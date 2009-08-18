@@ -1,5 +1,11 @@
-altos (0.4-82-gc6514ac) unstable; urgency=low
+altos (0.4+84+ge946fa2) unstable; urgency=low
+
+  * build for Debian from git
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 18 Aug 2009 11:52:46 -0600
+
+altos (0) unstable; urgency=low
 
   * Initial packaging
 
- -- Bdale Garbee <bdale@gag.com>  Mon, 17 Aug 2009 23:01:22 -0600
+ -- Bdale Garbee <bdale@gag.com>  Tue, 18 Aug 2009 11:43:43 -0600
