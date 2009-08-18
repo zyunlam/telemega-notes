@@ -12,7 +12,7 @@ prebuild:
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	./autogen.sh
+	./autogen.sh --prefix=/usr
 	touch configure-stamp
 
 build: build-stamp
