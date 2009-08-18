@@ -2,6 +2,7 @@
 # -*- makefile -*-
 
 export DH_VERBOSE=1
+PKG_VERSION := $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-.*/\1/p'| sed 's/+dfsg//')
 
 configure: configure-stamp
 configure-stamp:
@@ -13,7 +14,7 @@ build: build-stamp
 
 build-stamp: configure-stamp  
 	dh_testdir
-	$(MAKE)
+	$(MAKE) VERSION=$(PKG_VERSION)
 	touch $@
 
 clean: 
