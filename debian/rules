@@ -4,6 +4,11 @@
 export DH_VERBOSE=1
 PKG_VERSION := $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-.*/\1/p'| sed 's/+dfsg//')
 
+# this target invoked by git-buildpackage using a clean hook, see .gbp.conf
+prebuild:
+	dch -v `git describe | tr - +` "build for Debian from git"
+	git commit debian/changelog -m "update Debian changelog for build"
+
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
