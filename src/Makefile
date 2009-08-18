@@ -4,7 +4,7 @@
 #
 CC=sdcc
 
-VERSION=$(shell git describe)
+VERSION=$(shell cat version)
 
 CFLAGS=--model-small --debug --opt-code-speed
 
