@@ -1,3 +1,15 @@
+commit ea86b19629001059952f7572fa8564e2263dc9f6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 18 20:47:41 2009 -0600
+
+    deliver sources.list.d fragment so updates are closer to automatic
+
+commit cec78502c06f11880366f6131c0442906c6ed864
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 18 20:17:31 2009 -0600
+
+    update changelogs for Debian build
+
 commit 82d24bc65af85231b0d67394b30adfdb7beb6564
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 18 20:17:08 2009 -0600
