@@ -8,13 +8,12 @@ PKG_VERSION := $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)/\1/p')
 prebuild:
 	dch -v `git describe | tr - +` "build for Debian from git"
 	git commit debian/changelog -m "update Debian changelog for build"
-	
+	git log > ChangeLog
 
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	./autogen.sh --prefix=/usr
-	make ChangeLog
 	touch configure-stamp
 
 build: build-stamp
