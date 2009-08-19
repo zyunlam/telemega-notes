@@ -7,8 +7,9 @@ PKG_VERSION := $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)/\1/p')
 # this target invoked by git-buildpackage using a clean hook, see .gbp.conf
 prebuild:
 	dch -v `git describe | tr - +` "build for Debian from git"
-	git commit debian/changelog -m "update Debian changelog for build"
 	git log > ChangeLog
+	git commit ChangeLog debian/changelog \
+		-m "update changelogs for Debian build"
 
 configure: configure-stamp
 configure-stamp:
