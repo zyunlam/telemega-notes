@@ -1,3 +1,15 @@
+commit c71937b9744e7dc2d339c41a8f8f67f183352a70
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 10 15:20:38 2010 -0600
+
+    change all references to 'drogue' igniter to be 'apogee' instead
+
+commit b3a2e1221735d54dc3f2b97b4e75ed6f33ab8227
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 10 15:01:14 2010 -0600
+
+    update changelogs for Debian build
+
 commit 9394393c24c0a96b94319f2d0aa78fb498a121c9
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Apr 9 17:51:01 2010 -0700
