@@ -125,7 +125,7 @@ ao_log(void)
 				ao_log_data(&log);
 				log.type = AO_LOG_DEPLOY;
 				log.tick = ao_adc_ring[ao_log_adc_pos].tick;
-				log.u.deploy.drogue = ao_adc_ring[ao_log_adc_pos].sense_d;
+				log.u.deploy.apogee = ao_adc_ring[ao_log_adc_pos].sense_d;
 				log.u.deploy.main = ao_adc_ring[ao_log_adc_pos].sense_m;
 				ao_log_data(&log);
 			}

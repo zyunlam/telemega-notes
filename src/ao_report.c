@@ -106,7 +106,7 @@ ao_report_igniter_ready(enum ao_igniter igniter)
 static void
 ao_report_continuity(void) __reentrant
 {
-	uint8_t	c = (ao_report_igniter_ready(ao_igniter_drogue) |
+	uint8_t	c = (ao_report_igniter_ready(ao_igniter_apogee) |
 		     (ao_report_igniter_ready(ao_igniter_main) << 1));
 	if (c) {
 		while (c--) {

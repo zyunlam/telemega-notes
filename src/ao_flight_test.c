@@ -37,7 +37,7 @@ struct ao_adc {
 	int16_t		pres;		/* pressure sensor */
 	int16_t		temp;		/* temperature sensor */
 	int16_t		v_batt;		/* battery voltage */
-	int16_t		sense_d;	/* drogue continuity sense */
+	int16_t		sense_d;	/* apogee continuity sense */
 	int16_t		sense_m;	/* main continuity sense */
 };
 
@@ -74,14 +74,14 @@ uint8_t ao_adc_head;
 #define ao_packet_slave_start()
 
 enum ao_igniter {
-	ao_igniter_drogue = 0,
+	ao_igniter_apogee = 0,
 	ao_igniter_main = 1
 };
 
 void
 ao_ignite(enum ao_igniter igniter)
 {
-	printf ("ignite %s\n", igniter == ao_igniter_drogue ? "drogue" : "main");
+	printf ("ignite %s\n", igniter == ao_igniter_apogee ? "apogee" : "main");
 }
 
 struct ao_task {

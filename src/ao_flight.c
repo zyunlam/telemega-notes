@@ -347,7 +347,7 @@ ao_flight(void)
 			break;
 		case ao_flight_coast:
 
-			/* apogee detect: coast to drogue deploy:
+			/* apogee detect: coast to apogee drogue deploy:
 			 *
 			 * barometer: fall at least 10m
 			 *
@@ -359,8 +359,8 @@ ao_flight(void)
 			 */
 			if (ao_flight_pres > ao_min_pres + BARO_APOGEE)
 			{
-				/* ignite the drogue charge */
-				ao_ignite(ao_igniter_drogue);
+				/* ignite the apogee charge */
+				ao_ignite(ao_igniter_apogee);
 
 				/* slow down the telemetry system */
 				ao_telemetry_set_interval(AO_TELEMETRY_INTERVAL_RECOVER);

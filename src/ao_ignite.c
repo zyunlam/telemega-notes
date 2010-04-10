@@ -63,7 +63,7 @@ ao_igniter_status(enum ao_igniter igniter)
 
 	value = (AO_IGNITER_CLOSED>>1);
 	switch (igniter) {
-	case ao_igniter_drogue:
+	case ao_igniter_apogee:
 		value = adc.sense_d;
 		break;
 	case ao_igniter_main:
@@ -83,7 +83,7 @@ ao_igniter_fire(enum ao_igniter igniter) __critical
 {
 	ao_ignition[igniter].firing = 1;
 	switch (igniter) {
-	case ao_igniter_drogue:
+	case ao_igniter_apogee:
 		AO_IGNITER_DROGUE = 1;
 		ao_delay(AO_IGNITER_FIRE_TIME);
 		AO_IGNITER_DROGUE = 0;
@@ -106,9 +106,9 @@ ao_igniter(void)
 	ao_config_get();
 	for (;;) {
 		ao_sleep(&ao_ignition);
-		for (igniter = ao_igniter_drogue; igniter <= ao_igniter_main; igniter++) {
+		for (igniter = ao_igniter_apogee; igniter <= ao_igniter_main; igniter++) {
 			if (ao_ignition[igniter].request && !ao_ignition[igniter].fired) {
-				if (igniter == ao_igniter_drogue && ao_config.apogee_delay)
+				if (igniter == ao_igniter_apogee && ao_config.apogee_delay)
 					ao_delay(AO_SEC_TO_TICKS(ao_config.apogee_delay));
 
 				ao_igniter_fire(igniter);
@@ -132,8 +132,8 @@ ao_ignite_manual(void)
 		if(ao_match_word("main"))
 			ao_igniter_fire(ao_igniter_main);
 	} else {
-		if(ao_match_word("drogue"))
-			ao_igniter_fire(ao_igniter_drogue);
+		if(ao_match_word("apogee"))
+			ao_igniter_fire(ao_igniter_apogee);
 	}
 }
 
@@ -153,12 +153,12 @@ ao_ignite_print_status(enum ao_igniter igniter, __code char *name) __reentrant
 void
 ao_ignite_test(void)
 {
-	ao_ignite_print_status(ao_igniter_drogue, "drogue");
+	ao_ignite_print_status(ao_igniter_apogee, "apogee");
 	ao_ignite_print_status(ao_igniter_main, "main");
 }
 
 __code struct ao_cmds ao_ignite_cmds[] = {
-	{ 'i',	ao_ignite_manual,	"i <key> {main|drogue}              Fire igniter. <key> is doit with D&I" },
+	{ 'i',	ao_ignite_manual,	"i <key> {main|apogee}              Fire igniter. <key> is doit with D&I" },
 	{ 't',  ao_ignite_test,		"t                                  Test igniter continuity" },
 	{ 0,	ao_ignite_manual,	NULL },
 };

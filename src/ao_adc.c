@@ -74,7 +74,7 @@ ao_adc_dump(void) __reentrant
 {
 	static __xdata struct ao_adc	packet;
 	ao_adc_get(&packet);
-	printf("tick: %5u accel: %5d pres: %5d temp: %5d batt: %5d drogue: %5d main: %5d\n",
+	printf("tick: %5u accel: %5d pres: %5d temp: %5d batt: %5d apogee: %5d main: %5d\n",
 	       packet.tick, packet.accel, packet.pres, packet.temp,
 	       packet.v_batt, packet.sense_d, packet.sense_m);
 }
@@ -93,7 +93,7 @@ ao_adc_init(void)
 		  (1 << 2) |	/* v0.1 temperature */
 #endif
 		  (1 << 3) |	/* battery voltage */
-		  (1 << 4) |	/* drogue sense */
+		  (1 << 4) |	/* apogee sense */
 		  (1 << 5));	/* main sense */
 
 	/* enable interrupts */

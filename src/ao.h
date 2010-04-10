@@ -157,7 +157,7 @@ struct ao_adc {
 	int16_t		pres;		/* pressure sensor */
 	int16_t		temp;		/* temperature sensor */
 	int16_t		v_batt;		/* battery voltage */
-	int16_t		sense_d;	/* drogue continuity sense */
+	int16_t		sense_d;	/* apogee continuity sense */
 	int16_t		sense_m;	/* main continuity sense */
 };
 
@@ -523,7 +523,7 @@ struct ao_log_record {
 			int16_t		v_batt;
 		} temp_volt;
 		struct {
-			int16_t		drogue;
+			int16_t		apogee;
 			int16_t		main;
 		} deploy;
 		struct {
@@ -932,7 +932,7 @@ ao_add_stdio(char (*pollchar)(void),
  */
 
 enum ao_igniter {
-	ao_igniter_drogue = 0,
+	ao_igniter_apogee = 0,
 	ao_igniter_main = 1
 };
 
