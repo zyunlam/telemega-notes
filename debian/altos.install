@@ -2,7 +2,6 @@ debian/altos.desktop	usr/share/applications
 debian/altos.list	etc/apt/sources.list.d
 debian/altusmetrum.xpm	usr/share/pixmaps
 src/*.ihx		usr/share/altos
-src/*.map		usr/share/altos
 themes/background.png		usr/share/slim/themes/altusmetrum
 themes/slim/panel.png		usr/share/slim/themes/altusmetrum
 themes/slim/slim.theme		usr/share/slim/themes/altusmetrum
