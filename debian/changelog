@@ -1,3 +1,9 @@
+altos (0.7+27+gd6ffd49) unstable; urgency=low
+
+  * no need to deliver .map files any more
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 30 Aug 2010 19:46:42 -0600
+
 altos (0.7+25+g2a004d1) unstable; urgency=low
 
   * don't build all the "fat" jar deliverables by default
