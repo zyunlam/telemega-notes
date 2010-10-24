@@ -166,11 +166,15 @@ TT_SRC = \
 TD_MAIN_SRC = \
 	ao_teledongle.c
 
+TD_DRIVER_SRC = \
+	ao_pins.c
+
 TD_SRC = \
 	$(ALTOS_SRC) \
 	$(ALTOS_DRIVER_SRC) \
 	$(TELE_RECEIVER_SRC) \
 	$(TELE_COMMON_SRC) \
+	$(TD_DRIVER_SRC) \
 	$(TD_MAIN_SRC)
 
 include Makefile.defs
