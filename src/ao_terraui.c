@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009 Keith Packard <keithp@keithp.com>
+ * Copyright © 2010 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +15,36 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#define AO_NO_ADC_ISR 1
 #include "ao.h"
 
-void
-main(void)
-{
-	ao_clock_init();
+static __code uint8_t ready_beeps[] = {
+	AO_BEEP_g,	AO_MS_TO_TICKS(100),
+	AO_BEEP_bb,	AO_MS_TO_TICKS(100),
+	AO_BEEP_dd,	AO_MS_TO_TICKS(100),
+	AO_BEEP_gg,	AO_MS_TO_TICKS(200),
+	AO_BEEP_dd,	AO_MS_TO_TICKS(100),
+	AO_BEEP_gg,	AO_MS_TO_TICKS(400),
+};
 
-	/* Turn on the red LED until the system is stable */
-	ao_led_init(AO_LED_RED|AO_LED_GREEN);
-	ao_led_on(AO_LED_RED);
-	ao_timer_init();
-	ao_beep_init();
-	ao_cmd_init();
-	ao_usb_init();
-	ao_serial_init();
-	ao_gps_init();
-	ao_monitor_init(AO_LED_GREEN, TRUE);
-	ao_radio_init();
-	ao_config_init();
-	ao_terraui_init();
-	ao_start_scheduler();
+#define NUM_READY	(sizeof(ready_beeps) / 2)
+
+__xdata uint8_t	ao_terraui_wakeup;
+
+void
+ao_terraui(void)
+{
+	uint8_t	i;
+
+	for (i = 0; i < sizeof(ready_beeps); i += 2)
+		ao_beep_for(ready_beeps[i], ready_beeps[i+1]);
+	for (;;)
+		ao_sleep(&ao_terraui_wakeup);
+}
+
+static __xdata struct ao_task	terraui_task;
+
+void
+ao_terraui_init(void)
+{
+	ao_add_task(&terraui_task, ao_terraui, "terraui");
 }

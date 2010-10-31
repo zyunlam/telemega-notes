@@ -147,6 +147,10 @@ TI_SRC = \
 
 TT_MAIN_SRC = \
 	ao_teleterra.c
+
+TT_TASK_SRC = \
+	ao_terraui.c
+
 #
 # All sources for TeleTerra
 #
@@ -156,8 +160,8 @@ TT_SRC = \
 	$(TELE_RECEIVER_SRC) \
 	$(TELE_DRIVER_SRC) \
 	$(TELE_COMMON_SRC) \
-	$(TT_MAIN_SRC)
-
+	$(TT_MAIN_SRC) \
+	$(TT_TASK_SRC)
 
 #
 # Sources for TeleDongle
