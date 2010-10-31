@@ -31,6 +31,9 @@
 /* Convert a __data pointer into an __xdata pointer */
 #define DATA_TO_XDATA(a)	((void __xdata *) ((uint8_t) (a) | 0xff00))
 
+/* Convert a __code pointer into an __xdata pointer */
+#define CODE_TO_XDATA(a)	((void __xdata *) ((uint16_t) (a)))
+
 /* Stack runs from above the allocated __data space to 0xfe, which avoids
  * writing to 0xff as that triggers the stack overflow indicator
  */
@@ -1111,5 +1114,16 @@ ao_terraui(void);
 
 void
 ao_terraui_init(void);
+
+/* ao_audio.c */
+
+void
+ao_audio_test(void);
+
+void
+ao_audio_send(__xdata uint8_t *samples, uint16_t nsamples) __reentrant;
+
+void
+ao_audio_init(void);
 
 #endif /* _AO_H_ */

@@ -1,0 +1,10 @@
+PROG = teleterra-v0.1-$(VERSION).ihx
+
+SRC = \
+	$(TT_SRC) \
+	$(SKY_DRIVER_SRC) \
+	$(DBG_SRC)
+
+PRODUCT=TeleTerra-v0.1
+PRODUCT_DEF=-DTELETERRA_V_0_1
+IDPRODUCT=0x000d

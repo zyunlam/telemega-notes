@@ -149,6 +149,7 @@ TT_MAIN_SRC = \
 	ao_teleterra.c
 
 TT_TASK_SRC = \
+	ao_audio.c \
 	ao_terraui.c
 
 #

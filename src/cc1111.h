@@ -329,9 +329,13 @@ sfr __at 0xEE T4CCTL1;
 
 /* Timer compare value */
 sfr __at 0xCD T3CC0;
+__xdata __at (0xDFCD) volatile uint8_t T3CC0XADDR;
 sfr __at 0xCF T3CC1;
+__xdata __at (0xDFCF) volatile uint8_t T3CC1XADDR;
 sfr __at 0xED T4CC0;
+__xdata __at (0xDFED) volatile uint8_t T4CC0XADDR;
 sfr __at 0xEF T4CC1;
+__xdata __at (0xDFEF) volatile uint8_t T4CC1XADDR;
 
 /*
  * Peripheral control

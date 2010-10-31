@@ -17,26 +17,12 @@
 
 #include "ao.h"
 
-static __code uint8_t ready_beeps[] = {
-	AO_BEEP_g,	AO_MS_TO_TICKS(100),
-	AO_BEEP_bb,	AO_MS_TO_TICKS(100),
-	AO_BEEP_dd,	AO_MS_TO_TICKS(100),
-	AO_BEEP_gg,	AO_MS_TO_TICKS(200),
-	AO_BEEP_dd,	AO_MS_TO_TICKS(100),
-	AO_BEEP_gg,	AO_MS_TO_TICKS(400),
-};
-
-#define NUM_READY	(sizeof(ready_beeps) / 2)
-
 __xdata uint8_t	ao_terraui_wakeup;
 
 void
 ao_terraui(void)
 {
-	uint8_t	i;
-
-	for (i = 0; i < sizeof(ready_beeps); i += 2)
-		ao_beep_for(ready_beeps[i], ready_beeps[i+1]);
+	ao_audio_test();
 	for (;;)
 		ao_sleep(&ao_terraui_wakeup);
 }
