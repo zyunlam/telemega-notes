@@ -586,7 +586,9 @@ ao_audio_send(__xdata uint8_t *samples, uint16_t nsamples) __reentrant
 
 	/*
 	 * Turn on timer 4. Free running from 0 to 0xff, with P2_0
-	 * on interval controlled by data written to T4CC0
+	 * 'on' interval controlled by the value in T4CC0. Run this
+	 * timer as fast as possible, resulting in a frequency of
+	 * 24e6/256 or 93750Hz.
 	 */
 	T4CCTL0 = TxCCTLy_CMP_SET_UP_CLEAR_DOWN | TxCCTLy_CMP_MODE_ENABLE;
 	T4CC0 = 0x7f;
@@ -595,7 +597,11 @@ ao_audio_send(__xdata uint8_t *samples, uint16_t nsamples) __reentrant
 	P2SEL = (P2SEL & ~P2SEL_SELP2_0_MASK) | P2SEL_SELP2_0_PERIPHERAL;
 
 	/*
-	 * Turn on timer 3 to clock data to the PWM output
+	 * Turn on timer 3 to clock data to the PWM output. This
+	 * runs at 24e6/(17 * 128) or 11029Hz, almost exactly the
+	 * desired 11025Hz. Each cycle of the counter, a DMA transfer
+	 * reads a sample and writes to the T4CC0 register, which
+	 * controls the pulse width of the final audio signal
 	 */
 	T3CCTL0 = TxCCTLy_CMP_SET_UP_CLEAR_DOWN|TxCCTLy_CMP_MODE_ENABLE;
 	T3CC0 = 17;
@@ -603,10 +609,11 @@ ao_audio_send(__xdata uint8_t *samples, uint16_t nsamples) __reentrant
 	while (nsamples) {
 		uint16_t	this_samples;
 
+		/* Sigh. The DMA engine has only 13 bits of length */
 		if ((this_samples = nsamples) > 0x1fff)
 			this_samples = 0x1fff;
 		/*
-		 * Set up DMA from the samples to T4CC0, triggered by T3 CH0
+		 * Set up DMA to write samples to T4CC0, triggered by T3 CH0
 		 */
 		ao_dma_set_transfer(ao_audio_dma,
 				    samples,
