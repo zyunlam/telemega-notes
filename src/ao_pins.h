@@ -31,6 +31,7 @@
 	#define AO_LED_RED		1
 	#define LEDS_AVAILABLE		(AO_LED_RED)
 	#define HAS_EXTERNAL_TEMP	0
+        #define AUDIO_STANDBY_ON_P2_4	0
 #endif
 
 #if defined(TELEDONGLE_V_0_2)
@@ -45,6 +46,7 @@
 	#define AO_LED_RED		1
 	#define AO_LED_GREEN		2
 	#define LEDS_AVAILABLE		(AO_LED_RED|AO_LED_GREEN)
+        #define AUDIO_STANDBY_ON_P2_4	0
 #endif
 
 #if defined(TELEMETRUM_V_0_1)
@@ -60,6 +62,7 @@
 	#define AO_LED_GREEN		1
 	#define LEDS_AVAILABLE		(AO_LED_RED|AO_LED_GREEN)
 	#define HAS_EXTERNAL_TEMP	1
+        #define AUDIO_STANDBY_ON_P2_4	0
 #endif
 
 #if defined(TELEDONGLE_V_0_1)
@@ -74,6 +77,7 @@
 	#define AO_LED_RED		2
 	#define AO_LED_GREEN		1
 	#define LEDS_AVAILABLE		(AO_LED_RED|AO_LED_GREEN)
+        #define AUDIO_STANDBY_ON_P2_4	0
 #endif
 
 #if defined(TELETERRA_V_0_1)
@@ -88,6 +92,7 @@
 	#define AO_LED_RED		1
 	#define AO_LED_GREEN		2
 	#define LEDS_AVAILABLE		(AO_LED_RED|AO_LED_GREEN)
+        #define AUDIO_STANDBY_ON_P2_4	1
 #endif
 
 #if defined(TIDONGLE)
@@ -101,6 +106,7 @@
 	#define PACKET_HAS_SLAVE	0
 	#define AO_LED_RED		2
 	#define LEDS_AVAILABLE		(AO_LED_RED)
+        #define AUDIO_STANDBY_ON_P2_4	0
 #endif
 
 #if DBG_ON_P1
@@ -161,6 +167,11 @@
 
 #ifndef PACKET_HAS_SLAVE
 #error Please define PACKET_HAS_SLAVE
+#endif
+
+
+#ifndef AUDIO_STANDBY_ON_P2_4
+#error Please define AUDIO_STANDBY_ON_P2_4
 #endif
 
 #endif /* _AO_PINS_H_ */

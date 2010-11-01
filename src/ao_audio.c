@@ -584,6 +584,12 @@ ao_audio_send(__xdata uint8_t *samples, uint16_t nsamples) __reentrant
 {
 	ao_mutex_get(&ao_audio_mutex);
 
+#if AUDIO_STANDBY_ON_P2_4
+	/*
+	 * Turn on the audio amp
+	 */
+	P2_4 = 1;
+#endif
 	/*
 	 * Turn on timer 4. Free running from 0 to 0xff, with P2_0
 	 * 'on' interval controlled by the value in T4CC0. Run this
@@ -641,6 +647,12 @@ ao_audio_send(__xdata uint8_t *samples, uint16_t nsamples) __reentrant
 	P2_0 = 0;
 	P2SEL = (P2SEL & ~P2SEL_SELP2_0_MASK) | P2SEL_SELP2_0_GPIO;
 
+#if AUDIO_STANDBY_ON_P2_4
+	/*
+	 * Turn off the audio amp
+	 */
+	P2_4 = 0;
+#endif
 	ao_mutex_put(&ao_audio_mutex);
 }
 
@@ -664,6 +676,12 @@ ao_audio_init(void)
 	P2_0 = 0;
 	P2SEL = (P2SEL & ~P2SEL_SELP2_0_MASK) | P2SEL_SELP2_0_GPIO;
 	PERCFG = (PERCFG & ~PERCFG_T4CFG_ALT_MASK) | PERCFG_T4CFG_ALT_2;
+
+#if AUDIO_STANDBY_ON_P2_4
+	P2_4 = 0;
+	P2SEL &= ~P2SEL_SELP2_4_PERIPHERAL;
+	P2DIR |= (1 << 4);
+#endif
 
 	/* Timer 3 is used to clock the DMA transfers from the audio data buffer
 	 * to the timer 4
