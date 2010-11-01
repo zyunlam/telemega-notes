@@ -651,7 +651,7 @@ ao_audio_send(__xdata uint8_t *samples, uint16_t nsamples) __reentrant
 	/*
 	 * Turn off the audio amp
 	 */
-	P2_4 = 0;
+	P2_4 = 1;
 #endif
 	ao_mutex_put(&ao_audio_mutex);
 }
@@ -678,7 +678,7 @@ ao_audio_init(void)
 	PERCFG = (PERCFG & ~PERCFG_T4CFG_ALT_MASK) | PERCFG_T4CFG_ALT_2;
 
 #if AUDIO_STANDBY_ON_P2_4
-	P2_4 = 0;
+	P2_4 = 1;
 	P2SEL &= ~P2SEL_SELP2_4_PERIPHERAL;
 	P2DIR |= (1 << 4);
 #endif
