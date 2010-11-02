@@ -373,7 +373,5 @@ ao_flash_init(void)
 	SPI_CS_PORT |= M25_CS_MASK;	/* raise all CS pins */
 	SPI_CS_DIR |= M25_CS_MASK;	/* set CS pins as outputs */
 	SPI_CS_SEL &= ~M25_CS_MASK;	/* set CS pins as GPIO */
-	ao_spi_init();
-
 	ao_cmd_register(&ao_flash_cmds[0]);
 }
