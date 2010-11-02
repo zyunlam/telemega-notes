@@ -334,7 +334,7 @@ ao_flash_info(void) __reentrant
 
 	printf ("Detected chips %d size %d\n", ao_m25_numchips, ao_m25_total);
 	for (chip = 0; chip < ao_m25_numchips; chip++)
-		printf ("Flash chip %d select %02x size %d manf %02x type %02x cap %02x uid %02x\n",
+		printf ("Flash chip %d select %02x size %d\n",
 			chip, ao_m25_pin[chip], ao_m25_size[chip]);
 
 	printf ("Available chips:\n");
