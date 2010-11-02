@@ -340,6 +340,5 @@ ao_ee_init(void)
 	P1DIR |= (1 << EE_CS_INDEX);
 	P1SEL &= ~(1 << EE_CS_INDEX);
 
-	ao_spi_init();
 	ao_cmd_register(&ao_ee_cmds[0]);
 }

@@ -455,7 +455,5 @@ ao_ee_init(void)
 	FLASH_CS = 1;
 	P1DIR |= (1 << FLASH_CS_INDEX);
 	P1SEL &= ~(1 << FLASH_CS_INDEX);
-
-	ao_spi_init();
 	ao_cmd_register(&ao_flash_cmds[0]);
 }
