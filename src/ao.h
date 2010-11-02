@@ -479,6 +479,24 @@ void
 ao_ee_init(void);
 
 /*
+ * ao_m25.c
+ *
+ * Numonyx M25P family flash driver
+ */
+
+void
+ao_flash_erase_sector(uint8_t sector) __reentrant;
+
+void
+ao_flash_write_page(uint16_t page, __xdata uint8_t d[256]) __reentrant;
+
+void
+ao_flash_read_page(uint16_t page, __xdata uint8_t d[256]) __reentrant;
+
+void
+ao_flash_init(void);
+
+/*
  * ao_log.c
  */
 
@@ -746,6 +764,19 @@ ao_serial_set_speed(uint8_t speed);
 void
 ao_serial_init(void);
 #endif
+
+/*
+ * ao_spi.c
+ */
+
+void
+ao_spi_send(void __xdata *block, uint16_t len) __reentrant;
+
+void
+ao_spi_recv(void __xdata *block, uint16_t len) __reentrant;
+
+void
+ao_spi_init(void);
 
 /*
  * ao_gps.c

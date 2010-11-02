@@ -27,6 +27,8 @@ main(void)
 	ao_led_init(AO_LED_RED|AO_LED_GREEN);
 	ao_led_on(AO_LED_RED);
 	ao_timer_init();
+	ao_spi_init();
+	ao_flash_init();
 	ao_audio_init();
 	ao_cmd_init();
 	ao_usb_init();

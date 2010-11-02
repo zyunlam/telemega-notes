@@ -2,6 +2,7 @@ PROG = teleterra-v0.1-$(VERSION).ihx
 
 SRC = \
 	$(TT_SRC) \
+	$(SPI_DRIVER_SRC) \
 	$(SKY_DRIVER_SRC) \
 	$(DBG_SRC)
 
