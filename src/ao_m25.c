@@ -174,6 +174,32 @@ ao_m25_set_page_address(uint16_t page)
 }
 
 /*
+ * Scan the possible chip select lines
+ * to see which flash chips are connected
+ */
+static void
+ao_m25_scan(void)
+{
+	uint8_t	pin, size;
+
+	if (ao_m25_total)
+		return;
+
+	ao_m25_numchips = 0;
+	for (pin = 1; pin != 0; pin <<= 1) {
+		if (M25_CS_MASK & pin) {
+			size = ao_m25_read_capacity(pin);
+			if (size != 0) {
+				ao_m25_size[ao_m25_numchips] = size;
+				ao_m25_pin[ao_m25_numchips] = pin;
+				ao_m25_total += size;
+				ao_m25_numchips++;
+			}
+		}
+	}
+}
+
+/*
  * Erase the specified sector
  */
 void
@@ -183,6 +209,7 @@ ao_flash_erase_sector(uint8_t sector) __reentrant
 	uint16_t page = AO_M25_SECTOR_TO_PAGE(sector);
 
 	ao_mutex_get(&ao_m25_mutex);
+	ao_m25_scan();
 
 	cs = ao_m25_set_page_address(page);
 	ao_m25_wait_wip(cs);
@@ -206,6 +233,7 @@ ao_flash_write_page(uint16_t page, uint8_t __xdata *d) __reentrant
 	uint8_t	cs;
 
 	ao_mutex_get(&ao_m25_mutex);
+	ao_m25_scan();
 
 	cs = ao_m25_set_page_address(page);
 	ao_m25_write_enable(cs);
@@ -228,6 +256,7 @@ ao_flash_read_page(uint16_t page, __xdata uint8_t *d) __reentrant
 	uint8_t	cs;
 
 	ao_mutex_get(&ao_m25_mutex);
+	ao_m25_scan();
 
 	cs = ao_m25_set_page_address(page);
 
@@ -299,6 +328,10 @@ ao_flash_info(void) __reentrant
 {
 	uint8_t	chip, cs;
 
+	ao_mutex_get(&ao_m25_mutex);
+	ao_m25_scan();
+	ao_mutex_put(&ao_m25_mutex);
+
 	printf ("Detected chips %d size %d\n", ao_m25_numchips, ao_m25_total);
 	for (chip = 0; chip < ao_m25_numchips; chip++)
 		printf ("Flash chip %d select %02x size %d manf %02x type %02x cap %02x uid %02x\n",
@@ -336,25 +369,11 @@ __code struct ao_cmds ao_flash_cmds[] = {
 void
 ao_flash_init(void)
 {
-	uint8_t	pin, size;
-
 	/* Set up chip select wires */
 	SPI_CS_PORT |= M25_CS_MASK;	/* raise all CS pins */
 	SPI_CS_DIR |= M25_CS_MASK;	/* set CS pins as outputs */
 	SPI_CS_SEL &= ~M25_CS_MASK;	/* set CS pins as GPIO */
 	ao_spi_init();
 
-	ao_m25_numchips = 0;
-	for (pin = 1; pin != 0; pin <<= 1) {
-		if (M25_CS_MASK & pin) {
-			size = ao_m25_read_capacity(pin);
-			if (size != 0) {
-				ao_m25_size[ao_m25_numchips] = size;
-				ao_m25_pin[ao_m25_numchips] = pin;
-				ao_m25_total += size;
-				ao_m25_numchips++;
-			}
-		}
-	}
 	ao_cmd_register(&ao_flash_cmds[0]);
 }
