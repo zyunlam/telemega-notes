@@ -1,3 +1,59 @@
+altos (0.7.1+72+g594e805) unstable; urgency=low
+
+  [ Bdale Garbee ]
+  * remove the csv build dep, as that code will be abandoned
+
+  [ Keith Packard ]
+  * altosui: Remove ability to graph data in .csv files
+  * altosui: Separate out jfreechart and jcommon directories
+  * altosui: Split out flight monitoring to separate window
+  * altosui: Create buttons for main actions
+  * altosui: Fix channel setting at serial open time
+  * altosui: Fix more calls to AltosPreferences.channel()
+  * altosui: Create abstract interface for flight data display
+  * altosui: Add tab UI with 'pad' mode.
+  * altosui: Add ascent, descent and landed tabs
+  * altos: Use grey leds when unlit - easier to see
+
+  [ Anthony Towns ]
+  * use value_font for values
+  * add --replay command line argument
+  * read preferences for --replay
+  * reduce font size for FlightInfoTable
+  * use grayled.png for off
+  * add compass bearing to voice output
+  * add compass bearing during descent
+
+  [ Keith Packard ]
+  * altosui: Add RF calibration to TeleMetrum config dialog
+  * altosui: Eliminate unncessary import altosui lines
+  * altosui: Open serial device at 'new' time. Prohibit duplicate opens.
+  * altosui: Replace flight status table with labels, fix resize.
+  * altosui: With --replay option, exit when replay window is closed
+  * altosui: oops, missed a file in the previous commit
+  * altosui: eliminate menu bar, moving elements to buttons.
+  * altosui: add reboot button to telemetrum configuration UI
+  * altosui: Add callsign configuration in AltosUI configuration dialog
+  * altosui: Cleanup flight UI layout
+  * altosui: Add igniter status to ascent and descent tabs
+  * altosui: Add igniter ground testing code
+  * altosui: Unify datafile selection to AltosDataChooser
+  * altosui: Clean up global AltosUI configuration settings dialog
+  * doc: Add preliminary altosui documentation
+  * doc: git ignore generated doc files
+  * doc: Document the 'Flash Image' operation.
+  * altosui: Use timeouts to recover from broken packet links.
+
+  [ Bdale Garbee ]
+  * update turnon scripts to use stashed copies of stable release
+    firmware
+
+  [ Keith Packard ]
+  * altosui: switch channel selector to combo box. Shorten displayed
+    device names
+
+ -- Bdale Garbee <bdale@gag.com>  Fri, 19 Nov 2010 23:51:33 -0700
+
 altos (0.7.1+32+g8103432) unstable; urgency=low
 
   * add build-dep on libcsv-java
