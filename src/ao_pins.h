@@ -27,6 +27,23 @@
 	#define DBG_ON_P0 		0
 	#define PACKET_HAS_MASTER	0
 	#define PACKET_HAS_SLAVE	1
+	#define HAS_ADC_5V		0
+
+	#define AO_LED_RED		1
+	#define LEDS_AVAILABLE		(AO_LED_RED)
+	#define HAS_EXTERNAL_TEMP	0
+#endif
+
+#if defined(TELEMETRUM_V_1_1)
+	#define HAS_SERIAL_1		1
+	#define HAS_ADC			1
+	#define HAS_EEPROM		1
+	#define HAS_DBG			1
+	#define DBG_ON_P1 		1
+	#define DBG_ON_P0 		0
+	#define PACKET_HAS_MASTER	0
+	#define PACKET_HAS_SLAVE	1
+	#define HAS_ADC_5V		1
 
 	#define AO_LED_RED		1
 	#define LEDS_AVAILABLE		(AO_LED_RED)

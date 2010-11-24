@@ -40,6 +40,29 @@ ao_adc_get(__xdata struct ao_adc *packet)
 	memcpy(packet, &ao_adc_ring[i], sizeof (struct ao_adc));
 }
 
+#ifdef HAS_ADC_5V
+static void
+ao_fix_accel(void)
+{
+	uint32_t	total;
+	uint8_t		adc_l, adc_h;
+	uint8_t		ref_l, ref_h;
+	uint8_t __xdata	*p = (uint8_t __xdata *) &ao_adc_ring[ao_adc_head].accel;
+
+	ref_l = ADCL;
+	adc_l = p[0];
+	total = (uint32_t) (uint16_t) (adc_l * ref_l);
+
+	adc_h = p[1];
+	total += (uint32_t) (uint16_t) (adc_h * ref_l) << 8;
+
+	ref_h = ADCH;
+	total += (uint32_t) (uint16_t) (adc_l * ref_h) << 8;
+	total += (uint32_t) (uint16_t) (adc_h * ref_h) << 16;
+	*(uint16_t __xdata *) p = total >> 16;
+}
+#endif
+
 void
 ao_adc_isr(void) __interrupt 1
 {
@@ -47,13 +70,23 @@ ao_adc_isr(void) __interrupt 1
 	uint8_t	__xdata *a;
 
 	sequence = (ADCCON2 & ADCCON2_SCH_MASK) >> ADCCON2_SCH_SHIFT;
+#if HAS_ADC_5V
+	if (sequence == 2) {
+		ao_fix_accel();
+		/* and launch the temp sensor next */
+		ADCCON3 = ADCCON3_EREF_1_25 | ADCCON3_EDIV_512 | ADCCON3_ECH_TEMP;
+		return;
+	}
+#endif
+#if HAS_EXTERNAL_TEMP
 	if (sequence == ADCCON3_ECH_TEMP)
 		sequence = 2;
+#endif
 	a = (uint8_t __xdata *) (&ao_adc_ring[ao_adc_head].accel + sequence);
 	a[0] = ADCL;
 	a[1] = ADCH;
 	if (sequence < 5) {
-#if HAS_EXTERNAL_TEMP == 0
+#if !HAS_EXTERNAL_TEMP && !HAS_ADC_5V
 		/* start next channel conversion */
 		/* v0.2 replaces external temp sensor with internal one */
 		if (sequence == 1)
