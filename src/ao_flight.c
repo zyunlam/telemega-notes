@@ -146,16 +146,24 @@ ao_flight(void)
 	ao_raw_pres = 0;
 	ao_flight_tick = 0;
 	for (;;) {
-		ao_sleep(&ao_adc_ring);
+		ao_wakeup(DATA_TO_XDATA(&ao_flight_adc));
+		ao_sleep(DATA_TO_XDATA(&ao_adc_head));
 		while (ao_flight_adc != ao_adc_head) {
 			__pdata uint8_t ticks;
 			__pdata int16_t ao_vel_change;
+			__xdata int16_t *ao_adc;
 			ao_flight_prev_tick = ao_flight_tick;
 
 			/* Capture a sample */
-			ao_raw_accel = ao_adc_ring[ao_flight_adc].accel;
-			ao_raw_pres = ao_adc_ring[ao_flight_adc].pres;
-			ao_flight_tick = ao_adc_ring[ao_flight_adc].tick;
+			ao_adc = &ao_adc_ring[ao_flight_adc].tick;
+			ao_flight_tick = *ao_adc++;
+#if HAS_ACCEL_REF
+			ao_raw_accel = (uint16_t) ((((uint32_t) *ao_adc << 16) / (ao_accel_ref[ao_flight_adc] << 1))) >> 1;
+			*ao_adc++ = ao_raw_accel;
+#else
+			ao_raw_accel = *ao_adc++;
+#endif
+			ao_raw_pres = *ao_adc++;
 
 			ao_flight_accel -= ao_flight_accel >> 4;
 			ao_flight_accel += ao_raw_accel >> 4;
