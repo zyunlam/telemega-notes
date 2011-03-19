@@ -36,6 +36,16 @@
     </legalnotice>
     <revhistory>
       <revision>
+        <revnumber>0.9.2</revnumber>
+        <date>19 March 2011</date>
+	<revremark>
+	  Updated for software version 0.9.2.  This version has minor
+	  updates to the AltosUI code to fix graphing on Mac OS X and
+	  make flight data download more reliable. It is otherwise
+	  completely compatible with version 0.9.
+	</revremark>
+      </revision>
+      <revision>
         <revnumber>0.9</revnumber>
         <date>18 January 2011</date>
 	<revremark>
