@@ -1,3 +1,105 @@
+commit 7b1deb88f527692db0a4c05d4b85814315d5833f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Mar 19 21:47:38 2011 -0600
+
+    fix up git-buildpackage config file for life on the branch-0.9 branch
+
+commit 16b886fcd3a29e420a8351bc5da0baa4d7b77255
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 19 18:43:52 2011 -0700
+
+    altosui: Add software version to Configure AltosUI dialog
+    
+    Show this somewhere so we can figure out what is installed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    (cherry picked from commit e980b251e5a4d25410710a9aa89ef940e06b0d93)
+
+commit e2a2893fc04113ebc85a026c96f7317f4e82da58
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 19 16:54:21 2011 -0700
+
+    Update to 0.9.2
+    
+    Bump configure.ac and add notes to doc/altosumetrum.xsl
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8301a162cf23eac7b2fb5f8549e0ed3544e7a4dd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 16 14:10:06 2011 -0700
+
+    aoview: remove -s option.
+
+commit 189d82ed3ba35f2dd67ca9594c15c14a95b6fdf0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 16 14:05:13 2011 -0700
+
+    altosui: Missed jcommon.jar in the Mac OS install image
+    
+    This caused graphing to fail on Mac OS X
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    (cherry picked from commit 9f3d26cadf37880d2c9223f59271d295b11c4c2a)
+
+commit 2c1970e766f6ae5d5a6ac99f52f1ab23e041bec5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 19 01:06:01 2011 -0800
+
+    altosui: Display eeprom parsing errors to user
+    
+    When reading the eeprom, any parsing errors (most likely bad
+    checksums) indicate some kind of problem with either the hardware or
+    the flight software. Display these to the user and do not erase the
+    flight.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    (cherry picked from commit 249cd3b63d97581b068fff988e0cd7fcd5bf493e)
+
+commit 762657983fcf526cdf99b59a541e3f3cbb0701dc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 19 01:04:19 2011 -0800
+
+    altosui: Always read whole eeprom block, even at end of flight
+    
+    Instead of stopping early, continue reading the whole eeprom block so
+    that the extra serial data doesn't end up confusing the next user of
+    the serial line, which may well be reading the next flight.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    (cherry picked from commit 629a7637871b24fe6d1204aaa7185d84933d4639)
+
+commit 62fc5b2d33d4f64afff1f965ac52598ba9373bc0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 19 01:02:00 2011 -0800
+
+    altosui: Mark empty eeprom records 'invalid', don't generate exception
+    
+    When reading empty eeprom records, mark them as 'invalid', but don't
+    generate an exception as it's normal to read these at the end of the
+    flight log.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    (cherry picked from commit 7ca2cf1b7e03b8453b45b45e313a33ad65da9ad5)
+
+commit 2bb83d90aa03d825ca1b751418c91b194b72f1f9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 19 12:46:02 2011 -0700
+
+    elide changelog entries or re-release of 0.9
+
+commit 9541ccd9ff9e67e0862ca31706358d8308fc85d8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 19 12:42:40 2011 -0700
+
+    update turnon script to prefer TeleDongle as programmer
+
+commit 159fda30fe57349660c5e2d95017144ea3f5d7db
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 19 12:26:53 2011 -0700
+
+    update changelogs for Debian build
+
 commit 97f4f2e0d28eec1cf19d2d25140e42f6ac277700
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jan 19 11:21:52 2011 -0800
