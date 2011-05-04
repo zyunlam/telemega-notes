@@ -22,7 +22,7 @@
 #define LEDOUT		PORTB7
 #define LEDPORT		PORTB
 #define LEDDDR		DDRB
-#define LEDDDRPIN	DD6
+#define LEDDDRPIN	DD7
 
 int main(void)
 {
