@@ -46,7 +46,6 @@ void
 ao_usb_isr(void) __interrupt 6
 {
 	USBIF = 0;
-	IRCON2 &= ~IRCON2_USBIF;
 	ao_usb_iif |= USBIIF;
 	if (ao_usb_iif & 1)
 		ao_wakeup(&ao_usb_task);
@@ -59,7 +58,9 @@ ao_usb_isr(void) __interrupt 6
 	if (USBCIF & USBCIF_RSTIF)
 		ao_usb_set_interrupts();
 #if HAS_BTM
+#if BT_LINK_ON_P2
 	ao_btm_isr();
+#endif
 #endif
 }
 

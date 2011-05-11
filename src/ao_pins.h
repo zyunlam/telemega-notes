@@ -241,6 +241,45 @@
 	#define SPI_CS_ON_P1		1
 	#define SPI_CS_ON_P0		0
 	#define HAS_IGNITE		0
+	#define BT_LINK_ON_P2		1
+	#define BT_LINK_ON_P1		0
+	#define BT_LINK_PIN_INDEX	7
+	#define BT_LINK_PIN		P2_1
+#endif
+
+#if defined(TELEBT_V_0_1)
+	#define HAS_FLIGHT		0
+	#define HAS_USB			1
+	#define HAS_BEEP		1
+	#define HAS_SERIAL_1		1
+	#define HAS_SERIAL_1_ALT_1	1
+	#define HAS_SERIAL_1_ALT_2	0
+	#define HAS_SERIAL_1_HW_FLOW	1
+	#define USE_SERIAL_STDIN	1
+	#define HAS_ADC			0
+	#define HAS_DBG			1
+	#define HAS_EEPROM		1
+	#define USE_INTERNAL_FLASH	0
+	#define HAS_BTM			1
+	#define DBG_ON_P1 		1
+	#define DBG_ON_P0 		0
+	#define IGNITE_ON_P2		0
+	#define IGNITE_ON_P0		0
+	#define PACKET_HAS_MASTER	1
+	#define PACKET_HAS_SLAVE	0
+	#define AO_LED_RED		1
+	#define AO_LED_GREEN		2
+	#define LEDS_AVAILABLE		(AO_LED_RED|AO_LED_GREEN)
+	#define SPI_CS_ON_P1		1
+	#define SPI_CS_ON_P0		0
+	#define M25_CS_MASK		0x04	/* CS0 is P1_2 */
+	#define M25_MAX_CHIPS		1
+	#define HAS_ACCEL		0
+	#define HAS_IGNITE		0
+	#define BT_LINK_ON_P2		0
+	#define BT_LINK_ON_P1		1
+	#define BT_LINK_PIN_INDEX	7
+	#define BT_LINK_PIN		P1_7
 #endif
 
 #if DBG_ON_P1
