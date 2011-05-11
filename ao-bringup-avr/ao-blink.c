@@ -16,6 +16,7 @@
  */
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #define F_CPU 16000000UL	// 16 MHz
 #include <util/delay.h>
 
@@ -26,12 +27,51 @@
 
 int main(void)
 {
+	/* disable RC clock */
+	CLKSEL0 &= ~(1 << RCE);
+
+	/* Disable PLL */
+	PLLCSR &= ~(1 << PLLE);
+
+	/* Enable external clock */
+	CLKSEL0 |= (1 << EXTE);
+
+	/* wait for external clock to be ready */
+	while ((CLKSTA & (1 << EXTON)) == 0)
+		;
+
+	/* select external clock */
+	CLKSEL0 |= (1 << CLKS);
+
+	/* Disable the clock prescaler */
+	cli();
+	CLKPR = (1 << CLKPCE);
+	CLKPR = 0;
+	sei();
+
+	/* Set up the PLL to use the crystal */
+
+	/* Use primary system clock as PLL source */
+	PLLFRQ = ((0 << PINMUX) |	/* Use primary clock */
+		  (0 << PLLUSB) |	/* No divide by 2 for USB */
+		  (0 << PLLTM0) |	/* Disable high speed timer */
+		  (0x4 << PDIV0));	/* 48MHz PLL clock */
+
+	/* Set the frequency of the crystal */
+	PLLCSR |= (1 << PINDIV);	/* For 16MHz crystal on Teensy board */
+	// PLLCSR &= ~(1 << PINDIV);	/* For 8MHz crystal on TeleScience board */
+
+	/* Enable the PLL */
+	PLLCSR |= (1 << PLLE);
+	while (!(PLLCSR & (1 << PLOCK)))
+		;
+
 	LEDDDR |= (1 << LEDDDRPIN);
 
 	while (1) {
 		LEDPORT |= (1 << LEDOUT);
-		_delay_ms(200);
+		_delay_ms(1000);
 		LEDPORT &= ~(1 << LEDOUT);
-		_delay_ms(200);
+		_delay_ms(1000);
 	}
 }
