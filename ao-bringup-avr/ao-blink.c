@@ -17,7 +17,12 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#define TEENSY 1
+#if TEENSY
 #define F_CPU 16000000UL	// 16 MHz
+#else
+#define F_CPU  8000000UL	// 8 MHz
+#endif
 #include <util/delay.h>
 
 #define LEDOUT		PORTB7
@@ -25,18 +30,16 @@
 #define LEDDDR		DDRB
 #define LEDDDRPIN	DD7
 
+static void
+adc_start(void);
+
 ISR(TIMER1_COMPA_vect)
 {
-	static int	x;
-
-	if (++x > 50) {
-		x = 0;
-		LEDPORT ^= (1 << LEDOUT);
-	}
+	adc_start();
 }
 
 static void
-timer_init(void)
+timer1_init(void)
 {
 	TCCR1A = ((0 << WGM11) |	/* CTC mode, OCR1A */
 		  (0 << WGM10));	/* CTC mode, OCR1A */
@@ -46,8 +49,11 @@ timer_init(void)
 		  (1 << WGM12) |	/* CTC mode, OCR1A */
 		  (3 << CS10));		/* clk/64 from prescaler */
 
+#if TEENSY
 	OCR1A = 2500;			/* 16MHz clock */
-	// OCR1A = 1250;		/* 8MHz clock */
+#else
+	OCR1A = 1250;			/* 8MHz clock */
+#endif
 
 	TIMSK1 = (1 << OCIE1A);		/* Interrupt on compare match */
 }
@@ -86,8 +92,11 @@ clock_init(void)
 		  (0x4 << PDIV0));	/* 48MHz PLL clock */
 
 	/* Set the frequency of the crystal */
+#if TEENSY
 	PLLCSR |= (1 << PINDIV);	/* For 16MHz crystal on Teensy board */
-	// PLLCSR &= ~(1 << PINDIV);	/* For 8MHz crystal on TeleScience board */
+#else
+	PLLCSR &= ~(1 << PINDIV);	/* For 8MHz crystal on TeleScience board */
+#endif
 
 	/* Enable the PLL */
 	PLLCSR |= (1 << PLLE);
@@ -95,21 +104,66 @@ clock_init(void)
 		;
 }
 
+static void
+timer0_init(void)
+{
+	TCCR0A = ((1 << COM0A1) |
+		  (0 << COM0A0) |
+		  (1 << WGM01) |
+		  (1 << WGM00));
+
+	OCR0A = 0x10;
+	OCR0B = 0;
+	TIMSK0 = 0;
+
+	TCCR0B = ((0 << WGM02) |
+		  (5 << CS00));
+}
+
+ISR(ADC_vect)
+{
+	OCR0A = ADCH;
+}
+
+static void
+adc_start(void)
+{
+	ADMUX = ((0 << REFS1) |
+		 (1 << REFS0) |
+		 (1 << ADLAR) |
+		 (0 << MUX0));
+	ADCSRB &= ~(1 << MUX5);
+
+	ADCSRA = ((1 << ADEN) |
+		  (1 << ADSC) |
+		  (0 << ADATE) |
+		  (1 << ADIE) |
+		  (6 << ADPS0));
+}
+
+static void
+adc_init(void)
+{
+	ADCSRA = ((1 << ADEN) |
+		  (0 << ADSC) |
+		  (0 << ADATE) |
+		  (1 << ADIE) |
+		  (6 << ADPS0));
+	ADCSRB = ((0 << ADHSM) |
+		  (0 << MUX5) |
+		  (0 << ADTS0));
+	DIDR0 |= (1 << 0);
+}
+
 int main(void)
 {
 	clock_init();
-	timer_init();
+	adc_init();
+	timer1_init();
+	timer0_init();
 
 	LEDDDR |= (1 << LEDDDRPIN);
 
-	for (;;) {
-	}
-#if 0
-	while (1) {
-		LEDPORT |= (1 << LEDOUT);
-		_delay_ms(1000);
-		LEDPORT &= ~(1 << LEDOUT);
-		_delay_ms(1000);
-	}
-#endif
+	for (;;)
+		;
 }
