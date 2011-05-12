@@ -25,7 +25,35 @@
 #define LEDDDR		DDRB
 #define LEDDDRPIN	DD7
 
-int main(void)
+ISR(TIMER1_COMPA_vect)
+{
+	static int	x;
+
+	if (++x > 50) {
+		x = 0;
+		LEDPORT ^= (1 << LEDOUT);
+	}
+}
+
+static void
+timer_init(void)
+{
+	TCCR1A = ((0 << WGM11) |	/* CTC mode, OCR1A */
+		  (0 << WGM10));	/* CTC mode, OCR1A */
+	TCCR1B = ((0 << ICNC1) |	/* no input capture noise canceler */
+		  (0 << ICES1) |	/* input capture on falling edge (don't care) */
+		  (0 << WGM13) |	/* CTC mode, OCR1A */
+		  (1 << WGM12) |	/* CTC mode, OCR1A */
+		  (3 << CS10));		/* clk/64 from prescaler */
+
+	OCR1A = 2500;			/* 16MHz clock */
+	// OCR1A = 1250;		/* 8MHz clock */
+
+	TIMSK1 = (1 << OCIE1A);		/* Interrupt on compare match */
+}
+
+static void
+clock_init(void)
 {
 	/* disable RC clock */
 	CLKSEL0 &= ~(1 << RCE);
@@ -65,13 +93,23 @@ int main(void)
 	PLLCSR |= (1 << PLLE);
 	while (!(PLLCSR & (1 << PLOCK)))
 		;
+}
+
+int main(void)
+{
+	clock_init();
+	timer_init();
 
 	LEDDDR |= (1 << LEDDDRPIN);
 
+	for (;;) {
+	}
+#if 0
 	while (1) {
 		LEDPORT |= (1 << LEDOUT);
 		_delay_ms(1000);
 		LEDPORT &= ~(1 << LEDOUT);
 		_delay_ms(1000);
 	}
+#endif
 }
