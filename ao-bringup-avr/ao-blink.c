@@ -17,7 +17,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#define TEENSY 1
+#define TEENSY 0
 #if TEENSY
 #define F_CPU 16000000UL	// 16 MHz
 #else
