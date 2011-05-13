@@ -35,8 +35,10 @@ INC = \
 # Common AltOS sources
 #
 ALTOS_SRC = \
+	ao_cmd.c \
 	ao_mutex.c \
 	ao_panic.c \
+	ao_product.c \
 	ao_serial_avr.c \
 	ao_stdio.c \
 	ao_task.c \
@@ -96,4 +98,4 @@ install:
 
 uninstall:
 
-$(OBJ): ao.h
+$(OBJ): ao.h ao_product.h

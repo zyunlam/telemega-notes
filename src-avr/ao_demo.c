@@ -40,8 +40,9 @@ main(void)
 //	ao_debug_init();
 	ao_led_init(LEDS_AVAILABLE);
 	ao_timer_init();
+	ao_cmd_init();
 
-	ao_add_task(&demo_task, ao_demo, "demo");
+//	ao_add_task(&demo_task, ao_demo, "demo");
 	/* Turn on the LED until the system is stable */
 	ao_start_scheduler();
 	return 0;

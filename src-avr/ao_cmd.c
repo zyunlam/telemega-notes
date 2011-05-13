@@ -32,7 +32,7 @@ static void
 put_string(char *s)
 {
 	__xdata char	c;
-	while (c = *s++)
+	while ((c = *s++))
 		putchar(c);
 }
 
@@ -186,12 +186,14 @@ ao_match_word(__code char *word)
 	return 1;
 }
 
+#if 0
 static void
 eol(void)
 {
 	while (ao_cmd_lex_c != '\n')
 		ao_cmd_lex();
 }
+#endif
 
 static void
 echo(void)
@@ -220,7 +222,7 @@ version(void)
 {
 	printf("manufacturer     %s\n", ao_manufacturer);
 	printf("product          %s\n", ao_product);
-	printf("serial-number    %u\n", ao_romconfig.serial_number);
+//	printf("serial-number    %u\n", ao_romconfig.serial_number);
 	printf("software-version %s\n", ao_version);
 }
 
@@ -255,6 +257,7 @@ report(void)
 	case ao_cmd_syntax_error:
 		puts("Syntax error");
 		ao_cmd_status = 0;
+	default:
 		break;
 	}
 }
