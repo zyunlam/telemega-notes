@@ -8,6 +8,8 @@ CC=avr-gcc
 OBJCOPY=avr-objcopy
 CFLAGS=-g -mmcu=$(MCU) -Wall -Wstrict-prototypes -Os -mcall-prologues
 
+OBJS = ao-blink.o ao-switch.o ao-uart.o ao-bringup.o
+
 all: ao-blink.hex ao-switch.hex ao-uart.hex
 
 ao-blink.hex: ao-blink
@@ -31,11 +33,13 @@ ao-uart.hex: ao-uart
 	avr-size ao-uart
 	$(OBJCOPY) -R .eeprom -O ihex ao-uart $@
 
-ao-uart: ao-uart.o
-	$(CC) $(CFLAGS) -o $@ ao-uart.o
+ao-uart: ao-uart.o ao-bringup.o
+	$(CC) $(CFLAGS) -o $@ ao-uart.o ao-bringup.o
 
 ao-uart.s: ao-uart.c
 	$(CC) $(CFLAGS) -S -o $@ ao-uart.c
+
+$(OBJS): ao-bringup.h
 
 load-blink: ao-blink.hex
 	$(LOADCMD) $(LOADARG)ao-blink.hex

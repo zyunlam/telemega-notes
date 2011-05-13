@@ -15,13 +15,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include "ao-bringup.h"
+#ifndef _AO_BRINGUP_
+#define _AO_BRINGUP_
 
-int main(void)
-{
-	ao_bringup_init();
+#include <stdio.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#define TEENSY 1
+#if TEENSY
+#define F_CPU 16000000UL	// 16 MHz
+#else
+#define F_CPU  8000000UL	// 8 MHz
+#endif
+#include <util/delay.h>
 
-	for (;;) {
-		printf("Hello, world\n");
-	}
-}
+#define LEDOUT		PORTB7
+#define LEDPORT		PORTB
+#define LEDDDR		DDRB
+#define LEDDDRPIN	DD7
+
+void	ao_bringup_init(void);
+
+#endif
