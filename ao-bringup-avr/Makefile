@@ -23,8 +23,8 @@ ao-switch.hex: ao-switch
 	avr-size ao-switch
 	$(OBJCOPY) -R .eeprom -O ihex ao-switch $@
 
-ao-switch: ao-switch.o
-	$(CC) $(CFLAGS) -o $@ ao-switch.o
+ao-switch: ao-switch.o ao-bringup.o
+	$(CC) $(CFLAGS) -o $@ ao-switch.o ao-bringup.o
 
 ao-switch.s: ao-switch.c
 	$(CC) $(CFLAGS) -S -o $@ ao-switch.c

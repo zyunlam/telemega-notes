@@ -115,5 +115,10 @@ void	ao_bringup_init(void)
 	stdout = &mystdout;
 	stdin = &mystdin;
 
+	if (LEDDDR & (1 << LEDDDRPIN)) {
+		printf ("oops, starting all over\n");
+		for (;;)
+			;
+	}
 	LEDDDR |= (1 << LEDDDRPIN);
 }
