@@ -87,39 +87,12 @@ void
 switch_stack(void)
 {
 	uint8_t	*sp = (new_stack + stack_count);
-	uint8_t		l, h;
-
-//	for (l = 0; l < AO_STACK_SIZE - stack_count; l++)
-//		printf ("stack[%2d] = %2x\n", l, sp[l]);
-	l = new_stack[AO_STACK_SIZE - 1];
-	h = new_stack[AO_STACK_SIZE - 2];
-//	printf ("Target return address: h %02x l %02x\n", h, l);
-#if 0
-	asm("push %0" : : "r" (l));
-	asm("push %0" : : "r" (h));
-	asm("ret");
-#endif
-#if 0
-	asm("push r31; push r30");
-	asm("push r29; push r28; push r27; push r26; push r25");
-	asm("push r24; push r23; push r22; push r21; push r20");
-	asm("push r19; push r18; push r17; push r16; push r15");
-	asm("push r14; push r13; push r12; push r11; push r10");
-	asm("push r9; push r8; push r7; push r6; push r5");
-	asm("push r4; push r3; push r2; push r1; push r0");
-	asm("in r0, __SREG__" "\n\t"
-	    "push r0");
-#endif
-
 	uint8_t	sp_l, sp_h;
-	static	uint8_t reg[34];
+
 	sp_l = (uint16_t) sp;
 	sp_h = ((uint16_t) sp) >> 8;
 	asm volatile ("out __SP_H__,%0" : : "r" (sp_h) );
 	asm volatile ("out __SP_L__,%0" : : "r" (sp_l) );
-
-	asm volatile ("in %0,__SP_H__" : "=&r" (sp_h));
-	asm volatile ("in %0,__SP_L__" : "=&r" (sp_l));
 	asm volatile("pop r0"	"\n\t"
 		     "out __SREG__, r0");
 	asm volatile("pop r0" "\n\t"
@@ -154,14 +127,6 @@ switch_stack(void)
 		     "pop r29");
 	asm volatile("pop r30" "\n\t"
 		     "pop r31");
-	asm volatile ("in %0,__SP_H__" : "=&r" (sp_h));
-	asm volatile ("in %0,__SP_L__" : "=&r" (sp_l));
-	asm volatile ("pop %0" : "=&r" (h));
-	asm volatile ("pop %0" : "=&r" (l));
-	show_stack("before ret", sp_h, sp_l);
-	show_stack("returning to", h, l);
-	asm volatile("push %0" : : "r" (l));
-	asm volatile("push %0" : : "r" (h));
 	asm volatile("ret");
 }
 
