@@ -125,33 +125,37 @@ ISR(ADC_vect)
 	OCR0A = ADCH;
 }
 
+#define ADC_CHANNEL	0x25		/* Channel ADC13 */
+#define ADC_CHANNEL_LOW(c)	(((c) & 0x1f) << MUX0)
+#define ADC_CHANNEL_HIGH(c)	((((c) & 0x20) >> 5) << MUX5)
+
+#define ADCSRA_INIT	((1 << ADEN) |		/* Enable ADC */ 		\
+			 (0 << ADATE) |		/* No auto ADC trigger */ 	\
+			 (1 << ADIE) |		/* Enable interrupt */	\
+			 (6 << ADPS0))		/* Prescale clock by 64 */
+
+#define ADCSRB_INIT	((0 << ADHSM) |		/* No high-speed mode */ \
+			 (0 << ACME) |		/* Some comparitor thing */ \
+			 (0 << ADTS0))		/* Free running mode (don't care) */
+
 static void
 adc_start(void)
 {
-	ADMUX = ((0 << REFS1) |
-		 (1 << REFS0) |
-		 (1 << ADLAR) |
-		 (0 << MUX0));
-	ADCSRB &= ~(1 << MUX5);
+	ADMUX = ((0 << REFS1) |				/* AVcc reference */
+		 (1 << REFS0) |				/* AVcc reference */
+		 (1 << ADLAR) |				/* Left-shift results */
+		 (ADC_CHANNEL_LOW(ADC_CHANNEL)));	/* Select channel */
 
-	ADCSRA = ((1 << ADEN) |
-		  (1 << ADSC) |
-		  (0 << ADATE) |
-		  (1 << ADIE) |
-		  (6 << ADPS0));
+	ADCSRB = ADCSRB_INIT | ADC_CHANNEL_HIGH(ADC_CHANNEL);
+
+	ADCSRA = ADCSRA_INIT | (1 << ADSC);		/* Start conversion */
 }
 
 static void
 adc_init(void)
 {
-	ADCSRA = ((1 << ADEN) |
-		  (0 << ADSC) |
-		  (0 << ADATE) |
-		  (1 << ADIE) |
-		  (6 << ADPS0));
-	ADCSRB = ((0 << ADHSM) |
-		  (0 << MUX5) |
-		  (0 << ADTS0));
+	ADCSRA = ADCSRA_INIT;
+	ADCSRB = ADCSRB_INIT;
 	DIDR0 |= (1 << 0);
 }
 
