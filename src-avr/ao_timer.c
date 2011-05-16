@@ -149,7 +149,7 @@ ao_clock_init(void)
 		  (0x4 << PDIV0));	/* 48MHz PLL clock */
 
 	/* Set the frequency of the crystal */
-#if TEENSY
+#if AVR_CLOCK > 12000000UL
 	PLLCSR |= (1 << PINDIV);	/* For 16MHz crystal on Teensy board */
 #else
 	PLLCSR &= ~(1 << PINDIV);	/* For 8MHz crystal on TeleScience board */

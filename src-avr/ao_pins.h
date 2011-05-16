@@ -250,6 +250,20 @@
 	#define HAS_USB			0
 	#define PACKET_HAS_SLAVE	0
 	#define HAS_SERIAL_1		1
+	#define TEENSY			1
+	#define AVR_VCC_5V	       	1
+	#define AVR_VCC_3V3		0
+	#define AVR_CLOCK		16000000UL
+#endif
+
+#ifdef TELESCIENCE
+	#define AO_LED_RED		(1<<7)
+	#define LEDS_AVAILABLE		(AO_LED_RED)
+	#define HAS_USB			1
+	#define TEENSY			0
+	#define AVR_VCC_5V	       	0
+	#define AVR_VCC_3V3		1
+	#define AVR_CLOCK		8000000UL
 #endif
 
 #ifndef AVR
