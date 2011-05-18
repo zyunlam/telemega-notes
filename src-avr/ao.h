@@ -50,7 +50,11 @@
 struct ao_task {
 	__xdata void *wchan;		/* current wait channel (NULL if running) */
 	uint16_t alarm;			/* abort ao_sleep time */
+#ifdef AVR
+	uint8_t *sp;			/* saved stack pointer */
+#else
 	uint8_t	stack_count;		/* amount of saved stack */
+#endif
 	uint8_t task_id;		/* unique id */
 	__code char *name;		/* task name */
 	uint8_t	stack[AO_STACK_SIZE];	/* saved stack */

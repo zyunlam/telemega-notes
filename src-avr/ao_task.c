@@ -31,22 +31,22 @@ __xdata struct ao_task *__data ao_cur_task;
 static void
 ao_init_stack(__xdata struct ao_task *task, void (*start)(void))
 {
-	uint8_t		*stack = task->stack + AO_STACK_SIZE - 1;
+	uint8_t		*sp = task->stack + AO_STACK_SIZE - 1;
 	uint16_t	a = (uint16_t) start;
 	int		i;
 
 	/* Return address */
-	PUSH8(stack, a);
-	PUSH8(stack, (a >> 8));
+	PUSH8(sp, a);
+	PUSH8(sp, (a >> 8));
 
 	/* Clear register values */
 	i = 32;
 	while (i--)
-		PUSH8(stack, 0);
+		PUSH8(sp, 0);
 
 	/* SREG with interrupts enabled */
-	PUSH8(stack, 0x80);
-	task->stack_count = stack - task->stack;
+	PUSH8(sp, 0x80);
+	task->sp = sp;
 }
 #else
 static void
@@ -102,6 +102,19 @@ ao_add_task(__xdata struct ao_task * task, void (*start)(void), __code char *nam
 	ao_init_stack(task, start);
 }
 
+void
+ao_show_task_from(void)
+{
+	if (ao_cur_task)
+		printf("switching from %s\n", ao_cur_task->name);
+}
+
+void
+ao_show_task_to(void)
+{
+	printf("switching to %s\n", ao_cur_task->name);
+}
+
 /* Task switching function. This must not use any stack variables */
 void
 ao_yield(void) __naked
@@ -114,6 +127,7 @@ ao_yield(void) __naked
 	asm("push r14" "\n\t" "push r13" "\n\t" "push r12" "\n\t" "push r11" "\n\t" "push r10");
 	asm("push r9" "\n\t" "push r8" "\n\t" "push r7" "\n\t" "push r6" "\n\t" "push r5");
 	asm("push r4" "\n\t" "push r3" "\n\t" "push r2" "\n\t" "push r1" "\n\t" "push r0");
+	cli();
 	asm("in r0, __SREG__" "\n\t" "push r0");
 	sei();
 #else
@@ -150,11 +164,9 @@ ao_yield(void) __naked
 	{
 #ifdef AVR
 		uint8_t	sp_l, sp_h;
-		uint8_t *sp;
 		asm("in %0,__SP_L__" : "=&r" (sp_l) );
 		asm("in %0,__SP_H__" : "=&r" (sp_h) );
-		sp = (uint8_t *) ((uint16_t) sp_l | ((uint16_t) sp_h << 8));
-		ao_cur_task->stack_count = sp - ao_cur_task->stack;
+		ao_cur_task->sp = (uint8_t *) ((uint16_t) sp_l | ((uint16_t) sp_h << 8));
 #else
 		uint8_t stack_len;
 		__data uint8_t *stack_ptr;
@@ -175,6 +187,7 @@ ao_yield(void) __naked
 	SP = AO_STACK_START - 1;
 #endif
 
+	ao_show_task_from();
 	/* Find a task to run. If there isn't any runnable task,
 	 * this loop will run forever, which is just fine
 	 */
@@ -209,10 +222,11 @@ ao_yield(void) __naked
 
 #ifdef AVR
 	{
-		uint8_t	*sp = (ao_cur_task->stack + ao_cur_task->stack_count);
 		uint8_t	sp_l, sp_h;
-		sp_l = (uint16_t) sp;
-		sp_h = ((uint16_t) sp) >> 8;
+		sp_l = (uint16_t) ao_cur_task->sp;
+		sp_h = ((uint16_t) ao_cur_task->sp) >> 8;
+		ao_show_task_to();
+		cli();
 		asm("out __SP_H__,%0" : : "r" (sp_h) );
 		asm("out __SP_L__,%0" : : "r" (sp_l) );
 		asm("pop r0"	"\n\t"
@@ -325,16 +339,13 @@ void
 ao_task_info(void)
 {
 	uint8_t	i;
-	uint8_t pc_loc;
 	__xdata struct ao_task *task;
 
 	for (i = 0; i < ao_num_tasks; i++) {
 		task = ao_tasks[i];
-		pc_loc = task->stack_count - 17;
-		printf("%12s: wchan %04x pc %04x\n",
+		printf("%12s: wchan %04x\n",
 		       task->name,
-		       (int16_t) task->wchan,
-		       (task->stack[pc_loc]) | (task->stack[pc_loc+1] << 8));
+		       (int16_t) task->wchan);
 	}
 }
 
