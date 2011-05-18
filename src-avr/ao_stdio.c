@@ -94,9 +94,11 @@ ao_add_stdio(char (*pollchar)(void),
 int
 stdio_put(char c, FILE *stream)
 {
+#if 0
 	if (ao_cur_task && ao_num_stdios)
 		putchar(c);
 	else
+#endif
 	{
 		if (c == '\n')
 			stdio_put('\r', stream);

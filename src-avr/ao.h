@@ -326,7 +326,11 @@ extern __code __at (0x00a0) struct ao_romconfig ao_romconfig;
 #endif
 
 #if HAS_USB
+#ifdef AVR
+extern const uint8_t ao_usb_descriptors [];
+#else
 extern __code __at (0x00aa) uint8_t ao_usb_descriptors [];
+#endif
 #endif
 
 /*

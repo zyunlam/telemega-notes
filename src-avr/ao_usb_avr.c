@@ -16,32 +16,34 @@
  */
 
 #include "ao.h"
+#include "ao_usb.h"
 
 struct ao_task __xdata ao_usb_task;
 
-static __xdata uint16_t	ao_usb_in_bytes;
-static __xdata uint16_t ao_usb_in_bytes_last;
-static __xdata uint16_t	ao_usb_out_bytes;
-static __xdata uint8_t	ao_usb_iif;
+struct ao_usb_setup {
+	uint8_t		dir_type_recip;
+	uint8_t		request;
+	uint16_t	value;
+	uint16_t	index;
+	uint16_t	length;
+} __xdata ao_usb_setup;
+
+static __xdata uint8_t 	ao_usb_ep0_state;
+static const uint8_t * __xdata ao_usb_ep0_in_data;
+static __xdata uint8_t 	ao_usb_ep0_in_len;
+static __xdata uint8_t	ao_usb_ep0_in_pending;
+static __xdata uint8_t	ao_usb_ep0_in_buf[2];
+static __xdata uint8_t 	ao_usb_ep0_out_len;
+static __xdata uint8_t *__xdata ao_usb_ep0_out_data;
+
+static __xdata uint8_t	ao_usb_in_flushed;
 static __xdata uint8_t	ao_usb_running;
-
-static void
-ao_usb_set_interrupts(void)
-{
-	/* IN interrupts on the control an IN endpoints */
-	USBIIE = (1 << AO_USB_CONTROL_EP) | (1 << AO_USB_IN_EP);
-
-	/* OUT interrupts on the OUT endpoint */
-	USBOIE = (1 << AO_USB_OUT_EP);
-
-	/* Only care about reset */
-	USBCIE = USBCIE_RSTIE;
-}
+static __xdata uint8_t	ao_usb_configuration;
 
 void
 ao_usb_set_address(uint8_t address)
 {
-	UDADD = (0 << ADDEN) | address;
+	UDADDR = (0 << ADDEN) | address;
 	ao_usb_running = 1;
 }
 
@@ -51,8 +53,17 @@ ao_usb_set_address(uint8_t address)
 			             0x00)))
 
 static void
+ao_usb_dump_ep(uint8_t ep)
+{
+	UENUM = ep;
+	printf ("EP %d: UECONX %02x UECFG0X %02x UECFG1X %02x UEIENX %02x UESTA0X %02x UESTA1X %02X\n",
+		ep, UECONX, UECFG0X, UECFG1X, UEIENX, UESTA0X, UESTA1X);
+}
+
+static void
 ao_usb_set_ep0(void)
 {
+	printf ("set_ep0\n");
 	/* Set the CONTROL max packet size, single buffered */
 	UENUM = 0;
 	UECONX = (1 << EPEN);					/* Enable */
@@ -60,12 +71,15 @@ ao_usb_set_ep0(void)
 	UECFG0X = ((0 << EPTYPE0) |				/* Control */
 		   (0 << EPDIR));				/* Out (ish) */
 
-	UECFG1X = ((EP_SIZE(AO_USB_CONTROL_SIZE) << EPSIZE0) |	/* Size */
-		   (0 << EPBK));				/* Single bank */
+	UECFG1X = (EP_SIZE(AO_USB_CONTROL_SIZE) |		/* Size */
+		   (0 << EPBK0) |				/* Single bank */
+		   (1 << ALLOC));
 
-	UEIENX = ((1 << RXSTPE) |	/* Enable SETUP interrupt */
-		  (1 << RXOUTE) |	/* Enable OUT interrupt */
-		  (1 << TXINE));	/* Enable IN complete interrupt */
+	UEIENX = ((1 << RXSTPE) |				/* Enable SETUP interrupt */
+		  (1 << RXOUTE) |				/* Enable OUT interrupt */
+		  (1 << TXINE));				/* Enable IN complete interrupt */
+
+	ao_usb_dump_ep(0);
 }
 
 static void
@@ -78,9 +92,13 @@ ao_usb_set_configuration(void)
 	UECFG0X = ((2 << EPTYPE0) |				/* Bulk */
 		   (1 << EPDIR));				/* In */
 
-	UECFG1X = ((EP_SIZE(AO_USB_IN_SIZE) << EPSIZE0) |	/* Size */
-		   (1 << EPBK) |				/* Double bank */
+	UECFG1X = (EP_SIZE(AO_USB_IN_SIZE) |			/* Size */
+		   (1 << EPBK0) |				/* Double bank */
 		   (1 << ALLOC));				/* Allocate */
+
+	UEIENX = ((1 << TXINE));				/* Enable IN complete interrupt */
+
+	ao_usb_dump_ep(AO_USB_IN_EP);
 
 	/* Set the OUT max packet size, double buffered */
 	UENUM = AO_USB_OUT_EP;
@@ -89,74 +107,20 @@ ao_usb_set_configuration(void)
 	UECFG0X = ((2 << EPTYPE0) |				/* Bulk */
 		   (0 << EPDIR));				/* Out */
 
-	UECFG1X = ((EP_SIZE(AO_USB_OUT_SIZE) << EPSIZE0) |	/* Size */
-		   (1 << EPBK) |				/* Double bank */
+	UECFG1X = (EP_SIZE(AO_USB_OUT_SIZE) |			/* Size */
+		   (1 << EPBK0) |				/* Double bank */
 		   (1 << ALLOC));				/* Allocate */
+
+	UEIENX = ((1 << RXOUTE));				/* Enable OUT complete interrupt */
+
+	ao_usb_dump_ep(AO_USB_OUT_EP);
 }
 
 ISR(USB_GEN_vect)
 {
-	uint8_t intbits;
-
-        intbits = UDINT;
-        UDINT = 0;
-        if (intbits & (1<<EORSTI)) {
-		ao_usb_set_ep0();
-		usb_configuration = 0;
-        }
-	if (intbits & (1<<SOFI)) {
-		if (usb_configuration) {
-			t = transmit_flush_timer;
-			if (t) {
-				transmit_flush_timer = --t;
-				if (!t) {
-					UENUM = CDC_TX_ENDPOINT;
-					UEINTX = 0x3A;
-				}
-			}
-		}
-	}
+	ao_wakeup(&ao_usb_task);
 }
 
-struct ao_usb_setup {
-	uint8_t		dir_type_recip;
-	uint8_t		request;
-	uint16_t	value;
-	uint16_t	index;
-	uint16_t	length;
-} __xdata ao_usb_setup;
-
-__xdata uint8_t ao_usb_ep0_state;
-uint8_t * __xdata ao_usb_ep0_in_data;
-__xdata uint8_t ao_usb_ep0_in_len;
-__xdata uint8_t	ao_usb_ep0_in_buf[2];
-__xdata uint8_t ao_usb_ep0_out_len;
-__xdata uint8_t *__xdata ao_usb_ep0_out_data;
-__xdata uint8_t ao_usb_configuration;
-
-/* Send an IN data packet */
-static void
-ao_usb_ep0_flush(void)
-{
-	__xdata uint8_t this_len;
-	__xdata uint8_t	cs0;
-
-	/* If the IN packet hasn't been picked up, just return */
-	UENUM = 0;
-	if (!(UEINTX & (1 << TXINI)))
-		return;
-
-	this_len = ao_usb_ep0_in_len;
-	if (this_len > AO_USB_CONTROL_SIZE)
-		this_len = AO_USB_CONTROL_SIZE;
-
-	ao_usb_ep0_in_len -= this_len;
-	while (this_len--)
-		UEDATX = *ao_usb_ep0_in_data++;
-
-	/* Clear the TXINI bit to send the packet */
-	UEINTX &= ~(1 << TXINI);
-}
 
 __xdata static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 
@@ -183,22 +147,63 @@ ao_usb_get_descriptor(uint16_t value)
 	}
 }
 
-/* Read data from the ep0 OUT fifo
- */
+/* Send an IN data packet */
 static void
-ao_usb_ep0_fill(void)
+ao_usb_ep0_flush(void)
 {
-	__xdata uint8_t	len;
+	__xdata uint8_t this_len;
 
+	/* If the IN packet hasn't been picked up, just return */
 	UENUM = 0;
-	len = UEBCLX;	/* read length */
+	if (!(UEINTX & (1 << TXINI)))
+		return;
+
+	this_len = ao_usb_ep0_in_len;
+	if (this_len > AO_USB_CONTROL_SIZE)
+		this_len = AO_USB_CONTROL_SIZE;
+
+	ao_usb_ep0_in_len -= this_len;
+
+	/* Set IN interrupt enable */
+	if (ao_usb_ep0_in_len == 0 && this_len != AO_USB_CONTROL_SIZE) {
+		ao_usb_ep0_in_pending = 0;
+		UEIENX = ((1 << RXSTPE) | (1 << RXOUTE));			/* Disable IN interrupt */
+	} else {
+		ao_usb_ep0_in_pending = 1;
+		UEIENX = ((1 << RXSTPE) | (1 << RXOUTE) | (1 << TXINE));	/* Enable IN interrupt */
+	}
+
+	printf ("Flush EP0 len %d:", this_len);
+	while (this_len--) {
+		uint8_t	c = *ao_usb_ep0_in_data++;
+		printf(" %02x", c);
+		UEDATX = c;
+	}
+	printf ("\n");
+
+	/* Clear the TXINI bit to send the packet */
+	UEINTX = ~(1 << TXINI);
+}
+
+/* Read data from the ep0 OUT fifo */
+static void
+ao_usb_ep0_fill(uint8_t len)
+{
 	if (len > ao_usb_ep0_out_len)
 		len = ao_usb_ep0_out_len;
 	ao_usb_ep0_out_len -= len;
 
+	printf ("EP0 UEINTX %02x UEBCLX %d UEBCHX %d\n",
+		UEINTX, UEBCLX, UEBCHX);
 	/* Pull all of the data out of the packet */
-	while (len--)
-		*ao_usb_ep0_out_data++ = UEDATX;
+	printf ("Fill EP0 len %d:", len);
+	UENUM = 0;
+	while (len--) {
+		uint8_t	c = UEDATX;
+		*ao_usb_ep0_out_data++ = c;
+		printf (" %02x", c);
+	}
+	printf ("\n");
 }
 
 void
@@ -213,11 +218,15 @@ ao_usb_ep0_setup(void)
 	/* Pull the setup packet out of the fifo */
 	ao_usb_ep0_out_data = (__xdata uint8_t *) &ao_usb_setup;
 	ao_usb_ep0_out_len = 8;
-	ao_usb_ep0_fill();
+	ao_usb_ep0_fill(8);
+
+	/* ACK packet */
 	UENUM = 0;
-	UEINTX &= ~(1 << RXSTPI);
-	if (ao_usb_ep0_out_len != 0)
+	UEINTX = ~(1 << RXSTPI);
+	if (ao_usb_ep0_out_len != 0) {
+		printf ("invalid setup packet length\n");
 		return;
+	}
 
 	/* Figure out how to ACK the setup packet */
 	if (ao_usb_setup.dir_type_recip & AO_USB_DIR_IN) {
@@ -231,8 +240,8 @@ ao_usb_ep0_setup(void)
 		else
 			ao_usb_ep0_state = AO_USB_EP0_IDLE;
 	}
-	UENUM = 0;
 /*
+	UENUM = 0;
 	if (ao_usb_ep0_state == AO_USB_EP0_IDLE)
 		USBCS0 = USBCS0_CLR_OUTPKT_RDY | USBCS0_DATA_END;
 	else
@@ -243,30 +252,40 @@ ao_usb_ep0_setup(void)
 	ao_usb_ep0_in_len = 0;
 	switch(ao_usb_setup.dir_type_recip & AO_USB_SETUP_TYPE_MASK) {
 	case AO_USB_TYPE_STANDARD:
+		printf ("Standard setup packet\n");
 		switch(ao_usb_setup.dir_type_recip & AO_USB_SETUP_RECIP_MASK) {
 		case AO_USB_RECIP_DEVICE:
+			printf ("Device setup packet\n");
 			switch(ao_usb_setup.request) {
 			case AO_USB_REQ_GET_STATUS:
+				printf ("get status\n");
 				ao_usb_ep0_queue_byte(0);
 				ao_usb_ep0_queue_byte(0);
 				break;
 			case AO_USB_REQ_SET_ADDRESS:
+				printf ("set address %d\n", ao_usb_setup.value);
 				ao_usb_set_address(ao_usb_setup.value);
 				break;
 			case AO_USB_REQ_GET_DESCRIPTOR:
+				printf ("get descriptor %d\n", ao_usb_setup.value);
 				ao_usb_get_descriptor(ao_usb_setup.value);
 				break;
 			case AO_USB_REQ_GET_CONFIGURATION:
+				printf ("get configuration %d\n", ao_usb_configuration);
 				ao_usb_ep0_queue_byte(ao_usb_configuration);
 				break;
 			case AO_USB_REQ_SET_CONFIGURATION:
 				ao_usb_configuration = ao_usb_setup.value;
+				printf ("set configuration %d\n", ao_usb_configuration);
 				ao_usb_set_configuration();
 				break;
 			}
 			break;
 		case AO_USB_RECIP_INTERFACE:
+#ifndef AVR
 			#pragma disable_warning 110
+#endif
+			printf ("Interface setup packet\n");
 			switch(ao_usb_setup.request) {
 			case AO_USB_REQ_GET_STATUS:
 				ao_usb_ep0_queue_byte(0);
@@ -280,6 +299,7 @@ ao_usb_ep0_setup(void)
 			}
 			break;
 		case AO_USB_RECIP_ENDPOINT:
+			printf ("Endpoint setup packet\n");
 			switch(ao_usb_setup.request) {
 			case AO_USB_REQ_GET_STATUS:
 				ao_usb_ep0_queue_byte(0);
@@ -290,12 +310,15 @@ ao_usb_ep0_setup(void)
 		}
 		break;
 	case AO_USB_TYPE_CLASS:
+		printf ("Class setup packet\n");
 		switch (ao_usb_setup.request) {
 		case SET_LINE_CODING:
+			printf ("set line coding\n");
 			ao_usb_ep0_out_len = 7;
 			ao_usb_ep0_out_data = (__xdata uint8_t *) &ao_usb_line_coding;
 			break;
 		case GET_LINE_CODING:
+			printf ("get line coding\n");
 			ao_usb_ep0_in_len = 7;
 			ao_usb_ep0_in_data = (uint8_t *) &ao_usb_line_coding;
 			break;
@@ -307,6 +330,7 @@ ao_usb_ep0_setup(void)
 	if (ao_usb_ep0_state != AO_USB_EP0_DATA_OUT) {
 		if (ao_usb_setup.length < ao_usb_ep0_in_len)
 			ao_usb_ep0_in_len = ao_usb_setup.length;
+		printf ("Start ep0 in delivery\n");
 		ao_usb_ep0_flush();
 	}
 }
@@ -315,28 +339,43 @@ ao_usb_ep0_setup(void)
 static void
 ao_usb_ep0(void)
 {
-	__xdata uint8_t	intx;
+	uint8_t	intx, udint;
 
+	printf ("usb task started\n");
 	ao_usb_ep0_state = AO_USB_EP0_IDLE;
 	for (;;) {
 		cli();
 		for (;;) {
+			udint = UDINT;
+			UDINT = 0;
+//			printf ("UDINT %02x\n", udint);
+			if (udint & (1 << EORSTI)) {
+				ao_usb_configuration = 0;
+				ao_usb_set_ep0();
+			}
 			UENUM = 0;
 			intx = UEINTX;
-			if (intx & ((1 << RXOUTI) | (1 <<RXSTPI)))
-			    break;
+//			printf ("UEINTX %02x\n", intx);
+			if (intx & ((1 << RXSTPI) | (1 << RXOUTI) | (1 << TXINI)))
+				break;
+			printf ("usb task sleeping...\n");
 			ao_sleep(&ao_usb_task);
 		}
 		sei();
+		printf ("UEINTX for ep0 is %02x\n", intx);
 		if (intx & (1 << RXSTPI)) {
 			ao_usb_ep0_setup();
-			UENUM = 0;
-			UEINTX &= ~(1 << RXSTPI);
 		}
 		if (intx & (1 << RXOUTI)) {
-			ao_usb_ep0_fill();
+			ao_usb_ep0_fill(UEBCLX);
 			UENUM = 0;
-			UEINTX &= ~(1 << RXOUTI);
+			UEINTX = ~(1 << RXOUTI);
+			ao_usb_ep0_flush();
+		}
+		if (intx & (1 << TXINI) && ao_usb_ep0_in_pending) {
+			UDADDR |= (1 << ADDEN);
+			printf ("continue sending ep0 IN data\n");
+			ao_usb_ep0_flush();
 		}
 	}
 }
@@ -347,10 +386,23 @@ ao_usb_in_wait(void)
 {
 	for (;;) {
 		UENUM = AO_USB_IN_EP;
-		if ((UEINTX & (1 << RWAL)))
+		if (UEINTX & (1 << RWAL))
 			break;
-		ao_sleep(&ao_usb_in_bytes);
+		for (;;) {
+			UENUM = AO_USB_IN_EP;
+			if ((UEINTX & (1 << TXINI)))
+				break;
+			ao_sleep(&ao_usb_in_flushed);
+		}
+		UEINTX = ~(1 << TXINI);
 	}
+}
+
+static void
+ao_usb_in_send(void)
+{
+	UENUM = AO_USB_IN_EP;
+	UEINTX = (uint8_t) ~(1 << FIFOCON);
 }
 
 void
@@ -362,7 +414,8 @@ ao_usb_flush(void) __critical
 	/* If there are pending bytes, or if the last packet was full,
 	 * send another IN packet
 	 */
-	if (ao_usb_in_bytes || (ao_usb_in_bytes_last == AO_USB_IN_SIZE)) {
+	if (!ao_usb_in_flushed) {
+		ao_usb_in_flushed = 1;
 		ao_usb_in_wait();
 		ao_usb_in_send();
 	}
@@ -374,37 +427,48 @@ ao_usb_putchar(char c) __critical __reentrant
 	if (!ao_usb_running)
 		return;
 
-	ao_usb_in_wait();
+	ao_usb_in_flushed = 0;
 
-	/* Queue a byte, sending the packet when full */
+	/* Queue a byte */
 	UENUM = AO_USB_IN_EP;
 	UEDATX = c;
-	if (++ao_usb_in_bytes == AO_USB_IN_SIZE)
+
+	/* Send the packet when full */
+	if ((UEINTX & (1 << RWAL)) == 0)
 		ao_usb_in_send();
 }
 
-char
-ao_usb_pollchar(void) __critical
+static char
+_ao_usb_pollchar(void)
 {
 	char c;
-	if (ao_usb_out_bytes == 0) {
+
+	UENUM = AO_USB_OUT_EP;
+	while ((UEINTX & (1 << RWAL)) == 0) {
+
+		/* Ack the last packet */
+		UEINTX = (uint8_t) ~(1 << FIFOCON);
+
 		/* Check to see if a packet has arrived */
-		UENUM = AO_USB_OUT_EP;
 		if ((UEINTX & (1 << RXOUTI)) == 0)
 			return AO_READ_AGAIN;
-		ao_usb_out_bytes = (UEBCHX << 8) | UEBCLX;
-		if (ao_usb_out_bytes == 0) {
-			UEINTX &= ~(1 << RXOUTI);
-			return AO_READ_AGAIN;
-		}
+
+		/* Ack the interrupt */
+		UEINTX = ~(1 << RXOUTI);
 	}
-	--ao_usb_out_bytes;
-	UENUM = AO_USB_OUT_EP;
+
+	/* Pull a character out of the fifo */
 	c = UEDATX;
-	if (ao_usb_out_bytes == 0) {
-		UENUM = AO_USB_OUT_EP;
-		UEINTX &= ~(1 << RXOUTI);
-	}
+	return c;
+}
+
+char
+ao_usb_pollchar(void)
+{
+	char	c;
+	cli();
+	c = _ao_usb_pollchar();
+	sei();
 	return c;
 }
 
@@ -413,34 +477,26 @@ ao_usb_getchar(void) __critical
 {
 	char	c;
 
+	cli();
 	while ((c = ao_usb_pollchar()) == AO_READ_AGAIN)
 		ao_sleep(&ao_stdin_ready);
+	sei();
 	return c;
 }
 
-// Misc functions to wait for ready and send/receive packets
-static inline void usb_wait_in_ready(void)
-{
-	while (!(UEINTX & (1<<TXINI))) ;
-}
-static inline void usb_send_in(void)
-{
-	UEINTX = ~(1<<TXINI);
-}
-static inline void usb_wait_receive_out(void)
-{
-	while (!(UEINTX & (1<<RXOUTI))) ;
-}
-static inline void usb_ack_out(void)
-{
-	UEINTX = ~(1<<RXOUTI);
-}
-
-/* Endpoint 0 interrupt */
-
+/* Endpoint interrupt */
 ISR(USB_COM_vect)
 {
-	ao_wakeup(&ao_usb_task);
+	uint8_t	i = UEINT;
+
+	ao_led_toggle(AO_LED_RED);
+	UEINT = 0;
+	if (i & (1 << 0))
+		ao_wakeup(&ao_usb_task);
+	if (i & (1 << AO_USB_IN_EP))
+		ao_wakeup(&ao_usb_in_flushed);
+	if (i & (1 << AO_USB_OUT_EP))
+		ao_wakeup(&ao_stdin_ready);
 }
 
 #if AVR_VCC_5V
@@ -462,7 +518,6 @@ ao_usb_disable(void)
 {
 	/* Unplug from the bus */
 	UDCON = (1 << DETACH);
-	ao_usb_detatch_interface();
 
 	/* Disable the interface */
 	USBCON = 0;
@@ -497,9 +552,14 @@ ao_usb_enable(void)
 	/* Enable USB, enable the VBUS pad */
 	USBCON = AO_USB_CON | (1 << OTGPADE);
 
-	UDCON = (0 << DETACH);	/* Clear the DETACH bit to plug into the bus */
+	/* Enable global interrupts */
+	UDIEN = (1 << EORSTE);		/* End of reset interrupt */
 
-	usb_configuration = 0;
+	ao_usb_configuration = 0;
+
+	printf ("ao_usb_enable\n");
+
+	UDCON = (0 << DETACH);	/* Clear the DETACH bit to plug into the bus */
 }
 
 void
@@ -507,6 +567,7 @@ ao_usb_init(void)
 {
 	ao_usb_enable();
 
+	printf ("ao_usb_init\n");
 	ao_add_task(&ao_usb_task, ao_usb_ep0, "usb");
-	ao_add_stdio(ao_usb_pollchar, ao_usb_putchar, ao_usb_flush);
+//	ao_add_stdio(ao_usb_pollchar, ao_usb_putchar, ao_usb_flush);
 }

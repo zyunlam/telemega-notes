@@ -24,7 +24,6 @@ ISR(USART1_RX_vect)
 {
 	if (!ao_fifo_full(ao_usart1_rx_fifo))
 		ao_fifo_insert(ao_usart1_rx_fifo, UDR1);
-	ao_led_toggle(AO_LED_RED);
 	ao_wakeup(&ao_usart1_rx_fifo);
 #if USE_SERIAL_STDIN
 	ao_wakeup(&ao_stdin_ready);

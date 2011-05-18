@@ -64,7 +64,7 @@
 #define AO_USB_INT_EP		1
 #define AO_USB_OUT_EP		4
 #define AO_USB_IN_EP		5
-#define AO_USB_CONTROL_SIZE	32
+#define AO_USB_CONTROL_SIZE	16
 /*
  * Double buffer IN and OUT EPs, so each
  * gets half of the available space

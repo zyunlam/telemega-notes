@@ -247,7 +247,7 @@
 	#define AO_LED_RED		(1<<7)
 	#define LEDS_AVAILABLE		(AO_LED_RED)
 	#define USE_SERIAL_STDIN	1
-	#define HAS_USB			0
+	#define HAS_USB			1
 	#define PACKET_HAS_SLAVE	0
 	#define HAS_SERIAL_1		1
 	#define TEENSY			1

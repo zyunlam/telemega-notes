@@ -45,6 +45,7 @@ readline(void)
 	cmd_len = 0;
 	for (;;) {
 		flush();
+		printf ("readline sleeping...\n");
 		c = getchar();
 		/* backspace/delete */
 		if (c == '\010' || c == '\177') {
@@ -87,6 +88,7 @@ readline(void)
 	}
 	cmd_line[cmd_len++] = '\n';
 	cmd_line[cmd_len++] = '\0';
+	printf("cmd_len %d\n", cmd_len);
 	cmd_i = 0;
 }
 
@@ -278,6 +280,7 @@ ao_cmd(void)
 	__code struct ao_cmds * __xdata cs;
 	void (*__xdata func)(void);
 
+	printf ("ao_cmd\n");
 	for (;;) {
 		readline();
 		ao_cmd_lex();
