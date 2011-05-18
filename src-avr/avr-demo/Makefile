@@ -27,6 +27,7 @@ endif
 
 INC = \
 	ao.h \
+	ao_usb.h \
 	ao_pins.h \
 	altitude.h \
 	ao_kalman.h
