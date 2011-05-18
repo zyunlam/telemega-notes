@@ -63,6 +63,10 @@ ao_led_init(uint8_t enable)
 {
 	ao_led_enable = enable;
 #ifdef AVR
+	if ((LED_DDR & enable)) {
+		printf ("oops! restarted\n");
+		ao_panic(AO_PANIC_REBOOT);
+	}
 	LED_PORT &= ~enable;
 	LED_DDR |= enable;
 #else
