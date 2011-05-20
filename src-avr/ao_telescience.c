@@ -28,8 +28,8 @@ main(void)
 	ao_stdio_init();
 	ao_timer_init();
 	ao_cmd_init();
-//	ao_spi_init();
-//	ao_storage_init();
+	ao_spi_init();
+	ao_storage_init();
 	ao_usb_init();
 
 	/* Turn on the LED until the system is stable */

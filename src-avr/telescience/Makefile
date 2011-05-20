@@ -49,7 +49,8 @@ ALTOS_SRC = \
 	ao_task.c \
 	ao_timer.c \
 	ao_led.c \
-	ao_usb_avr.c
+	ao_usb_avr.c \
+	$(TELESCIENCE_STORAGE)
 
 PRODUCT=TeleScience-v0.1
 MCU=atmega32u4
@@ -104,4 +105,4 @@ install:
 
 uninstall:
 
-$(OBJ): ao.h ao_product.h
+$(OBJ): ao.h ao_product.h ao_usb.h
