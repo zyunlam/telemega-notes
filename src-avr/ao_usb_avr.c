@@ -48,6 +48,7 @@ static __xdata uint8_t *__xdata ao_usb_ep0_out_data;
 static __xdata uint8_t	ao_usb_in_flushed;
 static __xdata uint8_t	ao_usb_running;
 static __xdata uint8_t	ao_usb_configuration;
+static __xdata uint8_t	ueienx_0;
 
 void
 ao_usb_set_address(uint8_t address)
@@ -84,8 +85,8 @@ ao_usb_set_ep0(void)
 		   (0 << EPBK0) |				/* Single bank */
 		   (1 << ALLOC));
 
-	UEIENX = ((1 << RXSTPE) |				/* Enable SETUP interrupt */
-		  (1 << RXOUTE));				/* Enable OUT interrupt */
+	ueienx_0 = ((1 << RXSTPE) |				/* Enable SETUP interrupt */
+		    (1 << RXOUTE));				/* Enable OUT interrupt */
 
 //	ao_usb_dump_ep(0);
 	ao_usb_addr_pending = 0;
@@ -164,10 +165,8 @@ ao_usb_ep0_set_in_pending(uint8_t in_pending)
 {
 	ao_usb_ep0_in_pending = in_pending;
 
-	if (in_pending) {
-		UENUM = 0;
-		UEIENX = ((1 << RXSTPE) | (1 << RXOUTE) | (1 << TXINE));	/* Enable IN interrupt */
-	}
+	if (in_pending)
+		ueienx_0 = ((1 << RXSTPE) | (1 << RXOUTE) | (1 << TXINE));	/* Enable IN interrupt */
 }
 
 /* Send an IN data packet */
@@ -389,10 +388,12 @@ ao_usb_ep0(void)
 						UDADDR |= (1 << ADDEN);
 						ao_usb_addr_pending = 0;
 					}
-					UEIENX = ((1 << RXSTPE) | (1 << RXOUTE));	/* Disable IN interrupt */
+					ueienx_0 = ((1 << RXSTPE) | (1 << RXOUTE));	/* Disable IN interrupt */
 				}
 			}
 //			debug ("usb task sleeping...\n");
+			UENUM = 0;
+			UEIENX = ueienx_0;
 			ao_sleep(&ao_usb_task);
 		}
 		sei();
@@ -556,6 +557,8 @@ ISR(USB_COM_vect)
 #endif
 	UEINT = 0;
 	if (i & (1 << 0)) {
+		UENUM = 0;
+		UEIENX = 0;
 		ao_wakeup(&ao_usb_task);
 		++control_count;
 	}
