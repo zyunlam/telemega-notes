@@ -500,15 +500,18 @@ _ao_usb_pollchar(void)
 
 		if (intx & (1 << FIFOCON)) {
 			/* Ack the last packet */
-			UEINTX &= ~(1 << FIFOCON);
+			UEINTX = (uint8_t) ~(1 << FIFOCON);
 		}
 
 		/* Check to see if a packet has arrived */
-		if ((intx & (1 << RXOUTI)) == 0)
+		if ((intx & (1 << RXOUTI)) == 0) {
+			UENUM = AO_USB_OUT_EP;
+			UEIENX = (1 << RXOUTE);
 			return AO_READ_AGAIN;
+		}
 
 		/* Ack the interrupt */
-		UEINTX &= ~(1 << RXOUTI);
+		UEINTX = ~(1 << RXOUTI);
 	}
 
 	/* Pull a character out of the fifo */
@@ -532,7 +535,7 @@ ao_usb_getchar(void) __critical
 	char	c;
 
 	cli();
-	while ((c = ao_usb_pollchar()) == AO_READ_AGAIN)
+	while ((c = _ao_usb_pollchar()) == AO_READ_AGAIN)
 		ao_sleep(&ao_stdin_ready);
 	sei();
 	return c;
@@ -563,6 +566,8 @@ ISR(USB_COM_vect)
 		in_count++;
 	}
 	if (i & (1 << AO_USB_OUT_EP)) {
+		UENUM = AO_USB_OUT_EP;
+		UEIENX = 0;
 		ao_wakeup(&ao_stdin_ready);
 		++out_count;
 	}
