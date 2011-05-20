@@ -677,7 +677,9 @@ ao_usb_init(void)
 
 	debug ("ao_usb_init\n");
 	ao_add_task(&ao_usb_task, ao_usb_ep0, "usb");
-//	ao_add_task(&ao_usb_echo_task, ao_usb_echo, "usb echo");
+#if USB_DEBUG
+	ao_add_task(&ao_usb_echo_task, ao_usb_echo, "usb echo");
+#endif
 	ao_cmd_register(&ao_usb_cmds[0]);
 	ao_add_stdio(ao_usb_pollchar, ao_usb_putchar, ao_usb_flush);
 }
