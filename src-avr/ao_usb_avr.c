@@ -105,7 +105,9 @@ ao_usb_set_configuration(void)
 		   (1 << EPBK0) |				/* Double bank */
 		   (1 << ALLOC));				/* Allocate */
 
+#if 0
 	UEIENX = ((1 << TXINE));				/* Enable IN complete interrupt */
+#endif
 
 	ao_usb_dump_ep(AO_USB_IN_EP);
 
@@ -419,15 +421,18 @@ ao_usb_in_wait(void)
 		if (UEINTX & (1 << RWAL))
 			break;
 
+		cli();
 		/* Wait for an IN buffer to be ready */
 		for (;;) {
 			UENUM = AO_USB_IN_EP;
 			if ((UEINTX & (1 << TXINI)))
 				break;
+			UEIENX = (1 << TXINE);
 			ao_sleep(&ao_usb_in_flushed);
 		}
 		/* Ack the interrupt */
 		UEINTX &= ~(1 << TXINI);
+		sei();
 	}
 }
 
@@ -533,21 +538,35 @@ ao_usb_getchar(void) __critical
 	return c;
 }
 
+uint16_t	control_count;
+uint16_t	in_count;
+uint16_t	out_count;
+
 /* Endpoint interrupt */
 ISR(USB_COM_vect)
 {
+	uint8_t	old_num = UENUM;
 	uint8_t	i = UEINT;
 
 #ifdef AO_LED_RED
 	ao_led_toggle(AO_LED_RED);
 #endif
 	UEINT = 0;
-	if (i & (1 << 0))
+	if (i & (1 << 0)) {
 		ao_wakeup(&ao_usb_task);
-	if (i & (1 << AO_USB_IN_EP))
+		++control_count;
+	}
+	if (i & (1 << AO_USB_IN_EP)) {
+		UENUM = AO_USB_IN_EP;
+		UEIENX = 0;
 		ao_wakeup(&ao_usb_in_flushed);
-	if (i & (1 << AO_USB_OUT_EP))
+		in_count++;
+	}
+	if (i & (1 << AO_USB_OUT_EP)) {
 		ao_wakeup(&ao_stdin_ready);
+		++out_count;
+	}
+	UENUM = old_num;
 }
 
 #if AVR_VCC_5V
