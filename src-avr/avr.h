@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
 
 #if TEENSY
 #define F_CPU 16000000UL	// 16 MHz

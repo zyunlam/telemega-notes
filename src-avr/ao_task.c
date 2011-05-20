@@ -102,19 +102,6 @@ ao_add_task(__xdata struct ao_task * task, void (*start)(void), __code char *nam
 	ao_init_stack(task, start);
 }
 
-void
-ao_show_task_from(void)
-{
-//	if (ao_cur_task)
-//		printf("switching from %s\n", ao_cur_task->name);
-}
-
-void
-ao_show_task_to(void)
-{
-//	printf("switching to %s\n", ao_cur_task->name);
-}
-
 /* Task switching function. This must not use any stack variables */
 void
 ao_yield(void) __naked
@@ -187,7 +174,6 @@ ao_yield(void) __naked
 	SP = AO_STACK_START - 1;
 #endif
 
-	ao_show_task_from();
 	/* Find a task to run. If there isn't any runnable task,
 	 * this loop will run forever, which is just fine
 	 */
@@ -211,10 +197,11 @@ ao_yield(void) __naked
 				break;
 			}
 
-#ifdef AVR
-#else
 			/* Enter lower power mode when there isn't anything to do */
 			if (ao_next_task_index == ao_cur_task_index)
+#ifdef AVR
+				sleep_cpu();
+#else
 				PCON = PCON_IDLE;
 #endif
 		}
@@ -225,7 +212,6 @@ ao_yield(void) __naked
 		uint8_t	sp_l, sp_h;
 		sp_l = (uint16_t) ao_cur_task->sp;
 		sp_h = ((uint16_t) ao_cur_task->sp) >> 8;
-		ao_show_task_to();
 		cli();
 		asm("out __SP_H__,%0" : : "r" (sp_h) );
 		asm("out __SP_L__,%0" : : "r" (sp_l) );
@@ -291,9 +277,11 @@ ao_yield(void) __naked
 uint8_t
 ao_sleep(__xdata void *wchan)
 {
+	cli();
 	__critical {
 		ao_cur_task->wchan = wchan;
 	}
+	sei();
 	ao_yield();
 	ao_cur_task->alarm = 0;
 	if (ao_cur_task->wchan) {

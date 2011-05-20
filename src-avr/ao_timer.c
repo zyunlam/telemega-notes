@@ -162,6 +162,9 @@ ao_clock_init(void)
 	PLLCSR |= (1 << PLLE);
 	while (!(PLLCSR & (1 << PLOCK)))
 		;
+
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	sleep_enable();
 #else
 	/* Switch system clock to crystal oscilator */
 	CLKCON = (CLKCON & ~CLKCON_OSC_MASK) | (CLKCON_OSC_XTAL);
