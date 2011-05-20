@@ -105,14 +105,14 @@ ao_add_task(__xdata struct ao_task * task, void (*start)(void), __code char *nam
 void
 ao_show_task_from(void)
 {
-	if (ao_cur_task)
-		printf("switching from %s\n", ao_cur_task->name);
+//	if (ao_cur_task)
+//		printf("switching from %s\n", ao_cur_task->name);
 }
 
 void
 ao_show_task_to(void)
 {
-	printf("switching to %s\n", ao_cur_task->name);
+//	printf("switching to %s\n", ao_cur_task->name);
 }
 
 /* Task switching function. This must not use any stack variables */

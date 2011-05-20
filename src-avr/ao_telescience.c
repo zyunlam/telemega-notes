@@ -15,28 +15,24 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#ifndef _AVR_H_
-#define _AVR_H_
+#include "ao.h"
 
-#include <stdio.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
+int
+main(void)
+{
+	ao_clock_init();
 
-#if TEENSY
-#define F_CPU 16000000UL	// 16 MHz
-#else
-#define F_CPU  8000000UL	// 8 MHz
-#endif
+	PORTE |= (1 << 6);
+	DDRE |= (1 << 6);
 
-#define __pdata
-#define __data
-#define __xdata
-#define __code const
-#define __reentrant
-#define __naked
-#define __critical
-#define __interrupt(n)
+	ao_stdio_init();
+	ao_timer_init();
+	ao_cmd_init();
+//	ao_spi_init();
+//	ao_storage_init();
+	ao_usb_init();
 
-#define asm_nop	asm("nop");
-
-#endif /* _AVR_H_ */
+	/* Turn on the LED until the system is stable */
+	ao_start_scheduler();
+	return 0;
+}

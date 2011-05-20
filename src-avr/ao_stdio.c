@@ -37,6 +37,8 @@ __data int8_t ao_num_stdios;
 void
 putchar(char c)
 {
+	if (ao_cur_stdio >= ao_num_stdios || !ao_stdios[ao_cur_stdio].putchar)
+		return;
 	if (c == '\n')
 		(*ao_stdios[ao_cur_stdio].putchar)('\r');
 	(*ao_stdios[ao_cur_stdio].putchar)(c);
@@ -58,10 +60,12 @@ ao_getchar(void) __reentrant __critical
 	int8_t stdio = ao_cur_stdio;
 
 	for (;;) {
-		c = ao_stdios[stdio].pollchar();
-		if (c != AO_READ_AGAIN)
-			break;
-		if (++stdio == ao_num_stdios)
+		if (stdio < ao_num_stdios) {
+			c = ao_stdios[stdio].pollchar();
+			if (c != AO_READ_AGAIN)
+				break;
+		}
+		if (++stdio >= ao_num_stdios)
 			stdio = 0;
 		if (stdio == ao_cur_stdio)
 			ao_sleep(&ao_stdin_ready);
@@ -87,6 +91,7 @@ ao_add_stdio(char (*pollchar)(void),
 	ao_stdios[ao_num_stdios].putchar = putchar;
 	ao_stdios[ao_num_stdios].flush = flush;
 	ao_stdios[ao_num_stdios].echo = 1;
+	ao_wakeup(&ao_stdin_ready);
 	return ao_num_stdios++;
 }
 
@@ -94,7 +99,7 @@ ao_add_stdio(char (*pollchar)(void),
 int
 stdio_put(char c, FILE *stream)
 {
-#if 0
+#if 1
 	if (ao_cur_task && ao_num_stdios)
 		putchar(c);
 	else
@@ -124,6 +129,5 @@ ao_stdio_init(void)
 {
 	stdout = &mystdout;
 	stdin = &mystdin;
-	printf("%d stdios registered\n", ao_num_stdios);
 }
 #endif

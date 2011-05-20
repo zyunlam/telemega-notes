@@ -41,6 +41,9 @@ volatile __data uint8_t	ao_adc_interval = 1;
 volatile __data uint8_t	ao_adc_count;
 #endif
 
+void
+ao_debug_out(char c);
+
 #ifdef AVR
 ISR(TIMER1_COMPA_vect)
 #else

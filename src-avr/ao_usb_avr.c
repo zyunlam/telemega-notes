@@ -18,7 +18,13 @@
 #include "ao.h"
 #include "ao_usb.h"
 
-//#define printf(format, args...)
+#define USB_DEBUG 0
+
+#if USB_DEBUG
+#define debug(format, args...)	printf(format, ## args)
+#else
+#define debug(format, args...)
+#endif
 
 struct ao_task __xdata ao_usb_task;
 
@@ -47,7 +53,6 @@ void
 ao_usb_set_address(uint8_t address)
 {
 	UDADDR = (0 << ADDEN) | address;
-	ao_usb_running = 1;
 	ao_usb_addr_pending = 1;
 }
 
@@ -60,14 +65,14 @@ static void
 ao_usb_dump_ep(uint8_t ep)
 {
 	UENUM = ep;
-	printf ("EP %d: UECONX %02x UECFG0X %02x UECFG1X %02x UEIENX %02x UESTA0X %02x UESTA1X %02X\n",
+	debug ("EP %d: UECONX %02x UECFG0X %02x UECFG1X %02x UEIENX %02x UESTA0X %02x UESTA1X %02X\n",
 		ep, UECONX, UECFG0X, UECFG1X, UEIENX, UESTA0X, UESTA1X);
 }
 
 static void
 ao_usb_set_ep0(void)
 {
-	printf ("set_ep0\n");
+	debug ("set_ep0\n");
 	/* Set the CONTROL max packet size, single buffered */
 	UENUM = 0;
 	UECONX = (1 << EPEN);					/* Enable */
@@ -118,6 +123,7 @@ ao_usb_set_configuration(void)
 	UEIENX = ((1 << RXOUTE));				/* Enable OUT complete interrupt */
 
 	ao_usb_dump_ep(AO_USB_OUT_EP);
+	ao_usb_running = 1;
 }
 
 ISR(USB_GEN_vect)
@@ -171,7 +177,7 @@ ao_usb_ep0_flush(void)
 	cli();
 	UENUM = 0;
 	if (!(UEINTX & (1 << TXINI))) {
-		printf("EP0 not accepting IN data\n");
+		debug("EP0 not accepting IN data\n");
 		ao_usb_ep0_set_in_pending(1);
 	} else {
 		this_len = ao_usb_ep0_in_len;
@@ -186,13 +192,13 @@ ao_usb_ep0_flush(void)
 		else
 			ao_usb_ep0_set_in_pending(1);
 
-		printf ("Flush EP0 len %d:", this_len);
+		debug ("Flush EP0 len %d:", this_len);
 		while (this_len--) {
 			uint8_t	c = *ao_usb_ep0_in_data++;
-			printf(" %02x", c);
+			debug(" %02x", c);
 			UEDATX = c;
 		}
-		printf ("\n");
+		debug ("\n");
 
 		/* Clear the TXINI bit to send the packet */
 		UEINTX &= ~(1 << TXINI);
@@ -208,17 +214,17 @@ ao_usb_ep0_fill(uint8_t len, uint8_t ack)
 		len = ao_usb_ep0_out_len;
 	ao_usb_ep0_out_len -= len;
 
-//	printf ("EP0 UEINTX %02x UEBCLX %d UEBCHX %d\n",
+//	debug ("EP0 UEINTX %02x UEBCLX %d UEBCHX %d\n",
 //		UEINTX, UEBCLX, UEBCHX);
 	/* Pull all of the data out of the packet */
-	printf ("Fill EP0 len %d:", len);
+	debug ("Fill EP0 len %d:", len);
 	UENUM = 0;
 	while (len--) {
 		uint8_t	c = UEDATX;
 		*ao_usb_ep0_out_data++ = c;
-		printf (" %02x", c);
+		debug (" %02x", c);
 	}
-	printf ("\n");
+	debug ("\n");
 
 	/* ACK the packet */
 	UEINTX &= ~ack;
@@ -238,7 +244,7 @@ ao_usb_ep0_setup(void)
 	ao_usb_ep0_out_len = 8;
 	ao_usb_ep0_fill(8, (1 << RXSTPI) | (1 << RXOUTI) | (1 << TXINI));
 	if (ao_usb_ep0_out_len != 0) {
-		printf ("invalid setup packet length\n");
+		debug ("invalid setup packet length\n");
 		return;
 	}
 
@@ -266,31 +272,31 @@ ao_usb_ep0_setup(void)
 	ao_usb_ep0_in_len = 0;
 	switch(ao_usb_setup.dir_type_recip & AO_USB_SETUP_TYPE_MASK) {
 	case AO_USB_TYPE_STANDARD:
-		printf ("Standard setup packet\n");
+		debug ("Standard setup packet\n");
 		switch(ao_usb_setup.dir_type_recip & AO_USB_SETUP_RECIP_MASK) {
 		case AO_USB_RECIP_DEVICE:
-			printf ("Device setup packet\n");
+			debug ("Device setup packet\n");
 			switch(ao_usb_setup.request) {
 			case AO_USB_REQ_GET_STATUS:
-				printf ("get status\n");
+				debug ("get status\n");
 				ao_usb_ep0_queue_byte(0);
 				ao_usb_ep0_queue_byte(0);
 				break;
 			case AO_USB_REQ_SET_ADDRESS:
-				printf ("set address %d\n", ao_usb_setup.value);
+				debug ("set address %d\n", ao_usb_setup.value);
 				ao_usb_set_address(ao_usb_setup.value);
 				break;
 			case AO_USB_REQ_GET_DESCRIPTOR:
-				printf ("get descriptor %d\n", ao_usb_setup.value);
+				debug ("get descriptor %d\n", ao_usb_setup.value);
 				ao_usb_get_descriptor(ao_usb_setup.value);
 				break;
 			case AO_USB_REQ_GET_CONFIGURATION:
-				printf ("get configuration %d\n", ao_usb_configuration);
+				debug ("get configuration %d\n", ao_usb_configuration);
 				ao_usb_ep0_queue_byte(ao_usb_configuration);
 				break;
 			case AO_USB_REQ_SET_CONFIGURATION:
 				ao_usb_configuration = ao_usb_setup.value;
-				printf ("set configuration %d\n", ao_usb_configuration);
+				debug ("set configuration %d\n", ao_usb_configuration);
 				ao_usb_set_configuration();
 				break;
 			}
@@ -299,7 +305,7 @@ ao_usb_ep0_setup(void)
 #ifndef AVR
 			#pragma disable_warning 110
 #endif
-			printf ("Interface setup packet\n");
+			debug ("Interface setup packet\n");
 			switch(ao_usb_setup.request) {
 			case AO_USB_REQ_GET_STATUS:
 				ao_usb_ep0_queue_byte(0);
@@ -313,7 +319,7 @@ ao_usb_ep0_setup(void)
 			}
 			break;
 		case AO_USB_RECIP_ENDPOINT:
-			printf ("Endpoint setup packet\n");
+			debug ("Endpoint setup packet\n");
 			switch(ao_usb_setup.request) {
 			case AO_USB_REQ_GET_STATUS:
 				ao_usb_ep0_queue_byte(0);
@@ -324,15 +330,15 @@ ao_usb_ep0_setup(void)
 		}
 		break;
 	case AO_USB_TYPE_CLASS:
-		printf ("Class setup packet\n");
+		debug ("Class setup packet\n");
 		switch (ao_usb_setup.request) {
 		case SET_LINE_CODING:
-			printf ("set line coding\n");
+			debug ("set line coding\n");
 			ao_usb_ep0_out_len = 7;
 			ao_usb_ep0_out_data = (__xdata uint8_t *) &ao_usb_line_coding;
 			break;
 		case GET_LINE_CODING:
-			printf ("get line coding\n");
+			debug ("get line coding\n");
 			ao_usb_ep0_in_len = 7;
 			ao_usb_ep0_in_data = (uint8_t *) &ao_usb_line_coding;
 			break;
@@ -344,7 +350,7 @@ ao_usb_ep0_setup(void)
 	if (ao_usb_ep0_state != AO_USB_EP0_DATA_OUT) {
 		if (ao_usb_setup.length < ao_usb_ep0_in_len)
 			ao_usb_ep0_in_len = ao_usb_setup.length;
-		printf ("Start ep0 in delivery %d\n", ao_usb_ep0_in_len);
+		debug ("Start ep0 in delivery %d\n", ao_usb_ep0_in_len);
 		ao_usb_ep0_set_in_pending(1);
 	}
 }
@@ -355,21 +361,21 @@ ao_usb_ep0(void)
 {
 	uint8_t	intx, udint;
 
-	printf ("usb task started\n");
+	debug ("usb task started\n");
 	ao_usb_ep0_state = AO_USB_EP0_IDLE;
 	for (;;) {
 		cli();
 		for (;;) {
 			udint = UDINT;
 			UDINT = 0;
-//			printf ("UDINT %02x\n", udint);
+//			debug ("UDINT %02x\n", udint);
 			if (udint & (1 << EORSTI)) {
 				ao_usb_configuration = 0;
 				ao_usb_set_ep0();
 			}
 			UENUM = 0;
 			intx = UEINTX;
-//			printf ("UEINTX %02x\n", intx);
+//			debug ("UEINTX %02x\n", intx);
 			if (intx & ((1 << RXSTPI) | (1 << RXOUTI)))
 				break;
 			if ((intx & (1 << TXINI))) {
@@ -384,11 +390,11 @@ ao_usb_ep0(void)
 					UEIENX = ((1 << RXSTPE) | (1 << RXOUTE));	/* Disable IN interrupt */
 				}
 			}
-//			printf ("usb task sleeping...\n");
+//			debug ("usb task sleeping...\n");
 			ao_sleep(&ao_usb_task);
 		}
 		sei();
-//		printf ("UEINTX for ep0 is %02x\n", intx);
+//		debug ("UEINTX for ep0 is %02x\n", intx);
 		if (intx & (1 << RXSTPI)) {
 			ao_usb_ep0_setup();
 		}
@@ -397,7 +403,7 @@ ao_usb_ep0(void)
 			ao_usb_ep0_set_in_pending(1);
 		}
 		if (intx & (1 << TXINI) && ao_usb_ep0_in_pending) {
-			printf ("continue sending ep0 IN data\n");
+			debug ("continue sending ep0 IN data\n");
 			ao_usb_ep0_flush();
 		}
 	}
@@ -459,8 +465,6 @@ ao_usb_putchar(char c) __critical __reentrant
 	if (!ao_usb_running)
 		return;
 
-	ao_usb_in_flushed = 0;
-
 	ao_usb_in_wait();
 
 	/* Queue a byte */
@@ -470,6 +474,7 @@ ao_usb_putchar(char c) __critical __reentrant
 	/* Send the packet when full */
 	if ((UEINTX & (1 << RWAL)) == 0)
 		ao_usb_in_send();
+	ao_usb_in_flushed = 0;
 }
 
 static char
@@ -478,10 +483,13 @@ _ao_usb_pollchar(void)
 	char c;
 	uint8_t	intx;
 
+	if (!ao_usb_running)
+		return AO_READ_AGAIN;
+
 	for (;;) {
 		UENUM = AO_USB_OUT_EP;
 		intx = UEINTX;
-		printf("usb_pollchar UEINTX %02d\n", intx);
+		debug("usb_pollchar UEINTX %02d\n", intx);
 		if (intx & (1 << RWAL))
 			break;
 
@@ -530,7 +538,9 @@ ISR(USB_COM_vect)
 {
 	uint8_t	i = UEINT;
 
+#ifdef AO_LED_RED
 	ao_led_toggle(AO_LED_RED);
+#endif
 	UEINT = 0;
 	if (i & (1 << 0))
 		ao_wakeup(&ao_usb_task);
@@ -544,7 +554,10 @@ ISR(USB_COM_vect)
 #define AO_PAD_REGULATOR_INIT	(1 << UVREGE)	/* Turn on pad regulator */
 #endif
 #if AVR_VCC_3V3
-#define AO_PAD_REGULATOR_INIT	0		/* Turn off pad regulator */
+/* TeleScience V0.1 has a hardware bug -- UVcc is hooked up, but UCap is not
+ * Make this work by running power through UVcc to the USB system
+ */
+#define AO_PAD_REGULATOR_INIT	(1 << UVREGE)	/* Turn off pad regulator */
 #endif
 
 #if AVR_CLOCK == 16000000UL
@@ -598,11 +611,14 @@ ao_usb_enable(void)
 
 	ao_usb_configuration = 0;
 
-	printf ("ao_usb_enable\n");
+	debug ("ao_usb_enable\n");
 
+	debug ("UHWCON %02x USBCON %02x PLLCSR %02x UDIEN %02x\n",
+	       UHWCON, USBCON, PLLCSR, UDIEN);
 	UDCON = (0 << DETACH);	/* Clear the DETACH bit to plug into the bus */
 }
 
+#if USB_DEBUG
 struct ao_task __xdata ao_usb_echo_task;
 
 static void
@@ -616,14 +632,15 @@ ao_usb_echo(void)
 		ao_usb_flush();
 	}
 }
+#endif
 
 void
 ao_usb_init(void)
 {
 	ao_usb_enable();
 
-	printf ("ao_usb_init\n");
+	debug ("ao_usb_init\n");
 	ao_add_task(&ao_usb_task, ao_usb_ep0, "usb");
-	ao_add_task(&ao_usb_echo_task, ao_usb_echo, "usb echo");
-//	ao_add_stdio(ao_usb_pollchar, ao_usb_putchar, ao_usb_flush);
+//	ao_add_task(&ao_usb_echo_task, ao_usb_echo, "usb echo");
+	ao_add_stdio(ao_usb_pollchar, ao_usb_putchar, ao_usb_flush);
 }

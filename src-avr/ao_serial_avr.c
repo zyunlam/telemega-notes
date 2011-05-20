@@ -20,6 +20,15 @@
 __xdata struct ao_fifo	ao_usart1_rx_fifo;
 __xdata struct ao_fifo	ao_usart1_tx_fifo;
 
+void
+ao_debug_out(char c)
+{
+	if (c == '\n')
+		ao_debug_out('\r');
+	loop_until_bit_is_set(UCSR1A, UDRE1);
+	UDR1 = c;
+}
+
 ISR(USART1_RX_vect)
 {
 	if (!ao_fifo_full(ao_usart1_rx_fifo))
@@ -145,11 +154,13 @@ ao_serial_init(void)
 		  (1 << TXEN1) |	/* Enable transmitter */
 		  (1 << RXCIE1) |	/* Enable receive interrupts */
 		  (1 << UDRIE1));	/* Enable transmit empty interrupts */
+#if 0
 #if USE_SERIAL_STDIN
 	int8_t	i;
 	i = ao_add_stdio(ao_serial_pollchar,
 			 ao_serial_putchar,
 			 NULL);
 	printf("Register serial stdio as %d\n", i);
+#endif
 #endif
 }
