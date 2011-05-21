@@ -50,6 +50,7 @@ ALTOS_SRC = \
 	ao_timer.c \
 	ao_led.c \
 	ao_usb_avr.c \
+	ao_adc_avr.c \
 	$(TELESCIENCE_STORAGE)
 
 PRODUCT=TeleScience-v0.1

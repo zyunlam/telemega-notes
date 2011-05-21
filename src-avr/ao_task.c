@@ -26,6 +26,8 @@ __xdata struct ao_task *__data ao_cur_task;
 
 #ifdef AVR
 
+uint8_t	ao_cpu_sleep_disable;
+
 #define PUSH8(stack, val)	(*((stack)--) = (val))
 
 static void
@@ -200,7 +202,8 @@ ao_yield(void) __naked
 			/* Enter lower power mode when there isn't anything to do */
 			if (ao_next_task_index == ao_cur_task_index)
 #ifdef AVR
-				sleep_cpu();
+				if (!ao_cpu_sleep_disable)
+					sleep_cpu();
 #else
 				PCON = PCON_IDLE;
 #endif

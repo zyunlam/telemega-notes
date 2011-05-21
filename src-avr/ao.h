@@ -65,6 +65,10 @@ extern __xdata struct ao_task *__data ao_cur_task;
 #define AO_NUM_TASKS		16	/* maximum number of tasks */
 #define AO_NO_TASK		0	/* no task id */
 
+#ifdef AVR
+extern uint8_t	ao_cpu_sleep_disable;
+#endif
+
 /*
  ao_task.c
  */
@@ -165,14 +169,22 @@ ao_clock_init(void);
 /*
  * One set of samples read from the A/D converter or telemetry
  */
+#ifdef AVR
+#define NUM_ADC		12
+#endif
+
 struct ao_adc {
 	uint16_t	tick;		/* tick when the sample was read */
+#ifdef AVR
+	uint16_t	adc[NUM_ADC];	/* samples */
+#else
 	int16_t		accel;		/* accelerometer */
 	int16_t		pres;		/* pressure sensor */
 	int16_t		temp;		/* temperature sensor */
 	int16_t		v_batt;		/* battery voltage */
 	int16_t		sense_d;	/* drogue continuity sense */
 	int16_t		sense_m;	/* main continuity sense */
+#endif
 };
 
 #if HAS_ADC
@@ -190,6 +202,7 @@ struct ao_adc {
  */
 
 #define AO_ADC_RING	32
+
 #define ao_adc_ring_next(n)	(((n) + 1) & (AO_ADC_RING - 1))
 #define ao_adc_ring_prev(n)	(((n) - 1) & (AO_ADC_RING - 1))
 

@@ -31,6 +31,7 @@ main(void)
 	ao_spi_init();
 	ao_storage_init();
 	ao_usb_init();
+	ao_adc_init();
 
 	/* Turn on the LED until the system is stable */
 	ao_start_scheduler();

@@ -263,6 +263,7 @@
 	#define USE_SERIAL_STDIN	1
 	#define HAS_SERIAL_1		1
 	#define HAS_USB			1
+	#define HAS_ADC			1
 	#define PACKET_HAS_SLAVE	0
 
 	#define AVR_VCC_5V	       	0
