@@ -20,7 +20,6 @@
 volatile __xdata struct ao_adc	ao_adc_ring[AO_ADC_RING];
 volatile __data uint8_t		ao_adc_head;
 
-#define ADC0
 const uint8_t	adc_channels[NUM_ADC] = {
 	0x00,
 	0x01,
@@ -37,10 +36,6 @@ const uint8_t	adc_channels[NUM_ADC] = {
 };
 
 static uint8_t	ao_adc_channel;
-
-
-static uint16_t	ao_adc_int_count;
-static uint16_t	ao_adc_int_error;
 
 #define ADC_CHANNEL_LOW(c)	(((c) & 0x1f) << MUX0)
 #define ADC_CHANNEL_HIGH(c)	((((c) & 0x20) >> 5) << MUX5)
@@ -75,11 +70,8 @@ ao_adc_start(void)
 ISR(ADC_vect)
 {
 	uint16_t	value;
-	uint8_t	channel;
-	++ao_adc_int_count;
-	channel = (ADMUX & 0x1f) | (ADCSRB & 0x20);
-	if (adc_channels[ao_adc_channel] != channel)
-		++ao_adc_int_error;
+
+	/* Must read ADCL first or the value there will be lost */
 	value = ADCL;
 	value |= (ADCH << 8);
 	ao_adc_ring[ao_adc_head].adc[ao_adc_channel] = value;
@@ -114,14 +106,10 @@ ao_adc_dump(void) __reentrant
 {
 	static __xdata struct ao_adc	packet;
 	uint8_t i;
-	printf ("interrupts: %u\n", ao_adc_int_count);
-	printf ("errors: %u\n", ao_adc_int_error);
 	ao_adc_get(&packet);
-	printf ("ADMUX %02x ADCSRA %02x ADCSRB %02x\n",
-		ADMUX, ADCSRA, ADCSRB);
 	printf("tick: %5u",  packet.tick);
 	for (i = 0; i < NUM_ADC; i++)
-		printf (" %5u", packet.adc[i]);
+		printf (" %2d: %5u", i, packet.adc[i]);
 	printf ("\n");
 }
 
