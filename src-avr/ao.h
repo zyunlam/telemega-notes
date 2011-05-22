@@ -201,7 +201,7 @@ struct ao_adc {
  * ao_adc.c
  */
 
-#define AO_ADC_RING	16
+#define AO_ADC_RING	8
 
 #define ao_adc_ring_next(n)	(((n) + 1) & (AO_ADC_RING - 1))
 #define ao_adc_ring_prev(n)	(((n) - 1) & (AO_ADC_RING - 1))
