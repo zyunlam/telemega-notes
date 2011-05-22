@@ -51,6 +51,7 @@ ALTOS_SRC = \
 	ao_led.c \
 	ao_usb_avr.c \
 	ao_adc_avr.c \
+	ao_log_telescience.c \
 	$(TELESCIENCE_STORAGE)
 
 PRODUCT=TeleScience-v0.1
