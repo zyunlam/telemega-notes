@@ -77,8 +77,11 @@ quiet ?= $($1)
 
 all: $(PROG)
 
+CHECK=sh ../check-avr-mem
+
 $(PROG): Makefile $(OBJ)
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ)
+	$(call quiet,CHECK) $(PROG) || ($(RM) -f $(PROG); exit 1)
 
 $(PROG).hex: $(PROG)
 	avr-size $(PROG)
