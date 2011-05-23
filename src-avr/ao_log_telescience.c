@@ -88,7 +88,6 @@ ao_log_valid(struct ao_log_telescience *log)
 void
 ao_log_start(void)
 {
-	printf("Log goes from %ld to %ld\n", ao_log_current_pos, ao_log_end_pos);
 	ao_log_running = 1;
 	ao_wakeup(&ao_log_running);
 }
@@ -96,7 +95,6 @@ ao_log_start(void)
 void
 ao_log_stop(void)
 {
-	printf ("Log stopped at %ld\n", ao_log_current_pos);
 	ao_log_running = 0;
 	ao_wakeup((void *) &ao_adc_head);
 }
@@ -159,10 +157,13 @@ ao_log_set(void)
 {
 	ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success) {
-		if (ao_cmd_lex_i)
+		if (ao_cmd_lex_i) {
+			printf("Logging from %ld to %ld\n", ao_log_current_pos, ao_log_end_pos);
 			ao_log_start();
-		else
+		} else {
+			printf ("Log stopped at %ld\n", ao_log_current_pos);
 			ao_log_stop();
+		}
 	}
 }
 
