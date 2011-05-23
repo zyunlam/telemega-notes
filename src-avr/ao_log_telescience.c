@@ -86,8 +86,35 @@ ao_log_valid(struct ao_log_telescience *log)
 }
 
 void
+ao_log_start(void)
+{
+	printf("Log goes from %ld to %ld\n", ao_log_current_pos, ao_log_end_pos);
+	ao_log_running = 1;
+	ao_wakeup(&ao_log_running);
+}
+
+void
+ao_log_stop(void)
+{
+	printf ("Log stopped at %ld\n", ao_log_current_pos);
+	ao_log_running = 0;
+	ao_wakeup((void *) &ao_adc_head);
+}
+
+void
+ao_log_check_pin(void)
+{
+	if (PINB & (1 << PINB0))
+		ao_log_stop();
+	else
+		ao_log_start();
+}
+
+void
 ao_log_telescience(void)
 {
+	ao_log_check_pin();
+
 	ao_storage_setup();
 
 	/* Find end of data */
@@ -125,22 +152,6 @@ ao_log_telescience(void)
 			ao_sleep((void *) &ao_adc_head);
 		}
 	}
-}
-
-void
-ao_log_start(void)
-{
-	printf("Log goes from %ld to %ld\n", ao_log_current_pos, ao_log_end_pos);
-	ao_log_running = 1;
-	ao_wakeup(&ao_log_running);
-}
-
-void
-ao_log_stop(void)
-{
-	printf ("Log stopped at %ld\n", ao_log_current_pos);
-	ao_log_running = 0;
-	ao_wakeup((void *) &ao_adc_head);
 }
 
 void
@@ -214,10 +225,21 @@ const struct ao_cmds ao_log_cmds[] = {
 	{ 0,	NULL },
 };
 
+ISR(PCINT0_vect)
+{
+	ao_log_check_pin();
+}
+
 void
 ao_log_init(void)
 {
 	ao_log_running = 0;
+
+	PCMSK0 |= (1 << PCINT0);	/* Enable PCINT0 pin change */
+
+	PCICR |= (1 << PCIE0);		/* Enable pin change interrupt */
+
+	PORTB &= ~(1 << PORTB0);	/* Pull input down; always log if NC */
 
 	ao_cmd_register(&ao_log_cmds[0]);
 
