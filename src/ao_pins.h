@@ -72,6 +72,11 @@
 	#define M25_MAX_CHIPS		1
 	#define HAS_ACCEL		1
 	#define HAS_IGNITE		1
+
+	#define ASCENT_SIGNAL		P1_2	/* Use CS1 to signal ascent */
+	#define ASCENT_SIGNAL_DIR	P1DIR
+	#define ASCENT_SIGNAL_SEL	P1SEL
+	#define ASCENT_SIGNAL_PIN	2
 #endif
 
 #if defined(TELEDONGLE_V_0_2)

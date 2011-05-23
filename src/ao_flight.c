@@ -168,6 +168,9 @@ ao_flight(void)
 				ao_wakeup(&ao_gps_data);
 				ao_wakeup(&ao_gps_tracking_data);
 #endif
+#ifdef ASCENT_PIN
+				ASCENT_PIN = 0;
+#endif
 
 				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
 				break;
@@ -237,6 +240,9 @@ ao_flight(void)
 				/* Turn the RDF beacon back on */
 				ao_rdf_set(1);
 
+#ifdef ASCENT_PIN
+				ASCENT_PIN = 1;
+#endif
 				/*
 				 * Start recording min/max height
 				 * to figure out when the rocket has landed
@@ -313,6 +319,11 @@ static __xdata struct ao_task	flight_task;
 void
 ao_flight_init(void)
 {
+#ifdef ASCENT_SIGNAL
+	ASCENT_SIGNAL = 1;
+	ASCENT_SIGNAL_DIR |= (1 << ASCENT_SIGNAL_PIN);
+	ASCENT_SIGNAL_SEL &= ~(1 << ASCENT_SIGNAL_PIN);
+#endif
 	ao_flight_state = ao_flight_startup;
 	ao_add_task(&flight_task, ao_flight, "flight");
 }
