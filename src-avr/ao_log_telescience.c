@@ -111,8 +111,6 @@ ao_log_check_pin(void)
 void
 ao_log_telescience(void)
 {
-	ao_log_check_pin();
-
 	ao_storage_setup();
 
 	/* Find end of data */
@@ -122,12 +120,21 @@ ao_log_telescience(void)
 		if (!ao_log_valid(&log))
 			break;
 	}
+
+	/*
+	 * Wait for the other side to settle down
+	 */
+	ao_delay(AO_SEC_TO_TICKS(5));
+
+	ao_log_check_pin();
+
 	ao_log_current_pos = ao_log_start_pos;
 	ao_log_end_pos = ao_storage_config;
 	for (;;) {
 		while (!ao_log_running)
 			ao_sleep(&ao_log_running);
 
+		flush();
 		memset(&log, '\0', sizeof (struct ao_log_telescience));
 		log.type = AO_LOG_TELESCIENCE_START;
 		log.tick = ao_time();
@@ -149,12 +156,14 @@ ao_log_telescience(void)
 			/* Wait for more ADC data to arrive */
 			ao_sleep((void *) &ao_adc_head);
 		}
+		flush();
 	}
 }
 
 void
 ao_log_set(void)
 {
+	printf("Logging currently %s\n", ao_log_running ? "on" : "off");
 	ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success) {
 		if (ao_cmd_lex_i) {
@@ -165,6 +174,7 @@ ao_log_set(void)
 			ao_log_stop();
 		}
 	}
+	ao_cmd_status = ao_cmd_success;
 }
 
 void
@@ -174,7 +184,7 @@ ao_log_list(void)
 	uint32_t	start = 0;
 	uint8_t		flight = 0;
 
-	for (pos = 0; pos < ao_storage_config; pos += sizeof (struct ao_log_telescience)) {
+	for (pos = 0; ; pos += sizeof (struct ao_log_telescience)) {
 		if (!ao_storage_read(pos, &log, sizeof (struct ao_log_telescience)))
 			break;
 		if (!ao_log_valid(&log) || log.type == AO_LOG_TELESCIENCE_START) {
@@ -206,6 +216,7 @@ ao_log_delete(void)
 		printf("No such flight: %d\n", ao_cmd_lex_i);
 		return;
 	}
+	ao_log_stop();
 	for (pos = 0; pos < ao_storage_config; pos += ao_storage_block) {
 		if (!ao_storage_read(pos, &log, sizeof (struct ao_log_telescience)))
 			break;
@@ -213,6 +224,7 @@ ao_log_delete(void)
 			break;
 		ao_storage_erase(pos);
 	}
+	ao_log_current_pos = ao_log_start_pos = 0;
 	if (pos == 0)
 		printf("No such flight: %d\n", ao_cmd_lex_i);
 	else
@@ -236,11 +248,13 @@ ao_log_init(void)
 {
 	ao_log_running = 0;
 
+	DDRB &= ~(1 << DDB0);
+
+	PORTB |= (1 << PORTB0);		/* Pull input up; require input to log */
+
 	PCMSK0 |= (1 << PCINT0);	/* Enable PCINT0 pin change */
 
 	PCICR |= (1 << PCIE0);		/* Enable pin change interrupt */
-
-	PORTB &= ~(1 << PORTB0);	/* Pull input down; always log if NC */
 
 	ao_cmd_register(&ao_log_cmds[0]);
 
