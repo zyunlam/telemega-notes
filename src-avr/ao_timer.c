@@ -140,7 +140,13 @@ ao_clock_init(void)
 	/* Disable the clock prescaler */
 	cli();
 	CLKPR = (1 << CLKPCE);
+
+	/* Always run the system clock at 8MHz */
+#if AVR_CLOCK > 12000000UL
+	CLKPR = 1;
+#else
 	CLKPR = 0;
+#endif
 	sei();
 
 	/* Set up the PLL to use the crystal */
