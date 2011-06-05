@@ -45,7 +45,8 @@ ALTOS_SRC = \
 	ao_task.c \
 	ao_timer.c \
 	ao_led.c \
-	ao_usb_avr.c
+	ao_usb_avr.c \
+	ao_lcd.c
 
 PRODUCT=AvrDemo-v0.0
 MCU=atmega32u4

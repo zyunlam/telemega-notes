@@ -18,7 +18,7 @@ DUDECPUTYPE=m32u4
 PROGRAMMER=usbtiny
 LOADCMD=avrdude
 LOADARG=-p $(DUDECPUTYPE) -c $(PROGRAMMER) -e -U flash:w:
-CC=avr-gcc
+CC=avr-gcc -v
 OBJCOPY=avr-objcopy
 
 ifndef VERSION

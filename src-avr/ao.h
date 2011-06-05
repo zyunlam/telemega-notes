@@ -324,6 +324,13 @@ void
 ao_led_init(uint8_t enable);
 
 /*
+ * ao_lcd.c
+ */
+
+void
+ao_lcd_init(void);
+
+/*
  * ao_romconfig.c
  */
 

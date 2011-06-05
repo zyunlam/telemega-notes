@@ -43,6 +43,7 @@ main(void)
 	ao_timer_init();
 	ao_cmd_init();
 	ao_usb_init();
+	ao_lcd_init();
 
 //	ao_add_task(&demo_task, ao_demo, "demo");
 	/* Turn on the LED until the system is stable */
