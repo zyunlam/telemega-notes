@@ -108,11 +108,24 @@ ao_lcd_send_nibble(uint8_t rs, uint8_t data)
 	ao_lcd_set_bits(data);
 }
 
+static uint16_t	ao_lcd_time = 3;
+
+void
+ao_lcd_delay(void)
+{
+	volatile uint16_t	count;
+
+	for (count = 0; count < ao_lcd_time; count++)
+		;
+}
+
 void
 ao_lcd_send_ins(uint8_t data)
 {
-	printf("send ins %02x\n", data);
-	ao_lcd_wait_idle();
+//	printf("send ins %02x\n", data);
+//	ao_lcd_wait_idle();
+//	ao_delay(1);
+	ao_lcd_delay();
 	ao_lcd_send_nibble(0, data >> 4);
 	ao_lcd_send_nibble(0, data & 0xf);
 }
@@ -120,8 +133,9 @@ ao_lcd_send_ins(uint8_t data)
 void
 ao_lcd_send_data(uint8_t data)
 {
-	printf ("send data %02x\n", data);
-	ao_lcd_wait_idle();
+//	printf ("send data %02x\n", data);
+//	ao_lcd_wait_idle();
+	ao_lcd_delay();
 	ao_lcd_send_nibble(1, data >> 4);
 	ao_lcd_send_nibble(1, data & 0x0f);
 }
@@ -198,21 +212,63 @@ ao_lcd_contrast(void)
 	}
 }
 
+static uint8_t
+ao_cmd_hex_nibble(void)
+{
+	if ('0' <= ao_cmd_lex_c && ao_cmd_lex_c <= '9')
+		return ao_cmd_lex_c - '0';
+	if ('a' <= ao_cmd_lex_c && ao_cmd_lex_c <= 'f')
+		return ao_cmd_lex_c - ('a' - 10);
+	if ('A' <= ao_cmd_lex_c && ao_cmd_lex_c <= 'F')
+		return ao_cmd_lex_c - ('A' - 10);
+	ao_cmd_status = ao_cmd_syntax_error;
+	return 0;
+}
+
 void
 ao_lcd_string(void)
 {
-	ao_lcd_clear();
+	uint8_t	col = 0;
+	uint8_t	c;
+
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	ao_lcd_send_ins(0x80 | (ao_cmd_lex_i ? 0x40 : 0x00));
 	ao_cmd_white();
 	while (ao_cmd_lex_c != '\n') {
-		ao_lcd_send_data(ao_cmd_lex_c);
+		c = ao_cmd_lex_c;
+		if (c == '\\') {
+			ao_cmd_lex();
+			c = ao_cmd_hex_nibble() << 4;
+			ao_cmd_lex();
+			c |= ao_cmd_hex_nibble();
+		}
+		ao_lcd_send_data(c);
 		ao_cmd_lex();
+		col++;
+	}
+	while (col < 16) {
+		ao_lcd_send_data(' ');
+		col++;
+	}
+}
+
+void
+ao_lcd_delay_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status == ao_cmd_success) {
+		printf("setting LCD delay to %d\n", ao_cmd_lex_i);
+		ao_lcd_time = ao_cmd_lex_i;
 	}
 }
 
 __code struct ao_cmds ao_lcd_cmds[] = {
 	{ ao_lcd_start, "S\0Start LCD" },
-	{ ao_lcd_contrast, "C\0Set LCD contrast" },
-	{ ao_lcd_string, "s\0Send string to LCD" },
+	{ ao_lcd_contrast, "C <contrast>\0Set LCD contrast" },
+	{ ao_lcd_string, "s <line> <string>\0Send string to LCD" },
+	{ ao_lcd_delay_set, "t <delay>\0Set LCD delay" },
 	{ 0, NULL },
 };
 
