@@ -92,7 +92,8 @@ altosui_JAVA = \
 	AltosGraphUI.java \
 	AltosDataChooser.java \
 	AltosVersion.java \
-	AltosVoice.java
+	AltosVoice.java \
+	AltosTerra.java
 
 JFREECHART_CLASS= \
     jfreechart.jar

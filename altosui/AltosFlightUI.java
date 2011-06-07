@@ -41,6 +41,7 @@ public class AltosFlightUI extends JFrame implements AltosFlightDisplay {
 	AltosLanded	landed;
 	AltosSiteMap    sitemap;
 	boolean		has_map;
+	AltosTerra	terra;
 
 	private AltosFlightStatus flightStatus;
 	private AltosInfoTable flightInfo;
@@ -88,6 +89,7 @@ public class AltosFlightUI extends JFrame implements AltosFlightDisplay {
 		ascent.show(state, crc_errors);
 		descent.show(state, crc_errors);
 		landed.show(state, crc_errors);
+		terra.display(state);
 		if (tab != cur_tab) {
 			if (cur_tab == pane.getSelectedComponent()) {
 				pane.setSelectedComponent(tab);
@@ -230,6 +232,9 @@ public class AltosFlightUI extends JFrame implements AltosFlightDisplay {
 
 		pack();
 		setVisible(true);
+
+		terra = new AltosTerra(this);
+		terra.setVisible(true);
 
 		thread = new AltosDisplayThread(this, voice, this, reader);
 
