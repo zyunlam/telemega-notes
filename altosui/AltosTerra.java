@@ -116,6 +116,10 @@ public class AltosTerra
 	}
 
 	public void display() {
+		double speed = current_state.speed;
+		if (!current_state.ascent)
+			speed = current_state.baro_speed;
+		
 		switch (displayed_tab) {
 		default:
 		case info_tab:
@@ -140,7 +144,7 @@ public class AltosTerra
 			break;
 		case ascent_tab:
 			setLine(0, "S:%5d S⌈%5d%c",
-				(int) Math.floor(current_state.speed + 0.5),
+				(int) Math.floor(speed + 0.5),
 				(int) Math.floor(current_state.max_speed + 0.5),
 				state_char(current_state));
 			setLine(1, "H:%5d H⌈%5d",
@@ -154,7 +158,7 @@ public class AltosTerra
 				state_char(current_state));
 			setLine(1, "H%5d  S%5d",
 				(int) Math.floor(current_state.height + 0.5),
-				(int) Math.floor(current_state.baro_speed + 0.5));
+				(int) Math.floor(speed + 0.5));
 			break;
 		case landing_tab:
 			setLine(0, "%s%c", pos(current_state.gps.lat, "N", "S"),
