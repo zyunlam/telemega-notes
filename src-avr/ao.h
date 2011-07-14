@@ -1421,4 +1421,33 @@ ao_btm_init(void);
 void
 ao_debug_init(void);
 
+/* ao_spi_slave.c */
+
+void
+ao_spi_slave_read(uint8_t *data, int len);
+
+void
+ao_spi_slave_write(uint8_t *data, int len);
+
+void
+ao_spi_slave_init(void);
+
+/* ao_companion.c */
+
+#define AO_COMPANION_SETUP		1
+#define AO_COMPANION_FETCH		2
+
+struct ao_companion_command {
+	uint8_t		command;
+	uint8_t		flight_state;
+	uint16_t	tick;
+};
+
+struct ao_companion_setup {
+	uint16_t	board_id;
+	uint16_t	board_id_inverse;
+	uint8_t		update_period;
+	uint8_t		channels;
+};
+
 #endif /* _AO_H_ */
