@@ -201,7 +201,7 @@ struct ao_adc {
  * ao_adc.c
  */
 
-#define AO_ADC_RING	16
+#define AO_ADC_RING	8
 
 #define ao_adc_ring_next(n)	(((n) + 1) & (AO_ADC_RING - 1))
 #define ao_adc_ring_prev(n)	(((n) - 1) & (AO_ADC_RING - 1))
@@ -1343,6 +1343,7 @@ struct ao_fifo {
 	(f).remove = ((f).remove + 1) & (AO_FIFO_SIZE-1); \
 } while(0)
 
+#define ao_fifo_reset(f)	((f).insert = (f).remove = 0)
 #define ao_fifo_full(f)		((((f).insert + 1) & (AO_FIFO_SIZE-1)) == (f).remove)
 #define ao_fifo_empty(f)	((f).insert == (f).remove)
 
@@ -1423,11 +1424,14 @@ ao_debug_init(void);
 
 /* ao_spi_slave.c */
 
-void
+int
 ao_spi_slave_read(uint8_t *data, int len);
 
-void
+int
 ao_spi_slave_write(uint8_t *data, int len);
+
+void
+ao_spi_slave_debug(void);
 
 void
 ao_spi_slave_init(void);

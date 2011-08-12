@@ -18,7 +18,7 @@ DUDECPUTYPE=m32u4
 PROGRAMMER=usbtiny
 LOADCMD=avrdude
 LOADARG=-p $(DUDECPUTYPE) -c $(PROGRAMMER) -e -U flash:w:
-CC=avr-gcc -v
+CC=avr-gcc
 OBJCOPY=avr-objcopy
 
 ifndef VERSION
@@ -59,7 +59,7 @@ PRODUCT=TeleScience-v0.1
 MCU=atmega32u4
 PRODUCT_DEF=-DTELESCIENCE
 IDPRODUCT=0x000a
-CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -Os -mcall-prologues $(PRODUCT_DEF) -I. -DAVR
+CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -O3 -mcall-prologues $(PRODUCT_DEF) -I. -DAVR
 
 NICKLE=nickle
 

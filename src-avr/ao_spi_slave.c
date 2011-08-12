@@ -16,83 +16,85 @@
  */
 
 #include "ao.h"
+#include "ao_product.h"
 
-__xdata struct ao_fifo	ao_spi_slave_rx_fifo;
-__xdata struct ao_fifo	ao_spi_slave_tx_fifo;
+static struct ao_companion_command	ao_companion_command;
+static const struct ao_companion_setup	ao_companion_setup = {
+	.board_id 		= AO_idProduct_NUMBER,
+	.board_id_inverse	= ~AO_idProduct_NUMBER,
+	.update_period		= 50,
+	.channels		= NUM_ADC
+};
 
-static volatile uint8_t	ao_spi_slave_tx_started;
-
-static void
-ao_spi_slave_tx_start(void)
+static void ao_spi_slave_recv(void)
 {
-	if (!ao_spi_slave_tx_started && !ao_fifo_empty(ao_spi_slave_tx_fifo)) {
-		ao_spi_slave_tx_started = 1;
-		ao_fifo_remove(ao_spi_slave_tx_fifo, SPDR);
-	}
-}
+	uint8_t	*buf;
+	uint8_t len;
 
-ISR(SPI_STC_vect)
-{
-	uint8_t	spsr;
-
-	spsr = SPSR;
-	if (SPIF & (1 << SPIF)) {
-		uint8_t	byte = SPDR;
-		if (!ao_fifo_full(ao_spi_slave_rx_fifo))
-			ao_fifo_insert(ao_spi_slave_rx_fifo, byte);
-		ao_spi_slave_tx_started = 0;
-		ao_spi_slave_tx_start();
-		ao_wakeup(&ao_spi_slave_rx_fifo);
-		ao_wakeup(&ao_spi_slave_tx_fifo);
-	}
-}
-
-static void
-ao_spi_slave_put(uint8_t b) __critical
-{
-	cli();
-	while (ao_fifo_full(ao_spi_slave_tx_fifo))
-		ao_sleep(&ao_spi_slave_tx_fifo);
-	ao_fifo_insert(ao_spi_slave_tx_fifo, b);
-	ao_spi_slave_tx_start();
-	sei();
-}
-
-static uint8_t
-ao_spi_slave_get(void) __critical
-{
-	uint8_t	b;
-
-	cli();
-	while (ao_fifo_empty(ao_spi_slave_rx_fifo))
-		ao_sleep(&ao_spi_slave_rx_fifo);
-	ao_fifo_remove(ao_spi_slave_rx_fifo, b);
-	sei();
-	return b;
-}
-
-void
-ao_spi_slave_read(uint8_t *data, int len)
-{
+	len = sizeof (ao_companion_command);
+	buf = (uint8_t *) &ao_companion_command;
 	while (len--) {
-		ao_spi_slave_put(0);
-		*data++ = ao_spi_slave_get();
+		while (!(SPSR & (1 << SPIF)))
+			;
+		*buf++ = SPDR;
+	}
+
+	/* Figure out the outbound data */
+	switch (ao_companion_command.command) {
+	case AO_COMPANION_SETUP:
+		buf = (uint8_t *) &ao_companion_setup;
+		len = sizeof (ao_companion_setup);
+		break;
+	case AO_COMPANION_FETCH:
+		buf = (uint8_t *) &ao_adc_ring[ao_adc_ring_prev(ao_adc_head)].adc;
+		len = NUM_ADC * sizeof (uint16_t);
+		break;
+	default:
+		return;
+	}
+
+	/* Send the outbound data */
+	while (len--) {
+		SPDR = *buf++;
+		while (!(SPSR & (1 << SPIF)))
+			;
+	}
+	(void) SPDR;
+}
+
+static uint8_t ao_spi_slave_running;
+
+ISR(PCINT0_vect)
+{
+	if ((PINB & (1 << PINB0)) == 0) {
+		if (!(PCMSK0 & (1 << PCINT1)))
+			PCMSK0 |= (1 << PCINT1);
+		else {
+			PCMSK0 &= ~(1 << PCINT1);
+			cli();
+			if (!ao_spi_slave_running) {
+				ao_spi_slave_running = 1;
+				ao_spi_slave_recv();
+			}
+			sei();
+		}
+	} else {
+		ao_spi_slave_running = 0;
 	}
 }
 
-void
-ao_spi_slave_write(uint8_t *data, int len)
-{
-	while (len--) {
-		ao_spi_slave_put(*data++);
-		(void) ao_spi_slave_get();
-	}
+void ao_spi_slave_debug(void) {
+	printf ("slave running %d\n", ao_spi_slave_running);
 }
 
 void
 ao_spi_slave_init(void)
 {
-	SPCR = (1 << SPIE) |		/* Enable SPI interrupts */
+	PCMSK0 |= (1 << PCINT0);	/* Enable PCINT0 pin change */
+	PCICR |= (1 << PCIE0);		/* Enable pin change interrupt */
+
+	DDRB = (DDRB & 0xf0) | (1 << 3);
+	SPCR = (0 << SPIE) |		/* Disable SPI interrupts */
 		(1 << SPE) |		/* Enable SPI */
 		(0 << DORD) |		/* MSB first */
 		(0 << MSTR) |		/* Slave mode */

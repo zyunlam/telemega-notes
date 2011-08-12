@@ -19,7 +19,7 @@
 #include "ao_product.h"
 
 static struct ao_task ao_log_task;
-static struct ao_task ao_spi_task;
+//static struct ao_task ao_spi_task;
 
 uint8_t 	ao_log_running;
 uint8_t		ao_log_mutex;
@@ -233,47 +233,11 @@ ao_log_delete(void)
 		printf ("Erased\n");
 }
 
-void
-ao_spi_telescience(void)
-{
-	static union {
-		struct ao_companion_command	command;
-		struct ao_companion_setup	setup;
-		struct ao_adc			data;
-	} u;
-
-	for (;;) {
-		ao_spi_slave_read((uint8_t *) &u.command, sizeof (struct ao_companion_command));
-		switch (u.command.command) {
-		case AO_COMPANION_SETUP:
-			u.setup.board_id = AO_idProduct_NUMBER;
-			u.setup.board_id_inverse = ~AO_idProduct_NUMBER;
-			u.setup.update_period = 10;
-			u.setup.channels = NUM_ADC;
-			ao_spi_slave_write((uint8_t *) &u.setup,
-					   sizeof (struct ao_companion_setup));
-			break;
-		case AO_COMPANION_FETCH:
-			ao_adc_get(&u.data);
-			ao_spi_slave_write((uint8_t *) &u.data.adc,
-					   NUM_ADC * sizeof (uint16_t));
-			if (u.command.flight_state >= ao_flight_boost &&
-			    u.command.flight_state < ao_flight_landed) {
-				if (!ao_log_running)
-					ao_log_start();
-			} else {
-				if (ao_log_running)
-					ao_log_stop();
-			}
-			break;
-		}
-	}
-}
-
 const struct ao_cmds ao_log_cmds[] = {
 	{ ao_log_set,	"L <0 off, 1 on>\0Set logging mode" },
 	{ ao_log_list,	"l\0List stored flight logs" },
 	{ ao_log_delete, "d 1\0Delete all stored flights" },
+	{ ao_spi_slave_debug, "s\0Dump SPI slave data" },
 	{ 0,	NULL },
 };
 
@@ -285,5 +249,5 @@ ao_log_init(void)
 	ao_cmd_register(&ao_log_cmds[0]);
 
 	ao_add_task(&ao_log_task, ao_log_telescience, "log");
-	ao_add_task(&ao_spi_task, ao_spi_telescience, "spi");
+//	ao_add_task(&ao_spi_task, ao_spi_telescience, "spi");
 }
