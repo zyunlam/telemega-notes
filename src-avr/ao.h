@@ -577,11 +577,30 @@ extern __pdata uint32_t ao_log_start_pos;
 extern __xdata uint8_t	ao_log_running;
 extern __xdata enum flight_state ao_log_state;
 
+#define AO_LOG_TELESCIENCE_START	((uint8_t) 's')
+#define AO_LOG_TELESCIENCE_DATA		((uint8_t) 'd')
+
+struct ao_log_telescience {
+	uint8_t		type;
+	uint8_t		csum;
+	uint16_t	tick;
+	uint16_t	tm_tick;
+	uint8_t		tm_state;
+	uint8_t		unused;
+	uint16_t	adc[NUM_ADC];
+};
+
+extern struct ao_log_telescience ao_log_store;
+
 /* required functions from the underlying log system */
 
 /* Return the flight number from the given log slot, 0 if none */
 uint16_t
 ao_log_flight(uint8_t slot);
+
+/* Flash has been erased, go find the start of storage */
+void
+ao_log_restart(void);
 
 /* Flush the log */
 void
@@ -1440,6 +1459,7 @@ ao_spi_slave_init(void);
 
 #define AO_COMPANION_SETUP		1
 #define AO_COMPANION_FETCH		2
+#define AO_COMPANION_STATE		3
 
 struct ao_companion_command {
 	uint8_t		command;

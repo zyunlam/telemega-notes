@@ -153,8 +153,13 @@ ao_storage_zapall(void) __reentrant
 	ao_cmd_white();
 	if (!ao_match_word("DoIt"))
 		return;
+	if (ao_log_running) {
+		printf("Log is running, cannot erase\n");
+		return;
+	}
 	for (pos = 0; pos < ao_storage_config; pos += ao_storage_block)
 		ao_storage_erase(pos);
+	ao_log_restart();
 }
 
 void

@@ -58,7 +58,7 @@ ALTOS_SRC = \
 PRODUCT=TeleScience-v0.1
 MCU=atmega32u4
 PRODUCT_DEF=-DTELESCIENCE
-IDPRODUCT=0x000a
+IDPRODUCT=0x0011
 CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -O3 -mcall-prologues $(PRODUCT_DEF) -I. -DAVR
 
 NICKLE=nickle

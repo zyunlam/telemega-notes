@@ -30,17 +30,9 @@ uint32_t	ao_log_current_pos;
 #define AO_LOG_TELESCIENCE_START	((uint8_t) 's')
 #define AO_LOG_TELESCIENCE_DATA		((uint8_t) 'd')
 
-struct ao_log_telescience {
-	uint8_t		type;
-	uint8_t		csum;
-	uint16_t	tick;
-	union {
-		uint8_t		bytes[28];
-		uint16_t	adc[NUM_ADC];
-	} u;
-};
+struct ao_log_telescience ao_log_store;
+struct ao_log_telescience ao_log_fetch;
 
-static struct ao_log_telescience log;
 static uint8_t	ao_log_adc_pos;
 
 static uint8_t
@@ -54,20 +46,20 @@ ao_log_csum(__xdata uint8_t *b) __reentrant
 	return -sum;
 }
 
-uint8_t
-ao_log_telescience_data(struct ao_log_telescience *log)
+static uint8_t
+ao_log_telescience_write(void)
 {
 	uint8_t wrote = 0;
 
-	log->csum = 0;
-	log->csum = ao_log_csum((__xdata uint8_t *) log);
+	ao_log_store.csum = 0;
+	ao_log_store.csum = ao_log_csum((__xdata uint8_t *) &ao_log_store);
 	ao_mutex_get(&ao_log_mutex); {
 		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 			ao_log_stop();
 		if (ao_log_running) {
 			wrote = 1;
 			ao_storage_write(ao_log_current_pos,
-					 log,
+					 (__xdata uint8_t *) &ao_log_store,
 					 sizeof (struct ao_log_telescience));
 			ao_log_current_pos += sizeof (struct ao_log_telescience);
 		}
@@ -87,27 +79,56 @@ ao_log_valid(struct ao_log_telescience *log)
 	return 0;
 }
 
+static uint8_t
+ao_log_telescience_read(uint32_t pos)
+{
+	if (!ao_storage_read(pos, &ao_log_fetch, sizeof (struct ao_log_telescience)))
+		return 0;
+	return ao_log_valid(&ao_log_fetch);
+}
+
 void
 ao_log_start(void)
 {
-	ao_log_running = 1;
-	ao_wakeup(&ao_log_running);
+	if (!ao_log_running) {
+		ao_log_running = 1;
+		ao_wakeup(&ao_log_running);
+	}
 }
 
 void
 ao_log_stop(void)
 {
-	ao_log_running = 0;
-	ao_wakeup((void *) &ao_adc_head);
+	if (ao_log_running) {
+		ao_log_running = 0;
+	}
 }
 
 void
-ao_log_check_pin(void)
+ao_log_restart(void)
 {
-	if (PINB & (1 << PINB0))
-		ao_log_stop();
-	else
-		ao_log_start();
+	printf("Finding end of current data...\n"); flush();
+	/* Find end of data */
+	ao_log_end_pos = ao_storage_config;
+	for (ao_log_current_pos = 0;
+	     ao_log_current_pos < ao_storage_config;
+	     ao_log_current_pos += ao_storage_block)
+	{
+		printf("reading %ld\n", ao_log_current_pos); flush();
+		if (!ao_log_telescience_read(ao_log_current_pos))
+			break;
+	}
+	printf("last block is at %ld\n", ao_log_current_pos); flush();
+	if (ao_log_current_pos > 0) {
+		ao_log_current_pos -= ao_storage_block;
+		for (; ao_log_current_pos < ao_storage_config;
+		     ao_log_current_pos += sizeof (struct ao_log_telescience))
+		{
+			if (!ao_log_telescience_read(ao_log_current_pos))
+				break;
+		}
+	}
+	printf("Logging will start at %ld\n", ao_log_current_pos); flush();
 }
 
 void
@@ -115,50 +136,42 @@ ao_log_telescience(void)
 {
 	ao_storage_setup();
 
-	/* Find end of data */
-	while (ao_log_start_pos < ao_log_end_pos) {
-		if (!(ao_storage_read(ao_log_start_pos, &log, sizeof (struct ao_log_telescience))))
-			break;
-		if (!ao_log_valid(&log))
-			break;
-	}
-
-	/*
-	 * Wait for the other side to settle down
+	/* This can take a while, so let the rest
+	 * of the system finish booting before we start
 	 */
-	ao_delay(AO_SEC_TO_TICKS(5));
+	ao_delay(AO_SEC_TO_TICKS(10));
 
-	ao_log_check_pin();
-
-	ao_log_current_pos = ao_log_start_pos;
-	ao_log_end_pos = ao_storage_config;
+	ao_log_restart();
 	for (;;) {
 		while (!ao_log_running)
 			ao_sleep(&ao_log_running);
 
-		flush();
-		memset(&log, '\0', sizeof (struct ao_log_telescience));
-		log.type = AO_LOG_TELESCIENCE_START;
-		log.tick = ao_time();
-		ao_log_telescience_data(&log);
+		ao_log_start_pos = ao_log_current_pos;
+		printf("Start logging at %ld state %d\n",
+		       ao_log_current_pos, ao_log_store.tm_state); flush();
+		ao_log_store.type = AO_LOG_TELESCIENCE_START;
+		ao_log_store.tick = ao_time();
+		ao_log_telescience_write();
 		/* Write the whole contents of the ring to the log
 		 * when starting up.
 		 */
 		ao_log_adc_pos = ao_adc_ring_next(ao_adc_head);
-		log.type = AO_LOG_TELESCIENCE_DATA;
+		ao_log_store.type = AO_LOG_TELESCIENCE_DATA;
 		while (ao_log_running) {
 			/* Write samples to EEPROM */
 			while (ao_log_adc_pos != ao_adc_head) {
-				log.tick = ao_adc_ring[ao_log_adc_pos].tick;
-				memcpy(&log.u.adc, (void *) ao_adc_ring[ao_log_adc_pos].adc,
+				ao_log_store.tick = ao_adc_ring[ao_log_adc_pos].tick;
+				memcpy(&ao_log_store.adc, (void *) ao_adc_ring[ao_log_adc_pos].adc,
 				       NUM_ADC * sizeof (uint16_t));
-				ao_log_telescience_data(&log);
+				ao_log_telescience_write();
 				ao_log_adc_pos = ao_adc_ring_next(ao_log_adc_pos);
 			}
 			/* Wait for more ADC data to arrive */
 			ao_sleep((void *) &ao_adc_head);
 		}
-		flush();
+		printf("Stop logging at %ld state %d\n",
+		       ao_log_current_pos, ao_log_store.tm_state); flush();
+		memset(&ao_log_store.adc, '\0', sizeof (ao_log_store.adc));
 	}
 }
 
@@ -187,16 +200,17 @@ ao_log_list(void)
 	uint8_t		flight = 0;
 
 	for (pos = 0; ; pos += sizeof (struct ao_log_telescience)) {
-		if (!ao_storage_read(pos, &log, sizeof (struct ao_log_telescience)))
-			break;
-		if (!ao_log_valid(&log) || log.type == AO_LOG_TELESCIENCE_START) {
+		if (pos >= ao_storage_config ||
+		    !ao_log_telescience_read(pos) ||
+		    ao_log_fetch.type == AO_LOG_TELESCIENCE_START)
+		{
 			if (pos != start) {
 				printf("flight %d start %x end %x\n",
 				       flight,
 				       (uint16_t) (start >> 8),
-				       (uint16_t) ((pos + 0xff) >> 8));
+				       (uint16_t) ((pos + 0xff) >> 8)); flush();
 			}
-			if (!ao_log_valid(&log))
+			if (ao_log_fetch.type != AO_LOG_TELESCIENCE_START)
 				break;
 			start = pos;
 			flight++;
@@ -220,9 +234,7 @@ ao_log_delete(void)
 	}
 	ao_log_stop();
 	for (pos = 0; pos < ao_storage_config; pos += ao_storage_block) {
-		if (!ao_storage_read(pos, &log, sizeof (struct ao_log_telescience)))
-			break;
-		if (!ao_log_valid(&log))
+		if (!ao_log_telescience_read(pos))
 			break;
 		ao_storage_erase(pos);
 	}
@@ -233,11 +245,23 @@ ao_log_delete(void)
 		printf ("Erased\n");
 }
 
+static void
+ao_log_query(void)
+{
+	printf("Logging enabled: %d\n", ao_log_running);
+	printf("Log start: %ld\n", ao_log_start_pos);
+	printf("Log cur: %ld\n", ao_log_current_pos);
+	printf("Log end: %ld\n", ao_log_end_pos);
+	printf("log data tick: %04x\n", ao_log_store.tick);
+	printf("TM data tick: %04x\n", ao_log_store.tm_tick);
+	printf("TM state: %d\n", ao_log_store.tm_state);
+}
+
 const struct ao_cmds ao_log_cmds[] = {
 	{ ao_log_set,	"L <0 off, 1 on>\0Set logging mode" },
 	{ ao_log_list,	"l\0List stored flight logs" },
 	{ ao_log_delete, "d 1\0Delete all stored flights" },
-	{ ao_spi_slave_debug, "s\0Dump SPI slave data" },
+	{ ao_log_query, "q\0Query log status" },
 	{ 0,	NULL },
 };
 
@@ -249,5 +273,4 @@ ao_log_init(void)
 	ao_cmd_register(&ao_log_cmds[0]);
 
 	ao_add_task(&ao_log_task, ao_log_telescience, "log");
-//	ao_add_task(&ao_spi_task, ao_spi_telescience, "spi");
 }

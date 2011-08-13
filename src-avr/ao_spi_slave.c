@@ -26,7 +26,7 @@ static const struct ao_companion_setup	ao_companion_setup = {
 	.channels		= NUM_ADC
 };
 
-static void ao_spi_slave_recv(void)
+static uint8_t ao_spi_slave_recv(void)
 {
 	uint8_t	*buf;
 	uint8_t len;
@@ -35,7 +35,8 @@ static void ao_spi_slave_recv(void)
 	buf = (uint8_t *) &ao_companion_command;
 	while (len--) {
 		while (!(SPSR & (1 << SPIF)))
-			;
+			if ((PINB & (1 << PINB0)))
+				return 0;
 		*buf++ = SPDR;
 	}
 
@@ -49,17 +50,28 @@ static void ao_spi_slave_recv(void)
 		buf = (uint8_t *) &ao_adc_ring[ao_adc_ring_prev(ao_adc_head)].adc;
 		len = NUM_ADC * sizeof (uint16_t);
 		break;
+	case AO_COMPANION_STATE:
+		break;
 	default:
-		return;
+		return 0;
 	}
 
-	/* Send the outbound data */
-	while (len--) {
-		SPDR = *buf++;
-		while (!(SPSR & (1 << SPIF)))
-			;
+	if (len) {
+		/* Send the outbound data */
+		while (len--) {
+			SPDR = *buf++;
+			while (!(SPSR & (1 << SPIF)))
+				if ((PINB & (1 << PINB0)))
+					return 0;
+		}
+		(void) SPDR;
 	}
-	(void) SPDR;
+	ao_log_store.tm_tick = ao_companion_command.tick;
+	if (ao_log_store.tm_state != ao_companion_command.flight_state) {
+		ao_log_store.tm_state = ao_companion_command.flight_state;
+		return 1;
+	}
+	return 0;
 }
 
 static uint8_t ao_spi_slave_running;
@@ -67,16 +79,18 @@ static uint8_t ao_spi_slave_running;
 ISR(PCINT0_vect)
 {
 	if ((PINB & (1 << PINB0)) == 0) {
-		if (!(PCMSK0 & (1 << PCINT1)))
-			PCMSK0 |= (1 << PCINT1);
-		else {
-			PCMSK0 &= ~(1 << PCINT1);
+		if (!ao_spi_slave_running) {
+			uint8_t	changed;
+			ao_spi_slave_running = 1;
 			cli();
-			if (!ao_spi_slave_running) {
-				ao_spi_slave_running = 1;
-				ao_spi_slave_recv();
-			}
+			changed = ao_spi_slave_recv();
 			sei();
+			if (changed && ao_flight_boost <= ao_log_store.tm_state) {
+				if (ao_log_store.tm_state < ao_flight_landed)
+					ao_log_start();
+				else
+					ao_log_stop();
+			}
 		}
 	} else {
 		ao_spi_slave_running = 0;
