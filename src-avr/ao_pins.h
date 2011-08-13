@@ -259,6 +259,7 @@
 #ifdef TELESCIENCE
 	#define LEDS_AVAILABLE		0
 	#define HAS_USB			1
+	#define HAS_LOG			1
 	#define TEENSY			0
 	#define USE_SERIAL_STDIN	1
 	#define HAS_SERIAL_1		1
@@ -344,6 +345,10 @@
 
 #ifndef HAS_ADC
 #error Please define HAS_ADC
+#endif
+
+#ifndef HAS_LOG
+#define HAS_LOG HAS_EEPROM
 #endif
 
 #ifndef HAS_EEPROM

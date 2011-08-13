@@ -35,6 +35,8 @@ struct ao_log_telescience ao_log_fetch;
 
 static uint8_t	ao_log_adc_pos;
 
+__code uint8_t ao_log_format = AO_LOG_FORMAT_TELESCIENCE;
+
 static uint8_t
 ao_log_csum(__xdata uint8_t *b) __reentrant
 {
