@@ -18,7 +18,8 @@
 #include "ao.h"
 #include "ao_product.h"
 
-static struct ao_companion_command	ao_companion_command;
+struct ao_companion_command	ao_companion_command;
+
 static const struct ao_companion_setup	ao_companion_setup = {
 	.board_id 		= AO_idProduct_NUMBER,
 	.board_id_inverse	= ~AO_idProduct_NUMBER,
@@ -26,29 +27,46 @@ static const struct ao_companion_setup	ao_companion_setup = {
 	.channels		= NUM_ADC
 };
 
-static uint8_t ao_spi_slave_recv(void)
+static uint8_t
+ao_spi_read(uint8_t *buf, uint8_t len)
 {
-	uint8_t	*buf;
-	uint8_t len;
-
-	len = sizeof (ao_companion_command);
-	buf = (uint8_t *) &ao_companion_command;
 	while (len--) {
 		while (!(SPSR & (1 << SPIF)))
 			if ((PINB & (1 << PINB0)))
 				return 0;
 		*buf++ = SPDR;
 	}
+	return 1;
+}
+
+static void
+ao_spi_write(uint8_t *buf, uint8_t len)
+{
+	while (len--) {
+		SPDR = *buf++;
+		while (!(SPSR & (1 << SPIF)))
+			if ((PINB & (1 << PINB0)))
+				return;
+	}
+	/* Clear pending SPIF bit by reading */
+	(void) SPDR;
+}
+
+static uint8_t ao_spi_slave_recv(void)
+{
+	if (!ao_spi_read((uint8_t *) &ao_companion_command,
+			 sizeof (ao_companion_command)))
+		return 0;
 
 	/* Figure out the outbound data */
 	switch (ao_companion_command.command) {
 	case AO_COMPANION_SETUP:
-		buf = (uint8_t *) &ao_companion_setup;
-		len = sizeof (ao_companion_setup);
+		ao_spi_write((uint8_t *) &ao_companion_setup,
+			     sizeof (ao_companion_setup));
 		break;
 	case AO_COMPANION_FETCH:
-		buf = (uint8_t *) &ao_adc_ring[ao_adc_ring_prev(ao_adc_head)].adc;
-		len = NUM_ADC * sizeof (uint16_t);
+		ao_spi_write((uint8_t *) &ao_adc_ring[ao_adc_ring_prev(ao_adc_head)].adc,
+			     NUM_ADC * sizeof (uint16_t));
 		break;
 	case AO_COMPANION_STATE:
 		break;
@@ -56,16 +74,6 @@ static uint8_t ao_spi_slave_recv(void)
 		return 0;
 	}
 
-	if (len) {
-		/* Send the outbound data */
-		while (len--) {
-			SPDR = *buf++;
-			while (!(SPSR & (1 << SPIF)))
-				if ((PINB & (1 << PINB0)))
-					return 0;
-		}
-		(void) SPDR;
-	}
 	ao_log_store.tm_tick = ao_companion_command.tick;
 	if (ao_log_store.tm_state != ao_companion_command.flight_state) {
 		ao_log_store.tm_state = ao_companion_command.flight_state;
@@ -107,7 +115,24 @@ ao_spi_slave_init(void)
 	PCMSK0 |= (1 << PCINT0);	/* Enable PCINT0 pin change */
 	PCICR |= (1 << PCIE0);		/* Enable pin change interrupt */
 
-	DDRB = (DDRB & 0xf0) | (1 << 3);
+	DDRB = ((DDRB & 0xf0) |
+		(1 << 3) |		/* MISO, output */
+		(0 << 2) |		/* MOSI, input */
+		(0 << 1) |		/* SCK, input */
+		(0 << 0));		/* SS, input */
+
+	/* We'd like to have a pull-up on SS so that disconnecting the
+	 * TM would cause any SPI transaction to abort. However, when
+	 * I tried that, SPI transactions would spontaneously abort,
+	 * making me assume that we needed a less aggressive pull-up
+	 * than is offered inside the AVR
+	 */
+	PORTB = ((PORTB & 0xf0) |
+		 (1 << 3) |		/* MISO, output */
+		 (0 << 2) |		/* MOSI, no pull-up */
+		 (0 << 1) |		/* SCK, no pull-up */
+		 (0 << 0));		/* SS, no pull-up */
+
 	SPCR = (0 << SPIE) |		/* Disable SPI interrupts */
 		(1 << SPE) |		/* Enable SPI */
 		(0 << DORD) |		/* MSB first */

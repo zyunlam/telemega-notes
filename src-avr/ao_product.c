@@ -23,6 +23,7 @@
 const char ao_version[] = AO_iVersion_STRING;
 const char ao_manufacturer[] = AO_iManufacturer_STRING;
 const char ao_product[] = AO_iProduct_STRING;
+const int ao_serial_number = 1;
 
 #define LE_WORD(x)    ((x)&0xFF),((uint8_t) (((uint16_t) (x))>>8))
 

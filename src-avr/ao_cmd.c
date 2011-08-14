@@ -217,12 +217,13 @@ ao_reboot(void)
 	ao_panic(AO_PANIC_REBOOT);
 }
 
+
 static void
 version(void)
 {
 	printf("manufacturer     %s\n", ao_manufacturer);
 	printf("product          %s\n", ao_product);
-//	printf("serial-number    %u\n", ao_romconfig.serial_number);
+	printf("serial-number    %u\n", ao_serial_number);
 #if HAS_LOG
 	printf("log-format       %u\n", ao_log_format);
 #endif

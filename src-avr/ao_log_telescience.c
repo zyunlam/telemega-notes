@@ -109,18 +109,15 @@ ao_log_stop(void)
 void
 ao_log_restart(void)
 {
-	printf("Finding end of current data...\n"); flush();
 	/* Find end of data */
 	ao_log_end_pos = ao_storage_config;
 	for (ao_log_current_pos = 0;
 	     ao_log_current_pos < ao_storage_config;
 	     ao_log_current_pos += ao_storage_block)
 	{
-		printf("reading %ld\n", ao_log_current_pos); flush();
 		if (!ao_log_telescience_read(ao_log_current_pos))
 			break;
 	}
-	printf("last block is at %ld\n", ao_log_current_pos); flush();
 	if (ao_log_current_pos > 0) {
 		ao_log_current_pos -= ao_storage_block;
 		for (; ao_log_current_pos < ao_storage_config;
@@ -130,7 +127,6 @@ ao_log_restart(void)
 				break;
 		}
 	}
-	printf("Logging will start at %ld\n", ao_log_current_pos); flush();
 }
 
 void
@@ -149,10 +145,10 @@ ao_log_telescience(void)
 			ao_sleep(&ao_log_running);
 
 		ao_log_start_pos = ao_log_current_pos;
-		printf("Start logging at %ld state %d\n",
-		       ao_log_current_pos, ao_log_store.tm_state); flush();
 		ao_log_store.type = AO_LOG_TELESCIENCE_START;
 		ao_log_store.tick = ao_time();
+		ao_log_store.adc[0] = ao_companion_command.serial;
+		ao_log_store.adc[1] = ao_companion_command.flight;
 		ao_log_telescience_write();
 		/* Write the whole contents of the ring to the log
 		 * when starting up.
@@ -171,8 +167,6 @@ ao_log_telescience(void)
 			/* Wait for more ADC data to arrive */
 			ao_sleep((void *) &ao_adc_head);
 		}
-		printf("Stop logging at %ld state %d\n",
-		       ao_log_current_pos, ao_log_store.tm_state); flush();
 		memset(&ao_log_store.adc, '\0', sizeof (ao_log_store.adc));
 	}
 }
@@ -257,6 +251,8 @@ ao_log_query(void)
 	printf("log data tick: %04x\n", ao_log_store.tick);
 	printf("TM data tick: %04x\n", ao_log_store.tm_tick);
 	printf("TM state: %d\n", ao_log_store.tm_state);
+	printf("TM serial: %d\n", ao_companion_command.serial);
+	printf("TM flight: %d\n", ao_companion_command.flight);
 }
 
 const struct ao_cmds ao_log_cmds[] = {

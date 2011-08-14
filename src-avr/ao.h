@@ -1348,6 +1348,7 @@ ao_rssi_init(uint8_t rssi_led);
 extern const char ao_version[];
 extern const char ao_manufacturer[];
 extern const char ao_product[];
+extern const int ao_serial_number;
 
 /*
  * Fifos
@@ -1474,7 +1475,11 @@ struct ao_companion_command {
 	uint8_t		command;
 	uint8_t		flight_state;
 	uint16_t	tick;
+	uint16_t	serial;
+	uint16_t	flight;
 };
+
+extern struct ao_companion_command ao_companion_command;
 
 struct ao_companion_setup {
 	uint16_t	board_id;
