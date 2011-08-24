@@ -1,3 +1,33 @@
+commit db325c19b9d076e8ccdc2571ca941686fa7711d8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 23 21:17:36 2011 -0600
+
+    rewind changelog
+
+commit fc530ecfd01a3ae0593dc8a9659d72d7a371a22c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 23 21:16:56 2011 -0600
+
+    build on split branch
+
+commit 72475c4ccc969b050281893498fe43ea0829e1f9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 23 21:15:46 2011 -0600
+
+    first pass at splitting rules targets .. still folds through one 'install'
+
+commit b13596b2b2152d8af34f7aafa82b7d64a3636ff6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 23 20:24:49 2011 -0600
+
+    update control file for binary package split
+
+commit 192881b7cae49af375cc2b8b7305c937079ee724
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 23 20:11:01 2011 -0600
+
+    update changelogs for Debian build
+
 commit fc7e46b1215ea2b4cc138ed77d8eaa122369b15f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 23 20:10:14 2011 -0600
