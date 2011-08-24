@@ -1,20 +1,31 @@
 Source: altos
 Section: otherosfs
-Priority: extra
+Priority: optional
 Maintainer: Bdale Garbee <bdale@gag.com>
 Uploaders: Keith Packard <keithp@keithp.com>
 Build-Depends: debhelper (>= 7), autoconf, automake, flite1-dev, gawk, libasound2-dev, libgconf2-dev, libglade2-dev, libgtk2.0-dev, libreadline-dev, libusb-1.0-0-dev, nickle, sdcc, libplplot-dev, xsltproc, fop, docbook-xml, docbook-xsl, libsndfile1-dev, swig, openjdk-6-jdk, freetts, libtool, libjfreechart-java, libbluetooth-dev
 Standards-Version: 3.9.2
 Homepage: http://altusmetrum.org/AltOS
+Vcs-Git: git://git.gag.com/fw/altos
+Vcs-Browser: http://git.gag.com/?p=fw/altos
 
 Package: altos
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, default-jre | java2-runtime, freetts, nickle, plplot9-driver-cairo
+Architecture: all
+Depends: altos-bin, ${shlibs:Depends}, ${misc:Depends}, default-jre | java2-runtime, freetts
 Suggests: slim | gdm
 Replaces: altusmetrum-themes, slim-altusmetrum
 Conflicts: altusmetrum-themes, slim-altusmetrum
-Description: Altus Metrum firmware and utilities
- Firmware and utilities needed to support the TeleMetrum dual-deploy
- recording altimeter for high power model rocketry.  
+Description: Altus Metrum firmware and user interface
+ Firmware and platform-independent ground station program needed to support
+ Altus Metrum altimeter products for high power model rocketry.
+ .
+ See http://altusmetrum.org/ for more information.
+
+Package: altos-bin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, nickle, plplot9-driver-cairo
+Description: Altus Metrum platform specific runtime and utilities
+ Binary runtime library and utilities needed to support Altus Metrum
+ altimeter products for high power model rocketry.  
  .
  See http://altusmetrum.org/ for more information.
