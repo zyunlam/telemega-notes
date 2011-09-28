@@ -1,3 +1,19 @@
+altos (1.0.2) unstable; urgency=low
+
+  [ Bdale Garbee ]
+  * update release process docs
+  * update changelogs for Debian build
+  * include 1.0.1 release notes in docs, closes: #642705
+  * add run-time dependency on libjfreechart-java
+
+  [ Keith Packard ]
+  * altos: Delay reboot by a second to avoid re-entering idle mode
+  * Bump to version 1.0.2
+  * altos: TM: Don't turn on packet slave mode until idle/invalid state
+  * doc: Add 1.0.2 release notes
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 28 Sep 2011 01:58:27 -0600
+
 altos (1.0.1) unstable; urgency=low
 
   [ Bdale Garbee ]

@@ -1,3 +1,92 @@
+commit 8620861e6edb5c11f47458ebea1a3fad95354a48
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 28 01:57:22 2011 -0600
+
+    roll back Debian changelog to build for release
+
+commit ca8709f9b14a6c312be54e296904c5eb3267fcf8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 28 00:43:42 2011 -0700
+
+    doc: Add 1.0.2 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bbc46241a5c5f15b74d37b1d032e6cde28b501a9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 27 21:06:54 2011 -0700
+
+    altos: TM: Don't turn on packet slave mode until idle/invalid state
+    
+    Leave the packet link disabled until we've checked the
+    accelerometer. That way, we cannot accidentally get to idle mode when
+    the rocket is on the rail.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac7633630c1b04fdd761c16af7bd9377e76926c5
+Merge: 6e7fa21 fc4173f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Sep 27 01:00:14 2011 -0600
+
+    Merge branch 'master' into branch-1.0
+
+commit fc4173ff882dd9718f34ed043276ef612783dfe0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Sep 27 00:59:08 2011 -0600
+
+    add run-time dependency on libjfreechart-java
+
+commit 6e7fa216939f804135da4468fcf51d88cf6ee6c6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 26 11:58:05 2011 -0700
+
+    Bump to version 1.0.2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f82921baf869b76521892c65f3c7b09467b2b69d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 26 11:50:28 2011 -0700
+
+    altos: Delay reboot by a second to avoid re-entering idle mode
+    
+    TM and Tm go into idle mode if they receive a packet after boot
+    time. When tebooting the device over the packet link, the packet
+    master would be (rapidly) polling the device for additional data and
+    so the device would invariably receive a packet during bootup and go
+    into idle mode again.
+    
+    Delay the reboot by a second to give the controller time to disable
+    the master end of the packet link.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 989aae5b18856e3420ea5b7a26ddd8dccae9d6d3
+Merge: 0552fbe e44f1ff
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Sep 24 15:34:59 2011 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 0552fbed34c9698dac30c239df2a823a8502b3f3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 30 16:59:53 2011 -0600
+
+    include 1.0.1 release notes in docs, closes: #642705
+
+commit e44f1ffb7104d70f5c9b9a90529ddbe1b75da074
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Aug 30 16:59:53 2011 -0600
+
+    include 1.0.1 release notes in docs
+
+commit 5c3a0263d292cb0675f608d0ef085d13e51ce6ba
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Aug 28 13:39:37 2011 -0600
+
+    update changelogs for Debian build
+
 commit 93b8f40bb451c9ec152490d1f431ab18f8ecb7d1
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Aug 26 10:52:55 2011 -0600
