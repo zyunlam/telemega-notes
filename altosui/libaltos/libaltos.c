@@ -308,10 +308,6 @@ altos_getchar(struct altos_file *file, int timeout)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
-#include <bluetooth/rfcomm.h>
 
 static char *
 cc_fullname (char *dir, char *file)
