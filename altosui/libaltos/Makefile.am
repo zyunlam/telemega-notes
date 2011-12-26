@@ -16,8 +16,6 @@ noinst_PROGRAMS=cjnitest
 
 cjnitest_LDADD=libaltos.la
 
-LIBS=-lbluetooth
-
 HFILES=libaltos.h
 
 SWIG_FILE=libaltos.swig
