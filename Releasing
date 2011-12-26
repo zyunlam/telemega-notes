@@ -1,6 +1,9 @@
 These are Bdale's notes on how to do a release.
 
 	confirm that doc/ has a release-notes file for the new release
+		- add a release notes file
+		- update doc/Makefile
+		- link release notes in doc/altusmetrum.xsl
 
 	update the version in configure.ac and commit
 
