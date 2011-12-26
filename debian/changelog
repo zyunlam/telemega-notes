@@ -1,3 +1,9 @@
+altos (1.0.3~bpo60+1) squeeze-backports; urgency=low
+
+  * build for backports.org
+  
+ -- Bdale Garbee <bdale@gag.com>  Mon, 26 Dec 2011 01:48:47 -0700
+
 altos (1.0.3) unstable; urgency=low
 
   [ Bdale Garbee ]
