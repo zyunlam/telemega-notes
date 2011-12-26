@@ -1,3 +1,74 @@
+commit f993afc4860f105b719682f49a100779d47c02e0
+Merge: 9657e53 699dc89
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Dec 25 19:07:44 2011 -0700
+
+    Merge branch 'branch-1.0' of ssh://git.gag.com/scm/git/fw/altos into branch-1.0
+
+commit 9657e53abee69872e1b16dc997519aa3d70bf2d9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Dec 25 19:07:34 2011 -0700
+
+    more notes on release notes in Releasing
+
+commit 699dc89ce00cf3133b484324273f00d28a3c6af6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 25 17:01:41 2011 -0800
+
+    Add 1.0.3 release notes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 69dca3e53f0abbf0180dd5a04eed0549f4634561
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Dec 25 18:00:17 2011 -0700
+
+    mention release notes in Releasing file prep stage
+
+commit 3891be7d7ff9a3948f8a033b76b4b665040dc8f4
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Dec 25 17:37:15 2011 -0700
+
+    don't try to link bluetooth lib
+
+commit 098c2eeec57dd18c6bb6f18b21f386e93b8f7edb
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Dec 25 17:31:05 2011 -0700
+
+    don't try to include bluetooth headers
+
+commit baa571c241d438c9e229c2f12ec3f1d57ec64f84
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Dec 25 17:21:47 2011 -0700
+
+    releasing 1.0.3
+
+commit 9c14863faff674f611680d2cc7de9a29b0184fec
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Dec 17 17:05:06 2011 -0800
+
+    altos: Create TeleMetrum v1.2 directory
+    
+    The hardware is software-compatible with v1.1, but it's nice to have
+    the right version number in all of the files.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    (cherry picked from commit eff8611e3eb19853b06acfcd7e978c9046cd5f78)
+    
+    (this is quite different from the master version which is multi-arch)
+
+commit fff3f013bf5f8e8625efc9e603e91ba9a64a390c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 28 18:54:14 2011 -0600
+
+    lose the bluetooth lib dependency until it's relevant
+
+commit ba14fe42d5034161d7872437c5e3ffb1b121cae5
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 28 01:58:50 2011 -0600
+
+    update changelogs for Debian build
+
 commit 8620861e6edb5c11f47458ebea1a3fad95354a48
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 28 01:57:22 2011 -0600

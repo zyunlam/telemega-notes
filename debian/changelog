@@ -1,3 +1,19 @@
+altos (1.0.3) unstable; urgency=low
+
+  [ Bdale Garbee ]
+  * lose the bluetooth lib dependency until it's relevant
+  * don't try to include bluetooth headers
+  * don't try to link bluetooth lib
+  * mention release notes in Releasing file prep stage
+  * more notes on release notes in Releasing
+  * releasing 1.0.3
+
+  [ Keith Packard ]
+  * altos: Create TeleMetrum v1.2 directory
+  * Add 1.0.3 release notes.
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 25 Dec 2011 19:08:56 -0700
+
 altos (1.0.2) unstable; urgency=low
 
   [ Bdale Garbee ]
