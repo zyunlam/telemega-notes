@@ -108,7 +108,7 @@ public class AltosUI extends AltosFrame {
 		if (imgURL != null)
 			setIconImage(new ImageIcon(imgURL).getImage());
 
-		AltosPreferences.set_component(this);
+		AltosUIPreferences.set_component(this);
 
 		pane = getContentPane();
 		gridbag = new GridBagLayout();
@@ -253,9 +253,9 @@ public class AltosUI extends AltosFrame {
 		String	result;
 		result = JOptionPane.showInputDialog(AltosUI.this,
 						     "Configure Callsign",
-						     AltosPreferences.callsign());
+						     AltosUIPreferences.callsign());
 		if (result != null)
-			AltosPreferences.set_callsign(result);
+			AltosUIPreferences.set_callsign(result);
 	}
 
 	void ConfigureTeleMetrum() {
@@ -519,7 +519,7 @@ public class AltosUI extends AltosFrame {
 	
 	public static void main(final String[] args) {
 		try {
-			UIManager.setLookAndFeel(AltosPreferences.look_and_feel());
+			UIManager.setLookAndFeel(AltosUIPreferences.look_and_feel());
 		} catch (Exception e) {
 		}
 		/* Handle batch-mode */

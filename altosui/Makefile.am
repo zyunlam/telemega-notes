@@ -1,4 +1,4 @@
-SUBDIRS=libaltos
+SUBDIRS=libaltos altoslib
 JAVAROOT=classes
 AM_JAVACFLAGS=-encoding UTF-8 -Xlint:deprecation
 
@@ -79,7 +79,9 @@ altosui_JAVA = \
 	AltosLog.java \
 	AltosPad.java \
 	AltosParse.java \
+	AltosUIPreferences.java \
 	AltosPreferences.java \
+	AltosUIPreferences.java \
 	AltosReader.java \
 	AltosRecord.java \
 	AltosRecordCompanion.java \
