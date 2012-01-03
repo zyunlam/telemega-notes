@@ -36,7 +36,6 @@ altosui_JAVA = \
 	AltosEepromDelete.java \
 	AltosEepromDownload.java \
 	AltosEepromList.java \
-	AltosEepromLog.java \
 	AltosEepromManage.java \
 	AltosEepromMonitor.java \
 	AltosEepromTeleScience.java \
