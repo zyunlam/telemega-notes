@@ -51,7 +51,6 @@ altosui_JAVA = \
 	AltosFlightUI.java \
 	AltosFontListener.java \
 	AltosFreqList.java \
-	AltosGreatCircle.java \
 	AltosHexfile.java \
 	Altos.java \
 	AltosIdleMonitorUI.java \
