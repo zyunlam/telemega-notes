@@ -41,33 +41,19 @@ import libaltosJNI.*;
  * threads.
  */
 
-public class AltosSerial implements Runnable, AltosLink {
+public class AltosSerial extends AltosLink implements Runnable {
 
 	static java.util.List<String> devices_opened = Collections.synchronizedList(new LinkedList<String>());
 
 	AltosDevice device;
 	SWIGTYPE_p_altos_file altos;
-	LinkedList<LinkedBlockingQueue<AltosLine>> monitors;
-	LinkedBlockingQueue<AltosLine> reply_queue;
 	Thread input_thread;
-	String line;
-	byte[] line_bytes;
-	int line_count;
-	boolean monitor_mode;
-	int telemetry;
-	double frequency;
-	static boolean debug;
-	boolean remote;
-	LinkedList<String> pending_output = new LinkedList<String>();
 	Frame frame;
-	AltosConfigData	config_data;
-
-	static void set_debug(boolean new_debug) {
-		debug = new_debug;
-	}
 
 	public void run () {
 		int c;
+		byte[] line_bytes = null;
+		int line_count = 0;
 
 		try {
 			for (;;) {
@@ -75,11 +61,8 @@ public class AltosSerial implements Runnable, AltosLink {
 				if (Thread.interrupted())
 					break;
 				if (c == libaltosConstants.LIBALTOS_ERROR) {
-					for (int e = 0; e < monitors.size(); e++) {
-						LinkedBlockingQueue<AltosLine> q = monitors.get(e);
-						q.put(new AltosLine());
-					}
-					reply_queue.put (new AltosLine());
+					add_telem (new AltosLine());
+					add_reply (new AltosLine());
 					break;
 				}
 				if (c == libaltosConstants.LIBALTOS_TIMEOUT)
@@ -89,25 +72,8 @@ public class AltosSerial implements Runnable, AltosLink {
 				synchronized(this) {
 					if (c == '\n') {
 						if (line_count != 0) {
-							try {
-								line = new String(line_bytes, 0, line_count, "UTF-8");
-							} catch (UnsupportedEncodingException ue) {
-								line = "";
-								for (int i = 0; i < line_count; i++)
-									line = line + line_bytes[i];
-							}
-							if (debug)
-								System.out.printf("\t\t\t\t\t%s\n", line);
-							if (line.startsWith("TELEM") || line.startsWith("VERSION") || line.startsWith("CRC")) {
-								for (int e = 0; e < monitors.size(); e++) {
-									LinkedBlockingQueue<AltosLine> q = monitors.get(e);
-									q.put(new AltosLine (line));
-								}
-							} else {
-								reply_queue.put(new AltosLine (line));
-							}
+							add_bytes(line_bytes, line_count);
 							line_count = 0;
-							line = "";
 						}
 					} else {
 						if (line_bytes == null) {
@@ -127,10 +93,8 @@ public class AltosSerial implements Runnable, AltosLink {
 	}
 
 	public void flush_output() {
+		super.flush_output();
 		if (altos != null) {
-			for (String s : pending_output)
-				System.out.print(s);
-			pending_output.clear();
 			libaltos.altos_flush(altos);
 		}
 	}
@@ -189,22 +153,10 @@ public class AltosSerial implements Runnable, AltosLink {
 	}
 
 	public void flush_input() throws InterruptedException {
-		flush_output();
-		boolean	got_some;
-
-		int timeout = 100;
 		if (remote)
-			timeout = 500;
-		do {
-			Thread.sleep(timeout);
-			got_some = !reply_queue.isEmpty();
-			synchronized(this) {
-				if (!"VERSION".startsWith(line) &&
-				    !line.startsWith("VERSION"))
-					line = "";
-				reply_queue.clear();
-			}
-		} while (got_some);
+			flush_input(500);
+		else
+			flush_input(100);
 	}
 
 	int	in_reply;
@@ -245,29 +197,6 @@ public class AltosSerial implements Runnable, AltosLink {
 		return reply;
 	}
 
-	public String get_reply() throws InterruptedException {
-		return get_reply(5000);
-	}
-
-	public String get_reply_no_dialog(int timeout) throws InterruptedException, TimeoutException {
-		flush_output();
-		AltosLine line = reply_queue.poll(timeout, TimeUnit.MILLISECONDS);
-		if (line != null)
-			return line.line;
-		return null;
-	}
-
-	public void add_monitor(LinkedBlockingQueue<AltosLine> q) {
-		set_monitor(true);
-		monitors.add(q);
-	}
-
-	public void remove_monitor(LinkedBlockingQueue<AltosLine> q) {
-		monitors.remove(q);
-		if (monitors.isEmpty())
-			set_monitor(false);
-	}
-
 	public void close() {
 		if (remote) {
 			try {
@@ -306,14 +235,8 @@ public class AltosSerial implements Runnable, AltosLink {
 	}
 
 	public void print(String data) {
-		if (debug)
-			pending_output.add(data);
 		for (int i = 0; i < data.length(); i++)
 			putc(data.charAt(i));
-	}
-
-	public void printf(String format, Object ... arguments) {
-		print(String.format(format, arguments));
 	}
 
 	private void open() throws FileNotFoundException, AltosSerialInUseException {
@@ -338,120 +261,14 @@ public class AltosSerial implements Runnable, AltosLink {
 		flush_output();
 	}
 
-	private int telemetry_len() {
-		return Altos.telemetry_len(telemetry);
-	}
-
-	private void set_channel(int channel) {
-		if (altos != null) {
-			if (monitor_mode)
-				printf("m 0\nc r %d\nm %x\n",
-				       channel, telemetry_len());
-			else
-				printf("c r %d\n", channel);
-			flush_output();
-		}
-	}
-
-	private void set_radio_setting(int setting) {
-		if (altos != null) {
-			if (monitor_mode)
-				printf("m 0\nc R %d\nm %x\n",
-				       setting, telemetry_len());
-			else
-				printf("c R %d\n", setting);
-			flush_output();
-		}
-	}
-
-	public void set_radio_frequency(double frequency,
-					boolean has_setting,
-					int cal) {
-		if (debug)
-			System.out.printf("set_radio_frequency %7.3f %b %d\n", frequency, has_setting, cal);
-		if (has_setting)
-			set_radio_setting(AltosConvert.radio_frequency_to_setting(frequency, cal));
-		else
-			set_channel(AltosConvert.radio_frequency_to_channel(frequency));
-	}
-
-	public void set_radio_frequency(double in_frequency) throws InterruptedException, TimeoutException {
-		frequency = in_frequency;
-		config_data();
-		set_radio_frequency(frequency,
-				    config_data.radio_setting != 0,
-				    config_data.radio_calibration);
-	}
-
-	public void set_telemetry(int in_telemetry) {
-		telemetry = in_telemetry;
-		if (altos != null) {
-			if (monitor_mode)
-				printf("m 0\nm %x\n", telemetry_len());
-			flush_output();
-		}
-	}
-
-	void set_monitor(boolean monitor) {
-		monitor_mode = monitor;
-		if (altos != null) {
-			if (monitor)
-				printf("m %x\n", telemetry_len());
-			else
-				printf("m 0\n");
-			flush_output();
-		}
-	}
-
-	public void set_callsign(String callsign) {
-		if (altos != null) {
-			printf ("c c %s\n", callsign);
-			flush_output();
-		}
-	}
-
-	public AltosConfigData config_data() throws InterruptedException, TimeoutException {
-		if (config_data == null)
-			config_data = new AltosConfigData(this);
-		return config_data;
-	}
-
-	public void start_remote() throws TimeoutException, InterruptedException {
-		if (debug)
-			System.out.printf("start remote %7.3f\n", frequency);
-		if (frequency == 0.0)
-			frequency = AltosUIPreferences.frequency(device.getSerial());
-		set_radio_frequency(frequency);
-		set_callsign(AltosUIPreferences.callsign());
-		printf("p\nE 0\n");
-		flush_input();
-		remote = true;
-	}
-
-	public void stop_remote() throws InterruptedException {
-		if (debug)
-			System.out.printf("stop remote\n");
-		try {
-			flush_input();
-		} finally {
-			printf ("~\n");
-			flush_output();
-		}
-		remote = false;
-	}
-
 	public void set_frame(Frame in_frame) {
 		frame = in_frame;
 	}
 
 	public AltosSerial(AltosDevice in_device) throws FileNotFoundException, AltosSerialInUseException {
 		device = in_device;
-		line = "";
-		monitor_mode = false;
 		frame = null;
-		telemetry = Altos.ao_telemetry_standard;
-		monitors = new LinkedList<LinkedBlockingQueue<AltosLine>> ();
-		reply_queue = new LinkedBlockingQueue<AltosLine> ();
+		serial = device.getSerial();
 		open();
 	}
 }
