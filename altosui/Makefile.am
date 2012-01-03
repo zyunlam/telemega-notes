@@ -38,7 +38,6 @@ altosui_JAVA = \
 	AltosEepromList.java \
 	AltosEepromManage.java \
 	AltosEepromMonitor.java \
-	AltosEepromTeleScience.java \
 	AltosEepromSelect.java \
 	AltosFile.java \
 	AltosFlash.java \
