@@ -28,6 +28,8 @@ import org.altusmetrum.AltosLib.*;
 
 public class Altos extends AltosLib {
 
+	static final int tab_elt_pad = 5;
+
 	static Font label_font;
 	static Font value_font;
 	static Font status_font;

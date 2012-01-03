@@ -15,12 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package altosui;
 
 import java.lang.*;
 import java.text.*;
 import java.io.*;
 import java.util.concurrent.*;
+import org.altusmetrum.AltosLib.*;
 
 class AltosTelemetryReader extends AltosFlightReader {
 	AltosDevice	device;
@@ -57,7 +58,7 @@ class AltosTelemetryReader extends AltosFlightReader {
 	}
 
 	void save_frequency() {
-		AltosUIPreferences.set_frequency(device.getSerial(), frequency);
+		AltosPreferences.set_frequency(device.getSerial(), frequency);
 	}
 
 	void set_telemetry(int in_telemetry) {
@@ -66,7 +67,7 @@ class AltosTelemetryReader extends AltosFlightReader {
 	}
 
 	void save_telemetry() {
-		AltosUIPreferences.set_telemetry(device.getSerial(), telemetry);
+		AltosPreferences.set_telemetry(device.getSerial(), telemetry);
 	}
 
 	File backing_file() {
@@ -82,9 +83,9 @@ class AltosTelemetryReader extends AltosFlightReader {
 		previous = null;
 
 		telem = new LinkedBlockingQueue<AltosLine>();
-		frequency = AltosUIPreferences.frequency(device.getSerial());
+		frequency = AltosPreferences.frequency(device.getSerial());
 		set_frequency(frequency);
-		telemetry = AltosUIPreferences.telemetry(device.getSerial());
+		telemetry = AltosPreferences.telemetry(device.getSerial());
 		set_telemetry(telemetry);
 		serial.set_callsign(AltosUIPreferences.callsign());
 		serial.add_monitor(telem);
