@@ -217,6 +217,8 @@ public class AltosDroid extends Activity {
             // Get the message bytes and tell the BluetoothChatService to write
             byte[] send = message.getBytes();
             mChatService.write(send);
+	    byte[] newline = { '\n' };
+	    mChatService.write(newline);
 
             // Reset out string buffer to zero and clear the edit text field
             mOutStringBuffer.setLength(0);

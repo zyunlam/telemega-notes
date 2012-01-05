@@ -236,15 +236,17 @@ public class BluetoothChatService {
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
+		Log.i(TAG, "Connect starting");
                 if (secure) {
                 	Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-                	tmp = (BluetoothSocket) m.invoke(device, 2);
+                	tmp = (BluetoothSocket) m.invoke(device, 1);
 //                    tmp = device.createRfcommSocket(1);
                 } else {
                 	Method m = device.getClass().getMethod("createInsecureRfcommSocket", new Class[] {int.class});
-                	tmp = (BluetoothSocket) m.invoke(device, 2);
+                	tmp = (BluetoothSocket) m.invoke(device, 1);
 //                    tmp = device.createInsecureRfcommSocket(1);
                 }
+		Log.i(TAG, "Connect succeeded");
             } catch (Exception e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
 				e.printStackTrace();
@@ -253,19 +255,21 @@ public class BluetoothChatService {
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+            Log.i(TAG, "BEGIN ya y a mConnectThread SocketType:" + mSocketType);
             setName("ConnectThread" + mSocketType);
 
             // Always cancel discovery because it will slow down a connection
-            mAdapter.cancelDiscovery();
+//            mAdapter.cancelDiscovery();
 
             // Make a connection to the BluetoothSocket
             try {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
+		Log.i(TAG, "CONNECT SocketType:" + mSocketType);
                 mmSocket.connect();
             } catch (IOException e) {
                 // Close the socket
+		Log.e(TAG, "Connect failed", e);
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
@@ -332,9 +336,12 @@ public class BluetoothChatService {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
 
-                    // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(AltosDroid.MESSAGE_READ, bytes, -1, buffer)
+		    if (bytes > 0) {
+			Log.i(TAG, "Recv: " + new String(buffer, 0, bytes));
+			// Send the obtained bytes to the UI Activity
+			mHandler.obtainMessage(AltosDroid.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
+		    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
