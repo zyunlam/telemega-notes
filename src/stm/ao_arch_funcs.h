@@ -32,6 +32,10 @@ void
 ao_spi_send(void *block, uint16_t len, uint8_t spi_index);
 
 void
+ao_spi_queue_send(void *block, uint16_t len, uint8_t spi_index,
+		  void (*callback)(int spi_index));
+
+void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
 
 void
@@ -105,7 +109,7 @@ ao_dma_set_transfer(uint8_t 		index,
 		    uint32_t		ccr);
 
 void
-ao_dma_set_isr(uint8_t index, void (*isr)(int index));
+ao_dma_set_isr(uint8_t index, void (*isr)(int arg), int arg);
 
 void
 ao_dma_start(uint8_t index);

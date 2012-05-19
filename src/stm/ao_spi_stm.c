@@ -24,6 +24,7 @@ struct ao_spi_stm_info {
 };
 
 uint8_t	ao_spi_mutex[STM_NUM_SPI];
+static void (*ao_spi_callback[STM_NUM_SPI])(int spi_index);
 
 static const struct ao_spi_stm_info ao_spi_stm_info[STM_NUM_SPI] = {
 	{
@@ -40,8 +41,8 @@ static const struct ao_spi_stm_info ao_spi_stm_info[STM_NUM_SPI] = {
 
 static uint8_t	spi_dev_null;
 
-void
-ao_spi_send(void *block, uint16_t len, uint8_t spi_index)
+static void
+ao_spi_setup_send(void *block, uint16_t len, uint8_t spi_index)
 {
 	struct stm_spi *stm_spi = ao_spi_stm_info[spi_index].stm_spi;
 	uint8_t	mosi_dma_index = ao_spi_stm_info[spi_index].mosi_dma_index;
@@ -86,14 +87,61 @@ ao_spi_send(void *block, uint16_t len, uint8_t spi_index)
 			(0 << STM_SPI_CR2_SSOE) |
 			(1 << STM_SPI_CR2_TXDMAEN) |
 			(1 << STM_SPI_CR2_RXDMAEN));
+}
+
+static void
+ao_spi_start_send(uint8_t spi_index)
+{
+	uint8_t	mosi_dma_index = ao_spi_stm_info[spi_index].mosi_dma_index;
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
+
 	ao_dma_start(miso_dma_index);
 	ao_dma_start(mosi_dma_index);
+}
+
+static void
+ao_spi_finish_send(uint8_t spi_index)
+{
+	uint8_t	mosi_dma_index = ao_spi_stm_info[spi_index].mosi_dma_index;
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
+
+	ao_dma_done_transfer(mosi_dma_index);
+	ao_dma_done_transfer(miso_dma_index);
+}
+
+void
+ao_spi_dma_isr(int spi_index)
+{
+	ao_spi_callback[spi_index](spi_index);
+	ao_spi_finish_send(spi_index);
+}
+
+void
+ao_spi_queue_send(void *block, uint16_t len, uint8_t spi_index,
+		  void (*callback)(int spi_index))
+{
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
+
+	ao_spi_setup_send(block, len, spi_index);
+	ao_spi_callback[spi_index] = callback;
+	ao_dma_set_isr(miso_dma_index, ao_spi_dma_isr, spi_index);
+	ao_spi_start_send(spi_index);
+}
+
+void
+ao_spi_send(void *block, uint16_t len, uint8_t spi_index)
+{
+	uint8_t	mosi_dma_index = ao_spi_stm_info[spi_index].mosi_dma_index;
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
+
+	ao_spi_setup_send(block, len, spi_index);
+	ao_spi_start_send(spi_index);
 	ao_arch_critical(
 		while (!ao_dma_done[miso_dma_index])
 			ao_sleep(&ao_dma_done[miso_dma_index]);
 		);
-	ao_dma_done_transfer(mosi_dma_index);
-	ao_dma_done_transfer(miso_dma_index);
+	
+	ao_spi_finish_send(spi_index);
 }
 
 void
@@ -152,8 +200,8 @@ ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index)
 	ao_dma_done_transfer(miso_dma_index);
 }
 
-void
-ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
+static void
+ao_spi_setup_recv(void *block, uint16_t len, uint8_t spi_index)
 {
 	struct stm_spi *stm_spi = ao_spi_stm_info[spi_index].stm_spi;
 	uint8_t	mosi_dma_index = ao_spi_stm_info[spi_index].mosi_dma_index;
@@ -196,17 +244,48 @@ ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
 			(0 << STM_SPI_CR2_SSOE) |
 			(1 << STM_SPI_CR2_TXDMAEN) |
 			(1 << STM_SPI_CR2_RXDMAEN));
+}
+
+static void
+ao_spi_start_recv(uint8_t spi_index)
+{
+	uint8_t	mosi_dma_index = ao_spi_stm_info[spi_index].mosi_dma_index;
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
 	ao_dma_start(miso_dma_index);
 	ao_dma_start(mosi_dma_index);
+}
 
+static void
+ao_spi_done_recv(uint8_t spi_index)
+{
+	uint8_t	mosi_dma_index = ao_spi_stm_info[spi_index].mosi_dma_index;
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
+	ao_dma_done_transfer(mosi_dma_index);
+	ao_dma_done_transfer(miso_dma_index);
+}
+
+void
+ao_spi_queue_recv(void *block, uint16_t len, uint8_t spi_index, void (*callback)(int spi_index))
+{
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
+	ao_spi_setup_recv(block, len, spi_index);
+	ao_spi_callback[spi_index] = callback;
+	ao_dma_set_isr(miso_dma_index, ao_spi_dma_isr, spi_index);
+	ao_spi_start_recv(spi_index);
+}
+
+void
+ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
+{
+	uint8_t	miso_dma_index = ao_spi_stm_info[spi_index].miso_dma_index;
+	ao_spi_setup_recv(block, len, spi_index);
+	ao_spi_start_recv(spi_index);
 	/* Wait until the SPI unit is done */
 	ao_arch_critical(
 		while (!ao_dma_done[miso_dma_index])
 			ao_sleep(&ao_dma_done[miso_dma_index]);
 		);
-
-	ao_dma_done_transfer(mosi_dma_index);
-	ao_dma_done_transfer(miso_dma_index);
+	ao_spi_done_recv(spi_index);
 }
 
 void

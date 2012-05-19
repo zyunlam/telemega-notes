@@ -32,6 +32,7 @@ struct ao_i2c_stm_info {
 static uint8_t	ao_i2c_state[STM_NUM_I2C];
 static uint16_t	ao_i2c_addr[STM_NUM_I2C];
 uint8_t 	ao_i2c_mutex[STM_NUM_I2C];
+static void	(*ao_i2c_callback[STM_NUM_I2C])(uint8_t index);
 
 #define AO_STM_I2C_CR1 ((0 << STM_I2C_CR1_SWRST) |	\
 			(0 << STM_I2C_CR1_ALERT) |	\
@@ -182,8 +183,8 @@ static inline void out_dr(char *where, struct stm_i2c *stm_i2c, uint32_t dr) {
 	stm_i2c->dr = dr;
 }
 
-uint8_t
-ao_i2c_start(uint8_t index, uint16_t addr)
+void
+ao_i2c_queue_start(uint8_t index, uint16_t addr)
 {
 	struct stm_i2c	*stm_i2c = ao_i2c_stm_info[index].stm_i2c;
 	uint32_t	sr1, sr2;
@@ -196,9 +197,28 @@ ao_i2c_start(uint8_t index, uint16_t addr)
 		AO_STM_I2C_CR1 | (1 << STM_I2C_CR1_START));
 	out_cr2("start", stm_i2c,
 		AO_STM_I2C_CR2 | (1 << STM_I2C_CR2_ITEVTEN) | (1 << STM_I2C_CR2_ITERREN));
+}
+
+void
+ao_i2c_set_start_callback(uint8_t index, void (*callback)(uint8_t index))
+{
+
+}
+
+uint8_t
+ao_i2c_is_idle(uint8_t index)
+{
+	return ao_i2c_state[index] == I2C_IDLE;
+}
+
+uint8_t
+ao_i2c_start(uint8_t index, uint16_t addr)
+{
+	ao_i2c_queue_start(index, addr);
+
 	ao_alarm(1);
 	cli();
-	while (ao_i2c_state[index] == I2C_IDLE)
+	while (ao_i2c_is_idle(index))
 		if (ao_sleep(&ao_i2c_state[index]))
 			break;
 	sei();

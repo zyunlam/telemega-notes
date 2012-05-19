@@ -41,7 +41,7 @@ static uint8_t			ao_adc_ready;
  *
  * Mark time in ring, shut down DMA engine
  */
-static void ao_adc_done(int index)
+static void ao_adc_done(int arg)
 {
 	ao_adc_ring[ao_adc_head].tick = ao_time();
 	ao_adc_head = ao_adc_ring_next(ao_adc_head);
@@ -72,7 +72,7 @@ ao_adc_poll(void)
 			    (0 << STM_DMA_CCR_PINC) |
 			    (0 << STM_DMA_CCR_CIRC) |
 			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
-	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1), ao_adc_done);
+	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1), ao_adc_done, 0);
 	ao_dma_start(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
 
 	stm_adc.cr2 = AO_ADC_CR2_VAL | (1 << STM_ADC_CR2_SWSTART);
