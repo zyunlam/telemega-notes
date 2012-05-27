@@ -84,15 +84,13 @@ static uint8_t ao_spi_slave_recv(void)
 
 static uint8_t ao_spi_slave_running;
 
-ISR(PCINT0_vect)
+ISR(PCINT0_vect, ISR_BLOCK)
 {
 	if ((PINB & (1 << PINB0)) == 0) {
 		if (!ao_spi_slave_running) {
 			uint8_t	changed;
 			ao_spi_slave_running = 1;
-			cli();
 			changed = ao_spi_slave_recv();
-			sei();
 			if (changed && ao_flight_boost <= ao_log_store.tm_state) {
 				if (ao_log_store.tm_state < ao_flight_landed)
 					ao_log_start();
