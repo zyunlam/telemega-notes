@@ -331,4 +331,11 @@ struct ao_adc {
 #define AO_PROFILE	       	0
 #endif
 
+/*
+ * Custom changes for ULA payload
+ */
+
+#define ao_accel_axis	accel_z
+#define RADIO_DELAY_AFTER_BOOST	40
+
 #endif /* _AO_PINS_H_ */
