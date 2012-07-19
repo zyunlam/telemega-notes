@@ -91,9 +91,13 @@ typedef int16_t alt_t;
 typedef int16_t accel_t;
 
 /* MPU6000 is hooked up so that positive y is positive acceleration */
-#define ao_data_accel(packet)			((packet)->mpu6000.accel_y)
-#define ao_data_accel_cook(packet)		(-(packet)->mpu6000.accel_y)
-#define ao_data_set_accel(packet, accel)	((packet)->mpu6000.accel_y = (accel))
+#ifndef ao_accel_axis
+#define ao_accel_axis	accel_y
+#endif
+
+#define ao_data_accel(packet)			((packet)->mpu6000.ao_accel_axis)
+#define ao_data_accel_cook(packet)		(-(packet)->mpu6000.ao_accel_axis)
+#define ao_data_set_accel(packet, accel)	((packet)->mpu6000.ao_accel_axis = (accel))
 #define ao_data_accel_invert(a)			(-(a))
 
 #else /* HAS_MPU6000 && !HAS_HIGHG_ACCEL */
