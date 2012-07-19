@@ -283,6 +283,12 @@ ao_telemetry(void)
 	while (!ao_flight_number)
 		ao_sleep(&ao_flight_number);
 
+#if RADIO_DELAY_AFTER_BOOST
+	while (ao_flight_state < ao_flight_boost)
+		ao_sleep(&ao_flight_state);
+	ao_delay(AO_SEC_TO_TICKS(RADIO_DELAY_AFTER_BOOST));
+#endif
+
 	telemetry.generic.serial = ao_serial_number;
 	for (;;) {
 		while (ao_telemetry_interval == 0)
