@@ -16,3 +16,4 @@
  */
 
 void ao_pwmin_init(void);
+extern volatile __data uint16_t ao_icp3_count;
