@@ -97,8 +97,10 @@ ISR(ADC_vect)
 	if (++ao_adc_channel < NUM_ADC - 1)
 		ao_adc_start();
 	else {
+#if HAS_ICP3_COUNT
 		/* steal last adc channel for pwm input */
 		ao_data_ring[ao_data_head].adc.adc[ao_adc_channel] = ao_icp3_count;
+#endif
 		ADCSRA = ADCSRA_INIT;
 		ao_data_ring[ao_data_head].tick = ao_time();
 		ao_data_head = ao_data_ring_next(ao_data_head);
