@@ -285,7 +285,7 @@ ao_telemetry(void)
 
 #if RADIO_DELAY_AFTER_BOOST
 	while (ao_flight_state < ao_flight_boost)
-		ao_sleep(&ao_flight_state);
+		ao_sleep(DATA_TO_XDATA(&ao_flight_state));
 	ao_delay(AO_SEC_TO_TICKS(RADIO_DELAY_AFTER_BOOST));
 #endif
 

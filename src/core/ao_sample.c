@@ -34,7 +34,7 @@ __pdata uint16_t	ao_sample_tick;		/* time of last data */
 __pdata pres_t		ao_sample_pres;
 __pdata alt_t		ao_sample_alt;
 __pdata alt_t		ao_sample_height;
-#if HAS_ACCEL
+#if HAS_ACCEL || HAS_ACCEL_REF
 __pdata accel_t		ao_sample_accel;
 #endif
 
@@ -139,7 +139,7 @@ ao_sample(void)
 		ao_sample_alt = pres_to_altitude(ao_sample_pres);
 		ao_sample_height = ao_sample_alt - ao_ground_height;
 
-#if HAS_ACCEL
+#if HAS_ACCEL || HAS_ACCEL_REF
 		ao_sample_accel = ao_data_accel_cook(ao_data);
 		if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
 			ao_sample_accel = ao_data_accel_invert(ao_sample_accel);

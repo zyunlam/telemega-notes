@@ -91,6 +91,7 @@
 #endif
 
 #if defined(TELEMETRUM_V_1_2)
+	#define RADIO_DELAY_AFTER_BOOST	40
 	#define HAS_FLIGHT		1
 	#define HAS_USB			1
 	#define HAS_BEEP		1
@@ -121,7 +122,7 @@
 	#define SPI_CS_ON_P0		0
 	#define AO_M25_SPI_CS_MASK	0x02	/* CS0 is P1_1 */
 	#define M25_MAX_CHIPS		1
-	#define HAS_ACCEL		1
+	#define HAS_ACCEL		0
 	#define HAS_IGNITE		1
 	#define HAS_MONITOR		0
 #endif
@@ -523,7 +524,9 @@
 #error Please define HAS_ACCEL_REF
 #endif
 #else
+#ifndef HAS_ACCEL_REF
 #define HAS_ACCEL_REF 0
+#endif
 #endif
 
 #endif /* HAS_ADC */
