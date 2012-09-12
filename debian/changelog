@@ -1,9 +1,84 @@
-altos (1.0.1+3+g93b8f40) unstable; urgency=low
+altos (1.1-1) unstable; urgency=low
 
+  * new upstream minor release, which provides a few new features in AltosUI
+    and the AltOS firmware, and fixes bugs
+    - Add apogee-lockout value. Overrides the apogee detection logic to
+      prevent incorrect apogee charge firing.  A configuration menu 
+      provides a list of reasonable values, or the value can be set by hand.
+    - Fix a bug where the data reported in telemetry packets was from 
+      320ms ago.
+    - Force the radio frequency to 434.550MHz when the debug clock
+      pin is connected to ground at boot time. This provides a way
+      to talk to a TeleMini which is configured to some unknown frequency.
+    - Provide RSSI values for Monitor Idle mode. This makes it easy to check 
+      radio range without needing to go to flight mode.
+    - Fix a bug which caused the old received telemetry packets to
+      be retransmitted over the USB link when the radio was turned
+      off and back on.
+    - Fix a bug that caused GPS ready to happen too quickly. The
+      software was using every telemetry packet to signal new GPS
+      data, which caused GPS ready to be signalled after 10 packets
+      instead of 10 GPS updates.
+    - Fix Google Earth data export to work with recent versions. The
+      google earth file loading code got a lot pickier, requiring
+      some minor white space changes in the export code.
+    - Make the look-n-feel configurable, providing a choice from
+      the available options.
+    - Add an 'Age' element to mark how long since a telemetry packet
+      has been received. Useful to quickly gauge whether
+      communications with the rocket are still active.
+    - Add 'Configure Ground Station' dialog to set the radio
+      frequency used by a particular TeleDongle without having to go
+      through the flight monitor UI.
+    - Re-compute time spent in each state for the flight graph; this
+      figures out the actual boost and landing times instead of
+      using the conservative values provide by the flight
+      electronics. This improves the accuracy of the boost
+      acceleration and main descent rate computations.
+    - Make AltosUI run on Mac OS Lion. The default Java heap space
+      was dramatically reduced for this release causing much of the
+      UI to fail randomly. This most often affected the satellite
+      mapping download and displays.
+    - Change how data are displayed in the 'table' tab of the flight
+      monitoring window. This eliminates entries duplicated from the
+      header and adds both current altitude and pad altitude, which
+      are useful in 'Monitor Idle' mode.
+    - Add Imperial units mode to present data in feet instead of
+  * update build-deps to use cc1111 intead of sdcc, closes: #676739
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 11 Sep 2012 18:20:32 -0600
+
+altos (1.0.3) unstable; urgency=low
+
+  [ Bdale Garbee ]
+  * lose the bluetooth lib dependency until it's relevant
+  * don't try to include bluetooth headers
+  * don't try to link bluetooth lib
+  * mention release notes in Releasing file prep stage
+  * more notes on release notes in Releasing
+  * releasing 1.0.3
+
+  [ Keith Packard ]
+  * altos: Create TeleMetrum v1.2 directory
+  * Add 1.0.3 release notes.
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 25 Dec 2011 19:08:56 -0700
+
+altos (1.0.2) unstable; urgency=low
+
+  [ Bdale Garbee ]
   * update release process docs
-  * more release process doc updates
+  * update changelogs for Debian build
+  * include 1.0.1 release notes in docs, closes: #642705
+  * add run-time dependency on libjfreechart-java
 
- -- Bdale Garbee <bdale@gag.com>  Sun, 28 Aug 2011 13:39:31 -0600
+  [ Keith Packard ]
+  * altos: Delay reboot by a second to avoid re-entering idle mode
+  * Bump to version 1.0.2
+  * altos: TM: Don't turn on packet slave mode until idle/invalid state
+  * doc: Add 1.0.2 release notes
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 28 Sep 2011 01:58:27 -0600
 
 altos (1.0.1) unstable; urgency=low
 
