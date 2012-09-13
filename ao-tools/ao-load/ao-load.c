@@ -22,20 +22,25 @@
 #include <unistd.h>
 #include <getopt.h>
 #include "ccdbg.h"
+#include "cc.h"
 
 #define AO_USB_DESC_STRING		3
 
 struct sym {
 	unsigned	addr;
 	char		*name;
-} serial_symbols[] = {
-	{ 0,	"_ao_serial_number" },
-#define AO_SERIAL_NUMBER	(serial_symbols[0].addr)
-	{ 0,	"_ao_usb_descriptors" },
-#define AO_USB_DESCRIPTORS	(serial_symbols[1].addr)
+	int		required;
+} ao_symbols[] = {
+	{ 0,	"_ao_serial_number", 1 },
+#define AO_SERIAL_NUMBER	(ao_symbols[0].addr)
+	{ 0,	"_ao_usb_descriptors", 0 },
+#define AO_USB_DESCRIPTORS	(ao_symbols[1].addr)
+	{ 0,	"_ao_radio_cal", 1 },
+#define AO_RADIO_CAL		(ao_symbols[2].addr)
 };
 
-#define NUM_SERIAL_SYMBOLS	(sizeof(serial_symbols)/sizeof(serial_symbols[0]))
+#define NUM_SYMBOLS		3
+#define NUM_REQUIRED_SYMBOLS	2
 
 static int
 find_symbols(FILE *map)
@@ -47,7 +52,7 @@ find_symbols(FILE *map)
 	char	*colon;
 	unsigned long	a;
 	int	s;
-	int	found = 0;
+	int	required = 0;
 
 	while (fgets(line, sizeof(line), map) != NULL) {
 		line[sizeof(line)-1] = '\0';
@@ -63,14 +68,15 @@ find_symbols(FILE *map)
 		a = strtoul(colon+1, &addr_end, 16);
 		if (a == ULONG_MAX || addr_end == addr)
 			continue;
-		for (s = 0; s < NUM_SERIAL_SYMBOLS; s++)
-			if (!strcmp(serial_symbols[s].name, name)) {
-				serial_symbols[s].addr = (unsigned) a;
-				++found;
+		for (s = 0; s < NUM_SYMBOLS; s++)
+			if (!strcmp(ao_symbols[s].name, name)) {
+				ao_symbols[s].addr = (unsigned) a;
+				if (ao_symbols[s].required)
+					++required;
 				break;
 			}
 	}
-	return found == NUM_SERIAL_SYMBOLS;
+	return required >= NUM_REQUIRED_SYMBOLS;
 }
 
 static int
@@ -91,12 +97,14 @@ rewrite(struct hex_image *image, unsigned addr, char *data, int len)
 
 static const struct option options[] = {
 	{ .name = "tty", .has_arg = 1, .val = 'T' },
+	{ .name = "device", .has_arg = 1, .val = 'D' },
+	{ .name = "cal", .has_arg = 1, .val = 'c' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--tty <tty-name>] file.ihx serial-number\n", program);
+	fprintf(stderr, "usage: %s [--tty=<tty-name>] [--device=<device-name>] [--cal=<radio-cal>] file.ihx serial-number\n", program);
 	exit(1);
 }
 
@@ -119,15 +127,26 @@ main (int argc, char **argv)
 	char		serial_int[2];
 	unsigned int	s;
 	int		i;
-	unsigned	usb_descriptors;
 	int		string_num;
 	char		*tty = NULL;
+	char		*device = NULL;
+	uint32_t	cal = 0;
+	char		cal_int[4];
+	char		*cal_end;
 	int		c;
 
-	while ((c = getopt_long(argc, argv, "T:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "T:D:c:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
+			break;
+		case 'D':
+			device = optarg;
+			break;
+		case 'c':
+			cal = strtoul(optarg, &cal_end, 10);
+			if (cal_end == optarg || *cal_end != '\0')
+				usage(argv[0]);
 			break;
 		default:
 			usage(argv[0]);
@@ -178,7 +197,7 @@ main (int argc, char **argv)
 
 	serial = strtoul(serial_string, NULL, 0);
 	if (!serial)
-(argv[0]);
+		usage(argv[0]);
 
 	serial_int[0] = serial & 0xff;
 	serial_int[1] = (serial >> 8) & 0xff;
@@ -189,36 +208,55 @@ main (int argc, char **argv)
 		exit(1);
 	}
 
-	usb_descriptors = AO_USB_DESCRIPTORS - image->address;
-	string_num = 0;
-	while (image->data[usb_descriptors] != 0 && usb_descriptors < image->length) {
-		if (image->data[usb_descriptors+1] == AO_USB_DESC_STRING) {
-			++string_num;
-			if (string_num == 4)
-				break;
+	if (AO_USB_DESCRIPTORS) {
+		unsigned	usb_descriptors;
+		usb_descriptors = AO_USB_DESCRIPTORS - image->address;
+		string_num = 0;
+		while (image->data[usb_descriptors] != 0 && usb_descriptors < image->length) {
+			if (image->data[usb_descriptors+1] == AO_USB_DESC_STRING) {
+				++string_num;
+				if (string_num == 4)
+					break;
+			}
+			usb_descriptors += image->data[usb_descriptors];
 		}
-		usb_descriptors += image->data[usb_descriptors];
-	}
-	if (usb_descriptors >= image->length || image->data[usb_descriptors] == 0 ) {
-		fprintf(stderr, "Cannot rewrite serial string at %04x\n", AO_USB_DESCRIPTORS);
-		exit(1);
+		if (usb_descriptors >= image->length || image->data[usb_descriptors] == 0 ) {
+			fprintf(stderr, "Cannot rewrite serial string at %04x\n", AO_USB_DESCRIPTORS);
+			exit(1);
+		}
+
+		serial_ucs2_len = image->data[usb_descriptors] - 2;
+		serial_ucs2 = malloc(serial_ucs2_len);
+		if (!serial_ucs2) {
+			fprintf(stderr, "Malloc(%d) failed\n", serial_ucs2_len);
+			exit(1);
+		}
+		s = serial;
+		for (i = serial_ucs2_len / 2; i; i--) {
+			serial_ucs2[i * 2 - 1] = 0;
+			serial_ucs2[i * 2 - 2] = (s % 10) + '0';
+			s /= 10;
+		}
+		if (!rewrite(image, usb_descriptors + 2 + image->address, serial_ucs2, serial_ucs2_len))
+			usage(argv[0]);
 	}
 
-	serial_ucs2_len = image->data[usb_descriptors] - 2;
-	serial_ucs2 = malloc(serial_ucs2_len);
-	if (!serial_ucs2) {
-		fprintf(stderr, "Malloc(%d) failed\n", serial_ucs2_len);
-		exit(1);
+	if (cal) {
+		cal_int[0] = cal & 0xff;
+		cal_int[1] = (cal >> 8) & 0xff;
+		cal_int[2] = (cal >> 16) & 0xff;
+		cal_int[3] = (cal >> 24) & 0xff;
+		if (!AO_RADIO_CAL) {
+			fprintf(stderr, "Cannot find radio calibration location in image\n");
+			exit(1);
+		}
+		if (!rewrite(image, AO_RADIO_CAL, cal_int, sizeof (cal_int))) {
+			fprintf(stderr, "Cannot rewrite radio calibration at %04x\n", AO_RADIO_CAL);
+			exit(1);
+		}
 	}
-	s = serial;
-	for (i = serial_ucs2_len / 2; i; i--) {
-		serial_ucs2[i * 2 - 1] = 0;
-		serial_ucs2[i * 2 - 2] = (s % 10) + '0';
-		s /= 10;
-	}
-	if (!rewrite(image, usb_descriptors + 2 + image->address, serial_ucs2, serial_ucs2_len))
-		usage(argv[0]);
-
+	if (!tty)
+		tty = cc_usbdevs_find_by_arg(device, "TIDongle");
 	dbg = ccdbg_open(tty);
 	if (!dbg)
 		exit (1);

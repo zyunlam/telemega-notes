@@ -19,15 +19,18 @@
 #include <unistd.h>
 #include <getopt.h>
 #include "ccdbg.h"
+#include "cc.h"
 
 static const struct option options[] = {
 	{ .name = "tty", .has_arg = 1, .val = 'T' },
+	{ .name = "device", .has_arg = 1, .val = 'D' },
+	{ .name = "run", .has_arg = 0, .val = 'r' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--tty <tty-name>] file.ihx\n", program);
+	fprintf(stderr, "usage: %s [--tty <tty-name>] [--device <device-name>] [--run] file.ihx\n", program);
 	exit(1);
 }
 
@@ -42,12 +45,20 @@ main (int argc, char **argv)
 	char		*filename;
 	FILE		*file;
 	char		*tty = NULL;
+	char		*device = NULL;
 	int		c;
+	int		run = 0;
 
-	while ((c = getopt_long(argc, argv, "T:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "rT:D:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
+			break;
+		case 'D':
+			device = optarg;
+			break;
+		case 'r':
+			run = 1;
 			break;
 		default:
 			usage(argv[0]);
@@ -56,7 +67,7 @@ main (int argc, char **argv)
 	}
 	filename = argv[optind];
 	if (filename == NULL) {
-		fprintf(stderr, "usage: %s <filename.ihx>\n", argv[0]);
+		usage(argv[0]);
 		exit(1);
 	}
 	file = fopen(filename, "r");
@@ -75,6 +86,8 @@ main (int argc, char **argv)
 	}
 
 	ccdbg_hex_file_free(hex);
+	if (!tty)
+		tty = cc_usbdevs_find_by_arg(device, "TIDongle");
 	dbg = ccdbg_open(tty);
 	if (!dbg)
 		exit (1);
@@ -98,8 +111,10 @@ main (int argc, char **argv)
 		ccdbg_close(dbg);
 		exit(1);
 	}
-	ccdbg_set_pc(dbg, image->address);
-	ccdbg_resume(dbg);
+	if (run) {
+		ccdbg_set_pc(dbg, image->address);
+		ccdbg_resume(dbg);
+	}
 	ccdbg_close(dbg);
 	exit (0);
 }

@@ -1,17 +1,22 @@
 Source: altos
-Section: otherosfs
-Priority: extra
+Section: electronics
+Priority: optional
 Maintainer: Bdale Garbee <bdale@gag.com>
 Uploaders: Keith Packard <keithp@keithp.com>
-Build-Depends: debhelper (>= 7), autoconf, automake, flite1-dev, libasound2-dev, libgconf2-dev, libglade2-dev, libgtk2.0-dev, libreadline5-dev, libusb-1.0-0-dev, nickle, sdcc
-Standards-Version: 3.8.3
-Homepage: http://altusmetrum.org/
+Build-Depends: debhelper (>= 7), autoconf, automake, gawk, libreadline-dev, libusb-1.0-0-dev, nickle, cc1111, xsltproc, fop, docbook-xml, docbook-xsl, swig, default-jdk, freetts, libtool, libjfreechart-java, libbluetooth-dev, pkg-config, libelf-dev, libbluetooth-dev
+Standards-Version: 3.9.3
+Homepage: http://altusmetrum.org/AltOS
+Vcs-Git: git://git.gag.com/fw/altos
+Vcs-Browser: http://git.gag.com/?p=fw/altos
 
 Package: altos
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, nickle
+Depends: ${shlibs:Depends}, ${misc:Depends}, default-jre | java2-runtime, freetts, nickle, libjfreechart-java
+Suggests: slim | gdm
+Replaces: altusmetrum-themes, slim-altusmetrum
+Conflicts: altusmetrum-themes, slim-altusmetrum
 Description: Altus Metrum firmware and utilities
- Firmware and utilities needed to support the TeleMetrum dual-deploy
- recording altimeter for high power model rocketry.  
+ Firmware and utilities needed to support high power model rocketry products
+ from Altus Metrum, including TeleMetrum, TeleMini, and TeleDongle.
  .
  See http://altusmetrum.org/ for more information.

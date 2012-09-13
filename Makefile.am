@@ -1,4 +1,4 @@
-SUBDIRS=src ao-view ao-tools ao-utils
+SUBDIRS=src doc altoslib altosui ao-tools ao-utils altosdroid
 
 EXTRA_DIST = ChangeLog
 
@@ -11,3 +11,9 @@ ChangeLog:
 	(touch ChangeLog; echo 'git directory not found: installing possibly empty changelog.' >&2)
 
 dist-hook: ChangeLog
+
+fat:
+	cd src && $(MAKE) all
+	cd doc && $(MAKE) all
+	cd altosui/libaltos && $(MAKE) all
+	cd altosui && $(MAKE) fat

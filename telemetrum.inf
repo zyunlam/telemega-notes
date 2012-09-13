@@ -1,0 +1,88 @@
+; Copyright (C) 2010 Keith Packard (keithp@keithp.com)
+; released under GNU General Public License version 2
+
+[Version]
+Signature	= "$Windows NT$"
+Class   	= Modem
+ClassGUID	= {4D36E96D-E325-11CE-BFC1-08002BE10318}
+Provider	= %Mfg%
+DriverVer	= 08/05/2010,7.1.1.0
+PnpLockDown	= 0
+DriverPackageDisplayName = %DriverName%
+
+[DestinationDirs]
+FakeModemCopyFileSection = 12
+DefaultDestDir	= 12
+
+[ControlFlags]
+
+[Manufacturer]
+%Mfg% = Models, NTx86, NTamd64, NTia64
+
+[Models]
+%AltusMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000A, AltusMetrumSerial
+%TeleMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000B, AltusMetrumSerial
+%TeleDongle%	= AltusMetrum.Install, USB\VID_FFFE&PID_000C, AltusMetrumSerial
+%TeleTerra%	= AltusMetrum.Install, USB\VID_FFFE&PID_000D, AltusMetrumSerial
+
+[Models.NTx86]
+%AltusMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000A, AltusMetrumSerial
+%TeleMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000B, AltusMetrumSerial
+%TeleDongle%	= AltusMetrum.Install, USB\VID_FFFE&PID_000C, AltusMetrumSerial
+%TeleTerra%	= AltusMetrum.Install, USB\VID_FFFE&PID_000D, AltusMetrumSerial
+
+[Models.NTamd64]
+%AltusMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000A, AltusMetrumSerial
+%TeleMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000B, AltusMetrumSerial
+%TeleDongle%	= AltusMetrum.Install, USB\VID_FFFE&PID_000C, AltusMetrumSerial
+%TeleTerra%	= AltusMetrum.Install, USB\VID_FFFE&PID_000D, AltusMetrumSerial
+
+[Models.NTia64]
+%AltusMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000A, AltusMetrumSerial
+%TeleMetrum%	= AltusMetrum.Install, USB\VID_FFFE&PID_000B, AltusMetrumSerial
+%TeleDongle%	= AltusMetrum.Install, USB\VID_FFFE&PID_000C, AltusMetrumSerial
+%TeleTerra%	= AltusMetrum.Install, USB\VID_FFFE&PID_000D, AltusMetrumSerial
+
+;----------------------------------------------------------------------------
+; Installation sections
+;----------------------------------------------------------------------------
+
+[AltusMetrum.Install.NT]
+include		= mdmcpq.inf
+CopyFiles	= FakeModemCopyFileSection
+AddReg		= All.AddReg, Modem.AddReg, Uninstall.AddReg
+
+[AltusMetrum.Install.NT.Services]
+include		= mdmcpq.inf
+AddService	= usbser, 0x00000000, LowerFilter_Service_Inst
+
+[AltusMetrum.Install.NT.HW]
+include		= mdmcpq.inf
+AddReg		= LowerFilterAddReg
+
+;----------------------------------------------------------------------------
+; AddReg sections
+;----------------------------------------------------------------------------
+
+[All.AddReg]
+HKR,,FriendlyDriver,,		Unimodem.vxd
+HKR,,DevLoader,,		*vcomm
+HKR,,ConfigDialog,,		modemui.dll
+HKR,,EnumPropPages,,		"modemui.dll,EnumPropPages"
+HKR,,PortSubClass, 1,		02
+HKR,,DeviceType, 1,		01
+
+[Modem.AddReg]
+HKR,, Properties, 1, C0,01,00,00, 00,00,00,00, FF,00,00,00, 07,00,00,00, 0F,00,00,00, F7,0F,00,00, 00,84,03,00, C0,DA,00,00
+
+[Uninstall.AddReg]
+HKLM,Software\Microsoft\Windows\CurrentVersion\Uninstall\%TeleMetrum%,DisplayName,,"%TeleMetrum%"
+
+[Strings]
+Mfg		= "altusmetrum.org"
+AltusMetrum	= "AltusMetrum"
+TeleMetrum	= "TeleMetrum"
+TeleDongle	= "TeleDongle"
+TeleTerra	= "TeleTerra"
+DriverName	= "Altus Metrum Device Driver"
+
