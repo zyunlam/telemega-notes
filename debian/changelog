@@ -45,8 +45,9 @@ altos (1.1-1) unstable; urgency=low
       are useful in 'Monitor Idle' mode.
     - Add Imperial units mode to present data in feet instead of
   * update build-deps to use cc1111 intead of sdcc, closes: #676739
+  * update build-deps to use default-jdk, closes: #655580
 
- -- Bdale Garbee <bdale@gag.com>  Tue, 11 Sep 2012 18:20:32 -0600
+ -- Bdale Garbee <bdale@gag.com>  Thu, 13 Sep 2012 14:46:50 -0600
 
 altos (1.0.3) unstable; urgency=low
 
