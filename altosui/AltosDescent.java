@@ -45,6 +45,15 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 			lights.setVisible(true);
 		}
 
+		void show(String s) {
+			show();
+			value.setText(s);
+		}
+
+		void show(String format, double value) {
+			show(String.format(format, value));
+		}
+
 		void hide() {
 			label.setVisible(false);
 			value.setVisible(false);
@@ -119,16 +128,17 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 			value.setVisible(false);
 		}
 
+		void show(String v) {
+			show();
+			value.setText(v);
+		}
+
 		void show(AltosUnits units, double v) {
-			value.setText(units.show(8, v));
+			show(units.show(8, v));
 		}
 
 		void show(String format, double v) {
-			value.setText(String.format(format, v));
-		}
-
-		void show(String v) {
-			value.setText(v);
+			show(String.format(format, v));
 		}
 
 		void set_font() {
@@ -305,10 +315,22 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	Lon lon;
 
+	class Distance extends DescentValue {
+		void show(AltosState state, int crc_errors) {
+			show(AltosConvert.distance, state.from_pad.distance);
+		}
+
+		public Distance (GridBagLayout layout, int x, int y) {
+			super(layout, x, y, "Ground Distance");
+		}
+	}
+
+	Distance distance;
+		
+
 	class Apogee extends DescentStatus {
 		void show (AltosState state, int crc_errors) {
-			show();
-			value.setText(String.format("%4.2f V", state.drogue_sense));
+			show("%4.2f V", state.drogue_sense);
 			lights.set(state.drogue_sense > 3.2);
 		}
 		public Apogee (GridBagLayout layout, int y) {
@@ -320,8 +342,7 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	class Main extends DescentStatus {
 		void show (AltosState state, int crc_errors) {
-			show();
-			value.setText(String.format("%4.2f V", state.main_sense));
+			show("%4.2f V", state.main_sense);
 			lights.set(state.main_sense > 3.2);
 		}
 		public Main (GridBagLayout layout, int y) {
@@ -377,6 +398,7 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 		speed.reset();
 		bearing.reset();
 		range.reset();
+		distance.reset();
 		elevation.reset();
 		main.reset();
 		apogee.reset();
@@ -389,6 +411,7 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 		speed.set_font();
 		bearing.set_font();
 		range.set_font();
+		distance.set_font();
 		elevation.set_font();
 		main.set_font();
 		apogee.set_font();
@@ -400,12 +423,14 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 		if (state.gps != null && state.gps.connected) {
 			bearing.show(state, crc_errors);
 			range.show(state, crc_errors);
+			distance.show(state, crc_errors);
 			elevation.show(state, crc_errors);
 			lat.show(state, crc_errors);
 			lon.show(state, crc_errors);
 		} else {
 			bearing.hide();
 			range.hide();
+			distance.hide();
 			elevation.hide();
 			lat.hide();
 			lon.hide();
@@ -431,10 +456,11 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 		elevation = new Elevation(layout, 0, 1);
 		range = new Range(layout, 2, 1);
 		bearing = new Bearing(layout, 0, 2);
-		lat = new Lat(layout, 0, 3);
-		lon = new Lon(layout, 2, 3);
+		distance = new Distance(layout, 0, 3);
+		lat = new Lat(layout, 0, 4);
+		lon = new Lon(layout, 2, 4);
 
-		apogee = new Apogee(layout, 4);
-		main = new Main(layout, 5);
+		apogee = new Apogee(layout, 5);
+		main = new Main(layout, 6);
 	}
 }

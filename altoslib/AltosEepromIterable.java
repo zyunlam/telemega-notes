@@ -23,15 +23,7 @@ import java.text.*;
 
 public class AltosEepromIterable extends AltosRecordIterable {
 
-	static final int	seen_flight = 1;
-	static final int	seen_sensor = 2;
-	static final int	seen_temp_volt = 4;
-	static final int	seen_deploy = 8;
-	static final int	seen_gps_time = 16;
-	static final int	seen_gps_lat = 32;
-	static final int	seen_gps_lon = 64;
-
-	static final int	seen_basic = seen_flight|seen_sensor;
+	static final int	seen_basic = AltosRecord.seen_flight|AltosRecord.seen_sensor;
 
 	boolean			has_accel;
 	boolean			has_gps;
@@ -64,7 +56,7 @@ public class AltosEepromIterable extends AltosRecordIterable {
 		state.tick = record.tick;
 		switch (record.cmd) {
 		case AltosLib.AO_LOG_FLIGHT:
-			eeprom.seen |= seen_flight;
+			eeprom.seen |= AltosRecord.seen_flight;
 			state.ground_accel = record.a;
 			state.flight_accel = record.a;
 			state.flight = record.b;
@@ -82,10 +74,10 @@ public class AltosEepromIterable extends AltosRecordIterable {
 				state.flight_pres = (state.flight_pres * 15 + state.pres) / 16;
 			}
 			state.flight_accel = (state.flight_accel * 15 + state.accel) / 16;
-			if ((eeprom.seen & seen_sensor) == 0)
+			if ((eeprom.seen & AltosRecord.seen_sensor) == 0)
 				eeprom.sensor_tick = record.tick - 1;
 			state.flight_vel += (state.accel_plus_g - state.accel) * (record.tick - eeprom.sensor_tick);
-			eeprom.seen |= seen_sensor;
+			eeprom.seen |= AltosRecord.seen_sensor;
 			eeprom.sensor_tick = record.tick;
 			has_accel = true;
 			break;
@@ -96,17 +88,17 @@ public class AltosEepromIterable extends AltosRecordIterable {
 				eeprom.n_pad_samples++;
 				state.ground_pres = state.pres;
 			}
-			eeprom.seen |= seen_sensor;
+			eeprom.seen |= AltosRecord.seen_sensor;
 			break;
 		case AltosLib.AO_LOG_TEMP_VOLT:
 			state.temp = record.a;
 			state.batt = record.b;
-			eeprom.seen |= seen_temp_volt;
+			eeprom.seen |= AltosRecord.seen_temp_volt;
 			break;
 		case AltosLib.AO_LOG_DEPLOY:
 			state.drogue = record.a;
 			state.main = record.b;
-			eeprom.seen |= seen_deploy;
+			eeprom.seen |= AltosRecord.seen_deploy;
 			has_ignite = true;
 			break;
 		case AltosLib.AO_LOG_STATE:
@@ -114,6 +106,7 @@ public class AltosEepromIterable extends AltosRecordIterable {
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
 			eeprom.gps_tick = state.tick;
+			eeprom.seen |= AltosRecord.seen_gps_time;
 			AltosGPS old = state.gps;
 			state.gps = new AltosGPS();
 
@@ -136,10 +129,12 @@ public class AltosEepromIterable extends AltosRecordIterable {
 			has_gps = true;
 			break;
 		case AltosLib.AO_LOG_GPS_LAT:
+			eeprom.seen |= AltosRecord.seen_gps_lat;
 			int lat32 = record.a | (record.b << 16);
 			state.gps.lat = (double) lat32 / 1e7;
 			break;
 		case AltosLib.AO_LOG_GPS_LON:
+			eeprom.seen |= AltosRecord.seen_gps_lon;
 			int lon32 = record.a | (record.b << 16);
 			state.gps.lon = (double) lon32 / 1e7;
 			break;
