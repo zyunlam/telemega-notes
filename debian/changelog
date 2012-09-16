@@ -1,3 +1,13 @@
+altos (1.1.1-1) unstable; urgency=low
+  * new upstream bug-fix release
+    - fix flight data deletion problem affecting TeleMetrum v1.0 boards only
+    - fix broken Google Earth export from on-board flight data (.eeprom) files
+    - fix units displayed on "Landed" tab in UI to honor imperial units flag
+    - display both range to the rocket and ground distance in "Descent" tab
+    - fix bug in sensor data display for TeleMini in "Monitor Idle" mode
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 16 Sep 2012 14:07:23 -0600
+
 altos (1.1-1) unstable; urgency=low
 
   * new upstream minor release, which provides a few new features in AltosUI
