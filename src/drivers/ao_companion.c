@@ -24,11 +24,14 @@
 #endif
 
 #define COMPANION_SELECT()	do {			\
+		uint8_t	pause;				\
 		ao_spi_get_bit(AO_COMPANION_CS_PORT,	\
 			       AO_COMPANION_CS_PIN,	\
 			       AO_COMPANION_CS,		\
 			       AO_COMPANION_SPI_BUS,	\
 			       AO_SPI_SPEED_200kHz);	\
+		for (pause = 0; pause < 100; pause++)	\
+			ao_arch_nop();			\
 	} while (0)
 
 #define COMPANION_DESELECT()	do {			\
