@@ -32,6 +32,8 @@ public class AltosMs5607 {
 	public int	pa;
 	public int	cc;
 
+	static final boolean	ms5611 = true;
+
 	void convert() {
 		int	dT;
 		int TEMP;
@@ -43,9 +45,15 @@ public class AltosMs5607 {
 	
 		TEMP = (int) (2000 + (((long) dT * tempsens) >> 23));
 
-		OFF = ((long) off << 17) + (((long) tco * dT) >> 6);
+		if (ms5611) {
+			OFF = ((long) off << 16) + (((long) tco * dT) >> 7);
 
-		SENS = ((long) sens << 16) + (((long) tcs * dT) >> 7);
+			SENS = ((long) sens << 15) + (((long) tcs * dT) >> 8);
+		} else {
+			OFF = ((long) off << 17) + (((long) tco * dT) >> 6);
+
+			SENS = ((long) sens << 16) + (((long) tcs * dT) >> 7);
+		} 
 
 		if (TEMP < 2000) {
 			int	T2 = (int) (((long) dT * (long) dT) >> 31);
