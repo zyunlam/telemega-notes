@@ -50,6 +50,29 @@ public class AltosEepromRecord {
 		data = null;
 	}
 
+	public String toString() {
+		switch (cmd) {
+		case AltosLib.AO_LOG_FLIGHT:
+			return String.format("tick %5d flight %5d ground_accel %6d\n",
+					     tick, b, a);
+		case AltosLib.AO_LOG_SENSOR:
+			return String.format("tick %5d accel %5d pres %5d\n",
+					     tick, a, b);
+		case AltosLib.AO_LOG_TEMP_VOLT:
+		case AltosLib.AO_LOG_DEPLOY:
+		case AltosLib.AO_LOG_STATE:
+		case AltosLib.AO_LOG_GPS_TIME:
+		case AltosLib.AO_LOG_GPS_LAT:
+		case AltosLib.AO_LOG_GPS_LON:
+		case AltosLib.AO_LOG_GPS_ALT:
+		case AltosLib.AO_LOG_GPS_SAT:
+		case AltosLib.AO_LOG_GPS_DATE:
+		case AltosLib.AO_LOG_PRESSURE:
+		default:
+			return data;
+		}
+	}
+
 	public AltosEepromRecord (String line) {
 		tick_valid = false;
 		tick = 0;

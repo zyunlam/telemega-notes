@@ -99,9 +99,10 @@ class AltosGraphTime extends AltosGraph {
             int dataNum = g.getDataNum(this);
             int axisNum = g.getAxisNum(this);
 
-            plot.setDataset(dataNum, dataset);
+	    plot.setDataset(dataNum, dataset);
             plot.mapDatasetToRangeAxis(dataNum, axisNum);
-            plot.setRenderer(dataNum, renderer);
+	    plot.setRenderer(dataNum, renderer);
+//		    renderer.setSeriesVisible(0, false);
         }
     }
 

@@ -17,6 +17,7 @@ interface AltosDataPoint {
 
     double acceleration();
     double height();
+    double gps_height();
     double speed();
     double temperature();
     double battery_voltage();

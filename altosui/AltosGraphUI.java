@@ -38,6 +38,15 @@ public class AltosGraphUI extends AltosUIFrame
                 } 
             };
     
+        AltosGraphTime.Element gps_height = 
+		new AltosGraphTime.TimeSeries("Height", AltosConvert.height.show_units(), "GPS Height (AGL)", magenta) {
+                public void gotTimeData(double time, AltosDataPoint d) {
+			double	height = d.gps_height();
+			if (height != AltosRecord.MISSING)
+				series.add(time, AltosConvert.height.value(height));
+                } 
+            };
+    
         AltosGraphTime.Element speed =
 		new AltosGraphTime.TimeSeries("Speed", AltosConvert.speed.show_units(), "Vertical Speed", green) { 
                 public void gotTimeData(double time, AltosDataPoint d) {
@@ -113,6 +122,7 @@ public class AltosGraphUI extends AltosUIFrame
     
 	    graphs.add( myAltosGraphTime("Summary")
 			.addElement(height)
+			.addElement(gps_height)
 			.addElement(speed)
 			.addElement(acceleration) );
 

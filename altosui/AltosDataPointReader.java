@@ -48,6 +48,7 @@ class AltosDataPointReader implements Iterable<AltosDataPoint> {
 
             public double acceleration() { return state.acceleration; }
 	    public double height() { return state.height; }
+	    public double gps_height() { return state.gps_height; }
 	    public double speed() { return state.speed(); }
             public double temperature() { return state.temperature; }
             public double battery_voltage() { return state.battery; }
