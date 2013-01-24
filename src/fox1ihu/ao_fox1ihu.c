@@ -38,6 +38,8 @@ main(void)
 	ao_dma_init();
 	ao_exti_init();
 
+	ao_adc_init();
+
 	ao_cmd_init();
 
 	ao_usb_init();
