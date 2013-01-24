@@ -110,6 +110,7 @@
 #define HAS_GPS			0
 #define HAS_FLIGHT		0
 #define HAS_ADC			1
+#define HAS_ADC_TEMP		1
 #define HAS_LOG			0
 
 /*
@@ -119,14 +120,18 @@
 #define AO_ADC_NUM_SENSE	6
 
 struct ao_adc {
-	int16_t			tx_pa_current;	/* ADC_IN0 */
-	int16_t			tx_pa_temp;	/* ADC_IN1 */
-	int16_t			tx_xo_temp;	/* ADC_IN2 */
-	int16_t			rx_xo_temp;	/* ADC_IN3 */
-	int16_t			ihu_current;	/* ADC_IN8 */
-	int16_t			rx_cd;		/* ADC_IN9 */
-	int16_t			ant_sense_1;	/* ADC_IN10 */
-	int16_t			ant_sense_2;	/* ADC_IN11 */
+	int16_t			tx_pa_current;	/* 0 ADC_IN0 */
+	int16_t			tx_pa_temp;	/* 1 ADC_IN1 */
+	int16_t			tx_xo_temp;	/* 2 ADC_IN2 */
+	int16_t			rx_xo_temp;	/* 3 ADC_IN3 */
+	int16_t			ihu_current;	/* 4 ADC_IN8 */
+	int16_t			rx_cd;		/* 5 ADC_IN9 */
+	int16_t			ant_sense_1;	/* 6 ADC_IN10 */
+	int16_t			ant_sense_2;	/* 7 ADC_IN11 */
+	int16_t			gyro_x_1;	/* 8 ADC_IN12 */
+	int16_t			gyro_z_1;	/* 9 ADC_IN13 */
+	int16_t			gyro_x_2;	/* 10 ADC_IN14 */
+	int16_t			gyro_z_2;	/* 11 ADC_IN15 */
 };
 
 #define AO_ADC_TX_PA_CURRENT		0
@@ -161,13 +166,29 @@ struct ao_adc {
 #define AO_ADC_ANT_SENSE_2_PORT		(&stm_gpioc)
 #define AO_ADC_ANT_SENSE_2_PIN		1
 
+#define AO_ADC_GYRO_X_1			12
+#define AO_ADC_GYRO_X_1_PORT		(&stm_gpioc)
+#define AO_ADC_GYRO_X_1_PIN		2
+
+#define AO_ADC_GYRO_Z_1			13
+#define AO_ADC_GYRO_Z_1_PORT		(&stm_gpioc)
+#define AO_ADC_GYRO_Z_1_PIN		3
+
+#define AO_ADC_GYRO_X_2			14
+#define AO_ADC_GYRO_X_2_PORT		(&stm_gpioc)
+#define AO_ADC_GYRO_X_2_PIN		4
+
+#define AO_ADC_GYRO_Z_2			15
+#define AO_ADC_GYRO_Z_2_PORT		(&stm_gpioc)
+#define AO_ADC_GYRO_Z_2_PIN		5
+
 #define AO_ADC_TEMP			16
 
 #define AO_ADC_RCC_AHBENR	((1 << STM_RCC_AHBENR_GPIOAEN) | \
 				 (1 << STM_RCC_AHBENR_GPIOBEN) | \
 				 (1 << STM_RCC_AHBENR_GPIOCEN))
 
-#define AO_NUM_ADC_PIN		(9)
+#define AO_NUM_ADC_PIN		(12)
 
 #define AO_ADC_PIN0_PORT	AO_ADC_TX_PA_CURRENT_PORT
 #define AO_ADC_PIN0_PIN		AO_ADC_TX_PA_CURRENT_PIN
@@ -179,14 +200,20 @@ struct ao_adc {
 #define AO_ADC_PIN3_PIN		AO_ADC_RX_XO_TEMP_PIN
 #define AO_ADC_PIN4_PORT	AO_ADC_IHU_CURRENT_PORT
 #define AO_ADC_PIN4_PIN		AO_ADC_IHU_CURRENT_PIN
-#define AO_ADC_PIN5_PORT	AO_ADC_IHU_CURRENT_PORT
-#define AO_ADC_PIN5_PIN		AO_ADC_IHU_CURRENT_PIN
-#define AO_ADC_PIN6_PORT	AO_ADC_RX_CD_PORT
-#define AO_ADC_PIN6_PIN		AO_ADC_RX_CD_PIN
-#define AO_ADC_PIN7_PORT	AO_ADC_ANT_SENSE_1_PORT
-#define AO_ADC_PIN7_PIN		AO_ADC_ANT_SENSE_1_PIN
-#define AO_ADC_PIN8_PORT	AO_ADC_ANT_SENSE_2_PORT
-#define AO_ADC_PIN8_PIN		AO_ADC_ANT_SENSE_2_PIN
+#define AO_ADC_PIN5_PORT	AO_ADC_RX_CD_PORT
+#define AO_ADC_PIN5_PIN		AO_ADC_RX_CD_PIN
+#define AO_ADC_PIN6_PORT	AO_ADC_ANT_SENSE_1_PORT
+#define AO_ADC_PIN6_PIN		AO_ADC_ANT_SENSE_1_PIN
+#define AO_ADC_PIN7_PORT	AO_ADC_ANT_SENSE_2_PORT
+#define AO_ADC_PIN7_PIN		AO_ADC_ANT_SENSE_2_PIN
+#define AO_ADC_PIN8_PORT	AO_ADC_GYRO_X_1_PORT
+#define AO_ADC_PIN8_PIN		AO_ADC_GYRO_X_1_PIN
+#define AO_ADC_PIN9_PORT	AO_ADC_GYRO_Z_1_PORT
+#define AO_ADC_PIN9_PIN		AO_ADC_GYRO_Z_1_PIN
+#define AO_ADC_PIN10_PORT	AO_ADC_GYRO_X_2_PORT
+#define AO_ADC_PIN10_PIN	AO_ADC_GYRO_X_2_PIN
+#define AO_ADC_PIN11_PORT	AO_ADC_GYRO_Z_2_PORT
+#define AO_ADC_PIN11_PIN	AO_ADC_GYRO_Z_2_PIN
 
 #define AO_NUM_ADC	       	(AO_NUM_ADC_PIN + 1)	/* Add internal temp sensor */
 
@@ -195,10 +222,13 @@ struct ao_adc {
 #define AO_ADC_SQ3		AO_ADC_TX_XO_TEMP
 #define AO_ADC_SQ4		AO_ADC_RX_XO_TEMP
 #define AO_ADC_SQ5		AO_ADC_IHU_CURRENT
-#define AO_ADC_SQ6		AO_ADC_IHU_CURRENT
-#define AO_ADC_SQ7		AO_ADC_RX_CD
-#define AO_ADC_SQ8		AO_ADC_ANT_SENSE_1
-#define AO_ADC_SQ9		AO_ADC_ANT_SENSE_2
-#define AO_ADC_SQ10		AO_ADC_TEMP
+#define AO_ADC_SQ6		AO_ADC_RX_CD
+#define AO_ADC_SQ7		AO_ADC_ANT_SENSE_1
+#define AO_ADC_SQ8		AO_ADC_ANT_SENSE_2
+#define AO_ADC_SQ9		AO_ADC_GYRO_X_1
+#define AO_ADC_SQ10		AO_ADC_GYRO_Z_1
+#define AO_ADC_SQ11		AO_ADC_GYRO_X_2
+#define AO_ADC_SQ12		AO_ADC_GYRO_Z_2
+#define AO_ADC_SQ13		AO_ADC_TEMP
 
 #endif /* _AO_PINS_H_ */
