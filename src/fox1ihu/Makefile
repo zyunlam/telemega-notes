@@ -43,7 +43,7 @@ ALTOS_SRC = \
 	ao_adc_stm.c \
 	ao_data.c
 
-PRODUCT=Fox1IHH-v0.1
+PRODUCT=Fox1IHU-v1
 PRODUCT_DEF=-DFOX
 IDPRODUCT=0x0024
 
