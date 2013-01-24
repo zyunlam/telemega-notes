@@ -218,17 +218,30 @@ struct ao_adc {
 #define AO_NUM_ADC	       	(AO_NUM_ADC_PIN + 1)	/* Add internal temp sensor */
 
 #define AO_ADC_SQ1		AO_ADC_TX_PA_CURRENT
+#define AO_ADC_SQ1_NAME		"tx_pa_current"
 #define AO_ADC_SQ2		AO_ADC_TX_PA_TEMP
+#define AO_ADC_SQ2_NAME		"tx_pa_temp"
 #define AO_ADC_SQ3		AO_ADC_TX_XO_TEMP
+#define AO_ADC_SQ3_NAME		"tx_xo_temp"
 #define AO_ADC_SQ4		AO_ADC_RX_XO_TEMP
+#define AO_ADC_SQ4_NAME		"rx_xo_temp"
 #define AO_ADC_SQ5		AO_ADC_IHU_CURRENT
+#define AO_ADC_SQ5_NAME		"ihu_current"
 #define AO_ADC_SQ6		AO_ADC_RX_CD
+#define AO_ADC_SQ6_NAME		"rx_cd"
 #define AO_ADC_SQ7		AO_ADC_ANT_SENSE_1
+#define AO_ADC_SQ7_NAME		"ant_sense_1"
 #define AO_ADC_SQ8		AO_ADC_ANT_SENSE_2
+#define AO_ADC_SQ8_NAME		"ant_sense_2"
 #define AO_ADC_SQ9		AO_ADC_GYRO_X_1
+#define AO_ADC_SQ9_NAME		"gyro_x_1"
 #define AO_ADC_SQ10		AO_ADC_GYRO_Z_1
+#define AO_ADC_SQ10_NAME	"gyro_z_1"
 #define AO_ADC_SQ11		AO_ADC_GYRO_X_2
+#define AO_ADC_SQ11_NAME	"gyro_x_2"
 #define AO_ADC_SQ12		AO_ADC_GYRO_Z_2
+#define AO_ADC_SQ12_NAME	"gyro_z_2"
 #define AO_ADC_SQ13		AO_ADC_TEMP
+#define AO_ADC_SQ13_NAME	"temp"
 
 #endif /* _AO_PINS_H_ */
