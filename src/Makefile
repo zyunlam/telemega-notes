@@ -23,7 +23,8 @@ ifneq ($(shell which sdcc),)
 	telelaunch-v0.1 tidongle test \
 	teleterra-v0.2 teleshield-v0.1 \
 	telefire-v0.1 \
-	spiradio-v0.1
+	spiradio-v0.1 \
+	teleballoon-v1.2
 endif
 
 ifneq ($(shell which avr-gcc),)

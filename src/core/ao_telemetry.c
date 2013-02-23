@@ -26,7 +26,7 @@ static __pdata uint16_t ao_rdf_time;
 #define AO_SEND_MEGA	1
 #endif
 
-#if defined(TELEMETRUM_V_0_1) || defined(TELEMETRUM_V_0_2) || defined(TELEMETRUM_V_1_0) || defined(TELEMETRUM_V_1_1) || defined(TELEBALLOON_V_1_1) || defined(TELEMETRUM_V_1_2)
+#if defined(TELEMETRUM_V_0_1) || defined(TELEMETRUM_V_0_2) || defined(TELEMETRUM_V_1_0) || defined(TELEMETRUM_V_1_1) || defined(TELEBALLOON_V_1_1) || defined(TELEMETRUM_V_1_2) || defined(TELEBALLOON_V_1_2)
 #define AO_TELEMETRY_SENSOR	AO_TELEMETRY_SENSOR_TELEMETRUM
 #endif
 
