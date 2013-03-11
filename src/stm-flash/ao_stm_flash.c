@@ -25,8 +25,14 @@ ao_panic(uint8_t reason)
 	for (;;);
 }
 
+void
+ao_application(void)
+{
+	ao_boot_reboot(AO_BOOT_APPLICATION_BASE);
+}
+
 __code struct ao_cmds ao_flash_cmds[] = {
-	{ ao_reboot_application, "A\0Switch to application" },
+	{ ao_application, "A\0Switch to application" },
 	{ 0, NULL },
 };
 
