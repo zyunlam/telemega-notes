@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,32 +15,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include "ao.h"
-#include <ao_exti.h>
-#include <ao_boot.h>
+#ifndef _AO_BOOT_H_
+#define _AO_BOOT_H_
 
 void
-ao_panic(uint8_t reason)
-{
-	for (;;);
-}
+ao_reboot_application(void);
 
-__code struct ao_cmds ao_flash_cmds[] = {
-	{ ao_reboot_application, "A\0Switch to application" },
-	{ 0, NULL },
-};
-
-int
-main(void)
-{
-	ao_clock_init();
-	ao_timer_init();
-//	ao_dma_init();
-	ao_cmd_init();
-//	ao_exti_init();
-	ao_usb_init();
-
-	ao_cmd_register(&ao_flash_cmds[0]);
-	ao_start_scheduler();
-	return 0;
-}
+#endif /* _AO_BOOT_H_ */
