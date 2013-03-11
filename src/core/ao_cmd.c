@@ -310,7 +310,7 @@ help(void)
 	__pdata uint8_t cmds;
 	__pdata uint8_t cmd;
 	__code struct ao_cmds * __pdata cs;
-	const char *h;
+	__code char *h;
 	uint8_t e;
 
 	for (cmds = 0; cmds < ao_ncmds; cmds++) {
