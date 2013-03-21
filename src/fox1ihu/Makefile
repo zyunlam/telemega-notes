@@ -41,7 +41,8 @@ ALTOS_SRC = \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
 	ao_adc_stm.c \
-	ao_data.c
+	ao_data.c \
+	ao_watchdog.c
 
 PRODUCT=Fox1IHU-v1
 PRODUCT_DEF=-DFOX

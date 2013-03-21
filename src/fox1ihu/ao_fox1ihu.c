@@ -44,6 +44,8 @@ main(void)
 
 	ao_usb_init();
 
+	ao_watchdog_init();
+
 	ao_start_scheduler();
 	return 0;
 }
