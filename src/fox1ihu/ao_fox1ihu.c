@@ -17,8 +17,8 @@
 
 #include <ao.h>
 #include <ao_exti.h>
-#include <ao_packet.h>
-#include <ao_send_packet.h>
+#include <ao_watchdog.h>
+#include <ao_storage.h>
 
 int
 main(void)
@@ -43,6 +43,8 @@ main(void)
 	ao_cmd_init();
 
 	ao_usb_init();
+
+	ao_storage_init();
 
 	ao_watchdog_init();
 
