@@ -244,4 +244,10 @@ struct ao_adc {
 #define AO_ADC_SQ13		AO_ADC_TEMP
 #define AO_ADC_SQ13_NAME	"temp"
 
+/* Watchdog timer */
+
+#define AO_WATCHDOG_INTERVAL	AO_MS_TO_TICKS(40)
+#define AO_WATCHDOG_PORT	(&stm_gpiod)
+#define AO_WATCHDOG_BIT		3
+
 #endif /* _AO_PINS_H_ */
