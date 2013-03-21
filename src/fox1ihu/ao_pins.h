@@ -250,4 +250,11 @@ struct ao_adc {
 #define AO_WATCHDOG_PORT	(&stm_gpiod)
 #define AO_WATCHDOG_BIT		3
 
+/* MRAM device */
+
+#define M25_MAX_CHIPS		1
+#define AO_M25_SPI_CS_PORT	(&stm_gpiod)
+#define AO_M25_SPI_CS_MASK	(1 << 0)
+#define AO_M25_SPI_BUS		AO_SPI_2_PB13_PB14_PB15
+
 #endif /* _AO_PINS_H_ */

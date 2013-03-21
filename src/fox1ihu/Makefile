@@ -11,6 +11,8 @@ INC = \
 	ao_arch_funcs.h \
 	ao_pins.h \
 	ao_product.h \
+	ao_watchdog.h \
+	ao_storage.h \
 	ao_task.h \
 	stm32l.h \
 	Makefile
@@ -42,6 +44,8 @@ ALTOS_SRC = \
 	ao_exti_stm.c \
 	ao_adc_stm.c \
 	ao_data.c \
+	ao_storage.c \
+	ao_m25.c \
 	ao_watchdog.c
 
 PRODUCT=Fox1IHU-v1
