@@ -7,6 +7,11 @@ vpath load_csv.5c ../kalman
 vpath matrix.5c ../kalman
 vpath ao-make-product.5c ../util
 
+.SUFFIXES: .elf .ihx
+
+.elf.ihx:
+	objcopy -O ihex $*.elf $@
+
 CC=arm-none-eabi-gcc
 SAT=/home/keithp/sat
 SAT_CLIB=$(SAT)/lib/pdclib.a
