@@ -18,7 +18,7 @@ SDCCDIRS=\
 	telemetrum-v1.2 telemetrum-v1.1 telemetrum-v1.0 \
 	teledongle-v0.2 teledongle-v0.1 \
 	telemini-v1.0 telenano-v0.1 \
-	telebt-v0.0 telebt-v0.1 \
+	telebt-v1.0 \
 	telemetrum-v0.1-sky telemetrum-v0.1-sirf \
 	telelaunch-v0.1 tidongle test \
 	teleterra-v0.2 teleshield-v0.1 \
@@ -29,7 +29,7 @@ AVRDIRS=\
 	telescience-v0.1 telescience-pwm telepyro-v0.1 micropeak
 
 ARMDIRS=\
-	megametrum-v0.1 megadongle-v0.1 stm-bringup stm-demo telelco-v0.1 \
+	telemega-v0.1 megadongle-v0.1 stm-bringup stm-demo telelco-v0.1 \
 	telescience-v0.2
 
 ifneq ($(shell which sdcc),)

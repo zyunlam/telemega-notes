@@ -23,7 +23,7 @@
 static __xdata uint8_t	ao_log_mutex;
 static __xdata struct ao_log_mega log;
 
-__code uint8_t ao_log_format = AO_LOG_FORMAT_MEGAMETRUM;
+__code uint8_t ao_log_format = AO_LOG_FORMAT_TELEMEGA;
 
 static uint8_t
 ao_log_csum(__xdata uint8_t *b) __reentrant
@@ -170,6 +170,8 @@ ao_log(void)
 				ao_log_stop();
 		}
 #endif
+
+		ao_log_flush();
 
 		/* Wait for a while */
 		ao_delay(AO_MS_TO_TICKS(100));

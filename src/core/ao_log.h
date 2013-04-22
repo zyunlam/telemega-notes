@@ -43,7 +43,7 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TINY		2	/* two byte state/baro records */
 #define AO_LOG_FORMAT_TELEMETRY		3	/* 32 byte ao_telemetry records */
 #define AO_LOG_FORMAT_TELESCIENCE	4	/* 32 byte typed telescience records */
-#define AO_LOG_FORMAT_MEGAMETRUM	5	/* 32 byte typed megametrum records */
+#define AO_LOG_FORMAT_TELEMEGA		5	/* 32 byte typed telemega records */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 extern __code uint8_t ao_log_format;
@@ -267,5 +267,8 @@ ao_log_data(__xdata struct ao_log_record *log) __reentrant;
 
 uint8_t
 ao_log_mega(__xdata struct ao_log_mega *log) __reentrant;
+
+void
+ao_log_flush(void);
 
 #endif /* _AO_LOG_H_ */

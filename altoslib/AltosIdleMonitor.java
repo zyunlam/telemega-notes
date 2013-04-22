@@ -29,6 +29,7 @@ public class AltosIdleMonitor extends Thread {
 	double			frequency;
 	String			callsign;
 	AltosState		previous_state;
+	AltosListenerState	listener_state;
 	AltosConfigData		config_data;
 	AltosGPS		gps;
 
@@ -51,11 +52,11 @@ public class AltosIdleMonitor extends Thread {
 	}
 
 	boolean has_sensor_mm(AltosConfigData config_data) {
-		return config_data.product.startsWith("MegaMetrum");
+		return config_data.product.startsWith("TeleMega");
 	}
 
 	boolean has_gps(AltosConfigData config_data) {
-		return config_data.product.startsWith("TeleMetrum") || config_data.product.startsWith("MegaMetrum");
+		return config_data.product.startsWith("TeleMetrum") || config_data.product.startsWith("TeleMega");
 	}
 
 	AltosRecord sensor_mm(AltosConfigData config_data) throws InterruptedException, TimeoutException {
@@ -116,8 +117,10 @@ public class AltosIdleMonitor extends Thread {
 		} finally {
 			if (remote) {
 				link.stop_remote();
-				if (record != null)
-					record.rssi = AltosRSSI();
+				if (record != null) {
+					record.rssi = link.rssi();
+					listener_state.battery = link.monitor_battery();
+				}
 			} else {
 				if (record != null)
 					record.rssi = 0;
@@ -137,7 +140,7 @@ public class AltosIdleMonitor extends Thread {
 	}
 
 	public void post_state() {
-		listener.update(state);
+		listener.update(state, listener_state);
 	}
 
 	public void abort() {
@@ -172,5 +175,6 @@ public class AltosIdleMonitor extends Thread {
 		link = in_link;
 		remote = in_remote;
 		state = null;
+		listener_state = new AltosListenerState();
 	}
 }

@@ -46,6 +46,7 @@
 	#define AO_LED_RED		1
 	#define AO_LED_GREEN		2
 	#define AO_MONITOR_LED		AO_LED_RED
+	#define AO_BT_LED		AO_LED_GREEN
 	#define LEDS_AVAILABLE		(AO_LED_RED|AO_LED_GREEN)
 	#define SPI_CS_ON_P1		1
 	#define SPI_CS_ON_P0		0
@@ -60,6 +61,7 @@
 	#define LEGACY_MONITOR		0
 	#define HAS_RSSI		0
 	#define HAS_AES			0
+	#define HAS_RADIO		1
 #endif
 
 #if DBG_ON_P1

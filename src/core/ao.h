@@ -65,6 +65,7 @@
 #define AO_PANIC_STACK		12	/* Stack overflow */
 #define AO_PANIC_SPI		13	/* SPI communication failure */
 #define AO_PANIC_CRASH		14	/* Processor crashed */
+#define AO_PANIC_BUFIO		15	/* Mis-using bufio API */
 #define AO_PANIC_SELF_TEST_CC1120	0x40 | 1	/* Self test failure */
 #define AO_PANIC_SELF_TEST_HMC5883	0x40 | 2	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MPU6000	0x40 | 3	/* Self test failure */
@@ -93,7 +94,7 @@ extern volatile __data AO_TICK_TYPE ao_tick_count;
 #define AO_SEC_TO_TICKS(s)	((s) * AO_HERTZ)
 
 /* Returns the current time in ticks */
-uint16_t
+AO_TICK_TYPE
 ao_time(void);
 
 /* Suspend the current task until ticks time has passed */
@@ -517,17 +518,28 @@ extern __xdata uint8_t	ao_radio_dma;
 #define AO_RADIO_STATUS_CRC_OK	AO_FEC_DECODE_CRC_OK
 #endif
 
+#ifndef HAS_RADIO_RECV
+#define HAS_RADIO_RECV HAS_RADIO
+#endif
+#ifndef HAS_RADIO_XMIT
+#define HAS_RADIO_XMIT HAS_RADIO
+#endif
+
 void
 ao_radio_general_isr(void) ao_arch_interrupt(16);
 
+#if HAS_RADIO_XMIT
 void
 ao_radio_send(const __xdata void *d, uint8_t size) __reentrant;
+#endif
 
+#if HAS_RADIO_RECV
 uint8_t
 ao_radio_recv(__xdata void *d, uint8_t size) __reentrant;
 
 void
 ao_radio_recv_abort(void);
+#endif
 
 void
 ao_radio_test(uint8_t on);
@@ -535,7 +547,26 @@ ao_radio_test(uint8_t on);
 typedef int16_t (*ao_radio_fill_func)(uint8_t *buffer, int16_t len);
 
 void
-ao_radio_send_lots(ao_radio_fill_func fill);
+ao_radio_send_aprs(ao_radio_fill_func fill);
+
+/*
+ * ao_radio_pa
+ */
+
+#if HAS_RADIO_AMP
+void
+ao_radio_pa_on(void);
+
+void
+ao_radio_pa_off(void);
+
+void
+ao_radio_pa_init(void);
+#else
+#define ao_radio_pa_on()
+#define ao_radio_pa_off()
+#define ao_radio_pa_init()
+#endif
 
 /*
  * Compute the packet length as follows:
@@ -687,7 +718,7 @@ extern __xdata uint8_t ao_force_freq;
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	13
+#define AO_CONFIG_MINOR	14
 
 #define AO_AES_LEN 16
 
@@ -715,6 +746,12 @@ struct ao_config {
 	struct ao_pyro	pyro[AO_PYRO_NUM];	/* minor version 12 */
 #endif
 	uint16_t	aprs_interval;		/* minor version 13 */
+#if HAS_RADIO_POWER
+	uint8_t		radio_power;		/* minor version 14 */
+#endif
+#if HAS_RADIO_AMP
+	uint8_t		radio_amp;		/* minor version 14 */
+#endif
 };
 
 #define AO_IGNITE_MODE_DUAL		0

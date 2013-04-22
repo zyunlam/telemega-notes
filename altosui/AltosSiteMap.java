@@ -220,6 +220,16 @@ public class AltosSiteMap extends JScrollPane implements AltosFlightDisplay {
 		return pngfile.toString();
 	}
 
+	public void initAndFinishMapAsync (final AltosSiteMapTile tile, final Point offset) {
+		Thread thread = new Thread() {
+				public void run() {
+					initMap(offset);
+					finishTileLater(tile, offset);
+				}
+			};
+		thread.start();
+	}
+
 	public void setBaseLocation(double lat, double lng) {
 		for (Point k : mapTiles.keySet()) {
 			AltosSiteMapTile tile = mapTiles.get(k);
@@ -264,7 +274,7 @@ public class AltosSiteMap extends JScrollPane implements AltosFlightDisplay {
 		initMaps(lat, lon);
 		scrollRocketToVisible(pt(lat, lon));
 	}
-	public void show(final AltosState state, final int crc_errors) {
+	public void show(final AltosState state, final AltosListenerState listener_state) {
 		// if insufficient gps data, nothing to update
 		if (!state.gps.locked && state.gps.nsat < 4)
 			return;
@@ -294,7 +304,7 @@ public class AltosSiteMap extends JScrollPane implements AltosFlightDisplay {
 			Point2D.Double ref, lref;
 			ref = translatePoint(pt, tileCoordOffset(offset));
 			lref = translatePoint(last_pt, tileCoordOffset(offset));
-			tile.show(state, crc_errors, lref, ref);
+			tile.show(state, listener_state, lref, ref);
 			if (0 <= ref.x && ref.x < px_size)
 				if (0 <= ref.y && ref.y < px_size)
 					in_any = true;
@@ -307,9 +317,8 @@ public class AltosSiteMap extends JScrollPane implements AltosFlightDisplay {
 			lref = translatePoint(last_pt, tileCoordOffset(offset));
 
 			AltosSiteMapTile tile = createTile(offset);
-			tile.show(state, crc_errors, lref, ref);
-			initMap(offset);
-			finishTileLater(tile, offset);
+			tile.show(state, listener_state, lref, ref);
+			initAndFinishMapAsync(tile, offset);
 		}
 
 		scrollRocketToVisible(pt);
@@ -370,8 +379,7 @@ public class AltosSiteMap extends JScrollPane implements AltosFlightDisplay {
 				if (mapTiles.containsKey(offset))
 					continue;
 				AltosSiteMapTile tile = createTile(offset);
-				initMap(offset);
-				finishTileLater(tile, offset);
+				initAndFinishMapAsync(tile, offset);
 			}
 		}
 	}

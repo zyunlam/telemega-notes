@@ -13,8 +13,8 @@ vpath ao-make-product.5c ../util
 	objcopy -O ihex $*.elf $@
 
 CC=arm-none-eabi-gcc
-SAT=/home/keithp/sat
-SAT_CLIB=$(SAT)/lib/pdclib.a
+SAT=/opt/cortex
+SAT_CLIB=$(SAT)/lib/pdclib-cortex-m3.a
 SAT_CFLAGS=-I$(SAT)/include
 
 ifndef VERSION

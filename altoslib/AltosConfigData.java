@@ -135,6 +135,12 @@ public class AltosConfigData implements Iterable<String> {
 		}
 	}
 
+	public boolean has_monitor_battery() {
+		if (product.startsWith("TeleBT"))
+			return true;
+		return false;
+	}
+
 	int[] parse_version(String v) {
 		String[] parts = v.split("\\.");
 		int r[] = new int[parts.length];
@@ -476,7 +482,7 @@ public class AltosConfigData implements Iterable<String> {
 		/* UI doesn't support AES key config */
 
 		/* AO_PYRO_NUM */
-		if (pyros.length > 0) {
+		if (npyro > 0) {
 			for (int p = 0; p < pyros.length; p++) {
 				link.printf("c P %s\n",
 						   pyros[p].toString());
@@ -498,7 +504,7 @@ public class AltosConfigData implements Iterable<String> {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_FULL:
 		case AltosLib.AO_LOG_FORMAT_TINY:
-		case AltosLib.AO_LOG_FORMAT_MEGAMETRUM:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 			link.printf("l\n");
 			read_link(link, "done");
 		default:

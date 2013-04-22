@@ -98,12 +98,20 @@ public class AltosState {
 		ground_altitude = data.ground_altitude();
 
 		altitude = data.altitude();
+		if (altitude == AltosRecord.MISSING && data.gps != null)
+			altitude = data.gps.alt;
 
+		height = AltosRecord.MISSING;
 		if (data.kalman_height != AltosRecord.MISSING)
 			height = data.kalman_height;
 		else {
-			if (prev_state != null)
-				height = (prev_state.height * 15 + altitude - ground_altitude) / 16.0;
+			if (altitude != AltosRecord.MISSING && ground_altitude != AltosRecord.MISSING) {
+				double	cur_height = altitude - ground_altitude;
+				if (prev_state == null || prev_state.height == AltosRecord.MISSING)
+					height = cur_height;
+				else
+					height = (prev_state.height * 15 + cur_height) / 16.0;
+			}
 		}
 
 		report_time = System.currentTimeMillis();
@@ -147,38 +155,51 @@ public class AltosState {
 				/* compute barometric speed */
 
 				double height_change = height - prev_state.height;
+
+				double prev_baro_speed = prev_state.baro_speed;
+				if (prev_baro_speed == AltosRecord.MISSING)
+					prev_baro_speed = 0;
+
 				if (time_change > 0)
-					baro_speed = (prev_state.baro_speed * 3 + (height_change / time_change)) / 4.0;
+					baro_speed = (prev_baro_speed * 3 + (height_change / time_change)) / 4.0;
 				else
 					baro_speed = prev_state.baro_speed;
+
+				double prev_accel_speed = prev_state.accel_speed;
+
+				if (prev_accel_speed == AltosRecord.MISSING)
+					prev_accel_speed = 0;
 
 				if (acceleration == AltosRecord.MISSING) {
 					/* Fill in mising acceleration value */
 					accel_speed = baro_speed;
-					if (time_change > 0)
-						acceleration = (accel_speed - prev_state.accel_speed) / time_change;
+
+					if (time_change > 0 && accel_speed != AltosRecord.MISSING)
+						acceleration = (accel_speed - prev_accel_speed) / time_change;
 					else
 						acceleration = prev_state.acceleration;
 				} else {
 					/* compute accelerometer speed */
-					accel_speed = prev_state.accel_speed + acceleration * time_change;
+					accel_speed = prev_accel_speed + acceleration * time_change;
 				}
 			}
-
 		} else {
 			npad = 0;
 			ngps = 0;
 			gps = null;
-			baro_speed = 0;
-			accel_speed = 0;
+			baro_speed = AltosRecord.MISSING;
+			accel_speed = AltosRecord.MISSING;
+			pad_alt = AltosRecord.MISSING;
+			max_baro_speed = 0;
+			max_accel_speed = 0;
+			max_height = 0;
+			max_acceleration = 0;
 			time_change = 0;
-			if (acceleration == AltosRecord.MISSING)
-				acceleration = 0;
 		}
 
 		time = tick / 100.0;
 
-		if (cur.new_gps && (state == AltosLib.ao_flight_pad || state == AltosLib.ao_flight_idle)) {
+		if (cur.new_gps && (state < AltosLib.ao_flight_boost)) {
 
 			/* Track consecutive 'good' gps reports, waiting for 10 of them */
 			if (data.gps != null && data.gps.locked && data.gps.nsat >= 4)
@@ -188,7 +209,7 @@ public class AltosState {
 
 			/* Average GPS data while on the pad */
 			if (data.gps != null && data.gps.locked && data.gps.nsat >= 4) {
-				if (ngps > 1) {
+				if (ngps > 1 && state == AltosLib.ao_flight_pad) {
 					/* filter pad position */
 					pad_lat = (pad_lat * 31.0 + data.gps.lat) / 32.0;
 					pad_lon = (pad_lon * 31.0 + data.gps.lon) / 32.0;
@@ -201,7 +222,7 @@ public class AltosState {
 				ngps++;
 			}
 		} else {
-			if (ngps == 0)
+			if (ngps == 0 && ground_altitude != AltosRecord.MISSING)
 				pad_alt = ground_altitude;
 		}
 
@@ -218,32 +239,30 @@ public class AltosState {
 		boost = (AltosLib.ao_flight_boost == state);
 
 		/* Only look at accelerometer data under boost */
-		if (boost && acceleration > max_acceleration && acceleration != AltosRecord.MISSING)
+		if (boost && acceleration != AltosRecord.MISSING && (max_acceleration == AltosRecord.MISSING || acceleration > max_acceleration))
 			max_acceleration = acceleration;
-		if (boost && accel_speed > max_accel_speed && accel_speed != AltosRecord.MISSING)
+		if (boost && accel_speed != AltosRecord.MISSING && accel_speed > max_accel_speed)
 			max_accel_speed = accel_speed;
-		if (boost && baro_speed > max_baro_speed && baro_speed != AltosRecord.MISSING)
+		if (boost && baro_speed != AltosRecord.MISSING && baro_speed > max_baro_speed)
 			max_baro_speed = baro_speed;
 
-		if (height > max_height && height != AltosRecord.MISSING)
+		if (height != AltosRecord.MISSING && height > max_height)
 			max_height = height;
+		elevation = 0;
+		range = -1;
+		gps_height = 0;
 		if (data.gps != null) {
 			if (gps == null || !gps.locked || data.gps.locked)
 				gps = data.gps;
 			if (ngps > 0 && gps.locked) {
-				from_pad = new AltosGreatCircle(pad_lat, pad_lon, gps.lat, gps.lon);
+				double h = height;
+
+				if (h == AltosRecord.MISSING) h = 0;
+				from_pad = new AltosGreatCircle(pad_lat, pad_lon, 0, gps.lat, gps.lon, h);
+				elevation = from_pad.elevation;
+				range = from_pad.range;
+				gps_height = gps.alt - pad_alt;
 			}
-		}
-		elevation = 0;
-		range = -1;
-		if (ngps > 0) {
-			gps_height = gps.alt - pad_alt;
-			if (from_pad != null) {
-				elevation = Math.atan2(height, from_pad.distance) * 180 / Math.PI;
-				range = Math.sqrt(height * height + from_pad.distance * from_pad.distance);
-			}
-		} else {
-			gps_height = 0;
 		}
 	}
 

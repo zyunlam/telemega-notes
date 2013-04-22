@@ -3,7 +3,7 @@
   "/usr/share/xml/docbook/schema/dtd/4.5/docbookx.dtd">
 <book>
   <title>The Altus Metrum System</title>
-  <subtitle>An Owner's Manual for TeleMetrum, TeleMini and TeleDongle Devices</subtitle>
+  <subtitle>An Owner's Manual for TeleMetrum, TeleMini, TeleDongle and TeleBT Devices</subtitle>
   <bookinfo>
     <author>
       <firstname>Bdale</firstname>
@@ -35,6 +35,15 @@
       </para>
     </legalnotice>
     <revhistory>
+      <revision>
+	<revnumber>1.2</revnumber>
+	<date>14 April 2013</date>
+	<revremark>
+	  Updated for software version 1.2. Version 1.2 adds support
+	  for TeleBT and AltosDroid. It also adds a few minor features
+	  and fixes a few minor bugs in AltosUI and the AltOS firmware.
+	</revremark>
+      </revision>
       <revision>
 	<revnumber>1.1.1</revnumber>
 	<date>16 September 2012</date>
@@ -128,13 +137,20 @@ NAR #88757, TRA #12200
       air-frame.
     </para>
     <para>
-      Complementing TeleMetrum and TeleMini is TeleDongle, a USB to RF 
-      interface for communicating with the altimeters.  Combined with your 
-      choice of antenna and
-      notebook computer, TeleDongle and our associated user interface software
-      form a complete ground station capable of logging and displaying in-flight
-      telemetry, aiding rocket recovery, then processing and archiving flight
+      TeleDongle was our first ground station, providing a USB to RF
+      interfaces for communicating with the altimeters. Combined with
+      your choice of antenna and notebook computer, TeleDongle and our
+      associated user interface software form a complete ground
+      station capable of logging and displaying in-flight telemetry,
+      aiding rocket recovery, then processing and archiving flight
       data for analysis and review.
+    </para>
+    <para>
+      For a slightly more portable ground station experience that also
+      provides direct rocket recovery support, TeleBT offers flight
+      monitoring and data logging using a Bluetooth connection between
+      the receiver and an Android device that has the Altos Droid
+      application installed from the Google Play store.
     </para>
     <para>
       More products will be added to the Altus Metrum family over time, and
@@ -196,6 +212,16 @@ NAR #88757, TRA #12200
       Full source code and build instructions are also available.
       The latest version may always be downloaded from
       <ulink url="http://altusmetrum.org/AltOS"/>.
+    </para>
+    <para>
+      If you're using a TeleBT instead of the TeleDongle, you'll want
+      to go install the Altos Droid application from the Google Play
+      store. You don't need a data plan to use Altos Droid, but
+      without network access, the Map view will be less useful as it
+      won't contain any map data. You can also use TeleBT connected
+      over USB with your laptop computer; it acts exactly like a
+      TeleDongle. Anywhere this manual talks about TeleDongle, you can
+      also read that as 'and TeleBT when connected via USB'.
     </para>
   </chapter>
   <chapter>
@@ -364,15 +390,15 @@ NAR #88757, TRA #12200
         flights, do what makes sense.
       </para>
       <para>
-        If idle mode is entered, you will hear an audible "di-dit" or see 
-        two short flashes ("I" for idle), and the flight state machine is 
-        disengaged, thus no ejection charges will fire.  The altimeters also 
-        listen for the radio link when in idle mode for requests sent via 
-        TeleDongle.  Commands can be issued to a TeleMetrum in idle mode 
-        over either
-        USB or the radio link equivalently. TeleMini only has the radio link.
-        Idle mode is useful for configuring the altimeter, for extracting data
-        from the on-board storage chip after flight, and for ground testing
+        If idle mode is entered, you will hear an audible "di-dit" or
+        see two short flashes ("I" for idle), and the flight state
+        machine is disengaged, thus no ejection charges will fire.
+        The altimeters also listen for the radio link when in idle
+        mode for requests sent via TeleDongle.  Commands can be issued
+        to a TeleMetrum in idle mode over either USB or the radio link
+        equivalently. TeleMini only has the radio link.  Idle mode is
+        useful for configuring the altimeter, for extracting data from
+        the on-board storage chip after flight, and for ground testing
         pyro charges.
       </para>
       <para>
@@ -443,11 +469,12 @@ NAR #88757, TRA #12200
     <section>
       <title>Controlling An Altimeter Over The Radio Link</title>
       <para>
-        One of the unique features of the Altus Metrum system is
-        the ability to create a two way command link between TeleDongle
-        and an altimeter using the digital radio transceivers built into
-        each device. This allows you to interact with the altimeter from
-        afar, as if it were directly connected to the computer.
+        One of the unique features of the Altus Metrum system is the
+        ability to create a two way command link between TeleDongle
+        and an altimeter using the digital radio transceivers
+        built into each device. This allows you to interact with the
+        altimeter from afar, as if it were directly connected to the
+        computer.
       </para>
       <para>
         Any operation which can be performed with TeleMetrum can
@@ -1578,6 +1605,151 @@ NAR #88757, TRA #12200
 	except it works with the altimeter in "idle" mode by sending
 	query commands to discover the current state rather than
 	listening for telemetry packets.
+      </para>
+    </section>
+  </chapter>
+  <chapter>
+    <title>AltosDroid</title>
+    <para>
+      AltosDroid provides the same flight monitoring capabilities as
+      AltosUI, but runs on Android devices and is designed to connect
+      to a TeleBT receiver over Bluetooth™. Altos Droid monitors
+      telemetry data, logging it to internal storage in the Android
+      device, and presents that data in a UI the same way the 'Monitor
+      Flight' window does in AltosUI.
+    </para>
+    <para>
+      This manual will explain how to configure AltosDroid, connect
+      to TeleBT, operate the flight monitoring interface and describe
+      what the displayed data means.
+    </para>
+    <section>
+      <title>Installing AltosDroid</title>
+      <para>
+	AltosDroid is included in the Google Play store. To install
+	it on your Android device, open open the Google Play Store
+	application and search for "altosdroid". Make sure you don't
+	have a space between "altos" and "droid" or you probably won't
+	find what you want. That should bring you to the right page
+	from which you can download and install the application.
+      </para>
+    </section>
+    <section>
+      <title>Connecting to TeleBT</title>
+      <para>
+	Press the Android 'Menu' button or soft-key to see the
+	configuration options available. Select the 'Connect a device'
+	option and then the 'Scan for devices' entry at the bottom to
+	look for your TeleBT device. Select your device, and when it
+	asks for the code, enter '1234'.
+      </para>
+      <para>
+	Subsequent connections will not require you to enter that
+	code, and your 'paired' device will appear in the list without
+	scanning.
+      </para>
+    </section>
+    <section>
+      <title>Configuring AltosDroid</title>
+      <para>
+	The only configuration option available for AltosDroid is
+	which frequency to listen on. Press the Android 'Menu' button
+	or soft-key and pick the 'Select radio frequency' entry. That
+	brings up a menu of pre-set radio frequencies; pick the one
+	which matches your altimeter.
+      </para>
+    </section>
+    <section>
+      <title>Altos Droid Flight Monitoring</title>
+      <para>
+	Altos Droid is designed to mimic the AltosUI flight monitoring
+	display, providing separate tabs for each stage of your rocket
+	flight along with a tab containing a map of the local area
+	with icons marking the current location of the altimeter and
+	the Android device.
+      </para>
+      <section>
+	<title>Pad</title>
+        <para>
+          The 'Launch Pad' tab shows information used to decide when the
+          rocket is ready for flight. The first elements include red/green
+          indicators, if any of these is red, you'll want to evaluate
+          whether the rocket is ready to launch:
+          <itemizedlist>
+            <listitem>
+              <para>
+                Battery Voltage. This indicates whether the Li-Po battery
+                powering the TeleMetrum has sufficient charge to last for
+                the duration of the flight. A value of more than
+                3.7V is required for a 'GO' status.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Apogee Igniter Voltage. This indicates whether the apogee
+                igniter has continuity. If the igniter has a low
+                resistance, then the voltage measured here will be close
+                to the Li-Po battery voltage. A value greater than 3.2V is
+                required for a 'GO' status.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Main Igniter Voltage. This indicates whether the main
+                igniter has continuity. If the igniter has a low
+                resistance, then the voltage measured here will be close
+                to the Li-Po battery voltage. A value greater than 3.2V is
+                required for a 'GO' status.
+              </para>
+            </listitem>
+	    <listitem>
+	      <para>
+		On-board Data Logging. This indicates whether there is
+		space remaining on-board to store flight data for the
+		upcoming flight. If you've downloaded data, but failed
+		to erase flights, there may not be any space
+		left. TeleMetrum can store multiple flights, depending
+		on the configured maximum flight log size. TeleMini
+		stores only a single flight, so it will need to be
+		downloaded and erased after each flight to capture
+		data. This only affects on-board flight logging; the
+		altimeter will still transmit telemetry and fire
+		ejection charges at the proper times.
+	      </para>
+	    </listitem>
+            <listitem>
+              <para>
+                GPS Locked. For a TeleMetrum device, this indicates whether the GPS receiver is
+                currently able to compute position information. GPS requires
+                at least 4 satellites to compute an accurate position.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                GPS Ready. For a TeleMetrum device, this indicates whether GPS has reported at least
+                10 consecutive positions without losing lock. This ensures
+                that the GPS receiver has reliable reception from the
+                satellites.
+              </para>
+            </listitem>
+          </itemizedlist>
+          <para>
+            The Launchpad tab also shows the computed launch pad position
+            and altitude, averaging many reported positions to improve the
+            accuracy of the fix.
+          </para>
+        </para>
+      </section>
+    </section>
+    <section>
+      <title>Downloading Flight Logs</title>
+      <para>
+	Altos Droid always saves every bit of telemetry data it
+	receives. To download that to a computer for use with AltosUI,
+	simply remove the SD card from your Android device, or connect
+	your device to your computer's USB port and browse the files
+	on that device. You will find '.telem' files in the TeleMetrum
+	directory that will work with AltosUI directly.
       </para>
     </section>
   </chapter>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,50 +15,54 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include "ao.h"
+#include <ao.h>
+#include <ao_exti.h>
+#include <ao_fat.h>
 
-#if HAS_LOG
-__code uint8_t ao_log_format = AO_LOG_FORMAT_NONE;	/* until we actually log stuff */
-#endif
+uint16_t	ao_flight_number = 1;
 
-void
+int
 main(void)
 {
 	ao_clock_init();
-
-	/* Turn on the LED until the system is stable */
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_RED);
+	
+#if HAS_STACK_GUARD
+	ao_mpu_init();
+#endif
 
 	ao_task_init();
-
+//	ao_led_init(LEDS_AVAILABLE);
+//	ao_led_on(AO_LED_RED);
 	ao_timer_init();
-#if HAS_BEEP
-	ao_beep_init();
-#endif
-	ao_cmd_init();
-#if HAS_EEPROM
+
+
 	ao_spi_init();
+	ao_dma_init();
+	ao_exti_init();
+
 	ao_storage_init();
-#endif
+
+	ao_serial_init();
+
+	ao_cmd_init();
+
 	ao_usb_init();
-	ao_monitor_init();
-#if HAS_LOG
-	ao_report_init();
-#endif
 	ao_radio_init();
-	ao_packet_master_init();
-	ao_btm_init();
-#if HAS_LOG
-	ao_log_single_init();
-#endif
-#if HAS_DBG
-	ao_dbg_init();
-#endif
-#if HAS_AES
-	ao_aes_init();
-	ao_radio_cmac_init();
+
+	ao_fat_init();
+
+	ao_gps_init();
+	ao_gps_report_mega_init();
+
+	ao_telemetry_init();
+	ao_telemetry_set_interval(AO_SEC_TO_TICKS(1));
+	ao_rdf_set(1);
+
+#if HAS_SAMPLE_PROFILE
+	ao_sample_profile_init();
 #endif
 	ao_config_init();
+	
 	ao_start_scheduler();
+	return 0;
 }

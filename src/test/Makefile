@@ -2,7 +2,7 @@ vpath % ..:../core:../drivers:../util:../micropeak
 
 PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noisy_accel ao_flight_test_mm \
 	ao_gps_test ao_gps_test_skytraq ao_convert_test ao_convert_pa_test ao_fec_test \
-	ao_aprs_test ao_micropeak_test
+	ao_aprs_test ao_micropeak_test ao_fat_test
 
 INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h
 
@@ -30,7 +30,7 @@ ao_flight_test_accel: ao_flight_test.c ao_host.h ao_flight.c  ao_sample.c ao_kal
 	cc $(CFLAGS) -o $@ -DFORCE_ACCEL=1 ao_flight_test.c
 
 ao_flight_test_mm: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c $(INCS)
-	cc -DMEGAMETRUM=1 $(CFLAGS) -o $@ $< -lm
+	cc -DTELEMEGA=1 $(CFLAGS) -o $@ $< -lm
 
 ao_gps_test: ao_gps_test.c ao_gps_sirf.c ao_gps_print.c ao_host.h
 	cc $(CFLAGS) -o $@ $<
@@ -64,3 +64,6 @@ check: ao_fec_test ao_flight_test ao_flight_test_baro run-tests
 
 ao_micropeak_test: ao_micropeak_test.c ao_microflight.c ao_kalman.h
 	cc $(CFLAGS) -o $@ ao_micropeak_test.c -lm
+
+ao_fat_test: ao_fat_test.c ao_fat.c ao_bufio.c
+	cc $(CFLAGS) -o $@ ao_fat_test.c -lssl
