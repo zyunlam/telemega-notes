@@ -267,6 +267,7 @@ ao_arch_memory_barrier() {
 	asm volatile("" ::: "memory");
 }
 
+#if HAS_TASK
 static inline void
 ao_arch_init_stack(struct ao_task *task, void *start)
 {
@@ -333,6 +334,7 @@ static inline void ao_arch_restore_stack(void) {
 	/* Return to calling function */
 	asm("bx lr");
 }
+#endif
 
 #define ao_arch_isr_stack()
 
