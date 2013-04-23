@@ -18,6 +18,11 @@
 #include "ao.h"
 #include <ao_task.h>
 
+#ifndef HAS_TICK
+#define HAS_TICK 1
+#endif
+
+#if HAS_TICK
 volatile AO_TICK_TYPE ao_tick_count;
 
 AO_TICK_TYPE
@@ -30,10 +35,6 @@ ao_time(void)
 volatile __data uint8_t	ao_data_interval = 1;
 volatile __data uint8_t	ao_data_count;
 #endif
-
-void
-ao_debug_out(char c);
-
 
 void stm_tim6_isr(void)
 {
@@ -109,6 +110,8 @@ ao_timer_init(void)
 			(0 << STM_TIM67_CR1_UDIS) |
 			(1 << STM_TIM67_CR1_CEN));
 }
+
+#endif
 
 void
 ao_clock_init(void)
