@@ -15,6 +15,9 @@ INC = \
 	ao_storage.h \
 	ao_task.h \
 	stm32l.h \
+	ao_sdcard.h \
+	ao_bufio.h \
+	ao_fat.h \
 	Makefile
 
 #PROFILE=ao_profile.c
@@ -45,7 +48,10 @@ ALTOS_SRC = \
 	ao_adc_stm.c \
 	ao_data.c \
 	ao_storage.c \
-	ao_m25.c \
+	ao_mr25.c \
+	ao_sdcard.c \
+	ao_bufio.c \
+	ao_fat.c \
 	ao_watchdog.c
 
 PRODUCT=Fox1IHU-v1

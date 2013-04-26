@@ -19,6 +19,7 @@
 #include <ao_exti.h>
 #include <ao_watchdog.h>
 #include <ao_storage.h>
+#include <ao_fat.h>
 
 int
 main(void)
@@ -47,6 +48,8 @@ main(void)
 	ao_storage_init();
 
 	ao_watchdog_init();
+
+	ao_fat_init();
 
 	ao_start_scheduler();
 	return 0;
