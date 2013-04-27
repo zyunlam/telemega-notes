@@ -25,6 +25,7 @@ SDCCDIRS=\
 	telerepeat-v1.0
 
 ARMM3DIRS=\
+	fox1ihu fox1ihu/flash-loader \
 	easymega-v1.0 easymega-v1.0/flash-loader \
 	telemega-v0.1 telemega-v0.1/flash-loader \
 	telemega-v1.0 telemega-v1.0/flash-loader \
