@@ -54,7 +54,7 @@ ALTOS_SRC = \
 	ao_fat.c \
 	ao_watchdog.c
 
-PRODUCT=Fox1IHU-v1
+PRODUCT=Fox1IHU-v2
 PRODUCT_DEF=-DFOX
 IDPRODUCT=0x0024
 
