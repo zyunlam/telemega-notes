@@ -20,3 +20,6 @@ Desired AltosDroid feature list
  *) Frequency scanning
 
  *) Select satellite imaging mode
+
+ *) Re-loading flight data from .telem file to get back to
+    'find my rocket' mode after shutting down the application.
