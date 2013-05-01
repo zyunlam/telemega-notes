@@ -230,6 +230,7 @@ ao_send_location(void)
 		ao_xmemcpy(&telemetry.location.flags,
 		       &ao_gps_data.flags,
 		       26);
+		telemetry.location.tick = ao_gps_tick;
 		ao_mutex_put(&ao_gps_mutex);
 		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_loc_cur = ao_telemetry_config_max;
@@ -243,6 +244,7 @@ ao_send_satellite(void)
 	{
 		telemetry.generic.type = AO_TELEMETRY_SATELLITE;
 		ao_mutex_get(&ao_gps_mutex);
+		telemetry.satellite.tick = ao_gps_tick;
 		telemetry.satellite.channels = ao_gps_tracking_data.channels;
 		ao_xmemcpy(&telemetry.satellite.sats,
 		       &ao_gps_tracking_data.sats,
