@@ -334,6 +334,20 @@ static inline void ao_arch_restore_stack(void) {
 	/* Return to calling function */
 	asm("bx lr");
 }
+
+#define HAS_ARCH_START_SCHEDULER	1
+
+static inline void ao_arch_start_scheduler(void) {
+	uint32_t	sp;
+	uint32_t	control;
+
+	asm("mrs %0,msp" : "=&r" (sp));
+	asm("msr psp,%0" : : "r" (sp));
+	asm("mrs %0,control" : "=&r" (control));
+	control |= (1 << 1);
+	asm("msr control,%0" : : "r" (control));
+}
+
 #endif
 
 #define ao_arch_isr_stack()
