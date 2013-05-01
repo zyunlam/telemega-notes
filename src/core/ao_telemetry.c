@@ -244,7 +244,6 @@ ao_send_satellite(void)
 	{
 		telemetry.generic.type = AO_TELEMETRY_SATELLITE;
 		ao_mutex_get(&ao_gps_mutex);
-		telemetry.satellite.tick = ao_gps_tick;
 		telemetry.satellite.channels = ao_gps_tracking_data.channels;
 		ao_xmemcpy(&telemetry.satellite.sats,
 		       &ao_gps_tracking_data.sats,
