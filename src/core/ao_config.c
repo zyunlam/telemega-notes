@@ -141,8 +141,10 @@ _ao_config_get(void)
 		if (minor < 12)
 			memset(&ao_config.pyro, '\0', sizeof (ao_config.pyro));
 #endif
-		if (minor < 13)
+		if (minor < 13) {
 			ao_config.aprs_interval = 0;
+			ao_config.aprs_width = AO_APRS_WIDTH_MEDIUM;
+		}
 #if HAS_RADIO_POWER
 		if (minor < 14)
 			ao_config.radio_power = AO_CONFIG_DEFAULT_RADIO_POWER;
@@ -518,7 +520,7 @@ ao_config_key_set(void) __reentrant
 void
 ao_config_aprs_show(void)
 {
-	printf ("APRS interval: %d\n", ao_config.aprs_interval);
+	printf ("APRS interval: %d width %d\n", ao_config.aprs_interval, ao_config.aprs_width);
 }
 
 void
@@ -529,6 +531,14 @@ ao_config_aprs_set(void)
 		return;
 	_ao_config_edit_start();
 	ao_config.aprs_interval = ao_cmd_lex_i;
+	ao_cmd_decimal();
+	if (ao_cmd_status == ao_cmd_success &&
+	    AO_APRS_WIDTH_NARROW <= ao_cmd_lex_i &&
+	    ao_cmd_lex_i <= AO_APRS_WIDTH_WIDE)
+	{
+		ao_config.aprs_width = ao_cmd_lex_i;
+	} else
+		ao_config.aprs_width = AO_APRS_WIDTH_MEDIUM;
 	_ao_config_edit_finish();
 }
 

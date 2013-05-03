@@ -328,11 +328,17 @@ static const uint16_t rdf_setup[] = {
 };
 
 /*
- * APRS deviation is the same as RDF
+ * APRS wide deviation is the same as RDF, medium is 3/4 of that, low is 1/2 of that
  */
 
-#define APRS_DEV_E	RDF_DEV_E
-#define APRS_DEV_M	RDF_DEV_M
+#define APRS_WIDE_DEV_E	RDF_DEV_E
+#define APRS_WIDE_DEV_M	RDF_DEV_M
+
+#define APRS_MED_DEV_E	1
+#define APRS_MED_DEV_M	1
+
+#define APRS_NAR_DEV_E	0
+#define APRS_NAR_DEV_M	4
 
 /*
  * For our APRS beacon, set the symbol rate to 9.6kBaud (8x oversampling for 1200 baud data rate)
@@ -351,8 +357,6 @@ static const uint16_t rdf_setup[] = {
 #define APRS_DRATE_M	131
 
 static const uint16_t aprs_setup[] = {
-	CC115L_DEVIATN,		((APRS_DEV_E << CC115L_DEVIATN_DEVIATION_E) |
-				 (APRS_DEV_M << CC115L_DEVIATN_DEVIATION_M)),
 	CC115L_MDMCFG4,		((0xf << 4) |
 				 (APRS_DRATE_E << CC115L_MDMCFG4_DRATE_E)),
 	CC115L_MDMCFG3,		(APRS_DRATE_M),
@@ -360,6 +364,20 @@ static const uint16_t aprs_setup[] = {
 				 (CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
 				 (0 << CC115L_MDMCFG2_MANCHESTER_EN) |
 				 (CC115L_MDMCFG2_SYNC_MODE_NONE << CC115L_MDMCFG2_SYNC_MODE)),
+};
+
+#define APRS_WIDE_DEVIATN	((APRS_WIDE_DEV_E << CC115L_DEVIATN_DEVIATION_E) | \
+				 (APRS_WIDE_DEV_M << CC115L_DEVIATN_DEVIATION_M))
+
+#define APRS_MED_DEVIATN	((APRS_MED_DEV_E << CC115L_DEVIATN_DEVIATION_E) | \
+				 (APRS_MED_DEV_M << CC115L_DEVIATN_DEVIATION_M))
+
+#define APRS_NAR_DEVIATN	((APRS_NAR_DEV_E << CC115L_DEVIATN_DEVIATION_E) | \
+				 (APRS_NAR_DEV_M << CC115L_DEVIATN_DEVIATION_M))
+
+
+static const uint8_t aprs_width[] = {
+	APRS_NAR_DEVIATN, APRS_MED_DEVIATN, APRS_WIDE_DEVIATN
 };
 
 #define AO_PKTCTRL0_INFINITE	((CC115L_PKTCTRL0_PKT_FORMAT_NORMAL << CC115L_PKTCTRL0_PKT_FORMAT) | \
@@ -411,9 +429,11 @@ ao_radio_set_mode(uint16_t new_mode)
 		for (i = 0; i < sizeof (rdf_setup) / sizeof (rdf_setup[0]); i += 2)
 			ao_radio_reg_write(rdf_setup[i], rdf_setup[i+1]);
 
-	if (changes & AO_RADIO_MODE_BITS_APRS)
+	if (changes & AO_RADIO_MODE_BITS_APRS) {
 		for (i = 0; i < sizeof (aprs_setup) / sizeof (aprs_setup[0]); i += 2)
 			ao_radio_reg_write(aprs_setup[i], aprs_setup[i+1]);
+		ao_radio_reg_write(CC115L_DEVIATN, aprs_width[ao_config.aprs_width]);
+	}
 
 	if (changes & AO_RADIO_MODE_BITS_INFINITE)
 		ao_radio_reg_write(CC115L_PKTCTRL0, AO_PKTCTRL0_INFINITE);
@@ -799,7 +819,13 @@ _ao_radio_send_lots(ao_radio_fill_func fill, uint8_t mode)
 void
 ao_radio_send_aprs(ao_radio_fill_func fill)
 {
+	static uint8_t	last_width;
 	ao_radio_get();
+	/* Force deviation set when it changes */
+	if (last_width != ao_config.aprs_width) {
+		last_width = ao_config.aprs_width;
+		ao_radio_mode &= ~AO_RADIO_MODE_APRS;
+	}
 	_ao_radio_send_lots(fill, AO_RADIO_MODE_APRS);
 	ao_radio_put();
 }
