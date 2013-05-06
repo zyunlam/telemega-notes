@@ -749,8 +749,7 @@ struct ao_config {
 #if AO_PYRO_NUM
 	struct ao_pyro	pyro[AO_PYRO_NUM];	/* minor version 12 */
 #endif
-	uint8_t		aprs_interval;		/* minor version 13 */
-	uint8_t		aprs_width;		/* minor version 13 */
+	uint16_t	aprs_interval;		/* minor version 13 */
 #if HAS_RADIO_POWER
 	uint8_t		radio_power;		/* minor version 14 */
 #endif
@@ -769,10 +768,6 @@ struct ao_config {
 
 #define AO_PAD_ORIENTATION_ANTENNA_UP	0
 #define AO_PAD_ORIENTATION_ANTENNA_DOWN	1
-
-#define AO_APRS_WIDTH_NARROW		0
-#define AO_APRS_WIDTH_MEDIUM		1
-#define AO_APRS_WIDTH_WIDE		2
 
 extern __xdata struct ao_config ao_config;
 
