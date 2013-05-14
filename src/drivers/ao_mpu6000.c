@@ -305,6 +305,7 @@ static struct ao_task ao_mpu6000_task;
 static void
 ao_mpu6000_show(void)
 {
+#if 0
 	struct ao_data	sample;
 
 	ao_data_get(&sample);
@@ -315,6 +316,8 @@ ao_mpu6000_show(void)
 		sample.mpu6000.gyro_x,
 		sample.mpu6000.gyro_y,
 		sample.mpu6000.gyro_z);
+#endif
+	printf ("who-am-i: %02x\n", ao_mpu6000_reg_read(MPU6000_WHO_AM_I));
 }
 
 static const struct ao_cmds ao_mpu6000_cmds[] = {
@@ -327,7 +330,7 @@ ao_mpu6000_init(void)
 {
 	ao_mpu6000_configured = 0;
 
-	ao_add_task(&ao_mpu6000_task, ao_mpu6000, "mpu6000");
+//	ao_add_task(&ao_mpu6000_task, ao_mpu6000, "mpu6000");
 	ao_cmd_register(&ao_mpu6000_cmds[0]);
 }
 #endif
