@@ -19,6 +19,8 @@
 #include <ao_mpu6000.h>
 #include <ao_exti.h>
 
+#if HAS_MPU6000
+
 static uint8_t	ao_mpu6000_wake;
 static uint8_t	ao_mpu6000_configured;
 
@@ -328,3 +330,4 @@ ao_mpu6000_init(void)
 	ao_add_task(&ao_mpu6000_task, ao_mpu6000, "mpu6000");
 	ao_cmd_register(&ao_mpu6000_cmds[0]);
 }
+#endif
