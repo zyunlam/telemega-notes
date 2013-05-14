@@ -161,12 +161,15 @@ ao_mpu6000_setup(void)
 	if (ao_mpu6000_configured)
 		return;
 
+	ao_delay(AO_SEC_TO_TICKS(3));
+
 	/* Reset the whole chip */
 	
 	ao_mpu6000_reg_write(MPU6000_PWR_MGMT_1,
 			     (1 << MPU6000_PWR_MGMT_1_DEVICE_RESET));
 
 	/* Wait for it to reset. If we talk too quickly, it appears to get confused */
+	ao_delay(AO_SEC_TO_TICKS(3));
 	ao_delay(AO_MS_TO_TICKS(100));
 
 	/* Reset signal conditioning */
