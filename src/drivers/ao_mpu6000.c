@@ -35,16 +35,12 @@ static uint8_t	ao_mpu6000_configured;
 #define ao_mpu6000_spi_get()	ao_spi_get(AO_MPU6000_SPI_BUS, AO_SPI_SPEED_1MHz)
 #define ao_mpu6000_spi_put()	ao_spi_put(AO_MPU6000_SPI_BUS)
 
-#define ao_mpu6000_spi_start() 	ao_spi_get_bit(AO_MPU6000_SPI_CS_PORT,	\
-					       AO_MPU6000_SPI_CS_PIN,	\
-					       AO_MPU6000_SPI_CS,	\
-					       AO_MPU6000_SPI_BUS,	\
-					       AO_SPI_SPEED_1MHz)
+#define ao_mpu6000_spi_start() 	ao_spi_set_cs(AO_MPU6000_SPI_CS_PORT,	\
+					      (1 << AO_MPU6000_SPI_CS_PIN))
 
-#define ao_mpu6000_spi_end() 	ao_spi_put_bit(AO_MPU6000_SPI_CS_PORT,	\
-					       AO_MPU6000_SPI_CS_PIN,	\
-					       AO_MPU6000_SPI_CS,	\
-					       AO_MPU6000_SPI_BUS)
+#define ao_mpu6000_spi_end() 	ao_spi_clr_cs(AO_MPU6000_SPI_CS_PORT,	\
+					      (1 << AO_MPU6000_SPI_CS_PIN))
+
 #endif
 
 
