@@ -652,6 +652,7 @@ ao_radio_test_cmd(void)
 		ao_packet_slave_stop();
 #endif
 		ao_radio_get(0xff);
+		ao_radio_set_mode(AO_RADIO_MODE_RDF);
 		ao_radio_strobe(CC1120_STX);
 #if CC1120_TRACE
 		{ int t; 
