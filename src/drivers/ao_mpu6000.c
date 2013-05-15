@@ -161,14 +161,9 @@ ao_mpu6000_gyro_check(int16_t normal, int16_t test, char *which)
 }
 
 static void
-_ao_mpu6000_setup(void)
+_ao_mpu6000_wait_alive(void)
 {
-	struct ao_mpu6000_sample	normal_mode, test_mode;
-	int				errors =0;
-	int				i;
-
-	if (ao_mpu6000_configured)
-		return;
+	uint8_t	i;
 
 	/* Wait for the chip to wake up */
 	for (i = 0; i < 30; i++) {
@@ -178,6 +173,18 @@ _ao_mpu6000_setup(void)
 	}
 	if (i == 30)
 		ao_panic(AO_PANIC_SELF_TEST_MPU6000);
+}
+
+static void
+_ao_mpu6000_setup(void)
+{
+	struct ao_mpu6000_sample	normal_mode, test_mode;
+	int				errors =0;
+
+	if (ao_mpu6000_configured)
+		return;
+
+	_ao_mpu6000_wait_alive();
 
 	/* Reset the whole chip */
 	
@@ -186,7 +193,7 @@ _ao_mpu6000_setup(void)
 
 	/* Wait for it to reset. If we talk too quickly, it appears to get confused */
 
-	ao_delay(AO_MS_TO_TICKS(100));
+	_ao_mpu6000_wait_alive();
 
 	/* Reset signal conditioning, disabling I2C on SPI systems */
 	_ao_mpu6000_reg_write(MPU6000_USER_CTRL,
@@ -198,7 +205,7 @@ _ao_mpu6000_setup(void)
 			      (1 << MPU6000_USER_CTRL_SIG_COND_RESET));
 
 	while (_ao_mpu6000_reg_read(MPU6000_USER_CTRL) & (1 << MPU6000_USER_CTRL_SIG_COND_RESET))
-		ao_yield();
+		ao_delay(AO_MS_TO_TICKS(10));
 
 	/* Reset signal paths */
 	_ao_mpu6000_reg_write(MPU6000_SIGNAL_PATH_RESET,
@@ -219,10 +226,10 @@ _ao_mpu6000_setup(void)
 			      (0 << MPU6000_PWR_MGMT_1_TEMP_DIS) |
 			      (MPU6000_PWR_MGMT_1_CLKSEL_PLL_X_AXIS << MPU6000_PWR_MGMT_1_CLKSEL));
 
-	/* Set sample rate divider to sample at full speed
-	   _ao_mpu6000_reg_write(MPU6000_SMPRT_DIV, 0);
+	/* Set sample rate divider to sample at full speed */
+	_ao_mpu6000_reg_write(MPU6000_SMPRT_DIV, 0);
 
-	   /* Disable filtering */
+	/* Disable filtering */
 	_ao_mpu6000_reg_write(MPU6000_CONFIG,
 			      (MPU6000_CONFIG_EXT_SYNC_SET_DISABLED << MPU6000_CONFIG_EXT_SYNC_SET) |
 			      (MPU6000_CONFIG_DLPF_CFG_260_256 << MPU6000_CONFIG_DLPF_CFG));
