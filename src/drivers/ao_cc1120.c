@@ -691,6 +691,12 @@ ao_radio_test_cmd(void)
 		ao_radio_get(0xff);
 		ao_radio_set_mode(AO_RADIO_MODE_TEST);
 		ao_radio_strobe(CC1120_STX);
+		{ int i;
+			for (i = 0; i < 10; i++) {
+				ao_delay(AO_MS_TO_TICKS(100));
+				ao_radio_reg_write(CC1120_SOFT_TX_DATA_IN, 0);
+			}
+		}
 #if CC1120_TRACE
 		{ int t; 
 			for (t = 0; t < 10; t++) {
