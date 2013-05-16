@@ -22,6 +22,7 @@ ao_packet_slave(void)
 {
 	ao_tx_packet.addr = ao_serial_number;
 	ao_tx_packet.len = AO_PACKET_SYN;
+	ao_packet_restart = 1;
 	while (ao_packet_enable) {
 		if (ao_packet_recv()) {
 			ao_xmemcpy(&ao_tx_packet.callsign, &ao_rx_packet.packet.callsign, AO_MAX_CALLSIGN);
@@ -58,7 +59,7 @@ ao_packet_slave_stop(void)
 void
 ao_packet_slave_init(uint8_t enable)
 {
-	ao_add_stdio(ao_packet_pollchar,
+	ao_add_stdio(_ao_packet_pollchar,
 		     ao_packet_putchar,
 		     NULL);
 	if (enable)

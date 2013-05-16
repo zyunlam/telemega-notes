@@ -20,6 +20,7 @@
 #include <ao_event.h>
 #include <ao_quadrature.h>
 #include <ao_button.h>
+#include <ao_boot.h>
 
 struct ao_task demo_task;
 
@@ -183,17 +184,19 @@ main(void)
 {
 	ao_clock_init();
 	
+	ao_task_init();
+
 	ao_serial_init();
 	ao_timer_init();
 	ao_dma_init();
 	ao_cmd_init();
-	ao_lcd_stm_init();
+//	ao_lcd_stm_init();
 //	ao_lcd_font_init();
 	ao_spi_init();
 	ao_i2c_init();
 	ao_exti_init();
-	ao_quadrature_init();
-	ao_button_init();
+//	ao_quadrature_init();
+//	ao_button_init();
 
 	ao_timer_set_adc_interval(100);
 

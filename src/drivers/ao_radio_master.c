@@ -53,7 +53,7 @@ ao_radio_master_start(void)
 {
 	ao_spi_get_bit(AO_RADIO_CS_PORT, AO_RADIO_CS_PIN, AO_RADIO_CS,
 		       AO_RADIO_SPI_BUS,
-		       AO_SPI_SPEED_200kHz);
+		       AO_SPI_SPEED_2MHz);
 }
 
 static void
@@ -75,7 +75,7 @@ ao_radio_master_send(void)
 	 */
 
 	PRINTD("Waiting radio ready\n");
-	cli();
+	ao_arch_block_interrupts();
 	ao_radio_ready = ao_gpio_get(AO_RADIO_INT_PORT,
 				     AO_RADIO_INT_PIN, AO_RADIO_INT);
 	ret = 0;
@@ -84,7 +84,7 @@ ao_radio_master_send(void)
 		if (ret)
 			break;
 	}
-	sei();
+	ao_arch_release_interrupts();
 	if (ret)
 		return 0;
 
@@ -99,11 +99,11 @@ ao_radio_master_send(void)
 		    AO_RADIO_SPI_BUS);
 	ao_radio_master_stop();
 	PRINTD("waiting for send done %d\n", ao_radio_done);
-	cli();
+	ao_arch_block_interrupts();
 	while (!ao_radio_done)
 		if (ao_sleep((void *) &ao_radio_done))
 			break;
-	sei();
+	ao_arch_release_interrupts();
 	PRINTD ("sent, radio done %d isr_0 %d isr_1 %d\n", ao_radio_done, isr_0_count, isr_1_count);
 	return ao_radio_done;
 }
@@ -156,7 +156,7 @@ ao_radio_send(const void *d, uint8_t size)
 
 
 uint8_t
-ao_radio_recv(__xdata void *d, uint8_t size)
+ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 {
 	int8_t	ret;
 	uint8_t	recv;
@@ -166,6 +166,7 @@ ao_radio_recv(__xdata void *d, uint8_t size)
 	
 	ao_radio_get(AO_RADIO_SPI_RECV, 0);
 	ao_radio_spi_request.recv_len = size;
+	ao_radio_spi_request.timeout = timeout;
 	recv = ao_radio_master_send();
 	if (!recv) {
 		ao_radio_put();

@@ -17,19 +17,13 @@
 
 package altosui;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
 import java.io.*;
 import java.util.*;
 import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
-
-import libaltosJNI.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosEepromDownload implements Runnable {
 
@@ -113,7 +107,7 @@ public class AltosEepromDownload implements Runnable {
 
 		extension = "eeprom";
 		set_serial(flights.config_data.serial);
-		for (int i = 0; i < eechunk.chunk_size && !done; i += AltosEepromRecord.record_length) {
+		for (int i = 0; i < AltosEepromChunk.chunk_size && !done; i += AltosEepromRecord.record_length) {
 			try {
 				AltosEepromRecord r = new AltosEepromRecord(eechunk, i);
 				if (r.cmd == Altos.AO_LOG_FLIGHT)
@@ -220,7 +214,7 @@ public class AltosEepromDownload implements Runnable {
 		boolean	any_valid = false;
 
 		extension = "science";
-		for (int i = 0; i < eechunk.chunk_size && !done; i += AltosEepromTeleScience.record_length) {
+		for (int i = 0; i < AltosEepromChunk.chunk_size && !done; i += AltosEepromTeleScience.record_length) {
 			try {
 				AltosEepromTeleScience r = new AltosEepromTeleScience(eechunk, i);
 				if (r.type == AltosEepromTeleScience.AO_LOG_TELESCIENCE_START) {
@@ -273,7 +267,7 @@ public class AltosEepromDownload implements Runnable {
 
 		extension = "mega";
 		set_serial(flights.config_data.serial);
-		for (int i = 0; i < eechunk.chunk_size && !done; i += AltosEepromMega.record_length) {
+		for (int i = 0; i < AltosEepromChunk.chunk_size && !done; i += AltosEepromMega.record_length) {
 			try {
 				AltosEepromMega r = new AltosEepromMega(eechunk, i);
 				if (r.cmd == Altos.AO_LOG_FLIGHT)
@@ -289,7 +283,7 @@ public class AltosEepromDownload implements Runnable {
 				if (r.cmd == Altos.AO_LOG_GPS_TIME) {
 					year = 2000 + r.data8(14);
 					month = r.data8(15);
-					day = r.data8(14);
+					day = r.data8(16);
 					want_file = true;
 				}
 
@@ -320,7 +314,7 @@ public class AltosEepromDownload implements Runnable {
 		done = false;
 		start = true;
 
-		if (flights.config_data.serial == 0)
+		if (flights.config_data.serial < 0)
 			throw new IOException("no serial number found");
 
 		/* Reset per-capture variables */
@@ -337,7 +331,7 @@ public class AltosEepromDownload implements Runnable {
 
 		state = 0; state_block = log.start_block;
 		for (block = log.start_block; !done && block < log.end_block; block++) {
-			monitor.set_value(AltosLib.state_name(state), state, block - state_block);
+			monitor.set_value(AltosLib.state_name(state), state, block - state_block, block - log.start_block);
 
 			AltosEepromChunk	eechunk = new AltosEepromChunk(serial_line, block, block == log.start_block);
 
@@ -372,7 +366,7 @@ public class AltosEepromDownload implements Runnable {
 				extension = "science";
 				CaptureTeleScience(eechunk);
 				break;
-			case AltosLib.AO_LOG_FORMAT_MEGAMETRUM:
+			case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 				extension = "mega";
 				CaptureMega(eechunk);
 			}

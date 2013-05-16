@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public class AltosMs5607 {
 	public int	reserved;
@@ -32,6 +32,8 @@ public class AltosMs5607 {
 	public int	pa;
 	public int	cc;
 
+	static final boolean	ms5611 = false;
+
 	void convert() {
 		int	dT;
 		int TEMP;
@@ -41,20 +43,26 @@ public class AltosMs5607 {
 
 		dT = raw_temp - ((int) tref << 8);
 	
-		TEMP = (int) (2000 + (((long) dT * tempsens) >> 23));
+		TEMP = (int) (2000 + (((long) dT * (long) tempsens) >> 23));
 
-		OFF = ((long) off << 17) + (((long) tco * dT) >> 6);
+		if (ms5611) {
+			OFF = ((long) off << 16) + (((long) tco * (long) dT) >> 7);
 
-		SENS = ((long) sens << 16) + (((long) tcs * dT) >> 7);
+			SENS = ((long) sens << 15) + (((long) tcs * (long) dT) >> 8);
+		} else {
+			OFF = ((long) off << 17) + (((long) tco * (long) dT) >> 6);
+
+			SENS = ((long) sens << 16) + (((long) tcs * (long) dT) >> 7);
+		} 
 
 		if (TEMP < 2000) {
 			int	T2 = (int) (((long) dT * (long) dT) >> 31);
 			int TEMPM = TEMP - 2000;
-			long OFF2 = (61 * (long) TEMPM * (long) TEMPM) >> 4;
-			long SENS2 = 2 * (long) TEMPM * (long) TEMPM;
+			long OFF2 = ((long) 61 * (long) TEMPM * (long) TEMPM) >> 4;
+			long SENS2 = (long) 2 * (long) TEMPM * (long) TEMPM;
 			if (TEMP < 1500) {
 				int TEMPP = TEMP + 1500;
-				long TEMPP2 = TEMPP * TEMPP;
+				long TEMPP2 = (long) TEMPP * (long) TEMPP;
 				OFF2 = OFF2 + 15 * TEMPP2;
 				SENS2 = SENS2 + 8 * TEMPP2;
 			}
@@ -72,6 +80,43 @@ public class AltosMs5607 {
 		raw_temp = in_temp;
 		convert();
 		return pa;
+	}
+
+	public boolean parse_line(String line) {
+		String[] items = line.split("\\s+");
+		if (line.startsWith("Pressure:")) {
+			if (items.length >= 2)
+				raw_pres = Integer.parseInt(items[1]);
+		} else if (line.startsWith("Temperature:")) {
+			if (items.length >= 2)
+				raw_temp = Integer.parseInt(items[1]);
+		} else if (line.startsWith("ms5607 reserved:")) {
+			if (items.length >= 3)
+				reserved = Integer.parseInt(items[2]);
+		} else if (line.startsWith("ms5607 sens:")) {
+			if (items.length >= 3)
+				sens = Integer.parseInt(items[2]);
+		} else if (line.startsWith("ms5607 off:")) {
+			if (items.length >= 3)
+				off = Integer.parseInt(items[2]);
+		} else if (line.startsWith("ms5607 tcs:")) {
+			if (items.length >= 3)
+				tcs = Integer.parseInt(items[2]);
+		} else if (line.startsWith("ms5607 tco:")) {
+			if (items.length >= 3)
+				tco = Integer.parseInt(items[2]);
+		} else if (line.startsWith("ms5607 tref:")) {
+			if (items.length >= 3)
+				tref = Integer.parseInt(items[2]);
+		} else if (line.startsWith("ms5607 tempsens:")) {
+			if (items.length >= 3)
+				tempsens = Integer.parseInt(items[2]);
+		} else if (line.startsWith("ms5607 crc:")) {
+			if (items.length >= 3)
+				crc = Integer.parseInt(items[2]);
+		} else if (line.startsWith("Altitude"))
+			return false;
+		return true;
 	}
 
 	public AltosMs5607() {

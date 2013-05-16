@@ -15,29 +15,29 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public class AltosSpeed extends AltosUnits {
 
 	public double value(double v) {
 		if (AltosConvert.imperial_units)
-			return AltosConvert.meters_to_feet(v);
+			return AltosConvert.meters_to_mph(v);
 		return v;
 	}
 
 	public String show_units() {
 		if (AltosConvert.imperial_units)
-			return "ft/s";
+			return "mph";
 		return "m/s";
 	}
 
 	public String say_units() {
 		if (AltosConvert.imperial_units)
-			return "feet per second";
+			return "miles per hour";
 		return "meters per second";
 	}
 
-	int show_fraction(int width) {
+	public int show_fraction(int width) {
 		return width / 9;
 	}
 }

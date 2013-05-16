@@ -20,16 +20,11 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
-public class AltosFlightUI extends AltosFrame implements AltosFlightDisplay, AltosFontListener {
+public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay, AltosFontListener {
 	AltosVoice		voice;
 	AltosFlightReader	reader;
 	AltosDisplayThread	thread;
@@ -44,6 +39,7 @@ public class AltosFlightUI extends AltosFrame implements AltosFlightDisplay, Alt
 	AltosSiteMap    sitemap;
 	boolean		has_map;
 	boolean		has_companion;
+	boolean		has_state;
 
 	private AltosFlightStatus flightStatus;
 	private AltosInfoTable flightInfo;
@@ -102,29 +98,44 @@ public class AltosFlightUI extends AltosFrame implements AltosFlightDisplay, Alt
 
 	AltosFlightStatusUpdate	status_update;
 
-	public void show(AltosState state, int crc_errors) {
+	public void show(AltosState state, AltosListenerState listener_state) {
 		status_update.saved_state = state;
+
+		if (state == null)
+			state = new AltosState(new AltosRecord());
+
+		pad.show(state, listener_state);
+
+		if (state.state != Altos.ao_flight_startup) {
+			if (!has_state) {
+				pane.setTitleAt(0, "Launch Pad");
+				pane.add(ascent, 1);
+				pane.add(descent, 2);
+				pane.add(landed, 3);
+				has_state = true;
+			}
+		}
+
+		ascent.show(state, listener_state);
+		descent.show(state, listener_state);
+		landed.show(state, listener_state);
+
 		JComponent tab = which_tab(state);
-		try {
-		pad.show(state, crc_errors);
-		ascent.show(state, crc_errors);
-		descent.show(state, crc_errors);
-		landed.show(state, crc_errors);
 		if (tab != cur_tab) {
 			if (cur_tab == pane.getSelectedComponent()) {
 				pane.setSelectedComponent(tab);
 			}
 			cur_tab = tab;
 		}
-		flightStatus.show(state, crc_errors);
-		flightInfo.show(state, crc_errors);
+		flightStatus.show(state, listener_state);
+		flightInfo.show(state, listener_state);
 
 		if (state.data.companion != null) {
 			if (!has_companion) {
 				pane.add("Companion", companion);
 				has_companion= true;
 			}
-			companion.show(state, crc_errors);
+			companion.show(state, listener_state);
 		} else {
 			if (has_companion) {
 				pane.remove(companion);
@@ -136,15 +147,12 @@ public class AltosFlightUI extends AltosFrame implements AltosFlightDisplay, Alt
 				pane.add("Site Map", sitemap);
 				has_map = true;
 			}
-			sitemap.show(state, crc_errors);
+			sitemap.show(state, listener_state);
 		} else {
 			if (has_map) {
 				pane.remove(sitemap);
 				has_map = false;
 			}
-		}
-		} catch (Exception e) {
-			System.out.print("Show exception" + e);
 		}
 	}
 
@@ -264,22 +272,18 @@ public class AltosFlightUI extends AltosFrame implements AltosFlightDisplay, Alt
 		pane = new JTabbedPane();
 
 		pad = new AltosPad();
-		pane.add("Launch Pad", pad);
+		pane.add("Status", pad);
 
 		ascent = new AltosAscent();
-		pane.add("Ascent", ascent);
-
 		descent = new AltosDescent();
-		pane.add("Descent", descent);
-
 		landed = new AltosLanded(reader);
-		pane.add("Landed", landed);
 
 		flightInfo = new AltosInfoTable();
 		pane.add("Table", new JScrollPane(flightInfo));
 
 		companion = new AltosCompanionInfo();
 		has_companion = false;
+		has_state = false;
 
 		sitemap = new AltosSiteMap();
 		has_map = false;

@@ -26,276 +26,130 @@
 #include <getopt.h>
 #include <string.h>
 #include "stlink-common.h"
+#include "ao-elf.h"
+#include "ccdbg.h"
+#include "cc-usb.h"
+#include "cc.h"
+#include "ao-stmload.h"
 
 #define AO_USB_DESC_STRING		3
 
-struct sym {
-	unsigned	addr;
-	char		*name;
-	int		required;
-} ao_symbols[] = {
+struct sym ao_symbols[] = {
 
-	{ 0,	"ao_romconfig_version",	1 },
+	{ 0, AO_BOOT_APPLICATION_BASE + 0x100,	"ao_romconfig_version",	1 },
 #define AO_ROMCONFIG_VERSION	(ao_symbols[0].addr)
 
-	{ 0,	"ao_romconfig_check",	1 },
+	{ 0, AO_BOOT_APPLICATION_BASE + 0x102,	"ao_romconfig_check",	1 },
 #define AO_ROMCONFIG_CHECK	(ao_symbols[1].addr)
 
-	{ 0,	"ao_serial_number", 1 },
+	{ 0, AO_BOOT_APPLICATION_BASE + 0x104,	"ao_serial_number", 1 },
 #define AO_SERIAL_NUMBER	(ao_symbols[2].addr)
 
-	{ 0,	"ao_usb_descriptors", 0 },
-#define AO_USB_DESCRIPTORS	(ao_symbols[3].addr)
+	{ 0, AO_BOOT_APPLICATION_BASE + 0x108,	"ao_radio_cal", 0 },
+#define AO_RADIO_CAL		(ao_symbols[3].addr)
 
-	{ 0,	"ao_radio_cal", 0 },
-#define AO_RADIO_CAL		(ao_symbols[4].addr)
+	{ 0, AO_BOOT_APPLICATION_BASE + 0x10c,	"ao_usb_descriptors", 0 },
+#define AO_USB_DESCRIPTORS	(ao_symbols[4].addr)
 };
 
 #define NUM_SYMBOLS		5
 #define NUM_REQUIRED_SYMBOLS	3
 
-/*
- * Look through the Elf file for the AltOS symbols
- * that can be adjusted before the image is written
- * to the device
- */
-static int
-find_symbols (Elf *e)
-{
-	Elf_Scn 	*scn;
-	Elf_Data	*symbol_data = NULL;
-	GElf_Shdr	shdr;
-	GElf_Sym       	sym;
-	int		i, symbol_count, s;
-	int		required = 0;
-	char		*symbol_name;
-
-	/*
-	 * Find the symbols
-	 */
-
-	scn = NULL;
-	while ((scn = elf_nextscn(e, scn)) != NULL) {
-		if (gelf_getshdr(scn, &shdr) != &shdr)
-			return 0;
-
-		if (shdr.sh_type == SHT_SYMTAB) {
-			symbol_data = elf_getdata(scn, NULL);
-			symbol_count = shdr.sh_size / shdr.sh_entsize;
-			break;
-		}
-	}
-
-	if (!symbol_data)
-		return 0;
-
-	for (i = 0; i < symbol_count; i++) {
-		gelf_getsym(symbol_data, i, &sym);
-
-		symbol_name = elf_strptr(e, shdr.sh_link, sym.st_name);
-
-		for (s = 0; s < NUM_SYMBOLS; s++)
-			if (!strcmp (ao_symbols[s].name, symbol_name)) {
-				int	t;
-				ao_symbols[s].addr = sym.st_value;
-				if (ao_symbols[s].required)
-					++required;
-			}
-	}
-
-	return required >= NUM_REQUIRED_SYMBOLS;
-}
-
-struct load {
-	uint32_t	addr;
-	uint32_t	len;
-	uint8_t		buf[0];
-};
-
-uint32_t round4(uint32_t a) {
-	return (a + 3) & ~3;
-}
-
-struct load *
-new_load (uint32_t addr, uint32_t len)
-{
-	struct load *new;
-
-	len = round4(len);
-	new = calloc (1, sizeof (struct load) + len);
-	if (!new)
-		abort();
-
-	new->addr = addr;
-	new->len = len;
-	return new;
-}
-
-void
-load_paste(struct load *into, struct load *from)
-{
-	if (from->addr < into->addr || into->addr + into->len < from->addr + from->len)
-		abort();
-
-	memcpy(into->buf + from->addr - into->addr, from->buf, from->len);
-}
-
-/*
- * Make a new load structure large enough to hold the old one and
- * the new data
- */
-struct load *
-expand_load(struct load *from, uint32_t addr, uint32_t len)
-{
-	struct load	*new;
-
-	if (from) {
-		uint32_t	from_last = from->addr + from->len;
-		uint32_t	last = addr + len;
-
-		if (addr > from->addr)
-			addr = from->addr;
-		if (last < from_last)
-			last = from_last;
-
-		len = last - addr;
-
-		if (addr == from->addr && len == from->len)
-			return from;
-	}
-	new = new_load(addr, len);
-	if (from) {
-		load_paste(new, from);
-		free (from);
-	}
-	return new;
-}
-
-/*
- * Create a new load structure with data from the existing one
- * and the new data
- */
-struct load *
-load_write(struct load *from, uint32_t addr, uint32_t len, void *data)
-{
-	struct load	*new;
-
-	new = expand_load(from, addr, len);
-	memcpy(new->buf + addr - new->addr, data, len);
-	return new;
-}
-
-/*
- * Construct a large in-memory block for all
- * of the loaded sections of the program
- */
-static struct load *
-get_load(Elf *e)
-{
-	Elf_Scn 	*scn;
-	size_t		shstrndx;
-	GElf_Shdr	shdr;
-	Elf_Data	*data;
-	uint8_t		*buf;
-	char		*got_name;
-	size_t		nphdr;
-	int		p;
-	GElf_Phdr	phdr;
-	struct load	*load = NULL;
-	
-	if (elf_getshdrstrndx(e, &shstrndx) < 0)
-		return 0;
-
-	if (elf_getphdrnum(e, &nphdr) < 0)
-		return 0;
-
-	/*
-	 * As far as I can tell, all of the phdr sections should
-	 * be flashed to memory
-	 */
-	for (p = 0; p < nphdr; p++) {
-
-		/* Find this phdr */
-		gelf_getphdr(e, p, &phdr);
-
-		/* Get the associated file section */
-		scn = gelf_offscn(e, phdr.p_offset);
-
-		if (gelf_getshdr(scn, &shdr) != &shdr)
-			abort();
-
-		data = elf_getdata(scn, NULL);
-
-		/* Write the section data into the memory block */
-		load = load_write(load, phdr.p_paddr, phdr.p_filesz, data->d_buf);
-	}
-	return load;
-}
+int ao_num_symbols = NUM_SYMBOLS;
+int ao_num_required_symbols = NUM_REQUIRED_SYMBOLS;
 
 /*
  * Edit the to-be-written memory block
  */
 static int
-rewrite(struct load *load, unsigned addr, uint8_t *data, int len)
+rewrite(struct hex_image *load, unsigned address, uint8_t *data, int length)
 {
 	int 		i;
 
-	if (addr < load->addr || load->addr + load->len < addr + len)
+	if (address < load->address || load->address + load->length < address + length)
 		return 0;
 
-	printf("rewrite %04x:", addr);
-	for (i = 0; i < len; i++)
-		printf (" %02x", load->buf[addr - load->addr + i]);
+	printf("rewrite %04x:", address);
+	for (i = 0; i < length; i++)
+		printf (" %02x", load->data[address - load->address + i]);
 	printf(" ->");
-	for (i = 0; i < len; i++)
+	for (i = 0; i < length; i++)
 		printf (" %02x", data[i]);
 	printf("\n");
-	memcpy(load->buf + addr - load->addr, data, len);
+	memcpy(load->data + address - load->address, data, length);
 }
 
 /*
- * Open the specified ELF file and
- * check for the symbols we need
+ * Read a 16-bit value from the USB target
  */
 
-Elf *
-ao_open_elf(char *name)
+static uint16_t
+get_uint16_cc(struct cc_usb *cc, uint32_t addr)
 {
-	int		fd;
-	Elf		*e;
-	Elf_Scn 	*scn;
-	Elf_Data	*symbol_data = NULL;
-	GElf_Shdr	shdr;
-	GElf_Sym       	sym;
-	size_t		n, shstrndx, sz;
-	int		i, symbol_count, s;
-	int		required = 0;
+	struct hex_image	*hex = ao_self_read(cc, addr, 2);
+	uint16_t		v;
+	uint8_t			*data;
 
-	if (elf_version(EV_CURRENT) == EV_NONE)
-		return NULL;
+	if (!hex)
+		return 0;
+	data = hex->data + addr - hex->address;
+	v = data[0] | (data[1] << 8);
+	free(hex);
+	return v;
+}
 
-	fd = open(name, O_RDONLY, 0);
+static uint32_t
+get_uint32_cc(struct cc_usb *cc, uint32_t addr)
+{
+	struct hex_image	*hex = ao_self_read(cc, addr, 4);
+	uint32_t		v;
+	uint8_t			*data;
 
-	if (fd < 0)
-		return NULL;
+	if (!hex)
+		return 0;
+	data = hex->data + addr - hex->address;
+	v = data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+	free(hex);
+	return v;
+}
 
-	e = elf_begin(fd, ELF_C_READ, NULL);
+/*
+ * Read a 16-bit value from the target device with arbitrary
+ * alignment
+ */
+static uint16_t
+get_uint16_sl(stlink_t *sl, uint32_t addr)
+{
+	const 		uint8_t *data = sl->q_buf;
+	uint32_t	actual_addr;
+	int		off;
+	uint16_t	result;
 
-	if (!e)
-		return NULL;
+	sl->q_len = 0;
 
-	if (elf_kind(e) != ELF_K_ELF)
-		return NULL;
 
-	if (elf_getshdrstrndx(e, &shstrndx) != 0)
-		return NULL;
+	actual_addr = addr & ~3;
+	
+	stlink_read_mem32(sl, actual_addr, 8);
 
-	if (!find_symbols(e)) {
-		fprintf (stderr, "Cannot find required symbols\n");
-		return NULL;
-	}
+	if (sl->q_len != 8)
+		abort();
 
-	return e;
+	off = addr & 3;
+	result = data[off] | (data[off + 1] << 8);
+	return result;
+}
+
+static uint16_t
+get_uint16(stlink_t *sl, struct cc_usb *cc, uint32_t addr)
+{
+	uint16_t	result;
+	if (cc)
+		result = get_uint16_cc(cc, addr);
+	else
+		result = get_uint16_sl(sl, addr);
+	printf ("read 0x%08x = 0x%04x\n", addr, result);
+	return result;
 }
 
 /*
@@ -303,7 +157,7 @@ ao_open_elf(char *name)
  * alignment
  */
 static uint32_t
-get_uint32(stlink_t *sl, uint32_t addr)
+get_uint32_sl(stlink_t *sl, uint32_t addr)
 {
 	const 		uint8_t *data = sl->q_buf;
 	uint32_t	actual_addr;
@@ -323,35 +177,23 @@ get_uint32(stlink_t *sl, uint32_t addr)
 
 	off = addr & 3;
 	result = data[off] | (data[off + 1] << 8) | (data[off+2] << 16) | (data[off+3] << 24);
-	printf ("read 0x%08x = 0x%08x\n", addr, result);
 	return result;
 }
 
 /*
- * Read a 16-bit value from the target device with arbitrary
+ * Read a 32-bit value from the target device with arbitrary
  * alignment
  */
-static uint16_t
-get_uint16(stlink_t *sl, uint32_t addr)
+static uint32_t
+get_uint32(stlink_t *sl, struct cc_usb *cc, uint32_t addr)
 {
-	const 		uint8_t *data = sl->q_buf;
-	uint32_t	actual_addr;
-	int		off;
-	uint16_t	result;
+	uint32_t	result;
 
-	sl->q_len = 0;
-
-
-	actual_addr = addr & ~3;
-	
-	stlink_read_mem32(sl, actual_addr, 8);
-
-	if (sl->q_len != 8)
-		abort();
-
-	off = addr & 3;
-	result = data[off] | (data[off + 1] << 8);
-	printf ("read 0x%08x = 0x%04x\n", addr, result);
+	if (cc)
+		result = get_uint32_cc(cc, addr);
+	else
+		result = get_uint32_sl(sl, addr);
+	printf ("read 0x%08x = 0x%08x\n", addr, result);
 	return result;
 }
 
@@ -364,10 +206,10 @@ get_uint16(stlink_t *sl, uint32_t addr)
  * places this at 0x100 from the start of the rom section
  */
 static int
-check_flashed(stlink_t *sl)
+check_flashed(stlink_t *sl, struct cc_usb *cc)
 {
-	uint16_t	romconfig_version = get_uint16(sl, AO_ROMCONFIG_VERSION);
-	uint16_t	romconfig_check = get_uint16(sl, AO_ROMCONFIG_CHECK);
+	uint16_t	romconfig_version = get_uint16(sl, cc, AO_ROMCONFIG_VERSION);
+	uint16_t	romconfig_check = get_uint16(sl, cc, AO_ROMCONFIG_CHECK);
 
 	if (romconfig_version != (uint16_t) ~romconfig_check) {
 		fprintf (stderr, "Device has not been flashed before\n");
@@ -377,21 +219,28 @@ check_flashed(stlink_t *sl)
 }
 
 static const struct option options[] = {
+	{ .name = "stlink", .has_arg = 0, .val = 'S' },
+	{ .name = "tty", .has_arg = 1, .val = 'T' },
 	{ .name = "device", .has_arg = 1, .val = 'D' },
 	{ .name = "cal", .has_arg = 1, .val = 'c' },
 	{ .name = "serial", .has_arg = 1, .val = 's' },
+	{ .name = "verbose", .has_arg = 0, .val = 'v' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--cal=<radio-cal>] [--serial=<serial>] file.elf\n", program);
+	fprintf(stderr, "usage: %s [--stlink] [--verbose] [--device=<device>] [-tty=<tty>] [--cal=<radio-cal>] [--serial=<serial>] file.{elf,ihx}\n", program);
 	exit(1);
 }
 
 void
-done(stlink_t *sl, int code)
+done(stlink_t *sl, struct cc_usb *cc, int code)
 {
+	if (cc) {
+/*		cc_usb_printf(cc, "a\n"); */
+		cc_usb_close(cc);
+	}
 	if (sl) {
 		stlink_reset(sl);
 		stlink_run(sl);
@@ -399,6 +248,17 @@ done(stlink_t *sl, int code)
 		stlink_close(sl);
 	}
 	exit (code);
+}
+
+static int
+ends_with(char *whole, char *suffix)
+{
+	int whole_len = strlen(whole);
+	int suffix_len = strlen(suffix);
+
+	if (suffix_len > whole_len)
+		return 0;
+	return strcmp(whole + whole_len - suffix_len, suffix) == 0;
 }
 
 int
@@ -419,12 +279,21 @@ main (int argc, char **argv)
 	char			cal_int[4];
 	char			*cal_end;
 	int			c;
-	stlink_t		*sl;
+	stlink_t		*sl = NULL;
 	int			was_flashed = 0;
-	struct load		*load;
+	struct hex_image	*load;
+	int			tries;
+	struct cc_usb		*cc = NULL;
+	int			use_stlink = 0;
+	char			*tty = NULL;
+	int			success;
+	int			verbose = 0;
 
-	while ((c = getopt_long(argc, argv, "D:c:s:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "T:D:c:s:Sv", options, NULL)) != -1) {
 		switch (c) {
+		case 'T':
+			tty = optarg;
+			break;
 		case 'D':
 			device = optarg;
 			break;
@@ -438,92 +307,168 @@ main (int argc, char **argv)
 			if (serial_end == optarg || *serial_end != '\0')
 				usage(argv[0]);
 			break;
+		case 'S':
+			use_stlink = 1;
+			break;
+		case 'v':
+			verbose++;
+			break;
 		default:
 			usage(argv[0]);
 			break;
 		}
 	}
 
+	ao_self_verbose = verbose;
+
+	if (verbose > 1)
+		ccdbg_add_debug(CC_DEBUG_BITBANG);
+
 	filename = argv[optind];
 	if (filename == NULL)
 		usage(argv[0]);
 
-	/*
-	 * Open the source file and load the symbols and
-	 * flash data
-	 */
+	if (ends_with (filename, ".elf")) {
+		load = ao_load_elf(filename);
+	} else if (ends_with (filename, ".ihx")) {
+		int	i;
+		load = ccdbg_hex_load(filename);
+		for (i = 0; i < ao_num_symbols; i++)
+			ao_symbols[i].addr = ao_symbols[i].default_addr;
+	} else
+		usage(argv[0]);
+
+	if (use_stlink) {
+		/* Connect to the programming dongle
+		 */
 	
-	e = ao_open_elf(filename);
-	if (!e) {
-		fprintf(stderr, "Cannot open file \"%s\"\n", filename);
-		exit(1);
-	}
-
-	if (!find_symbols(e)) {
-		fprintf(stderr, "Cannot find symbols in \"%s\"\n", filename);
-		exit(1);
-	}
-
-	if (!(load = get_load(e))) {
-		fprintf(stderr, "Cannot find program data in \"%s\"\n", filename);
-		exit(1);
-	}
+		for (tries = 0; tries < 3; tries++) {
+			if (device) {
+				sl = stlink_v1_open(50);
+			} else {
+				sl = stlink_open_usb(50);
 		
-	/* Connect to the programming dongle
-	 */
-	
-	if (device) {
-		sl = stlink_v1_open(50);
+			}
+			if (!sl) {
+				fprintf (stderr, "No STLink devices present\n");
+				done (sl, NULL, 1);
+			}
+
+			if (sl->chip_id != 0)
+				break;
+			stlink_reset(sl);
+			stlink_close(sl);
+			sl = NULL;
+		}
+		if (!sl) {
+			fprintf (stderr, "Debugger connection failed\n");
+			exit(1);
+		}
+
+		/* Verify that the loaded image fits entirely within device flash
+		 */
+		if (load->address < sl->flash_base ||
+		    sl->flash_base + sl->flash_size < load->address + load->length) {
+			fprintf (stderr, "\%s\": Invalid memory range 0x%08x - 0x%08x\n", filename,
+				 load->address, load->address + load->length);
+			done(sl, NULL, 1);
+		}
+
+		/* Enter debugging mode
+		 */
+		if (stlink_current_mode(sl) == STLINK_DEV_DFU_MODE)
+			stlink_exit_dfu_mode(sl);
+
+		if (stlink_current_mode(sl) != STLINK_DEV_DEBUG_MODE)
+			stlink_enter_swd_mode(sl);
 	} else {
-		sl = stlink_open_usb(50);
-		
+		int	is_loader;
+		int	tries;
+
+		for (tries = 0; tries < 3; tries++) {
+			char	*this_tty = tty;
+			if (!this_tty)
+				this_tty = cc_usbdevs_find_by_arg(device, "AltosFlash");
+			if (!this_tty)
+				this_tty = cc_usbdevs_find_by_arg(device, "MegaMetrum");
+			if (!this_tty)
+				this_tty = getenv("ALTOS_TTY");
+			if (!this_tty)
+				this_tty="/dev/ttyACM0";
+
+			cc = cc_usb_open(this_tty);
+
+			if (!cc)
+				exit(1);
+			cc_usb_printf(cc, "v\n");
+			is_loader = 0;
+			for (;;) {
+				char	line[256];
+				cc_usb_getline(cc, line, sizeof(line));
+				if (!strncmp(line, "altos-loader", 12))
+					is_loader = 1;
+				if (!strncmp(line, "software-version", 16))
+					break;
+			}
+			if (is_loader)
+				break;
+			printf ("rebooting to loader\n");
+			cc_usb_printf(cc, "X\n");
+			cc_usb_close(cc);
+			sleep(1);
+			cc = NULL;
+		}
+		if (!is_loader) {
+			fprintf(stderr, "Cannot switch to boot loader\n");
+			exit(1);
+		}
+#if 0
+		{
+			uint8_t	check[256];
+			int	i = 0;
+
+			ao_self_block_read(cc, AO_BOOT_APPLICATION_BASE, check);
+			for (;;) {
+				uint8_t block[256];
+				putchar ('.');
+				if (++i == 40) {
+					putchar('\n');
+					i = 0;
+				}
+				fflush(stdout);
+				ao_self_block_write(cc, AO_BOOT_APPLICATION_BASE, block);
+				ao_self_block_read(cc, AO_BOOT_APPLICATION_BASE, block);
+				if (memcmp(block, check, 256) != 0) {
+					fprintf (stderr, "read differed\n");
+					exit(1);
+				}
+			}
+		}
+#endif
 	}
-	if (!sl) {
-		fprintf (stderr, "No STLink devices present\n");
-		done (sl, 1);
-	}
-
-	sl->verbose = 50;
-
-	/* Verify that the loaded image fits entirely within device flash
-	 */
-	if (load->addr < sl->flash_base ||
-	    sl->flash_base + sl->flash_size < load->addr + load->len) {
-		fprintf (stderr, "\%s\": Invalid memory range 0x%08x - 0x%08x\n", filename,
-			 load->addr, load->addr + load->len);
-		done(sl, 1);
-	}
-
-	/* Enter debugging mode
-	 */
-	if (stlink_current_mode(sl) == STLINK_DEV_DFU_MODE)
-		stlink_exit_dfu_mode(sl);
-
-	if (stlink_current_mode(sl) != STLINK_DEV_DEBUG_MODE)
-		stlink_enter_swd_mode(sl);
 
 	/* Go fetch existing config values
 	 * if available
 	 */
-	was_flashed = check_flashed(sl);
+	was_flashed = check_flashed(sl, cc);
 
 	if (!serial) {
 		if (!was_flashed) {
 			fprintf (stderr, "Must provide serial number\n");
-			done(sl, 1);
+			done(sl, cc, 1);
 		}
-		serial = get_uint16(sl, AO_SERIAL_NUMBER);
+		serial = get_uint16(sl, cc, AO_SERIAL_NUMBER);
 		if (!serial || serial == 0xffff) {
 			fprintf (stderr, "Invalid existing serial %d\n", serial);
-			done(sl, 1);
+			done(sl, cc, 1);
 		}
 	}
 
 	if (!cal && AO_RADIO_CAL && was_flashed) {
-		cal = get_uint32(sl, AO_RADIO_CAL);
+		cal = get_uint32(sl, cc, AO_RADIO_CAL);
 		if (!cal || cal == 0xffffffff) {
 			fprintf (stderr, "Invalid existing rf cal %d\n", cal);
-			done(sl, 1);
+			done(sl, cc, 1);
 		}
 	}
 
@@ -536,32 +481,31 @@ main (int argc, char **argv)
 	if (!rewrite(load, AO_SERIAL_NUMBER, serial_int, sizeof (serial_int))) {
 		fprintf(stderr, "Cannot rewrite serial integer at %08x\n",
 			AO_SERIAL_NUMBER);
-		done(sl, 1);
+		done(sl, cc, 1);
 	}
 
 	if (AO_USB_DESCRIPTORS) {
-		unsigned	usb_descriptors;
-		usb_descriptors = AO_USB_DESCRIPTORS - load->addr;
+		uint32_t	usb_descriptors = AO_USB_DESCRIPTORS - load->address;
 		string_num = 0;
 
-		while (load->buf[usb_descriptors] != 0 && usb_descriptors < load->len) {
-			if (load->buf[usb_descriptors+1] == AO_USB_DESC_STRING) {
+		while (load->data[usb_descriptors] != 0 && usb_descriptors < load->length) {
+			if (load->data[usb_descriptors+1] == AO_USB_DESC_STRING) {
 				++string_num;
 				if (string_num == 4)
 					break;
 			}
-			usb_descriptors += load->buf[usb_descriptors];
+			usb_descriptors += load->data[usb_descriptors];
 		}
-		if (usb_descriptors >= load->len || load->buf[usb_descriptors] == 0 ) {
+		if (usb_descriptors >= load->length || load->data[usb_descriptors] == 0 ) {
 			fprintf(stderr, "Cannot rewrite serial string at %08x\n", AO_USB_DESCRIPTORS);
-			done(sl, 1);
+			done(sl, cc, 1);
 		}
 
-		serial_ucs2_len = load->buf[usb_descriptors] - 2;
+		serial_ucs2_len = load->data[usb_descriptors] - 2;
 		serial_ucs2 = malloc(serial_ucs2_len);
 		if (!serial_ucs2) {
 			fprintf(stderr, "Malloc(%d) failed\n", serial_ucs2_len);
-			done(sl, 1);
+			done(sl, cc, 1);
 		}
 		s = serial;
 		for (i = serial_ucs2_len / 2; i; i--) {
@@ -569,9 +513,9 @@ main (int argc, char **argv)
 			serial_ucs2[i * 2 - 2] = (s % 10) + '0';
 			s /= 10;
 		}
-		if (!rewrite(load, usb_descriptors + 2 + load->addr, serial_ucs2, serial_ucs2_len)) {
+		if (!rewrite(load, usb_descriptors + 2 + load->address, serial_ucs2, serial_ucs2_len)) {
 			fprintf (stderr, "Cannot rewrite USB descriptor at %08x\n", AO_USB_DESCRIPTORS);
-			done(sl, 1);
+			done(sl, cc, 1);
 		}
 	}
 
@@ -589,10 +533,15 @@ main (int argc, char **argv)
 
 	/* And flash the resulting image to the device
 	 */
-	if (stlink_write_flash(sl, load->addr, load->buf, load->len) < 0) {
+	if (cc)
+		success = ao_self_write(cc, load);
+	else
+		success = (stlink_write_flash(sl, load->address, load->data, load->length) >= 0);
+		
+	if (!success) {
 		fprintf (stderr, "\"%s\": Write failed\n", filename);
-		done(sl, 1);
+		done(sl, cc, 1);
 	}
 
-	done(sl, 0);
+	done(sl, cc, 0);
 }

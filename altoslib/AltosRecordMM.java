@@ -15,10 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public class AltosRecordMM extends AltosRecord {
 
+	/* Sensor values */
 	public int	accel;
 	public int	pres;
 	public int	temp;
@@ -45,14 +46,10 @@ public class AltosRecordMM extends AltosRecord {
 		return raw / 4095.0;
 	}
 
-	public double raw_pressure() {
+	public double pressure() {
 		if (pres != MISSING)
 			return pres;
 		return MISSING;
-	}
-
-	public double filtered_pressure() {
-		return raw_pressure();
 	}
 
 	public double ground_pressure() {
@@ -98,9 +95,6 @@ public class AltosRecordMM extends AltosRecord {
 	}
 
 	public double acceleration() {
-		if (acceleration != MISSING)
-			return acceleration;
-
 		if (ground_accel == MISSING || accel == MISSING)
 			return MISSING;
 
@@ -108,10 +102,6 @@ public class AltosRecordMM extends AltosRecord {
 			return MISSING;
 
 		return (ground_accel - accel) / accel_counts_per_mss();
-	}
-
-	public double accel_speed() {
-		return speed;
 	}
 
 	public void copy (AltosRecordMM old) {
@@ -141,10 +131,10 @@ public class AltosRecordMM extends AltosRecord {
 		mag = old.mag;
 	}
 
+
+
 	public AltosRecordMM clone() {
-		AltosRecordMM n = (AltosRecordMM) super.clone();
-		n.copy(this);
-		return n;
+		return new AltosRecordMM(this);
 	}
 
 	void make_missing() {
@@ -175,6 +165,10 @@ public class AltosRecordMM extends AltosRecord {
 	public AltosRecordMM(AltosRecord old) {
 		super.copy(old);
 		make_missing();
+	}
+
+	public AltosRecordMM(AltosRecordMM old) {
+		copy(old);
 	}
 
 	public AltosRecordMM() {

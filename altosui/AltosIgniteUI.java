@@ -20,18 +20,14 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import javax.swing.event.*;
 import java.io.*;
-import java.util.*;
 import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
 public class AltosIgniteUI
-	extends AltosDialog
+	extends AltosUIDialog
 	implements ActionListener
 {
 	AltosDevice	device;
@@ -309,7 +305,7 @@ public class AltosIgniteUI
 	private boolean open() {
 		command_queue = new LinkedBlockingQueue<String>();
 
-		device = AltosDeviceDialog.show(owner, Altos.product_any);
+		device = AltosDeviceUIDialog.show(owner, Altos.product_any);
 		if (device != null) {
 				IgniteHandler	handler = new IgniteHandler(owner);
 				Thread		t = new Thread(handler);

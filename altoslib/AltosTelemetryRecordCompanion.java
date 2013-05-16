@@ -15,14 +15,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public class AltosTelemetryRecordCompanion extends AltosTelemetryRecordRaw {
 
 	AltosRecordCompanion	companion;
 
-	public AltosTelemetryRecordCompanion(int[] in_bytes) {
-		super(in_bytes);
+	public AltosTelemetryRecordCompanion(int[] in_bytes, int rssi) {
+		super(in_bytes, rssi);
 
 		int	off = 0;
 		if (uint8(6) == 0)

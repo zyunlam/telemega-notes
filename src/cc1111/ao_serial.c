@@ -34,7 +34,13 @@ const __code struct ao_serial_speed ao_serial_speeds[] = {
 		/* .baud = */ 59,
 		/* .gcr =  */ (11 << UxGCR_BAUD_E_SHIFT) | UxGCR_ORDER_LSB
 	},
+	/* [AO_SERIAL_SPEED_115200] = */ {
+		/* .baud = */ 59,
+		/* .gcr =  */ (12 << UxGCR_BAUD_E_SHIFT) | UxGCR_ORDER_LSB
+	},
 };
+
+#define AO_SERIAL_SPEED_MAX	AO_SERIAL_SPEED_115200
 
 #if HAS_SERIAL_0
 
@@ -85,10 +91,10 @@ ao_serial0_getchar(void) __critical
 }
 
 #if USE_SERIAL_0_STDIN
-char
-ao_serial0_pollchar(void) __critical
+int
+_ao_serial0_pollchar(void)
 {
-	char	c;
+	uint8_t	c;
 	if (ao_fifo_empty(ao_serial0_rx_fifo))
 		return AO_READ_AGAIN;
 	ao_fifo_remove(ao_serial0_rx_fifo,c);
@@ -116,7 +122,7 @@ void
 ao_serial0_set_speed(uint8_t speed)
 {
 	ao_serial0_drain();
-	if (speed > AO_SERIAL_SPEED_57600)
+	if (speed > AO_SERIAL_SPEED_MAX)
 		return;
 	U0UCR |= UxUCR_FLUSH;
 	U0BAUD = ao_serial_speeds[speed].baud;
@@ -173,10 +179,10 @@ ao_serial1_getchar(void) __critical
 }
 
 #if USE_SERIAL_1_STDIN
-char
-ao_serial1_pollchar(void) __critical
+int
+_ao_serial1_pollchar(void)
 {
-	char	c;
+	uint8_t	c;
 	if (ao_fifo_empty(ao_serial1_rx_fifo))
 		return AO_READ_AGAIN;
 	ao_fifo_remove(ao_serial1_rx_fifo,c);
@@ -204,7 +210,7 @@ void
 ao_serial1_set_speed(uint8_t speed)
 {
 	ao_serial1_drain();
-	if (speed > AO_SERIAL_SPEED_57600)
+	if (speed > AO_SERIAL_SPEED_MAX)
 		return;
 	U1UCR |= UxUCR_FLUSH;
 	U1BAUD = ao_serial_speeds[speed].baud;
@@ -265,7 +271,7 @@ ao_serial_init(void)
 	IEN0 |= IEN0_URX0IE;
 	IEN2 |= IEN2_UTX0IE;
 #if USE_SERIAL_0_STDIN && !DELAY_SERIAL_0_STDIN
-	ao_add_stdio(ao_serial0_pollchar,
+	ao_add_stdio(_ao_serial0_pollchar,
 		     ao_serial0_putchar,
 		     NULL);
 #endif
@@ -321,7 +327,7 @@ ao_serial_init(void)
 	IEN2 |= IEN2_UTX1IE;
 
 #if USE_SERIAL_1_STDIN && !DELAY_SERIAL_1_STDIN
-	ao_add_stdio(ao_serial1_pollchar,
+	ao_add_stdio(_ao_serial1_pollchar,
 		     ao_serial1_putchar,
 		     NULL);
 #endif

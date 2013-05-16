@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -27,7 +27,9 @@ public class AltosIdleMonitor extends Thread {
 	AltosState		state;
 	boolean			remote;
 	double			frequency;
+	String			callsign;
 	AltosState		previous_state;
+	AltosListenerState	listener_state;
 	AltosConfigData		config_data;
 	AltosGPS		gps;
 
@@ -50,11 +52,11 @@ public class AltosIdleMonitor extends Thread {
 	}
 
 	boolean has_sensor_mm(AltosConfigData config_data) {
-		return config_data.product.startsWith("MegaMetrum");
+		return config_data.product.startsWith("TeleMega");
 	}
 
 	boolean has_gps(AltosConfigData config_data) {
-		return config_data.product.startsWith("TeleMetrum") || config_data.product.startsWith("MegaMetrum");
+		return config_data.product.startsWith("TeleMetrum") || config_data.product.startsWith("TeleMega");
 	}
 
 	AltosRecord sensor_mm(AltosConfigData config_data) throws InterruptedException, TimeoutException {
@@ -87,6 +89,7 @@ public class AltosIdleMonitor extends Thread {
 		try {
 			if (remote) {
 				link.set_radio_frequency(frequency);
+				link.set_callsign(callsign);
 				link.start_remote();
 			} else
 				link.flush_input();
@@ -97,7 +100,7 @@ public class AltosIdleMonitor extends Thread {
 			else if (has_sensor_mm(config_data))
 				record = sensor_mm(config_data);
 			else
-				record = new AltosRecord();
+				record = new AltosRecordNone();
 
 			if (has_gps(config_data))
 				gps = new AltosGPSQuery(link, config_data);
@@ -109,13 +112,15 @@ public class AltosIdleMonitor extends Thread {
 			record.status = 0;
 			record.state = AltosLib.ao_flight_idle;
 			record.gps = gps;
-			record.new_gps = true;
+			record.gps_sequence++;
 			state = new AltosState (record, state);
 		} finally {
 			if (remote) {
 				link.stop_remote();
-				if (record != null)
-					record.rssi = AltosRSSI();
+				if (record != null) {
+					record.rssi = link.rssi();
+					listener_state.battery = link.monitor_battery();
+				}
 			} else {
 				if (record != null)
 					record.rssi = 0;
@@ -126,10 +131,27 @@ public class AltosIdleMonitor extends Thread {
 
 	public void set_frequency(double in_frequency) {
 		frequency = in_frequency;
+		link.abort_reply();
+	}
+
+	public void set_callsign(String in_callsign) {
+		callsign = in_callsign;
+		link.abort_reply();
 	}
 
 	public void post_state() {
-		listener.update(state);
+		listener.update(state, listener_state);
+	}
+
+	public void abort() {
+		if (isAlive()) {
+			interrupt();
+			link.abort_reply();
+			try {
+				join();
+			} catch (InterruptedException ie) {
+			}
+		}
 	}
 
 	public void run() {
@@ -153,5 +175,6 @@ public class AltosIdleMonitor extends Thread {
 		link = in_link;
 		remote = in_remote;
 		state = null;
+		listener_state = new AltosListenerState();
 	}
 }

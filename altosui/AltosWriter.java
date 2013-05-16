@@ -17,11 +17,7 @@
 
 package altosui;
 
-import java.lang.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 
 public interface AltosWriter {

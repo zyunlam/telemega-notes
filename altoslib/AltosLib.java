@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.util.*;
 import java.io.*;
@@ -50,7 +50,7 @@ public class AltosLib {
 	public static final int AO_LOG_SERIAL_NUMBER = 2002;
 	public static final int AO_LOG_LOG_FORMAT = 2003;
 
-	/* Added for header fields in megametrum files */
+	/* Added for header fields in telemega files */
 	public static final int AO_LOG_BARO_RESERVED = 3000;
 	public static final int AO_LOG_BARO_SENS = 3001;
 	public static final int AO_LOG_BARO_OFF = 3002;
@@ -89,10 +89,11 @@ public class AltosLib {
 	public final static int product_telelco = 0x0010;
 	public final static int product_telescience = 0x0011;
 	public final static int product_telepyro =0x0012;
-	public final static int product_megametrum = 0x0023;
+	public final static int product_telemega = 0x0023;
 	public final static int product_megadongle = 0x0024;
+	public final static int product_telegps = 0x0025;
 	public final static int product_altusmetrum_min = 0x000a;
-	public final static int product_altusmetrum_max = 0x0024;
+	public final static int product_altusmetrum_max = 0x0025;
 
 	public final static int product_any = 0x10000;
 	public final static int product_basestation = 0x10000 + 1;
@@ -199,7 +200,7 @@ public class AltosLib {
 
 	public static String state_name_capital(int state) {
 		if (state < 0 || state_to_string.length <= state)
-			return "invalid";
+			return "Invalid";
 		return state_to_string_capital[state];
 	}
 
@@ -214,7 +215,7 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_TINY = 2;
 	public static final int AO_LOG_FORMAT_TELEMETRY = 3;
 	public static final int AO_LOG_FORMAT_TELESCIENCE = 4;
-	public static final int AO_LOG_FORMAT_MEGAMETRUM = 5;
+	public static final int AO_LOG_FORMAT_TELEMEGA = 5;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {
@@ -404,5 +405,9 @@ public class AltosLib {
 		if (dot > 0)
 			input = input.substring(0,dot);
 		return input.concat(extension);
+	}
+
+	public static File replace_extension(File input, String extension) {
+		return new File(replace_extension(input.getPath(), extension));
 	}
 }

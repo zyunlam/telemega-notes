@@ -20,18 +20,11 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import javax.swing.plaf.basic.*;
-import java.io.*;
 import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
-import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
-class AltosEditFreqUI extends AltosDialog implements ActionListener {
+class AltosEditFreqUI extends AltosUIDialog implements ActionListener {
 	Frame		frame;
 	JTextField	frequency;
 	JTextField	description;
@@ -166,7 +159,7 @@ class AltosEditFreqUI extends AltosDialog implements ActionListener {
 	}
 }
 
-public class AltosConfigFreqUI extends AltosDialog implements ActionListener {
+public class AltosConfigFreqUI extends AltosUIDialog implements ActionListener {
 
 	Frame frame;
 	LinkedList<ActionListener> listeners;

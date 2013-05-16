@@ -21,17 +21,12 @@
 
 package altosui;
 
-import java.lang.*;
 import java.io.*;
-import java.util.concurrent.*;
 import java.util.*;
-import java.text.*;
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
 import libaltosJNI.*;
 
@@ -77,7 +72,7 @@ public class AltosSerial extends AltosLink  {
 		Object[] options = { "Cancel" };
 
 		JOptionPane	pane = new JOptionPane();
-		pane.setMessage(String.format("Connecting to %s, %7.3f MHz", device.toShortString(), frequency));
+		pane.setMessage(String.format("Connecting to %s, %7.3f MHz as %s", device.toShortString(), frequency, callsign));
 		pane.setOptions(options);
 		pane.setInitialValue(null);
 

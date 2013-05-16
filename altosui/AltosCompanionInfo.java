@@ -18,16 +18,8 @@
 package altosui;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosCompanionInfo extends JTable {
 	private AltosFlightInfoTableModel model;
@@ -91,7 +83,7 @@ public class AltosCompanionInfo extends JTable {
 		}
 	}
 	
-	public void show(AltosState state, int crc_errors) {
+	public void show(AltosState state, AltosListenerState listener_state) {
 		if (state == null)
 			return;
 		if (state.data.companion != null)

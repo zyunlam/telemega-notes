@@ -48,6 +48,7 @@ extern __xdata struct ao_task	ao_packet_task;
 extern __xdata uint8_t ao_packet_enable;
 extern __xdata uint8_t ao_packet_master_sleeping;
 extern __pdata uint8_t ao_packet_rx_len, ao_packet_rx_used, ao_packet_tx_used;
+extern __xdata uint8_t ao_packet_restart;
 
 void
 ao_packet_send(void);
@@ -61,13 +62,13 @@ ao_packet_flush(void);
 void
 ao_packet_putchar(char c) __reentrant;
 
-char
-ao_packet_pollchar(void) __critical;
+int
+_ao_packet_pollchar(void);
 
 #if PACKET_HAS_MASTER
 /* ao_packet_master.c */
 
-extern __xdata uint8_t ao_packet_last_rssi;
+extern __xdata int8_t ao_packet_last_rssi;
 
 void
 ao_packet_master_init(void);

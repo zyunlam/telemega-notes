@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 
 public class AltosTelemetryRecordMegaData extends AltosTelemetryRecordRaw {
@@ -35,8 +35,8 @@ public class AltosTelemetryRecordMegaData extends AltosTelemetryRecordRaw {
 	int	speed;
 	int	height;
 
-	public AltosTelemetryRecordMegaData(int[] in_bytes) {
-		super(in_bytes);
+	public AltosTelemetryRecordMegaData(int[] in_bytes, int rssi) {
+		super(in_bytes, rssi);
 
 		state = int8(5);
 
@@ -83,11 +83,11 @@ public class AltosTelemetryRecordMegaData extends AltosTelemetryRecordRaw {
 		next.accel_plus_g = accel_plus_g;
 		next.accel_minus_g = accel_minus_g;
 
-		next.acceleration = acceleration / 16.0;
-		next.speed = speed / 16.0;
-		next.height = height;
+		next.kalman_acceleration = acceleration / 16.0;
+		next.kalman_speed = speed / 16.0;
+		next.kalman_height = height;
 
-		next.seen |= AltosRecord.seen_flight | AltosRecord.seen_temp_volt;
+		next.seen |= AltosRecord.seen_sensor | AltosRecord.seen_temp_volt;
 
 		return next;
 	}

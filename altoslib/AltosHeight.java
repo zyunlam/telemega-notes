@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public class AltosHeight extends AltosUnits {
 
@@ -37,7 +37,7 @@ public class AltosHeight extends AltosUnits {
 		return "meters";
 	}
 
-	int show_fraction(int width) {
+	public int show_fraction(int width) {
 		return width / 9;
 	}
 }

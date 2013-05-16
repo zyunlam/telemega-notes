@@ -20,18 +20,12 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
 import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
-import libaltosJNI.*;
-
-public class AltosUI extends AltosFrame {
+public class AltosUI extends AltosUIFrame {
 	public AltosVoice voice = new AltosVoice();
 
 	public static boolean load_library(Frame frame) {
@@ -54,7 +48,7 @@ public class AltosUI extends AltosFrame {
 		} catch (FileNotFoundException ee) {
 			JOptionPane.showMessageDialog(AltosUI.this,
 						      ee.getMessage(),
-						      "Cannot open target device",
+						      String.format ("Cannot open %s", device.toShortString()),
 						      JOptionPane.ERROR_MESSAGE);
 		} catch (AltosSerialInUseException si) {
 			JOptionPane.showMessageDialog(AltosUI.this,
@@ -64,17 +58,17 @@ public class AltosUI extends AltosFrame {
 						      JOptionPane.ERROR_MESSAGE);
 		} catch (IOException ee) {
 			JOptionPane.showMessageDialog(AltosUI.this,
-						      device.toShortString(),
-						      "Unkonwn I/O error",
+						      String.format ("Unknown I/O error on %s", device.toShortString()),
+						      "Unknown I/O error",
 						      JOptionPane.ERROR_MESSAGE);
 		} catch (TimeoutException te) {
 			JOptionPane.showMessageDialog(this,
-						      device.toShortString(),
+						      String.format ("Timeout on %s", device.toShortString()),
 						      "Timeout error",
 						      JOptionPane.ERROR_MESSAGE);
 		} catch (InterruptedException ie) {
 			JOptionPane.showMessageDialog(this,
-						      device.toShortString(),
+						      String.format("Interrupted %s", device.toShortString()),
 						      "Interrupted exception",
 						      JOptionPane.ERROR_MESSAGE);
 		}
@@ -94,7 +88,7 @@ public class AltosUI extends AltosFrame {
 		c.weighty = 1;
 		b = new JButton(label);
 
-		Dimension ps = b.getPreferredSize();
+		//Dimension ps = b.getPreferredSize();
 
 		gridbag.setConstraints(b, c);
 		add(b, c);
@@ -230,14 +224,6 @@ public class AltosUI extends AltosFrame {
 		doLayout();
 		validate();
 
-		setVisible(true);
-
-		Insets i = getInsets();
-		Dimension ps = rootPane.getPreferredSize();
-		ps.width += i.left + i.right;
-		ps.height += i.top + i.bottom;
-		setPreferredSize(ps);
-		setSize(ps);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -245,10 +231,15 @@ public class AltosUI extends AltosFrame {
 				System.exit(0);
 			}
 		});
+
+		setLocationByPlatform(false);
+		
+		/* Insets aren't set before the window is visible */
+		setVisible(true);
 	}
 
 	private void ConnectToDevice() {
-		AltosDevice	device = AltosDeviceDialog.show(AltosUI.this,
+		AltosDevice	device = AltosDeviceUIDialog.show(AltosUI.this,
 								Altos.product_basestation);
 
 		if (device != null)
@@ -337,7 +328,7 @@ public class AltosUI extends AltosFrame {
 		if (record_reader == null)
 			return;
 		try {
-			new AltosGraphUI(record_reader, chooser.filename());
+			new AltosGraphUI(record_reader, chooser.file());
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
 		}
@@ -354,15 +345,14 @@ public class AltosUI extends AltosFrame {
 		}
 	}
 
-	static AltosRecordIterable open_logfile(String filename) {
-		File file = new File (filename);
+	static AltosRecordIterable open_logfile(File file) {
 		try {
 			FileInputStream in;
 
 			in = new FileInputStream(file);
-			if (filename.endsWith("eeprom"))
+			if (file.getName().endsWith("eeprom"))
 				return new AltosEepromIterable(in);
-			else if (filename.endsWith("mega"))
+			else if (file.getName().endsWith("mega"))
 				return new AltosEepromMegaIterable(in);
 			else
 				return new AltosTelemetryIterable(in);
@@ -372,8 +362,7 @@ public class AltosUI extends AltosFrame {
 		}
 	}
 
-	static AltosWriter open_csv(String filename) {
-		File file = new File (filename);
+	static AltosWriter open_csv(File file) {
 		try {
 			return new AltosCSV(file);
 		} catch (FileNotFoundException fe) {
@@ -382,8 +371,7 @@ public class AltosUI extends AltosFrame {
 		}
 	}
 
-	static AltosWriter open_kml(String filename) {
-		File file = new File (filename);
+	static AltosWriter open_kml(File file) {
 		try {
 			return new AltosKML(file);
 		} catch (FileNotFoundException fe) {
@@ -399,12 +387,12 @@ public class AltosUI extends AltosFrame {
 	static final int process_replay = 4;
 	static final int process_summary = 5;
 
-	static boolean process_csv(String input) {
+	static boolean process_csv(File input) {
 		AltosRecordIterable iterable = open_logfile(input);
 		if (iterable == null)
 			return false;
 
-		String output = Altos.replace_extension(input,".csv");
+		File output = Altos.replace_extension(input,".csv");
 		System.out.printf("Processing \"%s\" to \"%s\"\n", input, output);
 		if (input.equals(output)) {
 			System.out.printf("Not processing '%s'\n", input);
@@ -419,12 +407,12 @@ public class AltosUI extends AltosFrame {
 		return true;
 	}
 
-	static boolean process_kml(String input) {
+	static boolean process_kml(File input) {
 		AltosRecordIterable iterable = open_logfile(input);
 		if (iterable == null)
 			return false;
 
-		String output = Altos.replace_extension(input,".kml");
+		File output = Altos.replace_extension(input,".kml");
 		System.out.printf("Processing \"%s\" to \"%s\"\n", input, output);
 		if (input.equals(output)) {
 			System.out.printf("Not processing '%s'\n", input);
@@ -448,28 +436,26 @@ public class AltosUI extends AltosFrame {
 			return null;
 		}
 		AltosRecordIterable recs;
-		AltosReplayReader reader;
+		//AltosReplayReader reader;
 		if (file.getName().endsWith("eeprom")) {
 			recs = new AltosEepromIterable(in);
+		} else if (file.getName().endsWith("mega")) {
+			recs = new AltosEepromMegaIterable(in);
 		} else {
 			recs = new AltosTelemetryIterable(in);
 		}
 		return recs;
 	}
 
-	static AltosRecordIterable record_iterable_file(String filename) {
-		return record_iterable (new File(filename));
-	}
-
-	static AltosReplayReader replay_file(String filename) {
-		AltosRecordIterable recs = record_iterable_file(filename);
+	static AltosReplayReader replay_file(File file) {
+		AltosRecordIterable recs = record_iterable(file);
 		if (recs == null)
 			return null;
-		return new AltosReplayReader(recs.iterator(), new File(filename));
+		return new AltosReplayReader(recs.iterator(), file);
 	}
 
-	static boolean process_replay(String filename) {
-		AltosReplayReader reader = replay_file(filename);
+	static boolean process_replay(File file) {
+		AltosReplayReader reader = replay_file(file);
 		if (reader == null)
 			return false;
 		AltosFlightUI flight_ui = new AltosFlightUI(new AltosVoice(), reader);
@@ -477,12 +463,12 @@ public class AltosUI extends AltosFrame {
 		return true;
 	}
 
-	static boolean process_graph(String filename) {
-		AltosRecordIterable recs = record_iterable_file(filename);
+	static boolean process_graph(File file) {
+		AltosRecordIterable recs = record_iterable(file);
 		if (recs == null)
 			return false;
 		try {
-			new AltosGraphUI(recs, filename);
+			new AltosGraphUI(recs, file);
 			return true;
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
@@ -490,8 +476,8 @@ public class AltosUI extends AltosFrame {
 		return false;
 	}
 	
-	static boolean process_summary(String filename) {
-		AltosRecordIterable iterable = record_iterable_file(filename);
+	static boolean process_summary(File file) {
+		AltosRecordIterable iterable = record_iterable(file);
 		if (iterable == null)
 			return false;
 		try {
@@ -556,7 +542,6 @@ public class AltosUI extends AltosFrame {
 		/* Handle batch-mode */
 		if (args.length == 0) {
 			AltosUI altosui = new AltosUI();
-			altosui.setVisible(true);
 
 			java.util.List<AltosDevice> devices = AltosUSBDevice.list(Altos.product_basestation);
 			for (AltosDevice device : devices)
@@ -588,26 +573,27 @@ public class AltosUI extends AltosFrame {
 				else if (args[i].startsWith("--"))
 					help(1);
 				else {
+					File file = new File(args[i]);
 					switch (process) {
 					case process_none:
 					case process_graph:
-						if (!process_graph(args[i]))
+						if (!process_graph(file))
 							++errors;
 						break;
 					case process_replay:
-						if (!process_replay(args[i]))
+						if (!process_replay(file))
 							++errors;
 						break;
 					case process_kml:
-						if (!process_kml(args[i]))
+						if (!process_kml(file))
 							++errors;
 						break;
 					case process_csv:
-						if (!process_csv(args[i]))
+						if (!process_csv(file))
 							++errors;
 						break;
 					case process_summary:
-						if (!process_summary(args[i]))
+						if (!process_summary(file))
 							++errors;
 						break;
 					}

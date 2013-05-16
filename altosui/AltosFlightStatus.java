@@ -18,16 +18,8 @@
 package altosui;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosFlightStatus extends JComponent implements AltosFlightDisplay {
 	GridBagLayout	layout;
@@ -36,7 +28,7 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		JLabel		label;
 		JTextField	value;
 
-		void show(AltosState state, int crc_errors) {}
+		void show(AltosState state, AltosListenerState listener_state) {}
 
 		void reset() {
 			value.setText("");
@@ -72,7 +64,7 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	}
 
 	class Call extends FlightValue {
-		void show(AltosState state, int crc_errors) {
+		void show(AltosState state, AltosListenerState listener_state) {
 			value.setText(state.data.callsign);
 		}
 		public Call (GridBagLayout layout, int x) {
@@ -83,8 +75,11 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	Call call;
 
 	class Serial extends FlightValue {
-		void show(AltosState state, int crc_errors) {
-			value.setText(String.format("%d", state.data.serial));
+		void show(AltosState state, AltosListenerState listener_state) {
+			if (state.data.serial == AltosRecord.MISSING)
+				value.setText("none");
+			else
+				value.setText(String.format("%d", state.data.serial));
 		}
 		public Serial (GridBagLayout layout, int x) {
 			super (layout, x, "Serial");
@@ -94,8 +89,11 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	Serial serial;
 
 	class Flight extends FlightValue {
-		void show(AltosState state, int crc_errors) {
-			value.setText(String.format("%d", state.data.flight));
+		void show(AltosState state, AltosListenerState listener_state) {
+			if (state.data.flight == AltosRecord.MISSING)
+				value.setText("none");
+			else
+				value.setText(String.format("%d", state.data.flight));
 		}
 		public Flight (GridBagLayout layout, int x) {
 			super (layout, x, "Flight");
@@ -105,7 +103,7 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	Flight flight;
 
 	class FlightState extends FlightValue {
-		void show(AltosState state, int crc_errors) {
+		void show(AltosState state, AltosListenerState listener_state) {
 			value.setText(state.data.state());
 		}
 		public FlightState (GridBagLayout layout, int x) {
@@ -116,7 +114,7 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	FlightState flight_state;
 
 	class RSSI extends FlightValue {
-		void show(AltosState state, int crc_errors) {
+		void show(AltosState state, AltosListenerState listener_state) {
 			value.setText(String.format("%d", state.data.rssi));
 		}
 		public RSSI (GridBagLayout layout, int x) {
@@ -127,7 +125,7 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	RSSI rssi;
 
 	class LastPacket extends FlightValue {
-		void show(AltosState state, int crc_errors) {
+		void show(AltosState state, AltosListenerState listener_state) {
 			long secs = (System.currentTimeMillis() - state.report_time + 500) / 1000;
 			value.setText(String.format("%d", secs));
 		}
@@ -156,13 +154,13 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		last_packet.set_font();
 	}
 
-	public void show (AltosState state, int crc_errors) {
-		call.show(state, crc_errors);
-		serial.show(state, crc_errors);
-		flight.show(state, crc_errors);
-		flight_state.show(state, crc_errors);
-		rssi.show(state, crc_errors);
-		last_packet.show(state, crc_errors);
+	public void show (AltosState state, AltosListenerState listener_state) {
+		call.show(state, listener_state);
+		serial.show(state, listener_state);
+		flight.show(state, listener_state);
+		flight_state.show(state, listener_state);
+		rssi.show(state, listener_state);
+		last_packet.show(state, listener_state);
 	}
 
 	public int height() {

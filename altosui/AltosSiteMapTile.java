@@ -19,18 +19,10 @@ package altosui;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.imageio.ImageIO;
-import javax.swing.table.*;
-import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
-import java.lang.Math;
 import java.awt.geom.Point2D;
 import java.awt.geom.Line2D;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosSiteMapTile extends JLayeredPane {
 	JLabel mapLabel;
@@ -64,7 +56,7 @@ public class AltosSiteMapTile extends JLayeredPane {
 
 	private boolean drawn_landed_circle = false;
 	private boolean drawn_boost_circle = false;
-	public synchronized void show(AltosState state, int crc_errors,
+	public synchronized void show(AltosState state, AltosListenerState listener_state,
 				      Point2D.Double last_pt, Point2D.Double pt)
 	{
 		if (0 <= state.state && state.state < stateColors.length) {

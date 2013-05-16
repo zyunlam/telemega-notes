@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.text.*;
 import java.io.*;
@@ -105,6 +105,14 @@ public class AltosTelemetryReader extends AltosFlightReader {
 
 	public File backing_file() {
 		return log.file();
+	}
+
+	public boolean has_monitor_battery() {
+		return link.has_monitor_battery();
+	}
+
+	public double monitor_battery() {
+		return link.monitor_battery();
 	}
 
 	public AltosTelemetryReader (AltosLink in_link)

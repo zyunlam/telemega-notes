@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.text.ParseException;
 
@@ -41,18 +41,6 @@ class AltosOrderedMegaRecord extends AltosEepromMega implements Comparable<Altos
 			}
 		}
 		index = in_index;
-	}
-
-	public AltosOrderedMegaRecord(int in_cmd, int in_tick, int in_a, int in_b, int in_index) {
-		super(in_cmd, in_tick);
-		a = in_a;
-		b = in_b;
-		index = in_index;
-	}
-
-	public String toString() {
-		return String.format("%d.%d %04x %04x %04x",
-				     cmd, index, tick, a, b);
 	}
 
 	public int compareTo(AltosOrderedMegaRecord o) {

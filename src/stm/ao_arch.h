@@ -43,13 +43,12 @@
 #define __xdata
 #define __code const
 #define __reentrant
-#define __critical
 #define __interrupt(n)
 #define __at(n)
 
-#define CORTEX_M3_AIRCR		((uint32_t *) 0xe000ed0c)
-
-#define ao_arch_reboot()	(*((uint32_t *) 0xe000ed0c) = 0x05fa0004)
+#define ao_arch_reboot() \
+	(stm_scb.aircr = ((STM_SCB_AIRCR_VECTKEY_KEY << STM_SCB_AIRCR_VECTKEY) | \
+			  (1 << STM_SCB_AIRCR_SYSRESETREQ)))
 
 #define ao_arch_nop()		asm("nop")
 
@@ -78,101 +77,20 @@ extern const uint16_t ao_romconfig_check;
 extern const uint16_t ao_serial_number;
 extern const uint32_t ao_radio_cal;
 
-#define ARM_PUSH32(stack, val)	(*(--(stack)) = (val))
-
 #define ao_arch_task_members\
 	uint32_t *sp;			/* saved stack pointer */
 
-#define cli()	asm("cpsid i")
-#define sei()	asm("cpsie i")
+#define ao_arch_block_interrupts()	asm("cpsid i")
+#define ao_arch_release_interrupts()	asm("cpsie i")
 
-#define ao_arch_init_stack(task, start) do {				\
-		uint32_t	*sp = (uint32_t *) (task->stack + AO_STACK_SIZE); \
-		uint32_t	a = (uint32_t) start; 			\
-		int		i;					\
-									\
-		/* Return address (goes into LR) */			\
-		ARM_PUSH32(sp, a);					\
-									\
-		/* Clear register values r0-r12 */			\
-		i = 13;							\
-		while (i--)						\
-			ARM_PUSH32(sp, 0);				\
-									\
-		/* APSR */						\
-		ARM_PUSH32(sp, 0);					\
-									\
-		/* PRIMASK with interrupts enabled */			\
-		ARM_PUSH32(sp, 0);					\
-									\
-		task->sp = sp;						\
-} while (0);
-	
-#define ao_arch_save_regs() 	do {					\
-		/* Save general registers */				\
-		asm("push {r0-r12,lr}\n");				\
-									\
-		/* Save APSR */						\
-		asm("mrs r0,apsr");					\
-		asm("push {r0}");					\
-									\
-		/* Save PRIMASK */ 					\
-		asm("mrs r0,primask");					\
-		asm("push {r0}");					\
-									\
-		/* Enable interrupts */					\
-		sei();							\
-	} while (0)
-
-#define ao_arch_save_stack() do {					\
-		uint32_t	*sp;					\
-		asm("mov %0,sp" : "=&r" (sp) );				\
-		ao_cur_task->sp = (sp);					\
-		if ((uint8_t *) sp < &ao_cur_task->stack[0])		\
-			ao_panic (AO_PANIC_STACK);			\
-	} while (0)
-
-#if 0
-#define ao_arch_isr_stack() do {				\
-		uint32_t	*sp = (uint32_t *) 0x20004000;	\
-		asm("mov %0,sp" : "=&r" (sp) );			\
-	} while (0)
-#else
-#define ao_arch_isr_stack()
-#endif
-
-
-#define ao_arch_cpu_idle() do {			\
-		asm("wfi");		\
-	} while (0)
-
-#define ao_arch_restore_stack() do { \
-		uint32_t	sp;					\
-		sp = (uint32_t) ao_cur_task->sp;			\
-									\
-		/* Switch stacks */					\
-		asm("mov sp, %0" : : "r" (sp) );			\
-									\
-		/* Restore PRIMASK */					\
-		asm("pop {r0}");					\
-		asm("msr primask,r0");					\
-									\
-		/* Restore APSR */					\
-		asm("pop {r0}");					\
-		asm("msr apsr,r0");					\
-									\
-		/* Restore general registers */				\
-		asm("pop {r0-r12,lr}\n");				\
-									\
-		/* Return to calling function */			\
-		asm("bx lr");						\
-	} while(0)
-
-#define ao_arch_critical(b) do { cli(); do { b } while (0); sei(); } while (0)
 
 /*
  * For now, we're running at a weird frequency
  */
+
+#ifndef AO_HSE
+#error High speed frequency undefined
+#endif
 
 #if AO_HSE
 #define AO_PLLSRC	AO_HSE
@@ -185,6 +103,7 @@ extern const uint32_t ao_radio_cal;
 #define AO_HCLK		(AO_SYSCLK / AO_AHB_PRESCALER)
 #define AO_PCLK1	(AO_HCLK / AO_APB1_PRESCALER)
 #define AO_PCLK2	(AO_HCLK / AO_APB2_PRESCALER)
+#define AO_SYSTICK	(AO_HCLK / 8)
 
 #if AO_APB1_PRESCALER == 1
 #define AO_TIM23467_CLK		AO_PCLK1
@@ -209,46 +128,15 @@ void ao_lcd_font_init(void);
 
 void ao_lcd_font_string(char *s);
 
-char
-ao_serial1_getchar(void);
-
-void
-ao_serial1_putchar(char c);
-
-char
-ao_serial1_pollchar(void);
-
-void
-ao_serial1_set_speed(uint8_t speed);
-
-char
-ao_serial2_getchar(void);
-
-void
-ao_serial2_putchar(char c);
-
-char
-ao_serial2_pollchar(void);
-
-void
-ao_serial2_set_speed(uint8_t speed);
-
-char
-ao_serial3_getchar(void);
-
-void
-ao_serial3_putchar(char c);
-
-char
-ao_serial3_pollchar(void);
-
-void
-ao_serial3_set_speed(uint8_t speed);
-
 extern const uint32_t	ao_radio_cal;
 
 void
 ao_adc_init();
 
+#define AO_BOOT_APPLICATION_BASE	((uint32_t *) 0x08001000)
+#define AO_BOOT_LOADER_BASE		((uint32_t *) 0x0)
+#define HAS_BOOT_LOADER			1
+
 #endif /* _AO_ARCH_H_ */
+
 

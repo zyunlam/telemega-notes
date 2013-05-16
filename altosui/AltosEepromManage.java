@@ -17,19 +17,12 @@
 
 package altosui;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
 import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
-
-import libaltosJNI.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
 public class AltosEepromManage implements ActionListener {
 
@@ -50,6 +43,15 @@ public class AltosEepromManage implements ActionListener {
 			serial_line.close();
 			serial_line = null;
 		}
+	}
+
+	private int countDeletedFlights() {
+		int count = 0;
+		for (AltosEepromLog flight : flights) {
+			if (flight.selected)
+				count++;
+		}
+		return count;
 	}
 
 	private String showDeletedFlights() {
@@ -101,7 +103,8 @@ public class AltosEepromManage implements ActionListener {
 		} else if (cmd.equals("delete")) {
 			if (success) {
 				JOptionPane.showMessageDialog(frame,
-							      String.format("Flights erased: %s",
+							      String.format("%d flights erased: %s",
+									    countDeletedFlights(),
 									    showDeletedFlights()),
 							      serial_line.device.toShortString(),
 							      JOptionPane.INFORMATION_MESSAGE);
@@ -161,7 +164,7 @@ public class AltosEepromManage implements ActionListener {
 						      ee.getLocalizedMessage(),
 						      JOptionPane.ERROR_MESSAGE);
 		} else if (e instanceof TimeoutException) {
-			TimeoutException te = (TimeoutException) e;
+			//TimeoutException te = (TimeoutException) e;
 			JOptionPane.showMessageDialog(frame,
 						      String.format("Communications failed with \"%s\"",
 								    device.toShortString()),
@@ -202,10 +205,10 @@ public class AltosEepromManage implements ActionListener {
 
 	public AltosEepromManage(JFrame given_frame) {
 
-		boolean	running = false;
+		//boolean	running = false;
 
 		frame = given_frame;
-		device = AltosDeviceDialog.show(frame, Altos.product_any);
+		device = AltosDeviceUIDialog.show(frame, Altos.product_any);
 
 		remote = false;
 

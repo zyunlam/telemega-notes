@@ -19,9 +19,10 @@
 
 #ifndef ao_serial_btm_getchar
 #define ao_serial_btm_putchar	ao_serial1_putchar
-#define ao_serial_btm_pollchar	ao_serial1_pollchar
+#define _ao_serial_btm_pollchar	_ao_serial1_pollchar
 #define ao_serial_btm_set_speed ao_serial1_set_speed
 #define ao_serial_btm_drain	ao_serial1_drain
+#define ao_serial_btm_rx_fifo	ao_serial1_rx_fifo
 #endif
 
 int8_t			ao_btm_stdio;
@@ -112,6 +113,30 @@ __code struct ao_cmds ao_btm_cmds[] = {
 __xdata char		ao_btm_reply[AO_BTM_MAX_REPLY];
 
 /*
+ * Read one bluetooth character.
+ * Returns AO_READ_AGAIN if no character arrives within 10ms
+ */
+
+static int
+ao_btm_getchar(void)
+{
+	int	c;
+
+	ao_arch_block_interrupts();
+	while ((c = _ao_serial_btm_pollchar()) == AO_READ_AGAIN) {
+		ao_alarm(AO_MS_TO_TICKS(10));
+		c = ao_sleep(&ao_serial_btm_rx_fifo);
+		ao_clear_alarm();
+		if (c) {
+			c = AO_READ_AGAIN;
+			break;
+		}
+	}
+	ao_arch_release_interrupts();
+	return c;
+}
+
+/*
  * Read a line of data from the serial port, truncating
  * it after a few characters.
  */
@@ -120,26 +145,15 @@ uint8_t
 ao_btm_get_line(void)
 {
 	uint8_t ao_btm_reply_len = 0;
-	char c;
+	int c;
 
-	for (;;) {
-
-		while ((c = ao_serial_btm_pollchar()) != AO_READ_AGAIN) {
-			ao_btm_log_in_char(c);
-			if (ao_btm_reply_len < sizeof (ao_btm_reply))
-				ao_btm_reply[ao_btm_reply_len++] = c;
-			if (c == '\r' || c == '\n')
-				goto done;
-		}
-		for (c = 0; c < 10; c++) {
-			ao_delay(AO_MS_TO_TICKS(10));
-			if (!ao_fifo_empty(ao_serial1_rx_fifo))
-				break;
-		}
-		if (c == 10)
-			goto done;
+	while ((c = ao_btm_getchar()) != AO_READ_AGAIN) {
+		ao_btm_log_in_char(c);
+		if (ao_btm_reply_len < sizeof (ao_btm_reply))
+			ao_btm_reply[ao_btm_reply_len++] = c;
+		if (c == '\r' || c == '\n')
+			break;
 	}
-done:
 	for (c = ao_btm_reply_len; c < sizeof (ao_btm_reply);)
 		ao_btm_reply[c++] = '\0';
 	return ao_btm_reply_len;
@@ -279,7 +293,7 @@ ao_btm(void)
 	/* Turn off status reporting */
 	ao_btm_cmd("ATQ1\r");
 
-	ao_btm_stdio = ao_add_stdio(ao_serial_btm_pollchar,
+	ao_btm_stdio = ao_add_stdio(_ao_serial_btm_pollchar,
 				    ao_serial_btm_putchar,
 				    NULL);
 	ao_btm_echo(0);
@@ -288,7 +302,7 @@ ao_btm(void)
 		while (!ao_btm_connected)
 			ao_sleep(&ao_btm_connected);
 		while (ao_btm_connected) {
-			ao_led_for(AO_LED_GREEN, AO_MS_TO_TICKS(20));
+			ao_led_for(AO_BT_LED, AO_MS_TO_TICKS(20));
 			ao_delay(AO_SEC_TO_TICKS(3));
 		}
 	}
@@ -312,18 +326,20 @@ __xdata struct ao_task ao_btm_task;
 #endif
 
 void
-ao_btm_check_link() __critical
+ao_btm_check_link()
 {
-	/* Check the pin and configure the interrupt detector to wait for the
-	 * pin to flip the other way
-	 */
-	if (BT_LINK_PIN) {
-		ao_btm_connected = 0;
-		PICTL |= BT_PICTL_ICON;
-	} else {
-		ao_btm_connected = 1;
-		PICTL &= ~BT_PICTL_ICON;
-	}
+	ao_arch_critical(
+		/* Check the pin and configure the interrupt detector to wait for the
+		 * pin to flip the other way
+		 */
+		if (BT_LINK_PIN) {
+			ao_btm_connected = 0;
+			PICTL |= BT_PICTL_ICON;
+		} else {
+			ao_btm_connected = 1;
+			PICTL &= ~BT_PICTL_ICON;
+		}
+		);
 }
 
 void

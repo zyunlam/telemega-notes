@@ -14,7 +14,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
-
+/*
 package altosui;
 
 import java.awt.*;
@@ -27,7 +27,7 @@ import java.util.*;
 import java.text.*;
 import java.util.prefs.*;
 import java.util.concurrent.LinkedBlockingQueue;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosFlightStatusTableModel extends AbstractTableModel {
 	private String[] columnNames = {
@@ -65,3 +65,4 @@ public class AltosFlightStatusTableModel extends AbstractTableModel {
 		setValueAt(String.format("%1.0f", AltosConvert.speed(speed)), 3);
 	}
 }
+*/

@@ -20,15 +20,10 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import javax.swing.event.*;
 import java.io.*;
-import java.util.*;
 import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altosuilib_1.*;
 
 class FireButton extends JButton {
 	protected void processMouseEvent(MouseEvent e) {
@@ -51,7 +46,7 @@ class FireButton extends JButton {
 }
 
 public class AltosLaunchUI
-	extends AltosDialog
+	extends AltosUIDialog
 	implements ActionListener
 {
 	AltosDevice	device;
@@ -376,7 +371,7 @@ public class AltosLaunchUI
 	private boolean open() {
 		command_queue = new LinkedBlockingQueue<String>();
 
-		device = AltosDeviceDialog.show(owner, Altos.product_any);
+		device = AltosDeviceUIDialog.show(owner, Altos.product_any);
 		if (device != null) {
 				LaunchHandler	handler = new LaunchHandler(owner);
 				Thread		t = new Thread(handler);

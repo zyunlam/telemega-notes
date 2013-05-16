@@ -23,7 +23,7 @@
 static __xdata uint8_t	ao_log_mutex;
 static __xdata struct ao_log_mega log;
 
-__code uint8_t ao_log_format = AO_LOG_FORMAT_MEGAMETRUM;
+__code uint8_t ao_log_format = AO_LOG_FORMAT_TELEMEGA;
 
 static uint8_t
 ao_log_csum(__xdata uint8_t *b) __reentrant
@@ -95,6 +95,14 @@ ao_log(void)
 #if HAS_ACCEL
 	log.u.flight.ground_accel = ao_ground_accel;
 #endif
+#if HAS_GYRO
+	log.u.flight.ground_accel_along = ao_ground_accel_along;
+	log.u.flight.ground_accel_across = ao_ground_accel_across;
+	log.u.flight.ground_accel_through = ao_ground_accel_through;
+	log.u.flight.ground_pitch = ao_ground_pitch;
+	log.u.flight.ground_yaw = ao_ground_yaw;
+	log.u.flight.ground_roll = ao_ground_roll;
+#endif
 	log.u.flight.ground_pres = ao_ground_pres;
 	log.u.flight.flight = ao_flight_number;
 	ao_log_mega(&log);
@@ -162,6 +170,8 @@ ao_log(void)
 				ao_log_stop();
 		}
 #endif
+
+		ao_log_flush();
 
 		/* Wait for a while */
 		ao_delay(AO_MS_TO_TICKS(100));

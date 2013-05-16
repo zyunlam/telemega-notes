@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 import java.text.*;
 
 public abstract class AltosTelemetryRecord {
@@ -80,25 +80,25 @@ public abstract class AltosTelemetryRecord {
 				r = new AltosTelemetryRecordSensor(bytes, rssi);
 				break;
 			case packet_type_configuration:
-				r = new AltosTelemetryRecordConfiguration(bytes);
+				r = new AltosTelemetryRecordConfiguration(bytes, rssi);
 				break;
 			case packet_type_location:
-				r = new AltosTelemetryRecordLocation(bytes);
+				r = new AltosTelemetryRecordLocation(bytes, rssi);
 				break;
 			case packet_type_satellite:
-				r = new AltosTelemetryRecordSatellite(bytes);
+				r = new AltosTelemetryRecordSatellite(bytes, rssi);
 				break;
 			case packet_type_companion:
-				r = new AltosTelemetryRecordCompanion(bytes);
+				r = new AltosTelemetryRecordCompanion(bytes, rssi);
 				break;
 			case packet_type_MM_sensor:
 				r = new AltosTelemetryRecordMegaSensor(bytes, rssi);
 				break;
 			case packet_type_MM_data:
-				r = new AltosTelemetryRecordMegaData(bytes);
+				r = new AltosTelemetryRecordMegaData(bytes, rssi);
 				break;
 			default:
-				r = new AltosTelemetryRecordRaw(bytes);
+				r = new AltosTelemetryRecordRaw(bytes, rssi);
 				break;
 			}
 			break;

@@ -123,9 +123,10 @@ cc_handle_hex_read(struct cc_usb *cc)
 static void
 cc_usb_dbg(int indent, uint8_t *bytes, int len)
 {
-	int	eol = 1;
+	static int	eol = 1;
 	int	i;
 	uint8_t	c;
+	ccdbg_debug(CC_DEBUG_BITBANG, "<<<%d bytes>>>", len);
 	while (len--) {
 		c = *bytes++;
 		if (eol) {
@@ -135,12 +136,17 @@ cc_usb_dbg(int indent, uint8_t *bytes, int len)
 		}
 		switch (c) {
 		case '\r':
-			ccdbg_debug(CC_DEBUG_BITBANG, "^M");
+			ccdbg_debug(CC_DEBUG_BITBANG, "\\r");
 			break;
 		case '\n':
 			eol = 1;
+			ccdbg_debug(CC_DEBUG_BITBANG, "\\n\n");
+			break;
 		default:
-			ccdbg_debug(CC_DEBUG_BITBANG, "%c", c);
+			if (c < ' ' || c > '~')
+				ccdbg_debug(CC_DEBUG_BITBANG, "\\%02x", c);
+			else
+				ccdbg_debug(CC_DEBUG_BITBANG, "%c", c);
 		}
 	}
 }
@@ -254,15 +260,21 @@ cc_usb_printf(struct cc_usb *cc, char *format, ...)
 }
 
 int
-cc_usb_getchar(struct cc_usb *cc)
+cc_usb_getchar_timeout(struct cc_usb *cc, int timeout)
 {
 	while (cc->in_pos == cc->in_count) {
-		if (_cc_usb_sync(cc, 5000) < 0) {
+		if (_cc_usb_sync(cc, timeout) < 0) {
 			fprintf(stderr, "USB link timeout\n");
 			exit(1);
 		}
 	}
 	return cc->in_buf[cc->in_pos++];
+}
+
+int
+cc_usb_getchar(struct cc_usb *cc)
+{
+	return cc_usb_getchar_timeout(cc, 5000);
 }
 
 void
@@ -375,11 +387,12 @@ cc_usb_reset(struct cc_usb *cc)
 }
 
 void
-cc_usb_open_remote(struct cc_usb *cc, int channel)
+cc_usb_open_remote(struct cc_usb *cc, int freq, char *call)
 {
 	if (!cc->remote) {
-		printf ("channel %d\n", channel);
-		cc_usb_printf(cc, "\nc r %d\np\nE 0\n", channel);
+		fprintf (stderr, "freq %dkHz\n", freq);
+		fprintf (stderr, "call %s\n", call);
+		cc_usb_printf(cc, "\nc F %d\nc c %s\np\nE 0\n", freq, call);
 		do {
 			cc->in_count = cc->in_pos = 0;
 			_cc_usb_sync(cc, 100);
@@ -419,6 +432,8 @@ cc_usb_open(char *tty)
 	tcgetattr(cc->fd, &termios);
 	save_termios = termios;
 	cfmakeraw(&termios);
+	cfsetospeed(&termios, B9600);
+	cfsetispeed(&termios, B9600);
 	tcsetattr(cc->fd, TCSAFLUSH, &termios);
 	cc_usb_printf(cc, "\nE 0\nm 0\n");
 	do {

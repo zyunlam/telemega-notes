@@ -39,64 +39,15 @@
 #define CODE_TO_XDATA(a)	(a)
 #endif
 
-/* An AltOS task */
-struct ao_task {
-	__xdata void *wchan;		/* current wait channel (NULL if running) */
-	uint16_t alarm;			/* abort ao_sleep time */
-	ao_arch_task_members		/* any architecture-specific fields */
-	uint8_t task_id;		/* unique id */
-	__code char *name;		/* task name */
-	uint8_t	stack[AO_STACK_SIZE];	/* saved stack */
-};
+#ifndef HAS_TASK
+#define HAS_TASK	1
+#endif
 
-extern __xdata struct ao_task *__data ao_cur_task;
-
-#define AO_NUM_TASKS		16	/* maximum number of tasks */
-#define AO_NO_TASK		0	/* no task id */
-
-/*
- ao_task.c
- */
-
-/* Suspend the current task until wchan is awoken.
- * returns:
- *  0 on normal wake
- *  1 on alarm
- */
-uint8_t
-ao_sleep(__xdata void *wchan);
-
-/* Wake all tasks sleeping on wchan */
-void
-ao_wakeup(__xdata void *wchan);
-
-/* set an alarm to go off in 'delay' ticks */
-void
-ao_alarm(uint16_t delay);
-
-/* Clear any pending alarm */
-void
-ao_clear_alarm(void);
-
-/* Yield the processor to another task */
-void
-ao_yield(void) ao_arch_naked_declare;
-
-/* Add a task to the run queue */
-void
-ao_add_task(__xdata struct ao_task * task, void (*start)(void), __code char *name) __reentrant;
-
-/* Terminate the current task */
-void
-ao_exit(void);
-
-/* Dump task info to console */
-void
-ao_task_info(void);
-
-/* Start the scheduler. This will not return */
-void
-ao_start_scheduler(void);
+#if HAS_TASK
+#include <ao_task.h>
+#else
+#include <ao_notask.h>
+#endif
 
 /*
  * ao_panic.c
@@ -115,6 +66,8 @@ ao_start_scheduler(void);
 #define AO_PANIC_BT		11	/* Communications with bluetooth device failed */
 #define AO_PANIC_STACK		12	/* Stack overflow */
 #define AO_PANIC_SPI		13	/* SPI communication failure */
+#define AO_PANIC_CRASH		14	/* Processor crashed */
+#define AO_PANIC_BUFIO		15	/* Mis-using bufio API */
 #define AO_PANIC_SELF_TEST_CC1120	0x40 | 1	/* Self test failure */
 #define AO_PANIC_SELF_TEST_HMC5883	0x40 | 2	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MPU6000	0x40 | 3	/* Self test failure */
@@ -136,12 +89,14 @@ ao_panic(uint8_t reason);
 extern volatile __data AO_TICK_TYPE ao_tick_count;
 
 /* Our timer runs at 100Hz */
+#ifndef AO_HERTZ
 #define AO_HERTZ		100
+#endif
 #define AO_MS_TO_TICKS(ms)	((ms) / (1000 / AO_HERTZ))
 #define AO_SEC_TO_TICKS(s)	((s) * AO_HERTZ)
 
 /* Returns the current time in ticks */
-uint16_t
+AO_TICK_TYPE
 ao_time(void);
 
 /* Suspend the current task until ticks time has passed */
@@ -150,7 +105,7 @@ ao_delay(uint16_t ticks);
 
 /* Set the ADC interval */
 void
-ao_timer_set_adc_interval(uint8_t interval) __critical;
+ao_timer_set_adc_interval(uint8_t interval);
 
 /* Timer interrupt */
 void
@@ -168,11 +123,13 @@ ao_clock_init(void);
  * ao_mutex.c
  */
 
+#ifndef ao_mutex_get
 void
 ao_mutex_get(__xdata uint8_t *ao_mutex) __reentrant;
 
 void
 ao_mutex_put(__xdata uint8_t *ao_mutex) __reentrant;
+#endif
 
 /*
  * ao_cmd.c
@@ -188,6 +145,9 @@ extern __pdata uint16_t ao_cmd_lex_i;
 extern __pdata uint32_t ao_cmd_lex_u32;
 extern __pdata char	ao_cmd_lex_c;
 extern __pdata enum ao_cmd_status ao_cmd_status;
+
+void
+ao_put_string(__code char *s);
 
 void
 ao_cmd_lex(void);
@@ -215,6 +175,10 @@ ao_cmd_hex(void);
 
 void
 ao_cmd_decimal(void);
+
+/* Read a single hex nibble off stdin. */
+uint8_t
+ao_getnibble(void);
 
 uint8_t
 ao_match_word(__code char *word);
@@ -319,11 +283,13 @@ ao_temp_to_dC(int16_t temp) __reentrant;
  * Convert between pressure in Pa and altitude in meters
  */
 
-int32_t
+#include <ao_data.h>
+
+alt_t
 ao_pa_to_altitude(int32_t pa);
 
 int32_t
-ao_altitude_to_pa(int32_t alt);
+ao_altitude_to_pa(alt_t alt);
 
 #if HAS_DBG
 #include <ao_dbg.h>
@@ -339,10 +305,10 @@ ao_altitude_to_pa(int32_t alt);
  */
 
 uint8_t
-ao_spi_slave_recv(uint8_t *buf, uint8_t len);
+ao_spi_slave_recv(void *buf, uint16_t len);
 
 void
-ao_spi_slave_send(uint8_t *buf, uint8_t len);
+ao_spi_slave_send(void *buf, uint16_t len);
 
 void
 ao_spi_slave_init(void);
@@ -547,6 +513,8 @@ ao_telemetry_tiny_init(void);
 
 extern __xdata uint8_t	ao_radio_dma;
 
+extern __xdata int8_t	ao_radio_rssi;
+
 #ifdef PKT_APPEND_STATUS_1_CRC_OK
 #define AO_RADIO_STATUS_CRC_OK	PKT_APPEND_STATUS_1_CRC_OK
 #else
@@ -554,20 +522,55 @@ extern __xdata uint8_t	ao_radio_dma;
 #define AO_RADIO_STATUS_CRC_OK	AO_FEC_DECODE_CRC_OK
 #endif
 
+#ifndef HAS_RADIO_RECV
+#define HAS_RADIO_RECV HAS_RADIO
+#endif
+#ifndef HAS_RADIO_XMIT
+#define HAS_RADIO_XMIT HAS_RADIO
+#endif
+
 void
 ao_radio_general_isr(void) ao_arch_interrupt(16);
 
+#if HAS_RADIO_XMIT
 void
 ao_radio_send(const __xdata void *d, uint8_t size) __reentrant;
+#endif
 
+#if HAS_RADIO_RECV
 uint8_t
-ao_radio_recv(__xdata void *d, uint8_t size) __reentrant;
+ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout) __reentrant;
 
 void
 ao_radio_recv_abort(void);
+#endif
 
 void
 ao_radio_test(uint8_t on);
+
+typedef int16_t (*ao_radio_fill_func)(uint8_t *buffer, int16_t len);
+
+void
+ao_radio_send_aprs(ao_radio_fill_func fill);
+
+/*
+ * ao_radio_pa
+ */
+
+#if HAS_RADIO_AMP
+void
+ao_radio_pa_on(void);
+
+void
+ao_radio_pa_off(void);
+
+void
+ao_radio_pa_init(void);
+#else
+#define ao_radio_pa_on()
+#define ao_radio_pa_off()
+#define ao_radio_pa_init()
+#endif
 
 /*
  * Compute the packet length as follows:
@@ -602,8 +605,10 @@ extern const char const * const ao_state_names[];
 union ao_monitor {
 	struct ao_telemetry_raw_recv	raw;
 	struct ao_telemetry_all_recv	all;
+#if LEGACY_MONITOR
 	struct ao_telemetry_orig_recv	orig;
 	struct ao_telemetry_tiny_recv	tiny;
+#endif
 };
 
 extern __xdata union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
@@ -637,10 +642,10 @@ ao_monitor_init(void) __reentrant;
  * ao_stdio.c
  */
 
-#define AO_READ_AGAIN	((char) -1)
+#define AO_READ_AGAIN	(-1)
 
 struct ao_stdio {
-	char	(*pollchar)(void);
+	int	(*_pollchar)(void);	/* Called with interrupts blocked */
 	void	(*putchar)(char c) __reentrant;
 	void	(*flush)(void);
 	uint8_t	echo;
@@ -659,7 +664,7 @@ uint8_t
 ao_echo(void);
 
 int8_t
-ao_add_stdio(char (*pollchar)(void),
+ao_add_stdio(int (*pollchar)(void),
 	     void (*putchar)(char) __reentrant,
 	     void (*flush)(void)) __reentrant;
 
@@ -717,7 +722,7 @@ extern __xdata uint8_t ao_force_freq;
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	12
+#define AO_CONFIG_MINOR	14
 
 #define AO_AES_LEN 16
 
@@ -744,11 +749,22 @@ struct ao_config {
 #if AO_PYRO_NUM
 	struct ao_pyro	pyro[AO_PYRO_NUM];	/* minor version 12 */
 #endif
+	uint16_t	aprs_interval;		/* minor version 13 */
+#if HAS_RADIO_POWER
+	uint8_t		radio_power;		/* minor version 14 */
+#endif
+#if HAS_RADIO_AMP
+	uint8_t		radio_amp;		/* minor version 14 */
+#endif
 };
 
 #define AO_IGNITE_MODE_DUAL		0
 #define AO_IGNITE_MODE_APOGEE		1
 #define AO_IGNITE_MODE_MAIN		2
+
+#define AO_RADIO_ENABLE_CORE		1
+#define AO_RADIO_DISABLE_TELEMETRY	2
+#define AO_RADIO_DISABLE_RDF		4
 
 #define AO_PAD_ORIENTATION_ANTENNA_UP	0
 #define AO_PAD_ORIENTATION_ANTENNA_DOWN	1

@@ -15,8 +15,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public interface AltosIdleMonitorListener {
-	public void update(AltosState state);
+	public void update(AltosState state, AltosListenerState listener_state);
 }

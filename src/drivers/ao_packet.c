@@ -21,16 +21,16 @@ __xdata struct ao_packet_recv ao_rx_packet;
 __xdata struct ao_packet ao_tx_packet;
 __pdata uint8_t ao_packet_rx_len, ao_packet_rx_used, ao_packet_tx_used;
 
-static __xdata char tx_data[AO_PACKET_MAX];
-static __xdata char rx_data[AO_PACKET_MAX];
+static __xdata uint8_t tx_data[AO_PACKET_MAX];
+static __xdata uint8_t rx_data[AO_PACKET_MAX];
 static __pdata uint8_t rx_seq;
 
 __xdata struct ao_task	ao_packet_task;
 __xdata uint8_t ao_packet_enable;
+__xdata uint8_t ao_packet_restart;
 
 #if PACKET_HAS_MASTER
 __xdata uint8_t ao_packet_master_sleeping;
-__xdata uint8_t ao_packet_last_rssi;
 #endif
 
 void
@@ -61,7 +61,7 @@ ao_packet_recv(void)
 #ifdef AO_LED_GREEN
 	ao_led_on(AO_LED_GREEN);
 #endif
-	dma_done = ao_radio_recv(&ao_rx_packet, sizeof (struct ao_packet_recv));
+	dma_done = ao_radio_recv(&ao_rx_packet, sizeof (struct ao_packet_recv), 0);
 #ifdef AO_LED_GREEN
 	ao_led_off(AO_LED_GREEN);
 #endif
@@ -84,9 +84,6 @@ ao_packet_recv(void)
 	if (!(ao_rx_packet.status & AO_RADIO_STATUS_CRC_OK))
 		return 0;
 
-#if PACKET_HAS_MASTER
-	ao_packet_last_rssi = ao_rx_packet.rssi;
-#endif
 	/* Accept packets with matching call signs, or any packet if
 	 * our callsign hasn't been configured
 	 */
@@ -106,7 +103,8 @@ ao_packet_recv(void)
 		/* Check for incoming data at the next sequence and
 		 * for an empty data buffer
 		 */
-		if (ao_rx_packet.packet.seq == (uint8_t) (rx_seq + (uint8_t) 1) &&
+		if ((ao_rx_packet.packet.seq == (uint8_t) (rx_seq + (uint8_t) 1) ||
+		     ao_packet_restart) &&
 		    ao_packet_rx_used == ao_packet_rx_len) {
 
 			/* Copy data to the receive data buffer and set up the
@@ -126,6 +124,7 @@ ao_packet_recv(void)
 			ao_wakeup(&ao_stdin_ready);
 		}
 	}
+	ao_packet_restart = 0;
 
 	/* If the other side has seen the latest data we queued,
 	 * wake up any task waiting to send data and let them go again
@@ -152,6 +151,9 @@ ao_packet_flush(void)
 void
 ao_packet_putchar(char c) __reentrant
 {
+	/* No need to block interrupts, all variables here
+	 * are only manipulated in task context
+	 */
 	while (ao_packet_tx_used == AO_PACKET_MAX && ao_packet_enable) {
 #if PACKET_HAS_MASTER
 		ao_packet_flush();
@@ -163,8 +165,9 @@ ao_packet_putchar(char c) __reentrant
 		tx_data[ao_packet_tx_used++] = c;
 }
 
-char
-ao_packet_pollchar(void) __critical
+/* May be called with interrupts blocked */
+int
+_ao_packet_pollchar(void)
 {
 	if (!ao_packet_enable)
 		return AO_READ_AGAIN;

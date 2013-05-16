@@ -17,19 +17,12 @@
 
 package altosui;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.imageio.ImageIO;
-import javax.swing.table.*;
+import java.awt.image.*;
 import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
 import java.net.URL;
 import java.net.URLConnection;
-import org.altusmetrum.AltosLib.*;
 
 public class AltosSiteMapCache extends JLabel {
 	public static boolean fetchMap(File file, String url) {
@@ -95,7 +88,14 @@ public class AltosSiteMapCache extends JLabel {
 		}
 
 		try {
-			return new ImageIcon(ImageIO.read(pngfile));
+			BufferedImage	img;
+
+			img = ImageIO.read(pngfile);
+			if (img == null) {
+				System.out.printf("# Can't read pngfile %s\n", pngfile);
+				return null;
+			}
+			return new ImageIcon(img);
 		} catch (IOException e) {
 			System.out.printf("# IO error trying to load %s\n", pngfile);
 			return null;

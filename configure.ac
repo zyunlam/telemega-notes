@@ -18,13 +18,25 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.1.1)
+AC_INIT([altos], 1.2)
 AC_CONFIG_SRCDIR([src/core/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
 AC_SUBST(VERSION_DASH)
+
+
+dnl ==========================================================================
+dnl Java library versions
+
+ALTOSUILIB_VERSION=1
+ALTOSLIB_VERSION=1
+
+AC_SUBST(ALTOSLIB_VERSION)
+AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
+AC_SUBST(ALTOSUILIB_VERSION)
+AC_DEFINE(ALTOSUILIB_VERSION,$ALTOSUILIB_VERSION,[Version of the AltosUILib package])
 
 dnl ==========================================================================
 
@@ -74,10 +86,8 @@ AC_ARG_WITH(android, AS_HELP_STRING([--with-android=PATH],
 	[Set android SDK path (default searches in a variety of places)]),
 	[ANDROID_SDK=$withval], [ANDROID_SDK=${ANDROID_SDK:-auto}])
 
-echo ANDROID_SDK set to $ANDROID_SDK
-
 if test "x$ANDROID_SDK" = "xauto"; then
-	AC_MSG_CHECKING([Android SDK files])
+	AC_MSG_CHECKING([Android SDK])
 	for sdk in ../android/android-sdk-linux ../android/android-sdk ../android-sdk ../android-sdk-linux $HOME/android; do
 		if test "x$ANDROID_SDK" = "xauto"; then
 			SDK="$sdk"
@@ -91,6 +101,54 @@ if test "x$ANDROID_SDK" = "xauto"; then
 		ANDROID_SDK=no
 	fi
 	AC_MSG_RESULT([$ANDROID_SDK])
+fi
+if test "x$ANDROID_SDK" != "xno"; then
+	AC_MSG_CHECKING([Android SDK version])
+	SDK_VERSION=`grep -i '^Pkg.Revision=' $ANDROID_SDK/tools/source.properties | cut -f2- -d= | sed s/^r//`
+	SDK_MAJOR_VERSION="`echo $SDK_VERSION | sed 's/[[^0-9]].*//'`"
+	if test "$SDK_MAJOR_VERSION" -lt 17 ; then
+		AC_MSG_NOTICE([SDK version $SDK_VERSION is too old. Need >= r17])
+		ANDROID_SDK=no
+	else
+		AC_MSG_RESULT([$SDK_VERSION])
+	fi
+fi
+if test "x$ANDROID_SDK" != "xno"; then
+	AC_MSG_CHECKING([Android SDK API Level])
+	if test -f "$ANDROID_SDK/platforms/android-10/source.properties"; then
+		API_LEVEL=`sed -ne 's/^AndroidVersion.ApiLevel=//p' $ANDROID_SDK/platforms/android-10/source.properties`
+		if test "$API_LEVEL" = "10"; then
+			AC_MSG_RESULT([$API_LEVEL])
+		else
+			AC_MSG_NOTICE([API Level 10 not installed correctly.])
+			ANDROID_SDK=no
+		fi
+	else
+		AC_MSG_NOTICE([API Level 10 not installed, but is required.])
+		ANDROID_SDK=no
+	fi
+fi
+if test "x$ANDROID_SDK" != "xno"; then
+	AC_MSG_CHECKING([Android SDK required extras])
+	if test -f "$ANDROID_SDK/extras/android/support/source.properties"; then
+		ANDROID_SUPPORT_LIB_NAME=`sed -ne 's/^Extra.NameDisplay=//p' $ANDROID_SDK/extras/android/support/source.properties`
+		if test -f "$ANDROID_SDK/extras/google/google_play_services/source.properties"; then
+			GOOGLE_PLAY_SERVICES_NAME=`sed -ne 's/^Extra.NameDisplay=//p' $ANDROID_SDK/extras/google/google_play_services/source.properties`
+			AC_MSG_RESULT([$ANDROID_SUPPORT_LIB_NAME, $GOOGLE_PLAY_SERVICES_NAME])
+		else
+			AC_MSG_NOTICE([Google Play Services library not installed.])
+			ANDROID_SDK=no
+		fi
+	else
+		AC_MSG_NOTICE([Android Support Library not installed.])
+		ANDROID_SDK=no
+	fi
+fi
+
+if test "x$ANDROID_SDK" != "xno"; then
+	HAVE_ANDROID_SDK="yes"
+else
+	HAVE_ANDROID_SDK="no"
 fi
 
 AM_CONDITIONAL([ANDROID], [test x$ANDROID_SDK != xno])
@@ -124,7 +182,12 @@ AC_SUBST(WARN_CFLAGS)
 
 AC_CHECK_PROG([HAVE_SDCC], [sdcc], yes, no)
 if test "x$HAVE_SDCC" = "xno"; then
-	AC_MSG_ERROR([Please install sdcc to build AltOs])
+	AC_MSG_WARN([No sdcc found, cc1111 binaries will not be built])
+fi
+
+AC_CHECK_PROG([HAVE_ARM_GCC], [arm-none-eabi-gcc], yes, no)
+if test "x$HAVE_ARM_GCC" = "xno"; then
+	AC_MSG_WARN([No arm compiler found, STM32L and LPC11U14 binaries will not be built])
 fi
 
 AC_CHECK_PROG([HAVE_NICKLE], [nickle], yes, no)
@@ -146,10 +209,15 @@ AM_CONDITIONAL([LIBSTLINK], [test x$HAVE_STLINK != xno])
 AC_OUTPUT([
 Makefile
 altoslib/Makefile
+altosuilib/Makefile
+altosuilib/AltosUIVersion.java
 altosui/Makefile
-altosui/AltosVersion.java
 altosui/Info.plist
-altosui/libaltos/Makefile
+altosui/altos-windows.nsi
+libaltos/Makefile
+micropeak/Makefile
+micropeak/Info.plist
+micropeak/micropeak-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
 ao-tools/Makefile
@@ -163,6 +231,31 @@ ao-tools/ao-load/Makefile
 ao-tools/ao-telem/Makefile
 ao-tools/ao-stmload/Makefile
 ao-tools/ao-send-telem/Makefile
+ao-tools/ao-sky-flash/Makefile
+ao-tools/ao-dumpflash/Makefile
+ao-tools/ao-edit-telem/Makefile
+ao-tools/ao-dump-up/Makefile
 ao-utils/Makefile
 src/Version
 ])
+
+echo ""
+echo "  Package: ${PACKAGE_NAME} ${PACKAGE_VERSION}"
+echo ""
+echo "  Configuration"
+echo "    STM32L/LPC11U14 support.....: ${HAVE_ARM_GCC}"
+echo "    CC1111 support..............: ${HAVE_SDCC}"
+echo "    Android support.............: ${HAVE_ANDROID_SDK}"
+echo "    STlink support..............: ${HAVE_STLINK}"
+echo ""
+echo "  Java paths"
+echo "    freetts.....................: ${FREETTS}"
+echo "    jfreechart..................: ${JFREECHART}"
+echo "    jcommon.....................: ${JCOMMON}"
+echo "    JVM include.................: ${JVM_INCLUDE}"
+if test x${ANDROID_SDK} != "xno"; then
+echo ""
+echo "  Android path"
+echo "    Android SDK.................: ${ANDROID_SDK}"
+fi
+echo ""

@@ -16,13 +16,20 @@
  */
 
 #include "ao.h"
+#include "ao_log.h"
 #include "ao_product.h"
 
 static __pdata uint16_t ao_telemetry_interval;
 static __pdata uint8_t ao_rdf = 0;
 static __pdata uint16_t ao_rdf_time;
 
-#if defined(MEGAMETRUM)
+#if HAS_APRS
+static __pdata uint16_t ao_aprs_time;
+
+#include <ao_aprs.h>
+#endif
+
+#if defined(TELEMEGA)
 #define AO_SEND_MEGA	1
 #endif
 
@@ -223,6 +230,7 @@ ao_send_location(void)
 		ao_xmemcpy(&telemetry.location.flags,
 		       &ao_gps_data.flags,
 		       26);
+		telemetry.location.tick = ao_gps_tick;
 		ao_mutex_put(&ao_gps_mutex);
 		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_loc_cur = ao_telemetry_config_max;
@@ -288,30 +296,42 @@ ao_telemetry(void)
 		while (ao_telemetry_interval == 0)
 			ao_sleep(&telemetry);
 		time = ao_rdf_time = ao_time();
+#if HAS_APRS
+		ao_aprs_time = time;
+#endif
 		while (ao_telemetry_interval) {
 
-
-#ifdef AO_SEND_ALL_BARO
-			ao_send_baro();
+#if HAS_APRS
+			if (!(ao_config.radio_enable & AO_RADIO_DISABLE_TELEMETRY))
 #endif
+			{
+#ifdef AO_SEND_ALL_BARO
+				ao_send_baro();
+#endif
+#if HAS_FLIGHT
 #ifdef AO_SEND_MEGA
-			ao_send_mega_sensor();
-			ao_send_mega_data();
+				ao_send_mega_sensor();
+				ao_send_mega_data();
 #else
-			ao_send_sensor();
+				ao_send_sensor();
+#endif
 #endif
 
 #if HAS_COMPANION
-			if (ao_companion_running)
-				ao_send_companion();
+				if (ao_companion_running)
+					ao_send_companion();
 #endif
-			ao_send_configuration();
+				ao_send_configuration();
 #if HAS_GPS
-			ao_send_location();
-			ao_send_satellite();
+				ao_send_location();
+				ao_send_satellite();
 #endif
+			}
 #ifndef AO_SEND_ALL_BARO
 			if (ao_rdf &&
+#if HAS_APRS
+			    !(ao_config.radio_enable & AO_RADIO_DISABLE_RDF) &&
+#endif
 			    (int16_t) (ao_time() - ao_rdf_time) >= 0)
 			{
 #if HAS_IGNITE_REPORT
@@ -325,6 +345,14 @@ ao_telemetry(void)
 #endif
 					ao_radio_rdf();
 			}
+#if HAS_APRS
+			if (ao_config.aprs_interval != 0 &&
+			    (int16_t) (ao_time() - ao_aprs_time) >= 0)
+			{
+				ao_aprs_time = ao_time() + AO_SEC_TO_TICKS(ao_config.aprs_interval);
+				ao_aprs_send();
+			}
+#endif
 #endif
 			time += ao_telemetry_interval;
 			delay = time - ao_time();
@@ -389,8 +417,9 @@ ao_rdf_set(uint8_t rdf)
 	ao_rdf = rdf;
 	if (rdf == 0)
 		ao_radio_rdf_abort();
-	else
+	else {
 		ao_rdf_time = ao_time() + AO_RDF_INTERVAL_TICKS;
+	}
 }
 
 __xdata struct ao_task	ao_telemetry_task;

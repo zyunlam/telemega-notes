@@ -17,13 +17,6 @@
 
 #include <ao.h>
 
-struct ao_stm_usart {
-	struct ao_fifo		rx_fifo;
-	struct ao_fifo		tx_fifo;
-	struct stm_usart	*reg;
-	uint8_t			tx_started;
-};
-
 void
 ao_debug_out(char c)
 {
@@ -34,7 +27,7 @@ ao_debug_out(char c)
 }
 
 static void
-ao_usart_tx_start(struct ao_stm_usart *usart)
+_ao_usart_tx_start(struct ao_stm_usart *usart)
 {
 	if (!ao_fifo_empty(usart->tx_fifo) && !usart->tx_started)
 	{
@@ -61,55 +54,55 @@ ao_usart_isr(struct ao_stm_usart *usart, int stdin)
 	}
 	if (sr & (1 << STM_USART_SR_TC)) {
 		usart->tx_started = 0;
-		ao_usart_tx_start(usart);
+		_ao_usart_tx_start(usart);
 		ao_wakeup(&usart->tx_fifo);
 	}
+}
+
+int
+_ao_usart_pollchar(struct ao_stm_usart *usart)
+{
+	int	c;
+	
+	if (ao_fifo_empty(usart->rx_fifo))
+		c = AO_READ_AGAIN;
+	else {
+		uint8_t	u;
+		ao_fifo_remove(usart->rx_fifo,u);
+		c = u;
+	}
+	return c;
 }
 
 char
 ao_usart_getchar(struct ao_stm_usart *usart)
 {
-	char c;
-	cli();
-	while (ao_fifo_empty(usart->rx_fifo))
+	int c;
+	ao_arch_block_interrupts();
+	while ((c = _ao_usart_pollchar(usart)) == AO_READ_AGAIN)
 		ao_sleep(&usart->rx_fifo);
-	ao_fifo_remove(usart->rx_fifo, c);
-	sei();
-	return c;
-}
-
-char
-ao_usart_pollchar(struct ao_stm_usart *usart)
-{
-	char	c;
-	cli();
-	if (ao_fifo_empty(usart->rx_fifo)) {
-		sei();
-		return AO_READ_AGAIN;
-	}
-	ao_fifo_remove(usart->rx_fifo,c);
-	sei();
-	return c;
+	ao_arch_release_interrupts();
+	return (char) c;
 }
 
 void
 ao_usart_putchar(struct ao_stm_usart *usart, char c)
 {
-	cli();
+	ao_arch_block_interrupts();
 	while (ao_fifo_full(usart->tx_fifo))
 		ao_sleep(&usart->tx_fifo);
 	ao_fifo_insert(usart->tx_fifo, c);
-	ao_usart_tx_start(usart);
-	sei();
+	_ao_usart_tx_start(usart);
+	ao_arch_release_interrupts();
 }
 
 void
 ao_usart_drain(struct ao_stm_usart *usart)
 {
-	cli();
+	ao_arch_block_interrupts();
 	while (!ao_fifo_empty(usart->tx_fifo))
 		ao_sleep(&usart->tx_fifo);
-	sei();
+	ao_arch_release_interrupts();
 }
 
 static const struct {
@@ -127,12 +120,15 @@ static const struct {
 	[AO_SERIAL_SPEED_57600] = {
 		AO_PCLK1 / 57600
 	},
+	[AO_SERIAL_SPEED_115200] = {
+		AO_PCLK1 / 115200
+	},
 };
 
 void
 ao_usart_set_speed(struct ao_stm_usart *usart, uint8_t speed)
 {
-	if (speed > AO_SERIAL_SPEED_57600)
+	if (speed > AO_SERIAL_SPEED_115200)
 		return;
 	usart->reg->brr = ao_usart_speeds[speed].brr;
 }
@@ -201,10 +197,10 @@ ao_serial1_putchar(char c)
 	ao_usart_putchar(&ao_stm_usart1, c);
 }
 
-char
-ao_serial1_pollchar(void)
+int
+_ao_serial1_pollchar(void)
 {
-	return ao_usart_pollchar(&ao_stm_usart1);
+	return _ao_usart_pollchar(&ao_stm_usart1);
 }
 
 void
@@ -232,10 +228,10 @@ ao_serial2_putchar(char c)
 	ao_usart_putchar(&ao_stm_usart2, c);
 }
 
-char
-ao_serial2_pollchar(void)
+int
+_ao_serial2_pollchar(void)
 {
-	return ao_usart_pollchar(&ao_stm_usart2);
+	return _ao_usart_pollchar(&ao_stm_usart2);
 }
 
 void
@@ -263,10 +259,10 @@ ao_serial3_putchar(char c)
 	ao_usart_putchar(&ao_stm_usart3, c);
 }
 
-char
-ao_serial3_pollchar(void)
+int
+_ao_serial3_pollchar(void)
 {
-	return ao_usart_pollchar(&ao_stm_usart3);
+	return _ao_usart_pollchar(&ao_stm_usart3);
 }
 
 void
@@ -310,7 +306,7 @@ ao_serial_init(void)
 	stm_nvic_set_enable(STM_ISR_USART1_POS);
 	stm_nvic_set_priority(STM_ISR_USART1_POS, 4);
 #if USE_SERIAL_1_STDIN
-	ao_add_stdio(ao_serial1_pollchar,
+	ao_add_stdio(_ao_serial1_pollchar,
 		     ao_serial1_putchar,
 		     NULL);
 #endif
@@ -347,7 +343,7 @@ ao_serial_init(void)
 	stm_nvic_set_enable(STM_ISR_USART2_POS);
 	stm_nvic_set_priority(STM_ISR_USART2_POS, 4);
 #if USE_SERIAL_2_STDIN
-	ao_add_stdio(ao_serial2_pollchar,
+	ao_add_stdio(_ao_serial2_pollchar,
 		     ao_serial2_putchar,
 		     NULL);
 #endif
@@ -391,7 +387,7 @@ ao_serial_init(void)
 	stm_nvic_set_enable(STM_ISR_USART3_POS);
 	stm_nvic_set_priority(STM_ISR_USART3_POS, 4);
 #if USE_SERIAL_3_STDIN
-	ao_add_stdio(ao_serial3_pollchar,
+	ao_add_stdio(_ao_serial3_pollchar,
 		     ao_serial3_putchar,
 		     NULL);
 #endif

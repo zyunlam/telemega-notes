@@ -3,7 +3,7 @@
   "/usr/share/xml/docbook/schema/dtd/4.5/docbookx.dtd">
 <book>
   <title>The Altus Metrum System</title>
-  <subtitle>An Owner's Manual for TeleMetrum, TeleMini and TeleDongle Devices</subtitle>
+  <subtitle>An Owner's Manual for TeleMetrum, TeleMini, TeleDongle and TeleBT Devices</subtitle>
   <bookinfo>
     <author>
       <firstname>Bdale</firstname>
@@ -22,7 +22,7 @@
       <surname>Towns</surname>
     </author>
     <copyright>
-      <year>2012</year>
+      <year>2013</year>
       <holder>Bdale Garbee and Keith Packard</holder>
     </copyright>
     <legalnotice>
@@ -35,6 +35,15 @@
       </para>
     </legalnotice>
     <revhistory>
+      <revision>
+	<revnumber>1.2</revnumber>
+	<date>14 April 2013</date>
+	<revremark>
+	  Updated for software version 1.2. Version 1.2 adds support
+	  for TeleBT and AltosDroid. It also adds a few minor features
+	  and fixes a few minor bugs in AltosUI and the AltOS firmware.
+	</revremark>
+      </revision>
       <revision>
 	<revnumber>1.1.1</revnumber>
 	<date>16 September 2012</date>
@@ -122,19 +131,26 @@ NAR #88757, TRA #12200
       support optional capabilities in the future.
     </para>
     <para>
-      The newest device is TeleMini, a dual deploy altimeter with
+      Our second device was TeleMini, a dual deploy altimeter with
       radio telemetry and radio direction finding. This device is only
       13mm by 38mm (½ inch by 1½ inches) and can fit easily in an 18mm 
       air-frame.
     </para>
     <para>
-      Complementing TeleMetrum and TeleMini is TeleDongle, a USB to RF 
-      interface for communicating with the altimeters.  Combined with your 
-      choice of antenna and
-      notebook computer, TeleDongle and our associated user interface software
-      form a complete ground station capable of logging and displaying in-flight
-      telemetry, aiding rocket recovery, then processing and archiving flight
+      TeleDongle was our first ground station, providing a USB to RF
+      interfaces for communicating with the altimeters. Combined with
+      your choice of antenna and notebook computer, TeleDongle and our
+      associated user interface software form a complete ground
+      station capable of logging and displaying in-flight telemetry,
+      aiding rocket recovery, then processing and archiving flight
       data for analysis and review.
+    </para>
+    <para>
+      For a slightly more portable ground station experience that also
+      provides direct rocket recovery support, TeleBT offers flight
+      monitoring and data logging using a Bluetooth connection between
+      the receiver and an Android device that has the Altos Droid
+      application installed from the Google Play store.
     </para>
     <para>
       More products will be added to the Altus Metrum family over time, and
@@ -172,8 +188,9 @@ NAR #88757, TRA #12200
     <para>
       The TeleMini battery can be charged by disconnecting it from the
       TeleMini board and plugging it into a standalone battery charger 
-      board, and connecting that via a USB cable to a laptop or other USB
-      power source
+      such as the LipoCharger product included in TeleMini Starter Kits, 
+      and connecting that via a USB cable to a laptop or other USB
+      power source.  
     </para>
     <para>
       The other active device in the starter kit is the TeleDongle USB to
@@ -195,6 +212,16 @@ NAR #88757, TRA #12200
       Full source code and build instructions are also available.
       The latest version may always be downloaded from
       <ulink url="http://altusmetrum.org/AltOS"/>.
+    </para>
+    <para>
+      If you're using a TeleBT instead of the TeleDongle, you'll want
+      to go install the Altos Droid application from the Google Play
+      store. You don't need a data plan to use Altos Droid, but
+      without network access, the Map view will be less useful as it
+      won't contain any map data. You can also use TeleBT connected
+      over USB with your laptop computer; it acts exactly like a
+      TeleDongle. Anywhere this manual talks about TeleDongle, you can
+      also read that as 'and TeleBT when connected via USB'.
     </para>
   </chapter>
   <chapter>
@@ -278,6 +305,19 @@ NAR #88757, TRA #12200
       designed for use with single-cell batteries with 3.7 volts nominal.
     </para>
     <para>
+      The battery connectors are a standard 2-pin JST connector and
+      match batteries sold by Spark Fun. These batteries are
+      single-cell Lithium Polymer batteries that nominally provide 3.7
+      volts.  Other vendors sell similar batteries for RC aircraft
+      using mating connectors, however the polarity for those is
+      generally reversed from the batteries used by Altus Metrum
+      products. In particular, the Tenergy batteries supplied for use
+      in Featherweight flight computers are not compatible with Altus
+      Metrum flight computers or battery chargers. <emphasis>Check
+      polarity and voltage before connecting any battery not purchased
+      from Altus Metrum or Spark Fun.</emphasis>
+    </para>
+    <para>
       By default, we use the unregulated output of the Li-Po battery directly
       to fire ejection charges.  This works marvelously with standard
       low-current e-matches like the J-Tek from MJG Technologies, and with
@@ -350,15 +390,15 @@ NAR #88757, TRA #12200
         flights, do what makes sense.
       </para>
       <para>
-        If idle mode is entered, you will hear an audible "di-dit" or see 
-        two short flashes ("I" for idle), and the flight state machine is 
-        disengaged, thus no ejection charges will fire.  The altimeters also 
-        listen for the radio link when in idle mode for requests sent via 
-        TeleDongle.  Commands can be issued to a TeleMetrum in idle mode 
-        over either
-        USB or the radio link equivalently. TeleMini only has the radio link.
-        Idle mode is useful for configuring the altimeter, for extracting data
-        from the on-board storage chip after flight, and for ground testing
+        If idle mode is entered, you will hear an audible "di-dit" or
+        see two short flashes ("I" for idle), and the flight state
+        machine is disengaged, thus no ejection charges will fire.
+        The altimeters also listen for the radio link when in idle
+        mode for requests sent via TeleDongle.  Commands can be issued
+        to a TeleMetrum in idle mode over either USB or the radio link
+        equivalently. TeleMini only has the radio link.  Idle mode is
+        useful for configuring the altimeter, for extracting data from
+        the on-board storage chip after flight, and for ground testing
         pyro charges.
       </para>
       <para>
@@ -371,6 +411,36 @@ NAR #88757, TRA #12200
         step of a rickety step-ladder or hanging off the side of a launch 
         tower with a screw-driver trying to turn on your avionics before 
         installing igniters!
+      </para>
+      <para>
+	TeleMini is configured via the radio link. Of course, that
+	means you need to know the TeleMini radio configuration values
+	or you won't be able to communicate with it. For situations
+	when you don't have the radio configuration values, TeleMini
+	offers an 'emergency recovery' mode. In this mode, TeleMini is
+	configured as follows:
+	<itemizedlist>
+	  <listitem>
+	    Sets the radio frequency to 434.550MHz
+	  </listitem>
+	  <listitem>
+	    Sets the radio calibration back to the factory value.
+	  </listitem>
+	  <listitem>
+	    Sets the callsign to N0CALL
+	  </listitem>
+	  <listitem>
+	    Does not go to 'pad' mode after five seconds.
+	  </listitem>
+	</itemizedlist>
+      </para>
+      <para>
+	To get into 'emergency recovery' mode, first find the row of
+	four small holes opposite the switch wiring. Using a short
+	piece of small gauge wire, connect the outer two holes
+	together, then power TeleMini up. Once the red LED is lit,
+	disconnect the wire and the board should signal that it's in
+	'idle' mode after the initial five second startup period.
       </para>
     </section>
     <section>
@@ -399,11 +469,12 @@ NAR #88757, TRA #12200
     <section>
       <title>Controlling An Altimeter Over The Radio Link</title>
       <para>
-        One of the unique features of the Altus Metrum system is
-        the ability to create a two way command link between TeleDongle
-        and an altimeter using the digital radio transceivers built into
-        each device. This allows you to interact with the altimeter from
-        afar, as if it were directly connected to the computer.
+        One of the unique features of the Altus Metrum system is the
+        ability to create a two way command link between TeleDongle
+        and an altimeter using the digital radio transceivers
+        built into each device. This allows you to interact with the
+        altimeter from afar, as if it were directly connected to the
+        computer.
       </para>
       <para>
         Any operation which can be performed with TeleMetrum can
@@ -481,7 +552,7 @@ NAR #88757, TRA #12200
       <para>
         You can monitor the operation of the radio link by watching the 
         lights on the devices. The red LED will flash each time a packet
-        is tramsitted, while the green LED will light up on TeleDongle when 
+        is transmitted, while the green LED will light up on TeleDongle when 
         it is waiting to receive a packet from the altimeter.
       </para>
     </section>
@@ -754,6 +825,15 @@ NAR #88757, TRA #12200
             weaker signals may not be receivable. The packet link uses
             error detection and correction techniques which prevent
             incorrect data from being reported.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            The age of the displayed data, in seconds since the last 
+	    successfully received telemetry packet.  In normal operation
+	    this will stay in the low single digits.  If the number starts
+	    counting up, then you are no longer receiving data over the radio
+	    link from the flight computer.
           </para>
         </listitem>
       </itemizedlist>
@@ -1529,6 +1609,151 @@ NAR #88757, TRA #12200
     </section>
   </chapter>
   <chapter>
+    <title>AltosDroid</title>
+    <para>
+      AltosDroid provides the same flight monitoring capabilities as
+      AltosUI, but runs on Android devices and is designed to connect
+      to a TeleBT receiver over Bluetooth™. Altos Droid monitors
+      telemetry data, logging it to internal storage in the Android
+      device, and presents that data in a UI the same way the 'Monitor
+      Flight' window does in AltosUI.
+    </para>
+    <para>
+      This manual will explain how to configure AltosDroid, connect
+      to TeleBT, operate the flight monitoring interface and describe
+      what the displayed data means.
+    </para>
+    <section>
+      <title>Installing AltosDroid</title>
+      <para>
+	AltosDroid is included in the Google Play store. To install
+	it on your Android device, open open the Google Play Store
+	application and search for "altosdroid". Make sure you don't
+	have a space between "altos" and "droid" or you probably won't
+	find what you want. That should bring you to the right page
+	from which you can download and install the application.
+      </para>
+    </section>
+    <section>
+      <title>Connecting to TeleBT</title>
+      <para>
+	Press the Android 'Menu' button or soft-key to see the
+	configuration options available. Select the 'Connect a device'
+	option and then the 'Scan for devices' entry at the bottom to
+	look for your TeleBT device. Select your device, and when it
+	asks for the code, enter '1234'.
+      </para>
+      <para>
+	Subsequent connections will not require you to enter that
+	code, and your 'paired' device will appear in the list without
+	scanning.
+      </para>
+    </section>
+    <section>
+      <title>Configuring AltosDroid</title>
+      <para>
+	The only configuration option available for AltosDroid is
+	which frequency to listen on. Press the Android 'Menu' button
+	or soft-key and pick the 'Select radio frequency' entry. That
+	brings up a menu of pre-set radio frequencies; pick the one
+	which matches your altimeter.
+      </para>
+    </section>
+    <section>
+      <title>Altos Droid Flight Monitoring</title>
+      <para>
+	Altos Droid is designed to mimic the AltosUI flight monitoring
+	display, providing separate tabs for each stage of your rocket
+	flight along with a tab containing a map of the local area
+	with icons marking the current location of the altimeter and
+	the Android device.
+      </para>
+      <section>
+	<title>Pad</title>
+        <para>
+          The 'Launch Pad' tab shows information used to decide when the
+          rocket is ready for flight. The first elements include red/green
+          indicators, if any of these is red, you'll want to evaluate
+          whether the rocket is ready to launch:
+          <itemizedlist>
+            <listitem>
+              <para>
+                Battery Voltage. This indicates whether the Li-Po battery
+                powering the TeleMetrum has sufficient charge to last for
+                the duration of the flight. A value of more than
+                3.7V is required for a 'GO' status.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Apogee Igniter Voltage. This indicates whether the apogee
+                igniter has continuity. If the igniter has a low
+                resistance, then the voltage measured here will be close
+                to the Li-Po battery voltage. A value greater than 3.2V is
+                required for a 'GO' status.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Main Igniter Voltage. This indicates whether the main
+                igniter has continuity. If the igniter has a low
+                resistance, then the voltage measured here will be close
+                to the Li-Po battery voltage. A value greater than 3.2V is
+                required for a 'GO' status.
+              </para>
+            </listitem>
+	    <listitem>
+	      <para>
+		On-board Data Logging. This indicates whether there is
+		space remaining on-board to store flight data for the
+		upcoming flight. If you've downloaded data, but failed
+		to erase flights, there may not be any space
+		left. TeleMetrum can store multiple flights, depending
+		on the configured maximum flight log size. TeleMini
+		stores only a single flight, so it will need to be
+		downloaded and erased after each flight to capture
+		data. This only affects on-board flight logging; the
+		altimeter will still transmit telemetry and fire
+		ejection charges at the proper times.
+	      </para>
+	    </listitem>
+            <listitem>
+              <para>
+                GPS Locked. For a TeleMetrum device, this indicates whether the GPS receiver is
+                currently able to compute position information. GPS requires
+                at least 4 satellites to compute an accurate position.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                GPS Ready. For a TeleMetrum device, this indicates whether GPS has reported at least
+                10 consecutive positions without losing lock. This ensures
+                that the GPS receiver has reliable reception from the
+                satellites.
+              </para>
+            </listitem>
+          </itemizedlist>
+          <para>
+            The Launchpad tab also shows the computed launch pad position
+            and altitude, averaging many reported positions to improve the
+            accuracy of the fix.
+          </para>
+        </para>
+      </section>
+    </section>
+    <section>
+      <title>Downloading Flight Logs</title>
+      <para>
+	Altos Droid always saves every bit of telemetry data it
+	receives. To download that to a computer for use with AltosUI,
+	simply remove the SD card from your Android device, or connect
+	your device to your computer's USB port and browse the files
+	on that device. You will find '.telem' files in the TeleMetrum
+	directory that will work with AltosUI directly.
+      </para>
+    </section>
+  </chapter>
+  <chapter>
     <title>Using Altus Metrum Products</title>
     <section>
       <title>Being Legal</title>
@@ -1561,7 +1786,9 @@ NAR #88757, TRA #12200
         <title>On the Ground</title>
         <para>
           To receive the data stream from the rocket, you need an antenna and short
-          feed-line connected to one of our <ulink url="http://www.altusmetrum.org/TeleDongle/">TeleDongle</ulink> units.  The
+          feed-line connected to one of our <ulink url="http://www.altusmetrum.org/TeleDongle/">TeleDongle</ulink> units.  If possible, use an SMA to BNC 
+	adapter instead of feedline between the antenna feedpoint and 
+	TeleDongle, as this will give you the best performance.  The
           TeleDongle in turn plugs directly into the USB port on a notebook
           computer.  Because TeleDongle looks like a simple serial port, your computer
           does not require special device drivers... just plug it in.
@@ -1598,7 +1825,7 @@ NAR #88757, TRA #12200
           So, to recap, on the ground the hardware you'll need includes:
           <orderedlist inheritnum='inherit' numeration='arabic'>
             <listitem>
-              an antenna and feed-line
+              an antenna and feed-line or adapter
             </listitem>
             <listitem>
               a TeleDongle
@@ -1621,7 +1848,9 @@ NAR #88757, TRA #12200
             Arrow Antennas.
           </ulink>
           The 440-3 and 440-5 are both good choices for finding a
-          TeleMetrum- or TeleMini- equipped rocket when used with a suitable 70cm HT.
+          TeleMetrum- or TeleMini- equipped rocket when used with a suitable 
+	  70cm HT.  TeleDongle and an SMA to BNC adapter fit perfectly
+	  between the driven element and reflector of Arrow antennas.
         </para>
       </section>
       <section>
@@ -1647,22 +1876,36 @@ NAR #88757, TRA #12200
       <section>
         <title>Future Plans</title>
         <para>
-          In the future, we intend to offer "companion boards" for the rocket that will
-          plug in to TeleMetrum to collect additional data, provide more pyro channels,
-          and so forth.  
+          In the future, we intend to offer "companion boards" for the rocket 
+	  that will plug in to TeleMetrum to collect additional data, provide 
+	  more pyro channels, and so forth.  
         </para>
         <para>
-          We are also working on the design of a hand-held ground terminal that will
-          allow monitoring the rocket's status, collecting data during flight, and
-          logging data after flight without the need for a notebook computer on the
-          flight line.  Particularly since it is so difficult to read most notebook
-          screens in direct sunlight, we think this will be a great thing to have.
+	  Also under design is a new flight computer with more sensors, more
+	  pyro channels, and a more powerful radio system designed for use
+	  in multi-stage, complex, and extreme altitude projects.
         </para>
         <para>
-          Because all of our work is open, both the hardware designs and the software,
-          if you have some great idea for an addition to the current Altus Metrum family,
-          feel free to dive in and help!  Or let us know what you'd like to see that
-          we aren't already working on, and maybe we'll get excited about it too...
+          We are also working on alternatives to TeleDongle.  One is a
+	  a stand-alone, hand-held ground terminal that will allow monitoring 
+	  the rocket's status, collecting data during flight, and logging data 
+	  after flight without the need for a notebook computer on the
+          flight line.  Particularly since it is so difficult to read most 
+	  notebook screens in direct sunlight, we think this will be a great 
+	  thing to have.  We are also working on a TeleDongle variant with
+	  Bluetooth that will work with Android phones and tablets.
+        </para>
+        <para>
+          Because all of our work is open, both the hardware designs and the 
+	  software, if you have some great idea for an addition to the current 
+	  Altus Metrum family, feel free to dive in and help!  Or let us know 
+	  what you'd like to see that we aren't already working on, and maybe 
+	  we'll get excited about it too...
+        </para>
+        <para>
+	  Watch our 
+	  <ulink url="http://altusmetrum.org/">web site</ulink> for more news 
+	  and information as our family of products evolves!
         </para>
     </section>
   </chapter>
@@ -2199,7 +2442,7 @@ NAR #88757, TRA #12200
 	</listitem>
 	<listitem>
 	  <para>
-	    RF interface for battery charging, configuration, and data recovery.
+	    RF interface for configuration, and data recovery.
 	  </para>
 	</listitem>
 	<listitem>
@@ -2470,6 +2713,37 @@ NAR #88757, TRA #12200
     </para>
   </appendix>
   <appendix>
+    <title>Drill Templates</title>
+    <para>
+      These images, when printed, provide precise templates for the
+      mounting holes in Altus Metrum flight computers
+    </para>
+    <section>
+      <title>TeleMetrum template</title>
+      <para>
+	TeleMetrum has overall dimensions of 1.000 x 2.750 inches, and the
+	mounting holes are sized for use with 4-40 or M3 screws.
+      </para>
+      <mediaobject id="TeleMetrumTemplate">
+	<imageobject>
+	  <imagedata format="SVG" fileref="telemetrum.svg"/>
+	</imageobject>
+      </mediaobject>
+    </section>
+    <section>
+      <title>TeleMini template</title>
+      <para>
+	TeleMini has overall dimensions of 0.500 x 1.500 inches, and the
+	mounting holes are sized for use with 2-56 or M2 screws.
+      </para>
+      <mediaobject id="TeleMiniTemplate">
+	<imageobject>
+	  <imagedata format="SVG" fileref="telemini.svg"/>
+	</imageobject>
+      </mediaobject>
+    </section>
+  </appendix>
+  <appendix>
       <title>Calibration</title>
       <para>
         There are only two calibrations required for a TeleMetrum board, and
@@ -2577,13 +2851,14 @@ NAR #88757, TRA #12200
   <appendix
       xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Release Notes</title>
-    <xi:include	href="release-notes-1.1.1.xsl"  xpointer="xpointer(/article/*)"/>
-    <xi:include	href="release-notes-1.1.xsl"  xpointer="xpointer(/article/*)"/>
-    <xi:include	href="release-notes-1.0.1.xsl"  xpointer="xpointer(/article/*)"/>
-    <xi:include	href="release-notes-0.9.2.xsl"  xpointer="xpointer(/article/*)"/>
-    <xi:include	href="release-notes-0.9.xsl"  xpointer="xpointer(/article/*)"/>
-    <xi:include	href="release-notes-0.8.xsl"  xpointer="xpointer(/article/*)"/>
-    <xi:include	href="release-notes-0.7.1.xsl"  xpointer="xpointer(/article/*)"/>
+    <simplesect><title>Version 1.2</title><xi:include	href="release-notes-1.2.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
+    <simplesect><title>Version 1.1.1</title><xi:include	href="release-notes-1.1.1.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
+    <simplesect><title>Version 1.1</title><xi:include	href="release-notes-1.1.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
+    <simplesect><title>Version 1.0.1</title><xi:include	href="release-notes-1.0.1.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
+    <simplesect><title>Version 0.9.2</title><xi:include	href="release-notes-0.9.2.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
+    <simplesect><title>Version 0.9</title><xi:include	href="release-notes-0.9.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
+    <simplesect><title>Version 0.8</title><xi:include	href="release-notes-0.8.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
+    <simplesect><title>Version 0.7.1</title><xi:include	href="release-notes-0.7.1.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
   </appendix>
 </book>
 

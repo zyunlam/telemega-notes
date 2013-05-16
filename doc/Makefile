@@ -8,16 +8,18 @@ RELNOTES=\
 	release-notes-0.9.html \
 	release-notes-0.9.2.html \
 	release-notes-1.0.1.html \
+	release-notes-1.1.html \
 	release-notes-1.1.1.html \
-	release-notes-1.1.html
+	release-notes-1.2.html
 
 RELNOTES_XSL=$(RELNOTES:.html=.xsl)
-HTML=altusmetrum.html altos.html telemetry.html companion.html $(RELNOTES)
-PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf
+HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html $(RELNOTES)
+PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf
 DOC=$(HTML) $(PDF)
 HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
 FOSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/fo/docbook.xsl
 PDFSTYLE=
+IMAGES=telemetrum.svg telemini.svg
 
 .SUFFIXES: .xsl .html .fo .pdf
 
@@ -50,8 +52,8 @@ clean:
 distclean:
 	rm -f $(HTML) $(PDF) *.fo
 
-altusmetrum.html: $(RELNOTES_XSL)
-altusmetrum.fo: $(RELNOTES_XSL)
+altusmetrum.html: $(RELNOTES_XSL) $(IMAGES)
+altusmetrum.fo: $(RELNOTES_XSL) $(IMAGES)
 
 indent:		altusmetrum.xsl
 	xmlindent -i 2 < altusmetrum.xsl > altusmetrum.new

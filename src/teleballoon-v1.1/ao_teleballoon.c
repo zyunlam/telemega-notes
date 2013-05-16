@@ -26,6 +26,8 @@ ao_ignite_set_pins(void)
 	AO_IGNITER_DIR |= AO_IGNITER_DROGUE_BIT | AO_IGNITER_MAIN_BIT;
 }
 
+__pdata uint16_t ao_motor_number;
+
 void
 main(void)
 {
@@ -50,6 +52,8 @@ main(void)
 		while (P1_3 == 0)
 			;
 	}
+	ao_task_init();
+
 	ao_timer_init();
 	ao_adc_init();
 	ao_beep_init();

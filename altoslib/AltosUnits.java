@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public abstract class AltosUnits {
 
@@ -25,7 +25,7 @@ public abstract class AltosUnits {
 
 	public abstract String say_units();
 
-	abstract int show_fraction(int width);
+	public abstract int show_fraction(int width);
 
 	int say_fraction() {
 		return 0;
@@ -41,6 +41,10 @@ public abstract class AltosUnits {
 
 	private String say_units_format() {
 		return String.format("%%1.%df %s", say_fraction(), say_units());
+	}
+
+	public String graph_format(int width) {
+		return String.format(String.format("%%%d.%df", width, show_fraction(width)), 0.0);
 	}
 
 	public String show(int width, double v) {

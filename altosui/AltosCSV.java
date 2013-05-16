@@ -17,11 +17,9 @@
 
 package altosui;
 
-import java.lang.*;
 import java.io.*;
-import java.text.*;
 import java.util.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosCSV implements AltosWriter {
 	File			name;
@@ -130,10 +128,10 @@ public class AltosCSV implements AltosWriter {
 	void write_basic(AltosRecord record) {
 		out.printf("%8.2f,%10.2f,%8.2f,%8.2f,%8.2f,%8.2f,%5.1f,%5.2f,%5.2f,%5.2f",
 			   record.acceleration(),
-			   record.raw_pressure(),
-			   record.raw_altitude(),
-			   record.raw_height(),
-			   record.accel_speed(),
+			   record.pressure(),
+			   record.altitude(),
+			   record.height(),
+			   state.accel_speed,
 			   state.baro_speed,
 			   record.temperature(),
 			   record.battery_voltage(),

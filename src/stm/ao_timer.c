@@ -16,16 +16,19 @@
  */
 
 #include "ao.h"
+#include <ao_task.h>
 
-volatile __data AO_TICK_TYPE ao_tick_count;
+#ifndef HAS_TICK
+#define HAS_TICK 1
+#endif
 
-uint16_t ao_time(void)
+#if HAS_TICK
+volatile AO_TICK_TYPE ao_tick_count;
+
+AO_TICK_TYPE
+ao_time(void)
 {
-	uint16_t	v;
-	ao_arch_critical(
-		v = ao_tick_count;
-		);
-	return v;
+	return ao_tick_count;
 }
 
 #if AO_DATA_ALL
@@ -33,15 +36,14 @@ volatile __data uint8_t	ao_data_interval = 1;
 volatile __data uint8_t	ao_data_count;
 #endif
 
-void
-ao_debug_out(char c);
-
-
-void stm_tim6_isr(void)
+void stm_systick_isr(void)
 {
-	if (stm_tim6.sr & (1 << STM_TIM67_SR_UIF)) {
-		stm_tim6.sr = 0;
+	if (stm_systick.csr & (1 << STM_SYSTICK_CSR_COUNTFLAG)) {
 		++ao_tick_count;
+#if HAS_TASK_QUEUE
+		if (ao_task_alarm_tick && (int16_t) (ao_tick_count - ao_task_alarm_tick) >= 0)
+			ao_task_check_alarm((uint16_t) ao_tick_count);
+#endif
 #if AO_DATA_ALL
 		if (++ao_data_count == ao_data_interval) {
 			ao_data_count = 0;
@@ -56,10 +58,12 @@ void stm_tim6_isr(void)
 
 #if HAS_ADC
 void
-ao_timer_set_adc_interval(uint8_t interval) __critical
+ao_timer_set_adc_interval(uint8_t interval)
 {
-	ao_data_interval = interval;
-	ao_data_count = 0;
+	ao_arch_critical(
+		ao_data_interval = interval;
+		ao_data_count = 0;
+		);
 }
 #endif
 
@@ -77,34 +81,19 @@ ao_timer_set_adc_interval(uint8_t interval) __critical
 
 #define TIMER_10kHz	((AO_PCLK1 * TIMER_23467_SCALER) / 10000)
 
+#define SYSTICK_RELOAD (AO_SYSTICK / 100 - 1)
+
 void
 ao_timer_init(void)
 {
-	stm_nvic_set_enable(STM_ISR_TIM6_POS);
-	stm_nvic_set_priority(STM_ISR_TIM6_POS, AO_STM_NVIC_CLOCK_PRIORITY);
-
-	/* Turn on timer 6 */
-	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_TIM6EN);
-
-	stm_tim6.psc = TIMER_10kHz;
-	stm_tim6.arr = 99;
-	stm_tim6.cnt = 0;
-
-	/* Enable update interrupt */
-	stm_tim6.dier = (1 << STM_TIM67_DIER_UIE);
-
-	/* Poke timer to reload values */
-	stm_tim6.egr |= (1 << STM_TIM67_EGR_UG);
-
-	stm_tim6.cr2 = (STM_TIM67_CR2_MMS_RESET << STM_TIM67_CR2_MMS);
-
-	/* And turn it on */
-	stm_tim6.cr1 = ((0 << STM_TIM67_CR1_ARPE) |
-			(0 << STM_TIM67_CR1_OPM) |
-			(1 << STM_TIM67_CR1_URS) |
-			(0 << STM_TIM67_CR1_UDIS) |
-			(1 << STM_TIM67_CR1_CEN));
+	stm_systick.rvr = SYSTICK_RELOAD;
+	stm_systick.cvr = 0;
+	stm_systick.csr = ((1 << STM_SYSTICK_CSR_ENABLE) |
+			   (1 << STM_SYSTICK_CSR_TICKINT) |
+			   (STM_SYSTICK_CSR_CLKSOURCE_HCLK_8 << STM_SYSTICK_CSR_CLKSOURCE));
 }
+
+#endif
 
 void
 ao_clock_init(void)
@@ -266,6 +255,7 @@ ao_clock_init(void)
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
 
+#if DEBUG_THE_CLOCK
 	/* Output SYSCLK on PA8 for measurments */
 
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOAEN);
@@ -276,4 +266,5 @@ ao_clock_init(void)
 
 	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOPRE_DIV_1 << STM_RCC_CFGR_MCOPRE);
 	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOSEL_HSE << STM_RCC_CFGR_MCOSEL);
+#endif
 }

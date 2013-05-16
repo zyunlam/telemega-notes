@@ -16,6 +16,7 @@
  */
 
 #include "ao.h"
+#include "ao_task.h"
 
 __pdata uint16_t ao_cmd_lex_i;
 __pdata uint32_t ao_cmd_lex_u32;
@@ -28,8 +29,8 @@ static __xdata char	cmd_line[CMD_LEN];
 static __pdata uint8_t	cmd_len;
 static __pdata uint8_t	cmd_i;
 
-static void
-put_string(__code char *s)
+void
+ao_put_string(__code char *s)
 {
 	char	c;
 	while ((c = *s++))
@@ -39,7 +40,7 @@ put_string(__code char *s)
 static void
 backspace(void)
 {
-	put_string ("\010 \010");
+	ao_put_string ("\010 \010");
 }
 
 static void
@@ -47,7 +48,7 @@ readline(void)
 {
 	char c;
 	if (ao_echo())
-		put_string("> ");
+		ao_put_string("> ");
 	cmd_len = 0;
 	for (;;) {
 		flush();
@@ -108,6 +109,22 @@ putnibble(uint8_t v)
 		putchar(v + '0');
 	else
 		putchar(v + ('a' - 10));
+}
+
+uint8_t
+ao_getnibble(void)
+{
+	char	c;
+
+	c = getchar();
+	if ('0' <= c && c <= '9')
+		return c - '0';
+	if ('a' <= c && c <= 'f')
+		return c - ('a' - 10);
+	if ('A' <= c && c <= 'F')
+		return c - ('A' - 10);
+	ao_cmd_status = ao_cmd_lex_error;
+	return 0;
 }
 
 void
@@ -246,20 +263,39 @@ ao_reboot(void)
 	ao_panic(AO_PANIC_REBOOT);
 }
 
+#ifndef HAS_VERSION
+#define HAS_VERSION 1
+#endif
+
+#if HAS_VERSION
 static void
 version(void)
 {
-	printf("manufacturer     %s\n", ao_manufacturer);
-	printf("product          %s\n", ao_product);
-	printf("serial-number    %u\n", ao_serial_number);
-#if HAS_LOG
-	printf("log-format       %u\n", ao_log_format);
+	printf("manufacturer     %s\n"
+	       "product          %s\n"
+	       "serial-number    %u\n"
+#if HAS_FLIGHT
+	       "current-flight   %u\n"
 #endif
+#if HAS_LOG
+	       "log-format       %u\n"
+#endif
+	       , ao_manufacturer
+	       , ao_product
+	       , ao_serial_number
+#if HAS_FLIGHT
+	       , ao_flight_number
+#endif
+#if HAS_LOG
+	       , ao_log_format
+#endif
+		);
 #if HAS_MS5607
 	ao_ms5607_info();
 #endif
 	printf("software-version %s\n", ao_version);
 }
+#endif
 
 #ifndef NUM_CMDS
 #define NUM_CMDS	11
@@ -274,13 +310,21 @@ help(void)
 	__pdata uint8_t cmds;
 	__pdata uint8_t cmd;
 	__code struct ao_cmds * __pdata cs;
-	const char *h;
+	__code const char *h;
+	uint8_t e;
 
 	for (cmds = 0; cmds < ao_ncmds; cmds++) {
 		cs = ao_cmds[cmds];
 		for (cmd = 0; cs[cmd].func; cmd++) {
 			h = cs[cmd].help;
-			printf("%-45s %s\n", h, h + 1 + strlen(h));
+			ao_put_string(h);
+			e = strlen(h);
+			h += e + 1;
+			e = 45 - e;
+			while (e--)
+				putchar(' ');
+			ao_put_string(h);
+			putchar('\n');
 		}
 	}
 }
@@ -341,14 +385,33 @@ ao_cmd(void)
 	}
 }
 
+#if HAS_BOOT_LOADER
+
+#include <ao_boot.h>
+
+static void
+ao_loader(void)
+{
+	flush();
+	ao_boot_loader();
+}
+#endif
+
 __xdata struct ao_task ao_cmd_task;
 
 __code struct ao_cmds	ao_base_cmds[] = {
 	{ help,		"?\0Help" },
+#if HAS_TASK_INFO
 	{ ao_task_info,	"T\0Tasks" },
+#endif
 	{ echo,		"E <0 off, 1 on>\0Echo" },
 	{ ao_reboot,	"r eboot\0Reboot" },
+#if HAS_VERSION
 	{ version,	"v\0Version" },
+#endif
+#if HAS_BOOT_LOADER
+	{ ao_loader,	"X\0Switch to boot loader" },
+#endif
 	{ 0,	NULL },
 };
 

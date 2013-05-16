@@ -15,8 +15,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
+#include <ao.h>
 #include "stm32l.h"
 #include <string.h>
+#include <ao_boot.h>
 
 extern void main(void);
 extern char __stack__;
@@ -28,14 +30,26 @@ extern char __bss_start__, __bss_end__;
 
 void stm_halt_isr(void)
 {
-	for(;;);
+	ao_panic(AO_PANIC_CRASH);
 }
 
 void stm_ignore_isr(void)
 {
 }
 
-void start(void) {
+const void *stm_interrupt_vector[];
+
+void start(void)
+{
+#ifdef AO_BOOT_CHAIN
+	if (ao_boot_check_chain()) {
+#ifdef AO_BOOT_PIN
+		ao_boot_check_pin();
+#endif
+	}
+#endif
+	/* Set interrupt vector table offset */
+	stm_nvic.vto = (uint32_t) &stm_interrupt_vector;
 	memcpy(&__data_start__, &__text_end__, &__data_end__ - &__data_start__);
 	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);
 	main();

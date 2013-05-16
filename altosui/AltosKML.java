@@ -17,11 +17,8 @@
 
 package altosui;
 
-import java.lang.*;
 import java.io.*;
-import java.text.*;
-import java.util.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosKML implements AltosWriter {
 
@@ -29,6 +26,7 @@ public class AltosKML implements AltosWriter {
 	PrintStream		out;
 	int			state = -1;
 	AltosRecord		prev = null;
+	double			gps_start_altitude;
 
 	static final String[] kml_state_colors = {
 		"FF000000",
@@ -110,9 +108,15 @@ public class AltosKML implements AltosWriter {
 
 	void coord(AltosRecord record) {
 		AltosGPS	gps = record.gps;
+		double		altitude;
+
+		if (record.height() != AltosRecord.MISSING)
+			altitude = record.height() + gps_start_altitude;
+		else
+			altitude = gps.alt;
 		out.printf(kml_coord_fmt,
 			   gps.lon, gps.lat,
-			   record.filtered_altitude(), (double) gps.alt,
+			   altitude, (double) gps.alt,
 			   record.time, gps.nsat);
 	}
 
@@ -134,8 +138,6 @@ public class AltosKML implements AltosWriter {
 		if (gps == null)
 			return;
 
-		if ((record.seen & (AltosRecord.seen_flight)) == 0)
-			return;
 		if ((record.seen & (AltosRecord.seen_gps_lat)) == 0)
 			return;
 		if ((record.seen & (AltosRecord.seen_gps_lon)) == 0)
@@ -143,11 +145,9 @@ public class AltosKML implements AltosWriter {
 		if (!started) {
 			start(record);
 			started = true;
+			gps_start_altitude = gps.alt;
 		}
-		if (prev != null &&
-		    prev.gps.second == record.gps.second &&
-		    prev.gps.minute == record.gps.minute &&
-		    prev.gps.hour == record.gps.hour)
+		if (prev != null && prev.gps_sequence == record.gps_sequence)
 			return;
 		if (record.state != state) {
 			state = record.state;

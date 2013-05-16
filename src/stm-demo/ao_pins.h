@@ -60,12 +60,15 @@
 
 #define HAS_SPI_1		1
 #define SPI_1_PB3_PB4_PB5	1
+#define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
 
 #define HAS_SPI_2		0
 
 #define HAS_USB			1
 #define HAS_BEEP		0
 #define PACKET_HAS_SLAVE	0
+
+#define AO_BOOT_CHAIN		1
 
 #define LOW_LEVEL_DEBUG		1
 

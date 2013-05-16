@@ -22,47 +22,71 @@
 static uint8_t	ao_mpu6000_wake;
 static uint8_t	ao_mpu6000_configured;
 
-static void
-ao_mpu6000_write(uint8_t addr, uint8_t *data, uint8_t len)
-{
-	ao_i2c_get(AO_MPU6000_I2C_INDEX);
-	ao_i2c_start(AO_MPU6000_I2C_INDEX, MPU6000_ADDR_WRITE);
-	ao_i2c_send(&addr, 1, AO_MPU6000_I2C_INDEX, FALSE);
-	ao_i2c_send(data, len, AO_MPU6000_I2C_INDEX, TRUE);
-	ao_i2c_put(AO_MPU6000_I2C_INDEX);
-}
+#define ao_mpu6000_spi_get() 	ao_spi_get_bit(AO_MPU6000_SPI_CS_PORT,	\
+					       AO_MPU6000_SPI_CS_PIN,	\
+					       AO_MPU6000_SPI_CS,	\
+					       AO_MPU6000_SPI_BUS,	\
+					       AO_SPI_SPEED_1MHz)
+
+#define ao_mpu6000_spi_put() 	ao_spi_put_bit(AO_MPU6000_SPI_CS_PORT,	\
+					       AO_MPU6000_SPI_CS_PIN,	\
+					       AO_MPU6000_SPI_CS,	\
+					       AO_MPU6000_SPI_BUS)
+
 
 static void
 ao_mpu6000_reg_write(uint8_t addr, uint8_t value)
 {
 	uint8_t	d[2] = { addr, value };
+#ifdef AO_MPU6000_I2C_INDEX
 	ao_i2c_get(AO_MPU6000_I2C_INDEX);
 	ao_i2c_start(AO_MPU6000_I2C_INDEX, MPU6000_ADDR_WRITE);
 	ao_i2c_send(d, 2, AO_MPU6000_I2C_INDEX, TRUE);
 	ao_i2c_put(AO_MPU6000_I2C_INDEX);
+#else
+	ao_mpu6000_spi_get();
+	ao_spi_send(d, 2, AO_MPU6000_SPI_BUS);
+	ao_mpu6000_spi_put();
+#endif
 }
 
 static void
 ao_mpu6000_read(uint8_t addr, void *data, uint8_t len)
 {
+#ifdef AO_MPU6000_I2C_INDEX
 	ao_i2c_get(AO_MPU6000_I2C_INDEX);
 	ao_i2c_start(AO_MPU6000_I2C_INDEX, MPU6000_ADDR_WRITE);
 	ao_i2c_send(&addr, 1, AO_MPU6000_I2C_INDEX, FALSE);
 	ao_i2c_start(AO_MPU6000_I2C_INDEX, MPU6000_ADDR_READ);
 	ao_i2c_recv(data, len, AO_MPU6000_I2C_INDEX, TRUE);
 	ao_i2c_put(AO_MPU6000_I2C_INDEX);
+#else
+	addr |= 0x80;
+	ao_mpu6000_spi_get();
+	ao_spi_send(&addr, 1, AO_MPU6000_SPI_BUS);
+	ao_spi_recv(data, len, AO_MPU6000_SPI_BUS);
+	ao_mpu6000_spi_put();
+#endif
 }
 
 static uint8_t
 ao_mpu6000_reg_read(uint8_t addr)
 {
 	uint8_t	value;
+#ifdef AO_MPU6000_I2C_INDEX
 	ao_i2c_get(AO_MPU6000_I2C_INDEX);
 	ao_i2c_start(AO_MPU6000_I2C_INDEX, MPU6000_ADDR_WRITE);
 	ao_i2c_send(&addr, 1, AO_MPU6000_I2C_INDEX, FALSE);
 	ao_i2c_start(AO_MPU6000_I2C_INDEX, MPU6000_ADDR_READ);
 	ao_i2c_recv(&value, 1, AO_MPU6000_I2C_INDEX, TRUE);
 	ao_i2c_put(AO_MPU6000_I2C_INDEX);
+#else
+	addr |= 0x80;
+	ao_mpu6000_spi_get();
+	ao_spi_send(&addr, 1, AO_MPU6000_SPI_BUS);
+	ao_spi_recv(&value, 1, AO_MPU6000_SPI_BUS);
+	ao_mpu6000_spi_put();
+#endif
 	return value;
 }
 
@@ -199,6 +223,24 @@ ao_mpu6000_setup(void)
 	ao_delay(AO_MS_TO_TICKS(200));
 	ao_mpu6000_sample(&test_mode);
 
+#if TRIDGE
+	// read the product ID rev c has 1/2 the sensitivity of rev d
+    _mpu6000_product_id = _register_read(MPUREG_PRODUCT_ID);
+    //Serial.printf("Product_ID= 0x%x\n", (unsigned) _mpu6000_product_id);
+
+    if ((_mpu6000_product_id == MPU6000ES_REV_C4) || (_mpu6000_product_id == MPU6000ES_REV_C5) ||
+        (_mpu6000_product_id == MPU6000_REV_C4) || (_mpu6000_product_id == MPU6000_REV_C5)) {
+        // Accel scale 8g (4096 LSB/g)
+        // Rev C has different scaling than rev D
+        register_write(MPUREG_ACCEL_CONFIG,1<<3);
+    } else {
+        // Accel scale 8g (4096 LSB/g)
+        register_write(MPUREG_ACCEL_CONFIG,2<<3);
+    }
+    hal.scheduler->delay(1);
+
+#endif
+
 	/* Configure accelerometer to +/-16G */
 	ao_mpu6000_reg_write(MPU6000_ACCEL_CONFIG,
 			     (0 << MPU600_ACCEL_CONFIG_XA_ST) |
@@ -240,13 +282,15 @@ ao_mpu6000_setup(void)
 	ao_mpu6000_configured = 1;
 }
 
+struct ao_mpu6000_sample	ao_mpu6000_current;
+
 static void
 ao_mpu6000(void)
 {
 	ao_mpu6000_setup();
 	for (;;)
 	{
-		ao_mpu6000_sample((struct ao_mpu6000_sample *) &ao_data_ring[ao_data_head].mpu6000);
+		ao_mpu6000_sample(&ao_mpu6000_current);
 		ao_arch_critical(
 			AO_DATA_PRESENT(AO_DATA_MPU6000);
 			AO_DATA_WAIT();

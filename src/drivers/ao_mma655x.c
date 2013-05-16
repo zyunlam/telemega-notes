@@ -20,7 +20,7 @@
 
 #if HAS_MMA655X
 
-#if 1
+#if 0
 #define PRINTD(...) do { printf ("\r%5u %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); } while(0)
 #else
 #define PRINTD(...) 
@@ -238,11 +238,12 @@ ao_mma655x_setup(void)
 
 }
 
+uint16_t	ao_mma655x_current;
+
 static void
 ao_mma655x_dump(void)
 {
-	ao_mma655x_setup();
-	printf ("MMA655X value %d\n", ao_mma655x_value());
+	printf ("MMA655X value %d\n", ao_mma655x_current);
 }
 
 __code struct ao_cmds ao_mma655x_cmds[] = {
@@ -255,7 +256,7 @@ ao_mma655x(void)
 {
 	ao_mma655x_setup();
 	for (;;) {
-		ao_data_ring[ao_data_head].mma655x = ao_mma655x_value();
+		ao_mma655x_current = ao_mma655x_value();
 		ao_arch_critical(
 			AO_DATA_PRESENT(AO_DATA_MMA655X);
 			AO_DATA_WAIT();
@@ -273,7 +274,7 @@ ao_mma655x_init(void)
 	ao_cmd_register(&ao_mma655x_cmds[0]);
 	ao_spi_init_cs(AO_MMA655X_CS_PORT, (1 << AO_MMA655X_CS_PIN));
 
-//	ao_add_task(&ao_mma655x_task, ao_mma655x, "mma655x");
+	ao_add_task(&ao_mma655x_task, ao_mma655x, "mma655x");
 }
 
 #endif

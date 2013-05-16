@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.util.concurrent.TimeoutException;
 
@@ -27,38 +27,7 @@ class AltosMs5607Query extends AltosMs5607 {
 			if (line == null) {
 				throw new TimeoutException();
 			}
-			String[] items = line.split("\\s+");
-			if (line.startsWith("Pressure:")) {
-				if (items.length >= 2)
-					raw_pres = Integer.parseInt(items[1]);
-			} else if (line.startsWith("Temperature:")) {
-				if (items.length >= 2)
-					raw_temp = Integer.parseInt(items[1]);
-			} else if (line.startsWith("ms5607 reserved:")) {
-				if (items.length >= 3)
-					reserved = Integer.parseInt(items[2]);
-			} else if (line.startsWith("ms5607 sens:")) {
-				if (items.length >= 3)
-					sens = Integer.parseInt(items[2]);
-			} else if (line.startsWith("ms5607 off:")) {
-				if (items.length >= 3)
-					off = Integer.parseInt(items[2]);
-			} else if (line.startsWith("ms5607 tcs:")) {
-				if (items.length >= 3)
-					tcs = Integer.parseInt(items[2]);
-			} else if (line.startsWith("ms5607 tco:")) {
-				if (items.length >= 3)
-					tco = Integer.parseInt(items[2]);
-			} else if (line.startsWith("ms5607 tref:")) {
-				if (items.length >= 3)
-					tref = Integer.parseInt(items[2]);
-			} else if (line.startsWith("ms5607 tempsens:")) {
-				if (items.length >= 3)
-					tempsens = Integer.parseInt(items[2]);
-			} else if (line.startsWith("ms5607 crc:")) {
-				if (items.length >= 3)
-					crc = Integer.parseInt(items[2]);
-			} else if (line.startsWith("Altitude"))
+			if (!parse_line(line))
 				break;
 		}
 		convert();

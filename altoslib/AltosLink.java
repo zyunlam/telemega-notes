@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -249,6 +249,7 @@ public abstract class AltosLink implements Runnable {
 	public boolean monitor_mode = false;
 	public int telemetry = AltosLib.ao_telemetry_standard;
 	public double frequency;
+	public String callsign;
 	AltosConfigData	config_data;
 
 	private int telemetry_len() {
@@ -284,8 +285,8 @@ public abstract class AltosLink implements Runnable {
 		frequency = in_frequency;
 		config_data();
 		set_radio_frequency(frequency,
-				    config_data.radio_frequency != 0,
-				    config_data.radio_setting != 0,
+				    config_data.radio_frequency > 0,
+				    config_data.radio_setting > 0,
 				    config_data.radio_calibration);
 	}
 
@@ -330,6 +331,7 @@ public abstract class AltosLink implements Runnable {
 	}
 
 	public void set_callsign(String callsign) {
+		this.callsign = callsign;
 		printf ("c c %s\n", callsign);
 		flush_output();
 	}
@@ -339,10 +341,10 @@ public abstract class AltosLink implements Runnable {
 	public String name;
 
 	public void start_remote() throws TimeoutException, InterruptedException {
-		if (debug)
-			System.out.printf("start remote %7.3f\n", frequency);
 		if (frequency == 0.0)
 			frequency = AltosPreferences.frequency(serial);
+		if (debug)
+			System.out.printf("start remote %7.3f\n", frequency);
 		set_radio_frequency(frequency);
 		set_callsign(AltosPreferences.callsign());
 		printf("p\nE 0\n");
@@ -362,6 +364,64 @@ public abstract class AltosLink implements Runnable {
 		remote = false;
 	}
 
+	public int rssi() throws TimeoutException, InterruptedException {
+		if (remote)
+			return 0;
+		printf("s\n");
+		String line = get_reply_no_dialog(5000);
+		if (line == null)
+			throw new TimeoutException();
+		String[] items = line.split("\\s+");
+		if (items.length < 2)
+			return 0;
+		if (!items[0].equals("RSSI:"))
+			return 0;
+		int rssi = Integer.parseInt(items[1]);
+		return rssi;
+	}
+
+	public String[] adc() throws TimeoutException, InterruptedException {
+		printf("a\n");
+		for (;;) {
+			String line = get_reply_no_dialog(5000);
+			if (line == null) {
+				throw new TimeoutException();
+			}
+			if (!line.startsWith("tick:"))
+				continue;
+			String[] items = line.split("\\s+");
+			return items;
+		}
+	}
+
+	public boolean has_monitor_battery() {
+		return config_data.has_monitor_battery();
+	}
+
+	public double monitor_battery() {
+		int monitor_batt = AltosRecord.MISSING;
+
+		if (config_data.has_monitor_battery()) {
+			try {
+			String[] items = adc();
+			for (int i = 0; i < items.length;) {
+				if (items[i].equals("batt")) {
+					monitor_batt = Integer.parseInt(items[i+1]);
+					i += 2;
+					continue;
+				}
+				i++;
+			}
+			} catch (InterruptedException ie) {
+			} catch (TimeoutException te) {
+			}
+		}
+		if (monitor_batt == AltosRecord.MISSING)
+			return AltosRecord.MISSING;
+		return AltosConvert.cc_battery_to_voltage(monitor_batt);
+	}
+
 	public AltosLink() {
+		callsign = "";
 	}
 }

@@ -17,17 +17,12 @@
 
 package altosui;
 
-import java.lang.*;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import libaltosJNI.libaltos;
-import libaltosJNI.altos_device;
-import libaltosJNI.SWIGTYPE_p_altos_file;
-import libaltosJNI.SWIGTYPE_p_altos_list;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
 class AltosEepromItem implements ActionListener {
 	AltosEepromLog	log;
@@ -56,8 +51,8 @@ class AltosEepromItem implements ActionListener {
 	}
 }
 
-public class AltosEepromSelect extends AltosDialog implements ActionListener {
-	private JList			list;
+public class AltosEepromSelect extends AltosUIDialog implements ActionListener {
+	//private JList			list;
 	private JFrame			frame;
 	JButton				ok;
 	JButton				cancel;

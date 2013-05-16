@@ -15,13 +15,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 public class AltosTelemetryRecordRaw extends AltosTelemetryRecord {
 	int[]	bytes;
 	int	serial;
 	int	tick;
 	int	type;
+	int	rssi;
 
 	long	received_time;
 
@@ -53,21 +54,24 @@ public class AltosTelemetryRecordRaw extends AltosTelemetryRecord {
 		return AltosLib.string(bytes, off + 1, l);
 	}
 
-	public AltosTelemetryRecordRaw(int[] in_bytes) {
+	public AltosTelemetryRecordRaw(int[] in_bytes, int in_rssi) {
 		bytes = in_bytes;
 		serial = uint16(0);
 		tick   = uint16(2);
 		type   = uint8(4);
+		rssi   = in_rssi;
 	}
 
 	public AltosRecord update_state(AltosRecord previous) {
 		AltosRecord	next;
-		if (previous != null)
+
+		if (previous != null && previous.serial == serial)
 			next = previous.clone();
 		else
-			next = new AltosRecord();
+			next = new AltosRecordNone();
 		next.serial = serial;
 		next.tick = tick;
+		next.rssi = rssi;
 		return next;
 	}
 

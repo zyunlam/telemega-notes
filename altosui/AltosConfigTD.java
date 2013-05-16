@@ -17,20 +17,12 @@
 
 package altosui;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
 import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-
-import libaltosJNI.*;
-
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
 public class AltosConfigTD implements ActionListener {
 
@@ -323,7 +315,7 @@ public class AltosConfigTD implements ActionListener {
 		version = new string_ref("unknown");
 		product = new string_ref("unknown");
 
-		device = AltosDeviceDialog.show(owner, Altos.product_basestation);
+		device = AltosDeviceUIDialog.show(owner, Altos.product_basestation);
 		if (device != null) {
 			try {
 				serial_line = new AltosSerial(device);
@@ -344,11 +336,6 @@ public class AltosConfigTD implements ActionListener {
 							      String.format("Device \"%s\" already in use",
 									    device.toShortString()),
 							      "Device in use",
-							      JOptionPane.ERROR_MESSAGE);
-			} catch (IOException ee) {
-				JOptionPane.showMessageDialog(owner,
-							      device.toShortString(),
-							      ee.getLocalizedMessage(),
 							      JOptionPane.ERROR_MESSAGE);
 			}
 		}

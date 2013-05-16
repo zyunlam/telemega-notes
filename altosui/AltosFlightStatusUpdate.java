@@ -17,26 +17,21 @@
 
 package altosui;
 
-import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
-import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
-import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosFlightStatusUpdate implements ActionListener {
 
-	public AltosState	saved_state;
-	AltosFlightStatus	flightStatus;
+	public AltosState		saved_state;
+	public AltosListenerState	saved_listener_state;
+	AltosFlightStatus		flightStatus;
 
 	public void actionPerformed (ActionEvent e) {
-		if (saved_state != null)
-			flightStatus.show(saved_state, 0);
+		if (saved_state != null) {
+			if (saved_listener_state == null)
+				saved_listener_state = new AltosListenerState();
+			flightStatus.show(saved_state, saved_listener_state);
+		}
 	}
 
 	public AltosFlightStatusUpdate (AltosFlightStatus in_flightStatus) {

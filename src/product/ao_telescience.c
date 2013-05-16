@@ -16,6 +16,9 @@
  */
 
 #include "ao.h"
+#if HAS_ICP3_COUNT
+#include "ao_pwmin.h"
+#endif
 
 int
 main(void)
@@ -24,6 +27,8 @@ main(void)
 
 	PORTE |= (1 << 6);
 	DDRE |= (1 << 6);
+
+	ao_task_init();
 
 	ao_avr_stdio_init();
 	ao_timer_init();
@@ -34,6 +39,9 @@ main(void)
 	ao_usb_init();
 	ao_adc_init();
 	ao_log_single_init();
+#if HAS_ICP3_COUNT
+	ao_pwmin_init();
+#endif
 	ao_start_scheduler();
 	return 0;
 }

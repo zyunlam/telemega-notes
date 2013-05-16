@@ -18,10 +18,15 @@
 #include "ao.h"
 
 static char
-ao_packet_getchar(void) __critical
+ao_packet_getchar(void)
 {
-	char c;
-	while ((c = ao_packet_pollchar()) == AO_READ_AGAIN) {
+	int c;
+
+	/* No need to block interrupts in this function as
+	 * all packet variables are only modified from task
+	 * context, not an interrupt handler
+	 */
+	while ((c = _ao_packet_pollchar()) == AO_READ_AGAIN) {
 		if (!ao_packet_enable)
 			break;
 		if (ao_packet_master_sleeping)
@@ -35,7 +40,7 @@ ao_packet_getchar(void) __critical
 static void
 ao_packet_echo(void) __reentrant
 {
-	char	c;
+	int	c;
 	while (ao_packet_enable) {
 		c = ao_packet_getchar();
 		if (c != AO_READ_AGAIN)
@@ -140,7 +145,7 @@ ao_packet_forward(void) __reentrant
 static void
 ao_packet_signal(void)
 {
-	printf ("RSSI: %d\n", AO_RSSI_FROM_RADIO(ao_packet_last_rssi));
+	printf ("RSSI: %d\n", ao_radio_rssi);
 }
 
 __code struct ao_cmds ao_packet_master_cmds[] = {

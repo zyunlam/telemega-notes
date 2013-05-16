@@ -47,6 +47,8 @@ __xdata uint8_t ao_config_mutex;
 #define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 192 * (uint32_t) 1024)
 #endif
 #endif
+#define AO_CONFIG_DEFAULT_RADIO_POWER		0x60
+#define AO_CONFIG_DEFAULT_RADIO_AMP		0
 
 #if HAS_EEPROM
 static void
@@ -102,6 +104,7 @@ _ao_config_get(void)
 		ao_xmemset(&ao_config.callsign, '\0', sizeof (ao_config.callsign));
 		ao_xmemcpy(&ao_config.callsign, CODE_TO_XDATA(AO_CONFIG_DEFAULT_CALLSIGN),
 		       sizeof(AO_CONFIG_DEFAULT_CALLSIGN) - 1);
+		ao_config._legacy_radio_channel = 0;
 	}
 	minor = ao_config.minor;
 	if (minor != AO_CONFIG_MINOR) {
@@ -127,24 +130,38 @@ _ao_config_get(void)
 		if (minor < 6)
 			ao_config.pad_orientation = AO_CONFIG_DEFAULT_PAD_ORIENTATION;
 		if (minor < 8)
-			ao_config.radio_enable = TRUE;
+			ao_config.radio_enable = AO_RADIO_ENABLE_CORE;
 		if (minor < 9)
 			ao_xmemset(&ao_config.aes_key, '\0', AO_AES_LEN);
 		if (minor < 10)
-			ao_config.frequency = 434550;
+			ao_config.frequency = 434550 + ao_config._legacy_radio_channel * 100;
 		if (minor < 11)
 			ao_config.apogee_lockout = 0;
 #if AO_PYRO_NUM
 		if (minor < 12)
 			memset(&ao_config.pyro, '\0', sizeof (ao_config.pyro));
 #endif
+		if (minor < 13)
+			ao_config.aprs_interval = 0;
+#if HAS_RADIO_POWER
+		if (minor < 14)
+			ao_config.radio_power = AO_CONFIG_DEFAULT_RADIO_POWER;
+		#endif
+#if HAS_RADIO_AMP
+		if (minor  < 14)
+			ao_config.radio_amp = AO_CONFIG_DEFAULT_RADIO_AMP;
+#endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
 #if HAS_RADIO
 #if HAS_FORCE_FREQ
-	if (ao_force_freq)
+	if (ao_force_freq) {
 		ao_config.frequency = 434550;
+		ao_config.radio_cal = ao_radio_cal;
+		ao_xmemcpy(&ao_config.callsign, CODE_TO_XDATA(AO_CONFIG_DEFAULT_CALLSIGN),
+		       sizeof(AO_CONFIG_DEFAULT_CALLSIGN) - 1);
+	}
 #endif
 	ao_config_set_radio();
 #endif
@@ -203,6 +220,7 @@ ao_config_callsign_set(void) __reentrant
 }
 
 #if HAS_RADIO
+
 void
 ao_config_frequency_show(void) __reentrant
 {
@@ -220,7 +238,9 @@ ao_config_frequency_set(void) __reentrant
 	ao_config.frequency = ao_cmd_lex_u32;
 	ao_config_set_radio();
 	_ao_config_edit_finish();
+#if HAS_RADIO_RECV
 	ao_radio_recv_abort();
+#endif
 }
 #endif
 
@@ -493,6 +513,69 @@ ao_config_key_set(void) __reentrant
 }
 #endif
 
+#if HAS_APRS
+
+void
+ao_config_aprs_show(void)
+{
+	printf ("APRS interval: %d\n", ao_config.aprs_interval);
+}
+
+void
+ao_config_aprs_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.aprs_interval = ao_cmd_lex_i;
+	_ao_config_edit_finish();
+}
+
+#endif /* HAS_APRS */
+
+#if HAS_RADIO_AMP
+
+void
+ao_config_radio_amp_show(void)
+{
+	printf ("Radio amp setting: %d\n", ao_config.radio_amp);
+}
+
+void
+ao_config_radio_amp_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.radio_amp = ao_cmd_lex_i;
+	_ao_config_edit_finish();
+}
+
+#endif
+
+#if HAS_RADIO_POWER
+
+void
+ao_config_radio_power_show(void)
+{
+	printf ("Radio power setting: %d\n", ao_config.radio_power);
+}
+
+void
+ao_config_radio_power_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.radio_power = ao_cmd_lex_i;
+	_ao_config_edit_finish();
+}
+
+#endif
+
 struct ao_config_var {
 	__code char	*str;
 	void		(*set)(void) __reentrant;
@@ -524,15 +607,23 @@ __code struct ao_config_var ao_config_vars[] = {
 	  ao_config_callsign_set,	ao_config_callsign_show },
 	{ "e <0 disable, 1 enable>\0Enable telemetry and RDF",
 	  ao_config_radio_enable_set, ao_config_radio_enable_show },
+	{ "f <cal>\0Radio calib (cal = rf/(xtal/2^16))",
+	  ao_config_radio_cal_set,  	ao_config_radio_cal_show },
+#if HAS_RADIO_POWER
+	{ "p <setting>\0Radio power setting (0-255)",
+	  ao_config_radio_power_set,	ao_config_radio_power_show },
+#endif
+#if HAS_RADIO_AMP
+	{ "d <setting>\0Radio amplifier setting (0-3)",
+	  ao_config_radio_amp_set,	ao_config_radio_amp_show },
+#endif
 #endif /* HAS_RADIO */
 #if HAS_ACCEL
 	{ "a <+g> <-g>\0Accel calib (0 for auto)",
 	  ao_config_accel_calibrate_set,ao_config_accel_calibrate_show },
+	{ "o <0 antenna up, 1 antenna down>\0Set pad orientation",
+	  ao_config_pad_orientation_set,ao_config_pad_orientation_show },
 #endif /* HAS_ACCEL */
-#if HAS_RADIO
-	{ "f <cal>\0Radio calib (cal = rf/(xtal/2^16))",
-	  ao_config_radio_cal_set,  	ao_config_radio_cal_show },
-#endif /* HAS_RADIO */
 #if HAS_LOG
 	{ "l <size>\0Flight log size (kB)",
 	  ao_config_log_set,		ao_config_log_show },
@@ -541,10 +632,6 @@ __code struct ao_config_var ao_config_vars[] = {
 	{ "i <0 dual, 1 apogee, 2 main>\0Set igniter mode",
 	  ao_config_ignite_mode_set,	ao_config_ignite_mode_show },
 #endif
-#if HAS_ACCEL
-	{ "o <0 antenna up, 1 antenna down>\0Set pad orientation",
-	  ao_config_pad_orientation_set,ao_config_pad_orientation_show },
-#endif
 #if HAS_AES
 	{ "k <32 hex digits>\0Set AES encryption key",
 	  ao_config_key_set, ao_config_key_show },
@@ -552,6 +639,10 @@ __code struct ao_config_var ao_config_vars[] = {
 #if AO_PYRO_NUM
 	{ "P <n,?>\0Configure pyro channels",
 	  ao_pyro_set, ao_pyro_show },
+#endif
+#if HAS_APRS
+	{ "A <secs>\0APRS packet interval (0 disable)",
+	  ao_config_aprs_set, ao_config_aprs_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

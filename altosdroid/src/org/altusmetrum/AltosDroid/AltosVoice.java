@@ -21,7 +21,7 @@ package org.altusmetrum.AltosDroid;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosVoice {
 
@@ -38,7 +38,6 @@ public class AltosVoice {
 			public void onInit(int status) {
 				if (status == TextToSpeech.SUCCESS) tts_enabled = true;
 				if (tts_enabled) {
-					speak("AltosDroid ready");
 					idle_thread = new IdleThread();
 				}
 			}
@@ -67,7 +66,7 @@ public class AltosVoice {
 			speak(state.data.state());
 			if ((old_state == null || old_state.state <= AltosLib.ao_flight_boost) &&
 			    state.state > AltosLib.ao_flight_boost) {
-				speak(String.format("max speed: %d meters per second.", (int) (state.max_speed + 0.5)));
+				speak(String.format("max speed: %d meters per second.", (int) (state.max_speed() + 0.5)));
 				spoke = true;
 			} else if ((old_state == null || old_state.state < AltosLib.ao_flight_drogue) &&
 			           state.state >= AltosLib.ao_flight_drogue) {

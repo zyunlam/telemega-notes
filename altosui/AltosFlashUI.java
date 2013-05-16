@@ -21,16 +21,13 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
 import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
 public class AltosFlashUI
-	extends AltosDialog
+	extends AltosUIDialog
 	implements ActionListener
 {
 	Container	pane;
@@ -180,7 +177,7 @@ public class AltosFlashUI
 	}
 
 	boolean select_debug_dongle() {
-		debug_dongle = AltosDeviceDialog.show(frame, Altos.product_any);
+		debug_dongle = AltosDeviceUIDialog.show(frame, Altos.product_any);
 
 		if (debug_dongle == null)
 			return false;
@@ -218,15 +215,30 @@ public class AltosFlashUI
 		}
 	}
 
-	class flash_task implements Runnable {
+	class flash_task implements Runnable, AltosFlashListener {
 		AltosFlashUI	ui;
 		Thread		t;
 		AltosFlash	flash;
 
+		public void position(String in_s, int in_percent) {
+			final String s = in_s;
+			final int percent = in_percent;
+			Runnable r = new Runnable() {
+					public void run() {
+						try {
+							ui.actionPerformed(new ActionEvent(this,
+											   percent,
+											   s));
+						} catch (Exception ex) {
+						}
+					}
+				};
+			SwingUtilities.invokeLater(r);
+		}
+
 		public void run () {
 			try {
-				flash = new AltosFlash(ui.file, ui.debug_dongle);
-				flash.addActionListener(ui);
+				flash = new AltosFlash(ui.file, new AltosSerial(ui.debug_dongle), this);
 
 				final AltosRomconfig	current_config = flash.romconfig();
 

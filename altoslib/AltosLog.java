@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.io.*;
 import java.text.ParseException;
@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * This creates a thread to capture telemetry data and write it to
  * a log file
  */
-class AltosLog implements Runnable {
+public class AltosLog implements Runnable {
 
 	LinkedBlockingQueue<AltosLine>	input_queue;
 	LinkedBlockingQueue<String>	pending_queue;
@@ -45,7 +45,7 @@ class AltosLog implements Runnable {
 		}
 	}
 
-	void close() {
+	public void close() {
 		close_log_file();
 		if (log_thread != null) {
 			log_thread.interrupt();
@@ -53,7 +53,7 @@ class AltosLog implements Runnable {
 		}
 	}
 
-	File file() {
+	public File file() {
 		return file;
 	}
 
@@ -85,7 +85,7 @@ class AltosLog implements Runnable {
 					continue;
 				try {
 					AltosRecord	telem = AltosTelemetry.parse(line.line, previous);
-					if (telem.serial != 0 && telem.flight != 0 &&
+					if ((telem.seen & AltosRecord.seen_flight) != 0 &&
 					    (telem.serial != serial || telem.flight != flight || log_file == null))
 					{
 						close_log_file();

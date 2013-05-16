@@ -17,12 +17,12 @@
 
 package altosui;
 
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public interface AltosFlightDisplay {
 	void reset();
 
-	void show(AltosState state, int crc_errors);
+	void show(AltosState state, AltosListenerState listener_state);
 
 	void set_font();
 }

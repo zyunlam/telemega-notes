@@ -56,6 +56,11 @@ struct ao_ms5607_value {
 	int32_t		temp;	/* in °C * 100 */
 };
 
+extern struct ao_ms5607_sample	ao_ms5607_current;
+
+void
+ao_ms5607_setup(void);
+
 void
 ao_ms5607_init(void);
 

@@ -21,9 +21,22 @@
 /* ao_spi_stm.c
  */
 
-#define AO_SPI_SPEED_FAST	STM_SPI_CR1_BR_PCLK_4
+/* PCLK is set to 16MHz (HCLK 32MHz, APB prescaler 2) */
+
+#define AO_SPI_SPEED_8MHz	STM_SPI_CR1_BR_PCLK_2
+#define AO_SPI_SPEED_4MHz	STM_SPI_CR1_BR_PCLK_4
+#define AO_SPI_SPEED_2MHz	STM_SPI_CR1_BR_PCLK_8
 #define AO_SPI_SPEED_1MHz	STM_SPI_CR1_BR_PCLK_16
-#define AO_SPI_SPEED_200kHz	STM_SPI_CR1_BR_PCLK_256
+#define AO_SPI_SPEED_500kHz	STM_SPI_CR1_BR_PCLK_32
+#define AO_SPI_SPEED_250kHz	STM_SPI_CR1_BR_PCLK_64
+#define AO_SPI_SPEED_125kHz	STM_SPI_CR1_BR_PCLK_128
+#define AO_SPI_SPEED_62500Hz	STM_SPI_CR1_BR_PCLK_256
+
+#define AO_SPI_SPEED_FAST	AO_SPI_SPEED_8MHz
+
+/* Companion bus wants something no faster than 200kHz */
+
+#define AO_SPI_SPEED_200kHz	AO_SPI_SPEED_125kHz
 
 #define AO_SPI_CONFIG_1		0x00
 #define AO_SPI_1_CONFIG_PA5_PA6_PA7	AO_SPI_CONFIG_1
@@ -100,6 +113,19 @@ ao_spi_init(void);
 			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOEEN); \
 	} while (0)
 
+#define ao_disable_port(port) do {					\
+		if ((port) == &stm_gpioa)				\
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOAEN); \
+		else if ((port) == &stm_gpiob)				\
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOBEN); \
+		else if ((port) == &stm_gpioc)				\
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOCEN); \
+		else if ((port) == &stm_gpiod)				\
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIODEN); \
+		else if ((port) == &stm_gpioe)				\
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOEEN); \
+	} while (0)
+
 
 #define ao_gpio_set(port, bit, pin, v) stm_gpio_set(port, bit, v)
 
@@ -111,15 +137,19 @@ ao_spi_init(void);
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);\
 	} while (0)
 
-#define ao_enable_input(port,bit,mode) do {				\
-		ao_enable_port(port);					\
-		stm_moder_set(port, bit, STM_MODER_INPUT);		\
+#define ao_gpio_set_mode(port,bit,mode) do {				\
 		if (mode == AO_EXTI_MODE_PULL_UP)			\
 			stm_pupdr_set(port, bit, STM_PUPDR_PULL_UP);	\
 		else if (mode == AO_EXTI_MODE_PULL_DOWN)		\
 			stm_pupdr_set(port, bit, STM_PUPDR_PULL_DOWN);	\
 		else							\
 			stm_pupdr_set(port, bit, STM_PUPDR_NONE);	\
+	} while (0)
+	
+#define ao_enable_input(port,bit,mode) do {				\
+		ao_enable_port(port);					\
+		stm_moder_set(port, bit, STM_MODER_INPUT);		\
+		ao_gpio_set_mode(port, bit, mode);			\
 	} while (0)
 
 #define ao_enable_cs(port,bit) do {				\
@@ -196,5 +226,142 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t i2c_index, uint8_t stop);
 
 void
 ao_i2c_init(void);
+
+/* ao_serial_stm.c */
+struct ao_stm_usart {
+	struct ao_fifo		rx_fifo;
+	struct ao_fifo		tx_fifo;
+	struct stm_usart	*reg;
+	uint8_t			tx_started;
+};
+
+#if HAS_SERIAL_1
+extern struct ao_stm_usart	ao_stm_usart1;
+#endif
+
+#if HAS_SERIAL_2
+extern struct ao_stm_usart	ao_stm_usart2;
+#endif
+
+#if HAS_SERIAL_3
+extern struct ao_stm_usart	ao_stm_usart3;
+#endif
+
+#define ARM_PUSH32(stack, val)	(*(--(stack)) = (val))
+
+static inline uint32_t
+ao_arch_irqsave(void) {
+	uint32_t	primask;
+	asm("mrs %0,primask" : "=&r" (primask));
+	ao_arch_block_interrupts();
+	return primask;
+}
+
+static inline void
+ao_arch_irqrestore(uint32_t primask) {
+	asm("msr primask,%0" : : "r" (primask));
+}
+
+static inline void
+ao_arch_memory_barrier() {
+	asm volatile("" ::: "memory");
+}
+
+#if HAS_TASK
+static inline void
+ao_arch_init_stack(struct ao_task *task, void *start)
+{
+	uint32_t	*sp = (uint32_t *) (task->stack + AO_STACK_SIZE);
+	uint32_t	a = (uint32_t) start;
+	int		i;
+
+	/* Return address (goes into LR) */
+	ARM_PUSH32(sp, a);
+
+	/* Clear register values r0-r12 */
+	i = 13;
+	while (i--)
+		ARM_PUSH32(sp, 0);
+
+	/* APSR */
+	ARM_PUSH32(sp, 0);
+
+	/* PRIMASK with interrupts enabled */
+	ARM_PUSH32(sp, 0);
+
+	task->sp = sp;
+}
+
+static inline void ao_arch_save_regs(void) {
+	/* Save general registers */
+	asm("push {r0-r12,lr}\n");
+
+	/* Save APSR */
+	asm("mrs r0,apsr");
+	asm("push {r0}");
+
+	/* Save PRIMASK */
+	asm("mrs r0,primask");
+	asm("push {r0}");
+}
+
+static inline void ao_arch_save_stack(void) {
+	uint32_t	*sp;
+	asm("mov %0,sp" : "=&r" (sp) );
+	ao_cur_task->sp = (sp);
+	if ((uint8_t *) sp < &ao_cur_task->stack[0])
+		ao_panic (AO_PANIC_STACK);
+}
+
+static inline void ao_arch_restore_stack(void) {
+	uint32_t	sp;
+	sp = (uint32_t) ao_cur_task->sp;
+
+	/* Switch stacks */
+	asm("mov sp, %0" : : "r" (sp) );
+
+	/* Restore PRIMASK */
+	asm("pop {r0}");
+	asm("msr primask,r0");
+
+	/* Restore APSR */
+	asm("pop {r0}");
+	asm("msr apsr,r0");
+
+	/* Restore general registers */
+	asm("pop {r0-r12,lr}\n");
+
+	/* Return to calling function */
+	asm("bx lr");
+}
+
+#define HAS_ARCH_START_SCHEDULER	1
+
+static inline void ao_arch_start_scheduler(void) {
+	uint32_t	sp;
+	uint32_t	control;
+
+	asm("mrs %0,msp" : "=&r" (sp));
+	asm("msr psp,%0" : : "r" (sp));
+	asm("mrs %0,control" : "=&r" (control));
+	control |= (1 << 1);
+	asm("msr control,%0" : : "r" (control));
+}
+
+#define ao_arch_isr_stack()
+
+#endif
+
+#define ao_arch_wait_interrupt() do {			\
+		asm(".global ao_idle_loc\n\twfi\nao_idle_loc:");	\
+		ao_arch_release_interrupts();				\
+		ao_arch_block_interrupts();				\
+	} while (0)
+
+#define ao_arch_critical(b) do {				\
+		ao_arch_block_interrupts();			\
+		do { b } while (0);				\
+		ao_arch_release_interrupts();			\
+	} while (0)
 
 #endif /* _AO_ARCH_FUNCS_H_ */

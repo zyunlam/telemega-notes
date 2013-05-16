@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosLib;
+package org.altusmetrum.altoslib_1;
 
 import java.text.*;
 
@@ -257,9 +257,9 @@ public class AltosTelemetryRecordLegacy extends AltosTelemetryRecord {
 		record.accel_minus_g = map.get_int(AO_TELEM_CAL_ACCEL_MINUS, AltosRecord.MISSING);
 
 		/* flight computer values */
-		record.acceleration = map.get_double(AO_TELEM_KALMAN_ACCEL, AltosRecord.MISSING, 1/16.0);
-		record.speed = map.get_double(AO_TELEM_KALMAN_SPEED, AltosRecord.MISSING, 1/16.0);
-		record.height = map.get_int(AO_TELEM_KALMAN_HEIGHT, AltosRecord.MISSING);
+		record.kalman_acceleration = map.get_double(AO_TELEM_KALMAN_ACCEL, AltosRecord.MISSING, 1/16.0);
+		record.kalman_speed = map.get_double(AO_TELEM_KALMAN_SPEED, AltosRecord.MISSING, 1/16.0);
+		record.kalman_height = map.get_int(AO_TELEM_KALMAN_HEIGHT, AltosRecord.MISSING);
 
 		record.flight_accel = map.get_int(AO_TELEM_ADHOC_ACCEL, AltosRecord.MISSING);
 		record.flight_vel = map.get_int(AO_TELEM_ADHOC_SPEED, AltosRecord.MISSING);
@@ -267,7 +267,7 @@ public class AltosTelemetryRecordLegacy extends AltosTelemetryRecord {
 
 		if (map.has(AO_TELEM_GPS_STATE)) {
 		record.gps = new AltosGPS(map);
-		record.new_gps = true;
+		record.gps_sequence++;
 		}
 		else
 		record.gps = null;
@@ -334,9 +334,9 @@ public class AltosTelemetryRecordLegacy extends AltosTelemetryRecord {
 
 		/* Old TeleDongle code with kalman-reporting TeleMetrum code */
 		if ((record.flight_vel & 0xffff0000) == 0x80000000) {
-			record.speed = ((short) record.flight_vel) / 16.0;
-			record.acceleration = record.flight_accel / 16.0;
-			record.height = record.flight_pres;
+			record.kalman_speed = ((short) record.flight_vel) / 16.0;
+			record.kalman_acceleration = record.flight_accel / 16.0;
+			record.kalman_height = record.flight_pres;
 			record.flight_vel = AltosRecord.MISSING;
 			record.flight_pres = AltosRecord.MISSING;
 			record.flight_accel = AltosRecord.MISSING;
@@ -357,7 +357,7 @@ public class AltosTelemetryRecordLegacy extends AltosTelemetryRecord {
 		}
 
 		record.gps = new AltosGPS(words, i, record.version);
-		record.new_gps = true;
+		record.gps_sequence++;
 	}
 
 	public AltosTelemetryRecordLegacy(String line) throws ParseException, AltosCRCException {
@@ -455,9 +455,9 @@ public class AltosTelemetryRecordLegacy extends AltosTelemetryRecord {
 		record.accel_minus_g = int16(19);
 
 		if (uint16(11) == 0x8000) {
-			record.acceleration = int16(5);
-			record.speed = int16(9);
-			record.height = int16(13);
+			record.kalman_acceleration = int16(5);
+			record.kalman_speed = int16(9);
+			record.kalman_height = int16(13);
 			record.flight_accel = AltosRecord.MISSING;
 			record.flight_vel = AltosRecord.MISSING;
 			record.flight_pres = AltosRecord.MISSING;
@@ -465,9 +465,9 @@ public class AltosTelemetryRecordLegacy extends AltosTelemetryRecord {
 			record.flight_accel = int16(5);
 			record.flight_vel = uint32(9);
 			record.flight_pres = int16(13);
-			record.acceleration = AltosRecord.MISSING;
-			record.speed = AltosRecord.MISSING;
-			record.height = AltosRecord.MISSING;
+			record.kalman_acceleration = AltosRecord.MISSING;
+			record.kalman_speed = AltosRecord.MISSING;
+			record.kalman_height = AltosRecord.MISSING;
 		}
 
 		record.gps = null;
@@ -476,7 +476,7 @@ public class AltosTelemetryRecordLegacy extends AltosTelemetryRecord {
 
 		if ((gps_flags & (AO_GPS_VALID|AO_GPS_RUNNING)) != 0) {
 			record.gps = new AltosGPS();
-			record.new_gps = true;
+			record.gps_sequence++;
 
 			record.seen |= AltosRecord.seen_gps_time | AltosRecord.seen_gps_lat | AltosRecord.seen_gps_lon;
 			record.gps.nsat = (gps_flags & AO_GPS_NUM_SAT_MASK);

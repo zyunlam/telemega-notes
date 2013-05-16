@@ -17,6 +17,7 @@ INC = \
 #
 ALTOS_SRC = \
 	ao_interrupt.c \
+	ao_boot_chain.c \
 	ao_product.c \
 	ao_romconfig.c \
 	ao_cmd.c \
@@ -44,19 +45,21 @@ PRODUCT=StmDemo-v0.0
 PRODUCT_DEF=-DSTM_DEMO
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) -g -O0
+CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) -g -Os
 
-PROG=stm-demo
+PROG=stm-demo-$(VERSION)
+ELF=$(PROG).elf
+IHX=$(PROG).ihx
 
 SRC=$(ALTOS_SRC) ao_demo.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(ELF) $(IHX)
 
 LDFLAGS=-L../stm -Wl,-Taltos.ld
 
-$(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(SAT_CLIB) -lgcc
+$(ELF): Makefile $(OBJ)
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $@ $(OBJ) $(SAT_CLIB) -lgcc
 
 ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@

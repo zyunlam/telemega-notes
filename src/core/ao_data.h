@@ -52,6 +52,8 @@
 #define AO_DATA_MMA655X 0
 #endif
 
+#ifdef AO_DATA_RING
+
 #define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X)
 
 struct ao_data {
@@ -65,6 +67,9 @@ struct ao_data {
 #endif
 #if HAS_MPU6000
 	struct ao_mpu6000_sample	mpu6000;
+#if !HAS_MMA655X
+	int16_t				z_accel;
+#endif
 #endif
 #if HAS_HMC5883
 	struct ao_hmc5883_sample	hmc5883;
@@ -85,14 +90,7 @@ extern volatile __data uint8_t		ao_data_count;
 /*
  * Mark a section of data as ready, check for data complete
  */
-#define AO_DATA_PRESENT(bit)	do {					\
-		if ((ao_data_present |= (bit)) == AO_DATA_ALL) {	\
-			ao_data_ring[ao_data_head].tick = ao_tick_count; \
-			ao_data_head = ao_data_ring_next(ao_data_head); \
-			ao_data_present = 0;				\
-			ao_wakeup((void *) &ao_data_head);		\
-		}							\
-	} while (0);
+#define AO_DATA_PRESENT(bit)	(ao_data_present |= (bit))
 
 /*
  * Wait until it is time to write a sensor sample; this is
@@ -102,6 +100,8 @@ extern volatile __data uint8_t		ao_data_count;
 		ao_sleep((void *) &ao_data_count);	\
 	} while (0)
 
+#endif /* AO_DATA_RING */
+
 #if !HAS_BARO && HAS_MS5607
 
 /* Either an MS5607 or an MS5611 hooked to a SPI port
@@ -110,7 +110,12 @@ extern volatile __data uint8_t		ao_data_count;
 #define HAS_BARO	1
 
 typedef int32_t	pres_t;
-typedef int32_t alt_t;
+
+#ifndef AO_ALT_TYPE
+#define AO_ALT_TYPE	int32_t
+#endif
+
+typedef AO_ALT_TYPE	alt_t;
 
 #define ao_data_pres_cook(packet)	ao_ms5607_convert(&packet->ms5607_raw, &packet->ms5607_cooked)
 
@@ -133,6 +138,10 @@ typedef int16_t alt_t;
 #define pres_to_altitude(p)	ao_pres_to_altitude(p)
 #define ao_data_pres_cook(p)
 
+#endif
+
+#if !HAS_BARO
+typedef int16_t alt_t;
 #endif
 
 /*
@@ -272,10 +281,31 @@ typedef int16_t accel_t;
 typedef int16_t accel_t;
 
 /* MPU6000 is hooked up so that positive y is positive acceleration */
-#define ao_data_accel(packet)			((packet)->mpu6000.accel_y)
+#define ao_data_accel(packet)			((packet)->z_accel)
 #define ao_data_accel_cook(packet)		(-(packet)->mpu6000.accel_y)
-#define ao_data_set_accel(packet, accel)	((packet)->mpu6000.accel_y = (accel))
+#define ao_data_set_accel(packet, accel)	((packet)->z_accel = (accel))
 #define ao_data_accel_invert(a)			(-(a))
+
+#endif
+
+#if !HAS_GYRO && HAS_MPU6000
+
+#define HAS_GYRO	1
+
+typedef int16_t	gyro_t;
+typedef int32_t angle_t;
+
+/* Y axis is aligned with the direction of motion (along) */
+/* X axis is aligned in the other board axis (across) */
+/* Z axis is aligned perpendicular to the board (through) */
+
+#define ao_data_along(packet)	((packet)->mpu6000.accel_y)
+#define ao_data_across(packet)	((packet)->mpu6000.accel_x)
+#define ao_data_through(packet)	((packet)->mpu6000.accel_z)
+
+#define ao_data_roll(packet)	((packet)->mpu6000.gyro_y)
+#define ao_data_pitch(packet)	((packet)->mpu6000.gyro_x)
+#define ao_data_yaw(packet)	((packet)->mpu6000.gyro_z)
 
 #endif
 

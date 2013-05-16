@@ -187,7 +187,7 @@ static __code uint8_t radio_setup[] = {
 				 RF_BSCFG_BS_POST_KI_PRE_KI|
 				 RF_BSCFG_BS_POST_KP_PRE_KP|
 				 RF_BSCFG_BS_LIMIT_0),
-	RF_AGCCTRL2_OFF,	0x43,
+	RF_AGCCTRL2_OFF,	0x03,
 	RF_AGCCTRL1_OFF,	0x40,
 	RF_AGCCTRL0_OFF,	0x91,
 
@@ -248,6 +248,18 @@ __xdata uint8_t ao_radio_dma_done;
 __xdata uint8_t ao_radio_done;
 __xdata uint8_t ao_radio_abort;
 __xdata uint8_t ao_radio_mutex;
+
+#if PACKET_HAS_MASTER || HAS_AES
+#define NEED_RADIO_RSSI 1
+#endif
+
+#ifndef NEED_RADIO_RSSI
+#define NEED_RADIO_RSSI 0
+#endif
+
+#if NEED_RADIO_RSSI
+__xdata int8_t ao_radio_rssi;
+#endif
 
 void
 ao_radio_general_isr(void) __interrupt 16
@@ -322,7 +334,7 @@ ao_radio_send(__xdata void *packet, uint8_t size) __reentrant
 }
 
 uint8_t
-ao_radio_recv(__xdata void *packet, uint8_t size) __reentrant
+ao_radio_recv(__xdata void *packet, uint8_t size, uint8_t timeout) __reentrant
 {
 	ao_radio_abort = 0;
 	ao_radio_get(size - 2);
@@ -342,9 +354,13 @@ ao_radio_recv(__xdata void *packet, uint8_t size) __reentrant
 	/* Wait for DMA to be done, for the radio receive process to
 	 * get aborted or for a receive timeout to fire
 	 */
+	if (timeout)
+		ao_alarm(timeout);
 	__critical while (!ao_radio_dma_done && !ao_radio_abort)
 			   if (ao_sleep(&ao_radio_dma_done))
 				   break;
+	if (timeout)
+		ao_clear_alarm();
 
 	/* If recv was aborted, clean up by stopping the DMA engine
 	 * and idling the radio
@@ -352,7 +368,14 @@ ao_radio_recv(__xdata void *packet, uint8_t size) __reentrant
 	if (!ao_radio_dma_done) {
 		ao_dma_abort(ao_radio_dma);
 		ao_radio_idle();
+#if NEED_RADIO_RSSI
+		ao_radio_rssi = 0;
+#endif
 	}
+#if NEED_RADIO_RSSI
+	else
+		ao_radio_rssi = AO_RSSI_FROM_RADIO(((uint8_t *)packet)[size - 1]);
+#endif
 	ao_radio_put();
 	return ao_radio_dma_done;
 }

@@ -20,14 +20,8 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
 import java.io.*;
-import java.util.*;
-import java.text.*;
-import java.util.prefs.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
 
 public class AltosLanded extends JComponent implements AltosFlightDisplay, ActionListener {
 	GridBagLayout	layout;
@@ -35,7 +29,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	public class LandedValue {
 		JLabel		label;
 		JTextField	value;
-		void show(AltosState state, int crc_errors) {}
+		void show(AltosState state, AltosListenerState listener_state) {}
 
 		void reset() {
 			value.setText("");
@@ -108,7 +102,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	}
 
 	class Lat extends LandedValue {
-		void show (AltosState state, int crc_errors) {
+		void show (AltosState state, AltosListenerState listener_state) {
 			if (state.gps != null && state.gps.connected)
 				show(pos(state.gps.lat,"N", "S"));
 			else
@@ -122,7 +116,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	Lat lat;
 
 	class Lon extends LandedValue {
-		void show (AltosState state, int crc_errors) {
+		void show (AltosState state, AltosListenerState listener_state) {
 			show();
 			if (state.gps != null && state.gps.connected)
 				show(pos(state.gps.lon,"E", "W"));
@@ -137,7 +131,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	Lon lon;
 
 	class Bearing extends LandedValue {
-		void show (AltosState state, int crc_errors) {
+		void show (AltosState state, AltosListenerState listener_state) {
 			show();
 			if (state.from_pad != null)
 				show("%3.0f°", state.from_pad.bearing);
@@ -152,7 +146,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	Bearing bearing;
 
 	class Distance extends LandedValue {
-		void show (AltosState state, int crc_errors) {
+		void show (AltosState state, AltosListenerState listener_state) {
 			show();
 			if (state.from_pad != null)
 				show(AltosConvert.distance, state.from_pad.distance);
@@ -167,7 +161,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	Distance distance;
 
 	class Height extends LandedValue {
-		void show (AltosState state, int crc_errors) {
+		void show (AltosState state, AltosListenerState listener_state) {
 			show(AltosConvert.height, state.max_height);
 		}
 		public Height (GridBagLayout layout, int y) {
@@ -178,8 +172,8 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	Height	height;
 
 	class Speed extends LandedValue {
-		void show (AltosState state, int crc_errors) {
-			show(AltosConvert.speed, state.max_speed);
+		void show (AltosState state, AltosListenerState listener_state) {
+			show(AltosConvert.speed, state.max_speed());
 		}
 		public Speed (GridBagLayout layout, int y) {
 			super (layout, y, "Maximum Speed");
@@ -189,7 +183,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	Speed	speed;
 
 	class Accel extends LandedValue {
-		void show (AltosState state, int crc_errors) {
+		void show (AltosState state, AltosListenerState listener_state) {
 			show(AltosConvert.accel, state.max_acceleration);
 		}
 		public Accel (GridBagLayout layout, int y) {
@@ -219,21 +213,21 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 		accel.set_font();
 	}
 
-	public void show(AltosState state, int crc_errors) {
+	public void show(AltosState state, AltosListenerState listener_state) {
 		if (state.gps != null && state.gps.connected) {
-			bearing.show(state, crc_errors);
-			distance.show(state, crc_errors);
-			lat.show(state, crc_errors);
-			lon.show(state, crc_errors);
+			bearing.show(state, listener_state);
+			distance.show(state, listener_state);
+			lat.show(state, listener_state);
+			lon.show(state, listener_state);
 		} else {
 			bearing.hide();
 			distance.hide();
 			lat.hide();
 			lon.hide();
 		}
-		height.show(state, crc_errors);
-		speed.show(state, crc_errors);
-		accel.show(state, crc_errors);
+		height.show(state, listener_state);
+		speed.show(state, listener_state);
+		accel.show(state, listener_state);
 		if (reader.backing_file() != null)
 			graph.setEnabled(true);
 	}
@@ -256,11 +250,14 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 					} else if (filename.endsWith("telem")) {
 						FileInputStream in = new FileInputStream(file);
 						records = new AltosTelemetryIterable(in);
+					} else if (filename.endsWith("mega")) {
+						FileInputStream in = new FileInputStream(file);
+						records = new AltosEepromMegaIterable(in);
 					} else {
 						throw new FileNotFoundException(filename);
 					}
 					try {
-						new AltosGraphUI(records, filename);
+						new AltosGraphUI(records, file);
 					} catch (InterruptedException ie) {
 					} catch (IOException ie) {
 					}
@@ -272,6 +269,10 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 				}
 			}
 		}
+	}
+
+	public String getName() {
+		return "Landed";
 	}
 
 	public AltosLanded(AltosFlightReader in_reader) {

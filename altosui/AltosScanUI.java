@@ -20,15 +20,13 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.*;
 import javax.swing.event.*;
 import java.io.*;
 import java.util.*;
 import java.text.*;
-import java.util.prefs.*;
 import java.util.concurrent.*;
-import org.altusmetrum.AltosLib.*;
+import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altosuilib_1.*;
 
 class AltosScanResult {
 	String		callsign;
@@ -124,7 +122,7 @@ class AltosScanResults extends LinkedList<AltosScanResult> implements ListModel 
 }
 
 public class AltosScanUI
-	extends AltosDialog
+	extends AltosUIDialog
 	implements ActionListener
 {
 	AltosUI				owner;
@@ -330,7 +328,7 @@ public class AltosScanUI
 	}
 
 	private boolean open() {
-		device = AltosDeviceDialog.show(owner, Altos.product_basestation);
+		device = AltosDeviceUIDialog.show(owner, Altos.product_basestation);
 		if (device == null)
 			return false;
 		try {

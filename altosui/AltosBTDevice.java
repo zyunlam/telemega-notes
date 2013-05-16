@@ -16,9 +16,8 @@
  */
 
 package altosui;
-import java.lang.*;
-import java.util.*;
 import libaltosJNI.*;
+import org.altusmetrum.altosuilib_1.*;
 
 public class AltosBTDevice extends altos_bt_device implements AltosDevice {
 
@@ -79,11 +78,13 @@ public class AltosBTDevice extends altos_bt_device implements AltosDevice {
 		return libaltos.altos_bt_open(this);
 	}
 
+	/*
 	private boolean isAltusMetrum() {
 		if (getName().startsWith(Altos.bt_product_telebt))
 			return true;
 		return false;
 	}
+	*/
 
 	public boolean matchProduct(int want_product) {
 

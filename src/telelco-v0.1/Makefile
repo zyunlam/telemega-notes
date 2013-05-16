@@ -30,6 +30,7 @@ INC = \
 #PROFILE_DEF=-DAO_PROFILE=1
 
 ALTOS_SRC = \
+	ao_boot_chain.c \
 	ao_interrupt.c \
 	ao_product.c \
 	ao_romconfig.c \
@@ -61,7 +62,7 @@ ALTOS_SRC = \
 	ao_radio_cmac_cmd.c
 
 PRODUCT=TeleLCO-v0.1
-PRODUCT_DEF=-DMEGAMETRUM
+PRODUCT_DEF=-DTELEMEGA
 IDPRODUCT=0x0023
 
 CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) -Os -g

@@ -43,7 +43,7 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TINY		2	/* two byte state/baro records */
 #define AO_LOG_FORMAT_TELEMETRY		3	/* 32 byte ao_telemetry records */
 #define AO_LOG_FORMAT_TELESCIENCE	4	/* 32 byte typed telescience records */
-#define AO_LOG_FORMAT_MEGAMETRUM	5	/* 32 byte typed megametrum records */
+#define AO_LOG_FORMAT_TELEMEGA		5	/* 32 byte typed telemega records */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 extern __code uint8_t ao_log_format;
@@ -138,17 +138,17 @@ ao_log_full(void);
 #define AO_LOG_POS_NONE		(~0UL)
 
 struct ao_log_record {
-	char			type;
-	uint8_t			csum;
-	uint16_t		tick;
+	char			type;				/* 0 */
+	uint8_t			csum;				/* 1 */
+	uint16_t		tick;				/* 2 */
 	union {
 		struct {
-			int16_t		ground_accel;
-			uint16_t	flight;
+			int16_t		ground_accel;		/* 4 */
+			uint16_t	flight;			/* 6 */
 		} flight;
 		struct {
-			int16_t		accel;
-			int16_t		pres;
+			int16_t		accel;			/* 4 */
+			int16_t		pres;			/* 6 */
 		} sensor;
 		struct {
 			int16_t		temp;
@@ -197,16 +197,24 @@ struct ao_log_mega {
 	uint8_t			csum;			/* 1 */
 	uint16_t		tick;			/* 2 */
 	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
 		struct {
-			uint16_t	flight;		/* 4 */
-			int16_t		ground_accel;	/* 6 */
-			uint32_t	ground_pres;	/* 8 */
-			uint32_t	ground_temp;	/* 12 */
-		} flight;				/* 16 */
+			uint16_t	flight;			/* 4 */
+			int16_t		ground_accel;		/* 6 */
+			uint32_t	ground_pres;		/* 8 */
+			int16_t		ground_accel_along;	/* 16 */
+			int16_t		ground_accel_across;	/* 12 */
+			int16_t		ground_accel_through;	/* 14 */
+			int16_t		ground_roll;		/* 18 */
+			int16_t		ground_pitch;		/* 20 */
+			int16_t		ground_yaw;		/* 22 */
+		} flight;					/* 24 */
+		/* AO_LOG_STATE */
 		struct {
 			uint16_t	state;
 			uint16_t	reason;
 		} state;
+		/* AO_LOG_SENSOR */
 		struct {
 			uint32_t	pres;		/* 4 */
 			uint32_t	temp;		/* 8 */
@@ -221,12 +229,14 @@ struct ao_log_mega {
 			int16_t		mag_z;		/* 28 */
 			int16_t		accel;		/* 30 */
 		} sensor;	/* 32 */
+		/* AO_LOG_TEMP_VOLT */
 		struct {
 			int16_t		v_batt;		/* 4 */
 			int16_t		v_pbatt;	/* 6 */
 			int16_t		n_sense;	/* 8 */
 			int16_t		sense[10];	/* 10 */
 		} volt;					/* 30 */
+		/* AO_LOG_GPS_TIME */
 		struct {
 			int32_t		latitude;	/* 4 */
 			int32_t		longitude;	/* 8 */
@@ -240,6 +250,7 @@ struct ao_log_mega {
 			uint8_t		day;		/* 20 */
 			uint8_t		pad;		/* 21 */
 		} gps;	/* 22 */
+		/* AO_LOG_GPS_SAT */
 		struct {
 			uint16_t	channels;	/* 4 */
 			struct {
@@ -256,5 +267,8 @@ ao_log_data(__xdata struct ao_log_record *log) __reentrant;
 
 uint8_t
 ao_log_mega(__xdata struct ao_log_mega *log) __reentrant;
+
+void
+ao_log_flush(void);
 
 #endif /* _AO_LOG_H_ */
