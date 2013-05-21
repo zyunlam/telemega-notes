@@ -1,8 +1,128 @@
+commit 5a329c7f588334df7443b47c8f478ebadf312f62
+Merge: 9b13822 03fe10e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue May 21 09:31:48 2013 -0600
+
+    Merge branch 'branch-1.2' of ssh://git.gag.com/scm/git/fw/altos into branch-1.2
+
+commit 9b138221283f0b8e8df5a799f75d73fd456028a0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue May 21 09:29:30 2013 -0600
+
+    update changelog for 1.2.1 release
+
 commit 6f51726b1c04940c5be3b6f320d6aa529afff9ca
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue May 21 09:28:53 2013 -0600
 
     update configure.ac to reflect version 1.2.1
+
+commit 03fe10efd307da10e35c5f6a46f0c8b1a3888c57
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 20 21:41:01 2013 -0700
+
+    doc: Update description of graph window to note new tabs (config and map)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db9ea188aebe5299f46bbd4fca5317c1bc95f3f5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 20 21:37:20 2013 -0700
+
+    Create release notes for 1.2.1
+    
+    Move most of the 1.2 content to the 1.2.1 block
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 51f2c4ce2692ee3e898b4e94232c45a608932c15
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 19 20:35:42 2013 -0700
+
+    altos/telemega: The last two igniters are apogee and main
+    
+    Not the first two. TeleMega v0.3 has these marked on the silk
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8d40c37bae0c58037f267e54de40071cd19c931d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 17 03:27:20 2013 -0700
+
+    libaltos: Build the linux library targets when doing a 'fat' build
+    
+    These are necessary for the fat release, so make sure they're built then.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fbe7857e371fa8ffa726fda2b43d4eddd551eaa4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 17 03:34:50 2013 -0700
+
+    libaltos: use PurgeComm in Windows altos_close to abort in-progress ops
+    
+    Instead of manually signalling the related events, use PurgeComm which
+    can then abort the operations itself. Also make sure all of the
+    relevant handles are set to INVALID before closing them to avoid race conditions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b457ff8d43630c04e0cb22bb3a2765be5e188bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 17 03:21:08 2013 -0700
+
+    altos/cc1111: Hack on USB driver to make Windows happy
+    
+    The Windows modem driver is quite chatty at startup time, getting and
+    setting the comm parameters each time the device is opened. Sometimes,
+    when setting the parameters, the cc1111 would STALL EP0.
+    
+    Most of the time, Windows would happily pass this as an error back to
+    AltosUI which would then re-try the open (and succeed, most of the
+    time).
+    
+    Sometimes, Windows would stall for 30 seconds before passing the error
+    back. This made the whole UI freeze, and I suspect most people assumed
+    our app had died.
+    
+    A bit of analysis with the beagle USB sniffer and I discovered the
+    STALL settings, but there wasn't any correlation between the data on
+    the wire and when the STALL would be generated.
+    
+    So, I found a couple of other cc1111 USB stacks on the net and just
+    looked to see how our driver differed. There wasn't anything clearly
+    related, but there were a list of small differences:
+    
+     1) Other drivers didn't bother waiting for the hardware to
+        ack the USBADDR setting; doing it this way means we can set
+        the address *before* acking the setup packet. It'll get
+        set eventually, at which point the device will start responding to
+        packets again.
+    
+        Easy to fix, and saves a bit of code space too.
+    
+     2) The other drivers set the STALL bit for setup packets which aren't
+        understood. This shouldn't have any effect on 'good' systems as
+        those shouldn't ever be generating bogus setup packets anyways.
+    
+        The driver already handled the STALL state in the interrupt
+        handler, the only requirement was to figure out when to explicitly
+        set the STALL bit.
+    
+        That required moving the state updating code from the start of the
+        ep0 setup handling to the end, after the setup packet had been
+        examined and data queued in or out as appropriate.
+    
+     3) Our driver explicitly queued an IN packet for any setup request
+        that wasn't waiting for an OUT pack. This appears to tie in with
+        the USBADDR change above as before I made that change, this change
+        caused the driver to fail to respond to most setup packets.
+    
+        This was simple once the above change was made, just move the
+        generation of the IN packet inside the code that switched to the
+        IN state.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7699a55aed3a9a7daeb4c6a5a9a280f43edf455f
 Author: Bdale Garbee <bdale@gag.com>
