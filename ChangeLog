@@ -1,3 +1,15 @@
+commit 6f51726b1c04940c5be3b6f320d6aa529afff9ca
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue May 21 09:28:53 2013 -0600
+
+    update configure.ac to reflect version 1.2.1
+
+commit 7699a55aed3a9a7daeb4c6a5a9a280f43edf455f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu May 16 00:34:26 2013 -0600
+
+    update ChangeLog for release
+
 commit 116d8570766fbd3ef529111171935637a2e466af
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue May 14 08:51:22 2013 -0700
