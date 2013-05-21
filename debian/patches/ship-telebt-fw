@@ -1,6 +1,8 @@
---- altos-1.2.1.orig/altosui/Makefile.am
-+++ altos-1.2.1/altosui/Makefile.am
-@@ -148,7 +148,10 @@ FIRMWARE_TM=$(FIRMWARE_TM_1_0) $(FIRMWAR
+diff --git a/altosui/Makefile.am b/altosui/Makefile.am
+index d59e308..78e29cd 100644
+--- a/altosui/Makefile.am
++++ b/altosui/Makefile.am
+@@ -148,7 +148,10 @@ FIRMWARE_TM=$(FIRMWARE_TM_1_0) $(FIRMWARE_TM_1_1) $(FIRMWARE_TM_1_2)
  FIRMWARE_TELEMINI_1_0=$(top_srcdir)/src/telemini-v1.0-$(VERSION).ihx
  FIRMWARE_TELEMINI=$(FIRMWARE_TELEMINI_1_0)
  
@@ -12,8 +14,10 @@
  
  ALTUSMETRUM_DOC=$(top_srcdir)/doc/altusmetrum.pdf
  ALTOS_DOC=$(top_srcdir)/doc/altos.pdf
---- altos-1.2.1.orig/altosui/altos-windows.nsi.in
-+++ altos-1.2.1/altosui/altos-windows.nsi.in
+diff --git a/altosui/altos-windows.nsi.in b/altosui/altos-windows.nsi.in
+index 9886e4a..81506bb 100644
+--- a/altosui/altos-windows.nsi.in
++++ b/altosui/altos-windows.nsi.in
 @@ -111,7 +111,7 @@ Section "AltosUI Desktop Shortcut"
  	CreateShortCut "$DESKTOP\AltusMetrum.lnk" "$INSTDIR\altosui-fat.jar"  "" "$INSTDIR\altus-metrum.ico"
  SectionEnd
@@ -23,7 +27,7 @@
  
  	SetOutPath $INSTDIR
  
-@@ -120,6 +120,7 @@ Section "TeleMetrum and TeleDongle Firmw
+@@ -120,6 +120,7 @@ Section "TeleMetrum and TeleDongle Firmware"
  	File "../src/telemetrum-v1.2/telemetrum-v1.2-${VERSION}.ihx"
  	File "../src/telemini-v1.0/telemini-v1.0-${VERSION}.ihx"
  	File "../src/teledongle-v0.2/teledongle-v0.2-${VERSION}.ihx"
