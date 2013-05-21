@@ -36,12 +36,20 @@
     </legalnotice>
     <revhistory>
       <revision>
-	<revnumber>1.2</revnumber>
-	<date>14 April 2013</date>
+	<revnumber>1.2.1</revnumber>
+	<date>21 May 2013</date>
 	<revremark>
 	  Updated for software version 1.2. Version 1.2 adds support
 	  for TeleBT and AltosDroid. It also adds a few minor features
-	  and fixes a few minor bugs in AltosUI and the AltOS firmware.
+	  and fixes bugs in AltosUI and the AltOS firmware.
+	</revremark>
+      </revision>
+      <revision>
+	<revnumber>1.2</revnumber>
+	<date>18 April 2013</date>
+	<revremark>
+	  Updated for software version 1.2. Version 1.2 adds support
+	  for MicroPeak and the MicroPeak USB interface.
 	</revremark>
       </revision>
       <revision>
@@ -1105,14 +1113,15 @@ NAR #88757, TRA #12200
         flash memory.
       </para>
       <para>
-        Once a flight record is selected, a window with two tabs is
+        Once a flight record is selected, a window with four tabs is
         opened. The first tab contains a graph with acceleration
         (blue), velocity (green) and altitude (red) of the flight,
-        measured in metric units. The
-        apogee(yellow) and main(magenta) igniter voltages are also
-        displayed; high voltages indicate continuity, low voltages
-        indicate open circuits. The second tab contains some basic
-	flight statistics.
+        measured in metric units. The apogee(yellow) and main(magenta)
+        igniter voltages are also displayed; high voltages indicate
+        continuity, low voltages indicate open circuits. The second
+        tab lets you configure which data to show in the graph.  The
+        third contains some basic flight statistics while the fourth
+        has a map with the ground track of the flight displayed.
       </para>
       <para>
         The graph can be zoomed into a particular area by clicking and
@@ -2851,6 +2860,7 @@ NAR #88757, TRA #12200
   <appendix
       xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Release Notes</title>
+    <simplesect><title>Version 1.21</title><xi:include	href="release-notes-1.2.1.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
     <simplesect><title>Version 1.2</title><xi:include	href="release-notes-1.2.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
     <simplesect><title>Version 1.1.1</title><xi:include	href="release-notes-1.1.1.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
     <simplesect><title>Version 1.1</title><xi:include	href="release-notes-1.1.xsl"  xpointer="xpointer(/article/*)"/></simplesect>
