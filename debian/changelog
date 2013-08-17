@@ -1,3 +1,10 @@
+altos (1.2.1-3) unstable; urgency=low
+
+  [ Keith Packard ]
+  * altos: Make FAT test program link explicitly against libcrypto
+
+ -- Bdale Garbee <bdale@gag.com>  Sat, 17 Aug 2013 16:07:25 +0200
+
 altos (1.2.1-2) unstable; urgency=low
 
   [ Keith Packard ]
