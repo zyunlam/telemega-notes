@@ -28,6 +28,7 @@
 	<!-- Options Menu -->
 	<string name="connect_device">Connect a device</string>
 	<string name="select_freq">Select radio frequency</string>
+	<string name="preferences">Preferences</string>
 
 	<!-- DeviceListActivity -->
 	<string name="scanning">scanning for devices…</string>
@@ -79,5 +80,19 @@
 	<string name="pad_lat_label">Pad Lat</string>
 	<string name="pad_lon_label">Pad Lon</string>
 	<string name="pad_alt_label">Pad Alt</string>
+
+	<!-- Preferences -->
+	<string name="pref_units_title">Imperial Units</string>
+	<string name="pref_units">IMPERIAL-UNITS</string>
+	<string name="pref_units_summary">
+	  Use imperial units instead of metric
+	</string>
+	<string name="pref_sms_storage_title">Storage</string>
+	<string name="pref_sync">Sync</string>
+	<string name="pref_sync_summ">Sync Summary</string>
+        <string name="pref_syncConnectionType">Connection Type</string>
+        <string name="pref_syncConnectionTypes_default">
+	  Default Connection Type
+	</string>
 
 </resources>

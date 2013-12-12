@@ -512,6 +512,9 @@ public class AltosDroid extends FragmentActivity {
 			AlertDialog alert = builder.create();
 			alert.show();
 			return true;
+		case R.id.preferences:
+			startActivity(new Intent(this, AltosPreferencesUI.class));
+			return true;
 		}
 		return false;
 	}
