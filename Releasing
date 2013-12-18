@@ -1,6 +1,7 @@
 These are Bdale's notes on how to do a release.
 
-	- make sure there's a suitable ARM Cortex toolchain in /opt/cortex!
+	- make sure there's a suitable ARM Cortex toolchain installed, 
+	  including pdclib and stlink. 
 
 	git checkout master
 
