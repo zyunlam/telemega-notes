@@ -20,6 +20,10 @@
 #include <ao_log.h>
 #endif
 
+#if HAS_MPU6000
+#include <ao_quaternion.h>
+#endif
+
 #ifndef HAS_ACCEL
 #error Please define HAS_ACCEL
 #endif
@@ -41,6 +45,11 @@
 __pdata enum ao_flight_state	ao_flight_state;	/* current flight state */
 __pdata uint16_t		ao_boost_tick;		/* time of launch detect */
 __pdata uint16_t		ao_motor_number;	/* number of motors burned so far */
+
+#if HAS_IMU
+/* Any sensor can set this to mark the flight computer as 'broken' */
+__xdata uint8_t			ao_sensor_errors;
+#endif
 
 /*
  * track min/max data over a long interval to detect
@@ -95,6 +104,9 @@ ao_flight(void)
 			    ao_config.accel_minus_g == 0 ||
 			    ao_ground_accel < ao_config.accel_plus_g - ACCEL_NOSE_UP ||
 			    ao_ground_accel > ao_config.accel_minus_g + ACCEL_NOSE_UP ||
+#if HAS_IMU
+			    ao_sensor_errors ||
+#endif
 			    ao_ground_height < -1000 ||
 			    ao_ground_height > 7000)
 			{
@@ -117,14 +129,14 @@ ao_flight(void)
  			{
 				/* Set pad mode - we can fly! */
 				ao_flight_state = ao_flight_pad;
-#if HAS_USB && HAS_RADIO && !HAS_FLIGHT_DEBUG && !HAS_SAMPLE_PROFILE
+#if HAS_USB && !HAS_FLIGHT_DEBUG && !HAS_SAMPLE_PROFILE
 				/* Disable the USB controller in flight mode
 				 * to save power
 				 */
 				ao_usb_disable();
 #endif
 
-#if !HAS_ACCEL
+#if !HAS_ACCEL && PACKET_HAS_SLAVE
 				/* Disable packet mode in pad state on TeleMini */
 				ao_packet_slave_stop();
 #endif
@@ -134,8 +146,10 @@ ao_flight(void)
 				ao_rdf_set(1);
 				ao_telemetry_set_interval(AO_TELEMETRY_INTERVAL_PAD);
 #endif
+#if HAS_LED
 				/* signal successful initialization by turning off the LED */
 				ao_led_off(AO_LED_RED);
+#endif
 			} else {
 				/* Set idle mode */
  				ao_flight_state = ao_flight_idle;
@@ -145,8 +159,10 @@ ao_flight(void)
 				ao_packet_slave_start();
 #endif
 
+#if HAS_LED
 				/* signal successful initialization by turning off the LED */
 				ao_led_off(AO_LED_RED);
+#endif
 			}
 			/* wakeup threads due to state change */
 			ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
@@ -190,8 +206,8 @@ ao_flight(void)
 
 #if HAS_GPS
 				/* Record current GPS position by waking up GPS log tasks */
-				ao_wakeup(&ao_gps_data);
-				ao_wakeup(&ao_gps_tracking_data);
+				ao_gps_new = AO_GPS_NEW_DATA | AO_GPS_NEW_TRACKING;
+				ao_wakeup(&ao_gps_new);
 #endif
 
 				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
@@ -356,6 +372,18 @@ ao_flight(void)
 				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;
 			}
 			break;
+#if HAS_FLIGHT_DEBUG
+		case ao_flight_test:
+#if HAS_GYRO
+			printf ("angle %4d pitch %7d yaw %7d roll %7d\n",
+				ao_sample_orient,
+				((ao_sample_pitch << 9) - ao_ground_pitch) >> 9,
+				((ao_sample_yaw << 9) - ao_ground_yaw) >> 9,
+				((ao_sample_roll << 9) - ao_ground_roll) >> 9);
+#endif
+			flush();
+			break;
+#endif /* HAS_FLIGHT_DEBUG */
 		default:
 			break;
 		}
@@ -406,8 +434,17 @@ ao_flight_dump(void)
 	printf ("  error_avg   %d\n", ao_error_h_sq_avg);
 }
 
+static void
+ao_gyro_test(void)
+{
+	ao_flight_state = ao_flight_test;
+	ao_getchar();
+	ao_flight_state = ao_flight_idle;
+}
+
 __code struct ao_cmds ao_flight_cmds[] = {
 	{ ao_flight_dump, 	"F\0Dump flight status" },
+	{ ao_gyro_test,		"G\0Test gyro code" },
 	{ 0, NULL },
 };
 #endif

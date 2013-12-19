@@ -21,12 +21,12 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosConfigUI
 	extends AltosUIDialog
-	implements ActionListener, ItemListener, DocumentListener, AltosConfigValues
+	implements ActionListener, ItemListener, DocumentListener, AltosConfigValues, AltosUnitsListener
 {
 
 	Container	pane;
@@ -75,9 +75,14 @@ public class AltosConfigUI
 
 	ActionListener	listener;
 
-	static String[] main_deploy_values = {
+	static String[] main_deploy_values_m = {
 		"100", "150", "200", "250", "300", "350",
 		"400", "450", "500"
+	};
+
+	static String[] main_deploy_values_ft = {
+		"250", "500", "750", "1000", "1250", "1500",
+		"1750", "2000"
 	};
 
 	static String[] apogee_delay_values = {
@@ -180,7 +185,7 @@ public class AltosConfigUI
 
 	void set_pad_orientation_tool_tip() {
 		if (pad_orientation_value.isEnabled())
-			pad_orientation_value.setToolTipText("How will TeleMetrum be mounted in the airframe");
+			pad_orientation_value.setToolTipText("How will the computer be mounted in the airframe");
 		else {
 			if (is_telemetrum())
 				pad_orientation_value.setToolTipText("Older TeleMetrum firmware must fly antenna forward");
@@ -193,7 +198,7 @@ public class AltosConfigUI
 
 	/* Build the UI using a grid bag */
 	public AltosConfigUI(JFrame in_owner, boolean remote) {
-		super (in_owner, "Configure TeleMetrum", false);
+		super (in_owner, "Configure Flight Computer", false);
 
 		owner = in_owner;
 		GridBagConstraints c;
@@ -280,7 +285,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = il;
 		c.ipady = 5;
-		main_deploy_label = new JLabel("Main Deploy Altitude(m):");
+		main_deploy_label = new JLabel(get_main_deploy_label());
 		pane.add(main_deploy_label, c);
 
 		c = new GridBagConstraints();
@@ -291,7 +296,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		main_deploy_value = new JComboBox(main_deploy_values);
+		main_deploy_value = new JComboBox(main_deploy_values());
 		main_deploy_value.setEditable(true);
 		main_deploy_value.addItemListener(this);
 		pane.add(main_deploy_value, c);
@@ -616,6 +621,7 @@ public class AltosConfigUI
 		close.setActionCommand("Close");
 
 		addWindowListener(new ConfigListener(this));
+		AltosPreferences.register_units_listener(this);
 	}
 
 	/* Once the initial values are set, the config code will show the dialog */
@@ -654,15 +660,22 @@ public class AltosConfigUI
 
 	AltosConfigPyroUI	pyro_ui;
 
+	public void dispose() {
+		if (pyro_ui != null)
+			pyro_ui.dispose();
+		AltosPreferences.unregister_units_listener(this);
+		super.dispose();
+	}
+
 	/* Listen for events from our buttons */
 	public void actionPerformed(ActionEvent e) {
 		String	cmd = e.getActionCommand();
 
 		if (cmd.equals("Pyro")) {
-			if (pyro_ui == null && pyros != null) {
+			if (pyro_ui == null && pyros != null)
 				pyro_ui = new AltosConfigPyroUI(this, pyros);
+			if (pyro_ui != null)
 				pyro_ui.make_visible();
-			}
 			return;
 		}
 
@@ -718,12 +731,40 @@ public class AltosConfigUI
 	}
 
 	public void set_main_deploy(int new_main_deploy) {
-		main_deploy_value.setSelectedItem(Integer.toString(new_main_deploy));
+		main_deploy_value.setSelectedItem(AltosConvert.height.say(new_main_deploy));
 		main_deploy_value.setEnabled(new_main_deploy >= 0);
 	}
 
 	public int main_deploy() {
-		return Integer.parseInt(main_deploy_value.getSelectedItem().toString());
+		return (int) (AltosConvert.height.parse(main_deploy_value.getSelectedItem().toString()) + 0.5);
+	}
+
+	String get_main_deploy_label() {
+		return String.format("Main Deploy Altitude(%s):", AltosConvert.height.show_units());
+	}
+	
+	String[] main_deploy_values() {
+		if (AltosConvert.imperial_units)
+			return main_deploy_values_ft;
+		else
+			return main_deploy_values_m;
+	}
+			
+	void set_main_deploy_values() {
+		String[]	v = main_deploy_values();
+		while (main_deploy_value.getItemCount() > 0)
+			main_deploy_value.removeItemAt(0);
+		for (int i = 0; i < v.length; i++)
+			main_deploy_value.addItem(v[i]);
+		main_deploy_value.setMaximumRowCount(v.length);
+	}
+	
+	public void units_changed(boolean imperial_units) {
+		String v = main_deploy_value.getSelectedItem().toString();
+		main_deploy_label.setText(get_main_deploy_label());
+		set_main_deploy_values();
+		int m = (int) (AltosConvert.height.parse(v, !imperial_units) + 0.5);
+		set_main_deploy(m);
 	}
 
 	public void set_apogee_delay(int new_apogee_delay) {
@@ -745,28 +786,7 @@ public class AltosConfigUI
 	}
 
 	public void set_radio_frequency(double new_radio_frequency) {
-		int i;
-		for (i = 0; i < radio_frequency_value.getItemCount(); i++) {
-			AltosFrequency	f = (AltosFrequency) radio_frequency_value.getItemAt(i);
-			
-			if (f.close(new_radio_frequency)) {
-				radio_frequency_value.setSelectedIndex(i);
-				return;
-			}
-		}
-		for (i = 0; i < radio_frequency_value.getItemCount(); i++) {
-			AltosFrequency	f = (AltosFrequency) radio_frequency_value.getItemAt(i);
-			
-			if (new_radio_frequency < f.frequency)
-				break;
-		}
-		String	description = String.format("%s serial %s",
-						    product_value.getText(),
-						    serial_value.getText());
-		AltosFrequency	new_frequency = new AltosFrequency(new_radio_frequency, description);
-		AltosUIPreferences.add_common_frequency(new_frequency);
-		radio_frequency_value.insertItemAt(new_frequency, i);
-		radio_frequency_value.setSelectedIndex(i);
+		radio_frequency_value.set_frequency(new_radio_frequency);
 	}
 
 	public double radio_frequency() {
@@ -774,7 +794,11 @@ public class AltosConfigUI
 	}
 
 	public void set_radio_calibration(int new_radio_calibration) {
-		radio_calibration_value.setText(String.format("%d", new_radio_calibration));
+		radio_calibration_value.setVisible(new_radio_calibration >= 0);
+		if (new_radio_calibration < 0)
+			radio_calibration_value.setText("Disabled");
+		else
+			radio_calibration_value.setText(String.format("%d", new_radio_calibration));
 	}
 
 	public int radio_calibration() {
@@ -787,6 +811,7 @@ public class AltosConfigUI
 			radio_enable_value.setEnabled(true);
 		} else {
 			radio_enable_value.setSelected(true);
+			radio_enable_value.setVisible(radio_frequency() > 0);
 			radio_enable_value.setEnabled(false);
 		}
 		set_radio_enable_tool_tip();
@@ -800,6 +825,7 @@ public class AltosConfigUI
 	}
 
 	public void set_callsign(String new_callsign) {
+		callsign_value.setVisible(new_callsign != null);
 		callsign_value.setText(new_callsign);
 	}
 
@@ -859,10 +885,10 @@ public class AltosConfigUI
 		if (new_pad_orientation >= pad_orientation_values.length)
 			new_pad_orientation = 0;
 		if (new_pad_orientation < 0) {
-			pad_orientation_value.setEnabled(false);
+			pad_orientation_value.setVisible(false);
 			new_pad_orientation = 0;
 		} else {
-			pad_orientation_value.setEnabled(true);
+			pad_orientation_value.setVisible(true);
 		}
 		pad_orientation_value.setSelectedIndex(new_pad_orientation);
 		set_pad_orientation_tool_tip();
@@ -877,7 +903,7 @@ public class AltosConfigUI
 
 	public void set_pyros(AltosPyro[] new_pyros) {
 		pyros = new_pyros;
-		pyro.setEnabled(pyros != null);
+		pyro.setVisible(pyros != null);
 		if (pyros != null && pyro_ui != null)
 			pyro_ui.set_pyros(pyros);
 	}
@@ -896,7 +922,7 @@ public class AltosConfigUI
 		else
 			s = Integer.toString(new_aprs_interval);
 		aprs_interval_value.setSelectedItem(s);
-		aprs_interval_value.setEnabled(new_aprs_interval >= 0);
+		aprs_interval_value.setVisible(new_aprs_interval >= 0);
 		set_aprs_interval_tool_tip();
 	}
 

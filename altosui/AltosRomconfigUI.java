@@ -20,7 +20,7 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosRomconfigUI
@@ -91,7 +91,7 @@ public class AltosRomconfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		radio_calibration_value = new JTextField("1186611");
+		radio_calibration_value = new JTextField("0");
 		pane.add(radio_calibration_value, c);
 
 		/* Buttons */

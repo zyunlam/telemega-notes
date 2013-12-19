@@ -19,7 +19,7 @@ package altosui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 public class AltosDescent extends JComponent implements AltosFlightDisplay {
 	GridBagLayout	layout;
@@ -245,7 +245,7 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	class Height extends DescentValue {
 		void show (AltosState state, AltosListenerState listener_state) {
-			show(AltosConvert.height, state.height);
+			show(AltosConvert.height, state.height());
 		}
 		public Height (GridBagLayout layout, int x, int y) {
 			super (layout, x, y, "Height");
@@ -256,10 +256,7 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	class Speed extends DescentValue {
 		void show (AltosState state, AltosListenerState listener_state) {
-			double speed = state.accel_speed;
-			if (!state.ascent)
-				speed = state.baro_speed;
-			show(AltosConvert.speed, speed);
+			show(AltosConvert.speed, state.speed());
 		}
 		public Speed (GridBagLayout layout, int x, int y) {
 			super (layout, x, y, "Speed");
@@ -281,7 +278,7 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	class Lat extends DescentValue {
 		void show (AltosState state, AltosListenerState listener_state) {
-			if (state.gps != null && state.gps.connected)
+			if (state.gps != null && state.gps.connected && state.gps.lat != AltosLib.MISSING)
 				show(pos(state.gps.lat,"N", "S"));
 			else
 				show("???");
@@ -295,7 +292,7 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	class Lon extends DescentValue {
 		void show (AltosState state, AltosListenerState listener_state) {
-			if (state.gps != null && state.gps.connected)
+			if (state.gps != null && state.gps.connected && state.gps.lon != AltosLib.MISSING)
 				show(pos(state.gps.lon,"W", "E"));
 			else
 				show("???");
@@ -325,8 +322,8 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	class Apogee extends DescentStatus {
 		void show (AltosState state, AltosListenerState listener_state) {
-			show("%4.2f V", state.drogue_sense);
-			lights.set(state.drogue_sense > 3.2);
+			show("%4.2f V", state.apogee_voltage);
+			lights.set(state.apogee_voltage >= AltosLib.ao_igniter_good);
 		}
 		public Apogee (GridBagLayout layout, int y) {
 			super(layout, y, "Apogee Igniter Voltage");
@@ -337,8 +334,8 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 
 	class Main extends DescentStatus {
 		void show (AltosState state, AltosListenerState listener_state) {
-			show("%4.2f V", state.main_sense);
-			lights.set(state.main_sense > 3.2);
+			show("%4.2f V", state.main_voltage);
+			lights.set(state.main_voltage >= AltosLib.ao_igniter_good);
 		}
 		public Main (GridBagLayout layout, int y) {
 			super(layout, y, "Main Igniter Voltage");
@@ -430,11 +427,11 @@ public class AltosDescent extends JComponent implements AltosFlightDisplay {
 			lat.hide();
 			lon.hide();
 		}
-		if (state.main_sense != AltosRecord.MISSING)
+		if (state.main_voltage != AltosLib.MISSING)
 			main.show(state, listener_state);
 		else
 			main.hide();
-		if (state.drogue_sense != AltosRecord.MISSING)
+		if (state.apogee_voltage != AltosLib.MISSING)
 			apogee.show(state, listener_state);
 		else
 			apogee.hide();

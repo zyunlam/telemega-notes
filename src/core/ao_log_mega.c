@@ -65,6 +65,7 @@ ao_log_dump_check_data(void)
 	return 1;
 }
 
+#if HAS_ADC
 static __data uint8_t	ao_log_data_pos;
 
 /* a hack to make sure that ao_log_megas fill the eeprom block in even units */
@@ -151,6 +152,7 @@ ao_log(void)
 				log.u.volt.n_sense = AO_ADC_NUM_SENSE;
 				for (i = 0; i < AO_ADC_NUM_SENSE; i++)
 					log.u.volt.sense[i] = ao_data_ring[ao_log_data_pos].adc.sense[i];
+				log.u.volt.pyro = ao_pyro_fired;
 				ao_log_mega(&log);
 				next_other = log.tick + AO_OTHER_INTERVAL;
 			}
@@ -181,6 +183,7 @@ ao_log(void)
 			ao_sleep(&ao_log_running);
 	}
 }
+#endif
 
 uint16_t
 ao_log_flight(uint8_t slot)

@@ -21,7 +21,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay, AltosFontListener {
@@ -102,7 +102,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay, A
 		status_update.saved_state = state;
 
 		if (state == null)
-			state = new AltosState(new AltosRecord());
+			state = new AltosState();
 
 		pad.show(state, listener_state);
 
@@ -130,7 +130,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay, A
 		flightStatus.show(state, listener_state);
 		flightInfo.show(state, listener_state);
 
-		if (state.data.companion != null) {
+		if (state.companion != null) {
 			if (!has_companion) {
 				pane.add("Companion", companion);
 				has_companion= true;

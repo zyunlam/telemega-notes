@@ -63,6 +63,8 @@ struct ao_pyro {
 
 extern uint8_t	ao_pyro_wakeup;
 
+extern uint16_t	ao_pyro_fired;
+
 void
 ao_pyro_set(void);
 
@@ -71,5 +73,11 @@ ao_pyro_show(void);
 
 void
 ao_pyro_init(void);
+
+void
+ao_pyro_manual(uint8_t p);
+
+void
+ao_pyro_print_status(void);
 
 #endif

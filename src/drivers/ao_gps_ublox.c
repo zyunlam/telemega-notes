@@ -21,16 +21,37 @@
 
 #include "ao_gps_ublox.h"
 
+#define AO_UBLOX_DEBUG 0
+
+#include <stdarg.h>
+
+__xdata uint8_t ao_gps_new;
 __xdata uint8_t ao_gps_mutex;
 __pdata uint16_t ao_gps_tick;
 __xdata struct ao_telemetry_location	ao_gps_data;
 __xdata struct ao_telemetry_satellite	ao_gps_tracking_data;
 
-static const char ao_gps_set_nmea[] = "\r\n$PUBX,41,1,3,1,57600,0*2d\r\n";
+#undef AO_SERIAL_SPEED_UBLOX
 
-const char ao_gps_config[] = {
+#ifndef AO_SERIAL_SPEED_UBLOX
+#define AO_SERIAL_SPEED_UBLOX AO_SERIAL_SPEED_9600
+#endif
 
-};
+#if AO_SERIAL_SPEED_UBLOX == AO_SERIAL_SPEED_57600
+#define SERIAL_SPEED_STRING	"57600"
+#define SERIAL_SPEED_CHECKSUM	"2d"
+#endif
+#if AO_SERIAL_SPEED_UBLOX == AO_SERIAL_SPEED_19200
+#define SERIAL_SPEED_STRING	"19200"
+#define SERIAL_SPEED_CHECKSUM	"23"
+#endif
+#if AO_SERIAL_SPEED_UBLOX == AO_SERIAL_SPEED_9600
+#define SERIAL_SPEED_STRING	"9600"
+#define SERIAL_SPEED_CHECKSUM	"16"
+#endif
+
+static const char ao_gps_set_nmea[] =
+	"\r\n$PUBX,41,1,3,1," SERIAL_SPEED_STRING ",0*" SERIAL_SPEED_CHECKSUM "\r\n";
 
 struct ao_ublox_cksum {
 	uint8_t	a, b;
@@ -39,13 +60,34 @@ struct ao_ublox_cksum {
 static __pdata struct ao_ublox_cksum ao_ublox_cksum;
 static __pdata uint16_t ao_ublox_len;
 
-#ifndef ao_ublox_getchar
-#define ao_ublox_getchar	ao_serial1_getchar
-#define ao_ublox_putchar	ao_serial1_putchar
-#define ao_ublox_set_speed	ao_serial1_set_speed
+#if AO_UBLOX_DEBUG
+
+static uint8_t ao_gps_dbg_enable;
+
+#define DBG_PROTO	1
+#define DBG_CHAR	2
+#define DBG_INIT	4
+
+static void ao_gps_dbg(int level, char *format, ...) {
+	va_list a;
+
+	if (level & ao_gps_dbg_enable) {
+		va_start(a, format);
+		vprintf(format, a);
+		va_end(a);
+		flush();
+	}
+}
+
+#else
+#define ao_gps_dbg(fmt, ...)
 #endif
 
-#define ao_ublox_byte()	((uint8_t) ao_ublox_getchar())
+static inline uint8_t ao_ublox_byte(void) {
+	uint8_t	c = (uint8_t) ao_gps_getchar();
+	ao_gps_dbg(DBG_CHAR, " %02x", c);
+	return c;
+}
 
 static inline void add_cksum(struct ao_ublox_cksum *cksum, uint8_t c)
 {
@@ -61,7 +103,8 @@ static void ao_ublox_init_cksum(void)
 static void ao_ublox_put_u8(uint8_t c)
 {
 	add_cksum(&ao_ublox_cksum, c);
-	ao_ublox_putchar(c);
+	ao_gps_dbg(DBG_CHAR, " (%02x)", c);
+	ao_gps_putchar(c);
 }
 
 static void ao_ublox_put_i8(int8_t c)
@@ -183,6 +226,7 @@ ao_ublox_parse(void __xdata *target, const struct ublox_packet_parse *parse) __r
 			break;
 		}
 	}
+	ao_gps_dbg(DBG_PROTO, "\n");
 }
 
 /*
@@ -326,6 +370,7 @@ ao_ublox_parse_nav_svinfo(void)
 {
 	uint8_t	nsat;
 	nav_svinfo_nsat = 0;
+
 	ao_ublox_parse(&nav_svinfo, nav_svinfo_packet);
 	for (nsat = 0; nsat < nav_svinfo.num_ch && ao_ublox_len >= 12; nsat++) {
 		if (nsat < NAV_SVINFO_MAX_SAT) {
@@ -334,6 +379,17 @@ ao_ublox_parse_nav_svinfo(void)
 			ublox_discard(12);
 		}
 	}
+#if AO_UBLOX_DEBUG
+	ao_gps_dbg(DBG_PROTO, "svinfo num_ch %d flags %02x\n", nav_svinfo.num_ch, nav_svinfo.flags);
+	for (nsat = 0; nsat < nav_svinfo.num_ch; nsat++)
+		ao_gps_dbg(DBG_PROTO, "\t%d: chn %d svid %d flags %02x quality %d cno %d\n",
+			    nsat,
+			    nav_svinfo_sat[nsat].chn,
+			    nav_svinfo_sat[nsat].svid,
+			    nav_svinfo_sat[nsat].flags,
+			    nav_svinfo_sat[nsat].quality,
+			    nav_svinfo_sat[nsat].cno);
+#endif
 }
 
 /*
@@ -402,45 +458,60 @@ ao_ublox_parse_nav_velned(void)
  */
 
 static void
-ao_gps_setup(void)
+ao_gps_delay(void)
 {
-	uint8_t	i, k;
-	ao_ublox_set_speed(AO_SERIAL_SPEED_9600);
+	uint8_t i;
 
 	/*
 	 * A bunch of nulls so the start bit
 	 * is clear
 	 */
+
 	for (i = 0; i < 64; i++)
-		ao_ublox_putchar(0x00);
+		ao_gps_putchar(0x00);
+}
+
+static void
+ao_gps_setup(void)
+{
+	uint8_t	i, k;
+
+	ao_delay(AO_SEC_TO_TICKS(3));
+
+	ao_gps_dbg(DBG_INIT, "Set speed 9600\n");
+	ao_gps_set_speed(AO_SERIAL_SPEED_9600);
 
 	/*
 	 * Send the baud-rate setting and protocol-setting
 	 * command three times
 	 */
-	for (k = 0; k < 3; k++)
-		for (i = 0; i < sizeof (ao_gps_set_nmea); i++)
-			ao_ublox_putchar(ao_gps_set_nmea[i]);
+	for (k = 0; k < 3; k++) {
+		ao_gps_delay();
 
+		ao_gps_dbg(DBG_INIT, "Send initial setting\n");
+		for (i = 0; i < sizeof (ao_gps_set_nmea); i++)
+			ao_gps_putchar(ao_gps_set_nmea[i]);
+	}
+
+	ao_gps_delay();
+
+#if AO_SERIAL_SPEED_UBLOX != AO_SERIAL_SPEED_9600
+	ao_gps_dbg(DBG_INIT, "Set speed high\n");
 	/*
 	 * Increase the baud rate
 	 */
-	ao_ublox_set_speed(AO_SERIAL_SPEED_57600);
+	ao_gps_set_speed(AO_SERIAL_SPEED_UBLOX);
+#endif
 
-	/*
-	 * Pad with nulls to give the chip
-	 * time to see the baud rate switch
-	 */
-	for (i = 0; i < 64; i++)
-		ao_ublox_putchar(0x00);
+	ao_gps_delay();
 }
 
 static void
 ao_ublox_putstart(uint8_t class, uint8_t id, uint16_t len)
 {
 	ao_ublox_init_cksum();
-	ao_ublox_putchar(0xb5);
-	ao_ublox_putchar(0x62);
+	ao_gps_putchar(0xb5);
+	ao_gps_putchar(0x62);
 	ao_ublox_put_u8(class);
 	ao_ublox_put_u8(id);
 	ao_ublox_put_u8(len);
@@ -450,8 +521,8 @@ ao_ublox_putstart(uint8_t class, uint8_t id, uint16_t len)
 static void
 ao_ublox_putend(void)
 {
-	ao_ublox_putchar(ao_ublox_cksum.a);
-	ao_ublox_putchar(ao_ublox_cksum.b);
+	ao_gps_putchar(ao_ublox_cksum.a);
+	ao_gps_putchar(ao_ublox_cksum.b);
 }
 
 static void
@@ -547,7 +618,7 @@ ao_gps(void) __reentrant
 	/* Enable all of the messages we want */
 	for (i = 0; i < sizeof (ublox_enable_nav); i++)
 		ao_ublox_set_message_rate(UBLOX_NAV, ublox_enable_nav[i], 1);
-	
+
 	ao_ublox_set_navigation_settings((1 << UBLOX_CFG_NAV5_MASK_DYN) | (1 << UBLOX_CFG_NAV5_MASK_FIXMODE),
 					 UBLOX_CFG_NAV5_DYNMODEL_AIRBORNE_4G,
 					 UBLOX_CFG_NAV5_FIXMODE_3D,
@@ -577,6 +648,8 @@ ao_gps(void) __reentrant
 		/* Length */
 		ao_ublox_len = header_byte();
 		ao_ublox_len |= header_byte() << 8;
+
+		ao_gps_dbg(DBG_PROTO, "class %02x id %02x len %d\n", class, id, ao_ublox_len);
 
 		if (ao_ublox_len > 1023)
 			continue;
@@ -618,8 +691,10 @@ ao_gps(void) __reentrant
 			break;
 		}
 
-		if (ao_ublox_len != 0)
+		if (ao_ublox_len != 0) {
+			ao_gps_dbg(DBG_PROTO, "len left %d\n", ao_ublox_len);
 			continue;
+		}
 
 		/* verify checksum and end sequence */
 		cksum.a = ao_ublox_byte();
@@ -628,9 +703,9 @@ ao_gps(void) __reentrant
 			continue;
 
 		switch (class) {
-		case 0x01:
+		case UBLOX_NAV:
 			switch (id) {
-			case 0x21:
+			case UBLOX_NAV_TIMEUTC:
 				ao_mutex_get(&ao_gps_mutex);
 				ao_gps_tick = ao_time();
 
@@ -645,7 +720,7 @@ ao_gps(void) __reentrant
 				}
 				if (nav_timeutc.valid & (1 << NAV_TIMEUTC_VALID_UTC))
 					ao_gps_data.flags |= AO_GPS_DATE_VALID;
-				
+
 				ao_gps_data.altitude = nav_posllh.alt_msl / 1000;
 				ao_gps_data.latitude = nav_posllh.lat;
 				ao_gps_data.longitude = nav_posllh.lon;
@@ -667,7 +742,7 @@ ao_gps(void) __reentrant
 				ao_gps_data.ground_speed = nav_velned.g_speed;
 				ao_gps_data.climb_rate = -nav_velned.vel_d;
 				ao_gps_data.course = nav_velned.heading / 200000;
-				
+
 				ao_gps_tracking_data.channels = 0;
 
 				struct ao_telemetry_satellite_info *dst = &ao_gps_tracking_data.sats[0];
@@ -686,8 +761,8 @@ ao_gps(void) __reentrant
 				}
 
 				ao_mutex_put(&ao_gps_mutex);
-				ao_wakeup(&ao_gps_data);
-				ao_wakeup(&ao_gps_tracking_data);
+				ao_gps_new = AO_GPS_NEW_DATA | AO_GPS_NEW_TRACKING;
+				ao_wakeup(&ao_gps_new);
 				break;
 			}
 			break;
@@ -695,10 +770,32 @@ ao_gps(void) __reentrant
 	}
 }
 
+#if AO_UBLOX_DEBUG
+static void ao_gps_option(void)
+{
+	ao_cmd_hex();
+	if (ao_cmd_status != ao_cmd_success) {
+		ao_cmd_status = ao_cmd_success;
+		ao_gps_show();
+	} else {
+		ao_gps_dbg_enable = ao_cmd_lex_i;
+		printf ("gps debug set to %d\n", ao_gps_dbg_enable);
+	}
+}
+#else
+#define ao_gps_option ao_gps_show
+#endif
+
+__code struct ao_cmds ao_gps_cmds[] = {
+	{ ao_gps_option, 	"g\0Display GPS" },
+	{ 0, NULL },
+};
+
 __xdata struct ao_task ao_gps_task;
 
 void
 ao_gps_init(void)
 {
+	ao_cmd_register(&ao_gps_cmds[0]);
 	ao_add_task(&ao_gps_task, ao_gps, "gps");
 }

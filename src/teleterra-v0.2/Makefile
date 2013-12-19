@@ -52,7 +52,8 @@ CC1111_SRC = \
 DRIVER_SRC = \
 	ao_m25.c \
 	ao_lcd.c \
-	ao_gps_skytraq.c
+	ao_gps_skytraq.c \
+	ao_gps_show.c
 
 PRODUCT_SRC = \
 	ao_teleterra_0_2.c \
@@ -85,10 +86,10 @@ endif
 # Otherwise, print the full command line.
 quiet ?= $($1)
 
-all: ../$(PROG)
+all: $(PROG)
 
-../$(PROG): $(REL) Makefile
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(REL) && cp $(PROG) $(PMAP) ..
+$(PROG): $(REL) Makefile
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(REL)
 	$(call quiet,CHECK_STACK) ../cc1111/ao_arch.h $(PMEM) || rm $@
 
 ao_product.h: ao-make-product.5c ../Version

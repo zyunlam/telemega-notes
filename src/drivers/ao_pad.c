@@ -17,7 +17,7 @@
 
 #include <ao.h>
 #include <ao_pad.h>
-#include <ao_74hc497.h>
+#include <ao_74hc165.h>
 #include <ao_radio_cmac.h>
 
 static __xdata uint8_t ao_pad_ignite;
@@ -27,6 +27,7 @@ static __pdata uint8_t	ao_pad_armed;
 static __pdata uint16_t	ao_pad_arm_time;
 static __pdata uint8_t	ao_pad_box;
 static __xdata uint8_t	ao_pad_disabled;
+static __pdata uint16_t	ao_pad_packet_time;
 
 #define DEBUG	1
 
@@ -135,6 +136,12 @@ ao_pad_monitor(void)
 			query.arm_status = AO_PAD_ARM_STATUS_UNKNOWN;
 			arm_beep_time = 0;
 		}
+		if ((ao_time() - ao_pad_packet_time) > AO_SEC_TO_TICKS(2))
+			cur |= AO_LED_RED;
+		else if (ao_radio_cmac_rssi < -90)
+			cur |= AO_LED_AMBER;
+		else
+			cur |= AO_LED_GREEN;
 
 		for (c = 0; c < AO_PAD_NUM; c++) {
 			int16_t		sense = packet->adc.sense[c];
@@ -171,9 +178,10 @@ ao_pad_monitor(void)
 			query.igniter_status[c] = status;
 		}
 		if (cur != prev) {
-			PRINTD("change leds from %02x to %02x mask %02x\n",
-			       prev, cur, AO_LED_CONTINUITY_MASK|AO_LED_ARMED);
-			ao_led_set_mask(cur, AO_LED_CONTINUITY_MASK | AO_LED_ARMED);
+			PRINTD("change leds from %02x to %02x\n",
+			       prev, cur);
+			FLUSHD();
+			ao_led_set(cur);
 			prev = cur;
 		}
 
@@ -182,10 +190,7 @@ ao_pad_monitor(void)
 
 		if (ao_pad_armed) {
 			ao_strobe(1);
-			if (sample & 2)
-				ao_siren(1);
-			else
-				ao_siren(0);
+			ao_siren(1);
 			beeping = 1;
 		} else if (query.arm_status == AO_PAD_ARM_STATUS_ARMED && !beeping) {
 			if (arm_beep_time == 0) {
@@ -218,6 +223,21 @@ ao_pad_enable(void)
 	ao_wakeup (&ao_pad_disabled);
 }
 
+#if HAS_74HC165
+static uint8_t
+ao_pad_read_box(void)
+{
+	uint8_t		byte = ao_74hc165_read();
+	uint8_t		h, l;
+
+	h = byte >> 4;
+	l = byte & 0xf;
+	return h * 10 + l;
+}
+#else
+#define ao_pad_read_box()	0
+#endif
+
 static void
 ao_pad(void)
 {
@@ -226,18 +246,20 @@ ao_pad(void)
 
 	ao_pad_box = 0;
 	ao_led_set(0);
-	ao_led_on(AO_LED_POWER);
 	for (;;) {
 		FLUSHD();
 		while (ao_pad_disabled)
 			ao_sleep(&ao_pad_disabled);
 		ret = ao_radio_cmac_recv(&command, sizeof (command), 0);
-		PRINTD ("cmac_recv %d\n", ret);
+		PRINTD ("cmac_recv %d %d\n", ret, ao_radio_cmac_rssi);
 		if (ret != AO_RADIO_CMAC_OK)
 			continue;
+		ao_pad_packet_time = ao_time();
 		
-		PRINTD ("tick %d box %d cmd %d channels %02x\n",
-			command.tick, command.box, command.cmd, command.channels);
+		ao_pad_box = ao_pad_read_box();
+
+		PRINTD ("tick %d box %d (me %d) cmd %d channels %02x\n",
+			command.tick, command.box, ao_pad_box, command.cmd, command.channels);
 
 		switch (command.cmd) {
 		case AO_LAUNCH_ARM:
@@ -327,7 +349,7 @@ ao_pad_test(void)
 	}
 
 	for (c = 0; c < AO_PAD_NUM; c++) {
-		printf ("Pad %d: ");
+		printf ("Pad %d: ", c);
 		switch (query.igniter_status[c]) {
 		case AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_CLOSED:	printf ("No igniter. Relay closed\n"); break;
 		case AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN:	printf ("No igniter. Relay open\n"); break;
@@ -362,6 +384,26 @@ ao_pad_set_debug(void)
 	if (ao_cmd_status == ao_cmd_success)
 		ao_pad_debug = ao_cmd_lex_i != 0;
 }
+
+
+static void
+ao_pad_alarm_debug(void)
+{
+	uint8_t	which, value;
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	which = ao_cmd_lex_i;
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	value = ao_cmd_lex_i;
+	printf ("Set %s to %d\n", which ? "siren" : "strobe", value);
+	if (which)
+		ao_siren(value);
+	else
+		ao_strobe(value);
+}
 #endif
 
 __code struct ao_cmds ao_pad_cmds[] = {
@@ -369,6 +411,7 @@ __code struct ao_cmds ao_pad_cmds[] = {
 	{ ao_pad_manual,	"i <key> <n>\0Fire igniter. <key> is doit with D&I" },
 #if DEBUG
 	{ ao_pad_set_debug,	"D <0 off, 1 on>\0Debug" },
+	{ ao_pad_alarm_debug,	"S <0 strobe, 1 siren> <0 off, 1 on>\0Set alarm output" },
 #endif
 	{ 0, NULL }
 };

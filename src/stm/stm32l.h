@@ -171,6 +171,11 @@ stm_gpio_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->idr >> pin) & 1;
 }
 
+static inline uint16_t
+stm_gpio_get_all(struct stm_gpio *gpio) {
+	return gpio->idr;
+}
+
 extern struct stm_gpio stm_gpioa;
 extern struct stm_gpio stm_gpiob;
 extern struct stm_gpio stm_gpioc;
@@ -1734,7 +1739,7 @@ extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
 #define  STM_TIM234_CCMR1_CC1S_INPUT_TRC		3
 #define  STM_TIM234_CCMR1_CC1S_MASK			3
 
-#define STM_TIM234_CCMR2_OC2CE	15
+#define STM_TIM234_CCMR2_OC4CE	15
 #define STM_TIM234_CCMR2_OC4M	12
 #define  STM_TIM234_CCMR2_OC4M_FROZEN			0
 #define  STM_TIM234_CCMR2_OC4M_SET_HIGH_ON_MATCH	1

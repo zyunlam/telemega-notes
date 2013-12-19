@@ -26,6 +26,9 @@
 #define AO_GPS_NUM_SAT_MASK	(0xf << 0)
 #define AO_GPS_NUM_SAT_SHIFT	(0)
 
+#define AO_GPS_NEW_DATA		1
+#define AO_GPS_NEW_TRACKING	2
+
 #define AO_GPS_VALID		(1 << 4)
 #define AO_GPS_RUNNING		(1 << 5)
 #define AO_GPS_DATE_VALID	(1 << 6)
@@ -77,6 +80,11 @@ struct ao_telemetry_satellite {
 #define ao_gps_tracking_orig ao_telemetry_satellite
 #define ao_gps_sat_orig ao_telemetry_satellite_info
 
+extern __xdata struct ao_telemetry_location	ao_gps_data;
+extern __xdata struct ao_telemetry_satellite	ao_gps_tracking_data;
+
+uint8_t ao_gps_mutex;
+
 void
 ao_mutex_get(uint8_t *mutex)
 {
@@ -125,7 +133,7 @@ static uint16_t	recv_len;
 static void check_ublox_message(char *which, uint8_t *msg);
 
 char
-ao_serial1_getchar(void)
+ao_gps_getchar(void)
 {
 	char	c;
 	uint8_t	uc;
@@ -158,7 +166,7 @@ static int	message_len;
 static uint16_t	send_len;
 
 void
-ao_serial1_putchar(char c)
+ao_gps_putchar(char c)
 {
 	int	i;
 	uint8_t	uc = (uint8_t) c;
@@ -191,7 +199,7 @@ ao_serial1_putchar(char c)
 #define AO_SERIAL_SPEED_115200	3
 
 static void
-ao_serial1_set_speed(uint8_t speed)
+ao_gps_set_speed(uint8_t speed)
 {
 	int	fd = ao_gps_fd;
 	struct termios	termios;
@@ -224,6 +232,7 @@ uint8_t	ao_task_minimize_latency;
 #define ao_usb_getchar()	0
 
 #include "ao_gps_print.c"
+#include "ao_gps_show.c"
 #include "ao_gps_ublox.c"
 
 static void
@@ -341,11 +350,8 @@ check_ublox_message(char *which, uint8_t *msg)
 void
 ao_dump_state(void *wchan)
 {
-	if (wchan == &ao_gps_data)
-		ao_gps_print(&ao_gps_data);
-	else
-		ao_gps_tracking_print(&ao_gps_tracking_data);
-	putchar('\n');
+	if (wchan == &ao_gps_new)
+		ao_gps_show();
 	return;
 }
 

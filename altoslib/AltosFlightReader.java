@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.text.*;
 import java.io.*;
@@ -28,7 +28,7 @@ public class AltosFlightReader {
 
 	public void init() { }
 
-	public AltosRecord read() throws InterruptedException, ParseException, AltosCRCException, IOException { return null; }
+	public AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException { return null; }
 
 	public void close(boolean interrupted) { }
 
@@ -46,7 +46,7 @@ public class AltosFlightReader {
 
 	public File backing_file() { return null; }
 
-	public boolean has_monitor_battery() { return false; }
+	public boolean has_monitor_battery() throws InterruptedException { return false; }
 
-	public double monitor_battery() { return AltosRecord.MISSING; }
+	public double monitor_battery() throws InterruptedException { return AltosLib.MISSING; }
 }

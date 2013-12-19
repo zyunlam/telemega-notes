@@ -15,20 +15,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.text.*;
+import java.util.concurrent.*;
 
-public class AltosGPS {
+public class AltosGPS implements Cloneable {
 
-	public final static int MISSING = AltosRecord.MISSING;
+	public final static int MISSING = AltosLib.MISSING;
 
 	public int	nsat;
 	public boolean	locked;
 	public boolean	connected;
 	public double	lat;		/* degrees (+N -S) */
 	public double	lon;		/* degrees (+E -W) */
-	public int	alt;		/* m */
+	public double	alt;		/* m */
 	public int	year;
 	public int	month;
 	public int	day;
@@ -65,46 +66,102 @@ public class AltosGPS {
 	}
 
 	public void ClearGPSTime() {
-		year = month = day = 0;
-		hour = minute = second = 0;
+		year = month = day = AltosLib.MISSING;
+		hour = minute = second = AltosLib.MISSING;
 	}
 
 	public AltosGPS(AltosTelemetryMap map) throws ParseException {
-		String	state = map.get_string(AltosTelemetry.AO_TELEM_GPS_STATE,
-					       AltosTelemetry.AO_TELEM_GPS_STATE_ERROR);
+		String	state = map.get_string(AltosTelemetryLegacy.AO_TELEM_GPS_STATE,
+					       AltosTelemetryLegacy.AO_TELEM_GPS_STATE_ERROR);
 
-		nsat = map.get_int(AltosTelemetry.AO_TELEM_GPS_NUM_SAT, 0);
-		if (state.equals(AltosTelemetry.AO_TELEM_GPS_STATE_LOCKED)) {
+		nsat = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_NUM_SAT, 0);
+		if (state.equals(AltosTelemetryLegacy.AO_TELEM_GPS_STATE_LOCKED)) {
 			connected = true;
 			locked = true;
-			lat = map.get_double(AltosTelemetry.AO_TELEM_GPS_LATITUDE, MISSING, 1.0e-7);
-			lon = map.get_double(AltosTelemetry.AO_TELEM_GPS_LONGITUDE, MISSING, 1.0e-7);
-			alt = map.get_int(AltosTelemetry.AO_TELEM_GPS_ALTITUDE, MISSING);
-			year = map.get_int(AltosTelemetry.AO_TELEM_GPS_YEAR, MISSING);
+			lat = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_LATITUDE, MISSING, 1.0e-7);
+			lon = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_LONGITUDE, MISSING, 1.0e-7);
+			alt = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_ALTITUDE, MISSING);
+			year = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_YEAR, MISSING);
 			if (year != MISSING)
 				year += 2000;
-			month = map.get_int(AltosTelemetry.AO_TELEM_GPS_MONTH, MISSING);
-			day = map.get_int(AltosTelemetry.AO_TELEM_GPS_DAY, MISSING);
+			month = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_MONTH, MISSING);
+			day = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_DAY, MISSING);
 
-			hour = map.get_int(AltosTelemetry.AO_TELEM_GPS_HOUR, 0);
-			minute = map.get_int(AltosTelemetry.AO_TELEM_GPS_MINUTE, 0);
-			second = map.get_int(AltosTelemetry.AO_TELEM_GPS_SECOND, 0);
+			hour = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_HOUR, 0);
+			minute = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_MINUTE, 0);
+			second = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_SECOND, 0);
 
-			ground_speed = map.get_double(AltosTelemetry.AO_TELEM_GPS_HORIZONTAL_SPEED,
-						      AltosRecord.MISSING, 1/100.0);
-			course = map.get_int(AltosTelemetry.AO_TELEM_GPS_COURSE,
-					     AltosRecord.MISSING);
-			hdop = map.get_double(AltosTelemetry.AO_TELEM_GPS_HDOP, MISSING, 1.0);
-			vdop = map.get_double(AltosTelemetry.AO_TELEM_GPS_VDOP, MISSING, 1.0);
-			h_error = map.get_int(AltosTelemetry.AO_TELEM_GPS_HERROR, MISSING);
-			v_error = map.get_int(AltosTelemetry.AO_TELEM_GPS_VERROR, MISSING);
-		} else if (state.equals(AltosTelemetry.AO_TELEM_GPS_STATE_UNLOCKED)) {
+			ground_speed = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_HORIZONTAL_SPEED,
+						      AltosLib.MISSING, 1/100.0);
+			course = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_COURSE,
+					     AltosLib.MISSING);
+			hdop = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_HDOP, MISSING, 1.0);
+			vdop = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_VDOP, MISSING, 1.0);
+			h_error = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_HERROR, MISSING);
+			v_error = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_VERROR, MISSING);
+		} else if (state.equals(AltosTelemetryLegacy.AO_TELEM_GPS_STATE_UNLOCKED)) {
 			connected = true;
 			locked = false;
 		} else {
 			connected = false;
 			locked = false;
 		}
+	}
+
+	public boolean parse_string (String line, boolean says_done) {
+		String[] bits = line.split("\\s+");
+		if (bits.length == 0)
+			return false;
+		if (line.startsWith("Date:")) {
+			if (bits.length < 2)
+				return false;
+			String[] d = bits[1].split("/");
+			if (d.length < 3)
+				return false;
+			year = Integer.parseInt(d[0]) + 2000;
+			month = Integer.parseInt(d[1]);
+			day = Integer.parseInt(d[2]);
+		} else if (line.startsWith("Time:")) {
+			if (bits.length < 2)
+				return false;
+			String[] d = bits[1].split(":");
+			if (d.length < 3)
+				return false;
+			hour = Integer.parseInt(d[0]);
+			minute = Integer.parseInt(d[1]);
+			second = Integer.parseInt(d[2]);
+		} else if (line.startsWith("Lat/Lon:")) {
+			if (bits.length < 3)
+				return false;
+			lat = Integer.parseInt(bits[1]) * 1.0e-7;
+			lon = Integer.parseInt(bits[2]) * 1.0e-7;
+		} else if (line.startsWith("Alt:")) {
+			if (bits.length < 2)
+				return false;
+			alt = Integer.parseInt(bits[1]);
+		} else if (line.startsWith("Flags:")) {
+			if (bits.length < 2)
+				return false;
+			int status = Integer.decode(bits[1]);
+			connected = (status & AltosLib.AO_GPS_RUNNING) != 0;
+			locked = (status & AltosLib.AO_GPS_VALID) != 0;
+			if (!says_done)
+				return false;
+		} else if (line.startsWith("Sats:")) {
+			if (bits.length < 2)
+				return false;
+			nsat = Integer.parseInt(bits[1]);
+			cc_gps_sat = new AltosGPSSat[nsat];
+			for (int i = 0; i < nsat; i++) {
+				int	svid = Integer.parseInt(bits[2+i*2]);
+				int	cc_n0 = Integer.parseInt(bits[3+i*2]);
+				cc_gps_sat[i] = new AltosGPSSat(svid, cc_n0);
+			}
+		} else if (line.startsWith("done")) {
+			return false;
+		} else
+			return false;
+		return true;
 	}
 
 	public AltosGPS(String[] words, int i, int version) throws ParseException {
@@ -212,8 +269,44 @@ public class AltosGPS {
 	}
 
 	public AltosGPS() {
+		lat = AltosLib.MISSING;
+		lon = AltosLib.MISSING;
+		alt = AltosLib.MISSING;
 		ClearGPSTime();
 		cc_gps_sat = null;
+	}
+
+	public AltosGPS clone() {
+		AltosGPS	g = new AltosGPS();
+
+		g.nsat = nsat;
+		g.locked = locked;
+		g.connected = connected;
+		g.lat = lat;		/* degrees (+N -S) */
+		g.lon = lon;		/* degrees (+E -W) */
+		g.alt = alt;		/* m */
+		g.year = year;
+		g.month = month;
+		g.day = day;
+		g.hour = hour;
+		g.minute = minute;
+		g.second = second;
+
+		g.ground_speed = ground_speed;	/* m/s */
+		g.course = course;		/* degrees */
+		g.climb_rate = climb_rate;	/* m/s */
+		g.hdop = hdop;		/* unitless? */
+		g.h_error = h_error;	/* m */
+		g.v_error = v_error;	/* m */
+
+		if (cc_gps_sat != null) {
+			g.cc_gps_sat = new AltosGPSSat[cc_gps_sat.length];
+			for (int i = 0; i < cc_gps_sat.length; i++) {
+				g.cc_gps_sat[i] = new AltosGPSSat(cc_gps_sat[i].svid,
+								  cc_gps_sat[i].c_n0);
+			}
+		}
+		return g;
 	}
 
 	public AltosGPS(AltosGPS old) {
@@ -247,8 +340,36 @@ public class AltosGPS {
 				}
 			}
 		} else {
+			lat = AltosLib.MISSING;
+			lon = AltosLib.MISSING;
+			alt = AltosLib.MISSING;
 			ClearGPSTime();
 			cc_gps_sat = null;
+		}
+	}
+
+	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+		try {
+			AltosGPS	gps = new AltosGPS(link, config_data);
+
+			if (gps != null) {
+				state.set_gps(gps, state.gps_sequence++);
+				return;
+			}
+		} catch (TimeoutException te) {
+		}
+		state.set_gps(null, 0);
+	}
+
+	public AltosGPS (AltosLink link, AltosConfigData config_data) throws TimeoutException, InterruptedException {
+		boolean says_done = config_data.compare_version("1.0") >= 0;
+		link.printf("g\n");
+		for (;;) {
+			String line = link.get_reply_no_dialog(5000);
+			if (line == null)
+				throw new TimeoutException();
+			if (!parse_string(line, says_done))
+				break;
 		}
 	}
 }

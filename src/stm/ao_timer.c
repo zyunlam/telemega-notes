@@ -67,20 +67,6 @@ ao_timer_set_adc_interval(uint8_t interval)
 }
 #endif
 
-/*
- * According to the STM clock-configuration, timers run
- * twice as fast as the APB1 clock *if* the APB1 prescaler
- * is greater than 1.
- */
-
-#if AO_APB1_PRESCALER > 1
-#define TIMER_23467_SCALER 2
-#else
-#define TIMER_23467_SCALER 1
-#endif
-
-#define TIMER_10kHz	((AO_PCLK1 * TIMER_23467_SCALER) / 10000)
-
 #define SYSTICK_RELOAD (AO_SYSTICK / 100 - 1)
 
 void
@@ -104,7 +90,15 @@ ao_clock_init(void)
 	/* Switch to MSI while messing about */
 	stm_rcc.cr |= (1 << STM_RCC_CR_MSION);
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_MSIRDY)))
-		asm("nop");
+		ao_arch_nop();
+
+	stm_rcc.cfgr = (stm_rcc.cfgr & ~(STM_RCC_CFGR_SW_MASK << STM_RCC_CFGR_SW)) |
+		(STM_RCC_CFGR_SW_MSI << STM_RCC_CFGR_SW);
+
+	/* wait for system to switch to MSI */
+	while ((stm_rcc.cfgr & (STM_RCC_CFGR_SWS_MASK << STM_RCC_CFGR_SWS)) !=
+	       (STM_RCC_CFGR_SWS_MSI << STM_RCC_CFGR_SWS))
+		ao_arch_nop();
 
 	/* reset SW, HPRE, PPRE1, PPRE2, MCOSEL and MCOPRE */
 	stm_rcc.cfgr &= (uint32_t)0x88FFC00C;
@@ -155,7 +149,6 @@ ao_clock_init(void)
 	stm_flash.acr |= (1 << STM_FLASH_ACR_PRFEN);
 
 	/* Enable 1 wait state so the CPU can run at 32MHz */
-	/* (haven't managed to run the CPU at 32MHz yet, it's at 16MHz) */
 	stm_flash.acr |= (1 << STM_FLASH_ACR_LATENCY);
 
 	/* Enable power interface clock */

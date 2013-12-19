@@ -20,7 +20,7 @@ package altosui;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosDataChooser extends JFileChooser {
@@ -36,7 +36,7 @@ public class AltosDataChooser extends JFileChooser {
 		return file;
 	}
 
-	public AltosRecordIterable runDialog() {
+	public AltosStateIterable runDialog() {
 		int	ret;
 
 		ret = showOpenDialog(frame);
@@ -48,13 +48,10 @@ public class AltosDataChooser extends JFileChooser {
 			try {
 				if (filename.endsWith("eeprom")) {
 					FileInputStream in = new FileInputStream(file);
-					return new AltosEepromIterable(in);
+					return new AltosEepromFile(in);
 				} else if (filename.endsWith("telem")) {
 					FileInputStream in = new FileInputStream(file);
-					return new AltosTelemetryIterable(in);
-				} else if (filename.endsWith("mega")) {
-					FileInputStream in = new FileInputStream(file);
-					return new AltosEepromMegaIterable(in);
+					return new AltosTelemetryFile(in);
 				} else {
 					throw new FileNotFoundException();
 				}
@@ -77,8 +74,10 @@ public class AltosDataChooser extends JFileChooser {
 							  "telem"));
 		setFileFilter(new FileNameExtensionFilter("TeleMega eeprom file",
 							  "mega"));
+		setFileFilter(new FileNameExtensionFilter("EasyMini eeprom file",
+							  "mini"));
 		setFileFilter(new FileNameExtensionFilter("Flight data file",
-							  "telem", "eeprom", "mega"));
+							  "telem", "eeprom", "mega", "mini"));
 		setCurrentDirectory(AltosUIPreferences.logdir());
 	}
 }

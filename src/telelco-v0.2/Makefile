@@ -21,6 +21,7 @@ INC = \
 	ao_radio_spi.h \
 	ao_radio_cmac.h \
 	ao_cc1120_CC1120.h \
+	ao_debounce.h \
 	stm32l.h
 
 #
@@ -47,8 +48,8 @@ ALTOS_SRC = \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
 	ao_beep_stm.c \
-	ao_storage.c \
 	ao_eeprom_stm.c \
+	ao_fast_timer.c \
 	ao_lcd_stm.c \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
@@ -59,6 +60,7 @@ ALTOS_SRC = \
 	ao_fec_tx.c \
 	ao_fec_rx.c \
 	ao_seven_segment.c \
+	ao_debounce.c \
 	ao_quadrature.c \
 	ao_button.c \
 	ao_event.c \
@@ -75,14 +77,15 @@ CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) -Os -g
 
 PROGNAME=telelco-v0.2
 PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_telelco.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(SAT_CLIB) -lgcc
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 ../altitude.h: make-altitude
 	nickle $< > $@
@@ -95,7 +98,7 @@ ao_product.h: ao-make-product.5c ../Version
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
 	rm -f ao_product.h
 
 install:

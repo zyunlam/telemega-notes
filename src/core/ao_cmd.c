@@ -206,9 +206,9 @@ ao_cmd_hex(void)
 }
 
 void
-ao_cmd_decimal(void)
+ao_cmd_decimal(void) __reentrant
 {
-	__pdata uint8_t	r = ao_cmd_lex_error;
+	uint8_t	r = ao_cmd_lex_error;
 
 	ao_cmd_lex_u32 = 0;
 	ao_cmd_white();
@@ -290,9 +290,6 @@ version(void)
 	       , ao_log_format
 #endif
 		);
-#if HAS_MS5607
-	ao_ms5607_info();
-#endif
 	printf("software-version %s\n", ao_version);
 }
 #endif

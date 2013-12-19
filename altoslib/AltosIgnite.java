@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -141,7 +141,7 @@ public class AltosIgnite {
 		}
 	}
 
-	public void fire(int igniter) {
+	public void fire(int igniter) throws InterruptedException {
 		if (link == null)
 			return;
 		try {
@@ -154,21 +154,14 @@ public class AltosIgnite {
 				link.printf("i DoIt drogue\n");
 				break;
 			}
-		} catch (InterruptedException ie) {
 		} catch (TimeoutException te) {
 		} finally {
-			try {
-				stop_link();
-			} catch (InterruptedException ie) {
-			}
+			stop_link();
 		}
 	}
 
-	public void close() {
-		try {
-			stop_link();
-		} catch (InterruptedException ie) {
-		}
+	public void close() throws InterruptedException {
+		stop_link();
 		link.close();
 		link = null;
 	}

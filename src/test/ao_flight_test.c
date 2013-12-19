@@ -20,9 +20,12 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include <getopt.h>
 #include <math.h>
+
+#define GRAVITY 9.80665
 
 #define AO_HERTZ	100
 
@@ -35,11 +38,17 @@
 #define AO_MS_TO_SPEED(ms)	((int16_t) ((ms) * 16))
 #define AO_MSS_TO_ACCEL(mss)	((int16_t) ((mss) * 16))
 
+#define AO_GPS_NEW_DATA		1
+#define AO_GPS_NEW_TRACKING	2
+
+int ao_gps_new;
+
 #if TELEMEGA
 #define AO_ADC_NUM_SENSE	6
 #define HAS_MS5607		1
 #define HAS_MPU6000		1
 #define HAS_MMA655X		1
+#define HAS_HMC5883 		1
 
 struct ao_adc {
 	int16_t			sense[AO_ADC_NUM_SENSE];
@@ -83,6 +92,95 @@ struct ao_adc {
 
 #include <ao_data.h>
 #include <ao_log.h>
+#include <ao_telemetry.h>
+
+#if TELEMEGA
+int ao_gps_count;
+struct ao_telemetry_location ao_gps_first;
+struct ao_telemetry_location ao_gps_prev;
+struct ao_telemetry_location ao_gps_static;
+
+struct ao_telemetry_satellite ao_gps_tracking;
+
+static inline double sqr(double a) { return a * a; }
+
+void
+cc_great_circle (double start_lat, double start_lon,
+		 double end_lat, double end_lon,
+		 double *dist, double *bearing)
+{
+	const double rad = M_PI / 180;
+	const double earth_radius = 6371.2 * 1000;	/* in meters */
+	double lat1 = rad * start_lat;
+	double lon1 = rad * -start_lon;
+	double lat2 = rad * end_lat;
+	double lon2 = rad * -end_lon;
+
+//	double d_lat = lat2 - lat1;
+	double d_lon = lon2 - lon1;
+
+	/* From http://en.wikipedia.org/wiki/Great-circle_distance */
+	double vdn = sqrt(sqr(cos(lat2) * sin(d_lon)) +
+			  sqr(cos(lat1) * sin(lat2) -
+			      sin(lat1) * cos(lat2) * cos(d_lon)));
+	double vdd = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(d_lon);
+	double d = atan2(vdn,vdd);
+	double course;
+
+	if (cos(lat1) < 1e-20) {
+		if (lat1 > 0)
+			course = M_PI;
+		else
+			course = -M_PI;
+	} else {
+		if (d < 1e-10)
+			course = 0;
+		else
+			course = acos((sin(lat2)-sin(lat1)*cos(d)) /
+				      (sin(d)*cos(lat1)));
+		if (sin(lon2-lon1) > 0)
+			course = 2 * M_PI-course;
+	}
+	*dist = d * earth_radius;
+	*bearing = course * 180/M_PI;
+}
+
+double
+ao_distance_from_pad(void)
+{
+	double	dist, bearing;
+	if (!ao_gps_count)
+		return 0;
+	
+	cc_great_circle(ao_gps_first.latitude / 1e7,
+			ao_gps_first.longitude / 1e7,
+			ao_gps_static.latitude / 1e7,
+			ao_gps_static.longitude / 1e7,
+			&dist, &bearing);
+	return dist;
+}
+
+double
+ao_gps_angle(void)
+{
+	double	dist, bearing;
+	double	height;
+	double	angle;
+
+	if (ao_gps_count < 2)
+		return 0;
+
+	cc_great_circle(ao_gps_prev.latitude / 1e7,
+			ao_gps_prev.longitude / 1e7,
+			ao_gps_static.latitude / 1e7,
+			ao_gps_static.longitude / 1e7,
+			&dist, &bearing);
+	height = ao_gps_static.altitude - ao_gps_prev.altitude;
+
+	angle = atan2(dist, height);
+	return angle * 180/M_PI;
+}
+#endif
 
 #define to_fix16(x) ((int16_t) ((x) * 65536.0 + 0.5))
 #define to_fix32(x) ((int32_t) ((x) * 65536.0 + 0.5))
@@ -120,6 +218,7 @@ int	ao_summary = 0;
 #define ao_rdf_set(rdf)
 #define ao_packet_slave_start()
 #define ao_packet_slave_stop()
+#define flush()
 
 enum ao_igniter {
 	ao_igniter_drogue = 0,
@@ -136,6 +235,18 @@ double	main_time;
 int	tick_offset;
 
 static int32_t	ao_k_height;
+
+int16_t
+ao_time(void)
+{
+	return ao_data_static.tick;
+}
+
+void
+ao_delay(int16_t interval)
+{
+	return;
+}
 
 void
 ao_ignite(enum ao_igniter igniter)
@@ -200,6 +311,8 @@ struct ao_cmds {
 #include <ao_ms5607.h>
 struct ao_ms5607_prom	ms5607_prom;
 #include "ao_ms5607_convert.c"
+#define AO_PYRO_NUM	4
+#include <ao_pyro.h>
 #else
 #include "ao_convert.c"
 #endif
@@ -210,6 +323,12 @@ struct ao_config {
 	int16_t		accel_minus_g;
 	uint8_t		pad_orientation;
 	uint16_t	apogee_lockout;
+#if TELEMEGA
+	struct ao_pyro	pyro[AO_PYRO_NUM];	/* minor version 12 */
+	int16_t		accel_zero_along;
+	int16_t		accel_zero_across;
+	int16_t		accel_zero_through;
+#endif
 };
 
 #define AO_PAD_ORIENTATION_ANTENNA_UP	0
@@ -222,7 +341,6 @@ struct ao_config ao_config;
 #define DATA_TO_XDATA(x) (x)
 
 
-#define GRAVITY 9.80665
 extern int16_t ao_ground_accel, ao_flight_accel;
 extern int16_t ao_accel_2g;
 
@@ -246,6 +364,22 @@ uint16_t	prev_tick;
 #include "ao_sqrt.c"
 #include "ao_sample.c"
 #include "ao_flight.c"
+#if TELEMEGA
+#define AO_PYRO_NUM	4
+
+#define AO_PYRO_0	0
+#define AO_PYRO_1	1
+#define AO_PYRO_2	2
+#define AO_PYRO_3	3
+
+static void
+ao_pyro_pin_set(uint8_t pin, uint8_t value)
+{
+	printf ("set pyro %d %d\n", pin, value);
+}
+
+#include "ao_pyro.c"
+#endif
 
 #define to_double(f)	((f) / 65536.0)
 
@@ -305,17 +439,20 @@ ao_test_exit(void)
 	exit(0);
 }
 
-#if HAS_MPU6000
-static double
-ao_mpu6000_accel(int16_t sensor)
-{
-	return sensor / 32767.0 * MPU6000_ACCEL_FULLSCALE * GRAVITY;
-}
+#ifdef TELEMEGA
+struct ao_azel {
+	int	az;
+	int	el;
+};
 
-static double
-ao_mpu6000_gyro(int32_t sensor)
+static void
+azel (struct ao_azel *r, struct ao_quaternion *q)
 {
-	return sensor / 32767.0 * MPU6000_GYRO_FULLSCALE;
+	double	v;
+
+	r->az = floor (atan2(q->y, q->x) * 180/M_PI + 0.5);
+	v = sqrt (q->x*q->x + q->y*q->y);
+	r->el = floor (atan2(q->z, v) * 180/M_PI + 0.5);
 }
 #endif
 
@@ -342,6 +479,7 @@ ao_insert(void)
 		double	height = ao_pres_to_altitude(ao_data_static.adc.pres_real) - ao_ground_height;
 #endif
 
+		(void) accel;
 		if (!tick_offset)
 			tick_offset = -ao_data_static.tick;
 		if ((prev_tick - ao_data_static.tick) > 0x400)
@@ -372,25 +510,115 @@ ao_insert(void)
 		}
 
 		if (!ao_summary) {
+#if TELEMEGA
+			static struct ao_quaternion	ao_ground_mag;
+			static int			ao_ground_mag_set;
+
+			if (!ao_ground_mag_set) {
+				ao_quaternion_init_vector (&ao_ground_mag,
+							   ao_data_mag_across(&ao_data_static),
+							   ao_data_mag_through(&ao_data_static),
+							   ao_data_mag_along(&ao_data_static));
+				ao_quaternion_normalize(&ao_ground_mag, &ao_ground_mag);
+				ao_quaternion_rotate(&ao_ground_mag, &ao_ground_mag, &ao_rotation);
+				ao_ground_mag_set = 1;
+			}
+
+			struct ao_quaternion		ao_mag, ao_mag_rot;
+
+			ao_quaternion_init_vector(&ao_mag,
+						  ao_data_mag_across(&ao_data_static),
+						  ao_data_mag_through(&ao_data_static),
+						  ao_data_mag_along(&ao_data_static));
+
+			ao_quaternion_normalize(&ao_mag, &ao_mag);
+			ao_quaternion_rotate(&ao_mag_rot, &ao_mag, &ao_rotation);
+			
+			float				ao_dot;
+			int				ao_mag_angle;
+
+			ao_dot = ao_quaternion_dot(&ao_mag_rot, &ao_ground_mag);
+
+			struct ao_azel			ground_azel, mag_azel, rot_azel;
+
+			azel(&ground_azel, &ao_ground_mag);
+			azel(&mag_azel, &ao_mag);
+			azel(&rot_azel, &ao_mag_rot);
+
+			ao_mag_angle = floor (acos(ao_dot) * 180 / M_PI + 0.5);
+
+			(void) ao_mag_angle;
+
+			static struct ao_quaternion	ao_x = { .r = 0, .x = 1, .y = 0, .z = 0 };
+			struct ao_quaternion		ao_out;
+
+			ao_quaternion_rotate(&ao_out, &ao_x, &ao_rotation);
+
+			int	out = floor (atan2(ao_out.y, ao_out.x) * 180 / M_PI);
+
+#if 0
+			printf ("%7.2f state %-8.8s height %8.4f tilt %4d rot %4d mag_tilt %4d mag_rot %4d\n",
+				time,
+				ao_state_names[ao_flight_state],
+				ao_k_height / 65536.0,
+				ao_sample_orient, out,
+				mag_azel.el,
+				mag_azel.az);
+#endif
+			printf ("%7.2f state %-8.8s height %8.4f tilt %4d rot %4d dist %12.2f gps_tilt %4d gps_sats %2d\n",
+				time,
+				ao_state_names[ao_flight_state],
+				ao_k_height / 65536.0,
+				ao_sample_orient, out,
+				ao_distance_from_pad(),
+				(int) floor (ao_gps_angle() + 0.5),
+				(ao_gps_static.flags & 0xf) * 10);
+
+#if 0
+			printf ("\t\tstate %-8.8s ground az: %4d el %4d mag az %4d el %4d rot az %4d el %4d el_diff %4d az_diff %4d angle %4d tilt %4d ground %8.5f %8.5f %8.5f cur %8.5f %8.5f %8.5f rot %8.5f %8.5f %8.5f\n",
+				ao_state_names[ao_flight_state],
+				ground_azel.az, ground_azel.el,
+				mag_azel.az, mag_azel.el,
+				rot_azel.az, rot_azel.el,
+				ground_azel.el - rot_azel.el,
+				ground_azel.az - rot_azel.az,
+				ao_mag_angle,
+				ao_sample_orient,
+				ao_ground_mag.x,
+				ao_ground_mag.y,
+				ao_ground_mag.z,
+				ao_mag.x,
+				ao_mag.y,
+				ao_mag.z,
+				ao_mag_rot.x,
+				ao_mag_rot.y,
+				ao_mag_rot.z);
+#endif
+#endif
+
+#if 0
 			printf("%7.2f height %8.2f accel %8.3f "
 #if TELEMEGA
-			       "roll %8.3f angle %8.3f qangle %8.3f "
-			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f "
+			       "angle %5d "
+			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
 #endif
 			       "state %-8.8s k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d\n",
 			       time,
 			       height,
 			       accel,
 #if TELEMEGA
-			       ao_mpu6000_gyro(ao_sample_roll_angle) / 100.0,
-			       ao_mpu6000_gyro(ao_sample_angle) / 100.0,
-			       ao_sample_qangle,
+			       ao_sample_orient,
+
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_x),
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_y),
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_z),
 			       ao_mpu6000_gyro(ao_data_static.mpu6000.gyro_x - ao_ground_mpu6000.gyro_x),
 			       ao_mpu6000_gyro(ao_data_static.mpu6000.gyro_y - ao_ground_mpu6000.gyro_y),
 			       ao_mpu6000_gyro(ao_data_static.mpu6000.gyro_z - ao_ground_mpu6000.gyro_z),
+			       ao_data_static.hmc5883.x,
+			       ao_data_static.hmc5883.y,
+			       ao_data_static.hmc5883.z,
+			       ao_mag_angle,
 #endif
 			       ao_state_names[ao_flight_state],
 			       ao_k_height / 65536.0,
@@ -400,6 +628,7 @@ ao_insert(void)
 			       drogue_height,
 			       main_height,
 			       ao_error_h_sq_avg);
+#endif
 			
 //			if (ao_flight_state == ao_flight_landed)
 //				ao_test_exit();
@@ -407,125 +636,6 @@ ao_insert(void)
 	}
 }
 
-#define AO_MAX_CALLSIGN			8
-#define AO_MAX_VERSION			8
-#define AO_MAX_TELEMETRY		128
-
-struct ao_telemetry_generic {
-	uint16_t	serial;		/* 0 */
-	uint16_t	tick;		/* 2 */
-	uint8_t		type;		/* 4 */
-	uint8_t		payload[27];	/* 5 */
-	/* 32 */
-};
-
-#define AO_TELEMETRY_SENSOR_TELEMETRUM	0x01
-#define AO_TELEMETRY_SENSOR_TELEMINI	0x02
-#define AO_TELEMETRY_SENSOR_TELENANO	0x03
-
-struct ao_telemetry_sensor {
-	uint16_t	serial;		/*  0 */
-	uint16_t	tick;		/*  2 */
-	uint8_t		type;		/*  4 */
-
-	uint8_t         state;          /*  5 flight state */
-	int16_t		accel;		/*  6 accelerometer (TM only) */
-	int16_t		pres;		/*  8 pressure sensor */
-	int16_t		temp;		/* 10 temperature sensor */
-	int16_t		v_batt;		/* 12 battery voltage */
-	int16_t		sense_d;	/* 14 drogue continuity sense (TM/Tm) */
-	int16_t		sense_m;	/* 16 main continuity sense (TM/Tm) */
-
-	int16_t         acceleration;   /* 18 m/s² * 16 */
-	int16_t         speed;          /* 20 m/s * 16 */
-	int16_t         height;         /* 22 m */
-
-	int16_t		ground_pres;	/* 24 average pres on pad */
-	int16_t		ground_accel;	/* 26 average accel on pad */
-	int16_t		accel_plus_g;	/* 28 accel calibration at +1g */
-	int16_t		accel_minus_g;	/* 30 accel calibration at -1g */
-	/* 32 */
-};
-
-#define AO_TELEMETRY_CONFIGURATION	0x04
-
-struct ao_telemetry_configuration {
-	uint16_t	serial;				/*  0 */
-	uint16_t	tick;				/*  2 */
-	uint8_t		type;				/*  4 */
-
-	uint8_t         device;         		/*  5 device type */
-	uint16_t        flight;				/*  6 flight number */
-	uint8_t		config_major;			/*  8 Config major version */
-	uint8_t		config_minor;			/*  9 Config minor version */
-	uint16_t	apogee_delay;			/* 10 Apogee deploy delay in seconds */
-	uint16_t	main_deploy;			/* 12 Main deploy alt in meters */
-	uint16_t	flight_log_max;			/* 14 Maximum flight log size in kB */
-	char		callsign[AO_MAX_CALLSIGN];	/* 16 Radio operator identity */
-	char		version[AO_MAX_VERSION];	/* 24 Software version */
-	/* 32 */
-};
-
-#define AO_TELEMETRY_LOCATION		0x05
-
-#define AO_GPS_MODE_NOT_VALID		'N'
-#define AO_GPS_MODE_AUTONOMOUS		'A'
-#define AO_GPS_MODE_DIFFERENTIAL	'D'
-#define AO_GPS_MODE_ESTIMATED		'E'
-#define AO_GPS_MODE_MANUAL		'M'
-#define AO_GPS_MODE_SIMULATED		'S'
-
-struct ao_telemetry_location {
-	uint16_t	serial;		/*  0 */
-	uint16_t	tick;		/*  2 */
-	uint8_t		type;		/*  4 */
-
-	uint8_t         flags;		/*  5 Number of sats and other flags */
-	int16_t         altitude;	/*  6 GPS reported altitude (m) */
-	int32_t         latitude;	/*  8 latitude (degrees * 10⁷) */
-	int32_t         longitude;	/* 12 longitude (degrees * 10⁷) */
-	uint8_t         year;		/* 16 (- 2000) */
-	uint8_t         month;		/* 17 (1-12) */
-	uint8_t         day;		/* 18 (1-31) */
-	uint8_t         hour;		/* 19 (0-23) */
-	uint8_t         minute;		/* 20 (0-59) */
-	uint8_t         second;		/* 21 (0-59) */
-	uint8_t         pdop;		/* 22 (m * 5) */
-	uint8_t         hdop;		/* 23 (m * 5) */
-	uint8_t         vdop;		/* 24 (m * 5) */
-	uint8_t         mode;		/* 25 */
-	uint16_t	ground_speed;	/* 26 cm/s */
-	int16_t		climb_rate;	/* 28 cm/s */
-	uint8_t		course;		/* 30 degrees / 2 */
-	uint8_t		unused[1];	/* 31 */
-	/* 32 */
-};
-
-#define AO_TELEMETRY_SATELLITE		0x06
-
-struct ao_telemetry_satellite_info {
-	uint8_t		svid;
-	uint8_t		c_n_1;
-};
-
-struct ao_telemetry_satellite {
-	uint16_t				serial;		/*  0 */
-	uint16_t				tick;		/*  2 */
-	uint8_t					type;		/*  4 */
-	uint8_t					channels;	/*  5 number of reported sats */
-
-	struct ao_telemetry_satellite_info	sats[12];	/* 6 */
-	uint8_t					unused[2];	/* 30 */
-	/* 32 */
-};
-
-union ao_telemetry_all {
-	struct ao_telemetry_generic		generic;
-	struct ao_telemetry_sensor		sensor;
-	struct ao_telemetry_configuration	configuration;
-	struct ao_telemetry_location		location;
-	struct ao_telemetry_satellite		satellite;
-};
 
 uint16_t
 uint16(uint8_t *bytes, int off)
@@ -555,207 +665,6 @@ int32(uint8_t *bytes, int off)
 
 static int log_format;
 
-#if TELEMEGA
-
-static double
-ao_vec_norm(double x, double y, double z)
-{
-	return x*x + y*y + z*z;
-}
-
-static void
-ao_vec_normalize(double *x, double *y, double *z)
-{
-	double	scale = 1/sqrt(ao_vec_norm(*x, *y, *z));
-
-	*x *= scale;
-	*y *= scale;
-	*z *= scale;
-}
-
-struct ao_quat {
-	double	q0, q1, q2, q3;
-};
-
-static void
-ao_quat_mul(struct ao_quat *r, struct ao_quat *a, struct ao_quat *b)
-{
-	r->q0 = a->q0 * b->q0 - a->q1 * b->q1 - a->q2 * b->q2 - a->q3 * b->q3;
-	r->q1 = a->q0 * b->q1 + a->q1 * b->q0 + a->q2 * b->q3 - a->q3 * b->q2;
-	r->q2 = a->q0 * b->q2 - a->q1 * b->q3 + a->q2 * b->q0 + a->q3 * b->q1;
-	r->q3 = a->q0 * b->q3 + a->q1 * b->q2 - a->q2 * b->q1 + a->q3 * b->q0;
-}
-
-#if 0
-static void
-ao_quat_scale(struct ao_quat *r, struct ao_quat *a, double s)
-{
-	r->q0 = a->q0 * s;
-	r->q1 = a->q1 * s;
-	r->q2 = a->q2 * s;
-	r->q3 = a->q3 * s;
-}
-#endif
-
-static void
-ao_quat_conj(struct ao_quat *r, struct ao_quat *a)
-{
-	r->q0 =  a->q0;
-	r->q1 = -a->q1;
-	r->q2 = -a->q2;
-	r->q3 = -a->q3;
-}
-
-static void
-ao_quat_rot(struct ao_quat *r, struct ao_quat *a, struct ao_quat *q)
-{
-	struct ao_quat	t;
-	struct ao_quat	c;
-	ao_quat_mul(&t, q, a);
-	ao_quat_conj(&c, q);
-	ao_quat_mul(r, &t, &c);
-}
-
-static void
-ao_quat_from_angle(struct ao_quat *r,
-		   double x_rad,
-		   double y_rad,
-		   double z_rad)
-{
-	double angle = sqrt (x_rad * x_rad + y_rad * y_rad + z_rad * z_rad);
-	double s = sin(angle/2);
-	double c = cos(angle/2);
-
-	r->q0 = c;
-	r->q1 = x_rad * s / angle;
-	r->q2 = y_rad * s / angle;
-	r->q3 = z_rad * s / angle;
-}
-
-static void
-ao_quat_from_vector(struct ao_quat *r, double x, double y, double z)
-{
-	ao_vec_normalize(&x, &y, &z);
-	double	x_rad = atan2(z, y);
-	double	y_rad = atan2(x, z);
-	double	z_rad = atan2(y, x);
-
-	ao_quat_from_angle(r, x_rad, y_rad, z_rad);
-}
-
-static double
-ao_quat_norm(struct ao_quat *a)
-{
-	return (a->q0 * a->q0 +
-		a->q1 * a->q1 +
-		a->q2 * a->q2 +
-		a->q3 * a->q3);
-}
-
-static void
-ao_quat_normalize(struct ao_quat *a)
-{
-	double	norm = ao_quat_norm(a);
-
-	if (norm) {
-		double m = 1/sqrt(norm);
-
-		a->q0 *= m;
-		a->q1 *= m;
-		a->q2 *= m;
-		a->q3 *= m;
-	}
-}
-
-static struct ao_quat	ao_up, ao_current;
-static struct ao_quat	ao_orient;
-static int		ao_orient_tick;
-
-void
-set_orientation(double x, double y, double z, int tick)
-{
-	struct ao_quat	t;
-
-	printf ("set_orientation %g %g %g\n", x, y, z);
-	ao_quat_from_vector(&ao_orient, x, y, z);
-	ao_up.q1 = ao_up.q2 = 0;
-	ao_up.q0 = ao_up.q3 = sqrt(2)/2;
-	ao_orient_tick = tick;
-
-	ao_orient.q0 = 1;
-	ao_orient.q1 = 0;
-	ao_orient.q2 = 0;
-	ao_orient.q3 = 0;
-
-	printf ("orient (%g) %g %g %g up (%g) %g %g %g\n",
-		ao_orient.q0,
-		ao_orient.q1,
-		ao_orient.q2,
-		ao_orient.q3,
-		ao_up.q0,
-		ao_up.q1,
-		ao_up.q2,
-		ao_up.q3);
-
-	ao_quat_rot(&t, &ao_up, &ao_orient);
-	printf ("pad orient (%g) %g %g %g\n",
-		t.q0,
-		t.q1,
-		t.q2,
-		t.q3);
-
-}
-
-void
-update_orientation (double rate_x, double rate_y, double rate_z, int tick)
-{
-	struct ao_quat	q_dot;
-	double		lambda;
-	double		dt = (tick - ao_orient_tick) / 100.0;
-
-	ao_orient_tick = tick;
- 
-//	lambda = 1 - ao_quat_norm(&ao_orient);
-	lambda = 0;
-
-	q_dot.q0 = -0.5 * (ao_orient.q1 * rate_x + ao_orient.q2 * rate_y + ao_orient.q3 * rate_z) + lambda * ao_orient.q0;
-	q_dot.q1 =  0.5 * (ao_orient.q0 * rate_x + ao_orient.q2 * rate_z - ao_orient.q3 * rate_y) + lambda * ao_orient.q1;
-	q_dot.q2 =  0.5 * (ao_orient.q0 * rate_y + ao_orient.q3 * rate_x - ao_orient.q1 * rate_z) + lambda * ao_orient.q2;
-	q_dot.q3 =  0.5 * (ao_orient.q0 * rate_z + ao_orient.q1 * rate_y - ao_orient.q2 * rate_x) + lambda * ao_orient.q3;
-
-#if 0
-	printf ("update_orientation %g %g %g (%g s)\n", rate_x, rate_y, rate_z, dt);
-	printf ("q_dot (%g) %g %g %g\n",
-		q_dot.q0,
-		q_dot.q1,
-		q_dot.q2,
-		q_dot.q3);
-#endif
-
-	ao_orient.q0 += q_dot.q0 * dt;
-	ao_orient.q1 += q_dot.q1 * dt;
-	ao_orient.q2 += q_dot.q2 * dt;
-	ao_orient.q3 += q_dot.q3 * dt;
-
-	ao_quat_normalize(&ao_orient);
-
-	ao_quat_rot(&ao_current, &ao_up, &ao_orient);
-
-	ao_sample_qangle = 180 / M_PI * acos(ao_current.q3 * sqrt(2));
-#if 0
-	printf ("orient (%g) %g %g %g current (%g) %g %g %g\n",
-		ao_orient.q0,
-		ao_orient.q1,
-		ao_orient.q2,
-		ao_orient.q3,
-		ao_current.q0,
-		ao_current.q1,
-		ao_current.q2,
-		ao_current.q3);
-#endif
-}
-#endif
-
 void
 ao_sleep(void *wchan)
 {
@@ -771,6 +680,10 @@ ao_sleep(void *wchan)
 		char		*words[64];
 		int		nword;
 
+#if TELEMEGA
+		if (ao_flight_state >= ao_flight_boost && ao_flight_state < ao_flight_landed)
+			ao_pyro_check();
+#endif
 		for (;;) {
 			if (ao_records_read > 2 && ao_flight_state == ao_flight_startup)
 			{
@@ -826,43 +739,31 @@ ao_sleep(void *wchan)
 					ao_data_static.ms5607_raw.temp = int32(bytes, 4);
 					ao_ms5607_convert(&ao_data_static.ms5607_raw, &value);
 					ao_data_static.mpu6000.accel_x = int16(bytes, 8);
-					ao_data_static.mpu6000.accel_y = -int16(bytes, 10);
+					ao_data_static.mpu6000.accel_y = int16(bytes, 10);
 					ao_data_static.mpu6000.accel_z = int16(bytes, 12);
 					ao_data_static.mpu6000.gyro_x = int16(bytes, 14);
-					ao_data_static.mpu6000.gyro_y = -int16(bytes, 16);
+					ao_data_static.mpu6000.gyro_y = int16(bytes, 16);
 					ao_data_static.mpu6000.gyro_z = int16(bytes, 18);
+					ao_data_static.hmc5883.x = int16(bytes, 20);
+					ao_data_static.hmc5883.y = int16(bytes, 22);
+					ao_data_static.hmc5883.z = int16(bytes, 24);
 #if HAS_MMA655X
 					ao_data_static.mma655x = int16(bytes, 26);
 #endif
-					if (ao_records_read == 0)
-						ao_ground_mpu6000 = ao_data_static.mpu6000;
-					else if (ao_records_read < 10) {
-#define f(f) ao_ground_mpu6000.f = ao_ground_mpu6000.f + ((ao_data_static.mpu6000.f - ao_ground_mpu6000.f) >> 2)
-						f(accel_x);
-						f(accel_y);
-						f(accel_z);
-						f(gyro_x);
-						f(gyro_y);
-						f(gyro_z);
-
-						double		accel_x = ao_mpu6000_accel(ao_ground_mpu6000.accel_x);
-						double		accel_y = ao_mpu6000_accel(ao_ground_mpu6000.accel_y);
-						double		accel_z = ao_mpu6000_accel(ao_ground_mpu6000.accel_z);
-
-						/* X and Y are in the ground plane, arbitraryily picked as MPU X and Z axes
-						 * Z is normal to the ground, the MPU y axis
-						 */
-						set_orientation(accel_x, accel_z, accel_y, tick);
-					} else {
-						double		rate_x = ao_mpu6000_gyro(ao_data_static.mpu6000.gyro_x - ao_ground_mpu6000.gyro_x);
-						double		rate_y = ao_mpu6000_gyro(ao_data_static.mpu6000.gyro_y - ao_ground_mpu6000.gyro_y);
-						double		rate_z = ao_mpu6000_gyro(ao_data_static.mpu6000.gyro_z - ao_ground_mpu6000.gyro_z);
-
-						update_orientation(rate_x * M_PI / 180, rate_z * M_PI / 180, rate_y * M_PI / 180, tick);
-					}
 					ao_records_read++;
 					ao_insert();
 					return;
+				case 'G':
+					ao_gps_prev = ao_gps_static;
+					ao_gps_static.tick = tick;
+					ao_gps_static.latitude = int32(bytes, 0);
+					ao_gps_static.longitude = int32(bytes, 4);
+					ao_gps_static.altitude = int32(bytes, 8);
+					ao_gps_static.flags = bytes[13];
+					if (!ao_gps_count)
+						ao_gps_first = ao_gps_static;
+					ao_gps_count++;
+					break;
 				}
 				continue;
 			} else if (nword == 3 && strcmp(words[0], "ms5607") == 0) {
@@ -883,6 +784,23 @@ ao_sleep(void *wchan)
 				else if (strcmp(words[1], "crc:") == 0)
 					ms5607_prom.crc = strtoul(words[2], NULL, 10);
 				continue;
+			} else if (nword >= 3 && strcmp(words[0], "Pyro") == 0) {
+				int	p = strtoul(words[1], NULL, 10);
+				int	i, j;
+				struct ao_pyro	*pyro = &ao_config.pyro[p];
+
+				for (i = 2; i < nword; i++) {
+					for (j = 0; j < NUM_PYRO_VALUES; j++)
+						if (!strcmp (words[2], ao_pyro_values[j].name))
+							break;
+					if (j == NUM_PYRO_VALUES)
+						continue;
+					pyro->flags |= ao_pyro_values[j].flag;
+					if (ao_pyro_values[j].offset != NO_VALUE && i + 1 < nword) {
+						int16_t	val = strtoul(words[++i], NULL, 10);
+						*((int16_t *) ((char *) pyro + ao_pyro_values[j].offset)) = val;
+					}
+				}
 			}
 #else
 			if (nword == 4 && log_format != AO_LOG_FORMAT_TELEMEGA) {
@@ -899,6 +817,13 @@ ao_sleep(void *wchan)
 			} else if (nword >= 6 && strcmp(words[0], "Accel") == 0) {
 				ao_config.accel_plus_g = atoi(words[3]);
 				ao_config.accel_minus_g = atoi(words[5]);
+#ifdef TELEMEGA
+			} else if (nword >= 8 && strcmp(words[0], "IMU") == 0) {
+				ao_config.accel_zero_along = atoi(words[3]);
+				ao_config.accel_zero_across = atoi(words[5]);
+				ao_config.accel_zero_through = atoi(words[7]);
+				printf ("%d %d %d\n", ao_config.accel_zero_along, ao_config.accel_zero_across, ao_config.accel_zero_through);
+#endif
 			} else if (nword >= 4 && strcmp(words[0], "Main") == 0) {
 				ao_config.main_deploy = atoi(words[2]);
 			} else if (nword >= 3 && strcmp(words[0], "Apogee") == 0 &&

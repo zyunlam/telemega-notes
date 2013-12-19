@@ -17,14 +17,14 @@
 
 package altosui;
 
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 
 public interface AltosWriter {
 
-	public void write(AltosRecord record);
+	public void write(AltosState state);
 
-	public void write(AltosRecordIterable iterable);
+	public void write(AltosStateIterable states);
 
 	public void close();
 }

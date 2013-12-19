@@ -23,7 +23,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_1.*;
+import java.util.Arrays;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDisplay, AltosFontListener, AltosIdleMonitorListener, DocumentListener {
@@ -38,7 +39,10 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 	void stop_display() {
 		if (thread != null) {
-			thread.abort();
+			try {
+				thread.abort();
+			} catch (InterruptedException ie) {
+			}
 		}
 		thread = null;
 	}
@@ -65,13 +69,13 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 	public void show(AltosState state, AltosListenerState listener_state) {
 		status_update.saved_state = state;
-		try {
+//		try {
 			pad.show(state, listener_state);
 			flightStatus.show(state, listener_state);
 			flightInfo.show(state, listener_state);
-		} catch (Exception e) {
-			System.out.print("Show exception" + e);
-		}
+//		} catch (Exception e) {
+//			System.out.print("Show exception " + e);
+//		}
 	}
 
 	public void update(final AltosState state, final AltosListenerState listener_state) {
@@ -191,7 +195,11 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
-					disconnect();
+					try {
+						disconnect();
+					} catch (Exception ex) {
+						System.out.println(Arrays.toString(ex.getStackTrace()));
+					}
 					setVisible(false);
 					dispose();
 					AltosUIPreferences.unregister_font_listener(AltosIdleMonitorUI.this);

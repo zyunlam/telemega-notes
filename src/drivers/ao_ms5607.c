@@ -21,19 +21,17 @@
 
 #if HAS_MS5607 || HAS_MS5611
 
-static struct ao_ms5607_prom	ms5607_prom;
-static uint8_t	  		ms5607_configured;
+static __xdata struct ao_ms5607_prom	ms5607_prom;
+static __xdata uint8_t	  		ms5607_configured;
 
 static void
 ao_ms5607_start(void) {
-	ao_spi_get(AO_MS5607_SPI_INDEX,AO_SPI_SPEED_FAST);
-	ao_gpio_set(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, 0);
+	ao_spi_get_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, AO_MS5607_SPI_INDEX, AO_SPI_SPEED_FAST);
 }
 
 static void
 ao_ms5607_stop(void) {
-	ao_gpio_set(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, 1);
-	ao_spi_put(AO_MS5607_SPI_INDEX);
+	ao_spi_put_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, AO_MS5607_SPI_INDEX);
 }
 
 static void
@@ -42,7 +40,7 @@ ao_ms5607_reset(void) {
 
 	cmd = AO_MS5607_RESET;
 	ao_ms5607_start();
-	ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
+	ao_spi_send(DATA_TO_XDATA(&cmd), 1, AO_MS5607_SPI_INDEX);
 	ao_delay(AO_MS_TO_TICKS(10));
 	ao_ms5607_stop();
 }
@@ -71,17 +69,17 @@ ao_ms5607_crc(uint8_t *prom)
 }
 
 static void
-ao_ms5607_prom_read(struct ao_ms5607_prom *prom)
+ao_ms5607_prom_read(__xdata struct ao_ms5607_prom *prom)
 {
-	uint8_t		addr;
-	uint8_t		crc;
-	uint16_t	*r;
+	uint8_t			addr;
+	uint8_t			crc;
+	__xdata uint16_t	*r;
 
-	r = (uint16_t *) prom;
+	r = (__xdata uint16_t *) prom;
 	for (addr = 0; addr < 8; addr++) {
 		uint8_t	cmd = AO_MS5607_PROM_READ(addr);
 		ao_ms5607_start();
-		ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
+		ao_spi_send(DATA_TO_XDATA(&cmd), 1, AO_MS5607_SPI_INDEX);
 		ao_spi_recv(r, 2, AO_MS5607_SPI_INDEX);
 		ao_ms5607_stop();
 		r++;
@@ -116,25 +114,25 @@ ao_ms5607_setup(void)
 	ao_ms5607_prom_read(&ms5607_prom);
 }
 
-static volatile uint8_t	ao_ms5607_done;
+static __xdata volatile uint8_t	ao_ms5607_done;
 
 static void
 ao_ms5607_isr(void)
 {
 	ao_exti_disable(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN);
 	ao_ms5607_done = 1;
-	ao_wakeup((void *) &ao_ms5607_done);
+	ao_wakeup((__xdata void *) &ao_ms5607_done);
 }
 
 static uint32_t
 ao_ms5607_get_sample(uint8_t cmd) {
-	uint8_t	reply[3];
-	uint8_t read;
+	__xdata uint8_t	reply[3];
+	__xdata uint8_t read;
 
 	ao_ms5607_done = 0;
 
 	ao_ms5607_start();
-	ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
+	ao_spi_send(DATA_TO_XDATA(&cmd), 1, AO_MS5607_SPI_INDEX);
 
 	ao_exti_enable(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN);
 
@@ -142,7 +140,8 @@ ao_ms5607_get_sample(uint8_t cmd) {
 	ao_spi_put(AO_MS5607_SPI_INDEX);
 #endif
 	ao_arch_block_interrupts();
-	while (!ao_ms5607_done)
+	while (!ao_gpio_get(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN, AO_MS5607_MISO) &&
+	       !ao_ms5607_done)
 		ao_sleep((void *) &ao_ms5607_done);
 	ao_arch_release_interrupts();
 #if AO_MS5607_PRIVATE_PINS
@@ -175,16 +174,20 @@ ao_ms5607_get_sample(uint8_t cmd) {
 #define AO_CONVERT_D2	token_evaluator(AO_MS5607_CONVERT_D2_, AO_MS5607_TEMP_OVERSAMPLE)
 
 void
-ao_ms5607_sample(struct ao_ms5607_sample *sample)
+ao_ms5607_sample(__xdata struct ao_ms5607_sample *sample)
 {
 	sample->pres = ao_ms5607_get_sample(AO_CONVERT_D1);
 	sample->temp = ao_ms5607_get_sample(AO_CONVERT_D2);
 }
 
+#ifdef _CC1111_H_
+#include "ao_ms5607_convert_8051.c"
+#else
 #include "ao_ms5607_convert.c"
+#endif
 
 #if HAS_TASK
-struct ao_ms5607_sample	ao_ms5607_current;
+__xdata struct ao_ms5607_sample	ao_ms5607_current;
 
 static void
 ao_ms5607(void)
@@ -193,10 +196,10 @@ ao_ms5607(void)
 	for (;;)
 	{
 		ao_ms5607_sample(&ao_ms5607_current);
-		ao_arch_critical(
-			AO_DATA_PRESENT(AO_DATA_MS5607);
-			AO_DATA_WAIT();
-			);
+		ao_arch_block_interrupts();
+		AO_DATA_PRESENT(AO_DATA_MS5607);
+		AO_DATA_WAIT();
+		ao_arch_release_interrupts();
 	}
 }
 
@@ -218,11 +221,11 @@ ao_ms5607_info(void)
 static void
 ao_ms5607_dump(void)
 {
-	struct ao_ms5607_value value;
+	__xdata struct ao_ms5607_value value;
 
 	ao_ms5607_convert(&ao_ms5607_current, &value);
-	printf ("Pressure:    %8u %8d\n", ao_ms5607_current.pres, value.pres);
-	printf ("Temperature: %8u %8d\n", ao_ms5607_current.temp, value.temp);
+	printf ("Pressure:    %8lu %8ld\n", ao_ms5607_current.pres, value.pres);
+	printf ("Temperature: %8lu %8ld\n", ao_ms5607_current.temp, value.temp);
 	printf ("Altitude: %ld\n", ao_pa_to_altitude(value.pres));
 }
 
@@ -249,17 +252,9 @@ ao_ms5607_init(void)
 	 */
 	ao_exti_setup(AO_MS5607_MISO_PORT,
 		      AO_MS5607_MISO_PIN,
-		      AO_EXTI_MODE_RISING,
+		      AO_EXTI_MODE_RISING|
+		      AO_EXTI_PIN_NOCONFIGURE,
 		      ao_ms5607_isr);
-
-#ifdef STM_MODER_ALTERNATE
-	/* Reset the pin from INPUT to ALTERNATE so that SPI works
-	 * This needs an abstraction at some point...
-	 */
-	stm_moder_set(AO_MS5607_MISO_PORT,
-		      AO_MS5607_MISO_PIN,
-		      STM_MODER_ALTERNATE);
-#endif
 }
 
 #endif

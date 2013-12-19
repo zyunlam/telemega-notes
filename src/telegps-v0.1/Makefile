@@ -52,11 +52,11 @@ ALTOS_SRC = \
 	ao_exti_stm.c \
 	ao_serial_stm.c \
 	ao_gps_skytraq.c \
+	ao_gps_show.c \
 	ao_cc115l.c \
 	ao_fec_tx.c \
 	ao_rfpa0133.c \
 	ao_aprs.c \
-	ao_storage.c \
 	ao_eeprom_stm.c \
 	ao_sdcard.c \
 	ao_bufio.c \
@@ -74,14 +74,15 @@ CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STA
 
 PROGNAME=telegps-v0.1
 PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_telegps.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(SAT_CLIB) -lgcc
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 
@@ -91,7 +92,7 @@ ao_product.h: ao-make-product.5c ../Version
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
 	rm -f ao_product.h
 
 install:

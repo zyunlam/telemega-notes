@@ -22,7 +22,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.text.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosConfig implements ActionListener {
@@ -161,9 +161,9 @@ public class AltosConfig implements ActionListener {
 			} finally {
 				try {
 					stop_serial();
+					serial_line.close();
 				} catch (InterruptedException ie) {
 				}
-				serial_line.close();
 			}
 		}
 

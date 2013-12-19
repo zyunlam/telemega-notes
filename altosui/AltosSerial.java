@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 import libaltosJNI.*;
@@ -57,11 +57,8 @@ public class AltosSerial extends AltosLink  {
 	public void flush_output() {
 		super.flush_output();
 		if (altos != null) {
-			if (libaltos.altos_flush(altos) != 0) {
-				libaltos.altos_close(altos);
-				altos = null;
-				abort_reply();
-			}
+			if (libaltos.altos_flush(altos) != 0)
+				close_serial();
 		}
 	}
 
@@ -122,6 +119,17 @@ public class AltosSerial extends AltosLink  {
 		SwingUtilities.invokeLater(r);
 	}
 
+	private void close_serial() {
+		synchronized (devices_opened) {
+			devices_opened.remove(device.getPath());
+		}
+		if (altos != null) {
+			libaltos.altos_free(altos);
+			altos = null;
+		}
+		abort_reply();
+	}
+
 	public void close() {
 		if (remote) {
 			try {
@@ -132,23 +140,15 @@ public class AltosSerial extends AltosLink  {
 		if (in_reply != 0)
 			System.out.printf("Uh-oh. Closing active serial device\n");
 
-		if (altos != null) {
-			libaltos.altos_close(altos);
-		}
+		close_serial();
+
 		if (input_thread != null) {
 			try {
 				input_thread.interrupt();
 				input_thread.join();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ie) {
 			}
 			input_thread = null;
-		}
-		if (altos != null) {
-			libaltos.altos_free(altos);
-			altos = null;
-		}
-		synchronized (devices_opened) {
-			devices_opened.remove(device.getPath());
 		}
 		if (debug)
 			System.out.printf("Closing %s\n", device.getPath());
@@ -156,11 +156,17 @@ public class AltosSerial extends AltosLink  {
 
 	private void putc(char c) {
 		if (altos != null)
-			if (libaltos.altos_putchar(altos, c) != 0) {
-				libaltos.altos_close(altos);
-				altos = null;
-				abort_reply();
-			}
+			if (libaltos.altos_putchar(altos, c) != 0)
+				close_serial();
+	}
+
+	public void putchar(byte c) {
+		if (altos != null) {
+			if (debug)
+				System.out.printf(" %02x", (int) c & 0xff);
+			if (libaltos.altos_putchar(altos, (char) c) != 0)
+				close_serial();
+		}
 	}
 
 	public void print(String data) {

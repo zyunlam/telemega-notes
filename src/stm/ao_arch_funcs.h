@@ -87,13 +87,16 @@ extern uint16_t	ao_spi_speed[STM_NUM_SPI];
 void
 ao_spi_init(void);
 
+#define ao_spi_set_cs(reg,mask) ((reg)->bsrr = ((uint32_t) (mask)) << 16)
+#define ao_spi_clr_cs(reg,mask) ((reg)->bsrr = (mask))
+
 #define ao_spi_get_mask(reg,mask,bus, speed) do {		\
 		ao_spi_get(bus, speed);				\
-		(reg)->bsrr = ((uint32_t) mask) << 16;	\
+		ao_spi_set_cs(reg,mask);			\
 	} while (0)
 
 #define ao_spi_put_mask(reg,mask,bus) do {	\
-		(reg)->bsrr = mask;		\
+		ao_spi_clr_cs(reg,mask);	\
 		ao_spi_put(bus);		\
 	} while (0)
 
@@ -326,7 +329,7 @@ static inline void ao_arch_restore_stack(void) {
 
 	/* Restore APSR */
 	asm("pop {r0}");
-	asm("msr apsr,r0");
+	asm("msr apsr_nczvq,r0");
 
 	/* Restore general registers */
 	asm("pop {r0-r12,lr}\n");
@@ -335,6 +338,11 @@ static inline void ao_arch_restore_stack(void) {
 	asm("bx lr");
 }
 
+#ifndef HAS_SAMPLE_PROFILE
+#define HAS_SAMPLE_PROFILE 0
+#endif
+
+#if !HAS_SAMPLE_PROFILE
 #define HAS_ARCH_START_SCHEDULER	1
 
 static inline void ao_arch_start_scheduler(void) {
@@ -346,16 +354,19 @@ static inline void ao_arch_start_scheduler(void) {
 	asm("mrs %0,control" : "=&r" (control));
 	control |= (1 << 1);
 	asm("msr control,%0" : : "r" (control));
+	asm("isb");
 }
+#endif
 
 #define ao_arch_isr_stack()
 
 #endif
 
-#define ao_arch_wait_interrupt() do {			\
-		asm(".global ao_idle_loc\n\twfi\nao_idle_loc:");	\
-		ao_arch_release_interrupts();				\
-		ao_arch_block_interrupts();				\
+#define ao_arch_wait_interrupt() do {				\
+		asm("\twfi\n");					\
+		ao_arch_release_interrupts();			\
+		asm(".global ao_idle_loc\nao_idle_loc:");	\
+		ao_arch_block_interrupts();			\
 	} while (0)
 
 #define ao_arch_critical(b) do {				\

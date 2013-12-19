@@ -21,7 +21,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 public class AltosLanded extends JComponent implements AltosFlightDisplay, ActionListener {
 	GridBagLayout	layout;
@@ -103,7 +103,8 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 
 	class Lat extends LandedValue {
 		void show (AltosState state, AltosListenerState listener_state) {
-			if (state.gps != null && state.gps.connected)
+			show();
+			if (state.gps != null && state.gps.connected && state.gps.lat != AltosLib.MISSING)
 				show(pos(state.gps.lat,"N", "S"));
 			else
 				show("???");
@@ -118,7 +119,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	class Lon extends LandedValue {
 		void show (AltosState state, AltosListenerState listener_state) {
 			show();
-			if (state.gps != null && state.gps.connected)
+			if (state.gps != null && state.gps.connected && state.gps.lon != AltosLib.MISSING)
 				show(pos(state.gps.lon,"E", "W"));
 			else
 				show("???");
@@ -162,7 +163,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 
 	class Height extends LandedValue {
 		void show (AltosState state, AltosListenerState listener_state) {
-			show(AltosConvert.height, state.max_height);
+			show(AltosConvert.height, state.max_height());
 		}
 		public Height (GridBagLayout layout, int y) {
 			super (layout, y, "Maximum Height");
@@ -184,7 +185,7 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 
 	class Accel extends LandedValue {
 		void show (AltosState state, AltosListenerState listener_state) {
-			show(AltosConvert.accel, state.max_acceleration);
+			show(AltosConvert.accel, state.max_acceleration());
 		}
 		public Accel (GridBagLayout layout, int y) {
 			super (layout, y, "Maximum Acceleration");
@@ -243,21 +244,18 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 			if (file != null) {
 				String	filename = file.getName();
 				try {
-					AltosRecordIterable records = null;
+					AltosStateIterable states = null;
 					if (filename.endsWith("eeprom")) {
 						FileInputStream in = new FileInputStream(file);
-						records = new AltosEepromIterable(in);
+						states = new AltosEepromFile(in);
 					} else if (filename.endsWith("telem")) {
 						FileInputStream in = new FileInputStream(file);
-						records = new AltosTelemetryIterable(in);
-					} else if (filename.endsWith("mega")) {
-						FileInputStream in = new FileInputStream(file);
-						records = new AltosEepromMegaIterable(in);
+						states = new AltosTelemetryFile(in);
 					} else {
 						throw new FileNotFoundException(filename);
 					}
 					try {
-						new AltosGraphUI(records, file);
+						new AltosGraphUI(states, file);
 					} catch (InterruptedException ie) {
 					} catch (IOException ie) {
 					}

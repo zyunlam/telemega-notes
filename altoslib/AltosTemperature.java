@@ -15,29 +15,35 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 public class AltosTemperature extends AltosUnits {
 
-	public double value(double v) {
-		if (AltosConvert.imperial_units)
+	public double value(double v, boolean imperial_units) {
+		if (imperial_units)
 			return AltosConvert.c_to_f(v);
 		return v;
 	}
 
-	public String show_units() {
-		if (AltosConvert.imperial_units)
+	public double inverse(double v, boolean imperial_units) {
+		if (imperial_units)
+			return AltosConvert.f_to_c(v);
+		return v;
+	}
+
+	public String show_units(boolean imperial_units) {
+		if (imperial_units)
 			return "°F";
 		return "°C";
 	}
 
-	public String say_units() {
-		if (AltosConvert.imperial_units)
+	public String say_units(boolean imperial_units) {
+		if (imperial_units)
 			return "degrees farenheit";
 		return "degrees celsius";
 	}
 
-	public int show_fraction(int width) {
+	public int show_fraction(int width, boolean imperial_units) {
 		return width / 3;
 	}
 }

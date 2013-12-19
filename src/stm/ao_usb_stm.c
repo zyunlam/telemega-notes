@@ -572,7 +572,7 @@ ao_usb_ep0_out_set(uint8_t *data, uint8_t len)
 }
 
 static void
-ao_usb_ep0_in_start(uint8_t max)
+ao_usb_ep0_in_start(uint16_t max)
 {
 	/* Don't send more than asked for */
 	if (ao_usb_ep0_in_len > max)
@@ -965,7 +965,7 @@ ao_usb_disable(void)
 	stm_usb.cntr = (1 << STM_USB_CNTR_PDWN) | (1 << STM_USB_CNTR_FRES);
 
 	/* Disable the interface */
-	stm_rcc.apb1enr &+ ~(1 << STM_RCC_APB1ENR_USBEN);
+	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_USBEN);
 	ao_arch_release_interrupts();
 }
 

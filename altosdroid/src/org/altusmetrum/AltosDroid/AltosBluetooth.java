@@ -31,7 +31,7 @@ import android.os.Handler;
 //import android.os.Message;
 import android.util.Log;
 
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 public class AltosBluetooth extends AltosLink {
 
@@ -161,6 +161,20 @@ public class AltosBluetooth extends AltosLink {
 			connection_lost();
 		}
 	}
+
+	public void putchar(byte c) {
+		byte[] bytes = { c };
+		if (D) Log.d(TAG, "print(): begin");
+		try {
+			wait_connected();
+			output.write(bytes);
+			if (D) Log.d(TAG, "print(): Wrote byte: '" + c + "'");
+		} catch (IOException e) {
+			connection_lost();
+		} catch (InterruptedException e) {
+			connection_lost();
+		}
+	}		
 
 	public int getchar() {
 		try {

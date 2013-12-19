@@ -19,7 +19,7 @@ package altosui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 public class AltosCompanionInfo extends JTable {
 	private AltosFlightInfoTableModel model;
@@ -70,13 +70,13 @@ public class AltosCompanionInfo extends JTable {
 		model.clear();
 	}
 
-	AltosRecordCompanion	companion;
+	AltosCompanion	companion;
 
 	public String board_name() {
 		if (companion == null)
 			return "None";
 		switch (companion.board_id) {
-		case AltosRecordCompanion.board_id_telescience:
+		case AltosCompanion.board_id_telescience:
 			return "TeleScience";
 		default:
 			return String.format("%02x\n", companion.board_id);
@@ -86,8 +86,8 @@ public class AltosCompanionInfo extends JTable {
 	public void show(AltosState state, AltosListenerState listener_state) {
 		if (state == null)
 			return;
-		if (state.data.companion != null)
-			companion = state.data.companion;
+		if (state.companion != null)
+			companion = state.companion;
 		info_reset();
 		info_add_row(0, "Companion board", "%s", board_name());
 		if (companion != null) {

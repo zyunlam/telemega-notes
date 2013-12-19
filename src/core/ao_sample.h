@@ -64,8 +64,6 @@
  * for all further flight computations
  */
 
-#define GRAVITY 9.80665
-
 /*
  * Above this height, the baro sensor doesn't work
  */
@@ -115,9 +113,16 @@ extern __pdata int32_t	ao_accel_scale;		/* sensor to m/s² conversion */
 extern __pdata accel_t	ao_ground_accel_along;
 extern __pdata accel_t	ao_ground_accel_across;
 extern __pdata accel_t	ao_ground_accel_through;
-extern __pdata gyro_t	ao_ground_pitch;
-extern __pdata gyro_t	ao_ground_yaw;
-extern __pdata gyro_t	ao_ground_roll;
+extern __pdata int32_t	ao_ground_pitch;	/* * 512 */
+extern __pdata int32_t	ao_ground_yaw;		/* * 512 */
+extern __pdata int32_t	ao_ground_roll;		/* * 512 */
+extern __pdata accel_t	ao_sample_accel_along;
+extern __pdata accel_t	ao_sample_accel_across;
+extern __pdata accel_t	ao_sample_accel_through;
+extern __pdata gyro_t	ao_sample_roll;
+extern __pdata gyro_t	ao_sample_pitch;
+extern __pdata gyro_t	ao_sample_yaw;
+extern __pdata angle_t	ao_sample_orient;
 #endif
 
 void ao_sample_init(void);
@@ -136,8 +141,8 @@ uint8_t ao_sample(void);
 extern __pdata int16_t			ao_height;	/* meters */
 extern __pdata int16_t			ao_speed;	/* m/s * 16 */
 extern __pdata int16_t			ao_accel;	/* m/s² * 16 */
-extern __pdata int16_t			ao_max_height;	/* max of ao_height */
-extern __pdata int16_t			ao_avg_height;	/* running average of height */
+extern __xdata int16_t			ao_max_height;	/* max of ao_height */
+extern __xdata int16_t			ao_avg_height;	/* running average of height */
 
 extern __pdata int16_t			ao_error_h;
 extern __pdata int16_t			ao_error_h_sq_avg;

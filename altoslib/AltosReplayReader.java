@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.io.*;
 import java.util.*;
@@ -25,10 +25,10 @@ import java.util.*;
  */
 
 public class AltosReplayReader extends AltosFlightReader {
-	Iterator<AltosRecord>	iterator;
+	Iterator<AltosState>	iterator;
 	File	file;
 
-	public AltosRecord read() {
+	public AltosState read() {
 		if (iterator.hasNext())
 			return iterator.next();
 		return null;
@@ -41,11 +41,12 @@ public class AltosReplayReader extends AltosFlightReader {
 		/* Make it run in realtime after the rocket leaves the pad */
 		if (state.state > AltosLib.ao_flight_pad)
 			Thread.sleep((int) (Math.min(state.time_change,10) * 1000));
+		state.set_received_time(System.currentTimeMillis());
 	}
 
 	public File backing_file() { return file; }
 
-	public AltosReplayReader(Iterator<AltosRecord> in_iterator, File in_file) {
+	public AltosReplayReader(Iterator<AltosState> in_iterator, File in_file) {
 		iterator = in_iterator;
 		file = in_file;
 		name = file.getName();

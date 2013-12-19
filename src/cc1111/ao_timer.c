@@ -39,6 +39,9 @@ void ao_timer_isr(void) __interrupt 9
 	if (++ao_adc_count == ao_adc_interval) {
 		ao_adc_count = 0;
 		ao_adc_poll();
+#if (AO_DATA_ALL & ~(AO_DATA_ADC))
+		ao_wakeup(DATA_TO_XDATA(&ao_adc_count));
+#endif
 	}
 #endif
 }
@@ -92,6 +95,13 @@ ao_clock_init(void)
 	while (!(SLEEP & SLEEP_XOSC_STB))
 		;
 
+	/* Power down the unused HFRC oscillator */
+	SLEEP |= SLEEP_OSC_PD;
+
+	/* Wait for HFRC to power down */
+	while ((SLEEP & SLEEP_HFRC_STB) != 0)
+		;
+	
 	/* Crank up the timer tick and system clock speed */
 	CLKCON = ((CLKCON & ~(CLKCON_TICKSPD_MASK | CLKCON_CLKSPD_MASK)) |
 		  (CLKCON_TICKSPD_1 | CLKCON_CLKSPD_1));

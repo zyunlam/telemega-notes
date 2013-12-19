@@ -26,6 +26,9 @@
 #define AO_GPS_NUM_SAT_MASK	(0xf << 0)
 #define AO_GPS_NUM_SAT_SHIFT	(0)
 
+#define AO_GPS_NEW_DATA		1
+#define AO_GPS_NEW_TRACKING	2
+
 #define AO_GPS_VALID		(1 << 4)
 #define AO_GPS_RUNNING		(1 << 5)
 #define AO_GPS_DATE_VALID	(1 << 6)
@@ -427,11 +430,18 @@ void
 ao_dump_state(void *wchan)
 {
 	int	i;
-	if (wchan == &ao_gps_data)
+
+	if (wchan != &ao_gps_new)
+		return;
+	
+	if (ao_gps_new & AO_GPS_NEW_DATA) {
 		ao_gps_print(&ao_gps_data);
-	else
+		putchar('\n');
+	}
+	if (ao_gps_new & AO_GPS_NEW_TRACKING) {
 		ao_gps_tracking_print(&ao_gps_tracking_data);
-	putchar('\n');
+		putchar('\n');
+	}
 	return;
 	printf ("%02d:%02d:%02d",
 		ao_gps_data.hour, ao_gps_data.minute,

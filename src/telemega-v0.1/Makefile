@@ -25,6 +25,8 @@ INC = \
 	ao_task.h \
 	ao_whiten.h \
 	ao_sample_profile.h \
+	ao_quaternion.h \
+	math.h \
 	ao_mpu.h \
 	stm32l.h \
 	Makefile
@@ -44,6 +46,20 @@ INC = \
 #STACK_GUARD=ao_mpu_stm.c
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
 
+MATH_SRC=\
+	ef_acos.c \
+	ef_sqrt.c \
+	ef_rem_pio2.c \
+	kf_cos.c \
+	kf_sin.c \
+	kf_rem_pio2.c \
+	sf_copysign.c \
+	sf_cos.c \
+	sf_sin.c \
+	sf_fabs.c \
+	sf_floor.c \
+	sf_scalbn.c
+
 ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_interrupt.c \
@@ -59,6 +75,7 @@ ALTOS_SRC = \
 	ao_mutex.c \
 	ao_serial_stm.c \
 	ao_gps_skytraq.c \
+	ao_gps_show.c \
 	ao_gps_report_mega.c \
 	ao_ignite.c \
 	ao_freq.c \
@@ -73,6 +90,7 @@ ALTOS_SRC = \
 	ao_hmc5883.c \
 	ao_adc_stm.c \
 	ao_beep_stm.c \
+	ao_eeprom_stm.c \
 	ao_storage.c \
 	ao_m25.c \
 	ao_usb_stm.c \
@@ -92,6 +110,7 @@ ALTOS_SRC = \
 	ao_companion.c \
 	ao_pyro.c \
 	ao_aprs.c \
+	$(MATH_SRC) \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)
@@ -104,14 +123,15 @@ CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STA
 
 PROGNAME=telemega-v0.1
 PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_telemega.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(SAT_CLIB) -lgcc
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 ../altitude-pa.h: make-altitude-pa
 	nickle $< > $@
@@ -124,7 +144,7 @@ ao_product.h: ao-make-product.5c ../Version
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
 	rm -f ao_product.h
 
 install:

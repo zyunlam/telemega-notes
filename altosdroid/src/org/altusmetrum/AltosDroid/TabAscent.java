@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -87,12 +87,12 @@ public class TabAscent extends Fragment implements AltosDroidTab {
 
 	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
-			mHeightView.setText(AltosDroid.number("%6.0f m", state.height));
-			mMaxHeightView.setText(AltosDroid.number("%6.0f m", state.max_height));
+			mHeightView.setText(AltosDroid.number("%6.0f m", state.height()));
+			mMaxHeightView.setText(AltosDroid.number("%6.0f m", state.max_height()));
 			mSpeedView.setText(AltosDroid.number("%6.0f m/s", state.speed()));
 			mMaxSpeedView.setText(AltosDroid.number("%6.0f m/s", state.max_speed()));
-			mAccelView.setText(AltosDroid.number("%6.0f m/s²", state.acceleration));
-			mMaxAccelView.setText(AltosDroid.number("%6.0f m/s²", state.max_acceleration));
+			mAccelView.setText(AltosDroid.number("%6.0f m/s²", state.acceleration()));
+			mMaxAccelView.setText(AltosDroid.number("%6.0f m/s²", state.max_acceleration()));
 
 			if (state.gps != null) {
 				mLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
@@ -102,11 +102,11 @@ public class TabAscent extends Fragment implements AltosDroidTab {
 				mLongitudeView.setText("");
 			}
 
-			mApogeeVoltageView.setText(AltosDroid.number("%4.2f V", state.drogue_sense));
-			mApogeeLights.set(state.drogue_sense > 3.2, state.drogue_sense == AltosRecord.MISSING);
+			mApogeeVoltageView.setText(AltosDroid.number("%4.2f V", state.apogee_voltage));
+			mApogeeLights.set(state.apogee_voltage > 3.2, state.apogee_voltage == AltosLib.MISSING);
 
-			mMainVoltageView.setText(AltosDroid.number("%4.2f V", state.main_sense));
-			mMainLights.set(state.main_sense > 3.2, state.main_sense == AltosRecord.MISSING);
+			mMainVoltageView.setText(AltosDroid.number("%4.2f V", state.main_voltage));
+			mMainLights.set(state.main_voltage > 3.2, state.main_voltage == AltosLib.MISSING);
 		}
 	}
 }

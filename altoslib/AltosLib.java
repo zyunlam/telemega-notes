@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.util.*;
 import java.io.*;
@@ -28,6 +28,7 @@ public class AltosLib {
 	public static final int AO_LOG_TEMP_VOLT = 'T';
 	public static final int AO_LOG_DEPLOY = 'D';
 	public static final int AO_LOG_STATE = 'S';
+	public static final int AO_LOG_GPS_POS = 'P';
 	public static final int AO_LOG_GPS_TIME = 'G';
 	public static final int AO_LOG_GPS_LAT = 'N';
 	public static final int AO_LOG_GPS_LON = 'W';
@@ -62,6 +63,8 @@ public class AltosLib {
 
 	public static final int AO_LOG_SOFTWARE_VERSION = 9999;
 
+	public final static int	MISSING = 0x7fffffff;
+
 	/* Added to flag invalid records */
 	public static final int AO_LOG_INVALID = -1;
 
@@ -92,15 +95,58 @@ public class AltosLib {
 	public final static int product_telemega = 0x0023;
 	public final static int product_megadongle = 0x0024;
 	public final static int product_telegps = 0x0025;
+	public final static int product_easymini = 0x0026;
+	public final static int product_telemini = 0x0027;
 	public final static int product_altusmetrum_min = 0x000a;
-	public final static int product_altusmetrum_max = 0x0025;
+	public final static int product_altusmetrum_max = 0x002c;
 
 	public final static int product_any = 0x10000;
 	public final static int product_basestation = 0x10000 + 1;
 	public final static int product_altimeter = 0x10000 + 2;
 
+	private static class Product {
+		final String	name;
+		final int	product;
+
+		Product (String name, int product) {
+			this.name = name;
+			this.product = product;
+		}
+	}
+
+	private static Product[] products = {
+		new Product("telemetrum", product_telemetrum),
+		new Product("teleballoon", product_telemetrum),
+		new Product("teledongle", product_teledongle),
+		new Product("teleterra", product_teledongle),
+		new Product("telebt", product_telebt),
+		new Product("telelaunch", product_telelaunch),
+		new Product("telelco", product_telelco),
+		new Product("telescience", product_telescience),
+		new Product("telepyro", product_telepyro),
+		new Product("telemega", product_telemega),
+		new Product("megadongle", product_megadongle),
+		new Product("telegps", product_telegps),
+		new Product("easymini", product_easymini),
+		new Product("telemini", product_telemini)
+	};
+
+	public static int name_to_product(String name) {
+		String low = name.toLowerCase();
+
+		for (int i = 0; i < products.length; i++)
+			if (low.startsWith(products[i].name))
+				return products[i].product;
+		return product_any;
+	}
+
 	/* Bluetooth "identifier" (bluetooth sucks) */
 	public final static String bt_product_telebt = "TeleBT";
+
+	/* "good" voltages */
+
+	public final static double ao_battery_good = 3.8;
+	public final static double ao_igniter_good = 3.5;
 
 	/* Telemetry modes */
 	public static final int ao_telemetry_off = 0;
@@ -216,6 +262,9 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_TELEMETRY = 3;
 	public static final int AO_LOG_FORMAT_TELESCIENCE = 4;
 	public static final int AO_LOG_FORMAT_TELEMEGA = 5;
+	public static final int AO_LOG_FORMAT_EASYMINI = 6;
+	public static final int AO_LOG_FORMAT_TELEMETRUM = 7;
+	public static final int AO_LOG_FORMAT_TELEMINI = 8;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {
@@ -409,5 +458,25 @@ public class AltosLib {
 
 	public static File replace_extension(File input, String extension) {
 		return new File(replace_extension(input.getPath(), extension));
+	}
+
+	public static String product_name(int product_id) {
+		switch (product_id) {
+		case product_altusmetrum: return "AltusMetrum";
+		case product_telemetrum: return "TeleMetrum";
+		case product_teledongle: return "TeleDongle";
+		case product_teleterra: return "TeleTerra";
+		case product_telebt: return "TeleBT";
+		case product_telelaunch: return "TeleLaunch";
+		case product_telelco: return "TeleLco";
+		case product_telescience: return "Telescience";
+		case product_telepyro: return "TelePyro";
+		case product_telemega: return "TeleMega";
+		case product_megadongle: return "MegaDongle";
+		case product_telegps: return "TeleGPS";
+		case product_easymini: return "EasyMini";
+		case product_telemini: return "TeleMini";
+		default: return "unknown";
+		}
 	}
 }

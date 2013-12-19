@@ -35,6 +35,7 @@
 #define HAS_VERSION		0
 
 #define AO_BOOT_CHAIN		1
-#define AO_BOOT_PIN		1
+
+#define IS_FLASH_LOADER		1
 
 #endif /* _AO_FLASH_PINS_H_ */

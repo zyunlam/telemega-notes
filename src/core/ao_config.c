@@ -17,7 +17,7 @@
 
 #include "ao.h"
 #include "ao_log.h"
-#include <ao_storage.h>
+#include <ao_config.h>
 #if HAS_FLIGHT
 #include <ao_sample.h>
 #include <ao_data.h>
@@ -28,6 +28,9 @@ __pdata uint8_t ao_config_loaded;
 __pdata uint8_t ao_config_dirty;
 __xdata uint8_t ao_config_mutex;
 
+#ifndef AO_CONFIG_DEFAULT_APRS_INTERVAL
+#define AO_CONFIG_DEFAULT_APRS_INTERVAL	0
+#endif
 #define AO_CONFIG_DEFAULT_MAIN_DEPLOY	250
 #define AO_CONFIG_DEFAULT_RADIO_CHANNEL	0
 #define AO_CONFIG_DEFAULT_CALLSIGN	"N0CALL"
@@ -47,20 +50,22 @@ __xdata uint8_t ao_config_mutex;
 #define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 192 * (uint32_t) 1024)
 #endif
 #endif
+#ifndef AO_CONFIG_DEFAULT_RADIO_POWER
 #define AO_CONFIG_DEFAULT_RADIO_POWER		0x60
+#endif
 #define AO_CONFIG_DEFAULT_RADIO_AMP		0
 
 #if HAS_EEPROM
 static void
 _ao_config_put(void)
 {
-	ao_storage_setup();
-	ao_storage_erase(ao_storage_config);
-	ao_storage_write(ao_storage_config, &ao_config, sizeof (ao_config));
+	ao_config_setup();
+	ao_config_erase();
+	ao_config_write(0, &ao_config, sizeof (ao_config));
 #if HAS_FLIGHT
 	ao_log_write_erase(0);
 #endif
-	ao_storage_flush();
+	ao_config_flush();
 }
 
 void
@@ -92,8 +97,8 @@ _ao_config_get(void)
 	 * but ao_storage_setup *also* sets ao_storage_config, which we
 	 * need before calling ao_storage_read here
 	 */
-	ao_storage_setup();
-	ao_storage_read(ao_storage_config, &ao_config, sizeof (ao_config));
+	ao_config_setup();
+	ao_config_read(0, &ao_config, sizeof (ao_config));
 #endif
 	if (ao_config.major != AO_CONFIG_MAJOR) {
 		ao_config.major = AO_CONFIG_MAJOR;
@@ -122,8 +127,10 @@ _ao_config_get(void)
 			ao_config.radio_cal = ao_radio_cal;
 #endif
 		/* Fixups for minor version 4 */
+#if HAS_FLIGHT
 		if (minor < 4)
 			ao_config.flight_log_max = AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX;
+#endif
 		/* Fixupes for minor version 5 */
 		if (minor < 5)
 			ao_config.ignite_mode = AO_CONFIG_DEFAULT_IGNITE_MODE;
@@ -142,7 +149,7 @@ _ao_config_get(void)
 			memset(&ao_config.pyro, '\0', sizeof (ao_config.pyro));
 #endif
 		if (minor < 13)
-			ao_config.aprs_interval = 0;
+			ao_config.aprs_interval = AO_CONFIG_DEFAULT_APRS_INTERVAL;
 #if HAS_RADIO_POWER
 		if (minor < 14)
 			ao_config.radio_power = AO_CONFIG_DEFAULT_RADIO_POWER;
@@ -150,6 +157,19 @@ _ao_config_get(void)
 #if HAS_RADIO_AMP
 		if (minor  < 14)
 			ao_config.radio_amp = AO_CONFIG_DEFAULT_RADIO_AMP;
+#endif
+#if HAS_GYRO
+		if (minor < 15) {
+			ao_config.accel_zero_along = 0;
+			ao_config.accel_zero_across = 0;
+			ao_config.accel_zero_through = 0;
+
+			/* Reset the main accel offsets to force
+			 * re-calibration
+			 */
+			ao_config.accel_plus_g = 0;
+			ao_config.accel_minus_g = 0;
+		}
 #endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
@@ -270,10 +290,22 @@ ao_config_accel_calibrate_show(void) __reentrant
 {
 	printf("Accel cal +1g: %d -1g: %d\n",
 	       ao_config.accel_plus_g, ao_config.accel_minus_g);
+#if HAS_GYRO
+	printf ("IMU cal along %d across %d through %d\n",
+		ao_config.accel_zero_along,
+		ao_config.accel_zero_across,
+		ao_config.accel_zero_through);
+#endif
 }
 
 #define ACCEL_CALIBRATE_SAMPLES	1024
 #define ACCEL_CALIBRATE_SHIFT	10
+
+#if HAS_GYRO
+static int16_t accel_cal_along;
+static int16_t accel_cal_across;
+static int16_t accel_cal_through;
+#endif
 
 static int16_t
 ao_config_accel_calibrate_auto(char *orientation) __reentrant
@@ -281,6 +313,11 @@ ao_config_accel_calibrate_auto(char *orientation) __reentrant
 	uint16_t	i;
 	int32_t		accel_total;
 	uint8_t		cal_data_ring;
+#if HAS_GYRO
+	int32_t		accel_along_total = 0;
+	int32_t		accel_across_total = 0;
+	int32_t		accel_through_total = 0;
+#endif
 
 	printf("Orient antenna %s and press a key...", orientation);
 	flush();
@@ -294,10 +331,20 @@ ao_config_accel_calibrate_auto(char *orientation) __reentrant
 		ao_sleep(DATA_TO_XDATA(&ao_sample_data));
 		while (i && cal_data_ring != ao_sample_data) {
 			accel_total += (int32_t) ao_data_accel(&ao_data_ring[cal_data_ring]);
+#if HAS_GYRO
+			accel_along_total += (int32_t) ao_data_along(&ao_data_ring[cal_data_ring]);
+			accel_across_total += (int32_t) ao_data_across(&ao_data_ring[cal_data_ring]);
+			accel_through_total += (int32_t) ao_data_through(&ao_data_ring[cal_data_ring]);
+#endif
 			cal_data_ring = ao_data_ring_next(cal_data_ring);
 			i--;
 		}
 	}
+#if HAS_GYRO
+	accel_cal_along = accel_along_total >> ACCEL_CALIBRATE_SHIFT;
+	accel_cal_across = accel_across_total >> ACCEL_CALIBRATE_SHIFT;
+	accel_cal_through = accel_through_total >> ACCEL_CALIBRATE_SHIFT;
+#endif
 	return accel_total >> ACCEL_CALIBRATE_SHIFT;
 }
 
@@ -305,12 +352,28 @@ void
 ao_config_accel_calibrate_set(void) __reentrant
 {
 	int16_t	up, down;
+#if HAS_GYRO
+	int16_t	accel_along_up, accel_along_down;
+	int16_t	accel_across_up, accel_across_down;
+	int16_t	accel_through_up, accel_through_down;
+#endif
+	
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	if (ao_cmd_lex_i == 0) {
 		up = ao_config_accel_calibrate_auto("up");
+#if HAS_GYRO
+		accel_along_up = accel_cal_along;
+		accel_across_up = accel_cal_across;
+		accel_through_up = accel_cal_through;
+#endif
 		down = ao_config_accel_calibrate_auto("down");
+#if HAS_GYRO
+		accel_along_down = accel_cal_along;
+		accel_across_down = accel_cal_across;
+		accel_through_down = accel_cal_through;
+#endif
 	} else {
 		up = ao_cmd_lex_i;
 		ao_cmd_decimal();
@@ -326,6 +389,11 @@ ao_config_accel_calibrate_set(void) __reentrant
 	_ao_config_edit_start();
 	ao_config.accel_plus_g = up;
 	ao_config.accel_minus_g = down;
+#if HAS_GYRO
+	ao_config.accel_zero_along = (accel_along_up + accel_along_down) / 2;
+	ao_config.accel_zero_across = (accel_across_up + accel_across_down) / 2;
+	ao_config.accel_zero_through = (accel_through_up + accel_through_down) / 2;
+#endif
 	_ao_config_edit_finish();
 }
 #endif /* HAS_ACCEL */
@@ -399,7 +467,7 @@ void
 ao_config_log_set(void) __reentrant
 {
 	uint16_t	block = (uint16_t) (ao_storage_block >> 10);
-	uint16_t	config = (uint16_t) (ao_storage_config >> 10);
+	uint16_t	log_max = (uint16_t) (ao_storage_log_max >> 10);
 
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -408,8 +476,8 @@ ao_config_log_set(void) __reentrant
 		printf("Storage must be empty before changing log size\n");
 	else if (block > 1024 && (ao_cmd_lex_i & (block - 1)))
 		printf("Flight log size must be multiple of %d kB\n", block);
-	else if (ao_cmd_lex_i > config)
-		printf("Flight log max %d kB\n", config);
+	else if (ao_cmd_lex_i > log_max)
+		printf("Flight log max %d kB\n", log_max);
 	else {
 		_ao_config_edit_start();
 		ao_config.flight_log_max = (uint32_t) ao_cmd_lex_i << 10;
@@ -589,7 +657,7 @@ static void
 ao_config_show(void) __reentrant;
 
 static void
-ao_config_write(void) __reentrant;
+ao_config_save(void) __reentrant;
 
 __code struct ao_config_var ao_config_vars[] = {
 #if HAS_FLIGHT
@@ -648,7 +716,7 @@ __code struct ao_config_var ao_config_vars[] = {
 	  ao_config_show,		0 },
 #if HAS_EEPROM
 	{ "w\0Write to eeprom",
-	  ao_config_write,		0 },
+	  ao_config_save,		0 },
 #endif
 	{ "?\0Help",
 	  ao_config_help,		0 },
@@ -693,11 +761,14 @@ ao_config_show(void) __reentrant
 	for (cmd = 0; ao_config_vars[cmd].str != NULL; cmd++)
 		if (ao_config_vars[cmd].show)
 			(*ao_config_vars[cmd].show)();
+#if HAS_MS5607
+	ao_ms5607_info();
+#endif
 }
 
 #if HAS_EEPROM
 static void
-ao_config_write(void) __reentrant
+ao_config_save(void) __reentrant
 {
 	uint8_t saved = 0;
 	ao_mutex_get(&ao_config_mutex);

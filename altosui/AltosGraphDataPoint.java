@@ -18,7 +18,7 @@
 package altosui;
 
 import org.altusmetrum.altosuilib_1.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 public class AltosGraphDataPoint implements AltosUIDataPoint {
 
@@ -39,39 +39,41 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 	public static final int data_temperature = 12;
 	public static final int data_range = 13;
 	public static final int data_distance = 14;
+	public static final int data_pressure = 15;
 
 	public double x() throws AltosUIDataMissing {
-		if (state.data.time < -2)
+		double	time = state.time_since_boost();
+		if (time < -2)
 			throw new AltosUIDataMissing(-1);
-		return state.data.time;
+		return time;
 	}
 
 	public double y(int index) throws AltosUIDataMissing {
-		double y = AltosRecord.MISSING;
+		double y = AltosLib.MISSING;
 		switch (index) {
 		case data_height:
-			y = state.height;
+			y = state.height();
 			break;
 		case data_speed:
 			y = state.speed();
 			break;
 		case data_accel:
-			y = state.acceleration;
+			y = state.acceleration();
 			break;
 		case data_temp:
 			y = state.temperature;
 			break;
 		case data_battery_voltage:
-			y = state.battery;
+			y = state.battery_voltage;
 			break;
 		case data_drogue_voltage:
-			y = state.drogue_sense;
+			y = state.apogee_voltage;
 			break;
 		case data_main_voltage:
-			y = state.main_sense;
+			y = state.main_voltage;
 			break;
 		case data_rssi:
-			y = state.data.rssi;
+			y = state.rssi;
 			break;
 		case data_gps_height:
 			y = state.gps_height;
@@ -94,15 +96,18 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 			if (state.from_pad != null)
 				y = state.from_pad.distance;
 			break;
+		case data_pressure:
+			y = state.pressure();
+			break;
 		}
-		if (y == AltosRecord.MISSING)
+		if (y == AltosLib.MISSING)
 			throw new AltosUIDataMissing(index);
 		return y;
 	}
 
 	public int id(int index) {
 		if (index == data_state) {
-			int s = state.data.state;
+			int s = state.state;
 			if (s < Altos.ao_flight_boost || s > Altos.ao_flight_landed)
 				return -1;
 			return s;
@@ -112,7 +117,7 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 
 	public String id_name(int index) {
 		if (index == data_state)
-			return state.data.state();
+			return state.state_name();
 		return "";
 	}
 

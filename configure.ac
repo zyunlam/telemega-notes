@@ -18,7 +18,11 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
+<<<<<<< HEAD
 AC_INIT([altos], 1.2.1)
+=======
+AC_INIT([altos], 1.3)
+>>>>>>> branch-1.3
 AC_CONFIG_SRCDIR([src/core/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
@@ -26,12 +30,11 @@ AM_MAINTAINER_MODE
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
 AC_SUBST(VERSION_DASH)
 
-
 dnl ==========================================================================
 dnl Java library versions
 
 ALTOSUILIB_VERSION=1
-ALTOSLIB_VERSION=1
+ALTOSLIB_VERSION=2
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -180,34 +183,262 @@ if test "x$GCC" = "xyes"; then
 fi
 AC_SUBST(WARN_CFLAGS)
 
-AC_CHECK_PROG([HAVE_SDCC], [sdcc], yes, no)
-if test "x$HAVE_SDCC" = "xno"; then
-	AC_MSG_WARN([No sdcc found, cc1111 binaries will not be built])
+#
+# Configure SDCC
+#
+
+AC_ARG_WITH([sdcc],
+	    [AS_HELP_STRING([--with-sdcc],
+	                    [Name of SDCC])],
+	    [],
+	    [with_sdcc=auto])
+
+if test "x$with_sdcc" != "xno"; then	    
+	if test "x$with_sdcc" = "xauto"; then
+		with_sdcc="sdcc"
+		AC_CHECK_PROG([HAVE_SDCC],[$with_sdcc], yes, no)
+	else
+		HAVE_SDCC=yes
+	fi
+else
+	HAVE_SDCC=no
 fi
 
-AC_CHECK_PROG([HAVE_ARM_GCC], [arm-none-eabi-gcc], yes, no)
-if test "x$HAVE_ARM_GCC" = "xno"; then
-	AC_MSG_WARN([No arm compiler found, STM32L and LPC11U14 binaries will not be built])
+if test "x$HAVE_SDCC" = "xno"; then
+	AC_MSG_WARN([SDCC not found, cc1111 binaries will not be built])
+else
+	SDCC=$with_sdcc
 fi
+
+AC_SUBST(SDCC)
+AC_SUBST(HAVE_SDCC)
+
+#
+# Configure ARM compiler for STM32L and LPC11U14
+#
+
+AC_ARG_WITH([arm-cc],
+	    [AS_HELP_STRING([--with-arm-cc],
+	                    [Name of ARM C compiler])],
+	    [],
+	    [with_arm_cc=auto])
+
+if test "x$with_arm_cc" != "xno"; then	    
+	if test "x$with_arm_cc" = "xauto"; then
+		with_arm_cc="arm-none-eabi-gcc"
+		AC_CHECK_PROG([HAVE_ARM_CC],[$with_arm_cc], yes, no)
+	else
+		HAVE_ARM_CC=yes
+	fi
+else
+	HAVE_ARM_CC=no
+fi
+
+if test "x$HAVE_ARM_CC" = "xno"; then
+	AC_MSG_WARN([Arm compiler not found, ARM binaries will not be built])
+else
+	ARM_CC=$with_arm_cc
+fi
+AC_SUBST(HAVE_ARM_CC)
+AC_SUBST(ARM_CC)
+
+if test -d pdclib -a x"$HAVE_ARM_CC" = xyes; then
+	PDCLIB_ROOT='$(TOPDIR)/../pdclib-root'
+	PDCLIB_INCLUDES='-I$(TOPDIR)/../pdclib-root/include'
+	PDCLIB_LIBS_M0='-L$(TOPDIR)/../pdclib-root/lib -lpdclib-cortex-m0'
+	PDCLIB_LIBS_M3='-L$(TOPDIR)/../pdclib-root/lib -lpdclib-cortex-m3'
+	HAVE_PDCLIB=yes
+else
+	PDCLIB_INCLUDES=''
+	PDCLIB_LIBS_M0='-lpdclib-cortex-m0'
+	PDCLIB_LIBS_M3='-lpdclib-cortex-m3'
+	HAVE_PDCLIB=no
+fi
+
+AM_CONDITIONAL(PDCLIB, [test x$HAVE_PDCLIB = xyes])
+
+AC_SUBST(PDCLIB_INCLUDES)
+AC_SUBST(PDCLIB_LIBS_M0)
+AC_SUBST(PDCLIB_LIBS_M3)
+AC_SUBST(PDCLIB_ROOT)
+AC_SUBST(HAVE_PDCLIB)
+
+if test "x$HAVE_ARM_CC" = "xyes"; then
+	save_CC="$CC"
+	save_CFLAGS="$CFLAGS"
+	save_LIBS="$LIBS"
+	CC="$ARM_CC"
+	CFLAGS="-mthumb -mcpu=cortex-m0"
+	LIBS="-ffreestanding -nostdlib"
+	AC_LANG_PUSH([C])
+
+	AC_MSG_CHECKING([if ]$ARM_CC[ supports cortex-m0])
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([int i;])],
+			  [HAVE_ARM_M0_CC=yes],
+			  [HAVE_ARM_M0_CC=no])
+        AC_MSG_RESULT([$HAVE_ARM_M0_CC])
+
+	CFLAGS="-mthumb -mcpu=cortex-m3"
+	AC_MSG_CHECKING([if ]$ARM_CC[ supports cortex-m3])
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([int i;])],
+			  [HAVE_ARM_M3_CC=yes],
+			  [HAVE_ARM_M3_CC=no])
+        AC_MSG_RESULT([$HAVE_ARM_M3_CC])
+
+	if test x$HAVE_PDCLIB != xyes; then
+		AC_CHECK_LIB(pdclib-cortex-m0,memcpy,
+			     [],
+			     [HAVE_ARM_M0_CC=no])
+
+		AC_CHECK_LIB(pdclib-cortex-m3,memcpy,
+			     [],
+			     [HAVE_ARM_M3_CC=no])
+        fi
+
+	AC_LANG_POP([C])
+	LIBS="$save_LIBS"
+	CFLAGS="$save_CFLAGS"
+	CC="$save_CC"
+else
+	HAVE_ARM_M3_CC=no
+	HAVE_ARM_M0_CC=no
+fi
+AC_SUBST(HAVE_ARM_M3_CC)
+AC_SUBST(HAVE_ARM_M0_CC)
+	
+if test "x$HAVE_ARM_M3_CC" = "xno"; then
+	AC_MSG_WARN([No cortex-m3 arm compiler found, STM32L binaries will not be built])
+fi
+
+if test "x$HAVE_ARM_M0_CC" = "xno"; then
+	AC_MSG_WARN([No cortex-m0 arm compiler found, LPC11U14 binaries will not be built])
+fi
+
+#
+# Configure AVR compiler
+#
+
+AC_ARG_WITH([avr-cc],
+	    [AS_HELP_STRING([--with-avr-cc],
+	                    [Name of AVR C compiler])],
+	    [],
+	    [with_avr_cc=auto])
+
+if test "x$with_avr_cc" != "xno"; then	    
+	if test "x$with_avr_cc" = "xauto"; then
+		with_avr_cc="avr-gcc"
+		AC_CHECK_PROG([HAVE_AVR_CC],[$with_avr_cc], yes, no)
+	else
+		HAVE_AVR_CC=yes
+	fi
+else
+	HAVE_AVR_CC=no
+fi
+
+AC_ARG_WITH([avr-objcopy],
+	    [AS_HELP_STRING([--with-avr-objcopy],
+	                    [Name of AVR objcopy])],
+	    [],
+	    [with_avr_objcopy=auto])
+
+if test "x$with_avr_objcopy" != "xno"; then	    
+	if test "x$with_avr_objcopy" = "xauto"; then
+		with_avr_objcopy="avr-objcopy"
+		AC_CHECK_PROG([HAVE_AVR_OBJCOPY],[$with_avr_objcopy], yes, no)
+	else
+		HAVE_AVR_OBJCOPY=yes
+	fi
+else
+	HAVE_AVR_OBJCOPY=no
+fi
+
+if test "x$HAVE_AVR_CC" = "xno" -o "x$HAVE_AVR_OBJCOPY" = "xno"; then
+	AC_MSG_WARN([AVR compiler and objcopy not found, atmel binaries will not be built])
+	HAVE_AVR_CC=no
+else
+	save_CC="$CC"
+	save_CFLAGS="$CFLAGS"
+	save_LIBS="$LIBS"
+
+	CC="$with_avr_cc"
+	CFLAGS="-mmcu=attiny85"
+	AC_LANG_PUSH([C])
+	AC_MSG_CHECKING([if ]$with_avr_cc[ can link programs])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
+			  [AVR_LINK=yes],
+			  [AVR_LINK=no])
+        AC_MSG_RESULT([$AVR_LINK])
+	AC_LANG_POP([C])
+
+	LIBS="$save_LIBS"
+	CFLAGS="$save_CFLAGS"
+	CC="$save_CC"
+
+	if test "x$AVR_LINK" = xyes; then
+		AVR_CC=$with_avr_cc
+		AVR_OBJCOPY=$with_avr_objcopy
+	else
+		HAVE_AVR_CC=no;
+	fi
+fi
+
+AC_SUBST(AVR_CC)
+AC_SUBST(AVR_OBJCOPY)
+AC_SUBST(HAVE_AVR_CC)
 
 AC_CHECK_PROG([HAVE_NICKLE], [nickle], yes, no)
 if test "x$HAVE_NICKLE" = "xno"; then
 	AC_MSG_ERROR([Please install nickle to build AltOs])
 fi
 
-AC_CHECK_LIB(readline, readline)
+AC_ARG_WITH([readline],
+	    [AS_HELP_STRING([--with-readline],
+			      [enable readline functionality in ao-dbg @<:@default=auto@:>@])],
+	      [],
+	      [with_readline=auto])
+			      
+LIBREADLINE_LIBS=
+
+if test x"$with_readline" != "xno"; then
+	AC_CHECK_LIB([readline], [main],
+                      [AC_SUBST([LIBREADLINE], ["-lreadline -lncurses"])
+	               AC_DEFINE([HAVE_LIBREADLINE], [1],
+                         [Define if you have libreadline])],
+		      [if test "x$with_readline" != xauto; then
+	                 AC_MSG_ERROR([--with-readline was given, but test for readline failed])
+	               fi],
+		       -lncurses)
+fi
 
 PKG_CHECK_MODULES([LIBUSB], [libusb-1.0])
 
 AC_CHECK_HEADERS(libelf.h libelf/libelf.h, [break])
 AC_CHECK_HEADERS(gelf.h libelf/gelf.h, [break])
 
-PKG_CHECK_MODULES([LIBSTLINK], [stlink], [HAVE_STLINK=yes], [HAVE_STLINK=no])
+AC_ARG_WITH([stlink],
+	    [AS_HELP_STRING([--with-stlink],
+	                    [Build tools that use the stlink library (default: auto)])],
+	    [],
+	    [with_stlink=auto])
 
-AM_CONDITIONAL([LIBSTLINK], [test x$HAVE_STLINK != xno])
+if test x"$with_stlink" != "xno"; then
+	PKG_CHECK_MODULES([STLINK], [stlink], [HAVE_STLINK=yes], [HAVE_STLINK=no])
+	if test x"$HAVE_STLINK" = "xno" -a x"$with_stlink" != "xauto"; then
+		AC_MSG_ERROR([--with-stlink was given, but stlink was not found])
+	fi
+else
+	HAVE_STLINK=no
+fi
+
+if test x"$HAVE_STLINK" = "xyes"; then
+	AC_DEFINE(HAVE_STLINK,1,[Using STlink library])
+fi
+
+AM_CONDITIONAL([LIBSTLINK], [test x$HAVE_STLINK == xyes])
 
 AC_OUTPUT([
 Makefile
+src/Makedefs
 altoslib/Makefile
 altosuilib/Makefile
 altosuilib/AltosUIVersion.java
@@ -235,6 +466,9 @@ ao-tools/ao-sky-flash/Makefile
 ao-tools/ao-dumpflash/Makefile
 ao-tools/ao-edit-telem/Makefile
 ao-tools/ao-dump-up/Makefile
+ao-tools/ao-elftohex/Makefile
+ao-tools/ao-usbload/Makefile
+ao-tools/ao-flash/Makefile
 ao-utils/Makefile
 src/Version
 ])
@@ -243,10 +477,16 @@ echo ""
 echo "  Package: ${PACKAGE_NAME} ${PACKAGE_VERSION}"
 echo ""
 echo "  Configuration"
-echo "    STM32L/LPC11U14 support.....: ${HAVE_ARM_GCC}"
+echo "    Arm compiler................: ${ARM_CC}"
+echo "    STM32L support..............: ${HAVE_ARM_M3_CC}"
+echo "    LPC11U14 support............: ${HAVE_ARM_M0_CC}"
+echo "    SDCC........................: ${SDCC}"
 echo "    CC1111 support..............: ${HAVE_SDCC}"
+echo "    AVR compiler................: ${AVR_CC} ${AVR_OBJCOPY}"
+echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
 echo "    STlink support..............: ${HAVE_STLINK}"
+echo "    Local pdclib................: ${HAVE_PDCLIB}"
 echo ""
 echo "  Java paths"
 echo "    freetts.....................: ${FREETTS}"

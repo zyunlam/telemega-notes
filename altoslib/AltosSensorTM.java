@@ -15,14 +15,37 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.util.concurrent.TimeoutException;
 
-class AltosSensorTM extends AltosRecordTM {
+public class AltosSensorTM {
+	public int	tick;
+	public int	accel;
+	public int	pres;
+	public int	temp;
+	public int	batt;
+	public int	drogue;
+	public int	main;
 
-	public AltosSensorTM(AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException {
-		super();
+	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+		try {
+			AltosSensorTM	sensor_tm = new AltosSensorTM(link);
+
+			if (sensor_tm == null)
+				return;
+			state.set_accel(sensor_tm.accel);
+			state.set_pressure(AltosConvert.barometer_to_pressure(sensor_tm.pres));
+			state.set_temperature(AltosConvert.thermometer_to_temperature(sensor_tm.temp));
+			state.set_battery_voltage(AltosConvert.cc_battery_to_voltage(sensor_tm.batt));
+			state.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sensor_tm.drogue));
+			state.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sensor_tm.main));
+			
+		} catch (TimeoutException te) {
+		}
+	}
+
+	public AltosSensorTM(AltosLink link) throws InterruptedException, TimeoutException {
 		String[] items = link.adc();
 		for (int i = 0; i < items.length;) {
 			if (items[i].equals("tick:")) {
@@ -62,10 +85,6 @@ class AltosSensorTM extends AltosRecordTM {
 			}
 			i++;
 		}
-		ground_accel = config_data.accel_cal_plus;
-		ground_pres = pres;
-		accel_plus_g = config_data.accel_cal_plus;
-		accel_minus_g = config_data.accel_cal_minus;
 	}
 }
 

@@ -18,6 +18,7 @@
 #include <ao.h>
 #include <ao_exti.h>
 #include <ao_fat.h>
+#include <ao_eeprom.h>
 
 uint16_t	ao_flight_number = 1;
 
@@ -40,7 +41,7 @@ main(void)
 	ao_dma_init();
 	ao_exti_init();
 
-	ao_storage_init();
+	ao_eeprom_init();
 
 	ao_serial_init();
 

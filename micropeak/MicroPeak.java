@@ -23,7 +23,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class MicroPeak extends MicroFrame implements ActionListener, ItemListener {
@@ -230,6 +230,10 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		JMenuItem exitAction = new JMenuItem("Exit");
 		fileMenu.add(exitAction);
 		exitAction.addActionListener(this);
+
+		JButton downloadButton = new JButton ("Download");
+		downloadButton.addActionListener(this);
+		menuBar.add(downloadButton);
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {

@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -89,8 +89,8 @@ public class TabLanded extends Fragment implements AltosDroidTab {
 		}
 	       
 		if (state != null) {
-			mMaxHeightView.setText(String.format("%6.0f m", state.max_height));
-			mMaxAccelView.setText(String.format("%6.0f m/s²", state.max_acceleration));
+			mMaxHeightView.setText(String.format("%6.0f m", state.max_height()));
+			mMaxAccelView.setText(String.format("%6.0f m/s²", state.max_acceleration()));
 			mMaxSpeedView.setText(String.format("%6.0f m/s", state.max_speed()));
 		}
 	}

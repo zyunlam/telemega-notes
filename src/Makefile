@@ -13,43 +13,59 @@ vpath load_csv.5c kalman
 vpath matrix.5c kalman
 
 include Version
+TOPDIR=.
+include Makedefs
 
 SDCCDIRS=\
 	telemetrum-v1.2 telemetrum-v1.1 telemetrum-v1.0 \
-	teledongle-v0.2 teledongle-v0.1 \
-	telemini-v1.0 telenano-v0.1 \
+	teledongle-v0.2 \
+	telemini-v1.0 \
 	telebt-v1.0 \
-	telemetrum-v0.1-sky telemetrum-v0.1-sirf \
-	telelaunch-v0.1 tidongle test \
 	teleterra-v0.2 teleshield-v0.1 \
-	telefire-v0.1 \
-	spiradio-v0.1
+	telefire-v0.1 telefire-v0.2 \
+	telemini-v2.0
+
+ARMM3DIRS=\
+	telemega-v0.1 telemega-v0.1/flash-loader \
+	telemega-v1.0 telemega-v1.0/flash-loader \
+	telemetrum-v2.0 telemetrum-v2.0/flash-loader \
+	megadongle-v0.1 megadongle-v0.1/flash-loader \
+	telegps-v0.3 telegps-v0.3/flash-loader \
+	telelco-v0.2 telelco-v0.2/flash-loader \
+	telescience-v0.2 telescience-v0.2/flash-loader
+
+ARMM0DIRS=\
+	easymini-v1.0 easymini-v1.0/flash-loader
 
 AVRDIRS=\
-	telescience-v0.1 telescience-pwm telepyro-v0.1 micropeak
+	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1
 
-ARMDIRS=\
-	telemega-v0.1 telemega-v0.1/flash-loader \
-	telemega-v0.3 telemega-v0.3/flash-loader \
-	megadongle-v0.1 megadongle-v0.1/flash-loader \
-	telegps-v0.1 telegps-v0.1/flash-loader \
-	stm-bringup stm-demo \
-	telelco-v0.2 telelco-v0.2/flash-loader \
-	telescience-v0.2
+SUBDIRS=
 
-ifneq ($(shell which sdcc),)
-	SUBDIRS += $(SDCCDIRS)
+ifeq ($(strip $(HAVE_PDCLIB)),yes)
+PDCLIB=pdclib
+CLEAN_PDCLIB=clean-pdclib
 endif
 
-ifneq ($(shell which avr-gcc),)
-	SUBDIRS += $(AVRDIRS)
+ifeq ($(strip $(HAVE_SDCC)),yes)
+SUBDIRS+=$(SDCCDIRS)
 endif
 
-ifneq ($(shell which arm-none-eabi-gcc),)
-	SUBDIRS += $(ARMDIRS)
+ifeq ($(strip $(HAVE_ARM_M3_CC)),yes)
+SUBDIRS+=$(ARMM3DIRS)
+foo=bar
 endif
 
-ALLDIRS=$(SDCCDIRS) $(AVRDIRS) $(ARMDIRS)
+ifeq ($(strip $(HAVE_ARM_M0_CC)),yes)
+SUBDIRS+=$(ARMM0DIRS)
+baz=bletch
+endif
+
+ifeq ($(strip $(HAVE_AVR_CC)),yes)
+SUBDIRS += $(AVRDIRS)
+endif
+
+ALLDIRS=$(SDCCDIRS) $(ARMM3DIRS) $(ARMM0DIRS) $(AVRDIRS)
 
 all: all-local all-recursive
 
@@ -81,7 +97,7 @@ uninstall:
 
 all-recursive: all-local
 
-all-local: altitude.h altitude-pa.h ao_kalman.h ao_whiten.h
+all-local: altitude.h altitude-pa.h ao_kalman.h ao_whiten.h $(PDCLIB)
 
 altitude.h: make-altitude
 	nickle $< > $@
@@ -95,5 +111,13 @@ ao_kalman.h: make-kalman kalman.5c kalman_filter.5c load_csv.5c matrix.5c
 ao_whiten.h: make-whiten
 	nickle $< > $@
 
-clean-local:
+clean-local: $(CLEAN_PDCLIB)
 	rm -f altitude.h ao_kalman.h
+
+pdclib:
+	mkdir -p $(PDCLIB_ROOT)/include $(PDCLIB_ROOT)/lib 
+	cd ../pdclib && make && make prefix=`pwd`/../pdclib-root install
+
+clean-pdclib:
+	rm -rf $(PDCLIB_ROOT)
+	cd ../pdclib && make clean

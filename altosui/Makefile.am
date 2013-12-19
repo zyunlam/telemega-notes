@@ -1,6 +1,6 @@
 
 JAVAROOT=classes
-AM_JAVACFLAGS=-encoding UTF-8 -Xlint:deprecation
+AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -source 6
 
 man_MANS=altosui.1
 
@@ -34,10 +34,8 @@ altosui_JAVA = \
 	AltosDeviceUIDialog.java \
 	AltosDisplayThread.java \
 	AltosEepromDelete.java \
-	AltosEepromDownload.java \
-	AltosEepromList.java \
 	AltosEepromManage.java \
-	AltosEepromMonitor.java \
+	AltosEepromMonitorUI.java \
 	AltosEepromSelect.java \
 	AltosFlashUI.java \
 	AltosFlightDisplay.java \
@@ -137,26 +135,35 @@ ICONJAR= -C $(ICONDIR) altus-metrum-16.png \
 WINDOWS_ICON=$(ICONDIR)/altus-metrum.ico
 
 # Firmware
-FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2-$(VERSION).ihx
+FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
 FIRMWARE_TD=$(FIRMWARE_TD_0_2)
 
-FIRMWARE_TM_1_0=$(top_srcdir)/src/telemetrum-v1.0-$(VERSION).ihx
-FIRMWARE_TM_1_1=$(top_srcdir)/src/telemetrum-v1.1-$(VERSION).ihx
-FIRMWARE_TM_1_2=$(top_srcdir)/src/telemetrum-v1.2-$(VERSION).ihx
+FIRMWARE_TM_1_0=$(top_srcdir)/src/telemetrum-v1.0/telemetrum-v1.0-$(VERSION).ihx
+FIRMWARE_TM_1_1=$(top_srcdir)/src/telemetrum-v1.1/telemetrum-v1.1-$(VERSION).ihx
+FIRMWARE_TM_1_2=$(top_srcdir)/src/telemetrum-v1.2/telemetrum-v1.2-$(VERSION).ihx
 FIRMWARE_TM=$(FIRMWARE_TM_1_0) $(FIRMWARE_TM_1_1) $(FIRMWARE_TM_1_2)
 
-FIRMWARE_TELEMINI_1_0=$(top_srcdir)/src/telemini-v1.0-$(VERSION).ihx
+FIRMWARE_TELEMINI_1_0=$(top_srcdir)/src/telemini-v1.0/telemini-v1.0-$(VERSION).ihx
 FIRMWARE_TELEMINI=$(FIRMWARE_TELEMINI_1_0)
 
-FIRMWARE_TBT_1_0=$(top_srcdir)/src/telebt-v1.0-$(VERSION).ihx
+FIRMWARE_TBT_1_0=$(top_srcdir)/src/telebt-v1.0/telebt-v1.0-$(VERSION).ihx
 FIRMWARE_TBT=$(FIRMWARE_TBT_1_0)
 
-FIRMWARE=$(FIRMWARE_TM) $(FIRMWARE_TELEMINI) $(FIRMWARE_TD) $(FIRMWARE_TBT)
+FIRMWARE_TMEGA_1_0=$(top_srcdir)/src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx
+FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0)
+
+FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
+
+FIRMWARE=$(FIRMWARE_TM) $(FIRMWARE_TELEMINI) $(FIRMWARE_TD) $(FIRMWARE_TBT) $(FIRMWARE_TMEGA) $(FIRMWARE_EMINI)
 
 ALTUSMETRUM_DOC=$(top_srcdir)/doc/altusmetrum.pdf
 ALTOS_DOC=$(top_srcdir)/doc/altos.pdf
 TELEMETRY_DOC=$(top_srcdir)/doc/telemetry.pdf
-TEMPLATE_DOC=$(top_srcdir)/doc/telemetrum-outline.pdf $(top_srcdir)/doc/telemega-outline.pdf
+TEMPLATE_DOC=\
+	$(top_srcdir)/doc/telemetrum-outline.pdf \
+	$(top_srcdir)/doc/easymini-outline.pdf \
+	$(top_srcdir)/doc/telemega-outline.pdf \
+	$(top_srcdir)/doc/easymini-outline.pdf
 
 DOC=$(ALTUSMETRUM_DOC) $(ALTOS_DOC) $(TELEMETRY_DOC) $(TEMPLATE_DOC)
 
@@ -171,7 +178,7 @@ LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC)
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) ReadMe-Mac.rtf
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf
 MACOSX_EXTRA=$(FIRMWARE)
 
 WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/telemetrum.inf $(WINDOWS_ICON)
@@ -322,6 +329,8 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	mkdir macosx
 	cp -a AltosUI.app macosx/
 	cp -a ReadMe-Mac.rtf macosx/ReadMe.rtf
+	mkdir -p macosx/Doc
+	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/AltosUI.app/Contents
 	mkdir -p macosx/AltOS-$(VERSION) macosx/AltosUI.app/Contents/Resources/Java
 	cp -p $(FATJAR) macosx/AltosUI.app/Contents/Resources/Java/altosui.jar

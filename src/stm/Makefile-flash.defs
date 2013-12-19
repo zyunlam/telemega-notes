@@ -6,16 +6,15 @@ vpath ao-make-product.5c $(TOPDIR)/util
 .elf.ihx:
 	objcopy -O ihex $*.elf $@
 
-CC=arm-none-eabi-gcc
-SAT=/opt/cortex
-SAT_CLIB=$(SAT)/lib/pdclib-cortex-m3.a
-SAT_CFLAGS=-I$(SAT)/include
-
 ifndef VERSION
 include $(TOPDIR)/Version
 endif
+include $(TOPDIR)/Makedefs
 
-AO_CFLAGS=-I. -I$(TOPDIR)/stm -I$(TOPDIR)/core -I$(TOPDIR)/drivers -I$(TOPDIR)/product -I$(TOPDIR)
+CC=$(ARM_CC)
+LIBS=$(PDCLIB_LIBS_M3) -lgcc
+
+AO_CFLAGS=-I. -I$(TOPDIR)/stm -I$(TOPDIR)/core -I$(TOPDIR)/drivers -I$(TOPDIR)/product -I$(TOPDIR) $(PDCLIB_INCLUDES)
 STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb -ffreestanding -nostdlib $(AO_CFLAGS) $(SAT_CFLAGS)
 
 LDFLAGS=-L$(TOPDIR)/stm -Wl,-Taltos-loader.ld
@@ -62,7 +61,7 @@ SRC = \
 
 OBJ=$(SRC:.c=.o)
 
-PRODUCT=AltosFlash-$(VERSION)
+PRODUCT=AltosFlash
 PRODUCT_DEF=-DALTOS_FLASH
 IDPRODUCT=0x000a
 
@@ -72,7 +71,7 @@ PROGNAME=altos-flash
 PROG=$(HARDWARE)-$(PROGNAME)-$(VERSION).elf
 
 $(PROG): Makefile $(OBJ) altos-loader.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(SAT_CLIB) -lgcc
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 ao_product.h: ao-make-product.5c $(TOPDIR)/Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
@@ -84,7 +83,7 @@ all: $(PROG)
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROG)
+	rm -f *.o $(HARDWARE)-$(PROGNAME)-*.elf
 	rm -f ao_product.h
 
 install:

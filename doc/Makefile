@@ -11,29 +11,58 @@ RELNOTES=\
 	release-notes-1.1.html \
 	release-notes-1.1.1.html \
 	release-notes-1.2.html \
-	release-notes-1.2.1.html
+	release-notes-1.2.1.html \
+	release-notes-1.3.html
+
+PICTURES=\
+	altosui.png \
+	ascent.png \
+	configure-altimeter.png \
+	configure-altosui.png \
+	configure-groundstation.png \
+	configure-pyro.png \
+	descent.png \
+	device-selection.png \
+	easymini-top.jpg \
+	fire-igniter.png \
+	graph-configure.png \
+	graph-map.png \
+	graph.png \
+	graph-stats.png \
+	landed.png \
+	launch-pad.png \
+	load-maps.png \
+	scan-channels.png \
+	site-map.png \
+	table.png \
+	telemega-v1.0-top.jpg \
+	telemetrum-v1.1-thside.jpg \
+	telemini-v1-top.jpg \
+	telemini-v2-top.jpg
+SVG=\
+	easymini-outline.svg \
+	telemega-outline.svg \
+	telemetrum.svg \
+	telemini.svg
 
 RELNOTES_XSL=$(RELNOTES:.html=.xsl)
 HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html $(RELNOTES)
 PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf
-DOC=$(HTML) $(PDF)
 HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
-FOSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/fo/docbook.xsl
+FOSTYLE=xorg-fo.xsl
 PDFSTYLE=
-IMAGES=telemetrum.svg telemini.svg
+IMAGES=$(PICTURES) $(SVG)
+DOC=$(HTML) $(PDF) $(PICTURES)
 
-.SUFFIXES: .xsl .html .fo .pdf
+.SUFFIXES: .xsl .html .pdf
 
 XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
 
 .xsl.html:
 	xsltproc $(XSLTFLAGS) -o $@ $(HTMLSTYLE) $*.xsl
 
-.xsl.fo:
-	xsltproc $(XSLTFLAGS) -o $@ $(FOSTYLE) $*.xsl
-
-.fo.pdf:
-	fop -fo $*.fo -pdf $@
+.xsl.pdf:
+	xmlto -x $(FOSTYLE) --with-fop pdf $*.xsl
 
 all:	$(HTML) $(PDF)
 
@@ -48,13 +77,15 @@ publish:	$(DOC)
 	 git push)
 
 clean:
-	rm -f $(HTML) $(PDF) *.fo
+	rm -f $(HTML) $(PDF)
 
 distclean:
-	rm -f $(HTML) $(PDF) *.fo
+	rm -f $(HTML) $(PDF)
 
 altusmetrum.html: $(RELNOTES_XSL) $(IMAGES)
-altusmetrum.fo: $(RELNOTES_XSL) $(IMAGES)
+altusmetrum.pdf: $(RELNOTES_XSL) $(IMAGES)
+
+$(PDF): $(FOSTYLE)
 
 indent:		altusmetrum.xsl
 	xmlindent -i 2 < altusmetrum.xsl > altusmetrum.new

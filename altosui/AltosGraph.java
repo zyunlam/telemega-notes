@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 import org.altusmetrum.altosuilib_1.*;
 
 import org.jfree.ui.*;
@@ -37,57 +37,92 @@ import org.jfree.data.*;
 
 class AltosVoltage extends AltosUnits {
 
-	public double value(double v) {
+	public double value(double v, boolean imperial_units) {
 		return v;
 	}
 
-	public String show_units() {
+	public double inverse(double v, boolean imperial_units) {
+		return v;
+	}
+
+	public String show_units(boolean imperial_units) {
 		return "V";
 	}
 
-	public String say_units() {
+	public String say_units(boolean imperial_units) {
 		return "volts";
 	}
 
-	public int show_fraction(int width) {
+	public int show_fraction(int width, boolean imperial_units) {
 		return width / 2;
 	}
 }
 
 class AltosNsat extends AltosUnits {
 
-	public double value(double v) {
+	public double value(double v, boolean imperial_units) {
 		return v;
 	}
 
-	public String show_units() {
+	public double inverse(double v, boolean imperial_units) {
+		return v;
+	}
+
+	public String show_units(boolean imperial_units) {
 		return "Sats";
 	}
 
-	public String say_units() {
+	public String say_units(boolean imperial_units) {
 		return "Satellites";
 	}
 
-	public int show_fraction(int width) {
+	public int show_fraction(int width, boolean imperial_units) {
+		return 0;
+	}
+}
+
+class AltosPressure extends AltosUnits {
+
+	public double value(double p, boolean imperial_units) {
+		return p;
+	}
+
+	public double inverse(double p, boolean imperial_units) {
+		return p;
+	}
+
+	public String show_units(boolean imperial_units) {
+		return "Pa";
+	}
+
+	public String say_units(boolean imperial_units) {
+		return "pascals";
+	}
+
+	public int show_fraction(int width, boolean imperial_units) {
 		return 0;
 	}
 }
 
 class AltosDbm extends AltosUnits {
 
-	public double value(double v) {
-		return v;
+	public double value(double d, boolean imperial_units) {
+		return d;
 	}
 
-	public String show_units() {
+	public double inverse(double d, boolean imperial_units) {
+		return d;
+	}
+
+	public String show_units(boolean imperial_units) {
 		return "dBm";
 	}
 
-	public String say_units() {
-		return "d b m";
+	public String say_units(boolean imperial_units) {
+		return "D B M";
 	}
 
-	public int show_fraction(int width) {
+	public int show_fraction(int width, boolean imperial_units) {
 		return 0;
 	}
 }
@@ -96,6 +131,7 @@ public class AltosGraph extends AltosUIGraph {
 
 	static final private Color height_color = new Color(194,31,31);
 	static final private Color gps_height_color = new Color(150,31,31);
+	static final private Color pressure_color = new Color (225,31,31);
 	static final private Color range_color = new Color(100, 31, 31);
 	static final private Color distance_color = new Color(100, 31, 194);
 	static final private Color speed_color = new Color(31,194,31);
@@ -112,16 +148,18 @@ public class AltosGraph extends AltosUIGraph {
 	static final private Color state_color = new Color(0,0,0);
 
 	static AltosVoltage voltage_units = new AltosVoltage();
+	static AltosPressure pressure_units = new AltosPressure();
 	static AltosNsat nsat_units = new AltosNsat();
 	static AltosDbm dbm_units = new AltosDbm();
 
 	AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
-	AltosUIAxis	distance_axis;
+	AltosUIAxis	distance_axis, pressure_axis;
 
 	public AltosGraph(AltosUIEnable enable, AltosFlightStats stats, AltosGraphDataSet dataSet) {
 		super(enable);
 
 		height_axis = newAxis("Height", AltosConvert.height, height_color);
+		pressure_axis = newAxis("Pressure", pressure_units, pressure_color, 0);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
 		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
 		voltage_axis = newAxis("Voltage", voltage_units, voltage_color);
@@ -138,6 +176,12 @@ public class AltosGraph extends AltosUIGraph {
 			  height_color,
 			  true,
 			  height_axis);
+		addSeries("Pressure",
+			  AltosGraphDataPoint.data_pressure,
+			  pressure_units,
+			  pressure_color,
+			  false,
+			  pressure_axis);
 		addSeries("Speed",
 			  AltosGraphDataPoint.data_speed,
 			  AltosConvert.speed,

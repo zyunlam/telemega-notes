@@ -36,10 +36,7 @@ ALTOS_SRC = \
 	ao_data.c \
 	ao_i2c_stm.c \
 	ao_usb_stm.c \
-	ao_exti_stm.c \
-	ao_event.c \
-	ao_quadrature.c \
-	ao_button.c
+	ao_exti_stm.c
 
 PRODUCT=StmDemo-v0.0
 PRODUCT_DEF=-DSTM_DEMO
@@ -59,7 +56,7 @@ all: $(ELF) $(IHX)
 LDFLAGS=-L../stm -Wl,-Taltos.ld
 
 $(ELF): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $@ $(OBJ) $(SAT_CLIB) -lgcc
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $@ $(OBJ) $(LIBS)
 
 ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
@@ -69,7 +66,7 @@ $(OBJ): $(INC)
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROG)
+	rm -f *.o *.elf *.ihx
 	rm -f ao_product.h
 
 install:

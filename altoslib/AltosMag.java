@@ -15,11 +15,70 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
-public class AltosMag {
+import java.util.concurrent.*;
+
+public class AltosMag implements Cloneable {
 	public int		x;
 	public int		y;
 	public int		z;
+
+	public boolean parse_string(String line) {
+//		if (line.startsWith("Syntax error")) {
+//			x = y = z = 0;
+//			return true;
+//		}
+
+		if (!line.startsWith("X:"))
+			return false;
+
+		String[] items = line.split("\\s+");
+
+		if (items.length >= 6) {
+			x = Integer.parseInt(items[1]);
+			y = Integer.parseInt(items[3]);
+			z = Integer.parseInt(items[5]);
+		}
+		return true;
+	}
+
+	public AltosMag clone() {
+		AltosMag n = new AltosMag();
+
+		n.x = x;
+		n.y = y;
+		n.z = z;
+		return n;
+	}
+
+	public AltosMag() {
+		x = AltosLib.MISSING;
+		y = AltosLib.MISSING;
+		z = AltosLib.MISSING;
+	}
+
+	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+		try {
+			AltosMag	mag = new AltosMag(link);
+
+			if (mag != null)
+				state.set_mag(mag);
+		} catch (TimeoutException te) {
+		}
+	}
+
+	public AltosMag(AltosLink link) throws InterruptedException, TimeoutException {
+		this();
+		link.printf("M\n");
+		for (;;) {
+			String line = link.get_reply_no_dialog(5000);
+			if (line == null) {
+				throw new TimeoutException();
+			}
+			if (parse_string(line))
+				break;
+		}
+	}
 }
 	

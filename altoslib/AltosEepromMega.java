@@ -15,34 +15,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
+import java.io.*;
+import java.util.*;
 import java.text.*;
 
-public class AltosEepromMega {
-	public int	cmd;
-	public int	tick;
-	public boolean	valid;
-	public String	data;
-	public int	config_a, config_b;
-
-	public int	data8[];
-
+public class AltosEepromMega extends AltosEeprom {
 	public static final int	record_length = 32;
-	static final int	header_length = 4;
-	static final int	data_length = record_length - header_length;
 
-	public int data8(int i) {
-		return data8[i];
-	}
-
-	public int data16(int i) {
-		return ((data8[i] | (data8[i+1] << 8)) << 16) >> 16;
-	}
-
-	public int data32(int i) {
-		return data8[i] | (data8[i+1] << 8) | (data8[i+2] << 16) | (data8[i+3] << 24);
-	}
+	public int record_length() { return record_length; }
 
 	/* AO_LOG_FLIGHT elements */
 	public int flight() { return data16(0); }
@@ -68,11 +50,12 @@ public class AltosEepromMega {
 	public int mag_z() { return data16(24); }
 	public int accel() { return data16(26); }
 
-	/* AO_LOG_VOLT elements */
+	/* AO_LOG_TEMP_VOLT elements */
 	public int v_batt() { return data16(0); }
 	public int v_pbatt() { return data16(2); }
 	public int nsense() { return data16(4); }
 	public int sense(int i) { return data16(6 + i * 2); }
+	public int pyro() { return data16(26); }
 
 	/* AO_LOG_GPS_TIME elements */
 	public int latitude() { return data32(0); }
@@ -90,131 +73,139 @@ public class AltosEepromMega {
 	public int nsat() { return data16(0); }
 	public int svid(int n) { return data8(2 + n * 2); }
 	public int c_n(int n) { return data8(2 + n * 2 + 1); }
-	public AltosEepromMega (AltosEepromChunk chunk, int start) throws ParseException {
-		cmd = chunk.data(start);
 
-		valid = !chunk.erased(start, record_length);
-		if (valid) {
-			if (AltosConvert.checksum(chunk.data, start, record_length) != 0)
-				throw new ParseException(String.format("invalid checksum at 0x%x",
-								       chunk.address + start), 0);
-		} else {
-			cmd = AltosLib.AO_LOG_INVALID;
+	public AltosEepromMega (AltosEepromChunk chunk, int start) throws ParseException {
+		parse_chunk(chunk, start);
+	}
+
+	public void update_state(AltosState state) {
+		super.update_state(state);
+
+		AltosGPS	gps;
+
+		/* Flush any pending GPS changes */
+		if (state.gps_pending) {
+			switch (cmd) {
+			case AltosLib.AO_LOG_GPS_LAT:
+			case AltosLib.AO_LOG_GPS_LON:
+			case AltosLib.AO_LOG_GPS_ALT:
+			case AltosLib.AO_LOG_GPS_SAT:
+			case AltosLib.AO_LOG_GPS_DATE:
+				break;
+			default:
+				state.set_temp_gps();
+				break;
+			}
 		}
 
-		tick = chunk.data16(start+2);
+		switch (cmd) {
+		case AltosLib.AO_LOG_FLIGHT:
+			state.set_boost_tick(tick);
+			state.set_flight(flight());
+			state.set_ground_accel(ground_accel());
+			state.set_ground_pressure(ground_pres());
+			state.set_temperature(ground_temp() / 100.0);
+			break;
+		case AltosLib.AO_LOG_STATE:
+			state.set_tick(tick);
+			state.set_state(state());
+			break;
+		case AltosLib.AO_LOG_SENSOR:
+			state.set_tick(tick);
+			state.set_ms5607(pres(), temp());
 
-		data8 = new int[data_length];
-		for (int i = 0; i < data_length; i++)
-			data8[i] = chunk.data(start + header_length + i);
+			AltosIMU imu = new AltosIMU();
+			imu.accel_x = accel_x();
+			imu.accel_y = accel_y();
+			imu.accel_z = accel_z();
+
+			imu.gyro_x = gyro_x();
+			imu.gyro_y = gyro_y();
+			imu.gyro_z = gyro_z();
+			state.imu = imu;
+
+			AltosMag mag = new AltosMag();
+			mag.x = mag_x();
+			mag.y = mag_y();
+			mag.z = mag_z();
+
+			state.mag = mag;
+
+			state.set_accel(accel());
+
+			break;
+		case AltosLib.AO_LOG_TEMP_VOLT:
+			state.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt()));
+			state.set_pyro_voltage(AltosConvert.mega_pyro_voltage(v_pbatt()));
+
+			int nsense = nsense();
+
+			state.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sense(nsense-2)));
+			state.set_main_voltage(AltosConvert.mega_pyro_voltage(sense(nsense-1)));
+
+			double voltages[] = new double[nsense-2];
+			for (int i = 0; i < nsense-2; i++)
+				voltages[i] = AltosConvert.mega_pyro_voltage(sense(i));
+
+			state.set_ignitor_voltage(voltages);
+			break;
+		case AltosLib.AO_LOG_GPS_TIME:
+			state.set_tick(tick);
+			gps = state.make_temp_gps(false);
+			gps.lat = latitude() / 1e7;
+			gps.lon = longitude() / 1e7;
+			gps.alt = altitude();
+
+			gps.hour = hour();
+			gps.minute = minute();
+			gps.second = second();
+
+			int flags = flags();
+
+			gps.connected = (flags & AltosLib.AO_GPS_RUNNING) != 0;
+			gps.locked = (flags & AltosLib.AO_GPS_VALID) != 0;
+			gps.nsat = (flags & AltosLib.AO_GPS_NUM_SAT_MASK) >>
+				AltosLib.AO_GPS_NUM_SAT_SHIFT;
+
+			gps.year = 2000 + year();
+			gps.month = month();
+			gps.day = day();
+			break;
+		case AltosLib.AO_LOG_GPS_SAT:
+			state.set_tick(tick);
+			gps = state.make_temp_gps(true);
+
+			int n = nsat();
+			for (int i = 0; i < n; i++)
+				gps.add_sat(svid(i), c_n(i));
+			break;
+		}
 	}
 
 	public AltosEepromMega (String line) {
-		valid = false;
-		tick = 0;
-
-		if (line == null) {
-			cmd = AltosLib.AO_LOG_INVALID;
-			line = "";
-		} else {
-			try {
-				String[] tokens = line.split("\\s+");
-
-				if (tokens[0].length() == 1) {
-					if (tokens.length != 2 + data_length) {
-						cmd = AltosLib.AO_LOG_INVALID;
-						data = line;
-					} else {
-						cmd = tokens[0].codePointAt(0);
-						tick = Integer.parseInt(tokens[1],16);
-						valid = true;
-						data8 = new int[data_length];
-						for (int i = 0; i < data_length; i++)
-							data8[i] = Integer.parseInt(tokens[2 + i],16);
-					}
-				} else if (tokens[0].equals("Config") && tokens[1].equals("version:")) {
-					cmd = AltosLib.AO_LOG_CONFIG_VERSION;
-					data = tokens[2];
-				} else if (tokens[0].equals("Main") && tokens[1].equals("deploy:")) {
-					cmd = AltosLib.AO_LOG_MAIN_DEPLOY;
-					config_a = Integer.parseInt(tokens[2]);
-				} else if (tokens[0].equals("Apogee") && tokens[1].equals("delay:")) {
-					cmd = AltosLib.AO_LOG_APOGEE_DELAY;
-					config_a = Integer.parseInt(tokens[2]);
-				} else if (tokens[0].equals("Radio") && tokens[1].equals("channel:")) {
-					cmd = AltosLib.AO_LOG_RADIO_CHANNEL;
-					config_a = Integer.parseInt(tokens[2]);
-				} else if (tokens[0].equals("Callsign:")) {
-					cmd = AltosLib.AO_LOG_CALLSIGN;
-					data = tokens[1].replaceAll("\"","");
-				} else if (tokens[0].equals("Accel") && tokens[1].equals("cal")) {
-					cmd = AltosLib.AO_LOG_ACCEL_CAL;
-					config_a = Integer.parseInt(tokens[3]);
-					config_b = Integer.parseInt(tokens[5]);
-				} else if (tokens[0].equals("Radio") && tokens[1].equals("cal:")) {
-					cmd = AltosLib.AO_LOG_RADIO_CAL;
-					config_a = Integer.parseInt(tokens[2]);
-				} else if (tokens[0].equals("Max") && tokens[1].equals("flight") && tokens[2].equals("log:")) {
-					cmd = AltosLib.AO_LOG_MAX_FLIGHT_LOG;
-					config_a = Integer.parseInt(tokens[3]);
-				} else if (tokens[0].equals("manufacturer")) {
-					cmd = AltosLib.AO_LOG_MANUFACTURER;
-					data = tokens[1];
-				} else if (tokens[0].equals("product")) {
-					cmd = AltosLib.AO_LOG_PRODUCT;
-					data = tokens[1];
-				} else if (tokens[0].equals("serial-number")) {
-					cmd = AltosLib.AO_LOG_SERIAL_NUMBER;
-					config_a = Integer.parseInt(tokens[1]);
-				} else if (tokens[0].equals("log-format")) {
-					cmd = AltosLib.AO_LOG_LOG_FORMAT;
-					config_a = Integer.parseInt(tokens[1]);
-				} else if (tokens[0].equals("software-version")) {
-					cmd = AltosLib.AO_LOG_SOFTWARE_VERSION;
-					data = tokens[1];
-				} else if (tokens[0].equals("ms5607")) {
-					if (tokens[1].equals("reserved:")) {
-						cmd = AltosLib.AO_LOG_BARO_RESERVED;
-						config_a = Integer.parseInt(tokens[2]);
-					} else if (tokens[1].equals("sens:")) {
-						cmd = AltosLib.AO_LOG_BARO_SENS;
-						config_a = Integer.parseInt(tokens[2]);
-					} else if (tokens[1].equals("off:")) {
-						cmd = AltosLib.AO_LOG_BARO_OFF;
-						config_a = Integer.parseInt(tokens[2]);
-					} else if (tokens[1].equals("tcs:")) {
-						cmd = AltosLib.AO_LOG_BARO_TCS;
-						config_a = Integer.parseInt(tokens[2]);
-					} else if (tokens[1].equals("tco:")) {
-						cmd = AltosLib.AO_LOG_BARO_TCO;
-						config_a = Integer.parseInt(tokens[2]);
-					} else if (tokens[1].equals("tref:")) {
-						cmd = AltosLib.AO_LOG_BARO_TREF;
-						config_a = Integer.parseInt(tokens[2]);
-					} else if (tokens[1].equals("tempsens:")) {
-						cmd = AltosLib.AO_LOG_BARO_TEMPSENS;
-						config_a = Integer.parseInt(tokens[2]);
-					} else if (tokens[1].equals("crc:")) {
-						cmd = AltosLib.AO_LOG_BARO_CRC;
-						config_a = Integer.parseInt(tokens[2]);
-					} else {
-						cmd = AltosLib.AO_LOG_INVALID;
-						data = line;
-					}
-				} else {
-					cmd = AltosLib.AO_LOG_INVALID;
-					data = line;
-				}
-			} catch (NumberFormatException ne) {
-				cmd = AltosLib.AO_LOG_INVALID;
-				data = line;
-			}
-		}
+		parse_string(line);
 	}
 
-	public AltosEepromMega(int in_cmd, int in_tick) {
-		cmd = in_cmd;
-		tick = in_tick;
-		valid = true;
+	static public LinkedList<AltosEeprom> read(FileInputStream input) {
+		LinkedList<AltosEeprom> megas = new LinkedList<AltosEeprom>();
+
+		for (;;) {
+			try {
+				String line = AltosLib.gets(input);
+				if (line == null)
+					break;
+				try {
+					AltosEepromMega mega = new AltosEepromMega(line);
+					if (mega.cmd != AltosLib.AO_LOG_INVALID)
+						megas.add(mega);
+				} catch (Exception e) {
+					System.out.printf ("exception\n");
+				}
+			} catch (IOException ie) {
+				break;
+			}
+		}
+
+		return megas;
 	}
 }

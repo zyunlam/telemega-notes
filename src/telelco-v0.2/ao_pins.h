@@ -43,6 +43,8 @@
 
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	1
+#define USE_EEPROM_CONFIG	1
+#define USE_STORAGE_CONFIG	0
 #define HAS_USB			1
 #define HAS_BEEP		1
 #define HAS_RADIO		1
@@ -235,7 +237,6 @@
  */
 
 #define AO_QUADRATURE_COUNT	2
-#define AO_QUADRATURE_MODE	0
 
 #define AO_QUADRATURE_0_PORT	&stm_gpioe
 #define AO_QUADRATURE_0_A	3

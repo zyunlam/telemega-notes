@@ -18,7 +18,7 @@
 /*
  * Sensor data conversion functions
  */
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 public class AltosConvert {
 	/*
@@ -190,6 +190,46 @@ public class AltosConvert {
 		return ignite / 32767 * 15.0;
 	}
 
+	public static double
+	barometer_to_pressure(double count)
+	{
+		return ((count / 16.0) / 2047.0 + 0.095) / 0.009 * 1000.0;
+	}
+
+	static double
+	thermometer_to_temperature(double thermo)
+	{
+		return (thermo - 19791.268) / 32728.0 * 1.25 / 0.00247;
+	}
+
+	static double mega_adc(int raw) {
+		return raw / 4095.0;
+	}
+
+	static public double mega_battery_voltage(int v_batt) {
+		if (v_batt != AltosLib.MISSING)
+			return 3.3 * mega_adc(v_batt) * (15.0 + 27.0) / 27.0;
+		return AltosLib.MISSING;
+	}
+
+	static double mega_pyro_voltage(int raw) {
+		if (raw != AltosLib.MISSING)
+			return 3.3 * mega_adc(raw) * (100.0 + 27.0) / 27.0;
+		return AltosLib.MISSING;
+	}
+
+	static double tele_mini_voltage(int sensor) {
+		double	supply = 3.3;
+
+		return sensor / 32767.0 * supply * 127/27;
+	}
+
+	static double easy_mini_voltage(int sensor) {
+		double	supply = 3.0;
+
+		return sensor / 32767.0 * supply * 127/27;
+	}
+
 	public static double radio_to_frequency(int freq, int setting, int cal, int channel) {
 		double	f;
 
@@ -242,12 +282,24 @@ public class AltosConvert {
 		return meters * (100 / (2.54 * 12));
 	}
 
+	public static double feet_to_meters(double feet) {
+		return feet * 12 * 2.54 / 100.0;
+	}
+
 	public static double meters_to_miles(double meters) {
 		return meters_to_feet(meters) / 5280;
 	}
 
+	public static double miles_to_meters(double miles) {
+		return feet_to_meters(miles * 5280);
+	}
+
 	public static double meters_to_mph(double mps) {
 		return meters_to_miles(mps) * 3600;
+ 	}
+
+	public static double mph_to_meters(double mps) {
+		return miles_to_meters(mps) / 3600;
  	}
 
 	public static double meters_to_mach(double meters) {
@@ -260,6 +312,10 @@ public class AltosConvert {
 
 	public static double c_to_f(double c) {
 		return c * 9/5 + 32;
+	}
+
+	public static double f_to_c(double c) {
+		return (c - 32) * 5/9;
 	}
 
 	public static boolean imperial_units = false;

@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_1.*;
+import org.altusmetrum.altoslib_2.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -92,7 +92,7 @@ public class TabDescent extends Fragment implements AltosDroidTab {
 	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
 			mSpeedView.setText(AltosDroid.number("%6.0f m/s", state.speed()));
-			mHeightView.setText(AltosDroid.number("%6.0f m", state.height));
+			mHeightView.setText(AltosDroid.number("%6.0f m", state.height()));
 			if (from_receiver != null) {
 				mElevationView.setText(AltosDroid.number("%3.0f°", from_receiver.elevation));
 				mRangeView.setText(AltosDroid.number("%6.0f m", from_receiver.range));
@@ -111,11 +111,11 @@ public class TabDescent extends Fragment implements AltosDroidTab {
 				mLongitudeView.setText(AltosDroid.pos(state.gps.lon, "W", "E"));
 			}
 
-			mApogeeVoltageView.setText(AltosDroid.number("%4.2f V", state.drogue_sense));
-			mApogeeLights.set(state.drogue_sense > 3.2, state.drogue_sense == AltosRecord.MISSING);
+			mApogeeVoltageView.setText(AltosDroid.number("%4.2f V", state.apogee_voltage));
+			mApogeeLights.set(state.apogee_voltage > 3.2, state.apogee_voltage == AltosLib.MISSING);
 
-			mMainVoltageView.setText(AltosDroid.number("%4.2f V", state.main_sense));
-			mMainLights.set(state.main_sense > 3.2, state.main_sense == AltosRecord.MISSING);
+			mMainVoltageView.setText(AltosDroid.number("%4.2f V", state.main_voltage));
+			mMainLights.set(state.main_voltage > 3.2, state.main_voltage == AltosLib.MISSING);
 		}
 	}
 

@@ -194,6 +194,39 @@ main (int argc, char **argv)
 						telem.mega_data.height);
 
 					break;
+				case AO_TELEMETRY_METRUM_SENSOR:
+					printf ("state %1d accel %5d pres %9d temp %6.2f acceleration %6.2f speed %6.2f height %5d v_batt %5d sense_a %5d sense_m %5d\n",
+						telem.metrum_sensor.state,
+						telem.metrum_sensor.accel,
+						telem.metrum_sensor.pres,
+						telem.metrum_sensor.temp / 100.0,
+						telem.metrum_sensor.acceleration / 16.0,
+						telem.metrum_sensor.speed / 16.0,
+						telem.metrum_sensor.height,
+						telem.metrum_sensor.v_batt,
+						telem.metrum_sensor.sense_a,
+						telem.metrum_sensor.sense_m);
+					break;
+				case AO_TELEMETRY_METRUM_DATA:
+					printf ("ground_pres %9d ground_accel %5d accel_plus %5d accel_minus %5d\n",
+						telem.metrum_data.ground_pres,
+						telem.metrum_data.ground_accel,
+						telem.metrum_data.accel_plus_g,
+						telem.metrum_data.accel_minus_g);
+					break;
+				case AO_TELEMETRY_MINI:
+					printf ("state %1d v_batt %5d sense_a %5d sense_m %5d pres %9d temp %6.2f acceleration %6.2f speed %6.2f height %5d ground_pres %9d\n",
+						telem.mini.state,
+						telem.mini.v_batt,
+						telem.mini.sense_a,
+						telem.mini.sense_m,
+						telem.mini.pres,
+						telem.mini.temp / 100.0,
+						telem.mini.acceleration / 16.0,
+						telem.mini.speed / 16.0,
+						telem.mini.height,
+						telem.mini.ground_pres);
+					break;
 				default:
 					printf("\n");
 				}

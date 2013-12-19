@@ -18,6 +18,8 @@
 #ifndef _AO_DATA_H_
 #define _AO_DATA_H_
 
+#define GRAVITY 9.80665
+
 #if HAS_ADC
 #define AO_DATA_ADC	(1 << 0)
 #else
@@ -82,6 +84,10 @@ struct ao_data {
 #define ao_data_ring_next(n)	(((n) + 1) & (AO_DATA_RING - 1))
 #define ao_data_ring_prev(n)	(((n) - 1) & (AO_DATA_RING - 1))
 
+/* Get a copy of the last complete sample set */
+void
+ao_data_get(__xdata struct ao_data *packet);
+
 extern volatile __xdata struct ao_data	ao_data_ring[AO_DATA_RING];
 extern volatile __data uint8_t		ao_data_head;
 extern volatile __data uint8_t		ao_data_present;
@@ -97,7 +103,7 @@ extern volatile __data uint8_t		ao_data_count;
  * signaled by the timer tick
  */
 #define AO_DATA_WAIT() do {				\
-		ao_sleep((void *) &ao_data_count);	\
+		ao_sleep(DATA_TO_XDATA ((void *) &ao_data_count));	\
 	} while (0)
 
 #endif /* AO_DATA_RING */
@@ -268,7 +274,11 @@ typedef int16_t accel_t;
 /* MMA655X is hooked up so that positive values represent negative acceleration */
 
 #define ao_data_accel(packet)			((packet)->mma655x)
+#if AO_MMA655X_INVERT
+#define ao_data_accel_cook(packet)		(4095 - (packet)->mma655x)
+#else
 #define ao_data_accel_cook(packet)		((packet)->mma655x)
+#endif
 #define ao_data_set_accel(packet, accel)	((packet)->mma655x = (accel))
 #define ao_data_accel_invert(accel)		(4095 - (accel))
 
@@ -292,8 +302,8 @@ typedef int16_t accel_t;
 
 #define HAS_GYRO	1
 
-typedef int16_t	gyro_t;
-typedef int32_t angle_t;
+typedef int16_t	gyro_t;		/* in raw sample units */
+typedef int16_t angle_t;	/* in degrees */
 
 /* Y axis is aligned with the direction of motion (along) */
 /* X axis is aligned in the other board axis (across) */
@@ -306,6 +316,18 @@ typedef int32_t angle_t;
 #define ao_data_roll(packet)	((packet)->mpu6000.gyro_y)
 #define ao_data_pitch(packet)	((packet)->mpu6000.gyro_x)
 #define ao_data_yaw(packet)	((packet)->mpu6000.gyro_z)
+
+#endif
+
+#if !HAS_MAG && HAS_HMC5883
+
+#define HAS_MAG		1
+
+typedef int16_t ao_mag_t;		/* in raw sample units */
+
+#define ao_data_mag_along(packet)	((packet)->hmc5883.x)
+#define ao_data_mag_across(packet)	((packet)->hmc5883.y)
+#define ao_data_mag_through(packet)	((packet)->hmc5883.z)
 
 #endif
 

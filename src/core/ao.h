@@ -43,6 +43,12 @@
 #define HAS_TASK	1
 #endif
 
+#ifndef AO_PORT_TYPE
+#define AO_PORT_TYPE uint8_t
+#endif
+
+typedef AO_PORT_TYPE ao_port_t;
+
 #if HAS_TASK
 #include <ao_task.h>
 #else
@@ -68,6 +74,8 @@
 #define AO_PANIC_SPI		13	/* SPI communication failure */
 #define AO_PANIC_CRASH		14	/* Processor crashed */
 #define AO_PANIC_BUFIO		15	/* Mis-using bufio API */
+#define AO_PANIC_EXTI		16	/* Mis-using exti API */
+#define AO_PANIC_FAST_TIMER	17	/* Mis-using fast timer API */
 #define AO_PANIC_SELF_TEST_CC1120	0x40 | 1	/* Self test failure */
 #define AO_PANIC_SELF_TEST_HMC5883	0x40 | 2	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MPU6000	0x40 | 3	/* Self test failure */
@@ -174,7 +182,7 @@ void
 ao_cmd_hex(void);
 
 void
-ao_cmd_decimal(void);
+ao_cmd_decimal(void) __reentrant;
 
 /* Read a single hex nibble off stdin. */
 uint8_t
@@ -334,6 +342,10 @@ ao_spi_slave(void);
 #define AO_GPS_DATE_VALID	(1 << 6)
 #define AO_GPS_COURSE_VALID	(1 << 7)
 
+#define AO_GPS_NEW_DATA		1
+#define AO_GPS_NEW_TRACKING	2
+
+extern __xdata uint8_t ao_gps_new;
 extern __pdata uint16_t ao_gps_tick;
 extern __xdata uint8_t ao_gps_mutex;
 extern __xdata struct ao_telemetry_location ao_gps_data;
@@ -378,6 +390,9 @@ ao_gps_print(__xdata struct ao_gps_orig *gps_data);
 
 void
 ao_gps_tracking_print(__xdata struct ao_gps_tracking_orig *gps_tracking_data);
+
+void
+ao_gps_show(void) __reentrant;
 
 void
 ao_gps_init(void);
@@ -693,6 +708,8 @@ struct ao_ignition {
 	uint8_t firing;
 };
 
+extern __code char * __code ao_igniter_status_names[];
+
 extern __xdata struct ao_ignition ao_ignition[2];
 
 enum ao_igniter_status
@@ -722,7 +739,7 @@ extern __xdata uint8_t ao_force_freq;
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	14
+#define AO_CONFIG_MINOR	15
 
 #define AO_AES_LEN 16
 
@@ -755,6 +772,11 @@ struct ao_config {
 #endif
 #if HAS_RADIO_AMP
 	uint8_t		radio_amp;		/* minor version 14 */
+#endif
+#if HAS_GYRO
+	int16_t		accel_zero_along;	/* minor version 15 */
+	int16_t		accel_zero_across;	/* minor version 15 */
+	int16_t		accel_zero_through;	/* minor version 15 */
 #endif
 };
 

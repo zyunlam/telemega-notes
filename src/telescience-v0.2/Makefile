@@ -61,14 +61,15 @@ CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STA
 
 PROGNAME=telescience-v0.2
 PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_telescience.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(SAT_CLIB) -lgcc
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 
@@ -78,7 +79,7 @@ ao_product.h: ao-make-product.5c ../Version
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
 	rm -f ao_product.h
 
 install:

@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.io.*;
 
-public class AltosFlash {
+public class AltosFlash extends AltosProgrammer {
 	File			file;
 	FileInputStream		input;
 	AltosHexfile		image;
@@ -318,7 +318,7 @@ public class AltosFlash {
 		close();
 	}
 
-	public boolean check_rom_config() {
+	public boolean check_rom_config() throws InterruptedException {
 		if (debug == null)
 			return true;
 		if (rom_config == null)
@@ -330,7 +330,7 @@ public class AltosFlash {
 		rom_config = romconfig;
 	}
 
-	public AltosRomconfig romconfig() {
+	public AltosRomconfig romconfig() throws InterruptedException {
 		if (!check_rom_config())
 			return null;
 		return rom_config;

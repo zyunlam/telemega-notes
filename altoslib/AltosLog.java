@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_1;
+package org.altusmetrum.altoslib_2;
 
 import java.io.*;
-import java.text.ParseException;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.text.*;
+import java.util.concurrent.*;
 
 /*
  * This creates a thread to capture telemetry data and write it to
@@ -31,9 +31,11 @@ public class AltosLog implements Runnable {
 	LinkedBlockingQueue<String>	pending_queue;
 	int				serial;
 	int				flight;
+	int				receiver_serial;
 	FileWriter			log_file;
 	Thread				log_thread;
 	AltosFile			file;
+	AltosLink			link;
 
 	private void close_log_file() {
 		if (log_file != null) {
@@ -57,18 +59,15 @@ public class AltosLog implements Runnable {
 		return file;
 	}
 
-	boolean open (AltosRecord telem) throws IOException {
-		AltosFile	a = new AltosFile(telem);
+	boolean open (AltosState state) throws IOException, InterruptedException {
+		AltosFile	a = new AltosFile(state);
 
 		log_file = new FileWriter(a, true);
 		if (log_file != null) {
 			while (!pending_queue.isEmpty()) {
-				try {
-					String s = pending_queue.take();
-					log_file.write(s);
-					log_file.write('\n');
-				} catch (InterruptedException ie) {
-				}
+				String s = pending_queue.take();
+				log_file.write(s);
+				log_file.write('\n');
 			}
 			log_file.flush();
 			file = a;
@@ -78,22 +77,25 @@ public class AltosLog implements Runnable {
 
 	public void run () {
 		try {
-			AltosRecord	previous = null;
+			AltosState	state = new AltosState();
+			AltosConfigData	receiver_config = link.config_data();
+			state.set_receiver_serial(receiver_config.serial);
 			for (;;) {
 				AltosLine	line = input_queue.take();
 				if (line.line == null)
 					continue;
 				try {
-					AltosRecord	telem = AltosTelemetry.parse(line.line, previous);
-					if ((telem.seen & AltosRecord.seen_flight) != 0 &&
-					    (telem.serial != serial || telem.flight != flight || log_file == null))
+					AltosTelemetry	telem = AltosTelemetry.parse(line.line);
+					state = state.clone();
+					telem.update_state(state);
+					if (state.serial != serial || state.flight != flight || log_file == null)
 					{
 						close_log_file();
-						serial = telem.serial;
-						flight = telem.flight;
-						open(telem);
+						serial = state.serial;
+						flight = state.flight;
+						if (state.serial != AltosLib.MISSING && state.flight != AltosLib.MISSING)
+							open(state);
 					}
-					previous = telem;
 				} catch (ParseException pe) {
 				} catch (AltosCRCException ce) {
 				}
@@ -105,6 +107,7 @@ public class AltosLog implements Runnable {
 					pending_queue.put(line.line);
 			}
 		} catch (InterruptedException ie) {
+		} catch (TimeoutException te) {
 		} catch (IOException ie) {
 		}
 		close();
@@ -116,6 +119,7 @@ public class AltosLog implements Runnable {
 		link.add_monitor(input_queue);
 		serial = -1;
 		flight = -1;
+		this.link = link;
 		log_file = null;
 		log_thread = new Thread(this);
 		log_thread.start();
