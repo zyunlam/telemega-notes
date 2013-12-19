@@ -1,3 +1,423 @@
+altos (1.3-1) unstable; urgency=low
+
+  [ Keith Packard ]
+  * altos: Add flash-loader for telescience-v0.2
+  * altos: Add 'g' command to ublox GPS code.
+  * altos: Give u-blox 3 seconds after boot before we bug it
+  * altos: gps serial routines are called ao_gps_*, not ao_ublox_*
+  * altos: Fix telemega v0.3 igniter order (drogue/main moved). Label ADC dump
+  * altos: Initialize MPU6000 CS pin for SPI mode
+  * altos: Grab SPI mutex until MPU6000 I2C mode is disabled
+  * altos: Remove some MMA655x debugging printfs
+  * altos: Move MS5607 info from 'v' to 'c s'
+  * altos: Generate unmodulated carrier for CC1120 test mode
+  * altos/cc1111: Hack on USB driver to make Windows happy
+  * libaltos: Build the linux library targets when doing a 'fat' build
+  * libaltos: use PurgeComm in Windows altos_close to abort in-progress ops
+  * lpc: Initial lpcxpresso bits
+  * lpcxpresso: Add ao_demo.c
+  * altos/lpc: Get 100Hz timer running
+  * altos/lpc: Get USART running
+  * altos/lpc: Take advantage of USART TX fifo
+  * altos/lpc: Start adding USB register definitions
+  * altos/lpc: Start adding USB register defines
+  * altos: Finish off LPC USB register definitions
+  * altos: Allow target-specific USB endpoint specifications
+  * altos/lpc: Get USB working
+  * altos: Move ao_data.c from stm to core
+  * altos: Allow architecture to define the type of port registers
+  * altos: ao_data_get is in ao_data.c now, not ao_adc.c
+  * altos: Check for packet mode before trying to disable it in flight code
+  * altos: Use ao_data_pres macro in ao_log_tiny
+  * altos: Use ao_port_t in m25 driver
+  * altos: Add LPC spi driver
+  * altos: LPC interrupt priorities are just 0-3
+  * altos/lpc: Fix ao_enable_input, add ao_enable_analog
+  * altos/lpc: Clean up broken IOCONF defines
+  * altos/lpc: add gpio int, spi, adc and ct32b defines to lpc.h
+  * altos/lpc: Add ADC driver
+  * altos/lpc: Add beep driver
+  * altos/lpc: Add pin interrupt driver
+  * altos/lpc: Try a smaller stack.
+  * altos/lpc: Use separate interrupt stack
+  * altos: Add easymini-v0.1 product
+  * altos/lpc: Stick USB control structure in USB memory
+  * altos: Initialize SPI for easymini
+  * altos: Build easymini-v0.1
+  * altos: ignore built files in easymini-v0.1
+  * altos/attiny: Fix ao_spi_get_bit/ao_spi_put_bit macros
+  * altos: Use ao_spi_get/put_bit in MS5607 driver
+  * altos/lpc: Make EXTI code work.
+  * altos: Add EXTI_PIN_NOCONFIGURE to exti interface, use for MS5607
+  * altos/lpc: Don't use loader to place USB endpoint data in USB ram
+  * altos/lpc: Pull ADC data from the correct registers
+  * altos/lpc: SPI runs off main clock (48MHz), not sysclk (24MHz)
+  * altos/lpc: Missing parens around ao_gpio_set macro
+  * altos/lpc: Fix beeper driver
+  * altos/lpc: Create TX/RX busy macros for SPI driver
+  * altos/lpc: Leave SPI enabled all the time
+  * altos/lpc: Allow for alternate SPI SCLK0 pin usage
+  * altos/lpc: Configuring wrong pin for SPI1 MOSI
+  * altos/lpc: Reset SPI device at startup time
+  * altos/lpc: Force idle mode if USB gets an address during boot time
+  * altos/easymini: Easymini doesn't have USB connect or VBUS wiring
+  * altos/easymini: MS5607 chip select bits were defined wrong
+  * altos/easymini: Use different pins for igniter outputs
+  * altos/easymini: Initialize beep and ADC. Declare use of igniter bits.
+  * altos/telemega: The last two igniters are apogee and main
+  * Add Mini logging format. Use in EasyMini
+  * altosui: Add TeleBT firmware to release
+  * altos: Set the path for the STM32L compiler explicitly
+  * Bump master version to 1.2.9 to avoid confusion with 1.2 releases
+  * altos: Can't use inline functions because SDCC doesn't do that
+  * Separate out cortex-m0 compiler tests in configure
+  * Create release notes for 1.2.1
+  * doc: Update description of graph window to note new tabs (config and map)
+  * altosui: Stop downloading mega eeprom on empty block
+  * altosui: Missing 'break' after selecting 'mega' format detection
+  * ao-tools: Add ao-mega tool to parse TeleMega eeprom files
+  * ao-tools/ao-mega: Dump 'pyro' state from mega log
+  * altos: Add pyro code testing to ao_flight_test for TeleMega
+  * altos,altosui: Add pyro state logging for TeleMega
+  * altos: Light pyro charges simultaneously if so configured
+  * altos: write pyro fired to correct log field
+  * altos: Make manual pyro firing command work again
+  * Set version to 1.2.9.1
+  * altos: Add pyro operations to regular ignite commands
+  * altos: Add driver for 74hc165 shift register
+  * altos: Add telefire v0.2 support
+  * altos/telefire: Leave siren on all the time. Add siren/strobe debugging.
+  * altos: Add debounce helper. Use in button and quadrature drivers for TeleLCO
+  * altos: Add fast-timer API. Use for quadrature and button drivers
+  * altos/telelco: Add 30ms delay in search after finding a box
+  * altosui: Use preferred units for main deployment height configuration
+  * altos/lpc: Make ADC inputs work
+  * altos/lpc: Filter ADC inputs
+  * altos/lpc: Turn off more clocks, disable USART for easymini
+  * altos/lpc: Don't disable all of the clocks just yet, USB doesn't work
+  * altos/lpc: Remove spurious semicolon
+  * altos: Declare m25 write-in-progress as 'ao_port_t'
+  * altos: Disable USB on all flight computers when in flight mode
+  * altos/lpc: Get the IRC turned off after boot time
+  * altosui: Add raw pressure to the AltosUI graph
+  * altos/lpc: Get rid of ADC filter
+  * altos/cc1111: Fetch RSSI for TeleFire from correct byte
+  * altos: PCA9922 LED driver needs Enable driven low to latch values
+  * altos/telefire: Radio status (no data, weak data, good data) on LEDs
+  * altos/lpc: Enable brown-out-detector
+  * altos/lpc: Remove ao_usb_task structure
+  * altos/lpc: Don't disable all interrupts when disabling one interrupt
+  * altos/telefire-v0.1: Use same LED selection as the v0.2 setup
+  * altos/lpc: Add boot loader
+  * altosui: Add EasyMini USB ids
+  * altos: Support mega-style logging without ADC
+  * altosdroid: Just use GPS location provider to build on 4.2
+  * micropeak: Add Download button to menu bar
+  * altos/lpc: Rename serial port to 'serial0'
+  * altos: Remove ao_radio_gpio_bits from normal build
+  * altos: Make FAT test program link explicitly against libcrypto
+  * altosui: AltosDbm class was missing somehow
+  * altosdroid: Add note to report TeleBT battery level
+  * altos: allow projects to override default config values
+  * altos: Allow ublox to run at other baud rates
+  * altos: Set default LPC stack to 512 bytes, Em to 384 bytes
+  * altos: Wake up on LPC usart ISR only once
+  * altos: various cc115l driver hacks
+  * altos: Add telegps v0.3 product
+  * altos: Allow products to disable RDF entirely
+  * altos/lpc: Stop using burst mode for LPC ADC
+  * altos: Use installed arm compiler for LPC
+  * altosdroid: Add note to report TeleBT battery level
+  * altos: Set default LPC stack to 512 bytes, Em to 384 bytes
+  * altos: Wake up on LPC usart ISR only once
+  * altos: MS5607 pressure computation for low temperatures was wrong
+  * altos: Explicitly list the linker script needed for AVR targets.
+  * Initial TeleMini bits
+  * altos: Add 64-bit add/mul/shift for SDCC
+  * altos: Make 64x16 mul a bit faster
+  * altos: Add 64x64 multiply. Test 64 ops for dest same as either source
+  * altos: Add 64-bit subtraction
+  * altos: Make TeleMini v2.0 fit
+  * altos: Add exti and spi to telemini-v2.0
+  * altos/teletiny-v2.0: Support multiple SPI busses on CC1111
+  * Bump version to 1.2.9.2
+  * altos: Changes required by cc1111 multi-spi support
+  * altos: Build more products by default
+  * ao-tools: Use TeleDongle for default ao-dbg target
+  * cc1111: Rework ADC configuration a bit, fix Tm V2 ADC usage
+  * cc1111: Hacky pin interrupt support. Only useful for TeleMini v2
+  * altos: Get telemini to copy current MS5607 state to ring.
+  * altos/cc1111: Leave pin interrupts completely disabled at init time
+  * altos/cc1111: Wake up non-ADC sensor code each timer tick
+  * altos: Use %ld and %lu for MS5607 debug output
+  * altos/telemini-v2.0: Add ao_exti.h depend. Init beeper and usb.
+  * altos: Check for MS5607 MISO low before sleeping
+  * altos: Make ao_wakeup reentrant
+  * altos: Don't use ao_data on cc1111 projects
+  * altos: Initial TeleMetrum v2.0 bits
+  * altos: Add TeleMetrum v2.0 boot loader
+  * altos: Rename TeleMetrum v2.0 ADC sense members
+  * altos/telemetrum-v2.0: Fix MMA6555 SPI pin assignment
+  * altos/telemetrum-v2.0: Use 9600 baud for ublox
+  * altos: TM v2 places the MMA6555 upside down compared to Tmega
+  * altos: Update time for next alarm each time a task is added
+  * altos: Add debugging to ublox GPS driver
+  * altos: Force u-blox to 9600 baud for now
+  * altos/stm: New compiler doesn't correctly build flash bits yet
+  * altos/stm: Make sampling profiler work again
+  * altos/stm: Remove stale timer defines
+  * altos/stm: Make sure we switch to MSI during timer init
+  * altoslib: Start restructuring AltosState harder
+  * altos: Split EasyMini and TeleMini log formats
+  * altoslib, altosui: Restructured state management now does TM eeprom files
+  * altoslib/altosui: Get legacy telem working with new AltosState structure
+  * altoslib/altosui: Fixes for state changes
+  * altos/lpc: Add bits for building flash loaders
+  * altos/telegps: Initialize logging system
+  * altoslib/altosui: Further AltosState transition work
+  * altos: Not all products have pins to control flash loader
+  * altoslib: More AltosState hacking
+  * altoslib: Ensure eeprom file body always exists
+  * altoslib: Correct tick wrapping in eeprom file reading
+  * altoslib: Correct mega/metrum eeprom years by adding 2000
+  * altoslib: Clean up metrum eeprom file reading
+  * altoslib: Remove duplicate cmd/tick from TM eeprom file code
+  * altoslib: Make Ascent/descent use different filter values. Always filter.
+  * altoslib: Use first few baro samples for ground pressure on TM
+  * altoslib: Start integrated value at 0 by default
+  * altoslib: Clear sat data when tick changes
+  * altoslib: Set measured acceleration for measured acceleration
+  * altoslib: Finish AltosState changes. Update version number.
+  * altoslib: Remove AltosRecord-based telemetry code
+  * altoslib: remove AltosRecord based eeprom code
+  * altoslib: Remove more AltosRecord based files
+  * altoslib: Use AltosTelemetry.parse to pull telem lines apart
+  * altoslib: Only open log file when both flight and serial are known
+  * altoslib: Update received time when replaying flights
+  * altoslib: Record time_change in AltosState correctly
+  * altoslib: Rewrite AltosTelemetryIterable
+  * altoslib: Remove debug printf from AltosTelemetryMetrumSensor
+  * altosui: Fix 'Graph Flight' button in landed dialog
+  * ao-tools/ao-telem: Parse new TM v2 packets
+  * altos: Set tick value in new TeleMetrum v2 sensor packets
+  * altosui: Remove debugging printf from InfoTable
+  * altoslib/altosui: Add TeleMini-v1.0 eeprom support
+  * altoslib: Set 'valid' for valid TeleMetrum eeprom download
+  * altoslib: Lock access to AltosLink config_data
+  * altoslib: Add TeleMini eeprom file to Makefile.am
+  * altosui: Load Telem files in AltosDataChooser too
+  * altosui: Set 'flight' value in AltosEepromMonitor window during download
+  * altoslib: Add receiver serial to telem file names
+  * altoslib: TeleMetrum v2 telemetry includes computes Pa/°C, not raw values
+  * altosui: Include device name in Table view
+  * altos: Move micropeak sources around
+  * altos: Add nanopeak-v0.1
+  * altos: Stop copying cc1111 binaries to the altos/src dir
+  * altos/telemini-v2.0: Change initialization order
+  * altos/telemetrum-v2.0: Use red LED during boot time
+  * altoslib: Prefer averaged ground pres for ground alt computation
+  * Add TeleMini v2.0 telemetry support
+  * altos: Set TeleMini v2.0 USB ID correctly
+  * Change differentiation filter constants and limits
+  * altos: Don't require an LED for ao_flight
+  * altos/lpc, altos/stm: ARM requires ISB after switching stack pointers
+  * altos: Rename easymini-v0.1 to easymini-v1.0
+  * altos/stm: New GAS version requires flags in APSR assignment
+  * Add --with parameters to configure for compiler selection
+  * altos: Broken test for M0 compiler in src/Makefile
+  * altos: avr-gcc appears to find the loader scripts without help now
+  * altosui: Binaries to package are only in per-product dirs now
+  * altos: Messed up the ifeq syntax a bit so ARM bits weren't getting built
+  * doc: Add EasyMini outline drawing
+  * doc: Add easymini outline to distribution
+  * Bump version to 1.2.9.3
+  * altos: Use installed pdclib
+  * altos: Fix stm-bringup demo build to use installed pdclib
+  * Make sure the AVR compiler can actually link stuff
+  * Another try at skipping broken avr-gcc
+  * altos/micropeak: Increase boost detect to 30m
+  * altoslib,altosui: Be more robust when graphing bogus .telem files
+  * altos: Use #define values for ublox packet types
+  * altos: Merge GPS logging into a single function
+  * altos: Add floating point math functions from newlib
+  * altos: Fix GPS test frameworks to handle shared ao_gps_new variable
+  * altos: Add gyro-based orientation tracking
+  * altos: Calibrate IMU accelerometers too
+  * altos: IMU accel calibration values need to be signed
+  * altos: Mark arguments to quaternion functions as const
+  * altos: Add some comments describing quaternion multiplication
+  * altos: Add functions to init quaternions from vector pairs and euler angles
+  * altos: Rename ao_orient to ao_sample_orient
+  * altos: Keep 9 more bits of average pad IMU gyro data
+  * altos: Add sinf to math code
+  * altos: Fixup for ao_sample_orient rename
+  * altos: Compute initial rotation from vertical
+  * altos: Correct incremental rotation computation
+  * altos: Fixup for 32-bit gyro averages
+  * altos: Change ao_mpu6000_gyro arg to float
+  * altos: Update quaternion tests to check vectors_to_rotation
+  * altos: Add orientation test when HAS_FLIGHT_DEBUG is set
+  * altos: Make telemega v0.1 compile with new quaternion code
+  * altos: Make telemega v0.3 compile with new quaternion code
+  * altos: sample profile address range was too narrow
+  * altos: Don't hold GPS mutex while waiting for GPS data in report code
+  * altos: Add orientation tracking to ao_flight_test
+  * altoslib: Raise ParseException on invalid eeprom format
+  * altoslib: Start moving eeprom download logic to altoslib
+  * altosui: Make AltosEepromDownload not swing-dependent
+  * altosui, altoslib: Move eeprom download code to altoslib
+  * Ignore mac .dmg files
+  * Add ublox checksum generating program
+  * altos: Clean up .gitignore and add a few random files
+  * ao-tools: add ao-mega man page, ignore executable
+  * Add TeleMini v2.0 turnon script
+  * ignore "compile" script
+  * altos: Build TM v2.0 firmware by default
+  * altos: Don't hold GPS mutex while waiting in TM v2.0 report
+  * altos: Allow use of internal EEPROM for config storage
+  * altos: Move TeleMetrum v2.0 to using internal eeprom for config
+  * altos: Move telemega to using internal eeprom for config
+  * altos: Make sure flight erase log comes after config blog
+  * altos: include ao_eeprom.h in ao_telemetrum.c to define ao_eeprom_init
+  * Bump to version 1.2.9.4
+  * doc: Start work on 1.3 doc updates
+  * doc: Get altusmetrum.xsl to validate
+  * doc: Switch to xorg style to generate index
+  * doc: Make altos.xsl validate
+  * doc: Make telemetry.xsl validate
+  * Make companion.xsl validate
+  * doc: Make micropeak.xsl validate
+  * doc: Make pdf files depend on local stylesheet
+  * doc: Use system fo docbool.xsl instead of network one
+  * debian: Build now depends on 'xmlto' for docs
+  * Extend the hardware overview chapter. Edit System Operations
+  * Remove duplicate log description. Describe pyro config.
+  * Use more 1/4 single characters
+  * doc: "rocketry electronics" instead of listing products
+  * doc: use correct quotes in altusmetrum.xsl
+  * doc: Add telemetry enable and APRS interval config docs
+  * altosui: Handle units in pyro config.
+  * doc: Work on AltosUI Pyro config docs a bit more.
+  * ao-tools: Create general elf and hex library routines
+  * ao-tools: Add debug printf support
+  * ao-tools: Add ao-elftohex and .ihx symbol support
+  * ao-tools: Move ao-selfload into library
+  * ao-tools: move 16/32-bit readers from ao-stmload to lib
+  * ao-tools: Missing ao-selfload.h
+  * ao-tools: Split out altos symbol editing from ao-stmload
+  * ao-tools: Split out USB loader to ao-usbload
+  * doc: First pass for 1.3 finished; docs have most major sections updated.
+  * src/cc1111: Turn off RC osc after xtal is running
+  * altos: Add lots more GPS data to mega log
+  * altos: Telemega uses eeprom, include it in main file
+  * altos/test: Compute and plot tilt based on GPS track
+  * altos: Nothing in altos uses AES decryption, so don't compile it
+  * altosui: Don't try to report bearing/elevation without GPS
+  * altosui: Clean up serial close handling
+  * altosuilib: Deal with AltosUnits API change
+  * ao-tools: Add ao-flash-stm and ao-flash-lpc scripts
+  * ao-tools: Allow building without stlink and readline
+  * ao-tools: Clean up ao-stmload and ao-usbload options. Add --raw
+  * altos: Allow products to override default 100mA USB current
+  * altos: Build .ihx files for all arm projects
+  * altos: Change flash loader name to just AltosFlash
+  * altos: remove all versions of stm-demo executable
+  * altoslib: AltosEepromMonitor had false import of altosuilib
+  * ao-tools: build ao-usbload by default
+  * altos/stm: arm-none-eabi-binutils now puts 'main' into .text.startup
+  * altoslib: Support binary reading/writing in AltosLink
+  * altoslib: Add symbols to .ihx files
+  * altoslib: Create AltosProgrammer class
+  * altoslib: Publish mapping from product name back to USB id
+  * altosuilib: Don't match product_altusmetrum for product_basestation or product_altimeter
+  * altoslib: Use symbols in AltosRomconfig instead of fixed offsets
+  * altoslib: Add AltosNoSymbol exception
+  * altoslib: Add self-flashing code
+  * Add new tools to .gitignore
+  * altoslib: Don't require radio_cal or usb_descriptors in AltosRomconfig
+  * altosui: Match directories in hex file matcher
+  * altosui: When flashing to TeleDongle or TeleBT, match any .ihx file
+  * altos: Oops. Was only filling out part of the TeleMetrum ADC record
+  * altos: Rename telemega-v0.3 to telemega-v1.0
+  * ao-bringup: Add turnon_telemega script
+  * altosui: Ship TeleMega-v1.0 firmware
+  * debian: .ihx and .map files are left in subdirs now
+  * doc: More altusmetrum.xsl updates for 1.3
+  * Set version to 1.3 in preparation for release
+  * altos: Remove ARM .ihx files on 'make clean'
+  * java: Add -target 1.6 to all java compiles
+  * java: Missed libaltos java compile flags from previous patch
+  * ao-tools: Use st-flash for STM flashing instead of openocd
+  * Clean up reflashing section, include section on self-flash recovery
+  * doc: Convert several more itemizedlists to variablelists
+  * Keep tables together on a page
+  * doc: Add product pictures to manual
+  * Add altosui image and attempt to add launch photo to title
+  * doc: Add screen shots everywhere
+  * altos: Broke TeleMetrum GPS reporting by holding the GPS mutex too much
+  * doc: Publish images with HTML bits
+  * altosui: Add EasyMini bits to fat distribution images. Update telemetrum.inf
+  * altos: Use all 16 bits of setup packet len when limiting reply len
+  * altos: Make TeleMega v0.1 work more like TeleMega v1.0
+  * altoslib: Pass InterruptedException up the stack instead of hiding it
+  * altos/lpc: Be a bit more resistant to toolchain section name changes
+  * altosui: Hide non-applicable altimeter config values
+  * include pdclib in wrong place
+  * altos: Build pdclib locally if necessary
+  * altos: create target pdclib directories before building
+  * altos/stm: Update pdclib paths for flash-loader builds
+  * Remove stale stm test apps from regular build
+  * altos: get stm-bringup building again
+  * ao-tools: complain if st-flash is not available
+  * Ignore .dll files in libaltos
+  * Use git: path for pdclib
+  * fix git: path for pdclib
+  * altosui: Add docs to Mac OS X dmg distribution
+  * libaltos: fix test harness main type
+  * libaltos: remove usb id filtering from darwin code
+  * libaltos: Import newly build libaltos.dylib
+  * altoslib: Don't close telemetry reader at startup unless something fails
+  * altoslib: create eeprom download thread before telling monitor about it
+  * altoslib: Define 3.8 as a good battery and 3.5 as a good igniter
+  * altosdroid: Use altoslib standard voltages to control lights
+  * altosui: Remove some debug printfs
+  * Move pdclib build results to pdclib-root
+  * micropeak: Compile for java 6
+  * doc: Update micropeak quick start guide to note new boost detect
+  * doc: typo in micropeak doc hole->hold
+  * altos/stm: Semantic error in STM usb disable caused it to not work
+  * doc: Add tables describing AltOS beeps and flashes
+  * altos: Try IMU self-test 10 times before giving up
+  * ao-tools: Add man pages for ao-flash utilities
+  * micropeak: Add micropeak man page
+  * altoslib: Remove some old debug printfs for self flashing
+  * altos/lpc: Reset less of the device on USB reset.
+  * altos/lpc: Stop sending SETUP IN when the requested size is reached
+  * altosui: When device has no valid romconfig, set RF cal to 0
+  * altosdroid: bump versionName to 1.3 and versionCode to 4
+
+  [ Bdale Garbee ]
+  * add a note about callsign matching and case sensitivity to the manual
+  * new toolchain for STM32L is in /usr/bin, not /opt/cortex/bin
+  * updated turn-on script for telebt 1.1
+  * temporarily force stlink location in debian/rules to allow complete build
+  * add serial number to ao-usbload call, pass SERIAL to cal-freq
+  * capture my changes so far
+  * further documentation tweaks
+  * need to include the Cortex toolchain
+  * a fresher changelog entry for test builds
+  * we're using packaged and local-to-our-tree ARM toolchain now
+  * update release docs to include option for submodules
+  * update Debian standards version we claim compliance with
+  * update ChangeLog from git
+
+  [ Mike Beattie ]
+  * altosdroid: update to support new state code
+  * altosdroid: more updates for new AltosState
+  * altosdroid: convert rogue files to unix line endings
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 19 Dec 2013 01:43:28 -0700
+
 altos (1.2.1-3) unstable; urgency=low
 
   [ Keith Packard ]
