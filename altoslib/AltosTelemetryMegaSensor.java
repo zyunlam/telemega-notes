@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_2;
+package org.altusmetrum.altoslib_3;
 
 public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 	int	accel;
@@ -34,9 +34,12 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 	int	mag_y;
 	int	mag_z;
 
+	int	orient;
+
 	public AltosTelemetryMegaSensor(int[] bytes) {
 		super(bytes);
 
+		orient	      = int8(5);
 		accel         = int16(6);
 		pres          = int32(8);
 		temp          = int16(12);
@@ -61,23 +64,25 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		state.set_pressure(pres);
 		state.set_temperature(temp / 100.0);
 
+		state.set_orient(orient);
+
 		AltosIMU imu = new AltosIMU();
 		
-		imu.accel_x = accel_x;
-		imu.accel_y = accel_y;
-		imu.accel_z = accel_z;
+		imu.accel_x = AltosIMU.convert_accel(accel_x);
+		imu.accel_y = AltosIMU.convert_accel(accel_y);
+		imu.accel_z = AltosIMU.convert_accel(accel_z);
 
-		imu.gyro_x = gyro_x;
-		imu.gyro_y = gyro_y;
-		imu.gyro_z = gyro_z;
+		imu.gyro_x = AltosIMU.convert_gyro(gyro_x);
+		imu.gyro_y = AltosIMU.convert_gyro(gyro_y);
+		imu.gyro_z = AltosIMU.convert_gyro(gyro_z);
 
 		state.imu = imu;
 
 		AltosMag mag = new AltosMag();
 
-		mag.x = mag_x;
-		mag.y = mag_y;
-		mag.z = mag_z;
+		mag.x = AltosMag.convert_gauss(mag_x);
+		mag.y = AltosMag.convert_gauss(mag_y);
+		mag.z = AltosMag.convert_gauss(mag_z);
 
 		state.mag = mag;
 	}

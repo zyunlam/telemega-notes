@@ -20,7 +20,7 @@ package org.altusmetrum.altosuilib_1;
 import java.awt.*;
 import libaltosJNI.*;
 
-import org.altusmetrum.altoslib_2.*;
+import org.altusmetrum.altoslib_3.*;
 
 public class AltosUILib extends AltosLib {
 
@@ -81,18 +81,18 @@ public class AltosUILib extends AltosLib {
 	static public boolean initialized = false;
 	static public boolean loaded_library = false;
 
+	static final String[] library_names = { "altos", "altos32", "altos64" };
+
 	public static boolean load_library() {
 		if (!initialized) {
-			try {
-				System.loadLibrary("altos");
-				libaltos.altos_init();
-				loaded_library = true;
-			} catch (UnsatisfiedLinkError e) {
+			for (String name : library_names) {
 				try {
-					System.loadLibrary("altos64");
+					System.loadLibrary(name);
 					libaltos.altos_init();
 					loaded_library = true;
-				} catch (UnsatisfiedLinkError e2) {
+					break;
+				} catch (UnsatisfiedLinkError e) {
+					System.out.printf("Link error %s\n", e.getMessage());
 					loaded_library = false;
 				}
 			}

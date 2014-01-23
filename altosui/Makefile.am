@@ -98,7 +98,8 @@ ALTOSUILIB_CLASS=\
 	altosuilib_$(ALTOSUILIB_VERSION).jar
 
 LIBALTOS= \
-	libaltos.so \
+	libaltos32.so \
+	libaltos64.so \
 	libaltos.dylib \
 	altos.dll
 
@@ -164,7 +165,7 @@ TEMPLATE_DOC=\
 	$(top_srcdir)/doc/telemetrum-outline.pdf \
 	$(top_srcdir)/doc/easymini-outline.pdf \
 	$(top_srcdir)/doc/telemega-outline.pdf \
-	$(top_srcdir)/doc/easymini-outline.pdf
+	$(top_srcdir)/doc/telemini.pdf
 
 DOC=$(ALTUSMETRUM_DOC) $(ALTOS_DOC) $(TELEMETRY_DOC) $(TEMPLATE_DOC)
 
@@ -175,7 +176,9 @@ WINDOWS_DIST=Altos-Windows-$(VERSION_DASH).exe
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC)
+LINUX_LIBS=libaltos32.so libaltos64.so
+
+LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC)
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist
@@ -265,7 +268,11 @@ altosui-jdb: Makefile
 	echo 'exec jdb -classpath "classes:./*:../libaltos:$(FREETTS)/freetts.jar:$(JCOMMON)/jcommon.jar:$(JFREECHART)/jfreechart.jar" -Djava.library.path="../libaltos/.libs" altosui/AltosUI "$$@"' >> $@
 	chmod +x $@
 
-libaltos.so: build-libaltos
+libaltos32.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos64.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
@@ -281,7 +288,9 @@ altos64.dll: ../libaltos/altos64.dll
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
 
-../libaltos/.libs/libaltos.so: build-libaltos
+../libaltos/.libs/libaltos64.so: ../libaltos/.libs/libaltos32.so
+
+../libaltos/.libs/libaltos32.so: build-libaltos
 
 ../libaltos/altos.dll: build-altos-dll
 

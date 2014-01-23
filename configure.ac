@@ -18,7 +18,7 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.3)
+AC_INIT([altos], 1.3.1)
 AC_CONFIG_SRCDIR([src/core/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
@@ -30,7 +30,7 @@ dnl ==========================================================================
 dnl Java library versions
 
 ALTOSUILIB_VERSION=1
-ALTOSLIB_VERSION=2
+ALTOSLIB_VERSION=3
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -430,7 +430,58 @@ if test x"$HAVE_STLINK" = "xyes"; then
 	AC_DEFINE(HAVE_STLINK,1,[Using STlink library])
 fi
 
-AM_CONDITIONAL([LIBSTLINK], [test x$HAVE_STLINK == xyes])
+AM_CONDITIONAL([LIBSTLINK], [test x$HAVE_STLINK = xyes])
+
+AC_ARG_ENABLE([multi-arch],
+	      [AS_HELP_STRING([--enable-multi-arch],
+			      [enable building both i386 and amd64 libraries (default=auto)])],
+	      [MULTI_ARCH=$enableval],
+	      [MULTI_ARCH=auto])
+
+case x"$MULTI_ARCH" in
+xauto)
+	arch=`uname -m`
+	case x"$arch" in
+	xx86_64|xi*86)
+		save_CFLAGS="$CFLAGS"
+		save_LIBS="$LIBS"
+		LIBS="-lbluetooth"
+		CFLAGS="-m64"
+		AC_MSG_CHECKING([if ]$CC[ ]$CFLAGS[ can link programs])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
+				[M64_LINK=yes],
+				[M64_LINK=no])
+		AC_MSG_RESULT([$M64_LINK])
+		CFLAGS="-m32"
+		AC_MSG_CHECKING([if ]$CC[ ]$CFLAGS[ can link programs])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
+				[M32_LINK=yes],
+				[M32_LINK=no])
+		AC_MSG_RESULT([$M32_LINK])
+		CFLAGS="$save_CFLAGS"
+		LIBS="$save_LIBS"
+		case x"$M64_LINK"x"$M32_LINK" in
+		xyesxyes)
+			MULTI_ARCH=yes
+			;;
+		*)
+			MULTI_ARCH=no
+			;;
+		esac
+		;;
+	*)
+		MULTI_ARCH=no
+		;;
+	esac
+	;;
+xyes|xno)
+	;;
+*)
+	MULTI_ARCH="no"
+	;;
+esac
+	
+AM_CONDITIONAL([MULTI_ARCH], [test x$MULTI_ARCH = xyes])
 
 AC_OUTPUT([
 Makefile
@@ -483,6 +534,7 @@ echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
 echo "    STlink support..............: ${HAVE_STLINK}"
 echo "    Local pdclib................: ${HAVE_PDCLIB}"
+echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
 echo ""
 echo "  Java paths"
 echo "    freetts.....................: ${FREETTS}"

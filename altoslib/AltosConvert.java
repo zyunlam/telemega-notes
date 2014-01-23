@@ -18,7 +18,7 @@
 /*
  * Sensor data conversion functions
  */
-package org.altusmetrum.altoslib_2;
+package org.altusmetrum.altoslib_3;
 
 public class AltosConvert {
 	/*
@@ -329,6 +329,8 @@ public class AltosConvert {
 	public static AltosAccel accel = new AltosAccel();
 
 	public static AltosTemperature temperature = new AltosTemperature();
+
+	public static AltosOrient orient = new AltosOrient();
 
 	public static String show_gs(String format, double a) {
 		a = meters_to_g(a);

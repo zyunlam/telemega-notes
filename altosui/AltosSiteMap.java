@@ -23,7 +23,7 @@ import java.io.*;
 import java.lang.Math;
 import java.awt.geom.Point2D;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_2.*;
+import org.altusmetrum.altoslib_3.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosSiteMap extends JScrollPane implements AltosFlightDisplay {
@@ -182,7 +182,9 @@ public class AltosSiteMap extends JScrollPane implements AltosFlightDisplay {
 		}
 	}
 
-	public static void prefetchMaps(double lat, double lng, int w, int h) {
+	public static void prefetchMaps(double lat, double lng) {
+		int w = AltosSiteMapPreload.width;
+		int h = AltosSiteMapPreload.height;
 		AltosSiteMap asm = new AltosSiteMap(true);
 		asm.centre = asm.getBaseLocation(lat, lng);
 

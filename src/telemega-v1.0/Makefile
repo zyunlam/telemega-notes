@@ -59,7 +59,8 @@ MATH_SRC=\
 	sf_fabs.c \
 	sf_floor.c \
 	sf_scalbn.c \
-	sf_sin.c
+	sf_sin.c \
+	ef_log.c
 
 ALTOS_SRC = \
 	ao_boot_chain.c \
@@ -100,6 +101,7 @@ ALTOS_SRC = \
 	ao_i2c_stm.c \
 	ao_mpu6000.c \
 	ao_convert_pa.c \
+	ao_convert_volt.c \
 	ao_log.c \
 	ao_log_mega.c \
 	ao_sample.c \

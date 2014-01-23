@@ -41,6 +41,7 @@ static uint8_t			ao_adc_ready;
  */
 static void ao_adc_done(int index)
 {
+	(void) index;
 	AO_DATA_PRESENT(AO_DATA_ADC);
 	ao_dma_done_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
 	if (ao_data_present == AO_DATA_ALL) {
@@ -109,8 +110,10 @@ static void
 ao_adc_dump(void) __reentrant
 {
 	struct ao_data	packet;
-	int16_t *d;
+#ifndef AO_ADC_DUMP
 	uint8_t i;
+	int16_t *d;
+#endif
 
 	ao_data_get(&packet);
 #ifdef AO_ADC_DUMP

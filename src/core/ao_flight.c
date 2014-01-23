@@ -46,7 +46,7 @@ __pdata enum ao_flight_state	ao_flight_state;	/* current flight state */
 __pdata uint16_t		ao_boost_tick;		/* time of launch detect */
 __pdata uint16_t		ao_motor_number;	/* number of motors burned so far */
 
-#if HAS_IMU
+#if HAS_SENSOR_ERRORS
 /* Any sensor can set this to mark the flight computer as 'broken' */
 __xdata uint8_t			ao_sensor_errors;
 #endif
@@ -104,9 +104,6 @@ ao_flight(void)
 			    ao_config.accel_minus_g == 0 ||
 			    ao_ground_accel < ao_config.accel_plus_g - ACCEL_NOSE_UP ||
 			    ao_ground_accel > ao_config.accel_minus_g + ACCEL_NOSE_UP ||
-#if HAS_IMU
-			    ao_sensor_errors ||
-#endif
 			    ao_ground_height < -1000 ||
 			    ao_ground_height > 7000)
 			{
@@ -152,7 +149,11 @@ ao_flight(void)
 #endif
 			} else {
 				/* Set idle mode */
- 				ao_flight_state = ao_flight_idle;
+				ao_flight_state = ao_flight_idle;
+#if HAS_SENSOR_ERRORS
+				if (ao_sensor_errors)
+					ao_flight_state = ao_flight_invalid;
+#endif
  
 #if HAS_ACCEL && HAS_RADIO && PACKET_HAS_SLAVE
 				/* Turn on packet system in idle mode on TeleMetrum */
@@ -400,7 +401,7 @@ ao_flight_dump(void)
 #if HAS_ACCEL
 	int16_t	accel;
 
-	accel = ((ao_ground_accel - ao_sample_accel) * ao_accel_scale) >> 16;
+	accel = ((ao_config.accel_plus_g - ao_sample_accel) * ao_accel_scale) >> 16;
 #endif
 
 	printf ("sample:\n");
@@ -442,9 +443,18 @@ ao_gyro_test(void)
 	ao_flight_state = ao_flight_idle;
 }
 
+uint8_t ao_orient_test;
+
+static void
+ao_orient_test_select(void)
+{
+	ao_orient_test = !ao_orient_test;
+}
+
 __code struct ao_cmds ao_flight_cmds[] = {
 	{ ao_flight_dump, 	"F\0Dump flight status" },
 	{ ao_gyro_test,		"G\0Test gyro code" },
+	{ ao_orient_test_select,"O\0Test orientation code" },
 	{ 0, NULL },
 };
 #endif

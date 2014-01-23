@@ -22,7 +22,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_2.*;
+import org.altusmetrum.altoslib_3.*;
 import org.altusmetrum.altosuilib_1.*;
 
 public class AltosUI extends AltosUIFrame {
@@ -560,8 +560,9 @@ public class AltosUI extends AltosUIFrame {
 			AltosUI altosui = new AltosUI();
 
 			java.util.List<AltosDevice> devices = AltosUSBDevice.list(Altos.product_basestation);
-			for (AltosDevice device : devices)
-				altosui.telemetry_window(device);
+			if (devices != null)
+				for (AltosDevice device : devices)
+					altosui.telemetry_window(device);
 		} else {
 			int process = process_none;
 			for (int i = 0; i < args.length; i++) {
@@ -573,7 +574,7 @@ public class AltosUI extends AltosUIFrame {
 					} else {
 						double lat = Double.parseDouble(args[i+1]);
 						double lon = Double.parseDouble(args[i+2]);
-						AltosSiteMap.prefetchMaps(lat, lon, 5, 5);
+						AltosSiteMap.prefetchMaps(lat, lon);
 						i += 2;
 					}
 				} else if (args[i].equals("--replay"))

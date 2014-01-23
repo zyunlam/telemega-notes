@@ -353,9 +353,9 @@ ao_config_accel_calibrate_set(void) __reentrant
 {
 	int16_t	up, down;
 #if HAS_GYRO
-	int16_t	accel_along_up, accel_along_down;
-	int16_t	accel_across_up, accel_across_down;
-	int16_t	accel_through_up, accel_through_down;
+	int16_t	accel_along_up = 0, accel_along_down = 0;
+	int16_t	accel_across_up = 0, accel_across_down = 0;
+	int16_t	accel_through_up = 0, accel_through_down = 0;
 #endif
 	
 	ao_cmd_decimal();
@@ -390,9 +390,11 @@ ao_config_accel_calibrate_set(void) __reentrant
 	ao_config.accel_plus_g = up;
 	ao_config.accel_minus_g = down;
 #if HAS_GYRO
-	ao_config.accel_zero_along = (accel_along_up + accel_along_down) / 2;
-	ao_config.accel_zero_across = (accel_across_up + accel_across_down) / 2;
-	ao_config.accel_zero_through = (accel_through_up + accel_through_down) / 2;
+	if (ao_cmd_lex_i == 0) {
+		ao_config.accel_zero_along = (accel_along_up + accel_along_down) / 2;
+		ao_config.accel_zero_across = (accel_across_up + accel_across_down) / 2;
+		ao_config.accel_zero_through = (accel_through_up + accel_through_down) / 2;
+	}
 #endif
 	_ao_config_edit_finish();
 }
@@ -512,6 +514,10 @@ ao_config_pad_orientation_show(void) __reentrant
 	printf("Pad orientation: %d\n", ao_config.pad_orientation);
 }
 
+#ifndef AO_ACCEL_INVERT
+#define AO_ACCEL_INVERT	0x7fff
+#endif
+
 void
 ao_config_pad_orientation_set(void) __reentrant
 {
@@ -521,10 +527,10 @@ ao_config_pad_orientation_set(void) __reentrant
 	_ao_config_edit_start();
 	ao_cmd_lex_i &= 1;
 	if (ao_config.pad_orientation != ao_cmd_lex_i) {
-		uint16_t t;
+		int16_t t;
 		t = ao_config.accel_plus_g;
-		ao_config.accel_plus_g = 0x7fff - ao_config.accel_minus_g;
-		ao_config.accel_minus_g = 0x7fff - t;
+		ao_config.accel_plus_g = AO_ACCEL_INVERT - ao_config.accel_minus_g;
+		ao_config.accel_minus_g = AO_ACCEL_INVERT - t;
 	}
 	ao_config.pad_orientation = ao_cmd_lex_i;
 	_ao_config_edit_finish();
@@ -656,8 +662,10 @@ ao_config_help(void) __reentrant;
 static void
 ao_config_show(void) __reentrant;
 
+#if HAS_EEPROM
 static void
 ao_config_save(void) __reentrant;
+#endif
 
 __code struct ao_config_var ao_config_vars[] = {
 #if HAS_FLIGHT

@@ -24,9 +24,9 @@
 #endif
 
 static __pdata uint16_t ao_telemetry_interval;
-static __pdata uint8_t ao_rdf = 0;
 
 #if HAS_RDF
+static __pdata uint8_t ao_rdf = 0;
 static __pdata uint16_t ao_rdf_time;
 #endif
 
@@ -211,7 +211,6 @@ ao_send_metrum_data(void)
 {
 	if (--ao_telemetry_metrum_data_cur <= 0) {
 		__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
-		uint8_t	i;
 
 		telemetry.generic.tick = packet->tick;
 		telemetry.generic.type = AO_TELEMETRY_METRUM_DATA;
@@ -473,7 +472,6 @@ ao_telemetry(void)
 			}
 			else
 				time = ao_time();
-		bottom:	;
 		}
 	}
 }

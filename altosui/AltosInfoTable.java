@@ -20,7 +20,7 @@ package altosui;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.altusmetrum.altoslib_2.*;
+import org.altusmetrum.altoslib_3.*;
 
 public class AltosInfoTable extends JTable {
 	private AltosFlightInfoTableModel model;
@@ -46,9 +46,9 @@ public class AltosInfoTable extends JTable {
 			TableColumn column = getColumnModel().getColumn(i);
 
 			if ((i & 1) == 0)
-				column.setPreferredWidth(text_width(" Satellites Visible "));
+				column.setPreferredWidth(text_width(" Satellites Visible"));
 			else
-				column.setPreferredWidth(text_width(" 179°59.99999' "));
+				column.setPreferredWidth(text_width("W 179°59.99999' "));
 		}
 	}
 
@@ -125,6 +125,10 @@ public class AltosInfoTable extends JTable {
 				info_add_row(0, "Speed", "%8.1f  m/s", state.speed());
 			if (state.max_speed() != AltosLib.MISSING)
 				info_add_row(0, "Max Speed", "%8.1f  m/s", state.max_speed());
+			if (state.orient() != AltosLib.MISSING)
+				info_add_row(0, "Tilt", "%4.0f °", state.orient());
+			if (state.max_orient() != AltosLib.MISSING)
+				info_add_row(0, "Max Tilt", "%4.0f °", state.max_orient());
 			if (state.temperature != AltosLib.MISSING)
 				info_add_row(0, "Temperature", "%9.2f °C", state.temperature);
 			if (state.battery_voltage != AltosLib.MISSING)

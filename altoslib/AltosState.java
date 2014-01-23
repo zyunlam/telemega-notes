@@ -19,7 +19,7 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_2;
+package org.altusmetrum.altoslib_3;
 
 public class AltosState implements Cloneable {
 
@@ -464,6 +464,20 @@ public class AltosState implements Cloneable {
 		return acceleration.max();
 	}
 
+	public AltosValue	orient;
+
+	public void set_orient(double new_orient) {
+		orient.set(new_orient, time);
+	}
+
+	public double orient() {
+		return orient.value();
+	}
+
+	public double max_orient() {
+		return orient.max();
+	}
+
 	public AltosValue	kalman_height, kalman_speed, kalman_acceleration;
 
 	public void set_kalman(double height, double speed, double acceleration) {
@@ -560,6 +574,7 @@ public class AltosState implements Cloneable {
 		pressure = new AltosPressure();
 		speed = new AltosSpeed();
 		acceleration = new AltosAccel();
+		orient = new AltosValue();
 
 		temperature = AltosLib.MISSING;
 		battery_voltage = AltosLib.MISSING;
@@ -621,6 +636,7 @@ public class AltosState implements Cloneable {
 		pressure.finish_update();
 		speed.finish_update();
 		acceleration.finish_update();
+		orient.finish_update();
 
 		kalman_height.finish_update();
 		kalman_speed.finish_update();
@@ -665,6 +681,7 @@ public class AltosState implements Cloneable {
 		pressure.copy(old.pressure);
 		speed.copy(old.speed);
 		acceleration.copy(old.acceleration);
+		orient.copy(old.orient);
 
 		battery_voltage = old.battery_voltage;
 		pyro_voltage = old.pyro_voltage;
@@ -932,13 +949,7 @@ public class AltosState implements Cloneable {
 	}
 
 	void update_accel() {
-		double	ground = ground_accel;
-
-		if (ground == AltosLib.MISSING)
-			ground = ground_accel_avg;
 		if (accel == AltosLib.MISSING)
-			return;
-		if (ground == AltosLib.MISSING)
 			return;
 		if (accel_plus_g == AltosLib.MISSING)
 			return;
@@ -947,7 +958,7 @@ public class AltosState implements Cloneable {
 
 		double counts_per_g = (accel_minus_g - accel_plus_g) / 2.0;
 		double counts_per_mss = counts_per_g / 9.80665;
-		acceleration.set_measured((ground - accel) / counts_per_mss, time);
+		acceleration.set_measured((accel_plus_g - accel) / counts_per_mss, time);
 	}
 
 	public void set_accel_g(double accel_plus_g, double accel_minus_g) {
@@ -959,10 +970,8 @@ public class AltosState implements Cloneable {
 	}
 
 	public void set_ground_accel(double ground_accel) {
-		if (ground_accel != AltosLib.MISSING) {
+		if (ground_accel != AltosLib.MISSING)
 			this.ground_accel = ground_accel;
-			update_accel();
-		}
 	}
 
 	public void set_accel(double accel) {
