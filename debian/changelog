@@ -1,3 +1,73 @@
+altos (1.3.1-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * updated notes from 1.3 release
+  * use firmware in /usr/share/altos for production flashing
+  * set version to 1.3.0.2 for test flights this weekend
+  * set version to 1.3.1 for release
+  * update copyright date on main documentation file
+  * freshen ChangeLog for release
+
+  [ Mike Beattie ]
+  * altosdroid: force older jarsigner signing algorithm for java 1.7
+  * altosdroid: update to latest google play services
+  * altosdroid: improve build system dependencies
+
+  [ Keith Packard ]
+  * altoslib: Convert IMU and Mag sensor values to useful units
+  * altoslib: Fetch 'orient' value from Mega Sensor packet
+  * altosuilib: Rearrange graph enable buttons
+  * altosui: Add imu and mag sensor values to plots
+  * altoslib: Bump library version
+  * altos: Execute self-test on MMA655X part
+  * altos: 3-axis accel calibration was invalid in explicit accel cal mode
+  * altos: Complain about sensor self-test errors only in idle mode
+  * altos: mma655x also needs ao_sensor_errors
+  * altos: Clean up some minor warnings from -Wall
+  * altos: Turn on -Wall for stm compiles
+  * altos: Clean up -Wextra warnings
+  * altos: unsigned value in ao_pyro_set checked for negative value
+  * altos: Add default button return value from ao_button_get
+  * altos/stm: Turn on -Wextra
+  * altos: Clean up warnings for LPC products
+  * altos: cc115l driver tone_run wasn't recording number of tones
+  * altos: lpc exti setup was incorrectly testing mode
+  * altos/lpc: Missing */ in definition of PIO0_4
+  * altos: Turn on warnings for LPC products too
+  * altos: Turn on -Werror for STM and LPC builds
+  * altosui: Switch from radio buttons to check boxes in pyro config. Add close
+  * altosui: Extend Fire Igniter to additional channels
+  * altoslib: Add AltosOrient class and max_orient()
+  * altosui: Add orient to ascent and info table views
+  * altosui: Adjust info table column width
+  * altosui: Switch Graph to AltosOrient type
+  * altos: Add 'O' command for TeleMega orient testing
+  * altos: Flip acceleration data consistently for orientation changes
+  * altosui: Handle a missing libaltos when starting up
+  * Bump version to 1.3.9.1
+  * libaltos: Build -m64 and -m32 for fat tarball when possible
+  * altosui: Require both libaltos32 and libaltos64 for fat Linux tarball
+  * doc: Ship telemini outline as pdf file too
+  * altos: Switch APRS to compressed position format
+  * altos: Use factory calibration for all acceleration computations
+  * altos: Report battery, apogee and main voltages over APRS
+  * Ignore 32 and 64 bit cjnitest apps
+  * altos: Add missing ADC divider values for Tmega v1.0
+  * altosui: Make romconfig serial and radio cal fields 8 digits wide
+  * altoslib: Fetch target device config for Fire Igniter npyro value
+  * altosuilib: Remove some spurious debug printfs
+  * altosui: Handle already-opened link in IgniteUI
+  * altosui: Handle serial-port startup errors in idle-monitor
+  * doc: Fix image widths to make them all scale the same amount
+  * doc: Update for 1.3.1
+
+  [ Anthony Towns ]
+  * AltosSiteMapPreload: only load 49 maps
+  * altosui: --fetchmaps gets same number of maps as GUI
+  * altosui: rate limit map downloads
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 22 Jan 2014 20:56:31 -0700
+
 altos (1.3-1) unstable; urgency=low
 
   [ Keith Packard ]
