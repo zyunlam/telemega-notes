@@ -31,6 +31,7 @@ INC = \
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
 
 ALTOS_SRC = \
+	ao_boot_chain.c \
 	ao_interrupt.c \
 	ao_product.c \
 	ao_romconfig.c \
@@ -62,14 +63,15 @@ CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STA
 
 PROGNAME=fox1ihu-v0.1
 PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_fox1ihu.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(SAT_CLIB) -lgcc
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 
