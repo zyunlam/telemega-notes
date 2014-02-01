@@ -21,6 +21,20 @@
 /* External crystal at 8MHz */
 #define AO_HSE		8000000
 
+#define AO_WATCHDOG_PORT	(&stm_gpiod)
+#define AO_WATCHDOG_BIT		3
+
+#define AO_FLASH_LOADER_INIT do {						\
+		ao_enable_output(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG, 0); \
+	} while (0)
+	
+#define AO_TIMER_HOOK	do {						\
+		static uint8_t	watchdog;				\
+		ao_gpio_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG_PIN, watchdog); \
+		watchdog ^= 1;						\
+	} while (0)
+
+#define HAS_TICK		1
 #include <ao_flash_stm_pins.h>
 
 /* Detatched signal, PD6 */
