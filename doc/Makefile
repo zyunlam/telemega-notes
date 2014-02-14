@@ -13,7 +13,8 @@ RELNOTES=\
 	release-notes-1.2.html \
 	release-notes-1.2.1.html \
 	release-notes-1.3.html \
-	release-notes-1.3.1.html
+	release-notes-1.3.1.html \
+	release-notes-1.3.2.html
 
 PICTURES=\
 	altosui.png \
@@ -51,11 +52,12 @@ HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html $(
 PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf
 HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
 FOSTYLE=xorg-fo.xsl
+TEMPLATES=titlepage.templates.xsl
 PDFSTYLE=
 IMAGES=$(PICTURES) $(SVG)
 DOC=$(HTML) $(PDF) $(PICTURES)
 
-.SUFFIXES: .xsl .html .pdf
+.SUFFIXES: .xml .xsl .html .pdf
 
 XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
 
@@ -64,6 +66,9 @@ XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
 
 .xsl.pdf:
 	xmlto -x $(FOSTYLE) --with-fop pdf $*.xsl
+
+.xml.xsl:
+	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.xml
 
 all:	$(HTML) $(PDF)
 
@@ -78,7 +83,7 @@ publish:	$(DOC)
 	 git push)
 
 clean:
-	rm -f $(HTML) $(PDF)
+	rm -f $(HTML) $(PDF) $(TEMPLATES)
 
 distclean:
 	rm -f $(HTML) $(PDF)
@@ -86,7 +91,7 @@ distclean:
 altusmetrum.html: $(RELNOTES_XSL) $(IMAGES)
 altusmetrum.pdf: $(RELNOTES_XSL) $(IMAGES)
 
-$(PDF): $(FOSTYLE)
+$(PDF): $(FOSTYLE) $(TEMPLATES)
 
 indent:		altusmetrum.xsl
 	xmlindent -i 2 < altusmetrum.xsl > altusmetrum.new

@@ -25,6 +25,11 @@
       <year>2014</year>
       <holder>Bdale Garbee and Keith Packard</holder>
     </copyright>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="../themes/background.png" width="6.0in"/>
+      </imageobject>
+    </mediaobject>
     <legalnotice>
       <para>
         This document is released under the terms of the
@@ -35,6 +40,13 @@
       </para>
     </legalnotice>
     <revhistory>
+      <revision>
+	<revnumber>1.3.2</revnumber>
+	<date>24 January 2014</date>
+	<revremark>
+	  Bug fixes for TeleMega and AltosUI.
+	</revremark>
+      </revision>
       <revision>
 	<revnumber>1.3.1</revnumber>
 	<date>21 January 2014</date>
@@ -330,7 +342,115 @@ NAR #88757, TRA #12200
   <chapter>
     <title>Altus Metrum Hardware</title>
     <section>
-      <title>Overview</title>
+      <title>General Usage Instructions</title>
+      <para>
+	Here are general instructions for hooking up an Altus Metrum
+	flight computer. Instructions specific to each model will be
+	found in the section devoted to that model below.
+      </para>
+      <para>
+	To prevent electrical interference from affecting the
+	operation of the flight computer, it's important to always
+	twist pairs of wires connected to the board. Twist the switch
+	leads, the pyro leads and the battery leads. This reduces
+	interference through a mechanism called common mode rejection.
+      </para>
+      <section>
+	<title>Hooking Up Lithium Polymer Batteries</title>
+	<para>
+	  All Altus Metrum flight computers have a two pin JST PH
+	  series connector to connect up a single-cell Lithium Polymer
+	  cell (3.7V nominal). You can purchase matching batteries
+	  from the Altus Metrum store, or other vendors, or you can
+	  make your own. Pin 1 of the connector is positive, pin 2 is
+	  negative. Spark Fun sells a cable with the connector
+	  attached, which they call a <ulink
+	  url="https://www.sparkfun.com/products/9914">JST Jumper 2
+	  Wire Assembly</ulink>.
+	</para>
+	<para>
+	  Many RC vendors also sell lithium polymer batteries with
+	  this same connector. All that we have found use the opposite
+	  polarity, and if you use them that way, you will damage or
+	  destroy the flight computer.
+	</para>
+      </section>
+      <section>
+	<title>Hooking Up Pyro Charges</title>
+	<para>
+	  Altus Metrum flight computers always have two screws for
+	  each pyro charge. This means you shouldn't need to put two
+	  wires into a screw terminal or connect leads from pyro
+	  charges together externally.
+	</para>
+	<para>
+	  On the flight computer, one lead from each charge is hooked
+	  to the positive battery terminal through the power switch.
+	  The other lead is connected through the pyro circuit, which
+	  is connected to the negative battery terminal when the pyro
+	  circuit is fired.
+	</para>
+      </section>
+      <section>
+	<title>Hooking Up a Power Switch</title>
+	<para>
+	  Altus Metrum flight computers need an external power switch
+	  to turn them on. This disconnects both the computer and the
+	  pyro charges from the battery, preventing the charges from
+	  firing when in the Off position. The switch is in-line with
+	  the positive battery terminal.
+	</para>
+	<section>
+	  <title>Using an External Active Switch Circuit</title>
+	  <para>
+	    You can use an active switch circuit, such as the
+	    Featherweight Magnetic Switch, with any Altus Metrum
+	    flight computer. These require three connections, one to
+	    the battery, one to the positive power input on the flight
+	    computer and one to ground. Find instructions on how to
+	    hook these up for each flight computer below. The follow
+	    the instructions that come with your active switch to
+	    connect it up.
+	  </para>
+	</section>
+      </section>
+      <section>
+	<title>Using a Separate Pyro Battery</title>
+	<para>
+	  As mentioned above in the section on hooking up pyro
+	  charges, one lead for each of the pyro charges is connected
+	  through the power switch directly to the positive battery
+	  terminal. The other lead is connected to the pyro circuit,
+	  which connects it to the negative battery terminal when the
+	  pyro circuit is fired. The pyro circuit on all of the flight
+	  computers is designed to handle up to 16V.
+	</para>
+	<para>
+	  To use a separate pyro battery, connect the negative pyro
+	  battery terminal to the flight computer ground terminal,
+	  the positive battery terminal to the igniter and the other
+	  igniter lead to the negative pyro terminal on the flight
+	  computer. When the pyro channel fires, it will complete the
+	  circuit between the negative pyro terminal and the ground
+	  terminal, firing the igniter. Specific instructions on how
+	  to hook this up will be found in each section below.
+	</para>
+      </section>
+      <section>
+	<title>Using a Different Kind of Battery</title>
+	<para>
+	  EasyMini and TeleMini v2 are designed to use either a
+	  lithium polymer battery or any other battery producing
+	  between 4 and 12 volts, such as a rectangular 9V
+	  battery. TeleMega and TeleMetrum are not designed for this,
+	  and must only be powered by a lithium polymer battery. Find
+	  instructions on how to use other batteries in the EasyMini
+	  and TeleMini sections below.
+	</para>
+      </section>
+    </section>
+    <section>
+      <title>Specifications</title>
       <para>
 	Here's the full set of Altus Metrum products, both in
 	production and retired.
@@ -573,9 +693,107 @@ NAR #88757, TRA #12200
 	fin can end of the board, meaning an ideal “simple” avionics
 	bay for TeleMetrum should have at least 10 inches of interior length.
       </para>
+      <section>
+	<title>TeleMetrum Screw Terminals</title>
+	<para>
+	  TeleMetrum has six screw terminals on the end of the board
+	  opposite the telemetry antenna. Two are for the power
+	  switch, and two each for the apogee and main igniter
+	  circuits. Using the picture above and starting from the top,
+	  the terminals are as follows:
+	</para>
+	<table frame='all'>
+	  <title>TeleMetrum Screw Terminals</title>
+	  <?dbfo keep-together="always"?>
+	  <tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	    <colspec align='center' colwidth='*' colname='Pin #'/>
+	    <colspec align='center' colwidth='2*' colname='Pin Name'/>
+	    <colspec align='left' colwidth='5*' colname='Description'/>
+	    <thead>
+	      <row>
+		<entry align='center'>Terminal #</entry>
+		<entry align='center'>Terminal Name</entry>
+		<entry align='center'>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>1</entry>
+		<entry>Switch Output</entry>
+		<entry>Switch connection to flight computer</entry>
+	      </row>
+	      <row>
+		<entry>2</entry>
+		<entry>Switch Input</entry>
+		<entry>Switch connection to positive battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>3</entry>
+		<entry>Main +</entry>
+		<entry>Main pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>4</entry>
+		<entry>Main -</entry>
+		<entry>Main pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>5</entry>
+		<entry>Apogee +</entry>
+		<entry>Apogee pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>6</entry>
+		<entry>Apogee -</entry>
+		<entry>Apogee pyro channel connection to pyro circuit</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+      <section>
+	<title>Using a Separate Pyro Battery with TeleMetrum</title>
+	<para>
+	  As described above, using an external pyro battery involves
+	  connecting the negative battery terminal to the flight
+	  computer ground, connecting the positive battery terminal to
+	  one of the igniter leads and connecting the other igniter
+	  lead to the per-channel pyro circuit connection.
+	</para>
+	<para>
+	  To connect the negative battery terminal to the TeleMetrum
+	  ground, insert a small piece of wire, 24 to 28 gauge
+	  stranded, into the GND hole just above the screw terminal
+	  strip and solder it in place.
+	</para>
+	<para>
+	  Connecting the positive battery terminal to the pyro
+	  charges must be done separate from TeleMetrum, by soldering
+	  them together or using some other connector.
+	</para>
+	<para>
+	  The other lead from each pyro charge is then inserted into
+	  the appropriate per-pyro channel screw terminal (terminal 4 for the
+	  Main charge, terminal 6 for the Apogee charge).
+	</para>
+      </section>
+      <section>
+	<title>Using an Active Switch with TeleMetrum</title>
+	<para>
+	  As explained above, an external active switch requires three
+	  connections, one to the positive battery terminal, one to
+	  the flight computer positive input and one to ground.
+	</para>
+	<para>
+	  The positive battery terminal is available on screw terminal
+	  2, the positive flight computer input is on terminal 1. To
+	  hook a lead to ground, solder a piece of wire, 24 to 28
+	  gauge stranded, to the GND hole just above terminal 1.
+	</para>
+      </section>
     </section>
     <section>
-      <title>TeleMini</title>
+      <title>TeleMini v1.0</title>
       <informalfigure>
 	<mediaobject>
 	  <imageobject>
@@ -597,6 +815,113 @@ NAR #88757, TRA #12200
 	the board, meaning an ideal “simple” avionics bay for TeleMini
 	should have at least 9 inches of interior length.
       </para>
+      <section>
+	<title>TeleMini v1.0 Screw Terminals</title>
+	<para>
+	  TeleMini v1.0 has four screw terminals on the end of the
+	  board opposite the telemetry antenna. Two are for the apogee
+	  and two are for main igniter circuits. There are also wires
+	  soldered to the board for the power switch.  Using the
+	  picture above and starting from the top for the terminals
+	  and from the left for the power switch wires, the
+	  connections are as follows:
+	</para>
+	<table frame='all'>
+	  <title>TeleMini v1.0 Connections</title>
+	  <?dbfo keep-together="always"?>
+	  <tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	    <colspec align='center' colwidth='*' colname='Pin #'/>
+	    <colspec align='center' colwidth='2*' colname='Pin Name'/>
+	    <colspec align='left' colwidth='5*' colname='Description'/>
+	    <thead>
+	      <row>
+		<entry align='center'>Terminal #</entry>
+		<entry align='center'>Terminal Name</entry>
+		<entry align='center'>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>1</entry>
+		<entry>Apogee -</entry>
+		<entry>Apogee pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>2</entry>
+		<entry>Apogee +</entry>
+		<entry>Apogee pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>3</entry>
+		<entry>Main -</entry>
+		<entry>Main pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>4</entry>
+		<entry>Main +</entry>
+		<entry>Main pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Left</entry>
+		<entry>Switch Output</entry>
+		<entry>Switch connection to flight computer</entry>
+	      </row>
+	      <row>
+		<entry>Right</entry>
+		<entry>Switch Input</entry>
+		<entry>Switch connection to positive battery terminal</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+      <section>
+	<title>Using a Separate Pyro Battery with TeleMini v1.0</title>
+	<para>
+	  As described above, using an external pyro battery involves
+	  connecting the negative battery terminal to the flight
+	  computer ground, connecting the positive battery terminal to
+	  one of the igniter leads and connecting the other igniter
+	  lead to the per-channel pyro circuit connection. Because
+	  there is no solid ground connection to use on TeleMini, this
+	  is not recommended.
+	</para>
+	<para>
+	  The only available ground connection on TeleMini v1.0 are
+	  the two mounting holes next to the telemetry
+	  antenna. Somehow connect a small piece of wire to one of
+	  those holes and hook it to the negative pyro battery terminal.
+	</para>
+	<para>
+	  Connecting the positive battery terminal to the pyro
+	  charges must be done separate from TeleMini v1.0, by soldering
+	  them together or using some other connector.
+	</para>
+	<para>
+	  The other lead from each pyro charge is then inserted into
+	  the appropriate per-pyro channel screw terminal (terminal 3 for the
+	  Main charge, terminal 1 for the Apogee charge).
+	</para>
+      </section>
+      <section>
+	<title>Using an Active Switch with TeleMini v1.0</title>
+	<para>
+	  As explained above, an external active switch requires three
+	  connections, one to the positive battery terminal, one to
+	  the flight computer positive input and one to ground. Again,
+	  because TeleMini doesn't have any good ground connection,
+	  this is not recommended.
+	</para>
+	<para>
+	  The positive battery terminal is available on the Right
+	  power switch wire, the positive flight computer input is on
+	  the left power switch wire. Hook a lead to either of the
+	  mounting holes for a ground connection.
+	</para>
+      </section>
+    </section>
+    <section>
+      <title>TeleMini v2.0</title>
       <informalfigure>
 	<mediaobject>
 	  <imageobject>
@@ -611,6 +936,117 @@ NAR #88757, TRA #12200
 	board fits in a 24mm coupler. There's also a battery connector
 	for a LiPo battery if you want to use one of those.
       </para>
+      <section>
+	<title>TeleMini v2.0 Screw Terminals</title>
+	<para>
+	  TeleMini v2.0 has two sets of four screw terminals on the end of the
+	  board opposite the telemetry antenna. Using the picture
+	  above, the top four have connections for the main pyro
+	  circuit and an external battery and the bottom four have
+	  connections for the apogee pyro circuit and the power
+	  switch. Counting from the left, the connections are as follows:
+	</para>
+	<table frame='all'>
+	  <title>TeleMini v2.0 Connections</title>
+	  <?dbfo keep-together="always"?>
+	  <tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	    <colspec align='center' colwidth='*' colname='Pin #'/>
+	    <colspec align='center' colwidth='2*' colname='Pin Name'/>
+	    <colspec align='left' colwidth='5*' colname='Description'/>
+	    <thead>
+	      <row>
+		<entry align='center'>Terminal #</entry>
+		<entry align='center'>Terminal Name</entry>
+		<entry align='center'>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>Top 1</entry>
+		<entry>Main -</entry>
+		<entry>Main pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 2</entry>
+		<entry>Main +</entry>
+		<entry>Main pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Top 3</entry>
+		<entry>Battery +</entry>
+		<entry>Positive external battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Top 4</entry>
+		<entry>Battery -</entry>
+		<entry>Negative external battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 1</entry>
+		<entry>Apogee -</entry>
+		<entry>Apogee pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 2</entry>
+		<entry>Apogee +</entry>
+		<entry>Apogee pyro channel common connection to
+		battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 3</entry>
+		<entry>Switch Output</entry>
+		<entry>Switch connection to flight computer</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 4</entry>
+		<entry>Switch Input</entry>
+		<entry>Switch connection to positive battery terminal</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+      <section>
+	<title>Using a Separate Pyro Battery with TeleMini v2.0</title>
+	<para>
+	  As described above, using an external pyro battery involves
+	  connecting the negative battery terminal to the flight
+	  computer ground, connecting the positive battery terminal to
+	  one of the igniter leads and connecting the other igniter
+	  lead to the per-channel pyro circuit connection.
+	</para>
+	<para>
+	  To connect the negative pyro battery terminal to TeleMini
+	  ground, connect it to the negative external battery
+	  connection, top terminal 4.
+	</para>
+	<para>
+	  Connecting the positive battery terminal to the pyro
+	  charges must be done separate from TeleMini v2.0, by soldering
+	  them together or using some other connector.
+	</para>
+	<para>
+	  The other lead from each pyro charge is then inserted into
+	  the appropriate per-pyro channel screw terminal (top
+	  terminal 1 for the Main charge, bottom terminal 1 for the
+	  Apogee charge).
+	</para>
+      </section>
+      <section>
+	<title>Using an Active Switch with TeleMini v2.0</title>
+	<para>
+	  As explained above, an external active switch requires three
+	  connections, one to the positive battery terminal, one to
+	  the flight computer positive input and one to ground. Use
+	  the negative external battery connection, top terminal 4 for
+	  ground.
+	</para>
+	<para>
+	  The positive battery terminal is available on bottom
+	  terminal 4, the positive flight computer input is on the
+	  bottom terminal 3.
+	</para>
+      </section>
     </section>
     <section>
       <title>EasyMini</title>
@@ -627,6 +1063,117 @@ NAR #88757, TRA #12200
 	screw terminals match TeleMini v2.0, so you can easily swap between
 	EasyMini and TeleMini.
       </para>
+      <section>
+	<title>EasyMini Screw Terminals</title>
+	<para>
+	  EasyMini has two sets of four screw terminals on the end of the
+	  board opposite the telemetry antenna. Using the picture
+	  above, the top four have connections for the main pyro
+	  circuit and an external battery and the bottom four have
+	  connections for the apogee pyro circuit and the power
+	  switch. Counting from the left, the connections are as follows:
+	</para>
+	<table frame='all'>
+	  <title>EasyMini Connections</title>
+	  <?dbfo keep-together="always"?>
+	  <tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	    <colspec align='center' colwidth='*' colname='Pin #'/>
+	    <colspec align='center' colwidth='2*' colname='Pin Name'/>
+	    <colspec align='left' colwidth='5*' colname='Description'/>
+	    <thead>
+	      <row>
+		<entry align='center'>Terminal #</entry>
+		<entry align='center'>Terminal Name</entry>
+		<entry align='center'>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>Top 1</entry>
+		<entry>Main -</entry>
+		<entry>Main pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 2</entry>
+		<entry>Main +</entry>
+		<entry>Main pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Top 3</entry>
+		<entry>Battery +</entry>
+		<entry>Positive external battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Top 4</entry>
+		<entry>Battery -</entry>
+		<entry>Negative external battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 1</entry>
+		<entry>Apogee -</entry>
+		<entry>Apogee pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 2</entry>
+		<entry>Apogee +</entry>
+		<entry>Apogee pyro channel common connection to
+		battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 3</entry>
+		<entry>Switch Output</entry>
+		<entry>Switch connection to flight computer</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 4</entry>
+		<entry>Switch Input</entry>
+		<entry>Switch connection to positive battery terminal</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+      <section>
+	<title>Using a Separate Pyro Battery with EasyMini</title>
+	<para>
+	  As described above, using an external pyro battery involves
+	  connecting the negative battery terminal to the flight
+	  computer ground, connecting the positive battery terminal to
+	  one of the igniter leads and connecting the other igniter
+	  lead to the per-channel pyro circuit connection.
+	</para>
+	<para>
+	  To connect the negative pyro battery terminal to TeleMini
+	  ground, connect it to the negative external battery
+	  connection, top terminal 4.
+	</para>
+	<para>
+	  Connecting the positive battery terminal to the pyro
+	  charges must be done separate from EasyMini, by soldering
+	  them together or using some other connector.
+	</para>
+	<para>
+	  The other lead from each pyro charge is then inserted into
+	  the appropriate per-pyro channel screw terminal (top
+	  terminal 1 for the Main charge, bottom terminal 1 for the
+	  Apogee charge).
+	</para>
+      </section>
+      <section>
+	<title>Using an Active Switch with EasyMini</title>
+	<para>
+	  As explained above, an external active switch requires three
+	  connections, one to the positive battery terminal, one to
+	  the flight computer positive input and one to ground. Use
+	  the negative external battery connection, top terminal 4 for
+	  ground.
+	</para>
+	<para>
+	  The positive battery terminal is available on bottom
+	  terminal 4, the positive flight computer input is on the
+	  bottom terminal 3.
+	</para>
+      </section>
     </section>
     <section>
       <title>TeleMega</title>
@@ -644,6 +1191,161 @@ NAR #88757, TRA #12200
 	the board is aligned with the flight axis. It can be mounted
 	either antenna up or down.
       </para>
+      <section>
+	<title>TeleMega Screw Terminals</title>
+	<para>
+	  TeleMega has two sets of nine screw terminals on the end of
+	  the board opposite the telemetry antenna. They are as follows:
+	</para>
+	<table frame='all'>
+	  <title>TeleMega Screw Terminals</title>
+	  <?dbfo keep-together="always"?>
+	  <tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	    <colspec align='center' colwidth='*' colname='Pin #'/>
+	    <colspec align='center' colwidth='2*' colname='Pin Name'/>
+	    <colspec align='left' colwidth='5*' colname='Description'/>
+	    <thead>
+	      <row>
+		<entry align='center'>Terminal #</entry>
+		<entry align='center'>Terminal Name</entry>
+		<entry align='center'>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>Top 1</entry>
+		<entry>Switch Input</entry>
+		<entry>Switch connection to positive battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Top 2</entry>
+		<entry>Switch Output</entry>
+		<entry>Switch connection to flight computer</entry>
+	      </row>
+	      <row>
+		<entry>Top 3</entry>
+		<entry>GND</entry>
+		<entry>Ground connection for use with external active switch</entry>
+	      </row>
+	      <row>
+		<entry>Top 4</entry>
+		<entry>Main -</entry>
+		<entry>Main pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 5</entry>
+		<entry>Main +</entry>
+		<entry>Main pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Top 6</entry>
+		<entry>Apogee -</entry>
+		<entry>Apogee pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 7</entry>
+		<entry>Apogee +</entry>
+		<entry>Apogee pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Top 8</entry>
+		<entry>D -</entry>
+		<entry>D pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 9</entry>
+		<entry>D +</entry>
+		<entry>D pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 1</entry>
+		<entry>GND</entry>
+		<entry>Ground connection for negative pyro battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 2</entry>
+		<entry>Pyro</entry>
+		<entry>Positive pyro battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 3</entry>
+		<entry>Lipo</entry>
+		<entry>
+		  Power switch output. Use to connect main battery to
+		  pyro battery input
+		</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 4</entry>
+		<entry>A -</entry>
+		<entry>A pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 5</entry>
+		<entry>A +</entry>
+		<entry>A pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 6</entry>
+		<entry>B -</entry>
+		<entry>B pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 7</entry>
+		<entry>B +</entry>
+		<entry>B pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 8</entry>
+		<entry>C -</entry>
+		<entry>C pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 9</entry>
+		<entry>C +</entry>
+		<entry>C pyro channel common connection to battery +</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+      <section>
+	<title>Using a Separate Pyro Battery with TeleMega</title>
+	<para>
+	  TeleMega provides explicit support for an external pyro
+	  battery. All that is required is to remove the jumper
+	  between the lipo terminal (Bottom 3) and the pyro terminal
+	  (Bottom 2). Then hook the negative pyro battery terminal to ground
+	  (Bottom 1) and the positive pyro battery to the pyro battery
+	  input (Bottom 2). You can then use the existing pyro screw
+	  terminals to hook up all of the pyro charges.
+	</para>
+      </section>
+      <section>
+	<title>Using Only One Battery With TeleMega</title>
+	<para>
+	  Because TeleMega has built-in support for a separate pyro
+	  battery, if you want to fly with just one battery running
+	  both the computer and firing the charges, you need to
+	  connect the flight computer battery to the pyro
+	  circuit. TeleMega has two screw terminals for this—hook a
+	  wire from the Lipo terminal (Bottom 3) to the Pyro terminal
+	  (Bottom 2).
+	</para>
+      </section>
+      <section>
+	<title>Using an Active Switch with TeleMega</title>
+	<para>
+	  As explained above, an external active switch requires three
+	  connections, one to the positive battery terminal, one to
+	  the flight computer positive input and one to ground.
+	</para>
+	<para>
+	  The positive battery terminal is available on Top terminal
+	  1, the positive flight computer input is on Top terminal
+	  2. Ground is on Top terminal 3.
+	</para>
+      </section>
     </section>
     <section>
       <title>Flight Data Recording</title>
@@ -789,7 +1491,6 @@ NAR #88757, TRA #12200
 	pyro battery, check out the “External Pyro Battery” section in this 
 	manual for instructions on how to wire that up. The altimeters are 
 	designed to work with an external pyro battery of no more than 15 volts.
-
       </para>
       <para>
 	Ejection charges are wired directly to the screw terminal block
@@ -912,7 +1613,7 @@ NAR #88757, TRA #12200
 		<entry>dit dit dah dit</entry>
 		<entry>
 		  <para>
-		    Decellerating, but moving faster than 200m/s.
+		    Decelerating, but moving faster than 200m/s.
 		  </para>
 		</entry>
 	      </row>
@@ -922,7 +1623,7 @@ NAR #88757, TRA #12200
 		<entry>dah dit dah dit</entry>
 		<entry>
 		  <para>
-		    Decellerating, moving slower than 200m/s
+		    Decelerating, moving slower than 200m/s
 		  </para>
 		</entry>
 	      </row>
@@ -1308,22 +2009,112 @@ NAR #88757, TRA #12200
         time, and would of course appreciate customer feedback on
         performance in higher altitude flights!
       </para>
+    </section>
+    <section>
+      <title>APRS</title>
       <para>
 	TeleMetrum v2.0 and TeleMega can send APRS if desired, and the
 	interval between APRS packets can be configured. As each APRS
 	packet takes a full second to transmit, we recommend an
 	interval of at least 5 seconds to avoid consuming too much
-	battery power or radio channel bandwidth.
+	battery power or radio channel bandwidth. You can configure
+	the APRS interval using AltosUI; that process is described in
+	the Configure Altimeter section of the AltosUI chapter.
+      </para>
+      <para>
+	AltOS uses the APRS compressed position report data format,
+	which provides for higher position precision and shorter
+	packets than the original APRS format. It also includes
+	altitude data, which is invaluable when tracking rockets. We
+	haven't found a receiver which doesn't handle compressed
+	positions, but it's just possible that you have one, so if you
+	have an older device that can receive the raw packets but
+	isn't displaying position information, it's possible that this
+	is the cause.
+      </para>
+      <para>
+	The APRS packet format includes a comment field that can have
+	arbitrary text in it. AltOS uses this to send status
+	information about the flight computer. It sends four fields as
+	shown in the following table.
+      </para>
+      <table frame='all'>
+	<title>Altus Metrum APRS Comments</title>
+	<?dbfo keep-together="always"?>
+	<tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Field'/>
+	  <colspec align='center' colwidth='*' colname='Example'/>
+	  <colspec align='center' colwidth='4*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Field</entry>
+	      <entry align='center'>Example</entry>
+	      <entry align='center'>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>1</entry>
+	      <entry>L</entry>
+	      <entry>GPS Status U for unlocked, L for locked</entry>
+	    </row>
+	    <row>
+	      <entry>2</entry>
+	      <entry>6</entry>
+	      <entry>Number of Satellites in View</entry>
+	    </row>
+	    <row>
+	      <entry>3</entry>
+	      <entry>B4.0</entry>
+	      <entry>Altimeter Battery Voltage</entry>
+	    </row>
+	    <row>
+	      <entry>4</entry>
+	      <entry>A3.7</entry>
+	      <entry>Apogee Igniter Voltage</entry>
+	    </row>
+	    <row>
+	      <entry>5</entry>
+	      <entry>M3.7</entry>
+	      <entry>Main Igniter Voltage</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+      <para>
+	Here's an example of an APRS comment showing GPS lock with 6
+	satellites in view, a primary battery at 4.0V, and
+	apogee and main igniters both at 3.7V.
+	<screen>
+	  L6 B4.0 A3.7 M3.7
+	</screen>
+      </para>
+      <para>
+	Make sure your primary battery is above 3.8V, any connected
+	igniters are above 3.5V and GPS is locked with at least 5 or 6
+	satellites in view before flying. If GPS is switching between
+	L and U regularly, then it doesn't have a good lock and you
+	should wait until it becomes stable.
+      </para>
+      <para>
+	If the GPS receiver loses lock, the APRS data transmitted will
+	contain the last position for which GPS lock was
+	available. You can tell that this has happened by noticing
+	that the GPS status character switches from 'L' to 'U'. Before
+	GPS has locked, APRS will transmit zero for latitude,
+	longitude and altitude.
       </para>
     </section>
     <section>
       <title>Configurable Parameters</title>
       <para>
         Configuring an Altus Metrum altimeter for flight is very
-        simple.  Even on our baro-only TeleMini and EasyMini boards, the use of a Kalman 
-        filter means there is no need to set a “mach delay”.  The few 
-        configurable parameters can all be set using AltosUI over USB or
-        or radio link via TeleDongle.
+        simple.  Even on our baro-only TeleMini and EasyMini boards,
+        the use of a Kalman filter means there is no need to set a
+        “mach delay”.  The few configurable parameters can all be set
+        using AltosUI over USB or or radio link via TeleDongle. Read
+	the Configure Altimeter section in the AltosUI chapter below
+	for more information.
       </para>
       <section>
         <title>Radio Frequency</title>
@@ -1338,6 +2129,35 @@ NAR #88757, TRA #12200
 	  altimeter and TeleDongle must be configured to the same
 	  frequency to successfully communicate with each other.
         </para>
+      </section>
+      <section>
+	<title>Callsign</title>
+	<para>
+	  This sets the callsign used for telemetry, APRS and the
+	  packet link. For telemetry and APRS, this is used to
+	  identify the device. For the packet link, the callsign must
+	  match that configured in AltosUI or the link will not
+	  work. This is to prevent accidental configuration of another
+	  Altus Metrum flight computer operating on the same frequency nearby.
+	</para>
+      </section>
+      <section>
+	<title>Telemetry/RDF/APRS Enable</title>
+	<para>
+	  You can completely disable the radio while in flight, if
+	  necessary. This doesn't disable the packet link in idle
+	  mode.
+	</para>
+      </section>
+      <section>
+	<title>APRS Interval</title>
+	<para>
+	  This selects how often APRS packets are transmitted. Set
+	  this to zero to disable APRS without also disabling the
+	  regular telemetry and RDF transmissions. As APRS takes a
+	  full second to transmit a single position report, we
+	  recommend sending packets no more than once every 5 seconds.
+	</para>
       </section>
       <section>
         <title>Apogee Delay</title>
@@ -1533,7 +2353,7 @@ NAR #88757, TRA #12200
 		<listitem>
 		  <para>
 		    Fast. The motor has burned out and the rocket is
-		    descellerating, but it is going faster than 200m/s.
+		    decelerating, but it is going faster than 200m/s.
 		  </para>
 		</listitem>
 		<listitem>
@@ -2248,9 +3068,10 @@ NAR #88757, TRA #12200
       <section>
 	<title>APRS Interval</title>
 	<para>
-	  How often to transmit GPS information via APRS. This option
-	  is available on TeleMetrum v2 and TeleMega
-	  boards. TeleMetrum v1 boards cannot transmit APRS
+	  How often to transmit GPS information via APRS (in
+	  seconds). When set to zero, APRS transmission is
+	  disabled. This option is available on TeleMetrum v2 and
+	  TeleMega boards. TeleMetrum v1 boards cannot transmit APRS
 	  packets. Note that a single APRS packet takes nearly a full
 	  second to transmit, so enabling this option will prevent
 	  sending any other telemetry during that time.
@@ -4456,6 +5277,13 @@ NAR #88757, TRA #12200
   </appendix>
   <appendix>
     <title>Release Notes</title>
+    <simplesect>
+      <title>Version 1.3.2</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.3.2.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
     <simplesect>
       <title>Version 1.3.1</title>
       <xi:include

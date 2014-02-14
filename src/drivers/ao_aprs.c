@@ -488,9 +488,29 @@ static void tncCompressInt(uint8_t *dest, int32_t value, int len) {
 	}
 }
 
-#if HAS_ADC
+static int ao_num_sats(void)
+{
+    int i;
+    int n = 0;
+
+    for (i = 0; i < ao_gps_tracking_data.channels; i++) {
+	if (ao_gps_tracking_data.sats[i].svid)
+	    n++;
+    }
+    return n;
+}
+
+static char ao_gps_locked(void)
+{
+    if (ao_gps_data.flags & AO_GPS_VALID)
+	return 'L';
+    else
+	return 'U';
+}
+
 static int tncComment(uint8_t *buf)
 {
+#if HAS_ADC
 	struct ao_data packet;
 	
 	ao_arch_critical(ao_data_get(&packet););
@@ -500,61 +520,70 @@ static int tncComment(uint8_t *buf)
 	int16_t main = ao_ignite_decivolt(AO_SENSE_MAIN(&packet));
 
 	return sprintf((char *) buf,
-		       "B:%d.%d A:%d.%d M:%d.%d",
+		       "%c%d B%d.%d A%d.%d M%d.%d",
+		       ao_gps_locked(),
+		       ao_num_sats(),
 		       battery/10,
 		       battery % 10,
 		       apogee/10,
 		       apogee%10,
 		       main/10,
 		       main%10);
-}
+#else
+	return sprintf((char *) buf,
+		       "%c%d",
+		       ao_gps_locked(),
+		       ao_num_sats());
 #endif
+}
 
 /**
  *   Generate the plain text position packet.
  */
 static int tncPositionPacket(void)
 {
-    int32_t	latitude = ao_gps_data.latitude;
-    int32_t	longitude = ao_gps_data.longitude;
-    int32_t	altitude = ao_gps_data.altitude;
+    static int32_t	latitude;
+    static int32_t	longitude;
+    static int32_t	altitude;
+    int32_t		lat, lon, alt;
     uint8_t	*buf;
 
-    if (altitude < 0)
-	altitude = 0;
-    altitude = (altitude * (int32_t) 10000 + (3048/2)) / (int32_t) 3048;
-    
+    if (ao_gps_data.flags & AO_GPS_VALID) {
+	latitude = ao_gps_data.latitude;
+	longitude = ao_gps_data.longitude;
+	altitude = ao_gps_data.altitude;
+	if (altitude < 0)
+	    altitude = 0;
+    }
+
     buf = tncBuffer;
     *buf++ = '!';
 
     /* Symbol table ID */
     *buf++ = '/';
 
-    latitude = ((uint64_t) 380926 * (900000000 - latitude)) / 10000000;
-    longitude = ((uint64_t) 190463 * (1800000000 + longitude)) / 10000000;
+    lat = ((uint64_t) 380926 * (900000000 - latitude)) / 10000000;
+    lon = ((uint64_t) 190463 * (1800000000 + longitude)) / 10000000;
 
 #define ALTITUDE_LOG_BASE	0.001998002662673f	/* log(1.002) */
 
-    altitude = logf((float) altitude) * (1/ALTITUDE_LOG_BASE);
+    alt = (altitude * (int32_t) 10000 + (3048/2)) / (int32_t) 3048;
+    alt = logf((float) altitude) * (1/ALTITUDE_LOG_BASE);
 
-    tncCompressInt(buf, latitude, 4);
+    tncCompressInt(buf, lat, 4);
     buf += 4;
-    tncCompressInt(buf, longitude, 4);
+    tncCompressInt(buf, lon, 4);
     buf += 4;
 
     /* Symbol code */
     *buf++ = '\'';
 
-    tncCompressInt(buf, altitude, 2);
+    tncCompressInt(buf, alt, 2);
     buf += 2;
 
     *buf++ = 33 + ((1 << 5) | (2 << 3));
 
-#if HAS_ADC
     buf += tncComment(buf);
-#else
-    *buf = '\0';
-#endif
 
     return buf - tncBuffer;
 }
