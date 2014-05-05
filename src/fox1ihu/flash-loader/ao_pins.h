@@ -37,12 +37,12 @@
 #define HAS_TICK		1
 #include <ao_flash_stm_pins.h>
 
-/* Detatched signal, PD6 */
+/* Attached signal, PB8 */
 
 #define AO_BOOT_PIN		1
-#define AO_BOOT_APPLICATION_GPIO	stm_gpiod
-#define AO_BOOT_APPLICATION_PIN		6
-#define AO_BOOT_APPLICATION_VALUE	0
+#define AO_BOOT_APPLICATION_GPIO	stm_gpiob
+#define AO_BOOT_APPLICATION_PIN		8
+#define AO_BOOT_APPLICATION_VALUE	1
 #define AO_BOOT_APPLICATION_MODE	0
 
 #endif /* _AO_PINS_H_ */
