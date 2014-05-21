@@ -103,8 +103,8 @@ ao_spi_channel_init(uint8_t id)
 
 	lpc_ssp->cr0 = ((LPC_SSP_CR0_DSS_8 << LPC_SSP_CR0_DSS) |
 			(LPC_SSP_CR0_FRF_SPI << LPC_SSP_CR0_FRF) |
-			(0 << LPC_SSP_CR0_CPOL) |
-			(0 << LPC_SSP_CR0_CPHA) |
+			(1 << LPC_SSP_CR0_CPOL) |
+			(1 << LPC_SSP_CR0_CPHA) |
 			(0 << LPC_SSP_CR0_SCR));
 
 	/* Enable the device */

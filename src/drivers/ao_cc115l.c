@@ -45,17 +45,70 @@ static uint8_t ao_radio_abort;		/* radio operation should abort */
 #define ao_radio_spi_recv(d,l)	ao_spi_recv((d), (l), AO_CC115L_SPI_BUS)
 #define ao_radio_duplex(o,i,l)	ao_spi_duplex((o), (i), (l), AO_CC115L_SPI_BUS)
 
+#if CC115L_DEBUG
 struct ao_cc115l_reg {
 	uint16_t	addr;
 	char		*name;
 };
 
+static const struct ao_cc115l_reg ao_cc115l_reg[] = {
+	{ .addr = CC115L_IOCFG2, .name = "IOCFG2" },
+	{ .addr = CC115L_IOCFG1, .name = "IOCFG1" },
+	{ .addr = CC115L_IOCFG0, .name = "IOCFG0" },
+	{ .addr = CC115L_FIFOTHR, .name = "FIFOTHR" },
+	{ .addr = CC115L_SYNC1, .name = "SYNC1" },
+	{ .addr = CC115L_SYNC0, .name = "SYNC0" },
+	{ .addr = CC115L_PKTLEN, .name = "PKTLEN" },
+	{ .addr = CC115L_PKTCTRL0, .name = "PKTCTRL0" },
+	{ .addr = CC115L_CHANNR, .name = "CHANNR" },
+	{ .addr = CC115L_FSCTRL0, .name = "FSCTRL0" },
+	{ .addr = CC115L_FREQ2, .name = "FREQ2" },
+	{ .addr = CC115L_FREQ1, .name = "FREQ1" },
+	{ .addr = CC115L_FREQ0, .name = "FREQ0" },
+	{ .addr = CC115L_MDMCFG4, .name = "MDMCFG4" },
+	{ .addr = CC115L_MDMCFG3, .name = "MDMCFG3" },
+	{ .addr = CC115L_MDMCFG2, .name = "MDMCFG2" },
+	{ .addr = CC115L_MDMCFG1, .name = "MDMCFG1" },
+	{ .addr = CC115L_MDMCFG0, .name = "MDMCFG0" },
+	{ .addr = CC115L_DEVIATN, .name = "DEVIATN" },
+	{ .addr = CC115L_MCSM1, .name = "MCSM1" },
+	{ .addr = CC115L_MCSM0, .name = "MCSM0" },
+	{ .addr = CC115L_RESERVED_0X20, .name = "RESERVED_0X20" },
+	{ .addr = CC115L_FREND0, .name = "FREND0" },
+	{ .addr = CC115L_FSCAL3, .name = "FSCAL3" },
+	{ .addr = CC115L_FSCAL2, .name = "FSCAL2" },
+	{ .addr = CC115L_FSCAL1, .name = "FSCAL1" },
+	{ .addr = CC115L_FSCAL0, .name = "FSCAL0" },
+	{ .addr = CC115L_RESERVED_0X29, .name = "RESERVED_0X29" },
+	{ .addr = CC115L_RESERVED_0X2A, .name = "RESERVED_0X2A" },
+	{ .addr = CC115L_RESERVED_0X2B, .name = "RESERVED_0X2B" },
+	{ .addr = CC115L_TEST2, .name = "TEST2" },
+	{ .addr = CC115L_TEST1, .name = "TEST1" },
+	{ .addr = CC115L_TEST0, .name = "TEST0" },
+	{ .addr = CC115L_PARTNUM, .name = "PARTNUM" },
+	{ .addr = CC115L_VERSION, .name = "VERSION" },
+	{ .addr = CC115L_MARCSTATE, .name = "MARCSTATE" },
+	{ .addr = CC115L_PKTSTATUS, .name = "PKTSTATUS" },
+	{ .addr = CC115L_TXBYTES, .name = "TXBYTES" },
+	{ .addr = CC115L_PA, .name = "PA" },
+};
+
+#define AO_NUM_CC115L_REG	(sizeof ao_cc115l_reg / sizeof ao_cc115l_reg[0])
+
+static const char *cc115l_state_name[8] = {
+	[CC115L_STATUS_STATE_IDLE] = "IDLE",
+	[CC115L_STATUS_STATE_TX] = "TX",
+	[CC115L_STATUS_STATE_FSTXON] = "FSTXON",
+	[CC115L_STATUS_STATE_CALIBRATE] = "CALIBRATE",
+	[CC115L_STATUS_STATE_SETTLING] = "SETTLING",
+	[CC115L_STATUS_STATE_TX_FIFO_UNDERFLOW] = "TX_FIFO_UNDERFLOW",
+};
+#endif
+
 #if CC115L_TRACE
 
-static const struct ao_cc115l_reg ao_cc115l_reg[];
-static const char *cc115l_state_name[];
-
 enum ao_cc115l_trace_type {
+	trace_empty,
 	trace_strobe,
 	trace_read,
 	trace_write,
@@ -63,14 +116,17 @@ enum ao_cc115l_trace_type {
 	trace_line,
 };
 
+static const char trace_type_letter[] = "ESRWDL";
+
 struct ao_cc115l_trace {
 	enum ao_cc115l_trace_type	type;
+	int16_t				time;
 	int16_t				addr;
 	int16_t				value;
 	const char			*comment;
 };
 
-#define NUM_TRACE	256
+#define NUM_TRACE	128
 
 static struct ao_cc115l_trace	trace[NUM_TRACE];
 static int			trace_i;
@@ -78,12 +134,18 @@ static int			trace_disable;
 
 static void trace_add(enum ao_cc115l_trace_type type, int16_t addr, int16_t value, const char *comment)
 {
+	unsigned int	i;
 	if (trace_disable)
 		return;
 	switch (type) {
 	case trace_read:
 	case trace_write:
-		comment = ao_cc115l_reg[addr].name;
+		comment = "UNKNOWN";
+		for (i = 0; i < AO_NUM_CC115L_REG; i++)
+			if (ao_cc115l_reg[i].addr == addr) {
+				comment = ao_cc115l_reg[i].name;
+				break;
+			}
 		break;
 	case trace_strobe:
 		comment = cc115l_state_name[(value >> 4) & 0x7];
@@ -91,6 +153,9 @@ static void trace_add(enum ao_cc115l_trace_type type, int16_t addr, int16_t valu
 	default:
 		break;
 	}
+	if (comment == NULL)
+		comment = "no comment";
+	trace[trace_i].time = ao_time();
 	trace[trace_i].type = type;
 	trace[trace_i].addr = addr;
 	trace[trace_i].value = value;
@@ -98,6 +163,29 @@ static void trace_add(enum ao_cc115l_trace_type type, int16_t addr, int16_t valu
 	if (++trace_i == NUM_TRACE)
 		trace_i = 0;
 }
+
+static void
+trace_dump(void)
+{
+	int	i, j;
+
+	for (j = 0; j < NUM_TRACE; j++) {
+		i = j + trace_i;
+		if (i >= NUM_TRACE)
+			i -= NUM_TRACE;
+		if (trace[i].type != trace_empty) {
+			printf ("%3d %5d %c addr %04x value %04x comment %s\n",
+				j,
+				trace[i].time,
+				trace_type_letter[trace[i].type],
+				trace[i].addr,
+				trace[i].value,
+				trace[i].comment);
+			flush();
+		}
+	}
+}
+
 #else
 #define trace_add(t,a,v,c)
 #endif
@@ -131,6 +219,9 @@ ao_radio_reg_write(uint8_t addr, uint8_t value)
 	ao_radio_select();
 	ao_radio_spi_send(data, 2);
 	ao_radio_deselect();
+#if CC115L_TRACE
+	(void) ao_radio_reg_read(addr);
+#endif
 }
 
 #if UNUSED
@@ -610,18 +701,25 @@ ao_radio_rdf_abort(void)
 	ao_wakeup(&ao_radio_wake);
 }
 
-#define POWER_STEP	0x08
+static uint8_t	ao_cc115l_power_on[] = { 0x03, 0x17, 0x50, 0xc5, 0xc0 };
 
 static void
 ao_radio_stx(void)
 {
 	uint8_t	power;
+#if HAS_RADIO_POWER
 	ao_radio_pa_on();
+#endif
 	ao_radio_reg_write(CC115L_PA, 0);
 	ao_radio_strobe(CC115L_STX);
+#if HAS_RADIO_POWER
 	for (power = POWER_STEP; power < ao_config.radio_power; power += POWER_STEP)
 		ao_radio_reg_write(CC115L_PA, power);
 	ao_radio_reg_write(CC115L_PA, ao_config.radio_power);
+#else
+	for (power = 0; power < sizeof (ao_cc115l_power_on); power++)
+		ao_radio_reg_write(CC115L_PA, ao_cc115l_power_on[power]);
+#endif
 }
 
 static void
@@ -819,59 +917,6 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 }
 
 #if CC115L_DEBUG
-static const char *cc115l_state_name[] = {
-	[CC115L_STATUS_STATE_IDLE] = "IDLE",
-	[CC115L_STATUS_STATE_TX] = "TX",
-	[CC115L_STATUS_STATE_FSTXON] = "FSTXON",
-	[CC115L_STATUS_STATE_CALIBRATE] = "CALIBRATE",
-	[CC115L_STATUS_STATE_SETTLING] = "SETTLING",
-	[CC115L_STATUS_STATE_TX_FIFO_UNDERFLOW] = "TX_FIFO_UNDERFLOW",
-};
-
-static const struct ao_cc115l_reg ao_cc115l_reg[] = {
-	{ .addr = CC115L_IOCFG2, .name = "IOCFG2" },
-	{ .addr = CC115L_IOCFG1, .name = "IOCFG1" },
-	{ .addr = CC115L_IOCFG0, .name = "IOCFG0" },
-	{ .addr = CC115L_FIFOTHR, .name = "FIFOTHR" },
-	{ .addr = CC115L_SYNC1, .name = "SYNC1" },
-	{ .addr = CC115L_SYNC0, .name = "SYNC0" },
-	{ .addr = CC115L_PKTLEN, .name = "PKTLEN" },
-	{ .addr = CC115L_PKTCTRL0, .name = "PKTCTRL0" },
-	{ .addr = CC115L_CHANNR, .name = "CHANNR" },
-	{ .addr = CC115L_FSCTRL0, .name = "FSCTRL0" },
-	{ .addr = CC115L_FREQ2, .name = "FREQ2" },
-	{ .addr = CC115L_FREQ1, .name = "FREQ1" },
-	{ .addr = CC115L_FREQ0, .name = "FREQ0" },
-	{ .addr = CC115L_MDMCFG4, .name = "MDMCFG4" },
-	{ .addr = CC115L_MDMCFG3, .name = "MDMCFG3" },
-	{ .addr = CC115L_MDMCFG2, .name = "MDMCFG2" },
-	{ .addr = CC115L_MDMCFG1, .name = "MDMCFG1" },
-	{ .addr = CC115L_MDMCFG0, .name = "MDMCFG0" },
-	{ .addr = CC115L_DEVIATN, .name = "DEVIATN" },
-	{ .addr = CC115L_MCSM1, .name = "MCSM1" },
-	{ .addr = CC115L_MCSM0, .name = "MCSM0" },
-	{ .addr = CC115L_RESERVED_0X20, .name = "RESERVED_0X20" },
-	{ .addr = CC115L_FREND0, .name = "FREND0" },
-	{ .addr = CC115L_FSCAL3, .name = "FSCAL3" },
-	{ .addr = CC115L_FSCAL2, .name = "FSCAL2" },
-	{ .addr = CC115L_FSCAL1, .name = "FSCAL1" },
-	{ .addr = CC115L_FSCAL0, .name = "FSCAL0" },
-	{ .addr = CC115L_RESERVED_0X29, .name = "RESERVED_0X29" },
-	{ .addr = CC115L_RESERVED_0X2A, .name = "RESERVED_0X2A" },
-	{ .addr = CC115L_RESERVED_0X2B, .name = "RESERVED_0X2B" },
-	{ .addr = CC115L_TEST2, .name = "TEST2" },
-	{ .addr = CC115L_TEST1, .name = "TEST1" },
-	{ .addr = CC115L_TEST0, .name = "TEST0" },
-	{ .addr = CC115L_PARTNUM, .name = "PARTNUM" },
-	{ .addr = CC115L_VERSION, .name = "VERSION" },
-	{ .addr = CC115L_MARCSTATE, .name = "MARCSTATE" },
-	{ .addr = CC115L_PKTSTATUS, .name = "PKTSTATUS" },
-	{ .addr = CC115L_TXBYTES, .name = "TXBYTES" },
-	{ .addr = CC115L_PA, .name = "PA" },
-};
-
-#define AO_NUM_CC115L_REG	(sizeof ao_cc115l_reg / sizeof ao_cc115l_reg[0])
-
 static void ao_radio_show(void) {
 	uint8_t	status = ao_radio_status();
 	unsigned int	i;
@@ -931,6 +976,9 @@ static const struct ao_cmds ao_radio_cmds[] = {
 	{ ao_radio_show,	"R\0Show CC115L status" },
 	{ ao_radio_beep,	"b\0Emit an RDF beacon" },
 	{ ao_radio_packet,	"p\0Send a test packet" },
+#if CC115L_TRACE
+	{ trace_dump,		"D\0Dump CC115L trace" },
+#endif
 #endif
 	{ 0, NULL }
 };
@@ -944,6 +992,8 @@ ao_radio_init(void)
 
 	ao_radio_configured = 0;
 	ao_spi_init_cs (AO_CC115L_SPI_CS_PORT, (1 << AO_CC115L_SPI_CS_PIN));
+
+	ao_enable_output(0, 23, PIN, 1);
 
 #if 0
 	AO_CC115L_SPI_CS_PORT->bsrr = ((uint32_t) (1 << AO_CC115L_SPI_CS_PIN));
