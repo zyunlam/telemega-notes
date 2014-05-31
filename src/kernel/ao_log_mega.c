@@ -90,7 +90,6 @@ ao_log(void)
 	while (!ao_log_running)
 		ao_sleep(&ao_log_running);
 
-#if HAS_FLIGHT
 	log.type = AO_LOG_FLIGHT;
 	log.tick = ao_sample_tick;
 #if HAS_ACCEL
@@ -107,7 +106,6 @@ ao_log(void)
 	log.u.flight.ground_pres = ao_ground_pres;
 	log.u.flight.flight = ao_flight_number;
 	ao_log_mega(&log);
-#endif
 
 	/* Write the whole contents of the ring to the log
 	 * when starting up.
