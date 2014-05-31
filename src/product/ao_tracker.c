@@ -38,6 +38,31 @@ ao_usb_connected(void)
 #endif
 
 static void
+ao_tracker_start_flight(void)
+{
+	struct ao_log_mega log;
+	ao_log_start();
+	log.type = AO_LOG_FLIGHT;
+	log.tick = ao_time();
+#if HAS_ACCEL
+	log.u.flight.ground_accel = ao_ground_accel;
+#endif
+#if HAS_GYRO
+	log.u.flight.ground_accel_along = ao_ground_accel_along;
+	log.u.flight.ground_accel_across = ao_ground_accel_across;
+	log.u.flight.ground_accel_through = ao_ground_accel_through;
+	log.u.flight.ground_roll = ao_ground_roll;
+	log.u.flight.ground_pitch = ao_ground_pitch;
+	log.u.flight.ground_yaw = ao_ground_yaw;
+#endif
+#if HAS_FLIGHT
+	log.u.flight.ground_pres = ao_ground_pres;
+#endif
+	log.u.flight.flight = ao_flight_number;
+	ao_log_mega(&log);
+}
+
+static void
 ao_tracker(void)
 {
 	uint16_t	telem_rate = AO_SEC_TO_TICKS(1), new_telem_rate;
@@ -75,16 +100,10 @@ ao_tracker(void)
 				start_altitude = ao_gps_data.altitude;
 				break;
 			case ao_flight_pad:
-#if 0
 				ground_distance = ao_distance(ao_gps_data.latitude,
 							      start_latitude,
 							      ao_gps_data.longitude,
 							      start_longitude);
-#else
-				(void) start_latitude;
-				(void) start_longitude;
-				ground_distance = 0xffff;
-#endif
 				height = ao_gps_data.altitude - start_altitude;
 				if (height < 0)
 					height = -height;
@@ -92,11 +111,10 @@ ao_tracker(void)
 				    height >= ao_config.tracker_start_vert)
 				{
 					ao_flight_state = ao_flight_drogue;
-					ao_log_start();
+					ao_tracker_start_flight();
 				}
 				break;
 			case ao_flight_drogue:
-
 				/* Modulate data rates based on speed (in cm/s) */
 				if (ao_gps_data.climb_rate < 0)
 					speed = -ao_gps_data.climb_rate;
@@ -119,20 +137,21 @@ ao_tracker(void)
 		ao_mutex_put(&ao_gps_mutex);
 
 		if (new_telem_rate != telem_rate || new_telem_enabled != telem_enabled) {
-#if 0
+			if (ao_usb_connected()) {
+				printf ("telem enabled %d telem rate %d gps rate %d\n",
+					new_telem_enabled, new_telem_rate, new_gps_rate);
+				flush();
+			}
 			if (new_telem_enabled)
 				ao_telemetry_set_interval(new_telem_rate);
 			else
 				ao_telemetry_set_interval(0);
-#endif
 			telem_rate = new_telem_rate;
 			telem_enabled = new_telem_enabled;
 		}
 
 		if (new_gps_rate != gps_rate) {
-#if 0
 			ao_gps_set_rate(new_gps_rate);
-#endif
 			gps_rate = new_gps_rate;
 		}
 	}
