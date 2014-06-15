@@ -71,14 +71,14 @@ Section "Install Driver" InstDriver
 	InstDrv::CreateDevice /NOUNLOAD
 
 	SetOutPath $TEMP
-	File "../telemetrum.inf"
-	InstDrv::InstallDriver /NOUNLOAD "$TEMP\telemetrum.inf"
+	File "../altusmetrum.inf"
+	InstDrv::InstallDriver /NOUNLOAD "$TEMP\altusmetrum.inf"
 
 	SetOutPath $INSTDIR
-	File "../telemetrum.inf"
+	File "../altusmetrum.inf"
 
 	SetOutPath $WINDIR\Inf
-	File "../telemetrum.inf"
+	File "../altusmetrum.inf"
 
 SectionEnd
 
@@ -165,7 +165,7 @@ Section "Uninstall"
 	RMDir "$INSTDIR"
 
 	; Remove .inf file
-	Delete "$WINDIR\Inf\telemetrum.inf"
+	Delete "$WINDIR\Inf\altusmetrum.inf"
 
 	; Remove devices
 	InstDrv::InitDriverSetup /NOUNLOAD {4D36E96D-E325-11CE-BFC1-08002BE10318} AltusMetrumSerial
