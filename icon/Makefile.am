@@ -38,18 +38,18 @@ clean-local:
 
 $(AM_FILES): altusmetrum.build
 
-altusmetrum.build: altusmetrum.svg make-png
-	for i in $(RES); do ./make-png altusmetrum.svg $$i altus-metrum-$$i.png; done && touch $@
+altusmetrum.build: altusmetrum.svg
+	for i in $(RES); do rsvg-convert -w $$i -h $$i -o altus-metrum-$$i.png altusmetrum.svg; done && touch $@
 
 $(TG_FILES): telegps.build
 
-telegps.build: telegps.svg make-png
-	for i in $(RES); do ./make-png telegps.svg $$i telegps-$$i.png; done && touch $@
+telegps.build: telegps.svg
+	for i in $(RES); do rsvg-convert -w $$i -h $$i -o telegps-$$i.png telegps.svg; done && touch $@
 
 $(MP_FILES): micropeak.build
 
-micropeak.build: micropeak.svg make-png
-	for i in $(RES); do ./make-png micropeak.svg $$i micropeak-$$i.png; done && touch $@
+micropeak.build: micropeak.svg
+	for i in $(RES); do rsvg-convert -w $$i -h $$i -o micropeak-$$i.png micropeak.svg; done && touch $@
 
 #clean-local:
 #	$(RM) -f $(ICO_FILES)

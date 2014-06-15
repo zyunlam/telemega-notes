@@ -11,12 +11,12 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg2"
-   width="191.28"
-   height="245.28"
+   width="214.27165"
+   height="266.00192"
    version="1.0"
    sodipodi:version="0.32"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="altusmetrum-only.svg"
+   sodipodi:docname="altusmetrum.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/keithp/src/cc1111/altus-logo/bottom.png"
    inkscape:export-xdpi="119.89881"
@@ -29,7 +29,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -171,13 +171,44 @@
        fx="951.68713"
        fy="1205.2668"
        r="951.68701" />
+    <filter
+       id="filter3005"
+       inkscape:label="Drop Shadow"
+       color-interpolation-filters="sRGB">
+      <feFlood
+         id="feFlood3007"
+         flood-opacity="0.604"
+         flood-color="rgb(0,0,0)"
+         result="flood" />
+      <feComposite
+         id="feComposite3009"
+         in2="SourceGraphic"
+         in="flood"
+         operator="in"
+         result="composite1" />
+      <feGaussianBlur
+         id="feGaussianBlur3011"
+         stdDeviation="80"
+         result="blur" />
+      <feOffset
+         id="feOffset3013"
+         dx="100"
+         dy="100"
+         result="offset" />
+      <feComposite
+         id="feComposite3015"
+         in2="offset"
+         in="SourceGraphic"
+         operator="over"
+         result="composite2" />
+    </filter>
   </defs>
   <sodipodi:namedview
-     inkscape:cy="107.44765"
-     inkscape:cx="270.26251"
-     inkscape:zoom="0.86831672"
-     inkscape:window-height="709"
-     inkscape:window-width="1006"
+     inkscape:cy="128.91168"
+     inkscape:cx="271.89232"
+     inkscape:zoom="2.4559706"
+     inkscape:window-height="1177"
+     inkscape:window-width="1462"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -191,11 +222,15 @@
      inkscape:window-x="266"
      inkscape:window-y="43"
      inkscape:current-layer="svg2"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="20"
+     fit-margin-bottom="20" />
   <g
-     transform="matrix(0.1,0,0,0.1,1.1516425,2.6405446)"
+     transform="matrix(0.1,0,0,0.1,1.967113,2.4742836)"
      id="g3"
-     style="fill:url(#radialGradient3175);fill-opacity:1;stroke:url(#radialGradient3171);stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none">
+     style="fill:url(#radialGradient3175);fill-opacity:1;stroke:url(#radialGradient3171);stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3005)">
     <g
        transform="translate(20.61545,-27.69425)"
        style="fill:url(#radialGradient3028);fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3030);stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
