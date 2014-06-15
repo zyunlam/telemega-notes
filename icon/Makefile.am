@@ -1,6 +1,7 @@
+JAVA_RES=16 32 48 64 128 256
 MAC_RES=16 32 128 256 512
 WIN_RES=16 24 32 48 64 72 96 128 180 256
-RES=$(shell echo $(MAC_RES) $(WIN_RES) | awk '{ for (i = 1; i <= NF; i++) printf("%s\n", $$i); }' | sort -n -u)
+RES=$(shell echo $(JAVA_RES) $(MAC_RES) $(WIN_RES) | awk '{ for (i = 1; i <= NF; i++) printf("%s\n", $$i); }' | sort -n -u)
 
 AM_FILES=$(shell for i in $(RES); do echo altus-metrum-$$i.png; done)
 MP_FILES=$(shell for i in $(RES); do echo micropeak-$$i.png; done)
