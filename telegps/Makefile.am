@@ -74,6 +74,7 @@ ICONJAR= -C $(ICONDIR) telegps-16.png \
 	-C $(ICONDIR) telegps-256.png
 
 WINDOWS_ICON=$(ICONDIR)/telegps.ico
+MACOSX_ICON=$(ICONDIR)/TeleGPS.icns
 
 # Firmware
 FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
@@ -124,7 +125,7 @@ LINUX_EXTRA=telegps-fat telegps.desktop.in
 
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_README) $(DOC)
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_README) $(DOC) $(MACOSX_ICON)
 MACOSX_EXTRA=$(FIRMWARE)
 
 WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/telemetrum.inf $(DOC) $(WINDOWS_ICON)
@@ -264,9 +265,11 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	mkdir macosx
 	cp -a TeleGPS.app macosx/
 	cp -a $(MACOSX_README) macosx/ReadMe.rtf
-	cp -a $(DOC) macosx
+	mkdir -p macosx/Doc
+	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/TeleGPS.app/Contents
 	mkdir -p macosx/AltOS-$(VERSION) macosx/TeleGPS.app/Contents/Resources/Java
+	cp -p $(MACOSX_ICON) macosx/TeleGPS.app/Contents/Resources
 	cp -p $(FATJAR) macosx/TeleGPS.app/Contents/Resources/Java/telegps.jar
 	cp -p libaltos.dylib macosx/TeleGPS.app/Contents/Resources/Java
 	cp -p $(ALTOSLIB_CLASS) macosx/TeleGPS.app/Contents/Resources/Java

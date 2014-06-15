@@ -72,6 +72,7 @@ ICONJAR= -C $(ICONDIR) micropeak-16.png \
 	-C $(ICONDIR) micropeak-256.png
 
 WINDOWS_ICON=$(ICONDIR)/micro-peak.ico
+MACOSX_ICON=$(ICONDIR)/MicroPeak.icns
 
 desktopdir = $(datadir)/applications
 desktop_file = micropeak.desktop
@@ -112,7 +113,7 @@ MACOSX_DRIVER_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver
 MACOSX_DRIVER=FTDIUSBSerialDriver_v2_2_18.dmg
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVER) $(MACOSX_README) $(DOC)
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVER) $(MACOSX_README) $(DOC) $(MACOSX_ICON)
 
 $(MACOSX_DRIVER):
 	wget $(MACOSX_DRIVER_URL)
@@ -260,6 +261,7 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	cp -p Info.plist macosx/MicroPeak.app/Contents
 	cp -p $(MACOSX_DRIVER) macosx
 	mkdir -p macosx/MicroPeak.app/Contents/Resources/Java
+	cp -p $(MACOSX_ICON) macosx/MicroPeak.app/Contents/Resources
 	cp -p $(FATJAR) macosx/MicroPeak.app/Contents/Resources/Java/micropeak.jar
 	cp -p libaltos.dylib macosx/MicroPeak.app/Contents/Resources/Java
 	cp -p $(ALTOSLIB_CLASS) macosx/MicroPeak.app/Contents/Resources/Java
