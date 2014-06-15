@@ -1,0 +1,34 @@
+#!/bin/sh
+
+case $# in
+3)
+	;;
+*)
+	echo "Usage: $0 <input.svg> <size> <output.png>" 1>&2
+	exit 1
+	;;
+esac
+
+SVG=$1
+SIZE=$2
+PNG=$3
+
+SHADOW=$(($SIZE / 16))
+IMAGE=$(($SIZE - $SHADOW))
+
+OPACITY=80
+BLUR=$(($SHADOW / 4))
+SHIFT=$(($SHADOW - $BLUR))
+
+echo SHADOW $SHADOW IMAGE $IMAGE OPACITY $OPACITY SHIFT $SHIFT BLUR $BLUR
+
+TMP=image-$$.png
+
+trap "rm $TMP" 0 1 15
+
+rsvg-convert -w $IMAGE -h $IMAGE -o $TMP $SVG
+
+convert $TMP \
+	\( +clone -background black -shadow ${OPACITY}x${BLUR}+${SHIFT}+${SHIFT} \) \
+	+swap -background none -layers merge -crop ${SIZE}x${SIZE}+0+0 +repage $PNG
+
