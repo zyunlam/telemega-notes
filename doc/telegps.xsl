@@ -1282,7 +1282,8 @@ NAR #88757, TRA #12200
       <title>Mechanical Considerations</title>
       <para>
 	TeleGPS is designed to be rugged enough for typical rocketry
-	applications. 
+	applications.  The 4 mounting holes on the board are sized for 
+	use with 4-40 or M3 screws.
       </para>
     </section>
     <section>
