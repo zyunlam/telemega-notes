@@ -1,11 +1,13 @@
 !addplugindir ../altosui/Instdrv/NSIS/Plugins
-; Definitions for Java 1.6 Detection
-!define JRE_VERSION "1.6"
-!define JRE_ALTERNATE "1.7"
-!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=52247&/jre-6u27-windows-i586-p.exe"
-!define PRODUCT_NAME "Altus Metrum Windows Software"
+!include x64.nsh
+; Definitions for Java 1.7 Detection
+!define JRE_VERSION "1.7"
+!define JRE_ALTERNATE "1.6"
+!define JRE32_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=83383&/jre-7u51-windows-i586.exe"
+!define JRE64_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=83385&/jre-7u51-windows-x64.exe"
+!define PRODUCT_NAME "TeleGPS Windows Software"
 
-Name "Altus Metrum TeleGPS Installer"
+Name "TeleGPS Installer"
 
 ; Default install directory
 InstallDir "$PROGRAMFILES\AltusMetrum"
@@ -21,14 +23,36 @@ RequestExecutionLevel admin
 
 ShowInstDetails Show
 
-ComponentText "Altus Metrum TeleGPS Software Installer"
+ComponentText "TeleGPS Software Installer"
+
+Function .onInit
+	DetailPrint "Checking host operating system"
+	${If} ${RunningX64}
+		DetailPrint "Installer running on 64-bit host"
+		SetRegView 64
+		StrCpy $INSTDIR "$PROGRAMFILES64\AltusMetrum"
+		${DisableX64FSRedirection}
+	${EndIf}
+FunctionEnd
+
+Var JavaDownload
+Var JavaBits
 
 Function GetJRE
-        MessageBox MB_OK "${PRODUCT_NAME} uses Java ${JRE_VERSION} 32-bit, it will now \
-                         be downloaded and installed"
+	${If} ${RunningX64}
+	   StrCpy $JavaDownload ${JRE64_URL}
+	   StrCpy $JavaBits "64"
+	${Else}
+	   StrCpy $JavaDownload ${JRE32_URL}
+	   StrCpy $JavaBits "32"
+	${EndIf}
+
+        MessageBox MB_OK "${PRODUCT_NAME} uses Java ${JRE_VERSION}, \
+			$JavaBits bits, it will now \
+                        be downloaded and installed"
 
         StrCpy $2 "$TEMP\Java Runtime Environment.exe"
-        nsisdl::download /TIMEOUT=30000 ${JRE_URL} $2
+        nsisdl::download /TIMEOUT=30000 $JavaDownload $2
         Pop $R0 ;Get the return value
                 StrCmp $R0 "success" +3
                 MessageBox MB_OK "Download failed: $R0"
@@ -37,10 +61,10 @@ Function GetJRE
         Delete $2
 FunctionEnd
 
-
 Function DetectJRE
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" \
              "CurrentVersion"
+
   StrCmp $2 ${JRE_VERSION} done
 
   StrCmp $2 ${JRE_ALTERNATE} done
