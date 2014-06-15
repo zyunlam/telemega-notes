@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_3.*;
+import org.altusmetrum.altoslib_4.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -125,7 +125,9 @@ public class TabPad extends Fragment implements AltosDroidTab {
 			mDataLoggingLights.set(state.flight != 0, state.flight == AltosLib.MISSING);
 
 			if (state.gps != null) {
-				mGPSLockedView.setText(AltosDroid.integer("%4d sats", state.gps.nsat));
+				int soln = state.gps.nsat;
+				int nsat = state.gps.cc_gps_sat != null ? state.gps.cc_gps_sat.length : 0;
+				mGPSLockedView.setText(String.format("%4d in soln, %4d in view", soln, nsat));
 				mGPSLockedLights.set(state.gps.locked && state.gps.nsat >= 4, false);
 				if (state.gps_ready)
 					mGPSReadyView.setText("Ready");

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_1;
+package org.altusmetrum.altosuilib_2;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -23,7 +23,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_3.*;
+import org.altusmetrum.altoslib_4.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -45,7 +45,7 @@ public class AltosUIEnable extends Container {
 
 	class GraphElement implements ActionListener {
 		AltosUIGrapher	grapher;
-		JRadioButton	enable;
+		JCheckBox	enable;
 		String		name;
 
 		public void actionPerformed(ActionEvent ae) {
@@ -55,8 +55,8 @@ public class AltosUIEnable extends Container {
 		GraphElement (String name, AltosUIGrapher grapher, boolean enabled) {
 			this.name = name;
 			this.grapher = grapher;
-			enable = new JRadioButton(name, enabled);
-			grapher.set_enable(enabled);			  
+			enable = new JCheckBox(name, enabled);
+			grapher.set_enable(enabled);
 			enable.addActionListener(this);
 		}
 	}
@@ -86,10 +86,10 @@ public class AltosUIEnable extends Container {
 		/* Imperial units setting */
 
 		/* Add label */
-		JRadioButton imperial_units = new JRadioButton("Imperial Units", AltosUIPreferences.imperial_units());
+		JCheckBox imperial_units = new JCheckBox("Imperial Units", AltosUIPreferences.imperial_units());
 		imperial_units.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					JRadioButton item = (JRadioButton) e.getSource();
+					JCheckBox item = (JCheckBox) e.getSource();
 					boolean enabled = item.isSelected();
 					AltosUIPreferences.set_imperial_units(enabled);
 				}

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.util.concurrent.*;
 
@@ -27,6 +27,18 @@ public class AltosIMU implements Cloneable {
 	public double		gyro_x;
 	public double		gyro_y;
 	public double		gyro_z;
+
+/*
+ * XXX use ground measurements to adjust values
+
+	public double		ground_accel_x;
+	public double		ground_accel_y;
+	public double		ground_accel_z;
+
+	public double		ground_gyro_x;
+	public double		ground_gyro_y;
+	public double		ground_gyro_z;
+*/
 
 	public static int	counts_per_g = 2048;
 

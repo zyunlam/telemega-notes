@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.util.*;
 import java.io.*;
@@ -79,6 +79,7 @@ public class AltosLib {
 	public static final int ao_flight_main = 7;
 	public static final int ao_flight_landed = 8;
 	public static final int ao_flight_invalid = 9;
+	public static final int ao_flight_stateless = 10;
 
 	/* USB product IDs */
 	public final static int vendor_altusmetrum = 0xfffe;
@@ -187,6 +188,7 @@ public class AltosLib {
 		string_to_state.put("main", ao_flight_main);
 		string_to_state.put("landed", ao_flight_landed);
 		string_to_state.put("invalid", ao_flight_invalid);
+		string_to_state.put("stateless", ao_flight_stateless);
 		map_initialized = true;
 	}
 
@@ -203,7 +205,7 @@ public class AltosLib {
 		throw new IllegalArgumentException(String.format("Invalid telemetry %d",
 								 telemetry));
 	}
-	
+
 	private static String[] state_to_string = {
 		"startup",
 		"idle",
@@ -215,6 +217,7 @@ public class AltosLib {
 		"main",
 		"landed",
 		"invalid",
+		"stateless",
 	};
 
 	private static String[] state_to_string_capital = {
@@ -228,6 +231,7 @@ public class AltosLib {
 		"Main",
 		"Landed",
 		"Invalid",
+		"Stateless",
 	};
 
 	public static int state(String state) {
@@ -265,6 +269,7 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_EASYMINI = 6;
 	public static final int AO_LOG_FORMAT_TELEMETRUM = 7;
 	public static final int AO_LOG_FORMAT_TELEMINI = 8;
+	public static final int AO_LOG_FORMAT_TELEGPS = 9;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {
@@ -478,5 +483,9 @@ public class AltosLib {
 		case product_telemini: return "TeleMini";
 		default: return "unknown";
 		}
+	}
+
+	public static String ignitor_name(int i) {
+		return String.format("Ignitor %c", 'A' + i);
 	}
 }

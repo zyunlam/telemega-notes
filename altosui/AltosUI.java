@@ -22,8 +22,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_3.*;
-import org.altusmetrum.altosuilib_1.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
 public class AltosUI extends AltosUIFrame {
 	public AltosVoice voice = new AltosVoice();
@@ -72,6 +72,10 @@ public class AltosUI extends AltosUIFrame {
 						      "Interrupted exception",
 						      JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	public void scan_device_selected(AltosDevice device) {
+		telemetry_window(device);
 	}
 
 	Container	pane;
@@ -233,7 +237,7 @@ public class AltosUI extends AltosUIFrame {
 		});
 
 		setLocationByPlatform(false);
-		
+
 		/* Insets aren't set before the window is visible */
 		setVisible(true);
 	}
@@ -272,11 +276,11 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	void ScanChannels() {
-		new AltosScanUI(AltosUI.this);
+		new AltosScanUI(AltosUI.this, true);
 	}
 
 	void LoadMaps() {
-		new AltosSiteMapPreload(AltosUI.this);
+		new AltosUIMapPreload(AltosUI.this);
 	}
 
 	void LaunchController() {
@@ -302,7 +306,7 @@ public class AltosUI extends AltosUIFrame {
 	 * a TeleDongle over the packet link
 	 */
 	private void SaveFlightData() {
-		new AltosEepromManage(AltosUI.this);
+		new AltosEepromManage(AltosUI.this, AltosLib.product_any);
 	}
 
 	/* Load a flight log file and write out a CSV file containing
@@ -468,7 +472,7 @@ public class AltosUI extends AltosUIFrame {
 		}
 		return false;
 	}
-	
+
 	static boolean process_summary(File file) {
 		AltosStateIterable states = record_iterable(file);
 		if (states == null)
@@ -547,7 +551,7 @@ public class AltosUI extends AltosUIFrame {
 		System.out.printf("    --kml\tgenerate KML output for use with Google Earth\n");
 		System.exit(code);
 	}
-	
+
 	public static void main(final String[] args) {
 		int	errors = 0;
 		load_library(null);
@@ -574,7 +578,7 @@ public class AltosUI extends AltosUIFrame {
 					} else {
 						double lat = Double.parseDouble(args[i+1]);
 						double lon = Double.parseDouble(args[i+2]);
-						AltosSiteMap.prefetchMaps(lat, lon);
+//						AltosSiteMap.prefetchMaps(lat, lon);
 						i += 2;
 					}
 				} else if (args[i].equals("--replay"))

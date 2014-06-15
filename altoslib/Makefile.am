@@ -1,4 +1,4 @@
-AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -source 6
+AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked -source 6
 
 JAVAROOT=bin
 
@@ -28,9 +28,11 @@ altoslib_JAVA = \
 	AltosLib.java \
 	AltosCompanion.java \
 	AltosConfigData.java \
+	AltosConfigDataException.java \
 	AltosConfigValues.java \
 	AltosConvert.java \
 	AltosCRCException.java \
+	AltosCSV.java \
 	AltosDebug.java \
 	AltosEeprom.java \
 	AltosEepromChunk.java \
@@ -45,11 +47,13 @@ altoslib_JAVA = \
 	AltosEepromMega.java \
 	AltosEepromMetrum2.java \
 	AltosEepromMini.java \
+	AltosEepromGPS.java \
 	AltosEepromMonitor.java \
 	AltosFile.java \
 	AltosFlash.java \
 	AltosFlashListener.java \
 	AltosFlightReader.java \
+	AltosFlightStats.java \
 	AltosFrequency.java \
 	AltosGPS.java \
 	AltosGPSSat.java \
@@ -62,6 +66,7 @@ altoslib_JAVA = \
 	AltosIdleMonitorListener.java \
 	AltosIgnite.java \
 	AltosIMU.java \
+	AltosKML.java \
 	AltosLine.java \
 	AltosLink.java \
 	AltosListenerState.java \
@@ -114,7 +119,12 @@ altoslib_JAVA = \
 	AltosSpeed.java \
 	AltosTemperature.java \
 	AltosAccel.java \
-	AltosPyro.java
+	AltosVoltage.java \
+	AltosLocation.java \
+	AltosLatitude.java \
+	AltosLongitude.java \
+	AltosPyro.java \
+	AltosWriter.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar
 

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 
@@ -144,7 +144,7 @@ public class AltosRomconfig {
 		ao_romconfig_check,
 		ao_serial_number
 	};
-		
+
 	private static boolean name_required(String name) {
 		for (String required : required_names)
 			if (name.equals(required))

@@ -18,12 +18,16 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define HAS_RADIO	1
+#define HAS_RADIO		1
+#define DISABLE_LOG_SPACE	1
 
 #if defined(TELEMETRUM_V_1_0)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		1
 	#define HAS_USB			1
 	#define HAS_BEEP		1
+	#define HAS_BEEP_CONFIG		0
 	#define HAS_GPS			1
 	#define HAS_SERIAL_1		1
 	#define HAS_ADC			1
@@ -55,9 +59,13 @@
 #endif
 
 #if defined(TELEMETRUM_V_1_1)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		1
 	#define HAS_USB			1
 	#define HAS_BEEP		1
+	#define HAS_BEEP_CONFIG		0
+	#define HAS_BATTERY_REPORT	1
 	#define HAS_GPS			1
 	#define HAS_SERIAL_1		1
 	#define HAS_ADC			1
@@ -91,9 +99,13 @@
 #endif
 
 #if defined(TELEMETRUM_V_1_2)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		1
 	#define HAS_USB			1
 	#define HAS_BEEP		1
+	#define HAS_BEEP_CONFIG		0
+	#define HAS_BATTERY_REPORT	1
 	#define HAS_GPS			1
 	#define HAS_SERIAL_1		1
 	#define HAS_ADC			1
@@ -155,6 +167,8 @@
 #endif
 
 #if defined(TELEMINI_V_1_0)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		1
 	#define HAS_USB			0
 	#define HAS_BEEP		0
@@ -182,6 +196,8 @@
 #endif
 
 #if defined(TELENANO_V_0_1)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		1
 	#define HAS_USB			0
 	#define HAS_BEEP		0
@@ -207,9 +223,12 @@
 #endif
 
 #if defined(TELEMETRUM_V_0_1)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		1
 	#define HAS_USB			1
 	#define HAS_BEEP		1
+	#define HAS_BEEP_CONFIG		0
 	#define HAS_GPS			1
 	#define HAS_SERIAL_1		1
 	#define HAS_ADC			1
@@ -237,6 +256,8 @@
 #endif
 
 #if defined(TELEDONGLE_V_0_1)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		0
 	#define HAS_USB			1
 	#define HAS_BEEP		0
@@ -265,6 +286,8 @@
 #endif
 
 #if defined(TIDONGLE)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		0
 	#define HAS_USB			1
 	#define HAS_BEEP		0
@@ -292,6 +315,8 @@
 #endif
 
 #if defined(TELEBT_V_0_0)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		0
 	#define HAS_USB			1
 	#define HAS_BEEP		0
@@ -328,9 +353,12 @@
 #endif
 
 #if defined(TELEBT_V_0_1)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		0
 	#define HAS_USB			1
 	#define HAS_BEEP		1
+	#define HAS_BEEP_CONFIG		0
 	#define HAS_SERIAL_1		1
 	#define HAS_SERIAL_1_ALT_1	1
 	#define HAS_SERIAL_1_ALT_2	0
@@ -371,6 +399,8 @@
 #endif
 
 #if defined(TELELAUNCH_V_0_1)
+	/* Discontinued and was never built with CC1111 chips needing this */
+	#define NEEDS_CC1111_CLOCK_HACK	0
 	#define HAS_FLIGHT		0
 	#define HAS_USB			1
 	#define HAS_BEEP		1
@@ -571,5 +601,22 @@ struct ao_adc {
 	uint16_t	accel_ref;	/* acceleration reference */
 #endif
 };
+
+/*
+ * Voltage divider on ADC battery sampler
+ */
+#define AO_BATTERY_DIV_PLUS	5	/* 5k */
+#define AO_BATTERY_DIV_MINUS	10	/* 10k */
+
+/*
+ * Voltage divider on ADC igniter samplers
+ */
+#define AO_IGNITE_DIV_PLUS	100	/* 100k */
+#define AO_IGNITE_DIV_MINUS	27	/* 27k */
+
+/*
+ * ADC reference in decivolts
+ */
+#define AO_ADC_REFERENCE_DV	33
 
 #endif /* _AO_PINS_H_ */

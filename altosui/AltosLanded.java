@@ -21,216 +21,94 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import org.altusmetrum.altoslib_3.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
-public class AltosLanded extends JComponent implements AltosFlightDisplay, ActionListener {
-	GridBagLayout	layout;
+public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 
-	public class LandedValue {
-		JLabel		label;
-		JTextField	value;
-		void show(AltosState state, AltosListenerState listener_state) {}
-
-		void reset() {
-			value.setText("");
+	class Bearing extends AltosUIIndicator {
+		public void show (AltosState state, AltosListenerState listener_state) {
+			if (state.from_pad != null && state.from_pad.bearing != AltosLib.MISSING) {
+				show( String.format("%3.0f°", state.from_pad.bearing),
+				      state.from_pad.bearing_words(
+					      AltosGreatCircle.BEARING_LONG));
+			} else {
+				show("Missing", "Missing");
+			}
 		}
-
-		void show() {
-			label.setVisible(true);
-			value.setVisible(true);
-		}
-
-		void show(String s) {
-			show();
-			value.setText(s);
-		}
-		
-		void show(AltosUnits units, double v) {
-			show(units.show(8, v));
-		}
-
-		void show(String format, double v) {
-			show(String.format(format, v));
-		}
-
-		public void set_font() {
-			label.setFont(Altos.label_font);
-			value.setFont(Altos.value_font);
-		}
-
-		void hide() {
-			label.setVisible(false);
-			value.setVisible(false);
-		}
-
-		public LandedValue (GridBagLayout layout, int y, String text) {
-			GridBagConstraints	c = new GridBagConstraints();
-			c.weighty = 1;
-
-			label = new JLabel(text);
-			label.setFont(Altos.label_font);
-			label.setHorizontalAlignment(SwingConstants.LEFT);
-			c.gridx = 0; c.gridy = y;
-			c.insets = new Insets(10, 10, 10, 10);
-			c.anchor = GridBagConstraints.WEST;
-			c.weightx = 0;
-			c.fill = GridBagConstraints.VERTICAL;
-			layout.setConstraints(label, c);
-			add(label);
-
-			value = new JTextField(Altos.text_width);
-			value.setFont(Altos.value_font);
-			value.setHorizontalAlignment(SwingConstants.RIGHT);
-			c.gridx = 1; c.gridy = y;
-			c.anchor = GridBagConstraints.WEST;
-			c.weightx = 1;
-			c.fill = GridBagConstraints.BOTH;
-			layout.setConstraints(value, c);
-			add(value);
+		public Bearing (Container container, int y) {
+			super (container, y, "Bearing", 2);
 		}
 	}
 
-	String pos(double p, String pos, String neg) {
-		String	h = pos;
-		if (p < 0) {
-			h = neg;
-			p = -p;
-		}
-		int deg = (int) Math.floor(p);
-		double min = (p - Math.floor(p)) * 60.0;
-		return String.format("%s %4d° %9.6f", h, deg, min);
-	}
-
-	class Lat extends LandedValue {
-		void show (AltosState state, AltosListenerState listener_state) {
-			show();
-			if (state.gps != null && state.gps.connected && state.gps.lat != AltosLib.MISSING)
-				show(pos(state.gps.lat,"N", "S"));
-			else
-				show("???");
-		}
-		public Lat (GridBagLayout layout, int y) {
-			super (layout, y, "Latitude");
-		}
-	}
-
-	Lat lat;
-
-	class Lon extends LandedValue {
-		void show (AltosState state, AltosListenerState listener_state) {
-			show();
-			if (state.gps != null && state.gps.connected && state.gps.lon != AltosLib.MISSING)
-				show(pos(state.gps.lon,"E", "W"));
-			else
-				show("???");
-		}
-		public Lon (GridBagLayout layout, int y) {
-			super (layout, y, "Longitude");
-		}
-	}
-
-	Lon lon;
-
-	class Bearing extends LandedValue {
-		void show (AltosState state, AltosListenerState listener_state) {
-			show();
+	class Distance extends AltosUIUnitsIndicator {
+		public double value(AltosState state, int i) {
 			if (state.from_pad != null)
-				show("%3.0f°", state.from_pad.bearing);
+				return state.from_pad.distance;
 			else
-				show("???");
+				return AltosLib.MISSING;
 		}
-		public Bearing (GridBagLayout layout, int y) {
-			super (layout, y, "Bearing");
-		}
-	}
 
-	Bearing bearing;
-
-	class Distance extends LandedValue {
-		void show (AltosState state, AltosListenerState listener_state) {
-			show();
-			if (state.from_pad != null)
-				show(AltosConvert.distance, state.from_pad.distance);
-			else
-				show("???");
-		}
-		public Distance (GridBagLayout layout, int y) {
-			super (layout, y, "Distance");
+		public Distance(Container container, int y) {
+			super(container, y, AltosConvert.distance, "Ground Distance", 2);
 		}
 	}
 
-	Distance distance;
+	class Lat extends AltosUIUnitsIndicator {
 
-	class Height extends LandedValue {
-		void show (AltosState state, AltosListenerState listener_state) {
-			show(AltosConvert.height, state.max_height());
-		}
-		public Height (GridBagLayout layout, int y) {
-			super (layout, y, "Maximum Height");
-		}
-	}
+		public boolean hide (AltosState state, int i) { return state.gps == null || !state.gps.connected; }
 
-	Height	height;
-
-	class Speed extends LandedValue {
-		void show (AltosState state, AltosListenerState listener_state) {
-			show(AltosConvert.speed, state.max_speed());
+		public double value(AltosState state, int i) {
+			if (state.gps == null)
+				return AltosLib.MISSING;
+			if (!state.gps.connected)
+				return AltosLib.MISSING;
+			return state.gps.lat;
 		}
-		public Speed (GridBagLayout layout, int y) {
-			super (layout, y, "Maximum Speed");
+
+		public Lat (Container container, int y) {
+			super (container, y, AltosConvert.latitude, "Latitude", 2);
 		}
 	}
 
-	Speed	speed;
+	class Lon extends AltosUIUnitsIndicator {
+		public boolean hide (AltosState state, int i) { return state.gps == null || !state.gps.connected; }
 
-	class Accel extends LandedValue {
-		void show (AltosState state, AltosListenerState listener_state) {
-			show(AltosConvert.accel, state.max_acceleration());
+		public double value(AltosState state, int i) {
+			if (state.gps == null)
+				return AltosLib.MISSING;
+			if (!state.gps.connected)
+				return AltosLib.MISSING;
+			return state.gps.lon;
 		}
-		public Accel (GridBagLayout layout, int y) {
-			super (layout, y, "Maximum Acceleration");
+
+		public Lon (Container container, int y) {
+			super (container, y, AltosConvert.longitude, "Longitude", 2);
 		}
 	}
 
-	Accel	accel;
+	class MaxHeight extends AltosUIUnitsIndicator {
+		public double value(AltosState state, int i) { return state.max_height(); }
 
-	public void reset() {
-		lat.reset();
-		lon.reset();
-		bearing.reset();
-		distance.reset();
-		height.reset();
-		speed.reset();
-		accel.reset();
-	}
-
-	public void set_font() {
-		lat.set_font();
-		lon.set_font();
-		bearing.set_font();
-		distance.set_font();
-		height.set_font();
-		speed.set_font();
-		accel.set_font();
-	}
-
-	public void show(AltosState state, AltosListenerState listener_state) {
-		if (state.gps != null && state.gps.connected) {
-			bearing.show(state, listener_state);
-			distance.show(state, listener_state);
-			lat.show(state, listener_state);
-			lon.show(state, listener_state);
-		} else {
-			bearing.hide();
-			distance.hide();
-			lat.hide();
-			lon.hide();
+		public MaxHeight (Container container, int y) {
+			super (container, y, AltosConvert.height, "Maximum Height", 2);
 		}
-		height.show(state, listener_state);
-		speed.show(state, listener_state);
-		accel.show(state, listener_state);
-		if (reader.backing_file() != null)
-			graph.setEnabled(true);
+	}
+
+	class MaxSpeed extends AltosUIUnitsIndicator {
+		public double value(AltosState state, int i) { return state.max_speed(); }
+
+		public MaxSpeed (Container container, int y) {
+			super (container, y, AltosConvert.speed, "Maximum Speed", 2);
+		}
+	}
+
+	class MaxAccel extends AltosUIUnitsIndicator {
+		public double value(AltosState state, int i) { return state.max_acceleration(); }
+
+		public MaxAccel (Container container, int y) {
+			super (container, y, AltosConvert.speed, "Maximum acceleration", 2);
+		}
 	}
 
 	JButton	graph;
@@ -274,20 +152,16 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 	}
 
 	public AltosLanded(AltosFlightReader in_reader) {
-		layout = new GridBagLayout();
-
 		reader = in_reader;
 
-		setLayout(layout);
-
 		/* Elements in descent display */
-		bearing = new Bearing(layout, 0);
-		distance = new Distance(layout, 1);
-		lat = new Lat(layout, 2);
-		lon = new Lon(layout, 3);
-		height = new Height(layout, 4);
-		speed = new Speed(layout, 5);
-		accel = new Accel(layout, 6);
+		add(new Bearing(this, 0));
+		add(new Distance(this, 1));
+		add(new Lat(this, 2));
+		add(new Lon(this, 3));
+		add(new MaxHeight(this, 4));
+		add(new MaxSpeed(this, 5));
+		add(new MaxAccel(this, 6));
 
 		graph = new JButton ("Graph Flight");
 		graph.setActionCommand("graph");
@@ -296,12 +170,13 @@ public class AltosLanded extends JComponent implements AltosFlightDisplay, Actio
 
 		GridBagConstraints	c = new GridBagConstraints();
 
-		c.gridx = 0; c.gridy = 7;
+		c.gridx = 1; c.gridy = 7;
 		c.insets = new Insets(10, 10, 10, 10);
 		c.anchor = GridBagConstraints.WEST;
 		c.weightx = 0;
 		c.weighty = 0;
 		c.fill = GridBagConstraints.VERTICAL;
 		add(graph, c);
+		addHierarchyListener(this);
 	}
 }

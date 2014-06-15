@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.*;
@@ -55,7 +55,7 @@ public class AltosPreferences {
 
 	/* Launcher channel preference name */
 	public final static String launcherChannelPreference = "LAUNCHER-CHANNEL";
-	
+
 	/* Default logdir is ~/TeleMetrum */
 	public final static String logdirName = "TeleMetrum";
 
@@ -349,7 +349,7 @@ public class AltosPreferences {
 			return launcher_channel;
 		}
 	}
-	
+
 	public static AltosPreferencesBackend bt_devices() {
 		synchronized (backend) {
 			return backend.node("bt_devices");

@@ -601,6 +601,14 @@ static const uint8_t ublox_enable_nav[] = {
 };
 
 void
+ao_gps_set_rate(uint8_t rate)
+{
+	uint8_t	i;
+	for (i = 0; i < sizeof (ublox_enable_nav); i++)
+		ao_ublox_set_message_rate(UBLOX_NAV, ublox_enable_nav[i], rate);
+}
+
+void
 ao_gps(void) __reentrant
 {
 	uint8_t			class, id;
@@ -616,8 +624,7 @@ ao_gps(void) __reentrant
 		ao_ublox_set_message_rate(UBLOX_NAV, ublox_disable_nav[i], 0);
 
 	/* Enable all of the messages we want */
-	for (i = 0; i < sizeof (ublox_enable_nav); i++)
-		ao_ublox_set_message_rate(UBLOX_NAV, ublox_enable_nav[i], 1);
+	ao_gps_set_rate(1);
 
 	ao_ublox_set_navigation_settings((1 << UBLOX_CFG_NAV5_MASK_DYN) | (1 << UBLOX_CFG_NAV5_MASK_FIXMODE),
 					 UBLOX_CFG_NAV5_DYNMODEL_AIRBORNE_4G,
@@ -713,7 +720,7 @@ ao_gps(void) __reentrant
 				ao_gps_data.flags |= AO_GPS_RUNNING;
 				if (nav_sol.gps_fix & (1 << NAV_SOL_FLAGS_GPSFIXOK)) {
 					uint8_t	nsat = nav_sol.nsat;
-					ao_gps_data.flags |= AO_GPS_VALID;
+					ao_gps_data.flags |= AO_GPS_VALID | AO_GPS_COURSE_VALID;
 					if (nsat > 15)
 						nsat = 15;
 					ao_gps_data.flags |= nsat;

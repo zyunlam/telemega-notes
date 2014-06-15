@@ -22,8 +22,16 @@
 
 #define HAS_FLIGHT		1
 #define HAS_USB			1
+
+#define HAS_USB_PULLUP	1
+#define AO_USB_PULLUP_PORT	P1
+#define AO_USB_PULLUP_PIN	0
+#define AO_USB_PULLUP		P1_0
+
 #define USB_FORCE_FLIGHT_IDLE	1
 #define HAS_BEEP		1
+#define HAS_BEEP_CONFIG		0
+#define HAS_BATTERY_REPORT	1
 #define HAS_GPS			0
 #define HAS_SERIAL_1		0
 #define HAS_EEPROM		1
@@ -32,9 +40,8 @@
 #define HAS_DBG			0
 #define PACKET_HAS_SLAVE	1
 
-#define AO_LED_GREEN		1
 #define AO_LED_RED		2
-#define LEDS_AVAILABLE		(AO_LED_RED|AO_LED_GREEN)
+#define LEDS_AVAILABLE		AO_LED_RED
 #define HAS_EXTERNAL_TEMP	0
 #define HAS_ACCEL		0
 #define HAS_IGNITE		1
@@ -157,5 +164,22 @@ struct ao_adc {
 		ao_data_ring[ao_data_head].ms5607_raw.pres = ao_ms5607_current.pres; \
 		ao_data_ring[ao_data_head].ms5607_raw.temp = ao_ms5607_current.temp; \
 	} while (0)
+
+/*
+ * Voltage divider on ADC battery sampler
+ */
+#define AO_BATTERY_DIV_PLUS	100	/* 100k */
+#define AO_BATTERY_DIV_MINUS	27	/* 27k */
+
+/*
+ * Voltage divider on ADC igniter samplers
+ */
+#define AO_IGNITE_DIV_PLUS	100	/* 100k */
+#define AO_IGNITE_DIV_MINUS	27	/* 27k */
+
+/*
+ * ADC reference in decivolts
+ */
+#define AO_ADC_REFERENCE_DV	33
 
 #endif /* _AO_PINS_H_ */

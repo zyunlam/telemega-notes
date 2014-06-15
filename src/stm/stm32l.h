@@ -176,12 +176,27 @@ stm_gpio_get_all(struct stm_gpio *gpio) {
 	return gpio->idr;
 }
 
-extern struct stm_gpio stm_gpioa;
-extern struct stm_gpio stm_gpiob;
-extern struct stm_gpio stm_gpioc;
-extern struct stm_gpio stm_gpiod;
-extern struct stm_gpio stm_gpioe;
-extern struct stm_gpio stm_gpioh;
+/*
+ * We can't define these in registers.ld or our fancy
+ * ao_enable_gpio macro will expand into a huge pile of code
+ * as the compiler won't do correct constant folding and
+ * dead-code elimination
+
+ extern struct stm_gpio stm_gpioa;
+ extern struct stm_gpio stm_gpiob;
+ extern struct stm_gpio stm_gpioc;
+ extern struct stm_gpio stm_gpiod;
+ extern struct stm_gpio stm_gpioe;
+ extern struct stm_gpio stm_gpioh;
+
+*/
+
+#define stm_gpioh  (*((struct stm_gpio *) 0x40021400))
+#define stm_gpioe  (*((struct stm_gpio *) 0x40021000))
+#define stm_gpiod  (*((struct stm_gpio *) 0x40020c00))
+#define stm_gpioc  (*((struct stm_gpio *) 0x40020800))
+#define stm_gpiob  (*((struct stm_gpio *) 0x40020400))
+#define stm_gpioa  (*((struct stm_gpio *) 0x40020000))
 
 struct stm_usart {
 	vuint32_t	sr;	/* status register */
@@ -1491,6 +1506,36 @@ extern struct stm_temp_cal	stm_temp_cal;
 
 #define stm_temp_cal_cold	25
 #define stm_temp_cal_hot	110
+
+struct stm_dbg_mcu {
+	uint32_t	idcode;
+};
+
+extern struct stm_dbg_mcu	stm_dbg_mcu;
+
+static inline uint16_t
+stm_dev_id(void) {
+	return stm_dbg_mcu.idcode & 0xfff;
+}
+
+struct stm_flash_size {
+	uint16_t	f_size;
+};
+
+extern struct stm_flash_size	stm_flash_size_medium;
+extern struct stm_flash_size	stm_flash_size_large;
+
+/* Returns flash size in bytes */
+extern uint32_t
+stm_flash_size(void);
+
+struct stm_device_id {
+	uint32_t	u_id0;
+	uint32_t	u_id1;
+	uint32_t	u_id2;
+};
+
+extern struct stm_device_id	stm_device_id;
 
 #define STM_NUM_I2C	2
 

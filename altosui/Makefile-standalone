@@ -181,7 +181,7 @@ $(DARWIN_ZIP): $(DARWIN_FILES)
 	cp $(DARWIN_EXTRA) darwin/AltOS
 	cd darwin && zip -r ../$@ AltosUI.app AltOS
 
-WINDOWS_FILES = $(FAT_FILES) libaltos/altos.dll ../telemetrum.inf $(WINDOWS_ICON)
+WINDOWS_FILES = $(FAT_FILES) libaltos/altos.dll ../altusmetrum.inf $(WINDOWS_ICON)
 
 $(WINDOWS_EXE): $(WINDOWS_FILES) altos-windows.nsi
 	rm -f $@

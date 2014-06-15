@@ -2,11 +2,14 @@
 # Tiny AltOS build
 #
 #
-vpath % ../attiny:../drivers:../core:../product:..
+vpath % ../attiny:../drivers:../kernel:../product:..
 vpath ao-make-product.5c ../util
 vpath make-altitude-pa ../util
 
 include ../avr/Makefile.defs
+
+PUBLISH_DIR=$(HOME)/altusmetrumllc/Binaries
+PUBLISH_FILE=$(PUBLISH_DIR)/$(PROG)-$(VERSION).hex
 
 MCU=attiny85
 DUDECPUTYPE=t85
@@ -47,7 +50,7 @@ INC=\
 IDPRODUCT=0
 PRODUCT=MicroPeak-v0.1
 PRODUCT_DEF=-DMICROPEAK
-CFLAGS = $(PRODUCT_DEF) -I. -I../attiny -I../core -I.. -I../drivers -I../product
+CFLAGS = $(PRODUCT_DEF) -I. -I../attiny -I../kernel -I.. -I../drivers -I../product
 CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -O2 -mcall-prologues -DATTINY
 
 NICKLE=nickle
@@ -97,6 +100,16 @@ distclean:	clean
 clean:
 	rm -f *.o $(PROG) $(PROG).hex
 	rm -f ao_product.h
+
+
+publish: $(PROG).hex
+	cp -a $(PROG).hex $(PUBLISH_FILE)
+
+load-product:
+	$(LOADCMD) $(LOADARG)$(PUBLISH_FILE)
+
+load-product-slow:
+	$(LOADCMD) $(LOADSLOW) $(LOADARG)$(PUBLISH_FILE)
 
 ../altitude-pa.h: make-altitude-pa
 	nickle $< > $@

@@ -83,25 +83,57 @@ ao_timer_init(void)
 	T1CTL = T1CTL_MODE_MODULO | T1CTL_DIV_8;
 }
 
+#ifndef NEEDS_CC1111_CLOCK_HACK
+#define NEEDS_CC1111_CLOCK_HACK		1
+#endif
+
+#if NEEDS_CC1111_CLOCK_HACK
+static void
+ao_clock_delay(void)
+{
+	uint16_t	i = 0;
+
+	while (--i)
+		ao_arch_nop();
+}
+#endif
+
 /*
  * AltOS always cranks the clock to the max frequency
  */
 void
 ao_clock_init(void)
 {
+#if NEEDS_CC1111_CLOCK_HACK
+	/* Power up both oscillators */
+	SLEEP &= ~(SLEEP_OSC_PD);
+
+	/* Switch to the HFRC oscillator */
+	CLKCON = (CLKCON & ~CLKCON_OSC_MASK) | (CLKCON_OSC_RC);
+
+	/* Wait for the HFRC oscillator to be stable */
+	while (!(SLEEP & SLEEP_HFRC_STB))
+		;
+
+	/* Delay for 'a while' waiting for the crystal to
+	 * stabilize -- the XOSC_STB bit isn't reliable
+	 *
+	 *  http://www.ti.com/lit/er/swrz022c/swrz022c.pdf
+	 */
+
+	ao_clock_delay();
+#endif
+
 	/* Switch system clock to crystal oscilator */
 	CLKCON = (CLKCON & ~CLKCON_OSC_MASK) | (CLKCON_OSC_XTAL);
 
+	/* Wait for the HFRC oscillator to be stable */
 	while (!(SLEEP & SLEEP_XOSC_STB))
 		;
 
 	/* Power down the unused HFRC oscillator */
 	SLEEP |= SLEEP_OSC_PD;
 
-	/* Wait for HFRC to power down */
-	while ((SLEEP & SLEEP_HFRC_STB) != 0)
-		;
-	
 	/* Crank up the timer tick and system clock speed */
 	CLKCON = ((CLKCON & ~(CLKCON_TICKSPD_MASK | CLKCON_CLKSPD_MASK)) |
 		  (CLKCON_TICKSPD_1 | CLKCON_CLKSPD_1));

@@ -19,16 +19,27 @@ package altosui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_3.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
 public class AltosFlightStatus extends JComponent implements AltosFlightDisplay {
 	GridBagLayout	layout;
 
-	public class FlightValue {
+	public abstract class FlightValue {
 		JLabel		label;
 		JTextField	value;
 
-		void show(AltosState state, AltosListenerState listener_state) {}
+		void show() {
+			label.setVisible(true);
+			value.setVisible(true);
+		}
+
+		void hide() {
+			label.setVisible(false);
+			value.setVisible(false);
+		}
+
+		abstract void show(AltosState state, AltosListenerState listener_state);
 
 		void reset() {
 			value.setText("");
@@ -37,6 +48,11 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		void set_font() {
 			label.setFont(Altos.status_font);
 			value.setFont(Altos.status_font);
+		}
+
+		void setVisible(boolean visible) {
+			label.setVisible(visible);
+			value.setVisible(visible);
 		}
 
 		public FlightValue (GridBagLayout layout, int x, String text) {
@@ -55,6 +71,7 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 			add(label);
 
 			value = new JTextField("");
+			value.setEditable(false);
 			value.setFont(Altos.status_font);
 			value.setHorizontalAlignment(SwingConstants.CENTER);
 			c.gridx = x; c.gridy = 1;
@@ -64,9 +81,33 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	}
 
 	class Call extends FlightValue {
-		void show(AltosState state, AltosListenerState listener_state) {
-			value.setText(state.callsign);
+
+		String last_call = "";
+
+		boolean same_call(String call) {
+			if (last_call == null)
+				return call == null;
+			else
+				return last_call.equals(call);
 		}
+
+		void show(AltosState state, AltosListenerState listener_state) {
+			if (!same_call(state.callsign)) {
+				show();
+				value.setText(state.callsign);
+				if (state.callsign == null)
+					setVisible(false);
+				else
+					setVisible(true);
+				last_call = state.callsign;
+			}
+		}
+
+		public void reset() {
+			super.reset();
+			last_call = "";
+		}
+
 		public Call (GridBagLayout layout, int x) {
 			super (layout, x, "Callsign");
 		}
@@ -75,12 +116,24 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	Call call;
 
 	class Serial extends FlightValue {
+
+		int	last_serial = -1;
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.serial == AltosLib.MISSING)
-				value.setText("none");
-			else
-				value.setText(String.format("%d", state.serial));
+			if (state.serial != last_serial) {
+				show();
+				if (state.serial == AltosLib.MISSING)
+					value.setText("none");
+				else
+					value.setText(String.format("%d", state.serial));
+				last_serial = state.serial;
+			}
 		}
+
+		public void reset() {
+			super.reset();
+			last_serial = -1;
+		}
+
 		public Serial (GridBagLayout layout, int x) {
 			super (layout, x, "Serial");
 		}
@@ -89,12 +142,25 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	Serial serial;
 
 	class Flight extends FlightValue {
+
+		int	last_flight = -1;
+
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.flight == AltosLib.MISSING)
-				value.setText("none");
-			else
-				value.setText(String.format("%d", state.flight));
+			if (state.flight != last_flight) {
+				show();
+				if (state.flight == AltosLib.MISSING)
+					value.setText("none");
+				else
+					value.setText(String.format("%d", state.flight));
+				last_flight = state.flight;
+			}
 		}
+
+		public void reset() {
+			super.reset();
+			last_flight = -1;
+		}
+
 		public Flight (GridBagLayout layout, int x) {
 			super (layout, x, "Flight");
 		}
@@ -103,9 +169,26 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	Flight flight;
 
 	class FlightState extends FlightValue {
+
+		int	last_state = -1;
+
 		void show(AltosState state, AltosListenerState listener_state) {
-			value.setText(state.state_name());
+			if (state.state != last_state) {
+				if (state.state == AltosLib.ao_flight_stateless)
+					hide();
+				else {
+					show();
+					value.setText(state.state_name());
+				}
+				last_state = state.state;
+			}
 		}
+
+		public void reset() {
+			super.reset();
+			last_state = -1;
+		}
+
 		public FlightState (GridBagLayout layout, int x) {
 			super (layout, x, "State");
 		}
@@ -114,9 +197,26 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	FlightState flight_state;
 
 	class RSSI extends FlightValue {
+
+		int	last_rssi = 10000;
+
 		void show(AltosState state, AltosListenerState listener_state) {
-			value.setText(String.format("%d", state.rssi()));
+			if (state.rssi() != last_rssi) {
+				show();
+				value.setText(String.format("%d", state.rssi()));
+				if (state.rssi == AltosLib.MISSING)
+					setVisible(false);
+				else
+					setVisible(true);
+				last_rssi = state.rssi();
+			}
 		}
+
+		public void reset() {
+			super.reset();
+			last_rssi = 10000;
+		}
+
 		public RSSI (GridBagLayout layout, int x) {
 			super (layout, x, "RSSI");
 		}
@@ -125,10 +225,22 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	RSSI rssi;
 
 	class LastPacket extends FlightValue {
+
+		long	last_secs = -1;
+
 		void show(AltosState state, AltosListenerState listener_state) {
 			long secs = (System.currentTimeMillis() - state.received_time + 500) / 1000;
-			value.setText(String.format("%d", secs));
+			if (secs != last_secs) {
+				value.setText(String.format("%d", secs));
+				last_secs = secs;
+			}
 		}
+
+		public void reset() {
+			super.reset();
+			last_secs = -1;
+		}
+
 		public LastPacket(GridBagLayout layout, int x) {
 			super (layout, x, "Age");
 		}
@@ -145,13 +257,16 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		last_packet.reset();
 	}
 
-	public void set_font () {
+	public void font_size_changed(int font_size) {
 		call.set_font();
 		serial.set_font();
 		flight.set_font();
 		flight_state.set_font();
 		rssi.set_font();
 		last_packet.set_font();
+	}
+
+	public void units_changed(boolean imperial_units) {
 	}
 
 	public void show (AltosState state, AltosListenerState listener_state) {
@@ -167,6 +282,8 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		Dimension d = layout.preferredLayoutSize(this);
 		return d.height;
 	}
+
+	public String getName() { return "Flight Status"; }
 
 	public AltosFlightStatus() {
 		layout = new GridBagLayout();

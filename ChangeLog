@@ -1,3 +1,3170 @@
+commit 97a7cbaee806965ca7c696fb02f6e1d24b026b9b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 15 17:43:06 2014 -0600
+
+    add release to revision history
+
+commit 79c3dc334d79eacd63bbbbec046fc2c31266560c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 15 17:40:27 2014 -0600
+
+    tweaks
+
+commit a6c61fb993d3fd15183f8755d9058f05c606c9c0
+Merge: 0634119 4384899
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 16:31:01 2014 -0700
+
+    Merge remote-tracking branch 'origin/master'
+
+commit 0634119df45bf8d8a040b47bdfc6d9801b5e069a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 16:24:28 2014 -0700
+
+    micropeak: Deal with 64-bit windows
+    
+    Install 64-bit version of java. Install our bits in the 64-bit app directory
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b6eb1ac1b777b6c11e8f24c5ab5915b224101d40
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 16:16:59 2014 -0700
+
+    Add notes about windows driver signing in the 'signing-driver' file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6277827520df4df5ecda58898e5f99035f90282c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 16:11:49 2014 -0700
+
+    altosui: Ship telegps firmware
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b5651d311d4268a130996e71afc11b508e59637
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 16:10:15 2014 -0700
+
+    windows: Sign altusmetrum.inf with altusmetrum.cat
+    
+    This .cat file will need to be updated when we get our 'real'
+    signature.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ef6998c2d052bf639f257b71baefacf3a652506f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 16:06:42 2014 -0700
+
+    icon: Add drop-shadows to the SVG files; stop generating in the png versions
+    
+    Now everyone gets drop shadows.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 43848991defaeb7fae994101675b0056f9d9a2ed
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 15 17:29:49 2014 -0600
+
+    update Releasing document to include TeleGPS firmware files in those copied
+
+commit 90e03dfc8534fc4fc25f6a5ee9ec109b98baa238
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 15 17:28:02 2014 -0600
+
+    document mounting hole size for TeleGPS
+
+commit 44fc36b3f74386f0055eac4d9b9d201e6fff0847
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 16:08:27 2014 -0700
+
+    altosui: Deal with 64-bit windows
+    
+    Get a 64-bit java version installed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1a563026409ccff5dea6f89e567accb09bc4b5f6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 14:09:09 2014 -0700
+
+    telegps: Deal with 64-bit windows differently on install
+    
+    Download a 64-bit version of java as needed, install in 64-bit paths
+    instead of 32-bit paths.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit abf731b3d79b66d9da62496cebf157f2888a4c93
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 15 12:39:49 2014 -0700
+
+    windows: Rename telemetrum.inf to altusmetrum.inf
+    
+    Use the corporate name for this file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8073007292875169a6304824ae52039ce6564813
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 22:29:01 2014 -0700
+
+    telegps: Include telegps firmware in windows package
+    
+    This was disabled when the firmware wasn't ready yet
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6cad0b783f654864f0d6d8726c74605f108db3e0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 22:23:10 2014 -0700
+
+    altosuilib: Remove some debugging printfs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 823ef386f9dc5c5df197936f4254921f2e0282b0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 20:08:40 2014 -0700
+
+    altoslib: AltosFlightStatsTable: another editable text field that shouldn't be
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5392ee3c5328f8384ed30a2d147e4be96075e064
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 18:51:25 2014 -0700
+
+    altosuilib: Serialize access to async tile notify function in preload
+    
+    This ensures that we see each tile getting downloaded and don't
+    mis-count, which would result in wedging the process
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 23708b4760250f55e8e3b1a0141df9a9ee17a936
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 18:34:09 2014 -0700
+
+    icon: Make the icon shadows a bit less harsh
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4e3318645d08dda483aced97450b344629902c4d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 18:11:28 2014 -0700
+
+    debian: Build requires /usr/bin/convert now
+    
+    This is provided by either graphicsmagick or imagemagick
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 382e27de3472489f8f26c8c0868732d67754ecf5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 18:09:31 2014 -0700
+
+    telegps/micropeak: Ship built Mac OSX icons
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 33da986161c38936cff82fe43046f0bcd5e24d8e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 18:07:39 2014 -0700
+
+    icon: Build resolutions needed for Java bits too
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 66c4a091bb6a294f9d406e75f3634492c886d139
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 18:06:36 2014 -0700
+
+    altosui: Build MacOSX icon from svg
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b825ea71ebcc4a8da3e339ab3e21b0ad47f2e48f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 18:02:51 2014 -0700
+
+    icon: Build windows ico files, clean built files
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4ec960b705b87b15d015abb2a9a3e23eee414f1d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 17:51:46 2014 -0700
+
+    icon: Create all icons from .svg files
+    
+    Remove images from repository, leaving only the svg files and build
+    instructions
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 951fda701ed31f4d8390c130215597e8f63e837e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 16:26:22 2014 -0700
+
+    altosuilib: Make graph enable buttons be CheckBoxes instead of RadioButtons
+    
+    aj noticed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8e00f59be582de86cef28b33ce5523f39d3dc933
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 16:05:51 2014 -0700
+
+    telegps: Fix Mac icon file name
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 92943bf4536d4167edd097e61de5e6b4f29130f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 15:44:20 2014 -0700
+
+    micropeak: Make statistics entries un-editable
+    
+    Otherwise you can actually type in the various fields.x
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1fc3032d688cbb7c09c1dffde30cc815f3594e29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 15:20:07 2014 -0700
+
+    alotsuilib: Remove old "mega" and "mini" file extensions from data chooser
+    
+    We never shipped AltosUI which stored mega/mini files in different extensions
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c11b2f5caa3fbe2bc977e716ec1c3ccee9e75884
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:41:13 2014 -0700
+
+    altosui/telegps: Switch to AltosUIIndicator and AltosUIFlightTab
+    
+    Removes replicated code across all flight tabs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f5887a3e7cf993e23dbb1e0f6b9ebece78c34413
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:40:24 2014 -0700
+
+    altosuilib: Add AltosUIFlightTab class
+    
+    This covers most of the common functions for all flight status display tabs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8250777e6e869bcee9781691caa1f2a7cfb33b43
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:39:26 2014 -0700
+
+    altosuilib: Add more options to AltosUIIndicator to suit AltosUI
+    
+    This makes AltosUIIndicator capable of displaying most stuff in AltosUI
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 19273a4a341342ca6b5d65cfc490d92cbf23356f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:38:00 2014 -0700
+
+    altosuilib: Make sure only one thread is closing serial device
+    
+    Multiple closers can cause a crash by freeing the libaltos device twice
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2903f0911e79e381c6125022bb84096321c258eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:37:35 2014 -0700
+
+    altosuilib: provide getName() for AltosInfoTable
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 242e968a6982f2ceaa79780cbeec8c4e21321b44
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:36:49 2014 -0700
+
+    altosuilib: In graph, show zero sats in view as 0 instead of MISSING
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c7553c54765dcc9ac532fe52aae9594b2ad5e560
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:36:11 2014 -0700
+
+    altosuilib: Require all flight display classes to provide a name
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14f0faae48849ff6f1e326a294b54c504c730bb9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:34:59 2014 -0700
+
+    altoslib: When GPS disappears, set range and elevation to MISSING
+    
+    Use MISSING instead of bogus values so that displayers can tell what
+    to do.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 451950bba9ee3b25b5d0c6e5f0b55f08a5b29f73
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 14 14:33:58 2014 -0700
+
+    altoslib: Add units converters for latitude and longitude
+    
+    Makes display of these values consistent across all instances
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ae7084f5199318dc6582e212492a50cfda1cebb8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 22:36:00 2014 -0700
+
+    doc: TeleGPS docs are complete
+    
+    All TeleGPS features should now be documented to some degree
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bfbabfa60f3cedd994f693867bce56aad05be02a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 22:04:57 2014 -0700
+
+    telegps: Allow TeleGPS preferences to have a custom title and label
+    
+    Don't just inherit the AltosUI ones
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 536db8d03aedb45698c42418c50a46d609fc98ad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 22:04:35 2014 -0700
+
+    doc: Add a bunch more stuff to the telegps docs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9a6a3c34293eac6442f766e13ce148f595e891eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 21:26:33 2014 -0700
+
+    altosuilib: Make map-cache per-window instead of global
+    
+    This consumes more memory, but avoids cache conflicts between windows
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 92895c87bc3d97bf4990f1feda0bd8b07da4c405
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 21:25:41 2014 -0700
+
+    telegps: Shuffle menu entries around
+    
+    I think this makes them a bit more logical
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fb2d0c1ef98d9df3f64fb756d78392ce63a73435
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 15:54:08 2014 -0700
+
+    altosdroid: Improve voice for TeleGPS
+    
+    This avoids making lots of useless voice announcements for TeleGPS
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 191ea4a7bbcb22d70c648a9ba746f1061e6f74cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 15:53:30 2014 -0700
+
+    altosdroid: Don't crash when the map is touched
+    
+    The map 'canScroll' method was crashing when dereferencing a null
+    value somewhere. Just check all of them and bail instead of crashing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3f7e885055f8a97f334e0cd3163b760b174114b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 15:23:30 2014 -0700
+
+    telegps: Add status tab
+    
+    This includes pad-relative information, battery voltage and version information
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 876acbdc22ff93c22836f789e0b6394eb19e0da3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 15:22:25 2014 -0700
+
+    altoslib: Correctly save firmware version in AltosState
+    
+    It wasn't getting cloned
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3bfba8f9dbc1627a317804713f83b9d06566d008
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 15:21:28 2014 -0700
+
+    altoslib: Add conversion class for voltages
+    
+    Provide a common presentation for voltage values
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7ed63b6c3d5878a59f52f4114b5b01942735805f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 15:20:20 2014 -0700
+
+    altosuilib: Build some common classes for displaying values in flight window
+    
+    Right now, all of the flight displays have piles of custom code for
+    displaying values. These new widgets should be able to replace most of
+    that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a21dbb05fad2625d17bc2302faa96dc295e6ed7c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 00:28:38 2014 -0700
+
+    telegps: Show flight number in monitor window
+    
+    This lets the user find the flight by number
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8cb41ce9a64029b611b3595c86a4a8e74b952ff4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 00:28:09 2014 -0700
+
+    telegps: Disconnect telemetry device when closing monitor window
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fd9ae83492648c5d39f60bdcff15481efb365701
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 00:27:19 2014 -0700
+
+    altoslib: Remove telem monitoring when closing log file
+    
+    If we don't remove the telemetry monitor, the telemetry device will
+    still be sending telemetry, which isn't good.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 07baa7596b36cf808cd1ee26ff158b1cf8585294
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 13 00:01:46 2014 -0700
+
+    altoslib: Call state.set_serial first for telemetry parsing
+    
+    If we ever get around to supporting multiple simultaneous remote
+    devices, we'll need to notice that the serial changed right away
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f49540acd48292bd9f68ded647561d0e800c619d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 23:59:37 2014 -0700
+
+    altos/telegps: Create new flight if current flight is erased
+    
+    telegps is unique in that USB may be connected while a flight is
+    active and sensible things should happen. If a flight is being
+    recorded and gets erased, then a new flight should be started.
+    
+    This is done by hooking in the flight erase code and calling out to
+    the tracker code to figure out whether to switch to a new flight or not.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8117ba3553789a2bae9beb92fbe9e14e3cc79389
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 23:56:07 2014 -0700
+
+    altos: Define ao_log_mutex in ao_log.c rather than every log product
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dcaaf51245b44a440ee8590512f71195c30c16ae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 21:54:13 2014 -0700
+
+    altos/telegps: Keep ring of recent GPS positions to detect motion quickly
+    
+    Instead of comparing only against the last logged value, keep a ring
+    and start logging as soon as we move away from the furthest one in the ring.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 740d964ab82da8695c04650926afee4a0905011c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 21:53:07 2014 -0700
+
+    altos/telegps: Set default log to 496kB for 4 logs
+    
+    This leaves space for four flight logs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 77b5c0cc7f085aa3c0fada5d4a943eeaf16cf6e0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 21:52:13 2014 -0700
+
+    altos: Show current flight number for TeleGPS
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bfdaa95cb72c833896076d4e1a4bfe61d9549fed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 15:59:20 2014 -0700
+
+    debian: Fix build depends icotool -> icoutils
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7e911c2afff78db2e385c6346c90bfcd72a8f3fb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 14:34:02 2014 -0700
+
+    altos/telegps: Don't log data when plugged in to USB
+    
+    We don't want to accidentally log stuff when you're just trying to
+    charge the battery.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7d77d83685cbfce5323767bbfae3bd18be175ffc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 14:32:15 2014 -0700
+
+    telegps: Don't re-add frequency menu when already present.
+    
+    If the receiver disappears, we'll stop tracking, but won't pull the
+    frequency menu down. Doing that would take a bit of work, and it
+    doesn't seem worth the effort. As a kludge-around, avoid re-creating
+    the frequency menu if it's already displayed when we connect to
+    another device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8044eb8e23366e91c741060939baff5137f841c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 12 14:12:08 2014 -0700
+
+    altosui/telegps: Reduce CPU time needed for flight displays
+    
+    Don't update displays which aren't shown; track hierarchy changes to
+    trigger display from most recent state data.
+    
+    Don't update values which haven't changed; remember previous values
+    and compare with new before updating widget contents.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e00ffe6ab6197ab48ba8ce3cf71a197f7215649f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 23:28:55 2014 -0700
+
+    doc: Add TeleGPS screenshots
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c7774114f7bc62e2100c7575b1dcf3536ed56343
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 23:28:36 2014 -0700
+
+    doc: Update altusmetrum docs and screen shots for 1.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1ed591c7bdf19fe54bbde1827d0717f0ae51e003
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 23:27:16 2014 -0700
+
+    telegps: Remove 'Flight' from titles
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0495f1b5282d8f7449cbbc1dbf99d63818d7c03c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 23:26:36 2014 -0700
+
+    altos/telegps: Build .ihx versions for TeleGPS
+    
+    Needed to load with java
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6f306b267f63d0f59fb77b1ce41c678042dd6802
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 23:04:46 2014 -0700
+
+    altosuilib: Repaint map when starting line draw
+    
+    Starting line draw will remove any existing line, so repaint to get
+    rid of it
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit efb6a3d5ed12f8061a48a66efcfe066e68eaf792
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 23:04:11 2014 -0700
+
+    altoslib: Report GPS height when baro height is not available
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 57272609b0d2890029fdeceeca14da93cebdb471
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 21:37:23 2014 -0700
+
+    altosui: Don't list tracker parameters when configuring altimeter
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bfc0c65c9f9ec9547d71016fc897ba35bdb414f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 20:36:49 2014 -0700
+
+    altosuilib: Handle font and units changes in maps and stats table
+    
+    Add AltosFontListener and AltosUnitsListener bits as needed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2182c49298e0862a60dea104450d5f74dbeaeeb2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 19:57:24 2014 -0700
+
+    doc: Update 1.4 release notes to include a few more changes
+    
+    pyro firing time.
+    flight erase on TeleMega/TeleMetrum v2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d744e588b7504f314e39b1407152d11c031673c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 19:51:37 2014 -0700
+
+    altosui: Add pyro firing time configuration
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fcbfb3aea20e564045fc6a86f978cacabfc73226
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 18:58:09 2014 -0700
+
+    altosdroid: Altosdroid build doesn't work in parallel, so stop trying
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c661d5de7d9c8e430211e0f97ab0bf3f09a1a543
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 18:53:42 2014 -0700
+
+    altos: Re-enable telemini v2.0 builds
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 18b0f0966dfc4d1a716d4faea6f661bd3594bd94
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 18:53:10 2014 -0700
+
+    altos/telemini-v2.0: Disable beep frequency config on TeleMini v2.0
+    
+    Not enough flash otherwise.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac5b15692874ea3f7b3814250ab49c68786aa982
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 18:51:19 2014 -0700
+
+    altosuilib: Remove old widget-based map UI
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7a70e6fe3a11382d7f6653d19afac9ceb563db3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 18:50:07 2014 -0700
+
+    altos: Disable TeleMini v2.0 build for now
+
+commit a8325483adb8d9ffda62d3f4900cf52bde70ff62
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 18:48:11 2014 -0700
+
+    altoslib: Use GPS seconds as an additional sort key for TeleGPS eeprom
+    
+    Long idle periods with TeleGPS can easily overflow 16 bits of tick
+    count. Using the GPS seconds provides an additional sort which will
+    span the tick wrap-around.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db2443fdbf65b65703217174303027c439124a83
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 11 18:46:47 2014 -0700
+
+    altosuilib: Rewrite map GUI bits
+    
+    Use a single large Canvas and draw images on top by hand.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac33ca137551e32235cd2a0304da4b5e7af51a44
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 11:36:03 2014 -0700
+
+    telegps: Add statistics tab to graph UI
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 73249dbf16382c91c2a220ff852a4f099fe0de3d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 11:35:30 2014 -0700
+
+    altosuilib: Move AltosFlightStatsTable to altosuilib
+    
+    So that TeleGPS can share it
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9ef32b103c5c312aaa90b6546e504f2edeb1f99a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 11:34:21 2014 -0700
+
+    altosuilib: Skip voice announcements for invalid values
+    
+    When height and speed values aren't available, don't say anything
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 90686853e46b7f0df9bdaf671f859819eef926e0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 11:32:57 2014 -0700
+
+    altosui: Show "Missing" instead of huge numbers in descent/landed tabs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7bdd0deabaae38ddfecd1ea2ea8deaf9af40b2ac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 11:31:53 2014 -0700
+
+    altoslib: Use GPS speed/height values when other sensors are missing
+    
+    This lets TeleGPS report height/speed values without needing to
+    customize every AltosState user to pull out GPS values when the other
+    sensors aren't present.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6fc58142d2a108c91d257eb0175098bf082834f9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 11:30:36 2014 -0700
+
+    altosuilib: Split battery graph enable out from other adc enables
+    
+    This lets TeleGPS just show the battery voltage values without also
+    adding enable lines for the other flight computer ADC values like
+    ignitor voltages.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9d39bbd22e6cde1bbb39e7b5450f297d47365769
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 10:19:43 2014 -0700
+
+    altoslib: Check for time going backwards when replaying from file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff13cf1359e1f4ae33b16a5867fd364993566b65
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 10:18:44 2014 -0700
+
+    altoslib: Add new 'stateless' flight state for TeleGPS
+    
+    TeleGPS has no flight state, so add a new 'stateless' state for code
+    to handle this case differently than any of the existing states
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 871fb4753a3b54cc2e22309e80e24dfe9cc54511
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 10:15:47 2014 -0700
+
+    altoslib: TeleGPS no longer logs satellite information
+    
+    This doubles the amount of space available to log position information
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5f2029bd4e31289fb03e6af39abdbc16f8b8fa78
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 10:14:07 2014 -0700
+
+    altoslib/altosui/telegps: Switch TeleGPS config to motion/interval
+    
+    TeleGPS had configurable boost-detect values; those have been replaced
+    with a configurable stop-tracking motion limit and logging/telemetry
+    interval value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ae1174317fc476e39077f7dc257ec08709c6b301
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 10:11:03 2014 -0700
+
+    altoslib/altosui/telegps: Change log size configuration
+    
+    * Use new log-space value provided by firmware when available.
+    
+    * Divide that up into 1-8 flights and offer those sizes as options to
+      the user instead of a fixed set of sizes.
+    
+    * Show how many flights each selection will store
+    
+    * This also checks values provided by the user
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 44ca50a2c9404c92cc887a23dfa25b335ebe6198
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 09:55:04 2014 -0700
+
+    altos: Set TeleGPS default log size to half of avaiable memory
+    
+    LPC11U14 doesn't have on-chip config space, so we're consuming a block
+    of external flash. As a result, only 1984kB are available for
+    logging. Set the default log size to half of that to store two flights.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9d7f4fb6af0fee843191766858e39a481aeda347
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 09:52:15 2014 -0700
+
+    altos: Simplify tracker logic, removing boost detect
+    
+    This removes the ao_flight_state value from the tracker code and makes
+    it simply log position information when the device has moved within
+    the last 10 log intervals. This also changes the configuration
+    parameters to define what 'motionless' means, and what interval to
+    configure the GPS receiver for, log data and send telemetry.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c5a7889a8da3da64deb0f118656784e0ee3fd511
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 09:47:04 2014 -0700
+
+    Revert adding state to GPS location packets
+    
+    TeleGPS no longer has ao_flight_state
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f6d633d73a8f826cf2a3128e3e234bd11af49718
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 09:44:57 2014 -0700
+
+    Revert "ao-tools: Parse TeleGPS state value from gps location packet"
+    
+    This reverts commit 428d09294ba0395fedd71346ad00fd90a4cdde97.
+
+commit da9575fce5ff4dfe83522e290973a01c43e4661f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 09:42:43 2014 -0700
+
+    altos: Make extra pyro channel firing time configurable
+    
+    This adds a 'I' parameter to set the extra pyro channel firing time
+    (in ticks). This has no effect on the main/drogue channels.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 75df97b5f6ade3310618a477b685d39b7fd4666e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 09:37:43 2014 -0700
+
+    altos: Report total available log space in version command
+    
+    This provides a more accurate means of determining available log space
+    than guessing whether some portion of the flash chip holds
+    configuration data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 998eae61ecf56dd6ead4ec6ad82c952ae84170df
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 10 09:36:59 2014 -0700
+
+    Revert "altos: Write current flight state to GPS data from GPS drivers"
+    
+    This reverts commit db6003d34595fbd103d5b131912b6a797254f1c5.
+
+commit d696b34b4823647e2e91093ba9d5a351d3a52f8a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 8 16:08:30 2014 -0700
+
+    Revert "altoslib: Parse TeleGPS state value from GPS telemetry packet"
+    
+    This reverts commit d69547796caf74405f8304d23d4ae318315bbd7b.
+
+commit 5c117621444bc13aebbc7dc618b4a56f620931ac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 22:37:30 2014 -0700
+
+    Bump to version 1.3.2.4
+
+commit b33de8ba1e48d8ad0cb78f1c5692bb81da916080
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 22:25:17 2014 -0700
+
+    altoslib: Recover battery voltage from TeleGPS configuration packet
+    
+    TeleGPS stuffs battery voltage in the apogee_delay slot of the
+    configuration packet. Pull it out from there and stick it into the
+    current state.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6950506beacb1bcd5b8e54c3935174cf800e9aed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 22:24:08 2014 -0700
+
+    altoslib: TeleMega uses 5.6k/10k divider for v_batt
+    
+    I suspect the 15 and 27 values are a 'close approximation' for integer
+    work on the cc1111 devices
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee2216af17f23781ea912caba29fbd7e4d9ff480
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 22:23:19 2014 -0700
+
+    altos: Enable ADC for TeleGPS v1.0 battery voltage measuring
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ef85b3bc5300904ebfb878b1c7313a82b5b7aebf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 21:57:43 2014 -0700
+
+    altos: Encode TeleGPS battery voltage in configuration packet
+    
+    TeleGPS doesn't need apogee delay, so re-purpose it for the battery voltage
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d69547796caf74405f8304d23d4ae318315bbd7b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 21:13:40 2014 -0700
+
+    altoslib: Parse TeleGPS state value from GPS telemetry packet
+    
+    TeleGPS adds 0x80 to the state value to signify that this otherwise
+    unused byte contains the current state value
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 428d09294ba0395fedd71346ad00fd90a4cdde97
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 21:12:44 2014 -0700
+
+    ao-tools: Parse TeleGPS state value from gps location packet
+    
+    TeleGPS encodes state in a spare gps location packet byte, masking in
+    0x80 to signify that the state value is valid
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 23d9d37fd2a8f4b867f34e71a2b0f7cb090717c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 21:12:09 2014 -0700
+
+    altos: Make telegps builds depend on ao_tracker.h
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d165079b9275c69e727a1dac996ad1788c58ed40
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 21:11:33 2014 -0700
+
+    altos: Reduce tracker GPS buffer to 4 samples
+    
+    We just don't have enough RAM for 8 samples.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bd9e4f30b2a491b030246943767960ab053ac94c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 21:05:01 2014 -0700
+
+    altos: Define lat/lon sum variables as 64-bit instead of 16
+    
+    Oops. 16 bits won't hold position information...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 08550425fca3da73d8f16de567a2c956b85d676e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 21:02:26 2014 -0700
+
+    altos: Use 0x80 to indicate valid state value in the GPS location packet
+    
+    And only set this for tracker products; other products place state in
+    separate state packets
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d8b271502bfd1301b2244e3be5e8c9917a9c624a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 12:17:46 2014 -0700
+
+    Set version to 1.3.2.3
+    
+    Mayhem 2014 Saturday 2014-6-7
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d550c3b3eccbb0283c588b5df69edb2e9b44b4cc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:52:28 2014 -0700
+
+    telegps: Track graph windows as one of the TeleGPS windows
+    
+    TeleGPS exits when the number of windows goes to zero; track graphing
+    windows in addition to the usual flight monitoring windows.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9f2189e0b99aa32b788ecb4576dcb9bcc926f4e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:50:42 2014 -0700
+
+    altosuilib: Fix crash when initializing site map cache
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 611dc26ab4a3ee303c0253698b1e12931aa3644f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:50:04 2014 -0700
+
+    altosuilib: Add GPS altitude as a possible graph value
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5617919091d4c4a1e627470ddab0b45cf649f7a1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:49:14 2014 -0700
+
+    altosuilib: Show GPS instead of (missing) flight data for TeleGPS graphs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e0dfa934ba76d6f913af37999e05c20e614bd3e9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:47:11 2014 -0700
+
+    altoslib: Record whether flight data includes sensor values in AltosFlightStats
+    
+    Provide a way to elide the usual flight data from a graph for TeleGPS
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fcea12ac416b1eab11e9e8aae801358574308f73
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:46:32 2014 -0700
+
+    altoslib:  Add TeleGPS log parsing code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 537db628c0223f0c1f797705a353857c696f8051
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:44:55 2014 -0700
+
+    altoslib: All products with logging have the 'l' command
+    
+    Instead of listing products with the 'l' command, just exclude
+    products that don't have logging from using the 'l' command to collect
+    the number of stored flights.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d562a5d3a6dfea334a66ee74893b400bdca09315
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:44:07 2014 -0700
+
+    altos: Switch TeleGPS to GPS logging format
+    
+    It's customized for TeleGPS uses
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d71e6a5fc68d5b9bc1d12bbfc3fd5a4d86fb12f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:41:59 2014 -0700
+
+    altos: Update other CONFIG_EEPROM users to set LOG_ERASE_MARK
+    
+    All products placing config and erase marks in on-CPU EEPROM needs to
+    configure the erase code correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 394ab536257ab58de0190b3828dd3bb897ad4474
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:40:41 2014 -0700
+
+    altos: Write tracker logging from tracker thread directly
+    
+    Also, logs 8 pre-launch GPS packets so we can get the ground position.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db6003d34595fbd103d5b131912b6a797254f1c5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:39:10 2014 -0700
+
+    altos: Write current flight state to GPS data from GPS drivers
+    
+    This will be useful with TeleGPS which has no other packet containing
+    flight state.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 302842ccda46a0a3d58b60d5c7fc82e05f614b0b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:34:29 2014 -0700
+
+    altos: Add TeleGPS logging format
+    
+    This is mostly like the mega format, but places the flight state in a
+    spare byte of the GPS data and writes the gps starting location to the
+    flight packet.
+    
+    Log data is written by the main tracker thread; there's no reason for
+    a separate thread given the GPS update rate and the lack of flight
+    controls. This means ao_log_gps has an API to be called from there,
+    rather than a thread to run.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 62aa51f0b785bea146d1e9331e6253de2d547c94
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 11:01:14 2014 -0700
+
+    altos/telemega-v1.0: Adjust config params to make flight erase work
+    
+    Flight erase records are supposed to be written after the ao_config to
+    eeprom in telemega. They were getting written in the middle of one of
+    the pyro channel config blocks. Put a bunch of space between the two
+    by making the config max 1024 bytes instead of 128 bytes.
+    
+    Set the log erase marker to 0x55 -- eeprom comes from the factory as
+    0x00, so we use any value other than 0x55 to indicate 'unused' erase
+    slots.
+    
+    Save space for more flight erase blocks; we've  got plenty.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5d973570ef2324b21a64477eecb0a292652ff467
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 10:54:14 2014 -0700
+
+    altos: Clear out eeprom erase records when writing entry 0
+    
+    When writing config/erase to eeprom, there's no 'erase' operation as
+    on-chip eeprom is writable at a byte level. As such, we can't tell
+    when the erase blocks get reset when the config gets written. When
+    this happens, erase block 0 gets written explicitly, so just use that
+    call to trigger explicit erasing of the data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1d6ca536c688d35b3cba0a829b04b93c5124b328
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 10:09:51 2014 -0700
+
+    altos: Allow value other than 0 for marking erased flights
+    
+    on-chip eeprom doesn't erase to 0xff, so let TeleMega use a different
+    value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b8a29d65ec605a995de1d1ec8b110d620d2f7a87
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 10:05:21 2014 -0700
+
+    altos: Allow AO_CONFIG_MAX_SIZE to be configured. Validate it.
+    
+    TeleMega config is 200 bytes. AO_CONFIG_MAX_SIZE was 128. That didn't
+    work out well when logging erased flight information. Allow TeleMega
+    to use a larger value (1k), and then do a compiler hack to make sure
+    the defined value is at least as large as the ao_config structure.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1873d539a8f1a0e1e8ad539af5d49a77a129b928
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 7 07:41:11 2014 -0700
+
+    altos: Move ao_tracker.c to kernel
+    
+    Doesn't make sense to be in product
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a79fe8144dcab10294caa4b0eac967eeb0d8e7e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 21:42:10 2014 -0700
+
+    altos: Add telegps-v1.0 code and loader
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0e867c67c8e2c40058ae36723e06b2ce00bd0419
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 21:40:39 2014 -0700
+
+    altos/telegps-v0.3: Remove ao_flight_number from main program
+    
+    We've got logging enabled now
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f830d4e9202d2a138fc9aaacb2388f94390399db
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 21:39:50 2014 -0700
+
+    altos/telegps-v0.3: Disable APRS by default. Set log max to 1M
+    
+    And adjust default radio cal to be a bit closer
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cab6d80f11e07dd26b865727eb7ce4fd45be5c7c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 21:37:38 2014 -0700
+
+    altos: Force telemetry on by default for v0.3 TeleGPS boards
+    
+    These don't have a USB connect indicator, so just turn on telemetry by
+    default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 102b1977c138b30c2d2592ab310f7be072130a3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 21:36:16 2014 -0700
+
+    altos/lpc: HAS_USB_CONNECT has been changed to mean a custom pin
+    
+    The LPC stuff isn't actually very useful and TeleGPS uses a custom pin
+    instead, and was using HAS_USB_CONNECT to mean the same thing. That
+    wasn't good.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ec3de3ac461f2380d23c5c5d948333a9a210c400
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 21:35:41 2014 -0700
+
+    altos: Fix config to set default log size for all devices with log
+    
+    Not just devices with flight
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d8f84ba82bab653c041eb85f93b9dcb1083bd849
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:55:26 2014 -0700
+
+    altos: Add AO_LOG_FLIGHT packet to TeleGPS logs
+    
+    This encodes the flight number for tracking of data files.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fe0aaf4413035f9de2c805c612c71188ec8c6f4d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:49:59 2014 -0700
+
+    altos/telegps-v0.3: Add tracker task
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6160ddadeae324b4a68db800c98c339156b63076
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:49:01 2014 -0700
+
+    altos: Add debug to tracker to force launch
+    
+    This lets us test the move from pad to drogue state
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a29df3f9f6c4969eb01598f6917ce78c9ce37a6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:47:27 2014 -0700
+
+    altos: tracker distance computation flipped arguments around
+    
+    ao_distance takes (lat, lon, lat, lon) not (lat, lat, lon, lon)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b619199345256cdc456f8a0b99c0ad9335e877c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:45:18 2014 -0700
+
+    altos: Fix tracker start state
+    
+    Make sure log can start by scanning existing logs
+    Enable RDF by default
+    Turn off telemetry until we decide whether to turn it on in the loop
+    Allow TeleGPS v0.3 to run without ADC
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 97dac0f66bc938940e6b49409d950a1736c92655
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:44:26 2014 -0700
+
+    altos: Stick flight state in GPS location packets
+    
+    Useful for TeleGPS
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eebcf07950e909e4516b08c32e289a870f772793
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:35:45 2014 -0700
+
+    altos: Have tracker average 5 GPS samples before moving to pad mode
+    
+    Avoids early GPS noise right after lock
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e063701310c1ab5b766c27f24088699aad142fbd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:33:33 2014 -0700
+
+    altos: Change tracker not-moving speed to 2m/s and document
+    
+    Just adjust to avoid sensing motion from GPS noise
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d7df6e8c47df35c0d27f1a2559ecc305ef28d271
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 18:31:06 2014 -0700
+
+    altos: ao_distance was overflowing when checking for longitude wrap
+    
+    Need to shift everyone right one bit to fit in 32 bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2db2b75f8847ca0066bb19771653a65c9098ae52
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 17:24:57 2014 -0700
+
+    altos: Allow cc115l driver to be built without radio power control
+    
+    TeleGPS just wants full power, so remove the configuration option
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b8201bc9ba4a5f5f0522b68493cd5e7f013fd4bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 17:14:28 2014 -0700
+
+    altos: Include sensor logging task only on flight boards
+    
+    This lets TeleGPS use the logging infrastructure without wasting a
+    task to log sensor data
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3e28d8a242955d65d8cd50dbba4cad4609e2e1ae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 17:12:06 2014 -0700
+
+    altos: Add tracker task for TeleGPS
+    
+    This replaces the flight code to monitor GPS state and switch flight
+    states between startup/pad/drogue
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e152dd5c0786a650aed8f0c09babdc93895bff1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 17:10:28 2014 -0700
+
+    altos: Add ao_distance.c to compute cartesian distances on the globe
+    
+    This is not a great circle distance, but should be good enough for
+    points reasonably close together
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8e7b8b0533e03e89425296d464b7a1a26fb63686
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 16:52:36 2014 -0700
+
+    telegps: Update icon and icon building
+    
+    Switch to satellite icon, build the osx and windows icons.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1bcafc452f50e518c4d86cbd6b9057c4bf7e676f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 5 16:50:29 2014 -0700
+
+    altosuilib: Let the user hand-edit the preload map radius
+    
+    In case they want more than 5
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f59d69064763cfad2b4b15fd9660fd5fa21dba5e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 23:43:54 2014 -0700
+
+    doc: Create release notes for version 1.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cd2179cb0d71749f3637cc3ee03ccc6adfd74aae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 22:59:23 2014 -0700
+
+    telegps: Trap AltosConfigDataException in telegps config
+    
+    This was added for pyro configuration errors in AltosUI
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5e4087cd2fbb3ac67f90cd82edaa73c1eedbf67c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 22:23:31 2014 -0700
+
+    altoslib: Add missing AltosConfigDataException file
+
+commit ace5f42b5567cff07a61b622171ac364ea8c165d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 22:07:39 2014 -0700
+
+    altosui: Display error message when parsing pyro channel values fails
+    
+    Build an exception handling chain to get numeric parse errors
+    propagated all the way back to the original 'save' command and up into
+    a dialog window, including the pyro channel, field and value that were
+    in error.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 206fbb99d28961ce159e3affdd5c96f5e379a603
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 22:06:22 2014 -0700
+
+    altosui: Fix pyro channel value formatting
+    
+    Was using %6.1f for 1 and 2 fraction digit values as the
+    conditional structure for figuring out which format to use was
+    broken.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d20c608ce833fb8949dce527f92887775d216823
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 22:05:11 2014 -0700
+
+    altos: Fetch/store only 8 bits for pyro state values
+    
+    These fields are uint8_t, not int16_t. Fetching and storing 16 bits is
+    a bad idea.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b7abc063fb27da29cd7a717bbea15f92882bd205
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 22:04:11 2014 -0700
+
+    altos: Maximum pyro configuration parameter has 4 bytes in the name
+    
+    "f>=" needs four bytes, not just three to store the whole string. If
+    we only store three, then we never manage to compare correctly as the
+    null terminating byte is missing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7385c76af46ff400b9e79a8540199be289cb57c0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 2 22:03:26 2014 -0700
+
+    altos: Configuring pyro channels can use more than 48 characters
+    
+    Increase the command buffer from 48 to 128 bytes to hold the longest
+    pyro configuration commands
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 177d3c0333fd4218f01e05c78cbc5f186c8e32c0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 30 17:27:10 2014 -0700
+
+    altos: Allow sparse GPS data logging for TeleGPS
+    
+    When the device hasn't moved for a while, stop logging data. Start as
+    soon as it moves again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 12c408c5aa1d234fe9c946078d8a343b4fda7ebb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 30 17:30:08 2014 -0700
+
+    altos: Test APRS altitude encoding
+    
+    Verify fixed point version against naïve implementation
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a7b0a5613c8e59b4c672b21f8d0890fd5cffd4dc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 30 17:24:51 2014 -0700
+
+    altos: Switch APRS altitude encoding computation to fixed point
+    
+    APRS altitude is logarithmically encoded, so this implementation
+    includes a fixed point log-base-2 function along with a bit of other
+    fixed point stuff. This eliminates all floating point from TeleGPS,
+    saving around 4kB of code space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2d9842ee011139f5783a102ceb2b7f4c88b1a10f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 30 17:17:42 2014 -0700
+
+    telegps: Add config for tracker starting distances
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 29d325f418b401f61580288b5947b0df8ac5b717
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 22:03:48 2014 -0700
+
+    telegps: Fixup windows fat build harder
+
+commit b74dfc9c2cbe14593738eb994e9163d466155326
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 21:48:11 2014 -0700
+
+    TeleGPS firmware isn't quite ready, don't include in windows fat build yet
+
+commit e60d0456f59c76ad786bc8f8065fbe84e6cae922
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 21:37:53 2014 -0700
+
+    Capture windows build error messages
+
+commit 48074131ad05b4646e5d2dcf30ba4a1d17e249f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 16:39:26 2014 -0700
+
+    telegps: Add missing TeleGPSGraphUI.java file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca7e64a09823977e1af028e9482424e643beee68
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 14:40:39 2014 -0700
+
+    Build telegps distribution bits with 'make fat'
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf684a4c290573a3aa627fd8ddf6f6ebbe5fa057
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 14:36:14 2014 -0700
+
+    telegps: Add graph display
+    
+    Moved the altosui graph files to altosuilib and fixed things up.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f80075be4ebb9c5fe00c24b8c7638fad23267424
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 14:03:58 2014 -0700
+
+    java: Refactor AltosFlightDisplay units and font update handling
+    
+    Make AltosFlightDisplay explicitly implement AltosFontListener and
+    AltosUnitsListener interfaces to make everyone use the same API. Then,
+    actually go implement units listeners so that changing units updates
+    all of the active displays immediately
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71715337eb532a1fbe1a753240e7417d5223489f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 29 10:16:15 2014 -0700
+
+    telegps: Add info table
+    
+    Move a couple of files from altosui to altosuilib, hook up the info
+    table after changing it to implement the AltosFlightDisplay interface
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 13f84be8d1568a3fc2ed5eef5dcc2093c149285e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 22:53:06 2014 -0700
+
+    telegps: Add flash device functionality
+    
+    Move bits from altosui to altosuilib and use those.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8ba523cd793f2263bb1acd7a5a10f8964075bdc5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 22:45:23 2014 -0700
+
+    telegps: Auto-connect to any base stations plugged in at startup
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c30130d0bdc18ee351eb3d02e51f70f8a05905b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 22:06:43 2014 -0700
+
+    telegps: Don't try to ship TeleGPS firmware yet
+    
+    It's not quite ready. Instead, ship TBT and TD firmware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3871b9ac036e3adfa1da089245fc7973b268c921
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 21:56:52 2014 -0700
+
+    telegps: Add 'Info' tab
+    
+    This contains a summary of the tracking info, including position,
+    speed and course.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4cec35564324f909dcddeb7c0d83a2daa8223042
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 20:58:01 2014 -0700
+
+    telegps: Hook up data download dialog
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9a4c2c7fc6af922d052e23a1b99bf847fbf9b0e9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 20:48:59 2014 -0700
+
+    telegps: Add scan UI
+    
+    Move scan UI bits into altosuilib, allow telegps to not show telemetry
+    format options.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 82a69777c67128192b50bbf77ace0a6525f49cac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 20:24:04 2014 -0700
+
+    telegps: Add preferences dialog
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a7fd31842a602a8ac803d0e09efb4ffabf7a289b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 20:19:44 2014 -0700
+
+    telegps: Add device configuration dialogs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d6c5904e2a05c8ae023a8cd954cf16c19c477d7d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 20:00:10 2014 -0700
+
+    telegps: Use altosui's Instdrv NSIS plugin for telegps
+    
+    Instead of copying it, just point at it
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fe14315d4cfccf8b53d9c4b7fa79302fd36b2c9a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 19:50:52 2014 -0700
+
+    telegps: Working towards building fat versions of telegps application
+    
+    Lots more of the bits necessary for windows/macosx
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 47ff6f7528e3984012e874f91ea4f5c1d68cb465
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 19:45:01 2014 -0700
+
+    doc: Add outline of TeleGPS doc
+    
+    No actual content, mostly a place holder to make the build work
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e19121d5e7368ef723d4642d26c24252a386a790
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 19:44:21 2014 -0700
+
+    Mark version 1.3.2.2
+    
+    Preliminary 1.3.3 version (1.4?)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2fa7785f9efdefaf0fc2fa8e0b03c85047613b84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 16:08:30 2014 -0700
+
+    telegps: Add first version of telegps
+    
+    Not much implemented yet, but a shell of the UI and the map
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9b3516419981967a1c6ab956269139977ac368ca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 16:06:14 2014 -0700
+
+    altosui/altosuilib: Shuffle lots more code from altosui into
+    altosuilib
+    
+    All of the bluetooth management stuff, and AltosSerial.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 02e657e45e217dc483a81f28020cfe65a826e9be
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 10:43:09 2014 -0700
+
+    Document the need for ~/altusmetrumllc/google-maps-api-key
+    
+    Stick this in Releasing
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9b9e4bf1b51c45553879141811748e65debfc251
+Author: Tom Marble <tmarble@info9.net>
+Date:   Wed May 28 14:08:02 2014 -0500
+
+    jenkins.sh: make -j 4 can fail, fix for altosui-test
+
+commit 96ffe5bbd2a1b44ddda6cb25d37d2b0a672045f5
+Author: Tom Marble <tmarble@info9.net>
+Date:   Wed May 28 12:50:42 2014 -0500
+
+    fix for jenkins.sh
+
+commit 5eaef0c98488fa3fbd3a6494dc15e1b793eb6f94
+Author: Tom Marble <tmarble@info9.net>
+Date:   Wed May 28 12:38:36 2014 -0500
+
+    add jenkins.sh
+
+commit 324380dcf86be338c6d556b901d6889ddde97f7e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 10:31:47 2014 -0700
+
+    altosuilib: Don't try to draw to destroyed map windows
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1e5807ef428c9a0eb88ed8a3aef40098ab347d80
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 10:27:52 2014 -0700
+
+    altosuilib: Publish AltosSiteMap.centre. Add prefetchMaps with old API
+    
+    This gets altosui working again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 52ce41952c5a3c31532fa4f0d1b3155a162b76f4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 10:16:38 2014 -0700
+
+    altosuilib: Update map preloading UI to include zoom and maptypes
+    
+    This lets you specify precisely which maps to load.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5c3991768d3cb17fc99ad32b2d6d8d11f0e37dfa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 02:18:41 2014 -0700
+
+    altosuilib: Remove debug printf in AltosSiteMapCache
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a5ef9eaa8b809c56813625133120e7e91fc8e65
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 02:06:18 2014 -0700
+
+    altoslib: When log-format is missing, use product
+    
+    log-format was added for 1.0; earlier log files don't include that,
+    but do say which product they're from.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3773e89c47d356c4df58edc5725c33bca89b9605
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 28 00:42:24 2014 -0700
+
+    altosuilib: Add google maps API key, configured with -with-google-key
+    
+    This places the actual key outside of the repository, allowing the
+    user to configure the name of the file containing the key. By default,
+    this pulls the key from $HOME/altusmetrumllc/google-maps-api-key.
+    
+    With the key present, there are no longer any rate limits to loading
+    map data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e6cfa25702b3dc1d492c5f1a4d0b4ba4831d30bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 27 20:34:29 2014 -0700
+
+    altosuilib: Decompress map images asynchronously and in parallel
+    
+    This speeds up loading map images from disk quite a bit, and keeps the
+    UI responsive while that happens as well.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8e44580cbe978f1570d4d2ac13d3dd7cd470ecf7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 27 15:39:13 2014 -0700
+
+    altosuilib: Add distance measuring line to site map.
+    
+    Use any modifier or button other than the left one to draw a line on
+    the map. The length of the line is shown at the start of the line.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c674a20432c2cb97e5bc2a3de891f78b9e172fe9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 27 11:05:02 2014 -0700
+
+    altos: Fake flight code changes in kernel and stm
+    
+    Redirects data input from local sensors to USB sourced data, leaving
+    USB enabled when the computer goes into pad mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db08e99361d82de63058d3388823f486e5fc9839
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 27 10:58:53 2014 -0700
+
+    altosuilib: Add multiple zoom levels and content types to map
+    
+    Also changes the file format for hybrid, satellite and terrain maps to
+    jpg to save disk space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 535271f7312f1a88af11d4f1dbf3d405b660f26c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 21:14:42 2014 -0700
+
+    altos/test: Fix ADC structure for mega, use ao_config.h
+    
+    This switches from hand-coding the ao_config structure to using
+    ao_config.h and also updates the ADC structure for ao_flight_test_mega
+    to using the same one as telemega does natively
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1894b51daceaf9fb6b49a0625e09a366985d15b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 21:12:29 2014 -0700
+
+    altos: Move ao_config declarations to ao_config.h
+    
+    No sense leaving these in ao.h, and it's nice to make that file smaller
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3d5db24708b37d86eac187169e2553a408dfeb83
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 21:11:23 2014 -0700
+
+    altos: Make MS5607 PROM a public variable
+    
+    This will let the fake flight code update it as necessary, without
+    creating a new interface in ao_ms5607.c
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4df84dd5d007120f54cbda380789306608f2fc46
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 21:08:44 2014 -0700
+
+    micropeak: Add -Xlint:unchecked to javac line
+    
+    This shows missing parametric type errors
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f0216d721ed13f4d3dc608bb6ad8f83732b27c0a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 21:01:38 2014 -0700
+
+    altoslib/altosuilib: Change versions to altoslib:4, altosuilib:2
+    
+    API has changed for these libraries, time to bump the file versions
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d63319f6f29ef714bb1d5c359c2448f63e7a4534
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 20:58:24 2014 -0700
+
+    ao-tools: Add cc_usb_write function
+    
+    This writes raw bytes to the USB port; useful for sending binary data
+    for flashing or the upcoming flight test stuff.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0a6c76fc0525d6588a1d88127f0085f13a02f1af
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 20:55:11 2014 -0700
+
+    altosui/altosuilib/altoslib: Move more stuff out of autosui. Reduce site map memory
+    
+    Prepare to share with TeleGPS application.
+    
+    This also has the changes to the site map tile which cache only a few
+    images and regenerate the flight path on the fly, saving piles of memory
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4ac7797d3efb9cc2d9fae88519f55e40b1050224
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 25 20:47:49 2014 -0700
+
+    altosui/altosuilib: Cleanup -Xlint:unchecked warnings
+    
+    Add parametric types to avoid unchecked warnings.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b60a3689910731d9bdb8a431a3dcc9e99f961b35
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 22 18:46:58 2014 -0700
+
+    altoslib: Move CSV/KML output code to altoslib
+    
+    It's sharable, so share it
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2625a464417c8475c66101757ca2c30cd6c74e0c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 14:02:35 2014 -0700
+
+    altos: Add config values for tracker start motion limits
+    
+    TeleGPS switches from 'pad' to 'drogue' states after the device moves
+    a specified distance from the initial starting point. These values can
+    be configured, and this is the configuration for them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 161ae96f9ec11e2586df07c0f6d724ddc4dad76c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 14:00:05 2014 -0700
+
+    altos/test: Parse mega ground data. Fix pyro parsing
+    
+    This gets ao_flight_test_mega working with eeprom files
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 43be26603827b5930bf3e8082610cfa19b45534d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 13:58:54 2014 -0700
+
+    altos/test: Get APRS generation test working again
+    
+    APRS now includes sat info, so we have to fake that up to generate an
+    APRS test file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2a3846df381a5eeac8ec3327c770af502aaf4e76
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 01:37:57 2014 -0700
+
+    altos: Don't define ao_ignite_decivolt without igniters
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit af782e92c6a0c0a6b0fc2fa52519749a88ca8fb8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 01:36:40 2014 -0700
+
+    altos: Expose ao_gps_set_rate from u-blox driver
+    
+    This lets applications set the desired GPS update rate to reduce power usage
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8b488bdd0f5c91be7e5aae1c8f0193e713734b14
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 01:35:33 2014 -0700
+
+    altos: Fix cc115l debug build
+    
+    New compiler warning flags and moving to the nxp require a few minor
+    changes in the code to make it work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cb228304d8df3063914ab505a530d4ea79ca027d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 01:34:27 2014 -0700
+
+    altos: Allow APRS to send just battery voltage
+    
+    Don't require apogee and main voltages as well
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca338a897ba3237652a3ae092e660f26c9e35074
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 01:39:46 2014 -0700
+
+    altos/lpc: whitespace
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0a3312e725d914bbba6355e07d2f1d2833d2d6c2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 01:39:01 2014 -0700
+
+    altos/lpc: adc code computes number of active ADC channels
+    
+    Don't require the application to provide AO_NUM_ADC when AO_ADC_NUM is
+    computed automatically.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b278a73cb54ba2f107bf91089f87c11528f017ab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 21 01:41:38 2014 -0700
+
+    altos/stm: Make stm applications depend on ao_boot.h
+    
+    This should make sure they get recompiled when boot stuff changes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f3544daf08f38aa8e28ca214a19ab7fd47c0c802
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 16 00:00:12 2014 -0600
+
+    altosui: Remove another beep config debug printf
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eeacc001ba089b4bf5552b8ef36e61a0a96efabe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 23:57:50 2014 -0600
+
+    altosui: Remove debug printf about beep config
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6833e466d7d77765199bf4d21437c34a4eceb044
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 23:46:41 2014 -0600
+
+    altos: stm and lpc ao_boot.h were identical. move to kernel.
+    
+    These two files were absolutely identical, so share them by moving
+    under kernel instead.x
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 211d9af507daf9a8611ed1813415bee27e3839eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 23:34:17 2014 -0600
+
+    altos: Use explicit boot loader signal in ao_boot_reboot
+    
+    Instead of just "knowing" that ao_boot_loader will be passed zero when
+    the application wants to get back to the boot loader, explicitly
+    define the values so that both sides always agree.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0bf1c74e83fe49a11916b52596363f4dd56c522c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 23:10:54 2014 -0600
+
+    doc: Document the Apogee Lockout setting
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dbb0fcf6d161a9d49fe699c37a18e4c33c409b59
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu May 15 17:20:39 2014 -0600
+
+    include EasyMega Makefiles
+
+commit 0948f5d96456b2e7f57ad75dfc9ef455ba197163
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu May 15 17:19:08 2014 -0600
+
+    working?
+
+commit 0fd608868aa03f81b2d902e1da13ee0b1ab20b78
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu May 15 16:23:17 2014 -0600
+
+    lose the (old) easymega-v1.0 directory in favor of my fresher 0.1
+
+commit 819f73698f57e76dca50fe4fadccebd23ffb776d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 09:31:24 2014 -0600
+
+    altos: Make quadrature debounce per-pin rather than per-device
+    
+    Debouncing per-pin means we don't lose transitions, which makes
+    counting a lot more precise.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit da13064382e9673e69cdfae6abbac253c9fc42fc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 09:30:32 2014 -0600
+
+    altos/telemini-v2.0: Enable beep frequency configuration
+    
+    Now that there's space for this, add it in.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 36002fc724702d34302f3cc0df593019ca8db4e0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 09:29:52 2014 -0600
+
+    altos/telemini-v2.0: Remove old baro->alt conversion table
+    
+    TeleMini doesn't have two baro sensors...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d0d29cc233b0d444782530fea15d957b2b4c45d7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 09:28:30 2014 -0600
+
+    altos/cc1111: Switch P1_0 from a green LED to USB pullup
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3225fb54ec1beaf6dc8553ab4f5b86bea6bdf1f3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 15 09:27:34 2014 -0600
+
+    altos/cc1111: Add support for CPU-driven USB pullup
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 940ec6a2d5b054f68da39945a00f4d1b36d1b318
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 13 22:46:19 2014 -0700
+
+    altos/cc1111: Errata fix isn't needed for discontinued products
+    
+    And, doesn't fit in memory for some of them, so don't compile it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit feb0b5f8b28767197f87e5818812d6640c1f40e6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 13 17:30:47 2014 -0700
+
+    altos/cc1111: Wait for xtal to be stable
+    
+    Errata http://www.ti.com/lit/er/swrz022c/swrz022c.pdf says that the
+    xtal is stable bit is bogus and that you need to just delay for a while.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8124af8c27b2b9e446aa3a4f1da83d4db7c1ea87
+Merge: 6dd7eae 3bcf4bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 23:21:55 2014 -0700
+
+    Merge remote-tracking branch 'origin/master'
+
+commit 6dd7eae5e4752d2098797e96953db8923e26835b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 23:20:08 2014 -0700
+
+    ao-tools/ao-usbload: Check image flash usage against device flash availability
+    
+    For devices which report the range of valid flash addresses from their
+    boot loader, check the loaded image to make sure it fits within that range.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8a114bac1145359f3953ce70f049a6be71df5300
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 23:18:41 2014 -0700
+
+    altos/flash-loader: Check memory addresses against flash space
+    
+    This validates memory read/write requests to make sure they are within
+    the available flash memory space.
+    
+    This also reports the flash base and bounds addresses in the 'version'
+    command so that the loader can validate the image before attempting to
+    write it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a25c34ef0a92beaa0695e0d0020eda5e26b309e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:56:38 2014 -0700
+
+    altos/stm: Use #define'd constants for GPIO register addresses
+    
+    This lets the compiler short-circuit the tests in ao_enable_gpio and
+    ao_disable_gpio to save a bit of code space and time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 530894f508874f4cb3db644ca9ca679ed704f964
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:55:38 2014 -0700
+
+    altos/stm: Figure out available flash space based on chip id registers
+    
+    Look at the flash size and the device id registers to figure out how
+    much flash is available.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2c543be5548ccda6bd29a2a7659fcc287f7a9f07
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:54:35 2014 -0700
+
+    altos/stm: White space fix in ao_boot_pin.c
+
+commit 2f196323a2829f9537f3b339f19478127ffde623
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:53:07 2014 -0700
+
+    altos/stm: Use flash address of boot loader instead of 0x0
+    
+    Flash is at 0x08000000, but when the chip boots, it can be at 0x0 as
+    well. Use the 0x08000000 address when rebooting to flash
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a6053dfed6fc1a7f50be0c62782d0050758cd0b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:51:50 2014 -0700
+
+    altos: Assume all LPC products will have 32KB of flash
+    
+    If we ever use something smaller than this, we'll need to figure out
+    how to tell how much memory the device has.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d1908101241b1002fbc582b0a2c27045065a6615
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:51:16 2014 -0700
+
+    altos: Report amount of program space available in the version command
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3af4e824938fe07fe75c6d24d9906aebfbe578f3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:50:41 2014 -0700
+
+    altos: Add LED test command to pca9922 driver
+    
+    This lets you control the LEDs from the command line to test things.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 47750e236c45ab03f28fc3393996edb2bd4312e3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:49:39 2014 -0700
+
+    ao-bringup: Use official binaries for EasyMini turnon
+    
+    Don't use locally built ones, use the official ones found in
+    ~/altusmetrumllc/Binaries to ensure that all devices are shipped with
+    known firmware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5f4a1b3e553276a4d6727c111fe290fa3690fa1e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:48:45 2014 -0700
+
+    ao-bringup: test-baro should accept altitudes a bit below sea level
+    
+    Testing baro sensors on a particularly high pressure day at Keith's
+    house yields altitudes down to -20m or so.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 238ddde1ffdb8521d06519306cfb76271ae552b9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 12 22:47:55 2014 -0700
+
+    atosui: Hide Callsign and RSSI tabs for devices without a radio
+    
+    When doing Monitor Idle with EasyMini, it's nice to not put fields on
+    the screen which won't ever have useful data in them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3bcf4bdd3e3f3751ad9d517696b5573dd4593846
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon May 12 17:31:14 2014 -0600
+
+    update TeleMega turn-on script and Releasing for new stable firmware home
+
+commit cbb6f7a3abbde39163f2905badba0ae88744b104
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri May 9 12:30:25 2014 -0600
+
+    fix copyright year
+
+commit 8d9c79f5c162e07d57d42c6ba5825a3327a911d5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 9 00:05:39 2014 -0700
+
+    altos: Simplify quadrature tracking
+    
+    Set the timer to 200Hz for a 5ms debounce interval. Then, simply look
+    for transitions ending in both bits in the encoder being off, which
+    indicates the the encoder is resting in a detent. If bit '2' is
+    turning off, the encoder was rotated clockwise, otherwise the encoder
+    was rotated counter clockwise.
+    
+    This is a lot more reliable, although still not perfect.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ef48e1bb73c791d731b0d2c0e5beef1539103049
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 5 23:46:34 2014 -0700
+
+    altos: Clean up trailing whitespace in ao_pad.c
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c8ad50495e2d81209a4882dd4f82c19d9ae2ac34
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 5 23:45:30 2014 -0700
+
+    altos: Fix byte offsets in the mega AO_LOG_FLIGHT packets
+    
+    Just comments, but even those should be correct
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b22dff94778b1f15a6ad1989d526b936f0fa09ea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 5 23:43:44 2014 -0700
+
+    altos: ublox driver always offers course data when it has a fix
+    
+    Set the AO_GPS_COURSE_VALID bit to signal that this part of the GPS
+    data is valid.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c9d6a1fbb3148f03864df6d1ed5f6b6dccd7b383
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 5 23:41:43 2014 -0700
+
+    altosui: Add GPS course, ground speed and climb rate to graphs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 39fbc4cb1d4c92522c90aa5e36fd62a4827d8306
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 5 23:38:44 2014 -0700
+
+    altoslib: Parse remaining mega AO_LOG_FLIGNT and AO_LOG_GPS_TIME fields
+    
+    GPS fields past 'day' were not getting parsed. Ground values for the
+    IMU were not getting parsed, but a false 'temperature' value was being read.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2e6efa810b7fccc5af937386a40ae5af064bf26
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 5 23:38:05 2014 -0700
+
+    altoslib: Add a comment to remind us to fix the IMU code to deal with calibration
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d59d6787bfe26c3b18491ece602ad6cc5cf26c42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat May 3 10:58:31 2014 -0700
+
+    altos: 8051 64 * 16 multiply function was broken for negative 64-bit
+    
+    It was jumping around the actual multiply when the 64-bit argument was negative.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c49e13a7807a74bb66c83cd4a2e10eb601f59e62
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu May 8 16:24:26 2014 -0600
+
+    relay control implemented, this project is now complete
+
+commit acaad70e3db8f0b6ae45ca8309833db57bdf5ca2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu May 8 16:09:11 2014 -0600
+
+    first cut of usbrelay-v0.1 support .. LEDs wiggle, not switching relay yet
+
+commit 2dfc4bc92b11252f17103f28198a702a3fdc2b2d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 2 13:53:08 2014 -0700
+
+    altosui: Add configuration UI for beeper tone
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 027b1470c7a2d007eaab5c8d49f772b0c7559b80
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 2 12:26:07 2014 -0700
+
+    altos: Add configurable beep tone
+    
+    This lets you directly set the mid-range beep tone; the high and low
+    tones remain set off of that in the same ratio as before.
+    
+    Note that none of the cc1111 products get this feature as they don't
+    have enough flash space anymore...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8e3842660274ac4bcd7b5a78f5db215222b1c4de
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 30 22:14:37 2014 -0700
+
+    altos: For telelco discovery packets, retry 5 times with shorter timeout
+    
+    A timeout of 10ms is more than enough to receive a query packet, but
+    if we miss it during device discovery, it's a pain, so retry 5 times
+    to make sure we find everyone.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0223fced2c6d2b9f63ede6258afae46c3f55c200
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 30 22:13:44 2014 -0700
+
+    ao-tools: Clean up ao-sym structure an initializers
+    
+    Remove unused 'default_addr' field. Use named initializers when
+    setting up the struct.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 35efd4e51ece706234f80c076eb7f4f70c66098d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 30 22:12:30 2014 -0700
+
+    ao-load: Make ao_sym static to avoid collision with ao-editaltos
+    
+    ao-load doesn't use ao-editaltos at this point, but does share the
+    same name for the symbol table. To make the linker happier, make the
+    ao-load version static.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fd406000659a11862e05c22dbb20cdb738f56b01
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 30 22:11:39 2014 -0700
+
+    ao-telem: Dump orientation field from TeleMega sensor telemetry packet
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2cf65d60e1c73dbff0badbe1ee6cb43d75bf803c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 30 22:10:29 2014 -0700
+
+    altosui: Mark TeleMega additional pyro ignitor fired points in graphs
+    
+    Add markers to indicate when each additional pyro channel fires
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ecebb3902868d1d7485d2bc99ba4140c6b90567e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 30 21:30:46 2014 -0700
+
+    altoslib: Track pyro firing state when reading mega eeprom files
+    
+    TeleMega records whether each pyro has been fired in the eeprom file;
+    track that in the AltosState record.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5fb246fb50e262aa81ef7eb430be9782cfcf8848
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 29 19:04:30 2014 -0700
+
+    altosui: Add extra ignitors to graphable objects
+    
+    List all of the available extra ignitors as possible things to graph.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f8429152e438eb72618edaf5983ae1cd5d3d4dab
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 13 08:58:36 2014 -0600
+
+    ugly hack (just make sleep longer) to work around ttyACM* discovery issue
+
+commit 3b5c4d88671e6c511fbfb1ce6b046f558dd6c2bf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 12 17:46:34 2014 -0700
+
+    altos: Switch beeping to farnsworth spacing
+    
+    Use 17wpm/12wpm farnsworth spacing for the state reports. Leave the
+    numeric reports running slowly as those require counting.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8628f7e02834a476d5cb3afa4cbf8d46a4b3c513
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 12 17:45:38 2014 -0700
+
+    altosuilib: Make lines in graphs 2 units wide
+    
+    This makes the graphs a lot easier to read.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9e18c524fa2d1f648f265b3c3105f5ceacf06c10
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 11 16:40:06 2014 -0700
+
+    altoslib/altosui/altosuilib/libaltos: Remove trailing whitespace
+    
+    Just cleaning up the source code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b275ddfe20f54857d7d1abb98607c406b678090
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 11 16:31:32 2014 -0700
+
+    altos: Add 'microwater' product
+    
+    This is a custom firmware spin for micropeak designed for use with
+    water rockets that sets the boost detect altitude to 10m instead of 30m.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 99c729495a8cc589718607ee35d22454c6af2994
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 6 23:46:48 2014 -0700
+
+    altosui: Disable flight log configuration while flights are stored
+    
+    The log code won't let you resize the maximum flight log while there
+    is still data on the flight computer; the code to figure that out in
+    the UI was busted, leaving users confused about why it wasn't working.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4211c59e585545817b3cac02b41bb73106d6403e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 6 22:27:37 2014 -0700
+
+    altos: Fix nanopeak compile
+    
+    Nanopeak uses port B bit 3 for the LED instead of bit 4. Fix the async
+    code to support arbitrary bits for the serial LED.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 350d941a825d0271933de0bfdea82d3af5744c21
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 6 20:14:49 2014 -0700
+
+    altos: Provide stable binaries for MicroPeak
+    
+    Publish MicroPeak .hex file to LLC repo and install it from there,
+    rather than rebuilding it locally. This ensures that the installed
+    bits don't depend on local configuration of any kind.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2427eae5f3b429d302fbe14f708dcbc68c851954
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 6 19:48:07 2014 -0700
+
+    altos: Replace C code attiny async output with inline asm
+    
+    Using inline asm instead of C ensures that compiler changes will not
+    affect the timing of the serial data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1d943d4cade0a40723143626abf6e67f8eca9dcb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 5 18:17:17 2014 -0700
+
+    altos: Build TeleBalloon v2.0 by default
+    
+    We're supporting this now, we might as well build it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c14cfb1436c988eb0a0d26d7c4d83aeccecbc8a3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 5 18:16:21 2014 -0700
+
+    ao-bringup: Split out easymini test into separate script
+    
+    This lets you run the easy mini testing code without also flashing the device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9cb10d73fee0e3f36c778fd2a9c9992b87669fe2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 5 18:14:35 2014 -0700
+
+    altosui: Add ignitor tab for TeleMega extra ignitors
+    
+    Show the current state of the additional ignitors in another tab;
+    there's not really room in the 'Pad' tab.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca66a035edecd7feffcd22257d3413ce0e189c07
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 5 00:28:13 2014 -0700
+
+    doc: Document new voltage beeping at startup time
+
+commit 18148c33540cda8cb6658724a048ffd426c1a6bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 5 00:20:22 2014 -0700
+
+    Bump version to 1.3.3
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d367fc24bfd0377db6f3b00a888a18245616767
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 5 00:18:57 2014 -0700
+
+    altos: Report battery voltage instead of S at startup
+    
+    This works on everything with a beeper except TeleMetrum v1.0 which
+    just doesn't have enough flash space for the code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8bd732ac9cb816630f46dd269448ff8422620df8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 4 23:40:22 2014 -0700
+
+    doc: Outline files are now generated, so don't put them in git
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca4b20f9781b1dc6974d26952973dfe0d607478c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 4 23:38:40 2014 -0700
+
+    ao-tools: Wait for device to become ready instead of failing
+    
+    For some reason, USB devices take 'a while' to become usable; instead
+    of bailing immediately, sit around waiting to see if the device
+    becomes usable if we get an EBUSY or EACCES error.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2424c0e6fe53789dc83d1e96439dcdc13e847b07
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 4 23:37:15 2014 -0700
+
+    ao-tools: Use 'program' command in ao-flash-lpc instead of 'flash'
+    
+    The program meta-command is supposed to do the whole thing, and seems
+    more reliable in actually getting what we want flashed to the board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4800497fa1fc449807ef0097cc3fed367641ae29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 4 23:36:34 2014 -0700
+
+    ao-bringup: Get turnon_telemini working
+    
+    This script now does complete testing of the board
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 24167015705ae831692b95735968b04a876f935e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 4 23:34:48 2014 -0700
+
+    altos: Rename 'core' to 'kernel'
+    
+    core remains a bad name to use -- dirvish skips files (and
+    directories, it seems) with that name.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bb9fdef607728cc326a82aa632e59724f272e53b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 3 00:10:19 2014 -0700
+
+    altoslib: Missed a couple of easy mini voltage API changes
+    
+    Oh, and Tm was using Em conversions (which is almost right, except Tm
+    doesn't have the history)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 834cd051af1b80a98678de221d3c45cb30f8bb0d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 2 23:35:36 2014 -0700
+
+    Add easymini turnon script and helpers
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 21d584b9bf93b96a05ab374105493c0e17df320f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 2 22:04:18 2014 -0700
+
+    altoslib: Fix EasyMini voltage computations
+    
+    Early Em prototypes had a 3.0V regulator.
+    Early v1.0 boards measured power past the blocking diode.
+    
+    Deal with both conditions to try and report more accurate voltages for
+    EasyMini data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit adddad0dd45f67d01487c8dd75b040ca3ab50fe2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 2 20:36:26 2014 -0700
+
+    altoslib: Ignore speed/accel after boost when finding maxima
+    
+    Large spikes in acceleration often occur with ejection charges, which
+    can cause bogus acceleration and speed data to be seen. Ignore those
+    for the purpose of computing the maximum values of each.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff4deb417a460d96645fb6934890c2c195142be3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 28 23:33:25 2014 -0700
+
+    altos: HAS_LED is useless; remove it
+    
+    ao_flight was trying to decide whether to turn off the red LED by
+    checking whether HAS_LED was defined. And yet, none of the flight
+    firmware defines that anymore, except for easymini which defines it to
+    zero.
+    
+    Remove all uses and defines of this value, substituting AO_LED_RED in
+    ao_flight.c, which has to be defined for the ao_led_off call to work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca0bf9fb2d6323d7a454e5ce04b48d11366eee67
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 16 18:12:33 2014 -0700
+
+    Add easymega firmware
+    
+    A trimmed down TeleMega build with no radio or GPS, along with pin
+    changes necessary for the device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7e0b549b9b30d0a1290d28b2b94025a98af6a4de
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 10 22:55:45 2014 -0700
+
+    altosui: Hide Tilt Angle values when not available
+    
+    In the Ascent table, make sure the tilt angle fields are hidden when
+    they are set to MISSING.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b50e50fb814a572f7b4ea9e268a1ae150fe678c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 9 21:10:10 2014 -0700
+
+    altos: Another missing usbtrng file
+
+commit b5ac64bc0a6fd0fc23f39283e469c9820bdc88fe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 9 21:08:25 2014 -0700
+
+    altos: Missing ao_pins files for usbtrng
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 469bd376d84bf8d76faa3b726d96061d4d98b998
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 9 20:59:43 2014 -0700
+
+    altos: Fix LPC LED driver
+    
+    Was using wrong types
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a4a074d690fb34af49704ac3cc4826eaf06dd9d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 9 20:58:36 2014 -0700
+
+    altos: fix building LPC serial support for STDIO
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9671ca6c42544463fd551f81113c221265a2296e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 9 20:57:31 2014 -0700
+
+    altos: Don't require projects to define PACKET_HAS_SLAVE
+    
+    Really, most don't need it, and whinging about not having it defined
+    isn't useful.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e1e00a4b67fbdbae339219b35aefd44a1bcf9486
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 8 21:39:33 2014 -0800
+
+    Add USB True Random Number Generator product
+    
+    Just basic device support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6dad9ca543fbed3f849b01300224b1b21ef2eb08
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 8 16:25:33 2014 -0800
+
+    Re-add LCD bits to stm-demo
+
+commit 32f0f39a953dabe19ec92611570e4a82da8f8dce
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 8 16:25:10 2014 -0800
+
+    Add flash loader for stm-demo board
+
+commit 4c7da6d0ad568448c37761cd0c0108b9161a9345
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 7 21:27:26 2014 -0800
+
+    doc: Add separate outline pdf generation
+    
+    This generates one-page pdf files that contain just the outline of
+    each product.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8f2a85027b496451c5934eb36fcdffbd5e5da177
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 28 23:04:54 2014 -0800
+
+    Install .desktopfile as _SCRIPTS so they are left executable
+    
+    .desktop files should be marked executable so that the desktop
+    environment knows they are correct.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a072cbb137126e677d3ebbf0245ec4ea5aa481ad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 28 21:16:57 2014 -0800
+
+    altosui: Retry device enumeration after rebooting for self flash
+    
+    Windows takes 'a while' to include the rebooted device in the list of
+    available devices, so try a few times with a 100ms delay so that we
+    can avoid asking the user to select from an empty list.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac2cfb03158b4902466a72edad5dc471ee6bdb91
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 28 21:16:36 2014 -0800
+
+    Mark development sequence to 1.3.3 by bumping version to 1.3.2.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 57e5d13c0577e1b0a6e8117e2d04eeda6cf0b045
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 23 17:42:08 2014 -0800
+
+    libaltos: Link so with -znoexecstack flag
+    
+    This marks the library as not requiring an executable stack, which
+    openjdk prefers
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 104b8bfc9b37fda175f2cb2a1e33601fbf6f48f6
+Merge: 403b95e 1edf7ef
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 20 13:23:52 2014 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 403b95ee27782309b564855b85285c9f5f5c7068
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 20 13:23:32 2014 -0700
+
+    update turnon scripts to store cal values
+
+commit 3ef0cc28758c68e6076afa809e157a84ce3661fb
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 20 13:23:20 2014 -0700
+
+    typo fixes from Matt Kraai
+
+commit 1edf7ef8026ac4ab698a7f99671e9348d18ffd0a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 18 09:47:51 2014 -0800
+
+    altos: Create balloon-specific load for TMv2 hardware
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff4ae350c24b3d6ef71e29191bb719b07ab9c5bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 18 09:46:17 2014 -0800
+
+    altos: Make balloon code run again
+    
+    This fixes the balloon code so that it works with recent altos bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8b6f051663dd17492bece9efb9e898ef113ab414
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 18 09:45:41 2014 -0800
+
+    altos: Set reasonable accel values when !HAS_ACCEL
+    
+    This lets us use telemetrum log and telemetry formats for balloons
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9f6983e3d61fa5231f3d0ce33dbc5aadf946b597
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 18 09:44:52 2014 -0800
+
+    altos: Expose ao_usb_running globally
+    
+    This lets other bits of the code know when USB has been connected.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9b9d5b273a410e315739c5c6eaa4105523056b9a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 18 09:43:43 2014 -0800
+
+    altos: Move balloon flight code to core
+    
+    This lets us create more than one balloon product
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 43b1797189095c402e1c35bdc317c4196e180e66
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 17 21:30:28 2014 -0800
+
+    doc: Need to publish .svg files as well
+    
+    The drill templates are all .svg files that are referenced by the
+    generated html.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 874d0065ecb066ee746a016876edebc7cc6e3d96
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 17 21:27:57 2014 -0800
+
+    Re-create drill templates
+    
+    Using inkscape, the drill templates weren't getting printed
+    correctly. Switching to hand-generated svg fixes that.
+    
+    The .xsl file is also fixed to really encourage the images to be
+    printed at exactly 100%.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e713f0a53d608a8855884b7a48e4e3423d8a3d2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 17 00:15:58 2014 -0700
+
+    deliver images used in MicroPeak manual to web server, too
+
+commit 1d421a43494cf2003ac23fb8cd21d6ae05edfac8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 17 00:10:05 2014 -0700
+
+    update copyright year assertion in MicroPeak manual, remember during releases
+
+commit a3ddb5906167e445f937b16fafb7f5c537852f0a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 16 18:01:10 2014 -0800
+
+    Mark .desktop files as executable
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c860d837a0c97a091c5f47fce91bdb8beb4602d3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 16 15:53:50 2014 -0800
+
+    micropeak: Construct linux install script
+    
+    Uses the same script as altosui, just edits the final path name
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 948a614a62754fd4fffd9b84ad83fd444e4f0437
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 16 15:17:40 2014 -0800
+
+    Move .desktop and icon management out of debian dir
+    
+    This constructs a .desktop file from a template and installs it, along
+    with suitable .svg icons, during the normal build process
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 066a01ad0b4e73fdb47b43a42c1d0b7fae81a180
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 16 14:57:38 2014 -0800
+
+    Put altusmetrum.svg and micropeak.svg in icon directory
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 95f5a6ef52947088993d395874cf6aa502fd2503
+Merge: 135b6d4 de2a619
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 16 15:53:35 2014 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 135b6d4019f584c050b3d70c11fb5bcf2c7396c4
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 16 15:53:22 2014 -0700
+
+    use svg in the .desktop file
+
+commit 13dccd1869cdf00d4aa0df55a3ece33936cd520a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 16 15:51:32 2014 -0700
+
+    have the cal-freq script save cal values to a file
+
+commit de2a619900ee23911c866d5aaff63a0f9388bfc7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 16 13:01:29 2014 -0800
+
+    Add linux installer script
+    
+    Create a linux installer shell script that unpacks the archive in a
+    sensible place and adds a .desktop file to the environment
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf268354535a3a7b2e093235e5347ed2a6d809ff
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 13 21:53:13 2014 -0700
+
+    updating changelog for release
+
 commit e53be56179f4cd93227b6bdc28c2ae60b81db57d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Feb 9 23:47:47 2014 -0800

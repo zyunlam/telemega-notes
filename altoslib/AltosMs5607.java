@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.util.concurrent.*;
 
@@ -44,7 +44,7 @@ public class AltosMs5607 {
 		//int P;
 
 		dT = raw_temp - ((int) tref << 8);
-	
+
 		TEMP = (int) (2000 + (((long) dT * (long) tempsens) >> 23));
 
 		if (ms5611) {
@@ -55,7 +55,7 @@ public class AltosMs5607 {
 			OFF = ((long) off << 17) + (((long) tco * (long) dT) >> 6);
 
 			SENS = ((long) sens << 16) + (((long) tcs * (long) dT) >> 7);
-		} 
+		}
 
 		if (TEMP < 2000) {
 			int	T2 = (int) (((long) dT * (long) dT) >> 31);

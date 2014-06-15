@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.*;
@@ -24,6 +24,6 @@ public abstract class AltosStateIterable implements Iterable<AltosState> {
 
 	public void write_comments (PrintStream out) {
 	}
-	
+
 	public abstract void write(PrintStream out);
 }

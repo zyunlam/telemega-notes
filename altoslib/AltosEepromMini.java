@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.*;
@@ -43,7 +43,7 @@ public class AltosEepromMini extends AltosEeprom {
 
 	double voltage(AltosState state, int sensor) {
 		if (state.log_format == AltosLib.AO_LOG_FORMAT_EASYMINI)
-			return AltosConvert.easy_mini_voltage(sensor);
+			return AltosConvert.easy_mini_voltage(sensor, state.serial);
 		else
 			return AltosConvert.tele_mini_voltage(sensor);
 	}

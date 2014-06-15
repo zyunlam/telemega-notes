@@ -46,7 +46,7 @@
 #define HAS_BEEP		0
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		1
-#define HAS_RDF			0
+#define HAS_RDF			1
 #define HAS_APRS		1
 #define HAS_RADIO_RECV		0
 
@@ -69,9 +69,11 @@
 #define HAS_FLIGHT		0
 #define HAS_ADC			0
 #define HAS_LOG			1
+#define HAS_TRACKER		1
 
-#define AO_CONFIG_DEFAULT_APRS_INTERVAL	5
+#define AO_CONFIG_DEFAULT_APRS_INTERVAL		0
 #define AO_CONFIG_DEFAULT_RADIO_POWER		0xc0
+#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	496 * 1024
 
 /*
  * GPS
@@ -85,9 +87,9 @@
 
 /* gets pretty close to 434.550 */
 
-#define AO_RADIO_CAL_DEFAULT 	0x10b6a5
+#define AO_RADIO_CAL_DEFAULT 	1095378
 
-#define HAS_RADIO_POWER		1
+#define HAS_RADIO_POWER		0
 #define AO_FEC_DEBUG		0
 #define AO_CC115L_SPI_CS_PORT	0
 #define AO_CC115L_SPI_CS_PIN	3

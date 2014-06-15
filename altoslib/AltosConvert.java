@@ -18,7 +18,7 @@
 /*
  * Sensor data conversion functions
  */
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 public class AltosConvert {
 	/*
@@ -208,7 +208,7 @@ public class AltosConvert {
 
 	static public double mega_battery_voltage(int v_batt) {
 		if (v_batt != AltosLib.MISSING)
-			return 3.3 * mega_adc(v_batt) * (15.0 + 27.0) / 27.0;
+			return 3.3 * mega_adc(v_batt) * (5.6 + 10.0) / 10.0;
 		return AltosLib.MISSING;
 	}
 
@@ -224,10 +224,27 @@ public class AltosConvert {
 		return sensor / 32767.0 * supply * 127/27;
 	}
 
-	static double easy_mini_voltage(int sensor) {
-		double	supply = 3.0;
+	static double tele_gps_voltage(int sensor) {
+		double	supply = 3.3;
 
-		return sensor / 32767.0 * supply * 127/27;
+		return sensor / 32767.0 * supply * (5.6 + 10.0) / 10.0;
+	}
+
+	static double easy_mini_voltage(int sensor, int serial) {
+		double	supply = 3.3;
+		double	diode_offset = 0.0;
+
+		/* early prototypes had a 3.0V regulator */
+		if (serial < 1000)
+			supply = 3.0;
+
+		/* Purple v1.0 boards had the sensor after the
+		 * blocking diode, which drops about 150mV
+		 */
+		if (serial < 1665)
+			diode_offset = 0.150;
+
+		return sensor / 32767.0 * supply * 127/27 + diode_offset;
 	}
 
 	public static double radio_to_frequency(int freq, int setting, int cal, int channel) {
@@ -332,6 +349,12 @@ public class AltosConvert {
 
 	public static AltosOrient orient = new AltosOrient();
 
+	public static AltosVoltage voltage = new AltosVoltage();
+
+	public static AltosLatitude latitude = new AltosLatitude();
+
+	public static AltosLongitude longitude = new AltosLongitude();
+
 	public static String show_gs(String format, double a) {
 		a = meters_to_g(a);
 		format = format.concat(" g");
@@ -347,5 +370,43 @@ public class AltosConvert {
 		for (int i = 0; i < length; i++)
 			csum += data[i + start];
 		return csum & 0xff;
+	}
+
+	public static double beep_value_to_freq(int value) {
+		if (value == 0)
+			return 4000;
+		return 1.0/2.0 * (24.0e6/32.0) / (double) value;
+	}
+
+	public static int beep_freq_to_value(double freq) {
+		if (freq == 0)
+			return 94;
+		return (int) Math.floor (1.0/2.0 * (24.0e6/32.0) / freq + 0.5);
+	}
+
+	public static final int BEARING_LONG = 0;
+	public static final int BEARING_SHORT = 1;
+	public static final int BEARING_VOICE = 2;
+
+	public static String bearing_to_words(int length, double bearing) {
+		String [][] bearing_string = {
+			{
+				"North", "North North East", "North East", "East North East",
+				"East", "East South East", "South East", "South South East",
+				"South", "South South West", "South West", "West South West",
+				"West", "West North West", "North West", "North North West"
+			}, {
+				"N", "NNE", "NE", "ENE",
+				"E", "ESE", "SE", "SSE",
+				"S", "SSW", "SW", "WSW",
+				"W", "WNW", "NW", "NNW"
+			}, {
+				"north", "nor nor east", "north east", "east nor east",
+				"east", "east sow east", "south east", "sow sow east",
+				"south", "sow sow west", "south west", "west sow west",
+				"west", "west nor west", "north west", "nor nor west "
+			}
+		};
+		return bearing_string[length][(int)((bearing / 90 * 8 + 1) / 2)%16];
 	}
 }

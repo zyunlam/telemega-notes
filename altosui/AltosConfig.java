@@ -22,8 +22,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.text.*;
-import org.altusmetrum.altoslib_3.*;
-import org.altusmetrum.altosuilib_1.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
 public class AltosConfig implements ActionListener {
 
@@ -229,22 +229,28 @@ public class AltosConfig implements ActionListener {
 
 	void save_data() {
 
-		/* bounds check stuff */
-		if (config_ui.flight_log_max() > data.log_limit()) {
+		try {
+			/* bounds check stuff */
+			if (config_ui.flight_log_max() > data.log_space() / 1024) {
+				JOptionPane.showMessageDialog(owner,
+							      String.format("Requested flight log, %dk, is larger than the available space, %dk.\n",
+									    config_ui.flight_log_max(),
+									    data.log_space() / 1024),
+							      "Maximum Flight Log Too Large",
+							      JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			/* Pull data out of the UI and stuff back into our local data record */
+
+			data.get_values(config_ui);
+			run_serial_thread(serial_mode_save);
+		} catch (AltosConfigDataException ae) {
 			JOptionPane.showMessageDialog(owner,
-						      String.format("Requested flight log, %dk, is larger than the available space, %dk.\n",
-								    config_ui.flight_log_max(),
-								    data.log_limit()),
-						      "Maximum Flight Log Too Large",
+						      ae.getMessage(),
+						      "Configuration Data Error",
 						      JOptionPane.ERROR_MESSAGE);
-			return;
 		}
-
-		/* Pull data out of the UI and stuff back into our local data record */
-
-		data.get_values(config_ui);
-
-		run_serial_thread(serial_mode_save);
 	}
 
 	public void actionPerformed(ActionEvent e) {

@@ -18,8 +18,8 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.3.2)
-AC_CONFIG_SRCDIR([src/core/ao.h])
+AC_INIT([altos], 1.4)
+AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
@@ -29,8 +29,8 @@ AC_SUBST(VERSION_DASH)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=1
-ALTOSLIB_VERSION=3
+ALTOSUILIB_VERSION=2
+ALTOSLIB_VERSION=4
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -161,6 +161,20 @@ AC_ARG_WITH(fat-dir, AS_HELP_STRING([--with-fat-dir=PATH],
 AM_CONDITIONAL(FATINSTALL, [test "x$FATDIR" != "xnone"])
 
 AC_SUBST(FATDIR)
+
+AC_ARG_WITH(google-key, AS_HELP_STRING([--with-google-key=PATH],
+	    [Set the file to read the google maps API key from (defaults to ~/altusmetrumllc/google-maps-api-key)]),
+	    [GOOGLEKEYFILE=$withval], [GOOGLEKEYFILE=$HOME/altusmetrumllc/google-maps-api-key])
+
+if test -r "$GOOGLEKEYFILE" -a -s "$GOOGLEKEYFILE"; then
+	GOOGLEKEY='"'`cat "$GOOGLEKEYFILE"`'"'
+	HAVE_GOOGLE_KEY="yes"
+else
+	GOOGLEKEY='null'
+	HAVE_GOOGLE_KEY="no"
+fi
+
+AC_SUBST(GOOGLEKEY)
 
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -487,6 +501,7 @@ AC_OUTPUT([
 Makefile
 src/Makedefs
 altoslib/Makefile
+icon/Makefile
 altosuilib/Makefile
 altosuilib/AltosUIVersion.java
 altosui/Makefile
@@ -496,6 +511,9 @@ libaltos/Makefile
 micropeak/Makefile
 micropeak/Info.plist
 micropeak/micropeak-windows.nsi
+telegps/Makefile
+telegps/Info.plist
+telegps/telegps-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
 ao-tools/Makefile
@@ -536,11 +554,12 @@ echo "    STlink support..............: ${HAVE_STLINK}"
 echo "    Local pdclib................: ${HAVE_PDCLIB}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
 echo ""
-echo "  Java paths"
+echo "  Java"
 echo "    freetts.....................: ${FREETTS}"
 echo "    jfreechart..................: ${JFREECHART}"
 echo "    jcommon.....................: ${JCOMMON}"
 echo "    JVM include.................: ${JVM_INCLUDE}"
+echo "    Google maps API key.........: ${HAVE_GOOGLE_KEY}"
 if test x${ANDROID_SDK} != "xno"; then
 echo ""
 echo "  Android path"

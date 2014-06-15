@@ -21,100 +21,128 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_3.*;
-import org.altusmetrum.altosuilib_1.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
 public class AltosConfigUI
 	extends AltosUIDialog
 	implements ActionListener, ItemListener, DocumentListener, AltosConfigValues, AltosUnitsListener
 {
 
-	Container	pane;
-	JLabel		product_label;
-	JLabel		version_label;
-	JLabel		serial_label;
-	JLabel		main_deploy_label;
-	JLabel		apogee_delay_label;
-	JLabel		apogee_lockout_label;
-	JLabel		frequency_label;
-	JLabel		radio_calibration_label;
-	JLabel		radio_frequency_label;
-	JLabel		radio_enable_label;
-	JLabel		aprs_interval_label;
-	JLabel		flight_log_max_label;
-	JLabel		ignite_mode_label;
-	JLabel		pad_orientation_label;
-	JLabel		callsign_label;
+	Container		pane;
+	JLabel			product_label;
+	JLabel			version_label;
+	JLabel			serial_label;
+	JLabel			main_deploy_label;
+	JLabel			apogee_delay_label;
+	JLabel			apogee_lockout_label;
+	JLabel			frequency_label;
+	JLabel			radio_calibration_label;
+	JLabel			radio_frequency_label;
+	JLabel			radio_enable_label;
+	JLabel			aprs_interval_label;
+	JLabel			flight_log_max_label;
+	JLabel			ignite_mode_label;
+	JLabel			pad_orientation_label;
+	JLabel			callsign_label;
+	JLabel			beep_label;
+	JLabel			tracker_motion_label;
+	JLabel			tracker_interval_label;
 
 	public boolean		dirty;
 
-	JFrame		owner;
-	JLabel		product_value;
-	JLabel		version_value;
-	JLabel		serial_value;
-	JComboBox	main_deploy_value;
-	JComboBox	apogee_delay_value;
-	JComboBox	apogee_lockout_value;
-	AltosFreqList	radio_frequency_value;
-	JTextField	radio_calibration_value;
-	JRadioButton	radio_enable_value;
-	JComboBox	aprs_interval_value;
-	JComboBox	flight_log_max_value;
-	JComboBox	ignite_mode_value;
-	JComboBox	pad_orientation_value;
-	JTextField	callsign_value;
+	JFrame			owner;
+	JLabel			product_value;
+	JLabel			version_value;
+	JLabel			serial_value;
+	JComboBox<String>	main_deploy_value;
+	JComboBox<String>	apogee_delay_value;
+	JComboBox<String>	apogee_lockout_value;
+	AltosFreqList		radio_frequency_value;
+	JTextField		radio_calibration_value;
+	JRadioButton		radio_enable_value;
+	JComboBox<String>	aprs_interval_value;
+	JComboBox<String>	flight_log_max_value;
+	JComboBox<String>	ignite_mode_value;
+	JComboBox<String>	pad_orientation_value;
+	JTextField		callsign_value;
+	JComboBox<String>	beep_value;
+	JComboBox<String>	tracker_motion_value;
+	JComboBox<String>	tracker_interval_value;
 
-	JButton		pyro;
+	JButton			pyro;
 
-	JButton		save;
-	JButton		reset;
-	JButton		reboot;
-	JButton		close;
+	JButton			save;
+	JButton			reset;
+	JButton			reboot;
+	JButton			close;
 
-	AltosPyro[]	pyros;
+	AltosPyro[]		pyros;
+	double			pyro_firing_time;
 
-	ActionListener	listener;
+	ActionListener		listener;
 
-	static String[] main_deploy_values_m = {
+	static String[] 	main_deploy_values_m = {
 		"100", "150", "200", "250", "300", "350",
 		"400", "450", "500"
 	};
 
-	static String[] main_deploy_values_ft = {
+	static String[] 	main_deploy_values_ft = {
 		"250", "500", "750", "1000", "1250", "1500",
 		"1750", "2000"
 	};
 
-	static String[] apogee_delay_values = {
+	static String[] 	apogee_delay_values = {
 		"0", "1", "2", "3", "4", "5"
 	};
 
-	static String[] apogee_lockout_values = {
+	static String[] 	apogee_lockout_values = {
 		"0", "5", "10", "15", "20"
 	};
 
-	static String[] flight_log_max_values = {
-		"64", "128", "192", "256", "320",
-		"384", "448", "512", "576", "640",
-		"704", "768", "832", "896", "960",
-	};
-
-	static String[] ignite_mode_values = {
+	static String[] 	ignite_mode_values = {
 		"Dual Deploy",
 		"Redundant Apogee",
 		"Redundant Main",
 	};
 
-	static String[] aprs_interval_values = {
+	static String[] 	aprs_interval_values = {
 		"Disabled",
 		"2",
 		"5",
 		"10"
 	};
 
-	static String[] pad_orientation_values = {
+	static String[] 	beep_values = {
+		"3750",
+		"4000",
+		"4250",
+	};
+
+	static String[] 	pad_orientation_values = {
 		"Antenna Up",
 		"Antenna Down",
+	};
+
+	static String[]		tracker_motion_values_m = {
+		"2",
+		"5",
+		"10",
+		"25",
+	};
+
+	static String[]		tracker_motion_values_ft = {
+		"5",
+		"20",
+		"50",
+		"100"
+	};
+
+	static String[]		tracker_interval_values = {
+		"1",
+		"2",
+		"5",
+		"10"
 	};
 
 	/* A window listener to catch closing events and tell the config code */
@@ -132,9 +160,19 @@ public class AltosConfigUI
 		}
 	}
 
+	boolean is_telemini_v1() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("TeleMini-v1");
+	}
+
 	boolean is_telemini() {
 		String	product = product_value.getText();
 		return product != null && product.startsWith("TeleMini");
+	}
+
+	boolean is_easymini() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("EasyMini");
 	}
 
 	boolean is_telemetrum() {
@@ -167,12 +205,10 @@ public class AltosConfigUI
 		if (flight_log_max_value.isEnabled())
 			flight_log_max_value.setToolTipText("Size reserved for each flight log (in kB)");
 		else {
-			if (is_telemetrum())
-				flight_log_max_value.setToolTipText("Cannot set max value with flight logs in memory");
-			else if (is_telemini())
-				flight_log_max_value.setToolTipText("TeleMini stores only one flight");
+			if (is_telemini_v1())
+				flight_log_max_value.setToolTipText("TeleMini-v1 stores only one flight");
 			else
-				flight_log_max_value.setToolTipText("Cannot set max flight log value");
+				flight_log_max_value.setToolTipText("Cannot set max value with flight logs in memory");
 		}
 	}
 
@@ -189,11 +225,18 @@ public class AltosConfigUI
 		else {
 			if (is_telemetrum())
 				pad_orientation_value.setToolTipText("Older TeleMetrum firmware must fly antenna forward");
-			else if (is_telemini())
-				pad_orientation_value.setToolTipText("TeleMini doesn't care how it is mounted");
+			else if (is_telemini() || is_easymini())
+				pad_orientation_value.setToolTipText("TeleMini and EasyMini don't care how they are mounted");
 			else
 				pad_orientation_value.setToolTipText("Can't select orientation");
 		}
+	}
+
+	void set_beep_tool_tip() {
+		if (beep_value.isEnabled())
+			beep_value.setToolTipText("What frequency the beeper will sound at");
+		else
+			beep_value.setToolTipText("Older firmware could not select beeper frequency");
 	}
 
 	/* Build the UI using a grid bag */
@@ -296,7 +339,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		main_deploy_value = new JComboBox(main_deploy_values());
+		main_deploy_value = new JComboBox<String>(main_deploy_values());
 		main_deploy_value.setEditable(true);
 		main_deploy_value.addItemListener(this);
 		pane.add(main_deploy_value, c);
@@ -322,7 +365,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		apogee_delay_value = new JComboBox(apogee_delay_values);
+		apogee_delay_value = new JComboBox<String>(apogee_delay_values);
 		apogee_delay_value.setEditable(true);
 		apogee_delay_value.addItemListener(this);
 		pane.add(apogee_delay_value, c);
@@ -348,7 +391,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		apogee_lockout_value = new JComboBox(apogee_lockout_values);
+		apogee_lockout_value = new JComboBox<String>(apogee_lockout_values);
 		apogee_lockout_value.setEditable(true);
 		apogee_lockout_value.addItemListener(this);
 		pane.add(apogee_lockout_value, c);
@@ -451,7 +494,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		aprs_interval_value = new JComboBox(aprs_interval_values);
+		aprs_interval_value = new JComboBox<String>(aprs_interval_values);
 		aprs_interval_value.setEditable(true);
 		aprs_interval_value.addItemListener(this);
 		pane.add(aprs_interval_value, c);
@@ -491,7 +534,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = il;
 		c.ipady = 5;
-		flight_log_max_label = new JLabel("Maximum Flight Log Size:");
+		flight_log_max_label = new JLabel("Maximum Flight Log Size (kB):");
 		pane.add(flight_log_max_label, c);
 
 		c = new GridBagConstraints();
@@ -502,7 +545,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		flight_log_max_value = new JComboBox(flight_log_max_values);
+		flight_log_max_value = new JComboBox<String>();
 		flight_log_max_value.setEditable(true);
 		flight_log_max_value.addItemListener(this);
 		pane.add(flight_log_max_value, c);
@@ -528,7 +571,7 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		ignite_mode_value = new JComboBox(ignite_mode_values);
+		ignite_mode_value = new JComboBox<String>(ignite_mode_values);
 		ignite_mode_value.setEditable(false);
 		ignite_mode_value.addItemListener(this);
 		pane.add(ignite_mode_value, c);
@@ -554,11 +597,88 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		pad_orientation_value = new JComboBox(pad_orientation_values);
+		pad_orientation_value = new JComboBox<String>(pad_orientation_values);
 		pad_orientation_value.setEditable(false);
 		pad_orientation_value.addItemListener(this);
 		pane.add(pad_orientation_value, c);
 		set_pad_orientation_tool_tip();
+		row++;
+
+		/* Beeper */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		beep_label = new JLabel("Beeper Frequency:");
+		pane.add(beep_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		beep_value = new JComboBox<String>(beep_values);
+		beep_value.setEditable(true);
+		beep_value.addItemListener(this);
+		pane.add(beep_value, c);
+		set_beep_tool_tip();
+		row++;
+
+		/* Tracker triger horiz distances */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		tracker_motion_label = new JLabel(get_tracker_motion_label());
+		pane.add(tracker_motion_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		tracker_motion_value = new JComboBox<String>(tracker_motion_values());
+		tracker_motion_value.setEditable(true);
+		tracker_motion_value.addItemListener(this);
+		pane.add(tracker_motion_value, c);
+		row++;
+
+		/* Tracker triger vert distances */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		tracker_interval_label = new JLabel("Position Reporting Interval(s):");
+		pane.add(tracker_interval_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		tracker_interval_value = new JComboBox<String>(tracker_interval_values);
+		tracker_interval_value.setEditable(true);
+		tracker_interval_value.addItemListener(this);
+		pane.add(tracker_interval_value, c);
+		set_tracker_tool_tip();
 		row++;
 
 		/* Pyro channels */
@@ -673,7 +793,7 @@ public class AltosConfigUI
 
 		if (cmd.equals("Pyro")) {
 			if (pyro_ui == null && pyros != null)
-				pyro_ui = new AltosConfigPyroUI(this, pyros);
+				pyro_ui = new AltosConfigPyroUI(this, pyros, pyro_firing_time);
 			if (pyro_ui != null)
 				pyro_ui.make_visible();
 			return;
@@ -742,14 +862,14 @@ public class AltosConfigUI
 	String get_main_deploy_label() {
 		return String.format("Main Deploy Altitude(%s):", AltosConvert.height.show_units());
 	}
-	
+
 	String[] main_deploy_values() {
 		if (AltosConvert.imperial_units)
 			return main_deploy_values_ft;
 		else
 			return main_deploy_values_m;
 	}
-			
+
 	void set_main_deploy_values() {
 		String[]	v = main_deploy_values();
 		while (main_deploy_value.getItemCount() > 0)
@@ -758,13 +878,20 @@ public class AltosConfigUI
 			main_deploy_value.addItem(v[i]);
 		main_deploy_value.setMaximumRowCount(v.length);
 	}
-	
+
 	public void units_changed(boolean imperial_units) {
 		String v = main_deploy_value.getSelectedItem().toString();
 		main_deploy_label.setText(get_main_deploy_label());
 		set_main_deploy_values();
 		int m = (int) (AltosConvert.height.parse(v, !imperial_units) + 0.5);
 		set_main_deploy(m);
+
+		if (tracker_motion_value.isEnabled()) {
+			String motion = tracker_motion_value.getSelectedItem().toString();
+			tracker_motion_label.setText(get_tracker_motion_label());
+			set_tracker_motion_values();
+			set_tracker_motion((int) (AltosConvert.height.parse(motion, !imperial_units) + 0.5));
+		}
 	}
 
 	public void set_apogee_delay(int new_apogee_delay) {
@@ -772,8 +899,19 @@ public class AltosConfigUI
 		apogee_delay_value.setEnabled(new_apogee_delay >= 0);
 	}
 
-	public int apogee_delay() {
-		return Integer.parseInt(apogee_delay_value.getSelectedItem().toString());
+	private int parse_int(String name, String s, boolean split) throws AltosConfigDataException {
+		String v = s;
+		if (split)
+			v = s.split("\\s+")[0];
+		try {
+			return Integer.parseInt(v);
+		} catch (NumberFormatException ne) {
+			throw new AltosConfigDataException("Invalid %s \"%s\"", name, s);
+		}
+	}
+
+	public int apogee_delay() throws AltosConfigDataException {
+		return parse_int("apogee delay", apogee_delay_value.getSelectedItem().toString(), false);
 	}
 
 	public void set_apogee_lockout(int new_apogee_lockout) {
@@ -781,8 +919,8 @@ public class AltosConfigUI
 		apogee_lockout_value.setEnabled(new_apogee_lockout >= 0);
 	}
 
-	public int apogee_lockout() {
-		return Integer.parseInt(apogee_lockout_value.getSelectedItem().toString());
+	public int apogee_lockout() throws AltosConfigDataException {
+		return parse_int("apogee lockout", apogee_lockout_value.getSelectedItem().toString(), false);
 	}
 
 	public void set_radio_frequency(double new_radio_frequency) {
@@ -801,8 +939,8 @@ public class AltosConfigUI
 			radio_calibration_value.setText(String.format("%d", new_radio_calibration));
 	}
 
-	public int radio_calibration() {
-		return Integer.parseInt(radio_calibration_value.getText());
+	public int radio_calibration() throws AltosConfigDataException {
+		return parse_int("radio calibration", radio_calibration_value.getText(), false);
 	}
 
 	public void set_radio_enable(int new_radio_enable) {
@@ -833,9 +971,22 @@ public class AltosConfigUI
 		return callsign_value.getText();
 	}
 
+	int	flight_log_max_limit;
+	int	flight_log_max;
+
+	public String flight_log_max_label(int flight_log_max) {
+		if (flight_log_max_limit != 0) {
+			int	nflight = flight_log_max_limit / flight_log_max;
+			String	plural = nflight > 1 ? "s" : "";
+
+			return String.format("%d (%d flight%s)", flight_log_max, nflight, plural);
+		}
+		return String.format("%d", flight_log_max);
+	}
+
 	public void set_flight_log_max(int new_flight_log_max) {
-		flight_log_max_value.setEnabled(new_flight_log_max > 0);
-		flight_log_max_value.setSelectedItem(Integer.toString(new_flight_log_max));
+		flight_log_max_value.setSelectedItem(flight_log_max_label(new_flight_log_max));
+		flight_log_max = new_flight_log_max;
 		set_flight_log_max_tool_tip();
 	}
 
@@ -844,20 +995,19 @@ public class AltosConfigUI
 		set_flight_log_max_tool_tip();
 	}
 
-	public int flight_log_max() {
-		return Integer.parseInt(flight_log_max_value.getSelectedItem().toString());
+	public int flight_log_max() throws AltosConfigDataException {
+		return parse_int("flight log max", flight_log_max_value.getSelectedItem().toString(), true);
 	}
 
-	public void set_flight_log_max_limit(int flight_log_max_limit) {
-		//boolean	any_added = false;
+	public void set_flight_log_max_limit(int new_flight_log_max_limit) {
+		flight_log_max_limit = new_flight_log_max_limit;
 		flight_log_max_value.removeAllItems();
-		for (int i = 0; i < flight_log_max_values.length; i++) {
-			if (Integer.parseInt(flight_log_max_values[i]) < flight_log_max_limit){
-				flight_log_max_value.addItem(flight_log_max_values[i]);
-				//any_added = true;
-			}
+		for (int i = 8; i >= 1; i--) {
+			int	size = flight_log_max_limit / i;
+			flight_log_max_value.addItem(String.format("%d (%d flights)", size, i));
 		}
-		flight_log_max_value.addItem(String.format("%d", flight_log_max_limit));
+		if (flight_log_max != 0)
+			set_flight_log_max(flight_log_max);
 	}
 
 	public void set_ignite_mode(int new_ignite_mode) {
@@ -901,6 +1051,87 @@ public class AltosConfigUI
 			return -1;
 	}
 
+	public void set_beep(int new_beep) {
+		int new_freq = (int) Math.floor (AltosConvert.beep_value_to_freq(new_beep) + 0.5);
+		for (int i = 0; i < beep_values.length; i++)
+			if (new_beep == AltosConvert.beep_freq_to_value(Integer.parseInt(beep_values[i]))) {
+				beep_value.setSelectedIndex(i);
+				set_beep_tool_tip();
+				return;
+			}
+		beep_value.setSelectedItem(String.format("%d", new_freq));
+		beep_value.setEnabled(new_beep >= 0);
+		set_beep_tool_tip();
+	}
+
+	public int beep() {
+		if (beep_value.isEnabled())
+			return AltosConvert.beep_freq_to_value(Integer.parseInt(beep_value.getSelectedItem().toString()));
+		else
+			return -1;
+	}
+
+	String[] tracker_motion_values() {
+		if (AltosConvert.imperial_units)
+			return tracker_motion_values_ft;
+		else
+			return tracker_motion_values_m;
+	}
+
+	void set_tracker_motion_values() {
+		String[]	v = tracker_motion_values();
+		while (tracker_motion_value.getItemCount() > 0)
+			tracker_motion_value.removeItemAt(0);
+		for (int i = 0; i < v.length; i++)
+			tracker_motion_value.addItem(v[i]);
+		tracker_motion_value.setMaximumRowCount(v.length);
+	}
+
+	String get_tracker_motion_label() {
+		return String.format("Logging Trigger Motion (%s):", AltosConvert.height.show_units());
+	}
+
+	void set_tracker_tool_tip() {
+		if (tracker_motion_value.isEnabled())
+			tracker_motion_value.setToolTipText("How far the device must move before logging");
+		else
+			tracker_motion_value.setToolTipText("This device doesn't disable logging when stationary");
+		if (tracker_interval_value.isEnabled())
+			tracker_interval_value.setToolTipText("How often to report GPS position");
+		else
+			tracker_interval_value.setToolTipText("This device can't configure interval");
+	}
+
+	public void set_tracker_motion(int tracker_motion) {
+		if (tracker_motion < 0) {
+			tracker_motion_label.setVisible(false);
+			tracker_motion_value.setVisible(false);
+		} else {
+			tracker_motion_label.setVisible(true);
+			tracker_motion_value.setVisible(true);
+			tracker_motion_value.setSelectedItem(AltosConvert.height.say(tracker_motion));
+		}
+	}
+
+	public int tracker_motion() throws AltosConfigDataException {
+		return (int) AltosConvert.height.parse(tracker_motion_value.getSelectedItem().toString());
+	}
+
+	public void set_tracker_interval(int tracker_interval) {
+		if (tracker_interval< 0) {
+			tracker_interval_label.setVisible(false);
+			tracker_interval_value.setVisible(false);
+		} else {
+			tracker_interval_label.setVisible(true);
+			tracker_interval_value.setVisible(true);
+			tracker_interval_value.setSelectedItem(String.format("%d", tracker_interval));
+		}
+	}
+
+	public int tracker_interval() throws AltosConfigDataException {
+		return parse_int ("tracker interval", tracker_interval_value.getSelectedItem().toString(), false);
+	}
+
 	public void set_pyros(AltosPyro[] new_pyros) {
 		pyros = new_pyros;
 		pyro.setVisible(pyros != null);
@@ -908,10 +1139,23 @@ public class AltosConfigUI
 			pyro_ui.set_pyros(pyros);
 	}
 
-	public AltosPyro[] pyros() {
+	public AltosPyro[] pyros() throws AltosConfigDataException {
 		if (pyro_ui != null)
 			pyros = pyro_ui.get_pyros();
 		return pyros;
+	}
+
+	public void set_pyro_firing_time(double new_pyro_firing_time) {
+		pyro_firing_time = new_pyro_firing_time;
+		pyro.setVisible(pyro_firing_time >= 0);
+		if (pyro_firing_time >= 0 && pyro_ui != null)
+			pyro_ui.set_pyro_firing_time(pyro_firing_time);
+	}
+
+	public double pyro_firing_time() throws AltosConfigDataException {
+		if (pyro_ui != null)
+			pyro_firing_time = pyro_ui.get_pyro_firing_time();
+		return pyro_firing_time;
 	}
 
 	public void set_aprs_interval(int new_aprs_interval) {
@@ -926,11 +1170,11 @@ public class AltosConfigUI
 		set_aprs_interval_tool_tip();
 	}
 
-	public int aprs_interval() {
+	public int aprs_interval() throws AltosConfigDataException {
 		String	s = aprs_interval_value.getSelectedItem().toString();
 
 		if (s.equals("Disabled"))
 			return 0;
-		return Integer.parseInt(s);
+		return parse_int("aprs interval", s, false);
 	}
 }

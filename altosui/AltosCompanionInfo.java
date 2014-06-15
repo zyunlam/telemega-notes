@@ -19,9 +19,10 @@ package altosui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_3.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
-public class AltosCompanionInfo extends JTable {
+public class AltosCompanionInfo extends JTable implements AltosFlightDisplay {
 	private AltosFlightInfoTableModel model;
 
 	static final int info_columns = 2;
@@ -32,10 +33,13 @@ public class AltosCompanionInfo extends JTable {
 		return (infoValueMetrics.getHeight() + infoValueMetrics.getLeading()) * 18 / 10;
 	}
 
-	public void set_font() {
+	public void font_size_changed(int font_size) {
 		setFont(Altos.table_value_font);
 		setRowHeight(desired_row_height());
 		doLayout();
+	}
+
+	public void units_changed(boolean imperial_units) {
 	}
 
 	public AltosCompanionInfo() {
@@ -43,14 +47,14 @@ public class AltosCompanionInfo extends JTable {
 		model = (AltosFlightInfoTableModel) getModel();
 		setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
 		setShowGrid(true);
-		set_font();
+		font_size_changed(AltosUIPreferences.font_size());
 	}
 
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
 	}
 
-	void info_reset() {
+	public void reset() {
 		model.reset();
 	}
 
@@ -82,13 +86,15 @@ public class AltosCompanionInfo extends JTable {
 			return String.format("%02x\n", companion.board_id);
 		}
 	}
-	
+
+	public String getName() { return "Companion"; }
+
 	public void show(AltosState state, AltosListenerState listener_state) {
 		if (state == null)
 			return;
 		if (state.companion != null)
 			companion = state.companion;
-		info_reset();
+		reset();
 		info_add_row(0, "Companion board", "%s", board_name());
 		if (companion != null) {
 			info_add_row(0, "Last Data", "%5d", companion.tick);
