@@ -403,8 +403,6 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 	}
 
 	public AltosUIMapPreload(AltosUIFrame in_owner) {
-		System.out.printf("start creating preload ui\n");
-
 		owner = in_owner;
 
 		Container		pane = getContentPane();
@@ -605,7 +603,5 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 		pack();
 		setLocationRelativeTo(owner);
 		setVisible(true);
-
-		System.out.printf("done creating preload ui\n");
 	}
 }
