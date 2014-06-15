@@ -64,10 +64,12 @@ These are Bdale's notes on how to do a release.
 
 	# store a stable copy of ARM binaries for production use
 	cp src/easymini-v1.0/*.elf \
+	   src/telegps-v1.0/*.elf \
 	   src/telemega-v1.0/*.elf \
 	   src/telemetrum-v2.0/*.elf \
 	   ~/altusmetrumllc/Binaries/
 	cp src/easymini-v1.0/flash-loader/*.elf \
+	   src/telegps-v1.0/flash-loader/*.elf \
 	   src/telemega-v1.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
 	   ~/altusmetrumllc/Binaries/loaders/
