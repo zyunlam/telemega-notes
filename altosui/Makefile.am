@@ -114,7 +114,10 @@ FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0)
 FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
 FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0)
 
-FIRMWARE=$(FIRMWARE_TM) $(FIRMWARE_TELEMINI) $(FIRMWARE_TD) $(FIRMWARE_TBT) $(FIRMWARE_TMEGA) $(FIRMWARE_EMINI)
+FIRMWARE_TGPS_1_0=$(top_srcdir)/src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx
+FIRMWARE_TGPS=$(FIRMWARE_TGPS_1_0)
+
+FIRMWARE=$(FIRMWARE_TM) $(FIRMWARE_TELEMINI) $(FIRMWARE_TD) $(FIRMWARE_TBT) $(FIRMWARE_TMEGA) $(FIRMWARE_EMINI) $(FIRMWARE_TGPS)
 
 ALTUSMETRUM_DOC=$(top_srcdir)/doc/altusmetrum.pdf
 ALTOS_DOC=$(top_srcdir)/doc/altos.pdf
@@ -144,7 +147,7 @@ MACOSX_INFO_PLIST=Info.plist
 MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICON)
 MACOSX_EXTRA=$(FIRMWARE)
 
-WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(WINDOWS_ICON)
+WINDOWS_FILES=$(FAT_FILES) $(FIRMWARE) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(WINDOWS_ICON)
 
 all-local: classes/altosui $(JAR) altosui altosui-test altosui-jdb
 
