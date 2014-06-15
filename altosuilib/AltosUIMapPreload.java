@@ -327,7 +327,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 
 	/* AltosUIMapTileListener methods */
 
-	public void notify_tile(AltosUIMapTile tile, int status) {
+	public synchronized void notify_tile(AltosUIMapTile tile, int status) {
 		if (status == AltosUIMapStore.loading)
 			return;
 

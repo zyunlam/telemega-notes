@@ -387,7 +387,7 @@ public class AltosUIMapView extends Component implements MouseMotionListener, Mo
 	}
 
 	/* AltosUIMapTileListener methods */
-	public void notify_tile(AltosUIMapTile tile, int status) {
+	public synchronized void notify_tile(AltosUIMapTile tile, int status) {
 		for (Point point : tiles.keySet()) {
 			if (tile == tiles.get(point)) {
 				Point	screen = transform.screen(point);
@@ -399,7 +399,7 @@ public class AltosUIMapView extends Component implements MouseMotionListener, Mo
 	public AltosUIMapCache cache() { return cache; }
 
 	/* AltosUIMapStoreListener methods */
-	public void notify_store(AltosUIMapStore store, int status) {
+	public synchronized void notify_store(AltosUIMapStore store, int status) {
 		if (load_listener != null) {
 			for (AltosUIMapTile tile : tiles.values())
 				if (store.equals(tile.store))
