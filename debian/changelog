@@ -1,3 +1,334 @@
+altos (1.4-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * Add linux installer script
+  * Put altusmetrum.svg and micropeak.svg in icon directory
+  * Move .desktop and icon management out of debian dir
+  * micropeak: Construct linux install script
+  * Mark .desktop files as executable
+  * Re-create drill templates
+  * doc: Need to publish .svg files as well
+  * altos: Move balloon flight code to core
+  * altos: Expose ao_usb_running globally
+  * altos: Set reasonable accel values when !HAS_ACCEL
+  * altos: Make balloon code run again
+  * altos: Create balloon-specific load for TMv2 hardware
+  * libaltos: Link so with -znoexecstack flag
+  * Mark development sequence to 1.3.3 by bumping version to 1.3.2.1
+  * altosui: Retry device enumeration after rebooting for self flash
+  * Install .desktopfile as _SCRIPTS so they are left executable
+  * doc: Add separate outline pdf generation
+  * Add flash loader for stm-demo board
+  * Re-add LCD bits to stm-demo
+  * Add USB True Random Number Generator product
+  * altos: Don't require projects to define PACKET_HAS_SLAVE
+  * altos: fix building LPC serial support for STDIO
+  * altos: Fix LPC LED driver
+  * altos: Missing ao_pins files for usbtrng
+  * altos: Another missing usbtrng file
+  * altosui: Hide Tilt Angle values when not available
+  * Add easymega firmware
+  * altos: HAS_LED is useless; remove it
+  * altoslib: Ignore speed/accel after boost when finding maxima
+  * altoslib: Fix EasyMini voltage computations
+  * Add easymini turnon script and helpers
+  * altoslib: Missed a couple of easy mini voltage API changes
+  * altos: Rename 'core' to 'kernel'
+  * ao-bringup: Get turnon_telemini working
+  * ao-tools: Use 'program' command in ao-flash-lpc instead of 'flash'
+  * ao-tools: Wait for device to become ready instead of failing
+  * doc: Outline files are now generated, so don't put them in git
+  * altos: Report battery voltage instead of S at startup
+  * Bump version to 1.3.3
+  * doc: Document new voltage beeping at startup time
+  * altosui: Add ignitor tab for TeleMega extra ignitors
+  * ao-bringup: Split out easymini test into separate script
+  * altos: Build TeleBalloon v2.0 by default
+  * altos: Replace C code attiny async output with inline asm
+  * altos: Provide stable binaries for MicroPeak
+  * altos: Fix nanopeak compile
+  * altosui: Disable flight log configuration while flights are stored
+  * altos: Add 'microwater' product
+  * altoslib/altosui/altosuilib/libaltos: Remove trailing whitespace
+  * altosuilib: Make lines in graphs 2 units wide
+  * altos: Switch beeping to farnsworth spacing
+  * altosui: Add extra ignitors to graphable objects
+  * altoslib: Track pyro firing state when reading mega eeprom files
+  * altosui: Mark TeleMega additional pyro ignitor fired points in graphs
+  * ao-telem: Dump orientation field from TeleMega sensor telemetry packet
+  * ao-load: Make ao_sym static to avoid collision with ao-editaltos
+  * ao-tools: Clean up ao-sym structure an initializers
+  * altos: For telelco discovery packets, retry 5 times with shorter timeout
+  * altos: Add configurable beep tone
+  * altosui: Add configuration UI for beeper tone
+  * altos: 8051 64 * 16 multiply function was broken for negative 64-bit
+  * altoslib: Add a comment to remind us to fix the IMU code to deal with calibration
+  * altoslib: Parse remaining mega AO_LOG_FLIGNT and AO_LOG_GPS_TIME fields
+  * altosui: Add GPS course, ground speed and climb rate to graphs
+  * altos: ublox driver always offers course data when it has a fix
+  * altos: Fix byte offsets in the mega AO_LOG_FLIGHT packets
+  * altos: Clean up trailing whitespace in ao_pad.c
+  * altos: Simplify quadrature tracking
+  * atosui: Hide Callsign and RSSI tabs for devices without a radio
+  * ao-bringup: test-baro should accept altitudes a bit below sea level
+  * ao-bringup: Use official binaries for EasyMini turnon
+  * altos: Add LED test command to pca9922 driver
+  * altos: Report amount of program space available in the version command
+  * altos: Assume all LPC products will have 32KB of flash
+  * altos/stm: Use flash address of boot loader instead of 0x0
+  * altos/stm: White space fix in ao_boot_pin.c
+  * altos/stm: Figure out available flash space based on chip id registers
+  * altos/stm: Use #define'd constants for GPIO register addresses
+  * altos/flash-loader: Check memory addresses against flash space
+  * ao-tools/ao-usbload: Check image flash usage against device flash availability
+  * altos/cc1111: Wait for xtal to be stable
+  * altos/cc1111: Errata fix isn't needed for discontinued products
+  * altos/cc1111: Add support for CPU-driven USB pullup
+  * altos/cc1111: Switch P1_0 from a green LED to USB pullup
+  * altos/telemini-v2.0: Remove old baro->alt conversion table
+  * altos/telemini-v2.0: Enable beep frequency configuration
+  * altos: Make quadrature debounce per-pin rather than per-device
+  * doc: Document the Apogee Lockout setting
+  * altos: Use explicit boot loader signal in ao_boot_reboot
+  * altos: stm and lpc ao_boot.h were identical. move to kernel.
+  * altosui: Remove debug printf about beep config
+  * altosui: Remove another beep config debug printf
+  * altos/stm: Make stm applications depend on ao_boot.h
+  * altos/lpc: adc code computes number of active ADC channels
+  * altos/lpc: whitespace
+  * altos: Allow APRS to send just battery voltage
+  * altos: Fix cc115l debug build
+  * altos: Expose ao_gps_set_rate from u-blox driver
+  * altos: Don't define ao_ignite_decivolt without igniters
+  * altos/test: Get APRS generation test working again
+  * altos/test: Parse mega ground data. Fix pyro parsing
+  * altos: Add config values for tracker start motion limits
+  * altoslib: Move CSV/KML output code to altoslib
+  * altosui/altosuilib: Cleanup -Xlint:unchecked warnings
+  * altosui/altosuilib/altoslib: Move more stuff out of autosui. Reduce site map memory
+  * ao-tools: Add cc_usb_write function
+  * altoslib/altosuilib: Change versions to altoslib:4, altosuilib:2
+  * micropeak: Add -Xlint:unchecked to javac line
+  * altos: Make MS5607 PROM a public variable
+  * altos: Move ao_config declarations to ao_config.h
+  * altos/test: Fix ADC structure for mega, use ao_config.h
+  * altosuilib: Add multiple zoom levels and content types to map
+  * altos: Fake flight code changes in kernel and stm
+  * altosuilib: Add distance measuring line to site map.
+  * altosuilib: Decompress map images asynchronously and in parallel
+  * altosuilib: Add google maps API key, configured with -with-google-key
+  * altoslib: When log-format is missing, use product
+  * altosuilib: Remove debug printf in AltosSiteMapCache
+  * altosuilib: Update map preloading UI to include zoom and maptypes
+  * altosuilib: Publish AltosSiteMap.centre. Add prefetchMaps with old API
+  * altosuilib: Don't try to draw to destroyed map windows
+  * Document the need for ~/altusmetrumllc/google-maps-api-key
+  * altosui/altosuilib: Shuffle lots more code from altosui into altosuilib
+  * telegps: Add first version of telegps
+  * Mark version 1.3.2.2
+  * doc: Add outline of TeleGPS doc
+  * telegps: Working towards building fat versions of telegps application
+  * telegps: Use altosui's Instdrv NSIS plugin for telegps
+  * telegps: Add device configuration dialogs
+  * telegps: Add preferences dialog
+  * telegps: Add scan UI
+  * telegps: Hook up data download dialog
+  * telegps: Add 'Info' tab
+  * telegps: Don't try to ship TeleGPS firmware yet
+  * telegps: Auto-connect to any base stations plugged in at startup
+  * telegps: Add flash device functionality
+  * telegps: Add info table
+  * java: Refactor AltosFlightDisplay units and font update handling
+  * telegps: Add graph display
+  * Build telegps distribution bits with 'make fat'
+  * telegps: Add missing TeleGPSGraphUI.java file
+  * Capture windows build error messages
+  * TeleGPS firmware isn't quite ready, don't include in windows fat build yet
+  * telegps: Fixup windows fat build harder
+  * telegps: Add config for tracker starting distances
+  * altos: Switch APRS altitude encoding computation to fixed point
+  * altos: Test APRS altitude encoding
+  * altos: Allow sparse GPS data logging for TeleGPS
+  * altos: Configuring pyro channels can use more than 48 characters
+  * altos: Maximum pyro configuration parameter has 4 bytes in the name
+  * altos: Fetch/store only 8 bits for pyro state values
+  * altosui: Fix pyro channel value formatting
+  * altosui: Display error message when parsing pyro channel values fails
+  * altoslib: Add missing AltosConfigDataException file
+  * telegps: Trap AltosConfigDataException in telegps config
+  * doc: Create release notes for version 1.4
+  * altosuilib: Let the user hand-edit the preload map radius
+  * telegps: Update icon and icon building
+  * altos: Add ao_distance.c to compute cartesian distances on the globe
+  * altos: Add tracker task for TeleGPS
+  * altos: Include sensor logging task only on flight boards
+  * altos: Allow cc115l driver to be built without radio power control
+  * altos: ao_distance was overflowing when checking for longitude wrap
+  * altos: Change tracker not-moving speed to 2m/s and document
+  * altos: Have tracker average 5 GPS samples before moving to pad mode
+  * altos: Stick flight state in GPS location packets
+  * altos: Fix tracker start state
+  * altos: tracker distance computation flipped arguments around
+  * altos: Add debug to tracker to force launch
+  * altos/telegps-v0.3: Add tracker task
+  * altos: Add AO_LOG_FLIGHT packet to TeleGPS logs
+  * altos: Fix config to set default log size for all devices with log
+  * altos/lpc: HAS_USB_CONNECT has been changed to mean a custom pin
+  * altos: Force telemetry on by default for v0.3 TeleGPS boards
+  * altos/telegps-v0.3: Disable APRS by default. Set log max to 1M
+  * altos/telegps-v0.3: Remove ao_flight_number from main program
+  * altos: Add telegps-v1.0 code and loader
+  * altos: Move ao_tracker.c to kernel
+  * altos: Allow AO_CONFIG_MAX_SIZE to be configured. Validate it.
+  * altos: Allow value other than 0 for marking erased flights
+  * altos: Clear out eeprom erase records when writing entry 0
+  * altos/telemega-v1.0: Adjust config params to make flight erase work
+  * altos: Add TeleGPS logging format
+  * altos: Write current flight state to GPS data from GPS drivers
+  * altos: Write tracker logging from tracker thread directly
+  * altos: Update other CONFIG_EEPROM users to set LOG_ERASE_MARK
+  * altos: Switch TeleGPS to GPS logging format
+  * altoslib: All products with logging have the 'l' command
+  * altoslib:  Add TeleGPS log parsing code
+  * altoslib: Record whether flight data includes sensor values in AltosFlightStats
+  * altosuilib: Show GPS instead of (missing) flight data for TeleGPS graphs
+  * altosuilib: Add GPS altitude as a possible graph value
+  * altosuilib: Fix crash when initializing site map cache
+  * telegps: Track graph windows as one of the TeleGPS windows
+  * Set version to 1.3.2.3
+  * altos: Use 0x80 to indicate valid state value in the GPS location packet
+  * altos: Define lat/lon sum variables as 64-bit instead of 16
+  * altos: Reduce tracker GPS buffer to 4 samples
+  * altos: Make telegps builds depend on ao_tracker.h
+  * ao-tools: Parse TeleGPS state value from gps location packet
+  * altoslib: Parse TeleGPS state value from GPS telemetry packet
+  * altos: Encode TeleGPS battery voltage in configuration packet
+  * altos: Enable ADC for TeleGPS v1.0 battery voltage measuring
+  * altoslib: TeleMega uses 5.6k/10k divider for v_batt
+  * altoslib: Recover battery voltage from TeleGPS configuration packet
+  * Bump to version 1.3.2.4
+  * Revert "altoslib: Parse TeleGPS state value from GPS telemetry packet"
+  * Revert "altos: Write current flight state to GPS data from GPS drivers"
+  * altos: Report total available log space in version command
+  * altos: Make extra pyro channel firing time configurable
+  * Revert "ao-tools: Parse TeleGPS state value from gps location packet"
+  * Revert adding state to GPS location packets
+  * altos: Simplify tracker logic, removing boost detect
+  * altos: Set TeleGPS default log size to half of avaiable memory
+  * altoslib/altosui/telegps: Change log size configuration
+  * altoslib/altosui/telegps: Switch TeleGPS config to motion/interval
+  * altoslib: TeleGPS no longer logs satellite information
+  * altoslib: Add new 'stateless' flight state for TeleGPS
+  * altoslib: Check for time going backwards when replaying from file
+  * altosuilib: Split battery graph enable out from other adc enables
+  * altoslib: Use GPS speed/height values when other sensors are missing
+  * altosui: Show "Missing" instead of huge numbers in descent/landed tabs
+  * altosuilib: Skip voice announcements for invalid values
+  * altosuilib: Move AltosFlightStatsTable to altosuilib
+  * telegps: Add statistics tab to graph UI
+  * altosuilib: Rewrite map GUI bits
+  * altoslib: Use GPS seconds as an additional sort key for TeleGPS eeprom
+  * altos: Disable TeleMini v2.0 build for now
+  * altosuilib: Remove old widget-based map UI
+  * altos/telemini-v2.0: Disable beep frequency config on TeleMini v2.0
+  * altos: Re-enable telemini v2.0 builds
+  * altosdroid: Altosdroid build doesn't work in parallel, so stop trying
+  * altosui: Add pyro firing time configuration
+  * doc: Update 1.4 release notes to include a few more changes
+  * altosuilib: Handle font and units changes in maps and stats table
+  * altosui: Don't list tracker parameters when configuring altimeter
+  * altoslib: Report GPS height when baro height is not available
+  * altosuilib: Repaint map when starting line draw
+  * altos/telegps: Build .ihx versions for TeleGPS
+  * telegps: Remove 'Flight' from titles
+  * doc: Update altusmetrum docs and screen shots for 1.4
+  * doc: Add TeleGPS screenshots
+  * altosui/telegps: Reduce CPU time needed for flight displays
+  * telegps: Don't re-add frequency menu when already present.
+  * altos/telegps: Don't log data when plugged in to USB
+  * debian: Fix build depends icotool -> icoutils
+  * altos: Show current flight number for TeleGPS
+  * altos/telegps: Set default log to 496kB for 4 logs
+  * altos/telegps: Keep ring of recent GPS positions to detect motion quickly
+  * altos: Define ao_log_mutex in ao_log.c rather than every log product
+  * altos/telegps: Create new flight if current flight is erased
+  * altoslib: Call state.set_serial first for telemetry parsing
+  * altoslib: Remove telem monitoring when closing log file
+  * telegps: Disconnect telemetry device when closing monitor window
+  * telegps: Show flight number in monitor window
+  * altosuilib: Build some common classes for displaying values in flight window
+  * altoslib: Add conversion class for voltages
+  * altoslib: Correctly save firmware version in AltosState
+  * telegps: Add status tab
+  * altosdroid: Don't crash when the map is touched
+  * altosdroid: Improve voice for TeleGPS
+  * telegps: Shuffle menu entries around
+  * altosuilib: Make map-cache per-window instead of global
+  * doc: Add a bunch more stuff to the telegps docs
+  * telegps: Allow TeleGPS preferences to have a custom title and label
+  * doc: TeleGPS docs are complete
+  * altoslib: Add units converters for latitude and longitude
+  * altoslib: When GPS disappears, set range and elevation to MISSING
+  * altosuilib: Require all flight display classes to provide a name
+  * altosuilib: In graph, show zero sats in view as 0 instead of MISSING
+  * altosuilib: provide getName() for AltosInfoTable
+  * altosuilib: Make sure only one thread is closing serial device
+  * altosuilib: Add more options to AltosUIIndicator to suit AltosUI
+  * altosuilib: Add AltosUIFlightTab class
+  * altosui/telegps: Switch to AltosUIIndicator and AltosUIFlightTab
+  * alotsuilib: Remove old "mega" and "mini" file extensions from data chooser
+  * micropeak: Make statistics entries un-editable
+  * telegps: Fix Mac icon file name
+  * altosuilib: Make graph enable buttons be CheckBoxes instead of RadioButtons
+  * icon: Create all icons from .svg files
+  * icon: Build windows ico files, clean built files
+  * altosui: Build MacOSX icon from svg
+  * icon: Build resolutions needed for Java bits too
+  * telegps/micropeak: Ship built Mac OSX icons
+  * debian: Build requires /usr/bin/convert now
+  * icon: Make the icon shadows a bit less harsh
+  * altosuilib: Serialize access to async tile notify function in preload
+  * altoslib: AltosFlightStatsTable: another editable text field that shouldn't be
+  * altosuilib: Remove some debugging printfs
+  * telegps: Include telegps firmware in windows package
+  * windows: Rename telemetrum.inf to altusmetrum.inf
+  * telegps: Deal with 64-bit windows differently on install
+  * altosui: Deal with 64-bit windows
+  * icon: Add drop-shadows to the SVG files; stop generating in the png versions
+  * windows: Sign altusmetrum.inf with altusmetrum.cat
+  * altosui: Ship telegps firmware
+  * Add notes about windows driver signing in the 'signing-driver' file
+  * micropeak: Deal with 64-bit windows
+
+  [ Bdale Garbee ]
+  * have the cal-freq script save cal values to a file
+  * use svg in the .desktop file
+  * update copyright year assertion in MicroPeak manual, remember during releases
+  * deliver images used in MicroPeak manual to web server, too
+  * typo fixes from Matt Kraai
+  * update turnon scripts to store cal values
+  * ugly hack (just make sleep longer) to work around ttyACM* discovery issue
+  * first cut of usbrelay-v0.1 support .. LEDs wiggle, not switching relay yet
+  * relay control implemented, this project is now complete
+  * fix copyright year
+  * update TeleMega turn-on script and Releasing for new stable firmware home
+  * lose the (old) easymega-v1.0 directory in favor of my fresher 0.1
+  * working?
+  * include EasyMega Makefiles
+  * document mounting hole size for TeleGPS
+  * update Releasing document to include TeleGPS firmware files in those copied
+  * tweaks
+  * add release to revision history
+  * tagging 1.4 release
+  * turn-on support for TeleGPS
+
+  [ Tom Marble ]
+  * add jenkins.sh
+  * fix for jenkins.sh
+  * jenkins.sh: make -j 4 can fail, fix for altosui-test
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 15 Jun 2014 17:51:01 -0600
+
 altos (1.3.2-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
