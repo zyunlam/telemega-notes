@@ -1,14 +1,18 @@
-LINUX_RES=16 32 48 64 128 256 512
 MAC_RES=16 32 128 256 512
 WIN_RES=16 24 32 48 64 72 96 128 180 256
-RES=$(shell echo $(LINUX_RES) $(MAC_RES) $(WIN_RES) | awk '{ for (i = 1; i <= NF; i++) printf("%s\n", $$i); }' | sort -n -u)
+RES=$(shell echo $(MAC_RES) $(WIN_RES) | awk '{ for (i = 1; i <= NF; i++) printf("%s\n", $$i); }' | sort -n -u)
 
 AM_FILES=$(shell for i in $(RES); do echo altus-metrum-$$i.png; done)
 MP_FILES=$(shell for i in $(RES); do echo micropeak-$$i.png; done)
 TG_FILES=$(shell for i in $(RES); do echo telegps-$$i.png; done)
+
 MAC_TG_FILES=$(shell for i in $(MAC_RES); do echo telegps-$$i.png; done)
 MAC_MP_FILES=$(shell for i in $(MAC_RES); do echo micropeak-$$i.png; done)
 MAC_AM_FILES=$(shell for i in $(MAC_RES); do echo altus-metrum-$$i.png; done)
+
+WIN_TG_FILES=$(shell for i in $(WIN_RES); do echo telegps-$$i.png; done)
+WIN_MP_FILES=$(shell for i in $(WIN_RES); do echo micropeak-$$i.png; done)
+WIN_AM_FILES=$(shell for i in $(WIN_RES); do echo altus-metrum-$$i.png; done)
 
 ICO_FILES=altus-metrum.ico micro-peak.ico telegps.ico
 ICNS_FILES=AltosUIIcon.icns TeleGPS.icns MicroPeak.icns
@@ -29,7 +33,7 @@ res:
 all-local: $(ICO_FILES) $(ICNS_FILES)
 
 clean-local:
-	$(RM) $(TG_FILES) $(MP_FILES) $(ICO_FILES) $(ICNS_FILES) *.build
+	$(RM) altus-metrum-*.png telegps-*.png micropeak-*.png *.build *.ico *.icns
 
 $(AM_FILES): altusmetrum.build
 
@@ -49,14 +53,14 @@ micropeak.build: micropeak.svg
 #clean-local:
 #	$(RM) -f $(ICO_FILES)
 
-altus-metrum.ico: $(AM_FILES)
-	icotool -c -o $@ $(AM_FILES)
+altus-metrum.ico: $(WIN_AM_FILES)
+	icotool -c -o $@ $(WIN_AM_FILES)
 
-micro-peak.ico: $(MP_FILES)
-	icotool -c -o $@ $(MP_FILES)
+micro-peak.ico: $(WIN_MP_FILES)
+	icotool -c -o $@ $(WIN_MP_FILES)
 
-telegps.ico: $(TG_FILES)
-	icotool -c -o $@ $(TG_FILES)
+telegps.ico: $(WIN_TG_FILES)
+	icotool -c -o $@ $(WIN_TG_FILES)
 
 AltosUIIcon.icns: $(MAC_AM_FILES)
 	png2icns $@ $(MAC_AM_FILES)
