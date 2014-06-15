@@ -40,7 +40,8 @@
       <listitem>
 	<para>
 	  Make the firing time for extra pyro channels configurable,
-	  allowing longer (or shorter) than the default 50ms.
+	  allowing longer (or shorter) than the default 50ms.  Only relevant
+	  for TeleMega at this time.
 	</para>
       </listitem>
     </itemizedlist>
