@@ -55,6 +55,7 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 			value = new JTextField[values.length];
 			for (int j = 0; j < values.length; j++) {
 				value[j] = new JTextField(values[j]);
+				value[j].setEditable(false);
 				value[j].setFont(AltosUILib.value_font);
 				value[j].setHorizontalAlignment(SwingConstants.RIGHT);
 				c.gridx = j+1; c.gridy = y;

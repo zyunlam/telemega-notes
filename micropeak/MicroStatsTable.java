@@ -59,9 +59,9 @@ public class MicroStatsTable extends JComponent implements AltosFontListener {
 			texts = new JTextField[values.length];
 			for (int j = 0; j < values.length; j++) {
 				JTextField value = new JTextField(values[j]);
+				value.setEditable(false);
 				value.setFont(AltosUILib.value_font);
 				value.setHorizontalAlignment(SwingConstants.RIGHT);
-				value.setEditable(false);
 				texts[j] = value;
 				c.gridx = j+1; c.gridy = y;
 				c.anchor = GridBagConstraints.EAST;
