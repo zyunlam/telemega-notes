@@ -94,15 +94,18 @@ Section "Install Driver" InstDriver
 	InstDrv::DeleteOemInfFiles /NOUNLOAD
 	InstDrv::CreateDevice /NOUNLOAD
 
-	SetOutPath $TEMP
-	File "../altusmetrum.inf"
-	InstDrv::InstallDriver /NOUNLOAD "$TEMP\altusmetrum.inf"
-
 	SetOutPath $INSTDIR
 	File "../altusmetrum.inf"
+	File "../altusmetrum.cat"
 
-	SetOutPath $WINDIR\Inf
-	File "../altusmetrum.inf"
+	${DisableX64FSRedirection}
+	IfFileExists $WINDIR\System32\PnPutil.exe 0 nopnp
+		${DisableX64FSRedirection}
+		nsExec::ExecToLog '"$WINDIR\System32\PnPutil.exe" -i -a "$INSTDIR\altusmetrum.inf"'
+		Goto done
+nopnp:
+		InstDrv::InstallDriver /NOUNLOAD "$INSTDIR\altusmetrum.inf"
+done:
 
 SectionEnd
 
@@ -135,13 +138,14 @@ Section "TeleGPS Desktop Shortcut"
 	CreateShortCut "$DESKTOP\TeleGPS.lnk" "$INSTDIR\telegps-fat.jar"  "" "$INSTDIR\telegps.ico"
 SectionEnd
 
-Section "TeleGPS Firmware"
+Section "TeleGPS, TeleDongle and TeleBT Firmware"
 
 	SetOutPath $INSTDIR
 
 	File "../src/telegps-v1.0/telegps-v1.0-${VERSION}.ihx"
 	File "../src/teledongle-v0.2/teledongle-v0.2-${VERSION}.ihx"
 	File "../src/telebt-v1.0/telebt-v1.0-${VERSION}.ihx"
+
 SectionEnd
 
 Section "Documentation"
@@ -177,6 +181,11 @@ Section "Uninstall"
 
 	Delete "$INSTDIR\*.*"
 	RMDir "$INSTDIR"
+
+	; Remove devices
+	InstDrv::InitDriverSetup /NOUNLOAD {4D36E96D-E325-11CE-BFC1-08002BE10318} AltusMetrumSerial
+	InstDrv::DeleteOemInfFiles /NOUNLOAD
+	InstDrv::RemoveAllDevices
 
 	; Remove shortcuts, if any
 	Delete "$SMPROGRAMS\TeleGPS.lnk"

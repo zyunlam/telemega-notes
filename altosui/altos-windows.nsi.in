@@ -94,15 +94,18 @@ Section "Install Driver" InstDriver
 	InstDrv::DeleteOemInfFiles /NOUNLOAD
 	InstDrv::CreateDevice /NOUNLOAD
 
-	SetOutPath $TEMP
-	File "../altusmetrum.inf"
-	InstDrv::InstallDriver /NOUNLOAD "$TEMP\altusmetrum.inf"
-
 	SetOutPath $INSTDIR
 	File "../altusmetrum.inf"
+	File "../altusmetrum.cat"
 
-	SetOutPath $WINDIR\Inf
-	File "../altusmetrum.inf"
+	${DisableX64FSRedirection}
+	IfFileExists $WINDIR\System32\PnPutil.exe 0 nopnp
+		${DisableX64FSRedirection}
+		nsExec::ExecToLog '"$WINDIR\System32\PnPutil.exe" -i -a "$INSTDIR\altusmetrum.inf"'
+		Goto done
+nopnp:
+		InstDrv::InstallDriver /NOUNLOAD "$INSTDIR\altusmetrum.inf"
+done:
 
 SectionEnd
 

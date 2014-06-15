@@ -144,7 +144,7 @@ MACOSX_INFO_PLIST=Info.plist
 MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICON)
 MACOSX_EXTRA=$(FIRMWARE)
 
-WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(WINDOWS_ICON)
+WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(WINDOWS_ICON)
 
 all-local: classes/altosui $(JAR) altosui altosui-test altosui-jdb
 
@@ -334,4 +334,4 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 
 $(WINDOWS_DIST): $(WINDOWS_FILES) altos-windows.nsi
 	-rm -f $@
-	makensis -Oaltos-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" altos-windows.nsi
+	makensis -Oaltos-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" altos-windows.nsi || (cat altos-windows.log && exit 1)

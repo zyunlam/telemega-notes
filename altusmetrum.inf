@@ -6,9 +6,10 @@ Signature	= "$Windows NT$"
 Class   	= Modem
 ClassGUID	= {4D36E96D-E325-11CE-BFC1-08002BE10318}
 Provider	= %Mfg%
-DriverVer	= 08/05/2010,7.1.1.0
+DriverVer	= 06/15/2014,7.1.1.0
 PnpLockDown	= 0
 DriverPackageDisplayName = %DriverName%
+CatalogFile	= altusmetrum.cat
 
 [DestinationDirs]
 FakeModemCopyFileSection = 12
