@@ -91,6 +91,7 @@ ICONJAR= -C $(ICONDIR) altus-metrum-16.png \
 	-C $(ICONDIR) altus-metrum-256.png
 
 WINDOWS_ICON=$(ICONDIR)/altus-metrum.ico
+MACOSX_ICON=$(ICONDIR)/AltosUIIcon.icns
 
 # Firmware
 FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
@@ -140,7 +141,7 @@ LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) altos.desktop.in ../ic
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICON)
 MACOSX_EXTRA=$(FIRMWARE)
 
 WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/telemetrum.inf $(WINDOWS_ICON)
@@ -320,6 +321,7 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/AltosUI.app/Contents
 	mkdir -p macosx/AltOS-$(VERSION) macosx/AltosUI.app/Contents/Resources/Java
+	cp -p $(MACOSX_ICON) macosx/AltosUI.app/Contents/Resources
 	cp -p $(FATJAR) macosx/AltosUI.app/Contents/Resources/Java/altosui.jar
 	cp -p libaltos.dylib macosx/AltosUI.app/Contents/Resources/Java
 	cp -p $(ALTOSLIB_CLASS) macosx/AltosUI.app/Contents/Resources/Java
