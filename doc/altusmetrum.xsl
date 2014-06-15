@@ -41,6 +41,13 @@
     </legalnotice>
     <revhistory>
       <revision>
+	<revnumber>1.4</revnumber>
+	<date>15 June 2014</date>
+	<revremark>
+	  Major release adding TeleGPS support.
+	</revremark>
+      </revision>
+      <revision>
 	<revnumber>1.3.2</revnumber>
 	<date>24 January 2014</date>
 	<revremark>
