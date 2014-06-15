@@ -14,11 +14,17 @@ SIZE=$2
 PNG=$3
 
 SHADOW=$(($SIZE / 16))
-IMAGE=$(($SIZE - $SHADOW))
 
-OPACITY=80
-BLUR=$(($SHADOW / 4))
-SHIFT=$(($SHADOW - $BLUR))
+OPACITY=60
+BLUR=$(($SHADOW / 2))
+
+if [ $BLUR = 0 ]; then
+    BLUR=1
+fi
+
+SHIFT=$(($SHADOW * 3 / 4))
+
+IMAGE=$(($SIZE - $SHIFT - $BLUR))
 
 TMP=image-$$.png
 
@@ -29,4 +35,3 @@ rsvg-convert -w $IMAGE -h $IMAGE -o $TMP $SVG
 convert $TMP \
 	\( +clone -background black -shadow ${OPACITY}x${BLUR}+${SHIFT}+${SHIFT} \) \
 	+swap -background none -layers merge -crop ${SIZE}x${SIZE}+0+0 +repage $PNG
-

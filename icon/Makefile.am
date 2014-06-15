@@ -38,17 +38,17 @@ clean-local:
 
 $(AM_FILES): altusmetrum.build
 
-altusmetrum.build: altusmetrum.svg
+altusmetrum.build: altusmetrum.svg make-png
 	for i in $(RES); do ./make-png altusmetrum.svg $$i altus-metrum-$$i.png; done && touch $@
 
 $(TG_FILES): telegps.build
 
-telegps.build: telegps.svg
+telegps.build: telegps.svg make-png
 	for i in $(RES); do ./make-png telegps.svg $$i telegps-$$i.png; done && touch $@
 
 $(MP_FILES): micropeak.build
 
-micropeak.build: micropeak.svg
+micropeak.build: micropeak.svg make-png
 	for i in $(RES); do ./make-png micropeak.svg $$i micropeak-$$i.png; done && touch $@
 
 #clean-local:
