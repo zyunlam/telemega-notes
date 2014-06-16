@@ -73,7 +73,7 @@ These are Bdale's notes on how to do a release.
 	   src/telemega-v1.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
 	   ~/altusmetrumllc/Binaries/loaders/
-	(cd ~/altusmetrumllc ; git commit -a) 
+	(cd ~/altusmetrumllc ; git add Binaries ; git commit -a) 
 
 	- copy the relevant release notes file from doc/ to 
 	    /home/bdale/web/altusmetrum/AltOS/releases/<rev>
@@ -81,8 +81,12 @@ These are Bdale's notes on how to do a release.
 	- create /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>,
 	  and move the MicroPeak installers from AltOS/releases to there
 		
-	- go edit ~/web/altusmetrum/AltOS/releases/<rev>.mdwn and 
-	  /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>.mdwn, to 
+	- create /home/bdale/web/altusmetrum/TeleGPS/releases/<rev>,
+	  and move the MicroPeak installers from AltOS/releases to there
+		
+	- go edit ~/web/altusmetrum/AltOS/releases/<rev>.mdwn, 
+	  /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>.mdwn, and
+	  /home/bdale/web/altusmetrum/TeleGPS/releases/<rev>.mdwn, to 
 	  include release date and explicit ref to dir contents so the 
 	  web pages shows versioned links, commit and push
 
