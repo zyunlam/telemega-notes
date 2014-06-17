@@ -157,11 +157,28 @@ public class AltosUIFrame extends JFrame implements AltosUIListener, AltosPositi
 		}
 	}
 
+	static boolean global_settings_done;
+
+	public String getName() {
+		return "Altus Metrum";
+	}
+
 	void init() {
 		AltosUIPreferences.register_ui_listener(this);
 		AltosUIPreferences.register_position_listener(this);
 		position = AltosUIPreferences.position();
 		addWindowListener(new AltosUIFrameListener());
+
+		/* Try to make menus live in the menu bar like regular Mac apps */
+		if (!global_settings_done) {
+			try {
+				global_settings_done = true;
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name", getName());
+				System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+				System.setProperty( "apple.laf.useScreenMenuBar", "true" ); // for older versions of Java
+			} catch (Exception e) {
+			}
+		}
 		set_icon();
 	}
 
