@@ -59,14 +59,30 @@ public class AltosFreqList extends JMenu implements ActionListener {
 			l.actionPerformed(event);
 	}
 
+	boolean	label = true;
+
+	public void set_label(boolean label) {
+		this.label = label;
+		set_label();
+	}
+
+	private void set_label() {
+		String	new_text = "";
+		if (0 <= selected && selected < frequencies.length) {
+			AltosFrequency	frequency = frequencies[selected];
+			new_text = String.format("%s%7.3f MHz (%s) ▾",
+						 label ? "Frequency: " : "",
+						 frequency.frequency,
+						 frequency.description);
+		}
+		setText(new_text);
+	}
+
 	private void set_selected(AltosFrequency frequency) {
 		for (int i = 0; i < frequencies.length; i++) {
 			if (frequencies[i].frequency == frequency.frequency) {
 				selected = i;
-				String	new_text = String.format("Frequency: %7.3f MHz (%s) ▾",
-								 frequency.frequency,
-								 frequency.description);
-				setText(new_text);
+				set_label();
 			}
 		}
 	}
@@ -164,16 +180,27 @@ public class AltosFreqList extends JMenu implements ActionListener {
 		return 434.550;
 	}
 
-	public AltosFreqList () {
+	public AltosFreqList(double in_frequency, boolean label) {
 		super();
+		this.label = label;
+
 		for (AltosFrequency frequency: AltosUIPreferences.common_frequencies())
 			add(frequency);
 		product = "Unknown";
 		serial = 0;
+
+		if (in_frequency != 0)
+			set_frequency(in_frequency);
+	}
+	public AltosFreqList(double in_frequency) {
+		this(in_frequency, true);
 	}
 
-	public AltosFreqList(double in_frequency) {
-		this();
-		set_frequency(in_frequency);
+	public AltosFreqList (boolean label) {
+		this(0, label);
+	}
+
+	public AltosFreqList () {
+		this(0, true);
 	}
 }

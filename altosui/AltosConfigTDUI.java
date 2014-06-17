@@ -44,6 +44,7 @@ public class AltosConfigTDUI
 	JLabel		product_value;
 	JLabel		version_value;
 	JLabel		serial_value;
+	JMenuBar	radio_frequency_menu_bar;
 	AltosFreqList	radio_frequency_value;
 	JLabel		radio_calibration_value;
 
@@ -166,9 +167,11 @@ public class AltosConfigTDUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		radio_frequency_value = new AltosFreqList();
+		radio_frequency_value = new AltosFreqList(false);
 		radio_frequency_value.addItemListener(this);
-		pane.add(radio_frequency_value, c);
+		radio_frequency_menu_bar = new JMenuBar();
+		radio_frequency_menu_bar.add(radio_frequency_value);
+		pane.add(radio_frequency_menu_bar, c);
 		radio_frequency_value.setToolTipText("Telemetry, RDF and packet frequency");
 
 		/* Radio Calibration */
@@ -308,28 +311,7 @@ public class AltosConfigTDUI
 	}
 
 	public void set_radio_frequency(double new_radio_frequency) {
-		int i;
-		for (i = 0; i < radio_frequency_value.getItemCount(); i++) {
-			AltosFrequency	f = (AltosFrequency) radio_frequency_value.getItemAt(i);
-
-			if (f.close(new_radio_frequency)) {
-				radio_frequency_value.setSelectedIndex(i);
-				return;
-			}
-		}
-		for (i = 0; i < radio_frequency_value.getItemCount(); i++) {
-			AltosFrequency	f = (AltosFrequency) radio_frequency_value.getItemAt(i);
-
-			if (new_radio_frequency < f.frequency)
-				break;
-		}
-		String	description = String.format("%s serial %s",
-						    product_value.getText(),
-						    serial_value.getText());
-		AltosFrequency	new_frequency = new AltosFrequency(new_radio_frequency, description);
-		AltosPreferences.add_common_frequency(new_frequency);
-		radio_frequency_value.insertItemAt(new_frequency, i);
-		radio_frequency_value.setSelectedIndex(i);
+		radio_frequency_value.set_frequency(new_radio_frequency);
 	}
 
 	public double radio_frequency() {
