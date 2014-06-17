@@ -351,17 +351,18 @@ public class TeleGPS
 		frequencies.set_product("Monitor");
 		frequencies.set_serial(serial);
 		frequencies.set_frequency(AltosUIPreferences.frequency(serial));
-		frequencies.setEnabled(true);
 
+		menu_bar.add(frequencies);
+		menu_bar.repaint();
 	}
 
 	void disable_frequency_menu() {
-		if (frequency_listener != null) {
-			frequencies.removeActionListener(frequency_listener);
-			frequencies.setEnabled(false);
-			frequency_listener = null;
-		}
-
+		if (frequency_listener == null)
+			return;
+		frequencies.removeActionListener(frequency_listener);
+		menu_bar.remove(frequencies);
+		menu_bar.repaint();
+		frequency_listener = null;
 	}
 
 	public void set_reader(AltosFlightReader reader, AltosDevice device) {
@@ -435,8 +436,6 @@ public class TeleGPS
 		monitor_menu = make_menu("Monitor", monitor_menu_entries);
 		device_menu = make_menu("Device", device_menu_entries);
 		frequencies = new AltosFreqList();
-		frequencies.setEnabled(false);
-		menu_bar.add(frequencies);
 
 		displays = new LinkedList<AltosFlightDisplay>();
 

@@ -80,7 +80,8 @@ altosuilib_JAVA = \
 	AltosUIFlightTab.java \
 	AltosUIIndicator.java \
 	AltosUIUnitsIndicator.java \
-	AltosUIVoltageIndicator.java
+	AltosUIVoltageIndicator.java \
+	AltosUITelemetryMenu.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar
 
