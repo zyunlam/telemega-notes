@@ -22,8 +22,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosVoice		voice;

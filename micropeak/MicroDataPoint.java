@@ -17,7 +17,7 @@
 
 package org.altusmetrum.micropeak;
 
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class MicroDataPoint implements AltosUIDataPoint {
 	public double		time;

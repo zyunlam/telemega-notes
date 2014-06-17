@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 class FreqEntry extends JMenuItem {
 	AltosFrequency	frequency;
