@@ -81,7 +81,8 @@ altosuilib_JAVA = \
 	AltosUIIndicator.java \
 	AltosUIUnitsIndicator.java \
 	AltosUIVoltageIndicator.java \
-	AltosUITelemetryMenu.java
+	AltosUITelemetryMenu.java \
+	OSXAdapter.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar
 
