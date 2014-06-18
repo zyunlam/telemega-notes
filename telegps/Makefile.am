@@ -73,7 +73,7 @@ ICONJAR= -C $(ICONDIR) telegps-16.png \
 	-C $(ICONDIR) telegps-128.png \
 	-C $(ICONDIR) telegps-256.png
 
-WINDOWS_ICON=$(ICONDIR)/telegps.ico
+WINDOWS_ICON=$(ICONDIR)/telegps.ico $(ICONDIR)/telegps.exe
 MACOSX_ICON=$(ICONDIR)/TeleGPS.icns
 
 # Firmware

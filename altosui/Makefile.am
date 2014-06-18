@@ -90,7 +90,7 @@ ICONJAR= -C $(ICONDIR) altus-metrum-16.png \
 	-C $(ICONDIR) altus-metrum-128.png \
 	-C $(ICONDIR) altus-metrum-256.png
 
-WINDOWS_ICON=$(ICONDIR)/altus-metrum.ico
+WINDOWS_ICON=$(ICONDIR)/altus-metrum.ico $(ICONDIR)/altus-metrum.exe
 MACOSX_ICON=$(ICONDIR)/AltosUIIcon.icns
 
 # Firmware

@@ -71,7 +71,7 @@ ICONJAR= -C $(ICONDIR) micropeak-16.png \
 	-C $(ICONDIR) micropeak-128.png \
 	-C $(ICONDIR) micropeak-256.png
 
-WINDOWS_ICON=$(ICONDIR)/micro-peak.ico
+WINDOWS_ICON=$(ICONDIR)/micro-peak.ico $(ICONDIR)/micro-peak.exe
 MACOSX_ICON=$(ICONDIR)/MicroPeak.icns
 
 desktopdir = $(datadir)/applications
