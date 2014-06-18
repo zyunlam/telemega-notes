@@ -272,7 +272,7 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 
 $(WINDOWS_DIST): $(WINDOWS_FILES) micropeak-windows.nsi
 	-rm -f $@
-	makensis -Omicropeak-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" micropeak-windows.nsi
+	makensis -Omicropeak-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" micropeak-windows.nsi || (cat micropeak-windows.log && exit 1)
 
 Manifest.txt: Makefile
 	echo 'Main-Class: org.altusmetrum.micropeak.MicroPeak' > $@
