@@ -99,9 +99,24 @@ public class AltosUI extends AltosUIFrame {
 		return b;
 	}
 
+	/* OSXAdapter interfaces */
+	public void macosx_file_handler(String path) {
+		process_graph(new File(path));
+	}
+
+	public void macosx_quit_handler() {
+		System.exit(0);
+	}
+
+	public void macosx_preferences_handler() {
+		ConfigureAltosUI();
+	}
+
 	public AltosUI() {
 
 		load_library(null);
+
+		register_for_macosx_events();
 
 		AltosUIPreferences.set_component(this);
 

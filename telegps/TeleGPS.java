@@ -410,15 +410,37 @@ public class TeleGPS
 
 	private JMenu make_menu(String label, String[][] items) {
 		JMenu	menu = new JMenu(label);
-		for (int i = 0; i < items.length; i++)
+		for (int i = 0; i < items.length; i++) {
+			if (MAC_OS_X) {
+				if (items[i][1].equals("exit"))
+					continue;
+				if (items[i][1].equals("preferences"))
+					continue;
+			}
 			add_menu(menu, items[i][0], items[i][1]);
+		}
 		menu_bar.add(menu);
 		return menu;
+	}
+
+	/* OSXAdapter interfaces */
+	public void macosx_file_handler(String path) {
+		process_graph(new File(path));
+	}
+
+	public void macosx_quit_handler() {
+		System.exit(0);
+	}
+
+	public void macosx_preferences_handler() {
+		preferences();
 	}
 
 	public TeleGPS() {
 
 		AltosUIPreferences.set_component(this);
+
+		register_for_macosx_events();
 
 		reader = null;
 
