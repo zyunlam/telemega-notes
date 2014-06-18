@@ -34,7 +34,7 @@ res:
 all-local: $(ICO_FILES) $(ICNS_FILES)
 
 clean-local:
-	$(RM) altus-metrum-*.png telegps-*.png micropeak-*.png *.build *.ico *.icns
+	$(RM) altus-metrum-*.png telegps-*.png micropeak-*.png *.build *.ico *.icns *.o *.exe
 
 $(AM_FILES): altusmetrum.build
 
@@ -71,3 +71,20 @@ TeleGPS.icns: $(MAC_TG_FILES)
 
 MicroPeak.icns: $(MAC_MP_FILES)
 	png2icns $@ $(MAC_MP_FILES)
+
+MINGCC32=i686-w64-mingw32-gcc
+MINGWINDRES=i686-w64-mingw32-windres
+
+SUFFIXES=.rc .exe
+
+fat: all micro-peak.exe altus-metrum.exe telegps.exe
+
+altus-metrum.o: altus-metrum.ico
+micro-peak.o: micro-peak.ico
+telegps.o: telegps.ico
+
+.rc.o:
+	$(MINGWINDRES) $*.rc $@
+
+.o.exe:
+	$(MINGCC32) -o $@ windows-stub.c $*.o
