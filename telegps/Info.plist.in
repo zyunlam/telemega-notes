@@ -24,6 +24,33 @@
 	<string>6.0</string>
 	<key>CFBundleIconFile</key>
 	<string>TeleGPS.icns</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+	  <dict>
+	    <key>CFBundleTypeName</key>
+	    <string>Telemetry</string>
+	    <key>CFBundleTypeIconFile</key>
+	    <string>TeleGPS.icns</string>
+	    <key>CFBundleTypeExtensions</key>
+	    <array>
+	      <string>telem</string>
+	    </array>
+	    <key>CFBundleTypeRole</key>
+	    <string>Editor</string>
+	  </dict>
+	  <dict>
+	    <key>CFBundleTypeName</key>
+	    <string>Eeprom</string>
+	    <key>CFBundleTypeIconFile</key>
+	    <string>TeleGPS.icns</string>
+	    <key>CFBundleTypeExtensions</key>
+	    <array>
+	      <string>eeprom</string>
+	    </array>
+	    <key>CFBundleTypeRole</key>
+	    <string>Editor</string>
+	  </dict>
+	</array>
 	<key>Java</key>
 	<dict>
 		<key>MainClass</key>
