@@ -4,12 +4,14 @@
 !include java.nsh
 !include refresh-sh.nsh
 
-!define REG_NAME "Altus Metrum"
-!define PROG_ID	     "org.altusmetrum.altosui.1"
-!define PROG_ALTOSUI "org.altusmetrum.altosui.1"
-!define FAT_NAME "altosui-fat.jar"
-!define ICO_ICO "altus-metrum.ico"
-!define ICO_EXE "altus-metrum.exe"
+!define REG_NAME	"Altus Metrum"
+!define PROG_ID_TELEM	"altusmetrum.altosui.telem.1"
+!define PROG_ID_EEPROM	"altusmetrum.altosui.eeprom.1"
+!define FAT_NAME	"altosui-fat.jar"
+!define WIN_APP_ICON	"altusmetrum-altosui.ico"
+!define WIN_APP_EXE	"altusmetrum-altosui.exe"
+!define WIN_TELEM_EXE	"application-vnd.altusmetrum.telemetry.exe"
+!define WIN_EEPROM_EXE	"application-vnd.altusmetrum.eeprom.exe"
 
 Name "${REG_NAME} Installer"
 
@@ -104,13 +106,13 @@ Section "${REG_NAME} Application"
 
 	File "*.dll"
 
-	File "../icon/${ICO_ICO}"
+	File "../icon/${WIN_APP_ICON}"
 
-	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$SYSDIR\javaw.exe" "-jar ${FAT_NAME}" "$INSTDIR\${ICO_ICO}"
+	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$SYSDIR\javaw.exe" "-jar ${FAT_NAME}" "$INSTDIR\${WIN_APP_ICON}"
 SectionEnd
 
 Section "${REG_NAME} Desktop Shortcut"
-	CreateShortCut "$DESKTOP\${REG_NAME}.lnk" "$INSTDIR\${FAT_NAME}"  "" "$INSTDIR\${ICO_ICO}"
+	CreateShortCut "$DESKTOP\${REG_NAME}.lnk" "$INSTDIR\${FAT_NAME}"  "" "$INSTDIR\${WIN_APP_ICON}"
 SectionEnd
 
 Section "TeleMetrum, TeleDongle and TeleBT Firmware"
@@ -145,35 +147,51 @@ SectionEnd
 
 Section "File Associations"
 
+	${DisableX64FSRedirection}
+
 	SetOutPath $INSTDIR
 
-	File "../icon/${ICO_EXE}"
+	File "../icon/${WIN_APP_EXE}"
+	File "../icon/${WIN_TELEM_EXE}"
+	File "../icon/${WIN_EEPROM_EXE}"
 
-	; application elements
-	
-	WriteRegStr HKCR "${PROG_ID}"			""				"Altus Metrum Data File"
-	WriteRegStr HKCR "${PROG_ID}"			"FriendlyTypeName"		"Altus Metrum Data File"
-	WriteRegStr HKCR "${PROG_ID}\CurVer"		""				"${PROG_ID}"
-	WriteRegStr HKCR "${PROG_ID}\DefaultIcon"	""				'"$INSTDIR\${ICO_EXE}",-101'
-  WriteRegExpandStr HKCR "${PROG_ID}\shell\play\command" ""				'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
+	DeleteRegKey HKCR "${PROG_ID_TELEM}"
+	DeleteRegKey HKCR "${PROG_ID_EEPROM}"
+
+	DeleteRegKey   HKCR ".eeprom\${PROG_ID_EEPROM}"
+	DeleteRegValue HKCR ".eeprom\OpenWithProgids" "${PROG_ID_EEPROM}"
+	DeleteRegKey   HKCR ".telem\${PROG_ID_EEPROM}"
+	DeleteRegValue HKCR ".telem\OpenWithProgids" "${PROG_ID_EEPROM}"
 
 	; .eeprom elements
 
-	WriteRegStr HKCR ".eeprom"			""				"${PROG_ALTOSUI}"
-	WriteRegStr HKCR ".eeprom"			"PerceivedType"			"Altus Metrum Log File"
-	WriteRegStr HKCR ".eeprom"			"Content Type"			"application/altosui"
+	WriteRegStr HKCR "${PROG_ID_EEPROM}"		""				"Altus Metrum Log File"
+	WriteRegStr HKCR "${PROG_ID_EEPROM}"		"FriendlyTypeName"		"Altus Metrum Log File"
+	WriteRegStr HKCR "${PROG_ID_EEPROM}\CurVer"	""				"${PROG_ID_EEPROM}"
+	WriteRegStr HKCR "${PROG_ID_EEPROM}\DefaultIcon" ""				'"$INSTDIR\${WIN_EEPROM_EXE}",-101'
+  WriteRegExpandStr HKCR "${PROG_ID_EEPROM}\shell\open\command" ""			'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
 
-	WriteRegStr HKCR ".eeprom\OpenWithProgids"	"${PROG_ID}"			""
-	WriteRegStr HKCR ".eeprom\${PROG_ID}"		""				"${REG_NAME}"
+	WriteRegStr HKCR ".eeprom"			""				"${PROG_ID_EEPROM}"
+	WriteRegStr HKCR ".eeprom"			"PerceivedType"			"Altus Metrum Log File"
+	WriteRegStr HKCR ".eeprom"			"Content Type"			"application/vnd.altusmetrum.eeprom"
+
+	WriteRegStr HKCR ".eeprom\OpenWithProgids"	"${PROG_ID_EEPROM}"		""
+	WriteRegStr HKCR ".eeprom\${PROG_ID_EEPROM}"	""				"${REG_NAME}"
 	
 	; .telem elements
 	
-	WriteRegStr HKCR ".telem"			""				"${PROG_ALTOSUI}"
-	WriteRegStr HKCR ".telem"			"PerceivedType"			"Altus Metrum Telemetry File"
-	WriteRegStr HKCR ".telem"			"Content Type"			"application/altosui"
+	WriteRegStr HKCR "${PROG_ID_TELEM}"		""				"Altus Metrum Telemetry File"
+	WriteRegStr HKCR "${PROG_ID_TELEM}"		"FriendlyTypeName"		"Altus Metrum Telemetry File"
+	WriteRegStr HKCR "${PROG_ID_TELEM}\CurVer"	""				"${PROG_ID_TELEM}"
+	WriteRegStr HKCR "${PROG_ID_TELEM}\DefaultIcon" ""				'"$INSTDIR\${WIN_TELEM_EXE}",-101'
+  WriteRegExpandStr HKCR "${PROG_ID_TELEM}\shell\open\command" ""			'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
 
-	WriteRegStr HKCR ".telem\OpenWithProgids"	"${PROG_ID}"			""
-	WriteRegStr HKCR ".telem\${PROG_ID}"		""				"${REG_NAME}"
+	WriteRegStr HKCR ".telem"			""				"${PROG_ID_TELEM}"
+	WriteRegStr HKCR ".telem"			"PerceivedType"			"Altus Metrum Telemetry File"
+	WriteRegStr HKCR ".telem"			"Content Type"			"application/vnd.altusmetrum.telemetry"
+
+	WriteRegStr HKCR ".telem\OpenWithProgids"	"${PROG_ID_TELEM}"		""
+	WriteRegStr HKCR ".telem\${PROG_ID_TELEM}"	""				"${REG_NAME}"
 
 	Call RefreshShellIcons
 SectionEnd
@@ -206,21 +224,22 @@ Section "Uninstall"
 
 	DetailPrint "Delete uninstall reg entries"
 
-	DeleteRegKey   HKCR "${PROG_ID}"
+	DeleteRegKey   HKCR "${PROG_ID_EEPROM}"
+	DeleteRegKey   HKCR "${PROG_ID_TELEM}"
 
-	DeleteRegKey   HKCR ".eeprom\${PROG_ID}"
-	DeleteRegValue HKCR ".eeprom\OpenWithProgids" "${PROG_ID}"
+	DeleteRegKey   HKCR ".eeprom\${PROG_ID_EEPROM}"
+	DeleteRegValue HKCR ".eeprom\OpenWithProgids" "${PROG_ID_EEPROM}"
 
-	DeleteRegKey   HKCR ".telem\${PROG_ID}"
-	DeleteRegValue HKCR ".telem\OpenWithProgids" "${PROG_ID}"
+	DeleteRegKey   HKCR ".telem\${PROG_ID_TELEM}"
+	DeleteRegValue HKCR ".telem\OpenWithProgids" "${PROG_ID_TELEM}"
 
 	DetailPrint "Delete file association reg entries"
 
 	Delete "$INSTDIR\${FAT_NAME}"
 	Delete "$INSTDIR\uninstall-${REG_NAME}.exe"
 
-	Delete "$INSTDIR\${ICO_ICO}"
-	Delete "$INSTDIR\${ICO_EXE}"
+	Delete "$INSTDIR\${WIN_APP_ICON}"
+	Delete "$INSTDIR\${WIN_APP_EXE}"
 
 	; Remove shortcuts, if any
 	Delete "$SMPROGRAMS\${REG_NAME}.lnk"

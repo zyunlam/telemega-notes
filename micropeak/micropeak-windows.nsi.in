@@ -4,11 +4,13 @@
 !include java.nsh
 !include refresh-sh.nsh
 
-!define REG_NAME "MicroPeak"
-!define PROG_ID "org.altusmetrum.micropeak.1"
-!define FAT_NAME "micropeak-fat.jar"
-!define ICO_ICO "micro-peak.ico"
-!define ICO_EXE "micro-peak.exe"
+!define REG_NAME	"MicroPeak"
+!define PROG_ID		"org.altusmetrum.micropeak.1"
+!define PROG_ID_MPD	"org.altusmetrum.micropeak.mpd.1"
+!define FAT_NAME	"micropeak-fat.jar"
+!define WIN_APP_ICON	"altusmetrum-micropeak.ico"
+!define WIN_APP_EXE	"altusmetrum-micropeak.exe"
+!define WIN_MPD_EXE	"application-vnd.altusmetrum.micropeak.exe"
 
 Name "${REG_NAME} Installer"
 
@@ -82,13 +84,13 @@ Section "${REG_NAME} Application"
 
 	File "*.dll"
 
-	File "../icon/${ICO_ICO}"
+	File "../icon/${WIN_APP_ICON}"
 
-	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$SYSDIR\javaw.exe" "-jar ${FAT_NAME}" "$INSTDIR\${ICO_ICO}"
+	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$SYSDIR\javaw.exe" "-jar ${FAT_NAME}" "$INSTDIR\${WIN_APP_ICON}"
 SectionEnd
 
 Section "${REG_NAME} Desktop Shortcut"
-	CreateShortCut "$DESKTOP\${REG_NAME}.lnk" "$INSTDIR\${FAT_NAME}"  "" "$INSTDIR\${ICO_ICO}"
+	CreateShortCut "$DESKTOP\${REG_NAME}.lnk" "$INSTDIR\${FAT_NAME}"  "" "$INSTDIR\${WIN_APP_ICON}"
 SectionEnd
 
 Section "Documentation"
@@ -102,24 +104,28 @@ Section "File Associations"
 
 	SetOutPath $INSTDIR
 
-	File "../icon/${ICO_EXE}"
+	File "../icon/${WIN_APP_EXE}"
+	File "../icon/${WIN_MPD_EXE}"
 
 	; application elements
 	
-	WriteRegStr HKCR "${PROG_ID}"			""				"MicroPeak Data File"
-	WriteRegStr HKCR "${PROG_ID}"			"FriendlyTypeName"		"MicroPeak Data File"
-	WriteRegStr HKCR "${PROG_ID}\CurVer"		""				"${PROG_ID}"
-	WriteRegStr HKCR "${PROG_ID}\DefaultIcon"	""				'"$INSTDIR\${ICO_EXE}",-101'
-  WriteRegExpandStr HKCR "${PROG_ID}\shell\play\command" ""				'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
+	DeleteRegKey HKCR "${PROG_ID}"
+	DeleteRegKey HKCR "${PROG_ID_MPD}"
+
+	WriteRegStr HKCR "${PROG_ID_MPD}"		""				"MicroPeak Data File"
+	WriteRegStr HKCR "${PROG_ID_MPD}"		"FriendlyTypeName"		"MicroPeak Data File"
+	WriteRegStr HKCR "${PROG_ID_MPD}\CurVer"	""				"${PROG_ID_MPD}"
+	WriteRegStr HKCR "${PROG_ID_MPD}\DefaultIcon"	""				'"$INSTDIR\${WIN_MPD_EXE}",-101'
+  WriteRegExpandStr HKCR "${PROG_ID_MPD}\shell\play\command" ""				'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
 
 	; .mpd elements
 
-	WriteRegStr HKCR ".mpd"				""				"${PROG_ID}"
+	WriteRegStr HKCR ".mpd"				""				"${PROG_ID_MPD}"
 	WriteRegStr HKCR ".mpd"				"PerceivedType"			"MicroPeak Data File"
-	WriteRegStr HKCR ".mpd"				"Content Type"			"application/micropeak"
+	WriteRegStr HKCR ".mpd"				"Content Type"			"application/vnd.altusmetrum.micropeak"
 
-	WriteRegStr HKCR ".mpd\OpenWithProgids"		"${PROG_ID}"			""
-	WriteRegStr HKCR ".mpd\${PROG_ID}"		""				"${REG_NAME}"
+	WriteRegStr HKCR ".mpd\OpenWithProgids"		"${PROG_ID_MPD}"			""
+	WriteRegStr HKCR ".mpd\${PROG_ID_MPD}"		""				"${REG_NAME}"
 
 	Call RefreshShellIcons
 SectionEnd
@@ -153,15 +159,16 @@ Section "Uninstall"
 	DetailPrint "Delete uninstall reg entries"
 
 	DeleteRegKey   HKCR "${PROG_ID}"
+	DeleteRegKey   HKCR "${PROG_ID_MPD}"
 
-	DeleteRegKey   HKCR ".mpd\${PROG_ID}"
-	DeleteRegValue HKCR ".mpd\OpenWithProgids" "${PROG_ID}"
+	DeleteRegKey   HKCR ".mpd\${PROG_ID_MPD}"
+	DeleteRegValue HKCR ".mpd\OpenWithProgids" "${PROG_ID_MPD}"
 
 	Delete "$INSTDIR\${FAT_NAME}"
 	Delete "$INSTDIR\uninstall-${REG_NAME}.exe"
 
-	Delete "$INSTDIR\${ICO_ICO}"
-	Delete "$INSTDIR\${ICO_EXE}"
+	Delete "$INSTDIR\${WIN_APP_ICON}"
+	Delete "$INSTDIR\${WIN_APP_EXE}"
 
 	; Remove shortcuts, if any
 	Delete "$SMPROGRAMS\${REG_NAME}.lnk"

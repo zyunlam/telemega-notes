@@ -23,14 +23,14 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleIconFile</key>
-	<string>AltosUIIcon.icns</string>
+	<string>altusmetrum-altosui.icns</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 	  <dict>
 	    <key>CFBundleTypeName</key>
 	    <string>Telemetry</string>
 	    <key>CFBundleTypeIconFile</key>
-	    <string>AltosUIIcon.icns</string>
+	    <string>application-vnd.altusmetrum.telemetry.icns</string>
 	    <key>CFBundleTypeExtensions</key>
 	    <array>
 	      <string>telem</string>
@@ -42,7 +42,7 @@
 	    <key>CFBundleTypeName</key>
 	    <string>Eeprom</string>
 	    <key>CFBundleTypeIconFile</key>
-	    <string>AltosUIIcon.icns</string>
+	    <string>application-vnd.altusmetrum.eeprom.icns</string>
 	    <key>CFBundleTypeExtensions</key>
 	    <array>
 	      <string>eeprom</string>

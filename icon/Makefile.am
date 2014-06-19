@@ -3,85 +3,137 @@ MAC_RES=16 32 128 256 512
 WIN_RES=16 24 32 48 64 72 96 128 180 256
 RES=$(shell echo $(JAVA_RES) $(MAC_RES) $(WIN_RES) | awk '{ for (i = 1; i <= NF; i++) printf("%s\n", $$i); }' | sort -n -u)
 
-AM_FILES=$(shell for i in $(RES); do echo altus-metrum-$$i.png; done)
-MP_FILES=$(shell for i in $(RES); do echo micropeak-$$i.png; done)
-TG_FILES=$(shell for i in $(RES); do echo telegps-$$i.png; done)
+# Application icon base names
 
-MAC_TG_FILES=$(shell for i in $(MAC_RES); do echo telegps-$$i.png; done)
-MAC_MP_FILES=$(shell for i in $(MAC_RES); do echo micropeak-$$i.png; done)
-MAC_AM_FILES=$(shell for i in $(MAC_RES); do echo altus-metrum-$$i.png; done)
+AM_NAME		= altusmetrum-altosui
+MP_NAME		= altusmetrum-micropeak
+TG_NAME		= altusmetrum-telegps
 
-WIN_TG_FILES=$(shell for i in $(WIN_RES); do echo telegps-$$i.png; done)
-WIN_MP_FILES=$(shell for i in $(WIN_RES); do echo micropeak-$$i.png; done)
-WIN_AM_FILES=$(shell for i in $(WIN_RES); do echo altus-metrum-$$i.png; done)
+# File icon base names
 
-ICO_FILES=altus-metrum.ico micro-peak.ico telegps.ico
-ICNS_FILES=AltosUIIcon.icns TeleGPS.icns MicroPeak.icns
+EEPROM_NAME	= application-vnd.altusmetrum.eeprom
+TELEM_NAME	= application-vnd.altusmetrum.telemetry
+MPD_NAME	= application-vnd.altusmetrum.micropeak
 
-icondir = $(datadir)/icons/hicolor/scalable/apps
+# Application icons
 
-AM_ICON = altusmetrum.svg
-MP_ICON = micropeak.svg
-TG_ICON = telegps.svg
+AM_ICON		= $(AM_NAME).svg
+MP_ICON		= $(MP_NAME).svg
+TG_ICON		= $(TG_NAME).svg
 
-icon_DATA = $(AM_ICON) $(MP_ICON) $(TG_ICON)
+# File icons (note that MicroPeak uses the application icon for files)
 
-EXTRA_DIST = $(icon_DATA) $(AM_FILES) $(MP_FILES) $(TG_FILES)
+EEPROM_ICON	= $(EEPROM_NAME).svg
+TELEM_ICON	= $(TELEM_NAME).svg
+MPD_ICON	= $(MPD_NAME).svg
+
+# Files needed for Mac OSX icons
+
+MAC_AM_FILES	= $(shell for i in $(MAC_RES); do echo $(AM_NAME)-$$i.png; done)
+MAC_MP_FILES	= $(shell for i in $(MAC_RES); do echo $(MP_NAME)-$$i.png; done)
+MAC_TG_FILES	= $(shell for i in $(MAC_RES); do echo $(TG_NAME)-$$i.png; done)
+MAC_EEPROM_FILES= $(shell for i in $(MAC_RES); do echo $(EEPROM_NAME)-$$i.png; done)
+MAC_TELEM_FILES	= $(shell for i in $(MAC_RES); do echo $(TELEM_NAME)-$$i.png; done)
+MAC_MPD_FILES	= $(shell for i in $(MAC_RES); do echo $(MPD_NAME)-$$i.png; done)
+
+ICNS_FILES	= $(AM_NAME).icns $(MP_NAME).icns $(TG_NAME).icns \
+		  $(EEPROM_NAME).icns $(TELEM_NAME).icns $(MPD_NAME).icns
+
+# Files needed for Windows icons
+
+WIN_AM_FILES	= $(shell for i in $(WIN_RES); do echo $(AM_NAME)-$$i.png; done)
+WIN_MP_FILES	= $(shell for i in $(WIN_RES); do echo $(MP_NAME)-$$i.png; done)
+WIN_TG_FILES	= $(shell for i in $(WIN_RES); do echo $(TG_NAME)-$$i.png; done)
+WIN_EEPROM_FILES= $(shell for i in $(WIN_RES); do echo $(EEPROM_NAME)-$$i.png; done)
+WIN_TELEM_FILES	= $(shell for i in $(WIN_RES); do echo $(TELEM_NAME)-$$i.png; done)
+WIN_MPD_FILES	= $(shell for i in $(WIN_RES); do echo $(MPD_NAME)-$$i.png; done)
+
+ICO_FILES	= $(AM_NAME).ico $(MP_NAME).ico $(TG_NAME).ico \
+		  $(EEPROM_NAME).ico $(TELEM_NAME).ico $(MPD_NAME).ico
+
+EXE_FILES	= $(AM_NAME).exe $(MP_NAME).exe $(TG_NAME).exe \
+		  $(EEPROM_NAME).exe $(TELEM_NAME).exe $(MPD_NAME).exe
+
+# Files needed for Java internal icons
+
+JAVA_AM_FILES	= $(shell for i in $(JAVA_RES); do echo $(AM_NAME)-$$i.png; done)
+JAVA_MP_FILES	= $(shell for i in $(JAVA_RES); do echo $(MP_NAME)-$$i.png; done)
+JAVA_TG_FILES	= $(shell for i in $(JAVA_RES); do echo $(TG_NAME)-$$i.png; done)
+
+JAVA_FILES	= $(JAVA_AM_FILES) $(JAVA_MP_FILES) $(JAVA_TG_FILES)
+
+# PNG files needed by anyone
+
+AM_FILES	= $(shell for i in $(RES); do echo $(AM_NAME)-$$i.png; done)
+MP_FILES	= $(shell for i in $(RES); do echo $(MP_NAME)-$$i.png; done)
+TG_FILES	= $(shell for i in $(RES); do echo $(TG_NAME)-$$i.png; done)
+EEPROM_FILES	= $(shell for i in $(RES); do echo $(EEPROM_NAME)-$$i.png; done)
+TELEM_FILES	= $(shell for i in $(RES); do echo $(TELEM_NAME)-$$i.png; done)
+IN_MPD_FILES	= $(shell for i in $(RES); do echo $(MPD_NAME)-$$i.png; done)
+
+ICON_THEME=$(datadir)/icons/hicolor
+
+appicondir = $(ICON_THEME)/scalable/apps
+appicon_DATA = $(AM_ICON) $(MP_ICON) $(TG_ICON)
+
+MIME_ICONS = $(EEPROM_ICON) $(TELEM_ICON) $(MPD_ICON)
+
+mimeicondir = $(ICON_THEME)/scalable/mimetypes
+mimeicon_DATA = $(MIME_ICONS)
+
+mimedir = $(datadir)/mime/packages
+mime_DATA = org-altusmetrum-mimetypes.xml
+
+EXTRA_DIST = $(appicon_DATA) $(mimeicon_DATA) $(mime_DATA) windows-stub.c
 
 res:
 	echo $(RES)
 
-all-local: $(ICO_FILES) $(ICNS_FILES)
+java-altosui:
+	@echo $(JAVA_AM_FILES)
+
+java-micropeak:
+	@echo $(JAVA_MP_FILES)
+
+java-telegps:
+	@echo $(JAVA_TG_FILES)
+
+fat: all $(ICO_FILES) $(ICNS_FILES) $(EXE_FILES)
+
+all-local: $(JAVA_FILES)
 
 clean-local:
-	$(RM) altus-metrum-*.png telegps-*.png micropeak-*.png *.build *.ico *.icns *.o *.exe
+	$(RM) $(AM_NAME)-*.png $(TG_NAME)-*.png $(MP_NAME)-*.png
+	$(RM) $(EEPROM_NAME)-*.png $(TELEM_NAME)-*.png $(MPD_NAME)-*.png
+	$(RM) *.build *.ico *.rc *.icns *.o *.exe $(MPD_ICON)
 
-$(AM_FILES): altusmetrum.build
+install-data-hook:
+	update-mime-database $(datadir)/mime
+	update-icon-caches $(ICON_THEME)
 
-altusmetrum.build: altusmetrum.svg
-	for i in $(RES); do rsvg-convert -w $$i -h $$i -o altus-metrum-$$i.png altusmetrum.svg; done && touch $@
+$(MPD_ICON): $(MP_ICON)
+	$(LN_S) $(MP_ICON) $@
 
-$(TG_FILES): telegps.build
+$(AM_FILES): $(AM_NAME).build
+$(MP_FILES): $(MP_NAME).build
+$(TG_FILES): $(TG_NAME).build
 
-telegps.build: telegps.svg
-	for i in $(RES); do rsvg-convert -w $$i -h $$i -o telegps-$$i.png telegps.svg; done && touch $@
+SUFFIXES=.svg .build .icns .ico .rc .o .exe
 
-$(MP_FILES): micropeak.build
+.svg.build:
+	for i in $(RES); do rsvg-convert -w $$i -h $$i -o $*-$$i.png $*.svg; done && touch $@
 
-micropeak.build: micropeak.svg
-	for i in $(RES); do rsvg-convert -w $$i -h $$i -o micropeak-$$i.png micropeak.svg; done && touch $@
+.build.icns:
+	png2icns $@ $(shell for i in $(MAC_RES); do echo $*-$$i.png; done)
 
-#clean-local:
-#	$(RM) -f $(ICO_FILES)
+.build.ico:
+	icotool -c -o $@ $(shell for i in $(WIN_RES); do echo $*-$$i.png; done)
 
-altus-metrum.ico: $(WIN_AM_FILES)
-	icotool -c -o $@ $(WIN_AM_FILES)
-
-micro-peak.ico: $(WIN_MP_FILES)
-	icotool -c -o $@ $(WIN_MP_FILES)
-
-telegps.ico: $(WIN_TG_FILES)
-	icotool -c -o $@ $(WIN_TG_FILES)
-
-AltosUIIcon.icns: $(MAC_AM_FILES)
-	png2icns $@ $(MAC_AM_FILES)
-
-TeleGPS.icns: $(MAC_TG_FILES)
-	png2icns $@ $(MAC_TG_FILES)
-
-MicroPeak.icns: $(MAC_MP_FILES)
-	png2icns $@ $(MAC_MP_FILES)
+.ico.rc:
+	echo '101 ICON "$*.ico"' > $@
 
 MINGCC32=i686-w64-mingw32-gcc
 MINGWINDRES=i686-w64-mingw32-windres
-
-SUFFIXES=.rc .exe
-
-fat: all micro-peak.exe altus-metrum.exe telegps.exe
-
-altus-metrum.o: altus-metrum.ico
-micro-peak.o: micro-peak.ico
-telegps.o: telegps.ico
 
 .rc.o:
 	$(MINGWINDRES) $*.rc $@

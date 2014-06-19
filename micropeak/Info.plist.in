@@ -23,14 +23,14 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleIconFile</key>
-	<string>MicroPeak.icns</string>
+	<string>altusmetrum-micropeak.icns</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 	  <dict>
 	    <key>CFBundleTypeName</key>
 	    <string>MicroPeak data file</string>
 	    <key>CFBundleTypeIconFile</key>
-	    <string>MicroPeak.icns</string>
+	    <string>application-vnd.altusmetrum.micropeak.icns</string>
 	    <key>CFBundleTypeExtensions</key>
 	    <array>
 	      <string>mpd</string>

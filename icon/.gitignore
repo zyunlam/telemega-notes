@@ -1,6 +1,6 @@
-altus-metrum-*.png
-micropeak-*.png
-telegps-*.png
+application-*.png
+altusmetrum-*.png
+*.rc
 *.ico
 *.icns
 *.build
