@@ -75,7 +75,7 @@ WINDOWS_ICON=$(ICONDIR)/micro-peak.ico $(ICONDIR)/micro-peak.exe
 MACOSX_ICON=$(ICONDIR)/MicroPeak.icns
 
 desktopdir = $(datadir)/applications
-desktop_file = micropeak.desktop
+desktop_file = altusmetrum-micropeak.desktop
 desktop_SCRIPTS = $(desktop_file)
 
 all-local: micropeak-test micropeak-jdb $(JAR)
@@ -92,7 +92,7 @@ clean-local:
 EXTRA_DIST = $(desktop_file).in
 
 $(desktop_file): $(desktop_file).in
-	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/micropeak.desktop.in > $@
+	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/$(desktop_file).in > $@
 	chmod +x $@
 
 LINUX_DIST=MicroPeak-Linux-$(VERSION).tar.bz2

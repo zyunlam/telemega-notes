@@ -6,5 +6,5 @@ Comment=View and log data from TeleGPS tracking devices
 Icon=%icondir%/telegps.svg
 Exec=%bindir%/telegps %f
 Terminal=false
-MimeType=text/plain;
+MimeType=application/vnd.altusmetrum.telemetry;application/vnd.altusmetrum.eeprom
 Categories=Education;Electronics;Science;

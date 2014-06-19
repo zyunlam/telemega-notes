@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=MicroPeak
-GenericName=MicroPeak download and analysis
+GenericName=MicroPeak Download and Analysis
 Comment=View and log data from MicroPeak altimeters
 Icon=%icondir%/micropeak.svg
 Exec=%bindir%/micropeak %f
 Terminal=false
-MimeType=text/plain;
+MimeType=application/vnd.altusmetrum.micropeak
 Categories=Education;Electronics;Science;

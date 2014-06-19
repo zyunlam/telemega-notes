@@ -64,7 +64,7 @@ LIBALTOS= \
 	altos.dll
 
 desktopdir = $(datadir)/applications
-desktop_file = altos.desktop
+desktop_file = altusmetrum-altosui.desktop
 desktop_SCRIPTS = $(desktop_file)
 
 JAR=altosui.jar
@@ -141,7 +141,7 @@ FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFR
 
 LINUX_LIBS=libaltos32.so libaltos64.so
 
-LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) altos.desktop.in ../icon/altusmetrum.svg
+LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) $(desktop_file).in ../icon/altusmetrum.svg
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist
@@ -161,7 +161,7 @@ clean-local:
 EXTRA_DIST = $(desktop_file).in
 
 $(desktop_file): $(desktop_file).in
-	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/altos.desktop.in > $@
+	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/$(desktop_file).in > $@
 	chmod +x $@
 
 if FATINSTALL

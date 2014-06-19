@@ -89,7 +89,7 @@ FIRMWARE_TG=$(FIRMWARE_TG_1_0)
 FIRMWARE=$(FIRMWARE_TG) $(FIRMWARE_TD) $(FIRMWARE_TBT)
 
 desktopdir = $(datadir)/applications
-desktop_file = telegps.desktop
+desktop_file = altusmetrum-telegps.desktop
 desktop_SCRIPTS = $(desktop_file)
 
 all-local: telegps-test telegps-jdb $(JAR)
@@ -106,7 +106,7 @@ clean-local:
 EXTRA_DIST = $(desktop_file).in
 
 $(desktop_file): $(desktop_file).in
-	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/telegps.desktop.in > $@
+	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/$(desktop_file).in > $@
 	chmod +x $@
 
 LINUX_DIST=TeleGPS-Linux-$(VERSION).tar.bz2
@@ -120,8 +120,8 @@ DOC=$(TELEGPS_DOC)
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) telegps.desktop.in ../icon/telegps.svg
-LINUX_EXTRA=telegps-fat telegps.desktop.in
+LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in ../icon/telegps.svg
+LINUX_EXTRA=telegps-fat $(desktop_file).in
 
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
