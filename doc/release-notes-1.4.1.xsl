@@ -42,6 +42,13 @@
 	  packages for Linux, Mac and Windows.
 	</para>
       </listitem>
+      <listitem>
+	<para>
+	  Include Google Application Key for map downloading. The 1.4
+	  release didn't have this key in the released version of the
+	  software, making map downloading fail for most people.
+	</para>
+      </listitem>
     </itemizedlist>
   </para>
 </article>
