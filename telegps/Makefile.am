@@ -205,8 +205,6 @@ $(FATJAR): classtelegps.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CL
 		-C classes org \
 		-C ../libaltos libaltosJNI
 
-classtelegps.stamp: $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)
-
 libaltos.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .

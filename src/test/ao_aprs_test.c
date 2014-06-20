@@ -97,35 +97,11 @@ audio_gap(int secs)
 #endif
 }
 
-#include <math.h>
-
-int
-ao_aprs_encode_altitude_expensive(int meters)
-{
-	double	feet = meters / 0.3048;
-
-	double	encode = log(feet) / log(1.002);
-	return floor(encode + 0.5);
-}
-
 // This is where we go after reset.
 int main(int argc, char **argv)
 {
 	int	e, x;
 	int	a;
-
-	for (a = 1; a < 100000; a++) {
-		e = ao_aprs_encode_altitude(a);
-		x = ao_aprs_encode_altitude_expensive(a);
-
-		if (e != x) {
-			double	back_feet, back_meters;
-			back_feet = pow(1.002, e);
-			back_meters = back_feet * 0.3048;
-			fprintf (stderr, "APRS altitude encoding failure: altitude %d actual %d expected %d actual meters %f\n",
-				 a, e, x, back_meters);
-		}
-	}
 
     audio_gap(1);
 

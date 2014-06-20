@@ -261,6 +261,7 @@ static uint8_t TNC_AX25_HEADER[] = {
 
 #define TNC_CALLSIGN_OFF	7
 #define TNC_CALLSIGN_LEN	6
+#define TNC_SSID_OFF		13
 
 static void
 tncSetCallsign(void)
@@ -275,6 +276,7 @@ tncSetCallsign(void)
 	}
 	for (; i < TNC_CALLSIGN_LEN; i++)
 		TNC_AX25_HEADER[TNC_CALLSIGN_OFF + i] = ' ' << 1;
+	TNC_AX25_HEADER[TNC_SSID_OFF] = 0x60 | ((ao_serial_number % 10) << 1);
 #endif
 }
 
@@ -530,6 +532,7 @@ static int tncComment(uint8_t *buf)
 #ifdef AO_SENSE_MAIN
 		       " M%d.%d"
 #endif
+		       " %d"
 		       , ao_gps_locked(),
 		       ao_num_sats(),
 		       battery/10,
@@ -542,6 +545,7 @@ static int tncComment(uint8_t *buf)
 		       , main/10,
 		       main%10
 #endif
+		       , ao_serial_number
 		);
 #else
 	return sprintf((char *) buf,
