@@ -419,7 +419,10 @@ public class AltosConfigUI
 		c.ipady = 5;
 		radio_frequency_value = new AltosFreqList();
 		radio_frequency_value.addItemListener(this);
-		pane.add(radio_frequency_value, c);
+
+		JMenuBar menu_bar = new JMenuBar();
+		menu_bar.add(radio_frequency_value);
+		pane.add(menu_bar, c);
 		radio_frequency_value.setToolTipText("Telemetry, RDF and packet frequency");
 		row++;
 
