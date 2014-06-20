@@ -29,6 +29,13 @@
     </legalnotice>
     <revhistory>
       <revision>
+	<revnumber>1.4.1</revnumber>
+	<date>20 June 2014</date>
+	<revremark>
+	  Minor release fixing some installation bugs.
+	</revremark>
+      </revision>
+      <revision>
 	<revnumber>1.4</revnumber>
 	<date>13 June 2014</date>
 	<revremark>
@@ -1295,6 +1302,23 @@ NAR #88757, TRA #12200
       </para>
     </section>
   </chapter>
+  <appendix>
+    <title>Release Notes</title>
+    <simplesect>
+      <title>Version 1.41</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.4.1.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
+    <simplesect>
+      <title>Version 1.4</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.4.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
+  </appendix>
 </book>
 <!--  LocalWords:  Altusmetrum TeleGPS
 -->
