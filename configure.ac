@@ -534,6 +534,9 @@ ao-tools/ao-dump-up/Makefile
 ao-tools/ao-elftohex/Makefile
 ao-tools/ao-usbload/Makefile
 ao-tools/ao-flash/Makefile
+ao-tools/ao-test-igniter/Makefile
+ao-tools/ao-test-baro/Makefile
+ao-tools/ao-test-flash/Makefile
 ao-utils/Makefile
 src/Version
 ])
