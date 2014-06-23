@@ -53,7 +53,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	18
+#define AO_CONFIG_MINOR	19
 
 #define AO_AES_LEN 16
 
@@ -101,6 +101,9 @@ struct ao_config {
 #endif
 #if AO_PYRO_NUM
 	uint16_t	pyro_time;		/* minor version 18 */
+#endif
+#if HAS_APRS
+	uint8_t		aprs_ssid;		/* minor version 19 */
 #endif
 };
 
