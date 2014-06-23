@@ -41,6 +41,7 @@ public class AltosConfigUI
 	JLabel			radio_frequency_label;
 	JLabel			radio_enable_label;
 	JLabel			aprs_interval_label;
+	JLabel			aprs_ssid_label;
 	JLabel			flight_log_max_label;
 	JLabel			ignite_mode_label;
 	JLabel			pad_orientation_label;
@@ -62,6 +63,7 @@ public class AltosConfigUI
 	JTextField		radio_calibration_value;
 	JRadioButton		radio_enable_value;
 	JComboBox<String>	aprs_interval_value;
+	JComboBox<Integer>	aprs_ssid_value;
 	JComboBox<String>	flight_log_max_value;
 	JComboBox<String>	ignite_mode_value;
 	JComboBox<String>	pad_orientation_value;
@@ -111,6 +113,10 @@ public class AltosConfigUI
 		"2",
 		"5",
 		"10"
+	};
+
+	static Integer[]	aprs_ssid_values = {
+		0, 1, 2 ,3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 	};
 
 	static String[] 	beep_values = {
@@ -197,6 +203,15 @@ public class AltosConfigUI
 	void set_aprs_interval_tool_tip() {
 		if (aprs_interval_value.isEnabled())
 			aprs_interval_value.setToolTipText("Enable APRS and set the interval between APRS reports");
+		else
+			aprs_interval_value.setToolTipText("Hardware doesn't support APRS");
+	}
+
+	void set_aprs_ssid_tool_tip() {
+		if (aprs_ssid_value.isEnabled())
+			aprs_interval_value.setToolTipText("Set the APRS SSID (secondary station identifier)");
+		else if (aprs_interval_value.isEnabled())
+			aprs_interval_value.setToolTipText("Software version doesn't support setting the APRS SSID");
 		else
 			aprs_interval_value.setToolTipText("Hardware doesn't support APRS");
 	}
@@ -502,6 +517,33 @@ public class AltosConfigUI
 		aprs_interval_value.addItemListener(this);
 		pane.add(aprs_interval_value, c);
 		set_aprs_interval_tool_tip();
+		row++;
+
+		/* APRS SSID */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		aprs_ssid_label = new JLabel("APRS SSID:");
+		pane.add(aprs_ssid_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		aprs_ssid_value = new JComboBox<Integer>(aprs_ssid_values);
+		aprs_ssid_value.setEditable(false);
+		aprs_ssid_value.addItemListener(this);
+		aprs_ssid_value.setMaximumRowCount(aprs_ssid_values.length);
+		pane.add(aprs_ssid_value, c);
+		set_aprs_ssid_tool_tip();
 		row++;
 
 		/* Callsign */
@@ -1179,5 +1221,16 @@ public class AltosConfigUI
 		if (s.equals("Disabled"))
 			return 0;
 		return parse_int("aprs interval", s, false);
+	}
+
+	public void set_aprs_ssid(int new_aprs_ssid) {
+		aprs_ssid_value.setSelectedItem(Math.max(0,new_aprs_ssid));
+		aprs_ssid_value.setVisible(new_aprs_ssid >= 0);
+		set_aprs_ssid_tool_tip();
+	}
+
+	public int aprs_ssid() throws AltosConfigDataException {
+		Integer i = (Integer) aprs_ssid_value.getSelectedItem();
+		return i;
 	}
 }
