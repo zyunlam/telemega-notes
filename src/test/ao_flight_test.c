@@ -50,6 +50,7 @@ int ao_gps_new;
 #define HAS_MMA655X		1
 #define HAS_HMC5883 		1
 #define HAS_BEEP		1
+#define AO_CONFIG_MAX_SIZE	1024
 
 struct ao_adc {
 	int16_t			sense[AO_ADC_NUM_SENSE];
@@ -795,6 +796,7 @@ ao_sleep(void *wchan)
 					pyro->flags |= ao_pyro_values[j].flag;
 					if (ao_pyro_values[j].offset != NO_VALUE && i + 1 < nword) {
 						int16_t	val = strtoul(words[++i], NULL, 10);
+						printf("pyro %d condition %s value %d\n", p, words[i-1], val);
 						*((int16_t *) ((char *) pyro + ao_pyro_values[j].offset)) = val;
 					}
 				}
