@@ -18,7 +18,8 @@ prebuild:
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	PKG_CONFIG_PATH=/opt/stlink/lib/pkgconfig ./autogen.sh --prefix=/usr
+	PKG_CONFIG_PATH=/opt/stlink/lib/pkgconfig ./autogen.sh \
+		--prefix=/usr --with-google-key=/opt/google/maps-api-key
 	touch configure-stamp
 
 build: build-arch build-indep
