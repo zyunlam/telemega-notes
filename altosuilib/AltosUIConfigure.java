@@ -223,6 +223,31 @@ public class AltosUIConfigure
 		row++;
 	}
 
+	static final Integer map_caches[] = { 9, 25, 100 };
+
+	public void add_map_cache() {
+		pane.add(new JLabel("Map Cache Size"), constraints(0, 1));
+
+		final JComboBox<Integer> map_cache = new JComboBox<Integer>(map_caches);
+
+		map_cache.setEditable(true);
+		map_cache.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						int	size = (Integer) (map_cache.getSelectedItem());
+
+						AltosUIPreferences.set_map_cache(size);
+					} catch (ClassCastException ce) {
+						map_cache.setSelectedItem(new Integer(AltosUIPreferences.map_cache()));
+					}
+				}
+			});
+
+		map_cache.setSelectedItem (new Integer(AltosUIPreferences.map_cache()));
+		pane.add(map_cache, constraints(1, 2, GridBagConstraints.BOTH));
+		row++;
+	}
+
 	public void add_bluetooth() {
 	}
 
@@ -255,6 +280,7 @@ public class AltosUIConfigure
 		add_font_size();
 		add_look_and_feel();
 		add_position();
+		add_map_cache();
 		add_bluetooth();
 		add_frequencies();
 

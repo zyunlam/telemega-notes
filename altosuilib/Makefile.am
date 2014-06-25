@@ -68,6 +68,7 @@ altosuilib_JAVA = \
 	AltosUIMapPath.java \
 	AltosUIMapTile.java \
 	AltosUIMapCache.java \
+	AltosUIMapCacheListener.java \
 	AltosUIMapImage.java \
 	AltosUIMapTransform.java \
 	AltosUIMapRectangle.java \
