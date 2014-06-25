@@ -2,6 +2,10 @@ These are Bdale's notes on how to do a release.
 
 	git checkout master
 
+	- make sure the Google Maps API key is in the build chroot
+		mkdir -p /var/cache/pbuilder/base.cow/opt/google
+		cp ~/altusmetrumllc/google-maps-api-key \
+			/var/cache/pbuilder/base.cow/opt/google/maps-api-key
 	- make sure there is a doc/release-notes-<version>.xsl
 	- make sure that doc/altusmetrum.xsl has the right copyright year,
 	  and add release to the revision history at the front (release notes
