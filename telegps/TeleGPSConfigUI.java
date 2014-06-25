@@ -612,12 +612,16 @@ public class TeleGPSConfigUI
 	}
 
 	public void units_changed(boolean imperial_units) {
+		boolean	was_dirty = dirty;
+
 		if (tracker_motion_value.isEnabled()) {
 			String motion = tracker_motion_value.getSelectedItem().toString();
 			tracker_motion_label.setText(get_tracker_motion_label());
 			set_tracker_motion_values();
 			set_tracker_motion((int) (AltosConvert.height.parse(motion, !imperial_units) + 0.5));
 		}
+		if (!was_dirty)
+			set_clean();
 	}
 
 	/* set and get all of the dialog values */
@@ -794,7 +798,12 @@ public class TeleGPSConfigUI
 	}
 
 	public void set_tracker_motion(int tracker_motion) {
-		tracker_motion_value.setSelectedItem(AltosConvert.height.say(tracker_motion));
+		if (tracker_motion < 0) {
+			tracker_motion_value.setEnabled(false);
+		} else {
+			tracker_motion_value.setEnabled(true);
+			tracker_motion_value.setSelectedItem(AltosConvert.height.say(tracker_motion));
+		}
 	}
 
 	public int tracker_motion() throws AltosConfigDataException {
@@ -802,7 +811,12 @@ public class TeleGPSConfigUI
 	}
 
 	public void set_tracker_interval(int tracker_interval) {
-		tracker_interval_value.setSelectedItem(String.format("%d", tracker_interval));
+		if (tracker_interval< 0) {
+			tracker_interval_value.setEnabled(false);
+		} else {
+			tracker_interval_value.setEnabled(true);
+			tracker_interval_value.setSelectedItem(String.format("%d", tracker_interval));
+		}
 	}
 
 	public int tracker_interval() throws AltosConfigDataException {
