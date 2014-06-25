@@ -1,3 +1,22 @@
+altos (1.4.1-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * Sign our .inf file with the comodo key. Update signing-driver
+  * Fix java version detection and downloading
+  * altosui: Ship TeleMetrum v2.0 firmware with AltosUI
+  * Add 1.4.1 release notes
+  * Add note about including Google maps API key
+  * altosuilib: Mark 'Configure AltosUI' window with maps key status
+
+  [ Bdale Garbee ]
+  * notes updated for TeleGPS and 1.4 release learnings
+  * make sure to use Google Maps API key for official builds
+  * need the api key in Bdale's root too
+  * releasing 1.4.1
+  * update ChangeLog for release
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 24 Jun 2014 21:57:12 -0600
+
 altos (1.4-1) unstable; urgency=medium
 
   [ Keith Packard ]
