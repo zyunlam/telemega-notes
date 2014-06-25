@@ -92,6 +92,8 @@ These are Bdale's notes on how to do a release.
 	  /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>.mdwn, and
 	  /home/bdale/web/altusmetrum/TeleGPS/releases/<rev>.mdwn
 
+		- make sure the Windows stuff is like 1-4-1, not 1.4.1!
+
 	(cd doc ; make publish)
 
 		this pushes fresh documents to the web site
