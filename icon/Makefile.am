@@ -71,6 +71,10 @@ EEPROM_FILES	= $(shell for i in $(RES); do echo $(EEPROM_NAME)-$$i.png; done)
 TELEM_FILES	= $(shell for i in $(RES); do echo $(TELEM_NAME)-$$i.png; done)
 IN_MPD_FILES	= $(shell for i in $(RES); do echo $(MPD_NAME)-$$i.png; done)
 
+# XPM file needed by debian
+
+AM_XPM = altusmetrum.xpm
+
 ICON_THEME=$(datadir)/icons/hicolor
 
 appicondir = $(ICON_THEME)/scalable/apps
@@ -83,6 +87,9 @@ mimeicon_DATA = $(MIME_ICONS)
 
 mimedir = $(datadir)/mime/packages
 mime_DATA = org-altusmetrum-mimetypes.xml
+
+pixmapdir = $(datadir)/pixmaps
+pixmap_DATA = altusmetrum.xpm
 
 EXTRA_DIST = $(appicon_DATA) $(mimeicon_DATA) $(mime_DATA) windows-stub.c
 
@@ -100,12 +107,14 @@ java-telegps:
 
 fat: all $(ICO_FILES) $(ICNS_FILES) $(EXE_FILES)
 
-all-local: $(JAVA_FILES)
+all-local: $(JAVA_FILES) $(AM_XPM)
 
 clean-local:
 	$(RM) $(AM_NAME)-*.png $(TG_NAME)-*.png $(MP_NAME)-*.png
+	$(RM) altus-metrum-*.png micropeak-*.png telegps-*.png
 	$(RM) $(EEPROM_NAME)-*.png $(TELEM_NAME)-*.png $(MPD_NAME)-*.png
 	$(RM) *.build *.ico *.rc *.icns *.o *.exe $(MPD_ICON)
+	$(RM) altusmetrum.xpm
 
 install-data-hook:
 	update-mime-database $(datadir)/mime
@@ -113,6 +122,13 @@ install-data-hook:
 
 $(MPD_ICON): $(MP_ICON)
 	$(LN_S) $(MP_ICON) $@
+
+XPM_SRC=altusmetrum-altosui-32.png
+
+altusmetrum.xpm: $(XPM_SRC)
+	pngtopnm -alpha $(XPM_SRC) > mask-$@ && \
+		pngtopnm $(XPM_SRC) | \
+		ppmtoxpm -alphamask=mask-$@ > $@ && rm mask-$@
 
 $(AM_FILES): $(AM_NAME).build
 $(MP_FILES): $(MP_NAME).build
@@ -131,6 +147,7 @@ SUFFIXES=.svg .build .icns .ico .rc .o .exe
 
 .ico.rc:
 	echo '101 ICON "$*.ico"' > $@
+
 
 MINGCC32=i686-w64-mingw32-gcc
 MINGWINDRES=i686-w64-mingw32-windres
