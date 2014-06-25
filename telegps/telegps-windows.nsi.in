@@ -1,11 +1,7 @@
 !addplugindir ../altosui/Instdrv/NSIS/Plugins
+!addincludedir ../altosui/Instdrv/NSIS/Includes
 !include x64.nsh
-; Definitions for Java 1.7 Detection
-!define JRE_VERSION "1.7"
-!define JRE_ALTERNATE "1.6"
-!define JRE32_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=83383&/jre-7u51-windows-i586.exe"
-!define JRE64_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=83385&/jre-7u51-windows-x64.exe"
-!define PRODUCT_NAME "TeleGPS Windows Software"
+!include java.nsh
 
 Name "TeleGPS Installer"
 
@@ -33,45 +29,6 @@ Function .onInit
 		StrCpy $INSTDIR "$PROGRAMFILES64\AltusMetrum"
 		${DisableX64FSRedirection}
 	${EndIf}
-FunctionEnd
-
-Var JavaDownload
-Var JavaBits
-
-Function GetJRE
-	${If} ${RunningX64}
-	   StrCpy $JavaDownload ${JRE64_URL}
-	   StrCpy $JavaBits "64"
-	${Else}
-	   StrCpy $JavaDownload ${JRE32_URL}
-	   StrCpy $JavaBits "32"
-	${EndIf}
-
-        MessageBox MB_OK "${PRODUCT_NAME} uses Java ${JRE_VERSION}, \
-			$JavaBits bits, it will now \
-                        be downloaded and installed"
-
-        StrCpy $2 "$TEMP\Java Runtime Environment.exe"
-        nsisdl::download /TIMEOUT=30000 $JavaDownload $2
-        Pop $R0 ;Get the return value
-                StrCmp $R0 "success" +3
-                MessageBox MB_OK "Download failed: $R0"
-                Quit
-        ExecWait $2
-        Delete $2
-FunctionEnd
-
-Function DetectJRE
-  ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" \
-             "CurrentVersion"
-
-  StrCmp $2 ${JRE_VERSION} done
-
-  StrCmp $2 ${JRE_ALTERNATE} done
-
-  Call GetJRE
-
-  done:
 FunctionEnd
 
 ; Pages to present
