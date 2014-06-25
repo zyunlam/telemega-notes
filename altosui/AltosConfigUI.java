@@ -925,6 +925,8 @@ public class AltosConfigUI
 	}
 
 	public void units_changed(boolean imperial_units) {
+		boolean	was_dirty = dirty;
+
 		String v = main_deploy_value.getSelectedItem().toString();
 		main_deploy_label.setText(get_main_deploy_label());
 		set_main_deploy_values();
@@ -937,6 +939,9 @@ public class AltosConfigUI
 			set_tracker_motion_values();
 			set_tracker_motion((int) (AltosConvert.height.parse(motion, !imperial_units) + 0.5));
 		}
+
+		if (!was_dirty)
+			set_clean();
 	}
 
 	public void set_apogee_delay(int new_apogee_delay) {
@@ -1151,9 +1156,11 @@ public class AltosConfigUI
 		if (tracker_motion < 0) {
 			tracker_motion_label.setVisible(false);
 			tracker_motion_value.setVisible(false);
+			tracker_motion_value.setEnabled(false);
 		} else {
 			tracker_motion_label.setVisible(true);
 			tracker_motion_value.setVisible(true);
+			tracker_motion_value.setEnabled(true);
 			tracker_motion_value.setSelectedItem(AltosConvert.height.say(tracker_motion));
 		}
 	}
@@ -1166,9 +1173,11 @@ public class AltosConfigUI
 		if (tracker_interval< 0) {
 			tracker_interval_label.setVisible(false);
 			tracker_interval_value.setVisible(false);
+			tracker_interval_value.setEnabled(false);
 		} else {
 			tracker_interval_label.setVisible(true);
 			tracker_interval_value.setVisible(true);
+			tracker_interval_value.setEnabled(true);
 			tracker_interval_value.setSelectedItem(String.format("%d", tracker_interval));
 		}
 	}
