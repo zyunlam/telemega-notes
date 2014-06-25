@@ -1,3 +1,105 @@
+commit 1517ad263ba4c0b8c9251a726cce1ed8a86a634c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 24 21:54:30 2014 -0600
+
+    releasing 1.4.1
+
+commit 6986da4407ac53e267b95abb1848211ea9d32b41
+Merge: 5f6059a 237472e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 24 21:31:53 2014 -0600
+
+    Merge branch 'branch-1.4' of ssh://git.gag.com/scm/git/fw/altos into branch-1.4
+
+commit 5f6059a9273dfe557145a9f620db81693f3bc27e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 24 21:22:26 2014 -0600
+
+    need the api key in Bdale's root too
+
+commit 42fd93b67af396b0478e9e795026cf1a5312e5c9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 24 21:12:59 2014 -0600
+
+    make sure to use Google Maps API key for official builds
+
+commit 9a78df4ea121d1d3c14da2abae1a82c34121e13c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 15 18:41:25 2014 -0600
+
+    notes updated for TeleGPS and 1.4 release learnings
+
+commit 237472e1b98283a82c674bb48c0347189d9d37bf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 24 20:15:38 2014 -0700
+
+    altosuilib: Mark 'Configure AltosUI' window with maps key status
+    
+    This lets us check a build to make sure it has a maps key
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0da9cdfbeacbaed13615ca2daade372920299c4a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 20 11:56:58 2014 -0700
+
+    Add note about including Google maps API key
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2bbbd2c22e32d4c40782a9f12657f1a385cc6bc7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 20 11:51:11 2014 -0700
+
+    Add 1.4.1 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9dbd752150875f1f9fc93063f66d2153ec15d935
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 18 14:16:36 2014 -0700
+
+    altosui: Ship TeleMetrum v2.0 firmware with AltosUI
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 44f60782d73bf5fdb6e1e54a3fdbe50808b7d7f5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 17 20:46:33 2014 -0700
+
+    Fix java version detection and downloading
+    
+    Move java stuff to a common include file, java.nsh
+    
+    Let any version no older than 1.6 serve by using ${VersionCompare}
+    
+    Use version 6 downloads as those don't require a click-through agreement.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7140ca8a4bc0be8386f8edacadb7ac5d88c6f1b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 17 00:08:03 2014 -0700
+
+    Sign our .inf file with the comodo key. Update signing-driver
+    
+    I've tested this on Windows 7 and it appears to work. No idea if it
+    works on Windows 8 yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9ab3a1de95b705783c31a7e16447f52c10b6b480
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 15 17:44:42 2014 -0600
+
+    turn-on support for TeleGPS
+
+commit b40351d5cb9802133f443d4f5150958b03b9e8f0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 15 17:43:50 2014 -0600
+
+    tagging 1.4 release
+
 commit 97a7cbaee806965ca7c696fb02f6e1d24b026b9b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Jun 15 17:43:06 2014 -0600

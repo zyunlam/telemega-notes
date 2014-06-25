@@ -15,7 +15,8 @@ RELNOTES=\
 	release-notes-1.3.html \
 	release-notes-1.3.1.html \
 	release-notes-1.3.2.html \
-	release-notes-1.4.html
+	release-notes-1.4.html \
+	release-notes-1.4.1.html
 
 PICTURES=\
 	altosui.png \
@@ -106,6 +107,9 @@ distclean:
 
 altusmetrum.html: $(RELNOTES_XSL) $(IMAGES)
 altusmetrum.pdf: $(RELNOTES_XSL) $(IMAGES)
+
+telegps.html: $(RELNOTES_XSL) $(IMAGES)
+telegps.pdf: $(RELNOTES_XSL) $(IMAGES)
 
 $(PDF): $(FOSTYLE) $(TEMPLATES)
 
