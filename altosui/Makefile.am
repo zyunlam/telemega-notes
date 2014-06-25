@@ -167,7 +167,7 @@ clean-local:
 	-rm -rf classes $(JAR) $(FATJAR) \
 		$(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) windows $(WINDOWS_DIST) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt altos-windows.log altos-windows.nsi \
-		altosui altosui-test altosui-jdb macosx linux
+		altosui altosui-test altosui-jdb macosx linux *.desktop
 
 EXTRA_DIST = $(desktop_file).in
 

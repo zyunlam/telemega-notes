@@ -17,7 +17,7 @@ TeleGPS-Linux-*.tar.bz2
 TeleGPS-Linux-*.sh
 TeleGPS-Mac-*.zip
 TeleGPS-Windows-*.exe
-altusmetrum-telegps.desktop
+*.desktop
 telegps-windows.log
 *.dll
 *.dylib

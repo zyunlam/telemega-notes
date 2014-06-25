@@ -95,7 +95,7 @@ clean-local:
 		$(ALTOSUILIB_CLASS) \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		micropeak micropeak-test micropeak-jdb macosx linux windows micropeak-windows.log \
-		micropeak-windows.nsi
+		micropeak-windows.nsi *.desktop
 
 EXTRA_DIST = $(desktop_file).in
 

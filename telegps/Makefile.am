@@ -112,7 +112,7 @@ clean-local:
 		$(ALTOSUILIB_CLASS) \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		telegps telegps-test telegps-jdb macosx linux windows telegps-windows.log \
-		telegps-windows.nsi
+		telegps-windows.nsi *.desktop
 
 EXTRA_DIST = $(desktop_file).in
 
