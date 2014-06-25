@@ -58,23 +58,34 @@ ALTOSUILIB_CLASS=\
 ICONDIR=$(top_srcdir)/icon
 
 JAVA_ICONS=\
-	$(ICONDIR)/telegps-16.png \
-	$(ICONDIR)/telegps-32.png \
-	$(ICONDIR)/telegps-48.png \
-	$(ICONDIR)/telegps-64.png \
-	$(ICONDIR)/telegps-128.png \
-	$(ICONDIR)/telegps-256.png
+	$(ICONDIR)/altusmetrum-telegps-16.png \
+	$(ICONDIR)/altusmetrum-telegps-32.png \
+	$(ICONDIR)/altusmetrum-telegps-48.png \
+	$(ICONDIR)/altusmetrum-telegps-64.png \
+	$(ICONDIR)/altusmetrum-telegps-128.png\
+	$(ICONDIR)/altusmetrum-telegps-256.png
 
 # icon base names for jar
-ICONJAR= -C $(ICONDIR) telegps-16.png \
-	-C $(ICONDIR) telegps-32.png \
-	-C $(ICONDIR) telegps-48.png \
-	-C $(ICONDIR) telegps-64.png \
-	-C $(ICONDIR) telegps-128.png \
-	-C $(ICONDIR) telegps-256.png
+ICONJAR= \
+	-C $(ICONDIR) altusmetrum-telegps-16.png \
+	-C $(ICONDIR) altusmetrum-telegps-32.png \
+	-C $(ICONDIR) altusmetrum-telegps-48.png \
+	-C $(ICONDIR) altusmetrum-telegps-64.png \
+	-C $(ICONDIR) altusmetrum-telegps-128.png\
+	-C $(ICONDIR) altusmetrum-telegps-256.png
 
-WINDOWS_ICON=$(ICONDIR)/telegps.ico
-MACOSX_ICON=$(ICONDIR)/TeleGPS.icns
+WINDOWS_ICONS	=\
+	../icon/altusmetrum-telegps.ico \
+	../icon/altusmetrum-telegps.exe
+	../icon/application-vnd.altusmetrum.eeprom.ico \
+	../icon/application-vnd.altusmetrum.eeprom.exe \
+	../icon/application-vnd.altusmetrum.telemetry.ico \
+	../icon/application-vnd.altusmetrum.telemetry.exe
+
+MACOSX_ICONS	=\
+	../icon/altusmetrum-telegps.icns \
+	../icon/application-vnd.altusmetrum.eeprom.icns \
+	../icon/application-vnd.altusmetrum.telemetry.icns
 
 # Firmware
 FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
@@ -89,7 +100,7 @@ FIRMWARE_TG=$(FIRMWARE_TG_1_0)
 FIRMWARE=$(FIRMWARE_TG) $(FIRMWARE_TD) $(FIRMWARE_TBT)
 
 desktopdir = $(datadir)/applications
-desktop_file = telegps.desktop
+desktop_file = altusmetrum-telegps.desktop
 desktop_SCRIPTS = $(desktop_file)
 
 all-local: telegps-test telegps-jdb $(JAR)
@@ -106,7 +117,7 @@ clean-local:
 EXTRA_DIST = $(desktop_file).in
 
 $(desktop_file): $(desktop_file).in
-	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/telegps.desktop.in > $@
+	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/$(desktop_file).in > $@
 	chmod +x $@
 
 LINUX_DIST=TeleGPS-Linux-$(VERSION).tar.bz2
@@ -120,15 +131,15 @@ DOC=$(TELEGPS_DOC)
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) telegps.desktop.in ../icon/telegps.svg
-LINUX_EXTRA=telegps-fat telegps.desktop.in
+LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in ../icon/altusmetrum-telegps.svg
+LINUX_EXTRA=telegps-fat $(desktop_file).in
 
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_README) $(DOC) $(MACOSX_ICON)
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_README) $(DOC) $(MACOSX_ICONS)
 MACOSX_EXTRA=$(FIRMWARE)
 
-WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(DOC) $(WINDOWS_ICON)
+WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(DOC) $(WINDOWS_ICONS)
 
 if FATINSTALL
 
@@ -193,8 +204,6 @@ $(FATJAR): classtelegps.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CL
 		$(ICONJAR) \
 		-C classes org \
 		-C ../libaltos libaltosJNI
-
-classaltosui.stamp: $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)
 
 libaltos.so: build-libaltos
 	-rm -f "$@"
@@ -269,7 +278,7 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/TeleGPS.app/Contents
 	mkdir -p macosx/AltOS-$(VERSION) macosx/TeleGPS.app/Contents/Resources/Java
-	cp -p $(MACOSX_ICON) macosx/TeleGPS.app/Contents/Resources
+	cp -p $(MACOSX_ICONS) macosx/TeleGPS.app/Contents/Resources
 	cp -p $(FATJAR) macosx/TeleGPS.app/Contents/Resources/Java/telegps.jar
 	cp -p libaltos.dylib macosx/TeleGPS.app/Contents/Resources/Java
 	cp -p $(ALTOSLIB_CLASS) macosx/TeleGPS.app/Contents/Resources/Java

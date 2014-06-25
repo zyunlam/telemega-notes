@@ -69,6 +69,16 @@ ao_pyro_print_status(void)
 
 uint16_t	ao_pyro_fired;
 
+#ifndef PYRO_DBG
+#define PYRO_DBG	0
+#endif
+
+#if PYRO_DBG
+#define DBG(...)	do { printf("\t%d: ", (int) (pyro - ao_config.pyro)); printf(__VA_ARGS__); } while (0)
+#else
+#define DBG(...)
+#endif
+
 /*
  * Given a pyro structure, figure out
  * if the current flight state satisfies all
@@ -88,63 +98,73 @@ ao_pyro_ready(struct ao_pyro *pyro)
 		case ao_pyro_accel_less:
 			if (ao_accel <= pyro->accel_less)
 				continue;
+			DBG("accel %d > %d\n", ao_accel, pyro->accel_less);
 			break;
 		case ao_pyro_accel_greater:
 			if (ao_accel >= pyro->accel_greater)
 				continue;
+			DBG("accel %d < %d\n", ao_accel, pyro->accel_greater);
 			break;
-
-
 		case ao_pyro_speed_less:
 			if (ao_speed <= pyro->speed_less)
 				continue;
+			DBG("speed %d > %d\n", ao_speed, pyro->speed_less);
 			break;
 		case ao_pyro_speed_greater:
 			if (ao_speed >= pyro->speed_greater)
 				continue;
+			DBG("speed %d < %d\n", ao_speed, pyro->speed_greater);
 			break;
-
 		case ao_pyro_height_less:
 			if (ao_height <= pyro->height_less)
 				continue;
+			DBG("height %d > %d\n", ao_height, pyro->height_less);
 			break;
 		case ao_pyro_height_greater:
 			if (ao_height >= pyro->height_greater)
 				continue;
+			DBG("height %d < %d\n", ao_height, pyro->height_greater);
 			break;
 
 #if HAS_GYRO
 		case ao_pyro_orient_less:
 			if (ao_sample_orient <= pyro->orient_less)
 				continue;
+			DBG("orient %d > %d\n", ao_sample_orient, pyro->orient_less);
 			break;
 		case ao_pyro_orient_greater:
 			if (ao_sample_orient >= pyro->orient_greater)
 				continue;
+			DBG("orient %d < %d\n", ao_sample_orient, pyro->orient_greater);
 			break;
 #endif
 
 		case ao_pyro_time_less:
 			if ((int16_t) (ao_time() - ao_boost_tick) <= pyro->time_less)
 				continue;
+			DBG("time %d > %d\n", (int16_t)(ao_time() - ao_boost_tick), pyro->time_less);
 			break;
 		case ao_pyro_time_greater:
 			if ((int16_t) (ao_time() - ao_boost_tick) >= pyro->time_greater)
 				continue;
+			DBG("time %d < %d\n", (int16_t)(ao_time() - ao_boost_tick), pyro->time_greater);
 			break;
 
 		case ao_pyro_ascending:
 			if (ao_speed > 0)
 				continue;
+			DBG("not ascending speed %d\n", ao_speed);
 			break;
 		case ao_pyro_descending:
 			if (ao_speed < 0)
 				continue;
+			DBG("not descending speed %d\n", ao_speed);
 			break;
 
 		case ao_pyro_after_motor:
 			if (ao_motor_number == pyro->motor)
 				continue;
+			DBG("motor %d != %d\n", ao_motor_number, pyro->motor);
 			break;
 
 		case ao_pyro_delay:
@@ -154,10 +174,12 @@ ao_pyro_ready(struct ao_pyro *pyro)
 		case ao_pyro_state_less:
 			if (ao_flight_state < pyro->state_less)
 				continue;
+			DBG("state %d >= %d\n", ao_flight_state, pyro->state_less);
 			break;
 		case ao_pyro_state_greater_or_equal:
 			if (ao_flight_state >= pyro->state_greater_or_equal)
 				continue;
+			DBG("state %d >= %d\n", ao_flight_state, pyro->state_less);
 			break;
 
 		default:

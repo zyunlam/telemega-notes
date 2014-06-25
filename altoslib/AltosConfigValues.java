@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 public interface AltosConfigValues {
 	/* set and get all of the dialog values */
@@ -80,6 +80,10 @@ public interface AltosConfigValues {
 	public abstract int aprs_interval() throws AltosConfigDataException;
 
 	public abstract void set_aprs_interval(int new_aprs_interval);
+
+	public abstract int aprs_ssid() throws AltosConfigDataException;
+
+	public abstract void set_aprs_ssid(int new_aprs_ssid);
 
 	public abstract int beep() throws AltosConfigDataException;
 

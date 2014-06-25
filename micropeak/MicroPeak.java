@@ -23,8 +23,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class MicroPeak extends MicroFrame implements ActionListener, ItemListener {
 
@@ -190,9 +190,24 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 	public void itemStateChanged(ItemEvent e) {
 	}
 
+	/* OSXAdapter interfaces */
+	public void macosx_file_handler(String path) {
+		CommandGraph(new File(path));
+	}
+
+	public void macosx_quit_handler() {
+		System.exit(0);
+	}
+
+	public void macosx_preferences_handler() {
+		Preferences();
+	}
+
 	public MicroPeak() {
 
 		++number_of_windows;
+
+		register_for_macosx_events();
 
 		AltosUIPreferences.set_component(this);
 

@@ -15,16 +15,130 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
+import java.util.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_4.*;
+import java.awt.event.*;
+import org.altusmetrum.altoslib_5.*;
 
-public class AltosFreqList extends JComboBox<AltosFrequency> {
+class FreqEntry extends JMenuItem {
+	AltosFrequency	frequency;
+
+	public FreqEntry(AltosFrequency frequency) {
+		super(frequency.toShortString());
+		this.frequency = frequency;
+	}
+}
+
+public class AltosFreqList extends JMenu implements ActionListener {
 
 	String	product;
 	int	serial;
 	int	calibrate;
+
+	AltosFrequency[]	frequencies = new AltosFrequency[0];
+
+	int	selected = -1;
+
+	LinkedList<ActionListener> action_listeners = new LinkedList<ActionListener>();
+
+	public void addActionListener(ActionListener listener) {
+		action_listeners.add(listener);
+	}
+
+	public void removeActionListener(ActionListener listener) {
+		action_listeners.remove(listener);
+	}
+
+	public void actionPerformed(ActionEvent ev) {
+		FreqEntry e = (FreqEntry) ev.getSource();
+		set_selected(e.frequency);
+		ActionEvent event = new ActionEvent(e.frequency, 0, "selected");
+		for (ActionListener l : action_listeners)
+			l.actionPerformed(event);
+	}
+
+	boolean	label = true;
+
+	public void set_label(boolean label) {
+		this.label = label;
+		set_label();
+	}
+
+	private void set_label() {
+		String	new_text = "";
+		if (0 <= selected && selected < frequencies.length) {
+			AltosFrequency	frequency = frequencies[selected];
+			new_text = String.format("%s%7.3f MHz (%s) ▾",
+						 label ? "Frequency: " : "",
+						 frequency.frequency,
+						 frequency.description);
+		}
+		setText(new_text);
+	}
+
+	private void set_selected(AltosFrequency frequency) {
+		for (int i = 0; i < frequencies.length; i++) {
+			if (frequencies[i].frequency == frequency.frequency) {
+				selected = i;
+				set_label();
+			}
+		}
+	}
+
+	private AltosFrequency get_selected() {
+		if (0 <= selected && selected < frequencies.length)
+			return frequencies[selected];
+		return null;
+	}
+
+	private void add(AltosFrequency add) {
+		int insert;
+
+		for (insert = 0; insert < frequencies.length; insert++) {
+			if (frequencies[insert].frequency == add.frequency)
+				return;
+			if (add.frequency < frequencies[insert].frequency)
+				break;
+		}
+
+		AltosFrequency[]	new_frequencies = new AltosFrequency[frequencies.length + 1];
+
+		for (int before = 0; before < insert; before++)
+			new_frequencies[before] = frequencies[before];
+		new_frequencies[insert] = add;
+
+		for (int after = insert; after < frequencies.length; after++)
+			new_frequencies[after+1] = frequencies[after];
+
+		frequencies = new_frequencies;
+
+		FreqEntry	e = new FreqEntry(add);
+		add(e, insert);
+		e.addActionListener(this);
+	}
+
+	private void remove(AltosFrequency remove) {
+		int delete;
+		for (delete = 0; delete < frequencies.length; delete++) {
+			if (frequencies[delete].frequency == remove.frequency)
+				break;
+			if (remove.frequency < frequencies[delete].frequency)
+				return;
+		}
+
+		remove(delete);
+
+		AltosFrequency[]	new_frequencies = new AltosFrequency[frequencies.length - 1];
+
+		for (int before = 0; before < delete; before++)
+			new_frequencies[before] = frequencies[before];
+
+		for (int after = delete + 1; after < frequencies.length; after++)
+			new_frequencies[after-1] = frequencies[after];
+		frequencies = new_frequencies;
+	}
 
 	public void set_frequency(double new_frequency) {
 		int i;
@@ -34,25 +148,21 @@ public class AltosFreqList extends JComboBox<AltosFrequency> {
 			return;
 		}
 
-		for (i = 0; i < getItemCount(); i++) {
-			AltosFrequency	f = (AltosFrequency) getItemAt(i);
+		for (i = 0; i < frequencies.length; i++) {
+			AltosFrequency	f = frequencies[i];
 
 			if (f.close(new_frequency)) {
-				setSelectedIndex(i);
+				set_selected(f);
 				return;
 			}
 		}
-		for (i = 0; i < getItemCount(); i++) {
-			AltosFrequency	f = (AltosFrequency) getItemAt(i);
 
-			if (new_frequency < f.frequency)
-				break;
-		}
 		String	description = String.format("%s serial %d", product, serial);
 		AltosFrequency	frequency = new AltosFrequency(new_frequency, description);
 		AltosUIPreferences.add_common_frequency(frequency);
-		insertItemAt(frequency, i);
-		setMaximumRowCount(getItemCount());
+
+		add(frequency);
+		set_selected(frequency);
 	}
 
 	public void set_product(String new_product) {
@@ -64,22 +174,33 @@ public class AltosFreqList extends JComboBox<AltosFrequency> {
 	}
 
 	public double frequency() {
-		AltosFrequency	f = (AltosFrequency) getSelectedItem();
+		AltosFrequency	f = get_selected();
 		if (f != null)
 			return f.frequency;
 		return 434.550;
 	}
 
-	public AltosFreqList () {
-		super(AltosUIPreferences.common_frequencies());
-		setMaximumRowCount(getItemCount());
-		setEditable(false);
+	public AltosFreqList(double in_frequency, boolean label) {
+		super();
+		this.label = label;
+
+		for (AltosFrequency frequency: AltosUIPreferences.common_frequencies())
+			add(frequency);
 		product = "Unknown";
 		serial = 0;
+
+		if (in_frequency != 0)
+			set_frequency(in_frequency);
+	}
+	public AltosFreqList(double in_frequency) {
+		this(in_frequency, true);
 	}
 
-	public AltosFreqList(double in_frequency) {
-		this();
-		set_frequency(in_frequency);
+	public AltosFreqList (boolean label) {
+		this(0, label);
+	}
+
+	public AltosFreqList () {
+		this(0, true);
 	}
 }

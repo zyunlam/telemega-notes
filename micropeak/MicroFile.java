@@ -19,8 +19,8 @@ package org.altusmetrum.micropeak;
 
 import java.io.*;
 import java.util.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class MicroFile {
 

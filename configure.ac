@@ -18,7 +18,7 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.4)
+AC_INIT([altos], 1.4.1.1)
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
@@ -29,8 +29,8 @@ AC_SUBST(VERSION_DASH)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=2
-ALTOSLIB_VERSION=4
+ALTOSUILIB_VERSION=3
+ALTOSLIB_VERSION=5
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -534,6 +534,9 @@ ao-tools/ao-dump-up/Makefile
 ao-tools/ao-elftohex/Makefile
 ao-tools/ao-usbload/Makefile
 ao-tools/ao-flash/Makefile
+ao-tools/ao-test-igniter/Makefile
+ao-tools/ao-test-baro/Makefile
+ao-tools/ao-test-flash/Makefile
 ao-utils/Makefile
 src/Version
 ])

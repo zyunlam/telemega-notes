@@ -61,6 +61,7 @@ __xdata uint8_t ao_config_mutex;
 #define AO_CONFIG_DEFAULT_RADIO_POWER		0x60
 #endif
 #define AO_CONFIG_DEFAULT_RADIO_AMP		0
+#define AO_CONFIG_DEFAULT_APRS_SSID		(ao_serial_number % 10)
 
 #if HAS_EEPROM
 static void
@@ -192,6 +193,10 @@ _ao_config_get(void)
 		if (minor < 18)
 			ao_config.pyro_time = AO_CONFIG_DEFAULT_PYRO_TIME;
 #endif
+#if HAS_APRS
+		if (minor < 19)
+			ao_config.aprs_ssid = AO_CONFIG_DEFAULT_APRS_SSID;
+#endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
@@ -283,6 +288,7 @@ ao_config_frequency_set(void) __reentrant
 	ao_radio_recv_abort();
 #endif
 }
+
 #endif
 
 #if HAS_FLIGHT
@@ -737,6 +743,30 @@ ao_config_pyro_time_set(void)
 }
 #endif
 
+#if HAS_APRS
+void
+ao_config_aprs_ssid_show(void)
+{
+	printf ("APRS SSID: %d\n",
+		ao_config.aprs_ssid);
+}
+
+void
+ao_config_aprs_ssid_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	if (15 < ao_cmd_lex_i) {
+		ao_cmd_status = ao_cmd_lex_error;
+		return;
+	}
+	_ao_config_edit_start();
+	ao_config.aprs_ssid = ao_cmd_lex_i;
+	_ao_config_edit_finish();
+}
+#endif /* HAS_APRS */
+
 struct ao_config_var {
 	__code char	*str;
 	void		(*set)(void) __reentrant;
@@ -816,6 +846,10 @@ __code struct ao_config_var ao_config_vars[] = {
 #if HAS_TRACKER
 	{ "t <motion> <interval>\0Tracker configuration",
 	  ao_config_tracker_set, ao_config_tracker_show },
+#endif
+#if HAS_APRS
+	{ "S <ssid>\0Set APRS SSID (0-15)",
+	  ao_config_aprs_ssid_set, ao_config_aprs_ssid_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

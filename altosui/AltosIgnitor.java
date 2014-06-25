@@ -20,8 +20,8 @@ package altosui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosIgnitor extends AltosUIFlightTab {
 

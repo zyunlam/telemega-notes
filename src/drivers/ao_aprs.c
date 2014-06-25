@@ -1,11 +1,11 @@
-/** 
+/**
  * http://ad7zj.net/kd7lmo/aprsbeacon_code.html
  *
  * @mainpage Pico Beacon
  *
  * @section overview_sec Overview
  *
- * The Pico Beacon is an APRS based tracking beacon that operates in the UHF 420-450MHz band.  The device utilizes a 
+ * The Pico Beacon is an APRS based tracking beacon that operates in the UHF 420-450MHz band.  The device utilizes a
  * Microchip PIC 18F2525 embedded controller, Motorola M12+ GPS engine, and Analog Devices AD9954 DDS.  The device is capable
  * of generating a 1200bps A-FSK and 9600 bps FSK AX.25 compliant APRS (Automatic Position Reporting System) message.
 
@@ -24,7 +24,7 @@
  *                                     (4) corrected size of LOG_COORD block when searching for end of log.
  *
  * @subsection v303 V3.03
- * 15 Sep 2005, Change include; (1) removed AD9954 setting SDIO as input pin, 
+ * 15 Sep 2005, Change include; (1) removed AD9954 setting SDIO as input pin,
  *                                     (2) additional comments and Doxygen tags,
  *                                     (3) integration and test code calculates DDS FTW,
  *                                     (4) swapped bus and reference analog input ports (hardware change),
@@ -38,7 +38,7 @@
  *                                    (2) Doxygen documentation clean up and additions, and
  *                                    (3) added integration and test code to baseline.
  *
- * 
+ *
  * @subsection v301 V3.01
  * 13 Jan 2005, Renamed project and files to Pico Beacon.
  *
@@ -54,28 +54,28 @@
  *                                     (8) added flight data recorder, and
  *                                     (9) added diagnostics terminal mode.
  *
- * 
+ *
  * @subsection v201 V2.01
- * 30 Jan 2004, Change include; (1) General clean up of in-line documentation, and 
+ * 30 Jan 2004, Change include; (1) General clean up of in-line documentation, and
  *                                     (2) changed temperature resolution to 0.1 degrees F.
  *
- * 
+ *
  * @subsection v200 V2.00
  * 26 Oct 2002, Change include; (1) Micro Beacon II hardware changes including PIC18F252 processor,
- *                                     (2) serial EEPROM, 
- *                                     (3) GPS power control, 
- *                                     (4) additional ADC input, and 
- *                                     (5) LM60 temperature sensor.                            
+ *                                     (2) serial EEPROM,
+ *                                     (3) GPS power control,
+ *                                     (4) additional ADC input, and
+ *                                     (5) LM60 temperature sensor.
  *
  *
  * @subsection v101 V1.01
- * 5 Dec 2001, Change include; (1) Changed startup message, and 
+ * 5 Dec 2001, Change include; (1) Changed startup message, and
  *                                    (2) applied SEPARATE pragma to several methods for memory usage.
  *
  *
  * @subsection v100 V1.00
  * 25 Sep 2001, Initial release.  Flew ANSR-3 and ANSR-4.
- * 
+ *
 
 
  *
@@ -102,11 +102,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ *
 
 
- * 
- * 
+ *
+ *
  * @section design Design Details
  *
  * Provides design details on a variety of the components that make up the Pico Beacon.
@@ -118,29 +118,33 @@
  *  @page power Power Consumption
  *
  *  Measured DC power consumption.
- * 
- *  3VDC prime power current 
+ *
+ *  3VDC prime power current
 
  *
- *    7mA Held in reset 
+ *    7mA Held in reset
 
- *   18mA Processor running, all I/O off 
+ *   18mA Processor running, all I/O off
 
- *  110mA GPS running 
+ *  110mA GPS running
 
- *  120mA GPS running w/antenna 
+ *  120mA GPS running w/antenna
 
- *  250mA DDS running and GPS w/antenna 
+ *  250mA DDS running and GPS w/antenna
 
- *  420mA DDS running, GPS w/antenna, and PA chain on with no RF 
+ *  420mA DDS running, GPS w/antenna, and PA chain on with no RF
 
- *  900mA Transmit 
+ *  900mA Transmit
 
  *
  */
 
 #ifndef AO_APRS_TEST
 #include <ao.h>
+
+#if !HAS_APRS
+#error HAS_APRS not set
+#endif
 #endif
 
 #include <ao_aprs.h>
@@ -176,11 +180,11 @@ static uint16_t sysCRC16(const uint8_t *buffer, uint8_t length, uint16_t crc)
 {
     uint8_t i, bit, value;
 
-    for (i = 0; i < length; ++i) 
+    for (i = 0; i < length; ++i)
     {
         value = buffer[i];
 
-        for (bit = 0; bit < 8; ++bit) 
+        for (bit = 0; bit < 8; ++bit)
         {
             crc ^= (value & 0x01);
             crc = ( crc & 0x01 ) ? ( crc >> 1 ) ^ 0x8408 : ( crc >> 1 );
@@ -253,7 +257,7 @@ typedef enum
 
 /// AX.25 compliant packet header that contains destination, station call sign, and path.
 /// 0x76 for SSID-11, 0x78 for SSID-12
-static uint8_t TNC_AX25_HEADER[] = { 
+static uint8_t TNC_AX25_HEADER[] = {
     'A' << 1, 'P' << 1, 'A' << 1, 'M' << 1, ' ' << 1, ' ' << 1, 0x60,
     'N' << 1, '0' << 1, 'C' << 1, 'A' << 1, 'L' << 1, 'L' << 1, 0x78,
     'W' << 1, 'I' << 1, 'D' << 1, 'E' << 1, '2' << 1, ' ' << 1, 0x65,
@@ -261,6 +265,7 @@ static uint8_t TNC_AX25_HEADER[] = {
 
 #define TNC_CALLSIGN_OFF	7
 #define TNC_CALLSIGN_LEN	6
+#define TNC_SSID_OFF		13
 
 static void
 tncSetCallsign(void)
@@ -275,6 +280,9 @@ tncSetCallsign(void)
 	}
 	for (; i < TNC_CALLSIGN_LEN; i++)
 		TNC_AX25_HEADER[TNC_CALLSIGN_OFF + i] = ' ' << 1;
+
+	/* Fill in the SSID with the low digit of the serial number */
+	TNC_AX25_HEADER[TNC_SSID_OFF] = 0x60 | ((ao_config.aprs_ssid & 0xf) << 1);
 #endif
 }
 
@@ -302,7 +310,7 @@ static uint8_t tncBitStuff;
 /// Buffer to hold the message portion of the AX.25 packet as we prepare it.
 static uint8_t tncBuffer[TNC_BUFFER_SIZE];
 
-/** 
+/**
  *   Initialize the TNC internal variables.
  */
 static void tncInit()
@@ -323,7 +331,7 @@ static void tnc1200TimerTick()
     else
         timeNCOFreq = 0x3aab;
 
-    switch (tncMode) 
+    switch (tncMode)
     {
         case TNC_TX_READY:
             // Generate a test signal alteranting between high and low tones.
@@ -339,16 +347,16 @@ static void tnc1200TimerTick()
                 else
                     tncTxBit = 0;
 	    }
-                    
+
             // When the flag is done, determine if we need to send more or data.
-            if (++tncBitCount == 8) 
+            if (++tncBitCount == 8)
             {
                 tncBitCount = 0;
                 tncShift = 0x7e;
 
                 // Once we transmit x mS of flags, send the data.
                 // txDelay bytes * 8 bits/byte * 833uS/bit = x mS
-                if (++tncIndex == TNC_TX_DELAY) 
+                if (++tncIndex == TNC_TX_DELAY)
                 {
                     tncIndex = 0;
                     tncShift = TNC_AX25_HEADER[0];
@@ -361,7 +369,7 @@ static void tnc1200TimerTick()
 
         case TNC_TX_HEADER:
             // Determine if we have sent 5 ones in a row, if we have send a zero.
-            if (tncBitStuff == 0x1f) 
+            if (tncBitStuff == 0x1f)
             {
                 if (tncTxBit == 0)
                     tncTxBit = 1;
@@ -381,17 +389,17 @@ static void tnc1200TimerTick()
                     tncTxBit = 0;
 	    }
 
-            // Save the data stream so we can determine if bit stuffing is 
+            // Save the data stream so we can determine if bit stuffing is
             // required on the next bit time.
             tncBitStuff = ((tncBitStuff << 1) | (tncShift & 0x01)) & 0x1f;
 
             // If all the bits were shifted, get the next byte.
-            if (++tncBitCount == 8) 
+            if (++tncBitCount == 8)
             {
                 tncBitCount = 0;
 
                 // After the header is sent, then send the data.
-                if (++tncIndex == sizeof(TNC_AX25_HEADER)) 
+                if (++tncIndex == sizeof(TNC_AX25_HEADER))
                 {
                     tncIndex = 0;
                     tncShift = tncBuffer[0];
@@ -406,7 +414,7 @@ static void tnc1200TimerTick()
 
         case TNC_TX_DATA:
             // Determine if we have sent 5 ones in a row, if we have send a zero.
-            if (tncBitStuff == 0x1f) 
+            if (tncBitStuff == 0x1f)
             {
                 if (tncTxBit == 0)
                     tncTxBit = 1;
@@ -426,17 +434,17 @@ static void tnc1200TimerTick()
                     tncTxBit = 0;
 	    }
 
-            // Save the data stream so we can determine if bit stuffing is 
+            // Save the data stream so we can determine if bit stuffing is
             // required on the next bit time.
             tncBitStuff = ((tncBitStuff << 1) | (tncShift & 0x01)) & 0x1f;
 
             // If all the bits were shifted, get the next byte.
-            if (++tncBitCount == 8) 
+            if (++tncBitCount == 8)
             {
                 tncBitCount = 0;
 
                 // If everything was sent, transmit closing flags.
-                if (++tncIndex == tncLength) 
+                if (++tncIndex == tncLength)
                 {
                     tncIndex = 0;
                     tncShift = 0x7e;
@@ -451,7 +459,7 @@ static void tnc1200TimerTick()
 
         case TNC_TX_END:
             // The variable tncShift contains the lastest data byte.
-            // NRZI enocde the data stream. 
+            // NRZI enocde the data stream.
             if ((tncShift & 0x01) == 0x00) {
                 if (tncTxBit == 0)
                     tncTxBit = 1;
@@ -460,13 +468,13 @@ static void tnc1200TimerTick()
 	    }
 
             // If all the bits were shifted, get the next one.
-            if (++tncBitCount == 8) 
+            if (++tncBitCount == 8)
             {
                 tncBitCount = 0;
                 tncShift = 0x7e;
-    
+
                 // Transmit two closing flags.
-                if (++tncIndex == 2) 
+                if (++tncIndex == 2)
                 {
                     tncMode = TNC_TX_READY;
 
@@ -530,6 +538,7 @@ static int tncComment(uint8_t *buf)
 #ifdef AO_SENSE_MAIN
 		       " M%d.%d"
 #endif
+		       " %d"
 		       , ao_gps_locked(),
 		       ao_num_sats(),
 		       battery/10,
@@ -542,6 +551,7 @@ static int tncComment(uint8_t *buf)
 		       , main/10,
 		       main%10
 #endif
+		       , ao_serial_number
 		);
 #else
 	return sprintf((char *) buf,
@@ -759,7 +769,7 @@ tncFill(uint8_t *buf, int16_t len)
     return l;
 }
 
-/** 
+/**
  *    Prepare an AX.25 data packet.  Each time this method is called, it automatically
  *    rotates through 1 of 3 messages.
  *

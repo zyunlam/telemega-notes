@@ -64,7 +64,7 @@ LIBALTOS= \
 	altos.dll
 
 desktopdir = $(datadir)/applications
-desktop_file = altos.desktop
+desktop_file = altusmetrum-altosui.desktop
 desktop_SCRIPTS = $(desktop_file)
 
 JAR=altosui.jar
@@ -72,26 +72,37 @@ JAR=altosui.jar
 FATJAR=altosui-fat.jar
 
 # Icons
-ICONDIR=$(top_srcdir)/icon
+ICONDIR=../icon
 
 JAVA_ICONS=\
-	$(ICONDIR)/altus-metrum-16.png \
-	$(ICONDIR)/altus-metrum-32.png \
-	$(ICONDIR)/altus-metrum-48.png \
-	$(ICONDIR)/altus-metrum-64.png \
-	$(ICONDIR)/altus-metrum-128.png \
-	$(ICONDIR)/altus-metrum-256.png
+	$(ICONDIR)/altusmetrum-altosui-16.png \
+	$(ICONDIR)/altusmetrum-altosui-32.png \
+	$(ICONDIR)/altusmetrum-altosui-48.png \
+	$(ICONDIR)/altusmetrum-altosui-64.png \
+	$(ICONDIR)/altusmetrum-altosui-128.png\
+	$(ICONDIR)/altusmetrum-altosui-256.png
 
 # icon base names for jar
-ICONJAR= -C $(ICONDIR) altus-metrum-16.png \
-	-C $(ICONDIR) altus-metrum-32.png \
-	-C $(ICONDIR) altus-metrum-48.png \
-	-C $(ICONDIR) altus-metrum-64.png \
-	-C $(ICONDIR) altus-metrum-128.png \
-	-C $(ICONDIR) altus-metrum-256.png
+ICONJAR= \
+	-C $(ICONDIR) altusmetrum-altosui-16.png \
+	-C $(ICONDIR) altusmetrum-altosui-32.png \
+	-C $(ICONDIR) altusmetrum-altosui-48.png \
+	-C $(ICONDIR) altusmetrum-altosui-64.png \
+	-C $(ICONDIR) altusmetrum-altosui-128.png\
+	-C $(ICONDIR) altusmetrum-altosui-256.png
 
-WINDOWS_ICON=$(ICONDIR)/altus-metrum.ico
-MACOSX_ICON=$(ICONDIR)/AltosUIIcon.icns
+WINDOWS_ICONS	=\
+	$(ICONDIR)/altusmetrum-altosui.ico \
+	$(ICONDIR)/altusmetrum-altosui.exe
+	$(ICONDIR)/application-vnd.altusmetrum.eeprom.ico \
+	$(ICONDIR)/application-vnd.altusmetrum.eeprom.exe \
+	$(ICONDIR)/application-vnd.altusmetrum.telemetry.ico \
+	$(ICONDIR)/application-vnd.altusmetrum.telemetry.exe
+
+MACOSX_ICONS	=\
+	$(ICONDIR)/altusmetrum-altosui.icns \
+	$(ICONDIR)/application-vnd.altusmetrum.eeprom.icns \
+	$(ICONDIR)/application-vnd.altusmetrum.telemetry.icns
 
 # Firmware
 FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
@@ -100,7 +111,8 @@ FIRMWARE_TD=$(FIRMWARE_TD_0_2)
 FIRMWARE_TM_1_0=$(top_srcdir)/src/telemetrum-v1.0/telemetrum-v1.0-$(VERSION).ihx
 FIRMWARE_TM_1_1=$(top_srcdir)/src/telemetrum-v1.1/telemetrum-v1.1-$(VERSION).ihx
 FIRMWARE_TM_1_2=$(top_srcdir)/src/telemetrum-v1.2/telemetrum-v1.2-$(VERSION).ihx
-FIRMWARE_TM=$(FIRMWARE_TM_1_0) $(FIRMWARE_TM_1_1) $(FIRMWARE_TM_1_2)
+FIRMWARE_TM_2_0=$(top_srcdir)/src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx
+FIRMWARE_TM=$(FIRMWARE_TM_1_0) $(FIRMWARE_TM_1_1) $(FIRMWARE_TM_1_2) $(FIRMWARE_TM_2_0)
 
 FIRMWARE_TELEMINI_1_0=$(top_srcdir)/src/telemini-v1.0/telemini-v1.0-$(VERSION).ihx
 FIRMWARE_TELEMINI=$(FIRMWARE_TELEMINI_1_0)
@@ -140,14 +152,14 @@ FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFR
 
 LINUX_LIBS=libaltos32.so libaltos64.so
 
-LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) altos.desktop.in ../icon/altusmetrum.svg
+LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) $(desktop_file).in $(ICONDIR)/altusmetrum-altosui.svg
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICON)
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICONS)
 MACOSX_EXTRA=$(FIRMWARE)
 
-WINDOWS_FILES=$(FAT_FILES) $(FIRMWARE) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(WINDOWS_ICON)
+WINDOWS_FILES=$(FAT_FILES) $(FIRMWARE) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(WINDOWS_ICONS)
 
 all-local: classes/altosui $(JAR) altosui altosui-test altosui-jdb
 
@@ -160,7 +172,7 @@ clean-local:
 EXTRA_DIST = $(desktop_file).in
 
 $(desktop_file): $(desktop_file).in
-	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/altos.desktop.in > $@
+	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/$(desktop_file).in > $@
 	chmod +x $@
 
 if FATINSTALL
@@ -193,7 +205,6 @@ $(WINDOWS_DIST_TARGET): $(WINDOWS_DIST)
 else
 fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
 endif
-
 
 altosuidir=$(datadir)/java
 
@@ -324,7 +335,7 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/AltosUI.app/Contents
 	mkdir -p macosx/AltOS-$(VERSION) macosx/AltosUI.app/Contents/Resources/Java
-	cp -p $(MACOSX_ICON) macosx/AltosUI.app/Contents/Resources
+	cp -p $(MACOSX_ICONS) macosx/AltosUI.app/Contents/Resources
 	cp -p $(FATJAR) macosx/AltosUI.app/Contents/Resources/Java/altosui.jar
 	cp -p libaltos.dylib macosx/AltosUI.app/Contents/Resources/Java
 	cp -p $(ALTOSLIB_CLASS) macosx/AltosUI.app/Contents/Resources/Java

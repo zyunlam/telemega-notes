@@ -4347,6 +4347,50 @@ NAR #88757, TRA #12200
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
+	<para>
+	  Once you've located the right pins:
+	</para>
+	<orderedlist inheritnum='inherit' numeration='arabic'>
+	  <listitem>
+	    <para>
+	      Turn the altimeter power off.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Connect a battery.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Connect the indicated terminals together with a short
+	      piece of wire. Take care not to accidentally connect
+	      anything else.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Connect USB
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Turn the board power on.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      The board should now be visible over USB as 'AltosFlash'
+	      and be ready to receive firmware.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Once the board has been powered up, you can remove the
+	      piece of wire.
+	    </para>
+	  </listitem>
+	</orderedlist>
       </section>
     </section>
     <section>

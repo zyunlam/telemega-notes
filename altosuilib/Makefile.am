@@ -68,6 +68,7 @@ altosuilib_JAVA = \
 	AltosUIMapPath.java \
 	AltosUIMapTile.java \
 	AltosUIMapCache.java \
+	AltosUIMapCacheListener.java \
 	AltosUIMapImage.java \
 	AltosUIMapTransform.java \
 	AltosUIMapRectangle.java \
@@ -80,7 +81,9 @@ altosuilib_JAVA = \
 	AltosUIFlightTab.java \
 	AltosUIIndicator.java \
 	AltosUIUnitsIndicator.java \
-	AltosUIVoltageIndicator.java
+	AltosUIVoltageIndicator.java \
+	AltosUITelemetryMenu.java \
+	OSXAdapter.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar
 

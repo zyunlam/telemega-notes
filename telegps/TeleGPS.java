@@ -23,8 +23,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class TeleGPS
 	extends AltosUIFrame
@@ -351,17 +351,18 @@ public class TeleGPS
 		frequencies.set_product("Monitor");
 		frequencies.set_serial(serial);
 		frequencies.set_frequency(AltosUIPreferences.frequency(serial));
-		frequencies.setEnabled(true);
 
+		menu_bar.add(frequencies);
+		menu_bar.repaint();
 	}
 
 	void disable_frequency_menu() {
-		if (frequency_listener != null) {
-			frequencies.removeActionListener(frequency_listener);
-			frequencies.setEnabled(false);
-			frequency_listener = null;
-		}
-
+		if (frequency_listener == null)
+			return;
+		frequencies.removeActionListener(frequency_listener);
+		menu_bar.remove(frequencies);
+		menu_bar.repaint();
+		frequency_listener = null;
 	}
 
 	public void set_reader(AltosFlightReader reader, AltosDevice device) {
@@ -409,15 +410,37 @@ public class TeleGPS
 
 	private JMenu make_menu(String label, String[][] items) {
 		JMenu	menu = new JMenu(label);
-		for (int i = 0; i < items.length; i++)
+		for (int i = 0; i < items.length; i++) {
+			if (MAC_OS_X) {
+				if (items[i][1].equals("exit"))
+					continue;
+				if (items[i][1].equals("preferences"))
+					continue;
+			}
 			add_menu(menu, items[i][0], items[i][1]);
+		}
 		menu_bar.add(menu);
 		return menu;
+	}
+
+	/* OSXAdapter interfaces */
+	public void macosx_file_handler(String path) {
+		process_graph(new File(path));
+	}
+
+	public void macosx_quit_handler() {
+		System.exit(0);
+	}
+
+	public void macosx_preferences_handler() {
+		preferences();
 	}
 
 	public TeleGPS() {
 
 		AltosUIPreferences.set_component(this);
+
+		register_for_macosx_events();
 
 		reader = null;
 
@@ -435,8 +458,6 @@ public class TeleGPS
 		monitor_menu = make_menu("Monitor", monitor_menu_entries);
 		device_menu = make_menu("Device", device_menu_entries);
 		frequencies = new AltosFreqList();
-		frequencies.setEnabled(false);
-		menu_bar.add(frequencies);
 
 		displays = new LinkedList<AltosFlightDisplay>();
 

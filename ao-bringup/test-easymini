@@ -19,7 +19,7 @@ ao-list | while read product serial dev; do
 	    echo "Testing $product $serial $dev"
 
 	    echo "Testing igniters. Both should flash"
-	    ./test-igniter "$dev" drogue main
+	    ../ao-tools/ao-test-igniter/ao-test-igniter --tty="$dev" drogue main
 
 	    case $? in
 		0)
@@ -30,7 +30,7 @@ ao-list | while read product serial dev; do
 	    esac
 
 	    echo "Testing baro sensor"
-	    ./test-baro "$dev"
+	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
 
 	    case $? in
 		0)
@@ -43,7 +43,7 @@ ao-list | while read product serial dev; do
 	    FLASHSIZE=1048576
 
 	    echo "Testing flash"
-	    ./test-flash "$dev" "$FLASHSIZE"
+	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
 
 	    case $? in
 		0)
