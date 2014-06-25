@@ -42,7 +42,7 @@
     <revhistory>
       <revision>
 	<revnumber>1.4.1</revnumber>
-	<date>20 June 2014</date>
+	<date>24 June 2014</date>
 	<revremark>
 	  Minor release fixing some installation bugs.
 	</revremark>
