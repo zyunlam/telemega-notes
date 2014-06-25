@@ -385,8 +385,12 @@ public abstract class AltosLink implements Runnable {
 
 	public AltosConfigData config_data() throws InterruptedException, TimeoutException {
 		synchronized(config_data_lock) {
-			if (config_data == null)
+			if (config_data == null) {
+				printf("m 0\n");
 				config_data = new AltosConfigData(this);
+				if (monitor_mode)
+					set_monitor(true);
+			}
 			return config_data;
 		}
 	}
