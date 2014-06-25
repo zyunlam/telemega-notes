@@ -67,7 +67,7 @@ public class AltosUIMapView extends Component implements MouseMotionListener, Mo
 	AltosUILatLon		centre;
 
 	public void set_font() {
-		line.set_font(AltosUILib.value_font);
+		line.set_font(AltosUILib.status_font);
 		for (AltosUIMapTile tile : tiles.values())
 			tile.set_font(AltosUILib.value_font);
 		repaint();
