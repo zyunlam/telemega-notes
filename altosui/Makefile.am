@@ -336,6 +336,6 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	cp -p $(MACOSX_EXTRA) macosx/AltOS-$(VERSION)
 	genisoimage -D -V AltOS-$(VERSION) -no-pad -r -apple -o $@ macosx
 
-$(WINDOWS_DIST): $(WINDOWS_FILES) altos-windows.nsi
+$(WINDOWS_DIST): $(WINDOWS_FILES) altos-windows.nsi Instdrv/NSIS/Includes/java.nsh
 	-rm -f $@
 	makensis -Oaltos-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" altos-windows.nsi || (cat altos-windows.log && exit 1)
