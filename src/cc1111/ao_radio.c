@@ -40,6 +40,42 @@
 #define IF_FREQ_CONTROL	6
 
 /*
+ *  http://www.ntia.doc.gov/files/ntia/publications/84-168.pdf
+ *
+ * Necessary bandwidth for a FSK modulated signal:
+ *
+ *	bw = 2.6d + 0.55b	1.5 < m < 5.5
+ *	bw = 2.1d + 1.9b	5.5 < m < 20
+ *
+ *	b is the modulation rate in bps
+ *	d is the peak deviation (from the center)
+ *
+ *	m = 2d / b
+ *
+ * 20.5 kHz deviation 38.4kbps signal:
+ *
+ *	m = 41 / 38.4, which is < 5.5:
+ *
+ *	bw = 2.6 * 20.5 + 0.55 * 38.4 = 74.42kHz
+ *
+ *	M = 1, E = 3, bw = 75kHz
+ *
+ * 20.5 kHz deviation, 9.6kbps signal
+ *
+ *	m = 41 / 9.6, which is < 5.5:
+ *
+ *	bw = 2.6 * 20.5 + 0.55 * 9.6 = 58.58kHz
+ *
+ *	M = 2, E = 3, bw = 62.5kHz
+ *
+ * 20.5kHz deviation, 2.4kbps signal
+ *
+ *	m = 41 / 2.4, which is > 5.5:
+ *
+ *	bw = 2.1 * 20.5 + 1.9 * 2.4 = 47.61kHz
+ *
+ *	M = 3, E = 3, bw = 53.6kHz
+ *
  * For channel bandwidth of 93.75 kHz, the CHANBW_E and CHANBW_M values are
  *
  * BW = 24e6 / (8 * (4 + M) * 2 ** E)
@@ -47,7 +83,9 @@
  * So, M = 0 and E = 3
  */
 
-#define CHANBW_M	0
+#define CHANBW_M_384	1
+#define CHANBW_M_96	2
+#define CHANBW_M_24	3
 #define CHANBW_E	3
 
 /*
@@ -55,11 +93,22 @@
  *
  * R = (256 + M) * 2** E * 24e6 / 2**28
  *
- * So M is 163 and E is 10
+ * So for 38360kBaud, M is 163 and E is 10
  */
 
-#define DRATE_E		10
 #define DRATE_M		163
+
+#define DRATE_E_384	10
+
+/* For 9600 baud, M is 163 and E is 8
+ */
+
+#define DRATE_E_96	8
+
+/* For 2400 baud, M is 163 and E is 6
+ */
+
+#define DRATE_E_24	6
 
 /*
  * For a channel deviation of 20.5kHz, the DEVIATION_E and DEVIATION_M values are:
@@ -122,9 +171,6 @@ static __code uint8_t radio_setup[] = {
 	RF_FSCTRL1_OFF,		(IF_FREQ_CONTROL << RF_FSCTRL1_FREQ_IF_SHIFT),
 	RF_FSCTRL0_OFF,		(0 << RF_FSCTRL0_FREQOFF_SHIFT),
 
-	RF_MDMCFG4_OFF,		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
-				 (DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
 	RF_MDMCFG3_OFF,		(DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
 	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_ON |
 				 RF_MDMCFG2_MOD_FORMAT_GFSK |
@@ -204,7 +250,7 @@ static __code uint8_t radio_setup[] = {
 
 static __code uint8_t rdf_setup[] = {
 	RF_MDMCFG4_OFF,		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
+				 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
 				 (RDF_DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
 	RF_MDMCFG3_OFF,		(RDF_DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
 	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_OFF |
@@ -225,9 +271,11 @@ static __code uint8_t rdf_setup[] = {
 };
 
 static __code uint8_t fixed_pkt_setup[] = {
+#if !HAS_RADIO_RATE
 	RF_MDMCFG4_OFF,		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
-				 (DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
+				 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+				 (DRATE_E_384 << RF_MDMCFG4_DRATE_E_SHIFT)),
+#endif
 	RF_MDMCFG3_OFF,		(DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
 	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_ON |
 				 RF_MDMCFG2_MOD_FORMAT_GFSK |
@@ -248,6 +296,23 @@ static __code uint8_t fixed_pkt_setup[] = {
 				 RF_PKTCTRL0_CRC_EN|
 				 RF_PKTCTRL0_LENGTH_CONFIG_FIXED),
 };
+
+#if HAS_RADIO_RATE
+static __code uint8_t packet_rate_setup[] = {
+	/* 38400 */
+	((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+	 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+	 (DRATE_E_384 << RF_MDMCFG4_DRATE_E_SHIFT)),
+	/* 9600 */
+	((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+	 (CHANBW_M_96 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+	 (DRATE_E_96 << RF_MDMCFG4_DRATE_E_SHIFT)),
+	/* 2400 */
+	((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+	 (CHANBW_M_24 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+	 (DRATE_E_24 << RF_MDMCFG4_DRATE_E_SHIFT)),
+};
+#endif
 
 __xdata uint8_t	ao_radio_dma;
 __xdata uint8_t ao_radio_dma_done;
@@ -314,6 +379,9 @@ ao_radio_get(uint8_t len)
 	RF_FREQ1 = (uint8_t) (ao_config.radio_setting >> 8);
 	RF_FREQ0 = (uint8_t) (ao_config.radio_setting);
 	RF_PKTLEN = len;
+#if HAS_RADIO_RATE
+	RF_MDMCFG4 = packet_rate_setup[ao_config.radio_rate];
+#endif
 }
 
 
