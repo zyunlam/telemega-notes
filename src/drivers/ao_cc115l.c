@@ -269,16 +269,30 @@ ao_radio_idle(void)
  *		(256 + 131) * (2 ** 10) / (2**28) * 26e6 = 38383
  *
  *	DATARATE_M = 131
- *	DATARATE_E = 10
+ *	DATARATE_E_384 = 10
+ *	DATARATE_E_96 = 8
+ *	DATARATE_E_24 = 6
  */
-#define PACKET_DRATE_E	10
-#define PACKET_DRATE_M	131
+#define PACKET_DRATE_M		131
+
+#define PACKET_DRATE_E_384	10
+#define PACKET_DRATE_E_96	8
+#define PACKET_DRATE_E_24	6
+
+static const uint16_t packet_rate_setup[] = {
+	[AO_RADIO_RATE_38400] = ((0xf << 4) |
+				 (PACKET_DRATE_E_384 << CC115L_MDMCFG4_DRATE_E)),
+
+	[AO_RADIO_RATE_9600] = ((0xf << 4) |
+				(PACKET_DRATE_E_96 << CC115L_MDMCFG4_DRATE_E)),
+
+	[AO_RADIO_RATE_2400] = ((0xf << 4) |
+				(PACKET_DRATE_E_24 << CC115L_MDMCFG4_DRATE_E)),
+};
 
 static const uint16_t packet_setup[] = {
 	CC115L_DEVIATN,		((PACKET_DEV_E << CC115L_DEVIATN_DEVIATION_E) |
 				 (PACKET_DEV_M << CC115L_DEVIATN_DEVIATION_M)),
-	CC115L_MDMCFG4,		((0xf << 4) |
-				 (PACKET_DRATE_E << CC115L_MDMCFG4_DRATE_E)),
 	CC115L_MDMCFG3,		(PACKET_DRATE_M),
 	CC115L_MDMCFG2,		(0x00 |
 				 (CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
@@ -403,9 +417,12 @@ ao_radio_set_mode(uint16_t new_mode)
 		return;
 
 	changes = new_mode & (~ao_radio_mode);
-	if (changes & AO_RADIO_MODE_BITS_PACKET_TX)
+	if (changes & AO_RADIO_MODE_BITS_PACKET_TX) {
+		ao_radio_reg_write(CC115L_MDMCFG4, packet_rate_setup[ao_config.radio_rate]);
+
 		for (i = 0; i < sizeof (packet_setup) / sizeof (packet_setup[0]); i += 2)
 			ao_radio_reg_write(packet_setup[i], packet_setup[i+1]);
+	}
 
 	if (changes & AO_RADIO_MODE_BITS_RDF)
 		for (i = 0; i < sizeof (rdf_setup) / sizeof (rdf_setup[0]); i += 2)
@@ -494,6 +511,7 @@ static void
 ao_radio_get(void)
 {
 	static uint32_t	last_radio_setting;
+	static uint8_t	last_radio_rate;
 
 	ao_mutex_get(&ao_radio_mutex);
 	if (!ao_radio_configured)
@@ -503,6 +521,10 @@ ao_radio_get(void)
 		ao_radio_reg_write(CC115L_FREQ1, ao_config.radio_setting >> 8);
 		ao_radio_reg_write(CC115L_FREQ0, ao_config.radio_setting);
 		last_radio_setting = ao_config.radio_setting;
+	}
+	if (ao_config.radio_rate != last_radio_rate) {
+		ao_radio_mode &= ~AO_RADIO_MODE_BITS_PACKET_TX;
+		last_radio_rate = ao_config.radio_rate;
 	}
 }
 
