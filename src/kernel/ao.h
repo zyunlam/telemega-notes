@@ -521,6 +521,10 @@ struct ao_telemetry_raw_recv {
 #define AO_TELEMETRY_INTERVAL_RECOVER	AO_MS_TO_TICKS(1000)
 #endif
 
+#define AO_RADIO_RATE_38400	0
+#define AO_RADIO_RATE_9600	1
+#define AO_RADIO_RATE_2400	2
+
 void
 ao_telemetry_set_interval(uint16_t interval);
 
@@ -556,6 +560,15 @@ extern __xdata int8_t	ao_radio_rssi;
 #endif
 #ifndef HAS_RADIO_XMIT
 #define HAS_RADIO_XMIT HAS_RADIO
+#endif
+
+#define AO_RADIO_RATE_38400	0
+#define AO_RADIO_RATE_9600	1
+#define AO_RADIO_RATE_2400	2
+#define AO_RADIO_RATE_MAX	AO_RADIO_RATE_2400
+
+#if defined(HAS_RADIO) && !defined(HAS_RADIO_RATE)
+#define HAS_RADIO_RATE	HAS_RADIO
 #endif
 
 void
