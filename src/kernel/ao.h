@@ -757,11 +757,13 @@ extern __xdata uint8_t ao_force_freq;
  * ao_rssi.c
  */
 
+#ifdef AO_LED_TYPE
 void
-ao_rssi_set(int rssi_value);
+ao_rssi_set(int16_t rssi_value);
 
 void
 ao_rssi_init(AO_LED_TYPE rssi_led);
+#endif
 
 /*
  * ao_product.c

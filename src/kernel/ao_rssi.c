@@ -33,7 +33,7 @@ ao_rssi(void)
 }
 
 void
-ao_rssi_set(int rssi_value)
+ao_rssi_set(int16_t rssi_value)
 {
 	if (rssi_value > 0)
 		rssi_value = 0;
