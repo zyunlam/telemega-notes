@@ -168,6 +168,7 @@
 	#define HAS_RSSI		1
 	#define HAS_AES			0
 	#define HAS_TELEMETRY		0
+	#define AO_RADIO_REG_TEST	1
 #endif
 
 #if defined(TELEMINI_V_1_0)
@@ -363,6 +364,7 @@
 	#define HAS_RSSI		0
 	#define HAS_AES			0
 	#define HAS_TELEMETRY		0
+	#define AO_RADIO_REG_TEST	1
 #endif
 
 #if defined(TELEBT_V_0_1)
@@ -410,6 +412,7 @@
 	#define HAS_RSSI		0
 	#define HAS_AES			0
 	#define HAS_TELEMETRY		0
+	#define AO_RADIO_REG_TEST	1
 #endif
 
 #if defined(TELELAUNCH_V_0_1)

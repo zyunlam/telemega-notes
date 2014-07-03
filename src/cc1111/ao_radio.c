@@ -126,9 +126,9 @@ static __code uint8_t radio_setup[] = {
 				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
 				 (DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
 	RF_MDMCFG3_OFF,		(DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
-	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_OFF |
+	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_ON |
 				 RF_MDMCFG2_MOD_FORMAT_GFSK |
-				 RF_MDMCFG2_SYNC_MODE_15_16_THRES),
+				 RF_MDMCFG2_SYNC_MODE_15_16),
 	RF_MDMCFG1_OFF,		(RF_MDMCFG1_FEC_EN |
 				 RF_MDMCFG1_NUM_PREAMBLE_4 |
 				 (2 << RF_MDMCFG1_CHANSPC_E_SHIFT)),
@@ -155,8 +155,8 @@ static __code uint8_t radio_setup[] = {
 	RF_FSCAL1_OFF,		0x00,
 	RF_FSCAL0_OFF,		0x1F,
 
-	RF_TEST2_OFF,		0x88,
-	RF_TEST1_OFF,		0x31,
+	RF_TEST2_OFF,		RF_TEST2_RX_LOW_DATA_RATE_MAGIC,
+	RF_TEST1_OFF,		RF_TEST1_RX_LOW_DATA_RATE_MAGIC,
 	RF_TEST0_OFF,		0x09,
 
 	/* default sync values */
@@ -187,10 +187,16 @@ static __code uint8_t radio_setup[] = {
 				 RF_BSCFG_BS_POST_KI_PRE_KI|
 				 RF_BSCFG_BS_POST_KP_PRE_KP|
 				 RF_BSCFG_BS_LIMIT_0),
-	RF_AGCCTRL2_OFF,	0x03,
-	RF_AGCCTRL1_OFF,	0x40,
-	RF_AGCCTRL0_OFF,	0x91,
-
+	RF_AGCCTRL2_OFF,	(RF_AGCCTRL2_MAX_DVGA_GAIN_ALL|
+				 RF_AGCCTRL2_MAX_LNA_GAIN_0|
+				 RF_AGCCTRL2_MAGN_TARGET_33dB),
+	RF_AGCCTRL1_OFF,	(RF_AGCCTRL1_AGC_LNA_PRIORITY_0 |
+				 RF_AGCCTRL1_CARRIER_SENSE_REL_THR_DISABLE |
+				 RF_AGCCTRL1_CARRIER_SENSE_ABS_THR_0DB),
+	RF_AGCCTRL0_OFF,	(RF_AGCCTRL0_HYST_LEVEL_NONE |
+				 RF_AGCCTRL0_WAIT_TIME_8 |
+				 RF_AGCCTRL0_AGC_FREEZE_NORMAL |
+				 RF_AGCCTRL0_FILTER_LENGTH_8),
 	RF_IOCFG2_OFF,		0x00,
 	RF_IOCFG1_OFF,		0x00,
 	RF_IOCFG0_OFF,		0x00,
@@ -212,7 +218,7 @@ static __code uint8_t rdf_setup[] = {
 				 (RDF_DEVIATION_M << RF_DEVIATN_DEVIATION_M_SHIFT)),
 
 	/* packet length is set in-line */
-	RF_PKTCTRL1_OFF,	((1 << PKTCTRL1_PQT_SHIFT)|
+	RF_PKTCTRL1_OFF,	((0 << PKTCTRL1_PQT_SHIFT)|
 				 PKTCTRL1_ADR_CHK_NONE),
 	RF_PKTCTRL0_OFF,	(RF_PKTCTRL0_PKT_FORMAT_NORMAL|
 				 RF_PKTCTRL0_LENGTH_CONFIG_FIXED),
@@ -223,9 +229,9 @@ static __code uint8_t fixed_pkt_setup[] = {
 				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
 				 (DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
 	RF_MDMCFG3_OFF,		(DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
-	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_OFF |
+	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_ON |
 				 RF_MDMCFG2_MOD_FORMAT_GFSK |
-				 RF_MDMCFG2_SYNC_MODE_15_16_THRES),
+				 RF_MDMCFG2_SYNC_MODE_15_16),
 	RF_MDMCFG1_OFF,		(RF_MDMCFG1_FEC_EN |
 				 RF_MDMCFG1_NUM_PREAMBLE_4 |
 				 (2 << RF_MDMCFG1_CHANSPC_E_SHIFT)),
@@ -551,8 +557,31 @@ ao_radio_test_cmd(void)
 		ao_radio_test(0);
 }
 
+#if AO_RADIO_REG_TEST
+static void
+ao_radio_set_reg(void)
+{
+	uint8_t	offset;
+	ao_cmd_hex();
+	offset = ao_cmd_lex_i;
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	ao_cmd_hex();
+	printf("RF[%x] %x", offset, RF[offset]);
+	if (ao_cmd_status == ao_cmd_success) {
+		RF[offset] = ao_cmd_lex_i;
+		printf (" -> %x", RF[offset]);
+	}
+	ao_cmd_status = ao_cmd_success;
+	printf("\n");
+}
+#endif
+
 __code struct ao_cmds ao_radio_cmds[] = {
 	{ ao_radio_test_cmd,	"C <1 start, 0 stop, none both>\0Radio carrier test" },
+#if AO_RADIO_REG_TEST
+	{ ao_radio_set_reg,	"V <offset> <value>\0Set radio register" },
+#endif
 	{ 0,	NULL },
 };
 
