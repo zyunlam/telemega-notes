@@ -53,7 +53,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	19
+#define AO_CONFIG_MINOR	20
 
 #define AO_AES_LEN 16
 
@@ -104,6 +104,9 @@ struct ao_config {
 #endif
 #if HAS_APRS
 	uint8_t		aprs_ssid;		/* minor version 19 */
+#endif
+#if HAS_RADIO_RATE
+	uint8_t		radio_rate;		/* minor version 20 */
 #endif
 };
 

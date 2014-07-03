@@ -62,6 +62,7 @@ __xdata uint8_t ao_config_mutex;
 #endif
 #define AO_CONFIG_DEFAULT_RADIO_AMP		0
 #define AO_CONFIG_DEFAULT_APRS_SSID		(ao_serial_number % 10)
+#define AO_CONFIG_DEFAULT_RADIO_RATE		AO_RADIO_RATE_38400
 
 #if HAS_EEPROM
 static void
@@ -196,6 +197,10 @@ _ao_config_get(void)
 #if HAS_APRS
 		if (minor < 19)
 			ao_config.aprs_ssid = AO_CONFIG_DEFAULT_APRS_SSID;
+#endif
+#if HAS_RADIO_RATE
+		if (minor < 20)
+			ao_config.radio_rate = AO_CONFIG_DEFAULT_RADIO_RATE;
 #endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
@@ -481,6 +486,30 @@ ao_config_radio_cal_set(void) __reentrant
 	_ao_config_edit_start();
 	ao_config.radio_cal = ao_cmd_lex_u32;
 	ao_config_set_radio();
+	_ao_config_edit_finish();
+}
+
+#endif
+
+#if HAS_RADIO_RATE
+void
+ao_config_radio_rate_show(void) __reentrant
+{
+	printf("Telemetry rate: %d\n", ao_config.radio_rate);
+}
+
+void
+ao_config_radio_rate_set(void) __reentrant
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	if (AO_RADIO_RATE_MAX < ao_cmd_lex_i) {
+		ao_cmd_status = ao_cmd_lex_error;
+		return;
+	}
+	_ao_config_edit_start();
+	ao_config.radio_rate = ao_cmd_lex_i;
 	_ao_config_edit_finish();
 }
 #endif
@@ -802,6 +831,10 @@ __code struct ao_config_var ao_config_vars[] = {
 	  ao_config_radio_enable_set, ao_config_radio_enable_show },
 	{ "f <cal>\0Radio calib (cal = rf/(xtal/2^16))",
 	  ao_config_radio_cal_set,  	ao_config_radio_cal_show },
+#if HAS_RADIO_RATE
+	{ "T <rate>\0Telemetry rate (0=38.4, 1=9.6, 2=2.4)",
+	  ao_config_radio_rate_set,	ao_config_radio_rate_show },
+#endif
 #if HAS_RADIO_POWER
 	{ "p <setting>\0Radio power setting (0-255)",
 	  ao_config_radio_power_set,	ao_config_radio_power_show },
