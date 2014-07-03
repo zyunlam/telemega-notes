@@ -761,7 +761,7 @@ void
 ao_rssi_set(int rssi_value);
 
 void
-ao_rssi_init(uint8_t rssi_led);
+ao_rssi_init(AO_LED_TYPE rssi_led);
 
 /*
  * ao_product.c
