@@ -35,6 +35,9 @@ public class AltosPreferences {
 	/* telemetry format preference name */
 	public final static String telemetryPreferenceFormat = "TELEMETRY-%d";
 
+	/* telemetry rate format preference name */
+	public final static String telemetryRatePreferenceFormat = "RATE-%d";
+
 	/* voice preference name */
 	public final static String voicePreference = "VOICE";
 
@@ -49,6 +52,9 @@ public class AltosPreferences {
 
 	/* scanning telemetry preferences name */
 	public final static String scanningTelemetryPreference = "SCANNING-TELEMETRY";
+
+	/* scanning telemetry rate preferences name */
+	public final static String scanningTelemetryRatePreference = "SCANNING-RATE";
 
 	/* Launcher serial preference name */
 	public final static String launcherSerialPreference = "LAUNCHER-SERIAL";
@@ -74,6 +80,9 @@ public class AltosPreferences {
 	/* Telemetry (map serial to telemetry format) */
 	public static Hashtable<Integer, Integer> telemetries;
 
+	/* Telemetry rate (map serial to telemetry format) */
+	public static Hashtable<Integer, Integer> telemetry_rates;
+
 	/* Voice preference */
 	public static boolean voice;
 
@@ -85,6 +94,8 @@ public class AltosPreferences {
 
 	/* Scanning telemetry */
 	public static int scanning_telemetry;
+
+	public static int scanning_telemetry_rate;
 
 	/* List of frequencies */
 	public final static String common_frequencies_node_name = "COMMON-FREQUENCIES";
@@ -159,11 +170,15 @@ public class AltosPreferences {
 
 		telemetries = new Hashtable<Integer,Integer>();
 
+		telemetry_rates = new Hashtable<Integer,Integer>();
+
 		voice = backend.getBoolean(voicePreference, true);
 
 		callsign = backend.getString(callsignPreference,"N0CALL");
 
 		scanning_telemetry = backend.getInt(scanningTelemetryPreference,(1 << AltosLib.ao_telemetry_standard));
+
+		scanning_telemetry_rate = backend.getInt(scanningTelemetryRatePreference,(1 << AltosLib.ao_telemetry_rate_38400));
 
 		launcher_serial = backend.getInt(launcherSerialPreference, 0);
 
@@ -266,6 +281,25 @@ public class AltosPreferences {
 		}
 	}
 
+	public static void set_telemetry_rate(int serial, int new_telemetry_rate) {
+		synchronized (backend) {
+			telemetry_rates.put(serial, new_telemetry_rate);
+			backend.putInt(String.format(telemetryRatePreferenceFormat, serial), new_telemetry_rate);
+			flush_preferences();
+		}
+	}
+
+	public static int telemetry_rate(int serial) {
+		synchronized (backend) {
+			if (telemetry_rates.containsKey(serial))
+				return telemetry_rates.get(serial);
+			int telemetry_rate = backend.getInt(String.format(telemetryRatePreferenceFormat, serial),
+							    AltosLib.ao_telemetry_rate_38400);
+			telemetry_rates.put(serial, telemetry_rate);
+			return telemetry_rate;
+		}
+	}
+
 	public static void set_scanning_telemetry(int new_scanning_telemetry) {
 		synchronized (backend) {
 			scanning_telemetry = new_scanning_telemetry;
@@ -277,6 +311,20 @@ public class AltosPreferences {
 	public static int scanning_telemetry() {
 		synchronized (backend) {
 			return scanning_telemetry;
+		}
+	}
+
+	public static void set_scanning_telemetry_rate(int new_scanning_telemetry_rate) {
+		synchronized (backend) {
+			scanning_telemetry_rate = new_scanning_telemetry_rate;
+			backend.putInt(scanningTelemetryRatePreference, scanning_telemetry_rate);
+			flush_preferences();
+		}
+	}
+
+	public static int scanning_telemetry_rate() {
+		synchronized(backend) {
+			return scanning_telemetry_rate;
 		}
 	}
 

@@ -161,6 +161,15 @@ public class AltosLib {
 		"Off", "Standard Telemetry", "TeleMetrum v0.9", "TeleMetrum v0.8"
 	};
 
+	public static final int ao_telemetry_rate_38400 = 0;
+	public static final int ao_telemetry_rate_9600 = 1;
+	public static final int ao_telemetry_rate_2400 = 2;
+	public static final int ao_telemetry_rate_max = 2;
+
+	public static final Integer[] ao_telemetry_rate_values = {
+		38400, 9600, 2400
+	};
+
 	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
 
 	public static final int ao_telemetry_standard_len = 32;

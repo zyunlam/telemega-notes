@@ -46,6 +46,7 @@ public class AltosConfigData implements Iterable<String> {
 	public String	callsign;
 	public int	radio_enable;
 	public int	radio_calibration;
+	public int	telemetry_rate;
 	/* Old HAS_RADIO values */
 	public int	radio_channel;
 	public int	radio_setting;
@@ -235,6 +236,7 @@ public class AltosConfigData implements Iterable<String> {
 		radio_calibration = -1;
 		radio_channel = -1;
 		radio_setting = -1;
+		telemetry_rate = -1;
 
 		accel_cal_plus = -1;
 		accel_cal_minus = -1;
@@ -292,6 +294,7 @@ public class AltosConfigData implements Iterable<String> {
 		try { callsign = get_string(line, "Callsign:"); } catch (Exception e) {}
 		try { radio_enable = get_int(line, "Radio enable:"); } catch (Exception e) {}
 		try { radio_calibration = get_int(line, "Radio cal:"); } catch (Exception e) {}
+		try { telemetry_rate = get_int(line, "Telemetry rate:"); } catch (Exception e) {}
 
 		/* Old HAS_RADIO values */
 		try { radio_channel = get_int(line, "Radio channel:"); } catch (Exception e) {}
@@ -440,6 +443,8 @@ public class AltosConfigData implements Iterable<String> {
 			callsign = source.callsign();
 		if (radio_calibration >= 0)
 			radio_calibration = source.radio_calibration();
+		if (telemetry_rate >= 0)
+			telemetry_rate = source.telemetry_rate();
 
 		/* HAS_ACCEL */
 		if (pad_orientation >= 0)
@@ -484,6 +489,7 @@ public class AltosConfigData implements Iterable<String> {
 		dest.set_apogee_lockout(apogee_lockout);
 		dest.set_radio_calibration(radio_calibration);
 		dest.set_radio_frequency(frequency());
+		dest.set_telemetry_rate(telemetry_rate);
 		boolean max_enabled = true;
 
 		if (log_space() == 0)
@@ -553,6 +559,9 @@ public class AltosConfigData implements Iterable<String> {
 			link.printf("c c %s\n", callsign);
 		if (radio_enable >= 0)
 			link.printf("c e %d\n", radio_enable);
+
+		if (telemetry_rate >= 0)
+			link.printf("c T %d\n", telemetry_rate);
 
 		/* HAS_ACCEL */
 		/* UI doesn't support accel cal */

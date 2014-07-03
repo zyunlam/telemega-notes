@@ -38,11 +38,17 @@ public class AltosFlightReader {
 
 	public void set_telemetry(int telemetry) { }
 
+	public void set_telemetry_rate(int telemetry_rate) throws InterruptedException, TimeoutException { }
+
 	public void save_telemetry() { }
+
+	public void save_telemetry_rate() { }
 
 	public void update(AltosState state) throws InterruptedException { }
 
 	public boolean supports_telemetry(int telemetry) { return false; }
+
+	public boolean supports_telemetry_rate(int telemetry_rate) { return false; }
 
 	public File backing_file() { return null; }
 

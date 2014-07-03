@@ -53,6 +53,10 @@ public interface AltosConfigValues {
 
 	public abstract String callsign();
 
+	public abstract void set_telemetry_rate(int new_telemetry_rate);
+
+	public abstract int telemetry_rate() throws AltosConfigDataException;
+
 	public abstract void set_flight_log_max(int new_flight_log_max);
 
 	public abstract void set_flight_log_max_enabled(boolean enable);

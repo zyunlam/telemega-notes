@@ -274,6 +274,8 @@ public abstract class AltosLink implements Runnable {
 	}
 
 	public void flush_output() {
+		if (pending_output == null)
+			return;
 		for (String s : pending_output)
 			System.out.print(s);
 		pending_output.clear();
@@ -305,6 +307,7 @@ public abstract class AltosLink implements Runnable {
 	 */
 	public boolean monitor_mode = false;
 	public int telemetry = AltosLib.ao_telemetry_standard;
+	public int telemetry_rate = AltosLib.ao_telemetry_rate_38400;
 	public double frequency;
 	public String callsign;
 	AltosConfigData	config_data;
@@ -356,6 +359,15 @@ public abstract class AltosLink implements Runnable {
 		flush_output();
 	}
 
+	public void set_telemetry_rate(int in_telemetry_rate) {
+		telemetry_rate = in_telemetry_rate;
+		if (monitor_mode)
+			printf("m 0\nc T %d\nm %x\n", telemetry_rate, telemetry_len());
+		else
+			printf("c T %d\n", telemetry_rate);
+		flush_output();
+	}
+
 	public void set_monitor(boolean monitor) {
 		monitor_mode = monitor;
 		if (monitor)
@@ -383,7 +395,7 @@ public abstract class AltosLink implements Runnable {
 		flush_output();
 	}
 
-	public AltosConfigData config_data() throws InterruptedException, TimeoutException {
+ 	public AltosConfigData config_data() throws InterruptedException, TimeoutException {
 		synchronized(config_data_lock) {
 			if (config_data == null) {
 				printf("m 0\n");

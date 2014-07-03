@@ -26,6 +26,7 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	AltosLog	log;
 	double		frequency;
 	int		telemetry;
+	int		telemetry_rate;
 	AltosState	state = null;
 
 	LinkedBlockingQueue<AltosLine> telem;
@@ -92,6 +93,23 @@ public class AltosTelemetryReader extends AltosFlightReader {
 		}
 	}
 
+	public boolean supports_telemetry_rate(int telemetry_rate) {
+		try {
+			/* Version 1.4.1.1 supports all rates, older versions don't */
+			if (link.config_data().compare_version("1.4.1.1") >= 0)
+				return true;
+
+			if (telemetry_rate == AltosLib.ao_telemetry_rate_38400)
+				return true;
+			else
+				return false;
+		} catch (InterruptedException ie) {
+			return false;
+		} catch (TimeoutException te) {
+			return true;
+		}
+	}
+
 	public void save_frequency() {
 		AltosPreferences.set_frequency(link.serial, frequency);
 	}
@@ -103,6 +121,15 @@ public class AltosTelemetryReader extends AltosFlightReader {
 
 	public void save_telemetry() {
 		AltosPreferences.set_telemetry(link.serial, telemetry);
+	}
+
+	public void set_telemetry_rate(int in_telemetry_rate) {
+		telemetry_rate = in_telemetry_rate;
+		link.set_telemetry_rate(telemetry_rate);
+	}
+
+	public void save_telemetry_rate() {
+		AltosPreferences.set_telemetry_rate(link.serial, telemetry_rate);
 	}
 
 	public void set_monitor(boolean monitor) {
@@ -133,6 +160,8 @@ public class AltosTelemetryReader extends AltosFlightReader {
 			set_frequency(frequency);
 			telemetry = AltosPreferences.telemetry(link.serial);
 			set_telemetry(telemetry);
+			telemetry_rate = AltosPreferences.telemetry_rate(link.serial);
+			set_telemetry_rate(telemetry_rate);
 			link.add_monitor(telem);
 			success = true;
 		} finally {
