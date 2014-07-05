@@ -132,6 +132,9 @@ ao_clock_init(void);
  */
 
 #ifndef ao_mutex_get
+uint8_t
+ao_mutex_try(__xdata uint8_t *ao_mutex, uint8_t task_id) __reentrant;
+
 void
 ao_mutex_get(__xdata uint8_t *ao_mutex) __reentrant;
 

@@ -154,6 +154,28 @@ ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index)
 }
 
 void
+ao_spi_send_sync(void *block, uint16_t len, uint8_t spi_index)
+{
+	uint8_t		*b = block;
+	struct stm_spi	*stm_spi = ao_spi_stm_info[AO_SPI_INDEX(spi_index)].stm_spi;
+
+	stm_spi->cr2 = ((0 << STM_SPI_CR2_TXEIE) |
+			(0 << STM_SPI_CR2_RXNEIE) |
+			(0 << STM_SPI_CR2_ERRIE) |
+			(0 << STM_SPI_CR2_SSOE) |
+			(0 << STM_SPI_CR2_TXDMAEN) |
+			(0 << STM_SPI_CR2_RXDMAEN));
+
+	/* Clear RXNE */
+	(void) stm_spi->dr;
+
+	while (len--) {
+		while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)));
+		stm_spi->dr = *b++;
+	}
+}
+
+void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
 {
 	struct stm_spi *stm_spi = ao_spi_stm_info[AO_SPI_INDEX(spi_index)].stm_spi;
@@ -356,13 +378,11 @@ ao_spi_enable_index(uint8_t spi_index)
 	}
 }
 
-void
-ao_spi_get(uint8_t spi_index, uint32_t speed)
+static void
+ao_spi_config(uint8_t spi_index, uint32_t speed)
 {
 	uint8_t		id = AO_SPI_INDEX(spi_index);
 	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
-
-	ao_mutex_get(&ao_spi_mutex[id]);
 	stm_spi->cr1 = ((0 << STM_SPI_CR1_BIDIMODE) |			/* Three wire mode */
 			(0 << STM_SPI_CR1_BIDIOE) |
 			(0 << STM_SPI_CR1_CRCEN) |			/* CRC disabled */
@@ -378,7 +398,7 @@ ao_spi_get(uint8_t spi_index, uint32_t speed)
 			(0 << STM_SPI_CR1_CPOL) |			/* Format 0 */
 			(0 << STM_SPI_CR1_CPHA));
 	if (spi_index != ao_spi_index[id]) {
-		
+
 		/* Disable old config
 		 */
 		ao_spi_disable_index(ao_spi_index[id]);
@@ -386,11 +406,30 @@ ao_spi_get(uint8_t spi_index, uint32_t speed)
 		/* Enable new config
 		 */
 		ao_spi_enable_index(spi_index);
-		
+
 		/* Remember current config
 		 */
 		ao_spi_index[id] = spi_index;
 	}
+}
+
+uint8_t
+ao_spi_try_get(uint8_t spi_index, uint32_t speed, uint8_t task_id)
+{
+	uint8_t		id = AO_SPI_INDEX(spi_index);
+
+	if (!ao_mutex_try(&ao_spi_mutex[id], task_id))
+		return 0;
+	ao_spi_config(spi_index, speed);
+	return 1;
+}
+
+void
+ao_spi_get(uint8_t spi_index, uint32_t speed)
+{
+	uint8_t		id = AO_SPI_INDEX(spi_index);
+	ao_mutex_get(&ao_spi_mutex[id]);
+	ao_spi_config(spi_index, speed);
 }
 
 void

@@ -58,6 +58,7 @@
 	#define HAS_MONITOR		0
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
+	#define HAS_MUTEX_TRY		0
 #endif
 
 #if defined(TELEMETRUM_V_1_1)
@@ -100,6 +101,7 @@
 	#define HAS_MONITOR		0
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
+	#define HAS_MUTEX_TRY		0
 #endif
 
 #if defined(TELEMETRUM_V_1_2)
@@ -142,6 +144,7 @@
 	#define HAS_MONITOR		0
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
+	#define HAS_MUTEX_TRY		0
 #endif
 
 #if defined(TELEDONGLE_V_0_2)

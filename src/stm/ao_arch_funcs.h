@@ -64,6 +64,9 @@
 #define AO_SPI_INDEX(id)	((id) & AO_SPI_INDEX_MASK)
 #define AO_SPI_CONFIG(id)	((id) & AO_SPI_CONFIG_MASK)
 
+uint8_t
+ao_spi_try_get(uint8_t spi_index, uint32_t speed, uint8_t task_id);
+
 void
 ao_spi_get(uint8_t spi_index, uint32_t speed);
 
@@ -75,6 +78,9 @@ ao_spi_send(void *block, uint16_t len, uint8_t spi_index);
 
 void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_send_sync(void *block, uint16_t len, uint8_t spi_index);
 
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
@@ -94,6 +100,15 @@ ao_spi_init(void);
 		ao_spi_get(bus, speed);				\
 		ao_spi_set_cs(reg,mask);			\
 	} while (0)
+
+static inline uint8_t
+ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t speed, uint8_t task_id)
+{
+	if (!ao_spi_try_get(bus, speed, task_id))
+		return 0;
+	ao_spi_set_cs(reg, mask);
+	return 1;
+}
 
 #define ao_spi_put_mask(reg,mask,bus) do {	\
 		ao_spi_clr_cs(reg,mask);	\
@@ -252,6 +267,8 @@ extern struct ao_stm_usart	ao_stm_usart3;
 
 #define ARM_PUSH32(stack, val)	(*(--(stack)) = (val))
 
+typedef uint32_t	ao_arch_irq_t;
+
 static inline uint32_t
 ao_arch_irqsave(void) {
 	uint32_t	primask;
@@ -369,10 +386,10 @@ static inline void ao_arch_start_scheduler(void) {
 		ao_arch_block_interrupts();			\
 	} while (0)
 
-#define ao_arch_critical(b) do {				\
-		ao_arch_block_interrupts();			\
-		do { b } while (0);				\
-		ao_arch_release_interrupts();			\
+#define ao_arch_critical(b) do {			\
+		uint32_t __mask = ao_arch_irqsave();	\
+		do { b } while (0);			\
+		ao_arch_irqrestore(__mask);		\
 	} while (0)
 
 #endif /* _AO_ARCH_FUNCS_H_ */
