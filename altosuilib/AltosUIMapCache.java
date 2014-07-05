@@ -52,8 +52,6 @@ public class AltosUIMapCache implements AltosUIMapCacheListener {
 		if (new_size == cache_size)
 			return;
 
-		System.out.printf("cache size now %d\n", new_size);
-
 		synchronized(cache_lock) {
 			AltosUIMapImage[]	new_images = new AltosUIMapImage[new_size];
 
@@ -94,12 +92,8 @@ public class AltosUIMapCache implements AltosUIMapCacheListener {
 			try {
 				image = new AltosUIMapImage(tile, store);
 				image.used = used++;
-				if (images[oldest] != null) {
-					System.out.printf("drop %s\n", images[oldest].store.file.toString());
+				if (images[oldest] != null)
 					images[oldest].flush();
-				}
-
-				System.out.printf("load %s\n", store.file.toString());
 
 				images[oldest] = image;
 
