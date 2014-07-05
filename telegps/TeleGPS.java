@@ -60,6 +60,8 @@ public class TeleGPS
 	JMenu			device_menu;
 	AltosUIFreqList		frequencies;
 	ActionListener		frequency_listener;
+	AltosUIRateList		rates;
+	ActionListener		rate_listener;
 
 	Container		bag;
 
@@ -184,6 +186,7 @@ public class TeleGPS
 
 		telegps_status.disable_receive();
 		disable_frequency_menu();
+		disable_rate_menu();
 	}
 
 	void connect(AltosDevice device) {
@@ -364,6 +367,40 @@ public class TeleGPS
 
 	}
 
+	void enable_rate_menu(int serial, final AltosFlightReader reader) {
+
+		if (rate_listener != null)
+			disable_rate_menu();
+
+		rate_listener = new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int rate = rates.rate();
+					try {
+						System.out.printf("set rate %d\n", rate);
+						reader.set_telemetry_rate(rate);
+					} catch (TimeoutException te) {
+					} catch (InterruptedException ie) {
+					}
+					reader.save_telemetry_rate();
+				}
+			};
+
+		rates.addActionListener(rate_listener);
+		rates.set_product("Monitor");
+		rates.set_serial(serial);
+		rates.set_rate(AltosUIPreferences.telemetry_rate(serial));
+		rates.setEnabled(reader.supports_telemetry_rate(AltosLib.ao_telemetry_rate_2400));
+	}
+
+	void disable_rate_menu() {
+		if (rate_listener != null) {
+			rates.removeActionListener(rate_listener);
+			rates.setEnabled(false);
+			rate_listener = null;
+		}
+
+	}
+
 	public void set_reader(AltosFlightReader reader, AltosDevice device) {
 		status_update = new TeleGPSStatusUpdate(telegps_status);
 
@@ -374,8 +411,10 @@ public class TeleGPS
 		thread = new TeleGPSDisplayThread(this, voice(), this, reader);
 		thread.start();
 
-		if (device != null)
+		if (device != null) {
 			enable_frequency_menu(device.getSerial(), reader);
+			enable_rate_menu(device.getSerial(), reader);
+		}
 	}
 
 	static int	number_of_windows;
@@ -466,6 +505,16 @@ public class TeleGPS
 		c.weightx = 0;
 		c.gridwidth = 1;
 		bag.add(frequencies, c);
+
+		rates = new AltosUIRateList();
+		rates.setEnabled(false);
+		c.gridx = 1;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.WEST;
+		c.weightx = 0;
+		c.gridwidth = 1;
+		bag.add(rates, c);
 
 		displays = new LinkedList<AltosFlightDisplay>();
 
