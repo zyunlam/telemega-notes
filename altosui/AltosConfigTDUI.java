@@ -37,6 +37,7 @@ public class AltosConfigTDUI
 	JLabel		frequency_label;
 	JLabel		radio_calibration_label;
 	JLabel		radio_frequency_label;
+	JLabel		rate_label;
 
 	public boolean		dirty;
 
@@ -46,6 +47,7 @@ public class AltosConfigTDUI
 	JLabel		serial_value;
 	AltosUIFreqList	radio_frequency_value;
 	JLabel		radio_calibration_value;
+	AltosUIRateList	rate_value;
 
 	JButton		save;
 	JButton		reset;
@@ -192,6 +194,28 @@ public class AltosConfigTDUI
 		radio_calibration_value = new JLabel(String.format("%d", 1186611));
 		pane.add(radio_calibration_value, c);
 
+		/* Telemetry Rate */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = 7;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		rate_label = new JLabel("Telemetry Rate:");
+		pane.add(rate_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = 7;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		rate_value = new AltosUIRateList();
+		pane.add(rate_value, c);
+
 		/* Buttons */
 		c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = 12;
@@ -337,6 +361,14 @@ public class AltosConfigTDUI
 
 	public void set_radio_calibration(int calibration) {
 		radio_calibration_value.setText(String.format("%d", calibration));
+	}
+
+	public int telemetry_rate() {
+		return rate_value.getSelectedIndex();
+	}
+
+	public void set_telemetry_rate(int rate) {
+		rate_value.setSelectedIndex(rate);
 	}
 
 	public void set_clean() {

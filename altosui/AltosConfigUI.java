@@ -40,6 +40,7 @@ public class AltosConfigUI
 	JLabel			radio_calibration_label;
 	JLabel			radio_frequency_label;
 	JLabel			radio_enable_label;
+	JLabel			rate_label;
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
 	JLabel			flight_log_max_label;
@@ -62,6 +63,7 @@ public class AltosConfigUI
 	AltosUIFreqList		radio_frequency_value;
 	JTextField		radio_calibration_value;
 	JRadioButton		radio_enable_value;
+	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
 	JComboBox<String>	flight_log_max_value;
@@ -198,6 +200,13 @@ public class AltosConfigUI
 			radio_enable_value.setToolTipText("Enable/Disable telemetry and RDF transmissions");
 		else
 			radio_enable_value.setToolTipText("Firmware version does not support disabling radio");
+	}
+
+	void set_rate_tool_tip() {
+		if (rate_value.isEnabled())
+			rate_value.setToolTipText("Select telemetry baud rate");
+		else
+			rate_value.setToolTipText("Firmware version does not support variable telemetry rates");
 	}
 
 	void set_aprs_interval_tool_tip() {
@@ -488,6 +497,31 @@ public class AltosConfigUI
 		radio_enable_value.addItemListener(this);
 		pane.add(radio_enable_value, c);
 		set_radio_enable_tool_tip();
+		row++;
+
+		/* Telemetry Rate */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		rate_label = new JLabel("Telemetry baud rate:");
+		pane.add(radio_enable_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		rate_value = new AltosUIRateList();
+		rate_value.addItemListener(this);
+		pane.add(rate_value, c);
+		set_rate_tool_tip();
 		row++;
 
 		/* APRS interval */
@@ -1007,6 +1041,14 @@ public class AltosConfigUI
 			return radio_enable_value.isSelected() ? 1 : 0;
 		else
 			return -1;
+	}
+
+	public void set_telemetry_rate(int new_rate) {
+		rate_value.set_rate(new_rate);
+	}
+
+	public int telemetry_rate() {
+		return rate_value.rate();
 	}
 
 	public void set_callsign(String new_callsign) {

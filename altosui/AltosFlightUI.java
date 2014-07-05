@@ -171,6 +171,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 
 	Container		bag;
 	AltosUIFreqList		frequencies;
+	AltosUIRateList		rates;
 	AltosUITelemetryList	telemetries;
 	JLabel			telemetry;
 
@@ -217,27 +218,40 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 			c.anchor = GridBagConstraints.WEST;
 			bag.add (frequencies, c);
 
+			// Telemetry rate list
+			rates = new AltosUIRateList(AltosUIPreferences.telemetry_rate(serial));
+			rates.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int rate = rates.rate();
+						try {
+							reader.set_telemetry_rate(rate);
+						} catch (TimeoutException te) {
+						} catch (InterruptedException ie) {
+						}
+						reader.save_telemetry_rate();
+					}
+				});
+			rates.setEnabled(reader.supports_telemetry_rate(AltosLib.ao_telemetry_rate_2400));
+			c.gridx = 1;
+			c.gridy = 0;
+			c.weightx = 0;
+			c.weighty = 0;
+			c.insets = new Insets(3, 3, 3, 3);
+			c.fill = GridBagConstraints.NONE;
+			c.anchor = GridBagConstraints.WEST;
+			bag.add (rates, c);
+
 			// Telemetry format list
 			if (reader.supports_telemetry(Altos.ao_telemetry_standard)) {
-				telemetries = new JComboBox<String>();
-				for (int i = 1; i <= Altos.ao_telemetry_max; i++)
-					telemetries.addItem(Altos.telemetry_name(i));
-				int telemetry = AltosPreferences.telemetry(serial);
-				if (telemetry <= Altos.ao_telemetry_off ||
-				    telemetry > Altos.ao_telemetry_max)
-					telemetry = Altos.ao_telemetry_standard;
-				telemetries.setSelectedIndex(telemetry - 1);
-				telemetries.setMaximumRowCount(Altos.ao_telemetry_max);
-				telemetries.setPreferredSize(null);
-				telemetries.revalidate();
+				telemetries = new AltosUITelemetryList(serial);
 				telemetries.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							int telemetry = telemetries.getSelectedIndex() + 1;
+							int telemetry = telemetries.get_selected();
 							reader.set_telemetry(telemetry);
 							reader.save_telemetry();
 						}
 					});
-				c.gridx = 1;
+				c.gridx = 2;
 				c.gridy = 0;
 				c.weightx = 0;
 				c.weighty = 0;
@@ -256,7 +270,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 					version = "Telemetry: None";
 
 				telemetry = new JLabel(version);
-				c.gridx = 1;
+				c.gridx = 2;
 				c.gridy = 0;
 				c.weightx = 0;
 				c.weighty = 0;
@@ -274,9 +288,8 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		c.gridy = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
-		c.gridwidth = 2;
+		c.gridwidth = 3;
 		bag.add(flightStatus, c);
-		c.gridwidth = 1;
 
 		/* The rest of the window uses a tabbed pane to
 		 * show one of the alternate data views
@@ -315,7 +328,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1;
 		c.weighty = 1;
-		c.gridwidth = 2;
 		bag.add(pane, c);
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
