@@ -1024,15 +1024,21 @@ public class AltosState implements Cloneable {
 		firmware_version = version;
 	}
 
+	private void re_init() {
+		int bt = boost_tick;
+		int rs = receiver_serial;
+		init();
+		boost_tick = bt;
+		receiver_serial = rs;
+	}
+
 	public void set_flight(int flight) {
 
 		/* When the flight changes, reset the state */
-		if (flight != AltosLib.MISSING && flight != 0) {
+		if (flight != AltosLib.MISSING) {
 			if (this.flight != AltosLib.MISSING &&
 			    this.flight != flight) {
-				int bt = boost_tick;
-				init();
-				boost_tick = bt;
+				re_init();
 			}
 			this.flight = flight;
 		}
@@ -1043,9 +1049,7 @@ public class AltosState implements Cloneable {
 		if (serial != AltosLib.MISSING) {
 			if (this.serial != AltosLib.MISSING &&
 			    this.serial != serial) {
-				int bt = boost_tick;
-				init();
-				boost_tick = bt;
+				re_init();
 			}
 			this.serial = serial;
 		}
