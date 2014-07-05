@@ -521,7 +521,7 @@ ao_telemetry_set_interval(uint16_t interval)
 	ao_telemetry_companion_cur = cur;
 #endif
 
-	ao_telemetry_config_max = AO_SEC_TO_TICKS(1) / interval;
+	ao_telemetry_config_max = AO_SEC_TO_TICKS(5) / interval;
 #if HAS_COMPANION
 	if (ao_telemetry_config_max > cur)
 		cur++;
