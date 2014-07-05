@@ -59,7 +59,7 @@ public class AltosConfigUI
 	JComboBox<String>	main_deploy_value;
 	JComboBox<String>	apogee_delay_value;
 	JComboBox<String>	apogee_lockout_value;
-	AltosFreqList		radio_frequency_value;
+	AltosUIFreqList		radio_frequency_value;
 	JTextField		radio_calibration_value;
 	JRadioButton		radio_enable_value;
 	JComboBox<String>	aprs_interval_value;
@@ -432,12 +432,9 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		radio_frequency_value = new AltosFreqList();
+		radio_frequency_value = new AltosUIFreqList();
 		radio_frequency_value.addItemListener(this);
-
-		JMenuBar menu_bar = new JMenuBar();
-		menu_bar.add(radio_frequency_value);
-		pane.add(menu_bar, c);
+		pane.add(radio_frequency_value, c);
 		radio_frequency_value.setToolTipText("Telemetry, RDF and packet frequency");
 		row++;
 

@@ -36,7 +36,6 @@ altosuilib_JAVA = \
 	AltosVoice.java \
 	AltosDisplayThread.java \
 	AltosDeviceUIDialog.java \
-	AltosFreqList.java \
 	AltosSerial.java \
 	AltosSerialInUseException.java \
 	AltosConfigFreqUI.java \
@@ -82,7 +81,8 @@ altosuilib_JAVA = \
 	AltosUIIndicator.java \
 	AltosUIUnitsIndicator.java \
 	AltosUIVoltageIndicator.java \
-	AltosUITelemetryMenu.java \
+	AltosUIFreqList.java \
+	AltosUITelemetryList.java \
 	OSXAdapter.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar

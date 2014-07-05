@@ -103,7 +103,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 	}
 
 	Container	bag;
-	AltosFreqList	frequencies;
+	AltosUIFreqList	frequencies;
 	JTextField	callsign_value;
 
 	/* DocumentListener interface methods */
@@ -200,7 +200,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		/* Stick frequency selector at top of table for telemetry monitoring */
 		if (remote && serial >= 0) {
 			// Frequency menu
-			frequencies = new AltosFreqList(AltosUIPreferences.frequency(serial));
+			frequencies = new AltosUIFreqList(AltosUIPreferences.frequency(serial));
 			frequencies.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						double frequency = frequencies.frequency();

@@ -58,7 +58,7 @@ public class TeleGPS
 	JMenu			file_menu;
 	JMenu			monitor_menu;
 	JMenu			device_menu;
-	AltosFreqList		frequencies;
+	AltosUIFreqList		frequencies;
 	ActionListener		frequency_listener;
 
 	Container		bag;
@@ -351,18 +351,17 @@ public class TeleGPS
 		frequencies.set_product("Monitor");
 		frequencies.set_serial(serial);
 		frequencies.set_frequency(AltosUIPreferences.frequency(serial));
+		frequencies.setEnabled(true);
 
-		menu_bar.add(frequencies);
-		menu_bar.repaint();
 	}
 
 	void disable_frequency_menu() {
-		if (frequency_listener == null)
-			return;
-		frequencies.removeActionListener(frequency_listener);
-		menu_bar.remove(frequencies);
-		menu_bar.repaint();
-		frequency_listener = null;
+		if (frequency_listener != null) {
+			frequencies.removeActionListener(frequency_listener);
+			frequencies.setEnabled(false);
+			frequency_listener = null;
+		}
+
 	}
 
 	public void set_reader(AltosFlightReader reader, AltosDevice device) {
@@ -457,7 +456,16 @@ public class TeleGPS
 		file_menu = make_menu("File", file_menu_entries);
 		monitor_menu = make_menu("Monitor", monitor_menu_entries);
 		device_menu = make_menu("Device", device_menu_entries);
-		frequencies = new AltosFreqList();
+
+		frequencies = new AltosUIFreqList();
+		frequencies.setEnabled(false);
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.WEST;
+		c.weightx = 0;
+		c.gridwidth = 1;
+		bag.add(frequencies, c);
 
 		displays = new LinkedList<AltosFlightDisplay>();
 
