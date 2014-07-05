@@ -25,6 +25,10 @@
 
 static __pdata uint16_t ao_telemetry_interval;
 
+#if HAS_RADIO_RATE
+static __pdata uint16_t ao_telemetry_desired_interval;
+#endif
+
 #if HAS_RDF
 static __pdata uint8_t ao_rdf = 0;
 static __pdata uint16_t ao_rdf_time;
@@ -64,7 +68,7 @@ static void
 ao_send_sensor(void)
 {
 	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
-			
+
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_SENSOR;
 
@@ -106,12 +110,13 @@ ao_send_sensor(void)
 
 
 #ifdef AO_SEND_MEGA
+
 /* Send mega sensor packet */
 static void
 ao_send_mega_sensor(void)
 {
 	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
-			
+
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_MEGA_SENSOR;
 
@@ -240,7 +245,7 @@ static void
 ao_send_mini(void)
 {
 	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
-			
+
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_MINI;
 
@@ -490,12 +495,33 @@ ao_telemetry(void)
 	}
 }
 
+#if HAS_RADIO_RATE
+void
+ao_telemetry_reset_interval(void)
+{
+	ao_telemetry_set_interval(ao_telemetry_desired_interval);
+}
+#endif
+
 void
 ao_telemetry_set_interval(uint16_t interval)
 {
 	int8_t	cur = 0;
+
+#if HAS_RADIO_RATE
+	/* Limit max telemetry rate based on available radio bandwidth.
+	 */
+	static const uint16_t min_interval[] = {
+		/* [AO_RADIO_RATE_38400] = */ AO_MS_TO_TICKS(100),
+		/* [AO_RADIO_RATE_9600] = */ AO_MS_TO_TICKS(500),
+		/* [AO_RADIO_RATE_2400] = */ AO_MS_TO_TICKS(1000)
+	};
+
+	ao_telemetry_desired_interval = interval;
+	if (interval < min_interval[ao_config.radio_rate])
+		interval = min_interval[ao_config.radio_rate];
+#endif
 	ao_telemetry_interval = interval;
-	
 #if AO_SEND_MEGA
 	if (interval > 1)
 		ao_telemetry_mega_data_max = 1;

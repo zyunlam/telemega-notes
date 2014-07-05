@@ -62,6 +62,7 @@
 	#define HAS_RSSI		0
 	#define HAS_AES			0
 	#define HAS_RADIO		1
+	#define HAS_TELEMETRY		0
 #endif
 
 #if DBG_ON_P1

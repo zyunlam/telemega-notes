@@ -39,6 +39,7 @@
 #define USE_INTERNAL_FLASH	0
 #define HAS_DBG			0
 #define PACKET_HAS_SLAVE	1
+#define HAS_RADIO_RATE		0	/* not enough space for this */
 
 #define AO_LED_RED		2
 #define LEDS_AVAILABLE		AO_LED_RED

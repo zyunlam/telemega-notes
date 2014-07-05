@@ -521,9 +521,8 @@ struct ao_telemetry_raw_recv {
 #define AO_TELEMETRY_INTERVAL_RECOVER	AO_MS_TO_TICKS(1000)
 #endif
 
-#define AO_RADIO_RATE_38400	0
-#define AO_RADIO_RATE_9600	1
-#define AO_RADIO_RATE_2400	2
+void
+ao_telemetry_reset_interval(void);
 
 void
 ao_telemetry_set_interval(uint16_t interval);

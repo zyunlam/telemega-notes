@@ -492,6 +492,10 @@ ao_config_radio_cal_set(void) __reentrant
 #endif
 
 #if HAS_RADIO_RATE
+#ifndef HAS_TELEMETRY
+#error Please define HAS_TELEMETRY
+#endif
+
 void
 ao_config_radio_rate_show(void) __reentrant
 {
@@ -510,6 +514,9 @@ ao_config_radio_rate_set(void) __reentrant
 	}
 	_ao_config_edit_start();
 	ao_config.radio_rate = ao_cmd_lex_i;
+#if HAS_TELEMETRY
+	ao_telemetry_reset_interval();
+#endif
 	_ao_config_edit_finish();
 }
 #endif
