@@ -107,7 +107,7 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 
 	private void DownloadData() {
 		AltosDevice	device = MicroDeviceDialog.show(this);
-		
+
 		if (device != null)
 			new MicroDownload(this, device);
 	}
@@ -128,7 +128,7 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		if (save.runDialog())
 			SetName(data.name);
 	}
-	
+
 	private void Export() {
 		if (data == null) {
 			no_data();

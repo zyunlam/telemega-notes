@@ -39,7 +39,7 @@ ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader
 
 AVRDIRS=\
-	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1
+	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1 microkite
 
 SUBDIRS=
 

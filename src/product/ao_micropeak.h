@@ -29,6 +29,17 @@
 #define BOOST_DETECT		360	/* 30m at sea level, 36m at 2000m */
 #endif
 
+#ifndef LOG_INTERVAL
+#define LOG_INTERVAL		 2	/* 192 ms */
+#endif
+
+#define AO_LOG_ID_MICROPEAK	0
+#define AO_LOG_ID_MICROKITE	1
+
+#ifndef AO_LOG_ID
+#define AO_LOG_ID		AO_LOG_ID_MICROPEAK
+#endif
+
 /* Wait after power on before doing anything to give the user time to assemble the rocket */
 #define BOOST_DELAY		AO_SEC_TO_TICKS(60)
 

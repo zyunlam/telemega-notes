@@ -22,10 +22,17 @@
 
 static uint16_t ao_log_offset = STARTING_LOG_OFFSET;
 
+#define AO_LOG_ID_SHIFT	12
+#define AO_LOG_ID_MASK	((1 << AO_LOG_ID_SHIFT) - 1)
+
 void
 ao_log_micro_save(void)
 {
 	uint16_t	n_samples = (ao_log_offset - STARTING_LOG_OFFSET) / sizeof (uint16_t);
+
+#if AO_LOG_ID
+	n_samples |= AO_LOG_ID << AO_LOG_ID_SHIFT;
+#endif
 	ao_eeprom_write(PA_GROUND_OFFSET, &pa_ground, sizeof (pa_ground));
 	ao_eeprom_write(PA_MIN_OFFSET, &pa_min, sizeof (pa_min));
 	ao_eeprom_write(N_SAMPLES_OFFSET, &n_samples, sizeof (n_samples));
@@ -99,8 +106,12 @@ ao_log_micro_dump(void)
 	uint16_t	crc = 0xffff;
 
 	ao_eeprom_read(N_SAMPLES_OFFSET, &n_samples, sizeof (n_samples));
+
 	if (n_samples == 0xffff)
 		n_samples = 0;
+#if AO_LOG_ID
+	n_samples &= AO_LOG_ID_MASK;
+#endif
 	nbytes = STARTING_LOG_OFFSET + sizeof (uint16_t) * n_samples;
 	ao_async_start();
 	ao_async_byte('M');
