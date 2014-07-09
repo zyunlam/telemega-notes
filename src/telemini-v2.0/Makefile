@@ -25,7 +25,8 @@ INC = \
 	ao_int64.h \
 	ao_sample.h \
 	ao_exti.h \
-	ao_task.h
+	ao_task.h \
+	altitude-pa-small.h
 
 CORE_SRC = \
 	ao_cmd.c \

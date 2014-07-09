@@ -28,9 +28,11 @@
 #define AO_USB_PULLUP_PIN	0
 #define AO_USB_PULLUP		P1_0
 
+#define AO_SMALL_ALTITUDE_TABLE	1
+
 #define USB_FORCE_FLIGHT_IDLE	1
 #define HAS_BEEP		1
-#define HAS_BEEP_CONFIG		0
+#define HAS_BEEP_CONFIG		1
 #define HAS_BATTERY_REPORT	1
 #define HAS_GPS			0
 #define HAS_SERIAL_1		0
@@ -39,7 +41,8 @@
 #define USE_INTERNAL_FLASH	0
 #define HAS_DBG			0
 #define PACKET_HAS_SLAVE	1
-#define HAS_RADIO_RATE		0	/* not enough space for this */
+#define HAS_RADIO_RATE		1
+#define HAS_TELEMETRY		1
 
 #define AO_LED_RED		2
 #define LEDS_AVAILABLE		AO_LED_RED
