@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Keith Packard <keithp@keithp.com>
+ * Copyright © 2011 Keth Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 static __pdata uint16_t ao_telemetry_interval;
 
 #if HAS_RADIO_RATE
-static __pdata uint16_t ao_telemetry_desired_interval;
+static __xdata uint16_t ao_telemetry_desired_interval;
 #endif
 
 #if HAS_RDF
@@ -511,7 +511,7 @@ ao_telemetry_set_interval(uint16_t interval)
 #if HAS_RADIO_RATE
 	/* Limit max telemetry rate based on available radio bandwidth.
 	 */
-	static const uint16_t min_interval[] = {
+	static __xdata const uint16_t min_interval[] = {
 		/* [AO_RADIO_RATE_38400] = */ AO_MS_TO_TICKS(100),
 		/* [AO_RADIO_RATE_9600] = */ AO_MS_TO_TICKS(500),
 		/* [AO_RADIO_RATE_2400] = */ AO_MS_TO_TICKS(1000)
