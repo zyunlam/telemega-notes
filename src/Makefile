@@ -98,13 +98,16 @@ uninstall:
 
 all-recursive: all-local
 
-all-local: altitude.h altitude-pa.h ao_kalman.h ao_whiten.h $(PDCLIB)
+all-local: altitude.h altitude-pa.h altitude-pa-small.h ao_kalman.h ao_whiten.h $(PDCLIB)
 
 altitude.h: make-altitude
 	nickle $< > $@
 
 altitude-pa.h: make-altitude-pa
 	nickle $< > $@
+
+altitude-pa-small.h: make-altitude-pa
+	nickle $< --sample 3 > $@
 
 ao_kalman.h: make-kalman kalman.5c kalman_filter.5c load_csv.5c matrix.5c
 	bash $< kalman > $@

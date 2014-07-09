@@ -185,105 +185,135 @@ line_t best_fit(real[] values, int first, int last) {
        return (line_t) { m = m, b = b };
 }
 
-real	min_Pa = 0;
-real	max_Pa = 120000;
+void print_table (int pa_sample_shift, int pa_part_shift)
+{
+	real	min_Pa = 0;
+	real	max_Pa = 120000;
 
-/* Target is an array of < 1000 entries */
-int pa_sample_shift = 2;
-int pa_part_shift = 6;
-int pa_part_mask = (1 << pa_part_shift) - 1;
+	int pa_part_mask = (1 << pa_part_shift) - 1;
 
-int num_part = ceil(max_Pa / (2 ** (pa_part_shift + pa_sample_shift)));
+	int num_part = ceil(max_Pa / (2 ** (pa_part_shift + pa_sample_shift)));
 
-int num_samples = num_part << pa_part_shift;
+	int num_samples = num_part << pa_part_shift;
 
-real sample_to_Pa(int sample) = sample << pa_sample_shift;
+	real sample_to_Pa(int sample) = sample << pa_sample_shift;
 
-real sample_to_altitude(int sample) = pressure_to_altitude(sample_to_Pa(sample));
+	real sample_to_altitude(int sample) = pressure_to_altitude(sample_to_Pa(sample));
 
-int part_to_sample(int part) = part << pa_part_shift;
+	int part_to_sample(int part) = part << pa_part_shift;
 
-int sample_to_part(int sample) = sample >> pa_part_shift;
+	int sample_to_part(int sample) = sample >> pa_part_shift;
 
-bool is_part(int sample) = (sample & pa_part_mask) == 0;
+	bool is_part(int sample) = (sample & pa_part_mask) == 0;
 
-real[num_samples] alt = { [n] = sample_to_altitude(n) };
+	real[num_samples] alt = { [n] = sample_to_altitude(n) };
 
-int seg_len = 1 << pa_part_shift;
+	int seg_len = 1 << pa_part_shift;
 
-line_t [num_part] fit = {
-	[n] = best_fit(alt, n * seg_len, n * seg_len + seg_len - 1)
-};
+	line_t [num_part] fit = {
+		[n] = best_fit(alt, n * seg_len, n * seg_len + seg_len - 1)
+	};
 
-real[num_samples/seg_len + 1]	alt_part;
-real[dim(alt_part)]		alt_error = {0...};
+	real[num_samples/seg_len + 1]	alt_part;
+	real[dim(alt_part)]		alt_error = {0...};
 
-alt_part[0] = fit[0].b;
-alt_part[dim(fit)] = fit[dim(fit)-1].m * dim(fit) * seg_len + fit[dim(fit)-1].b;
+	alt_part[0] = fit[0].b;
+	alt_part[dim(fit)] = fit[dim(fit)-1].m * dim(fit) * seg_len + fit[dim(fit)-1].b;
 
-for (int i = 0; i < dim(fit) - 1; i++) {
-	real	here, there;
-	here = fit[i].m * (i+1) * seg_len + fit[i].b;
-	there = fit[i+1].m * (i+1) * seg_len + fit[i+1].b;
-#	printf ("at %d mis-fit %8.2f\n", i, there - here);
-	alt_part[i+1] = (here + there) / 2;
-}
-
-real round(real x) = floor(x + 0.5);
-
-real sample_to_fit_altitude(int sample) {
-	int	sub = sample // seg_len;
-	int	off = sample % seg_len;
-	line_t	l = fit[sub];
-	real r_v;
-	real i_v;
-
-	r_v = sample * l.m + l.b;
-	i_v = (round(alt_part[sub]*10) * (seg_len - off) + round(alt_part[sub+1]*10) * off) / seg_len;
-	return i_v/10;
-}
-
-real max_error = 0;
-int max_error_sample = 0;
-real total_error = 0;
-
-for (int sample = 0; sample < num_samples; sample++) {
-	real	Pa = sample_to_Pa(sample);
-	real	meters = alt[sample];
-
-	real	meters_approx = sample_to_fit_altitude(sample);
-	real	error = abs(meters - meters_approx);
-
-	int	part = sample_to_part(sample);
-
-	if (error > alt_error[part])
-		alt_error[part] = error;
-
-	total_error += error;
-	if (error > max_error) {
-		max_error = error;
-		max_error_sample = sample;
+	for (int i = 0; i < dim(fit) - 1; i++) {
+		real	here, there;
+		here = fit[i].m * (i+1) * seg_len + fit[i].b;
+		there = fit[i+1].m * (i+1) * seg_len + fit[i+1].b;
+#		printf ("at %d mis-fit %8.2f\n", i, there - here);
+		alt_part[i+1] = (here + there) / 2;
 	}
-	if (false) {
-		printf ("	%8.1f %8.2f %8.2f %8.2f %s\n",
-			Pa,
-			meters,
-			meters_approx,
-			meters - meters_approx,
-			is_part(sample) ? "*" : "");
+
+	real round(real x) = floor(x + 0.5);
+
+	real sample_to_fit_altitude(int sample) {
+		int	sub = sample // seg_len;
+			int	off = sample % seg_len;
+		line_t	l = fit[sub];
+		real r_v;
+		real i_v;
+
+		r_v = sample * l.m + l.b;
+		i_v = (round(alt_part[sub]*10) * (seg_len - off) + round(alt_part[sub+1]*10) * off) / seg_len;
+		return i_v/10;
+	}
+
+	real max_error = 0;
+	int max_error_sample = 0;
+	real total_error = 0;
+
+	for (int sample = 0; sample < num_samples; sample++) {
+		real	Pa = sample_to_Pa(sample);
+		real	meters = alt[sample];
+
+		real	meters_approx = sample_to_fit_altitude(sample);
+		real	error = abs(meters - meters_approx);
+
+		int	part = sample_to_part(sample);
+
+		if (error > alt_error[part])
+			alt_error[part] = error;
+
+		total_error += error;
+		if (error > max_error) {
+			max_error = error;
+			max_error_sample = sample;
+		}
+		if (false) {
+			printf ("	%8.1f %8.2f %8.2f %8.2f %s\n",
+				Pa,
+				meters,
+				meters_approx,
+				meters - meters_approx,
+				is_part(sample) ? "*" : "");
+		}
+	}
+
+	printf ("/*max error %f at %7.3f kPa. Average error %f*/\n",
+		max_error, sample_to_Pa(max_error_sample) / 1000, total_error / num_samples);
+
+	printf ("#define NALT %d\n", dim(alt_part));
+	printf ("#define ALT_SHIFT %d\n", pa_part_shift + pa_sample_shift);
+	printf ("#ifndef AO_ALT_VALUE\n#define AO_ALT_VALUE(x) (alt_t) (x)\n#endif\n");
+
+	for (int part = 0; part < dim(alt_part); part++) {
+		real kPa = sample_to_Pa(part_to_sample(part)) / 1000;
+		printf ("AO_ALT_VALUE(%10.1f), /* %6.2f kPa error %6.2fm */\n",
+			round (alt_part[part]*10) / 10, kPa,
+			alt_error[part]);
 	}
 }
 
-printf ("/*max error %f at %7.3f kPa. Average error %f*/\n",
-	max_error, sample_to_Pa(max_error_sample) / 1000, total_error / num_samples);
+autoload ParseArgs;
 
-printf ("#define NALT %d\n", dim(alt_part));
-printf ("#define ALT_SHIFT %d\n", pa_part_shift + pa_sample_shift);
-printf ("#ifndef AO_ALT_VALUE\n#define AO_ALT_VALUE(x) (alt_t) (x)\n#endif\n");
+void main()
+{
+	/* Target is an array of < 1000 entries */
+	int pa_sample_shift = 2;
+	int pa_part_shift = 6;
 
-for (int part = 0; part < dim(alt_part); part++) {
-	real kPa = sample_to_Pa(part_to_sample(part)) / 1000;
-	printf ("AO_ALT_VALUE(%10.1f), /* %6.2f kPa error %6.2fm */\n",
-		round (alt_part[part]*10) / 10, kPa,
-		alt_error[part]);
+	ParseArgs::argdesc argd = {
+		.args = {
+			{ .var = { .arg_int = &pa_sample_shift },
+			  .abbr = 's',
+			  .name = "sample",
+			  .expr_name = "sample_shift",
+			  .desc = "sample shift value" },
+			{ .var = { .arg_int = &pa_part_shift },
+			  .abbr = 'p',
+			  .name = "part",
+			  .expr_name = "part_shift",
+			  .desc = "part shift value" },
+		}
+	};
+
+	ParseArgs::parseargs(&argd, &argv);
+
+	print_table(pa_sample_shift, pa_part_shift);
 }
+
+main();

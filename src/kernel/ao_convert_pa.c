@@ -24,7 +24,11 @@
 #endif
 
 static const alt_t altitude_table[] AO_CONST_ATTRIB = {
+#if AO_SMALL_ALTITUDE_TABLE
+#include "altitude-pa-small.h"
+#else
 #include "altitude-pa.h"
+#endif
 };
 
 #ifndef FETCH_ALT
