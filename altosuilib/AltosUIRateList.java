@@ -28,11 +28,7 @@ public class AltosUIRateList extends JComboBox<String> {
 	public void set_rate(int new_rate) {
 		int i;
 
-		if (new_rate < 0) {
-			setVisible(false);
-			return;
-		}
-
+		setVisible(new_rate >= 0);
 		setSelectedIndex(new_rate);
 	}
 

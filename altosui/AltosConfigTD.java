@@ -183,14 +183,12 @@ public class AltosConfigTD implements ActionListener {
 	}
 
 	synchronized int telemetry_rate() {
-		System.out.printf("telemetry_rate: %d\n", telemetry_rate.get());
 		return telemetry_rate.get();
 	}
 
 	synchronized void set_telemetry_rate(int new_telemetry_rate){
 		int	rate = telemetry_rate.get();
 
-		System.out.printf("set_telemetry_rate %d\n", new_telemetry_rate);
 		if (rate >= 0)
 			telemetry_rate.set(new_telemetry_rate);
 	}

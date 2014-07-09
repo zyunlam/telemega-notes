@@ -53,6 +53,7 @@ public class AltosUIFreqList extends JComboBox<AltosFrequency> {
 		AltosUIPreferences.add_common_frequency(frequency);
 		insertItemAt(frequency, i);
 		setMaximumRowCount(getItemCount());
+		setVisible(true);
 	}
 
 	public void set_product(String new_product) {

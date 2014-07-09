@@ -508,7 +508,7 @@ public class AltosConfigUI
 		c.insets = il;
 		c.ipady = 5;
 		rate_label = new JLabel("Telemetry baud rate:");
-		pane.add(radio_enable_label, c);
+		pane.add(rate_label, c);
 
 		c = new GridBagConstraints();
 		c.gridx = 4; c.gridy = row;
@@ -929,6 +929,10 @@ public class AltosConfigUI
 	public void set_main_deploy(int new_main_deploy) {
 		main_deploy_value.setSelectedItem(AltosConvert.height.say(new_main_deploy));
 		main_deploy_value.setEnabled(new_main_deploy >= 0);
+
+		main_deploy_value.setVisible(new_main_deploy >= 0);
+		main_deploy_label.setVisible(new_main_deploy >= 0);
+
 	}
 
 	public int main_deploy() {
@@ -976,6 +980,9 @@ public class AltosConfigUI
 	}
 
 	public void set_apogee_delay(int new_apogee_delay) {
+		apogee_delay_value.setVisible(new_apogee_delay >= 0);
+		apogee_delay_label.setVisible(new_apogee_delay >= 0);
+
 		apogee_delay_value.setSelectedItem(Integer.toString(new_apogee_delay));
 		apogee_delay_value.setEnabled(new_apogee_delay >= 0);
 	}
@@ -998,6 +1005,9 @@ public class AltosConfigUI
 	public void set_apogee_lockout(int new_apogee_lockout) {
 		apogee_lockout_value.setSelectedItem(Integer.toString(new_apogee_lockout));
 		apogee_lockout_value.setEnabled(new_apogee_lockout >= 0);
+
+		apogee_lockout_value.setVisible(new_apogee_lockout >= 0);
+		apogee_lockout_label.setVisible(new_apogee_lockout >= 0);
 	}
 
 	public int apogee_lockout() throws AltosConfigDataException {
@@ -1005,6 +1015,7 @@ public class AltosConfigUI
 	}
 
 	public void set_radio_frequency(double new_radio_frequency) {
+		radio_frequency_label.setVisible(new_radio_frequency >= 0);
 		radio_frequency_value.set_frequency(new_radio_frequency);
 	}
 
@@ -1014,6 +1025,8 @@ public class AltosConfigUI
 
 	public void set_radio_calibration(int new_radio_calibration) {
 		radio_calibration_value.setVisible(new_radio_calibration >= 0);
+		radio_calibration_label.setVisible(new_radio_calibration >= 0);
+
 		if (new_radio_calibration < 0)
 			radio_calibration_value.setText("Disabled");
 		else
@@ -1025,12 +1038,14 @@ public class AltosConfigUI
 	}
 
 	public void set_radio_enable(int new_radio_enable) {
+		radio_enable_label.setVisible(new_radio_enable >= 0);
+		radio_enable_value.setVisible(new_radio_enable >= 0);
+
 		if (new_radio_enable >= 0) {
 			radio_enable_value.setSelected(new_radio_enable > 0);
 			radio_enable_value.setEnabled(true);
 		} else {
 			radio_enable_value.setSelected(true);
-			radio_enable_value.setVisible(radio_frequency() > 0);
 			radio_enable_value.setEnabled(false);
 		}
 		set_radio_enable_tool_tip();
@@ -1044,6 +1059,8 @@ public class AltosConfigUI
 	}
 
 	public void set_telemetry_rate(int new_rate) {
+		rate_label.setVisible(new_rate >= 0);
+
 		rate_value.set_rate(new_rate);
 	}
 
@@ -1053,6 +1070,8 @@ public class AltosConfigUI
 
 	public void set_callsign(String new_callsign) {
 		callsign_value.setVisible(new_callsign != null);
+		callsign_label.setVisible(new_callsign != null);
+
 		callsign_value.setText(new_callsign);
 	}
 
@@ -1074,6 +1093,9 @@ public class AltosConfigUI
 	}
 
 	public void set_flight_log_max(int new_flight_log_max) {
+		flight_log_max_value.setVisible(new_flight_log_max >= 0);
+		flight_log_max_label.setVisible(new_flight_log_max >= 0);
+
 		flight_log_max_value.setSelectedItem(flight_log_max_label(new_flight_log_max));
 		flight_log_max = new_flight_log_max;
 		set_flight_log_max_tool_tip();
@@ -1100,6 +1122,9 @@ public class AltosConfigUI
 	}
 
 	public void set_ignite_mode(int new_ignite_mode) {
+		ignite_mode_value.setVisible(new_ignite_mode >= 0);
+		ignite_mode_label.setVisible(new_ignite_mode >= 0);
+
 		if (new_ignite_mode >= ignite_mode_values.length)
 			new_ignite_mode = 0;
 		if (new_ignite_mode < 0) {
@@ -1121,14 +1146,13 @@ public class AltosConfigUI
 
 
 	public void set_pad_orientation(int new_pad_orientation) {
+		pad_orientation_value.setVisible(new_pad_orientation >= 0);
+		pad_orientation_label.setVisible(new_pad_orientation >= 0);
+
 		if (new_pad_orientation >= pad_orientation_values.length)
 			new_pad_orientation = 0;
-		if (new_pad_orientation < 0) {
-			pad_orientation_value.setVisible(false);
+		if (new_pad_orientation < 0)
 			new_pad_orientation = 0;
-		} else {
-			pad_orientation_value.setVisible(true);
-		}
 		pad_orientation_value.setSelectedIndex(new_pad_orientation);
 		set_pad_orientation_tool_tip();
 	}
@@ -1141,6 +1165,9 @@ public class AltosConfigUI
 	}
 
 	public void set_beep(int new_beep) {
+		beep_value.setVisible(new_beep >= 0);
+		beep_label.setVisible(new_beep >= 0);
+
 		int new_freq = (int) Math.floor (AltosConvert.beep_value_to_freq(new_beep) + 0.5);
 		for (int i = 0; i < beep_values.length; i++)
 			if (new_beep == AltosConvert.beep_freq_to_value(Integer.parseInt(beep_values[i]))) {
@@ -1192,13 +1219,12 @@ public class AltosConfigUI
 	}
 
 	public void set_tracker_motion(int tracker_motion) {
+		tracker_motion_label.setVisible(tracker_motion >= 0);
+		tracker_motion_value.setVisible(tracker_motion >= 0);
+
 		if (tracker_motion < 0) {
-			tracker_motion_label.setVisible(false);
-			tracker_motion_value.setVisible(false);
 			tracker_motion_value.setEnabled(false);
 		} else {
-			tracker_motion_label.setVisible(true);
-			tracker_motion_value.setVisible(true);
 			tracker_motion_value.setEnabled(true);
 			tracker_motion_value.setSelectedItem(AltosConvert.height.say(tracker_motion));
 		}
@@ -1209,13 +1235,12 @@ public class AltosConfigUI
 	}
 
 	public void set_tracker_interval(int tracker_interval) {
+		tracker_interval_label.setVisible(tracker_interval >= 0);
+		tracker_interval_value.setVisible(tracker_interval >= 0);
+
 		if (tracker_interval< 0) {
-			tracker_interval_label.setVisible(false);
-			tracker_interval_value.setVisible(false);
 			tracker_interval_value.setEnabled(false);
 		} else {
-			tracker_interval_label.setVisible(true);
-			tracker_interval_value.setVisible(true);
 			tracker_interval_value.setEnabled(true);
 			tracker_interval_value.setSelectedItem(String.format("%d", tracker_interval));
 		}
@@ -1252,6 +1277,9 @@ public class AltosConfigUI
 	}
 
 	public void set_aprs_interval(int new_aprs_interval) {
+		aprs_interval_value.setVisible(new_aprs_interval >= 0);
+		aprs_interval_label.setVisible(new_aprs_interval >= 0);
+
 		String	s;
 
 		if (new_aprs_interval <= 0)
@@ -1259,7 +1287,6 @@ public class AltosConfigUI
 		else
 			s = Integer.toString(new_aprs_interval);
 		aprs_interval_value.setSelectedItem(s);
-		aprs_interval_value.setVisible(new_aprs_interval >= 0);
 		set_aprs_interval_tool_tip();
 	}
 
@@ -1272,8 +1299,10 @@ public class AltosConfigUI
 	}
 
 	public void set_aprs_ssid(int new_aprs_ssid) {
-		aprs_ssid_value.setSelectedItem(Math.max(0,new_aprs_ssid));
 		aprs_ssid_value.setVisible(new_aprs_ssid >= 0);
+		aprs_ssid_label.setVisible(new_aprs_ssid >= 0);
+
+		aprs_ssid_value.setSelectedItem(Math.max(0,new_aprs_ssid));
 		set_aprs_ssid_tool_tip();
 	}
 
