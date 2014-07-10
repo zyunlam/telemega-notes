@@ -198,24 +198,28 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 				if (state.gps_height != AltosLib.MISSING)
 					info_add_row(1, "GPS height", "%8.1f", state.gps_height);
 
-				/* The SkyTraq GPS doesn't report these values */
-				/*
-				  if (false) {
-				  info_add_row(1, "GPS ground speed", "%8.1f m/s %3d°",
-				  state.gps.ground_speed,
-				  state.gps.course);
-				  info_add_row(1, "GPS climb rate", "%8.1f m/s",
-				  state.gps.climb_rate);
-				  info_add_row(1, "GPS error", "%6d m(h)%3d m(v)",
-				  state.gps.h_error, state.gps.v_error);
-				  }
-				*/
+				if (state.gps.ground_speed != AltosLib.MISSING && state.gps.course != AltosLib.MISSING)
+					info_add_row(1, "GPS ground speed", "%6.1f m/s %3d°",
+						     state.gps.ground_speed,
+						     state.gps.course);
+				if (state.gps.climb_rate != AltosLib.MISSING)
+					info_add_row(1, "GPS climb rate", "%6.1f m/s",
+						     state.gps.climb_rate);
 
-				info_add_row(1, "GPS hdop", "%8.1f", state.gps.hdop);
+				if (state.gps.h_error != AltosLib.MISSING && state.gps.v_error != AltosLib.MISSING)
+					info_add_row(1, "GPS error", "%6d m(h)%3d m(v)",
+						     state.gps.h_error, state.gps.v_error);
+				if (state.gps.pdop != AltosLib.MISSING &&
+				    state.gps.hdop != AltosLib.MISSING &&
+				    state.gps.vdop != AltosLib.MISSING)
+					info_add_row(1, "GPS dop", "%3.1fp/%3.1fh/%3.1fv",
+						     state.gps.pdop,
+						     state.gps.hdop,
+						     state.gps.vdop);
 
 				if (state.npad > 0) {
 					if (state.from_pad != null) {
-						info_add_row(1, "Distance from pad", "%6d m",
+						info_add_row(1, "Ground pad dist", "%6d m",
 							     (int) (state.from_pad.distance + 0.5));
 						info_add_row(1, "Direction from pad", "%6d°",
 							     (int) (state.from_pad.bearing + 0.5));
@@ -234,12 +238,12 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 					info_add_row(1, "Pad GPS alt", "%6.0f m", state.pad_alt);
 				}
 				if (state.gps.year != AltosLib.MISSING)
-					info_add_row(1, "GPS date", "%04d-%02d-%02d",
+					info_add_row(2, "GPS date", "%04d-%02d-%02d",
 						     state.gps.year,
 						     state.gps.month,
 						     state.gps.day);
 				if (state.gps.hour != AltosLib.MISSING)
-					info_add_row(1, "GPS time", "  %02d:%02d:%02d",
+					info_add_row(2, "GPS time", "  %02d:%02d:%02d",
 						     state.gps.hour,
 						     state.gps.minute,
 						     state.gps.second);
