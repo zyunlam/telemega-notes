@@ -59,6 +59,7 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 	public int year() { return data8(4); }
 	public int month() { return data8(5); }
 	public int day() { return data8(6); }
+	public int pdop() { return data8(7); }
 
 	/* AO_LOG_GPS_SAT elements */
 	public int nsat() { return data8(0); }
@@ -136,6 +137,7 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 			gps.year = 2000 + year();
 			gps.month = month();
 			gps.day = day();
+			gps.pdop = pdop() / 10.0;
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
 			gps = state.make_temp_gps(true);

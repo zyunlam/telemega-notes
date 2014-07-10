@@ -186,6 +186,7 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 	 *	g_v		GPS vertical speed (integer, cm/sec)
 	 *	g_s		GPS horizontal speed (integer, cm/sec)
 	 *	g_c		GPS course (integer, 0-359)
+	 *	g_pd		GPS pdop (integer * 10)
 	 *	g_hd		GPS hdop (integer * 10)
 	 *	g_vd		GPS vdop (integer * 10)
 	 *	g_he		GPS h error (integer)
@@ -209,6 +210,7 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 	final static String AO_TELEM_GPS_VERTICAL_SPEED		= "g_v";
 	final static String AO_TELEM_GPS_HORIZONTAL_SPEED	= "g_g";
 	final static String AO_TELEM_GPS_COURSE			= "g_c";
+	final static String AO_TELEM_GPS_PDOP			= "g_pd";
 	final static String AO_TELEM_GPS_HDOP			= "g_hd";
 	final static String AO_TELEM_GPS_VDOP			= "g_vd";
 	final static String AO_TELEM_GPS_HERROR			= "g_he";

@@ -187,8 +187,21 @@ public class AltosEepromMega extends AltosEeprom {
 			gps.ground_speed = ground_speed() * 1.0e-2;
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
-			gps.hdop = hdop();
-			gps.vdop = vdop();
+			if (state.compare_version("1.4.9") >= 0) {
+				gps.pdop = pdop() / 10.0;
+				gps.hdop = hdop() / 10.0;
+				gps.vdop = vdop() / 10.0;
+			} else {
+				gps.pdop = pdop() / 100.0;
+				if (gps.pdop < 0.8)
+					gps.pdop += 2.56;
+				gps.hdop = hdop() / 100.0;
+				if (gps.hdop < 0.8)
+					gps.hdop += 2.56;
+				gps.vdop = vdop() / 100.0;
+				if (gps.vdop < 0.8)
+					gps.vdop += 2.56;
+			}
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
 			state.set_tick(tick);

@@ -80,8 +80,9 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 			gps.ground_speed = ground_speed * 1.0e-2;
 			gps.course = course * 2;
 			gps.climb_rate = climb_rate * 1.0e-2;
-			gps.hdop = hdop;
-			gps.vdop = vdop;
+			gps.pdop = pdop / 10.0;
+			gps.hdop = hdop / 10.0;
+			gps.vdop = vdop / 10.0;
 		}
 		state.set_temp_gps();
 	}

@@ -1024,6 +1024,12 @@ public class AltosState implements Cloneable {
 		firmware_version = version;
 	}
 
+	public int compare_version(String other_version) {
+		if (firmware_version == null)
+			return AltosLib.MISSING;
+		return AltosLib.compare_version(firmware_version, other_version);
+	}
+
 	private void re_init() {
 		int bt = boost_tick;
 		int rs = receiver_serial;
