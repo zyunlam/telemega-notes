@@ -175,7 +175,7 @@ ao_gps_angle(void)
 			ao_gps_static.latitude / 1e7,
 			ao_gps_static.longitude / 1e7,
 			&dist, &bearing);
-	height = ao_gps_static.altitude - ao_gps_prev.altitude;
+	height = AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_static) - AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_prev);
 
 	angle = atan2(dist, height);
 	return angle * 180/M_PI;
@@ -756,7 +756,10 @@ ao_sleep(void *wchan)
 					ao_gps_static.tick = tick;
 					ao_gps_static.latitude = int32(bytes, 0);
 					ao_gps_static.longitude = int32(bytes, 4);
-					ao_gps_static.altitude = int32(bytes, 8);
+					{
+						int32_t	altitude = int32(bytes, 8);
+						AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_static, altitude);
+					}
 					ao_gps_static.flags = bytes[13];
 					if (!ao_gps_count)
 						ao_gps_first = ao_gps_static;

@@ -53,6 +53,9 @@ struct ao_gps_orig {
 	uint16_t		v_error;	/* m */
 };
 
+#define AO_TELEMETRY_LOCATION_ALTITUDE(l) 	((l)->altitude)
+#define AO_TELEMETRY_LOCATION_SET_ALTITUDE(l,a) ((l)->altitude = (a))
+
 #define SIRF_SAT_STATE_ACQUIRED			(1 << 0)
 #define SIRF_SAT_STATE_CARRIER_PHASE_VALID	(1 << 1)
 #define SIRF_SAT_BIT_SYNC_COMPLETE		(1 << 2)
@@ -433,7 +436,7 @@ ao_dump_state(void *wchan)
 
 	if (wchan != &ao_gps_new)
 		return;
-	
+
 	if (ao_gps_new & AO_GPS_NEW_DATA) {
 		ao_gps_print(&ao_gps_data);
 		putchar('\n');

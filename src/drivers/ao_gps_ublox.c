@@ -728,7 +728,7 @@ ao_gps(void) __reentrant
 				if (nav_timeutc.valid & (1 << NAV_TIMEUTC_VALID_UTC))
 					ao_gps_data.flags |= AO_GPS_DATE_VALID;
 
-				ao_gps_data.altitude = nav_posllh.alt_msl / 1000;
+				AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_data, nav_posllh.alt_msl / 1000);
 				ao_gps_data.latitude = nav_posllh.lat;
 				ao_gps_data.longitude = nav_posllh.lon;
 

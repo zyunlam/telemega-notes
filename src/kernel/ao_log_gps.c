@@ -75,7 +75,8 @@ ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data)
 	log.type = AO_LOG_GPS_TIME;
 	log.u.gps.latitude = gps_data->latitude;
 	log.u.gps.longitude = gps_data->longitude;
-	log.u.gps.altitude = gps_data->altitude;
+	log.u.gps.altitude_low = gps_data->altitude_low;
+	log.u.gps.altitude_high = gps_data->altitude_high;
 
 	log.u.gps.hour = gps_data->hour;
 	log.u.gps.minute = gps_data->minute;

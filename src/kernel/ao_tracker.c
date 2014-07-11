@@ -36,9 +36,9 @@ ao_usb_connected(void)
 #endif
 
 struct gps_position {
-	int32_t	latitude;
-	int32_t	longitude;
-	int16_t	altitude;
+	int32_t		latitude;
+	int32_t		longitude;
+	gps_alt_t	altitude;
 };
 
 #define GPS_RING	16
@@ -122,12 +122,13 @@ ao_tracker(void)
 			{
 				uint8_t	ring;
 				uint8_t	moving = 0;
+				gps_alt_t altitude = AO_TELEMETRY_LOCATION_ALTITUDE(&gps_data);
 
 				for (ring = ao_gps_ring_next(gps_head); ring != gps_head; ring = ao_gps_ring_next(ring)) {
 					ground_distance = ao_distance(gps_data.latitude, gps_data.longitude,
 								      gps_position[ring].latitude,
 								      gps_position[ring].longitude);
-					height = gps_position[ring].altitude - gps_data.altitude;
+					height = gps_position[ring].altitude - altitude;
 					if (height < 0)
 						height = -height;
 
@@ -153,7 +154,7 @@ ao_tracker(void)
 					ao_log_gps_data(gps_tick, &gps_data);
 					gps_position[gps_head].latitude = gps_data.latitude;
 					gps_position[gps_head].longitude = gps_data.longitude;
-					gps_position[gps_head].altitude = gps_data.altitude;
+					gps_position[gps_head].altitude = altitude;
 					gps_head = ao_gps_ring_next(gps_head);
 					ao_mutex_put(&tracker_mutex);
 				}
@@ -203,7 +204,7 @@ ao_tracker_set_telem(void)
 	printf ("log_started: %d\n", log_started);
 	printf ("latitude: %ld\n", (long) gps_data.latitude);
 	printf ("longitude: %ld\n", (long) gps_data.longitude);
-	printf ("altitude: %d\n", gps_data.altitude);
+	printf ("altitude: %ld\n", AO_TELEMETRY_LOCATION_ALTITUDE(&gps_data));
 	printf ("log_running: %d\n", ao_log_running);
 	printf ("log_start_pos: %ld\n", (long) ao_log_start_pos);
 	printf ("log_cur_pos: %ld\n", (long) ao_log_current_pos);

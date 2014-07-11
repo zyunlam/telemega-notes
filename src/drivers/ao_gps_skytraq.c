@@ -287,7 +287,8 @@ ao_nmea_gga(void)
 	ao_gps_next.hdop = i;
 	ao_gps_skip_field();
 
-	ao_gps_next.altitude = ao_gps_decimal(0xff);
+	AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_next, ao_gps_decimal(0xff));
+
 	ao_gps_skip_field();	/* skip any fractional portion */
 
 	ao_nmea_finish();
