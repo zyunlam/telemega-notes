@@ -151,6 +151,12 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 		return "Landed";
 	}
 
+	public void show(AltosState state, AltosListenerState listener_state) {
+		super.show(state, listener_state);
+		if (reader.backing_file() != null)
+			graph.setEnabled(true);
+	}
+
 	public AltosLanded(AltosFlightReader in_reader) {
 		reader = in_reader;
 
