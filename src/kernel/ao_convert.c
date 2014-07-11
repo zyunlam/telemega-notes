@@ -19,14 +19,16 @@
 #include "ao.h"
 #endif
 
-static const int16_t altitude_table[] = {
+#include <ao_sample.h>
+
+static const ao_v_t altitude_table[] = {
 #include "altitude.h"
 };
 
 #define ALT_FRAC_SCALE	(1 << ALT_FRAC_BITS)
 #define ALT_FRAC_MASK	(ALT_FRAC_SCALE - 1)
 
-int16_t
+ao_v_t
 ao_pres_to_altitude(int16_t pres) __reentrant
 {
 	uint8_t	o;
@@ -43,9 +45,9 @@ ao_pres_to_altitude(int16_t pres) __reentrant
 
 #if AO_NEED_ALTITUDE_TO_PRES
 int16_t
-ao_altitude_to_pres(int16_t alt) __reentrant
+ao_altitude_to_pres(ao_v_t alt) __reentrant
 {
-	int16_t span, sub_span;
+	ao_v_t span, sub_span;
 	uint8_t	l, h, m;
 	int32_t pres;
 

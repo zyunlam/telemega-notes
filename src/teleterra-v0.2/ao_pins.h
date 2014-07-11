@@ -72,6 +72,8 @@
 
 	#define BATTERY_PIN		5
 	#define HAS_TELEMETRY		0
+
+	#define AO_VALUE_32		0
 #endif
 
 #if DBG_ON_P1

@@ -457,7 +457,7 @@ void main() {
 					name = sprintf("%s_K%d_%d", prefix, i, time_inc);
 				else
 					name = sprintf("%s_K%d%d_%d", prefix, i, j, time_inc);
-				printf ("#define %s to_fix32(%12.10f)\n", name, k[i,j]);
+				printf ("#define %s to_fix_k(%12.10f)\n", name, k[i,j]);
 			}
 		printf ("\n");
 		exit(0);

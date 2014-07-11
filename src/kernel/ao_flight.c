@@ -60,10 +60,10 @@ __xdata uint8_t			ao_sensor_errors;
  * resting
  */
 static __data uint16_t		ao_interval_end;
-static __data int16_t		ao_interval_min_height;
-static __data int16_t		ao_interval_max_height;
+static __data ao_v_t		ao_interval_min_height;
+static __data ao_v_t		ao_interval_max_height;
 #if HAS_ACCEL
-static __data int16_t		ao_coast_avg_accel;
+static __data ao_v_t		ao_coast_avg_accel;
 #endif
 
 __pdata uint8_t			ao_flight_force_idle;
@@ -398,14 +398,14 @@ ao_flight(void)
 }
 
 #if HAS_FLIGHT_DEBUG
-static inline int int_part(int16_t i)	{ return i >> 4; }
-static inline int frac_part(int16_t i)	{ return ((i & 0xf) * 100 + 8) / 16; }
+static inline int int_part(ao_v_t i)	{ return i >> 4; }
+static inline int frac_part(ao_v_t i)	{ return ((i & 0xf) * 100 + 8) / 16; }
 
 static void
 ao_flight_dump(void)
 {
 #if HAS_ACCEL
-	int16_t	accel;
+	ao_v_t	accel;
 
 	accel = ((ao_config.accel_plus_g - ao_sample_accel) * ao_accel_scale) >> 16;
 #endif

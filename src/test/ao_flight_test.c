@@ -34,9 +34,11 @@
 #define ao_data_ring_next(n)	(((n) + 1) & (AO_DATA_RING - 1))
 #define ao_data_ring_prev(n)	(((n) - 1) & (AO_DATA_RING - 1))
 
+#if 0
 #define AO_M_TO_HEIGHT(m)	((int16_t) (m))
 #define AO_MS_TO_SPEED(ms)	((int16_t) ((ms) * 16))
 #define AO_MSS_TO_ACCEL(mss)	((int16_t) ((mss) * 16))
+#endif
 
 #define AO_GPS_NEW_DATA		1
 #define AO_GPS_NEW_TRACKING	2
@@ -93,6 +95,7 @@ struct ao_adc {
 #include <ao_data.h>
 #include <ao_log.h>
 #include <ao_telemetry.h>
+#include <ao_sample.h>
 
 #if TELEMEGA
 int ao_gps_count;
@@ -234,7 +237,7 @@ double	main_time;
 
 int	tick_offset;
 
-static int32_t	ao_k_height;
+static ao_k_t	ao_k_height;
 
 int16_t
 ao_time(void)

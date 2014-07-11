@@ -22,6 +22,7 @@
 
 #define HAS_FLIGHT		1
 #define HAS_USB			1
+#define AO_VALUE_32		0
 
 #define HAS_USB_PULLUP	1
 #define AO_USB_PULLUP_PORT	P1

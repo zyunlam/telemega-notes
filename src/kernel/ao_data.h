@@ -117,9 +117,7 @@ extern volatile __data uint8_t		ao_data_count;
 
 typedef int32_t	pres_t;
 
-#ifndef AO_ALT_TYPE
 #define AO_ALT_TYPE	int32_t
-#endif
 
 typedef AO_ALT_TYPE	alt_t;
 
@@ -144,10 +142,6 @@ typedef int16_t alt_t;
 #define pres_to_altitude(p)	ao_pres_to_altitude(p)
 #define ao_data_pres_cook(p)
 
-#endif
-
-#if !HAS_BARO
-typedef int16_t alt_t;
 #endif
 
 /*

@@ -25,7 +25,6 @@ INC = \
 CORE_SRC = \
 	ao_cmd.c \
 	ao_config.c \
-	ao_convert.c \
 	ao_mutex.c \
 	ao_panic.c \
 	ao_stdio.c \

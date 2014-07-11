@@ -20,6 +20,7 @@
 
 #define HAS_RADIO		1
 #define DISABLE_LOG_SPACE	1
+#define AO_VALUE_32		0
 #define HAS_WIDE_GPS		0
 
 #if defined(TELEMETRUM_V_1_0)
