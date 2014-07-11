@@ -41,8 +41,7 @@ cjnitest64_LDADD=libaltos64.la
 
 endif
 
-
-LIBS=-lbluetooth
+LIBS=-ldl
 
 HFILES=libaltos.h
 

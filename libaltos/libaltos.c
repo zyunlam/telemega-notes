@@ -643,6 +643,49 @@ altos_list_finish(struct altos_list *usbdevs)
 	free(usbdevs);
 }
 
+#include <dlfcn.h>
+
+static void *libbt;
+static int bt_initialized;
+
+static int init_bt(void) {
+	if (!bt_initialized) {
+		bt_initialized = 1;
+		libbt = dlopen("libbluetooth.so.3", RTLD_LAZY);
+		if (!libbt)
+			printf("failed to find bluetooth library\n");
+	}
+	return libbt != NULL;
+}
+
+#define join(a,b)	a ## b
+#define bt_func(name, ret, fail, formals, actuals)			\
+	static ret join(altos_, name) formals {				\
+				      static ret (*name) formals;	\
+				      if (!init_bt()) return fail;	\
+				      name = dlsym(libbt, #name);	\
+				      if (!name) return fail;		\
+				      return name actuals;		\
+				      }
+
+bt_func(ba2str, int, -1, (const bdaddr_t *ba, char *str), (ba, str))
+#define ba2str altos_ba2str
+
+bt_func(str2ba, int, -1, (const char *str, bdaddr_t *ba), (str, ba))
+#define str2ba altos_str2ba
+
+bt_func(hci_read_remote_name, int, -1, (int sock, const bdaddr_t *ba, int len, char *name, int timeout), (sock, ba, len, name, timeout))
+#define hci_read_remote altos_hci_read_remote
+
+bt_func(hci_open_dev, int, -1, (int dev_id), (dev_id))
+#define hci_open_dev altos_hci_open_dev
+
+bt_func(hci_get_route, int, -1, (bdaddr_t *bdaddr), (bdaddr))
+#define hci_get_route altos_hci_get_route
+
+bt_func(hci_inquiry, int, -1, (int adapter_id, int len, int max_rsp, const uint8_t *lap, inquiry_info **devs, long flags), (adapter_id, len, max_rsp, lap, devs, flags))
+#define hci_inquiry altos_hci_inquiry
+
 struct altos_bt_list {
 	inquiry_info	*ii;
 	int		sock;
@@ -706,7 +749,8 @@ altos_bt_list_next(struct altos_bt_list *bt_list,
 		return 0;
 
 	ii = &bt_list->ii[bt_list->rsp];
-	ba2str(&ii->bdaddr, device->addr);
+	if (ba2str(&ii->bdaddr, device->addr) < 0)
+		return 0;
 	memset(&device->name, '\0', sizeof (device->name));
 	if (hci_read_remote_name(bt_list->sock, &ii->bdaddr,
 				 sizeof (device->name),
@@ -742,11 +786,17 @@ altos_bt_open(struct altos_bt_device *device)
 	struct altos_file *file;
 
 	file = calloc(1, sizeof (struct altos_file));
-	if (!file)
+	if (!file) {
+		errno = ENOMEM;
+		altos_set_last_posix_error();
 		goto no_file;
+	}
 	addr.rc_family = AF_BLUETOOTH;
 	addr.rc_channel = 1;
-	str2ba(device->addr, &addr.rc_bdaddr);
+	if (str2ba(device->addr, &addr.rc_bdaddr) < 0) {
+		altos_set_last_posix_error();
+		goto no_sock;
+	}
 
 	for (i = 0; i < 5; i++) {
 		file->fd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
