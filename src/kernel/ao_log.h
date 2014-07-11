@@ -324,7 +324,7 @@ struct ao_log_metrum {
 			uint8_t		year;		/* 8 */
 			uint8_t		month;		/* 9 */
 			uint8_t		day;		/* 10 */
-			uint8_t		pad;		/* 11 */
+			uint8_t		pdop;		/* 11 */
 		} gps_time;	/* 12 */
 		/* AO_LOG_GPS_SAT (up to three packets) */
 		struct {
