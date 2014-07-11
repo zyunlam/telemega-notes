@@ -675,7 +675,7 @@ bt_func(str2ba, int, -1, (const char *str, bdaddr_t *ba), (str, ba))
 #define str2ba altos_str2ba
 
 bt_func(hci_read_remote_name, int, -1, (int sock, const bdaddr_t *ba, int len, char *name, int timeout), (sock, ba, len, name, timeout))
-#define hci_read_remote altos_hci_read_remote
+#define hci_read_remote_name altos_hci_read_remote_name
 
 bt_func(hci_open_dev, int, -1, (int dev_id), (dev_id))
 #define hci_open_dev altos_hci_open_dev
