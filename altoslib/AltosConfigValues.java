@@ -25,6 +25,8 @@ public interface AltosConfigValues {
 
 	public abstract void set_serial(int serial);
 
+	public abstract void set_altitude_32(int altitude_32);
+
 	public abstract void set_main_deploy(int new_main_deploy);
 
 	public abstract int main_deploy() throws AltosConfigDataException;

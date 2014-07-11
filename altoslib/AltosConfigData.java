@@ -31,6 +31,7 @@ public class AltosConfigData implements Iterable<String> {
 	public int	log_format;
 	public int	log_space;
 	public String	version;
+	public int	altitude_32;
 
 	/* Strings returned */
 	public LinkedList<String>	lines;
@@ -274,6 +275,7 @@ public class AltosConfigData implements Iterable<String> {
 		try { flight = get_int(line, "current-flight"); } catch (Exception e) {}
 		try { log_format = get_int(line, "log-format"); } catch (Exception e) {}
 		try { log_space = get_int(line, "log-space"); } catch (Exception e) {}
+		try { altitude_32 = get_int(line, "altitude-32"); } catch (Exception e) {}
 		try { version = get_string(line, "software-version"); } catch (Exception e) {}
 
 		/* Version also contains MS5607 info, which we ignore here */
@@ -484,6 +486,7 @@ public class AltosConfigData implements Iterable<String> {
 		dest.set_serial(serial);
 		dest.set_product(product);
 		dest.set_version(version);
+		dest.set_altitude_32(altitude_32);
 		dest.set_main_deploy(main_deploy);
 		dest.set_apogee_delay(apogee_delay);
 		dest.set_apogee_lockout(apogee_lockout);

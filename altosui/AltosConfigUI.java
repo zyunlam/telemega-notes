@@ -926,6 +926,9 @@ public class AltosConfigUI
 		serial_value.setText(String.format("%d", serial));
 	}
 
+	public void set_altitude_32(int altitude_32) {
+	}
+
 	public void set_main_deploy(int new_main_deploy) {
 		main_deploy_value.setSelectedItem(AltosConvert.height.say(new_main_deploy));
 		main_deploy_value.setEnabled(new_main_deploy >= 0);

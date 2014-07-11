@@ -31,7 +31,7 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 
 	int	acceleration;
 	int	speed;
-	int	height;
+	int	height_16;
 
 	public AltosTelemetryMegaData(int[] bytes) {
 		super(bytes);
@@ -55,7 +55,8 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 
 		acceleration = int16(26);
 		speed = int16(28);
-		height = int16(30);
+
+		height_16 = int16(30);
 	}
 
 	public void update_state(AltosState state) {
@@ -79,7 +80,13 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		state.set_ground_pressure(ground_pres);
 		state.set_accel_g(accel_plus_g, accel_minus_g);
 
-		state.set_kalman(height, speed/16.0, acceleration / 16.0);
+		/* Fill in the high bits of height from recent GPS
+		 * data if available, otherwise guess using the
+		 * previous kalman height
+		 */
+
+		state.set_kalman(extend_height(state, height_16),
+				 speed/16.0, acceleration / 16.0);
 	}
 }
 
