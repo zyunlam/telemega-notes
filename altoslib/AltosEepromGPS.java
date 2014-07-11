@@ -37,7 +37,7 @@ public class AltosEepromGPS extends AltosEeprom {
 	/* AO_LOG_GPS_TIME elements */
 	public int latitude() { return data32(0); }
 	public int longitude() { return data32(4); }
-	public int altitude() { return data16(8); }
+	public int altitude_low() { return data16(8); }
 	public int hour() { return data8(10); }
 	public int minute() { return data8(11); }
 	public int second() { return data8(12); }
@@ -52,6 +52,7 @@ public class AltosEepromGPS extends AltosEeprom {
 	public int hdop() { return data8(23); }
 	public int vdop() { return data8(24); }
 	public int mode() { return data8(25); }
+	public int altitude_high() { return data16(26); }
 
 	public boolean has_seconds() { return cmd == AltosLib.AO_LOG_GPS_TIME; }
 
@@ -99,7 +100,10 @@ public class AltosEepromGPS extends AltosEeprom {
 			gps = state.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
-			gps.alt = altitude();
+			if (state.altitude_32())
+				gps.alt = (altitude_low() & 0xffff) | (altitude_high() << 16);
+			else
+				gps.alt = altitude_low();
 
 			gps.hour = hour();
 			gps.minute = minute();

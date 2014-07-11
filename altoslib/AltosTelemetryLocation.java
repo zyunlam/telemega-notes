@@ -37,11 +37,12 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 	int	climb_rate;
 	int	course;
 
+	public static final int	AO_GPS_MODE_ALTITUDE_24 = (1 << 0);	/* Reports 24-bits of altitude */
+
 	public AltosTelemetryLocation(int[] bytes) {
 		super(bytes);
 
 		flags          = uint8(5);
-		altitude       = int16(6);
 		latitude       = uint32(8);
 		longitude      = uint32(12);
 		year	       = uint8(16);
@@ -57,6 +58,11 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 		ground_speed   = uint16(26);
 		climb_rate     = int16(28);
 		course	       = uint8(30);
+
+		if ((mode & AO_GPS_MODE_ALTITUDE_24) != 0) {
+			altitude = (int8(31) << 16) | uint16(6);
+		} else
+			altitude = int16(6);
 	}
 
 	public void update_state(AltosState state) {
