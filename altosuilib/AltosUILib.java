@@ -80,6 +80,7 @@ public class AltosUILib extends AltosLib {
 
 	static public boolean initialized = false;
 	static public boolean loaded_library = false;
+	static public boolean has_bluetooth = false;
 
 	static final String[] library_names = { "altos", "altos32", "altos64" };
 
@@ -96,6 +97,13 @@ public class AltosUILib extends AltosLib {
 					loaded_library = false;
 				}
 			}
+
+			String OS = System.getProperty("os.name");
+
+			if (OS.startsWith("Linux")) {
+				has_bluetooth = true;
+			}
+
 			initialized = true;
 		}
 		return loaded_library;
