@@ -740,11 +740,11 @@ ao_gps(void) __reentrant
 				ao_gps_data.minute = nav_timeutc.min;
 				ao_gps_data.second = nav_timeutc.sec;
 
-				ao_gps_data.pdop = nav_dop.pdop;
-				ao_gps_data.hdop = nav_dop.hdop;
-				ao_gps_data.vdop = nav_dop.vdop;
-
-				/* mode is not set */
+				/* we report dop scaled by 10, but ublox provides dop scaled by 100
+				 */
+				ao_gps_data.pdop = nav_dop.pdop / 10;
+				ao_gps_data.hdop = nav_dop.hdop / 10;
+				ao_gps_data.vdop = nav_dop.vdop / 10;
 
 				ao_gps_data.ground_speed = nav_velned.g_speed;
 				ao_gps_data.climb_rate = -nav_velned.vel_d;

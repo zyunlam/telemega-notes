@@ -278,10 +278,10 @@ ao_nmea_gga(void)
 
 	ao_gps_lexchar();
 	i = ao_gps_decimal(0xff);
-	if (i <= 50) {
-		i = (uint8_t) 5 * i;
+	if (i <= 25) {
+		i = (uint8_t) 10 * i;
 		if (ao_gps_char == '.')
-			i = (i + ((uint8_t) ao_gps_decimal(1) >> 1));
+			i = (i + ((uint8_t) ao_gps_decimal(1)));
 	} else
 		i = 255;
 	ao_gps_next.hdop = i;
