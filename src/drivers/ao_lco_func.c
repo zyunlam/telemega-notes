@@ -28,7 +28,21 @@ ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 {
 	int8_t		r;
 	uint16_t	sent_time;
+	uint16_t	timeout = AO_MS_TO_TICKS(10);
 
+#if HAS_RADIO_RATE
+	switch (ao_config.radio_rate) {
+	case AO_RADIO_RATE_38400:
+	default:
+		break;
+	case AO_RADIO_RATE_9600:
+		timeout = AO_MS_TO_TICKS(20);
+		break;
+	case AO_RADIO_RATE_2400:
+		timeout = AO_MS_TO_TICKS(80);
+		break;
+	}
+#endif
 	ao_mutex_get(&ao_lco_mutex);
 	command.tick = ao_time() - *tick_offset;
 	command.box = box;
@@ -36,7 +50,7 @@ ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 	command.channels = 0;
 	ao_radio_cmac_send(&command, sizeof (command));
 	sent_time = ao_time();
-	r = ao_radio_cmac_recv(query, sizeof (*query), AO_MS_TO_TICKS(10));
+	r = ao_radio_cmac_recv(query, sizeof (*query), timeout);
 	if (r == AO_RADIO_CMAC_OK)
 		*tick_offset = sent_time - query->tick;
 	ao_mutex_put(&ao_lco_mutex);
