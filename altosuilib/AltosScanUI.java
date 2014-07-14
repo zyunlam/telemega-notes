@@ -356,10 +356,13 @@ public class AltosScanUI
 				if (r != null) {
 					if (device != null) {
 						if (reader != null) {
+							System.out.printf("frequency %g rate %d\n", r.frequency.frequency, r.rate);
 							reader.set_telemetry(r.telemetry);
 							reader.set_telemetry_rate(r.rate);
 							reader.set_frequency(r.frequency.frequency);
 							reader.save_frequency();
+							reader.save_telemetry();
+							reader.save_telemetry_rate();
 							owner.scan_device_selected(device);
 						}
 					}
@@ -519,7 +522,7 @@ public class AltosScanUI
 				rate_boxes[k].addActionListener(this);
 				rate_boxes[k].setSelected((scanning_rate & (1 << k)) != 0);
 			}
-			y_offset_rate += AltosLib.ao_telemetry_rate_max;
+			y_offset_rate += AltosLib.ao_telemetry_rate_max + 1;
 		}
 
 		if (select_telemetry) {
