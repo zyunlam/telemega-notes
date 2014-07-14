@@ -51,6 +51,20 @@ public class AltosLib {
 	public static final int AO_LOG_SERIAL_NUMBER = 2002;
 	public static final int AO_LOG_LOG_FORMAT = 2003;
 
+	public static final int AO_LOG_FREQUENCY = 2004;
+	public static final int AO_LOG_APOGEE_LOCKOUT = 2005;
+	public static final int AO_LOG_RADIO_RATE = 2006;
+	public static final int AO_LOG_IGNITE_MODE = 2007;
+	public static final int AO_LOG_PAD_ORIENTATION = 2008;
+	public static final int AO_LOG_RADIO_ENABLE = 2009;
+	public static final int AO_LOG_AES_KEY = 2010;
+	public static final int AO_LOG_APRS = 2011;
+	public static final int AO_LOG_BEEP_SETTING = 2012;
+	public static final int AO_LOG_TRACKER_SETTING = 2013;
+	public static final int AO_LOG_PYRO_TIME = 2014;
+	public static final int AO_LOG_APRS_ID = 2015;
+	public static final int AO_LOG_ALTITUDE_32 = 2016;
+
 	/* Added for header fields in telemega files */
 	public static final int AO_LOG_BARO_RESERVED = 3000;
 	public static final int AO_LOG_BARO_SENS = 3001;
