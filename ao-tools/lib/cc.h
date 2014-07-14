@@ -517,8 +517,17 @@ struct ao_log_gps {
 #define AO_LOG_GPS_ALT		'H'
 #define AO_LOG_GPS_SAT		'V'
 #define AO_LOG_GPS_DATE		'Y'
+#define AO_LOG_GPS_POS		'P'
 
 #define AO_LOG_CONFIG		'c'
+
+#define AO_GPS_NUM_SAT_MASK	(0xf << 0)
+#define AO_GPS_NUM_SAT_SHIFT	(0)
+
+#define AO_GPS_VALID		(1 << 4)
+#define AO_GPS_RUNNING		(1 << 5)
+#define AO_GPS_DATE_VALID	(1 << 6)
+#define AO_GPS_COURSE_VALID	(1 << 7)
 
 #define AO_LOG_FORMAT_UNKNOWN		0	/* unknown; altosui will have to guess */
 #define AO_LOG_FORMAT_FULL		1	/* 8 byte typed log records */
