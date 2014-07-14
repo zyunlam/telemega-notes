@@ -563,6 +563,7 @@ ao-tools/ao-test-gps/Makefile
 ao-tools/ao-usbtrng/Makefile
 ao-tools/ao-chaosread/Makefile
 ao-tools/ao-makebin/Makefile
+ao-tools/ao-fakeflight/Makefile
 ao-utils/Makefile
 src/Version
 ])
