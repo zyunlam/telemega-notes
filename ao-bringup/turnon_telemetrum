@@ -1,17 +1,13 @@
 #!/bin/sh
 
-if [ -x ../ao-tools/ao-stmload/ao-stmload ]; then
-	STMLOAD=../ao-tools/ao-stmload/ao-stmload
-elif [ -x /usr/bin/ao-stmload ]; then
-	STMLOAD=/usr/bin/ao-stmload
+if [ -x /usr/bin/ao-flash-stm ]; then
+	FLASH_STM=/usr/bin/ao-flash-stm
 else
-	echo "Can't find ao-stmload!  Aborting."
+	echo "Can't find ao-flash-stm!  Aborting."
 	exit 1
 fi
 
-if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
-	USBLOAD=../ao-tools/ao-usbload/ao-usbload
-elif [ -x /usr/bin/ao-usbload ]; then
+if [ -x /usr/bin/ao-usbload ]; then
 	USBLOAD=/usr/bin/ao-usbload
 else
 	echo "Can't find ao-usbload!  Aborting."
@@ -31,9 +27,9 @@ echo
 echo -n "TeleMetrum-$VERSION serial number: "
 read SERIAL
 
-echo $STMLOAD
+echo $FLASH_STM
 
-$STMLOAD --raw ../src/telemetrum-v$VERSION/flash-loader/*.elf || exit 1
+$FLASH_STM ~/altusmetrumllc/Binaries/loaders/telemetrum-v$VERSION-*.elf || exit 1
 
 sleep 2
 
