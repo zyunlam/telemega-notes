@@ -25,6 +25,7 @@
 
 #define HAS_USB			1
 #define USE_USB_STDIO		0
+#define HAS_USB_DISABLE		0
 #define HAS_BEEP		0
 #define HAS_TASK		0
 #define HAS_ECHO		0
