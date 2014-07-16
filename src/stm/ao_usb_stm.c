@@ -950,6 +950,11 @@ ao_usb_getchar(void)
 	return c;
 }
 
+#ifndef HAS_USB_DISABLE
+#define HAS_USB_DISABLE 1
+#endif
+
+#if HAS_USB_DISABLE
 void
 ao_usb_disable(void)
 {
@@ -967,6 +972,7 @@ ao_usb_disable(void)
 	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_USBEN);
 	ao_arch_release_interrupts();
 }
+#endif
 
 void
 ao_usb_enable(void)
