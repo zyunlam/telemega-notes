@@ -5,8 +5,8 @@
 TELEMINI_VER=2.0
 TELEMINI_DEF=2_0
 
-vpath %.c ..:../core:../cc1111:../drivers:../product
-vpath %.h ..:../core:../cc1111:../drivers:../product
+vpath %.c ..:../kernel:../cc1111:../drivers:../product
+vpath %.h ..:../kernel:../cc1111:../drivers:../product
 vpath ao-make-product.5c ../util
 
 ifndef VERSION
@@ -30,7 +30,6 @@ INC = \
 CORE_SRC = \
 	ao_cmd.c \
 	ao_config.c \
-	ao_convert.c \
 	ao_flight.c \
 	ao_kalman.c \
 	ao_log.c \
@@ -59,6 +58,7 @@ CC1111_SRC = \
 	ao_spi.c \
 	ao_usb.c \
 	ao_convert_pa.c \
+	ao_convert_volt.c \
 	ao_beep.c \
 	ao_timer.c \
 	ao_exti.c \

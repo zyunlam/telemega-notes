@@ -49,13 +49,12 @@ int ao_gps_new;
 #define HAS_MPU6000		1
 #define HAS_MMA655X		1
 #define HAS_HMC5883 		1
+#define HAS_BEEP		1
 
 struct ao_adc {
 	int16_t			sense[AO_ADC_NUM_SENSE];
 	int16_t			v_batt;
 	int16_t			v_pbatt;
-	int16_t			accel_ref;
-	int16_t			accel;
 	int16_t			temp;
 };
 #else
@@ -309,7 +308,7 @@ struct ao_cmds {
 #if TELEMEGA
 #include "ao_convert_pa.c"
 #include <ao_ms5607.h>
-struct ao_ms5607_prom	ms5607_prom;
+struct ao_ms5607_prom	ao_ms5607_prom;
 #include "ao_ms5607_convert.c"
 #define AO_PYRO_NUM	4
 #include <ao_pyro.h>
@@ -317,22 +316,8 @@ struct ao_ms5607_prom	ms5607_prom;
 #include "ao_convert.c"
 #endif
 
-struct ao_config {
-	uint16_t	main_deploy;
-	int16_t		accel_plus_g;
-	int16_t		accel_minus_g;
-	uint8_t		pad_orientation;
-	uint16_t	apogee_lockout;
-#if TELEMEGA
-	struct ao_pyro	pyro[AO_PYRO_NUM];	/* minor version 12 */
-	int16_t		accel_zero_along;
-	int16_t		accel_zero_across;
-	int16_t		accel_zero_through;
-#endif
-};
-
-#define AO_PAD_ORIENTATION_ANTENNA_UP	0
-#define AO_PAD_ORIENTATION_ANTENNA_DOWN	1
+#include <ao_config.h>
+#include <ao_fake_flight.h>
 
 #define ao_config_get()
 
@@ -732,6 +717,18 @@ ao_sleep(void *wchan)
 					ao_flight_started = 1;
 					ao_ground_pres = int32(bytes, 4);
 					ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
+					ao_ground_accel_along = int16(bytes, 8);
+					ao_ground_accel_across = int16(bytes, 10);
+					ao_ground_accel_through = int16(bytes, 12);
+					ao_ground_roll = int16(bytes, 14);
+					ao_ground_pitch = int16(bytes, 16);
+					ao_ground_yaw = int16(bytes, 18);
+					ao_ground_mpu6000.accel_x = ao_ground_accel_across;
+					ao_ground_mpu6000.accel_y = ao_ground_accel_along;
+					ao_ground_mpu6000.accel_z = ao_ground_accel_through;
+					ao_ground_mpu6000.gyro_x = ao_ground_pitch >> 9;
+					ao_ground_mpu6000.gyro_y = ao_ground_roll >> 9;
+					ao_ground_mpu6000.gyro_z = ao_ground_yaw >> 9;
 					break;
 				case 'A':
 					ao_data_static.tick = tick;
@@ -768,21 +765,21 @@ ao_sleep(void *wchan)
 				continue;
 			} else if (nword == 3 && strcmp(words[0], "ms5607") == 0) {
 				if (strcmp(words[1], "reserved:") == 0)
-					ms5607_prom.reserved = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.reserved = strtoul(words[2], NULL, 10);
 				else if (strcmp(words[1], "sens:") == 0)
-					ms5607_prom.sens = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.sens = strtoul(words[2], NULL, 10);
 				else if (strcmp(words[1], "off:") == 0)
-					ms5607_prom.off = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.off = strtoul(words[2], NULL, 10);
 				else if (strcmp(words[1], "tcs:") == 0)
-					ms5607_prom.tcs = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.tcs = strtoul(words[2], NULL, 10);
 				else if (strcmp(words[1], "tco:") == 0)
-					ms5607_prom.tco = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.tco = strtoul(words[2], NULL, 10);
 				else if (strcmp(words[1], "tref:") == 0)
-					ms5607_prom.tref = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.tref = strtoul(words[2], NULL, 10);
 				else if (strcmp(words[1], "tempsens:") == 0)
-					ms5607_prom.tempsens = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.tempsens = strtoul(words[2], NULL, 10);
 				else if (strcmp(words[1], "crc:") == 0)
-					ms5607_prom.crc = strtoul(words[2], NULL, 10);
+					ao_ms5607_prom.crc = strtoul(words[2], NULL, 10);
 				continue;
 			} else if (nword >= 3 && strcmp(words[0], "Pyro") == 0) {
 				int	p = strtoul(words[1], NULL, 10);
@@ -791,7 +788,7 @@ ao_sleep(void *wchan)
 
 				for (i = 2; i < nword; i++) {
 					for (j = 0; j < NUM_PYRO_VALUES; j++)
-						if (!strcmp (words[2], ao_pyro_values[j].name))
+						if (!strcmp (words[i], ao_pyro_values[j].name))
 							break;
 					if (j == NUM_PYRO_VALUES)
 						continue;
@@ -991,6 +988,7 @@ void run_flight_fixed(char *name, FILE *f, int summary, char *info)
 	emulator_in = f;
 	emulator_info = info;
 	ao_summary = summary;
+
 	ao_flight_init();
 	ao_flight();
 }

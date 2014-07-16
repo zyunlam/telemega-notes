@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.*;
@@ -132,7 +132,7 @@ public class AltosEepromDownload implements Runnable {
 
 		CheckFile(false);
 	}
-	
+
 	void CaptureLog(AltosEepromLog log) throws IOException, InterruptedException, TimeoutException, ParseException {
 		int			block, state_block = 0;
 		int			log_format = flights.config_data.log_format;

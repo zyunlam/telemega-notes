@@ -11,6 +11,7 @@ INC = \
 	ao_arch_funcs.h \
 	ao_pins.h \
 	ao_product.h \
+	ao_tracker.h \
 	ao_task.h \
 	ao_whiten.h \
 	ao_cc115l.h \
@@ -18,9 +19,6 @@ INC = \
 	lpc.h \
 	Makefile
 
-
-MATH_SRC=\
-	ef_log.c
 
 ALTOS_SRC = \
 	ao_interrupt.c \
@@ -44,13 +42,14 @@ ALTOS_SRC = \
 	ao_cc115l.c \
 	ao_fec_tx.c \
 	ao_aprs.c \
+	ao_tracker.c \
 	ao_telemetry.c \
 	ao_storage.c \
 	ao_m25.c \
 	ao_log.c \
-	ao_log_mega.c \
-	ao_gps_report_mega.c \
-	$(MATH_SRC) \
+	ao_log_gps.c \
+	ao_distance.c \
+	ao_sqrt.c \
 	$(SAMPLE_PROFILE)
 
 PRODUCT=TeleGPS-v0.3
@@ -61,11 +60,12 @@ CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS) $(PROFILE_DEF) -Os -g
 
 PROGNAME=telegps-v0.3
 PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_telegps.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(PROG) $(HEX)
 
 LDFLAGS=-L../lpc -Wl,-Taltos.ld
 

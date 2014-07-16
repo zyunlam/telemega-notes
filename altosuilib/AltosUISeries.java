@@ -15,14 +15,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_1;
+package org.altusmetrum.altosuilib_2;
 
 import java.io.*;
 import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_3.*;
+import org.altusmetrum.altoslib_4.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -38,7 +38,7 @@ class AltosUITime extends AltosUnits {
 	public double value(double v, boolean imperial_units) { return v; }
 
 	public double inverse(double v, boolean imperial_unis) { return v; }
-	
+
 	public String show_units(boolean imperial_units) { return "s"; }
 
 	public String say_units(boolean imperial_units) { return "seconds"; }
@@ -60,7 +60,7 @@ public class AltosUISeries extends XYSeries implements AltosUIGrapher {
 	XYItemRenderer	renderer;
 	int		fetch;
 	boolean		enable;
-	
+
 	public void set_units() {
 		axis.set_units();
 		StandardXYToolTipGenerator	ttg;
@@ -104,6 +104,7 @@ public class AltosUISeries extends XYSeries implements AltosUIGrapher {
 
 		renderer = new XYLineAndShapeRenderer(true, false);
 		renderer.setSeriesPaint(0, color);
+		renderer.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		renderer.setSeriesVisible(0, enable);
 		set_units();
 	}

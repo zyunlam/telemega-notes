@@ -9,6 +9,7 @@ INC = \
 	ao.h \
 	ao_arch.h \
 	ao_arch_funcs.h \
+	ao_boot.h \
 	ao_pins.h \
 	ao_product.h
 
@@ -26,7 +27,6 @@ ALTOS_SRC = \
 	ao_stdio.c \
 	ao_panic.c \
 	ao_timer.c \
-	ao_serial_stm.c \
 	ao_lcd_stm.c \
 	ao_lcd_font.c \
 	ao_mutex.c \

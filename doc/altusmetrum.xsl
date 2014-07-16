@@ -41,6 +41,13 @@
     </legalnotice>
     <revhistory>
       <revision>
+	<revnumber>1.4</revnumber>
+	<date>15 June 2014</date>
+	<revremark>
+	  Major release adding TeleGPS support.
+	</revremark>
+      </revision>
+      <revision>
 	<revnumber>1.3.2</revnumber>
 	<date>24 January 2014</date>
 	<revremark>
@@ -1539,10 +1546,13 @@ NAR #88757, TRA #12200
         first five seconds of operation.
       </para>
       <para>
-        At power on, you will hear three beeps or see three flashes
-        (“S” in Morse code for start up) and then a pause while
-        the altimeter completes initialization and self test, and decides 
-	which mode to enter next.
+        At power on, the altimeter will beep out the battery voltage
+        to the nearest tenth of a volt.  Each digit is represented by
+        a sequence of short “dit” beeps, with a pause between
+        digits. A zero digit is represented with one long “dah”
+        beep. Then there will be a short pause while the altimeter
+        completes initialization and self test, and decides which mode
+        to enter next.
       </para>
       <para>
 	Here's a short summary of all of the modes and the beeping (or
@@ -1570,7 +1580,7 @@ NAR #88757, TRA #12200
 	      <row>
 		<entry>Startup</entry>
 		<entry>S</entry>
-		<entry>dit dit dit</entry>
+		<entry>battery voltage in decivolts</entry>
 		<entry>
 		  <para>
 		    Calibrating sensors, detecting orientation.
@@ -2009,22 +2019,112 @@ NAR #88757, TRA #12200
         time, and would of course appreciate customer feedback on
         performance in higher altitude flights!
       </para>
+    </section>
+    <section>
+      <title>APRS</title>
       <para>
 	TeleMetrum v2.0 and TeleMega can send APRS if desired, and the
 	interval between APRS packets can be configured. As each APRS
 	packet takes a full second to transmit, we recommend an
 	interval of at least 5 seconds to avoid consuming too much
-	battery power or radio channel bandwidth.
+	battery power or radio channel bandwidth. You can configure
+	the APRS interval using AltosUI; that process is described in
+	the Configure Altimeter section of the AltosUI chapter.
+      </para>
+      <para>
+	AltOS uses the APRS compressed position report data format,
+	which provides for higher position precision and shorter
+	packets than the original APRS format. It also includes
+	altitude data, which is invaluable when tracking rockets. We
+	haven't found a receiver which doesn't handle compressed
+	positions, but it's just possible that you have one, so if you
+	have an older device that can receive the raw packets but
+	isn't displaying position information, it's possible that this
+	is the cause.
+      </para>
+      <para>
+	The APRS packet format includes a comment field that can have
+	arbitrary text in it. AltOS uses this to send status
+	information about the flight computer. It sends four fields as
+	shown in the following table.
+      </para>
+      <table frame='all'>
+	<title>Altus Metrum APRS Comments</title>
+	<?dbfo keep-together="always"?>
+	<tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Field'/>
+	  <colspec align='center' colwidth='*' colname='Example'/>
+	  <colspec align='center' colwidth='4*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Field</entry>
+	      <entry align='center'>Example</entry>
+	      <entry align='center'>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>1</entry>
+	      <entry>L</entry>
+	      <entry>GPS Status U for unlocked, L for locked</entry>
+	    </row>
+	    <row>
+	      <entry>2</entry>
+	      <entry>6</entry>
+	      <entry>Number of Satellites in View</entry>
+	    </row>
+	    <row>
+	      <entry>3</entry>
+	      <entry>B4.0</entry>
+	      <entry>Altimeter Battery Voltage</entry>
+	    </row>
+	    <row>
+	      <entry>4</entry>
+	      <entry>A3.7</entry>
+	      <entry>Apogee Igniter Voltage</entry>
+	    </row>
+	    <row>
+	      <entry>5</entry>
+	      <entry>M3.7</entry>
+	      <entry>Main Igniter Voltage</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+      <para>
+	Here's an example of an APRS comment showing GPS lock with 6
+	satellites in view, a primary battery at 4.0V, and
+	apogee and main igniters both at 3.7V.
+	<screen>
+	  L6 B4.0 A3.7 M3.7
+	</screen>
+      </para>
+      <para>
+	Make sure your primary battery is above 3.8V, any connected
+	igniters are above 3.5V and GPS is locked with at least 5 or 6
+	satellites in view before flying. If GPS is switching between
+	L and U regularly, then it doesn't have a good lock and you
+	should wait until it becomes stable.
+      </para>
+      <para>
+	If the GPS receiver loses lock, the APRS data transmitted will
+	contain the last position for which GPS lock was
+	available. You can tell that this has happened by noticing
+	that the GPS status character switches from 'L' to 'U'. Before
+	GPS has locked, APRS will transmit zero for latitude,
+	longitude and altitude.
       </para>
     </section>
     <section>
       <title>Configurable Parameters</title>
       <para>
         Configuring an Altus Metrum altimeter for flight is very
-        simple.  Even on our baro-only TeleMini and EasyMini boards, the use of a Kalman 
-        filter means there is no need to set a “mach delay”.  The few 
-        configurable parameters can all be set using AltosUI over USB or
-        or radio link via TeleDongle.
+        simple.  Even on our baro-only TeleMini and EasyMini boards,
+        the use of a Kalman filter means there is no need to set a
+        “mach delay”.  The few configurable parameters can all be set
+        using AltosUI over USB or or radio link via TeleDongle. Read
+	the Configure Altimeter section in the AltosUI chapter below
+	for more information.
       </para>
       <section>
         <title>Radio Frequency</title>
@@ -2039,6 +2139,35 @@ NAR #88757, TRA #12200
 	  altimeter and TeleDongle must be configured to the same
 	  frequency to successfully communicate with each other.
         </para>
+      </section>
+      <section>
+	<title>Callsign</title>
+	<para>
+	  This sets the callsign used for telemetry, APRS and the
+	  packet link. For telemetry and APRS, this is used to
+	  identify the device. For the packet link, the callsign must
+	  match that configured in AltosUI or the link will not
+	  work. This is to prevent accidental configuration of another
+	  Altus Metrum flight computer operating on the same frequency nearby.
+	</para>
+      </section>
+      <section>
+	<title>Telemetry/RDF/APRS Enable</title>
+	<para>
+	  You can completely disable the radio while in flight, if
+	  necessary. This doesn't disable the packet link in idle
+	  mode.
+	</para>
+      </section>
+      <section>
+	<title>APRS Interval</title>
+	<para>
+	  This selects how often APRS packets are transmitted. Set
+	  this to zero to disable APRS without also disabling the
+	  regular telemetry and RDF transmissions. As APRS takes a
+	  full second to transmit a single position report, we
+	  recommend sending packets no more than once every 5 seconds.
+	</para>
       </section>
       <section>
         <title>Apogee Delay</title>
@@ -2060,6 +2189,20 @@ NAR #88757, TRA #12200
           firing simultaneously.  We've flown several air-frames this
           way quite happily, including Keith's successful L3 cert.
         </para>
+      </section>
+      <section>
+	<title>Apogee Lockout</title>
+	<para>
+	  Apogee lockout is the number of seconds after boost where
+	  the flight computer will not fire the apogee charge, even if
+	  the rocket appears to be at apogee. This is often called
+	  'Mach Delay', as it is intended to prevent a flight computer
+	  from unintentionally firing apogee charges due to the pressure
+	  spike that occurrs across a mach transition. Altus Metrum
+	  flight computers include a Kalman filter which is not fooled
+	  by this sharp pressure increase, and so this setting should
+	  be left at the default value of zero to disable it.
+	</para>
       </section>
       <section>
         <title>Main Deployment Altitude</title>
@@ -2636,10 +2779,19 @@ NAR #88757, TRA #12200
           dark blue for main, and black for landed.
         </para>
         <para>
-          The map's scale is approximately 3m (10ft) per pixel. The map
+          The map's default scale is approximately 3m (10ft) per pixel. The map
           can be dragged using the left mouse button. The map will attempt
           to keep the rocket roughly centered while data is being received.
         </para>
+	<para>
+	  You can adjust the style of map and the zoom level with
+	  buttons on the right side of the map window. You can draw a
+	  line on the map by moving the mouse over the map with a
+	  button other than the left one pressed, or by pressing the
+	  left button while also holding down the shift key. The
+	  length of the line in real-world units will be shown at the
+	  start of the line.
+	</para>
         <para>
           Images are fetched automatically via the Google Maps Static API,
           and cached on disk for reuse. If map images cannot be downloaded,
@@ -2649,6 +2801,24 @@ NAR #88757, TRA #12200
 	<para>
 	  You can pre-load images for your favorite launch sites
 	  before you leave home; check out the 'Preload Maps' section below.
+	</para>
+      </section>
+      <section>
+        <title>Ignitor</title>
+	<informalfigure>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="ignitor.png" width="5.5in"/>
+	    </imageobject>
+	  </mediaobject>
+	</informalfigure>
+        <para>
+          TeleMega includes four additional programmable pyro
+          channels. The Ignitor tab shows whether each of them has
+          continuity. If an ignitor has a low resistance, then the
+          voltage measured here will be close to the pyro battery
+          voltage. A value greater than 3.2V is required for a 'GO'
+          status.
 	</para>
       </section>
     </section>
@@ -2917,7 +3087,21 @@ NAR #88757, TRA #12200
         </para>
       </section>
       <section>
-        <title>Radio Frequency</title>
+        <title>Apogee Lockoug</title>
+        <para>
+	  Apogee lockout is the number of seconds after boost where
+	  the flight computer will not fire the apogee charge, even if
+	  the rocket appears to be at apogee. This is often called
+	  'Mach Delay', as it is intended to prevent a flight computer
+	  from unintentionally firing apogee charges due to the pressure
+	  spike that occurrs across a mach transition. Altus Metrum
+	  flight computers include a Kalman filter which is not fooled
+	  by this sharp pressure increase, and so this setting should
+	  be left at the default value of zero to disable it.
+        </para>
+      </section>
+      <section>
+        <title>Frequency</title>
         <para>
           This configures which of the frequencies to use for both
           telemetry and packet command mode. Note that if you set this
@@ -2975,12 +3159,11 @@ NAR #88757, TRA #12200
 	</para>
       </section>
       <section>
-        <title>Ignite Mode</title>
+        <title>Ignitor Firing Mode</title>
 	<para>
-	  TeleMetrum and TeleMini provide two igniter channels as they
-	  were originally designed as dual-deploy flight
-	  computers. This configuration parameter allows the two
-	  channels to be used in different configurations.
+	  This configuration parameter allows the two standard ignitor
+	  channels (Apogee and Main) to be used in different
+	  configurations.
 	</para>
           <variablelist>
 	    <varlistentry>
@@ -3051,6 +3234,16 @@ NAR #88757, TRA #12200
 	</variablelist>
       </section>
       <section>
+        <title>Beeper Frequency</title>
+	<para>
+	  The beeper on all Altus Metrum flight computers works best
+	  at 4000Hz, however if you have more than one flight computer
+	  in a single airframe, having all of them sound at the same
+	  frequency can be confusing. This parameter lets you adjust
+	  the base beeper frequency value.
+	</para>
+      </section>
+      <section>
 	<title>Configure Pyro Channels</title>
 	<informalfigure>
 	  <mediaobject>
@@ -3074,6 +3267,11 @@ NAR #88757, TRA #12200
 	  conditions are met. Each pyro channel has a separate set of
 	  configuration values, so you can use different values for
 	  the same condition with different channels.
+	</para>
+	<para>
+	  At the bottom of the window, the 'Pyro Firing Time'
+	  configuration sets the length of time (in seconds) which
+	  each of these pyro channels will fire for.
 	</para>
 	<para>
 	  Once you have selected the appropriate configuration for all
@@ -3362,9 +3560,62 @@ NAR #88757, TRA #12200
 	and name of the site. The contents of this list are actually
 	downloaded from our server at run-time, so as new sites are sent 
 	in, they'll get automatically added to this list.
+	If the launch site isn't in the list, you can manually enter the lat/lon values
       </para>
       <para>
-	If the launch site isn't in the list, you can manually enter the lat/lon values
+	There are four different kinds of maps you can view; you can
+	select which to download by selecting as many as you like from
+	the available types:
+	<variablelist>
+	  <varlistentry>
+	    <term>Hybrid</term>
+	    <listitem>
+	      <para>
+		A combination of satellite imagery and road data. This
+		is the default view.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Satellite</term>
+	    <listitem>
+	      <para>
+		Just the satellite imagery without any annotation.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Roadmap</term>
+	    <listitem>
+	      <para>
+		Roads, political boundaries and a few geographic features.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Terrain</term>
+	    <listitem>
+	      <para>
+		Contour intervals and shading that show hills and
+		valleys.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+      <para>
+	You can specify the range of zoom levels to download; smaller
+	numbers show more area with less resolution. The default
+	level, 0, shows about 3m/pixel. One zoom level change
+	doubles or halves that number.
+      </para>
+      <para>
+	The Tile Radius value sets how large an area around the center
+	point to download. Each tile is 512x512 pixels, and the
+	'radius' value specifies how many tiles away from the center
+	will be downloaded. Specify a radius of 0 and you get only the
+	center tile. A radius of 1 loads a 3x3 grid, centered on the
+	specified location.
       </para>
       <para>
 	Clicking the 'Load Map' button will fetch images from Google
@@ -5008,7 +5259,8 @@ NAR #88757, TRA #12200
       <informalfigure>
 	<mediaobject id="TeleMegaTemplate">
 	  <imageobject>
-	    <imagedata format="SVG" fileref="telemega-outline.svg"/>
+	    <imagedata format="SVG" fileref="telemega.svg"
+		       scalefit="0" scale="100" align="center" />
 	  </imageobject>
 	</mediaobject>
       </informalfigure>
@@ -5022,7 +5274,8 @@ NAR #88757, TRA #12200
       <informalfigure>
 	<mediaobject id="TeleMetrumTemplate">
 	  <imageobject>
-	    <imagedata format="SVG" fileref="telemetrum.svg"/>
+	    <imagedata format="SVG" fileref="telemetrum.svg"
+		       scalefit="0" scale="100" align="center" />
 	  </imageobject>
 	</mediaobject>
       </informalfigure>
@@ -5036,7 +5289,8 @@ NAR #88757, TRA #12200
       <informalfigure>
 	<mediaobject id="MiniTemplate">
 	  <imageobject>
-	    <imagedata format="SVG" fileref="easymini-outline.svg"/>
+	    <imagedata format="SVG" fileref="easymini.svg"
+		       scalefit="0" scale="100" align="center" />
 	  </imageobject>
 	</mediaobject>
       </informalfigure>
@@ -5050,7 +5304,8 @@ NAR #88757, TRA #12200
       <informalfigure>
 	<mediaobject id="TeleMiniTemplate">
 	  <imageobject>
-	    <imagedata format="SVG" fileref="telemini.svg"/>
+	    <imagedata format="SVG" fileref="telemini.svg"
+		       scalefit="0" scale="100" align="center" />
 	  </imageobject>
 	</mediaobject>
       </informalfigure>
@@ -5158,6 +5413,13 @@ NAR #88757, TRA #12200
   </appendix>
   <appendix>
     <title>Release Notes</title>
+    <simplesect>
+      <title>Version 1.4</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.4.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
     <simplesect>
       <title>Version 1.3.2</title>
       <xi:include

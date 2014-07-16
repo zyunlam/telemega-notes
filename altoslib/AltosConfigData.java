@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.util.*;
 import java.text.*;
@@ -29,6 +29,7 @@ public class AltosConfigData implements Iterable<String> {
 	public int	serial;
 	public int	flight;
 	public int	log_format;
+	public int	log_space;
 	public String	version;
 
 	/* Strings returned */
@@ -66,9 +67,13 @@ public class AltosConfigData implements Iterable<String> {
 	public AltosPyro[]	pyros;
 	public int		npyro;
 	public int		pyro;
+	public double		pyro_firing_time;
 
 	/* HAS_APRS */
 	public int		aprs_interval;
+
+	/* HAS_BEEP */
+	public int		beep;
 
 	/* Storage info replies */
 	public int	storage_size;
@@ -76,6 +81,10 @@ public class AltosConfigData implements Iterable<String> {
 
 	/* Log listing replies */
 	public int	stored_flight;
+
+	/* HAS_TRACKER */
+	public int	tracker_motion;
+	public int	tracker_interval;
 
 	public static String get_string(String line, String label) throws  ParseException {
 		if (line.startsWith(label)) {
@@ -100,8 +109,38 @@ public class AltosConfigData implements Iterable<String> {
 		throw new ParseException("mismatch", 0);
 	}
 
+	public static int[] get_values(String line, String label) throws NumberFormatException, ParseException {
+		if (line.startsWith(label)) {
+			String tail = line.substring(label.length()).trim();
+			String[] tokens = tail.split("\\s+");
+			if (tokens.length > 1) {
+				int[]	values = new int[2];
+				values[0] = Integer.parseInt(tokens[0]);
+				values[1] = Integer.parseInt(tokens[1]);
+				return values;
+			}
+		}
+		throw new ParseException("mismatch", 0);
+	}
+
 	public Iterator<String> iterator() {
 		return lines.iterator();
+	}
+
+	public int log_space() {
+		if (log_space > 0)
+			return log_space;
+
+		if (storage_size > 0) {
+			int	space = storage_size;
+
+			if (storage_erase_unit > 0 && use_flash_for_config())
+				space -= storage_erase_unit;
+
+			if (space > 0)
+				return space;
+		}
+		return 0;
 	}
 
 	public int log_available() {
@@ -117,7 +156,7 @@ public class AltosConfigData implements Iterable<String> {
 			if (flight_log_max <= 0)
 				return 1;
 			int	log_max = flight_log_max * 1024;
-			int	log_space = storage_size - storage_erase_unit;
+			int	log_space = log_space();
 			int	log_used;
 
 			if (stored_flight <= 0)
@@ -182,6 +221,7 @@ public class AltosConfigData implements Iterable<String> {
 		serial = 0;
 		flight = 0;
 		log_format = AltosLib.AO_LOG_FORMAT_UNKNOWN;
+		log_space = -1;
 		version = "unknown";
 
 		main_deploy = -1;
@@ -207,8 +247,14 @@ public class AltosConfigData implements Iterable<String> {
 		pyro = 0;
 		npyro = 0;
 		pyros = null;
+		pyro_firing_time = -1;
 
 		aprs_interval = -1;
+
+		beep = -1;
+
+		tracker_motion = -1;
+		tracker_interval = -1;
 
 		storage_size = -1;
 		storage_erase_unit = -1;
@@ -223,6 +269,7 @@ public class AltosConfigData implements Iterable<String> {
 		try { serial = get_int(line, "serial-number"); } catch (Exception e) {}
 		try { flight = get_int(line, "current-flight"); } catch (Exception e) {}
 		try { log_format = get_int(line, "log-format"); } catch (Exception e) {}
+		try { log_space = get_int(line, "log-space"); } catch (Exception e) {}
 		try { version = get_string(line, "software-version"); } catch (Exception e) {}
 
 		/* Version also contains MS5607 info, which we ignore here */
@@ -282,9 +329,20 @@ public class AltosConfigData implements Iterable<String> {
 					pyros[pyro++] = p;
 			} catch (Exception e) {}
 		}
+		try { pyro_firing_time = get_int(line, "Pyro time:") / 100.0; } catch (Exception e) {}
 
 		/* HAS_APRS */
 		try { aprs_interval = get_int(line, "APRS interval:"); } catch (Exception e) {}
+
+		/* HAS_BEEP */
+		try { beep = get_int(line, "Beeper setting:"); } catch (Exception e) {}
+
+		/* HAS_TRACKER */
+		try {
+			int[] values = get_values(line, "Tracker setting:");
+			tracker_motion = values[0];
+			tracker_interval = values[1];
+		} catch (Exception e) {}
 
 		/* Storage info replies */
 		try { storage_size = get_int(line, "Storage size:"); } catch (Exception e) {}
@@ -351,16 +409,16 @@ public class AltosConfigData implements Iterable<String> {
 						       channel);
 	}
 
-	public int log_limit() {
-		if (storage_size > 0 && storage_erase_unit > 0) {
-			int	log_limit = storage_size - storage_erase_unit;
-			if (log_limit > 0)
-				return log_limit / 1024;
-		}
-		return 1024;
+	boolean use_flash_for_config() {
+		if (product.startsWith("TeleMega"))
+			return false;
+		if (product.startsWith("TeleMetrum-v2"))
+			return false;
+		return true;
 	}
 
-	public void get_values(AltosConfigValues source) {
+
+	public void get_values(AltosConfigValues source) throws AltosConfigDataException {
 
 		/* HAS_FLIGHT */
 		if (main_deploy >= 0)
@@ -395,9 +453,21 @@ public class AltosConfigData implements Iterable<String> {
 		/* AO_PYRO_NUM */
 		if (npyro > 0)
 			pyros = source.pyros();
+		if (pyro_firing_time >= 0)
+			pyro_firing_time = source.pyro_firing_time();
 
+		/* HAS_APRS */
 		if (aprs_interval >= 0)
 			aprs_interval = source.aprs_interval();
+
+		/* HAS_BEEP */
+		if (beep >= 0)
+			beep = source.beep();
+		/* HAS_TRACKER */
+		if (tracker_motion >= 0)
+			tracker_motion = source.tracker_motion();
+		if (tracker_interval >= 0)
+			tracker_interval = source.tracker_interval();
 	}
 
 	public void set_values(AltosConfigValues dest) {
@@ -410,18 +480,23 @@ public class AltosConfigData implements Iterable<String> {
 		dest.set_radio_calibration(radio_calibration);
 		dest.set_radio_frequency(frequency());
 		boolean max_enabled = true;
+
+		if (log_space() == 0)
+			max_enabled = false;
+
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TINY:
 			max_enabled = false;
 			break;
 		default:
-			if (stored_flight >= 0)
+			if (stored_flight > 0)
 				max_enabled = false;
 			break;
 		}
+
 		dest.set_flight_log_max_enabled(max_enabled);
 		dest.set_radio_enable(radio_enable);
-		dest.set_flight_log_max_limit(log_limit());
+		dest.set_flight_log_max_limit(log_space() / 1024);
 		dest.set_flight_log_max(flight_log_max);
 		dest.set_ignite_mode(ignite_mode);
 		dest.set_pad_orientation(pad_orientation);
@@ -430,7 +505,11 @@ public class AltosConfigData implements Iterable<String> {
 			dest.set_pyros(pyros);
 		else
 			dest.set_pyros(null);
+		dest.set_pyro_firing_time(pyro_firing_time);
 		dest.set_aprs_interval(aprs_interval);
+		dest.set_beep(beep);
+		dest.set_tracker_motion(tracker_motion);
+		dest.set_tracker_interval(tracker_interval);
 	}
 
 	public void save(AltosLink link, boolean remote) throws InterruptedException, TimeoutException {
@@ -492,10 +571,20 @@ public class AltosConfigData implements Iterable<String> {
 						   pyros[p].toString());
 			}
 		}
+		if (pyro_firing_time >= 0)
+			link.printf("c I %d\n", (int) (pyro_firing_time * 100.0 + 0.5));
 
 		/* HAS_APRS */
 		if (aprs_interval >= 0)
 			link.printf("c A %d\n", aprs_interval);
+
+		/* HAS_BEEP */
+		if (beep >= 0)
+			link.printf("c b %d\n", beep);
+
+		/* HAS_TRACKER */
+		if (tracker_motion >= 0 && tracker_interval >= 0)
+			link.printf("c t %d %d\n", tracker_motion, tracker_interval);
 
 		link.printf("c w\n");
 		link.flush_output();
@@ -506,12 +595,12 @@ public class AltosConfigData implements Iterable<String> {
 		link.printf("c s\nf\nv\n");
 		read_link(link, "software-version");
 		switch (log_format) {
-		case AltosLib.AO_LOG_FORMAT_FULL:
-		case AltosLib.AO_LOG_FORMAT_TINY:
-		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_UNKNOWN:
+		case AltosLib.AO_LOG_FORMAT_NONE:
+			break;
+		default:
 			link.printf("l\n");
 			read_link(link, "done");
-		default:
 			break;
 		}
 	}

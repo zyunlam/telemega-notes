@@ -65,12 +65,17 @@
 #define ao_gps_fifo		(ao_stm_usart3.rx_fifo)
 
 #define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	(1024 * 1024)
+#define AO_CONFIG_MAX_SIZE			1024
+#define LOG_ERASE_MARK				0x55
+#define LOG_MAX_ERASE				128
+
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
 #define USE_EEPROM_CONFIG	1
 #define USE_STORAGE_CONFIG	0
 #define HAS_USB			1
 #define HAS_BEEP		1
+#define HAS_BATTERY_REPORT	1
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		1
 #define HAS_APRS		1

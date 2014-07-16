@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 public abstract class AltosUnits {
 
@@ -41,7 +41,7 @@ public abstract class AltosUnits {
 	public double value(double v) {
 		return value(v, AltosConvert.imperial_units);
 	}
-		
+
 	public double inverse(double v) {
 		return inverse(v, AltosConvert.imperial_units);
 	}
@@ -49,15 +49,15 @@ public abstract class AltosUnits {
 	public String show_units() {
 		return show_units(AltosConvert.imperial_units);
 	}
-		
+
 	public String say_units() {
 		return say_units(AltosConvert.imperial_units);
 	}
-		
+
 	public int show_fraction(int width) {
 		return show_fraction(width, AltosConvert.imperial_units);
 	}
-		
+
 	int say_fraction(boolean imperial_units) {
 		return 0;
 	}

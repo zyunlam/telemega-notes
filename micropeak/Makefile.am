@@ -1,5 +1,5 @@
 JAVAROOT=classes
-AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -source 6
+AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked -source 6
 
 man_MANS=micropeak.1
 
@@ -72,6 +72,11 @@ ICONJAR= -C $(ICONDIR) micropeak-16.png \
 	-C $(ICONDIR) micropeak-256.png
 
 WINDOWS_ICON=$(ICONDIR)/micro-peak.ico
+MACOSX_ICON=$(ICONDIR)/MicroPeak.icns
+
+desktopdir = $(datadir)/applications
+desktop_file = micropeak.desktop
+desktop_SCRIPTS = $(desktop_file)
 
 all-local: micropeak-test micropeak-jdb $(JAR)
 
@@ -84,7 +89,14 @@ clean-local:
 		micropeak micropeak-test micropeak-jdb macosx linux windows micropeak-windows.log \
 		micropeak-windows.nsi
 
+EXTRA_DIST = $(desktop_file).in
+
+$(desktop_file): $(desktop_file).in
+	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/micropeak.desktop.in > $@
+	chmod +x $@
+
 LINUX_DIST=MicroPeak-Linux-$(VERSION).tar.bz2
+LINUX_SH=MicroPeak-Linux-$(VERSION).sh
 MACOSX_DIST=MicroPeak-Mac-$(VERSION).dmg
 WINDOWS_DIST=MicroPeak-Windows-$(VERSION_DASH).exe
 
@@ -94,14 +106,14 @@ DOC=$(MICROPEAK_DOC)
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC)
-LINUX_EXTRA=micropeak-fat
+LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) micropeak.desktop.in ../icon/micropeak.svg
+LINUX_EXTRA=micropeak-fat micropeak.desktop.in
 
 MACOSX_DRIVER_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg
 MACOSX_DRIVER=FTDIUSBSerialDriver_v2_2_18.dmg
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVER) $(MACOSX_README) $(DOC)
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVER) $(MACOSX_README) $(DOC) $(MACOSX_ICON)
 
 $(MACOSX_DRIVER):
 	wget $(MACOSX_DRIVER_URL)
@@ -119,12 +131,17 @@ if FATINSTALL
 FATTARGET=$(FATDIR)/$(VERSION)
 
 LINUX_DIST_TARGET=$(FATTARGET)/$(LINUX_DIST)
+LINUX_SH_TARGET=$(FATTARGET)/$(LINUX_SH)
 MACOSX_DIST_TARGET=$(FATTARGET)/$(MACOSX_DIST)
 WINDOWS_DIST_TARGET=$(FATTARGET)/$(WINDOWS_DIST)
 
-fat: $(LINUX_DIST_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET)
+fat: $(LINUX_DIST_TARGET) $(LINUX_SH_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET)
 
 $(LINUX_DIST_TARGET): $(LINUX_DIST)
+	mkdir -p $(FATTARGET)
+	cp -p $< $@
+
+$(LINUX_SH_TARGET): $(LINUX_SH)
 	mkdir -p $(FATTARGET)
 	cp -p $< $@
 
@@ -137,7 +154,7 @@ $(WINDOWS_DIST_TARGET): $(WINDOWS_DIST)
 	cp -p $< $@
 
 else
-fat: $(LINUX_DIST) $(MACOSX_DIST) $(WINDOWS_DIST)
+fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
 endif
 
 micropeak: Makefile
@@ -230,6 +247,10 @@ $(LINUX_DIST): $(LINUX_FILES) $(LINUX_EXTRA)
 	chmod +x linux/MicroPeak/micropeak
 	tar cjf $@ -C linux MicroPeak
 
+$(LINUX_SH): $(LINUX_DIST) $(srcdir)/../altosui/linux-install.sh
+	sed 's/AltOS/MicroPeak/g' $(srcdir)/../altosui/linux-install.sh | cat - $(LINUX_DIST) > $@
+	chmod +x $@
+
 $(MACOSX_DIST): $(MACOSX_FILES)
 	-rm -f $@
 	-rm -rf macosx
@@ -240,6 +261,7 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	cp -p Info.plist macosx/MicroPeak.app/Contents
 	cp -p $(MACOSX_DRIVER) macosx
 	mkdir -p macosx/MicroPeak.app/Contents/Resources/Java
+	cp -p $(MACOSX_ICON) macosx/MicroPeak.app/Contents/Resources
 	cp -p $(FATJAR) macosx/MicroPeak.app/Contents/Resources/Java/micropeak.jar
 	cp -p libaltos.dylib macosx/MicroPeak.app/Contents/Resources/Java
 	cp -p $(ALTOSLIB_CLASS) macosx/MicroPeak.app/Contents/Resources/Java

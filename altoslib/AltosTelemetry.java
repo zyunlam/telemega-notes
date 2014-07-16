@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.text.*;
 
@@ -43,9 +43,9 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 	}
 
 	public void update_state(AltosState state) {
+		state.set_serial(serial);
 		if (state.state == AltosLib.ao_flight_invalid)
 			state.set_state(AltosLib.ao_flight_startup);
-		state.set_serial(serial);
 		state.set_tick(tick);
 		state.set_rssi(rssi, status);
 		state.set_received_time(received_time);
@@ -67,7 +67,7 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 	final static int packet_type_metrum_sensor = 0x0a;
 	final static int packet_type_metrum_data = 0x0b;
 	final static int packet_type_mini = 0x10;
-	
+
 	static AltosTelemetry parse_hex(String hex)  throws ParseException, AltosCRCException {
 		AltosTelemetry	telem = null;
 

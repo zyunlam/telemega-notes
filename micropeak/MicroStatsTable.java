@@ -19,8 +19,8 @@ package org.altusmetrum.micropeak;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_3.*;
-import org.altusmetrum.altosuilib_1.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
 public class MicroStatsTable extends JComponent implements AltosFontListener {
 	GridBagLayout	layout;
@@ -59,6 +59,7 @@ public class MicroStatsTable extends JComponent implements AltosFontListener {
 			texts = new JTextField[values.length];
 			for (int j = 0; j < values.length; j++) {
 				JTextField value = new JTextField(values[j]);
+				value.setEditable(false);
 				value.setFont(AltosUILib.value_font);
 				value.setHorizontalAlignment(SwingConstants.RIGHT);
 				texts[j] = value;

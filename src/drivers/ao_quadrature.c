@@ -22,11 +22,14 @@
 #include <ao_event.h>
 
 __xdata int32_t ao_quadrature_count[AO_QUADRATURE_COUNT];
-static uint8_t	ao_quadrature_state[AO_QUADRATURE_COUNT];
-static int8_t	ao_quadrature_raw[AO_QUADRATURE_COUNT];
+static uint8_t  ao_quadrature_state[AO_QUADRATURE_COUNT];
 
-#define BIT(a,b)	((a) | ((b) << 1))
-#define STATE(old_a, old_b, new_a, new_b)	(((BIT(old_a, old_b) << 2) | BIT(new_a, new_b)))
+struct ao_debounce {
+	uint8_t	state;
+	uint8_t	count;
+};
+
+static struct ao_debounce ao_debounce_state[AO_QUADRATURE_COUNT][2];
 
 #define port(q)	AO_QUADRATURE_ ## q ## _PORT
 #define bita(q) AO_QUADRATURE_ ## q ## _A
@@ -35,14 +38,35 @@ static int8_t	ao_quadrature_raw[AO_QUADRATURE_COUNT];
 #define pinb(q) AO_QUADRATURE_ ## q ## _B ## _PIN
 #define isr(q)  ao_quadrature_isr_ ## q
 
-static inline uint16_t
-ao_quadrature_read(struct stm_gpio *gpio, uint8_t pin_a, uint8_t pin_b) {
-	uint16_t	v = stm_gpio_get_all(gpio);
+#define DEBOUNCE	10
 
-	return ~((((v >> pin_a) & 1) | (((v >> pin_b) & 1) << 1))) & 3;
+static uint8_t
+ao_debounce(uint8_t cur, struct ao_debounce *debounce)
+{
+	if (cur == debounce->state)
+		debounce->count = 0;
+	else {
+		if (++debounce->count == DEBOUNCE) {
+			debounce->state = cur;
+			debounce->count = 0;
+		}
+	}
+	return debounce->state;
 }
 
-#define _ao_quadrature_get(q)	ao_quadrature_read(port(q), bita(q), bitb(q))
+static uint16_t
+ao_quadrature_read(struct stm_gpio *gpio, uint8_t pin_a, uint8_t pin_b, struct ao_debounce debounce_state[2]) {
+	uint16_t	v = ~stm_gpio_get_all(gpio);
+	uint8_t		a = (v >> pin_a) & 1;
+	uint8_t		b = (v >> pin_b) & 1;
+
+	a = ao_debounce(a, &debounce_state[0]);
+	b = ao_debounce(b, &debounce_state[1]);
+
+	return a | (b << 1);
+}
+
+#define _ao_quadrature_get(q)	ao_quadrature_read(port(q), bita(q), bitb(q), ao_debounce_state[q])
 
 static void
 _ao_quadrature_queue(uint8_t q, int8_t step)
@@ -54,51 +78,28 @@ _ao_quadrature_queue(uint8_t q, int8_t step)
 	ao_wakeup(&ao_quadrature_count[q]);
 }
 
-static const int8_t	step[16] = {
-	[STATE(0,0,0,0)] = 0,
-	[STATE(0,0,0,1)] = -1,
-	[STATE(0,0,1,0)] = 1,
-	[STATE(0,0,1,1)] = 0,
-	[STATE(0,1,0,0)] = 1,
-	[STATE(0,1,1,0)] = 0,
-	[STATE(0,1,1,1)] = -1,
-	[STATE(1,0,0,0)] = -1,
-	[STATE(1,0,0,1)] = 0,
-	[STATE(1,0,1,0)] = 0,
-	[STATE(1,0,1,1)] = 1,
-	[STATE(1,1,0,0)] = 0,
-	[STATE(1,1,0,1)] = 1,
-	[STATE(1,1,1,0)] = -1,
-	[STATE(1,1,1,1)] = 0
-};
-
 static void
-_ao_quadrature_set(uint8_t q, uint8_t value) {
-	uint8_t v;
-	
-	v = ao_quadrature_state[q] & 3;
-	value = value & 3;
+_ao_quadrature_set(uint8_t q, uint8_t new) {
+	uint8_t	old = ao_quadrature_state[q];
 
-	if (v == value)
-		return;
-	
-	ao_quadrature_state[q] = (v << 2) | value;
-
-	ao_quadrature_raw[q] += step[ao_quadrature_state[q]];
-	if (value == 0) {
-		if (ao_quadrature_raw[q] == 4)
+	if (old != new && new == 0) {
+		if (old & 2)
 			_ao_quadrature_queue(q, 1);
-		else if (ao_quadrature_raw[q] == -4)
+		else if (old & 1)
 			_ao_quadrature_queue(q, -1);
-		ao_quadrature_raw[q] = 0;
 	}
+	ao_quadrature_state[q] = new;
 }
 
 static void
 ao_quadrature_isr(void)
 {
+#if AO_QUADRATURE_COUNT > 0
 	_ao_quadrature_set(0, _ao_quadrature_get(0));
+#endif
+#if AO_QUADRATURE_COUNT > 1
 	_ao_quadrature_set(1, _ao_quadrature_get(1));
+#endif
 }
 
 int32_t
@@ -120,6 +121,8 @@ static void
 ao_quadrature_test(void)
 {
 	uint8_t	q;
+	int32_t	c;
+	uint8_t	s;
 
 	ao_cmd_decimal();
 	q = ao_cmd_lex_i;
@@ -127,10 +130,18 @@ ao_quadrature_test(void)
 		ao_cmd_status = ao_cmd_syntax_error;
 		return;
 	}
-	printf ("count %d state %x raw %d\n",
-		ao_quadrature_count[q],
-		ao_quadrature_state[q],
-		ao_quadrature_raw[q]);
+
+	c = -10000;
+	s = 0;
+	while (ao_quadrature_count[q] != 10) {
+		if (ao_quadrature_count[q] != c ||
+		    ao_quadrature_state[q] != s) {
+			c = ao_quadrature_count[q];
+			s = ao_quadrature_state[q];
+			printf ("count %3d state %2x\n", c, s);
+			flush();
+		}
+	}
 #if 0
 	for (;;) {
 		int32_t	c;

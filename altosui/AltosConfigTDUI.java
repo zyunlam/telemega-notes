@@ -21,8 +21,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_3.*;
-import org.altusmetrum.altosuilib_1.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
 public class AltosConfigTDUI
 	extends AltosUIDialog
@@ -311,7 +311,7 @@ public class AltosConfigTDUI
 		int i;
 		for (i = 0; i < radio_frequency_value.getItemCount(); i++) {
 			AltosFrequency	f = (AltosFrequency) radio_frequency_value.getItemAt(i);
-			
+
 			if (f.close(new_radio_frequency)) {
 				radio_frequency_value.setSelectedIndex(i);
 				return;
@@ -319,7 +319,7 @@ public class AltosConfigTDUI
 		}
 		for (i = 0; i < radio_frequency_value.getItemCount(); i++) {
 			AltosFrequency	f = (AltosFrequency) radio_frequency_value.getItemAt(i);
-			
+
 			if (new_radio_frequency < f.frequency)
 				break;
 		}

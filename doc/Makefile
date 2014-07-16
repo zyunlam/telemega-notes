@@ -14,7 +14,8 @@ RELNOTES=\
 	release-notes-1.2.1.html \
 	release-notes-1.3.html \
 	release-notes-1.3.1.html \
-	release-notes-1.3.2.html
+	release-notes-1.3.2.html \
+	release-notes-1.4.html
 
 PICTURES=\
 	altosui.png \
@@ -34,6 +35,19 @@ PICTURES=\
 	landed.png \
 	launch-pad.png \
 	load-maps.png \
+	micropeak-app.png \
+	micropeak-back.jpg \
+	micropeak-device-dialog.png \
+	micropeak-dime.jpg \
+	micropeak-download.png \
+	micropeak-graph-configure.png \
+	micropeak-graph.png \
+	micropeak-preferences.png \
+	micropeak-raw-data.png \
+	micropeak-save-dialog.png \
+	micropeak-statistics.png \
+	MicroPeakUSB-2.0-inuse.jpg \
+	MicroPeakUSB-2.0.jpg \
 	scan-channels.png \
 	site-map.png \
 	table.png \
@@ -41,21 +55,23 @@ PICTURES=\
 	telemetrum-v1.1-thside.jpg \
 	telemini-v1-top.jpg \
 	telemini-v2-top.jpg
+
 SVG=\
-	easymini-outline.svg \
-	telemega-outline.svg \
+	easymini.svg \
+	telemega.svg \
 	telemetrum.svg \
 	telemini.svg
 
 RELNOTES_XSL=$(RELNOTES:.html=.xsl)
-HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html $(RELNOTES)
-PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf
+HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html telegps.html $(RELNOTES)
+PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
+	telemetrum-outline.pdf telemega-outline.pdf easymini-outline.pdf
 HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
 FOSTYLE=xorg-fo.xsl
 TEMPLATES=titlepage.templates.xsl
 PDFSTYLE=
 IMAGES=$(PICTURES) $(SVG)
-DOC=$(HTML) $(PDF) $(PICTURES)
+DOC=$(HTML) $(PDF) $(IMAGES)
 
 .SUFFIXES: .xml .xsl .html .pdf
 

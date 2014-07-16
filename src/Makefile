@@ -19,11 +19,10 @@ include Makedefs
 SDCCDIRS=\
 	telemetrum-v1.2 telemetrum-v1.1 telemetrum-v1.0 \
 	teledongle-v0.2 \
-	telemini-v1.0 \
+	telemini-v1.0 telemini-v2.0 \
 	telebt-v1.0 \
 	teleterra-v0.2 teleshield-v0.1 \
-	telefire-v0.1 telefire-v0.2 \
-	telemini-v2.0
+	telefire-v0.1 telefire-v0.2
 
 ARMM3DIRS=\
 	telemega-v0.1 telemega-v0.1/flash-loader \
@@ -31,9 +30,11 @@ ARMM3DIRS=\
 	telemetrum-v2.0 telemetrum-v2.0/flash-loader \
 	megadongle-v0.1 megadongle-v0.1/flash-loader \
 	telegps-v0.3 telegps-v0.3/flash-loader \
+	telegps-v1.0 telegps-v1.0/flash-loader \
 	telelco-v0.2 telelco-v0.2/flash-loader \
 	telescience-v0.2 telescience-v0.2/flash-loader \
-	fox1ihu fox1ihu/flash-loader
+	fox1ihu fox1ihu/flash-loader \
+	teleballoon-v2.0
 
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader

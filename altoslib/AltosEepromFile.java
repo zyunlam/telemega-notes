@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.*;
@@ -72,7 +72,17 @@ public class AltosEepromFile extends AltosStateIterable {
 		headers = new AltosEepromIterable(AltosEepromHeader.read(input));
 
 		start = headers.state();
-		start.set_state(AltosLib.ao_flight_pad);
+		if (start.state != AltosLib.ao_flight_stateless)
+			start.set_state(AltosLib.ao_flight_pad);
+
+		if (start.log_format == AltosLib.MISSING) {
+			if (start.product != null) {
+				if (start.product.startsWith("TeleMetrum"))
+					start.log_format = AltosLib.AO_LOG_FORMAT_FULL;
+				else if (start.product.startsWith("TeleMini"))
+					start.log_format = AltosLib.AO_LOG_FORMAT_TINY;
+			}
+		}
 
 		switch (start.log_format) {
 		case AltosLib.AO_LOG_FORMAT_FULL:
@@ -92,6 +102,9 @@ public class AltosEepromFile extends AltosStateIterable {
 		case AltosLib.AO_LOG_FORMAT_TELEMINI:
 		case AltosLib.AO_LOG_FORMAT_EASYMINI:
 			body = new AltosEepromIterable(AltosEepromMini.read(input));
+			break;
+		case AltosLib.AO_LOG_FORMAT_TELEGPS:
+			body = new AltosEepromIterable(AltosEepromGPS.read(input));
 			break;
 		default:
 			body = new AltosEepromIterable(new LinkedList<AltosEeprom>());

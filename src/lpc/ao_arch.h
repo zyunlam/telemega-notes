@@ -28,9 +28,9 @@
 #define AO_STACK_SIZE	512
 #endif
 
-#define AO_LED_TYPE	uint16_t
-
 #define AO_PORT_TYPE	uint32_t
+
+#define AO_LED_TYPE	AO_PORT_TYPE
 
 #ifndef AO_TICK_TYPE
 #define AO_TICK_TYPE	uint16_t
@@ -140,7 +140,12 @@ ao_serial_init(void);
 #define AO_SPI_SPEED_FAST	AO_SPI_SPEED_12MHz
 
 #define AO_BOOT_APPLICATION_BASE	((uint32_t *) 0x00001000)
+#define AO_BOOT_APPLICATION_BOUND	((uint32_t *) (0x00000000 + 32 * 1024))
 #define AO_BOOT_LOADER_BASE		((uint32_t *) 0x00000000)
 #define HAS_BOOT_LOADER			1
+
+/* ADC definitions */
+
+#define AO_ADC_MAX	32767
 
 #endif /* _AO_ARCH_H_ */

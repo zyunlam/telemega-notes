@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.util.concurrent.TimeoutException;
 
@@ -31,10 +31,10 @@ public class AltosSensorEMini {
 
 			if (sensor_emini == null)
 				return;
-			state.set_battery_voltage(AltosConvert.easy_mini_voltage(sensor_emini.batt));
-			state.set_apogee_voltage(AltosConvert.easy_mini_voltage(sensor_emini.apogee));
-			state.set_main_voltage(AltosConvert.easy_mini_voltage(sensor_emini.main));
-			
+			state.set_battery_voltage(AltosConvert.easy_mini_voltage(sensor_emini.batt, config_data.serial));
+			state.set_apogee_voltage(AltosConvert.easy_mini_voltage(sensor_emini.apogee, config_data.serial));
+			state.set_main_voltage(AltosConvert.easy_mini_voltage(sensor_emini.main, config_data.serial));
+
 		} catch (TimeoutException te) {
 		}
 	}

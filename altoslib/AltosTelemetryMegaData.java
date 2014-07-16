@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 	int	state;
-	
+
 	int	v_batt;
 	int	v_pyro;
 	int	sense[];
@@ -41,7 +41,7 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		v_batt = int16(6);
 		v_pyro = int16(8);
 
-		sense = new int[6];	
+		sense = new int[6];
 
 		for (int i = 0; i < 6; i++) {
 			sense[i] = int8(10 + i) << 4;
@@ -62,7 +62,7 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		super.update_state(state);
 
 		state.set_state(this.state);
-			
+
 		state.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt));
 		state.set_pyro_voltage(AltosConvert.mega_pyro_voltage(v_pyro));
 

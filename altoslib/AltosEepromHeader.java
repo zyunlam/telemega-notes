@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.*;
@@ -53,9 +53,10 @@ public class AltosEepromHeader extends AltosEeprom {
 		case AltosLib.AO_LOG_MANUFACTURER:
 			break;
 		case AltosLib.AO_LOG_PRODUCT:
+			state.product = data;
 			break;
 		case AltosLib.AO_LOG_LOG_FORMAT:
-			state.log_format = config_a;
+			state.set_log_format(config_a);
 			break;
 		case AltosLib.AO_LOG_SERIAL_NUMBER:
 			state.set_serial(config_a);
@@ -162,7 +163,7 @@ public class AltosEepromHeader extends AltosEeprom {
 			break;
 		}
 	}
-	
+
 	public AltosEepromHeader (String[] tokens) {
 		last = false;
 		valid = true;
@@ -269,7 +270,7 @@ public class AltosEepromHeader extends AltosEeprom {
 		for (AltosEepromHeader header : headers) {
 			header.write(out);
 		}
-		
+
 	}
 
 	public AltosEepromHeader (String line) {

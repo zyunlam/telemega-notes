@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.*;
@@ -32,7 +32,12 @@ public class AltosEepromMega extends AltosEeprom {
 	public int flight() { return data16(0); }
 	public int ground_accel() { return data16(2); }
 	public int ground_pres() { return data32(4); }
-	public int ground_temp() { return data32(8); }
+	public int ground_accel_along() { return data16(8); }
+	public int ground_accel_across() { return data16(10); }
+	public int ground_accel_through() { return data16(12); }
+	public int ground_roll() { return data16(14); }
+	public int ground_pitch() { return data16(16); }
+	public int ground_yaw() { return data16(18); }
 
 	/* AO_LOG_STATE elements */
 	public int state() { return data16(0); }
@@ -70,7 +75,14 @@ public class AltosEepromMega extends AltosEeprom {
 	public int year() { return data8(14); }
 	public int month() { return data8(15); }
 	public int day() { return data8(16); }
-	
+	public int course() { return data8(17); }
+	public int ground_speed() { return data16(18); }
+	public int climb_rate() { return data16(20); }
+	public int pdop() { return data8(22); }
+	public int hdop() { return data8(23); }
+	public int vdop() { return data8(24); }
+	public int mode() { return data8(25); }
+
 	/* AO_LOG_GPS_SAT elements */
 	public int nsat() { return data16(0); }
 	public int svid(int n) { return data8(2 + n * 2); }
@@ -106,7 +118,6 @@ public class AltosEepromMega extends AltosEeprom {
 			state.set_flight(flight());
 			state.set_ground_accel(ground_accel());
 			state.set_ground_pressure(ground_pres());
-			state.set_temperature(ground_temp() / 100.0);
 			break;
 		case AltosLib.AO_LOG_STATE:
 			state.set_tick(tick);
@@ -150,6 +161,7 @@ public class AltosEepromMega extends AltosEeprom {
 				voltages[i] = AltosConvert.mega_pyro_voltage(sense(i));
 
 			state.set_ignitor_voltage(voltages);
+			state.set_pyro_fired(pyro());
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
 			state.set_tick(tick);
@@ -172,6 +184,11 @@ public class AltosEepromMega extends AltosEeprom {
 			gps.year = 2000 + year();
 			gps.month = month();
 			gps.day = day();
+			gps.ground_speed = ground_speed() * 1.0e-2;
+			gps.course = course() * 2;
+			gps.climb_rate = climb_rate() * 1.0e-2;
+			gps.hdop = hdop();
+			gps.vdop = vdop();
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
 			state.set_tick(tick);

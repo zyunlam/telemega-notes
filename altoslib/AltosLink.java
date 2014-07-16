@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_3;
+package org.altusmetrum.altoslib_4;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -76,7 +76,7 @@ public abstract class AltosLink implements Runnable {
 		return get_reply(5000);
 	}
 
-		
+
 	public abstract boolean can_cancel_reply();
 	public abstract boolean show_reply_timeout();
 	public abstract void hide_reply_timeout();
@@ -215,7 +215,7 @@ public abstract class AltosLink implements Runnable {
 					break;
 				}
 			}
-			
+
 		} finally {
 			--in_reply;
 		}

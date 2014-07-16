@@ -21,8 +21,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_3.*;
-import org.altusmetrum.altosuilib_1.*;
+import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altosuilib_2.*;
 
 public class AltosConfigPyroUI
 	extends AltosUIDialog
@@ -50,7 +50,7 @@ public class AltosConfigPyroUI
 		public int		flag;
 		public JCheckBox	enable;
 		public JTextField	value;
-		public JComboBox	combo;
+		public JComboBox<String>	combo;
 		AltosConfigPyroUI	ui;
 		boolean			setting;
 
@@ -63,22 +63,22 @@ public class AltosConfigPyroUI
 
 		public void itemStateChanged(ItemEvent e) {
 			set_enable(enable.isSelected());
-			if (!setting) 
+			if (!setting)
 				ui.set_dirty();
 		}
 
 		public void changedUpdate(DocumentEvent e) {
-			if (!setting) 
+			if (!setting)
 				ui.set_dirty();
 		}
 
 		public void insertUpdate(DocumentEvent e) {
-			if (!setting) 
+			if (!setting)
 				ui.set_dirty();
 		}
 
 		public void removeUpdate(DocumentEvent e) {
-			if (!setting) 
+			if (!setting)
 				ui.set_dirty();
 		}
 
@@ -105,11 +105,13 @@ public class AltosConfigPyroUI
 				AltosUnits units = AltosPyro.pyro_to_units(flag);
 				if (units != null)
 					unit_value = units.value(new_value);
-				String	format = "%6.0f";
-				if (scale >= 10)
-					format = "%6.1f";
-				else if (scale >= 100)
+				String	format;
+				if (scale >= 100)
 					format = "%6.2f";
+				else if (scale >= 10)
+					format = "%6.1f";
+				else
+					format = "%6.0f";
 				value.setText(String.format(format, unit_value));
 			}
 			if (combo != null)
@@ -122,12 +124,16 @@ public class AltosConfigPyroUI
 			return enable.isSelected();
 		}
 
-		public double value() {
+		public double value() throws AltosConfigDataException {
 			if (value != null) {
 				AltosUnits units = AltosPyro.pyro_to_units(flag);
-				if (units != null)
-					return units.parse(value.getText());
-				return Double.parseDouble(value.getText());
+				try {
+					if (units != null)
+						return units.parse(value.getText());
+					return Double.parseDouble(value.getText());
+				} catch (NumberFormatException e) {
+					throw new AltosConfigDataException("\"%s\": %s\n", value.getText(), e.getMessage());
+				}
 			}
 			if (combo != null)
 				return combo.getSelectedIndex() + AltosLib.ao_flight_boost;
@@ -149,7 +155,7 @@ public class AltosConfigPyroUI
 			enable = new JCheckBox();
 			enable.addItemListener(this);
 			pane.add(enable, c);
-			
+
 			if ((flag & AltosPyro.pyro_no_value) == 0) {
 				c = new GridBagConstraints();
 				c.gridx = x+1; c.gridy = y;
@@ -159,7 +165,7 @@ public class AltosConfigPyroUI
 				c.insets = il;
 				if ((flag & AltosPyro.pyro_state_value) != 0) {
 					make_state_names();
-					combo = new JComboBox(state_names);
+					combo = new JComboBox<String>(state_names);
 					combo.addItemListener(this);
 					pane.add(combo, c);
 				} else {
@@ -187,15 +193,21 @@ public class AltosConfigPyroUI
 			}
 		}
 
-		public AltosPyro get() {
+		public AltosPyro get() throws AltosConfigDataException {
 			AltosPyro	p = new AltosPyro(channel);
 
 			int row = 0;
 			for (int flag = 1; flag < AltosPyro.pyro_all; flag <<= 1) {
 				if ((AltosPyro.pyro_all & flag) != 0) {
 					if (items[row].enabled()) {
+						try {
 						p.flags |= flag;
 						p.set_value(flag, items[row].value());
+						} catch (AltosConfigDataException ae) {
+							throw new AltosConfigDataException("%s, %s",
+											   AltosPyro.pyro_to_name(flag),
+											   ae.getMessage());
+						}
 					}
 					row++;
 				}
@@ -224,7 +236,7 @@ public class AltosConfigPyroUI
 
 			items = new PyroItem[nrow];
 			int row = 0;
-			
+
 			GridBagConstraints	c;
 			c = new GridBagConstraints();
 			c.gridx = x; c.gridy = y;
@@ -254,11 +266,38 @@ public class AltosConfigPyroUI
 		}
 	}
 
-	public AltosPyro[] get_pyros() {
+	public AltosPyro[] get_pyros() throws AltosConfigDataException {
 		AltosPyro[]	pyros = new AltosPyro[columns.length];
-		for (int c = 0; c < columns.length; c++)
-			pyros[c] = columns[c].get();
+		for (int c = 0; c < columns.length; c++) {
+			try {
+				pyros[c] = columns[c].get();
+			} catch (AltosConfigDataException ae) {
+				throw new AltosConfigDataException ("Channel %c, %s", c + 'A', ae.getMessage());
+			}
+		}
 		return pyros;
+	}
+
+	JLabel			pyro_firing_time_label;
+	JComboBox<String>	pyro_firing_time_value;
+
+	static String[]		pyro_firing_time_values = {
+		"0.050", "0.100", "0.250", "0.500", "1.0", "2.0"
+	};
+
+	public void set_pyro_firing_time(double new_pyro_firing_time) {
+		pyro_firing_time_value.setSelectedItem(Double.toString(new_pyro_firing_time));
+		pyro_firing_time_value.setEnabled(new_pyro_firing_time >= 0);
+	}
+
+	public double get_pyro_firing_time() throws AltosConfigDataException {
+		String	v = pyro_firing_time_value.getSelectedItem().toString();
+
+		try {
+			return Double.parseDouble(v);
+		} catch (NumberFormatException e) {
+			throw new AltosConfigDataException("Invalid pyro firing time \"%s\"", v);
+		}
 	}
 
 	public void set_dirty() {
@@ -317,7 +356,7 @@ public class AltosConfigPyroUI
 			setVisible(false);
 	}
 
-	public AltosConfigPyroUI(AltosConfigUI in_owner, AltosPyro[] pyros) {
+	public AltosConfigPyroUI(AltosConfigUI in_owner, AltosPyro[] pyros, double pyro_firing_time) {
 
 		super(in_owner, "Configure Pyro Channels", false);
 
@@ -362,6 +401,32 @@ public class AltosConfigPyroUI
 			columns[i].set(pyros[i]);
 		}
 
+		/* Pyro firing time */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 2;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		pyro_firing_time_label = new JLabel("Pyro Firing Time(s):");
+		pane.add(pyro_firing_time_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 2; c.gridy = row;
+		c.gridwidth = 7;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		pyro_firing_time_value = new JComboBox<String>(pyro_firing_time_values);
+		pyro_firing_time_value.setEditable(true);
+		pyro_firing_time_value.addItemListener(this);
+		set_pyro_firing_time(pyro_firing_time);
+		pane.add(pyro_firing_time_value, c);
+		pyro_firing_time_value.setToolTipText("Length of extra pyro channel firing pulse");
+
 		c = new GridBagConstraints();
 		c.gridx = pyros.length*2-1;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -371,7 +436,7 @@ public class AltosConfigPyroUI
 		pane.add(close, c);
 		close.addActionListener(this);
 		close.setActionCommand("Close");
-		
+
 		addWindowListener(new ConfigListener(this, owner));
 		AltosPreferences.register_units_listener(this);
 	}
