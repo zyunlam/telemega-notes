@@ -41,7 +41,9 @@
 #endif
 
 /* Wait after power on before doing anything to give the user time to assemble the rocket */
+#ifndef BOOST_DELAY
 #define BOOST_DELAY		AO_SEC_TO_TICKS(60)
+#endif
 
 /* Pressure change (in Pa) to detect landing */
 #define LAND_DETECT		24	/* 2m at sea level, 2.4m at 2000m */

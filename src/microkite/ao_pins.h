@@ -62,8 +62,9 @@ typedef int32_t alt_t;
 
 #define AO_ALT_VALUE(x)		((x) * (alt_t) 10)
 
-#define BOOST_DETECT		1200	/* 100m (ish) */
+#define BOOST_DETECT		   0	/* none */
 #define LOG_INTERVAL		 200	/* 19.2 seconds */
+#define BOOST_DELAY		0
 
 #define AO_LOG_ID		AO_LOG_ID_MICROKITE
 

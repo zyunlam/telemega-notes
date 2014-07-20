@@ -62,19 +62,25 @@ ao_microflight(void)
 	h = 0;
 	for (;;) {
 		time += SAMPLE_SLEEP;
+#if BOOST_DETECT
 		if ((sample_count & 0x1f) == 0)
 			ao_led_on(AO_LED_REPORT);
+#endif
 		ao_delay_until(time);
 		ao_microsample();
+#if BOOST_DETECT
 		if ((sample_count & 0x1f) == 0)
 			ao_led_off(AO_LED_REPORT);
+#endif
 		pa_hist[h] = pa;
 		h = SKIP_PA_HIST(h,1);
 		pa_diff = pa_ground - ao_pa;
 
+#if BOOST_DETECT
 		/* Check for a significant pressure change */
 		if (pa_diff > BOOST_DETECT)
 			break;
+#endif
 
 		if (sample_count < GROUND_AVG * 2) {
 			if (sample_count < GROUND_AVG)
@@ -84,6 +90,9 @@ ao_microflight(void)
 			pa_ground = pa_sum >> GROUND_AVG_SHIFT;
 			pa_sum = 0;
 			sample_count = 0;
+#if !BOOST_DETECT
+			break;
+#endif
 		}
 	}
 
