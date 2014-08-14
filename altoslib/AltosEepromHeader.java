@@ -96,6 +96,22 @@ public class AltosEepromHeader extends AltosEeprom {
 		case AltosLib.AO_LOG_SOFTWARE_VERSION:
 			state.set_firmware_version(data);
 			break;
+		case AltosLib.AO_LOG_FREQUENCY:
+		case AltosLib.AO_LOG_APOGEE_LOCKOUT:
+		case AltosLib.AO_LOG_RADIO_RATE:
+		case AltosLib.AO_LOG_IGNITE_MODE:
+		case AltosLib.AO_LOG_PAD_ORIENTATION:
+		case AltosLib.AO_LOG_RADIO_ENABLE:
+		case AltosLib.AO_LOG_AES_KEY:
+		case AltosLib.AO_LOG_APRS:
+		case AltosLib.AO_LOG_BEEP_SETTING:
+		case AltosLib.AO_LOG_TRACKER_SETTING:
+		case AltosLib.AO_LOG_PYRO_TIME:
+		case AltosLib.AO_LOG_APRS_ID:
+			break;
+		case AltosLib.AO_LOG_ALTITUDE_32:
+			state.set_altitude_32(config_a);
+			break;
 		}
 	}
 
@@ -161,6 +177,22 @@ public class AltosEepromHeader extends AltosEeprom {
 		case AltosLib.AO_LOG_BARO_CRC:
 			out.printf ("# Baro crc: %d\n", config_a);
 			break;
+		case AltosLib.AO_LOG_FREQUENCY:
+		case AltosLib.AO_LOG_APOGEE_LOCKOUT:
+		case AltosLib.AO_LOG_RADIO_RATE:
+		case AltosLib.AO_LOG_IGNITE_MODE:
+		case AltosLib.AO_LOG_PAD_ORIENTATION:
+		case AltosLib.AO_LOG_RADIO_ENABLE:
+		case AltosLib.AO_LOG_AES_KEY:
+		case AltosLib.AO_LOG_APRS:
+		case AltosLib.AO_LOG_BEEP_SETTING:
+		case AltosLib.AO_LOG_TRACKER_SETTING:
+		case AltosLib.AO_LOG_PYRO_TIME:
+		case AltosLib.AO_LOG_APRS_ID:
+			break;
+		case AltosLib.AO_LOG_ALTITUDE_32:
+			out.printf("# Altitude-32: %d\n", config_a);
+			break;
 		}
 	}
 
@@ -204,6 +236,9 @@ public class AltosEepromHeader extends AltosEeprom {
 				config_a = Integer.parseInt(tokens[1]);
 			} else if (tokens[0].equals("log-format")) {
 				cmd = AltosLib.AO_LOG_LOG_FORMAT;
+				config_a = Integer.parseInt(tokens[1]);
+			} else if (tokens[0].equals("altitude-32")) {
+				cmd = AltosLib.AO_LOG_ALTITUDE_32;
 				config_a = Integer.parseInt(tokens[1]);
 			} else if (tokens[0].equals("software-version")) {
 				cmd = AltosLib.AO_LOG_SOFTWARE_VERSION;

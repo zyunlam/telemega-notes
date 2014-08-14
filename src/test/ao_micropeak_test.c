@@ -33,6 +33,7 @@ uint8_t ao_flight_debug;
 #define AO_FLIGHT_TEST
 
 typedef int32_t alt_t;
+typedef int32_t pres_t;
 
 #define AO_MS_TO_TICKS(ms)	((ms) / 10)
 

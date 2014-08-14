@@ -67,7 +67,7 @@ public class AltosEepromMega extends AltosEeprom {
 	/* AO_LOG_GPS_TIME elements */
 	public int latitude() { return data32(0); }
 	public int longitude() { return data32(4); }
-	public int altitude() { return data16(8); }
+	public int altitude_low() { return data16(8); }
 	public int hour() { return data8(10); }
 	public int minute() { return data8(11); }
 	public int second() { return data8(12); }
@@ -82,6 +82,7 @@ public class AltosEepromMega extends AltosEeprom {
 	public int hdop() { return data8(23); }
 	public int vdop() { return data8(24); }
 	public int mode() { return data8(25); }
+	public int altitude_high() { return data16(26); }
 
 	/* AO_LOG_GPS_SAT elements */
 	public int nsat() { return data16(0); }
@@ -168,7 +169,11 @@ public class AltosEepromMega extends AltosEeprom {
 			gps = state.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
-			gps.alt = altitude();
+
+			if (state.altitude_32())
+				gps.alt = (altitude_low() & 0xffff) | (altitude_high() << 16);
+			else
+				gps.alt = altitude_low();
 
 			gps.hour = hour();
 			gps.minute = minute();
@@ -187,8 +192,21 @@ public class AltosEepromMega extends AltosEeprom {
 			gps.ground_speed = ground_speed() * 1.0e-2;
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
-			gps.hdop = hdop();
-			gps.vdop = vdop();
+			if (state.compare_version("1.4.9") >= 0) {
+				gps.pdop = pdop() / 10.0;
+				gps.hdop = hdop() / 10.0;
+				gps.vdop = vdop() / 10.0;
+			} else {
+				gps.pdop = pdop() / 100.0;
+				if (gps.pdop < 0.8)
+					gps.pdop += 2.56;
+				gps.hdop = hdop() / 100.0;
+				if (gps.hdop < 0.8)
+					gps.hdop += 2.56;
+				gps.vdop = vdop() / 100.0;
+				if (gps.vdop < 0.8)
+					gps.vdop += 2.56;
+			}
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
 			state.set_tick(tick);

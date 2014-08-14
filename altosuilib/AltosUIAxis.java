@@ -48,7 +48,11 @@ public class AltosUIAxis extends NumberAxis {
 	public final static int axis_default = axis_include_zero;
 
 	public void set_units() {
-		setLabel(String.format("%s (%s)", label, units.show_units()));
+		String u = units.show_units();
+		if (u != null)
+			setLabel(String.format("%s (%s)", label, u));
+		else
+			setLabel(label);
 	}
 
 	public void set_enable(boolean enable) {

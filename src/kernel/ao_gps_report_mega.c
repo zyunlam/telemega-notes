@@ -78,7 +78,8 @@ ao_gps_report_mega(void)
 #if GPS_SPARSE_LOG
 		/* Don't log data if GPS has a fix and hasn't moved for a while */
 		if ((gps_data.flags & AO_GPS_VALID) &&
-		    !ao_gps_sparse_should_log(gps_data.latitude, gps_data.longitude, gps_data.altitude))
+		    !ao_gps_sparse_should_log(gps_data.latitude, gps_data.longitude,
+					      AO_TELEMETRY_LOCATION_ALTITUDE(&gps_data))
 			continue;
 #endif
 		if ((new & AO_GPS_NEW_DATA) && (gps_data.flags & AO_GPS_VALID)) {
@@ -87,8 +88,8 @@ ao_gps_report_mega(void)
 			gps_log.type = AO_LOG_GPS_TIME;
 			gps_log.u.gps.latitude = gps_data.latitude;
 			gps_log.u.gps.longitude = gps_data.longitude;
-			gps_log.u.gps.altitude = gps_data.altitude;
-
+			gps_log.u.gps.altitude_low = gps_data.altitude_low;
+			gps_log.u.gps.altitude_high = gps_data.altitude_high;
 			gps_log.u.gps.hour = gps_data.hour;
 			gps_log.u.gps.minute = gps_data.minute;
 			gps_log.u.gps.second = gps_data.second;

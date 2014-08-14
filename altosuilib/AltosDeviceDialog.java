@@ -131,7 +131,8 @@ public abstract class AltosDeviceDialog extends AltosUIDialog implements ActionL
 		buttonPane.add(cancel_button);
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 
-		add_bluetooth();
+		if (AltosUILib.has_bluetooth)
+			add_bluetooth();
 
 		buttonPane.add(select_button);
 

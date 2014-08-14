@@ -82,6 +82,13 @@ MACOSX_ICONS	=\
 	../icon/altusmetrum-micropeak.icns \
 	../icon/application-vnd.altusmetrum.micropeak.icns
 
+LINUX_ICONS	=\
+	$(ICONDIR)/altusmetrum-micropeak.svg \
+	$(ICONDIR)/application-vnd.altusmetrum.micropeak.svg
+
+LINUX_MIMETYPE	=\
+	$(ICONDIR)/org-altusmetrum-mimetypes.xml
+
 desktopdir = $(datadir)/applications
 desktop_file = altusmetrum-micropeak.desktop
 desktop_SCRIPTS = $(desktop_file)
@@ -114,7 +121,7 @@ DOC=$(MICROPEAK_DOC)
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in ../icon/altusmetrum-micropeak.svg
+LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
 LINUX_EXTRA=micropeak-fat $(desktop_file).in
 
 MACOSX_DRIVER_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg

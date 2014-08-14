@@ -25,12 +25,12 @@ import org.altusmetrum.altosuilib_3.*;
 
 public class MicroFrame extends AltosUIFrame {
 	static String[] micro_icon_names = {
-		"/micropeak-16.png",
-		"/micropeak-32.png",
-		"/micropeak-48.png",
-		"/micropeak-64.png",
-		"/micropeak-128.png",
-		"/micropeak-256.png"
+		"/altusmetrum-micropeak-16.png",
+		"/altusmetrum-micropeak-32.png",
+		"/altusmetrum-micropeak-48.png",
+		"/altusmetrum-micropeak-64.png",
+		"/altusmetrum-micropeak-128.png",
+		"/altusmetrum-micropeak-256.png"
 	};
 
 	static { set_icon_names(micro_icon_names); }

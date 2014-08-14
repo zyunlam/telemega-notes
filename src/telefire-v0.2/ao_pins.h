@@ -19,6 +19,7 @@
 #define _AO_PINS_H_
 
 #define HAS_RADIO		1
+#define HAS_RADIO_RATE		1
 #define HAS_TELEMETRY		0
 
 #define HAS_FLIGHT		0

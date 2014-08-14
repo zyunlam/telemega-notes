@@ -109,7 +109,7 @@ altitude-pa.h: make-altitude-pa
 altitude-pa-small.h: make-altitude-pa
 	nickle $< --sample 3 > $@
 
-ao_kalman.h: make-kalman kalman.5c kalman_filter.5c load_csv.5c matrix.5c
+ao_kalman.h: make-kalman kalman.5c kalman_micro.5c kalman_filter.5c load_csv.5c matrix.5c
 	bash $< kalman > $@
 
 ao_whiten.h: make-whiten

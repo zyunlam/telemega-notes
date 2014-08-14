@@ -278,15 +278,17 @@ ao_report_init(void);
  * Given raw data, convert to SI units
  */
 
+#if HAS_BARO
 /* pressure from the sensor to altitude in meters */
-int16_t
-ao_pres_to_altitude(int16_t pres) __reentrant;
+alt_t
+ao_pres_to_altitude(pres_t pres) __reentrant;
 
-int16_t
-ao_altitude_to_pres(int16_t alt) __reentrant;
+pres_t
+ao_altitude_to_pres(alt_t alt) __reentrant;
 
 int16_t
 ao_temp_to_dC(int16_t temp) __reentrant;
+#endif
 
 /*
  * ao_convert_pa.c
@@ -296,11 +298,13 @@ ao_temp_to_dC(int16_t temp) __reentrant;
 
 #include <ao_data.h>
 
+#if HAS_BARO
 alt_t
-ao_pa_to_altitude(int32_t pa);
+ao_pa_to_altitude(pres_t pa);
 
 int32_t
 ao_altitude_to_pa(alt_t alt);
+#endif
 
 #if HAS_DBG
 #include <ao_dbg.h>

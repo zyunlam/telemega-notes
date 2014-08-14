@@ -32,12 +32,12 @@ public class TeleGPS
 {
 
 	static String[] telegps_icon_names = {
-		"/telegps-16.png",
-		"/telegps-32.png",
-		"/telegps-48.png",
-		"/telegps-64.png",
-		"/telegps-128.png",
-		"/telegps-256.png"
+		"/altusmetrum-telegps-16.png",
+		"/altusmetrum-telegps-32.png",
+		"/altusmetrum-telegps-48.png",
+		"/altusmetrum-telegps-64.png",
+		"/altusmetrum-telegps-128.png",
+		"/altusmetrum-telegps-256.png"
 	};
 
 	static { set_icon_names(telegps_icon_names); }

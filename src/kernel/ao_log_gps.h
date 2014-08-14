@@ -21,9 +21,6 @@
 #ifndef _AO_LOG_GPS_H_
 #define _AO_LOG_GPS_H_
 
-uint8_t
-ao_log_gps_should_log(int32_t lat, int32_t lon, int16_t alt);
-
 void
 ao_log_gps_flight(void);
 

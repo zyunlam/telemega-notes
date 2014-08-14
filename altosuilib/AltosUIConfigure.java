@@ -283,7 +283,8 @@ public class AltosUIConfigure
 		add_look_and_feel();
 		add_position();
 		add_map_cache();
-		add_bluetooth();
+		if (AltosUILib.has_bluetooth)
+			add_bluetooth();
 		add_frequencies();
 
 		/* And a close button at the bottom */

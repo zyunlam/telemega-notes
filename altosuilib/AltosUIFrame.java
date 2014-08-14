@@ -36,12 +36,12 @@ public class AltosUIFrame extends JFrame implements AltosUIListener, AltosPositi
 	}
 
 	static String[] altos_icon_names = {
-		"/altus-metrum-16.png",
-		"/altus-metrum-32.png",
-		"/altus-metrum-48.png",
-		"/altus-metrum-64.png",
-		"/altus-metrum-128.png",
-		"/altus-metrum-256.png"
+		"/altusmetrum-altosui-16.png",
+		"/altusmetrum-altosui-32.png",
+		"/altusmetrum-altosui-48.png",
+		"/altusmetrum-altosui-64.png",
+		"/altusmetrum-altosui-128.png",
+		"/altusmetrum-altosui-256.png"
 	};
 
 	static public String[] icon_names;

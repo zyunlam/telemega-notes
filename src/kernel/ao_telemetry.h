@@ -86,12 +86,9 @@ struct ao_telemetry_configuration {
 
 #define AO_TELEMETRY_LOCATION		0x05
 
-#define AO_GPS_MODE_NOT_VALID		'N'
-#define AO_GPS_MODE_AUTONOMOUS		'A'
-#define AO_GPS_MODE_DIFFERENTIAL	'D'
-#define AO_GPS_MODE_ESTIMATED		'E'
-#define AO_GPS_MODE_MANUAL		'M'
-#define AO_GPS_MODE_SIMULATED		'S'
+/* Mode bits */
+
+#define AO_GPS_MODE_ALTITUDE_24		(1 << 0)	/* reports 24-bits of altitude */
 
 struct ao_telemetry_location {
 	uint16_t	serial;		/*  0 */
@@ -99,7 +96,7 @@ struct ao_telemetry_location {
 	uint8_t		type;		/*  4 */
 
 	uint8_t         flags;		/*  5 Number of sats and other flags */
-	int16_t         altitude;	/*  6 GPS reported altitude (m) */
+	uint16_t        altitude_low;	/*  6 GPS reported altitude (m) */
 	int32_t         latitude;	/*  8 latitude (degrees * 10⁷) */
 	int32_t         longitude;	/* 12 longitude (degrees * 10⁷) */
 	uint8_t         year;		/* 16 (- 2000) */
@@ -115,9 +112,30 @@ struct ao_telemetry_location {
 	uint16_t	ground_speed;	/* 26 cm/s */
 	int16_t		climb_rate;	/* 28 cm/s */
 	uint8_t		course;		/* 30 degrees / 2 */
-	uint8_t		unused;		/* 31 unused */
+	int8_t		altitude_high;	/* 31 high byte of altitude */
 	/* 32 */
 };
+
+#if HAS_GPS
+
+#ifndef HAS_WIDE_GPS
+#define HAS_WIDE_GPS	1
+#endif
+
+#if HAS_WIDE_GPS
+typedef int32_t		gps_alt_t;
+#define AO_TELEMETRY_LOCATION_ALTITUDE(l) 	(((gps_alt_t) (l)->altitude_high << 16) | ((l)->altitude_low))
+#define AO_TELEMETRY_LOCATION_SET_ALTITUDE(l,a) (((l)->mode |= AO_GPS_MODE_ALTITUDE_24), \
+						 ((l)->altitude_high = (a) >> 16), \
+						 ((l)->altitude_low = (a)))
+#else
+typedef int16_t		gps_alt_t;
+#define AO_TELEMETRY_LOCATION_ALTITUDE(l)	((gps_alt_t) (l)->altitude_low)
+#define AO_TELEMETRY_LOCATION_SET_ALTITUDE(l,a)	(((l)->mode = 0, \
+						  (l)->altitude_low = (a)))
+#endif /* HAS_WIDE_GPS */
+
+#endif /* HAS_GPS */
 
 #define AO_TELEMETRY_SATELLITE		0x06
 

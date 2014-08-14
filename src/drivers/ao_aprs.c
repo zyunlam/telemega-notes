@@ -713,7 +713,7 @@ static int tncPositionPacket(void)
     if (ao_gps_data.flags & AO_GPS_VALID) {
 	latitude = ao_gps_data.latitude;
 	longitude = ao_gps_data.longitude;
-	altitude = ao_gps_data.altitude;
+	altitude = AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_data);
 	if (altitude < 0)
 	    altitude = 0;
     }

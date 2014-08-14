@@ -108,6 +108,29 @@ cc_altitude_to_pressure(double altitude)
    return pressure;
 }
 
+double
+cc_altitude_to_temperature(double altitude)
+{
+
+   double base_temperature = LAYER0_BASE_TEMPERATURE;
+   double temperature;
+
+   int layer_number; /* identifies layer in the atmosphere */
+   double delta_z; /* difference between two altitudes */
+
+   /* calculate the base temperature for the atmospheric layer
+      associated with the inputted altitude */
+   for(layer_number = 0; layer_number < NUMBER_OF_LAYERS - 1 && altitude > base_altitude[layer_number + 1]; layer_number++) {
+      delta_z = base_altitude[layer_number + 1] - base_altitude[layer_number];
+      base_temperature += delta_z * lapse_rate[layer_number];
+   }
+
+   /* calculate the pressure at the inputted altitude */
+   delta_z = altitude - base_altitude[layer_number];
+   temperature = base_temperature + lapse_rate[layer_number] * delta_z;
+
+   return temperature - 273.15;
+}
 
 /* outputs the altitude associated with the given pressure. the altitude
    returned is measured with respect to the mean sea level */

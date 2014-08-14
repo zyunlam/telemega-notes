@@ -104,6 +104,14 @@ MACOSX_ICONS	=\
 	$(ICONDIR)/application-vnd.altusmetrum.eeprom.icns \
 	$(ICONDIR)/application-vnd.altusmetrum.telemetry.icns
 
+LINUX_ICONS	=\
+	$(ICONDIR)/altusmetrum-altosui.svg \
+	$(ICONDIR)/application-vnd.altusmetrum.eeprom.svg \
+	$(ICONDIR)/application-vnd.altusmetrum.telemetry.svg
+
+LINUX_MIMETYPE	=\
+	$(ICONDIR)/org-altusmetrum-mimetypes.xml
+
 # Firmware
 FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
 FIRMWARE_TD=$(FIRMWARE_TD_0_2)
@@ -152,7 +160,7 @@ FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFR
 
 LINUX_LIBS=libaltos32.so libaltos64.so
 
-LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) $(desktop_file).in $(ICONDIR)/altusmetrum-altosui.svg
+LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist

@@ -19,6 +19,8 @@
 #include <ao.h>
 #endif
 
+#include <ao_data.h>
+
 void
 ao_gps_show(void) __reentrant
 {
@@ -27,7 +29,11 @@ ao_gps_show(void) __reentrant
 	printf ("Date: %02d/%02d/%02d\n", ao_gps_data.year, ao_gps_data.month, ao_gps_data.day);
 	printf ("Time: %02d:%02d:%02d\n", ao_gps_data.hour, ao_gps_data.minute, ao_gps_data.second);
 	printf ("Lat/Lon: %ld %ld\n", (long) ao_gps_data.latitude, (long) ao_gps_data.longitude);
-	printf ("Alt: %d\n", ao_gps_data.altitude);
+#if HAS_WIDE_GPS
+	printf ("Alt: %ld\n", (long) AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_data));
+#else
+	printf ("Alt: %d\n", AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_data));
+#endif
 	printf ("Flags: 0x%x\n", ao_gps_data.flags);
 	printf ("Sats: %d", ao_gps_tracking_data.channels);
 	for (i = 0; i < ao_gps_tracking_data.channels; i++)

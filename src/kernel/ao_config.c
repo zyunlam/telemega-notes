@@ -518,6 +518,9 @@ ao_config_radio_rate_set(void) __reentrant
 	ao_telemetry_reset_interval();
 #endif
 	_ao_config_edit_finish();
+#if HAS_RADIO_RECV
+	ao_radio_recv_abort();
+#endif
 }
 #endif
 

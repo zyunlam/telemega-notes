@@ -176,8 +176,8 @@ struct ao_log_record {
 		int32_t		gps_latitude;
 		int32_t		gps_longitude;
 		struct {
-			int16_t		altitude;
-			uint16_t	unused;
+			uint16_t	altitude_low;
+			int16_t		altitude_high;
 		} gps_altitude;
 		struct {
 			uint16_t	svid;
@@ -246,7 +246,7 @@ struct ao_log_mega {
 		struct {
 			int32_t		latitude;	/* 4 */
 			int32_t		longitude;	/* 8 */
-			int16_t		altitude;	/* 12 */
+			uint16_t	altitude_low;	/* 12 */
 			uint8_t		hour;		/* 14 */
 			uint8_t		minute;		/* 15 */
 			uint8_t		second;		/* 16 */
@@ -261,7 +261,8 @@ struct ao_log_mega {
 			uint8_t		hdop;		/* 27 */
 			uint8_t		vdop;		/* 28 */
 			uint8_t		mode;		/* 29 */
-		} gps;	/* 30 */
+			int16_t		altitude_high;	/* 30 */
+		} gps;	/* 32 */
 		/* AO_LOG_GPS_SAT */
 		struct {
 			uint16_t	channels;	/* 4 */
@@ -272,6 +273,11 @@ struct ao_log_mega {
 		} gps_sat;				/* 30 */
 	} u;
 };
+
+#define AO_LOG_MEGA_GPS_ALTITUDE(l)	((int32_t) ((l)->u.gps.altitude_high << 16) | ((l)->u.gps.altitude_low))
+#define AO_LOG_MEGA_SET_GPS_ALTITUDE(l,a)	(((l)->u.gps.mode |= AO_GPS_MODE_ALTITUDE_24), \
+						 ((l)->u.gps.altitude_high = (a) >> 16), \
+						 (l)->u.gps.altitude_low = (a))
 
 struct ao_log_metrum {
 	char			type;			/* 0 */
@@ -306,8 +312,9 @@ struct ao_log_metrum {
 		struct {
 			int32_t		latitude;	/* 4 */
 			int32_t		longitude;	/* 8 */
-			int16_t		altitude;	/* 12 */
-		} gps;		/* 14 */
+			uint16_t	altitude_low;	/* 12 */
+			int16_t		altitude_high;	/* 14 */
+		} gps;		/* 16 */
 		/* AO_LOG_GPS_TIME */
 		struct {
 			uint8_t		hour;		/* 4 */
@@ -317,7 +324,7 @@ struct ao_log_metrum {
 			uint8_t		year;		/* 8 */
 			uint8_t		month;		/* 9 */
 			uint8_t		day;		/* 10 */
-			uint8_t		pad;		/* 11 */
+			uint8_t		pdop;		/* 11 */
 		} gps_time;	/* 12 */
 		/* AO_LOG_GPS_SAT (up to three packets) */
 		struct {
@@ -381,7 +388,7 @@ struct ao_log_gps {
 		struct {
 			int32_t		latitude;	/* 4 */
 			int32_t		longitude;	/* 8 */
-			int16_t		altitude;	/* 12 */
+			uint16_t	altitude_low;	/* 12 */
 			uint8_t		hour;		/* 14 */
 			uint8_t		minute;		/* 15 */
 			uint8_t		second;		/* 16 */
@@ -396,7 +403,7 @@ struct ao_log_gps {
 			uint8_t		hdop;		/* 27 */
 			uint8_t		vdop;		/* 28 */
 			uint8_t		mode;		/* 29 */
-			uint8_t		state;		/* 30 */
+			int16_t		altitude_high;	/* 30 */
 		} gps;	/* 31 */
 		/* AO_LOG_GPS_SAT */
 		struct {

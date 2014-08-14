@@ -130,6 +130,7 @@ esac
 #
 # Create the .desktop file by editing the paths
 #
+
 case "$target" in
 /*)
     target_abs="$target"
@@ -149,43 +150,46 @@ for infile in "$target"/AltOS/*.desktop.in; do
 done
 
 #
-# Figure out where to install the .desktop files. If we can, write it
-# to the public /usr/share/applications, otherwise, write it to the
-# per-user ~/.local/share/applications
+# Install the .desktop file
 #
 
-public=/usr/share/applications
-private=$HOME/.local/share/applications
-apps=""
+for desktop in "$target"/AltOS/*.desktop; do
+    case `id -u` in
+	0)
+	    xdg-desktop-menu install --mode system "$desktop"
+	    ;;
+	*)
+	    xdg-desktop-menu install --mode user "$desktop"
+	    ;;
+    esac
+done
 
-if [ -d "$public" -a -w "$public" ]; then
-    apps="$public"
-else
-    mkdir -p "$private" >/dev/null 2>&1 
-    if [ -d "$private" -a -w "$private" ]; then
-	apps="$private"
+#
+# Install mime type file
+#
+
+for mimetype in "$target"/AltOS/*-mimetypes.xml; do
+    case `id -u` in
+	0)
+	    xdg-mime install --mode system "$mimetype"
+	    ;;
+	*)
+	    xdg-mime install --mode user "$mimetype"
+	    ;;
+    esac
+done
+
+#
+# Install icons
+#
+
+for icon_dir in /usr/share/icons/hicolor/scalable/mimetypes "$HOME/.icons" "$HOME/.kde/share/icons"; do
+    if [ -w "$icon_dir" ]; then
+	cp "$target"/AltOS/*.svg "$icon_dir"
+	update-icon-caches "$icon_dir"
     fi
-fi
-	
-case "$apps" in
-"")
-    echo "Cannot install application icon"
-    finish 1
-    ;;
-esac
+done
 
-echo -n "Installing .desktop files to $apps..."
-
-cp "$target"/AltOS/*.desktop "$apps"
-
-case "$?" in
-0)
-    echo " done."
-    ;;
-*)
-    echo " failed."
-    ;;
-esac
 
 #
 # Install icon to desktop if desired
@@ -222,13 +226,14 @@ if [ -d $HOME/Desktop ]; then
 	esac
     done
 
-    echo -n "Installing desktop icons..."
     case "$do_desktop" in
-    [yY]*)
-	for d in "$target"/AltOS/*.desktop; do
-	    ln -f -s "$d" "$HOME/Desktop/"
-	done
-	;;
+	[yY]*)
+	    echo -n "Installing desktop icons..."
+	    for d in "$target"/AltOS/*.desktop; do
+		base=`basename $d`
+		cp --remove-destination "$d" "$HOME/Desktop/"
+	    done
+	    ;;
     esac
 
     echo " done."

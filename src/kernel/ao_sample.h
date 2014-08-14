@@ -24,6 +24,24 @@
  * ao_sample.c
  */
 
+#ifndef AO_VALUE_32
+#define AO_VALUE_32	1
+#endif
+
+#if AO_VALUE_32
+/*
+ * For 32-bit computed values, use 64-bit intermediates.
+ */
+typedef int64_t			ao_k_t;
+typedef int32_t			ao_v_t;
+#else
+/*
+ * For 16-bit computed values, use 32-bit intermediates.
+ */
+typedef int32_t			ao_k_t;
+typedef int16_t			ao_v_t;
+#endif
+
 /*
  * Barometer calibration
  *
@@ -87,9 +105,9 @@
  * 2047m/s² (over 200g)
  */
 
-#define AO_M_TO_HEIGHT(m)	((int16_t) (m))
-#define AO_MS_TO_SPEED(ms)	((int16_t) ((ms) * 16))
-#define AO_MSS_TO_ACCEL(mss)	((int16_t) ((mss) * 16))
+#define AO_M_TO_HEIGHT(m)	((ao_v_t) (m))
+#define AO_MS_TO_SPEED(ms)	((ao_v_t) ((ms) * 16))
+#define AO_MSS_TO_ACCEL(mss)	((ao_v_t) ((mss) * 16))
 
 extern __pdata uint16_t	ao_sample_tick;		/* time of last data */
 extern __data uint8_t	ao_sample_adc;		/* Ring position of last processed sample */
@@ -134,21 +152,33 @@ uint8_t ao_sample(void);
  * ao_kalman.c
  */
 
-#define to_fix16(x) ((int16_t) ((x) * 65536.0 + 0.5))
-#define to_fix32(x) ((int32_t) ((x) * 65536.0 + 0.5))
+#define to_fix_16(x) ((int16_t) ((x) * 65536.0 + 0.5))
+#define to_fix_32(x) ((int32_t) ((x) * 65536.0 + 0.5))
+#define to_fix_64(x) ((int64_t) ((x) * 65536.0 + 0.5))
+
+#ifdef AO_VALUE_32
+#if AO_VALUE_32
+#define to_fix_v(x)	to_fix_32(x)
+#define to_fix_k(x)	to_fix_64(x)
+#else
+#define to_fix_v(x)	to_fix_16(x)
+#define to_fix_k(x)	to_fix_32(x)
+#endif
+
 #define from_fix(x)	((x) >> 16)
 
-extern __pdata int16_t			ao_height;	/* meters */
-extern __pdata int16_t			ao_speed;	/* m/s * 16 */
-extern __pdata int16_t			ao_accel;	/* m/s² * 16 */
-extern __xdata int16_t			ao_max_height;	/* max of ao_height */
-extern __xdata int16_t			ao_avg_height;	/* running average of height */
+extern __pdata ao_v_t			ao_height;	/* meters */
+extern __pdata ao_v_t			ao_speed;	/* m/s * 16 */
+extern __pdata ao_v_t			ao_accel;	/* m/s² * 16 */
+extern __xdata ao_v_t			ao_max_height;	/* max of ao_height */
+extern __xdata ao_v_t			ao_avg_height;	/* running average of height */
 
-extern __pdata int16_t			ao_error_h;
-extern __pdata int16_t			ao_error_h_sq_avg;
+extern __pdata ao_v_t			ao_error_h;
+extern __pdata ao_v_t			ao_error_h_sq_avg;
 
 #if HAS_ACCEL
-extern __pdata int16_t			ao_error_a;
+extern __pdata ao_v_t			ao_error_a;
+#endif
 #endif
 
 void ao_kalman(void);

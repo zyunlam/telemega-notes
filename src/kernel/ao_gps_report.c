@@ -52,8 +52,12 @@ ao_gps_report(void)
 			gps_log.u.gps_longitude = gps_data.longitude;
 			ao_log_data(&gps_log);
 			gps_log.type = AO_LOG_GPS_ALT;
-			gps_log.u.gps_altitude.altitude = gps_data.altitude;
-			gps_log.u.gps_altitude.unused = 0xffff;
+			gps_log.u.gps_altitude.altitude_low = gps_data.altitude_low;
+#if HAS_WIDE_GPS
+			gps_log.u.gps_altitude.altitude_high = gps_data.altitude_high;
+#else
+			gps_log.u.gps_altitude.altitude_high = 0xffff;
+#endif
 			ao_log_data(&gps_log);
 			if (!date_reported && (gps_data.flags & AO_GPS_DATE_VALID)) {
 				gps_log.type = AO_LOG_GPS_DATE;

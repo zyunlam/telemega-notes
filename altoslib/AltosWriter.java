@@ -19,8 +19,6 @@ package org.altusmetrum.altoslib_5;
 
 public interface AltosWriter {
 
-	public void write(AltosState state);
-
 	public void write(AltosStateIterable states);
 
 	public void close();

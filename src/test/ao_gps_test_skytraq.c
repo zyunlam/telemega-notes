@@ -16,6 +16,7 @@
  */
 
 #define AO_GPS_TEST
+#define HAS_GPS 1
 #include "ao_host.h"
 #include <termios.h>
 #include <errno.h>
@@ -52,6 +53,9 @@ struct ao_gps_orig {
 	uint16_t		h_error;	/* m */
 	uint16_t		v_error;	/* m */
 };
+
+#define AO_TELEMETRY_LOCATION_ALTITUDE(l) 	((l)->altitude)
+#define AO_TELEMETRY_LOCATION_SET_ALTITUDE(l,a) ((l)->altitude = (a))
 
 #define SIRF_SAT_STATE_ACQUIRED			(1 << 0)
 #define SIRF_SAT_STATE_CARRIER_PHASE_VALID	(1 << 1)

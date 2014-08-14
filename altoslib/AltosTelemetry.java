@@ -114,6 +114,35 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 		return telem;
 	}
 
+	public static int extend_height(AltosState state, int height_16) {
+		double	compare_height;
+		int	height = height_16;
+
+		System.out.printf("state kalman height %g altitude %g ground_altitude %g gps_height %g\n",
+				  state.kalman_height.value(), state.altitude(), state.ground_altitude(), state.gps_height());
+		if (state.gps != null && state.gps.alt != AltosLib.MISSING) {
+			compare_height = state.gps_height();
+		} else {
+			compare_height = state.height();
+		}
+
+		if (compare_height != AltosLib.MISSING) {
+			int	high_bits = (int) Math.floor (compare_height / 65536.0);
+
+			height = (high_bits << 16) | (height_16 & 0xffff);
+
+			if (Math.abs(height + 65536 - compare_height) < Math.abs(height - compare_height))
+				height += 65536;
+			else if (Math.abs(height - 65536 - compare_height) < Math.abs(height - compare_height))
+				height -= 65536;
+			if (height != height_16) {
+				System.out.printf("Height adjusted from %d to %d with %g\n",
+						  height_16, height, compare_height);
+			}
+		}
+		return height;
+	}
+
 	public static AltosTelemetry parse(String line) throws ParseException, AltosCRCException {
 		String[] word = line.split("\\s+");
 		int i =0;

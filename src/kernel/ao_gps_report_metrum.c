@@ -44,7 +44,8 @@ ao_gps_report_metrum(void)
 			gps_log.type = AO_LOG_GPS_POS;
 			gps_log.u.gps.latitude = gps_data.latitude;
 			gps_log.u.gps.longitude = gps_data.longitude;
-			gps_log.u.gps.altitude = gps_data.altitude;
+			gps_log.u.gps.altitude_low = gps_data.altitude_low;
+			gps_log.u.gps.altitude_high = gps_data.altitude_high;
 			ao_log_metrum(&gps_log);
 
 			gps_log.type = AO_LOG_GPS_TIME;
@@ -55,6 +56,7 @@ ao_gps_report_metrum(void)
 			gps_log.u.gps_time.year = gps_data.year;
 			gps_log.u.gps_time.month = gps_data.month;
 			gps_log.u.gps_time.day = gps_data.day;
+			gps_log.u.gps_time.pdop = gps_data.pdop;
 			ao_log_metrum(&gps_log);
 		}
 

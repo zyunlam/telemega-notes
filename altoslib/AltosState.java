@@ -271,6 +271,7 @@ public class AltosState implements Cloneable {
 	public int	state;
 	public int	flight;
 	public int	serial;
+	public int	altitude_32;
 	public int	receiver_serial;
 	public boolean	landed;
 	public boolean	ascent;	/* going up? */
@@ -472,15 +473,23 @@ public class AltosState implements Cloneable {
 		pressure.set(p, time);
 	}
 
+	public double baro_height() {
+		double a = altitude();
+		double g = ground_altitude();
+		if (a != AltosLib.MISSING && g != AltosLib.MISSING)
+			return a - g;
+		return AltosLib.MISSING;
+	}
+
 	public double height() {
 		double k = kalman_height.value();
 		if (k != AltosLib.MISSING)
 			return k;
 
-		double a = altitude();
-		double g = ground_altitude();
-		if (a != AltosLib.MISSING && g != AltosLib.MISSING)
-			return a - g;
+		double b = baro_height();
+		if (b != AltosLib.MISSING)
+			return b;
+
 		return gps_height();
 	}
 
@@ -762,6 +771,7 @@ public class AltosState implements Cloneable {
 		product = null;
 		serial = AltosLib.MISSING;
 		receiver_serial = AltosLib.MISSING;
+		altitude_32 = AltosLib.MISSING;
 
 		baro = null;
 		companion = null;
@@ -899,6 +909,7 @@ public class AltosState implements Cloneable {
 		product = old.product;
 		serial = old.serial;
 		receiver_serial = old.receiver_serial;
+		altitude_32 = old.altitude_32;
 
 		baro = old.baro;
 		companion = old.companion;
@@ -1024,6 +1035,12 @@ public class AltosState implements Cloneable {
 		firmware_version = version;
 	}
 
+	public int compare_version(String other_version) {
+		if (firmware_version == null)
+			return AltosLib.MISSING;
+		return AltosLib.compare_version(firmware_version, other_version);
+	}
+
 	private void re_init() {
 		int bt = boost_tick;
 		int rs = receiver_serial;
@@ -1058,6 +1075,15 @@ public class AltosState implements Cloneable {
 	public void set_receiver_serial(int serial) {
 		if (serial != AltosLib.MISSING)
 			receiver_serial = serial;
+	}
+
+	public boolean altitude_32() {
+		return altitude_32 == 1;
+	}
+
+	public void set_altitude_32(int altitude_32) {
+		if (altitude_32 != AltosLib.MISSING)
+			this.altitude_32 = altitude_32;
 	}
 
 	public int rssi() {

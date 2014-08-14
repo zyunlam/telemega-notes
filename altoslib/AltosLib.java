@@ -51,6 +51,20 @@ public class AltosLib {
 	public static final int AO_LOG_SERIAL_NUMBER = 2002;
 	public static final int AO_LOG_LOG_FORMAT = 2003;
 
+	public static final int AO_LOG_FREQUENCY = 2004;
+	public static final int AO_LOG_APOGEE_LOCKOUT = 2005;
+	public static final int AO_LOG_RADIO_RATE = 2006;
+	public static final int AO_LOG_IGNITE_MODE = 2007;
+	public static final int AO_LOG_PAD_ORIENTATION = 2008;
+	public static final int AO_LOG_RADIO_ENABLE = 2009;
+	public static final int AO_LOG_AES_KEY = 2010;
+	public static final int AO_LOG_APRS = 2011;
+	public static final int AO_LOG_BEEP_SETTING = 2012;
+	public static final int AO_LOG_TRACKER_SETTING = 2013;
+	public static final int AO_LOG_PYRO_TIME = 2014;
+	public static final int AO_LOG_APRS_ID = 2015;
+	public static final int AO_LOG_ALTITUDE_32 = 2016;
+
 	/* Added for header fields in telemega files */
 	public static final int AO_LOG_BARO_RESERVED = 3000;
 	public static final int AO_LOG_BARO_SENS = 3001;
@@ -213,6 +227,31 @@ public class AltosLib {
 			return ao_telemetry_name[telemetry];
 		throw new IllegalArgumentException(String.format("Invalid telemetry %d",
 								 telemetry));
+	}
+
+	private static int[] split_version(String version) {
+		String[] tokens = version.split("\\.");
+		int[] ret = new int[tokens.length];
+		for (int i = 0; i < tokens.length; i++)
+			ret[i] = Integer.parseInt(tokens[i]);
+		return ret;
+	}
+
+	public static int compare_version(String version_a, String version_b) {
+		int[] a = split_version(version_a);
+		int[] b = split_version(version_b);
+
+		for (int i = 0; i < Math.min(a.length, b.length); i++) {
+			if (a[i] < b[i])
+				return -1;
+			if (a[i] > b[i])
+				return 1;
+		}
+		if (a.length < b.length)
+			return -1;
+		if (a.length > b.length)
+			return 1;
+		return 0;
 	}
 
 	private static String[] state_to_string = {

@@ -21,6 +21,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#define HAS_GPS	1
+
 #include <ao_telemetry.h>
 
 #define AO_GPS_NUM_SAT_MASK	(0xf << 0)
@@ -100,14 +102,11 @@ audio_gap(int secs)
 // This is where we go after reset.
 int main(int argc, char **argv)
 {
-	int	e, x;
-	int	a;
-
     audio_gap(1);
 
     ao_gps_data.latitude = (45.0 + 28.25 / 60.0) * 10000000;
     ao_gps_data.longitude = (-(122 + 44.2649 / 60.0)) * 10000000;
-    ao_gps_data.altitude = 84;
+    AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_data, 84);
     ao_gps_data.flags = (AO_GPS_VALID|AO_GPS_RUNNING);
 
     /* Transmit one packet */
