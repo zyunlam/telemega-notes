@@ -57,7 +57,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	20
+#define AO_CONFIG_MINOR	21
 
 #define AO_AES_LEN 16
 
@@ -112,7 +112,14 @@ struct ao_config {
 #if HAS_RADIO_RATE
 	uint8_t		radio_rate;		/* minor version 20 */
 #endif
+#if HAS_RADIO_FORWARD
+	uint32_t	send_frequency;		/* minor version 21 */
+#endif
 };
+
+#if HAS_RADIO_FORWARD
+extern __xdata uint32_t	ao_send_radio_setting;
+#endif
 
 #define AO_IGNITE_MODE_DUAL		0
 #define AO_IGNITE_MODE_APOGEE		1

@@ -93,10 +93,18 @@ ao_config_put(void)
 #endif
 
 #if HAS_RADIO
+
+#if HAS_RADIO_FORWARD
+__xdata uint32_t	ao_send_radio_setting;
+#endif
+
 void
 ao_config_set_radio(void)
 {
 	ao_config.radio_setting = ao_freq_to_set(ao_config.frequency, ao_config.radio_cal);
+#if HAS_RADIO_FORWARD
+	ao_send_radio_setting = ao_freq_to_set(ao_config.send_frequency, ao_config.radio_cal);
+#endif
 }
 #endif /* HAS_RADIO */
 
@@ -208,6 +216,10 @@ _ao_config_get(void)
 		if (minor < 20)
 			ao_config.radio_rate = AO_CONFIG_DEFAULT_RADIO_RATE;
 #endif
+#if HAS_RADIO_FORWARD
+		if (minor < 21)
+			ao_config.send_frequency = 434550;
+#endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
@@ -293,6 +305,31 @@ ao_config_frequency_set(void) __reentrant
 		return;
 	_ao_config_edit_start();
 	ao_config.frequency = ao_cmd_lex_u32;
+	ao_config_set_radio();
+	_ao_config_edit_finish();
+#if HAS_RADIO_RECV
+	ao_radio_recv_abort();
+#endif
+}
+
+#endif
+
+#if HAS_RADIO_FORWARD
+void
+ao_config_send_frequency_show(void) __reentrant
+{
+	printf("Send frequency: %ld\n",
+	       ao_config.send_frequency);
+}
+
+void
+ao_config_send_frequency_set(void) __reentrant
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.send_frequency = ao_cmd_lex_u32;
 	ao_config_set_radio();
 	_ao_config_edit_finish();
 #if HAS_RADIO_RECV
@@ -863,6 +900,10 @@ __code struct ao_config_var ao_config_vars[] = {
 #if HAS_RADIO
 	{ "F <freq>\0Frequency (kHz)",
 	  ao_config_frequency_set, ao_config_frequency_show },
+#if HAS_RADIO_FORWARD
+	{ "R <freq>\0Repeater output frequency (kHz)",
+	  ao_config_send_frequency_set, ao_config_send_frequency_show },
+#endif
 	{ "c <call>\0Callsign (8 char max)",
 	  ao_config_callsign_set,	ao_config_callsign_show },
 	{ "e <0 disable, 1 enable>\0Enable telemetry and RDF",

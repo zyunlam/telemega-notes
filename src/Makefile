@@ -22,7 +22,8 @@ SDCCDIRS=\
 	telemini-v1.0 telemini-v2.0 \
 	telebt-v1.0 \
 	teleterra-v0.2 teleshield-v0.1 \
-	telefire-v0.1 telefire-v0.2
+	telefire-v0.1 telefire-v0.2 \
+	telerepeat-v1.0
 
 ARMM3DIRS=\
 	easymega-v1.0 easymega-v1.0/flash-loader \
