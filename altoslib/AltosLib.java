@@ -329,7 +329,7 @@ public class AltosLib {
 		return false;
 	}
 
-	public static boolean ishex(int c) {
+	public static final boolean ishex(int c) {
 		if ('0' <= c && c <= '9')
 			return true;
 		if ('a' <= c && c <= 'f')
@@ -339,7 +339,7 @@ public class AltosLib {
 		return false;
 	}
 
-	public static boolean ishex(String s) {
+	public static final boolean ishex(String s) {
 		for (int i = 0; i < s.length(); i++)
 			if (!ishex(s.charAt(i)))
 				return false;
@@ -463,10 +463,17 @@ public class AltosLib {
 
 		if ((s.length() & 1) != 0)
 			throw new NumberFormatException(String.format("invalid line \"%s\"", s));
-		n = s.length() / 2;
+		byte[] bytes = s.getBytes(unicode_set);
+		n = bytes.length / 2;
 		r = new int[n];
-		for (i = 0; i < n; i++)
-			r[i] = hexbyte(s, i * 2);
+		for (i = 0; i < n; i++) {
+			int h = fromhex(bytes[(i << 1)]);
+			int l = fromhex(bytes[(i << 1) + 1]);
+			if (h < 0 || l < 0)
+				throw new NumberFormatException(String.format("invalid hex \"%c%c\"",
+									      bytes[(i<<1)], bytes[(i<<1) + 1]));
+			r[i] = (h << 4) + l;
+		}
 		return r;
 	}
 
