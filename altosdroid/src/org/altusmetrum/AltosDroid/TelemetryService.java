@@ -61,6 +61,7 @@ public class TelemetryService extends Service implements LocationListener {
 	static final int MSG_TELEMETRY         = 7;
 	static final int MSG_SETFREQUENCY      = 8;
 	static final int MSG_CRC_ERROR	       = 9;
+	static final int MSG_SETBAUD	       = 10;
 
 	public static final int STATE_NONE       = 0;
 	public static final int STATE_READY      = 1;
@@ -160,6 +161,11 @@ public class TelemetryService extends Service implements LocationListener {
 					} catch (InterruptedException e) {
 					} catch (TimeoutException e) {
 					}
+				}
+				break;
+			case MSG_SETBAUD:
+				if (s.state == STATE_CONNECTED) {
+					s.mAltosBluetooth.set_telemetry_rate((Integer) msg.obj);
 				}
 				break;
 			default:

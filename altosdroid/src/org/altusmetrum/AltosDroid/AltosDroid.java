@@ -476,6 +476,33 @@ public class AltosDroid extends FragmentActivity {
 		}
 	}
 
+	void setBaud(int baud) {
+		try {
+			mService.send(Message.obtain(null, TelemetryService.MSG_SETBAUD, baud));
+		} catch (RemoteException e) {
+		}
+	}
+
+	void setBaud(String baud) {
+		try {
+			int	value = Integer.parseInt(baud);
+			int	rate = AltosLib.ao_telemetry_rate_38400;
+			switch (value) {
+			case 2400:
+				rate = AltosLib.ao_telemetry_rate_2400;
+				break;
+			case 9600:
+				rate = AltosLib.ao_telemetry_rate_9600;
+				break;
+			case 38400:
+				rate = AltosLib.ao_telemetry_rate_38400;
+				break;
+			}
+			setBaud(rate);
+		} catch (NumberFormatException e) {
+		}
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent serverIntent = null;
@@ -501,16 +528,36 @@ public class AltosDroid extends FragmentActivity {
 				"Channel 9 (435.450MHz)"
 			};
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Pick a frequency");
-			builder.setItems(frequencies,
+			AlertDialog.Builder builder_freq = new AlertDialog.Builder(this);
+			builder_freq.setTitle("Pick a frequency");
+			builder_freq.setItems(frequencies,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
 							 setFrequency(frequencies[item]);
 						 }
 					 });
-			AlertDialog alert = builder.create();
-			alert.show();
+			AlertDialog alert_freq = builder_freq.create();
+			alert_freq.show();
+			return true;
+		case R.id.select_rate:
+			// Set the TBT baud rate
+
+			final String[] rates = {
+				"38400",
+				"9600",
+				"2400",
+			};
+
+			AlertDialog.Builder builder_rate = new AlertDialog.Builder(this);
+			builder_rate.setTitle("Pick a baud rate");
+			builder_rate.setItems(rates,
+					 new DialogInterface.OnClickListener() {
+						 public void onClick(DialogInterface dialog, int item) {
+							 setBaud(rates[item]);
+						 }
+					 });
+			AlertDialog alert_rate = builder_rate.create();
+			alert_rate.show();
 			return true;
 		}
 		return false;
