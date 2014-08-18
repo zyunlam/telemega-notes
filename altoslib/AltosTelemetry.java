@@ -118,8 +118,6 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 		double	compare_height;
 		int	height = height_16;
 
-		System.out.printf("state kalman height %g altitude %g ground_altitude %g gps_height %g\n",
-				  state.kalman_height.value(), state.altitude(), state.ground_altitude(), state.gps_height());
 		if (state.gps != null && state.gps.alt != AltosLib.MISSING) {
 			compare_height = state.gps_height();
 		} else {
@@ -135,10 +133,6 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 				height += 65536;
 			else if (Math.abs(height - 65536 - compare_height) < Math.abs(height - compare_height))
 				height -= 65536;
-			if (height != height_16) {
-				System.out.printf("Height adjusted from %d to %d with %g\n",
-						  height_16, height, compare_height);
-			}
 		}
 		return height;
 	}
