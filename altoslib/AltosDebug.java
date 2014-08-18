@@ -52,7 +52,7 @@ public class AltosDebug {
 	public static final byte GET_CHIP_ID =		0x68;
 
 
-	AltosLink	link;
+	private AltosLink	link;
 
 	boolean	debug_mode;
 
@@ -112,7 +112,11 @@ public class AltosDebug {
 		int i = 0;
 		int start = 0;
 		while (i < length) {
-			String	line = link.get_reply().trim();
+			String	line = link.get_reply();
+			if (line == null)
+				throw new IOException("No reply");
+
+			line = line.trim();
 			if (!AltosLib.ishex(line) || line.length() % 2 != 0)
 				throw new IOException(
 					String.format
