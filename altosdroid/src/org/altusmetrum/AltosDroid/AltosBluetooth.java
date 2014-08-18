@@ -174,18 +174,29 @@ public class AltosBluetooth extends AltosLink {
 		} catch (InterruptedException e) {
 			connection_lost();
 		}
-	}		
+	}
+
+	private static final int buffer_size = 1024;
+
+	private byte[] buffer = new byte[buffer_size];
+	private int buffer_len = 0;
+	private int buffer_off = 0;
 
 	public int getchar() {
-		try {
-			wait_connected();
-			return input.read();
-		} catch (IOException e) {
-			connection_lost();
-		} catch (java.lang.InterruptedException e) {
-			connection_lost();
+		while (buffer_off == buffer_len) {
+			try {
+				wait_connected();
+				buffer_len = input.read(buffer);
+				buffer_off = 0;
+			} catch (IOException e) {
+				connection_lost();
+				return AltosLink.ERROR;
+			} catch (java.lang.InterruptedException e) {
+				connection_lost();
+				return AltosLink.ERROR;
+			}
 		}
-		return AltosLink.ERROR;
+		return buffer[buffer_off++];
 	}
 
 	public void close() {

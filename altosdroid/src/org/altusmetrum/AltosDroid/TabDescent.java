@@ -29,7 +29,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.location.Location;
 
-public class TabDescent extends Fragment implements AltosDroidTab {
+public class TabDescent extends AltosDroidTab {
 	AltosDroid mAltosDroid;
 
 	private TextView mSpeedView;
@@ -89,7 +89,9 @@ public class TabDescent extends Fragment implements AltosDroidTab {
 		mAltosDroid = null;
 	}
 
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public String tab_name() { return "descent"; }
+
+	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
 			mSpeedView.setText(AltosDroid.number("%6.0f m/s", state.speed()));
 			mHeightView.setText(AltosDroid.number("%6.0f m", state.height()));

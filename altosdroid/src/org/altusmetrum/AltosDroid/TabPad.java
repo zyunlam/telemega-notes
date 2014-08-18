@@ -29,7 +29,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.location.Location;
 
-public class TabPad extends Fragment implements AltosDroidTab {
+public class TabPad extends AltosDroidTab {
 	AltosDroid mAltosDroid;
 
 	private TextView mBatteryVoltageView;
@@ -101,7 +101,9 @@ public class TabPad extends Fragment implements AltosDroidTab {
 		mAltosDroid = null;
 	}
 
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public String tab_name() { return "pad"; }
+
+	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
 			mBatteryVoltageView.setText(AltosDroid.number("%4.2f V", state.battery_voltage));
 			mBatteryLights.set(state.battery_voltage >= AltosLib.ao_battery_good, state.battery_voltage == AltosLib.MISSING);

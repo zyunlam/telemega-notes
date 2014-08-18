@@ -45,7 +45,7 @@ public class AltosVoice {
 
 	}
 
-	public void speak(String s) {
+	public synchronized void speak(String s) {
 		if (!tts_enabled) return;
 		tts.speak(s, TextToSpeech.QUEUE_ADD, null);
 	}
@@ -87,7 +87,8 @@ public class AltosVoice {
 			}
 		}
 		old_state = state;
-		idle_thread.notice(state, spoke);
+		if (idle_thread != null)
+			idle_thread.notice(state, spoke);
 	}
 
 
@@ -117,13 +118,20 @@ public class AltosVoice {
 			     state.state == AltosLib.ao_flight_stateless) &&
 			    state.range >= 0)
 			{
-				speak(String.format("Height %d, bearing %s %d, elevation %d, range %d.\n",
-				                    (int) (state.height() + 0.5),
-	                                state.from_pad.bearing_words(
-	                                      AltosGreatCircle.BEARING_VOICE),
-				                    (int) (state.from_pad.bearing + 0.5),
-				                    (int) (state.elevation + 0.5),
-				                    (int) (state.range + 0.5)));
+				if (state.from_pad != null) {
+					speak(String.format("Height %d, bearing %s %d, elevation %d, range %d.\n",
+							    (int) (state.height() + 0.5),
+							    state.from_pad.bearing_words(
+								    AltosGreatCircle.BEARING_VOICE),
+							    (int) (state.from_pad.bearing + 0.5),
+							    (int) (state.elevation + 0.5),
+							    (int) (state.range + 0.5)));
+				} else {
+					speak(String.format("Height %d, elevation %d, range %d.\n",
+							    (int) (state.height() + 0.5),
+							    (int) (state.elevation + 0.5),
+							    (int) (state.range + 0.5)));
+				}
 			} else if (state.state > AltosLib.ao_flight_pad) {
 				if (state.height() != AltosLib.MISSING)
 					speak(String.format("%d meters", (int) (state.height() + 0.5)));

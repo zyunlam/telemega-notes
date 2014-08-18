@@ -37,6 +37,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -53,8 +54,8 @@ import org.altusmetrum.altoslib_5.*;
 
 public class AltosDroid extends FragmentActivity {
 	// Debugging
-	private static final String TAG = "AltosDroid";
-	private static final boolean D = true;
+	static final String TAG = "AltosDroid";
+	static final boolean D = true;
 
 	// Message types received by our Handler
 	public static final int MSG_STATE_CHANGE    = 1;
@@ -66,6 +67,8 @@ public class AltosDroid extends FragmentActivity {
 	// Intent request codes
 	private static final int REQUEST_CONNECT_DEVICE = 1;
 	private static final int REQUEST_ENABLE_BT      = 2;
+
+	public static FragmentManager	fm;
 
 	// Layout Views
 	private TextView mTitle;
@@ -145,6 +148,7 @@ public class AltosDroid extends FragmentActivity {
 				ad.set_location((Location) msg.obj);
 				break;
 			case MSG_CRC_ERROR:
+				break;
 			case MSG_UPDATE_AGE:
 				if (ad.saved_state != null) {
 					ad.mAgeView.setText(String.format("%d", (System.currentTimeMillis() - ad.saved_state.received_time + 500) / 1000));
@@ -206,13 +210,29 @@ public class AltosDroid extends FragmentActivity {
 
 	void set_location(Location location) {
 		saved_location = location;
+		Log.d(TAG, "set_location");
 		update_ui(saved_state);
 	}
 
+	boolean same_string(String a, String b) {
+		if (a == null) {
+			if (b == null)
+				return true;
+			return false;
+		} else {
+			if (b == null)
+				return false;
+			return a.equals(b);
+		}
+	}
+
 	void update_ui(AltosState state) {
+
+		Log.d(TAG, "update_ui");
 		if (state != null && saved_state != null) {
 			if (saved_state.state != state.state) {
 				String currentTab = mTabHost.getCurrentTabTag();
+				Log.d(TAG, "switch state");
 				switch (state.state) {
 				case AltosLib.ao_flight_boost:
 					if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("ascent");
@@ -226,7 +246,6 @@ public class AltosDroid extends FragmentActivity {
 				}
 			}
 		}
-		saved_state = state;
 
 		AltosGreatCircle from_receiver = null;
 
@@ -243,18 +262,35 @@ public class AltosDroid extends FragmentActivity {
 		}
 
 		if (state != null) {
-			mCallsignView.setText(state.callsign);
-			mSerialView.setText(String.format("%d", state.serial));
-			mFlightView.setText(String.format("%d", state.flight));
-			mStateView.setText(state.state_name());
-			mRSSIView.setText(String.format("%d", state.rssi));
+			if (saved_state == null || !same_string(saved_state.callsign, state.callsign)) {
+				Log.d(TAG, "update callsign");
+				mCallsignView.setText(state.callsign);
+			}
+			if (saved_state == null || state.serial != saved_state.serial) {
+				Log.d(TAG, "update serial");
+				mSerialView.setText(String.format("%d", state.serial));
+			}
+			if (saved_state == null || state.flight != saved_state.flight) {
+				Log.d(TAG, "update flight");
+				mFlightView.setText(String.format("%d", state.flight));
+			}
+			if (saved_state == null || state.state != saved_state.state) {
+				Log.d(TAG, "update state");
+				mStateView.setText(state.state_name());
+			}
+			if (saved_state == null || state.rssi != saved_state.rssi) {
+				Log.d(TAG, "update rssi");
+				mRSSIView.setText(String.format("%d", state.rssi));
+			}
 		}
 
 		for (AltosDroidTab mTab : mTabs)
-			mTab.update_ui(state, from_receiver, saved_location);
+			mTab.update_ui(state, from_receiver, saved_location, mTab == mTabsAdapter.currentItem());
 
 		if (state != null)
 			mAltosVoice.tell(state);
+
+		saved_state = state;
 	}
 
 	private void onTimerTick() {
@@ -293,6 +329,8 @@ public class AltosDroid extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(D) Log.e(TAG, "+++ ON CREATE +++");
+
+		fm = getSupportFragmentManager();
 
 		// Get local Bluetooth adapter
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();

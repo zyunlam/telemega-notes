@@ -29,7 +29,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.location.Location;
 
-public class TabAscent extends Fragment implements AltosDroidTab {
+public class TabAscent extends AltosDroidTab {
 	AltosDroid mAltosDroid;
 
 	private TextView mHeightView;
@@ -85,7 +85,11 @@ public class TabAscent extends Fragment implements AltosDroidTab {
 		mAltosDroid = null;
 	}
 
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public String tab_name() {
+		return "ascent";
+	}
+
+	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
 			mHeightView.setText(AltosDroid.number("%6.0f m", state.height()));
 			mMaxHeightView.setText(AltosDroid.number("%6.0f m", state.max_height()));

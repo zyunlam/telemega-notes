@@ -19,7 +19,57 @@ package org.altusmetrum.AltosDroid;
 
 import org.altusmetrum.altoslib_5.*;
 import android.location.Location;
+import android.app.Activity;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.location.Location;
+import android.util.Log;
 
-public interface AltosDroidTab {
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver);
+public abstract class AltosDroidTab extends Fragment {
+	AltosState		last_state;
+	AltosGreatCircle	last_from_receiver;
+	Location		last_receiver;
+
+	public abstract void show(AltosState state, AltosGreatCircle from_receiver, Location receiver);
+
+	public abstract String tab_name();
+
+	public void set_visible(boolean visible) {
+		FragmentTransaction	ft = AltosDroid.fm.beginTransaction();
+		if (visible)
+			ft.show(this);
+		else
+			ft.hide(this);
+		ft.commit();
+	}
+
+	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver, boolean is_current) {
+		if (is_current) {
+			Log.d(AltosDroid.TAG, String.format("%s: visible, performing update", tab_name()));
+
+			show(state, from_receiver, receiver);
+		} else {
+			Log.d(AltosDroid.TAG, String.format("%s: not visible, skipping update", tab_name()));
+			last_state = state;
+			last_from_receiver = from_receiver;
+			last_receiver = receiver;
+			return;
+		}
+	}
+
+	public void onHiddenChanged(boolean hidden) {
+		if (last_state != null && isVisible()) {
+			AltosState		state = last_state;
+			AltosGreatCircle	from_receiver = last_from_receiver;
+			Location		receiver = last_receiver;
+
+			last_state = null;
+			last_from_receiver = null;
+			last_receiver = null;
+			show(state, from_receiver, receiver);
+		}
+	}
 }

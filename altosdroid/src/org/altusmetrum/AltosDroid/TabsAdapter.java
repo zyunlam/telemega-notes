@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -28,8 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
-
-
+import android.util.Log;
 
 /**
  * This is a helper class that implements the management of tabs and all
@@ -48,11 +48,13 @@ public class TabsAdapter extends FragmentPagerAdapter
 	private final TabHost mTabHost;
 	private final ViewPager mViewPager;
 	private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
+	private int position;
 
-	static final class TabInfo {
+	static class TabInfo {
 		private final String tag;
 		private final Class<?> clss;
 		private final Bundle args;
+		private Fragment fragment;
 
 		TabInfo(String _tag, Class<?> _class, Bundle _args) {
 			tag = _tag;
@@ -104,11 +106,32 @@ public class TabsAdapter extends FragmentPagerAdapter
 	@Override
 	public Fragment getItem(int position) {
 		TabInfo info = mTabs.get(position);
-		return Fragment.instantiate(mContext, info.clss.getName(), info.args);
+		Log.d(AltosDroid.TAG, String.format("TabsAdapter.getItem(%d)", position));
+		info.fragment = Fragment.instantiate(mContext, info.clss.getName(), info.args);
+		return info.fragment;
+	}
+
+	public Fragment currentItem() {
+		TabInfo info = mTabs.get(position);
+		return info.fragment;
 	}
 
 	public void onTabChanged(String tabId) {
-		int position = mTabHost.getCurrentTab();
+		AltosDroidTab	prev_frag = (AltosDroidTab) mTabs.get(position).fragment;
+
+		position = mTabHost.getCurrentTab();
+
+		AltosDroidTab	cur_frag = (AltosDroidTab) mTabs.get(position).fragment;
+
+		if (prev_frag != cur_frag) {
+			if (prev_frag != null) {
+				prev_frag.set_visible(false);
+			}
+		}
+		if (cur_frag != null) {
+			cur_frag.set_visible(true);
+		}
+		Log.d(AltosDroid.TAG, String.format("TabsAdapter.onTabChanged(%s) = %d", tabId, position));
 		mViewPager.setCurrentItem(position);
 	}
 
