@@ -41,6 +41,13 @@
     </legalnotice>
     <revhistory>
       <revision>
+	<revnumber>1.4.2</revnumber>
+	<date>17 August 2014</date>
+	<revremark>
+	  Minor release fixing some Windows Java installation bugs.
+	</revremark>
+      </revision>
+      <revision>
 	<revnumber>1.4.1</revnumber>
 	<date>24 June 2014</date>
 	<revremark>
@@ -5421,7 +5428,14 @@ NAR #88757, TRA #12200
   <appendix>
     <title>Release Notes</title>
     <simplesect>
-      <title>Version 1.41</title>
+      <title>Version 1.4.2</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.4.2.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
+    <simplesect>
+      <title>Version 1.4.1</title>
       <xi:include
 	  xmlns:xi="http://www.w3.org/2001/XInclude"
 	  href="release-notes-1.4.1.xsl"
