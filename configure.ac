@@ -459,7 +459,7 @@ xauto)
 	xx86_64|xi*86)
 		save_CFLAGS="$CFLAGS"
 		save_LIBS="$LIBS"
-		LIBS="-lbluetooth"
+		LIBS="-ldl"
 		CFLAGS="-m64"
 		AC_MSG_CHECKING([if ]$CC[ ]$CFLAGS[ can link programs])
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
