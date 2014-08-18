@@ -58,6 +58,7 @@ public class AltosConfigData implements Iterable<String> {
 
 	/* HAS_LOG */
 	public int	flight_log_max;
+	public int 	log_fixed;
 
 	/* HAS_IGNITE */
 	public int	ignite_mode;
@@ -244,6 +245,7 @@ public class AltosConfigData implements Iterable<String> {
 		pad_orientation = -1;
 
 		flight_log_max = -1;
+		log_fixed = -1;
 		ignite_mode = -1;
 
 		aes_key = "";
@@ -316,6 +318,7 @@ public class AltosConfigData implements Iterable<String> {
 
 		/* HAS_LOG */
 		try { flight_log_max = get_int(line, "Max flight log:"); } catch (Exception e) {}
+		try { log_fixed = get_int(line, "Log fixed:"); } catch (Exception e) {}
 
 		/* HAS_IGNITE */
 		try { ignite_mode = get_int(line, "Ignite mode:"); } catch (Exception e) {}
@@ -496,6 +499,9 @@ public class AltosConfigData implements Iterable<String> {
 		boolean max_enabled = true;
 
 		if (log_space() == 0)
+			max_enabled = false;
+
+		if (log_fixed > 0)
 			max_enabled = false;
 
 		switch (log_format) {
