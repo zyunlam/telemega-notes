@@ -50,13 +50,19 @@ __xdata uint8_t ao_config_mutex;
 #error Please define USE_INTERNAL_FLASH
 #endif
 #endif
+
 #ifndef AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX
-#if USE_INTERNAL_FLASH
-#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	ao_storage_config
-#else
-#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 192 * (uint32_t) 1024)
+# if FLIGHT_LOG_APPEND
+#  define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	ao_storage_log_max
+# else
+#  if USE_INTERNAL_FLASH
+#   define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	ao_storage_config
+#  else
+#   define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 192 * (uint32_t) 1024)
+#  endif
+# endif
 #endif
-#endif
+
 #ifndef AO_CONFIG_DEFAULT_RADIO_POWER
 #define AO_CONFIG_DEFAULT_RADIO_POWER		0x60
 #endif
@@ -525,15 +531,36 @@ ao_config_radio_rate_set(void) __reentrant
 #endif
 
 #if HAS_LOG
+
 void
 ao_config_log_show(void) __reentrant
 {
 	printf("Max flight log: %d kB\n", (int16_t) (ao_config.flight_log_max >> 10));
+#if FLIGHT_LOG_APPEND
+	printf("Log fixed: 1\n");
+#endif
 }
+
+#if FLIGHT_LOG_APPEND
+void
+ao_config_log_fix_append(void)
+{
+	_ao_config_edit_start();
+	ao_config.flight_log_max = ao_storage_log_max;
+	_ao_config_edit_finish();
+	ao_mutex_get(&ao_config_mutex);
+	_ao_config_put();
+	ao_config_dirty = 0;
+	ao_mutex_put(&ao_config_mutex);
+}
+#endif
 
 void
 ao_config_log_set(void) __reentrant
 {
+#if FLIGHT_LOG_APPEND
+	printf("Flight log fixed size %d kB\n", ao_storage_log_max >> 10);
+#else
 	uint16_t	block = (uint16_t) (ao_storage_block >> 10);
 	uint16_t	log_max = (uint16_t) (ao_storage_log_max >> 10);
 
@@ -551,6 +578,7 @@ ao_config_log_set(void) __reentrant
 		ao_config.flight_log_max = (uint32_t) ao_cmd_lex_i << 10;
 		_ao_config_edit_finish();
 	}
+#endif
 }
 #endif /* HAS_LOG */
 

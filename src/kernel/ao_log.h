@@ -51,10 +51,15 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 extern __code uint8_t ao_log_format;
+extern __code uint8_t ao_log_size;
 
 /* Return the flight number from the given log slot, 0 if none */
 uint16_t
 ao_log_flight(uint8_t slot);
+
+/* Check if there is valid log data at the specified location */
+uint8_t
+ao_log_check(uint32_t pos);
 
 /* Flush the log */
 void

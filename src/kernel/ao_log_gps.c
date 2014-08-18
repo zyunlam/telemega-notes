@@ -26,6 +26,7 @@
 static __xdata struct ao_log_gps log;
 
 __code uint8_t ao_log_format = AO_LOG_FORMAT_TELEGPS;
+__code uint8_t ao_log_size = sizeof (struct ao_log_gps);
 
 static uint8_t
 ao_log_csum(__xdata uint8_t *b) __reentrant
@@ -134,5 +135,18 @@ ao_log_flight(uint8_t slot)
 
 	if (ao_log_dump_check_data() && log.type == AO_LOG_FLIGHT)
 		return log.u.flight.flight;
+	return 0;
+}
+
+uint8_t
+ao_log_check(uint32_t pos)
+{
+	if (!ao_storage_read(pos,
+			     &log,
+			     sizeof (struct ao_log_gps)))
+		return 0;
+
+	if (ao_log_dump_check_data())
+		return 1;
 	return 0;
 }

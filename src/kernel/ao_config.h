@@ -28,6 +28,10 @@
 #define USE_EEPROM_CONFIG 0
 #endif
 
+#ifndef FLIGHT_LOG_APPEND
+#define FLIGHT_LOG_APPEND 0
+#endif
+
 #if USE_STORAGE_CONFIG
 
 #include <ao_storage.h>
@@ -145,6 +149,9 @@ ao_config_put(void);
 
 void
 ao_config_set_radio(void);
+
+void
+ao_config_log_fix_append(void);
 
 void
 ao_config_init(void);
