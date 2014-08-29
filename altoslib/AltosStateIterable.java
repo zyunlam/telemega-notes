@@ -26,4 +26,18 @@ public abstract class AltosStateIterable implements Iterable<AltosState> {
 	}
 
 	public abstract void write(PrintStream out);
+
+	public static AltosStateIterable iterable(File file) {
+		FileInputStream in;
+		try {
+			in = new FileInputStream(file);
+		} catch (Exception e) {
+			System.out.printf("Failed to open file '%s'\n", file);
+			return null;
+		}
+		if (file.getName().endsWith("telem"))
+			return new AltosTelemetryFile(in);
+		else
+			return new AltosEepromFile(in);
+	}
 }

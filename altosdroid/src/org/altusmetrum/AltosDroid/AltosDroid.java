@@ -101,9 +101,6 @@ public class AltosDroid extends FragmentActivity {
 	private Messenger mService = null;
 	final Messenger mMessenger = new Messenger(new IncomingHandler(this));
 
-	// Preferences
-	private AltosDroidPreferences prefs = null;
-
 	// TeleBT Config data
 	private AltosConfigData mConfigData = null;
 	// Local Bluetooth adapter
@@ -343,8 +340,7 @@ public class AltosDroid extends FragmentActivity {
 		}
 
 		// Initialise preferences
-		prefs = new AltosDroidPreferences(this);
-		AltosPreferences.init(prefs);
+		AltosDroidPreferences.init(this);
 
 		// Set up the window layout
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
@@ -480,9 +476,7 @@ public class AltosDroid extends FragmentActivity {
 		}
 	}
 
-	private void connectDevice(Intent data) {
-		// Get the device MAC address
-		String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+	private void connectDevice(String address) {
 		// Get the BLuetoothDevice object
 		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
 		// Attempt to connect to the device
@@ -491,6 +485,12 @@ public class AltosDroid extends FragmentActivity {
 			mService.send(Message.obtain(null, TelemetryService.MSG_CONNECT, device));
 		} catch (RemoteException e) {
 		}
+	}
+
+	private void connectDevice(Intent data) {
+		// Get the device MAC address
+		String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+		connectDevice(address);
 	}
 
 	@Override

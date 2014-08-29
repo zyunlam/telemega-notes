@@ -72,6 +72,7 @@ public class AltosLog implements Runnable {
 			}
 			log_file.flush();
 			file = a;
+			AltosPreferences.set_logfile(link.serial, file);
 		}
 		return log_file != null;
 	}

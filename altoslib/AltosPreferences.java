@@ -38,6 +38,9 @@ public class AltosPreferences {
 	/* telemetry rate format preference name */
 	public final static String telemetryRatePreferenceFormat = "RATE-%d";
 
+	/* log file format preference name */
+	public final static String logfilePreferenceFormat = "LOGFILE-%d";
+
 	/* voice preference name */
 	public final static String voicePreference = "VOICE";
 
@@ -82,6 +85,9 @@ public class AltosPreferences {
 
 	/* Telemetry rate (map serial to telemetry format) */
 	public static Hashtable<Integer, Integer> telemetry_rates;
+
+	/* Log file (map serial to logfile name) */
+	public static Hashtable<Integer, File> logfiles;
 
 	/* Voice preference */
 	public static boolean voice;
@@ -297,6 +303,27 @@ public class AltosPreferences {
 							    AltosLib.ao_telemetry_rate_38400);
 			telemetry_rates.put(serial, telemetry_rate);
 			return telemetry_rate;
+		}
+	}
+
+	public static void set_logfile(int serial, File new_logfile) {
+		synchronized(backend) {
+			logfiles.put(serial, new_logfile);
+			backend.putString(String.format(logfilePreferenceFormat, serial), new_logfile.getPath());
+			flush_preferences();
+		}
+	}
+
+	public static File logfile(int serial) {
+		synchronized(backend) {
+			if (logfiles.containsKey(serial))
+				return logfiles.get(serial);
+			String logfile_string = backend.getString(String.format(logfilePreferenceFormat, serial), null);
+			if (logfile_string == null)
+				return null;
+			File logfile = new File(logfile_string);
+			logfiles.put(serial, logfile);
+			return logfile;
 		}
 	}
 
