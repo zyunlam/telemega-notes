@@ -252,7 +252,7 @@ ao_pyro_check(void)
 	struct ao_pyro	*pyro;
 	uint8_t		p, any_waiting;
 	uint16_t	fire = 0;
-	
+
 	any_waiting = 0;
 	for (p = 0; p < AO_PYRO_NUM; p++) {
 		pyro = &ao_config.pyro[p];
@@ -288,6 +288,16 @@ ao_pyro_check(void)
 		 * the delay to expire
 		 */
 		if (pyro->delay_done) {
+
+			/* Check to make sure the required conditions
+			 * remain valid. If not, inhibit the channel
+			 * by setting the fired bit
+			 */
+			if (!ao_pyro_ready(pyro)) {
+				pyro->fired = 1;
+				continue;
+			}
+
 			if ((int16_t) (ao_time() - pyro->delay_done) < 0)
 				continue;
 		}
@@ -465,7 +475,7 @@ ao_pyro_set(void)
 		printf ("invalid pyro channel %d\n", p);
 		return;
 	}
-	pyro_tmp.flags = 0;
+	memset(&pyro_tmp, '\0', sizeof (pyro_tmp));
 	for (;;) {
 		ao_cmd_white();
 		if (ao_cmd_lex_c == '\n')
