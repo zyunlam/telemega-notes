@@ -44,8 +44,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
+import android.view.View;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.location.Location;
@@ -63,6 +65,8 @@ public class AltosDroid extends FragmentActivity {
 	public static final int MSG_UPDATE_AGE      = 3;
 	public static final int MSG_LOCATION	    = 4;
 	public static final int MSG_CRC_ERROR	    = 5;
+	public static final int MSG_FREQUENCY       = 6;
+	public static final int MSG_TELEMETRY_RATE  = 7;
 
 	// Intent request codes
 	private static final int REQUEST_CONNECT_DEVICE = 1;
@@ -78,11 +82,15 @@ public class AltosDroid extends FragmentActivity {
 	private TextView mRSSIView;
 	private TextView mSerialView;
 	private TextView mFlightView;
+	private RelativeLayout mStateLayout;
 	private TextView mStateView;
 	private TextView mAgeView;
 
 	// field to display the version at the bottom of the screen
 	private TextView mVersion;
+
+	private double frequency;
+	private int telemetry_rate;
 
 	// Tabs
 	TabHost         mTabHost;
@@ -122,11 +130,7 @@ public class AltosDroid extends FragmentActivity {
 				if(D) Log.d(TAG, "MSG_STATE_CHANGE: " + msg.arg1);
 				switch (msg.arg1) {
 				case TelemetryService.STATE_CONNECTED:
-					ad.mConfigData = (AltosConfigData) msg.obj;
-					String str = String.format(" %s S/N: %d", ad.mConfigData.product, ad.mConfigData.serial);
-					ad.mTitle.setText(R.string.title_connected_to);
-					ad.mTitle.append(str);
-					Toast.makeText(ad.getApplicationContext(), "Connected to " + str, Toast.LENGTH_SHORT).show();
+					ad.set_config_data((AltosConfigData) msg.obj);
 					break;
 				case TelemetryService.STATE_CONNECTING:
 					ad.mTitle.setText(R.string.title_connecting);
@@ -135,6 +139,9 @@ public class AltosDroid extends FragmentActivity {
 				case TelemetryService.STATE_NONE:
 					ad.mConfigData = null;
 					ad.mTitle.setText(R.string.title_not_connected);
+					String	active_device = AltosDroidPreferences.active_device();
+					if (active_device != null)
+						ad.connectDevice(active_device);
 					break;
 				}
 				break;
@@ -150,6 +157,12 @@ public class AltosDroid extends FragmentActivity {
 				if (ad.saved_state != null) {
 					ad.mAgeView.setText(String.format("%d", (System.currentTimeMillis() - ad.saved_state.received_time + 500) / 1000));
 				}
+				break;
+			case MSG_FREQUENCY:
+				ad.set_frequency((Double) msg.obj);
+				break;
+			case MSG_TELEMETRY_RATE:
+				ad.set_telemetry_rate((Integer) msg.obj);
 				break;
 			}
 		}
@@ -211,6 +224,33 @@ public class AltosDroid extends FragmentActivity {
 		update_ui(saved_state);
 	}
 
+	void set_title() {
+		if (mConfigData != null) {
+			String str = String.format("S/N %d %6.3f MHz", mConfigData.serial, frequency);
+
+			if (telemetry_rate != AltosLib.ao_telemetry_rate_38400)
+				str = str.concat(String.format(" %d bps", AltosLib.ao_telemetry_rate_values[telemetry_rate]));
+			mTitle.setText(str);
+		}
+	}
+
+	void set_frequency(double frequency) {
+		if (D) Log.d(TAG, String.format("AltosDroid: set_frequency %f\n", frequency));
+		this.frequency = frequency;
+		set_title();
+	}
+
+	void set_telemetry_rate(int telemetry_rate) {
+		if (D) Log.d(TAG, String.format("AltosDroid: set_telemetry_rate %d\n", telemetry_rate));
+		this.telemetry_rate = telemetry_rate;
+		set_title();
+	}
+
+	void set_config_data(AltosConfigData config_data) {
+		mConfigData = config_data;
+		set_title();
+	}
+
 	boolean same_string(String a, String b) {
 		if (a == null) {
 			if (b == null)
@@ -226,8 +266,15 @@ public class AltosDroid extends FragmentActivity {
 	void update_ui(AltosState state) {
 
 		Log.d(TAG, "update_ui");
-		if (state != null && saved_state != null) {
-			if (saved_state.state != state.state) {
+
+		int prev_state = AltosLib.ao_flight_invalid;
+
+		if (saved_state != null)
+			prev_state = saved_state.state;
+
+		if (state != null) {
+			Log.d(TAG, String.format("prev state %d new state  %d\n", prev_state, state.state));
+			if (prev_state != state.state) {
 				String currentTab = mTabHost.getCurrentTabTag();
 				Log.d(TAG, "switch state");
 				switch (state.state) {
@@ -239,6 +286,9 @@ public class AltosDroid extends FragmentActivity {
 					break;
 				case AltosLib.ao_flight_landed:
 					if (currentTab.equals("descent")) mTabHost.setCurrentTabByTag("landed");
+					break;
+				case AltosLib.ao_flight_stateless:
+					if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("descent");
 					break;
 				}
 			}
@@ -273,7 +323,12 @@ public class AltosDroid extends FragmentActivity {
 			}
 			if (saved_state == null || state.state != saved_state.state) {
 				Log.d(TAG, "update state");
-				mStateView.setText(state.state_name());
+				if (state.state == AltosLib.ao_flight_stateless) {
+					mStateLayout.setVisibility(View.GONE);
+				} else {
+					mStateView.setText(state.state_name());
+					mStateLayout.setVisibility(View.VISIBLE);
+				}
 			}
 			if (saved_state == null || state.rssi != saved_state.rssi) {
 				Log.d(TAG, "update rssi");
@@ -399,6 +454,7 @@ public class AltosDroid extends FragmentActivity {
 		mRSSIView      = (TextView) findViewById(R.id.rssi_value);
 		mSerialView    = (TextView) findViewById(R.id.serial_value);
 		mFlightView    = (TextView) findViewById(R.id.flight_value);
+		mStateLayout   = (RelativeLayout) findViewById(R.id.state_container);
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
 
@@ -421,6 +477,7 @@ public class AltosDroid extends FragmentActivity {
 		startService(new Intent(AltosDroid.this, TelemetryService.class));
 
 		doBindService();
+
 	}
 
 	@Override
@@ -490,6 +547,7 @@ public class AltosDroid extends FragmentActivity {
 	private void connectDevice(Intent data) {
 		// Get the device MAC address
 		String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+		AltosDroidPreferences.set_active_device(address);
 		connectDevice(address);
 	}
 
@@ -549,6 +607,11 @@ public class AltosDroid extends FragmentActivity {
 			// Launch the DeviceListActivity to see devices and do scan
 			serverIntent = new Intent(this, DeviceListActivity.class);
 			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+			return true;
+		case R.id.quit:
+			Log.d(TAG, "R.id.quit");
+			stopService(new Intent(AltosDroid.this, TelemetryService.class));
+			finish();
 			return true;
 		case R.id.select_freq:
 			// Set the TBT radio frequency

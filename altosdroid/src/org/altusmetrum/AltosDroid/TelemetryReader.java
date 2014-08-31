@@ -66,7 +66,7 @@ public class TelemetryReader extends Thread {
 		AltosState  state = null;
 
 		try {
-			for (;;) {
+			while (telemQueue != null) {
 				try {
 					state = read();
 					handler.obtainMessage(TelemetryService.MSG_TELEMETRY, state).sendToTarget();
@@ -91,5 +91,14 @@ public class TelemetryReader extends Thread {
 		state = null;
 		telemQueue = new LinkedBlockingQueue<AltosLine>();
 		link.add_monitor(telemQueue);
+		try {
+			link.set_radio_frequency(AltosPreferences.frequency(link.serial));
+			link.set_telemetry(AltosLib.ao_telemetry_standard);
+			link.set_telemetry_rate(AltosPreferences.telemetry_rate(link.serial));
+		} catch (InterruptedException ee) {
+			close();
+		} catch (TimeoutException te) {
+			close();
+		}
 	}
 }

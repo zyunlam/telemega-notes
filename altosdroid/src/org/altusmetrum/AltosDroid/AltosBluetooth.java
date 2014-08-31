@@ -52,6 +52,7 @@ public class AltosBluetooth extends AltosLink {
 
 	// Constructor
 	public AltosBluetooth(BluetoothDevice in_device, Handler in_handler) {
+//		set_debug(D);
 		adapter = BluetoothAdapter.getDefaultAdapter();
 		device = in_device;
 		handler = in_handler;
@@ -134,6 +135,22 @@ public class AltosBluetooth extends AltosLink {
 				if (D) Log.e(TAG, "ConnectThread: close() of connect socket failed", e);
 			}
 		}
+	}
+
+	public double frequency() {
+		return frequency;
+	}
+
+	public int telemetry_rate() {
+		return telemetry_rate;
+	}
+
+	public void save_frequency() {
+		AltosPreferences.set_frequency(serial, frequency);
+	}
+
+	public void save_telemetry_rate() {
+		AltosPreferences.set_telemetry_rate(serial, telemetry_rate);
 	}
 
 	private synchronized void wait_connected() throws InterruptedException, IOException {

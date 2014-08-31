@@ -115,6 +115,10 @@ public class TelemetryService extends Service implements LocationListener {
 					if (s.last_state      != null) msg.replyTo.send(Message.obtain(null, AltosDroid.MSG_TELEMETRY, s.last_state     ));
 					if (s.last_location   != null) msg.replyTo.send(Message.obtain(null, AltosDroid.MSG_LOCATION , s.last_location  ));
 					if (s.last_crc_errors != 0   ) msg.replyTo.send(Message.obtain(null, AltosDroid.MSG_CRC_ERROR, s.last_crc_errors));
+					if (s.state == STATE_CONNECTED) {
+						msg.replyTo.send(s.frequency_message());
+						msg.replyTo.send(s.telemetry_rate_message());
+					}
 				} catch (RemoteException e) {
 					s.mClients.remove(msg.replyTo);
 				}
@@ -131,13 +135,17 @@ public class TelemetryService extends Service implements LocationListener {
 				break;
 			case MSG_CONNECTED:
 				if (D) Log.d(TAG, "Connected to device");
-				s.connected();
+				try {
+					s.connected();
+				} catch (InterruptedException ie) {
+				}
 				break;
 			case MSG_CONNECT_FAILED:
 				if (D) Log.d(TAG, "Connection failed... retrying");
 				s.startAltosBluetooth();
 				break;
 			case MSG_DISCONNECTED:
+				Log.d(TAG, "MSG_DISCONNECTED");
 				// Only do the following if we haven't been shutdown elsewhere..
 				if (s.device != null) {
 					if (D) Log.d(TAG, "Disconnected from " + s.device.getName());
@@ -158,6 +166,8 @@ public class TelemetryService extends Service implements LocationListener {
 				if (s.state == STATE_CONNECTED) {
 					try {
 						s.mAltosBluetooth.set_radio_frequency((Double) msg.obj);
+						s.mAltosBluetooth.save_frequency();
+						s.sendMessageToClients(s.frequency_message());
 					} catch (InterruptedException e) {
 					} catch (TimeoutException e) {
 					}
@@ -166,6 +176,8 @@ public class TelemetryService extends Service implements LocationListener {
 			case MSG_SETBAUD:
 				if (s.state == STATE_CONNECTED) {
 					s.mAltosBluetooth.set_telemetry_rate((Integer) msg.obj);
+					s.mAltosBluetooth.save_telemetry_rate();
+					s.sendMessageToClients(s.telemetry_rate_message());
 				}
 				break;
 			default:
@@ -182,6 +194,16 @@ public class TelemetryService extends Service implements LocationListener {
 				mClients.remove(i);
 			}
 		}
+	}
+
+	private Message frequency_message() {
+		if (D) Log.d(TAG, String.format("frequency_message %f\n", mAltosBluetooth.frequency()));
+		return Message.obtain(null, AltosDroid.MSG_FREQUENCY, mAltosBluetooth.frequency());
+	}
+
+	private Message telemetry_rate_message() {
+		if (D) Log.d(TAG, String.format("telemetry_rate_message %d\n", mAltosBluetooth.telemetry_rate()));
+		return Message.obtain(null, AltosDroid.MSG_TELEMETRY_RATE, mAltosBluetooth.telemetry_rate());
 	}
 
 	private void stopAltosBluetooth() {
@@ -241,12 +263,14 @@ public class TelemetryService extends Service implements LocationListener {
 		sendMessageToClients(Message.obtain(null, AltosDroid.MSG_STATE_CHANGE, state, -1, acd));
 	}
 
-	private void connected() {
+	private void connected() throws InterruptedException {
 		try {
 			if (mAltosBluetooth == null)
 				throw new InterruptedException("no bluetooth");
 			mConfigData = mAltosBluetooth.config_data();
-		} catch (InterruptedException e) {
+			if (D) Log.d(TAG, "send frequency/rate messages\n");
+			sendMessageToClients(frequency_message());
+			sendMessageToClients(telemetry_rate_message());
 		} catch (TimeoutException e) {
 			// If this timed out, then we really want to retry it, but
 			// probably safer to just retry the connection from scratch.
@@ -258,10 +282,12 @@ public class TelemetryService extends Service implements LocationListener {
 
 		mTelemetryReader = new TelemetryReader(mAltosBluetooth, mHandler);
 		mTelemetryReader.start();
-		
-		mTelemetryLogger = new TelemetryLogger(this, mAltosBluetooth);
-	}
 
+		mTelemetryLogger = new TelemetryLogger(this, mAltosBluetooth);
+
+		sendMessageToClients(frequency_message());
+		sendMessageToClients(telemetry_rate_message());
+	}
 
 	private void onTimerTick() {
 		if (D) Log.d(TAG, "Timer wakeup");

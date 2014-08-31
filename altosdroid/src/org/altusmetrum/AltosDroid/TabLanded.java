@@ -92,7 +92,10 @@ public class TabLanded extends AltosDroidTab {
 
 		if (state != null) {
 			mMaxHeightView.setText(String.format("%6.0f m", state.max_height()));
-			mMaxAccelView.setText(String.format("%6.0f m/s²", state.max_acceleration()));
+			if (state.max_acceleration() != AltosLib.MISSING)
+				mMaxAccelView.setText(String.format("%6.0f m/s²", state.max_acceleration()));
+			else
+				mMaxAccelView.setText("missing");
 			mMaxSpeedView.setText(String.format("%6.0f m/s", state.max_speed()));
 		}
 	}
