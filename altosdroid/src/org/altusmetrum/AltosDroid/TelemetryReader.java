@@ -39,9 +39,17 @@ public class TelemetryReader extends Thread {
 	AltosLink   link;
 	AltosState  state = null;
 
+	AltosFlightReader	stacked;
+
 	LinkedBlockingQueue<AltosLine> telemQueue;
 
 	public AltosState read() throws ParseException, AltosCRCException, InterruptedException, IOException {
+		if (stacked != null) {
+			state = stacked.read();
+			if (state != null)
+				return state;
+			stacked = null;
+		}
 		AltosLine l = telemQueue.take();
 		if (l.line == null)
 			throw new IOException("IO error");
@@ -56,6 +64,10 @@ public class TelemetryReader extends Thread {
 
 	public void close() {
 		state = null;
+		if (stacked != null) {
+			stacked.close(false);
+			stacked = null;
+		}
 		link.remove_monitor(telemQueue);
 		link = null;
 		telemQueue.clear();
@@ -84,9 +96,10 @@ public class TelemetryReader extends Thread {
 		}
 	}
 
-	public TelemetryReader (AltosLink in_link, Handler in_handler) {
+	public TelemetryReader (AltosLink in_link, Handler in_handler, AltosFlightReader in_stacked) {
 		link    = in_link;
 		handler = in_handler;
+		stacked = in_stacked;
 
 		state = null;
 		telemQueue = new LinkedBlockingQueue<AltosLine>();
@@ -100,5 +113,22 @@ public class TelemetryReader extends Thread {
 		} catch (TimeoutException te) {
 			close();
 		}
+	}
+
+	private static AltosFlightReader existing_data(AltosLink link) {
+		if (link == null)
+			return null;
+
+		File	file = AltosPreferences.logfile(link.serial);
+		if (file != null) {
+			AltosStateIterable	iterable = AltosStateIterable.iterable(file);
+			if (iterable != null)
+				return new AltosReplayReader(iterable.iterator(), file, false);
+		}
+		return null;
+	}
+
+	public TelemetryReader(AltosLink link, Handler handler) {
+		this(link, handler, existing_data(link));
 	}
 }
