@@ -178,6 +178,8 @@ public class AltosPreferences {
 
 		telemetry_rates = new Hashtable<Integer,Integer>();
 
+		logfiles = new Hashtable<Integer,File>();
+
 		voice = backend.getBoolean(voicePreference, true);
 
 		callsign = backend.getString(callsignPreference,"N0CALL");

@@ -185,6 +185,9 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	}
 
 	private static AltosFlightReader existing_data(AltosLink link) {
+		if (link == null)
+			return null;
+
 		File	file = AltosPreferences.logfile(link.serial);
 		if (file != null) {
 			AltosStateIterable	iterable = AltosStateIterable.iterable(file);
