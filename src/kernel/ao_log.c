@@ -192,12 +192,14 @@ ao_log_find_max_erase_flight(void) __reentrant
 		ao_flight_number = 1;
 }
 
-void
+uint8_t
 ao_log_scan(void) __reentrant
 {
 	uint8_t		log_slot;
 	uint8_t		log_slots;
-#if !FLIGHT_LOG_APPEND
+#if FLIGHT_LOG_APPEND
+	uint8_t		ret;
+#else
 	uint8_t		log_want;
 #endif
 
@@ -248,9 +250,13 @@ ao_log_scan(void) __reentrant
 				empty = ao_log_current_pos;
 			}
 		}
+		ret = 1;
 	} else {
 		ao_log_find_max_erase_flight();
+		ret = 0;
 	}
+	ao_wakeup(&ao_flight_number);
+	return ret;
 #else
 
 	if (ao_flight_number)
@@ -278,8 +284,9 @@ ao_log_scan(void) __reentrant
 		if (++log_slot >= log_slots)
 			log_slot = 0;
 	} while (log_slot != log_want);
-#endif
 	ao_wakeup(&ao_flight_number);
+	return 0;
+#endif
 }
 
 void
