@@ -146,16 +146,18 @@ public class AltosBluetooth extends AltosLink {
 	}
 
 	public void save_frequency() {
-		AltosPreferences.set_frequency(serial, frequency);
+		AltosPreferences.set_frequency(0, frequency);
 	}
 
 	public void save_telemetry_rate() {
-		AltosPreferences.set_telemetry_rate(serial, telemetry_rate);
+		AltosPreferences.set_telemetry_rate(0, telemetry_rate);
 	}
 
 	private synchronized void wait_connected() throws InterruptedException, IOException {
 		if (input == null) {
+			if (D) Log.d(TAG, "wait_connected...");
 			wait();
+			if (D) Log.d(TAG, "wait_connected done");
 			if (input == null) throw new IOException();
 		}
 	}

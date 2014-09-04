@@ -31,6 +31,7 @@ import org.altusmetrum.altoslib_5.*;
 public class TelemetryReader extends Thread {
 
 	private static final String TAG = "TelemetryReader";
+	private static final boolean D = true;
 
 	int         crc_errors;
 
@@ -44,12 +45,6 @@ public class TelemetryReader extends Thread {
 	LinkedBlockingQueue<AltosLine> telemQueue;
 
 	public AltosState read() throws ParseException, AltosCRCException, InterruptedException, IOException {
-		if (stacked != null) {
-			state = stacked.read();
-			if (state != null)
-				return state;
-			stacked = null;
-		}
 		AltosLine l = telemQueue.take();
 		if (l.line == null)
 			throw new IOException("IO error");
@@ -78,6 +73,26 @@ public class TelemetryReader extends Thread {
 		AltosState  state = null;
 
 		try {
+			if (D) Log.d(TAG, "starting reader");
+			while (stacked != null) {
+				AltosState	stacked_state = null;
+				try {
+					stacked_state = stacked.read();
+				} catch (ParseException pe) {
+					continue;
+				} catch (AltosCRCException ce) {
+					continue;
+				}
+				if (stacked_state != null)
+					state = stacked_state;
+				else
+					stacked = null;
+			}
+			if (state != null) {
+				if (D) Log.d(TAG, "Send initial state");
+				handler.obtainMessage(TelemetryService.MSG_TELEMETRY, state).sendToTarget();
+			}
+			if (D) Log.d(TAG, "starting loop");
 			while (telemQueue != null) {
 				try {
 					state = read();
@@ -97,6 +112,7 @@ public class TelemetryReader extends Thread {
 	}
 
 	public TelemetryReader (AltosLink in_link, Handler in_handler, AltosFlightReader in_stacked) {
+		if (D) Log.d(TAG, "connected TelemetryReader create started");
 		link    = in_link;
 		handler = in_handler;
 		stacked = in_stacked;
@@ -104,15 +120,9 @@ public class TelemetryReader extends Thread {
 		state = null;
 		telemQueue = new LinkedBlockingQueue<AltosLine>();
 		link.add_monitor(telemQueue);
-		try {
-			link.set_radio_frequency(AltosPreferences.frequency(link.serial));
-			link.set_telemetry(AltosLib.ao_telemetry_standard);
-			link.set_telemetry_rate(AltosPreferences.telemetry_rate(link.serial));
-		} catch (InterruptedException ee) {
-			close();
-		} catch (TimeoutException te) {
-			close();
-		}
+		link.set_telemetry(AltosLib.ao_telemetry_standard);
+
+		if (D) Log.d(TAG, "connected TelemetryReader created");
 	}
 
 	private static AltosFlightReader existing_data(AltosLink link) {

@@ -58,7 +58,7 @@ public class AltosVoice {
 		}
 	}
 
-	public void tell(AltosState state) {
+	public void tell(AltosState state, AltosGreatCircle from_receiver) {
 		if (!tts_enabled) return;
 
 		boolean	spoke = false;
@@ -88,13 +88,14 @@ public class AltosVoice {
 		}
 		old_state = state;
 		if (idle_thread != null)
-			idle_thread.notice(state, spoke);
+			idle_thread.notice(state, from_receiver, spoke);
 	}
 
 
 	class IdleThread extends Thread {
 		boolean	           started;
 		private AltosState state;
+		private AltosGreatCircle from_receiver;
 		int                reported_landing;
 		int                report_interval;
 		long               report_time;
@@ -112,25 +113,26 @@ public class AltosVoice {
 				return;
 			}
 
-			/* If the rocket isn't on the pad, then report height */
-			if (((AltosLib.ao_flight_drogue <= state.state &&
+			/* If the rocket isn't on the pad, then report location */
+			if ((AltosLib.ao_flight_drogue <= state.state &&
 			      state.state < AltosLib.ao_flight_landed) ||
-			     state.state == AltosLib.ao_flight_stateless) &&
-			    state.range >= 0)
+			     state.state == AltosLib.ao_flight_stateless)
 			{
-				if (state.from_pad != null) {
+				AltosGreatCircle	position;
+
+				if (from_receiver != null)
+					position = from_receiver;
+				else
+					position = state.from_pad;
+
+				if (position != null) {
 					speak(String.format("Height %d, bearing %s %d, elevation %d, range %d.\n",
 							    (int) (state.height() + 0.5),
-							    state.from_pad.bearing_words(
+							    position.bearing_words(
 								    AltosGreatCircle.BEARING_VOICE),
-							    (int) (state.from_pad.bearing + 0.5),
-							    (int) (state.elevation + 0.5),
-							    (int) (state.range + 0.5)));
-				} else {
-					speak(String.format("Height %d, elevation %d, range %d.\n",
-							    (int) (state.height() + 0.5),
-							    (int) (state.elevation + 0.5),
-							    (int) (state.range + 0.5)));
+							    (int) (position.bearing + 0.5),
+							    (int) (position.elevation + 0.5),
+							    (int) (position.range + 0.5)));
 				}
 			} else if (state.state > AltosLib.ao_flight_pad) {
 				if (state.height() != AltosLib.MISSING)
@@ -186,9 +188,10 @@ public class AltosVoice {
 			}
 		}
 
-		public synchronized void notice(AltosState new_state, boolean spoken) {
+		public synchronized void notice(AltosState new_state, AltosGreatCircle new_from_receiver, boolean spoken) {
 			AltosState old_state = state;
 			state = new_state;
+			from_receiver = new_from_receiver;
 			if (!started && state.state > AltosLib.ao_flight_pad) {
 				started = true;
 				start();
