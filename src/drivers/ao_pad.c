@@ -362,14 +362,26 @@ ao_pad_test(void)
 void
 ao_pad_manual(void)
 {
+	uint8_t	ignite;
+	int	repeat;
 	ao_cmd_white();
 	if (!ao_match_word("DoIt"))
 		return;
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ao_pad_ignite = 1 << ao_cmd_lex_i;
-	ao_wakeup(&ao_pad_ignite);
+	ignite = 1 << ao_cmd_lex_i;
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success) {
+		repeat = 1;
+		ao_cmd_status = ao_cmd_success;
+	} else
+		repeat = ao_cmd_lex_i;
+	while (repeat-- > 0) {
+		ao_pad_ignite = ignite;
+		ao_wakeup(&ao_pad_ignite);
+		ao_delay(AO_PAD_FIRE_TIME>>1);
+	}
 }
 
 static __xdata struct ao_task ao_pad_task;
