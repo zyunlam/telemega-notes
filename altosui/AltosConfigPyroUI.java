@@ -285,9 +285,13 @@ public class AltosConfigPyroUI
 		"0.050", "0.100", "0.250", "0.500", "1.0", "2.0"
 	};
 
+	boolean	initializing;
+
 	public void set_pyro_firing_time(double new_pyro_firing_time) {
+		initializing = true;
 		pyro_firing_time_value.setSelectedItem(Double.toString(new_pyro_firing_time));
 		pyro_firing_time_value.setEnabled(new_pyro_firing_time >= 0);
+		initializing = false;
 	}
 
 	public double get_pyro_firing_time() throws AltosConfigDataException {
@@ -301,23 +305,28 @@ public class AltosConfigPyroUI
 	}
 
 	public void set_dirty() {
-		owner.set_dirty();
+		if (!initializing)
+			owner.set_dirty();
 	}
 
 	public void itemStateChanged(ItemEvent e) {
-		owner.set_dirty();
+		if (!initializing)
+			owner.set_dirty();
 	}
 
 	public void changedUpdate(DocumentEvent e) {
-		owner.set_dirty();
+		if (!initializing)
+			owner.set_dirty();
 	}
 
 	public void insertUpdate(DocumentEvent e) {
-		owner.set_dirty();
+		if (!initializing)
+			owner.set_dirty();
 	}
 
 	public void removeUpdate(DocumentEvent e) {
-		owner.set_dirty();
+		if (!initializing)
+			owner.set_dirty();
 	}
 
 	public void units_changed(boolean imperial_units) {
