@@ -20,7 +20,7 @@ echo "TeleMetrum v$VERSION Turn-On and Calibration Program"
 echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
 echo
 echo "Expectations:"
-echo "\tTeleMetrum v$VERSIOn powered from USB"
+echo "\tTeleMetrum v$VERSION powered from USB"
 echo "\t\twith ST-Link-V2 cabled to debug header"
 echo "\t\twith coax from UHF to frequency counter"
 echo
@@ -53,6 +53,6 @@ echo 'E 0' > $dev
 
 SERIAL=$SERIAL ./cal-freq $dev
 
-./cal-accel $dev
+../ao-tools/ao-cal-accel/ao-cal-accel $dev
 
 echo 'E 1' > $dev

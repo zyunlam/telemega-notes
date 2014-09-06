@@ -72,7 +72,7 @@ ao_log(void);
 /* functions provided in ao_log.c */
 
 /* Figure out the current flight number */
-void
+uint8_t
 ao_log_scan(void) __reentrant;
 
 /* Return the position of the start of the given log slot */

@@ -72,7 +72,7 @@ ao_tracker(void)
 #if !HAS_USB_CONNECT
 	ao_tracker_force_telem = 1;
 #endif
-	ao_log_scan();
+	log_started = ao_log_scan();
 
 	ao_rdf_set(1);
 
@@ -181,8 +181,7 @@ void
 ao_tracker_erase_end(void)
 {
 	if (erasing_current) {
-		ao_log_scan();
-		log_started = 0;
+		log_started = ao_log_scan();
 		ao_mutex_put(&tracker_mutex);
 	}
 }

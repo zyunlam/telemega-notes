@@ -54,6 +54,6 @@ echo 'E 0' > $dev
 
 SERIAL=$SERIAL ./cal-freq $dev
 
-./cal-accel $dev
+../ao-tools/ao-cal-accel/ao-cal-accel $dev
 
 echo 'E 1' > $dev

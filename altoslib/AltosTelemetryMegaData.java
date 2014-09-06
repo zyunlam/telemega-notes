@@ -36,7 +36,7 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 	public AltosTelemetryMegaData(int[] bytes) {
 		super(bytes);
 
-		state = int8(5);
+		state = uint8(5);
 
 		v_batt = int16(6);
 		v_pyro = int16(8);
@@ -44,7 +44,7 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		sense = new int[6];
 
 		for (int i = 0; i < 6; i++) {
-			sense[i] = int8(10 + i) << 4;
+			sense[i] = uint8(10 + i) << 4;
 			sense[i] |= sense[i] >> 8;
 		}
 

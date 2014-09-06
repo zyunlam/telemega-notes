@@ -22,13 +22,15 @@
 	<!-- AltosDroid -->
 	<string name="bt_not_enabled">Bluetooth was not enabled.</string>
 	<string name="title_connecting">connecting…</string>
-	<string name="title_connected_to">connected: </string>
+	<string name="title_connected_to">connected</string>
 	<string name="title_not_connected">not connected</string>
 
 	<!-- Options Menu -->
 	<string name="connect_device">Connect a device</string>
+	<string name="quit">Quit</string>
 	<string name="select_freq">Select radio frequency</string>
 	<string name="select_rate">Select data rate</string>
+	<string name="change_units">Change units</string>
 
 	<!-- DeviceListActivity -->
 	<string name="scanning">scanning for devices…</string>

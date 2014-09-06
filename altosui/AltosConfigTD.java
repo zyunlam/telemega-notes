@@ -223,8 +223,10 @@ public class AltosConfigTD implements ActionListener {
 					if (!config_version.get().equals("0.0"))
 						break;
 					been_there = true;
-					config.serial_line.printf("C\n ");
-					config.serial_line.flush_input();
+					if (config != null && config.serial_line != null) {
+						config.serial_line.printf("C\n ");
+						config.serial_line.flush_input();
+					}
 				}
 			} catch (InterruptedException ie) {
 			}
@@ -277,8 +279,10 @@ public class AltosConfigTD implements ActionListener {
 	}
 
 	void abort() {
-		serial_line.close();
-		serial_line = null;
+		if (serial_line != null) {
+			serial_line.close();
+			serial_line = null;
+		}
 		JOptionPane.showMessageDialog(owner,
 					      String.format("Connection to \"%s\" failed",
 							    device.toShortString()),

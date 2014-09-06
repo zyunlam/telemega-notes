@@ -33,10 +33,13 @@ public class TabPad extends AltosDroidTab {
 	AltosDroid mAltosDroid;
 
 	private TextView mBatteryVoltageView;
+	private TextView mBatteryVoltageLabel;
 	private GoNoGoLights mBatteryLights;
 	private TextView mApogeeVoltageView;
+	private TextView mApogeeVoltageLabel;
 	private GoNoGoLights mApogeeLights;
 	private TextView mMainVoltageView;
+	private TextView mMainVoltageLabel;
 	private GoNoGoLights mMainLights;
 	private TextView mDataLoggingView;
 	private GoNoGoLights mDataLoggingLights;
@@ -59,16 +62,19 @@ public class TabPad extends AltosDroidTab {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.tab_pad, container, false);
 		mBatteryVoltageView = (TextView) v.findViewById(R.id.battery_voltage_value);
+		mBatteryVoltageLabel = (TextView) v.findViewById(R.id.battery_voltage_label);
 		mBatteryLights = new GoNoGoLights((ImageView) v.findViewById(R.id.battery_redled),
 		                                  (ImageView) v.findViewById(R.id.battery_greenled),
 		                                  getResources());
 
 		mApogeeVoltageView = (TextView) v.findViewById(R.id.apogee_voltage_value);
+		mApogeeVoltageLabel = (TextView) v.findViewById(R.id.apogee_voltage_label);
 		mApogeeLights = new GoNoGoLights((ImageView) v.findViewById(R.id.apogee_redled),
 		                                 (ImageView) v.findViewById(R.id.apogee_greenled),
 		                                 getResources());
 
 		mMainVoltageView = (TextView) v.findViewById(R.id.main_voltage_value);
+		mMainVoltageLabel = (TextView) v.findViewById(R.id.main_voltage_label);
 		mMainLights = new GoNoGoLights((ImageView) v.findViewById(R.id.main_redled),
 		                               (ImageView) v.findViewById(R.id.main_greenled),
 		                               getResources());
@@ -107,11 +113,23 @@ public class TabPad extends AltosDroidTab {
 		if (state != null) {
 			mBatteryVoltageView.setText(AltosDroid.number("%4.2f V", state.battery_voltage));
 			mBatteryLights.set(state.battery_voltage >= AltosLib.ao_battery_good, state.battery_voltage == AltosLib.MISSING);
-
-			mApogeeVoltageView.setText(AltosDroid.number("%4.2f V", state.apogee_voltage));
+			if (state.apogee_voltage == AltosLib.MISSING) {
+				mApogeeVoltageView.setVisibility(View.GONE);
+				mApogeeVoltageLabel.setVisibility(View.GONE);
+			} else {
+				mApogeeVoltageView.setText(AltosDroid.number("%4.2f V", state.apogee_voltage));
+				mApogeeVoltageView.setVisibility(View.VISIBLE);
+				mApogeeVoltageLabel.setVisibility(View.VISIBLE);
+			}
 			mApogeeLights.set(state.apogee_voltage >= AltosLib.ao_igniter_good, state.apogee_voltage == AltosLib.MISSING);
-
-			mMainVoltageView.setText(AltosDroid.number("%4.2f V", state.main_voltage));
+			if (state.main_voltage == AltosLib.MISSING) {
+				mMainVoltageView.setVisibility(View.GONE);
+				mMainVoltageLabel.setVisibility(View.GONE);
+			} else {
+				mMainVoltageView.setText(AltosDroid.number("%4.2f V", state.main_voltage));
+				mMainVoltageView.setVisibility(View.VISIBLE);
+				mMainVoltageLabel.setVisibility(View.VISIBLE);
+			}
 			mMainLights.set(state.main_voltage >= AltosLib.ao_igniter_good, state.main_voltage == AltosLib.MISSING);
 
 			if (state.flight != 0) {
@@ -141,12 +159,12 @@ public class TabPad extends AltosDroidTab {
 		}
 
 		if (receiver != null) {
-			double altitude = 0;
+			double altitude = AltosLib.MISSING;
 			if (receiver.hasAltitude())
 				altitude = receiver.getAltitude();
 			mPadLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
 			mPadLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "W", "E"));
-			mPadAltitudeView.setText(AltosDroid.number("%4.0f m", altitude));
+			set_value(mPadAltitudeView, AltosConvert.height, 6, altitude);
 		}
 	}
 

@@ -91,8 +91,10 @@ public class AltosEepromGPS extends AltosEeprom {
 
 		switch (cmd) {
 		case AltosLib.AO_LOG_FLIGHT:
-			state.set_boost_tick(tick);
-			state.set_flight(flight());
+			if (state.flight == AltosLib.MISSING) {
+				state.set_boost_tick(tick);
+				state.set_flight(flight());
+			}
 			/* no place to log start lat/lon yet */
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:

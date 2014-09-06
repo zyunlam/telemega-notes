@@ -8,6 +8,8 @@ Desired AltosDroid feature list
 
  *) Highlight current frequency in the frequency list.
 
+	Placed current frequency in title bar
+
  *) Random frequency selection. Provide some mechanism to input
     arbitrary radio frequencies. Could be like AltosUI which allows
     you to edit the list of frequencies and assign names to them,
@@ -23,10 +25,16 @@ Desired AltosDroid feature list
 
  *) Remember most-recently-used TBT and frequency, perhaps
     auto-connect at startup.
+
+	Done
     
  *) Re-loading flight data from .telem file to get back to
     'find my rocket' mode after shutting down the application.
 
+	Done
+
  *) Imperial Units mode
+
+	Done
 
  *) TeleBT battery voltage

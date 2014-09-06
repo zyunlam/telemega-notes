@@ -252,7 +252,7 @@ ao_pyro_check(void)
 	struct ao_pyro	*pyro;
 	uint8_t		p, any_waiting;
 	uint16_t	fire = 0;
-	
+
 	any_waiting = 0;
 	for (p = 0; p < AO_PYRO_NUM; p++) {
 		pyro = &ao_config.pyro[p];
@@ -288,6 +288,16 @@ ao_pyro_check(void)
 		 * the delay to expire
 		 */
 		if (pyro->delay_done) {
+
+			/* Check to make sure the required conditions
+			 * remain valid. If not, inhibit the channel
+			 * by setting the fired bit
+			 */
+			if (!ao_pyro_ready(pyro)) {
+				pyro->fired = 1;
+				continue;
+			}
+
 			if ((int16_t) (ao_time() - pyro->delay_done) < 0)
 				continue;
 		}
@@ -465,7 +475,7 @@ ao_pyro_set(void)
 		printf ("invalid pyro channel %d\n", p);
 		return;
 	}
-	pyro_tmp.flags = 0;
+	memset(&pyro_tmp, '\0', sizeof (pyro_tmp));
 	for (;;) {
 		ao_cmd_white();
 		if (ao_cmd_lex_c == '\n')
@@ -489,13 +499,26 @@ ao_pyro_set(void)
 		}
 		pyro_tmp.flags |= ao_pyro_values[v].flag;
 		if (ao_pyro_values[v].offset != NO_VALUE) {
+			uint8_t negative = 0;
+			ao_cmd_white();
+			if (ao_cmd_lex_c == '-') {
+				negative = 1;
+				ao_cmd_lex();
+			}
 			ao_cmd_decimal();
 			if (ao_cmd_status != ao_cmd_success)
 				return;
-			if (ao_pyro_values[v].flag & AO_PYRO_8_BIT_VALUE)
+			if (ao_pyro_values[v].flag & AO_PYRO_8_BIT_VALUE) {
+				if (negative) {
+					ao_cmd_status = ao_cmd_syntax_error;
+					return;
+				}
 				*((uint8_t *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
-			else
+			} else {
+				if (negative)
+					ao_cmd_lex_i = -ao_cmd_lex_i;
 				*((int16_t *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
+			}
 		}
 	}
 	_ao_config_edit_start();

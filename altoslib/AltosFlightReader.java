@@ -21,16 +21,16 @@ import java.text.*;
 import java.io.*;
 import java.util.concurrent.*;
 
-public class AltosFlightReader {
+public abstract class AltosFlightReader {
 	public String name;
 
 	public int serial;
 
-	public void init() { }
+	public void init() {}
 
-	public AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException { return null; }
+	public abstract AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException;
 
-	public void close(boolean interrupted) { }
+	public abstract void close(boolean interrupted);
 
 	public void set_frequency(double frequency) throws InterruptedException, TimeoutException { }
 
