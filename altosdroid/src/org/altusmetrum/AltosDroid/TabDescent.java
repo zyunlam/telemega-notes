@@ -93,14 +93,14 @@ public class TabDescent extends AltosDroidTab {
 
 	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
-			mSpeedView.setText(AltosDroid.number("%6.0f m/s", state.speed()));
-			mHeightView.setText(AltosDroid.number("%6.0f m", state.height()));
+			set_value(mSpeedView, AltosConvert.speed, 6, state.speed());
+			set_value(mHeightView, AltosConvert.height, 6, state.height());
 			if (from_receiver != null) {
 				mElevationView.setText(AltosDroid.number("%3.0f°", from_receiver.elevation));
-				mRangeView.setText(AltosDroid.number("%6.0f m", from_receiver.range));
+				set_value(mRangeView, AltosConvert.distance, 6, from_receiver.range);
 				mBearingView.setText(AltosDroid.number("%3.0f°", from_receiver.bearing));
 				mCompassView.setText(from_receiver.bearing_words(AltosGreatCircle.BEARING_LONG));
-				mDistanceView.setText(AltosDroid.number("%6.0f m", from_receiver.distance));
+				set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
 			} else { 
 				mElevationView.setText("<unknown>");
 				mRangeView.setText("<unknown>");

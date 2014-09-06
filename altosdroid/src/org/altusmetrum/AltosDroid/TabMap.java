@@ -158,7 +158,7 @@ public class TabMap extends AltosDroidTab {
 	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
-			mDistanceView.setText(String.format("%6.0f m", from_receiver.distance));
+			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
 		}
 
 		if (state != null) {

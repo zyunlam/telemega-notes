@@ -91,12 +91,13 @@ public class TabAscent extends AltosDroidTab {
 
 	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
-			mHeightView.setText(AltosDroid.number("%6.0f m", state.height()));
-			mMaxHeightView.setText(AltosDroid.number("%6.0f m", state.max_height()));
-			mSpeedView.setText(AltosDroid.number("%6.0f m/s", state.speed()));
-			mMaxSpeedView.setText(AltosDroid.number("%6.0f m/s", state.max_speed()));
-			mAccelView.setText(AltosDroid.number("%6.0f m/s²", state.acceleration()));
-			mMaxAccelView.setText(AltosDroid.number("%6.0f m/s²", state.max_acceleration()));
+			set_value(mHeightView, AltosConvert.height, 6, state.height());
+			set_value(mHeightView, AltosConvert.height, 6, state.height());
+			set_value(mMaxHeightView, AltosConvert.height, 6, state.max_height());
+			set_value(mSpeedView, AltosConvert.speed, 6, state.speed());
+			set_value(mMaxSpeedView, AltosConvert.speed, 6, state.max_speed());
+			set_value(mAccelView, AltosConvert.accel, 6, state.acceleration());
+			set_value(mMaxAccelView, AltosConvert.accel, 6, state.max_acceleration());
 
 			if (state.gps != null) {
 				mLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));

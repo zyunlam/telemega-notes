@@ -30,6 +30,7 @@
 	<string name="quit">Quit</string>
 	<string name="select_freq">Select radio frequency</string>
 	<string name="select_rate">Select data rate</string>
+	<string name="change_units">Change units</string>
 
 	<!-- DeviceListActivity -->
 	<string name="scanning">scanning for devices…</string>

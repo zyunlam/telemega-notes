@@ -27,6 +27,9 @@ public class AltosDroidPreferences extends AltosPreferences {
 	static String active_device_address;
 
 	public static void init(Context context) {
+		if (backend != null)
+			return;
+
 		AltosPreferences.init(new AltosDroidPreferencesBackend(context));
 
 		active_device_address = backend.getString(activeDevicePreference, null);

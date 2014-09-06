@@ -54,7 +54,7 @@ import android.location.Location;
 
 import org.altusmetrum.altoslib_5.*;
 
-public class AltosDroid extends FragmentActivity {
+public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Debugging
 	static final String TAG = "AltosDroid";
 	static final boolean D = true;
@@ -187,6 +187,11 @@ public class AltosDroid extends FragmentActivity {
 		mTabs.remove(mTab);
 	}
 
+	public void units_changed(boolean imperial_units) {
+		for (AltosDroidTab mTab : mTabs)
+			mTab.units_changed(imperial_units);
+	}
+
 	void update_title(TelemetryState telemetry_state) {
 		switch (telemetry_state.connect) {
 		case TelemetryState.CONNECT_CONNECTED:
@@ -226,7 +231,15 @@ public class AltosDroid extends FragmentActivity {
 		}
 	}
 
+	boolean	registered_units_listener;
+
 	void update_state(TelemetryState telemetry_state) {
+
+		if (!registered_units_listener) {
+			registered_units_listener = true;
+			AltosPreferences.register_units_listener(this);
+		}
+
 		update_title(telemetry_state);
 		update_ui(telemetry_state.state, telemetry_state.location);
 		if (telemetry_state.connect == TelemetryState.CONNECT_CONNECTED)
@@ -655,6 +668,10 @@ public class AltosDroid extends FragmentActivity {
 					 });
 			AlertDialog alert_rate = builder_rate.create();
 			alert_rate.show();
+			return true;
+		case R.id.change_units:
+			boolean	imperial = AltosPreferences.imperial_units();
+			AltosPreferences.set_imperial_units(!imperial);
 			return true;
 		}
 		return false;

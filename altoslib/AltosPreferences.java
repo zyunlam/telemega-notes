@@ -157,6 +157,10 @@ public class AltosPreferences {
 	public static int launcher_channel;
 
 	public static void init(AltosPreferencesBackend in_backend) {
+
+		if (backend != null)
+			return;
+
 		backend = in_backend;
 
 		/* Initialize logdir from preferences */

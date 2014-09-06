@@ -159,12 +159,12 @@ public class TabPad extends AltosDroidTab {
 		}
 
 		if (receiver != null) {
-			double altitude = 0;
+			double altitude = AltosLib.MISSING;
 			if (receiver.hasAltitude())
 				altitude = receiver.getAltitude();
 			mPadLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
 			mPadLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "W", "E"));
-			mPadAltitudeView.setText(AltosDroid.number("%4.0f m", altitude));
+			set_value(mPadAltitudeView, AltosConvert.height, 6, altitude);
 		}
 	}
 

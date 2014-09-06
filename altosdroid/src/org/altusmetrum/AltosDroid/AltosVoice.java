@@ -68,12 +68,14 @@ public class AltosVoice {
 			if ((old_state == null || old_state.state <= AltosLib.ao_flight_boost) &&
 			    state.state > AltosLib.ao_flight_boost) {
 				if (state.max_speed() != AltosLib.MISSING)
-					speak(String.format("max speed: %d meters per second.", (int) (state.max_speed() + 0.5)));
+					speak(String.format("Max speed: %s.",
+							    AltosConvert.speed.say_units(state.max_speed())));
 				spoke = true;
 			} else if ((old_state == null || old_state.state < AltosLib.ao_flight_drogue) &&
 			           state.state >= AltosLib.ao_flight_drogue) {
 				if (state.max_height() != AltosLib.MISSING)
-					speak(String.format("max height: %d meters.", (int) (state.max_height() + 0.5)));
+					speak(String.format("Max height: %s.",
+							    AltosConvert.height.say_units(state.max_height())));
 				spoke = true;
 			}
 		}
@@ -126,17 +128,17 @@ public class AltosVoice {
 					position = state.from_pad;
 
 				if (position != null) {
-					speak(String.format("Height %d, bearing %s %d, elevation %d, range %d.\n",
-							    (int) (state.height() + 0.5),
+					speak(String.format("Height %s, bearing %s %d, elevation %d, range %s.\n",
+							    AltosConvert.height.say_units(state.height()),
 							    position.bearing_words(
 								    AltosGreatCircle.BEARING_VOICE),
 							    (int) (position.bearing + 0.5),
 							    (int) (position.elevation + 0.5),
-							    (int) (position.range + 0.5)));
+							    AltosConvert.distance.say_units(position.range)));
 				}
 			} else if (state.state > AltosLib.ao_flight_pad) {
 				if (state.height() != AltosLib.MISSING)
-					speak(String.format("%d meters", (int) (state.height() + 0.5)));
+					speak(AltosConvert.height.say_units(state.height()));
 			} else {
 				reported_landing = 0;
 			}
@@ -155,9 +157,9 @@ public class AltosVoice {
 				else
 					speak("rocket may have crashed");
 				if (state.from_pad != null)
-					speak(String.format("Bearing %d degrees, range %d meters.",
+					speak(String.format("Bearing %d degrees, range %s.",
 					                    (int) (state.from_pad.bearing + 0.5),
-					                    (int) (state.from_pad.distance + 0.5)));
+							    AltosConvert.distance.say_units(state.from_pad.distance)));
 				++reported_landing;
 			}
 		}
