@@ -96,6 +96,8 @@ public class TelemetryService extends Service implements LocationListener {
 		@Override
 		public void handleMessage(Message msg) {
 			TelemetryService s = service.get();
+			if (s == null)
+				return;
 			switch (msg.what) {
 			case MSG_REGISTER_CLIENT:
 				s.mClients.add(msg.replyTo);
