@@ -70,6 +70,7 @@ do_gps(file f) {
 	string[*] sats = find_gps(i, "Sats:");
 
 	int actual_flags = string_to_integer(flags[1]);
+	int actual_sats = string_to_integer(sats[1]);
 
 	while ((actual_flags & (1 << 4)) == 0) {
 		printf("Flags: %s\n", flags[1]);
