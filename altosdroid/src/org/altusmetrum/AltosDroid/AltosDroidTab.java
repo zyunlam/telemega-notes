@@ -39,29 +39,7 @@ public abstract class AltosDroidTab extends Fragment {
 
 	public void set_visible(boolean visible) {
 		FragmentTransaction	ft = AltosDroid.fm.beginTransaction();
-		if (visible)
-			ft.show(this);
-		else
-			ft.hide(this);
-		ft.commit();
-	}
-
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver, boolean is_current) {
-		if (is_current) {
-			Log.d(AltosDroid.TAG, String.format("%s: visible, performing update", tab_name()));
-
-			show(state, from_receiver, receiver);
-		} else {
-			Log.d(AltosDroid.TAG, String.format("%s: not visible, skipping update", tab_name()));
-			last_state = state;
-			last_from_receiver = from_receiver;
-			last_receiver = receiver;
-			return;
-		}
-	}
-
-	public void onHiddenChanged(boolean hidden) {
-		if (last_state != null && isVisible()) {
+		if (visible) {
 			AltosState		state = last_state;
 			AltosGreatCircle	from_receiver = last_from_receiver;
 			Location		receiver = last_receiver;
@@ -70,6 +48,23 @@ public abstract class AltosDroidTab extends Fragment {
 			last_from_receiver = null;
 			last_receiver = null;
 			show(state, from_receiver, receiver);
+			ft.show(this);
+		} else
+			ft.hide(this);
+		ft.commit();
+	}
+
+	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver, boolean is_current) {
+		if (is_current) {
+			if (AltosDroid.D) Log.d(AltosDroid.TAG, String.format("%s: visible, performing update", tab_name()));
+
+			show(state, from_receiver, receiver);
+		} else {
+			if (AltosDroid.D) Log.d(AltosDroid.TAG, String.format("%s: not visible, skipping update", tab_name()));
+			last_state = state;
+			last_from_receiver = from_receiver;
+			last_receiver = receiver;
+			return;
 		}
 	}
 }
