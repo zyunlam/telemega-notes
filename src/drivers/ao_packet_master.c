@@ -57,6 +57,12 @@ static __xdata uint16_t		ao_packet_master_time;
 #define AO_PACKET_MASTER_DELAY_LONG	AO_MS_TO_TICKS(1000)
 #define AO_PACKET_MASTER_DELAY_TIMEOUT	AO_MS_TO_TICKS(2000)
 
+#if HAS_RADIO_RATE
+#define AO_PACKET_MASTER_RECV_DELAY	AO_MS_TO_TICKS(100) << (ao_config.radio_rate << 1)
+#else
+#define AO_PACKET_MASTER_RECV_DELAY	AO_MS_TO_TICKS(100)
+#endif
+
 static void
 ao_packet_master_busy(void)
 {
@@ -91,7 +97,7 @@ ao_packet_master(void)
 		if (ao_tx_packet.len)
 			ao_packet_master_busy();
 		ao_packet_master_check_busy();
-		ao_alarm(ao_packet_master_delay);
+		ao_alarm(AO_PACKET_MASTER_RECV_DELAY);
 		r = ao_packet_recv();
 		ao_clear_alarm();
 		if (r) {
