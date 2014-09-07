@@ -290,15 +290,32 @@ ao_radio_idle(void)
 }
 
 /*
- * Packet deviation is 20.5kHz
+ * Packet deviation
  *
  *	fdev = fosc >> 24 * (256 + dev_m) << dev_e
  *
+ * Deviation for 38400 baud should be 20.5kHz:
+ *
  *     	32e6Hz / (2 ** 24) * (256 + 80) * (2 ** 5) = 20508Hz
+ *
+ * Deviation for 9600 baud should be 5.125kHz:
+ *
+ *     	32e6Hz / (2 ** 24) * (256 + 80) * (2 ** 3) = 5127Hz
+ *
+ * Deviation for 2400 baud should be 1.28125kHz, but cc1111 and
+ * cc115l can't do that, so we'll use 1.5kHz instead:
+ *
+ *     	32e6Hz / (2 ** 24) * (256 + 137) * (2 ** 1) = 1499Hz
  */
 
-#define PACKET_DEV_E	5
-#define PACKET_DEV_M	80
+#define PACKET_DEV_M_384	80
+#define PACKET_DEV_E_384	5
+
+#define PACKET_DEV_M_96		80
+#define PACKET_DEV_E_96		3
+
+#define PACKET_DEV_M_24		137
+#define PACKET_DEV_E_24		1
 
 /*
  * For our packet data
@@ -307,41 +324,55 @@ ao_radio_idle(void)
  *	Rdata = -------------------------------------- * fosc
  *		             2 ** 39
  *
+ * Given the bit period of the baseband, T, the bandwidth of the
+ * baseband signal is B = 1/(2T).  The overall bandwidth of the
+ * modulated signal is then Channel bandwidth = 2Δf + 2B.
+ *
+ * 38400 -- 2 * 20500 + 38400 = 79.4 kHz
+ *  9600 -- 2 * 5.125 +  9600 = 19.9 kHz
+ *  2400 -- 2 * 1.5   +  2400 =  5.4 khz
+ *
  * Symbol rate 38400 Baud:
  *
  *	DATARATE_M = 239914
  *	DATARATE_E = 9
- *	CHANBW = 74.42 (round to 100)
+ *	CHANBW = 79.4 (round to 100)
  *
  * Symbol rate 9600 Baud:
  *
  *	DATARATE_M = 239914
  *	DATARATE_E = 7
- *	CHANBW = 58.58 (round to 62.5)
+ *	CHANBW = 19.9 (round to 20)
  *
  * Symbol rate 2400 Baud:
  *
  *	DATARATE_M = 239914
  *	DATARATE_E = 5
- *	CHANBW = 47.61 (round to 50)
+ *	CHANBW = 5.0 (round to 8.0)
  */
 
 #define PACKET_DRATE_M	239914
 
 #define PACKET_DRATE_E_384	9
-#define PACKET_CHAN_BW_384	0x02	/* 200 / 2 = 100 */
+
+/* 200 / 2 = 100 */
+#define PACKET_CHAN_BW_384	((0 << CC1120_CHAN_BW_CHFILT_BYPASS) | \
+				 (CC1120_CHAN_BW_ADC_CIC_DECFACT_20 << CC1120_CHAN_BW_ADC_CIC_DECFACT) | \
+				 (2 << CC1120_CHAN_BW_BB_CIC_DECFACT))
 
 #define PACKET_DRATE_E_96	7
-#define PACKET_CHAN_BW_96	0x42	/* 125 / 2 = 62.5 */
+/* 200 / 10 = 20 */
+#define PACKET_CHAN_BW_96	((0 << CC1120_CHAN_BW_CHFILT_BYPASS) | \
+				 (CC1120_CHAN_BW_ADC_CIC_DECFACT_20 << CC1120_CHAN_BW_ADC_CIC_DECFACT) | \
+				 (10 << CC1120_CHAN_BW_BB_CIC_DECFACT))
 
 #define PACKET_DRATE_E_24	5
-#define PACKET_CHAN_BW_24	0x04	/* 200 / 4 = 50 */
+/* 200 / 25 = 8 */
+#define PACKET_CHAN_BW_24	((0 << CC1120_CHAN_BW_CHFILT_BYPASS) | \
+				 (CC1120_CHAN_BW_ADC_CIC_DECFACT_20 << CC1120_CHAN_BW_ADC_CIC_DECFACT) | \
+				 (25 << CC1120_CHAN_BW_BB_CIC_DECFACT))
 
 static const uint16_t packet_setup[] = {
-	CC1120_DEVIATION_M,	PACKET_DEV_M,
-	CC1120_MODCFG_DEV_E,	((CC1120_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1120_MODCFG_DEV_E_MODEM_MODE) |
-				 (CC1120_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1120_MODCFG_DEV_E_MOD_FORMAT) |
-				 (PACKET_DEV_E << CC1120_MODCFG_DEV_E_DEV_E)),
 	CC1120_DRATE1,		((PACKET_DRATE_M >> 8) & 0xff),
 	CC1120_DRATE0,		((PACKET_DRATE_M >> 0) & 0xff),
 	CC1120_PKT_CFG2,	((CC1120_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1120_PKT_CFG2_CCA_MODE) |
@@ -361,6 +392,10 @@ static const uint16_t packet_setup[] = {
 };
 
 static const uint16_t packet_setup_384[] = {
+	CC1120_DEVIATION_M,	PACKET_DEV_M_384,
+	CC1120_MODCFG_DEV_E,	((CC1120_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1120_MODCFG_DEV_E_MODEM_MODE) |
+				 (CC1120_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1120_MODCFG_DEV_E_MOD_FORMAT) |
+				 (PACKET_DEV_E_384 << CC1120_MODCFG_DEV_E_DEV_E)),
 	CC1120_DRATE2,		((PACKET_DRATE_E_384 << CC1120_DRATE2_DATARATE_E) |
 				 (((PACKET_DRATE_M >> 16) & CC1120_DRATE2_DATARATE_M_19_16_MASK) << CC1120_DRATE2_DATARATE_M_19_16)),
 	CC1120_CHAN_BW,		PACKET_CHAN_BW_384,
@@ -368,6 +403,10 @@ static const uint16_t packet_setup_384[] = {
 };
 
 static const uint16_t packet_setup_96[] = {
+	CC1120_DEVIATION_M,	PACKET_DEV_M_96,
+	CC1120_MODCFG_DEV_E,	((CC1120_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1120_MODCFG_DEV_E_MODEM_MODE) |
+				 (CC1120_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1120_MODCFG_DEV_E_MOD_FORMAT) |
+				 (PACKET_DEV_E_96 << CC1120_MODCFG_DEV_E_DEV_E)),
 	CC1120_DRATE2,		((PACKET_DRATE_E_96 << CC1120_DRATE2_DATARATE_E) |
 				 (((PACKET_DRATE_M >> 16) & CC1120_DRATE2_DATARATE_M_19_16_MASK) << CC1120_DRATE2_DATARATE_M_19_16)),
 	CC1120_CHAN_BW,		PACKET_CHAN_BW_96,
@@ -375,6 +414,10 @@ static const uint16_t packet_setup_96[] = {
 };
 
 static const uint16_t packet_setup_24[] = {
+	CC1120_DEVIATION_M,	PACKET_DEV_M_24,
+	CC1120_MODCFG_DEV_E,	((CC1120_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1120_MODCFG_DEV_E_MODEM_MODE) |
+				 (CC1120_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1120_MODCFG_DEV_E_MOD_FORMAT) |
+				 (PACKET_DEV_E_24 << CC1120_MODCFG_DEV_E_DEV_E)),
 	CC1120_DRATE2,		((PACKET_DRATE_E_24 << CC1120_DRATE2_DATARATE_E) |
 				 (((PACKET_DRATE_M >> 16) & CC1120_DRATE2_DATARATE_M_19_16_MASK) << CC1120_DRATE2_DATARATE_M_19_16)),
 	CC1120_CHAN_BW,		PACKET_CHAN_BW_24,

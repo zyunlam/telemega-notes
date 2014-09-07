@@ -163,8 +163,21 @@ public abstract class AltosLink implements Runnable {
 		if (!can_cancel && remote)
 			System.out.printf("Uh-oh, reading remote serial device from swing thread\n");
 
-		if (remote && can_cancel)
+		if (remote && can_cancel) {
 			timeout = 500;
+			switch (telemetry_rate) {
+			case AltosLib.ao_telemetry_rate_38400:
+			default:
+				timeout = 500;
+				break;
+			case AltosLib.ao_telemetry_rate_9600:
+				timeout = 2000;
+				break;
+			case AltosLib.ao_telemetry_rate_2400:
+				timeout = 8000;
+				break;
+			}
+		}
 		try {
 			++in_reply;
 
@@ -307,7 +320,7 @@ public abstract class AltosLink implements Runnable {
 	 */
 	public boolean monitor_mode = false;
 	public int telemetry = AltosLib.ao_telemetry_standard;
-	public int telemetry_rate = AltosLib.ao_telemetry_rate_38400;
+	public int telemetry_rate = -1;
 	public double frequency;
 	public String callsign;
 	AltosConfigData	config_data;
@@ -446,7 +459,12 @@ public abstract class AltosLink implements Runnable {
 		if (debug)
 			System.out.printf("start remote %7.3f\n", frequency);
 		set_radio_frequency(frequency);
-		set_callsign(AltosPreferences.callsign());
+		if (telemetry_rate < 0)
+			telemetry_rate = AltosPreferences.telemetry_rate(serial);
+		set_telemetry_rate(telemetry_rate);
+		if (callsign.equals(""))
+			callsign = AltosPreferences.callsign();
+		set_callsign(callsign);
 		printf("p\nE 0\n");
 		flush_input();
 		remote = true;

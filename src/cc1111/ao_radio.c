@@ -60,19 +60,19 @@
  *
  *	M = 1, E = 3, bw = 75kHz
  *
- * 20.5 kHz deviation, 9.6kbps signal
+ * 5.125 kHz deviation, 9.6kbps signal
  *
- *	m = 41 / 9.6, which is < 5.5:
+ *	m = 10.25 / 9.6, which is < 5.5:
  *
- *	bw = 2.6 * 20.5 + 0.55 * 9.6 = 58.58kHz
+ *	bw = 2.6 * 5.125 + 0.55 * 9.6 = 18.6kHz
  *
- *	M = 2, E = 3, bw = 62.5kHz
+ *	M = 2, E = 3, bw = 53.6kHz
  *
- * 20.5kHz deviation, 2.4kbps signal
+ * 1.28125kHz deviation, 2.4kbps signal
  *
- *	m = 41 / 2.4, which is > 5.5:
+ *	m = 2.565 / 2.4, which is < 5.5:
  *
- *	bw = 2.1 * 20.5 + 1.9 * 2.4 = 47.61kHz
+ *	bw = 2.6 * 20.5 + 1.9 * 2.4 = 47.61kHz
  *
  *	M = 3, E = 3, bw = 53.6kHz
  *
@@ -84,7 +84,7 @@
  */
 
 #define CHANBW_M_384	1
-#define CHANBW_M_96	2
+#define CHANBW_M_96	3
 #define CHANBW_M_24	3
 #define CHANBW_E	3
 
@@ -115,11 +115,19 @@
  *
  * F = 24e6/2**17 * (8 + DEVIATION_M) * 2**DEVIATION_E
  *
- * So M is 6 and E is 3
+ * For 20.5kHz deviation, M is 6 and E is 3
+ * For 5.125kHz deviation, M is 6 and E is 1
+ * For 1.28125kHz deviation, M is 0 and E is 0
  */
 
-#define DEVIATION_M	6
-#define DEVIATION_E	3
+#define DEVIATION_M_384	6
+#define DEVIATION_E_384	3
+
+#define DEVIATION_M_96	6
+#define DEVIATION_E_96	1
+
+#define DEVIATION_M_24	0
+#define DEVIATION_E_24	0
 
 /*
  * For our RDF beacon, set the symbol rate to 2kBaud (for a 1kHz tone),
@@ -181,9 +189,6 @@ static __code uint8_t radio_setup[] = {
 	RF_MDMCFG0_OFF,		(17 << RF_MDMCFG0_CHANSPC_M_SHIFT),
 
 	RF_CHANNR_OFF,		0,
-
-	RF_DEVIATN_OFF,		((DEVIATION_E << RF_DEVIATN_DEVIATION_E_SHIFT) |
-				 (DEVIATION_M << RF_DEVIATN_DEVIATION_M_SHIFT)),
 
 	/* SmartRF says set LODIV_BUF_CURRENT_TX to 0
 	 * And, we're not using power ramping, so use PA_POWER 0
@@ -284,8 +289,10 @@ static __code uint8_t fixed_pkt_setup[] = {
 				 RF_MDMCFG1_NUM_PREAMBLE_4 |
 				 (2 << RF_MDMCFG1_CHANSPC_E_SHIFT)),
 
-	RF_DEVIATN_OFF,		((DEVIATION_E << RF_DEVIATN_DEVIATION_E_SHIFT) |
-				 (DEVIATION_M << RF_DEVIATN_DEVIATION_M_SHIFT)),
+#if !HAS_RADIO_RATE
+	RF_DEVIATN_OFF,		((DEVIATION_E_384 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+				 (DEVIATION_M_384 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+#endif
 
 	/* max packet length -- now set inline */
 	RF_PKTCTRL1_OFF,	((1 << PKTCTRL1_PQT_SHIFT)|
@@ -298,19 +305,34 @@ static __code uint8_t fixed_pkt_setup[] = {
 };
 
 #if HAS_RADIO_RATE
-static __code uint8_t packet_rate_setup[] = {
+static __code struct {
+	uint8_t		mdmcfg4;
+	uint8_t		deviatn;
+} packet_rate_setup[] = {
 	/* 38400 */
-	((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-	 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
-	 (DRATE_E_384 << RF_MDMCFG4_DRATE_E_SHIFT)),
+	{
+		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+		 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+		 (DRATE_E_384 << RF_MDMCFG4_DRATE_E_SHIFT)),
+		((DEVIATION_E_384 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+		 (DEVIATION_M_384 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+	},
 	/* 9600 */
-	((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-	 (CHANBW_M_96 << RF_MDMCFG4_CHANBW_M_SHIFT) |
-	 (DRATE_E_96 << RF_MDMCFG4_DRATE_E_SHIFT)),
+	{
+		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+		 (CHANBW_M_96 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+		 (DRATE_E_96 << RF_MDMCFG4_DRATE_E_SHIFT)),
+		((DEVIATION_E_96 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+		 (DEVIATION_M_96 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+	},
 	/* 2400 */
-	((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-	 (CHANBW_M_24 << RF_MDMCFG4_CHANBW_M_SHIFT) |
-	 (DRATE_E_24 << RF_MDMCFG4_DRATE_E_SHIFT)),
+	{
+		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+		 (CHANBW_M_24 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+		 (DRATE_E_24 << RF_MDMCFG4_DRATE_E_SHIFT)),
+		((DEVIATION_E_24 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+		 (DEVIATION_M_24 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+	},
 };
 #endif
 
@@ -380,7 +402,8 @@ ao_radio_get(uint8_t len)
 	RF_FREQ0 = (uint8_t) (ao_config.radio_setting);
 	RF_PKTLEN = len;
 #if HAS_RADIO_RATE
-	RF_MDMCFG4 = packet_rate_setup[ao_config.radio_rate];
+	RF_MDMCFG4 = packet_rate_setup[ao_config.radio_rate].mdmcfg4;
+	RF_DEVIATN = packet_rate_setup[ao_config.radio_rate].deviatn;
 #endif
 }
 

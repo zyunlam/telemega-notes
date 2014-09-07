@@ -249,22 +249,40 @@ ao_radio_idle(void)
 }
 
 /*
- * Packet deviation is 20.5kHz
+ * Packet deviation
  *
  *	fdev = fosc >> 17 * (8 + dev_m) << dev_e
  *
+ * For 38400 baud, use 20.5kHz:
+ *
  *     	26e6 / (2 ** 17) * (8 + 5) * (2 ** 3) = 20630Hz
+ *
+ * For 9600 baud, use 5.125kHz:
+ *
+ *     	26e6 / (2 ** 17) * (8 + 5) * (2 ** 1) = 5157Hz
+ *
+ * For 2400 baud, use 1.5kHz:
+ *
+ *     	26e6 / (2 ** 17) * (8 + 0) * (2 ** 0) = 1587Hz
  */
 
-#define PACKET_DEV_E	3
-#define PACKET_DEV_M	5
+#define PACKET_DEV_E_384	3
+#define PACKET_DEV_M_384	5
+
+#define PACKET_DEV_E_96		1
+#define PACKET_DEV_M_96		5
+
+#define PACKET_DEV_E_24		0
+#define PACKET_DEV_M_24		0
 
 /*
- * For our packet data, set the symbol rate to 38400 Baud
+ * For our packet data:
  *
  *              (256 + DATARATE_M) * 2 ** DATARATE_E
  *	Rdata = -------------------------------------- * fosc
  *		             2 ** 28
+ *
+ * For 38400 baud:
  *
  *		(256 + 131) * (2 ** 10) / (2**28) * 26e6 = 38383
  *
@@ -279,20 +297,33 @@ ao_radio_idle(void)
 #define PACKET_DRATE_E_96	8
 #define PACKET_DRATE_E_24	6
 
-static const uint16_t packet_rate_setup[] = {
-	[AO_RADIO_RATE_38400] = ((0xf << 4) |
-				 (PACKET_DRATE_E_384 << CC115L_MDMCFG4_DRATE_E)),
+static const struct {
+	uint8_t		mdmcfg4;
+	uint8_t		deviatn;
+} packet_rate_setup[] = {
+	[AO_RADIO_RATE_38400] = {
+		.mdmcfg4 = ((0xf << 4) |
+			    (PACKET_DRATE_E_384 << CC115L_MDMCFG4_DRATE_E)),
+		.deviatn = ((PACKET_DEV_E_384 << CC115L_DEVIATN_DEVIATION_E) |
+			    (PACKET_DEV_M_384 << CC115L_DEVIATN_DEVIATION_M)),
+	},
 
-	[AO_RADIO_RATE_9600] = ((0xf << 4) |
-				(PACKET_DRATE_E_96 << CC115L_MDMCFG4_DRATE_E)),
+	[AO_RADIO_RATE_9600] = {
+		.mdmcfg4 = ((0xf << 4) |
+			    (PACKET_DRATE_E_96 << CC115L_MDMCFG4_DRATE_E)),
+		.deviatn = ((PACKET_DEV_E_96 << CC115L_DEVIATN_DEVIATION_E) |
+			    (PACKET_DEV_M_96 << CC115L_DEVIATN_DEVIATION_M)),
+	},
 
-	[AO_RADIO_RATE_2400] = ((0xf << 4) |
-				(PACKET_DRATE_E_24 << CC115L_MDMCFG4_DRATE_E)),
+	[AO_RADIO_RATE_2400] = {
+		.mdmcfg4 = ((0xf << 4) |
+			    (PACKET_DRATE_E_24 << CC115L_MDMCFG4_DRATE_E)),
+		.deviatn = ((PACKET_DEV_E_24 << CC115L_DEVIATN_DEVIATION_E) |
+			    (PACKET_DEV_M_24 << CC115L_DEVIATN_DEVIATION_M)),
+	},
 };
 
 static const uint16_t packet_setup[] = {
-	CC115L_DEVIATN,		((PACKET_DEV_E << CC115L_DEVIATN_DEVIATION_E) |
-				 (PACKET_DEV_M << CC115L_DEVIATN_DEVIATION_M)),
 	CC115L_MDMCFG3,		(PACKET_DRATE_M),
 	CC115L_MDMCFG2,		(0x00 |
 				 (CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
@@ -418,7 +449,8 @@ ao_radio_set_mode(uint16_t new_mode)
 
 	changes = new_mode & (~ao_radio_mode);
 	if (changes & AO_RADIO_MODE_BITS_PACKET_TX) {
-		ao_radio_reg_write(CC115L_MDMCFG4, packet_rate_setup[ao_config.radio_rate]);
+		ao_radio_reg_write(CC115L_MDMCFG4, packet_rate_setup[ao_config.radio_rate].mdmcfg4);
+		ao_radio_reg_write(CC115L_DEVIATN, packet_rate_setup[ao_config.radio_rate].deviatn);
 
 		for (i = 0; i < sizeof (packet_setup) / sizeof (packet_setup[0]); i += 2)
 			ao_radio_reg_write(packet_setup[i], packet_setup[i+1]);
