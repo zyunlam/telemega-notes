@@ -115,7 +115,7 @@ Section "${REG_NAME} Desktop Shortcut"
 	CreateShortCut "$DESKTOP\${REG_NAME}.lnk" "$INSTDIR\${FAT_NAME}"  "" "$INSTDIR\${WIN_APP_ICON}"
 SectionEnd
 
-Section "TeleMetrum, TeleDongle and TeleBT Firmware"
+Section "Firmware"
 
 	SetOutPath $INSTDIR
 
@@ -129,6 +129,7 @@ Section "TeleMetrum, TeleDongle and TeleBT Firmware"
 	File "../src/telebt-v1.0/telebt-v1.0-${VERSION}.ihx"
 	File "../src/telemega-v1.0/telemega-v1.0-${VERSION}.ihx"
 	File "../src/easymini-v1.0/easymini-v1.0-${VERSION}.ihx"
+	File "../src/easymega-v1.0/easymega-v1.0-${VERSION}.ihx"
 
 SectionEnd
 
