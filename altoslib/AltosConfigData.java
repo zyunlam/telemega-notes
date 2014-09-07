@@ -386,6 +386,10 @@ public class AltosConfigData implements Iterable<String> {
 		return radio_frequency >= 0 || radio_setting >= 0 || radio_channel >= 0;
 	}
 
+	public boolean has_telemetry_rate() {
+		return telemetry_rate >= 0;
+	}
+
 	public void set_frequency(double freq) {
 		int	frequency = radio_frequency;
 		int	setting = radio_setting;
@@ -558,19 +562,38 @@ public class AltosConfigData implements Iterable<String> {
 							radio_calibration);
 			/* When remote, reset the dongle frequency at the same time */
 			if (remote) {
+				link.flush_output();
 				link.stop_remote();
 				link.set_radio_frequency(frequency);
+				link.flush_output();
 				link.start_remote();
 			}
 		}
 
-		if (callsign != null)
+		if (telemetry_rate >= 0) {
+			link.printf("c T %d\n", telemetry_rate);
+			if (remote) {
+				link.flush_output();
+				link.stop_remote();
+				link.set_telemetry_rate(telemetry_rate);
+				link.flush_output();
+				link.start_remote();
+			}
+		}
+
+		if (callsign != null) {
 			link.printf("c c %s\n", callsign);
+			if (remote) {
+				link.flush_output();
+				link.stop_remote();
+				link.set_callsign(callsign);
+				link.flush_output();
+				link.start_remote();
+			}
+		}
+
 		if (radio_enable >= 0)
 			link.printf("c e %d\n", radio_enable);
-
-		if (telemetry_rate >= 0)
-			link.printf("c T %d\n", telemetry_rate);
 
 		/* HAS_ACCEL */
 		/* UI doesn't support accel cal */
