@@ -118,6 +118,10 @@ public class AltosIdleFetch implements AltosStateUpdate {
 			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
+		new AltosIdler("EasyMega",
+			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
+			       AltosIdler.idle_imu, AltosIdler.idle_mag,
+			       AltosIdler.idle_sensor_mega),
 	};
 
 	AltosLink		link;

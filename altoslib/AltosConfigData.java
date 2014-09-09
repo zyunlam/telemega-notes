@@ -429,6 +429,8 @@ public class AltosConfigData implements Iterable<String> {
 			return false;
 		if (product.startsWith("TeleMetrum-v2"))
 			return false;
+		if (product.startsWith("EasyMega"))
+			return false;
 		return true;
 	}
 

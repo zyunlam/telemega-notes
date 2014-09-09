@@ -213,6 +213,7 @@ public class AltosFlashUI
 		new AltosHexfileFilter(AltosLib.product_teledongle, "teledongle", "TeleDongle Image"),
 		new AltosHexfileFilter(AltosLib.product_telemega, "telemega", "TeleMega Image"),
 		new AltosHexfileFilter(AltosLib.product_easymini, "easymini", "EasyMini Image"),
+		new AltosHexfileFilter(AltosLib.product_easymega, "easymega", "EasyMega Image"),
 	};
 
 	boolean select_source_file() {

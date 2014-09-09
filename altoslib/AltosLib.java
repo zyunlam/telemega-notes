@@ -112,6 +112,7 @@ public class AltosLib {
 	public final static int product_telegps = 0x0025;
 	public final static int product_easymini = 0x0026;
 	public final static int product_telemini = 0x0027;
+	public final static int product_easymega = 0x0028;
 	public final static int product_altusmetrum_min = 0x000a;
 	public final static int product_altusmetrum_max = 0x002c;
 
@@ -143,7 +144,8 @@ public class AltosLib {
 		new Product("megadongle", product_megadongle),
 		new Product("telegps", product_telegps),
 		new Product("easymini", product_easymini),
-		new Product("telemini", product_telemini)
+		new Product("telemini", product_telemini),
+		new Product("easymega", product_easymega)
 	};
 
 	public static int name_to_product(String name) {
