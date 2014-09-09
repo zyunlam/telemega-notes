@@ -103,7 +103,7 @@ ICONJAR= -C $(ICONDIR) redled.png -C $(ICONDIR) redoff.png \
 all-local: $(JAR)
 
 clean-local:
-	-rm -rf $(JAVAROOT) $(JAR)
+	-rm -rf $(JAVAROOT) altosuilib_*.jar
 
 install-altosuilibJAVA: $(JAR)
 	@$(NORMAL_INSTALL)
