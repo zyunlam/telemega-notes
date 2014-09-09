@@ -23,14 +23,15 @@ public class AltosMma655x implements Cloneable {
 
 	int	accel;
 
-	public boolean parse_line(String line) {
-		String[] items = line.split("\\s+");
-		if (line.startsWith("MMA655X value:")) {
-			if (items.length >= 3)
-				accel = Integer.parseInt(items[1]);
-		} else
-			return false;
-		return true;
+	public boolean parse_line(String line) throws NumberFormatException {
+		if (line.startsWith("MMA655X value")) {
+			String[] items = line.split("\\s+");
+			if (items.length >= 3) {
+				accel = Integer.parseInt(items[2]);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public AltosMma655x() {
@@ -51,17 +52,18 @@ public class AltosMma655x implements Cloneable {
 			if (mma655x != null)
 				state.set_accel(mma655x.accel);
 		} catch (TimeoutException te) {
+		} catch (NumberFormatException ne) {
 		}
 	}
 
-	public AltosMma655x(AltosLink link) throws InterruptedException, TimeoutException {
+	public AltosMma655x(AltosLink link) throws InterruptedException, TimeoutException, NumberFormatException {
 		this();
 		link.printf("A\n");
 		for (;;) {
 			String line = link.get_reply_no_dialog(5000);
 			if (line == null)
 				throw new TimeoutException();
-			if (!parse_line(line))
+			if (parse_line(line))
 				break;
 		}
 	}
