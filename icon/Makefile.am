@@ -117,8 +117,8 @@ clean-local:
 	$(RM) altusmetrum.xpm
 
 install-data-hook:
-	update-mime-database $(datadir)/mime
-	update-icon-caches $(ICON_THEME)
+	update-mime-database $(DESTDIR)$(datadir)/mime
+	update-icon-caches $(DESTDIR)$(ICON_THEME)
 
 $(MPD_ICON): $(MP_ICON)
 	$(LN_S) $(MP_ICON) $@
