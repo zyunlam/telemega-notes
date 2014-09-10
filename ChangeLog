@@ -1,3 +1,58 @@
+commit 05e4094411f861bf29bea2e9c39c1b66f8f267f8
+Merge: acb2791 2ee937b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 01:32:27 2014 -0600
+
+    Merge branch 'master' into branch-1.5
+
+commit 2ee937b603b181bb24768eb4d0e2f918a5377fd3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 01:29:56 2014 -0600
+
+    use dh_installmime, which requires telling configure to stay out of the way
+
+commit 22e68da2cb3b0b42708876f1dde52dbfd0ce4bf7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 00:26:10 2014 -0600
+
+    another build dep
+
+commit 615b69b19557a9683eeb0475b30a053a35ca51ac
+Merge: a72b768 0365493
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 01:30:37 2014 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 036549343416183f973d00a86d897d4a368c1d6f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 10 00:03:53 2014 -0700
+
+    configure: Add --disable-install-shared-mime-info option
+    
+    This inhibits the installation of the shared mime info data file and
+    updating of the shared mime database. Necessary if you want to use a
+    distribution-specific shared mime installation hook, like dh_installmime
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1992a1e3046a5414ce8d394e1cd8e5e6f6338d29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 9 23:43:10 2014 -0700
+
+    .desktop: Use %F instead of %f in .desktop files
+    
+    %F is a list of files, %f is a single file. All of our tools can
+    handle lists of files, so make the .desktop file reflect that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit acb279125c0fa377c8b1dbbb8634fba60f7f845b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 00:05:07 2014 -0600
+
+    update ChangeLog
+
 commit 5de00e9e39cff2d3b409c2ce99caa994f0a36202
 Merge: b3fba98 a72b768
 Author: Bdale Garbee <bdale@gag.com>
