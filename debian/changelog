@@ -13,6 +13,10 @@ altos (1.5-1) unstable; urgency=medium
   * tweaking test scripts
   * releasing version 1.5
   * updated ChangeLog for 1.5 release
+  * update changelog for Debian build
+  * capture deleted file
+  * more build dependencies for processing icons
+  * update ChangeLog
 
   [ Keith Packard ]
   * doc: Add instructions for flash recovery technique
@@ -159,8 +163,9 @@ altos (1.5-1) unstable; urgency=medium
   * altos/easymega: Set USB PID for EasyMega to 0x0028
   * altoslib/altosuilib: Add EasyMega support
   * altoslib/altosuilib: clean all versions of the .jar file
+  * icons: Use DESTDIR when updating mime/icon caches
 
- -- Bdale Garbee <bdale@gag.com>  Tue, 09 Sep 2014 23:29:52 -0600
+ -- Bdale Garbee <bdale@gag.com>  Wed, 10 Sep 2014 00:06:56 -0600
 
 altos (1.4.1-1) unstable; urgency=medium
 
