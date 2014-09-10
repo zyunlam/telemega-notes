@@ -12,7 +12,9 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	PKG_CONFIG_PATH=/opt/stlink/lib/pkgconfig ./autogen.sh \
-		--prefix=/usr --with-google-key=/opt/google/maps-api-key
+		--prefix=/usr \
+		--disable-install-shared-mime-info \
+		--with-google-key=/opt/google/maps-api-key
 	touch configure-stamp
 
 build: build-arch build-indep
@@ -29,6 +31,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
+	rm -f debian/altos.sharedmimeinfo
 	[ ! -f Makefile ] || $(MAKE) distclean
 	dh_clean 
 
@@ -59,7 +62,8 @@ binary-arch: install
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam
-#	dh_installmime
+	cp icon/org-altusmetrum-mimetypes.xml debian/altos.sharedmimeinfo
+	dh_installmime
 #	dh_python
 #	dh_installinit
 #	dh_installcron
