@@ -24,7 +24,11 @@
 #endif
 
 static const alt_t altitude_table[] AO_CONST_ATTRIB = {
+#if AO_SMALL_ALTITUDE_TABLE
+#include "altitude-pa-small.h"
+#else
 #include "altitude-pa.h"
+#endif
 };
 
 #ifndef FETCH_ALT
@@ -35,11 +39,11 @@ static const alt_t altitude_table[] AO_CONST_ATTRIB = {
 #define ALT_MASK	(ALT_SCALE - 1)
 
 alt_t
-ao_pa_to_altitude(int32_t pa)
+ao_pa_to_altitude(pres_t pa)
 {
 	int16_t	o;
 	int16_t	part;
-	int32_t low, high;
+	alt_t low, high;
 
 	if (pa < 0)
 		pa = 0;
@@ -48,16 +52,16 @@ ao_pa_to_altitude(int32_t pa)
 	o = pa >> ALT_SHIFT;
 	part = pa & ALT_MASK;
 
-	low = (int32_t) FETCH_ALT(o) * (ALT_SCALE - part);
-	high = (int32_t) FETCH_ALT(o+1) * part + (ALT_SCALE >> 1);
+	low = (alt_t) FETCH_ALT(o) * (ALT_SCALE - part);
+	high = (alt_t) FETCH_ALT(o+1) * part + (ALT_SCALE >> 1);
 	return (low + high) >> ALT_SHIFT;
 }
 
 #ifdef AO_CONVERT_TEST
-int32_t
-ao_altitude_to_pa(int32_t alt)
+pres_t
+ao_altitude_to_pa(alt_t alt)
 {
-	int32_t 	span, sub_span;
+	alt_t 	span, sub_span;
 	uint16_t	l, h, m;
 	int32_t 	pa;
 
@@ -72,7 +76,7 @@ ao_altitude_to_pa(int32_t alt)
 	}
 	span = altitude_table[l] - altitude_table[h];
 	sub_span = altitude_table[l] - alt;
-	pa = ((((int32_t) l * (span - sub_span) + (int32_t) h * sub_span) << ALT_SHIFT) + (span >> 1)) / span;
+	pa = ((((alt_t) l * (span - sub_span) + (alt_t) h * sub_span) << ALT_SHIFT) + (span >> 1)) / span;
 	if (pa > 120000)
 		pa = 120000;
 	if (pa < 0)

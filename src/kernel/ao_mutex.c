@@ -17,6 +17,29 @@
 
 #include "ao.h"
 
+#ifndef HAS_MUTEX_TRY
+#define HAS_MUTEX_TRY 1
+#endif
+
+#if HAS_MUTEX_TRY
+
+uint8_t
+ao_mutex_try(__xdata uint8_t *mutex, uint8_t task_id) __reentrant
+{
+	uint8_t	ret;
+	if (*mutex == task_id)
+		ao_panic(AO_PANIC_MUTEX);
+	ao_arch_critical(
+		if (*mutex)
+			ret = 0;
+		else {
+			*mutex = task_id;
+			ret = 1;
+		});
+	return ret;
+}
+#endif
+
 void
 ao_mutex_get(__xdata uint8_t *mutex) __reentrant
 {

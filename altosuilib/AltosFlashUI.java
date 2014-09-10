@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 public class AltosFlashUI
 	extends AltosUIDialog
@@ -213,6 +213,7 @@ public class AltosFlashUI
 		new AltosHexfileFilter(AltosLib.product_teledongle, "teledongle", "TeleDongle Image"),
 		new AltosHexfileFilter(AltosLib.product_telemega, "telemega", "TeleMega Image"),
 		new AltosHexfileFilter(AltosLib.product_easymini, "easymini", "EasyMini Image"),
+		new AltosHexfileFilter(AltosLib.product_easymega, "easymega", "EasyMega Image"),
 	};
 
 	boolean select_source_file() {

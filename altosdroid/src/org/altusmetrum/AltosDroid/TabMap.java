@@ -19,7 +19,7 @@ package org.altusmetrum.AltosDroid;
 
 import java.util.Arrays;
 
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -42,7 +42,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.location.Location;
 
-public class TabMap extends Fragment implements AltosDroidTab {
+public class TabMap extends AltosDroidTab {
 	AltosDroid mAltosDroid;
 
 	private SupportMapFragment mMapFragment;
@@ -51,6 +51,7 @@ public class TabMap extends Fragment implements AltosDroidTab {
 
 	private Marker mRocketMarker;
 	private Marker mPadMarker;
+	private boolean pad_set;
 	private Polyline mPolyline;
 
 	private TextView mDistanceView;
@@ -152,10 +153,12 @@ public class TabMap extends Fragment implements AltosDroidTab {
 		}
 	}
 
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public String tab_name() { return "map"; }
+
+	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
-			mDistanceView.setText(String.format("%6.0f m", from_receiver.distance));
+			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
 		}
 
 		if (state != null) {
@@ -168,7 +171,8 @@ public class TabMap extends Fragment implements AltosDroidTab {
 					mPolyline.setVisible(true);
 				}
 
-				if (state.state == AltosLib.ao_flight_pad) {
+				if (!pad_set && state.pad_lat != AltosLib.MISSING) {
+					pad_set = true;
 					mPadMarker.setPosition(new LatLng(state.pad_lat, state.pad_lon));
 					mPadMarker.setVisible(true);
 				}
@@ -194,5 +198,4 @@ public class TabMap extends Fragment implements AltosDroidTab {
 		}
 
 	}
-
 }

@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.io.*;
 import java.util.*;
 import java.awt.Component;
 import javax.swing.*;
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 public class AltosUIPreferences extends AltosPreferences {
 
@@ -33,6 +33,9 @@ public class AltosUIPreferences extends AltosPreferences {
 
 	/* Window position preference name */
 	final static String positionPreference = "POSITION";
+
+	/* Maps cache size preference name */
+	final static String mapCachePreference = "MAP-CACHE";
 
 	/* UI Component to pop dialogs up */
 	static Component component;
@@ -52,6 +55,10 @@ public class AltosUIPreferences extends AltosPreferences {
 
 	public static int position = AltosUILib.position_top_left;
 
+	static LinkedList<AltosUIMapCacheListener> map_cache_listeners;
+
+	public static int map_cache = 9;
+
 	public static void init() {
 		AltosPreferences.init(new AltosUIPreferencesBackend());
 
@@ -68,6 +75,9 @@ public class AltosUIPreferences extends AltosPreferences {
 
 		position = backend.getInt(positionPreference, AltosUILib.position_top_left);
 		position_listeners = new LinkedList<AltosPositionListener>();
+
+		map_cache = backend.getInt(mapCachePreference, 9);
+		map_cache_listeners = new LinkedList<AltosUIMapCacheListener>();
 	}
 
 	static { init(); }
@@ -213,6 +223,34 @@ public class AltosUIPreferences extends AltosPreferences {
 	public static int position() {
 		synchronized (backend) {
 			return position;
+		}
+	}
+
+	public static void register_map_cache_listener(AltosUIMapCacheListener l) {
+		synchronized(backend) {
+			map_cache_listeners.add(l);
+		}
+	}
+
+	public static void unregister_map_cache_listener(AltosUIMapCacheListener l) {
+		synchronized (backend) {
+			map_cache_listeners.remove(l);
+		}
+	}
+
+	public static void set_map_cache(int new_map_cache) {
+		synchronized(backend) {
+			map_cache = new_map_cache;
+			backend.putInt(mapCachePreference, map_cache);
+			flush_preferences();
+			for (AltosUIMapCacheListener l: map_cache_listeners)
+				l.map_cache_changed(map_cache);
+		}
+	}
+
+	public static int map_cache() {
+		synchronized(backend) {
+			return map_cache;
 		}
 	}
 }

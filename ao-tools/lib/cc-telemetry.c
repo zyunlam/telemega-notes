@@ -89,4 +89,3 @@ cc_telemetry_unparse(const union ao_telemetry_all *telemetry, char output_line[C
 		p += 2;
 	}
 }
-		

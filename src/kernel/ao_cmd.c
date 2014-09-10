@@ -290,6 +290,9 @@ version(void)
 #if defined(AO_BOOT_APPLICATION_BASE) && defined(AO_BOOT_APPLICATION_BOUND)
 	       "program-space    %u\n"
 #endif
+#if AO_VALUE_32
+	       "altitude-32      1\n"
+#endif
 	       , ao_manufacturer
 	       , ao_product
 	       , ao_serial_number

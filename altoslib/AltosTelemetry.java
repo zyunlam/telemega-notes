@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.text.*;
 
@@ -112,6 +112,29 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 			telem.status = status;
 		}
 		return telem;
+	}
+
+	public static int extend_height(AltosState state, int height_16) {
+		double	compare_height;
+		int	height = height_16;
+
+		if (state.gps != null && state.gps.alt != AltosLib.MISSING) {
+			compare_height = state.gps_height();
+		} else {
+			compare_height = state.height();
+		}
+
+		if (compare_height != AltosLib.MISSING) {
+			int	high_bits = (int) Math.floor (compare_height / 65536.0);
+
+			height = (high_bits << 16) | (height_16 & 0xffff);
+
+			if (Math.abs(height + 65536 - compare_height) < Math.abs(height - compare_height))
+				height += 65536;
+			else if (Math.abs(height - 65536 - compare_height) < Math.abs(height - compare_height))
+				height -= 65536;
+		}
+		return height;
 	}
 
 	public static AltosTelemetry parse(String line) throws ParseException, AltosCRCException {

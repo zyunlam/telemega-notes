@@ -20,8 +20,8 @@ package org.altusmetrum.micropeak;
 import java.lang.*;
 import java.io.*;
 import java.util.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 class MicroIterator implements Iterator<MicroDataPoint> {
 	int		i;
@@ -97,9 +97,15 @@ public class MicroData implements AltosUIDataSet {
 	private double		time_step;
 	private double		ground_altitude;
 	private ArrayList<Integer>	bytes;
+	public int		log_id;
 	String			name;
 	MicroStats		stats;
-	
+
+	public static final int LOG_ID_MICROPEAK = 0;
+	public static final int LOG_ID_MICROKITE = 1;
+
+	public static final double CLOCK = 0.096;
+
 	public class FileEndedException extends Exception {
 	}
 
@@ -172,7 +178,7 @@ public class MicroData implements AltosUIDataSet {
 			if (get_nonwhite(f) == 'M' && get_nonwhite(f) == 'P')
 				return true;
 		}
-	} 
+	}
 
 	private int get_32(InputStream f)  throws IOException, FileEndedException, NonHexcharException {
 		int	v = 0;
@@ -345,6 +351,9 @@ public class MicroData implements AltosUIDataSet {
 			ground_pressure = get_32(f);
 			min_pressure = get_32(f);
 			int nsamples = get_16(f);
+
+			log_id = nsamples >> 12;
+			nsamples &= 0xfff;
 			pressures = new int[nsamples + 1];
 
 			ground_altitude = AltosConvert.pressure_to_altitude(ground_pressure);
@@ -367,7 +376,7 @@ public class MicroData implements AltosUIDataSet {
 					else
 						cur = down;
 				}
-				
+
 				pressures[i+1] = cur;
 			}
 
@@ -376,7 +385,14 @@ public class MicroData implements AltosUIDataSet {
 
 			crc_valid = crc == current_crc;
 
-			time_step = 0.192;
+			switch (log_id) {
+			case LOG_ID_MICROPEAK:
+				time_step = 2 * CLOCK;
+				break;
+			case LOG_ID_MICROKITE:
+				time_step = 200 * CLOCK;
+				break;
+			}
 			stats = new MicroStats(this);
 		} catch (FileEndedException fe) {
 			throw new IOException("File Ended Unexpectedly");
@@ -389,5 +405,5 @@ public class MicroData implements AltosUIDataSet {
 		pressures = new int[1];
 		pressures[0] = 101000;
 	}
-	
+
 }

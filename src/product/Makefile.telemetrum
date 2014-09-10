@@ -24,6 +24,7 @@ INC = \
 	altitude.h \
 	ao_kalman.h \
 	ao_product.h \
+	ao_telemetry.h \
 	$(TM_INC)
 
 CORE_SRC = \

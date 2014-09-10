@@ -132,6 +132,9 @@ ao_clock_init(void);
  */
 
 #ifndef ao_mutex_get
+uint8_t
+ao_mutex_try(__xdata uint8_t *ao_mutex, uint8_t task_id) __reentrant;
+
 void
 ao_mutex_get(__xdata uint8_t *ao_mutex) __reentrant;
 
@@ -275,15 +278,17 @@ ao_report_init(void);
  * Given raw data, convert to SI units
  */
 
+#if HAS_BARO
 /* pressure from the sensor to altitude in meters */
-int16_t
-ao_pres_to_altitude(int16_t pres) __reentrant;
+alt_t
+ao_pres_to_altitude(pres_t pres) __reentrant;
 
-int16_t
-ao_altitude_to_pres(int16_t alt) __reentrant;
+pres_t
+ao_altitude_to_pres(alt_t alt) __reentrant;
 
 int16_t
 ao_temp_to_dC(int16_t temp) __reentrant;
+#endif
 
 /*
  * ao_convert_pa.c
@@ -293,11 +298,13 @@ ao_temp_to_dC(int16_t temp) __reentrant;
 
 #include <ao_data.h>
 
+#if HAS_BARO
 alt_t
-ao_pa_to_altitude(int32_t pa);
+ao_pa_to_altitude(pres_t pa);
 
 int32_t
 ao_altitude_to_pa(alt_t alt);
+#endif
 
 #if HAS_DBG
 #include <ao_dbg.h>
@@ -522,6 +529,9 @@ struct ao_telemetry_raw_recv {
 #endif
 
 void
+ao_telemetry_reset_interval(void);
+
+void
 ao_telemetry_set_interval(uint16_t interval);
 
 void
@@ -556,6 +566,15 @@ extern __xdata int8_t	ao_radio_rssi;
 #endif
 #ifndef HAS_RADIO_XMIT
 #define HAS_RADIO_XMIT HAS_RADIO
+#endif
+
+#define AO_RADIO_RATE_38400	0
+#define AO_RADIO_RATE_9600	1
+#define AO_RADIO_RATE_2400	2
+#define AO_RADIO_RATE_MAX	AO_RADIO_RATE_2400
+
+#if defined(HAS_RADIO) && !defined(HAS_RADIO_RATE)
+#define HAS_RADIO_RATE	HAS_RADIO
 #endif
 
 void
@@ -757,11 +776,13 @@ extern __xdata uint8_t ao_force_freq;
  * ao_rssi.c
  */
 
+#ifdef AO_LED_TYPE
 void
-ao_rssi_set(int rssi_value);
+ao_rssi_set(int16_t rssi_value);
 
 void
-ao_rssi_init(uint8_t rssi_led);
+ao_rssi_init(AO_LED_TYPE rssi_led);
+#endif
 
 /*
  * ao_product.c

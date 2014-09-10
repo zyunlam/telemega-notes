@@ -211,12 +211,23 @@ ao_report_continuity(void) __reentrant
 			pause(AO_MS_TO_TICKS(100));
 		}
 	} else {
-		c = 10;
+		c = 5;
 		while (c--) {
 			high(AO_MS_TO_TICKS(20));
 			low(AO_MS_TO_TICKS(20));
 		}
 	}
+#if AO_PYRO_NUM
+	pause(AO_MS_TO_TICKS(250));
+	for(c = 0; c < AO_PYRO_NUM; c++) {
+		enum ao_igniter_status	status = ao_pyro_status(c);
+		if (status == ao_igniter_ready)
+			mid(AO_MS_TO_TICKS(25));
+		else
+			low(AO_MS_TO_TICKS(25));
+		pause(AO_MS_TO_TICKS(200));
+	}
+#endif
 #if HAS_LOG
 	if (ao_log_full()) {
 		pause(AO_MS_TO_TICKS(100));

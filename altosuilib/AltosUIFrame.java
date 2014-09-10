@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -36,12 +36,12 @@ public class AltosUIFrame extends JFrame implements AltosUIListener, AltosPositi
 	}
 
 	static String[] altos_icon_names = {
-		"/altus-metrum-16.png",
-		"/altus-metrum-32.png",
-		"/altus-metrum-48.png",
-		"/altus-metrum-64.png",
-		"/altus-metrum-128.png",
-		"/altus-metrum-256.png"
+		"/altusmetrum-altosui-16.png",
+		"/altusmetrum-altosui-32.png",
+		"/altusmetrum-altosui-48.png",
+		"/altusmetrum-altosui-64.png",
+		"/altusmetrum-altosui-128.png",
+		"/altusmetrum-altosui-256.png"
 	};
 
 	static public String[] icon_names;
@@ -157,11 +157,72 @@ public class AltosUIFrame extends JFrame implements AltosUIListener, AltosPositi
 		}
 	}
 
+	static boolean global_settings_done;
+
+	public String getName() {
+		return "Altus Metrum";
+	}
+
+	public void macosx_quit_handler() {
+		System.out.printf("Got quit handler\n");
+	}
+
+	public void macosx_about_handler() {
+		System.out.printf("Got about handler\n");
+	}
+
+	public void macosx_preferences_handler() {
+		System.out.printf("Got preferences handler\n");
+	}
+
+	public void macosx_file_handler(String path) {
+		System.out.printf("Got file handler with \"%s\"\n", path);
+	}
+
+	/* Check that we are on Mac OS X.  This is crucial to loading and using the OSXAdapter class.
+	 */
+	public static boolean MAC_OS_X = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
+
+	private static boolean registered_for_macosx_events;
+
+	/* Generic registration with the Mac OS X application menu
+	 * Checks the platform, then attempts to register with the Apple EAWT
+	 * See OSXAdapter.java to see how this is done without directly referencing any Apple APIs
+	 */
+	public synchronized void register_for_macosx_events() {
+		if (registered_for_macosx_events)
+			return;
+		registered_for_macosx_events = true;
+		if (MAC_OS_X) {
+			try {
+				// Generate and register the OSXAdapter, passing it a hash of all the methods we wish to
+				// use as delegates for various com.apple.eawt.ApplicationListener methods
+				OSXAdapter.setQuitHandler(this, getClass().getDeclaredMethod("macosx_quit_handler", (Class[])null));
+//				OSXAdapter.setAboutHandler(this, getClass().getDeclaredMethod("macosx_about_handler", (Class[])null));
+				OSXAdapter.setPreferencesHandler(this, getClass().getDeclaredMethod("macosx_preferences_handler", (Class[])null));
+				OSXAdapter.setFileHandler(this, getClass().getDeclaredMethod("macosx_file_handler", new Class[] { String.class }));
+			} catch (Exception e) {
+				System.err.println("Error while loading the OSXAdapter:");
+				e.printStackTrace();
+			}
+		}
+	}
 	void init() {
 		AltosUIPreferences.register_ui_listener(this);
 		AltosUIPreferences.register_position_listener(this);
 		position = AltosUIPreferences.position();
 		addWindowListener(new AltosUIFrameListener());
+
+		/* Try to make menus live in the menu bar like regular Mac apps */
+		if (!global_settings_done) {
+			try {
+				global_settings_done = true;
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name", getName());
+				System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+				System.setProperty("apple.laf.useScreenMenuBar", "true" ); // for older versions of Java
+			} catch (Exception e) {
+			}
+		}
 		set_icon();
 	}
 

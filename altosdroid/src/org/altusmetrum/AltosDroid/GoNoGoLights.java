@@ -20,6 +20,7 @@ package org.altusmetrum.AltosDroid;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
+import android.view.View;
 
 public class GoNoGoLights {
 	private Boolean state;
@@ -51,14 +52,27 @@ public class GoNoGoLights {
 		missing = m;
 		set = true;
 		if (missing) {
+			hide();
 			red.setImageDrawable(dGray);
 			green.setImageDrawable(dGray);
 		} else if (state) {
 			red.setImageDrawable(dGray);
 			green.setImageDrawable(dGreen);
+			show();
 		} else {
 			red.setImageDrawable(dRed);
 			green.setImageDrawable(dGray);
+			show();
 		}
+	}
+
+	public void show() {
+		red.setVisibility(View.VISIBLE);
+		green.setVisibility(View.VISIBLE);
+	}
+
+	public void hide() {
+		red.setVisibility(View.GONE);
+		green.setVisibility(View.GONE);
 	}
 }

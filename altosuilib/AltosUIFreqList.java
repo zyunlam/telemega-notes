@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import javax.swing.*;
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
-public class AltosFreqList extends JComboBox<AltosFrequency> {
+public class AltosUIFreqList extends JComboBox<AltosFrequency> {
 
 	String	product;
 	int	serial;
@@ -53,6 +53,7 @@ public class AltosFreqList extends JComboBox<AltosFrequency> {
 		AltosUIPreferences.add_common_frequency(frequency);
 		insertItemAt(frequency, i);
 		setMaximumRowCount(getItemCount());
+		setVisible(true);
 	}
 
 	public void set_product(String new_product) {
@@ -70,7 +71,7 @@ public class AltosFreqList extends JComboBox<AltosFrequency> {
 		return 434.550;
 	}
 
-	public AltosFreqList () {
+	public AltosUIFreqList () {
 		super(AltosUIPreferences.common_frequencies());
 		setMaximumRowCount(getItemCount());
 		setEditable(false);
@@ -78,7 +79,7 @@ public class AltosFreqList extends JComboBox<AltosFrequency> {
 		serial = 0;
 	}
 
-	public AltosFreqList(double in_frequency) {
+	public AltosUIFreqList(double in_frequency) {
 		this();
 		set_frequency(in_frequency);
 	}

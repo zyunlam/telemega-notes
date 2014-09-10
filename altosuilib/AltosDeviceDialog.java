@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import javax.swing.*;
 import java.awt.*;
@@ -131,7 +131,8 @@ public abstract class AltosDeviceDialog extends AltosUIDialog implements ActionL
 		buttonPane.add(cancel_button);
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 
-		add_bluetooth();
+		if (AltosUILib.has_bluetooth)
+			add_bluetooth();
 
 		buttonPane.add(select_button);
 

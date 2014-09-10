@@ -28,6 +28,10 @@
 #define USE_EEPROM_CONFIG 0
 #endif
 
+#ifndef FLIGHT_LOG_APPEND
+#define FLIGHT_LOG_APPEND 0
+#endif
+
 #if USE_STORAGE_CONFIG
 
 #include <ao_storage.h>
@@ -53,7 +57,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	18
+#define AO_CONFIG_MINOR	21
 
 #define AO_AES_LEN 16
 
@@ -102,7 +106,20 @@ struct ao_config {
 #if AO_PYRO_NUM
 	uint16_t	pyro_time;		/* minor version 18 */
 #endif
+#if HAS_APRS
+	uint8_t		aprs_ssid;		/* minor version 19 */
+#endif
+#if HAS_RADIO_RATE
+	uint8_t		radio_rate;		/* minor version 20 */
+#endif
+#if HAS_RADIO_FORWARD
+	uint32_t	send_frequency;		/* minor version 21 */
+#endif
 };
+
+#if HAS_RADIO_FORWARD
+extern __xdata uint32_t	ao_send_radio_setting;
+#endif
 
 #define AO_IGNITE_MODE_DUAL		0
 #define AO_IGNITE_MODE_APOGEE		1
@@ -139,6 +156,9 @@ ao_config_put(void);
 
 void
 ao_config_set_radio(void);
+
+void
+ao_config_log_fix_append(void);
 
 void
 ao_config_init(void);

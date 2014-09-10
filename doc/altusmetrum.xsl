@@ -41,8 +41,15 @@
     </legalnotice>
     <revhistory>
       <revision>
+	<revnumber>1.5</revnumber>
+	<date>6 September 2014</date>
+	<revremark>
+	  Major release adding EasyMega support.
+	</revremark>
+      </revision>
+      <revision>
 	<revnumber>1.4.1</revnumber>
-	<date>24 June 2014</date>
+	<date>20 June 2014</date>
 	<revremark>
 	  Minor release fixing some installation bugs.
 	</revremark>
@@ -203,6 +210,11 @@ NAR #88757, TRA #12200
       USB data download.
     </para>
     <para>
+      EasyMega is essentially a TeleMega board with the GPS receiver
+      and telemetry transmitter removed. It offers the same 6 pyro
+      channels and integrated gyroscopes for staging/air-start inhibit.
+    </para>
+    <para>
       TeleDongle was our first ground station, providing a USB to RF
       interfaces for communicating with the altimeters. Combined with
       your choice of antenna and notebook computer, TeleDongle and our
@@ -231,7 +243,7 @@ NAR #88757, TRA #12200
       “starter kit” is to charge the battery.
     </para>
     <para>
-      For TeleMetrum and TeleMega, the battery can be charged by plugging it into the
+      For TeleMetrum, TeleMega and EasyMega, the battery can be charged by plugging it into the
       corresponding socket of the device and then using the USB
       cable to plug the flight computer into your computer's USB socket. The
       on-board circuitry will charge the battery whenever it is plugged
@@ -252,7 +264,7 @@ NAR #88757, TRA #12200
       deeply discharged battery.
     </para>
     <para>
-      TeleMetrum v2.0 and TeleMega use a higher power battery charger,
+      TeleMetrum v2.0, TeleMega and EasyMega use a higher power battery charger,
       allowing them to charge the battery while running the board at
       maximum power. When the battery is charging, or when the board
       is consuming a lot of power, the red LED will be lit. When the
@@ -456,7 +468,7 @@ NAR #88757, TRA #12200
 	  EasyMini and TeleMini v2 are designed to use either a
 	  lithium polymer battery or any other battery producing
 	  between 4 and 12 volts, such as a rectangular 9V
-	  battery. TeleMega and TeleMetrum are not designed for this,
+	  battery. TeleMega, EasyMega and TeleMetrum are not designed for this,
 	  and must only be powered by a lithium polymer battery. Find
 	  instructions on how to use other batteries in the EasyMini
 	  and TeleMini sections below.
@@ -574,6 +586,16 @@ NAR #88757, TRA #12200
 	      <entry>40mW</entry>
 	      <entry>3.7V</entry>
 	    </row>
+	    <row>
+	      <entry>EasyMega <?linebreak?>v1.0</entry>
+	      <entry><para>MS5607 30km (100k')</para></entry>
+	      <entry><para>MMA6555 102g</para></entry>
+	      <entry>-</entry>
+	      <entry><para>MPU6000 HMC5883</para></entry>
+	      <entry>8MB</entry>
+	      <entry>-</entry>
+	      <entry>3.7V</entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </table>
@@ -680,6 +702,25 @@ NAR #88757, TRA #12200
 	      </para></entry>
 	      <entry>1¼ inch (3.18cm)</entry>
 	      <entry>3¼ inch (8.26cm)</entry>
+	      <entry>38mm coupler</entry>
+	    </row>
+	    <row>
+	      <entry>EasyMega</entry>
+	      <entry><para>
+		Debug<?linebreak?>
+		Companion<?linebreak?>
+		USB<?linebreak?>
+		Battery
+	      </para></entry>
+	      <entry><para>
+		Apogee pyro <?linebreak?>
+		Main pyro<?linebreak?>
+		Pyro A-D<?linebreak?>
+		Switch<?linebreak?>
+		Pyro battery
+	      </para></entry>
+	      <entry>1¼ inch (3.18cm)</entry>
+	      <entry>2¼ inch (5.62cm)</entry>
 	      <entry>38mm coupler</entry>
 	    </row>
 	  </tbody>
@@ -1362,6 +1403,178 @@ NAR #88757, TRA #12200
       </section>
     </section>
     <section>
+      <title>EasyMega</title>
+      <informalfigure>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="easymega-v1.0-top.jpg" width="4.5in" scalefit="1"/>
+	  </imageobject>
+	</mediaobject>
+      </informalfigure>
+      <para>
+	EasyMega is a 1¼ inch by 2¼ inch circuit board. It was
+	designed to easily fit in a 38mm coupler. Like TeleMetrum,
+	EasyMega has an accelerometer and so it must be mounted so that
+	the board is aligned with the flight axis. It can be mounted
+	either antenna up or down.
+      </para>
+      <section>
+	<title>EasyMega Screw Terminals</title>
+	<para>
+	  EasyMega has two sets of nine screw terminals on the end of
+	  the board opposite the telemetry antenna. They are as follows:
+	</para>
+	<table frame='all'>
+	  <title>EasyMega Screw Terminals</title>
+	  <?dbfo keep-together="always"?>
+	  <tgroup cols='3' align='center' colsep='1' rowsep='1'>
+	    <colspec align='center' colwidth='*' colname='Pin #'/>
+	    <colspec align='center' colwidth='2*' colname='Pin Name'/>
+	    <colspec align='left' colwidth='5*' colname='Description'/>
+	    <thead>
+	      <row>
+		<entry align='center'>Terminal #</entry>
+		<entry align='center'>Terminal Name</entry>
+		<entry align='center'>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry>Top 1</entry>
+		<entry>Switch Input</entry>
+		<entry>Switch connection to positive battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Top 2</entry>
+		<entry>Switch Output</entry>
+		<entry>Switch connection to flight computer</entry>
+	      </row>
+	      <row>
+		<entry>Top 3</entry>
+		<entry>GND</entry>
+		<entry>Ground connection for use with external active switch</entry>
+	      </row>
+	      <row>
+		<entry>Top 4</entry>
+		<entry>Main -</entry>
+		<entry>Main pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 5</entry>
+		<entry>Main +</entry>
+		<entry>Main pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Top 6</entry>
+		<entry>Apogee -</entry>
+		<entry>Apogee pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 7</entry>
+		<entry>Apogee +</entry>
+		<entry>Apogee pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Top 8</entry>
+		<entry>D -</entry>
+		<entry>D pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Top 9</entry>
+		<entry>D +</entry>
+		<entry>D pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 1</entry>
+		<entry>GND</entry>
+		<entry>Ground connection for negative pyro battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 2</entry>
+		<entry>Pyro</entry>
+		<entry>Positive pyro battery terminal</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 3</entry>
+		<entry>Lipo</entry>
+		<entry>
+		  Power switch output. Use to connect main battery to
+		  pyro battery input
+		</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 4</entry>
+		<entry>A -</entry>
+		<entry>A pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 5</entry>
+		<entry>A +</entry>
+		<entry>A pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 6</entry>
+		<entry>B -</entry>
+		<entry>B pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 7</entry>
+		<entry>B +</entry>
+		<entry>B pyro channel common connection to battery +</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 8</entry>
+		<entry>C -</entry>
+		<entry>C pyro channel connection to pyro circuit</entry>
+	      </row>
+	      <row>
+		<entry>Bottom 9</entry>
+		<entry>C +</entry>
+		<entry>C pyro channel common connection to battery +</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+      <section>
+	<title>Using a Separate Pyro Battery with EasyMega</title>
+	<para>
+	  EasyMega provides explicit support for an external pyro
+	  battery. All that is required is to remove the jumper
+	  between the lipo terminal (Bottom 3) and the pyro terminal
+	  (Bottom 2). Then hook the negative pyro battery terminal to ground
+	  (Bottom 1) and the positive pyro battery to the pyro battery
+	  input (Bottom 2). You can then use the existing pyro screw
+	  terminals to hook up all of the pyro charges.
+	</para>
+      </section>
+      <section>
+	<title>Using Only One Battery With EasyMega</title>
+	<para>
+	  Because EasyMega has built-in support for a separate pyro
+	  battery, if you want to fly with just one battery running
+	  both the computer and firing the charges, you need to
+	  connect the flight computer battery to the pyro
+	  circuit. EasyMega has two screw terminals for this—hook a
+	  wire from the Lipo terminal (Bottom 3) to the Pyro terminal
+	  (Bottom 2).
+	</para>
+      </section>
+      <section>
+	<title>Using an Active Switch with EasyMega</title>
+	<para>
+	  As explained above, an external active switch requires three
+	  connections, one to the positive battery terminal, one to
+	  the flight computer positive input and one to ground.
+	</para>
+	<para>
+	  The positive battery terminal is available on Top terminal
+	  1, the positive flight computer input is on Top terminal
+	  2. Ground is on Top terminal 3.
+	</para>
+      </section>
+    </section>
+    <section>
       <title>Flight Data Recording</title>
       <para>
 	Each flight computer logs data at 100 samples per second
@@ -1431,6 +1644,12 @@ NAR #88757, TRA #12200
 	      <entry>8MB</entry>
 	      <entry>40</entry>
 	    </row>
+	    <row>
+	      <entry>EasyMega</entry>
+	      <entry>32</entry>
+	      <entry>8MB</entry>
+	      <entry>40</entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </table>
@@ -1444,7 +1663,7 @@ NAR #88757, TRA #12200
 	Configuration data is also stored in the flash memory on
 	TeleMetrum v1.x, TeleMini and EasyMini. This consumes 64kB
 	of flash space.  This configuration space is not available
-	for storing flight log data. TeleMetrum v2.0 and TeleMega
+	for storing flight log data. TeleMetrum v2.0, TeleMega and EasyMega
 	store configuration data in a bit of eeprom available within
 	the processor chip, leaving that space available in flash for
 	more flight data.
@@ -1538,7 +1757,7 @@ NAR #88757, TRA #12200
         The AltOS firmware build for the altimeters has two
         fundamental modes, “idle” and “flight”.  Which of these modes
         the firmware operates in is determined at start up time. For
-        TeleMetrum and TeleMega, which have accelerometers, the mode is 
+        TeleMetrum, TeleMega and EasyMega, which have accelerometers, the mode is 
 	controlled by the orientation of the
         rocket (well, actually the board, of course...) at the time
         power is switched on.  If the rocket is “nose up”, then
@@ -1803,7 +2022,8 @@ NAR #88757, TRA #12200
 	and beep out the maximum height until turned off.
       </para>
       <para>
-        One “neat trick” of particular value when TeleMetrum or TeleMega are used with 
+        One “neat trick” of particular value when TeleMetrum, TeleMega
+	or EasyMega are used with 
         very large air-frames, is that you can power the board up while the 
         rocket is horizontal, such that it comes up in idle mode.  Then you can
         raise the air-frame to launch position, and issue a 'reset' command 
@@ -2050,6 +2270,15 @@ NAR #88757, TRA #12200
 	is the cause.
       </para>
       <para>
+	APRS packets include an SSID (Secondary Station Identifier)
+	field that allows one operator to have multiple
+	transmitters. AltOS allows you to set this to a single digit
+	from 0 to 9, allowing you to fly multiple transmitters at the
+	same time while keeping the identify of each one separate in
+	the receiver. By default, the SSID is set to the last digit of
+	the device serial number.
+      </para>
+      <para>
 	The APRS packet format includes a comment field that can have
 	arbitrary text in it. AltOS uses this to send status
 	information about the flight computer. It sends four fields as
@@ -2095,15 +2324,20 @@ NAR #88757, TRA #12200
 	      <entry>M3.7</entry>
 	      <entry>Main Igniter Voltage</entry>
 	    </row>
+	    <row>
+	      <entry>6</entry>
+	      <entry>1286</entry>
+	      <entry>Device Serial Number</entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </table>
       <para>
 	Here's an example of an APRS comment showing GPS lock with 6
 	satellites in view, a primary battery at 4.0V, and
-	apogee and main igniters both at 3.7V.
+	apogee and main igniters both at 3.7V from device 1286.
 	<screen>
-	  L6 B4.0 A3.7 M3.7
+	  L6 B4.0 A3.7 M3.7 1286
 	</screen>
       </para>
       <para>
@@ -2167,6 +2401,18 @@ NAR #88757, TRA #12200
 	</para>
       </section>
       <section>
+	<title>Telemetry baud rate</title>
+	<para>
+	  This sets the modulation bit rate for data transmission for
+	  both telemetry and packet link mode. Lower bit
+	  rates will increase range while reducing the amount of data
+	  that can be sent and increasing battery consumption. All
+	  telemetry is done using a rate 1/2 constraint 4 convolution
+	  code, so the actual data transmission rate is 1/2 of the
+	  modulation bit rate specified here.
+	</para>
+      </section>
+      <section>
 	<title>APRS Interval</title>
 	<para>
 	  This selects how often APRS packets are transmitted. Set
@@ -2174,6 +2420,14 @@ NAR #88757, TRA #12200
 	  regular telemetry and RDF transmissions. As APRS takes a
 	  full second to transmit a single position report, we
 	  recommend sending packets no more than once every 5 seconds.
+	</para>
+      </section>
+      <section>
+	<title>APRS SSID</title>
+	<para>
+	  This selects the SSID reported in APRS packets. By default,
+	  it is set to the last digit of the serial number, but you
+	  can change this to any value from 0 to 9.
 	</para>
       </section>
       <section>
@@ -2260,7 +2514,7 @@ NAR #88757, TRA #12200
       <section>
 	<title>Pad Orientation</title>
 	<para>
-	  TeleMetrum and TeleMega measure acceleration along the axis
+	  TeleMetrum, TeleMega and EasyMega measure acceleration along the axis
 	  of the board. Which way the board is oriented affects the
 	  sign of the acceleration value. Instead of trying to guess
 	  which way the board is mounted in the air frame, the
@@ -2275,7 +2529,7 @@ NAR #88757, TRA #12200
 	<title>Configurable Pyro Channels</title>
 	<para>
 	  In addition to the usual Apogee and Main pyro channels,
-	  TeleMega has four additional channels that can be configured
+	  TeleMega and EasyMega have four additional channels that can be configured
 	  to activate when various flight conditions are
 	  satisfied. You can select as many conditions as necessary;
 	  all of them must be met in order to activate the
@@ -2312,7 +2566,7 @@ NAR #88757, TRA #12200
 	  </listitem>
 	  <listitem>
 	    <para>
-	      Orientation. TeleMega contains a 3-axis gyroscope and
+	      Orientation. TeleMega and EasyMega contain a 3-axis gyroscope and
 	      accelerometer which is used to measure the current
 	      angle. Note that this angle is not the change in angle
 	      from the launch pad, but rather absolute relative to
@@ -3138,6 +3392,18 @@ NAR #88757, TRA #12200
 	</para>
       </section>
       <section>
+	<title>Telemetry baud rate</title>
+	<para>
+	  This sets the modulation bit rate for data transmission for
+	  both telemetry and packet link mode. Lower bit
+	  rates will increase range while reducing the amount of data
+	  that can be sent and increasing battery consumption. All
+	  telemetry is done using a rate 1/2 constraint 4 convolution
+	  code, so the actual data transmission rate is 1/2 of the
+	  modulation bit rate specified here.
+	</para>
+      </section>
+      <section>
 	<title>APRS Interval</title>
 	<para>
 	  How often to transmit GPS information via APRS (in
@@ -3147,6 +3413,14 @@ NAR #88757, TRA #12200
 	  packets. Note that a single APRS packet takes nearly a full
 	  second to transmit, so enabling this option will prevent
 	  sending any other telemetry during that time.
+	</para>
+      </section>
+      <section>
+	<title>APRS SSID</title>
+	<para>
+	  Which SSID to report in APRS packets. By default, this is
+	  set to the last digit of the serial number, but can be
+	  configured to any value from 0 to 9.
 	</para>
       </section>
       <section>
@@ -3211,8 +3485,8 @@ NAR #88757, TRA #12200
       <section>
         <title>Pad Orientation</title>
 	<para>
-	  Because they include accelerometers, TeleMetrum and
-	  TeleMega are sensitive to the orientation of the board. By
+	  Because they include accelerometers, TeleMetrum,
+	  TeleMega and EasyMega are sensitive to the orientation of the board. By
 	  default, they expect the antenna end to point forward. This
 	  parameter allows that default to be changed, permitting the
 	  board to be mounted with the antenna pointing aft instead.
@@ -3261,7 +3535,7 @@ NAR #88757, TRA #12200
 	</informalfigure>
 	<para>
 	  This opens a separate window to configure the additional
-	  pyro channels available on TeleMega.  One column is
+	  pyro channels available on TeleMega and EasyMega.  One column is
 	  presented for each channel. Each row represents a single
 	  parameter, if enabled the parameter must meet the specified
 	  test for the pyro channel to be fired. See the Pyro Channels
@@ -3409,7 +3683,7 @@ NAR #88757, TRA #12200
 	</mediaobject>
       </informalfigure>
       <para>
-        Select this button and then select a TeleDongle Device from the list provided.
+        Select this button and then select a TeleDongle or TeleBT Device from the list provided.
       </para>
       <para>
         The first few lines of the dialog provide information about the
@@ -3418,9 +3692,9 @@ NAR #88757, TRA #12200
         individual configuration entries.
       </para>
       <para>
-	Note that the TeleDongle itself doesn't save any configuration
+	Note that TeleDongle and TeleBT don't save any configuration
 	data, the settings here are recorded on the local machine in
-	the Java preferences database. Moving the TeleDongle to
+	the Java preferences database. Moving the device to
 	another machine, or using a different user account on the same
 	machine will cause settings made here to have no effect.
       </para>
@@ -3472,13 +3746,21 @@ NAR #88757, TRA #12200
         </para>
       </section>
       <section>
-        <title>Radio Calibration</title>
+        <title>RF Calibration</title>
         <para>
           The radios in every Altus Metrum device are calibrated at the
           factory to ensure that they transmit and receive on the
-          specified frequency.  To change a TeleDongle's calibration, 
+          specified frequency.  To change a TeleDongle or TeleBT's calibration, 
 	  you must reprogram the unit completely, so this entry simply
 	  shows the current value and doesn't allow any changes.
+        </para>
+      </section>
+      <section>
+        <title>Telemetry Rate</title>
+        <para>
+          This lets you match the telemetry and packet link rate from
+          the transmitter. If they don't match, the device won't
+          receive any data.
         </para>
       </section>
     </section>
@@ -3488,7 +3770,7 @@ NAR #88757, TRA #12200
         This reprograms Altus Metrum devices with new
         firmware. TeleMetrum v1.x, TeleDongle, TeleMini and TeleBT are
         all reprogrammed by using another similar unit as a
-        programming dongle (pair programming). TeleMega, TeleMetrum v2
+        programming dongle (pair programming). TeleMega, EasyMega, TeleMetrum v2
         and EasyMini are all programmed directly over their USB ports
         (self programming).  Please read the directions for flashing
         devices in the Updating Device Firmware chapter below.
@@ -3540,9 +3822,9 @@ NAR #88757, TRA #12200
       <para>
 	This listens for telemetry packets on all of the configured
 	frequencies, displaying information about each device it
-	receives a packet from. You can select which of the three
-	telemetry formats should be tried; by default, it only listens
-	for the standard telemetry packets used in v1.0 and later
+	receives a packet from. You can select which of the baud rates
+	and telemetry formats should be tried; by default, it only listens
+	at 38400 baud with the standard telemetry format used in v1.0 and later
 	firmware.
       </para>
     </section>
@@ -3825,12 +4107,12 @@ NAR #88757, TRA #12200
           In the rocket itself, you just need a flight computer and
           a single-cell, 3.7 volt nominal Li-Po rechargeable battery.  An 
 	  850mAh battery weighs less than a 9V alkaline battery, and will 
-	  run a TeleMetrum or TeleMega for hours.
+	  run a TeleMetrum, TeleMega or EasyMega for hours.
 	  A 110mAh battery weighs less than a triple A battery and is a good
-	  choice for use with TeleMini.
+	  choice for use with TeleMini or EasyMini.
         </para>
         <para>
-          By default, we ship flight computers with a simple wire antenna.  
+          By default, we ship TeleMini, TeleMetrum and TeleMega flight computers with a simple wire antenna.  
 	  If your electronics bay or the air-frame it resides within is made 
 	  of carbon fiber, which is opaque to RF signals, you may prefer to 
 	  install an SMA connector so that you can run a coaxial cable to an 
@@ -3884,8 +4166,8 @@ NAR #88757, TRA #12200
           if the rocket is hiding in sage brush or a tree, or if the last GPS position
           doesn't get you close enough because the rocket dropped into a canyon, or
           the wind is blowing it across a dry lake bed, or something like that...  Keith
-          currently uses a Yaesu VX-7R, Bdale has a Baofung UV-5R
-	  which isn't as nice, but was a whole lot cheaper.
+          currently uses a Yaesu FT1D, Bdale has a Yaesu VX-7R, which
+	  is a nicer radio in most ways but doesn't support APRS.
         </para>
         <para>
           So, to recap, on the ground the hardware you'll need includes:
@@ -3951,14 +4233,10 @@ NAR #88757, TRA #12200
       </section>
       <section>
         <title>Future Plans</title>
-	<para>
-	  We've designed a simple GPS based radio tracker called TeleGPS.  
-	  If all goes well, we hope to introduce this in the first
-	  half of 2014.
-	</para>
         <para>
           We have designed and prototyped several “companion boards” that 
-	  can attach to the companion connector on TeleMetrum and TeleMega
+	  can attach to the companion connector on TeleMetrum,
+	  TeleMega and EasyMega
 	  flight computers to collect more data, provide more pyro channels, 
 	  and so forth.  We do not yet know if or when any of these boards
 	  will be produced in enough quantity to sell.  If you have specific
@@ -4007,8 +4285,8 @@ NAR #88757, TRA #12200
       <orderedlist inheritnum='inherit' numeration='arabic'>
 	<listitem>
 	  <para>
-	    Make sure accelerometer-equipped products like TeleMetrum and
-	    TeleMega are aligned precisely along the axis of
+	    Make sure accelerometer-equipped products like TeleMetrum,
+	    TeleMega and EasyMega are aligned precisely along the axis of
 	    acceleration so that the accelerometer can accurately
 	    capture data during the flight.
 	  </para>
@@ -4218,7 +4496,7 @@ NAR #88757, TRA #12200
   <chapter>
     <title>Updating Device Firmware</title>
     <para>
-      TeleMega, TeleMetrum v2 and EasyMini are all programmed directly
+      TeleMega, TeleMetrum v2, EasyMega and EasyMini are all programmed directly
       over their USB connectors (self programming). TeleMetrum v1, TeleMini and
       TeleDongle are all programmed by using another device as a
       programmer (pair programming). It's important to recognize which
@@ -4241,12 +4519,12 @@ NAR #88757, TRA #12200
       performance slightly.
     </para>
     <para>
-      Self-programmable devices (TeleMega, TeleMetrum v2 and EasyMini)
+      Self-programmable devices (TeleMega, TeleMetrum v2, EasyMega and EasyMini)
       are reprogrammed by connecting them to your computer over USB
     </para>
     <section>
       <title>
-	Updating TeleMega, TeleMetrum v2 or EasyMini Firmware
+	Updating TeleMega, TeleMetrum v2, EasyMega or EasyMini Firmware
       </title>
       <orderedlist inheritnum='inherit' numeration='arabic'>
 	<listitem>
@@ -4328,6 +4606,20 @@ NAR #88757, TRA #12200
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
+	    <term>EasyMega</term>
+	    <listitem>
+	      <para>
+		Connect pin 6 and pin 1 of the companion connector. Pin 1
+		can be identified by the square pad around it, and then
+		the pins could sequentially across the board. Be very
+		careful to <emphasis>not</emphasis> short pin 8 to
+		anything as that is connected directly to the battery. Pin
+		7 carries 3.3V and the board will crash if that is
+		connected to pin 1, but shouldn't damage the board.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
 	    <term>TeleMetrum v2</term>
 	    <listitem>
 	      <para>
@@ -4354,6 +4646,50 @@ NAR #88757, TRA #12200
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
+	<para>
+	  Once you've located the right pins:
+	</para>
+	<orderedlist inheritnum='inherit' numeration='arabic'>
+	  <listitem>
+	    <para>
+	      Turn the altimeter power off.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Connect a battery.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Connect the indicated terminals together with a short
+	      piece of wire. Take care not to accidentally connect
+	      anything else.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Connect USB
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Turn the board power on.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      The board should now be visible over USB as 'AltosFlash'
+	      and be ready to receive firmware.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Once the board has been powered up, you can remove the
+	      piece of wire.
+	    </para>
+	  </listitem>
+	</orderedlist>
       </section>
     </section>
     <section>
@@ -4710,6 +5046,67 @@ NAR #88757, TRA #12200
 	<listitem>
 	  <para>
 	    3.25 x 1.25 inch board designed to fit inside 38mm air-frame coupler tube.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+    <section>
+      <title>
+	EasyMega Specifications
+      </title>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Recording altimeter for model rocketry.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Supports dual deployment and four auxiliary pyro channels
+	    (a total of 6 events).
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Barometric pressure sensor good to 100k feet MSL.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    1-axis high-g accelerometer for motor characterization, capable of
+	    +/- 102g.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    9-axis IMU including integrated 3-axis accelerometer,
+	    3-axis gyroscope and 3-axis magnetometer.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    On-board 8 Megabyte non-volatile memory for flight data storage.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    USB interface for battery charging, configuration, and data recovery.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Fully integrated support for Li-Po rechargeable batteries.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Can use either main system Li-Po or optional separate pyro battery
+	    to fire e-matches.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    1.25 x 1.25 inch board designed to fit inside 38mm air-frame coupler tube.
 	  </para>
 	</listitem>
       </itemizedlist>
@@ -5273,6 +5670,21 @@ NAR #88757, TRA #12200
       </informalfigure>
     </section>
     <section>
+      <title>EasyMega template</title>
+      <para>
+	EasyMega has overall dimensions of 1.250 x 2.250 inches, and
+	the mounting holes are sized for use with 4-40 or M3 screws.
+      </para>
+      <informalfigure>
+	<mediaobject id="EasyMegaTemplate">
+	  <imageobject>
+	    <imagedata format="SVG" fileref="easymega.svg"
+		       scalefit="0" scale="100" align="center" />
+	  </imageobject>
+	</mediaobject>
+      </informalfigure>
+    </section>
+    <section>
       <title>TeleMetrum template</title>
       <para>
 	TeleMetrum has overall dimensions of 1.000 x 2.750 inches, and the
@@ -5322,7 +5734,7 @@ NAR #88757, TRA #12200
       <title>Calibration</title>
       <para>
         There are only two calibrations required for TeleMetrum and
-        TeleMega, and only one for TeleDongle, TeleMini and EasyMini.
+        TeleMega, and only one for EasyMega, TeleDongle, TeleMini and EasyMini.
         All boards are shipped from the factory pre-calibrated, but
         the procedures are documented here in case they are ever
         needed.  Re-calibration is not supported by AltosUI, you must
@@ -5374,7 +5786,7 @@ NAR #88757, TRA #12200
 	</para>
       </section>
       <section>
-        <title>TeleMetrum and TeleMega Accelerometers</title>
+        <title>TeleMetrum, TeleMega and EasyMega Accelerometers</title>
         <para>
           While barometric sensors are factory-calibrated,
           accelerometers are not, and so each must be calibrated once
@@ -5401,7 +5813,7 @@ NAR #88757, TRA #12200
         </para>
         <para>
          In the unlikely event an accel cal goes badly, it is possible
-         that TeleMetrum or TeleMega may always come up in 'pad mode'
+         that TeleMetrum, TeleMega or EasyMega may always come up in 'pad mode'
          and as such not be listening to either the USB or radio link.
          If that happens, there is a special hook in the firmware to
          force the board back in to 'idle mode' so you can re-do the
@@ -5421,10 +5833,17 @@ NAR #88757, TRA #12200
   <appendix>
     <title>Release Notes</title>
     <simplesect>
-      <title>Version 1.41</title>
+      <title>Version 1.4.1</title>
       <xi:include
 	  xmlns:xi="http://www.w3.org/2001/XInclude"
 	  href="release-notes-1.4.1.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
+    <simplesect>
+      <title>Version 1.5</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.5.xsl"
 	  xpointer="xpointer(/article/*)"/>
     </simplesect>
     <simplesect>

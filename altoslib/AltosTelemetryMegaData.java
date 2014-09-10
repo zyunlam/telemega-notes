@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 	int	state;
@@ -31,12 +31,12 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 
 	int	acceleration;
 	int	speed;
-	int	height;
+	int	height_16;
 
 	public AltosTelemetryMegaData(int[] bytes) {
 		super(bytes);
 
-		state = int8(5);
+		state = uint8(5);
 
 		v_batt = int16(6);
 		v_pyro = int16(8);
@@ -44,7 +44,7 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		sense = new int[6];
 
 		for (int i = 0; i < 6; i++) {
-			sense[i] = int8(10 + i) << 4;
+			sense[i] = uint8(10 + i) << 4;
 			sense[i] |= sense[i] >> 8;
 		}
 
@@ -55,7 +55,8 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 
 		acceleration = int16(26);
 		speed = int16(28);
-		height = int16(30);
+
+		height_16 = int16(30);
 	}
 
 	public void update_state(AltosState state) {
@@ -79,7 +80,13 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		state.set_ground_pressure(ground_pres);
 		state.set_accel_g(accel_plus_g, accel_minus_g);
 
-		state.set_kalman(height, speed/16.0, acceleration / 16.0);
+		/* Fill in the high bits of height from recent GPS
+		 * data if available, otherwise guess using the
+		 * previous kalman height
+		 */
+
+		state.set_kalman(extend_height(state, height_16),
+				 speed/16.0, acceleration / 16.0);
 	}
 }
 

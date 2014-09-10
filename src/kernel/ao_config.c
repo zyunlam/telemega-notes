@@ -50,17 +50,25 @@ __xdata uint8_t ao_config_mutex;
 #error Please define USE_INTERNAL_FLASH
 #endif
 #endif
+
 #ifndef AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX
-#if USE_INTERNAL_FLASH
-#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	ao_storage_config
-#else
-#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 192 * (uint32_t) 1024)
+# if FLIGHT_LOG_APPEND
+#  define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	ao_storage_log_max
+# else
+#  if USE_INTERNAL_FLASH
+#   define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	ao_storage_config
+#  else
+#   define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 192 * (uint32_t) 1024)
+#  endif
+# endif
 #endif
-#endif
+
 #ifndef AO_CONFIG_DEFAULT_RADIO_POWER
 #define AO_CONFIG_DEFAULT_RADIO_POWER		0x60
 #endif
 #define AO_CONFIG_DEFAULT_RADIO_AMP		0
+#define AO_CONFIG_DEFAULT_APRS_SSID		(ao_serial_number % 10)
+#define AO_CONFIG_DEFAULT_RADIO_RATE		AO_RADIO_RATE_38400
 
 #if HAS_EEPROM
 static void
@@ -85,10 +93,18 @@ ao_config_put(void)
 #endif
 
 #if HAS_RADIO
+
+#if HAS_RADIO_FORWARD
+__xdata uint32_t	ao_send_radio_setting;
+#endif
+
 void
 ao_config_set_radio(void)
 {
 	ao_config.radio_setting = ao_freq_to_set(ao_config.frequency, ao_config.radio_cal);
+#if HAS_RADIO_FORWARD
+	ao_send_radio_setting = ao_freq_to_set(ao_config.send_frequency, ao_config.radio_cal);
+#endif
 }
 #endif /* HAS_RADIO */
 
@@ -192,6 +208,18 @@ _ao_config_get(void)
 		if (minor < 18)
 			ao_config.pyro_time = AO_CONFIG_DEFAULT_PYRO_TIME;
 #endif
+#if HAS_APRS
+		if (minor < 19)
+			ao_config.aprs_ssid = AO_CONFIG_DEFAULT_APRS_SSID;
+#endif
+#if HAS_RADIO_RATE
+		if (minor < 20)
+			ao_config.radio_rate = AO_CONFIG_DEFAULT_RADIO_RATE;
+#endif
+#if HAS_RADIO_FORWARD
+		if (minor < 21)
+			ao_config.send_frequency = 434550;
+#endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
@@ -283,6 +311,32 @@ ao_config_frequency_set(void) __reentrant
 	ao_radio_recv_abort();
 #endif
 }
+
+#endif
+
+#if HAS_RADIO_FORWARD
+void
+ao_config_send_frequency_show(void) __reentrant
+{
+	printf("Send frequency: %ld\n",
+	       ao_config.send_frequency);
+}
+
+void
+ao_config_send_frequency_set(void) __reentrant
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.send_frequency = ao_cmd_lex_u32;
+	ao_config_set_radio();
+	_ao_config_edit_finish();
+#if HAS_RADIO_RECV
+	ao_radio_recv_abort();
+#endif
+}
+
 #endif
 
 #if HAS_FLIGHT
@@ -477,18 +531,73 @@ ao_config_radio_cal_set(void) __reentrant
 	ao_config_set_radio();
 	_ao_config_edit_finish();
 }
+
+#endif
+
+#if HAS_RADIO_RATE
+#ifndef HAS_TELEMETRY
+#error Please define HAS_TELEMETRY
+#endif
+
+void
+ao_config_radio_rate_show(void) __reentrant
+{
+	printf("Telemetry rate: %d\n", ao_config.radio_rate);
+}
+
+void
+ao_config_radio_rate_set(void) __reentrant
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	if (AO_RADIO_RATE_MAX < ao_cmd_lex_i) {
+		ao_cmd_status = ao_cmd_lex_error;
+		return;
+	}
+	_ao_config_edit_start();
+	ao_config.radio_rate = ao_cmd_lex_i;
+#if HAS_TELEMETRY
+	ao_telemetry_reset_interval();
+#endif
+	_ao_config_edit_finish();
+#if HAS_RADIO_RECV
+	ao_radio_recv_abort();
+#endif
+}
 #endif
 
 #if HAS_LOG
+
 void
 ao_config_log_show(void) __reentrant
 {
 	printf("Max flight log: %d kB\n", (int16_t) (ao_config.flight_log_max >> 10));
+#if FLIGHT_LOG_APPEND
+	printf("Log fixed: 1\n");
+#endif
 }
+
+#if FLIGHT_LOG_APPEND
+void
+ao_config_log_fix_append(void)
+{
+	_ao_config_edit_start();
+	ao_config.flight_log_max = ao_storage_log_max;
+	_ao_config_edit_finish();
+	ao_mutex_get(&ao_config_mutex);
+	_ao_config_put();
+	ao_config_dirty = 0;
+	ao_mutex_put(&ao_config_mutex);
+}
+#endif
 
 void
 ao_config_log_set(void) __reentrant
 {
+#if FLIGHT_LOG_APPEND
+	printf("Flight log fixed size %d kB\n", ao_storage_log_max >> 10);
+#else
 	uint16_t	block = (uint16_t) (ao_storage_block >> 10);
 	uint16_t	log_max = (uint16_t) (ao_storage_log_max >> 10);
 
@@ -506,6 +615,7 @@ ao_config_log_set(void) __reentrant
 		ao_config.flight_log_max = (uint32_t) ao_cmd_lex_i << 10;
 		_ao_config_edit_finish();
 	}
+#endif
 }
 #endif /* HAS_LOG */
 
@@ -737,6 +847,30 @@ ao_config_pyro_time_set(void)
 }
 #endif
 
+#if HAS_APRS
+void
+ao_config_aprs_ssid_show(void)
+{
+	printf ("APRS SSID: %d\n",
+		ao_config.aprs_ssid);
+}
+
+void
+ao_config_aprs_ssid_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	if (15 < ao_cmd_lex_i) {
+		ao_cmd_status = ao_cmd_lex_error;
+		return;
+	}
+	_ao_config_edit_start();
+	ao_config.aprs_ssid = ao_cmd_lex_i;
+	_ao_config_edit_finish();
+}
+#endif /* HAS_APRS */
+
 struct ao_config_var {
 	__code char	*str;
 	void		(*set)(void) __reentrant;
@@ -766,12 +900,20 @@ __code struct ao_config_var ao_config_vars[] = {
 #if HAS_RADIO
 	{ "F <freq>\0Frequency (kHz)",
 	  ao_config_frequency_set, ao_config_frequency_show },
+#if HAS_RADIO_FORWARD
+	{ "R <freq>\0Repeater output frequency (kHz)",
+	  ao_config_send_frequency_set, ao_config_send_frequency_show },
+#endif
 	{ "c <call>\0Callsign (8 char max)",
 	  ao_config_callsign_set,	ao_config_callsign_show },
 	{ "e <0 disable, 1 enable>\0Enable telemetry and RDF",
 	  ao_config_radio_enable_set, ao_config_radio_enable_show },
 	{ "f <cal>\0Radio calib (cal = rf/(xtal/2^16))",
 	  ao_config_radio_cal_set,  	ao_config_radio_cal_show },
+#if HAS_RADIO_RATE
+	{ "T <rate>\0Telemetry rate (0=38.4, 1=9.6, 2=2.4)",
+	  ao_config_radio_rate_set,	ao_config_radio_rate_show },
+#endif
 #if HAS_RADIO_POWER
 	{ "p <setting>\0Radio power setting (0-255)",
 	  ao_config_radio_power_set,	ao_config_radio_power_show },
@@ -816,6 +958,10 @@ __code struct ao_config_var ao_config_vars[] = {
 #if HAS_TRACKER
 	{ "t <motion> <interval>\0Tracker configuration",
 	  ao_config_tracker_set, ao_config_tracker_show },
+#endif
+#if HAS_APRS
+	{ "S <ssid>\0Set APRS SSID (0-15)",
+	  ao_config_aprs_ssid_set, ao_config_aprs_ssid_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

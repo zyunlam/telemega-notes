@@ -20,6 +20,8 @@
 
 #define HAS_RADIO		1
 #define DISABLE_LOG_SPACE	1
+#define AO_VALUE_32		0
+#define HAS_WIDE_GPS		0
 
 #if defined(TELEMETRUM_V_1_0)
 	/* Discontinued and was never built with CC1111 chips needing this */
@@ -56,6 +58,9 @@
 	#define HAS_ACCEL		1
 	#define HAS_IGNITE		1
 	#define HAS_MONITOR		0
+	#define HAS_TELEMETRY		1
+	#define HAS_RADIO_RATE		0	/* not enough space for this */
+	#define HAS_MUTEX_TRY		0
 #endif
 
 #if defined(TELEMETRUM_V_1_1)
@@ -96,6 +101,9 @@
 	#define HAS_ACCEL		1
 	#define HAS_IGNITE		1
 	#define HAS_MONITOR		0
+	#define HAS_TELEMETRY		1
+	#define HAS_RADIO_RATE		0	/* not enough space for this */
+	#define HAS_MUTEX_TRY		0
 #endif
 
 #if defined(TELEMETRUM_V_1_2)
@@ -136,6 +144,9 @@
 	#define HAS_ACCEL		1
 	#define HAS_IGNITE		1
 	#define HAS_MONITOR		0
+	#define HAS_TELEMETRY		1
+	#define HAS_RADIO_RATE		0	/* not enough space for this */
+	#define HAS_MUTEX_TRY		0
 #endif
 
 #if defined(TELEDONGLE_V_0_2)
@@ -164,6 +175,8 @@
 	#define LEGACY_MONITOR		1
 	#define HAS_RSSI		1
 	#define HAS_AES			0
+	#define HAS_TELEMETRY		0
+	#define AO_RADIO_REG_TEST	1
 #endif
 
 #if defined(TELEMINI_V_1_0)
@@ -193,6 +206,8 @@
 	#define HAS_ACCEL		0
 	#define HAS_IGNITE		1
 	#define HAS_MONITOR		0
+	#define HAS_TELEMETRY		1
+	#define HAS_RADIO_RATE		0	/* not enough space for this */
 #endif
 
 #if defined(TELENANO_V_0_1)
@@ -220,6 +235,8 @@
 	#define HAS_ACCEL		0
 	#define HAS_IGNITE		0
 	#define HAS_MONITOR		0
+	#define HAS_TELEMETRY		1
+	#define HAS_RADIO_RATE		0	/* not enough space for this */
 #endif
 
 #if defined(TELEMETRUM_V_0_1)
@@ -252,6 +269,8 @@
 	#define HAS_ACCEL		1
 	#define HAS_IGNITE		1
 	#define HAS_MONITOR		0
+	#define HAS_TELEMETRY		1
+	#define HAS_RADIO_RATE		0	/* not enough space for this */
 	#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 127 * (uint32_t) 1024)
 #endif
 
@@ -283,6 +302,7 @@
 	#define LEGACY_MONITOR		1
 	#define HAS_RSSI		1
 	#define HAS_AES			0
+	#define HAS_TELEMETRY		0
 #endif
 
 #if defined(TIDONGLE)
@@ -312,6 +332,7 @@
 	#define LEGACY_MONITOR		1
 	#define HAS_RSSI		1
 	#define HAS_AES			0
+	#define HAS_TELEMETRY		0
 #endif
 
 #if defined(TELEBT_V_0_0)
@@ -350,6 +371,8 @@
 	#define LEGACY_MONITOR		1
 	#define HAS_RSSI		0
 	#define HAS_AES			0
+	#define HAS_TELEMETRY		0
+	#define AO_RADIO_REG_TEST	1
 #endif
 
 #if defined(TELEBT_V_0_1)
@@ -396,6 +419,8 @@
 	#define LEGACY_MONITOR		1
 	#define HAS_RSSI		0
 	#define HAS_AES			0
+	#define HAS_TELEMETRY		0
+	#define AO_RADIO_REG_TEST	1
 #endif
 
 #if defined(TELELAUNCH_V_0_1)
@@ -428,6 +453,7 @@
 	#define HAS_IGNITE		1
 	#define HAS_MONITOR		0
 	#define HAS_AES			1
+	#define HAS_TELEMETRY		0
 #endif
 
 #if DBG_ON_P1

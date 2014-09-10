@@ -24,7 +24,7 @@ int
 main(void)
 {
 	ao_clock_init();
-	
+
 #if HAS_STACK_GUARD
 	ao_mpu_init();
 #endif
@@ -48,7 +48,7 @@ main(void)
 	ao_send_packet_init();
 
 	ao_config_init();
-	
+
 	ao_start_scheduler();
 	return 0;
 }

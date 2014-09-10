@@ -83,6 +83,9 @@ ao_pyro_init(void);
 void
 ao_pyro_manual(uint8_t p);
 
+enum ao_igniter_status
+ao_pyro_status(uint8_t p);
+
 void
 ao_pyro_print_status(void);
 

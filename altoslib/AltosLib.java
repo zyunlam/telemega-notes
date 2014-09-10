@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.util.*;
 import java.io.*;
@@ -50,6 +50,20 @@ public class AltosLib {
 	public static final int AO_LOG_PRODUCT = 2001;
 	public static final int AO_LOG_SERIAL_NUMBER = 2002;
 	public static final int AO_LOG_LOG_FORMAT = 2003;
+
+	public static final int AO_LOG_FREQUENCY = 2004;
+	public static final int AO_LOG_APOGEE_LOCKOUT = 2005;
+	public static final int AO_LOG_RADIO_RATE = 2006;
+	public static final int AO_LOG_IGNITE_MODE = 2007;
+	public static final int AO_LOG_PAD_ORIENTATION = 2008;
+	public static final int AO_LOG_RADIO_ENABLE = 2009;
+	public static final int AO_LOG_AES_KEY = 2010;
+	public static final int AO_LOG_APRS = 2011;
+	public static final int AO_LOG_BEEP_SETTING = 2012;
+	public static final int AO_LOG_TRACKER_SETTING = 2013;
+	public static final int AO_LOG_PYRO_TIME = 2014;
+	public static final int AO_LOG_APRS_ID = 2015;
+	public static final int AO_LOG_ALTITUDE_32 = 2016;
 
 	/* Added for header fields in telemega files */
 	public static final int AO_LOG_BARO_RESERVED = 3000;
@@ -98,6 +112,7 @@ public class AltosLib {
 	public final static int product_telegps = 0x0025;
 	public final static int product_easymini = 0x0026;
 	public final static int product_telemini = 0x0027;
+	public final static int product_easymega = 0x0028;
 	public final static int product_altusmetrum_min = 0x000a;
 	public final static int product_altusmetrum_max = 0x002c;
 
@@ -129,7 +144,8 @@ public class AltosLib {
 		new Product("megadongle", product_megadongle),
 		new Product("telegps", product_telegps),
 		new Product("easymini", product_easymini),
-		new Product("telemini", product_telemini)
+		new Product("telemini", product_telemini),
+		new Product("easymega", product_easymega)
 	};
 
 	public static int name_to_product(String name) {
@@ -159,6 +175,15 @@ public class AltosLib {
 
 	private static final String[] ao_telemetry_name = {
 		"Off", "Standard Telemetry", "TeleMetrum v0.9", "TeleMetrum v0.8"
+	};
+
+	public static final int ao_telemetry_rate_38400 = 0;
+	public static final int ao_telemetry_rate_9600 = 1;
+	public static final int ao_telemetry_rate_2400 = 2;
+	public static final int ao_telemetry_rate_max = 2;
+
+	public static final Integer[] ao_telemetry_rate_values = {
+		38400, 9600, 2400
 	};
 
 	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
@@ -204,6 +229,31 @@ public class AltosLib {
 			return ao_telemetry_name[telemetry];
 		throw new IllegalArgumentException(String.format("Invalid telemetry %d",
 								 telemetry));
+	}
+
+	private static int[] split_version(String version) {
+		String[] tokens = version.split("\\.");
+		int[] ret = new int[tokens.length];
+		for (int i = 0; i < tokens.length; i++)
+			ret[i] = Integer.parseInt(tokens[i]);
+		return ret;
+	}
+
+	public static int compare_version(String version_a, String version_b) {
+		int[] a = split_version(version_a);
+		int[] b = split_version(version_b);
+
+		for (int i = 0; i < Math.min(a.length, b.length); i++) {
+			if (a[i] < b[i])
+				return -1;
+			if (a[i] > b[i])
+				return 1;
+		}
+		if (a.length < b.length)
+			return -1;
+		if (a.length > b.length)
+			return 1;
+		return 0;
 	}
 
 	private static String[] state_to_string = {
@@ -281,7 +331,7 @@ public class AltosLib {
 		return false;
 	}
 
-	public static boolean ishex(int c) {
+	public static final boolean ishex(int c) {
 		if ('0' <= c && c <= '9')
 			return true;
 		if ('a' <= c && c <= 'f')
@@ -291,7 +341,7 @@ public class AltosLib {
 		return false;
 	}
 
-	public static boolean ishex(String s) {
+	public static final boolean ishex(String s) {
 		for (int i = 0; i < s.length(); i++)
 			if (!ishex(s.charAt(i)))
 				return false;
@@ -415,10 +465,17 @@ public class AltosLib {
 
 		if ((s.length() & 1) != 0)
 			throw new NumberFormatException(String.format("invalid line \"%s\"", s));
-		n = s.length() / 2;
+		byte[] bytes = s.getBytes(unicode_set);
+		n = bytes.length / 2;
 		r = new int[n];
-		for (i = 0; i < n; i++)
-			r[i] = hexbyte(s, i * 2);
+		for (i = 0; i < n; i++) {
+			int h = fromhex(bytes[(i << 1)]);
+			int l = fromhex(bytes[(i << 1) + 1]);
+			if (h < 0 || l < 0)
+				throw new NumberFormatException(String.format("invalid hex \"%c%c\"",
+									      bytes[(i<<1)], bytes[(i<<1) + 1]));
+			r[i] = (h << 4) + l;
+		}
 		return r;
 	}
 

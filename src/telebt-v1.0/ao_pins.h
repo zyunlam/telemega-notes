@@ -48,6 +48,8 @@
 #define BT_LINK_PIN		P1_7
 #define HAS_MONITOR		1
 #define LEGACY_MONITOR		0
+#define HAS_TELEMETRY		0
+#define AO_RADIO_REG_TEST	1
 
 #define HAS_ADC			1
 #define AO_PAD_ADC_BATT		0

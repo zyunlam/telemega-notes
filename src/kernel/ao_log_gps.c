@@ -26,6 +26,7 @@
 static __xdata struct ao_log_gps log;
 
 __code uint8_t ao_log_format = AO_LOG_FORMAT_TELEGPS;
+__code uint8_t ao_log_size = sizeof (struct ao_log_gps);
 
 static uint8_t
 ao_log_csum(__xdata uint8_t *b) __reentrant
@@ -75,7 +76,8 @@ ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data)
 	log.type = AO_LOG_GPS_TIME;
 	log.u.gps.latitude = gps_data->latitude;
 	log.u.gps.longitude = gps_data->longitude;
-	log.u.gps.altitude = gps_data->altitude;
+	log.u.gps.altitude_low = gps_data->altitude_low;
+	log.u.gps.altitude_high = gps_data->altitude_high;
 
 	log.u.gps.hour = gps_data->hour;
 	log.u.gps.minute = gps_data->minute;
@@ -133,5 +135,18 @@ ao_log_flight(uint8_t slot)
 
 	if (ao_log_dump_check_data() && log.type == AO_LOG_FLIGHT)
 		return log.u.flight.flight;
+	return 0;
+}
+
+uint8_t
+ao_log_check(uint32_t pos)
+{
+	if (!ao_storage_read(pos,
+			     &log,
+			     sizeof (struct ao_log_gps)))
+		return 0;
+
+	if (ao_log_dump_check_data())
+		return 1;
 	return 0;
 }

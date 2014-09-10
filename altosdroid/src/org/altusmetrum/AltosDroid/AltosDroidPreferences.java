@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Mike Beattie <mike@ethernal.org>
+ * Copyright © 2014 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,88 +14,38 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
-
 package org.altusmetrum.AltosDroid;
 
-import java.io.File;
-import java.util.Map;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Environment;
+import org.altusmetrum.altoslib_5.*;
 
-import org.altusmetrum.altoslib_4.*;
+public class AltosDroidPreferences extends AltosPreferences {
 
-public class AltosDroidPreferences implements AltosPreferencesBackend {
-	public final static String        NAME    = "org.altusmetrum.AltosDroid";
-	private Context                   context = null;
-	private SharedPreferences         prefs   = null;
-	private SharedPreferences.Editor  editor  = null;
+	/* Active device preference name */
+	final static String activeDevicePreference = "ACTIVE-DEVICE";
 
-	public AltosDroidPreferences(Context in_context) {
-		this(in_context, NAME);
+	static String active_device_address;
+
+	public static void init(Context context) {
+		if (backend != null)
+			return;
+
+		AltosPreferences.init(new AltosDroidPreferencesBackend(context));
+
+		active_device_address = backend.getString(activeDevicePreference, null);
 	}
 
-	public AltosDroidPreferences(Context in_context, String in_prefs) {
-		context = in_context;
-		prefs   = context.getSharedPreferences(in_prefs, 0);
-		editor  = prefs.edit();
+	public static void set_active_device(String address) {
+		synchronized(backend) {
+			active_device_address = address;
+			backend.putString(activeDevicePreference, active_device_address);
+			flush_preferences();
+		}
 	}
 
-	public String[] keys() {
-		Map<String, ?> all = prefs.getAll();
-		return (String[])all.keySet().toArray();
-	}
-
-	public AltosPreferencesBackend node(String key) {
-		return new AltosDroidPreferences(context, key);
-	}
-
-	public boolean nodeExists(String key) {
-		return prefs.contains(key);
-	}
-
-	public boolean getBoolean(String key, boolean def) {
-		return prefs.getBoolean(key, def);
-	}
-
-	public double getDouble(String key, double def) {
-		Float f = Float.valueOf(prefs.getFloat(key, (float)def));
-		return f.doubleValue();
-	}
-
-	public int getInt(String key, int def) {
-		return prefs.getInt(key, def);
-	}
-
-	public String getString(String key, String def) {
-		return prefs.getString(key, def);
-	}
-
-	public void putBoolean(String key, boolean value) {
-		editor.putBoolean(key, value);
-	}
-
-	public void putDouble(String key, double value) {
-		editor.putFloat(key, (float)value);
-	}
-
-	public void putInt(String key, int value) {
-		editor.putInt(key, value);
-	}
-
-	public void putString(String key, String value) {
-		editor.putString(key, value);
-	}
-
-	public void remove(String key) {
-		editor.remove(key);
-	}
-
-	public void flush() {
-		editor.apply();
-	}
-
-	public File homeDirectory() {
-		return Environment.getExternalStorageDirectory();
+	public static String active_device() {
+		synchronized(backend) {
+			return active_device_address;
+		}
 	}
 }

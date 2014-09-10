@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,12 +25,13 @@ import java.lang.Math;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 public class AltosUIMapLine {
 	AltosUILatLon	start, end;
 
 	private Font	font = null;
+	static public int stroke_width = 6;
 
 	public void set_font(Font font) {
 		this.font = font;
@@ -87,19 +88,24 @@ public class AltosUIMapLine {
 	}
 
 	public void paint(Graphics2D g, AltosUIMapTransform t) {
-		g.setColor(Color.BLUE);
 
 		if (start == null || end == null)
 			return;
 
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
 		Line2D.Double line = new Line2D.Double(t.screen(start),
 						       t.screen(end));
 
+		g.setColor(Color.WHITE);
+		g.setStroke(new BasicStroke(stroke_width+4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		g.draw(line);
+
+		g.setColor(Color.BLUE);
+		g.setStroke(new BasicStroke(stroke_width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		g.draw(line);
 
 		String	message = line_dist();
-		g.setFont(font);
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		Rectangle2D	bounds;
 		bounds = font.getStringBounds(message, g.getFontRenderContext());
 
@@ -111,6 +117,13 @@ public class AltosUIMapLine {
 		} else {
 			x += 2.0f;
 		}
+
+		g.setFont(font);
+		g.setColor(Color.WHITE);
+		for (int dy = -2; dy <= 2; dy += 2)
+			for (int dx = -2; dx <= 2; dx += 2)
+				g.drawString(message, x + dx, y + dy);
+		g.setColor(Color.BLUE);
 		g.drawString(message, x, y);
 	}
 }

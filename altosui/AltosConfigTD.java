@@ -21,8 +21,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosConfigTD implements ActionListener {
 
@@ -62,6 +62,7 @@ public class AltosConfigTD implements ActionListener {
 	int_ref		radio_calibration;
 	int_ref		radio_setting;
 	int_ref		radio_frequency;
+	int_ref		telemetry_rate;
 	string_ref	config_version;
 	string_ref	version;
 	string_ref	product;
@@ -105,6 +106,7 @@ public class AltosConfigTD implements ActionListener {
 		config_ui.set_version(version.get());
 		config_ui.set_radio_frequency(frequency());
 		config_ui.set_radio_calibration(radio_calibration.get());
+		config_ui.set_telemetry_rate(telemetry_rate.get());
 		config_ui.set_clean();
 		if (!made_visible) {
 			made_visible = true;
@@ -140,6 +142,7 @@ public class AltosConfigTD implements ActionListener {
 			get_int(line, "Radio cal:", radio_calibration);
 			get_int(line, "Frequency:", radio_frequency);
 			get_int(line, "Radio setting:", radio_setting);
+			get_int(line, "Telemetry rate:", telemetry_rate);
 			get_string(line,"software-version", version);
 			get_string(line,"product", product);
 		}
@@ -151,6 +154,7 @@ public class AltosConfigTD implements ActionListener {
 		radio_setting.set(0);
 		radio_frequency.set(0);
 		radio_calibration.set(1186611);
+		telemetry_rate.set(Altos.ao_telemetry_rate_38400);
 		config_version.set("0.0");
 		version.set("unknown");
 		product.set("unknown");
@@ -176,6 +180,17 @@ public class AltosConfigTD implements ActionListener {
 		} else {
 			radio_channel.set(AltosConvert.radio_frequency_to_channel(freq));
 		}
+	}
+
+	synchronized int telemetry_rate() {
+		return telemetry_rate.get();
+	}
+
+	synchronized void set_telemetry_rate(int new_telemetry_rate){
+		int	rate = telemetry_rate.get();
+
+		if (rate >= 0)
+			telemetry_rate.set(new_telemetry_rate);
 	}
 
 	final static int	serial_mode_read = 0;
@@ -208,8 +223,10 @@ public class AltosConfigTD implements ActionListener {
 					if (!config_version.get().equals("0.0"))
 						break;
 					been_there = true;
-					config.serial_line.printf("C\n ");
-					config.serial_line.flush_input();
+					if (config != null && config.serial_line != null) {
+						config.serial_line.printf("C\n ");
+						config.serial_line.flush_input();
+					}
 				}
 			} catch (InterruptedException ie) {
 			}
@@ -218,6 +235,7 @@ public class AltosConfigTD implements ActionListener {
 			 * available firmware version might place on the actual frequency
 			 */
 			config.set_frequency(AltosPreferences.frequency(serial.get()));
+			config.set_telemetry_rate(AltosPreferences.telemetry_rate(serial.get()));
 			config.process_line("all finished");
 		}
 
@@ -226,6 +244,8 @@ public class AltosConfigTD implements ActionListener {
 			if (frequency != 0)
 				AltosPreferences.set_frequency(serial.get(),
 							       frequency);
+			AltosPreferences.set_telemetry_rate(serial.get(),
+							    telemetry_rate());
 		}
 
 		public void run () {
@@ -259,8 +279,10 @@ public class AltosConfigTD implements ActionListener {
 	}
 
 	void abort() {
-		serial_line.close();
-		serial_line = null;
+		if (serial_line != null) {
+			serial_line.close();
+			serial_line = null;
+		}
 		JOptionPane.showMessageDialog(owner,
 					      String.format("Connection to \"%s\" failed",
 							    device.toShortString()),
@@ -279,6 +301,8 @@ public class AltosConfigTD implements ActionListener {
 	void save_data() {
 		double	freq = config_ui.radio_frequency();
 		set_frequency(freq);
+		int telemetry_rate = config_ui.telemetry_rate();
+		set_telemetry_rate(telemetry_rate);
 		run_serial_thread(serial_mode_save);
 	}
 
@@ -311,6 +335,7 @@ public class AltosConfigTD implements ActionListener {
 		radio_setting = new int_ref(0);
 		radio_frequency = new int_ref(0);
 		radio_calibration = new int_ref(1186611);
+		telemetry_rate = new int_ref(AltosLib.ao_telemetry_rate_38400);
 		config_version = new string_ref("0.0");
 		version = new string_ref("unknown");
 		product = new string_ref("unknown");

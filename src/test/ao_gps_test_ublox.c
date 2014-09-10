@@ -16,6 +16,7 @@
  */
 
 #define AO_GPS_TEST
+#define HAS_GPS	1
 #include "ao_host.h"
 #include <termios.h>
 #include <errno.h>
@@ -44,7 +45,7 @@ struct ao_telemetry_location {
 	uint8_t			flags;
 	int32_t			latitude;	/* degrees * 10⁷ */
 	int32_t			longitude;	/* degrees * 10⁷ */
-	int16_t			altitude;	/* m */
+	int16_t			altitude_low;	/* m */
 	uint16_t		ground_speed;	/* cm/s */
 	uint8_t			course;		/* degrees / 2 */
 	uint8_t			pdop;		/* * 5 */
@@ -53,7 +54,13 @@ struct ao_telemetry_location {
 	int16_t			climb_rate;	/* cm/s */
 	uint16_t		h_error;	/* m */
 	uint16_t		v_error;	/* m */
+	int16_t			altitude_high;	/* m */
 };
+
+typedef int32_t		gps_alt_t;
+#define AO_TELEMETRY_LOCATION_ALTITUDE(l) 	(((gps_alt_t) (l)->altitude_high << 16) | ((l)->altitude_low))
+#define AO_TELEMETRY_LOCATION_SET_ALTITUDE(l,a) (((l)->altitude_high = (a) >> 16), \
+						 ((l)->altitude_low = (a)))
 
 #define UBLOX_SAT_STATE_ACQUIRED		(1 << 0)
 #define UBLOX_SAT_STATE_CARRIER_PHASE_VALID	(1 << 1)

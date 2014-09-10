@@ -18,8 +18,8 @@
 package altosui;
 
 import java.util.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosPad extends AltosUIFlightTab {
 
@@ -117,6 +117,17 @@ public class AltosPad extends AltosUIFlightTab {
 		}
 	}
 
+	boolean report_pad(AltosState state) {
+		if ((state.state == AltosLib.ao_flight_stateless ||
+		     state.state < AltosLib.ao_flight_pad) &&
+		    state.gps != null &&
+		    state.gps.lat != AltosLib.MISSING)
+		{
+			return false;
+		}
+		return true;
+	}
+
 	class PadLat extends AltosUIIndicator {
 
 		double	last_lat = AltosLib.MISSING - 1;
@@ -126,12 +137,12 @@ public class AltosPad extends AltosUIFlightTab {
 			String label = null;
 
 			if (state != null) {
-				if (state.state < AltosLib.ao_flight_pad && state.gps != null && state.gps.lat != AltosLib.MISSING) {
-					lat = state.gps.lat;
-					label = "Latitude";
-				} else {
+				if (report_pad(state)) {
 					lat = state.pad_lat;
 					label = "Pad Latitude";
+				} else {
+					lat = state.gps.lat;
+					label = "Latitude";
 				}
 			}
 			if (lat != last_lat) {
@@ -163,12 +174,12 @@ public class AltosPad extends AltosUIFlightTab {
 			String label = null;
 
 			if (state != null) {
-				if (state.state < AltosLib.ao_flight_pad && state.gps != null && state.gps.lon != AltosLib.MISSING) {
-					lon = state.gps.lon;
-					label = "Longitude";
-				} else {
+				if (report_pad(state)) {
 					lon = state.pad_lon;
 					label = "Pad Longitude";
+				} else {
+					lon = state.gps.lon;
+					label = "Longitude";
 				}
 			}
 			if (lon != last_lon) {
@@ -200,12 +211,12 @@ public class AltosPad extends AltosUIFlightTab {
 			String label = null;
 
 			if (state != null) {
-				if (state.state < AltosLib.ao_flight_pad && state.gps != null && state.gps.alt != AltosLib.MISSING) {
-					alt = state.gps.alt;
-					label = "Altitude";
-				} else {
+				if (report_pad(state)) {
 					alt = state.pad_alt;
 					label = "Pad Altitude";
+				} else {
+					alt = state.gps.alt;
+					label = "Altitude";
 				}
 			}
 			if (alt != last_alt) {

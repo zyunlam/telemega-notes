@@ -18,6 +18,7 @@ fat:
 	cd libaltos && $(MAKE) all
 	cd altoslib && $(MAKE) all
 	cd altosuilib && $(MAKE) all
+	cd icon && $(MAKE) fat
 	cd altosui && $(MAKE) fat
 	cd micropeak && $(MAKE) fat
 	cd telegps && $(MAKE) fat

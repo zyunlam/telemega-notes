@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.location.Location;
 
-public class TabLanded extends Fragment implements AltosDroidTab {
+public class TabLanded extends AltosDroidTab {
 	AltosDroid mAltosDroid;
 
 	private TextView mBearingView;
@@ -73,10 +73,12 @@ public class TabLanded extends Fragment implements AltosDroidTab {
 		mAltosDroid = null;
 	}
 
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public String tab_name() { return "landed"; }
+
+	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
-			mDistanceView.setText(String.format("%6.0f m", from_receiver.distance));
+			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
 		}
 		if (state != null && state.gps != null) {
 			mTargetLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
@@ -87,12 +89,11 @@ public class TabLanded extends Fragment implements AltosDroidTab {
 			mReceiverLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
 			mReceiverLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "W", "E"));
 		}
-	       
+
 		if (state != null) {
-			mMaxHeightView.setText(String.format("%6.0f m", state.max_height()));
-			mMaxAccelView.setText(String.format("%6.0f m/s²", state.max_acceleration()));
-			mMaxSpeedView.setText(String.format("%6.0f m/s", state.max_speed()));
+			set_value(mMaxHeightView, AltosConvert.height, 6, state.max_height());
+			set_value(mMaxAccelView, AltosConvert.accel, 6, state.max_acceleration());
+			set_value(mMaxSpeedView, AltosConvert.speed, 6, state.max_speed());
 		}
 	}
-
 }

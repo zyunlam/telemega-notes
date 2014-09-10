@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -29,7 +29,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.location.Location;
 
-public class TabDescent extends Fragment implements AltosDroidTab {
+public class TabDescent extends AltosDroidTab {
 	AltosDroid mAltosDroid;
 
 	private TextView mSpeedView;
@@ -89,16 +89,18 @@ public class TabDescent extends Fragment implements AltosDroidTab {
 		mAltosDroid = null;
 	}
 
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public String tab_name() { return "descent"; }
+
+	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
-			mSpeedView.setText(AltosDroid.number("%6.0f m/s", state.speed()));
-			mHeightView.setText(AltosDroid.number("%6.0f m", state.height()));
+			set_value(mSpeedView, AltosConvert.speed, 6, state.speed());
+			set_value(mHeightView, AltosConvert.height, 6, state.height());
 			if (from_receiver != null) {
 				mElevationView.setText(AltosDroid.number("%3.0f°", from_receiver.elevation));
-				mRangeView.setText(AltosDroid.number("%6.0f m", from_receiver.range));
+				set_value(mRangeView, AltosConvert.distance, 6, from_receiver.range);
 				mBearingView.setText(AltosDroid.number("%3.0f°", from_receiver.bearing));
 				mCompassView.setText(from_receiver.bearing_words(AltosGreatCircle.BEARING_LONG));
-				mDistanceView.setText(AltosDroid.number("%6.0f m", from_receiver.distance));
+				set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
 			} else { 
 				mElevationView.setText("<unknown>");
 				mRangeView.setText("<unknown>");

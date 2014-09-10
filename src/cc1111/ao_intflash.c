@@ -129,6 +129,8 @@ ao_intflash_write_aligned(uint16_t pos, __xdata void *d, uint16_t len) __reentra
 		nop
 		_endasm;
 	}
+	__critical while (!ao_intflash_dma_done)
+			   ao_sleep(&ao_intflash_dma_done);
 }
 
 static void

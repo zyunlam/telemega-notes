@@ -56,26 +56,41 @@ ALTOSUILIB_CLASS=\
 ICONDIR=$(top_srcdir)/icon
 
 JAVA_ICONS=\
-	$(ICONDIR)/micropeak-16.png \
-	$(ICONDIR)/micropeak-32.png \
-	$(ICONDIR)/micropeak-48.png \
-	$(ICONDIR)/micropeak-64.png \
-	$(ICONDIR)/micropeak-128.png \
-	$(ICONDIR)/micropeak-256.png
+	$(ICONDIR)/altusmetrum-micropeak-16.png \
+	$(ICONDIR)/altusmetrum-micropeak-32.png \
+	$(ICONDIR)/altusmetrum-micropeak-48.png \
+	$(ICONDIR)/altusmetrum-micropeak-64.png \
+	$(ICONDIR)/altusmetrum-micropeak-128.png\
+	$(ICONDIR)/altusmetrum-micropeak-256.png
 
 # icon base names for jar
-ICONJAR= -C $(ICONDIR) micropeak-16.png \
-	-C $(ICONDIR) micropeak-32.png \
-	-C $(ICONDIR) micropeak-48.png \
-	-C $(ICONDIR) micropeak-64.png \
-	-C $(ICONDIR) micropeak-128.png \
-	-C $(ICONDIR) micropeak-256.png
+ICONJAR= \
+	-C $(ICONDIR) altusmetrum-micropeak-16.png \
+	-C $(ICONDIR) altusmetrum-micropeak-32.png \
+	-C $(ICONDIR) altusmetrum-micropeak-48.png \
+	-C $(ICONDIR) altusmetrum-micropeak-64.png \
+	-C $(ICONDIR) altusmetrum-micropeak-128.png\
+	-C $(ICONDIR) altusmetrum-micropeak-256.png
 
-WINDOWS_ICON=$(ICONDIR)/micro-peak.ico
-MACOSX_ICON=$(ICONDIR)/MicroPeak.icns
+WINDOWS_ICONS	=\
+	../icon/altusmetrum-micropeak.ico \
+	../icon/altusmetrum-micropeak.exe
+	../icon/application-vnd.altusmetrum.micropeak.ico \
+	../icon/application-vnd.altusmetrum.micropeak.ico
+
+MACOSX_ICONS	=\
+	../icon/altusmetrum-micropeak.icns \
+	../icon/application-vnd.altusmetrum.micropeak.icns
+
+LINUX_ICONS	=\
+	$(ICONDIR)/altusmetrum-micropeak.svg \
+	$(ICONDIR)/application-vnd.altusmetrum.micropeak.svg
+
+LINUX_MIMETYPE	=\
+	$(ICONDIR)/org-altusmetrum-mimetypes.xml
 
 desktopdir = $(datadir)/applications
-desktop_file = micropeak.desktop
+desktop_file = altusmetrum-micropeak.desktop
 desktop_SCRIPTS = $(desktop_file)
 
 all-local: micropeak-test micropeak-jdb $(JAR)
@@ -87,12 +102,12 @@ clean-local:
 		$(ALTOSUILIB_CLASS) \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		micropeak micropeak-test micropeak-jdb macosx linux windows micropeak-windows.log \
-		micropeak-windows.nsi
+		micropeak-windows.nsi *.desktop
 
 EXTRA_DIST = $(desktop_file).in
 
 $(desktop_file): $(desktop_file).in
-	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/micropeak.desktop.in > $@
+	sed -e 's#%bindir%#@bindir@#' -e 's#%icondir%#$(datadir)/icons/hicolor/scalable/apps#' ${srcdir}/$(desktop_file).in > $@
 	chmod +x $@
 
 LINUX_DIST=MicroPeak-Linux-$(VERSION).tar.bz2
@@ -106,14 +121,14 @@ DOC=$(MICROPEAK_DOC)
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) micropeak.desktop.in ../icon/micropeak.svg
-LINUX_EXTRA=micropeak-fat micropeak.desktop.in
+LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
+LINUX_EXTRA=micropeak-fat $(desktop_file).in
 
 MACOSX_DRIVER_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg
 MACOSX_DRIVER=FTDIUSBSerialDriver_v2_2_18.dmg
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVER) $(MACOSX_README) $(DOC) $(MACOSX_ICON)
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVER) $(MACOSX_README) $(DOC) $(MACOSX_ICONS)
 
 $(MACOSX_DRIVER):
 	wget $(MACOSX_DRIVER_URL)
@@ -124,7 +139,7 @@ WINDOWS_DRIVER=CDM20824_Setup.exe
 $(WINDOWS_DRIVER):
 	wget $(WINDOWS_DRIVER_URL)
 
-WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(DOC) $(WINDOWS_ICON) $(WINDOWS_DRIVER)
+WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(DOC) $(WINDOWS_ICONS) $(WINDOWS_DRIVER)
 
 if FATINSTALL
 
@@ -261,7 +276,7 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	cp -p Info.plist macosx/MicroPeak.app/Contents
 	cp -p $(MACOSX_DRIVER) macosx
 	mkdir -p macosx/MicroPeak.app/Contents/Resources/Java
-	cp -p $(MACOSX_ICON) macosx/MicroPeak.app/Contents/Resources
+	cp -p $(MACOSX_ICONS) macosx/MicroPeak.app/Contents/Resources
 	cp -p $(FATJAR) macosx/MicroPeak.app/Contents/Resources/Java/micropeak.jar
 	cp -p libaltos.dylib macosx/MicroPeak.app/Contents/Resources/Java
 	cp -p $(ALTOSLIB_CLASS) macosx/MicroPeak.app/Contents/Resources/Java

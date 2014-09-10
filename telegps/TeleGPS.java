@@ -23,8 +23,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class TeleGPS
 	extends AltosUIFrame
@@ -32,12 +32,12 @@ public class TeleGPS
 {
 
 	static String[] telegps_icon_names = {
-		"/telegps-16.png",
-		"/telegps-32.png",
-		"/telegps-48.png",
-		"/telegps-64.png",
-		"/telegps-128.png",
-		"/telegps-256.png"
+		"/altusmetrum-telegps-16.png",
+		"/altusmetrum-telegps-32.png",
+		"/altusmetrum-telegps-48.png",
+		"/altusmetrum-telegps-64.png",
+		"/altusmetrum-telegps-128.png",
+		"/altusmetrum-telegps-256.png"
 	};
 
 	static { set_icon_names(telegps_icon_names); }
@@ -58,8 +58,10 @@ public class TeleGPS
 	JMenu			file_menu;
 	JMenu			monitor_menu;
 	JMenu			device_menu;
-	AltosFreqList		frequencies;
+	AltosUIFreqList		frequencies;
 	ActionListener		frequency_listener;
+	AltosUIRateList		rates;
+	ActionListener		rate_listener;
 
 	Container		bag;
 
@@ -184,6 +186,7 @@ public class TeleGPS
 
 		telegps_status.disable_receive();
 		disable_frequency_menu();
+		disable_rate_menu();
 	}
 
 	void connect(AltosDevice device) {
@@ -364,6 +367,40 @@ public class TeleGPS
 
 	}
 
+	void enable_rate_menu(int serial, final AltosFlightReader reader) {
+
+		if (rate_listener != null)
+			disable_rate_menu();
+
+		rate_listener = new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int rate = rates.rate();
+					try {
+						System.out.printf("set rate %d\n", rate);
+						reader.set_telemetry_rate(rate);
+					} catch (TimeoutException te) {
+					} catch (InterruptedException ie) {
+					}
+					reader.save_telemetry_rate();
+				}
+			};
+
+		rates.addActionListener(rate_listener);
+		rates.set_product("Monitor");
+		rates.set_serial(serial);
+		rates.set_rate(AltosUIPreferences.telemetry_rate(serial));
+		rates.setEnabled(reader.supports_telemetry_rate(AltosLib.ao_telemetry_rate_2400));
+	}
+
+	void disable_rate_menu() {
+		if (rate_listener != null) {
+			rates.removeActionListener(rate_listener);
+			rates.setEnabled(false);
+			rate_listener = null;
+		}
+
+	}
+
 	public void set_reader(AltosFlightReader reader, AltosDevice device) {
 		status_update = new TeleGPSStatusUpdate(telegps_status);
 
@@ -374,8 +411,10 @@ public class TeleGPS
 		thread = new TeleGPSDisplayThread(this, voice(), this, reader);
 		thread.start();
 
-		if (device != null)
+		if (device != null) {
 			enable_frequency_menu(device.getSerial(), reader);
+			enable_rate_menu(device.getSerial(), reader);
+		}
 	}
 
 	static int	number_of_windows;
@@ -409,15 +448,37 @@ public class TeleGPS
 
 	private JMenu make_menu(String label, String[][] items) {
 		JMenu	menu = new JMenu(label);
-		for (int i = 0; i < items.length; i++)
+		for (int i = 0; i < items.length; i++) {
+			if (MAC_OS_X) {
+				if (items[i][1].equals("exit"))
+					continue;
+				if (items[i][1].equals("preferences"))
+					continue;
+			}
 			add_menu(menu, items[i][0], items[i][1]);
+		}
 		menu_bar.add(menu);
 		return menu;
+	}
+
+	/* OSXAdapter interfaces */
+	public void macosx_file_handler(String path) {
+		process_graph(new File(path));
+	}
+
+	public void macosx_quit_handler() {
+		System.exit(0);
+	}
+
+	public void macosx_preferences_handler() {
+		preferences();
 	}
 
 	public TeleGPS() {
 
 		AltosUIPreferences.set_component(this);
+
+		register_for_macosx_events();
 
 		reader = null;
 
@@ -434,9 +495,26 @@ public class TeleGPS
 		file_menu = make_menu("File", file_menu_entries);
 		monitor_menu = make_menu("Monitor", monitor_menu_entries);
 		device_menu = make_menu("Device", device_menu_entries);
-		frequencies = new AltosFreqList();
+
+		frequencies = new AltosUIFreqList();
 		frequencies.setEnabled(false);
-		menu_bar.add(frequencies);
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.WEST;
+		c.weightx = 0;
+		c.gridwidth = 1;
+		bag.add(frequencies, c);
+
+		rates = new AltosUIRateList();
+		rates.setEnabled(false);
+		c.gridx = 1;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.WEST;
+		c.weightx = 0;
+		c.gridwidth = 1;
+		bag.add(rates, c);
 
 		displays = new LinkedList<AltosFlightDisplay>();
 

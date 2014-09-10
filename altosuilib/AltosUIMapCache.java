@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import javax.swing.*;
 import javax.imageio.ImageIO;
@@ -24,30 +24,31 @@ import java.awt.*;
 import java.io.*;
 import java.net.*;
 
-public class AltosUIMapCache {
+public class AltosUIMapCache implements AltosUIMapCacheListener {
 	static final int	success = 0;
 	static final int	loading = 1;
 	static final int	failed = 2;
 	static final int	bad_request = 3;
 	static final int	forbidden = 4;
 
-	static final int	min_cache_size = 9;
-	static final int	max_cache_size = 24;
+	int			min_cache_size;		/* configured minimum cache size */
+	int			cache_size;		/* current cache size */
+	int			requested_cache_size;	/* cache size computed by application */
 
 	private Object 		fetch_lock = new Object();
 	private Object 		cache_lock = new Object();
-
-	int			cache_size = min_cache_size;
 
 	AltosUIMapImage[]	images = new AltosUIMapImage[cache_size];
 
 	long			used;
 
 	public void set_cache_size(int new_size) {
+
+		requested_cache_size = new_size;
+
 		if (new_size < min_cache_size)
 			new_size = min_cache_size;
-		if (new_size > max_cache_size)
-			new_size = max_cache_size;
+
 		if (new_size == cache_size)
 			return;
 
@@ -109,6 +110,28 @@ public class AltosUIMapCache {
 		}
 	}
 
+	public void map_cache_changed(int map_cache) {
+		min_cache_size = map_cache;
+
+		set_cache_size(requested_cache_size);
+	}
+
+	public void dispose() {
+		AltosUIPreferences.unregister_map_cache_listener(this);
+
+		for (int i = 0; i < cache_size; i++) {
+			AltosUIMapImage image = images[i];
+
+			if (image != null)
+			    image.flush();
+		}
+	}
+
 	public AltosUIMapCache() {
+		min_cache_size = AltosUIPreferences.map_cache();
+
+		set_cache_size(0);
+
+		AltosUIPreferences.register_map_cache_listener(this);
 	}
 }

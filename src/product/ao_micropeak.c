@@ -73,8 +73,9 @@ main(void)
 	ao_report_altitude();
 	ao_pips();
 	ao_log_micro_dump();
-	
+#if BOOST_DELAY	
 	ao_delay(BOOST_DELAY);
+#endif
 
 	ao_microflight();
 

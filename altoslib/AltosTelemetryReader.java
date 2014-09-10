@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.text.*;
 import java.io.*;
@@ -26,11 +26,19 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	AltosLog	log;
 	double		frequency;
 	int		telemetry;
+	int		telemetry_rate;
 	AltosState	state = null;
+	AltosFlightReader	stacked;
 
 	LinkedBlockingQueue<AltosLine> telem;
 
 	public AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException {
+		if (stacked != null) {
+			state = stacked.read();
+			if (state != null)
+				return state;
+			stacked = null;
+		}
 		AltosLine l = telem.take();
 		if (l.line == null)
 			throw new IOException("IO error");
@@ -52,6 +60,12 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	}
 
 	public void close(boolean interrupted) {
+
+		if (stacked != null) {
+			stacked.close(interrupted);
+			stacked = null;
+		}
+
 		link.remove_monitor(telem);
 		log.close();
 		try {
@@ -92,6 +106,23 @@ public class AltosTelemetryReader extends AltosFlightReader {
 		}
 	}
 
+	public boolean supports_telemetry_rate(int telemetry_rate) {
+		try {
+			/* Version 1.4.1.1 supports all rates, older versions don't */
+			if (link.config_data().compare_version("1.4.1.1") >= 0)
+				return true;
+
+			if (telemetry_rate == AltosLib.ao_telemetry_rate_38400)
+				return true;
+			else
+				return false;
+		} catch (InterruptedException ie) {
+			return false;
+		} catch (TimeoutException te) {
+			return true;
+		}
+	}
+
 	public void save_frequency() {
 		AltosPreferences.set_frequency(link.serial, frequency);
 	}
@@ -103,6 +134,15 @@ public class AltosTelemetryReader extends AltosFlightReader {
 
 	public void save_telemetry() {
 		AltosPreferences.set_telemetry(link.serial, telemetry);
+	}
+
+	public void set_telemetry_rate(int in_telemetry_rate) {
+		telemetry_rate = in_telemetry_rate;
+		link.set_telemetry_rate(telemetry_rate);
+	}
+
+	public void save_telemetry_rate() {
+		AltosPreferences.set_telemetry_rate(link.serial, telemetry_rate);
 	}
 
 	public void set_monitor(boolean monitor) {
@@ -121,9 +161,10 @@ public class AltosTelemetryReader extends AltosFlightReader {
 		return link.monitor_battery();
 	}
 
-	public AltosTelemetryReader (AltosLink in_link)
+	public AltosTelemetryReader (AltosLink in_link, AltosFlightReader in_stacked)
 		throws IOException, InterruptedException, TimeoutException {
 		link = in_link;
+		stacked = in_stacked;
 		boolean success = false;
 		try {
 			log = new AltosLog(link);
@@ -133,11 +174,31 @@ public class AltosTelemetryReader extends AltosFlightReader {
 			set_frequency(frequency);
 			telemetry = AltosPreferences.telemetry(link.serial);
 			set_telemetry(telemetry);
+			telemetry_rate = AltosPreferences.telemetry_rate(link.serial);
+			set_telemetry_rate(telemetry_rate);
 			link.add_monitor(telem);
 			success = true;
 		} finally {
 			if (!success)
 				close(true);
 		}
+	}
+
+	private static AltosFlightReader existing_data(AltosLink link) {
+		if (link == null)
+			return null;
+
+		File	file = AltosPreferences.logfile(link.serial);
+		if (file != null) {
+			AltosStateIterable	iterable = AltosStateIterable.iterable(file);
+			if (iterable != null)
+				return new AltosReplayReader(iterable.iterator(), file, false);
+		}
+		return null;
+	}
+
+	public AltosTelemetryReader(AltosLink link)
+		throws IOException, InterruptedException, TimeoutException {
+		this(link, existing_data(link));
 	}
 }

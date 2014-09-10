@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.io.*;
 import java.util.*;
@@ -49,7 +49,8 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 	/* AO_LOG_GPS_POS elements */
 	public int latitude() { return data32(0); }
 	public int longitude() { return data32(4); }
-	public int altitude() { return data16(8); }
+	public int altitude_low() { return data16(8); }
+	public int altitude_high() { return data16(10); }
 
 	/* AO_LOG_GPS_TIME elements */
 	public int hour() { return data8(0); }
@@ -59,6 +60,7 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 	public int year() { return data8(4); }
 	public int month() { return data8(5); }
 	public int day() { return data8(6); }
+	public int pdop() { return data8(7); }
 
 	/* AO_LOG_GPS_SAT elements */
 	public int nsat() { return data8(0); }
@@ -117,7 +119,10 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 			gps = state.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
-			gps.alt = altitude();
+			if (state.altitude_32())
+				gps.alt = (altitude_low() & 0xffff) | (altitude_high() << 16);
+			else
+				gps.alt = altitude_low();
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
 			gps = state.make_temp_gps(false);
@@ -136,6 +141,7 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 			gps.year = 2000 + year();
 			gps.month = month();
 			gps.day = day();
+			gps.pdop = pdop() / 10.0;
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
 			gps = state.make_temp_gps(true);

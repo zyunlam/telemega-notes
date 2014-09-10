@@ -258,7 +258,7 @@ ao_lco_search(void)
 	for (box = 0; box < AO_PAD_MAX_BOXES; box++) {
 		if ((box % 10) == 0)
 			ao_lco_set_box(box);
-		for (try = 0; try < 5; try++) {
+		for (try = 0; try < 3; try++) {
 			tick_offset = 0;
 			r = ao_lco_query(box, &ao_pad_query, &tick_offset);
 			PRINTD("box %d result %d\n", box, r);

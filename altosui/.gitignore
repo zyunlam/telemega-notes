@@ -17,7 +17,7 @@ Altos-Linux-*.tar.bz2
 Altos-Linux-*.sh
 Altos-Mac-*.zip
 Altos-Windows-*.exe
-altos.desktop
+.desktop
 *.dll
 *.dylib
 *.so

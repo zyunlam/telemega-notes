@@ -24,8 +24,8 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.Arrays;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDisplay, AltosIdleMonitorListener, DocumentListener {
 	AltosDevice		device;
@@ -33,9 +33,11 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 	AltosPad		pad;
 	AltosInfoTable		flightInfo;
 	AltosFlightStatus	flightStatus;
+	AltosIgnitor		ignitor;
 	AltosIdleMonitor	thread;
 	int			serial;
 	boolean			remote;
+	boolean			has_ignitor;
 
 	void stop_display() {
 		if (thread != null) {
@@ -70,10 +72,22 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 	public void show(AltosState state, AltosListenerState listener_state) {
 		status_update.saved_state = state;
+		if (ignitor.should_show(state)) {
+			if (!has_ignitor) {
+				pane.add("Ignitor", ignitor);
+				has_ignitor = true;
+			}
+		} else {
+			if (has_ignitor) {
+				pane.remove(ignitor);
+				has_ignitor = false;
+			}
+		}
 //		try {
 			pad.show(state, listener_state);
 			flightStatus.show(state, listener_state);
 			flightInfo.show(state, listener_state);
+			ignitor.show(state, listener_state);
 //		} catch (Exception e) {
 //			System.out.print("Show exception " + e);
 //		}
@@ -89,7 +103,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 	}
 
 	Container	bag;
-	AltosFreqList	frequencies;
+	AltosUIFreqList	frequencies;
 	JTextField	callsign_value;
 
 	/* DocumentListener interface methods */
@@ -186,7 +200,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		/* Stick frequency selector at top of table for telemetry monitoring */
 		if (remote && serial >= 0) {
 			// Frequency menu
-			frequencies = new AltosFreqList(AltosUIPreferences.frequency(serial));
+			frequencies = new AltosUIFreqList(AltosUIPreferences.frequency(serial));
 			frequencies.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						double frequency = frequencies.frequency();
@@ -221,6 +235,8 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 		flightInfo = new AltosInfoTable();
 		pane.add("Table", new JScrollPane(flightInfo));
+
+		ignitor = new AltosIgnitor();
 
 		/* Make the tabbed pane use the rest of the window space */
 		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));

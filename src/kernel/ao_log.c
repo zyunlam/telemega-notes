@@ -142,19 +142,39 @@ ao_log_max_flight(void)
 	return max_flight;
 }
 
-void
-ao_log_scan(void) __reentrant
+static void
+ao_log_erase(uint8_t slot) __reentrant
 {
-	uint8_t		log_slot;
-	uint8_t		log_slots;
-	uint8_t		log_want;
+	uint32_t log_current_pos, log_end_pos;
 
-	ao_config_get();
+	ao_log_erase_mark();
+	log_current_pos = ao_log_pos(slot);
+	log_end_pos = log_current_pos + ao_config.flight_log_max;
+	while (log_current_pos < log_end_pos) {
+		uint8_t	i;
+		static __xdata uint8_t b;
 
-	ao_flight_number = ao_log_max_flight();
-	if (ao_flight_number)
-		if (++ao_flight_number == 0)
-			ao_flight_number = 1;
+		/*
+		 * Check to see if we've reached the end of
+		 * the used memory to avoid re-erasing the same
+		 * memory over and over again
+		 */
+		for (i = 0; i < 16; i++) {
+			if (ao_storage_read(log_current_pos + i, &b, 1))
+				if (b != 0xff)
+					break;
+		}
+		if (i == 16)
+			break;
+		ao_storage_erase(log_current_pos);
+		log_current_pos += ao_storage_block;
+	}
+}
+
+static void
+ao_log_find_max_erase_flight(void) __reentrant
+{
+	uint8_t	log_slot;
 
 	/* Now look through the log of flight numbers from erase operations and
 	 * see if the last one is bigger than what we found above
@@ -170,6 +190,80 @@ ao_log_scan(void) __reentrant
 	}
 	if (ao_flight_number == 0)
 		ao_flight_number = 1;
+}
+
+uint8_t
+ao_log_scan(void) __reentrant
+{
+	uint8_t		log_slot;
+	uint8_t		log_slots;
+#if FLIGHT_LOG_APPEND
+	uint8_t		ret;
+#else
+	uint8_t		log_want;
+#endif
+
+	ao_config_get();
+
+	/* Get any existing flight number */
+	ao_flight_number = ao_log_max_flight();
+
+#if FLIGHT_LOG_APPEND
+
+	/* Deal with older OS versions which stored multiple
+	 * flights in rom by erasing everything after the first
+	 * slot
+	 */
+	if (ao_config.flight_log_max != ao_storage_log_max) {
+		log_slots = ao_log_slots();
+		for (log_slot = 1; log_slot < log_slots; log_slot++) {
+			if (ao_log_flight(log_slot) != 0)
+				ao_log_erase(log_slot);
+		}
+		ao_config_log_fix_append();
+	}
+	ao_log_current_pos = ao_log_pos(0);
+	ao_log_end_pos = ao_log_current_pos + ao_storage_log_max;
+
+	if (ao_flight_number) {
+		uint32_t	full = ao_log_current_pos;
+		uint32_t	empty = ao_log_end_pos - ao_log_size;
+
+		/* If there's already a flight started, then find the
+		 * end of it
+		 */
+		for (;;) {
+			ao_log_current_pos = (full + empty) >> 1;
+			ao_log_current_pos -= ao_log_current_pos % ao_log_size;
+
+			if (ao_log_current_pos == full) {
+				if (ao_log_check(ao_log_current_pos))
+					ao_log_current_pos += ao_log_size;
+				break;
+			}
+			if (ao_log_current_pos == empty)
+				break;
+
+			if (ao_log_check(ao_log_current_pos)) {
+				full = ao_log_current_pos;
+			} else {
+				empty = ao_log_current_pos;
+			}
+		}
+		ret = 1;
+	} else {
+		ao_log_find_max_erase_flight();
+		ret = 0;
+	}
+	ao_wakeup(&ao_flight_number);
+	return ret;
+#else
+
+	if (ao_flight_number)
+		if (++ao_flight_number == 0)
+			ao_flight_number = 1;
+
+	ao_log_find_max_erase_flight();
 
 	/* With a flight number in hand, find a place to write a new log,
 	 * use the target flight number to index the available log slots so
@@ -190,8 +284,9 @@ ao_log_scan(void) __reentrant
 		if (++log_slot >= log_slots)
 			log_slot = 0;
 	} while (log_slot != log_want);
-
 	ao_wakeup(&ao_flight_number);
+	return 0;
+#endif
 }
 
 void
@@ -254,7 +349,6 @@ ao_log_delete(void) __reentrant
 {
 	uint8_t slot;
 	uint8_t slots;
-	uint32_t log_current_pos, log_end_pos;
 
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -268,28 +362,7 @@ ao_log_delete(void) __reentrant
 #if HAS_TRACKER
 				ao_tracker_erase_start(ao_cmd_lex_i);
 #endif
-				ao_log_erase_mark();
-				log_current_pos = ao_log_pos(slot);
-				log_end_pos = log_current_pos + ao_config.flight_log_max;
-				while (log_current_pos < log_end_pos) {
-					uint8_t	i;
-					static __xdata uint8_t b;
-
-					/*
-					 * Check to see if we've reached the end of
-					 * the used memory to avoid re-erasing the same
-					 * memory over and over again
-					 */
-					for (i = 0; i < 16; i++) {
-						if (ao_storage_read(log_current_pos + i, &b, 1))
-							if (b != 0xff)
-								break;
-					}
-					if (i == 16)
-						break;
-					ao_storage_erase(log_current_pos);
-					log_current_pos += ao_storage_block;
-				}
+				ao_log_erase(slot);
 #if HAS_TRACKER
 				ao_tracker_erase_end();
 #endif

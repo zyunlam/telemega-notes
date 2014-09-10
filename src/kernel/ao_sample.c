@@ -245,7 +245,7 @@ ao_sample_preflight(void)
 	} else {
 #if HAS_ACCEL
 		ao_accel_2g = ao_config.accel_minus_g - ao_config.accel_plus_g;
-		ao_accel_scale = to_fix32(GRAVITY * 2 * 16) / ao_accel_2g;
+		ao_accel_scale = to_fix_32(GRAVITY * 2 * 16) / ao_accel_2g;
 #endif
 		ao_sample_preflight_set();
 		ao_preflight = FALSE;

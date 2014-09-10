@@ -34,14 +34,20 @@
 #define ao_data_ring_next(n)	(((n) + 1) & (AO_DATA_RING - 1))
 #define ao_data_ring_prev(n)	(((n) - 1) & (AO_DATA_RING - 1))
 
+#if 0
 #define AO_M_TO_HEIGHT(m)	((int16_t) (m))
 #define AO_MS_TO_SPEED(ms)	((int16_t) ((ms) * 16))
 #define AO_MSS_TO_ACCEL(mss)	((int16_t) ((mss) * 16))
+#endif
 
 #define AO_GPS_NEW_DATA		1
 #define AO_GPS_NEW_TRACKING	2
 
 int ao_gps_new;
+
+#if !defined(TELEMEGA) && !defined(TELEMETRUM_V2)
+#define TELEMETRUM_V1 1
+#endif
 
 #if TELEMEGA
 #define AO_ADC_NUM_SENSE	6
@@ -50,6 +56,7 @@ int ao_gps_new;
 #define HAS_MMA655X		1
 #define HAS_HMC5883 		1
 #define HAS_BEEP		1
+#define AO_CONFIG_MAX_SIZE	1024
 
 struct ao_adc {
 	int16_t			sense[AO_ADC_NUM_SENSE];
@@ -57,7 +64,25 @@ struct ao_adc {
 	int16_t			v_pbatt;
 	int16_t			temp;
 };
-#else
+#endif
+
+#if TELEMETRUM_V2
+#define AO_ADC_NUM_SENSE	2
+#define HAS_MS5607		1
+#define HAS_MMA655X		1
+#define HAS_BEEP		1
+#define AO_CONFIG_MAX_SIZE	1024
+
+struct ao_adc {
+	int16_t			sense_a;
+	int16_t			sense_m;
+	int16_t			v_batt;
+	int16_t			temp;
+};
+#endif
+
+
+#if TELEMETRUM_V1
 /*
  * One set of samples read from the A/D converter
  */
@@ -92,6 +117,7 @@ struct ao_adc {
 #include <ao_data.h>
 #include <ao_log.h>
 #include <ao_telemetry.h>
+#include <ao_sample.h>
 
 #if TELEMEGA
 int ao_gps_count;
@@ -174,7 +200,7 @@ ao_gps_angle(void)
 			ao_gps_static.latitude / 1e7,
 			ao_gps_static.longitude / 1e7,
 			&dist, &bearing);
-	height = ao_gps_static.altitude - ao_gps_prev.altitude;
+	height = AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_static) - AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_prev);
 
 	angle = atan2(dist, height);
 	return angle * 180/M_PI;
@@ -184,17 +210,6 @@ ao_gps_angle(void)
 #define to_fix16(x) ((int16_t) ((x) * 65536.0 + 0.5))
 #define to_fix32(x) ((int32_t) ((x) * 65536.0 + 0.5))
 #define from_fix(x)	((x) >> 16)
-
-/*
- * Above this height, the baro sensor doesn't work
- */
-#define AO_BARO_SATURATE	13000
-#define AO_MIN_BARO_VALUE	ao_altitude_to_pres(AO_BARO_SATURATE)
-
-/*
- * Above this speed, baro measurements are unreliable
- */
-#define AO_MAX_BARO_SPEED	200
 
 #define ACCEL_NOSE_UP	(ao_accel_2g >> 2)
 
@@ -233,7 +248,7 @@ double	main_time;
 
 int	tick_offset;
 
-static int32_t	ao_k_height;
+static ao_k_t	ao_k_height;
 
 int16_t
 ao_time(void)
@@ -305,7 +320,7 @@ struct ao_cmds {
 #define ao_xmemcmp(d,s,c) memcmp(d,s,c)
 
 #define AO_NEED_ALTITUDE_TO_PRES 1
-#if TELEMEGA
+#if TELEMEGA || TELEMETRUM_V2
 #include "ao_convert_pa.c"
 #include <ao_ms5607.h>
 struct ao_ms5607_prom	ao_ms5607_prom;
@@ -455,7 +470,7 @@ ao_insert(void)
 #else
 		double	accel = 0.0;
 #endif
-#if TELEMEGA
+#if TELEMEGA || TELEMETRUM_V2
 		double	height;
 
 		ao_ms5607_convert(&ao_data_static.ms5607_raw, &ao_data_static.ms5607_cooked);
@@ -550,6 +565,7 @@ ao_insert(void)
 				mag_azel.el,
 				mag_azel.az);
 #endif
+#if 0
 			printf ("%7.2f state %-8.8s height %8.4f tilt %4d rot %4d dist %12.2f gps_tilt %4d gps_sats %2d\n",
 				time,
 				ao_state_names[ao_flight_state],
@@ -559,6 +575,7 @@ ao_insert(void)
 				(int) floor (ao_gps_angle() + 0.5),
 				(ao_gps_static.flags & 0xf) * 10);
 
+#endif
 #if 0
 			printf ("\t\tstate %-8.8s ground az: %4d el %4d mag az %4d el %4d rot az %4d el %4d el_diff %4d az_diff %4d angle %4d tilt %4d ground %8.5f %8.5f %8.5f cur %8.5f %8.5f %8.5f rot %8.5f %8.5f %8.5f\n",
 				ao_state_names[ao_flight_state],
@@ -581,9 +598,9 @@ ao_insert(void)
 #endif
 #endif
 
-#if 0
+#if 1
 			printf("%7.2f height %8.2f accel %8.3f "
-#if TELEMEGA
+#if TELEMEGA && 0
 			       "angle %5d "
 			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
 #endif
@@ -591,7 +608,7 @@ ao_insert(void)
 			       time,
 			       height,
 			       accel,
-#if TELEMEGA
+#if TELEMEGA && 0
 			       ao_sample_orient,
 
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_x),
@@ -674,7 +691,8 @@ ao_sleep(void *wchan)
 			{
 #if TELEMEGA
 				ao_data_static.mpu6000 = ao_ground_mpu6000;
-#else
+#endif
+#if TELEMETRUM_V1
 				ao_data_static.adc.accel = ao_flight_ground_accel;
 #endif
 				ao_insert();
@@ -755,7 +773,10 @@ ao_sleep(void *wchan)
 					ao_gps_static.tick = tick;
 					ao_gps_static.latitude = int32(bytes, 0);
 					ao_gps_static.longitude = int32(bytes, 4);
-					ao_gps_static.altitude = int32(bytes, 8);
+					{
+						int32_t	altitude = int32(bytes, 8);
+						AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_static, altitude);
+					}
 					ao_gps_static.flags = bytes[13];
 					if (!ao_gps_count)
 						ao_gps_first = ao_gps_static;
@@ -795,11 +816,64 @@ ao_sleep(void *wchan)
 					pyro->flags |= ao_pyro_values[j].flag;
 					if (ao_pyro_values[j].offset != NO_VALUE && i + 1 < nword) {
 						int16_t	val = strtoul(words[++i], NULL, 10);
+						printf("pyro %d condition %s value %d\n", p, words[i-1], val);
 						*((int16_t *) ((char *) pyro + ao_pyro_values[j].offset)) = val;
 					}
 				}
 			}
-#else
+#endif
+#if TELEMETRUM_V2
+			if (log_format == AO_LOG_FORMAT_TELEMETRUM && nword == 14 && strlen(words[0]) == 1) {
+				int	i;
+				struct ao_ms5607_value	value;
+
+				type = words[0][0];
+				tick = strtoul(words[1], NULL, 16);
+//				printf ("%c %04x", type, tick);
+				for (i = 2; i < nword; i++) {
+					bytes[i - 2] = strtoul(words[i], NULL, 16);
+//					printf(" %02x", bytes[i-2]);
+				}
+//				printf ("\n");
+				switch (type) {
+				case 'F':
+					ao_flight_ground_accel = int16(bytes, 2);
+					ao_flight_started = 1;
+					ao_ground_pres = int32(bytes, 4);
+					ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
+					break;
+				case 'A':
+					ao_data_static.tick = tick;
+					ao_data_static.ms5607_raw.pres = int32(bytes, 0);
+					ao_data_static.ms5607_raw.temp = int32(bytes, 4);
+					ao_ms5607_convert(&ao_data_static.ms5607_raw, &value);
+					ao_data_static.mma655x = int16(bytes, 8);
+					ao_records_read++;
+					ao_insert();
+					return;
+				}
+				continue;
+			} else if (nword == 3 && strcmp(words[0], "ms5607") == 0) {
+				if (strcmp(words[1], "reserved:") == 0)
+					ao_ms5607_prom.reserved = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "sens:") == 0)
+					ao_ms5607_prom.sens = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "off:") == 0)
+					ao_ms5607_prom.off = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tcs:") == 0)
+					ao_ms5607_prom.tcs = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tco:") == 0)
+					ao_ms5607_prom.tco = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tref:") == 0)
+					ao_ms5607_prom.tref = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tempsens:") == 0)
+					ao_ms5607_prom.tempsens = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "crc:") == 0)
+					ao_ms5607_prom.crc = strtoul(words[2], NULL, 10);
+				continue;
+			}
+#endif
+#if TELEMETRUM_V1
 			if (nword == 4 && log_format != AO_LOG_FORMAT_TELEMEGA) {
 				type = words[0][0];
 				tick = strtoul(words[1], NULL, 16);
@@ -924,7 +998,7 @@ ao_sleep(void *wchan)
 			if (type != 'F' && !ao_flight_started)
 				continue;
 
-#if TELEMEGA
+#if TELEMEGA || TELEMETRUM_V2
 			(void) a;
 			(void) b;
 #else
@@ -945,8 +1019,6 @@ ao_sleep(void *wchan)
 				ao_data_static.tick = tick;
 				ao_data_static.adc.accel = a;
 				ao_data_static.adc.pres_real = b;
-				if (b < AO_MIN_BARO_VALUE)
-					b = AO_MIN_BARO_VALUE;
 				ao_data_static.adc.pres = b;
 				ao_records_read++;
 				ao_insert();

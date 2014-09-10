@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.text.*;
 import java.util.concurrent.*;
@@ -40,10 +40,11 @@ public class AltosGPS implements Cloneable {
 	public double	ground_speed;	/* m/s */
 	public int	course;		/* degrees */
 	public double	climb_rate;	/* m/s */
+	public double	pdop;		/* unitless */
 	public double	hdop;		/* unitless */
 	public double	vdop;		/* unitless */
-	public int	h_error;	/* m */
-	public int	v_error;	/* m */
+	public double	h_error;	/* m */
+	public double	v_error;	/* m */
 
 	public AltosGPSSat[] cc_gps_sat;	/* tracking data */
 
@@ -95,6 +96,7 @@ public class AltosGPS implements Cloneable {
 						      AltosLib.MISSING, 1/100.0);
 			course = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_COURSE,
 					     AltosLib.MISSING);
+			pdop = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_PDOP, MISSING, 1.0);
 			hdop = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_HDOP, MISSING, 1.0);
 			vdop = map.get_double(AltosTelemetryLegacy.AO_TELEM_GPS_VDOP, MISSING, 1.0);
 			h_error = map.get_int(AltosTelemetryLegacy.AO_TELEM_GPS_HERROR, MISSING);
@@ -268,12 +270,24 @@ public class AltosGPS implements Cloneable {
 		cc_gps_sat[cc_gps_sat.length - 1] = sat;
 	}
 
-	public AltosGPS() {
+	private void init() {
 		lat = AltosLib.MISSING;
 		lon = AltosLib.MISSING;
 		alt = AltosLib.MISSING;
+		ground_speed = AltosLib.MISSING;
+		course = AltosLib.MISSING;
+		climb_rate = AltosLib.MISSING;
+		pdop = AltosLib.MISSING;
+		hdop = AltosLib.MISSING;
+		vdop = AltosLib.MISSING;
+		h_error = AltosLib.MISSING;
+		v_error = AltosLib.MISSING;
 		ClearGPSTime();
 		cc_gps_sat = null;
+	}
+
+	public AltosGPS() {
+		init();
 	}
 
 	public AltosGPS clone() {
@@ -295,7 +309,9 @@ public class AltosGPS implements Cloneable {
 		g.ground_speed = ground_speed;	/* m/s */
 		g.course = course;		/* degrees */
 		g.climb_rate = climb_rate;	/* m/s */
-		g.hdop = hdop;		/* unitless? */
+		g.pdop = pdop;		/* unitless */
+		g.hdop = hdop;		/* unitless */
+		g.vdop = vdop;		/* unitless */
 		g.h_error = h_error;	/* m */
 		g.v_error = v_error;	/* m */
 
@@ -327,9 +343,11 @@ public class AltosGPS implements Cloneable {
 			ground_speed = old.ground_speed;	/* m/s */
 			course = old.course;		/* degrees */
 			climb_rate = old.climb_rate;	/* m/s */
+			pdop = old.pdop;		/* unitless? */
 			hdop = old.hdop;		/* unitless? */
-			h_error = old.h_error;	/* m */
-			v_error = old.v_error;	/* m */
+			vdop = old.vdop;		/* unitless? */
+			h_error = old.h_error;		/* m */
+			v_error = old.v_error;		/* m */
 
 			if (old.cc_gps_sat != null) {
 				cc_gps_sat = new AltosGPSSat[old.cc_gps_sat.length];
@@ -340,11 +358,7 @@ public class AltosGPS implements Cloneable {
 				}
 			}
 		} else {
-			lat = AltosLib.MISSING;
-			lon = AltosLib.MISSING;
-			alt = AltosLib.MISSING;
-			ClearGPSTime();
-			cc_gps_sat = null;
+			init();
 		}
 	}
 

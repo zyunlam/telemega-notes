@@ -18,7 +18,9 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define HAS_RADIO	1
+#define HAS_RADIO		1
+#define HAS_RADIO_RATE		1
+#define HAS_TELEMETRY		0
 
 #define HAS_FLIGHT		0
 #define HAS_USB			1
@@ -95,11 +97,13 @@
 #define AO_PAD_ALL_PINS		((1 << AO_PAD_PIN_0) | (1 << AO_PAD_PIN_1) | (1 << AO_PAD_PIN_2) | (1 << AO_PAD_PIN_3))
 #define AO_PAD_ALL_CHANNELS	((1 << 0) | (1 << 1) | (1 << 2) | (1 << 3))
 
+/* Alarm 2 */
 #define AO_SIREN_PORT		P2
 #define AO_SIREN_DIR		P2DIR
 #define AO_SIREN_PIN		3
 #define AO_SIREN		P2_3
 
+/* Alarm 1 */
 #define AO_STROBE_PORT		P2
 #define AO_STROBE_DIR		P2DIR
 #define AO_STROBE_PIN		4

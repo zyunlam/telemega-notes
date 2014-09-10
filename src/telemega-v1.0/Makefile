@@ -31,6 +31,7 @@ INC = \
 	ao_mpu.h \
 	stm32l.h \
 	math.h \
+	ao_ms5607_convert.c \
 	Makefile
 
 #

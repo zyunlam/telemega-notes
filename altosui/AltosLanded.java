@@ -21,8 +21,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 
@@ -149,6 +149,12 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 
 	public String getName() {
 		return "Landed";
+	}
+
+	public void show(AltosState state, AltosListenerState listener_state) {
+		super.show(state, listener_state);
+		if (reader.backing_file() != null)
+			graph.setEnabled(true);
 	}
 
 	public AltosLanded(AltosFlightReader in_reader) {

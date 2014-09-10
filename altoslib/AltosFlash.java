@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.io.*;
 
@@ -345,7 +345,21 @@ public class AltosFlash extends AltosProgrammer {
 			debug = new AltosDebug(link);
 		input = new FileInputStream(file);
 		image = new AltosHexfile(input);
-		if (debug != null && !debug.check_connection()) {
+
+		boolean connection_ok = true;
+
+		if (debug != null) {
+			try {
+				connection_ok = debug.check_connection();
+			} catch (IOException ie) {
+				debug.close();
+				throw ie;
+			} catch (InterruptedException ie) {
+				debug.close();
+				throw ie;
+			}
+		}
+		if (!connection_ok) {
 			debug.close();
 			throw new IOException("Debug port not connected");
 		}

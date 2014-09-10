@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -163,8 +163,21 @@ public abstract class AltosLink implements Runnable {
 		if (!can_cancel && remote)
 			System.out.printf("Uh-oh, reading remote serial device from swing thread\n");
 
-		if (remote && can_cancel)
+		if (remote && can_cancel) {
 			timeout = 500;
+			switch (telemetry_rate) {
+			case AltosLib.ao_telemetry_rate_38400:
+			default:
+				timeout = 500;
+				break;
+			case AltosLib.ao_telemetry_rate_9600:
+				timeout = 2000;
+				break;
+			case AltosLib.ao_telemetry_rate_2400:
+				timeout = 8000;
+				break;
+			}
+		}
 		try {
 			++in_reply;
 
@@ -274,6 +287,8 @@ public abstract class AltosLink implements Runnable {
 	}
 
 	public void flush_output() {
+		if (pending_output == null)
+			return;
 		for (String s : pending_output)
 			System.out.print(s);
 		pending_output.clear();
@@ -305,6 +320,7 @@ public abstract class AltosLink implements Runnable {
 	 */
 	public boolean monitor_mode = false;
 	public int telemetry = AltosLib.ao_telemetry_standard;
+	public int telemetry_rate = -1;
 	public double frequency;
 	public String callsign;
 	AltosConfigData	config_data;
@@ -356,6 +372,15 @@ public abstract class AltosLink implements Runnable {
 		flush_output();
 	}
 
+	public void set_telemetry_rate(int in_telemetry_rate) {
+		telemetry_rate = in_telemetry_rate;
+		if (monitor_mode)
+			printf("m 0\nc T %d\nm %x\n", telemetry_rate, telemetry_len());
+		else
+			printf("c T %d\n", telemetry_rate);
+		flush_output();
+	}
+
 	public void set_monitor(boolean monitor) {
 		monitor_mode = monitor;
 		if (monitor)
@@ -383,10 +408,14 @@ public abstract class AltosLink implements Runnable {
 		flush_output();
 	}
 
-	public AltosConfigData config_data() throws InterruptedException, TimeoutException {
+ 	public AltosConfigData config_data() throws InterruptedException, TimeoutException {
 		synchronized(config_data_lock) {
-			if (config_data == null)
+			if (config_data == null) {
+				printf("m 0\n");
 				config_data = new AltosConfigData(this);
+				if (monitor_mode)
+					set_monitor(true);
+			}
 			return config_data;
 		}
 	}
@@ -430,7 +459,12 @@ public abstract class AltosLink implements Runnable {
 		if (debug)
 			System.out.printf("start remote %7.3f\n", frequency);
 		set_radio_frequency(frequency);
-		set_callsign(AltosPreferences.callsign());
+		if (telemetry_rate < 0)
+			telemetry_rate = AltosPreferences.telemetry_rate(serial);
+		set_telemetry_rate(telemetry_rate);
+		if (callsign.equals(""))
+			callsign = AltosPreferences.callsign();
+		set_callsign(callsign);
 		printf("p\nE 0\n");
 		flush_input();
 		remote = true;

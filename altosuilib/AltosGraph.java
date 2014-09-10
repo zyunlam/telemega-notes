@@ -15,14 +15,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.io.*;
 import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -172,6 +172,29 @@ class AltosMagUnits extends AltosUnits {
 	}
 }
 
+class AltosDopUnits extends AltosUnits {
+
+	public double value(double p, boolean imperial_units) {
+		return p;
+	}
+
+	public double inverse(double p, boolean imperial_units) {
+		return p;
+	}
+
+	public String show_units(boolean imperial_units) {
+		return null;
+	}
+
+	public String say_units(boolean imperial_units) {
+		return null;
+	}
+
+	public int show_fraction(int width, boolean imperial_units) {
+		return 1;
+	}
+}
+
 public class AltosGraph extends AltosUIGraph {
 
 	static final private Color height_color = new Color(194,31,31);
@@ -191,6 +214,9 @@ public class AltosGraph extends AltosUIGraph {
 	static final private Color gps_course_color = new Color (100, 31, 112);
 	static final private Color gps_ground_speed_color = new Color (31, 112, 100);
 	static final private Color gps_climb_rate_color = new Color (31, 31, 112);
+	static final private Color gps_pdop_color = new Color(50, 194, 0);
+	static final private Color gps_hdop_color = new Color(50, 0, 194);
+	static final private Color gps_vdop_color = new Color(194, 0, 50);
 	static final private Color temperature_color = new Color (31, 194, 194);
 	static final private Color dbm_color = new Color(31, 100, 100);
 	static final private Color state_color = new Color(0,0,0);
@@ -212,11 +238,12 @@ public class AltosGraph extends AltosUIGraph {
 	static AltosGyroUnits gyro_units = new AltosGyroUnits();
 	static AltosOrient orient_units = new AltosOrient();
 	static AltosMagUnits mag_units = new AltosMagUnits();
+	static AltosDopUnits dop_units = new AltosDopUnits();
 
 	AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
 	AltosUIAxis	distance_axis, pressure_axis;
 	AltosUIAxis	gyro_axis, orient_axis, mag_axis;
-	AltosUIAxis	course_axis;
+	AltosUIAxis	course_axis, dop_axis;
 
 	public AltosGraph(AltosUIEnable enable, AltosFlightStats stats, AltosGraphDataSet dataSet) {
 		super(enable);
@@ -236,6 +263,7 @@ public class AltosGraph extends AltosUIGraph {
 		orient_axis = newAxis("Tilt Angle", orient_units, orient_color, 0);
 		mag_axis = newAxis("Magnetic Field", mag_units, mag_x_color, 0);
 		course_axis = newAxis("Course", orient_units, gps_course_color, 0);
+		dop_axis = newAxis("Dilution of Precision", dop_units, gps_pdop_color, 0);
 
 		addMarker("State", AltosGraphDataPoint.data_state, state_color);
 
@@ -325,6 +353,24 @@ public class AltosGraph extends AltosUIGraph {
 				  gps_climb_rate_color,
 				  enable_gps,
 				  speed_axis);
+			addSeries("GPS Position DOP",
+				  AltosGraphDataPoint.data_gps_pdop,
+				  dop_units,
+				  gps_pdop_color,
+				  false,
+				  dop_axis);
+			addSeries("GPS Horizontal DOP",
+				  AltosGraphDataPoint.data_gps_hdop,
+				  dop_units,
+				  gps_hdop_color,
+				  false,
+				  dop_axis);
+			addSeries("GPS Vertical DOP",
+				  AltosGraphDataPoint.data_gps_vdop,
+				  dop_units,
+				  gps_vdop_color,
+				  false,
+				  dop_axis);
 		}
 		if (stats.has_rssi)
 			addSeries("Received Signal Strength",

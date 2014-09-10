@@ -53,6 +53,7 @@ ALTOS_SRC = \
 	ao_rssi.c \
 	ao_send_packet.c \
 	ao_packet_master.c \
+	ao_eeprom_stm.c \
 	ao_packet.c
 
 PRODUCT=MegaDongle-v0.1

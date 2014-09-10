@@ -17,7 +17,16 @@
     <item android:id="@+id/connect_scan"
           android:icon="@android:drawable/ic_menu_search"
           android:title="@string/connect_device" />
+    <item android:id="@+id/quit"
+          android:icon="@android:drawable/ic_menu_close_clear_cancel"
+          android:title="@string/quit" />
     <item android:id="@+id/select_freq"
           android:icon="@android:drawable/ic_menu_preferences"
           android:title="@string/select_freq" />
+    <item android:id="@+id/select_rate"
+          android:icon="@android:drawable/ic_menu_preferences"
+          android:title="@string/select_rate" />
+    <item android:id="@+id/change_units"
+	  android:icon="@android:drawable/ic_menu_view"
+	  android:title="@string/change_units" />
 </menu>

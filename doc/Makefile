@@ -16,7 +16,8 @@ RELNOTES=\
 	release-notes-1.3.1.html \
 	release-notes-1.3.2.html \
 	release-notes-1.4.html \
-	release-notes-1.4.1.html
+	release-notes-1.4.1.html \
+	release-notes-1.5.html
 
 PICTURES=\
 	altosui.png \
@@ -61,12 +62,13 @@ SVG=\
 	easymini.svg \
 	telemega.svg \
 	telemetrum.svg \
-	telemini.svg
+	telemini.svg \
+	easymega.svg
 
 RELNOTES_XSL=$(RELNOTES:.html=.xsl)
 HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html telegps.html $(RELNOTES)
 PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
-	telemetrum-outline.pdf telemega-outline.pdf easymini-outline.pdf
+	telemetrum-outline.pdf telemega-outline.pdf easymini-outline.pdf easymega-outline.pdf
 HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
 FOSTYLE=xorg-fo.xsl
 TEMPLATES=titlepage.templates.xsl

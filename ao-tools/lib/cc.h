@@ -346,6 +346,143 @@ struct ao_log_mega {
 	} u;
 };
 
+struct ao_log_metrum {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;		/* 4 */
+			int16_t		ground_accel;	/* 6 */
+			uint32_t	ground_pres;	/* 8 */
+			uint32_t	ground_temp;	/* 12 */
+		} flight;	/* 16 */
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;		/* 4 */
+			uint16_t	reason;		/* 6 */
+		} state;	/* 8 */
+		/* AO_LOG_SENSOR */
+		struct {
+			uint32_t	pres;		/* 4 */
+			uint32_t	temp;		/* 8 */
+			int16_t		accel;		/* 12 */
+		} sensor;	/* 14 */
+		/* AO_LOG_TEMP_VOLT */
+		struct {
+			int16_t		v_batt;		/* 4 */
+			int16_t		sense_a;	/* 6 */
+			int16_t		sense_m;	/* 8 */
+		} volt;		/* 10 */
+		/* AO_LOG_GPS_POS */
+		struct {
+			int32_t		latitude;	/* 4 */
+			int32_t		longitude;	/* 8 */
+			uint16_t	altitude_low;	/* 12 */
+			int16_t		altitude_high;	/* 14 */
+		} gps;		/* 16 */
+		/* AO_LOG_GPS_TIME */
+		struct {
+			uint8_t		hour;		/* 4 */
+			uint8_t		minute;		/* 5 */
+			uint8_t		second;		/* 6 */
+			uint8_t		flags;		/* 7 */
+			uint8_t		year;		/* 8 */
+			uint8_t		month;		/* 9 */
+			uint8_t		day;		/* 10 */
+			uint8_t		pdop;		/* 11 */
+		} gps_time;	/* 12 */
+		/* AO_LOG_GPS_SAT (up to three packets) */
+		struct {
+			uint8_t	channels;		/* 4 */
+			uint8_t	more;			/* 5 */
+			struct {
+				uint8_t	svid;
+				uint8_t c_n;
+			} sats[4];			/* 6 */
+		} gps_sat;				/* 14 */
+		uint8_t		raw[12];		/* 4 */
+	} u;	/* 16 */
+};
+
+struct ao_log_mini {
+	char		type;				/* 0 */
+	uint8_t		csum;				/* 1 */
+	uint16_t	tick;				/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;		/* 4 */
+			uint16_t	r6;
+			uint32_t	ground_pres;	/* 8 */
+		} flight;
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;		/* 4 */
+			uint16_t	reason;		/* 6 */
+		} state;
+		/* AO_LOG_SENSOR */
+		struct {
+			uint8_t		pres[3];	/* 4 */
+			uint8_t		temp[3];	/* 7 */
+			int16_t		sense_a;	/* 10 */
+			int16_t		sense_m;	/* 12 */
+			int16_t		v_batt;		/* 14 */
+		} sensor;				/* 16 */
+	} u;						/* 16 */
+};							/* 16 */
+
+#define ao_log_pack24(dst,value) do {		\
+		(dst)[0] = (value);		\
+		(dst)[1] = (value) >> 8;	\
+		(dst)[2] = (value) >> 16;	\
+	} while (0)
+
+struct ao_log_gps {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;			/* 4 */
+			int16_t		start_altitude;		/* 6 */
+			int32_t		start_latitude;		/* 8 */
+			int32_t		start_longitude;	/* 12 */
+		} flight;					/* 16 */
+		/* AO_LOG_GPS_TIME */
+		struct {
+			int32_t		latitude;	/* 4 */
+			int32_t		longitude;	/* 8 */
+			uint16_t	altitude_low;	/* 12 */
+			uint8_t		hour;		/* 14 */
+			uint8_t		minute;		/* 15 */
+			uint8_t		second;		/* 16 */
+			uint8_t		flags;		/* 17 */
+			uint8_t		year;		/* 18 */
+			uint8_t		month;		/* 19 */
+			uint8_t		day;		/* 20 */
+			uint8_t		course;		/* 21 */
+			uint16_t	ground_speed;	/* 22 */
+			int16_t		climb_rate;	/* 24 */
+			uint8_t		pdop;		/* 26 */
+			uint8_t		hdop;		/* 27 */
+			uint8_t		vdop;		/* 28 */
+			uint8_t		mode;		/* 29 */
+			int16_t		altitude_high;	/* 30 */
+		} gps;	/* 31 */
+		/* AO_LOG_GPS_SAT */
+		struct {
+			uint16_t	channels;	/* 4 */
+			struct {
+				uint8_t	svid;
+				uint8_t c_n;
+			} sats[12];			/* 6 */
+		} gps_sat;				/* 30 */
+	} u;
+};
+
 #define AO_CONFIG_CONFIG		1
 #define AO_CONFIG_MAIN			2
 #define AO_CONFIG_APOGEE		3
@@ -380,8 +517,29 @@ struct ao_log_mega {
 #define AO_LOG_GPS_ALT		'H'
 #define AO_LOG_GPS_SAT		'V'
 #define AO_LOG_GPS_DATE		'Y'
+#define AO_LOG_GPS_POS		'P'
 
 #define AO_LOG_CONFIG		'c'
+
+#define AO_GPS_NUM_SAT_MASK	(0xf << 0)
+#define AO_GPS_NUM_SAT_SHIFT	(0)
+
+#define AO_GPS_VALID		(1 << 4)
+#define AO_GPS_RUNNING		(1 << 5)
+#define AO_GPS_DATE_VALID	(1 << 6)
+#define AO_GPS_COURSE_VALID	(1 << 7)
+
+#define AO_LOG_FORMAT_UNKNOWN		0	/* unknown; altosui will have to guess */
+#define AO_LOG_FORMAT_FULL		1	/* 8 byte typed log records */
+#define AO_LOG_FORMAT_TINY		2	/* two byte state/baro records */
+#define AO_LOG_FORMAT_TELEMETRY		3	/* 32 byte ao_telemetry records */
+#define AO_LOG_FORMAT_TELESCIENCE	4	/* 32 byte typed telescience records */
+#define AO_LOG_FORMAT_TELEMEGA		5	/* 32 byte typed telemega records */
+#define AO_LOG_FORMAT_EASYMINI		6	/* 16-byte MS5607 baro only, 3.0V supply */
+#define AO_LOG_FORMAT_TELEMETRUM	7	/* 16-byte typed telemetrum records */
+#define AO_LOG_FORMAT_TELEMINI		8	/* 16-byte MS5607 baro only, 3.3V supply */
+#define AO_LOG_FORMAT_TELEGPS		9	/* 32 byte telegps records */
+#define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 int
 cc_mega_parse(const char *input_line, struct ao_log_mega *l);
@@ -397,6 +555,9 @@ cc_pressure_to_altitude(double pressure);
 
 double
 cc_altitude_to_pressure(double altitude);
+
+double
+cc_altitude_to_temperature(double altitude);
 
 double
 cc_barometer_to_pressure(double baro);

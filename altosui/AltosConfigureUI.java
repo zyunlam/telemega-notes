@@ -22,7 +22,7 @@ import java.awt.event.*;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosConfigureUI
 	extends AltosUIConfigure
@@ -89,6 +89,8 @@ public class AltosConfigureUI
 		row++;
 	}
 
+	boolean has_bluetooth;
+
 	public void add_bluetooth() {
 		JButton manage_bluetooth = new JButton("Manage Bluetooth");
 		manage_bluetooth.addActionListener(new ActionListener() {
@@ -98,6 +100,7 @@ public class AltosConfigureUI
 			});
 		pane.add(manage_bluetooth, constraints(0, 2));
 		/* in the same row as add_frequencies, so don't bump row */
+		has_bluetooth = true;
 	}
 
 	public void add_frequencies() {
@@ -108,7 +111,10 @@ public class AltosConfigureUI
 				}
 			});
 		manage_frequencies.setToolTipText("Configure which values are shown in frequency menus");
-		pane.add(manage_frequencies, constraints(2, 1));
+		if (has_bluetooth)
+			pane.add(manage_frequencies, constraints(2, 1));
+		else
+			pane.add(manage_frequencies, constraints(0, 3));
 		row++;
 	}
 

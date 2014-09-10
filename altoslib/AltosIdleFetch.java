@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.io.*;
 import java.util.*;
@@ -115,6 +115,10 @@ public class AltosIdleFetch implements AltosStateUpdate {
 
 		new AltosIdler("TeleMega",
 			       AltosIdler.idle_gps,
+			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
+			       AltosIdler.idle_imu, AltosIdler.idle_mag,
+			       AltosIdler.idle_sensor_mega),
+		new AltosIdler("EasyMega",
 			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),

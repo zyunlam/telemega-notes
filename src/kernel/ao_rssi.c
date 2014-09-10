@@ -17,9 +17,9 @@
 
 #include "ao.h"
 
-static __xdata uint16_t	ao_rssi_time;
-static __pdata uint16_t	ao_rssi_delay;
-static __pdata uint8_t	ao_rssi_led;
+static __xdata uint16_t		ao_rssi_time;
+static __pdata uint16_t		ao_rssi_delay;
+static __pdata AO_LED_TYPE	ao_rssi_led;
 
 void
 ao_rssi(void)
@@ -33,7 +33,7 @@ ao_rssi(void)
 }
 
 void
-ao_rssi_set(int rssi_value)
+ao_rssi_set(int16_t rssi_value)
 {
 	if (rssi_value > 0)
 		rssi_value = 0;
@@ -45,7 +45,7 @@ ao_rssi_set(int rssi_value)
 __xdata struct ao_task ao_rssi_task;
 
 void
-ao_rssi_init(uint8_t rssi_led)
+ao_rssi_init(AO_LED_TYPE rssi_led)
 {
 	ao_rssi_led = rssi_led;
 	ao_rssi_delay = 0;

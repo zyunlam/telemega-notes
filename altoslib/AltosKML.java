@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.io.*;
 
@@ -28,17 +28,24 @@ public class AltosKML implements AltosWriter {
 	double			gps_start_altitude;
 
 	static final String[] kml_state_colors = {
-		"FF000000",
-		"FF000000",
-		"FF000000",
-		"FF0000FF",
-		"FF4080FF",
-		"FF00FFFF",
-		"FFFF0000",
-		"FF00FF00",
-		"FF000000",
-		"FFFFFFFF"
+		"FF000000",	// startup
+		"FF000000",	// idle
+		"FF000000",	// pad
+		"FF0000FF",	// boost
+		"FF4080FF",	// fast
+		"FF00FFFF",	// coast
+		"FFFF0000",	// drogue
+		"FF00FF00",	// main
+		"FF000000",	// landed
+		"FFFFFFFF",	// invalid
+		"FFFF0000",	// stateless
 	};
+
+	static String state_color(int state) {
+		if (state < 0 || kml_state_colors.length <= state)
+			return kml_state_colors[AltosLib.ao_flight_invalid];
+		return kml_state_colors[state];
+	}
 
 	static final String kml_header_start =
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -95,7 +102,8 @@ public class AltosKML implements AltosWriter {
 
 	void state_start(AltosState state) {
 		String	state_name = AltosLib.state_name(state.state);
-		out.printf(kml_style_start, state_name, kml_state_colors[state.state]);
+		String	state_color = state_color(state.state);
+		out.printf(kml_style_start, state_name, state_color);
 		out.printf("\tState: %s\n", state_name);
 		out.printf("%s", kml_style_end);
 		out.printf(kml_placemark_start, state_name, state_name);

@@ -22,19 +22,19 @@
 
 #define FIX_BITS	16
 
-#define to_fix16(x) ((int16_t) ((x) * 65536.0 + 0.5))
-#define to_fix32(x) ((int32_t) ((x) * 65536.0 + 0.5))
+#define to_fix_v(x) ((int16_t) ((x) * 65536.0 + 0.5))
+#define to_fix_k(x) ((int32_t) ((x) * 65536.0 + 0.5))
 #define from_fix8(x)	((x) >> 8)
 #define from_fix(x)	((x) >> 16)
-#define fix8_to_fix16(x)	((x) << 8)
+#define fix8_to_fix_v(x)	((x) << 8)
 #define fix16_to_fix8(x)	((x) >> 8)
 
 #include <ao_kalman.h>
 
 /* Basic time step (96ms) */
-#define AO_MK_STEP	to_fix16(0.096)
+#define AO_MK_STEP	to_fix_v(0.096)
 /* step ** 2 / 2 */
-#define AO_MK_STEP_2_2	to_fix16(0.004608)
+#define AO_MK_STEP_2_2	to_fix_v(0.004608)
 
 uint32_t	ao_k_pa;		/* 24.8 fixed point */
 int32_t		ao_k_pa_speed;		/* 16.16 fixed point */
@@ -49,7 +49,7 @@ ao_microkalman_init(void)
 {
 	ao_pa = pa;
 	ao_k_pa = pa << 8;
-}	
+}
 
 void
 ao_microkalman_predict(void)

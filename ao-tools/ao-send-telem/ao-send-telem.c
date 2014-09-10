@@ -85,6 +85,12 @@ packet_state(union ao_telemetry_all *telem)
 	case AO_TELEMETRY_MEGA_DATA:
 		cur_state = telem->mega_data.state;
 		break;
+	case AO_TELEMETRY_METRUM_SENSOR:
+		cur_state = telem->metrum_sensor.state;
+		break;
+	case AO_TELEMETRY_MINI:
+		cur_state = telem->mini.state;
+		break;
 	}
 	return cur_state;
 }

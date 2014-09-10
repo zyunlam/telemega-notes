@@ -161,16 +161,17 @@ static inline void ao_arch_restore_stack(void) {
 
 #endif /* HAS_TASK */
 
-#define ao_arch_wait_interrupt() do {			\
-		asm(".global ao_idle_loc\n\twfi\nao_idle_loc:");	\
-		ao_arch_release_interrupts();				\
-		ao_arch_block_interrupts();				\
+#define ao_arch_wait_interrupt() do {				\
+		asm("\twfi\n");					\
+		ao_arch_release_interrupts();			\
+		asm(".global ao_idle_loc\n\nao_idle_loc:");	\
+		ao_arch_block_interrupts();			\
 	} while (0)
 
-#define ao_arch_critical(b) do {				\
-		ao_arch_block_interrupts();			\
-		do { b } while (0);				\
-		ao_arch_release_interrupts();			\
+#define ao_arch_critical(b) do {			\
+		uint32_t __mask = ao_arch_irqsave();	\
+		do { b } while (0);			\
+		ao_arch_irqrestore(__mask);		\
 	} while (0)
 
 /*

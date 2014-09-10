@@ -40,6 +40,42 @@
 #define IF_FREQ_CONTROL	6
 
 /*
+ *  http://www.ntia.doc.gov/files/ntia/publications/84-168.pdf
+ *
+ * Necessary bandwidth for a FSK modulated signal:
+ *
+ *	bw = 2.6d + 0.55b	1.5 < m < 5.5
+ *	bw = 2.1d + 1.9b	5.5 < m < 20
+ *
+ *	b is the modulation rate in bps
+ *	d is the peak deviation (from the center)
+ *
+ *	m = 2d / b
+ *
+ * 20.5 kHz deviation 38.4kbps signal:
+ *
+ *	m = 41 / 38.4, which is < 5.5:
+ *
+ *	bw = 2.6 * 20.5 + 0.55 * 38.4 = 74.42kHz
+ *
+ *	M = 1, E = 3, bw = 75kHz
+ *
+ * 5.125 kHz deviation, 9.6kbps signal
+ *
+ *	m = 10.25 / 9.6, which is < 5.5:
+ *
+ *	bw = 2.6 * 5.125 + 0.55 * 9.6 = 18.6kHz
+ *
+ *	M = 2, E = 3, bw = 53.6kHz
+ *
+ * 1.28125kHz deviation, 2.4kbps signal
+ *
+ *	m = 2.565 / 2.4, which is < 5.5:
+ *
+ *	bw = 2.6 * 20.5 + 1.9 * 2.4 = 47.61kHz
+ *
+ *	M = 3, E = 3, bw = 53.6kHz
+ *
  * For channel bandwidth of 93.75 kHz, the CHANBW_E and CHANBW_M values are
  *
  * BW = 24e6 / (8 * (4 + M) * 2 ** E)
@@ -47,7 +83,9 @@
  * So, M = 0 and E = 3
  */
 
-#define CHANBW_M	0
+#define CHANBW_M_384	1
+#define CHANBW_M_96	3
+#define CHANBW_M_24	3
 #define CHANBW_E	3
 
 /*
@@ -55,22 +93,41 @@
  *
  * R = (256 + M) * 2** E * 24e6 / 2**28
  *
- * So M is 163 and E is 10
+ * So for 38360kBaud, M is 163 and E is 10
  */
 
-#define DRATE_E		10
 #define DRATE_M		163
+
+#define DRATE_E_384	10
+
+/* For 9600 baud, M is 163 and E is 8
+ */
+
+#define DRATE_E_96	8
+
+/* For 2400 baud, M is 163 and E is 6
+ */
+
+#define DRATE_E_24	6
 
 /*
  * For a channel deviation of 20.5kHz, the DEVIATION_E and DEVIATION_M values are:
  *
  * F = 24e6/2**17 * (8 + DEVIATION_M) * 2**DEVIATION_E
  *
- * So M is 6 and E is 3
+ * For 20.5kHz deviation, M is 6 and E is 3
+ * For 5.125kHz deviation, M is 6 and E is 1
+ * For 1.28125kHz deviation, M is 0 and E is 0
  */
 
-#define DEVIATION_M	6
-#define DEVIATION_E	3
+#define DEVIATION_M_384	6
+#define DEVIATION_E_384	3
+
+#define DEVIATION_M_96	6
+#define DEVIATION_E_96	1
+
+#define DEVIATION_M_24	0
+#define DEVIATION_E_24	0
 
 /*
  * For our RDF beacon, set the symbol rate to 2kBaud (for a 1kHz tone),
@@ -122,22 +179,16 @@ static __code uint8_t radio_setup[] = {
 	RF_FSCTRL1_OFF,		(IF_FREQ_CONTROL << RF_FSCTRL1_FREQ_IF_SHIFT),
 	RF_FSCTRL0_OFF,		(0 << RF_FSCTRL0_FREQOFF_SHIFT),
 
-	RF_MDMCFG4_OFF,		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
-				 (DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
 	RF_MDMCFG3_OFF,		(DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
-	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_OFF |
+	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_ON |
 				 RF_MDMCFG2_MOD_FORMAT_GFSK |
-				 RF_MDMCFG2_SYNC_MODE_15_16_THRES),
+				 RF_MDMCFG2_SYNC_MODE_15_16),
 	RF_MDMCFG1_OFF,		(RF_MDMCFG1_FEC_EN |
 				 RF_MDMCFG1_NUM_PREAMBLE_4 |
 				 (2 << RF_MDMCFG1_CHANSPC_E_SHIFT)),
 	RF_MDMCFG0_OFF,		(17 << RF_MDMCFG0_CHANSPC_M_SHIFT),
 
 	RF_CHANNR_OFF,		0,
-
-	RF_DEVIATN_OFF,		((DEVIATION_E << RF_DEVIATN_DEVIATION_E_SHIFT) |
-				 (DEVIATION_M << RF_DEVIATN_DEVIATION_M_SHIFT)),
 
 	/* SmartRF says set LODIV_BUF_CURRENT_TX to 0
 	 * And, we're not using power ramping, so use PA_POWER 0
@@ -155,8 +206,8 @@ static __code uint8_t radio_setup[] = {
 	RF_FSCAL1_OFF,		0x00,
 	RF_FSCAL0_OFF,		0x1F,
 
-	RF_TEST2_OFF,		0x88,
-	RF_TEST1_OFF,		0x31,
+	RF_TEST2_OFF,		RF_TEST2_RX_LOW_DATA_RATE_MAGIC,
+	RF_TEST1_OFF,		RF_TEST1_RX_LOW_DATA_RATE_MAGIC,
 	RF_TEST0_OFF,		0x09,
 
 	/* default sync values */
@@ -187,10 +238,16 @@ static __code uint8_t radio_setup[] = {
 				 RF_BSCFG_BS_POST_KI_PRE_KI|
 				 RF_BSCFG_BS_POST_KP_PRE_KP|
 				 RF_BSCFG_BS_LIMIT_0),
-	RF_AGCCTRL2_OFF,	0x03,
-	RF_AGCCTRL1_OFF,	0x40,
-	RF_AGCCTRL0_OFF,	0x91,
-
+	RF_AGCCTRL2_OFF,	(RF_AGCCTRL2_MAX_DVGA_GAIN_ALL|
+				 RF_AGCCTRL2_MAX_LNA_GAIN_0|
+				 RF_AGCCTRL2_MAGN_TARGET_33dB),
+	RF_AGCCTRL1_OFF,	(RF_AGCCTRL1_AGC_LNA_PRIORITY_0 |
+				 RF_AGCCTRL1_CARRIER_SENSE_REL_THR_DISABLE |
+				 RF_AGCCTRL1_CARRIER_SENSE_ABS_THR_0DB),
+	RF_AGCCTRL0_OFF,	(RF_AGCCTRL0_HYST_LEVEL_NONE |
+				 RF_AGCCTRL0_WAIT_TIME_8 |
+				 RF_AGCCTRL0_AGC_FREEZE_NORMAL |
+				 RF_AGCCTRL0_FILTER_LENGTH_8),
 	RF_IOCFG2_OFF,		0x00,
 	RF_IOCFG1_OFF,		0x00,
 	RF_IOCFG0_OFF,		0x00,
@@ -198,7 +255,7 @@ static __code uint8_t radio_setup[] = {
 
 static __code uint8_t rdf_setup[] = {
 	RF_MDMCFG4_OFF,		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
+				 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
 				 (RDF_DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
 	RF_MDMCFG3_OFF,		(RDF_DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
 	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_OFF |
@@ -212,26 +269,30 @@ static __code uint8_t rdf_setup[] = {
 				 (RDF_DEVIATION_M << RF_DEVIATN_DEVIATION_M_SHIFT)),
 
 	/* packet length is set in-line */
-	RF_PKTCTRL1_OFF,	((1 << PKTCTRL1_PQT_SHIFT)|
+	RF_PKTCTRL1_OFF,	((0 << PKTCTRL1_PQT_SHIFT)|
 				 PKTCTRL1_ADR_CHK_NONE),
 	RF_PKTCTRL0_OFF,	(RF_PKTCTRL0_PKT_FORMAT_NORMAL|
 				 RF_PKTCTRL0_LENGTH_CONFIG_FIXED),
 };
 
 static __code uint8_t fixed_pkt_setup[] = {
+#if !HAS_RADIO_RATE
 	RF_MDMCFG4_OFF,		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
-				 (CHANBW_M << RF_MDMCFG4_CHANBW_M_SHIFT) |
-				 (DRATE_E << RF_MDMCFG4_DRATE_E_SHIFT)),
+				 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+				 (DRATE_E_384 << RF_MDMCFG4_DRATE_E_SHIFT)),
+#endif
 	RF_MDMCFG3_OFF,		(DRATE_M << RF_MDMCFG3_DRATE_M_SHIFT),
-	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_OFF |
+	RF_MDMCFG2_OFF,		(RF_MDMCFG2_DEM_DCFILT_ON |
 				 RF_MDMCFG2_MOD_FORMAT_GFSK |
-				 RF_MDMCFG2_SYNC_MODE_15_16_THRES),
+				 RF_MDMCFG2_SYNC_MODE_15_16),
 	RF_MDMCFG1_OFF,		(RF_MDMCFG1_FEC_EN |
 				 RF_MDMCFG1_NUM_PREAMBLE_4 |
 				 (2 << RF_MDMCFG1_CHANSPC_E_SHIFT)),
 
-	RF_DEVIATN_OFF,		((DEVIATION_E << RF_DEVIATN_DEVIATION_E_SHIFT) |
-				 (DEVIATION_M << RF_DEVIATN_DEVIATION_M_SHIFT)),
+#if !HAS_RADIO_RATE
+	RF_DEVIATN_OFF,		((DEVIATION_E_384 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+				 (DEVIATION_M_384 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+#endif
 
 	/* max packet length -- now set inline */
 	RF_PKTCTRL1_OFF,	((1 << PKTCTRL1_PQT_SHIFT)|
@@ -242,6 +303,38 @@ static __code uint8_t fixed_pkt_setup[] = {
 				 RF_PKTCTRL0_CRC_EN|
 				 RF_PKTCTRL0_LENGTH_CONFIG_FIXED),
 };
+
+#if HAS_RADIO_RATE
+static __code struct {
+	uint8_t		mdmcfg4;
+	uint8_t		deviatn;
+} packet_rate_setup[] = {
+	/* 38400 */
+	{
+		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+		 (CHANBW_M_384 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+		 (DRATE_E_384 << RF_MDMCFG4_DRATE_E_SHIFT)),
+		((DEVIATION_E_384 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+		 (DEVIATION_M_384 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+	},
+	/* 9600 */
+	{
+		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+		 (CHANBW_M_96 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+		 (DRATE_E_96 << RF_MDMCFG4_DRATE_E_SHIFT)),
+		((DEVIATION_E_96 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+		 (DEVIATION_M_96 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+	},
+	/* 2400 */
+	{
+		((CHANBW_E << RF_MDMCFG4_CHANBW_E_SHIFT) |
+		 (CHANBW_M_24 << RF_MDMCFG4_CHANBW_M_SHIFT) |
+		 (DRATE_E_24 << RF_MDMCFG4_DRATE_E_SHIFT)),
+		((DEVIATION_E_24 << RF_DEVIATN_DEVIATION_E_SHIFT) |
+		 (DEVIATION_M_24 << RF_DEVIATN_DEVIATION_M_SHIFT)),
+	},
+};
+#endif
 
 __xdata uint8_t	ao_radio_dma;
 __xdata uint8_t ao_radio_dma_done;
@@ -308,6 +401,10 @@ ao_radio_get(uint8_t len)
 	RF_FREQ1 = (uint8_t) (ao_config.radio_setting >> 8);
 	RF_FREQ0 = (uint8_t) (ao_config.radio_setting);
 	RF_PKTLEN = len;
+#if HAS_RADIO_RATE
+	RF_MDMCFG4 = packet_rate_setup[ao_config.radio_rate].mdmcfg4;
+	RF_DEVIATN = packet_rate_setup[ao_config.radio_rate].deviatn;
+#endif
 }
 
 
@@ -551,8 +648,31 @@ ao_radio_test_cmd(void)
 		ao_radio_test(0);
 }
 
+#if AO_RADIO_REG_TEST
+static void
+ao_radio_set_reg(void)
+{
+	uint8_t	offset;
+	ao_cmd_hex();
+	offset = ao_cmd_lex_i;
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	ao_cmd_hex();
+	printf("RF[%x] %x", offset, RF[offset]);
+	if (ao_cmd_status == ao_cmd_success) {
+		RF[offset] = ao_cmd_lex_i;
+		printf (" -> %x", RF[offset]);
+	}
+	ao_cmd_status = ao_cmd_success;
+	printf("\n");
+}
+#endif
+
 __code struct ao_cmds ao_radio_cmds[] = {
 	{ ao_radio_test_cmd,	"C <1 start, 0 stop, none both>\0Radio carrier test" },
+#if AO_RADIO_REG_TEST
+	{ ao_radio_set_reg,	"V <offset> <value>\0Set radio register" },
+#endif
 	{ 0,	NULL },
 };
 

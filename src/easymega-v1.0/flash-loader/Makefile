@@ -4,5 +4,5 @@
 #
 
 TOPDIR=../..
-HARDWARE=easymega-v0.1
+HARDWARE=easymega-v1.0
 include $(TOPDIR)/stm/Makefile-flash.defs

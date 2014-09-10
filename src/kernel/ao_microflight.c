@@ -43,10 +43,12 @@ void
 ao_microflight(void)
 {
 	int16_t		sample_count;
+	int16_t		log_count;
 	uint16_t	time;
 	uint32_t	pa_interval_min, pa_interval_max;
 	int32_t		pa_diff;
-	uint8_t		h, i;
+	uint8_t		h;
+	uint8_t		i;
 	uint8_t		accel_lock = 0;
 	uint32_t	pa_sum = 0;
 
@@ -60,19 +62,25 @@ ao_microflight(void)
 	h = 0;
 	for (;;) {
 		time += SAMPLE_SLEEP;
+#if BOOST_DETECT
 		if ((sample_count & 0x1f) == 0)
 			ao_led_on(AO_LED_REPORT);
+#endif
 		ao_delay_until(time);
 		ao_microsample();
+#if BOOST_DETECT
 		if ((sample_count & 0x1f) == 0)
 			ao_led_off(AO_LED_REPORT);
+#endif
 		pa_hist[h] = pa;
 		h = SKIP_PA_HIST(h,1);
 		pa_diff = pa_ground - ao_pa;
 
+#if BOOST_DETECT
 		/* Check for a significant pressure change */
 		if (pa_diff > BOOST_DETECT)
 			break;
+#endif
 
 		if (sample_count < GROUND_AVG * 2) {
 			if (sample_count < GROUND_AVG)
@@ -82,6 +90,9 @@ ao_microflight(void)
 			pa_ground = pa_sum >> GROUND_AVG_SHIFT;
 			pa_sum = 0;
 			sample_count = 0;
+#if !BOOST_DETECT
+			break;
+#endif
 		}
 	}
 
@@ -93,7 +104,10 @@ ao_microflight(void)
 	}
 
 	/* Log the remaining samples so we get a complete history since leaving the ground */
-	for (; i != h; i = SKIP_PA_HIST(i,2)) {
+#if LOG_INTERVAL < NUM_PA_HIST
+	for (; i != h; i = SKIP_PA_HIST(i,2))
+#endif
+	{
 		pa = pa_hist[i];
 		ao_log_micro_data();
 	}
@@ -101,6 +115,7 @@ ao_microflight(void)
 	/* Now sit around until the pressure is stable again and record the max */
 
 	sample_count = 0;
+	log_count = 0;
 	pa_min = ao_pa;
 	pa_interval_min = ao_pa;
 	pa_interval_max = ao_pa;
@@ -112,8 +127,11 @@ ao_microflight(void)
 		ao_microsample();
 		if ((sample_count & 3) == 0)
 			ao_led_off(AO_LED_REPORT);
-		if (sample_count & 1)
+		if (log_count == LOG_INTERVAL - 1) {
 			ao_log_micro_data();
+			log_count = 0;
+		} else
+			log_count++;
 
 		/* If accelerating upwards, don't look for min pressure */
 		if (ao_pa_accel < ACCEL_LOCK_PA)

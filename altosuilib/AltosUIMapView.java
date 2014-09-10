@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,7 +26,7 @@ import java.lang.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 public class AltosUIMapView extends Component implements MouseMotionListener, MouseListener, MouseWheelListener, ComponentListener, AltosUIMapTileListener, AltosUIMapStoreListener {
 
@@ -67,7 +67,7 @@ public class AltosUIMapView extends Component implements MouseMotionListener, Mo
 	AltosUILatLon		centre;
 
 	public void set_font() {
-		line.set_font(AltosUILib.value_font);
+		line.set_font(AltosUILib.status_font);
 		for (AltosUIMapTile tile : tiles.values())
 			tile.set_font(AltosUILib.value_font);
 		repaint();
@@ -370,7 +370,7 @@ public class AltosUIMapView extends Component implements MouseMotionListener, Mo
 		for (Point point : to_remove)
 			tiles.remove(point);
 
-		cache.set_cache_size(((lower_right.y - upper_left.y) / px_size + 1) * ((lower_right.x - upper_left.x) / px_size + 1));
+		cache.set_cache_size((getWidth() / px_size + 2) * (getHeight() / px_size + 2));
 		for (int y = upper_left.y; y <= lower_right.y; y += px_size) {
 			for (int x = upper_left.x; x <= lower_right.x; x += px_size) {
 				Point point = new Point(x, y);

@@ -15,9 +15,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 public class AltosGraphDataPoint implements AltosUIDataPoint {
 
@@ -53,7 +53,10 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 	public static final int data_gps_course = 27;
 	public static final int data_gps_ground_speed = 28;
 	public static final int data_gps_climb_rate = 29;
-	public static final int data_ignitor_0 = 30;
+	public static final int data_gps_pdop = 30;
+	public static final int data_gps_hdop = 31;
+	public static final int data_gps_vdop = 32;
+	public static final int data_ignitor_0 = 33;
 	public static final int data_ignitor_num = 32;
 	public static final int data_ignitor_max = data_ignitor_0 + data_ignitor_num - 1;
 	public static final int data_ignitor_fired_0 = data_ignitor_0 + data_ignitor_num;
@@ -191,6 +194,24 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 		case data_gps_climb_rate:
 			if (state.gps != null)
 				y = state.gps.climb_rate;
+			else
+				y = AltosLib.MISSING;
+			break;
+		case data_gps_pdop:
+			if (state.gps != null)
+				y = state.gps.pdop;
+			else
+				y = AltosLib.MISSING;
+			break;
+		case data_gps_hdop:
+			if (state.gps != null)
+				y = state.gps.hdop;
+			else
+				y = AltosLib.MISSING;
+			break;
+		case data_gps_vdop:
+			if (state.gps != null)
+				y = state.gps.vdop;
 			else
 				y = AltosLib.MISSING;
 			break;

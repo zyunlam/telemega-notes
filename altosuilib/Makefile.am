@@ -36,7 +36,6 @@ altosuilib_JAVA = \
 	AltosVoice.java \
 	AltosDisplayThread.java \
 	AltosDeviceUIDialog.java \
-	AltosFreqList.java \
 	AltosSerial.java \
 	AltosSerialInUseException.java \
 	AltosConfigFreqUI.java \
@@ -68,6 +67,7 @@ altosuilib_JAVA = \
 	AltosUIMapPath.java \
 	AltosUIMapTile.java \
 	AltosUIMapCache.java \
+	AltosUIMapCacheListener.java \
 	AltosUIMapImage.java \
 	AltosUIMapTransform.java \
 	AltosUIMapRectangle.java \
@@ -80,7 +80,11 @@ altosuilib_JAVA = \
 	AltosUIFlightTab.java \
 	AltosUIIndicator.java \
 	AltosUIUnitsIndicator.java \
-	AltosUIVoltageIndicator.java
+	AltosUIVoltageIndicator.java \
+	AltosUIFreqList.java \
+	AltosUITelemetryList.java \
+	AltosUIRateList.java \
+	OSXAdapter.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar
 
@@ -99,7 +103,7 @@ ICONJAR= -C $(ICONDIR) redled.png -C $(ICONDIR) redoff.png \
 all-local: $(JAR)
 
 clean-local:
-	-rm -rf $(JAVAROOT) $(JAR)
+	-rm -rf $(JAVAROOT) altosuilib_*.jar
 
 install-altosuilibJAVA: $(JAR)
 	@$(NORMAL_INSTALL)

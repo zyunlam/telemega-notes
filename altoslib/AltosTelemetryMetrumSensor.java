@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 
 public class AltosTelemetryMetrumSensor extends AltosTelemetryStandard {
@@ -27,7 +27,7 @@ public class AltosTelemetryMetrumSensor extends AltosTelemetryStandard {
 
 	int	acceleration;
 	int	speed;
-	int	height;
+	int	height_16;
 
 	int	v_batt;
 	int	sense_a;
@@ -43,7 +43,7 @@ public class AltosTelemetryMetrumSensor extends AltosTelemetryStandard {
 
 		acceleration  = int16(14);
 		speed         = int16(16);
-		height        = int16(18);
+		height_16     = int16(18);
 
 		v_batt        = int16(20);
 		sense_a       = int16(22);
@@ -59,7 +59,8 @@ public class AltosTelemetryMetrumSensor extends AltosTelemetryStandard {
 		state.set_pressure(pres);
 		state.set_temperature(temp/100.0);
 
-		state.set_kalman(height, speed/16.0, acceleration/16.0);
+		state.set_kalman(extend_height(state, height_16),
+				 speed/16.0, acceleration/16.0);
 
 		state.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt));
 

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_2;
+package org.altusmetrum.altosuilib_3;
 
 import java.util.*;
 import libaltosJNI.*;
@@ -79,6 +79,7 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 		if (want_product == AltosUILib.product_altimeter)
 			return have_product == AltosUILib.product_telemetrum ||
 				have_product == AltosUILib.product_telemega ||
+				have_product == AltosUILib.product_easymega ||
 				have_product == AltosUILib.product_telegps ||
 				have_product == AltosUILib.product_easymini ||
 				have_product == AltosUILib.product_telemini;

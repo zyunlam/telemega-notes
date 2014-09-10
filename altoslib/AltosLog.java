@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.io.*;
 import java.text.*;
@@ -72,6 +72,7 @@ public class AltosLog implements Runnable {
 			}
 			log_file.flush();
 			file = a;
+			AltosPreferences.set_logfile(link.serial, file);
 		}
 		return log_file != null;
 	}

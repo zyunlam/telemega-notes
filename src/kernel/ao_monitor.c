@@ -115,6 +115,8 @@ ao_monitor_put(void)
 {
 #if LEGACY_MONITOR
 	__xdata char callsign[AO_MAX_CALLSIGN+1];
+#endif
+#if LEGACY_MONITOR || HAS_RSSI
 	int16_t rssi;
 #endif
 	uint8_t ao_monitor_tail;
@@ -240,7 +242,7 @@ ao_monitor_put(void)
 			hex(sum);
 			putchar ('\n');
 #if HAS_RSSI
-			if (recv_raw.packet[ao_monitoring + 1] & PKT_APPEND_STATUS_1_CRC_OK) {
+			if (recv_raw.packet[ao_monitoring + 1] & AO_RADIO_STATUS_CRC_OK) {
 				rssi = AO_RSSI_FROM_RADIO(recv_raw.packet[ao_monitoring]);
 				ao_rssi_set(rssi);
 			}

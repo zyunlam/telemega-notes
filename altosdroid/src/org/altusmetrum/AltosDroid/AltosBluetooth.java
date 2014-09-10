@@ -31,7 +31,7 @@ import android.os.Handler;
 //import android.os.Message;
 import android.util.Log;
 
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
 public class AltosBluetooth extends AltosLink {
 
@@ -52,6 +52,7 @@ public class AltosBluetooth extends AltosLink {
 
 	// Constructor
 	public AltosBluetooth(BluetoothDevice in_device, Handler in_handler) {
+//		set_debug(D);
 		adapter = BluetoothAdapter.getDefaultAdapter();
 		device = in_device;
 		handler = in_handler;
@@ -136,9 +137,27 @@ public class AltosBluetooth extends AltosLink {
 		}
 	}
 
+	public double frequency() {
+		return frequency;
+	}
+
+	public int telemetry_rate() {
+		return telemetry_rate;
+	}
+
+	public void save_frequency() {
+		AltosPreferences.set_frequency(0, frequency);
+	}
+
+	public void save_telemetry_rate() {
+		AltosPreferences.set_telemetry_rate(0, telemetry_rate);
+	}
+
 	private synchronized void wait_connected() throws InterruptedException, IOException {
 		if (input == null) {
+			if (D) Log.d(TAG, "wait_connected...");
 			wait();
+			if (D) Log.d(TAG, "wait_connected done");
 			if (input == null) throw new IOException();
 		}
 	}
@@ -174,18 +193,29 @@ public class AltosBluetooth extends AltosLink {
 		} catch (InterruptedException e) {
 			connection_lost();
 		}
-	}		
+	}
+
+	private static final int buffer_size = 1024;
+
+	private byte[] buffer = new byte[buffer_size];
+	private int buffer_len = 0;
+	private int buffer_off = 0;
 
 	public int getchar() {
-		try {
-			wait_connected();
-			return input.read();
-		} catch (IOException e) {
-			connection_lost();
-		} catch (java.lang.InterruptedException e) {
-			connection_lost();
+		while (buffer_off == buffer_len) {
+			try {
+				wait_connected();
+				buffer_len = input.read(buffer);
+				buffer_off = 0;
+			} catch (IOException e) {
+				connection_lost();
+				return AltosLink.ERROR;
+			} catch (java.lang.InterruptedException e) {
+				connection_lost();
+				return AltosLink.ERROR;
+			}
 		}
-		return AltosLink.ERROR;
+		return buffer[buffer_off++];
 	}
 
 	public void close() {

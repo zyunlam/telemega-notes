@@ -37,35 +37,40 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
+import android.view.View;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.location.Location;
 
-import org.altusmetrum.altoslib_4.*;
+import org.altusmetrum.altoslib_5.*;
 
-public class AltosDroid extends FragmentActivity {
+public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Debugging
-	private static final String TAG = "AltosDroid";
-	private static final boolean D = true;
+	static final String TAG = "AltosDroid";
+	static final boolean D = true;
 
 	// Message types received by our Handler
-	public static final int MSG_STATE_CHANGE    = 1;
-	public static final int MSG_TELEMETRY       = 2;
-	public static final int MSG_UPDATE_AGE      = 3;
-	public static final int MSG_LOCATION	    = 4;
-	public static final int MSG_CRC_ERROR	    = 5;
+
+	public static final int MSG_STATE           = 1;
+	public static final int MSG_UPDATE_AGE      = 2;
 
 	// Intent request codes
-	private static final int REQUEST_CONNECT_DEVICE = 1;
-	private static final int REQUEST_ENABLE_BT      = 2;
+	public static final int REQUEST_CONNECT_DEVICE = 1;
+	public static final int REQUEST_ENABLE_BT      = 2;
+
+	public static FragmentManager	fm;
+
+	private BluetoothAdapter mBluetoothAdapter = null;
 
 	// Layout Views
 	private TextView mTitle;
@@ -75,11 +80,15 @@ public class AltosDroid extends FragmentActivity {
 	private TextView mRSSIView;
 	private TextView mSerialView;
 	private TextView mFlightView;
+	private RelativeLayout mStateLayout;
 	private TextView mStateView;
 	private TextView mAgeView;
 
 	// field to display the version at the bottom of the screen
 	private TextView mVersion;
+
+	private double frequency;
+	private int telemetry_rate;
 
 	// Tabs
 	TabHost         mTabHost;
@@ -89,22 +98,13 @@ public class AltosDroid extends FragmentActivity {
 	int             tabHeight;
 
 	// Timer and Saved flight state for Age calculation
-	private Timer timer = new Timer();
+	private Timer timer;
 	AltosState saved_state;
-	Location saved_location;
 
 	// Service
 	private boolean mIsBound   = false;
 	private Messenger mService = null;
 	final Messenger mMessenger = new Messenger(new IncomingHandler(this));
-
-	// Preferences
-	private AltosDroidPreferences prefs = null;
-
-	// TeleBT Config data
-	private AltosConfigData mConfigData = null;
-	// Local Bluetooth adapter
-	private BluetoothAdapter mBluetoothAdapter = null;
 
 	// Text to Speech
 	private AltosVoice mAltosVoice = null;
@@ -117,38 +117,21 @@ public class AltosDroid extends FragmentActivity {
 		@Override
 		public void handleMessage(Message msg) {
 			AltosDroid ad = mAltosDroid.get();
+
 			switch (msg.what) {
-			case MSG_STATE_CHANGE:
-				if(D) Log.d(TAG, "MSG_STATE_CHANGE: " + msg.arg1);
-				switch (msg.arg1) {
-				case TelemetryService.STATE_CONNECTED:
-					ad.mConfigData = (AltosConfigData) msg.obj;
-					String str = String.format(" %s S/N: %d", ad.mConfigData.product, ad.mConfigData.serial);
-					ad.mTitle.setText(R.string.title_connected_to);
-					ad.mTitle.append(str);
-					Toast.makeText(ad.getApplicationContext(), "Connected to " + str, Toast.LENGTH_SHORT).show();
-					break;
-				case TelemetryService.STATE_CONNECTING:
-					ad.mTitle.setText(R.string.title_connecting);
-					break;
-				case TelemetryService.STATE_READY:
-				case TelemetryService.STATE_NONE:
-					ad.mConfigData = null;
-					ad.mTitle.setText(R.string.title_not_connected);
-					break;
+			case MSG_STATE:
+				if(D) Log.d(TAG, "MSG_STATE");
+				TelemetryState telemetry_state = (TelemetryState) msg.obj;
+				if (telemetry_state == null) {
+					Log.d(TAG, "telemetry_state null!");
+					return;
 				}
+
+				ad.update_state(telemetry_state);
 				break;
-			case MSG_TELEMETRY:
-				ad.update_ui((AltosState) msg.obj);
-				break;
-			case MSG_LOCATION:
-				ad.set_location((Location) msg.obj);
-				break;
-			case MSG_CRC_ERROR:
 			case MSG_UPDATE_AGE:
-				if (ad.saved_state != null) {
-					ad.mAgeView.setText(String.format("%d", (System.currentTimeMillis() - ad.saved_state.received_time + 500) / 1000));
-				}
+				if(D) Log.d(TAG, "MSG_UPDATE_AGE");
+				ad.update_age();
 				break;
 			}
 		}
@@ -204,57 +187,180 @@ public class AltosDroid extends FragmentActivity {
 		mTabs.remove(mTab);
 	}
 
-	void set_location(Location location) {
-		saved_location = location;
-		update_ui(saved_state);
+	public void units_changed(boolean imperial_units) {
+		for (AltosDroidTab mTab : mTabs)
+			mTab.units_changed(imperial_units);
 	}
 
-	void update_ui(AltosState state) {
-		if (state != null && saved_state != null) {
-			if (saved_state.state != state.state) {
-				String currentTab = mTabHost.getCurrentTabTag();
-				switch (state.state) {
-				case AltosLib.ao_flight_boost:
-					if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("ascent");
-					break;
-				case AltosLib.ao_flight_drogue:
-					if (currentTab.equals("ascent")) mTabHost.setCurrentTabByTag("descent");
-					break;
-				case AltosLib.ao_flight_landed:
-					if (currentTab.equals("descent")) mTabHost.setCurrentTabByTag("landed");
-					break;
-				}
+	void update_title(TelemetryState telemetry_state) {
+		switch (telemetry_state.connect) {
+		case TelemetryState.CONNECT_CONNECTED:
+			if (telemetry_state.config != null) {
+				String str = String.format("S/N %d %6.3f MHz", telemetry_state.config.serial,
+							   telemetry_state.frequency);
+				if (telemetry_state.telemetry_rate != AltosLib.ao_telemetry_rate_38400)
+					str = str.concat(String.format(" %d bps",
+								       AltosLib.ao_telemetry_rate_values[telemetry_state.telemetry_rate]));
+				mTitle.setText(str);
+			} else {
+				mTitle.setText(R.string.title_connected_to);
 			}
+			break;
+		case TelemetryState.CONNECT_CONNECTING:
+			mTitle.setText(R.string.title_connecting);
+			break;
+		case TelemetryState.CONNECT_READY:
+		case TelemetryState.CONNECT_NONE:
+			mTitle.setText(R.string.title_not_connected);
+			break;
 		}
-		saved_state = state;
+	}
+
+	void start_timer() {
+		if (timer == null) {
+			timer = new Timer();
+			timer.scheduleAtFixedRate(new TimerTask(){ public void run() {onTimerTick();}}, 1000L, 1000L);
+		}
+	}
+
+	void stop_timer() {
+		if (timer != null) {
+			timer.cancel();
+			timer.purge();
+			timer = null;
+		}
+	}
+
+	boolean	registered_units_listener;
+
+	void update_state(TelemetryState telemetry_state) {
+
+		if (!registered_units_listener) {
+			registered_units_listener = true;
+			AltosPreferences.register_units_listener(this);
+		}
+
+		update_title(telemetry_state);
+		update_ui(telemetry_state.state, telemetry_state.location);
+		if (telemetry_state.connect == TelemetryState.CONNECT_CONNECTED)
+			start_timer();
+		else
+			stop_timer();
+	}
+
+	boolean same_string(String a, String b) {
+		if (a == null) {
+			if (b == null)
+				return true;
+			return false;
+		} else {
+			if (b == null)
+				return false;
+			return a.equals(b);
+		}
+	}
+
+	void update_age() {
+		if (saved_state != null)
+			mAgeView.setText(String.format("%d", (System.currentTimeMillis() - saved_state.received_time + 500) / 1000));
+	}
+
+	void update_ui(AltosState state, Location location) {
+
+		Log.d(TAG, "update_ui");
+
+		int prev_state = AltosLib.ao_flight_invalid;
 
 		AltosGreatCircle from_receiver = null;
 
-		if (state != null && saved_location != null && state.gps != null && state.gps.locked) {
-			double altitude = 0;
-			if (saved_location.hasAltitude())
-				altitude = saved_location.getAltitude();
-			from_receiver = new AltosGreatCircle(saved_location.getLatitude(),
-							     saved_location.getLongitude(),
-							     altitude,
-							     state.gps.lat,
-							     state.gps.lon,
-							     state.gps.alt);
-		}
+		if (saved_state != null)
+			prev_state = saved_state.state;
 
 		if (state != null) {
-			mCallsignView.setText(state.callsign);
-			mSerialView.setText(String.format("%d", state.serial));
-			mFlightView.setText(String.format("%d", state.flight));
-			mStateView.setText(state.state_name());
-			mRSSIView.setText(String.format("%d", state.rssi));
+			Log.d(TAG, String.format("prev state %d new state  %d\n", prev_state, state.state));
+			if (state.state == AltosLib.ao_flight_stateless) {
+				boolean	prev_locked = false;
+				boolean locked = false;
+
+				if(state.gps != null)
+					locked = state.gps.locked;
+				if (saved_state != null && saved_state.gps != null)
+					prev_locked = saved_state.gps.locked;
+				if (prev_locked != locked) {
+					String currentTab = mTabHost.getCurrentTabTag();
+					if (locked) {
+						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("descent");
+					} else {
+						if (currentTab.equals("descent")) mTabHost.setCurrentTabByTag("pad");
+					}
+				}
+			} else {
+				if (prev_state != state.state) {
+					String currentTab = mTabHost.getCurrentTabTag();
+					Log.d(TAG, "switch state");
+					switch (state.state) {
+					case AltosLib.ao_flight_boost:
+						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("ascent");
+						break;
+					case AltosLib.ao_flight_drogue:
+						if (currentTab.equals("ascent")) mTabHost.setCurrentTabByTag("descent");
+						break;
+					case AltosLib.ao_flight_landed:
+						if (currentTab.equals("descent")) mTabHost.setCurrentTabByTag("landed");
+						break;
+					case AltosLib.ao_flight_stateless:
+						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("descent");
+						break;
+					}
+				}
+			}
+
+			if (location != null && state.gps != null && state.gps.locked) {
+				double altitude = 0;
+				if (location.hasAltitude())
+					altitude = location.getAltitude();
+				from_receiver = new AltosGreatCircle(location.getLatitude(),
+								     location.getLongitude(),
+								     altitude,
+								     state.gps.lat,
+								     state.gps.lon,
+								     state.gps.alt);
+			}
+
+			if (saved_state == null || !same_string(saved_state.callsign, state.callsign)) {
+				Log.d(TAG, "update callsign");
+				mCallsignView.setText(state.callsign);
+			}
+			if (saved_state == null || state.serial != saved_state.serial) {
+				Log.d(TAG, "update serial");
+				mSerialView.setText(String.format("%d", state.serial));
+			}
+			if (saved_state == null || state.flight != saved_state.flight) {
+				Log.d(TAG, "update flight");
+				mFlightView.setText(String.format("%d", state.flight));
+			}
+			if (saved_state == null || state.state != saved_state.state) {
+				Log.d(TAG, "update state");
+				if (state.state == AltosLib.ao_flight_stateless) {
+					mStateLayout.setVisibility(View.GONE);
+				} else {
+					mStateView.setText(state.state_name());
+					mStateLayout.setVisibility(View.VISIBLE);
+				}
+			}
+			if (saved_state == null || state.rssi != saved_state.rssi) {
+				Log.d(TAG, "update rssi");
+				mRSSIView.setText(String.format("%d", state.rssi));
+			}
 		}
 
 		for (AltosDroidTab mTab : mTabs)
-			mTab.update_ui(state, from_receiver, saved_location);
+			mTab.update_ui(state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
 		if (state != null)
-			mAltosVoice.tell(state);
+			mAltosVoice.tell(state, from_receiver);
+
+		saved_state = state;
 	}
 
 	private void onTimerTick() {
@@ -301,12 +407,9 @@ public class AltosDroid extends FragmentActivity {
 		if (mBluetoothAdapter == null) {
 			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
 			finish();
-			return;
 		}
 
-		// Initialise preferences
-		prefs = new AltosDroidPreferences(this);
-		AltosPreferences.init(prefs);
+		fm = getSupportFragmentManager();
 
 		// Set up the window layout
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
@@ -349,7 +452,6 @@ public class AltosDroid extends FragmentActivity {
 		for (int i = 0; i < 5; i++)
 			mTabHost.getTabWidget().getChildAt(i).getLayoutParams().height = tabHeight;
 
-
 		// Set up the custom title
 		mTitle = (TextView) findViewById(R.id.title_left_text);
 		mTitle.setText(R.string.app_name);
@@ -365,10 +467,9 @@ public class AltosDroid extends FragmentActivity {
 		mRSSIView      = (TextView) findViewById(R.id.rssi_value);
 		mSerialView    = (TextView) findViewById(R.id.serial_value);
 		mFlightView    = (TextView) findViewById(R.id.flight_value);
+		mStateLayout   = (RelativeLayout) findViewById(R.id.state_container);
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
-
-		timer.scheduleAtFixedRate(new TimerTask(){ public void run() {onTimerTick();}}, 1000L, 100L);
 
 		mAltosVoice = new AltosVoice(this);
 	}
@@ -378,15 +479,16 @@ public class AltosDroid extends FragmentActivity {
 		super.onStart();
 		if(D) Log.e(TAG, "++ ON START ++");
 
-		if (!mBluetoothAdapter.isEnabled()) {
-			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-		}
-
 		// Start Telemetry Service
 		startService(new Intent(AltosDroid.this, TelemetryService.class));
 
+		if (!mBluetoothAdapter.isEnabled()) {
+			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			startActivityForResult(enableIntent, AltosDroid.REQUEST_ENABLE_BT);
+		}
+
 		doBindService();
+
 	}
 
 	@Override
@@ -415,6 +517,7 @@ public class AltosDroid extends FragmentActivity {
 		if(D) Log.e(TAG, "--- ON DESTROY ---");
 
 		if (mAltosVoice != null) mAltosVoice.stop();
+		stop_timer();
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -442,17 +545,19 @@ public class AltosDroid extends FragmentActivity {
 		}
 	}
 
+	private void connectDevice(String address) {
+		// Attempt to connect to the device
+		try {
+			if (D) Log.d(TAG, "Connecting to " + address);
+			mService.send(Message.obtain(null, TelemetryService.MSG_CONNECT, address));
+		} catch (RemoteException e) {
+		}
+	}
+
 	private void connectDevice(Intent data) {
 		// Get the device MAC address
 		String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-		// Get the BLuetoothDevice object
-		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-		// Attempt to connect to the device
-		try {
-			if (D) Log.d(TAG, "Connecting to " + device.getName());
-			mService.send(Message.obtain(null, TelemetryService.MSG_CONNECT, device));
-		} catch (RemoteException e) {
-		}
+		connectDevice(address);
 	}
 
 	@Override
@@ -476,6 +581,33 @@ public class AltosDroid extends FragmentActivity {
 		}
 	}
 
+	void setBaud(int baud) {
+		try {
+			mService.send(Message.obtain(null, TelemetryService.MSG_SETBAUD, baud));
+		} catch (RemoteException e) {
+		}
+	}
+
+	void setBaud(String baud) {
+		try {
+			int	value = Integer.parseInt(baud);
+			int	rate = AltosLib.ao_telemetry_rate_38400;
+			switch (value) {
+			case 2400:
+				rate = AltosLib.ao_telemetry_rate_2400;
+				break;
+			case 9600:
+				rate = AltosLib.ao_telemetry_rate_9600;
+				break;
+			case 38400:
+				rate = AltosLib.ao_telemetry_rate_38400;
+				break;
+			}
+			setBaud(rate);
+		} catch (NumberFormatException e) {
+		}
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent serverIntent = null;
@@ -484,6 +616,11 @@ public class AltosDroid extends FragmentActivity {
 			// Launch the DeviceListActivity to see devices and do scan
 			serverIntent = new Intent(this, DeviceListActivity.class);
 			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+			return true;
+		case R.id.quit:
+			Log.d(TAG, "R.id.quit");
+			stopService(new Intent(AltosDroid.this, TelemetryService.class));
+			finish();
 			return true;
 		case R.id.select_freq:
 			// Set the TBT radio frequency
@@ -501,16 +638,40 @@ public class AltosDroid extends FragmentActivity {
 				"Channel 9 (435.450MHz)"
 			};
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Pick a frequency");
-			builder.setItems(frequencies,
+			AlertDialog.Builder builder_freq = new AlertDialog.Builder(this);
+			builder_freq.setTitle("Pick a frequency");
+			builder_freq.setItems(frequencies,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
 							 setFrequency(frequencies[item]);
 						 }
 					 });
-			AlertDialog alert = builder.create();
-			alert.show();
+			AlertDialog alert_freq = builder_freq.create();
+			alert_freq.show();
+			return true;
+		case R.id.select_rate:
+			// Set the TBT baud rate
+
+			final String[] rates = {
+				"38400",
+				"9600",
+				"2400",
+			};
+
+			AlertDialog.Builder builder_rate = new AlertDialog.Builder(this);
+			builder_rate.setTitle("Pick a baud rate");
+			builder_rate.setItems(rates,
+					 new DialogInterface.OnClickListener() {
+						 public void onClick(DialogInterface dialog, int item) {
+							 setBaud(rates[item]);
+						 }
+					 });
+			AlertDialog alert_rate = builder_rate.create();
+			alert_rate.show();
+			return true;
+		case R.id.change_units:
+			boolean	imperial = AltosPreferences.imperial_units();
+			AltosPreferences.set_imperial_units(!imperial);
 			return true;
 		}
 		return false;

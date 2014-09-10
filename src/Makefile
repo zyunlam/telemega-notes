@@ -22,9 +22,11 @@ SDCCDIRS=\
 	telemini-v1.0 telemini-v2.0 \
 	telebt-v1.0 \
 	teleterra-v0.2 teleshield-v0.1 \
-	telefire-v0.1 telefire-v0.2
+	telefire-v0.1 telefire-v0.2 \
+	telerepeat-v1.0
 
 ARMM3DIRS=\
+	easymega-v1.0 easymega-v1.0/flash-loader \
 	telemega-v0.1 telemega-v0.1/flash-loader \
 	telemega-v1.0 telemega-v1.0/flash-loader \
 	telemetrum-v2.0 telemetrum-v2.0/flash-loader \
@@ -39,7 +41,7 @@ ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader
 
 AVRDIRS=\
-	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1
+	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1 microkite
 
 SUBDIRS=
 
@@ -98,7 +100,7 @@ uninstall:
 
 all-recursive: all-local
 
-all-local: altitude.h altitude-pa.h ao_kalman.h ao_whiten.h $(PDCLIB)
+all-local: altitude.h altitude-pa.h altitude-pa-small.h ao_kalman.h ao_whiten.h $(PDCLIB)
 
 altitude.h: make-altitude
 	nickle $< > $@
@@ -106,7 +108,10 @@ altitude.h: make-altitude
 altitude-pa.h: make-altitude-pa
 	nickle $< > $@
 
-ao_kalman.h: make-kalman kalman.5c kalman_filter.5c load_csv.5c matrix.5c
+altitude-pa-small.h: make-altitude-pa
+	nickle $< --sample 3 > $@
+
+ao_kalman.h: make-kalman kalman.5c kalman_micro.5c kalman_filter.5c load_csv.5c matrix.5c
 	bash $< kalman > $@
 
 ao_whiten.h: make-whiten

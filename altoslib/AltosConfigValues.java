@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 public interface AltosConfigValues {
 	/* set and get all of the dialog values */
@@ -24,6 +24,8 @@ public interface AltosConfigValues {
 	public abstract void set_version(String version);
 
 	public abstract void set_serial(int serial);
+
+	public abstract void set_altitude_32(int altitude_32);
 
 	public abstract void set_main_deploy(int new_main_deploy);
 
@@ -53,6 +55,10 @@ public interface AltosConfigValues {
 
 	public abstract String callsign();
 
+	public abstract void set_telemetry_rate(int new_telemetry_rate);
+
+	public abstract int telemetry_rate() throws AltosConfigDataException;
+
 	public abstract void set_flight_log_max(int new_flight_log_max);
 
 	public abstract void set_flight_log_max_enabled(boolean enable);
@@ -80,6 +86,10 @@ public interface AltosConfigValues {
 	public abstract int aprs_interval() throws AltosConfigDataException;
 
 	public abstract void set_aprs_interval(int new_aprs_interval);
+
+	public abstract int aprs_ssid() throws AltosConfigDataException;
+
+	public abstract void set_aprs_ssid(int new_aprs_ssid);
 
 	public abstract int beep() throws AltosConfigDataException;
 

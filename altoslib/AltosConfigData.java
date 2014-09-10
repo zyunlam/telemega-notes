@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_4;
+package org.altusmetrum.altoslib_5;
 
 import java.util.*;
 import java.text.*;
@@ -31,6 +31,7 @@ public class AltosConfigData implements Iterable<String> {
 	public int	log_format;
 	public int	log_space;
 	public String	version;
+	public int	altitude_32;
 
 	/* Strings returned */
 	public LinkedList<String>	lines;
@@ -46,6 +47,7 @@ public class AltosConfigData implements Iterable<String> {
 	public String	callsign;
 	public int	radio_enable;
 	public int	radio_calibration;
+	public int	telemetry_rate;
 	/* Old HAS_RADIO values */
 	public int	radio_channel;
 	public int	radio_setting;
@@ -56,6 +58,7 @@ public class AltosConfigData implements Iterable<String> {
 
 	/* HAS_LOG */
 	public int	flight_log_max;
+	public int 	log_fixed;
 
 	/* HAS_IGNITE */
 	public int	ignite_mode;
@@ -71,6 +74,7 @@ public class AltosConfigData implements Iterable<String> {
 
 	/* HAS_APRS */
 	public int		aprs_interval;
+	public int		aprs_ssid;
 
 	/* HAS_BEEP */
 	public int		beep;
@@ -234,12 +238,14 @@ public class AltosConfigData implements Iterable<String> {
 		radio_calibration = -1;
 		radio_channel = -1;
 		radio_setting = -1;
+		telemetry_rate = -1;
 
 		accel_cal_plus = -1;
 		accel_cal_minus = -1;
 		pad_orientation = -1;
 
 		flight_log_max = -1;
+		log_fixed = -1;
 		ignite_mode = -1;
 
 		aes_key = "";
@@ -250,6 +256,7 @@ public class AltosConfigData implements Iterable<String> {
 		pyro_firing_time = -1;
 
 		aprs_interval = -1;
+		aprs_ssid = -1;
 
 		beep = -1;
 
@@ -270,6 +277,7 @@ public class AltosConfigData implements Iterable<String> {
 		try { flight = get_int(line, "current-flight"); } catch (Exception e) {}
 		try { log_format = get_int(line, "log-format"); } catch (Exception e) {}
 		try { log_space = get_int(line, "log-space"); } catch (Exception e) {}
+		try { altitude_32 = get_int(line, "altitude-32"); } catch (Exception e) {}
 		try { version = get_string(line, "software-version"); } catch (Exception e) {}
 
 		/* Version also contains MS5607 info, which we ignore here */
@@ -290,6 +298,7 @@ public class AltosConfigData implements Iterable<String> {
 		try { callsign = get_string(line, "Callsign:"); } catch (Exception e) {}
 		try { radio_enable = get_int(line, "Radio enable:"); } catch (Exception e) {}
 		try { radio_calibration = get_int(line, "Radio cal:"); } catch (Exception e) {}
+		try { telemetry_rate = get_int(line, "Telemetry rate:"); } catch (Exception e) {}
 
 		/* Old HAS_RADIO values */
 		try { radio_channel = get_int(line, "Radio channel:"); } catch (Exception e) {}
@@ -309,6 +318,7 @@ public class AltosConfigData implements Iterable<String> {
 
 		/* HAS_LOG */
 		try { flight_log_max = get_int(line, "Max flight log:"); } catch (Exception e) {}
+		try { log_fixed = get_int(line, "Log fixed:"); } catch (Exception e) {}
 
 		/* HAS_IGNITE */
 		try { ignite_mode = get_int(line, "Ignite mode:"); } catch (Exception e) {}
@@ -333,6 +343,7 @@ public class AltosConfigData implements Iterable<String> {
 
 		/* HAS_APRS */
 		try { aprs_interval = get_int(line, "APRS interval:"); } catch (Exception e) {}
+		try { aprs_ssid = get_int(line, "APRS SSID:"); } catch (Exception e) {}
 
 		/* HAS_BEEP */
 		try { beep = get_int(line, "Beeper setting:"); } catch (Exception e) {}
@@ -375,6 +386,10 @@ public class AltosConfigData implements Iterable<String> {
 		return radio_frequency >= 0 || radio_setting >= 0 || radio_channel >= 0;
 	}
 
+	public boolean has_telemetry_rate() {
+		return telemetry_rate >= 0;
+	}
+
 	public void set_frequency(double freq) {
 		int	frequency = radio_frequency;
 		int	setting = radio_setting;
@@ -414,6 +429,8 @@ public class AltosConfigData implements Iterable<String> {
 			return false;
 		if (product.startsWith("TeleMetrum-v2"))
 			return false;
+		if (product.startsWith("EasyMega"))
+			return false;
 		return true;
 	}
 
@@ -437,6 +454,8 @@ public class AltosConfigData implements Iterable<String> {
 			callsign = source.callsign();
 		if (radio_calibration >= 0)
 			radio_calibration = source.radio_calibration();
+		if (telemetry_rate >= 0)
+			telemetry_rate = source.telemetry_rate();
 
 		/* HAS_ACCEL */
 		if (pad_orientation >= 0)
@@ -459,6 +478,8 @@ public class AltosConfigData implements Iterable<String> {
 		/* HAS_APRS */
 		if (aprs_interval >= 0)
 			aprs_interval = source.aprs_interval();
+		if (aprs_ssid >= 0)
+			aprs_ssid = source.aprs_ssid();
 
 		/* HAS_BEEP */
 		if (beep >= 0)
@@ -474,14 +495,19 @@ public class AltosConfigData implements Iterable<String> {
 		dest.set_serial(serial);
 		dest.set_product(product);
 		dest.set_version(version);
+		dest.set_altitude_32(altitude_32);
 		dest.set_main_deploy(main_deploy);
 		dest.set_apogee_delay(apogee_delay);
 		dest.set_apogee_lockout(apogee_lockout);
 		dest.set_radio_calibration(radio_calibration);
 		dest.set_radio_frequency(frequency());
+		dest.set_telemetry_rate(telemetry_rate);
 		boolean max_enabled = true;
 
 		if (log_space() == 0)
+			max_enabled = false;
+
+		if (log_fixed > 0)
 			max_enabled = false;
 
 		switch (log_format) {
@@ -507,6 +533,7 @@ public class AltosConfigData implements Iterable<String> {
 			dest.set_pyros(null);
 		dest.set_pyro_firing_time(pyro_firing_time);
 		dest.set_aprs_interval(aprs_interval);
+		dest.set_aprs_ssid(aprs_ssid);
 		dest.set_beep(beep);
 		dest.set_tracker_motion(tracker_motion);
 		dest.set_tracker_interval(tracker_interval);
@@ -537,14 +564,36 @@ public class AltosConfigData implements Iterable<String> {
 							radio_calibration);
 			/* When remote, reset the dongle frequency at the same time */
 			if (remote) {
+				link.flush_output();
 				link.stop_remote();
 				link.set_radio_frequency(frequency);
+				link.flush_output();
 				link.start_remote();
 			}
 		}
 
-		if (callsign != null)
+		if (telemetry_rate >= 0) {
+			link.printf("c T %d\n", telemetry_rate);
+			if (remote) {
+				link.flush_output();
+				link.stop_remote();
+				link.set_telemetry_rate(telemetry_rate);
+				link.flush_output();
+				link.start_remote();
+			}
+		}
+
+		if (callsign != null) {
 			link.printf("c c %s\n", callsign);
+			if (remote) {
+				link.flush_output();
+				link.stop_remote();
+				link.set_callsign(callsign);
+				link.flush_output();
+				link.start_remote();
+			}
+		}
+
 		if (radio_enable >= 0)
 			link.printf("c e %d\n", radio_enable);
 
@@ -577,6 +626,8 @@ public class AltosConfigData implements Iterable<String> {
 		/* HAS_APRS */
 		if (aprs_interval >= 0)
 			link.printf("c A %d\n", aprs_interval);
+		if (aprs_ssid >= 0)
+			link.printf("c S %d\n", aprs_ssid);
 
 		/* HAS_BEEP */
 		if (beep >= 0)

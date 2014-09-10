@@ -21,8 +21,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_4.*;
-import org.altusmetrum.altosuilib_2.*;
+import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altosuilib_3.*;
 
 public class AltosConfigTDUI
 	extends AltosUIDialog
@@ -37,6 +37,7 @@ public class AltosConfigTDUI
 	JLabel		frequency_label;
 	JLabel		radio_calibration_label;
 	JLabel		radio_frequency_label;
+	JLabel		rate_label;
 
 	public boolean		dirty;
 
@@ -44,8 +45,9 @@ public class AltosConfigTDUI
 	JLabel		product_value;
 	JLabel		version_value;
 	JLabel		serial_value;
-	AltosFreqList	radio_frequency_value;
+	AltosUIFreqList	radio_frequency_value;
 	JLabel		radio_calibration_value;
+	AltosUIRateList	rate_value;
 
 	JButton		save;
 	JButton		reset;
@@ -53,7 +55,6 @@ public class AltosConfigTDUI
 	JButton		close;
 
 	ActionListener	listener;
-
 
 	/* A window listener to catch closing events and tell the config code */
 	class ConfigListener extends WindowAdapter {
@@ -166,7 +167,7 @@ public class AltosConfigTDUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		radio_frequency_value = new AltosFreqList();
+		radio_frequency_value = new AltosUIFreqList();
 		radio_frequency_value.addItemListener(this);
 		pane.add(radio_frequency_value, c);
 		radio_frequency_value.setToolTipText("Telemetry, RDF and packet frequency");
@@ -192,6 +193,28 @@ public class AltosConfigTDUI
 		c.ipady = 5;
 		radio_calibration_value = new JLabel(String.format("%d", 1186611));
 		pane.add(radio_calibration_value, c);
+
+		/* Telemetry Rate */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = 7;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		rate_label = new JLabel("Telemetry Rate:");
+		pane.add(rate_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = 7;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		rate_value = new AltosUIRateList();
+		pane.add(rate_value, c);
 
 		/* Buttons */
 		c = new GridBagConstraints();
@@ -338,6 +361,14 @@ public class AltosConfigTDUI
 
 	public void set_radio_calibration(int calibration) {
 		radio_calibration_value.setText(String.format("%d", calibration));
+	}
+
+	public int telemetry_rate() {
+		return rate_value.getSelectedIndex();
+	}
+
+	public void set_telemetry_rate(int rate) {
+		rate_value.setSelectedIndex(rate);
 	}
 
 	public void set_clean() {

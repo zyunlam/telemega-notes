@@ -131,7 +131,7 @@ JAR=altoslib_$(ALTOSLIB_VERSION).jar
 all-local: $(JAR)
 
 clean-local:
-	-rm -rf bin $(JAR)
+	-rm -rf $(JAVAROOT) altoslib_*.jar
 
 install-altoslibJAVA: $(JAR)
 	@$(NORMAL_INSTALL)
