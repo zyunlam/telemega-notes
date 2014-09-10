@@ -16,7 +16,14 @@ altos (1.5-1) unstable; urgency=medium
   * update changelog for Debian build
   * capture deleted file
   * more build dependencies for processing icons
+  * more build dependencies for processing icons
   * update ChangeLog
+  * update changelog for Debian build
+  * another build dep
+  * use dh_installmime, which requires telling configure to stay out of the way
+  * another build dep
+  * use dh_installmime, which requires telling configure to stay out of the way
+  * update changelog for release
 
   [ Keith Packard ]
   * doc: Add instructions for flash recovery technique
@@ -164,8 +171,10 @@ altos (1.5-1) unstable; urgency=medium
   * altoslib/altosuilib: Add EasyMega support
   * altoslib/altosuilib: clean all versions of the .jar file
   * icons: Use DESTDIR when updating mime/icon caches
+  * .desktop: Use %F instead of %f in .desktop files
+  * configure: Add --disable-install-shared-mime-info option
 
- -- Bdale Garbee <bdale@gag.com>  Wed, 10 Sep 2014 00:06:56 -0600
+ -- Bdale Garbee <bdale@gag.com>  Wed, 10 Sep 2014 01:35:20 -0600
 
 altos (1.4.1-1) unstable; urgency=medium
 
