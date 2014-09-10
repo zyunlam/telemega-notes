@@ -1,3 +1,39 @@
+commit 5de00e9e39cff2d3b409c2ce99caa994f0a36202
+Merge: b3fba98 a72b768
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 00:02:57 2014 -0600
+
+    Merge branch 'master' into branch-1.5
+
+commit a72b7683606d3e741043011c929482a0a168a5c9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Sep 9 23:44:45 2014 -0600
+
+    more build dependencies for processing icons
+
+commit b3fba989a84db7d904e09a8f47e3a86d4e0f9577
+Merge: 28bd505 1fb200d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 00:01:33 2014 -0600
+
+    Merge branch 'master' into branch-1.5
+
+commit 1fb200d18cc385230b3af574816ec354682cc5c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 9 23:00:14 2014 -0700
+
+    icons: Use DESTDIR when updating mime/icon caches
+    
+    This is done in install-data-hook and needs to explicitly use DESTDIR
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 28bd5057252e61bc5b1a35a00bc1f9fdfde097f7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Sep 9 23:23:27 2014 -0600
+
+    updated ChangeLog for 1.5 release
+
 commit 45f50ad3a8ce69c708974711a5939c42a74bf53b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Sep 9 23:22:58 2014 -0600
