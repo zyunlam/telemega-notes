@@ -497,6 +497,14 @@ esac
 	
 AM_CONDITIONAL([MULTI_ARCH], [test x$MULTI_ARCH = xyes])
 
+AC_ARG_ENABLE([install-shared-mime-info],
+	      [AS_HELP_STRING([--disable-install-shared-mime-info],
+	                      [disable installing shared mime info files (default=yes)])],
+	      [INSTALL_SHARED_MIME_INFO=$enableval],
+	      [INSTALL_SHARED_MIME_INFO=yes])
+
+AM_CONDITIONAL([INSTALL_SHARED_MIME_INFO], [test x$INSTALL_SHARED_MIME_INFO = xyes])
+
 AC_OUTPUT([
 Makefile
 src/Makedefs
@@ -557,6 +565,7 @@ echo "    Android support.............: ${HAVE_ANDROID_SDK}"
 echo "    STlink support..............: ${HAVE_STLINK}"
 echo "    Local pdclib................: ${HAVE_PDCLIB}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
+echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
 echo ""
 echo "  Java"
 echo "    freetts.....................: ${FREETTS}"

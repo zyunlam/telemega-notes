@@ -85,8 +85,10 @@ MIME_ICONS = $(EEPROM_ICON) $(TELEM_ICON) $(MPD_ICON)
 mimeicondir = $(ICON_THEME)/scalable/mimetypes
 mimeicon_DATA = $(MIME_ICONS)
 
+if INSTALL_SHARED_MIME_INFO
 mimedir = $(datadir)/mime/packages
 mime_DATA = org-altusmetrum-mimetypes.xml
+endif
 
 pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = altusmetrum.xpm
@@ -116,9 +118,11 @@ clean-local:
 	$(RM) *.build *.ico *.rc *.icns *.o *.exe $(MPD_ICON)
 	$(RM) altusmetrum.xpm
 
+if INSTALL_SHARED_MIME_INFO
 install-data-hook:
 	update-mime-database $(DESTDIR)$(datadir)/mime
 	update-icon-caches $(DESTDIR)$(ICON_THEME)
+endif
 
 $(MPD_ICON): $(MP_ICON)
 	$(LN_S) $(MP_ICON) $@
