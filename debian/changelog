@@ -1,3 +1,167 @@
+altos (1.5-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * notes updated for TeleGPS and 1.4 release learnings
+  * make sure to use Google Maps API key for official builds
+  * need the api key in Bdale's root too
+  * update Releasing file based on learnings from 1.4.1 release
+  * Windows sucks, hard .. make sure filenames are legal in .mdwn files
+  * note need to push the updated repo with production binaries during release
+  * update turnon tools
+  * change easymega from v0.1 to v1.0, tweak to build on master, add to Makefile
+  * turn echo back on after accel cal in turnon_telemetrum so rest is easier
+  * tweaking test scripts
+  * releasing version 1.5
+  * updated ChangeLog for 1.5 release
+
+  [ Keith Packard ]
+  * doc: Add instructions for flash recovery technique
+  * altos/micropeak: Create a script to load firmware.
+  * altosui/telegps: Use menus for frequency list and telemetry formats
+  * altosuilib: Move menu bars into the Mac OS X top bar
+  * altosui: Fix ground station configure frequency list
+  * java: Bump java library versions for next release
+  * altos/micropeak: Add load script template
+  * Sign our .inf file with the comodo key. Update signing-driver
+  * Fix java version detection and downloading
+  * icon: Construct .exe files to hold windows icons for file associations
+  * windows installer: Create file associations for Windows.
+  * macosx: Define icons for our file types on OS X
+  * altosui: Ship TeleMetrum v2.0 firmware with AltosUI
+  * altosuilib: Hook up apple messages to callbacks
+  * macosx: Respond to apple messages in all apps
+  * windows: Missed adding 'refresh-sh.nsh'
+  * linux: .desktop files must begin with organization name
+  * Rename icon files to fit XDG specifications. Add file icons. Add mime types
+  * altosuilib: Wrap radio frequency menu in JMenuBar when used in config
+  * altos/aprs: Encode last serial number in SSID. Transmit serial in comment
+  * altosui: Add Ignitor tab to Monitor Idle mode
+  * altos: Make APRS SSID configurable
+  * altosui/telegps: Expose configurable APRS SSID
+  * ao-tools: Add ao-test-baro, ao-test-igniter and ao-test-flash
+  * ao-bringup: Use the C tools to test EasyMini
+  * altos: Add optional debugging to print out pyro firing status
+  * altos/ao_flight_test: Get the Tmega version compiling again
+  * Bump version to 1.4.1.1
+  * altosuilib: Make map cache size configurable
+  * altosuilib: Outline map lines and distance value with white
+  * icon: Generate altusmetrum.xpm and install it
+  * altosuilib: Mark 'Configure AltosUI' window with maps key status
+  * Clean all .desktop files, ignore them too
+  * Add 1.4.1 release notes
+  * Add note about including Google maps API key
+  * altosui: Don't show the tracker motion value when switching units
+  * telegps: Disable tracker config when not available
+  * altosui/telegps: Undo the frequency/telemetry menu changes
+  * altoslib: Disable telemetry while getting config data
+  * altoslib: Preserve receiver_serial across state reset for new transmitter
+  * altosuilib: Remove debug printfs from map cache
+  * altos: ao_rssi subsystem needs to use AO_LED_TYPE instead of uint8_t
+  * altos: Stop sticking cc1111 firmware in src directory
+  * altos: Use TeleMetrum v1.9 board for MegaDongle experiments
+  * altos: Reduce configuration data telemetry to once per 5 seconds
+  * altos: Add defines for 2400 and 9600 baud telemetry rates
+  * altos: Add config support for 2400 and 9600 baud telemetry rates
+  * altos: Call ao_telemetry_reset_interval when telemetry rate changes
+  * altos/cc1111: Adjust receive parameters to improve sensitivity
+  * altos/cc1111: Add 2400 and 9600 baud telemetry rate support
+  * altos: Add 2400 and 9600 baud telemetry support to cc115l driver
+  * altos: Packet reception tuning for cc1120 driver
+  * altos: Add telemetry rate support to CC1120 driver
+  * altos: Rework packet receive for cc1120
+  * altoslib: Support multiple telemetry rates
+  * altosuilib: Add telemetry rate to Scan UI
+  * altosui: Support telemetry data rates
+  * telegps: Support variable telemetry rate
+  * Add support for the "kite" micropeak variant
+  * Bump version to 1.4.9.1 -- on the way to 1.5
+  * altosui: Hide inactive altimeter configuration entries
+  * altos/telemini-v2.0: Add memory decorations to new telemetry variables
+  * altos: Add smaller pa to altitude table for TeleMini
+  * altos/telemini-v2.0: Enable beep config and radio rate config
+  * micropeak/altosui/telegps: Fix icon file names
+  * altoslib: Clean up GPS DOP support in AltosState
+  * altoslib: Ensure CSV output is consistent
+  * altosuilib: Add GPS DOP values to graph
+  * altosuilib: Add GPS DOP values to info table
+  * altosuilib: Allow for unitless axes in graphs
+  * altos: Extend GPS altitudes to at least 24 bits everywhere
+  * altoslib: Handle wide GPS altitude values in eeprom and telemetry
+  * altos: Scale DOP values by 10 in GPS drivers
+  * altos: Record pdop value in TeleMetrumV2 log
+  * altos: Use 32-bits for flight state data (alt/speed/accel)
+  * altosui: Fix the 'Graph' button on the landed tab
+  * altoslib: Extend telemetry heights from 16 to 32 bits
+  * libaltos: Bind to libbluetooth at runtime on demand
+  * altosui: Don't show bluetooth UI bits on mac/windows
+  * libaltos: typo in libaltos broke the build
+  * telegps: Missing function in TeleGPSConfigUI
+  * altos/telefire,telelco: Add HAS_RADIO_RATE to launch system software
+  * ao-tools: Add TMv2 and Tgps log formats to cc.h
+  * ao-tools: Provide altitude to temperature conversion function
+  * ao-tools: Add a few GPS telem/eeprom constants
+  * altos: Interrupt radio receive when changing data rate
+  * altos: Make ao_gps_print deal with telem containing 32-bit altitude values
+  * altos/test: Build TeleMetrumV2 flight test variant
+  * altoslib: Parse eeprom 'altitude-32' fields
+  * Set version to 1.4.9.2
+  * altosuilib: Fix minor scan UI nits
+  * linux-fat: Fix up fat linux install icons, mime types and .desktop files
+  * altoslib: Handle TeleGPS files for KML export
+  * altos: Have MicroKite just start recording at startup
+  * altos: Document which TeleFire alarm pins are which
+  * altos: Report additional pyro channels via beeper
+  * altosdroid: Add telemetry rate support
+  * altosdroid: Skip updating hidden UI elements
+  * altoslib: Parse 'Log fixed:' configuration value
+  * altoslib: Handle link timeout in AltosDebug.read_memory
+  * altoslib: Close serial port when AltosFlash fails to detect a target
+  * altoslib: Improve performance of AltosLib.hexbytes
+  * altoslib: Remove some debug printfs
+  * ao-tools/ao-send-telem: Support sending TM v2 and Tm v2 telemetry
+  * Use -ldl when testing whether -m32 and -m64 builds work
+  * cc1111: Wait for internal flash write to complete
+  * telegps-v1.0: Provide one log and append to it
+  * altosui: Make Windows java test "smarter"
+  * altos: Add telerepeat-v1.0
+  * Add ao-tools/ao-cal-accel
+  * ao-bringup: Use ao-cal-accel instead of cal-accel in turnon scripts
+  * ao-bringup: Test EasyMega boards
+  * altos: Make sure pyro remains valid during delay
+  * altosdroid: start restoring from log data on startup
+  * altoslib: TeleMega telemetry pyro voltages are uint8
+  * altosdroid: fixup fetching active device address
+  * altosdroid: Add quit. Restart. Show freq in title.
+  * altoslib: create logfiles preference object. check link in existing_data
+  * altosdroid: Add missing preferences backend file
+  * altosdroid: reload previous log file at connect time
+  * altos: Don't add AO_LOG_FLIGHT to existing GPS logs
+  * altoslib: Ignore extra AO_LOG_FLIGHT records from TeleGPS
+  * altoslib: Catch a couple null pointers in AltosConfigTD
+  * altosui: Fix 'pad' screen for TeleGPS
+  * altos/telefire: Add firing length to manual pad command
+  * altosdroid: Use single object to pass data to UI
+  * altos: Allow negative values for pyro configuration data
+  * altosui: Don't mark altimeter dirty when opening pyro panel
+  * altosdroid: add new TelemetryState.java
+  * altosdroid: Ignore TelemetryService messages after service shutdown
+  * altosdroid: Update tab contents before switching
+  * altosdroid: Add imperial unit support
+  * altosdroid: Mark completed items as 'done'
+  * altos: Reduce deviation at 2400/9600 baud
+  * altoslib: Update local callsign/baud rate when using remote protocol
+  * altoslib: Increase timeouts when using low baud rate remote protocol
+  * altos: Scale packet master receive delay by baud rate
+  * doc: Update for version 1.5 release
+  * altosui: Include EasyMega firmware in fat release
+  * Tag version 1.4.9.3
+  * altoslib: Fix idle monitor parsing of MMA655x state
+  * altos/easymega: Set USB PID for EasyMega to 0x0028
+  * altoslib/altosuilib: Add EasyMega support
+  * altoslib/altosuilib: clean all versions of the .jar file
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 09 Sep 2014 23:29:52 -0600
+
 altos (1.4.1-1) unstable; urgency=medium
 
   [ Keith Packard ]
