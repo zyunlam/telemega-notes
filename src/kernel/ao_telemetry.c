@@ -518,7 +518,7 @@ ao_telemetry_set_interval(uint16_t interval)
 	};
 
 	ao_telemetry_desired_interval = interval;
-	if (interval < min_interval[ao_config.radio_rate])
+	if (interval && interval < min_interval[ao_config.radio_rate])
 		interval = min_interval[ao_config.radio_rate];
 #endif
 	ao_telemetry_interval = interval;
