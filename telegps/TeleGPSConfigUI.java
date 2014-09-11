@@ -344,7 +344,7 @@ public class TeleGPSConfigUI
 		c.insets = il;
 		c.ipady = 5;
 		rate_label = new JLabel("Telemetry baud rate:");
-		pane.add(radio_enable_label, c);
+		pane.add(rate_label, c);
 
 		c = new GridBagConstraints();
 		c.gridx = 4; c.gridy = row;
