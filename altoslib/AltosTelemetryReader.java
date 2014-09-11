@@ -199,6 +199,6 @@ public class AltosTelemetryReader extends AltosFlightReader {
 
 	public AltosTelemetryReader(AltosLink link)
 		throws IOException, InterruptedException, TimeoutException {
-		this(link, existing_data(link));
+		this(link, null);
 	}
 }
