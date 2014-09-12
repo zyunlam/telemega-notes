@@ -246,15 +246,15 @@ ao_report_continuity(void) __reentrant
 void
 ao_report(void)
 {
-	ao_report_state = ao_flight_state;
 	for(;;) {
+		ao_report_state = ao_flight_state;
 #if HAS_BATTERY_REPORT
-		if (ao_flight_state == ao_flight_startup)
+		if (ao_report_state == ao_flight_startup)
 			ao_report_battery();
 		else
 #endif
 			ao_report_beep();
-		if (ao_flight_state == ao_flight_landed) {
+		if (ao_report_state == ao_flight_landed) {
 			ao_report_altitude();
 #if HAS_FLIGHT
 			ao_delay(AO_SEC_TO_TICKS(5));
@@ -262,7 +262,7 @@ ao_report(void)
 #endif
 		}
 #if HAS_IGNITE_REPORT
-		if (ao_flight_state == ao_flight_idle)
+		if (ao_report_state == ao_flight_idle)
 			ao_report_continuity();
 		while (ao_flight_state == ao_flight_pad) {
 			uint8_t	c;
@@ -272,10 +272,8 @@ ao_report(void)
 				pause(AO_MS_TO_TICKS(100));
 		}
 #endif
-
 		while (ao_report_state == ao_flight_state)
 			ao_sleep(DATA_TO_XDATA(&ao_flight_state));
-		ao_report_state = ao_flight_state;
 	}
 }
 
