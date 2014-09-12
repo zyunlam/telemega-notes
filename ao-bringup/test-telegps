@@ -21,7 +21,7 @@ ao-list | while read product serial dev; do
 	    FLASHSIZE=2097152
 
 	    echo "Testing flash"
-	    ./test-flash "$dev" "$FLASHSIZE"
+	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
 
 	    case $? in
 		0)
