@@ -79,8 +79,8 @@ bin/AltosDroid-release-unsigned.apk: $(SRC) $(ALTOSLIB) $(SUPPORT_V4) $(GOOGLE_P
 
 bin/AltosDroid-release.apk: bin/AltosDroid-release-unsigned.apk
 	jarsigner -sigalg SHA1withDSA -digestalg SHA1 \
-	   -keystore ~/altusmetrumllc/release.keystore \
-	   -storepass:file ~/altusmetrumllc/Passphrase \
+	   -keystore ~/altusmetrumllc/google-play-release.keystore \
+	   -storepass:file ~/altusmetrumllc/google-play-passphrase \
 	   -signedjar bin/AltosDroid-release-signed.apk \
 	   bin/AltosDroid-release-unsigned.apk AltosDroid
 	$(ZIPALIGN) -f 4 \
