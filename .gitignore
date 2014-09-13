@@ -65,3 +65,4 @@ doc/telemetrum.html
 doc/telemetrum.pdf
 altosui/altos-windows.log
 pdclib-root
+ao-bringup/cal_values

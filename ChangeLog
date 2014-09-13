@@ -1,3 +1,79 @@
+commit d16e60858427bf7dbe83a858728ebf097a09207a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Sep 13 11:29:19 2014 -0600
+
+    ignore cal_values file in bringup directory
+
+commit 40885ae5e6be66faf08cdb9b481d1d998856ca4b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Sep 13 11:28:19 2014 -0600
+
+    need multi-arch in fat build
+
+commit e969172a81e24f70c349b10f429e69817900c307
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 11 19:56:13 2014 -0700
+
+    altos: Make sure we don't beep out continuity twice in idle mode
+    
+    If the battery voltage report takes longer than the initialiation
+    sequence, we could get to the state reporting after the state had
+    switched from startup to idle. This would result in continuity being
+    reported the first time through the loop. Then, as the state had
+    already changed, we'd pass through the while test and go back to
+    report continuity a second time.
+    
+    Fixed by using the state remembered before beeping out the voltage to
+    decide whether to report the continuity.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 800f3377b1a374ad5cf826aa897efdcb08059040
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 11 15:00:25 2014 -0700
+
+    altos: Fix ability to disable telemetry by setting interval to 0
+    
+    For non-zero telemetry intervals, the radio code limits the value
+    based on the data rate. However, a zero interval means that telemetry
+    should be entirely disabled, so that value should be left alone when
+    checking.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 793588e218102204e69755a16bc32ea5c67f29c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 11 14:23:29 2014 -0700
+
+    telegps: Was mis-configuring the 'Configure Device' dialog
+    
+    Make sure we show 'rate_label' instead of showing 'radio_enable_label'
+    twice.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 19730b872c61f34724b0f187f71cccb6a65251dd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 11 14:14:07 2014 -0700
+
+    altoslib: Stop re-loading previous flight when starting telemetry monitoring
+    
+    This feature is necessary on AltosDroid because there's no other UI
+    for reloading an old flight. It's not useful on the desktop where you
+    really just want to see new telemetry; old telemetry is availbale
+    through the 'graph flight' or 'replay' mechanisms.
+    
+    AltosDroid uses a different class for reading telemetry data, so we
+    can just remove this feature from altoslib at this point.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 10e31d84ee5cdf10248988079df91354ae6ed612
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 10 01:33:33 2014 -0600
+
+    update changelog for release
+
 commit 05e4094411f861bf29bea2e9c39c1b66f8f267f8
 Merge: acb2791 2ee937b
 Author: Bdale Garbee <bdale@gag.com>
