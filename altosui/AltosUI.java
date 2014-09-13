@@ -471,7 +471,6 @@ public class AltosUI extends AltosUIFrame {
 		if (reader == null)
 			return false;
 		AltosFlightUI flight_ui = new AltosFlightUI(new AltosVoice(), reader);
-		flight_ui.set_exit_on_close();
 		return true;
 	}
 
@@ -559,9 +558,9 @@ public class AltosUI extends AltosUIFrame {
 	public static void help(int code) {
 		System.out.printf("Usage: altosui [OPTION]... [FILE]...\n");
 		System.out.printf("  Options:\n");
-		System.out.printf("    --fetchmaps <lat> <lon>\tpre-fetch maps for site map view\n");
 		System.out.printf("    --replay <filename>\t\trelive the glory of past flights \n");
 		System.out.printf("    --graph <filename>\t\tgraph a flight\n");
+		System.out.printf("    --summary <filename>\t\tText summary of a flight\n");
 		System.out.printf("    --csv\tgenerate comma separated output for spreadsheets, etc\n");
 		System.out.printf("    --kml\tgenerate KML output for use with Google Earth\n");
 		System.exit(code);
@@ -574,10 +573,11 @@ public class AltosUI extends AltosUIFrame {
 			UIManager.setLookAndFeel(AltosUIPreferences.look_and_feel());
 		} catch (Exception e) {
 		}
+		AltosUI altosui = null;
+
 		/* Handle batch-mode */
 		if (args.length == 0) {
-			AltosUI altosui = new AltosUI();
-
+			altosui = new AltosUI();
 			java.util.List<AltosDevice> devices = AltosUSBDevice.list(Altos.product_basestation);
 			if (devices != null)
 				for (AltosDevice device : devices)
@@ -615,10 +615,14 @@ public class AltosUI extends AltosUIFrame {
 					switch (process) {
 					case process_none:
 					case process_graph:
+						if (altosui == null)
+							altosui = new AltosUI();
 						if (!process_graph(file))
 							++errors;
 						break;
 					case process_replay:
+						if (altosui == null)
+							altosui = new AltosUI();
 						if (!process_replay(file))
 							++errors;
 						break;
