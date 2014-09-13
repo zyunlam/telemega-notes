@@ -546,6 +546,7 @@ ao-tools/ao-test-igniter/Makefile
 ao-tools/ao-test-baro/Makefile
 ao-tools/ao-test-flash/Makefile
 ao-tools/ao-cal-accel/Makefile
+ao-tools/ao-test-gps/Makefile
 ao-utils/Makefile
 src/Version
 ])
