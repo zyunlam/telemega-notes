@@ -1,5 +1,8 @@
 if ANDROID
-all_target=bin/AltosDroid-debug.apk bin/AltosDroid-release-unsigned.apk
+all_target=bin/AltosDroid-debug.apk
+if ANDROID_RELEASE
+all_target+=bin/AltosDroid-release.apk
+endif
 else
 all_target=
 endif
@@ -76,7 +79,8 @@ bin/AltosDroid-release-unsigned.apk: $(SRC) $(ALTOSLIB) $(SUPPORT_V4) $(GOOGLE_P
 
 bin/AltosDroid-release.apk: bin/AltosDroid-release-unsigned.apk
 	jarsigner -sigalg SHA1withDSA -digestalg SHA1 \
-	   -keystore release.keystore \
+	   -keystore ~/altusmetrumllc/release.keystore \
+	   -storepass:file ~/altusmetrumllc/Passphrase \
 	   -signedjar bin/AltosDroid-release-signed.apk \
 	   bin/AltosDroid-release-unsigned.apk AltosDroid
 	$(ZIPALIGN) -f 4 \

@@ -144,13 +144,18 @@ if test "x$ANDROID_SDK" != "xno"; then
 	fi
 fi
 
+ANDROID_RELEASE=no
 if test "x$ANDROID_SDK" != "xno"; then
 	HAVE_ANDROID_SDK="yes"
+	if test -f "$HOME/altusmetrumllc/release.keystore" -a -f "$HOME/altusmetrumllc/Passphrase"; then
+		ANDROID_RELEASE=yes
+	fi
 else
 	HAVE_ANDROID_SDK="no"
 fi
 
 AM_CONDITIONAL([ANDROID], [test x$ANDROID_SDK != xno])
+AM_CONDITIONAL([ANDROID_RELEASE], [test x$ANDROID_RELEASE = xyes])
 
 AC_SUBST(ANDROID_SDK)
 
@@ -563,6 +568,7 @@ echo "    CC1111 support..............: ${HAVE_SDCC}"
 echo "    AVR compiler................: ${AVR_CC} ${AVR_OBJCOPY}"
 echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
+echo "    Android release support.....: ${ANDROID_RELEASE}"
 echo "    STlink support..............: ${HAVE_STLINK}"
 echo "    Local pdclib................: ${HAVE_PDCLIB}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
