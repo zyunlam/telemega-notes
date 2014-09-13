@@ -6,10 +6,6 @@ Desired AltosDroid feature list
  *) Channel scanning. Provide the ability to search for telemetry
     signals like AltosUI does.
 
- *) Highlight current frequency in the frequency list.
-
-	Placed current frequency in title bar
-
  *) Random frequency selection. Provide some mechanism to input
     arbitrary radio frequencies. Could be like AltosUI which allows
     you to edit the list of frequencies and assign names to them,
@@ -22,6 +18,20 @@ Desired AltosDroid feature list
  *) Frequency scanning
 
  *) Select satellite imaging mode
+
+ *) TeleBT battery voltage
+
+ *) Deal with long bluetooth list. Currently, a list longer than
+    the screen makes it impossible to use entries off the bottom.
+
+ *) Pickle/unpickle state instead of reloading entire history from
+    file. Current restart time is lengthy.
+
+Completed features
+
+ *) Highlight current frequency in the frequency list.
+
+	Placed current frequency in title bar
 
  *) Remember most-recently-used TBT and frequency, perhaps
     auto-connect at startup.
@@ -37,4 +47,3 @@ Desired AltosDroid feature list
 
 	Done
 
- *) TeleBT battery voltage
