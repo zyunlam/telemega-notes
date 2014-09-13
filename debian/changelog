@@ -24,6 +24,10 @@ altos (1.5-1) unstable; urgency=medium
   * another build dep
   * use dh_installmime, which requires telling configure to stay out of the way
   * update changelog for release
+  * update changelog for Debian build
+  * need multi-arch in fat build
+  * ignore cal_values file in bringup directory
+  * updated ChangeLog for release
 
   [ Keith Packard ]
   * doc: Add instructions for flash recovery technique
@@ -173,8 +177,12 @@ altos (1.5-1) unstable; urgency=medium
   * icons: Use DESTDIR when updating mime/icon caches
   * .desktop: Use %F instead of %f in .desktop files
   * configure: Add --disable-install-shared-mime-info option
+  * altoslib: Stop re-loading previous flight when starting telemetry monitoring
+  * telegps: Was mis-configuring the 'Configure Device' dialog
+  * altos: Fix ability to disable telemetry by setting interval to 0
+  * altos: Make sure we don't beep out continuity twice in idle mode
 
- -- Bdale Garbee <bdale@gag.com>  Wed, 10 Sep 2014 01:35:20 -0600
+ -- Bdale Garbee <bdale@gag.com>  Sat, 13 Sep 2014 11:33:05 -0600
 
 altos (1.4.1-1) unstable; urgency=medium
 
