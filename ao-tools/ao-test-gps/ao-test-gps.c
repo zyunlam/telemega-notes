@@ -160,6 +160,7 @@ do_gps(struct cc_usb *usb) {
 		int actual_sats = strtol(sats[1], NULL, 0);
 
 		if (actual_flags & (1 << 4)) {
+			printf("\n");
 			printf("Flags: %s (0x%x)\n", flags[1], actual_flags);
 			printf("Sats: %s (%d)\n", sats[1], actual_sats);
 			break;
