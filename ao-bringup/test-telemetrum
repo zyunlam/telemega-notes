@@ -1,7 +1,7 @@
 #!/bin/sh
 
-VERSION=1.0
-PRODUCT=EasyMega
+VERSION=2.0
+PRODUCT=TeleMetrum
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 
 echo "$PRODUCT-v$VERSION Test Program"
@@ -19,8 +19,8 @@ ao-list | while read product serial dev; do
 	    echo "Testing $product $serial $dev"
 	    echo ""
 
-	    ./test-igniters $dev drogue main 0 1 2 3
-	    echo""
+	    ./test-igniters "$dev" drogue main
+	    echo ""
 
 	    echo "Testing baro sensor"
 	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
@@ -38,6 +38,18 @@ ao-list | while read product serial dev; do
 
 	    echo "Testing flash"
 	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
+
+	    case $? in
+		0)
+		    ;;
+		*)
+		    echo "failed"
+		    exit 1
+	    esac
+	    echo""
+
+	    echo "Testing GPS"
+	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
 
 	    case $? in
 		0)
