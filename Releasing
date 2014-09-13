@@ -61,18 +61,21 @@ These are Bdale's notes on how to do a release.
 
 	make distclean
 
-	./autogen.sh --with-fat-dir=/home/bdale/web/altusmetrum/AltOS/releases
+	./autogen.sh --enable-multi-arch \
+		--with-fat-dir=/home/bdale/web/altusmetrum/AltOS/releases
 	make && make fat
 
 		this pushes packages for each platform to web site
 
 	# store a stable copy of ARM binaries for production use
-	cp src/easymini-v1.0/*.elf \
+	cp src/easymega-v1.0/*.elf \
+	   src/easymini-v1.0/*.elf \
 	   src/telegps-v1.0/*.elf \
 	   src/telemega-v1.0/*.elf \
 	   src/telemetrum-v2.0/*.elf \
 	   ~/altusmetrumllc/Binaries/
-	cp src/easymini-v1.0/flash-loader/*.elf \
+	cp src/easymega-v1.0/flash-loader/*.elf \
+	   src/easymini-v1.0/flash-loader/*.elf \
 	   src/telegps-v1.0/flash-loader/*.elf \
 	   src/telemega-v1.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
@@ -87,7 +90,7 @@ These are Bdale's notes on how to do a release.
 	  and move the MicroPeak installers from AltOS/releases to there
 		
 	- create /home/bdale/web/altusmetrum/TeleGPS/releases/<rev>,
-	  and move the MicroPeak installers from AltOS/releases to there
+	  and move the TeleGPS installers from AltOS/releases to there
 		
 	- go edit ~/web/altusmetrum/AltOS/releases/<rev>.mdwn, 
 	  /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>.mdwn, and
