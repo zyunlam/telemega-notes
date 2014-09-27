@@ -1125,11 +1125,11 @@ ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 	ao_exti_set_mode(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN,
 			 AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH);
 
-	ao_exti_set_callback(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN, ao_radio_rx_isr);
-	ao_exti_enable(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
-
 	rx_starting = 1;
 	rx_task_id = ao_cur_task->task_id;
+
+	ao_exti_set_callback(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN, ao_radio_rx_isr);
+	ao_exti_enable(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
 
 	ao_radio_strobe(CC1120_SRX);
 
@@ -1148,8 +1148,9 @@ ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 		ao_clear_alarm();
 
 	if (ao_radio_abort) {
+		if (rx_task_id_save == 0)
+			ao_radio_burst_read_stop();
 		ret = 0;
-		rx_task_id = 0;
 		goto abort;
 	}
 
