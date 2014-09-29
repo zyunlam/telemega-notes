@@ -55,12 +55,15 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	}
 
 	public void font_size_changed(int font_size) {
-		map.font_size_changed(font_size);
-		statsTable.font_size_changed(font_size);
+		if (map != null)
+			map.font_size_changed(font_size);
+		if (statsTable != null)
+			statsTable.font_size_changed(font_size);
 	}
 
 	public void units_changed(boolean imperial_units) {
-		map.units_changed(imperial_units);
+		if (map != null)
+			map.units_changed(imperial_units);
 	}
 
 	AltosGraphUI(AltosStateIterable states, File file) throws InterruptedException, IOException {
