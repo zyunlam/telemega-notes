@@ -75,7 +75,8 @@ public class AltosEepromChunk {
 		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
-			eeprom = new AltosEepromMega(this, offset);
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			eeprom = new AltosEepromMega(this, offset, log_format);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
 			eeprom = new AltosEepromMetrum2(this, offset);
