@@ -90,6 +90,9 @@ public class AltosConfigData implements Iterable<String> {
 	public int	tracker_motion;
 	public int	tracker_interval;
 
+	/* HAS_GYRO */
+	public int	accel_zero_along, accel_zero_across, accel_zero_through;
+
 	public static String get_string(String line, String label) throws  ParseException {
 		if (line.startsWith(label)) {
 			String	quoted = line.substring(label.length()).trim();
@@ -266,6 +269,10 @@ public class AltosConfigData implements Iterable<String> {
 		storage_size = -1;
 		storage_erase_unit = -1;
 		stored_flight = 0;
+
+		accel_zero_along = -1;
+		accel_zero_across = -1;
+		accel_zero_through = -1;
 	}
 
 	public void parse_line(String line) {
@@ -361,6 +368,18 @@ public class AltosConfigData implements Iterable<String> {
 
 		/* Log listing replies */
 		try { get_int(line, "flight"); stored_flight++; }  catch (Exception e) {}
+
+		/* HAS_GYRO */
+		try {
+			if (line.startsWith("IMU call along")) {
+				String[] bits = line.split("\\s+");
+				if (bits.length >= 8) {
+					accel_zero_along = Integer.parseInt(bits[3]);
+					accel_zero_across = Integer.parseInt(bits[5]);
+					accel_zero_through = Integer.parseInt(bits[7]);
+				}
+			}
+		} catch (Exception e) {}
 	}
 
 	public AltosConfigData() {
@@ -636,6 +655,9 @@ public class AltosConfigData implements Iterable<String> {
 		/* HAS_TRACKER */
 		if (tracker_motion >= 0 && tracker_interval >= 0)
 			link.printf("c t %d %d\n", tracker_motion, tracker_interval);
+
+		/* HAS_GYRO */
+		/* UI doesn't support accel cal */
 
 		link.printf("c w\n");
 		link.flush_output();

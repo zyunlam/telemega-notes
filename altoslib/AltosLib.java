@@ -74,6 +74,7 @@ public class AltosLib {
 	public static final int AO_LOG_BARO_TREF = 3006;
 	public static final int AO_LOG_BARO_TEMPSENS = 3007;
 	public static final int AO_LOG_BARO_CRC = 3008;
+	public static final int AO_LOG_IMU_CAL = 3009;
 
 	public static final int AO_LOG_SOFTWARE_VERSION = 9999;
 

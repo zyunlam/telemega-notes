@@ -44,8 +44,8 @@ public class AltosState implements Cloneable {
 	public int	boost_tick;
 
 	class AltosValue {
-		private double	value;
-		private double	prev_value;
+		double	value;
+		double	prev_value;
 		private double	max_value;
 		private double	set_time;
 		private double	prev_set_time;
@@ -180,8 +180,19 @@ public class AltosState implements Cloneable {
 	}
 
 	class AltosCValue {
-		AltosValue	measured;
-		AltosValue	computed;
+
+		class AltosIValue extends AltosValue {
+			boolean can_max() {
+				return c_can_max();
+			}
+		};
+
+		public AltosIValue	measured;
+		public AltosIValue	computed;
+
+		boolean can_max() { return true; }
+
+		boolean c_can_max() { return can_max(); }
 
 		double value() {
 			double v = measured.value();
@@ -263,8 +274,8 @@ public class AltosState implements Cloneable {
 		}
 
 		AltosCValue() {
-			measured = new AltosValue();
-			computed = new AltosValue();
+			measured = new AltosIValue();
+			computed = new AltosIValue();
 		}
 	}
 
@@ -600,10 +611,10 @@ public class AltosState implements Cloneable {
 		return acceleration.max();
 	}
 
-	public AltosValue	orient;
+	public AltosCValue	orient;
 
 	public void set_orient(double new_orient) {
-		orient.set(new_orient, time);
+		orient.set_measured(new_orient, time);
 	}
 
 	public double orient() {
@@ -713,7 +724,7 @@ public class AltosState implements Cloneable {
 		pressure = new AltosPressure();
 		speed = new AltosSpeed();
 		acceleration = new AltosAccel();
-		orient = new AltosValue();
+		orient = new AltosCValue();
 
 		temperature = AltosLib.MISSING;
 		battery_voltage = AltosLib.MISSING;
@@ -733,7 +744,24 @@ public class AltosState implements Cloneable {
 		gps_pending = false;
 
 		imu = null;
+		last_imu_time = AltosLib.MISSING;
+		rotation = null;
+		ground_rotation = null;
+
 		mag = null;
+		accel_zero_along = AltosLib.MISSING;
+		accel_zero_across = AltosLib.MISSING;
+		accel_zero_through = AltosLib.MISSING;
+
+		accel_ground_along = AltosLib.MISSING;
+		accel_ground_across = AltosLib.MISSING;
+		accel_ground_through = AltosLib.MISSING;
+
+		pad_orientation = AltosLib.MISSING;
+
+		gyro_zero_roll = AltosLib.MISSING;
+		gyro_zero_pitch = AltosLib.MISSING;
+		gyro_zero_yaw = AltosLib.MISSING;
 
 		set_npad(0);
 		ngps = 0;
@@ -861,6 +889,27 @@ public class AltosState implements Cloneable {
 			imu = old.imu.clone();
 		else
 			imu = null;
+		last_imu_time = old.last_imu_time;
+
+		if (old.rotation != null)
+			rotation = new AltosRotation (old.rotation);
+
+		if (old.ground_rotation != null) {
+			ground_rotation = new AltosRotation(old.ground_rotation);
+		}
+
+		accel_zero_along = old.accel_zero_along;
+		accel_zero_across = old.accel_zero_across;
+		accel_zero_through = old.accel_zero_through;
+
+		accel_ground_along = old.accel_ground_along;
+		accel_ground_across = old.accel_ground_across;
+		accel_ground_through = old.accel_ground_through;
+		pad_orientation = old.pad_orientation;
+
+		gyro_zero_roll = old.gyro_zero_roll;
+		gyro_zero_pitch = old.gyro_zero_pitch;
+		gyro_zero_yaw = old.gyro_zero_yaw;
 
 		if (old.mag != null)
 			mag = old.mag.clone();
@@ -1112,14 +1161,168 @@ public class AltosState implements Cloneable {
 		}
 	}
 
+
+	public double	accel_zero_along;
+	public double	accel_zero_across;
+	public double	accel_zero_through;
+
+	public AltosRotation	rotation;
+	public AltosRotation	ground_rotation;
+
+	public void set_accel_zero(double zero_along, double zero_across, double zero_through) {
+		if (zero_along != AltosLib.MISSING) {
+			accel_zero_along = zero_along;
+			accel_zero_across = zero_across;
+			accel_zero_through = zero_through;
+		}
+	}
+
+	public int pad_orientation;
+
+	public double	accel_ground_along, accel_ground_across, accel_ground_through;
+
+	void update_pad_rotation() {
+		if (pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
+			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - accel_zero_across),
+						     AltosIMU.convert_accel(accel_ground_through - accel_zero_through),
+						     AltosIMU.convert_accel(accel_ground_along - accel_zero_along),
+						     pad_orientation);
+			ground_rotation = rotation;
+			orient.set_computed(rotation.tilt(), time);
+		}
+	}
+
+	public void set_accel_ground(double ground_along, double ground_across, double ground_through) {
+		accel_ground_along = ground_along;
+		accel_ground_across = ground_across;
+		accel_ground_through = ground_through;
+		update_pad_rotation();
+	}
+
+	public void set_pad_orientation(int pad_orientation) {
+		this.pad_orientation = pad_orientation;
+		update_pad_rotation();
+	}
+
+	public double	gyro_zero_roll;
+	public double	gyro_zero_pitch;
+	public double	gyro_zero_yaw;
+
+	public void set_gyro_zero(double roll, double pitch, double yaw) {
+		if (roll != AltosLib.MISSING) {
+			gyro_zero_roll = roll;
+			gyro_zero_pitch = pitch;
+			gyro_zero_yaw = yaw;
+		}
+	}
+
+	public double	last_imu_time;
+
+	private double radians(double degrees) {
+		if (degrees == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return degrees * Math.PI / 180.0;
+	}
+
+	private void update_orient() {
+		if (last_imu_time != AltosLib.MISSING) {
+			double	t = time - last_imu_time;
+
+			double	pitch = radians(gyro_pitch());
+			double	yaw = radians(gyro_yaw());
+			double	roll = radians(gyro_roll());
+
+			if (t > 0 & pitch != AltosLib.MISSING && rotation != null) {
+				rotation.rotate(t, pitch, yaw, roll);
+				orient.set_computed(rotation.tilt(), time);
+			}
+		}
+		last_imu_time = time;
+	}
+
 	public void set_imu(AltosIMU imu) {
 		if (imu != null)
 			imu = imu.clone();
 		this.imu = imu;
+		update_orient();
+	}
+
+	private double gyro_zero_overflow(double first) {
+		double v = first / 128.0;
+		if (v < 0)
+			v = Math.ceil(v);
+		else
+			v = Math.floor(v);
+		return v * 128.0;
+	}
+
+	public void check_imu_wrap(AltosIMU imu) {
+		if (this.imu == null) {
+			gyro_zero_roll += gyro_zero_overflow(imu.gyro_roll);
+			gyro_zero_pitch += gyro_zero_overflow(imu.gyro_pitch);
+			gyro_zero_yaw += gyro_zero_overflow(imu.gyro_yaw);
+		}
+	}
+
+	public double accel_along() {
+		if (imu != null && accel_zero_along != AltosLib.MISSING)
+			return AltosIMU.convert_accel(imu.accel_along - accel_zero_along);
+		return AltosLib.MISSING;
+	}
+
+	public double accel_across() {
+		if (imu != null && accel_zero_across != AltosLib.MISSING)
+			return AltosIMU.convert_accel(imu.accel_across - accel_zero_across);
+		return AltosLib.MISSING;
+	}
+
+	public double accel_through() {
+		if (imu != null && accel_zero_through != AltosLib.MISSING)
+			return AltosIMU.convert_accel(imu.accel_through - accel_zero_through);
+		return AltosLib.MISSING;
+	}
+
+	public double gyro_roll() {
+		if (imu != null && gyro_zero_roll != AltosLib.MISSING) {
+			return AltosIMU.convert_gyro(imu.gyro_roll - gyro_zero_roll);
+		}
+		return AltosLib.MISSING;
+	}
+
+	public double gyro_pitch() {
+		if (imu != null && gyro_zero_pitch != AltosLib.MISSING) {
+			return AltosIMU.convert_gyro(imu.gyro_pitch - gyro_zero_pitch);
+		}
+		return AltosLib.MISSING;
+	}
+
+	public double gyro_yaw() {
+		if (imu != null && gyro_zero_yaw != AltosLib.MISSING) {
+			return AltosIMU.convert_gyro(imu.gyro_yaw - gyro_zero_yaw);
+		}
+		return AltosLib.MISSING;
 	}
 
 	public void set_mag(AltosMag mag) {
 		this.mag = mag.clone();
+	}
+
+	public double mag_along() {
+		if (mag != null)
+			return AltosMag.convert_gauss(mag.along);
+		return AltosLib.MISSING;
+	}
+
+	public double mag_across() {
+		if (mag != null)
+			return AltosMag.convert_gauss(mag.across);
+		return AltosLib.MISSING;
+	}
+
+	public double mag_through() {
+		if (mag != null)
+			return AltosMag.convert_gauss(mag.through);
+		return AltosLib.MISSING;
 	}
 
 	public AltosMs5607 make_baro() {

@@ -149,6 +149,12 @@ public class AltosEepromMega extends AltosEeprom {
 			state.set_flight(flight());
 			state.set_ground_accel(ground_accel());
 			state.set_ground_pressure(ground_pres());
+			state.set_accel_ground(ground_accel_along(),
+					       ground_accel_across(),
+					       ground_accel_through());
+			state.set_gyro_zero(ground_roll() / 512.0,
+					    ground_pitch() / 512.0,
+					    ground_yaw() / 512.0);
 			break;
 		case AltosLib.AO_LOG_STATE:
 			state.set_tick(tick);
@@ -158,22 +164,21 @@ public class AltosEepromMega extends AltosEeprom {
 			state.set_tick(tick);
 			state.set_ms5607(pres(), temp());
 
-			AltosIMU imu = new AltosIMU();
-			imu.accel_x = AltosIMU.convert_accel(accel_x());
-			imu.accel_y = AltosIMU.convert_accel(accel_y());
-			imu.accel_z = AltosIMU.convert_accel(accel_z());
+			AltosIMU	imu = new AltosIMU(accel_y(),	/* along */
+							   accel_x(),	/* across */
+							   accel_z(),	/* through */
+							   gyro_y(),	/* roll */
+							   gyro_x(),	/* pitch */
+							   gyro_z());	/* yaw */
 
-			imu.gyro_x = AltosIMU.convert_gyro(gyro_x());
-			imu.gyro_y = AltosIMU.convert_gyro(gyro_y());
-			imu.gyro_z = AltosIMU.convert_gyro(gyro_z());
-			state.imu = imu;
+			if (log_format == AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD)
+				state.check_imu_wrap(imu);
 
-			AltosMag mag = new AltosMag();
-			mag.x = AltosMag.convert_gauss(mag_x());
-			mag.y = AltosMag.convert_gauss(mag_y());
-			mag.z = AltosMag.convert_gauss(mag_z());
+			state.set_imu(imu);
 
-			state.mag = mag;
+			state.set_mag(new AltosMag(mag_x(),
+						   mag_y(),
+						   mag_z()));
 
 			state.set_accel(accel());
 

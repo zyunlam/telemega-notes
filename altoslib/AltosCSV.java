@@ -162,17 +162,10 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_advanced(AltosState state) {
-		AltosIMU	imu = state.imu;
-		AltosMag	mag = state.mag;
-
-		if (imu == null)
-			imu = new AltosIMU();
-		if (mag == null)
-			mag = new AltosMag();
 		out.printf("%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
-			   imu.accel_x, imu.accel_y, imu.accel_z,
-			   imu.gyro_x, imu.gyro_y, imu.gyro_z,
-			   mag.x, mag.y, mag.z);
+			   state.accel_along(), state.accel_across(), state.accel_through(),
+			   state.gyro_roll(), state.gyro_pitch(), state.gyro_yaw(),
+			   state.mag_along(), state.mag_across(), state.mag_through());
 	}
 
 	void write_gps_header() {
@@ -381,7 +374,7 @@ public class AltosCSV implements AltosWriter {
 				has_basic = true;
 			if (state.battery_voltage != AltosLib.MISSING)
 				has_battery = true;
-			if (state.imu != null || state.mag != null)
+			if (state.accel_across() != AltosLib.MISSING)
 				has_advanced = true;
 			if (state.gps != null) {
 				has_gps = true;

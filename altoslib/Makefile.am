@@ -124,7 +124,9 @@ altoslib_JAVA = \
 	AltosLatitude.java \
 	AltosLongitude.java \
 	AltosPyro.java \
-	AltosWriter.java
+	AltosWriter.java \
+	AltosQuaternion.java \
+	AltosRotation.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar
 

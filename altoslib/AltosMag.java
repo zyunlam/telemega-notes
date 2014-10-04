@@ -20,19 +20,19 @@ package org.altusmetrum.altoslib_5;
 import java.util.concurrent.*;
 
 public class AltosMag implements Cloneable {
-	public double		x;
-	public double		y;
-	public double		z;
+	public int		along;
+	public int		across;
+	public int		through;
 
 	public static double counts_per_gauss = 1090;
 
-	public static double convert_gauss(int counts) {
-		return (double) counts / counts_per_gauss;
+	public static double convert_gauss(double counts) {
+		return counts / counts_per_gauss;
 	}
 
 	public boolean parse_string(String line) {
 //		if (line.startsWith("Syntax error")) {
-//			x = y = z = 0;
+//			along = across = through = 0;
 //			return true;
 //		}
 
@@ -42,9 +42,9 @@ public class AltosMag implements Cloneable {
 		String[] items = line.split("\\s+");
 
 		if (items.length >= 6) {
-			x = convert_gauss(Integer.parseInt(items[1]));
-			y = convert_gauss(Integer.parseInt(items[3]));
-			z = convert_gauss(Integer.parseInt(items[5]));
+			along = Integer.parseInt(items[1]);
+			across = Integer.parseInt(items[3]);
+			through = Integer.parseInt(items[5]);
 		}
 		return true;
 	}
@@ -52,16 +52,22 @@ public class AltosMag implements Cloneable {
 	public AltosMag clone() {
 		AltosMag n = new AltosMag();
 
-		n.x = x;
-		n.y = y;
-		n.z = z;
+		n.along = along;
+		n.across = across;
+		n.through = through;
 		return n;
 	}
 
 	public AltosMag() {
-		x = AltosLib.MISSING;
-		y = AltosLib.MISSING;
-		z = AltosLib.MISSING;
+		along = AltosLib.MISSING;
+		across = AltosLib.MISSING;
+		through = AltosLib.MISSING;
+	}
+
+	public AltosMag(int along, int across, int through) {
+		this.along = along;
+		this.across = across;
+		this.through = through;
 	}
 
 	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {

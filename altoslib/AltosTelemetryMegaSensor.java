@@ -66,24 +66,13 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 
 		state.set_orient(orient);
 
-		AltosIMU imu = new AltosIMU();
+		state.set_imu(new AltosIMU(accel_y,	/* along */
+					   accel_x,	/* across */
+					   accel_z,	/* through */
+					   gyro_y,	/* along */
+					   gyro_x,	/* across */
+					   gyro_z));	/* through */
 
-		imu.accel_x = AltosIMU.convert_accel(accel_x);
-		imu.accel_y = AltosIMU.convert_accel(accel_y);
-		imu.accel_z = AltosIMU.convert_accel(accel_z);
-
-		imu.gyro_x = AltosIMU.convert_gyro(gyro_x);
-		imu.gyro_y = AltosIMU.convert_gyro(gyro_y);
-		imu.gyro_z = AltosIMU.convert_gyro(gyro_z);
-
-		state.imu = imu;
-
-		AltosMag mag = new AltosMag();
-
-		mag.x = AltosMag.convert_gauss(mag_x);
-		mag.y = AltosMag.convert_gauss(mag_y);
-		mag.z = AltosMag.convert_gauss(mag_z);
-
-		state.mag = mag;
+		state.set_mag(new AltosMag(mag_x, mag_y, mag_z));
 	}
 }
