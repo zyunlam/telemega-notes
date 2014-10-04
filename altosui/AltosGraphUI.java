@@ -64,6 +64,8 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	public void units_changed(boolean imperial_units) {
 		if (map != null)
 			map.units_changed(imperial_units);
+		if (enable != null)
+			enable.units_changed(imperial_units);
 	}
 
 	AltosGraphUI(AltosStateIterable states, File file) throws InterruptedException, IOException {
