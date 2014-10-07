@@ -74,7 +74,7 @@ void
 ao_spi_put(uint8_t spi_index);
 
 void
-ao_spi_send(void *block, uint16_t len, uint8_t spi_index);
+ao_spi_send(const void *block, uint16_t len, uint8_t spi_index);
 
 void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
