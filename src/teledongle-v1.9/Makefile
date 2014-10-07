@@ -15,6 +15,8 @@ INC = \
 	ao_task.h \
 	ao_whiten.h \
 	stm32l.h \
+	ao_cc1200.h \
+	ao_cc1200_CC1200.h \
 	Makefile
 
 #PROFILE=ao_profile.c
@@ -26,13 +28,6 @@ INC = \
 
 #STACK_GUARD=ao_mpu_stm.c
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
-
-#	ao_monitor.c \
-#	ao_rssi.c \
-#	ao_send_packet.c \
-#	ao_packet_master.c \
-#	ao_packet.c
-
 
 ALTOS_SRC = \
 	ao_boot_chain.c \
@@ -53,7 +48,12 @@ ALTOS_SRC = \
 	ao_spi_stm.c \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
-	ao_eeprom_stm.c
+	ao_send_packet.c \
+	ao_eeprom_stm.c \
+	ao_monitor.c \
+	ao_rssi.c \
+	ao_packet_master.c \
+	ao_packet.c
 
 PRODUCT=TeleDongle-v1.9
 PRODUCT_DEF=-DTELEDONGLE

@@ -110,7 +110,7 @@
 /*
  * Telemetry monitoring
  */
-#define HAS_MONITOR		0
+#define HAS_MONITOR		1
 #define LEGACY_MONITOR		0
 #define HAS_MONITOR_PUT		1
 #define AO_MONITOR_LED		AO_LED_GREEN
@@ -121,7 +121,7 @@
 
 /* gets pretty close to 434.550 */
 
-#define AO_RADIO_CAL_DEFAULT 	0x6ca333
+#define AO_RADIO_CAL_DEFAULT 	5695733
 
 #define AO_FEC_DEBUG		0
 #define AO_CC1200_SPI_CS_PORT	(&stm_gpioc)
