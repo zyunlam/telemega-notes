@@ -5831,6 +5831,58 @@ NAR #88757, TRA #12200
       </section>
   </appendix>
   <appendix>
+    <title>Igniter Current</title>
+      <para>
+	The question "how much igniter current can Altus Metrum products 
+	handle?" comes up fairly frequently.  The short answer is "more than
+	you're likely to need", the remainder of this appendix provides a
+	longer answer.
+      </para>
+      <section>
+        <title>Current Products</title>
+        <para>
+	  The FET switches we're using on all of our current products that 
+	  have pyro channels are the Vishay Siliconix Si7232DN.  These parts 
+	  have exceptionally low Rds(on) values, better than 0.02 ohms!  That 
+	  means they aren't making a lot of heat... and the limit on current 
+	  is "package limited", meaning it's all about how much you can heat 
+	  the die before something breaks.
+	</para>
+	<para>
+	  Cutting to the chase, the Si7232DN specs are 25 amps *continuous* at
+	  20V at a temperature of 25C.  In pulsed mode, they're rated for 40A.
+	  However, those specs are a little mis-leading because it really is 
+	  all about the heat generated... you can get something like 85A 
+	  through one briefly.  Note that a typical commercial e-match only 
+	  needed about 13 microseconds to fire in tests on my bench a couple 
+	  years ago!
+	</para>
+	<para>
+	  So a great plan is to use something like an e-match as the initiator 
+	  and build up pyrogen(s) as required to actually light what you're 
+	  trying to light...  But if you want to use a high-current igniter, 
+	  we can probably handle it!
+	</para>
+      </section>
+      <section>
+        <title>Version 1 Products</title>
+        <para>
+	  The FET switches used on TeleMetrum v1 and TeleMini v1 products
+	  were Fairchild FDS9926A.  The Rds(on) values under our operating
+	  conditions are on the order of 0.04 ohms.  These parts were rated
+	  for a continuous current-carrying capacity of 6.5A, and a pulsed 
+	  current capacity of 20A.
+	</para>
+	<para>
+	  As with the more modern parts, the real limit is based on the heat
+	  generated in the part during the firing interval.  So, while the 
+	  specs on these parts aren't as good as the ones we use on current
+	  products, they were still great, and we never had a complaint about
+	  current carrying capacity with any of our v1 boards.
+	</para>
+      </section>
+  </appendix>
+  <appendix>
     <title>Release Notes</title>
     <simplesect>
       <title>Version 1.4.1</title>
