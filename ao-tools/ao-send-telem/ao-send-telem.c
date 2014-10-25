@@ -29,12 +29,14 @@ static const struct option options[] = {
 	{ .name = "device", .has_arg = 1, .val = 'D' },
 	{ .name = "frequency", .has_arg = 1, .val = 'F' },
 	{ .name = "realtime", .has_arg = 0, .val = 'R' },
+	{ .name = "verbose", .has_arg = 0, .val = 'v' },
+	{ .name = "fake", .has_arg = 0, .val = 'f' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--tty <tty-name>] [--device <device-name>] [--frequency <kHz>] [--realtime] file.telem ...\n", program);
+	fprintf(stderr, "usage: %s [--tty <tty-name>] [--device <device-name>] [--frequency <kHz>] [--realtime] [--verbose] [--fake] file.telem ...\n", program);
 	exit(1);
 }
 
@@ -126,7 +128,7 @@ send_telem(struct cc_usb *cc, union ao_telemetry_all *telem)
 	for (i = 0; i < 0x20; i++)
 		cc_usb_printf(cc, "%02x", b[i]);
 	cc_usb_sync(cc);
-}	
+}
 
 static void
 do_delay(uint16_t now, uint16_t then)
@@ -173,9 +175,11 @@ main (int argc, char **argv)
 	uint16_t	last_tick;
 	int		started;
 	int		realtime = 0;
-      
+	int		verbose = 0;
+	int		fake = 0;
+	int		rate = 0;
 
-	while ((c = getopt_long(argc, argv, "RT:D:F:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "vRfT:D:F:r:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
@@ -188,6 +192,30 @@ main (int argc, char **argv)
 			break;
 		case 'R':
 			realtime = 1;
+			break;
+		case 'v':
+			verbose++;
+			break;
+		case 'f':
+			fake++;
+			break;
+		case 'r':
+			rate = atoi(optarg);
+			switch (rate) {
+			case 38400:
+				rate = 0;
+				break;
+			case 9600:
+				rate = 1;
+				break;
+			case 2400:
+				rate = 2;
+				break;
+			default:
+				fprintf(stderr, "Rate %d isn't 38400, 9600 or 2400\n", rate);
+				usage(argv[0]);
+				break;
+			}
 			break;
 		default:
 			usage(argv[0]);
@@ -206,42 +234,65 @@ main (int argc, char **argv)
 
 	cc_usb_printf(cc, "m 0\n");
 	cc_usb_printf(cc, "c F %d\n", freq);
-	for (i = optind; i < argc; i++) {
-		file = fopen(argv[i], "r");
-		if (!file) {
-			perror(argv[i]);
-			ret++;
-			continue;
+	cc_usb_printf(cc, "c T %d\n", rate);
+
+	if (fake) {
+		union ao_telemetry_all	telem;
+		uint16_t		tick;
+		int			i;
+
+		memset(&telem, '\0', sizeof (telem));
+		telem.generic.serial = 1;
+		telem.generic.type = 0;
+		for (i = 0; i < sizeof (telem.generic.payload); i++)
+			telem.generic.payload[i] = i & 7;
+		for (;;) {
+			telem.generic.tick += 50;
+			send_telem(cc, &telem);
+			do_delay(50, 0);
 		}
-		started = 0;
-		last_tick = 0;
-		while (fgets(line, sizeof (line), file)) {
-			union ao_telemetry_all telem;
+	} else {
+		for (i = optind; i < argc; i++) {
+			file = fopen(argv[i], "r");
+			if (!file) {
+				perror(argv[i]);
+				ret++;
+				continue;
+			}
+			started = 0;
+			last_tick = 0;
+			while (fgets(line, sizeof (line), file)) {
+				union ao_telemetry_all telem;
 
-			if (cc_telemetry_parse(line, &telem)) {
-				/*
-				 * Skip packets with CRC errors.
-				 */
-				if ((telem.generic.status & (1 << 7)) == 0)
-					continue;
+				if (cc_telemetry_parse(line, &telem)) {
+					/*
+					 * Skip packets with CRC errors.
+					 */
+					if ((telem.generic.status & (1 << 7)) == 0)
+						continue;
 
-				if (started) {
-					do_delay(telem.generic.tick, last_tick);
-					last_tick = telem.generic.tick;
-					send_telem(cc, &telem);
-				} else {
-					enum ao_flight_state state = packet_state(&telem);
-					add_telem(&telem);
-					if (ao_flight_pad < state && state < ao_flight_landed) {
-						printf ("started\n");
-						started = 1;
-						last_tick = send_queued(cc, realtime);
+					if (verbose)
+						printf ("type %4d\n", telem.generic.type);
+
+					if (started || realtime) {
+						do_delay(telem.generic.tick, last_tick);
+						last_tick = telem.generic.tick;
+						send_telem(cc, &telem);
+					} else {
+						enum ao_flight_state state = packet_state(&telem);
+						printf ("\tstate %4d\n", state);
+						add_telem(&telem);
+						if (ao_flight_pad < state && state < ao_flight_landed) {
+							printf ("started\n");
+							started = 1;
+							last_tick = send_queued(cc, realtime);
+						}
 					}
 				}
 			}
-		}
-		fclose (file);
+			fclose (file);
 
+		}
 	}
 	return ret;
 }
