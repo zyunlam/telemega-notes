@@ -7,6 +7,22 @@
  *
  ***************************************************************/
 
+/*
+ * Values affecting receive sensitivity:
+ *
+ *
+ *	PQT		- sets how good the preamble needs to look before
+ *			  we start looking for a sync word
+ *	SYNC_THR	- sets how good the sync needs to be before we
+ *			  start decoding a packet
+ */
+
+/* Values depending on data rate
+ *
+ *	DCFILT_BW_SETTLE
+ *	DCFILT_BW
+ */
+
 #ifndef AO_CC1200_AGC_GAIN_ADJUST
 #define AO_CC1200_AGC_GAIN_ADJUST	-81
 #endif
@@ -18,7 +34,7 @@
         CC1200_SYNC0,                        0x91,       /* Sync Word Configuration [7:0] */
         CC1200_SYNC_CFG1,                                /* Sync Word Detection Configuration Reg. 1 */
 		((CC1200_SYNC_CFG1_SYNC_MODE_16_BITS << CC1200_SYNC_CFG1_SYNC_MODE) |
-		 (0xc << CC1200_SYNC_CFG1_SYNC_THR)),
+		 (12 << CC1200_SYNC_CFG1_SYNC_THR)),
         CC1200_SYNC_CFG0,                                /* Sync Word Detection Configuration Reg. 0 */
 		((1 << CC1200_SYNC_CFG0_AUTO_CLEAR) |
 		 (0 << CC1200_SYNC_CFG0_RX_CONFIG_LIMITATION) |
@@ -29,8 +45,8 @@
         CC1200_DCFILT_CFG,                   0x5d,       /* Digital DC Removal Configuration */
         CC1200_PREAMBLE_CFG0,       			 /* Preamble Detection Configuration Reg. 0 */
 		((1 << CC1200_PREAMBLE_CFG0_PQT_EN) |
-		 (CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT_24 << CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT) |
-		 (2 << CC1200_PREAMBLE_CFG0_PQT)),
+		 (CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT_11 << CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT) |
+		 (12 << CC1200_PREAMBLE_CFG0_PQT)),
         CC1200_IQIC,                         0xcb,       /* Digital Image Channel Compensation Configuration */
         CC1200_CHAN_BW,                      0x11,       /* Channel Filter Configuration */
         CC1200_MDMCFG1,                      0x40,       /* General Modem Parameter Configuration Reg. 1 */
