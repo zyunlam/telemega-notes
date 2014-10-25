@@ -518,15 +518,9 @@ struct ao_telemetry_raw_recv {
 
 /* Set delay between telemetry reports (0 to disable) */
 
-#ifdef AO_SEND_ALL_BARO
-#define AO_TELEMETRY_INTERVAL_PAD	AO_MS_TO_TICKS(100)
-#define AO_TELEMETRY_INTERVAL_FLIGHT	AO_MS_TO_TICKS(100)
-#define AO_TELEMETRY_INTERVAL_RECOVER	AO_MS_TO_TICKS(100)
-#else
 #define AO_TELEMETRY_INTERVAL_PAD	AO_MS_TO_TICKS(1000)
 #define AO_TELEMETRY_INTERVAL_FLIGHT	AO_MS_TO_TICKS(100)
 #define AO_TELEMETRY_INTERVAL_RECOVER	AO_MS_TO_TICKS(1000)
-#endif
 
 void
 ao_telemetry_reset_interval(void);

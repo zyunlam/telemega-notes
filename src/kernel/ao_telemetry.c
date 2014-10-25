@@ -269,30 +269,6 @@ ao_send_mini(void)
 
 #endif /* AO_SEND_MINI */
 
-#ifdef AO_SEND_ALL_BARO
-static uint8_t		ao_baro_sample;
-
-static void
-ao_send_baro(void)
-{
-	uint8_t		sample = ao_sample_data;
-	uint8_t		samples = (sample - ao_baro_sample) & (AO_DATA_RING - 1);
-
-	if (samples > 12) {
-		ao_baro_sample = (ao_baro_sample + (samples - 12)) & (AO_DATA_RING - 1);
-		samples = 12;
-	}
-	telemetry.generic.tick = ao_data_ring[sample].tick;
-	telemetry.generic.type = AO_TELEMETRY_BARO;
-	telemetry.baro.samples = samples;
-	for (sample = 0; sample < samples; sample++) {
-		telemetry.baro.baro[sample] = ao_data_ring[ao_baro_sample].adc.pres;
-		ao_baro_sample = ao_data_ring_next(ao_baro_sample);
-	}
-	ao_radio_send(&telemetry, sizeof (telemetry));
-}
-#endif
-
 static __pdata int8_t ao_telemetry_config_max;
 static __pdata int8_t ao_telemetry_config_cur;
 
@@ -422,10 +398,6 @@ ao_telemetry(void)
 			if (!(ao_config.radio_enable & AO_RADIO_DISABLE_TELEMETRY))
 #endif
 			{
-#ifdef AO_SEND_ALL_BARO
-				ao_send_baro();
-#endif
-
 #if HAS_FLIGHT
 # ifdef AO_SEND_MEGA
 				ao_send_mega_sensor();
@@ -453,7 +425,6 @@ ao_telemetry(void)
 				ao_send_satellite();
 #endif
 			}
-#ifndef AO_SEND_ALL_BARO
 #if HAS_RDF
 			if (ao_rdf &&
 #if HAS_APRS
@@ -481,7 +452,6 @@ ao_telemetry(void)
 				ao_aprs_send();
 			}
 #endif /* HAS_APRS */
-#endif /* !AO_SEND_ALL_BARO */
 			time += ao_telemetry_interval;
 			delay = time - ao_time();
 			if (delay > 0) {
