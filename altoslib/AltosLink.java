@@ -55,8 +55,11 @@ public abstract class AltosLink implements Runnable {
 
 	public void printf(String format, Object ... arguments) {
 		String	line = String.format(format, arguments);
-		if (debug)
-			pending_output.add(line);
+		if (debug) {
+			synchronized (pending_output) {
+				pending_output.add(line);
+			}
+		}
 		try {
 			print(line);
 		} catch (InterruptedException ie) {
@@ -286,12 +289,14 @@ public abstract class AltosLink implements Runnable {
 		binary_queue.put(dup);
 	}
 
-	public void flush_output() {
+	public synchronized void flush_output() {
 		if (pending_output == null)
 			return;
-		for (String s : pending_output)
-			System.out.print(s);
-		pending_output.clear();
+		synchronized (pending_output) {
+			for (String s : pending_output)
+				System.out.print(s);
+			pending_output.clear();
+		}
 	}
 
 	public void flush_input(int timeout) throws InterruptedException {
