@@ -35,6 +35,7 @@ ARMM3DIRS=\
 	telegps-v1.0 telegps-v1.0/flash-loader \
 	telelco-v0.2 telelco-v0.2/flash-loader \
 	telescience-v0.2 telescience-v0.2/flash-loader \
+	teledongle-v1.9 teledongle-v1.9/flash-loader \
 	teleballoon-v2.0
 
 ARMM0DIRS=\
