@@ -219,18 +219,18 @@ ao_radio_idle(void)
 {
 	for (;;) {
 		uint8_t	state = (ao_radio_strobe(CC1200_SIDLE) >> CC1200_STATUS_STATE) & CC1200_STATUS_STATE_MASK;
-		if (state == CC1200_STATUS_STATE_IDLE) {
-			ao_radio_strobe(CC1200_SFTX);
-			ao_radio_strobe(CC1200_SFRX);
+		if (state == CC1200_STATUS_STATE_IDLE)
 			break;
-		}
 		if (state == CC1200_STATUS_STATE_TX_FIFO_ERROR)
 			ao_radio_strobe(CC1200_SFTX);
 		if (state == CC1200_STATUS_STATE_RX_FIFO_ERROR)
 			ao_radio_strobe(CC1200_SFRX);
 	}
-	/* Flush any pending TX bytes */
+	/* Flush any pending data in the fifos */
 	ao_radio_strobe(CC1200_SFTX);
+	ao_radio_strobe(CC1200_SFRX);
+	/* Make sure the RF calibration is current */
+	ao_radio_strobe(CC1200_SCAL);
 }
 
 /*
@@ -635,6 +635,8 @@ ao_radio_setup(void)
 
 	ao_radio_mode = 0;
 
+	ao_radio_idle();
+
 	ao_config_get();
 
 	ao_radio_configured = 1;
@@ -666,6 +668,7 @@ ao_radio_get(uint8_t len)
 		ao_radio_reg_write(CC1200_FREQ1, ao_config.radio_setting >> 8);
 		ao_radio_reg_write(CC1200_FREQ0, ao_config.radio_setting);
 		last_radio_setting = ao_config.radio_setting;
+		ao_radio_strobe(CC1200_SCAL);
 	}
 	if (ao_config.radio_rate != last_radio_rate) {
 		ao_radio_mode &= ~AO_RADIO_MODE_BITS_PACKET;
@@ -994,9 +997,8 @@ uint8_t
 ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 {
 	ao_radio_abort = 0;
-	ao_radio_wake = 0;
+
 	ao_radio_get(size - 2);
-	ao_radio_idle();
 	ao_radio_set_mode(AO_RADIO_MODE_PACKET_RX);
 	ao_radio_wake = 0;
 	ao_radio_start_rx();

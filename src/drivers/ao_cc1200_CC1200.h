@@ -34,7 +34,7 @@
         CC1200_SYNC0,                        0x91,       /* Sync Word Configuration [7:0] */
         CC1200_SYNC_CFG1,                                /* Sync Word Detection Configuration Reg. 1 */
 		((CC1200_SYNC_CFG1_SYNC_MODE_16_BITS << CC1200_SYNC_CFG1_SYNC_MODE) |
-		 (12 << CC1200_SYNC_CFG1_SYNC_THR)),
+		 (11 << CC1200_SYNC_CFG1_SYNC_THR)),
         CC1200_SYNC_CFG0,                                /* Sync Word Detection Configuration Reg. 0 */
 		((1 << CC1200_SYNC_CFG0_AUTO_CLEAR) |
 		 (0 << CC1200_SYNC_CFG0_RX_CONFIG_LIMITATION) |
@@ -46,7 +46,7 @@
         CC1200_PREAMBLE_CFG0,       			 /* Preamble Detection Configuration Reg. 0 */
 		((1 << CC1200_PREAMBLE_CFG0_PQT_EN) |
 		 (CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT_11 << CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT) |
-		 (12 << CC1200_PREAMBLE_CFG0_PQT)),
+		 (6 << CC1200_PREAMBLE_CFG0_PQT)),
         CC1200_IQIC,                         0xcb,       /* Digital Image Channel Compensation Configuration */
         CC1200_CHAN_BW,                      0x11,       /* Channel Filter Configuration */
         CC1200_MDMCFG1,                      0x40,       /* General Modem Parameter Configuration Reg. 1 */
@@ -60,7 +60,7 @@
         CC1200_AGC_CFG0,                     0x87,       /* Automatic Gain Control Configuration Reg. 0 */
         CC1200_FIFO_CFG,                     0x40,       /* FIFO Configuration */
 	CC1200_SETTLING_CFG,	                         /* Frequency Synthesizer Calibration and Settling Configuration */
-		((CC1200_SETTLING_CFG_FS_AUTOCAL_IDLE_TO_ON << CC1200_SETTLING_CFG_FS_AUTOCAL) |
+		((CC1200_SETTLING_CFG_FS_AUTOCAL_EVERY_4TH_TIME << CC1200_SETTLING_CFG_FS_AUTOCAL) |
 		 (CC1200_SETTLING_CFG_LOCK_TIME_75_30 << CC1200_SETTLING_CFG_LOCK_TIME) |
 		 (CC1200_SETTLING_CFG_FSREG_TIME_60 << CC1200_SETTLING_CFG_FSREG_TIME)),
         CC1200_FS_CFG,                                   /* Frequency Synthesizer Configuration */
