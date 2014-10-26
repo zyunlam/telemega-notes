@@ -19,19 +19,32 @@
 #include "ao_log.h"
 #include "ao_product.h"
 
-#ifndef HAS_RDF
-#define HAS_RDF 1
-#endif
-
 static __pdata uint16_t ao_telemetry_interval;
 
 #if HAS_RADIO_RATE
 static __xdata uint16_t ao_telemetry_desired_interval;
 #endif
 
+/* TeleMetrum v1.0 just doesn't have enough space to
+ * manage the more complicated telemetry scheduling, so
+ * it loses the ability to disable telem/rdf separately
+ */
+
+#if defined(TELEMETRUM_V_1_0)
+#define SIMPLIFY
+#endif
+
+#ifdef SIMPLIFY
+#define ao_telemetry_time time
+#define RDF_SPACE	__pdata
+#else
+#define RDF_SPACE	__xdata
+static __pdata uint16_t ao_telemetry_time;
+#endif
+
 #if HAS_RDF
-static __pdata uint8_t ao_rdf = 0;
-static __pdata uint16_t ao_rdf_time;
+static RDF_SPACE uint8_t ao_rdf = 0;
+static RDF_SPACE uint16_t ao_rdf_time;
 #endif
 
 #if HAS_APRS
@@ -308,6 +321,7 @@ ao_send_configuration(void)
 
 #if HAS_GPS
 
+static __pdata int8_t ao_telemetry_gps_max;
 static __pdata int8_t ao_telemetry_loc_cur;
 static __pdata int8_t ao_telemetry_sat_cur;
 
@@ -324,7 +338,7 @@ ao_send_location(void)
 		telemetry.location.tick = ao_gps_tick;
 		ao_mutex_put(&ao_gps_mutex);
 		ao_radio_send(&telemetry, sizeof (telemetry));
-		ao_telemetry_loc_cur = ao_telemetry_config_max;
+		ao_telemetry_loc_cur = ao_telemetry_gps_max;
 	}
 }
 
@@ -341,7 +355,7 @@ ao_send_satellite(void)
 		       AO_MAX_GPS_TRACKING * sizeof (struct ao_telemetry_satellite_info));
 		ao_mutex_put(&ao_gps_mutex);
 		ao_radio_send(&telemetry, sizeof (telemetry));
-		ao_telemetry_sat_cur = ao_telemetry_config_max;
+		ao_telemetry_sat_cur = ao_telemetry_gps_max;
 	}
 }
 #endif
@@ -387,6 +401,7 @@ ao_telemetry(void)
 		while (ao_telemetry_interval == 0)
 			ao_sleep(&telemetry);
 		time = ao_time();
+		ao_telemetry_time = time;
 #if HAS_RDF
 		ao_rdf_time = time;
 #endif
@@ -394,73 +409,85 @@ ao_telemetry(void)
 		ao_aprs_time = time;
 #endif
 		while (ao_telemetry_interval) {
-#if HAS_APRS
+			time = ao_time() + AO_SEC_TO_TICKS(100);
+#ifndef SIMPLIFY
 			if (!(ao_config.radio_enable & AO_RADIO_DISABLE_TELEMETRY))
 #endif
 			{
-#if HAS_FLIGHT
+#ifndef SIMPLIFY
+				if ( (int16_t) (ao_time() - ao_telemetry_time) >= 0)
+#endif
+				{
+					ao_telemetry_time = ao_time() + ao_telemetry_interval;
 # ifdef AO_SEND_MEGA
-				ao_send_mega_sensor();
-				ao_send_mega_data();
+					ao_send_mega_sensor();
+					ao_send_mega_data();
 # endif
 # ifdef AO_SEND_METRUM
-				ao_send_metrum_sensor();
-				ao_send_metrum_data();
+					ao_send_metrum_sensor();
+					ao_send_metrum_data();
 # endif
 # ifdef AO_SEND_MINI
-				ao_send_mini();
+					ao_send_mini();
 # endif
 # ifdef AO_TELEMETRY_SENSOR
-				ao_send_sensor();
+					ao_send_sensor();
 # endif
-#endif /* HAS_FLIGHT */
-
 #if HAS_COMPANION
-				if (ao_companion_running)
-					ao_send_companion();
+					if (ao_companion_running)
+						ao_send_companion();
 #endif
-				ao_send_configuration();
 #if HAS_GPS
-				ao_send_location();
-				ao_send_satellite();
+					ao_send_location();
+					ao_send_satellite();
+#endif
+					ao_send_configuration();
+				}
+#ifndef SIMPLIFY
+				time = ao_telemetry_time;
 #endif
 			}
 #if HAS_RDF
-			if (ao_rdf &&
-#if HAS_APRS
-			    !(ao_config.radio_enable & AO_RADIO_DISABLE_RDF) &&
-#endif /* HAS_APRS */
-			    (int16_t) (ao_time() - ao_rdf_time) >= 0)
+			if (ao_rdf
+#ifndef SIMPLIFY
+			    && !(ao_config.radio_enable & AO_RADIO_DISABLE_RDF)
+#endif
+				)
 			{
+				if ((int16_t) (ao_time() - ao_rdf_time) >= 0) {
 #if HAS_IGNITE_REPORT
-				uint8_t	c;
-#endif /* HAS_IGNITE_REPORT */
-				ao_rdf_time = ao_time() + AO_RDF_INTERVAL_TICKS;
+					uint8_t	c;
+#endif
+					ao_rdf_time = ao_time() + AO_RDF_INTERVAL_TICKS;
 #if HAS_IGNITE_REPORT
-				if (ao_flight_state == ao_flight_pad && (c = ao_report_igniter()))
-					ao_radio_continuity(c);
-				else
-#endif /* HAS_IGNITE_REPORT*/
-					ao_radio_rdf();
+					if (ao_flight_state == ao_flight_pad && (c = ao_report_igniter()))
+						ao_radio_continuity(c);
+					else
+#endif
+						ao_radio_rdf();
+				}
+#ifndef SIMPLIFY
+				if ((int16_t) (time - ao_rdf_time) > 0)
+					time = ao_rdf_time;
+#endif
 			}
 #endif /* HAS_RDF */
 #if HAS_APRS
-			if (ao_config.aprs_interval != 0 &&
-			    (int16_t) (ao_time() - ao_aprs_time) >= 0)
-			{
-				ao_aprs_time = ao_time() + AO_SEC_TO_TICKS(ao_config.aprs_interval);
-				ao_aprs_send();
+			if (ao_config.aprs_interval != 0) {
+				if ((int16_t) (ao_time() - ao_aprs_time) >= 0) {
+					ao_aprs_time = ao_time() + AO_SEC_TO_TICKS(ao_config.aprs_interval);
+					ao_aprs_send();
+				}
+				if ((int16_t) (time - ao_aprs_time) > 0)
+					time = ao_aprs_time;
 			}
 #endif /* HAS_APRS */
-			time += ao_telemetry_interval;
 			delay = time - ao_time();
 			if (delay > 0) {
 				ao_alarm(delay);
 				ao_sleep(&telemetry);
 				ao_clear_alarm();
 			}
-			else
-				time = ao_time();
 		}
 	}
 }
@@ -517,20 +544,30 @@ ao_telemetry_set_interval(uint16_t interval)
 	ao_telemetry_companion_cur = cur;
 #endif
 
+#if HAS_GPS
+	ao_telemetry_gps_max = AO_SEC_TO_TICKS(1) / interval;
+	if (ao_telemetry_gps_max > cur)
+		cur++;
+	ao_telemetry_loc_cur = cur;
+	if (ao_telemetry_gps_max > cur)
+		cur++;
+	ao_telemetry_sat_cur = cur;
+#endif
+
 	ao_telemetry_config_max = AO_SEC_TO_TICKS(5) / interval;
-#if HAS_COMPANION
 	if (ao_telemetry_config_max > cur)
 		cur++;
 	ao_telemetry_config_cur = cur;
-#endif
 
-#if HAS_GPS
-	if (ao_telemetry_config_max > cur)
-		cur++;
-	ao_telemetry_loc_cur = cur;
-	if (ao_telemetry_config_max > cur)
-		cur++;
-	ao_telemetry_sat_cur = cur;
+#ifndef SIMPLIFY
+	ao_telemetry_time = 
+#if HAS_RDF
+		ao_rdf_time =
+#endif
+#if HAS_APRS
+		ao_aprs_time =
+#endif
+		ao_time();
 #endif
 	ao_wakeup(&telemetry);
 }

@@ -120,6 +120,12 @@ struct ao_telemetry_location {
 #define HAS_WIDE_GPS	1
 #endif
 
+#ifdef HAS_TELEMETRY
+#ifndef HAS_RDF
+#define HAS_RDF		1
+#endif
+#endif
+
 #if HAS_WIDE_GPS
 typedef int32_t		gps_alt_t;
 #define AO_TELEMETRY_LOCATION_ALTITUDE(l) 	(((gps_alt_t) (l)->altitude_high << 16) | ((l)->altitude_low))

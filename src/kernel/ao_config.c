@@ -557,10 +557,10 @@ ao_config_radio_rate_set(void) __reentrant
 	}
 	_ao_config_edit_start();
 	ao_config.radio_rate = ao_cmd_lex_i;
+	_ao_config_edit_finish();
 #if HAS_TELEMETRY
 	ao_telemetry_reset_interval();
 #endif
-	_ao_config_edit_finish();
 #if HAS_RADIO_RECV
 	ao_radio_recv_abort();
 #endif
@@ -684,6 +684,9 @@ ao_config_radio_enable_set(void) __reentrant
 	_ao_config_edit_start();
 	ao_config.radio_enable = ao_cmd_lex_i;
 	_ao_config_edit_finish();
+#if HAS_TELEMETRY && HAS_RADIO_RATE
+	ao_telemetry_reset_interval();
+#endif
 }
 #endif /* HAS_RADIO */
 
@@ -735,6 +738,7 @@ ao_config_aprs_set(void)
 	_ao_config_edit_start();
 	ao_config.aprs_interval = ao_cmd_lex_i;
 	_ao_config_edit_finish();
+	ao_telemetry_reset_interval();
 }
 
 #endif /* HAS_APRS */
@@ -825,6 +829,9 @@ ao_config_tracker_set(void)
 	ao_config.tracker_motion = m;
 	ao_config.tracker_interval = i;
 	_ao_config_edit_finish();
+#if HAS_TELEMETRY
+	ao_telemetry_reset_interval();
+#endif
 }
 #endif /* HAS_TRACKER */
 
