@@ -427,8 +427,10 @@ public abstract class AltosLink implements Runnable {
 
 	public void set_callsign(String callsign) {
 		this.callsign = callsign;
-		printf ("c c %s\n", callsign);
-		flush_output();
+		if (callsign != null) {
+			printf ("c c %s\n", callsign);
+			flush_output();
+		}
 	}
 
 	public boolean is_loader() throws InterruptedException {
@@ -467,7 +469,7 @@ public abstract class AltosLink implements Runnable {
 		if (telemetry_rate < 0)
 			telemetry_rate = AltosPreferences.telemetry_rate(serial);
 		set_telemetry_rate(telemetry_rate);
-		if (callsign.equals(""))
+		if (callsign == null || callsign.equals(""))
 			callsign = AltosPreferences.callsign();
 		set_callsign(callsign);
 		printf("p\nE 0\n");
