@@ -43,10 +43,6 @@
 #define HAS_TASK	1
 #endif
 
-#ifndef AO_PORT_TYPE
-#define AO_PORT_TYPE uint8_t
-#endif
-
 typedef AO_PORT_TYPE ao_port_t;
 
 #if HAS_TASK
