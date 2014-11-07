@@ -18,17 +18,18 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-/* External crystal at 8MHz */
-#define AO_HSE		8000000
+#include <ao_flash_lpc_pins.h>
 
-#include <ao_flash_stm_pins.h>
+/* Debug port TXD (pin 6) */
 
-/* Companion port cs_companion0 PD0 */
-
-#define AO_BOOT_PIN		1
-#define AO_BOOT_APPLICATION_GPIO	stm_gpiod
-#define AO_BOOT_APPLICATION_PIN		0
+#define AO_BOOT_PIN			1
+#define AO_BOOT_APPLICATION_GPIO	0
+#define AO_BOOT_APPLICATION_PIN		19
 #define AO_BOOT_APPLICATION_VALUE	1
 #define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_UP
+
+#define HAS_USB_PULLUP	1
+#define AO_USB_PULLUP_PORT	0
+#define AO_USB_PULLUP_PIN	20
 
 #endif /* _AO_PINS_H_ */
