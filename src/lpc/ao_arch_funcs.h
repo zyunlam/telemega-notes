@@ -201,7 +201,7 @@ void
 ao_spi_put(uint8_t spi_index);
 
 void
-ao_spi_send(void *block, uint16_t len, uint8_t spi_index);
+ao_spi_send(const void *block, uint16_t len, uint8_t spi_index);
 
 void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
@@ -210,7 +210,7 @@ void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
 
 void
-ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t spi_index);
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
 
 extern uint16_t	ao_spi_speed[LPC_NUM_SPI];
 
