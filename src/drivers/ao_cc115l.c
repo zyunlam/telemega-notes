@@ -246,6 +246,8 @@ ao_radio_idle(void)
 	}
 	/* Flush any pending TX bytes */
 	ao_radio_strobe(CC115L_SFTX);
+	/* Make sure the RF calibration is current */
+	ao_radio_strobe(CC115L_SCAL);
 }
 
 /*
@@ -325,23 +327,22 @@ static const struct {
 
 static const uint16_t packet_setup[] = {
 	CC115L_MDMCFG3,		(PACKET_DRATE_M),
-	CC115L_MDMCFG2,		(0x00 |
-				 (CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
+	CC115L_MDMCFG2,		((CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
 				 (0 << CC115L_MDMCFG2_MANCHESTER_EN) |
 				 (CC115L_MDMCFG2_SYNC_MODE_16BITS << CC115L_MDMCFG2_SYNC_MODE)),
 };
 
 
 /*
- * RDF deviation is 5kHz
+ * RDF deviation is 3kHz
  *
  *	fdev = fosc >> 17 * (8 + dev_m) << dev_e
  *
- *     	26e6 / (2 ** 17) * (8 + 4) * (2 ** 1) = 4761Hz
+ *     	26e6 / (2 ** 17) * (8 + 7) * (2 ** 0) = 2975
  */
 
-#define RDF_DEV_E	1
-#define RDF_DEV_M	4
+#define RDF_DEV_E	0
+#define RDF_DEV_M	7
 
 /*
  * For our RDF beacon, set the symbol rate to 2kBaud (for a 1kHz tone)
@@ -364,8 +365,7 @@ static const uint16_t rdf_setup[] = {
 	CC115L_MDMCFG4,		((0xf << 4) |
 				 (RDF_DRATE_E << CC115L_MDMCFG4_DRATE_E)),
 	CC115L_MDMCFG3,		(RDF_DRATE_M),
-	CC115L_MDMCFG2,		(0x00 |
-				 (CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
+	CC115L_MDMCFG2,		((CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
 				 (0 << CC115L_MDMCFG2_MANCHESTER_EN) |
 				 (CC115L_MDMCFG2_SYNC_MODE_NONE << CC115L_MDMCFG2_SYNC_MODE)),
 };
@@ -401,8 +401,7 @@ static const uint16_t aprs_setup[] = {
 	CC115L_MDMCFG4,		((0xf << 4) |
 				 (APRS_DRATE_E << CC115L_MDMCFG4_DRATE_E)),
 	CC115L_MDMCFG3,		(APRS_DRATE_M),
-	CC115L_MDMCFG2,		(0x00 |
-				 (CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
+	CC115L_MDMCFG2,		((CC115L_MDMCFG2_MOD_FORMAT_GFSK << CC115L_MDMCFG2_MOD_FORMAT) |
 				 (0 << CC115L_MDMCFG2_MANCHESTER_EN) |
 				 (CC115L_MDMCFG2_SYNC_MODE_NONE << CC115L_MDMCFG2_SYNC_MODE)),
 };
@@ -491,22 +490,33 @@ static const uint16_t radio_setup[] = {
 	AO_CC115L_DONE_INT_GPIO_IOCFG,	    CC115L_IOCFG_GPIO_CFG_PA_PD | (1 << CC115L_IOCFG_GPIO_INV),
 
         CC115L_FIFOTHR,                     0x47,       /* TX FIFO Thresholds */
-	CC115L_MDMCFG1,			    (0x00 |
-					     (CC115L_MDMCFG1_NUM_PREAMBLE_4 << CC115L_MDMCFG1_NUM_PREAMBLE) |
-					     (1 << CC115L_MDMCFG1_CHANSPC_E)),
+	CC115L_MDMCFG1,					/* Modem Configuration */
+		((CC115L_MDMCFG1_NUM_PREAMBLE_4 << CC115L_MDMCFG1_NUM_PREAMBLE) |
+		 (1 << CC115L_MDMCFG1_CHANSPC_E)),
 	CC115L_MDMCFG0,			    248,	/* Channel spacing M value (100kHz channels) */
+	CC115L_MCSM1,			    0x30,	/* Main Radio Control State Machine Configuration */
         CC115L_MCSM0,                       0x38,       /* Main Radio Control State Machine Configuration */
         CC115L_RESERVED_0X20,               0xfb,       /* Use setting from SmartRF Studio */
+	CC115L_FREND0,			    0x10,	/* Front End TX Configuration */
         CC115L_FSCAL3,                      0xe9,       /* Frequency Synthesizer Calibration */
         CC115L_FSCAL2,                      0x2a,       /* Frequency Synthesizer Calibration */
         CC115L_FSCAL1,                      0x00,       /* Frequency Synthesizer Calibration */
         CC115L_FSCAL0,                      0x1f,       /* Frequency Synthesizer Calibration */
+	CC115L_RESERVED_0X29,		    0x59,	/* RESERVED */
+	CC115L_RESERVED_0X2A,		    0x7f,	/* RESERVED */
+	CC115L_RESERVED_0X2B,		    0x3f,	/* RESERVED */
         CC115L_TEST2,                       0x81,       /* Various Test Settings */
         CC115L_TEST1,                       0x35,       /* Various Test Settings */
         CC115L_TEST0,                       0x09,       /* Various Test Settings */
 };
 
 static uint8_t	ao_radio_configured = 0;
+
+#if HAS_RADIO_POWER
+#define RADIO_POWER	ao_config.radio_power
+#else
+#define RADIO_POWER	0xc0
+#endif
 
 static void
 ao_radio_setup(void)
@@ -522,6 +532,8 @@ ao_radio_setup(void)
 	ao_radio_mode = 0;
 
 	ao_config_get();
+
+	ao_radio_reg_write(CC115L_PA, RADIO_POWER);
 
 	ao_radio_strobe(CC115L_SCAL);
 
@@ -553,6 +565,8 @@ ao_radio_get(void)
 		ao_radio_reg_write(CC115L_FREQ1, ao_config.radio_setting >> 8);
 		ao_radio_reg_write(CC115L_FREQ0, ao_config.radio_setting);
 		last_radio_setting = ao_config.radio_setting;
+		/* Make sure the RF calibration is current */
+		ao_radio_strobe(CC115L_SCAL);
 	}
 	if (ao_config.radio_rate != last_radio_rate) {
 		ao_radio_mode &= ~AO_RADIO_MODE_BITS_PACKET_TX;
@@ -666,23 +680,11 @@ ao_radio_rdf_abort(void)
 
 #define POWER_STEP	0x08
 
-#if HAS_RADIO_POWER
-#define RADIO_POWER	ao_config.radio_power
-#else
-#define RADIO_POWER	0xc0
-#endif
-
 static void
 ao_radio_stx(void)
 {
-	uint8_t	power;
 	ao_radio_pa_on();
-	ao_radio_reg_write(CC115L_PA, 0);
 	ao_radio_strobe(CC115L_STX);
-	for (power = POWER_STEP; power < RADIO_POWER; power += POWER_STEP)
-		ao_radio_reg_write(CC115L_PA, power);
-	if (power != RADIO_POWER)
-		ao_radio_reg_write(CC115L_PA, RADIO_POWER);
 }
 
 static void
