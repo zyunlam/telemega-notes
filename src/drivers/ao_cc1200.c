@@ -28,8 +28,14 @@ static uint8_t ao_radio_abort;		/* radio operation should abort */
 
 int8_t	ao_radio_rssi;			/* Last received RSSI value */
 
+#ifndef CC1200_DEBUG
 #define CC1200_DEBUG		0
+#endif
+
+#ifndef CC1200_LOW_LEVEL_DEBUG
 #define CC1200_LOW_LEVEL_DEBUG	0
+#endif
+
 #define CC1200_TRACE		0
 #define CC1200_APRS_TRACE	0
 
@@ -742,6 +748,8 @@ ao_rdf_start(uint8_t len)
 static void
 ao_radio_run(void)
 {
+	ao_radio_wake = 0;
+	ao_radio_abort = 0;
 	ao_radio_start_tx();
 	ao_radio_wait_isr(0);
 	if (!ao_radio_wake)
@@ -858,6 +866,7 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 	uint8_t	started = 0;
 	uint8_t	fifo_space;
 
+	ao_radio_abort = 0;
 	ao_radio_get(0xff);
 	fifo_space = CC1200_FIFO_SIZE;
 	while (!done) {
