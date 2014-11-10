@@ -158,7 +158,7 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_advanced_header() {
-		out.printf("accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z");
+		out.printf("accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,mag_x,mag_y,mag_z");
 	}
 
 	void write_advanced(AltosState state) {
