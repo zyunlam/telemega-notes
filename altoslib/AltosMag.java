@@ -18,8 +18,9 @@
 package org.altusmetrum.altoslib_5;
 
 import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosMag implements Cloneable {
+public class AltosMag implements Cloneable, Serializable {
 	public int		along;
 	public int		across;
 	public int		through;

@@ -18,8 +18,9 @@
 package org.altusmetrum.altoslib_5;
 
 import java.lang.Math;
+import java.io.*;
 
-public class AltosGreatCircle implements Cloneable {
+public class AltosGreatCircle implements Cloneable, Serializable {
 	public double	distance;
 	public double	bearing;
 	public double	range;

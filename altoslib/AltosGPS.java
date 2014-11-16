@@ -19,8 +19,9 @@ package org.altusmetrum.altoslib_5;
 
 import java.text.*;
 import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosGPS implements Cloneable {
+public class AltosGPS implements Cloneable, Serializable {
 
 	public final static int MISSING = AltosLib.MISSING;
 

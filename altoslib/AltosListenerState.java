@@ -17,7 +17,9 @@
 
 package org.altusmetrum.altoslib_5;
 
-public class AltosListenerState {
+import java.io.*;
+
+public class AltosListenerState implements Serializable {
 	public int	crc_errors;
 	public double	battery;
 
