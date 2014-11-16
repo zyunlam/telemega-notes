@@ -139,6 +139,10 @@ public class TelemetryService extends Service implements LocationListener {
 			case MSG_TELEMETRY:
 				// forward telemetry messages
 				s.telemetry_state.state = (AltosState) msg.obj;
+				if (s.telemetry_state.state != null) {
+					if (D) Log.d(TAG, "Save state");
+					AltosPreferences.set_state(0, s.telemetry_state.state, null);
+				}
 				if (D) Log.d(TAG, "MSG_TELEMETRY");
 				s.sendMessageToClients();
 				break;
@@ -179,6 +183,8 @@ public class TelemetryService extends Service implements LocationListener {
 	private Message message() {
 		if (telemetry_state == null)
 			Log.d(TAG, "telemetry_state null!");
+		if (telemetry_state.state == null)
+			Log.d(TAG, "telemetry_state.state null!");
 		return Message.obtain(null, AltosDroid.MSG_STATE, telemetry_state);
 	}
 
@@ -262,7 +268,7 @@ public class TelemetryService extends Service implements LocationListener {
 		if (D) Log.d(TAG, "connected bluetooth configured");
 		telemetry_state.connect = TelemetryState.CONNECT_CONNECTED;
 
-		mTelemetryReader = new TelemetryReader(mAltosBluetooth, mHandler);
+		mTelemetryReader = new TelemetryReader(mAltosBluetooth, mHandler, telemetry_state.state);
 		mTelemetryReader.start();
 
 		if (D) Log.d(TAG, "connected TelemetryReader started");
@@ -305,6 +311,13 @@ public class TelemetryService extends Service implements LocationListener {
 		//mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
 		telemetry_state.connect = TelemetryState.CONNECT_READY;
+
+		AltosSavedState saved_state = AltosPreferences.state(0);
+
+		if (saved_state != null) {
+			if (D) Log.d(TAG, String.format("recovered old state flight %d\n", saved_state.state.flight));
+			telemetry_state.state = saved_state.state;
+		}
 
 		// Start our timer - first event in 10 seconds, then every 10 seconds after that.
 		timer.scheduleAtFixedRate(new TimerTask(){ public void run() {onTimerTick();}}, 10000L, 10000L);
