@@ -198,4 +198,7 @@ public class TabMap extends AltosDroidTab {
 		}
 
 	}
+
+	public TabMap() {
+	}
 }
