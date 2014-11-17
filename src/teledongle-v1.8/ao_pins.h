@@ -69,7 +69,7 @@
 #define HAS_BEEP		0
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		0
-#define HAS_RSSI		1
+#define HAS_RSSI		0
 
 #define HAS_SPI_1		0
 #define SPI_1_PA5_PA6_PA7	0	/* Barometer */
@@ -114,6 +114,7 @@
 #define LEGACY_MONITOR		0
 #define HAS_MONITOR_PUT		1
 #define AO_MONITOR_LED		AO_LED_GREEN
+#define AO_MONITOR_BAD		AO_LED_RED
 
 /*
  * Radio (cc1200)

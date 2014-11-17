@@ -43,12 +43,12 @@ main(void)
 	ao_usb_init();
 	ao_radio_init();
 	ao_monitor_init();
-	ao_rssi_init(AO_LED_RED);
 	ao_packet_master_init();
 	ao_send_packet_init();
 
 	ao_config_init();
 
+	ao_led_off(AO_LED_RED);
 	ao_start_scheduler();
 	return 0;
 }
