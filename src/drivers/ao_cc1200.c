@@ -599,14 +599,20 @@ ao_radio_set_mode(uint16_t new_mode)
 		}
 	}
 
-	if (changes & AO_RADIO_MODE_BITS_TX_BUF)
+	if (changes & AO_RADIO_MODE_BITS_TX_BUF) {
 		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_TXFIFO_THR);
+		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH);
+	}
 
-	if (changes & AO_RADIO_MODE_BITS_TX_FINISH)
+	if (changes & AO_RADIO_MODE_BITS_TX_FINISH) {
 		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_PKT_SYNC_RXTX);
+		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH);
+	}
 
-	if (changes & AO_RADIO_MODE_BITS_RX)
-		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_PKT_SYNC_RXTX);
+	if (changes & AO_RADIO_MODE_BITS_RX) {
+		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_MARC_MCU_WAKEUP);
+		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_RISING|AO_EXTI_PRIORITY_HIGH);
+	}
 
 	if (changes & AO_RADIO_MODE_BITS_RDF)
 		ao_radio_set_regs(rdf_setup);
@@ -709,20 +715,6 @@ ao_radio_show_state(char *where)
 static void
 ao_radio_wait_isr(uint16_t timeout)
 {
-	uint8_t	state;
-
-	state = ao_radio_state();
-	switch (state) {
-	case CC1200_STATUS_STATE_IDLE:
-	case CC1200_STATUS_STATE_RX_FIFO_ERROR:
-	case CC1200_STATUS_STATE_TX_FIFO_ERROR:
-#if CC1200_LOW_LEVEL_DEBUG
-		printf("before wait, state %d\n", state); flush();
-#endif
-		ao_radio_abort = 1;
-		return;
-	}
-
 	if (timeout)
 		ao_alarm(timeout);
 
@@ -731,6 +723,7 @@ ao_radio_wait_isr(uint16_t timeout)
 		if (ao_sleep(&ao_radio_wake))
 			ao_radio_abort = 1;
 	ao_arch_release_interrupts();
+
 	if (timeout)
 		ao_clear_alarm();
 }
@@ -1005,14 +998,80 @@ ao_radio_dump_state(struct ao_radio_state *s)
 uint8_t
 ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 {
-	ao_radio_abort = 0;
+	uint8_t	success = 0;
 
+	ao_radio_abort = 0;
 	ao_radio_get(size - 2);
 	ao_radio_set_mode(AO_RADIO_MODE_PACKET_RX);
 	ao_radio_wake = 0;
 	ao_radio_start_rx();
-	ao_radio_wait_isr(timeout);
-	if (ao_radio_wake) {
+
+	while (!ao_radio_abort) {
+		ao_radio_wait_isr(timeout);
+		if (ao_radio_wake) {
+			uint8_t		marc_status1 = ao_radio_reg_read(CC1200_MARC_STATUS1);
+
+			/* Check the receiver status to see what happened
+			 */
+			switch (marc_status1) {
+			case CC1200_MARC_STATUS1_RX_FINISHED:
+			case CC1200_MARC_STATUS1_ADDRESS:
+			case CC1200_MARC_STATUS1_CRC:
+				/* Normal return, go fetch the bytes from the FIFO
+				 * and give them back to the caller
+				 */
+				success = 1;
+				break;
+			case CC1200_MARC_STATUS1_RX_TIMEOUT:
+			case CC1200_MARC_STATUS1_RX_TERMINATION:
+			case CC1200_MARC_STATUS1_EWOR_SYNC_LOST:
+			case CC1200_MARC_STATUS1_MAXIMUM_LENGTH:
+			case CC1200_MARC_STATUS1_RX_FIFO_OVERFLOW:
+			case CC1200_MARC_STATUS1_RX_FIFO_UNDERFLOW:
+				/* Something weird happened; reset the radio and
+				 * return failure
+				 */
+				success = 0;
+				break;
+			default:
+				/* some other status; go wait for the radio to do something useful
+				 */
+				continue;
+			}
+			break;
+		} else {
+			uint8_t modem_status1 = ao_radio_reg_read(CC1200_MODEM_STATUS1);
+
+			/* Check to see if the packet header has been seen, in which case we'll
+			 * want to keep waiting for the rest of the packet to appear
+			 */
+			if (modem_status1 & ((1 << CC1200_MODEM_STATUS1_SYNC_FOUND) |
+					     (1 << CC1200_MODEM_STATUS1_PQT_REACHED)))
+			{
+				ao_radio_abort = 0;
+
+				/* Set a timeout based on the packet length so that we make sure to
+				 * wait long enough to receive the whole thing.
+				 *
+				 * timeout = bits * FEC expansion / rate
+				 */
+				switch (ao_config.radio_rate) {
+				default:
+				case AO_RADIO_RATE_38400:
+					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 384) + 1;
+					break;
+				case AO_RADIO_RATE_9600:
+					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 96) + 1;
+					break;
+				case AO_RADIO_RATE_2400:
+					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 24) + 1;
+					break;
+				}
+			}
+		}
+	}
+
+	if (success) {
 		int8_t	rssi;
 		uint8_t	status;
 
@@ -1033,7 +1092,7 @@ ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 	}
 
 	ao_radio_put();
-	return ao_radio_wake;
+	return success;
 }
 
 
