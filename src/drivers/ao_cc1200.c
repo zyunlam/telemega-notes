@@ -1045,8 +1045,7 @@ ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 			/* Check to see if the packet header has been seen, in which case we'll
 			 * want to keep waiting for the rest of the packet to appear
 			 */
-			if (modem_status1 & ((1 << CC1200_MODEM_STATUS1_SYNC_FOUND) |
-					     (1 << CC1200_MODEM_STATUS1_PQT_REACHED)))
+			if (modem_status1 & (1 << CC1200_MODEM_STATUS1_SYNC_FOUND))
 			{
 				ao_radio_abort = 0;
 
