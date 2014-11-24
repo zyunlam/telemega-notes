@@ -46,7 +46,7 @@
         CC1200_PREAMBLE_CFG0,       			 /* Preamble Detection Configuration Reg. 0 */
 		((1 << CC1200_PREAMBLE_CFG0_PQT_EN) |
 		 (CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT_11 << CC1200_PREAMBLE_CFG0_PQT_VALID_TIMEOUT) |
-		 (6 << CC1200_PREAMBLE_CFG0_PQT)),
+		 (15 << CC1200_PREAMBLE_CFG0_PQT)),
         CC1200_IQIC,                         0xcb,       /* Digital Image Channel Compensation Configuration */
         CC1200_CHAN_BW,                      0x11,       /* Channel Filter Configuration */
         CC1200_MDMCFG1,                      0x40,       /* General Modem Parameter Configuration Reg. 1 */
