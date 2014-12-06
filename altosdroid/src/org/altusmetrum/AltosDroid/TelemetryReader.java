@@ -40,8 +40,6 @@ public class TelemetryReader extends Thread {
 	AltosLink   link;
 	AltosState  state = null;
 
-	AltosFlightReader	stacked;
-
 	LinkedBlockingQueue<AltosLine> telemQueue;
 
 	public AltosState read() throws ParseException, AltosCRCException, InterruptedException, IOException {
@@ -59,10 +57,6 @@ public class TelemetryReader extends Thread {
 
 	public void close() {
 		state = null;
-		if (stacked != null) {
-			stacked.close(false);
-			stacked = null;
-		}
 		link.remove_monitor(telemQueue);
 		link = null;
 		telemQueue.clear();
@@ -73,25 +67,6 @@ public class TelemetryReader extends Thread {
 		AltosState  state = null;
 
 		try {
-			if (D) Log.d(TAG, "starting reader");
-			while (stacked != null) {
-				AltosState	stacked_state = null;
-				try {
-					stacked_state = stacked.read();
-				} catch (ParseException pe) {
-					continue;
-				} catch (AltosCRCException ce) {
-					continue;
-				}
-				if (stacked_state != null)
-					state = stacked_state;
-				else
-					stacked = null;
-			}
-			if (state != null) {
-				if (D) Log.d(TAG, "Send initial state");
-				handler.obtainMessage(TelemetryService.MSG_TELEMETRY, state).sendToTarget();
-			}
 			if (D) Log.d(TAG, "starting loop");
 			while (telemQueue != null) {
 				try {
@@ -111,34 +86,16 @@ public class TelemetryReader extends Thread {
 		}
 	}
 
-	public TelemetryReader (AltosLink in_link, Handler in_handler, AltosFlightReader in_stacked) {
+	public TelemetryReader (AltosLink in_link, Handler in_handler, AltosState in_state) {
 		if (D) Log.d(TAG, "connected TelemetryReader create started");
 		link    = in_link;
 		handler = in_handler;
-		stacked = in_stacked;
 
-		state = null;
+		state = in_state;
 		telemQueue = new LinkedBlockingQueue<AltosLine>();
 		link.add_monitor(telemQueue);
 		link.set_telemetry(AltosLib.ao_telemetry_standard);
 
 		if (D) Log.d(TAG, "connected TelemetryReader created");
-	}
-
-	private static AltosFlightReader existing_data(AltosLink link) {
-		if (link == null)
-			return null;
-
-		File	file = AltosPreferences.logfile(link.serial);
-		if (file != null) {
-			AltosStateIterable	iterable = AltosStateIterable.iterable(file);
-			if (iterable != null)
-				return new AltosReplayReader(iterable.iterator(), file, false);
-		}
-		return null;
-	}
-
-	public TelemetryReader(AltosLink link, Handler handler) {
-		this(link, handler, existing_data(link));
 	}
 }

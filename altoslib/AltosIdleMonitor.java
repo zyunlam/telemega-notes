@@ -35,20 +35,6 @@ public class AltosIdleMonitor extends Thread {
 	AltosConfigData		config_data;
 	AltosGPS		gps;
 
-	int AltosRSSI() throws TimeoutException, InterruptedException {
-		link.printf("s\n");
-		String line = link.get_reply_no_dialog(5000);
-		if (line == null)
-			throw new TimeoutException();
-		String[] items = line.split("\\s+");
-		if (items.length < 2)
-			return 0;
-		if (!items[0].equals("RSSI:"))
-			return 0;
-		int rssi = Integer.parseInt(items[1]);
-		return rssi;
-	}
-
 	void start_link() throws InterruptedException, TimeoutException {
 		if (remote) {
 			link.set_radio_frequency(frequency);
@@ -58,26 +44,30 @@ public class AltosIdleMonitor extends Thread {
 			link.flush_input();
 	}
 
-	void stop_link() throws InterruptedException, TimeoutException {
+	boolean stop_link() throws InterruptedException, TimeoutException {
 		if (remote)
 			link.stop_remote();
+		return link.reply_abort;
 	}
 
-	void update_state(AltosState state) throws InterruptedException, TimeoutException {
+	boolean update_state(AltosState state) throws InterruptedException, TimeoutException {
 		boolean		worked = false;
+		boolean		aborted = false;
 
 		try {
 			start_link();
 			fetch.update_state(state);
-			worked = true;
+			if (!link.has_error && !link.reply_abort)
+				worked = true;
 		} finally {
-			stop_link();
+			aborted = stop_link();
 			if (worked) {
 				if (remote)
 					state.set_rssi(link.rssi(), 0);
 				listener_state.battery = link.monitor_battery();
 			}
 		}
+		return aborted;
 	}
 
 	public void set_frequency(double in_frequency) {
@@ -102,12 +92,16 @@ public class AltosIdleMonitor extends Thread {
 	public void run() {
 		AltosState state = new AltosState();
 		try {
-			while (!link.has_error) {
+			for (;;) {
 				try {
 					link.config_data();
 					update_state(state);
 					listener.update(state, listener_state);
 				} catch (TimeoutException te) {
+				}
+				if (link.has_error || link.reply_abort) {
+					listener.failed();
+					break;
 				}
 				Thread.sleep(1000);
 			}

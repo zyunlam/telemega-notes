@@ -163,7 +163,7 @@ public class TabPad extends AltosDroidTab {
 			if (receiver.hasAltitude())
 				altitude = receiver.getAltitude();
 			mPadLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
-			mPadLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "W", "E"));
+			mPadLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
 			set_value(mPadAltitudeView, AltosConvert.height, 6, altitude);
 		}
 	}

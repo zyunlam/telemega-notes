@@ -94,9 +94,18 @@ __xdata struct ao_task ao_monitor_blink_task;
 void
 ao_monitor_blink(void)
 {
+#ifdef AO_MONITOR_BAD
+	uint8_t		*recv;
+#endif
 	for (;;) {
 		ao_sleep(DATA_TO_XDATA(&ao_monitor_head));
-		ao_led_for(AO_MONITOR_LED, AO_MS_TO_TICKS(100));
+#ifdef AO_MONITOR_BAD
+		recv = (uint8_t *) &ao_monitor_ring[ao_monitor_ring_prev(ao_monitor_head)];
+		if (ao_monitoring && !(recv[ao_monitoring + 1] & AO_RADIO_STATUS_CRC_OK))
+			ao_led_for(AO_MONITOR_BAD, AO_MS_TO_TICKS(100));
+		else
+#endif
+			ao_led_for(AO_MONITOR_LED, AO_MS_TO_TICKS(100));
 	}
 }
 #endif

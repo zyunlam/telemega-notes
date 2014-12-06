@@ -18,8 +18,9 @@
 package org.altusmetrum.altoslib_5;
 
 import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosIMU implements Cloneable {
+public class AltosIMU implements Cloneable, Serializable {
 	public int		accel_along;
 	public int		accel_across;
 	public int		accel_through;

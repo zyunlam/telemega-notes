@@ -59,6 +59,15 @@ void
 ao_led_init(AO_PORT_TYPE enable)
 {
 	ao_led_enable = enable;
-	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_GPIO);
+	ao_enable_port(LED_PORT);
+	if (LED_PORT == 0) {
+		if (enable & (1 << 11))
+			lpc_ioconf.pio0_11 = LPC_IOCONF_FUNC_PIO0_11 | (1 << LPC_IOCONF_ADMODE);
+		if (enable & (1 << 12))
+			lpc_ioconf.pio0_12 = LPC_IOCONF_FUNC_PIO0_12 | (1 << LPC_IOCONF_ADMODE);
+		if (enable & (1 << 14))
+			lpc_ioconf.pio0_14 = LPC_IOCONF_FUNC_PIO0_14 | (1 << LPC_IOCONF_ADMODE);
+	}
 	lpc_gpio.dir[LED_PORT] |= enable;
+	ao_led_off(enable);
 }

@@ -82,11 +82,23 @@ public class AltosUILib extends AltosLib {
 	static public boolean loaded_library = false;
 	static public boolean has_bluetooth = false;
 
-	static final String[] library_names = { "altos", "altos32", "altos64" };
+	static final String[] library_names_32 = { "altos", "altos32", "altos64" };
+	static final String[] library_names_64 = { "altos", "altos64", "altos32" };
 
 	public static boolean load_library() {
 		if (!initialized) {
-			for (String name : library_names) {
+			String model = System.getProperty("sun.arch.data.model", "missing");
+			boolean is_64 = false;
+			if (model.equals("64")) {
+				is_64 = true;
+			} else if (model.equals("32")) {
+				;
+			} else {
+				String arch = System.getProperty("os.arch", "missing");
+				if (arch.endsWith("64"))
+					is_64 = true;
+			}
+			for (String name : is_64 ? library_names_64 : library_names_32) {
 				try {
 					System.loadLibrary(name);
 					libaltos.altos_init();

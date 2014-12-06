@@ -40,6 +40,8 @@
 #define AO_STACK_END	0xfe
 #define AO_STACK_SIZE	(AO_STACK_END - AO_STACK_START + 1)
 
+#define AO_PORT_TYPE	uint8_t
+
 #define ao_arch_reboot() do {					\
 	WDCTL = WDCTL_EN | WDCTL_MODE_WATCHDOG | WDCTL_INT_64;	\
 	ao_delay(AO_SEC_TO_TICKS(2));				\

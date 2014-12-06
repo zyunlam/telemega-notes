@@ -42,7 +42,7 @@ static const struct ao_spi_stm_info ao_spi_stm_info[STM_NUM_SPI] = {
 static uint8_t	spi_dev_null;
 
 void
-ao_spi_send(void *block, uint16_t len, uint8_t spi_index)
+ao_spi_send(const void *block, uint16_t len, uint8_t spi_index)
 {
 	struct stm_spi *stm_spi = ao_spi_stm_info[AO_SPI_INDEX(spi_index)].stm_spi;
 	uint8_t	mosi_dma_index = ao_spi_stm_info[AO_SPI_INDEX(spi_index)].mosi_dma_index;
@@ -51,7 +51,7 @@ ao_spi_send(void *block, uint16_t len, uint8_t spi_index)
 	/* Set up the transmit DMA to deliver data */
 	ao_dma_set_transfer(mosi_dma_index,
 			    &stm_spi->dr,
-			    block,
+			    (void *) block,
 			    len,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
 			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |

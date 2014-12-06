@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ * Copyright © 2014 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,39 +15,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include <ao.h>
-#include <ao_exti.h>
-#include <ao_packet.h>
-#include <ao_send_packet.h>
+package org.altusmetrum.altoslib_5;
 
-int
-main(void)
-{
-	ao_clock_init();
+import java.io.*;
 
-#if HAS_STACK_GUARD
-	ao_mpu_init();
-#endif
+public class AltosSavedState implements Serializable {
+	public AltosState		state;
+	public AltosListenerState	listener_state;
 
-	ao_task_init();
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_RED);
-	ao_timer_init();
-
-	ao_spi_init();
-	ao_exti_init();
-
-	ao_cmd_init();
-
-	ao_usb_init();
-	ao_radio_init();
-	ao_monitor_init();
-	ao_packet_master_init();
-	ao_send_packet_init();
-
-	ao_config_init();
-
-	ao_led_off(AO_LED_RED);
-	ao_start_scheduler();
-	return 0;
+	public AltosSavedState(AltosState state, AltosListenerState listener_state) {
+		this.state = state;
+		this.listener_state = listener_state;
+	}
 }

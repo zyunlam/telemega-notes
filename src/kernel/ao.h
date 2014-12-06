@@ -43,10 +43,6 @@
 #define HAS_TASK	1
 #endif
 
-#ifndef AO_PORT_TYPE
-#define AO_PORT_TYPE uint8_t
-#endif
-
 typedef AO_PORT_TYPE ao_port_t;
 
 #if HAS_TASK
@@ -518,15 +514,9 @@ struct ao_telemetry_raw_recv {
 
 /* Set delay between telemetry reports (0 to disable) */
 
-#ifdef AO_SEND_ALL_BARO
-#define AO_TELEMETRY_INTERVAL_PAD	AO_MS_TO_TICKS(100)
-#define AO_TELEMETRY_INTERVAL_FLIGHT	AO_MS_TO_TICKS(100)
-#define AO_TELEMETRY_INTERVAL_RECOVER	AO_MS_TO_TICKS(100)
-#else
 #define AO_TELEMETRY_INTERVAL_PAD	AO_MS_TO_TICKS(1000)
 #define AO_TELEMETRY_INTERVAL_FLIGHT	AO_MS_TO_TICKS(100)
 #define AO_TELEMETRY_INTERVAL_RECOVER	AO_MS_TO_TICKS(1000)
-#endif
 
 void
 ao_telemetry_reset_interval(void);
@@ -662,6 +652,7 @@ union ao_monitor {
 extern __xdata union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
 
 #define ao_monitor_ring_next(n)	(((n) + 1) & (AO_MONITOR_RING - 1))
+#define ao_monitor_ring_prev(n)	(((n) - 1) & (AO_MONITOR_RING - 1))
 
 extern __data uint8_t ao_monitoring;
 extern __data uint8_t ao_monitor_head;

@@ -20,8 +20,8 @@
 #endif
 #include "ao_telem.h"
 
-#ifndef AO_TELEMETRY_LOCATION_ALTITUDE
-#define AO_TELEMETRY_LOCATION_ALTITUDE(l)	((l)->altitude)
+#ifndef AO_GPS_ORIG_ALTITUDE
+#define AO_GPS_ORIG_ALTITUDE(l)	((l)->altitude)
 #endif
 
 void
@@ -46,7 +46,7 @@ ao_gps_print(__xdata struct ao_gps_orig *gps_data) __reentrant
 	       AO_TELEM_GPS_ALTITUDE " %d ",
 	       (long) gps_data->latitude,
 	       (long) gps_data->longitude,
-	       AO_TELEMETRY_LOCATION_ALTITUDE(gps_data));
+	       AO_GPS_ORIG_ALTITUDE(gps_data));
 
 	if (gps_data->flags & AO_GPS_DATE_VALID)
 		printf(AO_TELEM_GPS_YEAR " %d "

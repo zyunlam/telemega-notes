@@ -179,7 +179,7 @@ public class TabMap extends AltosDroidTab {
 			}
 			if (state.gps != null) {
 				mTargetLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
-				mTargetLongitudeView.setText(AltosDroid.pos(state.gps.lon, "W", "E"));
+				mTargetLongitudeView.setText(AltosDroid.pos(state.gps.lon, "E", "W"));
 				if (state.gps.locked && state.gps.nsat >= 4)
 					center (state.gps.lat, state.gps.lon, 10);
 			}
@@ -193,9 +193,12 @@ public class TabMap extends AltosDroidTab {
 			else
 				accuracy = 1000;
 			mReceiverLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
-			mReceiverLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "W", "E"));
+			mReceiverLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
 			center (receiver.getLatitude(), receiver.getLongitude(), accuracy);
 		}
 
+	}
+
+	public TabMap() {
 	}
 }

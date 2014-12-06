@@ -17,7 +17,9 @@
 
 package org.altusmetrum.altoslib_5;
 
-public class AltosCompanion {
+import java.io.*;
+
+public class AltosCompanion implements Serializable {
 	public final static int	board_id_telescience = 0x0a;
 	public final static int	MAX_CHANNELS = 12;
 

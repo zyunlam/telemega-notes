@@ -4,4 +4,4 @@
 
 TOPDIR=../..
 HARDWARE=teledongle-v1.9
-include $(TOPDIR)/stm/Makefile-flash.defs
+include $(TOPDIR)/lpc/Makefile-flash.defs

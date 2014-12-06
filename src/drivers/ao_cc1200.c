@@ -21,30 +21,30 @@
 #include <ao_fec.h>
 #include <ao_packet.h>
 
-#define AO_RADIO_MAX_RECV	sizeof(struct ao_packet)
-#define AO_RADIO_MAX_SEND	sizeof(struct ao_packet)
-
 static uint8_t ao_radio_mutex;
 
 static uint8_t ao_radio_wake;		/* radio ready. Also used as sleep address */
 static uint8_t ao_radio_abort;		/* radio operation should abort */
-static uint8_t ao_radio_mcu_wake;	/* MARC status change */
-static uint8_t ao_radio_marc_status;	/* Last read MARC status value */
-static uint8_t ao_radio_tx_finished;	/* MARC status indicates TX finished */
 
 int8_t	ao_radio_rssi;			/* Last received RSSI value */
 
-#define CC1200_DEBUG	1
-#define CC1200_TRACE	1
+#ifndef CC1200_DEBUG
+#define CC1200_DEBUG		0
+#endif
+
+#ifndef CC1200_LOW_LEVEL_DEBUG
+#define CC1200_LOW_LEVEL_DEBUG	0
+#endif
+
+#define CC1200_TRACE		0
+#define CC1200_APRS_TRACE	0
 
 extern const uint32_t	ao_radio_cal;
 
-#define FOSC	32000000
+#define FOSC	40000000
 
-#define ao_radio_try_select(task_id)	ao_spi_try_get_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS,AO_SPI_SPEED_125kHz, task_id)
-#define ao_radio_select()	ao_spi_get_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS,AO_SPI_SPEED_125kHz)
+#define ao_radio_select()	ao_spi_get_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS,AO_SPI_SPEED_FAST)
 #define ao_radio_deselect()	ao_spi_put_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS)
-#define ao_radio_spi_send_sync(d,l)	ao_spi_send_sync((d), (l), AO_CC1200_SPI_BUS)
 #define ao_radio_spi_send(d,l)	ao_spi_send((d), (l), AO_CC1200_SPI_BUS)
 #define ao_radio_spi_send_fixed(d,l) ao_spi_send_fixed((d), (l), AO_CC1200_SPI_BUS)
 #define ao_radio_spi_recv(d,l)	ao_spi_recv((d), (l), AO_CC1200_SPI_BUS)
@@ -128,7 +128,6 @@ ao_radio_strobe(uint8_t addr)
 	return in;
 }
 
-#if 0
 static uint8_t
 ao_radio_fifo_read(uint8_t *data, uint8_t len)
 {
@@ -143,7 +142,6 @@ ao_radio_fifo_read(uint8_t *data, uint8_t len)
 	ao_radio_deselect();
 	return status;
 }
-#endif
 
 static uint8_t
 ao_radio_fifo_write_start(void)
@@ -164,7 +162,7 @@ static inline uint8_t ao_radio_fifo_write_stop(uint8_t status) {
 }
 
 static uint8_t
-ao_radio_fifo_write(uint8_t *data, uint8_t len)
+ao_radio_fifo_write(const uint8_t *data, uint8_t len)
 {
 	uint8_t	status = ao_radio_fifo_write_start();
 	ao_radio_spi_send(data, len);
@@ -185,13 +183,11 @@ ao_radio_tx_fifo_space(void)
 	return CC1200_FIFO_SIZE - ao_radio_reg_read(CC1200_NUM_TXBYTES);
 }
 
-#if CC1200_DEBUG || CC1200_TRACE
 static uint8_t
 ao_radio_status(void)
 {
 	return ao_radio_strobe (CC1200_SNOP);
 }
-#endif
 
 void
 ao_radio_recv_abort(void)
@@ -201,25 +197,6 @@ ao_radio_recv_abort(void)
 }
 
 #define ao_radio_rdf_value 0x55
-
-static uint8_t
-ao_radio_get_marc_status(void)
-{
-	return ao_radio_reg_read(CC1200_MARC_STATUS1);
-}
-
-static void
-ao_radio_check_marc_status(void)
-{
-	ao_radio_mcu_wake = 0;
-	ao_radio_marc_status = ao_radio_get_marc_status();
-
-	/* Anyt other than 'tx/rx finished' means an error occurred */
-	if (ao_radio_marc_status & ~(CC1200_MARC_STATUS1_TX_FINISHED|CC1200_MARC_STATUS1_RX_FINISHED))
-		ao_radio_abort = 1;
-	if (ao_radio_marc_status & (CC1200_MARC_STATUS1_TX_FINISHED))
-		ao_radio_tx_finished = 1;
-}
 
 static void
 ao_radio_isr(void)
@@ -232,10 +209,15 @@ ao_radio_isr(void)
 static void
 ao_radio_start_tx(void)
 {
-	ao_exti_set_callback(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, ao_radio_isr);
 	ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
-	ao_radio_tx_finished = 0;
 	ao_radio_strobe(CC1200_STX);
+}
+
+static void
+ao_radio_start_rx(void)
+{
+	ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
+	ao_radio_strobe(CC1200_SRX);
 }
 
 static void
@@ -250,37 +232,40 @@ ao_radio_idle(void)
 		if (state == CC1200_STATUS_STATE_RX_FIFO_ERROR)
 			ao_radio_strobe(CC1200_SFRX);
 	}
-	/* Flush any pending TX bytes */
+	/* Flush any pending data in the fifos */
 	ao_radio_strobe(CC1200_SFTX);
+	ao_radio_strobe(CC1200_SFRX);
+	/* Make sure the RF calibration is current */
+	ao_radio_strobe(CC1200_SCAL);
 }
 
 /*
  * Packet deviation
  *
- *	fdev = fosc >> 24 * (256 + dev_m) << dev_e
+ *	fdev = fosc >> 22 * (256 + dev_m) << dev_e
  *
  * Deviation for 38400 baud should be 20.5kHz:
  *
- *     	32e6Hz / (2 ** 24) * (256 + 80) * (2 ** 5) = 20508Hz
+ *     	40e6 / (2 ** 22) * (256 + 13) * (2 ** 3) = 20523Hz
  *
  * Deviation for 9600 baud should be 5.125kHz:
  *
- *     	32e6Hz / (2 ** 24) * (256 + 80) * (2 ** 3) = 5127Hz
+ *     	40e6 / (2 ** 22) * (256 + 13) * (2 ** 1) = 5131Hz
  *
  * Deviation for 2400 baud should be 1.28125kHz, but cc1111 and
  * cc115l can't do that, so we'll use 1.5kHz instead:
  *
- *     	32e6Hz / (2 ** 24) * (256 + 137) * (2 ** 1) = 1499Hz
+ *     	40e6 / (2 ** 21) * (79) = 1506Hz
  */
 
-#define PACKET_DEV_M_384	80
-#define PACKET_DEV_E_384	5
+#define PACKET_DEV_M_384	13
+#define PACKET_DEV_E_384	3
 
-#define PACKET_DEV_M_96		80
-#define PACKET_DEV_E_96		3
+#define PACKET_DEV_M_96		13
+#define PACKET_DEV_E_96		1
 
-#define PACKET_DEV_M_24		137
-#define PACKET_DEV_E_24		1
+#define PACKET_DEV_M_24		79
+#define PACKET_DEV_E_24		0
 
 /*
  * For our packet data
@@ -299,37 +284,37 @@ ao_radio_idle(void)
  *
  * Symbol rate 38400 Baud:
  *
- *	DATARATE_M = 239914
- *	DATARATE_E = 9
- *	CHANBW = 79.4 (79.4)
+ *	DATARATE_M = 1013008
+ *	DATARATE_E = 8
+ *	CHANBW = 104.16667
  *
  * Symbol rate 9600 Baud:
  *
- *	DATARATE_M = 239914
- *	DATARATE_E = 7
- *	CHANBW = 19.9 (round to 19.8)
+ *	DATARATE_M = 1013008
+ *	DATARATE_E = 6
+ *	CHANBW = 26.042 (round to 19.8)
  *
  * Symbol rate 2400 Baud:
  *
- *	DATARATE_M = 239914
- *	DATARATE_E = 5
+ *	DATARATE_M = 1013008
+ *	DATARATE_E = 4
  *	CHANBW = 5.0 (round to 9.5)
  */
 
-#define PACKET_SYMBOL_RATE_M	239914
+#define PACKET_SYMBOL_RATE_M		1013008
 
-#define PACKET_SYMBOL_RATE_E_384	9
+#define PACKET_SYMBOL_RATE_E_384	8
 
 /* 200 / 2 = 100 */
 #define PACKET_CHAN_BW_384	((CC1200_CHAN_BW_ADC_CIC_DECFACT_12 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
-				 (21 << CC1200_CHAN_BW_BB_CIC_DECFACT))
+				 (16 << CC1200_CHAN_BW_BB_CIC_DECFACT))
 
-#define PACKET_SYMBOL_RATE_E_96	7
+#define PACKET_SYMBOL_RATE_E_96		6
 /* 200 / 10 = 20 */
 #define PACKET_CHAN_BW_96	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
-				 (21 << CC1200_CHAN_BW_BB_CIC_DECFACT))
+				 (16 << CC1200_CHAN_BW_BB_CIC_DECFACT))
 
-#define PACKET_SYMBOL_RATE_E_24	5
+#define PACKET_SYMBOL_RATE_E_24		4
 /* 200 / 25 = 8 */
 #define PACKET_CHAN_BW_24	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
 				 (44 << CC1200_CHAN_BW_BB_CIC_DECFACT))
@@ -337,17 +322,17 @@ ao_radio_idle(void)
 static const uint16_t packet_setup[] = {
 	CC1200_SYMBOL_RATE1,		((PACKET_SYMBOL_RATE_M >> 8) & 0xff),
 	CC1200_SYMBOL_RATE0,		((PACKET_SYMBOL_RATE_M >> 0) & 0xff),
-	CC1200_PKT_CFG2,	((CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
-				 (CC1200_PKT_CFG2_PKT_FORMAT_NORMAL << CC1200_PKT_CFG2_PKT_FORMAT)),
-	CC1200_PKT_CFG1,	((0 << CC1200_PKT_CFG1_WHITE_DATA) |
-				 (CC1200_PKT_CFG1_ADDR_CHECK_CFG_NONE << CC1200_PKT_CFG1_ADDR_CHECK_CFG) |
-				 (CC1200_PKT_CFG1_CRC_CFG_DISABLED << CC1200_PKT_CFG1_CRC_CFG) |
-				 (0 << CC1200_PKT_CFG1_APPEND_STATUS)),
-	CC1200_PKT_CFG0,	((0 << CC1200_PKT_CFG0_RESERVED7) |
-				 (CC1200_PKT_CFG0_LENGTH_CONFIG_FIXED << CC1200_PKT_CFG0_LENGTH_CONFIG) |
-				 (0 << CC1200_PKT_CFG0_PKG_BIT_LEN) |
-				 (0 << CC1200_PKT_CFG0_UART_MODE_EN) |
-				 (0 << CC1200_PKT_CFG0_UART_SWAP_EN)),
+        CC1200_PKT_CFG2,                            	 /* Packet Configuration Reg. 2 */
+		((0 << CC1200_PKT_CFG2_FG_MODE_EN) |
+		 (CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
+		 (CC1200_PKT_CFG2_PKT_FORMAT_NORMAL << CC1200_PKT_CFG2_PKT_FORMAT)),
+        CC1200_PKT_CFG1,                                 /* Packet Configuration Reg. 1 */
+		((1 << CC1200_PKT_CFG1_FEC_EN) |
+		 (1 << CC1200_PKT_CFG1_WHITE_DATA) |
+		 (0 << CC1200_PKT_CFG1_PN9_SWAP_EN) |
+		 (CC1200_PKT_CFG1_ADDR_CHECK_CFG_NONE << CC1200_PKT_CFG1_ADDR_CHECK_CFG) |
+		 (CC1200_PKT_CFG1_CRC_CFG_CRC16_INIT_ONES << CC1200_PKT_CFG1_CRC_CFG) |
+		 (1 << CC1200_PKT_CFG1_APPEND_STATUS)),
         CC1200_PREAMBLE_CFG1,	((CC1200_PREAMBLE_CFG1_NUM_PREAMBLE_4_BYTES << CC1200_PREAMBLE_CFG1_NUM_PREAMBLE) |
 				 (CC1200_PREAMBLE_CFG1_PREAMBLE_WORD_AA << CC1200_PREAMBLE_CFG1_PREAMBLE_WORD)),
 };
@@ -357,10 +342,14 @@ static const uint16_t packet_setup_384[] = {
 	CC1200_MODCFG_DEV_E,	((CC1200_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1200_MODCFG_DEV_E_MODEM_MODE) |
 				 (CC1200_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1200_MODCFG_DEV_E_MOD_FORMAT) |
 				 (PACKET_DEV_E_384 << CC1200_MODCFG_DEV_E_DEV_E)),
-	CC1200_SYMBOL_RATE2,		((PACKET_SYMBOL_RATE_E_384 << CC1200_SYMBOL_RATE2_DATARATE_E) |
+	CC1200_SYMBOL_RATE2,	((PACKET_SYMBOL_RATE_E_384 << CC1200_SYMBOL_RATE2_DATARATE_E) |
 				 (((PACKET_SYMBOL_RATE_M >> 16) & CC1200_SYMBOL_RATE2_DATARATE_M_19_16_MASK) << CC1200_SYMBOL_RATE2_DATARATE_M_19_16)),
 	CC1200_CHAN_BW,		PACKET_CHAN_BW_384,
-	CC1200_PA_CFG0,		0x7b,
+        CC1200_MDMCFG2,                                  /* General Modem Parameter Configuration Reg. 2 */
+		((CC1200_MDMCFG2_ASK_SHAPE_8 << CC1200_MDMCFG2_ASK_SHAPE) |
+		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
+		 (CC1200_MDMCFG2_UPSAMPLER_P_8 << CC1200_MDMCFG2_UPSAMPLER_P) |
+		 (0 << CC1200_MDMCFG2_CFM_DATA_EN)),
 };
 
 static const uint16_t packet_setup_96[] = {
@@ -368,10 +357,14 @@ static const uint16_t packet_setup_96[] = {
 	CC1200_MODCFG_DEV_E,	((CC1200_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1200_MODCFG_DEV_E_MODEM_MODE) |
 				 (CC1200_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1200_MODCFG_DEV_E_MOD_FORMAT) |
 				 (PACKET_DEV_E_96 << CC1200_MODCFG_DEV_E_DEV_E)),
-	CC1200_SYMBOL_RATE2,		((PACKET_SYMBOL_RATE_E_96 << CC1200_SYMBOL_RATE2_DATARATE_E) |
+	CC1200_SYMBOL_RATE2,	((PACKET_SYMBOL_RATE_E_96 << CC1200_SYMBOL_RATE2_DATARATE_E) |
 				 (((PACKET_SYMBOL_RATE_M >> 16) & CC1200_SYMBOL_RATE2_DATARATE_M_19_16_MASK) << CC1200_SYMBOL_RATE2_DATARATE_M_19_16)),
 	CC1200_CHAN_BW,		PACKET_CHAN_BW_96,
-	CC1200_PA_CFG0,		0x7d,
+        CC1200_MDMCFG2,                                  /* General Modem Parameter Configuration Reg. 2 */
+		((CC1200_MDMCFG2_ASK_SHAPE_8 << CC1200_MDMCFG2_ASK_SHAPE) |
+		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
+		 (CC1200_MDMCFG2_UPSAMPLER_P_32 << CC1200_MDMCFG2_UPSAMPLER_P) |
+		 (0 << CC1200_MDMCFG2_CFM_DATA_EN)),
 };
 
 static const uint16_t packet_setup_24[] = {
@@ -379,34 +372,27 @@ static const uint16_t packet_setup_24[] = {
 	CC1200_MODCFG_DEV_E,	((CC1200_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1200_MODCFG_DEV_E_MODEM_MODE) |
 				 (CC1200_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1200_MODCFG_DEV_E_MOD_FORMAT) |
 				 (PACKET_DEV_E_24 << CC1200_MODCFG_DEV_E_DEV_E)),
-	CC1200_SYMBOL_RATE2,		((PACKET_SYMBOL_RATE_E_24 << CC1200_SYMBOL_RATE2_DATARATE_E) |
+	CC1200_SYMBOL_RATE2,	((PACKET_SYMBOL_RATE_E_24 << CC1200_SYMBOL_RATE2_DATARATE_E) |
 				 (((PACKET_SYMBOL_RATE_M >> 16) & CC1200_SYMBOL_RATE2_DATARATE_M_19_16_MASK) << CC1200_SYMBOL_RATE2_DATARATE_M_19_16)),
 	CC1200_CHAN_BW,		PACKET_CHAN_BW_24,
-	CC1200_PA_CFG0,		0x7e,
-};
-
-static const uint16_t packet_tx_setup[] = {
-	CC1200_PKT_CFG2,	((CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
-				 (CC1200_PKT_CFG2_PKT_FORMAT_NORMAL << CC1200_PKT_CFG2_PKT_FORMAT)),
-	AO_CC1200_INT_GPIO_IOCFG, 		CC1200_IOCFG_GPIO_CFG_RX0TX1_CFG,
-};
-
-static const uint16_t packet_rx_setup[] = {
-	CC1200_PKT_CFG2,	((CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
-				 (CC1200_PKT_CFG2_PKT_FORMAT_SYNCHRONOUS_SERIAL << CC1200_PKT_CFG2_PKT_FORMAT)),
-	AO_CC1200_INT_GPIO_IOCFG, 		CC1200_IOCFG_GPIO_CFG_CLKEN_SOFT,
+        CC1200_MDMCFG2,                                  /* General Modem Parameter Configuration Reg. 2 */
+		((CC1200_MDMCFG2_ASK_SHAPE_8 << CC1200_MDMCFG2_ASK_SHAPE) |
+		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
+		 (CC1200_MDMCFG2_UPSAMPLER_P_64 << CC1200_MDMCFG2_UPSAMPLER_P) |
+		 (0 << CC1200_MDMCFG2_CFM_DATA_EN)),
 };
 
 /*
- * RDF deviation is 5kHz
+ * RDF deviation is 3kHz
  *
- *	fdev = fosc >> 24 * (256 + dev_m) << dev_e
+ *	fdev = fosc >> 22 * (256 + dev_m) << dev_e	dev_e != 0
+ *	fdev = fosc >> 21 * dev_m			dev_e == 0
  *
- *     	32e6Hz / (2 ** 24) * (256 + 71) * (2 ** 3) = 4989
+ *     	40e6 / (2 ** 21) * 157 = 2995Hz
  */
 
-#define RDF_DEV_E	3
-#define RDF_DEV_M	71
+#define RDF_DEV_E	0
+#define RDF_DEV_M	157
 
 /*
  * For our RDF beacon, set the symbol rate to 2kBaud (for a 1kHz tone)
@@ -415,13 +401,13 @@ static const uint16_t packet_rx_setup[] = {
  *	Rdata = -------------------------------------- * fosc
  *		             2 ** 39
  *
- *	DATARATE_M = 25166
- *	DATARATE_E = 5
+ *	DATARATE_M = 669411
+ *	DATARATE_E = 4
  *
  * To make the tone last for 200ms, we need 2000 * .2 = 400 bits or 50 bytes
  */
-#define RDF_SYMBOL_RATE_E	5
-#define RDF_SYMBOL_RATE_M	25166
+#define RDF_SYMBOL_RATE_E	4
+#define RDF_SYMBOL_RATE_M	669411
 #define RDF_PACKET_LEN	50
 
 static const uint16_t rdf_setup[] = {
@@ -429,36 +415,42 @@ static const uint16_t rdf_setup[] = {
 	CC1200_MODCFG_DEV_E,	((CC1200_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1200_MODCFG_DEV_E_MODEM_MODE) |
 				 (CC1200_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1200_MODCFG_DEV_E_MOD_FORMAT) |
 				 (RDF_DEV_E << CC1200_MODCFG_DEV_E_DEV_E)),
-	CC1200_SYMBOL_RATE2,		((RDF_SYMBOL_RATE_E << CC1200_SYMBOL_RATE2_DATARATE_E) |
+	CC1200_SYMBOL_RATE2,	((RDF_SYMBOL_RATE_E << CC1200_SYMBOL_RATE2_DATARATE_E) |
 				 (((RDF_SYMBOL_RATE_M >> 16) & CC1200_SYMBOL_RATE2_DATARATE_M_19_16_MASK) << CC1200_SYMBOL_RATE2_DATARATE_M_19_16)),
-	CC1200_SYMBOL_RATE1,		((RDF_SYMBOL_RATE_M >> 8) & 0xff),
-	CC1200_SYMBOL_RATE0,		((RDF_SYMBOL_RATE_M >> 0) & 0xff),
-	CC1200_PKT_CFG2,	((CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
-				 (CC1200_PKT_CFG2_PKT_FORMAT_NORMAL << CC1200_PKT_CFG2_PKT_FORMAT)),
-	CC1200_PKT_CFG1,	((0 << CC1200_PKT_CFG1_WHITE_DATA) |
-				 (CC1200_PKT_CFG1_ADDR_CHECK_CFG_NONE << CC1200_PKT_CFG1_ADDR_CHECK_CFG) |
-				 (CC1200_PKT_CFG1_CRC_CFG_DISABLED << CC1200_PKT_CFG1_CRC_CFG) |
-				 (0 << CC1200_PKT_CFG1_APPEND_STATUS)),
-	CC1200_PKT_CFG0,	((0 << CC1200_PKT_CFG0_RESERVED7) |
-				 (CC1200_PKT_CFG0_LENGTH_CONFIG_FIXED << CC1200_PKT_CFG0_LENGTH_CONFIG) |
-				 (0 << CC1200_PKT_CFG0_PKG_BIT_LEN) |
-				 (0 << CC1200_PKT_CFG0_UART_MODE_EN) |
-				 (0 << CC1200_PKT_CFG0_UART_SWAP_EN)),
-        CC1200_PREAMBLE_CFG1,	((CC1200_PREAMBLE_CFG1_NUM_PREAMBLE_NONE << CC1200_PREAMBLE_CFG1_NUM_PREAMBLE) |
-				 (CC1200_PREAMBLE_CFG1_PREAMBLE_WORD_AA << CC1200_PREAMBLE_CFG1_PREAMBLE_WORD)),
-	CC1200_PA_CFG0,		0x7e,
+	CC1200_SYMBOL_RATE1,	((RDF_SYMBOL_RATE_M >> 8) & 0xff),
+	CC1200_SYMBOL_RATE0,	((RDF_SYMBOL_RATE_M >> 0) & 0xff),
+        CC1200_PKT_CFG2,                            	 /* Packet Configuration Reg. 2 */
+		((0 << CC1200_PKT_CFG2_FG_MODE_EN) |
+		 (CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
+		 (CC1200_PKT_CFG2_PKT_FORMAT_NORMAL << CC1200_PKT_CFG2_PKT_FORMAT)),
+        CC1200_PKT_CFG1,                                 /* Packet Configuration Reg. 1 */
+		((0 << CC1200_PKT_CFG1_FEC_EN) |
+		 (0 << CC1200_PKT_CFG1_WHITE_DATA) |
+		 (0 << CC1200_PKT_CFG1_PN9_SWAP_EN) |
+		 (CC1200_PKT_CFG1_ADDR_CHECK_CFG_NONE << CC1200_PKT_CFG1_ADDR_CHECK_CFG) |
+		 (CC1200_PKT_CFG1_CRC_CFG_DISABLED << CC1200_PKT_CFG1_CRC_CFG) |
+		 (0 << CC1200_PKT_CFG1_APPEND_STATUS)),
+        CC1200_PREAMBLE_CFG1,
+		((CC1200_PREAMBLE_CFG1_NUM_PREAMBLE_NONE << CC1200_PREAMBLE_CFG1_NUM_PREAMBLE) |
+		 (CC1200_PREAMBLE_CFG1_PREAMBLE_WORD_AA << CC1200_PREAMBLE_CFG1_PREAMBLE_WORD)),
+        CC1200_MDMCFG2,                                  /* General Modem Parameter Configuration Reg. 2 */
+		((0 << CC1200_MDMCFG2_ASK_SHAPE) |
+		 (0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
+		 (12 << CC1200_MDMCFG2_UPSAMPLER_P) |
+		 (0 << CC1200_MDMCFG2_CFM_DATA_EN)),
 };
 
 /*
  * APRS deviation is 3kHz
  *
- *	fdev = fosc >> 24 * (256 + dev_m) << dev_e
+ *	fdev = fosc >> 22 * (256 + dev_m) << dev_e	dev_e != 0
+ *	fdev = fosc >> 21 * dev_m			dev_e == 0
  *
- *     	32e6Hz / (2 ** 24) * (256 + 137) * (2 ** 2) = 2998Hz
+ *     	40e6 / (2 ** 21) * 157 = 2995Hz
  */
 
-#define APRS_DEV_E	2
-#define APRS_DEV_M	137
+#define APRS_DEV_E	0
+#define APRS_DEV_M	157
 
 /*
  * For our APRS beacon, set the symbol rate to 9.6kBaud (8x oversampling for 1200 baud data rate)
@@ -467,33 +459,48 @@ static const uint16_t rdf_setup[] = {
  *	Rdata = -------------------------------------- * fosc
  *		             2 ** 39
  *
- *	DATARATE_M = 239914
- *	DATARATE_E = 7
+ *	DATARATE_M = 1013008
+ *	DATARATE_E = 6
  *
  *	Rdata = 9599.998593330383301
  *
  */
-#define APRS_SYMBOL_RATE_E	7
-#define APRS_SYMBOL_RATE_M	239914
+#define APRS_SYMBOL_RATE_E	6
+#define APRS_SYMBOL_RATE_M	1013008
 
 static const uint16_t aprs_setup[] = {
 	CC1200_DEVIATION_M,	APRS_DEV_M,
 	CC1200_MODCFG_DEV_E,	((CC1200_MODCFG_DEV_E_MODEM_MODE_NORMAL << CC1200_MODCFG_DEV_E_MODEM_MODE) |
 				 (CC1200_MODCFG_DEV_E_MOD_FORMAT_2_GFSK << CC1200_MODCFG_DEV_E_MOD_FORMAT) |
 				 (APRS_DEV_E << CC1200_MODCFG_DEV_E_DEV_E)),
-	CC1200_SYMBOL_RATE2,		((APRS_SYMBOL_RATE_E << CC1200_SYMBOL_RATE2_DATARATE_E) |
+	CC1200_SYMBOL_RATE2,	((APRS_SYMBOL_RATE_E << CC1200_SYMBOL_RATE2_DATARATE_E) |
 				 (((APRS_SYMBOL_RATE_M >> 16) & CC1200_SYMBOL_RATE2_DATARATE_M_19_16_MASK) << CC1200_SYMBOL_RATE2_DATARATE_M_19_16)),
-	CC1200_SYMBOL_RATE1,		((APRS_SYMBOL_RATE_M >> 8) & 0xff),
-	CC1200_SYMBOL_RATE0,		((APRS_SYMBOL_RATE_M >> 0) & 0xff),
-	CC1200_PKT_CFG2,	((CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
-				 (CC1200_PKT_CFG2_PKT_FORMAT_NORMAL << CC1200_PKT_CFG2_PKT_FORMAT)),
-	CC1200_PKT_CFG1,	((0 << CC1200_PKT_CFG1_WHITE_DATA) |
-				 (CC1200_PKT_CFG1_ADDR_CHECK_CFG_NONE << CC1200_PKT_CFG1_ADDR_CHECK_CFG) |
-				 (CC1200_PKT_CFG1_CRC_CFG_DISABLED << CC1200_PKT_CFG1_CRC_CFG) |
-				 (0 << CC1200_PKT_CFG1_APPEND_STATUS)),
-        CC1200_PREAMBLE_CFG1,	((CC1200_PREAMBLE_CFG1_NUM_PREAMBLE_NONE << CC1200_PREAMBLE_CFG1_NUM_PREAMBLE) |
-				 (CC1200_PREAMBLE_CFG1_PREAMBLE_WORD_AA << CC1200_PREAMBLE_CFG1_PREAMBLE_WORD)),
-	CC1200_PA_CFG0,		0x7d,
+	CC1200_SYMBOL_RATE1,	((APRS_SYMBOL_RATE_M >> 8) & 0xff),
+	CC1200_SYMBOL_RATE0,	((APRS_SYMBOL_RATE_M >> 0) & 0xff),
+        CC1200_PKT_CFG2,                            	 /* Packet Configuration Reg. 2 */
+		((0 << CC1200_PKT_CFG2_FG_MODE_EN) |
+		 (CC1200_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1200_PKT_CFG2_CCA_MODE) |
+		 (CC1200_PKT_CFG2_PKT_FORMAT_NORMAL << CC1200_PKT_CFG2_PKT_FORMAT)),
+        CC1200_PKT_CFG1,                                 /* Packet Configuration Reg. 1 */
+		((0 << CC1200_PKT_CFG1_FEC_EN) |
+		 (0 << CC1200_PKT_CFG1_WHITE_DATA) |
+		 (0 << CC1200_PKT_CFG1_PN9_SWAP_EN) |
+		 (CC1200_PKT_CFG1_ADDR_CHECK_CFG_NONE << CC1200_PKT_CFG1_ADDR_CHECK_CFG) |
+		 (CC1200_PKT_CFG1_CRC_CFG_DISABLED << CC1200_PKT_CFG1_CRC_CFG) |
+		 (0 << CC1200_PKT_CFG1_APPEND_STATUS)),
+        CC1200_PKT_CFG0,                                 /* Packet Configuration Reg. 0 */
+		((CC1200_PKT_CFG0_LENGTH_CONFIG_FIXED << CC1200_PKT_CFG0_LENGTH_CONFIG) |
+		 (0 << CC1200_PKT_CFG0_PKG_BIT_LEN) |
+		 (0 << CC1200_PKT_CFG0_UART_MODE_EN) |
+		 (0 << CC1200_PKT_CFG0_UART_SWAP_EN)),
+        CC1200_PREAMBLE_CFG1,
+		((CC1200_PREAMBLE_CFG1_NUM_PREAMBLE_NONE << CC1200_PREAMBLE_CFG1_NUM_PREAMBLE) |
+		 (CC1200_PREAMBLE_CFG1_PREAMBLE_WORD_AA << CC1200_PREAMBLE_CFG1_PREAMBLE_WORD)),
+        CC1200_MDMCFG2,                                  /* General Modem Parameter Configuration Reg. 2 */
+		((CC1200_MDMCFG2_ASK_SHAPE_8 << CC1200_MDMCFG2_ASK_SHAPE) |
+		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
+		 (CC1200_MDMCFG2_UPSAMPLER_P_8 << CC1200_MDMCFG2_UPSAMPLER_P) |
+		 (0 << CC1200_MDMCFG2_CFM_DATA_EN)),
 };
 
 /*
@@ -521,14 +528,12 @@ static const uint16_t test_setup[] = {
 				 (CC1200_PREAMBLE_CFG1_PREAMBLE_WORD_AA << CC1200_PREAMBLE_CFG1_PREAMBLE_WORD)),
 };
 
-#define AO_PKT_CFG0_INFINITE ((0 << CC1200_PKT_CFG0_RESERVED7) |	\
-			      (CC1200_PKT_CFG0_LENGTH_CONFIG_INFINITE << CC1200_PKT_CFG0_LENGTH_CONFIG) | \
+#define AO_PKT_CFG0_INFINITE ((CC1200_PKT_CFG0_LENGTH_CONFIG_INFINITE << CC1200_PKT_CFG0_LENGTH_CONFIG) | \
 			      (0 << CC1200_PKT_CFG0_PKG_BIT_LEN) |	\
 			      (0 << CC1200_PKT_CFG0_UART_MODE_EN) |	\
 			      (0 << CC1200_PKT_CFG0_UART_SWAP_EN))
 
-#define AO_PKT_CFG0_FIXED ((0 << CC1200_PKT_CFG0_RESERVED7) |		\
-			   (CC1200_PKT_CFG0_LENGTH_CONFIG_FIXED << CC1200_PKT_CFG0_LENGTH_CONFIG) | \
+#define AO_PKT_CFG0_FIXED ((CC1200_PKT_CFG0_LENGTH_CONFIG_FIXED << CC1200_PKT_CFG0_LENGTH_CONFIG) | \
 			   (0 << CC1200_PKT_CFG0_PKG_BIT_LEN) |		\
 			   (0 << CC1200_PKT_CFG0_UART_MODE_EN) |	\
 			   (0 << CC1200_PKT_CFG0_UART_SWAP_EN))
@@ -536,10 +541,9 @@ static const uint16_t test_setup[] = {
 static uint16_t ao_radio_mode;
 
 #define AO_RADIO_MODE_BITS_PACKET	1
-#define AO_RADIO_MODE_BITS_PACKET_TX	2
 #define AO_RADIO_MODE_BITS_TX_BUF	4
 #define AO_RADIO_MODE_BITS_TX_FINISH	8
-#define AO_RADIO_MODE_BITS_PACKET_RX	16
+#define AO_RADIO_MODE_BITS_RX		16
 #define AO_RADIO_MODE_BITS_RDF		32
 #define AO_RADIO_MODE_BITS_APRS		64
 #define AO_RADIO_MODE_BITS_TEST		128
@@ -547,14 +551,13 @@ static uint16_t ao_radio_mode;
 #define AO_RADIO_MODE_BITS_FIXED	512
 
 #define AO_RADIO_MODE_NONE		0
-#define AO_RADIO_MODE_PACKET_TX_BUF	(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_PACKET_TX | AO_RADIO_MODE_BITS_TX_BUF)
-#define AO_RADIO_MODE_PACKET_TX_FINISH	(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_PACKET_TX | AO_RADIO_MODE_BITS_TX_FINISH)
-#define AO_RADIO_MODE_PACKET_RX		(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_PACKET_RX)
-#define AO_RADIO_MODE_RDF		(AO_RADIO_MODE_BITS_RDF | AO_RADIO_MODE_BITS_TX_FINISH)
-#define AO_RADIO_MODE_APRS_BUF		(AO_RADIO_MODE_BITS_APRS | AO_RADIO_MODE_BITS_INFINITE | AO_RADIO_MODE_BITS_TX_BUF)
-#define AO_RADIO_MODE_APRS_LAST_BUF	(AO_RADIO_MODE_BITS_APRS | AO_RADIO_MODE_BITS_FIXED | AO_RADIO_MODE_BITS_TX_BUF)
-#define AO_RADIO_MODE_APRS_FINISH	(AO_RADIO_MODE_BITS_APRS | AO_RADIO_MODE_BITS_FIXED | AO_RADIO_MODE_BITS_TX_FINISH)
-#define AO_RADIO_MODE_TEST		(AO_RADIO_MODE_BITS_TEST | AO_RADIO_MODE_BITS_INFINITE | AO_RADIO_MODE_BITS_TX_BUF)
+#define AO_RADIO_MODE_PACKET_TX		(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_FINISH)
+#define AO_RADIO_MODE_PACKET_RX		(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_RX)
+#define AO_RADIO_MODE_RDF		(AO_RADIO_MODE_BITS_RDF    | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_FINISH)
+#define AO_RADIO_MODE_APRS_BUF		(AO_RADIO_MODE_BITS_APRS   | AO_RADIO_MODE_BITS_INFINITE | AO_RADIO_MODE_BITS_TX_BUF)
+#define AO_RADIO_MODE_APRS_LAST_BUF	(AO_RADIO_MODE_BITS_APRS   | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_BUF)
+#define AO_RADIO_MODE_APRS_FINISH	(AO_RADIO_MODE_BITS_APRS   | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_FINISH)
+#define AO_RADIO_MODE_TEST		(AO_RADIO_MODE_BITS_TEST   | AO_RADIO_MODE_BITS_INFINITE | AO_RADIO_MODE_BITS_TX_BUF)
 
 static void
 _ao_radio_set_regs(const uint16_t *regs, int nreg)
@@ -596,17 +599,20 @@ ao_radio_set_mode(uint16_t new_mode)
 		}
 	}
 
-	if (changes & AO_RADIO_MODE_BITS_PACKET_TX)
-		ao_radio_set_regs(packet_tx_setup);
-
-	if (changes & AO_RADIO_MODE_BITS_TX_BUF)
+	if (changes & AO_RADIO_MODE_BITS_TX_BUF) {
 		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_TXFIFO_THR);
+		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH);
+	}
 
-	if (changes & AO_RADIO_MODE_BITS_TX_FINISH)
-		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_RX0TX1_CFG);
+	if (changes & AO_RADIO_MODE_BITS_TX_FINISH) {
+		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_PKT_SYNC_RXTX);
+		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH);
+	}
 
-	if (changes & AO_RADIO_MODE_BITS_PACKET_RX)
-		ao_radio_set_regs(packet_rx_setup);
+	if (changes & AO_RADIO_MODE_BITS_RX) {
+		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_MARC_MCU_WAKEUP);
+		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_RISING|AO_EXTI_PRIORITY_HIGH);
+	}
 
 	if (changes & AO_RADIO_MODE_BITS_RDF)
 		ao_radio_set_regs(rdf_setup);
@@ -635,11 +641,13 @@ static uint8_t	ao_radio_configured = 0;
 static void
 ao_radio_setup(void)
 {
-//	ao_radio_strobe(CC1200_SRES);
+	ao_radio_strobe(CC1200_SRES);
 
 	ao_radio_set_regs(radio_setup);
 
 	ao_radio_mode = 0;
+
+	ao_radio_idle();
 
 	ao_config_get();
 
@@ -672,6 +680,7 @@ ao_radio_get(uint8_t len)
 		ao_radio_reg_write(CC1200_FREQ1, ao_config.radio_setting >> 8);
 		ao_radio_reg_write(CC1200_FREQ0, ao_config.radio_setting);
 		last_radio_setting = ao_config.radio_setting;
+		ao_radio_strobe(CC1200_SCAL);
 	}
 	if (ao_config.radio_rate != last_radio_rate) {
 		ao_radio_mode &= ~AO_RADIO_MODE_BITS_PACKET;
@@ -682,6 +691,43 @@ ao_radio_get(uint8_t len)
 
 #define ao_radio_put()	ao_mutex_put(&ao_radio_mutex)
 
+static inline uint8_t
+ao_radio_state(void)
+{
+	return (ao_radio_status() >> CC1200_STATUS_STATE) & CC1200_STATUS_STATE_MASK;
+}
+
+#if CC1200_DEBUG
+void
+ao_radio_show_state(char *where)
+{
+	printf("%s: state %d len %d rxbytes %d\n",
+	       where, ao_radio_state(),
+	       ao_radio_reg_read(CC1200_PKT_LEN),
+	       ao_radio_reg_read(CC1200_NUM_RXBYTES));
+}
+#else
+#define ao_radio_show_state(where)
+#endif
+
+/* Wait for the radio to signal an interrupt
+ */
+static void
+ao_radio_wait_isr(uint16_t timeout)
+{
+	if (timeout)
+		ao_alarm(timeout);
+
+	ao_arch_block_interrupts();
+	while (!ao_radio_wake && !ao_radio_abort)
+		if (ao_sleep(&ao_radio_wake))
+			ao_radio_abort = 1;
+	ao_arch_release_interrupts();
+
+	if (timeout)
+		ao_clear_alarm();
+}
+
 static void
 ao_rdf_start(uint8_t len)
 {
@@ -690,20 +736,15 @@ ao_rdf_start(uint8_t len)
 
 	ao_radio_set_mode(AO_RADIO_MODE_RDF);
 	ao_radio_wake = 0;
-
 }
 
 static void
-ao_rdf_run(void)
+ao_radio_run(void)
 {
+	ao_radio_wake = 0;
+	ao_radio_abort = 0;
 	ao_radio_start_tx();
-
-	ao_arch_block_interrupts();
-	while (!ao_radio_wake && !ao_radio_abort && !ao_radio_mcu_wake)
-		ao_sleep(&ao_radio_wake);
-	ao_arch_release_interrupts();
-	if (ao_radio_mcu_wake)
-		ao_radio_check_marc_status();
+	ao_radio_wait_isr(0);
 	if (!ao_radio_wake)
 		ao_radio_idle();
 	ao_radio_put();
@@ -716,7 +757,7 @@ ao_radio_rdf(void)
 
 	ao_radio_fifo_write_fixed(ao_radio_rdf_value, AO_RADIO_RDF_LEN);
 
-	ao_rdf_run();
+	ao_radio_run();
 }
 
 void
@@ -738,7 +779,7 @@ ao_radio_continuity(uint8_t c)
 	ao_radio_spi_send_fixed(0x00, AO_RADIO_CONT_PAUSE_LEN);
 	status = ao_radio_fifo_write_stop(status);
 	(void) status;
-	ao_rdf_run();
+	ao_radio_run();
 }
 
 void
@@ -794,28 +835,17 @@ ao_radio_test_cmd(void)
 	}
 }
 
-static void
-ao_radio_wait_isr(uint16_t timeout)
-{
-	if (timeout)
-		ao_alarm(timeout);
-	ao_arch_block_interrupts();
-	while (!ao_radio_wake && !ao_radio_mcu_wake && !ao_radio_abort)
-		if (ao_sleep(&ao_radio_wake))
-			ao_radio_abort = 1;
-	ao_arch_release_interrupts();
-	if (timeout)
-		ao_clear_alarm();
-	if (ao_radio_mcu_wake)
-		ao_radio_check_marc_status();
-}
-
 void
 ao_radio_send(const void *d, uint8_t size)
 {
-	(void) d;
-	(void) size;
+	ao_radio_get(size);
+	ao_radio_set_mode(AO_RADIO_MODE_PACKET_TX);
+
+	ao_radio_fifo_write(d, size);
+
+	ao_radio_run();
 }
+
 
 #define AO_RADIO_LOTS	64
 
@@ -829,6 +859,7 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 	uint8_t	started = 0;
 	uint8_t	fifo_space;
 
+	ao_radio_abort = 0;
 	ao_radio_get(0xff);
 	fifo_space = CC1200_FIFO_SIZE;
 	while (!done) {
@@ -837,6 +868,9 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 			done = 1;
 			cnt = -cnt;
 		}
+#if CC1200_APRS_TRACE
+		printf("APRS fill %d bytes done %d\n", cnt, done);
+#endif
 		total += cnt;
 
 		/* At the last buffer, set the total length */
@@ -849,8 +883,11 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 
 			/* Wait for some space in the fifo */
 			while (!ao_radio_abort && (fifo_space = ao_radio_tx_fifo_space()) == 0) {
+#if CC1200_APRS_TRACE
+				printf("APRS space %d cnt %d\n", fifo_space, cnt); flush();
+#endif
 				ao_radio_wake = 0;
-				ao_radio_wait_isr(0);
+				ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
 			}
 			if (ao_radio_abort)
 				break;
@@ -867,33 +904,194 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 			} else
 				ao_radio_set_mode(AO_RADIO_MODE_APRS_BUF);
 
+			ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
+
 			ao_radio_fifo_write(b, this_len);
 			b += this_len;
-
+#if CC1200_APRS_TRACE
+			printf("APRS write fifo %d space now %d\n", this_len, ao_radio_tx_fifo_space());
+#endif
 			if (!started) {
-				ao_radio_start_tx();
+#if CC1200_APRS_TRACE
+				printf("APRS start\n");
+#endif
+				ao_radio_strobe(CC1200_STX);
+#if CC1200_APRS_TRACE
+				{ int t;
+					for (t = 0; t < 20; t++) {
+						uint8_t	status = ao_radio_status();
+						uint8_t space = ao_radio_tx_fifo_space();
+						printf ("status: %02x fifo %d\n", status, space);
+						if ((status >> 4) == 2)
+							break;
+						ao_delay(AO_MS_TO_TICKS(0));
+					}
+				}
+#endif
 				started = 1;
-			} else
-				ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
+			}
 		}
 		if (ao_radio_abort) {
 			ao_radio_idle();
 			break;
 		}
-		/* Wait for the transmitter to go idle */
-		ao_radio_wake = 0;
-		ao_radio_wait_isr(0);
 	}
+	/* Wait for the transmitter to go idle */
+	ao_radio_wake = 0;
+#if CC1200_APRS_TRACE
+	printf("APRS wait idle\n"); flush();
+#endif
+	ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
+#if CC1200_APRS_TRACE
+	printf("APRS abort %d\n", ao_radio_abort);
+#endif
 	ao_radio_put();
 }
+
+#if 0
+static uint8_t
+ao_radio_marc_state(void)
+{
+	return ao_radio_reg_read(CC1200_MARCSTATE);
+}
+
+static uint8_t
+ao_radio_modem_status1(void)
+{
+	return ao_radio_reg_read(CC1200_MODEM_STATUS1);
+}
+
+static uint8_t
+ao_radio_modem_status0(void)
+{
+	return ao_radio_reg_read(CC1200_MODEM_STATUS0);
+}
+
+struct ao_radio_state {
+	char	where[4];
+	uint8_t	marc_state;
+	uint8_t marc_status1;
+	uint8_t marc_status0;
+	uint8_t	modem_status1;
+	uint8_t	modem_status0;
+};
+
+static void
+ao_radio_fill_state(char *where, struct ao_radio_state *s)
+{
+	strcpy(s->where, where);
+	s->marc_state = ao_radio_marc_state();
+	s->marc_status1 = ao_radio_reg_read(CC1200_MARC_STATUS1);
+	s->marc_status0 = ao_radio_reg_read(CC1200_MARC_STATUS0);
+	s->modem_status1 = ao_radio_modem_status1();
+	s->modem_status0 = ao_radio_modem_status0();
+}
+
+static void
+ao_radio_dump_state(struct ao_radio_state *s)
+{
+	printf ("%s: marc %2x marc1 %2x marc0 %2x modem1 %2x modem0 %2x\n",
+		s->where, s->marc_state, s->marc_status1, s->marc_status0, s->modem_status1, s->modem_status0);
+}
+#endif
 
 uint8_t
 ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 {
-	(void) d;
-	(void) size;
-	(void) timeout;
-	return 0;
+	uint8_t	success = 0;
+
+	ao_radio_abort = 0;
+	ao_radio_get(size - 2);
+	ao_radio_set_mode(AO_RADIO_MODE_PACKET_RX);
+	ao_radio_wake = 0;
+	ao_radio_start_rx();
+
+	while (!ao_radio_abort) {
+		ao_radio_wait_isr(timeout);
+		if (ao_radio_wake) {
+			uint8_t		marc_status1 = ao_radio_reg_read(CC1200_MARC_STATUS1);
+
+			/* Check the receiver status to see what happened
+			 */
+			switch (marc_status1) {
+			case CC1200_MARC_STATUS1_RX_FINISHED:
+			case CC1200_MARC_STATUS1_ADDRESS:
+			case CC1200_MARC_STATUS1_CRC:
+				/* Normal return, go fetch the bytes from the FIFO
+				 * and give them back to the caller
+				 */
+				success = 1;
+				break;
+			case CC1200_MARC_STATUS1_RX_TIMEOUT:
+			case CC1200_MARC_STATUS1_RX_TERMINATION:
+			case CC1200_MARC_STATUS1_EWOR_SYNC_LOST:
+			case CC1200_MARC_STATUS1_MAXIMUM_LENGTH:
+			case CC1200_MARC_STATUS1_RX_FIFO_OVERFLOW:
+			case CC1200_MARC_STATUS1_RX_FIFO_UNDERFLOW:
+				/* Something weird happened; reset the radio and
+				 * return failure
+				 */
+				success = 0;
+				break;
+			default:
+				/* some other status; go wait for the radio to do something useful
+				 */
+				continue;
+			}
+			break;
+		} else {
+			uint8_t modem_status1 = ao_radio_reg_read(CC1200_MODEM_STATUS1);
+
+			/* Check to see if the packet header has been seen, in which case we'll
+			 * want to keep waiting for the rest of the packet to appear
+			 */
+			if (modem_status1 & (1 << CC1200_MODEM_STATUS1_SYNC_FOUND))
+			{
+				ao_radio_abort = 0;
+
+				/* Set a timeout based on the packet length so that we make sure to
+				 * wait long enough to receive the whole thing.
+				 *
+				 * timeout = bits * FEC expansion / rate
+				 */
+				switch (ao_config.radio_rate) {
+				default:
+				case AO_RADIO_RATE_38400:
+					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 384) + 1;
+					break;
+				case AO_RADIO_RATE_9600:
+					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 96) + 1;
+					break;
+				case AO_RADIO_RATE_2400:
+					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 24) + 1;
+					break;
+				}
+			}
+		}
+	}
+
+	if (success) {
+		int8_t	rssi;
+		uint8_t	status;
+
+		status = ao_radio_fifo_read(d, size);
+		(void) status;
+		rssi = ((int8_t *) d)[size - 2];
+		ao_radio_rssi = rssi;
+
+		/* Bound it to the representable range */
+		if (rssi > -11)
+			rssi = -11;
+
+		/* Write it back to the packet */
+		((int8_t *) d)[size-2] = AO_RADIO_FROM_RSSI(rssi);
+	} else {
+		ao_radio_idle();
+		ao_radio_rssi = 0;
+	}
+
+	ao_radio_put();
+	return success;
 }
 
 
@@ -932,6 +1130,7 @@ static const struct ao_cc1200_reg ao_cc1200_reg[] = {
 	{ .addr = CC1200_PREAMBLE_CFG0,	.name = "PREAMBLE_CFG0" },
 	{ .addr = CC1200_IQIC,	.name = "IQIC" },
 	{ .addr = CC1200_CHAN_BW,	.name = "CHAN_BW" },
+	{ .addr = CC1200_MDMCFG2,	.name = "MDMCFG2" },
 	{ .addr = CC1200_MDMCFG1,	.name = "MDMCFG1" },
 	{ .addr = CC1200_MDMCFG0,	.name = "MDMCFG0" },
 	{ .addr = CC1200_SYMBOL_RATE2,	.name = "SYMBOL_RATE2" },
@@ -1064,8 +1263,8 @@ static const struct ao_cc1200_reg ao_cc1200_reg[] = {
 	{ .addr = CC1200_PARTNUMBER,	.name = "PARTNUMBER" },
 	{ .addr = CC1200_PARTVERSION,	.name = "PARTVERSION" },
 	{ .addr = CC1200_SERIAL_STATUS,	.name = "SERIAL_STATUS" },
-	{ .addr = CC1200_RX_STATUS,	.name = "RX_STATUS" },
-	{ .addr = CC1200_TX_STATUS,	.name = "TX_STATUS" },
+	{ .addr = CC1200_MODEM_STATUS1,	.name = "MODEM_STATUS1" },
+	{ .addr = CC1200_MODEM_STATUS0,	.name = "MODEM_STATUS0" },
 	{ .addr = CC1200_MARC_STATUS1,	.name = "MARC_STATUS1" },
 	{ .addr = CC1200_MARC_STATUS0,	.name = "MARC_STATUS0" },
 	{ .addr = CC1200_PA_IFAMP_TEST,	.name = "PA_IFAMP_TEST" },
@@ -1091,11 +1290,17 @@ static const struct ao_cc1200_reg ao_cc1200_reg[] = {
 
 #define AO_NUM_CC1200_REG	(sizeof ao_cc1200_reg / sizeof ao_cc1200_reg[0])
 
+static uint8_t
+ao_radio_get_marc_status(void)
+{
+	return ao_radio_reg_read(CC1200_MARC_STATUS1);
+}
+
 static void ao_radio_show(void) {
-	uint8_t	status = ao_radio_status();
+	uint8_t	status;
 	unsigned int	i;
 
-	ao_radio_get(0xff);
+	ao_mutex_get(&ao_radio_mutex);
 	status = ao_radio_status();
 	printf ("Status:   %02x\n", status);
 	printf ("CHIP_RDY: %d\n", (status >> CC1200_STATUS_CHIP_RDY) & 1);
@@ -1141,6 +1346,8 @@ ao_radio_test_recv(void)
 		printf (" RSSI %d", AO_RSSI_FROM_RADIO(bytes[32]));
 		for (b = 0; b < 32; b++)
 			printf (" %02x", bytes[b]);
+
+		printf (" RSSI %02x LQI %02x", bytes[32], bytes[33]);
 		printf ("\n");
 	}
 }
@@ -1151,12 +1358,15 @@ ao_radio_test_recv(void)
 static void
 ao_radio_aprs(void)
 {
+#if PACKET_HAS_SLAVE
 	ao_packet_slave_stop();
+#endif
 	ao_aprs_send();
 }
 #endif
 #endif
 
+#if CC1200_LOW_LEVEL_DEBUG
 static void
 ao_radio_strobe_test(void)
 {
@@ -1204,6 +1414,7 @@ ao_radio_read_test(void)
 	data = ao_radio_reg_read(addr);
 	printf ("Read %04x = %02x\n", addr, data);
 }
+#endif
 
 static const struct ao_cmds ao_radio_cmds[] = {
 	{ ao_radio_test_cmd,	"C <1 start, 0 stop, none both>\0Radio carrier test" },
@@ -1216,9 +1427,11 @@ static const struct ao_cmds ao_radio_cmds[] = {
 	{ ao_radio_packet,	"p\0Send a test packet" },
 	{ ao_radio_test_recv,	"q\0Recv a test packet" },
 #endif
-	{ ao_radio_strobe_test,	"S <value>\0Strobe radio" },
+#if CC1200_LOW_LEVEL_DEBUG
+	{ ao_radio_strobe_test,	"A <value>\0Strobe radio" },
 	{ ao_radio_write_test,	"W <addr> <value>\0Write radio reg" },
-	{ ao_radio_read_test,	"R <addr>\0Read radio reg" },
+	{ ao_radio_read_test,	"B <addr>\0Read radio reg" },
+#endif
 	{ 0, NULL }
 };
 

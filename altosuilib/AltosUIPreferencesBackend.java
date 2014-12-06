@@ -62,6 +62,14 @@ public class AltosUIPreferencesBackend implements AltosPreferencesBackend {
 		_preferences.putBoolean(key, value);
 	}
 
+	public byte[] getBytes(String key, byte[] def) {
+		return _preferences.getByteArray(key, def);
+	}
+
+	public void putBytes(String key, byte[] value) {
+		_preferences.putByteArray(key, value);
+	}
+
 	public boolean nodeExists(String key) {
 		try {
 			return _preferences.nodeExists(key);

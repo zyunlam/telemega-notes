@@ -101,7 +101,7 @@ public class TabAscent extends AltosDroidTab {
 
 			if (state.gps != null) {
 				mLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
-				mLongitudeView.setText(AltosDroid.pos(state.gps.lon, "W", "E"));
+				mLongitudeView.setText(AltosDroid.pos(state.gps.lon, "E", "W"));
 			} else {
 				mLatitudeView.setText("");
 				mLongitudeView.setText("");

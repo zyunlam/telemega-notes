@@ -43,9 +43,9 @@ static struct lpc_ssp * const ao_lpc_ssp[LPC_NUM_SPI] = { &lpc_ssp0, &lpc_ssp1 }
 	} while (0)
 
 void
-ao_spi_send(void *block, uint16_t len, uint8_t id)
+ao_spi_send(const void *block, uint16_t len, uint8_t id)
 {
-	uint8_t	*b = block;
+	const uint8_t	*b = block;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
 
 	spi_loop(len, *b++, (void));
@@ -69,9 +69,9 @@ ao_spi_recv(void *block, uint16_t len, uint8_t id)
 }
 
 void
-ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t id)
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t id)
 {
-	uint8_t	*o = out;
+	const uint8_t	*o = out;
 	uint8_t	*i = in;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
 

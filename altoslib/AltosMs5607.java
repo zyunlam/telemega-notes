@@ -18,8 +18,9 @@
 package org.altusmetrum.altoslib_5;
 
 import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosMs5607 {
+public class AltosMs5607 implements Serializable {
 	public int	reserved;
 	public int	sens;
 	public int	off;

@@ -32,7 +32,6 @@ altosui_JAVA = \
 	AltosLaunchUI.java \
 	AltosLanded.java \
 	AltosPad.java \
-	AltosUIPreferencesBackend.java \
 	AltosUI.java \
 	AltosGraphUI.java
 

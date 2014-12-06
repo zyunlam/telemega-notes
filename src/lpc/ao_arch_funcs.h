@@ -30,8 +30,19 @@
 
 #define ao_gpio_get(port, bit, pin) 	(lpc_gpio.byte[lpc_all_bit(port,bit)])
 
+#define PORT0_JTAG_REGS	((1 << 11) | (1 << 12) | (1 << 14))
+
+static inline void lpc_set_gpio(int port, int bit) {
+	if (port == 0 && (1 << bit) & (PORT0_JTAG_REGS)) {
+		vuint32_t *_ioconf = &lpc_ioconf.pio0_0 + ((port)*24+(bit));
+
+		*_ioconf = (*_ioconf & ~LPC_IOCONF_FUNC_MASK) | LPC_IOCONF_FUNC_PIO0_11;
+	}
+}
+
 #define ao_enable_output(port,bit,pin,v) do {			\
 		ao_enable_port(port);				\
+		lpc_set_gpio(port,bit);				\
 		ao_gpio_set(port, bit, pin, v);			\
 		lpc_gpio.dir[port] |= (1 << bit);		\
 	} while (0)
@@ -52,6 +63,7 @@
 
 #define ao_enable_input(port,bit,mode) do {				\
 		ao_enable_port(port);					\
+		lpc_set_gpio(port,bit);					\
 		lpc_gpio.dir[port] &= ~(1 << bit);			\
 		ao_gpio_set_mode(port,bit,mode);			\
 	} while (0)
@@ -201,7 +213,7 @@ void
 ao_spi_put(uint8_t spi_index);
 
 void
-ao_spi_send(void *block, uint16_t len, uint8_t spi_index);
+ao_spi_send(const void *block, uint16_t len, uint8_t spi_index);
 
 void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
@@ -210,7 +222,7 @@ void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
 
 void
-ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t spi_index);
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
 
 extern uint16_t	ao_spi_speed[LPC_NUM_SPI];
 

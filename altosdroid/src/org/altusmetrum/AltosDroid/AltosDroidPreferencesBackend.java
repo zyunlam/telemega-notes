@@ -22,6 +22,7 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.util.*;
 
 import org.altusmetrum.altoslib_5.*;
 
@@ -71,6 +72,16 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 		return prefs.getString(key, def);
 	}
 
+	public byte[] getBytes(String key, byte[] def) {
+		String save = prefs.getString(key, null);
+
+		if (save == null)
+			return def;
+
+		byte[] bytes = Base64.decode(save, Base64.DEFAULT);
+		return bytes;
+	}
+
 	public void putBoolean(String key, boolean value) {
 		editor.putBoolean(key, value);
 	}
@@ -85,6 +96,11 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 
 	public void putString(String key, String value) {
 		editor.putString(key, value);
+	}
+
+	public void putBytes(String key, byte[] bytes) {
+		String save = Base64.encodeToString(bytes, Base64.DEFAULT);
+		editor.putString(key, save);
 	}
 
 	public void remove(String key) {
