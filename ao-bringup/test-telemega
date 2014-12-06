@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.1
+VERSION=1.0
 PRODUCT=TeleMega
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 
@@ -18,7 +18,7 @@ ao-list | while read product serial dev; do
 
 	    echo "Testing $product $serial $dev"
 
-	    ./test-igniters $dev drogue main 0 1 2 3
+	    ./test-igniters $dev main drogue 3 0 1 2
 	    echo""
 
 	    echo "Testing baro sensor"
