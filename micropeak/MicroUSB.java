@@ -19,6 +19,7 @@ package org.altusmetrum.micropeak;
 
 import java.util.*;
 import libaltosJNI.*;
+import org.altusmetrum.altoslib_5.*;
 import org.altusmetrum.altosuilib_3.*;
 
 public class MicroUSB extends altos_device implements AltosDevice {
@@ -75,11 +76,14 @@ public class MicroUSB extends altos_device implements AltosDevice {
 	}
 
 	private boolean isMicro() {
-		if (getVendor() != 0x0403)
-			return false;
-		if (getProduct() != 0x6015)
-			return false;
-		return true;
+		int vid = getVendor();
+		int pid = getProduct();
+		if (vid == 0x0403 && pid == 0x6015)
+			return true;
+		if (vid == AltosLib.vendor_altusmetrum &&
+		    pid == AltosLib.product_mpusb)
+			return true;
+		return false;
 	}
 
 	public boolean matchProduct(int product) {
