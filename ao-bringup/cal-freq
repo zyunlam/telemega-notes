@@ -37,6 +37,8 @@ while true; do
 
 		echo "Programming flash with cal value " $CAL_VALUE
 
+		dd if=$dev iflag=nonblock
+
 		cat << EOF > $dev
 c f $CAL_VALUE
 c w
