@@ -515,7 +515,13 @@ static uint8_t	ao_radio_configured = 0;
 #if HAS_RADIO_POWER
 #define RADIO_POWER	ao_config.radio_power
 #else
-#define RADIO_POWER	0xc0
+
+#if 0
+#define RADIO_POWER	0x03	/* -31.75dBm on the test board */
+#endif
+
+#define RADIO_POWER	0xc0	/* full power */
+
 #endif
 
 static void
