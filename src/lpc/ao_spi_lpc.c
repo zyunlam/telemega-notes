@@ -19,63 +19,130 @@
 
 static uint8_t		ao_spi_mutex[LPC_NUM_SPI];
 
+struct ao_lpc_ssp_state {
+	int		tx_count;
+	const uint8_t	*tx;
+	int		tx_inc;
+	int		rx_count;
+	uint8_t		*rx;
+	int		rx_inc;
+};
+
+static struct ao_lpc_ssp_state ao_lpc_ssp_state[LPC_NUM_SPI];
+
 static struct lpc_ssp * const ao_lpc_ssp[LPC_NUM_SPI] = { &lpc_ssp0, &lpc_ssp1 };
 
-#define tx_busy(lpc_ssp) (lpc_ssp->sr & ((1 << LPC_SSP_SR_BSY) | (1 << LPC_SSP_SR_TNF))) != (1 << LPC_SSP_SR_TNF)
-#define rx_busy(lpc_ssp) (lpc_ssp->sr & ((1 << LPC_SSP_SR_BSY) | (1 << LPC_SSP_SR_RNE))) != (1 << LPC_SSP_SR_RNE)
+static inline void
+ao_lpc_ssp_recv(struct lpc_ssp *lpc_ssp, struct ao_lpc_ssp_state *state)
+{
+	while ((lpc_ssp->sr & (1 << LPC_SSP_SR_RNE)) &&
+	       state->rx_count)
+	{
+		/* RX ready, read a byte */
+		*state->rx = lpc_ssp->dr;
+		state->rx += state->rx_inc;
+		state->rx_count--;
+	}
+}
 
-#define spi_loop(len, put, get) do {					\
-		while (len--) {						\
-			/* Wait for space in the fifo */		\
-			while (tx_busy(lpc_ssp))			\
-				;					\
-									\
-			/* send a byte */				\
-			lpc_ssp->dr = put;				\
-									\
-			/* Wait for byte to appear in the fifo */	\
-			while (rx_busy(lpc_ssp))			\
-				;					\
-									\
-			/* recv a byte */				\
-			get lpc_ssp->dr;				\
-		}							\
-	} while (0)
+static void
+ao_lpc_ssp_isr(struct lpc_ssp *lpc_ssp, struct ao_lpc_ssp_state *state)
+{
+	ao_lpc_ssp_recv(lpc_ssp, state);
+	while ((lpc_ssp->sr & (1 << LPC_SSP_SR_TNF)) &&
+	       state->tx_count)
+	{
+		/* TX ready, write a byte */
+		lpc_ssp->dr = *state->tx;
+		state->tx += state->tx_inc;
+		state->tx_count--;
+		ao_lpc_ssp_recv(lpc_ssp, state);
+	}
+	if (!state->rx_count) {
+		lpc_ssp->imsc &= ~(1 << LPC_SSP_IMSC_TXIM);
+		ao_wakeup(state);
+	}
+}
+
+void
+lpc_ssp0_isr(void)
+{
+	ao_lpc_ssp_isr(&lpc_ssp0, &ao_lpc_ssp_state[0]);
+}
+
+void
+lpc_ssp1_isr(void)
+{
+	ao_lpc_ssp_isr(&lpc_ssp1, &ao_lpc_ssp_state[1]);
+}
+
+static void
+ao_spi_run(struct lpc_ssp *lpc_ssp, struct ao_lpc_ssp_state *state)
+{
+	ao_arch_block_interrupts();
+	lpc_ssp->imsc = (1 << LPC_SSP_IMSC_TXIM);
+	while (state->rx_count)
+		ao_sleep(state);
+	ao_arch_release_interrupts();
+}
+
+static uint8_t	ao_spi_tx_dummy = 0xff;
+static uint8_t	ao_spi_rx_dummy;
 
 void
 ao_spi_send(const void *block, uint16_t len, uint8_t id)
 {
-	const uint8_t	*b = block;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
+	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
 
-	spi_loop(len, *b++, (void));
+	state->tx_count = state->rx_count = len;
+	state->tx = block;
+	state->tx_inc = 1;
+	state->rx = &ao_spi_rx_dummy;
+	state->rx_inc = 0;
+	ao_spi_run(lpc_ssp, state);
 }
 
 void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t id)
 {
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
+	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
 
-	spi_loop(len, value, (void));
+	state->tx_count = state->rx_count = len;
+	state->tx = &value;
+	state->tx_inc = 0;
+	state->rx = &ao_spi_rx_dummy;
+	state->rx_inc = 0;
+	ao_spi_run(lpc_ssp, state);
 }
 
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t id)
 {
-	uint8_t	*b = block;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
+	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
 
-	spi_loop(len, 0xff, *b++ =);
+	state->tx_count = state->rx_count = len;
+	state->tx = &ao_spi_tx_dummy;
+	state->tx_inc = 0;
+	state->rx = block;
+	state->rx_inc = 1;
+	ao_spi_run(lpc_ssp, state);
 }
 
 void
 ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t id)
 {
-	const uint8_t	*o = out;
-	uint8_t	*i = in;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
+	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
 
-	spi_loop(len, *o++, *i++ =);
+	state->tx_count = state->rx_count = len;
+	state->tx = out;
+	state->tx_inc = 1;
+	state->rx = in;
+	state->rx_inc = 1;
+	ao_spi_run(lpc_ssp, state);
 }
 
 void
@@ -84,7 +151,7 @@ ao_spi_get(uint8_t id, uint32_t speed)
 	struct lpc_ssp	*lpc_ssp = ao_lpc_ssp[id];
 
 	ao_mutex_get(&ao_spi_mutex[id]);
-	
+
 	/* Set the clock prescale */
 	lpc_ssp->cpsr = speed;
 }
@@ -100,6 +167,11 @@ ao_spi_channel_init(uint8_t id)
 {
 	struct lpc_ssp	*lpc_ssp = ao_lpc_ssp[id];
 	uint8_t	d;
+
+	/* Clear interrupt registers */
+	lpc_ssp->imsc = 0;
+	lpc_ssp->ris = 0;
+	lpc_ssp->mis = 0;
 
 	lpc_ssp->cr0 = ((LPC_SSP_CR0_DSS_8 << LPC_SSP_CR0_DSS) |
 			(LPC_SSP_CR0_FRF_SPI << LPC_SSP_CR0_FRF) |
@@ -151,7 +223,11 @@ ao_spi_init(void)
 	lpc_scb.presetctrl &= ~(1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	ao_spi_channel_init(0);
-#endif			   
+
+	/* Configure NVIC */
+	lpc_nvic_set_enable(LPC_ISR_SSP0_POS);
+	lpc_nvic_set_priority(LPC_ISR_SSP0_POS, 0);
+#endif
 
 #if HAS_SPI_1
 
@@ -190,7 +266,7 @@ ao_spi_init(void)
 #ifndef HAS_MOSI1
 #error "No pin specified for MOSI1"
 #endif
-		
+
 	/* Enable the device */
 	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_SSP1);
 
@@ -201,5 +277,10 @@ ao_spi_init(void)
 	lpc_scb.presetctrl &= ~(1 << LPC_SCB_PRESETCTRL_SSP1_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP1_RST_N);
 	ao_spi_channel_init(1);
+
+	/* Configure NVIC */
+	lpc_nvic_set_enable(LPC_ISR_SSP1_POS);
+	lpc_nvic_set_priority(LPC_ISR_SSP1_POS, 0);
+
 #endif /* HAS_SPI_1 */
 }

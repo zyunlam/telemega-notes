@@ -130,12 +130,15 @@ ao_serial_init(void);
 /* SPI definitions */
 
 #define AO_SPI_SPEED_12MHz		4
+#define AO_SPI_SPEED_8MHz		6
 #define AO_SPI_SPEED_6MHz		8
 #define AO_SPI_SPEED_4MHz		12
 #define AO_SPI_SPEED_2MHz		24
 #define AO_SPI_SPEED_1MHz		48
 #define AO_SPI_SPEED_500kHz		96
 #define AO_SPI_SPEED_250kHz		192
+#define AO_SPI_SPEED_125kHz		384
+#define AO_SPI_SPEED_62500Hz		768
 
 #define AO_SPI_SPEED_FAST	AO_SPI_SPEED_12MHz
 
