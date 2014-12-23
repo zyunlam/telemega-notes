@@ -24,7 +24,7 @@
  */
 
 #ifndef AO_CC1200_AGC_GAIN_ADJUST
-#define AO_CC1200_AGC_GAIN_ADJUST	-81
+#define AO_CC1200_AGC_GAIN_ADJUST	-94
 #endif
 
         CC1200_IOCFG2,                       0x06,       /* GPIO2 IO Pin Configuration */
