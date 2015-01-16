@@ -249,4 +249,10 @@ static inline void ao_arch_start_scheduler(void) {
 	asm("isb");
 }
 
+void *
+ao_usb_alloc(uint16_t len);
+
+void
+ao_usb_write(void *block, int len);
+
 #endif /* _AO_ARCH_FUNCS_H_ */
