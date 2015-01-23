@@ -388,7 +388,6 @@ ao_config_accel_calibrate_auto(char *orientation) __reentrant
 	uint16_t	i;
 	int32_t		accel_total;
 	uint8_t		cal_data_ring;
-	int16_t		min = 32767, max = -32768;
 #if HAS_GYRO
 	int32_t		accel_along_total = 0;
 	int32_t		accel_across_total = 0;
@@ -406,10 +405,7 @@ ao_config_accel_calibrate_auto(char *orientation) __reentrant
 	while (i) {
 		ao_sleep(DATA_TO_XDATA(&ao_sample_data));
 		while (i && cal_data_ring != ao_sample_data) {
-			int16_t	v = ao_data_accel(&ao_data_ring[cal_data_ring]);
-			accel_total += (int32_t) v;
-			if (v < min) min = v;
-			if (v > max) max = v;
+			accel_total += (int32_t) ao_data_accel(&ao_data_ring[cal_data_ring]);
 #if HAS_GYRO
 			accel_along_total += (int32_t) ao_data_along(&ao_data_ring[cal_data_ring]);
 			accel_across_total += (int32_t) ao_data_across(&ao_data_ring[cal_data_ring]);
@@ -424,7 +420,6 @@ ao_config_accel_calibrate_auto(char *orientation) __reentrant
 	accel_cal_across = accel_across_total >> ACCEL_CALIBRATE_SHIFT;
 	accel_cal_through = accel_through_total >> ACCEL_CALIBRATE_SHIFT;
 #endif
-	printf ("total %d min %d max %d\n", accel_total, min, max);
 	return accel_total >> ACCEL_CALIBRATE_SHIFT;
 }
 
