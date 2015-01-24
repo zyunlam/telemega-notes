@@ -16,13 +16,16 @@
  */
 
 #include "ao.h"
+#ifdef AO_BTM_INT_PORT
+#include <ao_exti.h>
+#endif
 
 #ifndef ao_serial_btm_getchar
 #define ao_serial_btm_putchar	ao_serial1_putchar
 #define _ao_serial_btm_pollchar	_ao_serial1_pollchar
+#define _ao_serial_btm_sleep()	ao_sleep((void *) &ao_serial1_rx_fifo)
 #define ao_serial_btm_set_speed ao_serial1_set_speed
 #define ao_serial_btm_drain	ao_serial1_drain
-#define ao_serial_btm_rx_fifo	ao_serial1_rx_fifo
 #endif
 
 int8_t			ao_btm_stdio;
@@ -125,7 +128,7 @@ ao_btm_getchar(void)
 	ao_arch_block_interrupts();
 	while ((c = _ao_serial_btm_pollchar()) == AO_READ_AGAIN) {
 		ao_alarm(AO_MS_TO_TICKS(10));
-		c = ao_sleep(&ao_serial_btm_rx_fifo);
+		c = _ao_serial_btm_sleep();
 		ao_clear_alarm();
 		if (c) {
 			c = AO_READ_AGAIN;
@@ -146,6 +149,7 @@ ao_btm_get_line(void)
 {
 	uint8_t ao_btm_reply_len = 0;
 	int c;
+	uint8_t l;
 
 	while ((c = ao_btm_getchar()) != AO_READ_AGAIN) {
 		ao_btm_log_in_char(c);
@@ -154,8 +158,8 @@ ao_btm_get_line(void)
 		if (c == '\r' || c == '\n')
 			break;
 	}
-	for (c = ao_btm_reply_len; c < sizeof (ao_btm_reply);)
-		ao_btm_reply[c++] = '\0';
+	for (l = ao_btm_reply_len; l < sizeof (ao_btm_reply);)
+		ao_btm_reply[l++] = '\0';
 	return ao_btm_reply_len;
 }
 
@@ -214,7 +218,7 @@ ao_btm_string(__code char *cmd)
 {
 	char	c;
 
-	while (c = *cmd++)
+	while ((c = *cmd++) != '\0')
 		ao_btm_putchar(c);
 }
 
@@ -263,6 +267,12 @@ ao_btm_try_speed(uint8_t speed)
 void
 ao_btm(void)
 {
+#ifdef AO_BTM_RESET_PORT
+	ao_gpio_set(AO_BTM_RESET_PORT, AO_BTM_RESET_PIN, AO_BTM_RESET, 0);
+	ao_delay(AO_MS_TO_TICKS(20));
+	ao_gpio_set(AO_BTM_RESET_PORT, AO_BTM_RESET_PIN, AO_BTM_RESET, 1);
+#endif
+
 	/*
 	 * Wait for the bluetooth device to boot
 	 */
@@ -316,6 +326,7 @@ __xdata struct ao_task ao_btm_task;
 #define BT_PDIR		P2DIR
 #define BT_PINP		P2INP
 #define BT_IEN2_PIE	IEN2_P2IE
+#define BT_CC1111	1
 #endif
 #if BT_LINK_ON_P1
 #define BT_PICTL_ICON	PICTL_P1ICON
@@ -323,11 +334,13 @@ __xdata struct ao_task ao_btm_task;
 #define BT_PDIR		P1DIR
 #define BT_PINP		P1INP
 #define BT_IEN2_PIE	IEN2_P1IE
+#define BT_CC1111	1
 #endif
 
 void
 ao_btm_check_link()
 {
+#if BT_CC1111
 	ao_arch_critical(
 		/* Check the pin and configure the interrupt detector to wait for the
 		 * pin to flip the other way
@@ -340,8 +353,10 @@ ao_btm_check_link()
 			PICTL &= ~BT_PICTL_ICON;
 		}
 		);
+#endif
 }
 
+#if BT_CC1111
 void
 ao_btm_isr(void)
 #if BT_LINK_ON_P1
@@ -357,6 +372,16 @@ ao_btm_isr(void)
 	}
 	BT_PIFG = 0;
 }
+#endif
+
+#ifdef AO_BTM_INT_PORT
+void
+ao_btm_isr(void)
+{
+	ao_btm_check_link();
+	ao_wakeup(&ao_btm_connected);
+}
+#endif
 
 void
 ao_btm_init (void)
@@ -365,6 +390,18 @@ ao_btm_init (void)
 
 	ao_serial_btm_set_speed(AO_SERIAL_SPEED_19200);
 
+#ifdef AO_BTM_RESET_PORT
+	ao_enable_output(AO_BTM_RESET_PORT,AO_BTM_RESET_PIN,AO_BTM_RESET,0);
+#endif
+
+#ifdef AO_BTM_INT_PORT
+	ao_enable_port(AO_BTM_INT_PORT);
+	ao_exti_setup(AO_BTM_INT_PORT, AO_BTM_INT_PIN,
+		      AO_EXTI_MODE_FALLING|AO_EXTI_MODE_RISING|AO_EXTI_PRIORITY_LOW,
+		      ao_btm_isr);
+#endif
+
+#if BT_CC1111
 #if BT_LINK_ON_P1
 	/*
 	 * Configure ser reset line
@@ -386,9 +423,14 @@ ao_btm_init (void)
 
 	/* Enable interrupts */
 	IEN2 |= BT_IEN2_PIE;
+#endif
 
 	/* Check current pin state */
 	ao_btm_check_link();
+
+#ifdef AO_BTM_INT_PORT
+	ao_exti_enable(AO_BTM_INT_PORT, AO_BTM_INT_PIN);
+#endif
 
 #if BT_LINK_ON_P2
 	/* Eable the pin interrupt */

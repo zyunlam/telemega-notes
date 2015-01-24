@@ -86,7 +86,7 @@ ao_led_for(uint16_t colors, uint16_t ticks) __reentrant
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);		\
 		stm_otyper_set(port, bit, STM_OTYPER_PUSH_PULL);	\
 	} while (0)
-	
+
 void
 ao_led_init(uint16_t enable)
 {
