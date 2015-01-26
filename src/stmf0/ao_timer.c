@@ -247,6 +247,10 @@ ao_clock_init(void)
 	/* Clear reset flags */
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
+#if !AO_HSI && !AO_NEED_HSI
+	/* Turn off the HSI clock */
+	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
+#endif
 #if DEBUG_THE_CLOCK
 	/* Output SYSCLK on PA8 for measurments */
 

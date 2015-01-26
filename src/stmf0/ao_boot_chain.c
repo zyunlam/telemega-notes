@@ -43,7 +43,7 @@ struct ao_boot {
 };
 
 static struct ao_boot __attribute__ ((section(".boot"))) ao_boot;
-	
+
 int
 ao_boot_check_chain(void)
 {

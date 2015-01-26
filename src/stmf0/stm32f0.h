@@ -435,20 +435,41 @@ extern struct stm_flash	stm_flash;
 #define STM_FLASH_PECR_PRGLOCK		1
 #define STM_FLASH_PECR_PELOCK		0
 
-#define STM_FLASH_SR_OPTVERR		11
-#define STM_FLASH_SR_SIZERR		10
-#define STM_FLASH_SR_PGAERR		9
-#define STM_FLASH_SR_WRPERR		8
-#define STM_FLASH_SR_READY		3
-#define STM_FLASH_SR_ENDHV		2
-#define STM_FLASH_SR_EOP		1
+#define STM_FLASH_SR_EOP		5
+#define STM_FLASH_SR_WRPRTERR		4
+#define STM_FLASH_SR_PGERR		2
 #define STM_FLASH_SR_BSY		0
 
-#define STM_FLASH_PEKEYR_PEKEY1	0x89ABCDEF
-#define STM_FLASH_PEKEYR_PEKEY2 0x02030405
+#define STM_FLASH_CR_OBL_LAUNCH		13
+#define STM_FLASH_CR_EOPIE		12
+#define STM_FLASH_CR_ERRIE		10
+#define STM_FLASH_CR_OPTWRE		9
+#define STM_FLASH_CR_LOCK		7
+#define STM_FLASH_CR_STRT		6
+#define STM_FLASH_CR_OPTER		5
+#define STM_FLASH_CR_OPTPG		4
+#define STM_FLASH_CR_MER		2
+#define STM_FLASH_CR_PER		1
+#define STM_FLASH_CR_PG			0
 
-#define STM_FLASH_PRGKEYR_PRGKEY1 0x8C9DAEBF
-#define STM_FLASH_PRGKEYR_PRGKEY2 0x13141516
+#define STM_FLASH_OBR_DATA1		24
+#define STM_FLASH_OBR_DATA0		16
+#define STM_FLASH_OBR_BOOT_SEL		15
+#define STM_FLASH_OBR_RAM_PARITY_CHECK	14
+#define STM_FLASH_OBR_VDDA_MONITOR	13
+#define STM_FLASH_OBR_NBOOT1		12
+#define STM_FLASH_OBR_NBOOT0		11
+#define STM_FLASH_OBR_NRST_STDBY	10
+#define STM_FLASH_OBR_NRST_STOP		9
+#define STM_FLASH_OBR_WDG_SW		8
+#define STM_FLASH_OBR_RDPRT		1
+#define  STM_FLASH_OBR_RDPRT_LEVEL0		0
+#define  STM_FLASH_OBR_RDPRT_LEVEL1		1
+#define  STM_FLASH_OBR_RDPRT_LEVEL2		3
+#define STM_FLASH_OBR_OPTERR		0
+
+#define STM_FLASH_KEYR_KEY1	0x45670123
+#define STM_FLASH_KEYR_KEY2 	0xcdef89ab
 
 struct stm_rcc {
 	vuint32_t	cr;
@@ -1176,6 +1197,39 @@ struct stm_syscfg {
 
 extern struct stm_syscfg stm_syscfg;
 
+#define STM_SYSCFG_CFGR1_TIM3_DMA_RMP	30
+#define STM_SYSCFG_CFGR1_TIM2_DMA_RMP	29
+#define STM_SYSCFG_CFGR1_TIM1_DMA_RMP	28
+#define STM_SYSCFG_CFGR1_I2C1_DMA_RMP	27
+#define STM_SYSCFG_CFGR1_USART3_DMA_RMP	26
+#define STM_SYSCFG_CFGR1_USART2_DMA_RMP	25
+#define STM_SYSCFG_CFGR1_SPI2_DMA_RMP	24
+#define STM_SYSCFG_CFGR1_I2C_PA10_FMP	23
+#define STM_SYSCFG_CFGR1_I2C_PA9_FMP	22
+#define STM_SYSCFG_CFGR1_I2C2_FMP	21
+#define STM_SYSCFG_CFGR1_I2C1_FMP	20
+#define STM_SYSCFG_CFGR1_I2C_PB9_FMP	19
+#define STM_SYSCFG_CFGR1_I2C_PB8_FMP	18
+#define STM_SYSCFG_CFGR1_I2C_PB7_FMP	17
+#define STM_SYSCFG_CFGR1_I2C_PB6_FMP	16
+#define STM_SYSCFG_CFGR1_TIM17_DMA_RMP2	14
+#define STM_SYSCFG_CFGR1_TIM16_DMA_RMP2	13
+#define STM_SYSCFG_CFGR1_TIM17_DMA_RMP	12
+#define STM_SYSCFG_CFGR1_TIM16_DMA_RMP	11
+#define STM_SYSCFG_CFGR1_USART1_RX_DMA_RMP	10
+#define STM_SYSCFG_CFGR1_USART1_TX_DMA_RMP	9
+#define STM_SYSCFG_CFGR1_ADC_DMA_RMP		8
+#define STM_SYSCFG_CFGR1_IRDA_ENV_SEL	6
+#define  STM_SYSCFG_CFGR1_IRDA_ENV_SEL_TIMER16	0
+#define  STM_SYSCFG_CFGR1_IRDA_ENV_SEL_USART1	1
+#define  STM_SYSCFG_CFGR1_IRDA_ENV_SEL_USART4	2
+#define STM_SYSCFG_CFGR1_PA11_PA12_RMP	4
+#define STM_SYSCFG_CFGR1_MEM_MODE	0
+#define  STM_SYSCFG_CFGR1_MEM_MODE_MAIN_FLASH	0
+#define  STM_SYSCFG_CFGR1_MEM_MODE_SYSTEM_FLASH	1
+#define  STM_SYSCFG_CFGR1_MEM_MODE_SRAM		3
+#define  STM_SYSCFG_CFGR1_MEM_MODE_MASK		3
+
 #if 0
 static inline void
 stm_exticr_set(struct stm_gpio *gpio, int pin) {
@@ -1503,35 +1557,34 @@ extern struct stm_adc stm_adc;
 #define  STM_ADC_CCR_ADCPRE_HSI_4	2
 #define  STM_ADC_CCR_ADCPRE_MASK	3
 
-struct stm_temp_cal {
-	uint16_t	vref;
-	uint16_t	ts_cal_cold;
-	uint16_t	reserved;
-	uint16_t	ts_cal_hot;
+struct stm_cal {
+	uint16_t	ts_cal_cold;	/* 30°C */
+	uint16_t	vrefint_cal;
+	uint16_t	unused_c0;
+	uint16_t	ts_cal_hot;	/* 110°C */
 };
 
-extern struct stm_temp_cal	stm_temp_cal;
+extern struct stm_cal	stm_cal;
 
-#define stm_temp_cal_cold	25
+#define stm_temp_cal_cold	30
 #define stm_temp_cal_hot	110
 
-struct stm_dbg_mcu {
+struct stm_dbgmcu {
 	uint32_t	idcode;
 };
 
-extern struct stm_dbg_mcu	stm_dbg_mcu;
+extern struct stm_dbgmcu	stm_dbgmcu;
 
 static inline uint16_t
 stm_dev_id(void) {
-	return stm_dbg_mcu.idcode & 0xfff;
+	return stm_dbgmcu.idcode & 0xfff;
 }
 
 struct stm_flash_size {
 	uint16_t	f_size;
 };
 
-extern struct stm_flash_size	stm_flash_size_medium;
-extern struct stm_flash_size	stm_flash_size_large;
+extern struct stm_flash_size	stm_flash_size_04x;
 
 /* Returns flash size in bytes */
 extern uint32_t

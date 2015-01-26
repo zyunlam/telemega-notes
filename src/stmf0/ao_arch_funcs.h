@@ -120,30 +120,25 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 
 #define ao_enable_port(port) do {					\
 		if ((port) == &stm_gpioa)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOAEN); \
+			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN); \
 		else if ((port) == &stm_gpiob)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOBEN); \
+			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPBEN); \
 		else if ((port) == &stm_gpioc)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOCEN); \
-		else if ((port) == &stm_gpiod)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIODEN); \
-		else if ((port) == &stm_gpioe)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOEEN); \
+			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPCEN); \
+		else if ((port) == &stm_gpiof)				\
+			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPFEN); \
 	} while (0)
 
 #define ao_disable_port(port) do {					\
 		if ((port) == &stm_gpioa)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOAEN); \
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPAEN); \
 		else if ((port) == &stm_gpiob)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOBEN); \
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPBEN); \
 		else if ((port) == &stm_gpioc)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOCEN); \
-		else if ((port) == &stm_gpiod)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIODEN); \
-		else if ((port) == &stm_gpioe)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOEEN); \
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPCEN); \
+		else if ((port) == &stm_gpiof)				\
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPFEN); \
 	} while (0)
-
 
 #define ao_gpio_set(port, bit, pin, v) stm_gpio_set(port, bit, v)
 
@@ -163,7 +158,7 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		else							\
 			stm_pupdr_set(port, bit, STM_PUPDR_NONE);	\
 	} while (0)
-	
+
 #define ao_enable_input(port,bit,mode) do {				\
 		ao_enable_port(port);					\
 		stm_moder_set(port, bit, STM_MODER_INPUT);		\
@@ -388,11 +383,5 @@ static inline void ao_arch_start_scheduler(void) {
 		do { b } while (0);			\
 		ao_arch_irqrestore(__mask);		\
 	} while (0)
-
-void
-ao_clock_enable_crs(void);
-
-void
-ao_clock_disable_crs(void);
 
 #endif /* _AO_ARCH_FUNCS_H_ */
