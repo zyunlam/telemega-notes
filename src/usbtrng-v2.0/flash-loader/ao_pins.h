@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,14 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define LED_PORT_ENABLE	STM_RCC_AHBENR_IOPAEN
-#define LED_PORT	(&stm_gpioa)
-#define LED_PIN_RED	2
-#define LED_PIN_GREEN	3
-#define AO_LED_RED	(1 << LED_PIN_RED)
-#define AO_LED_GREEN	(1 << LED_PIN_GREEN)
+#include <ao_flash_stm_pins.h>
 
-#define LEDS_AVAILABLE	(AO_LED_RED | AO_LED_GREEN)
+/* Red LED */
 
-#define HAS_BEEP	0
-
-/* 48MHz clock based on USB */
-#define AO_HSI48	1
-
-/* HCLK = 48MHz */
-#define AO_AHB_PRESCALER	1
-#define AO_RCC_CFGR_HPRE_DIV	STM_RCC_CFGR_HPRE_DIV_1
-
-/* APB = 48MHz */
-#define AO_APB_PRESCALER	1
-#define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
-
-#define HAS_USB		1
-
-#define IS_FLASH_LOADER	0
+#define AO_BOOT_PIN			1
+#define AO_BOOT_APPLICATION_GPIO	stm_gpioa
+#define AO_BOOT_APPLICATION_PIN		2
+#define AO_BOOT_APPLICATION_VALUE	0
+#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_DOWN
 
 #endif /* _AO_PINS_H_ */
