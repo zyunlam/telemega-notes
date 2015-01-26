@@ -23,6 +23,8 @@
 
 struct cc_usb;
 
+extern int cc_default_timeout;
+
 struct cc_usb *
 cc_usb_open(char *tty);
 

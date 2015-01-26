@@ -86,12 +86,13 @@ static const struct option options[] = {
 	{ .name = "cal", .has_arg = 1, .val = 'c' },
 	{ .name = "serial", .has_arg = 1, .val = 's' },
 	{ .name = "verbose", .has_arg = 1, .val = 'v' },
+	{ .name = "wait", .has_arg = 0, .val = 'w' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--raw] [--verbose=<verbose>] [--device=<device>] [-tty=<tty>] [--cal=<radio-cal>] [--serial=<serial>] file.{elf,ihx}\n", program);
+	fprintf(stderr, "usage: %s [--raw] [--verbose=<verbose>] [--device=<device>] [-tty=<tty>] [--cal=<radio-cal>] [--serial=<serial>] [--wait] file.{elf,ihx}\n", program);
 	exit(1);
 }
 
@@ -145,7 +146,7 @@ main (int argc, char **argv)
 	uint32_t		flash_base, flash_bound;
 	int			has_flash_size = 0;
 
-	while ((c = getopt_long(argc, argv, "rT:D:c:s:v:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "wrT:D:c:s:v:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
@@ -155,6 +156,9 @@ main (int argc, char **argv)
 			break;
 		case 'r':
 			raw = 1;
+			break;
+		case 'w':
+			cc_default_timeout = -1;
 			break;
 		case 'c':
 			cal = strtoul(optarg, &cal_end, 10);
@@ -208,6 +212,10 @@ main (int argc, char **argv)
 				this_tty = cc_usbdevs_find_by_arg(device, "AltosFlash");
 			if (!this_tty)
 				this_tty = cc_usbdevs_find_by_arg(device, "TeleMega");
+			if (!this_tty)
+				this_tty = cc_usbdevs_find_by_arg(device, "TeleMetrum");
+			if (!this_tty)
+				this_tty = cc_usbdevs_find_by_arg(device, "TeleGPS");
 			if (!this_tty)
 				this_tty = getenv("ALTOS_TTY");
 			if (!this_tty)

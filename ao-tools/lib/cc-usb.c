@@ -152,6 +152,8 @@ cc_usb_dbg(int indent, uint8_t *bytes, int len)
 	}
 }
 
+int	cc_default_timeout = 5000;
+
 /*
  * Flush pending writes, fill pending reads
  */
@@ -227,7 +229,7 @@ _cc_usb_sync(struct cc_usb *cc, int wait_for_input, int write_timeout)
 void
 cc_usb_sync(struct cc_usb *cc)
 {
-	if (_cc_usb_sync(cc, 0, 5000) < 0) {
+	if (_cc_usb_sync(cc, 0, cc_default_timeout) < 0) {
 		fprintf(stderr, "USB link timeout\n");
 		exit(1);
 	}
@@ -268,7 +270,7 @@ int
 cc_usb_getchar_timeout(struct cc_usb *cc, int timeout)
 {
 	while (cc->in_pos == cc->in_count) {
-		if (_cc_usb_sync(cc, timeout, 5000) < 0) {
+		if (_cc_usb_sync(cc, timeout, cc_default_timeout) < 0) {
 			fprintf(stderr, "USB link timeout\n");
 			exit(1);
 		}
@@ -279,7 +281,7 @@ cc_usb_getchar_timeout(struct cc_usb *cc, int timeout)
 int
 cc_usb_getchar(struct cc_usb *cc)
 {
-	return cc_usb_getchar_timeout(cc, 5000);
+	return cc_usb_getchar_timeout(cc, cc_default_timeout);
 }
 
 void
@@ -400,7 +402,7 @@ cc_usb_open_remote(struct cc_usb *cc, int freq, char *call)
 		cc_usb_printf(cc, "\nc F %d\nc c %s\np\nE 0\n", freq, call);
 		do {
 			cc->in_count = cc->in_pos = 0;
-			_cc_usb_sync(cc, 100, 5000);
+			_cc_usb_sync(cc, 100, cc_default_timeout);
 		} while (cc->in_count > 0);
 		cc->remote = 1;
 	}
@@ -459,7 +461,7 @@ cc_usb_open(char *tty)
 	cc_usb_printf(cc, "\nE 0\nm 0\n");
 	do {
 		cc->in_count = cc->in_pos = 0;
-		_cc_usb_sync(cc, 100, 5000);
+		_cc_usb_sync(cc, 100, cc_default_timeout);
 	} while (cc->in_count > 0);
 	return cc;
 }
