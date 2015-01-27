@@ -29,14 +29,15 @@ SECTIONS {
 	 * Rom contents
 	 */
 
-	.text : {
+	.interrupt : {
 		__text_start__ = .;
 		*(.interrupt)	/* Interrupt vectors */
+	} > rom
 
-		. = ORIGIN(rom) + 0x100;
-
+	.text ORIGIN(rom) + 0x100 : {
 		ao_romconfig.o(.romconfig*)
 		ao_product.o(.romconfig*)
+
 		*(.text*)	/* Executable code */
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		*(.rodata*)	/* Constants */
@@ -47,7 +48,7 @@ SECTIONS {
 	 * the application and bootloader share the same addresses.
 	 * This must be all uninitialized data
 	 */
-	.boot (NOLOAD) : {
+	.boot ORIGIN(ram) + SIZEOF(.interrupt) (NOLOAD) : {
 		__boot_start__ = .;
 		*(.boot)
 		__boot_end__ = .;

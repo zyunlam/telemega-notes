@@ -54,12 +54,9 @@ SECTIONS {
 		ao_product.o(.romconfig*)
 
 		*(.text*)	/* Executable code */
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		*(.rodata*)	/* Constants */
 
-	} > rom
-
-	.ARM.exidx : {
-		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 	} > rom
 	__text_end__ = .;
 
