@@ -41,7 +41,18 @@
 #define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
 
 #define HAS_USB		1
+#define AO_USB_DIRECTIO	1
 
 #define IS_FLASH_LOADER	0
+
+/* ADC */
+
+#define AO_ADC_PIN0_PORT	(&stm_gpioa)
+#define AO_ADC_PIN0_PIN		6
+#define AO_ADC_PIN0_CH		6
+
+#define AO_ADC_RCC_AHBENR	((1 << STM_RCC_AHBENR_IOPAEN))
+
+#define AO_NUM_ADC		1
 
 #endif /* _AO_PINS_H_ */
