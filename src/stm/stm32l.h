@@ -1515,7 +1515,7 @@ extern struct stm_dbg_mcu	stm_dbg_mcu;
 
 static inline uint16_t
 stm_dev_id(void) {
-	return stm_dbgmcu.idcode & 0xfff;
+	return stm_dbg_mcu.idcode & 0xfff;
 }
 
 struct stm_flash_size {
