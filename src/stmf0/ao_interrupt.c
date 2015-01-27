@@ -74,6 +74,9 @@ void start(void)
 	}
 #endif
 #if RELOCATE_INTERRUPT
+	/* Turn on syscfg */
+	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGCOMPEN);
+
 	memcpy(&__interrupt_start__, &__interrupt_rom__, &__interrupt_end__ - &__interrupt_start__);
 	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
 		(STM_SYSCFG_CFGR1_MEM_MODE_SRAM << STM_SYSCFG_CFGR1_MEM_MODE);
@@ -112,8 +115,8 @@ isr(exti2_3)
 isr(exti4_15)
 isr(tsc)
 isr(dma_ch1)
-isr(dma_ch2_3_dma2_ch1_2)
-isr(dma_ch4_5_6_7_dma2_ch3_4_5)
+isr(dma_ch2_3)
+isr(dma_ch4_5_6)
 isr(adc_comp)
 isr(tim1_brk_up_trg_com)
 isr(tim1_cc)
@@ -157,8 +160,8 @@ const void *stm_interrupt_vector[] = {
 	i(0x5c, exti4_15),
 	i(0x60, tsc),
 	i(0x64, dma_ch1),
-	i(0x68, dma_ch2_3_dma2_ch1_2),
-	i(0x6c, dma_ch4_5_6_7_dma2_ch3_4_5),
+	i(0x68, dma_ch2_3),
+	i(0x6c, dma_ch4_5_6),
 	i(0x70, adc_comp),
 	i(0x74, tim1_brk_up_trg_com),
 	i(0x78, tim1_cc),
