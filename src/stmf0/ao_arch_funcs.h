@@ -384,4 +384,17 @@ static inline void ao_arch_start_scheduler(void) {
 		ao_arch_irqrestore(__mask);		\
 	} while (0)
 
+/* ao_usb_stm.c */
+
+#if AO_USB_DIRECTIO
+uint16_t *
+ao_usb_alloc(void);
+
+void
+ao_usb_free(uint16_t *buffer);
+
+void
+ao_usb_write(uint16_t *buffer, uint16_t len);
+#endif /* AO_USB_DIRECTIO */
+
 #endif /* _AO_ARCH_FUNCS_H_ */

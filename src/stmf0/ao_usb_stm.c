@@ -80,6 +80,7 @@ static uint16_t	*ao_usb_ep0_tx_buffer;
 static uint16_t	*ao_usb_ep0_rx_buffer;
 
 /* Pointer to bulk data tx/rx buffers in USB memory */
+static uint16_t ao_usb_in_tx_offset;
 static uint16_t	*ao_usb_in_tx_buffer;
 static uint16_t	*ao_usb_out_rx_buffer;
 
@@ -140,6 +141,13 @@ static inline uint16_t *ao_usb_packet_buffer_addr(uint16_t sram_addr)
 {
 	return (uint16_t *) (stm_usb_sram + sram_addr);
 }
+
+#if AO_USB_DIRECTIO
+static inline uint16_t ao_usb_packet_buffer_offset(uint16_t *addr)
+{
+	return (uint16_t) ((uint8_t *) addr - stm_usb_sram);
+}
+#endif
 
 static inline uint32_t ao_usb_epr_stat_rx(uint32_t epr) {
 	return (epr >> STM_USB_EPR_STAT_RX) & STM_USB_EPR_STAT_RX_MASK;
@@ -368,7 +376,6 @@ ao_usb_set_configuration(void)
 	/* Set up the INT end point */
 	ao_usb_bdt[AO_USB_INT_EPR].single.addr_tx = ao_usb_sram_addr;
 	ao_usb_bdt[AO_USB_INT_EPR].single.count_tx = 0;
-	ao_usb_in_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
 	ao_usb_sram_addr += AO_USB_INT_SIZE;
 
 	ao_usb_init_ep(AO_USB_INT_EPR,
@@ -393,7 +400,8 @@ ao_usb_set_configuration(void)
 	/* Set up the IN end point */
 	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_sram_addr;
 	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = 0;
-	ao_usb_in_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
+	ao_usb_in_tx_offset = ao_usb_sram_addr;
+	ao_usb_in_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_in_tx_offset);
 	ao_usb_sram_addr += AO_USB_IN_SIZE;
 
 	ao_usb_init_ep(AO_USB_IN_EPR,
@@ -415,7 +423,7 @@ static uint16_t	reset_count;
  */
 
 static void
-ao_usb_write(const uint8_t *src, uint16_t *base, uint16_t bytes)
+ao_usb_copy_tx(const uint8_t *src, uint16_t *base, uint16_t bytes)
 {
 	while (bytes >= 2) {
 		*base++ = src[0] | (src[1] << 8);
@@ -427,7 +435,7 @@ ao_usb_write(const uint8_t *src, uint16_t *base, uint16_t bytes)
 }
 
 static void
-ao_usb_read(uint8_t *dst, uint16_t *base, uint16_t bytes)
+ao_usb_copy_rx(uint8_t *dst, uint16_t *base, uint16_t bytes)
 {
 	while (bytes >= 2) {
 		uint16_t s = *base++;
@@ -462,7 +470,7 @@ ao_usb_ep0_flush(void)
 	ao_usb_ep0_in_len -= this_len;
 
 	debug_data ("Flush EP0 len %d:", this_len);
-	ao_usb_write(ao_usb_ep0_in_data, ao_usb_ep0_tx_buffer, this_len);
+	ao_usb_copy_tx(ao_usb_ep0_in_data, ao_usb_ep0_tx_buffer, this_len);
 	debug_data ("\n");
 	ao_usb_ep0_in_data += this_len;
 
@@ -484,7 +492,7 @@ ao_usb_ep0_fill(void)
 
 	/* Pull all of the data out of the packet */
 	debug_data ("Fill EP0 len %d:", len);
-	ao_usb_read(ao_usb_ep0_out_data, ao_usb_ep0_rx_buffer, len);
+	ao_usb_copy_rx(ao_usb_ep0_out_data, ao_usb_ep0_rx_buffer, len);
 	debug_data ("\n");
 	ao_usb_ep0_out_data += len;
 
@@ -773,7 +781,8 @@ _ao_usb_in_send(void)
 	ao_usb_in_pending = 1;
 	if (ao_usb_tx_count != AO_USB_IN_SIZE)
 		ao_usb_in_flushed = 1;
-	ao_usb_write(ao_usb_tx_buffer, ao_usb_in_tx_buffer, ao_usb_tx_count);
+	ao_usb_copy_tx(ao_usb_tx_buffer, ao_usb_in_tx_buffer, ao_usb_tx_count);
+	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_in_tx_offset;
 	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = ao_usb_tx_count;
 	ao_usb_tx_count = 0;
 	_ao_usb_set_stat_tx(AO_USB_IN_EPR, STM_USB_EPR_STAT_TX_VALID);
@@ -851,7 +860,7 @@ _ao_usb_out_recv(void)
 	_rx_dbg1("out_recv count", ao_usb_rx_count);
 	debug ("recv %d\n", ao_usb_rx_count);
 	debug_data("Fill OUT len %d:", ao_usb_rx_count);
-	ao_usb_read(ao_usb_rx_buffer, ao_usb_out_rx_buffer, ao_usb_rx_count);
+	ao_usb_copy_rx(ao_usb_rx_buffer, ao_usb_out_rx_buffer, ao_usb_rx_count);
 	debug_data("\n");
 	ao_usb_rx_pos = 0;
 
@@ -896,6 +905,47 @@ ao_usb_getchar(void)
 	ao_arch_release_interrupts();
 	return c;
 }
+
+#if AO_USB_DIRECTIO
+uint16_t *
+ao_usb_alloc(void)
+{
+	uint16_t	*buffer;
+
+	if (!ao_usb_running)
+		return NULL;
+	buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
+	ao_usb_sram_addr += AO_USB_IN_SIZE;
+	return buffer;
+}
+
+void
+ao_usb_free(uint16_t *addr)
+{
+	uint16_t	offset = ao_usb_packet_buffer_offset(addr);
+	if (offset < ao_usb_sram_addr)
+		ao_usb_sram_addr = offset;
+}
+
+void
+ao_usb_write(uint16_t *buffer, uint16_t len)
+{
+	ao_arch_block_interrupts();
+
+	/* Flush any pending regular */
+	if (ao_usb_tx_count)
+		_ao_usb_in_send();
+
+	while (ao_usb_in_pending)
+		ao_sleep(&ao_usb_in_pending);
+	ao_usb_in_pending = 1;
+	ao_usb_in_flushed = (len != AO_USB_IN_SIZE);
+	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_packet_buffer_offset(buffer);
+	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = len;
+	_ao_usb_set_stat_tx(AO_USB_IN_EPR, STM_USB_EPR_STAT_TX_VALID);
+	ao_arch_release_interrupts();
+}
+#endif
 
 void
 ao_usb_disable(void)
