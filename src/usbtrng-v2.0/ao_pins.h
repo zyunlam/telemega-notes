@@ -55,4 +55,8 @@
 
 #define AO_NUM_ADC		1
 
+/* CRC */
+#define AO_CRC_WIDTH	32
+#define AO_CRC_INIT	0xffffffff
+
 #endif /* _AO_PINS_H_ */
