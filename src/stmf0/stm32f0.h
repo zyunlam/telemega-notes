@@ -23,6 +23,7 @@
 typedef volatile uint32_t	vuint32_t;
 typedef volatile void *		vvoid_t;
 typedef volatile uint16_t	vuint16_t;
+typedef volatile uint8_t	vuint8_t;
 
 struct stm_gpio {
 	vuint32_t	moder;
@@ -567,6 +568,37 @@ extern struct stm_pwr stm_pwr;
 #define STM_PWR_CSR_PVDO	(2)
 #define STM_PWR_CSR_SBF		(1)
 #define STM_PWR_CSR_WUF		(0)
+
+struct stm_crc {
+	union {
+		vuint32_t	u32;
+		vuint16_t	u16;
+		vuint8_t	u8;
+	} 		dr;
+	vuint32_t	idr;
+	vuint32_t	cr;
+	uint32_t	_0c;
+
+	vuint32_t	init;
+	vuint32_t	pol;
+};
+
+extern struct stm_crc	stm_crc;
+
+#define stm_crc	(*((struct stm_crc *) 0x40023000))
+
+#define STM_CRC_CR_REV_OUT	7
+#define STM_CRC_CR_REV_IN	5
+#define  STM_CRC_CR_REV_IN_NONE		0
+#define  STM_CRC_CR_REV_IN_BY_BYTE	1
+#define  STM_CRC_CR_REV_IN_BY_HALF_WORD	2
+#define  STM_CRC_CR_REV_IN_BY_WORD	3
+#define STM_CRC_CR_POLYSIZE	3
+#define  STM_CRC_CR_POLYSIZE_32		0
+#define  STM_CRC_CR_POLYSIZE_16		1
+#define  STM_CRC_CR_POLYSIZE_8		2
+#define  STM_CRC_CR_POLYSIZE_7		3
+#define STM_CRC_CR_RESET	0
 
 /* The SYSTICK starts at 0xe000e010 */
 
