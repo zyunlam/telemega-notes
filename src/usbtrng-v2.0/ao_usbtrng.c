@@ -23,7 +23,6 @@ static void
 ao_trng_fetch(void)
 {
 	static uint16_t	*buffer[2];
-	static uint32_t	adc_in[AO_USB_IN_SIZE/2];	/* twice as many as we need */
 	uint32_t	kbytes = 1;
 	uint32_t	count;
 	int		usb_buf_id;
@@ -50,18 +49,21 @@ ao_trng_fetch(void)
 
 	ao_led_on(AO_LED_GREEN);
 	while (count--) {
-		ao_adc_read((uint16_t *) adc_in, AO_USB_IN_SIZE);
-		rnd = adc_in;
 		buf = buffer[usb_buf_id];
+//		printf ("before get: head %3d tail %3d running %d\n", ao_adc_ring_head, ao_adc_ring_tail, ao_adc_running); flush();
+		rnd = (uint32_t *) ao_adc_get(AO_USB_IN_SIZE);	/* one 16-bit value per output byte */
+//		printf ("after get: head %3d tail %3d running %d\n", ao_adc_ring_head, ao_adc_ring_tail, ao_adc_running); flush();
 		for (i = 0; i < 32; i++)
 			*buf++ = ao_crc_in_32_out_16(*rnd++);
+		ao_adc_ack(AO_USB_IN_SIZE);
+//		printf ("after ack: head %3d tail %3d running %d\n", ao_adc_ring_head, ao_adc_ring_tail, ao_adc_running); flush();
 		ao_led_toggle(AO_LED_GREEN|AO_LED_RED);
 		ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
 		ao_led_toggle(AO_LED_GREEN|AO_LED_RED);
 		usb_buf_id = 1-usb_buf_id;
 	}
 	ao_led_off(AO_LED_GREEN|AO_LED_RED);
-	ao_usb_flush();
+	flush();
 }
 
 static const struct ao_cmds usbtrng_cmds[] = {

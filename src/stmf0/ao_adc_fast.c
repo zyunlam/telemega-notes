@@ -18,7 +18,10 @@
 #include <ao.h>
 #include <ao_adc_fast.h>
 
-static uint8_t			ao_adc_done;
+uint16_t ao_adc_ring[AO_ADC_RING_SIZE];
+
+uint16_t ao_adc_ring_head, ao_adc_ring_tail;
+uint8_t ao_adc_running;
 
 /*
  * Callback from DMA ISR
@@ -28,22 +31,30 @@ static uint8_t			ao_adc_done;
 static void ao_adc_dma_done(int index)
 {
 	(void) index;
-	ao_adc_done = 1;
-	ao_wakeup(&ao_adc_done);
+	ao_adc_ring_head += AO_ADC_RING_CHUNK;
+	if (ao_adc_ring_head == AO_ADC_RING_SIZE)
+		ao_adc_ring_head = 0;
+	ao_adc_running = 0;
+	ao_wakeup(&ao_adc_ring_head);
+	ao_dma_done_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
 }
 
-/*
- * Start the ADC sequence using the DMA engine
- */
 void
-ao_adc_read(uint16_t *dest, int len)
+_ao_adc_start(void)
 {
-	ao_adc_done = 0;
+	uint16_t	*buf;
+
+	if (ao_adc_running)
+		return;
+	if (_ao_adc_space() < AO_ADC_RING_CHUNK)
+		return;
+	ao_adc_running = 1;
+	buf = ao_adc_ring + ao_adc_ring_head;
 	stm_adc.isr = 0;
 	ao_dma_set_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1),
 			    &stm_adc.dr,
-			    dest,
-			    len,
+			    buf,
+			    AO_ADC_RING_CHUNK,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
 			    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_16 << STM_DMA_CCR_MSIZE) |
@@ -56,16 +67,6 @@ ao_adc_read(uint16_t *dest, int len)
 	ao_dma_start(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
 
 	stm_adc.cr |= (1 << STM_ADC_CR_ADSTART);
-	ao_arch_block_interrupts();
-	while (!ao_adc_done)
-		ao_sleep(&ao_adc_done);
-	ao_arch_release_interrupts();
-
-	ao_dma_done_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
-
-	stm_adc.cr |= (1 << STM_ADC_CR_ADSTP);
-	while ((stm_adc.cr & (1 << STM_ADC_CR_ADSTP)) != 0)
-		;
 }
 
 void
@@ -185,4 +186,5 @@ ao_adc_init(void)
 	stm_syscfg.cfgr1 &= ~(1 << STM_SYSCFG_CFGR1_ADC_DMA_RMP);
 
 	ao_dma_alloc(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
+	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1), ao_adc_dma_done);
 }
