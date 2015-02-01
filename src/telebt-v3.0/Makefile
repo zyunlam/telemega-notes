@@ -55,6 +55,7 @@ ALTOS_SRC = \
 	ao_convert_volt.c \
 	ao_packet_master.c \
 	ao_packet.c \
+	ao_monitor.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)

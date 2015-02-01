@@ -200,4 +200,9 @@ struct ao_adc {
 
 #define HAS_BOOT_RADIO		0
 
+/* Monitor bits */
+#define HAS_MONITOR		1
+#define LEGACY_MONITOR		0
+#define AO_MONITOR_LED		AO_LED_RED
+
 #endif /* _AO_PINS_H_ */
