@@ -35,7 +35,7 @@ __xdata uint8_t		ao_btm_connected;
 
 #if BT_DEBUG
 __xdata char		ao_btm_buffer[256];
-int			ao_btm_ptr;
+uint16_t		ao_btm_ptr;
 char			ao_btm_dir;
 
 static void
@@ -84,6 +84,10 @@ ao_btm_dump(void)
 			putchar(ao_btm_buffer[i]);
 	}
 	putchar('\n');
+	ao_cmd_decimal();
+	if (ao_cmd_status == ao_cmd_success && ao_cmd_lex_i)
+		ao_btm_ptr = 0;
+	ao_cmd_status = ao_cmd_success;
 }
 
 static void
@@ -98,9 +102,44 @@ ao_btm_speed(void)
 		ao_cmd_status = ao_cmd_syntax_error;
 }
 
+static uint8_t	ao_btm_enable;
+
+static void
+ao_btm_do_echo(void)
+{
+	int	c;
+	while (ao_btm_enable) {
+		ao_arch_block_interrupts();
+		while ((c = _ao_serial_btm_pollchar()) == AO_READ_AGAIN && ao_btm_enable)
+			_ao_serial_btm_sleep();
+		ao_arch_release_interrupts();
+		if (c != AO_READ_AGAIN) {
+			putchar(c);
+			flush();
+		}
+	}
+	ao_exit();
+}
+
+static struct ao_task ao_btm_echo_task;
+
+static void
+ao_btm_send(void)
+{
+	int c;
+	ao_btm_enable = 1;
+	ao_add_task(&ao_btm_echo_task, ao_btm_do_echo, "btm-echo");
+	while ((c = getchar()) != '~') {
+		ao_serial_btm_putchar(c);
+	}
+	ao_btm_enable = 0;
+	ao_wakeup((void *) &ao_serial_btm_rx_fifo);
+}
+
 __code struct ao_cmds ao_btm_cmds[] = {
 	{ ao_btm_dump,		"d\0Dump btm buffer." },
 	{ ao_btm_speed,		"s <19200,57600>\0Set btm serial speed." },
+	{ ao_btm_send,		"S\0BTM interactive mode. ~ to exit." },
 	{ 0, NULL },
 };
 
@@ -260,6 +299,52 @@ ao_btm_try_speed(uint8_t speed)
 	return 0;
 }
 
+#if BT_LINK_ON_P2
+#define BT_PICTL_ICON	PICTL_P2ICON
+#define BT_PIFG		P2IFG
+#define BT_PDIR		P2DIR
+#define BT_PINP		P2INP
+#define BT_IEN2_PIE	IEN2_P2IE
+#define BT_CC1111	1
+#endif
+#if BT_LINK_ON_P1
+#define BT_PICTL_ICON	PICTL_P1ICON
+#define BT_PIFG		P1IFG
+#define BT_PDIR		P1DIR
+#define BT_PINP		P1INP
+#define BT_IEN2_PIE	IEN2_P1IE
+#define BT_CC1111	1
+#endif
+
+void
+ao_btm_check_link()
+{
+#if BT_CC1111
+	ao_arch_critical(
+		/* Check the pin and configure the interrupt detector to wait for the
+		 * pin to flip the other way
+		 */
+		if (BT_LINK_PIN) {
+			ao_btm_connected = 0;
+			PICTL |= BT_PICTL_ICON;
+		} else {
+			ao_btm_connected = 1;
+			PICTL &= ~BT_PICTL_ICON;
+		}
+		);
+#else
+	ao_arch_block_interrupts();
+	if (ao_gpio_get(AO_BTM_INT_PORT, AO_BTM_INT_PIN, AO_BTM_INT) == 0) {
+		ao_btm_connected = 1;
+	} else {
+		ao_btm_connected = 0;
+	}
+	ao_arch_release_interrupts();
+#endif
+}
+
+__xdata struct ao_task ao_btm_task;
+
 /*
  * A thread to initialize the bluetooth device and
  * hang around to blink the LED when connected
@@ -267,12 +352,6 @@ ao_btm_try_speed(uint8_t speed)
 void
 ao_btm(void)
 {
-#ifdef AO_BTM_RESET_PORT
-	ao_gpio_set(AO_BTM_RESET_PORT, AO_BTM_RESET_PIN, AO_BTM_RESET, 0);
-	ao_delay(AO_MS_TO_TICKS(20));
-	ao_gpio_set(AO_BTM_RESET_PORT, AO_BTM_RESET_PIN, AO_BTM_RESET, 1);
-#endif
-
 	/*
 	 * Wait for the bluetooth device to boot
 	 */
@@ -308,6 +387,13 @@ ao_btm(void)
 				    NULL);
 	ao_btm_echo(0);
 
+	/* Check current pin state */
+	ao_btm_check_link();
+
+#ifdef AO_BTM_INT_PORT
+	ao_exti_enable(AO_BTM_INT_PORT, AO_BTM_INT_PIN);
+#endif
+
 	for (;;) {
 		while (!ao_btm_connected)
 			ao_sleep(&ao_btm_connected);
@@ -318,43 +404,6 @@ ao_btm(void)
 	}
 }
 
-__xdata struct ao_task ao_btm_task;
-
-#if BT_LINK_ON_P2
-#define BT_PICTL_ICON	PICTL_P2ICON
-#define BT_PIFG		P2IFG
-#define BT_PDIR		P2DIR
-#define BT_PINP		P2INP
-#define BT_IEN2_PIE	IEN2_P2IE
-#define BT_CC1111	1
-#endif
-#if BT_LINK_ON_P1
-#define BT_PICTL_ICON	PICTL_P1ICON
-#define BT_PIFG		P1IFG
-#define BT_PDIR		P1DIR
-#define BT_PINP		P1INP
-#define BT_IEN2_PIE	IEN2_P1IE
-#define BT_CC1111	1
-#endif
-
-void
-ao_btm_check_link()
-{
-#if BT_CC1111
-	ao_arch_critical(
-		/* Check the pin and configure the interrupt detector to wait for the
-		 * pin to flip the other way
-		 */
-		if (BT_LINK_PIN) {
-			ao_btm_connected = 0;
-			PICTL |= BT_PICTL_ICON;
-		} else {
-			ao_btm_connected = 1;
-			PICTL &= ~BT_PICTL_ICON;
-		}
-		);
-#endif
-}
 
 #if BT_CC1111
 void
@@ -423,13 +472,6 @@ ao_btm_init (void)
 
 	/* Enable interrupts */
 	IEN2 |= BT_IEN2_PIE;
-#endif
-
-	/* Check current pin state */
-	ao_btm_check_link();
-
-#ifdef AO_BTM_INT_PORT
-	ao_exti_enable(AO_BTM_INT_PORT, AO_BTM_INT_PIN);
 #endif
 
 #if BT_LINK_ON_P2
