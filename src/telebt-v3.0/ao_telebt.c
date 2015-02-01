@@ -52,6 +52,8 @@ main(void)
 
 	ao_config_init();
 
+	ao_led_off(AO_LED_RED);
+
 	ao_start_scheduler();
 	return 0;
 }
