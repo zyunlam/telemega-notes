@@ -23,6 +23,10 @@
 #define USB_DEBUG_DATA	0
 #define USB_ECHO	0
 
+#ifndef AO_PA11_PA12_RMP
+#error "must define AO_PA11_PA12_RMP"
+#endif
+
 #ifndef USE_USB_STDIO
 #define USE_USB_STDIO	1
 #endif
@@ -1069,6 +1073,12 @@ __code struct ao_cmds ao_usb_cmds[] = {
 void
 ao_usb_init(void)
 {
+	/* Turn on syscfg */
+	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGCOMPEN);
+
+	/* Set PA11/PA12 remapping bit */
+	stm_syscfg.cfgr1 |= (AO_PA11_PA12_RMP << STM_SYSCFG_CFGR1_PA11_PA12_RMP);
+
 	ao_usb_enable();
 
 	debug ("ao_usb_init\n");
