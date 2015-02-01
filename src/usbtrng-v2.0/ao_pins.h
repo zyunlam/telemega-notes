@@ -40,8 +40,9 @@
 #define AO_APB_PRESCALER	1
 #define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
 
-#define HAS_USB		1
-#define AO_USB_DIRECTIO	1
+#define HAS_USB			1
+#define AO_USB_DIRECTIO		1
+#define AO_PA11_PA12_RMP	0
 
 #define IS_FLASH_LOADER	0
 
