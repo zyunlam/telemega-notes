@@ -49,12 +49,13 @@
 #define SERIAL_1_PA9_PA10	1
 
 #define HAS_SERIAL_2		1
-#define USE_SERIAL_2_STDIN	0
+#define USE_SERIAL_2_STDIN	1
+#define DELAY_SERIAL_2_STDIN	1
 #define USE_SERIAL_2_FLOW	1
 #define SERIAL_2_PA2_PA3	1
 #define SERIAL_2_PD5_PD6	0
 
-#define HAS_SERIAL_3		1
+#define HAS_SERIAL_3		0
 #define USE_SERIAL_3_STDIN	0
 #define SERIAL_3_PB10_PB11	1
 #define SERIAL_3_PC10_PC11	0
@@ -170,7 +171,7 @@ struct ao_adc {
 #define _ao_serial_btm_sleep	_ao_serial2_sleep
 #define ao_serial_btm_set_speed ao_serial2_set_speed
 #define ao_serial_btm_drain	ao_serial2_drain
-#define ao_serial_btm_rx_fifo	ao_serial2_rx_fifo
+#define ao_serial_btm_rx_fifo	(ao_stm_usart2.rx_fifo)
 
 #define AO_BTM_INT_PORT		(&stm_gpioa)
 #define AO_BTM_INT_PIN		15
