@@ -124,8 +124,6 @@ ao_adc_init(void);
 #define AO_USB_OUT_EP	2
 #define AO_USB_IN_EP	3
 
-extern uint8_t	ao_usb_out_avail;
-
 void
 ao_serial_init(void);
 

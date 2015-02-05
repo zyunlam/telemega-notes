@@ -80,12 +80,14 @@ static uint8_t	*ao_usb_ep0_setup_buffer;
 static uint8_t	*ao_usb_ep0_rx_buffer;
 
 /* Pointer to bulk data tx/rx buffers in USB memory */
-static uint8_t	*ao_usb_in_tx_buffer[2];
-static uint8_t	ao_usb_in_tx_cur;
+static uint8_t	*ao_usb_in_tx_buffer;
+static uint8_t	*ao_usb_out_rx_buffer;
+
+/* Our data buffers */
+static uint8_t	ao_usb_tx_buffer[AO_USB_IN_SIZE];
 static uint8_t	ao_usb_tx_count;
 
-static uint8_t	*ao_usb_out_rx_buffer[2];
-static uint8_t	ao_usb_out_rx_cur;
+static uint8_t	ao_usb_rx_buffer[AO_USB_OUT_SIZE];
 static uint8_t	ao_usb_rx_count, ao_usb_rx_pos;
 
 extern struct lpc_usb_endpoint lpc_usb_endpoint;
@@ -106,7 +108,7 @@ static uint8_t	ao_usb_in_pending;
 /* Marks when an OUT packet has been received by the hardware
  * but not pulled to the shadow buffer.
  */
-uint8_t		ao_usb_out_avail;
+static uint8_t	ao_usb_out_avail;
 uint8_t		ao_usb_running;
 static uint8_t	ao_usb_configuration;
 
@@ -360,16 +362,12 @@ ao_usb_set_configuration(void)
 
 	/* Set up the INT end point */
 	ao_usb_enable_epn(AO_USB_INT_EP, 0, NULL, 0, NULL);
-
+	
 	/* Set up the OUT end point */
-	ao_usb_enable_epn(AO_USB_OUT_EP, AO_USB_OUT_SIZE * 2, &ao_usb_out_rx_buffer[0], 0, NULL);
-	ao_usb_out_rx_buffer[1] = ao_usb_out_rx_buffer[0] + AO_USB_OUT_SIZE;
-	ao_usb_out_rx_cur = 0;
+	ao_usb_enable_epn(AO_USB_OUT_EP, AO_USB_OUT_SIZE, &ao_usb_out_rx_buffer, 0, NULL);
 
 	/* Set up the IN end point */
-	ao_usb_enable_epn(AO_USB_IN_EP, 0, NULL, AO_USB_IN_SIZE * 2, &ao_usb_in_tx_buffer[0]);
-	ao_usb_in_tx_buffer[1] = ao_usb_in_tx_buffer[0] + AO_USB_IN_SIZE;
-	ao_usb_in_tx_cur = 0;
+	ao_usb_enable_epn(AO_USB_IN_EP, 0, NULL, AO_USB_IN_SIZE, &ao_usb_in_tx_buffer);
 
 	ao_usb_running = 1;
 }
@@ -718,8 +716,8 @@ _ao_usb_in_send(void)
 	ao_usb_in_pending = 1;
 	if (ao_usb_tx_count != AO_USB_IN_SIZE)
 		ao_usb_in_flushed = 1;
-	ao_usb_set_ep(ao_usb_epn_in(AO_USB_IN_EP), ao_usb_in_tx_buffer[ao_usb_in_tx_cur], ao_usb_tx_count);
-	ao_usb_in_tx_cur = 1 - ao_usb_in_tx_cur;
+	memcpy(ao_usb_in_tx_buffer, ao_usb_tx_buffer, ao_usb_tx_count);
+	ao_usb_set_ep(ao_usb_epn_in(AO_USB_IN_EP), ao_usb_in_tx_buffer, ao_usb_tx_count);
 	ao_usb_tx_count = 0;
 	_tx_dbg0("in_send end");
 }
@@ -771,12 +769,10 @@ ao_usb_putchar(char c)
 
 	ao_arch_block_interrupts();
 	_ao_usb_in_wait();
-	ao_arch_release_interrupts();
 
 	ao_usb_in_flushed = 0;
-	ao_usb_in_tx_buffer[ao_usb_in_tx_cur][ao_usb_tx_count++] = (uint8_t) c;
+	ao_usb_tx_buffer[ao_usb_tx_count++] = (uint8_t) c;
 
-	ao_arch_block_interrupts();
 	/* Send the packet when full */
 	if (ao_usb_tx_count == AO_USB_IN_SIZE) {
 		_tx_dbg0("putchar full");
@@ -784,43 +780,6 @@ ao_usb_putchar(char c)
 		_tx_dbg0("putchar flushed");
 	}
 	ao_arch_release_interrupts();
-}
-
-void *
-ao_usb_alloc(uint16_t len)
-{
-	return ao_usb_alloc_sram(len);
-}
-
-void
-ao_usb_write(void *block, int len)
-{
-	uint8_t *b = block;
-	int this_time;
-
-	if (!ao_usb_running)
-		return;
-
-	if (!ao_usb_in_flushed)
-		ao_usb_flush();
-
-	while (len) {
-		ao_usb_in_flushed = 0;
-		this_time = AO_USB_IN_SIZE;
-		if (this_time > len)
-			this_time = len;
-		b += this_time;
-		len -= this_time;
-
-		ao_arch_block_interrupts();
-		while (ao_usb_in_pending)
-			ao_sleep(&ao_usb_in_pending);
-		ao_usb_in_pending = 1;
-		if (this_time != AO_USB_IN_SIZE)
-			ao_usb_in_flushed = 1;
-		ao_usb_set_ep(ao_usb_epn_in(AO_USB_IN_EP), b, this_time);
-		ao_arch_release_interrupts();
-	}
 }
 
 static void
@@ -833,12 +792,13 @@ _ao_usb_out_recv(void)
 
 	_rx_dbg1("out_recv count", ao_usb_rx_count);
 	debug ("recv %d\n", ao_usb_rx_count);
-	debug_data("Fill OUT len %d\n", ao_usb_rx_count);
+	debug_data("Fill OUT len %d:", ao_usb_rx_count);
+	memcpy(ao_usb_rx_buffer, ao_usb_out_rx_buffer, ao_usb_rx_count);
+	debug_data("\n");
 	ao_usb_rx_pos = 0;
-	ao_usb_rx_out_cur = 1 - ao_usb_rx_out_cur;
 
 	/* ACK the packet */
-	ao_usb_set_epn_out(AO_USB_OUT_EP, ao_usb_out_rx_buffer[1-ao_usb_rx_out_cur], AO_USB_OUT_SIZE);
+	ao_usb_set_epn_out(AO_USB_OUT_EP, ao_usb_out_rx_buffer, AO_USB_OUT_SIZE);
 }
 
 int
@@ -863,7 +823,7 @@ _ao_usb_pollchar(void)
 	}
 
 	/* Pull a character out of the fifo */
-	c = ao_usb_rx_buffer[ao_usb_rx_out_cur][ao_usb_rx_pos++];
+	c = ao_usb_rx_buffer[ao_usb_rx_pos++];
 	return c;
 }
 
