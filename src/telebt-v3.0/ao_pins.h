@@ -184,7 +184,7 @@ struct ao_adc {
 
 /* gets pretty close to 434.550 */
 
-#define AO_RADIO_CAL_DEFAULT 	0x6ca333
+#define AO_RADIO_CAL_DEFAULT 	5695485
 
 #define AO_FEC_DEBUG		0
 #define AO_CC1200_SPI_CS_PORT	(&stm_gpiob)
