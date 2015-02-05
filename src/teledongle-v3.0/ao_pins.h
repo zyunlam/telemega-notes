@@ -20,7 +20,7 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define AO_STACK_SIZE	324
+#define AO_STACK_SIZE	320
 
 #define HAS_TASK_QUEUE		1
 
