@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-/* Using TeleMetrum v1.9 board */
+/* Using TeleDongle v3.0 board */
 
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_

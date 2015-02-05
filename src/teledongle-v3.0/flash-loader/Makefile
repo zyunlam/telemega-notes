@@ -3,5 +3,5 @@
 #
 
 TOPDIR=../..
-HARDWARE=teledongle-v1.9
+HARDWARE=teledongle-v3.0
 include $(TOPDIR)/lpc/Makefile-flash.defs

@@ -42,13 +42,13 @@ ALTOS_SRC = \
 	ao_packet_master.c \
 	ao_packet.c
 
-PRODUCT=TeleDongle-v1.9
+PRODUCT=TeleDongle-v3.0
 PRODUCT_DEF=-DTELEDONGLE
 IDPRODUCT=0x000c
 
 CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS) -Os -g
 
-PROGNAME=teledongle-v1.9
+PROGNAME=teledongle-v3.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
 
