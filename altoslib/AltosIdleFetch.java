@@ -131,6 +131,7 @@ public class AltosIdleFetch implements AltosStateUpdate {
 
 	public void update_state(AltosState state) throws InterruptedException {
 		try {
+			/* Fetch config data from remote */
 			AltosConfigData config_data = new AltosConfigData(link);
 			state.set_state(AltosLib.ao_flight_startup);
 			state.set_serial(config_data.serial);

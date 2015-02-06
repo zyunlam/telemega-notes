@@ -93,6 +93,16 @@ public class AltosConfigData implements Iterable<String> {
 	/* HAS_GYRO */
 	public int	accel_zero_along, accel_zero_across, accel_zero_through;
 
+	/* ms5607 data */
+	public int	ms5607_reserved;
+	public int	ms5607_sens;
+	public int	ms5607_off;
+	public int	ms5607_tcs;
+	public int	ms5607_tco;
+	public int	ms5607_tref;
+	public int	ms5607_tempsens;
+	public int	ms5607_crc;
+
 	public static String get_string(String line, String label) throws  ParseException {
 		if (line.startsWith(label)) {
 			String	quoted = line.substring(label.length()).trim();
@@ -288,6 +298,15 @@ public class AltosConfigData implements Iterable<String> {
 		try { version = get_string(line, "software-version"); } catch (Exception e) {}
 
 		/* Version also contains MS5607 info, which we ignore here */
+
+		try { ms5607_reserved = get_int(line, "ms5607 reserved:"); } catch (Exception e) {}
+		try { ms5607_sens = get_int(line, "ms5607 sens:"); } catch (Exception e) {}
+		try { ms5607_off = get_int(line, "ms5607 off:"); } catch (Exception e) {}
+		try { ms5607_tcs = get_int(line, "ms5607 tcs:"); } catch (Exception e) {}
+		try { ms5607_tco = get_int(line, "ms5607 tco:"); } catch (Exception e) {}
+		try { ms5607_tref = get_int(line, "ms5607 tref:"); } catch (Exception e) {}
+		try { ms5607_tempsens = get_int(line, "ms5607 tempsens:"); } catch (Exception e) {}
+		try { ms5607_crc = get_int(line, "ms5607 crc:"); } catch (Exception e) {}
 
 		/* Config show replies */
 
