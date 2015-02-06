@@ -71,6 +71,29 @@ Section "FTDI USB Driver"
 	ExecWait $2
 SectionEnd
 
+Section "Install Driver" InstDriver
+
+	InstDrv::InitDriverSetup /NOUNLOAD {4D36E96D-E325-11CE-BFC1-08002BE10318} AltusMetrumSerial
+	Pop $0
+	DetailPrint "InitDriverSetup: $0"
+	InstDrv::DeleteOemInfFiles /NOUNLOAD
+	InstDrv::CreateDevice /NOUNLOAD
+
+	SetOutPath $INSTDIR
+	File "../altusmetrum.inf"
+	File "../altusmetrum.cat"
+
+	${DisableX64FSRedirection}
+	IfFileExists $WINDIR\System32\PnPutil.exe 0 nopnp
+		${DisableX64FSRedirection}
+		nsExec::ExecToLog '"$WINDIR\System32\PnPutil.exe" -i -a "$INSTDIR\altusmetrum.inf"'
+		Goto done
+nopnp:
+		InstDrv::InstallDriver /NOUNLOAD "$INSTDIR\altusmetrum.inf"
+done:
+
+SectionEnd
+
 Section "${REG_NAME} Application"
 	Call DetectJRE
 
