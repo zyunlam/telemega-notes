@@ -15,13 +15,31 @@ dist-hook: ChangeLog
 fat:
 	cd src && $(MAKE) all
 	cd doc && $(MAKE) all
-	cd libaltos && $(MAKE) all
+	cd libaltos && $(MAKE) fat
 	cd altoslib && $(MAKE) all
 	cd altosuilib && $(MAKE) all
 	cd icon && $(MAKE) fat
 	cd altosui && $(MAKE) fat
 	cd micropeak && $(MAKE) fat
 	cd telegps && $(MAKE) fat
+
+fat_linux = \
+	altosui/Altos-Linux-$(VERSION).sh altosui/Altos-Linux-$(VERSION).tar.bz2 \
+	telegps/TeleGPS-Linux-$(VERSION).sh telegps/TeleGPS-Linux-$(VERSION).tar.bz2 \
+	micropeak/MicroPeak-Linux-$(VERSION).sh micropeak/MicroPeak-Linux-$(VERSION).tar.bz2
+
+fat_mac = \
+	altosui/Altos-Mac-$(VERSION).dmg \
+	telegps/TeleGPS-Mac-$(VERSION).dmg \
+	micropeak/MicroPeak-Mac-$(VERSION).dmg
+
+fat_windows = \
+	altosui/Altos-Windows-$(VERSION_DASH).exe \
+	telegps/TeleGPS-Windows-$(VERSION_DASH).exe \
+	micropeak/MicroPeak-Windows-$(VERSION_DASH).exe
+
+keithp-fat: fat
+	scp -p $(fat_linux) $(fat_mac) $(fat_windows) keithp.com:public_html/altos-$(VERSION)
 
 set-java-versions:
 	$(top_srcdir)/fix-java-versions org.altusmetrum.altoslib=$(ALTOSLIB_VERSION) org.altusmetrum.altosuilib=$(ALTOSUILIB_VERSION)
