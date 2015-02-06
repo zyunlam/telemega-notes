@@ -113,7 +113,8 @@ LINUX_MIMETYPE	=\
 
 # Firmware
 FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
-FIRMWARE_TD=$(FIRMWARE_TD_0_2)
+FIRMWARE_TD_3_0=$(top_srcdir)/src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx
+FIRMWARE_TD=$(FIRMWARE_TD_0_2) $(FIRMWARE_TD_3_0)
 
 FIRMWARE_TM_1_0=$(top_srcdir)/src/telemetrum-v1.0/telemetrum-v1.0-$(VERSION).ihx
 FIRMWARE_TM_1_1=$(top_srcdir)/src/telemetrum-v1.1/telemetrum-v1.1-$(VERSION).ihx
