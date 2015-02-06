@@ -56,8 +56,8 @@ public class AltosFlashUI
 
 	private static String[] pair_programmed = {
 		"teleballoon",
-		"telebt",
-		"teledongle",
+		"telebt-v1",
+		"teledongle-v0",
 		"telefire",
 		"telemetrum-v0",
 		"telemetrum-v1",
