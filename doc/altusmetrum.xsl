@@ -22,7 +22,7 @@
       <surname>Towns</surname>
     </author>
     <copyright>
-      <year>2014</year>
+      <year>2015</year>
       <holder>Bdale Garbee and Keith Packard</holder>
     </copyright>
     <mediaobject>
@@ -40,6 +40,13 @@
       </para>
     </legalnotice>
     <revhistory>
+      <revision>
+	<revnumber>1.6</revnumber>
+	<date>8 January 2015</date>
+	<revremark>
+	  Major release adding TeleDongle v3.0 support.
+	</revremark>
+      </revision>
       <revision>
 	<revnumber>1.5</revnumber>
 	<date>6 September 2014</date>
@@ -215,13 +222,15 @@ NAR #88757, TRA #12200
       channels and integrated gyroscopes for staging/air-start inhibit.
     </para>
     <para>
-      TeleDongle was our first ground station, providing a USB to RF
+      TeleDongle v0.2 was our first ground station, providing a USB to RF
       interfaces for communicating with the altimeters. Combined with
       your choice of antenna and notebook computer, TeleDongle and our
       associated user interface software form a complete ground
       station capable of logging and displaying in-flight telemetry,
       aiding rocket recovery, then processing and archiving flight
-      data for analysis and review.
+      data for analysis and review. The latest version, TeleDongle
+      v3, has all new electronics with a higher performance radio
+      for improved range.
     </para>
     <para>
       For a slightly more portable ground station experience that also
@@ -2760,9 +2769,12 @@ NAR #88757, TRA #12200
         <listitem>
           <para>
             The Received Signal Strength Indicator value. This lets
-            you know how strong a signal TeleDongle is receiving. The
-            radio inside TeleDongle operates down to about -99dBm;
-            weaker signals may not be receivable. The packet link uses
+            you know how strong a signal TeleDongle is receiving. At
+            the default data rate, 38400 bps, in bench testing, the
+            radio inside TeleDongle v0.2 operates down to about
+            -106dBm, while the v3 radio works down to about -111dBm.
+            Weaker signals, or an environment with radio noise may
+            cause the data to not be received. The packet link uses
             error detection and correction techniques which prevent
             incorrect data from being reported.
           </para>
@@ -3768,12 +3780,13 @@ NAR #88757, TRA #12200
       <title>Flash Image</title>
       <para>
         This reprograms Altus Metrum devices with new
-        firmware. TeleMetrum v1.x, TeleDongle, TeleMini and TeleBT are
-        all reprogrammed by using another similar unit as a
-        programming dongle (pair programming). TeleMega, EasyMega, TeleMetrum v2
-        and EasyMini are all programmed directly over their USB ports
-        (self programming).  Please read the directions for flashing
-        devices in the Updating Device Firmware chapter below.
+        firmware. TeleMetrum v1.x, TeleDongle v0.2, TeleMini and
+        TeleBT are all reprogrammed by using another similar unit as a
+        programming dongle (pair programming). TeleMega, EasyMega,
+        TeleMetrum v2, EasyMini and TeleDongle v3 are all programmed
+        directly over their USB ports (self programming).  Please read
+        the directions for flashing devices in the Updating Device
+        Firmware chapter below.
       </para>
     </section>
     <section>
@@ -4496,11 +4509,12 @@ NAR #88757, TRA #12200
   <chapter>
     <title>Updating Device Firmware</title>
     <para>
-      TeleMega, TeleMetrum v2, EasyMega and EasyMini are all programmed directly
-      over their USB connectors (self programming). TeleMetrum v1, TeleMini and
-      TeleDongle are all programmed by using another device as a
-      programmer (pair programming). It's important to recognize which
-      kind of devices you have before trying to reprogram them.
+      TeleMega, TeleMetrum v2, EasyMega, EasyMini and TeleDongle v3
+      are all programmed directly over their USB connectors (self
+      programming). TeleMetrum v1, TeleMini and TeleDongle v0.2 are
+      all programmed by using another device as a programmer (pair
+      programming). It's important to recognize which kind of devices
+      you have before trying to reprogram them.
     </para>
     <para>
       You may wish to begin by ensuring you have current firmware images.
@@ -4512,7 +4526,7 @@ NAR #88757, TRA #12200
       version from <ulink url="http://www.altusmetrum.org/AltOS/"/>.
     </para>
     <para>
-      If you need to update the firmware on a TeleDongle, we recommend 
+      If you need to update the firmware on a TeleDongle v0.2, we recommend 
       updating the altimeter first, before updating TeleDongle.  However,
       note that TeleDongle rarely need to be updated.  Any firmware version
       1.0.1 or later will work, version 1.2.1 may have improved receiver
@@ -4524,12 +4538,13 @@ NAR #88757, TRA #12200
     </para>
     <section>
       <title>
-	Updating TeleMega, TeleMetrum v2, EasyMega or EasyMini Firmware
+	Updating TeleMega, TeleMetrum v2, EasyMega, EasyMini or
+	TeleDongle v3 Firmware
       </title>
       <orderedlist inheritnum='inherit' numeration='arabic'>
 	<listitem>
 	  <para>
-	    Attach a battery and power switch to the target
+	    Attach a battery if necessary and power switch to the target
 	    device. Power up the device.
 	  </para>
 	</listitem>
@@ -4573,7 +4588,8 @@ NAR #88757, TRA #12200
 	<listitem>
 	  <para>
 	    Verify that the device is working by using the 'Configure
-	    Altimeter' item to check over the configuration.
+	    Altimeter' or 'Configure Groundstation' item to check over
+	    the configuration.
 	  </para>
 	</listitem>
       </orderedlist>
@@ -4645,6 +4661,17 @@ NAR #88757, TRA #12200
 	      </para>
 	    </listitem>
 	  </varlistentry>
+	  <varlistentry>
+	    <term>TeleDongle v3</term>
+	    <listitem>
+	      <para>
+		Connect pin 32 on the CPU to ground. Pin 32 is closest
+		to the USB wires on the row of pins towards the center
+		of the board. Ground is available on the capacitor
+		next to it, on the end towards the USB wires.
+	      </para>
+	    </listitem>
+	  </varlistentry>
 	</variablelist>
 	<para>
 	  Once you've located the right pins:
@@ -4696,10 +4723,10 @@ NAR #88757, TRA #12200
       <title>Pair Programming</title>
       <para>
 	The big concept to understand is that you have to use a
-	TeleMega, TeleMetrum or TeleDongle as a programmer to update a
-	pair programmed device. Due to limited memory resources in the
-	cc1111, we don't support programming directly over USB for these
-	devices.
+	TeleMetrum v1.0, TeleBT v1.0 or TeleDongle v0.2 as a
+	programmer to update a pair programmed device. Due to limited
+	memory resources in the cc1111, we don't support programming
+	directly over USB for these devices.
       </para>
     </section>
     <section>
@@ -4714,14 +4741,14 @@ NAR #88757, TRA #12200
         </listitem>
         <listitem>
 	  <para>
-          Take the 2 screws out of the TeleDongle case to get access
-          to the circuit board.
+          Take the 2 screws out of the TeleDongle v0.2 or TeleBT v1.0
+          case to get access to the circuit board.
 	  </para>
         </listitem>
         <listitem>
 	  <para>
           Plug the 8-pin end of the programming cable to the
-          matching connector on the TeleDongle, and the 4-pin end to the
+          matching connector on the TeleDongle v0.2 or TeleBT v1.0, and the 4-pin end to the
           matching connector on the TeleMetrum.
 	  Note that each MicroMaTch connector has an alignment pin that
 	  goes through a hole in the PC board when you have the cable
@@ -4735,7 +4762,7 @@ NAR #88757, TRA #12200
         </listitem>
         <listitem>
 	  <para>
-          Plug the TeleDongle into your computer's USB port, and power
+          Plug the TeleDongle v0.2 or TeleBT v1.0 into your computer's USB port, and power
           up the TeleMetrum.
 	  </para>
         </listitem>
@@ -4746,7 +4773,7 @@ NAR #88757, TRA #12200
         </listitem>
         <listitem>
 	  <para>
-          Pick the TeleDongle device from the list, identifying it as the
+          Pick the TeleDongle v0.2 or TeleBT v1.0 device from the list, identifying it as the
           programming device.
 	  </para>
         </listitem>
@@ -4798,14 +4825,14 @@ NAR #88757, TRA #12200
 </listitem>
         <listitem>
 <para>
-          Take the 2 screws out of the TeleDongle case to get access
+          Take the 2 screws out of the TeleDongle v0.2 or TeleBT v1.0 case to get access
           to the circuit board.
         </para>
 </listitem>
         <listitem>
 <para>
           Plug the 8-pin end of the programming cable to the matching
-          connector on the TeleDongle, and the 4-pins into the holes
+          connector on the TeleDongle v0.2 or TeleBT v1.0, and the 4-pins into the holes
           in the TeleMini circuit board.  Note that the MicroMaTch
           connector has an alignment pin that goes through a hole in
           the PC board when you have the cable oriented correctly, and
@@ -4820,7 +4847,7 @@ NAR #88757, TRA #12200
 </listitem>
         <listitem>
 <para>
-          Plug the TeleDongle into your computer's USB port, and power
+          Plug the TeleDongle v0.2 or TeleBT v1.0 into your computer's USB port, and power
           up the TeleMini
         </para>
 </listitem>
@@ -4831,7 +4858,7 @@ NAR #88757, TRA #12200
 </listitem>
         <listitem>
 <para>
-          Pick the TeleDongle device from the list, identifying it as the
+          Pick the TeleDongle v0.2 or TeleBT v1.0 device from the list, identifying it as the
           programming device.
         </para>
 </listitem>
@@ -4871,10 +4898,12 @@ NAR #88757, TRA #12200
       </orderedlist>
     </section>
     <section>
-      <title>Updating TeleDongle Firmware</title>
+      <title>Updating TeleDongle v0.2 Firmware</title>
       <para>
-        Updating TeleDongle's firmware is just like updating TeleMetrum or TeleMini
-	firmware, but you use either a TeleMetrum or another TeleDongle as the programmer.
+        Updating TeleDongle v0.2 firmware is just like updating
+	TeleMetrum v1.x or TeleMini
+	firmware, but you use either a TeleMetrum v1.x, TeleDongle
+	v0.2 or TeleBT v1.0 as the programmer.
 	</para>
       <orderedlist inheritnum='inherit' numeration='arabic'>
         <listitem>
@@ -4887,12 +4916,13 @@ NAR #88757, TRA #12200
         <listitem>
 <para>
 	  Find the USB cable that you got as part of the starter kit, and
-	  plug the “mini” end in to the mating connector on TeleMetrum or TeleDongle.
+	  plug the “mini” end in to the mating connector on TeleMetrum
+	  v1.x, TeleDongle v0.2 or TeleBT v1.0.
         </para>
 </listitem>
         <listitem>
 <para>
-          Take the 2 screws out of the TeleDongle case to get access
+          Take the 2 screws out of the TeleDongle v0.2 or TeleBT v1.0 case to get access
           to the circuit board.
         </para>
 </listitem>
@@ -4900,7 +4930,7 @@ NAR #88757, TRA #12200
 <para>
           Plug the 8-pin end of the programming cable to the
           matching connector on the programmer, and the 4-pin end to the
-          matching connector on the TeleDongle.
+          matching connector on the TeleDongle v0.2.
 	  Note that each MicroMaTch connector has an alignment pin that
 	  goes through a hole in the PC board when you have the cable
 	  oriented correctly.
@@ -4908,7 +4938,7 @@ NAR #88757, TRA #12200
 </listitem>
         <listitem>
 <para>
-          Attach a battery to the TeleMetrum board if you're using one.
+          Attach a battery to the TeleMetrum v1.x board if you're using one.
         </para>
 </listitem>
         <listitem>
@@ -4930,7 +4960,7 @@ NAR #88757, TRA #12200
 </listitem>
         <listitem>
 <para>
-          Select the image you want put on the TeleDongle, which should have a
+          Select the image you want put on the TeleDongle v0.2, which should have a
           name in the form teledongle-v0.2-1.0.0.ihx.  It should be visible
 	in the default directory, if not you may have to poke around
 	your system to find it.
@@ -4940,7 +4970,8 @@ NAR #88757, TRA #12200
 <para>
           Make sure the configuration parameters are reasonable
           looking. If the serial number and/or RF configuration
-          values aren't right, you'll need to change them.  The TeleDongle
+          values aren't right, you'll need to change them.  The
+	  TeleDongle v0.2
 	  serial number is on the “bottom” of the circuit board, and can
 	  usually be read through the translucent blue plastic case without
 	  needing to remove the board from the case.
@@ -4949,16 +4980,16 @@ NAR #88757, TRA #12200
         <listitem>
 <para>
           Hit the 'OK' button and the software should proceed to flash
-          the TeleDongle with new firmware, showing a progress bar.
+          the TeleDongle v0.2 with new firmware, showing a progress bar.
         </para>
 </listitem>
         <listitem>
 <para>
-          Confirm that the TeleDongle board seems to have updated OK, which you
+          Confirm that the TeleDongle v0.2 board seems to have updated OK, which you
           can do by plugging in to it over USB and using a terminal program
           to connect to the board and issue the 'v' command to check
           the version, etc.  Once you're happy, remove the programming cable
-	  and put the cover back on the TeleDongle.
+	  and put the cover back on the TeleDongle v0.2.
         </para>
 </listitem>
         <listitem>
@@ -5849,7 +5880,7 @@ NAR #88757, TRA #12200
 	  the die before something breaks.
 	</para>
 	<para>
-	  Cutting to the chase, the Si7232DN specs are 25 amps *continuous* at
+	  Cutting to the chase, the Si7232DN specs are 25 amps <emphasis>continuous</emphasis> at
 	  20V at a temperature of 25C.  In pulsed mode, they're rated for 40A.
 	  However, those specs are a little mis-leading because it really is 
 	  all about the heat generated... you can get something like 85A 
@@ -5885,10 +5916,10 @@ NAR #88757, TRA #12200
   <appendix>
     <title>Release Notes</title>
     <simplesect>
-      <title>Version 1.4.1</title>
+      <title>Version 1.6</title>
       <xi:include
 	  xmlns:xi="http://www.w3.org/2001/XInclude"
-	  href="release-notes-1.4.1.xsl"
+	  href="release-notes-1.6.xsl"
 	  xpointer="xpointer(/article/*)"/>
     </simplesect>
     <simplesect>
@@ -5896,6 +5927,13 @@ NAR #88757, TRA #12200
       <xi:include
 	  xmlns:xi="http://www.w3.org/2001/XInclude"
 	  href="release-notes-1.5.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
+    <simplesect>
+      <title>Version 1.4.1</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.4.1.xsl"
 	  xpointer="xpointer(/article/*)"/>
     </simplesect>
     <simplesect>
