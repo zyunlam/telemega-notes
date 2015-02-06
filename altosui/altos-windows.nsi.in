@@ -108,7 +108,7 @@ Section "${REG_NAME} Application"
 
 	File "../icon/${WIN_APP_ICON}"
 
-	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$SYSDIR\javaw.exe" "-jar ${FAT_NAME}" "$INSTDIR\${WIN_APP_ICON}"
+	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$INSTDIR\${FAT_NAME}" "" "$INSTDIR\${WIN_APP_ICON}"
 SectionEnd
 
 Section "${REG_NAME} Desktop Shortcut"
@@ -164,13 +164,15 @@ Section "File Associations"
 	DeleteRegKey   HKCR ".telem\${PROG_ID_EEPROM}"
 	DeleteRegValue HKCR ".telem\OpenWithProgids" "${PROG_ID_EEPROM}"
 
+	SearchPath $1 "javaw.exe"
+
 	; .eeprom elements
 
 	WriteRegStr HKCR "${PROG_ID_EEPROM}"		""				"Altus Metrum Log File"
 	WriteRegStr HKCR "${PROG_ID_EEPROM}"		"FriendlyTypeName"		"Altus Metrum Log File"
 	WriteRegStr HKCR "${PROG_ID_EEPROM}\CurVer"	""				"${PROG_ID_EEPROM}"
 	WriteRegStr HKCR "${PROG_ID_EEPROM}\DefaultIcon" ""				'"$INSTDIR\${WIN_EEPROM_EXE}",-101'
-  WriteRegExpandStr HKCR "${PROG_ID_EEPROM}\shell\open\command" ""			'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
+  WriteRegExpandStr HKCR "${PROG_ID_EEPROM}\shell\open\command" ""			'"$1" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
 
 	WriteRegStr HKCR ".eeprom"			""				"${PROG_ID_EEPROM}"
 	WriteRegStr HKCR ".eeprom"			"PerceivedType"			"Altus Metrum Log File"
@@ -185,7 +187,7 @@ Section "File Associations"
 	WriteRegStr HKCR "${PROG_ID_TELEM}"		"FriendlyTypeName"		"Altus Metrum Telemetry File"
 	WriteRegStr HKCR "${PROG_ID_TELEM}\CurVer"	""				"${PROG_ID_TELEM}"
 	WriteRegStr HKCR "${PROG_ID_TELEM}\DefaultIcon" ""				'"$INSTDIR\${WIN_TELEM_EXE}",-101'
-  WriteRegExpandStr HKCR "${PROG_ID_TELEM}\shell\open\command" ""			'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
+  WriteRegExpandStr HKCR "${PROG_ID_TELEM}\shell\open\command" ""			'"$1" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
 
 	WriteRegStr HKCR ".telem"			""				"${PROG_ID_TELEM}"
 	WriteRegStr HKCR ".telem"			"PerceivedType"			"Altus Metrum Telemetry File"
