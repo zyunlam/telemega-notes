@@ -75,11 +75,17 @@ public class MicroUSB extends altos_device implements AltosDevice {
 		return libaltos.altos_open(this);
 	}
 
-	private boolean isMicro() {
+	private boolean isFTDI() {
 		int vid = getVendor();
 		int pid = getProduct();
 		if (vid == 0x0403 && pid == 0x6015)
 			return true;
+		return false;
+	}
+
+	private boolean isMicro() {
+		int vid = getVendor();
+		int pid = getProduct();
 		if (vid == AltosLib.vendor_altusmetrum &&
 		    pid == AltosLib.product_mpusb)
 			return true;
@@ -87,16 +93,32 @@ public class MicroUSB extends altos_device implements AltosDevice {
 	}
 
 	public boolean matchProduct(int product) {
-		return isMicro();
+		return isFTDI() || isMicro();
 	}
 
 	static java.util.List<MicroUSB> list() {
 		if (!load_library())
 			return null;
 
-		SWIGTYPE_p_altos_list list = libaltos.altos_ftdi_list_start();
-
 		ArrayList<MicroUSB> device_list = new ArrayList<MicroUSB>();
+
+		SWIGTYPE_p_altos_list list;
+
+		list = libaltos.altos_ftdi_list_start();
+
+		if (list != null) {
+			for (;;) {
+				MicroUSB device = new MicroUSB();
+				if (libaltos.altos_list_next(list, device) == 0)
+					break;
+				if (device.isFTDI())
+					device_list.add(device);
+			}
+			libaltos.altos_list_finish(list);
+		}
+
+		list = libaltos.altos_list_start();
+
 		if (list != null) {
 			for (;;) {
 				MicroUSB device = new MicroUSB();
