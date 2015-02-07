@@ -19,130 +19,56 @@
 
 static uint8_t		ao_spi_mutex[LPC_NUM_SPI];
 
-struct ao_lpc_ssp_state {
-	int		tx_count;
-	const uint8_t	*tx;
-	int		tx_inc;
-	int		rx_count;
-	uint8_t		*rx;
-	int		rx_inc;
-};
-
-static struct ao_lpc_ssp_state ao_lpc_ssp_state[LPC_NUM_SPI];
-
 static struct lpc_ssp * const ao_lpc_ssp[LPC_NUM_SPI] = { &lpc_ssp0, &lpc_ssp1 };
 
-static inline void
-ao_lpc_ssp_recv(struct lpc_ssp *lpc_ssp, struct ao_lpc_ssp_state *state)
-{
-	while ((lpc_ssp->sr & (1 << LPC_SSP_SR_RNE)) &&
-	       state->rx_count)
-	{
-		/* RX ready, read a byte */
-		*state->rx = lpc_ssp->dr;
-		state->rx += state->rx_inc;
-		state->rx_count--;
-	}
-}
-
-static void
-ao_lpc_ssp_isr(struct lpc_ssp *lpc_ssp, struct ao_lpc_ssp_state *state)
-{
-	ao_lpc_ssp_recv(lpc_ssp, state);
-	while ((lpc_ssp->sr & (1 << LPC_SSP_SR_TNF)) &&
-	       state->tx_count)
-	{
-		/* TX ready, write a byte */
-		lpc_ssp->dr = *state->tx;
-		state->tx += state->tx_inc;
-		state->tx_count--;
-		ao_lpc_ssp_recv(lpc_ssp, state);
-	}
-	if (!state->rx_count) {
-		lpc_ssp->imsc &= ~(1 << LPC_SSP_IMSC_TXIM);
-		ao_wakeup(state);
-	}
-}
-
-void
-lpc_ssp0_isr(void)
-{
-	ao_lpc_ssp_isr(&lpc_ssp0, &ao_lpc_ssp_state[0]);
-}
-
-void
-lpc_ssp1_isr(void)
-{
-	ao_lpc_ssp_isr(&lpc_ssp1, &ao_lpc_ssp_state[1]);
-}
-
-static void
-ao_spi_run(struct lpc_ssp *lpc_ssp, struct ao_lpc_ssp_state *state)
-{
-	ao_arch_block_interrupts();
-	lpc_ssp->imsc = (1 << LPC_SSP_IMSC_TXIM);
-	while (state->rx_count)
-		ao_sleep(state);
-	ao_arch_release_interrupts();
-}
-
-static uint8_t	ao_spi_tx_dummy = 0xff;
-static uint8_t	ao_spi_rx_dummy;
+#define spi_loop(len, put, get) do {					\
+		while (len--) {						\
+			/* send a byte */				\
+			lpc_ssp->dr = put;				\
+			/* wait for the received byte to appear */	\
+			while ((lpc_ssp->sr & (1 << LPC_SSP_SR_RNE)) == 0) \
+				;					\
+			/* receive a byte */				\
+			get lpc_ssp->dr;				\
+		}							\
+		/* Wait for the SSP to go idle (it already should be) */ \
+		while (lpc_ssp->sr & (1 << LPC_SSP_SR_BSY));		\
+	} while (0)
 
 void
 ao_spi_send(const void *block, uint16_t len, uint8_t id)
 {
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
-	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
+	const uint8_t	*o = block;
 
-	state->tx_count = state->rx_count = len;
-	state->tx = block;
-	state->tx_inc = 1;
-	state->rx = &ao_spi_rx_dummy;
-	state->rx_inc = 0;
-	ao_spi_run(lpc_ssp, state);
+	spi_loop(len, *o++, (void));
 }
 
 void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t id)
 {
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
-	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
 
-	state->tx_count = state->rx_count = len;
-	state->tx = &value;
-	state->tx_inc = 0;
-	state->rx = &ao_spi_rx_dummy;
-	state->rx_inc = 0;
-	ao_spi_run(lpc_ssp, state);
+	spi_loop(len, value, (void));
 }
 
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t id)
 {
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
-	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
+	uint8_t *i = block;
 
-	state->tx_count = state->rx_count = len;
-	state->tx = &ao_spi_tx_dummy;
-	state->tx_inc = 0;
-	state->rx = block;
-	state->rx_inc = 1;
-	ao_spi_run(lpc_ssp, state);
+	spi_loop(len, 0xff, *i++ =);
 }
 
 void
 ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t id)
 {
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
-	struct ao_lpc_ssp_state *state = &ao_lpc_ssp_state[id];
+	const uint8_t *o = out;
+	uint8_t *i = in;
 
-	state->tx_count = state->rx_count = len;
-	state->tx = out;
-	state->tx_inc = 1;
-	state->rx = in;
-	state->rx_inc = 1;
-	ao_spi_run(lpc_ssp, state);
+	spi_loop(len, *o++, *i++ =);
 }
 
 void
@@ -223,10 +149,6 @@ ao_spi_init(void)
 	lpc_scb.presetctrl &= ~(1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	ao_spi_channel_init(0);
-
-	/* Configure NVIC */
-	lpc_nvic_set_enable(LPC_ISR_SSP0_POS);
-	lpc_nvic_set_priority(LPC_ISR_SSP0_POS, 0);
 #endif
 
 #if HAS_SPI_1
@@ -277,10 +199,5 @@ ao_spi_init(void)
 	lpc_scb.presetctrl &= ~(1 << LPC_SCB_PRESETCTRL_SSP1_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP1_RST_N);
 	ao_spi_channel_init(1);
-
-	/* Configure NVIC */
-	lpc_nvic_set_enable(LPC_ISR_SSP1_POS);
-	lpc_nvic_set_priority(LPC_ISR_SSP1_POS, 0);
-
 #endif /* HAS_SPI_1 */
 }
