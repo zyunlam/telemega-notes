@@ -37,6 +37,7 @@ public class AltosFlightStats {
 	public double		pad_lat, pad_lon;
 	public boolean		has_flight_data;
 	public boolean		has_gps;
+	public boolean		has_gps_sats;
 	public boolean		has_flight_adc;
 	public boolean		has_battery;
 	public boolean		has_rssi;
@@ -113,6 +114,7 @@ public class AltosFlightStats {
 		lat = lon = AltosLib.MISSING;
 		has_flight_data = false;
 		has_gps = false;
+		has_gps_sats = false;
 		has_flight_adc = false;
 		has_battery = false;
 		has_rssi = false;
@@ -174,6 +176,8 @@ public class AltosFlightStats {
 				lat = state.gps.lat;
 				lon = state.gps.lon;
 				has_gps = true;
+				if (state.gps.cc_gps_sat != null)
+					has_gps_sats = true;
 			}
 			if (state.imu != null)
 				has_imu = true;

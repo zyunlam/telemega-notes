@@ -329,12 +329,14 @@ public class AltosGraph extends AltosUIGraph {
 				  gps_nsat_solution_color,
 				  false,
 				  nsat_axis);
-			addSeries("GPS Satellites in View",
-				  AltosGraphDataPoint.data_gps_nsat_view,
-				  nsat_units,
-				  gps_nsat_view_color,
-				  false,
-				  nsat_axis);
+			if (stats.has_gps_sats) {
+				addSeries("GPS Satellites in View",
+					  AltosGraphDataPoint.data_gps_nsat_view,
+					  nsat_units,
+					  gps_nsat_view_color,
+					  false,
+					  nsat_axis);
+			}
 			addSeries("GPS Course",
 				  AltosGraphDataPoint.data_gps_course,
 				  orient_units,
