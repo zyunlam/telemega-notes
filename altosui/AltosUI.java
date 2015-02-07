@@ -463,7 +463,7 @@ public class AltosUI extends AltosUIFrame {
 		AltosStateIterable states = record_iterable(file);
 		if (states == null)
 			return null;
-		return new AltosReplayReader(states.iterator(), file, true);
+		return new AltosReplayReader(states.iterator(), file);
 	}
 
 	static boolean process_replay(File file) {
