@@ -254,7 +254,10 @@ public class AltosEepromDownload implements Runnable {
 		flights = given_flights;
 		success = false;
 
-		monitor.set_states(AltosLib.ao_flight_boost, AltosLib.ao_flight_landed);
+		if (flights.config_data.log_has_state())
+			monitor.set_states(AltosLib.ao_flight_boost, AltosLib.ao_flight_landed);
+		else
+			monitor.set_states(AltosLib.ao_flight_invalid, AltosLib.ao_flight_invalid);
 
 		monitor.start();
 	}

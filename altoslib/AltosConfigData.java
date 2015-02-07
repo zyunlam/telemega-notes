@@ -577,6 +577,14 @@ public class AltosConfigData implements Iterable<String> {
 		dest.set_tracker_interval(tracker_interval);
 	}
 
+	public boolean log_has_state() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEGPS:
+			return false;
+		}
+		return true;
+	}
+
 	public void save(AltosLink link, boolean remote) throws InterruptedException, TimeoutException {
 
 		/* HAS_FLIGHT */
