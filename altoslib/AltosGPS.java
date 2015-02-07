@@ -378,6 +378,7 @@ public class AltosGPS implements Cloneable, Serializable {
 
 	public AltosGPS (AltosLink link, AltosConfigData config_data) throws TimeoutException, InterruptedException {
 		boolean says_done = config_data.compare_version("1.0") >= 0;
+		init();
 		link.printf("g\n");
 		for (;;) {
 			String line = link.get_reply_no_dialog(5000);
