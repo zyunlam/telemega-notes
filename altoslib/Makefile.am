@@ -90,6 +90,7 @@ altoslib_JAVA = \
 	AltosSensorTMini.java \
 	AltosSensorMega.java \
 	AltosSensorMetrum.java \
+	AltosSensorTGPS.java \
 	AltosState.java \
 	AltosStateIterable.java \
 	AltosStateUpdate.java \
