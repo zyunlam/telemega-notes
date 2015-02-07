@@ -17,7 +17,7 @@
 
 #include "ao.h"
 
-static char
+static int
 ao_packet_getchar(void)
 {
 	int c;
