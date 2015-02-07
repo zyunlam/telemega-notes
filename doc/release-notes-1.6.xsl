@@ -42,6 +42,13 @@
 	  received.
 	</para>
       </listitem>
+      <listitem>
+	<para>
+	  Replace LPC11U14 SPI driver with non-interrupt version. The
+	  interrupt code would occasionally wedge on long transfers
+	  if interrupts were blocked for too long.
+	</para>
+      </listitem>
     </itemizedlist>
   </para>
   <para>
@@ -74,6 +81,37 @@
 	  Show the 'Connecting' dialog when using Monitor Idle. Lets
 	  you cancel the Monitor Idle startup when connecting over the
 	  radio link.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Make 'Monitor Idle' work for TeleGPS devices when connected
+	  over USB. It's nice for testing without needing to broadcast
+	  over the radio.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Use different Windows API to discover USB devices. This
+	  works better on my Windows 7 box, and will be used if the
+	  older API fails to provide the necessary information.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Look in more places in the registry to try and identify the
+	  installed Java version on Windows. If you install the
+	  default 32-bit version of Windows on a 64-bit OS, the Java
+	  registry information is hiding \SOFTWARE\Wow6432Node for
+	  some reason.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fix file association on Windows by searching for the
+	  javaw.exe program instead of assuming it is in
+	  %SYSTEMROOT%. This makes double-clicking on Altus Metrum
+	  data files in the file manager work correctly.
 	</para>
       </listitem>
     </itemizedlist>
