@@ -22,9 +22,11 @@ import java.io.*;
 public class AltosListenerState implements Serializable {
 	public int	crc_errors;
 	public double	battery;
+	public boolean	running;
 
 	public AltosListenerState() {
 		crc_errors = 0;
 		battery = AltosLib.MISSING;
+		running = true;
 	}
 }

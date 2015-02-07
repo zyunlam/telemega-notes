@@ -168,8 +168,10 @@ public class TeleGPSDisplayThread extends Thread {
 			for (;;) {
 				try {
 					state = reader.read();
-					if (state == null)
+					if (state == null) {
+						listener_state.running = false;
 						break;
+					}
 					reader.update(state);
 					show_safely();
 					told = tell();

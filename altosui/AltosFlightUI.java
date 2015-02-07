@@ -97,6 +97,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 
 	public void show(AltosState state, AltosListenerState listener_state) {
 		status_update.saved_state = state;
+		status_update.saved_listener_state = listener_state;
 
 		if (state == null)
 			state = new AltosState();
@@ -335,9 +336,14 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		AltosUIPreferences.register_font_listener(this);
 		AltosPreferences.register_units_listener(this);
 
+		status_update = new AltosFlightStatusUpdate(flightStatus);
+
+		flightStatus.start(status_update);
+
 		addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
+					flightStatus.stop();
 					disconnect();
 					setVisible(false);
 					dispose();
@@ -352,10 +358,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		setVisible(true);
 
 		thread = new AltosDisplayThread(this, voice, this, reader);
-
-		status_update = new AltosFlightStatusUpdate(flightStatus);
-
-		new javax.swing.Timer(100, status_update).start();
 
 		thread.start();
 	}
