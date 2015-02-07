@@ -141,7 +141,7 @@ public class AltosIdleFetch implements AltosStateUpdate {
 		try {
 			/* Fetch config data from remote */
 			AltosConfigData config_data = new AltosConfigData(link);
-			state.set_state(AltosLib.ao_flight_startup);
+			state.set_state(AltosLib.ao_flight_stateless);
 			state.set_serial(config_data.serial);
 			state.set_callsign(config_data.callsign);
 			state.set_ground_accel(config_data.accel_cal_plus);
