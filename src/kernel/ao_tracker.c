@@ -132,7 +132,7 @@ ao_tracker(void)
 					if (height < 0)
 						height = -height;
 
-					if (ao_tracker_force_telem)
+					if (ao_tracker_force_telem > 1)
 						printf("head %d ring %d ground_distance %d height %d\n", gps_head, ring, ground_distance, height);
 					if (ground_distance > ao_config.tracker_motion ||
 					    height > (ao_config.tracker_motion << 1))
@@ -141,7 +141,7 @@ ao_tracker(void)
 						break;
 					}
 				}
-				if (ao_tracker_force_telem) {
+				if (ao_tracker_force_telem > 1) {
 					printf ("moving %d started %d\n", moving, log_started);
 					flush();
 				}
@@ -191,11 +191,9 @@ static struct ao_task ao_tracker_task;
 static void
 ao_tracker_set_telem(void)
 {
-	uint8_t	telem;
 	ao_cmd_hex();
-	telem = ao_cmd_lex_i;
 	if (ao_cmd_status == ao_cmd_success)
-		ao_tracker_force_telem = telem;
+		ao_tracker_force_telem = ao_cmd_lex_i;
 	ao_cmd_status = ao_cmd_success;
 	printf ("flight: %d\n", ao_flight_number);
 	printf ("force_telem: %d\n", ao_tracker_force_telem);
@@ -211,7 +209,7 @@ ao_tracker_set_telem(void)
 }
 
 static const struct ao_cmds ao_tracker_cmds[] = {
-	{ ao_tracker_set_telem,	"t <d>\0Set telem on USB" },
+	{ ao_tracker_set_telem,	"t <d>\0Set telem on USB (0 off, 1 on, 2 dbg)" },
 	{ 0, NULL },
 };
 
