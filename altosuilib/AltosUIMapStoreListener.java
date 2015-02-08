@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 public interface AltosUIMapStoreListener {
 	abstract void notify_store(AltosUIMapStore store, int status);

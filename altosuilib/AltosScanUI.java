@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 class AltosScanResult {
 	String		callsign;

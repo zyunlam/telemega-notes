@@ -15,10 +15,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.util.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 public class AltosBTKnown implements Iterable<AltosBTDevice> {
 	LinkedList<AltosBTDevice>	devices = new LinkedList<AltosBTDevice>();
