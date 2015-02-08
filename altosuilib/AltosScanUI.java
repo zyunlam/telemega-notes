@@ -444,6 +444,7 @@ public class AltosScanUI
 	}
 
 	public AltosScanUI(AltosUIFrame in_owner, boolean in_select_telemetry) {
+		super(in_owner, "Scan Telemetry", false);
 
 		owner = in_owner;
 		select_telemetry = in_select_telemetry;
