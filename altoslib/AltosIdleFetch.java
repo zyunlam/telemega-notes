@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.io.*;
 import java.util.*;
@@ -38,6 +38,7 @@ class AltosIdler {
 	static final int	idle_sensor_mega = 12;
 	static final int	idle_sensor_emini = 13;
 	static final int	idle_sensor_tmini = 14;
+	static final int	idle_sensor_tgps = 15;
 
 	public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException {
 		for (int idler : idlers) {
@@ -72,6 +73,10 @@ class AltosIdler {
 				break;
 			case idle_sensor_tmini:
 				AltosSensorTMini.update_state(state, link, config_data);
+				break;
+			case idle_sensor_tgps:
+				AltosSensorTGPS.update_state(state, link, config_data);
+				break;
 			}
 			if (idle != null)
 				idle.update_state(state);
@@ -122,6 +127,9 @@ public class AltosIdleFetch implements AltosStateUpdate {
 			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
+		new AltosIdler("TeleGPS",
+			       AltosIdler.idle_gps,
+			       AltosIdler.idle_sensor_tgps),
 	};
 
 	AltosLink		link;
@@ -131,8 +139,9 @@ public class AltosIdleFetch implements AltosStateUpdate {
 
 	public void update_state(AltosState state) throws InterruptedException {
 		try {
+			/* Fetch config data from remote */
 			AltosConfigData config_data = new AltosConfigData(link);
-			state.set_state(AltosLib.ao_flight_startup);
+			state.set_state(AltosLib.ao_flight_stateless);
 			state.set_serial(config_data.serial);
 			state.set_callsign(config_data.callsign);
 			state.set_ground_accel(config_data.accel_cal_plus);

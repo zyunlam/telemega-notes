@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 public abstract class AltosUIFlightTab extends JComponent implements AltosFlightDisplay, HierarchyListener {
 	public GridBagLayout	layout;

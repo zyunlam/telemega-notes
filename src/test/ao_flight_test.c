@@ -600,7 +600,7 @@ ao_insert(void)
 
 #if 1
 			printf("%7.2f height %8.2f accel %8.3f "
-#if TELEMEGA && 0
+#if TELEMEGA && 1
 			       "angle %5d "
 			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
 #endif
@@ -608,7 +608,7 @@ ao_insert(void)
 			       time,
 			       height,
 			       accel,
-#if TELEMEGA && 0
+#if TELEMEGA && 1
 			       ao_sample_orient,
 
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_x),
@@ -764,6 +764,8 @@ ao_sleep(void *wchan)
 					ao_data_static.hmc5883.z = int16(bytes, 24);
 #if HAS_MMA655X
 					ao_data_static.mma655x = int16(bytes, 26);
+					if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
+						ao_data_static.mma655x = ao_data_accel_invert(ao_data_static.mma655x);
 #endif
 					ao_records_read++;
 					ao_insert();
@@ -900,6 +902,9 @@ ao_sleep(void *wchan)
 			} else if (nword >= 3 && strcmp(words[0], "Apogee") == 0 &&
 				   strcmp(words[1], "lockout:") == 0) {
 				ao_config.apogee_lockout = atoi(words[2]);
+			} else if (nword >= 3 && strcmp(words[0], "Pad") == 0 &&
+				   strcmp(words[1], "orientation:") == 0) {
+				ao_config.pad_orientation = atoi(words[2]);
 			} else if (nword >= 36 && strcmp(words[0], "CALL") == 0) {
 				tick = atoi(words[10]);
 				if (!ao_flight_started) {

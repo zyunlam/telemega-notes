@@ -15,14 +15,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.io.*;
 import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -329,48 +329,54 @@ public class AltosGraph extends AltosUIGraph {
 				  gps_nsat_solution_color,
 				  false,
 				  nsat_axis);
-			addSeries("GPS Satellites in View",
-				  AltosGraphDataPoint.data_gps_nsat_view,
-				  nsat_units,
-				  gps_nsat_view_color,
-				  false,
-				  nsat_axis);
-			addSeries("GPS Course",
-				  AltosGraphDataPoint.data_gps_course,
-				  orient_units,
-				  gps_course_color,
-				  false,
-				  course_axis);
-			addSeries("GPS Ground Speed",
-				  AltosGraphDataPoint.data_gps_ground_speed,
-				  AltosConvert.speed,
-				  gps_ground_speed_color,
-				  enable_gps,
-				  speed_axis);
-			addSeries("GPS Climb Rate",
-				  AltosGraphDataPoint.data_gps_climb_rate,
-				  AltosConvert.speed,
-				  gps_climb_rate_color,
-				  enable_gps,
-				  speed_axis);
+			if (stats.has_gps_sats) {
+				addSeries("GPS Satellites in View",
+					  AltosGraphDataPoint.data_gps_nsat_view,
+					  nsat_units,
+					  gps_nsat_view_color,
+					  false,
+					  nsat_axis);
+			}
+			if (stats.has_gps_detail) {
+				addSeries("GPS Course",
+					  AltosGraphDataPoint.data_gps_course,
+					  orient_units,
+					  gps_course_color,
+					  false,
+					  course_axis);
+				addSeries("GPS Ground Speed",
+					  AltosGraphDataPoint.data_gps_ground_speed,
+					  AltosConvert.speed,
+					  gps_ground_speed_color,
+					  enable_gps,
+					  speed_axis);
+				addSeries("GPS Climb Rate",
+					  AltosGraphDataPoint.data_gps_climb_rate,
+					  AltosConvert.speed,
+					  gps_climb_rate_color,
+					  enable_gps,
+					  speed_axis);
+			}
 			addSeries("GPS Position DOP",
 				  AltosGraphDataPoint.data_gps_pdop,
 				  dop_units,
 				  gps_pdop_color,
 				  false,
 				  dop_axis);
-			addSeries("GPS Horizontal DOP",
-				  AltosGraphDataPoint.data_gps_hdop,
-				  dop_units,
-				  gps_hdop_color,
-				  false,
-				  dop_axis);
-			addSeries("GPS Vertical DOP",
-				  AltosGraphDataPoint.data_gps_vdop,
-				  dop_units,
-				  gps_vdop_color,
-				  false,
-				  dop_axis);
+			if (stats.has_gps_detail) {
+				addSeries("GPS Horizontal DOP",
+					  AltosGraphDataPoint.data_gps_hdop,
+					  dop_units,
+					  gps_hdop_color,
+					  false,
+					  dop_axis);
+				addSeries("GPS Vertical DOP",
+					  AltosGraphDataPoint.data_gps_vdop,
+					  dop_units,
+					  gps_vdop_color,
+					  false,
+					  dop_axis);
+			}
 		}
 		if (stats.has_rssi)
 			addSeries("Received Signal Strength",
@@ -410,58 +416,58 @@ public class AltosGraph extends AltosUIGraph {
 		}
 
 		if (stats.has_imu) {
-			addSeries("Acceleration X",
-				  AltosGraphDataPoint.data_accel_x,
+			addSeries("Acceleration Along",
+				  AltosGraphDataPoint.data_accel_along,
 				  AltosConvert.accel,
 				  accel_x_color,
 				  false,
 				  accel_axis);
-			addSeries("Acceleration Y",
-				  AltosGraphDataPoint.data_accel_y,
+			addSeries("Acceleration Across",
+				  AltosGraphDataPoint.data_accel_across,
 				  AltosConvert.accel,
 				  accel_y_color,
 				  false,
 				  accel_axis);
-			addSeries("Acceleration Z",
-				  AltosGraphDataPoint.data_accel_z,
+			addSeries("Acceleration Through",
+				  AltosGraphDataPoint.data_accel_through,
 				  AltosConvert.accel,
 				  accel_z_color,
 				  false,
 				  accel_axis);
-			addSeries("Rotation Rate X",
-				  AltosGraphDataPoint.data_gyro_x,
+			addSeries("Roll Rate",
+				  AltosGraphDataPoint.data_gyro_roll,
 				  gyro_units,
 				  gyro_x_color,
 				  false,
 				  gyro_axis);
-			addSeries("Rotation Rate Y",
-				  AltosGraphDataPoint.data_gyro_y,
+			addSeries("Pitch Rate",
+				  AltosGraphDataPoint.data_gyro_pitch,
 				  gyro_units,
 				  gyro_y_color,
 				  false,
 				  gyro_axis);
-			addSeries("Rotation Rate Z",
-				  AltosGraphDataPoint.data_gyro_z,
+			addSeries("Yaw Rate",
+				  AltosGraphDataPoint.data_gyro_yaw,
 				  gyro_units,
 				  gyro_z_color,
 				  false,
 				  gyro_axis);
 		}
 		if (stats.has_mag) {
-			addSeries("Magnetometer X",
-				  AltosGraphDataPoint.data_mag_x,
+			addSeries("Magnetometer Along",
+				  AltosGraphDataPoint.data_mag_along,
 				  mag_units,
 				  mag_x_color,
 				  false,
 				  mag_axis);
-			addSeries("Magnetometer Y",
-				  AltosGraphDataPoint.data_mag_y,
+			addSeries("Magnetometer Across",
+				  AltosGraphDataPoint.data_mag_across,
 				  mag_units,
 				  mag_y_color,
 				  false,
 				  mag_axis);
-			addSeries("Magnetometer Z",
-				  AltosGraphDataPoint.data_mag_z,
+			addSeries("Magnetometer Through",
+				  AltosGraphDataPoint.data_mag_through,
 				  mag_units,
 				  mag_z_color,
 				  false,

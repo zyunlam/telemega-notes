@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.text.*;
 import java.io.*;
@@ -28,20 +28,16 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	int		telemetry;
 	int		telemetry_rate;
 	AltosState	state = null;
-	AltosFlightReader	stacked;
 
 	LinkedBlockingQueue<AltosLine> telem;
 
 	public AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException {
-		if (stacked != null) {
-			state = stacked.read();
-			if (state != null)
-				return state;
-			stacked = null;
-		}
-		AltosLine l = telem.take();
-		if (l.line == null)
-			throw new IOException("IO error");
+		AltosLine l;
+		do {
+			l = telem.take();
+			if (l.line == null)
+				throw new IOException("IO error");
+		} while (!link.get_monitor());
 		AltosTelemetry	telem = AltosTelemetry.parse(l.line);
 		if (state == null)
 			state = new AltosState();
@@ -57,14 +53,10 @@ public class AltosTelemetryReader extends AltosFlightReader {
 
 	public void reset() {
 		flush();
+		state = null;
 	}
 
 	public void close(boolean interrupted) {
-
-		if (stacked != null) {
-			stacked.close(interrupted);
-			stacked = null;
-		}
 
 		link.remove_monitor(telem);
 		log.close();
@@ -161,10 +153,9 @@ public class AltosTelemetryReader extends AltosFlightReader {
 		return link.monitor_battery();
 	}
 
-	public AltosTelemetryReader (AltosLink in_link, AltosFlightReader in_stacked)
+	public AltosTelemetryReader (AltosLink in_link)
 		throws IOException, InterruptedException, TimeoutException {
 		link = in_link;
-		stacked = in_stacked;
 		boolean success = false;
 		try {
 			log = new AltosLog(link);
@@ -182,23 +173,5 @@ public class AltosTelemetryReader extends AltosFlightReader {
 			if (!success)
 				close(true);
 		}
-	}
-
-	private static AltosFlightReader existing_data(AltosLink link) {
-		if (link == null)
-			return null;
-
-		File	file = AltosPreferences.logfile(link.serial);
-		if (file != null) {
-			AltosStateIterable	iterable = AltosStateIterable.iterable(file);
-			if (iterable != null)
-				return new AltosReplayReader(iterable.iterator(), file, false);
-		}
-		return null;
-	}
-
-	public AltosTelemetryReader(AltosLink link)
-		throws IOException, InterruptedException, TimeoutException {
-		this(link, null);
 	}
 }

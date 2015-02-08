@@ -56,3 +56,7 @@ SERIAL=$SERIAL ./cal-freq $dev
 ../ao-tools/ao-cal-accel/ao-cal-accel $dev
 
 echo 'E 1' > $dev
+
+./test-telemetrum
+
+exit $?

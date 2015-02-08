@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -101,7 +101,7 @@ public class TabAscent extends AltosDroidTab {
 
 			if (state.gps != null) {
 				mLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
-				mLongitudeView.setText(AltosDroid.pos(state.gps.lon, "W", "E"));
+				mLongitudeView.setText(AltosDroid.pos(state.gps.lon, "E", "W"));
 			} else {
 				mLatitudeView.setText("");
 				mLongitudeView.setText("");

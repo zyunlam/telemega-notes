@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_5.*;
-import org.altusmetrum.altosuilib_3.*;
+import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altosuilib_6.*;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -55,12 +55,17 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	}
 
 	public void font_size_changed(int font_size) {
-		map.font_size_changed(font_size);
-		statsTable.font_size_changed(font_size);
+		if (map != null)
+			map.font_size_changed(font_size);
+		if (statsTable != null)
+			statsTable.font_size_changed(font_size);
 	}
 
 	public void units_changed(boolean imperial_units) {
-		map.units_changed(imperial_units);
+		if (map != null)
+			map.units_changed(imperial_units);
+		if (enable != null)
+			enable.units_changed(imperial_units);
 	}
 
 	AltosGraphUI(AltosStateIterable states, File file) throws InterruptedException, IOException {

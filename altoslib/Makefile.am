@@ -82,6 +82,7 @@ altoslib_JAVA = \
 	AltosProgrammer.java \
 	AltosReplayReader.java \
 	AltosRomconfig.java \
+	AltosSavedState.java \
 	AltosSelfFlash.java \
 	AltosSensorMM.java \
 	AltosSensorEMini.java \
@@ -89,6 +90,7 @@ altoslib_JAVA = \
 	AltosSensorTMini.java \
 	AltosSensorMega.java \
 	AltosSensorMetrum.java \
+	AltosSensorTGPS.java \
 	AltosState.java \
 	AltosStateIterable.java \
 	AltosStateUpdate.java \
@@ -124,7 +126,9 @@ altoslib_JAVA = \
 	AltosLatitude.java \
 	AltosLongitude.java \
 	AltosPyro.java \
-	AltosWriter.java
+	AltosWriter.java \
+	AltosQuaternion.java \
+	AltosRotation.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar
 

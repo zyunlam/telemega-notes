@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -82,12 +82,12 @@ public class TabLanded extends AltosDroidTab {
 		}
 		if (state != null && state.gps != null) {
 			mTargetLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
-			mTargetLongitudeView.setText(AltosDroid.pos(state.gps.lon, "W", "E"));
+			mTargetLongitudeView.setText(AltosDroid.pos(state.gps.lon, "E", "W"));
 		}
 
 		if (receiver != null) {
 			mReceiverLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
-			mReceiverLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "W", "E"));
+			mReceiverLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
 		}
 
 		if (state != null) {

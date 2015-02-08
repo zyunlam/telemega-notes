@@ -31,6 +31,8 @@
 
 #define AO_STACK_SIZE	116
 
+#define AO_PORT_TYPE	uint8_t
+
 /* Various definitions to make GCC look more like SDCC */
 
 #define ao_arch_naked_declare	__attribute__((naked))

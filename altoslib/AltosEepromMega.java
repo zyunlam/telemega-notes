@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.io.*;
 import java.util.*;
@@ -26,6 +26,8 @@ public class AltosEepromMega extends AltosEeprom {
 
 	public static final int max_sat = 12;
 
+	private int log_format;
+
 	public int record_length() { return record_length; }
 
 	/* AO_LOG_FLIGHT elements */
@@ -35,9 +37,36 @@ public class AltosEepromMega extends AltosEeprom {
 	public int ground_accel_along() { return data16(8); }
 	public int ground_accel_across() { return data16(10); }
 	public int ground_accel_through() { return data16(12); }
-	public int ground_roll() { return data16(14); }
-	public int ground_pitch() { return data16(16); }
-	public int ground_yaw() { return data16(18); }
+	public int ground_roll() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+			return data32(16);
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return data16(14);
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+	public int ground_pitch() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+			return data32(20);
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return data16(16);
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+	public int ground_yaw() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+			return data32(24);
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return data16(18);
+		default:
+			return AltosLib.MISSING;
+		}
+	}
 
 	/* AO_LOG_STATE elements */
 	public int state() { return data16(0); }
@@ -89,7 +118,8 @@ public class AltosEepromMega extends AltosEeprom {
 	public int svid(int n) { return data8(2 + n * 2); }
 	public int c_n(int n) { return data8(2 + n * 2 + 1); }
 
-	public AltosEepromMega (AltosEepromChunk chunk, int start) throws ParseException {
+	public AltosEepromMega (AltosEepromChunk chunk, int start, int log_format) throws ParseException {
+		this.log_format = log_format;
 		parse_chunk(chunk, start);
 	}
 
@@ -119,6 +149,12 @@ public class AltosEepromMega extends AltosEeprom {
 			state.set_flight(flight());
 			state.set_ground_accel(ground_accel());
 			state.set_ground_pressure(ground_pres());
+			state.set_accel_ground(ground_accel_along(),
+					       ground_accel_across(),
+					       ground_accel_through());
+			state.set_gyro_zero(ground_roll() / 512.0,
+					    ground_pitch() / 512.0,
+					    ground_yaw() / 512.0);
 			break;
 		case AltosLib.AO_LOG_STATE:
 			state.set_tick(tick);
@@ -128,22 +164,21 @@ public class AltosEepromMega extends AltosEeprom {
 			state.set_tick(tick);
 			state.set_ms5607(pres(), temp());
 
-			AltosIMU imu = new AltosIMU();
-			imu.accel_x = AltosIMU.convert_accel(accel_x());
-			imu.accel_y = AltosIMU.convert_accel(accel_y());
-			imu.accel_z = AltosIMU.convert_accel(accel_z());
+			AltosIMU	imu = new AltosIMU(accel_y(),	/* along */
+							   accel_x(),	/* across */
+							   accel_z(),	/* through */
+							   gyro_y(),	/* roll */
+							   gyro_x(),	/* pitch */
+							   gyro_z());	/* yaw */
 
-			imu.gyro_x = AltosIMU.convert_gyro(gyro_x());
-			imu.gyro_y = AltosIMU.convert_gyro(gyro_y());
-			imu.gyro_z = AltosIMU.convert_gyro(gyro_z());
-			state.imu = imu;
+			if (log_format == AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD)
+				state.check_imu_wrap(imu);
 
-			AltosMag mag = new AltosMag();
-			mag.x = AltosMag.convert_gauss(mag_x());
-			mag.y = AltosMag.convert_gauss(mag_y());
-			mag.z = AltosMag.convert_gauss(mag_z());
+			state.set_imu(imu);
 
-			state.mag = mag;
+			state.set_mag(new AltosMag(mag_x(),
+						   mag_y(),
+						   mag_z()));
 
 			state.set_accel(accel());
 
@@ -221,11 +256,12 @@ public class AltosEepromMega extends AltosEeprom {
 		}
 	}
 
-	public AltosEepromMega (String line) {
+	public AltosEepromMega (String line, int log_format) {
+		this.log_format = log_format;
 		parse_string(line);
 	}
 
-	static public LinkedList<AltosEeprom> read(FileInputStream input) {
+	static public LinkedList<AltosEeprom> read(FileInputStream input, int log_format) {
 		LinkedList<AltosEeprom> megas = new LinkedList<AltosEeprom>();
 
 		for (;;) {
@@ -234,7 +270,7 @@ public class AltosEepromMega extends AltosEeprom {
 				if (line == null)
 					break;
 				try {
-					AltosEepromMega mega = new AltosEepromMega(line);
+					AltosEepromMega mega = new AltosEepromMega(line, log_format);
 					if (mega.cmd != AltosLib.AO_LOG_INVALID)
 						megas.add(mega);
 				} catch (Exception e) {

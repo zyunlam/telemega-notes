@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.io.*;
 import java.util.*;
@@ -75,7 +75,8 @@ public class AltosEepromDownload implements Runnable {
 	}
 
 	boolean			done;
-	boolean			start;
+	int			prev_state;
+	int			state_block;
 
 	void LogEeprom(AltosEeprom r) throws IOException {
 		if (r.cmd != AltosLib.AO_LOG_INVALID) {
@@ -140,7 +141,6 @@ public class AltosEepromDownload implements Runnable {
 		state = new AltosState();
 
 		done = false;
-		start = true;
 
 		if (flights.config_data.serial < 0)
 			throw new IOException("no serial number found");
@@ -154,12 +154,8 @@ public class AltosEepromDownload implements Runnable {
 		/* Now scan the eeprom, reading blocks of data and converting to .eeprom file form */
 
 		state_block = log.start_block;
+		prev_state = AltosLib.ao_flight_startup;
 		for (block = log.start_block; !done && block < log.end_block; block++) {
-			monitor.set_value(state.state_name(),
-					  state.state,
-					  block - state_block,
-					  block - log.start_block);
-
 			AltosEepromChunk	eechunk = new AltosEepromChunk(link, block, block == log.start_block);
 
 			/*
@@ -177,6 +173,16 @@ public class AltosEepromDownload implements Runnable {
 			}
 
 			CaptureEeprom (eechunk, log_format);
+
+			if (state.state != prev_state && state.state != AltosLib.ao_flight_invalid) {
+				state_block = block;
+				prev_state = state.state;
+			}
+
+			monitor.set_value(state.state_name(),
+					  state.state,
+					  block - state_block,
+					  block - log.start_block);
 		}
 		CheckFile(true);
 		if (eeprom_file != null) {
@@ -254,7 +260,10 @@ public class AltosEepromDownload implements Runnable {
 		flights = given_flights;
 		success = false;
 
-		monitor.set_states(AltosLib.ao_flight_boost, AltosLib.ao_flight_landed);
+		if (flights.config_data.log_has_state())
+			monitor.set_states(AltosLib.ao_flight_boost, AltosLib.ao_flight_landed);
+		else
+			monitor.set_states(AltosLib.ao_flight_invalid, AltosLib.ao_flight_invalid);
 
 		monitor.start();
 	}

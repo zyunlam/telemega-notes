@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.io.*;
 import java.util.*;
@@ -25,7 +25,7 @@ public class AltosEepromHeader extends AltosEeprom {
 
 	public int	cmd;
 	public String	data;
-	public int	config_a, config_b;
+	public int	config_a, config_b, config_c;
 	public boolean	last;
 	public boolean	valid;
 
@@ -93,6 +93,9 @@ public class AltosEepromHeader extends AltosEeprom {
 			state.make_baro();
 			state.baro.crc = config_a;
 			break;
+		case AltosLib.AO_LOG_IMU_CAL:
+			state.set_accel_zero(config_a, config_b, config_c);
+			break;
 		case AltosLib.AO_LOG_SOFTWARE_VERSION:
 			state.set_firmware_version(data);
 			break;
@@ -100,7 +103,10 @@ public class AltosEepromHeader extends AltosEeprom {
 		case AltosLib.AO_LOG_APOGEE_LOCKOUT:
 		case AltosLib.AO_LOG_RADIO_RATE:
 		case AltosLib.AO_LOG_IGNITE_MODE:
+			break;
 		case AltosLib.AO_LOG_PAD_ORIENTATION:
+			state.set_pad_orientation(config_a);
+			break;
 		case AltosLib.AO_LOG_RADIO_ENABLE:
 		case AltosLib.AO_LOG_AES_KEY:
 		case AltosLib.AO_LOG_APRS:
@@ -177,11 +183,17 @@ public class AltosEepromHeader extends AltosEeprom {
 		case AltosLib.AO_LOG_BARO_CRC:
 			out.printf ("# Baro crc: %d\n", config_a);
 			break;
+		case AltosLib.AO_LOG_IMU_CAL:
+			out.printf ("# IMU cal: %d %d %d\n", config_a, config_b, config_c);
+			break;
 		case AltosLib.AO_LOG_FREQUENCY:
 		case AltosLib.AO_LOG_APOGEE_LOCKOUT:
 		case AltosLib.AO_LOG_RADIO_RATE:
 		case AltosLib.AO_LOG_IGNITE_MODE:
+			break;
 		case AltosLib.AO_LOG_PAD_ORIENTATION:
+			out.printf("# Pad orientation: %d\n", config_a);
+			break;
 		case AltosLib.AO_LOG_RADIO_ENABLE:
 		case AltosLib.AO_LOG_AES_KEY:
 		case AltosLib.AO_LOG_APRS:
@@ -273,6 +285,14 @@ public class AltosEepromHeader extends AltosEeprom {
 					cmd = AltosLib.AO_LOG_INVALID;
 					data = tokens[2];
 				}
+			} else if (tokens[0].equals("IMU") && tokens[1].equals("cal")) {
+				cmd = AltosLib.AO_LOG_IMU_CAL;
+				config_a = Integer.parseInt(tokens[3]);
+				config_b = Integer.parseInt(tokens[5]);
+				config_c = Integer.parseInt(tokens[7]);
+			} else if (tokens[0].equals("Pad") && tokens[1].equals("orientation:")) {
+				cmd = AltosLib.AO_LOG_PAD_ORIENTATION;
+				config_a = Integer.parseInt(tokens[2]);
 			} else
 				valid = false;
 		} catch (Exception e) {

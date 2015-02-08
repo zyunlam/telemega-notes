@@ -34,6 +34,9 @@ ao_serial0_getchar(void);
 int
 _ao_serial0_pollchar(void);
 
+uint8_t
+_ao_serial0_sleep(void);
+
 void
 ao_serial0_putchar(char c);
 
@@ -53,6 +56,9 @@ ao_serial1_getchar(void);
 
 int
 _ao_serial1_pollchar(void);
+
+uint8_t
+_ao_serial1_sleep(void);
 
 void
 ao_serial1_putchar(char c);
@@ -74,6 +80,9 @@ ao_serial2_getchar(void);
 int
 _ao_serial2_pollchar(void);
 
+uint8_t
+_ao_serial2_sleep(void);
+
 void
 ao_serial2_putchar(char c);
 
@@ -93,6 +102,9 @@ ao_serial3_getchar(void);
 
 int
 _ao_serial3_pollchar(void);
+
+uint8_t
+_ao_serial3_sleep(void);
 
 void
 ao_serial3_putchar(char c);

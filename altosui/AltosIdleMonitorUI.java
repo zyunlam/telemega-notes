@@ -24,8 +24,8 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.Arrays;
-import org.altusmetrum.altoslib_5.*;
-import org.altusmetrum.altosuilib_3.*;
+import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altosuilib_6.*;
 
 public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDisplay, AltosIdleMonitorListener, DocumentListener {
 	AltosDevice		device;
@@ -97,6 +97,15 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		Runnable r = new Runnable() {
 				public void run() {
 					show(state, listener_state);
+				}
+			};
+		SwingUtilities.invokeLater(r);
+	}
+
+	public void failed() {
+		Runnable r = new Runnable() {
+				public void run() {
+					close();
 				}
 			};
 		SwingUtilities.invokeLater(r);
@@ -174,6 +183,19 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		}
 	}
 
+	private void close() {
+		try {
+			disconnect();
+		} catch (Exception ex) {
+			System.out.printf("Exception %s\n", ex.toString());
+			for (StackTraceElement el : ex.getStackTrace())
+				System.out.printf("%s\n", el.toString());
+		}
+		setVisible(false);
+		dispose();
+		AltosUIPreferences.unregister_font_listener(AltosIdleMonitorUI.this);
+	}
+
 	public AltosIdleMonitorUI(JFrame in_owner)
 		throws FileNotFoundException, TimeoutException, InterruptedException {
 
@@ -184,9 +206,10 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 		serial = device.getSerial();
 
-		AltosLink link;
+		AltosSerial link;
 		try {
 			link = new AltosSerial(device);
+			link.set_frame(this);
 		} catch (Exception ex) {
 			idle_exception(in_owner, ex);
 			return;
@@ -248,16 +271,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
-					try {
-						disconnect();
-					} catch (Exception ex) {
-						System.out.printf("Exception %s\n", ex.toString());
-						for (StackTraceElement el : ex.getStackTrace())
-							System.out.printf("%s\n", el.toString());
-					}
-					setVisible(false);
-					dispose();
-					AltosUIPreferences.unregister_font_listener(AltosIdleMonitorUI.this);
+					close();
 				}
 			});
 

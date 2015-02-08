@@ -15,9 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
-public class AltosCompanion {
+import java.io.*;
+
+public class AltosCompanion implements Serializable {
 	public final static int	board_id_telescience = 0x0a;
 	public final static int	MAX_CHANNELS = 12;
 

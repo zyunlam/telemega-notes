@@ -1,16 +1,1615 @@
-commit d16e60858427bf7dbe83a858728ebf097a09207a
+commit 26f61380ce6b4df80fa0b5a8a242cef79d5ae339
 Author: Bdale Garbee <bdale@gag.com>
-Date:   Sat Sep 13 11:29:19 2014 -0600
+Date:   Sat Feb 7 22:23:38 2015 -0700
 
-    ignore cal_values file in bringup directory
+    document addition of TeleDongle to the set of ARM targets to save binaries for
 
-commit 40885ae5e6be66faf08cdb9b481d1d998856ca4b
+commit 4231d68bae69d9a7d1f52205002db452cd5f986d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 20:42:15 2015 -0800
+
+    Bump java library versions
+    
+    Lots of minor API/ABI changes; make sure people can install both 1.5
+    and 1.6 at the same time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c72d83ccd207b5300a90f2e84de6c5c96642478c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 20:36:10 2015 -0800
+
+    altosuilib: Don't offer to graph some GPS details that TM doesn't log
+    
+    When using a TM eeprom file, various minor GPS details are logged
+    (course, ground speed, climb rate, etc). Make sure these aren't
+    offered up for graphing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 426bacbbd6e0573b143e7c48d71db977e53181fc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 20:22:19 2015 -0800
+
+    altosuilib: Get the Eeprom download progress bar working again
+    
+    The eeprom download code wasn't computing the start of each state
+    transition correctly, so the progress bar was snapping to the end of
+    the chunk for each state.
+    
+    Invalid state values would snap the bar to the right side.
+    
+    Landed state wasn't ever seen, so the bar would not ever fill.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit aea188e4227993c508c7045d02f2bc87abd4e428
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 18:10:34 2015 -0800
+
+    doc: update 1.6 release notes with recent bug fixes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0dd733efdbb66535889aafecbba45f49266ed886
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 17:49:39 2015 -0800
+
+    altosuilib: Set the icon and title of the telemetry scanning dialog
+    
+    Just need to call 'super' to get the window configured correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9d5a6914982a29d22103e0202735c9e01ee9e831
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 17:35:15 2015 -0800
+
+    altoslib: Clear saved TelemetryReader state instead of resetting in ScanUI
+    
+    Instead of attempting to mash the saved state from AltosScanUI, just
+    throw it away in AltosTelemetryReader.reset. Much cleaner, and more reliable.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cbc9ecd960d0dd27a2275b4550c30c5c88ccf5bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 17:09:40 2015 -0800
+
+    altosuilib: Reset telemetry state after processing it
+    
+    This avoids re-using stale state after switching telemetry reception
+    parameters around, which otherwise generates spurious entries for the
+    wrong frequencies in the scan results list.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c0ce45100dd205f59cd84465138c74d9b31df0bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 17:08:03 2015 -0800
+
+    altoslib: Drop telemetry packets processed while monitoring is disabled
+    
+    A lag between the thread queuing telemetry packets and one pulling
+    them out can result in stale telemetry data being returned to the
+    reader. Fix this by dropping telemetry read while monitoring is disabled.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8a2be4d36a3b116d82529805430c5fb665688267
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 15:09:57 2015 -0800
+
+    altosuilib: Wait for product data while scanning
+    
+    Now that Altos only sends config information once every 5 seconds, we
+    want to keep waiting for that if we're receiving packets successfully.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e70f3dca01b15b75b0b8795eb71bd12817af4800
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 14:43:11 2015 -0800
+
+    altoslib: Mark listener as 'not running' on EOF.
+    
+    This adds a 'running' member to the AltosListenerState class, and when
+    the replay reader reaches EOF, marks the listener as no longer
+    running.
+    
+    AltosUI and TeleGPS now display 'done' in the 'Age' field when this
+    occurs, to let the user know that the replay is over.
+    
+    Also make sure that the display timers are stopped when this happens,
+    or when the window is closed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 08f07d0af123e1c307bc4c0c973da07fae8246b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 14:40:17 2015 -0800
+
+    altosui: Remove the dregs of AltosDroid load-old-telem code
+    
+    AltosDroid used to scan the old .telem file to return to the previous
+    flight state on restart. Now it just loads the old state object
+    instead, a vast improvement in performance.
+    
+    To do that, there were some changes in the altoslib code
+    required. This patch just removes those, fixing replay bugs in TeleGPS
+    along the way.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d08c427188f7b748d9ea7651143bc843e9c2691
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 13:09:18 2015 -0800
+
+    altos: ao_packet_getchar needs to return 'int' so AO_READ_AGAIN works
+    
+    With ao_packet_getchar returning 'char', AO_READ_AGAIN would get
+    converted to 0xff instead of -1 on return, making ao_packet_echo
+    either produce a bogus character on output, breaking command
+    responses, or wedge and never exit when the link was dropped.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a5c64bef6952f25cadebc3e1f9909a5f513e015
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 02:37:36 2015 -0800
+
+    Update version 1.6 release notes with more bug fixes
+    
+    A few bugs found during release testing are notable enough to be
+    included in the release notes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 211cb482e4da04dc032432abc236ef8b5a5e732f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 01:30:21 2015 -0800
+
+    altos: Separate out ao_tracker force from dbg
+    
+    Allow enabling telemetry when USB is connected without also enabling
+    the motion debugging output.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f9f235bce84df3a6c0261e9d256aac544f87f70f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 01:05:57 2015 -0800
+
+    altos/lpc: Give up on interrupt-driven SPI driver
+    
+    There are just too many limitations in when interrupts are delivered
+    to make them useful. Instead, just drive the SPI directly with the
+    CPU. At higher spi speeds (6Mhz or more), it's probably faster to do
+    it this way anyways.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4b52f67abd0f9ed6d8208556007d75e7ee735cf0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 7 01:05:03 2015 -0800
+
+    altos/drivers: Increase SPI speed of CC115L to 6MHz
+    
+    The datasheet says that the maximum for back-to-back data is 6.5MHz.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ba22e2dbf87b139f0349f4dd8a7e6046514f5bad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 23:50:49 2015 -0800
+
+    altoslib: Initialize GPS data to MISSING for Monitor Idle mode
+    
+    Make sure any un-set values are flagged correctly for the Monitor Idle
+    UI by using the init() method.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 31fd32cd75f4f22458f0dc82823934672e16b988
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 21:50:47 2015 -0800
+
+    altoslib: Use 'stateless' for Monitor Idle
+    
+    This reflects the lack of flight state progression during Monitor Idle
+    and ensures that the GPS 'ready' indicator will light after 10 solid
+    GPS fixes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 449c6731b1977c7623dd006ec2db56f383f8d85a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 20:45:28 2015 -0800
+
+    altoslib: Support TeleGPS for Monitor Idle
+    
+    TeleGPS has ADC and GPS values, so build the necessary ADC parser and
+    then hook up GPS parsing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58f06706383418ebfa56d88ba51411e6185e09df
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 20:40:05 2015 -0800
+
+    altosuilib: Don't show 'Sats in view' for TeleGPS eeprom graphing
+    
+    We don't log the visible sats from TeleGPS, only the basic GPS
+    info. Have AltosFlightStats track whether sat info is present, then
+    use that to elide the Sats In View graph entry as needed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 35ad1833b10595564de84c88f44a214b1c134ccf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 20:36:44 2015 -0800
+
+    altosuilib: EEProm download from TeleGPS doesn't have states
+    
+    As TeleGPS doesn't have flight states, the EEProm download progress
+    bar shouldn't show 'state invalid', and it should use a different
+    scale for each block.
+    
+    Fix this by having AltosConfigData know which devices have state based
+    on their log format, then mark the progress bar state limits as
+    'invalid/invalid' instead of 'boost/landed'. Then have the progress
+    bar use that to set a more reasonable scale for each block.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 66e7a8081c07d0d96a31ae34963d430f06dccdfb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 04:45:17 2015 -0800
+
+    altoslib: Store MS5607 data in AltosConfigData for use by AltosMs5607
+    
+    When doing 'Monitor Idle', we fetch new config data each iteration and
+    pass that to each of the readers, including ms5607. Instead of
+    re-fetching the config data there, just store the ms5607 parameters
+    when we fetch it the first time and copy it over.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14d524782af4f06d7f3722dcc852772ec493c2cc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 03:36:10 2015 -0800
+
+    Package TeleDongle-v3.0 firmware with TeleGPS and AltosUI apps
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit df47839824dd4e708c22fbf8f4a3054b9c45b9c3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 03:34:30 2015 -0800
+
+    altosuilib: New teledongle and telebt devices are not pair-programmed
+    
+    Only list telebt-v1 and teledongle-v0 as pair-programmed devices so
+    that newer versions go through the self-programming process
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 21ff52befb27decc4b23458315620c47d7a07b21
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 03:33:28 2015 -0800
+
+    micropeak: Install Windows AltusMetrum driver bits
+    
+    Make AltOS-based µPUSB devices work with MicroPeak
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a3f26f6d0c7574b8cdaecbccd7cfe89aaeb736b0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 03:32:27 2015 -0800
+
+    micropeak: Support both FTDI and Altus Metrum USB IDs
+    
+    The windows driver only returns FTDI devices when
+    altos_ftdi_list_start is invoked, so we need to call both that and the
+    regular altos_list_start to get all of the devices.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cc707432c6eaedb9587bb63ac570146b356b6bfd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 03:31:07 2015 -0800
+
+    micropeak: Fix file association registry install on Windows
+    
+    Need to invoke DisableX64FSRedirection before setting file association
+    registry entries or Windows won't find our application.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1fc5c8625f649b43d93f23a5fa1ba16773f2d0db
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 03:03:58 2015 -0800
+
+    windows: Look for current Java version in \SOFTWARE\Wow6432Node
+    
+    I have no idea what this is, but I found the Java version down in
+    there...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 83d3d967f576a57285d40e77c4a17303edeef4f1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 03:03:00 2015 -0800
+
+    Add 'keithp-fat' target for uploading temporary builds to keithp's machine
+    
+    This lets me quickly prepare a new test version for Windows/Mac in a
+    single command.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7a7d60d72e2e742fbc364489721f356806966c03
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 6 01:29:56 2015 -0800
+
+    libaltos: Use more SetupDi API to get Windows 7 listing devices
+    
+    My Windows 7 box doesn't include 'SymbolicName' in the registry, but
+    SetupDiGetDeviceInstanceId *does* return something that includes
+    vid/pid/serial, so use that in preference.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 98db372758470cdaf7b517d670a7ce9186c787bc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 5 22:25:35 2015 -0800
+
+    Update docs for 1.6
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9fac8b639d2142c90eb95771cda1f6559e987db2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 16 22:09:26 2015 +1300
+
+    altos/lpc: Double buffer USB data transfers
+    
+    This allocates twice the space in the USB memory so that transactions
+    can be double buffered without using separate CPU memory.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    
+    Conflicts:
+    	src/lpc/ao_usb_lpc.c
+
+commit 0671b3c8c24c9f33be77a10315c4669f33c516d7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 5 16:08:44 2015 -0800
+
+    altos/lpc: Clean up USB endpoint access functions
+    
+    The USB device endpoints can have two pointers in them, but we use
+    only the first. Fix the access functions to take an index as to which
+    we want so that we can disable the other address registers with them
+    instead of requiring open-coded access.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a01ce949611b0c18df54c3f3877a43d27699c258
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 5 15:34:05 2015 -0800
+
+    altos/easymini-v1.0: Shrink stack to deal with USB changes
+    
+    Reverting the USB double buffering means using more RAM, need to
+    shrink the EasyMini stack to accomodate that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2bde76fe852d7908a968168580be4cd4dc0333d6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 5 15:01:03 2015 -0800
+
+    altos/teledongle-v3.0: Shrink stacks to 320 bytes to fit in ram
+    
+    The old USB code had static in/out buffers in ram
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5bf39f674b3d5ee98b55f42562a5ba1a9328ff07
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 5 14:56:13 2015 -0800
+
+    Revert LPC usb performance improvements
+    
+    There's something screwy going on, sticking garbage in the input
+    buffer at boot time
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ef69872c824668146a3876f1f3d0d2e51d3e4c8d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 5 14:54:27 2015 -0800
+
+    Revert "altos/lpc: Fix double-buffered USB changes"
+    
+    This reverts commit 41a0604ad1ea1a03e2db7d41731dbadf466b45db.
+
+commit aeca3b46bc1726a06952cc2ff86f50c6d80ed1e1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 4 22:55:24 2015 -0800
+
+    ao-bringup: Add turnon_teledonglev3
+    
+    TeleDongle v3 uses the LPC11U14 processor which has no on-chip eeprom,
+    so we must reflash the device to set the default radio calibration value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bc41ab47b928b837724f8bc6b84d0b5b47c25df3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 4 20:33:04 2015 -0800
+
+    altos: Rename teledongle-v1.9 as teledongle-v3.0
+    
+    No hardware changes from the 1.9 prototypes to the 3.0 final version.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dbafa16cfa897b2a5c6cf455cf8675e83eb0d7d6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 4 20:30:15 2015 -0800
+
+    altos/telebt-v3.0: Set initial radio cal to a sensible value
+    
+    CC1200 uses a different xtal than CC1120, so the default calibration
+    needs to change. This value hit 434.550 on SN 2407, so it seems like a
+    reasonable place to start.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit be443d8d50ad8f59a74bf2f4e810a7359ff72132
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:57:14 2015 +0100
+
+    altos/telebt-v3.0: Add monitor bits
+    
+    Will be useful to actually be able to receive telemetry
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6eb145d48cfcabf757093433bd2314a80e490a17
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:46:40 2015 +0100
+
+    altos/usbtrng-v2.0: Select PA11/PA12 mapping config value
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8f9e192e9d1c6fab9843939ff9117f6bb3725943
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:44:52 2015 +0100
+
+    altos/stmf0: Support PA11/PA12 remapping
+    
+    Small pin-count versions of the STMF0 can remap PA11/PA12 on the same
+    pins as PA9/PA10. These are used by USB, so have the USB driver deal
+    with remapping them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 466d3e977ca279f97944141fcc12c04f4f58212e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:44:07 2015 +0100
+
+    altos/telebt-v3.0: Turn red LED off after initialization
+    
+    This lets the user know the device successfully initialized.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 845ae016d700c37948e053ead5f7e2778356fda3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:43:06 2015 +0100
+
+    altos/telebt-v3.0: Fix stdio setup for BTM
+    
+    Make sure the BTM module is allowed to be included in stdio, but delay
+    adding that until the BT link is running.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a138e05ae6241a6743ca9f64528124f5f6c8e0ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:42:01 2015 +0100
+
+    altos: Always include a check for stdio overflow
+    
+    For some reason, the check for running out of space to record stdio
+    devices was disabled when only one device was expected.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 870428a909025988a8cd834755ea166e2d1e34ca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:39:17 2015 +0100
+
+    altos/btm: Add fancier debug. Pull serial reset port low.
+    
+    Adds an interactive debugging mode to help diagnose BTM issues.
+    
+    Discovered that the serial reset pin on the BTM needs to be pulled low
+    for the device to work correctly.
+    
+    Leave the bt link interrupt disabled until things are initialized.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 44a503a8cf3778cad5469c592e8ccbae58e44b97
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 1 16:36:51 2015 +0100
+
+    altos/stm: Add ability to delay STDIO usage for serial ports
+    
+    Bluetooth needs to delay adding the serial port to stdio until the
+    link is up and running. The cc1111 serial driver had
+    DELAY_SERIAL_*_STDIN bits which have been added to the STM serial driver.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 252211e9e54a1e6f4efe2df6382ce60c909de70c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 30 14:04:50 2015 +0100
+
+    And, also add the TeleBT v3.0 flash loader Makefile
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bfa5c70a827ac8be23ca48797edc14e13461d6ac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 30 14:03:55 2015 +0100
+
+    Oops, forgot the TeleBT-v3.0 Makefile
+    
+    git doesn't warn about files named 'Makefile' because they're supposed
+    to be generated...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8ca1f234586225caea1040bc229b63491dadc1cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 27 20:41:15 2015 -0800
+
+    altos/stmf0: Re-implement fast ADC code for stmf0
+    
+    This creates a ring buffer for ADC data so that ADC fetching can run
+    in parallel with other activities.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3749426af1e900a1b3354922fdd7e8b3bfa38084
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 27 17:18:42 2015 -0800
+
+    altos/usbtrng-v2.0: Use stmf042 hardware CRC unit
+    
+    Switch from software to hardware for CRC computation. I think this
+    must be faster, right?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a95d6776dea86cdc4bdc3512505ba7e75365c127
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 27 16:55:27 2015 -0800
+
+    altos/stmf0: Add CRC driver
+    
+    Sets up the stm32f0 CRC hardware, exposing inline functions to access
+    it. DMA access is possible, but usbtrng can't use that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 79f3434013650fe4e3d76e5eb56a10000ee34249
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 27 09:36:19 2015 -0800
+
+    altos/stmf0: Remove remaining stm32l bits from stm32f0 code
+    
+    These were left over from the stm32f0 initial implementation work; now
+    it's more useful to list only the bits which are valid.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf08397202860a73417cd1711012eb3e33f308c3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 26 22:23:19 2015 -0800
+
+    ao-tools: Add ao-usbtrng to dump RNG data for testing
+    
+    ao-usbtrng reads a specified number of kilobytes of random data from
+    a random number generator.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee91e1da606c8a8fade278a3aeae9c1cc9014b84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 26 22:22:00 2015 -0800
+
+    altos/stm: Fix typo in stm32l.h
+    
+    This crept in while working on the stmf0 bits. oops.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac1a58af4d281a9bc3572dc503982a94e439a4c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 26 22:16:18 2015 -0800
+
+    altos/usbtrng-v2.0: Add random output command
+    
+    Read chunks of random ADC data, do some CRC16 computations to de-bias
+    and merge 4 bytes of input data into 2 bytes of output data, then dump
+    that out over USB.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 729bb7a405460db8d44c9ff6ee903b28c7499a02
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 26 22:14:57 2015 -0800
+
+    altos/stmf0: Add ADC and DMA APIs
+    
+    The ADC api is what USBtrng wants; a way to repeatedly read a single
+    ADC input as fast as possible.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a01effc2f64c757c907e0f4937b4d3710b97bde0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 26 22:12:40 2015 -0800
+
+    altos/stmf0: Add faster USB path
+    
+    This adds a way to allocate private USB buffers for sending data
+    without needing to copy it again. It requires ensuring that all
+    accesses are 16 bits aligned to 16 bit boundaries.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e1d5bcb1968e280b8ebdf6c8b12e8a87167fd890
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 26 22:10:47 2015 -0800
+
+    altos/stmf0: Fix linker scripts to make ao_boot work
+    
+    The flash loader ended up assuming ao_boot was at the start of ram,
+    while the application stuck it after the interrupt table (where it
+    needs to go).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 32c68670af9f8aa690c64d64502e559c0df0c1db
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 25 19:58:38 2015 -0800
+
+    ao-tools: Add --wait option to ao-usbload
+    
+    This waits forever for USB writes to complete, instead of timing out
+    after five seconds. Useful when debugging the device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 02b07a202839d6e68b3f0db7f8965478661db140
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 25 19:37:05 2015 -0800
+
+    altos: Add flash-loader to usbtrng-v2.0
+    
+    Uses the new STM32F042 flash loading bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit df881bce8576f091b2d8cb53b8ce8a43aeedecde
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 25 19:35:19 2015 -0800
+
+    altos: Add self-flash support for STM32F042 processor
+    
+    Also moves the usual address for applications out of the way of the
+    flash loader.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 02e1058fa52ee7c867ea6c9031ebb9e21d14889c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 25 16:43:48 2015 -0800
+
+    altos: USBtrng v2.0 hardware bringup
+    
+    Gets the USB connection running and blinks the LEDs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 02f03df6d089cafae99f8ce15dcbd87f6e78d749
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 25 16:42:39 2015 -0800
+
+    altos: Initial STMF04x support
+    
+    Basic clock configuration, OS support, LED and USB drivers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0e7d1c89fea98eabca738f10cbfebec631be3bb7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 24 11:18:59 2015 -0800
+
+    altos: Add support for TeleBT v3.0
+    
+    Add support to the BTM driver for non-CC1111 interrupts
+    Add HW flow control to STM serial driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41a0604ad1ea1a03e2db7d41731dbadf466b45db
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 22 21:31:45 2015 -0800
+
+    altos/lpc: Fix double-buffered USB changes
+    
+    These got merged when we were down in Auckland, but before they'd been
+    finished. Transmitting worked fine, but receiving was mis-configuring
+    the OUT buffer size in the hardware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 291eec859606b73b43072cd2debfbb92659e0d95
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 22 20:34:43 2015 -0800
+
+    altos: Get rid of some accidental debug code
+    
+    I was debugging the accelerometer calibration code and left some
+    printfs in it, which made TM run out of flash space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e05e0c6b71a1df65f188e00622e9632eb27510fd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 16 22:09:26 2015 +1300
+
+    Set version to 1.5.9.1
+
+commit 2a053d3d157e00b6a6406f4f78ddb8e298b6c4b7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 22 17:27:09 2014 -0800
+
+    altos/lpc: Switch LPC SPI driver to interrupt-driven
+    
+    This improves performance for SPI transfers, while allowing other
+    tasks to get work done during longer SPI transfers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 213a6604ec225e843f30244e6f94d0ebb3d27e46
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 22 17:11:51 2014 -0800
+
+    altos: Adjust CC1200 RSSI reporting value
+    
+    On the test setup, we were about 13dB off, so tweak the settings to
+    suit. This result wasn't tested; it's just a rough offset until we get
+    a production run of TeleDongle boards back to do more systematic
+    measurements.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 014dcc1f179237dc247fafa4a2cff91809260681
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 22 17:10:33 2014 -0800
+
+    altos: Document cc115l power measured at RF setting 0x03 as -31.75dBm
+    
+    We built a custom TeleGPS load for radio sensitivity measurements with
+    the lowest documented power level setting (0x03), and measured the
+    power out at that value of -31.75dBm on the test board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cf09ee2a4b093c56b64260c3db3f5e07143aa888
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 9 21:44:53 2014 -0800
+
+    ao-bringup: Clear pending output before setting frequency.
+    
+    Maybe this will unwedge things
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5b7ec0c69343db3793c0317939b5eff1f2d04752
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Dec 6 15:08:53 2014 -0800
+
+    micropeak: Support µPUSB with our own USB ids
+    
+    This matches the new µPUSB id as well as the FTDI USB id.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7e52ef59082cb2afdba498233c429321c37a6ac3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Dec 6 15:08:29 2014 -0800
+
+    altoslib: Add usbtrng, usbrelay and mpusb USB ids
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7339d2379713b5b7e4c4fe6bad89ed93f9d39e82
+Merge: d1f9121 b6462ca
 Author: Bdale Garbee <bdale@gag.com>
-Date:   Sat Sep 13 11:28:19 2014 -0600
+Date:   Sat Dec 6 15:39:53 2014 -0700
 
-    need multi-arch in fat build
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
 
-commit e969172a81e24f70c349b10f429e69817900c307
+commit d1f9121593fe30b924223e89ef4d596b5bec2b25
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Dec 6 15:39:35 2014 -0700
+
+    improve test procedures for TeleMega
+
+commit b6462ca3a7e99fe390ec97f94c23d36fab8c294d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 23 18:56:40 2014 -0800
+
+    altos/cc1200: With PQT wide open, we can't use PQT_REACHED for start
+    
+    Because we're allowing even signals only weakly correlated with the
+    preamble through to sync detection, we can't use the PQT_REACHED
+    symbol to tell when a packet header has been seen. Instead, just look
+    for SYNC_FOUND.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0e3eeaf59688dac92eb3a27d589923126cb34e00
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 23 18:50:57 2014 -0800
+
+    altos/cc1200: Open up preamble detect to improve sensitivity
+    
+    Increase soft decision PQT value to max (15) to ensure that we detect
+    even weak packets.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eabeb76a2a9acb624ae364c4f0f315bfc3549d98
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 23 18:31:15 2014 -0800
+
+    altos/cc1200: Wait for packet to be placed in FIFO during receive
+    
+    This changes the receive code to use MCU_STATUS, waiting for
+    MARC_STATUS1 to indicate that the packet is in the fifo before reading
+    it out.
+    
+    It also fixes the receive timeout code to keep receiving if the
+    preamble or sync have been seen when the timeout fires. This makes
+    TeleLCO able to use short timeouts during scanning while still
+    successfully receiving packets.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2163f6e6b341b7840f03e89d568699b8ea186435
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 16 16:39:18 2014 -0800
+
+    altos/teledongle-v1.8: Make this the same as teledongle v1.9
+    
+    Remove RSSI LED blinking, add CRC error LED
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54f7ab842a8cba3003cd5a9deb2515151263ca2e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 16 16:38:12 2014 -0800
+
+    altos: Allow TeleMega to be built without MPU6000
+    
+    Robert Braibish's board has a dead MPU6000; this fix lets the TeleMega
+    firmware build without that driver so the rest of the board could be verified.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f16ea9abfaac9eee3b0935c586e383ae046d6cf5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 16 16:37:15 2014 -0800
+
+    altosui: Remove duplicate AltosUIPreferencesBackend.java
+    
+    There's a copy in altosuilib
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit abdf3177293c57e659017b64819c13f11c126011
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 16 13:41:27 2014 -0800
+
+    altos/microsplash: fix .gitignore to ignore resulting binary
+
+commit 97a321692c2e41a1d3f77fb541780ada945eff52
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 16 13:40:15 2014 -0800
+
+    Add AltosDroid release note for version 1.5
+
+commit 47956ac01397c0a7fafc6b0a4840113186924b2e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 16 13:17:55 2014 -0800
+
+    altosdroid: East and West were flipped in all GPS output
+    
+    East is positive, West is negative
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5aae1446026a08bf8f09c56b960545eff30a8bd1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 15 22:52:42 2014 -0800
+
+    altosdroid: Save AltosState and restore at startup
+    
+    Instead of re-parsing the old logfile, save the current state in the
+    preferences database and restore at restart of the
+    TelemetryService. This makes the state get restored even before the BT
+    connection is recovered.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 52ce23327bd81e2d40a1817442e75bd6b60ffe95
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 15 22:50:31 2014 -0800
+
+    altoslib: add AltosPreferences state save/restore interfaces
+    
+    This serializes an entire AltosState object and stores it in the
+    preferences database for later retrieval. AltosDroid uses this to
+    recover the old state data when restarting.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a488da3ca72fe0778b2d79a8cac935621d1d789d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 15 22:49:06 2014 -0800
+
+    altosdroid: TabMap needs to expose () constructor
+    
+    Otherwise we get an exception at startup time for some reason.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit deda23963586eb07a32f9a3c83a0355178e19340
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 15 22:48:15 2014 -0800
+
+    altoslib: Add getBytes/putBytes interface to AltosPreferencesBackend
+    
+    This lets us store arbitrary binary data in the preferences database
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e5dd00ef0014364fc059970cc020f209b3b16cf8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 15 22:46:01 2014 -0800
+
+    altosdroid: Don't display MISSING flight number
+    
+    Just check and clear the entry if we end up seeing that value
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 60edcfe410e7fa848813d6c1ed8dc9808887d041
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 15 16:03:32 2014 -0800
+
+    altoslib: Make AltosState serializable
+    
+    This involved making every class it references serializable as well
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4d4fee0b0091a1b6257a06f62b1078778cdb417f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 10 14:41:17 2014 -0800
+
+    altoslib: Missing headers for mag sensor in CSV output
+    
+    Kelsey Black <nmonic@gmail.com> reported that the TeleMega CSV output
+    was missing the header labels for the mag sensor data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 437eba2ff27b2b7dfd0f363819b9a43ab8b28ead
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 20:04:47 2014 -0800
+
+    altos: Reset interrupt flags before TX in CC1200 driver
+    
+    Failing to reset the flags set during interrupt leads to
+    short-circuiting transmission and not a lot of packets going out.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7f742824673e5e6034defdb09b66d4d56eb8d4fe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 16:05:49 2014 -0800
+
+    altos/teledongle-v1.9: Switch to NXP processor as on prototype boards
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a082d9b5ed169b9d4153885f3535987e5ae5d84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 16:04:56 2014 -0800
+
+    altos/lpc: Disable JTAG when using pins for GPIO
+    
+    JTAG is enabled by default, making those pins not support GPIO unless
+    specifically configured.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58db263cc835be0abb972654c2d7369718c88b37
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 16:04:14 2014 -0800
+
+    altos/lpc: Declare SPI send parameters as const
+    
+    This matches STM
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d3dd45b060c996153ff8195bd371e9e1f3b15efb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 16:02:47 2014 -0800
+
+    altos: Use other TeleDongle LED for CRC-invalid packet reporting
+    
+    Instead of blinking out some fake-o RSSI indication, just blink the
+    red LED when a packet with a bad CRC is received.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2313cdacefb2139bc68cd98e782c54d706af0704
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 16:02:07 2014 -0800
+
+    altosuilib: GPS errors are recorded in floating point, not integers
+    
+    Fix the format used to present them in the info table.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2f0ff9675017655846a8abc617b4dc9a3666d0b9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 16:01:24 2014 -0800
+
+    altos: Use AO_SPO_SPEED_FAST for CC1200
+    
+    This asks for the fastest available SPI speed, instead of fixing it to
+    8MHz, which may not be supported on every architecture.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 80a0397dde2f787fb20fd2520b274b826c68ed5a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 16:00:06 2014 -0800
+
+    altos: Stop attempting to ramp power on CC115L
+    
+    The PA register on the 115L isn't in any way monotonic, making the old
+    code broken. Just rempve it instead of fixing it; we don't ramp
+    anywhere else...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2e5ffd839fe5be99359e4c86a96f03148bac698
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 15:58:42 2014 -0800
+
+    altos: Declare port register type only in arch header
+    
+    Instead of defaulting to 8 bits, explicitly require declaration of the
+    type of the port register for each architecture.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2060d6ca222a04608e598baf59757f12ea2ec70
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 6 13:27:29 2014 -0800
+
+    Move teledongle 1.9 to 1.8; there's a new 1.9
+    
+    1.9 is now the lpc11u14-based form-factor prototype board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b67556949aa080fc5e70771e972de880e44eca12
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 5 22:11:44 2014 -0800
+
+    altos: Rename microwater to microsplash
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b0e903a76276e33f531eade42ac721c9490c6758
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 30 21:59:45 2014 -0700
+
+    altosui: Pop up 'Connecting' dialog during Monitor Idle
+    
+    This was a bit harder than expected as I had to wire up a way to shut
+    down the whole monitor idle window when you clicked on the cancel button.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ef00182c79bd7a56fbc5d782cb8f4aa0079bb86f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 25 21:14:25 2014 -0700
+
+    altos: Increase CC1200 SPI data rate to 8MHz
+    
+    This got set to 125kHz to make debugging with a logic analyzer easier
+    and never changed back to a reasonable speed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4d51570ed8776461d084726149923c5be43d622e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 25 19:56:25 2014 -0700
+
+    altos: Fix up telemetry delay computations
+    
+    With RDF, APRS and telemetry all being sent at varying rates,
+    computing when to send the next radio data is not as simple as sending
+    telemetry and then figuring out whether to send RDF and/or APRS.
+    
+    Fix this by computing times for the next telemetry/rdf/aprs packet,
+    and only sending each when that time has passed. Compute the delay
+    until the next radio activity as the minimum time to any transmission.
+    
+    This also adds code to the config bits to reset the radio times
+    whenever something changes that might affect which radio data to send
+    next.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c831f1ffb378c20b7513d209d60cdd5dee9db85b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 25 17:44:48 2014 -0700
+
+    altos: Perform cc1200 calibration less often. Tweak radio params
+    
+    This performs calibration after every 4 operations, or when the
+    frequency changes. This reduces the time it takes to get to receive
+    mode.
+    
+    This also makes the sync and preamble qualifiers more strict to reject
+    bad packets.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3f7263f57b1b697d92ed6c3d62956e5bdfc11f24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 25 11:20:44 2014 -0700
+
+    altos: Remove old AO_SEND_ALL_BARO bits
+    
+    This was used for testing the original TeleMini which couldn't log
+    data at full speed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ae4be19f8ab0899a879a10aec28dc381f44dd2c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 25 10:21:30 2014 -0700
+
+    altos: Build TeleDongle v1.9 by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 51ef3fad6435c0b21945d48fbbaa5a4c092c4960
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 25 10:20:07 2014 -0700
+
+    altos: Increase PQT value for cc1200 improving sensitivity
+    
+    The PQT value indicates how 'good' the preamble is; higher values
+    allow a lower quality of preamble to pass the test, permitting more
+    packets to be decoded.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9102183b40f0b32d4fb6d24502b79a6431184310
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 25 10:17:48 2014 -0700
+
+    altos: Sort out ao_gps_print altitude fetching
+    
+    ao_gps_print is used by both teledongle/telebt and the host-based GPS
+    test code. The first instance uses the old internal GPS structure,
+    containing just a 16-bit altitude while the second uses an
+    ao_telemetry structure, which contains 32 bits split into two
+    members.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cb83b5432e1320726ad496ded78cced7274618b0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 7 05:36:18 2014 +0200
+
+    altos/teledongle-v1.9: Add remaining code to complete the project
+    
+    This turns the prototype board into a full teledongle
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a3fe79266a77f8fc001117f49db1d2f14f9e6b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 7 05:34:06 2014 +0200
+
+    altos: Complete cc1200 driver
+    
+    Deal with differences between cc1120 and cc1200, including built-in
+    packet support and various register changes.
+    
+    This now works to send and receive telemetry, as well as send APRS and
+    RDF.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7fea8b245cdccc1ec77aa559433952f339676473
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 7 05:35:10 2014 +0200
+
+    altos: Expose telemetry altitude macros even without GPS
+    
+    This allows for APRS testing in the new teledongle code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 484b530a16a54ca8fde412c3f466bfe7eed978cd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 7 05:32:00 2014 +0200
+
+    altos: Mark STM ao_spi_send as taking const pointer
+    
+    We don't write to this, so let it be const for type checking
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c17dff05b70d98e3193e8e68cc9599f3a30270b5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 24 19:10:45 2014 -0700
+
+    ao-tools/ao-send-telem: Add verbose, fake and rate options
+    
+    Verbose dumps some data while sending packets.
+    Fake sends constructed packets, once every 500ms.
+    Rate sets the transmit bit rate.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e2562ee43b8558df0836217ea3a187b36e2669b3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 15 16:10:11 2014 -0700
+
+    altosuilib: Try to detect the architecture when loading JNI lib
+    
+    Look at sun.arch.data.model and os.arch to try and load the right
+    libaltos file the first time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 88df7cd314269fa1debe226b49b7e4e9dc238d8e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 24 21:21:19 2014 -0700
+
+    altoslib: synchronize access to serial debug output list
+    
+    This list is access by both the receiver and the monitor task, so it
+    needs to be locked to prevent collisions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 221824b038bf18ca43a38c82d18b0ae9586ba565
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 9 13:11:16 2014 -0600
+
+    document pyro current limits in an appendix
+
+commit ffda6989e856e66a1bea253e82cb70f51ada3e7a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 5 00:07:10 2014 -0700
+
+    altos: Add prototype TeleDongle v1.9 code
+    
+    Lights up the hardware, sends carrier and RDF tones. A bit more cc1200
+    work to be done still.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 27a467d802a80a33ea20eb5cda2558d03caa2c00
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 5 00:03:28 2014 -0700
+
+    altos: Copy cc1120 driver to cc1200 driver and hack a bit
+    
+    The cc1200 is similar to the cc1120, although many registers have
+    changed.
+    
+    This driver can send a bare carrier and an RDF tone, but does not yet
+    receive or transmit telemetry data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 62628c8b429d06ee834f0b6511c430cbeaab9303
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 4 00:30:54 2014 -0700
+
+    altos: Fix syntax error with ao_log_mega change.
+    
+    Missed a semi-colon.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 00ae706dab6e8fddef4c5730a17c433a022228b7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 4 00:11:13 2014 -0700
+
+    altoslib: Compute tilt angle from eeprom data
+    
+    This copies the computation of tilt angle from the firmware so that
+    post-flight analysis can also show the data.
+    
+    This change also renames all of the imu values to make them easier to
+    understand:
+    
+    	accel	gyro	axis
+    
+    	along	roll	length of the board
+    	across	pitch	across the board
+    	through	yaw	through the board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a757fd5af53f5721a949181372548afa4757d6c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 4 00:10:03 2014 -0700
+
+    altosui: Update 'Imperial Units' checkbox when units change
+    
+    If you have two graphs running, make sure the imperial units
+    checkboxes agree.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 656d8fe17532ca6c7d1d43996f187df2f14f5395
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 4 00:07:39 2014 -0700
+
+    altoslib: Deal with new Mega log format that has 32-bit gyro cal
+    
+    This adds parsing for the new log format type to get all 32 bits of
+    the gyro calibration data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9521dc63671b69065d27fc1ccba6d20cc90643cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 4 00:04:39 2014 -0700
+
+    altos: Record 32-bits for gyro calibration values
+    
+    The gyro ground calibration values are scaled by 512 to provide a bit
+    more precision for the computations. This means they don't fit in 16
+    bits, so change the format of the flight log record. Also change the
+    reported format so that AltosUI has a chance of figuring it out.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 95d9248da78f86240dbe77e2c206420dc509c9cf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 29 12:57:27 2014 -0700
+
+    altosui: Check for map and stats table when changing units/fonts in graph
+    
+    AltosGraphUI wasn't making sure the map and stats tables were present
+    before attempting to adjust font size and units.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 40c5535b65a75374fb1dbbd994c29324db814f5b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 29 12:56:04 2014 -0700
+
+    altos: Handle antenna down in ao_flight_test
+    
+    Parse the Pad orientation config value and flip the accelerometer
+    value back around in antenna down configuration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b97a125a9f8bd9619833647a9b6aa6329103e136
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 26 22:58:13 2014 -0700
+
+    ao-bringup: Auto-select programmer for teledongle turnon
+    
+    Bdale's programmer is SN 100, Keith's is SN 186. Use the username to
+    figure out which one to use.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b4eba3f3a58a9c35e3699ff14405b997c1318d91
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 26 22:53:39 2014 -0700
+
+    altos: Make sure we drop the SPI mutex when aborting cc1120 recv
+    
+    The cc1120 receive code is 'twisty', in that it acquires the SPI mutex
+    in the middle of an interrupt handler so that it can quickly start the
+    radio when the signal comes in. This means we have to be careful to
+    drop that mutex in all paths which leave the receive code, including
+    when the packet receive is aborted mid-way through the process.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 22661ba69b8919116092382f1f5aa0dc79d02cc9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Sep 13 17:56:51 2014 -0600
+
+    store cal value correctly even when we didn't need to change it
+
+commit b0eb63205223e2982d0ded08503c3f128420270f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 13 15:59:18 2014 -0700
+
+    altosdroid: Update notebook to reflect current status
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9dc426756742fb967fdd21e1fcec54edeb4b12ac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 13 15:52:56 2014 -0700
+
+    altosui: Bring up main window when doing --replay or --graph
+    
+    This shows the main window when replaying or graphing files so that
+    you can interact with that, changing the global configuration or doing
+    other stuff.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 75d5368cb2a95f3f7385952669a14765460f549d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 13 15:51:50 2014 -0700
+
+    altosui: Fix --replay to run in realtime after boost
+    
+    I added the ability to rapidly replay files for AltosDroid to recover
+    from a crash, but didn't change AltosUI to use realtime mode again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 04b5cc37659b1b3d6b62f1ef17b17c0492434cba
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Sep 13 16:37:42 2014 -0600
+
+    reflect filename changes in LLC repo
+
+commit 93d1cedc94358ebf5c2af537a25a242f6c19954c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 13 15:23:40 2014 -0700
+
+    altosdroid: Automatically sign the released version if the key is available
+    
+    Look in ~/altusmetrumllc for release.keystore and Passphrase and
+    enable building and signing of the release binary.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2731486c12678a7d3bd7ec79e74a2fcaf20845bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 13 13:38:31 2014 -0700
+
+    altosdroid: Update version code and name for 1.5
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e151c144fcdb1da96e715f29c049dc4869e1d53d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 13 13:00:58 2014 -0700
+
+    Mark master branch as past the 1.5 point
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff7c006e50515040d43399899fac26a3fe26d8a7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Sep 13 12:31:08 2014 -0600
+
+    updated to reflect changes from 1.5 release
+
+commit 20d640ec504afbfdb69dba1b241d84af1e62abed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 12 20:58:26 2014 -0700
+
+    ao-bringup: Improve igniter testing. Add TeleMega and TeleMetrum testing.
+    
+    The script lets you re-try each one when they fail, which is nice if
+    you're hand-holding the setup.
+    
+    The TeleMetrum and TeleMega tests are adapted from the EasyMega tests
+    and are hooked up to the turnon scripts.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e0077866138a1e29ede7181e39f04860b866543a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 12 20:57:05 2014 -0700
+
+    ao-tools/ao-test-igniter: Remove bogus printf
+    
+    This must have been left over from testing; it prints "device (null)",
+    which isn't very useful.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6681d31929266fec9711b3d89a4f074cd2afcc6e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 12 20:56:29 2014 -0700
+
+    ao-tools/ao-test-gps: Improve output formatting
+    
+    Add a newline before printing out the flags and sats at exit time
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2d045570d2cda0abde67a68506cb3fc2e119ec3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 12 17:22:37 2014 -0700
+
+    ao-bringup: Use C version of ao-test-gps in test-telegps
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d0e597789ac298b108ea04cc1a2c999bcf14bc9c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 12 17:22:03 2014 -0700
+
+    ao-tools: Add ao-test-gps program
+    
+    This waits for GPS to report lock
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit def036794f1460a5457e6b86350712c336e296d6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 12 16:38:59 2014 -0700
+
+    ao-bringup: Use C version of test-flash for telegps
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1630a8e458f174d6df1aa30ff30e3f02a10bdbf7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 11 19:59:58 2014 -0700
+
+    altosui: Ignore built .desktop file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 807e62ccebc83eb6427a63431d06effa074e5e76
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 11 19:56:13 2014 -0700
 
@@ -28,7 +1627,21 @@ Date:   Thu Sep 11 19:56:13 2014 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit 800f3377b1a374ad5cf826aa897efdcb08059040
+commit d7ad490a33900a788b15d1600ebaa2a71e6f35ff
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 11 15:57:21 2014 -0700
+
+    altos: Add smaller altitude table file to .gitignore
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7ad8921b164103629b246c25860297454aa7ec6b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 11 15:56:14 2014 -0700
+
+    altos/test: Add TMv2 test program to .gitignore
+
+commit 0cedc27e22a9fbc9ccfe1b403c84d728bb23220d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 11 15:00:25 2014 -0700
 
@@ -41,7 +1654,7 @@ Date:   Thu Sep 11 15:00:25 2014 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit 793588e218102204e69755a16bc32ea5c67f29c7
+commit 6dafd7bf947d892e430cd565eb92a3366abb3604
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 11 14:23:29 2014 -0700
 
@@ -52,7 +1665,7 @@ Date:   Thu Sep 11 14:23:29 2014 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit 19730b872c61f34724b0f187f71cccb6a65251dd
+commit 368c7d583380b4453f432d5a965a1e4c45a92f92
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 11 14:14:07 2014 -0700
 
@@ -67,19 +1680,6 @@ Date:   Thu Sep 11 14:14:07 2014 -0700
     can just remove this feature from altoslib at this point.
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
-
-commit 10e31d84ee5cdf10248988079df91354ae6ed612
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Wed Sep 10 01:33:33 2014 -0600
-
-    update changelog for release
-
-commit 05e4094411f861bf29bea2e9c39c1b66f8f267f8
-Merge: acb2791 2ee937b
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Wed Sep 10 01:32:27 2014 -0600
-
-    Merge branch 'master' into branch-1.5
 
 commit 2ee937b603b181bb24768eb4d0e2f918a5377fd3
 Author: Bdale Garbee <bdale@gag.com>
@@ -123,31 +1723,11 @@ Date:   Tue Sep 9 23:43:10 2014 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit acb279125c0fa377c8b1dbbb8634fba60f7f845b
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Wed Sep 10 00:05:07 2014 -0600
-
-    update ChangeLog
-
-commit 5de00e9e39cff2d3b409c2ce99caa994f0a36202
-Merge: b3fba98 a72b768
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Wed Sep 10 00:02:57 2014 -0600
-
-    Merge branch 'master' into branch-1.5
-
 commit a72b7683606d3e741043011c929482a0a168a5c9
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Sep 9 23:44:45 2014 -0600
 
     more build dependencies for processing icons
-
-commit b3fba989a84db7d904e09a8f47e3a86d4e0f9577
-Merge: 28bd505 1fb200d
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Wed Sep 10 00:01:33 2014 -0600
-
-    Merge branch 'master' into branch-1.5
 
 commit 1fb200d18cc385230b3af574816ec354682cc5c9
 Author: Keith Packard <keithp@keithp.com>
@@ -158,18 +1738,6 @@ Date:   Tue Sep 9 23:00:14 2014 -0700
     This is done in install-data-hook and needs to explicitly use DESTDIR
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
-
-commit 28bd5057252e61bc5b1a35a00bc1f9fdfde097f7
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Tue Sep 9 23:23:27 2014 -0600
-
-    updated ChangeLog for 1.5 release
-
-commit 45f50ad3a8ce69c708974711a5939c42a74bf53b
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Tue Sep 9 23:22:58 2014 -0600
-
-    releasing version 1.5
 
 commit a8c799c48a52bf13466536db627b66bfe2a435cd
 Author: Keith Packard <keithp@keithp.com>

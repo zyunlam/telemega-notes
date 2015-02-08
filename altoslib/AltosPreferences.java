@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.io.*;
 import java.util.*;
@@ -40,6 +40,9 @@ public class AltosPreferences {
 
 	/* log file format preference name */
 	public final static String logfilePreferenceFormat = "LOGFILE-%d";
+
+	/* state preference name */
+	public final static String statePreferenceFormat = "STATE-%d";
 
 	/* voice preference name */
 	public final static String voicePreference = "VOICE";
@@ -331,6 +334,48 @@ public class AltosPreferences {
 			logfiles.put(serial, logfile);
 			return logfile;
 		}
+	}
+
+	public static void set_state(int serial, AltosState state, AltosListenerState listener_state) {
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+			AltosSavedState	saved_state = new AltosSavedState(state, listener_state);
+			oos.writeObject(saved_state);
+
+			byte[] bytes = baos.toByteArray();
+
+			synchronized(backend) {
+				backend.putBytes(String.format(statePreferenceFormat, serial), bytes);
+				flush_preferences();
+			}
+		} catch (IOException ie) {
+		}
+	}
+
+	public static AltosSavedState state(int serial) {
+		byte[] bytes = null;
+
+		synchronized(backend) {
+			bytes = backend.getBytes(String.format(statePreferenceFormat, serial), null);
+		}
+
+		if (bytes == null)
+			return null;
+
+		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+
+		try {
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			AltosSavedState saved_state = (AltosSavedState) ois.readObject();
+			return saved_state;
+		} catch (IOException ie) {
+		} catch (ClassNotFoundException ce) {
+		}
+		return null;
 	}
 
 	public static void set_scanning_telemetry(int new_scanning_telemetry) {

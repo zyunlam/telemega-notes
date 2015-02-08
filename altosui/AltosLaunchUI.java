@@ -23,7 +23,7 @@ import javax.swing.*;
 import java.io.*;
 import java.text.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altosuilib_3.*;
+import org.altusmetrum.altosuilib_6.*;
 
 class FireButton extends JButton {
 	protected void processMouseEvent(MouseEvent e) {

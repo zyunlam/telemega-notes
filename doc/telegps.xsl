@@ -10,7 +10,7 @@
       <surname>Packard</surname>
     </author>
     <copyright>
-      <year>2014</year>
+      <year>2015</year>
       <holder>Bdale Garbee and Keith Packard</holder>
     </copyright>
     <mediaobject>
@@ -28,6 +28,13 @@
       </para>
     </legalnotice>
     <revhistory>
+      <revision>
+	<revnumber>1.6</revnumber>
+	<date>8 January 2015</date>
+	<revremark>
+	  Major release adding TeleDongle v3.0 support.
+	</revremark>
+      </revision>
       <revision>
 	<revnumber>1.4.1</revnumber>
 	<date>20 June 2014</date>
@@ -1305,7 +1312,14 @@ NAR #88757, TRA #12200
   <appendix>
     <title>Release Notes</title>
     <simplesect>
-      <title>Version 1.41</title>
+      <title>Version 1.6</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.6.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
+    <simplesect>
+      <title>Version 1.4.1</title>
       <xi:include
 	  xmlns:xi="http://www.w3.org/2001/XInclude"
 	  href="release-notes-1.4.1.xsl"

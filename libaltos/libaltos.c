@@ -1121,6 +1121,8 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 	HRESULT 	result;
 	DWORD		friendlyname_type;
 	DWORD		friendlyname_len;
+	char		instanceid[1024];
+	DWORD		instanceid_len;
 
 	dev_info_data.cbSize = sizeof (SP_DEVINFO_DATA);
 	while(SetupDiEnumDeviceInfo(list->dev_info, list->index,
@@ -1141,6 +1143,7 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 			pid = 0x6015;
 			serial = 0;
 		} else {
+			vid = pid = serial = 0;
 			/* Fetch symbolic name for this device and parse out
 			 * the vid/pid/serial info */
 			symbolic_len = sizeof(symbolic);
@@ -1148,16 +1151,34 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 						 symbolic, &symbolic_len);
 			if (result != 0) {
 				altos_set_last_windows_error();
+			} else {
+				sscanf((char *) symbolic + sizeof("\\??\\USB#VID_") - 1,
+				       "%04X", &vid);
+				sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_") - 1,
+				       "%04X", &pid);
+				sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_XXXX#") - 1,
+				       "%d", &serial);
+			}
+			if (vid == 0 || pid == 0 || serial == 0) {
+				if (SetupDiGetDeviceInstanceId(list->dev_info,
+							       &dev_info_data,
+							       instanceid,
+							       sizeof (instanceid),
+							       &instanceid_len)) {
+					sscanf((char *) instanceid + sizeof("USB\\VID_") - 1,
+					       "%04X", &vid);
+					sscanf((char *) instanceid + sizeof("USB\\VID_XXXX&PID_") - 1,
+					       "%04X", &pid);
+					sscanf((char *) instanceid + sizeof("USB\\VID_XXXX&PID_XXXX\\") - 1,
+					       "%d", &serial);
+				} else {
+					altos_set_last_windows_error();
+				}
+			}
+			if (vid == 0 || pid == 0 || serial == 0) {
 				RegCloseKey(dev_key);
 				continue;
 			}
-			vid = pid = serial = 0;
-			sscanf((char *) symbolic + sizeof("\\??\\USB#VID_") - 1,
-			       "%04X", &vid);
-			sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_") - 1,
-			       "%04X", &pid);
-			sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_XXXX#") - 1,
-			       "%d", &serial);
 		}
 
 		/* Fetch the com port name */

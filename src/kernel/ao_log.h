@@ -43,11 +43,12 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TINY		2	/* two byte state/baro records */
 #define AO_LOG_FORMAT_TELEMETRY		3	/* 32 byte ao_telemetry records */
 #define AO_LOG_FORMAT_TELESCIENCE	4	/* 32 byte typed telescience records */
-#define AO_LOG_FORMAT_TELEMEGA		5	/* 32 byte typed telemega records */
+#define AO_LOG_FORMAT_TELEMEGA_OLD	5	/* 32 byte typed telemega records */
 #define AO_LOG_FORMAT_EASYMINI		6	/* 16-byte MS5607 baro only, 3.0V supply */
 #define AO_LOG_FORMAT_TELEMETRUM	7	/* 16-byte typed telemetrum records */
 #define AO_LOG_FORMAT_TELEMINI		8	/* 16-byte MS5607 baro only, 3.3V supply */
 #define AO_LOG_FORMAT_TELEGPS		9	/* 32 byte telegps records */
+#define AO_LOG_FORMAT_TELEMEGA		10	/* 32 byte typed telemega records with 32 bit gyro cal */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 extern __code uint8_t ao_log_format;
@@ -215,10 +216,22 @@ struct ao_log_mega {
 			int16_t		ground_accel_along;	/* 12 */
 			int16_t		ground_accel_across;	/* 14 */
 			int16_t		ground_accel_through;	/* 16 */
+			int16_t		pad_18;			/* 18 */
+			int32_t		ground_roll;		/* 20 */
+			int32_t		ground_pitch;		/* 24 */
+			int32_t		ground_yaw;		/* 28 */
+		} flight;					/* 32 */
+		struct {
+			uint16_t	flight;			/* 4 */
+			int16_t		ground_accel;		/* 6 */
+			uint32_t	ground_pres;		/* 8 */
+			int16_t		ground_accel_along;	/* 12 */
+			int16_t		ground_accel_across;	/* 14 */
+			int16_t		ground_accel_through;	/* 16 */
 			int16_t		ground_roll;		/* 18 */
 			int16_t		ground_pitch;		/* 20 */
 			int16_t		ground_yaw;		/* 22 */
-		} flight;					/* 24 */
+		} flight_old;					/* 24 */
 		/* AO_LOG_STATE */
 		struct {
 			uint16_t	state;

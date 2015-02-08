@@ -15,12 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.text.*;
 import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosGPS implements Cloneable {
+public class AltosGPS implements Cloneable, Serializable {
 
 	public final static int MISSING = AltosLib.MISSING;
 
@@ -377,6 +378,7 @@ public class AltosGPS implements Cloneable {
 
 	public AltosGPS (AltosLink link, AltosConfigData config_data) throws TimeoutException, InterruptedException {
 		boolean says_done = config_data.compare_version("1.0") >= 0;
+		init();
 		link.printf("g\n");
 		for (;;) {
 			String line = link.get_reply_no_dialog(5000);

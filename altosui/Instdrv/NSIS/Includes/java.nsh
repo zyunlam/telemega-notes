@@ -42,9 +42,25 @@ Function DoDetectJRE
   ReadRegStr $2 HKCU "SOFTWARE\JavaSoft\Java Runtime Environment" \
              "CurrentVersion"
 
-  IfErrors hklm_version
+  IfErrors hkcuwow_version
 
   DetailPrint "HKEY_CURRENT_USER Java version $2"
+
+  ${VersionCompare} $2 ${JRE_VERSION} $3
+
+  IntCmp $3 1 yes yes no
+
+hkcuwow_version:
+
+  ; Check in HKCU Wow6432Node for CurrentVersion
+
+  ClearErrors
+  ReadRegStr $2 HKCU "SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment" \
+	     "CurrentVersion"
+
+  Iferrors hklm_version
+
+  DetailPrint "HKEY_CURRENT_USER Wow6432Node Java version $2"
 
   ${VersionCompare} $2 ${JRE_VERSION} $3
 
@@ -58,9 +74,25 @@ hklm_version:
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" \
              "CurrentVersion"
   
-  IfErrors hkcu_any
+  IfErrors hklmwow_version
 
   DetailPrint "HKEY_LOCAL_MACHINE Java version $2"
+
+  ${VersionCompare} $2 ${JRE_VERSION} $3
+
+  IntCmp $3 1 yes yes no
+
+hklmwow_version:
+
+  ; Check in HKLM Wow6432Node for CurrentVersion
+
+  ClearErrors
+  ReadRegStr $2 HKLM "SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment" \
+	     "CurrentVersion"
+
+  Iferrors hkcu_any
+
+  DetailPrint "HKEY_LOCAL_MACHINE Wow6432Node Java version $2"
 
   ${VersionCompare} $2 ${JRE_VERSION} $3
 

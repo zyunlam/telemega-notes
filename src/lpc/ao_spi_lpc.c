@@ -21,34 +21,27 @@ static uint8_t		ao_spi_mutex[LPC_NUM_SPI];
 
 static struct lpc_ssp * const ao_lpc_ssp[LPC_NUM_SPI] = { &lpc_ssp0, &lpc_ssp1 };
 
-#define tx_busy(lpc_ssp) (lpc_ssp->sr & ((1 << LPC_SSP_SR_BSY) | (1 << LPC_SSP_SR_TNF))) != (1 << LPC_SSP_SR_TNF)
-#define rx_busy(lpc_ssp) (lpc_ssp->sr & ((1 << LPC_SSP_SR_BSY) | (1 << LPC_SSP_SR_RNE))) != (1 << LPC_SSP_SR_RNE)
-
 #define spi_loop(len, put, get) do {					\
 		while (len--) {						\
-			/* Wait for space in the fifo */		\
-			while (tx_busy(lpc_ssp))			\
-				;					\
-									\
 			/* send a byte */				\
 			lpc_ssp->dr = put;				\
-									\
-			/* Wait for byte to appear in the fifo */	\
-			while (rx_busy(lpc_ssp))			\
+			/* wait for the received byte to appear */	\
+			while ((lpc_ssp->sr & (1 << LPC_SSP_SR_RNE)) == 0) \
 				;					\
-									\
-			/* recv a byte */				\
+			/* receive a byte */				\
 			get lpc_ssp->dr;				\
 		}							\
+		/* Wait for the SSP to go idle (it already should be) */ \
+		while (lpc_ssp->sr & (1 << LPC_SSP_SR_BSY));		\
 	} while (0)
 
 void
-ao_spi_send(void *block, uint16_t len, uint8_t id)
+ao_spi_send(const void *block, uint16_t len, uint8_t id)
 {
-	uint8_t	*b = block;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
+	const uint8_t	*o = block;
 
-	spi_loop(len, *b++, (void));
+	spi_loop(len, *o++, (void));
 }
 
 void
@@ -62,18 +55,18 @@ ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t id)
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t id)
 {
-	uint8_t	*b = block;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
+	uint8_t *i = block;
 
-	spi_loop(len, 0xff, *b++ =);
+	spi_loop(len, 0xff, *i++ =);
 }
 
 void
-ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t id)
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t id)
 {
-	uint8_t	*o = out;
-	uint8_t	*i = in;
 	struct lpc_ssp *lpc_ssp = ao_lpc_ssp[id];
+	const uint8_t *o = out;
+	uint8_t *i = in;
 
 	spi_loop(len, *o++, *i++ =);
 }
@@ -84,7 +77,7 @@ ao_spi_get(uint8_t id, uint32_t speed)
 	struct lpc_ssp	*lpc_ssp = ao_lpc_ssp[id];
 
 	ao_mutex_get(&ao_spi_mutex[id]);
-	
+
 	/* Set the clock prescale */
 	lpc_ssp->cpsr = speed;
 }
@@ -100,6 +93,11 @@ ao_spi_channel_init(uint8_t id)
 {
 	struct lpc_ssp	*lpc_ssp = ao_lpc_ssp[id];
 	uint8_t	d;
+
+	/* Clear interrupt registers */
+	lpc_ssp->imsc = 0;
+	lpc_ssp->ris = 0;
+	lpc_ssp->mis = 0;
 
 	lpc_ssp->cr0 = ((LPC_SSP_CR0_DSS_8 << LPC_SSP_CR0_DSS) |
 			(LPC_SSP_CR0_FRF_SPI << LPC_SSP_CR0_FRF) |
@@ -151,7 +149,7 @@ ao_spi_init(void)
 	lpc_scb.presetctrl &= ~(1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	ao_spi_channel_init(0);
-#endif			   
+#endif
 
 #if HAS_SPI_1
 
@@ -190,7 +188,7 @@ ao_spi_init(void)
 #ifndef HAS_MOSI1
 #error "No pin specified for MOSI1"
 #endif
-		
+
 	/* Enable the device */
 	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_SSP1);
 

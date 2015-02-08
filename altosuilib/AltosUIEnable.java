@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -23,7 +23,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -37,11 +37,18 @@ import org.jfree.data.*;
 
 public class AltosUIEnable extends Container {
 
-	Insets	il, ir;
-	int	y;
-	int	x;
+	Insets		il, ir;
+	int		y;
+	int		x;
+	JCheckBox	imperial_units;
 
 	static final int max_rows = 14;
+
+	public void units_changed(boolean imperial_units) {
+		if (this.imperial_units != null) {
+			this.imperial_units.setSelected(imperial_units);
+		}
+	}
 
 	class GraphElement implements ActionListener {
 		AltosUIGrapher	grapher;
@@ -86,7 +93,7 @@ public class AltosUIEnable extends Container {
 		/* Imperial units setting */
 
 		/* Add label */
-		JCheckBox imperial_units = new JCheckBox("Imperial Units", AltosUIPreferences.imperial_units());
+		imperial_units = new JCheckBox("Imperial Units", AltosUIPreferences.imperial_units());
 		imperial_units.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					JCheckBox item = (JCheckBox) e.getSource();

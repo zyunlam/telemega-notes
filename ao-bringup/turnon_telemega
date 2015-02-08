@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -x /usr/bin/ao-flash-stm ]; then
-	STMLOAD=/usr/bin/ao-flash-stm
+	FLASH_STM=/usr/bin/ao-flash-stm
 else
 	echo "Can't find ao-flash-stm!  Aborting."
 	exit 1
@@ -21,22 +21,22 @@ echo "TeleMega v$VERSION Turn-On and Calibration Program"
 echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
 echo
 echo "Expectations:"
-echo "\tTeleMega v$VERSIOn powered from USB"
+echo "\tTeleMega v$VERSION powered from USB"
 echo "\t\twith ST-Link-V2 cabled to debug header"
 echo "\t\twith coax from UHF to frequency counter"
 echo
 echo -n "TeleMega-$VERSION serial number: "
 read SERIAL
 
-echo $STMLOAD
+echo $FLASH_STM
 
-$STMLOAD $REPO/loaders/telemega-v$VERSION*.elf || exit 1
+$FLASH_STM $REPO/loaders/telemega-v$VERSION*.elf || exit 1
 
-sleep 2
+sleep 5
 
 $USBLOAD --serial=$SERIAL $REPO/telemega-v$VERSION*.elf || exit 1
 
-sleep 2
+sleep 5
 
 dev=`ao-list | awk '/TeleMega-v'"$VERSION"'/ { print $3; exit(0); }'`
 
@@ -57,3 +57,7 @@ SERIAL=$SERIAL ./cal-freq $dev
 ../ao-tools/ao-cal-accel/ao-cal-accel $dev
 
 echo 'E 1' > $dev
+
+./test-telemega
+
+exit $?

@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMonitor {
 	JFrame		owner;
@@ -36,6 +36,8 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 	JProgressBar	pbar;
 	int		min_state, max_state;
 	ActionListener	listener;
+
+	static final int	progress_max = 10000;
 
 	public AltosEepromMonitorUI(JFrame owner) {
 		super (owner, "Download Flight Data", false);
@@ -102,7 +104,7 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 
 		pbar = new JProgressBar();
 		pbar.setMinimum(0);
-		pbar.setMaximum(1000);
+		pbar.setMaximum(progress_max);
 		pbar.setValue(0);
 		pbar.setString("startup");
 		pbar.setStringPainted(true);
@@ -155,16 +157,40 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 	}
 
 	private void set_value_internal(String state_name, int state, int state_block, int block) {
-		if (state_block > 100)
-			state_block = 100;
-		if (state < min_state) state = min_state;
-		if (state >= max_state) state = max_state - 1;
-		state -= min_state;
+		double	pos;
+		String	s;
 
-		int pos = state * 100 + state_block;
+		if (min_state == AltosLib.ao_flight_invalid) {
+			int	lblock = block;
+			if (lblock > 1000)
+				lblock = 1000;
+			pos = lblock / 1000.0;
+			s = String.format("block %d", block);
+		} else {
+			if (state == AltosLib.ao_flight_invalid)
+				state = 0;
+			if (state_block > 100)
+				state_block = 100;
+			if (state < min_state) state = min_state;
+			if (state > max_state) state = max_state;
 
-		pbar.setString(String.format("block %d state %s", block, state_name));
-		pbar.setValue(pos);
+			if (state == max_state)
+				state_block = 0;
+
+			state -= min_state;
+
+			int	nstate = max_state - min_state;
+
+			double	spos = (double) state / (double) nstate;
+			double	bpos = state_block / 100.0;
+
+			pos = spos + bpos / nstate;
+
+			s = String.format("block %d state %s", block, state_name);
+		}
+
+		pbar.setString(s);
+		pbar.setValue((int) (pos * progress_max));
 	}
 
 	public void set_value(String in_state_name, int in_state, int in_state_block, int in_block) {

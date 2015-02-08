@@ -19,8 +19,8 @@ package org.altusmetrum.telegps;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_5.*;
-import org.altusmetrum.altosuilib_3.*;
+import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altosuilib_6.*;
 
 public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 	GridBagLayout	layout;
@@ -179,11 +179,15 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 		long	last_secs = -1;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			long secs = (System.currentTimeMillis() - state.received_time + 500) / 1000;
+			if (listener_state.running) {
+				long secs = (System.currentTimeMillis() - state.received_time + 500) / 1000;
 
-			if (secs != last_secs) {
-				value.setText(String.format("%d", secs));
-				last_secs = secs;
+				if (secs != last_secs) {
+					value.setText(String.format("%d", secs));
+					last_secs = secs;
+				}
+			} else {
+				value.setText("done");
 			}
 		}
 
@@ -232,11 +236,29 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 		flight.show(state, listener_state);
 		rssi.show(state, listener_state);
 		last_packet.show(state, listener_state);
+		if (!listener_state.running)
+			stop();
 	}
 
 	public int height() {
 		Dimension d = layout.preferredLayoutSize(this);
 		return d.height;
+	}
+
+	TeleGPSStatusUpdate	status_update;
+	javax.swing.Timer	timer;
+
+	public void start(TeleGPSStatusUpdate status_update) {
+		this.status_update = status_update;
+		timer = new javax.swing.Timer(100, status_update);
+		timer.start();
+	}
+
+	public void stop() {
+		if (timer != null) {
+			timer.stop();
+			timer = null;
+		}
 	}
 
 	public TeleGPSStatus() {

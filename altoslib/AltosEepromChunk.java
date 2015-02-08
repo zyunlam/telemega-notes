@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.text.*;
 import java.util.concurrent.*;
@@ -75,7 +75,8 @@ public class AltosEepromChunk {
 		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
-			eeprom = new AltosEepromMega(this, offset);
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			eeprom = new AltosEepromMega(this, offset, log_format);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
 			eeprom = new AltosEepromMetrum2(this, offset);

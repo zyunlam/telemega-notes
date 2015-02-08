@@ -71,6 +71,29 @@ Section "FTDI USB Driver"
 	ExecWait $2
 SectionEnd
 
+Section "Install Driver" InstDriver
+
+	InstDrv::InitDriverSetup /NOUNLOAD {4D36E96D-E325-11CE-BFC1-08002BE10318} AltusMetrumSerial
+	Pop $0
+	DetailPrint "InitDriverSetup: $0"
+	InstDrv::DeleteOemInfFiles /NOUNLOAD
+	InstDrv::CreateDevice /NOUNLOAD
+
+	SetOutPath $INSTDIR
+	File "../altusmetrum.inf"
+	File "../altusmetrum.cat"
+
+	${DisableX64FSRedirection}
+	IfFileExists $WINDIR\System32\PnPutil.exe 0 nopnp
+		${DisableX64FSRedirection}
+		nsExec::ExecToLog '"$WINDIR\System32\PnPutil.exe" -i -a "$INSTDIR\altusmetrum.inf"'
+		Goto done
+nopnp:
+		InstDrv::InstallDriver /NOUNLOAD "$INSTDIR\altusmetrum.inf"
+done:
+
+SectionEnd
+
 Section "${REG_NAME} Application"
 	Call DetectJRE
 
@@ -86,7 +109,7 @@ Section "${REG_NAME} Application"
 
 	File "../icon/${WIN_APP_ICON}"
 
-	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$SYSDIR\javaw.exe" "-jar ${FAT_NAME}" "$INSTDIR\${WIN_APP_ICON}"
+	CreateShortCut "$SMPROGRAMS\${REG_NAME}.lnk" "$INSTDIR\${FAT_NAME}" "" "$INSTDIR\${WIN_APP_ICON}"
 SectionEnd
 
 Section "${REG_NAME} Desktop Shortcut"
@@ -102,10 +125,14 @@ SectionEnd
 
 Section "File Associations"
 
+	${DisableX64FSRedirection}
+
 	SetOutPath $INSTDIR
 
 	File "../icon/${WIN_APP_EXE}"
 	File "../icon/${WIN_MPD_EXE}"
+
+	SearchPath $1 "javaw.exe"
 
 	; application elements
 	
@@ -116,7 +143,7 @@ Section "File Associations"
 	WriteRegStr HKCR "${PROG_ID_MPD}"		"FriendlyTypeName"		"MicroPeak Data File"
 	WriteRegStr HKCR "${PROG_ID_MPD}\CurVer"	""				"${PROG_ID_MPD}"
 	WriteRegStr HKCR "${PROG_ID_MPD}\DefaultIcon"	""				'"$INSTDIR\${WIN_MPD_EXE}",-101'
-  WriteRegExpandStr HKCR "${PROG_ID_MPD}\shell\play\command" ""				'"%SYSTEMROOT%\System32\javaw.exe" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
+  WriteRegExpandStr HKCR "${PROG_ID_MPD}\shell\play\command" ""				'"$1" -Djava.library.path="$INSTDIR" -jar "$INSTDIR\${FAT_NAME}" "%1"'
 
 	; .mpd elements
 

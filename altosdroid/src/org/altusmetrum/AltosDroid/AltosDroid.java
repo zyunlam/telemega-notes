@@ -52,7 +52,7 @@ import android.widget.Toast;
 import android.app.AlertDialog;
 import android.location.Location;
 
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Debugging
@@ -337,7 +337,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			}
 			if (saved_state == null || state.flight != saved_state.flight) {
 				Log.d(TAG, "update flight");
-				mFlightView.setText(String.format("%d", state.flight));
+				if (state.flight == AltosLib.MISSING)
+					mFlightView.setText("");
+				else
+					mFlightView.setText(String.format("%d", state.flight));
 			}
 			if (saved_state == null || state.state != saved_state.state) {
 				Log.d(TAG, "update state");

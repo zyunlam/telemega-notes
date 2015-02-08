@@ -15,11 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosMs5607 {
+public class AltosMs5607 implements Serializable {
 	public int	reserved;
 	public int	sens;
 	public int	off;
@@ -126,7 +127,7 @@ public class AltosMs5607 {
 
 	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
 		try {
-			AltosMs5607	ms5607 = new AltosMs5607(link);
+			AltosMs5607	ms5607 = new AltosMs5607(link, config_data);
 
 			if (ms5607 != null) {
 				state.set_ms5607(ms5607);
@@ -143,9 +144,17 @@ public class AltosMs5607 {
 		cc = AltosLib.MISSING;
 	}
 
-	public AltosMs5607 (AltosLink link) throws InterruptedException, TimeoutException {
+	public AltosMs5607 (AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException {
 		this();
-		link.printf("c s\nB\n");
+		reserved = config_data.ms5607_reserved;
+		sens = config_data.ms5607_sens;
+		off = config_data.ms5607_off;
+		tcs = config_data.ms5607_tcs;
+		tco = config_data.ms5607_tco;
+		tref = config_data.ms5607_tref;
+		tempsens = config_data.ms5607_tempsens;
+		crc = config_data.ms5607_crc;
+		link.printf("B\n");
 		for (;;) {
 			String line = link.get_reply_no_dialog(5000);
 			if (line == null) {

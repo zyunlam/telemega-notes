@@ -18,7 +18,7 @@
 #define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
 
-#define AO_STACK_SIZE	384
+#define AO_STACK_SIZE	376
 
 #define IS_FLASH_LOADER	0
 

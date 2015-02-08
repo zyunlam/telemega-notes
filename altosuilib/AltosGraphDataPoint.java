@@ -15,9 +15,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 public class AltosGraphDataPoint implements AltosUIDataPoint {
 
@@ -40,15 +40,15 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 	public static final int data_range = 14;
 	public static final int data_distance = 15;
 	public static final int data_pressure = 16;
-	public static final int data_accel_x = 17;
-	public static final int data_accel_y = 18;
-	public static final int data_accel_z = 19;
-	public static final int data_gyro_x = 20;
-	public static final int data_gyro_y = 21;
-	public static final int data_gyro_z = 22;
-	public static final int data_mag_x = 23;
-	public static final int data_mag_y = 24;
-	public static final int data_mag_z = 25;
+	public static final int data_accel_along = 17;
+	public static final int data_accel_across = 18;
+	public static final int data_accel_through = 19;
+	public static final int data_gyro_roll = 20;
+	public static final int data_gyro_pitch = 21;
+	public static final int data_gyro_yaw = 22;
+	public static final int data_mag_along = 23;
+	public static final int data_mag_across = 24;
+	public static final int data_mag_through = 25;
 	public static final int data_orient = 26;
 	public static final int data_gps_course = 27;
 	public static final int data_gps_ground_speed = 28;
@@ -128,53 +128,32 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 			y = state.pressure();
 			break;
 
-		case data_accel_x:
-		case data_accel_y:
-		case data_accel_z:
-		case data_gyro_x:
-		case data_gyro_y:
-		case data_gyro_z:
-			AltosIMU	imu = state.imu;
-			if (imu == null)
-				break;
-			switch (index) {
-			case data_accel_x:
-				y = imu.accel_x;
-				break;
-			case data_accel_y:
-				y = imu.accel_y;
-				break;
-			case data_accel_z:
-				y = imu.accel_z;
-				break;
-			case data_gyro_x:
-				y = imu.gyro_x;
-				break;
-			case data_gyro_y:
-				y = imu.gyro_y;
-				break;
-			case data_gyro_z:
-				y = imu.gyro_z;
-				break;
-			}
+		case data_accel_along:
+			y = state.accel_along();
 			break;
-		case data_mag_x:
-		case data_mag_y:
-		case data_mag_z:
-			AltosMag	mag = state.mag;
-			if (mag == null)
-				break;
-			switch (index) {
-			case data_mag_x:
-				y = mag.x;
-				break;
-			case data_mag_y:
-				y = mag.y;
-				break;
-			case data_mag_z:
-				y = mag.z;
-				break;
-			}
+		case data_accel_across:
+			y = state.accel_across();
+			break;
+		case data_accel_through:
+			y = state.accel_through();
+			break;
+		case data_gyro_roll:
+			y = state.gyro_roll();
+			break;
+		case data_gyro_pitch:
+			y = state.gyro_pitch();
+			break;
+		case data_gyro_yaw:
+			y = state.gyro_yaw();
+			break;
+		case data_mag_along:
+			y = state.mag_along();
+			break;
+		case data_mag_across:
+			y = state.mag_across();
+			break;
+		case data_mag_through:
+			y = state.mag_through();
 			break;
 		case data_orient:
 			y = state.orient();

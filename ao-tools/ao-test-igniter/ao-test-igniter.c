@@ -190,7 +190,6 @@ main (int argc, char **argv)
 	if (verbose > 1)
 		ccdbg_add_debug(CC_DEBUG_BITBANG);
 
-	printf ("device %s\n", device);
 	if (!tty)
 		tty = cc_usbdevs_find_by_arg(device, "TeleMega-v1.0");
 	if (!tty)

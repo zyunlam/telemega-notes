@@ -17,7 +17,8 @@ RELNOTES=\
 	release-notes-1.3.2.html \
 	release-notes-1.4.html \
 	release-notes-1.4.1.html \
-	release-notes-1.5.html
+	release-notes-1.5.html \
+	release-notes-1.6.html
 
 PICTURES=\
 	altosui.png \

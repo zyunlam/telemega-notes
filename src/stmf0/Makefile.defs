@@ -1,0 +1,9 @@
+ifndef TOPDIR
+TOPDIR=..
+endif
+
+include $(TOPDIR)/stmf0/Makefile-stmf0.defs
+
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Taltos.ld
+
+.DEFAULT_GOAL=all

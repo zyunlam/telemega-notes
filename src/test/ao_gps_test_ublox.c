@@ -59,6 +59,7 @@ struct ao_telemetry_location {
 
 typedef int32_t		gps_alt_t;
 #define AO_TELEMETRY_LOCATION_ALTITUDE(l) 	(((gps_alt_t) (l)->altitude_high << 16) | ((l)->altitude_low))
+#define AO_GPS_ORIG_ALTITUDE(l)			AO_TELEMETRY_LOCATION_ALTITUDE(l)
 #define AO_TELEMETRY_LOCATION_SET_ALTITUDE(l,a) (((l)->altitude_high = (a) >> 16), \
 						 ((l)->altitude_low = (a)))
 

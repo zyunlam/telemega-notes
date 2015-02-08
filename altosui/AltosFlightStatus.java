@@ -19,8 +19,8 @@ package altosui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_5.*;
-import org.altusmetrum.altosuilib_3.*;
+import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altosuilib_6.*;
 
 public class AltosFlightStatus extends JComponent implements AltosFlightDisplay {
 	GridBagLayout	layout;
@@ -229,10 +229,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		long	last_secs = -1;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			long secs = (System.currentTimeMillis() - state.received_time + 500) / 1000;
-			if (secs != last_secs) {
-				value.setText(String.format("%d", secs));
-				last_secs = secs;
+			if (listener_state.running) {
+				long secs = (System.currentTimeMillis() - state.received_time + 500) / 1000;
+				if (secs != last_secs) {
+					value.setText(String.format("%d", secs));
+					last_secs = secs;
+				}
+			} else {
+				value.setText("done");
 			}
 		}
 
@@ -276,6 +280,8 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		flight_state.show(state, listener_state);
 		rssi.show(state, listener_state);
 		last_packet.show(state, listener_state);
+		if (!listener_state.running)
+			stop();
 	}
 
 	public int height() {
@@ -284,6 +290,22 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 	}
 
 	public String getName() { return "Flight Status"; }
+
+	AltosFlightStatusUpdate	status_update;
+	javax.swing.Timer	timer;
+
+	public void start(AltosFlightStatusUpdate status_update) {
+		this.status_update = status_update;
+		timer = new javax.swing.Timer(100, status_update);
+		timer.start();
+	}
+
+	public void stop() {
+		if (timer != null) {
+			timer.stop();
+			timer = null;
+		}
+	}
 
 	public AltosFlightStatus() {
 		layout = new GridBagLayout();

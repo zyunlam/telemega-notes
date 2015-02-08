@@ -21,8 +21,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.io.*;
 import java.text.*;
-import org.altusmetrum.altoslib_5.*;
-import org.altusmetrum.altosuilib_3.*;
+import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altosuilib_6.*;
 
 public class TeleGPSDisplayThread extends Thread {
 
@@ -168,8 +168,10 @@ public class TeleGPSDisplayThread extends Thread {
 			for (;;) {
 				try {
 					state = reader.read();
-					if (state == null)
+					if (state == null) {
+						listener_state.running = false;
 						break;
+					}
 					reader.update(state);
 					show_safely();
 					told = tell();

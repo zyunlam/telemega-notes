@@ -48,14 +48,14 @@ INC=\
 	altitude-pa.h
 
 IDPRODUCT=0
-PRODUCT=MicroWater-v0.1
+PRODUCT=MicroSplash-v0.1
 PRODUCT_DEF=-DMICROPEAK
 CFLAGS = $(PRODUCT_DEF) -I. -I../attiny -I../kernel -I.. -I../drivers -I../product
 CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -O2 -mcall-prologues -DATTINY
 
 NICKLE=nickle
 
-PROG=microwater-v0.1
+PROG=microsplash-v1.0
 
 SRC=$(ALTOS_SRC)
 OBJ=$(SRC:.c=.o)

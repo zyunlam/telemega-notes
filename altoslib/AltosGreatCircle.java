@@ -15,11 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.lang.Math;
+import java.io.*;
 
-public class AltosGreatCircle implements Cloneable {
+public class AltosGreatCircle implements Cloneable, Serializable {
 	public double	distance;
 	public double	bearing;
 	public double	range;

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -55,8 +55,11 @@ public abstract class AltosLink implements Runnable {
 
 	public void printf(String format, Object ... arguments) {
 		String	line = String.format(format, arguments);
-		if (debug)
-			pending_output.add(line);
+		if (debug) {
+			synchronized (pending_output) {
+				pending_output.add(line);
+			}
+		}
 		try {
 			print(line);
 		} catch (InterruptedException ie) {
@@ -286,12 +289,14 @@ public abstract class AltosLink implements Runnable {
 		binary_queue.put(dup);
 	}
 
-	public void flush_output() {
+	public synchronized void flush_output() {
 		if (pending_output == null)
 			return;
-		for (String s : pending_output)
-			System.out.print(s);
-		pending_output.clear();
+		synchronized (pending_output) {
+			for (String s : pending_output)
+				System.out.print(s);
+			pending_output.clear();
+		}
 	}
 
 	public void flush_input(int timeout) throws InterruptedException {
@@ -381,13 +386,17 @@ public abstract class AltosLink implements Runnable {
 		flush_output();
 	}
 
-	public void set_monitor(boolean monitor) {
+	public synchronized void set_monitor(boolean monitor) {
 		monitor_mode = monitor;
 		if (monitor)
 			printf("m %x\n", telemetry_len());
 		else
 			printf("m 0\n");
 		flush_output();
+	}
+
+	public synchronized boolean get_monitor() {
+		return monitor_mode;
 	}
 
 	private void set_channel(int channel) {
@@ -422,8 +431,10 @@ public abstract class AltosLink implements Runnable {
 
 	public void set_callsign(String callsign) {
 		this.callsign = callsign;
-		printf ("c c %s\n", callsign);
-		flush_output();
+		if (callsign != null) {
+			printf ("c c %s\n", callsign);
+			flush_output();
+		}
 	}
 
 	public boolean is_loader() throws InterruptedException {
@@ -462,7 +473,7 @@ public abstract class AltosLink implements Runnable {
 		if (telemetry_rate < 0)
 			telemetry_rate = AltosPreferences.telemetry_rate(serial);
 		set_telemetry_rate(telemetry_rate);
-		if (callsign.equals(""))
+		if (callsign == null || callsign.equals(""))
 			callsign = AltosPreferences.callsign();
 		set_callsign(callsign);
 		printf("p\nE 0\n");

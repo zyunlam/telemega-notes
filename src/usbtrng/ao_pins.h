@@ -71,3 +71,5 @@
  */
 #define HAS_SCK1		0
 #define HAS_MOSI1		0
+
+#define AO_ADC_6		1

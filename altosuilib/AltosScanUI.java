@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 
 class AltosScanResult {
 	String		callsign;
@@ -159,6 +159,8 @@ public class AltosScanUI
 	Thread				thread;
 	AltosFrequency[]		frequencies;
 	int				frequency_index;
+	int				packet_count;
+	int				tick_count;
 
 	void scan_exception(Exception e) {
 		if (e instanceof FileNotFoundException) {
@@ -200,6 +202,7 @@ public class AltosScanUI
 						AltosState	state = reader.read();
 						if (state == null)
 							continue;
+						packet_count++;
 						if (state.flight != AltosLib.MISSING) {
 							final AltosScanResult	result = new AltosScanResult(state.callsign,
 													     state.serial,
@@ -251,9 +254,6 @@ public class AltosScanUI
 	void next() throws InterruptedException, TimeoutException {
 		reader.set_monitor(false);
 
-		/* Let any pending input from the last configuration drain out */
-		Thread.sleep(100);
-
 		if (select_rate) {
 			boolean	wrapped = false;
 			do {
@@ -284,6 +284,8 @@ public class AltosScanUI
 				return;
 			}
 		}
+		packet_count = 0;
+		tick_count = 0;
 		++frequency_index;
 		if (frequency_index >= frequencies.length)
 			frequency_index = 0;
@@ -308,7 +310,9 @@ public class AltosScanUI
 	}
 
 	void tick_timer() throws InterruptedException, TimeoutException {
-		next();
+		++tick_count;
+		if (packet_count == 0 || tick_count > 5)
+			next();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -356,7 +360,6 @@ public class AltosScanUI
 				if (r != null) {
 					if (device != null) {
 						if (reader != null) {
-							System.out.printf("frequency %g rate %d\n", r.frequency.frequency, r.rate);
 							reader.set_telemetry(r.telemetry);
 							reader.set_telemetry_rate(r.rate);
 							reader.set_frequency(r.frequency.frequency);
@@ -441,6 +444,7 @@ public class AltosScanUI
 	}
 
 	public AltosScanUI(AltosUIFrame in_owner, boolean in_select_telemetry) {
+		super(in_owner, "Scan Telemetry", false);
 
 		owner = in_owner;
 		select_telemetry = in_select_telemetry;

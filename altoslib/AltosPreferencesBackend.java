@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.io.File;
 
@@ -32,6 +32,9 @@ public interface AltosPreferencesBackend {
 
 	public boolean getBoolean(String key, boolean def);
 	public void    putBoolean(String key, boolean value);
+
+	public byte[]  getBytes(String key, byte[] def);
+	public void    putBytes(String key, byte[] value);
 
 	public boolean nodeExists(String key);
 	public AltosPreferencesBackend node(String key);

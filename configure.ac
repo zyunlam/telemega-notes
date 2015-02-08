@@ -18,7 +18,7 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.5)
+AC_INIT([altos], 1.6)
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
@@ -29,8 +29,8 @@ AC_SUBST(VERSION_DASH)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=3
-ALTOSLIB_VERSION=5
+ALTOSUILIB_VERSION=6
+ALTOSLIB_VERSION=6
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -144,13 +144,18 @@ if test "x$ANDROID_SDK" != "xno"; then
 	fi
 fi
 
+ANDROID_RELEASE=no
 if test "x$ANDROID_SDK" != "xno"; then
 	HAVE_ANDROID_SDK="yes"
+	if test -f "$HOME/altusmetrumllc/release.keystore" -a -f "$HOME/altusmetrumllc/Passphrase"; then
+		ANDROID_RELEASE=yes
+	fi
 else
 	HAVE_ANDROID_SDK="no"
 fi
 
 AM_CONDITIONAL([ANDROID], [test x$ANDROID_SDK != xno])
+AM_CONDITIONAL([ANDROID_RELEASE], [test x$ANDROID_RELEASE = xyes])
 
 AC_SUBST(ANDROID_SDK)
 
@@ -546,6 +551,8 @@ ao-tools/ao-test-igniter/Makefile
 ao-tools/ao-test-baro/Makefile
 ao-tools/ao-test-flash/Makefile
 ao-tools/ao-cal-accel/Makefile
+ao-tools/ao-test-gps/Makefile
+ao-tools/ao-usbtrng/Makefile
 ao-utils/Makefile
 src/Version
 ])
@@ -562,6 +569,7 @@ echo "    CC1111 support..............: ${HAVE_SDCC}"
 echo "    AVR compiler................: ${AVR_CC} ${AVR_OBJCOPY}"
 echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
+echo "    Android release support.....: ${ANDROID_RELEASE}"
 echo "    STlink support..............: ${HAVE_STLINK}"
 echo "    Local pdclib................: ${HAVE_PDCLIB}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"

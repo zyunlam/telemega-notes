@@ -17,22 +17,10 @@ ao-list | while read product serial dev; do
 	"$PRODUCT-v$VERSION")
 
 	    echo "Testing $product $serial $dev"
+	    echo ""
 
-	    for igniter in drogue main 0 1 2 3; do
-		echo "Testing $igniter igniter."
-		echo -n "Press enter to continue..."
-		read foo < /dev/tty
-		../ao-tools/ao-test-igniter/ao-test-igniter --tty="$dev" $igniter
-
-		case $? in
-		    0)
-			;;
-		    *)
-			echo "failed"
-			exit 1
-			;;
-		esac
-	    done
+	    ./test-igniters $dev drogue main 0 1 2 3
+	    echo""
 
 	    echo "Testing baro sensor"
 	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
@@ -44,6 +32,7 @@ ao-list | while read product serial dev; do
 		    echo "failed"
 		    exit 1
 	    esac
+	    echo""
 
 	    FLASHSIZE=8388608
 
@@ -57,12 +46,10 @@ ao-list | while read product serial dev; do
 		    echo "failed"
 		    exit 1
 	    esac
+	    echo""
 
 	    echo "$PRODUCT-v$VERSION" serial "$serial" is ready to ship
 	    ret=0
-	    ;;
-	*)
-	    echo "Skipping $product $serial $dev"
 	    ;;
     esac
 done

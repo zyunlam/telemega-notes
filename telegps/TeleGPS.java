@@ -23,8 +23,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_5.*;
-import org.altusmetrum.altosuilib_3.*;
+import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altosuilib_6.*;
 
 public class TeleGPS
 	extends AltosUIFrame
@@ -67,7 +67,6 @@ public class TeleGPS
 
 	TeleGPSStatus		telegps_status;
 	TeleGPSStatusUpdate	status_update;
-	javax.swing.Timer	status_timer;
 
 	JTabbedPane		pane;
 
@@ -147,6 +146,7 @@ public class TeleGPS
 	public void show(AltosState state, AltosListenerState listener_state) {
 		try {
 			status_update.saved_state = state;
+			status_update.saved_listener_state = listener_state;
 
 			if (state == null)
 				state = new AltosState();
@@ -178,11 +178,7 @@ public class TeleGPS
 	void disconnect() {
 		setTitle("TeleGPS");
 		stop_display();
-		if (status_timer != null) {
-			status_timer.stop();
-			status_timer = null;
-			status_update = null;
-		}
+		telegps_status.stop();
 
 		telegps_status.disable_receive();
 		disable_frequency_menu();
@@ -404,8 +400,7 @@ public class TeleGPS
 	public void set_reader(AltosFlightReader reader, AltosDevice device) {
 		status_update = new TeleGPSStatusUpdate(telegps_status);
 
-		status_timer = new javax.swing.Timer(100, status_update);
-		status_timer.start();
+		telegps_status.start(status_update);
 
 		setTitle(String.format("TeleGPS %s", reader.name));
 		thread = new TeleGPSDisplayThread(this, voice(), this, reader);

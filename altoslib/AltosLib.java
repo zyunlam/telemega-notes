@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.util.*;
 import java.io.*;
@@ -74,6 +74,7 @@ public class AltosLib {
 	public static final int AO_LOG_BARO_TREF = 3006;
 	public static final int AO_LOG_BARO_TEMPSENS = 3007;
 	public static final int AO_LOG_BARO_CRC = 3008;
+	public static final int AO_LOG_IMU_CAL = 3009;
 
 	public static final int AO_LOG_SOFTWARE_VERSION = 9999;
 
@@ -113,6 +114,9 @@ public class AltosLib {
 	public final static int product_easymini = 0x0026;
 	public final static int product_telemini = 0x0027;
 	public final static int product_easymega = 0x0028;
+	public final static int product_usbtrng = 0x0029;
+	public final static int product_usbrelay = 0x002a;
+	public final static int product_mpusb = 0x002b;
 	public final static int product_altusmetrum_min = 0x000a;
 	public final static int product_altusmetrum_max = 0x002c;
 
@@ -187,6 +191,7 @@ public class AltosLib {
 	};
 
 	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
+//	public static final String launch_sites_url = "file:///home/keithp/misc/text/altusmetrum/AltOS/launch-sites.txt";
 
 	public static final int ao_telemetry_standard_len = 32;
 	public static final int ao_telemetry_0_9_len = 95;
@@ -315,11 +320,12 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_TINY = 2;
 	public static final int AO_LOG_FORMAT_TELEMETRY = 3;
 	public static final int AO_LOG_FORMAT_TELESCIENCE = 4;
-	public static final int AO_LOG_FORMAT_TELEMEGA = 5;
+	public static final int AO_LOG_FORMAT_TELEMEGA_OLD = 5;
 	public static final int AO_LOG_FORMAT_EASYMINI = 6;
 	public static final int AO_LOG_FORMAT_TELEMETRUM = 7;
 	public static final int AO_LOG_FORMAT_TELEMINI = 8;
 	public static final int AO_LOG_FORMAT_TELEGPS = 9;
+	public static final int AO_LOG_FORMAT_TELEMEGA = 10;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {

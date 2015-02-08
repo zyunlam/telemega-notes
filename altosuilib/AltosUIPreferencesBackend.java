@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_3;
+package org.altusmetrum.altosuilib_6;
 
 import java.io.File;
 import java.util.prefs.*;
-import org.altusmetrum.altoslib_5.*;
+import org.altusmetrum.altoslib_6.*;
 import javax.swing.filechooser.FileSystemView;
 
 public class AltosUIPreferencesBackend implements AltosPreferencesBackend {
@@ -60,6 +60,14 @@ public class AltosUIPreferencesBackend implements AltosPreferencesBackend {
 	}
 	public void    putBoolean(String key, boolean value) {
 		_preferences.putBoolean(key, value);
+	}
+
+	public byte[] getBytes(String key, byte[] def) {
+		return _preferences.getByteArray(key, def);
+	}
+
+	public void putBytes(String key, byte[] value) {
+		_preferences.putByteArray(key, value);
 	}
 
 	public boolean nodeExists(String key) {

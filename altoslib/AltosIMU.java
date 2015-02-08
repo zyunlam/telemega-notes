@@ -15,41 +15,30 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosIMU implements Cloneable {
-	public double		accel_x;
-	public double		accel_y;
-	public double		accel_z;
+public class AltosIMU implements Cloneable, Serializable {
+	public int		accel_along;
+	public int		accel_across;
+	public int		accel_through;
 
-	public double		gyro_x;
-	public double		gyro_y;
-	public double		gyro_z;
+	public int		gyro_roll;
+	public int		gyro_pitch;
+	public int		gyro_yaw;
 
-/*
- * XXX use ground measurements to adjust values
+	public static double	counts_per_g = 2048.0;
 
-	public double		ground_accel_x;
-	public double		ground_accel_y;
-	public double		ground_accel_z;
-
-	public double		ground_gyro_x;
-	public double		ground_gyro_y;
-	public double		ground_gyro_z;
-*/
-
-	public static int	counts_per_g = 2048;
-
-	public static double convert_accel(int counts) {
-		return (double) counts / (double) counts_per_g * (-AltosConvert.GRAVITATIONAL_ACCELERATION);
+	public static double convert_accel(double counts) {
+		return counts / counts_per_g * (-AltosConvert.GRAVITATIONAL_ACCELERATION);
 	}
 
 	public static double	counts_per_degsec = 16.4;
 
-	public static double convert_gyro(int counts) {
-		return (double) counts / counts_per_degsec;
+	public static double convert_gyro(double counts) {
+		return counts / counts_per_degsec;
 	}
 
 	public boolean parse_string(String line) {
@@ -59,12 +48,12 @@ public class AltosIMU implements Cloneable {
 		String[] items = line.split("\\s+");
 
 		if (items.length >= 8) {
-			accel_x = convert_accel(Integer.parseInt(items[1]));
-			accel_y = convert_accel(Integer.parseInt(items[2]));
-			accel_z = convert_accel(Integer.parseInt(items[3]));
-			gyro_x = convert_gyro(Integer.parseInt(items[5]));
-			gyro_y = convert_gyro(Integer.parseInt(items[6]));
-			gyro_z = convert_gyro(Integer.parseInt(items[7]));
+			accel_along = Integer.parseInt(items[1]);
+			accel_across = Integer.parseInt(items[2]);
+			accel_through = Integer.parseInt(items[3]);
+			gyro_roll = Integer.parseInt(items[5]);
+			gyro_pitch = Integer.parseInt(items[6]);
+			gyro_yaw = Integer.parseInt(items[7]);
 		}
 		return true;
 	}
@@ -72,13 +61,13 @@ public class AltosIMU implements Cloneable {
 	public AltosIMU clone() {
 		AltosIMU	n = new AltosIMU();
 
-		n.accel_x = accel_x;
-		n.accel_y = accel_y;
-		n.accel_z = accel_z;
+		n.accel_along = accel_along;
+		n.accel_across = accel_across;
+		n.accel_through = accel_through;
 
-		n.gyro_x = gyro_x;
-		n.gyro_y = gyro_y;
-		n.gyro_z = gyro_z;
+		n.gyro_roll = gyro_roll;
+		n.gyro_pitch = gyro_pitch;
+		n.gyro_yaw = gyro_yaw;
 		return n;
 	}
 
@@ -93,13 +82,25 @@ public class AltosIMU implements Cloneable {
 	}
 
 	public AltosIMU() {
-		accel_x = AltosLib.MISSING;
-		accel_y = AltosLib.MISSING;
-		accel_z = AltosLib.MISSING;
+		accel_along = AltosLib.MISSING;
+		accel_across = AltosLib.MISSING;
+		accel_through = AltosLib.MISSING;
 
-		gyro_x = AltosLib.MISSING;
-		gyro_y = AltosLib.MISSING;
-		gyro_z = AltosLib.MISSING;
+		gyro_roll = AltosLib.MISSING;
+		gyro_pitch = AltosLib.MISSING;
+		gyro_yaw = AltosLib.MISSING;
+	}
+
+	public AltosIMU(int accel_along, int accel_across, int accel_through,
+			int gyro_roll, int gyro_pitch, int gyro_yaw) {
+
+		this.accel_along = accel_along;
+		this.accel_across = accel_across;
+		this.accel_through = accel_through;
+
+		this.gyro_roll = gyro_roll;
+		this.gyro_pitch = gyro_pitch;
+		this.gyro_yaw = gyro_yaw;
 	}
 
 	public AltosIMU(AltosLink link) throws InterruptedException, TimeoutException {

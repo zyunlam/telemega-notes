@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_5;
+package org.altusmetrum.altoslib_6;
 
 import java.util.*;
 import java.text.*;
@@ -89,6 +89,19 @@ public class AltosConfigData implements Iterable<String> {
 	/* HAS_TRACKER */
 	public int	tracker_motion;
 	public int	tracker_interval;
+
+	/* HAS_GYRO */
+	public int	accel_zero_along, accel_zero_across, accel_zero_through;
+
+	/* ms5607 data */
+	public int	ms5607_reserved;
+	public int	ms5607_sens;
+	public int	ms5607_off;
+	public int	ms5607_tcs;
+	public int	ms5607_tco;
+	public int	ms5607_tref;
+	public int	ms5607_tempsens;
+	public int	ms5607_crc;
 
 	public static String get_string(String line, String label) throws  ParseException {
 		if (line.startsWith(label)) {
@@ -266,6 +279,10 @@ public class AltosConfigData implements Iterable<String> {
 		storage_size = -1;
 		storage_erase_unit = -1;
 		stored_flight = 0;
+
+		accel_zero_along = -1;
+		accel_zero_across = -1;
+		accel_zero_through = -1;
 	}
 
 	public void parse_line(String line) {
@@ -281,6 +298,15 @@ public class AltosConfigData implements Iterable<String> {
 		try { version = get_string(line, "software-version"); } catch (Exception e) {}
 
 		/* Version also contains MS5607 info, which we ignore here */
+
+		try { ms5607_reserved = get_int(line, "ms5607 reserved:"); } catch (Exception e) {}
+		try { ms5607_sens = get_int(line, "ms5607 sens:"); } catch (Exception e) {}
+		try { ms5607_off = get_int(line, "ms5607 off:"); } catch (Exception e) {}
+		try { ms5607_tcs = get_int(line, "ms5607 tcs:"); } catch (Exception e) {}
+		try { ms5607_tco = get_int(line, "ms5607 tco:"); } catch (Exception e) {}
+		try { ms5607_tref = get_int(line, "ms5607 tref:"); } catch (Exception e) {}
+		try { ms5607_tempsens = get_int(line, "ms5607 tempsens:"); } catch (Exception e) {}
+		try { ms5607_crc = get_int(line, "ms5607 crc:"); } catch (Exception e) {}
 
 		/* Config show replies */
 
@@ -361,6 +387,18 @@ public class AltosConfigData implements Iterable<String> {
 
 		/* Log listing replies */
 		try { get_int(line, "flight"); stored_flight++; }  catch (Exception e) {}
+
+		/* HAS_GYRO */
+		try {
+			if (line.startsWith("IMU call along")) {
+				String[] bits = line.split("\\s+");
+				if (bits.length >= 8) {
+					accel_zero_along = Integer.parseInt(bits[3]);
+					accel_zero_across = Integer.parseInt(bits[5]);
+					accel_zero_through = Integer.parseInt(bits[7]);
+				}
+			}
+		} catch (Exception e) {}
 	}
 
 	public AltosConfigData() {
@@ -539,6 +577,14 @@ public class AltosConfigData implements Iterable<String> {
 		dest.set_tracker_interval(tracker_interval);
 	}
 
+	public boolean log_has_state() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEGPS:
+			return false;
+		}
+		return true;
+	}
+
 	public void save(AltosLink link, boolean remote) throws InterruptedException, TimeoutException {
 
 		/* HAS_FLIGHT */
@@ -636,6 +682,9 @@ public class AltosConfigData implements Iterable<String> {
 		/* HAS_TRACKER */
 		if (tracker_motion >= 0 && tracker_interval >= 0)
 			link.printf("c t %d %d\n", tracker_motion, tracker_interval);
+
+		/* HAS_GYRO */
+		/* UI doesn't support accel cal */
 
 		link.printf("c w\n");
 		link.flush_output();

@@ -63,7 +63,7 @@ int
 _ao_usart_pollchar(struct ao_stm_usart *usart)
 {
 	int	c;
-	
+
 	if (ao_fifo_empty(usart->rx_fifo))
 		c = AO_READ_AGAIN;
 	else {
@@ -83,6 +83,12 @@ ao_usart_getchar(struct ao_stm_usart *usart)
 		ao_sleep(&usart->rx_fifo);
 	ao_arch_release_interrupts();
 	return (char) c;
+}
+
+static inline uint8_t
+_ao_usart_sleep(struct ao_stm_usart *usart)
+{
+	return ao_sleep(&usart->rx_fifo);
 }
 
 void
@@ -179,6 +185,13 @@ ao_usart_init(struct ao_stm_usart *usart)
 	ao_usart_set_speed(usart, AO_SERIAL_SPEED_9600);
 }
 
+void
+ao_usart_set_flow(struct ao_stm_usart *usart)
+{
+	usart->reg->cr3 |= ((1 << STM_USART_CR3_CTSE) |
+			    (1 << STM_USART_CR3_RTSE));
+}
+
 #if HAS_SERIAL_1
 
 struct ao_stm_usart ao_stm_usart1;
@@ -201,6 +214,18 @@ int
 _ao_serial1_pollchar(void)
 {
 	return _ao_usart_pollchar(&ao_stm_usart1);
+}
+
+uint8_t
+_ao_serial1_sleep(void)
+{
+	return _ao_usart_sleep(&ao_stm_usart1);
+}
+
+void
+ao_serial1_drain(void)
+{
+	ao_usart_drain(&ao_stm_usart1);
 }
 
 void
@@ -234,6 +259,18 @@ _ao_serial2_pollchar(void)
 	return _ao_usart_pollchar(&ao_stm_usart2);
 }
 
+uint8_t
+_ao_serial2_sleep(void)
+{
+	return _ao_usart_sleep(&ao_stm_usart2);
+}
+
+void
+ao_serial2_drain(void)
+{
+	ao_usart_drain(&ao_stm_usart2);
+}
+
 void
 ao_serial2_set_speed(uint8_t speed)
 {
@@ -263,6 +300,12 @@ int
 _ao_serial3_pollchar(void)
 {
 	return _ao_usart_pollchar(&ao_stm_usart3);
+}
+
+uint8_t
+_ao_serial3_sleep(void)
+{
+	return _ao_usart_sleep(&ao_stm_usart3);
 }
 
 void
@@ -305,7 +348,7 @@ ao_serial_init(void)
 
 	stm_nvic_set_enable(STM_ISR_USART1_POS);
 	stm_nvic_set_priority(STM_ISR_USART1_POS, 4);
-#if USE_SERIAL_1_STDIN
+#if USE_SERIAL_1_STDIN && !DELAY_SERIAL_1_STDIN
 	ao_add_stdio(_ao_serial1_pollchar,
 		     ao_serial1_putchar,
 		     NULL);
@@ -324,25 +367,35 @@ ao_serial_init(void)
 
 	stm_afr_set(&stm_gpioa, 2, STM_AFR_AF7);
 	stm_afr_set(&stm_gpioa, 3, STM_AFR_AF7);
+#if USE_SERIAL_2_FLOW
+	stm_afr_set(&stm_gpioa, 0, STM_AFR_AF7);
+	stm_afr_set(&stm_gpioa, 1, STM_AFR_AF7);
+#endif
 #else
 #if SERIAL_2_PD5_PD6
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIODEN);
 
 	stm_afr_set(&stm_gpiod, 5, STM_AFR_AF7);
 	stm_afr_set(&stm_gpiod, 6, STM_AFR_AF7);
+#if USE_SERIAL_2_FLOW
+#error "Don't know how to set flowcontrol for serial 2 on PD"
+#endif
 #else
 #error "No SERIAL_2 port configuration specified"
-#endif	
+#endif
 #endif
 	/* Enable USART */
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_USART2EN);
 
 	ao_stm_usart2.reg = &stm_usart2;
 	ao_usart_init(&ao_stm_usart2);
+#if USE_SERIAL_2_FLOW
+	ao_usart_set_flow(&ao_stm_usart2);
+#endif
 
 	stm_nvic_set_enable(STM_ISR_USART2_POS);
 	stm_nvic_set_priority(STM_ISR_USART2_POS, 4);
-#if USE_SERIAL_2_STDIN
+#if USE_SERIAL_2_STDIN && !DELAY_SERIAL_2_STDIN
 	ao_add_stdio(_ao_serial2_pollchar,
 		     ao_serial2_putchar,
 		     NULL);
@@ -386,12 +439,10 @@ ao_serial_init(void)
 
 	stm_nvic_set_enable(STM_ISR_USART3_POS);
 	stm_nvic_set_priority(STM_ISR_USART3_POS, 4);
-#if USE_SERIAL_3_STDIN
+#if USE_SERIAL_3_STDIN && !DELAY_SERIAL_3_STDIN
 	ao_add_stdio(_ao_serial3_pollchar,
 		     ao_serial3_putchar,
 		     NULL);
 #endif
 #endif
 }
-
-
