@@ -167,15 +167,21 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 			pos = lblock / 1000.0;
 			s = String.format("block %d", block);
 		} else {
+			if (state == AltosLib.ao_flight_invalid)
+				state = 0;
 			if (state_block > 100)
 				state_block = 100;
 			if (state < min_state) state = min_state;
-			if (state >= max_state) state = max_state - 1;
+			if (state > max_state) state = max_state;
+
+			if (state == max_state)
+				state_block = 0;
+
 			state -= min_state;
 
 			int	nstate = max_state - min_state;
 
-			double	spos = (double) (state - min_state) / (double) nstate;
+			double	spos = (double) state / (double) nstate;
 			double	bpos = state_block / 100.0;
 
 			pos = spos + bpos / nstate;
