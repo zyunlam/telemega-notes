@@ -53,6 +53,7 @@ public class AltosTelemetryReader extends AltosFlightReader {
 
 	public void reset() {
 		flush();
+		state = null;
 	}
 
 	public void close(boolean interrupted) {

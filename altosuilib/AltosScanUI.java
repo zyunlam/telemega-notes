@@ -210,8 +210,6 @@ public class AltosScanUI
 													     frequencies[frequency_index],
 													     telemetry,
 													     rate);
-							/* Reset the state so we don't get this data for another channel */
-							state.init();
 							Runnable r = new Runnable() {
 									public void run() {
 										results.add(result);
