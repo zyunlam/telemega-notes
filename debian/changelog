@@ -1,3 +1,165 @@
+altos (1.6-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altoslib: Stop re-loading previous flight when starting telemetry monitoring
+  * telegps: Was mis-configuring the 'Configure Device' dialog
+  * altos: Fix ability to disable telemetry by setting interval to 0
+  * altos/test: Add TMv2 test program to .gitignore
+  * altos: Add smaller altitude table file to .gitignore
+  * altos: Make sure we don't beep out continuity twice in idle mode
+  * altosui: Ignore built .desktop file
+  * ao-bringup: Use C version of test-flash for telegps
+  * ao-tools: Add ao-test-gps program
+  * ao-bringup: Use C version of ao-test-gps in test-telegps
+  * ao-tools/ao-test-gps: Improve output formatting
+  * ao-tools/ao-test-igniter: Remove bogus printf
+  * ao-bringup: Improve igniter testing. Add TeleMega and TeleMetrum testing.
+  * Mark master branch as past the 1.5 point
+  * altosdroid: Update version code and name for 1.5
+  * altosdroid: Automatically sign the released version if the key is available
+  * altosui: Fix --replay to run in realtime after boost
+  * altosui: Bring up main window when doing --replay or --graph
+  * altosdroid: Update notebook to reflect current status
+  * altos: Make sure we drop the SPI mutex when aborting cc1120 recv
+  * ao-bringup: Auto-select programmer for teledongle turnon
+  * altos: Handle antenna down in ao_flight_test
+  * altosui: Check for map and stats table when changing units/fonts in graph
+  * altos: Record 32-bits for gyro calibration values
+  * altoslib: Deal with new Mega log format that has 32-bit gyro cal
+  * altosui: Update 'Imperial Units' checkbox when units change
+  * altoslib: Compute tilt angle from eeprom data
+  * altos: Fix syntax error with ao_log_mega change.
+  * altos: Copy cc1120 driver to cc1200 driver and hack a bit
+  * altos: Add prototype TeleDongle v1.9 code
+  * altoslib: synchronize access to serial debug output list
+  * altosuilib: Try to detect the architecture when loading JNI lib
+  * ao-tools/ao-send-telem: Add verbose, fake and rate options
+  * altos: Mark STM ao_spi_send as taking const pointer
+  * altos: Expose telemetry altitude macros even without GPS
+  * altos: Complete cc1200 driver
+  * altos/teledongle-v1.9: Add remaining code to complete the project
+  * altos: Sort out ao_gps_print altitude fetching
+  * altos: Increase PQT value for cc1200 improving sensitivity
+  * altos: Build TeleDongle v1.9 by default
+  * altos: Remove old AO_SEND_ALL_BARO bits
+  * altos: Perform cc1200 calibration less often. Tweak radio params
+  * altos: Fix up telemetry delay computations
+  * altos: Increase CC1200 SPI data rate to 8MHz
+  * altosui: Pop up 'Connecting' dialog during Monitor Idle
+  * altos: Rename microwater to microsplash
+  * Move teledongle 1.9 to 1.8; there's a new 1.9
+  * altos: Declare port register type only in arch header
+  * altos: Stop attempting to ramp power on CC115L
+  * altos: Use AO_SPO_SPEED_FAST for CC1200
+  * altosuilib: GPS errors are recorded in floating point, not integers
+  * altos: Use other TeleDongle LED for CRC-invalid packet reporting
+  * altos/lpc: Declare SPI send parameters as const
+  * altos/lpc: Disable JTAG when using pins for GPIO
+  * altos/teledongle-v1.9: Switch to NXP processor as on prototype boards
+  * altos: Reset interrupt flags before TX in CC1200 driver
+  * altoslib: Missing headers for mag sensor in CSV output
+  * altoslib: Make AltosState serializable
+  * altosdroid: Don't display MISSING flight number
+  * altoslib: Add getBytes/putBytes interface to AltosPreferencesBackend
+  * altosdroid: TabMap needs to expose () constructor
+  * altoslib: add AltosPreferences state save/restore interfaces
+  * altosdroid: Save AltosState and restore at startup
+  * altosdroid: East and West were flipped in all GPS output
+  * Add AltosDroid release note for version 1.5
+  * altos/microsplash: fix .gitignore to ignore resulting binary
+  * altosui: Remove duplicate AltosUIPreferencesBackend.java
+  * altos: Allow TeleMega to be built without MPU6000
+  * altos/teledongle-v1.8: Make this the same as teledongle v1.9
+  * altos/cc1200: Wait for packet to be placed in FIFO during receive
+  * altos/cc1200: Open up preamble detect to improve sensitivity
+  * altos/cc1200: With PQT wide open, we can't use PQT_REACHED for start
+  * altoslib: Add usbtrng, usbrelay and mpusb USB ids
+  * micropeak: Support µPUSB with our own USB ids
+  * ao-bringup: Clear pending output before setting frequency.
+  * altos: Document cc115l power measured at RF setting 0x03 as -31.75dBm
+  * altos: Adjust CC1200 RSSI reporting value
+  * altos/lpc: Switch LPC SPI driver to interrupt-driven
+  * Set version to 1.5.9.1
+  * altos: Get rid of some accidental debug code
+  * altos/lpc: Fix double-buffered USB changes
+  * altos: Add support for TeleBT v3.0
+  * altos: Initial STMF04x support
+  * altos: USBtrng v2.0 hardware bringup
+  * altos: Add self-flash support for STM32F042 processor
+  * altos: Add flash-loader to usbtrng-v2.0
+  * ao-tools: Add --wait option to ao-usbload
+  * altos/stmf0: Fix linker scripts to make ao_boot work
+  * altos/stmf0: Add faster USB path
+  * altos/stmf0: Add ADC and DMA APIs
+  * altos/usbtrng-v2.0: Add random output command
+  * altos/stm: Fix typo in stm32l.h
+  * ao-tools: Add ao-usbtrng to dump RNG data for testing
+  * altos/stmf0: Remove remaining stm32l bits from stm32f0 code
+  * altos/stmf0: Add CRC driver
+  * altos/usbtrng-v2.0: Use stmf042 hardware CRC unit
+  * altos/stmf0: Re-implement fast ADC code for stmf0
+  * Oops, forgot the TeleBT-v3.0 Makefile
+  * And, also add the TeleBT v3.0 flash loader Makefile
+  * altos/stm: Add ability to delay STDIO usage for serial ports
+  * altos/btm: Add fancier debug. Pull serial reset port low.
+  * altos: Always include a check for stdio overflow
+  * altos/telebt-v3.0: Fix stdio setup for BTM
+  * altos/telebt-v3.0: Turn red LED off after initialization
+  * altos/stmf0: Support PA11/PA12 remapping
+  * altos/usbtrng-v2.0: Select PA11/PA12 mapping config value
+  * altos/telebt-v3.0: Add monitor bits
+  * altos/telebt-v3.0: Set initial radio cal to a sensible value
+  * altos: Rename teledongle-v1.9 as teledongle-v3.0
+  * ao-bringup: Add turnon_teledonglev3
+  * Revert "altos/lpc: Fix double-buffered USB changes"
+  * Revert LPC usb performance improvements
+  * altos/teledongle-v3.0: Shrink stacks to 320 bytes to fit in ram
+  * altos/easymini-v1.0: Shrink stack to deal with USB changes
+  * altos/lpc: Clean up USB endpoint access functions
+  * altos/lpc: Double buffer USB data transfers
+  * Update docs for 1.6
+  * libaltos: Use more SetupDi API to get Windows 7 listing devices
+  * Add 'keithp-fat' target for uploading temporary builds to keithp's machine
+  * windows: Look for current Java version in \SOFTWARE\Wow6432Node
+  * micropeak: Fix file association registry install on Windows
+  * micropeak: Support both FTDI and Altus Metrum USB IDs
+  * micropeak: Install Windows AltusMetrum driver bits
+  * altosuilib: New teledongle and telebt devices are not pair-programmed
+  * Package TeleDongle-v3.0 firmware with TeleGPS and AltosUI apps
+  * altoslib: Store MS5607 data in AltosConfigData for use by AltosMs5607
+  * altosuilib: EEProm download from TeleGPS doesn't have states
+  * altosuilib: Don't show 'Sats in view' for TeleGPS eeprom graphing
+  * altoslib: Support TeleGPS for Monitor Idle
+  * altoslib: Use 'stateless' for Monitor Idle
+  * altoslib: Initialize GPS data to MISSING for Monitor Idle mode
+  * altos/drivers: Increase SPI speed of CC115L to 6MHz
+  * altos/lpc: Give up on interrupt-driven SPI driver
+  * altos: Separate out ao_tracker force from dbg
+  * Update version 1.6 release notes with more bug fixes
+  * altos: ao_packet_getchar needs to return 'int' so AO_READ_AGAIN works
+  * altosui: Remove the dregs of AltosDroid load-old-telem code
+  * altoslib: Mark listener as 'not running' on EOF.
+  * altosuilib: Wait for product data while scanning
+  * altoslib: Drop telemetry packets processed while monitoring is disabled
+  * altosuilib: Reset telemetry state after processing it
+  * altoslib: Clear saved TelemetryReader state instead of resetting in ScanUI
+  * altosuilib: Set the icon and title of the telemetry scanning dialog
+  * doc: update 1.6 release notes with recent bug fixes
+  * altosuilib: Get the Eeprom download progress bar working again
+  * altosuilib: Don't offer to graph some GPS details that TM doesn't log
+  * Bump java library versions
+
+  [ Bdale Garbee ]
+  * updated to reflect changes from 1.5 release
+  * reflect filename changes in LLC repo
+  * store cal value correctly even when we didn't need to change it
+  * document pyro current limits in an appendix
+  * improve test procedures for TeleMega
+  * document addition of TeleDongle to the set of ARM targets to save binaries for
+  * update ChangeLog for release
+
+ -- Bdale Garbee <bdale@gag.com>  Sat, 07 Feb 2015 22:40:49 -0700
+
 altos (1.5-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
