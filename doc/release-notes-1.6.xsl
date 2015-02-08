@@ -46,7 +46,9 @@
 	<para>
 	  Replace LPC11U14 SPI driver with non-interrupt version. The
 	  interrupt code would occasionally wedge on long transfers
-	  if interrupts were blocked for too long.
+	  if interrupts were blocked for too long. This affects all
+	  released TeleGPS products; if you have a TeleGPS device,
+	  you'll want to reflash the firmware.
 	</para>
       </listitem>
     </itemizedlist>
@@ -112,6 +114,27 @@
 	  javaw.exe program instead of assuming it is in
 	  %SYSTEMROOT%. This makes double-clicking on Altus Metrum
 	  data files in the file manager work correctly.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  When replaying a file, put 'done' in the Age field when we
+	  reach the end of the file, instead of continuing to count forever.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  In the Scan Channels code, wait for five seconds if we see
+	  any packet. This is needed because AltOS now sends the
+	  callsign, serial number and flight number only once every
+	  five seconds these days.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  In the Scan Channels code, reset pending flight state
+	  information each time we change channels. This avoids having
+	  flight computers appear on multiple frequencies by accident.
 	</para>
       </listitem>
     </itemizedlist>
