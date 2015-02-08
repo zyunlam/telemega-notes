@@ -337,42 +337,46 @@ public class AltosGraph extends AltosUIGraph {
 					  false,
 					  nsat_axis);
 			}
-			addSeries("GPS Course",
-				  AltosGraphDataPoint.data_gps_course,
-				  orient_units,
-				  gps_course_color,
-				  false,
-				  course_axis);
-			addSeries("GPS Ground Speed",
-				  AltosGraphDataPoint.data_gps_ground_speed,
-				  AltosConvert.speed,
-				  gps_ground_speed_color,
-				  enable_gps,
-				  speed_axis);
-			addSeries("GPS Climb Rate",
-				  AltosGraphDataPoint.data_gps_climb_rate,
-				  AltosConvert.speed,
-				  gps_climb_rate_color,
-				  enable_gps,
-				  speed_axis);
+			if (stats.has_gps_detail) {
+				addSeries("GPS Course",
+					  AltosGraphDataPoint.data_gps_course,
+					  orient_units,
+					  gps_course_color,
+					  false,
+					  course_axis);
+				addSeries("GPS Ground Speed",
+					  AltosGraphDataPoint.data_gps_ground_speed,
+					  AltosConvert.speed,
+					  gps_ground_speed_color,
+					  enable_gps,
+					  speed_axis);
+				addSeries("GPS Climb Rate",
+					  AltosGraphDataPoint.data_gps_climb_rate,
+					  AltosConvert.speed,
+					  gps_climb_rate_color,
+					  enable_gps,
+					  speed_axis);
+			}
 			addSeries("GPS Position DOP",
 				  AltosGraphDataPoint.data_gps_pdop,
 				  dop_units,
 				  gps_pdop_color,
 				  false,
 				  dop_axis);
-			addSeries("GPS Horizontal DOP",
-				  AltosGraphDataPoint.data_gps_hdop,
-				  dop_units,
-				  gps_hdop_color,
-				  false,
-				  dop_axis);
-			addSeries("GPS Vertical DOP",
-				  AltosGraphDataPoint.data_gps_vdop,
-				  dop_units,
-				  gps_vdop_color,
-				  false,
-				  dop_axis);
+			if (stats.has_gps_detail) {
+				addSeries("GPS Horizontal DOP",
+					  AltosGraphDataPoint.data_gps_hdop,
+					  dop_units,
+					  gps_hdop_color,
+					  false,
+					  dop_axis);
+				addSeries("GPS Vertical DOP",
+					  AltosGraphDataPoint.data_gps_vdop,
+					  dop_units,
+					  gps_vdop_color,
+					  false,
+					  dop_axis);
+			}
 		}
 		if (stats.has_rssi)
 			addSeries("Received Signal Strength",
