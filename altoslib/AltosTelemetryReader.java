@@ -32,9 +32,12 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	LinkedBlockingQueue<AltosLine> telem;
 
 	public AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException {
-		AltosLine l = telem.take();
-		if (l.line == null)
-			throw new IOException("IO error");
+		AltosLine l;
+		do {
+			l = telem.take();
+			if (l.line == null)
+				throw new IOException("IO error");
+		} while (!link.get_monitor());
 		AltosTelemetry	telem = AltosTelemetry.parse(l.line);
 		if (state == null)
 			state = new AltosState();

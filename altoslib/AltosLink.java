@@ -386,13 +386,17 @@ public abstract class AltosLink implements Runnable {
 		flush_output();
 	}
 
-	public void set_monitor(boolean monitor) {
+	public synchronized void set_monitor(boolean monitor) {
 		monitor_mode = monitor;
 		if (monitor)
 			printf("m %x\n", telemetry_len());
 		else
 			printf("m 0\n");
 		flush_output();
+	}
+
+	public synchronized boolean get_monitor() {
+		return monitor_mode;
 	}
 
 	private void set_channel(int channel) {
