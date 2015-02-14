@@ -168,7 +168,7 @@ struct ao_adc {
 #define ao_serial_btm_getchar	ao_serial2_getchar
 #define ao_serial_btm_putchar	ao_serial2_putchar
 #define _ao_serial_btm_pollchar	_ao_serial2_pollchar
-#define _ao_serial_btm_sleep	_ao_serial2_sleep
+#define _ao_serial_btm_sleep_for	_ao_serial2_sleep_for
 #define ao_serial_btm_set_speed ao_serial2_set_speed
 #define ao_serial_btm_drain	ao_serial2_drain
 #define ao_serial_btm_rx_fifo	(ao_stm_usart2.rx_fifo)

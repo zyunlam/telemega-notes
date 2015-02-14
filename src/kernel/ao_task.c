@@ -450,7 +450,7 @@ ao_wakeup(__xdata void *wchan) __reentrant
 	ao_check_stack();
 }
 
-void
+static void
 ao_alarm(uint16_t delay)
 {
 #if HAS_TASK_QUEUE
@@ -468,7 +468,7 @@ ao_alarm(uint16_t delay)
 #endif
 }
 
-void
+static void
 ao_clear_alarm(void)
 {
 #if HAS_TASK_QUEUE
@@ -483,14 +483,24 @@ ao_clear_alarm(void)
 #endif
 }
 
+uint8_t
+ao_sleep_for(__xdata void *wchan, uint16_t timeout)
+{
+	uint8_t	ret;
+	if (timeout)
+		ao_alarm(timeout);
+	ret = ao_sleep(wchan);
+	if (timeout)
+		ao_clear_alarm();
+	return ret;
+}
+
 static __xdata uint8_t ao_forever;
 
 void
 ao_delay(uint16_t ticks)
 {
-	ao_alarm(ticks);
-	ao_sleep(&ao_forever);
-	ao_clear_alarm();
+	ao_sleep_for(&ao_forever, ticks);
 }
 
 void

@@ -102,8 +102,7 @@ ao_companion(void)
 		    break;
 	}
 	while (ao_companion_running) {
-		ao_alarm(ao_companion_setup.update_period);
-		if (ao_sleep(DATA_TO_XDATA(&ao_flight_state)))
+		if (ao_sleep_for(DATA_TO_XDATA(&ao_flight_state), ao_companion_setup.update_period))
 			ao_companion_get_data();
 		else
 			ao_companion_notify();

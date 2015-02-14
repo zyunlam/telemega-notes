@@ -375,9 +375,7 @@ ao_pyro(void)
 		ao_sleep(&ao_flight_state);
 
 	for (;;) {
-		ao_alarm(AO_MS_TO_TICKS(100));
-		ao_sleep(&ao_pyro_wakeup);
-		ao_clear_alarm();
+		ao_sleep_for(&ao_pyro_wakeup, AO_MS_TO_TICKS(100));
 		if (ao_flight_state >= ao_flight_landed)
 			break;
 		any_waiting = ao_pyro_check();

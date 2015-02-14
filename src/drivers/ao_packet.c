@@ -54,14 +54,14 @@ ao_packet_send(void)
 }
 
 uint8_t
-ao_packet_recv(void)
+ao_packet_recv(uint16_t timeout)
 {
 	uint8_t	dma_done;
 
 #ifdef AO_LED_GREEN
 	ao_led_on(AO_LED_GREEN);
 #endif
-	dma_done = ao_radio_recv(&ao_rx_packet, sizeof (struct ao_packet_recv), 0);
+	dma_done = ao_radio_recv(&ao_rx_packet, sizeof (struct ao_packet_recv), timeout);
 #ifdef AO_LED_GREEN
 	ao_led_off(AO_LED_GREEN);
 #endif
