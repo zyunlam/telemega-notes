@@ -81,8 +81,16 @@ ao_packet_recv(uint16_t timeout)
 	/* Check to see if we got a valid packet */
 	if (!dma_done)
 		return 0;
-	if (!(ao_rx_packet.status & AO_RADIO_STATUS_CRC_OK))
+	if (!(ao_rx_packet.status & AO_RADIO_STATUS_CRC_OK)) {
+		printf("bad crc addr %d len %d seq %d ack %d callsign %8.8s\n",
+			ao_rx_packet.packet.addr,
+			ao_rx_packet.packet.len,
+			ao_rx_packet.packet.seq,
+			ao_rx_packet.packet.ack,
+			ao_rx_packet.packet.callsign);
+		flush();
 		return 0;
+	}
 
 	/* Accept packets with matching call signs, or any packet if
 	 * our callsign hasn't been configured
@@ -90,8 +98,10 @@ ao_packet_recv(uint16_t timeout)
 	if (ao_xmemcmp(ao_rx_packet.packet.callsign,
 		       ao_config.callsign,
 		       AO_MAX_CALLSIGN) != 0 &&
-	    ao_xmemcmp(ao_config.callsign, CODE_TO_XDATA("N0CALL"), 7) != 0)
+	    ao_xmemcmp(ao_config.callsign, CODE_TO_XDATA("N0CALL"), 7) != 0) {
+		printf ("bad call\n"); flush();
 		return 0;
+	}
 
 	/* SYN packets carry no data */
 	if (ao_rx_packet.packet.len == AO_PACKET_SYN) {
