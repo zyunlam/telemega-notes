@@ -63,6 +63,7 @@ public class TelemetryService extends Service implements LocationListener {
 	static final int MSG_SETFREQUENCY      = 8;
 	static final int MSG_CRC_ERROR	       = 9;
 	static final int MSG_SETBAUD	       = 10;
+	static final int MSG_DISCONNECT	       = 11;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
@@ -110,6 +111,11 @@ public class TelemetryService extends Service implements LocationListener {
 				AltosDroidPreferences.set_active_device(address);
 				s.start_altos_bluetooth(address);
 				break;
+			case MSG_DISCONNECT:
+				if (D) Log.d(TAG, "Disconnect command received");
+				s.address = null;
+				s.stop_altos_bluetooth(true);
+				break;
 			case MSG_SETFREQUENCY:
 				if (D) Log.d(TAG, "MSG_SETFREQUENCY");
 				s.telemetry_state.frequency = (Double) msg.obj;
@@ -144,7 +150,7 @@ public class TelemetryService extends Service implements LocationListener {
 				}
 				break;
 			case MSG_CONNECT_FAILED:
-				if (s.address != null && !s.clients.isEmpty()) {
+				if (s.address != null) {
 					if (D) Log.d(TAG, "Connection failed... retrying");
 					s.start_altos_bluetooth(s.address);
 				} else {
@@ -153,7 +159,7 @@ public class TelemetryService extends Service implements LocationListener {
 				break;
 			case MSG_DISCONNECTED:
 				Log.d(TAG, "MSG_DISCONNECTED");
-				if (s.address != null && !s.clients.isEmpty()) {
+				if (s.address != null) {
 					if (D) Log.d(TAG, "Connection lost... retrying");
 					s.start_altos_bluetooth(s.address);
 				} else {

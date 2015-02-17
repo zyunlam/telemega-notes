@@ -553,6 +553,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
+	private void disconnectDevice() {
+		try {
+			mService.send(Message.obtain(null, TelemetryService.MSG_DISCONNECT, null));
+		} catch (RemoteException e) {
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -610,9 +617,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			serverIntent = new Intent(this, DeviceListActivity.class);
 			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
 			return true;
+		case R.id.disconnect:
+			/* Disconnect the bluetooth device
+			 */
+			disconnectDevice();
+			return true;
 		case R.id.quit:
 			Log.d(TAG, "R.id.quit");
-			stopService(new Intent(AltosDroid.this, TelemetryService.class));
+			disconnectDevice();
 			finish();
 			return true;
 		case R.id.select_freq:

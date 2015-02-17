@@ -17,6 +17,9 @@
     <item android:id="@+id/connect_scan"
           android:icon="@android:drawable/ic_menu_search"
           android:title="@string/connect_device" />
+    <item android:id="@+id/disconnect"
+	  android:icon="@android:drawable/ic_notification_clear_all"
+	  android:title="@string/disconnect_device" />
     <item android:id="@+id/quit"
           android:icon="@android:drawable/ic_menu_close_clear_cancel"
           android:title="@string/quit" />
