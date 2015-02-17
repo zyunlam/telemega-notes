@@ -352,7 +352,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		for (AltosDroidTab mTab : mTabs)
 			mTab.update_ui(state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
-		if (state != null)
+		if (state != null && mAltosVoice != null)
 			mAltosVoice.tell(state, from_receiver);
 
 		saved_state = state;
@@ -465,8 +465,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mStateLayout   = (RelativeLayout) findViewById(R.id.state_container);
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
-
-		mAltosVoice = new AltosVoice(this);
 	}
 
 	@Override
@@ -484,6 +482,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 		doBindService();
 
+		if (mAltosVoice == null)
+			mAltosVoice = new AltosVoice(this);
 	}
 
 	@Override
@@ -504,6 +504,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		if(D) Log.e(TAG, "-- ON STOP --");
 
 		doUnbindService();
+		if (mAltosVoice != null) {
+			mAltosVoice.stop();
+			mAltosVoice = null;
+		}
 	}
 
 	@Override
