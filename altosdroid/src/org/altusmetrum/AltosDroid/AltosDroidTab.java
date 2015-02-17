@@ -64,7 +64,7 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 			ft.show(this);
 		} else
 			ft.hide(this);
-		ft.commit();
+		ft.commitAllowingStateLoss();
 	}
 
 	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver, boolean is_current) {
