@@ -64,20 +64,16 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 			ft.show(this);
 		} else
 			ft.hide(this);
-		ft.commit();
+		ft.commitAllowingStateLoss();
 	}
 
 	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver, boolean is_current) {
 		last_state = state;
 		last_from_receiver = from_receiver;
 		last_receiver = receiver;
-		if (is_current) {
-			if (AltosDroid.D) Log.d(AltosDroid.TAG, String.format("%s: visible, performing update", tab_name()));
-
+		if (is_current)
 			show(state, from_receiver, receiver);
-		} else {
-			if (AltosDroid.D) Log.d(AltosDroid.TAG, String.format("%s: not visible, skipping update", tab_name()));
+		else
 			return;
-		}
 	}
 }

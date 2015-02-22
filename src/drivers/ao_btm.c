@@ -23,7 +23,7 @@
 #ifndef ao_serial_btm_getchar
 #define ao_serial_btm_putchar	ao_serial1_putchar
 #define _ao_serial_btm_pollchar	_ao_serial1_pollchar
-#define _ao_serial_btm_sleep()	ao_sleep((void *) &ao_serial1_rx_fifo)
+#define _ao_serial_btm_sleep_for(timeout)	ao_sleep_for((void *) &ao_serial1_rx_fifo, timeout)
 #define ao_serial_btm_set_speed ao_serial1_set_speed
 #define ao_serial_btm_drain	ao_serial1_drain
 #endif
@@ -111,7 +111,7 @@ ao_btm_do_echo(void)
 	while (ao_btm_enable) {
 		ao_arch_block_interrupts();
 		while ((c = _ao_serial_btm_pollchar()) == AO_READ_AGAIN && ao_btm_enable)
-			_ao_serial_btm_sleep();
+			_ao_serial_btm_sleep_for(0);
 		ao_arch_release_interrupts();
 		if (c != AO_READ_AGAIN) {
 			putchar(c);
@@ -166,9 +166,7 @@ ao_btm_getchar(void)
 
 	ao_arch_block_interrupts();
 	while ((c = _ao_serial_btm_pollchar()) == AO_READ_AGAIN) {
-		ao_alarm(AO_MS_TO_TICKS(10));
-		c = _ao_serial_btm_sleep();
-		ao_clear_alarm();
+		c = _ao_serial_btm_sleep_for(AO_MS_TO_TICKS(10));
 		if (c) {
 			c = AO_READ_AGAIN;
 			break;

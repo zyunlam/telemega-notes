@@ -228,7 +228,7 @@ void
 ao_button_init(void);
 
 char
-ao_button_get(void) __critical;
+ao_button_get(uint16_t timeout) __critical;
 
 void
 ao_button_clear(void) __critical;

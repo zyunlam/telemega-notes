@@ -27,6 +27,7 @@
 
 	<!-- Options Menu -->
 	<string name="connect_device">Connect a device</string>
+	<string name="disconnect_device">Disconnect device</string>
 	<string name="quit">Quit</string>
 	<string name="select_freq">Select radio frequency</string>
 	<string name="select_rate">Select data rate</string>

@@ -72,12 +72,12 @@ ao_button_mask(uint8_t reg)
 }
 
 char
-ao_button_get(void) __critical
+ao_button_get(uint16_t timeout) __critical
 {
 	char	b;
 
 	while (ao_fifo_empty(ao_button_fifo))
-		if (ao_sleep(&ao_button_fifo))
+		if (ao_sleep_for(&ao_button_fifo, timeout))
 			return 0;
 	ao_fifo_remove(ao_button_fifo, b);
 	return b;

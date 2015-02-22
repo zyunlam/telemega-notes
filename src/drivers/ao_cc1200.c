@@ -715,17 +715,11 @@ ao_radio_show_state(char *where)
 static void
 ao_radio_wait_isr(uint16_t timeout)
 {
-	if (timeout)
-		ao_alarm(timeout);
-
 	ao_arch_block_interrupts();
 	while (!ao_radio_wake && !ao_radio_abort)
-		if (ao_sleep(&ao_radio_wake))
+		if (ao_sleep_for(&ao_radio_wake, timeout))
 			ao_radio_abort = 1;
 	ao_arch_release_interrupts();
-
-	if (timeout)
-		ao_clear_alarm();
 }
 
 static void

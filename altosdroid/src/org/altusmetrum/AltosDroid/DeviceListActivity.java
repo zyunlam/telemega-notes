@@ -50,7 +50,8 @@ public class DeviceListActivity extends Activity {
 	private static final boolean D = true;
 
 	// Return Intent extra
-	public static String EXTRA_DEVICE_ADDRESS = "device_address";
+	public static final String EXTRA_DEVICE_ADDRESS = "device_address";
+	public static final String EXTRA_DEVICE_NAME = "device_name";
 
 	// Member fields
 	private BluetoothAdapter mBtAdapter;
@@ -164,9 +165,20 @@ public class DeviceListActivity extends Activity {
 			String info = ((TextView) v).getText().toString();
 			String address = info.substring(info.length() - 17);
 
+			int newline = info.indexOf('\n');
+
+			String name = null;
+			if (newline > 0)
+				name = info.substring(0, newline);
+			else
+				name = info;
+
+			if (D) Log.d(TAG, String.format("******* selected item '%s'", info));
+
 			// Create the result Intent and include the MAC address
 			Intent intent = new Intent();
 			intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
+			intent.putExtra(EXTRA_DEVICE_NAME, name);
 
 			// Set result and finish this Activity
 			setResult(Activity.RESULT_OK, intent);

@@ -207,9 +207,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			}
 			break;
 		case TelemetryState.CONNECT_CONNECTING:
-			mTitle.setText(R.string.title_connecting);
+			if (telemetry_state.address != null)
+				mTitle.setText(String.format("Connecting to %s...", telemetry_state.address.name));
+			else
+				mTitle.setText("Connecting to something...");
 			break;
-		case TelemetryState.CONNECT_READY:
+		case TelemetryState.CONNECT_DISCONNECTED:
 		case TelemetryState.CONNECT_NONE:
 			mTitle.setText(R.string.title_not_connected);
 			break;
@@ -244,8 +247,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		update_ui(telemetry_state.state, telemetry_state.location);
 		if (telemetry_state.connect == TelemetryState.CONNECT_CONNECTED)
 			start_timer();
-		else
-			stop_timer();
 	}
 
 	boolean same_string(String a, String b) {
@@ -267,8 +268,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	void update_ui(AltosState state, Location location) {
 
-		Log.d(TAG, "update_ui");
-
 		int prev_state = AltosLib.ao_flight_invalid;
 
 		AltosGreatCircle from_receiver = null;
@@ -277,7 +276,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			prev_state = saved_state.state;
 
 		if (state != null) {
-			Log.d(TAG, String.format("prev state %d new state  %d\n", prev_state, state.state));
 			if (state.state == AltosLib.ao_flight_stateless) {
 				boolean	prev_locked = false;
 				boolean locked = false;
@@ -297,7 +295,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			} else {
 				if (prev_state != state.state) {
 					String currentTab = mTabHost.getCurrentTabTag();
-					Log.d(TAG, "switch state");
 					switch (state.state) {
 					case AltosLib.ao_flight_boost:
 						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("ascent");
@@ -328,22 +325,18 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			}
 
 			if (saved_state == null || !same_string(saved_state.callsign, state.callsign)) {
-				Log.d(TAG, "update callsign");
 				mCallsignView.setText(state.callsign);
 			}
 			if (saved_state == null || state.serial != saved_state.serial) {
-				Log.d(TAG, "update serial");
 				mSerialView.setText(String.format("%d", state.serial));
 			}
 			if (saved_state == null || state.flight != saved_state.flight) {
-				Log.d(TAG, "update flight");
 				if (state.flight == AltosLib.MISSING)
 					mFlightView.setText("");
 				else
 					mFlightView.setText(String.format("%d", state.flight));
 			}
 			if (saved_state == null || state.state != saved_state.state) {
-				Log.d(TAG, "update state");
 				if (state.state == AltosLib.ao_flight_stateless) {
 					mStateLayout.setVisibility(View.GONE);
 				} else {
@@ -352,7 +345,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				}
 			}
 			if (saved_state == null || state.rssi != saved_state.rssi) {
-				Log.d(TAG, "update rssi");
 				mRSSIView.setText(String.format("%d", state.rssi));
 			}
 		}
@@ -360,7 +352,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		for (AltosDroidTab mTab : mTabs)
 			mTab.update_ui(state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
-		if (state != null)
+		if (state != null && mAltosVoice != null)
 			mAltosVoice.tell(state, from_receiver);
 
 		saved_state = state;
@@ -473,8 +465,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mStateLayout   = (RelativeLayout) findViewById(R.id.state_container);
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
-
-		mAltosVoice = new AltosVoice(this);
 	}
 
 	@Override
@@ -492,16 +482,18 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 		doBindService();
 
+		if (mAltosVoice == null)
+			mAltosVoice = new AltosVoice(this);
 	}
 
 	@Override
-	public synchronized void onResume() {
+	public void onResume() {
 		super.onResume();
 		if(D) Log.e(TAG, "+ ON RESUME +");
 	}
 
 	@Override
-	public synchronized void onPause() {
+	public void onPause() {
 		super.onPause();
 		if(D) Log.e(TAG, "- ON PAUSE -");
 	}
@@ -512,6 +504,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		if(D) Log.e(TAG, "-- ON STOP --");
 
 		doUnbindService();
+		if (mAltosVoice != null) {
+			mAltosVoice.stop();
+			mAltosVoice = null;
+		}
 	}
 
 	@Override
@@ -548,19 +544,24 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
-	private void connectDevice(String address) {
+	private void connectDevice(Intent data) {
 		// Attempt to connect to the device
 		try {
-			if (D) Log.d(TAG, "Connecting to " + address);
-			mService.send(Message.obtain(null, TelemetryService.MSG_CONNECT, address));
+			String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+			String name = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_NAME);
+
+			if (D) Log.d(TAG, "Connecting to " + address + name);
+			DeviceAddress	a = new DeviceAddress(address, name);
+			mService.send(Message.obtain(null, TelemetryService.MSG_CONNECT, a));
 		} catch (RemoteException e) {
 		}
 	}
 
-	private void connectDevice(Intent data) {
-		// Get the device MAC address
-		String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-		connectDevice(address);
+	private void disconnectDevice() {
+		try {
+			mService.send(Message.obtain(null, TelemetryService.MSG_DISCONNECT, null));
+		} catch (RemoteException e) {
+		}
 	}
 
 	@Override
@@ -620,9 +621,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			serverIntent = new Intent(this, DeviceListActivity.class);
 			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
 			return true;
+		case R.id.disconnect:
+			/* Disconnect the bluetooth device
+			 */
+			disconnectDevice();
+			return true;
 		case R.id.quit:
 			Log.d(TAG, "R.id.quit");
-			stopService(new Intent(AltosDroid.this, TelemetryService.class));
+			disconnectDevice();
 			finish();
 			return true;
 		case R.id.select_freq:
