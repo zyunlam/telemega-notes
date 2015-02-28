@@ -26,15 +26,13 @@ ao_adc_init(void);
 
 /* Total ring size in samples */
 #define AO_ADC_RING_SIZE	256
-/* Number of samples fetched per ao_adc_start call */
-#define AO_ADC_RING_CHUNK	(AO_ADC_RING_SIZE >> 1)
 
 extern uint16_t	ao_adc_ring[AO_ADC_RING_SIZE];
 
 #define ao_adc_ring_step(pos,inc)	(((pos) + (inc)) & (AO_ADC_RING_SIZE - 1))
 
 extern uint16_t	ao_adc_ring_head, ao_adc_ring_tail;
-extern uint8_t	ao_adc_running;
+extern uint16_t	ao_adc_running;
 
 void
 _ao_adc_start(void);
@@ -50,9 +48,7 @@ _ao_adc_remain(void)
 static inline uint16_t
 _ao_adc_space(void)
 {
-	if (ao_adc_ring_head == ao_adc_ring_tail)
-		return AO_ADC_RING_SIZE;
-	if (ao_adc_ring_head > ao_adc_ring_tail)
+	if (ao_adc_ring_head >= ao_adc_ring_tail)
 		return AO_ADC_RING_SIZE - ao_adc_ring_head;
 	return ao_adc_ring_tail - ao_adc_ring_head;
 }
@@ -81,7 +77,7 @@ ao_adc_ack(uint16_t n)
 	ao_adc_ring_tail += n;
 	if (ao_adc_ring_tail == AO_ADC_RING_SIZE)
 		ao_adc_ring_tail = 0;
-	if (!ao_adc_running && _ao_adc_space() >= AO_ADC_RING_CHUNK)
+	if (!ao_adc_running)
 		_ao_adc_start();
 	ao_arch_release_interrupts();
 }
