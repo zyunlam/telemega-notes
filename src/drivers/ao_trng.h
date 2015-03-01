@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Keith Packard <keithp@keithp.com>
+ * Copyright © 2015 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +15,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include <ao.h>
-#include <ao_adc_fast.h>
-#include <ao_crc.h>
-#include <ao_trng.h>
+#ifndef _AO_TRNG_H_
+#define _AO_TRNG_H_
 
-void main(void)
-{
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_RED);
-	ao_clock_init();
-	ao_task_init();
-	ao_timer_init();
-	ao_dma_init();
-	ao_adc_init();
-	ao_crc_init();
+void
+ao_trng_init(void);
 
-	ao_cmd_init();
-
-	ao_usb_init();
-
-	ao_trng_init();
-
-	ao_led_off(AO_LED_RED);
-
-	ao_start_scheduler();
-}
+#endif /* _AO_TRNG_H_ */
