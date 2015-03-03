@@ -707,8 +707,7 @@ static int tncPositionPacket(void)
     static int32_t	latitude;
     static int32_t	longitude;
     static int32_t	altitude;
-    int32_t		lat, lon, alt;
-    uint8_t	*buf;
+    uint8_t		*buf;
 
     if (ao_gps_data.flags & AO_GPS_VALID) {
 	latitude = ao_gps_data.latitude;
@@ -719,28 +718,93 @@ static int tncPositionPacket(void)
     }
 
     buf = tncBuffer;
-    *buf++ = '!';
 
-    /* Symbol table ID */
-    *buf++ = '/';
+    switch (ao_config.aprs_format) {
+    case AO_APRS_FORMAT_COMPRESSED:
+    default:
+    {
+	    int32_t		lat, lon, alt;
 
-    lat = ((uint64_t) 380926 * (900000000 - latitude)) / 10000000;
-    lon = ((uint64_t) 190463 * (1800000000 + longitude)) / 10000000;
+	    *buf++ = '!';
 
-    alt = ao_aprs_encode_altitude(altitude);
+	    /* Symbol table ID */
+	    *buf++ = '/';
 
-    tncCompressInt(buf, lat, 4);
-    buf += 4;
-    tncCompressInt(buf, lon, 4);
-    buf += 4;
+	    lat = ((uint64_t) 380926 * (900000000 - latitude)) / 10000000;
+	    lon = ((uint64_t) 190463 * (1800000000 + longitude)) / 10000000;
 
-    /* Symbol code */
-    *buf++ = '\'';
+	    alt = ao_aprs_encode_altitude(altitude);
 
-    tncCompressInt(buf, alt, 2);
-    buf += 2;
+	    tncCompressInt(buf, lat, 4);
+	    buf += 4;
+	    tncCompressInt(buf, lon, 4);
+	    buf += 4;
 
-    *buf++ = 33 + ((1 << 5) | (2 << 3));
+	    /* Symbol code */
+	    *buf++ = '\'';
+
+	    tncCompressInt(buf, alt, 2);
+	    buf += 2;
+
+	    *buf++ = 33 + ((1 << 5) | (2 << 3));
+
+	    break;
+    }
+    case AO_APRS_FORMAT_UNCOMPRESSED:
+    {
+	    char	lat_sign = 'N', lon_sign = 'E';
+	    int32_t	lat = latitude;
+	    int32_t	lon = longitude;
+	    int32_t	alt = altitude;
+	    uint16_t	lat_deg;
+	    uint16_t	lon_deg;
+	    uint16_t	lat_min;
+	    uint16_t	lat_frac;
+	    uint16_t	lon_min;
+	    uint16_t	lon_frac;
+
+	    if (lat < 0) {
+		    lat_sign = 'S';
+		    lat = -lat;
+	    }
+
+	    if (lon < 0) {
+		    lon_sign = 'W';
+		    lon = -lon;
+	    }
+
+	    /* Round latitude and longitude by 0.005 minutes */
+	    lat = lat + 833;
+	    if (lat > 900000000)
+		    lat = 900000000;
+	    lon = lon + 833;
+	    if (lon > 1800000000)
+		    lon = 1800000000;
+
+	    lat_deg = lat / 10000000;
+	    lat -= lat_deg * 10000000;
+	    lat *= 60;
+	    lat_min = lat / 10000000;
+	    lat -= lat_min * 10000000;
+	    lat_frac = lat / 100000;
+
+	    lon_deg = lon / 10000000;
+	    lon -= lon_deg * 10000000;
+	    lon *= 60;
+	    lon_min = lon / 10000000;
+	    lon -= lon_min * 10000000;
+	    lon_frac = lon / 100000;
+
+	    /* Convert from meters to feet */
+	    alt = (alt * 328 + 50) / 100;
+
+	    buf += sprintf((char *) tncBuffer, "!%02u%02u.%02u%c/%03u%02u.%02u%c'/A=%06u ",
+			   lat_deg, lat_min, lat_frac, lat_sign,
+			   lon_deg, lon_min, lon_frac, lon_sign,
+			   alt);
+	    break;
+    }
+    }
 
     buf += tncComment(buf);
 
