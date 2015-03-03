@@ -190,6 +190,13 @@ public class AltosLib {
 		38400, 9600, 2400
 	};
 
+	public static final int ao_aprs_format_compressed = 0;
+	public static final int ao_aprs_format_uncompressed = 1;
+
+	public static final String[] ao_aprs_format_name = {
+		"Compressed", "Uncompressed"
+	};
+
 	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
 //	public static final String launch_sites_url = "file:///home/keithp/misc/text/altusmetrum/AltOS/launch-sites.txt";
 

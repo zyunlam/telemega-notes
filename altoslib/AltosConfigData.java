@@ -75,6 +75,7 @@ public class AltosConfigData implements Iterable<String> {
 	/* HAS_APRS */
 	public int		aprs_interval;
 	public int		aprs_ssid;
+	public int		aprs_format;
 
 	/* HAS_BEEP */
 	public int		beep;
@@ -270,6 +271,7 @@ public class AltosConfigData implements Iterable<String> {
 
 		aprs_interval = -1;
 		aprs_ssid = -1;
+		aprs_format = -1;
 
 		beep = -1;
 
@@ -370,6 +372,7 @@ public class AltosConfigData implements Iterable<String> {
 		/* HAS_APRS */
 		try { aprs_interval = get_int(line, "APRS interval:"); } catch (Exception e) {}
 		try { aprs_ssid = get_int(line, "APRS SSID:"); } catch (Exception e) {}
+		try { aprs_format = get_int(line, "APRS format:"); } catch (Exception e) {}
 
 		/* HAS_BEEP */
 		try { beep = get_int(line, "Beeper setting:"); } catch (Exception e) {}
@@ -518,6 +521,8 @@ public class AltosConfigData implements Iterable<String> {
 			aprs_interval = source.aprs_interval();
 		if (aprs_ssid >= 0)
 			aprs_ssid = source.aprs_ssid();
+		if (aprs_format >= 0)
+			aprs_format = source.aprs_format();
 
 		/* HAS_BEEP */
 		if (beep >= 0)
@@ -572,6 +577,7 @@ public class AltosConfigData implements Iterable<String> {
 		dest.set_pyro_firing_time(pyro_firing_time);
 		dest.set_aprs_interval(aprs_interval);
 		dest.set_aprs_ssid(aprs_ssid);
+		dest.set_aprs_format(aprs_format);
 		dest.set_beep(beep);
 		dest.set_tracker_motion(tracker_motion);
 		dest.set_tracker_interval(tracker_interval);
@@ -674,6 +680,8 @@ public class AltosConfigData implements Iterable<String> {
 			link.printf("c A %d\n", aprs_interval);
 		if (aprs_ssid >= 0)
 			link.printf("c S %d\n", aprs_ssid);
+		if (aprs_format >= 0)
+			link.printf("c C %d\n", aprs_format);
 
 		/* HAS_BEEP */
 		if (beep >= 0)

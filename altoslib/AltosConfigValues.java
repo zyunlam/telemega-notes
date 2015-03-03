@@ -91,6 +91,10 @@ public interface AltosConfigValues {
 
 	public abstract void set_aprs_ssid(int new_aprs_ssid);
 
+	public abstract int aprs_format() throws AltosConfigDataException;
+
+	public abstract void set_aprs_format(int new_aprs_format);
+
 	public abstract int beep() throws AltosConfigDataException;
 
 	public abstract void set_beep(int new_beep);
