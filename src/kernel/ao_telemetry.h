@@ -258,13 +258,14 @@ struct ao_telemetry_metrum_data {
 	uint16_t	serial;		/*  0 */
 	uint16_t	tick;		/*  2 */
 	uint8_t		type;		/*  4 */
+	uint8_t		pad5[3];	/*  5 */
 
-	int32_t		ground_pres;	/* 8 average pres on pad */
+	int32_t		ground_pres;	/*  8 average pres on pad */
 	int16_t		ground_accel;	/* 12 average accel on pad */
 	int16_t		accel_plus_g;	/* 14 accel calibration at +1g */
 	int16_t		accel_minus_g;	/* 16 accel calibration at -1g */
 
-	uint8_t		pad[14];	/* 18 */
+	uint8_t		pad18[14];	/* 18 */
 	/* 32 */
 };
 
@@ -331,6 +332,8 @@ union ao_telemetry_all {
 	struct ao_telemetry_mini		mini;
 	struct ao_telemetry_baro		baro;
 };
+
+typedef char ao_check_telemetry_size[sizeof(union ao_telemetry_all) == 32 ? 1 : -1];
 
 struct ao_telemetry_all_recv {
 	union ao_telemetry_all		telemetry;
