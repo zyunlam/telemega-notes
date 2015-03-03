@@ -354,7 +354,7 @@ public abstract class AltosLink implements Runnable {
 		if (frequency == 0)
 			return;
 		if (has_frequency)
-			set_radio_freq((int) Math.floor (frequency * 1000));
+			set_radio_freq((int) Math.floor (frequency * 1000 + 0.5));
 		else if (has_setting)
 			set_radio_setting(AltosConvert.radio_frequency_to_setting(frequency, cal));
 		else
