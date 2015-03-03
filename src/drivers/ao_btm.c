@@ -263,6 +263,15 @@ uint8_t
 ao_btm_cmd(__code char *cmd)
 {
 	ao_btm_drain();
+
+#ifdef AO_BTM_INT_PORT
+	/* Trust that AltosDroid will eventually disconnect and let us
+	 * get things set up. The BTM module doesn't appear to listen
+	 * for +++, so we have no way to force a disconnect.
+	 */
+	while (ao_btm_connected)
+		ao_sleep(&ao_btm_connected);
+#endif
 	ao_btm_string(cmd);
 	return ao_btm_wait_reply();
 }
@@ -350,6 +359,10 @@ __xdata struct ao_task ao_btm_task;
 void
 ao_btm(void)
 {
+#ifdef AO_BTM_INT_PORT
+	ao_exti_enable(AO_BTM_INT_PORT, AO_BTM_INT_PIN);
+#endif
+
 	/*
 	 * Wait for the bluetooth device to boot
 	 */
@@ -380,6 +393,8 @@ ao_btm(void)
 	/* Turn off status reporting */
 	ao_btm_cmd("ATQ1\r");
 
+	ao_btm_drain();
+
 	ao_btm_stdio = ao_add_stdio(_ao_serial_btm_pollchar,
 				    ao_serial_btm_putchar,
 				    NULL);
@@ -387,10 +402,6 @@ ao_btm(void)
 
 	/* Check current pin state */
 	ao_btm_check_link();
-
-#ifdef AO_BTM_INT_PORT
-	ao_exti_enable(AO_BTM_INT_PORT, AO_BTM_INT_PIN);
-#endif
 
 	for (;;) {
 		while (!ao_btm_connected)
