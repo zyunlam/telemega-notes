@@ -550,10 +550,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
 			String name = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_NAME);
 
-			if (D) Log.d(TAG, "Connecting to " + address + name);
+			if (D) Log.d(TAG, "Connecting to " + address + " " + name);
 			DeviceAddress	a = new DeviceAddress(address, name);
 			mService.send(Message.obtain(null, TelemetryService.MSG_CONNECT, a));
+			if (D) Log.d(TAG, "Sent connecting message");
 		} catch (RemoteException e) {
+			if (D) Log.e(TAG, "connect device message failed");
 		}
 	}
 

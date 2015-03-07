@@ -94,6 +94,7 @@ public class TelemetryService extends Service implements LocationListener {
 		@Override
 		public void handleMessage(Message msg) {
 			TelemetryService s = service.get();
+			AltosBluetooth bt = null;
 			if (s == null)
 				return;
 			switch (msg.what) {
@@ -109,7 +110,7 @@ public class TelemetryService extends Service implements LocationListener {
 				if (D) Log.d(TAG, "Connect command received");
 				DeviceAddress address = (DeviceAddress) msg.obj;
 				AltosDroidPreferences.set_active_device(address);
-				s.start_altos_bluetooth(address);
+				s.start_altos_bluetooth(address, false);
 				break;
 			case MSG_DISCONNECT:
 				if (D) Log.d(TAG, "Disconnect command received");
@@ -143,6 +144,13 @@ public class TelemetryService extends Service implements LocationListener {
 				 *Messages from AltosBluetooth
 				 */
 			case MSG_CONNECTED:
+				Log.d(TAG, "MSG_CONNECTED");
+				bt = (AltosBluetooth) msg.obj;
+
+				if (bt != s.altos_bluetooth) {
+					if (D) Log.d(TAG, "Stale message");
+					break;
+				}
 				if (D) Log.d(TAG, "Connected to device");
 				try {
 					s.connected();
@@ -150,18 +158,31 @@ public class TelemetryService extends Service implements LocationListener {
 				}
 				break;
 			case MSG_CONNECT_FAILED:
+				Log.d(TAG, "MSG_CONNECT_FAILED");
+				bt = (AltosBluetooth) msg.obj;
+
+				if (bt != s.altos_bluetooth) {
+					if (D) Log.d(TAG, "Stale message");
+					break;
+				}
 				if (s.address != null) {
 					if (D) Log.d(TAG, "Connection failed... retrying");
-					s.start_altos_bluetooth(s.address);
+					s.start_altos_bluetooth(s.address, true);
 				} else {
 					s.stop_altos_bluetooth(true);
 				}
 				break;
 			case MSG_DISCONNECTED:
 				Log.d(TAG, "MSG_DISCONNECTED");
+				bt = (AltosBluetooth) msg.obj;
+
+				if (bt != s.altos_bluetooth) {
+					if (D) Log.d(TAG, "Stale message");
+					break;
+				}
 				if (s.address != null) {
 					if (D) Log.d(TAG, "Connection lost... retrying");
-					s.start_altos_bluetooth(s.address);
+					s.start_altos_bluetooth(s.address, true);
 				} else {
 					s.stop_altos_bluetooth(true);
 				}
@@ -217,7 +238,7 @@ public class TelemetryService extends Service implements LocationListener {
 		 */
 		if (address != null && telemetry_state.connect == TelemetryState.CONNECT_DISCONNECTED) {
 			if (D) Log.d(TAG, "Reconnecting now...");
-			start_altos_bluetooth(address);
+			start_altos_bluetooth(address, false);
 		}
 	}
 
@@ -292,11 +313,17 @@ public class TelemetryService extends Service implements LocationListener {
 		}
 	}
 
-	private void start_altos_bluetooth(DeviceAddress address) {
+	private void start_altos_bluetooth(DeviceAddress address, boolean pause) {
 		// Get the BLuetoothDevice object
 		BluetoothDevice device = bluetooth_adapter.getRemoteDevice(address.address);
 
 		stop_altos_bluetooth(false);
+		if (pause) {
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+			}
+		}
 		this.address = address;
 		if (D) Log.d(TAG, String.format("start_altos_bluetooth(): Connecting to %s (%s)", device.getName(), device.getAddress()));
 		altos_bluetooth = new AltosBluetooth(device, handler);
@@ -316,7 +343,14 @@ public class TelemetryService extends Service implements LocationListener {
 		} catch (TimeoutException e) {
 			// If this timed out, then we really want to retry it, but
 			// probably safer to just retry the connection from scratch.
-			handler.obtainMessage(MSG_CONNECT_FAILED).sendToTarget();
+			if (D) Log.d(TAG, "connected timeout");
+			if (address != null) {
+				if (D) Log.d(TAG, "connected timeout, retrying");
+				start_altos_bluetooth(address, true);
+			} else {
+				handler.obtainMessage(MSG_CONNECT_FAILED).sendToTarget();
+				stop_altos_bluetooth(true);
+			}
 			return;
 		}
 
@@ -372,7 +406,7 @@ public class TelemetryService extends Service implements LocationListener {
 
 		DeviceAddress address = AltosDroidPreferences.active_device();
 		if (address != null)
-			start_altos_bluetooth(address);
+			start_altos_bluetooth(address, false);
 	}
 
 	@Override
