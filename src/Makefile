@@ -40,7 +40,8 @@ ARMM3DIRS=\
 	telebt-v3.0 telebt-v3.0/flash-loader
 
 ARMM0DIRS=\
-	easymini-v1.0 easymini-v1.0/flash-loader
+	easymini-v1.0 easymini-v1.0/flash-loader \
+	chaoskey-v0.1 chaoskey-v0.1/flash-loader
 
 AVRDIRS=\
 	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1 microkite
