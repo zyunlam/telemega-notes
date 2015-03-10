@@ -35,9 +35,11 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 	AltosFlightStatus	flightStatus;
 	AltosIgnitor		ignitor;
 	AltosIdleMonitor	thread;
+	AltosUIMap      	sitemap;
 	int			serial;
 	boolean			remote;
 	boolean			has_ignitor;
+	boolean			has_map;
 
 	void stop_display() {
 		if (thread != null) {
@@ -83,11 +85,26 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 				has_ignitor = false;
 			}
 		}
+		if (state.gps != null && state.gps.connected) {
+			if (!has_map) {
+				pane.add("Site Map", sitemap);
+				has_map = true;
+			}
+		} else {
+			if (has_map) {
+				pane.remove(sitemap);
+				has_map = false;
+			}
+		}
+
 //		try {
 			pad.show(state, listener_state);
 			flightStatus.show(state, listener_state);
 			flightInfo.show(state, listener_state);
-			ignitor.show(state, listener_state);
+			if (has_ignitor)
+				ignitor.show(state, listener_state);
+			if (has_map)
+				sitemap.show(state, listener_state);
 //		} catch (Exception e) {
 //			System.out.print("Show exception " + e);
 //		}
@@ -260,6 +277,8 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		pane.add("Table", new JScrollPane(flightInfo));
 
 		ignitor = new AltosIgnitor();
+
+		sitemap = new AltosUIMap();
 
 		/* Make the tabbed pane use the rest of the window space */
 		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));
