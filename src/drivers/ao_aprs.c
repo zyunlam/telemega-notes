@@ -719,7 +719,13 @@ static int tncPositionPacket(void)
 
     buf = tncBuffer;
 
+#ifdef AO_APRS_TEST
+#define AO_APRS_FORMAT_COMPRESSED	0
+#define AO_APRS_FORMAT_UNCOMPRESSED	1
+    switch (AO_APRS_FORMAT_COMPRESSED) {
+#else
     switch (ao_config.aprs_format) {
+#endif
     case AO_APRS_FORMAT_COMPRESSED:
     default:
     {
