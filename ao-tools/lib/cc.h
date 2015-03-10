@@ -50,7 +50,7 @@ void
 cc_usbdevs_free(struct cc_usbdevs *usbdevs);
 
 struct cc_usbdevs *
-cc_usbdevs_scan(void);
+cc_usbdevs_scan(int non_tty);
 
 char *
 cc_usbdevs_find_by_arg(char *arg, char *default_product);
