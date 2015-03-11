@@ -21,4 +21,7 @@
 void
 ao_trng_init(void);
 
+void
+ao_reset(void);
+
 #endif /* _AO_TRNG_H_ */

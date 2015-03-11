@@ -40,4 +40,6 @@ void main(void)
 	ao_led_off(AO_LED_RED);
 
 	ao_start_scheduler();
+
+	ao_reset(); /* Power On Self Test */
 }
