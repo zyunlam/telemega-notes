@@ -20,23 +20,6 @@
 #include <ao_crc.h>
 #include <ao_trng.h>
 
-
-static struct ao_task ao_blink_red_task;
-static uint8_t ao_failed = 0;
-
-static void
-ao_blink_red(void)
-{
-	for (;;) {
-		while (!ao_failed)
-			ao_sleep(&ao_failed);
-		while (ao_failed) {
-			ao_led_toggle(AO_LED_RED);
-			ao_delay(AO_MS_TO_TICKS(500));
-		}
-	}
-}
-
 static struct ao_task ao_blink_green_task;
 static uint8_t ao_blinking_green = 0;
 
@@ -63,66 +46,90 @@ ao_blink_green_toggle(void)
 	ao_wakeup(&ao_blinking_green);
 }
 
-#define ADC_WORDS (AO_USB_IN_SIZE / sizeof (uint16_t))
-static uint16_t prev16 = 0;
-static uint16_t	adc_values[ADC_WORDS];
-static uint8_t	adc_i = ADC_WORDS;
+static struct ao_task ao_blink_red_task;
+static int8_t ao_failed = -1; /* -1 need POST, 0 NOMINAL, 1 FAILED */
 
-static uint16_t
-fetch16(uint8_t initialize)
+/* On handling failure, keithp said:
+ We could disconnect from USB easily enough, or disconnect and come back
+ with a different setup that the kernel driver could report as an
+ error. Lots of options.
+*/
+void
+ao_trng_failure(void)
 {
-	uint32_t	*rnd;
-	uint8_t		i;
-
-	if (ao_failed)
-		return 0;
-	if (initialize)
-		adc_i = ADC_WORDS;
-	if (adc_i == ADC_WORDS) {
-		rnd = (uint32_t *) ao_adc_get(AO_USB_IN_SIZE);	/* one 16-bit value per output byte */
-		adc_i = 0;
-		for (i = 0; i < ADC_WORDS; i++) {
-			adc_values[i] = ao_crc_in_32_out_16(*rnd++);
-		}
-	}
-	if (initialize)
-		prev16 = adc_values[adc_i++];
-	if (adc_values[adc_i] == prev16) {
-		/* FAILED: how do we prevent spewing bad data? */
-		printf("FAILED value %d repeated\n", prev16);
-		ao_failed = 1;
-		ao_wakeup(&ao_failed);
-		return 0;
-	}
-	prev16 = adc_values[adc_i];
-	adc_i++;
-	return prev16;
+	ao_failed = 1;
+	ao_wakeup(&ao_failed);
 }
 
 static void
-ao_simulate_failure(void)
+ao_trng_fetch(uint32_t kbytes)
 {
-	if (adc_i == ADC_WORDS)
-		fetch16(0);
-	prev16 = adc_values[adc_i];
+	static uint16_t	*buffer[2];
+	uint32_t	count;
+	int		usb_buf_id;
+	uint16_t	i;
+	uint16_t	*buf;
+	uint32_t        *rnd;
+	uint32_t        prev, cur;
+
+	if (!buffer[0]) {
+		buffer[0] = ao_usb_alloc();
+		buffer[1] = ao_usb_alloc();
+		if (!buffer[0])
+			return;
+	}
+
+	usb_buf_id = 0;
+	count = kbytes * (1024/AO_USB_IN_SIZE);
+
+	ao_crc_reset();
+
+	ao_led_on(AO_LED_TRNG_READ);
+	while (count--) {
+		/* one 16-bit value per output byte */
+		rnd = (uint32_t *) ao_adc_get(AO_USB_IN_SIZE + 2);
+		buf = buffer[usb_buf_id];
+		prev = *rnd++;
+		for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
+			cur = *rnd++;
+			if (cur == prev)
+				ao_trng_failure();
+			*buf++ = ao_crc_in_32_out_16(cur);
+			prev = cur;
+		}
+		ao_adc_ack(AO_USB_IN_SIZE);
+		ao_led_toggle(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
+		ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
+		ao_led_toggle(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
+		usb_buf_id = 1-usb_buf_id;
+	}
+	ao_led_off(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
+	flush();
+}
+
+static void
+ao_trng_fetch_cmd(void)
+{
+	uint32_t kbytes = 1;
+
+	ao_cmd_decimal();
+	if (ao_cmd_status == ao_cmd_success)
+		kbytes = ao_cmd_lex_u32;
+	else
+		ao_cmd_status = ao_cmd_success;
+	ao_trng_fetch(kbytes);
 }
 
 /* NOTE: the reset function also functions as the Power On Self Test */
 void
-ao_reset(void)
+ao_trng_reset(void)
 {
-	uint32_t	count;
-
 	printf("Power On Self Test\n"); /* DEBUGGING */
 	ao_failed = 0;
 	ao_led_off(AO_LED_RED);
 	ao_wakeup(&ao_failed);
-	fetch16(1);
 	/* get the first 1k bits and ensure there are no duplicates */
-	count = 1024 / sizeof (uint16_t);
-	while (count-- && !ao_failed) {
-		fetch16(0);
-	}
+	ao_trng_fetch(1);
 	if (ao_failed) { /* show failure */
 		printf("FAILED self test\n");
 	} else { /* show success */
@@ -135,55 +142,22 @@ ao_reset(void)
 }
 
 static void
-ao_trng_fetch(void)
+ao_blink_red(void)
 {
-	static uint16_t	*buffer[2];
-	uint32_t	kbytes = 1;
-	uint32_t	count;
-	int		usb_buf_id;
-	uint16_t	i;
-	uint16_t	*buf;
-
-	if (!buffer[0]) {
-		buffer[0] = ao_usb_alloc();
-		buffer[1] = ao_usb_alloc();
-		if (!buffer[0])
-			return;
+	if (ao_failed < 0)
+		ao_trng_reset(); /* lazy POST */
+	for (;;) {
+		while (!ao_failed)
+			ao_sleep(&ao_failed);
+		while (ao_failed) {
+			ao_led_toggle(AO_LED_RED);
+			ao_delay(AO_MS_TO_TICKS(500));
+		}
 	}
-
-	ao_cmd_decimal();
-	if (ao_cmd_status == ao_cmd_success)
-		kbytes = ao_cmd_lex_u32;
-	else
-		ao_cmd_status = ao_cmd_success;
-	usb_buf_id = 0;
-	count = kbytes * (1024/AO_USB_IN_SIZE);
-
-	ao_crc_reset();
-
-	ao_led_on(AO_LED_TRNG_READ);
-	while (count--) {
-		buf = buffer[usb_buf_id];
-		for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++)
-			*buf++ = fetch16(0);
-		ao_adc_ack(AO_USB_IN_SIZE);
-		ao_led_toggle(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
-		ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
-		ao_led_toggle(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
-		usb_buf_id = 1-usb_buf_id;
-	}
-	ao_led_off(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
-	flush();
 }
 
 static void
-ao_trng_word(void)
-{
-	printf("%d\n", fetch16(0));
-}
-
-static void
-ao_status(void)
+ao_trng_status(void)
 {
 	if (ao_failed)
 		printf("FAILED\n");
@@ -192,12 +166,11 @@ ao_status(void)
 }
 
 static const struct ao_cmds ao_trng_cmds[] = {
-	{ ao_trng_fetch, "f <kbytes>\0Fetch a block of numbers" },
-	{ ao_trng_word, "F\0Fetch 16 bit unsigned int" },
-	{ ao_reset, "R\0reset" },
+	{ ao_trng_fetch_cmd, "f <kbytes>\0Fetch a block of numbers" },
+	{ ao_trng_reset, "R\0Reset" },
 	{ ao_blink_green_toggle, "G\0Toggle green LED blinking" },
-	{ ao_status, "s\0show status" },
-	{ ao_simulate_failure, "z\0simulate failure" },
+	{ ao_trng_status, "s\0Show status" },
+	{ ao_trng_failure, "z\0Simulate failure" },
 	{ 0, NULL },
 };
 
