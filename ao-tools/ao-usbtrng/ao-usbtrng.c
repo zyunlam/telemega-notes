@@ -62,18 +62,22 @@ main (int argc, char **argv)
 	struct cc_usb		*cc = NULL;
 	char			*tty = NULL;
 	int			verbose = 0;
+	int			reset = 0;
 	int			ret = 0;
 	int			kbytes = 0; /* 0 == continuous */
 	int			written;
 	uint8_t			bits[1024];
 
-	while ((c = getopt_long(argc, argv, "vT:D:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "vRT:D:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
 			break;
 		case 'D':
 			device = optarg;
+			break;
+		case 'R':
+			reset++;
 			break;
 		case 'v':
 			verbose++;
@@ -104,23 +108,26 @@ main (int argc, char **argv)
 	if (!cc)
 		exit(1);
 
-	if (kbytes) {
-		cc_usb_printf(cc, "f %d\n", kbytes);
+        if (reset) {
+		cc_usb_printf(cc, "R\n");
+        } else {
+		if (kbytes) {
+			cc_usb_printf(cc, "f %d\n", kbytes);
 
-		while (kbytes--) {
-			for (i = 0; i < 1024; i++)
-				bits[i] = cc_usb_getchar(cc);
-			write(1, bits, 1024);
+			while (kbytes--) {
+				for (i = 0; i < 1024; i++)
+					bits[i] = cc_usb_getchar(cc);
+				write(1, bits, 1024);
+			}
+		} else { /* 0 == continuous */
+			written = 0;
+			while (written >= 0) {
+				cc_usb_printf(cc, "f\n");
+				for (i = 0; i < 1024; i++)
+					bits[i] = cc_usb_getchar(cc);
+				written = write(1, bits, 1024);
+			}
 		}
-	} else { /* 0 == continuous */
-		written = 0;
-		while (written >= 0) {
-			cc_usb_printf(cc, "f 1\n");
-			for (i = 0; i < 1024; i++)
-				bits[i] = cc_usb_getchar(cc);
-			written = write(1, bits, 1024);
-		}
-	}
-
+        }
 	done(cc, ret);
 }
