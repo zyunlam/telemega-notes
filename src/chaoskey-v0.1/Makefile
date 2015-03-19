@@ -37,7 +37,8 @@ ALTOS_SRC = \
 
 PRODUCT=ChaosKey-v0.1
 PRODUCT_DEF=-DCHAOSKEY_V_0_1
-IDPRODUCT=0x0028
+IDVENDOR=0x1d50
+IDPRODUCT=0x60c6
 
 CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -g -Os
 
@@ -54,7 +55,7 @@ $(PROG): Makefile $(OBJ) altos.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
+	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -V $(IDVENDOR) -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) -o $@
 
 $(OBJ): $(INC)
 
