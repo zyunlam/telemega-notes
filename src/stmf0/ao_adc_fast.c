@@ -23,7 +23,7 @@ uint16_t ao_adc_ring[AO_ADC_RING_SIZE] __attribute__((aligned(4)));
 /* Maximum number of samples fetched per _ao_adc_start call */
 #define AO_ADC_RING_CHUNK	(AO_ADC_RING_SIZE >> 1)
 
-uint16_t ao_adc_ring_head, ao_adc_ring_tail;
+uint16_t ao_adc_ring_head, ao_adc_ring_remain;
 uint16_t ao_adc_running;
 
 /*
@@ -36,6 +36,7 @@ static void ao_adc_dma_done(int index)
 {
 	(void) index;
 	ao_adc_ring_head += ao_adc_running;
+	ao_adc_ring_remain += ao_adc_running;
 	if (ao_adc_ring_head == AO_ADC_RING_SIZE)
 		ao_adc_ring_head = 0;
 	ao_adc_running = 0;

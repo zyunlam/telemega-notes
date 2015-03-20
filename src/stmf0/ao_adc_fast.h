@@ -31,52 +31,53 @@ extern uint16_t	ao_adc_ring[AO_ADC_RING_SIZE];
 
 #define ao_adc_ring_step(pos,inc)	(((pos) + (inc)) & (AO_ADC_RING_SIZE - 1))
 
-extern uint16_t	ao_adc_ring_head, ao_adc_ring_tail;
+extern uint16_t	ao_adc_ring_head, ao_adc_ring_remain;
 extern uint16_t	ao_adc_running;
+
+/*
+ * Place to start fetching values from
+ */
+static inline uint16_t
+ao_adc_ring_tail(void)
+{
+	return (ao_adc_ring_head - ao_adc_ring_remain) & (AO_ADC_RING_SIZE - 1);
+}
 
 void
 _ao_adc_start(void);
 
-static inline uint16_t
-_ao_adc_remain(void)
-{
-	if (ao_adc_ring_tail > ao_adc_ring_head)
-		return AO_ADC_RING_SIZE - ao_adc_ring_tail;
-	return ao_adc_ring_head - ao_adc_ring_tail;
-}
-
+/*
+ * Space available to write ADC values into
+ */
 static inline uint16_t
 _ao_adc_space(void)
 {
-	if (ao_adc_ring_head >= ao_adc_ring_tail)
+	/* Free to end of buffer? */
+	if (ao_adc_ring_remain <= ao_adc_ring_head)
 		return AO_ADC_RING_SIZE - ao_adc_ring_head;
-	return ao_adc_ring_tail - ao_adc_ring_head;
+
+	/* no, return just the unused entries beyond head */
+	return AO_ADC_RING_SIZE - ao_adc_ring_remain;
 }
 
-static inline uint16_t *
+static inline uint16_t
 ao_adc_get(uint16_t n)
 {
-	if (ao_adc_ring_tail + n > AO_ADC_RING_SIZE)
-		ao_panic(AO_PANIC_ADC);
 	ao_arch_block_interrupts();
-	while (_ao_adc_remain() < n) {
+	while (ao_adc_ring_remain < n) {
 		if (!ao_adc_running)
 			_ao_adc_start();
 		ao_sleep(&ao_adc_ring_head);
 	}
 	ao_arch_release_interrupts();
-	return &ao_adc_ring[ao_adc_ring_tail];
+	return ao_adc_ring_tail();
 }
 
 static inline void
 ao_adc_ack(uint16_t n)
 {
-	if (ao_adc_ring_tail + n > AO_ADC_RING_SIZE)
-		ao_panic(AO_PANIC_ADC);
 	ao_arch_block_interrupts();
-	ao_adc_ring_tail += n;
-	if (ao_adc_ring_tail == AO_ADC_RING_SIZE)
-		ao_adc_ring_tail = 0;
+	ao_adc_ring_remain -= n;
 	if (!ao_adc_running)
 		_ao_adc_start();
 	ao_arch_release_interrupts();
