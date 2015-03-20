@@ -20,6 +20,48 @@
 #include <ao_crc.h>
 #include <ao_trng.h>
 
+static struct ao_task ao_blink_green_task;
+static uint8_t ao_blinking_green = 0;
+
+static void
+ao_blink_green(void)
+{
+	for (;;) {
+		while (!ao_blinking_green)
+			ao_sleep(&ao_blinking_green);
+		while (ao_blinking_green) {
+			ao_led_toggle(AO_LED_GREEN);
+			ao_delay(AO_MS_TO_TICKS(1000));
+		}
+	}
+}
+
+static void
+ao_blink_green_toggle(void)
+{
+	ao_blinking_green = !ao_blinking_green;
+	if (!ao_blinking_green)
+		ao_led_off(AO_LED_GREEN);
+	ao_wakeup(&ao_blinking_green);
+}
+
+static struct ao_task ao_blink_red_task;
+static uint8_t ao_failed = 0; /* 0 NOMINAL, 1 FAILED */
+static uint8_t ao_post = 0; /* 0 POST needed, 1 powered up */
+
+/* On handling failure, keithp said:
+ We could disconnect from USB easily enough, or disconnect and come back
+ with a different setup that the kernel driver could report as an
+ error. Lots of options.
+*/
+
+void
+ao_trng_failure()
+{
+	ao_failed = 1;
+	ao_wakeup(&ao_failed);
+}
+
 static void
 ao_trng_fetch(void)
 {
@@ -31,6 +73,9 @@ ao_trng_fetch(void)
 	uint16_t	*buf;
 	uint16_t	t;
 	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
+	uint32_t	cur;
+	uint32_t        prev = 0;
+	uint8_t         prev_set = 0; /* prev has been set */
 
 	if (!buffer[0]) {
 		buffer[0] = ao_usb_alloc();
@@ -54,8 +99,13 @@ ao_trng_fetch(void)
 		t = ao_adc_get(AO_USB_IN_SIZE) >> 1;	/* one 16-bit value per output byte */
 		buf = buffer[usb_buf_id];
 		for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
-			*buf++ = ao_crc_in_32_out_16(rnd[t]);
+			cur = rnd[t];
+			if (prev_set && (cur == prev))
+				ao_trng_failure();
+			*buf++ = ao_crc_in_32_out_16(cur);
 			t = (t + 1) & ((AO_ADC_RING_SIZE>>1) - 1);
+                        prev = cur;
+			prev_set = 1;
 		}
 		ao_adc_ack(AO_USB_IN_SIZE);
 		ao_led_toggle(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
@@ -67,13 +117,74 @@ ao_trng_fetch(void)
 	flush();
 }
 
+static void
+ao_trng_fetch_cmd(void)
+{
+	if (!ao_failed)
+		ao_trng_fetch();
+}
+
+/* NOTE: the reset function also functions as the Power On Self Test */
+void
+ao_trng_reset(void)
+{
+	printf("Resetting...\n");
+	ao_failed = 0;
+	ao_led_off(AO_LED_RED);
+	ao_wakeup(&ao_failed);
+	/* get the first 1k bits and ensure there are no duplicates */
+	/* FIXME ao_trng_fetch(); */
+	putchar('\n');
+	if (ao_failed) { /* show failure */
+		printf("FAILED self test\n");
+	} else { /* show success */
+		printf("PASS - operation NOMINAL\n");
+		/* this blocks! */
+		ao_led_on(AO_LED_GREEN);
+		ao_delay(AO_MS_TO_TICKS(1000));
+		ao_led_off(AO_LED_GREEN);
+	}
+}
+
+static void
+ao_blink_red(void)
+{
+	if (!ao_post) {
+		ao_trng_reset(); /* POST */
+		ao_post = 1;
+	}
+	for (;;) {
+		while (!ao_failed)
+			ao_sleep(&ao_failed);
+		while (ao_failed) {
+			ao_led_toggle(AO_LED_RED);
+			ao_delay(AO_MS_TO_TICKS(500));
+		}
+	}
+}
+
+static void
+ao_trng_status(void)
+{
+	if (ao_failed)
+		printf("FAILED\n");
+	else
+		printf("NOMINAL\n");
+}
+
 static const struct ao_cmds ao_trng_cmds[] = {
-	{ ao_trng_fetch,	"f <kbytes>\0Fetch a block of numbers" },
+	{ ao_trng_fetch_cmd, "f <kbytes>\0Fetch a block of numbers" },
+	{ ao_trng_reset, "R\0Reset" },
+	{ ao_blink_green_toggle, "G\0Toggle green LED blinking" },
+	{ ao_trng_status, "s\0Show status" },
+	{ ao_trng_failure, "z\0Simulate failure" },
 	{ 0, NULL },
 };
 
 void
 ao_trng_init(void)
 {
+	ao_add_task(&ao_blink_red_task, ao_blink_red, "blink_red");
+	ao_add_task(&ao_blink_green_task, ao_blink_green, "blink_green");
 	ao_cmd_register(ao_trng_cmds);
 }
