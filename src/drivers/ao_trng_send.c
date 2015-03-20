@@ -27,7 +27,8 @@ ao_trng_send(void)
 	int		usb_buf_id;
 	uint16_t	i;
 	uint16_t	*buf;
-	uint32_t	*rnd;
+	uint16_t	t;
+	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
 
 	if (!buffer[0]) {
 		buffer[0] = ao_usb_alloc();
@@ -42,10 +43,12 @@ ao_trng_send(void)
 
 	for (;;) {
 		ao_led_on(AO_LED_TRNG_ACTIVE);
-		rnd = (uint32_t *) ao_adc_get(AO_USB_IN_SIZE);	/* one 16-bit value per output byte */
+		t = ao_adc_get(AO_USB_IN_SIZE) >> 1;	/* one 16-bit value per output byte */
 		buf = buffer[usb_buf_id];
-		for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++)
-			*buf++ = ao_crc_in_32_out_16(*rnd++);
+		for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
+			*buf++ = ao_crc_in_32_out_16(rnd[t]);
+			t = (t + 1) & ((AO_ADC_RING_SIZE>>1) - 1);
+		}
 		ao_adc_ack(AO_USB_IN_SIZE);
 		ao_led_off(AO_LED_TRNG_ACTIVE);
 		ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
