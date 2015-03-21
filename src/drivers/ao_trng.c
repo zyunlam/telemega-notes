@@ -18,6 +18,7 @@
 #include <ao.h>
 #include <ao_adc_fast.h>
 #include <ao_crc.h>
+#include <ao_boot.h>
 #include <ao_trng.h>
 
 static struct ao_task ao_blink_green_task;
@@ -36,15 +37,6 @@ ao_blink_green(void)
 	}
 }
 
-static void
-ao_blink_green_toggle(void)
-{
-	ao_blinking_green = !ao_blinking_green;
-	if (!ao_blinking_green)
-		ao_led_off(AO_LED_GREEN);
-	ao_wakeup(&ao_blinking_green);
-}
-
 static struct ao_task ao_blink_red_task;
 static uint8_t ao_failed = 0; /* 0 NOMINAL, 1 FAILED */
 static uint8_t ao_post = 0; /* 0 POST needed, 1 powered up */
@@ -61,6 +53,8 @@ ao_trng_failure()
 	ao_failed = 1;
 	ao_wakeup(&ao_failed);
 }
+
+#ifdef DEBUG_FIPS
 
 static void
 ao_trng_fetch(void)
@@ -124,26 +118,116 @@ ao_trng_fetch_cmd(void)
 		ao_trng_fetch();
 }
 
+static void
+ao_trng_status(void)
+{
+	if (ao_failed)
+		printf("FAILED\n");
+	else
+		printf("NOMINAL\n");
+}
+
+void ao_trng_reset(void); /* forward declaration */
+
+static void
+ao_blink_green_toggle(void)
+{
+	ao_blinking_green = !ao_blinking_green;
+	if (!ao_blinking_green)
+		ao_led_off(AO_LED_GREEN);
+	ao_wakeup(&ao_blinking_green);
+}
+
+static const struct ao_cmds ao_trng_cmds[] = {
+	{ ao_trng_fetch_cmd, "f <kbytes>\0Fetch a block of numbers" },
+	{ ao_trng_reset, "R\0Reset" },
+	{ ao_blink_green_toggle, "G\0Toggle green LED blinking" },
+	{ ao_trng_status, "s\0Show status" },
+	{ ao_trng_failure, "z\0Simulate failure" },
+	{ 0, NULL },
+};
+
+#else
+
+static void
+ao_trng_send(void)
+{
+	static uint16_t	*buffer[2];
+	int		usb_buf_id;
+	uint16_t	i;
+	uint16_t	*buf;
+	uint16_t	t;
+	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
+
+	if (!buffer[0]) {
+		buffer[0] = ao_usb_alloc();
+		buffer[1] = ao_usb_alloc();
+		if (!buffer[0])
+			return;
+	}
+
+	usb_buf_id = 0;
+
+	ao_crc_reset();
+
+	for (;;) {
+		ao_led_on(AO_LED_TRNG_ACTIVE);
+		t = ao_adc_get(AO_USB_IN_SIZE) >> 1;	/* one 16-bit value per output byte */
+		buf = buffer[usb_buf_id];
+		for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
+			*buf++ = ao_crc_in_32_out_16(rnd[t]);
+			t = (t + 1) & ((AO_ADC_RING_SIZE>>1) - 1);
+		}
+		ao_adc_ack(AO_USB_IN_SIZE);
+		ao_led_off(AO_LED_TRNG_ACTIVE);
+		ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
+		usb_buf_id = 1-usb_buf_id;
+	}
+}
+
+static struct ao_task ao_trng_send_task;
+
+static void
+ao_bootloader_cmd(void)
+{
+	for (;;) {
+		getchar(); /* any char will do */
+                /* give feedback we are going into bootloader mode */
+		ao_led_on(AO_LED_GREEN);
+		ao_delay(AO_MS_TO_TICKS(500));
+		ao_led_off(AO_LED_GREEN);
+		ao_delay(AO_MS_TO_TICKS(500));
+		ao_led_on(AO_LED_GREEN);
+		ao_delay(AO_MS_TO_TICKS(500));
+		ao_led_off(AO_LED_GREEN);
+		ao_delay(AO_MS_TO_TICKS(500));
+		ao_led_on(AO_LED_GREEN);
+		ao_delay(AO_MS_TO_TICKS(500));
+		ao_led_off(AO_LED_GREEN);
+                ao_boot_loader();
+	}
+}
+
+static struct ao_task ao_bootloader_cmd_task;
+
+#endif
+
+
 /* NOTE: the reset function also functions as the Power On Self Test */
 void
 ao_trng_reset(void)
 {
-	printf("Resetting...\n");
+	/* printf("Resetting...\n"); */
 	ao_failed = 0;
 	ao_led_off(AO_LED_RED);
 	ao_wakeup(&ao_failed);
 	/* get the first 1k bits and ensure there are no duplicates */
 	/* FIXME ao_trng_fetch(); */
-	putchar('\n');
-	if (ao_failed) { /* show failure */
-		printf("FAILED self test\n");
-	} else { /* show success */
-		printf("PASS - operation NOMINAL\n");
-		/* this blocks! */
+        if (!ao_failed) {
 		ao_led_on(AO_LED_GREEN);
 		ao_delay(AO_MS_TO_TICKS(1000));
 		ao_led_off(AO_LED_GREEN);
-	}
+        }
 }
 
 static void
@@ -163,28 +247,15 @@ ao_blink_red(void)
 	}
 }
 
-static void
-ao_trng_status(void)
-{
-	if (ao_failed)
-		printf("FAILED\n");
-	else
-		printf("NOMINAL\n");
-}
-
-static const struct ao_cmds ao_trng_cmds[] = {
-	{ ao_trng_fetch_cmd, "f <kbytes>\0Fetch a block of numbers" },
-	{ ao_trng_reset, "R\0Reset" },
-	{ ao_blink_green_toggle, "G\0Toggle green LED blinking" },
-	{ ao_trng_status, "s\0Show status" },
-	{ ao_trng_failure, "z\0Simulate failure" },
-	{ 0, NULL },
-};
-
 void
 ao_trng_init(void)
 {
 	ao_add_task(&ao_blink_red_task, ao_blink_red, "blink_red");
 	ao_add_task(&ao_blink_green_task, ao_blink_green, "blink_green");
+#ifdef DEBUG_FIPS
 	ao_cmd_register(ao_trng_cmds);
+#else
+	ao_add_task(&ao_bootloader_cmd_task, ao_bootloader_cmd, "bootloader_cmd");
+	ao_add_task(&ao_trng_send_task, ao_trng_send, "trng_send");
+#endif
 }

@@ -61,7 +61,6 @@
 #define AO_CRC_INIT	0xffffffff
 
 /* TRNG */
-#define AO_LED_TRNG_READ	AO_LED_RED
-#define AO_LED_TRNG_WRITE	AO_LED_GREEN
+#define AO_LED_TRNG_ACTIVE	AO_LED_GREEN
 
 #endif /* _AO_PINS_H_ */

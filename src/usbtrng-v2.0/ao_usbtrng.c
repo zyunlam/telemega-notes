@@ -30,9 +30,9 @@ void main(void)
 	ao_dma_init();
 	ao_adc_init();
 	ao_crc_init();
-
+#ifdef DEBUG_FIPS
 	ao_cmd_init();
-
+#endif
 	ao_usb_init();
 
 	ao_trng_init();

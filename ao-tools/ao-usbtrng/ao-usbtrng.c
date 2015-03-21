@@ -36,12 +36,14 @@ static const struct option options[] = {
 	{ .name = "tty", .has_arg = 1, .val = 'T' },
 	{ .name = "device", .has_arg = 1, .val = 'D' },
 	{ .name = "verbose", .has_arg = 0, .val = 'v' },
+	{ .name = "reset", .has_arg = 0, .val = 'R' },
+	{ .name = "bootloader", .has_arg = 0, .val = 'X' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--verbose] [--device=<AltOS-device>] [-tty=<tty>] [<kbytes>]\n", program);
+	fprintf(stderr, "usage: %s [--verbose] [--reset] [--bootloader] [--device=<AltOS-device>] [-tty=<tty>] [<kbytes>]\n", program);
 	exit(1);
 }
 
@@ -63,12 +65,13 @@ main (int argc, char **argv)
 	char			*tty = NULL;
 	int			verbose = 0;
 	int			reset = 0;
+	int			bootloader = 0;
 	int			ret = 0;
 	int			kbytes = 0; /* 0 == continuous */
 	int			written;
 	uint8_t			bits[1024];
 
-	while ((c = getopt_long(argc, argv, "vRT:D:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "vRXT:D:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
@@ -78,6 +81,9 @@ main (int argc, char **argv)
 			break;
 		case 'R':
 			reset++;
+			break;
+		case 'X':
+			bootloader++;
 			break;
 		case 'v':
 			verbose++;
@@ -108,7 +114,9 @@ main (int argc, char **argv)
 	if (!cc)
 		exit(1);
 
-        if (reset) {
+        if (bootloader) {
+		cc_usb_printf(cc, "X\n");
+        } else if (reset) {
 		cc_usb_printf(cc, "R\n");
         } else {
 		if (kbytes) {

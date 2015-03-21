@@ -18,6 +18,11 @@
 #ifndef _AO_TRNG_H_
 #define _AO_TRNG_H_
 
+/* if this is defined the command processor will enable
+   debugging FIPS 140-2 errors
+#define DEBUG_FIPS 1
+*/
+
 void
 ao_trng_init(void);
 
