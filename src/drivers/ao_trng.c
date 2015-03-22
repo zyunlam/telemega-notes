@@ -56,6 +56,10 @@ ao_trng_failure()
 
 #ifdef DEBUG_FIPS
 
+static uint16_t ao_fail_ring_tail;
+static uint32_t	ao_fail_adc;
+static uint32_t fail_ring[AO_ADC_RING_SIZE >> 1];
+
 static void
 ao_trng_fetch(void)
 {
@@ -88,26 +92,31 @@ ao_trng_fetch(void)
 
 	ao_crc_reset();
 
-	ao_led_on(AO_LED_TRNG_READ);
-	while (count--) {
+	ao_led_on(AO_LED_TRNG_ACTIVE);
+	while (!ao_failed && count--) {
 		t = ao_adc_get(AO_USB_IN_SIZE) >> 1;	/* one 16-bit value per output byte */
 		buf = buffer[usb_buf_id];
 		for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
 			cur = rnd[t];
-			if (prev_set && (cur == prev))
+			fail_ring[t] = cur;
+			if (prev_set && (cur == prev)) {
 				ao_trng_failure();
+				ao_fail_ring_tail = t;
+				ao_fail_adc = cur;
+				break;
+			}
 			*buf++ = ao_crc_in_32_out_16(cur);
 			t = (t + 1) & ((AO_ADC_RING_SIZE>>1) - 1);
                         prev = cur;
 			prev_set = 1;
 		}
 		ao_adc_ack(AO_USB_IN_SIZE);
-		ao_led_toggle(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
+		ao_led_toggle(AO_LED_TRNG_ACTIVE);
 		ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
-		ao_led_toggle(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
+		ao_led_toggle(AO_LED_TRNG_ACTIVE);
 		usb_buf_id = 1-usb_buf_id;
 	}
-	ao_led_off(AO_LED_TRNG_READ|AO_LED_TRNG_WRITE);
+	ao_led_off(AO_LED_TRNG_ACTIVE);
 	flush();
 }
 
@@ -121,9 +130,25 @@ ao_trng_fetch_cmd(void)
 static void
 ao_trng_status(void)
 {
-	if (ao_failed)
-		printf("FAILED\n");
-	else
+	if (ao_failed) {
+		uint16_t i;
+		uint32_t *rnd = (uint32_t *) ao_adc_ring;
+
+		printf("FAILED at ring_tail: %3d,    adc = %08x\n", ao_fail_ring_tail, ao_fail_adc);
+		for (i = 0; i < (AO_ADC_RING_SIZE >> 1); i += 4) {
+			printf("%3d: %08x  ", i, rnd[i]);
+			printf("%3d: %08x  ", i+1, rnd[i+1]);
+			printf("%3d: %08x  ", i+2, rnd[i+2]);
+			printf("%3d: %08x\n", i+3, rnd[i+3]);
+		}
+		printf("COPY fail_ring: %3d,    adc = %08x\n", ao_fail_ring_tail, ao_fail_adc);
+		for (i = 0; i < (AO_ADC_RING_SIZE >> 1); i += 4) {
+			printf("%3d: %08x  ", i, fail_ring[i]);
+			printf("%3d: %08x  ", i+1, fail_ring[i+1]);
+			printf("%3d: %08x  ", i+2, fail_ring[i+2]);
+			printf("%3d: %08x\n", i+3, fail_ring[i+3]);
+		}
+	} else
 		printf("NOMINAL\n");
 }
 

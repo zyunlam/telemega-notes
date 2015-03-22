@@ -23,6 +23,8 @@
 #define DEBUG_FIPS 1
 */
 
+#define DEBUG_FIPS 1
+
 void
 ao_trng_init(void);
 
