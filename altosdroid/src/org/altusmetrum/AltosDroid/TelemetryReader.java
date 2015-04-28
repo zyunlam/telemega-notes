@@ -81,6 +81,8 @@ public class TelemetryReader extends Thread {
 			}
 		} catch (InterruptedException ee) {
 		} catch (IOException ie) {
+			Log.e(TAG, "IO exception in telemetry reader");
+			handler.obtainMessage(TelemetryService.MSG_DISCONNECTED, link).sendToTarget();
 		} finally {
 			close();
 		}

@@ -19,7 +19,7 @@
           package="org.altusmetrum.AltosDroid"
           android:versionCode="6"
           android:versionName="1.5">
-    <uses-sdk android:targetSdkVersion="10" android:minSdkVersion="10"/>
+    <uses-sdk android:targetSdkVersion="12" android:minSdkVersion="12"/>
     <!-- Google Maps -->
     <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
 
@@ -38,18 +38,35 @@
                 android:protectionLevel="signature"/>
     <uses-permission android:name="org.altusmetrum.AltosDroid.permission.MAPS_RECEIVE"/>
 
+    <!-- Permissions needed to access USB OTG -->
+    <uses-feature android:name="android.hardware.usb.host" />
 
     <application android:label="@string/app_name"
                  android:icon="@drawable/app_icon"
-                 android:allowBackup="true" >
+                 android:allowBackup="true"
+		 android:theme="@style/CustomTheme">
         <activity android:name="org.altusmetrum.AltosDroid.AltosDroid"
                   android:label="@string/app_name"
-                  android:configChanges="orientation|keyboardHidden" >
+                  android:configChanges="orientation|keyboardHidden"
+		  android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+	<activity android:name="org.altusmetrum.AltosDroid.AltosDroid"
+                  android:configChanges="orientation|keyboardHidden"
+		  android:launchMode="singleTop">
+	  <intent-filter>
+	    <action
+		android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+	  </intent-filter>
+	  <meta-data
+	      android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+	      android:resource="@xml/device_filter" />
+	</activity>
+
         <activity android:name=".DeviceListActivity"
                   android:label="@string/select_device"
                   android:theme="@android:style/Theme.Dialog"

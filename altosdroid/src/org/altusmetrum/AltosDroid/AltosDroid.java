@@ -23,6 +23,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -51,6 +52,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.location.Location;
+import android.hardware.usb.*;
 
 import org.altusmetrum.altoslib_6.*;
 
@@ -58,6 +60,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Debugging
 	static final String TAG = "AltosDroid";
 	static final boolean D = true;
+
+	// Actions sent to the telemetry server at startup time
+
+	public static final String ACTION_BLUETOOTH = "org.altusmetrum.AltosDroid.BLUETOOTH";
+	public static final String ACTION_USB = "org.altusmetrum.AltosDroid.USB";
 
 	// Message types received by our Handler
 
@@ -100,6 +107,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Timer and Saved flight state for Age calculation
 	private Timer timer;
 	AltosState saved_state;
+
+	UsbDevice	pending_usb_device;
+	boolean		start_with_usb;
 
 	// Service
 	private boolean mIsBound   = false;
@@ -147,6 +157,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				mService.send(msg);
 			} catch (RemoteException e) {
 				// In this case the service has crashed before we could even do anything with it
+			}
+			if (pending_usb_device != null) {
+				try {
+					mService.send(Message.obtain(null, TelemetryService.MSG_OPEN_USB, pending_usb_device));
+					pending_usb_device = null;
+				} catch (RemoteException e) {
+				}
 			}
 		}
 
@@ -395,15 +412,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		super.onCreate(savedInstanceState);
 		if(D) Log.e(TAG, "+++ ON CREATE +++");
 
-		// Get local Bluetooth adapter
-		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-		// If the adapter is null, then Bluetooth is not supported
-		if (mBluetoothAdapter == null) {
-			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-			finish();
-		}
-
 		fm = getSupportFragmentManager();
 
 		// Set up the window layout
@@ -467,23 +475,117 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mAgeView       = (TextView) findViewById(R.id.age_value);
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
-		if(D) Log.e(TAG, "++ ON START ++");
+	private boolean ensureBluetooth() {
+		// Get local Bluetooth adapter
+		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-		// Start Telemetry Service
-		startService(new Intent(AltosDroid.this, TelemetryService.class));
+		// If the adapter is null, then Bluetooth is not supported
+		if (mBluetoothAdapter == null) {
+			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+			return false;
+		}
 
 		if (!mBluetoothAdapter.isEnabled()) {
 			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, AltosDroid.REQUEST_ENABLE_BT);
 		}
 
+		return true;
+	}
+
+	private boolean check_usb() {
+		UsbDevice	device = AltosUsb.find_device(this, AltosLib.product_basestation);
+
+		if (device != null) {
+			Intent		i = new Intent(this, AltosDroid.class);
+			PendingIntent	pi = PendingIntent.getActivity(this, 0, new Intent("hello world", null, this, AltosDroid.class), 0);
+
+			if (AltosUsb.request_permission(this, device, pi)) {
+				connectUsb(device);
+			}
+			start_with_usb = true;
+			return true;
+		}
+
+		start_with_usb = false;
+
+		return false;
+	}
+
+	private void noticeIntent(Intent intent) {
+
+		/* Ok, this is pretty convenient.
+		 *
+		 * When a USB device is plugged in, and our 'hotplug'
+		 * intent registration fires, we get an Intent with
+		 * EXTRA_DEVICE set.
+		 *
+		 * When we start up and see a usb device and request
+		 * permission to access it, that queues a
+		 * PendingIntent, which has the EXTRA_DEVICE added in,
+		 * along with the EXTRA_PERMISSION_GRANTED field as
+		 * well.
+		 *
+		 * So, in both cases, we get the device name using the
+		 * same call. We check to see if access was granted,
+		 * in which case we ignore the device field and do our
+		 * usual startup thing.
+		 */
+
+		UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+		boolean granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, true);
+
+		if (D) Log.e(TAG, "intent " + intent + " device " + device + " granted " + granted);
+
+		if (!granted)
+			device = null;
+
+		if (device != null) {
+			if (D) Log.d(TAG, "intent has usb device " + device.toString());
+			connectUsb(device);
+		} else {
+
+			/* 'granted' is only false if this intent came
+			 * from the request_permission call and
+			 * permission was denied. In which case, we
+			 * don't want to loop forever...
+			 */
+			if (granted) {
+				if (D) Log.d(TAG, "check for a USB device at startup");
+				if (check_usb())
+					return;
+			}
+			if (D) Log.d(TAG, "Starting by looking for bluetooth devices");
+			if (ensureBluetooth())
+				return;
+			finish();
+		}
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		if(D) Log.e(TAG, "++ ON START ++");
+
+		noticeIntent(getIntent());
+
+		// Start Telemetry Service
+		String	action = start_with_usb ? ACTION_USB : ACTION_BLUETOOTH;
+
+		startService(new Intent(action, null, AltosDroid.this, TelemetryService.class));
+
 		doBindService();
 
 		if (mAltosVoice == null)
 			mAltosVoice = new AltosVoice(this);
+
+	}
+
+	@Override
+	public void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		if(D) Log.d(TAG, "onNewIntent");
+		noticeIntent(intent);
 	}
 
 	@Override
@@ -519,7 +621,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		stop_timer();
 	}
 
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(D) Log.d(TAG, "onActivityResult " + resultCode);
 		switch (requestCode) {
 		case REQUEST_CONNECT_DEVICE:
@@ -541,6 +643,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				finish();
 			}
 			break;
+		}
+	}
+
+	private void connectUsb(UsbDevice device) {
+		if (mService == null)
+			pending_usb_device = device;
+		else {
+			// Attempt to connect to the device
+			try {
+				mService.send(Message.obtain(null, TelemetryService.MSG_OPEN_USB, device));
+				if (D) Log.d(TAG, "Sent OPEN_USB message");
+			} catch (RemoteException e) {
+				if (D) Log.e(TAG, "connect device message failed");
+			}
 		}
 	}
 
@@ -619,12 +735,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		Intent serverIntent = null;
 		switch (item.getItemId()) {
 		case R.id.connect_scan:
-			// Launch the DeviceListActivity to see devices and do scan
-			serverIntent = new Intent(this, DeviceListActivity.class);
-			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+			if (ensureBluetooth()) {
+				// Launch the DeviceListActivity to see devices and do scan
+				serverIntent = new Intent(this, DeviceListActivity.class);
+				startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+			}
 			return true;
 		case R.id.disconnect:
-			/* Disconnect the bluetooth device
+			/* Disconnect the device
 			 */
 			disconnectDevice();
 			return true;

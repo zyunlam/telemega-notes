@@ -33,16 +33,13 @@ import android.util.Log;
 
 import org.altusmetrum.altoslib_6.*;
 
-public class AltosBluetooth extends AltosLink {
+public class AltosBluetooth extends AltosDroidLink {
 
 	// Debugging
 	private static final String TAG = "AltosBluetooth";
 	private static final boolean D = true;
 
 	private ConnectThread    connect_thread = null;
-	private Thread           input_thread   = null;
-
-	private Handler          handler;
 
 	private BluetoothAdapter adapter;
 	private BluetoothSocket  socket;
@@ -51,6 +48,7 @@ public class AltosBluetooth extends AltosLink {
 
 	// Constructor
 	public AltosBluetooth(BluetoothDevice device, Handler handler) {
+		super(handler);
 //		set_debug(D);
 		adapter = BluetoothAdapter.getDefaultAdapter();
 		this.handler = handler;
@@ -60,16 +58,7 @@ public class AltosBluetooth extends AltosLink {
 		connect_thread.start();
 	}
 
-	private Object closed_lock = new Object();
-	private boolean closed = false;
-
-	private boolean closed() {
-		synchronized(closed_lock) {
-			return closed;
-		}
-	}
-
-	private void connected() {
+	void connected() {
 		if (closed()) {
 			if (D) Log.d(TAG, "connected after closed");
 			return;
@@ -80,24 +69,11 @@ public class AltosBluetooth extends AltosLink {
 				if (socket != null) {
 					input = socket.getInputStream();
 					output = socket.getOutputStream();
-
-					input_thread = new Thread(this);
-					input_thread.start();
-
-					// Configure the newly connected device for telemetry
-					print("~\nE 0\n");
-					set_monitor(false);
-					if (D) Log.d(TAG, "ConnectThread: connected");
-
-					/* Let TelemetryService know we're connected
-					 */
-					handler.obtainMessage(TelemetryService.MSG_CONNECTED, this).sendToTarget();
-
-					/* Notify other waiting threads that we're connected now
-					 */
-					notifyAll();
+					super.connected();
 				}
 			}
+		} catch (InterruptedException ie) {
+			connect_failed();
 		} catch (IOException io) {
 			connect_failed();
 		}
@@ -109,24 +85,14 @@ public class AltosBluetooth extends AltosLink {
 			return;
 		}
 
-		close_socket();
+		close_device();
 		input = null;
 		output = null;
 		handler.obtainMessage(TelemetryService.MSG_CONNECT_FAILED, this).sendToTarget();
 		if (D) Log.e(TAG, "ConnectThread: Failed to establish connection");
 	}
 
-	private void disconnected() {
-		if (closed()) {
-			if (D) Log.d(TAG, "disconnected after closed");
-			return;
-		}
-
-		if (D) Log.d(TAG, "Sending disconnected message");
-		handler.obtainMessage(TelemetryService.MSG_DISCONNECTED, this).sendToTarget();
-	}
-
-	private void close_socket() {
+	void close_device() {
 		BluetoothSocket	tmp_socket;
 
 		synchronized(this) {
@@ -143,6 +109,12 @@ public class AltosBluetooth extends AltosLink {
 		}
 	}
 
+	public void close() {
+		super.close();
+		input = null;
+		output = null;
+	}
+
 	private final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
 	private void create_socket(BluetoothDevice  device) {
@@ -156,7 +128,7 @@ public class AltosBluetooth extends AltosLink {
 		}
 		if (socket != null) {
 			if (D) Log.d(TAG, String.format("Socket already allocated %s", socket.toString()));
-			close_socket();
+			close_device();
 		}
 		synchronized (this) {
 			socket = tmp_socket;
@@ -205,22 +177,6 @@ public class AltosBluetooth extends AltosLink {
 		}
 	}
 
-	public double frequency() {
-		return frequency;
-	}
-
-	public int telemetry_rate() {
-		return telemetry_rate;
-	}
-
-	public void save_frequency() {
-		AltosPreferences.set_frequency(0, frequency);
-	}
-
-	public void save_telemetry_rate() {
-		AltosPreferences.set_telemetry_rate(0, telemetry_rate);
-	}
-
 	private synchronized void wait_connected() throws InterruptedException, IOException {
 		if (input == null && socket != null) {
 			if (D) Log.d(TAG, "wait_connected...");
@@ -231,108 +187,22 @@ public class AltosBluetooth extends AltosLink {
 			throw new IOException();
 	}
 
-	public void print(String data) {
-		byte[] bytes = data.getBytes();
-		if (D) Log.d(TAG, "print(): begin");
+	int write(byte[] buffer, int len) {
 		try {
-			wait_connected();
-			output.write(bytes);
-			if (D) Log.d(TAG, "print(): Wrote bytes: '" + data.replace('\n', '\\') + "'");
-		} catch (IOException e) {
-			disconnected();
-		} catch (InterruptedException e) {
-			disconnected();
+			output.write(buffer, 0, len);
+		} catch (IOException ie) {
+			return -1;
 		}
+		return len;
 	}
 
-	public void putchar(byte c) {
-		byte[] bytes = { c };
-		if (D) Log.d(TAG, "print(): begin");
+	int read(byte[] buffer, int len) {
 		try {
-			wait_connected();
-			output.write(bytes);
-			if (D) Log.d(TAG, "print(): Wrote byte: '" + c + "'");
-		} catch (IOException e) {
-			disconnected();
-		} catch (InterruptedException e) {
-			disconnected();
+			return input.read(buffer, 0, len);
+		} catch (IOException ie) {
+			return -1;
 		}
 	}
-
-	private static final int buffer_size = 1024;
-
-	private byte[] buffer = new byte[buffer_size];
-	private int buffer_len = 0;
-	private int buffer_off = 0;
-
-	private byte[] debug_chars = new byte[buffer_size];
-	private int debug_off;
-
-	private void debug_input(byte b) {
-		if (b == '\n') {
-			Log.d(TAG, "            " + new String(debug_chars, 0, debug_off));
-			debug_off = 0;
-		} else {
-			if (debug_off < buffer_size)
-				debug_chars[debug_off++] = b;
-		}
-	}
-
-	public int getchar() {
-		while (buffer_off == buffer_len) {
-			try {
-				wait_connected();
-				buffer_len = input.read(buffer);
-				buffer_off = 0;
-			} catch (IOException e) {
-				if (D) Log.d(TAG, "getchar IOException");
-				disconnected();
-				return AltosLink.ERROR;
-			} catch (java.lang.InterruptedException e) {
-				if (D) Log.d(TAG, "getchar Interrupted");
-				disconnected();
-				return AltosLink.ERROR;
-			}
-		}
-		if (D)
-			debug_input(buffer[buffer_off]);
-		return buffer[buffer_off++];
-	}
-
-	public void closing() {
-		synchronized(closed_lock) {
-			if (D) Log.d(TAG, "Marked closed true");
-			closed = true;
-		}
-	}
-
-
-	public void close() {
-		if (D) Log.d(TAG, "close(): begin");
-
-		closing();
-
-		close_socket();
-
-		synchronized(this) {
-
-			if (input_thread != null) {
-				if (D) Log.d(TAG, "close(): stopping input_thread");
-				try {
-					if (D) Log.d(TAG, "close(): input_thread.interrupt().....");
-					input_thread.interrupt();
-					if (D) Log.d(TAG, "close(): input_thread.join().....");
-					input_thread.join();
-				} catch (Exception e) {}
-				input_thread = null;
-			}
-			input = null;
-			output = null;
-			notifyAll();
-		}
-	}
-
-	//public void flush_output() { super.flush_output(); }
 
 	// Stubs of required methods when extending AltosLink
 	public boolean can_cancel_reply()   { return false; }
