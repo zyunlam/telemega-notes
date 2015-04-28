@@ -37,6 +37,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
@@ -46,6 +47,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.View;
+import android.view.LayoutInflater;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.RelativeLayout;
@@ -407,6 +409,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		return String.format(format, value);
 	}
 
+	private View create_tab_view(String label) {
+		LayoutInflater inflater = (LayoutInflater) this.getLayoutInflater();
+		View tab_view = inflater.inflate(R.layout.tab_layout, null);
+		TextView text_view = (TextView) tab_view.findViewById (R.id.tabLabel);
+		text_view.setText(label);
+		return tab_view;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -428,32 +438,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-		mTabsAdapter.addTab(mTabHost.newTabSpec("pad").setIndicator("Pad"), TabPad.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("ascent").setIndicator("Ascent"), TabAscent.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("descent").setIndicator("Descent"), TabDescent.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("landed").setIndicator("Landed"), TabLanded.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("map").setIndicator("Map"), TabMap.class, null);
-
-
-		// Scale the size of the Tab bar for different screen densities
-		// This probably won't be needed when we start supporting ICS+ tabs.
-		DisplayMetrics metrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(metrics);
-		int density = metrics.densityDpi;
-
-		if (density==DisplayMetrics.DENSITY_XHIGH)
-			tabHeight = 65;
-		else if (density==DisplayMetrics.DENSITY_HIGH)
-			tabHeight = 45;
-		else if (density==DisplayMetrics.DENSITY_MEDIUM)
-			tabHeight = 35;
-		else if (density==DisplayMetrics.DENSITY_LOW)
-			tabHeight = 25;
-		else
-			tabHeight = 65;
-
-		for (int i = 0; i < 5; i++)
-			mTabHost.getTabWidget().getChildAt(i).getLayoutParams().height = tabHeight;
+		mTabsAdapter.addTab(mTabHost.newTabSpec("pad").setIndicator(create_tab_view("Pad")), TabPad.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("ascent").setIndicator(create_tab_view("Ascent")), TabAscent.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("descent").setIndicator(create_tab_view("Descent")), TabDescent.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("landed").setIndicator(create_tab_view("Landed")), TabLanded.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("map").setIndicator(create_tab_view("Map")), TabMap.class, null);
 
 		// Set up the custom title
 		mTitle = (TextView) findViewById(R.id.title_left_text);
