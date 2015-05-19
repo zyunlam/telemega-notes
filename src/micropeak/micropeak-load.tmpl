@@ -8,13 +8,14 @@ LOADSLOW="%LOADSLOW%"
 LOADFAST=""
 
 case "$1" in
-fast)
-	LOADSPEED="$LOADFAST"
+slow)
+	LOADSPEED="$LOADSLOW"
 	;;
 *)
-	LOADSPEED="$LOADSLOW"
+	LOADSPEED="$LOADFAST"
 	;;
 esac
 
 echo ${LOADCMD} ${LOADSPEED} ${LOADARG}${HEX}
 ${LOADCMD} ${LOADSPEED} ${LOADARG}${HEX}
+/usr/games/xcowsay --cow-size=large --at=1000,500 "${HEX} finished"
