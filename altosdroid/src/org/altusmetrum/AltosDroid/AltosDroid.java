@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.text.*;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -687,8 +688,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	void setFrequency(String freq) {
 		try {
-			setFrequency (Double.parseDouble(freq.substring(11, 17)));
-		} catch (NumberFormatException e) {
+			setFrequency (AltosParse.parse_double_net(freq.substring(11, 17)));
+		} catch (ParseException e) {
 		}
 	}
 

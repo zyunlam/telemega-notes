@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
+import java.text.*;
 import org.altusmetrum.altoslib_6.*;
 import org.altusmetrum.altosuilib_6.*;
 
@@ -679,9 +680,13 @@ public class TeleGPS
 				if (args.length < i + 3) {
 					help(1);
 				} else {
-					double lat = Double.parseDouble(args[i+1]);
-					double lon = Double.parseDouble(args[i+2]);
+					try {
+					double lat = AltosParse.parse_double_locale(args[i+1]);
+					double lon = AltosParse.parse_double_locale(args[i+2]);
 					AltosUIMap.prefetch_maps(lat, lon);
+					} catch (ParseException e) {
+						System.out.printf("Can't parse number %s\n", e.toString());
+					}
 					i += 2;
 				}
 			} else if (args[i].equals("--replay"))

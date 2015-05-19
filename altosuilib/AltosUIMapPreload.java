@@ -53,33 +53,33 @@ class AltosUIMapPos extends Box {
 		hemi.setSelectedIndex(h);
 	}
 
-	public double get_value() throws NumberFormatException {
+	public double get_value() throws ParseException {
 		int	h = hemi.getSelectedIndex();
 		String	d_t = deg.getText();
 		String	m_t = min.getText();
 		double 	d, m, v;
 		try {
-			d = Double.parseDouble(d_t);
-		} catch (NumberFormatException ne) {
+			d = AltosParse.parse_double_locale(d_t);
+		} catch (ParseException pe) {
 			JOptionPane.showMessageDialog(owner,
 						      String.format("Invalid degrees \"%s\"",
 								    d_t),
 						      "Invalid number",
 						      JOptionPane.ERROR_MESSAGE);
-			throw ne;
+			throw pe;
 		}
 		try {
 			if (m_t.equals(""))
 				m = 0;
 			else
-				m = Double.parseDouble(m_t);
-		} catch (NumberFormatException ne) {
+				m = AltosParse.parse_double_locale(m_t);
+		} catch (ParseException pe) {
 			JOptionPane.showMessageDialog(owner,
 						      String.format("Invalid minutes \"%s\"",
 								    m_t),
 						      "Invalid number",
 						      JOptionPane.ERROR_MESSAGE);
-			throw ne;
+			throw pe;
 		}
 		v = d + m/60.0;
 		if (h == 1)
@@ -142,9 +142,9 @@ class AltosUISite {
 		name = elements[0];
 
 		try {
-			latitude = Double.parseDouble(elements[1]);
-			longitude = Double.parseDouble(elements[2]);
-		} catch (NumberFormatException ne) {
+			latitude = AltosParse.parse_double_net(elements[1]);
+			longitude = AltosParse.parse_double_net(elements[2]);
+		} catch (ParseException pe) {
 			throw new ParseException(String.format("Invalid site line %s", line), 0);
 		}
 	}
@@ -171,6 +171,7 @@ class AltosUISites extends Thread {
 		try {
 			add(new AltosUISite(line));
 		} catch (ParseException pe) {
+			System.out.printf("parse exception %s\n", pe.toString());
 		}
 	}
 
@@ -394,7 +395,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 						max_z = min_z;
 					r = (Integer) radius.getSelectedItem();
 					loading = true;
-				} catch (NumberFormatException ne) {
+				} catch (ParseException pe) {
 					load_button.setSelected(false);
 				}
 				start_load();

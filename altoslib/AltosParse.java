@@ -17,6 +17,7 @@
 
 package org.altusmetrum.altoslib_6;
 
+import java.util.*;
 import java.text.*;
 
 public class AltosParse {
@@ -40,11 +41,23 @@ public class AltosParse {
 		}
 	}
 
-	public static double parse_double(String v) throws ParseException {
+	static NumberFormat nf_locale = NumberFormat.getInstance();
+
+	static NumberFormat nf_net = NumberFormat.getInstance(Locale.ROOT);
+
+	public static double parse_double_locale(String str) throws ParseException {
 		try {
-			return Double.parseDouble(v);
-		} catch (NumberFormatException e) {
-			throw new ParseException("error parsing double " + v, 0);
+			return nf_locale.parse(str.trim()).doubleValue();
+		} catch (ParseException pe) {
+			throw new ParseException("error parsing double " + str, 0);
+		}
+	}
+
+	public static double parse_double_net(String str) throws ParseException {
+		try {
+			return nf_net.parse(str.trim()).doubleValue();
+		} catch (ParseException pe) {
+			throw new ParseException("error parsing double " + str, 0);
 		}
 	}
 

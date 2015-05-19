@@ -18,6 +18,7 @@
 package org.altusmetrum.altosuilib_6;
 
 import java.awt.*;
+import java.text.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
@@ -51,10 +52,10 @@ class AltosEditFreqUI extends AltosUIDialog implements ActionListener {
 		String	d_s = description.getText();
 
 		try {
-			double	f_d = Double.parseDouble(f_s);
+			double	f_d = AltosParse.parse_double_locale(f_s);
 
 			return new AltosFrequency(f_d, d_s);
-		} catch (NumberFormatException ne) {
+		} catch (ParseException ne) {
 		}
 		return null;
 	}

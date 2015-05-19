@@ -195,10 +195,10 @@ public class AltosGPS implements Cloneable, Serializable {
 			lon = AltosParse.parse_coord(words[i++]);
 			alt = AltosParse.parse_int(words[i++]);
 			if (version > 1 || (i < words.length && !words[i].equals("SAT"))) {
-				ground_speed = AltosParse.parse_double(AltosParse.strip_suffix(words[i++], "m/s(H)"));
+				ground_speed = AltosParse.parse_double_net(AltosParse.strip_suffix(words[i++], "m/s(H)"));
 				course = AltosParse.parse_int(words[i++]);
-				climb_rate = AltosParse.parse_double(AltosParse.strip_suffix(words[i++], "m/s(V)"));
-				hdop = AltosParse.parse_double(AltosParse.strip_suffix(words[i++], "(hdop)"));
+				climb_rate = AltosParse.parse_double_net(AltosParse.strip_suffix(words[i++], "m/s(V)"));
+				hdop = AltosParse.parse_double_net(AltosParse.strip_suffix(words[i++], "(hdop)"));
 				h_error = AltosParse.parse_int(words[i++]);
 				v_error = AltosParse.parse_int(words[i++]);
 			}

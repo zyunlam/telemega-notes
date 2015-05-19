@@ -17,6 +17,7 @@
 
 package org.altusmetrum.telegps;
 
+import java.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -686,7 +687,11 @@ public class TeleGPSConfigUI
 			String motion = tracker_motion_value.getSelectedItem().toString();
 			tracker_motion_label.setText(get_tracker_motion_label());
 			set_tracker_motion_values();
-			set_tracker_motion((int) (AltosConvert.height.parse(motion, !imperial_units) + 0.5));
+			try {
+				int m = (int) (AltosConvert.height.parse_locale(motion, !imperial_units) + 0.5);
+				set_tracker_motion(m);
+			} catch (ParseException pe) {
+			}
 		}
 		if (!was_dirty)
 			set_clean();
@@ -886,7 +891,12 @@ public class TeleGPSConfigUI
 	}
 
 	public int tracker_motion() throws AltosConfigDataException {
-		return (int) AltosConvert.height.parse(tracker_motion_value.getSelectedItem().toString());
+		String str = tracker_motion_value.getSelectedItem().toString();
+		try {
+			return (int) (AltosConvert.height.parse_locale(str) + 0.5);
+		} catch (ParseException pe) {
+			throw new AltosConfigDataException("invalid tracker motion %s", str);
+		}
 	}
 
 	public void set_tracker_interval(int tracker_interval) {
