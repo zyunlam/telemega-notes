@@ -41,7 +41,11 @@ int8_t	ao_radio_rssi;			/* Last received RSSI value */
 
 extern const uint32_t	ao_radio_cal;
 
+#ifdef AO_CC1200_FOSC
+#define FOSC	AO_CC1200_FOSC
+#else
 #define FOSC	40000000
+#endif
 
 #define ao_radio_select()	ao_spi_get_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS,AO_SPI_SPEED_FAST)
 #define ao_radio_deselect()	ao_spi_put_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS)
@@ -301,20 +305,28 @@ ao_radio_idle(void)
  *	CHANBW = 5.0 (round to 9.5)
  */
 
+#if FOSC == 40000000
 #define PACKET_SYMBOL_RATE_M		1013008
-
 #define PACKET_SYMBOL_RATE_E_384	8
+#define PACKET_SYMBOL_RATE_E_96		6
+#define PACKET_SYMBOL_RATE_E_24		4
+#endif
+
+#if FOSC == 32000000
+#define PACKET_SYMBOL_RATE_M		239914
+#define PACKET_SYMBOL_RATE_E_384	9
+#define PACKET_SYMBOL_RATE_E_96		7
+#define PACKET_SYMBOL_RATE_E_24		5
+#endif
 
 /* 200 / 2 = 100 */
 #define PACKET_CHAN_BW_384	((CC1200_CHAN_BW_ADC_CIC_DECFACT_12 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
 				 (16 << CC1200_CHAN_BW_BB_CIC_DECFACT))
 
-#define PACKET_SYMBOL_RATE_E_96		6
 /* 200 / 10 = 20 */
 #define PACKET_CHAN_BW_96	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
 				 (16 << CC1200_CHAN_BW_BB_CIC_DECFACT))
 
-#define PACKET_SYMBOL_RATE_E_24		4
 /* 200 / 25 = 8 */
 #define PACKET_CHAN_BW_24	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
 				 (44 << CC1200_CHAN_BW_BB_CIC_DECFACT))
