@@ -2620,9 +2620,9 @@ NAR #88757, TRA #12200
 	  <listitem>
 	    <para>
 	      After Motor. The flight software counts each time the
-	      rocket starts accelerating (presumably due to a motor or
-	      motors igniting). Use this value to count ignitions for
-	      multi-staged or multi-airstart launches.
+	      rocket starts accelerating and then decelerating
+	      (presumably due to a motor or motors burning). Use this
+	      value for multi-staged or multi-airstart launches.
 	    </para>
 	  </listitem>
 	  <listitem>
