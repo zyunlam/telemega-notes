@@ -587,16 +587,7 @@ public class AltosUI extends AltosUIFrame {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("--help"))
 					help(0);
-				else if (args[i].equals("--fetchmaps")) {
-					if (args.length < i + 3) {
-						help(1);
-					} else {
-						double lat = Double.parseDouble(args[i+1]);
-						double lon = Double.parseDouble(args[i+2]);
-//						AltosSiteMap.prefetchMaps(lat, lon);
-						i += 2;
-					}
-				} else if (args[i].equals("--replay"))
+				else if (args[i].equals("--replay"))
 					process = process_replay;
 				else if (args[i].equals("--kml"))
 					process = process_kml;
