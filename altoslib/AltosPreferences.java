@@ -118,6 +118,13 @@ public class AltosPreferences {
 
 	public final static String	unitsPreference = "IMPERIAL-UNITS";
 
+	/* Maps cache size preference name */
+	final static String mapCachePreference = "MAP-CACHE";
+
+	static LinkedList<AltosMapCacheListener> map_cache_listeners;
+
+	public static int map_cache = 9;
+
 	public static AltosFrequency[] load_common_frequencies() {
 		AltosFrequency[] frequencies = null;
 		boolean	existing = false;
@@ -208,6 +215,9 @@ public class AltosPreferences {
 		common_frequencies = load_common_frequencies();
 
 		AltosConvert.imperial_units = backend.getBoolean(unitsPreference, false);
+
+		map_cache = backend.getInt(mapCachePreference, 9);
+		map_cache_listeners = new LinkedList<AltosMapCacheListener>();
 	}
 
 	public static void flush_preferences() {
@@ -546,6 +556,35 @@ public class AltosPreferences {
 	public static void unregister_units_listener(AltosUnitsListener l) {
 		synchronized(backend) {
 			units_listeners.remove(l);
+		}
+	}
+
+
+	public static void register_map_cache_listener(AltosMapCacheListener l) {
+		synchronized(backend) {
+			map_cache_listeners.add(l);
+		}
+	}
+
+	public static void unregister_map_cache_listener(AltosMapCacheListener l) {
+		synchronized (backend) {
+			map_cache_listeners.remove(l);
+		}
+	}
+
+	public static void set_map_cache(int new_map_cache) {
+		synchronized(backend) {
+			map_cache = new_map_cache;
+			backend.putInt(mapCachePreference, map_cache);
+			flush_preferences();
+			for (AltosMapCacheListener l: map_cache_listeners)
+				l.map_cache_changed(map_cache);
+		}
+	}
+
+	public static int map_cache() {
+		synchronized(backend) {
+			return map_cache;
 		}
 	}
 }
