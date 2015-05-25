@@ -44,6 +44,7 @@ static uint8_t	ao_lco_firing;
 static uint8_t	ao_lco_valid;
 static uint8_t	ao_lco_got_channels;
 static uint16_t	ao_lco_tick_offset;
+static uint8_t	ao_lco_show_voltage;
 
 static struct ao_pad_query	ao_pad_query;
 
@@ -58,6 +59,19 @@ ao_lco_set_box(uint8_t box)
 {
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, box % 10);
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, box / 10);
+}
+
+static void
+ao_lco_set_voltage(uint16_t decivolts)
+{
+	uint8_t	tens, ones, tenths;
+
+	tenths = decivolts % 10;
+	ones = (decivolts / 10) % 10;
+	tens = (decivolts / 100) % 10;
+	ao_seven_segment_set(AO_LCO_PAD_DIGIT, tenths);
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, ones | 0x10);
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, tens);
 }
 
 #define MASK_SIZE(n)	(((n) + 7) >> 3)
@@ -124,6 +138,7 @@ ao_lco_input(void)
 					} while (!ao_lco_pad_present(new_pad));
 					if (new_pad != ao_lco_pad) {
 						ao_lco_pad = new_pad;
+						ao_lco_set_box(ao_lco_box);
 						ao_lco_set_pad(ao_lco_pad);
 					}
 				}
@@ -145,6 +160,7 @@ ao_lco_input(void)
 						ao_lco_box = new_box;
 						ao_lco_got_channels = 0;
 						ao_lco_set_box(ao_lco_box);
+						ao_lco_set_pad(ao_lco_pad);
 					}
 				}
 				break;
@@ -160,8 +176,18 @@ ao_lco_input(void)
 			case AO_BUTTON_FIRE:
 				if (ao_lco_armed) {
 					ao_lco_firing = event.value;
+					ao_lco_show_voltage = 0;
 					PRINTD("Firing %d\n", ao_lco_firing);
 					ao_wakeup(&ao_lco_armed);
+				} else {
+					if (event.value) {
+						if (ao_lco_got_channels)
+							ao_lco_set_voltage(ao_pad_query.battery);
+					} else {
+						ao_lco_set_box(ao_lco_box);
+						ao_lco_set_pad(ao_lco_pad);
+					}
+					ao_lco_show_voltage = event.value;
 				}
 				break;
 			}
@@ -210,8 +236,11 @@ ao_lco_update(void)
 		ao_lco_valid = 1;
 		if (!c) {
 			ao_lco_pad = ao_lco_pad_first();
-			ao_lco_set_pad(ao_lco_pad);
+			if (!ao_lco_show_voltage)
+				ao_lco_set_pad(ao_lco_pad);
 		}
+		if (ao_lco_show_voltage)
+			ao_lco_set_voltage(ao_pad_query.battery);
 	} else
 		ao_lco_valid = 0;
 
@@ -223,6 +252,7 @@ ao_lco_update(void)
 	       query.igniter_status[2],
 	       query.igniter_status[3]);
 #endif
+	PRINTD("ao_lco_update valid %d\n", ao_lco_valid);
 	ao_wakeup(&ao_pad_query);
 }
 
@@ -253,8 +283,10 @@ ao_lco_search(void)
 	int8_t		r;
 	int8_t		try;
 	uint8_t		box;
+	uint8_t		boxes = 0;
 
 	ao_lco_box_reset_present();
+	ao_lco_set_pad(-1);
 	for (box = 0; box < AO_PAD_MAX_BOXES; box++) {
 		if ((box % 10) == 0)
 			ao_lco_set_box(box);
@@ -263,7 +295,9 @@ ao_lco_search(void)
 			r = ao_lco_query(box, &ao_pad_query, &tick_offset);
 			PRINTD("box %d result %d\n", box, r);
 			if (r == AO_RADIO_CMAC_OK) {
+				++boxes;
 				ao_lco_box_set_present(box);
+				ao_lco_set_pad((boxes % 10) - 1);
 				ao_delay(AO_MS_TO_TICKS(30));
 				break;
 			}
@@ -287,12 +321,12 @@ ao_lco_igniter_status(void)
 
 	for (;;) {
 		ao_sleep(&ao_pad_query);
+		PRINTD("RSSI %d VALID %d\n", ao_radio_cmac_rssi, ao_lco_valid);
 		if (!ao_lco_valid) {
 			ao_led_on(AO_LED_RED);
 			ao_led_off(AO_LED_GREEN|AO_LED_AMBER);
 			continue;
 		}
-		PRINTD("RSSI %d\n", ao_radio_cmac_rssi);
 		if (ao_radio_cmac_rssi < -90) {
 			ao_led_on(AO_LED_AMBER);
 			ao_led_off(AO_LED_RED|AO_LED_GREEN);
@@ -361,6 +395,7 @@ ao_lco_monitor(void)
 			if (!ao_lco_valid)
 				ao_lco_update();
 			ao_lco_arm(ao_lco_box, 1 << ao_lco_pad, ao_lco_tick_offset);
+			ao_delay(AO_MS_TO_TICKS(30));
 			ao_lco_update();
 		} else {
 			ao_lco_update();
