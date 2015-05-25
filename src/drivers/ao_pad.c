@@ -29,6 +29,10 @@ static __pdata uint8_t	ao_pad_box;
 static __xdata uint8_t	ao_pad_disabled;
 static __pdata uint16_t	ao_pad_packet_time;
 
+#ifndef AO_PAD_RSSI_MINIMUM
+#define AO_PAD_RSSI_MINIMUM	-90
+#endif
+
 #define DEBUG	1
 
 #if DEBUG
@@ -36,8 +40,8 @@ static __pdata uint8_t	ao_pad_debug;
 #define PRINTD(...) (ao_pad_debug ? (printf(__VA_ARGS__), 0) : 0)
 #define FLUSHD()    (ao_pad_debug ? (flush(), 0) : 0)
 #else
-#define PRINTD(...) 
-#define FLUSHD()    
+#define PRINTD(...)
+#define FLUSHD()
 #endif
 
 static void
@@ -138,7 +142,7 @@ ao_pad_monitor(void)
 		}
 		if ((ao_time() - ao_pad_packet_time) > AO_SEC_TO_TICKS(2))
 			cur |= AO_LED_RED;
-		else if (ao_radio_cmac_rssi < -90)
+		else if (ao_radio_cmac_rssi < AO_PAD_RSSI_MINIMUM)
 			cur |= AO_LED_AMBER;
 		else
 			cur |= AO_LED_GREEN;
@@ -255,7 +259,7 @@ ao_pad(void)
 		if (ret != AO_RADIO_CMAC_OK)
 			continue;
 		ao_pad_packet_time = ao_time();
-		
+
 		ao_pad_box = ao_pad_read_box();
 
 		PRINTD ("tick %d box %d (me %d) cmd %d channels %02x\n",
