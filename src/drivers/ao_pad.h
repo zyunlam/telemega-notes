@@ -39,6 +39,7 @@ struct ao_pad_query {
 	uint8_t		channels;	/* which chanels are present */
 	uint8_t		armed;		/* which channels are armed */
 	uint8_t		arm_status;	/* status of arming switch */
+	uint8_t		battery;	/* battery voltage in decivolts */
 	uint8_t		igniter_status[AO_PAD_MAX_CHANNELS];	/* status for each igniter */
 };
 

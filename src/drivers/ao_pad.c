@@ -127,6 +127,8 @@ ao_pad_monitor(void)
 
 #define VOLTS_TO_PYRO(x) ((int16_t) ((x) * 27.0 / 127.0 / 3.3 * 32767.0))
 
+		/* convert ADC value to voltage in tenths, then add .2 for the diode drop */
+		query.battery = (packet->adc.batt + 96) / 192 + 2;
 		cur = 0;
 		if (pyro > VOLTS_TO_PYRO(10)) {
 			query.arm_status = AO_PAD_ARM_STATUS_ARMED;
