@@ -514,6 +514,7 @@ AC_OUTPUT([
 Makefile
 src/Makedefs
 altoslib/Makefile
+altoslib/AltosVersion.java
 icon/Makefile
 altosuilib/Makefile
 altosuilib/AltosUIVersion.java
