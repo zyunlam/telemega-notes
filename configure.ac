@@ -517,7 +517,6 @@ altoslib/Makefile
 altoslib/AltosVersion.java
 icon/Makefile
 altosuilib/Makefile
-altosuilib/AltosUIVersion.java
 altosui/Makefile
 altosui/Info.plist
 altosui/altos-windows.nsi
