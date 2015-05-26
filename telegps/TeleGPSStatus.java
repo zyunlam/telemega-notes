@@ -19,8 +19,8 @@ package org.altusmetrum.telegps;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_7.*;
+import org.altusmetrum.altosuilib_7.*;
 
 public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 	GridBagLayout	layout;

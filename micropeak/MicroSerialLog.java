@@ -20,7 +20,7 @@ package org.altusmetrum.micropeak;
 import java.util.*;
 import java.io.*;
 import libaltosJNI.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altosuilib_7.*;
 
 public interface MicroSerialLog {
 

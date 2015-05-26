@@ -25,7 +25,7 @@ import java.util.UUID;
 import android.os.Handler;
 import android.util.Log;
 
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_7.*;
 
 public abstract class AltosDroidLink extends AltosLink {
 

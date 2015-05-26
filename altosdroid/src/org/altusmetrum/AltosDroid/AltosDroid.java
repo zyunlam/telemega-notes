@@ -57,7 +57,7 @@ import android.app.AlertDialog;
 import android.location.Location;
 import android.hardware.usb.*;
 
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_7.*;
 
 public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Debugging
