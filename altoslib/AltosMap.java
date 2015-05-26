@@ -24,19 +24,19 @@ import java.util.concurrent.*;
 
 public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, AltosMapStoreListener {
 
-	static final int px_size = 512;
+	public static final int px_size = 512;
 
-	static final int maptype_hybrid = 0;
-	static final int maptype_roadmap = 1;
-	static final int maptype_satellite = 2;
-	static final int maptype_terrain = 3;
-	static final int maptype_default = maptype_hybrid;
+	public static final int maptype_hybrid = 0;
+	public static final int maptype_roadmap = 1;
+	public static final int maptype_satellite = 2;
+	public static final int maptype_terrain = 3;
+	public static final int maptype_default = maptype_hybrid;
 
-	static final int default_zoom = 15;
-	static final int min_zoom = 3;
-	static final int max_zoom = 21;
+	public static final int default_zoom = 15;
+	public static final int min_zoom = 3;
+	public static final int max_zoom = 21;
 
-	static final String[] maptype_names = {
+	public static final String[] maptype_names = {
 		"hybrid",
 		"roadmap",
 		"satellite",
@@ -157,7 +157,7 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 	}
 
 	public void font_size_changed(int font_size) {
-		map_interface.line.font_size_changed(font_size);
+		map_interface.line().font_size_changed(font_size);
 		for (AltosMapTile tile : tiles.values())
 			tile.font_size_changed(font_size);
 		repaint();
@@ -211,7 +211,7 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 		if (!gps.locked && gps.nsat < 4)
 			return;
 
-		AltosMapRectangle	damage = map_interface.path.add(gps.lat, gps.lon, state.state);
+		AltosMapRectangle	damage = map_interface.path().add(gps.lat, gps.lon, state.state);
 
 		switch (state.state) {
 		case AltosLib.ao_flight_boost:
@@ -279,8 +279,8 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 			lower_right = new AltosPointInt(centre.x + load_radius * AltosMap.px_size,
 								centre.y + load_radius * AltosMap.px_size);
 		} else {
-			upper_left = floor(transform.screen_point(new AltosPointDouble(0.0, 0.0)));
-			lower_right = floor(transform.screen_point(new AltosPointDouble(width(), height())));
+			upper_left = floor(transform.screen_point(new AltosPointInt(0, 0)));
+			lower_right = floor(transform.screen_point(new AltosPointInt(width(), height())));
 		}
 		LinkedList<AltosPointInt> to_remove = new LinkedList<AltosPointInt>();
 
@@ -302,8 +302,8 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 				if (!tiles.containsKey(point)) {
 					AltosLatLon	ul = transform.lat_lon(new AltosPointDouble(x, y));
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
-					AltosMapTile tile = new AltosMapTile(this, ul, center, zoom, maptype,
-									     AltosMap.px_size);
+					AltosMapTile tile = map_interface.new_tile(this, ul, center, zoom, maptype,
+										   AltosMap.px_size);
 					tiles.put(point, tile);
 				}
 			}
@@ -326,6 +326,22 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 
 	public String getName() {
 		return "Map";
+	}
+
+	public void paint() {
+		make_tiles();
+
+		for (AltosMapTile tile : tiles.values())
+			tile.paint(transform);
+
+		synchronized(marks) {
+			for (AltosMapMark mark : marks)
+				mark.paint(transform);
+		}
+
+		map_interface.path().paint(transform);
+
+		map_interface.line().paint(transform);
 	}
 
 	/* AltosMapTileListener methods */

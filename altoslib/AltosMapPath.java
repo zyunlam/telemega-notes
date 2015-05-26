@@ -22,34 +22,17 @@ import java.lang.Math;
 import java.util.*;
 import java.util.concurrent.*;
 
-class PathPoint {
-	AltosLatLon	lat_lon;
-	int		state;
-
-	public PathPoint(AltosLatLon lat_lon, int state) {
-		this.lat_lon = lat_lon;
-		this.state = state;
-	}
-
-	public boolean equals(PathPoint other) {
-		if (other == null)
-			return false;
-
-		return lat_lon.equals(other.lat_lon) && state == other.state;
-	}
-}
-
 public abstract class AltosMapPath {
 
-	LinkedList<PathPoint>	points = new LinkedList<PathPoint>();
-	PathPoint		last_point = null;
+	public LinkedList<AltosMapPathPoint>	points = new LinkedList<AltosMapPathPoint>();
+	public AltosMapPathPoint		last_point = null;
 
 	static public int stroke_width = 6;
 
 	public abstract void paint(AltosMapTransform t);
 
 	public AltosMapRectangle add(double lat, double lon, int state) {
-		PathPoint		point = new PathPoint(new AltosLatLon (lat, lon), state);
+		AltosMapPathPoint		point = new AltosMapPathPoint(new AltosLatLon (lat, lon), state);
 		AltosMapRectangle	rect = null;
 
 		if (!point.equals(last_point)) {
@@ -62,6 +45,6 @@ public abstract class AltosMapPath {
 	}
 
 	public void clear () {
-		points = new LinkedList<PathPoint>();
+		points = new LinkedList<AltosMapPathPoint>();
 	}
 }

@@ -18,27 +18,24 @@
 package org.altusmetrum.altoslib_6;
 
 import java.io.*;
-import java.net.*;
+import java.lang.Math;
+import java.util.*;
+import java.util.concurrent.*;
 
-public interface AltosMapInterface {
-	public abstract AltosMapPath path();
-	public abstract AltosMapLine line();
+public class AltosMapPathPoint {
+	public AltosLatLon	lat_lon;
+	public int		state;
 
-	public abstract AltosImage load_image(File file) throws Exception;
+	public boolean equals(AltosMapPathPoint other) {
+		if (other == null)
+			return false;
 
-	public abstract AltosMapMark new_mark(double lat, double lon, int state);
+		return lat_lon.equals(other.lat_lon) && state == other.state;
+	}
 
-	public abstract AltosMapTile new_tile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size);
-
-	public abstract int width();
-
-	public abstract int height();
-
-	public abstract void repaint();
-
-	public abstract void repaint(AltosMapRectangle damage, int pad);
-
-	public abstract void repaint(double x, double y, double w, double h);
-
-	public abstract void set_units();
+	public AltosMapPathPoint(AltosLatLon lat_lon, int state) {
+		this.lat_lon = lat_lon;
+		this.state = state;
+	}
 }
+

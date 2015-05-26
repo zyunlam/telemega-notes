@@ -138,6 +138,7 @@ altoslib_JAVA = \
 	AltosMapLine.java \
 	AltosMapMark.java \
 	AltosMapPath.java \
+	AltosMapPathPoint.java \
 	AltosMapRectangle.java \
 	AltosMapStore.java \
 	AltosMapStoreListener.java \
@@ -147,6 +148,7 @@ altoslib_JAVA = \
 	AltosMapZoomListener.java \
 	AltosPointDouble.java \
 	AltosPointInt.java \
+	AltosRectangle.java \
 	AltosFlightDisplay.java \
 	AltosFontListener.java \
 	AltosVersion.java

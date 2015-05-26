@@ -39,8 +39,16 @@ public class AltosMapTransform {
 		return new AltosLatLon(lat,lon);
 	}
 
+	public AltosPointDouble screen_point(AltosPointInt screen) {
+		return new AltosPointDouble(screen.x + offset_x, screen.y + offset_y);
+	}
+
 	public AltosPointDouble screen_point(AltosPointDouble screen) {
 		return new AltosPointDouble(screen.x + offset_x, screen.y + offset_y);
+	}
+
+	public AltosLatLon screen_lat_lon(AltosPointInt screen) {
+		return lat_lon(screen_point(screen));
 	}
 
 	public AltosLatLon screen_lat_lon(AltosPointDouble screen) {
@@ -71,12 +79,12 @@ public class AltosMapTransform {
 					 (int) (point.y - offset_y + 0.5));
 	}
 
-//	public Rectangle screen(AltosMapRectangle map_rect) {
-//		AltosPoint2D	ul = screen(map_rect.ul);
-//		AltosPoint2D	lr = screen(map_rect.lr);
-//
-//		return new Rectangle((int) ul.x, (int) ul.y, (int) (lr.x - ul.x), (int) (lr.y - ul.y));
-//	}
+	public AltosRectangle screen(AltosMapRectangle map_rect) {
+		AltosPointDouble	ul = screen(map_rect.ul);
+		AltosPointDouble	lr = screen(map_rect.lr);
+
+		return new AltosRectangle((int) ul.x, (int) ul.y, (int) (lr.x - ul.x), (int) (lr.y - ul.y));
+	}
 
 	public AltosPointDouble screen(AltosLatLon lat_lon) {
 		return screen(point(lat_lon));

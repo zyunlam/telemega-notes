@@ -17,28 +17,13 @@
 
 package org.altusmetrum.altoslib_6;
 
-import java.io.*;
-import java.net.*;
+public class AltosRectangle {
+	public int	x, y, width, height;
 
-public interface AltosMapInterface {
-	public abstract AltosMapPath path();
-	public abstract AltosMapLine line();
-
-	public abstract AltosImage load_image(File file) throws Exception;
-
-	public abstract AltosMapMark new_mark(double lat, double lon, int state);
-
-	public abstract AltosMapTile new_tile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size);
-
-	public abstract int width();
-
-	public abstract int height();
-
-	public abstract void repaint();
-
-	public abstract void repaint(AltosMapRectangle damage, int pad);
-
-	public abstract void repaint(double x, double y, double w, double h);
-
-	public abstract void set_units();
+	public AltosRectangle(int x, int y, int w, int h) {
+		this.x = x;
+		this.y = y;
+		this.width = w;
+		this.height = h;
+	}
 }
