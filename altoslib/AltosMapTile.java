@@ -22,13 +22,13 @@ import java.util.*;
 
 public abstract class AltosMapTile implements AltosFontListener {
 	AltosMapTileListener	listener;
-	AltosLatLon	upper_left, center;
-	int		px_size;
+	public AltosLatLon	upper_left, center;
+	public int		px_size;
 	int		zoom;
 	int		maptype;
-	AltosMapStore	store;
-	AltosMapCache	cache;
-	int		status;
+	public AltosMapStore	store;
+	public AltosMapCache	cache;
+	public int	status;
 
 	static public final int	success = 0;
 	static public final int	loading = 1;

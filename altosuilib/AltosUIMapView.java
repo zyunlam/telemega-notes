@@ -426,21 +426,6 @@ public class AltosUIMapView extends Component implements MouseMotionListener, Mo
 	}
 
 	public void paint(Graphics g) {
-		VolatileImage	back_buffer = create_back_buffer();
-		do {
-			GraphicsConfiguration gc = getGraphicsConfiguration();
-			int code = back_buffer.validate(gc);
-			if (code == VolatileImage.IMAGE_INCOMPATIBLE)
-				back_buffer = create_back_buffer();
-
-			Graphics g_back = back_buffer.getGraphics();
-			g_back.setClip(g.getClip());
-			do_paint(g_back);
-			g_back.dispose();
-
-			g.drawImage(back_buffer, 0, 0, this);
-		} while (back_buffer.contentsLost());
-		back_buffer.flush();
 	}
 
 	public void update(Graphics g) {

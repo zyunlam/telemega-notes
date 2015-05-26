@@ -12,8 +12,6 @@ altosuilib_JAVA = \
 	GrabNDrag.java \
 	AltosDevice.java \
 	AltosDeviceDialog.java \
-	AltosFlightDisplay.java \
-	AltosFontListener.java \
 	AltosPositionListener.java \
 	AltosUIConfigure.java \
 	AltosUIAxis.java \
@@ -61,6 +59,7 @@ altosuilib_JAVA = \
 	AltosBTManage.java \
 	AltosBTKnown.java \
 	AltosUIMap.java \
+	AltosUIMapNew.java \
 	AltosUIMapView.java \
 	AltosUIMapLine.java \
 	AltosUIMapMark.java \
@@ -84,6 +83,7 @@ altosuilib_JAVA = \
 	AltosUIFreqList.java \
 	AltosUITelemetryList.java \
 	AltosUIRateList.java \
+	AltosUIImage.java \
 	OSXAdapter.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar
