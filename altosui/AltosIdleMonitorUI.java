@@ -35,7 +35,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 	AltosFlightStatus	flightStatus;
 	AltosIgnitor		ignitor;
 	AltosIdleMonitor	thread;
-	AltosUIMap      	sitemap;
+	AltosUIMapNew      	sitemap;
 	int			serial;
 	boolean			remote;
 	boolean			has_ignitor;
@@ -278,7 +278,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 		ignitor = new AltosIgnitor();
 
-		sitemap = new AltosUIMap();
+		sitemap = new AltosUIMapNew();
 
 		/* Make the tabbed pane use the rest of the window space */
 		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));

@@ -283,16 +283,16 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 				if (t.has_location()) {
 					String	message = null;
 					switch (status) {
-					case AltosUIMapCache.loading:
+					case AltosMapTile.loading:
 						message = "Loading...";
 						break;
-					case AltosUIMapCache.bad_request:
+					case AltosMapTile.bad_request:
 						message = "Internal error";
 						break;
-					case AltosUIMapCache.failed:
+					case AltosMapTile.failed:
 						message = "Network error, check connection";
 						break;
-					case AltosUIMapCache.forbidden:
+					case AltosMapTile.forbidden:
 						message = "Too many requests, try later";
 						break;
 					}
@@ -417,6 +417,11 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 
 	public String getName() {
 		return "Map";
+	}
+
+	/* AltosGraphUI interface */
+	public void centre(AltosState state) {
+		map.centre(state);
 	}
 
 	/* internal layout bits */

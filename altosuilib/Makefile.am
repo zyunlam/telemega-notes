@@ -58,25 +58,8 @@ altosuilib_JAVA = \
 	AltosBTDeviceIterator.java \
 	AltosBTManage.java \
 	AltosBTKnown.java \
-	AltosUIMap.java \
 	AltosUIMapNew.java \
 	AltosUIMapPreloadNew.java \
-	AltosUIMapView.java \
-	AltosUIMapLine.java \
-	AltosUIMapMark.java \
-	AltosUIMapPath.java \
-	AltosUIMapTile.java \
-	AltosUIMapCache.java \
-	AltosUIMapCacheListener.java \
-	AltosUIMapImage.java \
-	AltosUIMapTransform.java \
-	AltosUIMapRectangle.java \
-	AltosUIMapZoomListener.java \
-	AltosUIMapTileListener.java \
-	AltosUIMapPreload.java \
-	AltosUIMapStore.java \
-	AltosUIMapStoreListener.java \
-	AltosUILatLon.java \
 	AltosUIFlightTab.java \
 	AltosUIIndicator.java \
 	AltosUIUnitsIndicator.java \

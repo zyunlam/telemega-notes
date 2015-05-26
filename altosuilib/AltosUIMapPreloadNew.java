@@ -227,7 +227,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	boolean		loading;
 	JButton		close_button;
 
-	JCheckBox[]	maptypes = new JCheckBox[AltosUIMap.maptype_terrain - AltosUIMap.maptype_hybrid + 1];
+	JCheckBox[]	maptypes = new JCheckBox[AltosMap.maptype_terrain - AltosMap.maptype_hybrid + 1];
 
 	JComboBox<Integer>	min_zoom;
 	JComboBox<Integer>	max_zoom;
@@ -271,7 +271,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 	private void do_load() {
 		tiles_loaded = 0;
-		map.set_zoom(cur_z + AltosUIMapView.default_zoom);
+		map.set_zoom(cur_z + AltosMap.default_zoom);
 		map.set_maptype(cur_type);
 		map.set_load_params(latitude, longitude, r, this);
 	}
@@ -279,7 +279,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	private int next_type(int start) {
 		int next_type;
 		for (next_type = start;
-		     next_type <= AltosUIMap.maptype_terrain && (all_types & (1 << next_type)) == 0;
+		     next_type <= AltosMap.maptype_terrain && (all_types & (1 << next_type)) == 0;
 		     next_type++)
 			;
 		return next_type;
@@ -288,7 +288,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	private void next_load() {
 		int next_type = next_type(cur_type + 1);
 
-		if (next_type > AltosUIMap.maptype_terrain) {
+		if (next_type > AltosMap.maptype_terrain) {
 			if (cur_z == max_z) {
 				return;
 			} else {
@@ -304,13 +304,13 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		cur_z = min_z;
 		int ntype = 0;
 		all_types = 0;
-		for (int t = AltosUIMap.maptype_hybrid; t <= AltosUIMap.maptype_terrain; t++)
+		for (int t = AltosMap.maptype_hybrid; t <= AltosMap.maptype_terrain; t++)
 			if (maptypes[t].isSelected()) {
 				all_types |= (1 << t);
 				ntype++;
 			}
 		if (ntype == 0) {
-			all_types |= (1 << AltosUIMap.maptype_hybrid);
+			all_types |= (1 << AltosMap.maptype_hybrid);
 			ntype = 1;
 		}
 
@@ -557,9 +557,9 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 		c.gridwidth = 1;
 
-		for (int type = AltosUIMap.maptype_hybrid; type <= AltosUIMap.maptype_terrain; type++) {
-			maptypes[type] = new JCheckBox(AltosUIMap.maptype_labels[type],
-						       type == AltosUIMap.maptype_hybrid);
+		for (int type = AltosMap.maptype_hybrid; type <= AltosMap.maptype_terrain; type++) {
+			maptypes[type] = new JCheckBox(AltosMap.maptype_labels[type],
+						       type == AltosMap.maptype_hybrid);
 			c.gridx = 2 + (type >> 1);
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridy = (type & 1) + 3;

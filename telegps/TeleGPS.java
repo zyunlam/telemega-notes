@@ -651,7 +651,6 @@ public class TeleGPS
 	public static void help(int code) {
 		System.out.printf("Usage: altosui [OPTION]... [FILE]...\n");
 		System.out.printf("  Options:\n");
-		System.out.printf("    --fetchmaps <lat> <lon>\tpre-fetch maps for site map view\n");
 		System.out.printf("    --replay <filename>\t\trelive the glory of past flights \n");
 		System.out.printf("    --graph <filename>\t\tgraph a flight\n");
 		System.out.printf("    --csv\tgenerate comma separated output for spreadsheets, etc\n");
@@ -676,20 +675,7 @@ public class TeleGPS
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("--help"))
 				help(0);
-			else if (args[i].equals("--fetchmaps")) {
-				if (args.length < i + 3) {
-					help(1);
-				} else {
-					try {
-					double lat = AltosParse.parse_double_locale(args[i+1]);
-					double lon = AltosParse.parse_double_locale(args[i+2]);
-					AltosUIMap.prefetch_maps(lat, lon);
-					} catch (ParseException e) {
-						System.out.printf("Can't parse number %s\n", e.toString());
-					}
-					i += 2;
-				}
-			} else if (args[i].equals("--replay"))
+			else if (args[i].equals("--replay"))
 				process = process_replay;
 			else if (args[i].equals("--kml"))
 				process = process_kml;
