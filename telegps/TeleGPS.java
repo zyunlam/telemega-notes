@@ -173,7 +173,7 @@ public class TeleGPS
 	}
 
 	void load_maps() {
-		new AltosUIMapPreload(this);
+		new AltosUIMapPreloadNew(this);
 	}
 
 	void disconnect() {

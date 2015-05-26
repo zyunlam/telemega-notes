@@ -60,6 +60,7 @@ altosuilib_JAVA = \
 	AltosBTKnown.java \
 	AltosUIMap.java \
 	AltosUIMapNew.java \
+	AltosUIMapPreloadNew.java \
 	AltosUIMapView.java \
 	AltosUIMapLine.java \
 	AltosUIMapMark.java \
