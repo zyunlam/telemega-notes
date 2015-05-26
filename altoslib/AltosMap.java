@@ -22,7 +22,7 @@ import java.lang.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, AltosMapStoreListener {
+public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 	public static final int px_size = 512;
 
@@ -54,18 +54,12 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 
 	AltosMapCache		cache;
 
+	public AltosMapCache cache() { return cache; }
+
 	LinkedList<AltosMapMark> marks = new LinkedList<AltosMapMark>();
 
-	LinkedList<AltosMapZoomListener> zoom_listeners = new LinkedList<AltosMapZoomListener>();
-
-	public void add_zoom_listener(AltosMapZoomListener listener) {
-		if (!zoom_listeners.contains(listener))
-			zoom_listeners.add(listener);
-	}
-
-	public void remove_zoom_listener(AltosMapZoomListener listener) {
-		zoom_listeners.remove(listener);
-	}
+	AltosMapPath	path;
+	AltosMapLine	line;
 
 	boolean		have_boost = false;
 	boolean		have_landed = false;
@@ -84,7 +78,7 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 	 */
 	static final long auto_scroll_delay = 20 * 1000;
 
-	AltosMapTransform	transform;
+	public AltosMapTransform	transform;
 	AltosLatLon		centre;
 
 	public void reset() {
@@ -92,16 +86,14 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 	}
 
 	/* MapInterface wrapping functions */
-	public void set_units() {
-		map_interface.set_units();
+
+	public void repaint(int x, int y, int w, int h) {
+		map_interface.repaint(new AltosRectangle(x, y, w, h));
 	}
 
 	public void repaint(AltosMapRectangle damage, int pad) {
-		map_interface.repaint(damage, pad);
-	}
-
-	public void repaint(double x, double y, double w, double h) {
-		map_interface.repaint(x, y, w, h);
+		AltosRectangle r = transform.screen(damage);
+		repaint(r.x - pad, r.y - pad, r.width + pad * 2, r.height + pad * 2);
 	}
 
 	public void repaint() {
@@ -156,30 +148,22 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 		return false;
 	}
 
-	public void font_size_changed(int font_size) {
-		map_interface.line().font_size_changed(font_size);
-		for (AltosMapTile tile : tiles.values())
-			tile.font_size_changed(font_size);
-		repaint();
-	}
-
-	public void units_changed(boolean imperial_units) {
-	}
-
-	private void set_transform() {
+	public void set_transform() {
 		transform = new AltosMapTransform(width(), height(), zoom, centre);
 		repaint();
 	}
+
+	private void set_zoom_label() {
+		map_interface.set_zoom_label(String.format("Zoom %d", get_zoom() - default_zoom));
+	}
+
 
 	public boolean set_zoom(int zoom) {
 		if (AltosMap.min_zoom <= zoom && zoom <= AltosMap.max_zoom && zoom != this.zoom) {
 			this.zoom = zoom;
 			tiles.clear();
 			set_transform();
-
-			for (AltosMapZoomListener listener : zoom_listeners)
-				listener.zoom_changed(this.zoom);
-
+			set_zoom_label();
 			return true;
 		}
 		return false;
@@ -211,7 +195,7 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 		if (!gps.locked && gps.nsat < 4)
 			return;
 
-		AltosMapRectangle	damage = map_interface.path().add(gps.lat, gps.lon, state.state);
+		AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state.state);
 
 		switch (state.state) {
 		case AltosLib.ao_flight_boost:
@@ -339,9 +323,9 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 				mark.paint(transform);
 		}
 
-		map_interface.path().paint(transform);
+		path.paint(transform);
 
-		map_interface.line().paint(transform);
+		line.paint(transform);
 	}
 
 	/* AltosMapTileListener methods */
@@ -363,9 +347,58 @@ public class AltosMap implements AltosFlightDisplay, AltosMapTileListener, Altos
 		}
 	}
 
+	/* UI elements */
+
+	AltosPointInt	drag_start;
+
+	private void drag(int x, int y) {
+		if (drag_start == null)
+			return;
+
+		int dx = x - drag_start.x;
+		int dy = y - drag_start.y;
+
+		AltosLatLon new_centre = transform.screen_lat_lon(new AltosPointInt(width() / 2 - dx, height() / 2 - dy));
+		centre(new_centre);
+		drag_start = new AltosPointInt(x, y);
+	}
+
+	private void drag_start(int x, int y) {
+		drag_start = new AltosPointInt(x, y);
+	}
+
+	private void line_start(int x, int y) {
+		line.pressed(new AltosPointInt(x, y), transform);
+		repaint();
+	}
+
+	private void line(int x, int y) {
+		line.dragged(new AltosPointInt(x, y), transform);
+		repaint();
+	}
+
+	public void touch_start(int x, int y, boolean is_drag) {
+		notice_user_input();
+		if (is_drag)
+			drag_start(x, y);
+		else
+			line_start(x, y);
+	}
+
+	public void touch_continue(int x, int y, boolean is_drag) {
+		notice_user_input();
+		if (is_drag)
+			drag(x, y);
+		else
+			line(x, y);
+	}
+
 	public AltosMap(AltosMapInterface map_interface) {
 		this.map_interface = map_interface;
 		cache = new AltosMapCache(map_interface);
+		line = map_interface.new_line();
+		path = map_interface.new_path();
+		set_zoom_label();
 		centre(0, 0);
 	}
 }

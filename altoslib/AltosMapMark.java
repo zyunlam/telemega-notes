@@ -24,8 +24,8 @@ import java.util.concurrent.*;
 
 public abstract class AltosMapMark {
 
-	AltosLatLon	lat_lon;
-	int		state;
+	public AltosLatLon	lat_lon;
+	public int		state;
 
 	static public int stroke_width = 6;
 

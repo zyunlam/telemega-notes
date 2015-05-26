@@ -22,12 +22,10 @@ import java.lang.Math;
 import java.util.*;
 import java.util.concurrent.*;
 
-public abstract class AltosMapLine implements AltosFontListener {
+public abstract class AltosMapLine {
 	public AltosLatLon	start, end;
 
 	static public int stroke_width = 6;
-
-	public abstract void font_size_changed(int font_size);
 
 	public abstract void paint(AltosMapTransform t);
 

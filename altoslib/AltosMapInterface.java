@@ -21,8 +21,9 @@ import java.io.*;
 import java.net.*;
 
 public interface AltosMapInterface {
-	public abstract AltosMapPath path();
-	public abstract AltosMapLine line();
+	public abstract AltosMapPath new_path();
+
+	public abstract AltosMapLine new_line();
 
 	public abstract AltosImage load_image(File file) throws Exception;
 
@@ -36,9 +37,7 @@ public interface AltosMapInterface {
 
 	public abstract void repaint();
 
-	public abstract void repaint(AltosMapRectangle damage, int pad);
+	public abstract void repaint(AltosRectangle damage);
 
-	public abstract void repaint(double x, double y, double w, double h);
-
-	public abstract void set_units();
+	public abstract void set_zoom_label(String label);
 }

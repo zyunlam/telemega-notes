@@ -99,6 +99,7 @@ public abstract class AltosMapTile implements AltosFontListener {
 	public AltosMapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
 		this.listener = listener;
 		this.upper_left = upper_left;
+		this.cache = listener.cache();
 
 		while (center.lon < -180.0)
 			center.lon += 360.0;
