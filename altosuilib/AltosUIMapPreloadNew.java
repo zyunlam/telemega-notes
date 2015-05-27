@@ -118,96 +118,7 @@ class AltosUIMapPos extends Box {
 	}
 }
 
-class AltosUISite {
-	String	name;
-	double	latitude;
-	double	longitude;
-
-	public String toString() {
-		return name;
-	}
-
-	public AltosUISite(String in_name, double in_latitude, double in_longitude) {
-		name = in_name;
-		latitude = in_latitude;
-		longitude = in_longitude;
-	}
-
-	public AltosUISite(String line) throws ParseException {
-		String[]	elements = line.split(":");
-
-		if (elements.length < 3)
-			throw new ParseException(String.format("Invalid site line %s", line), 0);
-
-		name = elements[0];
-
-		try {
-			latitude = AltosParse.parse_double_net(elements[1]);
-			longitude = AltosParse.parse_double_net(elements[2]);
-		} catch (ParseException pe) {
-			throw new ParseException(String.format("Invalid site line %s", line), 0);
-		}
-	}
-}
-
-class AltosUISites extends Thread {
-	AltosUIMapPreloadNew	preload;
-	URL			url;
-	LinkedList<AltosUISite>	sites;
-
-	void notify_complete() {
-		SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					preload.set_sites();
-				}
-			});
-	}
-
-	void add(AltosUISite site) {
-		sites.add(site);
-	}
-
-	void add(String line) {
-		try {
-			add(new AltosUISite(line));
-		} catch (ParseException pe) {
-			System.out.printf("parse exception %s\n", pe.toString());
-		}
-	}
-
-	public void run() {
-		try {
-			URLConnection uc = url.openConnection();
-			//int length = uc.getContentLength();
-
-			InputStreamReader in_stream = new InputStreamReader(uc.getInputStream(), AltosLib.unicode_set);
-			BufferedReader in = new BufferedReader(in_stream);
-
-			for (;;) {
-				String line = in.readLine();
-				if (line == null)
-					break;
-				add(line);
-			}
-		} catch (IOException e) {
-		} finally {
-			notify_complete();
-		}
-	}
-
-	public AltosUISites(AltosUIMapPreloadNew in_preload) {
-		sites = new LinkedList<AltosUISite>();
-		preload = in_preload;
-		try {
-			url = new URL(AltosLib.launch_sites_url);
-		} catch (java.net.MalformedURLException e) {
-			notify_complete();
-		}
-		start();
-	}
-}
-
-public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosMapTileListener  {
+public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosMapTileListener, AltosLaunchSiteListener  {
 	AltosUIFrame	owner;
 	AltosUIMapNew	map;
 	AltosMapCache	cache;
@@ -219,9 +130,8 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	int		pbar_max;
 	int		pbar_cur;
 
-	AltosUISites	sites;
 	JLabel		site_list_label;
-	JComboBox<AltosUISite>	site_list;
+	JComboBox<AltosLaunchSite>	site_list;
 
 	JToggleButton	load_button;
 	boolean		loading;
@@ -357,21 +267,13 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 	public AltosMapCache cache() { return cache; }
 
-	public void set_sites() {
-		int	i = 1;
-		for (AltosUISite site : sites.sites) {
-			site_list.insertItemAt(site, i);
-			i++;
-		}
-	}
-
 	public void itemStateChanged(ItemEvent e) {
 		int		state = e.getStateChange();
 
 		if (state == ItemEvent.SELECTED) {
 			Object	o = e.getItem();
-			if (o instanceof AltosUISite) {
-				AltosUISite	site = (AltosUISite) o;
+			if (o instanceof AltosLaunchSite) {
+				AltosLaunchSite	site = (AltosLaunchSite) o;
 				lat.set_value(site.latitude);
 				lon.set_value(site.longitude);
 			}
@@ -401,6 +303,18 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 				start_load();
 			}
 		}
+	}
+
+	public void notify_launch_sites(final java.util.List<AltosLaunchSite> sites) {
+		SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					int	i = 1;
+					for (AltosLaunchSite site : sites) {
+						site_list.insertItemAt(site, i);
+						i++;
+					}
+				}
+			});
 	}
 
 	public AltosUIMapPreloadNew(AltosUIFrame in_owner) {
@@ -463,10 +377,10 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 		pane.add(site_list_label, c);
 
-		site_list = new JComboBox<AltosUISite>(new AltosUISite[] { new AltosUISite("Site List", 0, 0) });
+		site_list = new JComboBox<AltosLaunchSite>(new AltosLaunchSite[] { new AltosLaunchSite("Site List", 0, 0) });
 		site_list.addItemListener(this);
 
-		sites = new AltosUISites(this);
+		new AltosLaunchSites(this);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.CENTER;
