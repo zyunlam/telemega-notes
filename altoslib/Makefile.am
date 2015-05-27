@@ -151,6 +151,9 @@ altoslib_JAVA = \
 	AltosRectangle.java \
 	AltosFlightDisplay.java \
 	AltosFontListener.java \
+	AltosLaunchSite.java \
+	AltosLaunchSiteListener.java \
+	AltosLaunchSites.java \
 	AltosVersion.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar
