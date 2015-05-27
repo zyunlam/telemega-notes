@@ -58,8 +58,9 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 	LinkedList<AltosMapMark> marks = new LinkedList<AltosMapMark>();
 
-	AltosMapPath	path;
-	AltosMapLine	line;
+	AltosMapPath		path;
+	AltosMapLine		line;
+	public AltosLatLon	last_position;
 
 	boolean		have_boost = false;
 	boolean		have_landed = false;
@@ -195,8 +196,6 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		if (!gps.locked && gps.nsat < 4)
 			return;
 
-		AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state.state);
-
 		switch (state.state) {
 		case AltosLib.ao_flight_boost:
 			if (!have_boost) {
@@ -212,8 +211,15 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			break;
 		}
 
-		if (damage != null)
-			repaint(damage, AltosMapPath.stroke_width);
+		if (path != null) {
+			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state.state);
+
+			if (damage != null)
+				repaint(damage, AltosMapPath.stroke_width);
+		}
+
+		last_position = new AltosLatLon(gps.lat, gps.lon);
+
 		maybe_centre(gps.lat, gps.lon);
 	}
 
@@ -323,9 +329,11 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 				mark.paint(transform);
 		}
 
-		path.paint(transform);
+		if (path != null)
+			path.paint(transform);
 
-		line.paint(transform);
+		if (line != null)
+			line.paint(transform);
 	}
 
 	/* AltosMapTileListener methods */
@@ -368,13 +376,17 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	private void line_start(int x, int y) {
-		line.pressed(new AltosPointInt(x, y), transform);
-		repaint();
+		if (line != null) {
+			line.pressed(new AltosPointInt(x, y), transform);
+			repaint();
+		}
 	}
 
 	private void line(int x, int y) {
-		line.dragged(new AltosPointInt(x, y), transform);
-		repaint();
+		if (line != null) {
+			line.dragged(new AltosPointInt(x, y), transform);
+			repaint();
+		}
 	}
 
 	public void touch_start(int x, int y, boolean is_drag) {

@@ -38,8 +38,17 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 	AltosMap map;
 
+	AltosLatLon	here;
+
 	Canvas	canvas;
 	Paint	paint;
+
+	Bitmap	pad_bitmap;
+	int	pad_off_x, pad_off_y;
+	Bitmap	rocket_bitmap;
+	int	rocket_off_x, rocket_off_y;
+	Bitmap	here_bitmap;
+	int	here_off_x, here_off_y;
 
 	private boolean pad_set;
 
@@ -54,10 +63,30 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 	int	stroke_width = 20;
 
+	private void draw_bitmap(AltosLatLon lat_lon, Bitmap bitmap, int off_x, int off_y) {
+		if (lat_lon != null) {
+			AltosPointInt pt = new AltosPointInt(map.transform.screen(lat_lon));
+
+			canvas.drawBitmap(bitmap, pt.x - off_x, pt.y - off_y, paint);
+		}
+	}
+
 	class MapView extends View implements ScaleGestureDetector.OnScaleGestureListener {
 
 		ScaleGestureDetector	scale_detector;
 		boolean			scaling;
+
+		private void draw_positions() {
+			if (map.last_position != null && here != null) {
+				AltosPointDouble	rocket_screen = map.transform.screen(map.last_position);
+				AltosPointDouble	here_screen = map.transform.screen(here);
+				paint.setColor(0xff8080ff);
+				canvas.drawLine((float) rocket_screen.x, (float) rocket_screen.y,
+						(float) here_screen.x, (float) here_screen.y, paint);
+			}
+			draw_bitmap(map.last_position, rocket_bitmap, rocket_off_x, rocket_off_y);
+			draw_bitmap(here, here_bitmap, here_off_x, here_off_y);
+		}
 
 		protected void onDraw(Canvas view_canvas) {
 			canvas = view_canvas;
@@ -66,6 +95,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 			paint.setStrokeCap(Paint.Cap.ROUND);
 			paint.setStrokeJoin(Paint.Join.ROUND);
 			map.paint();
+			draw_positions();
 			canvas = null;
 		}
 
@@ -205,7 +235,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	}
 
 	public AltosMapPath new_path() {
-		return new MapPath();
+		return null;
 	}
 
 	class MapLine extends AltosMapLine {
@@ -217,7 +247,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	}
 
 	public AltosMapLine new_line() {
-		return new MapLine();
+		return null;
 	}
 
 	class MapImage implements AltosImage {
@@ -241,6 +271,8 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 	class MapMark extends AltosMapMark {
 		public void paint(AltosMapTransform t) {
+			if (state == AltosLib.ao_flight_boost)
+				draw_bitmap(lat_lon, pad_bitmap, pad_off_x, pad_off_y);
 		}
 
 		MapMark(double lat, double lon, int state) {
@@ -357,6 +389,20 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 		super.onAttach(activity);
 		mAltosDroid = (AltosDroid) activity;
 		mAltosDroid.registerTab(this);
+		pad_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pad);
+		/* arrow at the bottom of the launchpad image */
+		pad_off_x = pad_bitmap.getWidth() / 2;
+		pad_off_y = pad_bitmap.getHeight();
+
+		rocket_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.rocket);
+		/* arrow at the bottom of the rocket image */
+		rocket_off_x = rocket_bitmap.getWidth() / 2;
+		rocket_off_y = rocket_bitmap.getHeight();
+
+		here_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_indicator_current_position);
+		/* Center of the dot */
+		here_off_x = here_bitmap.getWidth() / 2;
+		here_off_y = here_bitmap.getHeight() / 2;
 	}
 
 	@Override
@@ -400,42 +446,12 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	}
 
 	private void setupMap() {
-/*
-		mMap = mMapFragment.getMap();
-		if (mMap != null) {
-			mMap.setMyLocationEnabled(true);
-			mMap.getUiSettings().setTiltGesturesEnabled(false);
-			mMap.getUiSettings().setZoomControlsEnabled(false);
-
-			mRocketMarker = mMap.addMarker(
-					// From: http://mapicons.nicolasmollet.com/markers/industry/military/missile-2/
-					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.rocket))
-					                   .position(new LatLng(0,0))
-					                   .visible(false)
-					);
-
-			mPadMarker = mMap.addMarker(
-					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.pad))
-					                   .position(new LatLng(0,0))
-					                   .visible(false)
-					);
-
-			mPolyline = mMap.addPolyline(
-					new PolylineOptions().add(new LatLng(0,0), new LatLng(0,0))
-					                     .width(3)
-					                     .color(Color.BLUE)
-					                     .visible(false)
-					);
-
-			mapLoaded = true;
-		}
-*/
 	}
 
 	private void center(double lat, double lon, double accuracy) {
 		if (mapAccuracy < 0 || accuracy < mapAccuracy/10) {
 			if (map != null)
-				map.centre(lat, lon);
+				map.maybe_centre(lat, lon);
 			mapAccuracy = accuracy;
 		}
 	}
@@ -461,13 +477,14 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 		if (receiver != null) {
 			double accuracy;
 
+			here = new AltosLatLon(receiver.getLatitude(), receiver.getLongitude());
 			if (receiver.hasAccuracy())
 				accuracy = receiver.getAccuracy();
 			else
 				accuracy = 1000;
-			mReceiverLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
-			mReceiverLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
-			center (receiver.getLatitude(), receiver.getLongitude(), accuracy);
+			mReceiverLatitudeView.setText(AltosDroid.pos(here.lat, "N", "S"));
+			mReceiverLongitudeView.setText(AltosDroid.pos(here.lon, "E", "W"));
+			center (here.lat, here.lon, accuracy);
 		}
 
 	}
