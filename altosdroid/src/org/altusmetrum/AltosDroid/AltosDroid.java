@@ -42,7 +42,6 @@ import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -60,9 +59,6 @@ import android.hardware.usb.*;
 import org.altusmetrum.altoslib_7.*;
 
 public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
-	// Debugging
-	static final String TAG = "AltosDroid";
-	static final boolean D = true;
 
 	// Actions sent to the telemetry server at startup time
 
@@ -133,17 +129,17 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 			switch (msg.what) {
 			case MSG_STATE:
-				if(D) Log.d(TAG, "MSG_STATE");
+				AltosDebug.debug("MSG_STATE");
 				TelemetryState telemetry_state = (TelemetryState) msg.obj;
 				if (telemetry_state == null) {
-					Log.d(TAG, "telemetry_state null!");
+					AltosDebug.debug("telemetry_state null!");
 					return;
 				}
 
 				ad.update_state(telemetry_state);
 				break;
 			case MSG_UPDATE_AGE:
-				if(D) Log.d(TAG, "MSG_UPDATE_AGE");
+				AltosDebug.debug("MSG_UPDATE_AGE");
 				ad.update_age();
 				break;
 			}
@@ -421,7 +417,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if(D) Log.e(TAG, "+++ ON CREATE +++");
+		AltosDebug.debug("+++ ON CREATE +++");
 
 		fm = getSupportFragmentManager();
 
@@ -526,13 +522,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 		boolean granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, true);
 
-		if (D) Log.e(TAG, "intent " + intent + " device " + device + " granted " + granted);
+		AltosDebug.debug("intent %s device %s granted %s", intent, device, granted);
 
 		if (!granted)
 			device = null;
 
 		if (device != null) {
-			if (D) Log.d(TAG, "intent has usb device " + device.toString());
+			AltosDebug.debug("intent has usb device " + device.toString());
 			connectUsb(device);
 		} else {
 
@@ -542,11 +538,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			 * don't want to loop forever...
 			 */
 			if (granted) {
-				if (D) Log.d(TAG, "check for a USB device at startup");
+				AltosDebug.debug("check for a USB device at startup");
 				if (check_usb())
 					return;
 			}
-			if (D) Log.d(TAG, "Starting by looking for bluetooth devices");
+			AltosDebug.debug("Starting by looking for bluetooth devices");
 			if (ensureBluetooth())
 				return;
 			finish();
@@ -556,7 +552,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	@Override
 	public void onStart() {
 		super.onStart();
-		if(D) Log.e(TAG, "++ ON START ++");
+		AltosDebug.debug("++ ON START ++");
 
 		noticeIntent(getIntent());
 
@@ -575,26 +571,26 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	@Override
 	public void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		if(D) Log.d(TAG, "onNewIntent");
+		AltosDebug.debug("onNewIntent");
 		noticeIntent(intent);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		if(D) Log.e(TAG, "+ ON RESUME +");
+		AltosDebug.debug("+ ON RESUME +");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		if(D) Log.e(TAG, "- ON PAUSE -");
+		AltosDebug.debug("- ON PAUSE -");
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		if(D) Log.e(TAG, "-- ON STOP --");
+		AltosDebug.debug("-- ON STOP --");
 
 		doUnbindService();
 		if (mAltosVoice != null) {
@@ -606,14 +602,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if(D) Log.e(TAG, "--- ON DESTROY ---");
+		AltosDebug.debug("--- ON DESTROY ---");
 
 		if (mAltosVoice != null) mAltosVoice.stop();
 		stop_timer();
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(D) Log.d(TAG, "onActivityResult " + resultCode);
+		AltosDebug.debug("onActivityResult " + resultCode);
 		switch (requestCode) {
 		case REQUEST_CONNECT_DEVICE:
 			// When DeviceListActivity returns with a device to connect to
@@ -628,7 +624,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				//setupChat();
 			} else {
 				// User did not enable Bluetooth or an error occured
-				Log.e(TAG, "BT not enabled");
+				AltosDebug.error("BT not enabled");
 				stopService(new Intent(AltosDroid.this, TelemetryService.class));
 				Toast.makeText(this, R.string.bt_not_enabled, Toast.LENGTH_SHORT).show();
 				finish();
@@ -644,9 +640,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			// Attempt to connect to the device
 			try {
 				mService.send(Message.obtain(null, TelemetryService.MSG_OPEN_USB, device));
-				if (D) Log.d(TAG, "Sent OPEN_USB message");
+				AltosDebug.debug("Sent OPEN_USB message");
 			} catch (RemoteException e) {
-				if (D) Log.e(TAG, "connect device message failed");
+				AltosDebug.debug("connect device message failed");
 			}
 		}
 	}
@@ -657,12 +653,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
 			String name = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_NAME);
 
-			if (D) Log.d(TAG, "Connecting to " + address + " " + name);
+			AltosDebug.debug("Connecting to " + address + " " + name);
 			DeviceAddress	a = new DeviceAddress(address, name);
 			mService.send(Message.obtain(null, TelemetryService.MSG_CONNECT, a));
-			if (D) Log.d(TAG, "Sent connecting message");
+			AltosDebug.debug("Sent connecting message");
 		} catch (RemoteException e) {
-			if (D) Log.e(TAG, "connect device message failed");
+			AltosDebug.debug("connect device message failed");
 		}
 	}
 
@@ -738,7 +734,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			disconnectDevice();
 			return true;
 		case R.id.quit:
-			Log.d(TAG, "R.id.quit");
+			AltosDebug.debug("R.id.quit");
 			disconnectDevice();
 			finish();
 			return true;

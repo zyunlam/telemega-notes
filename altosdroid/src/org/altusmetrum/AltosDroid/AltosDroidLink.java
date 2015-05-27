@@ -23,15 +23,10 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 import android.os.Handler;
-import android.util.Log;
 
 import org.altusmetrum.altoslib_7.*;
 
 public abstract class AltosDroidLink extends AltosLink {
-
-	// Debugging
-	private static final String TAG = "AltosDroidLink";
-	private static final boolean D = true;
 
 	Handler		handler;
 
@@ -70,7 +65,7 @@ public abstract class AltosDroidLink extends AltosLink {
 		// Configure the newly connected device for telemetry
 		print("~\nE 0\n");
 		set_monitor(false);
-		if (D) Log.d(TAG, "ConnectThread: connected");
+		AltosDebug.debug("ConnectThread: connected");
 
 		/* Let TelemetryService know we're connected
 		 */
@@ -83,7 +78,7 @@ public abstract class AltosDroidLink extends AltosLink {
 
 	public void closing() {
 		synchronized(closed_lock) {
-			if (D) Log.d(TAG, "Marked closing true");
+			AltosDebug.debug("Marked closing true");
 			closing = true;
 		}
 	}
@@ -97,14 +92,14 @@ public abstract class AltosDroidLink extends AltosLink {
 	abstract void close_device();
 
 	public void close() {
-		if (D) Log.d(TAG, "close(): begin");
+		AltosDebug.debug("close(): begin");
 
 		closing();
 
 		flush_output();
 
 		synchronized (closed_lock) {
-			if (D) Log.d(TAG, "Marked closed true");
+			AltosDebug.debug("Marked closed true");
 			closed = true;
 		}
 
@@ -113,11 +108,11 @@ public abstract class AltosDroidLink extends AltosLink {
 		synchronized(this) {
 
 			if (input_thread != null) {
-				if (D) Log.d(TAG, "close(): stopping input_thread");
+				AltosDebug.debug("close(): stopping input_thread");
 				try {
-					if (D) Log.d(TAG, "close(): input_thread.interrupt().....");
+					AltosDebug.debug("close(): input_thread.interrupt().....");
 					input_thread.interrupt();
-					if (D) Log.d(TAG, "close(): input_thread.join().....");
+					AltosDebug.debug("close(): input_thread.join().....");
 					input_thread.join();
 				} catch (Exception e) {}
 				input_thread = null;
@@ -143,7 +138,7 @@ public abstract class AltosDroidLink extends AltosLink {
 
 	private void debug_input(byte b) {
 		if (b == '\n') {
-			Log.d(TAG, "            " + new String(debug_chars, 0, debug_off));
+			AltosDebug.debug("            " + new String(debug_chars, 0, debug_off));
 			debug_off = 0;
 		} else {
 			if (debug_off < buffer_size)
@@ -153,11 +148,11 @@ public abstract class AltosDroidLink extends AltosLink {
 
 	private void disconnected() {
 		if (closed()) {
-			if (D) Log.d(TAG, "disconnected after closed");
+			AltosDebug.debug("disconnected after closed");
 			return;
 		}
 
-		if (D) Log.d(TAG, "Sending disconnected message");
+		AltosDebug.debug("Sending disconnected message");
 		handler.obtainMessage(TelemetryService.MSG_DISCONNECTED, this).sendToTarget();
 	}
 
@@ -169,13 +164,13 @@ public abstract class AltosDroidLink extends AltosLink {
 		while (buffer_off == buffer_len) {
 			buffer_len = read(in_buffer, buffer_size);
 			if (buffer_len < 0) {
-				Log.d(TAG, "ERROR returned from getchar()");
+				AltosDebug.debug("ERROR returned from getchar()");
 				disconnected();
 				return ERROR;
 			}
 			buffer_off = 0;
 		}
-		if (D)
+		if (AltosDebug.D)
 			debug_input(in_buffer[buffer_off]);
 		return in_buffer[buffer_off++];
 	}
@@ -192,7 +187,7 @@ public abstract class AltosDroidLink extends AltosLink {
 			int	sent = write(out_buffer, out_buffer_off);
 
 			if (sent <= 0) {
-				Log.d(TAG, "flush_output() failed");
+				AltosDebug.debug("flush_output() failed");
 				out_buffer_off = 0;
 				break;
 			}
@@ -212,10 +207,10 @@ public abstract class AltosDroidLink extends AltosLink {
 
 	public void print(String data) {
 		byte[] bytes = data.getBytes();
-		if (D) Log.d(TAG, "print(): begin");
+		AltosDebug.debug("print(): begin");
 		for (byte b : bytes)
 			putchar(b);
-		if (D) Log.d(TAG, "print(): Wrote bytes: '" + data.replace('\n', '\\') + "'");
+		AltosDebug.debug("print(): Wrote bytes: '" + data.replace('\n', '\\') + "'");
 	}
 
 	public AltosDroidLink(Handler handler) {

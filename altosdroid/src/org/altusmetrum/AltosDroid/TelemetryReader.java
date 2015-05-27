@@ -22,16 +22,12 @@ package org.altusmetrum.AltosDroid;
 import java.text.*;
 import java.io.*;
 import java.util.concurrent.*;
-import android.util.Log;
 import android.os.Handler;
 
 import org.altusmetrum.altoslib_7.*;
 
 
 public class TelemetryReader extends Thread {
-
-	private static final String TAG = "TelemetryReader";
-	private static final boolean D = true;
 
 	int         crc_errors;
 
@@ -67,13 +63,13 @@ public class TelemetryReader extends Thread {
 		AltosState  state = null;
 
 		try {
-			if (D) Log.d(TAG, "starting loop");
+			AltosDebug.debug("starting loop");
 			while (telemQueue != null) {
 				try {
 					state = read();
 					handler.obtainMessage(TelemetryService.MSG_TELEMETRY, state).sendToTarget();
 				} catch (ParseException pp) {
-					Log.e(TAG, String.format("Parse error: %d \"%s\"", pp.getErrorOffset(), pp.getMessage()));
+					AltosDebug.error("Parse error: %d \"%s\"", pp.getErrorOffset(), pp.getMessage());
 				} catch (AltosCRCException ce) {
 					++crc_errors;
 					handler.obtainMessage(TelemetryService.MSG_CRC_ERROR, new Integer(crc_errors)).sendToTarget();
@@ -81,7 +77,7 @@ public class TelemetryReader extends Thread {
 			}
 		} catch (InterruptedException ee) {
 		} catch (IOException ie) {
-			Log.e(TAG, "IO exception in telemetry reader");
+			AltosDebug.error("IO exception in telemetry reader");
 			handler.obtainMessage(TelemetryService.MSG_DISCONNECTED, link).sendToTarget();
 		} finally {
 			close();
@@ -89,7 +85,7 @@ public class TelemetryReader extends Thread {
 	}
 
 	public TelemetryReader (AltosLink in_link, Handler in_handler, AltosState in_state) {
-		if (D) Log.d(TAG, "connected TelemetryReader create started");
+		AltosDebug.debug("connected TelemetryReader create started");
 		link    = in_link;
 		handler = in_handler;
 
@@ -98,6 +94,6 @@ public class TelemetryReader extends Thread {
 		link.add_monitor(telemQueue);
 		link.set_telemetry(AltosLib.ao_telemetry_standard);
 
-		if (D) Log.d(TAG, "connected TelemetryReader created");
+		AltosDebug.debug("connected TelemetryReader created");
 	}
 }

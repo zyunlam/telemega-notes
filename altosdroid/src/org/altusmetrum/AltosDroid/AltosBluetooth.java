@@ -29,15 +29,10 @@ import android.bluetooth.BluetoothSocket;
 //import android.os.Bundle;
 import android.os.Handler;
 //import android.os.Message;
-import android.util.Log;
 
 import org.altusmetrum.altoslib_7.*;
 
 public class AltosBluetooth extends AltosDroidLink {
-
-	// Debugging
-	private static final String TAG = "AltosBluetooth";
-	private static final boolean D = true;
 
 	private ConnectThread    connect_thread = null;
 
@@ -60,7 +55,7 @@ public class AltosBluetooth extends AltosDroidLink {
 
 	void connected() {
 		if (closed()) {
-			if (D) Log.d(TAG, "connected after closed");
+			AltosDebug.debug("connected after closed");
 			return;
 		}
 
@@ -82,7 +77,7 @@ public class AltosBluetooth extends AltosDroidLink {
 
 	private void connect_failed() {
 		if (closed()) {
-			if (D) Log.d(TAG, "connect_failed after closed");
+			AltosDebug.debug("connect_failed after closed");
 			return;
 		}
 
@@ -90,7 +85,7 @@ public class AltosBluetooth extends AltosDroidLink {
 		input = null;
 		output = null;
 		handler.obtainMessage(TelemetryService.MSG_CONNECT_FAILED, this).sendToTarget();
-		if (D) Log.e(TAG, "ConnectThread: Failed to establish connection");
+		AltosDebug.error("ConnectThread: Failed to establish connection");
 	}
 
 	void close_device() {
@@ -105,7 +100,7 @@ public class AltosBluetooth extends AltosDroidLink {
 			try {
 				tmp_socket.close();
 			} catch (IOException e) {
-				if (D) Log.e(TAG, "close_socket failed");
+				AltosDebug.error("close_socket failed");
 			}
 		}
 	}
@@ -122,13 +117,14 @@ public class AltosBluetooth extends AltosDroidLink {
 
 		BluetoothSocket tmp_socket = null;
 
+		AltosDebug.check_ui("create_socket\n");
 		try {
 			tmp_socket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		if (socket != null) {
-			if (D) Log.d(TAG, String.format("Socket already allocated %s", socket.toString()));
+			AltosDebug.debug("Socket already allocated %s", socket.toString());
 			close_device();
 		}
 		synchronized (this) {
@@ -139,7 +135,7 @@ public class AltosBluetooth extends AltosDroidLink {
 	private class ConnectThread extends Thread {
 
 		public void run() {
-			if (D) Log.d(TAG, "ConnectThread: BEGIN");
+			AltosDebug.debug("ConnectThread: BEGIN (pause %b)", pause);
 			setName("ConnectThread");
 
 			if (pause) {
@@ -154,7 +150,7 @@ public class AltosBluetooth extends AltosDroidLink {
 			try {
 				BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
 			} catch (Exception e) {
-				if (D) Log.d(TAG, String.format("cancelDiscovery exception %s", e.toString()));
+				AltosDebug.debug("cancelDiscovery exception %s", e.toString());
 			}
 
 			BluetoothSocket	local_socket = null;
@@ -170,8 +166,13 @@ public class AltosBluetooth extends AltosDroidLink {
 					// This is a blocking call and will only return on a
 					// successful connection or an exception
 					local_socket.connect();
-				} catch (IOException e) {
-					if (D) Log.d(TAG, String.format("Connect exception %s", e.toString()));
+				} catch (Exception e) {
+					AltosDebug.debug("Connect exception %s", e.toString());
+					try {
+						local_socket.close();
+					} catch (Exception ce) {
+						AltosDebug.debug("Close exception %s", ce.toString());
+					}
 					local_socket = null;
 				}
 			}
@@ -182,15 +183,16 @@ public class AltosBluetooth extends AltosDroidLink {
 				connect_failed();
 			}
 
-			if (D) Log.d(TAG, "ConnectThread: completed");
+			AltosDebug.debug("ConnectThread: completed");
 		}
 	}
 
 	private synchronized void wait_connected() throws InterruptedException, IOException {
+		AltosDebug.check_ui("wait_connected\n");
 		if (input == null && socket != null) {
-			if (D) Log.d(TAG, "wait_connected...");
+			AltosDebug.debug("wait_connected...");
 			wait();
-			if (D) Log.d(TAG, "wait_connected done");
+			AltosDebug.debug("wait_connected done");
 		}
 		if (socket == null)
 			throw new IOException();

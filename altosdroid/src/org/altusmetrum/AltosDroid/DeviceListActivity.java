@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -45,9 +44,6 @@ import android.widget.AdapterView.OnItemClickListener;
  * Activity in the result Intent.
  */
 public class DeviceListActivity extends Activity {
-	// Debugging
-	private static final String TAG = "DeviceListActivity";
-	private static final boolean D = true;
 
 	// Return Intent extra
 	public static final String EXTRA_DEVICE_ADDRESS = "device_address";
@@ -137,7 +133,7 @@ public class DeviceListActivity extends Activity {
 	* Start device discover with the BluetoothAdapter
 	*/
 	private void doDiscovery() {
-		if (D) Log.d(TAG, "doDiscovery()");
+		AltosDebug.debug("doDiscovery()");
 
 		// Indicate scanning in the title
 		setProgressBarIndeterminateVisibility(true);
@@ -173,7 +169,7 @@ public class DeviceListActivity extends Activity {
 			else
 				name = info;
 
-			if (D) Log.d(TAG, String.format("******* selected item '%s'", info));
+			AltosDebug.debug("******* selected item '%s'", info);
 
 			// Create the result Intent and include the MAC address
 			Intent intent = new Intent();

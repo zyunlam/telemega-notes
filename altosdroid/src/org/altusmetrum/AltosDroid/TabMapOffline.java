@@ -31,12 +31,8 @@ import android.view.*;
 import android.widget.*;
 import android.location.Location;
 import android.content.*;
-import android.util.Log;
 
 public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
-	// Debugging
-	static final String TAG = "AltosDroid";
-	static final boolean D = true;
 
 	AltosDroid mAltosDroid;
 
@@ -75,7 +71,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 		public boolean onScale(ScaleGestureDetector detector) {
 			float	f = detector.getScaleFactor();
-			if (D) Log.d(TAG, String.format("onScale %f\n", f));
+			AltosDebug.debug("onScale %f\n", f);
 			if (f <= 0.8) {
 				map.set_zoom(map.get_zoom() - 1);
 				return true;
@@ -88,12 +84,12 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 		}
 
 		public boolean onScaleBegin(ScaleGestureDetector detector) {
-			if (D) Log.d(TAG, String.format("onScaleBegin %f\n", detector.getScaleFactor()));
+			AltosDebug.debug("onScaleBegin %f\n", detector.getScaleFactor());
 			return true;
 		}
 
 		public void onScaleEnd(ScaleGestureDetector detector) {
-			if (D) Log.d(TAG, String.format("onScaleEnd %f\n", detector.getScaleFactor()));
+			AltosDebug.debug("onScaleEnd %f\n", detector.getScaleFactor());
 		}
 
 		@Override
@@ -105,19 +101,19 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 			}
 
 			if (scaling) {
-				if(D) Log.d(TAG, "scale in progress\n");
+				if(AltosDebug.D) AltosDebug.debug("scale in progress\n");
 				if (event.getAction() == MotionEvent.ACTION_UP) {
-					if (D) Log.d(TAG, "scale finished\n");
+					AltosDebug.debug("scale finished\n");
 					scaling = false;
 				}
 				return true;
 			}
 
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				if(D) Log.d(TAG, String.format("down event %g %g\n", event.getX(), event.getY()));
+				AltosDebug.debug("down event %g %g\n", event.getX(), event.getY());
 				map.touch_start((int) event.getX(), (int) event.getY(), true);
 			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-				if(D) Log.d(TAG, String.format("continue event %g %g\n", event.getX(), event.getY()));
+				AltosDebug.debug("continue event %g %g\n", event.getX(), event.getY());
 				map.touch_continue((int) event.getX(), (int) event.getY(), true);
 			}
 			return true;

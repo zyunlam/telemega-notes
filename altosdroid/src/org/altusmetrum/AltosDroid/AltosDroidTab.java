@@ -26,7 +26,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentManager;
 import android.location.Location;
-import android.util.Log;
 import android.widget.TextView;
 
 public abstract class AltosDroidTab extends Fragment implements AltosUnitsListener {

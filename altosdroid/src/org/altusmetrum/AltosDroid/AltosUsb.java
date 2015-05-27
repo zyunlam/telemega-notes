@@ -27,15 +27,10 @@ import android.content.Context;
 import android.hardware.usb.*;
 import android.app.*;
 import android.os.Handler;
-import android.util.Log;
 
 import org.altusmetrum.altoslib_7.*;
 
 public class AltosUsb extends AltosDroidLink {
-
-	// Debugging
-	private static final String TAG = "AltosUsb";
-	private static final boolean D = true;
 
 	private Thread           input_thread   = null;
 
@@ -91,19 +86,19 @@ public class AltosUsb extends AltosDroidLink {
 		}
 
 		if (in != null && out != null) {
-			Log.d(TAG, String.format("\tin %s out %s\n", in.toString(), out.toString()));
+			AltosDebug.debug("\tin %s out %s\n", in.toString(), out.toString());
 
 			manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
 			if (manager == null) {
-				Log.d(TAG, "USB_SERVICE failed");
+				AltosDebug.debug("USB_SERVICE failed");
 				return;
 			}
 
 			connection = manager.openDevice(device);
 
 			if (connection == null) {
-				Log.d(TAG, "openDevice failed");
+				AltosDebug.debug("openDevice failed");
 				return;
 			}
 
@@ -167,7 +162,7 @@ public class AltosUsb extends AltosDroidLink {
 //		if (manager.hasPermission(device))
 //			return true;
 
-		Log.d(TAG, "request permission for USB device " + device.toString());
+		AltosDebug.debug("request permission for USB device " + device.toString());
 
 		manager.requestPermission(device, pi);
 		return false;
@@ -183,7 +178,7 @@ public class AltosUsb extends AltosDroidLink {
 			int	product = device.getProductId();
 
 			if (matchProduct(match_product, device)) {
-				Log.d(TAG, "found USB device " + device.toString());
+				AltosDebug.debug("found USB device " + device.toString());
 				return device;
 			}
 		}
@@ -193,11 +188,11 @@ public class AltosUsb extends AltosDroidLink {
 
 	private void disconnected() {
 		if (closed()) {
-			if (D) Log.d(TAG, "disconnected after closed");
+			AltosDebug.debug("disconnected after closed");
 			return;
 		}
 
-		if (D) Log.d(TAG, "Sending disconnected message");
+		AltosDebug.debug("Sending disconnected message");
 		handler.obtainMessage(TelemetryService.MSG_DISCONNECTED, this).sendToTarget();
 	}
 
@@ -210,20 +205,20 @@ public class AltosUsb extends AltosDroidLink {
 		}
 
 		if (tmp_connection != null) {
-			if (D) Log.d(TAG, "Closing USB device");
+			AltosDebug.debug("Closing USB device");
 			tmp_connection.close();
 		}
 	}
 
 	int read(byte[] buffer, int len) {
 		int ret = connection.bulkTransfer(in, buffer, len, -1);
-		if (D) Log.d(TAG, String.format("read(%d) = %d\n", len, ret));
+		AltosDebug.debug("read(%d) = %d\n", len, ret);
 		return ret;
 	}
 
 	int write(byte[] buffer, int len) {
 		int ret = connection.bulkTransfer(out, buffer, len, -1);
-		if (D) Log.d(TAG, String.format("write(%d) = %d\n", len, ret));
+		AltosDebug.debug("write(%d) = %d\n", len, ret);
 		return ret;
 	}
 
