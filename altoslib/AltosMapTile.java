@@ -26,6 +26,7 @@ public abstract class AltosMapTile implements AltosFontListener {
 	public int		px_size;
 	int		zoom;
 	int		maptype;
+	int		scale;
 	public AltosMapStore	store;
 	public AltosMapCache	cache;
 	public int	status;
@@ -51,23 +52,28 @@ public abstract class AltosMapTile implements AltosFontListener {
 		else
 			format_string = "png";
 		return new File(AltosPreferences.mapdir(),
-				String.format("map-%c%.6f,%c%.6f-%s%d.%s",
-					      chlat, lat, chlon, lon, maptype_string, zoom, format_string));
+				String.format("map-%c%.6f,%c%.6f-%s%d%s.%s",
+					      chlat, lat, chlon, lon, maptype_string, zoom, scale == 1 ? "" : String.format("-%d", scale), format_string));
 	}
 
 	private String map_url() {
 		String format_string;
+		int z = zoom;
+
 		if (maptype == AltosMap.maptype_hybrid || maptype == AltosMap.maptype_satellite || maptype == AltosMap.maptype_terrain)
 			format_string = "jpg";
 		else
 			format_string = "png32";
 
+		for (int s = 1; s < scale; s <<= 1)
+			z--;
+
 		if (AltosVersion.has_google_maps_api_key())
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&sensor=false&maptype=%s&format=%s&key=%s",
-					     center.lat, center.lon, zoom, px_size, px_size, AltosMap.maptype_names[maptype], format_string, AltosVersion.google_maps_api_key);
+			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s&key=%s",
+					     center.lat, center.lon, z, px_size/scale, px_size/scale, scale, AltosMap.maptype_names[maptype], format_string, AltosVersion.google_maps_api_key);
 		else
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&sensor=false&maptype=%s&format=%s",
-					     center.lat, center.lon, zoom, px_size, px_size, AltosMap.maptype_names[maptype], format_string);
+			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s",
+					     center.lat, center.lon, z, px_size/scale, px_size/scale, AltosMap.maptype_names[maptype], format_string);
 	}
 
 	public void font_size_changed(int font_size) {
@@ -96,7 +102,7 @@ public abstract class AltosMapTile implements AltosFontListener {
 
 	public abstract void paint(AltosMapTransform t);
 
-	public AltosMapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+	public AltosMapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
 		this.listener = listener;
 		this.upper_left = upper_left;
 		this.cache = listener.cache();
@@ -110,8 +116,13 @@ public abstract class AltosMapTile implements AltosFontListener {
 		this.zoom = zoom;
 		this.maptype = maptype;
 		this.px_size = px_size;
+		this.scale = scale;
 
 		status = AltosMapTile.loading;
 		store = AltosMapStore.get(map_url(), map_file());
+	}
+
+	public AltosMapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+		this(listener, upper_left, center, zoom, maptype, px_size, 1);
 	}
 }

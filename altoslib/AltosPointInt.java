@@ -28,4 +28,14 @@ public class AltosPointInt {
 		this.x = x;
 		this.y = y;
 	}
+
+	public AltosPointInt(double x, double y) {
+		this.x = (int) (x + 0.5);
+		this.y = (int) (y + 0.5);
+	}
+
+	public AltosPointInt(AltosPointDouble pt_d) {
+		this.x = (int) (pt_d.x + 0.5);
+		this.y = (int) (pt_d.y + 0.5);
+	}
 }

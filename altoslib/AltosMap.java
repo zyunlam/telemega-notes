@@ -287,7 +287,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 					AltosLatLon	ul = transform.lat_lon(new AltosPointDouble(x, y));
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
 					AltosMapTile tile = map_interface.new_tile(this, ul, center, zoom, maptype,
-										   AltosMap.px_size);
+										   px_size);
 					tiles.put(point, tile);
 				}
 			}
