@@ -341,12 +341,6 @@ public class TelemetryService extends Service implements LocationListener {
 		BluetoothDevice device = bluetooth_adapter.getRemoteDevice(address.address);
 
 		disconnect(false);
-		if (pause) {
-			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e) {
-			}
-		}
 		this.address = address;
 		if (D) Log.d(TAG, String.format("start_altos_bluetooth(): Connecting to %s (%s)", device.getName(), device.getAddress()));
 		altos_link = new AltosBluetooth(device, handler);
@@ -450,12 +444,14 @@ public class TelemetryService extends Service implements LocationListener {
 		// Move us into the foreground.
 		startForeground(NOTIFICATION, notification);
 
-		String	action = intent.getAction();
+		if (intent != null) {
+			String	action = intent.getAction();
 
-		if (action.equals(AltosDroid.ACTION_BLUETOOTH)) {
-			DeviceAddress address = AltosDroidPreferences.active_device();
-			if (address != null && !address.address.startsWith("USB"))
-				start_altos_bluetooth(address, false);
+			if (action.equals(AltosDroid.ACTION_BLUETOOTH)) {
+				DeviceAddress address = AltosDroidPreferences.active_device();
+				if (address != null && !address.address.startsWith("USB"))
+					start_altos_bluetooth(address, false);
+			}
 		}
 
 		// We want this service to continue running until it is explicitly

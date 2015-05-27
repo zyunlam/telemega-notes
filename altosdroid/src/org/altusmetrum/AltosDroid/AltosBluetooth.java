@@ -41,19 +41,19 @@ public class AltosBluetooth extends AltosDroidLink {
 
 	private ConnectThread    connect_thread = null;
 
-	private BluetoothAdapter adapter;
+	private BluetoothDevice	 device;
 	private BluetoothSocket  socket;
 	private InputStream      input;
 	private OutputStream     output;
+	private boolean		 pause;
 
 	// Constructor
-	public AltosBluetooth(BluetoothDevice device, Handler handler) {
+	public AltosBluetooth(BluetoothDevice device, Handler handler, boolean pause) {
 		super(handler);
-//		set_debug(D);
-		adapter = BluetoothAdapter.getDefaultAdapter();
+		this.device = device;
 		this.handler = handler;
+		this.pause = pause;
 
-		create_socket(device);
 		connect_thread = new ConnectThread();
 		connect_thread.start();
 	}
@@ -64,6 +64,7 @@ public class AltosBluetooth extends AltosDroidLink {
 			return;
 		}
 
+		AltosDebug.check_ui("connected\n");
 		try {
 			synchronized(this) {
 				if (socket != null) {
@@ -141,9 +142,17 @@ public class AltosBluetooth extends AltosDroidLink {
 			if (D) Log.d(TAG, "ConnectThread: BEGIN");
 			setName("ConnectThread");
 
+			if (pause) {
+				try {
+					Thread.sleep(4000);
+				} catch (InterruptedException e) {
+				}
+			}
+
+			create_socket(device);
 			// Always cancel discovery because it will slow down a connection
 			try {
-				adapter.cancelDiscovery();
+				BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
 			} catch (Exception e) {
 				if (D) Log.d(TAG, String.format("cancelDiscovery exception %s", e.toString()));
 			}
