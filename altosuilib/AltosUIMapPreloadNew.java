@@ -118,7 +118,7 @@ class AltosUIMapPos extends Box {
 	}
 }
 
-public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosMapTileListener, AltosLaunchSiteListener  {
+public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener  {
 	AltosUIFrame	owner;
 	AltosUIMapNew	map;
 	AltosMapCache	cache;
@@ -127,8 +127,8 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	AltosUIMapPos	lon;
 
 	JProgressBar	pbar;
-	int		pbar_max;
-	int		pbar_cur;
+
+	AltosMapLoader	loader;
 
 	JLabel		site_list_label;
 	JComboBox<AltosLaunchSite>	site_list;
@@ -149,123 +149,48 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	static final String[]	lat_hemi_names = { "N", "S" };
 	static final String[]	lon_hemi_names = { "E", "W" };
 
-	class updatePbar implements Runnable {
-		String		s;
-
-		public updatePbar(String in_s) {
-			s = in_s;
-		}
-
-		public void run() {
-			int 	n = ++pbar_cur;
-
-			pbar.setMaximum(pbar_max);
-			pbar.setValue(n);
-			pbar.setString(s);
-		}
-	}
-
 	double	latitude, longitude;
-	int	min_z;
-	int	max_z;
-	int	cur_z;
-	int	all_types;
-	int	cur_type;
-	int	r;
 
-	int	tiles_per_layer;
-	int	tiles_loaded;
-	int	layers_total;
-	int	layers_loaded;
-
-
-	private void do_load() {
-		tiles_loaded = 0;
-		map.set_zoom(cur_z + AltosMap.default_zoom);
-		map.set_maptype(cur_type);
-		map.set_load_params(latitude, longitude, r, this);
+	/* AltosMapLoaderListener interfaces */
+	public void loader_start(final int max) {
+		SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					pbar.setMaximum(max);
+					pbar.setValue(0);
+					pbar.setString("");
+					map.clear_marks();
+					map.add_mark(latitude, longitude, AltosLib.ao_flight_boost);
+				}
+			});
 	}
 
-	private int next_type(int start) {
-		int next_type;
-		for (next_type = start;
-		     next_type <= AltosMap.maptype_terrain && (all_types & (1 << next_type)) == 0;
-		     next_type++)
-			;
-		return next_type;
+	public void loader_notify(final int cur, final int max, final String name) {
+		SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					pbar.setValue(cur);
+					pbar.setString(name);
+				}
+			});
 	}
 
-	private void next_load() {
-		int next_type = next_type(cur_type + 1);
-
-		if (next_type > AltosMap.maptype_terrain) {
-			if (cur_z == max_z) {
-				return;
-			} else {
-				cur_z++;
-			}
-			next_type = next_type(0);
-		}
-		cur_type = next_type;
-		do_load();
+	public void loader_done(int max) {
+		SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					pbar.setValue(0);
+					pbar.setString("");
+					load_button.setSelected(false);
+					loading = false;
+				}
+			});
 	}
 
-	private void start_load() {
-		cur_z = min_z;
-		int ntype = 0;
-		all_types = 0;
+	private int all_types() {
+		int all_types = 0;
 		for (int t = AltosMap.maptype_hybrid; t <= AltosMap.maptype_terrain; t++)
-			if (maptypes[t].isSelected()) {
+			if (maptypes[t].isSelected())
 				all_types |= (1 << t);
-				ntype++;
-			}
-		if (ntype == 0) {
-			all_types |= (1 << AltosMap.maptype_hybrid);
-			ntype = 1;
-		}
-
-		cur_type = next_type(0);
-		tiles_per_layer = (r * 2 + 1) * (r * 2 + 1);
-		layers_total = (max_z - min_z + 1) * ntype;
-		layers_loaded = 0;
-		pbar_max = layers_total * tiles_per_layer;
-		pbar_cur = 0;
-
-		map.clear_marks();
-		map.add_mark(latitude,longitude, AltosLib.ao_flight_boost);
-		do_load();
+		return all_types;
 	}
-
-	/* AltosMapTileListener methods */
-
-	public synchronized void notify_tile(AltosMapTile tile, int status) {
-		if (status == AltosMapTile.loading)
-			return;
-
-		SwingUtilities.invokeLater(new updatePbar(tile.store.file.toString()));
-		++tiles_loaded;
-		if (tiles_loaded == tiles_per_layer) {
-			++layers_loaded;
-			if (layers_loaded == layers_total) {
-				SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							pbar.setValue(0);
-							pbar.setString("");
-							load_button.setSelected(false);
-							loading = false;
-						}
-					});
-			} else {
-				SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							next_load();
-						}
-					});
-			}
-		}
-	}
-
-	public AltosMapCache cache() { return cache; }
 
 	public void itemStateChanged(ItemEvent e) {
 		int		state = e.getStateChange();
@@ -291,16 +216,17 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 				try {
 					latitude = lat.get_value();
 					longitude = lon.get_value();
-					min_z = (Integer) min_zoom.getSelectedItem();
-					max_z = (Integer) max_zoom.getSelectedItem();
+					int min_z = (Integer) min_zoom.getSelectedItem();
+					int max_z = (Integer) max_zoom.getSelectedItem();
 					if (max_z < min_z)
 						max_z = min_z;
-					r = (Integer) radius.getSelectedItem();
+					int r = (Integer) radius.getSelectedItem();
 					loading = true;
+
+					loader.load(latitude, longitude, min_z, max_z, r, all_types());
 				} catch (ParseException pe) {
 					load_button.setSelected(false);
 				}
-				start_load();
 			}
 		}
 	}
@@ -330,6 +256,8 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 		map = new AltosUIMapNew();
 		cache = new AltosMapCache(map);
+
+		loader = new AltosMapLoader(map.map, cache, this);
 
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;
