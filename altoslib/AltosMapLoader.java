@@ -41,12 +41,9 @@ public class AltosMapLoader implements AltosMapTileListener {
 	int	layers_loaded;
 
 	AltosMap	map;
-	AltosMapCache	cache;
 
 	public void do_load() {
-		map.set_zoom(cur_z + AltosMap.default_zoom);
-		map.set_maptype(cur_type);
-		map.set_load_params(latitude, longitude, radius, this);
+		map.set_load_params(cur_z + AltosMap.default_zoom, cur_type, latitude, longitude, radius, this);
 	}
 
 	public int next_type(int start) {
@@ -132,12 +129,10 @@ public class AltosMapLoader implements AltosMapTileListener {
 			next_load();
 	}
 
-	public AltosMapCache cache() { return cache; }
+	public AltosMapCache cache() { return map.cache(); }
 
-	public AltosMapLoader(AltosMap map, AltosMapCache cache,
-			      AltosMapLoaderListener listener) {
+	public AltosMapLoader(AltosMap map, AltosMapLoaderListener listener) {
 		this.map = map;
-		this.cache = cache;
 		this.listener = listener;
 	}
 }

@@ -248,7 +248,9 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 	public void add_mark(double lat, double lon, int state) {
 		synchronized(marks) {
-			marks.add(map_interface.new_mark(lat, lon, state));
+			AltosMapMark mark = map_interface.new_mark(lat, lon, state);
+			if (mark != null)
+				marks.add(mark);
 		}
 		repaint();
 	}
@@ -303,11 +305,15 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		}
 	}
 
-	public void set_load_params(double lat, double lon, int radius, AltosMapTileListener listener) {
+	public void set_load_params(int new_zoom, int new_type, double lat, double lon, int radius, AltosMapTileListener listener) {
+		if (AltosMap.min_zoom <= new_zoom && new_zoom <= AltosMap.max_zoom)
+			zoom = new_zoom;
+		maptype = new_type;
 		load_centre = new AltosLatLon(lat, lon);
 		load_radius = radius;
 		load_listener = listener;
 		centre(lat, lon);
+		tiles.clear();
 		make_tiles();
 		for (AltosMapTile tile : tiles.values()) {
 			tile.add_store_listener(this);
