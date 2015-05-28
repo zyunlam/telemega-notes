@@ -429,10 +429,6 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 
 	JComboBox<String>	maptype_combo;
 
-	public void set_load_params(double lat, double lon, int radius, AltosMapTileListener listener) {
-		map.set_load_params(lat, lon, radius, listener);
-	}
-
 	MapView	view;
 
 	public AltosUIMapNew() {
