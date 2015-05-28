@@ -121,7 +121,6 @@ class AltosUIMapPos extends Box {
 public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener  {
 	AltosUIFrame	owner;
 	AltosUIMapNew	map;
-	AltosMapCache	cache;
 
 	AltosUIMapPos	lat;
 	AltosUIMapPos	lon;
@@ -255,9 +254,8 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		pane.setLayout(new GridBagLayout());
 
 		map = new AltosUIMapNew();
-		cache = new AltosMapCache(map);
 
-		loader = new AltosMapLoader(map.map, cache, this);
+		loader = new AltosMapLoader(map.map, this);
 
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;
