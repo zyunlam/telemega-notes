@@ -37,6 +37,9 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 
 	public abstract String tab_name();
 
+	public void set_map_type(int map_type) {
+	}
+
 	public void units_changed(boolean imperial_units) {
 		if (!isHidden() && last_state != null)
 			show(last_state, last_from_receiver, last_receiver);

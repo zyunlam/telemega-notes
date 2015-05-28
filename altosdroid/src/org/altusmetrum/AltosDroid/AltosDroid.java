@@ -73,6 +73,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Intent request codes
 	public static final int REQUEST_CONNECT_DEVICE = 1;
 	public static final int REQUEST_ENABLE_BT      = 2;
+	public static final int REQUEST_PRELOAD_MAPS   = 3;
+	public static final int REQUEST_MAP_TYPE       = 4;
 
 	public static FragmentManager	fm;
 
@@ -630,6 +632,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				finish();
 			}
 			break;
+		case REQUEST_MAP_TYPE:
+			if (resultCode == Activity.RESULT_OK)
+				set_map_type(data);
+			break;
 		}
 	}
 
@@ -666,6 +672,16 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		try {
 			mService.send(Message.obtain(null, TelemetryService.MSG_DISCONNECT, null));
 		} catch (RemoteException e) {
+		}
+	}
+
+	private void set_map_type(Intent data) {
+		int	mode = data.getIntExtra(MapTypeActivity.EXTRA_MAP_TYPE, -1);
+
+		AltosDebug.debug("intent set_map_type %d\n", mode);
+		if (mode != -1) {
+			for (AltosDroidTab mTab : mTabs)
+				mTab.set_map_type(mode);
 		}
 	}
 
@@ -788,6 +804,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		case R.id.change_units:
 			boolean	imperial = AltosPreferences.imperial_units();
 			AltosPreferences.set_imperial_units(!imperial);
+			return true;
+		case R.id.preload_maps:
+			serverIntent = new Intent(this, PreloadMapActivity.class);
+			startActivityForResult(serverIntent, REQUEST_PRELOAD_MAPS);
+			return true;
+		case R.id.map_type:
+			serverIntent = new Intent(this, MapTypeActivity.class);
+			startActivityForResult(serverIntent, REQUEST_MAP_TYPE);
 			return true;
 		}
 		return false;

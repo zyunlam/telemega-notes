@@ -32,6 +32,11 @@
 	<string name="select_freq">Select radio frequency</string>
 	<string name="select_rate">Select data rate</string>
 	<string name="change_units">Change units</string>
+	<string name="preload_maps">Load Maps</string>
+	<string name="map_type">Map Type</string>
+
+	<!-- MapTypeActivity -->
+	<string name="map_type">Map Type</string>
 
 	<!-- DeviceListActivity -->
 	<string name="scanning">scanning for devices…</string>
@@ -84,4 +89,19 @@
 	<string name="pad_lon_label">Pad Lon</string>
 	<string name="pad_alt_label">Pad Alt</string>
 
+	<!-- Map preload -->
+	<string name="preload_site_label">Known Launch Sites</string>
+	<string name="preload_latitude_label">Latitude</string>
+	<string name="preload_longitude_label">Longitude</string>
+
+	<string name="preload_types">Map Types</string>
+	<string name="preload_hybrid">Hybrid</string>
+	<string name="preload_satellite">Satellite</string>
+	<string name="preload_roadmap">Roadmap</string>
+	<string name="preload_terrain">Terrain</string>
+	<string name="preload_min_zoom">Minimum Zoom</string>
+	<string name="preload_max_zoom">Maximum Zoom</string>
+	<string name="preload_tile_radius">Tile Radius</string>
+	
+	<string name="preload_load">Load Map</string>
 </resources>

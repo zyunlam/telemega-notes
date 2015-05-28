@@ -39,6 +39,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	AltosMap map;
 
 	AltosLatLon	here;
+	AltosLatLon	pad;
 
 	Canvas	canvas;
 	Paint	paint;
@@ -84,6 +85,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 				canvas.drawLine((float) rocket_screen.x, (float) rocket_screen.y,
 						(float) here_screen.x, (float) here_screen.y, paint);
 			}
+			draw_bitmap(pad, pad_bitmap, pad_off_x, pad_off_y);
 			draw_bitmap(map.last_position, rocket_bitmap, rocket_off_x, rocket_off_y);
 			draw_bitmap(here, here_bitmap, here_off_x, here_off_y);
 		}
@@ -271,8 +273,6 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 	class MapMark extends AltosMapMark {
 		public void paint(AltosMapTransform t) {
-			if (state == AltosLib.ao_flight_boost)
-				draw_bitmap(lat_lon, pad_bitmap, pad_off_x, pad_off_y);
 		}
 
 		MapMark(double lat, double lon, int state) {
@@ -472,6 +472,8 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 				if (state.gps.locked && state.gps.nsat >= 4)
 					center (state.gps.lat, state.gps.lon, 10);
 			}
+			if (state.pad_lat != AltosLib.MISSING && pad == null)
+				pad = new AltosLatLon(state.pad_lat, state.pad_lon);
 		}
 
 		if (receiver != null) {
@@ -487,6 +489,11 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 			center (here.lat, here.lon, accuracy);
 		}
 
+	}
+
+	public void set_map_type(int map_type) {
+		if (map != null)
+			map.set_maptype(map_type);
 	}
 
 	public TabMapOffline() {

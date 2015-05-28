@@ -334,7 +334,6 @@ public class TelemetryService extends Service implements LocationListener {
 
 	private void start_altos_bluetooth(DeviceAddress address, boolean pause) {
 		// Get the BLuetoothDevice object
-		AltosDebug.check_ui("start_altos_bluetooth\n");
 		BluetoothDevice device = bluetooth_adapter.getRemoteDevice(address.address);
 
 		disconnect(false);

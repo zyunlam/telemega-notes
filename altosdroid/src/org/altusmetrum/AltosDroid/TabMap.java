@@ -199,6 +199,19 @@ public class TabMap extends AltosDroidTab {
 
 	}
 
+	public void set_map_type(int map_type) {
+		if (mMap != null) {
+			if (map_type == AltosMap.maptype_hybrid)
+				mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+			else if (map_type == AltosMap.maptype_satellite)
+				mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+			else if (map_type == AltosMap.maptype_terrain)
+				mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+			else
+				mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+		}
+	}
+
 	public TabMap() {
 	}
 }
