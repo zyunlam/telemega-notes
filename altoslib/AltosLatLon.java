@@ -27,6 +27,10 @@ public class AltosLatLon {
 		return lat == other.lat && lon == other.lon;
 	}
 
+	public String toString() {
+		return String.format("%f/%f", lat, lon);
+	}
+
 	public AltosLatLon(double lat, double lon) {
 		this.lat = lat;
 		this.lon = lon;
