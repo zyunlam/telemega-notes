@@ -154,6 +154,8 @@ altoslib_JAVA = \
 	AltosLaunchSite.java \
 	AltosLaunchSiteListener.java \
 	AltosLaunchSites.java \
+	AltosMapLoaderListener.java \
+	AltosMapLoader.java \
 	AltosVersion.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar
