@@ -150,8 +150,10 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public void set_transform() {
-		transform = new AltosMapTransform(width(), height(), zoom, centre);
-		repaint();
+		if (centre != null) {
+			transform = new AltosMapTransform(width(), height(), zoom, centre);
+			repaint();
+		}
 	}
 
 	private void set_zoom_label() {
@@ -285,6 +287,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			tiles.remove(point);
 
 		cache.set_cache_size((width() / AltosMap.px_size + 2) * (height() / AltosMap.px_size + 2));
+
 		for (int y = (int) upper_left.y; y <= lower_right.y; y += AltosMap.px_size) {
 			for (int x = (int) upper_left.x; x <= lower_right.x; x += AltosMap.px_size) {
 				AltosPointInt point = new AltosPointInt(x, y);
@@ -319,7 +322,8 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public void paint() {
-		make_tiles();
+		if (centre != null)
+			make_tiles();
 
 		for (AltosMapTile tile : tiles.values())
 			tile.paint(transform);
@@ -411,6 +415,5 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		line = map_interface.new_line();
 		path = map_interface.new_path();
 		set_zoom_label();
-		centre(0, 0);
 	}
 }
