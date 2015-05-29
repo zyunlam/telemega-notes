@@ -57,6 +57,7 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 
 	public void set_visible(boolean visible) {
 		FragmentTransaction	ft = AltosDroid.fm.beginTransaction();
+		AltosDebug.debug("set visible %b %s\n", visible, tab_name());
 		if (visible) {
 			AltosState		state = last_state;
 			AltosGreatCircle	from_receiver = last_from_receiver;

@@ -109,6 +109,10 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		return map_interface.height();
 	}
 
+	public void debug(String format, Object ... arguments) {
+		map_interface.debug(format, arguments);
+	}
+
 	public AltosPointInt floor(AltosPointDouble point) {
 		return new AltosPointInt ((int) Math.floor(point.x / AltosMap.px_size) * AltosMap.px_size,
 					      (int) Math.floor(point.y / AltosMap.px_size) * AltosMap.px_size);
@@ -150,6 +154,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public void set_transform() {
+		debug("set_transform, centre is %s\n", centre);
 		if (centre != null) {
 			transform = new AltosMapTransform(width(), height(), zoom, centre);
 			repaint();
@@ -375,6 +380,11 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 		int dx = x - drag_start.x;
 		int dy = y - drag_start.y;
+
+		if (transform == null) {
+			debug("Transform not set in drag\n");
+			return;
+		}
 
 		AltosLatLon new_centre = transform.screen_lat_lon(new AltosPointInt(width() / 2 - dx, height() / 2 - dy));
 		centre(new_centre);

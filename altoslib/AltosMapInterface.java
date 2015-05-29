@@ -40,4 +40,6 @@ public interface AltosMapInterface {
 	public abstract void repaint(AltosRectangle damage);
 
 	public abstract void set_zoom_label(String label);
+
+	public abstract void debug(String format, Object ... arguments);
 }

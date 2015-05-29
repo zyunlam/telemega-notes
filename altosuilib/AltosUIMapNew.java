@@ -369,6 +369,10 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 		zoom_label.setText(label);
 	}
 
+	public void debug(String format, Object ... arguments) {
+		System.out.printf(format, arguments);
+	}
+
 	/* AltosFlightDisplay interface */
 
 	public void set_font() {
