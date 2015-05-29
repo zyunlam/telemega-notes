@@ -118,6 +118,7 @@ public class TabMap extends AltosDroidTab {
 	private void setupMap() {
 		mMap = mMapFragment.getMap();
 		if (mMap != null) {
+			set_map_type(mAltosDroid.map_type);
 			mMap.setMyLocationEnabled(true);
 			mMap.getUiSettings().setTiltGesturesEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);

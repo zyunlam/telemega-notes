@@ -76,6 +76,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	public static final int REQUEST_PRELOAD_MAPS   = 3;
 	public static final int REQUEST_MAP_TYPE       = 4;
 
+	public int map_type = AltosMap.maptype_hybrid;
+
 	public static FragmentManager	fm;
 
 	private BluetoothAdapter mBluetoothAdapter = null;
@@ -677,12 +679,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	}
 
 	private void set_map_type(Intent data) {
-		int	mode = data.getIntExtra(MapTypeActivity.EXTRA_MAP_TYPE, -1);
+		int type = data.getIntExtra(MapTypeActivity.EXTRA_MAP_TYPE, -1);
 
-		AltosDebug.debug("intent set_map_type %d\n", mode);
-		if (mode != -1) {
+		AltosDebug.debug("intent set_map_type %d\n", type);
+		if (type != -1) {
+			map_type = type;
 			for (AltosDroidTab mTab : mTabs)
-				mTab.set_map_type(mode);
+				mTab.set_map_type(map_type);
 		}
 	}
 

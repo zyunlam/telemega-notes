@@ -389,6 +389,10 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 		super.onAttach(activity);
 		mAltosDroid = (AltosDroid) activity;
 		mAltosDroid.registerTab(this);
+
+		map = new AltosMap(this);
+		map.set_maptype(mAltosDroid.map_type);
+
 		pad_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pad);
 		/* arrow at the bottom of the launchpad image */
 		pad_off_x = pad_bitmap.getWidth() / 2;
