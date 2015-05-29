@@ -32,12 +32,27 @@ import android.widget.*;
 import android.location.Location;
 import android.content.*;
 import android.util.Log;
-import android.os.Looper;
+import android.os.*;
+import android.content.pm.*;
 
 public class AltosDebug {
 	// Debugging
 	static final String TAG = "AltosDroid";
-	public static final boolean D = true;
+
+	static boolean	D = true;
+
+	static void init(Context context) {
+		ApplicationInfo	app_info = context.getApplicationInfo();
+
+		if ((app_info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+			Log.d(TAG, "Enable debugging\n");
+			D = true;
+		} else {
+			Log.d(TAG, "Disable debugging\n");
+			D = false;
+		}
+	}
+
 
 	static void info(String format, Object ... arguments) {
 		Log.i(TAG, String.format(format, arguments));

@@ -419,6 +419,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		AltosDebug.init(this);
 		AltosDebug.debug("+++ ON CREATE +++");
 
 		fm = getSupportFragmentManager();
