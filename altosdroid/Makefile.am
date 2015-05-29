@@ -14,7 +14,8 @@ DX=$(SDK)/platform-tools/dx
 ADB=$(SDK)/platform-tools/adb
 AAPT=$(SDK)/platform-tools/aapt
 APKBUILDER=$(SDK)/tools/apkbuilder
-ZIPALIGN=$(SDK)/tools/zipalign
+ZIPALIGN_A=$(SDK)/tools/zipalign
+ZIPALIGN_B=$(SDK)/build-tools/*/zipalign
 
 JAVA_SRC_DIR=src/org/altusmetrum/AltosDroid
 EXT_LIBDIR=libs
@@ -83,9 +84,15 @@ bin/AltosDroid-release.apk: bin/AltosDroid-release-unsigned.apk
 	   -storepass:file ~/altusmetrumllc/google-play-passphrase \
 	   -signedjar bin/AltosDroid-release-signed.apk \
 	   bin/AltosDroid-release-unsigned.apk AltosDroid
-	$(ZIPALIGN) -f 4 \
-	   bin/AltosDroid-release-signed.apk \
-	   bin/AltosDroid-release.apk
+	if [ -f $(ZIPALIGN_A) ]; then \
+		$(ZIPALIGN_A) -f 4 \
+		   bin/AltosDroid-release-signed.apk \
+		   bin/AltosDroid-release.apk; \
+	else \
+		$(ZIPALIGN_B) -f 4 \
+		   bin/AltosDroid-release-signed.apk \
+		   bin/AltosDroid-release.apk; \
+	fi
 
 release: bin/AltosDroid-release.apk
 
