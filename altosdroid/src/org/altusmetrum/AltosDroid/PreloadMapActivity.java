@@ -36,6 +36,10 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.AdapterView.*;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
+import android.location.Criteria;
 
 import org.altusmetrum.altoslib_7.*;
 
@@ -45,7 +49,7 @@ import org.altusmetrum.altoslib_7.*;
  * by the user, the MAC address of the device is sent back to the parent
  * Activity in the result Intent.
  */
-public class PreloadMapActivity extends Activity implements AltosLaunchSiteListener, AltosMapInterface, AltosMapLoaderListener {
+public class PreloadMapActivity extends Activity implements AltosLaunchSiteListener, AltosMapInterface, AltosMapLoaderListener, LocationListener {
 
 	private ArrayAdapter<AltosLaunchSite> known_sites_adapter;
 
@@ -54,6 +58,7 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	private CheckBox	roadmap;
 	private CheckBox	terrain;
 
+	private Spinner		known_sites_spinner;
 	private Spinner		min_zoom;
 	private Spinner		max_zoom;
 	private Spinner		tile_radius;
@@ -65,7 +70,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 	/* AltosMapLoaderListener interfaces */
 	public void loader_start(final int max) {
-		AltosDebug.debug("loader_start max %d\n", max);
 		this.runOnUiThread(new Runnable() {
 				public void run() {
 					progress.setMax(max);
@@ -75,7 +79,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	}
 
 	public void loader_notify(final int cur, final int max, final String name) {
-		AltosDebug.debug("loader_notify cur %4d max %4d %s\n", cur, max, name);
 		this.runOnUiThread(new Runnable() {
 				public void run() {
 					progress.setProgress(cur);
@@ -84,7 +87,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	}
 
 	public void loader_done(int max) {
-		AltosDebug.debug("loader_done max %d\n", max);
 		this.runOnUiThread(new Runnable() {
 				public void run() {
 					progress.setProgress(0);
@@ -111,7 +113,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		}
 
 		public PreloadMapImage(File file) {
-			AltosDebug.debug("preload file %s\n", file.toString());
 		}
 	}
 
@@ -160,7 +161,43 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	}
 
 	public void set_zoom_label(String label) {
-		AltosDebug.debug("zoom label %s\n", label);
+	}
+
+	public void debug(String format, Object ... arguments) {
+		AltosDebug.debug(format, arguments);
+	}
+
+	/* LocationProvider interface */
+
+	AltosLaunchSite	current_location_site;
+
+	public void onLocationChanged(Location location) {
+		AltosDebug.debug("location changed");
+		if (current_location_site == null) {
+			AltosLaunchSite selected_item = (AltosLaunchSite) known_sites_spinner.getSelectedItem();
+
+			current_location_site = new AltosLaunchSite("Current Location", location.getLatitude(), location.getLongitude());
+			known_sites_adapter.insert(current_location_site, 0);
+
+			if (selected_item != null)
+				known_sites_spinner.setSelection(known_sites_adapter.getPosition(selected_item));
+			else {
+				latitude.setText(new StringBuffer(String.format("%12.6f", current_location_site.latitude)));
+				longitude.setText(new StringBuffer(String.format("%12.6f", current_location_site.longitude)));
+			}
+		} else {
+			current_location_site.latitude = location.getLatitude();
+			current_location_site.longitude = location.getLongitude();
+		}
+	}
+
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+	}
+
+	public void onProviderEnabled(String provider) {
+	}
+
+	public void onProviderDisabled(String provider) {
 	}
 
 	private double text(EditText view) throws ParseException {
@@ -213,8 +250,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 			int	r = radius();
 			int	t = types();
 
-			AltosDebug.debug("load lat %12.6f lon %12.6f min %d max %d r %d types %x\n",
-					 lat, lon, min, max, r, t);
 			loader.load(lat, lon, min, max, r, t);
 		} catch (ParseException e) {
 		}
@@ -241,8 +276,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	class SiteListListener implements OnItemSelectedListener {
 		public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 			AltosLaunchSite	site = (AltosLaunchSite) parent.getItemAtPosition(pos);
-			AltosDebug.debug("Site selected: %s\n", site.toString());
-
 			latitude.setText(new StringBuffer(String.format("%12.6f", site.latitude)));
 			longitude.setText(new StringBuffer(String.format("%12.6f", site.longitude)));
 		}
@@ -256,8 +289,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		AltosDebug.debug("preload map onCreate");
 
 		// Setup the window
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -293,13 +324,13 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 			    AltosMap.min_zoom - AltosMap.default_zoom,
 			    AltosMap.max_zoom - AltosMap.default_zoom, 2);
 		tile_radius = (Spinner) findViewById(R.id.preload_tile_radius);
-		add_numbers(tile_radius, 1, 5, 3);
+		add_numbers(tile_radius, 1, 5, 5);
 
 		progress = (ProgressBar) findViewById(R.id.preload_progress);
 
 		// Initialize array adapters. One for already paired devices and
 		// one for newly discovered devices
-		Spinner known_sites_spinner = (Spinner) findViewById(R.id.preload_site_list);
+		known_sites_spinner = (Spinner) findViewById(R.id.preload_site_list);
 
 		known_sites_adapter = new ArrayAdapter<AltosLaunchSite>(this, android.R.layout.simple_spinner_item);
 
@@ -312,11 +343,19 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 		loader = new AltosMapLoader(map, this);
 
+		// Listen for GPS and Network position updates
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+
 		new AltosLaunchSites(this);
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+
+		// Stop listening for location updates
+		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
 	}
 }
