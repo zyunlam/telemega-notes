@@ -349,6 +349,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 	@Override
 	public void onDetach() {
+		super.onDetach();
 		mAltosDroid = null;
 	}
 
