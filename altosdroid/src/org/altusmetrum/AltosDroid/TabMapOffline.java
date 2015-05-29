@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import java.util.Arrays;
+import java.util.*;
 import java.io.*;
 
 import org.altusmetrum.altoslib_7.*;
@@ -31,6 +31,26 @@ import android.view.*;
 import android.widget.*;
 import android.location.Location;
 import android.content.*;
+
+class Rocket {
+	AltosLatLon	position;
+	String		name;
+	TabMapOffline	tab;
+
+	void paint() {
+		tab.draw_bitmap(position, tab.rocket_bitmap, tab.rocket_off_x, tab.rocket_off_y);
+		tab.draw_text(position, name, 0, 3*tab.rocket_bitmap.getHeight()/4);
+	}
+
+	void set_position(AltosLatLon position) {
+		this.position = position;
+	}
+
+	Rocket(String name, TabMapOffline tab) {
+		this.name = name;
+		this.tab = tab;
+	}
+}
 
 public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
@@ -59,117 +79,41 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	private TextView mTargetLongitudeView;
 	private TextView mReceiverLatitudeView;
 	private TextView mReceiverLongitudeView;
+	private AltosMapView map_view;
 
 	private double mapAccuracy = -1;
 
 	int	stroke_width = 20;
 
-	private void draw_bitmap(AltosLatLon lat_lon, Bitmap bitmap, int off_x, int off_y) {
-		if (lat_lon != null) {
+
+	void draw_text(AltosLatLon lat_lon, String text, int off_x, int off_y) {
+		if (lat_lon != null && map != null && map.transform != null) {
+			AltosPointInt pt = new AltosPointInt(map.transform.screen(lat_lon));
+
+			Rect	bounds = new Rect();
+			paint.getTextBounds(text, 0, text.length(), bounds);
+
+			int	width = bounds.right - bounds.left;
+			int	height = bounds.bottom - bounds.top;
+
+			float x = pt.x;
+			float y = pt.y;
+			x = x - width / 2.0f - off_x;
+			y = y + height / 2.0f - off_y;
+			paint.setColor(0xff000000);
+			canvas.drawText(text, 0, text.length(), x, y, paint);
+		}
+	}
+
+	void draw_bitmap(AltosLatLon lat_lon, Bitmap bitmap, int off_x, int off_y) {
+		if (lat_lon != null && map != null && map.transform != null) {
 			AltosPointInt pt = new AltosPointInt(map.transform.screen(lat_lon));
 
 			canvas.drawBitmap(bitmap, pt.x - off_x, pt.y - off_y, paint);
 		}
 	}
 
-	class MapView extends View implements ScaleGestureDetector.OnScaleGestureListener {
-
-		ScaleGestureDetector	scale_detector;
-		boolean			scaling;
-
-		private void draw_positions() {
-			if (map.last_position != null && here != null) {
-				AltosPointDouble	rocket_screen = map.transform.screen(map.last_position);
-				AltosPointDouble	here_screen = map.transform.screen(here);
-				paint.setColor(0xff8080ff);
-				canvas.drawLine((float) rocket_screen.x, (float) rocket_screen.y,
-						(float) here_screen.x, (float) here_screen.y, paint);
-			}
-			draw_bitmap(pad, pad_bitmap, pad_off_x, pad_off_y);
-			draw_bitmap(map.last_position, rocket_bitmap, rocket_off_x, rocket_off_y);
-			draw_bitmap(here, here_bitmap, here_off_x, here_off_y);
-		}
-
-		protected void onDraw(Canvas view_canvas) {
-			canvas = view_canvas;
-			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			paint.setStrokeWidth(stroke_width);
-			paint.setStrokeCap(Paint.Cap.ROUND);
-			paint.setStrokeJoin(Paint.Join.ROUND);
-			map.paint();
-			draw_positions();
-			canvas = null;
-		}
-
-		public boolean onScale(ScaleGestureDetector detector) {
-			float	f = detector.getScaleFactor();
-			AltosDebug.debug("onScale %f\n", f);
-			if (f <= 0.8) {
-				map.set_zoom(map.get_zoom() - 1);
-				return true;
-			}
-			if (f >= 1.2) {
-				map.set_zoom(map.get_zoom() + 1);
-				return true;
-			}
-			return false;
-		}
-
-		public boolean onScaleBegin(ScaleGestureDetector detector) {
-			AltosDebug.debug("onScaleBegin %f\n", detector.getScaleFactor());
-			return true;
-		}
-
-		public void onScaleEnd(ScaleGestureDetector detector) {
-			AltosDebug.debug("onScaleEnd %f\n", detector.getScaleFactor());
-		}
-
-		@Override
-		public boolean dispatchTouchEvent(MotionEvent event) {
-			scale_detector.onTouchEvent(event);
-
-			if (scale_detector.isInProgress()) {
-				scaling = true;
-			}
-
-			if (scaling) {
-				if(AltosDebug.D) AltosDebug.debug("scale in progress\n");
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					AltosDebug.debug("scale finished\n");
-					scaling = false;
-				}
-				return true;
-			}
-
-			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				AltosDebug.debug("down event %g %g\n", event.getX(), event.getY());
-				map.touch_start((int) event.getX(), (int) event.getY(), true);
-			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-				AltosDebug.debug("continue event %g %g\n", event.getX(), event.getY());
-				map.touch_continue((int) event.getX(), (int) event.getY(), true);
-			}
-			return true;
-		}
-
-		public MapView(Context context) {
-			super(context);
-			scale_detector = new ScaleGestureDetector(this.getContext(), this);
-		}
-	}
-
-	class MapFragment extends Fragment {
-		MapView	map_view;
-
-		public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-			map_view = new MapView(container.getContext());
-			return map_view;
-		}
-
-		public MapFragment() {
-		}
-	}
-
-	MapFragment map_fragment;
+	HashMap<Integer,Rocket> rockets = new HashMap<Integer,Rocket>();
 
 	/* AltosMapInterface */
 
@@ -337,7 +281,6 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 					}
 				}
 			}
-
 		}
 
 		public MapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
@@ -351,37 +294,32 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	}
 
 	public int width() {
-		if (map_fragment != null && map_fragment.map_view != null)
-			return map_fragment.map_view.getWidth();
+		if (map_view != null)
+			return map_view.getWidth();
 		return 500;
 	}
 
 	public int height() {
-		if (map_fragment != null && map_fragment.map_view != null)
-			return map_fragment.map_view.getHeight();
+		if (map_view != null)
+			return map_view.getHeight();
 		return 500;
 	}
 
 	public void repaint() {
-		this.getActivity().runOnUiThread(new Runnable() {
-				public void run() {
-					if (map_fragment != null && map_fragment.map_view != null)
-						map_fragment.map_view.invalidate();
-				}
-			});
+		if (map_view != null)
+			map_view.postInvalidate();
 	}
 
-	public void repaint(AltosRectangle t_damage) {
-		final AltosRectangle damage = t_damage;
-		this.getActivity().runOnUiThread(new Runnable() {
-				public void run() {
-					if (map_fragment != null && map_fragment.map_view != null)
-						map_fragment.map_view.invalidate(damage.x, damage.y, damage.x + damage.width, damage.y + damage.height);
-				}
-			});
+	public void repaint(AltosRectangle damage) {
+		if (map_view != null)
+			map_view.postInvalidate(damage.x, damage.y, damage.x + damage.width, damage.y + damage.height);
 	}
 
 	public void set_zoom_label(String label) {
+	}
+
+	public void debug(String format, Object ... arguments) {
+		AltosDebug.debug(format, arguments);
 	}
 
 	@Override
@@ -410,46 +348,40 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	}
 
 	@Override
+	public void onDetach() {
+		mAltosDroid = null;
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.tab_map, container, false);
+		View v = inflater.inflate(R.layout.tab_map_offline, container, false);
 
-		map_fragment = new MapFragment();
-		map = new AltosMap(this);
-		mDistanceView  = (TextView)v.findViewById(R.id.distance_value);
-		mBearingView   = (TextView)v.findViewById(R.id.bearing_value);
-		mTargetLatitudeView  = (TextView)v.findViewById(R.id.target_lat_value);
-		mTargetLongitudeView = (TextView)v.findViewById(R.id.target_lon_value);
-		mReceiverLatitudeView  = (TextView)v.findViewById(R.id.receiver_lat_value);
-		mReceiverLongitudeView = (TextView)v.findViewById(R.id.receiver_lon_value);
+		map_view = (AltosMapView)v.findViewById(R.id.map_view_offline);
+		map_view.set_tab(this);
+		mDistanceView  = (TextView)v.findViewById(R.id.distance_value_offline);
+		mBearingView   = (TextView)v.findViewById(R.id.bearing_value_offline);
+		mTargetLatitudeView  = (TextView)v.findViewById(R.id.target_lat_value_offline);
+		mTargetLongitudeView = (TextView)v.findViewById(R.id.target_lon_value_offline);
+		mReceiverLatitudeView  = (TextView)v.findViewById(R.id.receiver_lat_value_offline);
+		mReceiverLongitudeView = (TextView)v.findViewById(R.id.receiver_lon_value_offline);
 		return v;
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		getChildFragmentManager().beginTransaction().add(R.id.map, map_fragment).commit();
 	}
- 
+
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
 
 		mAltosDroid.unregisterTab(this);
-		mAltosDroid = null;
-		map_fragment = null;
-
-//		Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
-//		FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-//		ft.remove(fragment);
-//		ft.commit();
-	}
-
-	private void setupMap() {
 	}
 
 	private void center(double lat, double lon, double accuracy) {
@@ -478,6 +410,21 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 			}
 			if (state.pad_lat != AltosLib.MISSING && pad == null)
 				pad = new AltosLatLon(state.pad_lat, state.pad_lon);
+
+			int serial = state.serial;
+			if (serial == AltosLib.MISSING)
+				serial = 0;
+
+			Rocket	rocket = null;
+
+			if (state.gps != null && state.gps.locked) {
+				if (!rockets.containsKey(serial)) {
+					rocket = new Rocket(String.format("%d", serial), this);
+					rockets.put(serial, rocket);
+				} else
+					rocket = rockets.get(serial);
+				rocket.set_position(new AltosLatLon(state.gps.lat, state.gps.lon));
+			}
 		}
 
 		if (receiver != null) {
@@ -495,6 +442,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 	}
 
+	@Override
 	public void set_map_type(int map_type) {
 		if (map != null)
 			map.set_maptype(map_type);
