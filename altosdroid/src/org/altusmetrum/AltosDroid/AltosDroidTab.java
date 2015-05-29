@@ -62,11 +62,18 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 			AltosGreatCircle	from_receiver = last_from_receiver;
 			Location		receiver = last_receiver;
 
-			show(state, from_receiver, receiver);
 			ft.show(this);
+			show(state, from_receiver, receiver);
 		} else
 			ft.hide(this);
 		ft.commitAllowingStateLoss();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		AltosDebug.debug("onResume tab %s\n", tab_name());
+		set_visible(true);
 	}
 
 	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver, boolean is_current) {
