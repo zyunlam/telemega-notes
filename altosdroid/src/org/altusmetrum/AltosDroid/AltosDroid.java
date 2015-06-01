@@ -82,9 +82,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	private BluetoothAdapter mBluetoothAdapter = null;
 
-	// Layout Views
-	private TextView mTitle;
-
 	// Flight state values
 	private TextView mCallsignView;
 	private TextView mRSSIView;
@@ -221,20 +218,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				if (telemetry_state.telemetry_rate != AltosLib.ao_telemetry_rate_38400)
 					str = str.concat(String.format(" %d bps",
 								       AltosLib.ao_telemetry_rate_values[telemetry_state.telemetry_rate]));
-				mTitle.setText(str);
+				setTitle(str);
 			} else {
-				mTitle.setText(R.string.title_connected_to);
+				setTitle(R.string.title_connected_to);
 			}
 			break;
 		case TelemetryState.CONNECT_CONNECTING:
 			if (telemetry_state.address != null)
-				mTitle.setText(String.format("Connecting to %s...", telemetry_state.address.name));
+				setTitle(String.format("Connecting to %s...", telemetry_state.address.name));
 			else
-				mTitle.setText("Connecting to something...");
+				setTitle("Connecting to something...");
 			break;
 		case TelemetryState.CONNECT_DISCONNECTED:
 		case TelemetryState.CONNECT_NONE:
-			mTitle.setText(R.string.title_not_connected);
+			setTitle(R.string.title_not_connected);
 			break;
 		}
 	}
@@ -427,9 +424,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		fm = getSupportFragmentManager();
 
 		// Set up the window layout
-		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.altosdroid);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 
 		// Create the Tabs and ViewPager
 		mTabHost = (TabHost)findViewById(android.R.id.tabhost);
@@ -446,11 +441,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mTabsAdapter.addTab(mTabHost.newTabSpec("landed").setIndicator(create_tab_view("Landed")), TabLanded.class, null);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("map").setIndicator(create_tab_view("Map")), TabMap.class, null);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("offmap").setIndicator(create_tab_view("OffMap")), TabMapOffline.class, null);
-
-		// Set up the custom title
-		mTitle = (TextView) findViewById(R.id.title_left_text);
-		mTitle.setText(R.string.app_name);
-		mTitle = (TextView) findViewById(R.id.title_right_text);
 
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);
