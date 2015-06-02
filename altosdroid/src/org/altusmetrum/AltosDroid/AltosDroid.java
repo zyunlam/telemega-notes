@@ -55,6 +55,8 @@ import android.widget.Toast;
 import android.app.AlertDialog;
 import android.location.Location;
 import android.hardware.usb.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
 
 import org.altusmetrum.altoslib_7.*;
 
@@ -90,6 +92,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	private RelativeLayout mStateLayout;
 	private TextView mStateView;
 	private TextView mAgeView;
+	private boolean  mAgeViewOld;
+	private int mAgeNewColor;
+	private int mAgeOldColor;
 
 	// field to display the version at the bottom of the screen
 	private TextView mVersion;
@@ -279,8 +284,18 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	}
 
 	void update_age() {
-		if (saved_state != null)
-			mAgeView.setText(String.format("%d", (System.currentTimeMillis() - saved_state.received_time + 500) / 1000));
+		if (saved_state != null) {
+			int age = (int) ((System.currentTimeMillis() - saved_state.received_time + 500) / 1000);
+			boolean old = age >= 10;
+			if (old != mAgeViewOld) {
+				if (old)
+					mAgeView.setTextColor(mAgeOldColor);
+				else
+					mAgeView.setTextColor(mAgeNewColor);
+				mAgeViewOld = old;
+			}
+			mAgeView.setText(String.format("%d", age));
+		}
 	}
 
 	void update_ui(AltosState state, Location location) {
@@ -455,6 +470,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mStateLayout   = (RelativeLayout) findViewById(R.id.state_container);
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
+		mAgeNewColor   = mAgeView.getTextColors().getDefaultColor();
+		mAgeOldColor   = getResources().getColor(R.color.old_color);
 	}
 
 	private boolean ensureBluetooth() {
