@@ -33,6 +33,8 @@
 	<string name="select_rate">Select data rate</string>
 	<string name="change_units">Change units</string>
 	<string name="preload_maps">Load Maps</string>
+	<string name="select_tracker">Select Tracker</string>
+	<string name="delete_track">Delete Track</string>
 	<string name="map_type">Map Type</string>
 
 	<!-- MapTypeActivity -->

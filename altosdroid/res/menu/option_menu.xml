@@ -37,6 +37,12 @@
     <item android:id="@+id/map_type"
 	  android:icon="@android:drawable/ic_menu_mapmode"
 	  android:title="@string/map_type" />
+    <item android:id="@+id/select_tracker"
+	  android:icon="@android:drawable/ic_menu_view"
+	  android:title="@string/select_tracker"/>
+    <item android:id="@+id/delete_track"
+	  android:icon="@android:drawable/ic_notification_clear_all"
+	  android:title="@string/delete_track"/>
     <item android:id="@+id/quit"
           android:icon="@android:drawable/ic_menu_close_clear_cancel"
           android:title="@string/quit" />
