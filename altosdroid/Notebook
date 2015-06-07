@@ -15,17 +15,39 @@ Desired AltosDroid feature list
 
  *) Monitor-idle mode
 
- *) Frequency scanning
-
- *) Select satellite imaging mode
-
  *) TeleBT battery voltage
 
- *) Deal with long bluetooth list. Currently, a list longer than
-    the screen makes it impossible to use entries off the bottom.
+ *) Select tracker by clicking map
 
- *) Pickle/unpickle state instead of reloading entire history from
-    file. Current restart time is lengthy.
+ *) Auto select tracker after long delay
+
+ *) Evaluate performance issues
+
+ *) Merge offline/online maps into single tab with mode
+
+ *) Make voice responses depend on selected tab
+
+ *) Monitor TeleMega igniters
+
+ *) Convert to four tab design:
+
+	1) Pad
+
+		Report out GPS status, report igniter/battery status changes
+
+	2) Flight
+
+		Report height, speed, az/el/range
+
+	3) Recovery
+
+		Report range bearing/heading (bearing if stationary,
+		heading if in motion
+
+	4) Map
+
+		Pick out report based on current flight status
+		(presume flight if in motion, recovery otherwise)
 
 Completed features
 
@@ -47,3 +69,28 @@ Completed features
 
 	Done
 
+ *) Select satellite imaging mode
+
+	Done
+
+ *) Deal with long bluetooth list. Currently, a list longer than
+    the screen makes it impossible to use entries off the bottom.
+
+	Done
+
+ *) Pickle/unpickle state instead of reloading entire history from
+    file. Current restart time is lengthy.
+
+	Done
+
+ *) Offline maps
+
+	Done
+
+ *) Multi-tracker management
+
+	Done
+
+ *) Provide units for age field, turn red if old
+
+	Done
