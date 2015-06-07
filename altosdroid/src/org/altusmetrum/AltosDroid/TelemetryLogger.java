@@ -34,7 +34,7 @@ public class TelemetryLogger {
 			logger = null;
 		}
 	}
-	
+
 	void handleExternalStorageState() {
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {

@@ -21,6 +21,7 @@ package org.altusmetrum.AltosDroid;
 
 import java.text.*;
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.*;
 import android.os.Handler;
 
@@ -34,25 +35,18 @@ public class TelemetryReader extends Thread {
 	Handler     handler;
 
 	AltosLink   link;
-	AltosState  state = null;
 
 	LinkedBlockingQueue<AltosLine> telemQueue;
 
-	public AltosState read() throws ParseException, AltosCRCException, InterruptedException, IOException {
+	public AltosTelemetry read() throws ParseException, AltosCRCException, InterruptedException, IOException {
 		AltosLine l = telemQueue.take();
 		if (l.line == null)
 			throw new IOException("IO error");
 		AltosTelemetry telem = AltosTelemetryLegacy.parse(l.line);
-		if (state == null)
-			state = new AltosState();
-		else
-			state = state.clone();
-		telem.update_state(state);
-		return state;
+		return telem;
 	}
 
 	public void close() {
-		state = null;
 		link.remove_monitor(telemQueue);
 		link = null;
 		telemQueue.clear();
@@ -60,14 +54,12 @@ public class TelemetryReader extends Thread {
 	}
 
 	public void run() {
-		AltosState  state = null;
-
 		try {
 			AltosDebug.debug("starting loop");
 			while (telemQueue != null) {
 				try {
-					state = read();
-					handler.obtainMessage(TelemetryService.MSG_TELEMETRY, state).sendToTarget();
+					AltosTelemetry	telem = read();
+					handler.obtainMessage(TelemetryService.MSG_TELEMETRY, telem).sendToTarget();
 				} catch (ParseException pp) {
 					AltosDebug.error("Parse error: %d \"%s\"", pp.getErrorOffset(), pp.getMessage());
 				} catch (AltosCRCException ce) {
@@ -84,12 +76,11 @@ public class TelemetryReader extends Thread {
 		}
 	}
 
-	public TelemetryReader (AltosLink in_link, Handler in_handler, AltosState in_state) {
+	public TelemetryReader (AltosLink in_link, Handler in_handler) {
 		AltosDebug.debug("connected TelemetryReader create started");
 		link    = in_link;
 		handler = in_handler;
 
-		state = in_state;
 		telemQueue = new LinkedBlockingQueue<AltosLine>();
 		link.add_monitor(telemQueue);
 		link.set_telemetry(AltosLib.ao_telemetry_standard);

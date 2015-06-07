@@ -18,10 +18,8 @@
 package org.altusmetrum.AltosDroid;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import android.app.Notification;
 //import android.app.NotificationManager;
@@ -62,6 +60,7 @@ public class TelemetryService extends Service implements LocationListener {
 	static final int MSG_CRC_ERROR	       = 10;
 	static final int MSG_SETBAUD	       = 11;
 	static final int MSG_DISCONNECT	       = 12;
+	static final int MSG_DELETE_SERIAL     = 13;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
@@ -119,6 +118,10 @@ public class TelemetryService extends Service implements LocationListener {
 				AltosDebug.debug("Disconnect command received");
 				s.address = null;
 				s.disconnect(true);
+				break;
+			case MSG_DELETE_SERIAL:
+				AltosDebug.debug("Delete Serial command received");
+				s.delete_serial((Integer) msg.obj);
 				break;
 			case MSG_SETFREQUENCY:
 				AltosDebug.debug("MSG_SETFREQUENCY");
@@ -197,13 +200,8 @@ public class TelemetryService extends Service implements LocationListener {
 				 * Messages from TelemetryReader
 				 */
 			case MSG_TELEMETRY:
-				s.telemetry_state.state = (AltosState) msg.obj;
-				if (s.telemetry_state.state != null) {
-					AltosDebug.debug("Save state");
-					AltosPreferences.set_state(0, s.telemetry_state.state, null);
-				}
 				AltosDebug.debug("MSG_TELEMETRY");
-				s.send_to_clients();
+				s.telemetry((AltosTelemetry) msg.obj);
 				break;
 			case MSG_CRC_ERROR:
 				// forward crc error messages
@@ -217,13 +215,31 @@ public class TelemetryService extends Service implements LocationListener {
 		}
 	}
 
+	/* Handle telemetry packet
+	 */
+	private void telemetry(AltosTelemetry telem) {
+		AltosState	state;
+
+		if (telemetry_state.states.containsKey(telem.serial))
+			state = telemetry_state.states.get(telem.serial).clone();
+		else
+			state = new AltosState();
+		telem.update_state(state);
+		telemetry_state.states.put(telem.serial, state);
+		if (state != null) {
+			AltosDebug.debug("Save state %d", telem.serial);
+			AltosPreferences.set_state(telem.serial, state, null);
+		}
+		send_to_clients();
+	}
+
 	/* Construct the message to deliver to clients
 	 */
 	private Message message() {
 		if (telemetry_state == null)
 			AltosDebug.debug("telemetry_state null!");
-		if (telemetry_state.state == null)
-			AltosDebug.debug("telemetry_state.state null!");
+		if (telemetry_state.states == null)
+			AltosDebug.debug("telemetry_state.states null!");
 		return Message.obtain(null, AltosDroid.MSG_STATE, telemetry_state);
 	}
 
@@ -332,6 +348,12 @@ public class TelemetryService extends Service implements LocationListener {
 		}
 	}
 
+	private void delete_serial(int serial) {
+		telemetry_state.states.remove((Integer) serial);
+		AltosPreferences.remove_state(serial);
+		send_to_clients();
+	}
+
 	private void start_altos_bluetooth(DeviceAddress address, boolean pause) {
 		// Get the BLuetoothDevice object
 		BluetoothDevice device = bluetooth_adapter.getRemoteDevice(address.address);
@@ -372,7 +394,7 @@ public class TelemetryService extends Service implements LocationListener {
 		telemetry_state.connect = TelemetryState.CONNECT_CONNECTED;
 		telemetry_state.address = address;
 
-		telemetry_reader = new TelemetryReader(altos_link, handler, telemetry_state.state);
+		telemetry_reader = new TelemetryReader(altos_link, handler);
 		telemetry_reader.start();
 
 		AltosDebug.debug("connected TelemetryReader started");
@@ -406,11 +428,32 @@ public class TelemetryService extends Service implements LocationListener {
 		telemetry_state.connect = TelemetryState.CONNECT_DISCONNECTED;
 		telemetry_state.address = null;
 
-		AltosSavedState saved_state = AltosPreferences.state(0);
+		/* Pull the saved state information out of the preferences database
+		 */
+		ArrayList<Integer> serials = AltosPreferences.list_states();
 
-		if (saved_state != null) {
-			AltosDebug.debug("recovered old state flight %d\n", saved_state.state.flight);
-			telemetry_state.state = saved_state.state;
+		telemetry_state.latest_serial = AltosPreferences.latest_state();
+
+		for (int serial : serials) {
+			AltosSavedState saved_state = AltosPreferences.state(serial);
+			if (saved_state != null) {
+				if (serial == 0) {
+					serial = saved_state.state.serial;
+					AltosPreferences.set_state(serial, saved_state.state, saved_state.listener_state);
+					AltosPreferences.remove_state(0);
+				}
+				if (telemetry_state.latest_serial == 0)
+					telemetry_state.latest_serial = serial;
+
+				AltosDebug.debug("recovered old state serial %d flight %d\n",
+						 serial,
+						 saved_state.state.flight);
+				if (saved_state.state.gps != null)
+					AltosDebug.debug("\tposition %f,%f\n",
+							 saved_state.state.gps.lat,
+							 saved_state.state.gps.lon);
+				telemetry_state.states.put(serial, saved_state.state);
+			}
 		}
 
 		// Listen for GPS and Network position updates

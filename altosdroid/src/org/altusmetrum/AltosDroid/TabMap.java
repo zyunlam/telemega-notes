@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.support.v4.app.FragmentTransaction;
@@ -43,8 +44,6 @@ import android.widget.TextView;
 import android.location.Location;
 
 public class TabMap extends AltosDroidTab {
-	AltosDroid mAltosDroid;
-
 	private SupportMapFragment mMapFragment;
 	private GoogleMap mMap;
 	private boolean mapLoaded = false;
@@ -63,11 +62,40 @@ public class TabMap extends AltosDroidTab {
 
 	private double mapAccuracy = -1;
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mAltosDroid = (AltosDroid) activity;
-		mAltosDroid.registerTab(this);
+	private Bitmap rocket_bitmap(String text) {
+
+		/* From: http://mapicons.nicolasmollet.com/markers/industry/military/missile-2/
+		 */
+		Bitmap orig_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.rocket);
+		Bitmap bitmap = orig_bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+		Canvas canvas = new Canvas(bitmap);
+		Paint paint = new Paint();
+		paint.setTextSize(40);
+		paint.setColor(0xff000000);
+
+		Rect	bounds = new Rect();
+		paint.getTextBounds(text, 0, text.length(), bounds);
+
+		int	width = bounds.right - bounds.left;
+		int	height = bounds.bottom - bounds.top;
+
+		float x = bitmap.getWidth() / 2.0f - width / 2.0f;
+		float y = bitmap.getHeight() / 2.0f - height / 2.0f;
+
+		AltosDebug.debug("map label x %f y %f\n", x, y);
+
+		canvas.drawText(text, 0, text.length(), x, y, paint);
+		return bitmap;
+	}
+
+	private Marker rocket_marker(int serial, double lat, double lon) {
+		Bitmap	bitmap = rocket_bitmap(String.format("%d", serial));
+
+		return mMap.addMarker(new MarkerOptions()
+				      .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+				      .position(new LatLng(lat, lon))
+				      .visible(false));
 	}
 
 	@Override
@@ -102,33 +130,17 @@ public class TabMap extends AltosDroidTab {
 		getChildFragmentManager().beginTransaction().add(R.id.map, mMapFragment).commit();
 	}
 
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-
-		mAltosDroid.unregisterTab(this);
-		mAltosDroid = null;
-
-		//Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
-		//FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-		//ft.remove(fragment);
-		//ft.commit();
-	}
-
 	private void setupMap() {
 		mMap = mMapFragment.getMap();
 		if (mMap != null) {
-			set_map_type(mAltosDroid.map_type);
+			set_map_type(altos_droid.map_type);
 			mMap.setMyLocationEnabled(true);
 			mMap.getUiSettings().setTiltGesturesEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 
-			mRocketMarker = mMap.addMarker(
-					// From: http://mapicons.nicolasmollet.com/markers/industry/military/missile-2/
-					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.rocket))
-					                   .position(new LatLng(0,0))
-					                   .visible(false)
-					);
+			Bitmap label_bitmap = rocket_bitmap("hello");
+
+			mRocketMarker = rocket_marker(1800,0,0);
 
 			mPadMarker = mMap.addMarker(
 					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.pad))
@@ -156,7 +168,7 @@ public class TabMap extends AltosDroidTab {
 
 	public String tab_name() { return "map"; }
 
-	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
 			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
@@ -166,6 +178,8 @@ public class TabMap extends AltosDroidTab {
 			if (mapLoaded) {
 				if (state.gps != null) {
 					mRocketMarker.setPosition(new LatLng(state.gps.lat, state.gps.lon));
+					mRocketMarker.setTitle("hello world");
+					mRocketMarker.setSnippet("hello");
 					mRocketMarker.setVisible(true);
 
 					mPolyline.setPoints(Arrays.asList(new LatLng(state.pad_lat, state.pad_lon), new LatLng(state.gps.lat, state.gps.lon)));

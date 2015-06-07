@@ -29,8 +29,6 @@ import android.widget.TextView;
 import android.location.Location;
 
 public class TabLanded extends AltosDroidTab {
-	AltosDroid mAltosDroid;
-
 	private TextView mBearingView;
 	private TextView mDistanceView;
 	private TextView mTargetLatitudeView;
@@ -40,14 +38,6 @@ public class TabLanded extends AltosDroidTab {
 	private TextView mMaxHeightView;
 	private TextView mMaxSpeedView;
 	private TextView mMaxAccelView;
-
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mAltosDroid = (AltosDroid) activity;
-		mAltosDroid.registerTab(this);
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,16 +56,9 @@ public class TabLanded extends AltosDroidTab {
 		return v;
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		mAltosDroid.unregisterTab(this);
-		mAltosDroid = null;
-	}
-
 	public String tab_name() { return "landed"; }
 
-	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
 			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
