@@ -72,10 +72,8 @@ case "$dev" in
         ;;
 esac
 
-echo 'E 0' > $dev
+SERIAL=$SERIAL ./cal-freq $dev
 
 ./test-telegps
-
-SERIAL=$SERIAL ./cal-freq $dev
 
 exit $?

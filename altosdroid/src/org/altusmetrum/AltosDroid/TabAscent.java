@@ -30,8 +30,6 @@ import android.widget.TextView;
 import android.location.Location;
 
 public class TabAscent extends AltosDroidTab {
-	AltosDroid mAltosDroid;
-
 	private TextView mHeightView;
 	private TextView mMaxHeightView;
 	private TextView mSpeedView;
@@ -44,13 +42,6 @@ public class TabAscent extends AltosDroidTab {
 	private GoNoGoLights mApogeeLights;
 	private TextView mMainVoltageView;
 	private GoNoGoLights mMainLights;
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mAltosDroid = (AltosDroid) activity;
-		mAltosDroid.registerTab(this);
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,18 +69,11 @@ public class TabAscent extends AltosDroidTab {
 		return v;
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		mAltosDroid.unregisterTab(this);
-		mAltosDroid = null;
-	}
-
 	public String tab_name() {
 		return "ascent";
 	}
 
-	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
 			set_value(mHeightView, AltosConvert.height, 6, state.height());
 			set_value(mHeightView, AltosConvert.height, 6, state.height());

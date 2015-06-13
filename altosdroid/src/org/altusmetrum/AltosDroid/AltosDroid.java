@@ -42,19 +42,13 @@ import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.Window;
-import android.view.View;
-import android.view.LayoutInflater;
-import android.widget.TabHost;
-import android.widget.TextView;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.view.*;
+import android.widget.*;
 import android.app.AlertDialog;
 import android.location.Location;
 import android.hardware.usb.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
 
 import org.altusmetrum.altoslib_7.*;
 
@@ -82,9 +76,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	private BluetoothAdapter mBluetoothAdapter = null;
 
-	// Layout Views
-	private TextView mTitle;
-
 	// Flight state values
 	private TextView mCallsignView;
 	private TextView mRSSIView;
@@ -93,6 +84,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	private RelativeLayout mStateLayout;
 	private TextView mStateView;
 	private TextView mAgeView;
+	private boolean  mAgeViewOld;
+	private int mAgeNewColor;
+	private int mAgeOldColor;
 
 	// field to display the version at the bottom of the screen
 	private TextView mVersion;
@@ -110,6 +104,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// Timer and Saved flight state for Age calculation
 	private Timer timer;
 	AltosState saved_state;
+	TelemetryState	telemetry_state;
+	Integer[] 	serials;
 
 	UsbDevice	pending_usb_device;
 	boolean		start_with_usb;
@@ -134,13 +130,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			switch (msg.what) {
 			case MSG_STATE:
 				AltosDebug.debug("MSG_STATE");
-				TelemetryState telemetry_state = (TelemetryState) msg.obj;
-				if (telemetry_state == null) {
+				if (msg.obj == null) {
 					AltosDebug.debug("telemetry_state null!");
 					return;
 				}
-
-				ad.update_state(telemetry_state);
+				ad.update_state((TelemetryState) msg.obj);
 				break;
 			case MSG_UPDATE_AGE:
 				AltosDebug.debug("MSG_UPDATE_AGE");
@@ -221,20 +215,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				if (telemetry_state.telemetry_rate != AltosLib.ao_telemetry_rate_38400)
 					str = str.concat(String.format(" %d bps",
 								       AltosLib.ao_telemetry_rate_values[telemetry_state.telemetry_rate]));
-				mTitle.setText(str);
+				setTitle(str);
 			} else {
-				mTitle.setText(R.string.title_connected_to);
+				setTitle(R.string.title_connected_to);
 			}
 			break;
 		case TelemetryState.CONNECT_CONNECTING:
 			if (telemetry_state.address != null)
-				mTitle.setText(String.format("Connecting to %s...", telemetry_state.address.name));
+				setTitle(String.format("Connecting to %s...", telemetry_state.address.name));
 			else
-				mTitle.setText("Connecting to something...");
+				setTitle("Connecting to something...");
 			break;
 		case TelemetryState.CONNECT_DISCONNECTED:
 		case TelemetryState.CONNECT_NONE:
-			mTitle.setText(R.string.title_not_connected);
+			setTitle(R.string.title_not_connected);
 			break;
 		}
 	}
@@ -256,17 +250,34 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	boolean	registered_units_listener;
 
-	void update_state(TelemetryState telemetry_state) {
+	int	current_serial;
+
+	void update_state(TelemetryState new_telemetry_state) {
+
+		if (new_telemetry_state != null)
+			telemetry_state = new_telemetry_state;
+
+		if (current_serial == 0)
+			current_serial = telemetry_state.latest_serial;
 
 		if (!registered_units_listener) {
 			registered_units_listener = true;
 			AltosPreferences.register_units_listener(this);
 		}
 
+		serials = telemetry_state.states.keySet().toArray(new Integer[0]);
+
 		update_title(telemetry_state);
-		update_ui(telemetry_state.state, telemetry_state.location);
-		if (telemetry_state.connect == TelemetryState.CONNECT_CONNECTED)
-			start_timer();
+
+		AltosDebug.debug("update state current serial %d\n", current_serial);
+
+		AltosState	state = null;
+		if (telemetry_state.states.containsKey(current_serial))
+			state = telemetry_state.states.get(current_serial);
+
+		update_ui(telemetry_state, state, telemetry_state.location);
+
+		start_timer();
 	}
 
 	boolean same_string(String a, String b) {
@@ -281,12 +292,55 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
-	void update_age() {
-		if (saved_state != null)
-			mAgeView.setText(String.format("%d", (System.currentTimeMillis() - saved_state.received_time + 500) / 1000));
+
+	private int blend_component(int a, int b, double r, int shift, int mask) {
+		return ((int) (((a >> shift) & mask) * r + ((b >> shift) & mask) * (1 - r)) & mask) << shift;
+	}
+	private int blend_color(int a, int b, double r) {
+		return (blend_component(a, b, r, 0, 0xff) |
+			blend_component(a, b, r, 8, 0xff) |
+			blend_component(a, b, r, 16, 0xff) |
+			blend_component(a, b, r, 24, 0xff));
 	}
 
-	void update_ui(AltosState state, Location location) {
+	int state_age(AltosState state) {
+		return (int) ((System.currentTimeMillis() - state.received_time + 500) / 1000);
+	}
+
+	void set_screen_on(int age) {
+		if (age < 60)
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		else
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	}
+
+	void update_age() {
+		if (saved_state != null) {
+			int age = state_age(saved_state);
+
+			double age_scale = age / 100.0;
+
+			if (age_scale > 1.0)
+				age_scale = 1.0;
+
+			mAgeView.setTextColor(blend_color(mAgeOldColor, mAgeNewColor, age_scale));
+
+			set_screen_on(age);
+
+			String	text;
+			if (age < 60)
+				text = String.format("%ds", age);
+			else if (age < 60 * 60)
+				text = String.format("%dm", age / 60);
+			else if (age < 60 * 60 * 24)
+				text = String.format("%dh", age / (60 * 60));
+			else
+				text = String.format("%dd", age / (24 * 60 * 60));
+			mAgeView.setText(text);
+		}
+	}
+
+	void update_ui(TelemetryState telem_state, AltosState state, Location location) {
 
 		int prev_state = AltosLib.ao_flight_invalid;
 
@@ -296,6 +350,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			prev_state = saved_state.state;
 
 		if (state != null) {
+			set_screen_on(state_age(state));
+
 			if (state.state == AltosLib.ao_flight_stateless) {
 				boolean	prev_locked = false;
 				boolean locked = false;
@@ -370,7 +426,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 
 		for (AltosDroidTab mTab : mTabs)
-			mTab.update_ui(state, from_receiver, location, mTab == mTabsAdapter.currentItem());
+			mTab.update_ui(telem_state, state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
 		if (state != null && mAltosVoice != null)
 			mAltosVoice.tell(state, from_receiver);
@@ -427,9 +483,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		fm = getSupportFragmentManager();
 
 		// Set up the window layout
-		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.altosdroid);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 
 		// Create the Tabs and ViewPager
 		mTabHost = (TabHost)findViewById(android.R.id.tabhost);
@@ -447,11 +501,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mTabsAdapter.addTab(mTabHost.newTabSpec("map").setIndicator(create_tab_view("Map")), TabMap.class, null);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("offmap").setIndicator(create_tab_view("OffMap")), TabMapOffline.class, null);
 
-		// Set up the custom title
-		mTitle = (TextView) findViewById(R.id.title_left_text);
-		mTitle.setText(R.string.app_name);
-		mTitle = (TextView) findViewById(R.id.title_right_text);
-
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);
 		mVersion.setText("Version: " + BuildInfo.version +
@@ -465,6 +514,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mStateLayout   = (RelativeLayout) findViewById(R.id.state_container);
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
+		mAgeNewColor   = mAgeView.getTextColors().getDefaultColor();
+		mAgeOldColor   = getResources().getColor(R.color.old_color);
 	}
 
 	private boolean ensureBluetooth() {
@@ -737,6 +788,26 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
+	void select_tracker(int serial) {
+		int i;
+		for (i = 0; i < serials.length; i++)
+			if (serials[i] == serial)
+				break;
+		if (i == serials.length)
+			return;
+
+		AltosDebug.debug("Switching to serial %d\n", serial);
+		current_serial = serial;
+		update_state(null);
+	}
+
+	void delete_track(int serial) {
+		try {
+			mService.send(Message.obtain(null, TelemetryService.MSG_DELETE_SERIAL, (Integer) serial));
+		} catch (Exception ex) {
+		}
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent serverIntent = null;
@@ -817,8 +888,43 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			serverIntent = new Intent(this, MapTypeActivity.class);
 			startActivityForResult(serverIntent, REQUEST_MAP_TYPE);
 			return true;
+		case R.id.select_tracker:
+			if (serials != null) {
+				String[] trackers = new String[serials.length];
+				for (int i = 0; i < serials.length; i++)
+					trackers[i] = String.format("%d", serials[i]);
+				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
+				builder_serial.setTitle("Select a tracker");
+				builder_serial.setItems(trackers,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int item) {
+									select_tracker(serials[item]);
+								}
+							});
+				AlertDialog alert_serial = builder_serial.create();
+				alert_serial.show();
+
+			}
+			return true;
+		case R.id.delete_track:
+			if (serials != null) {
+				String[] trackers = new String[serials.length];
+				for (int i = 0; i < serials.length; i++)
+					trackers[i] = String.format("%d", serials[i]);
+				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
+				builder_serial.setTitle("Delete a track");
+				builder_serial.setItems(trackers,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int item) {
+									delete_track(serials[item]);
+								}
+							});
+				AlertDialog alert_serial = builder_serial.create();
+				alert_serial.show();
+
+			}
+			return true;
 		}
 		return false;
 	}
-
 }

@@ -30,8 +30,6 @@ import android.widget.TextView;
 import android.location.Location;
 
 public class TabPad extends AltosDroidTab {
-	AltosDroid mAltosDroid;
-
 	private TextView mBatteryVoltageView;
 	private TextView mBatteryVoltageLabel;
 	private GoNoGoLights mBatteryLights;
@@ -50,13 +48,6 @@ public class TabPad extends AltosDroidTab {
 	private TextView mPadLatitudeView;
 	private TextView mPadLongitudeView;
 	private TextView mPadAltitudeView;
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mAltosDroid = (AltosDroid) activity;
-		mAltosDroid.registerTab(this);
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -100,16 +91,9 @@ public class TabPad extends AltosDroidTab {
         return v;
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		mAltosDroid.unregisterTab(this);
-		mAltosDroid = null;
-	}
-
 	public String tab_name() { return "pad"; }
 
-	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
 			mBatteryVoltageView.setText(AltosDroid.number("%4.2f V", state.battery_voltage));
 			mBatteryLights.set(state.battery_voltage >= AltosLib.ao_battery_good, state.battery_voltage == AltosLib.MISSING);

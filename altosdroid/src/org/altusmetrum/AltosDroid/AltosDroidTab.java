@@ -29,11 +29,13 @@ import android.location.Location;
 import android.widget.TextView;
 
 public abstract class AltosDroidTab extends Fragment implements AltosUnitsListener {
+	TelemetryState		last_telem_state;
 	AltosState		last_state;
 	AltosGreatCircle	last_from_receiver;
 	Location		last_receiver;
+	AltosDroid		altos_droid;
 
-	public abstract void show(AltosState state, AltosGreatCircle from_receiver, Location receiver);
+	public abstract void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver);
 
 	public abstract String tab_name();
 
@@ -41,8 +43,8 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 	}
 
 	public void units_changed(boolean imperial_units) {
-		if (!isHidden() && last_state != null)
-			show(last_state, last_from_receiver, last_receiver);
+		if (!isHidden())
+			show(last_telem_state, last_state, last_from_receiver, last_receiver);
 	}
 
 	public void set_value(TextView text_view,
@@ -59,15 +61,25 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 		FragmentTransaction	ft = AltosDroid.fm.beginTransaction();
 		AltosDebug.debug("set visible %b %s\n", visible, tab_name());
 		if (visible) {
-			AltosState		state = last_state;
-			AltosGreatCircle	from_receiver = last_from_receiver;
-			Location		receiver = last_receiver;
-
 			ft.show(this);
-			show(state, from_receiver, receiver);
+			show(last_telem_state, last_state, last_from_receiver, last_receiver);
 		} else
 			ft.hide(this);
 		ft.commitAllowingStateLoss();
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		altos_droid = (AltosDroid) activity;
+		altos_droid.registerTab(this);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		altos_droid.unregisterTab(this);
+		altos_droid = null;
 	}
 
 	@Override
@@ -77,12 +89,16 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 		set_visible(true);
 	}
 
-	public void update_ui(AltosState state, AltosGreatCircle from_receiver, Location receiver, boolean is_current) {
+	public void update_ui(TelemetryState telem_state, AltosState state,
+			      AltosGreatCircle from_receiver, Location receiver, boolean is_current)
+	{
+		last_telem_state = telem_state;
 		last_state = state;
 		last_from_receiver = from_receiver;
 		last_receiver = receiver;
+		AltosDebug.debug("update_ui tab %s is_current %b\n", tab_name(), is_current);
 		if (is_current)
-			show(state, from_receiver, receiver);
+			show(telem_state, state, from_receiver, receiver);
 		else
 			return;
 	}

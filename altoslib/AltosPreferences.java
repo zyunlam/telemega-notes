@@ -19,6 +19,7 @@ package org.altusmetrum.altoslib_7;
 
 import java.io.*;
 import java.util.*;
+import java.text.*;
 
 public class AltosPreferences {
 	public static AltosPreferencesBackend backend = null;
@@ -42,7 +43,9 @@ public class AltosPreferences {
 	public final static String logfilePreferenceFormat = "LOGFILE-%d";
 
 	/* state preference name */
+	public final static String statePreferenceHead = "STATE-";
 	public final static String statePreferenceFormat = "STATE-%d";
+	public final static String statePreferenceLatest = "STATE-LATEST";
 
 	/* voice preference name */
 	public final static String voicePreference = "VOICE";
@@ -360,10 +363,41 @@ public class AltosPreferences {
 
 			synchronized(backend) {
 				backend.putBytes(String.format(statePreferenceFormat, serial), bytes);
+				backend.putInt(statePreferenceLatest, serial);
 				flush_preferences();
 			}
 		} catch (IOException ie) {
 		}
+	}
+
+	public static ArrayList<Integer> list_states() {
+		String[]		keys = backend.keys();
+		ArrayList<Integer>	states = new ArrayList<Integer>();
+
+		for (String key : keys) {
+			if (key.startsWith(statePreferenceHead)) {
+				try {
+					int serial = AltosParse.parse_int(key.substring(statePreferenceHead.length()));
+					states.add(serial);
+				} catch (ParseException pe) {
+				}
+			}
+		}
+		return states;
+	}
+
+	public static void remove_state(int serial) {
+		synchronized(backend) {
+			backend.remove(String.format(statePreferenceFormat, serial));
+		}
+	}
+
+	public static int latest_state() {
+		int	latest = 0;
+		synchronized (backend) {
+			latest = backend.getInt(statePreferenceLatest, 0);
+		}
+		return latest;
 	}
 
 	public static AltosSavedState state(int serial) {

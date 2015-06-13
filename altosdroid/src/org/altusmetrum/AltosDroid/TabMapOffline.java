@@ -54,8 +54,6 @@ class Rocket {
 
 public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
-	AltosDroid mAltosDroid;
-
 	AltosMap map;
 
 	AltosLatLon	here;
@@ -325,11 +323,9 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mAltosDroid = (AltosDroid) activity;
-		mAltosDroid.registerTab(this);
 
 		map = new AltosMap(this);
-		map.set_maptype(mAltosDroid.map_type);
+		map.set_maptype(altos_droid.map_type);
 
 		pad_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pad);
 		/* arrow at the bottom of the launchpad image */
@@ -345,12 +341,6 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 		/* Center of the dot */
 		here_off_x = here_bitmap.getWidth() / 2;
 		here_off_y = here_bitmap.getHeight() / 2;
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		mAltosDroid = null;
 	}
 
 	@Override
@@ -382,7 +372,6 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 	public void onDestroyView() {
 		super.onDestroyView();
 
-		mAltosDroid.unregisterTab(this);
 	}
 
 	private void center(double lat, double lon, double accuracy) {
@@ -395,7 +384,7 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 
 	public String tab_name() { return "offmap"; }
 
-	public void show(AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
 			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
@@ -411,20 +400,30 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 			}
 			if (state.pad_lat != AltosLib.MISSING && pad == null)
 				pad = new AltosLatLon(state.pad_lat, state.pad_lon);
+		}
 
-			int serial = state.serial;
-			if (serial == AltosLib.MISSING)
-				serial = 0;
+		if (telem_state != null) {
+			Integer[] old_serial = rockets.keySet().toArray(new Integer[0]);
+			Integer[] new_serial = telem_state.states.keySet().toArray(new Integer[0]);
 
-			Rocket	rocket = null;
+			/* remove deleted keys */
+			for (int serial : old_serial) {
+				if (!telem_state.states.containsKey(serial))
+					rockets.remove(serial);
+			}
 
-			if (state.gps != null && state.gps.locked) {
-				if (!rockets.containsKey(serial)) {
+			/* set remaining keys */
+
+			for (int serial : new_serial) {
+				Rocket 		rocket;
+				AltosState	t_state = telem_state.states.get(serial);
+				if (rockets.containsKey(serial))
+					rocket = rockets.get(serial);
+				else {
 					rocket = new Rocket(String.format("%d", serial), this);
 					rockets.put(serial, rocket);
-				} else
-					rocket = rockets.get(serial);
-				rocket.set_position(new AltosLatLon(state.gps.lat, state.gps.lon));
+				}
+				rocket.set_position(new AltosLatLon(t_state.gps.lat, t_state.gps.lon));
 			}
 		}
 
