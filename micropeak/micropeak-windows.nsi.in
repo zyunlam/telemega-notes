@@ -65,9 +65,9 @@ UninstPage instfiles
 Section "FTDI USB Driver"
 	SetOutPath $INSTDIR
 
-	File "CDM20824_Setup.exe"
+	File "CDM_v2.12.00_WHQL_Certified.exe"
 
-	StrCpy $2 "$INSTDIR\CDM20824_Setup.exe"
+	StrCpy $2 "$INSTDIR\CDM_v2.12.00_WHQL_Certified.exe"
 	ExecWait $2
 SectionEnd
 
