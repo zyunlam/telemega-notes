@@ -86,10 +86,17 @@ public abstract class AltosLink implements Runnable {
 
 	public boolean	reply_abort;
 	public int	in_reply;
+	boolean	cancel_enable = true;
+
+	public void set_cancel_enable(boolean e) {
+		cancel_enable = e;
+	}
 
 	boolean		reply_timeout_shown = false;
 
 	private boolean check_reply_timeout() {
+		if (!cancel_enable)
+			return false;
 		if (!reply_timeout_shown)
 			reply_timeout_shown = show_reply_timeout();
 		return reply_abort;
