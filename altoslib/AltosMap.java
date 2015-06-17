@@ -154,7 +154,6 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public void set_transform() {
-		debug("set_transform, centre is %s\n", centre);
 		if (centre != null) {
 			transform = new AltosMapTransform(width(), height(), zoom, centre);
 			repaint();
