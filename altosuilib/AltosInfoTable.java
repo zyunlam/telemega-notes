@@ -137,6 +137,8 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 		if (state != null) {
 			if (state.device_type != AltosLib.MISSING)
 				info_add_row(0, "Device", "%s", AltosLib.product_name(state.device_type));
+			else if (state.product != null)
+				info_add_row(0, "Device", "%s", state.product);
 			if (state.altitude() != AltosLib.MISSING)
 				info_add_row(0, "Altitude", "%6.0f    m", state.altitude());
 			if (state.ground_altitude() != AltosLib.MISSING)
