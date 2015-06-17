@@ -136,6 +136,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 	public void changedUpdate(DocumentEvent e) {
 		if (callsign_value != null) {
 			String	callsign = callsign_value.getText();
+			System.out.printf("callsign set to %s\n", callsign);
 			thread.set_callsign(callsign);
 			AltosUIPreferences.set_callsign(callsign);
 		}
@@ -147,30 +148,6 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 	public void removeUpdate(DocumentEvent e) {
 		changedUpdate(e);
-	}
-
-	int row = 0;
-
-	public GridBagConstraints constraints (int x, int width, int fill) {
-		GridBagConstraints c = new GridBagConstraints();
-		Insets insets = new Insets(4, 4, 4, 4);
-
-		c.insets = insets;
-		c.fill = fill;
-		if (width == 3)
-			c.anchor = GridBagConstraints.CENTER;
-		else if (x == 2)
-			c.anchor = GridBagConstraints.EAST;
-		else
-			c.anchor = GridBagConstraints.WEST;
-		c.gridx = x;
-		c.gridwidth = width;
-		c.gridy = row;
-		return c;
-	}
-
-	public GridBagConstraints constraints(int x, int width) {
-		return constraints(x, width, GridBagConstraints.NONE);
 	}
 
 	void idle_exception(JFrame owner, Exception e) {
@@ -226,11 +203,14 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		AltosSerial link;
 		try {
 			link = new AltosSerial(device);
-			link.set_frame(this);
 		} catch (Exception ex) {
 			idle_exception(in_owner, ex);
 			return;
 		}
+		link.set_frame(this);
+
+		/* We let the user set the freq/callsign, so don't bother with the cancel dialog */
+		link.set_cancel_enable(false);
 
 		bag = getContentPane();
 		bag.setLayout(new GridBagLayout());
@@ -239,6 +219,8 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 		/* Stick frequency selector at top of table for telemetry monitoring */
 		if (remote && serial >= 0) {
+			set_inset(3);
+
 			// Frequency menu
 			frequencies = new AltosUIFreqList(AltosUIPreferences.frequency(serial));
 			frequencies.addActionListener(new ActionListener() {
@@ -255,15 +237,17 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 			callsign_value = new JTextField(AltosUIPreferences.callsign());
 			callsign_value.getDocument().addDocumentListener(this);
 			callsign_value.setToolTipText("Callsign sent in packet mode");
-			bag.add(callsign_value, constraints(2, 1, GridBagConstraints.BOTH));
-			row++;
+			bag.add(callsign_value, constraints(2, 1, GridBagConstraints.HORIZONTAL));
+			next_row();
 		}
 
+		set_inset(0);
 
 		/* Flight status is always visible */
 		flightStatus = new AltosFlightStatus();
-		bag.add(flightStatus, constraints(0, 3, GridBagConstraints.HORIZONTAL));
-		row++;
+		bag.add(flightStatus, constraints(0, 4, GridBagConstraints.HORIZONTAL));
+
+		next_row();
 
 		/* The rest of the window uses a tabbed pane to
 		 * show one of the alternate data views
@@ -281,7 +265,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		sitemap = new AltosUIMapNew();
 
 		/* Make the tabbed pane use the rest of the window space */
-		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));
+		bag.add(pane, constraints(0, 4, GridBagConstraints.BOTH));
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
