@@ -481,8 +481,6 @@ public class TeleGPS
 		bag = getContentPane();
 		bag.setLayout(new GridBagLayout());
 
-		GridBagConstraints c = new GridBagConstraints();
-
 		setTitle("TeleGPS");
 
 		menu_bar = new JMenuBar();
@@ -492,25 +490,16 @@ public class TeleGPS
 		monitor_menu = make_menu("Monitor", monitor_menu_entries);
 		device_menu = make_menu("Device", device_menu_entries);
 
+		set_inset(3);
 		frequencies = new AltosUIFreqList();
 		frequencies.setEnabled(false);
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.anchor = GridBagConstraints.WEST;
-		c.weightx = 0;
-		c.gridwidth = 1;
-		bag.add(frequencies, c);
+		bag.add(frequencies, constraints (0, 1));
 
 		rates = new AltosUIRateList();
 		rates.setEnabled(false);
-		c.gridx = 1;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.anchor = GridBagConstraints.WEST;
-		c.weightx = 0;
-		c.gridwidth = 1;
-		bag.add(rates, c);
+		bag.add(rates, constraints(1, 1));
+		next_row();
+		set_inset(0);
 
 		displays = new LinkedList<AltosFlightDisplay>();
 
@@ -518,13 +507,9 @@ public class TeleGPS
 
 		/* TeleGPS status is always visible */
 		telegps_status = new TeleGPSStatus();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		c.gridwidth = 2;
-		bag.add(telegps_status, c);
-		c.gridwidth = 1;
+		bag.add(telegps_status, constraints(0, 3, GridBagConstraints.HORIZONTAL));
+		next_row();
+
 		displays.add(telegps_status);
 
 
@@ -534,13 +519,7 @@ public class TeleGPS
 		pane = new JTabbedPane();
 
 		/* Make the tabbed pane use the rest of the window space */
-		c.gridx = 0;
-		c.gridy = 2;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.gridwidth = 2;
-		bag.add(pane, c);
+		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));
 
 		map = new AltosUIMapNew();
 		pane.add(map.getName(), map);
