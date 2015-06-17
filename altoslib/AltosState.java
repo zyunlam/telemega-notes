@@ -1040,6 +1040,10 @@ public class AltosState implements Cloneable, Serializable {
 		return AltosLib.state_name(state);
 	}
 
+	public void set_product(String product) {
+		this.product = product;
+	}
+
 	public void set_state(int state) {
 		if (state != AltosLib.ao_flight_invalid) {
 			this.state = state;
