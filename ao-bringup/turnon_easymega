@@ -38,7 +38,7 @@ $USBLOAD --serial=$SERIAL $REPO/easymega-v$VERSION*.elf || exit 1
 
 sleep 2
 
-dev=`ao-list | awk '/EasyMega-v'"$VERSION"'/ { print $3; exit(0); }'`
+dev=`../ao-tools/ao-list/ao-list | awk '/EasyMega-v'"$VERSION"'/ { print $3; exit(0); }'`
 
 case "$dev" in
 /dev/tty*)
