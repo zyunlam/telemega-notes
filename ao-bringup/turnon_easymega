@@ -1,14 +1,14 @@
 #!/bin/sh
 
-if [ -x /usr/bin/ao-flash-stm ]; then
-	STMLOAD=/usr/bin/ao-flash-stm
+if [ -x ../ao-tools/ao-flash/ao-flash-stm ]; then
+	STMLOAD=../ao-tools/ao-flash/ao-flash-stm
 else
 	echo "Can't find ao-flash-stm!  Aborting."
 	exit 1
 fi
 
-if [ -x /usr/bin/ao-usbload ]; then
-	USBLOAD=/usr/bin/ao-usbload
+if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
+	USBLOAD=../ao-tools/ao-usbload/ao-usbload
 else
 	echo "Can't find ao-usbload!  Aborting."
 	exit 1
