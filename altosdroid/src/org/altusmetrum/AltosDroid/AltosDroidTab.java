@@ -96,7 +96,6 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 		last_state = state;
 		last_from_receiver = from_receiver;
 		last_receiver = receiver;
-		AltosDebug.debug("update_ui tab %s is_current %b\n", tab_name(), is_current);
 		if (is_current)
 			show(telem_state, state, from_receiver, receiver);
 		else
