@@ -21,6 +21,19 @@ public class AltosFrequency {
 	public double	frequency;
 	public String	description;
 
+	public int hashCode() {
+		return new Double(frequency).hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (!(o instanceof AltosFrequency))
+			return false;
+		AltosFrequency other = (AltosFrequency) o;
+		return other.frequency == frequency;
+	}
+
 	public String toString() {
 		return String.format("%7.3f MHz %-20s",
 				     frequency, description);

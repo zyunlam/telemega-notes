@@ -20,7 +20,19 @@ package org.altusmetrum.altoslib_7;
 public class AltosPointInt {
 	public int	x, y;
 
-	public boolean equals(AltosPointInt n) {
+	public int hashCode() {
+		return  x ^ y;
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (!(o instanceof AltosPointInt))
+			return false;
+
+		AltosPointInt n = (AltosPointInt) o;
+
 		return n.x == x && n.y == y;
 	}
 

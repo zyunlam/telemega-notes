@@ -21,9 +21,17 @@ public class AltosLatLon {
 	public double	lat;
 	public double	lon;
 
-	public boolean equals(AltosLatLon other) {
-		if (other == null)
+	public int hashCode() {
+		return new Double(lat).hashCode() ^ new Double(lon).hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
 			return false;
+		if (!(o instanceof AltosLatLon))
+			return false;
+
+		AltosLatLon other = (AltosLatLon) o;
 		return lat == other.lat && lon == other.lon;
 	}
 

@@ -175,7 +175,18 @@ public class AltosMapStore {
 		}
 	}
 
-	public boolean equals(AltosMapStore other) {
+	public int hashCode() {
+		return url.hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (!(o instanceof AltosMapStore))
+			return false;
+
+		AltosMapStore other = (AltosMapStore) o;
 		return url.equals(other.url);
 	}
 

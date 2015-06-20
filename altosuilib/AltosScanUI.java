@@ -62,9 +62,18 @@ class AltosScanResult {
 		rate = in_rate;
 	}
 
-	public boolean equals(AltosScanResult other) {
+	public int hashCode() {
+		return serial ^ frequency.hashCode() ^ telemetry ^ rate;
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (!(o instanceof AltosScanResult))
+			return false;
+		AltosScanResult other = (AltosScanResult) o;
 		return (serial == other.serial &&
-			frequency.frequency == other.frequency.frequency &&
+			frequency.equals(other.frequency) &&
 			telemetry == other.telemetry &&
 			rate == other.rate);
 	}

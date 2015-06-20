@@ -26,9 +26,18 @@ public class AltosMapPathPoint {
 	public AltosLatLon	lat_lon;
 	public int		state;
 
-	public boolean equals(AltosMapPathPoint other) {
-		if (other == null)
+	public int hashCode() {
+		return lat_lon.hashCode() ^ state;
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
 			return false;
+
+		if (!(o instanceof AltosMapPathPoint))
+			return false;
+
+		AltosMapPathPoint other = (AltosMapPathPoint) o;
 
 		return lat_lon.equals(other.lat_lon) && state == other.state;
 	}

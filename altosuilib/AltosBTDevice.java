@@ -104,15 +104,18 @@ public class AltosBTDevice extends altos_bt_device implements AltosDevice {
 		return false;
 	}
 
+	public int hashCode() {
+		return getName().hashCode() ^ getAddr().hashCode();
+	}
+
 	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
 		if (!(o instanceof AltosBTDevice))
 			return false;
 		AltosBTDevice other = (AltosBTDevice) o;
 		return getName().equals(other.getName()) && getAddr().equals(other.getAddr());
-	}
-
-	public int hashCode() {
-		return getName().hashCode() ^ getAddr().hashCode();
 	}
 
 	public AltosBTDevice(String name, String addr) {

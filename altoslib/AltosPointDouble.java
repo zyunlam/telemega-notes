@@ -20,7 +20,19 @@ package org.altusmetrum.altoslib_7;
 public class AltosPointDouble {
 	public double	x, y;
 
-	public boolean equals(AltosPointDouble n) {
+	public int hashCode() {
+		return new Double(x).hashCode() ^ new Double(y).hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (!(o instanceof AltosPointDouble))
+			return false;
+
+		AltosPointDouble n = (AltosPointDouble) o;
+
 		return n.x == x && n.y == y;
 	}
 
