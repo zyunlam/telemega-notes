@@ -39,6 +39,10 @@ public class AltosMapTransform {
 		return new AltosLatLon(lat,lon);
 	}
 
+	public AltosLatLon lat_lon (AltosPointInt point) {
+		return lat_lon(new AltosPointDouble(point.x, point.y));
+	}
+
 	public AltosPointDouble screen_point(AltosPointInt screen) {
 		return new AltosPointDouble(screen.x + offset_x, screen.y + offset_y);
 	}

@@ -280,29 +280,23 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			upper_left = floor(transform.screen_point(new AltosPointInt(0, 0)));
 			lower_right = floor(transform.screen_point(new AltosPointInt(width(), height())));
 		}
-		LinkedList<AltosPointInt> to_remove = new LinkedList<AltosPointInt>();
-
 		for (AltosPointInt point : tiles.keySet()) {
 			if (point.x < upper_left.x || lower_right.x < point.x ||
 			    point.y < upper_left.y || lower_right.y < point.y) {
-				to_remove.add(point);
+				tiles.remove(point);
 			}
 		}
-
-		for (AltosPointInt point : to_remove)
-			tiles.remove(point);
 
 		cache.set_cache_size((width() / AltosMap.px_size + 2) * (height() / AltosMap.px_size + 2));
 
 		for (int y = (int) upper_left.y; y <= lower_right.y; y += AltosMap.px_size) {
 			for (int x = (int) upper_left.x; x <= lower_right.x; x += AltosMap.px_size) {
-				AltosPointInt point = new AltosPointInt(x, y);
+				AltosPointInt	point = new AltosPointInt(x, y);
 
 				if (!tiles.containsKey(point)) {
-					AltosLatLon	ul = transform.lat_lon(new AltosPointDouble(x, y));
+					AltosLatLon	ul = transform.lat_lon(point);
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
-					AltosMapTile tile = map_interface.new_tile(this, ul, center, zoom, maptype,
-										   px_size);
+					AltosMapTile tile = map_interface.new_tile(this, ul, center, zoom, maptype, px_size);
 					tiles.put(point, tile);
 				}
 			}
