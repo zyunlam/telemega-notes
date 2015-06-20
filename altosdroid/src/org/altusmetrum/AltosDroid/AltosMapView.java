@@ -79,7 +79,11 @@ public class AltosMapView extends View implements ScaleGestureDetector.OnScaleGe
 		line.set_b(tab.here);
 		line.paint();
 		draw_bitmap(tab.pad, tab.pad_bitmap, tab.pad_off_x, tab.pad_off_y);
-		for (Rocket rocket : tab.rockets.values())
+
+		Rocket[]	rockets = tab.rockets.values().toArray(new Rocket[0]);
+
+		Arrays.sort(rockets);
+		for (Rocket rocket : rockets)
 			rocket.paint();
 		draw_bitmap(tab.here, tab.here_bitmap, tab.here_off_x, tab.here_off_y);
 	}
