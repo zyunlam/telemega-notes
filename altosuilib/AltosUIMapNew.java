@@ -140,17 +140,23 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 			int	zoom_change = e.getWheelRotation();
 
 			map.notice_user_input();
-			AltosLatLon	mouse_lat_lon = map.transform.screen_lat_lon(new AltosPointInt(e.getPoint().x, e.getPoint().y));
+			AltosLatLon	mouse_lat_lon = null;
+
+			if (map.transform != null)
+				mouse_lat_lon = map.transform.screen_lat_lon(new AltosPointInt(e.getPoint().x, e.getPoint().y));
+
 			map.set_zoom(map.get_zoom() - zoom_change);
 
-			AltosPointDouble	new_mouse = map.transform.screen(mouse_lat_lon);
+			if (mouse_lat_lon != null) {
+				AltosPointDouble	new_mouse = map.transform.screen(mouse_lat_lon);
 
-			int	dx = getWidth()/2 - e.getPoint().x;
-			int	dy = getHeight()/2 - e.getPoint().y;
+				int	dx = getWidth()/2 - e.getPoint().x;
+				int	dy = getHeight()/2 - e.getPoint().y;
 
-			AltosLatLon	new_centre = map.transform.screen_lat_lon(new AltosPointInt((int) new_mouse.x + dx, (int) new_mouse.y + dy));
+				AltosLatLon	new_centre = map.transform.screen_lat_lon(new AltosPointInt((int) new_mouse.x + dx, (int) new_mouse.y + dy));
 
-			map.centre(new_centre);
+				map.centre(new_centre);
+			}
 		}
 
 		/* ComponentListener methods */
