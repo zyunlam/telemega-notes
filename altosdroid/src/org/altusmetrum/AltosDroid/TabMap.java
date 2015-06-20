@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import java.util.Arrays;
+import java.util.*;
 
 import org.altusmetrum.altoslib_7.*;
 
@@ -48,7 +48,7 @@ public class TabMap extends AltosDroidTab {
 	private GoogleMap mMap;
 	private boolean mapLoaded = false;
 
-	private Marker mRocketMarker;
+	private HashMap<Integer,Marker> rockets = new HashMap<Integer,Marker>();
 	private Marker mPadMarker;
 	private boolean pad_set;
 	private Polyline mPolyline;
@@ -61,6 +61,9 @@ public class TabMap extends AltosDroidTab {
 	private TextView mReceiverLongitudeView;
 
 	private double mapAccuracy = -1;
+
+	private AltosLatLon my_position = null;
+	private AltosLatLon target_position = null;
 
 	private Bitmap rocket_bitmap(String text) {
 
@@ -95,7 +98,7 @@ public class TabMap extends AltosDroidTab {
 		return mMap.addMarker(new MarkerOptions()
 				      .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
 				      .position(new LatLng(lat, lon))
-				      .visible(false));
+				      .visible(true));
 	}
 
 	@Override
@@ -140,8 +143,6 @@ public class TabMap extends AltosDroidTab {
 
 			Bitmap label_bitmap = rocket_bitmap("hello");
 
-			mRocketMarker = rocket_marker(1800,0,0);
-
 			mPadMarker = mMap.addMarker(
 					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.pad))
 					                   .position(new LatLng(0,0))
@@ -150,7 +151,7 @@ public class TabMap extends AltosDroidTab {
 
 			mPolyline = mMap.addPolyline(
 					new PolylineOptions().add(new LatLng(0,0), new LatLng(0,0))
-					                     .width(3)
+					                     .width(20)
 					                     .color(Color.BLUE)
 					                     .visible(false)
 					);
@@ -168,24 +169,47 @@ public class TabMap extends AltosDroidTab {
 
 	public String tab_name() { return "map"; }
 
+	private void set_rocket(int serial, AltosState state) {
+		Marker	marker;
+
+		if (state.gps == null || state.gps.lat == AltosLib.MISSING)
+			return;
+
+		if (rockets.containsKey(serial)) {
+			marker = rockets.get(serial);
+			marker.setPosition(new LatLng(state.gps.lat, state.gps.lon));
+		} else {
+			marker = rocket_marker(serial, state.gps.lat, state.gps.lon);
+			rockets.put(serial, marker);
+			marker.setVisible(true);
+		}
+	}
+
+	private void remove_rocket(int serial) {
+		Marker marker = rockets.get(serial);
+		marker.remove();
+		rockets.remove(serial);
+	}
+
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
 			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
 		}
 
+		if (telem_state != null) {
+			for (int serial : rockets.keySet()) {
+				if (!telem_state.states.containsKey(serial))
+					remove_rocket(serial);
+			}
+
+			for (int serial : telem_state.states.keySet()) {
+				set_rocket(serial, telem_state.states.get(serial));
+			}
+		}
+
 		if (state != null) {
 			if (mapLoaded) {
-				if (state.gps != null) {
-					mRocketMarker.setPosition(new LatLng(state.gps.lat, state.gps.lon));
-					mRocketMarker.setTitle("hello world");
-					mRocketMarker.setSnippet("hello");
-					mRocketMarker.setVisible(true);
-
-					mPolyline.setPoints(Arrays.asList(new LatLng(state.pad_lat, state.pad_lon), new LatLng(state.gps.lat, state.gps.lon)));
-					mPolyline.setVisible(true);
-				}
-
 				if (!pad_set && state.pad_lat != AltosLib.MISSING) {
 					pad_set = true;
 					mPadMarker.setPosition(new LatLng(state.pad_lat, state.pad_lon));
@@ -193,6 +217,9 @@ public class TabMap extends AltosDroidTab {
 				}
 			}
 			if (state.gps != null) {
+
+				target_position = new AltosLatLon(state.gps.lat, state.gps.lon);
+
 				mTargetLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
 				mTargetLongitudeView.setText(AltosDroid.pos(state.gps.lon, "E", "W"));
 				if (state.gps.locked && state.gps.nsat >= 4)
@@ -207,9 +234,16 @@ public class TabMap extends AltosDroidTab {
 				accuracy = receiver.getAccuracy();
 			else
 				accuracy = 1000;
-			mReceiverLatitudeView.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
-			mReceiverLongitudeView.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
-			center (receiver.getLatitude(), receiver.getLongitude(), accuracy);
+
+			my_position = new AltosLatLon(receiver.getLatitude(), receiver.getLongitude());
+			mReceiverLatitudeView.setText(AltosDroid.pos(my_position.lat, "N", "S"));
+			mReceiverLongitudeView.setText(AltosDroid.pos(my_position.lon, "E", "W"));
+			center (my_position.lat, my_position.lon, accuracy);
+		}
+
+		if (my_position != null && target_position != null) {
+			mPolyline.setPoints(Arrays.asList(new LatLng(my_position.lat, my_position.lon), new LatLng(target_position.lat, target_position.lon)));
+			mPolyline.setVisible(true);
 		}
 
 	}
