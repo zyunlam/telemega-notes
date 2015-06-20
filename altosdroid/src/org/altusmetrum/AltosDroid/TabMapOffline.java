@@ -32,9 +32,10 @@ import android.widget.*;
 import android.location.Location;
 import android.content.*;
 
-class Rocket {
+class Rocket implements Comparable {
 	AltosLatLon	position;
 	String		name;
+	long		last_packet;
 	TabMapOffline	tab;
 
 	void paint() {
@@ -42,13 +43,26 @@ class Rocket {
 		tab.draw_text(position, name, 0, 3*tab.rocket_bitmap.getHeight()/4);
 	}
 
-	void set_position(AltosLatLon position) {
+	void set_position(AltosLatLon position, long last_packet) {
 		this.position = position;
+		this.last_packet = last_packet;
 	}
 
 	Rocket(String name, TabMapOffline tab) {
 		this.name = name;
 		this.tab = tab;
+	}
+
+	public int compareTo(Object o) {
+		Rocket other = (Rocket) o;
+
+		long	diff = last_packet - other.last_packet;
+
+		if (diff > 0)
+			return 1;
+		if (diff < 0)
+			return -1;
+		return 0;
 	}
 }
 
@@ -137,57 +151,8 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 		CYAN,   // stateless
 	};
 
-	class MapPath extends AltosMapPath {
-
-		boolean line_in(AltosPointDouble a, AltosPointDouble b) {
-			final Rect bounds = canvas.getClipBounds();
-			int left = (int) Math.floor (Math.min((float) a.x, (float) b.x) - stroke_width / 2.0f);
-			int right = (int) Math.ceil(Math.max((float) a.x, (float) b.x) + stroke_width / 2.0f);
-			int top = (int) Math.floor(Math.min((float) a.y, (float) b.y) - stroke_width / 2.0f);
-			int bottom = (int) Math.ceil(Math.max((float) a.y, (float) b.y) + stroke_width / 2.0f);
-
-			return left < bounds.right && bounds.left < right &&
-				top < bounds.bottom && bounds.top < bottom;
-		}
-
-		public void paint(AltosMapTransform t) {
-			AltosPointDouble	prev = null;
-			int			cur_color = paint.getColor();
-
-			for (AltosMapPathPoint point : points) {
-				AltosPointDouble	cur = t.screen(point.lat_lon);
-
-				if (prev != null && line_in(prev, cur)) {
-					int color;
-					if (0 <= point.state && point.state < stateColors.length)
-						color = stateColors[point.state];
-					else
-						color = stateColors[AltosLib.ao_flight_invalid];
-					if (color != cur_color) {
-						paint.setColor(color);
-						cur_color = color;
-					}
-					canvas.drawLine((float) prev.x, (float) prev.y, (float) cur.x, (float) cur.y, paint);
-				}
-				prev = cur;
-			}
-		}
-
-		public MapPath() {
-			stroke_width = TabMapOffline.this.stroke_width;
-		}
-	}
-
 	public AltosMapPath new_path() {
 		return null;
-	}
-
-	class MapLine extends AltosMapLine {
-		public void paint(AltosMapTransform t) {
-		}
-
-		public MapLine() {
-		}
 	}
 
 	public AltosMapLine new_line() {
@@ -423,7 +388,8 @@ public class TabMapOffline extends AltosDroidTab implements AltosMapInterface {
 					rocket = new Rocket(String.format("%d", serial), this);
 					rockets.put(serial, rocket);
 				}
-				rocket.set_position(new AltosLatLon(t_state.gps.lat, t_state.gps.lon));
+				if (t_state.gps != null)
+					rocket.set_position(new AltosLatLon(t_state.gps.lat, t_state.gps.lon), t_state.received_time);
 			}
 		}
 
