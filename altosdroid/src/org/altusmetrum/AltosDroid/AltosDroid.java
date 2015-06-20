@@ -248,9 +248,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
-	boolean	registered_units_listener;
-
 	int	current_serial;
+	long	switch_time;
+
+	void set_switch_time() {
+		switch_time = System.currentTimeMillis();
+	}
+
+	boolean	registered_units_listener;
 
 	void update_state(TelemetryState new_telemetry_state) {
 
@@ -269,11 +274,35 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 		update_title(telemetry_state);
 
-		AltosDebug.debug("update state current serial %d\n", current_serial);
-
 		AltosState	state = null;
-		if (telemetry_state.states.containsKey(current_serial))
+		boolean		aged = true;
+
+		if (telemetry_state.states.containsKey(current_serial)) {
 			state = telemetry_state.states.get(current_serial);
+			int age = state_age(state);
+			if (age < 20)
+				aged = false;
+			if (switch_time != 0 && (switch_time - state.received_time) > 0)
+				aged = true;
+		}
+
+		if (aged) {
+			AltosState	newest_state = null;
+			int		newest_age = 0;
+
+			for (int serial : telemetry_state.states.keySet()) {
+				AltosState	existing = telemetry_state.states.get(serial);
+				int		existing_age = state_age(existing);
+
+				if (newest_state == null || existing_age < newest_age) {
+					newest_state = existing;
+					newest_age = existing_age;
+				}
+			}
+
+			if (newest_state != null)
+				state = newest_state;
+		}
 
 		update_ui(telemetry_state, state, telemetry_state.location);
 
@@ -750,6 +779,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	void setFrequency(double freq) {
 		try {
 			mService.send(Message.obtain(null, TelemetryService.MSG_SETFREQUENCY, freq));
+			set_switch_time();
 		} catch (RemoteException e) {
 		}
 	}
@@ -764,6 +794,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	void setBaud(int baud) {
 		try {
 			mService.send(Message.obtain(null, TelemetryService.MSG_SETBAUD, baud));
+			set_switch_time();
 		} catch (RemoteException e) {
 		}
 	}
@@ -796,7 +827,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		if (i == serials.length)
 			return;
 
-		AltosDebug.debug("Switching to serial %d\n", serial);
 		current_serial = serial;
 		update_state(null);
 	}
