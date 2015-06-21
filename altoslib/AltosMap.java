@@ -166,6 +166,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 
 	public boolean set_zoom(int zoom) {
+		notice_user_input();
 		if (AltosMap.min_zoom <= zoom && zoom <= AltosMap.max_zoom && zoom != this.zoom) {
 			this.zoom = zoom;
 			tiles.clear();
@@ -174,6 +175,29 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean set_zoom_centre(int zoom, AltosPointInt centre) {
+		AltosLatLon	mouse_lat_lon = null;
+		boolean		ret;
+
+		if (transform != null)
+			mouse_lat_lon = transform.screen_lat_lon(centre);
+
+		ret = set_zoom(zoom);
+
+		if (ret && mouse_lat_lon != null) {
+			AltosPointDouble	new_mouse = transform.screen(mouse_lat_lon);
+
+			double	dx = width()/2.0 - centre.x;
+			double	dy = height()/2.0 - centre.y;
+
+			AltosLatLon	new_centre = transform.screen_lat_lon(new AltosPointDouble(new_mouse.x + dx, new_mouse.y + dy));
+
+			centre(new_centre);
+		}
+
+		return ret;
 	}
 
 	public int get_zoom() {
