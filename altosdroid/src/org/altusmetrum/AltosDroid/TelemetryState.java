@@ -32,6 +32,7 @@ public class TelemetryState {
 	AltosConfigData	config;
 	Location	location;
 	int		crc_errors;
+	double		receiver_battery;
 	double		frequency;
 	int		telemetry_rate;
 
@@ -45,6 +46,7 @@ public class TelemetryState {
 		states = new HashMap<Integer,AltosState>();
 		location = null;
 		crc_errors = 0;
+		receiver_battery = AltosLib.MISSING;
 		frequency = AltosPreferences.frequency(0);
 		telemetry_rate = AltosPreferences.telemetry_rate(0);
 	}

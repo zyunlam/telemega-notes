@@ -45,7 +45,6 @@ import android.location.Criteria;
 
 import org.altusmetrum.altoslib_7.*;
 
-
 public class TelemetryService extends Service implements LocationListener {
 
 	static final int MSG_REGISTER_CLIENT   = 1;
@@ -305,6 +304,8 @@ public class TelemetryService extends Service implements LocationListener {
 		if (altos_link != null)
 			altos_link.closing();
 
+		stop_receiver_voltage_timer();
+
 		if (telemetry_reader != null) {
 			AltosDebug.debug("disconnect(): stopping TelemetryReader");
 			telemetry_reader.interrupt();
@@ -367,6 +368,35 @@ public class TelemetryService extends Service implements LocationListener {
 		send_to_clients();
 	}
 
+	// Timer for receiver battery voltage monitoring
+	Timer receiver_voltage_timer;
+
+	private void update_receiver_voltage() {
+		if (altos_link != null) {
+			try {
+				double	voltage = altos_link.monitor_battery();
+				AltosDebug.debug("update receiver voltage %g\n", voltage);
+				telemetry_state.receiver_battery = voltage;
+			} catch (InterruptedException ie) {
+			}
+		}
+	}
+
+	private void stop_receiver_voltage_timer() {
+		if (receiver_voltage_timer != null) {
+			receiver_voltage_timer.cancel();
+			receiver_voltage_timer.purge();
+			receiver_voltage_timer = null;
+		}
+	}
+
+	private void start_receiver_voltage_timer() {
+		if (receiver_voltage_timer == null && altos_link.has_monitor_battery()) {
+			receiver_voltage_timer = new Timer();
+			receiver_voltage_timer.scheduleAtFixedRate(new TimerTask() { public void run() {update_receiver_voltage();}}, 1000L, 10000L);
+		}
+	}
+
 	private void connected() throws InterruptedException {
 		AltosDebug.debug("connected top");
 		AltosDebug.check_ui("connected\n");
@@ -400,6 +430,8 @@ public class TelemetryService extends Service implements LocationListener {
 		AltosDebug.debug("connected TelemetryReader started");
 
 		telemetry_logger = new TelemetryLogger(this, altos_link);
+
+		start_receiver_voltage_timer();
 
 		AltosDebug.debug("Notify UI of connection");
 

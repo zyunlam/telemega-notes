@@ -60,6 +60,43 @@
 
 	<RelativeLayout
 		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" >
+
+		<ImageView
+			android:id="@+id/receiver_redled"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/receiver_voltage_label"
+			android:src="@drawable/grayled" />
+
+		<ImageView
+			android:id="@+id/receiver_greenled"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toRightOf="@id/receiver_redled"
+			android:contentDescription="@string/receiver_voltage_label"
+			android:paddingRight="5dp"
+			android:src="@drawable/grayled" />
+
+		<TextView
+			android:id="@+id/receiver_voltage_label"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toRightOf="@id/receiver_greenled"
+			android:text="@string/receiver_voltage_label" />
+
+		<TextView
+			android:id="@+id/receiver_voltage_value"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/receiver_voltage_label"
+			android:layout_toRightOf="@id/receiver_greenled"
+			android:text=""
+			android:textAppearance="?android:attr/textAppearanceSmall" />
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:paddingTop="5dp" >
 

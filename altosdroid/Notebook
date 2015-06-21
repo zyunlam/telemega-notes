@@ -15,8 +15,6 @@ Desired AltosDroid feature list
 
  *) Monitor-idle mode
 
- *) TeleBT battery voltage
-
  *) Select tracker by clicking map
 
  *) Auto select tracker after long delay
@@ -92,5 +90,9 @@ Completed features
 	Done
 
  *) Provide units for age field, turn red if old
+
+	Done
+
+ *) TeleBT battery voltage
 
 	Done

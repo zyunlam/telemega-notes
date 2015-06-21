@@ -76,6 +76,7 @@
 	<string name="max_speed_label">Max Speed</string>
 	<string name="max_accel_label">Max Accel</string>
 	<string name="battery_voltage_label">Battery Voltage</string>
+	<string name="receiver_voltage_label">Receiver Battery</string>
 	<string name="apogee_voltage_label">Apogee Igniter Voltage</string>
 	<string name="main_voltage_label">Main Igniter Voltage</string>
 	<string name="logging_label">On-board Data Logging</string>
