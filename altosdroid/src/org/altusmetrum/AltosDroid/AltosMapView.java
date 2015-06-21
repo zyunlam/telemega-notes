@@ -115,12 +115,13 @@ public class AltosMapView extends View implements ScaleGestureDetector.OnScaleGe
 
 	public boolean onScale(ScaleGestureDetector detector) {
 		float	f = detector.getScaleFactor();
+
 		if (f <= 0.8) {
-			tab.map.set_zoom(tab.map.get_zoom() - 1);
+			tab.map.set_zoom_centre(tab.map.get_zoom() - 1, new AltosPointInt((int) detector.getFocusX(), (int) detector.getFocusY()));
 			return true;
 		}
 		if (f >= 1.2) {
-			tab.map.set_zoom(tab.map.get_zoom() + 1);
+			tab.map.set_zoom_centre(tab.map.get_zoom() + 1, new AltosPointInt((int) detector.getFocusX(), (int) detector.getFocusY()));
 			return true;
 		}
 		return false;
