@@ -36,6 +36,7 @@
 	<string name="select_tracker">Select Tracker</string>
 	<string name="delete_track">Delete Track</string>
 	<string name="map_type">Map Type</string>
+	<string name="map_source">Toggle Online/Offline maps</string>
 
 	<!-- MapTypeActivity -->
 	<string name="map_type">Map Type</string>

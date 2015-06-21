@@ -37,6 +37,9 @@
     <item android:id="@+id/map_type"
 	  android:icon="@android:drawable/ic_menu_mapmode"
 	  android:title="@string/map_type" />
+    <item android:id="@+id/map_source"
+	  android:icon="@android:drawable/ic_menu_mapmode"
+	  android:title="@string/map_source" />
     <item android:id="@+id/select_tracker"
 	  android:icon="@android:drawable/ic_menu_view"
 	  android:title="@string/select_tracker"/>

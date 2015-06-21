@@ -449,9 +449,6 @@ public class TelemetryService extends Service implements LocationListener {
 			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
 		}
 
-		// Initialise preferences
-		AltosDroidPreferences.init(this);
-
 		telemetry_state = new TelemetryState();
 
 		// Create a reference to the NotificationManager so that we can update our notifcation text later

@@ -27,6 +27,14 @@ public class AltosDroidPreferences extends AltosPreferences {
 
 	static DeviceAddress	active_device_address;
 
+	/* Map source preference name */
+	final static String mapSourcePreference = "MAP-SOURCE";
+
+	static final int	MAP_SOURCE_OFFLINE = 0;
+	static final int	MAP_SOURCE_ONLINE = 1;
+
+	static int	map_source;
+
 	public static void init(Context context) {
 		if (backend != null)
 			return;
@@ -38,6 +46,8 @@ public class AltosDroidPreferences extends AltosPreferences {
 
 		if (address != null && name != null)
 			active_device_address = new DeviceAddress (address, name);
+
+		map_source = backend.getInt(mapSourcePreference, MAP_SOURCE_ONLINE);
 	}
 
 	public static void set_active_device(DeviceAddress address) {
@@ -52,6 +62,20 @@ public class AltosDroidPreferences extends AltosPreferences {
 	public static DeviceAddress active_device() {
 		synchronized(backend) {
 			return active_device_address;
+		}
+	}
+
+	public static void set_map_source(int map_source) {
+		synchronized(backend) {
+			AltosDroidPreferences.map_source = map_source;
+			backend.putInt(mapSourcePreference, map_source);
+			flush_preferences();
+		}
+	}
+
+	public static int map_source() {
+		synchronized(backend) {
+			return map_source;
 		}
 	}
 }

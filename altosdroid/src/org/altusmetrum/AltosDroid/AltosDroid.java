@@ -503,11 +503,17 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		return tab_view;
 	}
 
+	public void set_map_source() {
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AltosDebug.init(this);
 		AltosDebug.debug("+++ ON CREATE +++");
+
+		// Initialise preferences
+		AltosDroidPreferences.init(this);
 
 		fm = getSupportFragmentManager();
 
@@ -917,6 +923,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		case R.id.map_type:
 			serverIntent = new Intent(this, MapTypeActivity.class);
 			startActivityForResult(serverIntent, REQUEST_MAP_TYPE);
+			return true;
+		case R.id.map_source:
+			int source = AltosDroidPreferences.map_source();
+			int new_source = source == AltosDroidPreferences.MAP_SOURCE_ONLINE ? AltosDroidPreferences.MAP_SOURCE_OFFLINE : AltosDroidPreferences.MAP_SOURCE_ONLINE;
+			AltosDroidPreferences.set_map_source(new_source);
+			set_map_source();
 			return true;
 		case R.id.select_tracker:
 			if (serials != null) {
