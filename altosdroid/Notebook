@@ -15,14 +15,6 @@ Desired AltosDroid feature list
 
  *) Monitor-idle mode
 
- *) Select tracker by clicking map
-
- *) Auto select tracker after long delay
-
- *) Evaluate performance issues
-
- *) Merge offline/online maps into single tab with mode
-
  *) Make voice responses depend on selected tab
 
  *) Monitor TeleMega igniters
@@ -96,3 +88,19 @@ Completed features
  *) TeleBT battery voltage
 
 	Done
+
+ *) Evaluate performance issues
+
+	Done. Offline maps were duplicating tabs at every redisplay.
+
+ *) Merge offline/online maps into single tab with mode
+
+	Done.
+
+ *) Auto select tracker after long delay
+
+	Done.
+
+ *) Select tracker by clicking map
+
+	Done.

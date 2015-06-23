@@ -36,7 +36,9 @@ import android.util.*;
 class Rocket implements Comparable {
 	AltosLatLon	position;
 	String		name;
+	int		serial;
 	long		last_packet;
+	boolean		active;
 	AltosMapOffline	map_offline;
 
 	void paint() {
@@ -49,13 +51,17 @@ class Rocket implements Comparable {
 		this.last_packet = last_packet;
 	}
 
-	Rocket(String name, AltosMapOffline map_offline) {
-		this.name = name;
-		this.map_offline = map_offline;
+	void set_active(boolean active) {
+		this.active = active;
 	}
 
 	public int compareTo(Object o) {
 		Rocket other = (Rocket) o;
+
+		if (active && !other.active)
+			return 1;
+		if (other.active && !active)
+			return -1;
 
 		long	diff = last_packet - other.last_packet;
 
@@ -65,12 +71,19 @@ class Rocket implements Comparable {
 			return -1;
 		return 0;
 	}
+
+	Rocket(int serial, AltosMapOffline map_offline) {
+		this.serial = serial;
+		this.name = String.format("%d", serial);
+		this.map_offline = map_offline;
+	}
 }
 
 public class AltosMapOffline extends View implements ScaleGestureDetector.OnScaleGestureListener, AltosMapInterface, AltosDroidMapInterface {
 	ScaleGestureDetector	scale_detector;
 	boolean			scaling;
 	AltosMap		map;
+	AltosDroid		altos_droid;
 
 	AltosLatLon	here;
 	AltosLatLon	pad;
@@ -236,6 +249,24 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	public void set_zoom_label(String label) {
 	}
 
+	public void select_object(AltosLatLon latlon) {
+		if (map.transform == null)
+			return;
+		for (Rocket rocket : sorted_rockets()) {
+			if (rocket.position == null) {
+				debug("rocket %d has no position\n", rocket.serial);
+				continue;
+			}
+			double distance = map.transform.hypot(latlon, rocket.position);
+			debug("check select %d distance %g width %d\n", rocket.serial, distance, rocket_bitmap.getWidth());
+			if (distance < rocket_bitmap.getWidth() * 2.0) {
+				debug("selecting %d\n", rocket.serial);
+				altos_droid.select_tracker(rocket.serial);
+				break;
+			}
+		}
+	}
+
 	class Line {
 		AltosLatLon	a, b;
 
@@ -295,16 +326,20 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 		}
 	}
 
+	private Rocket[] sorted_rockets() {
+		Rocket[]	rocket_array = rockets.values().toArray(new Rocket[0]);
+
+		Arrays.sort(rocket_array);
+		return rocket_array;
+	}
+
 	private void draw_positions() {
 		line.set_a(map.last_position);
 		line.set_b(here);
 		line.paint();
 		draw_bitmap(pad, pad_bitmap, pad_off_x, pad_off_y);
 
-		Rocket[]	rocket_array = rockets.values().toArray(new Rocket[0]);
-
-		Arrays.sort(rocket_array);
-		for (Rocket rocket : rocket_array)
+		for (Rocket rocket : sorted_rockets())
 			rocket.paint();
 		draw_bitmap(here, here_bitmap, here_off_x, here_off_y);
 	}
@@ -379,6 +414,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			map.touch_start((int) event.getX(), (int) event.getY(), true);
 		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 			map.touch_continue((int) event.getX(), (int) event.getY(), true);
+		} else if (event.getAction() == MotionEvent.ACTION_UP) {
+			map.touch_stop((int) event.getX(), (int) event.getY(), true);
 		}
 		return true;
 	}
@@ -425,11 +462,13 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 				if (rockets.containsKey(serial))
 					rocket = rockets.get(serial);
 				else {
-					rocket = new Rocket(String.format("%d", serial), this);
+					rocket = new Rocket(serial, this);
 					rockets.put(serial, rocket);
 				}
 				if (t_state.gps != null)
 					rocket.set_position(new AltosLatLon(t_state.gps.lat, t_state.gps.lon), t_state.received_time);
+				if (state != null)
+					rocket.set_active(state.serial == serial);
 			}
 		}
 		if (receiver != null) {
@@ -437,9 +476,10 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 		}
 	}
 
-	public void onCreateView(int map_type) {
+	public void onCreateView(AltosDroid altos_droid) {
+		this.altos_droid = altos_droid;
 		map = new AltosMap(this);
-		map.set_maptype(map_type);
+		map.set_maptype(altos_droid.map_type);
 
 		pad_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pad);
 		/* arrow at the bottom of the launchpad image */
@@ -464,6 +504,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 
 	public AltosMapOffline(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		this.altos_droid = altos_droid;
 		scale_detector = new ScaleGestureDetector(context, this);
 	}
 }

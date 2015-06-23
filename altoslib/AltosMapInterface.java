@@ -42,4 +42,6 @@ public interface AltosMapInterface {
 	public abstract void set_zoom_label(String label);
 
 	public abstract void debug(String format, Object ... arguments);
+
+	public abstract void select_object(AltosLatLon latlon);
 }

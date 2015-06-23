@@ -391,12 +391,21 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 	AltosPointInt	drag_start;
 
+	boolean		dragged;
+
+	static final double drag_far = 20;
+
 	private void drag(int x, int y) {
 		if (drag_start == null)
 			return;
 
 		int dx = x - drag_start.x;
 		int dy = y - drag_start.y;
+
+		double distance = Math.hypot(dx, dy);
+
+		if (distance > drag_far)
+			dragged = true;
 
 		if (transform == null) {
 			debug("Transform not set in drag\n");
@@ -410,6 +419,12 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 	private void drag_start(int x, int y) {
 		drag_start = new AltosPointInt(x, y);
+		dragged = false;
+	}
+
+	private void drag_stop(int x, int y) {
+		if (!dragged)
+			map_interface.select_object (transform.screen_lat_lon(new AltosPointInt(x,y)));
 	}
 
 	private void line_start(int x, int y) {
@@ -440,6 +455,12 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			drag(x, y);
 		else
 			line(x, y);
+	}
+
+	public void touch_stop(int x, int y, boolean is_drag) {
+		notice_user_input();
+		if (is_drag)
+			drag_stop(x, y);
 	}
 
 	public AltosMap(AltosMapInterface map_interface) {

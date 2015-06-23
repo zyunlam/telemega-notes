@@ -23,7 +23,7 @@ import android.location.Location;
 import org.altusmetrum.altoslib_7.*;
 
 public interface AltosDroidMapInterface {
-	public void onCreateView(int map_type);
+	public void onCreateView(AltosDroid altos_droid);
 
 	public void set_visible(boolean visible);
 

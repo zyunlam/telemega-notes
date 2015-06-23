@@ -57,14 +57,6 @@ public class TabMap extends AltosDroidTab {
 		super.onCreate(savedInstanceState);
 	}
 
-	private void make_offline_map() {
-	}
-
-	private void make_online_map() {
-		map_online = new AltosMapOnline(view.getContext());
-		map_online.onCreateView(altos_droid.map_type);
-	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.tab_map, container, false);
@@ -77,9 +69,9 @@ public class TabMap extends AltosDroidTab {
 		mReceiverLatitudeView  = (TextView)view.findViewById(R.id.receiver_lat_value);
 		mReceiverLongitudeView = (TextView)view.findViewById(R.id.receiver_lon_value);
 		map_offline = (AltosMapOffline)view.findViewById(R.id.map_offline);
-		map_offline.onCreateView(altos_droid.map_type);
+		map_offline.onCreateView(altos_droid);
 		map_online = new AltosMapOnline(view.getContext());
-		map_online.onCreateView(altos_droid.map_type);
+		map_online.onCreateView(altos_droid);
 		set_map_source(AltosDroidPreferences.map_source());
 		return view;
 	}

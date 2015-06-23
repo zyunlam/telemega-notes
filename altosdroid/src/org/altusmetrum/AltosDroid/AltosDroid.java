@@ -18,10 +18,9 @@
 package org.altusmetrum.AltosDroid;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.text.*;
+import java.util.*;
+import java.io.*;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -248,11 +247,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
+	int	selected_serial = 0;
 	int	current_serial;
 	long	switch_time;
 
 	void set_switch_time() {
 		switch_time = System.currentTimeMillis();
+		selected_serial = 0;
 	}
 
 	boolean	registered_units_listener;
@@ -261,6 +262,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 		if (new_telemetry_state != null)
 			telemetry_state = new_telemetry_state;
+
+		if (selected_serial != 0)
+			current_serial = selected_serial;
 
 		if (current_serial == 0)
 			current_serial = telemetry_state.latest_serial;
@@ -271,6 +275,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 
 		serials = telemetry_state.states.keySet().toArray(new Integer[0]);
+		Arrays.sort(serials);
 
 		update_title(telemetry_state);
 
@@ -282,7 +287,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			int age = state_age(state);
 			if (age < 20)
 				aged = false;
-			if (switch_time != 0 && (switch_time - state.received_time) > 0)
+			if (current_serial == selected_serial)
+				aged = false;
+			else if (switch_time != 0 && (switch_time - state.received_time) > 0)
 				aged = true;
 		}
 
@@ -828,13 +835,26 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	void select_tracker(int serial) {
 		int i;
-		for (i = 0; i < serials.length; i++)
-			if (serials[i] == serial)
-				break;
-		if (i == serials.length)
-			return;
 
-		current_serial = serial;
+		AltosDebug.debug("select tracker %d\n", serial);
+
+		if (serial == selected_serial) {
+			AltosDebug.debug("%d already selected\n", serial);
+			return;
+		}
+
+		if (serial != 0) {
+			for (i = 0; i < serials.length; i++)
+				if (serials[i] == serial)
+					break;
+
+			if (i == serials.length) {
+				AltosDebug.debug("attempt to select unknown tracker %d\n", serial);
+				return;
+			}
+		}
+
+		current_serial = selected_serial = serial;
 		update_state(null);
 	}
 
@@ -933,15 +953,19 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			return true;
 		case R.id.select_tracker:
 			if (serials != null) {
-				String[] trackers = new String[serials.length];
+				String[] trackers = new String[serials.length+1];
+				trackers[0] = "Auto";
 				for (int i = 0; i < serials.length; i++)
-					trackers[i] = String.format("%d", serials[i]);
+					trackers[i+1] = String.format("%d", serials[i]);
 				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
 				builder_serial.setTitle("Select a tracker");
 				builder_serial.setItems(trackers,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int item) {
-									select_tracker(serials[item]);
+									if (item == 0)
+										select_tracker(0);
+									else
+										select_tracker(serials[item-1]);
 								}
 							});
 				AlertDialog alert_serial = builder_serial.create();

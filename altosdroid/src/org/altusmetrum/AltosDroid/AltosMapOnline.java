@@ -121,7 +121,11 @@ public class AltosMapOnline implements AltosDroidMapInterface {
 	private AltosLatLon my_position = null;
 	private AltosLatLon target_position = null;
 
-	public void onCreateView(final int map_type) {
+	private AltosDroid altos_droid;
+
+	public void onCreateView(AltosDroid altos_droid) {
+		this.altos_droid = altos_droid;
+		final int map_type = altos_droid.map_type;
 		mMapFragment = new SupportMapFragment() {
 			@Override
 			public void onActivityCreated(Bundle savedInstanceState) {

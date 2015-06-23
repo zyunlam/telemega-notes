@@ -51,6 +51,13 @@ public class AltosMapTransform {
 		return new AltosPointDouble(screen.x + offset_x, screen.y + offset_y);
 	}
 
+	public double hypot(AltosLatLon a, AltosLatLon b) {
+		AltosPointDouble	a_pt = point(a);
+		AltosPointDouble	b_pt = point(b);
+
+		return Math.hypot(a_pt.x - b_pt.x, a_pt.y - b_pt.y);
+	}
+
 	public AltosLatLon screen_lat_lon(AltosPointInt screen) {
 		return lat_lon(screen_point(screen));
 	}
