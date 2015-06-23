@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.location.Location;
 
-public class TabLanded extends AltosDroidTab {
+public class TabRecover extends AltosDroidTab {
 	private TextView mBearingView;
 	private TextView mDistanceView;
 	private TextView mTargetLatitudeView;
@@ -41,7 +41,7 @@ public class TabLanded extends AltosDroidTab {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.tab_landed, container, false);
+		View v = inflater.inflate(R.layout.tab_recover, container, false);
 
 		mBearingView   = (TextView) v.findViewById(R.id.bearing_value);
 		mDistanceView  = (TextView) v.findViewById(R.id.distance_value);
@@ -56,7 +56,7 @@ public class TabLanded extends AltosDroidTab {
 		return v;
 	}
 
-	public String tab_name() { return "landed"; }
+	public String tab_name() { return "recover"; }
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {

@@ -399,9 +399,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				if (prev_locked != locked) {
 					String currentTab = mTabHost.getCurrentTabTag();
 					if (locked) {
-						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("descent");
+						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("flight");
 					} else {
-						if (currentTab.equals("descent")) mTabHost.setCurrentTabByTag("pad");
+						if (currentTab.equals("flight")) mTabHost.setCurrentTabByTag("pad");
 					}
 				}
 			} else {
@@ -409,16 +409,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 					String currentTab = mTabHost.getCurrentTabTag();
 					switch (state.state) {
 					case AltosLib.ao_flight_boost:
-						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("ascent");
-						break;
-					case AltosLib.ao_flight_drogue:
-						if (currentTab.equals("ascent")) mTabHost.setCurrentTabByTag("descent");
+						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("flight");
 						break;
 					case AltosLib.ao_flight_landed:
-						if (currentTab.equals("descent")) mTabHost.setCurrentTabByTag("landed");
+						if (currentTab.equals("flight")) mTabHost.setCurrentTabByTag("recover");
 						break;
 					case AltosLib.ao_flight_stateless:
-						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("descent");
+						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("flight");
 						break;
 					}
 				}
@@ -539,9 +536,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
 		mTabsAdapter.addTab(mTabHost.newTabSpec("pad").setIndicator(create_tab_view("Pad")), TabPad.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("ascent").setIndicator(create_tab_view("Ascent")), TabAscent.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("descent").setIndicator(create_tab_view("Descent")), TabDescent.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("landed").setIndicator(create_tab_view("Landed")), TabLanded.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("flight").setIndicator(create_tab_view("Flight")), TabFlight.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("recover").setIndicator(create_tab_view("Recover")), TabRecover.class, null);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("map").setIndicator(create_tab_view("Map")), TabMap.class, null);
 
 		// Display the Version

@@ -163,6 +163,9 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	public void set_zoom_label(String label) {
 	}
 
+	public void select_object(AltosLatLon latlon) {
+	}
+
 	public void debug(String format, Object ... arguments) {
 		AltosDebug.debug(format, arguments);
 	}
