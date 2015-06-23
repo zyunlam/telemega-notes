@@ -42,34 +42,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.location.Location;
+import android.content.*;
 
-public class TabMap extends AltosDroidTab {
-	private SupportMapFragment mMapFragment;
-	private GoogleMap mMap;
-	private boolean mapLoaded = false;
+class RocketOnline implements Comparable {
+	Marker		marker;
+	long		last_packet;
 
-	private HashMap<Integer,Marker> rockets = new HashMap<Integer,Marker>();
-	private Marker mPadMarker;
-	private boolean pad_set;
-	private Polyline mPolyline;
+	void set_position(AltosLatLon position, long last_packet) {
+		marker.setPosition(new LatLng(position.lat, position.lon));
+		this.last_packet = last_packet;
+	}
 
-	private TextView mDistanceView;
-	private TextView mBearingView;
-	private TextView mTargetLatitudeView;
-	private TextView mTargetLongitudeView;
-	private TextView mReceiverLatitudeView;
-	private TextView mReceiverLongitudeView;
-
-	private double mapAccuracy = -1;
-
-	private AltosLatLon my_position = null;
-	private AltosLatLon target_position = null;
-
-	private Bitmap rocket_bitmap(String text) {
+	private Bitmap rocket_bitmap(Context context, String text) {
 
 		/* From: http://mapicons.nicolasmollet.com/markers/industry/military/missile-2/
 		 */
-		Bitmap orig_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.rocket);
+		Bitmap orig_bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.rocket);
 		Bitmap bitmap = orig_bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
 		Canvas canvas = new Canvas(bitmap);
@@ -86,61 +74,84 @@ public class TabMap extends AltosDroidTab {
 		float x = bitmap.getWidth() / 2.0f - width / 2.0f;
 		float y = bitmap.getHeight() / 2.0f - height / 2.0f;
 
-		AltosDebug.debug("map label x %f y %f\n", x, y);
-
 		canvas.drawText(text, 0, text.length(), x, y, paint);
 		return bitmap;
 	}
 
-	private Marker rocket_marker(int serial, double lat, double lon) {
-		Bitmap	bitmap = rocket_bitmap(String.format("%d", serial));
-
-		return mMap.addMarker(new MarkerOptions()
-				      .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-				      .position(new LatLng(lat, lon))
-				      .visible(true));
+	public void remove() {
+		marker.remove();
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public int compareTo(Object o) {
+		RocketOnline other = (RocketOnline) o;
 
+		long	diff = last_packet - other.last_packet;
+
+		if (diff > 0)
+			return 1;
+		if (diff < 0)
+			return -1;
+		return 0;
+	}
+
+	RocketOnline(Context context, String name, GoogleMap map, double lat, double lon, long last_packet) {
+		this.marker = map.addMarker(new MarkerOptions()
+					    .icon(BitmapDescriptorFactory.fromBitmap(rocket_bitmap(context, name)))
+					    .position(new LatLng(lat, lon))
+					    .visible(true));
+		this.last_packet = last_packet;
+	}
+}
+
+public class AltosMapOnline implements AltosDroidMapInterface {
+	public SupportMapFragment mMapFragment;
+	private GoogleMap mMap;
+	private boolean mapLoaded = false;
+	Context context;
+
+	private HashMap<Integer,RocketOnline> rockets = new HashMap<Integer,RocketOnline>();
+	private Marker mPadMarker;
+	private boolean pad_set;
+	private Polyline mPolyline;
+
+	private View map_view;
+
+	private double mapAccuracy = -1;
+
+	private AltosLatLon my_position = null;
+	private AltosLatLon target_position = null;
+
+	public void onCreateView(final int map_type) {
 		mMapFragment = new SupportMapFragment() {
 			@Override
 			public void onActivityCreated(Bundle savedInstanceState) {
 				super.onActivityCreated(savedInstanceState);
-				setupMap();
+				setupMap(map_type);
+			}
+			@Override
+			public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+				map_view = super.onCreateView(inflater, container, savedInstanceState);
+				return map_view;
+			}
+			@Override
+			public void onDestroyView() {
+				super.onDestroyView();
+				map_view = null;
 			}
 		};
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.tab_map, container, false);
-		mDistanceView  = (TextView)v.findViewById(R.id.distance_value);
-		mBearingView   = (TextView)v.findViewById(R.id.bearing_value);
-		mTargetLatitudeView  = (TextView)v.findViewById(R.id.target_lat_value);
-		mTargetLongitudeView = (TextView)v.findViewById(R.id.target_lon_value);
-		mReceiverLatitudeView  = (TextView)v.findViewById(R.id.receiver_lat_value);
-		mReceiverLongitudeView = (TextView)v.findViewById(R.id.receiver_lon_value);
-		return v;
-	}
+//	public void onActivityCreated() {
+//		getChildFragmentManager().beginTransaction().add(R.id.map, mMapFragment).commit();
+//	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		getChildFragmentManager().beginTransaction().add(R.id.map, mMapFragment).commit();
-	}
-
-	private void setupMap() {
+	public void setupMap(int map_type) {
 		mMap = mMapFragment.getMap();
 		if (mMap != null) {
-			set_map_type(altos_droid.map_type);
+			set_map_type(map_type);
 			mMap.setMyLocationEnabled(true);
 			mMap.getUiSettings().setTiltGesturesEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
-
-			Bitmap label_bitmap = rocket_bitmap("hello");
 
 			mPadMarker = mMap.addMarker(
 					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.pad))
@@ -159,42 +170,53 @@ public class TabMap extends AltosDroidTab {
 		}
 	}
 
-	private void center(double lat, double lon, double accuracy) {
+	public void center(double lat, double lon, double accuracy) {
+		if (mMap == null)
+			return;
+
 		if (mapAccuracy < 0 || accuracy < mapAccuracy/10) {
 			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon),14));
 			mapAccuracy = accuracy;
 		}
 	}
 
-	public String tab_name() { return "map"; }
-
 	private void set_rocket(int serial, AltosState state) {
-		Marker	marker;
+		RocketOnline	rocket;
 
 		if (state.gps == null || state.gps.lat == AltosLib.MISSING)
 			return;
 
+		if (mMap == null)
+			return;
+
 		if (rockets.containsKey(serial)) {
-			marker = rockets.get(serial);
-			marker.setPosition(new LatLng(state.gps.lat, state.gps.lon));
+			rocket = rockets.get(serial);
+			rocket.set_position(new AltosLatLon(state.gps.lat, state.gps.lon), state.received_time);
 		} else {
-			marker = rocket_marker(serial, state.gps.lat, state.gps.lon);
-			rockets.put(serial, marker);
-			marker.setVisible(true);
+			rocket = new RocketOnline(context,
+						  String.format("%d", serial),
+						  mMap, state.gps.lat, state.gps.lon,
+						  state.received_time);
+			rockets.put(serial, rocket);
 		}
 	}
 
 	private void remove_rocket(int serial) {
-		Marker marker = rockets.get(serial);
-		marker.remove();
+		RocketOnline rocket = rockets.get(serial);
+		rocket.remove();
 		rockets.remove(serial);
 	}
 
+	public void set_visible(boolean visible) {
+		if (map_view == null)
+			return;
+		if (visible)
+			map_view.setVisibility(View.VISIBLE);
+		else
+			map_view.setVisibility(View.GONE);
+	}
+
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
-		if (from_receiver != null) {
-			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
-			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
-		}
 
 		if (telem_state != null) {
 			for (int serial : rockets.keySet()) {
@@ -218,9 +240,6 @@ public class TabMap extends AltosDroidTab {
 			if (state.gps != null) {
 
 				target_position = new AltosLatLon(state.gps.lat, state.gps.lon);
-
-				mTargetLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
-				mTargetLongitudeView.setText(AltosDroid.pos(state.gps.lon, "E", "W"));
 				if (state.gps.locked && state.gps.nsat >= 4)
 					center (state.gps.lat, state.gps.lon, 10);
 			}
@@ -235,8 +254,6 @@ public class TabMap extends AltosDroidTab {
 				accuracy = 1000;
 
 			my_position = new AltosLatLon(receiver.getLatitude(), receiver.getLongitude());
-			mReceiverLatitudeView.setText(AltosDroid.pos(my_position.lat, "N", "S"));
-			mReceiverLongitudeView.setText(AltosDroid.pos(my_position.lon, "E", "W"));
 			center (my_position.lat, my_position.lon, accuracy);
 		}
 
@@ -260,6 +277,7 @@ public class TabMap extends AltosDroidTab {
 		}
 	}
 
-	public TabMap() {
+	public AltosMapOnline(Context context) {
+		this.context = context;
 	}
 }

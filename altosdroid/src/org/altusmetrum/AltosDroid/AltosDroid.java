@@ -503,7 +503,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		return tab_view;
 	}
 
-	public void set_map_source() {
+	public void set_map_source(int source) {
+		for (AltosDroidTab mTab : mTabs)
+			mTab.set_map_source(source);
 	}
 
 	@Override
@@ -928,7 +930,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			int source = AltosDroidPreferences.map_source();
 			int new_source = source == AltosDroidPreferences.MAP_SOURCE_ONLINE ? AltosDroidPreferences.MAP_SOURCE_OFFLINE : AltosDroidPreferences.MAP_SOURCE_ONLINE;
 			AltosDroidPreferences.set_map_source(new_source);
-			set_map_source();
+			set_map_source(new_source);
 			return true;
 		case R.id.select_tracker:
 			if (serials != null) {
