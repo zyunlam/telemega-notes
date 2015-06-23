@@ -17,10 +17,6 @@ Desired AltosDroid feature list
 
  *) Make voice responses depend on selected tab
 
- *) Monitor TeleMega igniters
-
- *) Convert to four tab design:
-
 	1) Pad
 
 		Report out GPS status, report igniter/battery status changes
@@ -38,6 +34,8 @@ Desired AltosDroid feature list
 
 		Pick out report based on current flight status
 		(presume flight if in motion, recovery otherwise)
+
+ *) Monitor TeleMega igniters
 
 Completed features
 
@@ -102,5 +100,9 @@ Completed features
 	Done.
 
  *) Select tracker by clicking map
+
+	Done.
+
+ *) Convert to four tab design:
 
 	Done.
