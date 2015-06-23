@@ -86,6 +86,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	AltosDroid		altos_droid;
 
 	AltosLatLon	here;
+	AltosLatLon	there;
 	AltosLatLon	pad;
 
 	Canvas	canvas;
@@ -334,7 +335,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	}
 
 	private void draw_positions() {
-		line.set_a(map.last_position);
+		line.set_a(there);
 		line.set_b(here);
 		line.paint();
 		draw_bitmap(pad, pad_bitmap, pad_off_x, pad_off_y);
@@ -465,8 +466,12 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 					rocket = new Rocket(serial, this);
 					rockets.put(serial, rocket);
 				}
-				if (t_state.gps != null)
-					rocket.set_position(new AltosLatLon(t_state.gps.lat, t_state.gps.lon), t_state.received_time);
+				if (t_state.gps != null) {
+					AltosLatLon	latlon = new AltosLatLon(t_state.gps.lat, t_state.gps.lon);
+					rocket.set_position(latlon, t_state.received_time);
+					if (state.serial == serial)
+						there = latlon;
+				}
 				if (state != null)
 					rocket.set_active(state.serial == serial);
 			}
