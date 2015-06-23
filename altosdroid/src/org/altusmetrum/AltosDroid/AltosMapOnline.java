@@ -46,6 +46,7 @@ import android.content.*;
 
 class RocketOnline implements Comparable {
 	Marker		marker;
+	int		serial;
 	long		last_packet;
 
 	void set_position(AltosLatLon position, long last_packet) {
@@ -94,7 +95,9 @@ class RocketOnline implements Comparable {
 		return 0;
 	}
 
-	RocketOnline(Context context, String name, GoogleMap map, double lat, double lon, long last_packet) {
+	RocketOnline(Context context, int serial, GoogleMap map, double lat, double lon, long last_packet) {
+		this.serial = serial;
+		String name = String.format("%d", serial);
 		this.marker = map.addMarker(new MarkerOptions()
 					    .icon(BitmapDescriptorFactory.fromBitmap(rocket_bitmap(context, name)))
 					    .position(new LatLng(lat, lon))
@@ -103,7 +106,7 @@ class RocketOnline implements Comparable {
 	}
 }
 
-public class AltosMapOnline implements AltosDroidMapInterface {
+public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarkerClickListener {
 	public SupportMapFragment mMapFragment;
 	private GoogleMap mMap;
 	private boolean mapLoaded = false;
@@ -149,6 +152,16 @@ public class AltosMapOnline implements AltosDroidMapInterface {
 //		getChildFragmentManager().beginTransaction().add(R.id.map, mMapFragment).commit();
 //	}
 
+	public boolean onMarkerClick(Marker marker) {
+		for (RocketOnline rocket : rockets.values()) {
+			if (rocket.marker.equals(marker)) {
+				altos_droid.select_tracker(rocket.serial);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void setupMap(int map_type) {
 		mMap = mMapFragment.getMap();
 		if (mMap != null) {
@@ -156,6 +169,7 @@ public class AltosMapOnline implements AltosDroidMapInterface {
 			mMap.setMyLocationEnabled(true);
 			mMap.getUiSettings().setTiltGesturesEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
+			mMap.setOnMarkerClickListener(this);
 
 			mPadMarker = mMap.addMarker(
 					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.pad))
@@ -198,7 +212,7 @@ public class AltosMapOnline implements AltosDroidMapInterface {
 			rocket.set_position(new AltosLatLon(state.gps.lat, state.gps.lon), state.received_time);
 		} else {
 			rocket = new RocketOnline(context,
-						  String.format("%d", serial),
+						  serial,
 						  mMap, state.gps.lat, state.gps.lon,
 						  state.received_time);
 			rockets.put(serial, rocket);
