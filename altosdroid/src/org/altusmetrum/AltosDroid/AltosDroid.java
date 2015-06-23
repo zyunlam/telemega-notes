@@ -536,7 +536,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mTabsAdapter.addTab(mTabHost.newTabSpec("descent").setIndicator(create_tab_view("Descent")), TabDescent.class, null);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("landed").setIndicator(create_tab_view("Landed")), TabLanded.class, null);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("map").setIndicator(create_tab_view("Map")), TabMap.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("offmap").setIndicator(create_tab_view("OffMap")), TabMapOffline.class, null);
 
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);
