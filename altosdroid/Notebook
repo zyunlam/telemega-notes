@@ -15,26 +15,6 @@ Desired AltosDroid feature list
 
  *) Monitor-idle mode
 
- *) Make voice responses depend on selected tab
-
-	1) Pad
-
-		Report out GPS status, report igniter/battery status changes
-
-	2) Flight
-
-		Report height, speed, az/el/range
-
-	3) Recovery
-
-		Report range bearing/heading (bearing if stationary,
-		heading if in motion
-
-	4) Map
-
-		Pick out report based on current flight status
-		(presume flight if in motion, recovery otherwise)
-
  *) Monitor TeleMega igniters
 
 Completed features
@@ -104,5 +84,9 @@ Completed features
 	Done.
 
  *) Convert to four tab design:
+
+	Done.
+
+ *) Make voice responses depend on selected tab
 
 	Done.
