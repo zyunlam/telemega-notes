@@ -69,6 +69,7 @@
 	<string name="speed_label">Speed</string>
 	<string name="accel_label">Acceleration</string>
 	<string name="bearing_label">Bearing</string>
+	<string name="direction_label">Direction</string>
 	<string name="elevation_label">Elevation</string>
 	<string name="range_label">Range</string>
 	<string name="distance_label">Distance</string>

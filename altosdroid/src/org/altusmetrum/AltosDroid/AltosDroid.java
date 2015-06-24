@@ -990,4 +990,29 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 		return false;
 	}
+
+	static String direction(AltosGreatCircle from_receiver,
+			     Location receiver) {
+		if (!receiver.hasBearing())
+			return null;
+
+		float	bearing = receiver.getBearing();
+		float	heading = (float) from_receiver.bearing - bearing;
+
+		while (heading <= -180.0f)
+			heading += 360.0f;
+		while (heading > 180.0f)
+			heading -= 360.0f;
+
+		int iheading = (int) (heading + 0.5f);
+
+		if (-1 < iheading && iheading < 1)
+			return "ahead";
+		else if (iheading < -179 || 179 < iheading)
+			return "backwards";
+		else if (iheading < 0)
+			return String.format("left %d", -iheading);
+		else
+			return String.format("right %d", iheading);
+	}
 }

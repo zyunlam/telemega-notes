@@ -30,6 +30,7 @@ import android.location.Location;
 
 public class TabRecover extends AltosDroidTab {
 	private TextView mBearingView;
+	private TextView mDirectionView;
 	private TextView mDistanceView;
 	private TextView mTargetLatitudeView;
 	private TextView mTargetLongitudeView;
@@ -44,6 +45,7 @@ public class TabRecover extends AltosDroidTab {
 		View v = inflater.inflate(R.layout.tab_recover, container, false);
 
 		mBearingView   = (TextView) v.findViewById(R.id.bearing_value);
+		mDirectionView = (TextView) v.findViewById(R.id.direction_value);
 		mDistanceView  = (TextView) v.findViewById(R.id.distance_value);
 		mTargetLatitudeView  = (TextView) v.findViewById(R.id.target_lat_value);
 		mTargetLongitudeView = (TextView) v.findViewById(R.id.target_lon_value);
@@ -62,6 +64,11 @@ public class TabRecover extends AltosDroidTab {
 		if (from_receiver != null) {
 			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
 			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
+			String direction = AltosDroid.direction(from_receiver, receiver);
+			if (direction == null)
+				mDirectionView.setText("");
+			else
+				mDirectionView.setText(direction);
 		}
 		if (state != null && state.gps != null) {
 			mTargetLatitudeView.setText(AltosDroid.pos(state.gps.lat, "N", "S"));
