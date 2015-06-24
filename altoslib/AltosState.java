@@ -66,7 +66,7 @@ public class AltosState implements Cloneable, Serializable {
 
 		void set_filtered(double new_value, double time) {
 			if (prev_value != AltosLib.MISSING) {
-				double f = 1/Math.exp((time - prev_set_time) / filter_le);
+				double f = 1/Math.exp((time - prev_set_time) / filter_len);
 				new_value = f * new_value + (1-f) * prev_value;
 			}
 			set(new_value, time);
