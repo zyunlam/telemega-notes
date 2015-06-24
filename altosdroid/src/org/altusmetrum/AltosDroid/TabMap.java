@@ -37,6 +37,7 @@ public class TabMap extends AltosDroidTab {
 	AltosLatLon	here;
 
 	private TextView mDistanceView;
+	private TextView mBearingLabel;
 	private TextView mBearingView;
 	private TextView mTargetLatitudeView;
 	private TextView mTargetLongitudeView;
@@ -63,6 +64,7 @@ public class TabMap extends AltosDroidTab {
 		int map_source = AltosDroidPreferences.map_source();
 
 		mDistanceView  = (TextView)view.findViewById(R.id.distance_value);
+		mBearingLabel  = (TextView)view.findViewById(R.id.bearing_label);
 		mBearingView   = (TextView)view.findViewById(R.id.bearing_value);
 		mTargetLatitudeView  = (TextView)view.findViewById(R.id.target_lat_value);
 		mTargetLongitudeView = (TextView)view.findViewById(R.id.target_lon_value);
@@ -99,8 +101,19 @@ public class TabMap extends AltosDroidTab {
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
-			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
+			String	direction = AltosDroid.direction(from_receiver, receiver);
+			if (direction != null) {
+				mBearingLabel.setText("Direction");
+				mBearingView.setText(direction);
+			} else {
+				mBearingLabel.setText("Bearing");
+				mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
+			}
 			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
+		} else {
+			mBearingLabel.setText("Bearing");
+			mBearingView.setText("");
+			set_value(mDistanceView, AltosConvert.distance, 6, AltosLib.MISSING);
 		}
 
 		if (state != null) {

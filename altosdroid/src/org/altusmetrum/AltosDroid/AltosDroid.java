@@ -998,6 +998,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	static String direction(AltosGreatCircle from_receiver,
 			     Location receiver) {
+		if (from_receiver == null)
+			return null;
+
+		if (receiver == null)
+			return null;
+
 		if (!receiver.hasBearing())
 			return null;
 
@@ -1016,8 +1022,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		else if (iheading < -179 || 179 < iheading)
 			return "backwards";
 		else if (iheading < 0)
-			return String.format("left %d", -iheading);
+			return String.format("left %d°", -iheading);
 		else
-			return String.format("right %d", iheading);
+			return String.format("right %d°", iheading);
 	}
 }
