@@ -195,8 +195,8 @@ public class AltosVoice {
 			return true;
 		}
 
-		if (last_tell_mode == TELL_MODE_FLIGHT) {
-			if (time_since_speak() < 10 * 1000 && last_flight_tell == TELL_FLIGHT_TRACK)
+		if (last_tell_mode == TELL_MODE_FLIGHT && last_flight_tell == TELL_FLIGHT_TRACK) {
+			if (time_since_speak() < 10 * 1000)
 				return false;
 			if (!target_moved(state) && !receiver_moved(receiver))
 				return false;
