@@ -105,7 +105,7 @@ public class TabPad extends AltosDroidTab {
         return v;
 	}
 
-	public String tab_name() { return "pad"; }
+	public String tab_name() { return AltosDroid.tab_pad_name; }
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {

@@ -79,7 +79,7 @@ public class TabFlight extends AltosDroidTab {
 		return v;
 	}
 
-	public String tab_name() { return "flight"; }
+	public String tab_name() { return AltosDroid.tab_flight_name; }
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {

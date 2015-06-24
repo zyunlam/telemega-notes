@@ -87,6 +87,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	private int mAgeNewColor;
 	private int mAgeOldColor;
 
+	public static final String	tab_pad_name = "pad";
+	public static final String	tab_flight_name = "flight";
+	public static final String	tab_recover_name = "recover";
+	public static final String	tab_map_name = "map";
+
 	// field to display the version at the bottom of the screen
 	private TextView mVersion;
 
@@ -399,9 +404,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				if (prev_locked != locked) {
 					String currentTab = mTabHost.getCurrentTabTag();
 					if (locked) {
-						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("flight");
+						if (currentTab.equals(tab_pad_name)) mTabHost.setCurrentTabByTag(tab_flight_name);
 					} else {
-						if (currentTab.equals("flight")) mTabHost.setCurrentTabByTag("pad");
+						if (currentTab.equals(tab_flight_name)) mTabHost.setCurrentTabByTag(tab_pad_name);
 					}
 				}
 			} else {
@@ -409,13 +414,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 					String currentTab = mTabHost.getCurrentTabTag();
 					switch (state.state) {
 					case AltosLib.ao_flight_boost:
-						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("flight");
+						if (currentTab.equals(tab_pad_name)) mTabHost.setCurrentTabByTag(tab_flight_name);
 						break;
 					case AltosLib.ao_flight_landed:
-						if (currentTab.equals("flight")) mTabHost.setCurrentTabByTag("recover");
+						if (currentTab.equals(tab_flight_name)) mTabHost.setCurrentTabByTag(tab_recover_name);
 						break;
 					case AltosLib.ao_flight_stateless:
-						if (currentTab.equals("pad")) mTabHost.setCurrentTabByTag("flight");
+						if (currentTab.equals(tab_pad_name)) mTabHost.setCurrentTabByTag(tab_flight_name);
 						break;
 					}
 				}
@@ -535,10 +540,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-		mTabsAdapter.addTab(mTabHost.newTabSpec("pad").setIndicator(create_tab_view("Pad")), TabPad.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("flight").setIndicator(create_tab_view("Flight")), TabFlight.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("recover").setIndicator(create_tab_view("Recover")), TabRecover.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("map").setIndicator(create_tab_view("Map")), TabMap.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_pad_name).setIndicator(create_tab_view("Pad")), TabPad.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_flight_name).setIndicator(create_tab_view("Flight")), TabFlight.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_recover_name).setIndicator(create_tab_view("Recover")), TabRecover.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_map_name).setIndicator(create_tab_view("Map")), TabMap.class, null);
 
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);

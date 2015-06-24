@@ -58,7 +58,7 @@ public class TabRecover extends AltosDroidTab {
 		return v;
 	}
 
-	public String tab_name() { return "recover"; }
+	public String tab_name() { return AltosDroid.tab_recover_name; }
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {

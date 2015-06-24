@@ -88,7 +88,7 @@ public class TabMap extends AltosDroidTab {
 		super.onDestroyView();
 	}
 
-	public String tab_name() { return "map"; }
+	public String tab_name() { return AltosDroid.tab_map_name; }
 
 	private void center(double lat, double lon, double accuracy) {
 		if (map_offline != null)
