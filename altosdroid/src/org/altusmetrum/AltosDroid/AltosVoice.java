@@ -183,6 +183,9 @@ public class AltosVoice {
 		if (state == null)
 			return false;
 
+		if (last_tell_mode != TELL_MODE_FLIGHT)
+			last_flight_tell = TELL_FLIGHT_NONE;
+
 		if (state.state != last_state && AltosLib.ao_flight_boost <= state.state && state.state <= AltosLib.ao_flight_landed) {
 			speak(state.state_name());
 			if (descending(state.state) && !descending(last_state)) {
