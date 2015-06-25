@@ -441,6 +441,12 @@ public class TelemetryService extends Service implements LocationListener {
 
 	@Override
 	public void onCreate() {
+
+		AltosDebug.init(this);
+
+		// Initialise preferences
+		AltosDroidPreferences.init(this);
+
 		// Get local Bluetooth adapter
 		bluetooth_adapter = BluetoothAdapter.getDefaultAdapter();
 

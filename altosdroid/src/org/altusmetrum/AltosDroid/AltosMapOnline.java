@@ -275,7 +275,7 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 			center (my_position.lat, my_position.lon, accuracy);
 		}
 
-		if (my_position != null && target_position != null) {
+		if (my_position != null && target_position != null && mPolyline != null) {
 			mPolyline.setPoints(Arrays.asList(new LatLng(my_position.lat, my_position.lon), new LatLng(target_position.lat, target_position.lon)));
 			mPolyline.setVisible(true);
 		}

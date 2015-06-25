@@ -424,7 +424,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	double	mapAccuracy;
 
 	public void center(double lat, double lon, double accuracy) {
-		if (mapAccuracy < 0 || accuracy < mapAccuracy/10) {
+		if (mapAccuracy <= 0 || accuracy < mapAccuracy/10 || (map != null && !map.has_centre())) {
 			if (map != null)
 				map.maybe_centre(lat, lon);
 			mapAccuracy = accuracy;
