@@ -131,6 +131,10 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		return (System.currentTimeMillis() - user_input_time) < auto_scroll_delay;
 	}
 
+	public boolean has_centre() {
+		return centre != null;
+	}
+
 	public boolean far_from_centre(AltosLatLon lat_lon) {
 
 		if (centre == null || transform == null)
@@ -423,8 +427,13 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	private void drag_stop(int x, int y) {
-		if (!dragged)
+		if (!dragged) {
+			if (transform == null) {
+				debug("Transform not set in stop\n");
+				return;
+			}
 			map_interface.select_object (transform.screen_lat_lon(new AltosPointInt(x,y)));
+		}
 	}
 
 	private void line_start(int x, int y) {
