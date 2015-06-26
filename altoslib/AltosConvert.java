@@ -230,6 +230,12 @@ public class AltosConvert {
 		return sensor / 32767.0 * supply * (5.6 + 10.0) / 10.0;
 	}
 
+	static double tele_bt_3_battery(int raw) {
+		if (raw == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return 3.3 * mega_adc(raw) * (5.1 + 10.0) / 10.0;
+	}
+
 	static double easy_mini_voltage(int sensor, int serial) {
 		double	supply = 3.3;
 		double	diode_offset = 0.0;

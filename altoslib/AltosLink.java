@@ -553,7 +553,15 @@ public abstract class AltosLink implements Runnable {
 		}
 		if (monitor_batt == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosConvert.cc_battery_to_voltage(monitor_batt);
+
+		double	volts = AltosLib.MISSING;
+		if (config_data.product.startsWith("TeleBT-v3")) {
+			volts = AltosConvert.tele_bt_3_battery(monitor_batt);
+		} else {
+			volts = AltosConvert.cc_battery_to_voltage(monitor_batt);
+		}
+
+		return volts;
 	}
 
 	public AltosLink() {
