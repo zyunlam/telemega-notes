@@ -36,6 +36,10 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 		return hide(value(state, i));
 	}
 
+	public boolean hide(AltosState state, AltosListenerState listener_state, int i) {
+		return hide(state, i);
+	}
+
 	public double value (AltosState state, AltosListenerState listener_state, int i) {
 		return value(state, i);
 	}
@@ -77,7 +81,7 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 				v[i] = value(state, listener_state, i);
 			else
 				v[i] = AltosLib.MISSING;
-			if (hide(state, i))
+			if (hide(state, listener_state, i))
 				hide = true;
 		}
 
