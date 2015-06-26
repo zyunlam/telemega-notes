@@ -161,6 +161,26 @@ public class TeleGPSState extends AltosUIFlightTab {
 		}
 	}
 
+	class ReceiverBattery extends AltosUIVoltageIndicator {
+
+		public double voltage(AltosState state) { return AltosLib.MISSING; }
+
+		public double good() { return AltosLib.ao_battery_good; }
+
+		public boolean hide(AltosState state, AltosListenerState listener_state, int i) {
+			return value(state, listener_state, i) == AltosLib.MISSING;
+		}
+
+		public double value(AltosState state, AltosListenerState listener_state, int i) {
+			if (listener_state == null)
+				return AltosLib.MISSING;
+			return listener_state.battery;
+		}
+
+		public ReceiverBattery (AltosUIFlightTab container, int y) {
+			super(container, y, "Receiver Battery", 2);
+		}
+	}
 
 	public void labels(Container container, int y) {
 		GridBagLayout		layout = (GridBagLayout)(container.getLayout());
@@ -203,5 +223,6 @@ public class TeleGPSState extends AltosUIFlightTab {
 		add(new FirmwareVersion(this, y++));
 		add(new FlightLogMax(this, y++));
 		add(new BatteryVoltage(this, y++));
+		add(new ReceiverBattery(this, y++));
 	}
 }

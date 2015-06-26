@@ -373,7 +373,6 @@ public class TeleGPS
 				public void actionPerformed(ActionEvent e) {
 					int rate = rates.rate();
 					try {
-						System.out.printf("set rate %d\n", rate);
 						reader.set_telemetry_rate(rate);
 					} catch (TimeoutException te) {
 					} catch (InterruptedException ie) {
