@@ -253,6 +253,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	public void select_object(AltosLatLon latlon) {
 		if (map.transform == null)
 			return;
+		ArrayList<Integer>	near = new ArrayList<Integer>();
+
 		for (Rocket rocket : sorted_rockets()) {
 			if (rocket.position == null) {
 				debug("rocket %d has no position\n", rocket.serial);
@@ -262,10 +264,11 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			debug("check select %d distance %g width %d\n", rocket.serial, distance, rocket_bitmap.getWidth());
 			if (distance < rocket_bitmap.getWidth() * 2.0) {
 				debug("selecting %d\n", rocket.serial);
-				altos_droid.select_tracker(rocket.serial);
-				break;
+				near.add(rocket.serial);
 			}
 		}
+		if (near.size() != 0)
+			altos_droid.touch_trackers(near.toArray(new Integer[0]));
 	}
 
 	class Line {
@@ -359,7 +362,6 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 
 	@Override
 	protected void onDraw(Canvas view_canvas) {
-		debug("onDraw");
 		if (map == null) {
 			debug("MapView draw without map\n");
 			return;

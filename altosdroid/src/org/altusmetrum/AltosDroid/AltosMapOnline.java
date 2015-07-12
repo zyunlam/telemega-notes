@@ -21,15 +21,8 @@ import java.util.*;
 
 import org.altusmetrum.altoslib_7.*;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.*;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -48,6 +41,7 @@ class RocketOnline implements Comparable {
 	Marker		marker;
 	int		serial;
 	long		last_packet;
+	int		size;
 
 	void set_position(AltosLatLon position, long last_packet) {
 		marker.setPosition(new LatLng(position.lat, position.lon));
@@ -74,6 +68,8 @@ class RocketOnline implements Comparable {
 
 		float x = bitmap.getWidth() / 2.0f - width / 2.0f;
 		float y = bitmap.getHeight() / 2.0f - height / 2.0f;
+
+		size = bitmap.getWidth();
 
 		canvas.drawText(text, 0, text.length(), x, y, paint);
 		return bitmap;
@@ -106,7 +102,7 @@ class RocketOnline implements Comparable {
 	}
 }
 
-public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarkerClickListener {
+public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 	public SupportMapFragment mMapFragment;
 	private GoogleMap mMap;
 	private boolean mapLoaded = false;
@@ -152,14 +148,43 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 //		getChildFragmentManager().beginTransaction().add(R.id.map, mMapFragment).commit();
 //	}
 
-	public boolean onMarkerClick(Marker marker) {
-		for (RocketOnline rocket : rockets.values()) {
-			if (rocket.marker.equals(marker)) {
-				altos_droid.select_tracker(rocket.serial);
-				return true;
-			}
+	private double pixel_distance(LatLng a, LatLng b) {
+		Projection projection = mMap.getProjection();
+
+		Point	a_pt = projection.toScreenLocation(a);
+		Point	b_pt = projection.toScreenLocation(b);
+
+		return Math.hypot((double) (a_pt.x - b_pt.x), (double) (a_pt.y - b_pt.y));
+	}
+
+	private RocketOnline[] sorted_rockets() {
+		RocketOnline[]	rocket_array = rockets.values().toArray(new RocketOnline[0]);
+
+		Arrays.sort(rocket_array);
+		return rocket_array;
+	}
+
+	public void onMapClick(LatLng lat_lng) {
+		ArrayList<Integer>	near = new ArrayList<Integer>();
+
+		for (RocketOnline rocket : sorted_rockets()) {
+			LatLng	pos = rocket.marker.getPosition();
+
+			if (pos == null)
+				continue;
+
+			double distance = pixel_distance(lat_lng, pos);
+			if (distance < rocket.size * 2)
+				near.add(rocket.serial);
 		}
-		return false;
+
+		if (near.size() != 0)
+			altos_droid.touch_trackers(near.toArray(new Integer[0]));
+	}
+
+	public boolean onMarkerClick(Marker marker) {
+		onMapClick(marker.getPosition());
+		return true;
 	}
 
 	public void setupMap(int map_type) {
@@ -170,6 +195,7 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 			mMap.getUiSettings().setTiltGesturesEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 			mMap.setOnMarkerClickListener(this);
+			mMap.setOnMapClickListener(this);
 
 			mPadMarker = mMap.addMarker(
 					new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.pad))
