@@ -301,10 +301,6 @@ public class AltosVoice {
 		else
 			tell_mode = TELL_MODE_RECOVER;
 
-		AltosDebug.debug("last_serial %d serial %d last_mode %d mode %d\n",
-				 last_tell_serial, tell_serial,
-				 last_tell_mode, tell_mode);
-
 		if (tell_mode == TELL_MODE_PAD)
 			spoken = tell_pad(telem_state, state, from_receiver, receiver);
 		else if (tell_mode == TELL_MODE_FLIGHT)
