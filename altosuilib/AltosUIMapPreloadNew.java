@@ -140,10 +140,15 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 	JComboBox<Integer>	min_zoom;
 	JComboBox<Integer>	max_zoom;
-	JComboBox<Integer>	radius;
+	JComboBox<Double>	radius;
 
 	Integer[]		zooms = { -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6 };
-	Integer[]		radii = { 1, 2, 3, 4, 5 };
+
+	Double[]	radius_mi = { 1.0, 2.0, 5.0, 10.0, 20.0 };
+	Double		radius_def_mi = 5.0;
+	Double[]	radius_km = { 2.0, 5.0, 10.0, 20.0, 30.0 };
+	Double		radius_def_km = 10.0;
+
 
 	static final String[]	lat_hemi_names = { "N", "S" };
 	static final String[]	lon_hemi_names = { "E", "W" };
@@ -183,6 +188,11 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 			});
 	}
 
+	public void debug(String format, Object ... arguments) {
+		System.out.printf(format, arguments);
+	}
+
+
 	private int all_types() {
 		int all_types = 0;
 		for (int t = AltosMap.maptype_hybrid; t <= AltosMap.maptype_terrain; t++)
@@ -219,7 +229,12 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 					int max_z = (Integer) max_zoom.getSelectedItem();
 					if (max_z < min_z)
 						max_z = min_z;
-					int r = (Integer) radius.getSelectedItem();
+					Double r = (Double) radius.getSelectedItem();
+
+					if (AltosPreferences.imperial_units())
+						r = AltosConvert.distance.inverse(r);
+					else
+						r = r * 1000;
 					loading = true;
 
 					loader.load(latitude, longitude, min_z, max_z, r, all_types());
@@ -430,13 +445,21 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		c.gridy = 3;
 		pane.add(max_zoom, c);
 
-		JLabel radius_label = new JLabel("Tile Radius");
+		JLabel radius_label = new JLabel(String.format("Map Radius (%s)",
+							       AltosPreferences.imperial_units() ? "miles" : "km"));
 		c.gridx = 4;
 		c.gridy = 4;
 		pane.add(radius_label, c);
 
-		radius = new JComboBox<Integer>(radii);
-		radius.setSelectedItem(radii[4]);
+		Double[]	radii;
+		Double		radius_default;
+
+		if (AltosPreferences.imperial_units())
+			radii = radius_mi;
+		else
+			radii = radius_km;
+		radius = new JComboBox<Double>(radii);
+		radius.setSelectedItem(radii[2]);
 		radius.setEditable(true);
 		c.gridx = 5;
 		c.gridy = 4;

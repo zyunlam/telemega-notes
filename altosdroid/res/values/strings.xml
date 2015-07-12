@@ -106,7 +106,7 @@
 	<string name="preload_terrain">Terrain</string>
 	<string name="preload_min_zoom">Minimum Zoom</string>
 	<string name="preload_max_zoom">Maximum Zoom</string>
-	<string name="preload_tile_radius">Tile Radius</string>
+	<string name="preload_radius">Radius</string>
 	
 	<string name="preload_load">Load Map</string>
 </resources>

@@ -103,15 +103,15 @@
 	       android:prompt="@string/preload_max_zoom"
 	       android:spinnerMode="dropdown"
 	       />
-      <TextView android:id="@+id/preload_tile_radius_label"
+      <TextView android:id="@+id/preload_radius_label"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:text="@string/preload_tile_radius"
+		android:text="@string/preload_radius"
 		/>
-      <Spinner android:id="@+id/preload_tile_radius"
+      <Spinner android:id="@+id/preload_radius"
 	       android:layout_width="fill_parent"
 	       android:layout_height="wrap_content"
-	       android:prompt="@string/preload_tile_radius"
+	       android:prompt="@string/preload_radius"
 	       android:spinnerMode="dropdown"
 	       />
       <Button android:id="@+id/preload_load"

@@ -61,7 +61,8 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	private Spinner		known_sites_spinner;
 	private Spinner		min_zoom;
 	private Spinner		max_zoom;
-	private Spinner		tile_radius;
+	private TextView	radius_label;
+	private Spinner		radius;
 
 	private EditText	latitude;
 	private EditText	longitude;
@@ -227,8 +228,17 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		return value(max_zoom);
 	}
 
-	private int radius() {
-		return value(tile_radius);
+	private double value_distance(Spinner spinner) {
+		return (Double) spinner.getSelectedItem();
+	}
+
+	private double radius() {
+		double r = value_distance(radius);
+		if (AltosPreferences.imperial_units())
+			r = AltosConvert.distance.inverse(r);
+		else
+			r = r * 1000;
+		return r;
 	}
 
 	private int bit(CheckBox box, int value) {
@@ -250,11 +260,14 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 			double	lon = longitude();
 			int	min = min_z();
 			int	max = max_z();
-			int	r = radius();
+			double	r = radius();
 			int	t = types();
 
+			AltosDebug.debug("PreloadMap load %f %f %d %d %f %d\n",
+					 lat, lon, min, max, r, t);
 			loader.load(lat, lon, min, max, r, t);
 		} catch (ParseException e) {
+			AltosDebug.debug("PreloadMap load raised exception %s", e.toString());
 		}
 	}
 
@@ -276,6 +289,37 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		spinner.setSelection(spinner_def);
 	}
 
+
+	private void add_distance(Spinner spinner, double[] distances_km, double def_km, double[] distances_mi, double def_mi) {
+
+		ArrayAdapter<Double> adapter = new ArrayAdapter<Double>(this, android.R.layout.simple_spinner_item);
+
+		int	spinner_def = 0;
+		int	pos = 0;
+
+		double[] distances;
+		double	def;
+		if (AltosPreferences.imperial_units()) {
+			distances = distances_mi;
+			def = def_mi;
+		} else {
+			distances = distances_km;
+			def = def_km;
+		}
+
+		for (int i = 0; i < distances.length; i++) {
+			adapter.add(distances[i]);
+			if (distances[i] == def)
+				spinner_def = pos;
+			pos++;
+		}
+
+		spinner.setAdapter(adapter);
+		spinner.setSelection(spinner_def);
+	}
+
+
+
 	class SiteListListener implements OnItemSelectedListener {
 		public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 			AltosLaunchSite	site = (AltosLaunchSite) parent.getItemAtPosition(pos);
@@ -288,6 +332,11 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		public SiteListListener() {
 		}
 	}
+
+	double[]	radius_mi = { 1, 2, 5, 10, 20 };
+	double		radius_def_mi = 2;
+	double[]	radius_km = { 1, 2, 5, 10, 20, 30 };
+	double		radius_def_km = 2;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -326,8 +375,13 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		add_numbers(max_zoom,
 			    AltosMap.min_zoom - AltosMap.default_zoom,
 			    AltosMap.max_zoom - AltosMap.default_zoom, 2);
-		tile_radius = (Spinner) findViewById(R.id.preload_tile_radius);
-		add_numbers(tile_radius, 1, 5, 5);
+		radius_label = (TextView) findViewById(R.id.preload_radius_label);
+		radius = (Spinner) findViewById(R.id.preload_radius);
+		if (AltosPreferences.imperial_units())
+			radius_label.setText("Radius (miles)");
+		else
+			radius_label.setText("Radius (km)");
+		add_distance(radius, radius_km, radius_def_km, radius_mi, radius_def_mi);
 
 		progress = (ProgressBar) findViewById(R.id.preload_progress);
 

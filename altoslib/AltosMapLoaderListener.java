@@ -23,4 +23,6 @@ public interface AltosMapLoaderListener {
 	public abstract void loader_notify(int cur, int max, String name);
 
 	public abstract void loader_done(int max);
+
+	public abstract void debug(String format, Object ... arguments);
 }
