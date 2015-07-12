@@ -15,7 +15,9 @@ Desired AltosDroid feature list
 
  *) Monitor-idle mode
 
- *) Monitor TeleMega igniters
+ *) Online maps comes up tracking object at 0,0
+
+ *) Have names for each serial number, default to callsign
 
 Completed features
 
@@ -90,3 +92,17 @@ Completed features
  *) Make voice responses depend on selected tab
 
 	Done.
+
+ *) Monitor TeleMega igniters
+
+	Done. Visible only in Pad tab
+
+ *) Make it harder to switch trackers in map view. Too easy to touch
+    the screen and switch on accident.
+
+	Done. A menu pops up with trackers within a small radius of
+	the touch point, letting you cancel if that wasn't your intent.
+
+ *) Make sure it keeps talking with the screen blanked
+
+	Done. Don't shut down voice when stopping UI.

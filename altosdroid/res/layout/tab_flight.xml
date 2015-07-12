@@ -15,377 +15,386 @@
      with this program; if not, write to the Free Software Foundation, Inc.,
      59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+  <LinearLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="0"
+      android:baselineAligned="true"
+      android:orientation="horizontal" >
+
+    <RelativeLayout
+	android:layout_width="0dp"
 	android:layout_height="wrap_content"
-	android:orientation="vertical" >
+	android:layout_weight="1" >
 
-	<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="0"
-		android:baselineAligned="true"
-		android:orientation="horizontal" >
+      <TextView
+	  android:id="@+id/speed_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/speed_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/speed_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/speed_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/speed_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/speed_label" />
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-			<TextView
-				android:id="@+id/speed_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/speed_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+      <TextView
+	  android:id="@+id/height_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/height_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/height_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/height_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/height_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/height_label" />
+  </LinearLayout>
 
-			<TextView
-				android:id="@+id/height_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/height_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+  <LinearLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="0"
+      android:baselineAligned="true"
+      android:orientation="horizontal" >
 
-	</LinearLayout>
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-	<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="0"
-		android:baselineAligned="true"
-		android:orientation="horizontal" >
+      <TextView
+	  android:id="@+id/max_speed_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/max_speed_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/max_speed_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/max_speed_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/max_speed_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/max_speed_label" />
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-			<TextView
-				android:id="@+id/max_speed_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/max_speed_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+      <TextView
+	  android:id="@+id/max_height_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/max_height_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/max_height_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/max_height_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/max_height_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/max_height_label" />
+  </LinearLayout>
 
-			<TextView
-				android:id="@+id/max_height_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/max_height_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+  <LinearLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="0"
+      android:baselineAligned="true"
+      android:orientation="horizontal"
+      android:paddingTop="5dp" >
 
-	</LinearLayout>
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-	<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="0"
-		android:baselineAligned="true"
-		android:orientation="horizontal"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/elevation_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/elevation_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/elevation_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/elevation_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/elevation_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/elevation_label" />
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-			<TextView
-				android:id="@+id/elevation_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/elevation_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+      <TextView
+	  android:id="@+id/range_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/range_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/range_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/range_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/range_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/range_label" />
+  </LinearLayout>
 
-			<TextView
-				android:id="@+id/range_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/range_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+  <LinearLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="0"
+      android:baselineAligned="true"
+      android:orientation="horizontal"
+      android:paddingTop="5dp" >
 
-	</LinearLayout>
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-	<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="0"
-		android:baselineAligned="true"
-		android:orientation="horizontal"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/bearing_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/bearing_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/bearing_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/bearing_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/bearing_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/bearing_label" />
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-			<TextView
-				android:id="@+id/bearing_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/bearing_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+      <TextView
+	  android:id="@+id/compass_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/compass_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/compass_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/compass_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="" />
+  </LinearLayout>
 
-			<TextView
-				android:id="@+id/compass_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/compass_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+  <LinearLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="0"
+      android:baselineAligned="true"
+      android:orientation="horizontal"
+      android:paddingTop="5dp" >
 
-	</LinearLayout>
+    <RelativeLayout
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
 
-	<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="0"
-		android:baselineAligned="true"
-		android:orientation="horizontal"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/distance_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/gnd_distance_label" />
 
-		<RelativeLayout
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
+      <TextView
+	  android:id="@+id/distance_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/distance_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-			<TextView
-				android:id="@+id/distance_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/gnd_distance_label" />
+    <TextView
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1" >
+    </TextView>
 
-			<TextView
-				android:id="@+id/distance_value"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_below="@id/distance_label"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall" />
-		</RelativeLayout>
+  </LinearLayout>
 
-		<TextView
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1" >
-		</TextView>
+  <RelativeLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingTop="5dp" >
 
-	</LinearLayout>
+    <TextView
+	android:id="@+id/lat_label"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:text="@string/latitude_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+    <TextView
+	android:id="@+id/lat_value"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentRight="true"
+	android:layout_below="@id/lat_label"
+	android:text=""
+	android:textAppearance="?android:attr/textAppearanceSmall" />
+  </RelativeLayout>
 
-		<TextView
-			android:id="@+id/lat_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/latitude_label" />
+  <RelativeLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingTop="5dp" >
 
-		<TextView
-			android:id="@+id/lat_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/lat_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+    <TextView
+	android:id="@+id/lon_label"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:text="@string/longitude_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+    <TextView
+	android:id="@+id/lon_value"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentRight="true"
+	android:layout_below="@id/lon_label"
+	android:text=""
+	android:textAppearance="?android:attr/textAppearanceSmall" />
+  </RelativeLayout>
 
-		<TextView
-			android:id="@+id/lon_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/longitude_label" />
+  <RelativeLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingTop="5dp" >
 
-		<TextView
-			android:id="@+id/lon_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/lon_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+    <ImageView
+	android:visibility="gone"
+	android:id="@+id/apogee_redled"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:contentDescription="@string/apogee_voltage_label"
+	android:src="@drawable/grayled" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+    <ImageView
+	android:visibility="gone"
+	android:id="@+id/apogee_greenled"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_toRightOf="@id/apogee_redled"
+	android:contentDescription="@string/apogee_voltage_label"
+	android:paddingRight="5dp"
+	android:src="@drawable/grayled" />
 
-		<ImageView
-			android:id="@+id/apogee_redled"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:contentDescription="@string/apogee_voltage_label"
-			android:src="@drawable/grayled" />
+    <TextView
+	android:visibility="gone"
+	android:id="@+id/apogee_voltage_label"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_toRightOf="@id/apogee_greenled"
+	android:text="@string/apogee_voltage_label" />
 
-		<ImageView
-			android:id="@+id/apogee_greenled"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_toRightOf="@id/apogee_redled"
-			android:contentDescription="@string/apogee_voltage_label"
-			android:paddingRight="5dp"
-			android:src="@drawable/grayled" />
+    <TextView
+	android:visibility="gone"
+	android:id="@+id/apogee_voltage_value"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentRight="true"
+	android:layout_below="@id/apogee_voltage_label"
+	android:layout_toRightOf="@id/apogee_greenled"
+	android:text=""
+	android:textAppearance="?android:attr/textAppearanceSmall" />
+  </RelativeLayout>
 
-		<TextView
-			android:id="@+id/apogee_voltage_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_toRightOf="@id/apogee_greenled"
-			android:text="@string/apogee_voltage_label" />
+  <RelativeLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingTop="5dp" >
 
-		<TextView
-			android:id="@+id/apogee_voltage_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/apogee_voltage_label"
-			android:layout_toRightOf="@id/apogee_greenled"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+    <ImageView
+	android:visibility="gone"
+	android:id="@+id/main_redled"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:contentDescription="@string/main_voltage_label"
+	android:src="@drawable/grayled" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+    <ImageView
+	android:visibility="gone"
+	android:id="@+id/main_greenled"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_toRightOf="@id/main_redled"
+	android:contentDescription="@string/main_voltage_label"
+	android:paddingRight="5dp"
+	android:src="@drawable/grayled" />
 
-		<ImageView
-			android:id="@+id/main_redled"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:contentDescription="@string/main_voltage_label"
-			android:src="@drawable/grayled" />
+    <TextView
+	android:visibility="gone"
+	android:id="@+id/main_voltage_label"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_toRightOf="@id/main_greenled"
+	android:text="@string/main_voltage_label" />
 
-		<ImageView
-			android:id="@+id/main_greenled"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_toRightOf="@id/main_redled"
-			android:contentDescription="@string/main_voltage_label"
-			android:paddingRight="5dp"
-			android:src="@drawable/grayled" />
-
-		<TextView
-			android:id="@+id/main_voltage_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_toRightOf="@id/main_greenled"
-			android:text="@string/main_voltage_label" />
-
-		<TextView
-			android:id="@+id/main_voltage_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/main_voltage_label"
-			android:layout_toRightOf="@id/main_greenled"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+    <TextView
+	android:visibility="gone"
+	android:id="@+id/main_voltage_value"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentRight="true"
+	android:layout_below="@id/main_voltage_label"
+	android:layout_toRightOf="@id/main_greenled"
+	android:text=""
+	android:textAppearance="?android:attr/textAppearanceSmall" />
+  </RelativeLayout>
 
 </LinearLayout>

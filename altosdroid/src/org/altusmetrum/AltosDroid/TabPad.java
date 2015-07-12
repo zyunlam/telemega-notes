@@ -54,9 +54,14 @@ public class TabPad extends AltosDroidTab {
 	private TextView gps_ready_view;
 	private GoNoGoLights gps_ready_lights;
 
-	private TextView pad_latitude_view;
-	private TextView pad_longitude_view;
-	private TextView pad_altitude_view;
+	private TextView receiver_latitude_view;
+	private TextView receiver_longitude_view;
+	private TextView receiver_altitude_view;
+
+	private TextView[] ignite_voltage_view = new TextView[4];
+	private TextView[] ignite_voltage_label = new TextView[4];
+	private GoNoGoLights[] ignite_lights = new GoNoGoLights[4];
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -99,9 +104,46 @@ public class TabPad extends AltosDroidTab {
 		                                   (ImageView) v.findViewById(R.id.gps_ready_greenled),
 		                                   getResources());
 
-		pad_latitude_view = (TextView) v.findViewById(R.id.pad_lat_value);
-		pad_longitude_view = (TextView) v.findViewById(R.id.pad_lon_value);
-		pad_altitude_view = (TextView) v.findViewById(R.id.pad_alt_value);
+		for (int i = 0; i < 4; i++) {
+			int view_id, label_id, lights_id;
+			int red_id, green_id;
+			switch (i) {
+			case 0:
+			default:
+				view_id = R.id.ignite_a_voltage_value;
+				label_id = R.id.ignite_a_voltage_label;
+				red_id = R.id.ignite_a_redled;
+				green_id = R.id.ignite_a_greenled;
+				break;
+			case 1:
+				view_id = R.id.ignite_b_voltage_value;
+				label_id = R.id.ignite_b_voltage_label;
+				red_id = R.id.ignite_b_redled;
+				green_id = R.id.ignite_b_greenled;
+				break;
+			case 2:
+				view_id = R.id.ignite_c_voltage_value;
+				label_id = R.id.ignite_c_voltage_label;
+				red_id = R.id.ignite_c_redled;
+				green_id = R.id.ignite_c_greenled;
+				break;
+			case 3:
+				view_id = R.id.ignite_d_voltage_value;
+				label_id = R.id.ignite_d_voltage_label;
+				red_id = R.id.ignite_d_redled;
+				green_id = R.id.ignite_d_greenled;
+				break;
+			}
+			ignite_voltage_view[i] = (TextView) v.findViewById(view_id);
+			ignite_voltage_label[i] = (TextView) v.findViewById(label_id);
+			ignite_lights[i] = new GoNoGoLights((ImageView) v.findViewById(red_id),
+							     (ImageView) v.findViewById(green_id),
+							     getResources());
+		}
+
+		receiver_latitude_view = (TextView) v.findViewById(R.id.receiver_lat_value);
+		receiver_longitude_view = (TextView) v.findViewById(R.id.receiver_lon_value);
+		receiver_altitude_view = (TextView) v.findViewById(R.id.receiver_alt_value);
         return v;
 	}
 
@@ -109,13 +151,13 @@ public class TabPad extends AltosDroidTab {
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
-			battery_voltage_view.setText(AltosDroid.number("%4.2f V", state.battery_voltage));
+			battery_voltage_view.setText(AltosDroid.number(" %4.2f V", state.battery_voltage));
 			battery_lights.set(state.battery_voltage >= AltosLib.ao_battery_good, state.battery_voltage == AltosLib.MISSING);
 			if (state.apogee_voltage == AltosLib.MISSING) {
 				apogee_voltage_view.setVisibility(View.GONE);
 				apogee_voltage_label.setVisibility(View.GONE);
 			} else {
-				apogee_voltage_view.setText(AltosDroid.number("%4.2f V", state.apogee_voltage));
+				apogee_voltage_view.setText(AltosDroid.number(" %4.2f V", state.apogee_voltage));
 				apogee_voltage_view.setVisibility(View.VISIBLE);
 				apogee_voltage_label.setVisibility(View.VISIBLE);
 			}
@@ -124,11 +166,26 @@ public class TabPad extends AltosDroidTab {
 				main_voltage_view.setVisibility(View.GONE);
 				main_voltage_label.setVisibility(View.GONE);
 			} else {
-				main_voltage_view.setText(AltosDroid.number("%4.2f V", state.main_voltage));
+				main_voltage_view.setText(AltosDroid.number(" %4.2f V", state.main_voltage));
 				main_voltage_view.setVisibility(View.VISIBLE);
 				main_voltage_label.setVisibility(View.VISIBLE);
 			}
 			main_lights.set(state.main_voltage >= AltosLib.ao_igniter_good, state.main_voltage == AltosLib.MISSING);
+
+			int num_igniter = state.ignitor_voltage == null ? 0 : state.ignitor_voltage.length;
+
+			for (int i = 0; i < 4; i++) {
+				double voltage = i >= num_igniter ? AltosLib.MISSING : state.ignitor_voltage[i];
+				if (voltage == AltosLib.MISSING) {
+					ignite_voltage_view[i].setVisibility(View.GONE);
+					ignite_voltage_label[i].setVisibility(View.GONE);
+				} else {
+					ignite_voltage_view[i].setText(AltosDroid.number(" %4.2f V", voltage));
+					ignite_voltage_view[i].setVisibility(View.VISIBLE);
+					ignite_voltage_label[i].setVisibility(View.VISIBLE);
+				}
+				ignite_lights[i].set(voltage >= AltosLib.ao_igniter_good, voltage == AltosLib.MISSING);
+			}
 
 			if (state.flight != 0) {
 				if (state.state <= AltosLib.ao_flight_pad)
@@ -145,7 +202,7 @@ public class TabPad extends AltosDroidTab {
 			if (state.gps != null) {
 				int soln = state.gps.nsat;
 				int nsat = state.gps.cc_gps_sat != null ? state.gps.cc_gps_sat.length : 0;
-				gps_locked_view.setText(String.format("%4d in soln, %4d in view", soln, nsat));
+				gps_locked_view.setText(String.format("%d in soln, %d in view", soln, nsat));
 				gps_locked_lights.set(state.gps.locked && state.gps.nsat >= 4, false);
 				if (state.gps_ready)
 					gps_ready_view.setText("Ready");
@@ -161,7 +218,7 @@ public class TabPad extends AltosDroidTab {
 				receiver_voltage_view.setVisibility(View.GONE);
 				receiver_voltage_label.setVisibility(View.GONE);
 			} else {
-				receiver_voltage_view.setText(AltosDroid.number("%4.2f V", telem_state.receiver_battery));
+				receiver_voltage_view.setText(AltosDroid.number(" %4.2f V", telem_state.receiver_battery));
 				receiver_voltage_view.setVisibility(View.VISIBLE);
 				receiver_voltage_label.setVisibility(View.VISIBLE);
 			}
@@ -172,10 +229,9 @@ public class TabPad extends AltosDroidTab {
 			double altitude = AltosLib.MISSING;
 			if (receiver.hasAltitude())
 				altitude = receiver.getAltitude();
-			pad_latitude_view.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
-			pad_longitude_view.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
-			set_value(pad_altitude_view, AltosConvert.height, 6, altitude);
+			receiver_latitude_view.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
+			receiver_longitude_view.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
+			set_value(receiver_altitude_view, AltosConvert.height, 1, altitude);
 		}
 	}
-
 }
