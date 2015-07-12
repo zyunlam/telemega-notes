@@ -133,7 +133,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 			switch (msg.what) {
 			case MSG_STATE:
-				AltosDebug.debug("MSG_STATE");
 				if (msg.obj == null) {
 					AltosDebug.debug("telemetry_state null!");
 					return;
@@ -141,7 +140,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				ad.update_state((TelemetryState) msg.obj);
 				break;
 			case MSG_UPDATE_AGE:
-				AltosDebug.debug("MSG_UPDATE_AGE");
 				ad.update_age();
 				break;
 			}
@@ -691,12 +689,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	public void onStop() {
 		super.onStop();
 		AltosDebug.debug("-- ON STOP --");
-
-		doUnbindService();
-		if (mAltosVoice != null) {
-			mAltosVoice.stop();
-			mAltosVoice = null;
-		}
 	}
 
 	@Override
@@ -704,7 +696,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		super.onDestroy();
 		AltosDebug.debug("--- ON DESTROY ---");
 
-		if (mAltosVoice != null) mAltosVoice.stop();
+		doUnbindService();
+		if (mAltosVoice != null) {
+			mAltosVoice.stop();
+			mAltosVoice = null;
+		}
 		stop_timer();
 	}
 
