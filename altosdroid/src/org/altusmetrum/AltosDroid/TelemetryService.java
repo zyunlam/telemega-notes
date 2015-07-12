@@ -199,13 +199,11 @@ public class TelemetryService extends Service implements LocationListener {
 				 * Messages from TelemetryReader
 				 */
 			case MSG_TELEMETRY:
-				AltosDebug.debug("MSG_TELEMETRY");
 				s.telemetry((AltosTelemetry) msg.obj);
 				break;
 			case MSG_CRC_ERROR:
 				// forward crc error messages
 				s.telemetry_state.crc_errors = (Integer) msg.obj;
-				AltosDebug.debug("MSG_CRC_ERROR");
 				s.send_to_clients();
 				break;
 			default:
@@ -226,7 +224,6 @@ public class TelemetryService extends Service implements LocationListener {
 		telem.update_state(state);
 		telemetry_state.states.put(telem.serial, state);
 		if (state != null) {
-			AltosDebug.debug("Save state %d", telem.serial);
 			AltosPreferences.set_state(telem.serial, state, null);
 		}
 		send_to_clients();
@@ -280,7 +277,6 @@ public class TelemetryService extends Service implements LocationListener {
 
 	private void send_to_client(Messenger client, Message m) {
 		try {
-			AltosDebug.debug("Send message to client %s", client.toString());
 			client.send(m);
 		} catch (RemoteException e) {
 			AltosDebug.error("Client %s disappeared", client.toString());
@@ -290,7 +286,6 @@ public class TelemetryService extends Service implements LocationListener {
 
 	private void send_to_clients() {
 		Message m = message();
-		AltosDebug.debug("Send message to %d clients", clients.size());
 		for (Messenger client : clients)
 			send_to_client(client, m);
 	}
@@ -375,7 +370,6 @@ public class TelemetryService extends Service implements LocationListener {
 		if (altos_link != null) {
 			try {
 				double	voltage = altos_link.monitor_battery();
-				AltosDebug.debug("update receiver voltage %g\n", voltage);
 				telemetry_state.receiver_battery = voltage;
 			} catch (InterruptedException ie) {
 			}
@@ -519,7 +513,11 @@ public class TelemetryService extends Service implements LocationListener {
 		// Move us into the foreground.
 		startForeground(NOTIFICATION, notification);
 
-		if (intent != null) {
+		/* Start bluetooth if we don't have a connection already */
+		if (intent != null &&
+		    (telemetry_state.connect == TelemetryState.CONNECT_NONE ||
+		     telemetry_state.connect == TelemetryState.CONNECT_DISCONNECTED))
+		{
 			String	action = intent.getAction();
 
 			if (action.equals(AltosDroid.ACTION_BLUETOOTH)) {
