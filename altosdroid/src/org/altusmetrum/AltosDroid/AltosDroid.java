@@ -652,6 +652,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		super.onStart();
 		AltosDebug.debug("++ ON START ++");
 
+		set_switch_time();
+
 		noticeIntent(getIntent());
 
 		// Start Telemetry Service
