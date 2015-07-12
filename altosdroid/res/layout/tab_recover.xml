@@ -15,217 +15,237 @@
      with this program; if not, write to the Free Software Foundation, Inc.,
      59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:orientation="vertical" >
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" >
+  <LinearLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_weight="0"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical" >
 
-		<TextView
-			android:id="@+id/bearing_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/bearing_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content" >
 
-		<TextView
-			android:id="@+id/bearing_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@+id/bearing_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/bearing_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/bearing_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" >
+      <TextView
+	  android:id="@+id/bearing_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@+id/bearing_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/direction_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/direction_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content" >
 
-		<TextView
-			android:id="@+id/direction_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@+id/direction_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/direction_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/direction_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/direction_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@+id/direction_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/distance_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/distance_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/distance_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@+id/distance_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/distance_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/distance_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/distance_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@+id/distance_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/target_lat_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/target_latitude_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/target_lat_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/target_lat_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/target_lat_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/target_latitude_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/target_lat_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/target_lat_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/target_lon_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/target_longitude_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/target_lon_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/target_lon_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/target_lon_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/target_longitude_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/target_lon_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/target_lon_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/receiver_lat_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/receiver_latitude_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/receiver_lat_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/receiver_lat_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/receiver_lat_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/receiver_latitude_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/receiver_lat_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/receiver_lat_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/receiver_lon_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/receiver_longitude_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/receiver_lon_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/receiver_lon_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/receiver_lon_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/receiver_longitude_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/receiver_lon_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/receiver_lon_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/max_height_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/max_height_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/max_height_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/max_height_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/max_height_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/max_height_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/max_height_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/max_height_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/max_speed_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/max_speed_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/max_speed_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/max_speed_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/max_speed_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/max_speed_label" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp" >
+      <TextView
+	  android:id="@+id/max_speed_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/max_speed_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
-		<TextView
-			android:id="@+id/max_accel_label"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/max_accel_label" />
+    <RelativeLayout
+	android:layout_gravity="fill"
+	android:layout_weight="1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
 
-		<TextView
-			android:id="@+id/max_accel_value"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_below="@id/max_accel_label"
-			android:text=""
-			android:textAppearance="?android:attr/textAppearanceSmall" />
-	</RelativeLayout>
+      <TextView
+	  android:id="@+id/max_accel_label"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:text="@string/max_accel_label" />
 
+      <TextView
+	  android:id="@+id/max_accel_value"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_alignParentRight="true"
+	  android:layout_below="@id/max_accel_label"
+	  android:text=""
+	  android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
+  </LinearLayout>
 </LinearLayout>

@@ -26,6 +26,7 @@
       android:baselineAligned="true"
       android:orientation="horizontal"
       android:layout_weight="1">
+
     <LinearLayout
 	android:id="@+id/map_online"
 	android:orientation="horizontal"
@@ -33,11 +34,12 @@
 	android:layout_height="fill_parent"
 	android:layout_weight="1">
     </LinearLayout>
-    <org.altusmetrum.AltosDroid.AltosMapOffline android:id="@+id/map_offline"
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						/>
+
+    <org.altusmetrum.AltosDroid.AltosMapOffline
+	android:id="@+id/map_offline"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"/>
   </FrameLayout>
   
   <LinearLayout

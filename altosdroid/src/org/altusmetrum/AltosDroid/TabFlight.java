@@ -22,11 +22,8 @@ import org.altusmetrum.altoslib_7.*;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
 import android.location.Location;
 
 public class TabFlight extends AltosDroidTab {
@@ -41,9 +38,11 @@ public class TabFlight extends AltosDroidTab {
 	private TextView distance_view;
 	private TextView latitude_view;
 	private TextView longitude_view;
+	private View apogee_view;
 	private TextView apogee_voltage_view;
 	private TextView apogee_voltage_label;
 	private GoNoGoLights apogee_lights;
+	private View main_view;
 	private TextView main_voltage_view;
 	private TextView main_voltage_label;
 	private GoNoGoLights main_lights;
@@ -64,12 +63,14 @@ public class TabFlight extends AltosDroidTab {
 		latitude_view  = (TextView) v.findViewById(R.id.lat_value);
 		longitude_view = (TextView) v.findViewById(R.id.lon_value);
 
+		apogee_view = v.findViewById(R.id.apogee_view);
 		apogee_voltage_view = (TextView) v.findViewById(R.id.apogee_voltage_value);
 		apogee_lights = new GoNoGoLights((ImageView) v.findViewById(R.id.apogee_redled),
 		                                 (ImageView) v.findViewById(R.id.apogee_greenled),
 		                                 getResources());
 		apogee_voltage_label = (TextView) v.findViewById(R.id.apogee_voltage_label);
 
+		main_view = v.findViewById(R.id.main_view);
 		main_voltage_view = (TextView) v.findViewById(R.id.main_voltage_value);
 		main_lights = new GoNoGoLights((ImageView) v.findViewById(R.id.main_redled),
 		                               (ImageView) v.findViewById(R.id.main_greenled),
@@ -106,27 +107,19 @@ public class TabFlight extends AltosDroidTab {
 			}
 
 			if (state.apogee_voltage == AltosLib.MISSING) {
-				apogee_voltage_view.setVisibility(View.GONE);
-				apogee_voltage_label.setVisibility(View.GONE);
-				apogee_lights.hide();
+				apogee_view.setVisibility(View.GONE);
 			} else {
 				apogee_voltage_view.setText(AltosDroid.number("%4.2f V", state.apogee_voltage));
-				apogee_voltage_view.setVisibility(View.VISIBLE);
-				apogee_voltage_label.setVisibility(View.VISIBLE);
 				apogee_lights.set(state.apogee_voltage > 3.2, state.apogee_voltage == AltosLib.MISSING);
-				apogee_lights.show();
+				apogee_view.setVisibility(View.VISIBLE);
 			}
 
 			if (state.main_voltage == AltosLib.MISSING) {
-				main_voltage_view.setVisibility(View.GONE);
-				main_voltage_label.setVisibility(View.GONE);
-				main_lights.hide();
+				main_view.setVisibility(View.GONE);
 			} else {
 				main_voltage_view.setText(AltosDroid.number("%4.2f V", state.main_voltage));
-				main_voltage_view.setVisibility(View.VISIBLE);
-				main_voltage_label.setVisibility(View.VISIBLE);
 				main_lights.set(state.main_voltage > 3.2, state.main_voltage == AltosLib.MISSING);
-				main_lights.show();
+				main_view.setVisibility(View.VISIBLE);
 			}
 		}
 	}

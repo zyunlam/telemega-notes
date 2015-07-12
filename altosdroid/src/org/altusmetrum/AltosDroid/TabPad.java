@@ -22,25 +22,25 @@ import org.altusmetrum.altoslib_7.*;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
 import android.location.Location;
 
 public class TabPad extends AltosDroidTab {
 	private TextView battery_voltage_view;
 	private GoNoGoLights battery_lights;
 
+	private TableRow receiver_row;
 	private TextView receiver_voltage_view;
 	private TextView receiver_voltage_label;
 	private GoNoGoLights receiver_voltage_lights;
 
+	private TableRow apogee_row;
 	private TextView apogee_voltage_view;
 	private TextView apogee_voltage_label;
 	private GoNoGoLights apogee_lights;
 
+	private TableRow main_row;
 	private TextView main_voltage_view;
 	private TextView main_voltage_label;
 	private GoNoGoLights main_lights;
@@ -58,6 +58,7 @@ public class TabPad extends AltosDroidTab {
 	private TextView receiver_longitude_view;
 	private TextView receiver_altitude_view;
 
+	private TableRow[] ignite_row = new TableRow[4];
 	private TextView[] ignite_voltage_view = new TextView[4];
 	private TextView[] ignite_voltage_label = new TextView[4];
 	private GoNoGoLights[] ignite_lights = new GoNoGoLights[4];
@@ -71,18 +72,21 @@ public class TabPad extends AltosDroidTab {
 		                                  (ImageView) v.findViewById(R.id.battery_greenled),
 		                                  getResources());
 
+		receiver_row = (TableRow) v.findViewById(R.id.receiver_row);
 		receiver_voltage_view = (TextView) v.findViewById(R.id.receiver_voltage_value);
 		receiver_voltage_label = (TextView) v.findViewById(R.id.receiver_voltage_label);
 		receiver_voltage_lights = new GoNoGoLights((ImageView) v.findViewById(R.id.receiver_redled),
 							   (ImageView) v.findViewById(R.id.receiver_greenled),
 							   getResources());
 
+		apogee_row = (TableRow) v.findViewById(R.id.apogee_row);
 		apogee_voltage_view = (TextView) v.findViewById(R.id.apogee_voltage_value);
 		apogee_voltage_label = (TextView) v.findViewById(R.id.apogee_voltage_label);
 		apogee_lights = new GoNoGoLights((ImageView) v.findViewById(R.id.apogee_redled),
 		                                 (ImageView) v.findViewById(R.id.apogee_greenled),
 		                                 getResources());
 
+		main_row = (TableRow) v.findViewById(R.id.main_row);
 		main_voltage_view = (TextView) v.findViewById(R.id.main_voltage_value);
 		main_voltage_label = (TextView) v.findViewById(R.id.main_voltage_label);
 		main_lights = new GoNoGoLights((ImageView) v.findViewById(R.id.main_redled),
@@ -105,35 +109,40 @@ public class TabPad extends AltosDroidTab {
 		                                   getResources());
 
 		for (int i = 0; i < 4; i++) {
-			int view_id, label_id, lights_id;
+			int row_id, view_id, label_id, lights_id;
 			int red_id, green_id;
 			switch (i) {
 			case 0:
 			default:
+				row_id = R.id.ignite_a_row;
 				view_id = R.id.ignite_a_voltage_value;
 				label_id = R.id.ignite_a_voltage_label;
 				red_id = R.id.ignite_a_redled;
 				green_id = R.id.ignite_a_greenled;
 				break;
 			case 1:
+				row_id = R.id.ignite_b_row;
 				view_id = R.id.ignite_b_voltage_value;
 				label_id = R.id.ignite_b_voltage_label;
 				red_id = R.id.ignite_b_redled;
 				green_id = R.id.ignite_b_greenled;
 				break;
 			case 2:
+				row_id = R.id.ignite_c_row;
 				view_id = R.id.ignite_c_voltage_value;
 				label_id = R.id.ignite_c_voltage_label;
 				red_id = R.id.ignite_c_redled;
 				green_id = R.id.ignite_c_greenled;
 				break;
 			case 3:
+				row_id = R.id.ignite_d_row;
 				view_id = R.id.ignite_d_voltage_value;
 				label_id = R.id.ignite_d_voltage_label;
 				red_id = R.id.ignite_d_redled;
 				green_id = R.id.ignite_d_greenled;
 				break;
 			}
+			ignite_row[i] = (TableRow) v.findViewById(row_id);
 			ignite_voltage_view[i] = (TextView) v.findViewById(view_id);
 			ignite_voltage_label[i] = (TextView) v.findViewById(label_id);
 			ignite_lights[i] = new GoNoGoLights((ImageView) v.findViewById(red_id),
@@ -154,21 +163,17 @@ public class TabPad extends AltosDroidTab {
 			battery_voltage_view.setText(AltosDroid.number(" %4.2f V", state.battery_voltage));
 			battery_lights.set(state.battery_voltage >= AltosLib.ao_battery_good, state.battery_voltage == AltosLib.MISSING);
 			if (state.apogee_voltage == AltosLib.MISSING) {
-				apogee_voltage_view.setVisibility(View.GONE);
-				apogee_voltage_label.setVisibility(View.GONE);
+				apogee_row.setVisibility(View.GONE);
 			} else {
 				apogee_voltage_view.setText(AltosDroid.number(" %4.2f V", state.apogee_voltage));
-				apogee_voltage_view.setVisibility(View.VISIBLE);
-				apogee_voltage_label.setVisibility(View.VISIBLE);
+				apogee_row.setVisibility(View.VISIBLE);
 			}
 			apogee_lights.set(state.apogee_voltage >= AltosLib.ao_igniter_good, state.apogee_voltage == AltosLib.MISSING);
 			if (state.main_voltage == AltosLib.MISSING) {
-				main_voltage_view.setVisibility(View.GONE);
-				main_voltage_label.setVisibility(View.GONE);
+				main_row.setVisibility(View.GONE);
 			} else {
 				main_voltage_view.setText(AltosDroid.number(" %4.2f V", state.main_voltage));
-				main_voltage_view.setVisibility(View.VISIBLE);
-				main_voltage_label.setVisibility(View.VISIBLE);
+				main_row.setVisibility(View.VISIBLE);
 			}
 			main_lights.set(state.main_voltage >= AltosLib.ao_igniter_good, state.main_voltage == AltosLib.MISSING);
 
@@ -177,12 +182,10 @@ public class TabPad extends AltosDroidTab {
 			for (int i = 0; i < 4; i++) {
 				double voltage = i >= num_igniter ? AltosLib.MISSING : state.ignitor_voltage[i];
 				if (voltage == AltosLib.MISSING) {
-					ignite_voltage_view[i].setVisibility(View.GONE);
-					ignite_voltage_label[i].setVisibility(View.GONE);
+					ignite_row[i].setVisibility(View.GONE);
 				} else {
 					ignite_voltage_view[i].setText(AltosDroid.number(" %4.2f V", voltage));
-					ignite_voltage_view[i].setVisibility(View.VISIBLE);
-					ignite_voltage_label[i].setVisibility(View.VISIBLE);
+					ignite_row[i].setVisibility(View.VISIBLE);
 				}
 				ignite_lights[i].set(voltage >= AltosLib.ao_igniter_good, voltage == AltosLib.MISSING);
 			}
@@ -215,12 +218,10 @@ public class TabPad extends AltosDroidTab {
 
 		if (telem_state != null) {
 			if (telem_state.receiver_battery == AltosLib.MISSING) {
-				receiver_voltage_view.setVisibility(View.GONE);
-				receiver_voltage_label.setVisibility(View.GONE);
+				receiver_row.setVisibility(View.GONE);
 			} else {
 				receiver_voltage_view.setText(AltosDroid.number(" %4.2f V", telem_state.receiver_battery));
-				receiver_voltage_view.setVisibility(View.VISIBLE);
-				receiver_voltage_label.setVisibility(View.VISIBLE);
+				receiver_row.setVisibility(View.VISIBLE);
 			}
 			receiver_voltage_lights.set(telem_state.receiver_battery >= AltosLib.ao_battery_good, telem_state.receiver_battery == AltosLib.MISSING);
 		}
