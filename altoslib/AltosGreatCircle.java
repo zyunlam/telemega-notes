@@ -28,8 +28,8 @@ public class AltosGreatCircle implements Cloneable, Serializable {
 
 	double sqr(double a) { return a * a; }
 
-	static final double rad = Math.PI / 180;
-	static final double earth_radius = 6371.2 * 1000;	/* in meters */
+	public static final double rad = Math.PI / 180;
+	public static final double earth_radius = 6371.2 * 1000;	/* in meters */
 
 	public static final int BEARING_LONG = AltosConvert.BEARING_LONG;
 	public static final int BEARING_SHORT = AltosConvert.BEARING_SHORT;
