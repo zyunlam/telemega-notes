@@ -860,13 +860,17 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	void touch_trackers(Integer[] serials) {
 		AlertDialog.Builder builder_tracker = new AlertDialog.Builder(this);
 		builder_tracker.setTitle("Select Tracker");
-		final String[] trackers = new String[serials.length];
+		final String[] trackers = new String[serials.length + 1];
+		trackers[0] = "Auto";
 		for (int i = 0; i < serials.length; i++)
-			trackers[i] = String.format("%d", serials[i]);
+			trackers[i+1] = String.format("%d", serials[i]);
 		builder_tracker.setItems(trackers,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
-							 select_tracker(Integer.parseInt(trackers[item]));
+							 if (item == 0)
+								 select_tracker(0);
+							 else
+								 select_tracker(Integer.parseInt(trackers[item]));
 						 }
 					 });
 		AlertDialog alert_tracker = builder_tracker.create();
