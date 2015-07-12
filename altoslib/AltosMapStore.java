@@ -118,49 +118,85 @@ public class AltosMapStore {
 	static final long	forbidden_interval = 60l * 1000l * 1000l * 1000l;
 	static final long 	google_maps_ratelimit_ms = 1200;
 
-	class loader implements Runnable {
+	static Object	loader_lock = new Object();
 
-		public void run() {
-			if (file.exists()) {
-				notify_listeners(AltosMapTile.success);
-				return;
-			}
+	static LinkedList<AltosMapStore> waiting = new LinkedList<AltosMapStore>();
+	static LinkedList<AltosMapStore> running = new LinkedList<AltosMapStore>();
 
-			synchronized(forbidden_lock) {
-				if (forbidden_set && (System.nanoTime() - forbidden_time) < forbidden_interval) {
-					notify_listeners(AltosMapTile.forbidden);
-					return;
-				}
-			}
+	static final int concurrent_loaders = 128;
 
-			int new_status;
-
-			if (!AltosVersion.has_google_maps_api_key()) {
-				synchronized (fetch_lock) {
-					long startTime = System.nanoTime();
-					new_status = fetch_url();
-					if (new_status == AltosMapTile.success) {
-						long duration_ms = (System.nanoTime() - startTime) / 1000000;
-						if (duration_ms < google_maps_ratelimit_ms) {
-							try {
-								Thread.sleep(google_maps_ratelimit_ms - duration_ms);
-							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt();
-							}
-						}
-					}
-				}
-			} else {
-				new_status = fetch_url();
-			}
-			notify_listeners(new_status);
+	static void start_loaders() {
+		while (!waiting.isEmpty() && running.size() < concurrent_loaders) {
+			AltosMapStore 	s = waiting.remove();
+			running.add(s);
+			Thread lt = s.make_loader_thread();
+			lt.start();
 		}
 	}
 
+	void finish_loader() {
+		synchronized(loader_lock) {
+			running.remove(this);
+			start_loaders();
+		}
+	}
+
+	void add_loader() {
+		synchronized(loader_lock) {
+			waiting.add(this);
+			start_loaders();
+		}
+	}
+
+	class loader implements Runnable {
+
+		public void run() {
+			try {
+				if (file.exists()) {
+					notify_listeners(AltosMapTile.success);
+					return;
+				}
+
+				synchronized(forbidden_lock) {
+					if (forbidden_set && (System.nanoTime() - forbidden_time) < forbidden_interval) {
+						notify_listeners(AltosMapTile.forbidden);
+						return;
+					}
+				}
+
+				int new_status;
+
+				if (!AltosVersion.has_google_maps_api_key()) {
+					synchronized (fetch_lock) {
+						long startTime = System.nanoTime();
+						new_status = fetch_url();
+						if (new_status == AltosMapTile.success) {
+							long duration_ms = (System.nanoTime() - startTime) / 1000000;
+							if (duration_ms < google_maps_ratelimit_ms) {
+								try {
+									Thread.sleep(google_maps_ratelimit_ms - duration_ms);
+								} catch (InterruptedException e) {
+									Thread.currentThread().interrupt();
+								}
+							}
+						}
+					}
+				} else {
+					new_status = fetch_url();
+				}
+				notify_listeners(new_status);
+			} finally {
+				finish_loader();
+			}
+		}
+	}
+
+	private Thread make_loader_thread() {
+		return new Thread(new loader());
+	}
+
 	private void load() {
-		loader	l = new loader();
-		Thread	lt = new Thread(l);
-		lt.start();
+		add_loader();
 	}
 
 	private AltosMapStore (String url, File file) {
