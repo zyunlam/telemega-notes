@@ -117,4 +117,12 @@ public class AltosMapTransform {
 		offset_x = centre_pt.x - width / 2.0;
 		offset_y = centre_pt.y - height / 2.0;
 	}
+
+	public static double lon_from_distance(double lat, double distance) {
+		double c = AltosGreatCircle.earth_radius * Math.cos(lat * Math.PI / 180) * 2 * Math.PI;
+
+		if (c < 10)
+			return 0;
+		return distance/c * 360.0;
+	}
 }
