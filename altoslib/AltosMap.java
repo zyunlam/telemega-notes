@@ -113,12 +113,12 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		map_interface.debug(format, arguments);
 	}
 
-	public AltosPointInt floor(AltosPointDouble point) {
+	static public AltosPointInt floor(AltosPointDouble point) {
 		return new AltosPointInt ((int) Math.floor(point.x / AltosMap.px_size) * AltosMap.px_size,
 					      (int) Math.floor(point.y / AltosMap.px_size) * AltosMap.px_size);
 	}
 
-	public AltosPointInt ceil(AltosPointDouble point) {
+	static public AltosPointInt ceil(AltosPointDouble point) {
 		return new AltosPointInt ((int) Math.ceil(point.x / AltosMap.px_size) * AltosMap.px_size,
 					      (int) Math.ceil(point.y / AltosMap.px_size) * AltosMap.px_size);
 	}
@@ -356,6 +356,9 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	public void paint() {
 		if (centre != null)
 			make_tiles();
+
+		if (transform == null)
+			return;
 
 		for (AltosMapTile tile : tiles.values())
 			tile.paint(transform);
