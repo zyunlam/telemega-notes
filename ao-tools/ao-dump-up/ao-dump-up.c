@@ -29,12 +29,13 @@
 static const struct option options[] = {
 	{ .name = "tty", .has_arg = 1, .val = 'T' },
 	{ .name = "device", .has_arg = 1, .val = 'D' },
+	{ .name = "wait", .has_arg = 0, .val = 'w' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--tty <tty-name>] [--device <device-name>]\n", program);
+	fprintf(stderr, "usage: %s [--tty <tty-name>] [--device <device-name>] [--wait]\n", program);
 	exit(1);
 }
 
@@ -134,7 +135,7 @@ static int swap16(int i)
 static int find_header(struct cc_usb *cc)
 {
 	for (;;) {
-		if (get_nonwhite(cc, 0) == 'M' && get_nonwhite(cc, 1000) == 'P')
+		if (get_nonwhite(cc, -1) == 'M' && get_nonwhite(cc, 1000) == 'P')
 			return 1;
 	}
 }
@@ -165,9 +166,13 @@ main (int argc, char **argv)
 	int		i;
 	int		crc;
 	int		current_crc;
+	int		wait = 0;
 
-	while ((c = getopt_long(argc, argv, "T:D:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "wT:D:", options, NULL)) != -1) {
 		switch (c) {
+		case 'w':
+			wait = 1;
+			break;
 		case 'T':
 			tty = optarg;
 			break;
@@ -179,8 +184,21 @@ main (int argc, char **argv)
 			break;
 		}
 	}
-	if (!tty)
-		tty = cc_usbdevs_find_by_arg(device, "FT230X Basic UART");
+	if (!tty) {
+		for (;;) {
+			tty = cc_usbdevs_find_by_arg(device, "FT230X Basic UART");
+			if (tty) {
+				if (wait) {
+					printf("tty is %s\n", tty);
+					sleep(1);
+				}
+				break;
+			}
+			if (!wait)
+				break;
+			sleep(1);
+		}
+	}
 	if (!tty)
 		tty = getenv("ALTOS_TTY");
 	if (!tty)

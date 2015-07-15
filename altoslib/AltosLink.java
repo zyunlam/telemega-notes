@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_6;
+package org.altusmetrum.altoslib_7;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -86,10 +86,17 @@ public abstract class AltosLink implements Runnable {
 
 	public boolean	reply_abort;
 	public int	in_reply;
+	boolean	cancel_enable = true;
+
+	public void set_cancel_enable(boolean e) {
+		cancel_enable = e;
+	}
 
 	boolean		reply_timeout_shown = false;
 
 	private boolean check_reply_timeout() {
+		if (!cancel_enable)
+			return false;
 		if (!reply_timeout_shown)
 			reply_timeout_shown = show_reply_timeout();
 		return reply_abort;
@@ -354,7 +361,7 @@ public abstract class AltosLink implements Runnable {
 		if (frequency == 0)
 			return;
 		if (has_frequency)
-			set_radio_freq((int) Math.floor (frequency * 1000));
+			set_radio_freq((int) Math.floor (frequency * 1000 + 0.5));
 		else if (has_setting)
 			set_radio_setting(AltosConvert.radio_frequency_to_setting(frequency, cal));
 		else
@@ -546,7 +553,15 @@ public abstract class AltosLink implements Runnable {
 		}
 		if (monitor_batt == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosConvert.cc_battery_to_voltage(monitor_batt);
+
+		double	volts = AltosLib.MISSING;
+		if (config_data.product.startsWith("TeleBT-v3")) {
+			volts = AltosConvert.tele_bt_3_battery(monitor_batt);
+		} else {
+			volts = AltosConvert.cc_battery_to_voltage(monitor_batt);
+		}
+
+		return volts;
 	}
 
 	public AltosLink() {

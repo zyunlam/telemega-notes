@@ -554,9 +554,9 @@ ao_insert(void)
 
 			ao_quaternion_rotate(&ao_out, &ao_x, &ao_rotation);
 
+#if 0
 			int	out = floor (atan2(ao_out.y, ao_out.x) * 180 / M_PI);
 
-#if 0
 			printf ("%7.2f state %-8.8s height %8.4f tilt %4d rot %4d mag_tilt %4d mag_rot %4d\n",
 				time,
 				ao_state_names[ao_flight_state],
@@ -717,7 +717,7 @@ ao_sleep(void *wchan)
 					break;
 			}
 #if TELEMEGA
-			if (log_format == AO_LOG_FORMAT_TELEMEGA && nword == 30 && strlen(words[0]) == 1) {
+			if ((log_format == AO_LOG_FORMAT_TELEMEGA_OLD || log_format == AO_LOG_FORMAT_TELEMEGA) && nword == 30 && strlen(words[0]) == 1) {
 				int	i;
 				struct ao_ms5607_value	value;
 
@@ -895,7 +895,6 @@ ao_sleep(void *wchan)
 				ao_config.accel_zero_along = atoi(words[3]);
 				ao_config.accel_zero_across = atoi(words[5]);
 				ao_config.accel_zero_through = atoi(words[7]);
-				printf ("%d %d %d\n", ao_config.accel_zero_along, ao_config.accel_zero_across, ao_config.accel_zero_through);
 #endif
 			} else if (nword >= 4 && strcmp(words[0], "Main") == 0) {
 				ao_config.main_deploy = atoi(words[2]);

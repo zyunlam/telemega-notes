@@ -128,7 +128,35 @@ altoslib_JAVA = \
 	AltosPyro.java \
 	AltosWriter.java \
 	AltosQuaternion.java \
-	AltosRotation.java
+	AltosRotation.java \
+	AltosImage.java \
+	AltosLatLon.java \
+	AltosMap.java \
+	AltosMapCache.java \
+	AltosMapCacheListener.java \
+	AltosMapInterface.java \
+	AltosMapLine.java \
+	AltosMapMark.java \
+	AltosMapPath.java \
+	AltosMapPathPoint.java \
+	AltosMapRectangle.java \
+	AltosMapStore.java \
+	AltosMapStoreListener.java \
+	AltosMapTile.java \
+	AltosMapTileListener.java \
+	AltosMapTransform.java \
+	AltosMapZoomListener.java \
+	AltosPointDouble.java \
+	AltosPointInt.java \
+	AltosRectangle.java \
+	AltosFlightDisplay.java \
+	AltosFontListener.java \
+	AltosLaunchSite.java \
+	AltosLaunchSiteListener.java \
+	AltosLaunchSites.java \
+	AltosMapLoaderListener.java \
+	AltosMapLoader.java \
+	AltosVersion.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar
 

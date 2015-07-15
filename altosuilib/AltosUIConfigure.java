@@ -15,13 +15,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_7;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import org.altusmetrum.altoslib_7.*;
 
 class DelegatingRenderer implements ListCellRenderer<Object> {
 
@@ -269,8 +270,8 @@ public class AltosUIConfigure
 		row++;
 
 		pane.add(new JLabel (String.format("AltOS version %s (%smaps key)",
-						   AltosUIVersion.version,
-						   AltosUIVersion.has_google_maps_api_key() ? "" : "no ")),
+						   AltosVersion.version,
+						   AltosVersion.has_google_maps_api_key() ? "" : "no ")),
 			 constraints(0, 3));
 		row++;
 

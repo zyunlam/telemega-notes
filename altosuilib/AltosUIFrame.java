@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_7;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -207,6 +207,62 @@ public class AltosUIFrame extends JFrame implements AltosUIListener, AltosPositi
 			}
 		}
 	}
+
+	int row = 0;
+
+	public void next_row() {
+		row++;
+	}
+
+	int inset = 0;
+
+	public void set_inset(int i) {
+		inset = i;
+	}
+
+	public GridBagConstraints constraints (int x, int width, int fill, int anchor, double weightx, double weighty) {
+		return new GridBagConstraints(x,			/* x */
+					      row,			/* y */
+					      width,			/* width */
+					      1,			/* height */
+					      weightx,			/* weightx */
+					      weighty,			/* weighty */
+					      anchor,			/* anchor */
+					      fill,			/* fill */
+					      new Insets(inset,inset,inset,inset),	/* insets */
+					      0,			/* ipadx */
+					      0);			/* ipady */
+	}
+
+	public GridBagConstraints constraints (int x, int width, int fill, int anchor) {
+		double	weightx = 0;
+		double	weighty = 0;
+
+		if (fill == GridBagConstraints.NONE) {
+			weightx = 0;
+			weighty = 0;
+		} else if (fill == GridBagConstraints.HORIZONTAL) {
+			weightx = 1;
+			weighty = 0;
+		} else if (fill == GridBagConstraints.VERTICAL) {
+			weightx = 0;
+			weighty = 1;
+		} else if (fill == GridBagConstraints.BOTH) {
+			weightx = 1;
+			weighty = 1;
+		}
+
+		return constraints (x, width, fill, anchor, weightx, weighty);
+	}
+
+	public GridBagConstraints constraints (int x, int width, int fill) {
+		return constraints (x, width, fill, GridBagConstraints.WEST);
+	}
+
+	public GridBagConstraints constraints(int x, int width) {
+		return constraints(x, width, GridBagConstraints.NONE);
+	}
+
 	void init() {
 		AltosUIPreferences.register_ui_listener(this);
 		AltosUIPreferences.register_position_listener(this);

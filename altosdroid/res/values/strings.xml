@@ -32,6 +32,14 @@
 	<string name="select_freq">Select radio frequency</string>
 	<string name="select_rate">Select data rate</string>
 	<string name="change_units">Change units</string>
+	<string name="preload_maps">Load Maps</string>
+	<string name="select_tracker">Select Tracker</string>
+	<string name="delete_track">Delete Track</string>
+	<string name="map_type">Map Type</string>
+	<string name="map_source">Toggle Online/Offline maps</string>
+
+	<!-- MapTypeActivity -->
+	<string name="map_type">Map Type</string>
 
 	<!-- DeviceListActivity -->
 	<string name="scanning">scanning for devices…</string>
@@ -61,6 +69,7 @@
 	<string name="speed_label">Speed</string>
 	<string name="accel_label">Acceleration</string>
 	<string name="bearing_label">Bearing</string>
+	<string name="direction_label">Direction</string>
 	<string name="elevation_label">Elevation</string>
 	<string name="range_label">Range</string>
 	<string name="distance_label">Distance</string>
@@ -68,10 +77,15 @@
 	<string name="max_height_label">Max Height</string>
 	<string name="max_speed_label">Max Speed</string>
 	<string name="max_accel_label">Max Accel</string>
-	<string name="battery_voltage_label">Battery Voltage</string>
-	<string name="apogee_voltage_label">Apogee Igniter Voltage</string>
-	<string name="main_voltage_label">Main Igniter Voltage</string>
-	<string name="logging_label">On-board Data Logging</string>
+	<string name="battery_voltage_label">Battery</string>
+	<string name="receiver_voltage_label">Receiver Battery</string>
+	<string name="apogee_voltage_label">Apogee Igniter</string>
+	<string name="main_voltage_label">Main Igniter</string>
+	<string name="ignite_a_voltage_label">Igniter A</string>
+	<string name="ignite_b_voltage_label">Igniter B</string>
+	<string name="ignite_c_voltage_label">Igniter C</string>
+	<string name="ignite_d_voltage_label">Igniter D</string>
+	<string name="logging_label">Data Logging</string>
 	<string name="gps_locked_label">GPS Locked</string>
 	<string name="gps_ready_label">GPS Ready</string>
 	<string name="latitude_label">Latitude</string>
@@ -80,8 +94,21 @@
 	<string name="target_longitude_label">Tar Lon</string>
 	<string name="receiver_latitude_label">My Lat</string>
 	<string name="receiver_longitude_label">My Lon</string>
-	<string name="pad_lat_label">Pad Lat</string>
-	<string name="pad_lon_label">Pad Lon</string>
-	<string name="pad_alt_label">Pad Alt</string>
+	<string name="receiver_altitude_label">My Alt</string>
 
+	<!-- Map preload -->
+	<string name="preload_site_label">Known Launch Sites</string>
+	<string name="preload_latitude_label">Latitude</string>
+	<string name="preload_longitude_label">Longitude</string>
+
+	<string name="preload_types">Map Types</string>
+	<string name="preload_hybrid">Hybrid</string>
+	<string name="preload_satellite">Satellite</string>
+	<string name="preload_roadmap">Roadmap</string>
+	<string name="preload_terrain">Terrain</string>
+	<string name="preload_min_zoom">Minimum Zoom</string>
+	<string name="preload_max_zoom">Maximum Zoom</string>
+	<string name="preload_radius">Radius</string>
+	
+	<string name="preload_load">Load Map</string>
 </resources>

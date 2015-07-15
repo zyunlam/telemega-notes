@@ -220,6 +220,10 @@ _ao_config_get(void)
 		if (minor < 21)
 			ao_config.send_frequency = 434550;
 #endif
+#if HAS_APRS
+		if (minor < 22)
+			ao_config.aprs_format = AO_CONFIG_DEFAULT_APRS_FORMAT;
+#endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
@@ -876,6 +880,23 @@ ao_config_aprs_ssid_set(void)
 	ao_config.aprs_ssid = ao_cmd_lex_i;
 	_ao_config_edit_finish();
 }
+
+void
+ao_config_aprs_format_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.aprs_format = ao_cmd_lex_i != 0;
+	_ao_config_edit_finish();
+}
+
+void
+ao_config_aprs_format_show(void)
+{
+	printf ("APRS format: %d\n", ao_config.aprs_format);
+}
 #endif /* HAS_APRS */
 
 struct ao_config_var {
@@ -969,6 +990,8 @@ __code struct ao_config_var ao_config_vars[] = {
 #if HAS_APRS
 	{ "S <ssid>\0Set APRS SSID (0-15)",
 	  ao_config_aprs_ssid_set, ao_config_aprs_ssid_show },
+	{ "C <0 compressed, 1 uncompressed>\0APRS format",
+	  ao_config_aprs_format_set, ao_config_aprs_format_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

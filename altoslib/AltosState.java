@@ -19,7 +19,7 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_6;
+package org.altusmetrum.altoslib_7;
 
 import java.io.*;
 
@@ -31,8 +31,9 @@ public class AltosState implements Cloneable, Serializable {
 
 	public int set;
 
+	static final double filter_len = 2.0;
 	static final double ascent_filter_len = 0.5;
-	static final double descent_filter_len = 0.5;
+	static final double descent_filter_len = 5.0;
 
 	/* derived data */
 
@@ -64,8 +65,10 @@ public class AltosState implements Cloneable, Serializable {
 		}
 
 		void set_filtered(double new_value, double time) {
-			if (prev_value != AltosLib.MISSING)
-				new_value = (prev_value * 15.0 + new_value) / 16.0;
+			if (prev_value != AltosLib.MISSING) {
+				double f = 1/Math.exp((time - prev_set_time) / filter_len);
+				new_value = f * new_value + (1-f) * prev_value;
+			}
 			set(new_value, time);
 		}
 
@@ -1038,6 +1041,10 @@ public class AltosState implements Cloneable, Serializable {
 
 	public String state_name() {
 		return AltosLib.state_name(state);
+	}
+
+	public void set_product(String product) {
+		this.product = product;
 	}
 
 	public void set_state(int state) {

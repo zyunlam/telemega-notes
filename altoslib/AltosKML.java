@@ -15,14 +15,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_6;
+package org.altusmetrum.altoslib_7;
 
 import java.io.*;
+import java.util.*;
+
+class KMLWriter extends PrintWriter {
+	public PrintWriter printf(String format, Object ... arguments) {
+		return printf(Locale.ROOT, format, arguments);
+	}
+
+	public KMLWriter(File name) throws FileNotFoundException {
+		super(name);
+	}
+}
 
 public class AltosKML implements AltosWriter {
 
 	File			name;
-	PrintStream		out;
+	PrintWriter		out;
 	int			flight_state = -1;
 	AltosState		prev = null;
 	double			gps_start_altitude;
@@ -137,6 +148,10 @@ public class AltosKML implements AltosWriter {
 			end();
 			prev = null;
 		}
+		if (out != null) {
+			out.close();
+			out = null;
+		}
 	}
 
 	public void write(AltosState state) {
@@ -177,7 +192,7 @@ public class AltosKML implements AltosWriter {
 
 	public AltosKML(File in_name) throws FileNotFoundException {
 		name = in_name;
-		out = new PrintStream(name);
+		out = new KMLWriter(name);
 	}
 
 	public AltosKML(String in_string) throws FileNotFoundException {

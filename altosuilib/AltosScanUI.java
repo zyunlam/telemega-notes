@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_7;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_7.*;
 
 class AltosScanResult {
 	String		callsign;
@@ -62,9 +62,18 @@ class AltosScanResult {
 		rate = in_rate;
 	}
 
-	public boolean equals(AltosScanResult other) {
+	public int hashCode() {
+		return serial ^ frequency.hashCode() ^ telemetry ^ rate;
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (!(o instanceof AltosScanResult))
+			return false;
+		AltosScanResult other = (AltosScanResult) o;
 		return (serial == other.serial &&
-			frequency.frequency == other.frequency.frequency &&
+			frequency.equals(other.frequency) &&
 			telemetry == other.telemetry &&
 			rate == other.rate);
 	}

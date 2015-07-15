@@ -14,11 +14,16 @@ DX=$(SDK)/platform-tools/dx
 ADB=$(SDK)/platform-tools/adb
 AAPT=$(SDK)/platform-tools/aapt
 APKBUILDER=$(SDK)/tools/apkbuilder
-ZIPALIGN=$(SDK)/tools/zipalign
+ZIPALIGN_A=$(SDK)/tools/zipalign
+ZIPALIGN_B=$(SDK)/build-tools/*/zipalign
 
 JAVA_SRC_DIR=src/org/altusmetrum/AltosDroid
 EXT_LIBDIR=libs
 DRAWABLE_DIR=res/drawable
+LAYOUT_DIR=res/layout
+MENU_DIR=res/menu
+VALUES_DIR=res/values
+XML_DIR=res/xml
 ALTOSLIB_SRCDIR=../altoslib
 ALTOSLIB_JAR=altoslib_$(ALTOSLIB_VERSION).jar
 
@@ -39,19 +44,25 @@ DRAWABLES=\
     $(DRAWABLE_DIR)/greenled.png \
     $(DRAWABLE_DIR)/grayled.png
 
-SRC=$(JAVA_SRC) $(DRAWABLES)
+LAYOUTS=$(LAYOUT_DIR)/*.xml
+MENUS=$(MENU_DIR)/*.xml
+VALUES=$(VALUES_DIR)/*.xml
+XMLS=$(XML_DIR)/*.xml
+
+RES=$(LAYOUTS) $(MENUS) $(VALUES) $(XMLS)
+
+SRC=$(JAVA_SRC) $(DRAWABLES) $(RES)
 
 all: $(all_target)
 
 .NOTPARALLEL:
 
-$(EXT_LIBDIR):
+$(ALTOSLIB): $(ALTOSLIB_SRCDIR)/$(ALTOSLIB_JAR)
 	mkdir -p $(EXT_LIBDIR)
-
-$(ALTOSLIB): $(EXT_LIBDIR) $(ALTOSLIB_SRCDIR)/$(ALTOSLIB_JAR)
 	cd $(EXT_LIBDIR) && ln -sf $(shell echo $(EXT_LIBDIR) | sed 's|[^/]\+|..|g')/$(ALTOSLIB_SRCDIR)/$(ALTOSLIB_JAR) .
 
-$(SUPPORT_V4): $(EXT_LIBDIR) $(SUPPORT_V4_SRCDIR)/$(SUPPORT_V4_JAR)
+$(SUPPORT_V4): $(SUPPORT_V4_SRCDIR)/$(SUPPORT_V4_JAR)
+	mkdir -p $(EXT_LIBDIR)
 	cd $(EXT_LIBDIR) && ln -sf $(SUPPORT_V4_SRCDIR)/$(SUPPORT_V4_JAR) .
 
 $(GOOGLE_PLAY_SERVICES_LIB): $(GOOGLE_PLAY_SERVICES_LIB_SRCDIR)/$(GOOGLE_PLAY_SERVICES_LIB)
@@ -83,9 +94,15 @@ bin/AltosDroid-release.apk: bin/AltosDroid-release-unsigned.apk
 	   -storepass:file ~/altusmetrumllc/google-play-passphrase \
 	   -signedjar bin/AltosDroid-release-signed.apk \
 	   bin/AltosDroid-release-unsigned.apk AltosDroid
-	$(ZIPALIGN) -f 4 \
-	   bin/AltosDroid-release-signed.apk \
-	   bin/AltosDroid-release.apk
+	if [ -f $(ZIPALIGN_A) ]; then \
+		$(ZIPALIGN_A) -f 4 \
+		   bin/AltosDroid-release-signed.apk \
+		   bin/AltosDroid-release.apk; \
+	else \
+		$(ZIPALIGN_B) -f 4 \
+		   bin/AltosDroid-release-signed.apk \
+		   bin/AltosDroid-release.apk; \
+	fi
 
 release: bin/AltosDroid-release.apk
 

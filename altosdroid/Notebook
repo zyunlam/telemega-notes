@@ -15,17 +15,9 @@ Desired AltosDroid feature list
 
  *) Monitor-idle mode
 
- *) Frequency scanning
+ *) Online maps comes up tracking object at 0,0
 
- *) Select satellite imaging mode
-
- *) TeleBT battery voltage
-
- *) Deal with long bluetooth list. Currently, a list longer than
-    the screen makes it impossible to use entries off the bottom.
-
- *) Pickle/unpickle state instead of reloading entire history from
-    file. Current restart time is lengthy.
+ *) Have names for each serial number, default to callsign
 
 Completed features
 
@@ -47,3 +39,70 @@ Completed features
 
 	Done
 
+ *) Select satellite imaging mode
+
+	Done
+
+ *) Deal with long bluetooth list. Currently, a list longer than
+    the screen makes it impossible to use entries off the bottom.
+
+	Done
+
+ *) Pickle/unpickle state instead of reloading entire history from
+    file. Current restart time is lengthy.
+
+	Done
+
+ *) Offline maps
+
+	Done
+
+ *) Multi-tracker management
+
+	Done
+
+ *) Provide units for age field, turn red if old
+
+	Done
+
+ *) TeleBT battery voltage
+
+	Done
+
+ *) Evaluate performance issues
+
+	Done. Offline maps were duplicating tabs at every redisplay.
+
+ *) Merge offline/online maps into single tab with mode
+
+	Done.
+
+ *) Auto select tracker after long delay
+
+	Done.
+
+ *) Select tracker by clicking map
+
+	Done.
+
+ *) Convert to four tab design:
+
+	Done.
+
+ *) Make voice responses depend on selected tab
+
+	Done.
+
+ *) Monitor TeleMega igniters
+
+	Done. Visible only in Pad tab
+
+ *) Make it harder to switch trackers in map view. Too easy to touch
+    the screen and switch on accident.
+
+	Done. A menu pops up with trackers within a small radius of
+	the touch point, letting you cancel if that wasn't your intent.
+
+ *) Make sure it keeps talking with the screen blanked
+
+	Done. Don't shut down voice when stopping UI.

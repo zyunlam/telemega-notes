@@ -8,8 +8,15 @@ vpath make-altitude-pa ../util
 
 include ../avr/Makefile.defs
 
+PROGNAME=microsplash-v1.0
+PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
+
+SCRIPT=microsplash-load
+
 PUBLISH_DIR=$(HOME)/altusmetrumllc/Binaries
-PUBLISH_FILE=$(PUBLISH_DIR)/$(PROG)-$(VERSION).hex
+PUBLISH_HEX=$(PUBLISH_DIR)/$(HEX)
+PUBLISH_SCRIPT=$(PUBLISH_DIR)/$(SCRIPT)
 
 MCU=attiny85
 DUDECPUTYPE=t85
@@ -48,14 +55,12 @@ INC=\
 	altitude-pa.h
 
 IDPRODUCT=0
-PRODUCT=MicroSplash-v0.1
+PRODUCT=MicroSplash-v1.0
 PRODUCT_DEF=-DMICROPEAK
 CFLAGS = $(PRODUCT_DEF) -I. -I../attiny -I../kernel -I.. -I../drivers -I../product
 CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -O2 -mcall-prologues -DATTINY
 
 NICKLE=nickle
-
-PROG=microsplash-v1.0
 
 SRC=$(ALTOS_SRC)
 OBJ=$(SRC:.c=.o)
@@ -68,7 +73,7 @@ endif
 # Otherwise, print the full command line.
 quiet ?= $($1)
 
-all: $(PROG) $(PROG).hex
+all: $(PROG) $(HEX) $(SCRIPT)
 
 CHECK=sh ../util/check-avr-mem
 
@@ -76,16 +81,16 @@ $(PROG): Makefile $(OBJ)
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ)
 	$(call quiet,CHECK) $(PROG) || ($(RM) -f $(PROG); exit 1)
 
-$(PROG).hex: $(PROG)
+$(HEX): $(PROG)
 	avr-size $(PROG)
 	$(OBJCOPY) -R .eeprom -O ihex $(PROG) $@
 
 
-load: $(PROG).hex
-	$(LOADCMD) $(LOADARG)$(PROG).hex
+load: $(HEX)
+	$(LOADCMD) $(LOADARG)$(HEX)
 
-load-slow: $(PROG).hex
-	$(LOADCMD) $(LOADSLOW) $(LOADARG)$(PROG).hex
+load-slow: $(HEX)
+	$(LOADCMD) $(LOADSLOW) $(LOADARG)$(HEX)
 
 ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
@@ -98,21 +103,29 @@ ao_product.o: ao_product.c ao_product.h
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROG) $(PROG).hex
+	rm -f *.o $(PROG) $(HEX) $(SCRIPT)
 	rm -f ao_product.h
 
+publish: $(PUBLISH_HEX) $(PUBLISH_SCRIPT)
 
-publish: $(PROG).hex
-	cp -a $(PROG).hex $(PUBLISH_FILE)
+$(PUBLISH_HEX): $(HEX)
+	cp -a $(HEX) $@
+
+$(PUBLISH_SCRIPT): $(SCRIPT)
+	cp -a $(SCRIPT) $@
 
 load-product:
-	$(LOADCMD) $(LOADARG)$(PUBLISH_FILE)
+	./$(SCRIPT) fast
 
 load-product-slow:
-	$(LOADCMD) $(LOADSLOW) $(LOADARG)$(PUBLISH_FILE)
+	./$(SCRIPT) slow
 
 ../altitude-pa.h: make-altitude-pa
 	nickle $< > $@
+
+$(SCRIPT): $(SCRIPT).tmpl Makefile ../Version
+	sed -e 's/%HEX%/$(HEX)/' -e 's/%LOADCMD%/$(LOADCMD)/' -e 's/%LOADARG%/$(LOADARG)/' -e 's/%LOADSLOW%/$(LOADSLOW)/' $(SCRIPT).tmpl > $@ || (rm $@ && exit 1)
+	chmod +x $@
 
 install:
 

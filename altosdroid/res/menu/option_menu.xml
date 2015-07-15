@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009 The Android Open Source Project
+<!-- 
+  Copyright © 2015 Keith Packard <keithp@keithp.com>
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
 
-          http://www.apache.org/licenses/LICENSE-2.0
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
 
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
+  You should have received a copy of the GNU General Public License along
+  with this program; if not, write to the Free Software Foundation, Inc.,
+  59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/connect_scan"
@@ -20,9 +22,6 @@
     <item android:id="@+id/disconnect"
 	  android:icon="@android:drawable/ic_notification_clear_all"
 	  android:title="@string/disconnect_device" />
-    <item android:id="@+id/quit"
-          android:icon="@android:drawable/ic_menu_close_clear_cancel"
-          android:title="@string/quit" />
     <item android:id="@+id/select_freq"
           android:icon="@android:drawable/ic_menu_preferences"
           android:title="@string/select_freq" />
@@ -32,4 +31,22 @@
     <item android:id="@+id/change_units"
 	  android:icon="@android:drawable/ic_menu_view"
 	  android:title="@string/change_units" />
+    <item android:id="@+id/preload_maps"
+	  android:icon="@android:drawable/ic_menu_mapmode"
+	  android:title="@string/preload_maps" />
+    <item android:id="@+id/map_type"
+	  android:icon="@android:drawable/ic_menu_mapmode"
+	  android:title="@string/map_type" />
+    <item android:id="@+id/map_source"
+	  android:icon="@android:drawable/ic_menu_mapmode"
+	  android:title="@string/map_source" />
+    <item android:id="@+id/select_tracker"
+	  android:icon="@android:drawable/ic_menu_view"
+	  android:title="@string/select_tracker"/>
+    <item android:id="@+id/delete_track"
+	  android:icon="@android:drawable/ic_notification_clear_all"
+	  android:title="@string/delete_track"/>
+    <item android:id="@+id/quit"
+          android:icon="@android:drawable/ic_menu_close_clear_cancel"
+          android:title="@string/quit" />
 </menu>

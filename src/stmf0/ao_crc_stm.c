@@ -60,7 +60,7 @@
 #endif
 
 #ifndef AO_CRC_INIT
-#define AO_CRC_INIT	0xffffffff;
+#define AO_CRC_INIT	0xffffffff
 #endif
 
 void

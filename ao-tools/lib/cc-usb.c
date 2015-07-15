@@ -207,8 +207,10 @@ _cc_usb_sync(struct cc_usb *cc, int wait_for_input, int write_timeout)
 					write(2, cc->in_buf, cc->in_count);
 					cc->in_count = 0;
 				}
-			} else if (ret < 0)
+			} else if (ret <= 0) {
 				perror("read");
+				return -1;
+			}
 		}
 		if (fds.revents & POLLOUT) {
 			ret = write(cc->fd, cc->out_buf,

@@ -91,7 +91,6 @@ radio_cmac_recv(uint8_t len, uint16_t timeout) __reentrant
 		return AO_RADIO_CMAC_TIMEOUT;
 	}
 
-	ao_radio_cmac_rssi = ao_radio_rssi;
 	if (!(cmac_data[len + AO_CMAC_KEY_LEN +1] & AO_RADIO_STATUS_CRC_OK))
 		return AO_RADIO_CMAC_CRC_ERROR;
 
@@ -114,12 +113,14 @@ radio_cmac_recv(uint8_t len, uint16_t timeout) __reentrant
 	/* Check the packet signature against the signature provided
 	 * over the link
 	 */
-	 
+
 	if (memcmp(&cmac_data[len],
 		   &cmac_data[len + AO_CMAC_KEY_LEN + 2],
 		   AO_CMAC_KEY_LEN) != 0) {
 		return AO_RADIO_CMAC_MAC_ERROR;
 	}
+
+	ao_radio_cmac_rssi = ao_radio_rssi;
 
 	return AO_RADIO_CMAC_OK;
 }
@@ -161,4 +162,3 @@ ao_radio_cmac_recv(__xdata void *packet, uint8_t len, uint16_t timeout) __reentr
 	ao_mutex_put(&ao_radio_cmac_mutex);
 	return i;
 }
-

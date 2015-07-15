@@ -22,8 +22,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_7.*;
+import org.altusmetrum.altosuilib_7.*;
 
 public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosVoice		voice;
@@ -40,7 +40,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosDescent	descent;
 	AltosLanded	landed;
 	AltosCompanionInfo	companion;
-	AltosUIMap      sitemap;
+	AltosUIMapNew      sitemap;
 	boolean		has_map;
 	boolean		has_companion;
 	boolean		has_state;
@@ -189,12 +189,12 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		bag = getContentPane();
 		bag.setLayout(new GridBagLayout());
 
-		GridBagConstraints c = new GridBagConstraints();
-
 		setTitle(String.format("AltOS %s", reader.name));
 
 		/* Stick channel selector at top of table for telemetry monitoring */
 		if (serial >= 0) {
+			set_inset(3);
+
 			// Frequency menu
 			frequencies = new AltosUIFreqList(AltosUIPreferences.frequency(serial));
 			frequencies.set_product("Monitor");
@@ -210,14 +210,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 						reader.save_frequency();
 					}
 			});
-			c.gridx = 0;
-			c.gridy = 0;
-			c.weightx = 0;
-			c.weighty = 0;
-			c.insets = new Insets(3, 3, 3, 3);
-			c.fill = GridBagConstraints.NONE;
-			c.anchor = GridBagConstraints.WEST;
-			bag.add (frequencies, c);
+			bag.add (frequencies, constraints(0, 1));
 
 			// Telemetry rate list
 			rates = new AltosUIRateList(AltosUIPreferences.telemetry_rate(serial));
@@ -233,14 +226,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 					}
 				});
 			rates.setEnabled(reader.supports_telemetry_rate(AltosLib.ao_telemetry_rate_2400));
-			c.gridx = 1;
-			c.gridy = 0;
-			c.weightx = 0;
-			c.weighty = 0;
-			c.insets = new Insets(3, 3, 3, 3);
-			c.fill = GridBagConstraints.NONE;
-			c.anchor = GridBagConstraints.WEST;
-			bag.add (rates, c);
+			bag.add (rates, constraints(1, 1));
 
 			// Telemetry format list
 			if (reader.supports_telemetry(Altos.ao_telemetry_standard)) {
@@ -252,14 +238,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 							reader.save_telemetry();
 						}
 					});
-				c.gridx = 2;
-				c.gridy = 0;
-				c.weightx = 0;
-				c.weighty = 0;
-				c.fill = GridBagConstraints.NONE;
-				c.anchor = GridBagConstraints.WEST;
-				bag.add (telemetries, c);
-				c.insets = new Insets(0, 0, 0, 0);
+				bag.add (telemetries, constraints(2, 1));
 			} else {
 				String	version;
 
@@ -271,26 +250,17 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 					version = "Telemetry: None";
 
 				telemetry = new JLabel(version);
-				c.gridx = 2;
-				c.gridy = 0;
-				c.weightx = 0;
-				c.weighty = 0;
-				c.fill = GridBagConstraints.NONE;
-				c.anchor = GridBagConstraints.WEST;
-				bag.add (telemetry, c);
-				c.insets = new Insets(0, 0, 0, 0);
+				bag.add (telemetry, constraints(2, 1));
 			}
+			next_row();
 		}
+		set_inset(0);
 
 		/* Flight status is always visible */
 		flightStatus = new AltosFlightStatus();
 		displays.add(flightStatus);
-		c.gridx = 0;
-		c.gridy = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		c.gridwidth = 3;
-		bag.add(flightStatus, c);
+		bag.add(flightStatus, constraints(0, 4, GridBagConstraints.HORIZONTAL));
+		next_row();
 
 		/* The rest of the window uses a tabbed pane to
 		 * show one of the alternate data views
@@ -319,17 +289,12 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		has_companion = false;
 		has_state = false;
 
-		sitemap = new AltosUIMap();
+		sitemap = new AltosUIMapNew();
 		displays.add(sitemap);
 		has_map = false;
 
 		/* Make the tabbed pane use the rest of the window space */
-		c.gridx = 0;
-		c.gridy = 2;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1;
-		c.weighty = 1;
-		bag.add(pane, c);
+		bag.add(pane, constraints(0, 4, GridBagConstraints.BOTH));
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 

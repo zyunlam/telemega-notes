@@ -20,201 +20,305 @@ package org.altusmetrum.AltosDroid;
 
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.location.Location;
 
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_7.*;
 
 public class AltosVoice {
 
 	private TextToSpeech tts         = null;
 	private boolean      tts_enabled = false;
 
-	private IdleThread   idle_thread = null;
+	static final int TELL_MODE_NONE = 0;
+	static final int TELL_MODE_PAD = 1;
+	static final int TELL_MODE_FLIGHT = 2;
+	static final int TELL_MODE_RECOVER = 3;
 
-	private AltosState   old_state   = null;
+	static final int TELL_FLIGHT_NONE = 0;
+	static final int TELL_FLIGHT_STATE = 1;
+	static final int TELL_FLIGHT_SPEED = 2;
+	static final int TELL_FLIGHT_HEIGHT = 3;
+	static final int TELL_FLIGHT_TRACK = 4;
+
+	private int		last_tell_mode;
+	private int		last_tell_serial = AltosLib.MISSING;
+	private int		last_state;
+	private AltosGPS	last_gps;
+	private double		last_height = AltosLib.MISSING;
+	private Location	last_receiver;
+	private long		last_speak_time;
+	private int		last_flight_tell = TELL_FLIGHT_NONE;
+
+	private long now() {
+		return System.currentTimeMillis();
+	}
+
+	private void reset_last() {
+		last_tell_mode = TELL_MODE_NONE;
+		last_speak_time = now() - 100 * 1000;
+		last_gps = null;
+		last_height = AltosLib.MISSING;
+		last_receiver = null;
+		last_state = AltosLib.ao_flight_invalid;
+		last_flight_tell = TELL_FLIGHT_NONE;
+	}
 
 	public AltosVoice(AltosDroid a) {
-
 		tts = new TextToSpeech(a, new OnInitListener() {
 			public void onInit(int status) {
 				if (status == TextToSpeech.SUCCESS) tts_enabled = true;
-				if (tts_enabled) {
-					idle_thread = new IdleThread();
-				}
 			}
 		});
+		reset_last();
+	}
 
+	public synchronized void set_enable(boolean enable) {
+		tts_enabled = enable;
 	}
 
 	public synchronized void speak(String s) {
 		if (!tts_enabled) return;
+		last_speak_time = now();
 		tts.speak(s, TextToSpeech.QUEUE_ADD, null);
 	}
 
+	public synchronized long time_since_speak() {
+		return now() - last_speak_time;
+	}
+
+	public synchronized void speak(String format, Object ... arguments) {
+		speak(String.format(format, arguments));
+	}
+
+	public synchronized boolean is_speaking() {
+		return tts.isSpeaking();
+	}
+
 	public void stop() {
-		if (tts != null) tts.shutdown();
-		if (idle_thread != null) {
-			idle_thread.interrupt();
-			idle_thread = null;
+		if (tts != null) {
+			tts.stop();
+			tts.shutdown();
 		}
 	}
 
-	public void tell(AltosState state, AltosGreatCircle from_receiver) {
+	private boolean		last_apogee_good;
+	private boolean		last_main_good;
+	private boolean		last_gps_good;
+
+	private boolean tell_gonogo(String name,
+				  boolean current,
+				  boolean previous,
+				  boolean new_mode) {
+		if (current != previous || new_mode)
+			speak("%s %s.", name, current ? "ready" : "not ready");
+		return current;
+	}
+
+	private boolean tell_pad(TelemetryState telem_state, AltosState state,
+			      AltosGreatCircle from_receiver, Location receiver) {
+
+		if (state == null)
+			return false;
+
+		if (state.apogee_voltage != AltosLib.MISSING)
+			last_apogee_good = tell_gonogo("apogee",
+						       state.apogee_voltage >= AltosLib.ao_igniter_good,
+						       last_apogee_good,
+						       last_tell_mode != TELL_MODE_PAD);
+
+		if (state.main_voltage != AltosLib.MISSING)
+			last_main_good = tell_gonogo("main",
+						     state.main_voltage >= AltosLib.ao_igniter_good,
+						     last_main_good,
+						     last_tell_mode != TELL_MODE_PAD);
+
+		if (state.gps != null)
+			last_gps_good = tell_gonogo("G P S",
+						    state.gps_ready,
+						    last_gps_good,
+						    last_tell_mode != TELL_MODE_PAD);
+		return true;
+	}
+
+
+	private boolean descending(int state) {
+		return AltosLib.ao_flight_drogue <= state && state <= AltosLib.ao_flight_landed;
+	}
+
+	private boolean target_moved(AltosState state) {
+		if (last_gps != null && state != null && state.gps != null) {
+			AltosGreatCircle	moved = new AltosGreatCircle(last_gps.lat, last_gps.lon, last_gps.alt,
+									     state.gps.lat, state.gps.lon, state.gps.alt);
+			double			height_change = 0;
+			double			height = state.height();
+
+			if (height != AltosLib.MISSING && last_height != AltosLib.MISSING)
+				height_change = Math.abs(last_height - height);
+
+			if (moved.range < 10 && height_change < 10)
+				return false;
+		}
+		return true;
+	}
+
+	private boolean receiver_moved(Location receiver) {
+		if (last_receiver != null && receiver != null) {
+			AltosGreatCircle	moved = new AltosGreatCircle(last_receiver.getLatitude(),
+									     last_receiver.getLongitude(),
+									     last_receiver.getAltitude(),
+									     receiver.getLatitude(),
+									     receiver.getLongitude(),
+									     receiver.getAltitude());
+			if (moved.range < 10)
+				return false;
+		}
+		return true;
+	}
+
+	private boolean tell_flight(TelemetryState telem_state, AltosState state,
+				    AltosGreatCircle from_receiver, Location receiver) {
+
+		boolean	spoken = false;
+
+		if (state == null)
+			return false;
+
+		if (last_tell_mode != TELL_MODE_FLIGHT)
+			last_flight_tell = TELL_FLIGHT_NONE;
+
+		if (state.state != last_state && AltosLib.ao_flight_boost <= state.state && state.state <= AltosLib.ao_flight_landed) {
+			speak(state.state_name());
+			if (descending(state.state) && !descending(last_state)) {
+				if (state.max_height() != AltosLib.MISSING) {
+					speak("max height: %s.",
+					      AltosConvert.height.say_units(state.max_height()));
+				}
+			}
+			last_flight_tell = TELL_FLIGHT_STATE;
+			return true;
+		}
+
+		if (last_tell_mode == TELL_MODE_FLIGHT && last_flight_tell == TELL_FLIGHT_TRACK) {
+			if (time_since_speak() < 10 * 1000)
+				return false;
+			if (!target_moved(state) && !receiver_moved(receiver))
+				return false;
+		}
+
+		double	speed;
+		double	height;
+
+		if (last_flight_tell == TELL_FLIGHT_NONE || last_flight_tell == TELL_FLIGHT_STATE || last_flight_tell == TELL_FLIGHT_TRACK) {
+			last_flight_tell = TELL_FLIGHT_SPEED;
+
+			if (state.state <= AltosLib.ao_flight_coast) {
+				speed = state.speed();
+			} else {
+				speed = state.gps_speed();
+				if (speed == AltosLib.MISSING)
+					speed = state.speed();
+			}
+
+			if (speed != AltosLib.MISSING) {
+				speak("speed: %s.", AltosConvert.speed.say_units(speed));
+				return true;
+			}
+		}
+
+		if (last_flight_tell == TELL_FLIGHT_SPEED) {
+			last_flight_tell = TELL_FLIGHT_HEIGHT;
+			height = state.height();
+
+			if (height != AltosLib.MISSING) {
+				speak("height: %s.", AltosConvert.height.say_units(height));
+				return true;
+			}
+		}
+
+		if (last_flight_tell == TELL_FLIGHT_HEIGHT) {
+			last_flight_tell = TELL_FLIGHT_TRACK;
+			if (from_receiver != null) {
+				speak("bearing %s %d, elevation %d, range %s.",
+				      from_receiver.bearing_words(
+					      AltosGreatCircle.BEARING_VOICE),
+				      (int) (from_receiver.bearing + 0.5),
+				      (int) (from_receiver.elevation + 0.5),
+				      AltosConvert.distance.say(from_receiver.range));
+				return true;
+			}
+		}
+
+		return spoken;
+	}
+
+	private boolean tell_recover(TelemetryState telem_state, AltosState state,
+				     AltosGreatCircle from_receiver, Location receiver) {
+
+		if (from_receiver == null)
+			return false;
+
+		if (last_tell_mode == TELL_MODE_RECOVER) {
+			if (!target_moved(state) && !receiver_moved(receiver))
+				return false;
+			if (time_since_speak() <= 10 * 1000)
+				return false;
+		}
+
+		String direction = AltosDroid.direction(from_receiver, receiver);
+		if (direction == null)
+			direction = String.format("Bearing %d", (int) (from_receiver.bearing + 0.5));
+
+		speak("%s, range %s.", direction,
+		      AltosConvert.distance.say_units(from_receiver.distance));
+
+		return true;
+	}
+
+	public void tell(TelemetryState telem_state, AltosState state,
+			 AltosGreatCircle from_receiver, Location receiver,
+			 AltosDroidTab tab) {
+
+		boolean	spoken = false;
+
 		if (!tts_enabled) return;
 
-		boolean	spoke = false;
-		if (old_state == null || old_state.state != state.state) {
-			if (state.state != AltosLib.ao_flight_stateless)
-				speak(state.state_name());
-			if ((old_state == null || old_state.state <= AltosLib.ao_flight_boost) &&
-			    state.state > AltosLib.ao_flight_boost) {
-				if (state.max_speed() != AltosLib.MISSING)
-					speak(String.format("Max speed: %s.",
-							    AltosConvert.speed.say_units(state.max_speed())));
-				spoke = true;
-			} else if ((old_state == null || old_state.state < AltosLib.ao_flight_drogue) &&
-			           state.state >= AltosLib.ao_flight_drogue) {
-				if (state.max_height() != AltosLib.MISSING)
-					speak(String.format("Max height: %s.",
-							    AltosConvert.height.say_units(state.max_height())));
-				spoke = true;
+		if (is_speaking()) return;
+
+		int	tell_serial = last_tell_serial;
+
+		if (state != null)
+			tell_serial = state.serial;
+
+		if (tell_serial != last_tell_serial)
+			reset_last();
+
+		int	tell_mode = TELL_MODE_NONE;
+
+		if (tab.tab_name().equals(AltosDroid.tab_pad_name))
+			tell_mode = TELL_MODE_PAD;
+		else if (tab.tab_name().equals(AltosDroid.tab_flight_name))
+			tell_mode = TELL_MODE_FLIGHT;
+		else
+			tell_mode = TELL_MODE_RECOVER;
+
+		if (tell_mode == TELL_MODE_PAD)
+			spoken = tell_pad(telem_state, state, from_receiver, receiver);
+		else if (tell_mode == TELL_MODE_FLIGHT)
+			spoken = tell_flight(telem_state, state, from_receiver, receiver);
+		else
+			spoken = tell_recover(telem_state, state, from_receiver, receiver);
+
+		if (spoken) {
+			last_tell_mode = tell_mode;
+			last_tell_serial = tell_serial;
+			if (state != null) {
+				last_state = state.state;
+				last_height = state.height();
+				if (state.gps != null)
+					last_gps = state.gps;
 			}
-		}
-		if (old_state == null || old_state.gps_ready != state.gps_ready) {
-			if (state.gps_ready) {
-				speak("GPS ready");
-				spoke = true;
-			} else if (old_state != null) {
-				speak("GPS lost");
-				spoke = true;
-			}
-		}
-		old_state = state;
-		if (idle_thread != null)
-			idle_thread.notice(state, from_receiver, spoke);
-	}
-
-
-	class IdleThread extends Thread {
-		boolean	           started;
-		private AltosState state;
-		private AltosGreatCircle from_receiver;
-		int                reported_landing;
-		int                report_interval;
-		long               report_time;
-
-		public synchronized void report(boolean last) {
-			if (state == null)
-				return;
-
-			/* reset the landing count once we hear about a new flight */
-			if (state.state < AltosLib.ao_flight_drogue)
-				reported_landing = 0;
-
-			/* Shut up once the rocket is on the ground */
-			if (reported_landing > 2) {
-				return;
-			}
-
-			/* If the rocket isn't on the pad, then report location */
-			if ((AltosLib.ao_flight_drogue <= state.state &&
-			      state.state < AltosLib.ao_flight_landed) ||
-			     state.state == AltosLib.ao_flight_stateless)
-			{
-				AltosGreatCircle	position;
-
-				if (from_receiver != null)
-					position = from_receiver;
-				else
-					position = state.from_pad;
-
-				if (position != null) {
-					speak(String.format("Height %s, bearing %s %d, elevation %d, range %s.\n",
-							    AltosConvert.height.say_units(state.height()),
-							    position.bearing_words(
-								    AltosGreatCircle.BEARING_VOICE),
-							    (int) (position.bearing + 0.5),
-							    (int) (position.elevation + 0.5),
-							    AltosConvert.distance.say_units(position.range)));
-				}
-			} else if (state.state > AltosLib.ao_flight_pad) {
-				if (state.height() != AltosLib.MISSING)
-					speak(AltosConvert.height.say_units(state.height()));
-			} else {
-				reported_landing = 0;
-			}
-
-			/* If the rocket is coming down, check to see if it has landed;
-			 * either we've got a landed report or we haven't heard from it in
-			 * a long time
-			 */
-			if (state.state >= AltosLib.ao_flight_drogue &&
-			    (last ||
-			     System.currentTimeMillis() - state.received_time >= 15000 ||
-			     state.state == AltosLib.ao_flight_landed))
-			{
-				if (Math.abs(state.speed()) < 20 && state.height() < 100)
-					speak("rocket landed safely");
-				else
-					speak("rocket may have crashed");
-				if (state.from_pad != null)
-					speak(String.format("Bearing %d degrees, range %s.",
-					                    (int) (state.from_pad.bearing + 0.5),
-							    AltosConvert.distance.say_units(state.from_pad.distance)));
-				++reported_landing;
-			}
-		}
-
-		long now () {
-			return System.currentTimeMillis();
-		}
-
-		void set_report_time() {
-			report_time = now() + report_interval;
-		}
-
-		public void run () {
-			try {
-				for (;;) {
-					set_report_time();
-					for (;;) {
-						synchronized (this) {
-							long sleep_time = report_time - now();
-							if (sleep_time <= 0)
-								break;
-							wait(sleep_time);
-						}
-					}
-					report(false);
-				}
-			} catch (InterruptedException ie) {
-			}
-		}
-
-		public synchronized void notice(AltosState new_state, AltosGreatCircle new_from_receiver, boolean spoken) {
-			AltosState old_state = state;
-			state = new_state;
-			from_receiver = new_from_receiver;
-			if (!started && state.state > AltosLib.ao_flight_pad) {
-				started = true;
-				start();
-			}
-
-			if (state.state < AltosLib.ao_flight_drogue)
-				report_interval = 10000;
-			else
-				report_interval = 20000;
-			if (old_state != null && old_state.state != state.state) {
-				report_time = now();
-				this.notify();
-			} else if (spoken)
-				set_report_time();
-		}
-
-		public IdleThread() {
-			state = null;
-			reported_landing = 0;
-			report_interval = 10000;
+			if (receiver != null)
+				last_receiver = receiver;
 		}
 	}
-
 }

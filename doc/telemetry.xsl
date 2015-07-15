@@ -110,7 +110,7 @@
       </para>
     </section>
     <section>
-      <title>Sensor Data</title>
+      <title>TeleMetrum v1.x, TeleMini and TeleNano Sensor Data</title>
       <informaltable frame='none' label='' tocentry='0'>
 	<tgroup cols='2' align='center' colsep='1' rowsep='1'>
 	  <colspec align='center' colwidth='*' colname='Offset'/>
@@ -124,7 +124,7 @@
 	  <tbody>
 	    <row>
 	      <entry>0x01</entry>
-	      <entry>TeleMetrum Sensor Data</entry>
+	      <entry>TeleMetrum v1.x Sensor Data</entry>
 	    </row>
 	    <row>
 	      <entry>0x02</entry>
@@ -138,7 +138,7 @@
 	</tgroup>
       </informaltable>
       <para>
-	TeleMetrum, TeleMini and TeleNano share this same packet
+	TeleMetrum v1.x, TeleMini and TeleNano share this same packet
 	format for sensor data. Each uses a distinct packet type so
 	that the receiver knows which data values are valid and which
 	are undefined.
@@ -205,6 +205,316 @@
 	    </row>
 	    <row>
 	      <entry>30</entry><entry>int16_t</entry><entry>accel_minus_g</entry><entry>TM</entry>
+	    </row>
+	    <row>
+	      <entry>32</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </section>
+    <section>
+      <title>TeleMega Sensor  Data</title>
+      <informaltable frame='none' label='' tocentry='0'>
+	<tgroup cols='2' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Offset'/>
+	  <colspec align='left' colwidth='3*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry>Type</entry>
+	      <entry>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>0x08</entry>
+	      <entry>TeleMega IMU Sensor Data</entry>
+	    </row>
+	    <row>
+	      <entry>0x09</entry>
+	      <entry>TeleMega Kalman and Voltage Data</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+      <para>
+	TeleMega has a lot of sensors, and so it splits the sensor
+	data into two packets. The raw IMU data are sent more often;
+	the voltage values don't change very fast, and the Kalman
+	values can be reconstructed from the IMU data.
+      </para>
+      <para>
+	IMU Sensor Data packets are transmitted once per second on the
+	ground, 10 times per second during ascent and once per second
+	during descent and landing
+      </para>
+      <para>
+	Kalman and Voltage Data packets are transmitted once per second on the
+	ground, 5 times per second during ascent and once per second
+	during descent and landing
+      </para>
+      <para>
+	The high-g accelerometer is reported separately from the data
+	for the 9-axis IMU (accel/gyro/mag). The 9-axis IMU is mounted
+	so that the X axis is "across" the board (along the short
+	axis0, the Y axis is "along" the board (along the long axis,
+	with the high-g accelerometer) and the Z axis is "through" the
+	board (perpendicular to the board). Rotation measurements are
+	around the respective axis, so Y rotation measures the spin
+	rate of the rocket while X and Z rotation measure the tilt
+	rate.
+      </para>
+      <para>
+	The overall tilt angle of the rocket is computed by first
+	measuring the orientation of the rocket on the pad using the 3
+	axis accelerometer, and then integrating the overall tilt rate
+	from the 3 axis gyroscope to compute the total orientation
+	change of the airframe since liftoff.
+      </para>
+      <table frame='all'>
+	<title>TeleMega IMU Sensor Packet Contents</title>
+	<tgroup cols='4' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Offset'/>
+	  <colspec align='center' colwidth='3*' colname='Data Type'/>
+	  <colspec align='left' colwidth='3*' colname='Name'/>
+	  <colspec align='left' colwidth='9*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Offset</entry>
+	      <entry align='center'>Data Type</entry>
+	      <entry align='center'>Name</entry>
+	      <entry align='center'>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>5</entry><entry>uint8_t</entry><entry>orient</entry><entry>Angle from vertical in degrees</entry>
+	    </row>
+	    <row>
+	      <entry>6</entry><entry>int16_t</entry><entry>accel</entry><entry>High G accelerometer</entry>
+	    </row>
+	    <row>
+	      <entry>8</entry><entry>int32_t</entry><entry>pres</entry><entry>pressure (Pa * 10)</entry>
+	    </row>
+	    <row>
+	      <entry>12</entry><entry>int16_t</entry><entry>temp</entry><entry>temperature (°C * 100)</entry>
+	    </row>
+	    <row>
+	      <entry>14</entry><entry>int16_t</entry><entry>accel_x</entry><entry>X axis acceleration (across)</entry>
+	    </row>
+	    <row>
+	      <entry>16</entry><entry>int16_t</entry><entry>accel_y</entry><entry>Y axis acceleration (along)</entry>
+	    </row>
+	    <row>
+	      <entry>18</entry><entry>int16_t</entry><entry>accel_z</entry><entry>Z axis acceleration (through)</entry>
+	    </row>
+	    <row>
+	      <entry>20</entry><entry>int16_t</entry><entry>gyro_x</entry><entry>X axis rotation (across)</entry>
+	    </row>
+	    <row>
+	      <entry>22</entry><entry>int16_t</entry><entry>gyro_y</entry><entry>Y axis rotation (along)</entry>
+	    </row>
+	    <row>
+	      <entry>24</entry><entry>int16_t</entry><entry>gyro_z</entry><entry>Z axis rotation (through)</entry>
+	    </row>
+	    <row>
+	      <entry>26</entry><entry>int16_t</entry><entry>mag_x</entry><entry>X field strength (across)</entry>
+	    </row>
+	    <row>
+	      <entry>28</entry><entry>int16_t</entry><entry>mag_y</entry><entry>Y field strength (along)</entry>
+	    </row>
+	    <row>
+	      <entry>30</entry><entry>int16_t</entry><entry>mag_z</entry><entry>Z field strength (through)</entry>
+	    </row>
+	    <row>
+	      <entry>32</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+      <table frame='all'>
+	<title>TeleMega Kalman and Voltage Data Packet Contents</title>
+	<tgroup cols='4' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Offset'/>
+	  <colspec align='center' colwidth='3*' colname='Data Type'/>
+	  <colspec align='left' colwidth='3*' colname='Name'/>
+	  <colspec align='left' colwidth='9*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Offset</entry>
+	      <entry align='center'>Data Type</entry>
+	      <entry align='center'>Name</entry>
+	      <entry align='center'>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>5</entry><entry>uint8_t</entry><entry>state</entry><entry>Flight state</entry>
+	    </row>
+	    <row>
+	      <entry>6</entry><entry>int16_t</entry><entry>v_batt</entry><entry>battery voltage</entry>
+	    </row>
+	    <row>
+	      <entry>8</entry><entry>int16_t</entry><entry>v_pyro</entry><entry>pyro battery voltage</entry>
+	    </row>
+	    <row>
+	      <entry>10</entry><entry>int8_t[6]</entry><entry>sense</entry><entry>pyro continuity sense</entry>
+	    </row>
+	    <row>
+	      <entry>16</entry><entry>int32_t</entry><entry>ground_pres</entry><entry>Average barometer reading on ground</entry>
+	    </row>
+	    <row>
+	      <entry>20</entry><entry>int16_t</entry><entry>ground_accel</entry><entry>Average accelerometer reading on ground</entry>
+	    </row>
+	    <row>
+	      <entry>22</entry><entry>int16_t</entry><entry>accel_plus_g</entry><entry>Accel calibration at +1g</entry>
+	    </row>
+	    <row>
+	      <entry>24</entry><entry>int16_t</entry><entry>accel_minus_g</entry><entry>Accel calibration at -1g</entry>
+	    </row>
+	    <row>
+	      <entry>26</entry><entry>int16_t</entry><entry>acceleration</entry><entry>m/s² * 16</entry>
+	    </row>
+	    <row>
+	      <entry>28</entry><entry>int16_t</entry><entry>speed</entry><entry>m/s * 16</entry>
+	    </row>
+	    <row>
+	      <entry>30</entry><entry>int16_t</entry><entry>height</entry><entry>m</entry>
+	    </row>
+	    <row>
+	      <entry>32</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </section>
+    <section>
+      <title>TeleMetrum v2 Sensor  Data</title>
+      <informaltable frame='none' label='' tocentry='0'>
+	<tgroup cols='2' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Offset'/>
+	  <colspec align='left' colwidth='3*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry>Type</entry>
+	      <entry>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>0x0A</entry>
+	      <entry>TeleMetrum v2 Sensor Data</entry>
+	    </row>
+	    <row>
+	      <entry>0x0B</entry>
+	      <entry>TeleMetrum v2 Calibration Data</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+      <para>
+	TeleMetrum v2 has higher resolution barometric data than
+	TeleMetrum v1, and so the constant calibration data is
+	split out into a separate packet.
+      </para>
+      <para>
+	TeleMetrum v2 Sensor Data packets are transmitted once per second on the
+	ground, 10 times per second during ascent and once per second
+	during descent and landing
+      </para>
+      <para>
+	TeleMetrum v2 Calibration Data packets are always transmitted once per second.
+      </para>
+      <table frame='all'>
+	<title>TeleMetrum v2 Sensor Packet Contents</title>
+	<tgroup cols='4' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Offset'/>
+	  <colspec align='center' colwidth='3*' colname='Data Type'/>
+	  <colspec align='left' colwidth='3*' colname='Name'/>
+	  <colspec align='left' colwidth='9*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Offset</entry>
+	      <entry align='center'>Data Type</entry>
+	      <entry align='center'>Name</entry>
+	      <entry align='center'>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>5</entry><entry>uint8_t</entry><entry>state</entry><entry>Flight state</entry>
+	    </row>
+	    <row>
+	      <entry>6</entry><entry>int16_t</entry><entry>accel</entry><entry>accelerometer</entry>
+	    </row>
+	    <row>
+	      <entry>8</entry><entry>int32_t</entry><entry>pres</entry><entry>pressure sensor (Pa * 10)</entry>
+	    </row>
+	    <row>
+	      <entry>12</entry><entry>int16_t</entry><entry>temp</entry><entry>temperature sensor (°C * 100)</entry>
+	    </row>
+
+	    <row>
+	      <entry>14</entry><entry>int16_t</entry><entry>acceleration</entry><entry>m/s² * 16</entry>
+	    </row>
+	    <row>
+	      <entry>16</entry><entry>int16_t</entry><entry>speed</entry><entry>m/s * 16</entry>
+	    </row>
+	    <row>
+	      <entry>18</entry><entry>int16_t</entry><entry>height</entry><entry>m</entry>
+	    </row>
+
+	    <row>
+	      <entry>20</entry><entry>int16_t</entry><entry>v_batt</entry><entry>battery voltage</entry>
+	    </row>
+	    <row>
+	      <entry>22</entry><entry>int16_t</entry><entry>sense_d</entry><entry>drogue continuity sense</entry>
+	    </row>
+	    <row>
+	      <entry>24</entry><entry>int16_t</entry><entry>sense_m</entry><entry>main continuity sense</entry>
+	    </row>
+	    <row>
+	      <entry>26</entry><entry>pad[6]</entry><entry>pad bytes</entry><entry></entry>
+	    </row>
+	    <row>
+	      <entry>32</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+      <table frame='all'>
+	<title>TeleMetrum v2 Calibration Data Packet Contents</title>
+	<tgroup cols='4' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Offset'/>
+	  <colspec align='center' colwidth='3*' colname='Data Type'/>
+	  <colspec align='left' colwidth='3*' colname='Name'/>
+	  <colspec align='left' colwidth='9*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Offset</entry>
+	      <entry align='center'>Data Type</entry>
+	      <entry align='center'>Name</entry>
+	      <entry align='center'>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>5</entry><entry>pad[3]</entry><entry>pad bytes</entry><entry></entry>
+	    </row>
+	    <row>
+	      <entry>8</entry><entry>int32_t</entry><entry>ground_pres</entry><entry>Average barometer reading on ground</entry>
+	    </row>
+	    <row>
+	      <entry>12</entry><entry>int16_t</entry><entry>ground_accel</entry><entry>Average accelerometer reading on ground</entry>
+	    </row>
+	    <row>
+	      <entry>14</entry><entry>int16_t</entry><entry>accel_plus_g</entry><entry>Accel calibration at +1g</entry>
+	    </row>
+	    <row>
+	      <entry>16</entry><entry>int16_t</entry><entry>accel_minus_g</entry><entry>Accel calibration at -1g</entry>
+	    </row>
+	    <row>
+	      <entry>18</entry><entry>pad[14]</entry><entry>pad bytes</entry><entry></entry>
 	    </row>
 	    <row>
 	      <entry>32</entry>
@@ -315,7 +625,7 @@
       </informaltable>
       <para>
 	This packet provides all of the information available from the
-	Venus SkyTraq GPS receiver—position, time, speed and precision
+	GPS receiver—position, time, speed and precision
 	estimates. 
       </para>
       <para>
@@ -604,62 +914,169 @@
 	</tgroup>
       </table>
     </section>
-  </section>
-  <section>
-    <title>Data Transmission</title>
-    <para>
-      Altus Metrum devices use the Texas Instruments CC1111
-      microcontroller which includes an integrated sub-GHz digital
-      transceiver. This transceiver is used to both transmit and
-      receive the telemetry packets. This section discusses what
-      modulation scheme is used and how this device is configured.
-    </para>
     <section>
-      <title>Modulation Scheme</title>
-      <para>
-	Texas Instruments provides a tool for computing modulation
-	parameters given a desired modulation format and basic bit
-	rate. For AltOS, the basic bit rate was specified as 38 kBaud,
-	resulting in the following signal parmeters:
-      </para>
-      <table>
-	<title>Modulation Scheme</title>
-	<tgroup cols='3'>
-	  <colspec align="center" colwidth="*" colname="parameter"/>
-	  <colspec align="center" colwidth="*" colname="value"/>
-	  <colspec align="center" colwidth="*" colname="description"/>
+      <title>Companion Data Data</title>
+      <informaltable frame='none' label='' tocentry='0'>
+	<tgroup cols='2' align='center' colsep='1' rowsep='1'>
+	  <colspec align='center' colwidth='*' colname='Offset'/>
+	  <colspec align='left' colwidth='3*' colname='Description'/>
 	  <thead>
 	    <row>
-	      <entry align='center'>Parameter</entry>
-	      <entry align='center'>Value</entry>
+	      <entry>Type</entry>
+	      <entry>Description</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>0x07</entry>
+	      <entry>Companion Data Data</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+      <para>
+	When a companion board is attached to TeleMega or TeleMetrum,
+	it can provide telemetry data to be included in the
+	downlink. The companion board can provide up to 12 16-bit data
+	values.
+      </para>
+      <para>
+	The companion board itself specifies the transmission rate. On
+	the ground and during descent, that rate is limited to one
+	packet per second. During ascent, that rate is limited to 10
+	packets per second.
+      </para>
+      <table frame='all'>
+	<title>Companion Data Contents</title>
+	<tgroup cols='4' align='center' colsep='1' rowsep='1'>
+	  <colspec align='right' colwidth='*' colname='Offset'/>
+	  <colspec align='center' colwidth='3*' colname='Data Type'/>
+	  <colspec align='left' colwidth='3*' colname='Name'/>
+	  <colspec align='left' colwidth='9*' colname='Description'/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Offset</entry>
+	      <entry align='center'>Data Type</entry>
+	      <entry align='center'>Name</entry>
 	      <entry align='center'>Description</entry>
 	    </row>
 	  </thead>
 	  <tbody>
 	    <row>
-	      <entry>Modulation</entry>
-	      <entry>GFSK</entry>
-	      <entry>Gaussian Frequency Shift Keying</entry>
+	      <entry>5</entry><entry>uint8_t</entry><entry>board_id</entry>
+	      <entry>Type of companion board attached</entry>
 	    </row>
 	    <row>
-	      <entry>Deviation</entry>
-	      <entry>20.507812 kHz</entry>
-	      <entry>Frequency modulation</entry>
+	      <entry>6</entry><entry>uint8_t</entry><entry>update_period</entry>
+	      <entry>How often telemetry is sent, in 1/100ths of a second</entry>
 	    </row>
 	    <row>
-	      <entry>Data rate</entry>
-	      <entry>38.360596 kBaud</entry>
-	      <entry>Raw bit rate</entry>
+	      <entry>7</entry><entry>uint8_t</entry><entry>channels</entry>
+	      <entry>Number of data channels supplied</entry>
 	    </row>
 	    <row>
-	      <entry>RX Filter Bandwidth</entry>
-	      <entry>93.75 kHz</entry>
-	      <entry>Receiver Band pass filter bandwidth</entry>
+	      <entry>8</entry><entry>uint16_t[12]</entry><entry>companion_data</entry>
+	      <entry>Up to 12 channels of 16-bit companion data</entry>
 	    </row>
 	    <row>
-	      <entry>IF Frequency</entry>
-	      <entry>140.62 kHz</entry>
-	      <entry>Receiver intermediate frequency</entry>
+	      <entry>32</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </section>
+  </section>
+  <section>
+    <title>Data Transmission</title>
+    <para>
+      Altus Metrum devices use Texas Instruments sub-GHz digital radio
+      products. Ground stations use parts with HW FEC while some
+      flight computers perform FEC in software. TeleGPS is
+      transmit-only.
+    </para>
+    <table>
+      <title>Altus Metrum Radio Parts</title>
+      <tgroup cols='3'>
+	<colspec align="center" colwidth="*" colname="Part Number"/>
+	<colspec align="center" colwidth="*" colname="Description"/>
+	<colspec align="left" colwidth="*" colname="Used in"/>
+	<thead>
+	  <row>
+	    <entry align="center">Part Number</entry>
+	    <entry align="center">Description</entry>
+	    <entry align="center">Used in</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>CC1111</entry><entry>10mW transceiver with integrated SoC</entry>
+	    <entry>TeleDongle v0.2, TeleBT v1.0, TeleMetrum v1.x, TeleMini</entry>
+	  </row>
+	  <row>
+	    <entry>CC1120</entry><entry>35mW transceiver with SW FEC</entry>
+	    <entry>TeleMetrum v2, TeleMega</entry>
+	  </row>
+	  <row>
+	    <entry>CC1200</entry><entry>35mW transceiver with HW FEC</entry>
+	    <entry>TeleDongle v3.0, TeleBT v3.0</entry>
+	  </row>
+	  <row>
+	    <entry>CC115L</entry><entry>14mW transmitter with SW FEC</entry>
+	    <entry>TeleGPS</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+    <section>
+      <title>Modulation Scheme</title>
+      <para>
+	Texas Instruments provides a tool for computing modulation
+	parameters given a desired modulation format and basic bit
+	rate.
+
+	While we might like to use something with better low-signal
+	performance like BPSK, the radios we use don't support that,
+	but do support Gaussian frequency shift keying (GFSK). Regular
+	frequency shift keying (FSK) encodes the signal by switching
+	the carrier between two frequencies. The Gaussian version is
+	essentially the same, but the shift between frequencies gently
+	follows a gaussian curve, rather than switching
+	immediately. This tames the bandwidth of the signal without
+	affecting the ability to transmit data.
+
+	For AltOS, there are three available bit rates, 38.4kBaud,
+	9.6kBaud and 2.4kBaud resulting in the following signal
+	parmeters:
+
+      </para>
+      <table>
+	<title>Modulation Scheme</title>
+	<tgroup cols='3'>
+	  <colspec align="center" colwidth="*" colname="rate"/>
+	  <colspec align="center" colwidth="*" colname="deviation"/>
+	  <colspec align="center" colwidth="*" colname="bandwidth"/>
+	  <thead>
+	    <row>
+	      <entry align='center'>Rate</entry>
+	      <entry align='center'>Deviation</entry>
+	      <entry align='center'>Receiver Bandwidth</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>38.4kBaud</entry>
+	      <entry>20.5kHz</entry>
+	      <entry>100kHz</entry>
+	    </row>
+	    <row>
+	      <entry>9.6kBaud</entry>
+	      <entry>5.125kHz</entry>
+	      <entry>25kHz</entry>
+	    </row>
+	    <row>
+	      <entry>2.4kBaud</entry>
+	      <entry>1.5kHz</entry>
+	      <entry>5kHz</entry>
 	    </row>
 	  </tbody>
 	</tgroup>
@@ -668,10 +1085,12 @@
     <section>
       <title>Error Correction</title>
       <para>
-	The cc1111 provides forward error correction in hardware,
-	which AltOS uses to improve reception of weak signals. The
-	overall effect of this is to halve the available bandwidth for
-	data from 38 kBaud to 19 kBaud.
+	The cc1111 and cc1200 provide forward error correction in
+	hardware; on the cc1120 and cc115l that's done in
+	software. AltOS uses this to improve reception of weak
+	signals. As it's a rate 1/2 encoding, each bit of data takes
+	two bits when transmitted, so the effective data rate is half
+	of the raw transmitted bit rate.
       </para>
       <table>
 	<title>Error Correction</title>

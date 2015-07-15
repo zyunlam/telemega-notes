@@ -18,19 +18,21 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.6)
+AC_INIT([altos], 1.6.1)
+ANDROID_VERSION=9
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
 AC_SUBST(VERSION_DASH)
+AC_SUBST(ANDROID_VERSION)
 
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=6
-ALTOSLIB_VERSION=6
+ALTOSUILIB_VERSION=7
+ALTOSLIB_VERSION=7
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -514,9 +516,9 @@ AC_OUTPUT([
 Makefile
 src/Makedefs
 altoslib/Makefile
+altoslib/AltosVersion.java
 icon/Makefile
 altosuilib/Makefile
-altosuilib/AltosUIVersion.java
 altosui/Makefile
 altosui/Info.plist
 altosui/altos-windows.nsi
@@ -529,6 +531,7 @@ telegps/Info.plist
 telegps/telegps-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
+altosdroid/AndroidManifest.xml
 ao-tools/Makefile
 ao-tools/lib/Makefile
 ao-tools/ao-rawload/Makefile
@@ -551,6 +554,7 @@ ao-tools/ao-test-igniter/Makefile
 ao-tools/ao-test-baro/Makefile
 ao-tools/ao-test-flash/Makefile
 ao-tools/ao-cal-accel/Makefile
+ao-tools/ao-cal-freq/Makefile
 ao-tools/ao-test-gps/Makefile
 ao-tools/ao-usbtrng/Makefile
 ao-utils/Makefile
