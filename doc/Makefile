@@ -18,7 +18,8 @@ RELNOTES=\
 	release-notes-1.4.html \
 	release-notes-1.4.1.html \
 	release-notes-1.5.html \
-	release-notes-1.6.html
+	release-notes-1.6.html \
+	release-notes-1.6.1.html
 
 PICTURES=\
 	altosui.png \
@@ -51,6 +52,7 @@ PICTURES=\
 	micropeak-statistics.png \
 	MicroPeakUSB-2.0-inuse.jpg \
 	MicroPeakUSB-2.0.jpg \
+	monitor-idle.png \
 	scan-channels.png \
 	site-map.png \
 	table.png \

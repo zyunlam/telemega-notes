@@ -41,6 +41,13 @@
     </legalnotice>
     <revhistory>
       <revision>
+	<revnumber>1.6.1</revnumber>
+	<date>15 July 2015</date>
+	<revremark>
+	  Minor release adding TeleBT v3.0 support.
+	</revremark>
+      </revision>
+      <revision>
 	<revnumber>1.6</revnumber>
 	<date>8 January 2015</date>
 	<revremark>
@@ -3853,8 +3860,7 @@ NAR #88757, TRA #12200
       <para>
 	Before heading out to a new launch site, you can use this to
 	load satellite images in case you don't have internet
-	connectivity at the site. This loads a fairly large area
-	around the launch site, which should cover any flight you're likely to make.
+	connectivity at the site.
       </para>
       <para>
 	There's a drop-down menu of launch sites we know about; if
@@ -3909,15 +3915,18 @@ NAR #88757, TRA #12200
 	You can specify the range of zoom levels to download; smaller
 	numbers show more area with less resolution. The default
 	level, 0, shows about 3m/pixel. One zoom level change
-	doubles or halves that number.
+	doubles or halves that number. Larger zoom levels show more
+	detail, smaller zoom levels less.
       </para>
       <para>
-	The Tile Radius value sets how large an area around the center
-	point to download. Each tile is 512x512 pixels, and the
-	'radius' value specifies how many tiles away from the center
-	will be downloaded. Specify a radius of 0 and you get only the
-	center tile. A radius of 1 loads a 3x3 grid, centered on the
-	specified location.
+	The Map Radius value sets how large an area around the center
+	point to download. Select a value large enough to cover any
+	plausible flight from that site. Be aware that loading a large
+	area with a high maximum zoom level can attempt to download a
+	lot of data. Loading hybrid maps with a 10km radius at a
+	minimum zoom of -2 and a maximum zoom of 2 consumes about
+	120MB of space. Terrain and road maps consume about 1/10 as
+	much space as satellite or hybrid maps.
       </para>
       <para>
 	Clicking the 'Load Map' button will fetch images from Google
@@ -3929,6 +3938,13 @@ NAR #88757, TRA #12200
     </section>
     <section>
       <title>Monitor Idle</title>
+      <informalfigure>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="monitor-idle.png" width="5.2in" scalefit="1"/>
+	  </imageobject>
+	</mediaobject>
+      </informalfigure>
       <para>
 	This brings up a dialog similar to the Monitor Flight UI,
 	except it works with the altimeter in “idle” mode by sending
@@ -3939,22 +3955,28 @@ NAR #88757, TRA #12200
 	cannot manage to run Monitor Idle, then it's very likely that
 	your callsigns are different in some way.
       </para>
+      <para>
+	You can change the frequency and callsign used to communicate
+	with the flight computer; they must both match the
+	configuration in the flight computer exactly.
+      </para>
     </section>
   </chapter>
   <chapter>
     <title>AltosDroid</title>
     <para>
       AltosDroid provides the same flight monitoring capabilities as
-      AltosUI, but runs on Android devices and is designed to connect
-      to a TeleBT receiver over Bluetooth™. AltosDroid monitors
+      AltosUI, but runs on Android devices. AltosDroid is designed to connect
+      to a TeleBT receiver over Bluetooth™ and (on Android devices supporting
+      USB On-the-go) TeleDongle and TeleBT devices over USB. AltosDroid monitors
       telemetry data, logging it to internal storage in the Android
-      device, and presents that data in a UI the same way the 'Monitor
-      Flight' window does in AltosUI.
+      device, and presents that data in a UI similar to the 'Monitor
+      Flight' window in AltosUI.
     </para>
     <para>
-      This manual will explain how to configure AltosDroid, connect
-      to TeleBT, operate the flight monitoring interface and describe
-      what the displayed data means.
+      This manual will explain how to configure AltosDroid, connect to
+      TeleBT or TeleDongle, operate the flight monitoring interface
+      and describe what the displayed data means.
     </para>
     <section>
       <title>Installing AltosDroid</title>
@@ -3968,7 +3990,7 @@ NAR #88757, TRA #12200
       </para>
     </section>
     <section>
-      <title>Connecting to TeleBT</title>
+      <title>Connecting to TeleBT over Bluetooth™</title>
       <para>
 	Press the Android 'Menu' button or soft-key to see the
 	configuration options available. Select the 'Connect a device'
@@ -3983,14 +4005,90 @@ NAR #88757, TRA #12200
       </para>
     </section>
     <section>
+      <title>Connecting to TeleDongle or TeleBT over USB</title>
+      <para>
+	Get a special USB On-the-go adapter cable. These cables have a USB
+	micro-B male connector on one end and a standard A female
+	connector on the other end. Plug in your TeleDongle or TeleBT
+	device to the adapter cable and the adapter cable into your
+	phone and AltosDroid should automatically start up. If it
+	doesn't, the most likely reason is that your Android device
+	doesn't support USB On-the-go.
+      </para>
+    </section>
+    <section>
       <title>Configuring AltosDroid</title>
       <para>
-	The only configuration option available for AltosDroid is
-	which frequency to listen on. Press the Android 'Menu' button
-	or soft-key and pick the 'Select radio frequency' entry. That
-	brings up a menu of pre-set radio frequencies; pick the one
-	which matches your altimeter.
+	There are several configuration and operation parameters
+	available in the AltosDroid menu.
       </para>
+      <section>
+	<title>Select radio frequency</title>
+	<para>
+	  This selects which frequency to listen on by bringing up a
+	  menu of pre-set radio frequencies. Pick the one which matches
+	  your altimeter.
+	</para>
+      </section>
+      <section>
+	<title>Select data rate</title>
+	<para>
+	  Altus Metrum transmitters can be configured to operate at
+	  lower data rates to improve transmission range. If you have
+	  configured your device to do this, this menu item allows you
+	  to change the receiver to match.
+	</para>
+      </section>
+      <section>
+	<title>Change units</title>
+	<para>
+	  This toggles between metric and imperial units.
+	</para>
+      </section>
+      <section>
+	<title>Load maps</title>
+	<para>
+	  Brings up a dialog allowing you to download offline map
+	  tiles so that you can have maps available even if you have
+	  no network connectivity at the launch site.
+	</para>
+      </section>
+      <section>
+	<title>Map type</title>
+	<para>
+	  Displays a menu of map types and lets you select one. Hybrid
+	  maps include satellite images with a roadmap
+	  overlaid. Satellite maps dispense with the roadmap
+	  overlay. Roadmap shows just the roads. Terrain includes
+	  roads along with shadows indicating changes in elevation,
+	  and other geographical features.
+	</para>
+      </section>
+      <section>
+	<title>Toggle Online/Offline maps</title>
+	<para>
+	  Switches between online and offline maps. Online maps will
+	  show a 'move to current position' icon in the upper right
+	  corner, while offline maps will have copyright information
+	  all over the map. Otherwise, they're pretty similar.
+	</para>
+      </section>
+      <section>
+	<title>Select Tracker</title>
+	<para>
+	  Switches the information displays to show data for a
+	  different transmitting device. The map will always show all
+	  of the devices in view. Trackers are shown and selected by
+	  serial number, so make sure you note the serial number of
+	  devices in each airframe.
+	</para>
+      </section>
+      <section>
+	<title>Delete Track</title>
+	<para>
+	  Deletes all information about a transmitting device.
+	</para>
+      </section>
     </section>
     <section>
       <title>AltosDroid Flight Monitoring</title>
@@ -4004,91 +4102,353 @@ NAR #88757, TRA #12200
       <section>
 	<title>Pad</title>
         <para>
-          The 'Launch Pad' tab shows information used to decide when the
+          The 'Pad' tab shows information used to decide when the
           rocket is ready for flight. The first elements include red/green
           indicators, if any of these is red, you'll want to evaluate
-          whether the rocket is ready to launch:
-          <variablelist>
-	    <varlistentry>
-	      <term>Battery Voltage</term>
-	      <listitem>
-		<para>
-		  This indicates whether the Li-Po battery
-		  powering the TeleMetrum has sufficient charge to last for
-		  the duration of the flight. A value of more than
-		  3.8V is required for a 'GO' status.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>Apogee Igniter Voltage</term>
-	      <listitem>
-		<para>
-		  This indicates whether the apogee
-		  igniter has continuity. If the igniter has a low
-		  resistance, then the voltage measured here will be close
-		  to the Li-Po battery voltage. A value greater than 3.2V is
-		  required for a 'GO' status.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>Main Igniter Voltage</term>
-	      <listitem>
-		<para>
-		  This indicates whether the main
-		  igniter has continuity. If the igniter has a low
-		  resistance, then the voltage measured here will be close
-		  to the Li-Po battery voltage. A value greater than 3.2V is
-		  required for a 'GO' status.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>On-board Data Logging</term>
-	      <listitem>
-		<para>
-		  This indicates whether there is
-		  space remaining on-board to store flight data for the
-		  upcoming flight. If you've downloaded data, but failed
-		  to erase flights, there may not be any space
-		  left. TeleMetrum can store multiple flights, depending
-		  on the configured maximum flight log size. TeleMini
-		  stores only a single flight, so it will need to be
-		  downloaded and erased after each flight to capture
-		  data. This only affects on-board flight logging; the
-		  altimeter will still transmit telemetry and fire
-		  ejection charges at the proper times.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>GPS Locked</term>
-	      <listitem>
-		<para>
-		  For a TeleMetrum or TeleMega device, this indicates whether the GPS receiver is
-		  currently able to compute position information. GPS requires
-		  at least 4 satellites to compute an accurate position.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>GPS Ready</term>
-	      <listitem>
-		<para>
-		  For a TeleMetrum or TeleMega device, this indicates whether GPS has reported at least
-		  10 consecutive positions without losing lock. This ensures
-		  that the GPS receiver has reliable reception from the
-		  satellites.
-		</para>
-	      </listitem>
-	    </varlistentry>
-          </variablelist>
+          whether the rocket is ready to launch.
 	</para>
 	<para>
-	  The Launchpad tab also shows the computed launch pad position
-	  and altitude, averaging many reported positions to improve the
-	  accuracy of the fix.
+	  When the pad tab is selected, the voice responses will
+	  include status changes to the igniters and GPS reception,
+	  letting you know if the rocket is still ready for launch.
+	</para>
+        <variablelist>
+	  <varlistentry>
+	    <term>Battery</term>
+	    <listitem>
+	      <para>
+		This indicates whether the Li-Po battery
+		powering the transmitter has sufficient charge to last for
+		the duration of the flight. A value of more than
+		3.8V is required for a 'GO' status.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Receiver Battery</term>
+	    <listitem>
+	      <para>
+		This indicates whether the Li-Po battery
+		powering the TeleBT has sufficient charge to last for
+		the duration of the flight. A value of more than
+		3.8V is required for a 'GO' status.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Data Logging</term>
+	    <listitem>
+	      <para>
+		This indicates whether there is space remaining
+		on-board to store flight data for the upcoming
+		flight. If you've downloaded data, but failed to
+		erase flights, there may not be any space
+		left. TeleMetrum and TeleMega can store multiple
+		flights, depending on the configured maximum flight
+		log size. TeleGPS logs data continuously. TeleMini
+		stores only a single flight, so it will need to be
+		downloaded and erased after each flight to capture
+		data. This only affects on-board flight logging; the
+		altimeter will still transmit telemetry and fire
+		ejection charges at the proper times.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>GPS Locked</term>
+	    <listitem>
+	      <para>
+		For a TeleMetrum or TeleMega device, this indicates whether the GPS receiver is
+		currently able to compute position information. GPS requires
+		at least 4 satellites to compute an accurate position.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>GPS Ready</term>
+	    <listitem>
+	      <para>
+		For a TeleMetrum or TeleMega device, this indicates whether GPS has reported at least
+		10 consecutive positions without losing lock. This ensures
+		that the GPS receiver has reliable reception from the
+		satellites.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Apogee Igniter</term>
+	    <listitem>
+	      <para>
+		This indicates whether the apogee
+		igniter has continuity. If the igniter has a low
+		resistance, then the voltage measured here will be close
+		to the Li-Po battery voltage. A value greater than 3.2V is
+		required for a 'GO' status.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Main Igniter</term>
+	    <listitem>
+	      <para>
+		This indicates whether the main
+		igniter has continuity. If the igniter has a low
+		resistance, then the voltage measured here will be close
+		to the Li-Po battery voltage. A value greater than 3.2V is
+		required for a 'GO' status.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Igniter A-D</term>
+	    <listitem>
+	      <para>
+		This indicates whether the indicated additional pyro
+		channel igniter has continuity. If the igniter has a
+		low resistance, then the voltage measured here will
+		be close to the Li-Po battery voltage. A value
+		greater than 3.2V is required for a 'GO' status.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+        </variablelist>
+	<para>
+	  The Pad tab also shows the location of the Android device.
+	</para>
+      </section>
+      <section>
+	<title>Flight</title>
+        <para>
+          The 'Flight' tab shows information used to evaluate and spot
+          a rocket while in flight. It displays speed and height data
+          to monitor the health of the rocket, along with elevation,
+          range and bearing to help locate the rocket in the sky.
+	</para>
+	<para>
+	  While the Flight tab is displayed, the voice announcements
+	  will include current speed, height, elevation and bearing
+	  information.
+	</para>
+        <variablelist>
+	  <varlistentry>
+	    <term>Speed</term>
+	    <listitem>
+	      <para>
+		Shows current vertical speed. During descent, the
+		speed values are averaged over a fairly long time to
+		try and make them steadier.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Height</term>
+	    <listitem>
+	      <para>
+		Shows the current height above the launch pad.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Max Speed</term>
+	    <listitem>
+	      <para>
+		Shows the maximum vertical speed seen during the flight.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Max Height</term>
+	    <listitem>
+	      <para>
+		Shows the maximum height above launch pad.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Elevation</term>
+	    <listitem>
+	      <para>
+		This is the angle above the horizon from the android
+		devices current position.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Range</term>
+	    <listitem>
+	      <para>
+		The total distance from the android device to the
+		rocket, including both ground distance and
+		difference in altitude. Use this to gauge how large
+		the rocket is likely to appear in the sky.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Bearing</term>
+	    <listitem>
+	      <para>
+		This is the aziumuth from true north for the rocket
+		from the android device. Use this in combination
+		with the Elevation value to help locate the rocket
+		in the sky, or at least to help point the antenna in
+		the general direction. This is provided in both
+		degrees and a compass point (like West South
+		West). You'll want to know which direction is true
+		north before launching your rocket.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Ground Distance</term>
+	    <listitem>
+	      <para>
+		This shows the distance across the ground to the
+		lat/lon where the rocket is located. Use this to
+		estimate what is currently under the rocket.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Latitude/Longitude</term>
+	    <listitem>
+	      <para>
+		Displays the last known location of the rocket.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Apogee Igniter</term>
+	    <listitem>
+	      <para>
+		This indicates whether the apogee
+		igniter has continuity. If the igniter has a low
+		resistance, then the voltage measured here will be close
+		to the Li-Po battery voltage. A value greater than 3.2V is
+		required for a 'GO' status.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Main Igniter</term>
+	    <listitem>
+	      <para>
+		This indicates whether the main
+		igniter has continuity. If the igniter has a low
+		resistance, then the voltage measured here will be close
+		to the Li-Po battery voltage. A value greater than 3.2V is
+		required for a 'GO' status.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+        </variablelist>
+      </section>
+      <section>
+	<title>Recover</title>
+        <para>
+          The 'Recover' tab shows information used while recovering the
+	  rocket on the ground after flight.
+	</para>
+	<para>
+	  While the Recover tab is displayed, the voice announcements
+	  will include distance along with either bearing or
+	  direction, depending on whether you are moving.
+	</para>
+        <variablelist>
+	  <varlistentry>
+	    <term>Bearing</term>
+	    <listitem>
+	      <para>
+		This is the aziumuth from true north for the rocket
+		from the android device. Use this in combination
+		with the Elevation value to help locate the rocket
+		in the sky, or at least to help point the antenna in
+		the general direction. This is provided in both
+		degrees and a compass point (like West South
+		West). You'll want to know which direction is true
+		north before launching your rocket.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Direction</term>
+	    <listitem>
+	      <para>
+		When you are in motion, this provides the angle from
+		your current direction of motion towards the rocket.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Distance</term>
+	    <listitem>
+	      <para>
+		Distance over the ground to the rocket.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Tar Lat/Tar Lon</term>
+	    <listitem>
+	      <para>
+		Displays the last known location of the rocket.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>My Lat/My Lon</term>
+	    <listitem>
+	      <para>
+		Displays the location of the Android device.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Max Height</term>
+	    <listitem>
+	      <para>
+		Shows the maximum height above launch pad.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Max Speed</term>
+	    <listitem>
+	      <para>
+		Shows the maximum vertical speed seen during the flight.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>Max Accel</term>
+	    <listitem>
+	      <para>
+		Shows the maximum vertical acceleration seen during the flight.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+        </variablelist>
+      </section>
+      <section>
+	<title>Map</title>
+	<para>
+	  The 'Map' tab shows a map of the area around the rocket
+	  being tracked along with information needed to recover it.
+	</para>
+	<para>
+	  On the map itself, icons showing the location of the android
+	  device along with the last known location of each tracker. A
+	  blue line is drawn from the android device location to the
+	  currently selected tracker.
+	</para>
+	<para>
+	  Below the map, the distance and either bearing or direction
+	  along with the lat/lon of the target and the android device
+	  are shown
+	</para>
+	<para>
+	  The Map tab provides the same voice announcements as the
+	  Recover tab.
 	</para>
       </section>
     </section>
@@ -4097,9 +4457,9 @@ NAR #88757, TRA #12200
       <para>
 	AltosDroid always saves every bit of telemetry data it
 	receives. To download that to a computer for use with AltosUI,
-	simply remove the SD card from your Android device, or connect
-	your device to your computer's USB port and browse the files
-	on that device. You will find '.telem' files in the TeleMetrum
+	remove the SD card from your Android device, or connect your
+	device to your computer's USB port and browse the files on
+	that device. You will find '.telem' files in the TeleMetrum
 	directory that will work with AltosUI directly.
       </para>
     </section>
@@ -5915,6 +6275,13 @@ NAR #88757, TRA #12200
   </appendix>
   <appendix>
     <title>Release Notes</title>
+    <simplesect>
+      <title>Version 1.6.1</title>
+      <xi:include
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+	  href="release-notes-1.6.1.xsl"
+	  xpointer="xpointer(/article/*)"/>
+    </simplesect>
     <simplesect>
       <title>Version 1.6</title>
       <xi:include
