@@ -24,7 +24,7 @@ ao_packet_slave(void)
 	ao_tx_packet.len = AO_PACKET_SYN;
 	ao_packet_restart = 1;
 	while (ao_packet_enable) {
-		if (ao_packet_recv()) {
+		if (ao_packet_recv(0)) {
 			ao_xmemcpy(&ao_tx_packet.callsign, &ao_rx_packet.packet.callsign, AO_MAX_CALLSIGN);
 #if HAS_FLIGHT
 			ao_flight_force_idle = TRUE;

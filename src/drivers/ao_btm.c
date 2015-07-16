@@ -23,7 +23,7 @@
 #ifndef ao_serial_btm_getchar
 #define ao_serial_btm_putchar	ao_serial1_putchar
 #define _ao_serial_btm_pollchar	_ao_serial1_pollchar
-#define _ao_serial_btm_sleep()	ao_sleep((void *) &ao_serial1_rx_fifo)
+#define _ao_serial_btm_sleep_for(timeout)	ao_sleep_for((void *) &ao_serial1_rx_fifo, timeout)
 #define ao_serial_btm_set_speed ao_serial1_set_speed
 #define ao_serial_btm_drain	ao_serial1_drain
 #endif
@@ -111,7 +111,7 @@ ao_btm_do_echo(void)
 	while (ao_btm_enable) {
 		ao_arch_block_interrupts();
 		while ((c = _ao_serial_btm_pollchar()) == AO_READ_AGAIN && ao_btm_enable)
-			_ao_serial_btm_sleep();
+			_ao_serial_btm_sleep_for(0);
 		ao_arch_release_interrupts();
 		if (c != AO_READ_AGAIN) {
 			putchar(c);
@@ -166,9 +166,7 @@ ao_btm_getchar(void)
 
 	ao_arch_block_interrupts();
 	while ((c = _ao_serial_btm_pollchar()) == AO_READ_AGAIN) {
-		ao_alarm(AO_MS_TO_TICKS(10));
-		c = _ao_serial_btm_sleep();
-		ao_clear_alarm();
+		c = _ao_serial_btm_sleep_for(AO_MS_TO_TICKS(10));
 		if (c) {
 			c = AO_READ_AGAIN;
 			break;
@@ -265,6 +263,15 @@ uint8_t
 ao_btm_cmd(__code char *cmd)
 {
 	ao_btm_drain();
+
+#ifdef AO_BTM_INT_PORT
+	/* Trust that AltosDroid will eventually disconnect and let us
+	 * get things set up. The BTM module doesn't appear to listen
+	 * for +++, so we have no way to force a disconnect.
+	 */
+	while (ao_btm_connected)
+		ao_sleep(&ao_btm_connected);
+#endif
 	ao_btm_string(cmd);
 	return ao_btm_wait_reply();
 }
@@ -352,6 +359,10 @@ __xdata struct ao_task ao_btm_task;
 void
 ao_btm(void)
 {
+#ifdef AO_BTM_INT_PORT
+	ao_exti_enable(AO_BTM_INT_PORT, AO_BTM_INT_PIN);
+#endif
+
 	/*
 	 * Wait for the bluetooth device to boot
 	 */
@@ -382,6 +393,8 @@ ao_btm(void)
 	/* Turn off status reporting */
 	ao_btm_cmd("ATQ1\r");
 
+	ao_btm_drain();
+
 	ao_btm_stdio = ao_add_stdio(_ao_serial_btm_pollchar,
 				    ao_serial_btm_putchar,
 				    NULL);
@@ -389,10 +402,6 @@ ao_btm(void)
 
 	/* Check current pin state */
 	ao_btm_check_link();
-
-#ifdef AO_BTM_INT_PORT
-	ao_exti_enable(AO_BTM_INT_PORT, AO_BTM_INT_PIN);
-#endif
 
 	for (;;) {
 		while (!ao_btm_connected)

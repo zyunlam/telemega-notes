@@ -1,3 +1,1912 @@
+commit 6e9bb9178356620bd47d9f2e31abf42b7f1a8f11
+Merge: e2cefd8 87c8bb3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jul 16 13:31:42 2015 -0600
+
+    Merge branch 'master' into branch-1.6
+
+commit 87c8bb3956897830da1f7aaca2990a9571767b73
+Merge: 643c2fb d6445b3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jul 16 07:54:35 2015 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit d6445b3739ac2c5dd040efdb97317a6b2a48044a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 15 18:31:05 2015 -0700
+
+    Bump Java library versions
+    
+    Avoid problems if you have an old version of the library installed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 643c2fb03833d658320f476ef731bbb06fe3cc31
+Merge: e41786f 271f56a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jul 15 16:43:50 2015 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 271f56a41c7e785b0fab7e572325df842d104277
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 15 11:41:03 2015 -0700
+
+    Bump configure.ac versions to 1.6.1
+    
+    And set android version to 9
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3cb5b31a534ab0c987667f37c976a5cd589d42a5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 15 11:40:24 2015 -0700
+
+    doc: Update for 1.6.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7338719414ec2c34235c368a55934be0765661c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 22:33:07 2015 -0700
+
+    Bump version to 1.6.0.4 (android version 8)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 52dc7dc5a791f3e7e307ae11f5c6a20b5bf71ba6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 22:31:47 2015 -0700
+
+    altosdroid: Cleanup Makefile.am
+    
+    Avoid re-creating library symlinks.
+    Make builds depend on resource files too.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c4af5cb233013b35d6763f5adf8d11b47f847111
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 22:17:16 2015 -0700
+
+    altosdroid: Clean up tab layout
+    
+    Fuss with weights and gravitys, then add some wrapping layouts to get
+    things looking reasonable on small and larger screens.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e41786fb384892961a6547e17812a24314ce9623
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Jul 11 22:59:34 2015 -0600
+
+    add debian branch spec to vcs-git: line in control so Debian tools work right
+
+commit 251263f72a1c189aac709d3d0410eb916a9f66d6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 20:37:16 2015 -0700
+
+    altosdroid: Add 'Auto' to map tracker list
+    
+    Add an 'auto' menu entry when selecting trackers from the map.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2997c9720f58b2955925e4e99c11a6ec302114a9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 20:36:18 2015 -0700
+
+    altosdroid: Note time at startup to avoid flipping trackers
+    
+    Need to set the initial 'switch' time in onStart to avoid flipping
+    between trackers before we've done any other 'switching' action.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2a85f273e33a316bd044c4c8dce17c19633cffe6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 20:21:34 2015 -0700
+
+    Generate Android version info from configure.ac
+    
+    This avoids having version data in two places.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ed682ca39496849b6c0d6bdf81bee6263864895f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:55:43 2015 -0700
+
+    altosdroid: Add other igniter status, various other layout changes
+    
+    Show the first four igniters (A-D) in the pad tab. Make pad and flight
+    layouts look a bit better
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 84021b8e0ab9262262345ce47671c3c0c6c43566
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:54:36 2015 -0700
+
+    altosdroid: Don't disconnect from bluetooth onStartCommand
+    
+    If we've already got a bluetooth connection running, don't slam it
+    shut when the UI starts up again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bdc953e26ac2dd67021f905807324c6a02e49690
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:54:07 2015 -0700
+
+    altosdroid: Remove a debug line in AltosVoice
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 51bf46248ca7ee3c817e62274b7366258c9f87cf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:53:06 2015 -0700
+
+    altosdroid: Pop up menu of nearby trackers on map click
+    
+    This lets the user select one of potentially many overlapping
+    trackers, and also makes it clear when the current tracker is being
+    changed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b64ab2a8a25b0c22443bc77829c7f35b4f1c2455
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:17:40 2015 -0700
+
+    altosdroid: Keep speaking even when screen is off
+    
+    Move the voice and telemetry disabling calls from onStop to onDestroy
+    so that a stopped application only leaves off updating the screen, and
+    not the voice bits as well.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d015cfc1499a263549f52d46e9e5b934fcb94f53
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:15:08 2015 -0700
+
+    altoslib: Preload maps based on distance rather than number of tiles
+    
+    This lets you get the specific area requested at all zoom levels,
+    rather than having further detail only at lower resolution zooms.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit afa37e4667ace42c1f43b01b613e639772cfeb75
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:13:37 2015 -0700
+
+    altoslib: Convert longitude from distance in AltosMapTransform
+    
+    This computes the longitude cooresponding to a specific distance at a
+    specific latitude.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1b6f3de0a547fa452d5c40775bcf59c49b229e5e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:11:48 2015 -0700
+
+    altoslib: Limit simultanous map tile downloads to 128
+    
+    Before this change, every tile requested would get downloaded at the
+    same time. With moving to distance-based offline map loading radius
+    values, the number of tiles at closer zooms was in the thousands,
+    overwhelming the network.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b313a5a3d5aba89330c0e20eeac00cc571828953
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:10:44 2015 -0700
+
+    altoslib: Make earth size constants public
+    
+    This lets other code share the values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a9bc364ecc69d9085146a39198f0671de164eb2e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 11 19:09:28 2015 -0700
+
+    altoslib: Make AltosMap floor/ceil static. Check transform in paint
+    
+    This avoids crashing in paint when no transform has been set yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 002c523fae9369f0261c28f33152289d965d406b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 25 18:40:21 2015 -0700
+
+    telegps: Add receiver battery to Status display
+    
+    Makes it a bit cramped, but it's useful to have if you're using TeleBT.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3d508b66c2a15286bb9af88e4d92209463e0725d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 25 18:35:07 2015 -0700
+
+    altosui: Correctly show/hide receiver battery value
+    
+    Override the hide() test function which has the listener_state
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f76d5e4fc2ed1e0d79c096cc89793d671ecb78c3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 25 18:33:46 2015 -0700
+
+    altosuilib: Receiver battery voltage lives in listener_state
+    
+    The code to detect whether to show or hide this entry was using
+    functions that weren't given the listener_state and hence returned
+    MISSING all of the time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7c0f66bf64f410415afaff1b5c8e1443512b7a57
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 25 18:31:29 2015 -0700
+
+    altoslib: Support TeleBT v3.0 battery voltage conversion
+    
+    TeleBT v3.0 uses an STM32 instead of a cc1111, so it needs a different
+    voltage computation from the raw ADC value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee1b0bd05bedb8a5a631cc79c77fde8fd920ac38
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 25 18:42:29 2015 -0700
+
+    altos/telebt-v3.0: Report battery voltage correctly
+    
+    There was an extra %d, and an extra ':' in the output, making the UI
+    not parse the voltage correctly
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6ecd75a7abb5fcee440f7672082013088634680b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 25 12:23:04 2015 -0700
+
+    altoslib: Don't crash if dragging a map view without any tiles
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 06908e377b7b932bfe3f6dfc840a0a13340f32ce
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 25 12:22:04 2015 -0700
+
+    altosdroid: Class of offline map view widget changed
+    
+    Switch around AltosViewPager to match.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71d924288d45b09ae655d06df9780ba286e3f3be
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 24 12:02:22 2015 -0700
+
+    altosdroid: Display direction in map view
+    
+    Use direction in map view when available, otherwise use bearing
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c7067f14359d25a8275f2b09e7b30c06c0424dbb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 22:40:11 2015 -0700
+
+    altoslib: Fix replay to run in realtime again
+    
+    At some point, this got sped up to 10x normal speedx
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3e7588e382c70e467b1f328fcfb6bc38a6b79ac7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 22:22:06 2015 -0700
+
+    Bump version to 1.6.0.3
+    
+    Mark the release of 1.6.0.3 altosdroid
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3ce5e24fefaddaa74eadba4722e904354c871387
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 22:21:45 2015 -0700
+
+    altosdroid: Update version numbers in manifest
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d9f96c45d0a3099e9e5fd3c75cc27f9415fcaf55
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 22:21:30 2015 -0700
+
+    altosdroid: Mark tab-dependent voice output as done
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit aed8d3ee2561bbec59b9684fb2042186191302ca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 22:04:47 2015 -0700
+
+    altosdroid: Make sure flight voice output always starts with 'speed'
+    
+    This resets the flight-mode voice output state back to start again
+    each time the flight tab is selected
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b1b41e0823a60769e7d2d806f4d97ae043d7dae3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 22:00:33 2015 -0700
+
+    altosdroid: Make sure whole flight state is spoken even when no-one is moving
+    
+    This eliminates the case where much of the flight state wasn't
+    reported if the tracker or receiver weren't moving.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f275e73f42e0aaf1760da99fb93c394320aafb84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 21:47:06 2015 -0700
+
+    altoslib: Typo slipped into AltosState.java
+    
+    Oops.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bfa6cd8934b993bd4a67cfc7a4eeecf9b11915ef
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 21:39:09 2015 -0700
+
+    altosdroid: Change voice output around
+    
+    This makes the voice output depend on the current displayed tab; where
+    the 'recovery' and 'map' tabs get the same value.
+    
+    Pad
+    
+    	Reports igniter and GPS status changes
+    
+    Flight
+    
+    	Report flight state changes and max height after apogee
+    	Report current speed, height and bearing/elevation/range once
+    	every 10 seconds while the rocket is in motion.
+    
+    Recovery
+    
+    	Report distance and bearing when the location of either the
+    	tracker or the receiver changes by more than 10m, but not more
+    	than once every 10 seconds.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a761b34ed8fc64435f5a49623f4a5c55e2dda33a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 21:37:25 2015 -0700
+
+    altosdroid: Define strings for the tab names
+    
+    Use these everywhere instead of replicating the same name; might
+    reduce errors.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 56146cd379e1319b7adcf8e22cdda55f771e11be
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 21:35:43 2015 -0700
+
+    altosdroid: Show direction to target in recover tab
+    
+    This takes the bearing to target and current direction of motion (from
+    the Android API) and computes a turn amount and displays that so you
+    don't have to know which way is north when walking towards the rocket.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 60b8bea12edb954e6140a92c8412364c9581e3c2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 21:38:37 2015 -0700
+
+    altoslib: Use a longer filter for descent values
+    
+    This makes descent speeds almost useful, a huge improvement
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1513693602c2a4cab0783833d1844c066edabb71
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 23:21:05 2015 -0700
+
+    altosdroid: Fix line drawing to old tracker location
+    
+    Selecting an old tracker would often fail to switch the bearing line
+    as it was using the map data instead of just using the local data for
+    the relavant tracker.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 87d2ab135b493486162d33ff172eba1f44dc0ce5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 21:04:01 2015 -0700
+
+    altosdroid: Mark four-tab change done
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fb0bd0ec18088ef01549cdb96243d591f618e32b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 20:59:17 2015 -0700
+
+    altosdroid: Allow tracker selection from online map widget
+    
+    Need separate tracker selection code for online maps
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2b6768ed32d7be444c49caa40d30b520177bb22a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 20:43:23 2015 -0700
+
+    altosdroid: Switch to four tabs (pad/flight/recover/map)
+    
+    Ascent and descent were almost the same; no reason to have both.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0f56903774d9e8bb033dfc0af6945e8ddc1d3065
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 20:08:05 2015 -0700
+
+    altosdroid: Select tracker by clicking on map
+    
+    This lets you pick a  tracker from the map, rather than having to use
+    the menu.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a959c1926048d1b96a06aa291131afd7c8e771c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 18:41:01 2015 -0700
+
+    altosdroid: Get rid of on-line only maps tab
+    
+    The offline tab did both, so delete the online one and replace it with
+    the offline one.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 18fe64cf2648568dd0bde5acd7b627f1ddb6917e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 18:26:34 2015 -0700
+
+    altosdroid: Display online/offline maps in same tab
+    
+    Make the map portion switchable between online and offline maps,
+    leaving the rest of the tab alone.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee656c9d41238ab2c56859a03fe6b8ce8ff2df4e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 21 10:34:00 2015 -0700
+
+    altosdroid: Add map source preference
+    
+    Not hooked up yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9af72a2e629779833ff1787bbfc2ddc8b9d88bba
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 21 09:37:05 2015 -0700
+
+    altosdroid: Show receiver battery voltage in the 'pad' view
+    
+    Helpful to determine when the receiver battery is getting low
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4fbe9d5a1f56178a737ede6b31e8d01a02a7543f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 21 09:36:20 2015 -0700
+
+    altosdroid: Use AltosMap set_zoom_centre
+    
+    This keeps the center of the zoom gesture pinned to the screen.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 08e4e291d32bdb3ac3271a85190d277b1874d277
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 21 09:35:28 2015 -0700
+
+    altosuilib: Use AltosMap set_zoom_centre instead of in-line version
+    
+    Shares the same function with altosdroid this way.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e0c318cdd32b3c3fed5099c754aea3ebc6186a0f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 21 09:34:29 2015 -0700
+
+    altoslib: Add set_zoom_centre to AltosMap
+    
+    This zooms around a specific point, keeping it at the same place on
+    the screen.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b8bdb432aacc1a273ee484a29a24b3768c274db6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 11:58:08 2015 -0700
+
+    altosdroid: Multiple tracker support for google maps
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c72e18fa1713b6e1aa7906210e79dd6354d2390f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 11:57:29 2015 -0700
+
+    altosdroid: Stack map markers with newest rocket on top
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0f40284c554aaadc71a598de8f1c5fe64ea387e1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 11:58:45 2015 -0700
+
+    altosdroid: Support for sorting rockets by age
+    
+    Now we can just sort rockets so that the top-most shown is the newest
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit de785b409e404a5296a7ff2037f52f3029536f28
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 11:57:10 2015 -0700
+
+    altosdroid: Remove debug
+    
+    Just noise at this point.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b2ad3b1ef59fe6e51c8c544f215c33f3b48c3aeb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 11:55:44 2015 -0700
+
+    altosdroid: Switch trackers automatically when changing freq or baud
+    
+    This works by switching trackers when we receive telemetry newer than
+    the last time we changed the frequency configuration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a33336b8f468c5b0f2e14c0ee0242c9a24a8b90
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 11:54:20 2015 -0700
+
+    altosuilib: Allow for no transform in map mouse wheel function
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3882e358b6f2970cb1afebcf2a71da34a57002df
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 11:53:24 2015 -0700
+
+    altoslib: Clean up map tile removal
+    
+    Remove them while walking the hash table, rather than creating a list
+    to remove.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0cc03210d5d53d12604688f294b6ca39e3a025de
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 09:35:26 2015 -0700
+
+    altoslib/altosuilib: Fix equals methods, add hashCode
+    
+    Whenever we use a class as a HashMap key, that class needs to override
+    the equals(Object) and hashCode() methods. Otherwise, the hash table
+    won't work right.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5568c30f0a4fe346b8ed58934c23653064427d65
+Author: Keith Packard <keithp@aimi.keithp.com>
+Date:   Thu Jun 18 17:37:35 2015 -0700
+
+    ao-bringup: Make turnon_easymega run without 'make install'
+    
+    Use relative paths for all altos tools
+    
+    Signed-off-by: Keith Packard <keithp@aimi.keithp.com>
+
+commit 6cf27ddd5e84824610d6a0bcbb81ba4626b71409
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 18 17:12:41 2015 -0700
+
+    ao-bringup: Use local versions of tools instead of /usr/bin for turnon_easymega
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3e5521070564e9a184f3b781dad9d39cdd963510
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 18 16:56:19 2015 -0700
+
+    ao-bringup: Fail turnon_easymega if accel cal fails
+    
+    This prevents a failing board from being reported as good
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6683146168216aacdc0842934cec1fb48ea03518
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 17 00:12:06 2015 -0700
+
+    telegps: use new AltosUIFrame constraint helper
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c71abc5c29025eb57fc78968a4ccf8c34cb3a6f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 16 23:49:45 2015 -0700
+
+    micropeak: Update mac/windows FTDI drivers
+    
+    Use latest FTDI drivers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1098f7502a603a9cf80ad950f53a2c2abdf7ec93
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 16 23:43:53 2015 -0700
+
+    altosuilib: Create grid-bag helper functions in AltosUIFrame
+    
+    This eases the burden of creating suitable GridBagConstraints values
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cdeefaba7d5ef69f28e5dfb152c5f185f8b85f2e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 16 23:42:59 2015 -0700
+
+    altosuilib: Show state.product if state.device_type isn't set
+    
+    MonitorIdle doesn't get the device type, only the product.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 469be0a57dc9932c26f9c38986d22f6e8b2fd6ed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 16 23:42:22 2015 -0700
+
+    altoslib: Remove debug output from AltosMap
+    
+    It's just annoying now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 76532162d63239b00a51dd0ff6b1356b07b62d2d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 16 23:41:51 2015 -0700
+
+    altoslib: Expose public function to set state.product
+    
+    Just adds a setter function for this value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5cacce8099bfc4fa4019538ac88be00bd2023865
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 16 23:40:34 2015 -0700
+
+    altoslib: Let the application disable the link cancel dialog
+    
+    This lets the application control whether to pop up the cancel dialog
+    when the link isn't working.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 75682a5a18f28acf8f4a61a0d45dad461218186e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 16 23:38:07 2015 -0700
+
+    altoslib: Set product for idle monitor
+    
+    This lets the UI show the product name
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c46c2c5767c6e909fa58587e6c864a4fbaa9fa20
+Merge: 39f4361 6cb7d76
+Author: Robert Garbee <robert@gag.com>
+Date:   Sat Jun 13 17:40:59 2015 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 39f4361675aa13899864f427a33d4aa48be56cd2
+Author: Robert Garbee <robert@gag.com>
+Date:   Sat Jun 13 17:40:16 2015 -0600
+
+    add beep when test completes
+
+commit 6cb7d76c3fbe32b442713e358654d07b2506897e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 6 20:37:53 2015 -0700
+
+    altosdroid: Resource changes needed for multi-tracker mode
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 78df1d5213c402780fa2ce7e062c64cf5a01c45f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 6 20:37:27 2015 -0700
+
+    altosdroid: Note recent changes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c813c2c8f71017a686128e06b5178fc99ece251c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 6 20:36:18 2015 -0700
+
+    altosdroid: Add multi-tracker support
+    
+    This lets you view multiple trackers in the offline maps tab (online
+    maps not done yet), saves state of each tracker to preferences.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f79d569dfe333621d63a1d4001c85a88f736ad58
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 6 20:35:32 2015 -0700
+
+    altoslib: Add preferences for saving/restoring multiple flight states
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 64ca3d2e7d2b23aedfdf98ef8ebd760bd3291534
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 6 06:00:43 2015 -0700
+
+    ao-tools: Add missing ao-cal-freq man page
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55753ac8b4b73ec58cb6ef874acc8d606193c5e7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 5 22:52:51 2015 -0700
+
+    ao-bringup: Do telegps freq cal before testing GPS
+    
+    This lets the GPS get some time to see sats while we're messing with
+    the radio frequency calibration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 527700623cc369cc58e15c29dc1ee374fa4efeb7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 5 22:52:21 2015 -0700
+
+    ao-bringup: Use new ao-cal-freq program for cal-freq script
+    
+    Remove shell script bits that were unreliable.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b9797aa9b6ca38db79c22e4dcefc6efc8a148599
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 5 22:17:02 2015 -0700
+
+    ao-tools: Create ao-cal-freq
+    
+    Create C-based frequency calibration program to replace shell script
+    which isn't reliable.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7c75ec6e11a9287b2360bb62ef4ddb4f0e2083c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 2 12:48:42 2015 -0700
+
+    altosdroid: Highlight age in red when older than 10 seconds
+    
+    This lets you quickly identify stale data
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a533ea525620f194fd89fedad043659bb433d71b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 31 23:09:18 2015 -0700
+
+    altosdroid: Switch from custom title to standard Holo theme
+    
+    This gives us the menu button, which is awfully useful on devices
+    without a hardware version...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0beb02f1848e34892cca6e34ba83d6ca836d6df2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 29 09:49:30 2015 -0700
+
+    altoslib: Require 'debug' hook in AltosMapInterface
+    
+    This lets the map users redirect debug messages as appropriate
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4f1c4dddbce7b4e8673173f1690f79ba60e72ba2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 29 09:43:58 2015 -0700
+
+    altosdroid: use 'show' to set new tab contents in onResume
+    
+    Hook onResume so that newly created/recreated tabs get current
+    contents. The set_visible hook isn't sufficient for that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 625c496987c2d320a51f3d27f8f00bde17b46a78
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 29 09:42:58 2015 -0700
+
+    altosdroid: Missing call to super.onDetach from TabMapOffline
+    
+    Causes an exception when you shut down the application.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 50e709a4088f3d6846fd66cbe9b8c437b3f9c88b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 22:13:39 2015 -0700
+
+    altosdroid: Split out AltosMapView into separate file
+    
+    This lets us use the regular layout configuration bits in the .xml
+    file instead of needing to patch the map object into the display. That
+    was causing problems when re-entering the map tab as the map view
+    would somehow end up with a zero width.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2e424f8dc2886aa475e6ddb21457eba08f768b16
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 22:12:26 2015 -0700
+
+    altosdroid: Add 'Current Location' as an option when preloading maps
+    
+    This lets you load maps around your current location, in case your
+    favorite launch site isn't in the list.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4315b91d7afc2391e3f7444906ac226500bf1345
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 22:08:51 2015 -0700
+
+    altosdroid: Save selected map type in AltosDroid object
+    
+    The map tabs may not have been created when the map type was selected,
+    so save the desired type in the main application object.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41028472fd2e7e0209125e76b94e551f9d10f89c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 22:06:55 2015 -0700
+
+    altosdroid: Disable debug output on release builds
+    
+    We generate an awful lot of debug spew to the log; presumably that's
+    not helping performance, so lose that for release builds.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e2d54de24df37baa5ff3837334d97f726934ec25
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 22:05:36 2015 -0700
+
+    altosdroid: Look for zipalign in the new place too
+    
+    This build tool moved for some reason...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 85013045ca505096064aaf45c312b158d0263d2a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 01:05:18 2015 -0700
+
+    altosdroid: Add map types and map preloading UIs
+    
+    This adds an ugly dialog to select which maps to preload, and also
+    adds the ability to display other map types.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ba698c2cc48677735046d0881df9c180674e4082
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 01:01:23 2015 -0700
+
+    altoslib: Pass all map loader params to set_load_params
+    
+    Add zoom and map type to the param list so we don't call set_zoom and
+    set_maptype separately, which only causes lots of extra image loads to
+    get started unnecessarily.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c63617415553d97f9be2f19b94365b53d4480c68
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 01:00:47 2015 -0700
+
+    altosuilib: Eliminate extra MapCache in AltosUIMapPreloadNew
+    
+    Use the cache from the map.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff01fb7275973cdbfd976d3b4e638c6235108121
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 01:00:22 2015 -0700
+
+    altosuilib: Get rid of AltosUIMapNew.set_load_params
+    
+    This isn't needed anywhere.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b49b74847ad55e14d1dbf2872ebbe313147e9fd3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 27 23:14:09 2015 -0700
+
+    altosuilib: Switch to altoslib map loading code
+    
+    Remove the map loading code from the UI bits and use the new altoslib
+    version instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b4e6da65158a434905dc652e46c69d2c38cea7f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 27 23:12:34 2015 -0700
+
+    altoslib: Add map loading helper class
+    
+    This adds the AltosMapLoader class, which iterates over a sequence of
+    zoom levels and formats to get local copies of a desired launch site.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ccd557c846eed37328d6799f36e61308bcbb678a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 27 23:11:58 2015 -0700
+
+    altoslib: Provide toString method for AltosLatLon
+    
+    Makes printing them easier.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 756f501593365b80cfa6f7ca871da3291bbde67a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 27 22:43:53 2015 -0700
+
+    altoslib: Start with map empty
+    
+    Don't load images from 0,0 for no good reason; wait until someone sets
+    a desired lat/lon
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ccba2bb2f193ffd6c3a3d934a46bc06466b4b258
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 27 15:31:25 2015 -0700
+
+    altosuilib: Use altoslib site list loader
+    
+    Removes the custom version and uses the shared code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 519d477cb752d9cdba78a4daa32b1f547bf889b4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 27 15:30:29 2015 -0700
+
+    altoslib: Add AltosLaunchSite bits
+    
+    This asynchronously fetches the list of available launch sites from
+    the standard location and notifies the caller when finished.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 103a50db50be55c2293468d273dd94472dd89d94
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 23:05:49 2015 -0700
+
+    altosdroid: Place icons on screen instead of drawing path
+    
+    This makes drawing a bunch faster, and locating stuff on the screen easier.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2509b664df6a13e6ae9e6753dc9fa0d696a4f6c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 23:05:11 2015 -0700
+
+    altosdroid: Centralize debug printf code
+    
+    Create AltosDebug to hold the debug code, use it everywhere.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bca342577740a9d04b8419ecadcff582e77f1e61
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 23:02:43 2015 -0700
+
+    altosdroid: Move pause before reopening bluetooth into connec thread
+    
+    This avoids stalling the UI while waiting for TBT to boot.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7975d088a4ac44c0943134fa41d0e3b88f50b98f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 19:47:04 2015 -0700
+
+    altosdroid: Add offline map tab
+    
+    It's not very fancy yet, but it does zoom and pan, and show the path
+    of the rocket with a line.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f822b84d8c25159ff113fef6a419b6e18e87a87a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 01:04:00 2015 -0700
+
+    altosuilib: Get rid of AltosUIVersion.java
+    
+    It's been moved to altoslib/AltosVersion.java
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4895f443e4a748de2677e51869f20c05d265c944
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 00:56:17 2015 -0700
+
+    altosuilib: Remove old map bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f41fe2291891b28327c332098bdc601bc75fc4c0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 00:46:21 2015 -0700
+
+    altosuilib: Use new map code for map preload UI
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cd0f4de98ea709e5f070d5f1337658590d2004a1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 00:33:02 2015 -0700
+
+    altosuilib: Add AltosUIImage.java
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 501fa41111b93cc213a1114a33612858e1e93ab5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 26 00:29:53 2015 -0700
+
+    altoslib/altosuilib: Get new Map display code running in altosui and telegps
+    
+    Looks like the display is all hooked up. Still need to replace the
+    preload UIs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cb23b992be8ba40c97d8988c134a814a13ccd58c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 20:34:05 2015 -0700
+
+    altoslib/altosuilib: Update library version to 7
+    
+    So many ABI/API changes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 68effc6e39f731a2d7bbe2963999c1e785118897
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 20:33:28 2015 -0700
+
+    altoslib: More frobbing with new map bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 00aca369c4070901e0400f291d5f269b5fb8015c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 20:10:37 2015 -0700
+
+    altoslib: Get new abstract mapping code compiling
+    
+    Not useful yet, but at least it compiles now?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6ca2c42061b3c0160bf0137c9cd65989c522b826
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 16:35:23 2015 -0700
+
+    altoslib: Build AltosVersion.java in configure.ac
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dcbd87bc685924a6587a5f4dae47d34f417601b0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 16:26:01 2015 -0700
+
+    altos/telelco: Show box voltage with pad knob instead of firing button
+    
+    Turn left past '1' and see the firing box battery voltage instead of
+    pushing the firing button with the box disarmed. This seems like a
+    safer UI.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 91f617d450c187500593d1ae785958187f68ca14
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 15:49:21 2015 -0700
+
+    altos/telelco: Display telefire battery voltage
+    
+    When the firing button is pressed while unarmed, show the telefire
+    battery voltage in the display.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a54aac3361b7bd18f111e5ba06fb89015504b8a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 15:47:46 2015 -0700
+
+    altos: Add telelco v0.3 (v0.2 with cc1200 instead of cc1120)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9b268351aee44de959dcc4c792189c10a00428fe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 25 13:23:54 2015 -0700
+
+    telefire: Report telefire battery voltage over telemetry link
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0e76cb2a7d5db24b6cecdccb6fb8d5bf5527fadf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 24 17:28:07 2015 -0700
+
+    altos: Only set CMAC RSSI value on valid packet received
+    
+    This ignores spurious packets for the purpose of showing the RSSI
+    value in telelco/telefire, avoiding warning about 'low RSSI' when the
+    radio receives noise.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e7c25e3ba04b1e9f8e6fa31e2d464fe96a074dad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 24 17:25:25 2015 -0700
+
+    telefire: Make 'good' RSSI value configurable
+    
+    Different radios will have different 'good' RSSI values, so let each
+    product configure it, leaving the default set to -90dBm, which is
+    a solid signal value for the CC1111.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 29edc37a8de56cb6eb028e3bf3f56aa70f109eba
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 21 13:49:28 2015 -0700
+
+    altoslib: Create display-independent map support code
+    
+    This takes the swing-specific map code and creates a generic version.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 59a28811cb19d315b483df296145a2769c445f80
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:25:05 2015 -0700
+
+    Flip version to 1.6.0.2
+    
+    Tag a version for development builds
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f3ddaae82215e365726f2a62a3dc46bfb29eb1b5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:23:09 2015 -0700
+
+    micropeak: Use fast load mode by default in -load script
+    
+    Speed up flashing in default config
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eac71f2b871357ff69581c713059a3741a82a932
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:22:10 2015 -0700
+
+    microsplash: Add 'publish' target to Makefile
+    
+    This dumps the resulting binary and -load script into the Binaries
+    directory of the altusmetrumllc repo
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dba00b3d9102db99592f5822a703e64d98ace8bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:17:01 2015 -0700
+
+    altos: Support 32MHz xtal on cc1200
+    
+    I ended up building some cc1200-based boards with 32MHz xtals, so just
+    make this an option when building the driver.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fcb523cd083503591fa1277648e5deb258bbbaf4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:16:10 2015 -0700
+
+    doc: Clarify what 'after motor' means
+    
+    Note that this means after motor burn-out, not after motor start.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b67e6ae8ce34ef119da96b442776bb3d78b4f874
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:14:43 2015 -0700
+
+    ao-dump-up: Add --wait option to make testing µPusb easier
+    
+    The --wait option hangs around until a suitable device appears, so
+    that you can test a pile of µPusb devices without needing to
+    constantly interact with the command line.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2b57158737f85c7009658b3e923c66794f01bbdf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:12:52 2015 -0700
+
+    altosui: Remove un-implemented --fetchmaps argument
+    
+    This has been stubbed out for a while, so just remove it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3e5e9333420ede74d998556c1bbd5888e8ff75ae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 19 10:09:22 2015 -0700
+
+    altoslib: Expose locale and non-locale floating point parsing functions
+    
+    UI bits use locale-specific floating point formats, so parsing those
+    needs to use the locale. Network-based data, like .kml bits need to
+    use non-locale-specific parsing code, so now we've got both APIs
+    available, and each used as appropriate.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3fbf0a29a1b8a67b90ef965ee3e2e972c0ec33a1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 18 10:52:24 2015 -0700
+
+    altoslib: Use Locale.ROOT for KML export
+    
+    This avoids locale-specific number formatting, which breaks
+    googleearth when importing the resulting file.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1cc1900e13d79e0451587439c23bbb062d86cee3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 27 22:29:45 2015 -0700
+
+    altosdroid: Fix tab label height problems
+    
+    With a newer android API versions, we can set the indicator to a View
+    instead of just a string. This lets us wrap the desired string in a
+    TextView and show just that for the indicator, making it exactly the
+    right size.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7bfa8841b65707d629b425b306ec4cc3acfc156c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 27 21:20:22 2015 -0700
+
+    altosdroid: Add USB support for TeleDongle/TeleBT
+    
+    This lets AltosDroid use a USB-connected receiver as well as Bluetooth devices.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 356617a3476e237311b8bbcefd6beda8271b120d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 29 12:10:47 2015 -0700
+
+    windows: Use new windows stub to launch applications
+    
+    This avoids needing to locate javaw on the system while also making
+    the registry entries less fragile.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fe76229618643f0af7eae965e7a8fc6c70410d27
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 29 12:08:42 2015 -0700
+
+    icon: Convert windows stub into launcher program
+    
+    Instead of an empty windows stub that exists only to hold icons, add
+    useful code that allows it to find and run the related java
+    application. This also adds more resources to that application to
+    provide more information to Windows too.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b1b69c8b73cbffb56c688f6a968d144b642cdff2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 20 15:09:20 2015 -0700
+
+    altos/stmf0: Have fast ADC ring buffer code use wrap-around
+    
+    Instead of requiring that the whole set of returned values fit
+    precisely in the ring, allow for wrap-around so that we can fetch an
+    odd number of ADC values. The previous version required that the fetch
+    amount always be a factor of the ADC buffer size.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 43b4044dc71d44cb25be6397b4d66fd792580eed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 19 01:12:24 2015 -0700
+
+    altos/chaoskey: Set USB VID/PID to 0x1d50/0x60c6
+    
+    These are allocated from the OpenMoko USB vendor ID page and offer a
+    more 'official' number than from using the 0xfffe space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c3321bd9f73c89686fe983a8d99f4e54fa91550e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 19 01:11:33 2015 -0700
+
+    altos: Add the ability to configure a different USB vendor ID
+    
+    ChaosKey will use an OpenMoko vid/pid, so we need the ability to
+    configure a different USB vendor ID for each product.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fce4e6926de7cb5ef6ea64a8db134c442b86153b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 10 09:35:02 2015 -0600
+
+    ao-tools/ao-list: Show devices that have no TTY
+    
+    chaoskey doesn't advertise itself as a modem, so the kernel doesn't
+    allocate a tty device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ce99807ef942de54a3f934d321baf3c3d26442bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 10 09:34:01 2015 -0600
+
+    altos/test: Support old telemega eeprom file formats in ao_flight_test
+    
+    The old eeprom format used different stoarge for the accel calibration
+    data, which doesn't matter to this code, but the change in the format
+    value does.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f92be7e22150b2de4c899e687d3bbfc1eb842f9e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 10 09:32:20 2015 -0600
+
+    altos/test: Make aprs test code compile again
+    
+    Adding the compressed/uncompressed config option broke the APRS test harness.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 46f2a759dc21ebf3a7bf7e0566903fc1e7364719
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 10 09:30:53 2015 -0600
+
+    ao-tools/ao-mega: Clean up formatting of pyro status messages
+    
+    There was an extra newline and missing space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2c4ebe9b4b392531cd1a5bbafc4ddc38a9391af5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 10 09:29:52 2015 -0600
+
+    altosui: Add map to MonitorIdle display
+    
+    Nice to be able to verify that maps are working by using this mode,
+    instead of needing to use flight monitoring.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dec8de9c642fea1df924a667a4779a6c6c8c3453
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 7 16:53:58 2015 -0800
+
+    altos/stmf0: Need ao_exti.h for pin configuration
+    
+    Flash loader uses pin configuration to set up GPIOs for boot selection
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4e53a5da5a8921829a3bb290e7c051950a66ab75
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 7 16:40:30 2015 -0800
+
+    altos: Add makefile for chaoskey flash loader
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 601f33f5e2f833fed9ab10b24a9df91905d7f766
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 7 12:38:08 2015 -0800
+
+    altos: Build chaoskey by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f3406f38d71d0c9b55c9a3ae2356a778328509a9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 7 12:36:57 2015 -0800
+
+    altos: Add .gitignore for chaoskey
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4862bec43b29264c361950700f935604f41b840b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 7 12:33:36 2015 -0800
+
+    doc: Update telemetry docs to include new packet formats
+    
+    Add TeleMega TeleMetrum v2 and companion data packet formats.
+    
+    List which radio parts each product uses.
+    
+    Document modulation parameters for new data rates.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cdd7ad469728fde178c69b9c99d70d6e0ab3f12d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 7 10:18:57 2015 -0800
+
+    altosdroid: Deal with bluetooth connection failures better
+    
+    Remember when we've closed the bluetooth connection so that we stop
+    operations, including reporting connection status messages or even
+    starting a connection attempt.
+    
+    Pass the AltosBluetooth object back in connection status messages so
+    that TelemetryService can tell when messages from closed objects get
+    delivered. There's a queue between the two, so the above fix catches
+    most of these instances, but not all of them.
+    
+    Stick a delay during reconnect -- if the TeleBT device is getting
+    power-cycled, it will need a few seconds to reconfigure the device at
+    startup, if AltosDroid manages to connect during that time, the
+    configuration commands will be ignored.
+    
+    Unlock the AltosBluetooth device while we connect so that cancel
+    calls will actually work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d446c90dab0aca7e501a0228f24c210758d84a1d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 2 22:23:22 2015 -0800
+
+    altosui/telegps: Change from variable-units snuck into master
+    
+    show_units_name(double) only exists on the variable-units branch...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bef7c89dac68956a94ae386fa6b87165ab6cb484
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 2 21:16:06 2015 -0800
+
+    altos: Missing pad field in TMv2 data packet
+    
+    The normal ARM padding would have filled this in correctly, but it's
+    best to be explicit about the structure.
+    
+    This also adds a test to make sure the resulting telemetry declaration
+    is exactly 32 bytes,
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b133656df4698ceb7af5902711edf9253a29227
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 2 21:11:33 2015 -0800
+
+    altos: Wait for BT disconnect before sending command
+    
+    If AltosDroid manages to connect to the BT module before we've
+    configured it, we won't be able to talk to it as we can't force the
+    module to ignore connection attempts. Wait for AltosDroid to give up
+    and let us configure the device. Eventually, we'll manage, if
+    AltosDroid's delay interval is longer than the time it takes to
+    configure the unit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 112f528755b6c8a2f6eef3bfec21fac981ffb44f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 2 21:08:44 2015 -0800
+
+    ao-tools: Add ao-flash-stm32f0x
+    
+    This new script uses openocd to flash stm32f0x parts
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff3c27e3b842107680dc48084f71eb8c63f1bcab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 2 21:06:51 2015 -0800
+
+    altoslib: Round frequency when configuring radio
+    
+    This makes sure we set the right frequency, instead of being off by
+    1kHz on a regular basis...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e637367e8b940e1642a07b3b7c99147561de9cf1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 2 21:06:02 2015 -0800
+
+    altosui/telegps: Add config option for APRS format
+    
+    Allow configuration of APRS compressed/uncompressed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2614d20b324ab215ef22f178e3635d48e757fa9b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 2 21:02:31 2015 -0800
+
+    altos: Make APRS format (compressed/uncompressed) configurable
+    
+    This provides a choice of compressed vs uncompressed when sending APRS
+    packets to deal with receivers that still do not have support for the
+    more useful compressed format.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0724cc334a3bd8d81bbd4641d90a7e4040330efe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 28 16:06:23 2015 -0800
+
+    altos/usbtrng: Split out random number generating code to separate driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bd18bc5a42fcecfb710477371b9f62610a1ea640
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 28 16:04:00 2015 -0800
+
+    altos: Add chaoskey flash loader
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4c436a1c39da971b72d4302623f27af9d56cc38
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 28 16:02:17 2015 -0800
+
+    altos: Create chaoskey product
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 476c5b87ea0901f70fe98b581ecca9afaf957607
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 28 16:00:45 2015 -0800
+
+    altos/stmf0: Allocate USB buffers at startup
+    
+    This lets the extra allocations used from ao_usb_alloc_buffers be
+    allocated before the first USB connection happens.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e4b415cc8f839ceae48916b5e9d78f78589186cf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 28 16:00:17 2015 -0800
+
+    altos/stmf0: Typo in ao_crc_stm.c
+    
+    Extra semicolon
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 27aef593fb4c037fdb65c9fb397829b42d72d0f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 28 15:59:30 2015 -0800
+
+    altos/stmf0: Fix fast ADC interface
+    
+    This was configuring the hardware wrong, and wasn't keeping the output
+    ring full.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ec2d758844202108b446e6b12ec1da8812ceb265
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 28 15:07:16 2015 -0800
+
+    altos: Allow software to offer other USB interface classes than CDC
+    
+    This lets some boards offer non-CDC class USB interfaces so that the
+    modem driver doesn't pick them up.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4af4e36cda96d053458eeb040e35886890917385
+Merge: 91b1a80 106b16b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 22 14:55:40 2015 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 91b1a80650a7dcd7c5bf819618a8cea0fceb37d9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 8 09:29:01 2015 -0700
+
+    swap names so v3.0 is the default TeleDongle version to turn on
+
+commit 106b16b4d5d024543d7ad8c4b4762151e253f3c4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 16 22:22:37 2015 -0800
+
+    altosdroid: Ignore automatic tab changing while activity is saved
+    
+    When the activity state is saved (after onSaveInstanceState()), we
+    can't update the UI until the activity is restarted or restored; that
+    means any UI changes we make, like switching tabs, must deal with this
+    by allowing those changes to be ignored, using commitAllowingStateLoss
+    instead of commit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e6630ac41ca0d8563cf9a0df5d4acba8192e9624
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 16 21:35:34 2015 -0800
+
+    altosdroid: Missing file: DeviceAddress.java
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8f2d82461f3cf5da157b23ea45a2fa60d56b196b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 16 21:32:54 2015 -0800
+
+    altosdroid: Only speak when GUI is running
+    
+    Create voice in onStart, stop it in onStop. This way, if some other
+    application is in use, the voice won't be annoying you.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 877609a60a9f2c61c1efad8285b2a3c22f59be28
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 16 21:19:09 2015 -0800
+
+    altosdroid: Explicitly disconnect BT on termination or 'disconnect'
+    
+    This adds an explicit message to the telemetry service telling it when
+    to stop trying to talk to the bluetooth device. Until this message is
+    received, the service will reconnect to the specified BT device.
+    
+    That message is sent when you 'quit' the application, or when you 'disconnect'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c51d39c7ea1153cd2d0dc02c47824a9f35b22fb9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 16 20:57:11 2015 -0800
+
+    altosdroid: Lots of bluetooth connection changes
+    
+    Appears to more reliably abort in-progress connection attempts so you
+    can switch TBT devices without having the previous device in
+    operation.
+    
+    Shows which device the connection is being attempted for.
+    
+    Eliminate the 10-second timer and just disable the service when the GUI
+    shuts down while no BT connection is running.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b13a78e4f457f67605fc6dafc7f9733746a4f70c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 16 20:49:39 2015 -0800
+
+    ao-bringup: Changes for telebt for keith's hacking
+    
+    Make the programming device auto-detect by username.
+    Load binary from ~/altusmetrumllc
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2ebb4dff758058ae9512cf36518416eb69b928f0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 15 08:57:55 2015 -0800
+
+    altos: Remove some accidental debug printfs from ao_packet.c
+    
+    While fixing the cc1200 configuration, I added some debug printfs to
+    this code. They were accidentally committed with the fix...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 135abf0e7c5ceb5738a0b5f68fe2be4b7abdae5e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 14 23:18:38 2015 -0800
+
+    altos/cc1200: Adjust bit-sync configuration
+    
+    The default bit timing adjustment mechanism allows for only a 0.2%
+    deviation from the programmed bit timing. I found one TeleMini device
+    which is beyond that tolerance as it was built with an older crystal
+    with more error.
+    
+    Switch to the more expensive synchronization mechanism which allows up
+    to 2% timing error, but requires a multi-byte preamble (which we
+    have). This fixes packet mode nicely.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9c75faf1ec51eb2f9a8dc9402653490143a784d9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 14 08:35:47 2015 -0800
+
+    altos: embed ao_alarm and ao_clear_alarm in ao_sleep_for
+    
+    sdcc won't embed these itself, and thus consumes too much flash for
+    telemetrum-v1.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cc64e0e9d35e01b349680159a5bbd68d059134cd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 14 01:16:42 2015 -0800
+
+    ao-bringup/turnon_telemini: Detect which programmer to use by $USER
+    
+    Bdale uses TD 100, keithp uses TD 186.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c4f9d96bdea192486f0e3f2d80b846c39a05c0ab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 14 01:13:21 2015 -0800
+
+    altosuilib: Detect pair programming by product name, not USB id
+    
+    With TeleDongle, TeleBT and TeleMetrum coming in both pair- and self-
+    programmable versions, we can't use the USB id to tell them
+    apart. Instead, fetch the device name and use that instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0e929ee2d0a3d1b1bacd36c2c3723ab860eb40b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 14 01:11:30 2015 -0800
+
+    altosui: Run all igniter status requests from non-GUI thread
+    
+    Anything run from the UI thread blocks the UI entirely; the Fire
+    Igniters startup code to collect the number of pyro channels when
+    building the UI was doing that from the UI thread. Switch that around
+    so that the UI doesn't get built until that reply comes back, allowing
+    the user to see the 'connecting' dialog, and cancel it if required.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f4c812bef76a2cd95f675cb27ea89059561ceec7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 13 23:51:10 2015 -0800
+
+    altos: Replace ao_alarm/ao_clear_alarm with ao_sleep_for
+    
+    Having arbitrary alarms firing in the middle of complicated device
+    logic makes no sense at all. Therefore only correct use of ao_alarm
+    and ao_clear_alarm was around a specific ao_sleep call, with correct
+    recovery in case the alarm fires.
+    
+    This patch replaces all uses of ao_alarm/ao_sleep/ao_clear_alarm with
+    ao_sleep_for, a new function which takes the alarm timeout directly.
+    
+    A few cases which weren't simply calling ao_sleep have been reworked
+    to pass the timeout value down to the place where sleep *is* being
+    called, and having that code deal with the return correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1445725b983134d5a967dee88ef997bf15d4a422
+Author: Tom Marble <tmarble@info9.net>
+Date:   Wed Feb 11 08:21:27 2015 -0600
+
+    Added continuous output option to ao-usbtrng
+
+commit 65837616a6d073da8e3e2bf9da524a48cffb77c2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 9 07:28:18 2015 -0800
+
+    altos/stmf0: Add ao_crc_stm.c
+    
+    Tom discovered that this was missing
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fa813bcb6afc851cf4029b56c19ba46a3ae578f5
+Author: Tom Marble <tmarble@info9.net>
+Date:   Mon Feb 9 08:35:24 2015 -0600
+
+    Minor typo in man page
+
+commit e2cefd8593d269ce603aaf33f4a53a5c2dcb3350
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Feb 7 22:36:22 2015 -0700
+
+    update ChangeLog for release
+
 commit 26f61380ce6b4df80fa0b5a8a242cef79d5ae339
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Feb 7 22:23:38 2015 -0700

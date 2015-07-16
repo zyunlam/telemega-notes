@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_8;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 
@@ -34,6 +34,10 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 		if (state == null)
 			return hide(AltosLib.MISSING);
 		return hide(value(state, i));
+	}
+
+	public boolean hide(AltosState state, AltosListenerState listener_state, int i) {
+		return hide(state, i);
 	}
 
 	public double value (AltosState state, AltosListenerState listener_state, int i) {
@@ -77,7 +81,7 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 				v[i] = value(state, listener_state, i);
 			else
 				v[i] = AltosLib.MISSING;
-			if (hide(state, i))
+			if (hide(state, listener_state, i))
 				hide = true;
 		}
 

@@ -68,10 +68,19 @@ extern __data uint8_t ao_task_minimize_latency;	/* Reduce IRQ latency */
 uint8_t
 ao_sleep(__xdata void *wchan);
 
+/* Suspend the current task until wchan is awoken or the timeout
+ * expires. returns:
+ *  0 on normal wake
+ *  1 on alarm
+ */
+uint8_t
+ao_sleep_for(__xdata void *wchan, uint16_t timeout);
+
 /* Wake all tasks sleeping on wchan */
 void
 ao_wakeup(__xdata void *wchan) __reentrant;
 
+#if 0
 /* set an alarm to go off in 'delay' ticks */
 void
 ao_alarm(uint16_t delay);
@@ -79,6 +88,7 @@ ao_alarm(uint16_t delay);
 /* Clear any pending alarm */
 void
 ao_clear_alarm(void);
+#endif
 
 /* Yield the processor to another task */
 void

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_8;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 public class AltosFlashUI
 	extends AltosUIDialog
@@ -54,7 +54,7 @@ public class AltosFlashUI
 	// Flash controller
 	AltosProgrammer	programmer;
 
-	private static String[] pair_programmed = {
+	private static final String[] pair_programmed_files = {
 		"teleballoon",
 		"telebt-v1",
 		"teledongle-v0",
@@ -67,20 +67,34 @@ public class AltosFlashUI
 		"teleterra"
 	};
 
+	private static final String[] pair_programmed_devices = {
+		"TeleBalloon",
+		"TeleBT-v1",
+		"TeleDongle-v0",
+		"TeleFire",
+		"TeleMetrum-v0",
+		"TeleMetrum-v1",
+		"TeleMini",
+		"TeleNano",
+		"TeleShield",
+		"TeleTerra"
+	};
+
 	private boolean is_pair_programmed() {
 
 		if (file != null) {
 			String	name = file.getName();
-			for (int i = 0; i < pair_programmed.length; i++) {
-				if (name.startsWith(pair_programmed[i]))
+			for (int i = 0; i < pair_programmed_files.length; i++) {
+				if (name.startsWith(pair_programmed_files[i]))
 					return true;
 			}
 		}
 		if (device != null) {
-			if (!device.matchProduct(AltosLib.product_altusmetrum) &&
-			    (device.matchProduct(AltosLib.product_teledongle) ||
-			     device.matchProduct(AltosLib.product_telebt)))
-				return true;
+			String	name = device.toString();
+			for (int i = 0; i < pair_programmed_devices.length; i++) {
+				if (name.startsWith(pair_programmed_devices[i]))
+					return true;
+			}
 		}
 		return false;
 	}

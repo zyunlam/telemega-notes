@@ -23,8 +23,9 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import java.text.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class TeleGPS
 	extends AltosUIFrame
@@ -70,7 +71,7 @@ public class TeleGPS
 
 	JTabbedPane		pane;
 
-	AltosUIMap   		map;
+	AltosUIMapNew  		map;
 	TeleGPSInfo		gps_info;
 	TeleGPSState		gps_state;
 	AltosInfoTable		info_table;
@@ -172,7 +173,7 @@ public class TeleGPS
 	}
 
 	void load_maps() {
-		new AltosUIMapPreload(this);
+		new AltosUIMapPreloadNew(this);
 	}
 
 	void disconnect() {
@@ -372,7 +373,6 @@ public class TeleGPS
 				public void actionPerformed(ActionEvent e) {
 					int rate = rates.rate();
 					try {
-						System.out.printf("set rate %d\n", rate);
 						reader.set_telemetry_rate(rate);
 					} catch (TimeoutException te) {
 					} catch (InterruptedException ie) {
@@ -480,8 +480,6 @@ public class TeleGPS
 		bag = getContentPane();
 		bag.setLayout(new GridBagLayout());
 
-		GridBagConstraints c = new GridBagConstraints();
-
 		setTitle("TeleGPS");
 
 		menu_bar = new JMenuBar();
@@ -491,25 +489,16 @@ public class TeleGPS
 		monitor_menu = make_menu("Monitor", monitor_menu_entries);
 		device_menu = make_menu("Device", device_menu_entries);
 
+		set_inset(3);
 		frequencies = new AltosUIFreqList();
 		frequencies.setEnabled(false);
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.anchor = GridBagConstraints.WEST;
-		c.weightx = 0;
-		c.gridwidth = 1;
-		bag.add(frequencies, c);
+		bag.add(frequencies, constraints (0, 1));
 
 		rates = new AltosUIRateList();
 		rates.setEnabled(false);
-		c.gridx = 1;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.NONE;
-		c.anchor = GridBagConstraints.WEST;
-		c.weightx = 0;
-		c.gridwidth = 1;
-		bag.add(rates, c);
+		bag.add(rates, constraints(1, 1));
+		next_row();
+		set_inset(0);
 
 		displays = new LinkedList<AltosFlightDisplay>();
 
@@ -517,13 +506,9 @@ public class TeleGPS
 
 		/* TeleGPS status is always visible */
 		telegps_status = new TeleGPSStatus();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		c.gridwidth = 2;
-		bag.add(telegps_status, c);
-		c.gridwidth = 1;
+		bag.add(telegps_status, constraints(0, 3, GridBagConstraints.HORIZONTAL));
+		next_row();
+
 		displays.add(telegps_status);
 
 
@@ -533,15 +518,9 @@ public class TeleGPS
 		pane = new JTabbedPane();
 
 		/* Make the tabbed pane use the rest of the window space */
-		c.gridx = 0;
-		c.gridy = 2;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.gridwidth = 2;
-		bag.add(pane, c);
+		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));
 
-		map = new AltosUIMap();
+		map = new AltosUIMapNew();
 		pane.add(map.getName(), map);
 		displays.add(map);
 
@@ -650,7 +629,6 @@ public class TeleGPS
 	public static void help(int code) {
 		System.out.printf("Usage: altosui [OPTION]... [FILE]...\n");
 		System.out.printf("  Options:\n");
-		System.out.printf("    --fetchmaps <lat> <lon>\tpre-fetch maps for site map view\n");
 		System.out.printf("    --replay <filename>\t\trelive the glory of past flights \n");
 		System.out.printf("    --graph <filename>\t\tgraph a flight\n");
 		System.out.printf("    --csv\tgenerate comma separated output for spreadsheets, etc\n");
@@ -675,16 +653,7 @@ public class TeleGPS
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("--help"))
 				help(0);
-			else if (args[i].equals("--fetchmaps")) {
-				if (args.length < i + 3) {
-					help(1);
-				} else {
-					double lat = Double.parseDouble(args[i+1]);
-					double lon = Double.parseDouble(args[i+2]);
-					AltosUIMap.prefetch_maps(lat, lon);
-					i += 2;
-				}
-			} else if (args[i].equals("--replay"))
+			else if (args[i].equals("--replay"))
 				process = process_replay;
 			else if (args[i].equals("--kml"))
 				process = process_kml;

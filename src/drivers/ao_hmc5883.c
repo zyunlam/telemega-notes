@@ -75,13 +75,11 @@ ao_hmc5883_sample(struct ao_hmc5883_sample *sample)
 	ao_exti_enable(AO_HMC5883_INT_PORT, AO_HMC5883_INT_PIN);
 	ao_hmc5883_reg_write(HMC5883_MODE, HMC5883_MODE_SINGLE);
 
-	ao_alarm(AO_MS_TO_TICKS(10));
 	ao_arch_block_interrupts();
 	while (!ao_hmc5883_done)
-		if (ao_sleep(&ao_hmc5883_done))
+		if (ao_sleep_for(&ao_hmc5883_done, AO_MS_TO_TICKS(10)))
 			++ao_hmc5883_missed_irq;
 	ao_arch_release_interrupts();
-	ao_clear_alarm();
 
 	ao_hmc5883_read(HMC5883_X_MSB, (uint8_t *) sample, sizeof (struct ao_hmc5883_sample));
 #if __BYTE_ORDER == __LITTLE_ENDIAN

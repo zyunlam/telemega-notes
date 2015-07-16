@@ -21,42 +21,32 @@ package org.altusmetrum.AltosDroid;
 
 import java.text.*;
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.*;
-import android.util.Log;
 import android.os.Handler;
 
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 
 public class TelemetryReader extends Thread {
-
-	private static final String TAG = "TelemetryReader";
-	private static final boolean D = true;
 
 	int         crc_errors;
 
 	Handler     handler;
 
 	AltosLink   link;
-	AltosState  state = null;
 
 	LinkedBlockingQueue<AltosLine> telemQueue;
 
-	public AltosState read() throws ParseException, AltosCRCException, InterruptedException, IOException {
+	public AltosTelemetry read() throws ParseException, AltosCRCException, InterruptedException, IOException {
 		AltosLine l = telemQueue.take();
 		if (l.line == null)
 			throw new IOException("IO error");
 		AltosTelemetry telem = AltosTelemetryLegacy.parse(l.line);
-		if (state == null)
-			state = new AltosState();
-		else
-			state = state.clone();
-		telem.update_state(state);
-		return state;
+		return telem;
 	}
 
 	public void close() {
-		state = null;
 		link.remove_monitor(telemQueue);
 		link = null;
 		telemQueue.clear();
@@ -64,16 +54,14 @@ public class TelemetryReader extends Thread {
 	}
 
 	public void run() {
-		AltosState  state = null;
-
 		try {
-			if (D) Log.d(TAG, "starting loop");
+			AltosDebug.debug("starting loop");
 			while (telemQueue != null) {
 				try {
-					state = read();
-					handler.obtainMessage(TelemetryService.MSG_TELEMETRY, state).sendToTarget();
+					AltosTelemetry	telem = read();
+					handler.obtainMessage(TelemetryService.MSG_TELEMETRY, telem).sendToTarget();
 				} catch (ParseException pp) {
-					Log.e(TAG, String.format("Parse error: %d \"%s\"", pp.getErrorOffset(), pp.getMessage()));
+					AltosDebug.error("Parse error: %d \"%s\"", pp.getErrorOffset(), pp.getMessage());
 				} catch (AltosCRCException ce) {
 					++crc_errors;
 					handler.obtainMessage(TelemetryService.MSG_CRC_ERROR, new Integer(crc_errors)).sendToTarget();
@@ -81,21 +69,22 @@ public class TelemetryReader extends Thread {
 			}
 		} catch (InterruptedException ee) {
 		} catch (IOException ie) {
+			AltosDebug.error("IO exception in telemetry reader");
+			handler.obtainMessage(TelemetryService.MSG_DISCONNECTED, link).sendToTarget();
 		} finally {
 			close();
 		}
 	}
 
-	public TelemetryReader (AltosLink in_link, Handler in_handler, AltosState in_state) {
-		if (D) Log.d(TAG, "connected TelemetryReader create started");
+	public TelemetryReader (AltosLink in_link, Handler in_handler) {
+		AltosDebug.debug("connected TelemetryReader create started");
 		link    = in_link;
 		handler = in_handler;
 
-		state = in_state;
 		telemQueue = new LinkedBlockingQueue<AltosLine>();
 		link.add_monitor(telemQueue);
 		link.set_telemetry(AltosLib.ao_telemetry_standard);
 
-		if (D) Log.d(TAG, "connected TelemetryReader created");
+		AltosDebug.debug("connected TelemetryReader created");
 	}
 }

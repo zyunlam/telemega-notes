@@ -57,7 +57,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	21
+#define AO_CONFIG_MINOR	22
 
 #define AO_AES_LEN 16
 
@@ -115,7 +115,14 @@ struct ao_config {
 #if HAS_RADIO_FORWARD
 	uint32_t	send_frequency;		/* minor version 21 */
 #endif
+#if HAS_APRS
+	uint8_t		aprs_format;		/* minor version 22 */
+#endif
 };
+
+#define AO_APRS_FORMAT_COMPRESSED	0
+#define AO_APRS_FORMAT_UNCOMPRESSED	1
+#define AO_CONFIG_DEFAULT_APRS_FORMAT	AO_APRS_FORMAT_COMPRESSED
 
 #if HAS_RADIO_FORWARD
 extern __xdata uint32_t	ao_send_radio_setting;

@@ -15,10 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_6;
+package org.altusmetrum.altoslib_8;
 
 import java.io.*;
 import java.util.*;
+import java.text.*;
 
 public class AltosPreferences {
 	public static AltosPreferencesBackend backend = null;
@@ -42,7 +43,9 @@ public class AltosPreferences {
 	public final static String logfilePreferenceFormat = "LOGFILE-%d";
 
 	/* state preference name */
+	public final static String statePreferenceHead = "STATE-";
 	public final static String statePreferenceFormat = "STATE-%d";
+	public final static String statePreferenceLatest = "STATE-LATEST";
 
 	/* voice preference name */
 	public final static String voicePreference = "VOICE";
@@ -117,6 +120,13 @@ public class AltosPreferences {
 	/* Units preference */
 
 	public final static String	unitsPreference = "IMPERIAL-UNITS";
+
+	/* Maps cache size preference name */
+	final static String mapCachePreference = "MAP-CACHE";
+
+	static LinkedList<AltosMapCacheListener> map_cache_listeners;
+
+	public static int map_cache = 9;
 
 	public static AltosFrequency[] load_common_frequencies() {
 		AltosFrequency[] frequencies = null;
@@ -208,6 +218,9 @@ public class AltosPreferences {
 		common_frequencies = load_common_frequencies();
 
 		AltosConvert.imperial_units = backend.getBoolean(unitsPreference, false);
+
+		map_cache = backend.getInt(mapCachePreference, 9);
+		map_cache_listeners = new LinkedList<AltosMapCacheListener>();
 	}
 
 	public static void flush_preferences() {
@@ -350,10 +363,41 @@ public class AltosPreferences {
 
 			synchronized(backend) {
 				backend.putBytes(String.format(statePreferenceFormat, serial), bytes);
+				backend.putInt(statePreferenceLatest, serial);
 				flush_preferences();
 			}
 		} catch (IOException ie) {
 		}
+	}
+
+	public static ArrayList<Integer> list_states() {
+		String[]		keys = backend.keys();
+		ArrayList<Integer>	states = new ArrayList<Integer>();
+
+		for (String key : keys) {
+			if (key.startsWith(statePreferenceHead)) {
+				try {
+					int serial = AltosParse.parse_int(key.substring(statePreferenceHead.length()));
+					states.add(serial);
+				} catch (ParseException pe) {
+				}
+			}
+		}
+		return states;
+	}
+
+	public static void remove_state(int serial) {
+		synchronized(backend) {
+			backend.remove(String.format(statePreferenceFormat, serial));
+		}
+	}
+
+	public static int latest_state() {
+		int	latest = 0;
+		synchronized (backend) {
+			latest = backend.getInt(statePreferenceLatest, 0);
+		}
+		return latest;
 	}
 
 	public static AltosSavedState state(int serial) {
@@ -546,6 +590,35 @@ public class AltosPreferences {
 	public static void unregister_units_listener(AltosUnitsListener l) {
 		synchronized(backend) {
 			units_listeners.remove(l);
+		}
+	}
+
+
+	public static void register_map_cache_listener(AltosMapCacheListener l) {
+		synchronized(backend) {
+			map_cache_listeners.add(l);
+		}
+	}
+
+	public static void unregister_map_cache_listener(AltosMapCacheListener l) {
+		synchronized (backend) {
+			map_cache_listeners.remove(l);
+		}
+	}
+
+	public static void set_map_cache(int new_map_cache) {
+		synchronized(backend) {
+			map_cache = new_map_cache;
+			backend.putInt(mapCachePreference, map_cache);
+			flush_preferences();
+			for (AltosMapCacheListener l: map_cache_listeners)
+				l.map_cache_changed(map_cache);
+		}
+	}
+
+	public static int map_cache() {
+		synchronized(backend) {
+			return map_cache;
 		}
 	}
 }

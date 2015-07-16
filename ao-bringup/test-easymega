@@ -12,7 +12,7 @@ echo "\t$PRODUCT v$VERSION powered from USB"
 echo
 
 ret=1
-ao-list | while read product serial dev; do
+../ao-tools/ao-list/ao-list | while read product serial dev; do
     case "$product" in
 	"$PRODUCT-v$VERSION")
 

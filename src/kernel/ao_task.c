@@ -450,37 +450,39 @@ ao_wakeup(__xdata void *wchan) __reentrant
 	ao_check_stack();
 }
 
-void
-ao_alarm(uint16_t delay)
+uint8_t
+ao_sleep_for(__xdata void *wchan, uint16_t timeout)
 {
+	uint8_t	ret;
+	if (timeout) {
 #if HAS_TASK_QUEUE
-	uint32_t flags;
-	/* Make sure we sleep *at least* delay ticks, which means adding
-	 * one to account for the fact that we may be close to the next tick
-	 */
-	flags = ao_arch_irqsave();
+		uint32_t flags;
+		/* Make sure we sleep *at least* delay ticks, which means adding
+		 * one to account for the fact that we may be close to the next tick
+		 */
+		flags = ao_arch_irqsave();
 #endif
-	if (!(ao_cur_task->alarm = ao_time() + delay + 1))
-		ao_cur_task->alarm = 1;
+		if (!(ao_cur_task->alarm = ao_time() + timeout + 1))
+			ao_cur_task->alarm = 1;
 #if HAS_TASK_QUEUE
-	ao_task_to_alarm_queue(ao_cur_task);
-	ao_arch_irqrestore(flags);
+		ao_task_to_alarm_queue(ao_cur_task);
+		ao_arch_irqrestore(flags);
 #endif
-}
+	}
+	ret = ao_sleep(wchan);
+	if (timeout) {
+#if HAS_TASK_QUEUE
+		uint32_t flags;
 
-void
-ao_clear_alarm(void)
-{
-#if HAS_TASK_QUEUE
-	uint32_t flags;
-
-	flags = ao_arch_irqsave();
+		flags = ao_arch_irqsave();
 #endif
-	ao_cur_task->alarm = 0;
+		ao_cur_task->alarm = 0;
 #if HAS_TASK_QUEUE
-	ao_task_from_alarm_queue(ao_cur_task);
-	ao_arch_irqrestore(flags);
+		ao_task_from_alarm_queue(ao_cur_task);
+		ao_arch_irqrestore(flags);
 #endif
+	}
+	return ret;
 }
 
 static __xdata uint8_t ao_forever;
@@ -488,9 +490,7 @@ static __xdata uint8_t ao_forever;
 void
 ao_delay(uint16_t ticks)
 {
-	ao_alarm(ticks);
-	ao_sleep(&ao_forever);
-	ao_clear_alarm();
+	ao_sleep_for(&ao_forever, ticks);
 }
 
 void

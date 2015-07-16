@@ -195,15 +195,13 @@ ao_i2c_start(uint8_t index, uint16_t addr)
 		if (!(stm_i2c->cr1 & (1 << STM_I2C_CR1_START)))
 			break;
 	}
-	ao_alarm(AO_MS_TO_TICKS(250));
 	ao_arch_block_interrupts();
 	stm_i2c->cr2 = AO_STM_I2C_CR2 | (1 << STM_I2C_CR2_ITEVTEN) | (1 << STM_I2C_CR2_ITERREN);
 	ao_i2c_ev_isr(index);
 	while (ao_i2c_state[index] == I2C_IDLE)
-		if (ao_sleep(&ao_i2c_state[index]))
+		if (ao_sleep_for(&ao_i2c_state[index], AO_MS_TO_TICKS(250)))
 			break;
 	ao_arch_release_interrupts();
-	ao_clear_alarm();
 	return ao_i2c_state[index] == I2C_RUNNING;
 }
 
@@ -258,16 +256,14 @@ ao_i2c_send(void *block, uint16_t len, uint8_t index, uint8_t stop)
 			    (STM_DMA_CCR_DIR_MEM_TO_PER << STM_DMA_CCR_DIR));
 			   
 	ao_dma_start(tx_dma_index);
-	ao_alarm(1 + len);
 	ao_arch_block_interrupts();
 	while (!ao_dma_done[tx_dma_index])
-		if (ao_sleep(&ao_dma_done[tx_dma_index]))
+		if (ao_sleep_for(&ao_dma_done[tx_dma_index], 1 + len))
 			break;
-	ao_clear_alarm();
 	ao_dma_done_transfer(tx_dma_index);
 	stm_i2c->cr2 = AO_STM_I2C_CR2 | (1 << STM_I2C_CR2_ITEVTEN) | (1 << STM_I2C_CR2_ITERREN);
 	while ((stm_i2c->sr1 & (1 << STM_I2C_SR1_BTF)) == 0)
-		if (ao_sleep(&ao_i2c_state[index]))
+		if (ao_sleep_for(&ao_i2c_state[index], 1 + len))
 			break;
 	stm_i2c->cr2 = AO_STM_I2C_CR2;
 	ao_arch_release_interrupts();
@@ -321,14 +317,12 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t index, uint8_t stop)
 		if (stop)
 			stm_i2c->cr1 = AO_STM_I2C_CR1 | (1 << STM_I2C_CR1_STOP);
 
-		ao_alarm(1);
 		ao_arch_block_interrupts();
 		while (ao_i2c_recv_len[index])
-			if (ao_sleep(&ao_i2c_recv_len[index]))
+			if (ao_sleep_for(&ao_i2c_recv_len[index], 1))
 				break;
 		ao_arch_release_interrupts();
 		ret = ao_i2c_recv_len[index] == 0;
-		ao_clear_alarm();
 	} else {
 		uint8_t		rx_dma_index = ao_i2c_stm_info[index].rx_dma_index;
 		ao_dma_set_transfer(rx_dma_index,
@@ -351,13 +345,11 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t index, uint8_t stop)
 		ao_i2c_wait_addr(index);
 
 		ao_dma_start(rx_dma_index);
-		ao_alarm(len);
 		ao_arch_block_interrupts();
 		while (!ao_dma_done[rx_dma_index])
-			if (ao_sleep(&ao_dma_done[rx_dma_index]))
+			if (ao_sleep_for(&ao_dma_done[rx_dma_index], len))
 				break;
 		ao_arch_release_interrupts();
-		ao_clear_alarm();
 		ret = ao_dma_done[rx_dma_index];
 		ao_dma_done_transfer(rx_dma_index);
 		stm_i2c->cr1 = AO_STM_I2C_CR1 | (1 << STM_I2C_CR1_STOP);

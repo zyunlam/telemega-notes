@@ -837,15 +837,11 @@ ao_radio_test_cmd(void)
 static void
 ao_radio_wait_isr(uint16_t timeout)
 {
-	if (timeout)
-		ao_alarm(timeout);
 	ao_arch_block_interrupts();
 	while (!ao_radio_wake && !ao_radio_mcu_wake && !ao_radio_abort)
-		if (ao_sleep(&ao_radio_wake))
+		if (ao_sleep_for(&ao_radio_wake, timeout))
 			ao_radio_abort = 1;
 	ao_arch_release_interrupts();
-	if (timeout)
-		ao_clear_alarm();
 	if (ao_radio_mcu_wake)
 		ao_radio_check_marc_status();
 }
@@ -1060,19 +1056,17 @@ ao_radio_rx_isr(void)
 static uint16_t
 ao_radio_rx_wait(void)
 {
-	ao_alarm(AO_MS_TO_TICKS(100));
 	ao_arch_block_interrupts();
 	rx_waiting = 1;
 	while (rx_data_cur - rx_data_consumed < AO_FEC_DECODE_BLOCK &&
 	       !ao_radio_abort &&
 	       !ao_radio_mcu_wake)
 	{
-		if (ao_sleep(&ao_radio_wake))
+		if (ao_sleep_for(&ao_radio_wake, AO_MS_TO_TICKS(100)))
 			ao_radio_abort = 1;
 	}
 	rx_waiting = 0;
 	ao_arch_release_interrupts();
-	ao_clear_alarm();
 	if (ao_radio_abort || ao_radio_mcu_wake)
 		return 0;
 	rx_data_consumed += AO_FEC_DECODE_BLOCK;
@@ -1133,19 +1127,15 @@ ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 
 	ao_radio_strobe(CC1120_SRX);
 
-	if (timeout)
-		ao_alarm(timeout);
 	ao_arch_block_interrupts();
 	while (rx_starting && !ao_radio_abort) {
-		if (ao_sleep(&ao_radio_wake))
+		if (ao_sleep_for(&ao_radio_wake, timeout))
 			ao_radio_abort = 1;
 	}
 	uint8_t	rx_task_id_save = rx_task_id;
 	rx_task_id = 0;
 	rx_starting = 0;
 	ao_arch_release_interrupts();
-	if (timeout)
-		ao_clear_alarm();
 
 	if (ao_radio_abort) {
 		if (rx_task_id_save == 0)

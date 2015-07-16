@@ -24,7 +24,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.*;
 
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 	public final static String        NAME    = "org.altusmetrum.AltosDroid";
@@ -44,7 +44,12 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 
 	public String[] keys() {
 		Map<String, ?> all = prefs.getAll();
-		return (String[])all.keySet().toArray();
+		Object[] ao = all.keySet().toArray();
+
+		String[] as = new String[ao.length];
+		for (int i = 0; i < ao.length; i++)
+			as[i] = (String) ao[i];
+		return as;
 	}
 
 	public AltosPreferencesBackend node(String key) {
@@ -104,6 +109,7 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 	}
 
 	public void remove(String key) {
+		AltosDebug.debug("remove preference %s\n", key);
 		editor.remove(key);
 	}
 

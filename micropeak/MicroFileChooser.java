@@ -20,8 +20,8 @@ package org.altusmetrum.micropeak;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class MicroFileChooser extends JFileChooser {
 	JFrame	frame;

@@ -18,8 +18,8 @@
 package altosui;
 
 import java.util.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class AltosPad extends AltosUIFlightTab {
 
@@ -103,8 +103,11 @@ public class AltosPad extends AltosUIFlightTab {
 
 		public double voltage(AltosState state) { return AltosLib.MISSING; }
 
-		public boolean hide(double v) { return v == AltosLib.MISSING; }
 		public double good() { return AltosLib.ao_battery_good; }
+
+		public boolean hide(AltosState state, AltosListenerState listener_state, int i) {
+			return value(state, listener_state, i) == AltosLib.MISSING;
+		}
 
 		public double value(AltosState state, AltosListenerState listener_state, int i) {
 			if (listener_state == null)
@@ -243,12 +246,12 @@ public class AltosPad extends AltosUIFlightTab {
 	public AltosPad() {
 		int y = 0;
 		add(new Battery(this, y++));
+		add(new ReceiverBattery(this, y++));
 		add(new Apogee(this, y++));
 		add(new Main(this, y++));
 		add(new LoggingReady(this, y++));
 		add(new GPSLocked(this, y++));
 		add(new GPSReady(this, y++));
-		add(new ReceiverBattery(this, y++));
 		add(new PadLat(this, y++));
 		add(new PadLon(this, y++));
 		add(new PadAlt(this, y++));

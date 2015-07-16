@@ -1,18 +1,14 @@
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Environment;
-import android.util.Log;
 
 public class TelemetryLogger {
-	private static final String TAG = "TelemetryLogger";
-	private static final boolean D = true;
-
 	private Context   context = null;
 	private AltosLink link    = null;
 	private AltosLog  logger  = null;
@@ -33,21 +29,21 @@ public class TelemetryLogger {
 
 	private void close() {
 		if (logger != null) {
-			if (D) Log.d(TAG, "Shutting down Telemetry Logging");
+			AltosDebug.debug("Shutting down Telemetry Logging");
 			logger.close();
 			logger = null;
 		}
 	}
-	
+
 	void handleExternalStorageState() {
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			if (logger == null) {
-				if (D) Log.d(TAG, "Starting up Telemetry Logging");
+				AltosDebug.debug("Starting up Telemetry Logging");
 				logger = new AltosLog(link);
 			}
 		} else {
-			if (D) Log.d(TAG, "External Storage not present - stopping");
+			AltosDebug.debug("External Storage not present - stopping");
 			close();
 		}
 	}

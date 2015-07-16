@@ -97,9 +97,7 @@ ao_packet_master(void)
 		if (ao_tx_packet.len)
 			ao_packet_master_busy();
 		ao_packet_master_check_busy();
-		ao_alarm(AO_PACKET_MASTER_RECV_DELAY);
-		r = ao_packet_recv();
-		ao_clear_alarm();
+		r = ao_packet_recv(AO_PACKET_MASTER_RECV_DELAY);
 		if (r) {
 			/* if we can transmit data, do so */
 			if (ao_packet_tx_used && ao_tx_packet.len == 0)
@@ -107,9 +105,7 @@ ao_packet_master(void)
 			if (ao_rx_packet.packet.len)
 				ao_packet_master_busy();
 			ao_packet_master_sleeping = 1;
-			ao_alarm(ao_packet_master_delay);
-			ao_sleep(&ao_packet_master_sleeping);
-			ao_clear_alarm();
+			ao_sleep_for(&ao_packet_master_sleeping, ao_packet_master_delay);
 			ao_packet_master_sleeping = 0;
 		}
 	}

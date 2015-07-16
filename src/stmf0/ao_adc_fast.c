@@ -18,43 +18,53 @@
 #include <ao.h>
 #include <ao_adc_fast.h>
 
-uint16_t ao_adc_ring[AO_ADC_RING_SIZE];
+uint16_t ao_adc_ring[AO_ADC_RING_SIZE] __attribute__((aligned(4)));
 
-uint16_t ao_adc_ring_head, ao_adc_ring_tail;
-uint8_t ao_adc_running;
+/* Maximum number of samples fetched per _ao_adc_start call */
+#define AO_ADC_RING_CHUNK	(AO_ADC_RING_SIZE >> 1)
+
+uint16_t ao_adc_ring_head, ao_adc_ring_remain;
+uint16_t ao_adc_running;
 
 /*
  * Callback from DMA ISR
  *
- * Mark time in ring, shut down DMA engine
+ * Wakeup any waiting processes, mark the DMA as done, start the ADC
+ * if there's still lots of space in the ring
  */
 static void ao_adc_dma_done(int index)
 {
 	(void) index;
-	ao_adc_ring_head += AO_ADC_RING_CHUNK;
+	ao_adc_ring_head += ao_adc_running;
+	ao_adc_ring_remain += ao_adc_running;
 	if (ao_adc_ring_head == AO_ADC_RING_SIZE)
 		ao_adc_ring_head = 0;
 	ao_adc_running = 0;
 	ao_wakeup(&ao_adc_ring_head);
 	ao_dma_done_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
+	_ao_adc_start();
 }
 
 void
 _ao_adc_start(void)
 {
 	uint16_t	*buf;
+	uint16_t	count;
 
 	if (ao_adc_running)
 		return;
-	if (_ao_adc_space() < AO_ADC_RING_CHUNK)
+	count = _ao_adc_space();
+	if (count == 0)
 		return;
-	ao_adc_running = 1;
+	if (count > AO_ADC_RING_CHUNK)
+		count = AO_ADC_RING_CHUNK;
+	ao_adc_running = count;
 	buf = ao_adc_ring + ao_adc_ring_head;
 	stm_adc.isr = 0;
 	ao_dma_set_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1),
 			    &stm_adc.dr,
 			    buf,
-			    AO_ADC_RING_CHUNK,
+			    count,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
 			    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_16 << STM_DMA_CCR_MSIZE) |
@@ -140,7 +150,6 @@ ao_adc_init(void)
 #if AO_NUM_ADC > 8
 #error Need more ADC defines
 #endif
-	stm_adc.chselr = chselr;
 
 	/* Set the clock */
 	stm_adc.cfgr2 = STM_ADC_CFGR2_CKMODE_PCLK_2 << STM_ADC_CFGR2_CKMODE;
@@ -160,14 +169,16 @@ ao_adc_init(void)
 	while ((stm_adc.isr & (1 << STM_ADC_ISR_ADRDY)) == 0)
 		;
 
+	stm_adc.chselr = chselr;
+
 	stm_adc.cfgr1 = ((0 << STM_ADC_CFGR1_AWDCH) |
 			 (0 << STM_ADC_CFGR1_AWDEN) |
 			 (0 << STM_ADC_CFGR1_AWDSGL) |
 			 (0 << STM_ADC_CFGR1_DISCEN) |
 			 (0 << STM_ADC_CFGR1_AUTOOFF) |
-			 (1 << STM_ADC_CFGR1_WAIT) |
+			 (0 << STM_ADC_CFGR1_WAIT) |
 			 (1 << STM_ADC_CFGR1_CONT) |
-			 (0 << STM_ADC_CFGR1_OVRMOD) |
+			 (1 << STM_ADC_CFGR1_OVRMOD) |
 			 (STM_ADC_CFGR1_EXTEN_DISABLE << STM_ADC_CFGR1_EXTEN) |
 			 (0 << STM_ADC_CFGR1_ALIGN) |
 			 (STM_ADC_CFGR1_RES_12 << STM_ADC_CFGR1_RES) |
@@ -186,5 +197,4 @@ ao_adc_init(void)
 	stm_syscfg.cfgr1 &= ~(1 << STM_SYSCFG_CFGR1_ADC_DMA_RMP);
 
 	ao_dma_alloc(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
-	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1), ao_adc_dma_done);
 }

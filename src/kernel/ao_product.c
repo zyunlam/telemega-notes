@@ -33,6 +33,10 @@ const char ao_product[] = AO_iProduct_STRING;
 #define AO_USB_MAX_POWER	100
 #endif
 
+#ifndef AO_USB_INTERFACE_CLASS
+#define AO_USB_INTERFACE_CLASS	0x02
+#endif
+
 #include "ao_usb.h"
 /* USB descriptors in one giant block of bytes */
 AO_ROMCONFIG_SYMBOL(0x00aa) uint8_t ao_usb_descriptors [] =
@@ -45,7 +49,7 @@ AO_ROMCONFIG_SYMBOL(0x00aa) uint8_t ao_usb_descriptors [] =
 	0x00,			/*  bDeviceSubClass */
 	0x00,			/*  bDeviceProtocol */
 	AO_USB_CONTROL_SIZE,	/*  bMaxPacketSize */
-	LE_WORD(0xFFFE),	/*  idVendor */
+	LE_WORD(AO_idVendor_NUMBER),	/*  idVendor */
 	LE_WORD(AO_idProduct_NUMBER),	/*  idProduct */
 	LE_WORD(0x0100),	/*  bcdDevice */
 	0x01,			/*  iManufacturer */
@@ -69,7 +73,7 @@ AO_ROMCONFIG_SYMBOL(0x00aa) uint8_t ao_usb_descriptors [] =
 	0x00,			/*  bInterfaceNumber */
 	0x00,			/*  bAlternateSetting */
 	0x01,			/*  bNumEndPoints */
-	0x02,			/*  bInterfaceClass */
+	AO_USB_INTERFACE_CLASS,	/*  bInterfaceClass */
 	0x02,			/*  bInterfaceSubClass */
 	0x01,			/*  bInterfaceProtocol, linux requires value of 1 for the cdc_acm module */
 	0x00,			/*  iInterface */

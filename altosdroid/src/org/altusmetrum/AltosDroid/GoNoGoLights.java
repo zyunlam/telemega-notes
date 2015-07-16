@@ -52,27 +52,14 @@ public class GoNoGoLights {
 		missing = m;
 		set = true;
 		if (missing) {
-			hide();
 			red.setImageDrawable(dGray);
 			green.setImageDrawable(dGray);
 		} else if (state) {
 			red.setImageDrawable(dGray);
 			green.setImageDrawable(dGreen);
-			show();
 		} else {
 			red.setImageDrawable(dRed);
 			green.setImageDrawable(dGray);
-			show();
 		}
-	}
-
-	public void show() {
-		red.setVisibility(View.VISIBLE);
-		green.setVisibility(View.VISIBLE);
-	}
-
-	public void hide() {
-		red.setVisibility(View.GONE);
-		green.setVisibility(View.GONE);
 	}
 }

@@ -34,13 +34,15 @@ ARMM3DIRS=\
 	telegps-v0.3 telegps-v0.3/flash-loader \
 	telegps-v1.0 telegps-v1.0/flash-loader \
 	telelco-v0.2 telelco-v0.2/flash-loader \
+	telelco-v0.3 telelco-v0.3/flash-loader \
 	telescience-v0.2 telescience-v0.2/flash-loader \
 	teledongle-v3.0 teledongle-v3.0/flash-loader \
 	teleballoon-v2.0 \
 	telebt-v3.0 telebt-v3.0/flash-loader
 
 ARMM0DIRS=\
-	easymini-v1.0 easymini-v1.0/flash-loader
+	easymini-v1.0 easymini-v1.0/flash-loader \
+	chaoskey-v0.1 chaoskey-v0.1/flash-loader
 
 AVRDIRS=\
 	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1 microkite
