@@ -19,7 +19,7 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_7;
+package org.altusmetrum.altoslib_8;
 
 import java.io.*;
 

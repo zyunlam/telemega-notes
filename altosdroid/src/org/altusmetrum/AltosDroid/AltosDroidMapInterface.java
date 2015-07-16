@@ -20,7 +20,7 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 import java.io.*;
 import android.location.Location;
-import org.altusmetrum.altoslib_7.*;
+import org.altusmetrum.altoslib_8.*;
 
 public interface AltosDroidMapInterface {
 	public void onCreateView(AltosDroid altos_droid);

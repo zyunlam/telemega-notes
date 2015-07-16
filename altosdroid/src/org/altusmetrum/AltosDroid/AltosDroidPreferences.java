@@ -17,7 +17,7 @@
 package org.altusmetrum.AltosDroid;
 
 import android.content.Context;
-import org.altusmetrum.altoslib_7.*;
+import org.altusmetrum.altoslib_8.*;
 
 public class AltosDroidPreferences extends AltosPreferences {
 

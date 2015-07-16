@@ -24,8 +24,8 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.Arrays;
-import org.altusmetrum.altoslib_7.*;
-import org.altusmetrum.altosuilib_7.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDisplay, AltosIdleMonitorListener, DocumentListener {
 	AltosDevice		device;

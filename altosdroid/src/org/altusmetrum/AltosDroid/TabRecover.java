@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_7.*;
+import org.altusmetrum.altoslib_8.*;
 
 import android.app.Activity;
 import android.os.Bundle;

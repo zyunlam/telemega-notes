@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_7;
+package org.altusmetrum.altosuilib_8;
 
 import java.awt.*;
 import javax.swing.*;
