@@ -40,19 +40,19 @@ These are Bdale's notes on how to do a release.
 
 	- verify debian/changelog is "clean" ending in last release version
 	- craft a suitable debian/changelog entry, possibly using:
-	git-dch --release --new-version=<version>-1 --multimaint-merge
+	gbp dch --release --new-version=<version>-1 --multimaint-merge
 
         git commit -n debian/changelog -m "update changelog for Debian build"
 
 	- if this is a -1 release, then
-		git-buildpackage --git-no-pristine-tar --git-submodules \
+		gbp buildpackage --git-no-pristine-tar --git-submodules \
 			--git-upstream-branch=branch-<version> \ # eg 1.3
 			--git-upstream-tag=<version>	         # eg 1.3.1
 		pristine-tar commit \
 			../build-area/altos_<version>.orig.tar.gz \
 			branch-<version>
 	  else if this is not a -1 release
-		git-buildpackage --git-submodules
+		gbp buildpackage --git-submodules
 
 	git tag debian/<version>
 
@@ -70,6 +70,7 @@ These are Bdale's notes on how to do a release.
 	# store a stable copy of ARM binaries for production use
 	cp src/easymega-v1.0/*.elf \
 	   src/easymini-v1.0/*.elf \
+	   src/telebt-v3.0/*.elf \
 	   src/teledongle-v3.0/*.elf \
 	   src/telegps-v1.0/*.elf \
 	   src/telemega-v1.0/*.elf \
@@ -77,6 +78,7 @@ These are Bdale's notes on how to do a release.
 	   ~/altusmetrumllc/Binaries/
 	cp src/easymega-v1.0/flash-loader/*.elf \
 	   src/easymini-v1.0/flash-loader/*.elf \
+	   src/telebt-v3.0/flash-loader/*.elf \
 	   src/teledongle-v3.0/flash-loader/*.elf \
 	   src/telegps-v1.0/flash-loader/*.elf \
 	   src/telemega-v1.0/flash-loader/*.elf \
@@ -87,6 +89,8 @@ These are Bdale's notes on how to do a release.
 
 	- copy the relevant release notes file from doc/ to 
 	    /home/bdale/web/altusmetrum/AltOS/releases/<rev>
+
+	(cd ~/web/altusmetrum/AltOS/releases/<rev> ; rm *.tar.bz2)
 
 	- create /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>,
 	  and move the MicroPeak installers from AltOS/releases to there
