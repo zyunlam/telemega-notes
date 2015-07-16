@@ -1,3 +1,193 @@
+altos (1.6.1-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * swap names so v3.0 is the default TeleDongle version to turn on
+  * add debian branch spec to vcs-git: line in control so Debian tools work right
+  * changelog for 1.6.1 release
+
+  [ Tom Marble ]
+  * Minor typo in man page
+  * Added continuous output option to ao-usbtrng
+
+  [ Keith Packard ]
+  * altos/stmf0: Add ao_crc_stm.c
+  * altos: Replace ao_alarm/ao_clear_alarm with ao_sleep_for
+  * altosui: Run all igniter status requests from non-GUI thread
+  * altosuilib: Detect pair programming by product name, not USB id
+  * ao-bringup/turnon_telemini: Detect which programmer to use by $USER
+  * altos: embed ao_alarm and ao_clear_alarm in ao_sleep_for
+  * altos/cc1200: Adjust bit-sync configuration
+  * altos: Remove some accidental debug printfs from ao_packet.c
+  * ao-bringup: Changes for telebt for keith's hacking
+  * altosdroid: Lots of bluetooth connection changes
+  * altosdroid: Explicitly disconnect BT on termination or 'disconnect'
+  * altosdroid: Only speak when GUI is running
+  * altosdroid: Missing file: DeviceAddress.java
+  * altosdroid: Ignore automatic tab changing while activity is saved
+  * altos: Allow software to offer other USB interface classes than CDC
+  * altos/stmf0: Fix fast ADC interface
+  * altos/stmf0: Typo in ao_crc_stm.c
+  * altos/stmf0: Allocate USB buffers at startup
+  * altos: Create chaoskey product
+  * altos: Add chaoskey flash loader
+  * altos/usbtrng: Split out random number generating code to separate driver
+  * altos: Make APRS format (compressed/uncompressed) configurable
+  * altosui/telegps: Add config option for APRS format
+  * altoslib: Round frequency when configuring radio
+  * ao-tools: Add ao-flash-stm32f0x
+  * altos: Wait for BT disconnect before sending command
+  * altos: Missing pad field in TMv2 data packet
+  * altosui/telegps: Change from variable-units snuck into master
+  * altosdroid: Deal with bluetooth connection failures better
+  * doc: Update telemetry docs to include new packet formats
+  * altos: Add .gitignore for chaoskey
+  * altos: Build chaoskey by default
+  * altos: Add makefile for chaoskey flash loader
+  * altos/stmf0: Need ao_exti.h for pin configuration
+  * altosui: Add map to MonitorIdle display
+  * ao-tools/ao-mega: Clean up formatting of pyro status messages
+  * altos/test: Make aprs test code compile again
+  * altos/test: Support old telemega eeprom file formats in ao_flight_test
+  * ao-tools/ao-list: Show devices that have no TTY
+  * altos: Add the ability to configure a different USB vendor ID
+  * altos/chaoskey: Set USB VID/PID to 0x1d50/0x60c6
+  * altos/stmf0: Have fast ADC ring buffer code use wrap-around
+  * icon: Convert windows stub into launcher program
+  * windows: Use new windows stub to launch applications
+  * altosdroid: Add USB support for TeleDongle/TeleBT
+  * altosdroid: Fix tab label height problems
+  * altoslib: Use Locale.ROOT for KML export
+  * altoslib: Expose locale and non-locale floating point parsing functions
+  * altosui: Remove un-implemented --fetchmaps argument
+  * ao-dump-up: Add --wait option to make testing µPusb easier
+  * doc: Clarify what 'after motor' means
+  * altos: Support 32MHz xtal on cc1200
+  * microsplash: Add 'publish' target to Makefile
+  * micropeak: Use fast load mode by default in -load script
+  * Flip version to 1.6.0.2
+  * altoslib: Create display-independent map support code
+  * telefire: Make 'good' RSSI value configurable
+  * altos: Only set CMAC RSSI value on valid packet received
+  * telefire: Report telefire battery voltage over telemetry link
+  * altos: Add telelco v0.3 (v0.2 with cc1200 instead of cc1120)
+  * altos/telelco: Display telefire battery voltage
+  * altos/telelco: Show box voltage with pad knob instead of firing button
+  * altoslib: Build AltosVersion.java in configure.ac
+  * altoslib: Get new abstract mapping code compiling
+  * altoslib: More frobbing with new map bits
+  * altoslib/altosuilib: Update library version to 7
+  * altoslib/altosuilib: Get new Map display code running in altosui and telegps
+  * altosuilib: Add AltosUIImage.java
+  * altosuilib: Use new map code for map preload UI
+  * altosuilib: Remove old map bits
+  * altosuilib: Get rid of AltosUIVersion.java
+  * altosdroid: Add offline map tab
+  * altosdroid: Move pause before reopening bluetooth into connec thread
+  * altosdroid: Centralize debug printf code
+  * altosdroid: Place icons on screen instead of drawing path
+  * altoslib: Add AltosLaunchSite bits
+  * altosuilib: Use altoslib site list loader
+  * altoslib: Start with map empty
+  * altoslib: Provide toString method for AltosLatLon
+  * altoslib: Add map loading helper class
+  * altosuilib: Switch to altoslib map loading code
+  * altosuilib: Get rid of AltosUIMapNew.set_load_params
+  * altosuilib: Eliminate extra MapCache in AltosUIMapPreloadNew
+  * altoslib: Pass all map loader params to set_load_params
+  * altosdroid: Add map types and map preloading UIs
+  * altosdroid: Look for zipalign in the new place too
+  * altosdroid: Disable debug output on release builds
+  * altosdroid: Save selected map type in AltosDroid object
+  * altosdroid: Add 'Current Location' as an option when preloading maps
+  * altosdroid: Split out AltosMapView into separate file
+  * altosdroid: Missing call to super.onDetach from TabMapOffline
+  * altosdroid: use 'show' to set new tab contents in onResume
+  * altoslib: Require 'debug' hook in AltosMapInterface
+  * altosdroid: Switch from custom title to standard Holo theme
+  * altosdroid: Highlight age in red when older than 10 seconds
+  * ao-tools: Create ao-cal-freq
+  * ao-bringup: Use new ao-cal-freq program for cal-freq script
+  * ao-bringup: Do telegps freq cal before testing GPS
+  * ao-tools: Add missing ao-cal-freq man page
+  * altoslib: Add preferences for saving/restoring multiple flight states
+  * altosdroid: Add multi-tracker support
+  * altosdroid: Note recent changes
+  * altosdroid: Resource changes needed for multi-tracker mode
+  * altoslib: Set product for idle monitor
+  * altoslib: Let the application disable the link cancel dialog
+  * altoslib: Expose public function to set state.product
+  * altoslib: Remove debug output from AltosMap
+  * altosuilib: Show state.product if state.device_type isn't set
+  * altosuilib: Create grid-bag helper functions in AltosUIFrame
+  * micropeak: Update mac/windows FTDI drivers
+  * telegps: use new AltosUIFrame constraint helper
+  * ao-bringup: Fail turnon_easymega if accel cal fails
+  * ao-bringup: Use local versions of tools instead of /usr/bin for turnon_easymega
+  * ao-bringup: Make turnon_easymega run without 'make install'
+  * altoslib/altosuilib: Fix equals methods, add hashCode
+  * altoslib: Clean up map tile removal
+  * altosuilib: Allow for no transform in map mouse wheel function
+  * altosdroid: Switch trackers automatically when changing freq or baud
+  * altosdroid: Remove debug
+  * altosdroid: Support for sorting rockets by age
+  * altosdroid: Stack map markers with newest rocket on top
+  * altosdroid: Multiple tracker support for google maps
+  * altoslib: Add set_zoom_centre to AltosMap
+  * altosuilib: Use AltosMap set_zoom_centre instead of in-line version
+  * altosdroid: Use AltosMap set_zoom_centre
+  * altosdroid: Show receiver battery voltage in the 'pad' view
+  * altosdroid: Add map source preference
+  * altosdroid: Display online/offline maps in same tab
+  * altosdroid: Get rid of on-line only maps tab
+  * altosdroid: Select tracker by clicking on map
+  * altosdroid: Switch to four tabs (pad/flight/recover/map)
+  * altosdroid: Allow tracker selection from online map widget
+  * altosdroid: Mark four-tab change done
+  * altosdroid: Fix line drawing to old tracker location
+  * altoslib: Use a longer filter for descent values
+  * altosdroid: Show direction to target in recover tab
+  * altosdroid: Define strings for the tab names
+  * altosdroid: Change voice output around
+  * altoslib: Typo slipped into AltosState.java
+  * altosdroid: Make sure whole flight state is spoken even when no-one is moving
+  * altosdroid: Make sure flight voice output always starts with 'speed'
+  * altosdroid: Mark tab-dependent voice output as done
+  * altosdroid: Update version numbers in manifest
+  * Bump version to 1.6.0.3
+  * altoslib: Fix replay to run in realtime again
+  * altosdroid: Display direction in map view
+  * altosdroid: Class of offline map view widget changed
+  * altoslib: Don't crash if dragging a map view without any tiles
+  * altos/telebt-v3.0: Report battery voltage correctly
+  * altoslib: Support TeleBT v3.0 battery voltage conversion
+  * altosuilib: Receiver battery voltage lives in listener_state
+  * altosui: Correctly show/hide receiver battery value
+  * telegps: Add receiver battery to Status display
+  * altoslib: Make AltosMap floor/ceil static. Check transform in paint
+  * altoslib: Make earth size constants public
+  * altoslib: Limit simultanous map tile downloads to 128
+  * altoslib: Convert longitude from distance in AltosMapTransform
+  * altoslib: Preload maps based on distance rather than number of tiles
+  * altosdroid: Keep speaking even when screen is off
+  * altosdroid: Pop up menu of nearby trackers on map click
+  * altosdroid: Remove a debug line in AltosVoice
+  * altosdroid: Don't disconnect from bluetooth onStartCommand
+  * altosdroid: Add other igniter status, various other layout changes
+  * Generate Android version info from configure.ac
+  * altosdroid: Note time at startup to avoid flipping trackers
+  * altosdroid: Add 'Auto' to map tracker list
+  * altosdroid: Clean up tab layout
+  * altosdroid: Cleanup Makefile.am
+  * Bump version to 1.6.0.4 (android version 8)
+  * doc: Update for 1.6.1
+  * Bump configure.ac versions to 1.6.1
+  * Bump Java library versions
+
+  [ Robert Garbee ]
+  * add beep when test completes
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 16 Jul 2015 13:38:22 -0600
+
 altos (1.6-1) unstable; urgency=medium
 
   [ Keith Packard ]
