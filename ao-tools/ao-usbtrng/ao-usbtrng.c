@@ -35,14 +35,13 @@
 static const struct option options[] = {
 	{ .name = "tty", .has_arg = 1, .val = 'T' },
 	{ .name = "device", .has_arg = 1, .val = 'D' },
-	{ .name = "raw", .has_arg = 0, .val = 'r' },
-	{ .name = "verbose", .has_arg = 1, .val = 'v' },
+	{ .name = "verbose", .has_arg = 0, .val = 'v' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--verbose=<verbose>] [--device=<device>] [-tty=<tty>] <kbytes>\n", program);
+	fprintf(stderr, "usage: %s [--verbose] [--device=<AltOS-device>] [-tty=<tty>] [<kbytes>]\n", program);
 	exit(1);
 }
 
@@ -58,21 +57,17 @@ main (int argc, char **argv)
 {
 	char			*device = NULL;
 	char			*filename;
-	Elf			*e;
-	unsigned int		s;
 	int			i;
 	int			c;
-	int			tries;
 	struct cc_usb		*cc = NULL;
 	char			*tty = NULL;
-	int			success;
 	int			verbose = 0;
 	int			ret = 0;
-	int			expected_size;
-	int			kbytes;
+	int			kbytes = 0; /* 0 == continuous */
+	int			written;
 	uint8_t			bits[1024];
 
-	while ((c = getopt_long(argc, argv, "rT:D:c:s:v:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "vT:D:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
@@ -89,12 +84,8 @@ main (int argc, char **argv)
 		}
 	}
 
-	if (!argv[optind])
-		usage(argv[0]);
-
-	kbytes = atoi(argv[optind]);
-	if (kbytes < 1)
-		kbytes = 1;
+	if (optind < argc)
+		kbytes = atoi(argv[optind]);
 
 	ao_verbose = verbose;
 
@@ -113,13 +104,22 @@ main (int argc, char **argv)
 	if (!cc)
 		exit(1);
 
-	cc_usb_printf(cc, "f %d\n", kbytes);
+	if (kbytes) {
+		cc_usb_printf(cc, "f %d\n", kbytes);
 
-	while (kbytes--) {
-		int	i;
-		for (i = 0; i < 1024; i++)
-			bits[i] = cc_usb_getchar(cc);
-		write(1, bits, 1024);
+		while (kbytes--) {
+			for (i = 0; i < 1024; i++)
+				bits[i] = cc_usb_getchar(cc);
+			write(1, bits, 1024);
+		}
+	} else { /* 0 == continuous */
+		written = 0;
+		while (written >= 0) {
+			cc_usb_printf(cc, "f 1\n");
+			for (i = 0; i < 1024; i++)
+				bits[i] = cc_usb_getchar(cc);
+			written = write(1, bits, 1024);
+		}
 	}
 
 	done(cc, ret);

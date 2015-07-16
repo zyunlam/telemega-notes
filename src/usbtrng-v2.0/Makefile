@@ -12,6 +12,7 @@ INC = \
 	ao_pins.h \
 	ao_product.h \
 	ao_task.h \
+	ao_adc_fast.h \
 	stm32f0.h
 
 #
@@ -31,6 +32,7 @@ ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_cmd.c \
 	ao_usb_stm.c \
+	ao_trng.c \
 	ao_task.c \
 	ao_product.c
 

@@ -15,7 +15,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_6;
+package org.altusmetrum.altoslib_8;
+
+import java.text.*;
 
 public abstract class AltosUnits {
 
@@ -29,13 +31,22 @@ public abstract class AltosUnits {
 
 	public abstract int show_fraction(int width, boolean imperial_units);
 
-	public double parse(String s, boolean imperial_units) throws NumberFormatException {
-		double v = Double.parseDouble(s);
+	public double parse_locale(String s, boolean imperial_units) throws ParseException {
+		double v = AltosParse.parse_double_locale(s);
 		return inverse(v, imperial_units);
 	}
 
-	public double parse(String s) throws NumberFormatException {
-		return parse(s, AltosConvert.imperial_units);
+	public double parse_net(String s, boolean imperial_units) throws ParseException {
+		double v = AltosParse.parse_double_net(s);
+		return inverse(v, imperial_units);
+	}
+
+	public double parse_locale(String s) throws ParseException {
+		return parse_locale(s, AltosConvert.imperial_units);
+	}
+
+	public double parse_net(String s) throws ParseException {
+		return parse_net(s, AltosConvert.imperial_units);
 	}
 
 	public double value(double v) {

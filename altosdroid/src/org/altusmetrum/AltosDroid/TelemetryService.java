@@ -18,10 +18,8 @@
 package org.altusmetrum.AltosDroid;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import android.app.Notification;
 //import android.app.NotificationManager;
@@ -29,6 +27,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothAdapter;
+import android.hardware.usb.*;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Bundle;
@@ -38,55 +37,50 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.Toast;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 import android.location.Criteria;
 
-import org.altusmetrum.altoslib_6.*;
-
+import org.altusmetrum.altoslib_8.*;
 
 public class TelemetryService extends Service implements LocationListener {
-
-	private static final String TAG = "TelemetryService";
-	private static final boolean D = true;
 
 	static final int MSG_REGISTER_CLIENT   = 1;
 	static final int MSG_UNREGISTER_CLIENT = 2;
 	static final int MSG_CONNECT           = 3;
-	static final int MSG_CONNECTED         = 4;
-	static final int MSG_CONNECT_FAILED    = 5;
-	static final int MSG_DISCONNECTED      = 6;
-	static final int MSG_TELEMETRY         = 7;
-	static final int MSG_SETFREQUENCY      = 8;
-	static final int MSG_CRC_ERROR	       = 9;
-	static final int MSG_SETBAUD	       = 10;
+	static final int MSG_OPEN_USB	       = 4;
+	static final int MSG_CONNECTED         = 5;
+	static final int MSG_CONNECT_FAILED    = 6;
+	static final int MSG_DISCONNECTED      = 7;
+	static final int MSG_TELEMETRY         = 8;
+	static final int MSG_SETFREQUENCY      = 9;
+	static final int MSG_CRC_ERROR	       = 10;
+	static final int MSG_SETBAUD	       = 11;
+	static final int MSG_DISCONNECT	       = 12;
+	static final int MSG_DELETE_SERIAL     = 13;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
 	private int NOTIFICATION = R.string.telemetry_service_label;
 	//private NotificationManager mNM;
 
-	// Timer - we wake up every now and then to decide if the service should stop
-	private Timer timer = new Timer();
-
-	ArrayList<Messenger> mClients = new ArrayList<Messenger>(); // Keeps track of all current registered clients.
-	final Handler   mHandler   = new IncomingHandler(this);
-	final Messenger mMessenger = new Messenger(mHandler); // Target we publish for clients to send messages to IncomingHandler.
+	ArrayList<Messenger> clients = new ArrayList<Messenger>(); // Keeps track of all current registered clients.
+	final Handler   handler   = new IncomingHandler(this);
+	final Messenger messenger = new Messenger(handler); // Target we publish for clients to send messages to IncomingHandler.
 
 	// Name of the connected device
-	String address;
-	private AltosBluetooth  mAltosBluetooth  = null;
-	private TelemetryReader mTelemetryReader = null;
-	private TelemetryLogger mTelemetryLogger = null;
-	// Local Bluetooth adapter
-	private BluetoothAdapter mBluetoothAdapter = null;
+	DeviceAddress address;
+	private AltosDroidLink  altos_link  = null;
+	private TelemetryReader telemetry_reader = null;
+	private TelemetryLogger telemetry_logger = null;
 
-	private TelemetryState	telemetry_state;
+	// Local Bluetooth adapter
+	private BluetoothAdapter bluetooth_adapter = null;
 
 	// Last data seen; send to UI when it starts
+	private TelemetryState	telemetry_state;
 
 	// Handler of incoming messages from clients.
 	static class IncomingHandler extends Handler {
@@ -96,83 +90,121 @@ public class TelemetryService extends Service implements LocationListener {
 		@Override
 		public void handleMessage(Message msg) {
 			TelemetryService s = service.get();
+			AltosDroidLink bt = null;
 			if (s == null)
 				return;
 			switch (msg.what) {
+
+				/* Messages from application */
 			case MSG_REGISTER_CLIENT:
-				s.mClients.add(msg.replyTo);
-				try {
-					// Now we try to send the freshly connected UI any relavant information about what
-					// we're talking to
-					msg.replyTo.send(s.message());
-				} catch (RemoteException e) {
-					s.mClients.remove(msg.replyTo);
-				}
-				if (D) Log.d(TAG, "Client bound to service");
+				s.add_client(msg.replyTo);
 				break;
 			case MSG_UNREGISTER_CLIENT:
-				s.mClients.remove(msg.replyTo);
-				if (D) Log.d(TAG, "Client unbound from service");
+				s.remove_client(msg.replyTo);
 				break;
 			case MSG_CONNECT:
-				if (D) Log.d(TAG, "Connect command received");
-				String address = (String) msg.obj;
+				AltosDebug.debug("Connect command received");
+				DeviceAddress address = (DeviceAddress) msg.obj;
 				AltosDroidPreferences.set_active_device(address);
-				s.startAltosBluetooth(address);
+				s.start_altos_bluetooth(address, false);
 				break;
+			case MSG_OPEN_USB:
+				AltosDebug.debug("Open USB command received");
+				UsbDevice device = (UsbDevice) msg.obj;
+				s.start_usb(device);
+				break;
+			case MSG_DISCONNECT:
+				AltosDebug.debug("Disconnect command received");
+				s.address = null;
+				s.disconnect(true);
+				break;
+			case MSG_DELETE_SERIAL:
+				AltosDebug.debug("Delete Serial command received");
+				s.delete_serial((Integer) msg.obj);
+				break;
+			case MSG_SETFREQUENCY:
+				AltosDebug.debug("MSG_SETFREQUENCY");
+				s.telemetry_state.frequency = (Double) msg.obj;
+				if (s.telemetry_state.connect == TelemetryState.CONNECT_CONNECTED) {
+					try {
+						s.altos_link.set_radio_frequency(s.telemetry_state.frequency);
+						s.altos_link.save_frequency();
+					} catch (InterruptedException e) {
+					} catch (TimeoutException e) {
+					}
+				}
+				s.send_to_clients();
+				break;
+			case MSG_SETBAUD:
+				AltosDebug.debug("MSG_SETBAUD");
+				s.telemetry_state.telemetry_rate = (Integer) msg.obj;
+				if (s.telemetry_state.connect == TelemetryState.CONNECT_CONNECTED) {
+					s.altos_link.set_telemetry_rate(s.telemetry_state.telemetry_rate);
+					s.altos_link.save_telemetry_rate();
+				}
+				s.send_to_clients();
+				break;
+
+				/*
+				 *Messages from AltosBluetooth
+				 */
 			case MSG_CONNECTED:
-				if (D) Log.d(TAG, "Connected to device");
+				AltosDebug.debug("MSG_CONNECTED");
+				bt = (AltosDroidLink) msg.obj;
+
+				if (bt != s.altos_link) {
+					AltosDebug.debug("Stale message");
+					break;
+				}
+				AltosDebug.debug("Connected to device");
 				try {
 					s.connected();
 				} catch (InterruptedException ie) {
 				}
 				break;
 			case MSG_CONNECT_FAILED:
-				if (D) Log.d(TAG, "Connection failed... retrying");
-				if (s.address != null)
-					s.startAltosBluetooth(s.address);
+				AltosDebug.debug("MSG_CONNECT_FAILED");
+				bt = (AltosDroidLink) msg.obj;
+
+				if (bt != s.altos_link) {
+					AltosDebug.debug("Stale message");
+					break;
+				}
+				if (s.address != null) {
+					AltosDebug.debug("Connection failed... retrying");
+					s.start_altos_bluetooth(s.address, true);
+				} else {
+					s.disconnect(true);
+				}
 				break;
 			case MSG_DISCONNECTED:
-				Log.d(TAG, "MSG_DISCONNECTED");
-				s.stopAltosBluetooth();
-				break;
-			case MSG_TELEMETRY:
-				// forward telemetry messages
-				s.telemetry_state.state = (AltosState) msg.obj;
-				if (s.telemetry_state.state != null) {
-					if (D) Log.d(TAG, "Save state");
-					AltosPreferences.set_state(0, s.telemetry_state.state, null);
+
+				/* This can be sent by either AltosDroidLink or TelemetryReader */
+				AltosDebug.debug("MSG_DISCONNECTED");
+				bt = (AltosDroidLink) msg.obj;
+
+				if (bt != s.altos_link) {
+					AltosDebug.debug("Stale message");
+					break;
 				}
-				if (D) Log.d(TAG, "MSG_TELEMETRY");
-				s.sendMessageToClients();
+				if (s.address != null) {
+					AltosDebug.debug("Connection lost... retrying");
+					s.start_altos_bluetooth(s.address, true);
+				} else {
+					s.disconnect(true);
+				}
+				break;
+
+				/*
+				 * Messages from TelemetryReader
+				 */
+			case MSG_TELEMETRY:
+				s.telemetry((AltosTelemetry) msg.obj);
 				break;
 			case MSG_CRC_ERROR:
 				// forward crc error messages
 				s.telemetry_state.crc_errors = (Integer) msg.obj;
-				if (D) Log.d(TAG, "MSG_CRC_ERROR");
-				s.sendMessageToClients();
-				break;
-			case MSG_SETFREQUENCY:
-				if (D) Log.d(TAG, "MSG_SETFREQUENCY");
-				s.telemetry_state.frequency = (Double) msg.obj;
-				if (s.telemetry_state.connect == TelemetryState.CONNECT_CONNECTED) {
-					try {
-						s.mAltosBluetooth.set_radio_frequency(s.telemetry_state.frequency);
-						s.mAltosBluetooth.save_frequency();
-					} catch (InterruptedException e) {
-					} catch (TimeoutException e) {
-					}
-				}
-				s.sendMessageToClients();
-				break;
-			case MSG_SETBAUD:
-				if (D) Log.d(TAG, "MSG_SETBAUD");
-				s.telemetry_state.telemetry_rate = (Integer) msg.obj;
-				if (s.telemetry_state.connect == TelemetryState.CONNECT_CONNECTED) {
-					s.mAltosBluetooth.set_telemetry_rate(s.telemetry_state.telemetry_rate);
-					s.mAltosBluetooth.save_telemetry_rate();
-				}
-				s.sendMessageToClients();
+				s.send_to_clients();
 				break;
 			default:
 				super.handleMessage(msg);
@@ -180,161 +212,288 @@ public class TelemetryService extends Service implements LocationListener {
 		}
 	}
 
+	/* Handle telemetry packet
+	 */
+	private void telemetry(AltosTelemetry telem) {
+		AltosState	state;
+
+		if (telemetry_state.states.containsKey(telem.serial))
+			state = telemetry_state.states.get(telem.serial).clone();
+		else
+			state = new AltosState();
+		telem.update_state(state);
+		telemetry_state.states.put(telem.serial, state);
+		if (state != null) {
+			AltosPreferences.set_state(telem.serial, state, null);
+		}
+		send_to_clients();
+	}
+
+	/* Construct the message to deliver to clients
+	 */
 	private Message message() {
 		if (telemetry_state == null)
-			Log.d(TAG, "telemetry_state null!");
-		if (telemetry_state.state == null)
-			Log.d(TAG, "telemetry_state.state null!");
+			AltosDebug.debug("telemetry_state null!");
+		if (telemetry_state.states == null)
+			AltosDebug.debug("telemetry_state.states null!");
 		return Message.obtain(null, AltosDroid.MSG_STATE, telemetry_state);
 	}
 
-	private void sendMessageToClients() {
-		Message m = message();
-		if (D) Log.d(TAG, String.format("Send message to %d clients", mClients.size()));
-		for (int i=mClients.size()-1; i>=0; i--) {
-			try {
-				if (D) Log.d(TAG, String.format("Send message to client %d", i));
-				mClients.get(i).send(m);
-			} catch (RemoteException e) {
-				mClients.remove(i);
-			}
+	/* A new friend has connected
+	 */
+	private void add_client(Messenger client) {
+
+		clients.add(client);
+		AltosDebug.debug("Client bound to service");
+
+		/* On connect, send the current state to the new client
+		 */
+		send_to_client(client, message());
+
+		/* If we've got an address from a previous session, then
+		 * go ahead and try to reconnect to the device
+		 */
+		if (address != null && telemetry_state.connect == TelemetryState.CONNECT_DISCONNECTED) {
+			AltosDebug.debug("Reconnecting now...");
+			start_altos_bluetooth(address, false);
 		}
 	}
 
-	private void stopAltosBluetooth() {
-		if (D) Log.d(TAG, "stopAltosBluetooth(): begin");
-		telemetry_state.connect = TelemetryState.CONNECT_READY;
-		if (mTelemetryReader != null) {
-			if (D) Log.d(TAG, "stopAltosBluetooth(): stopping TelemetryReader");
-			mTelemetryReader.interrupt();
+	/* A client has disconnected, clean up
+	 */
+	private void remove_client(Messenger client) {
+		clients.remove(client);
+		AltosDebug.debug("Client unbound from service");
+
+		/* When the list of clients is empty, stop the service if
+		 * we have no current telemetry source
+		 */
+
+		 if (clients.isEmpty() && telemetry_state.connect == TelemetryState.CONNECT_DISCONNECTED) {
+			 AltosDebug.debug("No clients, no connection. Stopping\n");
+			 stopSelf();
+		 }
+	}
+
+	private void send_to_client(Messenger client, Message m) {
+		try {
+			client.send(m);
+		} catch (RemoteException e) {
+			AltosDebug.error("Client %s disappeared", client.toString());
+			remove_client(client);
+		}
+	}
+
+	private void send_to_clients() {
+		Message m = message();
+		for (Messenger client : clients)
+			send_to_client(client, m);
+	}
+
+	private void disconnect(boolean notify) {
+		AltosDebug.debug("disconnect(): begin");
+
+		telemetry_state.connect = TelemetryState.CONNECT_DISCONNECTED;
+		telemetry_state.address = null;
+
+		if (altos_link != null)
+			altos_link.closing();
+
+		stop_receiver_voltage_timer();
+
+		if (telemetry_reader != null) {
+			AltosDebug.debug("disconnect(): stopping TelemetryReader");
+			telemetry_reader.interrupt();
 			try {
-				mTelemetryReader.join();
+				telemetry_reader.join();
 			} catch (InterruptedException e) {
 			}
-			mTelemetryReader = null;
+			telemetry_reader = null;
 		}
-		if (mTelemetryLogger != null) {
-			if (D) Log.d(TAG, "stopAltosBluetooth(): stopping TelemetryLogger");
-			mTelemetryLogger.stop();
-			mTelemetryLogger = null;
+		if (telemetry_logger != null) {
+			AltosDebug.debug("disconnect(): stopping TelemetryLogger");
+			telemetry_logger.stop();
+			telemetry_logger = null;
 		}
-		if (mAltosBluetooth != null) {
-			if (D) Log.d(TAG, "stopAltosBluetooth(): stopping AltosBluetooth");
-			mAltosBluetooth.close();
-			mAltosBluetooth = null;
+		if (altos_link != null) {
+			AltosDebug.debug("disconnect(): stopping AltosDroidLink");
+			altos_link.close();
+			altos_link = null;
 		}
 		telemetry_state.config = null;
-		if (D) Log.d(TAG, "stopAltosBluetooth(): send message to clients");
-		sendMessageToClients();
+		if (notify) {
+			AltosDebug.debug("disconnect(): send message to clients");
+			send_to_clients();
+			if (clients.isEmpty()) {
+				AltosDebug.debug("disconnect(): no clients, terminating");
+				stopSelf();
+			}
+		}
 	}
 
-	private void startAltosBluetooth(String address) {
-		// Get the BLuetoothDevice object
-		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+	private void start_usb(UsbDevice device) {
+		AltosUsb	d = new AltosUsb(this, device, handler);
 
+		if (d != null) {
+			disconnect(false);
+			altos_link = d;
+			try {
+				connected();
+			} catch (InterruptedException ie) {
+			}
+		}
+	}
+
+	private void delete_serial(int serial) {
+		telemetry_state.states.remove((Integer) serial);
+		AltosPreferences.remove_state(serial);
+		send_to_clients();
+	}
+
+	private void start_altos_bluetooth(DeviceAddress address, boolean pause) {
+		// Get the BLuetoothDevice object
+		BluetoothDevice device = bluetooth_adapter.getRemoteDevice(address.address);
+
+		disconnect(false);
 		this.address = address;
-		if (mAltosBluetooth == null) {
-			if (D) Log.d(TAG, String.format("startAltosBluetooth(): Connecting to %s (%s)", device.getName(), device.getAddress()));
-			mAltosBluetooth = new AltosBluetooth(device, mHandler);
-			telemetry_state.connect = TelemetryState.CONNECT_CONNECTING;
-			sendMessageToClients();
-		} else {
-			// This is a bit of a hack - if it appears we're still connected, we treat this as a restart.
-			// So, to give a suitable delay to teardown/bringup, we just schedule a resend of a message
-			// to ourselves in a few seconds time that will ultimately call this method again.
-			// ... then we tear down the existing connection.
-			// We do it this way around so that we don't lose a reference to the device when this method
-			// is called on reception of MSG_CONNECT_FAILED in the handler above.
-			mHandler.sendMessageDelayed(Message.obtain(null, MSG_CONNECT, address), 3000);
-			stopAltosBluetooth();
+		AltosDebug.debug("start_altos_bluetooth(): Connecting to %s (%s)", device.getName(), device.getAddress());
+		altos_link = new AltosBluetooth(device, handler, pause);
+		telemetry_state.connect = TelemetryState.CONNECT_CONNECTING;
+		telemetry_state.address = address;
+		send_to_clients();
+	}
+
+	// Timer for receiver battery voltage monitoring
+	Timer receiver_voltage_timer;
+
+	private void update_receiver_voltage() {
+		if (altos_link != null) {
+			try {
+				double	voltage = altos_link.monitor_battery();
+				telemetry_state.receiver_battery = voltage;
+			} catch (InterruptedException ie) {
+			}
+		}
+	}
+
+	private void stop_receiver_voltage_timer() {
+		if (receiver_voltage_timer != null) {
+			receiver_voltage_timer.cancel();
+			receiver_voltage_timer.purge();
+			receiver_voltage_timer = null;
+		}
+	}
+
+	private void start_receiver_voltage_timer() {
+		if (receiver_voltage_timer == null && altos_link.has_monitor_battery()) {
+			receiver_voltage_timer = new Timer();
+			receiver_voltage_timer.scheduleAtFixedRate(new TimerTask() { public void run() {update_receiver_voltage();}}, 1000L, 10000L);
 		}
 	}
 
 	private void connected() throws InterruptedException {
-		if (D) Log.d(TAG, "connected top");
+		AltosDebug.debug("connected top");
+		AltosDebug.check_ui("connected\n");
 		try {
-			if (mAltosBluetooth == null)
+			if (altos_link == null)
 				throw new InterruptedException("no bluetooth");
-			telemetry_state.config = mAltosBluetooth.config_data();
-			mAltosBluetooth.set_radio_frequency(telemetry_state.frequency);
-			mAltosBluetooth.set_telemetry_rate(telemetry_state.telemetry_rate);
+			telemetry_state.config = altos_link.config_data();
+			altos_link.set_radio_frequency(telemetry_state.frequency);
+			altos_link.set_telemetry_rate(telemetry_state.telemetry_rate);
 		} catch (TimeoutException e) {
 			// If this timed out, then we really want to retry it, but
 			// probably safer to just retry the connection from scratch.
-			mHandler.obtainMessage(MSG_CONNECT_FAILED).sendToTarget();
+			AltosDebug.debug("connected timeout");
+			if (address != null) {
+				AltosDebug.debug("connected timeout, retrying");
+				start_altos_bluetooth(address, true);
+			} else {
+				handler.obtainMessage(MSG_CONNECT_FAILED).sendToTarget();
+				disconnect(true);
+			}
 			return;
 		}
 
-		if (D) Log.d(TAG, "connected bluetooth configured");
+		AltosDebug.debug("connected bluetooth configured");
 		telemetry_state.connect = TelemetryState.CONNECT_CONNECTED;
+		telemetry_state.address = address;
 
-		mTelemetryReader = new TelemetryReader(mAltosBluetooth, mHandler, telemetry_state.state);
-		mTelemetryReader.start();
+		telemetry_reader = new TelemetryReader(altos_link, handler);
+		telemetry_reader.start();
 
-		if (D) Log.d(TAG, "connected TelemetryReader started");
+		AltosDebug.debug("connected TelemetryReader started");
 
-		mTelemetryLogger = new TelemetryLogger(this, mAltosBluetooth);
+		telemetry_logger = new TelemetryLogger(this, altos_link);
 
-		if (D) Log.d(TAG, "Notify UI of connection");
+		start_receiver_voltage_timer();
 
-		sendMessageToClients();
-	}
+		AltosDebug.debug("Notify UI of connection");
 
-	private void onTimerTick() {
-		if (D) Log.d(TAG, "Timer wakeup");
-		try {
-			if (mClients.size() <= 0 && telemetry_state.connect != TelemetryState.CONNECT_CONNECTED) {
-				stopSelf();
-			}
-		} catch (Throwable t) {
-			Log.e(TAG, "Timer failed: ", t);
-		}
+		send_to_clients();
 	}
 
 
 	@Override
 	public void onCreate() {
-		// Get local Bluetooth adapter
-		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-		// If the adapter is null, then Bluetooth is not supported
-		if (mBluetoothAdapter == null) {
-			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-		}
+		AltosDebug.init(this);
 
 		// Initialise preferences
 		AltosDroidPreferences.init(this);
+
+		// Get local Bluetooth adapter
+		bluetooth_adapter = BluetoothAdapter.getDefaultAdapter();
+
+		// If the adapter is null, then Bluetooth is not supported
+		if (bluetooth_adapter == null) {
+			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+		}
 
 		telemetry_state = new TelemetryState();
 
 		// Create a reference to the NotificationManager so that we can update our notifcation text later
 		//mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
-		telemetry_state.connect = TelemetryState.CONNECT_READY;
+		telemetry_state.connect = TelemetryState.CONNECT_DISCONNECTED;
+		telemetry_state.address = null;
 
-		AltosSavedState saved_state = AltosPreferences.state(0);
+		/* Pull the saved state information out of the preferences database
+		 */
+		ArrayList<Integer> serials = AltosPreferences.list_states();
 
-		if (saved_state != null) {
-			if (D) Log.d(TAG, String.format("recovered old state flight %d\n", saved_state.state.flight));
-			telemetry_state.state = saved_state.state;
+		telemetry_state.latest_serial = AltosPreferences.latest_state();
+
+		for (int serial : serials) {
+			AltosSavedState saved_state = AltosPreferences.state(serial);
+			if (saved_state != null) {
+				if (serial == 0) {
+					serial = saved_state.state.serial;
+					AltosPreferences.set_state(serial, saved_state.state, saved_state.listener_state);
+					AltosPreferences.remove_state(0);
+				}
+				if (telemetry_state.latest_serial == 0)
+					telemetry_state.latest_serial = serial;
+
+				AltosDebug.debug("recovered old state serial %d flight %d\n",
+						 serial,
+						 saved_state.state.flight);
+				if (saved_state.state.gps != null)
+					AltosDebug.debug("\tposition %f,%f\n",
+							 saved_state.state.gps.lat,
+							 saved_state.state.gps.lon);
+				telemetry_state.states.put(serial, saved_state.state);
+			}
 		}
-
-		// Start our timer - first event in 10 seconds, then every 10 seconds after that.
-		timer.scheduleAtFixedRate(new TimerTask(){ public void run() {onTimerTick();}}, 10000L, 10000L);
 
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
-
-		String address = AltosDroidPreferences.active_device();
-		if (address != null)
-			startAltosBluetooth(address);
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.i("TelemetryService", "Received start id " + startId + ": " + intent);
+		AltosDebug.debug("Received start id %d: %s", startId, intent);
 
 		CharSequence text = getText(R.string.telemetry_service_started);
 
@@ -354,6 +513,20 @@ public class TelemetryService extends Service implements LocationListener {
 		// Move us into the foreground.
 		startForeground(NOTIFICATION, notification);
 
+		/* Start bluetooth if we don't have a connection already */
+		if (intent != null &&
+		    (telemetry_state.connect == TelemetryState.CONNECT_NONE ||
+		     telemetry_state.connect == TelemetryState.CONNECT_DISCONNECTED))
+		{
+			String	action = intent.getAction();
+
+			if (action.equals(AltosDroid.ACTION_BLUETOOTH)) {
+				DeviceAddress address = AltosDroidPreferences.active_device();
+				if (address != null && !address.address.startsWith("USB"))
+					start_altos_bluetooth(address, false);
+			}
+		}
+
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
@@ -366,13 +539,10 @@ public class TelemetryService extends Service implements LocationListener {
 		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
 
 		// Stop the bluetooth Comms threads
-		stopAltosBluetooth();
+		disconnect(true);
 
 		// Demote us from the foreground, and cancel the persistent notification.
 		stopForeground(true);
-
-		// Stop our timer
-		if (timer != null) {timer.cancel();}
 
 		// Tell the user we stopped.
 		Toast.makeText(this, R.string.telemetry_service_stopped, Toast.LENGTH_SHORT).show();
@@ -380,14 +550,14 @@ public class TelemetryService extends Service implements LocationListener {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		return mMessenger.getBinder();
+		return messenger.getBinder();
 	}
 
 
 	public void onLocationChanged(Location location) {
 		telemetry_state.location = location;
-		if (D) Log.d(TAG, "location changed");
-		sendMessageToClients();
+		AltosDebug.debug("location changed");
+		send_to_clients();
 	}
 
 	public void onStatusChanged(String provider, int status, Bundle extras) {

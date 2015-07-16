@@ -124,20 +124,29 @@ FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFR
 LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
 LINUX_EXTRA=micropeak-fat $(desktop_file).in
 
-MACOSX_DRIVER_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg
-MACOSX_DRIVER=FTDIUSBSerialDriver_v2_2_18.dmg
+MACOSX_DRIVER_0_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg
+MACOSX_DRIVER_0=FTDI_v2_2_18.dmg
+
+MACOSX_DRIVER_1_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_3.dmg
+MACOSX_DRIVER_1=FTDI_v2_3.dmg
+
+MACOSX_DRIVERS=$(MACOSX_DRIVER_1) $(MACOSX_DRIVER_0)
+
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVER) $(MACOSX_README) $(DOC) $(MACOSX_ICONS)
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVERS) $(MACOSX_README) $(DOC) $(MACOSX_ICONS)
 
-$(MACOSX_DRIVER):
-	wget $(MACOSX_DRIVER_URL)
+$(MACOSX_DRIVER_0):
+	wget -O $@ $(MACOSX_DRIVER_0_URL)
 
-WINDOWS_DRIVER_URL=http://www.ftdichip.com/Drivers/CDM/CDM20824_Setup.exe
-WINDOWS_DRIVER=CDM20824_Setup.exe
+$(MACOSX_DRIVER_1):
+	wget -O $@ $(MACOSX_DRIVER_1_URL)
+
+WINDOWS_DRIVER_URL=http://www.ftdichip.com/Drivers/CDM/CDM%20v2.12.00%20WHQL%20Certified.exe
+WINDOWS_DRIVER=CDM_v2.12.00_WHQL_Certified.exe
 
 $(WINDOWS_DRIVER):
-	wget $(WINDOWS_DRIVER_URL)
+	wget -O "$(WINDOWS_DRIVER)" "$(WINDOWS_DRIVER_URL)"
 
 WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(DOC) $(WINDOWS_ICONS) $(WINDOWS_DRIVER)
 
@@ -274,7 +283,7 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	cp -a $(MACOSX_README) macosx/ReadMe.rtf
 	cp -a $(DOC) macosx
 	cp -p Info.plist macosx/MicroPeak.app/Contents
-	cp -p $(MACOSX_DRIVER) macosx
+	cp -p $(MACOSX_DRIVERS) macosx
 	mkdir -p macosx/MicroPeak.app/Contents/Resources/Java
 	cp -p $(MACOSX_ICONS) macosx/MicroPeak.app/Contents/Resources
 	cp -p $(FATJAR) macosx/MicroPeak.app/Contents/Resources/Java/micropeak.jar

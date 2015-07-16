@@ -86,9 +86,9 @@ ao_usart_getchar(struct ao_stm_usart *usart)
 }
 
 static inline uint8_t
-_ao_usart_sleep(struct ao_stm_usart *usart)
+_ao_usart_sleep_for(struct ao_stm_usart *usart, uint16_t timeout)
 {
-	return ao_sleep(&usart->rx_fifo);
+	return ao_sleep_for(&usart->rx_fifo, timeout);
 }
 
 void
@@ -217,9 +217,9 @@ _ao_serial1_pollchar(void)
 }
 
 uint8_t
-_ao_serial1_sleep(void)
+_ao_serial1_sleep_for(uint16_t timeout)
 {
-	return _ao_usart_sleep(&ao_stm_usart1);
+	return _ao_usart_sleep_for(&ao_stm_usart1, timeout);
 }
 
 void
@@ -260,9 +260,9 @@ _ao_serial2_pollchar(void)
 }
 
 uint8_t
-_ao_serial2_sleep(void)
+_ao_serial2_sleep_for(uint16_t timeout)
 {
-	return _ao_usart_sleep(&ao_stm_usart2);
+	return _ao_usart_sleep_for(&ao_stm_usart2, timeout);
 }
 
 void
@@ -303,9 +303,9 @@ _ao_serial3_pollchar(void)
 }
 
 uint8_t
-_ao_serial3_sleep(void)
+_ao_serial3_sleep_for(uint16_t timeout)
 {
-	return _ao_usart_sleep(&ao_stm_usart3);
+	return _ao_usart_sleep_for(&ao_stm_usart3, timeout);
 }
 
 void

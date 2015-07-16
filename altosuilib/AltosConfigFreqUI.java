@@ -15,13 +15,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_8;
 
 import java.awt.*;
+import java.text.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 class AltosEditFreqUI extends AltosUIDialog implements ActionListener {
 	Frame		frame;
@@ -51,10 +52,10 @@ class AltosEditFreqUI extends AltosUIDialog implements ActionListener {
 		String	d_s = description.getText();
 
 		try {
-			double	f_d = Double.parseDouble(f_s);
+			double	f_d = AltosParse.parse_double_locale(f_s);
 
 			return new AltosFrequency(f_d, d_s);
-		} catch (NumberFormatException ne) {
+		} catch (ParseException ne) {
 		}
 		return null;
 	}

@@ -280,9 +280,7 @@ ao_lco_igniter_status(void)
 	uint16_t	delay;
 
 	for (;;) {
-//		ao_alarm(delay);
 		ao_sleep(&ao_pad_query);
-//		ao_clear_alarm();
 		if (!ao_lco_valid) {
 			ao_led_on(AO_LED_RED);
 			ao_led_off(AO_LED_GREEN);
@@ -364,9 +362,7 @@ ao_lco_monitor(void)
 			delay = AO_MS_TO_TICKS(100);
 		else
 			delay = AO_SEC_TO_TICKS(1);
-		ao_alarm(delay);
-		ao_sleep(&ao_lco_armed);
-		ao_clear_alarm();
+		ao_sleep_for(&ao_lco_armed, delay);
 	}
 }
 

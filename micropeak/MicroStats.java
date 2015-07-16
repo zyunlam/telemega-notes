@@ -18,8 +18,8 @@
 package org.altusmetrum.micropeak;
 
 import java.io.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class MicroStats {
 	double		coast_height;

@@ -55,7 +55,7 @@ Copyright © 2003-2007 Apple, Inc., All Rights Reserved
 
 */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_8;
 
 import java.lang.reflect.*;
 import java.util.HashMap;

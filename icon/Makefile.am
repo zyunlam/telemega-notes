@@ -150,14 +150,21 @@ SUFFIXES=.svg .build .icns .ico .rc .o .exe
 	icotool -c -o $@ $(shell for i in $(WIN_RES); do echo $*-$$i.png; done)
 
 .ico.rc:
-	echo '101 ICON "$*.ico"' > $@
+	./make-rc "$*" $(VERSION) > $@
 
 
 MINGCC32=i686-w64-mingw32-gcc
 MINGWINDRES=i686-w64-mingw32-windres
+MINGFLAGS=-Wall -DWINDOWS -mwindows
+MINGLIBS=-lshlwapi
 
 .rc.o:
 	$(MINGWINDRES) $*.rc $@
 
 .o.exe:
-	$(MINGCC32) -o $@ windows-stub.c $*.o
+	$(MINGCC32) -o $@ $(MINGFLAGS) windows-stub.o $*.o $(MINGLIBS)
+
+$(EXE_FILES): windows-stub.o make-rc
+
+windows-stub.o: windows-stub.c
+	$(MINGCC32) -c $(MINGFLAGS) windows-stub.c

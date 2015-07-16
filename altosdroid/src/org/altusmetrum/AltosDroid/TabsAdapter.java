@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
-import android.util.Log;
 
 /**
  * This is a helper class that implements the management of tabs and all
@@ -106,7 +105,7 @@ public class TabsAdapter extends FragmentPagerAdapter
 	@Override
 	public Fragment getItem(int position) {
 		TabInfo info = mTabs.get(position);
-		Log.d(AltosDroid.TAG, String.format("TabsAdapter.getItem(%d)", position));
+		AltosDebug.debug("TabsAdapter.getItem(%d)", position);
 		info.fragment = Fragment.instantiate(mContext, info.clss.getName(), info.args);
 		return info.fragment;
 	}
@@ -131,7 +130,7 @@ public class TabsAdapter extends FragmentPagerAdapter
 		if (cur_frag != null) {
 			cur_frag.set_visible(true);
 		}
-		Log.d(AltosDroid.TAG, String.format("TabsAdapter.onTabChanged(%s) = %d", tabId, position));
+		AltosDebug.debug("TabsAdapter.onTabChanged(%s) = %d", tabId, position);
 		mViewPager.setCurrentItem(position);
 	}
 

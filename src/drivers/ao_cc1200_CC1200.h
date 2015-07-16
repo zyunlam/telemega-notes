@@ -101,6 +101,15 @@
 		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
 		 (CC1200_MDMCFG2_UPSAMPLER_P_8 << CC1200_MDMCFG2_UPSAMPLER_P) |
 		 (0 << CC1200_MDMCFG2_CFM_DATA_EN)),
+	CC1200_MDMCFG0,					 /* General Modem Parameter Configuration Reg. 0 */ 
+		((0 << CC1200_MDMCFG0_TRANSPARENT_MODE_EN) |
+		 (0 << CC1200_MDMCFG0_TRANSPARENT_INTFACT) |
+		 (0 << CC1200_MDMCFG0_DATA_FILTER_EN) |	
+		 (1 << CC1200_MDMCFG0_VITERBI_EN)),
+	CC1200_TOC_CFG,					/* Timing Offset Correction Configuration */
+		((CC1200_TOC_CFG_TOC_LIMIT_2 << CC1200_TOC_CFG_TOC_LIMIT) |
+		 (CC1200_TOC_CFG_TOC_PRE_SYNC_BLOCKLEN_6_16 << CC1200_TOC_CFG_TOC_PRE_SYNC_BLOCKLEN)|
+		 (CC1200_TOC_CFG_TOC_POST_SYNC_BLOCKLEN_2_32 << CC1200_TOC_CFG_TOC_POST_SYNC_BLOCKLEN)),
         CC1200_FREQ2,                        0x6c,       /* Frequency Configuration [23:16] */
         CC1200_FREQ1,                        0xa3,       /* Frequency Configuration [15:8] */
         CC1200_FREQ0,                        0x33,       /* Frequency Configuration [7:0] */

@@ -1,58 +1,89 @@
 #!/bin/sh
 
-if [ -x ../ao-tools/ao-load/ao-load ]; then
-	AOLOAD=../ao-tools/ao-load/ao-load
-elif [ -x /usr/bin/ao-load ]; then
-	AOLOAD=/usr/bin/ao-load
+if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+	FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+elif [ -x /usr/bin/ao-flash-lpc ]; then
+	FLASH_LPC=/usr/bin/ao-flash-lpc
 else
-	echo "Can't find ao-load!  Aborting."
+	echo "Can't find ao-flash-lpc!  Aborting."
 	exit 1
 fi
 
-if [ -x ../ao-tools/ao-rawload/ao-rawload ]; then
-	RAWLOAD=../ao-tools/ao-rawload/ao-rawload
-elif [ -x /usr/bin/ao-rawload ]; then
-	RAWLOAD=/usr/bin/ao-rawload
+if [ -x /usr/bin/ao-usbload ]; then
+	USBLOAD=/usr/bin/ao-usbload
 else
-	echo "Can't find ao-rawload!  Aborting."
+	echo "Can't find ao-usbload!  Aborting."
 	exit 1
 fi
 
-echo "TeleDongle v0.2 Turn-On and Calibration Program"
-echo "Copyright 2010 by Bdale Garbee.  Released under GPL v2"
+PRODUCT=teledongle
+PRODUCT_NAME=TeleDongle
+VERSION=3.0
+
+echo "$PRODUCT_NAME v$VERSION Turn-On and Calibration Program"
+echo "Copyright © 2015 by Bdale Garbee.  Released under GPL v2"
 echo
 echo "Expectations:"
-echo "\tTeleDongle v0.2 powered from USB"
-echo "\t\twith TIdongle (on /dev/ttyACM0) cabled to debug header"
-echo "\t\twith coax from SMA to frequency counter"
+echo "\t$PRODUCT_NAME v$VERSION powered from USB"
+echo "\t\twith ST-Link-V2 cabled to debug header"
+echo "\t\twith coax from UHF to frequency counter"
 echo
-echo -n "TeleDongle serial number: "
+echo -n "$PRODUCT_NAME-$VERSION serial number: "
 read SERIAL
 
-echo $RAWLOAD
+BINARIES=$HOME/altusmetrumllc/Binaries
 
-case $USER in
-    bdale)
-	programmer=100
+LOADER="$BINARIES/loaders/$PRODUCT-v$VERSION-"*.elf
+ALTOS="$BINARIES/$PRODUCT-v$VERSION"*.elf
+
+$FLASH_LPC $LOADER || exit 1
+
+sleep 2
+
+$USBLOAD --serial=$SERIAL $ALTOS || exit 1
+
+sleep 5
+
+dev=`ao-list | awk '/TeleDongle-v'"$VERSION"'/ { print $3; exit(0); }'`
+
+case "$dev" in
+/dev/tty*)
+	echo "TeleDongle found on $dev"
 	;;
-    keithp)
-	programmer=186
+*)
+	echo 'No TeleDongle-v'"$VERSION"' found'
+	exit 1
 	;;
 esac
 
-$RAWLOAD -D $programmer -r ao_led_blink.ihx
-echo "LEDs should be blinking"
-sleep 5
+echo 'E 0' > $dev
 
-$RAWLOAD -D $programmer -r ao_radio_xmit.ihx
-echo -n "Generating RF carrier.  Please enter measured frequency: "
-read FREQ
+./cal-freq-file $dev $SERIAL
 
-CAL_VALUE=`nickle -e "floor(434.55 / $FREQ * 1186611 + 0.5)"`
+case $? in
+    0)
+	;;
+    *)
+	echo "Frequency calibration failed"
+	exit 1
+	;;
+esac
 
-echo "Programming flash with cal value " $CAL_VALUE
-$AOLOAD -D $programmer --cal $CAL_VALUE /usr/share/altos/teledongle-v0.2*.ihx $SERIAL
+CAL_VALUE=`grep "^$SERIAL," cal_values | tail -1 | sed 's/^[^,]*,//'`
 
-echo "Serial number "$SERIAL" programmed with RF cal value "$CAL_VALUE
-echo $SERIAL","$CAL_VALUE >> cal_values
-echo "Unplug and replug USB, cu to the board, confirm freq and record power"
+case "$CAL_VALUE" in
+    [1-9]*)
+    ;;
+    *)
+	echo "Invalid calibration value: $CAL_VALUE"
+	exit 1
+	;;
+esac
+
+echo "Reflashing with calibration: $CAL_VALUE"
+
+$USBLOAD --cal=$CAL_VALUE --tty=$dev $ALTOS || exit 1
+
+echo "$PRODUCT_NAME-v$VERSION $SERIAL is ready to ship"
+
+exit $?

@@ -85,7 +85,7 @@ main (int argc, char **argv)
 
 			if (cc_mega_parse(line, &log)) {
 				if (log.is_config) {
-					printf ("kind %d\n", log.u.config_int.kind);
+					printf ("config %2d %s", log.u.config_int.kind, line);
 				} else {
 					printf ("tick %5d ", log.tick);
 					switch (log.type) {
@@ -126,8 +126,7 @@ main (int argc, char **argv)
 							printf (" s%d %6d",
 								j, log.u.volt.sense[j]);
 						}
-						printf ("pyro %04x\n", log.u.volt.pyro);
-						printf ("\n");
+						printf (" pyro %04x\n", log.u.volt.pyro);
 						break;
 					default:
 						printf ("type %c\n", log.type, log.tick);

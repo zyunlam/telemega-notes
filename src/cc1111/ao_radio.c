@@ -451,13 +451,9 @@ ao_radio_recv(__xdata void *packet, uint8_t size, uint8_t timeout) __reentrant
 	/* Wait for DMA to be done, for the radio receive process to
 	 * get aborted or for a receive timeout to fire
 	 */
-	if (timeout)
-		ao_alarm(timeout);
 	__critical while (!ao_radio_dma_done && !ao_radio_abort)
-			   if (ao_sleep(&ao_radio_dma_done))
+			   if (ao_sleep_for(&ao_radio_dma_done, timeout))
 				   break;
-	if (timeout)
-		ao_clear_alarm();
 
 	/* If recv was aborted, clean up by stopping the DMA engine
 	 * and idling the radio

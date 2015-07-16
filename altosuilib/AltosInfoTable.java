@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_6;
+package org.altusmetrum.altosuilib_8;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 public class AltosInfoTable extends JTable implements AltosFlightDisplay, HierarchyListener {
 	private AltosFlightInfoTableModel model;
@@ -137,6 +137,8 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 		if (state != null) {
 			if (state.device_type != AltosLib.MISSING)
 				info_add_row(0, "Device", "%s", AltosLib.product_name(state.device_type));
+			else if (state.product != null)
+				info_add_row(0, "Device", "%s", state.product);
 			if (state.altitude() != AltosLib.MISSING)
 				info_add_row(0, "Altitude", "%6.0f    m", state.altitude());
 			if (state.ground_altitude() != AltosLib.MISSING)

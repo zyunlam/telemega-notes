@@ -54,7 +54,7 @@ void
 ao_packet_send(void);
 
 uint8_t
-ao_packet_recv(void);
+ao_packet_recv(uint16_t timeout);
 
 void
 ao_packet_flush(void);

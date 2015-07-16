@@ -219,7 +219,7 @@ is_am(int idVendor, int idProduct) {
 }
 
 struct cc_usbdevs *
-cc_usbdevs_scan(void)
+cc_usbdevs_scan(int non_tty)
 {
 	int			e;
 	struct dirent		**ents;
@@ -241,7 +241,7 @@ cc_usbdevs_scan(void)
 		dir = cc_fullname(USB_DEVICES, ents[e]->d_name);
 		dev = usb_scan_device(dir);
 		free(dir);
-		if (is_am(dev->idVendor, dev->idProduct) && dev->tty) {
+		if (is_am(dev->idVendor, dev->idProduct) && (non_tty || dev->tty)) {
 			if (devs->dev)
 				devs->dev = realloc(devs->dev,
 						    (devs->ndev + 1) * sizeof (struct usbdev *));
@@ -274,7 +274,7 @@ match_dev(char *product, int serial)
 	int			i;
 	char			*tty = NULL;
 
-	devs = cc_usbdevs_scan();
+	devs = cc_usbdevs_scan(FALSE);
 	if (!devs)
 		return NULL;
 	for (i = 0; i < devs->ndev; i++) {

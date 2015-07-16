@@ -26,8 +26,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -38,7 +38,7 @@ public class TeleGPSGraphUI extends AltosUIFrame
 	JTabbedPane		pane;
 	AltosGraph		graph;
 	AltosUIEnable		enable;
-	AltosUIMap		map;
+	AltosUIMapNew		map;
 	AltosState		state;
 	AltosFlightStats	stats;
 	AltosGraphDataSet	graphDataSet;
@@ -69,7 +69,7 @@ public class TeleGPSGraphUI extends AltosUIFrame
 		graph = new AltosGraph(enable, stats, graphDataSet);
 		statsTable = new AltosFlightStatsTable(stats);
 
-		map = new AltosUIMap();
+		map = new AltosUIMapNew();
 
 		pane.add("Graph", graph.panel);
 		pane.add("Configure Graph", enable);

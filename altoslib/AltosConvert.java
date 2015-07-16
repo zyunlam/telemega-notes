@@ -18,7 +18,7 @@
 /*
  * Sensor data conversion functions
  */
-package org.altusmetrum.altoslib_6;
+package org.altusmetrum.altoslib_8;
 
 public class AltosConvert {
 	/*
@@ -228,6 +228,12 @@ public class AltosConvert {
 		double	supply = 3.3;
 
 		return sensor / 32767.0 * supply * (5.6 + 10.0) / 10.0;
+	}
+
+	static double tele_bt_3_battery(int raw) {
+		if (raw == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return 3.3 * mega_adc(raw) * (5.1 + 10.0) / 10.0;
 	}
 
 	static double easy_mini_voltage(int sensor, int serial) {

@@ -539,9 +539,7 @@ ao_terraui(void)
 		else
 			ao_terraui_page[ao_current_page]();
 
-		ao_alarm(AO_SEC_TO_TICKS(1));
-		b = ao_button_get();
-		ao_clear_alarm();
+		b = ao_button_get(AO_SEC_TO_TICKS(1));
 
 		if (b > 0) {
 			ao_beep_for(AO_BEEP_HIGH, AO_MS_TO_TICKS(10));

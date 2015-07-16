@@ -17,12 +17,13 @@
 
 package altosui;
 
+import java.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class AltosConfigPyroUI
 	extends AltosUIDialog
@@ -87,9 +88,9 @@ public class AltosConfigPyroUI
 
 			if (units != null) {
 				try {
-					double v = units.parse(value.getText(), !imperial_units);
+					double v = units.parse_locale(value.getText(), !imperial_units);
 					set(enabled(), v);
-				} catch (NumberFormatException ne) {
+				} catch (ParseException pe) {
 					set(enabled(), 0.0);
 				}
 			}
@@ -129,9 +130,9 @@ public class AltosConfigPyroUI
 				AltosUnits units = AltosPyro.pyro_to_units(flag);
 				try {
 					if (units != null)
-						return units.parse(value.getText());
-					return Double.parseDouble(value.getText());
-				} catch (NumberFormatException e) {
+						return units.parse_locale(value.getText());
+					return AltosParse.parse_double_locale(value.getText());
+				} catch (ParseException e) {
 					throw new AltosConfigDataException("\"%s\": %s\n", value.getText(), e.getMessage());
 				}
 			}
@@ -298,8 +299,8 @@ public class AltosConfigPyroUI
 		String	v = pyro_firing_time_value.getSelectedItem().toString();
 
 		try {
-			return Double.parseDouble(v);
-		} catch (NumberFormatException e) {
+			return AltosParse.parse_double_locale(v);
+		} catch (ParseException e) {
 			throw new AltosConfigDataException("Invalid pyro firing time \"%s\"", v);
 		}
 	}

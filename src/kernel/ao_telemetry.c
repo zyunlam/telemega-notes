@@ -486,9 +486,7 @@ ao_telemetry(void)
 #endif /* HAS_APRS */
 			delay = time - ao_time();
 			if (delay > 0) {
-				ao_alarm(delay);
-				ao_sleep(&telemetry);
-				ao_clear_alarm();
+				ao_sleep_for(&telemetry, delay);
 			}
 		}
 	}

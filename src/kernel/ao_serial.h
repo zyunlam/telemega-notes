@@ -35,7 +35,7 @@ int
 _ao_serial0_pollchar(void);
 
 uint8_t
-_ao_serial0_sleep(void);
+_ao_serial0_sleep_for(uint16_t timeout);
 
 void
 ao_serial0_putchar(char c);
@@ -58,7 +58,7 @@ int
 _ao_serial1_pollchar(void);
 
 uint8_t
-_ao_serial1_sleep(void);
+_ao_serial1_sleep_for(uint16_t timeout);
 
 void
 ao_serial1_putchar(char c);
@@ -81,7 +81,7 @@ int
 _ao_serial2_pollchar(void);
 
 uint8_t
-_ao_serial2_sleep(void);
+_ao_serial2_sleep_for(uint16_t timeout);
 
 void
 ao_serial2_putchar(char c);
@@ -104,7 +104,7 @@ int
 _ao_serial3_pollchar(void);
 
 uint8_t
-_ao_serial3_sleep(void);
+_ao_serial3_sleep_for(uint16_t timeout);
 
 void
 ao_serial3_putchar(char c);

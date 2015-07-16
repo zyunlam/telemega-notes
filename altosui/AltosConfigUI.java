@@ -21,8 +21,9 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import java.text.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class AltosConfigUI
 	extends AltosUIDialog
@@ -43,6 +44,7 @@ public class AltosConfigUI
 	JLabel			rate_label;
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
+	JLabel			aprs_format_label;
 	JLabel			flight_log_max_label;
 	JLabel			ignite_mode_label;
 	JLabel			pad_orientation_label;
@@ -66,6 +68,7 @@ public class AltosConfigUI
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
+	JComboBox<String>	aprs_format_value;
 	JComboBox<String>	flight_log_max_value;
 	JComboBox<String>	ignite_mode_value;
 	JComboBox<String>	pad_orientation_value;
@@ -218,11 +221,20 @@ public class AltosConfigUI
 
 	void set_aprs_ssid_tool_tip() {
 		if (aprs_ssid_value.isEnabled())
-			aprs_interval_value.setToolTipText("Set the APRS SSID (secondary station identifier)");
-		else if (aprs_interval_value.isEnabled())
-			aprs_interval_value.setToolTipText("Software version doesn't support setting the APRS SSID");
+			aprs_ssid_value.setToolTipText("Set the APRS SSID (secondary station identifier)");
+		else if (aprs_ssid_value.isEnabled())
+			aprs_ssid_value.setToolTipText("Software version doesn't support setting the APRS SSID");
 		else
-			aprs_interval_value.setToolTipText("Hardware doesn't support APRS");
+			aprs_ssid_value.setToolTipText("Hardware doesn't support APRS");
+	}
+
+	void set_aprs_format_tool_tip() {
+		if (aprs_format_value.isEnabled())
+			aprs_format_value.setToolTipText("Set the APRS format (compressed/uncompressed)");
+		else if (aprs_format_value.isEnabled())
+			aprs_format_value.setToolTipText("Software version doesn't support setting the APRS format");
+		else
+			aprs_format_value.setToolTipText("Hardware doesn't support APRS");
 	}
 
 	void set_flight_log_max_tool_tip() {
@@ -575,6 +587,33 @@ public class AltosConfigUI
 		aprs_ssid_value.setMaximumRowCount(aprs_ssid_values.length);
 		pane.add(aprs_ssid_value, c);
 		set_aprs_ssid_tool_tip();
+		row++;
+
+		/* APRS format */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		aprs_format_label = new JLabel("APRS format:");
+		pane.add(aprs_format_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		aprs_format_value = new JComboBox<String>(AltosLib.ao_aprs_format_name);
+		aprs_format_value.setEditable(false);
+		aprs_format_value.addItemListener(this);
+		aprs_format_value.setMaximumRowCount(AltosLib.ao_aprs_format_name.length);
+		pane.add(aprs_format_value, c);
+		set_aprs_format_tool_tip();
 		row++;
 
 		/* Callsign */
@@ -938,8 +977,13 @@ public class AltosConfigUI
 
 	}
 
-	public int main_deploy() {
-		return (int) (AltosConvert.height.parse(main_deploy_value.getSelectedItem().toString()) + 0.5);
+	public int main_deploy() throws AltosConfigDataException {
+		String	str = main_deploy_value.getSelectedItem().toString();
+		try {
+			return (int) (AltosConvert.height.parse_locale(str) + 0.5);
+		} catch (ParseException pe) {
+			throw new AltosConfigDataException("invalid main deploy height %s", str);
+		}
 	}
 
 	String get_main_deploy_label() {
@@ -968,14 +1012,21 @@ public class AltosConfigUI
 		String v = main_deploy_value.getSelectedItem().toString();
 		main_deploy_label.setText(get_main_deploy_label());
 		set_main_deploy_values();
-		int m = (int) (AltosConvert.height.parse(v, !imperial_units) + 0.5);
-		set_main_deploy(m);
+		try {
+			int m = (int) (AltosConvert.height.parse_locale(v, !imperial_units) + 0.5);
+			set_main_deploy(m);
+		} catch (ParseException pe) {
+		}
 
 		if (tracker_motion_value.isEnabled()) {
 			String motion = tracker_motion_value.getSelectedItem().toString();
 			tracker_motion_label.setText(get_tracker_motion_label());
 			set_tracker_motion_values();
-			set_tracker_motion((int) (AltosConvert.height.parse(motion, !imperial_units) + 0.5));
+			try {
+				int m = (int) (AltosConvert.height.parse_locale(motion, !imperial_units) + 0.5);
+				set_tracker_motion(m);
+			} catch (ParseException pe) {
+			}
 		}
 
 		if (!was_dirty)
@@ -1234,7 +1285,12 @@ public class AltosConfigUI
 	}
 
 	public int tracker_motion() throws AltosConfigDataException {
-		return (int) AltosConvert.height.parse(tracker_motion_value.getSelectedItem().toString());
+		String str = tracker_motion_value.getSelectedItem().toString();
+		try {
+			return (int) (AltosConvert.height.parse_locale(str) + 0.5);
+		} catch (ParseException pe) {
+			throw new AltosConfigDataException("invalid tracker motion %s", str);
+		}
 	}
 
 	public void set_tracker_interval(int tracker_interval) {
@@ -1312,5 +1368,17 @@ public class AltosConfigUI
 	public int aprs_ssid() throws AltosConfigDataException {
 		Integer i = (Integer) aprs_ssid_value.getSelectedItem();
 		return i;
+	}
+
+	public void set_aprs_format(int new_aprs_format) {
+		aprs_format_value.setVisible(new_aprs_format >= 0);
+		aprs_format_label.setVisible(new_aprs_format >= 0);
+
+		aprs_format_value.setSelectedIndex(Math.max(0,new_aprs_format));
+		set_aprs_format_tool_tip();
+	}
+
+	public int aprs_format() throws AltosConfigDataException {
+		return aprs_format_value.getSelectedIndex();
 	}
 }

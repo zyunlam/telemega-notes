@@ -17,14 +17,23 @@
 package org.altusmetrum.AltosDroid;
 
 import android.content.Context;
-import org.altusmetrum.altoslib_6.*;
+import org.altusmetrum.altoslib_8.*;
 
 public class AltosDroidPreferences extends AltosPreferences {
 
 	/* Active device preference name */
-	final static String activeDevicePreference = "ACTIVE-DEVICE";
+	final static String activeDeviceAddressPreference = "ACTIVE-DEVICE-ADDRESS";
+	final static String activeDeviceNamePreference = "ACTIVE-DEVICE-NAME";
 
-	static String active_device_address;
+	static DeviceAddress	active_device_address;
+
+	/* Map source preference name */
+	final static String mapSourcePreference = "MAP-SOURCE";
+
+	static final int	MAP_SOURCE_OFFLINE = 0;
+	static final int	MAP_SOURCE_ONLINE = 1;
+
+	static int	map_source;
 
 	public static void init(Context context) {
 		if (backend != null)
@@ -32,20 +41,41 @@ public class AltosDroidPreferences extends AltosPreferences {
 
 		AltosPreferences.init(new AltosDroidPreferencesBackend(context));
 
-		active_device_address = backend.getString(activeDevicePreference, null);
+		String address = backend.getString(activeDeviceAddressPreference, null);
+		String name = backend.getString(activeDeviceNamePreference, null);
+
+		if (address != null && name != null)
+			active_device_address = new DeviceAddress (address, name);
+
+		map_source = backend.getInt(mapSourcePreference, MAP_SOURCE_ONLINE);
 	}
 
-	public static void set_active_device(String address) {
+	public static void set_active_device(DeviceAddress address) {
 		synchronized(backend) {
 			active_device_address = address;
-			backend.putString(activeDevicePreference, active_device_address);
+			backend.putString(activeDeviceAddressPreference, active_device_address.address);
+			backend.putString(activeDeviceNamePreference, active_device_address.name);
 			flush_preferences();
 		}
 	}
 
-	public static String active_device() {
+	public static DeviceAddress active_device() {
 		synchronized(backend) {
 			return active_device_address;
+		}
+	}
+
+	public static void set_map_source(int map_source) {
+		synchronized(backend) {
+			AltosDroidPreferences.map_source = map_source;
+			backend.putInt(mapSourcePreference, map_source);
+			flush_preferences();
+		}
+	}
+
+	public static int map_source() {
+		synchronized(backend) {
+			return map_source;
 		}
 	}
 }

@@ -28,12 +28,12 @@ main (int argc, char **argv)
 	struct cc_usbdev	*dev;
 	int			i;
 
-	devs = cc_usbdevs_scan();
+	devs = cc_usbdevs_scan(TRUE);
 	if (devs) {
 		for (i = 0; i < devs->ndev; i++) {
 			dev = devs->dev[i];
 			printf ("%-20.20s %6d %s\n",
-				dev->product, dev->serial, dev->tty);
+				dev->product, dev->serial, dev->tty ? dev->tty : "(none)");
 		}
 		cc_usbdevs_free(devs);
 	}

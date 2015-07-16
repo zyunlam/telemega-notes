@@ -24,8 +24,8 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_6.*;
-import org.altusmetrum.altosuilib_6.*;
+import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altosuilib_8.*;
 
 public class AltosIgniteUI
 	extends AltosUIDialog
@@ -49,8 +49,6 @@ public class AltosIgniteUI
 	boolean		timer_running;
 
 	LinkedBlockingQueue<String>	command_queue;
-
-	LinkedBlockingQueue<String>	reply_queue;
 
 	class Igniter {
 		JRadioButton	button;
@@ -150,8 +148,7 @@ public class AltosIgniteUI
 						}
 						reply = "status";
 					} else if (command.equals("get_npyro")) {
-						put_reply(String.format("%d", ignite.npyro()));
-						continue;
+						reply = String.format("npyro %d", ignite.npyro());
 					} else if (command.equals("quit")) {
 						ignite.close();
 						break;
@@ -211,6 +208,9 @@ public class AltosIgniteUI
 			set_ignite_status();
 		} else if (reply.equals("fired")) {
 			fired();
+		} else if (reply.startsWith("npyro")) {
+			npyro = Integer.parseInt(reply.substring(6));
+			make_ui();
 		}
 	}
 
@@ -250,24 +250,6 @@ public class AltosIgniteUI
 		}
 	}
 
-	void put_reply(String reply) {
-		try {
-			reply_queue.put(reply);
-		} catch (Exception ex) {
-			ignite_exception(ex);
-		}
-	}
-
-	String get_reply() {
-		String reply = "";
-		try {
-			reply = reply_queue.take();
-		} catch (Exception ex) {
-			ignite_exception(ex);
-		}
-		return reply;
-	}
-
 	boolean	getting_status = false;
 
 	boolean	visible = false;
@@ -287,12 +269,6 @@ public class AltosIgniteUI
 		}
 	}
 
-	int get_npyro() {
-		send_command("get_npyro");
-		String reply = get_reply();
-		return Integer.parseInt(reply);
-	}
-
 	boolean	firing = false;
 
 	void start_fire(String which) {
@@ -310,8 +286,9 @@ public class AltosIgniteUI
 	void close() {
 		if (opened) {
 			send_command("quit");
-			timer.stop();
 		}
+		if (timer != null)
+			timer.stop();
 		setVisible(false);
 		dispose();
 	}
@@ -383,7 +360,6 @@ public class AltosIgniteUI
 
 	private boolean open() {
 		command_queue = new LinkedBlockingQueue<String>();
-		reply_queue = new LinkedBlockingQueue<String>();
 
 		opened = false;
 		device = AltosDeviceUIDialog.show(owner, Altos.product_any);
@@ -403,13 +379,7 @@ public class AltosIgniteUI
 		return false;
 	}
 
-	public AltosIgniteUI(JFrame in_owner) {
-
-		owner = in_owner;
-
-		if (!open())
-			return;
-
+	private void make_ui() {
 		group = new ButtonGroup();
 
 		Container		pane = getContentPane();
@@ -421,8 +391,6 @@ public class AltosIgniteUI
 		timer.setActionCommand("tick");
 		timer_running = false;
 		timer.restart();
-
-		owner = in_owner;
 
 		pane.setLayout(new GridBagLayout());
 
@@ -442,8 +410,6 @@ public class AltosIgniteUI
 		pane.add(label, c);
 
 		y++;
-
-		int npyro = get_npyro();
 
 		igniters = new Igniter[2 + npyro];
 
@@ -491,5 +457,15 @@ public class AltosIgniteUI
 		setLocationRelativeTo(owner);
 
 		addWindowListener(new ConfigListener(this));
+	}
+
+	public AltosIgniteUI(JFrame in_owner) {
+
+		owner = in_owner;
+
+		if (!open())
+			return;
+
+		send_command("get_npyro");
 	}
 }
