@@ -3990,6 +3990,18 @@ NAR #88757, TRA #12200
       </para>
     </section>
     <section>
+      <title>Charging TeleBT Battery</title>
+      <para>
+	Before using TeleBT with AltosDroid, make sure the internal 
+	TeleBT battery is charged.  To do this, attach a micro USB
+	cable from a computer or other USB power source to TeleBT.
+	A dual LED on the circuit board should illuminate, showing
+	red while the battery is charging, green when charging is
+	completed, and both red and green on at the same time if
+	there is a battery fault.
+      </para>
+    </section>
+    <section>
       <title>Connecting to TeleBT over Bluetooth™</title>
       <para>
 	Press the Android 'Menu' button or soft-key to see the
