@@ -23,5 +23,6 @@ AO_ROMCONFIG_SYMBOL (0) uint16_t ao_serial_number = 0;
 #ifndef AO_RADIO_CAL_DEFAULT
 #define AO_RADIO_CAL_DEFAULT 0x01020304
 #endif
+#if HAS_RADIO
 AO_ROMCONFIG_SYMBOL (0) uint32_t ao_radio_cal = AO_RADIO_CAL_DEFAULT;
-
+#endif
