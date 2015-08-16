@@ -1,62 +1,61 @@
 #!/bin/sh
 
-if [ -x ../ao-tools/ao-load/ao-load ]; then
-	AOLOAD=../ao-tools/ao-load/ao-load
-elif [ -x /usr/bin/ao-load ]; then
-	AOLOAD=/usr/bin/ao-load
+if [ -x /usr/bin/ao-flash-stm ]; then
+	FLASH_STM=/usr/bin/ao-flash-stm
 else
-	echo "Can't find ao-load!  Aborting."
+	echo "Can't find ao-flash-stm!  Aborting."
 	exit 1
 fi
 
-if [ -x ../ao-tools/ao-rawload/ao-rawload ]; then
-	RAWLOAD=../ao-tools/ao-rawload/ao-rawload
-elif [ -x /usr/bin/ao-rawload ]; then
-	RAWLOAD=/usr/bin/ao-rawload
+if [ -x /usr/bin/ao-usbload ]; then
+	USBLOAD=/usr/bin/ao-usbload
 else
-	echo "Can't find ao-rawload!  Aborting."
+	echo "Can't find ao-usbload!  Aborting."
 	exit 1
 fi
 
-echo "TeleBT v1.1 Turn-On and Calibration Program"
-echo "Copyright 2013 by Bdale Garbee.  Released under GPL v2"
+VERSION=3.0
+REPO=~/altusmetrumllc/Binaries
+
+echo "TeleBT v$VERSION Turn-On and Calibration Program"
+echo "Copyright 2015 by Bdale Garbee.  Released under GPL v2"
 echo
 echo "Expectations:"
-echo "\tTeleBT v1.1 powered from USB"
-echo "\t\twith TeleDonlge (on /dev/ttyACM0) cabled to debug header"
-echo "\t\twith coax from SMA to frequency counter"
+echo "\tTeleBT v$VERSION powered from USB"
+echo "\t\twith ST-Link-V2 cabled to debug header"
+echo "\t\twith coax from UHF to frequency counter"
 echo
-echo -n "TeleBT serial number: "
+echo -n "TeleBT-$VERSION serial number: "
 read SERIAL
 
-echo $RAWLOAD
+echo $FLASH_STM
 
-case $USER in
-    bdale)
-	DONGLE=100
+$FLASH_STM $REPO/loaders/telebt-v$VERSION*.elf || exit 1
+
+sleep 5
+
+$USBLOAD --serial=$SERIAL $REPO/telebt-v$VERSION*.elf || exit 1
+
+sleep 5
+
+dev=`ao-list | awk '/TeleBT-v'"$VERSION"'/ { print $3; exit(0); }'`
+
+case "$dev" in
+/dev/tty*)
+	echo "TeleBT found on $dev"
 	;;
-    keithp)
-	DONGLE=186
-	;;
-    *)
-	echo "Unknow user"
+*)
+	echo 'No TeleBT-v'"$VERSION"' found'
 	exit 1
 	;;
 esac
 
-$RAWLOAD -D $DONGLE -r ao_led_blink.ihx
-echo "LEDs should be blinking"
-sleep 5
+echo 'E 0' > $dev
 
-$RAWLOAD -D $DONGLE -r ao_radio_xmit.ihx
-echo -n "Generating RF carrier.  Please enter measured frequency: "
-read FREQ
+SERIAL=$SERIAL ./cal-freq $dev
 
-CAL_VALUE=`nickle -e "floor(434.55 / $FREQ * 1186611 + 0.5)"`
+echo 'E 1' > $dev
 
-echo "Programming flash with cal value " $CAL_VALUE
-$AOLOAD -D $DONGLE --cal $CAL_VALUE ~/altusmetrumllc/Binaries/telebt-v1.0*.ihx $SERIAL
+echo "TeleBT-v$VERSION $SERIAL is ready to ship"
 
-echo "Serial number "$SERIAL" programmed with RF cal value "$CAL_VALUE
-echo $SERIAL","$CAL_VALUE >> cal_values
-echo "Unplug debug cable, power cycle, cu to the board, confirm freq and record power"
+exit $?

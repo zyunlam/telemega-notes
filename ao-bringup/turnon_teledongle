@@ -58,7 +58,7 @@ esac
 
 echo 'E 0' > $dev
 
-./cal-freq-file $dev $SERIAL
+SERIAL=$SERIAL ./cal-freq $dev
 
 case $? in
     0)
