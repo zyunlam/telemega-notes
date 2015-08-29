@@ -27,6 +27,6 @@ void
 ao_lco_arm(uint16_t box, uint8_t channels, uint16_t tick_offset);
 
 void
-ao_lco_ignite(uint16_t box, uint8_t channels, uint16_t tick_offset);
+ao_lco_ignite(void);
 
 #endif /* _AO_LCO_FUNC_H_ */
