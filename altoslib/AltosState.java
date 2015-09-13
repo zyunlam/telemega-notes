@@ -284,7 +284,7 @@ public class AltosState implements Cloneable, Serializable {
 		}
 	}
 
-	public int	state;
+	private int	state;
 	public int	flight;
 	public int	serial;
 	public int	altitude_32;
@@ -1054,6 +1054,10 @@ public class AltosState implements Cloneable, Serializable {
 				  state <= AltosLib.ao_flight_coast);
 			boost = (AltosLib.ao_flight_boost == state);
 		}
+	}
+
+	public int state() {
+		return state;
 	}
 
 	public void set_device_type(int device_type) {

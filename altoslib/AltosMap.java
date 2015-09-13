@@ -230,23 +230,23 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		if (!gps.locked && gps.nsat < 4)
 			return;
 
-		switch (state.state) {
+		switch (state.state()) {
 		case AltosLib.ao_flight_boost:
 			if (!have_boost) {
-				add_mark(gps.lat, gps.lon, state.state);
+				add_mark(gps.lat, gps.lon, state.state());
 				have_boost = true;
 			}
 			break;
 		case AltosLib.ao_flight_landed:
 			if (!have_landed) {
-				add_mark(gps.lat, gps.lon, state.state);
+				add_mark(gps.lat, gps.lon, state.state());
 				have_landed = true;
 			}
 			break;
 		}
 
 		if (path != null) {
-			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state.state);
+			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state.state());
 
 			if (damage != null)
 				repaint(damage, AltosMapPath.stroke_width);
@@ -324,6 +324,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 				if (!tiles.containsKey(point)) {
 					AltosLatLon	ul = transform.lat_lon(point);
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
+					debug("make tile %g,%g\n", center.lat, center.lon);
 					AltosMapTile tile = map_interface.new_tile(this, ul, center, zoom, maptype, px_size);
 					tiles.put(point, tile);
 				}

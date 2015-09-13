@@ -112,8 +112,8 @@ public class AltosKML implements AltosWriter {
 	boolean	started = false;
 
 	void state_start(AltosState state) {
-		String	state_name = AltosLib.state_name(state.state);
-		String	state_color = state_color(state.state);
+		String	state_name = AltosLib.state_name(state.state());
+		String	state_color = state_color(state.state());
 		out.printf(kml_style_start, state_name, state_color);
 		out.printf("\tState: %s\n", state_name);
 		out.printf("%s", kml_style_end);
@@ -171,8 +171,8 @@ public class AltosKML implements AltosWriter {
 		}
 		if (prev != null && prev.gps_sequence == state.gps_sequence)
 			return;
-		if (state.state != flight_state) {
-			flight_state = state.state;
+		if (state.state() != flight_state) {
+			flight_state = state.state();
 			if (prev != null) {
 				coord(state);
 				state_end(prev);

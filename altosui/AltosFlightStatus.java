@@ -173,14 +173,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		int	last_state = -1;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.state != last_state) {
-				if (state.state == AltosLib.ao_flight_stateless)
+			if (state.state() != last_state) {
+				if (state.state() == AltosLib.ao_flight_stateless)
 					hide();
 				else {
 					show();
 					value.setText(state.state_name());
 				}
-				last_state = state.state;
+				last_state = state.state();
 			}
 		}
 

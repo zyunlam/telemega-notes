@@ -75,7 +75,7 @@ public class AltosTelemetryFile extends AltosStateIterable {
 		for (AltosTelemetry telem : telems) {
 			telem.update_state(state);
 			state.finish_update();
-			if (state.state != AltosLib.ao_flight_invalid && state.state >= AltosLib.ao_flight_boost) {
+			if (state.state() != AltosLib.ao_flight_invalid && state.state() >= AltosLib.ao_flight_boost) {
 				start.set_boost_tick(state.tick);
 				break;
 			}

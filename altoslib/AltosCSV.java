@@ -129,7 +129,7 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_flight(AltosState state) {
-		out.printf("%d,%8s", state.state, state.state_name());
+		out.printf("%d,%8s", state.state(), state.state_name());
 	}
 
 	void write_basic_header() {
@@ -326,14 +326,14 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	private void write(AltosState state) {
-		if (state.state == AltosLib.ao_flight_startup)
+		if (state.state() == AltosLib.ao_flight_startup)
 			return;
 		if (!header_written) {
 			write_header();
 			header_written = true;
 		}
 		if (!seen_boost) {
-			if (state.state >= AltosLib.ao_flight_boost) {
+			if (state.state() >= AltosLib.ao_flight_boost) {
 				seen_boost = true;
 				boost_tick = state.tick;
 				flush_pad();
@@ -368,7 +368,7 @@ public class AltosCSV implements AltosWriter {
 		has_gps_sat = false;
 		has_companion = false;
 		for (AltosState state : states) {
-			if (state.state != AltosLib.ao_flight_stateless && state.state != AltosLib.ao_flight_invalid && state.state != AltosLib.ao_flight_startup)
+			if (state.state() != AltosLib.ao_flight_stateless && state.state() != AltosLib.ao_flight_invalid && state.state() != AltosLib.ao_flight_startup)
 				has_flight_state = true;
 			if (state.acceleration() != AltosLib.MISSING || state.pressure() != AltosLib.MISSING)
 				has_basic = true;

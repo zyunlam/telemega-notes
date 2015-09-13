@@ -111,12 +111,12 @@ public class AltosEepromDownload implements Runnable {
 				monitor.set_flight(state.flight);
 
 			/* Monitor state transitions to update display */
-			if (state.state != AltosLib.ao_flight_invalid &&
-			    state.state <= AltosLib.ao_flight_landed)
+			if (state.state() != AltosLib.ao_flight_invalid &&
+			    state.state() <= AltosLib.ao_flight_landed)
 			{
-				if (state.state > AltosLib.ao_flight_pad)
+				if (state.state() > AltosLib.ao_flight_pad)
 					want_file = true;
-				if (state.state == AltosLib.ao_flight_landed)
+				if (state.state() == AltosLib.ao_flight_landed)
 					done = true;
 			}
 
@@ -174,13 +174,13 @@ public class AltosEepromDownload implements Runnable {
 
 			CaptureEeprom (eechunk, log_format);
 
-			if (state.state != prev_state && state.state != AltosLib.ao_flight_invalid) {
+			if (state.state() != prev_state && state.state() != AltosLib.ao_flight_invalid) {
 				state_block = block;
-				prev_state = state.state;
+				prev_state = state.state();
 			}
 
 			monitor.set_value(state.state_name(),
-					  state.state,
+					  state.state(),
 					  block - state_block,
 					  block - log.start_block);
 		}

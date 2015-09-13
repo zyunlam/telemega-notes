@@ -53,13 +53,13 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 
 	JComponent cur_tab = null;
 	JComponent which_tab(AltosState state) {
-		if (state.state < Altos.ao_flight_boost)
+		if (state.state() < Altos.ao_flight_boost)
 			return pad;
-		if (state.state <= Altos.ao_flight_coast)
+		if (state.state() <= Altos.ao_flight_coast)
 			return ascent;
-		if (state.state <= Altos.ao_flight_main)
+		if (state.state() <= Altos.ao_flight_main)
 			return descent;
-		if (state.state == AltosLib.ao_flight_stateless)
+		if (state.state() == AltosLib.ao_flight_stateless)
 			return descent;
 		return landed;
 	}
@@ -102,7 +102,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		if (state == null)
 			state = new AltosState();
 
-		if (state.state != Altos.ao_flight_startup) {
+		if (state.state() != Altos.ao_flight_startup) {
 			if (!has_state) {
 				pane.setTitleAt(0, "Launch Pad");
 				pane.add(ascent, 1);
