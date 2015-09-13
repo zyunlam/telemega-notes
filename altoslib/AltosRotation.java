@@ -28,7 +28,7 @@ public class AltosRotation {
 	}
 
 	public void rotate(double dt, double x, double y, double z) {
-		AltosQuaternion	rot = AltosQuaternion.half_euler(x * dt, y * dt, z * dt);
+		AltosQuaternion	rot = AltosQuaternion.half_euler(x * dt / 2.0, y * dt / 2.0, z * dt / 2.0);
 		rotation = rot.multiply(rotation).normalize();
 	}
 
