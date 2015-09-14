@@ -45,7 +45,7 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:hint="@string/preload_latitude_label"
-		android:inputType="number"/>
+		android:inputType="number|numberSigned|numberDecimal"/>
       <TextView android:id="@+id/preload_longitude_label"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:hint="@string/preload_longitude_label"
-		android:inputType="number"/>
+		android:inputType="number|numberSigned|numberDecimal"/>
       <TextView android:id="@+id/preload_types"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
