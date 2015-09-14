@@ -52,7 +52,10 @@ static uint16_t	ao_lco_fire_tick;
 static uint8_t	ao_lco_fire_down;
 static uint8_t	ao_lco_drag_race;
 static uint8_t	ao_lco_pad;
-static uint8_t	ao_lco_box;
+static int16_t	ao_lco_box;
+
+#define AO_LCO_BOX_DRAG		0x1000
+
 static struct ao_pad_query	ao_pad_query;
 
 static uint8_t	ao_lco_display_mutex;
@@ -65,12 +68,34 @@ ao_lco_set_pad(uint8_t pad)
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
+#define SEVEN_SEGMENT_d		((0 << 0) |	\
+				 (0 << 1) |	\
+				 (1 << 2) |	\
+				 (1 << 3) |	\
+				 (1 << 4) |	\
+				 (1 << 5) |	\
+				 (1 << 6))
+
+
+#define SEVEN_SEGMENT_r		((0 << 0) |	\
+				 (0 << 1) |	\
+				 (0 << 2) |	\
+				 (1 << 3) |	\
+				 (1 << 4) |	\
+				 (0 << 5) |	\
+				 (0 << 6))
+
 static void
-ao_lco_set_box(uint8_t box)
+ao_lco_set_box(uint16_t box)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
-	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, box % 10 | (ao_lco_drag_race << 4));
-	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, box / 10 | (ao_lco_drag_race << 4));
+	if (box == AO_LCO_BOX_DRAG) {
+		ao_seven_segment_direct(AO_LCO_BOX_DIGIT_10, SEVEN_SEGMENT_d | (ao_lco_drag_race << 7));
+		ao_seven_segment_direct(AO_LCO_BOX_DIGIT_1, SEVEN_SEGMENT_r | (ao_lco_drag_race << 7));
+	} else {
+		ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, box % 10 | (ao_lco_drag_race << 4));
+		ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, box / 10 | (ao_lco_drag_race << 4));
+	}
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
@@ -92,39 +117,15 @@ ao_lco_set_voltage(uint16_t decivolts)
 static void
 ao_lco_set_display(void)
 {
-	if (ao_lco_pad == 0) {
+	if (ao_lco_pad == 0 && ao_lco_box != AO_LCO_BOX_DRAG) {
 		ao_lco_set_voltage(ao_pad_query.battery);
 	} else {
-		ao_lco_set_pad(ao_lco_pad);
+		if (ao_lco_box == AO_LCO_BOX_DRAG)
+			ao_lco_set_pad(ao_lco_drag_race);
+		else
+			ao_lco_set_pad(ao_lco_pad);
 		ao_lco_set_box(ao_lco_box);
 	}
-}
-
-#define SEVEN_SEGMENT_d		((0 << 0) |	\
-				 (0 << 1) |	\
-				 (1 << 2) |	\
-				 (1 << 3) |	\
-				 (1 << 4) |	\
-				 (1 << 5) |	\
-				 (1 << 6))
-
-
-#define SEVEN_SEGMENT_r		((0 << 0) |	\
-				 (0 << 1) |	\
-				 (0 << 2) |	\
-				 (1 << 3) |	\
-				 (1 << 4) |	\
-				 (0 << 5) |	\
-				 (0 << 6))
-
-static void
-ao_lco_set_display_drag(void)
-{
-	ao_mutex_get(&ao_lco_display_mutex);
-	ao_seven_segment_direct(AO_LCO_BOX_DIGIT_10, SEVEN_SEGMENT_d | 0x80);
-	ao_seven_segment_direct(AO_LCO_BOX_DIGIT_1, SEVEN_SEGMENT_r | 0x80);
-	ao_mutex_put(&ao_lco_display_mutex);
-	ao_lco_set_pad(ao_lco_pad);
 }
 
 #define MASK_SIZE(n)	(((n) + 7) >> 3)
@@ -134,8 +135,11 @@ ao_lco_set_display_drag(void)
 static uint8_t	ao_lco_box_mask[MASK_SIZE(AO_PAD_MAX_BOXES)];
 
 static uint8_t
-ao_lco_box_present(uint8_t box)
+ao_lco_box_present(uint16_t box)
 {
+	if (box == AO_LCO_BOX_DRAG)
+		return 1;
+
 	if (box >= AO_PAD_MAX_BOXES)
 		return 0;
 	return (ao_lco_box_mask[MASK_ID(box)] >> MASK_SHIFT(box)) & 1;
@@ -171,8 +175,6 @@ static uint8_t		ao_lco_drag_beep_count;
 static uint8_t		ao_lco_drag_beep_on;
 static uint16_t		ao_lco_drag_beep_time;
 static uint16_t		ao_lco_drag_warn_time;
-static uint16_t		ao_lco_drag_display_time;
-static uint8_t		ao_lco_drag_display_on;
 
 #define AO_LCO_DRAG_BEEP_TIME	AO_MS_TO_TICKS(50)
 #define AO_LCO_DRAG_WARN_TIME	AO_SEC_TO_TICKS(5)
@@ -237,10 +239,8 @@ ao_lco_drag_enable(void)
 	ao_lco_drag_race = 1;
 	memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 	ao_lco_drag_beep(5);
-	ao_lco_set_display_drag();
+	ao_lco_set_display();
 	ao_lco_fire_down = 0;
-	ao_lco_drag_display_on = 1;
-	ao_lco_drag_display_time = ao_time() + AO_SEC_TO_TICKS(5);
 }
 
 static void
@@ -298,24 +298,6 @@ ao_lco_drag_warn_check(uint16_t now, uint16_t delay)
 	return delay;
 }
 
-static uint16_t
-ao_lco_drag_display_check(uint16_t now, uint16_t delay)
-{
-	uint16_t	display_delay;
-
-	if (ao_lco_drag_display_on) {
-		if ((int16_t) (now - ao_lco_drag_display_time) >= 0) {
-			ao_lco_drag_display_on = 0;
-			ao_lco_set_display();
-		} else {
-			display_delay = ao_lco_drag_display_time - now;
-			if (delay > display_delay)
-				delay = display_delay;
-		}
-	}
-	return delay;
-}
-
 static void
 ao_lco_drag_monitor(void)
 {
@@ -337,7 +319,6 @@ ao_lco_drag_monitor(void)
 		delay = ao_lco_drag_button_check(now, delay);
 		delay = ao_lco_drag_warn_check(now, delay);
 		delay = ao_lco_drag_beep_check(now, delay);
-		delay = ao_lco_drag_display_check(now, delay);
 
 		/* check to see if there's anything left to do here */
 		if (!ao_lco_fire_down && !ao_lco_drag_race && !ao_lco_drag_beep_count) {
@@ -351,7 +332,8 @@ static void
 ao_lco_input(void)
 {
 	static struct ao_event	event;
-	int8_t	dir, new_box, new_pad;
+	int8_t		dir, new_pad;
+	int16_t		new_box;
 
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
 	for (;;) {
@@ -385,18 +367,26 @@ ao_lco_input(void)
 					dir = (int8_t) event.value;
 					new_box = ao_lco_box;
 					do {
-						new_box += dir;
-						if (new_box > ao_lco_max_box)
-							new_box = ao_lco_min_box;
-						else if (new_box < ao_lco_min_box)
-							new_box = ao_lco_max_box;
+						if (new_box == AO_LCO_BOX_DRAG) {
+							if (dir < 0)
+								new_box = ao_lco_max_box;
+							else
+								new_box = ao_lco_min_box;
+						} else {
+							new_box += dir;
+							if (new_box > ao_lco_max_box)
+								new_box = AO_LCO_BOX_DRAG;
+							else if (new_box < ao_lco_min_box)
+								new_box = AO_LCO_BOX_DRAG;
+						}
 						if (new_box == ao_lco_box)
 							break;
 					} while (!ao_lco_box_present(new_box));
 					if (ao_lco_box != new_box) {
 						ao_lco_box = new_box;
 						ao_lco_pad = 1;
-						ao_lco_channels[ao_lco_box] = 0;
+						if (ao_lco_box != AO_LCO_BOX_DRAG)
+							ao_lco_channels[ao_lco_box] = 0;
 						ao_lco_set_display();
 					}
 				}
@@ -418,9 +408,12 @@ ao_lco_input(void)
 								break;
 							}
 						}
-					} else if (ao_lco_pad != 0) {
+					} else {
 						memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
-						ao_lco_selected[ao_lco_box] = (1 << (ao_lco_pad - 1));
+						if (ao_lco_pad != 0 && ao_lco_box != AO_LCO_BOX_DRAG)
+							ao_lco_selected[ao_lco_box] = (1 << (ao_lco_pad - 1));
+						else
+							ao_lco_armed = 0;
 					}
 				}
 				ao_wakeup(&ao_lco_armed);
@@ -433,12 +426,13 @@ ao_lco_input(void)
 					ao_wakeup(&ao_lco_armed);
 				} else {
 					if (event.value) {
-						ao_lco_fire_down = 1;
-						ao_lco_fire_tick = ao_time();
-						ao_lco_drag_active = 1;
-						/* ao_lco_fire_down will already be off if we just enabled drag mode */
-						if (ao_lco_fire_down && ao_lco_drag_race) {
-							if (ao_lco_pad != 0) {
+						if (ao_lco_box == AO_LCO_BOX_DRAG) {
+							ao_lco_fire_down = 1;
+							ao_lco_fire_tick = ao_time();
+							ao_lco_drag_active = 1;
+						}
+						if (ao_lco_drag_race) {
+							if (ao_lco_pad != 0 && ao_lco_box != AO_LCO_BOX_DRAG) {
 								ao_lco_selected[ao_lco_box] ^= (1 << (ao_lco_pad - 1));
 								PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
 								       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);
@@ -505,16 +499,18 @@ ao_lco_get_channels(uint8_t box, struct ao_pad_query *query)
 static void
 ao_lco_update(void)
 {
-	uint8_t	previous_valid = ao_lco_valid[ao_lco_box];
+	if (ao_lco_box != AO_LCO_BOX_DRAG) {
+		uint8_t	previous_valid = ao_lco_valid[ao_lco_box];
 
-	if (ao_lco_get_channels(ao_lco_box, &ao_pad_query)) {
-		if (!previous_valid) {
-			if (ao_lco_pad != 0)
-				ao_lco_pad = ao_lco_pad_first(ao_lco_box);
-			ao_lco_set_display();
+		if (ao_lco_get_channels(ao_lco_box, &ao_pad_query)) {
+			if (!previous_valid) {
+				if (ao_lco_pad != 0)
+					ao_lco_pad = ao_lco_pad_first(ao_lco_box);
+				ao_lco_set_display();
+			}
+			if (ao_lco_pad == 0)
+				ao_lco_set_display();
 		}
-		if (ao_lco_pad == 0)
-			ao_lco_set_display();
 	}
 }
 
@@ -583,44 +579,50 @@ ao_lco_igniter_status(void)
 
 	for (;;) {
 		ao_sleep(&ao_pad_query);
-		PRINTD("RSSI %d VALID %d\n", ao_radio_cmac_rssi, ao_lco_valid[ao_lco_box]);
-		if (!ao_lco_valid[ao_lco_box]) {
-			ao_led_on(AO_LED_RED);
-			ao_led_off(AO_LED_GREEN|AO_LED_AMBER);
-			continue;
-		}
-		if (ao_radio_cmac_rssi < -90) {
-			ao_led_on(AO_LED_AMBER);
-			ao_led_off(AO_LED_RED|AO_LED_GREEN);
+		PRINTD("RSSI %d VALID %d\n", ao_radio_cmac_rssi, ao_lco_box == AO_LCO_BOX_DRAG ? -1 : ao_lco_valid[ao_lco_box]);
+		if (ao_lco_box == AO_LCO_BOX_DRAG) {
+			ao_led_off(AO_LED_RED|AO_LED_GREEN|AO_LED_AMBER);
+			for (c = 0; c < AO_LED_CONTINUITY_NUM; c++)
+				ao_led_off(continuity_led[c]);
 		} else {
-			ao_led_on(AO_LED_GREEN);
-			ao_led_off(AO_LED_RED|AO_LED_AMBER);
-		}
-		if (ao_pad_query.arm_status)
-			ao_led_on(AO_LED_REMOTE_ARM);
-		else
-			ao_led_off(AO_LED_REMOTE_ARM);
-
-		for (c = 0; c < AO_LED_CONTINUITY_NUM; c++) {
-			uint8_t	status;
-
-			if (ao_lco_drag_race) {
-				if (ao_lco_selected[ao_lco_box] & (1 << c) && t)
-					ao_led_on(continuity_led[c]);
-				else
-					ao_led_off(continuity_led[c]);
-			} else {
-				if (ao_pad_query.channels & (1 << c))
-					status = ao_pad_query.igniter_status[c];
-				else
-					status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
-				if (status == AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN)
-					ao_led_on(continuity_led[c]);
-				else
-					ao_led_off(continuity_led[c]);
+			if (!ao_lco_valid[ao_lco_box]) {
+				ao_led_on(AO_LED_RED);
+				ao_led_off(AO_LED_GREEN|AO_LED_AMBER);
+				continue;
 			}
+			if (ao_radio_cmac_rssi < -90) {
+				ao_led_on(AO_LED_AMBER);
+				ao_led_off(AO_LED_RED|AO_LED_GREEN);
+			} else {
+				ao_led_on(AO_LED_GREEN);
+				ao_led_off(AO_LED_RED|AO_LED_AMBER);
+			}
+			if (ao_pad_query.arm_status)
+				ao_led_on(AO_LED_REMOTE_ARM);
+			else
+				ao_led_off(AO_LED_REMOTE_ARM);
+
+			for (c = 0; c < AO_LED_CONTINUITY_NUM; c++) {
+				uint8_t	status;
+
+				if (ao_lco_drag_race) {
+					if (ao_lco_selected[ao_lco_box] & (1 << c) && t)
+						ao_led_on(continuity_led[c]);
+					else
+						ao_led_off(continuity_led[c]);
+				} else {
+					if (ao_pad_query.channels & (1 << c))
+						status = ao_pad_query.igniter_status[c];
+					else
+						status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
+					if (status == AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN)
+						ao_led_on(continuity_led[c]);
+					else
+						ao_led_off(continuity_led[c]);
+				}
+			}
+			t = 1-t;
 		}
-		t = 1-t;
 	}
 }
 
@@ -665,7 +667,7 @@ ao_lco_monitor(void)
 						PRINTD("Arming box %d pads %x\n",
 						       box, ao_lco_selected[box]);
 						if (ao_lco_valid[box])
-							ao_lco_arm(box, ao_lco_selected[box], ao_lco_tick_offset[ao_lco_box]);
+							ao_lco_arm(box, ao_lco_selected[box], ao_lco_tick_offset[box]);
 					}
 				}
 			}
