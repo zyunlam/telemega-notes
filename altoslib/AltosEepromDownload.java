@@ -147,7 +147,6 @@ public class AltosEepromDownload implements Runnable {
 
 		/* Reset per-capture variables */
 		want_file = false;
-		eeprom_file = null;
 		eeprom_pending = new LinkedList<String>();
 
 		/* Set serial number in the monitor dialog window */
@@ -185,10 +184,6 @@ public class AltosEepromDownload implements Runnable {
 					  block - log.start_block);
 		}
 		CheckFile(true);
-		if (eeprom_file != null) {
-			eeprom_file.flush();
-			eeprom_file.close();
-		}
 	}
 
 	public void run () {
@@ -201,10 +196,15 @@ public class AltosEepromDownload implements Runnable {
 				parse_exception = null;
 				if (log.selected) {
 					monitor.reset();
+					eeprom_file = null;
 					try {
 						CaptureLog(log);
 					} catch (ParseException e) {
 						parse_exception = e;
+					}
+					if (eeprom_file != null) {
+						eeprom_file.flush();
+						eeprom_file.close();
 					}
 				}
 				if (parse_exception != null) {
