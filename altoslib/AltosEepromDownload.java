@@ -35,7 +35,7 @@ public class AltosEepromDownload implements Runnable {
 
 	AltosEepromList		flights;
 	boolean			success;
-	ParseException		parse_exception;
+	String			parse_errors;
 	AltosState		state;
 
 	private void FlushPending() throws IOException {
@@ -88,6 +88,13 @@ public class AltosEepromDownload implements Runnable {
 		}
 	}
 
+	void LogError(String error) {
+		if (parse_errors != null)
+			parse_errors.concat(error.concat("\n"));
+		else
+			parse_errors = error;
+	}
+
 	void CaptureEeprom(AltosEepromChunk eechunk, int log_format) throws IOException, ParseException {
 		boolean any_valid = false;
 		boolean got_flight = false;
@@ -98,7 +105,14 @@ public class AltosEepromDownload implements Runnable {
 		monitor.set_serial(flights.config_data.serial);
 
 		for (int i = 0; i < AltosEepromChunk.chunk_size && !done; i += record_length) {
-			AltosEeprom r = eechunk.eeprom(i, log_format, state);
+			AltosEeprom r = null;
+
+			try {
+				r = eechunk.eeprom(i, log_format, state);
+			} catch (ParseException pe) {
+				LogError(pe.getMessage());
+				r = null;
+			}
 
 			if (r == null)
 				continue;
@@ -193,25 +207,25 @@ public class AltosEepromDownload implements Runnable {
 				link.start_remote();
 
 			for (AltosEepromLog log : flights) {
-				parse_exception = null;
+				parse_errors = null;
 				if (log.selected) {
 					monitor.reset();
 					eeprom_file = null;
 					try {
 						CaptureLog(log);
 					} catch (ParseException e) {
-						parse_exception = e;
+						LogError(e.getMessage());
 					}
 					if (eeprom_file != null) {
 						eeprom_file.flush();
 						eeprom_file.close();
 					}
 				}
-				if (parse_exception != null) {
+				if (parse_errors != null) {
 					failed = true;
-					monitor.show_message(String.format("Flight %d download error\n%s\nValid log data saved",
+					monitor.show_message(String.format("Flight %d download error. Valid log data saved\n%s",
 									   log.flight,
-									   parse_exception.getMessage()),
+									   parse_errors),
 							     link.name,
 							     AltosEepromMonitor.WARNING_MESSAGE);
 				}
