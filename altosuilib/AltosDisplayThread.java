@@ -219,12 +219,14 @@ public class AltosDisplayThread extends Thread {
 		try {
 			for (;;) {
 				try {
-					state = reader.read();
-					if (state == null) {
+					AltosState new_state = reader.read();
+					if (new_state == null) {
+						state = null;
 						listener_state.running = false;
 						break;
 					}
-					reader.update(state);
+					reader.update(new_state);
+					state = new_state;
 					show_safely();
 					told = tell();
 					idle_thread.notice(told);
