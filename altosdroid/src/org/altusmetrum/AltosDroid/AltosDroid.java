@@ -386,12 +386,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		AltosGreatCircle from_receiver = null;
 
 		if (saved_state != null)
-			prev_state = saved_state.state;
+			prev_state = saved_state.state();
 
 		if (state != null) {
 			set_screen_on(state_age(state));
 
-			if (state.state == AltosLib.ao_flight_stateless) {
+			if (state.state() == AltosLib.ao_flight_stateless) {
 				boolean	prev_locked = false;
 				boolean locked = false;
 
@@ -408,9 +408,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 					}
 				}
 			} else {
-				if (prev_state != state.state) {
+				if (prev_state != state.state()) {
 					String currentTab = mTabHost.getCurrentTabTag();
-					switch (state.state) {
+					switch (state.state()) {
 					case AltosLib.ao_flight_boost:
 						if (currentTab.equals(tab_pad_name)) mTabHost.setCurrentTabByTag(tab_flight_name);
 						break;
@@ -448,8 +448,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				else
 					mFlightView.setText(String.format("%d", state.flight));
 			}
-			if (saved_state == null || state.state != saved_state.state) {
-				if (state.state == AltosLib.ao_flight_stateless) {
+			if (saved_state == null || state.state() != saved_state.state()) {
+				if (state.state() == AltosLib.ao_flight_stateless) {
 					mStateLayout.setVisibility(View.GONE);
 				} else {
 					mStateView.setText(state.state_name());

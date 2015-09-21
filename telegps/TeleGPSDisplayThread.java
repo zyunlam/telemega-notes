@@ -129,7 +129,7 @@ public class TeleGPSDisplayThread extends Thread {
 		}
 
 		public synchronized void notice(boolean spoken) {
-			if (old_state != null && old_state.state != state.state) {
+			if (old_state != null && old_state.state() != state.state()) {
 				report_time = now();
 				this.notify();
 			} else if (spoken)
