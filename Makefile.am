@@ -39,6 +39,7 @@ fat_windows = \
 	micropeak/MicroPeak-Windows-$(VERSION_DASH).exe
 
 keithp-fat: fat
+	ssh keithp.com mkdir -p public_html/altos-$(VERSION)
 	scp -p $(fat_linux) $(fat_mac) $(fat_windows) keithp.com:public_html/altos-$(VERSION)
 
 set-java-versions:
