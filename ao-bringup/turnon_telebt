@@ -56,6 +56,15 @@ SERIAL=$SERIAL ./cal-freq $dev
 
 echo 'E 1' > $dev
 
+echo -n "checking BlueTooth functionality... "
+btdev=`hcitool scan | awk -F \- '/TeleBT/ { print $2 }'`
+if [ "$btdev" = "$SERIAL" ]; then
+	echo "working!"
+else
+	echo "device not found"
+	exit 1
+fi
+
 echo "TeleBT-v$VERSION $SERIAL is ready to ship"
 
 exit $?
