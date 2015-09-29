@@ -23,6 +23,10 @@
 #define ao_spi_fast(b)
 #endif
 
+#if !HAS_COMPANION
+#error HAS_COMPANION not set in ao_companion.c
+#endif
+
 #define COMPANION_SELECT()	do {			\
 		ao_spi_get_bit(AO_COMPANION_CS_PORT,	\
 			       AO_COMPANION_CS_PIN,	\

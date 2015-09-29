@@ -1358,11 +1358,6 @@ public class AltosState implements Cloneable, Serializable {
 		}
 	}
 
-	public void make_companion (int nchannels) {
-		if (companion == null)
-			companion = new AltosCompanion(nchannels);
-	}
-
 	public void set_companion(AltosCompanion companion) {
 		this.companion = companion;
 	}

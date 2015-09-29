@@ -168,10 +168,20 @@ static const uint8_t ao_segments[] = {
 	(0 << 6),		/* F */
 };
 
+
+void
+ao_seven_segment_direct(uint8_t digit, uint8_t segments)
+{
+	uint8_t	s;
+
+	for (s = 0; s <= 7; s++)
+		ao_lcd_set(digit, s, !!(segments & (1 << s)));
+	ao_lcd_flush();
+}
+
 void
 ao_seven_segment_set(uint8_t digit, uint8_t value)
 {
-	uint8_t	s;
 	uint8_t	segments;
 
 	if (value == AO_SEVEN_SEGMENT_CLEAR)
@@ -183,10 +193,7 @@ ao_seven_segment_set(uint8_t digit, uint8_t value)
 		if (value & 0x10)
 			segments |= (1 << 7);
 	}
-
-	for (s = 0; s <= 7; s++)
-		ao_lcd_set(digit, s, !!(segments & (1 << s)));
-	ao_lcd_flush();
+	ao_seven_segment_direct(digit, segments);
 }
 
 void
