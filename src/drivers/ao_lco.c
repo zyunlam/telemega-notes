@@ -39,6 +39,9 @@ static uint8_t	ao_lco_debug;
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
 
+#define AO_LCO_VALID_LAST	1
+#define AO_LCO_VALID_EVER	2
+
 static uint8_t	ao_lco_min_box, ao_lco_max_box;
 static uint8_t	ao_lco_selected[AO_PAD_MAX_BOXES];
 static uint8_t	ao_lco_valid[AO_PAD_MAX_BOXES];
@@ -488,10 +491,10 @@ ao_lco_get_channels(uint8_t box, struct ao_pad_query *query)
 	r = ao_lco_query(box, query, &ao_lco_tick_offset[box]);
 	if (r == AO_RADIO_CMAC_OK) {
 		ao_lco_channels[box] = query->channels;
-		ao_lco_valid[box] = 1;
+		ao_lco_valid[box] = AO_LCO_VALID_LAST | AO_LCO_VALID_EVER;
 	} else
-		ao_lco_valid[box] = 0;
-	PRINTD("ao_lco_get_channels(%d) rssi %d valid %d ret %d\n", box, ao_radio_cmac_rssi, ao_lco_valid[box], r);
+		ao_lco_valid[box] &= ~AO_LCO_VALID_LAST;
+	PRINTD("ao_lco_get_channels(%d) rssi %d valid %d ret %d offset %d\n", box, ao_radio_cmac_rssi, ao_lco_valid[box], r, ao_lco_tick_offset[box]);
 	ao_wakeup(&ao_pad_query);
 	return ao_lco_valid[box];
 }
@@ -502,8 +505,8 @@ ao_lco_update(void)
 	if (ao_lco_box != AO_LCO_BOX_DRAG) {
 		uint8_t	previous_valid = ao_lco_valid[ao_lco_box];
 
-		if (ao_lco_get_channels(ao_lco_box, &ao_pad_query)) {
-			if (!previous_valid) {
+		if (ao_lco_get_channels(ao_lco_box, &ao_pad_query) & AO_LCO_VALID_LAST) {
+			if (!(previous_valid & AO_LCO_VALID_EVER)) {
 				if (ao_lco_pad != 0)
 					ao_lco_pad = ao_lco_pad_first(ao_lco_box);
 				ao_lco_set_display();
@@ -537,7 +540,6 @@ ao_lco_box_set_present(uint8_t box)
 static void
 ao_lco_search(void)
 {
-	uint16_t	tick_offset;
 	int8_t		r;
 	int8_t		try;
 	uint8_t		box;
@@ -549,9 +551,9 @@ ao_lco_search(void)
 		if ((box % 10) == 0)
 			ao_lco_set_box(box);
 		for (try = 0; try < 3; try++) {
-			tick_offset = 0;
-			r = ao_lco_query(box, &ao_pad_query, &tick_offset);
-			PRINTD("box %d result %d\n", box, r);
+			ao_lco_tick_offset[box] = 0;
+			r = ao_lco_query(box, &ao_pad_query, &ao_lco_tick_offset[box]);
+			PRINTD("box %d result %d offset %d\n", box, r, ao_lco_tick_offset[box]);
 			if (r == AO_RADIO_CMAC_OK) {
 				++boxes;
 				ao_lco_box_set_present(box);
@@ -585,7 +587,7 @@ ao_lco_igniter_status(void)
 			for (c = 0; c < AO_LED_CONTINUITY_NUM; c++)
 				ao_led_off(continuity_led[c]);
 		} else {
-			if (!ao_lco_valid[ao_lco_box]) {
+			if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST)) {
 				ao_led_on(AO_LED_RED);
 				ao_led_off(AO_LED_GREEN|AO_LED_AMBER);
 				continue;
@@ -666,8 +668,10 @@ ao_lco_monitor(void)
 					if (ao_lco_selected[box]) {
 						PRINTD("Arming box %d pads %x\n",
 						       box, ao_lco_selected[box]);
-						if (ao_lco_valid[box])
+						if (ao_lco_valid[box] & AO_LCO_VALID_EVER) {
 							ao_lco_arm(box, ao_lco_selected[box], ao_lco_tick_offset[box]);
+							ao_delay(AO_MS_TO_TICKS(10));
+						}
 					}
 				}
 			}
