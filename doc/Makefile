@@ -74,6 +74,7 @@ PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf telegps.
 	telemetrum-outline.pdf telemega-outline.pdf easymini-outline.pdf easymega-outline.pdf
 HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
 FOSTYLE=xorg-fo.xsl
+FOPCFG=fop-cfg.xml
 TEMPLATES=titlepage.templates.xsl
 PDFSTYLE=
 IMAGES=$(PICTURES) $(SVG)
@@ -87,7 +88,7 @@ XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
 	xsltproc $(XSLTFLAGS) -o $@ $(HTMLSTYLE) $*.xsl
 
 .xsl.pdf:
-	xmlto -x $(FOSTYLE) --with-fop pdf $*.xsl
+	xmlto -p '-c $(FOPCFG)' --searchpath `pwd` -x $(FOSTYLE) --with-fop pdf $*.xsl
 
 .xml.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.xml
@@ -116,8 +117,11 @@ altusmetrum.pdf: $(RELNOTES_XSL) $(IMAGES)
 telegps.html: $(RELNOTES_XSL) $(IMAGES)
 telegps.pdf: $(RELNOTES_XSL) $(IMAGES)
 
-$(PDF): $(FOSTYLE) $(TEMPLATES)
+$(PDF): $(FOSTYLE) $(TEMPLATES) $(FOPCFG)
 
 indent:		altusmetrum.xsl
 	xmlindent -i 2 < altusmetrum.xsl > altusmetrum.new
+
+$(FOPCFG): Makefile
+	(echo '<fop version="1.0">'; echo '  <base>'"`pwd`"'</base>'; echo '</fop>') > $@
 
