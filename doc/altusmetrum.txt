@@ -40,7 +40,21 @@
 
 	include::telemini-v1.0.raw[]
 
+	include::telemini-v2.0.raw[]
+
+	include::easymini.raw[]
+
+	include::telemega.raw[]
+
+	include::easymega.raw[]
+
+	include::installation.raw[]
+
+	include::system-operation.raw[]
+
 	include::handling.raw[]
+
+	include::flight-data-recording.raw[]
 
 	include::specs.raw[]
 

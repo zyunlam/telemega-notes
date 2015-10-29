@@ -68,6 +68,13 @@ INC_FILES=\
 	usage.inc \
 	telemetrum.inc \
 	telemini-v1.0.inc \
+	telemini-v2.0.inc \
+	easymini.inc \
+	telemega.inc \
+	easymega.inc \
+	installation.inc \
+	system-operation.inc \
+	flight-data-recording.inc \
 	handling.inc \
 	specs.inc
 

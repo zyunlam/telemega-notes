@@ -28,6 +28,7 @@
 		[options="header",grid="all",cols="2,3,10"]
 		|====
 		|Terminal #|Terminal Name|Description
+
 		|1
 		|Apogee -
 		|Apogee pyro channel connection to pyro circuit
