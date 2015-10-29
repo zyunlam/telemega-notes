@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!-- $Id: fop.xconf 1339442 2012-05-17 01:42:56Z gadams $ -->
+
+<!--
+
+This is an example configuration file for FOP.
+This file contains the same settings as the default values
+and will have no effect if used unchanged.
+
+Relative config url's will be resolved relative to
+the location of this file.
+
+-->
+
+<!-- NOTE: This is the version of the configuration -->
+<fop version="1.0">
+
+  <!-- Base URL for resolving relative URLs -->
+  <base>.</base>
+  
+  <!-- Source resolution in dpi (dots/pixels per inch) for determining the size of pixels in SVG and bitmap images, default: 72dpi -->
+  <source-resolution>72</source-resolution>
+  <!-- Target resolution in dpi (dots/pixels per inch) for specifying the target resolution for generated bitmaps, default: 72dpi -->
+  <target-resolution>72</target-resolution>
+  
+  <!-- Default page-height and page-width, in case
+       value is specified as auto -->
+  <default-page-settings height="11in" width="8.26in"/>
+  
+  <!-- Information for specific renderers -->
+  <!-- Uses renderer mime type for renderers -->
+  <renderers>
+    <renderer mime="application/pdf">
+      <filterList>
+        <!-- provides compression using zlib flate (default is on) -->
+        <value>flate</value>
+      </filterList>
+
+      <fonts>
+        <!-- embedded fonts -->
+	<font embed-url="fonts/FrutigerLTStd-Light.otf">
+	  <font-triplet name="Frutiger LT Std" style="normal"
+			weight="normal"/>
+	</font>
+	<font embed-url="fonts/FrutigerLTStd-LightItalic.otf">
+	  <font-triplet name="Frutiger LT Std" style="italic"
+			weight="normal"/>
+	</font>
+	<font embed-url="fonts/FrutigerLTStd-Roman.otf">
+	  <font-triplet name="Frutiger LT Std" style="normal"
+			weight="bold"/>
+	</font>
+	<font embed-url="fonts/FrutigerLTStd-Italic.otf">
+	  <font-triplet name="Frutiger LT Std" style="italic"
+			weight="bold"/>
+	</font>
+
+	<font embed-url="fonts/DejaVuSansMono.ttf">
+	  <font-triplet name="DejaVu Sans Mono" style="normal"
+			weight="normal"/>
+	</font>
+	<font embed-url="fonts/DejaVuSansMono-Oblique.ttf">
+	  <font-triplet name="DejaVu Sans Mono" style="italic"
+			weight="normal"/>
+	</font>
+	<font embed-url="fonts/DejaVuSansMono-Bold.ttf">
+	  <font-triplet name="DejaVu Sans Mono" style="normal"
+			weight="bold"/>
+	</font>
+	<font embed-url="fonts/DejaVuSansMono-BoldOblique.ttf">
+	  <font-triplet name="DejaVu Sans Mono" style="italic"
+			weight="bold"/>
+	</font>
+      </fonts>
+    </renderer>
+
+    <renderer mime="image/svg+xml">
+      <format type="paginated"/>
+      <link value="true"/>
+      <strokeText value="false"/>
+    </renderer>
+
+    <renderer mime="text/xml">
+    </renderer>
+
+  </renderers>
+</fop>
+

@@ -61,6 +61,15 @@ PICTURES=\
 	telemini-v1-top.jpg \
 	telemini-v2-top.jpg
 
+TXT_FILES=altusmetrum.txt
+INC_FILES=intro.inc getting-started.inc usage.inc telemetrum.inc handling.inc specs.inc
+
+RAW_FILES=$(TXT_FILES:.txt=.raw)
+
+RAW_INC=$(INC_FILES:.inc=.raw)
+
+AD_PDF=$(TXT_FILES:.txt=.pdf)
+
 SVG=\
 	easymini.svg \
 	telemega.svg \
@@ -71,7 +80,7 @@ SVG=\
 RELNOTES_XSL=$(RELNOTES:.html=.xsl)
 HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html telegps.html $(RELNOTES)
 PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
-	telemetrum-outline.pdf telemega-outline.pdf easymini-outline.pdf easymega-outline.pdf
+	telemetrum-outline.pdf telemega-outline.pdf easymini-outline.pdf easymega-outline.pdf $(AD_PDF)
 HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
 FOSTYLE=xorg-fo.xsl
 FOPCFG=fop-cfg.xml
@@ -80,9 +89,21 @@ PDFSTYLE=
 IMAGES=$(PICTURES) $(SVG)
 DOC=$(HTML) $(PDF) $(IMAGES)
 
-.SUFFIXES: .xml .xsl .html .pdf
+.SUFFIXES: .inc .txt .raw .pdf .html
 
 XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
+
+.txt.raw:
+	sed -e 's/@@VERSION@@/$(VERSION)/' -e 's/@@DATE@@/$(DATE)/' -e 's/^[ 	]*//' -e 's/^\\//' $*.txt > $@
+
+.inc.raw:
+	sed -e 's/@@VERSION@@/$(VERSION)/' -e 's/@@DATE@@/$(DATE)/' -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
+
+.raw.pdf:
+	a2x --verbose -k -d book -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file am-fo.xsl --fop --fop-opts="-c fop.xconf" $*.raw
+
+.raw.html:
+	a2x --verbose -k -d book -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --stylesheet=am.css $*.raw
 
 .xsl.html:
 	xsltproc $(XSLTFLAGS) -o $@ $(HTMLSTYLE) $*.xsl
@@ -94,6 +115,8 @@ XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.xml
 
 all:	$(HTML) $(PDF)
+
+altusmetrum.pdf: altusmetrum-docinfo.xml $(RAW_FILES) $(RAW_INC)
 
 install:	all
 
