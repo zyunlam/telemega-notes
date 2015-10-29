@@ -38,6 +38,8 @@
 
 	include::telemetrum.raw[]
 
+	include::telemini-v1.0.raw[]
+
 	include::handling.raw[]
 
 	include::specs.raw[]

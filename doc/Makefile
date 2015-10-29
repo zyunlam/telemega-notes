@@ -62,7 +62,14 @@ PICTURES=\
 	telemini-v2-top.jpg
 
 TXT_FILES=altusmetrum.txt
-INC_FILES=intro.inc getting-started.inc usage.inc telemetrum.inc handling.inc specs.inc
+INC_FILES=\
+	intro.inc \
+	getting-started.inc \
+	usage.inc \
+	telemetrum.inc \
+	telemini-v1.0.inc \
+	handling.inc \
+	specs.inc
 
 RAW_FILES=$(TXT_FILES:.txt=.raw)
 
