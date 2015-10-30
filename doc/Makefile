@@ -75,6 +75,7 @@ INC_FILES=\
 	easymega.inc \
 	installation.inc \
 	altosui.inc \
+	altosdroid.inc \
 	system-operation.inc \
 	pyro-channels.inc \
 	flight-data-recording.inc \

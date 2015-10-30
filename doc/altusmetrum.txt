@@ -27,6 +27,8 @@
 
 	include::altosui.raw[]
 
+	include::altosdroid.raw[]
+
 	include::system-operation.raw[]
 
 	include::handling.raw[]
