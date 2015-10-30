@@ -63,6 +63,7 @@ PICTURES=\
 
 TXT_FILES=altusmetrum.txt
 INC_FILES=\
+	dedication.inc \
 	intro.inc \
 	getting-started.inc \
 	usage.inc \
@@ -73,7 +74,9 @@ INC_FILES=\
 	telemega.inc \
 	easymega.inc \
 	installation.inc \
+	altosui.inc \
 	system-operation.inc \
+	pyro-channels.inc \
 	flight-data-recording.inc \
 	handling.inc \
 	specs.inc

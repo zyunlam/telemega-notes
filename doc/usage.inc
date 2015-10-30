@@ -23,6 +23,7 @@
 		attached, which they call a
 		link:https://www.sparkfun.com/products/9914[JST Jumper 2 Wire Assembly]
 
+		[WARNING]
 		Many RC vendors also sell lithium polymer batteries with
 		this same connector. All that we have found use the opposite
 		polarity, and if you use them that way, you will damage or
@@ -84,7 +85,11 @@
 		EasyMini and TeleMini v2 are designed to use either a
 		lithium polymer battery or any other battery producing
 		between 4 and 12 volts, such as a rectangular 9V
-		battery. TeleMega, EasyMega and TeleMetrum are not designed for this,
-		and must only be powered by a lithium polymer battery. Find
-		instructions on how to use other batteries in the EasyMini
-		and TeleMini sections below.
+		battery.
+
+		[WARNING]
+		TeleMega, EasyMega and TeleMetrum are only designed to
+		use a single-cell Lithium Polymer battery and cannot
+		be used with any other kind. Connecting a different
+		kind of battery to any of these will destroy the
+		board.

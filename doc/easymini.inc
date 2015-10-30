@@ -52,6 +52,29 @@
 		|Switch connection to positive battery terminal
 		|====
 
+	=== Connecting A Battery To TeleMini v2.0
+
+		There are two possible battery connections on
+		EasyMini. You can use either method; both feed
+		through the power switch terminals.
+
+		One battery connection is the standard Altus Metrum
+		white JST plug. This mates with single-cell Lithium
+		Polymer batteries sold by Altus Metrum.
+
+		The other is a pair of screw terminals marked 'Battery
+		+' and 'Battery -'. Connect a battery from 4 to 12
+		volts to these terminals, being careful to match polarity.
+
+	=== Charging Lithium Batteries
+
+		Because EasyMini allows for batteries other than the
+		standard Altus Metrum Lithium Polymer cells, it cannot
+		incorporate a battery charger circuit. Therefore, when
+		using a Litium Polymer cell, you'll need an external
+		charger. These are available from Altus Metrum, or
+		from Spark Fun.
+
       	=== Using a Separate Pyro Battery with EasyMini
 	
 		As described above, using an external pyro battery involves
