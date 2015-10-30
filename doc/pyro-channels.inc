@@ -47,30 +47,23 @@ pad and initialize the system.
   of less than that value.
   ====
 
-Flight Time:: Time since boost was
-detected. Select a value and choose whether to
-activate the pyro channel before or after that
-amount of time.
+Flight Time:: Time since boost was detected. Select a value and choose
+whether to activate the pyro channel before or after that amount of
+time.
 
-Ascending:: A simple test saying whether the
-rocket is going up or not. This is exactly
-equivalent to testing whether the speed is
-&gt; 0.
+Ascending:: A simple test saying whether the rocket is going up or
+not. This is exactly equivalent to testing whether the speed is > 0.
 
-Descending:: A simple test saying whether the
-rocket is going down or not. This is exactly
-equivalent to testing whether the speed is
-&lt; 0.
+Descending:: A simple test saying whether the rocket is going down or
+not. This is exactly equivalent to testing whether the speed is < 0.
 
-After Motor:: The flight software counts each
-time the rocket starts accelerating and then
-decelerating (presumably due to a motor or
-motors burning). Use this value for
-multi-staged or multi-airstart launches.
+After Motor:: The flight software counts each time the rocket starts
+accelerating and then decelerating (presumably due to a motor or
+motors burning). Use this value for multi-staged or multi-airstart
+launches.
 
-Delay:: This value doesn't perform any checks,
-instead it inserts a delay between the time
-when the other parameters become true and when
+Delay:: This value doesn't perform any checks, instead it inserts a
+delay between the time when the other parameters become true and when
 the pyro channel is activated.
 
 Flight State:: The flight software tracks the flight
@@ -96,15 +89,11 @@ through a sequence of states:
 
  * Landed. The rocket is no longer moving.
 
-You can select a state to limit when the pyro
-channel may activate; note that the check is
-based on when the rocket transitions *into*
-the state, and so checking for “greater than
-Boost” means that the rocket is currently in
-boost or some later state.
+You can select a state to limit when the pyro channel may activate;
+note that the check is based on when the rocket transitions *into* the
+state, and so checking for “greater than Boost” means that the rocket
+is currently in boost or some later state.
 
-When a motor burns out, the rocket enters
-either Fast or Coast state (depending on how
-fast it is moving). If the computer detects
-upwards acceleration again, it will move back
-to Boost state.
+When a motor burns out, the rocket enters either Fast or Coast state
+(depending on how fast it is moving). If the computer detects upwards
+acceleration again, it will move back to Boost state.

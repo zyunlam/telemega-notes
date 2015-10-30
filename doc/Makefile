@@ -74,6 +74,8 @@ INC_FILES=\
 	telemega.inc \
 	easymega.inc \
 	installation.inc \
+	using-am-products.inc \
+	updating-firmware.inc \
 	altosui.inc \
 	altosdroid.inc \
 	system-operation.inc \

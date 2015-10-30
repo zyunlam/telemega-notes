@@ -25,6 +25,8 @@
 
 	include::installation.raw[]
 
+	include::using-am-products.raw[]
+
 	include::altosui.raw[]
 
 	include::altosdroid.raw[]
@@ -32,6 +34,8 @@
 	include::system-operation.raw[]
 
 	include::handling.raw[]
+
+	include::updating-firmware.raw[]
 
 	include::flight-data-recording.raw[]
 
