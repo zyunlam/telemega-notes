@@ -1,5 +1,6 @@
 == TeleMini v1.0
 
+	.TeleMini v1.0 Board
 	image::telemini-v1-top.jpg[width="5.5in"]
 
 	TeleMini v1.0 is ½ inches by 1½ inches.  It was

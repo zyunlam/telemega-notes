@@ -362,6 +362,7 @@
 
 		==== Flight Graph
 
+			.Flight Data Graph
 			image::graph.png[width="5.5in"]
 
 			By default, the graph contains acceleration (blue),
@@ -378,6 +379,7 @@
 
 		==== Configure Graph
 
+			.Flight Graph Configuration
 			image::graph-configure.png[width="5.5in"]
 
 			This selects which graph elements to show, and, at the
@@ -386,12 +388,14 @@
 
 		==== Flight Statistics
 
+			.Flight Statistics
 			image::graph-stats.png[width="5.5in"]
 
 			Shows overall data computed from the flight.
 
 		==== Map
 
+			.Flight Map
 			image::graph-map.png[width="5.5in"]
 
 			Shows a satellite image of the flight area overlaid
@@ -437,6 +441,7 @@
 
 	=== Configure Altimeter
 
+		.Altimeter Configuration
 		image::configure-altimeter.png[width="3.6in"]
 
 		Select this button and then select either an altimeter or
@@ -638,6 +643,7 @@
 
       		==== Configure Pyro Channels
 
+			.Additional Pyro Channel Configuration
 			image::configure-pyro.png[width="5.5in"]
 
 			This opens a separate window to configure the
@@ -845,6 +851,7 @@
 
 	=== Fire Igniter
 
+		.Fire Igniter Window
 		image::fire-igniter.png[width="1.2in"]
 
 		This activates the igniter circuits in the flight
@@ -872,6 +879,7 @@
 
 	=== Scan Channels
 
+		.Scan Channels Window
 		image::scan-channels.png[width="3.2in"]
 
 		This listens for telemetry packets on all of the
@@ -884,6 +892,7 @@
 
 	=== Load Maps
 
+		.Load Maps Window
 		image::load-maps.png[width="5.2in"]
 
 		Before heading out to a new launch site, you can use
@@ -944,6 +953,7 @@
 
 	=== Monitor Idle
 
+		.Monitor Idle Window
 		image::monitor-idle.png[width="5.2in"]
 
 		This brings up a dialog similar to the Monitor Flight

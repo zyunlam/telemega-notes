@@ -1,5 +1,6 @@
 == EasyMini
 
+	.EasyMini Board
 	image::easymini-top.jpg[width="5.5in"]
 
 	EasyMini is built on a 0.8 inch by 1½ inch circuit board. It's

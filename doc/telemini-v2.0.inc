@@ -1,7 +1,7 @@
 == TeleMini v2.0
 
+	.TeleMini v2.0 Board
 	image::telemini-v2-top.jpg[width="5.5in"]
-
       
 	TeleMini v2.0 is 0.8 inches by 1½ inches. It adds more
 	on-board data logging memory, a built-in USB connector and

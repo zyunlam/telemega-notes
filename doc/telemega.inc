@@ -1,5 +1,6 @@
 == TeleMega
 
+	.TeleMega Board
 	image::telemega-v1.0-top.jpg[width="5.5in"]
 
 	TeleMega is a 1¼ inch by 3¼ inch circuit board. It was

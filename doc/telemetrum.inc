@@ -1,5 +1,9 @@
 == TeleMetrum
 
+	.TeleMetrum v2 Board
+	image::telemetrum-v2.0-th.jpg[width="5.5in"]
+
+	.TeleMetrum v1 Board
 	image::telemetrum-v1.1-thside.jpg[width="5.5in"]
 
 	TeleMetrum is a 1 inch by 2¾ inch circuit board.  It was designed to
