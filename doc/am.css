@@ -348,24 +348,16 @@ div.variablelist p.title
   margin-bottom: -0.8em;
 }
 
-table {
-    border: none;
-}
-
 div.revhistory {
     border-style: none;
 }
 
-div.revhistory table, th, td, tr {
-    margin-top: 1em;
-    border-width: 1px;
+div.revhistory table, div.revhistory th, div.revhistory td {
     border-collapse: collapse;
-    border-top: 1px;
-    border-bottom: 1px;
-    border-left: 1px;
-    border-right: 1px;
-    border: 1px solid black;
+    border: 1px solid #0080ff;
+    padding: 0.25em;
 }
+
 div.revhistory th {
   color: #0080ff;
 }
@@ -385,12 +377,18 @@ div.indexdiv dl, div.indexdiv dt
   Table styling does not work because of overriding attributes in
   generated HTML.
 */
+div.table-contents p,
+div.informaltable p
+{
+    margin: 0px;
+}
+/*
 div.table table,
 div.informaltable table
 {
     margin-left: 0;
-    margin-right: 5%;
-    margin-bottom: 0.8em;
+    margin-right: 0.25em;
+    margin-bottom: 0.25em;
 }
 div.informaltable table
 {
@@ -404,9 +402,15 @@ div.informaltable tfoot,
 div.informaltable tbody
 {
     /* No effect in IE6. */
-    border-top: 3px solid #527bbd;
-    border-bottom: 3px solid #527bbd;
+    border-top: 1px solid #0080ff;
+    border-bottom: 1px solid #0080ff;
+    border-left: 1px solid #0080ff;
+    border-right: 1px solid #0080ff !important;
+    border-width: 1px !important;
 }
+*/
+
+
 div.table thead, div.table tfoot,
 div.informaltable thead, div.informaltable tfoot
 {

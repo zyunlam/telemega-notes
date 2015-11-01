@@ -28,6 +28,7 @@
   </para>
 </legalnotice>
 <revhistory>
+  <?dbhtml filename="telegps-revhistory.html"?>
   <revision>
     <revnumber>1.6.1</revnumber>
     <date>15 July 2015</date>

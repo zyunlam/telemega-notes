@@ -56,16 +56,34 @@
 <xsl:param name="html.cellspacing" select="''"/>
 
 <xsl:param name="table.borders.with.css" select="1"/>
-<xsl:param name="table.cell.border.color" select="'#527bbd'"/>
-
+<xsl:param name="table.cell.border.color" select="'#0080ff'"/>
 <xsl:param name="table.cell.border.style" select="'solid'"/>
 <xsl:param name="table.cell.border.thickness" select="'1px'"/>
 <xsl:param name="table.footnote.number.format" select="'a'"/>
 <xsl:param name="table.footnote.number.symbols" select="''"/>
-<xsl:param name="table.frame.border.color" select="'#527bbd'"/>
+<xsl:param name="table.frame.border.color" select="'#0080ff'"/>
 <xsl:param name="table.frame.border.style" select="'solid'"/>
-<xsl:param name="table.frame.border.thickness" select="'3px'"/>
+<xsl:param name="table.frame.border.thickness" select="'1px'"/>
 <xsl:param name="tablecolumns.extension" select="'1'"/>
+
+<xsl:attribute-set name="revhistory.title.properties">
+  <xsl:attribute name="font-size">12pt</xsl:attribute>
+  <xsl:attribute name="font-weight">bold</xsl:attribute>
+  <xsl:attribute name="text-align">center</xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="revhistory.table.properties">
+  <xsl:attribute name="border">0.5pt solid #0080ff</xsl:attribute>
+  <xsl:attribute name="width">50%</xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="revhistory.table.cell.properties">
+  <xsl:attribute name="border">0.5pt solid #0080ff</xsl:attribute>
+  <xsl:attribute name="font-size">12pt</xsl:attribute>
+  <xsl:attribute name="padding">2pt</xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:param name="generate.revhistory.link" select="1"/>
 
 <xsl:param name="highlight.source" select="1"/>
 

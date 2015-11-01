@@ -19,6 +19,7 @@
   </para>
 </legalnotice>
 <revhistory>
+  <?dbhtml filename="companion-revhistory.html"?>
   <revision>
     <revnumber>0.1</revnumber>
     <date>13 January 2012</date>

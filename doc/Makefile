@@ -167,10 +167,16 @@ ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
 
 HTML=altusmetrum.html micropeak.html telegps.html $(RELNOTES_HTML) $(ONEFILE_HTML_FILES)
 
+HTML_REVHISTORY=\
+	altusmetrum-revhistory.html \
+	micropeak-revhistory.html \
+	telegps-revhistory.html
+
 PDF=altusmetrum.pdf micropeak.pdf telegps.pdf $(RELNOTES_PDF) $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 
 FOP_STYLE=am-fo.xsl
+HTML_STYLE=am-html.xsl
 FOP_XCONF=fop.xconf
 STYLESHEET=am.css
 
@@ -189,9 +195,9 @@ TEMPLATES_TMPL=titlepage.templates.tmpl
 TEMPLATES_XSL=$(TEMPLATES_TMPL:.tmpl=.xsl)
 
 PDF_CONFIG_FILES=$(FOP_STYLE) $(FOP_XCONF) $(TEMPLATES_XSL)
-HTML_CONFIG_FILES=$(TEMPLATES_XSL) $(STYLESHEET)
+HTML_CONFIG_FILES=$(TEMPLATES_XSL)
 
-DOC=$(HTML) $(PDF) $(IMAGES) $(STYLESHEET)
+DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
 .SUFFIXES: .tmpl .xsl .inc .txt .raw .pdf .html
 
@@ -205,7 +211,7 @@ DOC=$(HTML) $(PDF) $(IMAGES) $(STYLESHEET)
 	a2x -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 
 .raw.html:
-	a2x -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --stylesheet=$(STYLESHEET) $*.raw
+	a2x -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
@@ -213,6 +219,12 @@ DOC=$(HTML) $(PDF) $(IMAGES) $(STYLESHEET)
 all:	$(HTML) $(PDF)
 
 $(HTML): $(PDF)
+
+altusmetrum-revhistory.html: altusmetrum.html
+
+micropeak-revhistory.html: micropeak.html
+
+telegps-revhistory.html: telegps.html
 
 altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(RAW_FILES) $(RAW_INC) $(IMAGES)
 
@@ -238,7 +250,7 @@ publish-keithp:	$(DOC) $(FONTS)
 	scp -p $(FONTS) keithp.com:~keithp/public_html/altos/fonts
 
 clean:
-	rm -f $(HTML) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
+	rm -f $(HTML) $(HTML_REVHISTORY) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
 
 distclean: clean
 	rm -f $(HTML) $(PDF)

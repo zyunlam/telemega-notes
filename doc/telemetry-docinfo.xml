@@ -19,6 +19,7 @@
   </para>
 </legalnotice>
 <revhistory>
+  <?dbhtml filename="telemetry-revhistory.html"?>
   <revision>
     <revnumber>0.1</revnumber>
     <date>1 July 2011</date>

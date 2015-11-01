@@ -23,6 +23,7 @@
   </para>
 </legalnotice>
 <revhistory>
+  <?dbhtml filename="micropeak-revhistory.html"?>
   <revision>
     <revnumber>1.3.2</revnumber>
     <date>12 February 2014</date>
