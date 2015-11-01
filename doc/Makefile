@@ -22,7 +22,7 @@ RELNOTES_INC=\
 	release-notes-1.6.inc \
 	release-notes-1.6.1.inc
 
-PICTURES=\
+IMAGES=\
 	altosui.png \
 	ascent.png \
 	configure-altimeter.png \
@@ -31,12 +31,17 @@ PICTURES=\
 	configure-pyro.png \
 	descent.png \
 	device-selection.png \
+	easymega.svg \
+	easymega-v1.0-bottom.jpg \
+	easymega-v1.0-top.jpg \
+	easymini.svg \
 	easymini-top.jpg \
 	fire-igniter.png \
 	graph-configure.png \
 	graph-map.png \
 	graph.png \
 	graph-stats.png \
+	ignitor.png \
 	landed.png \
 	launch-pad.png \
 	load-maps.png \
@@ -47,6 +52,7 @@ PICTURES=\
 	micropeak-download.png \
 	micropeak-graph-configure.png \
 	micropeak-graph.png \
+	micropeak-nofont.svg \
 	micropeak-preferences.png \
 	micropeak-raw-data.png \
 	micropeak-save-dialog.png \
@@ -57,8 +63,25 @@ PICTURES=\
 	scan-channels.png \
 	site-map.png \
 	table.png \
+	telegps-configure.png \
+	telegps-graph-configure.png \
+	telegps-graph-graph.png \
+	telegps-graph-map.png \
+	telegps-graph-stats.png \
+	telegps-info.png \
+	telegps-location.png \
+	telegps-map.png \
+	telegps-preferences.png \
+	telegps-scan.png \
+	telegps-status.png \
+	telegps-table.png \
+	telegps-v1.0-top.jpg \
+	telemega.svg \
 	telemega-v1.0-top.jpg \
+	telemetrum.svg \
 	telemetrum-v1.1-thside.jpg \
+	telemetrum-v2.0-th.jpg \
+	telemini.svg \
 	telemini-v1-top.jpg \
 	telemini-v2-top.jpg
 
@@ -134,42 +157,45 @@ SVG=\
 RELNOTES_PDF=$(RELNOTES_INC:.inc=.pdf)
 RELNOTES_HTML=$(RELNOTES_INC:.inc=.html)
 
-ALTOS_TXT_FILES=\
-	altos.txt
+ONEFILE_TXT_FILES=\
+	altos.txt \
+	companion.txt \
+	telemetry.txt
 
-ALTOS_RAW_FILES=$(ALTOS_TXT_FILES:.txt=.raw)
-ALTOS_PDF_FILES=$(ALTOS_TXT_FILES:.txt=.pdf)
+ONEFILE_RAW_FILES=$(ONEFILE_TXT_FILES:.txt=.raw)
+ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
 
-HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html telegps.html $(RELNOTES_HTML)
+HTML=altusmetrum.html micropeak.html telegps.html $(RELNOTES_HTML) $(ONEFILE_HTML_FILES)
 
-PDF=altusmetrum.pdf $(RELNOTES_PDF) $(ALTOS_PDF_FILES) telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
+PDF=altusmetrum.pdf micropeak.pdf telegps.pdf $(RELNOTES_PDF) $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 
-FOSTYLE=am-fo.xsl
+FOP_STYLE=am-fo.xsl
+FOP_XCONF=fop.xconf
+STYLESHEET=am.css
 
 TEMPLATES_TMPL=titlepage.templates.tmpl
 
 TEMPLATES_XSL=$(TEMPLATES_TMPL:.tmpl=.xsl)
 
-IMAGES=$(PICTURES) $(SVG)
+PDF_CONFIG_FILES=$(FOP_STYLE) $(FOP_XCONF) $(TEMPLATES_XSL)
+HTML_CONFIG_FILES=$(TEMPLATES_XSL) $(STYLESHEET)
 
-DOC=$(HTML) $(PDF) $(IMAGES)
+DOC=$(HTML) $(PDF) $(IMAGES) $(STYLESHEET)
 
 .SUFFIXES: .tmpl .xsl .inc .txt .raw .pdf .html
 
-XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
-
 .txt.raw:
-	sed -e 's/@@VERSION@@/$(VERSION)/' -e 's/@@DATE@@/$(DATE)/' -e 's/^[ 	]*//' -e 's/^\\//' $*.txt > $@
+	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.txt > $@
 
 .inc.raw:
-	sed -e 's/@@VERSION@@/$(VERSION)/' -e 's/@@DATE@@/$(DATE)/' -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
+	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
 .raw.pdf:
-	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file am-fo.xsl --fop --fop-opts="-c fop.xconf" $*.raw
+	a2x -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 
 .raw.html:
-	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --stylesheet=am.css $*.raw
+	a2x -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --stylesheet=$(STYLESHEET) $*.raw
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
@@ -194,11 +220,14 @@ publish:	$(DOC)
 	 git commit -F - /home/bdale/web/altusmetrum/AltOS/doc/* ; \
 	 git push)
 
+publish-keithp:	$(DOC)
+	scp -p $(DOC) keithp.com:~keithp/public_html/altos
+
 clean:
 	rm -f $(HTML) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
 
 distclean: clean
 	rm -f $(HTML) $(PDF)
 
-$(PDF): $(FOSTYLE) $(TEMPLATES_XSL)
-$(HTML): $(TEMPLATES_XSL)
+$(PDF): $(PDF_CONFIG_FILES)
+$(HTML): $(HTML_CONFIG_FILES)
