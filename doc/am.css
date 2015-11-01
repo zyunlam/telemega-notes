@@ -110,6 +110,74 @@ div titlepage {
     border-top: 2px;
 }
 
+div.warning h1, div.warning h2, div.warning h3, div.warning h4, div.warning h5, div.warning h6 {
+    color: #ff2020;
+}
+
+div.warning p, div.note p, div.error p {
+    margin-left: 5%;
+    margin-left: 5%;
+}
+
+div.toc {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 25em;
+    margin-right: 5ex;
+    margin-left: 0px;
+    float: left;
+    border-right: 2px solid #0080ff;
+    border-collapse: collapse;
+    overflow: auto;
+}
+
+div.toc a:link {
+    text-decoration: none;
+}
+
+div.toc a:visited {
+    text-decoration: none;
+}
+
+div.toc a:hover {
+    text-decoration: underline;
+}
+
+div.toc a:active {
+    text-decoration: underline;
+}
+
+div.book {
+    margin-left: 25em;
+}
+
+div.list-of-figures {
+    display: none;
+}
+
+div.list-of-tables {
+    display: none;
+}
+
+div.figure p {
+    text-align: center;
+}
+div.figure img {
+    display: block;
+    margin: auto;
+}
+
+div.table p.title {
+    text-align: center;
+}
+
+div.table-contents table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 div.toc p:first-child,
 div.list-of-figures p:first-child,
 div.list-of-tables p:first-child,
