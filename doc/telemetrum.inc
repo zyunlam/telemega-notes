@@ -17,6 +17,18 @@
 	fin can end of the board, meaning an ideal “simple” avionics
 	bay for TeleMetrum should have at least 10 inches of interior length.
 
+	There are two generations of the TeleMetrum design. The
+	major changes in the v2 generation are:
+
+	* uBlox GPS chip certified for altitude records
+
+	* Higher power radio (40mW vs 10mW)
+
+	* APRS support
+
+	Otherwise, they're the same size, with mounting holes and
+	screw terminals in the same position.
+
 	=== TeleMetrum Screw Terminals
 
 		TeleMetrum has six screw terminals on the end of the board

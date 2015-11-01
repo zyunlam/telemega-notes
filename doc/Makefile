@@ -2,24 +2,25 @@
 #	http://docbook.sourceforge.net/release/xsl/current/README
 #
 
-RELNOTES=\
-	release-notes-0.7.1.html \
-	release-notes-0.8.html \
-	release-notes-0.9.html \
-	release-notes-0.9.2.html \
-	release-notes-1.0.1.html \
-	release-notes-1.1.html \
-	release-notes-1.1.1.html \
-	release-notes-1.2.html \
-	release-notes-1.2.1.html \
-	release-notes-1.3.html \
-	release-notes-1.3.1.html \
-	release-notes-1.3.2.html \
-	release-notes-1.4.html \
-	release-notes-1.4.1.html \
-	release-notes-1.5.html \
-	release-notes-1.6.html \
-	release-notes-1.6.1.html
+RELNOTES_INC=\
+	release-notes-0.7.1.inc \
+	release-notes-0.8.inc \
+	release-notes-0.9.inc \
+	release-notes-0.9.2.inc \
+	release-notes-1.0.1.inc \
+	release-notes-1.1.inc \
+	release-notes-1.1.1.inc \
+	release-notes-1.2.inc \
+	release-notes-1.2.1.inc \
+	release-notes-1.3.inc \
+	release-notes-1.3.1.inc \
+	release-notes-1.3.2.inc \
+	release-notes-1.4.inc \
+	release-notes-1.4.1.inc \
+	release-notes-1.4.2.inc \
+	release-notes-1.5.inc \
+	release-notes-1.6.inc \
+	release-notes-1.6.1.inc
 
 PICTURES=\
 	altosui.png \
@@ -62,6 +63,7 @@ PICTURES=\
 	telemini-v2-top.jpg
 
 TXT_FILES=altusmetrum.txt
+
 INC_FILES=\
 	dedication.inc \
 	intro.inc \
@@ -82,13 +84,45 @@ INC_FILES=\
 	pyro-channels.inc \
 	flight-data-recording.inc \
 	handling.inc \
-	specs.inc
+	specs.inc \
+	release-notes.inc \
+	$(RELNOTES_INC)
 
-RAW_FILES=$(TXT_FILES:.txt=.raw)
+RAW_FILES=$(TXT_FILES:.txt=.raw) $(INC_FILES:.inc=.raw)
 
-RAW_INC=$(INC_FILES:.inc=.raw)
+TELEGPS_INC_FILES=\
+	dedication.inc \
+	telegps-quick-start.inc \
+	telegps-using.inc \
+	telegps-system-operation.inc \
+	telegps-application.inc \
+	handling.inc \
+	telegps-specs.inc \
+	telegps-updating-firmware.inc \
+	telegps-release-notes.inc
 
-AD_PDF=$(TXT_FILES:.txt=.pdf)
+TELEGPS_TXT_FILES=\
+	telegps.txt
+
+TELEGPS_RAW_FILES=$(TELEGPS_TXT_FILES:.txt=.raw) $(TELEGPS_INC_FILES:.inc=.raw)
+
+MICROPEAK_TXT_FILES=\
+	micropeak.txt
+
+MICROPEAK_INC_FILES=
+
+MICROPEAK_RAW_FILES=$(MICROPEAK_TXT_FILES:.txt=.raw) $(MICROPEAK_INC_FILES:.inc=.raw)
+
+OUTLINE_TXT_FILES=\
+	easymega-outline.txt \
+	easymini-outline.txt \
+	telemega-outline.txt \
+	telemetrum-outline.txt \
+	telemini-outline.txt
+
+OUTLINE_RAW_FILES=$(OUTLINE_TXT_FILES:.txt=.raw)
+
+OUTLINE_PDF_FILES=$(OUTLINE_TXT_FILES:.txt=.pdf)
 
 SVG=\
 	easymini.svg \
@@ -97,19 +131,25 @@ SVG=\
 	telemini.svg \
 	easymega.svg
 
-RELNOTES_XSL=$(RELNOTES:.html=.xsl)
-HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html telegps.html $(RELNOTES)
-PDF=altusmetrum.pdf altos.pdf telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
-	telemetrum-outline.pdf telemega-outline.pdf easymini-outline.pdf easymega-outline.pdf $(AD_PDF)
-HTMLSTYLE=/usr/share/xml/docbook/stylesheet/docbook-xsl/html/docbook.xsl
+RELNOTES_PDF=$(RELNOTES_INC:.inc=.pdf)
+RELNOTES_HTML=$(RELNOTES_INC:.inc=.html)
+
+HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html telegps.html $(RELNOTES_HTML)
+
+PDF=altusmetrum.pdf $(RELNOTES_PDF) altos.pdf telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
+	$(OUTLINE_PDF_FILES)
+
 FOSTYLE=xorg-fo.xsl
-FOPCFG=fop-cfg.xml
-TEMPLATES=titlepage.templates.xsl
-PDFSTYLE=
+
+TEMPLATES_TMPL=titlepage.templates.tmpl
+
+TEMPLATES_XSL=$(TEMPLATES_TMPL:.tmpl=.xsl)
+
 IMAGES=$(PICTURES) $(SVG)
+
 DOC=$(HTML) $(PDF) $(IMAGES)
 
-.SUFFIXES: .inc .txt .raw .pdf .html
+.SUFFIXES: .tmpl .xsl .inc .txt .raw .pdf .html
 
 XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
 
@@ -120,23 +160,23 @@ XSLTFLAGS=--stringparam section.autolabel 1 --xinclude
 	sed -e 's/@@VERSION@@/$(VERSION)/' -e 's/@@DATE@@/$(DATE)/' -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
 .raw.pdf:
-	a2x --verbose -k -d book -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file am-fo.xsl --fop --fop-opts="-c fop.xconf" $*.raw
+	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file am-fo.xsl --fop --fop-opts="-c fop.xconf" $*.raw
 
 .raw.html:
-	a2x --verbose -k -d book -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --stylesheet=am.css $*.raw
+	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --stylesheet=am.css $*.raw
 
-.xsl.html:
-	xsltproc $(XSLTFLAGS) -o $@ $(HTMLSTYLE) $*.xsl
-
-.xsl.pdf:
-	xmlto -p '-c $(FOPCFG)' --searchpath `pwd` -x $(FOSTYLE) --with-fop pdf $*.xsl
-
-.xml.xsl:
-	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.xml
+.tmpl.xsl:
+	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
 
 all:	$(HTML) $(PDF)
 
-altusmetrum.pdf: altusmetrum-docinfo.xml $(RAW_FILES) $(RAW_INC)
+$(HTML): $(PDF)
+
+altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(RAW_FILES) $(RAW_INC) $(IMAGES)
+
+telegps.html telegps.pdf: telegps-docinfo.xml $(TELEGPS_RAW_FILES) $(IMAGES)
+
+micropeak.pdf micropeak.html: micropeak-docinfo.xml $(MICROPEAK_RAW_FILES) $(IMAGES)
 
 install:	all
 
@@ -149,22 +189,10 @@ publish:	$(DOC)
 	 git push)
 
 clean:
-	rm -f $(HTML) $(PDF) $(TEMPLATES)
+	rm -f $(HTML) $(PDF) $(TEMPLATES_XSL)
 
-distclean:
+distclean: clean
 	rm -f $(HTML) $(PDF)
 
-altusmetrum.html: $(RELNOTES_XSL) $(IMAGES)
-altusmetrum.pdf: $(RELNOTES_XSL) $(IMAGES)
-
-telegps.html: $(RELNOTES_XSL) $(IMAGES)
-telegps.pdf: $(RELNOTES_XSL) $(IMAGES)
-
-$(PDF): $(FOSTYLE) $(TEMPLATES) $(FOPCFG)
-
-indent:		altusmetrum.xsl
-	xmlindent -i 2 < altusmetrum.xsl > altusmetrum.new
-
-$(FOPCFG): Makefile
-	(echo '<fop version="1.0">'; echo '  <base>'"`pwd`"'</base>'; echo '</fop>') > $@
-
+$(PDF): $(FOSTYLE) $(TEMPLATES_XSL)
+$(HTML): $(TEMPLATES_XSL)

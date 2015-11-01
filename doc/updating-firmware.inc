@@ -17,17 +17,11 @@
 	download the most recent version from
 	http://www.altusmetrum.org/AltOS/
 
-	If you need to update the firmware on a TeleDongle v0.2, we
-	recommend updating the altimeter first, before updating
-	TeleDongle.  However, note that TeleDongle rarely need to be
-	updated.  Any firmware version 1.0.1 or later will work,
-	version 1.2.1 may have improved receiver performance slightly.
-
-	Self-programmable devices (TeleMega, TeleMetrum v2, EasyMega
-	and EasyMini) are reprogrammed by connecting them to your
-	computer over USB
-
 	=== Updating TeleMega, TeleMetrum v2, EasyMega, EasyMini or TeleDongle v3 Firmware
+
+		Self-programmable devices (TeleMega, TeleMetrum v2,
+		EasyMega and EasyMini) are reprogrammed by connecting
+		them to your computer over USB
 
 		. Attach a battery if necessary and power switch to
 		  the target device. Power up the device.
@@ -143,6 +137,13 @@
 		limited memory resources in the cc1111, we don't
 		support programming directly over USB for these
 		devices.
+
+		If you need to update the firmware on a TeleDongle
+		v0.2, we recommend updating the altimeter first,
+		before updating TeleDongle.  However, note that
+		TeleDongle rarely need to be updated.  Any firmware
+		version 1.0.1 or later will work, version 1.2.1 may
+		have improved receiver performance slightly.
 
 		==== Updating TeleMetrum v1.x Firmware
 

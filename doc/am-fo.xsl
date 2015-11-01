@@ -18,6 +18,9 @@
 <xsl:include href="titlepage.templates.xsl"/>
 <xsl:include href="footer.templates.xsl"/>
 
+<xsl:param name="ulink.show" select="0" />
+<xsl:param name="ulink.footnotes" select="1"/>
+
 <xsl:param name="fop1.extensions" select="1" />
 <xsl:param name="variablelist.as.blocks" select="1" />
 

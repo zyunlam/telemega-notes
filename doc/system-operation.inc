@@ -384,7 +384,7 @@
 		shown in the following table.
 
 		.Altus Metrum APRS Comments
-		[options="header",cols="1,1,1"]
+		[options="header",cols="1,1,3"]
 		|====
 		|Field	      |Example	      |Description
 

@@ -1,5 +1,4 @@
 = The Altus Metrum System
-
 :doctype: book
 :numbered:
 
@@ -41,5 +40,4 @@
 
 	include::specs.raw[]
 
-	[index]
-	== Index
+	include::release-notes.raw[]

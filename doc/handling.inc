@@ -6,6 +6,7 @@
 	will deliver impressive results.  However, as with all electronic
 	devices, there are some precautions you must take.
 
+	[WARNING]
 	The Lithium Polymer rechargeable batteries have an
 	extraordinary power density.  This is great because we can fly with
 	much less battery mass than if we used alkaline batteries or previous
