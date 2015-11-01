@@ -677,7 +677,8 @@
 
 	=== Configure AltosUI
 
-		image:configure-altosui.png[width="2.4in"]
+		.Configure AltosUI Dialog
+		image::configure-altosui.png[width="2.4in"]
 
 		This button presents a dialog so that you can
 		configure the AltosUI global settings.
@@ -770,45 +771,44 @@
 
 	=== Configure Groundstation
 
-		image:configure-groundstation.png[width="3.1in"]
+		.Configure Groundstation Dialog
+		image::configure-groundstation.png[width="3.1in"]
 
-			Select this button and then select a
-			TeleDongle or TeleBT Device from the list
-			provided.
+		Select this button and then select a TeleDongle or
+		TeleBT Device from the list provided.
 
-			The first few lines of the dialog provide
-			information about the connected device,
-			including the product name, software version
-			and hardware serial number. Below that are the
-			individual configuration entries.
+		The first few lines of the dialog provide information
+		about the connected device, including the product
+		name, software version and hardware serial
+		number. Below that are the individual configuration
+		entries.
 
-			Note that TeleDongle and TeleBT don't save any
-			configuration data, the settings here are
-			recorded on the local machine in the Java
-			preferences database. Moving the device to
-			another machine, or using a different user
-			account on the same machine will cause
-			settings made here to have no effect.
+		Note that TeleDongle and TeleBT don't save any
+		configuration data, the settings here are recorded on
+		the local machine in the Java preferences
+		database. Moving the device to another machine, or
+		using a different user account on the same machine
+		will cause settings made here to have no effect.
 
-			At the bottom of the dialog, there are three
-			buttons:
+		At the bottom of the dialog, there are three
+		buttons:
 
-			Save::
-			This writes any changes to the local Java
-			preferences file. If you don't press this
-			button, any changes you make will be lost.
+		Save::
+		This writes any changes to the local Java
+		preferences file. If you don't press this
+		button, any changes you make will be lost.
 
-			Reset::
-			This resets the dialog to the most recently
-			saved values, erasing any changes you have
-			made.
+		Reset::
+		This resets the dialog to the most recently
+		saved values, erasing any changes you have
+		made.
 
-			Close::
-			This closes the dialog. Any unsaved changes
-			will be lost.
+		Close::
+		This closes the dialog. Any unsaved changes
+		will be lost.
 
-			The rest of the dialog contains the parameters
-			to be configured.
+		The rest of the dialog contains the parameters
+		to be configured.
 
 		==== Frequency
 

@@ -78,7 +78,7 @@
 == The MicroPeak USB adapter
 
 	.MicroPeak USB Adapter
-	image::MicroPeakUSB-2.0.jpg[width="4.5in"]
+	image::MicroPeakUSB-2.0.jpg[width="4.5in",align="center"]
 
 	MicroPeak stores barometric pressure information for the first
 	48 seconds of the flight in on-board non-volatile memory. The
@@ -103,25 +103,25 @@
 
 		* Start the MicroPeak application.
 
-		  image::micropeak-nofont.svg[width="0.5in"]
+		  image::micropeak-nofont.svg[width="0.5in",align="center"]
 
 		* Click on the Download button at the top of the
                   window.
 
 		  .MicroPeak Application
-		  image::micropeak-app.png[width="4.5in"]
+		  image::micropeak-app.png[width="4.5in",align="center"]
 
 		* Select from the listed devices. There will probably
 		  be only one.
 
 		  .MicroPeak Device Dialog
-		  image::micropeak-device-dialog.png[width="2.3in"]
+		  image::micropeak-device-dialog.png[width="2.3in",align="center"]
 
 		* The application will now wait until it receives
 		  valid data from the MicroPeak USB adapter.
 
 		  .MicroPeak Download Dialog
-		  image::micropeak-download.png[width="2in"]
+		  image::micropeak-download.png[width="2in",align="center"]
 
 		* The MicroPeak USB adapter has a small
 		  phototransistor under the hole in the center of the
@@ -133,7 +133,7 @@
 		  MicroPeak board itself.
 
 		  .MicroPeak Downloading
-		  image::MicroPeakUSB-2.0-inuse.jpg[width="4.5in"]
+		  image::MicroPeakUSB-2.0-inuse.jpg[width="4.5in",align="center"]
 
 		* After the maximum flight height is reported,
 		  MicroPeak will pause for a few seconds, blink the
@@ -145,7 +145,7 @@
 		  MicroPeak board and try again.
 
 		  .MicroPeak Save Dialog
-		  image::micropeak-save-dialog.png[width="2.3in"]
+		  image::micropeak-save-dialog.png[width="2.3in",align="center"]
 
 		* Once the data are saved, a graph will be displayed
 		  with height, speed and acceleration values computed
@@ -185,7 +185,7 @@
 		==== MicroPeak Graphs
 
 			.MicroPeak Graph
-			image::micropeak-graph.png[width="4.5in"]
+			image::micropeak-graph.png[width="4.5in",align="center"]
 
 			Under the Graph tab, the height, speed and acceleration values
 			are displayed together. You can zoom in on the graph by
@@ -196,7 +196,7 @@
 		==== MicroPeak Flight Statistics
 
 			.MicroPeak Flight Statistics
-			image::micropeak-statistics.png[width="4.5in"]
+			image::micropeak-statistics.png[width="4.5in",align="center"]
 
 			The Statistics tab presents overall data from
 			the flight. Note that the Maximum height value
@@ -211,7 +211,7 @@
 		==== Raw Flight Data
 
 			.MicroPeak Raw Flight Data
-			image::micropeak-raw-data.png[width="4.5in"]
+			image::micropeak-raw-data.png[width="4.5in",align="center"]
 
 			A table consisting of the both the raw barometric pressure
 			data and values computed from that for each recorded time.
@@ -219,7 +219,7 @@
 		==== Configuring the Graph
 
 			.MicroPeak Graph Configuration
-			image::micropeak-graph-configure.png[width="4.5in"]
+			image::micropeak-graph-configure.png[width="4.5in",align="center"]
 
 			This selects which graph elements to show, and lets you
 			switch between metric and imperial units
@@ -227,7 +227,7 @@
 	=== Setting MicroPeak Preferences
 
 			.MicroPeak Preferences
-			image::micropeak-preferences.png[width="1.8in"]
+			image::micropeak-preferences.png[width="1.8in",align="center"]
 
 			The MicroPeak application has a few user settings which are
 			configured through the Preferences dialog, which can be

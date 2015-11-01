@@ -14,6 +14,7 @@
 		EasyMega has two sets of nine screw terminals on the end of
 		the board opposite the telemetry antenna. They are as follows:
 
+		.EasyMega Screw Terminals
 		[options="header",grid="all",cols="2,3,10"]
 		|====
 		|Terminal #|Terminal Name|Description

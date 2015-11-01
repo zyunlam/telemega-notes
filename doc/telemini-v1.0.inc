@@ -26,6 +26,7 @@
 		and from the left for the power switch wires, the
 		connections are as follows:
 
+		.TeleMini v1.0 Screw Terminals
 		[options="header",grid="all",cols="2,3,10"]
 		|====
 		|Terminal #|Terminal Name|Description

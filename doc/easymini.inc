@@ -4,19 +4,25 @@
 	image::easymini-top.jpg[width="5.5in"]
 
 	EasyMini is built on a 0.8 inch by 1½ inch circuit board. It's
-	designed to fit in a 24mm coupler tube. The connectors and
-	screw terminals match TeleMini v2.0, so you can easily swap between
-	EasyMini and TeleMini.
+	designed to fit in a 24mm coupler tube.
+
+	You usually don't need to configure EasyMini at all; it's set
+	up to do dual-deployment with an event at apogee to separate
+	the airframe and deploy a drogue and another event at 250m
+	(820ft) to deploy the main. Install EasyMini in your airframe,
+	hook up a battery, igniters and a power switch and you're
+	ready to fly.
 
 	=== EasyMini Screw Terminals
 	
-		EasyMini has two sets of four screw terminals on the end of the
-		board opposite the telemetry antenna. Using the picture
+		EasyMini has two sets of four screw terminals near one end of the
+		board. Using the picture
 		above, the top four have connections for the main pyro
 		circuit and an external battery and the bottom four have
 		connections for the apogee pyro circuit and the power
 		switch. Counting from the left, the connections are as follows:
 
+		.EasyMini Screw Terminals
 		[options="header",grid="all",cols="2,3,10"]
 		|====
 		|Terminal #|Terminal Name|Description
@@ -53,7 +59,7 @@
 		|Switch connection to positive battery terminal
 		|====
 
-	=== Connecting A Battery To TeleMini v2.0
+	=== Connecting A Battery To EasyMini
 
 		There are two possible battery connections on
 		EasyMini. You can use either method; both feed
@@ -84,7 +90,7 @@
 		one of the igniter leads and connecting the other igniter
 		lead to the per-channel pyro circuit connection.
 
-		To connect the negative pyro battery terminal to TeleMini
+		To connect the negative pyro battery terminal to EasyMini
 		ground, connect it to the negative external battery
 		connection, top terminal 4.
 

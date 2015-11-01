@@ -4,6 +4,7 @@
 	Here's the full set of Altus Metrum products, both in
 	production and retired.
 
+	.Altus Metrum Flight Computer Electronics
 	[options="header"]
 	|================================
 	|Device | Barometer | Z-axis accel | GPS | 3D sensors | Storage | RF Output | Battery
@@ -91,6 +92,7 @@
 	|==============================
 
 	<<<<
+	.Altus Metrum Flight Computer Mechanical Components
 	[options="header",grid="all"]
 	|==============================
 	|Device|Connectors|Screw Terminals|Width|Length|Tube Size

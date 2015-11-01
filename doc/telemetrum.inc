@@ -37,6 +37,7 @@
 		circuits. Using the picture above and starting from the top,
 		the terminals are as follows:
 
+		.TeleMetrum Screw Terminals
 		[options="header",grid="all",cols="2,3,10"]
 		|=========================
 		|Terminal #|Terminal Name|Description
