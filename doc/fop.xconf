@@ -38,20 +38,20 @@ the location of this file.
 
       <fonts>
         <!-- embedded fonts -->
-	<font embed-url="fonts/FrutigerLTStd-Light.otf">
-	  <font-triplet name="Frutiger LT Std" style="normal"
+	<font embed-url="fonts/OpenSans-Light.ttf">
+	  <font-triplet name="Open Sans Light" style="normal"
 			weight="normal"/>
 	</font>
-	<font embed-url="fonts/FrutigerLTStd-LightItalic.otf">
-	  <font-triplet name="Frutiger LT Std" style="italic"
+	<font embed-url="fonts/OpenSans-LightItalic.ttf">
+	  <font-triplet name="Open Sans Light" style="italic"
 			weight="normal"/>
 	</font>
-	<font embed-url="fonts/FrutigerLTStd-Roman.otf">
-	  <font-triplet name="Frutiger LT Std" style="normal"
+	<font embed-url="fonts/OpenSans-Semibold.ttf">
+	  <font-triplet name="Open Sans Light" style="normal"
 			weight="bold"/>
 	</font>
-	<font embed-url="fonts/FrutigerLTStd-Italic.otf">
-	  <font-triplet name="Frutiger LT Std" style="italic"
+	<font embed-url="fonts/OpenSans-SemiboldItalic.ttf">
+	  <font-triplet name="Open Sans Light" style="italic"
 			weight="bold"/>
 	</font>
 

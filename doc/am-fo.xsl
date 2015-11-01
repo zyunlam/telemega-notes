@@ -30,8 +30,8 @@
 <!-- justify, left or right -->
 <xsl:param name="alignment">left</xsl:param>
 
-<xsl:param name="body.font.family" select="'Frutiger LT Std,sans-serif'"/>
-<xsl:param name="title.font.family" select="'Frutiger LT Std,sans-serif'"/>
+<xsl:param name="body.font.family" select="'Open Sans Light,sans-serif'"/>
+<xsl:param name="title.font.family" select="'Open Sans Light,sans-serif'"/>
 <xsl:param name="monospace.font.family" select="'DejaVu Sans Mono,monospace'"/>
 <xsl:param name="body.font.master">12</xsl:param>
 <xsl:param name="body.font.size">
@@ -42,9 +42,6 @@
 <xsl:param name="body.margin.top" select="'0.5in'"/>
 <xsl:param name="bridgehead.in.toc" select="0"/>
 <xsl:param name="footer.column.widths">10 1 1</xsl:param>
-
-<!-- overide setting in common.xsl -->
-<xsl:param name="table.frame.border.thickness" select="'2px'"/>
 
 <!-- Default fetches image from Internet (long timeouts) -->
 <xsl:param name="draft.watermark.image" select="''"/>
@@ -108,6 +105,12 @@
   </xsl:choose>
 </xsl:param>
 
+<xsl:param name="table.frame.border.thickness">0.5pt</xsl:param>
+<xsl:param name="table.frame.border.color">#0080ff</xsl:param>
+<xsl:param name="table.frame.border.thickness">0.5pt</xsl:param>
+<xsl:param name="table.cell.border.thickness">0.5pt</xsl:param>
+<xsl:param name="table.cell.border.color">#0080ff</xsl:param>
+<xsl:param name="table.cell.border.with.css" select="1"/>
 
 <xsl:attribute-set name="copyright.title.properties">
   <xsl:attribute name="font-size">12pt</xsl:attribute>
@@ -122,15 +125,14 @@
 </xsl:attribute-set>
 
 <xsl:attribute-set name="revhistory.table.properties">
-  <xsl:attribute name="border">0.5pt solid black</xsl:attribute>
-  <xsl:attribute name="background-color">#EEEEEE</xsl:attribute>
+  <xsl:attribute name="border">0.5pt solid #0080ff</xsl:attribute>
   <xsl:attribute name="width">50%</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="revhistory.table.cell.properties">
-  <xsl:attribute name="border">0.5pt solid black</xsl:attribute>
+  <xsl:attribute name="border">0.5pt solid #0080ff</xsl:attribute>
   <xsl:attribute name="font-size">12pt</xsl:attribute>
-  <xsl:attribute name="padding">4pt</xsl:attribute>
+  <xsl:attribute name="padding">2pt</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="monospace.properties">

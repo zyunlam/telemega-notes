@@ -174,6 +174,16 @@ FOP_STYLE=am-fo.xsl
 FOP_XCONF=fop.xconf
 STYLESHEET=am.css
 
+FONTS=\
+	fonts/DejaVuSansMono-BoldOblique.ttf \
+	fonts/DejaVuSansMono-Bold.ttf \
+	fonts/DejaVuSansMono-Oblique.ttf \
+	fonts/DejaVuSansMono.ttf \
+	fonts/OpenSans-Light.ttf \
+	fonts/OpenSans-LightItalic.ttf \
+	fonts/OpenSans-Semibold.ttf \
+	fonts/OpenSans-SemiboldItalic.ttf
+
 TEMPLATES_TMPL=titlepage.templates.tmpl
 
 TEMPLATES_XSL=$(TEMPLATES_TMPL:.tmpl=.xsl)
@@ -212,16 +222,20 @@ micropeak.pdf micropeak.html: micropeak-docinfo.xml $(MICROPEAK_RAW_FILES) $(IMA
 
 install:	all
 
-publish:	$(DOC)
+publish:	$(DOC) $(FONTS)
 	cp $(DOC) /home/bdale/web/altusmetrum/AltOS/doc/
+	mkdir -p /home/bdale/web/altusmetrum/AltOS/doc/fonts/
+	cp $(FONTS) /home/bdale/web/altusmetrum/AltOS/doc/fonts/
 	(cd /home/bdale/web/altusmetrum ; \
 	 git add /home/bdale/web/altusmetrum/AltOS/doc/* ; \
+	 git add /home/bdale/web/altusmetrum/AltOS/doc/fonts/* ; \
 	 echo "update docs" | \
-	 git commit -F - /home/bdale/web/altusmetrum/AltOS/doc/* ; \
+	 git commit -F - /home/bdale/web/altusmetrum/AltOS/doc/* /home/bdale/web/altusmetrum/AltOS/doc/fonts/* ; \
 	 git push)
 
-publish-keithp:	$(DOC)
+publish-keithp:	$(DOC) $(FONTS)
 	scp -p $(DOC) keithp.com:~keithp/public_html/altos
+	scp -p $(FONTS) keithp.com:~keithp/public_html/altos/fonts
 
 clean:
 	rm -f $(HTML) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
