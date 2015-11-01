@@ -134,12 +134,18 @@ SVG=\
 RELNOTES_PDF=$(RELNOTES_INC:.inc=.pdf)
 RELNOTES_HTML=$(RELNOTES_INC:.inc=.html)
 
+ALTOS_TXT_FILES=\
+	altos.txt
+
+ALTOS_RAW_FILES=$(ALTOS_TXT_FILES:.txt=.raw)
+ALTOS_PDF_FILES=$(ALTOS_TXT_FILES:.txt=.pdf)
+
 HTML=altusmetrum.html altos.html telemetry.html companion.html micropeak.html telegps.html $(RELNOTES_HTML)
 
-PDF=altusmetrum.pdf $(RELNOTES_PDF) altos.pdf telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
+PDF=altusmetrum.pdf $(RELNOTES_PDF) $(ALTOS_PDF_FILES) telemetry.pdf companion.pdf micropeak.pdf telegps.pdf \
 	$(OUTLINE_PDF_FILES)
 
-FOSTYLE=xorg-fo.xsl
+FOSTYLE=am-fo.xsl
 
 TEMPLATES_TMPL=titlepage.templates.tmpl
 
@@ -189,7 +195,7 @@ publish:	$(DOC)
 	 git push)
 
 clean:
-	rm -f $(HTML) $(PDF) $(TEMPLATES_XSL)
+	rm -f $(HTML) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
 
 distclean: clean
 	rm -f $(HTML) $(PDF)
