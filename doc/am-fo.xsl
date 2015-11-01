@@ -33,7 +33,7 @@
 <xsl:param name="body.font.family" select="'Open Sans Light,sans-serif'"/>
 <xsl:param name="title.font.family" select="'Open Sans Light,sans-serif'"/>
 <xsl:param name="monospace.font.family" select="'DejaVu Sans Mono,monospace'"/>
-<xsl:param name="body.font.master">12</xsl:param>
+<xsl:param name="body.font.master">11</xsl:param>
 <xsl:param name="body.font.size">
  <xsl:value-of select="$body.font.master"/><xsl:text>pt</xsl:text>
 </xsl:param>
@@ -112,14 +112,49 @@
 <xsl:param name="table.cell.border.color">#0080ff</xsl:param>
 <xsl:param name="table.cell.border.with.css" select="1"/>
 
+<xsl:attribute-set name="component.title.properties">
+  <xsl:attribute name="font-size">
+    <xsl:value-of select="$body.font.master * 1.61051"/>
+    <xsl:text>pt</xsl:text>
+  </xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="section.title.level1.properties">
+  <xsl:attribute name="font-size">
+    <xsl:value-of select="$body.font.master * 1.4641"/>
+    <xsl:text>pt</xsl:text>
+  </xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="section.title.level2.properties">
+  <xsl:attribute name="font-size">
+    <xsl:value-of select="$body.font.master * 1.331"/>
+    <xsl:text>pt</xsl:text>
+  </xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="section.title.level3.properties">
+  <xsl:attribute name="font-size">
+    <xsl:value-of select="$body.font.master * 1.21"/>
+    <xsl:text>pt</xsl:text>
+  </xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="section.title.level4.properties">
+  <xsl:attribute name="font-size">
+    <xsl:value-of select="$body.font.master * 1.1"/>
+    <xsl:text>pt</xsl:text>
+  </xsl:attribute>
+</xsl:attribute-set>
+
 <xsl:attribute-set name="copyright.title.properties">
-  <xsl:attribute name="font-size">12pt</xsl:attribute>
+  <xsl:attribute name="font-size">11pt</xsl:attribute>
   <xsl:attribute name="font-weight">bold</xsl:attribute>
   <xsl:attribute name="text-align">center</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="revhistory.title.properties">
-  <xsl:attribute name="font-size">12pt</xsl:attribute>
+  <xsl:attribute name="font-size">11pt</xsl:attribute>
   <xsl:attribute name="font-weight">bold</xsl:attribute>
   <xsl:attribute name="text-align">center</xsl:attribute>
 </xsl:attribute-set>
@@ -131,12 +166,12 @@
 
 <xsl:attribute-set name="revhistory.table.cell.properties">
   <xsl:attribute name="border">0.5pt solid #0080ff</xsl:attribute>
-  <xsl:attribute name="font-size">12pt</xsl:attribute>
+  <xsl:attribute name="font-size">11pt</xsl:attribute>
   <xsl:attribute name="padding">2pt</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="monospace.properties">
-  <xsl:attribute name="font-size">9pt</xsl:attribute>
+  <xsl:attribute name="font-size">11pt</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="component.title.properties">
