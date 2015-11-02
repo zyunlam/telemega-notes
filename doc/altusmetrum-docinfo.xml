@@ -26,6 +26,15 @@
     <imagedata fileref="../themes/background.png" width="6.0in"/>
   </imageobject>
 </mediaobject>
+
+<corpauthor>
+  <inlinemediaobject>
+    <imageobject>
+      <imagedata fileref="altusmetrum-oneline.svg" width="3in"/>
+    </imageobject>
+  </inlinemediaobject>
+</corpauthor>
+
 <legalnotice>
   <para>
     This document is released under the terms of the

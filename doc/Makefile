@@ -83,7 +83,10 @@ IMAGES=\
 	telemetrum-v2.0-th.jpg \
 	telemini.svg \
 	telemini-v1-top.jpg \
-	telemini-v2-top.jpg
+	telemini-v2-top.jpg \
+	altusmetrum-oneline.svg \
+	telegps-oneline.svg \
+	micropeak-oneline.svg
 
 TXT_FILES=altusmetrum.txt
 
@@ -177,6 +180,7 @@ PDF=altusmetrum.pdf micropeak.pdf telegps.pdf $(RELNOTES_PDF) $(ONEFILE_PDF_FILE
 
 FOP_STYLE=am-fo.xsl
 HTML_STYLE=am-html.xsl
+COMMON_STYLE=common.xsl
 FOP_XCONF=fop.xconf
 STYLESHEET=am.css
 
@@ -187,6 +191,8 @@ FONTS=\
 	fonts/DejaVuSansMono.ttf \
 	fonts/OpenSans-Light.ttf \
 	fonts/OpenSans-LightItalic.ttf \
+	fonts/OpenSans-Regular.ttf \
+	fonts/OpenSans-Italic.ttf \
 	fonts/OpenSans-Semibold.ttf \
 	fonts/OpenSans-SemiboldItalic.ttf
 
@@ -194,8 +200,8 @@ TEMPLATES_TMPL=titlepage.templates.tmpl
 
 TEMPLATES_XSL=$(TEMPLATES_TMPL:.tmpl=.xsl)
 
-PDF_CONFIG_FILES=$(FOP_STYLE) $(FOP_XCONF) $(TEMPLATES_XSL)
-HTML_CONFIG_FILES=$(TEMPLATES_XSL)
+PDF_CONFIG_FILES=$(FOP_STYLE) $(COMMON_STYLE) $(FOP_XCONF) $(TEMPLATES_XSL)
+HTML_CONFIG_FILES=$(HTML_STYLE) $(COMMON_STYLE) $(TEMPLATES_XSL)
 
 DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 

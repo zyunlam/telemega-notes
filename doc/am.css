@@ -87,16 +87,16 @@ body div {
 }
 
 a:link {
-    color: #0080ff;
+    color: #78079a;
 }
 
 a:visited {
-    color: #0080ff;
+    color: #78079a;
 }
 
 h1, h2, h3, h4, h5, h6
 {
-  color: #0080ff;
+  color: #78079a;
   font-family: "Open Sans",sans-serif;
 }
 
@@ -119,16 +119,26 @@ div.warning p, div.note p, div.error p {
     margin-left: 5%;
 }
 
-div.toc {
+h3.corpauthor img {
     position: fixed;
     left: 0px;
     top: 0px;
-    height: 100%;
-    width: 25em;
+    width: 410px;
+    height: 90px;
+    border-right: 2px solid #78079a;
+    border-bottom: 2px solid #78079a;
+}
+
+div.toc {
+    position: fixed;
+    left: 0px;
+    top: 92px;
+    bottom: 0;
+    width: 410px;
     margin-right: 5ex;
     margin-left: 0px;
     float: left;
-    border-right: 2px solid #0080ff;
+    border-right: 2px solid #78079a;
     border-collapse: collapse;
     overflow: auto;
 }
@@ -186,7 +196,7 @@ div.example p.title,
 div.sidebar p.title
 {
   font-weight: normal;
-  color: #0080ff;
+  color: #78079a;
   font-family: "Open Sans",sans-serif;
   margin-bottom: 0.2em;
 }
@@ -235,7 +245,7 @@ div.navheader th, div.navheader td, div.navfooter td {
     font-family: "Open Sans",sans-serif;
     font-size: 12pt;
     font-weight: normal;
-    color: #0080ff;
+    color: #78079a;
 }
 div.navheader img, div.navfooter img {
   border-style: none;
@@ -354,12 +364,12 @@ div.revhistory {
 
 div.revhistory table, div.revhistory th, div.revhistory td {
     border-collapse: collapse;
-    border: 1px solid #0080ff;
+    border: 1px solid #78079a;
     padding: 0.25em;
 }
 
 div.revhistory th {
-  color: #0080ff;
+  color: #78079a;
 }
 
 /* Keep TOC and index lines close together. */
@@ -402,10 +412,10 @@ div.informaltable tfoot,
 div.informaltable tbody
 {
     /* No effect in IE6. */
-    border-top: 1px solid #0080ff;
-    border-bottom: 1px solid #0080ff;
-    border-left: 1px solid #0080ff;
-    border-right: 1px solid #0080ff !important;
+    border-top: 1px solid #78079a;
+    border-bottom: 1px solid #78079a;
+    border-left: 1px solid #78079a;
+    border-right: 1px solid #78079a !important;
     border-width: 1px !important;
 }
 */

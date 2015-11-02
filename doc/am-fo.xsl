@@ -106,10 +106,10 @@
 </xsl:param>
 
 <xsl:param name="table.frame.border.thickness">0.5pt</xsl:param>
-<xsl:param name="table.frame.border.color">#0080ff</xsl:param>
+<xsl:param name="table.frame.border.color">#78079a</xsl:param>
 <xsl:param name="table.frame.border.thickness">0.5pt</xsl:param>
 <xsl:param name="table.cell.border.thickness">0.5pt</xsl:param>
-<xsl:param name="table.cell.border.color">#0080ff</xsl:param>
+<xsl:param name="table.cell.border.color">#78079a</xsl:param>
 <xsl:param name="table.cell.border.with.css" select="1"/>
 
 <xsl:attribute-set name="component.title.properties">
@@ -160,12 +160,12 @@
 </xsl:attribute-set>
 
 <xsl:attribute-set name="revhistory.table.properties">
-  <xsl:attribute name="border">0.5pt solid #0080ff</xsl:attribute>
+  <xsl:attribute name="border">0.5pt solid #78079a</xsl:attribute>
   <xsl:attribute name="width">50%</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="revhistory.table.cell.properties">
-  <xsl:attribute name="border">0.5pt solid #0080ff</xsl:attribute>
+  <xsl:attribute name="border">0.5pt solid #78079a</xsl:attribute>
   <xsl:attribute name="font-size">11pt</xsl:attribute>
   <xsl:attribute name="padding">2pt</xsl:attribute>
 </xsl:attribute-set>
@@ -176,12 +176,12 @@
 
 <xsl:attribute-set name="component.title.properties">
   <xsl:attribute name="font-weight">normal</xsl:attribute>
-  <xsl:attribute name="color">#0080ff</xsl:attribute>
+  <xsl:attribute name="color">#78079a</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="section.title.properties">
   <xsl:attribute name="font-weight">normal</xsl:attribute>
-  <xsl:attribute name="color">#0080ff</xsl:attribute>
+  <xsl:attribute name="color">#78079a</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="admonition.title.properties">
@@ -191,7 +191,7 @@
 
 <xsl:attribute-set name="formal.title.properties">
   <xsl:attribute name="font-weight">normal</xsl:attribute>
-  <xsl:attribute name="color">#0080ff</xsl:attribute>
+  <xsl:attribute name="color">#78079a</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:attribute-set name="sidebar.properties" use-attribute-sets="formal.object.properties">

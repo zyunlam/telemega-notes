@@ -18,6 +18,14 @@
     <imagedata fileref="telegps-v1.0-top.jpg" width="4.0in"/>
   </imageobject>
 </mediaobject>
+<corpauthor>
+  <inlinemediaobject>
+    <imageobject>
+      <imagedata fileref="telegps-oneline.svg" width="3in"/>
+    </imageobject>
+  </inlinemediaobject>
+</corpauthor>
+
 <legalnotice>
   <para>
     This document is released under the terms of the
