@@ -24,56 +24,65 @@
 	MicroPeak is designed to be easy to use. Requiring no external
 	components, flying takes just a few steps
 
-	* Install the battery. Fit a CR1025 battery into the plastic
-	  carrier. The positive (\+) terminal should be towards the more
-	  open side of the carrier. Slip the carrier into the battery
-	  holder with the positive (+) terminal facing away from the
-	  circuit board.
+	Install the battery::
+
+	  Fit a CR1025 battery into the plastic carrier. The positive
+	  (\+) terminal should be towards the more open side of the
+	  carrier. Slip the carrier into the battery holder with the
+	  positive (+) terminal facing away from the circuit board.
 
 		.MicroPeak and Battery
 		image::micropeak-back.jpg[width="4.5in"]
 
-	* Install MicroPeak in your rocket. This can be as simple as
-	  preparing a soft cushion of wadding inside a vented model payload
-	  bay. Wherever you mount it, make sure you protect the
-	  barometric sensor from corrosive ejection gasses as those
-	  will damage the sensor, and shield it from light as that can
-	  cause incorrect sensor readings.
+	Install MicroPeak in your rocket::
 
-	* Turn MicroPeak on. Slide the switch so that the actuator
-	  covers the '1' printed on the board. MicroPeak will report
-	  the maximum height of the last flight in decimeters using a
-	  sequence of flashes on the LED. A sequence of short flashes
-	  indicates one digit. A single long flash indicates zero. The
-	  height is reported in decimeters, so the last digit will be
-	  tenths of a meter. For example, if MicroPeak reports 5 4 4
-	  3, then the maximum height of the last flight was 544.3m, or
-	  1786 feet.
+	  This can be as simple as preparing a soft cushion of wadding
+	  inside a vented model payload bay. Wherever you mount it,
+	  make sure you protect the barometric sensor from corrosive
+	  ejection gasses as those will damage the sensor, and shield
+	  it from light as that can cause incorrect sensor readings.
 
-      	* Finish preparing the rocket for flight. After the
-	  previous flight data have been reported, MicroPeak waits for
-	  one minute before starting to check for launch. This gives
-	  you time to finish assembling the rocket. As those
-	  activities might cause pressure changes inside the airframe,
-	  MicroPeak might accidentally detect boost. If you need to do
-	  anything to the airframe after the one minute window passes,
-	  make sure to be careful not to disturb the altimeter. The
-	  LED will remain dark during the one minute delay, but after
-	  that, it will start blinking once every 3 seconds.
+	Turn MicroPeak on::
 
-      	* Fly the rocket. Once the rocket passes about 30m in height
-	  (100 feet), the micro-controller will record the ground
-	  pressure and track the pressure seen during the flight. In
-	  this mode, the LED flickers rapidly. When the rocket lands,
-	  and the pressure stabilizes, the micro-controller will record
-	  the minimum pressure pressure experienced during the flight,
-	  compute the height represented by the difference in air
-	  pressure and blink that value out on the LED. After that,
-	  MicroPeak powers down to conserve battery power.
+	  Slide the switch so that the actuator covers the '1' printed
+	  on the board. MicroPeak will report the maximum height of
+	  the last flight in decimeters using a sequence of flashes on
+	  the LED. A sequence of short flashes indicates one digit. A
+	  single long flash indicates zero. The height is reported in
+	  decimeters, so the last digit will be tenths of a meter. For
+	  example, if MicroPeak reports 5 4 4 3, then the maximum
+	  height of the last flight was 544.3m, or 1786 feet.
 
-      	* Recover the data. Turn MicroPeak off and then back on. MicroPeak
-	  will blink out the maximum height for the last flight. Turn
-	  MicroPeak back off to conserve battery power.
+      	Finish preparing the rocket for flight::
+
+	  After the previous flight data have been reported, MicroPeak
+	  waits for one minute before starting to check for
+	  launch. This gives you time to finish assembling the
+	  rocket. As those activities might cause pressure changes
+	  inside the airframe, MicroPeak might accidentally detect
+	  boost. If you need to do anything to the airframe after the
+	  one minute window passes, make sure to be careful not to
+	  disturb the altimeter. The LED will remain dark during the
+	  one minute delay, but after that, it will start blinking
+	  once every 3 seconds.
+
+      	Fly the rocket::
+
+	  Once the rocket passes about 30m in height (100 feet), the
+	  micro-controller will record the ground pressure and track
+	  the pressure seen during the flight. In this mode, the LED
+	  flickers rapidly. When the rocket lands, and the pressure
+	  stabilizes, the micro-controller will record the minimum
+	  pressure pressure experienced during the flight, compute the
+	  height represented by the difference in air pressure and
+	  blink that value out on the LED. After that, MicroPeak
+	  powers down to conserve battery power.
+
+      	Recover the data::
+
+	  Turn MicroPeak off and then back on. MicroPeak will blink
+	  out the maximum height for the last flight. Turn MicroPeak
+	  back off to conserve battery power.
 
 == The MicroPeak USB adapter
 
