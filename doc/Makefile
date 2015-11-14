@@ -3,24 +3,24 @@
 #
 
 RELNOTES_INC=\
-	release-notes-0.7.1.inc \
-	release-notes-0.8.inc \
-	release-notes-0.9.inc \
-	release-notes-0.9.2.inc \
-	release-notes-1.0.1.inc \
-	release-notes-1.1.inc \
-	release-notes-1.1.1.inc \
-	release-notes-1.2.inc \
-	release-notes-1.2.1.inc \
-	release-notes-1.3.inc \
-	release-notes-1.3.1.inc \
-	release-notes-1.3.2.inc \
-	release-notes-1.4.inc \
-	release-notes-1.4.1.inc \
-	release-notes-1.4.2.inc \
-	release-notes-1.5.inc \
+	release-notes-1.6.1.inc \
 	release-notes-1.6.inc \
-	release-notes-1.6.1.inc
+	release-notes-1.5.inc \
+	release-notes-1.4.2.inc \
+	release-notes-1.4.1.inc \
+	release-notes-1.4.inc \
+	release-notes-1.3.2.inc \
+	release-notes-1.3.1.inc \
+	release-notes-1.3.inc \
+	release-notes-1.2.1.inc \
+	release-notes-1.2.inc \
+	release-notes-1.1.1.inc \
+	release-notes-1.1.inc \
+	release-notes-1.0.1.inc \
+	release-notes-0.9.2.inc \
+	release-notes-0.9.inc \
+	release-notes-0.8.inc \
+	release-notes-0.7.1.inc
 
 IMAGES=\
 	altosui.png \
@@ -183,6 +183,8 @@ ONEFILE_TXT_FILES=\
 ONEFILE_RAW_FILES=$(ONEFILE_TXT_FILES:.txt=.raw)
 ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
 
+AM_HTML=am.html
+
 HTML=altusmetrum.html micropeak.html telegps.html easymini.html $(RELNOTES_HTML) $(ONEFILE_HTML_FILES)
 
 HTML_REVHISTORY=\
@@ -268,15 +270,18 @@ publish:	$(DOC) $(FONTS)
 	 git commit -F - /home/bdale/web/altusmetrum/AltOS/doc/* /home/bdale/web/altusmetrum/AltOS/doc/fonts/* ; \
 	 git push)
 
-publish-keithp:	$(DOC) $(FONTS)
-	scp -p $(DOC) keithp.com:~keithp/public_html/altos
+publish-keithp:	am.html $(DOC) $(FONTS)
+	scp -p am.html $(DOC) keithp.com:~keithp/public_html/altos
 	scp -p $(FONTS) keithp.com:~keithp/public_html/altos/fonts
 
 clean:
-	rm -f $(HTML) $(HTML_REVHISTORY) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
+	rm -f am.html $(HTML) $(HTML_REVHISTORY) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
 
 distclean: clean
 	rm -f $(HTML) $(PDF)
 
 $(PDF): $(PDF_CONFIG_FILES)
 $(HTML): $(HTML_CONFIG_FILES)
+
+am.html: Makefile make-am-html $(HTML)
+	sh ./make-am-html $(HTML) > $@

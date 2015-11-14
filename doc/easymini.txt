@@ -1,4 +1,4 @@
-= EasyMini
+= EasyMini Owner's Manual
 :doctype: book
 :numbered:
 :altusmetrum: 1
