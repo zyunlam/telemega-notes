@@ -59,39 +59,8 @@
 		memory, the flight computer will emit a warbling tone (much
 		slower than the “no continuity tone”)
 
-		Here's a summary of all of the “pad” and “idle” mode indications.
-
-		.Pad/Idle Indications
-		[options="header",cols="1,1,3"]
-		|====
-		|Name		|Beeps		|Description
-
-		|Neither
-		|brap
-		|No continuity detected on either apogee or main igniters.
-
-		|Apogee
-		|dit
-		|Continuity detected only on apogee igniter.
-
-		|Main
-		|dit dit
-		|Continuity detected only on main igniter.
-
-
-		|Both
-		|dit dit dit
-		|Continuity detected on both igniters.
-
-
-		|Storage Full
-		|warble
-		|On-board data logging storage is full. This will
-		 not prevent the flight computer from safely
-		 controlling the flight or transmitting telemetry
-		 signals, but no record of the flight will be
-		 stored in on-board flash.
-		|====
+		See <<_understanding_beeps>> for a summary of all of
+		the audio signals used.
 
 		Once landed, the flight computer will signal that by emitting
 		the “Landed” sound described above, after which it will beep

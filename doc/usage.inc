@@ -124,6 +124,84 @@
 		|Error detected during sensor calibration.
 		|====
 
+		Here's a summary of all of the Pad and Idle mode
+		indications. In Idle mode, you'll hear one of these
+		just once after the two short dits indicating idle
+		mode. In Pad mode, after the dit dah dah dit
+		indicating Pad mode, you'll hear these once every five
+		seconds.
+
+		.Pad/Idle Indications
+		[options="header",cols="1,1,3"]
+		|====
+		|Name		|Beeps		|Description
+
+		|Neither
+		|brap
+		|No continuity detected on either apogee or main igniters.
+
+		|Apogee
+		|dit
+		|Continuity detected only on apogee igniter.
+
+		|Main
+		|dit dit
+		|Continuity detected only on main igniter.
+
+
+		|Both
+		|dit dit dit
+		|Continuity detected on both igniters.
+
+
+		|Storage Full
+		|warble
+		|On-board data logging storage is full. This will
+		 not prevent the flight computer from safely
+		 controlling the flight or transmitting telemetry
+		 signals, but no record of the flight will be
+		 stored in on-board flash.
+		|====
+
+		For devices with a radio transmitter, in addition to
+		the digital and APRS telemetry signals, you can also
+		receive audio tones with a standard amateur
+		70cm FM receiver. While on the pad, you will hear
+		igniter status once every five seconds.
+
+		.Pad Radio Indications
+		[options="header",cols="1,1,3"]
+		|====
+		|Name		|Beeps		|Description
+
+		|Neither
+		|½ second tone
+		|No continuity detected on either apogee or main igniters.
+
+		|Apogee
+		|dit
+		|Continuity detected only on apogee igniter.
+
+		|Main
+		|dit dit
+		|Continuity detected only on main igniter.
+
+
+		|Both
+		|dit dit dit
+		|Continuity detected on both igniters.
+
+		|====
+
+		During ascent, the tones will be muted to allow the
+		telemetry data to consume the full radio bandwidth.
+
+		During descent and after landing, a ½ second tone will
+		be transmitted every five seconds. This can be used to
+		find the rocket using RDF techniques when the signal
+		is too weak to receive GPS information via telemetry
+		or APRS.
+
 	=== Turning On the Power
 
 		Connect a battery and power switch and turn the switch
