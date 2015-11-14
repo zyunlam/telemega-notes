@@ -315,9 +315,9 @@
 		data will be downloaded from that device directly. If
 		you select a TeleDongle device, flight data will be
 		downloaded from a flight computer over radio link via
-		the specified TeleDongle. See the chapter on
-		Controlling An Altimeter Over The Radio Link for more
-		information.
+		the specified TeleDongle. See
+		<<_controlling_an_altimeter_over_the_radio_link>> for
+		more information.
 
 		After the device has been selected, a dialog showing
 		the flight data saved in the device will be shown
@@ -343,7 +343,7 @@
 
 		Once a flight record is selected, the flight monitor interface
 		is displayed and the flight is re-enacted in real time. Check
-		the Monitor Flight chapter above to learn how this window operates.
+		<<_monitor_flight>> to learn how this window operates.
 
 	=== Graph Data
 
@@ -567,8 +567,8 @@
 		programming). TeleMega, EasyMega, TeleMetrum v2,
 		EasyMini and TeleDongle v3 are all programmed directly
 		over their USB ports (self programming).  Please read
-		the directions for flashing devices in the Updating
-		Device Firmware chapter below.
+		the directions for flashing devices in
+		<<_updating_device_firmware>>.
 
 	=== Fire Igniter
 

@@ -6,7 +6,7 @@
 		interval of at least 5 seconds to avoid consuming too much
 		battery power or radio channel bandwidth. You can configure
 		the APRS interval using {application}; that process is described in
-		<<{configure_section}>> in the {application} chapter.
+		<<{configure_section}>>.
 
 		AltOS supports both compressed and uncompressed APRS
 		position report data formats. The compressed format

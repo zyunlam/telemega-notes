@@ -342,12 +342,10 @@
 
 	        The rest of the dialog contains the parameters to be configured.
 
-          The rest of the dialog contains the parameters to be configured.
-	
 		include::config-device.raw[]
 
 	=== Flash Device
 
 		This reprograms TeleGPS devices with new
 		firmware. Please read the directions for flashing
-		devices in the Updating Device Firmware chapter below.
+		devices in <<_updating_device_firmware>>.

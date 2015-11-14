@@ -25,7 +25,6 @@
 
 	=== Configurable Parameters
 
-        Configuring TeleGPS is very
-        simple; the few configurable parameters can all be set
-        using the TeleGPS application over USB. Read
-	the Configure TeleGPS section in the TeleGPS Software chapter
+        Configuring TeleGPS is very simple; the few configurable
+        parameters can all be set using the TeleGPS application over
+        USB. Check out <<_configure_device>>.
