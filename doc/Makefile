@@ -230,17 +230,16 @@ DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
 .raw.pdf:
-	a2x --verbose -a icons -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
+	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
+	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
 
-.raw.html:
-	a2x --verbose -a icons -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
+.pdf.html:
+	@touch $@
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
 
 all:	$(HTML) $(PDF)
-
-$(HTML): $(PDF)
 
 altusmetrum-revhistory.html: altusmetrum.html
 
@@ -248,7 +247,7 @@ micropeak-revhistory.html: micropeak.html
 
 telegps-revhistory.html: telegps.html
 
-altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(RAW_FILES) $(RAW_INC) $(IMAGES)
+altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(RAW_FILES) $(IMAGES)
 
 telegps.html telegps.pdf: telegps-docinfo.xml $(TELEGPS_RAW_FILES) $(IMAGES)
 
