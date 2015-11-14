@@ -403,34 +403,6 @@ div.informaltable p
 {
     margin: 0px;
 }
-/*
-div.table table,
-div.informaltable table
-{
-    margin-left: 0;
-    margin-right: 0.25em;
-    margin-bottom: 0.25em;
-}
-div.informaltable table
-{
-    margin-top: 0.4em
-}
-div.table thead,
-div.table tfoot,
-div.table tbody,
-div.informaltable thead,
-div.informaltable tfoot,
-div.informaltable tbody
-{
-    /* No effect in IE6. */
-    border-top: 1px solid #78079a;
-    border-bottom: 1px solid #78079a;
-    border-left: 1px solid #78079a;
-    border-right: 1px solid #78079a !important;
-    border-width: 1px !important;
-}
-*/
-
 
 div.table thead, div.table tfoot,
 div.informaltable thead, div.informaltable tfoot
