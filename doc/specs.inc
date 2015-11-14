@@ -9,6 +9,7 @@
 	|================================
 	|Device | Barometer | Z-axis accel | GPS | 3D sensors | Storage | RF Output | Battery
 
+	ifdef::telemetrum[]
 	|TeleMetrum v1.0
 	|MP3H6115 10km (33k')
 	|MMA2202 50g
@@ -44,7 +45,9 @@
 	|8MB
 	|40mW
 	|3.7V
+	endif::telemetrum[]
 
+	ifdef::telemini[]
 	|TeleMini v1.0
 	|MP3H6115 10km (33k')
 	|-
@@ -62,7 +65,9 @@
 	|1MB
 	|10mW
 	|3.7-12V
+	endif::telemini[]
 
+	ifdef::easymini[]
 	|EasyMini v1.0
 	|MS5607 30km (100k')
 	|-
@@ -71,7 +76,9 @@
 	|1MB
 	|-
 	|3.7-12V
+	endif::easymini[]
 
+	ifdef::telemega[]
 	|TeleMega v1.0
 	|MS5607 30km (100k')
 	|MMA6555 102g
@@ -80,7 +87,9 @@
 	|8MB
 	|40mW
 	|3.7V
+	endif::telemega[]
 
+	ifdef::easymega[]
 	|EasyMega v1.0
 	|MS5607 30km (100k')
 	|MMA6555 102g
@@ -89,6 +98,8 @@
 	|8MB
 	|-
 	|3.7V
+	endif::easymega[]
+
 	|==============================
 
 	<<<<
@@ -97,13 +108,16 @@
 	|==============================
 	|Device|Connectors|Screw Terminals|Width|Length|Tube Size
 
+	ifdef::telemetrum[]
 	|TeleMetrum
 	|Antenna Debug Companion USB Battery
 	|Apogee pyro Main pyro Switch
 	|1 inch (2.54cm)
 	|2 ¾ inch (6.99cm)
 	|29mm coupler
+	endif::telemetrum[]
 
+	ifdef::telemini[]
 	|TeleMini v1.0
 	|Antenna Debug Battery
 	|Apogee pyro Main pyro
@@ -117,25 +131,33 @@
 	|0.8 inch (2.03cm)
 	|1½ inch (3.81cm)
 	|24mm coupler
+	endif::telemini[]
 
+	ifdef::easymini[]
 	|EasyMini
 	|Debug USB Battery
 	|Apogee pyro Main pyro Battery
 	|0.8 inch (2.03cm)
 	|1½ inch (3.81cm)
 	|24mm coupler
+	endif::easymini[]
 
+	ifdef::telemega[]
 	|TeleMega
 	|Antenna Debug Companion USB Battery
 	|Apogee pyro Main pyro Pyro A-D Switch Pyro battery
 	|1¼ inch (3.18cm)
 	|3¼ inch (8.26cm)
 	|38mm coupler
+	endif::telemega[]
 
+	ifdef::easymega[]
 	|EasyMega
 	|Debug Companion USB Battery
 	|Apogee pyro Main pyro Pyro A-D Switch Pyro battery
 	|1¼ inch (3.18cm)
 	|2¼ inch (5.62cm)
 	|38mm coupler
+	endif::easymega[]
+
 	|====================================

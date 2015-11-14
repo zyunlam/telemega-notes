@@ -5,24 +5,30 @@
 
 	=== Batteries
 
+		ifdef::telemetrum,telemega,easymega[]
 		For TeleMetrum, TeleMega and EasyMega, the battery can be charged by plugging it into the
 		corresponding socket of the device and then using the USB
 		cable to plug the flight computer into your computer's USB socket. The
 		on-board circuitry will charge the battery whenever it is plugged
 		in, because the on-off switch does NOT control the
 		charging circuitry.
-		The Lithium Polymer TeleMini and EasyMini battery can be charged by
-		disconnecting it from the board and plugging it into a
-		standalone battery charger such as the LipoCharger product
-		included in TeleMini Starter Kits, and connecting that via a USB
-		cable to a laptop or other USB power source.
+		endif::telemetrum,telemega,easymega[]
+		The Lithium Polymer
+		ifdef::telemini[TeleMini and]
+		EasyMini battery can be charged by disconnecting it
+		from the board and plugging it into a standalone
+		battery charger such as link:http://altusmetrum.org/LipoCharger[LipoCharger], and
+		connecting that via a USB cable to a laptop or other
+		USB power source.
 
-		You can also choose to use another battery with TeleMini v2.0
-		and EasyMini, anything supplying between 4 and 12 volts should
+		You can also choose to use another battery with
+		ifdef::telemini[TeleMini v2.0 and]
+		EasyMini, anything supplying between 4 and 12 volts should
 		work fine (like a standard 9V battery), but if you are planning
 		to fire pyro charges, ground testing is required to verify that
 		the battery supplies enough current to fire your chosen e-matches.
 
+		ifdef::telemetrum,telemega,easymega[]
 		[NOTE]
 		====
 		On TeleMetrum v1 boards, when the GPS chip is initially
@@ -45,7 +51,9 @@
 		battery is damaged or missing, both LEDs will be lit, which
 		appears yellow.
 		====
+		endif::telemetrum,telemega,easymega[]
 
+	ifdef::radio[]
 	=== Ground Station Hardware
 
 		There are two ground stations available, the TeleDongle USB to
@@ -58,6 +66,7 @@
 		computer.  If you are using an older version of Linux and are having
 		problems, try moving to a fresher kernel (2.6.33 or
 		newer).
+	endif::radio[]
 
 	=== Linux/Mac/Windows Ground Station Software
 
@@ -71,6 +80,7 @@
 		available. The latest version may always be downloaded
 		from http://altusmetrum.org/AltOS
 
+	ifdef::radio[]
 	=== Android Ground Station Software
 
 		TeleBT can also connect to an Android device over
@@ -83,3 +93,4 @@
 		without network access, you'll want to download
 		offline map data before wandering away from the
 		network.
+	endif::radio[]

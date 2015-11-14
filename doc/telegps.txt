@@ -2,6 +2,8 @@
 :doctype: book
 :numbered:
 :telegps: 1
+:radio: 1
+:gps: 1
 :application: TeleGPS
 
 	include::telegps-dedication.raw[]

@@ -105,7 +105,7 @@ INC_FILES=\
 	telemetrum.inc \
 	telemini-v1.0.inc \
 	telemini-v2.0.inc \
-	easymini.inc \
+	easymini-device.inc \
 	telemega.inc \
 	easymega.inc \
 	installation.inc \
@@ -146,6 +146,14 @@ MICROPEAK_INC_FILES=
 
 MICROPEAK_RAW_FILES=$(MICROPEAK_TXT_FILES:.txt=.raw) $(MICROPEAK_INC_FILES:.inc=.raw)
 
+EASYMINI_TXT_FILES=\
+	easymini.txt
+
+EASYMINI_INC_FILES=$(INC_FILES) easymini-release-notes.inc
+
+
+EASYMINI_RAW_FILES=$(EASYMINI_TXT_FILES:.txt=.raw) $(EASYMINI_INC_FILES:.inc=.raw)
+
 OUTLINE_TXT_FILES=\
 	easymega-outline.txt \
 	easymini-outline.txt \
@@ -175,14 +183,15 @@ ONEFILE_TXT_FILES=\
 ONEFILE_RAW_FILES=$(ONEFILE_TXT_FILES:.txt=.raw)
 ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
 
-HTML=altusmetrum.html micropeak.html telegps.html $(RELNOTES_HTML) $(ONEFILE_HTML_FILES)
+HTML=altusmetrum.html micropeak.html telegps.html easymini.html $(RELNOTES_HTML) $(ONEFILE_HTML_FILES)
 
 HTML_REVHISTORY=\
 	altusmetrum-revhistory.html \
 	micropeak-revhistory.html \
-	telegps-revhistory.html
+	telegps-revhistory.html \
+	easymini-revhistory.html
 
-PDF=altusmetrum.pdf micropeak.pdf telegps.pdf $(RELNOTES_PDF) $(ONEFILE_PDF_FILES) \
+PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(RELNOTES_PDF) $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 
 FOP_STYLE=am-fo.xsl
@@ -244,6 +253,8 @@ altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(RAW_FILES) $(RAW_INC
 telegps.html telegps.pdf: telegps-docinfo.xml $(TELEGPS_RAW_FILES) $(IMAGES)
 
 micropeak.pdf micropeak.html: micropeak-docinfo.xml $(MICROPEAK_RAW_FILES) $(IMAGES)
+
+easymini.pdf easymini.html: easymini-docinfo.xml $(EASYMINI_RAW_FILES) $(IMAGES)
 
 install:	all
 

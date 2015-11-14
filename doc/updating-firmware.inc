@@ -1,12 +1,21 @@
 [appendix]
 == Updating Device Firmware
 
+	ifdef::telemega[]
 	TeleMega, TeleMetrum v2, EasyMega, EasyMini and TeleDongle v3
-	are all programmed directly over their USB connectors (self
-	programming). TeleMetrum v1, TeleMini and TeleDongle v0.2 are
+	are all
+	endif::telemega[]
+	ifndef::telemega[]
+	EasyMini is
+	endif::telemega[]
+	programmed directly over their USB connectors (self
+	programming).
+	ifdef::telemega[]
+	TeleMetrum v1, TeleMini and TeleDongle v0.2 are
 	all programmed by using another device as a programmer (pair
 	programming). It's important to recognize which kind of devices
 	you have before trying to reprogram them.
+	endif::telemega[]
 
 	You may wish to begin by ensuring you have current firmware
 	images.  These are distributed as part of the AltOS software
@@ -17,11 +26,15 @@
 	download the most recent version from
 	http://www.altusmetrum.org/AltOS/
 
+	ifdef::telemega[]
 	=== Updating TeleMega, TeleMetrum v2, EasyMega, EasyMini or TeleDongle v3 Firmware
+	endif::telemega[]
+	ifndef::telemega[]
+	=== Updating EasyMini Firmware
+	endif::telemega[]
 
-		Self-programmable devices (TeleMega, TeleMetrum v2,
-		EasyMega and EasyMini) are reprogrammed by connecting
-		them to your computer over USB
+		Self-programmable devices are reprogrammed by
+		connecting them to your computer over USB.
 
 		. Attach a battery if necessary and power switch to
 		  the target device. Power up the device.
@@ -36,7 +49,7 @@
 		. Select the image you want to flash to the device,
 		  which should have a name in the form
 		  <product>-v<product-version>-<software-version>.ihx,
-		  such as TeleMega-v1.0-1.3.0.ihx.
+		  such as EasyMini-v1.0-1.6.0.ihx.
 
 		. Make sure the configuration parameters are
 		  reasonable looking. If the serial number and/or RF
@@ -62,6 +75,7 @@
 			connectors will force the boot loader to start, even if the
 			regular operating system has been corrupted in some way.
 
+			ifdef::telemega[]
 			TeleMega::
 
 			Connect pin 6 and pin 1 of the companion
@@ -72,7 +86,9 @@
 			battery. Pin 7 carries 3.3V and the board will crash
 			if that is connected to pin 1, but shouldn't damage
 			the board.
+			endif::telemega[]
 
+			ifdef::easymega[]
 			EasyMega::
 
 			Connect pin 6 and pin 1 of the companion
@@ -83,7 +99,9 @@
 			battery. Pin 7 carries 3.3V and the board will crash
 			if that is connected to pin 1, but shouldn't damage
 			the board.
+			endif::easymega[]
 
+			ifdef::telemetrum[]
 			TeleMetrum v2::
 
 			Connect pin 6 and pin 1 of the companion
@@ -94,7 +112,9 @@
 			battery. Pin 7 carries 3.3V and the board will crash
 			if that is connected to pin 1, but shouldn't damage
 			the board.
+			endif::telemetrum[]
 
+			ifdef::easymini[]
 			EasyMini::
 
 			Connect pin 6 and pin 1 of the debug connector, which
@@ -102,13 +122,16 @@
 			identified by the square pad around it, and then the
 			pins could sequentially across the board, making Pin 6
 			the one on the other end of the row.
+			endif::easymini[]
 
+			ifdef::telemetrum[]
 			TeleDongle v3::
 
 			Connect pin 32 on the CPU to ground. Pin 32 is closest
 			to the USB wires on the row of pins towards the center
 			of the board. Ground is available on the capacitor
 			next to it, on the end towards the USB wires.
+			endif::telemetrum[]
 
 			Once you've located the right pins:
 
@@ -129,6 +152,7 @@
 			the board has been powered up, you can remove the
 			piece of wire.
 
+	ifdef::telemetrum,telemini[]
 	=== Pair Programming
 
 		The big concept to understand is that you have to use
@@ -341,3 +365,4 @@
 		TeleMetrum to help ensure that the cabling to
 		companion boards used in a rocket don't ever come
 		loose accidentally in flight.
+	endif::telemetrum,telemini[]

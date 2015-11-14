@@ -1,15 +1,8 @@
-= The Altus Metrum System
+= EasyMini
 :doctype: book
 :numbered:
 :altusmetrum: 1
-:radio: 1
-:gps: 1
-:telemetrum: 1
-:telemini: 1
 :easymini: 1
-:telemega: 1
-:easymega: 1
-:telegps: 1
 :application: AltosUI
 
 	include::dedication.raw[]
@@ -20,25 +13,13 @@
 
 	include::usage.raw[]
 
-	include::telemetrum.raw[]
-
-	include::telemini-v1.0.raw[]
-
-	include::telemini-v2.0.raw[]
-
 	include::easymini-device.raw[]
-
-	include::telemega.raw[]
-
-	include::easymega.raw[]
 
 	include::installation.raw[]
 
 	include::using-am-products.raw[]
 
 	include::altosui.raw[]
-
-	include::altosdroid.raw[]
 
 	include::system-operation.raw[]
 
@@ -50,4 +31,4 @@
 
 	include::specs.raw[]
 
-	include::release-notes.raw[]
+	include::easymini-release-notes.raw[]

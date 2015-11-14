@@ -1,3 +1,4 @@
+ifdef::radio[]
 ==== Voice Settings
 
 	{application} provides voice announcements during
@@ -13,11 +14,12 @@
 	Plays a short message allowing you to verify
 	that the audio system is working and the volume settings
 	are reasonable
+endif::radio[]
 
 ==== Log Directory
 
 	{application} logs all telemetry data and saves all
-	TeleMetrum flash data to this directory. This
+	flash data to this directory. This
 	directory is also used as the staring point
 	when selecting data files for display or
 	export.
@@ -28,6 +30,7 @@
 	change where {application} reads and writes data
 	files.
 
+ifdef::radio[]
 ==== Callsign
 
 	This value is transmitted in each command
@@ -46,6 +49,7 @@
 	exactly match the callsign configured in the
 	flight computer.  This matching is case
 	sensitive.
+endif::radio[]
 
 ==== Imperial Units
 
@@ -86,13 +90,16 @@
 	{application} window that includes all of the
 	command buttons.
 
+ifdef::gps[]
 ==== Map Cache Size
 
 	Sets the number of map 'tiles' kept in memory
 	while the application is running. More tiles
 	consume more memory, but will make panning
 	around the map faster.
+endif::gps[]
 
+ifdef::radio[]
 ==== Manage Frequencies
 
 	This brings up a dialog where you can
@@ -103,3 +110,4 @@
 	frequency settings of any devices, it only
 	changes the set of frequencies shown in the
 	menus.
+endif::radio[]

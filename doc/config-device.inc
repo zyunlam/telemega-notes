@@ -37,85 +37,87 @@ ifdef::altusmetrum[]
 
 endif::altusmetrum[]
 
-==== Frequency
+ifdef::radio[]
+	==== Frequency
 
-	This configures which of the frequencies to use for
-	both telemetry and packet command mode. Note that if
-	you set this value via packet command mode, the
-	TeleDongle frequency will also be automatically
-	reconfigured to match so that communication will
-	continue afterwards.
+		This configures which of the frequencies to use for
+		both telemetry and packet command mode. Note that if
+		you set this value via packet command mode, the
+		TeleDongle frequency will also be automatically
+		reconfigured to match so that communication will
+		continue afterwards.
 
-==== RF Calibration
+	==== RF Calibration
 
-	The radios in every Altus Metrum device are calibrated
-	at the factory to ensure that they transmit and
-	receive on the specified frequency.  If you need to
-	you can adjust the calibration by changing this value.
-	Do not do this without understanding what the value
-	means, read the appendix on calibration and/or the
-	source code for more information.  To change a
-	TeleDongle's calibration, you must reprogram the unit
-	completely.
+		The radios in every Altus Metrum device are calibrated
+		at the factory to ensure that they transmit and
+		receive on the specified frequency.  If you need to
+		you can adjust the calibration by changing this value.
+		Do not do this without understanding what the value
+		means, read the appendix on calibration and/or the
+		source code for more information.  To change a
+		TeleDongle's calibration, you must reprogram the unit
+		completely.
 
-==== Telemetry/RDF/APRS Enable
+	==== Telemetry/RDF/APRS Enable
 
-	Enables the radio for transmission during
-	flight. When disabled, the radio will not
-	transmit anything during flight at all.
+		Enables the radio for transmission during
+		flight. When disabled, the radio will not
+		transmit anything during flight at all.
 
-==== Telemetry baud rate
+	==== Telemetry baud rate
 
-	This sets the modulation bit rate for data
-	transmission for both telemetry and packet
-	link mode. Lower bit rates will increase range
-	while reducing the amount of data that can be
-	sent and increasing battery consumption. All
-	telemetry is done using a rate 1/2 constraint
-	4 convolution code, so the actual data
-	transmission rate is 1/2 of the modulation bit
-	rate specified here.
+		This sets the modulation bit rate for data
+		transmission for both telemetry and packet
+		link mode. Lower bit rates will increase range
+		while reducing the amount of data that can be
+		sent and increasing battery consumption. All
+		telemetry is done using a rate 1/2 constraint
+		4 convolution code, so the actual data
+		transmission rate is 1/2 of the modulation bit
+		rate specified here.
 
-==== APRS Interval
+	==== APRS Interval
 
-	How often to transmit GPS information via APRS
-	(in seconds). When set to zero, APRS
-	transmission is disabled.
-	ifdef::altusmetrum[]
-	This option is
-	available on TeleMetrum v2 and TeleMega
-	boards. TeleMetrum v1 boards cannot transmit
-	APRS packets.
-	endif::altusmetrum[]
-	Note that a single APRS packet
-	takes nearly a full second to transmit, so
-	enabling this option will prevent sending any
-	other telemetry during that time.
+		How often to transmit GPS information via APRS
+		(in seconds). When set to zero, APRS
+		transmission is disabled.
+		ifdef::altusmetrum[]
+		This option is
+		available on TeleMetrum v2 and TeleMega
+		boards. TeleMetrum v1 boards cannot transmit
+		APRS packets.
+		endif::altusmetrum[]
+		Note that a single APRS packet
+		takes nearly a full second to transmit, so
+		enabling this option will prevent sending any
+		other telemetry during that time.
 
-==== APRS SSID
+	==== APRS SSID
 
-	Which SSID to report in APRS packets. By
-	default, this is set to the last digit of the
-	serial number, but can be configured to any
-	value from 0 to 9.
+		Which SSID to report in APRS packets. By
+		default, this is set to the last digit of the
+		serial number, but can be configured to any
+		value from 0 to 9.
 
-==== APRS Format
+	==== APRS Format
 
-	Whether to send APRS data in Compressed or
-	Uncompressed format. Compressed format is
-	smaller and more precise. Uncompressed
-	format is older, but may work better with your
-	device. The Kenwood TH-D72 only displays
-	altitude information with Uncompressed
-	format, while the Yaesu FT1D only displays
-	altitude with Compressed format. Test before
-	you fly to see which to use.
+		Whether to send APRS data in Compressed or
+		Uncompressed format. Compressed format is
+		smaller and more precise. Uncompressed
+		format is older, but may work better with your
+		device. The Kenwood TH-D72 only displays
+		altitude information with Uncompressed
+		format, while the Yaesu FT1D only displays
+		altitude with Compressed format. Test before
+		you fly to see which to use.
 
-==== Callsign
+	==== Callsign
 
-	This sets the call sign included in each
-	telemetry packet. Set this as needed to
-	conform to your local radio regulations.
+		This sets the call sign included in each
+		telemetry packet. Set this as needed to
+		conform to your local radio regulations.
+endif::radio[]
 
 ifdef::altusmetrum[]
 
@@ -153,6 +155,7 @@ ifdef::altusmetrum[]
 		is fired first, followed after a two second
 		delay by the 'main' channel.
 
+	ifdef::telemetrum,telemega,easymega[]
 	==== Pad Orientation
 
 		Because they include accelerometers,
@@ -172,6 +175,7 @@ ifdef::altusmetrum[]
 		In this mode, the antenna end of the flight
 		computer must point aft, in line with the
 		expected flight path.
+	endif::telemetrum,telemega,easymega[]
 
 	==== Beeper Frequency
 
@@ -185,21 +189,22 @@ ifdef::altusmetrum[]
 
 endif::altusmetrum[]
 
-==== Logging Trigger Motion
+ifdef::telegps[]
+	==== Logging Trigger Motion
 
-	This sets the amount of motion that TeleGPS
-	needs to see before logging the new
-	position. Motions smaller than this are
-	skipped, which saves storage space.
+		This sets the amount of motion that TeleGPS
+		needs to see before logging the new
+		position. Motions smaller than this are
+		skipped, which saves storage space.
 
-==== Position Reporting Interval
+	==== Position Reporting Interval
 
-	The interval between TeleGPS position reports,
-	both over the air and in the log. Increase
-	this to reduce the frequency of radio
-	transmissions and the length of time available
-	in the log.
-
+		The interval between TeleGPS position reports,
+		both over the air and in the log. Increase
+		this to reduce the frequency of radio
+		transmissions and the length of time available
+		in the log.
+endif::telegps[]
 
 ifdef::altusmetrum[]
 

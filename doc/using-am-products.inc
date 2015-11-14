@@ -1,23 +1,32 @@
 == Using Altus Metrum Products
 
+	ifdef::radio[]
 	=== Being Legal
 
-        First off, in the US, you need an
-        link:http://www.altusmetrum.org/Radio/[amateur radio license]
-        or other authorization to legally operate the radio
-        transmitters that are part of our products.
+	        First off, in the US, you need an
+	        link:http://www.altusmetrum.org/Radio/[amateur radio license]
+	        or other authorization to legally operate the radio
+	        transmitters that are part of our products.
+	endif::radio[]
 
 
 	=== In the Rocket
 
 		In the rocket itself, you just need a flight computer
 		and a single-cell, 3.7 volt nominal Li-Po rechargeable
-		battery.  An 850mAh battery weighs less than a 9V
+		battery.
+		ifdef::telemetrum,telemega,easymega[]
+		An 850mAh battery weighs less than a 9V
 		alkaline battery, and will run a TeleMetrum, TeleMega
-		or EasyMega for hours.  A 110mAh battery weighs less
+		or EasyMega for hours.
+		endif::telemetrum,telemega,easymega[]
+		A 110mAh battery weighs less
 		than a triple A battery and is a good choice for use
-		with TeleMini or EasyMini.
+		with
+		ifdef::telemini[TeleMini or]
+		EasyMini.
 
+		ifdef::radio[]
 		By default, we ship TeleMini, TeleMetrum and TeleMega
 		flight computers with a simple wire antenna.  If your
 		electronics bay or the air-frame it resides within is
@@ -28,9 +37,11 @@
 		antenna is fixed on all current products, so you
 		really want to install the flight computer in a bay
 		made of RF-transparent materials if at all possible.
+		endif::radio[]
 
 	=== On the Ground
 
+		ifdef::radio[]
 		To receive the data stream from the rocket, you need
 		an antenna and short feed-line connected to one of our
 		link:http://www.altusmetrum.org/TeleDongle/[TeleDongle]
@@ -42,28 +53,35 @@
 		TeleDongle looks like a simple serial port, your
 		computer does not require special device
 		drivers... just plug it in.
+		endif::radio[]
 
 		The GUI tool, AltosUI, is written in Java and runs
 		across Linux, Mac OS and Windows. There's also a suite
 		of C tools for Linux which can perform most of the
 		same tasks.
 
+		ifdef::radio[]
 		Alternatively, a TeleBT attached with an SMA to BNC
 		adapter at the feed point of a hand-held yagi used in
 		conjunction with an Android device running AltosDroid
 		makes an outstanding ground station.
+		endif::radio[]
 
-		After the flight, you can use the radio link to
+		After the flight,
+		ifdef::radio[]
+		you can use the radio link to
 		extract the more detailed data logged in either
-		TeleMetrum or TeleMini devices, or you can use a mini
-		USB cable to plug into the TeleMetrum board directly.
-		Pulling out the data without having to open up the
-		rocket is pretty cool!  A USB cable is also how you
+		TeleMetrum or TeleMini devices, or
+		endif::radio[]
+		you can use a
+		USB cable to plug into the flight computer board directly.
+		A USB cable is also how you
 		charge the Li-Po battery, so you'll want one of those
-		anyway... the same cable used by lots of digital
+		anyway. The same cable used by lots of digital
 		cameras and other modern electronic stuff will work
 		fine.
 
+		ifdef::gps[]
 		If your rocket lands out of sight, you may enjoy
 		having a hand-held GPS receiver, so that you can put
 		in a way-point for the last reported rocket position
@@ -72,7 +90,9 @@
 		look around starting from there.  AltosDroid on an
 		Android device with GPS receiver works great for this,
 		too!
+		endif::gps[]
 
+		ifdef::radio[]
 		You may also enjoy having a ham radio “HT” that covers
 		the 70cm band... you can use that with your antenna to
 		direction-find the rocket on the ground the same way
@@ -102,6 +122,7 @@
 		with a suitable 70cm HT.  TeleDongle and an SMA to BNC
 		adapter fit perfectly between the driven element and
 		reflector of Arrow antennas.
+		endif::radio[]
 
 	=== Data Analysis
 
@@ -115,7 +136,7 @@
 		velocity.  You can also generate and view a standard
 		set of plots showing the altitude, acceleration, and
 		velocity of the rocket during flight.  And you can
-		even export a TeleMetrum data file usable with Google
+		even export a flight log in a format usable with Google
 		Maps and Google Earth for visualizing the flight path
 		in two or three dimensions!
 
@@ -125,6 +146,7 @@
 
 	=== Future Plans
 
+		ifdef::telemetrum,telemega,easymega[]
 		We have designed and prototyped several “companion
 		boards” that can attach to the companion connector on
 		TeleMetrum, TeleMega and EasyMega flight computers to
@@ -135,6 +157,7 @@
 		control of events in your rockets beyond the
 		capabilities of our existing productions, please let
 		us know!
+		endif::telemetrum,telemega,easymega[]
 
 		Because all of our work is open, both the hardware
 		designs and the software, if you have some great idea

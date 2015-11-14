@@ -11,6 +11,7 @@
 	chapter is split into sections, each of which documents one of
 	the tasks provided from the top-level toolbar.
 
+	ifdef::radio[]
     	=== Monitor Flight
 	////
 	      <subtitle>Receive, Record and Display Telemetry Data</subtitle>
@@ -298,26 +299,34 @@
 			voltage measured here will be close to the pyro battery
 			voltage. A value greater than 3.2V is required for a 'GO'
 			status.
+	endif::radio[]
+
 
 	=== Save Flight Data
 
 		The altimeter records flight data to its internal
-		flash memory.  TeleMetrum data is recorded at a much
+		flash memory.
+		ifdef::radio[]
+		Data logged on board is recorded at a much
 		higher rate than the telemetry system can handle, and
 		is not subject to radio drop-outs. As such, it
 		provides a more complete and precise record of the
-		flight. The 'Save Flight Data' button allows you to
+		flight.
+		endif::radio[]
+		The 'Save Flight Data' button allows you to
 		read the flash memory and write it to disk.
 
 		Clicking on the 'Save Flight Data' button brings up a
 		list of connected flight computers and TeleDongle
 		devices. If you select a flight computer, the flight
-		data will be downloaded from that device directly. If
-		you select a TeleDongle device, flight data will be
+		data will be downloaded from that device directly.
+		ifdef::radio[]
+		If you select a TeleDongle device, flight data will be
 		downloaded from a flight computer over radio link via
 		the specified TeleDongle. See
 		<<_controlling_an_altimeter_over_the_radio_link>> for
 		more information.
+		endif::radio[]
 
 		After the device has been selected, a dialog showing
 		the flight data saved in the device will be shown
@@ -342,8 +351,12 @@
 		flash memory.
 
 		Once a flight record is selected, the flight monitor interface
-		is displayed and the flight is re-enacted in real time. Check
+		is displayed and the flight is re-enacted in real
+		time.
+		ifdef::radio[]
+		Check
 		<<_monitor_flight>> to learn how this window operates.
+		endif::radio[]
 
 	=== Graph Data
 
@@ -392,6 +405,7 @@
 
 			Shows overall data computed from the flight.
 
+		ifdef::gps[]
 		==== Map
 
 			.Flight Map
@@ -401,6 +415,7 @@
 			with the path of the flight. The red concentric
 			circles mark the launch pad, the black concentric
 			circles mark the landing location.
+		endif::gps[]
 
 	=== Export Data
 
@@ -412,8 +427,11 @@
 		data, while .telem files contain receiver signal
 		strength information.  Next, a second dialog appears
 		which is used to select where to write the resulting
-		file. It has a selector to choose between CSV and KML
-		file formats.
+		file.
+		ifdef::gps[]
+			It has a selector to choose between CSV and KML
+			file formats.
+		endif::gps[]
 
 		==== Comma Separated Value Format
 
@@ -432,20 +450,29 @@
 			standard units, with the barometric data reported in
 			both pressure, altitude and height above pad units.
 
-		==== Keyhole Markup Language (for Google Earth)
+		ifdef::gps[]
+			==== Keyhole Markup Language (for Google Earth)
 
-			This is the format used by Google Earth to provide an
-			overlay within that application. With this, you can
-			use Google Earth to see the whole flight path in 3D.
+				This is the format used by Google Earth to provide an
+				overlay within that application. With this, you can
+				use Google Earth to see the whole flight path
+				in 3D.
+		endif::gps[]
 
 	=== Configure Altimeter
 
 		.Altimeter Configuration
 		image::configure-altimeter.png[width="3.6in"]
 
+		ifdef::radio[]
 		Select this button and then select either an altimeter or
 		TeleDongle Device from the list provided. Selecting a TeleDongle
-		device will use the radio link to configure a remote altimeter.
+		device will use the radio link to configure a remote
+		altimeter.
+		endif::radio[]
+		ifndef::radio[]
+		Select this button and then select an altimeter.
+		endif::radio[]
 
 		The first few lines of the dialog provide information about the
 		connected device, including the product name,
@@ -490,6 +517,7 @@
 
 		include::config-ui.raw[]
 
+	ifdef::radio[]
 	=== Configure Groundstation
 
 		.Configure Groundstation Dialog
@@ -557,16 +585,27 @@
 			This lets you match the telemetry and packet
 			link rate from the transmitter. If they don't
 			match, the device won't receive any data.
+	endif::radio[]
 
 	=== Flash Image
 
 		This reprograms Altus Metrum devices with new
-		firmware. TeleMetrum v1.x, TeleDongle v0.2, TeleMini
-		and TeleBT are all reprogrammed by using another
-		similar unit as a programming dongle (pair
-		programming). TeleMega, EasyMega, TeleMetrum v2,
-		EasyMini and TeleDongle v3 are all programmed directly
-		over their USB ports (self programming).  Please read
+		firmware.
+		ifdef::telemetrum,telemini[]
+			TeleMetrum v1.x, TeleDongle v0.2, TeleMini
+			and TeleBT are all reprogrammed by using another
+			similar unit as a programming dongle (pair
+			programming).
+		endif::telemetrum,telemini[]
+		ifdef::telemega,easymega,telemetrum[]
+			TeleMega, EasyMega, TeleMetrum v2,
+			EasyMini and TeleDongle v3 are all
+		endif::telemega,easymega,telemetrum[]
+		ifndef::telemega,easymega,telemetrum[]
+			EasyMini is
+		endif::telemega,easymega,telemetrum[]
+		programmed directly
+		over USB (self programming). Please read
 		the directions for flashing devices in
 		<<_updating_device_firmware>>.
 
@@ -577,10 +616,13 @@
 
 		This activates the igniter circuits in the flight
 		computer to help test recovery systems
-		deployment. Because this command can operate over the
+		deployment.
+		ifdef::radio[]
+		Because this command can operate over the
 		Packet Command Link, you can prepare the rocket as for
 		flight and then test the recovery system without
 		needing to snake wires inside the air-frame.
+		endif::radio[]
 
 		Selecting the 'Fire Igniter' button brings up the
 		usual device selection dialog. Pick the desired
@@ -598,6 +640,7 @@
 		point you start over again at selecting the desired
 		igniter.
 
+	ifdef::radio[]
 	=== Scan Channels
 
 		.Scan Channels Window
@@ -610,9 +653,13 @@
 		be tried; by default, it only listens at 38400 baud
 		with the standard telemetry format used in v1.0 and
 		later firmware.
+	endif::radio[]
 
+	ifdef::gps[]
 	include::load-maps.raw[]
+	endif::gps[]
 
+	ifdef::radio[]
 	=== Monitor Idle
 
 		.Monitor Idle Window
@@ -632,3 +679,4 @@
 		communicate with the flight computer; they must both
 		match the configuration in the flight computer
 		exactly.
+	endif::radio[]

@@ -54,15 +54,19 @@
 
 		Altus Metrum flight computers include a beeper to
 		provide information about the state of the system.
+		ifdef::telemini[]
 		TeleMini doesn't have room for a beeper, so instead it
 		uses an LED, which works the same, except for every
 		beep is replaced with the flash of the LED.
+		endif::telemini[]
 
-		Here's a short summary of all of the modes and the beeping (or
-		flashing, in the case of TeleMini v1) that accompanies each
-		mode. In the description of the beeping pattern, “dit” means a
-		short beep while "dah" means a long beep (three times as
-		long). “Brap” means a long dissonant tone.
+		Here's a short summary of all of the modes and the
+		beeping
+		ifdef::telemini[(or flashing, in the case of TeleMini v1)]
+		that accompanies each mode. In the description of the
+		beeping pattern, “dit” means a short beep while "dah"
+		means a long beep (three times as long). “Brap” means
+		a long dissonant tone.
 
 		.AltOS Modes
 		[options="border",cols="1,1,2,2"]
@@ -80,7 +84,8 @@
 		|Idle
 		|I
 		|dit dit
-		|Ready to accept commands over USB or radio link.
+		|Ready to accept commands over USB
+		ifdef::radio[or radio link.]
 
 		|Pad
 		|P
@@ -163,6 +168,7 @@
 		 stored in on-board flash.
 		|====
 
+		ifdef::radio[]
 		For devices with a radio transmitter, in addition to
 		the digital and APRS telemetry signals, you can also
 		receive audio tones with a standard amateur
@@ -201,6 +207,7 @@
 		find the rocket using RDF techniques when the signal
 		is too weak to receive GPS information via telemetry
 		or APRS.
+		endif::radio[]
 
 	=== Turning On the Power
 
@@ -216,30 +223,39 @@
 		Flight/Pad::
 		The flight computer is waiting to detect
 		launch and then fly the rocket. In this mode, the USB
-		link is disabled, and the radio goes into
-		transmit-only mode. The only way to get out of this
+		link is
+		ifdef::radio[disabled, and the radio goes into transmit-only mode.]
+		ifndef::radio[disabled.]
+		The only way to get out of this
 		mode is to power the flight computer down.
 
 		Idle::
 		The flight computer is ready to communicate over USB
-		and in packet mode over the radio. You can configure
+		ifdef::radio[and in packet mode over the radio.]
+		You can configure
 		the flight computer, download data or display
 		the current state.
 
+		ifdef::telemetrum,easymega,telemega[]
 		For flight computers with accelerometers (TeleMetrum,
 		EasyMega and TeleMega), the mode is selected by the
 		orientation of the board during the self test
 		interval. If the board is pointing upwards as if ready
 		to fly, it will enter Flight/Pad mode. Otherwise, it will
 		enter Idle mode.
+		endif::telemetrum,easymega,telemega[]
 
+		ifdef::easymini[]
 		For EasyMini, if the USB cable is connected to a
 		computer, it will enter Idle mode. Otherwise, it will
 		enter Flight/Pad mode.
+		endif::easymini[]
 
+		ifdef::telemini[]
 		For TeleMini v1.0, if a packet link is waiting to
 		connect when the device is powered on, it will enter
 		Idle mode, otherwise it will enter Flight/Pad mode.
+		endif::telemini[]
 
 		You can see in <<_understanding_beeps>>
 		how to tell which mode the flight computer is in.
@@ -278,14 +294,19 @@
 
 	=== Using a Different Kind of Battery
 
-		EasyMini and TeleMini v2 are designed to use either a
+		EasyMini
+		ifdef::telemini[and TeleMini v2 are]
+		ifndef::telemini[is]
+		designed to use either a
 		lithium polymer battery or any other battery producing
 		between 4 and 12 volts, such as a rectangular 9V
 		battery.
 
+		ifdef::telemega,easymega,telemetrum[]
 		[WARNING]
 		TeleMega, EasyMega and TeleMetrum are only designed to
 		operate off a single-cell Lithium Polymer battery and
 		cannot be used with any other kind. Connecting a
 		different kind of battery to any of these will destroy
 		the board.
+		endif::telemega,easymega,telemetrum[]

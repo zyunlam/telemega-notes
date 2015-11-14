@@ -5,7 +5,10 @@
 
 		The AltOS firmware build for the altimeters has two
 		fundamental modes, “idle” and “flight”.  Which of these modes
-		the firmware operates in is determined at start up time. For
+		the firmware operates in is determined at start up
+		time.
+		ifdef::telemetrum,telemega,easymega[]
+		For
 		TeleMetrum, TeleMega and EasyMega, which have accelerometers, the mode is
 		controlled by the orientation of the
 		rocket (well, actually the board, of course...) at the time
@@ -13,12 +16,20 @@
 		the flight computer assumes it's on a rail or rod being prepared for
 		launch, so the firmware chooses flight mode.  However, if the
 		rocket is more or less horizontal, the firmware instead enters
-		idle mode.  Since TeleMini v2.0 and EasyMini don't have an
+		idle mode.
+		endif::telemetrum,telemega,easymega[]
+		Since
+		ifdef::telemini[TeleMini v2.0 and EasyMini don't]
+		ifndef::telemini[EasyMini doesn't]
+		have an
 		accelerometer we can use to determine orientation, “idle” mode
 		is selected if the board is connected via USB to a computer,
-		otherwise the board enters “flight” mode. TeleMini v1.0
+		otherwise the board enters “flight” mode.
+		ifdef::telemini[]
+		TeleMini v1.0
 		selects “idle” mode if it receives a command packet within the
 		first five seconds of operation.
+		endif::telemini[]
 
 		At power on, the altimeter will beep out the battery voltage
 		to the nearest tenth of a volt.  Each digit is represented by
@@ -45,13 +56,16 @@
 		If idle mode is entered, you will hear an audible “di-dit” or
 		see two short flashes (“I” for idle), and the flight state
 		machine is disengaged, thus no ejection charges will fire.
+		ifdef::radio[]
 		The altimeters also listen for the radio link when in idle
 		mode for requests sent via TeleDongle.  Commands can be issued
 		in idle mode over either USB or the radio link
-		equivalently. TeleMini v1.0 only has the radio link.  Idle
-		mode is useful for configuring the altimeter, for extracting
-		data from the on-board storage chip after flight, and for
-		ground testing pyro charges.
+		equivalently.
+		ifdef::telemini[TeleMini v1.0 only has the radio link.]
+		endif::radio[]
+		Idle mode is useful for configuring the altimeter, for
+		extracting data from the on-board storage chip after
+		flight, and for ground testing pyro charges.
 
 		In “Idle” and “Pad” modes, once the mode indication
 		beeps/flashes and continuity indication has been sent, if
@@ -70,6 +84,7 @@
 		beep. The flight computer will continue to report landed mode
 		and beep out the maximum height until turned off.
 
+		ifdef::telemetrum,telemega,easymega[]
 		One “neat trick” of particular value when TeleMetrum, TeleMega
 		or EasyMega are used with
 		very large air-frames, is that you can power the board up while the
@@ -80,7 +95,9 @@
 		step of a rickety step-ladder or hanging off the side of a launch
 		tower with a screw-driver trying to turn on your avionics before
 		installing igniters!
+		endif::telemetrum,telemega,easymega[]
 
+		ifdef::telemini[]
 		TeleMini v1.0 is configured solely via the radio link. Of course, that
 		means you need to know the TeleMini radio configuration values
 		or you won't be able to communicate with it. For situations
@@ -99,8 +116,11 @@
 		piece of small gauge wire, connect the outer two holes
 		together, then power TeleMini up. Once the red LED is lit,
 		disconnect the wire and the board should signal that it's in
-		'idle' mode after the initial five second startup period.
+		'idle' mode after the initial five second startup
+		period.
+		endif::telemini[]
 
+	ifdef::gps[]
     	=== GPS
 
 		TeleMetrum and TeleMega include a complete GPS receiver.  A
@@ -120,7 +140,9 @@
 		is turned back on, the GPS system should lock very quickly, typically
 		long before igniter installation and return to the flight line are
 		complete.
+	endif::gps[]
 
+	ifdef::radio[]
     	=== Controlling An Altimeter Over The Radio Link
 
 		One of the unique features of the Altus Metrum system is the
@@ -199,25 +221,38 @@
 		lights on the devices. The red LED will flash each time a packet
 		is transmitted, while the green LED will light up on TeleDongle when
 		it is waiting to receive a packet from the altimeter.
+	endif::radio[]
 
     	=== Ground Testing
 
 		An important aspect of preparing a rocket using electronic deployment
-		for flight is ground testing the recovery system.  Thanks
+		for flight is ground testing the recovery system.
+		ifdef::radio[]
+		Thanks
 		to the bi-directional radio link central to the Altus Metrum system,
 		this can be accomplished in a TeleMega, TeleMetrum or TeleMini equipped rocket
 		with less work than you may be accustomed to with other systems.  It
 		can even be fun!
+		endif::radio[]
 
 		Just prep the rocket for flight, then power up the altimeter
-		in “idle” mode (placing air-frame horizontal for TeleMetrum or TeleMega, or
-		selecting the Configure Altimeter tab for TeleMini).  This will cause
-		the firmware to go into “idle” mode, in which the normal flight
-		state machine is disabled and charges will not fire without
-		manual command.  You can now command the altimeter to fire the apogee
-		or main charges from a safe distance using your computer and
-		TeleDongle and the Fire Igniter tab to complete ejection testing.
+		in “idle”
+		ifdef::telemetrum,telemega,telemini[]
+			mode (placing air-frame horizontal for TeleMetrum or TeleMega, or
+			selecting the Configure Altimeter tab for TeleMini).
+			This will cause
+			the firmware to go into “idle” mode, in which the normal flight
+			state machine is disabled and charges will not fire without
+			manual command.
+		endif::telemetrum,telemega,telemini[]
+		ifndef::telemetrum,telemega,telemini[]
+			mode.
+		endif::telemetrum,telemega,telemini[]
+		You can now command the altimeter to fire the apogee
+		or main charges from a safe distance using your
+		computer and the Fire Igniter tab to complete ejection testing.
 
+	ifdef::radio[]
     	=== Radio Link
 
 		TeleMetrum, TeleMini and TeleMega all incorporate an
@@ -255,10 +290,13 @@
 		devices.  We hope to fly boards to higher altitudes
 		over time, and would of course appreciate customer
 		feedback on performance in higher altitude flights!
+	endif::radio[]
 
+	ifdef::gps+radio[]
 	:aprsdevices: TeleMetrum v2.0 and TeleMega
 	:configure_section: _configure_altimeter
 	include::aprs-operation.raw[]
+	endif::gps+radio[]
 
     	=== Configurable Parameters
 
@@ -266,6 +304,5 @@
 		very simple.  Even on our baro-only TeleMini and
 		EasyMini boards, the use of a Kalman filter means
 		there is no need to set a “mach delay”.  All of the
-		configurable parameters can be set using AltosUI
-		over USB or or radio link via TeleDongle. Read
+		configurable parameters can be set using AltosUI. Read
 		<<_configure_altimeter>> for more information.
