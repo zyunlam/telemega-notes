@@ -50,6 +50,122 @@
 		firing when in the Off position. The switch is in-line with
 		the positive battery terminal.
 
+	=== Understanding Beeps
+
+		Altus Metrum flight computers include a beeper to
+		provide information about the state of the system.
+		TeleMini doesn't have room for a beeper, so instead it
+		uses an LED, which works the same, except for every
+		beep is replaced with the flash of the LED.
+
+		Here's a short summary of all of the modes and the beeping (or
+		flashing, in the case of TeleMini v1) that accompanies each
+		mode. In the description of the beeping pattern, “dit” means a
+		short beep while "dah" means a long beep (three times as
+		long). “Brap” means a long dissonant tone.
+
+		.AltOS Modes
+		[options="border",cols="1,1,2,2"]
+		|====
+		|Mode Name
+		|Abbreviation
+		|Beeps
+		|Description
+
+		|Startup
+		|S
+		|battery voltage in decivolts
+		|Calibrating sensors, detecting orientation.
+
+		|Idle
+		|I
+		|dit dit
+		|Ready to accept commands over USB or radio link.
+
+		|Pad
+		|P
+		|dit dah dah dit
+		|Waiting for launch. Not listening for commands.
+
+		|Boost
+		|B
+		|dah dit dit dit
+		|Accelerating upwards.
+
+		|Fast
+		|F
+		|dit dit dah dit
+		|Decelerating, but moving faster than 200m/s.
+
+		|Coast
+		|C
+		|dah dit dah dit
+		|Decelerating, moving slower than 200m/s
+
+		|Drogue
+		|D
+		|dah dit dit
+		|Descending after apogee. Above main height.
+
+		|Main
+		|M
+		|dah dah
+		|Descending. Below main height.
+
+		|Landed
+		|L
+		|dit dah dit dit
+		|Stable altitude for at least ten seconds.
+
+
+		|Sensor error
+		|X
+		|dah dit dit dah
+		|Error detected during sensor calibration.
+		|====
+
+	=== Turning On the Power
+
+		Connect a battery and power switch and turn the switch
+		to "on". The flight computer will signal power on by
+		reporting the battery voltage and then perform an internal self
+		test and sensor calibration.
+
+		Once the self test and calibration are complete, there
+		are two modes that an Altus Metrum flight computer can
+		operate in:
+
+		Flight/Pad::
+		The flight computer is waiting to detect
+		launch and then fly the rocket. In this mode, the USB
+		link is disabled, and the radio goes into
+		transmit-only mode. The only way to get out of this
+		mode is to power the flight computer down.
+
+		Idle::
+		The flight computer is ready to communicate over USB
+		and in packet mode over the radio. You can configure
+		the flight computer, download data or display
+		the current state.
+
+		For flight computers with accelerometers (TeleMetrum,
+		EasyMega and TeleMega), the mode is selected by the
+		orientation of the board during the self test
+		interval. If the board is pointing upwards as if ready
+		to fly, it will enter Flight/Pad mode. Otherwise, it will
+		enter Idle mode.
+
+		For EasyMini, if the USB cable is connected to a
+		computer, it will enter Idle mode. Otherwise, it will
+		enter Flight/Pad mode.
+
+		For TeleMini v1.0, if a packet link is waiting to
+		connect when the device is powered on, it will enter
+		Idle mode, otherwise it will enter Flight/Pad mode.
+
+		You can see in <<_understanding_beeps>>
+		how to tell which mode the flight computer is in.
+
 	=== Using an External Active Switch Circuit
 
 		You can use an active switch circuit, such as the
@@ -63,13 +179,14 @@
 
 	=== Using a Separate Pyro Battery
 
-		As mentioned above in the section on hooking up pyro
-		charges, one lead for each of the pyro charges is connected
-		through the power switch directly to the positive battery
-		terminal. The other lead is connected to the pyro circuit,
-		which connects it to the negative battery terminal when the
-		pyro circuit is fired. The pyro circuit on all of the flight
-		computers is designed to handle up to 16V.
+		As mentioned above in <<_hooking_up_pyro_charges>>, one
+		lead for each of the pyro charges is connected through
+		the power switch directly to the positive battery
+		terminal. The other lead is connected to the pyro
+		circuit, which connects it to the negative battery
+		terminal when the pyro circuit is fired. The pyro
+		circuit on all of the flight computers is designed to
+		handle up to 16V.
 
 		To use a separate pyro battery, connect the negative pyro
 		battery terminal to the flight computer ground terminal,
@@ -78,7 +195,8 @@
 		computer. When the pyro channel fires, it will complete the
 		circuit between the negative pyro terminal and the ground
 		terminal, firing the igniter. Specific instructions on how
-		to hook this up will be found in each section below.
+		to hook this up for each flight computer will be found
+		in the section below for that flight computer.
 
 	=== Using a Different Kind of Battery
 
@@ -89,7 +207,7 @@
 
 		[WARNING]
 		TeleMega, EasyMega and TeleMetrum are only designed to
-		use a single-cell Lithium Polymer battery and cannot
-		be used with any other kind. Connecting a different
-		kind of battery to any of these will destroy the
-		board.
+		operate off a single-cell Lithium Polymer battery and
+		cannot be used with any other kind. Connecting a
+		different kind of battery to any of these will destroy
+		the board.

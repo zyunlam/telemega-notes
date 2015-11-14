@@ -1,8 +1,10 @@
 = TeleGPS Owner's Manual
 :doctype: book
 :numbered:
+:telegps: 1
+:application: TeleGPS
 
-	include::dedication.raw[]
+	include::telegps-dedication.raw[]
 
 	include::telegps-quick-start.raw[]
 

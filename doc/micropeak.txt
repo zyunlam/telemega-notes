@@ -149,8 +149,8 @@
 
 		* Once the data are saved, a graph will be displayed
 		  with height, speed and acceleration values computed
-		  from the recorded barometric pressure data. See the
-		  next section for more details on that.
+		  from the recorded barometric pressure data. See
+		  <<_analyzing_micropeak_data> for more details on that.
 
 	=== Analyzing MicroPeak Data
 

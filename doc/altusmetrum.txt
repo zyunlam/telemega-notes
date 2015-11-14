@@ -1,6 +1,8 @@
 = The Altus Metrum System
 :doctype: book
 :numbered:
+:altusmetrum: 1
+:application: AltosUI
 
 	include::dedication.raw[]
 

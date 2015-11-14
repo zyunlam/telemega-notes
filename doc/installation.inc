@@ -22,13 +22,14 @@
 	Check polarity and voltage before connecting any battery not
 	purchased from Altus Metrum or Spark Fun.
 
-	By default, we use the unregulated output of the battery directly
-	to fire ejection charges.  This works marvelously with standard
-	low-current e-matches like the J-Tek from MJG Technologies, and with
-	Quest Q2G2 igniters.  However, if you want or need to use a separate
-	pyro battery, check out the “External Pyro Battery” section in this
-	manual for instructions on how to wire that up. The altimeters are
-	designed to work with an external pyro battery of no more than 15 volts.
+	By default, we use the unregulated output of the battery
+	directly to fire ejection charges.  This works marvelously
+	with standard low-current e-matches like the J-Tek from MJG
+	Technologies, and with Quest Q2G2 igniters.  However, if you
+	want or need to use a separate pyro battery, check out
+	<<_using_a_separate_pyro_battery>> for instructions on how to wire
+	that up. The altimeters are designed to work with an external
+	pyro battery of no more than 15 volts.
 
 	Ejection charges are wired directly to the screw terminal block
 	at the aft end of the altimeter.  You'll need a very small straight

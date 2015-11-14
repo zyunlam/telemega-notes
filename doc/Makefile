@@ -90,6 +90,13 @@ IMAGES=\
 
 TXT_FILES=altusmetrum.txt
 
+COMMON_INC_FILES=\
+	config-device.inc \
+	config-ui.inc \
+	load-maps.inc \
+	aprs-operation.inc \
+	handling.inc
+
 INC_FILES=\
 	dedication.inc \
 	intro.inc \
@@ -109,23 +116,23 @@ INC_FILES=\
 	system-operation.inc \
 	pyro-channels.inc \
 	flight-data-recording.inc \
-	handling.inc \
 	specs.inc \
+	$(COMMON_INC_FILES) \
 	release-notes.inc \
 	$(RELNOTES_INC)
 
 RAW_FILES=$(TXT_FILES:.txt=.raw) $(INC_FILES:.inc=.raw)
 
 TELEGPS_INC_FILES=\
-	dedication.inc \
+	telegps-dedication.inc \
 	telegps-quick-start.inc \
 	telegps-using.inc \
 	telegps-system-operation.inc \
 	telegps-application.inc \
-	handling.inc \
 	telegps-specs.inc \
 	telegps-updating-firmware.inc \
-	telegps-release-notes.inc
+	telegps-release-notes.inc \
+	$(COMMON_INC_FILES)
 
 TELEGPS_TXT_FILES=\
 	telegps.txt
@@ -214,10 +221,10 @@ DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
 .raw.pdf:
-	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
+	a2x --verbose -a icons -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 
 .raw.html:
-	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
+	a2x --verbose -a icons -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl

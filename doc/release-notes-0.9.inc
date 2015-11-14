@@ -18,8 +18,8 @@
 	  flight logs just because you fly the same board twice in one
 	  day.
 
-	* Telemetry support for devices with serial number >=
-	  256. Previous versions used a telemetry packet format that
+	* Telemetry support for devices with serial number >= 256.
+	  Previous versions used a telemetry packet format that
 	  provided only 8 bits for the device serial number. This
 	  change requires that both ends of the telemetry link be
 	  running the 0.9 firmware or they will not communicate.

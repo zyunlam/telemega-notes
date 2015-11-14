@@ -91,7 +91,7 @@
         
 			You can pre-load images for your favorite
 			launch sites before you leave home; check out
-			the 'Preload Maps' section below.
+			<<_load_maps>>.
 	
 		==== Location
 
@@ -233,155 +233,14 @@
 			within that application. With this, you can use Google Earth to
 			see the whole path in 3D.
 
-	=== Load Maps
-
-		.Load Maps Window
-		image::load-maps.png[width="5.2in"]
-
-		Before using TeleGPS, you can use Load Maps to load
-		map data in case you don't have access to the internet
-		while receiving telemetry.
-
-		There's a drop-down menu of rocket launch sites we
-		know about; if your favorites aren't there, please let
-		us know the lat/lon and name of the site. The contents
-		of this list are actually downloaded from our server
-		at run-time, so as new sites are sent in, they'll get
-		automatically added to this list.  If the launch site
-		isn't in the list, you can manually enter the lat/lon
-		values
-
-		There are four different kinds of maps you can view;
-		you can select which to download by selecting as many
-		as you like from the available types:
-
-		Hybrid::
-		A combination of satellite imagery and road data. This
-		is the default view.
-
-		Satellite::
-		Just the satellite imagery without any annotation.
-
-		Roadmap::
-		Roads, political boundaries and a few geographic
-		features.
-
-		Terrain::
-		Contour intervals and shading that show hills and
-		valleys.
-
-		You can specify the range of zoom levels to download;
-		smaller numbers show more area with less
-		resolution. The default level, 0, shows about
-		3m/pixel. One zoom level change doubles or halves that
-		number. Larger zoom levels show more detail, smaller
-		zoom levels less.
-
-		The Map Radius value sets how large an area around the
-		center point to download. Select a value large enough
-		to cover any plausible flight from that site. Be aware
-		that loading a large area with a high maximum zoom
-		level can attempt to download a lot of data. Loading
-		hybrid maps with a 10km radius at a minimum zoom of -2
-		and a maximum zoom of 2 consumes about 120MB of
-		space. Terrain and road maps consume about 1/10 as
-		much space as satellite or hybrid maps.
-
-		Clicking the 'Load Map' button will fetch images from
-		Google Maps; note that Google limits how many images
-		you can fetch at once, so if you load more than one
-		launch site, you may get some gray areas in the map
-		which indicate that Google is tired of sending data to
-		you. Try again later.
+	include::load-maps.raw[]
 
 	=== Preferences
 
 		.TeleGPS Preferences Window
 		image::telegps-preferences.png[width="2.4in"]
 
-			AltosUI provides voice announcements during
-			flight so that you can keep your eyes on the
-			sky and still get information about the
-			current flight status. However, sometimes you
-			don't want to hear them.
-
-			Enable::
-			Turns all voice announcements on and off
-
-			Test Voice::
-			Plays a short message allowing you to verify
-			that the audio system is working and the volume settings
-			are reasonable
-
-      		==== Log Directory
-
-			AltosUI logs all telemetry data and saves all
-			TeleMetrum flash data to this directory. This
-			directory is also used as the staring point
-			when selecting data files for display or
-			export.
-
-			Click on the directory name to bring up a
-			directory choosing dialog, select a new
-			directory and click 'Select Directory' to
-			change where AltosUI reads and writes data
-			files.
-
-      		==== Callsign
-
-			This value is transmitted in each command
-			packet sent from TeleDongle and received from
-			an altimeter.  It is not used in telemetry
-			mode, as the callsign configured in the
-			altimeter board is included in all telemetry
-			packets.  Configure this with the AltosUI
-			operators call sign as needed to comply with
-			your local radio regulations.
-
-			Note that to successfully command a flight
-			computer over the radio (to configure the
-			altimeter, monitor idle, or fire pyro
-			charges), the callsign configured here must
-			exactly match the callsign configured in the
-			flight computer.  This matching is case
-			sensitive.
-
-		==== Imperial Units
-
-			This switches between metric units (meters)
-			and imperial units (feet and miles). This
-			affects the display of values use during
-			flight monitoring, configuration, data
-			graphing and all of the voice
-			announcements. It does not change the units
-			used when exporting to CSV files, those are
-			always produced in metric units.
-
-		==== Font Size
-
-			Selects the set of fonts used in the flight
-			monitor window. Choose between the small,
-			medium and large sets.
-
-      		==== Serial Debug
-
-			This causes all communication with a connected
-			device to be dumped to the console from which
-			AltosUI was started. If you've started it from
-			an icon or menu entry, the output will simply
-			be discarded. This mode can be useful to debug
-			various serial communication issues.
-
-		==== Manage Frequencies
-
-			This brings up a dialog where you can
-			configure the set of frequencies shown in the
-			various frequency menus. You can add as many
-			as you like, or even reconfigure the default
-			set. Changing this list does not affect the
-			frequency settings of any devices, it only
-			changes the set of frequencies shown in the
-			menus.
+		include::config-ui.raw[]
 
 	=== Close
 
@@ -485,82 +344,7 @@
 
           The rest of the dialog contains the parameters to be configured.
 	
-		==== Frequency
-
-			This configures which of the frequencies to use for
-			both telemetry and packet command mode. Note that if
-			you set this value via packet command mode, the
-			TeleDongle frequency will also be automatically
-			reconfigured to match so that communication will
-			continue afterwards.
-
-		==== RF Calibration
-
-			The radios in every Altus Metrum device are calibrated
-			at the factory to ensure that they transmit and
-			receive on the specified frequency.  If you need to
-			you can adjust the calibration by changing this value.
-			Do not do this without understanding what the value
-			means, read the appendix on calibration and/or the
-			source code for more information.  To change a
-			TeleDongle's calibration, you must reprogram the unit
-			completely.
-
-      		==== Telemetry/RDF/APRS Enable
-
-			Enables the radio for transmission during
-			flight. When disabled, the radio will not
-			transmit anything during flight at all.
-
-      		==== Telemetry baud rate
-
-			This sets the modulation bit rate for data
-			transmission for both telemetry and packet
-			link mode. Lower bit rates will increase range
-			while reducing the amount of data that can be
-			sent and increasing battery consumption. All
-			telemetry is done using a rate 1/2 constraint
-			4 convolution code, so the actual data
-			transmission rate is 1/2 of the modulation bit
-			rate specified here.
-
-      		==== APRS Interval
-
-			How often to transmit GPS information via APRS
-			(in seconds). When set to zero, APRS
-			transmission is disabled. This option is
-			available on TeleMetrum v2 and TeleMega
-			boards. TeleMetrum v1 boards cannot transmit
-			APRS packets. Note that a single APRS packet
-			takes nearly a full second to transmit, so
-			enabling this option will prevent sending any
-			other telemetry during that time.
-
-      		==== APRS SSID
-
-			Which SSID to report in APRS packets. By
-			default, this is set to the last digit of the
-			serial number, but can be configured to any
-			value from 0 to 9.
-
-		==== Callsign
-
-			This sets the call sign included in each
-			telemetry packet. Set this as needed to
-			conform to your local radio regulations.
-
-		==== Logging Trigger Motion
-
-			If TeleGPS moves less than this distance over
-			a long period of time, it will not log that
-			location, saving storage space.
-
-		==== Position Reporting Interval
-
-			This sets how often TeleGPS reports position
-			information via telemetry and to the on-board
-			log. Reducing this value will save power and
-			logging memory consumption.
+		include::config-device.raw[]
 
 	=== Flash Device
 
