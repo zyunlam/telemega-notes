@@ -125,8 +125,8 @@ h3.corpauthor img {
     top: 0px;
     width: 410px;
     height: 90px;
-    border-right: 2px solid #78079a;
-    border-bottom: 2px solid #78079a;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
 }
 
 div.toc {
@@ -134,13 +134,28 @@ div.toc {
     left: 0px;
     top: 92px;
     bottom: 0;
-    width: 410px;
-    margin-right: 5ex;
-    margin-left: 0px;
+    width: 390px;
+    margin-right: 0;
+    margin-left: 0;
+    padding-left: 10px;
+    padding-right: 10px;
     float: left;
-    border-right: 2px solid #78079a;
+    border-right: 2px solid #808080;
     border-collapse: collapse;
     overflow: auto;
+}
+
+div.toc p,
+div.list-of-figures p,
+div.list-of-tables p,
+div.list-of-examples p,
+div.toc a
+{
+    color: black;
+}
+
+div.toc p {
+    color: black;
 }
 
 div.toc a:link {
@@ -188,10 +203,6 @@ div.table-contents table {
     margin-right: auto;
 }
 
-div.toc p:first-child,
-div.list-of-figures p:first-child,
-div.list-of-tables p:first-child,
-div.list-of-examples p:first-child,
 div.example p.title,
 div.sidebar p.title
 {
@@ -204,13 +215,13 @@ div.sidebar p.title
 body h1 {
   margin: .0em 0 0 -4%;
   line-height: 1.3;
-  border-bottom: 2px solid silver;
+  border-bottom: 2px solid #808080;
 }
 
 body h2 {
   margin: 0.5em 0 0 -4%;
   line-height: 1.3;
-  border-bottom: 2px solid silver;
+  border-bottom: 2px solid #808080;
 }
 
 body h3 {
@@ -221,7 +232,7 @@ body h3 {
 body h4 {
   margin: .8em 0 0 -3%;
   line-height: 1.3;
-  border-top: 2px solid silver;goog
+  border-top: 2px solid #808080;
 }
 
 body h5 {
@@ -238,7 +249,7 @@ body hr {
   border: none; /* Broken on IE6 */
 }
 div.footnotes hr {
-  border: 1px solid silver;
+  border: 1px solid #808080;
 }
 
 div.navheader th, div.navheader td, div.navfooter td {
@@ -254,7 +265,7 @@ div.navheader a, div.navfooter a {
   font-weight: normal;
 }
 div.navfooter hr {
-  border: 1px solid silver;
+  border: 1px solid #808080;
 }
 
 body td {
@@ -291,7 +302,7 @@ tt.literal, code.literal {
 }
 
 .programlisting, .screen {
-  border: 1px solid silver;
+  border: 1px solid #808080;
   background: #f4f4f4;
   margin: 0.5em 10% 0.5em 0;
   padding: 0.5em 1em;
@@ -301,7 +312,7 @@ div.sidebar {
   background: #ffffee;
   margin: 1.0em 10% 0.5em 0;
   padding: 0.5em 1em;
-  border: 1px solid silver;
+  border: 1px solid #808080;
 }
 div.sidebar * { padding: 0; }
 div.sidebar div { margin: 0; }
@@ -331,7 +342,7 @@ dt {
 }
 
 dt span.term {
-  font-style: normal;
+  font-weight: bold;
 }
 
 div.variablelist dd p {
@@ -364,12 +375,12 @@ div.revhistory {
 
 div.revhistory table, div.revhistory th, div.revhistory td {
     border-collapse: collapse;
-    border: 1px solid #78079a;
+    border: 1px solid #808080;
     padding: 0.25em;
 }
 
 div.revhistory th {
-  color: #78079a;
+    color: black;
 }
 
 /* Keep TOC and index lines close together. */
