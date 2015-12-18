@@ -177,6 +177,11 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 
 #define ao_gpio_get(port, bit, pin) stm_gpio_get(port, bit)
 
+#define ao_gpio_set_bits(port, bits) stm_gpio_set_bits(port, bits)
+
+#define ao_gpio_clr_bits(port, bits) stm_gpio_clr_bits(port, bits);
+
+
 #define ao_enable_output(port,bit,pin,v) do {			\
 		ao_enable_port(port);				\
 		ao_gpio_set(port, bit, pin, v);			\
