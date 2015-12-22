@@ -224,6 +224,10 @@ _ao_config_get(void)
 		if (minor < 22)
 			ao_config.aprs_format = AO_CONFIG_DEFAULT_APRS_FORMAT;
 #endif
+#if HAS_FIXED_PAD_BOX
+		if (minor < 22)
+			ao_config.pad_box = 1;
+#endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
@@ -899,6 +903,25 @@ ao_config_aprs_format_show(void)
 }
 #endif /* HAS_APRS */
 
+#if HAS_FIXED_PAD_BOX
+void
+ao_config_pad_box_show(void)
+{
+	printf ("Pad box: %d\n", ao_config.pad_box);
+}
+
+void
+ao_config_pad_box_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.pad_box = ao_cmd_lex_i;
+	_ao_config_edit_finish();
+}
+#endif
+
 struct ao_config_var {
 	__code char	*str;
 	void		(*set)(void) __reentrant;
@@ -992,6 +1015,10 @@ __code struct ao_config_var ao_config_vars[] = {
 	  ao_config_aprs_ssid_set, ao_config_aprs_ssid_show },
 	{ "C <0 compressed, 1 uncompressed>\0APRS format",
 	  ao_config_aprs_format_set, ao_config_aprs_format_show },
+#endif
+#if HAS_FIXED_PAD_BOX
+	{ "B <box>\0Set pad box (1-99)",
+	  ao_config_pad_box_set, ao_config_pad_box_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

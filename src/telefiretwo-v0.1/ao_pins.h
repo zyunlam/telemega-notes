@@ -37,6 +37,7 @@
 #define PACKET_HAS_MASTER	0
 #define PACKET_HAS_SLAVE	0
 #define AO_DATA_RING		32
+#define HAS_FIXED_PAD_BOX	1
 
 /* 8MHz High speed external crystal */
 #define AO_HSE			8000000

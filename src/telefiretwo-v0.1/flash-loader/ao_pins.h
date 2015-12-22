@@ -23,6 +23,10 @@
 
 #include <ao_flash_stm_pins.h>
 
-#define AO_BOOT_PIN		0
+#define AO_BOOT_PIN			1
+#define AO_BOOT_APPLICATION_GPIO	stm_gpiob
+#define AO_BOOT_APPLICATION_PIN		6
+#define AO_BOOT_APPLICATION_VALUE	1
+#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_UP
 
 #endif /* _AO_PINS_H_ */
