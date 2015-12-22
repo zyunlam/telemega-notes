@@ -118,6 +118,9 @@ struct ao_config {
 #if HAS_APRS
 	uint8_t		aprs_format;		/* minor version 22 */
 #endif
+#if HAS_FIXED_PAD_BOX
+	uint8_t		pad_box;		/* minor version 22 */
+#endif
 };
 
 #define AO_APRS_FORMAT_COMPRESSED	0

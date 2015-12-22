@@ -39,7 +39,9 @@ ARMM3DIRS=\
 	telescience-v0.2 telescience-v0.2/flash-loader \
 	teledongle-v3.0 teledongle-v3.0/flash-loader \
 	teleballoon-v2.0 \
-	telebt-v3.0 telebt-v3.0/flash-loader
+	telebt-v3.0 telebt-v3.0/flash-loader \
+	telelcotwo-v0.1 telelcotwo-v0.1/flash-loader \
+	telefiretwo-v0.1 telefiretwo-v0.1/flash-loader \
 
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader \
