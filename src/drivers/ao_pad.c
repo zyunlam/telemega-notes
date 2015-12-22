@@ -155,13 +155,15 @@ ao_pad_monitor(void)
 		if (pyro > VOLTS_TO_PYRO(10)) {
 			query.arm_status = AO_PAD_ARM_STATUS_ARMED;
 			cur |= AO_LED_ARMED;
-		} else if (pyro < VOLTS_TO_PYRO(5)) {
-			query.arm_status = AO_PAD_ARM_STATUS_DISARMED;
-			arm_beep_time = 0;
-		} else {
+#if AO_FIRE_R_POWER_FET
+		} else if (pyro > VOLTS_TO_PYRO(5)) {
 			if ((ao_time() % 100) < 50)
 				cur |= AO_LED_ARMED;
 			query.arm_status = AO_PAD_ARM_STATUS_UNKNOWN;
+			arm_beep_time = 0;
+#endif
+		} else {
+			query.arm_status = AO_PAD_ARM_STATUS_DISARMED;
 			arm_beep_time = 0;
 		}
 		if ((ao_time() - ao_pad_packet_time) > AO_SEC_TO_TICKS(2))
@@ -279,8 +281,10 @@ ao_pad_read_box(void)
 	l = byte & 0xf;
 	return h * 10 + l;
 }
-#else
-#define ao_pad_read_box()	0
+#endif
+
+#if HAS_FIXED_PAD_BOX
+#define ao_pad_read_box()	ao_config.pad_box
 #endif
 
 #ifdef PAD_BOX
