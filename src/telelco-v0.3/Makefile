@@ -23,7 +23,6 @@ INC = \
 	ao_radio_cmac.h \
 	ao_cc1200_CC1200.h \
 	ao_cc1200.h \
-	ao_debounce.h \
 	stm32l.h
 
 #
@@ -62,7 +61,6 @@ ALTOS_SRC = \
 	ao_fec_tx.c \
 	ao_fec_rx.c \
 	ao_seven_segment.c \
-	ao_debounce.c \
 	ao_quadrature.c \
 	ao_button.c \
 	ao_event.c \
