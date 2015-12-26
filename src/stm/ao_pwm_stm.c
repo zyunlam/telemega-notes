@@ -27,11 +27,23 @@ ao_pwm_up(void)
 {
 	if (pwm_running++ == 0) {
 		struct stm_tim234	*tim = &AO_PWM_TIMER;
+
 		tim->ccr1 = 0;
 		tim->ccr2 = 0;
 		tim->ccr3 = 0;
 		tim->ccr4 = 0;
-		tim->arr = PWM_MAX;	/* turn on the timer */
+		tim->arr = PWM_MAX - 1;	/* turn on the timer */
+		tim->cr1 = ((STM_TIM234_CR1_CKD_1 << STM_TIM234_CR1_CKD) |
+			    (0 << STM_TIM234_CR1_ARPE) |
+			    (STM_TIM234_CR1_CMS_EDGE << STM_TIM234_CR1_CMS) |
+			    (STM_TIM234_CR1_DIR_UP << STM_TIM234_CR1_DIR) |
+			    (0 << STM_TIM234_CR1_OPM) |
+			    (0 << STM_TIM234_CR1_URS) |
+			    (0 << STM_TIM234_CR1_UDIS) |
+			    (1 << STM_TIM234_CR1_CEN));
+
+		/* Set the timer running */
+		tim->egr = (1 << STM_TIM234_EGR_UG);
 	}
 }
 
@@ -40,7 +52,19 @@ ao_pwm_down(void)
 {
 	if (--pwm_running == 0) {
 		struct stm_tim234	*tim = &AO_PWM_TIMER;
-		tim->arr = 0;	/* turn off the timer */
+
+		tim->arr = 0;
+		tim->cr1 = ((STM_TIM234_CR1_CKD_1 << STM_TIM234_CR1_CKD) |
+			    (0 << STM_TIM234_CR1_ARPE) |
+			    (STM_TIM234_CR1_CMS_EDGE << STM_TIM234_CR1_CMS) |
+			    (STM_TIM234_CR1_DIR_UP << STM_TIM234_CR1_DIR) |
+			    (0 << STM_TIM234_CR1_OPM) |
+			    (0 << STM_TIM234_CR1_URS) |
+			    (0 << STM_TIM234_CR1_UDIS) |
+			    (0 << STM_TIM234_CR1_CEN));
+
+		/* Stop the timer */
+		tim->egr = (1 << STM_TIM234_EGR_UG);
 	}
 }
 
@@ -49,14 +73,12 @@ ao_pwm_set(uint8_t pwm, uint16_t value)
 {
 	struct stm_tim234	*tim = &AO_PWM_TIMER;
 
+	if (value > PWM_MAX)
+		value = PWM_MAX;
 	if (value != 0) {
 		if (pwm_value[pwm] == 0)
 			ao_pwm_up();
-	} else {
-		if (pwm_value[pwm] != 0)
-			ao_pwm_down();
 	}
-	pwm_value[pwm] = value;
 	switch (pwm) {
 	case 0:
 		tim->ccr1 = value;
@@ -71,6 +93,11 @@ ao_pwm_set(uint8_t pwm, uint16_t value)
 		tim->ccr4 = value;
 		break;
 	}
+	if (value == 0) {
+		if (pwm_value[pwm] != 0)
+			ao_pwm_down();
+	}
+	pwm_value[pwm] = value;
 }
 
 static void
@@ -100,13 +127,10 @@ ao_pwm_init(void)
 {
 	struct stm_tim234	*tim = &AO_PWM_TIMER;
 
-	stm_rcc.apb1enr |= AO_PWM_TIMER_ENABLE;
-	tim->ccr1 = 0;
-	tim->ccr2 = 0;
-	tim->ccr3 = 0;
-	tim->ccr4 = 0;
-	tim->arr = 0;	/* turn off the timer */
-	tim->psc = 0;
+	stm_rcc.apb1enr |= (1 << AO_PWM_TIMER_ENABLE);
+
+	tim->cr1 = 0;
+	tim->psc = AO_PWM_TIMER_SCALE - 1;
 	tim->cnt = 0;
 	tim->ccer = ((1 << STM_TIM234_CCER_CC1E) |
 		     (0 << STM_TIM234_CCER_CC1P) |
@@ -119,26 +143,26 @@ ao_pwm_init(void)
 
 	tim->ccmr1 = ((0 << STM_TIM234_CCMR1_OC2CE) |
 		      (STM_TIM234_CCMR1_OC2M_PWM_MODE_1 << STM_TIM234_CCMR1_OC2M) |
-		      (1 << STM_TIM234_CCMR1_OC2PE) |
+		      (0 << STM_TIM234_CCMR1_OC2PE) |
 		      (0 << STM_TIM234_CCMR1_OC2FE) |
 		      (STM_TIM234_CCMR1_CC2S_OUTPUT << STM_TIM234_CCMR1_CC2S) |
 
 		      (0 << STM_TIM234_CCMR1_OC1CE) |
 		      (STM_TIM234_CCMR1_OC1M_PWM_MODE_1 << STM_TIM234_CCMR1_OC1M) |
-		      (1 << STM_TIM234_CCMR1_OC1PE) |
+		      (0 << STM_TIM234_CCMR1_OC1PE) |
 		      (0 << STM_TIM234_CCMR1_OC1FE) |
 		      (STM_TIM234_CCMR1_CC1S_OUTPUT << STM_TIM234_CCMR1_CC1S));
 
 
 	tim->ccmr2 = ((0 << STM_TIM234_CCMR2_OC4CE) |
 		      (STM_TIM234_CCMR2_OC4M_PWM_MODE_1 << STM_TIM234_CCMR2_OC4M) |
-		      (1 << STM_TIM234_CCMR2_OC4PE) |
+		      (0 << STM_TIM234_CCMR2_OC4PE) |
 		      (0 << STM_TIM234_CCMR2_OC4FE) |
 		      (STM_TIM234_CCMR2_CC4S_OUTPUT << STM_TIM234_CCMR2_CC4S) |
 
 		      (0 << STM_TIM234_CCMR2_OC3CE) |
 		      (STM_TIM234_CCMR2_OC3M_PWM_MODE_1 << STM_TIM234_CCMR2_OC3M) |
-		      (1 << STM_TIM234_CCMR2_OC3PE) |
+		      (0 << STM_TIM234_CCMR2_OC3PE) |
 		      (0 << STM_TIM234_CCMR2_OC3FE) |
 		      (STM_TIM234_CCMR2_CC3S_OUTPUT << STM_TIM234_CCMR2_CC3S));
 	tim->egr = 0;
@@ -150,25 +174,19 @@ ao_pwm_init(void)
 		    (STM_TIM234_CR2_MMS_RESET<< STM_TIM234_CR2_MMS) |
 		    (0 << STM_TIM234_CR2_CCDS));
 
-	tim->cr1 = ((STM_TIM234_CR1_CKD_1 << STM_TIM234_CR1_CKD) |
-		    (1 << STM_TIM234_CR1_ARPE) |
-		    (STM_TIM234_CR1_CMS_EDGE << STM_TIM234_CR1_CMS) |
-		    (STM_TIM234_CR1_DIR_UP << STM_TIM234_CR1_DIR) |
-		    (0 << STM_TIM234_CR1_OPM) |
-		    (0 << STM_TIM234_CR1_URS) |
-		    (0 << STM_TIM234_CR1_UDIS) |
-		    (1 << STM_TIM234_CR1_CEN));
-
-	stm_afr_set(&stm_gpiod, 12, STM_AFR_AF2);
+	stm_afr_set(AO_PWM_0_GPIO, AO_PWM_0_PIN, STM_AFR_AF2);
+	stm_ospeedr_set(AO_PWM_0_GPIO, AO_PWM_0_PIN, STM_OSPEEDR_40MHz);
 #if NUM_PWM > 1
-	stm_afr_set(&stm_gpiod, 13, STM_AFR_AF2);
+	stm_afr_set(AO_PWM_1_GPIO, AO_PWM_1_PIN, STM_AFR_AF2);
+	stm_ospeedr_set(AO_PWM_1_GPIO, AO_PWM_1_PIN, STM_OSPEEDR_40MHz);
 #endif
 #if NUM_PWM > 2
-	stm_afr_set(&stm_gpiod, 14, STM_AFR_AF2);
+	stm_afr_set(AO_PWM_2_GPIO, AO_PWM_2_PIN, STM_AFR_AF2);
+	stm_ospeedr_set(AO_PWM_2_GPIO, AO_PWM_2_PIN, STM_OSPEEDR_40MHz);
 #endif
 #if NUM_PWM > 3
-	stm_afr_set(&stm_gpiod, 15, STM_AFR_AF2);
+	stm_afr_set(AO_PWM_3_GPIO, AO_PWM_3_PIN, STM_AFR_AF2);
+	stm_ospeedr_set(AO_PWM_3_GPIO, AO_PWM_3_PIN, STM_OSPEEDR_40MHz);
 #endif
-
 	ao_cmd_register(&ao_pwm_cmds[0]);
 }

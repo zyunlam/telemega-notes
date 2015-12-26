@@ -387,8 +387,20 @@ struct ao_adc {
  */
 
 #define NUM_PWM			4
-#define PWM_MAX			1024
+#define PWM_MAX			1023
 #define AO_PWM_TIMER		stm_tim4
 #define AO_PWM_TIMER_ENABLE	STM_RCC_APB1ENR_TIM4EN
+
+#define AO_PWM_0_GPIO		(&stm_gpiod)
+#define AO_PWM_0_PIN		12
+
+#define AO_PWM_1_GPIO		(&stm_gpiod)
+#define AO_PWM_1_PIN		13
+
+#define AO_PWM_2_GPIO		(&stm_gpiod)
+#define AO_PWM_2_PIN		14
+
+#define AO_PWM_3_GPIO		(&stm_gpiod)
+#define AO_PWM_3_PIN		15
 
 #endif /* _AO_PINS_H_ */
