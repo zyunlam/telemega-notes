@@ -100,8 +100,8 @@ ALTOS_SRC = \
 	ao_sample.c \
 	ao_kalman.c \
 	ao_flight.c \
-	ao_companion.c \
 	ao_pyro.c \
+	ao_pwm_stm.c \
 	$(MATH_SRC) \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \

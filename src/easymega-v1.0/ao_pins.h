@@ -78,7 +78,7 @@
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0
 #define HAS_APRS		0
-#define HAS_COMPANION		1
+#define HAS_COMPANION		0
 
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* Barometer */
@@ -352,5 +352,21 @@ struct ao_adc {
 #ifndef AO_PROFILE
 #define AO_PROFILE	       	0
 #endif
+
+/*
+ * PWM output
+ */
+
+#define NUM_PWM			2
+#define PWM_MAX			1023
+#define AO_PWM_TIMER		stm_tim4
+#define AO_PWM_TIMER_ENABLE	STM_RCC_APB1ENR_TIM4EN
+#define AO_PWM_TIMER_SCALE	1
+
+#define AO_PWM_0_GPIO		(&stm_gpiob)
+#define AO_PWM_0_PIN		6
+
+#define AO_PWM_1_GPIO		(&stm_gpiob)
+#define AO_PWM_1_PIN		7
 
 #endif /* _AO_PINS_H_ */

@@ -24,6 +24,7 @@
 #include <ao_companion.h>
 #include <ao_profile.h>
 #include <ao_eeprom.h>
+#include <ao_pwm.h>
 #if HAS_SAMPLE_PROFILE
 #include <ao_sample_profile.h>
 #endif
@@ -79,7 +80,8 @@ main(void)
 
 	ao_usb_init();
 	ao_igniter_init();
-	ao_companion_init();
+//	ao_companion_init();
+	ao_pwm_init();
 	ao_pyro_init();
 
 	ao_config_init();
