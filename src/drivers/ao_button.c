@@ -18,7 +18,6 @@
 #include <ao.h>
 #include <ao_button.h>
 #include <ao_exti.h>
-#include <ao_debounce.h>
 #if AO_EVENT
 #include <ao_event.h>
 #define ao_button_queue(b,v)	ao_event_put_isr(AO_EVENT_BUTTON, b, v)
@@ -26,9 +25,14 @@
 #define ao_button_queue(b,v)
 #endif
 
-#define AO_BUTTON_DEBOUNCE_HOLD	10
+#define AO_BUTTON_DEBOUNCE_INTERVAL	AO_MS_TO_TICKS(50)
 
-static struct ao_debounce	ao_button_debounce[AO_BUTTON_COUNT];
+struct ao_button_state {
+	AO_TICK_TYPE	time;
+	uint8_t		value;
+};
+
+static struct ao_button_state	ao_button_state[AO_BUTTON_COUNT];
 
 #define port(q)	AO_BUTTON_ ## q ## _PORT
 #define bit(q) AO_BUTTON_ ## q
@@ -38,10 +42,8 @@ static struct ao_debounce	ao_button_debounce[AO_BUTTON_COUNT];
 #define ao_button_value(b)	!ao_gpio_get(port(b), bit(b), pin(b))
 
 static uint8_t
-_ao_button_get(struct ao_debounce *debounce)
+_ao_button_get(uint8_t b)
 {
-	uint8_t	b = debounce - ao_button_debounce;
-
 	switch (b) {
 #if AO_BUTTON_COUNT > 0
 	case 0: return ao_button_value(0);
@@ -63,22 +65,31 @@ _ao_button_get(struct ao_debounce *debounce)
 }
 
 static void
-_ao_button_set(struct ao_debounce *debounce, uint8_t value)
+_ao_button_check(uint8_t b)
 {
-	uint8_t b = debounce - ao_button_debounce;
+	uint8_t	value = _ao_button_get(b);
 
-	ao_button_queue(b, value);
+	if (value != ao_button_state[b].value) {
+		AO_TICK_TYPE	now = ao_time();
+
+		if ((now - ao_button_state[b].time) >= AO_BUTTON_DEBOUNCE_INTERVAL) {
+			ao_button_state[b].value = value;
+			ao_button_queue(b, value);
+		}
+		ao_button_state[b].time = now;
+	}
 }
 
-
-#define ao_button_update(b)	ao_button_do(b, ao_gpio_get(port(b), bit(b), pin(b)))
-
 static void
-ao_button_debounce_init(struct ao_debounce *debounce) {
-	ao_debounce_config(debounce,
-			   _ao_button_get,
-			   _ao_button_set,
-			   AO_BUTTON_DEBOUNCE_HOLD);
+_ao_button_init(uint8_t b)
+{
+	uint8_t	m = ao_arch_irqsave();
+	uint8_t value = _ao_button_get(b);
+	ao_button_state[b].value = value;
+	ao_button_state[b].time = ao_time();
+	ao_button_queue(b, value);
+	ao_arch_irqrestore(m);
+
 }
 
 static void
@@ -87,17 +98,17 @@ ao_button_isr(void)
 	uint8_t	b;
 
 	for (b = 0; b < AO_BUTTON_COUNT; b++)
-		_ao_debounce_start(&ao_button_debounce[b]);
+		_ao_button_check(b);
 }
 
 #define init(b) do {							\
-		ao_button_debounce_init(&ao_button_debounce[b]);	\
 		ao_enable_port(port(b));				\
 									\
 		ao_exti_setup(port(b), bit(b),				\
 			      AO_BUTTON_MODE|AO_EXTI_MODE_FALLING|AO_EXTI_MODE_RISING|AO_EXTI_PRIORITY_MED, \
-			      ao_button_isr);			\
+			      ao_button_isr);				\
 		ao_exti_enable(port(b), bit(b));			\
+		_ao_button_init(b);					\
 	} while (0)
 
 void
@@ -118,5 +129,4 @@ ao_button_init(void)
 #if AO_BUTTON_COUNT > 4
 	init(4);
 #endif
-	ao_debounce_init();
 }
