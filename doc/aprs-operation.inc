@@ -26,10 +26,9 @@
 		the receiver. By default, the SSID is set to the last digit of
 		the device serial number.
 
-		The APRS packet format includes a comment field that can have
-		arbitrary text in it. AltOS uses this to send status
-		information about the flight computer. It sends four fields as
-		shown in the following table.
+		The APRS packet format includes a comment field that
+		can have arbitrary text in it. AltOS uses this to send
+		status information as shown in the following table.
 
 		.Altus Metrum APRS Comments
 		[options="header",cols="1,1,3"]
@@ -48,6 +47,8 @@
 		|B4.0
 		|Altimeter Battery Voltage
 
+	ifdef::altusmetrum[]
+
 		|4
 		|A3.7
 		|Apogee Igniter Voltage
@@ -59,8 +60,19 @@
 		|6
 		|1286
 		|Device Serial Number
+
+	endif::altusmetrum[]
+	ifdef::telegps[]
+
+		|4
+		|1286
+		|Device Serial Number
+
+	endif::telegps[]
+
 		|====
 
+		ifdef::altusmetrum[]
 		Here's an example of an APRS comment showing GPS lock with 6
 		satellites in view, a primary battery at 4.0V, and
 		apogee and main igniters both at 3.7V from device 1286.
@@ -68,13 +80,25 @@
 		....
 		L6 B4.0 A3.7 M3.7 1286
 		....
+		endif::altusmetrum[]
 
-		Make sure your primary battery is above 3.8V, any
-		connected igniters are above 3.5V and GPS is locked
-		with at least 5 or 6 satellites in view before
-		flying. If GPS is switching between L and U regularly,
-		then it doesn't have a good lock and you should wait
-		until it becomes stable.
+		ifdef::telegps[]
+		Here's an example of an APRS comment showing GPS lock with 6
+		satellites in view and a primary battery at 4.0V from device 1876.
+
+		....
+		L6 B4.0 1876
+		....
+		endif::telegps[]
+
+		Make sure your primary battery is above 3.8V
+	ifdef::altusmetrum[]
+		any connected igniters are above 3.5V
+	endif::altusmetrum[]
+		and GPS is locked with at least 5 or 6 satellites in
+		view before flying. If GPS is switching between L and
+		U regularly, then it doesn't have a good lock and you
+		should wait until it becomes stable.
 
 		If the GPS receiver loses lock, the APRS data
 		transmitted will contain the last position for which
