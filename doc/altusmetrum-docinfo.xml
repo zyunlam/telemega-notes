@@ -30,7 +30,7 @@
 <corpauthor>
   <inlinemediaobject>
     <imageobject>
-      <imagedata fileref="altusmetrum-oneline.svg" width="3in"/>
+      <imagedata fileref="altusmetrum-oneline.svg" width="4in"/>
     </imageobject>
   </inlinemediaobject>
 </corpauthor>
@@ -46,6 +46,13 @@
 </legalnotice>
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
+  <revision>
+    <revnumber>1.6.2</revnumber>
+    <date>10 January 2016</date>
+    <revremark>
+      Minor release adding TeleMega v2.0 support.
+    </revremark>
+  </revision>
   <revision>
     <revnumber>1.6.1</revnumber>
     <date>15 July 2015</date>

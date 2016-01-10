@@ -1,0 +1,25 @@
+Creating documentation for a new release of AltOS
+
+* Write release notes in release-notes-${version}.inc. Write docinfo
+  for release notes in release-notes-${version}-docinfo.xml. Add to
+  Makefile
+
+* Add references to that as appropriate from each of the
+  documents:
+
+	release-notes.inc
+	easymini-release-notes.inc
+	telegps-release-notes.inc
+
+* Update date and add docinfo short release info for each document as
+  appropriate
+
+	altusmetrum-docinfo.xml
+	companion-docinfo.xml
+	easymini-docinfo.xml
+	micropeak-docinfo.xml
+	telegps-docinfo.xml
+	telemetry-docinfo.xml
+
+* Add release-notes-${version}.inc and
+  release-notes-${version}-docinfo.xml to git

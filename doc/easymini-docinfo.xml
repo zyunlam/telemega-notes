@@ -10,7 +10,7 @@
   <email>keithp@keithp.com</email>
 </author>
 <copyright>
-  <year>2015</year>
+  <year>2016</year>
   <holder>Bdale Garbee and Keith Packard</holder>
 </copyright>
 <mediaobject>
@@ -40,7 +40,7 @@
   <?dbhtml filename="easymini-revhistory.html"?>
   <revision>
     <revnumber>1.6.2</revnumber>
-    <date>13 November 2015</date>
+    <date>10 January 2016</date>
     <revremark>
       First release of separate EasyMini doc
     </revremark>
