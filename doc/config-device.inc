@@ -206,7 +206,7 @@ ifdef::telegps[]
 		in the log.
 endif::telegps[]
 
-ifdef::altusmetrum[]
+ifdef::telemega,easymega[]
 
 	==== Configure Pyro Channels
 
@@ -242,4 +242,4 @@ ifdef::altusmetrum[]
 
 		include::pyro-channels.raw[]
 
-endif::altusmetrum[]
+endif::telemega,easymega[]
