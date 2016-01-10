@@ -75,6 +75,13 @@ static __pdata uint16_t ao_aprs_time;
 
 static __xdata union ao_telemetry_all	telemetry;
 
+static void
+ao_telemetry_send(void)
+{
+	ao_radio_send(&telemetry, sizeof (telemetry));
+	ao_delay(1);
+}
+
 #if defined AO_TELEMETRY_SENSOR
 /* Send sensor packet */
 static void
@@ -117,7 +124,7 @@ ao_send_sensor(void)
 	telemetry.sensor.accel_minus_g = 0;
 #endif
 
-	ao_radio_send(&telemetry, sizeof (telemetry));
+	ao_telemetry_send();
 }
 #endif
 
@@ -156,7 +163,7 @@ ao_send_mega_sensor(void)
 	telemetry.mega_sensor.mag_z = packet->hmc5883.z;
 #endif
 
-	ao_radio_send(&telemetry, sizeof (telemetry));
+	ao_telemetry_send();
 }
 
 static __pdata int8_t ao_telemetry_mega_data_max;
@@ -190,8 +197,8 @@ ao_send_mega_data(void)
 		telemetry.mega_data.speed = ao_speed;
 		telemetry.mega_data.height = ao_height;
 
-		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_mega_data_cur = ao_telemetry_mega_data_max;
+		ao_telemetry_send();
 	}
 }
 #endif /* AO_SEND_MEGA */
@@ -221,7 +228,7 @@ ao_send_metrum_sensor(void)
 	telemetry.metrum_sensor.sense_a = packet->adc.sense_a;
 	telemetry.metrum_sensor.sense_m = packet->adc.sense_m;
 
-	ao_radio_send(&telemetry, sizeof (telemetry));
+	ao_telemetry_send();
 }
 
 static __pdata int8_t ao_telemetry_metrum_data_max;
@@ -248,8 +255,8 @@ ao_send_metrum_data(void)
 		telemetry.metrum_data.accel_minus_g = 2;
 #endif
 
-		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_metrum_data_cur = ao_telemetry_metrum_data_max;
+		ao_telemetry_send();
 	}
 }
 #endif /* AO_SEND_METRUM */
@@ -279,7 +286,7 @@ ao_send_mini(void)
 
 	telemetry.mini.ground_pres = ao_ground_pres;
 
-	ao_radio_send(&telemetry, sizeof (telemetry));
+	ao_telemetry_send();
 }
 
 #endif /* AO_SEND_MINI */
@@ -316,8 +323,8 @@ ao_send_configuration(void)
 		ao_xmemcpy (telemetry.configuration.version,
 			    CODE_TO_XDATA(ao_version),
 			    AO_MAX_VERSION);
-		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_config_cur = ao_telemetry_config_max;
+		ao_telemetry_send();
 	}
 }
 
@@ -339,8 +346,8 @@ ao_send_location(void)
 		       27);
 		telemetry.location.tick = ao_gps_tick;
 		ao_mutex_put(&ao_gps_mutex);
-		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_loc_cur = ao_telemetry_gps_max;
+		ao_telemetry_send();
 	}
 }
 
@@ -356,8 +363,8 @@ ao_send_satellite(void)
 		       &ao_gps_tracking_data.sats,
 		       AO_MAX_GPS_TRACKING * sizeof (struct ao_telemetry_satellite_info));
 		ao_mutex_put(&ao_gps_mutex);
-		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_sat_cur = ao_telemetry_gps_max;
+		ao_telemetry_send();
 	}
 }
 #endif
@@ -380,8 +387,8 @@ ao_send_companion(void)
 		       ao_companion_data,
 		       ao_companion_setup.channels * 2);
 		ao_mutex_put(&ao_companion_mutex);
-		ao_radio_send(&telemetry, sizeof (telemetry));
 		ao_telemetry_companion_cur = ao_telemetry_companion_max;
+		ao_telemetry_send();
 	}
 }
 #endif
