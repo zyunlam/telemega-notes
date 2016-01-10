@@ -844,6 +844,7 @@ ao_radio_test_cmd(void)
 void
 ao_radio_send(const void *d, uint8_t size)
 {
+	ao_delay(1);
 	ao_radio_get(size);
 	ao_radio_set_mode(AO_RADIO_MODE_PACKET_TX);
 
