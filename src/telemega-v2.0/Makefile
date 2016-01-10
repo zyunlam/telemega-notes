@@ -21,7 +21,7 @@ INC = \
 	ao_hmc5883.h \
 	ao_mpu6000.h \
 	ao_mma655x.h \
-	ao_cc1120_CC1120.h \
+	ao_cc1200_CC1200.h \
 	ao_profile.h \
 	ao_task.h \
 	ao_whiten.h \
@@ -85,9 +85,7 @@ ALTOS_SRC = \
 	ao_freq.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
-	ao_cc1120.c \
-	ao_fec_tx.c \
-	ao_fec_rx.c \
+	ao_cc1200.c \
 	ao_data.c \
 	ao_ms5607.c \
 	ao_mma655x.c \

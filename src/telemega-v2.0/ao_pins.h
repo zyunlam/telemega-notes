@@ -301,24 +301,24 @@ struct ao_adc {
 
 /* gets pretty close to 434.550 */
 
-#define AO_RADIO_CAL_DEFAULT 	0x6ca333
+#define AO_RADIO_CAL_DEFAULT 	5695733
 
 #define AO_FEC_DEBUG		0
-#define AO_CC1120_SPI_CS_PORT	(&stm_gpioc)
-#define AO_CC1120_SPI_CS_PIN	5
-#define AO_CC1120_SPI_BUS	AO_SPI_2_PB13_PB14_PB15
-#define AO_CC1120_SPI		stm_spi2
+#define AO_CC1200_SPI_CS_PORT	(&stm_gpioc)
+#define AO_CC1200_SPI_CS_PIN	5
+#define AO_CC1200_SPI_BUS	AO_SPI_2_PB13_PB14_PB15
+#define AO_CC1200_SPI		stm_spi2
 
-#define AO_CC1120_INT_PORT		(&stm_gpioe)
-#define AO_CC1120_INT_PIN		1
-#define AO_CC1120_MCU_WAKEUP_PORT	(&stm_gpioc)
-#define AO_CC1120_MCU_WAKEUP_PIN	(0)
+#define AO_CC1200_INT_PORT		(&stm_gpioe)
+#define AO_CC1200_INT_PIN		1
+#define AO_CC1200_MCU_WAKEUP_PORT	(&stm_gpioc)
+#define AO_CC1200_MCU_WAKEUP_PIN	(0)
 
-#define AO_CC1120_INT_GPIO	2
-#define AO_CC1120_INT_GPIO_IOCFG	CC1120_IOCFG2
+#define AO_CC1200_INT_GPIO	2
+#define AO_CC1200_INT_GPIO_IOCFG	CC1200_IOCFG2
 
-#define AO_CC1120_MARC_GPIO	3
-#define AO_CC1120_MARC_GPIO_IOCFG	CC1120_IOCFG3
+#define AO_CC1200_MARC_GPIO	3
+#define AO_CC1200_MARC_GPIO_IOCFG	CC1200_IOCFG3
 
 #define HAS_BOOT_RADIO		0
 
