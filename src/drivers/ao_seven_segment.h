@@ -23,6 +23,9 @@
 #define AO_SEVEN_SEGMENT_CLEAR		0xff
 
 void
+ao_seven_segment_direct(uint8_t digit, uint8_t segments);
+
+void
 ao_seven_segment_set(uint8_t digit, uint8_t value);
 
 void

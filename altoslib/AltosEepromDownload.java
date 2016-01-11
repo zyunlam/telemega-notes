@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_8;
+package org.altusmetrum.altoslib_9;
 
 import java.io.*;
 import java.util.*;
@@ -35,7 +35,7 @@ public class AltosEepromDownload implements Runnable {
 
 	AltosEepromList		flights;
 	boolean			success;
-	ParseException		parse_exception;
+	String			parse_errors;
 	AltosState		state;
 
 	private void FlushPending() throws IOException {
@@ -88,6 +88,13 @@ public class AltosEepromDownload implements Runnable {
 		}
 	}
 
+	void LogError(String error) {
+		if (parse_errors != null)
+			parse_errors.concat(error.concat("\n"));
+		else
+			parse_errors = error;
+	}
+
 	void CaptureEeprom(AltosEepromChunk eechunk, int log_format) throws IOException, ParseException {
 		boolean any_valid = false;
 		boolean got_flight = false;
@@ -98,7 +105,14 @@ public class AltosEepromDownload implements Runnable {
 		monitor.set_serial(flights.config_data.serial);
 
 		for (int i = 0; i < AltosEepromChunk.chunk_size && !done; i += record_length) {
-			AltosEeprom r = eechunk.eeprom(i, log_format, state);
+			AltosEeprom r = null;
+
+			try {
+				r = eechunk.eeprom(i, log_format, state);
+			} catch (ParseException pe) {
+				LogError(pe.getMessage());
+				r = null;
+			}
 
 			if (r == null)
 				continue;
@@ -111,12 +125,12 @@ public class AltosEepromDownload implements Runnable {
 				monitor.set_flight(state.flight);
 
 			/* Monitor state transitions to update display */
-			if (state.state != AltosLib.ao_flight_invalid &&
-			    state.state <= AltosLib.ao_flight_landed)
+			if (state.state() != AltosLib.ao_flight_invalid &&
+			    state.state() <= AltosLib.ao_flight_landed)
 			{
-				if (state.state > AltosLib.ao_flight_pad)
+				if (state.state() > AltosLib.ao_flight_pad)
 					want_file = true;
-				if (state.state == AltosLib.ao_flight_landed)
+				if (state.state() == AltosLib.ao_flight_landed)
 					done = true;
 			}
 
@@ -147,7 +161,6 @@ public class AltosEepromDownload implements Runnable {
 
 		/* Reset per-capture variables */
 		want_file = false;
-		eeprom_file = null;
 		eeprom_pending = new LinkedList<String>();
 
 		/* Set serial number in the monitor dialog window */
@@ -174,21 +187,17 @@ public class AltosEepromDownload implements Runnable {
 
 			CaptureEeprom (eechunk, log_format);
 
-			if (state.state != prev_state && state.state != AltosLib.ao_flight_invalid) {
+			if (state.state() != prev_state && state.state() != AltosLib.ao_flight_invalid) {
 				state_block = block;
-				prev_state = state.state;
+				prev_state = state.state();
 			}
 
 			monitor.set_value(state.state_name(),
-					  state.state,
+					  state.state(),
 					  block - state_block,
 					  block - log.start_block);
 		}
 		CheckFile(true);
-		if (eeprom_file != null) {
-			eeprom_file.flush();
-			eeprom_file.close();
-		}
 	}
 
 	public void run () {
@@ -198,20 +207,25 @@ public class AltosEepromDownload implements Runnable {
 				link.start_remote();
 
 			for (AltosEepromLog log : flights) {
-				parse_exception = null;
+				parse_errors = null;
 				if (log.selected) {
 					monitor.reset();
+					eeprom_file = null;
 					try {
 						CaptureLog(log);
 					} catch (ParseException e) {
-						parse_exception = e;
+						LogError(e.getMessage());
+					}
+					if (eeprom_file != null) {
+						eeprom_file.flush();
+						eeprom_file.close();
 					}
 				}
-				if (parse_exception != null) {
+				if (parse_errors != null) {
 					failed = true;
-					monitor.show_message(String.format("Flight %d download error\n%s\nValid log data saved",
+					monitor.show_message(String.format("Flight %d download error. Valid log data saved\n%s",
 									   log.flight,
-									   parse_exception.getMessage()),
+									   parse_errors),
 							     link.name,
 							     AltosEepromMonitor.WARNING_MESSAGE);
 				}

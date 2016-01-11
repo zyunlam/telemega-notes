@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altoslib_9.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -191,9 +191,9 @@ public class TabPad extends AltosDroidTab {
 			}
 
 			if (state.flight != 0) {
-				if (state.state <= AltosLib.ao_flight_pad)
+				if (state.state() <= AltosLib.ao_flight_pad)
 					data_logging_view.setText("Ready to record");
-				else if (state.state < AltosLib.ao_flight_landed)
+				else if (state.state() < AltosLib.ao_flight_landed)
 					data_logging_view.setText("Recording data");
 				else
 					data_logging_view.setText("Recorded data");

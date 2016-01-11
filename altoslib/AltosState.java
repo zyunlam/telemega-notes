@@ -19,7 +19,7 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_8;
+package org.altusmetrum.altoslib_9;
 
 import java.io.*;
 
@@ -284,7 +284,7 @@ public class AltosState implements Cloneable, Serializable {
 		}
 	}
 
-	public int	state;
+	private int	state;
 	public int	flight;
 	public int	serial;
 	public int	altitude_32;
@@ -1056,6 +1056,10 @@ public class AltosState implements Cloneable, Serializable {
 		}
 	}
 
+	public int state() {
+		return state;
+	}
+
 	public void set_device_type(int device_type) {
 		this.device_type = device_type;
 		switch (device_type) {
@@ -1356,11 +1360,6 @@ public class AltosState implements Cloneable, Serializable {
 			set_pressure(baro.pa);
 			set_temperature(baro.cc / 100.0);
 		}
-	}
-
-	public void make_companion (int nchannels) {
-		if (companion == null)
-			companion = new AltosCompanion(nchannels);
 	}
 
 	public void set_companion(AltosCompanion companion) {

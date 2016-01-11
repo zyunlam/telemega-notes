@@ -78,6 +78,7 @@
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0
 #define HAS_APRS		0
+#define HAS_COMPANION		1
 
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* Barometer */

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_8;
+package org.altusmetrum.altoslib_9;
 
 public class AltosRotation {
 	private AltosQuaternion		rotation;
@@ -28,7 +28,7 @@ public class AltosRotation {
 	}
 
 	public void rotate(double dt, double x, double y, double z) {
-		AltosQuaternion	rot = AltosQuaternion.half_euler(x * dt, y * dt, z * dt);
+		AltosQuaternion	rot = AltosQuaternion.half_euler(x * dt / 2.0, y * dt / 2.0, z * dt / 2.0);
 		rotation = rot.multiply(rotation).normalize();
 	}
 

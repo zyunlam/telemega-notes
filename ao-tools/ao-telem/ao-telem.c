@@ -173,6 +173,15 @@ main (int argc, char **argv)
 						telem.mega_sensor.mag_y,
 						telem.mega_sensor.mag_z);
 					break;
+				case AO_TELEMETRY_COMPANION:
+					printf("board_id %3d update_period %3d channels %2d",
+					       telem.companion.board_id,
+					       telem.companion.update_period,
+					       telem.companion.channels);
+					for (c = 0; c < telem.companion.channels; c++)
+						printf(" %6d", telem.companion.companion_data[c]);
+					printf("\n");
+					break;
 				case AO_TELEMETRY_MEGA_DATA:
 					printf ("state %1d v_batt %5d v_pyro %5d ",
 						telem.mega_data.state,
@@ -182,7 +191,7 @@ main (int argc, char **argv)
 						printf ("s%1d %5d ", c,
 							telem.mega_data.sense[c] |
 							(telem.mega_data.sense[c] << 8));
-					
+
 					printf ("ground_pres %5d ground_accel %5d accel_plus %5d accel_minus %5d ",
 						telem.mega_data.ground_pres,
 						telem.mega_data.ground_accel,

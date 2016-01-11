@@ -22,8 +22,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_8.*;
-import org.altusmetrum.altosuilib_8.*;
+import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altosuilib_9.*;
 
 public class AltosUI extends AltosUIFrame {
 	public AltosVoice voice = new AltosVoice();
@@ -539,7 +539,7 @@ public class AltosUI extends AltosUIFrame {
 			System.out.printf ("process cat\n");
 			for (AltosState state : eef) {
 				System.out.printf ("tick %d state %d height %g\n",
-						   state.tick, state.state, state.height());
+						   state.tick, state.state(), state.height());
 				if ((state.set & AltosState.set_gps) != 0)
 					System.out.printf ("time %g lat %g lon %g alt %g\n",
 							   state.time_since_boost(),

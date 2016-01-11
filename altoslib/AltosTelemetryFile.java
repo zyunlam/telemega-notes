@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_8;
+package org.altusmetrum.altoslib_9;
 
 import java.io.*;
 import java.util.*;
@@ -75,7 +75,7 @@ public class AltosTelemetryFile extends AltosStateIterable {
 		for (AltosTelemetry telem : telems) {
 			telem.update_state(state);
 			state.finish_update();
-			if (state.state != AltosLib.ao_flight_invalid && state.state >= AltosLib.ao_flight_boost) {
+			if (state.state() != AltosLib.ao_flight_invalid && state.state() >= AltosLib.ao_flight_boost) {
 				start.set_boost_tick(state.tick);
 				break;
 			}

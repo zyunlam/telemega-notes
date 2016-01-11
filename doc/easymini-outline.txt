@@ -1,0 +1,9 @@
+= EasyMini Outline and Hole Pattern
+:doctype: article
+
+	This image, when printed, provides a precise template for the
+	mounting holes in EasyMini.  EasyMini has overall dimensions
+	of 0.800 x 1.500 inches, and the mounting holes are sized for
+	use with 4-40 or M3 screws.
+
+	image::easymini.svg[align="center"]

@@ -149,7 +149,7 @@ TEMPLATE_DOC=\
 	$(top_srcdir)/doc/telemetrum-outline.pdf \
 	$(top_srcdir)/doc/easymini-outline.pdf \
 	$(top_srcdir)/doc/telemega-outline.pdf \
-	$(top_srcdir)/doc/telemini.pdf
+	$(top_srcdir)/doc/telemini-outline.pdf
 
 DOC=$(ALTUSMETRUM_DOC) $(ALTOS_DOC) $(TELEMETRY_DOC) $(TEMPLATE_DOC)
 

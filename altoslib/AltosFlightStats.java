@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_8;
+package org.altusmetrum.altoslib_9;
 
 import java.io.*;
 
@@ -52,7 +52,7 @@ public class AltosFlightStats {
 
 		for (AltosState s : states) {
 			state = s;
-			if (state.state == AltosLib.ao_flight_landed)
+			if (state.state() == AltosLib.ao_flight_landed)
 				break;
 		}
 
@@ -92,7 +92,7 @@ public class AltosFlightStats {
 			state = s;
 			if (state.acceleration() < 1)
 				boost_time = state.time;
-			if (state.state >= AltosLib.ao_flight_boost && state.state <= AltosLib.ao_flight_landed)
+			if (state.state() >= AltosLib.ao_flight_boost && state.state() <= AltosLib.ao_flight_landed)
 				break;
 		}
 		if (state == null)
@@ -138,7 +138,7 @@ public class AltosFlightStats {
 			if (state.pressure() != AltosLib.MISSING)
 				has_flight_data = true;
 
-			int state_id = state.state;
+			int state_id = state.state();
 			if (state.time >= boost_time && state_id < AltosLib.ao_flight_boost)
 				state_id = AltosLib.ao_flight_boost;
 			if (state.time >= landed_time && state_id < AltosLib.ao_flight_landed)

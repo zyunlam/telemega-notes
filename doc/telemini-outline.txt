@@ -1,0 +1,9 @@
+= TeleMini Outline and Hole Pattern
+:doctype: article
+
+	This image, when printed, provides a precise template for the
+	mounting holes in TeleMini. TeleMini has overall dimensions of
+	0.500 x 1.500 inches, and the mounting holes are sized for use
+	with 2-56 or M2 screws.
+
+	image::telemini.svg[align="center"]

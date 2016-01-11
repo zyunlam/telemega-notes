@@ -18,8 +18,8 @@
 package altosui;
 
 import java.util.*;
-import org.altusmetrum.altoslib_8.*;
-import org.altusmetrum.altosuilib_8.*;
+import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altosuilib_9.*;
 
 public class AltosPad extends AltosUIFlightTab {
 
@@ -49,10 +49,10 @@ public class AltosPad extends AltosUIFlightTab {
 				hide();
 			} else {
 				if (state.flight != 0) {
-					if (state.state <= Altos.ao_flight_pad)
+					if (state.state() <= Altos.ao_flight_pad)
 						show("Ready to record");
-					else if (state.state < Altos.ao_flight_landed ||
-						 state.state == AltosLib.ao_flight_stateless)
+					else if (state.state() < Altos.ao_flight_landed ||
+						 state.state() == AltosLib.ao_flight_stateless)
 						show("Recording data");
 					else
 						show("Recorded data");
@@ -121,8 +121,8 @@ public class AltosPad extends AltosUIFlightTab {
 	}
 
 	boolean report_pad(AltosState state) {
-		if ((state.state == AltosLib.ao_flight_stateless ||
-		     state.state < AltosLib.ao_flight_pad) &&
+		if ((state.state() == AltosLib.ao_flight_stateless ||
+		     state.state() < AltosLib.ao_flight_pad) &&
 		    state.gps != null &&
 		    state.gps.lat != AltosLib.MISSING)
 		{
