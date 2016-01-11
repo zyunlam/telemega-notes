@@ -1,3 +1,89 @@
+altos (1.6.2-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * process updates from 1.6.1 release
+  * move turnon_teledongle to new cal-freq code
+  * add a paragraph about TeleBT battery charging to AltosDroid chapter in documentation
+  * turnon script for TeleBT v3.0
+  * apply wrap-and-sort to control files
+  * add automatic Bluetooth functionality check to turnon_telebt
+  * new build dependency on asciidoc
+  * now building for m4, too
+  * modify bringup scripts to handle TeleMega v2.0
+  * modify release procedure to reflect Keith setting version in confgure.ac
+  * submodule madness
+  * one more time, with feeling .. this time, I've updated pdclib
+  * update Changelog from git log
+
+  [ Keith Packard ]
+  * altoslib: Add companion telemetry data support
+  * ao-telem: Add companion packet telemetry data printing
+  * altos: Add HAS_COMPANION to new boards with companion connectors
+  * altos/telefire: No reply for ARMED. Ignore time for FIRE.
+  * altos: Provide direct segment driving interface for LCD displays
+  * altos/telelco: Infrastructure changes for drag racing
+  * altos/telelco: Add drag race UI
+  * altoslib: Hide 'state' member and use accessor function
+  * altoslib: Rotation off by factor of two
+  * altos/telelco: Adjust drag race UI
+  * altosdroid: Add minus sign and decimal point to lat/lon input fields
+  * altosuilib: In display thread, set new state synchronously
+  * altoslib: Make sure .eeprom download file is flushed on exception
+  * Bump release number to 1.6.1.1
+  * altoslib: Clean up remaining direct AltosState.state users
+  * altoslib: Keep downloading when a parse error occurs
+  * Create directory on keithp.com when uploading devel version
+  * telelco: Fix pad reset to one on radio signal loss
+  * doc: Force FOP to read images from doc directory
+  * doc: Start doc transition to asciidoc
+  * doc: Add asciidoc telemini v1.0
+  * doc: Lots more conversion from docbook to asciidoc
+  * doc: Add asciidoc version of altosui chapter.
+  * doc: Add asciidoc version of Altos Droid manual
+  * doc: Add updating firmware and using am products asciidoc bits
+  * doc: Add titles to all figures
+  * doc: Finish converting docs to asciidoc format
+  * doc: Convert AltOS doc to asciidoc
+  * doc: Convert telemetry and companion docs to asciidoc
+  * doc: Minor makefile cleanups
+  * doc: Switch to free fonts. Publish fonts with docs.
+  * doc: Place html book contents on left side of page with separate scrollbar
+  * doc: Split revhistory to separate file for html docs
+  * doc: Get images and tables all centered and labeled
+  * doc: Make pdf titles less ridiculously large
+  * doc: verbose mode for a2x
+  * altosui: telemini outline pdf changed name
+  * doc: Add product logos to books
+  * Break out common pieces from TeleGPS and AltusMetrum
+  * doc: Reformat 'Using MicroPeak' section
+  * doc: Provide more actual links instead of just chapter names
+  * doc: Move pad beeps table to usage chapter
+  * doc: Reformat html versions a bit
+  * doc: Split out EasyMini into a separate manual
+  * doc: Try a different trick for asciidoc build issues
+  * doc: Construct html index for documentation
+  * doc: Remove some bogus bits from am.css
+  * ao-tools/ao-dbg: Stop using sigvec
+  * altos: Add TeleMega v2.0, including PWM driver
+  * altos: Get stm32l pwm driver working
+  * altos: Set AO_PWM_TIMER_SCALE for telemega-v2.0
+  * Switch TeleMega v2.0 to CC1200 radio chip
+  * altos: Insert inter telemetry-packet delay
+  * Elide pyro channel information from EasyMini docs
+  * Elide flight computer info from APRS section of TeleGPS manual
+  * altoslib: Remove debug message from AltosMap
+  * Update java library versions
+  * Add release notes for 1.6.2
+  * altos: Set TeleMega v2.0 PWM to support servos
+  * altos: Switch PWM constants to end up exposing µsec
+  * Bump version to 1.6.2, altosdroid to 10
+  * doc: Update copyright year in altusmetrum doc
+  * doc: fix typo in using external active switch circuit section
+  * doc: Remove telemini v2.0. Add telemega v2.0
+  * doc: Remove extraneous 'first off' from legal paragraph
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 10 Jan 2016 19:11:18 -0700
+
 altos (1.6.1-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
