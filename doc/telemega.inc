@@ -9,6 +9,18 @@
 	the board is aligned with the flight axis. It can be mounted
 	either antenna up or down.
 
+	TeleMega v2.0 has a few minor changes from v1.0:
+
+	* Companion connector matches EasyMega functions
+	* Serial port connector replaced with servo connector with
+	  support for up to 4 PWM channels.
+	* Radio switched from cc1120 to cc1200.
+
+	None of these affect operation using the stock firmware, but
+	they do mean that the device needs different firmware to
+	operate correctly, so make sure you load the right firmware
+	when reflashing the device.
+
 	=== TeleMega Screw Terminals
 
 		TeleMega has two sets of nine screw terminals on the end of

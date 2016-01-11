@@ -25,7 +25,6 @@
 	endif::telemetrum[]
 	ifdef::telemini[]
 	|TeleMini v1.0		|2	|5kB	|4
-	|TeleMini v2.0		|16	|1MB	|10
 	endif::telemini[]
 	ifdef::easymini[]
 	|EasyMini		|16	|1MB	|10

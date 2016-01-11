@@ -24,8 +24,6 @@
 
 	include::telemini-v1.0.raw[]
 
-	include::telemini-v2.0.raw[]
-
 	include::easymini-device.raw[]
 
 	include::telemega.raw[]

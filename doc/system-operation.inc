@@ -19,8 +19,7 @@
 		idle mode.
 		endif::telemetrum,telemega,easymega[]
 		Since
-		ifdef::telemini[TeleMini v2.0 and EasyMini don't]
-		ifndef::telemini[EasyMini doesn't]
+		EasyMini doesn't
 		have an
 		accelerometer we can use to determine orientation, “idle” mode
 		is selected if the board is connected via USB to a computer,
