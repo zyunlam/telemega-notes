@@ -84,7 +84,6 @@ IMAGES=\
 	telemetrum-v2.0-th.jpg \
 	telemini.svg \
 	telemini-v1-top.jpg \
-	telemini-v2-top.jpg \
 	altusmetrum-oneline.svg \
 	telegps-oneline.svg \
 	micropeak-oneline.svg
@@ -105,7 +104,6 @@ INC_FILES=\
 	usage.inc \
 	telemetrum.inc \
 	telemini-v1.0.inc \
-	telemini-v2.0.inc \
 	easymini-device.inc \
 	telemega.inc \
 	easymega.inc \

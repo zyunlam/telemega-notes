@@ -3,7 +3,7 @@
 	ifdef::radio[]
 	=== Being Legal
 
-	        First off, in the US, you need an
+	        In the US, you need an
 	        link:http://www.altusmetrum.org/Radio/[amateur radio license]
 	        or other authorization to legally operate the radio
 	        transmitters that are part of our products.

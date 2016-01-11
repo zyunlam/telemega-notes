@@ -267,7 +267,7 @@
 		flight computer. These require three connections, one to
 		the battery, one to the positive power input on the flight
 		computer and one to ground. Find instructions on how to
-		hook these up for each flight computer below. The follow
+		hook these up for each flight computer below. Then follow
 		the instructions that come with your active switch to
 		connect it up.
 
