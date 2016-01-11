@@ -62,7 +62,7 @@ lco_arm(void)
 static void
 lco_ignite(void)
 {
-	ao_lco_ignite(lco_box, lco_channels, tick_offset);
+	ao_lco_ignite();
 }
 
 static void

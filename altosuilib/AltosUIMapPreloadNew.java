@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_8;
+package org.altusmetrum.altosuilib_9;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,7 +26,7 @@ import java.text.*;
 import java.lang.Math;
 import java.net.URL;
 import java.net.URLConnection;
-import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altoslib_9.*;
 
 class AltosUIMapPos extends Box {
 	AltosUIFrame	owner;

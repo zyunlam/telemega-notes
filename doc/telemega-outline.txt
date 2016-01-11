@@ -1,0 +1,9 @@
+= TeleMega Outline and Hole Pattern
+:doctype: article
+
+	This image, when printed, provides a precise template for the
+	mounting holes in TeleMega. TeleMega has overall dimensions of
+	1.250 x 3.250 inches, and the mounting holes are sized for use
+	with 4-40 or M3 screws.
+
+	image::telemega.svg[align="center"]

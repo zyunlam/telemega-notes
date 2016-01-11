@@ -66,7 +66,6 @@ main(int argc, char **argv)
 {
 	int flags, opt;
 	char *endptr;
-	struct sigvec vec, ovec;
 
 	while ((opt = getopt_long(argc, argv, "PVvHhmt:X:c:r:Z:s:S:p:T:", options, NULL)) != -1) {
 		switch (opt) {
@@ -169,22 +168,16 @@ main(int argc, char **argv)
 				perror("fdopen");
 				exit(1);
 			}
-			vec.sv_handler = SIG_IGN;
-			vec.sv_mask = 0;
-			vec.sv_flags = 0;
-			sigvec(SIGINT, &vec, &ovec);
+			signal(SIGINT, SIG_IGN);
 			command_read();
-			sigvec(SIGINT, &ovec, NULL);
+			signal(SIGINT, SIG_DFL);
 			fclose(s51_input);
 			fclose(s51_output);
 		}
 	} else {
 		s51_input = stdin;
 		s51_output = stdout;
-		vec.sv_handler = s51_sigint;
-		vec.sv_mask = 0;
-		vec.sv_flags = 0;
-		sigvec(SIGINT, &vec, &ovec);
+		signal(SIGINT, s51_sigint);
 		command_read();
 	}
 	exit(0);

@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_8;
+package org.altusmetrum.altosuilib_9;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altoslib_9.*;
 
 public class AltosDataChooser extends JFileChooser {
 	JFrame	frame;

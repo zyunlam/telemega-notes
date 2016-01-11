@@ -1,0 +1,51 @@
+= The Altus Metrum System
+:doctype: book
+:numbered:
+:altusmetrum: 1
+:radio: 1
+:gps: 1
+:telemetrum: 1
+:telemini: 1
+:easymini: 1
+:telemega: 1
+:easymega: 1
+:telegps: 1
+:application: AltosUI
+
+	include::dedication.raw[]
+
+	include::intro.raw[]
+
+	include::getting-started.raw[]
+
+	include::usage.raw[]
+
+	include::telemetrum.raw[]
+
+	include::telemini-v1.0.raw[]
+
+	include::easymini-device.raw[]
+
+	include::telemega.raw[]
+
+	include::easymega.raw[]
+
+	include::installation.raw[]
+
+	include::using-am-products.raw[]
+
+	include::altosui.raw[]
+
+	include::altosdroid.raw[]
+
+	include::system-operation.raw[]
+
+	include::handling.raw[]
+
+	include::updating-firmware.raw[]
+
+	include::flight-data-recording.raw[]
+
+	include::specs.raw[]
+
+	include::release-notes.raw[]

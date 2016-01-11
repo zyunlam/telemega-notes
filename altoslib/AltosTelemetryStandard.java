@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_8;
+package org.altusmetrum.altoslib_9;
 
 public abstract class AltosTelemetryStandard extends AltosTelemetry {
 	int[]	bytes;
@@ -68,11 +68,9 @@ public abstract class AltosTelemetryStandard extends AltosTelemetry {
 		case packet_type_satellite:
 			telem = new AltosTelemetrySatellite(bytes);
 			break;
-/*
 		case packet_type_companion:
 			telem = new AltosTelemetryCompanion(bytes);
 			break;
-*/
 		case packet_type_mega_sensor:
 			telem = new AltosTelemetryMegaSensor(bytes);
 			break;

@@ -96,6 +96,7 @@ altoslib_JAVA = \
 	AltosStateUpdate.java \
 	AltosTelemetry.java \
 	AltosTelemetryConfiguration.java \
+	AltosTelemetryCompanion.java \
 	AltosTelemetryFile.java \
 	AltosTelemetryIterable.java \
 	AltosTelemetryLegacy.java \

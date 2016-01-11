@@ -15,9 +15,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_8;
+package org.altusmetrum.altosuilib_9;
 
-import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altoslib_9.*;
 
 public class AltosGraphDataPoint implements AltosUIDataPoint {
 
@@ -217,7 +217,7 @@ public class AltosGraphDataPoint implements AltosUIDataPoint {
 
 	public int id(int index) {
 		if (index == data_state) {
-			int s = state.state;
+			int s = state.state();
 			if (AltosLib.ao_flight_boost <= s && s <= AltosLib.ao_flight_landed)
 				return s;
 		} else if (data_ignitor_fired_0 <= index && index <= data_ignitor_fired_max) {

@@ -22,7 +22,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.location.Location;
 
-import org.altusmetrum.altoslib_8.*;
+import org.altusmetrum.altoslib_9.*;
 
 public class AltosVoice {
 
@@ -186,9 +186,9 @@ public class AltosVoice {
 		if (last_tell_mode != TELL_MODE_FLIGHT)
 			last_flight_tell = TELL_FLIGHT_NONE;
 
-		if (state.state != last_state && AltosLib.ao_flight_boost <= state.state && state.state <= AltosLib.ao_flight_landed) {
+		if (state.state() != last_state && AltosLib.ao_flight_boost <= state.state() && state.state() <= AltosLib.ao_flight_landed) {
 			speak(state.state_name());
-			if (descending(state.state) && !descending(last_state)) {
+			if (descending(state.state()) && !descending(last_state)) {
 				if (state.max_height() != AltosLib.MISSING) {
 					speak("max height: %s.",
 					      AltosConvert.height.say_units(state.max_height()));
@@ -211,7 +211,7 @@ public class AltosVoice {
 		if (last_flight_tell == TELL_FLIGHT_NONE || last_flight_tell == TELL_FLIGHT_STATE || last_flight_tell == TELL_FLIGHT_TRACK) {
 			last_flight_tell = TELL_FLIGHT_SPEED;
 
-			if (state.state <= AltosLib.ao_flight_coast) {
+			if (state.state() <= AltosLib.ao_flight_coast) {
 				speed = state.speed();
 			} else {
 				speed = state.gps_speed();
@@ -312,7 +312,7 @@ public class AltosVoice {
 			last_tell_mode = tell_mode;
 			last_tell_serial = tell_serial;
 			if (state != null) {
-				last_state = state.state;
+				last_state = state.state();
 				last_height = state.height();
 				if (state.gps != null)
 					last_gps = state.gps;

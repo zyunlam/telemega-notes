@@ -1,4 +1,6 @@
 *.html
 *.pdf
 *.fo
+*.raw
 titlepage.templates.xsl
+fop-cfg.xml

@@ -288,8 +288,7 @@ ao_pad(void)
 			PRINTD ("armed\n");
 			ao_pad_armed = command.channels;
 			ao_pad_arm_time = ao_time();
-
-			/* fall through ... */
+			break;
 
 		case AO_LAUNCH_QUERY:
 			if (command.box != ao_pad_box) {
@@ -318,13 +317,6 @@ ao_pad(void)
 			if ((uint16_t) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
 				PRINTD ("late pad arm_time %d time %d\n",
 					ao_pad_arm_time, ao_time());
-				break;
-			}
-			time_difference = command.tick - ao_time();
-			if (time_difference < 0)
-				time_difference = -time_difference;
-			if (time_difference > 10) {
-				PRINTD ("time different too large %d\n", time_difference);
 				break;
 			}
 			PRINTD ("ignite\n");

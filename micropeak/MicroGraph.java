@@ -22,8 +22,8 @@ import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_8.*;
-import org.altusmetrum.altosuilib_8.*;
+import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altosuilib_9.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;

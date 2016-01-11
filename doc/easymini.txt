@@ -1,0 +1,34 @@
+= EasyMini Owner's Manual
+:doctype: book
+:numbered:
+:altusmetrum: 1
+:easymini: 1
+:application: AltosUI
+
+	include::dedication.raw[]
+
+	include::intro.raw[]
+
+	include::getting-started.raw[]
+
+	include::usage.raw[]
+
+	include::easymini-device.raw[]
+
+	include::installation.raw[]
+
+	include::using-am-products.raw[]
+
+	include::altosui.raw[]
+
+	include::system-operation.raw[]
+
+	include::handling.raw[]
+
+	include::updating-firmware.raw[]
+
+	include::flight-data-recording.raw[]
+
+	include::specs.raw[]
+
+	include::easymini-release-notes.raw[]
