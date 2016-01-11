@@ -21,5 +21,14 @@ Creating documentation for a new release of AltOS
 	telegps-docinfo.xml
 	telemetry-docinfo.xml
 
+* Update copyright year as appropriate
+
+	altusmetrum-docinfo.xml
+	companion-docinfo.xml
+	easymini-docinfo.xml
+	micropeak-docinfo.xml
+	telegps-docinfo.xml
+	telemetry-docinfo.xml
+
 * Add release-notes-${version}.inc and
   release-notes-${version}-docinfo.xml to git
