@@ -1,3 +1,808 @@
+commit 1681776abc0873bcbbbc5b2b17e15d54a1031f51
+Merge: 8830926 aebdcaf
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 19:07:49 2016 -0700
+
+    Merge branch 'master' into branch-1.6
+
+commit aebdcaf37eafbc13cce695fe65a455e49c6108c3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 19:06:19 2016 -0700
+
+    one more time, with feeling .. this time, I've updated pdclib
+
+commit 88309264656220bae6ee941211f7aa1b1dc19944
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 19:06:19 2016 -0700
+
+    one more time, with feeling .. this time, I've updated pdclib
+
+commit 70e9064ca962dfd345f8a342afa130f969606553
+Merge: 489d22f 73ce3f7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 19:04:49 2016 -0700
+
+    Merge branch 'master' into branch-1.6
+
+commit 73ce3f73526edfabccd3b98e6e67de6d82a84b63
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 18:58:31 2016 -0700
+
+    submodule madness
+
+commit cbec66452ecd01bbd5aebf6f98443d5e0540f5d2
+Merge: 4043e07 81b8f4d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 18:29:07 2016 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 81b8f4da612b527915f68f632fbd94a46bc1795f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 17:22:35 2016 -0800
+
+    doc: Remove extraneous 'first off' from legal paragraph
+    
+    Not helpful (bdale)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a00f186a06f22638882f43f49fa0c03ea387eac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 17:13:56 2016 -0800
+
+    doc: Remove telemini v2.0. Add telemega v2.0
+    
+    Reflect hardware we've actually shipped.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6cbf93995d90fc4790eb77bcaa233742857fe052
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 17:01:57 2016 -0800
+
+    doc: fix typo in using external active switch circuit section
+    
+    the -> then (bdale)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3547e65eecbe7bd4e16dc6f2048b7a69f29d05ff
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 16:59:37 2016 -0800
+
+    doc: Update copyright year in altusmetrum doc
+    
+    And note that this need to be checked for each release in RELNOTES
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4043e0707cdc77158f709c19dd134f92b4604270
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 17:45:45 2016 -0700
+
+    modify release procedure to reflect Keith setting version in confgure.ac
+
+commit 2f35e0ba52f538ea1061bfff5bbd772b8a241386
+Merge: 86ccbac 3fdaf74
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 17:44:03 2016 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 86ccbac16f5cd0be4a4c11260816b4799cda46f2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 17:43:34 2016 -0700
+
+    modify bringup scripts to handle TeleMega v2.0
+
+commit 3fdaf745f98f42f1ec4ae7cc682f47be8d8568eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 14:37:05 2016 -0800
+
+    Bump version to 1.6.2, altosdroid to 10
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ebe009b9c7c2f4de3405479f800a33b449fcbb1e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 17:41:38 2016 -0700
+
+    now building for m4, too
+
+commit ff9c034dc942ec4bc5cc30cc593ea2165e143d55
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 10 17:38:26 2016 -0700
+
+    new build dependency on asciidoc
+
+commit a66e57e0e92cdbd3c6a10b835c50f55647c07351
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 15:56:21 2016 -0800
+
+    altos: Switch PWM constants to end up exposing µsec
+    
+    This changes the constants so the clock runs at 1MHz, making the step
+    1µsec each. Then make the period 20000 steps, or 20ms for a 50Hz
+    frequency as before.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4e29bcd07819415ebe44e22536305e9c51d9ae4c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 15:44:08 2016 -0800
+
+    altos: Set TeleMega v2.0 PWM to support servos
+    
+    Typical servos use a 50Hz signal with less than 10% duty cycle. Set
+    the divider to 10 and the range to 64000 to provide a reasonable level
+    of detail down in the low range.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54c20f1caf7f2e09284a9839cfa854d71f5634a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 11:44:17 2016 -0800
+
+    Add release notes for 1.6.2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7041c386cdf37716f8daf0bc1a9204db620e3de9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 12:30:34 2016 -0800
+
+    Update java library versions
+    
+    altoslib is API incompatible with 1.6.1 release due to altos.state updates.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b560b20cc7d4d5ac219613b29707f7cb8a018273
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 12:30:11 2016 -0800
+
+    altoslib: Remove debug message from AltosMap
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 88671454e931ea5e5946438df3c437493e2356c8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 12:21:24 2016 -0800
+
+    Elide flight computer info from APRS section of TeleGPS manual
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit efd6cd5682be3d0cead71ecfa00f37428b64785f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 10 12:15:50 2016 -0800
+
+    Elide pyro channel information from EasyMini docs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4344bf3de532f54e0185421975c3c8dff1ac8bc2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 9 21:33:23 2016 -0800
+
+    altos: Insert inter telemetry-packet delay
+    
+    The receivers take some time to reset the radio between packets, so
+    make sure we don't send back-to-back telemetry too quickly by delaying
+    after sending each telemetry packet.
+
+commit fe8b7ab9dd1949c53af8f09f08679bdf0280c104
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 9 16:28:53 2016 -0800
+
+    Switch TeleMega v2.0 to CC1200 radio chip
+    
+    That's what we're using, after all
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0fd370af8bc8842000415c4d182d84b4bf6f90fa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Dec 25 23:27:45 2015 -0800
+
+    altos: Set AO_PWM_TIMER_SCALE for telemega-v2.0
+    
+    This is needed to configure the PWM timer correctly
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 742f7c834bb5d651d2bebf2069d4e8facc33390d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Dec 25 23:20:29 2015 -0800
+
+    altos: Get stm32l pwm driver working
+    
+    Fix the CCMR1_OC1PE and CCMR2_OC3PE values.
+    Disable clock when no PWM outputs are running.
+    Fix the apb1enr value for the timer.
+    Set ARR value to PWM_MAX - 1 -- ARR is off by one.
+    Sets the GPIO pins to 40MHz bandwidth for sharper edges.
+    
+    Tested on EasyMega, but that code is not included as it breaks the
+    companion protocol.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8aa0ab9fe9ca41f6d520d388973164bc0c599a06
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 24 00:28:59 2015 -0800
+
+    altos: Add TeleMega v2.0, including PWM driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a1b760d0a01e7087bcc214fcd395541fbf268fe8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Dec 23 10:18:24 2015 -0800
+
+    ao-tools/ao-dbg: Stop using sigvec
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f28d59ddf3e1b763ce5757f572e79085963818e9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 14 00:01:05 2015 -0800
+
+    doc: Remove some bogus bits from am.css
+    
+    Just commented out stuff which had a nested comment and was thus invalid
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 19f700f1c99d2f3dcd8775cc629037312d853ee1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 23:36:02 2015 -0800
+
+    doc: Construct html index for documentation
+    
+    This gets uploaded to keith's machine as an easy way to see what's available.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 688c5ee98565a25e77c8618e1957ed3b8eff5a56
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 23:17:11 2015 -0800
+
+    doc: Try a different trick for asciidoc build issues
+    
+    asciidoc creates temp files in the current directory using basename of
+    the source filename. Doing html and pdf builds in parallel causes
+    chaos as a result. Fix this by having the pdf target build both
+    serially, and then have the html target just depend on the pdf target.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 992c0eab6275cec7d5035b99952537fd7ece2ed4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 22:55:35 2015 -0800
+
+    doc: Split out EasyMini into a separate manual
+    
+    EasyMini uses a tiny fraction of the overall system software;
+    splitting the manual out makes it a lot smaller.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b030dfb3df859b3b3cb9c666394f315edcd11f49
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 20:59:25 2015 -0800
+
+    doc: Reformat html versions a bit
+    
+    Color more text black, including toc. Add a bit of space around the
+    toc. Make paragraph labels bold.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6260ee1419ba5c122939b28e3e8fc6f8ecf48928
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 20:58:58 2015 -0800
+
+    doc: Move pad beeps table to usage chapter
+    
+    This places all of the sound information in one place.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2133c235af9511a42b65b239c6fcbeafa0e6d272
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 20:58:08 2015 -0800
+
+    doc: Provide more actual links instead of just chapter names
+    
+    Replace 'see chapter "foo"' with 'see <<foo>>' so that a link is
+    created to directly go to the relevant text.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 87cb41dfa07153b4dc44f723c65888945b3a11b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 20:56:45 2015 -0800
+
+    doc: Reformat 'Using MicroPeak' section
+    
+    Use labeled paragraphs to make the steps stand out.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4c1206a47431c7d873228fdd7328e1b9ac93a390
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 13 19:45:02 2015 -0800
+
+    Break out common pieces from TeleGPS and AltusMetrum
+    
+    This creates shared files for portions of the TeleGPS and AltusMetrum
+    manual to avoid duplicating text between the two.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ef2ba847ca53a8ddfcddd4e51a0dd43c45161c85
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 21:05:20 2015 -0800
+
+    doc: Add product logos to books
+    
+    This places the product logo on the title verso in pdf form, and above
+    the TOC in html form.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8642690da76a86736b97026e2a259d8cbad26262
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 06:20:27 2015 -0800
+
+    altosui: telemini outline pdf changed name
+    
+    It's now telemini-outline.pdf, just like the other outline files.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c877ecce7b67272eb6dcba50a58b59cd1cbfa5ab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 05:43:59 2015 -0800
+
+    doc: verbose mode for a2x
+
+commit 13d03ee8ba3a300ef2a3a380b60f08dbe37793b0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 05:08:27 2015 -0800
+
+    doc: Make pdf titles less ridiculously large
+    
+    Instead of having them grow at 20% per nesting level, use 10% instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 553d9041b52cbb88662fcc5e6a277ce43bd151cd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 04:23:56 2015 -0800
+
+    doc: Get images and tables all centered and labeled
+    
+    A bunch of images were using image: instead of image:: and some images
+    and tables were missing titles.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit edcb80f25875200a73269045db71c1579b0c2c82
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 04:22:27 2015 -0800
+
+    doc: Split revhistory to separate file for html docs
+    
+    This avoids having the revhistory clutter the top of the document.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1c0f2cd7cbd8fa1360d6b18a1bf8ac0707634aa4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 04:20:18 2015 -0800
+
+    doc: Place html book contents on left side of page with separate scrollbar
+    
+    This lets the user see the toc while browsing the document
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2816b305fc9e18a1190e392d43ff489936f10f0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 1 04:18:34 2015 -0800
+
+    doc: Switch to free fonts. Publish fonts with docs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5b782c8f45ed6c34ed0e7f1aff6ac298c9a879ff
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 31 23:54:26 2015 -0700
+
+    doc: Minor makefile cleanups
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 22f399b13fbbc980315a1f6a9f5616586b680d77
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 31 23:36:03 2015 -0700
+
+    doc: Convert telemetry and companion docs to asciidoc
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14ad137fd14707bc7b45a3512a4a6f81915ca1c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 31 22:40:13 2015 -0700
+
+    doc: Convert AltOS doc to asciidoc
+    
+    It's still pretty stale, but at least it isn't in docbook?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ce297f14ff54d230d01fb6dedaafca571e8b836b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 31 21:34:42 2015 -0700
+
+    doc: Finish converting docs to asciidoc format
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9aed128dc0aab5d49e1b3264c864a6c3e929bffe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 31 14:54:20 2015 -0700
+
+    doc: Add titles to all figures
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7ef958cbb51a04079e2a4833917ccef57ae5a2ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 20:32:58 2015 -0700
+
+    doc: Add updating firmware and using am products asciidoc bits
+    
+    This finishes the asciidoc transition
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41aca78e3f7c17433e3c77cd3c596bbf8acab7cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 18:38:46 2015 -0700
+
+    doc: Add asciidoc version of Altos Droid manual
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5ddf9525f94f38c20327d1f2b43917e43519b949
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 18:14:38 2015 -0700
+
+    doc: Add asciidoc version of altosui chapter.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit adfbccfeb551c9d0315116912e7255a173fc3103
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 16:49:00 2015 +0900
+
+    doc: Lots more conversion from docbook to asciidoc
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c5fd0eaa786a122580ba9a3ef7bfc0f2cfd8263b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 15:50:31 2015 +0900
+
+    doc: Add asciidoc telemini v1.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8cf466d7a767a20387a8d9d6ec81ee00af3fe4a7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 12:12:15 2015 +0900
+
+    doc: Start doc transition to asciidoc
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c1ca80318102af122cb7b5380331e37795280761
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 13 13:52:32 2015 -0700
+
+    doc: Force FOP to read images from doc directory
+    
+    Looks like something changed and fop is now reading from the directory
+    containing the source file. xmlto places that source in /tmp, making
+    all relative URIs fail. Fix this by creating a fop configuration file
+    directing it to load relative to the doc directory and then pass that
+    through xmlto.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0ae116dd8779fd0594d443a735e7b6834ea9b713
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 10 14:10:59 2015 -0700
+
+    telelco: Fix pad reset to one on radio signal loss
+    
+    The pad number was getting reset back to one when signal was lost,
+    causing pad one to get fired in this case even when already set to arm mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6659d08c41d89e4aa3d5e849c066a91bb09f2dd7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 21 07:03:30 2015 +0100
+
+    Create directory on keithp.com when uploading devel version
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 926522c6791c2a5529ea24ebd67eea45350e3526
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 21 07:01:19 2015 +0100
+
+    altoslib: Keep downloading when a parse error occurs
+    
+    Eventually, we'll hit a block with no valid data and give up. Until
+    then, keep going in case the flight computer glitched and wrote bad data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 431c713389dc819d2433d893c898ff82c7941722
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 21 06:32:52 2015 +0100
+
+    altoslib: Clean up remaining direct AltosState.state users
+    
+    This value has been hidden to avoid having it written accidentally;
+    there were a few more bits of code using it though.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c1dec3bec0789e8934a6e13fd117931ba468b318
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 21 06:27:26 2015 +0100
+
+    Bump release number to 1.6.1.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0f8272852b12cf7a349cd9fd07f17c55cdb335a1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 21 06:25:49 2015 +0100
+
+    altoslib: Make sure .eeprom download file is flushed on exception
+    
+    Flush and close the eeprom file even if an exception occurs to make
+    sure that contents of the file aren't lost.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a81d028dc62a0a624051fc3c9debb9687fda931e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 21 06:00:36 2015 +0100
+
+    altosuilib: In display thread, set new state synchronously
+    
+    When replaying telemetry, received_time gets set by both the
+    telemetry reader (when the file is initially read) and by the replay
+    reader (as the telemetry is processed). Because these two events are
+    separated by the time it takes to play the file, the second time is
+    the one we want for figuring out how long since the last telemetry
+    packet. However, if we set the global state when pulling the state out
+    of the telemetry reader, and then the replay reader pauses for a long
+    time, then the voice output thread sees the intermediate time value
+    and thinks that it has been a long time since the last packet was
+    received and reports that the rocket may have crashed.
+    
+    Fix this by just holding the read state until it has been passed by
+    the replay reader and had the received_time set to current time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f61c2b73f3b63aa9c3f0fbccede89c71580089ba
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 13 22:27:10 2015 -0700
+
+    altosdroid: Add minus sign and decimal point to lat/lon input fields
+    
+    Some android devices always have change-sign and decimal-point keys
+    visible, but some do not. Make sure they're available for lat/lon input.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9dae5f76c5691dc94c02839eb1321426f96f2134
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 13 22:24:47 2015 -0700
+
+    altos/telelco: Adjust drag race UI
+    
+    Enter/leave drag race is done by rotating the box selector knob
+    to a new 'dr' position and then holding down the firing button; this
+    avoids a potential accidental firing if you somehow don't realize
+    you've armed the box before selecting drag race mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 618f7ac8f31941fcbb3ed91829de69c0f0be8e0b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 12 20:41:37 2015 -0700
+
+    altoslib: Rotation off by factor of two
+    
+    The rotation computation was off by a factor of two when converting
+    the rates to a quaternion (the quaternion needs to be half of the
+    actual rotation amount). This ended up presenting a tilt angle of
+    twice what it should be.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0afa07d3c1dcb5e301fcb8b4edfecdd961662478
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 12 19:20:49 2015 -0700
+
+    altoslib: Hide 'state' member and use accessor function
+    
+    Someone was smashing the state to 'landed' when no packets had been
+    received for a while. Found that by making it impossible for anyone
+    outside of AltosState to change the value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7064bc685aebeef07711e525dea4d5fbe33d235b
+Merge: ea1d241 dda3f45
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Sep 29 00:46:42 2015 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit ea1d24151cf76ae8f2368673317b66958e2508c4
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Sep 29 00:45:27 2015 -0600
+
+    add automatic Bluetooth functionality check to turnon_telebt
+
+commit dda3f459eaff8d4e41cb44584c8ef77b8e2b3b1c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 29 17:29:00 2015 -0700
+
+    altos/telelco: Add drag race UI
+    
+    With the unit disarmed, press and hold the fire button for five
+    seconds to enable drag race mode.
+    
+    The display will show 'dr' for five seconds and beep five times to
+    indicate that drag race mode is enabled. The decimal points in the
+    display will all be displayed as an additional visual aid. Once every
+    five seconds, it will beep.
+    
+    With drag race mode enabled, you can select a box/pad pair and press
+    the 'fire' button to add it to the drag race group. For the current
+    box, all members of the drag race group will have their continuity
+    LEDs blink slowly. There will be no indication of continuity in this
+    mode; you'll want to check that before enabling drag race mode. If you
+    want to de-select a member of the group, just press the fire button
+    again. Each time you push the fire button, it will beep out the pad
+    number added or removed.
+    
+    Arm the box and you will not be able to add or remove members from the
+    drag race group. Firing will simultaneously fire all members of the
+    drag race group.
+    
+    To disable drag race mode, press and hold the fire button for two
+    seconds. It will beep twice and turn off the decimal points in the display.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55c1be449ef7ce389a3d94686051d272c858bee4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 29 13:21:19 2015 -0700
+
+    altos/telelco: Infrastructure changes for drag racing
+    
+    This makes the lco management code support arming multiple pads and
+    firing all of them at once. The UI code does not expose this yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2839796ca5ace5f0c79643afc1a868893246b621
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 29 13:20:16 2015 -0700
+
+    altos: Provide direct segment driving interface for LCD displays
+    
+    This exposes a simple bit-mask for setting the seven segments instead
+    of just allowing hex-decimal values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 368f87918547f89e7eb2a92990621e75e07a3b25
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 29 13:18:46 2015 -0700
+
+    altos/telefire: No reply for ARMED. Ignore time for FIRE.
+    
+    This will let us do drag races by letting the LCO arm multiple boxes
+    and fire them all with a single command.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f491eec1b950e4ad35a535db254a27a3dd2ad430
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 20 23:02:04 2015 -0700
+
+    altos: Add HAS_COMPANION to new boards with companion connectors
+    
+    Thanks much to Rob Derstadt for discovering this bug!
+    
+    TeleMetrum v2.0, TeleMega, EasyMega, TeleBalloon v2.0 all have
+    companion connectors and yet HAS_COMPANION was not defined. This
+    disabled companion telemetry packets on these products, but otherwise
+    didn't have any effect.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b4064bf63bb95c58d74869f4ff3e440370d64692
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 20 10:51:11 2015 -0700
+
+    ao-telem: Add companion packet telemetry data printing
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 73dd2e2c73c42f6ce949b4aa7992f63610962c37
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 20 10:50:30 2015 -0700
+
+    altoslib: Add companion telemetry data support
+    
+    This got lost in the great telemetry rewrite
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 489d22f448d9927533e90da4d16c5a332a234a8d
+Merge: 570daac eaab49a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Aug 16 17:53:40 2015 +0200
+
+    Merge branch 'master' into branch-1.6
+
+commit eaab49ab1859ebe236a201f93b5352e67aa7ed2b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Aug 16 17:43:32 2015 +0200
+
+    apply wrap-and-sort to control files
+
+commit 909b048a4797b2477279750a77a82c6f5f2776d0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Aug 7 20:52:48 2015 -0600
+
+    turnon script for TeleBT v3.0
+
+commit 9e40f97b013256650364a2a7be96d7d2216ed778
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Jul 31 10:47:08 2015 -0600
+
+    add a paragraph about TeleBT battery charging to AltosDroid chapter in documentation
+
+commit 773b23c48f67564eec83fc3ee085862c547ad160
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jul 28 01:34:25 2015 -0600
+
+    move turnon_teledongle to new cal-freq code
+
+commit 570daace9caf7647a09c53d5c75593cc4c98b93b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jul 16 13:36:13 2015 -0600
+
+    changelog for 1.6.1 release
+
 commit 6e9bb9178356620bd47d9f2e31abf42b7f1a8f11
 Merge: e2cefd8 87c8bb3
 Author: Bdale Garbee <bdale@gag.com>
