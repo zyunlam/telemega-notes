@@ -127,7 +127,6 @@ ao_clock_enable_crs(void)
 		      (0 << STM_CRS_CR_ERRIE) |
 		      (0 << STM_CRS_CR_SYNCWARNIE) |
 		      (0 << STM_CRS_CR_SYNCOKIE));
-
 }
 
 void
