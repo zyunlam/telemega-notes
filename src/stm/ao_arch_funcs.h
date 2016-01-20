@@ -284,6 +284,8 @@ struct ao_stm_usart {
 	struct ao_fifo		tx_fifo;
 	struct stm_usart	*reg;
 	uint8_t			tx_started;
+	uint8_t			tx_running;
+	uint8_t			draining;
 };
 
 #if HAS_SERIAL_1

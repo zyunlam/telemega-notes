@@ -26,14 +26,19 @@ ao_debug_out(char c)
 	stm_usart1.dr = c;
 }
 
-static void
+static int
 _ao_usart_tx_start(struct ao_stm_usart *usart)
 {
 	if (!ao_fifo_empty(usart->tx_fifo) && !usart->tx_started)
 	{
 		usart->tx_started = 1;
+		usart->tx_running = 1;
+		usart->reg->cr1 |= (1 << STM_USART_CR1_TXEIE) | (1 << STM_USART_CR1_TCIE);
 		ao_fifo_remove(usart->tx_fifo, usart->reg->dr);
+		ao_wakeup(&usart->tx_fifo);
+		return 1;
 	}
+	return 0;
 }
 
 static void
@@ -52,10 +57,18 @@ ao_usart_isr(struct ao_stm_usart *usart, int stdin)
 		if (stdin)
 			ao_wakeup(&ao_stdin_ready);
 	}
-	if (sr & (1 << STM_USART_SR_TC)) {
+	if (sr & (1 << STM_USART_SR_TXE)) {
 		usart->tx_started = 0;
-		_ao_usart_tx_start(usart);
-		ao_wakeup(&usart->tx_fifo);
+		if (!_ao_usart_tx_start(usart))
+			usart->reg->cr1 &= ~(1<< STM_USART_CR1_TXEIE);
+	}
+	if (sr & (1 << STM_USART_SR_TC)) {
+		usart->tx_running = 0;
+		usart->reg->cr1 &= ~(1 << STM_USART_CR1_TCIE);
+		if (usart->draining) {
+			usart->draining = 0;
+			ao_wakeup(&usart->tx_fifo);
+		}
 	}
 }
 
@@ -105,12 +118,14 @@ ao_usart_putchar(struct ao_stm_usart *usart, char c)
 	ao_arch_release_interrupts();
 }
 
-void
+static void
 ao_usart_drain(struct ao_stm_usart *usart)
 {
 	ao_arch_block_interrupts();
-	while (!ao_fifo_empty(usart->tx_fifo))
+	while (!ao_fifo_empty(usart->tx_fifo) || usart->tx_running) {
+		usart->draining = 1;
 		ao_sleep(&usart->tx_fifo);
+	}
 	ao_arch_release_interrupts();
 }
 
@@ -153,7 +168,7 @@ ao_usart_init(struct ao_stm_usart *usart)
 			  (0 << STM_USART_CR1_PS) |
 			  (0 << STM_USART_CR1_PEIE) |
 			  (0 << STM_USART_CR1_TXEIE) |
-			  (1 << STM_USART_CR1_TCIE) |
+			  (0 << STM_USART_CR1_TCIE) |
 			  (1 << STM_USART_CR1_RXNEIE) |
 			  (0 << STM_USART_CR1_IDLEIE) |
 			  (1 << STM_USART_CR1_TE) |
@@ -234,6 +249,7 @@ ao_serial1_drain(void)
 void
 ao_serial1_set_speed(uint8_t speed)
 {
+	ao_usart_drain(&ao_stm_usart1);
 	ao_usart_set_speed(&ao_stm_usart1, speed);
 }
 #endif	/* HAS_SERIAL_1 */
@@ -277,6 +293,7 @@ ao_serial2_drain(void)
 void
 ao_serial2_set_speed(uint8_t speed)
 {
+	ao_usart_drain(&ao_stm_usart2);
 	ao_usart_set_speed(&ao_stm_usart2, speed);
 }
 #endif	/* HAS_SERIAL_2 */
@@ -314,7 +331,14 @@ _ao_serial3_sleep_for(uint16_t timeout)
 void
 ao_serial3_set_speed(uint8_t speed)
 {
+	ao_usart_drain(&ao_stm_usart3);
 	ao_usart_set_speed(&ao_stm_usart3, speed);
+}
+
+void
+ao_serial3_drain(void)
+{
+	ao_usart_drain(&ao_stm_usart3);
 }
 #endif	/* HAS_SERIAL_3 */
 
