@@ -20,6 +20,12 @@
 #include <ao_crc.h>
 #include <ao_trng_send.h>
 
+static void
+ao_hv_init(void)
+{
+	ao_enable_output(AO_HV_ENABLE_PORT, AO_HV_ENABLE_BIT, AO_HV_ENABLE_PIN, 1);
+}
+
 void main(void)
 {
 	ao_led_init(LEDS_AVAILABLE);
@@ -32,6 +38,8 @@ void main(void)
 	ao_crc_init();
 
 	ao_usb_init();
+
+	ao_hv_init();
 
 	ao_trng_send_init();
 

@@ -57,6 +57,11 @@
 
 #define AO_NUM_ADC		1
 
+/* HV enable */
+
+#define AO_HV_ENABLE_PORT	(&stm_gpioa)
+#define AO_HV_ENABLE_BIT	8
+
 /* CRC */
 #define AO_CRC_WIDTH	32
 #define AO_CRC_INIT	0xffffffff
