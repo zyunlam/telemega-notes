@@ -67,6 +67,11 @@
 #define AO_CRC_INIT	0xffffffff
 
 /* TRNG */
-#define AO_LED_TRNG_ACTIVE	AO_LED_GREEN
+#define AO_LED_TRNG_COOKED	AO_LED_GREEN
+#define AO_LED_TRNG_RAW		AO_LED_RED
+
+/* Mode pin */
+#define AO_RAW_PORT		(&stm_gpioa)
+#define AO_RAW_BIT		15
 
 #endif /* _AO_PINS_H_ */

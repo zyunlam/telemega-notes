@@ -1,0 +1,50 @@
+#!/bin/sh
+
+if [ -x /usr/bin/ao-flash-stm32f0x ]; then
+	FLASH_STM=/usr/bin/ao-flash-stm32f0x
+else
+	echo "Can't find ao-flash-stm32f0x!  Aborting."
+	exit 1
+fi
+
+if [ -x /usr/bin/ao-usbload ]; then
+	USBLOAD=/usr/bin/ao-usbload
+else
+	echo "Can't find ao-usbload!  Aborting."
+	exit 1
+fi
+
+VERSION=0.1
+PRODUCT=ChaosKey
+
+echo "ChaosKey v$VERSION Turn-On and Calibration Program"
+echo "Copyright 2015 by Keith Packard.  Released under GPL v2"
+echo
+echo "Expectations:"
+echo "\tChaosKey v$VERSION powered from USB"
+echo "\t\twith ST-Link-V2 cabled to debug header"
+echo
+
+
+case $# in
+    1)
+	SERIAL="$1"
+	echo "$PRODUCT-$VERSION serial number: $SERIAL" 
+	;;
+    0)
+	echo -n "$PRODUCT-$VERSION serial number: "
+	read SERIAL
+	;;
+    *)
+	echo "Usage: $0 <serial-number>" 1>&2
+	exit 1;
+	;;
+esac
+
+$FLASH_STM ../src/chaoskey-v$VERSION/flash-loader/chaoskey-v$VERSION-*.elf || exit 1
+
+sleep 2
+
+$USBLOAD --serial=$SERIAL ../src/chaoskey-v$VERSION/chaoskey-v$VERSION*.ihx || exit 1
+
+exit $?
