@@ -72,6 +72,11 @@ ao_trng_send(void)
 
 	ao_crc_reset();
 
+	/* Delay long enough for the HV power supply to stabilize so that the
+	 * first bits we read aren't of poor quality
+	 */
+	ao_delay(AO_MS_TO_TICKS(250));
+
 	for (;;) {
 		if (ao_send_raw()) {
 			ao_led_on(AO_LED_TRNG_RAW);
