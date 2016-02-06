@@ -129,12 +129,9 @@ ao_clock_enable_crs(void)
 		      (0 << STM_CRS_CR_SYNCOKIE));
 }
 
-void
-ao_clock_init(void)
+static void
+ao_clock_hsi(void)
 {
-	uint32_t	cfgr;
-
-	/* Switch to HSI while messing about */
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSION);
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSIRDY)))
 		ao_arch_nop();
@@ -152,10 +149,11 @@ ao_clock_init(void)
 
 	/* reset PLLON, CSSON, HSEBYP, HSEON */
 	stm_rcc.cr &= 0x0000ffff;
+}
 
-	/* Disable all interrupts */
-	stm_rcc.cir = 0;
-
+static void
+ao_clock_normal_start(void)
+{
 #if AO_HSE
 #define STM_RCC_CFGR_SWS_TARGET_CLOCK		STM_RCC_CFGR_SWS_HSE
 #define STM_RCC_CFGR_SW_TARGET_CLOCK		STM_RCC_CFGR_SW_HSE
@@ -171,6 +169,11 @@ ao_clock_init(void)
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEON);
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSERDY)))
 		asm("nop");
+
+#ifdef STM_PLLSRC
+#error No code for PLL initialization yet
+#endif
+
 #endif
 
 
@@ -195,10 +198,46 @@ ao_clock_init(void)
 #define STM_PLLSRC				STM_HSI
 #define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	0
 #endif
+}
 
-#ifdef STM_PLLSRC
-#error No code for PLL initialization yet
+static void
+ao_clock_normal_switch(void)
+{
+	uint32_t	cfgr;
+
+	cfgr = stm_rcc.cfgr;
+	cfgr &= ~(STM_RCC_CFGR_SW_MASK << STM_RCC_CFGR_SW);
+	cfgr |= (STM_RCC_CFGR_SW_TARGET_CLOCK << STM_RCC_CFGR_SW);
+	stm_rcc.cfgr = cfgr;
+	for (;;) {
+		uint32_t	c, part, mask, val;
+
+		c = stm_rcc.cfgr;
+		mask = (STM_RCC_CFGR_SWS_MASK << STM_RCC_CFGR_SWS);
+		val = (STM_RCC_CFGR_SWS_TARGET_CLOCK << STM_RCC_CFGR_SWS);
+		part = c & mask;
+		if (part == val)
+			break;
+	}
+#if !AO_HSI && !AO_NEED_HSI
+	/* Turn off the HSI clock */
+	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
 #endif
+}
+
+void
+ao_clock_init(void)
+{
+	uint32_t	cfgr;
+
+	/* Switch to HSI while messing about */
+	ao_clock_hsi();
+
+	/* Disable all interrupts */
+	stm_rcc.cir = 0;
+
+	/* Start high speed clock */
+	ao_clock_normal_start();
 
 	/* Set flash latency to tolerate 48MHz SYSCLK  -> 1 wait state */
 
@@ -227,29 +266,11 @@ ao_clock_init(void)
 	stm_rcc.cfgr = cfgr;
 
 	/* Switch to the desired system clock */
-
-	cfgr = stm_rcc.cfgr;
-	cfgr &= ~(STM_RCC_CFGR_SW_MASK << STM_RCC_CFGR_SW);
-	cfgr |= (STM_RCC_CFGR_SW_TARGET_CLOCK << STM_RCC_CFGR_SW);
-	stm_rcc.cfgr = cfgr;
-	for (;;) {
-		uint32_t	c, part, mask, val;
-
-		c = stm_rcc.cfgr;
-		mask = (STM_RCC_CFGR_SWS_MASK << STM_RCC_CFGR_SWS);
-		val = (STM_RCC_CFGR_SWS_TARGET_CLOCK << STM_RCC_CFGR_SWS);
-		part = c & mask;
-		if (part == val)
-			break;
-	}
+	ao_clock_normal_switch();
 
 	/* Clear reset flags */
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
-#if !AO_HSI && !AO_NEED_HSI
-	/* Turn off the HSI clock */
-	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
-#endif
 #if DEBUG_THE_CLOCK
 	/* Output SYSCLK on PA8 for measurments */
 
@@ -263,3 +284,18 @@ ao_clock_init(void)
 	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOSEL_HSE << STM_RCC_CFGR_MCOSEL);
 #endif
 }
+
+#if AO_POWER_MANAGEMENT
+void
+ao_clock_suspend(void)
+{
+	ao_clock_hsi();
+}
+
+void
+ao_clock_resume(void)
+{
+	ao_clock_normal_start();
+	ao_clock_normal_switch();
+}
+#endif

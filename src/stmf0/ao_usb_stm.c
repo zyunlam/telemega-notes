@@ -18,8 +18,10 @@
 #include "ao.h"
 #include "ao_usb.h"
 #include "ao_product.h"
+#include "ao_power.h"
 
 #define USB_DEBUG 	0
+#define USB_STATUS	0
 #define USB_DEBUG_DATA	0
 #define USB_ECHO	0
 
@@ -129,10 +131,9 @@ static uint8_t	ao_usb_out_avail;
 uint8_t		ao_usb_running;
 static uint8_t	ao_usb_configuration;
 
-#define AO_USB_EP0_GOT_RESET	1
-#define AO_USB_EP0_GOT_SETUP	2
-#define AO_USB_EP0_GOT_RX_DATA	4
-#define AO_USB_EP0_GOT_TX_ACK	8
+#define AO_USB_EP0_GOT_SETUP	1
+#define AO_USB_EP0_GOT_RX_DATA	2
+#define AO_USB_EP0_GOT_TX_ACK	4
 
 static uint8_t	ao_usb_ep0_receive;
 static uint8_t	ao_usb_address;
@@ -438,6 +439,7 @@ static uint16_t int_count;
 static uint16_t	in_count;
 static uint16_t	out_count;
 static uint16_t	reset_count;
+static uint16_t suspend_count;
 
 /* The USB memory must be accessed in 16-bit units
  */
@@ -686,11 +688,6 @@ static void
 ao_usb_ep0_handle(uint8_t receive)
 {
 	ao_usb_ep0_receive = 0;
-	if (receive & AO_USB_EP0_GOT_RESET) {
-		debug ("\treset\n");
-		ao_usb_set_ep0();
-		return;
-	}
 	if (receive & AO_USB_EP0_GOT_SETUP) {
 		debug ("\tsetup\n");
 		ao_usb_ep0_setup();
@@ -719,6 +716,23 @@ ao_usb_ep0_handle(uint8_t receive)
 		if (ao_usb_ep0_state == AO_USB_EP0_DATA_IN)
 			ao_usb_ep0_flush();
 	}
+}
+
+void
+ao_usb_suspend(void)
+{
+	stm_usb.cntr |= (1 << STM_USB_CNTR_FSUSP);
+	ao_power_suspend();
+	stm_usb.cntr |= (1 << STM_USB_CNTR_LP_MODE);
+	ao_clock_suspend();
+}
+
+void
+ao_usb_wakeup(void)
+{
+	ao_clock_resume();
+	stm_usb.cntr &= ~(1 << STM_USB_CNTR_FSUSP);
+	ao_power_resume();
 }
 
 void
@@ -784,10 +798,18 @@ stm_usb_isr(void)
 
 	if (istr & (1 << STM_USB_ISTR_RESET)) {
 		++reset_count;
-		ao_usb_ep0_receive |= AO_USB_EP0_GOT_RESET;
-		ao_usb_ep0_handle(ao_usb_ep0_receive);
+		debug ("\treset\n");
+		ao_usb_set_ep0();
 	}
-
+	if (istr & (1 << STM_USB_ISTR_SUSP)) {
+		++suspend_count;
+		debug ("\tsuspend\n");
+		ao_usb_suspend();
+	}
+	if (istr & (1 << STM_USB_ISTR_WKUP)) {
+		debug ("\twakeup\n");
+		ao_usb_wakeup();
+	}
 }
 
 /* Queue the current IN buffer for transmission */
@@ -1050,8 +1072,8 @@ ao_usb_enable(void)
 	stm_usb.cntr = ((1 << STM_USB_CNTR_CTRM) |
 			(0 << STM_USB_CNTR_PMAOVRM) |
 			(0 << STM_USB_CNTR_ERRM) |
-			(0 << STM_USB_CNTR_WKUPM) |
-			(0 << STM_USB_CNTR_SUSPM) |
+			(1 << STM_USB_CNTR_WKUPM) |
+			(1 << STM_USB_CNTR_SUSPM) |
 			(1 << STM_USB_CNTR_RESETM) |
 			(0 << STM_USB_CNTR_SOFM) |
 			(0 << STM_USB_CNTR_ESOFM) |
@@ -1086,12 +1108,12 @@ ao_usb_echo(void)
 }
 #endif
 
-#if USB_DEBUG
+#if USB_STATUS
 static void
 ao_usb_irq(void)
 {
-	printf ("control: %d out: %d in: %d int: %d reset: %d\n",
-		control_count, out_count, in_count, int_count, reset_count);
+	printf ("control: %d out: %d in: %d int: %d reset: %d suspend %d\n",
+		control_count, out_count, in_count, int_count, reset_count, suspend_count);
 }
 
 __code struct ao_cmds ao_usb_cmds[] = {
@@ -1119,7 +1141,7 @@ ao_usb_init(void)
 #if USB_ECHO
 	ao_add_task(&ao_usb_echo_task, ao_usb_echo, "usb echo");
 #endif
-#if USB_DEBUG
+#if USB_STATUS
 	ao_cmd_register(&ao_usb_cmds[0]);
 #endif
 #if !USB_ECHO

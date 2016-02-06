@@ -18,6 +18,8 @@
 #ifndef _AO_ARCH_FUNCS_H_
 #define _AO_ARCH_FUNCS_H_
 
+#include <ao_power.h>
+
 /* ao_spi_stm.c
  */
 
@@ -118,27 +120,44 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 #define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
 #define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
-#define ao_enable_port(port) do {					\
-		if ((port) == &stm_gpioa)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN); \
-		else if ((port) == &stm_gpiob)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPBEN); \
-		else if ((port) == &stm_gpioc)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPCEN); \
-		else if ((port) == &stm_gpiof)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPFEN); \
-	} while (0)
+extern struct ao_power	ao_power_gpioa;
+extern struct ao_power	ao_power_gpiob;
+extern struct ao_power	ao_power_gpioc;
+extern struct ao_power	ao_power_gpiof;
 
-#define ao_disable_port(port) do {					\
-		if ((port) == &stm_gpioa)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPAEN); \
-		else if ((port) == &stm_gpiob)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPBEN); \
-		else if ((port) == &stm_gpioc)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPCEN); \
-		else if ((port) == &stm_gpiof)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPFEN); \
-	} while (0)
+static inline void ao_enable_port(struct stm_gpio *port)
+{
+	if ((port) == &stm_gpioa) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN);
+		ao_power_register(&ao_power_gpioa);
+	} else if ((port) == &stm_gpiob) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPBEN);
+		ao_power_register(&ao_power_gpiob);
+	} else if ((port) == &stm_gpioc) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPCEN);
+		ao_power_register(&ao_power_gpioc);
+	} else if ((port) == &stm_gpiof) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPFEN);
+		ao_power_register(&ao_power_gpiof);
+	}
+}
+
+static inline void ao_disable_port(struct stm_gpio *port)
+{
+	if ((port) == &stm_gpioa) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPAEN);
+		ao_power_unregister(&ao_power_gpioa);
+	} else if ((port) == &stm_gpiob) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPBEN);
+		ao_power_unregister(&ao_power_gpiob);
+	} else if ((port) == &stm_gpioc) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPCEN);
+		ao_power_unregister(&ao_power_gpioc);
+	} else if ((port) == &stm_gpiof) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPFEN);
+		ao_power_unregister(&ao_power_gpiof);
+	}
+}
 
 #define ao_gpio_set(port, bit, pin, v) stm_gpio_set(port, bit, v)
 
@@ -166,8 +185,7 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 	} while (0)
 
 #define ao_enable_cs(port,bit) do {				\
-		stm_gpio_set((port), bit, 1);			\
-		stm_moder_set((port), bit, STM_MODER_OUTPUT);	\
+		ao_enable_output(port, bit, pin, 1);		\
 	} while (0)
 
 #define ao_spi_init_cs(port, mask) do {				\
