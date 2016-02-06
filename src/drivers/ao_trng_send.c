@@ -20,6 +20,9 @@
 #include <ao_crc.h>
 #include <ao_trng_send.h>
 #include <ao_exti.h>
+#include <ao_power.h>
+
+static uint8_t	trng_running;
 
 static void
 ao_trng_send_raw(uint16_t *buf)
@@ -72,12 +75,15 @@ ao_trng_send(void)
 
 	ao_crc_reset();
 
-	/* Delay long enough for the HV power supply to stabilize so that the
-	 * first bits we read aren't of poor quality
-	 */
-	ao_delay(AO_MS_TO_TICKS(250));
-
 	for (;;) {
+		if (!trng_running) {
+			/* Delay long enough for the HV power supply
+			 * to stabilize so that the first bits we read
+			 * aren't of poor quality
+			 */
+			ao_delay(AO_MS_TO_TICKS(10));
+			trng_running = TRUE;
+		}
 		if (ao_send_raw()) {
 			ao_led_on(AO_LED_TRNG_RAW);
 			ao_trng_send_raw(buffer[usb_buf_id]);
@@ -95,9 +101,39 @@ ao_trng_send(void)
 
 static struct ao_task ao_trng_send_task;
 
+#if AO_POWER_MANAGEMENT
+
+static void ao_trng_suspend(void *arg)
+{
+	(void) arg;
+#ifdef AO_TRNG_ENABLE_PORT
+	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 0);
+#endif
+	trng_running = FALSE;
+}
+
+static void ao_trng_resume(void *arg)
+{
+	(void) arg;
+#ifdef AO_TRNG_ENABLE_PORT
+	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
+#endif
+}
+
+static struct ao_power ao_trng_power = {
+	.suspend = ao_trng_suspend,
+	.resume = ao_trng_resume
+};
+
+#endif
+
 void
 ao_trng_send_init(void)
 {
+#ifdef AO_TRNG_ENABLE_PORT
+	ao_enable_output(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
+	ao_power_register(&ao_trng_power);
+#endif
 	ao_enable_input(AO_RAW_PORT, AO_RAW_BIT, AO_EXTI_MODE_PULL_UP);
 	ao_add_task(&ao_trng_send_task, ao_trng_send, "trng_send");
 }
