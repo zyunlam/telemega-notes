@@ -124,6 +124,16 @@ ao_timer_init(void);
 void
 ao_clock_init(void);
 
+#if AO_POWER_MANAGEMENT
+/* Go to low power clock */
+void
+ao_clock_suspend(void);
+
+/* Restart full-speed clock */
+void
+ao_clock_resume(void);
+#endif
+
 /*
  * ao_mutex.c
  */
