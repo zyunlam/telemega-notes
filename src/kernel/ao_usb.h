@@ -107,6 +107,18 @@ extern __code __at (0x00aa) uint8_t ao_usb_descriptors [];
 #define AO_USB_IN_EP		5
 #endif
 
+#ifndef AO_USB_HAS_OUT
+#define AO_USB_HAS_OUT	1
+#endif
+
+#ifndef AO_USB_HAS_IN
+#define AO_USB_HAS_IN	1
+#endif
+
+#ifndef AO_USB_HAS_INT
+#define AO_USB_HAS_INT	1
+#endif
+
 /*
  * USB bulk packets can only come in 8, 16, 32 and 64
  * byte sizes, so we'll use 64 for everything

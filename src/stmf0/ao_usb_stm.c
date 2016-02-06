@@ -29,6 +29,10 @@
 #error "must define AO_PA11_PA12_RMP"
 #endif
 
+#ifndef AO_POWER_MANAGEMENT
+#define AO_POWER_MANAGEMENT	0
+#endif
+
 #ifndef USE_USB_STDIO
 #define USE_USB_STDIO	1
 #endif
@@ -397,6 +401,7 @@ ao_usb_set_configuration(void)
 {
 	debug ("ao_usb_set_configuration\n");
 
+#if AO_USB_HAS_INT
 	/* Set up the INT end point */
 	ao_usb_bdt[AO_USB_INT_EPR].single.addr_tx = ao_usb_int_tx_offset;
 	ao_usb_bdt[AO_USB_INT_EPR].single.count_tx = 0;
@@ -406,7 +411,9 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_EP_TYPE_INTERRUPT,
 		       STM_USB_EPR_STAT_RX_DISABLED,
 		       STM_USB_EPR_STAT_TX_NAK);
+#endif
 
+#if AO_USB_HAS_OUT
 	/* Set up the OUT end point */
 	ao_usb_bdt[AO_USB_OUT_EPR].single.addr_rx = ao_usb_out_rx_offset;
 	ao_usb_bdt[AO_USB_OUT_EPR].single.count_rx = ((1 << STM_USB_BDT_COUNT_RX_BL_SIZE) |
@@ -417,7 +424,9 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_EP_TYPE_BULK,
 		       STM_USB_EPR_STAT_RX_VALID,
 		       STM_USB_EPR_STAT_TX_DISABLED);
+#endif
 
+#if AO_USB_HAS_IN
 	/* Set up the IN end point */
 	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_in_tx_offset;
 	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = 0;
@@ -427,6 +436,7 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_EP_TYPE_BULK,
 		       STM_USB_EPR_STAT_RX_DISABLED,
 		       STM_USB_EPR_STAT_TX_NAK);
+#endif
 
 	ao_usb_running = 1;
 #if AO_USB_DIRECTIO
@@ -439,7 +449,6 @@ static uint16_t int_count;
 static uint16_t	in_count;
 static uint16_t	out_count;
 static uint16_t	reset_count;
-static uint16_t suspend_count;
 
 /* The USB memory must be accessed in 16-bit units
  */
@@ -718,6 +727,7 @@ ao_usb_ep0_handle(uint8_t receive)
 	}
 }
 
+#if AO_POWER_MANAGEMENT
 void
 ao_usb_suspend(void)
 {
@@ -734,6 +744,7 @@ ao_usb_wakeup(void)
 	stm_usb.cntr &= ~(1 << STM_USB_CNTR_FSUSP);
 	ao_power_resume();
 }
+#endif
 
 void
 stm_usb_isr(void)
@@ -801,8 +812,8 @@ stm_usb_isr(void)
 		debug ("\treset\n");
 		ao_usb_set_ep0();
 	}
+#if AO_POWER_MANAGEMENT
 	if (istr & (1 << STM_USB_ISTR_SUSP)) {
-		++suspend_count;
 		debug ("\tsuspend\n");
 		ao_usb_suspend();
 	}
@@ -810,6 +821,7 @@ stm_usb_isr(void)
 		debug ("\twakeup\n");
 		ao_usb_wakeup();
 	}
+#endif
 }
 
 /* Queue the current IN buffer for transmission */
@@ -1072,8 +1084,8 @@ ao_usb_enable(void)
 	stm_usb.cntr = ((1 << STM_USB_CNTR_CTRM) |
 			(0 << STM_USB_CNTR_PMAOVRM) |
 			(0 << STM_USB_CNTR_ERRM) |
-			(1 << STM_USB_CNTR_WKUPM) |
-			(1 << STM_USB_CNTR_SUSPM) |
+			(AO_POWER_MANAGEMENT << STM_USB_CNTR_WKUPM) |
+			(AO_POWER_MANAGEMENT << STM_USB_CNTR_SUSPM) |
 			(1 << STM_USB_CNTR_RESETM) |
 			(0 << STM_USB_CNTR_SOFM) |
 			(0 << STM_USB_CNTR_ESOFM) |
@@ -1112,8 +1124,8 @@ ao_usb_echo(void)
 static void
 ao_usb_irq(void)
 {
-	printf ("control: %d out: %d in: %d int: %d reset: %d suspend %d\n",
-		control_count, out_count, in_count, int_count, reset_count, suspend_count);
+	printf ("control: %d out: %d in: %d int: %d reset: %d\n",
+		control_count, out_count, in_count, int_count, reset_count);
 }
 
 __code struct ao_cmds ao_usb_cmds[] = {
