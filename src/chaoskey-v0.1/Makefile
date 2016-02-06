@@ -13,6 +13,7 @@ INC = \
 	ao_product.h \
 	ao_task.h \
 	ao_adc_fast.h \
+	ao_power.h \
 	stm32f0.h
 
 #
@@ -33,6 +34,8 @@ ALTOS_SRC = \
 	ao_usb_stm.c \
 	ao_trng_send.c \
 	ao_task.c \
+	ao_power.c \
+	ao_gpio.c \
 	ao_product.c
 
 PRODUCT=ChaosKey-v0.1
