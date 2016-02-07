@@ -22,7 +22,8 @@
 #include <ao_exti.h>
 #include <ao_power.h>
 
-static uint8_t	trng_running;
+static uint8_t		trng_running;
+static AO_TICK_TYPE	trng_power_time;
 
 static void
 ao_trng_send_raw(uint16_t *buf)
@@ -45,7 +46,7 @@ ao_trng_send_cooked(uint16_t *buf)
 	uint16_t	t;
 	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
 
-	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;	/* one 16-bit value per output byte */
+	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;	/* two 16-bit values per two output bytes */
 	for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
 		*buf++ = ao_crc_in_32_out_16(rnd[t]);
 		t = (t + 1) & ((AO_ADC_RING_SIZE>>1) - 1);
@@ -73,15 +74,26 @@ ao_trng_send(void)
 
 	usb_buf_id = 0;
 
+#ifdef AO_TRNG_ENABLE_PORT
+	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
+#endif
+	trng_power_time = ao_time();
+
 	ao_crc_reset();
 
 	for (;;) {
 		if (!trng_running) {
+			AO_TICK_TYPE	delay;
+
+			delay = trng_power_time + AO_MS_TO_TICKS(100) - ao_time();
+			if (delay > AO_MS_TO_TICKS(100))
+				delay = AO_MS_TO_TICKS(100);
+
 			/* Delay long enough for the HV power supply
 			 * to stabilize so that the first bits we read
 			 * aren't of poor quality
 			 */
-			ao_delay(AO_MS_TO_TICKS(10));
+			ao_delay(delay);
 			trng_running = TRUE;
 		}
 		if (ao_send_raw()) {
@@ -118,6 +130,7 @@ static void ao_trng_resume(void *arg)
 #ifdef AO_TRNG_ENABLE_PORT
 	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
 #endif
+	trng_power_time = ao_time();
 }
 
 static struct ao_power ao_trng_power = {
@@ -131,7 +144,7 @@ void
 ao_trng_send_init(void)
 {
 #ifdef AO_TRNG_ENABLE_PORT
-	ao_enable_output(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
+	ao_enable_output(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 0);
 	ao_power_register(&ao_trng_power);
 #endif
 	ao_enable_input(AO_RAW_PORT, AO_RAW_BIT, AO_EXTI_MODE_PULL_UP);
