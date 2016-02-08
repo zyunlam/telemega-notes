@@ -25,32 +25,68 @@
 static uint8_t		trng_running;
 static AO_TICK_TYPE	trng_power_time;
 
-static void
+/* Make sure there's at least 8 bits of variance in the samples */
+#define MIN_VARIANCE		(128 * 128)
+
+#define DECLARE_STATS	int32_t sum = 0, sum2 = 0
+
+#define ADD_STATS(value) do {			\
+		sum += (value);			\
+		sum2 += (value) * (value);	\
+	} while(0)
+
+#define GOOD_STATS(i)	(((sum2 - (sum * sum) / i) / i) >= MIN_VARIANCE)
+
+#define TRNG_ENABLE_DELAY	AO_MS_TO_TICKS(100)
+
+static int
 ao_trng_send_raw(uint16_t *buf)
 {
 	uint16_t	i;
 	uint16_t	t;
-	uint16_t	*rnd = (uint16_t *) ao_adc_ring;
+	uint16_t	v;
+
+	DECLARE_STATS;
 
 	t = ao_adc_get(AO_USB_IN_SIZE>>1);	/* one 16-bit value per two output bytes */
 	for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
-		*buf++ = rnd[t];
+		v = ao_adc_ring[t];
+		*buf++ = v;
 		t = (t + 1) & (AO_ADC_RING_SIZE - 1);
+
+		ADD_STATS(v);
 	}
+	return GOOD_STATS(AO_USB_IN_SIZE / sizeof (uint16_t));
 }
 
-static void
+static int
 ao_trng_send_cooked(uint16_t *buf)
 {
 	uint16_t	i;
 	uint16_t	t;
 	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
 
-	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;	/* two 16-bit values per two output bytes */
+	DECLARE_STATS;
+
+	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;		/* one 16-bit value per output byte */
+
 	for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
-		*buf++ = ao_crc_in_32_out_16(rnd[t]);
-		t = (t + 1) & ((AO_ADC_RING_SIZE>>1) - 1);
+		uint32_t	v;
+		uint16_t	v1, v2;
+
+		/* Fetch two values in one operation */
+		v = rnd[t];
+		t = (t + 1) & ((AO_ADC_RING_SIZE >> 1) - 1);
+
+		*buf++ = ao_crc_in_32_out_16(v);
+
+		v1 = v;
+		v2 = v >> 16;
+
+		ADD_STATS(v1);
+		ADD_STATS(v2);
 	}
+	return GOOD_STATS(2 * AO_USB_IN_SIZE / sizeof (uint16_t));
 }
 
 static inline int
@@ -64,6 +100,8 @@ ao_trng_send(void)
 {
 	static uint16_t	*buffer[2];
 	int	usb_buf_id;
+	int	good_bits;
+	int	failed = 0;
 
 	if (!buffer[0]) {
 		buffer[0] = ao_usb_alloc();
@@ -85,9 +123,9 @@ ao_trng_send(void)
 		if (!trng_running) {
 			AO_TICK_TYPE	delay;
 
-			delay = trng_power_time + AO_MS_TO_TICKS(100) - ao_time();
-			if (delay > AO_MS_TO_TICKS(100))
-				delay = AO_MS_TO_TICKS(100);
+			delay = trng_power_time + TRNG_ENABLE_DELAY - ao_time();
+			if (delay > TRNG_ENABLE_DELAY)
+				delay = TRNG_ENABLE_DELAY;
 
 			/* Delay long enough for the HV power supply
 			 * to stabilize so that the first bits we read
@@ -98,16 +136,26 @@ ao_trng_send(void)
 		}
 		if (ao_send_raw()) {
 			ao_led_on(AO_LED_TRNG_RAW);
-			ao_trng_send_raw(buffer[usb_buf_id]);
+			good_bits = ao_trng_send_raw(buffer[usb_buf_id]);
 			ao_led_off(AO_LED_TRNG_RAW);
 		} else {
 			ao_led_on(AO_LED_TRNG_COOKED);
-			ao_trng_send_cooked(buffer[usb_buf_id]);
+			good_bits = ao_trng_send_cooked(buffer[usb_buf_id]);
 			ao_led_off(AO_LED_TRNG_COOKED);
 		}
 		ao_adc_ack(AO_USB_IN_SIZE);
-		ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
-		usb_buf_id = 1-usb_buf_id;
+		if (good_bits) {
+			ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
+			usb_buf_id = 1-usb_buf_id;
+			failed = 0;
+		} else {
+			failed++;
+			ao_delay(AO_MS_TO_TICKS(10));
+			if (failed > 10) {
+				ao_usb_disable();
+				ao_panic(AO_PANIC_DMA);
+			}
+		}
 	}
 }
 
