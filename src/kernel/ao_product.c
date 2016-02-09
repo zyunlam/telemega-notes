@@ -138,7 +138,7 @@ AO_ROMCONFIG_SYMBOL(0x00aa) uint8_t ao_usb_descriptors [] =
 	/* Data class interface descriptor */
 	0x09,
 	AO_USB_DESC_INTERFACE,
-	0x01,				/* bInterfaceNumber */
+	AO_USB_HAS_INT,			/* bInterfaceNumber */
 	0x00,				/* bAlternateSetting */
 	AO_USB_HAS_OUT + AO_USB_HAS_IN,	/* bNumEndPoints */
 	AO_USB_INTERFACE_CLASS_DATA,	/* bInterfaceClass = data */
