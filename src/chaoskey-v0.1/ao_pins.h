@@ -52,6 +52,7 @@
 #define AO_USB_HAS_IN			1
 #define AO_USB_HAS_INT			0
 #define AO_USB_SELF_POWER		0
+#define AO_USB_DEVICE_ID_SERIAL		1
 
 #define IS_FLASH_LOADER	0
 
