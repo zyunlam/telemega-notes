@@ -38,7 +38,7 @@ ALTOS_SRC = \
 	ao_gpio.c \
 	ao_product.c
 
-PRODUCT=ChaosKey-v0.1
+PRODUCT=ChaosKey-hw-0.3-sw-$(VERSION)
 PRODUCT_DEF=-DCHAOSKEY_V_0_1
 IDVENDOR=0x1d50
 IDPRODUCT=0x60c6
