@@ -570,6 +570,36 @@ ao_usb_ep0_in_start(uint16_t max)
 
 static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 
+#if AO_USB_DEVICE_ID_SERIAL
+static uint8_t ao_usb_serial[2 + 48];
+
+/* Convert a 32-bit value to 8 hexidecimal UCS2 characters */
+static void
+hex_to_ucs2(uint32_t in, uint8_t *out)
+{
+	int	i;
+
+	for (i = 28; i >= 0; i -= 4) {
+		uint8_t	bits = (in >> i) & 0xf;
+		*out++ = (bits < 10) ? ('0' + bits) : ('a' + bits);
+		*out++ = 0;
+	}
+}
+
+/* Encode the device ID (96 bits) in hexidecimal to use as a device
+ * serial number
+ */
+static void
+ao_usb_serial_init(void)
+{
+	ao_usb_serial[0] = 50;	/* length */
+	ao_usb_serial[1] = AO_USB_DESC_STRING;
+	hex_to_ucs2(stm_device_id.u_id0, ao_usb_serial + 2 + 0);
+	hex_to_ucs2(stm_device_id.u_id1, ao_usb_serial + 2 + 16);
+	hex_to_ucs2(stm_device_id.u_id2, ao_usb_serial + 2 + 32);
+}
+#endif
+
 /* Walk through the list of descriptors and find a match
  */
 static void
@@ -587,6 +617,13 @@ ao_usb_get_descriptor(uint16_t value)
 				len = descriptor[2];
 			else
 				len = descriptor[0];
+#if AO_USB_DEVICE_ID_SERIAL
+			/* Slightly hacky - the serial number is string 3 */
+			if (type == AO_USB_DESC_STRING && (value & 0xff) == 3) {
+				descriptor = ao_usb_serial;
+				len = sizeof (ao_usb_serial);
+			}
+#endif
 			ao_usb_ep0_in_set(descriptor, len);
 			break;
 		}
@@ -1144,6 +1181,10 @@ ao_usb_init(void)
 	stm_syscfg.cfgr1 |= (AO_PA11_PA12_RMP << STM_SYSCFG_CFGR1_PA11_PA12_RMP);
 
 	ao_usb_enable();
+
+#if AO_USB_DEVICE_ID_SERIAL
+	ao_usb_serial_init();
+#endif
 
 	debug ("ao_usb_init\n");
 	ao_usb_ep0_state = AO_USB_EP0_IDLE;
