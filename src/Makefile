@@ -43,7 +43,8 @@ ARMM3DIRS=\
 
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader \
-	chaoskey-v0.1 chaoskey-v0.1/flash-loader
+	chaoskey-v0.1 chaoskey-v0.1/flash-loader \
+	chaoskey-v1.0 chaoskey-v1.0/flash-loader
 
 AVRDIRS=\
 	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1 microkite
