@@ -50,7 +50,9 @@
 #define AO_USB_INTERFACE_CLASS_DATA	0xff
 #define AO_USB_HAS_OUT			0
 #define AO_USB_HAS_IN			1
+#define AO_USB_HAS_IN2			1
 #define AO_USB_HAS_INT			0
+#define USE_USB_STDIO			0
 #define AO_USB_SELF_POWER		0
 #define AO_USB_DEVICE_ID_SERIAL		1
 

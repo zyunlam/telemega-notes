@@ -413,6 +413,9 @@ ao_usb_free(uint16_t *buffer);
 
 void
 ao_usb_write(uint16_t *buffer, uint16_t len);
+
+void
+ao_usb_write2(uint16_t *buffer, uint16_t len);
 #endif /* AO_USB_DIRECTIO */
 
 #endif /* _AO_ARCH_FUNCS_H_ */
