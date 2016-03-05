@@ -1007,7 +1007,7 @@ ao_usb_putchar(char c)
 }
 #endif
 
-#if AO_USB_HAS_IN
+#if AO_USB_HAS_IN2
 /* Queue the current IN buffer for transmission */
 static void
 _ao_usb_in2_send(void)
