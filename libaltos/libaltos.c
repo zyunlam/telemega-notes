@@ -83,6 +83,7 @@ altos_strndup (const char *s, size_t n)
 #include <fcntl.h>
 #include <termios.h>
 #include <errno.h>
+#include <unistd.h>
 
 #define USB_BUF_SIZE	64
 
