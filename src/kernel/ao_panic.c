@@ -38,10 +38,15 @@ ao_panic_delay(uint8_t n)
 {
 	uint8_t	i = 0, j = 0;
 
-	while (n--)
+	while (n--) {
+#ifdef AO_PANIC_DELAY_SCALE
+	uint8_t s = AO_PANIC_DELAY_SCALE;
+	while (s--)
+#endif
 		while (--j)
 			while (--i)
 				ao_arch_nop();
+	}
 }
 
 void
@@ -56,16 +61,16 @@ ao_panic(uint8_t reason)
 	ao_arch_block_interrupts();
 	for (;;) {
 		ao_panic_delay(20);
+#if HAS_BEEP
 		for (n = 0; n < 5; n++) {
-			ao_led_on(AO_LED_PANIC);
 			ao_beep(AO_BEEP_HIGH);
 			ao_panic_delay(1);
-			ao_led_off(AO_LED_PANIC);
 			ao_beep(AO_BEEP_LOW);
 			ao_panic_delay(1);
 		}
 		ao_beep(AO_BEEP_OFF);
 		ao_panic_delay(2);
+#endif
 
 #ifdef SDCC
 #pragma disable_warning 126
