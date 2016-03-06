@@ -1,5 +1,5 @@
 JAVAC=javac
-AM_CFLAGS=-DLINUX -DPOSIX_TTY -I$(JVM_INCLUDE)
+AM_CFLAGS=-DLINUX -DPOSIX_TTY -I$(JVM_INCLUDE) -I$(JVM_INCLUDE)/linux
 AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -source 6
 
 altoslibdir=$(libdir)/altos
@@ -64,7 +64,7 @@ classlibaltos.stamp: $(SWIG_FILE)
 
 MINGCC32=i686-w64-mingw32-gcc
 MINGCC64=x86_64-w64-mingw32-gcc
-MINGFLAGS=-Wall -DWINDOWS -DBUILD_DLL -I$(JVM_INCLUDE)
+MINGFLAGS=-Wall -DWINDOWS -DBUILD_DLL -I$(JVM_INCLUDE) -I$(JVM_INCLUDE)/linux
 MINGLIBS=-lsetupapi
 
 fat: all altos.dll altos64.dll
