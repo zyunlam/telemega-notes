@@ -1,10 +1,10 @@
 #!/bin/sh
 
-if [ -x /usr/bin/ao-flash-stm32f0x ]; then
-	FLASH_STM=/usr/bin/ao-flash-stm32f0x
+if [ -x /usr/bin/dfu-util ]; then
+    DFU_UTIL=/usr/bin/dfu-util
 else
-	echo "Can't find ao-flash-stm32f0x!  Aborting."
-	exit 1
+    echo "Can't find dfu-util! Aborting."
+    exit 1
 fi
 
 if [ -x /usr/bin/ao-usbload ]; then
@@ -22,10 +22,9 @@ echo "Copyright 2015 by Keith Packard.  Released under GPL v2"
 echo
 echo "Expectations:"
 echo "\tChaosKey v$VERSION powered from USB"
-echo "\t\twith ST-Link-V2 cabled to debug header"
 echo
 
-$FLASH_STM ../src/chaoskey-v$VERSION/flash-loader/chaoskey-v$VERSION-*.elf || exit 1
+$DFU_UTIL -a 0 -s 0x08000000:leave -D ../src/chaoskey-v$VERSION/flash-loader/chaoskey-v$VERSION*.bin || exit 1
 
 sleep 2
 
