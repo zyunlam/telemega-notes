@@ -140,20 +140,6 @@ static int find_header(struct cc_usb *cc)
 	}
 }
 
-static const char *state_names[] = {
-	"startup",
-	"idle",
-	"pad",
-	"boost",
-	"fast",
-	"coast",
-	"drogue",
-	"main",
-	"landed",
-	"invalid"
-};
-
-
 int
 main (int argc, char **argv)
 {
