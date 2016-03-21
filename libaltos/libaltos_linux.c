@@ -517,7 +517,7 @@ altos_bt_open(struct altos_bt_device *device)
 #else
 	file->out_fd = dup(file->fd);
 #endif
-	return file;
+	return &file->file;
 no_link:
 	close(file->fd);
 no_sock:
