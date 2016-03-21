@@ -112,9 +112,8 @@ public class AltosUILib extends AltosLib {
 
 			String OS = System.getProperty("os.name");
 
-			if (OS.startsWith("Linux")) {
+			if (OS.startsWith("L") || OS.startsWith("W"))
 				has_bluetooth = true;
-			}
 
 			initialized = true;
 		}
