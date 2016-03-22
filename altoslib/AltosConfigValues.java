@@ -45,8 +45,6 @@ public interface AltosConfigValues {
 
 	public abstract void set_radio_calibration(int new_radio_calibration);
 
-	public abstract int radio_calibration() throws AltosConfigDataException;
-
 	public abstract void set_radio_enable(int new_radio_enable);
 
 	public abstract int radio_enable();

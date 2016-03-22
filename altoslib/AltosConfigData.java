@@ -493,8 +493,6 @@ public class AltosConfigData implements Iterable<String> {
 			radio_enable = source.radio_enable();
 		if (callsign != null)
 			callsign = source.callsign();
-		if (radio_calibration >= 0)
-			radio_calibration = source.radio_calibration();
 		if (telemetry_rate >= 0)
 			telemetry_rate = source.telemetry_rate();
 
@@ -600,10 +598,6 @@ public class AltosConfigData implements Iterable<String> {
 			link.printf("c d %d\n", apogee_delay);
 		if (apogee_lockout >= 0)
 			link.printf("c L %d\n", apogee_lockout);
-
-		/* Don't mess with radio calibration when remote */
-		if (radio_calibration > 0 && !remote)
-			link.printf("c f %d\n", radio_calibration);
 
 		/* HAS_RADIO */
 		if (has_frequency()) {

@@ -63,7 +63,7 @@ public class AltosConfigUI
 	JComboBox<String>	apogee_delay_value;
 	JComboBox<String>	apogee_lockout_value;
 	AltosUIFreqList		radio_frequency_value;
-	JTextField		radio_calibration_value;
+	JLabel			radio_calibration_value;
 	JRadioButton		radio_enable_value;
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
@@ -189,13 +189,6 @@ public class AltosConfigUI
 	boolean is_telemetrum() {
 		String	product = product_value.getText();
 		return product != null && product.startsWith("TeleMetrum");
-	}
-
-	void set_radio_calibration_tool_tip() {
-		if (radio_calibration_value.isEnabled())
-			radio_calibration_value.setToolTipText("Tune radio output to match desired frequency");
-		else
-			radio_calibration_value.setToolTipText("Cannot tune radio while connected over packet mode");
 	}
 
 	void set_radio_enable_tool_tip() {
@@ -478,12 +471,8 @@ public class AltosConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		radio_calibration_value = new JTextField(String.format("%d", 1186611));
-		radio_calibration_value.getDocument().addDocumentListener(this);
-		if (remote)
-			radio_calibration_value.setEnabled(false);
+		radio_calibration_value = new JLabel(String.format("%d", 1186611));
 		pane.add(radio_calibration_value, c);
-		set_radio_calibration_tool_tip();
 		row++;
 
 		/* Radio Enable */
@@ -1085,10 +1074,6 @@ public class AltosConfigUI
 			radio_calibration_value.setText("Disabled");
 		else
 			radio_calibration_value.setText(String.format("%d", new_radio_calibration));
-	}
-
-	public int radio_calibration() throws AltosConfigDataException {
-		return parse_int("radio calibration", radio_calibration_value.getText(), false);
 	}
 
 	public void set_radio_enable(int new_radio_enable) {
