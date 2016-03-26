@@ -198,6 +198,7 @@ public class AltosLib {
 	};
 
 	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
+	public static final String launch_sites_env = "LAUNCH_SITES";
 //	public static final String launch_sites_url = "file:///home/keithp/misc/text/altusmetrum/AltOS/launch-sites.txt";
 
 	public static final int ao_telemetry_standard_len = 32;

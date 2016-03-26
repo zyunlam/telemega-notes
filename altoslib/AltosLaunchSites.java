@@ -47,7 +47,12 @@ public class AltosLaunchSites extends Thread {
 
 	public void run() {
 		try {
-			url = new URL(AltosLib.launch_sites_url);
+			String	path;
+
+			path = System.getenv(AltosLib.launch_sites_env);
+			if (path == null)
+				path = AltosLib.launch_sites_url;
+			url = new URL(path);
 			URLConnection uc = url.openConnection();
 
 			InputStreamReader in_stream = new InputStreamReader(uc.getInputStream(), AltosLib.unicode_set);
