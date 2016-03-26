@@ -189,7 +189,8 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	}
 
 	public void debug(String format, Object ... arguments) {
-		System.out.printf(format, arguments);
+		if (AltosSerial.debug)
+			System.out.printf(format, arguments);
 	}
 
 
