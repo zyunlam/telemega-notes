@@ -56,6 +56,10 @@ extern __data uint8_t ao_num_tasks;
 extern __xdata struct ao_task *__data ao_cur_task;
 extern __data uint8_t ao_task_minimize_latency;	/* Reduce IRQ latency */
 
+#ifndef HAS_ARCH_VALIDATE_CUR_STACK
+#define ao_validate_cur_stack()
+#endif
+
 /*
  ao_task.c
  */

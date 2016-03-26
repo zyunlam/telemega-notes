@@ -366,6 +366,22 @@ static inline void ao_arch_restore_stack(void) {
 #define HAS_SAMPLE_PROFILE 0
 #endif
 
+#if DEBUG
+#define HAS_ARCH_VALIDATE_CUR_STACK	1
+
+static inline void
+ao_validate_cur_stack(void)
+{
+	uint8_t		*psp;
+
+	asm("mrs %0,psp" : "=&r" (psp));
+	if (ao_cur_task &&
+	    psp <= ao_cur_task->stack &&
+	    psp >= ao_cur_task->stack - 256)
+		ao_panic(AO_PANIC_STACK);
+}
+#endif
+
 #if !HAS_SAMPLE_PROFILE
 #define HAS_ARCH_START_SCHEDULER	1
 
