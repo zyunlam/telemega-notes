@@ -50,12 +50,14 @@ void stm_systick_isr(void)
 #if AO_DATA_ALL
 		if (++ao_data_count == ao_data_interval) {
 			ao_data_count = 0;
+#if HAS_ADC
 #if HAS_FAKE_FLIGHT
 			if (ao_fake_flight_active)
 				ao_fake_flight_poll();
 			else
 #endif
 				ao_adc_poll();
+#endif
 #if (AO_DATA_ALL & ~(AO_DATA_ADC))
 			ao_wakeup((void *) &ao_data_count);
 #endif
@@ -92,6 +94,7 @@ ao_timer_init(void)
 
 #endif
 
+#if AO_HSI48
 static void
 ao_clock_enable_crs(void)
 {
@@ -128,6 +131,7 @@ ao_clock_enable_crs(void)
 		      (0 << STM_CRS_CR_SYNCWARNIE) |
 		      (0 << STM_CRS_CR_SYNCOKIE));
 }
+#endif
 
 static void
 ao_clock_hsi(void)
@@ -155,10 +159,11 @@ static void
 ao_clock_normal_start(void)
 {
 #if AO_HSE
-#define STM_RCC_CFGR_SWS_TARGET_CLOCK		STM_RCC_CFGR_SWS_HSE
-#define STM_RCC_CFGR_SW_TARGET_CLOCK		STM_RCC_CFGR_SW_HSE
+	uint32_t	cfgr;
+#define STM_RCC_CFGR_SWS_TARGET_CLOCK		STM_RCC_CFGR_SWS_PLL
+#define STM_RCC_CFGR_SW_TARGET_CLOCK		STM_RCC_CFGR_SW_PLL
 #define STM_PLLSRC				AO_HSE
-#define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	1
+#define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	STM_RCC_CFGR_PLLSRC_HSE
 
 #if AO_HSE_BYPASS
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEBYP);
@@ -171,7 +176,29 @@ ao_clock_normal_start(void)
 		asm("nop");
 
 #ifdef STM_PLLSRC
-#error No code for PLL initialization yet
+	/* Disable the PLL */
+	stm_rcc.cr &= ~(1 << STM_RCC_CR_PLLON);
+	while (stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY))
+		asm("nop");
+
+	/* PLLVCO to 48MHz (for USB) -> PLLMUL = 3 */
+	cfgr = stm_rcc.cfgr;
+	cfgr &= ~(STM_RCC_CFGR_PLLMUL_MASK << STM_RCC_CFGR_PLLMUL);
+	cfgr |= (AO_RCC_CFGR_PLLMUL << STM_RCC_CFGR_PLLMUL);
+
+	/* PLL source */
+	cfgr &= ~(1 << STM_RCC_CFGR_PLLSRC);
+	cfgr |= (STM_RCC_CFGR_PLLSRC_TARGET_CLOCK  << STM_RCC_CFGR_PLLSRC);
+	stm_rcc.cfgr = cfgr;
+
+	/* Disable pre divider */
+	stm_rcc.cfgr2 = (STM_RCC_CFGR2_PREDIV_1 << STM_RCC_CFGR2_PREDIV);
+
+	/* Enable the PLL and wait for it */
+	stm_rcc.cr |= (1 << STM_RCC_CR_PLLON);
+	while (!(stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY)))
+		asm("nop");
+
 #endif
 
 #endif
@@ -222,6 +249,10 @@ ao_clock_normal_switch(void)
 #if !AO_HSI && !AO_NEED_HSI
 	/* Turn off the HSI clock */
 	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
+#endif
+#ifdef STM_PLLSRC
+	/* USB PLL source */
+	stm_rcc.cfgr3 |= (1 << STM_RCC_CFGR3_USBSW);
 #endif
 }
 
