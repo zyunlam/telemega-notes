@@ -72,7 +72,9 @@ _ao_adc_start(void)
 			    (1 << STM_DMA_CCR_MINC) |
 			    (0 << STM_DMA_CCR_PINC) |
 			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR) |
+			    (1 << STM_DMA_CCR_TCIE));
+
 	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1), ao_adc_dma_done);
 	ao_dma_start(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
 

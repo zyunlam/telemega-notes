@@ -795,7 +795,7 @@ isr(tim7)
 #define STM_ISR_TSC_POS			8
 #define STM_ISR_DMA_CH1_POS		9
 #define STM_ISR_DMA_CH2_3_DMA2_CH1_2_POS	10
-#define STM_ISR_DMA_CH44_5_6_7_DMA2_CH3_4_5_POS	11
+#define STM_ISR_DMA_CH4_5_6_7_DMA2_CH3_4_5_POS	11
 #define STM_ISR_ADC_COMP_POS		12
 #define STM_ISR_TIM1_BRK_UP_TRG_COM_POS	13
 #define STM_ISR_TIM1_CC_POS		14
@@ -890,7 +890,7 @@ struct stm_dma_channel {
 	vuint32_t	reserved;
 };
 
-#define STM_NUM_DMA	6
+#define STM_NUM_DMA	5
 
 struct stm_dma {
 	vuint32_t		isr;
@@ -900,7 +900,7 @@ struct stm_dma {
 
 extern struct stm_dma stm_dma;
 
-/* DMA channels go from 1 to 6, instead of 0 to 5 (sigh)
+/* DMA channels go from 1 to 5, instead of 0 to 4 (sigh)
  */
 
 #define STM_DMA_INDEX(channel)		((channel) - 1)
@@ -1042,7 +1042,7 @@ extern struct stm_spi stm_spi1, stm_spi2, stm_spi3;
 #define STM_SPI_CR1_BIDIOE		14
 #define STM_SPI_CR1_CRCEN		13
 #define STM_SPI_CR1_CRCNEXT		12
-#define STM_SPI_CR1_DFF			11
+#define STM_SPI_CR1_CRCL		11
 #define STM_SPI_CR1_RXONLY		10
 #define STM_SPI_CR1_SSM			9
 #define STM_SPI_CR1_SSI			8
@@ -1063,17 +1063,43 @@ extern struct stm_spi stm_spi1, stm_spi2, stm_spi3;
 #define STM_SPI_CR1_CPOL		1
 #define STM_SPI_CR1_CPHA		0
 
+#define STM_SPI_CR2_LDMA_TX	14
+#define STM_SPI_CR2_LDMA_RX	13
+#define STM_SPI_CR2_FRXTH	12
+#define STM_SPI_CR2_DS		8
+#define  STM_SPI_CR2_DS_4		0x3
+#define  STM_SPI_CR2_DS_5		0x4
+#define  STM_SPI_CR2_DS_6		0x5
+#define  STM_SPI_CR2_DS_7		0x6
+#define  STM_SPI_CR2_DS_8		0x7
+#define  STM_SPI_CR2_DS_9		0x8
+#define  STM_SPI_CR2_DS_10		0x9
+#define  STM_SPI_CR2_DS_11		0xa
+#define  STM_SPI_CR2_DS_12		0xb
+#define  STM_SPI_CR2_DS_13		0xc
+#define  STM_SPI_CR2_DS_14		0xd
+#define  STM_SPI_CR2_DS_15		0xe
+#define  STM_SPI_CR2_DS_16		0xf
 #define STM_SPI_CR2_TXEIE	7
 #define STM_SPI_CR2_RXNEIE	6
 #define STM_SPI_CR2_ERRIE	5
+#define STM_SPI_CR2_FRF		4
+# define STM_SPI_CR2_FRF_MOTOROLA	0
+# define STM_SPI_CR2_FRF_TI		1
+#define STM_SPI_CR2_NSSP	3
 #define STM_SPI_CR2_SSOE	2
 #define STM_SPI_CR2_TXDMAEN	1
 #define STM_SPI_CR2_RXDMAEN	0
 
+#define STM_SPI_SR_FTLVL	11
+#define STM_SPI_SR_FRLVL	9
+#define STM_SPI_SR_FRE		8
 #define STM_SPI_SR_BSY		7
 #define STM_SPI_SR_OVR		6
 #define STM_SPI_SR_MODF		5
 #define STM_SPI_SR_CRCERR	4
+#define STM_SPI_SR_UDR		3
+#define STM_SPI_SR_CHSIDE	2
 #define STM_SPI_SR_TXE		1
 #define STM_SPI_SR_RXNE		0
 

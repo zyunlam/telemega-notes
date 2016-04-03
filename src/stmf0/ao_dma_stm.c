@@ -28,9 +28,7 @@ static uint8_t ao_dma_allocated[STM_NUM_DMA];
 static uint8_t ao_dma_mutex[STM_NUM_DMA];
 static uint8_t ao_dma_active;
 
-#define id(ch)		STM_DMA_INDEX(ch)
-#define id_mask(id)	(STM_DMA_ISR_MASK << (id))
-#define ch_mask(ch)	id_mask(id(ch))
+#define ch_mask(id)	(STM_DMA_ISR_MASK << STM_DMA_ISR(id))
 
 static void
 ao_dma_isr(uint8_t low_index, uint8_t high_index, uint32_t mask) {
@@ -41,7 +39,7 @@ ao_dma_isr(uint8_t low_index, uint8_t high_index, uint32_t mask) {
 	/* Ack them */
 	stm_dma.ifcr = isr;
 	for (index = low_index; index <= high_index; index++) {
-		if (isr & id_mask(index)) {
+		if (isr & ch_mask(index)) {
 			if (ao_dma_config[index].isr)
 				(*ao_dma_config[index].isr)(index);
 			else {
@@ -52,9 +50,25 @@ ao_dma_isr(uint8_t low_index, uint8_t high_index, uint32_t mask) {
 	}
 }
 
-void stm_dma_ch1_isr(void) { ao_dma_isr(id(1), id(1), ch_mask(1)); }
-void stm_dma_ch2_3_isr(void) { ao_dma_isr(id(2), id(3), ch_mask(2) | ch_mask(3)); }
-void stm_dma1_ch4_5_6_isr(void) { ao_dma_isr(id(4), id(6), ch_mask(4) | ch_mask(5) | ch_mask(6)); }
+void stm_dma_ch1_isr(void) {
+	ao_dma_isr(STM_DMA_INDEX(1),
+		   STM_DMA_INDEX(1),
+		   ch_mask(STM_DMA_INDEX(1)));
+}
+
+void stm_dma_ch2_3_isr(void) {
+	ao_dma_isr(STM_DMA_INDEX(2),
+		   STM_DMA_INDEX(3),
+		   ch_mask(STM_DMA_INDEX(2)) |
+		   ch_mask(STM_DMA_INDEX(3)));
+}
+
+void stm_dma1_ch4_5_6_isr(void) {
+	ao_dma_isr(STM_DMA_INDEX(4), STM_DMA_INDEX(6),
+		   ch_mask(STM_DMA_INDEX(4)) |
+		   ch_mask(STM_DMA_INDEX(5)) |
+		   ch_mask(STM_DMA_INDEX(6)));
+}
 
 void
 ao_dma_set_transfer(uint8_t 		index,
@@ -73,11 +87,12 @@ ao_dma_set_transfer(uint8_t 		index,
 		if (ao_dma_active++ == 0)
 			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_DMAEN);
 		);
-	stm_dma.channel[index].ccr = ccr | (1 << STM_DMA_CCR_TCIE);
+	ao_dma_config[index].isr = NULL;
+	ao_dma_done[index] = 0;
 	stm_dma.channel[index].cndtr = count;
 	stm_dma.channel[index].cpar = peripheral;
 	stm_dma.channel[index].cmar = memory;
-	ao_dma_config[index].isr = NULL;
+	stm_dma.channel[index].ccr = ccr;
 }
 
 void
@@ -89,7 +104,6 @@ ao_dma_set_isr(uint8_t index, void (*isr)(int))
 void
 ao_dma_start(uint8_t index)
 {
-	ao_dma_done[index] = 0;
 	stm_dma.channel[index].ccr |= (1 << STM_DMA_CCR_EN);
 }
 
