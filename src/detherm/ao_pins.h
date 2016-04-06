@@ -72,11 +72,13 @@
 /* MS5607 */
 #define HAS_MS5607		1
 
-#define AO_MS5607_CS_PORT	(&stm_gpiob)
-#define AO_MS5607_CS_PIN	6
+#define AO_MS5607_CS_PORT	(&stm_gpioa)
+#define AO_MS5607_CS_PIN	0
 #define AO_MS5607_SPI_INDEX	AO_SPI_1_PB3_PB4_PB5
 #define AO_MS5607_MISO_PORT	(&stm_gpiob)
 #define AO_MS5607_MISO_PIN	4
+#define AO_MS5607_PRIVATE_PINS	1
+#define AO_MS5607_SPI_SPEED	AO_SPI_SPEED_6MHz
 
 /* Flash */
 

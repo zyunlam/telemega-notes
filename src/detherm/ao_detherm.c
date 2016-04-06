@@ -35,8 +35,8 @@ void main(void)
 	ao_usb_init();
 
 	ao_storage_init();
+	ao_ms5607_init();
 //	ao_flight_init();
-//	ao_ms5607_init();
 	ao_pwm_init();
 	ao_log_init();
 	ao_report_init();
