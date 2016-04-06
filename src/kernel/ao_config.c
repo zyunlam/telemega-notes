@@ -227,6 +227,8 @@ _ao_config_get(void)
 #if HAS_FIXED_PAD_BOX
 		if (minor < 22)
 			ao_config.pad_box = 1;
+		if (minor < 23)
+			ao_config.pad_idle = 120;
 #endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
@@ -920,6 +922,23 @@ ao_config_pad_box_set(void)
 	ao_config.pad_box = ao_cmd_lex_i;
 	_ao_config_edit_finish();
 }
+
+void
+ao_config_pad_idle_show(void)
+{
+	printf ("Idle timeout: %d\n", ao_config.pad_idle);
+}
+
+void
+ao_config_pad_idle_set(void)
+{
+	ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.pad_idle = ao_cmd_lex_i;
+	_ao_config_edit_finish();
+}
 #endif
 
 struct ao_config_var {
@@ -1019,6 +1038,8 @@ __code struct ao_config_var ao_config_vars[] = {
 #if HAS_FIXED_PAD_BOX
 	{ "B <box>\0Set pad box (1-99)",
 	  ao_config_pad_box_set, ao_config_pad_box_show },
+	{ "i <seconds>\0Set idle timeout (0 disable)",
+	  ao_config_pad_idle_set, ao_config_pad_idle_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

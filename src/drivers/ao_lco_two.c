@@ -29,12 +29,13 @@ static uint8_t	ao_lco_debug;
 #define DEBUG_STATUS	2
 #define PRINTD(l, ...) do { if (!(ao_lco_debug & l)) break; printf ("\r%5u %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } while(0)
 #else
-#define PRINTD(l,...) 
+#define PRINTD(l,...)
 #endif
 
 #define AO_LCO_VALID_LAST	1
 #define AO_LCO_VALID_EVER	2
 
+static uint8_t	ao_lco_suspended;
 static uint8_t	ao_lco_selected;
 static uint8_t	ao_lco_valid;
 static uint8_t	ao_lco_channels;
@@ -43,7 +44,6 @@ static uint16_t	ao_lco_tick_offset;
 /* UI values */
 static uint8_t	ao_lco_armed;
 static uint8_t	ao_lco_firing;
-static uint8_t	ao_lco_fire_down;
 
 #define ao_lco_box	(ao_config.pad_box)
 
@@ -71,12 +71,44 @@ ao_lco_set_armed(int pad, int armed)
 }
 
 static void
+ao_lco_suspend(void)
+{
+	if (!ao_lco_suspended) {
+		PRINTD(DEBUG_EVENT, "suspend\n");
+		ao_lco_suspended = 1;
+		ao_lco_selected = 0;
+		ao_lco_armed = 0;
+		ao_wakeup(&ao_pad_query);
+	}
+}
+
+static void
+ao_lco_wakeup(void)
+{
+	if (ao_lco_suspended) {
+		ao_lco_suspended = 0;
+		ao_wakeup(&ao_lco_suspended);
+	}
+}
+
+static void
 ao_lco_input(void)
 {
 	static struct ao_event	event;
+	uint8_t	timeout;
 
+	ao_config_get();
 	for (;;) {
-		ao_event_get(&event);
+		if (ao_config.pad_idle && !ao_lco_suspended) {
+			timeout = ao_event_get_for(&event, AO_SEC_TO_TICKS(ao_config.pad_idle));
+			if (timeout) {
+				ao_lco_suspend();
+				continue;
+			}
+		} else {
+			ao_event_get(&event);
+		}
+		ao_lco_wakeup();
 		PRINTD(DEBUG_EVENT, "event type %d unit %d value %d\n",
 		       event.type, event.unit, event.value);
 		switch (event.type) {
@@ -92,7 +124,6 @@ ao_lco_input(void)
 #endif
 			case AO_BUTTON_FIRE:
 				if (ao_lco_armed) {
-					ao_lco_fire_down = 0;
 					ao_lco_firing = event.value;
 					PRINTD(DEBUG_EVENT, "Firing %d\n", ao_lco_firing);
 					ao_wakeup(&ao_lco_armed);
@@ -155,6 +186,12 @@ ao_lco_igniter_status(void)
 
 	for (;;) {
 		ao_sleep(&ao_pad_query);
+		while (ao_lco_suspended) {
+			ao_led_off(AO_LED_GREEN|AO_LED_AMBER|AO_LED_RED|AO_LED_REMOTE_ARM);
+			for (c = 0; c < AO_LED_CONTINUITY_NUM; c++)
+				ao_led_off(continuity_led[c]);
+			ao_sleep(&ao_lco_suspended);
+		}
 		PRINTD(DEBUG_STATUS, "RSSI %d VALID %d\n", ao_radio_cmac_rssi, ao_lco_valid);
 		if (!(ao_lco_valid & AO_LCO_VALID_LAST)) {
 			ao_led_on(AO_LED_RED);
@@ -195,6 +232,8 @@ ao_lco_arm_warn(void)
 {
 	int	i;
 	for (;;) {
+		while (ao_lco_suspended)
+			ao_sleep(&ao_lco_suspended);
 		while (!ao_lco_armed)
 			ao_sleep(&ao_lco_armed);
 		for (i = 0; i < ao_lco_armed; i++) {
@@ -220,6 +259,9 @@ ao_lco_monitor(void)
 	ao_add_task(&ao_lco_igniter_status_task, ao_lco_igniter_status, "lco igniter status");
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
 	for (;;) {
+		while (ao_lco_suspended)
+			ao_sleep(&ao_lco_suspended);
+
 		PRINTD(DEBUG_STATUS, "monitor armed %d firing %d\n",
 		       ao_lco_armed, ao_lco_firing);
 
@@ -240,8 +282,9 @@ ao_lco_monitor(void)
 		}
 		if (ao_lco_armed && ao_lco_firing)
 			delay = AO_MS_TO_TICKS(100);
-		else
+		else {
 			delay = AO_SEC_TO_TICKS(1);
+		}
 		ao_sleep_for(&ao_lco_armed, delay);
 	}
 }

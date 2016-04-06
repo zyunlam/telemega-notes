@@ -41,6 +41,22 @@ ao_event_get(struct ao_event *ev)
 		);
 }
 
+uint8_t
+ao_event_get_for(struct ao_event *ev, uint16_t timeout)
+{
+	uint8_t	empty = 1;
+	ao_arch_critical(
+		while ((empty = ao_event_queue_empty()))
+			if (ao_sleep_for(&ao_event_queue, timeout))
+				break;
+		if (!empty) {
+			*ev = ao_event_queue[ao_event_queue_remove];
+			ao_event_queue_remove = ao_event_queue_next(ao_event_queue_remove);
+		}
+		);
+	return empty;
+}
+
 /* called with interrupts disabled */
 void
 ao_event_put_isr(uint8_t type, uint8_t unit, int32_t value)
