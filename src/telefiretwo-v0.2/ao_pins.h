@@ -144,12 +144,12 @@
 
 #define LEDS_AVAILABLE		(LED_PORT_0_MASK|LED_PORT_1_MASK)
 
-/* Alarm 2 */
+/* Alarm A */
 #define AO_SIREN
 #define AO_SIREN_PORT		(&stm_gpiob)
 #define AO_SIREN_PIN		8
 
-/* Alarm 1 */
+/* Alarm B */
 #define AO_STROBE
 #define AO_STROBE_PORT		(&stm_gpiob)
 #define AO_STROBE_PIN		9
