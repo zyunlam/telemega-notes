@@ -110,7 +110,7 @@ ao_exti_set_mode(struct stm_gpio *gpio, uint8_t pin, uint8_t mode) {
 	(void) gpio;
 
 	uint32_t	mask = 1 << pin;
-	
+
 	if (mode & AO_EXTI_MODE_RISING)
 		stm_exti.rtsr |= mask;
 	else

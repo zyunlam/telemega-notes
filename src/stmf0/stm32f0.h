@@ -837,8 +837,11 @@ isr(tim7)
 
 struct stm_syscfg {
 	vuint32_t	cfgr1;
+	uint32_t	reserved_04;
 	vuint32_t	exticr[4];
 	vuint32_t	cfgr2;
+	uint8_t		reserved_1c[0x80-0x1c];
+	vuint32_t	itline[31];
 };
 
 extern struct stm_syscfg stm_syscfg;
