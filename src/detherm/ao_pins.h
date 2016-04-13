@@ -98,10 +98,18 @@
 #define AO_PWM_TIMER_ENABLE	STM_RCC_APB1ENR_TIM3EN
 #define AO_PWM_TIMER_SCALE	32
 
-/* Motor */
+/* Servo */
 
-#define AO_MOTOR_DIR_GPIO	(&stm_gpiob)
-#define AO_MOTOR_DIR_PIN	0
-#define AO_MOTOR_SPEED_PWM	0
+#define AO_SERVO_DIR_PORT	(&stm_gpiob)
+#define AO_SERVO_DIR_BIT	0
+#define AO_SERVO_SPEED_PWM	0
+
+/* limit 2 */
+#define AO_SERVO_LIMIT_FORE_PORT	(&stm_gpiob)
+#define AO_SERVO_LIMIT_FORE_BIT		6
+
+/* limit 1 */
+#define AO_SERVO_LIMIT_BACK_PORT	(&stm_gpiob)
+#define AO_SERVO_LIMIT_BACK_BIT		7
 
 #endif /* _AO_PINS_H_ */

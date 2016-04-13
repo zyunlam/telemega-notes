@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Keith Packard <keithp@keithp.com>
+ * Copyright © 2016 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,36 +15,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include <ao.h>
-#include <ao_exti.h>
-#include <ao_pwm.h>
-#include <ao_servo.h>
+#ifndef _AO_SERVO_H_
+#define _AO_SERVO_H_
 
-void main(void)
-{
-	ao_led_init(LEDS_AVAILABLE);
+void
+ao_servo_run(uint16_t speed, uint8_t dir, uint16_t timeout);
 
-	ao_led_on(AO_LED_RED);
+void
+ao_servo_init(void);
 
-	ao_clock_init();
-	ao_task_init();
-	ao_timer_init();
-	ao_exti_init();
+#define AO_SERVO_FORE	0
+#define AO_SERVO_BACK	1
 
-	ao_dma_init();
-	ao_spi_init();
-	ao_usb_init();
+/* To configure the servo:
+ *
+ *	#define AO_SERVO_PWM			<pwm index>
+ *	#define AO_SERVO_DIR_PORT		<gpio>
+ *	#define AO_SERVO_DIR_PIN		<pin>
+ *	#define AO_SERVO_LIMIT_FORE_PORT	<gpio>
+ *	#define AO_SERVO_LIMIT_FORE_PIN		<pin>
+ *	#define AO_SERVO_LIMIT_BACK_PORT	<gpio>
+ *	#define AO_SERVO_LIMIT_BACK_PIN		<pin>
+ */
 
-	ao_storage_init();
-	ao_ms5607_init();
-//	ao_flight_init();
-	ao_pwm_init();
-	ao_servo_init();
-	ao_log_init();
-	ao_report_init();
-	ao_config_init();
-
-	ao_cmd_init();
-
-	ao_start_scheduler();
-}
+#endif /* _AO_SERVO_H_ */

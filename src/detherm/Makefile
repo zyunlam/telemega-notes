@@ -42,6 +42,7 @@ ALTOS_SRC = \
 	ao_ms5607.c \
 	ao_convert_pa.c \
 	ao_pwm.c \
+	ao_servo.c \
 	ao_task.c \
 	ao_config.c \
 	ao_cmd.c \
