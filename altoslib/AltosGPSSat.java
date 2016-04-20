@@ -16,8 +16,11 @@
  */
 
 package org.altusmetrum.altoslib_9;
+import java.text.*;
+import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosGPSSat {
+public class AltosGPSSat implements Serializable {
 	public int	svid;
 	public int	c_n0;
 
