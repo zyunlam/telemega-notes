@@ -281,7 +281,7 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 					mPadMarker.setVisible(true);
 				}
 			}
-			if (state.gps != null) {
+			if (state.gps != null && state.gps.lat != AltosLib.MISSING) {
 
 				target_position = new AltosLatLon(state.gps.lat, state.gps.lon);
 				if (state.gps.locked && state.gps.nsat >= 4)
