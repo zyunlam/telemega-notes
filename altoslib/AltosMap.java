@@ -308,7 +308,11 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			upper_left = floor(transform.screen_point(new AltosPointInt(0, 0)));
 			lower_right = floor(transform.screen_point(new AltosPointInt(width(), height())));
 		}
-		for (AltosPointInt point : tiles.keySet()) {
+
+		Enumeration<AltosPointInt> keyEnumeration = tiles.keys();
+
+		while (keyEnumeration.hasMoreElements()) {
+			AltosPointInt point = keyEnumeration.nextElement();
 			if (point.x < upper_left.x || lower_right.x < point.x ||
 			    point.y < upper_left.y || lower_right.y < point.y) {
 				tiles.remove(point);
@@ -377,7 +381,10 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 	/* AltosMapTileListener methods */
 	public synchronized void notify_tile(AltosMapTile tile, int status) {
-		for (AltosPointInt point : tiles.keySet()) {
+		Enumeration<AltosPointInt> keyEnumeration = tiles.keys();
+
+		while (keyEnumeration.hasMoreElements()) {
+			AltosPointInt point = keyEnumeration.nextElement();
 			if (tile == tiles.get(point)) {
 				AltosPointInt	screen = transform.screen(point);
 				repaint(screen.x, screen.y, AltosMap.px_size, AltosMap.px_size);
