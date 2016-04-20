@@ -442,10 +442,12 @@ ao_wakeup(__xdata void *wchan) __reentrant
 	}
 	ao_arch_irqrestore(flags);
 #else
+	{
 	uint8_t	i;
 	for (i = 0; i < ao_num_tasks; i++)
 		if (ao_tasks[i]->wchan == wchan)
 			ao_tasks[i]->wchan = NULL;
+	}
 #endif
 	ao_check_stack();
 }
