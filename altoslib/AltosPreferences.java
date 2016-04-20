@@ -351,6 +351,11 @@ public class AltosPreferences {
 
 	public static void set_state(int serial, AltosState state, AltosListenerState listener_state) {
 
+		backend.debug("set_state for %d pos %g,%g\n",
+			      serial,
+			      state.gps != null ? state.gps.lat : 0.0,
+			      state.gps != null ? state.gps.lon : 0.0);
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		try {
@@ -367,6 +372,7 @@ public class AltosPreferences {
 				flush_preferences();
 			}
 		} catch (IOException ie) {
+			backend.debug("set_state failed %s\n", ie.toString());
 		}
 	}
 
@@ -376,6 +382,7 @@ public class AltosPreferences {
 
 		for (String key : keys) {
 			if (key.startsWith(statePreferenceHead)) {
+				backend.debug("list_states %s\n", key);
 				try {
 					int serial = AltosParse.parse_int(key.substring(statePreferenceHead.length()));
 					states.add(serial);
@@ -403,21 +410,31 @@ public class AltosPreferences {
 	public static AltosSavedState state(int serial) {
 		byte[] bytes = null;
 
+		backend.debug("get state %d\n", serial);
+
 		synchronized(backend) {
 			bytes = backend.getBytes(String.format(statePreferenceFormat, serial), null);
 		}
 
-		if (bytes == null)
+		if (bytes == null) {
+			backend.debug("no state for %d\n", serial);
 			return null;
+		}
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
 		try {
 			ObjectInputStream ois = new ObjectInputStream(bais);
 			AltosSavedState saved_state = (AltosSavedState) ois.readObject();
+			backend.debug("got saved state for %d: %g,%g\n",
+				      serial,
+				      saved_state.state.gps != null ? saved_state.state.gps.lat : 0.0,
+				      saved_state.state.gps != null ? saved_state.state.gps.lon : 0.0);
 			return saved_state;
 		} catch (IOException ie) {
+			backend.debug("IO exception %s\n", ie.toString());
 		} catch (ClassNotFoundException ce) {
+			backend.debug("ClassNotFoundException %s\n", ce.toString());
 		}
 		return null;
 	}

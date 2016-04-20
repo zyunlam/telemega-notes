@@ -106,4 +106,8 @@ public class AltosUIPreferencesBackend implements AltosPreferencesBackend {
 		/* Use the file system view default directory */
 		return FileSystemView.getFileSystemView().getDefaultDirectory();
 	}
+
+	public void debug(String format, Object ... arguments) {
+		System.out.printf(format, arguments);
+	}
 }

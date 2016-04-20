@@ -120,4 +120,8 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 	public File homeDirectory() {
 		return Environment.getExternalStorageDirectory();
 	}
+
+	public void debug(String format, Object ... arguments) {
+		AltosDebug.debug(format, arguments);
+	}
 }

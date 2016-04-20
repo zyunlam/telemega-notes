@@ -45,4 +45,6 @@ public interface AltosPreferencesBackend {
 	public void    flush();
 
 	public File homeDirectory();
+
+	public void debug(String format, Object ... arguments);
 }
