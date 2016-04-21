@@ -69,7 +69,7 @@ public class AltosEepromChunk {
 			eeprom = new AltosEepromTM(this, offset);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TINY:
-			eeprom = new AltosEepromTm(this, offset, state);
+			eeprom = new AltosEepromTMini(this, offset, state);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
 		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:

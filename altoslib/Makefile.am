@@ -39,7 +39,7 @@ altoslib_JAVA = \
 	AltosEepromDownload.java \
 	AltosEepromFile.java \
 	AltosEepromTM.java \
-	AltosEepromTm.java \
+	AltosEepromTMini.java \
 	AltosEepromHeader.java \
 	AltosEepromIterable.java \
 	AltosEepromList.java \

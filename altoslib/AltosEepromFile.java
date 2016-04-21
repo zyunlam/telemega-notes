@@ -89,7 +89,7 @@ public class AltosEepromFile extends AltosStateIterable {
 			body = new AltosEepromIterable(AltosEepromTM.read(input));
 			break;
 		case AltosLib.AO_LOG_FORMAT_TINY:
-			body = new AltosEepromIterable(AltosEepromTm.read(input));
+			body = new AltosEepromIterable(AltosEepromTMini.read(input));
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
 		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:
