@@ -33,8 +33,8 @@ OS_SRCS=libaltos_posix.c libaltos_darwin.c
 #	-iwithsysroot /System/Library/Frameworks/IOKit.framework/Headers \
 #	-iwithsysroot /System/Library/Frameworks/CoreFoundation.framework/Headers
 
-XCODE=/Applications/Xcode.app
-SDK=$(XCODE)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+XCODE=/Applications/Xcode-beta.app
+SDK=$(XCODE)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk
 MINVERSION=10.5
 
 OS_LIB_CFLAGS=\
@@ -43,7 +43,7 @@ OS_LIB_CFLAGS=\
 	-iwithsysroot /System/Library/Frameworks/JavaVM.framework/Headers \
 	-iwithsysroot /System/Library/Frameworks/IOKit.framework/Headers \
 	-iwithsysroot /System/Library/Frameworks/CoreFoundation.framework/Headers
-OS_APP_CFLAGS=$(OS_LIB_CFLAGS)
+OS_APP_CFLAGS=$(OS_LIB_CFLAGS) -O0 -g
 
 OS_LDFLAGS =\
 	-framework IOKit -framework CoreFoundation
