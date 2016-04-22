@@ -57,6 +57,7 @@ public class TelemetryService extends Service {
 	static final int MSG_SETBAUD	       = 11;
 	static final int MSG_DISCONNECT	       = 12;
 	static final int MSG_DELETE_SERIAL     = 13;
+	static final int MSG_BLUETOOTH_ENABLED = 14;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
@@ -86,6 +87,8 @@ public class TelemetryService extends Service {
 
 		@Override
 		public void handleMessage(Message msg) {
+			DeviceAddress address;
+
 			TelemetryService s = service.get();
 			AltosDroidLink bt = null;
 			if (s == null)
@@ -101,7 +104,7 @@ public class TelemetryService extends Service {
 				break;
 			case MSG_CONNECT:
 				AltosDebug.debug("Connect command received");
-				DeviceAddress address = (DeviceAddress) msg.obj;
+				address = (DeviceAddress) msg.obj;
 				AltosDroidPreferences.set_active_device(address);
 				s.start_altos_bluetooth(address, false);
 				break;
@@ -202,6 +205,12 @@ public class TelemetryService extends Service {
 				// forward crc error messages
 				s.telemetry_state.crc_errors = (Integer) msg.obj;
 				s.send_to_clients();
+				break;
+			case MSG_BLUETOOTH_ENABLED:
+				AltosDebug.debug("TelemetryService notes that BT is now enabled");
+				address = AltosDroidPreferences.active_device();
+				if (address != null && !address.address.startsWith("USB"))
+					s.start_altos_bluetooth(address, false);
 				break;
 			default:
 				super.handleMessage(msg);
@@ -348,10 +357,14 @@ public class TelemetryService extends Service {
 	}
 
 	private void start_altos_bluetooth(DeviceAddress address, boolean pause) {
-		// Get the BLuetoothDevice object
-		BluetoothDevice device = bluetooth_adapter.getRemoteDevice(address.address);
+		if (bluetooth_adapter == null || !bluetooth_adapter.isEnabled())
+			return;
 
 		disconnect(false);
+
+		// Get the BluetoothDevice object
+		BluetoothDevice device = bluetooth_adapter.getRemoteDevice(address.address);
+
 		this.address = address;
 		AltosDebug.debug("start_altos_bluetooth(): Connecting to %s (%s)", device.getName(), device.getAddress());
 		altos_link = new AltosBluetooth(device, handler, pause);
@@ -440,11 +453,6 @@ public class TelemetryService extends Service {
 
 		// Get local Bluetooth adapter
 		bluetooth_adapter = BluetoothAdapter.getDefaultAdapter();
-
-		// If the adapter is null, then Bluetooth is not supported
-		if (bluetooth_adapter == null) {
-			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-		}
 
 		telemetry_state = new TelemetryState();
 

@@ -564,22 +564,15 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		mAgeOldColor   = getResources().getColor(R.color.old_color);
 	}
 
-	private boolean ensureBluetooth() {
+	private void ensureBluetooth() {
 		// Get local Bluetooth adapter
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-		// If the adapter is null, then Bluetooth is not supported
-		if (mBluetoothAdapter == null) {
-			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-			return false;
-		}
-
-		if (!mBluetoothAdapter.isEnabled()) {
+		/* if there is a BT adapter and it isn't turned on, then turn it on */
+		if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
 			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, AltosDroid.REQUEST_ENABLE_BT);
 		}
-
-		return true;
 	}
 
 	private boolean check_usb() {
@@ -645,9 +638,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 					return;
 			}
 			AltosDebug.debug("Starting by looking for bluetooth devices");
-			if (ensureBluetooth())
-				return;
-			finish();
+			ensureBluetooth();
 		}
 	}
 
@@ -738,12 +729,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			if (resultCode == Activity.RESULT_OK) {
 				// Bluetooth is now enabled, so set up a chat session
 				//setupChat();
+				AltosDebug.debug("BT enabled");
+				bluetoothEnabled(data);
 			} else {
 				// User did not enable Bluetooth or an error occured
-				AltosDebug.error("BT not enabled");
-				stopService(new Intent(AltosDroid.this, TelemetryService.class));
-				Toast.makeText(this, R.string.bt_not_enabled, Toast.LENGTH_SHORT).show();
-				finish();
+				AltosDebug.debug("BT not enabled");
 			}
 			break;
 		case REQUEST_MAP_TYPE:
@@ -764,6 +754,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			} catch (RemoteException e) {
 				AltosDebug.debug("connect device message failed");
 			}
+		}
+	}
+
+	private void bluetoothEnabled(Intent data) {
+		try {
+			mService.send(Message.obtain(null, TelemetryService.MSG_BLUETOOTH_ENABLED, null));
+		} catch (RemoteException e) {
+			AltosDebug.debug("send BT enabled message failed");
 		}
 	}
 
@@ -907,11 +905,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		Intent serverIntent = null;
 		switch (item.getItemId()) {
 		case R.id.connect_scan:
-			if (ensureBluetooth()) {
-				// Launch the DeviceListActivity to see devices and do scan
-				serverIntent = new Intent(this, DeviceListActivity.class);
-				startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
-			}
+			ensureBluetooth();
+			// Launch the DeviceListActivity to see devices and do scan
+			serverIntent = new Intent(this, DeviceListActivity.class);
+			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
 			return true;
 		case R.id.disconnect:
 			/* Disconnect the device
