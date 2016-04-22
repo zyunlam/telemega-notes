@@ -45,13 +45,15 @@ import android.view.*;
 import android.widget.*;
 import android.app.AlertDialog;
 import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
 import android.hardware.usb.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 
 import org.altusmetrum.altoslib_10.*;
 
-public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
+public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener {
 
 	// Actions sent to the telemetry server at startup time
 
@@ -97,6 +99,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	private double frequency;
 	private int telemetry_rate;
+
+	public Location location = null;
 
 	// Tabs
 	TabHost         mTabHost;
@@ -314,7 +318,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				state = newest_state;
 		}
 
-		update_ui(telemetry_state, state, telemetry_state.location);
+		update_ui(telemetry_state, state);
 
 		start_timer();
 	}
@@ -379,7 +383,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
-	void update_ui(TelemetryState telem_state, AltosState state, Location location) {
+	void update_ui(TelemetryState telem_state, AltosState state) {
 
 		int prev_state = AltosLib.ao_flight_invalid;
 
@@ -679,12 +683,26 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	public void onResume() {
 		super.onResume();
 		AltosDebug.debug("+ ON RESUME +");
+
+		// Listen for GPS and Network position updates
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+
+		location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+		AltosDebug.debug("Resume, location is %f,%f\n",
+				 location.getLatitude(),
+				 location.getLongitude());
+
+		update_ui(telemetry_state, saved_state);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		AltosDebug.debug("- ON PAUSE -");
+		// Stop listening for location updates
+		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
 	}
 
 	@Override
@@ -1015,7 +1033,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	}
 
 	static String direction(AltosGreatCircle from_receiver,
-			     Location receiver) {
+				Location receiver) {
 		if (from_receiver == null)
 			return null;
 
@@ -1043,5 +1061,25 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			return String.format("left %d°", -iheading);
 		else
 			return String.format("right %d°", iheading);
+	}
+
+	public void onLocationChanged(Location location) {
+		this.location = location;
+		AltosDebug.debug("Location changed to %f,%f",
+				 location.getLatitude(),
+				 location.getLongitude());
+		update_ui(telemetry_state, saved_state);
+	}
+
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		AltosDebug.debug("Location status now %d\n", status);
+	}
+
+	public void onProviderEnabled(String provider) {
+		AltosDebug.debug("Location provider enabled %s\n", provider);
+	}
+
+	public void onProviderDisabled(String provider) {
+		AltosDebug.debug("Location provider disabled %s\n", provider);
 	}
 }

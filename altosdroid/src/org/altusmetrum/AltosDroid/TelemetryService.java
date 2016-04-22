@@ -38,14 +38,11 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.Looper;
 import android.widget.Toast;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationListener;
 import android.location.Criteria;
 
 import org.altusmetrum.altoslib_10.*;
 
-public class TelemetryService extends Service implements LocationListener {
+public class TelemetryService extends Service {
 
 	static final int MSG_REGISTER_CLIENT   = 1;
 	static final int MSG_UNREGISTER_CLIENT = 2;
@@ -484,11 +481,6 @@ public class TelemetryService extends Service implements LocationListener {
 				telemetry_state.states.put(serial, saved_state.state);
 			}
 		}
-
-		// Listen for GPS and Network position updates
-		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 	}
 
 	@Override
@@ -535,9 +527,6 @@ public class TelemetryService extends Service implements LocationListener {
 	@Override
 	public void onDestroy() {
 
-		// Stop listening for location updates
-		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
-
 		// Stop the bluetooth Comms threads
 		disconnect(true);
 
@@ -552,21 +541,4 @@ public class TelemetryService extends Service implements LocationListener {
 	public IBinder onBind(Intent intent) {
 		return messenger.getBinder();
 	}
-
-
-	public void onLocationChanged(Location location) {
-		telemetry_state.location = location;
-		AltosDebug.debug("location changed");
-		send_to_clients();
-	}
-
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-	}
-
-	public void onProviderEnabled(String provider) {
-	}
-
-	public void onProviderDisabled(String provider) {
-	}
-
 }

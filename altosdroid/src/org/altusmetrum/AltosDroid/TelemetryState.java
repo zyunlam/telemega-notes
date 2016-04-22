@@ -30,7 +30,6 @@ public class TelemetryState {
 	int		connect;
 	DeviceAddress	address;
 	AltosConfigData	config;
-	Location	location;
 	int		crc_errors;
 	double		receiver_battery;
 	double		frequency;
@@ -44,7 +43,6 @@ public class TelemetryState {
 		connect = CONNECT_NONE;
 		config = null;
 		states = new HashMap<Integer,AltosState>();
-		location = null;
 		crc_errors = 0;
 		receiver_battery = AltosLib.MISSING;
 		frequency = AltosPreferences.frequency(0);
