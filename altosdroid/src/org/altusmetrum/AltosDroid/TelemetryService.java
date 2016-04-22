@@ -248,7 +248,7 @@ public class TelemetryService extends Service implements LocationListener {
 
 		/* On connect, send the current state to the new client
 		 */
-		send_to_client(client, message());
+		send_to_client(client);
 
 		/* If we've got an address from a previous session, then
 		 * go ahead and try to reconnect to the device
@@ -275,7 +275,8 @@ public class TelemetryService extends Service implements LocationListener {
 		 }
 	}
 
-	private void send_to_client(Messenger client, Message m) {
+	private void send_to_client(Messenger client) {
+		Message m = message();
 		try {
 			client.send(m);
 		} catch (RemoteException e) {
@@ -285,9 +286,8 @@ public class TelemetryService extends Service implements LocationListener {
 	}
 
 	private void send_to_clients() {
-		Message m = message();
 		for (Messenger client : clients)
-			send_to_client(client, m);
+			send_to_client(client);
 	}
 
 	private void disconnect(boolean notify) {
