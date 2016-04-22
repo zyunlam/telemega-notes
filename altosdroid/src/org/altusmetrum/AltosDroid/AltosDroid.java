@@ -49,7 +49,7 @@ import android.hardware.usb.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 

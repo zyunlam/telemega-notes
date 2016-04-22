@@ -22,7 +22,7 @@ import java.awt.event.*;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class TeleGPSPreferences
 	extends AltosUIConfigure
