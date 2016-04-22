@@ -149,7 +149,7 @@ fi
 ANDROID_RELEASE=no
 if test "x$ANDROID_SDK" != "xno"; then
 	HAVE_ANDROID_SDK="yes"
-	if test -f "$HOME/altusmetrumllc/release.keystore" -a -f "$HOME/altusmetrumllc/Passphrase"; then
+	if test -f "$HOME/altusmetrumllc/google-play-release.keystore" -a -f "$HOME/altusmetrumllc/google-play-passphrase"; then
 		ANDROID_RELEASE=yes
 	fi
 else
