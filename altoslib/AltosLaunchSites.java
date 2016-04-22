@@ -65,6 +65,7 @@ public class AltosLaunchSites extends Thread {
 				add(line);
 			}
 		} catch (Exception e) {
+			System.out.printf("file exception %s\n", e.toString());
 		} finally {
 			notify_complete();
 		}
