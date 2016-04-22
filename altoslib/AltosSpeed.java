@@ -21,25 +21,25 @@ public class AltosSpeed extends AltosUnits {
 
 	public double value(double v, boolean imperial_units) {
 		if (imperial_units)
-			return AltosConvert.meters_to_mph(v);
+			return AltosConvert.mps_to_fps(v);
 		return v;
 	}
 
 	public double inverse(double v, boolean imperial_units) {
 		if (imperial_units)
-			return AltosConvert.mph_to_meters(v);
+			return AltosConvert.fps_to_mps(v);
 		return v;
 	}
 
 	public String show_units(boolean imperial_units) {
 		if (imperial_units)
-			return "mph";
+			return "fps";
 		return "m/s";
 	}
 
 	public String say_units(boolean imperial_units) {
 		if (imperial_units)
-			return "miles per hour";
+			return "feet per second";
 		return "meters per second";
 	}
 

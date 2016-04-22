@@ -325,6 +325,14 @@ public class AltosConvert {
 		return miles_to_meters(mps) / 3600;
  	}
 
+	public static double mps_to_fps(double mps) {
+		return meters_to_miles(mps) * 5280;
+ 	}
+
+	public static double fps_to_mps(double mps) {
+		return miles_to_meters(mps) / 5280;
+ 	}
+
 	public static double meters_to_mach(double meters) {
 		return meters / 343;		/* something close to mach at usual rocket sites */
 	}
