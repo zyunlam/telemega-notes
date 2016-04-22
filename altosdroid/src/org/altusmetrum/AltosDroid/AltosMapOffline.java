@@ -441,6 +441,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	}
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+		boolean	changed = false;
+
 		if (state != null) {
 			map.show(state, null);
 			if (state.pad_lat != AltosLib.MISSING && pad == null)
@@ -479,7 +481,12 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			}
 		}
 		if (receiver != null) {
-			here = new AltosLatLon(receiver.getLatitude(), receiver.getLongitude());
+			AltosLatLon new_here = new AltosLatLon(receiver.getLatitude(), receiver.getLongitude());
+			if (!new_here.equals(here)) {
+				here = new_here;
+				AltosDebug.debug("Location changed, redraw");
+				repaint();
+			}
 		}
 	}
 
