@@ -70,6 +70,7 @@ _ao_usart_pollchar(struct ao_stm_usart *usart)
 		uint8_t	u;
 		ao_fifo_remove(usart->rx_fifo,u);
 		c = u;
+		ao_usb_putchar(c); ao_usb_flush();
 	}
 	return c;
 }
@@ -82,6 +83,7 @@ ao_usart_getchar(struct ao_stm_usart *usart)
 	while ((c = _ao_usart_pollchar(usart)) == AO_READ_AGAIN)
 		ao_sleep(&usart->rx_fifo);
 	ao_arch_release_interrupts();
+	ao_usb_putchar(c); ao_usb_flush();
 	return (char) c;
 }
 
@@ -94,6 +96,7 @@ _ao_usart_sleep_for(struct ao_stm_usart *usart, uint16_t timeout)
 void
 ao_usart_putchar(struct ao_stm_usart *usart, char c)
 {
+	ao_usb_putchar(c); ao_usb_flush();
 	ao_arch_block_interrupts();
 	while (ao_fifo_full(usart->tx_fifo))
 		ao_sleep(&usart->tx_fifo);
