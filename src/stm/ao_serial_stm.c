@@ -16,6 +16,7 @@
  */
 
 #include <ao.h>
+#include <ao_exti.h>
 
 void
 ao_debug_out(char c)
@@ -29,40 +30,67 @@ ao_debug_out(char c)
 static int
 _ao_usart_tx_start(struct ao_stm_usart *usart)
 {
-	if (!ao_fifo_empty(usart->tx_fifo) && !usart->tx_started)
-	{
-		usart->tx_started = 1;
-		usart->tx_running = 1;
-		usart->reg->cr1 |= (1 << STM_USART_CR1_TXEIE) | (1 << STM_USART_CR1_TCIE);
-		ao_fifo_remove(usart->tx_fifo, usart->reg->dr);
-		ao_wakeup(&usart->tx_fifo);
-		return 1;
+	if (!ao_fifo_empty(usart->tx_fifo)) {
+#if HAS_SERIAL_SW_FLOW
+		if (usart->gpio_cts && ao_gpio_get(usart->gpio_cts, usart->pin_cts, foo) == 1) {
+			ao_exti_enable(usart->gpio_cts, usart->pin_cts);
+			return 0;
+		}
+#endif
+		if (usart->reg->sr & (1 << STM_USART_SR_TXE))
+		{
+			usart->tx_running = 1;
+			usart->reg->cr1 |= (1 << STM_USART_CR1_TXEIE) | (1 << STM_USART_CR1_TCIE);
+			ao_fifo_remove(usart->tx_fifo, usart->reg->dr);
+			ao_wakeup(&usart->tx_fifo);
+			return 1;
+		}
 	}
 	return 0;
+}
+
+#if HAS_SERIAL_SW_FLOW
+static void
+_ao_usart_cts(struct ao_stm_usart *usart)
+{
+	if (_ao_usart_tx_start(usart))
+		ao_exti_disable(usart->gpio_cts, usart->pin_cts);
+}
+#endif
+
+static void
+_ao_usart_rx(struct ao_stm_usart *usart, int stdin)
+{
+	if (usart->reg->sr & (1 << STM_USART_SR_RXNE)) {
+		if (!ao_fifo_full(usart->rx_fifo)) {
+			ao_fifo_insert(usart->rx_fifo, usart->reg->dr);
+			ao_wakeup(&usart->rx_fifo);
+			if (stdin)
+				ao_wakeup(&ao_stdin_ready);
+#if HAS_SERIAL_SW_FLOW
+			/* If the fifo is nearly full, turn off RTS and wait
+			 * for it to drain a bunch
+			 */
+			if (usart->gpio_rts && ao_fifo_mostly(usart->rx_fifo)) {
+				ao_gpio_set(usart->gpio_rts, usart->pin_rts, usart->pin_rts, 1);
+				usart->rts = 0;
+			}
+#endif
+		} else {
+			usart->reg->cr1 &= ~(1 << STM_USART_CR1_RXNEIE);
+		}
+	}
 }
 
 static void
 ao_usart_isr(struct ao_stm_usart *usart, int stdin)
 {
-	uint32_t	sr;
+	_ao_usart_rx(usart, stdin);
 
-	sr = usart->reg->sr;
-	usart->reg->sr = 0;
+	if (!_ao_usart_tx_start(usart))
+		usart->reg->cr1 &= ~(1<< STM_USART_CR1_TXEIE);
 
-	if (sr & (1 << STM_USART_SR_RXNE)) {
-		char c = usart->reg->dr;
-		if (!ao_fifo_full(usart->rx_fifo))
-			ao_fifo_insert(usart->rx_fifo, c);
-		ao_wakeup(&usart->rx_fifo);
-		if (stdin)
-			ao_wakeup(&ao_stdin_ready);
-	}
-	if (sr & (1 << STM_USART_SR_TXE)) {
-		usart->tx_started = 0;
-		if (!_ao_usart_tx_start(usart))
-			usart->reg->cr1 &= ~(1<< STM_USART_CR1_TXEIE);
-	}
-	if (sr & (1 << STM_USART_SR_TC)) {
+	if (usart->reg->sr & (1 << STM_USART_SR_TC)) {
 		usart->tx_running = 0;
 		usart->reg->cr1 &= ~(1 << STM_USART_CR1_TCIE);
 		if (usart->draining) {
@@ -72,7 +100,7 @@ ao_usart_isr(struct ao_stm_usart *usart, int stdin)
 	}
 }
 
-int
+static int
 _ao_usart_pollchar(struct ao_stm_usart *usart)
 {
 	int	c;
@@ -82,13 +110,23 @@ _ao_usart_pollchar(struct ao_stm_usart *usart)
 	else {
 		uint8_t	u;
 		ao_fifo_remove(usart->rx_fifo,u);
+		if ((usart->reg->cr1 & (1 << STM_USART_CR1_RXNEIE)) == 0) {
+			if (ao_fifo_barely(usart->rx_fifo))
+				usart->reg->cr1 |= (1 << STM_USART_CR1_RXNEIE);
+		}
+#if HAS_SERIAL_SW_FLOW
+		/* If we've cleared RTS, check if there's space now and turn it back on */
+		if (usart->gpio_rts && usart->rts == 0 && ao_fifo_barely(usart->rx_fifo)) {
+			ao_gpio_set(usart->gpio_rts, usart->pin_rts, foo, 0);
+			usart->rts = 1;
+		}
+#endif
 		c = u;
-		ao_usb_putchar(c); ao_usb_flush();
 	}
 	return c;
 }
 
-char
+static char
 ao_usart_getchar(struct ao_stm_usart *usart)
 {
 	int c;
@@ -96,7 +134,6 @@ ao_usart_getchar(struct ao_stm_usart *usart)
 	while ((c = _ao_usart_pollchar(usart)) == AO_READ_AGAIN)
 		ao_sleep(&usart->rx_fifo);
 	ao_arch_release_interrupts();
-	ao_usb_putchar(c); ao_usb_flush();
 	return (char) c;
 }
 
@@ -106,10 +143,9 @@ _ao_usart_sleep_for(struct ao_stm_usart *usart, uint16_t timeout)
 	return ao_sleep_for(&usart->rx_fifo, timeout);
 }
 
-void
+static void
 ao_usart_putchar(struct ao_stm_usart *usart, char c)
 {
-	ao_usb_putchar(c); ao_usb_flush();
 	ao_arch_block_interrupts();
 	while (ao_fifo_full(usart->tx_fifo))
 		ao_sleep(&usart->tx_fifo);
@@ -149,7 +185,7 @@ static const struct {
 	},
 };
 
-void
+static void
 ao_usart_set_speed(struct ao_stm_usart *usart, uint8_t speed)
 {
 	if (speed > AO_SERIAL_SPEED_115200)
@@ -157,7 +193,7 @@ ao_usart_set_speed(struct ao_stm_usart *usart, uint8_t speed)
 	usart->reg->brr = ao_usart_speeds[speed].brr;
 }
 
-void
+static void
 ao_usart_init(struct ao_stm_usart *usart)
 {
 	usart->reg->cr1 = ((0 << STM_USART_CR1_OVER8) |
@@ -203,12 +239,14 @@ ao_usart_init(struct ao_stm_usart *usart)
 	ao_usart_set_speed(usart, AO_SERIAL_SPEED_9600);
 }
 
-void
+#if HAS_SERIAL_HW_FLOW
+static void
 ao_usart_set_flow(struct ao_stm_usart *usart)
 {
 	usart->reg->cr3 |= ((1 << STM_USART_CR3_CTSE) |
 			    (1 << STM_USART_CR3_RTSE));
 }
+#endif
 
 #if HAS_SERIAL_1
 
@@ -296,13 +334,22 @@ ao_serial2_set_speed(uint8_t speed)
 	ao_usart_drain(&ao_stm_usart2);
 	ao_usart_set_speed(&ao_stm_usart2, speed);
 }
+
+#if HAS_SERIAL_SW_FLOW
+void
+ao_serial2_cts(void)
+{
+	_ao_usart_cts(&ao_stm_usart2);
+}
+#endif
+
 #endif	/* HAS_SERIAL_2 */
 
 #if HAS_SERIAL_3
 
 struct ao_stm_usart ao_stm_usart3;
 
-void stm_usart3_isr(void) { ao_usart_isr(&ao_stm_usart3, USE_SERIAL_2_STDIN); }
+void stm_usart3_isr(void) { ao_usart_isr(&ao_stm_usart3, USE_SERIAL_3_STDIN); }
 
 char
 ao_serial3_getchar(void)
@@ -341,6 +388,28 @@ ao_serial3_drain(void)
 	ao_usart_drain(&ao_stm_usart3);
 }
 #endif	/* HAS_SERIAL_3 */
+
+#if HAS_SERIAL_SW_FLOW
+static void
+ao_serial_set_sw_rts_cts(struct ao_stm_usart *usart,
+			 void (*isr)(void),
+			 struct stm_gpio *port_rts,
+			 int pin_rts,
+			 struct stm_gpio *port_cts,
+			 int pin_cts)
+{
+	/* Pull RTS low to note that there's space in the FIFO
+	 */
+	ao_enable_output(port_rts, pin_rts, foo, 0);
+	usart->gpio_rts = port_rts;
+	usart->pin_rts = pin_rts;
+	usart->rts = 1;
+
+	ao_exti_setup(port_cts, pin_cts, AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_MED, isr);
+	usart->gpio_cts = port_cts;
+	usart->pin_cts = pin_cts;
+}
+#endif
 
 void
 ao_serial_init(void)
@@ -394,10 +463,19 @@ ao_serial_init(void)
 
 	stm_afr_set(&stm_gpioa, 2, STM_AFR_AF7);
 	stm_afr_set(&stm_gpioa, 3, STM_AFR_AF7);
-#if USE_SERIAL_2_FLOW
+# if USE_SERIAL_2_FLOW
+#  if USE_SERIAL_2_SW_FLOW
+	ao_serial_set_sw_rts_cts(&ao_stm_usart2,
+				 ao_serial2_cts,
+				 SERIAL_2_PORT_RTS,
+				 SERIAL_2_PIN_RTS,
+				 SERIAL_2_PORT_CTS,
+				 SERIAL_2_PIN_CTS);
+#  else
 	stm_afr_set(&stm_gpioa, 0, STM_AFR_AF7);
 	stm_afr_set(&stm_gpioa, 1, STM_AFR_AF7);
-#endif
+#  endif
+# endif
 #else
 #if SERIAL_2_PD5_PD6
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIODEN);
@@ -416,7 +494,7 @@ ao_serial_init(void)
 
 	ao_stm_usart2.reg = &stm_usart2;
 	ao_usart_init(&ao_stm_usart2);
-#if USE_SERIAL_2_FLOW
+#if USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW
 	ao_usart_set_flow(&ao_stm_usart2);
 #endif
 

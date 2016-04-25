@@ -820,6 +820,8 @@ struct ao_fifo {
 } while(0)
 
 #define ao_fifo_full(f)		((((f).insert + 1) & (AO_FIFO_SIZE-1)) == (f).remove)
+#define ao_fifo_mostly(f)	((((f).insert - (f).remove) & (AO_FIFO_SIZE-1)) >= (AO_FIFO_SIZE * 3 / 4))
+#define ao_fifo_barely(f)	((((f).insert - (f).remove) & (AO_FIFO_SIZE-1)) >= (AO_FIFO_SIZE * 1 / 4))
 #define ao_fifo_empty(f)	((f).insert == (f).remove)
 
 #if PACKET_HAS_MASTER || PACKET_HAS_SLAVE

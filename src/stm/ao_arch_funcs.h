@@ -278,14 +278,35 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t i2c_index, uint8_t stop);
 void
 ao_i2c_init(void);
 
+#if USE_SERIAL_1_SW_FLOW || USE_SERIAL_2_SW_FLOW || USE_SERIAL_3_SW_FLOW
+#define HAS_SERIAL_SW_FLOW 1
+#else
+#define HAS_SERIAL_SW_FLOW 0
+#endif
+
+#if USE_SERIAL_1_FLOW && !USE_SERIAL_1_SW_FLOW || USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW || USE_SERIAL_3_FLOW && !USE_SERIAL_3_SW_FLOW
+#define HAS_SERIAL_HW_FLOW 1
+#else
+#define HAS_SERIAL_HW_FLOW 0
+#endif
+
 /* ao_serial_stm.c */
 struct ao_stm_usart {
 	struct ao_fifo		rx_fifo;
 	struct ao_fifo		tx_fifo;
 	struct stm_usart	*reg;
-	uint8_t			tx_started;
 	uint8_t			tx_running;
 	uint8_t			draining;
+#if HAS_SERIAL_SW_FLOW
+	/* RTS - 0 if we have FIFO space, 1 if not
+	 * CTS - 0 if we can send, 0 if not
+	 */
+	struct stm_gpio		*gpio_rts;
+	struct stm_gpio		*gpio_cts;
+	uint8_t			pin_rts;
+	uint8_t			pin_cts;
+	uint8_t			rts;
+#endif
 };
 
 #if HAS_SERIAL_1
