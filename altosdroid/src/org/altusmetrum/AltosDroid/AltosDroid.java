@@ -64,12 +64,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	public static final int MSG_STATE           = 1;
 	public static final int MSG_UPDATE_AGE      = 2;
+	public static final int	MSG_IDLE_MODE	    = 3;
+	public static final int MSG_IGNITER_STATUS  = 4;
 
 	// Intent request codes
 	public static final int REQUEST_CONNECT_DEVICE = 1;
 	public static final int REQUEST_ENABLE_BT      = 2;
 	public static final int REQUEST_PRELOAD_MAPS   = 3;
 	public static final int REQUEST_MAP_TYPE       = 4;
+	public static final int REQUEST_IDLE_MODE      = 5;
+	public static final int REQUEST_IGNITERS       = 6;
+
+	public static final String EXTRA_IDLE_MODE = "idle_mode";
+	public static final String EXTRA_IDLE_RESULT = "idle_result";
+	public static final String EXTRA_TELEMETRY_SERVICE = "telemetry_service";
 
 	public int map_type = AltosMap.maptype_hybrid;
 
@@ -99,6 +107,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	private double frequency;
 	private int telemetry_rate;
+
+	private boolean idle_mode = false;
 
 	public Location location = null;
 
@@ -145,6 +155,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				break;
 			case MSG_UPDATE_AGE:
 				ad.update_age();
+				break;
+			case MSG_IDLE_MODE:
+				ad.idle_mode = (Boolean) msg.obj;
+				ad.update_state(null);
 				break;
 			}
 		}
@@ -216,8 +230,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		switch (telemetry_state.connect) {
 		case TelemetryState.CONNECT_CONNECTED:
 			if (telemetry_state.config != null) {
-				String str = String.format("S/N %d %6.3f MHz", telemetry_state.config.serial,
-							   telemetry_state.frequency);
+				String str = String.format("S/N %d %6.3f MHz%s", telemetry_state.config.serial,
+							   telemetry_state.frequency, idle_mode ? " (idle)" : "");
 				if (telemetry_state.telemetry_rate != AltosLib.ao_telemetry_rate_38400)
 					str = str.concat(String.format(" %d bps",
 								       AltosLib.ao_telemetry_rate_values[telemetry_state.telemetry_rate]));
@@ -444,7 +458,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				mCallsignView.setText(state.callsign);
 			}
 			if (saved_state == null || state.serial != saved_state.serial) {
-				mSerialView.setText(String.format("%d", state.serial));
+				if (state.serial == AltosLib.MISSING)
+					mSerialView.setText("");
+				else
+					mSerialView.setText(String.format("%d", state.serial));
 			}
 			if (saved_state == null || state.flight != saved_state.flight) {
 				if (state.flight == AltosLib.MISSING)
@@ -461,7 +478,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				}
 			}
 			if (saved_state == null || state.rssi != saved_state.rssi) {
-				mRSSIView.setText(String.format("%d", state.rssi));
+				if (state.rssi == AltosLib.MISSING)
+					mRSSIView.setText("");
+				else
+					mRSSIView.setText(String.format("%d", state.rssi));
 			}
 		}
 
@@ -681,9 +701,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 		location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-		AltosDebug.debug("Resume, location is %f,%f\n",
-				 location.getLatitude(),
-				 location.getLongitude());
+		if (location != null)
+			AltosDebug.debug("Resume, location is %f,%f\n",
+					 location.getLatitude(),
+					 location.getLongitude());
 
 		update_ui(telemetry_state, saved_state);
 	}
@@ -740,6 +761,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			if (resultCode == Activity.RESULT_OK)
 				set_map_type(data);
 			break;
+		case REQUEST_IDLE_MODE:
+			if (resultCode == Activity.RESULT_OK)
+				idle_mode(data);
+			break;
+		case REQUEST_IGNITERS:
+			break;
 		}
 	}
 
@@ -795,6 +822,40 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			map_type = type;
 			for (AltosDroidTab mTab : mTabs)
 				mTab.set_map_type(map_type);
+		}
+	}
+
+	private void idle_mode(Intent data) {
+		int type = data.getIntExtra(IdleModeActivity.EXTRA_IDLE_RESULT, -1);
+		Message msg;
+
+		AltosDebug.debug("intent idle_mode %d", type);
+		switch (type) {
+		case IdleModeActivity.IDLE_MODE_CONNECT:
+			msg = Message.obtain(null, TelemetryService.MSG_MONITOR_IDLE_START);
+			try {
+				mService.send(msg);
+			} catch (RemoteException re) {
+			}
+			break;
+		case IdleModeActivity.IDLE_MODE_DISCONNECT:
+			msg = Message.obtain(null, TelemetryService.MSG_MONITOR_IDLE_STOP);
+			try {
+				mService.send(msg);
+			} catch (RemoteException re) {
+			}
+			break;
+		case IdleModeActivity.IDLE_MODE_REBOOT:
+			msg = Message.obtain(null, TelemetryService.MSG_REBOOT);
+			try {
+				mService.send(msg);
+			} catch (RemoteException re) {
+			}
+			break;
+		case IdleModeActivity.IDLE_MODE_IGNITERS:
+			Intent serverIntent = new Intent(this, IgniterActivity.class);
+			startActivityForResult(serverIntent, REQUEST_IGNITERS);
+			break;
 		}
 	}
 
@@ -1024,6 +1085,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				alert_serial.show();
 
 			}
+			return true;
+		case R.id.idle_mode:
+			serverIntent = new Intent(this, IdleModeActivity.class);
+			serverIntent.putExtra(EXTRA_IDLE_MODE, idle_mode);
+			startActivityForResult(serverIntent, REQUEST_IDLE_MODE);
 			return true;
 		}
 		return false;

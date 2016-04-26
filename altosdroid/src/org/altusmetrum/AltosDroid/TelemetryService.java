@@ -42,7 +42,7 @@ import android.location.Criteria;
 
 import org.altusmetrum.altoslib_10.*;
 
-public class TelemetryService extends Service {
+public class TelemetryService extends Service implements AltosIdleMonitorListener {
 
 	static final int MSG_REGISTER_CLIENT   = 1;
 	static final int MSG_UNREGISTER_CLIENT = 2;
@@ -58,6 +58,11 @@ public class TelemetryService extends Service {
 	static final int MSG_DISCONNECT	       = 12;
 	static final int MSG_DELETE_SERIAL     = 13;
 	static final int MSG_BLUETOOTH_ENABLED = 14;
+	static final int MSG_MONITOR_IDLE_START= 15;
+	static final int MSG_MONITOR_IDLE_STOP = 16;
+	static final int MSG_REBOOT	       = 17;
+	static final int MSG_IGNITER_QUERY     = 18;
+	static final int MSG_IGNITER_FIRE      = 19;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
@@ -80,6 +85,13 @@ public class TelemetryService extends Service {
 	// Last data seen; send to UI when it starts
 	private TelemetryState	telemetry_state;
 
+	// Idle monitor if active
+	AltosIdleMonitor idle_monitor = null;
+
+	// Igniter bits
+	AltosIgnite ignite = null;
+	boolean ignite_running;
+
 	// Handler of incoming messages from clients.
 	static class IncomingHandler extends Handler {
 		private final WeakReference<TelemetryService> service;
@@ -93,6 +105,7 @@ public class TelemetryService extends Service {
 			AltosDroidLink bt = null;
 			if (s == null)
 				return;
+
 			switch (msg.what) {
 
 				/* Messages from application */
@@ -212,6 +225,26 @@ public class TelemetryService extends Service {
 				if (address != null && !address.address.startsWith("USB"))
 					s.start_altos_bluetooth(address, false);
 				break;
+			case MSG_MONITOR_IDLE_START:
+				AltosDebug.debug("start monitor idle");
+				s.start_idle_monitor();
+				break;
+			case MSG_MONITOR_IDLE_STOP:
+				AltosDebug.debug("stop monitor idle");
+				s.stop_idle_monitor();
+				break;
+			case MSG_REBOOT:
+				AltosDebug.debug("reboot");
+				s.reboot_remote();
+				break;
+			case MSG_IGNITER_QUERY:
+				AltosDebug.debug("igniter query");
+				s.igniter_query(msg.replyTo);
+				break;
+			case MSG_IGNITER_FIRE:
+				AltosDebug.debug("igniter fire");
+				s.igniter_fire((String) msg.obj);
+				break;
 			default:
 				super.handleMessage(msg);
 			}
@@ -255,6 +288,7 @@ public class TelemetryService extends Service {
 		/* On connect, send the current state to the new client
 		 */
 		send_to_client(client);
+		send_idle_mode_to_client(client);
 
 		/* If we've got an address from a previous session, then
 		 * go ahead and try to reconnect to the device
@@ -296,17 +330,29 @@ public class TelemetryService extends Service {
 			send_to_client(client);
 	}
 
-	private void disconnect(boolean notify) {
-		AltosDebug.debug("disconnect(): begin");
+	private void send_idle_mode_to_client(Messenger client) {
+		Message m = Message.obtain(null, AltosDroid.MSG_IDLE_MODE, idle_monitor != null);
+		try {
+			client.send(m);
+		} catch (RemoteException e) {
+			AltosDebug.error("Client %s disappeared", client.toString());
+			remove_client(client);
+		}
+	}
 
-		telemetry_state.connect = TelemetryState.CONNECT_DISCONNECTED;
-		telemetry_state.address = null;
+	private void send_idle_mode_to_clients() {
+		for (Messenger client : clients)
+			send_idle_mode_to_client(client);
+	}
 
-		if (altos_link != null)
-			altos_link.closing();
+	private void telemetry_start() {
+		if (telemetry_reader == null && idle_monitor == null && !ignite_running) {
+			telemetry_reader = new TelemetryReader(altos_link, handler);
+			telemetry_reader.start();
+		}
+	}
 
-		stop_receiver_voltage_timer();
-
+	private void telemetry_stop() {
 		if (telemetry_reader != null) {
 			AltosDebug.debug("disconnect(): stopping TelemetryReader");
 			telemetry_reader.interrupt();
@@ -316,6 +362,23 @@ public class TelemetryService extends Service {
 			}
 			telemetry_reader = null;
 		}
+	}
+
+	private void disconnect(boolean notify) {
+		AltosDebug.debug("disconnect(): begin");
+
+		telemetry_state.connect = TelemetryState.CONNECT_DISCONNECTED;
+		telemetry_state.address = null;
+
+		if (idle_monitor != null)
+			stop_idle_monitor();
+
+		if (altos_link != null)
+			altos_link.closing();
+
+		stop_receiver_voltage_timer();
+
+		telemetry_stop();
 		if (telemetry_logger != null) {
 			AltosDebug.debug("disconnect(): stopping TelemetryLogger");
 			telemetry_logger.stop();
@@ -325,6 +388,7 @@ public class TelemetryService extends Service {
 			AltosDebug.debug("disconnect(): stopping AltosDroidLink");
 			altos_link.close();
 			altos_link = null;
+			ignite = null;
 		}
 		telemetry_state.config = null;
 		if (notify) {
@@ -373,14 +437,95 @@ public class TelemetryService extends Service {
 		send_to_clients();
 	}
 
+	private void start_idle_monitor() {
+		if (altos_link != null && idle_monitor == null) {
+			telemetry_stop();
+			idle_monitor = new AltosIdleMonitor(this, altos_link, true, false);
+			idle_monitor.set_callsign(AltosPreferences.callsign());
+			idle_monitor.start();
+			send_idle_mode_to_clients();
+		}
+	}
+
+	private void stop_idle_monitor() {
+		if (idle_monitor != null) {
+			try {
+				idle_monitor.abort();
+			} catch (InterruptedException ie) {
+			}
+			idle_monitor = null;
+			telemetry_start();
+			send_idle_mode_to_clients();
+		}
+	}
+
+	private void reboot_remote() {
+		if (altos_link != null) {
+			stop_idle_monitor();
+			try {
+				altos_link.start_remote();
+				altos_link.printf("r eboot\n");
+				altos_link.flush_output();
+			} catch (TimeoutException te) {
+			} catch (InterruptedException ie) {
+			} finally {
+				try {
+					altos_link.stop_remote();
+				} catch (InterruptedException ie) {
+				}
+			}
+		}
+	}
+
+	private void ensure_ignite() {
+		if (ignite == null)
+			ignite = new AltosIgnite(altos_link, true, false);
+	}
+
+	private synchronized void igniter_query(Messenger client) {
+		ensure_ignite();
+		HashMap<String,Integer> status_map = null;
+		ignite_running = true;
+		try {
+			stop_idle_monitor();
+			try {
+				status_map = ignite.status();
+			} catch (InterruptedException ie) {
+				AltosDebug.debug("ignite.status interrupted");
+			} catch (TimeoutException te) {
+				AltosDebug.debug("ignite.status timeout");
+			}
+		} finally {
+			ignite_running = false;
+		}
+		Message m = Message.obtain(null, AltosDroid.MSG_IGNITER_STATUS, status_map);
+		try {
+			client.send(m);
+		} catch (RemoteException e) {
+		}
+	}
+
+	private synchronized void igniter_fire(String igniter) {
+		ensure_ignite();
+		ignite_running = true;
+		stop_idle_monitor();
+		try {
+			ignite.fire(igniter);
+		} catch (InterruptedException ie) {
+		} finally {
+			ignite_running = false;
+		}
+	}
+
 	// Timer for receiver battery voltage monitoring
 	Timer receiver_voltage_timer;
 
 	private void update_receiver_voltage() {
-		if (altos_link != null) {
+		if (altos_link != null && idle_monitor == null && !ignite_running) {
 			try {
 				double	voltage = altos_link.monitor_battery();
 				telemetry_state.receiver_battery = voltage;
+				send_to_clients();
 			} catch (InterruptedException ie) {
 			}
 		}
@@ -428,8 +573,7 @@ public class TelemetryService extends Service {
 		telemetry_state.connect = TelemetryState.CONNECT_CONNECTED;
 		telemetry_state.address = address;
 
-		telemetry_reader = new TelemetryReader(altos_link, handler);
-		telemetry_reader.start();
+		telemetry_start();
 
 		AltosDebug.debug("connected TelemetryReader started");
 
@@ -548,5 +692,15 @@ public class TelemetryService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return messenger.getBinder();
+	}
+
+	/* AltosIdleMonitorListener */
+	public void update(AltosState state, AltosListenerState listener_state)	{
+		telemetry_state.states.put(state.serial, state);
+		telemetry_state.receiver_battery = listener_state.battery;
+		send_to_clients();
+	}
+
+	public void failed() {
 	}
 }

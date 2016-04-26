@@ -28,6 +28,7 @@ public class AltosIdleMonitor extends Thread {
 	AltosIdleFetch		fetch;
 
 	boolean			remote;
+	boolean			close_on_exit;
 	double			frequency;
 	String			callsign;
 
@@ -107,18 +108,25 @@ public class AltosIdleMonitor extends Thread {
 			}
 		} catch (InterruptedException ie) {
 		}
-		try {
-			link.close();
-		} catch (InterruptedException ie) {
+		if (close_on_exit) {
+			try {
+				link.close();
+			} catch (InterruptedException ie) {
+			}
 		}
 	}
 
-	public AltosIdleMonitor(AltosIdleMonitorListener in_listener, AltosLink in_link, boolean in_remote)
-		throws FileNotFoundException, InterruptedException, TimeoutException {
+	public AltosIdleMonitor(AltosIdleMonitorListener in_listener, AltosLink in_link, boolean in_remote, boolean in_close_on_exit) {
 		listener = in_listener;
 		link = in_link;
 		remote = in_remote;
+		close_on_exit = in_close_on_exit;
 		listener_state = new AltosListenerState();
 		fetch = new AltosIdleFetch(link);
 	}
+
+	public AltosIdleMonitor(AltosIdleMonitorListener in_listener, AltosLink in_link, boolean in_remote) {
+		this(in_listener, in_link, in_remote, true);
+	}
 }
+

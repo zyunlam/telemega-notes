@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 public class AltosIgnite {
 	AltosLink	link;
 	boolean		remote;
+	boolean		close_on_exit;
 	boolean		link_started;
 	boolean		have_npyro = false;
 	int		npyro;
@@ -180,14 +181,18 @@ public class AltosIgnite {
 
 	public void close() throws InterruptedException {
 		stop_link();
-		link.close();
+		if (close_on_exit)
+			link.close();
 		link = null;
 	}
 
-	public AltosIgnite(AltosLink in_link, boolean in_remote)
-		throws FileNotFoundException, TimeoutException, InterruptedException {
-
+	public AltosIgnite(AltosLink in_link, boolean in_remote, boolean in_close_on_exit) {
 		link = in_link;
 		remote = in_remote;
+		close_on_exit = in_close_on_exit;
+	}
+
+	public AltosIgnite(AltosLink in_link, boolean in_remote) {
+		this(in_link, in_remote, true);
 	}
 }

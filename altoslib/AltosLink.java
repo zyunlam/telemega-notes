@@ -539,15 +539,15 @@ public abstract class AltosLink implements Runnable {
 
 		if (config_data.has_monitor_battery()) {
 			try {
-			String[] items = adc();
-			for (int i = 0; i < items.length;) {
-				if (items[i].equals("batt")) {
-					monitor_batt = Integer.parseInt(items[i+1]);
-					i += 2;
-					continue;
+				String[] items = adc();
+				for (int i = 0; i < items.length;) {
+					if (items[i].equals("batt")) {
+						monitor_batt = Integer.parseInt(items[i+1]);
+						i += 2;
+						continue;
+					}
+					i++;
 				}
-				i++;
-			}
 			} catch (TimeoutException te) {
 			}
 		}

@@ -39,7 +39,7 @@
     <uses-permission android:name="org.altusmetrum.AltosDroid.permission.MAPS_RECEIVE"/>
 
     <!-- Permissions needed to access USB OTG -->
-    <uses-feature android:name="android.hardware.usb.host" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
 
     <application android:label="@string/app_name"
                  android:icon="@drawable/app_icon"
@@ -79,6 +79,16 @@
 
         <activity android:name=".MapTypeActivity"
                   android:label="@string/map_type"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboardHidden" />
+
+        <activity android:name=".IdleModeActivity"
+                  android:label="@string/idle_mode"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboardHidden" />
+
+        <activity android:name=".IgniterActivity"
+                  android:label="@string/igniters"
                   android:theme="@android:style/Theme.Dialog"
                   android:configChanges="orientation|keyboardHidden" />
 

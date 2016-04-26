@@ -207,10 +207,9 @@ public abstract class AltosDroidLink extends AltosLink {
 
 	public void print(String data) {
 		byte[] bytes = data.getBytes();
-		AltosDebug.debug("print(): begin");
+		AltosDebug.debug(data.replace('\n', '\\'));
 		for (byte b : bytes)
 			putchar(b);
-		AltosDebug.debug("print(): Wrote bytes: '" + data.replace('\n', '\\') + "'");
 	}
 
 	public AltosDroidLink(Handler handler) {
