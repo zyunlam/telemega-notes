@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 Keith Packard <keithp@keithp.com>
+ * Copyright © 2012 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,21 +15,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.AltosDroid;
+package org.altusmetrum.altoslib_10;
 
-import java.util.*;
-import java.io.*;
-import android.location.Location;
-import org.altusmetrum.altoslib_10.*;
-
-public interface AltosDroidMapInterface {
-	public void onCreateView(AltosDroid altos_droid);
-
-	public void onDestroyView();
-
-	public void set_visible(boolean visible);
-
-	public void center(double lat, double lon, double accuracy);
-
-	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver);
+public interface AltosMapTypeListener {
+	public void map_type_changed(int map_type);
 }

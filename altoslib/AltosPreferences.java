@@ -128,6 +128,9 @@ public class AltosPreferences {
 
 	public static int map_cache = 9;
 
+	final static String mapTypePreference = "MAP-TYPE";
+	static int	map_type;
+
 	public static AltosFrequency[] load_common_frequencies() {
 		AltosFrequency[] frequencies = null;
 		boolean	existing = false;
@@ -221,6 +224,7 @@ public class AltosPreferences {
 
 		map_cache = backend.getInt(mapCachePreference, 9);
 		map_cache_listeners = new LinkedList<AltosMapCacheListener>();
+		map_type = backend.getInt(mapTypePreference, AltosMap.maptype_hybrid);
 	}
 
 	public static void flush_preferences() {
@@ -636,6 +640,41 @@ public class AltosPreferences {
 	public static int map_cache() {
 		synchronized(backend) {
 			return map_cache;
+		}
+	}
+
+	static LinkedList<AltosMapTypeListener> map_type_listeners;
+
+	public static void set_map_type(int map_type) {
+		synchronized(backend) {
+			AltosPreferences.map_type = map_type;
+			backend.putInt(mapTypePreference, map_type);
+			flush_preferences();
+		}
+		if (map_type_listeners != null) {
+			for (AltosMapTypeListener l : map_type_listeners) {
+				l.map_type_changed(map_type);
+			}
+		}
+	}
+
+	public static int map_type() {
+		synchronized(backend) {
+			return map_type;
+		}
+	}
+
+	public static void register_map_type_listener(AltosMapTypeListener l) {
+		synchronized(backend) {
+			if (map_type_listeners == null)
+				map_type_listeners = new LinkedList<AltosMapTypeListener>();
+			map_type_listeners.add(l);
+		}
+	}
+
+	public static void unregister_map_type_listener(AltosMapTypeListener l) {
+		synchronized(backend) {
+			map_type_listeners.remove(l);
 		}
 	}
 }

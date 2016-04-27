@@ -102,7 +102,7 @@ class RocketOnline implements Comparable {
 	}
 }
 
-public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, AltosMapTypeListener {
 	public SupportMapFragment mMapFragment;
 	private GoogleMap mMap;
 	private boolean mapLoaded = false;
@@ -124,7 +124,8 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 
 	public void onCreateView(AltosDroid altos_droid) {
 		this.altos_droid = altos_droid;
-		final int map_type = altos_droid.map_type;
+		final int map_type = AltosPreferences.map_type();
+		AltosPreferences.register_map_type_listener(this);
 		mMapFragment = new SupportMapFragment() {
 			@Override
 			public void onActivityCreated(Bundle savedInstanceState) {
@@ -144,9 +145,9 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 		};
 	}
 
-//	public void onActivityCreated() {
-//		getChildFragmentManager().beginTransaction().add(R.id.map, mMapFragment).commit();
-//	}
+	public void onDestroyView() {
+		AltosPreferences.unregister_map_type_listener(this);
+	}
 
 	private double pixel_distance(LatLng a, LatLng b) {
 		Projection projection = mMap.getProjection();
@@ -190,7 +191,7 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 	public void setupMap(int map_type) {
 		mMap = mMapFragment.getMap();
 		if (mMap != null) {
-			set_map_type(map_type);
+			map_type_changed(map_type);
 			mMap.setMyLocationEnabled(true);
 			mMap.getUiSettings().setTiltGesturesEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
@@ -308,7 +309,7 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 
 	}
 
-	public void set_map_type(int map_type) {
+	public void map_type_changed(int map_type) {
 		if (mMap != null) {
 			if (map_type == AltosMap.maptype_hybrid)
 				mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);

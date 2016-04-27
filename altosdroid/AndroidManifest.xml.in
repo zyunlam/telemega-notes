@@ -92,6 +92,11 @@
                   android:theme="@android:style/Theme.Dialog"
                   android:configChanges="orientation|keyboardHidden" />
 
+	<activity android:name=".SetupActivity"
+		  android:label="@string/setup"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboardHidden" />
+		  
         <service android:name=".TelemetryService" />
 
         <meta-data android:name="com.google.android.maps.v2.API_KEY"

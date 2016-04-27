@@ -79,7 +79,7 @@ class Rocket implements Comparable {
 	}
 }
 
-public class AltosMapOffline extends View implements ScaleGestureDetector.OnScaleGestureListener, AltosMapInterface, AltosDroidMapInterface {
+public class AltosMapOffline extends View implements ScaleGestureDetector.OnScaleGestureListener, AltosMapInterface, AltosDroidMapInterface, AltosMapTypeListener {
 	ScaleGestureDetector	scale_detector;
 	boolean			scaling;
 	AltosMap		map;
@@ -493,7 +493,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	public void onCreateView(AltosDroid altos_droid) {
 		this.altos_droid = altos_droid;
 		map = new AltosMap(this);
-		map.set_maptype(altos_droid.map_type);
+		AltosPreferences.register_map_type_listener(this);
+		map.set_maptype(AltosPreferences.map_type());
 
 		pad_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pad);
 		/* arrow at the bottom of the launchpad image */
@@ -511,7 +512,11 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 		here_off_y = here_bitmap.getHeight() / 2;
 	}
 
-	public void set_map_type(int map_type) {
+	public void onDestroyView() {
+		AltosPreferences.unregister_map_type_listener(this);
+	}
+
+	public void map_type_changed(int map_type) {
 		if (map != null)
 			map.set_maptype(map_type);
 	}

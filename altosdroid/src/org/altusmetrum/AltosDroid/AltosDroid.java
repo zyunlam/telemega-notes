@@ -71,15 +71,19 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	public static final int REQUEST_CONNECT_DEVICE = 1;
 	public static final int REQUEST_ENABLE_BT      = 2;
 	public static final int REQUEST_PRELOAD_MAPS   = 3;
-	public static final int REQUEST_MAP_TYPE       = 4;
 	public static final int REQUEST_IDLE_MODE      = 5;
 	public static final int REQUEST_IGNITERS       = 6;
+	public static final int REQUEST_SETUP	       = 7;
 
 	public static final String EXTRA_IDLE_MODE = "idle_mode";
 	public static final String EXTRA_IDLE_RESULT = "idle_result";
 	public static final String EXTRA_TELEMETRY_SERVICE = "telemetry_service";
 
-	public int map_type = AltosMap.maptype_hybrid;
+	// Setup result bits
+	public static final int SETUP_BAUD = 1;
+	public static final int SETUP_UNITS = 2;
+	public static final int SETUP_MAP_SOURCE = 4;
+	public static final int SETUP_MAP_TYPE = 8;
 
 	public static FragmentManager	fm;
 
@@ -534,11 +538,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		return tab_view;
 	}
 
-	public void set_map_source(int source) {
-		for (AltosDroidTab mTab : mTabs)
-			mTab.set_map_source(source);
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -757,17 +756,39 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				AltosDebug.debug("BT not enabled");
 			}
 			break;
-		case REQUEST_MAP_TYPE:
-			if (resultCode == Activity.RESULT_OK)
-				set_map_type(data);
-			break;
 		case REQUEST_IDLE_MODE:
 			if (resultCode == Activity.RESULT_OK)
 				idle_mode(data);
 			break;
 		case REQUEST_IGNITERS:
 			break;
+		case REQUEST_SETUP:
+			if (resultCode == Activity.RESULT_OK)
+				note_setup_changes(data);
+			break;
 		}
+	}
+
+	private void note_setup_changes(Intent data) {
+		int changes = data.getIntExtra(SetupActivity.EXTRA_SETUP_CHANGES, 0);
+
+		if ((changes & SETUP_BAUD) != 0) {
+			try {
+				mService.send(Message.obtain(null, TelemetryService.MSG_SETBAUD,
+							     AltosPreferences.telemetry_rate(1)));
+			} catch (RemoteException re) {
+			}
+		}
+		if ((changes & SETUP_UNITS) != 0) {
+			/* nothing to do here */
+		}
+		if ((changes & SETUP_MAP_SOURCE) != 0) {
+			/* nothing to do here */
+		}
+		if ((changes & SETUP_MAP_TYPE) != 0) {
+			/* nothing to do here */
+		}
+		set_switch_time();
 	}
 
 	private void connectUsb(UsbDevice device) {
@@ -811,17 +832,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		try {
 			mService.send(Message.obtain(null, TelemetryService.MSG_DISCONNECT, null));
 		} catch (RemoteException e) {
-		}
-	}
-
-	private void set_map_type(Intent data) {
-		int type = data.getIntExtra(MapTypeActivity.EXTRA_MAP_TYPE, -1);
-
-		AltosDebug.debug("intent set_map_type %d\n", type);
-		if (type != -1) {
-			map_type = type;
-			for (AltosDroidTab mTab : mTabs)
-				mTab.set_map_type(map_type);
 		}
 	}
 
@@ -981,6 +991,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			disconnectDevice();
 			finish();
 			return true;
+		case R.id.setup:
+			serverIntent = new Intent(this, SetupActivity.class);
+			startActivityForResult(serverIntent, REQUEST_SETUP);
+			return true;
 		case R.id.select_freq:
 			// Set the TBT radio frequency
 
@@ -1007,44 +1021,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 					 });
 			AlertDialog alert_freq = builder_freq.create();
 			alert_freq.show();
-			return true;
-		case R.id.select_rate:
-			// Set the TBT baud rate
-
-			final String[] rates = {
-				"38400",
-				"9600",
-				"2400",
-			};
-
-			AlertDialog.Builder builder_rate = new AlertDialog.Builder(this);
-			builder_rate.setTitle("Pick a baud rate");
-			builder_rate.setItems(rates,
-					 new DialogInterface.OnClickListener() {
-						 public void onClick(DialogInterface dialog, int item) {
-							 setBaud(rates[item]);
-						 }
-					 });
-			AlertDialog alert_rate = builder_rate.create();
-			alert_rate.show();
-			return true;
-		case R.id.change_units:
-			boolean	imperial = AltosPreferences.imperial_units();
-			AltosPreferences.set_imperial_units(!imperial);
-			return true;
-		case R.id.preload_maps:
-			serverIntent = new Intent(this, PreloadMapActivity.class);
-			startActivityForResult(serverIntent, REQUEST_PRELOAD_MAPS);
-			return true;
-		case R.id.map_type:
-			serverIntent = new Intent(this, MapTypeActivity.class);
-			startActivityForResult(serverIntent, REQUEST_MAP_TYPE);
-			return true;
-		case R.id.map_source:
-			int source = AltosDroidPreferences.map_source();
-			int new_source = source == AltosDroidPreferences.MAP_SOURCE_ONLINE ? AltosDroidPreferences.MAP_SOURCE_OFFLINE : AltosDroidPreferences.MAP_SOURCE_ONLINE;
-			AltosDroidPreferences.set_map_source(new_source);
-			set_map_source(new_source);
 			return true;
 		case R.id.select_tracker:
 			if (serials != null) {

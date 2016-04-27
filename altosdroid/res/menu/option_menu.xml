@@ -25,30 +25,21 @@
     <item android:id="@+id/select_freq"
           android:icon="@android:drawable/ic_menu_preferences"
           android:title="@string/select_freq" />
-    <item android:id="@+id/select_rate"
-          android:icon="@android:drawable/ic_menu_preferences"
-          android:title="@string/select_rate" />
-    <item android:id="@+id/change_units"
-	  android:icon="@android:drawable/ic_menu_view"
-	  android:title="@string/change_units" />
-    <item android:id="@+id/preload_maps"
-	  android:icon="@android:drawable/ic_menu_mapmode"
-	  android:title="@string/preload_maps" />
-    <item android:id="@+id/map_type"
-	  android:icon="@android:drawable/ic_menu_mapmode"
-	  android:title="@string/map_type" />
-    <item android:id="@+id/map_source"
-	  android:icon="@android:drawable/ic_menu_mapmode"
-	  android:title="@string/map_source" />
+
     <item android:id="@+id/select_tracker"
 	  android:icon="@android:drawable/ic_menu_view"
 	  android:title="@string/select_tracker"/>
     <item android:id="@+id/delete_track"
 	  android:icon="@android:drawable/ic_notification_clear_all"
 	  android:title="@string/delete_track"/>
+
+    <item android:id="@+id/setup"
+          android:icon="@android:drawable/ic_menu_preferences"
+          android:title="@string/setup" />
     <item android:id="@+id/idle_mode"
           android:icon="@android:drawable/ic_menu_preferences"
           android:title="@string/idle_mode" />
+
     <item android:id="@+id/quit"
           android:icon="@android:drawable/ic_menu_close_clear_cancel"
           android:title="@string/quit" />

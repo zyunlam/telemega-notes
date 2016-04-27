@@ -29,6 +29,7 @@
 	<string name="connect_device">Connect a device</string>
 	<string name="disconnect_device">Disconnect device</string>
 	<string name="quit">Quit</string>
+	<string name="setup">Setup</string>
 	<string name="select_freq">Select radio frequency</string>
 	<string name="select_rate">Select data rate</string>
 	<string name="change_units">Change units</string>
@@ -125,5 +126,13 @@
 	<string name="igniter_arm">Arm</string>
 	<string name="igniter_armed">Armed</string>
 	<string name="igniter_fire">Fire</string>
+	
+	<!-- setup -->
+	<string name="telemetry_rate">Telemetry Rate</string>
+	<string name="set_units">Units</string>
+	<string name="map_type">Map Type</string>
+	<string name="map_source">Map Source</string>
+	<string name="preload_maps">Preload Maps</string>
+	<string name="done">Done</string>
 	
 </resources>

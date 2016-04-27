@@ -36,36 +36,41 @@ import org.altusmetrum.altoslib_10.*;
 
 class IgniterItem {
 	public String name;
+	public String pretty;
 	public String status;
 	public LinearLayout igniter_view = null;
-	public TextView	name_view = null;
+	public TextView	pretty_view = null;
 	public TextView	status_view = null;
 
 	private void update() {
-		AltosDebug.debug("update item %s %s", name, status);
-		if (name_view != null)
-			name_view.setText(name);
+		AltosDebug.debug("update item %s %s", pretty, status);
+		if (pretty_view != null)
+			pretty_view.setText(pretty);
 		if (status_view != null)
 			status_view.setText(status);
 	}
 
-	public void set(String name, String status) {
-		if (!name.equals(this.name) || !status.equals(this.status)) {
+	public void set(String name, String pretty, String status) {
+		if (!name.equals(this.name) ||
+		    !pretty.equals(this.pretty) ||
+		    !status.equals(this.status))
+		{
 			this.name = name;
+			this.pretty = pretty;
 			this.status = status;
 			update();
 		}
 	}
 
 	public void realize(LinearLayout igniter_view,
-			    TextView name_view,
+			    TextView pretty_view,
 			    TextView status_view) {
 		if (igniter_view != this.igniter_view ||
-		    name_view != this.name_view ||
+		    pretty_view != this.pretty_view ||
 		    status_view != this.status_view)
 		{
 			this.igniter_view = igniter_view;
-			this.name_view = name_view;
+			this.pretty_view = pretty_view;
 			this.status_view = status_view;
 			update();
 		}
@@ -124,6 +129,9 @@ public class IgniterActivity extends Activity {
 
 	private Timer timer;
 
+	private Timer arm_timer;
+	private int arm_remaining;
+
 	public static final int IGNITER_QUERY = 1;
 	public static final int IGNITER_FIRE = 2;
 
@@ -175,10 +183,44 @@ public class IgniterActivity extends Activity {
 		finish();
 	}
 
+	class FireThread extends Thread {
+		private final String igniter;
+
+		@Override
+		public void run() {
+			Message msg = Message.obtain(null, TelemetryService.MSG_IGNITER_FIRE, igniter);
+			try {
+				service.send(msg);
+			} catch (RemoteException re) {
+			}
+		}
+
+		public FireThread(String igniter) {
+			this.igniter = igniter;
+		}
+	}
+
 	private void fire_igniter() {
+		if (igniters_adapter.selected_item >= 0) {
+			IgniterItem	item = igniters_adapter.getItem(igniters_adapter.selected_item);
+			FireThread	ft = new FireThread(item.name);
+			ft.run();
+		}
 	}
 
 	private void arm_igniter(boolean is_checked) {
+		if (is_checked) {
+			arm_timer = new Timer();
+			fire.setEnabled(true);
+			arm_timer.scheduleAtFixedRate(new TimerTask() {
+					public void run() {
+						arm_timer_tick();
+					}},
+				1000L, 1000L);
+		} else {
+			arm_timer.cancel();
+			fire.setEnabled(false);
+		}
 	}
 
 	private synchronized void timer_tick() {
@@ -190,6 +232,7 @@ public class IgniterActivity extends Activity {
 			msg.replyTo = messenger;
 			service.send(msg);
 		} catch (RemoteException re) {
+			timer_running = false;
 		}
 	}
 
@@ -205,7 +248,7 @@ public class IgniterActivity extends Activity {
 		} else
 			item = igniters.get(name);
 
-		item.set(pretty, AltosIgnite.status_string(status.get(name)));
+		item.set(name, pretty, AltosIgnite.status_string(status.get(name)));
 		return true;
 	}
 
@@ -227,13 +270,41 @@ public class IgniterActivity extends Activity {
 //			igniters_view.setSelection(selected_item);
 	}
 
+	private void arm_set_text() {
+		String	text = String.format("Armed %d", arm_remaining);
+
+		arm.setTextOn(text);
+	}
+
+	private void arm_timer_tick() {
+		--arm_remaining;
+		if (arm_remaining <= 0) {
+			timer.cancel();
+			arm.setChecked(false);
+			fire.setEnabled(false);
+		} else
+			arm_set_text();
+	}
+
+	private void select_item(int position) {
+		if (position != igniters_adapter.selected_item) {
+			if (igniters_adapter.selected_item >= 0)
+				igniters_view.setItemChecked(igniters_adapter.selected_item, false);
+			if (position >= 0) {
+				igniters_view.setItemChecked(position, true);
+				arm.setEnabled(true);
+				arm_remaining = 10;
+				arm_set_text();
+			} else
+				arm.setEnabled(false);
+			igniters_adapter.selected_item = position;
+		}
+	}
+
 	private class IgniterItemClickListener implements ListView.OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> av, View v, int position, long id) {
-			if (igniters_adapter.selected_item >= 0)
-				igniters_view.setItemChecked(igniters_adapter.selected_item, false);
-			igniters_view.setItemChecked(position, true);
-			igniters_adapter.selected_item = position;
+			select_item(position);
 		}
 	}
 
@@ -261,6 +332,7 @@ public class IgniterActivity extends Activity {
 			});
 
 		arm = (ToggleButton) findViewById(R.id.igniter_arm);
+		arm.setEnabled(false);
 		arm.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener() {
 				public void onCheckedChanged(CompoundButton v, boolean is_checked) {
 					arm_igniter(is_checked);
