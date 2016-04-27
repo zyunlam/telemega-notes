@@ -174,7 +174,7 @@ AC_ARG_WITH(google-key, AS_HELP_STRING([--with-google-key=PATH],
 	    [GOOGLEKEYFILE=$withval], [GOOGLEKEYFILE=$HOME/altusmetrumllc/google-maps-api-key])
 
 if test -r "$GOOGLEKEYFILE" -a -s "$GOOGLEKEYFILE"; then
-	GOOGLEKEY='"'`cat "$GOOGLEKEYFILE"`'"'
+	GOOGLEKEY=`cat "$GOOGLEKEYFILE"`
 	HAVE_GOOGLE_KEY="yes"
 else
 	GOOGLEKEY='null'

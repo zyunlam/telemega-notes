@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_10;
 public class AltosVersion {
 	public final static String version = "@VERSION@";
 
-	public final static String google_maps_api_key = @GOOGLEKEY@;
+	public final static String google_maps_api_key = "@GOOGLEKEY@";
 
 	public static boolean has_google_maps_api_key() {
 		return google_maps_api_key != null && google_maps_api_key.length() > 1;
