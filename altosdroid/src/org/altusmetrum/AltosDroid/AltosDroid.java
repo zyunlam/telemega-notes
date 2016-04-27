@@ -109,9 +109,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	// field to display the version at the bottom of the screen
 	private TextView mVersion;
 
-	private double frequency;
-	private int telemetry_rate;
-
 	private boolean idle_mode = false;
 
 	public Location location = null;
@@ -884,11 +881,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 	}
 
-	void setFrequency(String freq) {
-		try {
-			setFrequency (AltosParse.parse_double_net(freq.substring(11, 17)));
-		} catch (ParseException e) {
-		}
+	void setFrequency(AltosFrequency frequency) {
+		setFrequency (frequency.frequency);
 	}
 
 	void setBaud(int baud) {
@@ -998,22 +992,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		case R.id.select_freq:
 			// Set the TBT radio frequency
 
-			final String[] frequencies = {
-				"Channel 0 (434.550MHz)",
-				"Channel 1 (434.650MHz)",
-				"Channel 2 (434.750MHz)",
-				"Channel 3 (434.850MHz)",
-				"Channel 4 (434.950MHz)",
-				"Channel 5 (435.050MHz)",
-				"Channel 6 (435.150MHz)",
-				"Channel 7 (435.250MHz)",
-				"Channel 8 (435.350MHz)",
-				"Channel 9 (435.450MHz)"
-			};
+			final AltosFrequency[] frequencies = AltosPreferences.common_frequencies();
+			String[] frequency_strings = new String[frequencies.length];
+			for (int i = 0; i < frequencies.length; i++)
+				frequency_strings[i] = frequencies[i].toString();
 
 			AlertDialog.Builder builder_freq = new AlertDialog.Builder(this);
 			builder_freq.setTitle("Pick a frequency");
-			builder_freq.setItems(frequencies,
+			builder_freq.setItems(frequency_strings,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
 							 setFrequency(frequencies[item]);

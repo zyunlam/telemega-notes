@@ -133,6 +133,14 @@
 	<string name="map_type">Map Type</string>
 	<string name="map_source">Map Source</string>
 	<string name="preload_maps">Preload Maps</string>
-	<string name="done">Done</string>
+	<string name="manage_frequencies">Manage Frequencies</string>
+	<string name="done">OK</string>
 	
+	<!-- manage frequencies -->
+	<string name="set">Set</string>
+	<string name="mhz">MHz</string>
+	<string name="remove">Remove</string>
+	<string name="done">OK</string>
+	<string name="frequency">Frequency</string>
+	<string name="description">Description</string>
 </resources>

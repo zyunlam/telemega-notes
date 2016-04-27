@@ -95,7 +95,12 @@
 	<activity android:name=".SetupActivity"
 		  android:label="@string/setup"
                   android:theme="@android:style/Theme.Dialog"
-                  android:configChanges="orientation|keyboardHidden" />
+                  android:configChanges="orientation" />
+		  
+	<activity android:name=".ManageFrequenciesActivity"
+		  android:label="@string/manage_frequencies"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboard" />
 		  
         <service android:name=".TelemetryService" />
 

@@ -111,6 +111,11 @@
           android:layout_height="wrap_content"
 	  android:text="@string/preload_maps"
 	  />
+  <Button android:id="@+id/manage_frequencies"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+	  android:text="@string/manage_frequencies"
+	  />
   <Button android:id="@+id/done"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"

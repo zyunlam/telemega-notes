@@ -37,6 +37,7 @@ public class SetupActivity extends Activity {
 	private Spinner set_units;
 	private Spinner map_type;
 	private Spinner map_source;
+	private Button manage_frequencies;
 	private Button preload_maps;
 	private Button done;
 
@@ -240,6 +241,11 @@ public class SetupActivity extends Activity {
 		add_change(AltosDroid.SETUP_MAP_SOURCE);
 	}
 
+	private void manage_frequencies(){
+		Intent intent = new Intent(this, ManageFrequenciesActivity.class);
+		startActivity(intent);
+	}
+
 	private void preload_maps(){
 		Intent intent = new Intent(this, PreloadMapActivity.class);
 		startActivity(intent);
@@ -293,6 +299,13 @@ public class SetupActivity extends Activity {
 				}
 			});
 
+
+		manage_frequencies = (Button) findViewById(R.id.manage_frequencies);
+		manage_frequencies.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					manage_frequencies();
+				}
+			});
 
 		preload_maps = (Button) findViewById(R.id.preload_maps);
 		preload_maps.setOnClickListener(new OnClickListener() {

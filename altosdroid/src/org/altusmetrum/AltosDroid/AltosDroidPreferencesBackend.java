@@ -53,6 +53,8 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 	}
 
 	public AltosPreferencesBackend node(String key) {
+		if (!nodeExists(key))
+			putBoolean(key, true);
 		return new AltosDroidPreferencesBackend(context, key);
 	}
 
