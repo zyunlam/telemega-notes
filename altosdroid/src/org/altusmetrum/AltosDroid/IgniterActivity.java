@@ -43,7 +43,6 @@ class IgniterItem {
 	public TextView	status_view = null;
 
 	private void update() {
-		AltosDebug.debug("update item %s %s", pretty, status);
 		if (pretty_view != null)
 			pretty_view.setText(pretty);
 		if (status_view != null)
@@ -77,7 +76,6 @@ class IgniterItem {
 	}
 
 	public IgniterItem() {
-		AltosDebug.debug("New igniter item");
 	}
 }
 
@@ -102,9 +100,7 @@ class IgniterAdapter extends ArrayAdapter<IgniterItem> {
 			item.realize(igniter_view,
 				     (TextView) igniter_view.findViewById(R.id.igniter_name),
 				     (TextView) igniter_view.findViewById(R.id.igniter_status));
-			AltosDebug.debug("Realize new igniter view");
-		} else
-			AltosDebug.debug("Reuse existing igniter view");
+		}
 		if (position == selected_item)
 			item.igniter_view.setBackgroundColor(Color.RED);
 		else
@@ -123,11 +119,11 @@ public class IgniterActivity extends Activity {
 	private IgniterAdapter igniters_adapter;
 
 	private boolean is_bound;
-	private boolean timer_running;
 	private Messenger service = null;
 	private final Messenger messenger = new Messenger(new IncomingHandler(this));
 
-	private Timer timer;
+	private Timer query_timer;
+	private boolean query_timer_running;
 
 	private Timer arm_timer;
 	private int arm_remaining;
@@ -156,6 +152,7 @@ public class IgniterActivity extends Activity {
 	private ServiceConnection connection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder binder) {
 			service = new Messenger(binder);
+			query_timer_tick();
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -205,12 +202,16 @@ public class IgniterActivity extends Activity {
 			IgniterItem	item = igniters_adapter.getItem(igniters_adapter.selected_item);
 			FireThread	ft = new FireThread(item.name);
 			ft.run();
+			arm.setChecked(false);
 		}
 	}
 
 	private void arm_igniter(boolean is_checked) {
 		if (is_checked) {
+			arm_timer_stop();
 			arm_timer = new Timer();
+			arm_remaining = 10;
+			arm_set_text();
 			fire.setEnabled(true);
 			arm_timer.scheduleAtFixedRate(new TimerTask() {
 					public void run() {
@@ -218,22 +219,37 @@ public class IgniterActivity extends Activity {
 					}},
 				1000L, 1000L);
 		} else {
-			arm_timer.cancel();
+			arm_timer_stop();
 			fire.setEnabled(false);
 		}
 	}
 
-	private synchronized void timer_tick() {
-		if (timer_running)
+	private synchronized void query_timer_tick() {
+		if (query_timer_running)
 			return;
-		timer_running = true;
-		try {
-			Message msg = Message.obtain(null, TelemetryService.MSG_IGNITER_QUERY);
-			msg.replyTo = messenger;
-			service.send(msg);
-		} catch (RemoteException re) {
-			timer_running = false;
-		}
+		if (service == null)
+			return;
+		query_timer_running = true;
+		Thread thread = new Thread(new Runnable() {
+				public void run() {
+					try {
+						Message msg = Message.obtain(null, TelemetryService.MSG_IGNITER_QUERY);
+						msg.replyTo = messenger;
+						if (service == null) {
+							synchronized(IgniterActivity.this) {
+								query_timer_running = false;
+							}
+						} else
+							service.send(msg);
+					} catch (RemoteException re) {
+						AltosDebug.debug("igniter query thread failed");
+						synchronized(IgniterActivity.this) {
+							query_timer_running = false;
+						}
+					}
+				}
+			});
+		thread.start();
 	}
 
 	private boolean set_igniter(HashMap <String,Integer> status, String name, String pretty) {
@@ -253,7 +269,7 @@ public class IgniterActivity extends Activity {
 	}
 
 	private synchronized void igniter_status(HashMap <String,Integer> status) {
-		timer_running = false;
+		query_timer_running = false;
 		if (status == null) {
 			AltosDebug.debug("no igniter status");
 			return;
@@ -266,24 +282,41 @@ public class IgniterActivity extends Activity {
 			if (!set_igniter(status, name, pretty))
 				break;
 		}
-//		if (igniters_adapter.selected_item >= 0)
-//			igniters_view.setSelection(selected_item);
+	}
+
+	private synchronized void arm_timer_stop() {
+		if (arm_timer != null) {
+			arm_timer.cancel();
+			arm_timer = null;
+		}
+		arm_remaining = 0;
 	}
 
 	private void arm_set_text() {
 		String	text = String.format("Armed %d", arm_remaining);
 
+		if (arm.isChecked())
+			arm.setText(text);
 		arm.setTextOn(text);
 	}
 
 	private void arm_timer_tick() {
 		--arm_remaining;
 		if (arm_remaining <= 0) {
-			timer.cancel();
-			arm.setChecked(false);
-			fire.setEnabled(false);
-		} else
-			arm_set_text();
+			arm_timer_stop();
+			runOnUiThread(new Runnable() {
+					public void run() {
+						arm.setChecked(false);
+						fire.setEnabled(false);
+					}
+				});
+		} else {
+			runOnUiThread(new Runnable() {
+					public void run() {
+						arm_set_text();
+					}
+				});
+		}
 	}
 
 	private void select_item(int position) {
@@ -293,8 +326,6 @@ public class IgniterActivity extends Activity {
 			if (position >= 0) {
 				igniters_view.setItemChecked(position, true);
 				arm.setEnabled(true);
-				arm_remaining = 10;
-				arm_set_text();
 			} else
 				arm.setEnabled(false);
 			igniters_adapter.selected_item = position;
@@ -304,6 +335,7 @@ public class IgniterActivity extends Activity {
 	private class IgniterItemClickListener implements ListView.OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> av, View v, int position, long id) {
+			AltosDebug.debug("select %d\n", position);
 			select_item(position);
 		}
 	}
@@ -325,6 +357,7 @@ public class IgniterActivity extends Activity {
 		igniters_view.setOnItemClickListener(new IgniterItemClickListener());
 
 		fire = (Button) findViewById(R.id.igniter_fire);
+		fire.setEnabled(false);
 		fire.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					fire_igniter();
@@ -352,19 +385,24 @@ public class IgniterActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		timer = new Timer(true);
-		timer.scheduleAtFixedRate(new TimerTask() {
+		query_timer = new Timer(true);
+		query_timer.scheduleAtFixedRate(new TimerTask() {
 				public void run() {
-					timer_tick();
+					query_timer_tick();
 				}},
-			1000L, 1000L);
+			0L, 5000L);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		timer.cancel();
-		timer = null;
+		if (query_timer != null) {
+			query_timer.cancel();
+			query_timer = null;
+		}
+		arm_timer_stop();
+		arm.setChecked(false);
+		fire.setEnabled(false);
 	}
 
 	@Override

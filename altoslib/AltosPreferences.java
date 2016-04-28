@@ -116,6 +116,7 @@ public class AltosPreferences {
 	public final static String	frequency_count = "COUNT";
 	public final static String	frequency_format = "FREQUENCY-%d";
 	public final static String	description_format = "DESCRIPTION-%d";
+	public final static String	frequenciesPreference = "FREQUENCIES";
 
 	/* Units preference */
 
@@ -132,24 +133,29 @@ public class AltosPreferences {
 	static int	map_type;
 
 	public static AltosFrequency[] load_common_frequencies() {
+
 		AltosFrequency[] frequencies = null;
-		boolean	existing = false;
-		existing = backend.nodeExists(common_frequencies_node_name);
 
-		if (existing) {
-			AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
-			int		count = node.getInt(frequency_count, 0);
+		frequencies = (AltosFrequency[]) backend.getSerializable(frequenciesPreference, null);
 
-			frequencies = new AltosFrequency[count];
-			for (int i = 0; i < count; i++) {
-				double	frequency;
-				String	description;
+		if (frequencies == null) {
+			if (backend.nodeExists(common_frequencies_node_name)) {
+				AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
+				int		count = node.getInt(frequency_count, 0);
 
-				frequency = node.getDouble(String.format(frequency_format, i), 0.0);
-				description = node.getString(String.format(description_format, i), null);
-				frequencies[i] = new AltosFrequency(frequency, description);
+				frequencies = new AltosFrequency[count];
+				for (int i = 0; i < count; i++) {
+					double	frequency;
+					String	description;
+
+					frequency = node.getDouble(String.format(frequency_format, i), 0.0);
+					description = node.getString(String.format(description_format, i), null);
+					frequencies[i] = new AltosFrequency(frequency, description);
+				}
 			}
-		} else {
+		}
+
+		if (frequencies == null) {
 			frequencies = new AltosFrequency[10];
 			for (int i = 0; i < 10; i++) {
 				frequencies[i] = new AltosFrequency(434.550 + i * .1,
@@ -159,15 +165,6 @@ public class AltosPreferences {
 		return frequencies;
 	}
 
-	public static void save_common_frequencies(AltosFrequency[] frequencies) {
-		AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
-
-		node.putInt(frequency_count, frequencies.length);
-		for (int i = 0; i < frequencies.length; i++) {
-			node.putDouble(String.format(frequency_format, i), frequencies[i].frequency);
-			node.putString(String.format(description_format, i), frequencies[i].description);
-		}
-	}
 	public static int launcher_serial;
 
 	public static int launcher_channel;
@@ -355,28 +352,10 @@ public class AltosPreferences {
 
 	public static void set_state(int serial, AltosState state, AltosListenerState listener_state) {
 
-		backend.debug("set_state for %d pos %g,%g\n",
-			      serial,
-			      state.gps != null ? state.gps.lat : 0.0,
-			      state.gps != null ? state.gps.lon : 0.0);
-
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		try {
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-
-			AltosSavedState	saved_state = new AltosSavedState(state, listener_state);
-			oos.writeObject(saved_state);
-
-			byte[] bytes = baos.toByteArray();
-
-			synchronized(backend) {
-				backend.putBytes(String.format(statePreferenceFormat, serial), bytes);
-				backend.putInt(statePreferenceLatest, serial);
-				flush_preferences();
-			}
-		} catch (IOException ie) {
-			backend.debug("set_state failed %s\n", ie.toString());
+		synchronized(backend) {
+			backend.putSerializable(String.format(statePreferenceFormat, serial),
+						new AltosSavedState(state, listener_state));
+			backend.putInt(statePreferenceLatest, serial);
 		}
 	}
 
@@ -386,7 +365,6 @@ public class AltosPreferences {
 
 		for (String key : keys) {
 			if (key.startsWith(statePreferenceHead)) {
-				backend.debug("list_states %s\n", key);
 				try {
 					int serial = AltosParse.parse_int(key.substring(statePreferenceHead.length()));
 					states.add(serial);
@@ -412,35 +390,9 @@ public class AltosPreferences {
 	}
 
 	public static AltosSavedState state(int serial) {
-		byte[] bytes = null;
-
-		backend.debug("get state %d\n", serial);
-
 		synchronized(backend) {
-			bytes = backend.getBytes(String.format(statePreferenceFormat, serial), null);
+			return (AltosSavedState) backend.getSerializable(String.format(statePreferenceFormat, serial), null);
 		}
-
-		if (bytes == null) {
-			backend.debug("no state for %d\n", serial);
-			return null;
-		}
-
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-
-		try {
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			AltosSavedState saved_state = (AltosSavedState) ois.readObject();
-			backend.debug("got saved state for %d: %g,%g\n",
-				      serial,
-				      saved_state.state.gps != null ? saved_state.state.gps.lat : 0.0,
-				      saved_state.state.gps != null ? saved_state.state.gps.lon : 0.0);
-			return saved_state;
-		} catch (IOException ie) {
-			backend.debug("IO exception %s\n", ie.toString());
-		} catch (ClassNotFoundException ce) {
-			backend.debug("ClassNotFoundException %s\n", ce.toString());
-		}
-		return null;
 	}
 
 	public static void set_scanning_telemetry(int new_scanning_telemetry) {
@@ -556,7 +508,7 @@ public class AltosPreferences {
 	public static void set_common_frequencies(AltosFrequency[] frequencies) {
 		synchronized(backend) {
 			common_frequencies = frequencies;
-			save_common_frequencies(frequencies);
+			backend.putSerializable(frequenciesPreference, frequencies);
 			flush_preferences();
 		}
 	}

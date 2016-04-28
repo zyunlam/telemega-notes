@@ -17,7 +17,11 @@
 
 package org.altusmetrum.altoslib_10;
 
-public class AltosFrequency {
+import java.io.*;
+import java.util.*;
+import java.text.*;
+
+public class AltosFrequency implements Serializable {
 	public double	frequency;
 	public String	description;
 

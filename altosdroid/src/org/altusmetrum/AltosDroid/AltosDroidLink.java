@@ -170,8 +170,8 @@ public abstract class AltosDroidLink extends AltosLink {
 			}
 			buffer_off = 0;
 		}
-		if (AltosDebug.D)
-			debug_input(in_buffer[buffer_off]);
+//		if (AltosDebug.D)
+//			debug_input(in_buffer[buffer_off]);
 		return in_buffer[buffer_off++];
 	}
 
@@ -207,7 +207,7 @@ public abstract class AltosDroidLink extends AltosLink {
 
 	public void print(String data) {
 		byte[] bytes = data.getBytes();
-		AltosDebug.debug(data.replace('\n', '\\'));
+//		AltosDebug.debug(data.replace('\n', '\\'));
 		for (byte b : bytes)
 			putchar(b);
 	}

@@ -22,7 +22,7 @@ import java.util.prefs.*;
 import org.altusmetrum.altoslib_10.*;
 import javax.swing.filechooser.FileSystemView;
 
-public class AltosUIPreferencesBackend implements AltosPreferencesBackend {
+public class AltosUIPreferencesBackend extends AltosPreferencesBackend {
 
 	private Preferences _preferences = null;
 

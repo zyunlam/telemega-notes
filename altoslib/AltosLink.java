@@ -170,8 +170,8 @@ public abstract class AltosLink implements Runnable {
 		boolean	can_cancel = can_cancel_reply();
 		String	reply = null;
 
-		if (!can_cancel && remote)
-			System.out.printf("Uh-oh, reading remote serial device from swing thread\n");
+//		if (!can_cancel && remote)
+//			System.out.printf("Uh-oh, reading remote serial device from swing thread\n");
 
 		if (remote && can_cancel) {
 			timeout = 500;

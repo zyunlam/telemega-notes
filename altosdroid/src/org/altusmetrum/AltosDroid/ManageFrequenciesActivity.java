@@ -28,6 +28,7 @@ import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
+import android.view.inputmethod.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 
@@ -186,6 +187,13 @@ public class ManageFrequenciesActivity extends Activity {
 		}
 	}
 
+	private void hide_keyboard() {
+		InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+		View view = getCurrentFocus();
+		if (view != null)
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+	}
+
 	private void set() {
 		String	frequency_text = set_frequency.getEditableText().toString();
 		String	description_text = set_description.getEditableText().toString();
@@ -199,6 +207,7 @@ public class ManageFrequenciesActivity extends Activity {
 			changed = true;
 		} catch (ParseException pe) {
 		}
+		hide_keyboard();
 	}
 
 	private void remove() {

@@ -88,7 +88,6 @@ public class AltosMapLoader implements AltosMapTileListener, AltosMapStoreListen
 
 		for (int y = (int) upper_left.y; y <= lower_right.y; y += AltosMap.px_size) {
 			for (int x = (int) upper_left.x; x <= lower_right.x; x += AltosMap.px_size) {
-				listener.debug("Make tile at %d, %d\n", x, y);
 				AltosPointInt	point = new AltosPointInt(x, y);
 				AltosLatLon	ul = transform.lat_lon(point);
 				AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
@@ -174,7 +173,6 @@ public class AltosMapLoader implements AltosMapTileListener, AltosMapStoreListen
 
 		++tiles_loaded_total;
 		++tiles_loaded_layer;
-		listener.debug("total %d layer %d\n", tiles_loaded_total, tiles_loaded_layer);
 
 		if (tiles_loaded_layer == tiles_this_layer) {
 			++layers_loaded;
