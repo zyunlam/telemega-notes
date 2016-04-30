@@ -2,9 +2,9 @@
 :toc!:
 :doctype: article
 
-	Version 1.6.3 contains bug fixes for our host software on
-	desktops, laptops an android devices along with BlueTooth
-	support for Windows.
+	Version 1.6.3 adds idle mode to AltosDroid and has bug fixes
+	for our host software on desktops, laptops an android devices
+	along with BlueTooth support for Windows.
 
 	== AltOS
 
@@ -38,6 +38,24 @@
 
 	== AltosDroid
 
+	AltosDroid new features:
+
+	* Monitor Idle mode. Check state of flight computer while in
+          idle mode over the radio link
+
+	* Fire Igniters. Remotely fire ignires for recovery system
+          ground tests.
+
+	* Remote reboot. Cause the flight computer to reboot over the
+          radio link. This provides a method for switching the flight
+          computer from idle to flight mode without needing to reach
+          the power switch.
+
+	* Configurable frequency menu. Change the set of available
+          frequencies and provide more descriptive names.
+
+	AltosDroid bug fixes:
+
 	* Don't set target location if GPS hasn't locked yet.
 
 	* Fix saving target states so they can be reloaded when the
@@ -47,6 +65,20 @@
 
 	* Fix crash on some Android devices for offline maps when
           changing the map scale or location.
+
+	* Don't require USB OTG support. This kept the latest
+	  AltosDroid from being offered on devices without USB device
+	  support, although it can work without that just fine using
+	  BlueTooth.
+
+	* Don't require bluetooth to be enabled. This allows the
+          application to operate with USB devices or just show old
+          data without turning on the bluetooth radio.
+
+	* Recover old tracker positions when restarting
+          application. This finally allows you to safely stop and
+          restart the application without losing the last known
+          location of any tracker.
 
 	== Documentation
 
