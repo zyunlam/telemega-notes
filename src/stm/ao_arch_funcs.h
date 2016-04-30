@@ -391,13 +391,6 @@ static inline void ao_arch_save_stack(void) {
 
 static inline void ao_arch_restore_stack(void) {
 	uint32_t	sp;
-	uint32_t	control;
-
-	asm("mrs %0,control" : "=&r" (control));
-	control |= (1 << 1);
-	asm("msr control,%0" : : "r" (control));
-	asm("isb");
-
 	sp = (uint32_t) ao_cur_task->sp;
 
 	/* Switch stacks */
@@ -454,14 +447,7 @@ static inline void ao_arch_start_scheduler(void) {
 }
 #endif
 
-static inline void ao_arch_isr_stack(void) {
-	uint32_t	control;
-
-	asm("mrs %0,control" : "=&r" (control));
-	control &= ~(1 << 1);
-	asm("msr control,%0" : : "r" (control));
-	asm("isb");
-}
+#define ao_arch_isr_stack()
 
 #endif
 
