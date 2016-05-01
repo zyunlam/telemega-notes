@@ -263,7 +263,7 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 		telem.update_state(state);
 		telemetry_state.states.put(telem.serial, state);
 		if (state != null) {
-			AltosPreferences.set_state(telem.serial, state, null);
+			AltosPreferences.set_state(state);
 		}
 		send_to_clients();
 	}
@@ -613,24 +613,21 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 		telemetry_state.latest_serial = AltosPreferences.latest_state();
 
 		for (int serial : serials) {
-			AltosSavedState saved_state = AltosPreferences.state(serial);
+			AltosState saved_state = AltosPreferences.state(serial);
 			if (saved_state != null) {
-				if (serial == 0) {
-					serial = saved_state.state.serial;
-					AltosPreferences.set_state(serial, saved_state.state, saved_state.listener_state);
-					AltosPreferences.remove_state(0);
-				}
 				if (telemetry_state.latest_serial == 0)
 					telemetry_state.latest_serial = serial;
 
-				AltosDebug.debug("recovered old state serial %d flight %d\n",
+				AltosDebug.debug("recovered old state serial %d flight %d",
 						 serial,
-						 saved_state.state.flight);
-				if (saved_state.state.gps != null)
-					AltosDebug.debug("\tposition %f,%f\n",
-							 saved_state.state.gps.lat,
-							 saved_state.state.gps.lon);
-				telemetry_state.states.put(serial, saved_state.state);
+						 saved_state.flight);
+				if (saved_state.gps != null)
+					AltosDebug.debug("\tposition %f,%f",
+							 saved_state.gps.lat,
+							 saved_state.gps.lon);
+				telemetry_state.states.put(serial, saved_state);
+			} else {
+				AltosDebug.debug("Failed to recover state for %d", serial);
 			}
 		}
 	}

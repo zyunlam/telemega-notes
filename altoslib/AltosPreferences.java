@@ -350,12 +350,12 @@ public class AltosPreferences {
 		}
 	}
 
-	public static void set_state(int serial, AltosState state, AltosListenerState listener_state) {
+	public static void set_state(AltosState state) {
 
 		synchronized(backend) {
-			backend.putSerializable(String.format(statePreferenceFormat, serial),
-						new AltosSavedState(state, listener_state));
-			backend.putInt(statePreferenceLatest, serial);
+			backend.putSerializable(String.format(statePreferenceFormat, state.serial), state);
+			backend.putInt(statePreferenceLatest, state.serial);
+			flush_preferences();
 		}
 	}
 
@@ -389,9 +389,13 @@ public class AltosPreferences {
 		return latest;
 	}
 
-	public static AltosSavedState state(int serial) {
+	public static AltosState state(int serial) {
 		synchronized(backend) {
-			return (AltosSavedState) backend.getSerializable(String.format(statePreferenceFormat, serial), null);
+			try {
+				return (AltosState) backend.getSerializable(String.format(statePreferenceFormat, serial), null);
+			} catch (Exception e) {
+				return null;
+			}
 		}
 	}
 
