@@ -700,4 +700,8 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 
 	public void failed() {
 	}
+
+	public void error(String reason) {
+		stop_idle_monitor();
+	}
 }

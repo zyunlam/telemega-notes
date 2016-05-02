@@ -113,6 +113,7 @@ altoslib_JAVA = \
 	AltosTelemetrySatellite.java \
 	AltosTelemetryStandard.java \
 	AltosUnitsListener.java \
+	AltosUnknownProduct.java \
 	AltosMs5607.java \
 	AltosIMU.java \
 	AltosMag.java \

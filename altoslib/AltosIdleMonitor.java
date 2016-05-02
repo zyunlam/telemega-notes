@@ -51,7 +51,7 @@ public class AltosIdleMonitor extends Thread {
 		return link.reply_abort;
 	}
 
-	boolean update_state(AltosState state) throws InterruptedException, TimeoutException {
+	boolean update_state(AltosState state) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		boolean		worked = false;
 		boolean		aborted = false;
 
@@ -99,6 +99,8 @@ public class AltosIdleMonitor extends Thread {
 					update_state(state);
 					listener.update(state, listener_state);
 				} catch (TimeoutException te) {
+				} catch (AltosUnknownProduct ae) {
+					listener.error(String.format("Unknown product \"%s\"", ae.product));
 				}
 				if (link.has_error || link.reply_abort) {
 					listener.failed();

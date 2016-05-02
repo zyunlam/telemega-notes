@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 Keith Packard <keithp@keithp.com>
+ * Copyright © 2010 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,10 @@
 
 package org.altusmetrum.altoslib_10;
 
-public interface AltosStateUpdate {
-	public void	update_state(AltosState state) throws InterruptedException, AltosUnknownProduct;
+public class AltosUnknownProduct extends Exception {
+	public String product;
+
+	public AltosUnknownProduct (String in_product) {
+		product = in_product;
+	}
 }

@@ -128,6 +128,19 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		SwingUtilities.invokeLater(r);
 	}
 
+	public void error(final String reason) {
+		Runnable r = new Runnable() {
+				public void run() {
+					disconnect();
+					JOptionPane.showMessageDialog(AltosIdleMonitorUI.this,
+								      reason,
+								      "Error fetching data",
+								      JOptionPane.ERROR_MESSAGE);
+				}
+			};
+		SwingUtilities.invokeLater(r);
+	}
+
 	Container	bag;
 	AltosUIFreqList	frequencies;
 	JTextField	callsign_value;

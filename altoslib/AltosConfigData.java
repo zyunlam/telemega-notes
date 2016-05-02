@@ -476,6 +476,18 @@ public class AltosConfigData implements Iterable<String> {
 	}
 
 
+	public boolean mma655x_inverted() throws AltosUnknownProduct {
+		if (product.startsWith("EasyMega-v1"))
+			return false;
+		if (product.startsWith("TeleMetrum-v2"))
+			return true;
+		if (product.startsWith("TeleMega-v2"))
+			return false;
+		if (product.startsWith("TeleMega-v1"))
+			return false;
+		throw new AltosUnknownProduct(product);
+	}
+
 	public void get_values(AltosConfigValues source) throws AltosConfigDataException {
 
 		/* HAS_FLIGHT */
