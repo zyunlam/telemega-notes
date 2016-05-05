@@ -62,15 +62,6 @@ UninstPage instfiles
 
 ; And the stuff to install
 
-Section "FTDI USB Driver"
-	SetOutPath $INSTDIR
-
-	File "CDM_v2.12.00_WHQL_Certified.exe"
-
-	StrCpy $2 "$INSTDIR\CDM_v2.12.00_WHQL_Certified.exe"
-	ExecWait $2
-SectionEnd
-
 Section "Install Driver" InstDriver
 
 	InstDrv::InitDriverSetup /NOUNLOAD {4D36E96D-E325-11CE-BFC1-08002BE10318} AltusMetrumSerial
@@ -115,6 +106,15 @@ SectionEnd
 
 Section "${REG_NAME} Desktop Shortcut"
 	CreateShortCut "$DESKTOP\${REG_NAME}.lnk" "$INSTDIR\${WIN_APP_EXE}"  "" "$INSTDIR\${WIN_APP_ICON}"
+SectionEnd
+
+Section "FTDI USB Driver"
+	SetOutPath $INSTDIR
+
+	File "CDM_v2.12.00_WHQL_Certified.exe"
+
+	StrCpy $2 "$INSTDIR\CDM_v2.12.00_WHQL_Certified.exe"
+	ExecWait $2
 SectionEnd
 
 Section "Documentation"
