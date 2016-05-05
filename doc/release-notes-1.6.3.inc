@@ -8,8 +8,11 @@
 
 	== AltOS
 
-	There aren't any significant bug fixes or new features in the
-	flight firmware in version 1.6.3.
+	AltOS fixes:
+
+	* Fix hardware flow control on TeleBT v3.0. RTS/CTS is
+	  wired backwards on this board, switch from using the
+	  hardware to driving these pins with software.
 
 	== AltosUI and TeleGPS Applications
 
@@ -35,6 +38,9 @@
 
 	* Fix USB device discovery on Mac OS X El Capitan. This makes
           the connected Altus Metrum USB devices appear again.
+
+	* Fix acceleration data presented in MonitorIdle mode for
+	  TeleMetrum v2.0 flight computers.
 
 	== AltosDroid
 
