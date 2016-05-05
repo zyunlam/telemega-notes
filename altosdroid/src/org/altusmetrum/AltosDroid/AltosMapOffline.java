@@ -133,7 +133,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			if (canvas.quickReject(pt.x, pt.y, pt.x + px_size, pt.y + px_size, Canvas.EdgeType.AA))
 				return;
 
-			AltosImage		altos_image = cache.get(this, store, px_size, px_size);
+			AltosImage		altos_image = this.get_image();
 
 			MapImage 		map_image = (MapImage) altos_image;
 
@@ -150,8 +150,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 				if (t.has_location()) {
 					String	message = null;
 					switch (status) {
-					case AltosMapTile.loading:
-						message = "Loading...";
+					case AltosMapTile.fetching:
+						message = "Fetching...";
 						break;
 					case AltosMapTile.bad_request:
 						message = "Internal error";
@@ -181,14 +181,14 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			}
 		}
 
-		public MapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(listener, upper_left, center, zoom, maptype, px_size, 2);
+		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+			super(cache, upper_left, center, zoom, maptype, px_size, 2);
 		}
 
 	}
 
-	public AltosMapTile new_tile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new MapTile(listener, upper_left, center, zoom, maptype, px_size);
+	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+		return new MapTile(cache, upper_left, center, zoom, maptype, px_size);
 	}
 
 	public AltosMapPath new_path() {

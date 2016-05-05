@@ -35,6 +35,7 @@ public class AltosMapStore {
 	public synchronized void add_listener(AltosMapStoreListener listener) {
 		if (!listeners.contains(listener))
 			listeners.add(listener);
+		listener.notify_store(this, status);
 	}
 
 	public synchronized void remove_listener(AltosMapStoreListener listener) {
@@ -110,7 +111,7 @@ public class AltosMapStore {
 				file.delete();
 			return AltosMapTile.bad_request;
 		}
-		return AltosMapTile.success;
+		return AltosMapTile.fetched;
 	}
 
 	static Object	fetch_lock = new Object();
@@ -118,42 +119,42 @@ public class AltosMapStore {
 	static final long	forbidden_interval = 60l * 1000l * 1000l * 1000l;
 	static final long 	google_maps_ratelimit_ms = 1200;
 
-	static Object	loader_lock = new Object();
+	static Object	fetcher_lock = new Object();
 
 	static LinkedList<AltosMapStore> waiting = new LinkedList<AltosMapStore>();
 	static LinkedList<AltosMapStore> running = new LinkedList<AltosMapStore>();
 
-	static final int concurrent_loaders = 128;
+	static final int concurrent_fetchers = 128;
 
-	static void start_loaders() {
-		while (!waiting.isEmpty() && running.size() < concurrent_loaders) {
+	static void start_fetchers() {
+		while (!waiting.isEmpty() && running.size() < concurrent_fetchers) {
 			AltosMapStore 	s = waiting.remove();
 			running.add(s);
-			Thread lt = s.make_loader_thread();
+			Thread lt = s.make_fetcher_thread();
 			lt.start();
 		}
 	}
 
-	void finish_loader() {
-		synchronized(loader_lock) {
+	void finish_fetcher() {
+		synchronized(fetcher_lock) {
 			running.remove(this);
-			start_loaders();
+			start_fetchers();
 		}
 	}
 
-	void add_loader() {
-		synchronized(loader_lock) {
+	void add_fetcher() {
+		synchronized(fetcher_lock) {
 			waiting.add(this);
-			start_loaders();
+			start_fetchers();
 		}
 	}
 
-	class loader implements Runnable {
+	class fetcher implements Runnable {
 
 		public void run() {
 			try {
 				if (file.exists()) {
-					notify_listeners(AltosMapTile.success);
+					notify_listeners(AltosMapTile.fetched);
 					return;
 				}
 
@@ -170,7 +171,7 @@ public class AltosMapStore {
 					synchronized (fetch_lock) {
 						long startTime = System.nanoTime();
 						new_status = fetch_url();
-						if (new_status == AltosMapTile.success) {
+						if (new_status == AltosMapTile.fetched) {
 							long duration_ms = (System.nanoTime() - startTime) / 1000000;
 							if (duration_ms < google_maps_ratelimit_ms) {
 								try {
@@ -186,17 +187,17 @@ public class AltosMapStore {
 				}
 				notify_listeners(new_status);
 			} finally {
-				finish_loader();
+				finish_fetcher();
 			}
 		}
 	}
 
-	private Thread make_loader_thread() {
-		return new Thread(new loader());
+	private Thread make_fetcher_thread() {
+		return new Thread(new fetcher());
 	}
 
-	private void load() {
-		add_loader();
+	private void fetch() {
+		add_fetcher();
 	}
 
 	private AltosMapStore (String url, File file) {
@@ -204,10 +205,10 @@ public class AltosMapStore {
 		this.file = file;
 
 		if (file.exists())
-			status = AltosMapTile.success;
+			status = AltosMapTile.fetched;
 		else {
-			status = AltosMapTile.loading;
-			load();
+			status = AltosMapTile.fetching;
+			fetch();
 		}
 	}
 

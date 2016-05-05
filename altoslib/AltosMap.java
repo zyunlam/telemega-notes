@@ -328,7 +328,8 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 				if (!tiles.containsKey(point)) {
 					AltosLatLon	ul = transform.lat_lon(point);
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
-					AltosMapTile tile = map_interface.new_tile(this, ul, center, zoom, maptype, px_size);
+					AltosMapTile tile = map_interface.new_tile(cache, ul, center, zoom, maptype, px_size);
+					tile.add_listener(this);
 					tiles.put(point, tile);
 				}
 			}
@@ -345,11 +346,6 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		centre(lat, lon);
 		tiles.clear();
 		make_tiles();
-		for (AltosMapTile tile : tiles.values()) {
-			tile.add_store_listener(this);
-			if (tile.store_status() != AltosMapTile.loading)
-				listener.notify_tile(tile, tile.store_status());
-		}
 		repaint();
 	}
 

@@ -127,8 +127,6 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 	JProgressBar	pbar;
 
-	AltosMapLoader	loader;
-
 	JLabel		site_list_label;
 	JComboBox<AltosLaunchSite>	site_list;
 
@@ -238,7 +236,10 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 						r = r * 1000;
 					loading = true;
 
-					loader.load(latitude, longitude, min_z, max_z, r, all_types());
+					new AltosMapLoader(map.map, this,
+							   latitude, longitude,
+							   min_z, max_z, r, all_types());
+
 				} catch (ParseException pe) {
 					load_button.setSelected(false);
 				}
@@ -270,8 +271,6 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		pane.setLayout(new GridBagLayout());
 
 		map = new AltosUIMapNew();
-
-		loader = new AltosMapLoader(map.map, this);
 
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;

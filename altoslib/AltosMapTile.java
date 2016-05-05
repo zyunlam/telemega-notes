@@ -20,22 +20,23 @@ package org.altusmetrum.altoslib_10;
 import java.io.*;
 import java.util.*;
 
-public abstract class AltosMapTile implements AltosFontListener {
-	AltosMapTileListener	listener;
+public abstract class AltosMapTile implements AltosFontListener, AltosMapStoreListener {
+	LinkedList<AltosMapTileListener>	listeners = new LinkedList<AltosMapTileListener>();
 	public AltosLatLon	upper_left, center;
 	public int		px_size;
 	int		zoom;
 	int		maptype;
 	int		scale;
+	private AltosMapCache	cache;
 	public AltosMapStore	store;
-	public AltosMapCache	cache;
 	public int	status;
 
-	static public final int	success = 0;
-	static public final int	loading = 1;
-	static public final int	failed = 2;
-	static public final int	bad_request = 3;
-	static public final int	forbidden = 4;
+	static public final int	loaded = 0;	/* loaded from file */
+	static public final int	fetched = 1;	/* downloaded to file */
+	static public final int	fetching = 2;	/* downloading from net */
+	static public final int	failed = 3;	/* loading from file failed */
+	static public final int	bad_request = 4;/* downloading failed */
+	static public final int	forbidden = 5;	/* downloading failed */
 
 	private File map_file() {
 		double lat = center.lat;
@@ -79,33 +80,46 @@ public abstract class AltosMapTile implements AltosFontListener {
 	public void font_size_changed(int font_size) {
 	}
 
-	public void set_status(int status) {
+	private synchronized void notify_listeners(int status) {
 		this.status = status;
-		listener.notify_tile(this, status);
+		for (AltosMapTileListener listener : listeners)
+			listener.notify_tile(this, status);
+	}
+
+	public void notify_store(AltosMapStore store, int status) {
+//		System.out.printf("AltosMapTile.notify_store %d\n", status);
+		notify_listeners(status);
 	}
 
 	public void notify_image(AltosImage image) {
-		listener.notify_tile(this, status);
-	}
-
-	public int store_status() {
-		return store.status();
-	}
-
-	public void add_store_listener(AltosMapStoreListener listener) {
-		store.add_listener(listener);
-	}
-
-	public void remove_store_listener(AltosMapStoreListener listener) {
-		store.remove_listener(listener);
+		if (image == null)
+			status = failed;
+		else
+			status = loaded;
+		notify_listeners(status);
 	}
 
 	public abstract void paint(AltosMapTransform t);
 
-	public AltosMapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
-		this.listener = listener;
+	public AltosImage get_image() {
+		if (cache == null)
+			return null;
+		return cache.get(this);
+	}
+
+	public synchronized void add_listener(AltosMapTileListener listener) {
+		if (!listeners.contains(listener))
+			listeners.add(listener);
+		listener.notify_tile(this, status);
+	}
+
+	public synchronized void remove_listener(AltosMapTileListener listener) {
+		listeners.remove(listener);
+	}
+
+	public AltosMapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+		this.cache = cache;
 		this.upper_left = upper_left;
-		this.cache = listener.cache();
 
 		while (center.lon < -180.0)
 			center.lon += 360.0;
@@ -118,11 +132,11 @@ public abstract class AltosMapTile implements AltosFontListener {
 		this.px_size = px_size;
 		this.scale = scale;
 
-		status = AltosMapTile.loading;
 		store = AltosMapStore.get(map_url(), map_file());
+		store.add_listener(this);
 	}
 
-	public AltosMapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		this(listener, upper_left, center, zoom, maptype, px_size, 1);
+	public AltosMapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+		this(cache, upper_left, center, zoom, maptype, px_size, 1);
 	}
 }

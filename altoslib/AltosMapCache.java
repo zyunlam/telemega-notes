@@ -23,25 +23,20 @@ import java.net.*;
 public class AltosMapCache implements AltosMapCacheListener {
 
 	/* An entry in the MapCache */
-	class MapCacheElement implements AltosMapStoreListener {
+	class MapCacheElement implements AltosMapTileListener {
 
 		AltosMapTile		tile;		/* Notify when image has been loaded */
 		AltosImage		image;
-		AltosMapStore		store;
 		long			used;
 
 		class loader implements Runnable {
 			public void run() {
-				if (image != null)
-					tile.notify_image(image);
-				try {
-					image = map_interface.load_image(store.file);
-				} catch (Exception ex) {
+				if (image == null) {
+					try {
+						image = map_interface.load_image(tile.store.file);
+					} catch (Exception ex) {
+					}
 				}
-				if (image == null)
-					tile.set_status(AltosMapTile.failed);
-				else
-					tile.set_status(AltosMapTile.success);
 				tile.notify_image(image);
 			}
 		}
@@ -60,41 +55,21 @@ public class AltosMapCache implements AltosMapCacheListener {
 		}
 
 		public boolean has_map() {
-			return store.status() == AltosMapTile.success;
+			return tile.status == AltosMapTile.loaded;
 		}
 
-		public synchronized void notify_store(AltosMapStore store, int status) {
-			switch (status) {
-			case AltosMapTile.loading:
-				break;
-			case AltosMapTile.success:
+		public synchronized void notify_tile(AltosMapTile tile, int status) {
+			if (status == AltosMapTile.fetched) {
+				System.out.printf("tile fetched, loading image\n");
 				load();
-				break;
-			default:
-				tile.set_status(status);
-				tile.notify_image(null);
 			}
 		}
 
-		public MapCacheElement(AltosMapTile tile, AltosMapStore store) throws IOException {
+		public MapCacheElement(AltosMapTile tile) {
 			this.tile = tile;
 			this.image = null;
-			this.store = store;
 			this.used = 0;
-
-			int status = store.status();
-			switch (status) {
-			case AltosMapTile.loading:
-				store.add_listener(this);
-				break;
-			case AltosMapTile.success:
-				load();
-				break;
-			default:
-				tile.set_status(status);
-				tile.notify_image(null);
-				break;
-			}
+			tile.add_listener(this);
 		}
 	}
 
@@ -135,7 +110,7 @@ public class AltosMapCache implements AltosMapCacheListener {
 		}
 	}
 
-	public AltosImage get(AltosMapTile tile, AltosMapStore store, int width, int height) {
+	public AltosImage get(AltosMapTile tile) {
 		int		oldest = -1;
 		long		age = used;
 
@@ -148,7 +123,7 @@ public class AltosMapCache implements AltosMapCacheListener {
 					oldest = i;
 					break;
 				}
-				if (store.equals(element.store)) {
+				if (tile.store.equals(element.tile.store)) {
 					element.used = used++;
 					return element.image;
 				}
@@ -158,24 +133,15 @@ public class AltosMapCache implements AltosMapCacheListener {
 				}
 			}
 
-			try {
-				element = new MapCacheElement(tile, store);
-				element.used = used++;
-				if (elements[oldest] != null)
-					elements[oldest].flush();
+			element = new MapCacheElement(tile);
+			element.used = used++;
+			if (elements[oldest] != null)
+				elements[oldest].flush();
 
-				elements[oldest] = element;
-
-				if (element.image == null)
-					tile.set_status(AltosMapTile.loading);
-				else
-					tile.set_status(AltosMapTile.success);
-
-				return element.image;
-			} catch (IOException e) {
-				tile.set_status(AltosMapTile.failed);
-				return null;
-			}
+			elements[oldest] = element;
+			System.out.printf("AltosMapCache.get image ? %s\n",
+					  element.image == null ? "false" : "true");
+			return element.image;
 		}
 	}
 
