@@ -56,14 +56,29 @@ Function openLinkNewWindow
   Exch
   Push $0
   Exch
- 
-  ReadRegStr $0 HKCR "http\shell\open\command" ""
+
+  ReadRegStr $1 HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoice" "Progid"
+  IfErrors iexplore
+
+  Goto foundbrowser
+iexplore:
+  StrCpy $1 "IE.AssocFile.HTM"
+
+foundbrowser:  
+
+  StrCpy $2 "\shell\open\command"
+
+  StrCpy $3 $1$2
+
+  ReadRegStr $0 HKCR $3 ""
+
 # Get browser path
-    DetailPrint $0
+  DetailPrint $0
+ 
   StrCpy $2 '"'
   StrCpy $1 $0 1
   StrCmp $1 $2 +2 # if path is not enclosed in " look for space as final char
-    StrCpy $2 ' '
+  StrCpy $2 ' '
   StrCpy $3 1
   loop:
     StrCpy $1 $0 1 $3
