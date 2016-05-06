@@ -58,50 +58,28 @@
 		doesn't, the most likely reason is that your Android
 		device doesn't support USB On-the-go.
       
-    	=== Configuring AltosDroid
+	=== AltosDroid Menu
 
-		There are several configuration and operation
-		parameters available in the AltosDroid menu.
-      
+		The main AltosDroid menu has a selection of operation
+		and configuration options.
+
+		Connect a device::
+
+		Offers a menu of available TeleBT devices, and an
+		option to scan for additional devices.
+
+		Disconnect device::
+
+		Disconnects the current TeleBT or TeleDongle
+		device. You can reconnect TeleBT over bluetooth by
+		using Connect a Device. You can reconnect a USB device
+		by unplugging it and then plugging it back in.
+
 		Select radio frequency::
 
 		This selects which frequency to listen on by bringing
 		up a menu of pre-set radio frequencies. Pick the one
 		which matches your altimeter.
-	
-		Select data rate::
-
-		Altus Metrum transmitters can be configured to operate
-		at lower data rates to improve transmission range. If
-		you have configured your device to do this, this menu
-		item allows you to change the receiver to match.
-	
-		Change units::
-
-		This toggles between metric and imperial units.
-	
-		Load maps::
-
-		Brings up a dialog allowing you to download offline
-		map tiles so that you can have maps available even if
-		you have no network connectivity at the launch site.
-	
-		Map type::
-
-		Displays a menu of map types and lets you select
-		one. Hybrid maps include satellite images with a
-		roadmap overlaid. Satellite maps dispense with the
-		roadmap overlay. Roadmap shows just the roads. Terrain
-		includes roads along with shadows indicating changes
-		in elevation, and other geographical features.
-	
-		Toggle Online/Offline maps::
-
-		Switches between online and offline maps. Online maps
-		will show a 'move to current position' icon in the
-		upper right corner, while offline maps will have
-		copyright information all over the map. Otherwise,
-		they're pretty similar.
 	
 		Select Tracker::
 
@@ -115,6 +93,93 @@
 
 		Deletes all information about a transmitting device.
 	
+		Setup::
+
+		Offers additional configuration operations. See
+		<<_setup>>.
+
+		Idle Mode::
+
+		Communicate with an altimeter in Idle mode. See <<_idle_mode>>
+
+		Quit::
+
+		Shuts down AltosDroid.
+
+	=== Setup
+
+		Telemetry Rate::
+
+		Altus Metrum transmitters can be configured to operate
+		at lower data rates to improve transmission range. If
+		you have configured your device to do this, this menu
+		item allows you to change the receiver to match.
+	
+		Units::
+
+		Selects which units used to report values.
+	
+		Map Type::
+
+		Displays a menu of map types and lets you select
+		one. Hybrid maps include satellite images with a
+		roadmap overlaid. Satellite maps dispense with the
+		roadmap overlay. Roadmap shows just the roads. Terrain
+		includes roads along with shadows indicating changes
+		in elevation, and other geographical features.
+	
+		Map Source::
+
+		Select between online and offline maps. Online maps
+		will show a 'move to current position' icon in the
+		upper right corner, while offline maps will have
+		copyright information all over the map. Otherwise,
+		they're pretty similar.
+	
+		Preload Maps::
+
+		Brings up a dialog allowing you to download offline
+		map tiles so that you can have maps available even if
+		you have no network connectivity at the launch site.
+	
+		Manage Frequencies::
+
+		This presents a dialog containing the current list of
+		frequencies that will be show in the 'Select radio
+		frequency' menu. You can change the label for existing
+		frequencies, delete or add new frequencies.
+
+	=== Idle Mode
+
+		Callsign::
+
+		Lets you configure the callsign used by AltosDroid to
+		communicate with the flight computer. The callsign on
+		the two devices must match or the communication will
+		fail. This provides a modest amount of protection
+		against accidentally controlling another persons
+		flight computer.
+
+		Monitor::
+
+		This provides similar information to monitoring the
+		telemetry stream from a flight computer in flight
+		mode. The title of the application will change to
+		include (idle) so you can tell this mode is active.
+
+		Reboot::
+
+		Remotely reboots the flight computer. This is useful
+		when the flight computers turned on while the airframe
+		is horizontal and you want to restart the flight
+		computers in pad mode after raising the airframe to
+		vertical.
+
+		Fire Igniters::
+
+		Remotely control igniters for ground testing recovery
+		systems.
+
 	=== AltosDroid Flight Monitoring
 
 		AltosDroid is designed to mimic the AltosUI flight
@@ -253,7 +318,7 @@
 
 		Bearing::
 
-		This is the aziumuth from true north for the rocket
+		This is the azimuth from true north for the rocket
 		from the android device. Use this in combination with
 		the Elevation value to help locate the rocket in the
 		sky, or at least to help point the antenna in the
@@ -300,7 +365,7 @@
 	
 		Bearing::
 	    
-		This is the aziumuth from true north for the rocket
+		This is the azimuth from true north for the rocket
 		from the android device. Use this in combination with
 		the Elevation value to help locate the rocket in the
 		sky, or at least to help point the antenna in the
@@ -328,7 +393,8 @@
 	      
 		Max Height::
 
-		Shows the maximum height above launch pad.
+		Shows the maximum height above launch pad seen during
+		the flight.
 	      
 		Max Speed::
 

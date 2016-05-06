@@ -105,6 +105,23 @@ extern __code __at (0x00aa) uint8_t ao_usb_descriptors [];
 #ifndef AO_USB_OUT_EP
 #define AO_USB_OUT_EP		4
 #define AO_USB_IN_EP		5
+#define AO_USB_IN2_EP		6
+#endif
+
+#ifndef AO_USB_HAS_OUT
+#define AO_USB_HAS_OUT	1
+#endif
+
+#ifndef AO_USB_HAS_IN
+#define AO_USB_HAS_IN	1
+#endif
+
+#ifndef AO_USB_HAS_INT
+#define AO_USB_HAS_INT	1
+#endif
+
+#ifndef AO_USB_HAS_IN2
+#define AO_USB_HAS_IN2	0
 #endif
 
 /*

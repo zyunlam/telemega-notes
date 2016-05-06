@@ -269,6 +269,10 @@ typedef int16_t accel_t;
 
 #define AO_ACCEL_INVERT		4095
 
+#ifndef AO_MMA655X_INVERT
+#error AO_MMA655X_INVERT not defined
+#endif
+
 #define ao_data_accel(packet)			((packet)->mma655x)
 #if AO_MMA655X_INVERT
 #define ao_data_accel_cook(packet)		(AO_ACCEL_INVERT - (packet)->mma655x)

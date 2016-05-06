@@ -24,8 +24,8 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_9.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class AltosIgniteUI
 	extends AltosUIDialog
@@ -47,6 +47,8 @@ public class AltosIgniteUI
 
 	int		time_remaining;
 	boolean		timer_running;
+
+	int		poll_remaining;
 
 	LinkedBlockingQueue<String>	command_queue;
 
@@ -256,6 +258,7 @@ public class AltosIgniteUI
 
 	void set_ignite_status() {
 		getting_status = false;
+		poll_remaining = 2;
 		if (!visible) {
 			visible = true;
 			setVisible(true);
@@ -263,6 +266,10 @@ public class AltosIgniteUI
 	}
 
 	void poll_ignite_status() {
+		if (poll_remaining > 0) {
+			--poll_remaining;
+			return;
+		}
 		if (!getting_status) {
 			getting_status = true;
 			send_command("get_status");

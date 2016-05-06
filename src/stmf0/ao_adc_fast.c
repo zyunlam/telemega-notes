@@ -72,7 +72,9 @@ _ao_adc_start(void)
 			    (1 << STM_DMA_CCR_MINC) |
 			    (0 << STM_DMA_CCR_PINC) |
 			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR) |
+			    (1 << STM_DMA_CCR_TCIE));
+
 	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1), ao_adc_dma_done);
 	ao_dma_start(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
 
@@ -83,7 +85,6 @@ void
 ao_adc_init(void)
 {
 	uint32_t	chselr;
-	int		i;
 
 	/* Reset ADC */
 	stm_rcc.apb2rstr |= (1 << STM_RCC_APB2RSTR_ADCRST);
@@ -157,12 +158,13 @@ ao_adc_init(void)
 	/* Shortest sample time */
 	stm_adc.smpr = STM_ADC_SMPR_SMP_1_5 << STM_ADC_SMPR_SMP;
 
+	/* Turn off enable and start */
+	stm_adc.cr &= ~((1 << STM_ADC_CR_ADEN) | (1 << STM_ADC_CR_ADSTART));
+
 	/* Calibrate */
 	stm_adc.cr |= (1 << STM_ADC_CR_ADCAL);
-	for (i = 0; i < 0xf000; i++) {
-		if ((stm_adc.cr & (1 << STM_ADC_CR_ADCAL)) == 0)
-			break;
-	}
+	while ((stm_adc.cr & (1 << STM_ADC_CR_ADCAL)) != 0)
+		;
 
 	/* Enable */
 	stm_adc.cr |= (1 << STM_ADC_CR_ADEN);

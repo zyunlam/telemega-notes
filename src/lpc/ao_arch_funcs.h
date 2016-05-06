@@ -227,6 +227,28 @@ ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
 void
 ao_spi_init(void);
 
+static inline void
+ao_spi_send_sync(const void *block, uint16_t len, uint8_t spi_index)
+{
+	ao_spi_send(block, len, spi_index);
+}
+
+static inline void ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
+{
+	struct lpc_ssp	*lpc_ssp;
+	switch (spi_index) {
+	case 0:
+		lpc_ssp = &lpc_ssp0;
+		break;
+	case 1:
+		lpc_ssp = &lpc_ssp1;
+		break;
+	}
+	lpc_ssp->dr = byte;
+	while ((lpc_ssp->sr & (1 << LPC_SSP_SR_RNE)) == 0);
+	(void) lpc_ssp->dr;
+}
+
 #define ao_spi_init_cs(port, mask) do {					\
 		uint8_t __bit__;					\
 		for (__bit__ = 0; __bit__ < 32; __bit__++) {		\

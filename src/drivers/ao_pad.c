@@ -50,7 +50,11 @@ ao_siren(uint8_t v)
 #ifdef AO_SIREN
 	ao_gpio_set(AO_SIREN_PORT, AO_SIREN_PIN, AO_SIREN, v);
 #else
+#if HAS_BEEP
 	ao_beep(v ? AO_BEEP_MID : 0);
+#else
+	(void) v;
+#endif
 #endif
 }
 
@@ -59,13 +63,15 @@ ao_strobe(uint8_t v)
 {
 #ifdef AO_STROBE
 	ao_gpio_set(AO_STROBE_PORT, AO_STROBE_PIN, AO_STROBE, v);
+#else
+	(void) v;
 #endif
 }
 
 static void
 ao_pad_run(void)
 {
-	uint8_t	pins;
+	AO_PORT_TYPE	pins;
 
 	for (;;) {
 		while (!ao_pad_ignite)
@@ -90,17 +96,27 @@ ao_pad_run(void)
 		if (ao_pad_ignite & (1 << 3))
 			pins |= (1 << AO_PAD_PIN_3);
 #endif
-		AO_PAD_PORT = (AO_PAD_PORT & (~AO_PAD_ALL_PINS)) | pins;
+		PRINTD("ignite pins 0x%x\n", pins);
+		ao_gpio_set_bits(AO_PAD_PORT, pins);
 		while (ao_pad_ignite) {
 			ao_pad_ignite = 0;
 
 			ao_delay(AO_PAD_FIRE_TIME);
 		}
-		AO_PAD_PORT &= ~(AO_PAD_ALL_PINS);
+		ao_gpio_clr_bits(AO_PAD_PORT, pins);
+		PRINTD("turn off pins 0x%x\n", pins);
 	}
 }
 
 #define AO_PAD_ARM_SIREN_INTERVAL	200
+
+#ifndef AO_PYRO_R_PYRO_SENSE
+#define AO_PYRO_R_PYRO_SENSE	100
+#define AO_PYRO_R_SENSE_GND	27
+#define AO_FIRE_R_POWER_FET	100
+#define AO_FIRE_R_FET_SENSE	100
+#define AO_FIRE_R_SENSE_GND	27
+#endif
 
 static void
 ao_pad_monitor(void)
@@ -109,7 +125,7 @@ ao_pad_monitor(void)
 	uint8_t			sample;
 	__pdata uint8_t		prev = 0, cur = 0;
 	__pdata uint8_t		beeping = 0;
-	__xdata struct ao_data	*packet;
+	__xdata volatile struct ao_data	*packet;
 	__pdata uint16_t	arm_beep_time = 0;
 
 	sample = ao_data_head;
@@ -120,12 +136,18 @@ ao_pad_monitor(void)
 				ao_sleep((void *) DATA_TO_XDATA(&ao_data_head));
 			);
 
+
 		packet = &ao_data_ring[sample];
 		sample = ao_data_ring_next(sample);
 
 		pyro = packet->adc.pyro;
 
-#define VOLTS_TO_PYRO(x) ((int16_t) ((x) * 27.0 / 127.0 / 3.3 * 32767.0))
+#define VOLTS_TO_PYRO(x) ((int16_t) ((x) * ((1.0 * AO_PYRO_R_SENSE_GND) / \
+					    (1.0 * (AO_PYRO_R_SENSE_GND + AO_PYRO_R_PYRO_SENSE)) / 3.3 * AO_ADC_MAX)))
+
+
+#define VOLTS_TO_FIRE(x) ((int16_t) ((x) * ((1.0 * AO_FIRE_R_SENSE_GND) / \
+					    (1.0 * (AO_FIRE_R_SENSE_GND + AO_FIRE_R_FET_SENSE)) / 3.3 * AO_ADC_MAX)))
 
 		/* convert ADC value to voltage in tenths, then add .2 for the diode drop */
 		query.battery = (packet->adc.batt + 96) / 192 + 2;
@@ -133,13 +155,15 @@ ao_pad_monitor(void)
 		if (pyro > VOLTS_TO_PYRO(10)) {
 			query.arm_status = AO_PAD_ARM_STATUS_ARMED;
 			cur |= AO_LED_ARMED;
-		} else if (pyro < VOLTS_TO_PYRO(5)) {
-			query.arm_status = AO_PAD_ARM_STATUS_DISARMED;
-			arm_beep_time = 0;
-		} else {
+#if AO_FIRE_R_POWER_FET
+		} else if (pyro > VOLTS_TO_PYRO(5)) {
 			if ((ao_time() % 100) < 50)
 				cur |= AO_LED_ARMED;
 			query.arm_status = AO_PAD_ARM_STATUS_UNKNOWN;
+			arm_beep_time = 0;
+#endif
+		} else {
+			query.arm_status = AO_PAD_ARM_STATUS_DISARMED;
 			arm_beep_time = 0;
 		}
 		if ((ao_time() - ao_pad_packet_time) > AO_SEC_TO_TICKS(2))
@@ -165,22 +189,39 @@ ao_pad_monitor(void)
 			 *	27k            /
 			 *		gnd ---
 			 *
+			 *		v_pyro \
+			 *	200k		igniter
+			 *		output /
+			 *	200k           \
+			 *		sense   relay
+			 *	22k            /
+			 *		gnd ---
+			 *
 			 *	If the relay is closed, then sense will be 0
 			 *	If no igniter is present, then sense will be v_pyro * 27k/227k = pyro * 127 / 227 ~= pyro/2
 			 *	If igniter is present, then sense will be v_pyro * 27k/127k ~= v_pyro / 20 = pyro
 			 */
 
+#if AO_FIRE_R_POWER_FET
 			if (sense <= pyro / 8) {
 				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_CLOSED;
 				if ((ao_time() % 100) < 50)
 					cur |= AO_LED_CONTINUITY(c);
-			}
-			else if (pyro / 8 * 3 <= sense && sense <= pyro / 8 * 5)
+			} else
+			if (pyro / 8 * 3 <= sense && sense <= pyro / 8 * 5)
 				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
 			else if (pyro / 8 * 7 <= sense) {
 				status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
 				cur |= AO_LED_CONTINUITY(c);
 			}
+#else
+			if (sense >= pyro / 8 * 5) {
+				status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
+				cur |= AO_LED_CONTINUITY(c);
+			} else {
+				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
+			}
+#endif
 			query.igniter_status[c] = status;
 		}
 		if (cur != prev) {
@@ -240,8 +281,14 @@ ao_pad_read_box(void)
 	l = byte & 0xf;
 	return h * 10 + l;
 }
-#else
-#define ao_pad_read_box()	0
+#endif
+
+#if HAS_FIXED_PAD_BOX
+#define ao_pad_read_box()	ao_config.pad_box
+#endif
+
+#ifdef PAD_BOX
+#define ao_pad_read_box()	PAD_BOX
 #endif
 
 static void

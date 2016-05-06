@@ -99,7 +99,7 @@ ao_clock_init(void)
 				 (1 << LPC_SCB_SYSAHBCLKCTRL_FLASHARRAY) |
 				 (1 << LPC_SCB_SYSAHBCLKCTRL_GPIO) |
 				 (1 << LPC_SCB_SYSAHBCLKCTRL_IOCON));
-				 
+
 	/* Enable the brown-out detection at the highest voltage to
 	 * make sure the flash part remains happy
 	 */
@@ -112,21 +112,21 @@ ao_clock_init(void)
 	/* Turn the IRC clock back on */
 	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_IRC_PD);
 	ao_clock_delay();
-	
+
 	/* Switch to the IRC clock */
 	lpc_scb.mainclksel = LPC_SCB_MAINCLKSEL_SEL_IRC << LPC_SCB_MAINCLKSEL_SEL;
 	lpc_scb.mainclkuen = (0 << LPC_SCB_MAINCLKUEN_ENA);
 	lpc_scb.mainclkuen = (1 << LPC_SCB_MAINCLKUEN_ENA);
 	while (!(lpc_scb.mainclkuen & (1 << LPC_SCB_MAINCLKUEN_ENA)))
 		;
-	
+
 	/* Switch USB to the main clock */
 	lpc_scb.usbclksel = (LPC_SCB_USBCLKSEL_SEL_MAIN_CLOCK << LPC_SCB_USBCLKSEL_SEL);
 	lpc_scb.usbclkuen = (0 << LPC_SCB_USBCLKUEN_ENA);
 	lpc_scb.usbclkuen = (1 << LPC_SCB_USBCLKUEN_ENA);
 	while (!(lpc_scb.usbclkuen & (1 << LPC_SCB_USBCLKUEN_ENA)))
 		;
-	
+
 	/* Find a PLL post divider ratio that gets the FCCO in range */
 	for (p = 0; p < 4; p++)
 		if (AO_LPC_CLKOUT << (1 + p) >= AO_LPC_FCCO_MIN)
@@ -163,12 +163,12 @@ ao_clock_init(void)
 	lpc_scb.syspllclkuen = (1 << LPC_SCB_SYSPLLCLKUEN_ENA);
 	while (!(lpc_scb.syspllclkuen & (1 << LPC_SCB_SYSPLLCLKUEN_ENA)))
 		;
-	
+
 	/* Turn on the PLL */
 	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_SYSPLL_PD);
 
 	/* Wait for it to lock */
-	
+
 	for (i = 0; i < 20000; i++)
 		if (lpc_scb.syspllstat & (1 << LPC_SCB_SYSPLLSTAT_LOCK))
 			break;
@@ -199,7 +199,7 @@ ao_clock_init(void)
 	lpc_scb.usbpllclkuen = (1 << LPC_SCB_USBPLLCLKUEN_ENA);
 	while (!(lpc_scb.usbpllclkuen & (1 << LPC_SCB_USBPLLCLKUEN_ENA)))
 		;
-	
+
 	/* Power down everything we don't need */
 	lpc_scb.pdruncfg = ((1 << LPC_SCB_PDRUNCFG_IRCOUT_PD) |
 			    (1 << LPC_SCB_PDRUNCFG_IRC_PD) |

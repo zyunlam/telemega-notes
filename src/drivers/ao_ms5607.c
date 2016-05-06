@@ -24,9 +24,13 @@
 __xdata struct ao_ms5607_prom	ao_ms5607_prom;
 static __xdata uint8_t	  	ms5607_configured;
 
+#ifndef AO_MS5607_SPI_SPEED
+#define AO_MS5607_SPI_SPEED	AO_SPI_SPEED_FAST
+#endif
+
 static void
 ao_ms5607_start(void) {
-	ao_spi_get_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, AO_MS5607_SPI_INDEX, AO_SPI_SPEED_FAST);
+	ao_spi_get_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, AO_MS5607_SPI_INDEX, AO_MS5607_SPI_SPEED);
 }
 
 static void

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.util.*;
@@ -24,7 +24,7 @@ import java.lang.Math;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class AltosMapLoader implements AltosMapTileListener, AltosMapStoreListener {
+public class AltosMapLoader extends Thread implements AltosMapTileListener {
 	AltosMapLoaderListener	listener;
 
 	double	latitude, longitude;
@@ -88,14 +88,11 @@ public class AltosMapLoader implements AltosMapTileListener, AltosMapStoreListen
 
 		for (int y = (int) upper_left.y; y <= lower_right.y; y += AltosMap.px_size) {
 			for (int x = (int) upper_left.x; x <= lower_right.x; x += AltosMap.px_size) {
-				listener.debug("Make tile at %d, %d\n", x, y);
 				AltosPointInt	point = new AltosPointInt(x, y);
 				AltosLatLon	ul = transform.lat_lon(point);
 				AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
-				AltosMapTile	tile = map.map_interface.new_tile(this, ul, center, zoom, maptype, AltosMap.px_size);
-				tile.add_store_listener(this);
-				if (tile.store_status() != AltosMapTile.loading)
-					notify_tile(tile, tile.store_status());
+				AltosMapTile	tile = map.map_interface.new_tile(null, ul, center, zoom, maptype, AltosMap.px_size);
+				tile.add_listener(this);
 			}
 		}
 	}
@@ -124,7 +121,7 @@ public class AltosMapLoader implements AltosMapTileListener, AltosMapStoreListen
 		do_load();
 	}
 
-	private void start_load() {
+	public void run() {
 
 		cur_z = min_z;
 		int ntype = 0;
@@ -139,67 +136,64 @@ public class AltosMapLoader implements AltosMapTileListener, AltosMapStoreListen
 
 		cur_type = next_type(0);
 
+		tiles_total = 0;
 		for (int z = min_z; z <= max_z; z++)
-			tiles_total += tiles_per_layer(z);
+			tiles_total += tiles_per_layer(z) * ntype;
 
 		layers_total = (max_z - min_z + 1) * ntype;
 		layers_loaded = 0;
 		tiles_loaded_total = 0;
 
-		listener.debug("total tiles %d\n", tiles_total);
+		listener.debug("total tiles %d layers %d\n", tiles_total, layers_total);
 
 		listener.loader_start(tiles_total);
 		do_load();
 	}
 
-	public void load(double latitude, double longitude, int min_z, int max_z, double radius, int all_types) {
-		listener.debug("lat %f lon %f min_z %d max_z %d radius %f all_types %d\n",
-			       latitude, longitude, min_z, max_z, radius, all_types);
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.min_z = min_z;
-		this.max_z = max_z;
-		this.radius = radius;
-		this.all_types = all_types;
-		start_load();
-	}
-
-	public synchronized void notify_store(AltosMapStore store, int status) {
+	public synchronized void notify_tile(AltosMapTile tile, int status) {
 		boolean	do_next = false;
-		if (status == AltosMapTile.loading)
+		if (status == AltosMapTile.fetching)
 			return;
+
+		tile.remove_listener(this);
 
 		if (layers_loaded >= layers_total)
 			return;
 
 		++tiles_loaded_total;
 		++tiles_loaded_layer;
-		listener.debug("total %d layer %d\n", tiles_loaded_total, tiles_loaded_layer);
+
+		listener.debug("AltosMapLoader.notify_tile status %d total %d of %d layer %d of %d\n",
+			       status, tiles_loaded_total, tiles_total, tiles_loaded_layer, tiles_this_layer);
 
 		if (tiles_loaded_layer == tiles_this_layer) {
 			++layers_loaded;
 			listener.debug("%d layers loaded\n", layers_loaded);
-			if (layers_loaded == layers_total) {
-				listener.loader_done(tiles_total);
-				return;
-			} else {
-				do_next = true;
-			}
+			do_next = true;
 		}
-		listener.loader_notify(tiles_loaded_total,
-				       tiles_total, store.file.toString());
-		if (do_next)
-			next_load();
+
+		if (tiles_loaded_total == tiles_total)
+			listener.loader_done(tiles_total);
+		else {
+			listener.loader_notify(tiles_loaded_total,
+					       tiles_total, tile.store.file.toString());
+			if (do_next)
+				next_load();
+		}
 	}
 
-	public synchronized void notify_tile(AltosMapTile tile, int status) {
-		notify_store(tile.store, status);
-	}
-
-	public AltosMapCache cache() { return map.cache(); }
-
-	public AltosMapLoader(AltosMap map, AltosMapLoaderListener listener) {
+	public AltosMapLoader(AltosMap map, AltosMapLoaderListener listener,
+			      double latitude, double longitude, int min_z, int max_z, double radius, int all_types) {
+		listener.debug("lat %f lon %f min_z %d max_z %d radius %f all_types %d\n",
+			       latitude, longitude, min_z, max_z, radius, all_types);
 		this.map = map;
 		this.listener = listener;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.min_z = min_z;
+		this.max_z = max_z;
+		this.radius = radius;
+		this.all_types = all_types;
+		start();
 	}
 }

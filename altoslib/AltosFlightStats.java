@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 
@@ -57,7 +57,7 @@ public class AltosFlightStats {
 		}
 
 		if (state == null)
-			return 0;
+			return AltosLib.MISSING;
 
 		double	landed_height = state.height();
 
@@ -65,7 +65,7 @@ public class AltosFlightStats {
 
 		boolean	above = true;
 
-		double	landed_time = -1000;
+		double	landed_time = AltosLib.MISSING;
 
 		for (AltosState s : states) {
 			state = s;
@@ -73,14 +73,12 @@ public class AltosFlightStats {
 			if (state.height() > landed_height + 10) {
 				above = true;
 			} else {
-				if (above && state.height() < landed_height + 2) {
+				if (above && Math.abs(state.height() - landed_height) < 2) {
 					above = false;
 					landed_time = state.time;
 				}
 			}
 		}
-		if (landed_time == -1000)
-			landed_time = state.time;
 		return landed_time;
 	}
 
@@ -96,10 +94,8 @@ public class AltosFlightStats {
 				break;
 		}
 		if (state == null)
-			return 0;
+			return AltosLib.MISSING;
 
-		if (boost_time == AltosLib.MISSING)
-			boost_time = state.time;
 		return boost_time;
 	}
 
@@ -122,6 +118,13 @@ public class AltosFlightStats {
 		has_imu = false;
 		has_mag = false;
 		has_orient = false;
+
+		for (int s = AltosLib.ao_flight_startup; s <= AltosLib.ao_flight_landed; s++) {
+			state_count[s] = 0;
+			state_speed[s] = 0.0;
+			state_accel[s] = 0.0;
+		}
+
 		for (AltosState state : states) {
 			if (serial == AltosLib.MISSING && state.serial != AltosLib.MISSING)
 				serial = state.serial;
@@ -139,10 +142,13 @@ public class AltosFlightStats {
 				has_flight_data = true;
 
 			int state_id = state.state();
-			if (state.time >= boost_time && state_id < AltosLib.ao_flight_boost)
+			if (boost_time != AltosLib.MISSING && state.time >= boost_time && state_id < AltosLib.ao_flight_boost) {
 				state_id = AltosLib.ao_flight_boost;
-			if (state.time >= landed_time && state_id < AltosLib.ao_flight_landed)
+			}
+			if (landed_time != AltosLib.MISSING && state.time >= landed_time && state_id < AltosLib.ao_flight_landed) {
 				state_id = AltosLib.ao_flight_landed;
+			}
+
 			if (state.gps != null && state.gps.locked) {
 				year = state.gps.year;
 				month = state.gps.month;

@@ -348,6 +348,7 @@ struct ao_adc {
  */
 
 #define HAS_MMA655X		1
+#define AO_MMA655X_INVERT	0
 #define AO_MMA655X_SPI_INDEX	AO_SPI_1_PE13_PE14_PE15
 #define AO_MMA655X_CS_PORT	(&stm_gpiod)
 #define AO_MMA655X_CS_PIN	4

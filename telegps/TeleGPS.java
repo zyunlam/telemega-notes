@@ -24,8 +24,8 @@ import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
 import java.text.*;
-import org.altusmetrum.altoslib_9.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class TeleGPS
 	extends AltosUIFrame

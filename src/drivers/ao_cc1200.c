@@ -20,6 +20,9 @@
 #include <ao_exti.h>
 #include <ao_fec.h>
 #include <ao_packet.h>
+#if HAS_PAD
+#include <ao_pad.h>
+#endif
 
 static uint8_t ao_radio_mutex;
 
@@ -813,6 +816,9 @@ ao_radio_test_cmd(void)
 #if PACKET_HAS_SLAVE
 		ao_packet_slave_stop();
 #endif
+#if HAS_PAD
+		ao_pad_disable();
+#endif
 		ao_radio_get(0xff);
 		ao_radio_set_mode(AO_RADIO_MODE_TEST);
 		ao_radio_strobe(CC1200_STX);
@@ -837,6 +843,9 @@ ao_radio_test_cmd(void)
 		radio_on = 0;
 #if HAS_MONITOR
 		ao_monitor_enable();
+#endif
+#if HAS_PAD
+		ao_pad_enable();
 #endif
 	}
 }

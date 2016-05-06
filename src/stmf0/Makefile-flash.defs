@@ -39,16 +39,23 @@ LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Taltos-loader.ld
 
 PROGNAME=altos-flash
 PROG=$(HARDWARE)-$(PROGNAME)-$(VERSION).elf
+BIN=$(HARDWARE)-$(PROGNAME)-$(VERSION).bin
+
+MAKEBIN=$(TOPDIR)/../ao-tools/ao-makebin/ao-makebin
+FLASH_ADDR=0x08000000
+
+all: $(PROG) $(BIN)
 
 $(PROG): Makefile $(OBJ) altos-loader.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
+$(BIN): $(PROG)
+	$(MAKEBIN) --output=$@ --base=$(FLASH_ADDR) $(PROG)
+	
 ao_product.h: ao-make-product.5c $(TOPDIR)/Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
 $(OBJ): $(INC)
-
-all: $(PROG)
 
 distclean:	clean
 

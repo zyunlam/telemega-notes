@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.lang.*;
@@ -308,7 +308,11 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			upper_left = floor(transform.screen_point(new AltosPointInt(0, 0)));
 			lower_right = floor(transform.screen_point(new AltosPointInt(width(), height())));
 		}
-		for (AltosPointInt point : tiles.keySet()) {
+
+		Enumeration<AltosPointInt> keyEnumeration = tiles.keys();
+
+		while (keyEnumeration.hasMoreElements()) {
+			AltosPointInt point = keyEnumeration.nextElement();
 			if (point.x < upper_left.x || lower_right.x < point.x ||
 			    point.y < upper_left.y || lower_right.y < point.y) {
 				tiles.remove(point);
@@ -324,7 +328,8 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 				if (!tiles.containsKey(point)) {
 					AltosLatLon	ul = transform.lat_lon(point);
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
-					AltosMapTile tile = map_interface.new_tile(this, ul, center, zoom, maptype, px_size);
+					AltosMapTile tile = map_interface.new_tile(cache, ul, center, zoom, maptype, px_size);
+					tile.add_listener(this);
 					tiles.put(point, tile);
 				}
 			}
@@ -341,11 +346,6 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		centre(lat, lon);
 		tiles.clear();
 		make_tiles();
-		for (AltosMapTile tile : tiles.values()) {
-			tile.add_store_listener(this);
-			if (tile.store_status() != AltosMapTile.loading)
-				listener.notify_tile(tile, tile.store_status());
-		}
 		repaint();
 	}
 
@@ -377,7 +377,10 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 
 	/* AltosMapTileListener methods */
 	public synchronized void notify_tile(AltosMapTile tile, int status) {
-		for (AltosPointInt point : tiles.keySet()) {
+		Enumeration<AltosPointInt> keyEnumeration = tiles.keys();
+
+		while (keyEnumeration.hasMoreElements()) {
+			AltosPointInt point = keyEnumeration.nextElement();
 			if (tile == tiles.get(point)) {
 				AltosPointInt	screen = transform.screen(point);
 				repaint(screen.x, screen.y, AltosMap.px_size, AltosMap.px_size);
@@ -414,10 +417,8 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		if (distance > drag_far)
 			dragged = true;
 
-		if (transform == null) {
-			debug("Transform not set in drag\n");
+		if (transform == null)
 			return;
-		}
 
 		AltosLatLon new_centre = transform.screen_lat_lon(new AltosPointInt(width() / 2 - dx, height() / 2 - dy));
 		centre(new_centre);
@@ -432,7 +433,6 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	private void drag_stop(int x, int y) {
 		if (!dragged) {
 			if (transform == null) {
-				debug("Transform not set in stop\n");
 				return;
 			}
 			map_interface.select_object (transform.screen_lat_lon(new AltosPointInt(x,y)));
@@ -440,14 +440,14 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	private void line_start(int x, int y) {
-		if (line != null) {
+		if (line != null && transform != null) {
 			line.pressed(new AltosPointInt(x, y), transform);
 			repaint();
 		}
 	}
 
 	private void line(int x, int y) {
-		if (line != null) {
+		if (line != null && transform != null) {
 			line.dragged(new AltosPointInt(x, y), transform);
 			repaint();
 		}

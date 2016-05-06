@@ -25,7 +25,9 @@
  * STM32F0 definitions and code fragments for AltOS
  */
 
+#ifndef AO_STACK_SIZE
 #define AO_STACK_SIZE	512
+#endif
 
 #define AO_LED_TYPE	uint16_t
 
@@ -115,6 +117,7 @@ extern const uint32_t ao_radio_cal;
 #define AO_PCLK1	(AO_HCLK / AO_APB1_PRESCALER)
 #define AO_PCLK2	(AO_HCLK / AO_APB2_PRESCALER)
 #define AO_SYSTICK	(AO_HCLK)
+#define AO_PANIC_DELAY_SCALE  (AO_SYSCLK / 12000000)
 
 #if AO_APB1_PRESCALER == 1
 #define AO_TIM23467_CLK		AO_PCLK1
@@ -128,10 +131,10 @@ extern const uint32_t ao_radio_cal;
 #define AO_TIM91011_CLK		(2 * AO_PCLK2)
 #endif
 
-#define AO_STM_NVIC_HIGH_PRIORITY	4
-#define AO_STM_NVIC_CLOCK_PRIORITY	6
-#define AO_STM_NVIC_MED_PRIORITY	8
-#define AO_STM_NVIC_LOW_PRIORITY	10
+#define AO_STM_NVIC_HIGH_PRIORITY	(0 << 6)
+#define AO_STM_NVIC_CLOCK_PRIORITY	(1 << 6)
+#define AO_STM_NVIC_MED_PRIORITY	(2 << 6)
+#define AO_STM_NVIC_LOW_PRIORITY	(3 << 6)
 
 void ao_lcd_stm_init(void);
 

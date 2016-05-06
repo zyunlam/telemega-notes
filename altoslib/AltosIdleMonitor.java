@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -28,6 +28,7 @@ public class AltosIdleMonitor extends Thread {
 	AltosIdleFetch		fetch;
 
 	boolean			remote;
+	boolean			close_on_exit;
 	double			frequency;
 	String			callsign;
 
@@ -50,7 +51,7 @@ public class AltosIdleMonitor extends Thread {
 		return link.reply_abort;
 	}
 
-	boolean update_state(AltosState state) throws InterruptedException, TimeoutException {
+	boolean update_state(AltosState state) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		boolean		worked = false;
 		boolean		aborted = false;
 
@@ -98,6 +99,8 @@ public class AltosIdleMonitor extends Thread {
 					update_state(state);
 					listener.update(state, listener_state);
 				} catch (TimeoutException te) {
+				} catch (AltosUnknownProduct ae) {
+					listener.error(String.format("Unknown product \"%s\"", ae.product));
 				}
 				if (link.has_error || link.reply_abort) {
 					listener.failed();
@@ -107,18 +110,25 @@ public class AltosIdleMonitor extends Thread {
 			}
 		} catch (InterruptedException ie) {
 		}
-		try {
-			link.close();
-		} catch (InterruptedException ie) {
+		if (close_on_exit) {
+			try {
+				link.close();
+			} catch (InterruptedException ie) {
+			}
 		}
 	}
 
-	public AltosIdleMonitor(AltosIdleMonitorListener in_listener, AltosLink in_link, boolean in_remote)
-		throws FileNotFoundException, InterruptedException, TimeoutException {
+	public AltosIdleMonitor(AltosIdleMonitorListener in_listener, AltosLink in_link, boolean in_remote, boolean in_close_on_exit) {
 		listener = in_listener;
 		link = in_link;
 		remote = in_remote;
+		close_on_exit = in_close_on_exit;
 		listener_state = new AltosListenerState();
 		fetch = new AltosIdleFetch(link);
 	}
+
+	public AltosIdleMonitor(AltosIdleMonitorListener in_listener, AltosLink in_link, boolean in_remote) {
+		this(in_listener, in_link, in_remote, true);
+	}
 }
+

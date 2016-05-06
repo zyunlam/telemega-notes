@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.util.concurrent.*;
 
 public class AltosMma655x implements Cloneable {
 
-	int	accel;
+	private int	accel;
 
 	public boolean parse_line(String line) throws NumberFormatException {
 		if (line.startsWith("MMA655X value")) {
@@ -45,12 +45,18 @@ public class AltosMma655x implements Cloneable {
 		return n;
 	}
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException, AltosUnknownProduct {
 		try {
 			AltosMma655x	mma655x = new AltosMma655x(link);
 
-			if (mma655x != null)
-				state.set_accel(mma655x.accel);
+			if (mma655x != null) {
+				int accel = mma655x.accel;
+				if (config_data.mma655x_inverted())
+					accel = 4095 - accel;
+				if (config_data.pad_orientation == 1)
+					accel = 4095 - accel;
+				state.set_accel(accel);
+			}
 		} catch (TimeoutException te) {
 		} catch (NumberFormatException ne) {
 		}

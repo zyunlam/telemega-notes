@@ -18,8 +18,8 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.6.2)
-ANDROID_VERSION=10
+AC_INIT([altos], 1.6.3)
+ANDROID_VERSION=11
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
@@ -31,8 +31,8 @@ AC_SUBST(ANDROID_VERSION)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=9
-ALTOSLIB_VERSION=9
+ALTOSUILIB_VERSION=10
+ALTOSLIB_VERSION=10
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -149,7 +149,7 @@ fi
 ANDROID_RELEASE=no
 if test "x$ANDROID_SDK" != "xno"; then
 	HAVE_ANDROID_SDK="yes"
-	if test -f "$HOME/altusmetrumllc/release.keystore" -a -f "$HOME/altusmetrumllc/Passphrase"; then
+	if test -f "$HOME/altusmetrumllc/google-play-release.keystore" -a -f "$HOME/altusmetrumllc/google-play-passphrase"; then
 		ANDROID_RELEASE=yes
 	fi
 else
@@ -174,7 +174,7 @@ AC_ARG_WITH(google-key, AS_HELP_STRING([--with-google-key=PATH],
 	    [GOOGLEKEYFILE=$withval], [GOOGLEKEYFILE=$HOME/altusmetrumllc/google-maps-api-key])
 
 if test -r "$GOOGLEKEYFILE" -a -s "$GOOGLEKEYFILE"; then
-	GOOGLEKEY='"'`cat "$GOOGLEKEYFILE"`'"'
+	GOOGLEKEY=`cat "$GOOGLEKEYFILE"`
 	HAVE_GOOGLE_KEY="yes"
 else
 	GOOGLEKEY='null'
@@ -557,6 +557,8 @@ ao-tools/ao-cal-accel/Makefile
 ao-tools/ao-cal-freq/Makefile
 ao-tools/ao-test-gps/Makefile
 ao-tools/ao-usbtrng/Makefile
+ao-tools/ao-chaosread/Makefile
+ao-tools/ao-makebin/Makefile
 ao-utils/Makefile
 src/Version
 ])

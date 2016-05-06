@@ -2,153 +2,134 @@
 
 ; Definitions for Java Detection
 
-!define JRE_VERSION "1.6"
-!define JRE32_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=52247&/jre-6u27-windows-i586.exe"
-!define JRE64_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=52249&/jre-6u27-windows-x64.exe"
+!define JAVA_VERSION "6.0"
 
-Var JavaDownload
-Var JavaBits
-
-Function GetJRE
-	${If} ${RunningX64}
-	   StrCpy $JavaDownload ${JRE64_URL}
-	   StrCpy $JavaBits "64"
-	${Else}
-	   StrCpy $JavaDownload ${JRE32_URL}
-	   StrCpy $JavaBits "32"
-	${EndIf}
-
-        MessageBox MB_OK "This product uses Java ${JRE_VERSION}, \
-			$JavaBits bits, it will now \
-                        be downloaded and installed"
-
-        StrCpy $2 "$TEMP\Java Runtime Environment.exe"
-        nsisdl::download /TIMEOUT=30000 $JavaDownload $2
-        Pop $R0 ;Get the return value
-                StrCmp $R0 "success" +3
-                MessageBox MB_OK "Download failed: $R0"
-                Quit
-        ExecWait $2
-        Delete $2
+Function GetFileVersion
+	!define GetFileVersion `!insertmacro GetFileVersionCall`
+ 
+	!macro GetFileVersionCall _FILE _RESULT
+		Push `${_FILE}`
+		Call GetFileVersion
+		Pop ${_RESULT}
+	!macroend
+ 
+	Exch $0
+	Push $1
+	Push $2
+	Push $3
+	Push $4
+	Push $5
+	Push $6
+	ClearErrors
+ 
+	GetDllVersion '$0' $1 $2
+	IfErrors error
+	IntOp $3 $1 >> 16
+	IntOp $3 $3 & 0x0000FFFF
+	IntOp $4 $1 & 0x0000FFFF
+	IntOp $5 $2 >> 16
+	IntOp $5 $5 & 0x0000FFFF
+	IntOp $6 $2 & 0x0000FFFF
+	StrCpy $0 '$3.$4.$5.$6'
+	goto end
+ 
+	error:
+	SetErrors
+	StrCpy $0 ''
+ 
+	end:
+	Pop $6
+	Pop $5
+	Pop $4
+	Pop $3
+	Pop $2
+	Pop $1
+	Exch $0
 FunctionEnd
+
+Function openLinkNewWindow
+  Push $3
+  Exch
+  Push $2
+  Exch
+  Push $1
+  Exch
+  Push $0
+  Exch
+
+  ReadRegStr $1 HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoice" "Progid"
+  IfErrors iexplore
+
+  Goto foundbrowser
+iexplore:
+  StrCpy $1 "IE.AssocFile.HTM"
+
+foundbrowser:  
+
+  StrCpy $2 "\shell\open\command"
+
+  StrCpy $3 $1$2
+
+  ReadRegStr $0 HKCR $3 ""
+
+# Get browser path
+  DetailPrint $0
+ 
+  StrCpy $2 '"'
+  StrCpy $1 $0 1
+  StrCmp $1 $2 +2 # if path is not enclosed in " look for space as final char
+  StrCpy $2 ' '
+  StrCpy $3 1
+  loop:
+    StrCpy $1 $0 1 $3
+    DetailPrint $1
+    StrCmp $1 $2 found
+    StrCmp $1 "" found
+    IntOp $3 $3 + 1
+    Goto loop
+ 
+  found:
+    StrCpy $1 $0 $3
+    StrCmp $2 " " +2
+      StrCpy $1 '$1"'
+ 
+  Pop $0
+  Exec '$1 $0'
+  Pop $0
+  Pop $1
+  Pop $2
+  Pop $3
+FunctionEnd
+ 
+!macro _OpenURL URL
+Push "${URL}"
+Call openLinkNewWindow
+!macroend
+ 
+!define OpenURL '!insertmacro "_OpenURL"'
 
 Function DoDetectJRE
 
-  DetailPrint "Desired Java version ${JRE_VERSION}"
+  DetailPrint "Desired Java version ${JAVA_VERSION}"
 
-  ; Check in HKCU for CurrentVersion
-
-  ClearErrors
-  ReadRegStr $2 HKCU "SOFTWARE\JavaSoft\Java Runtime Environment" \
-             "CurrentVersion"
-
-  IfErrors hkcuwow_version
-
-  DetailPrint "HKEY_CURRENT_USER Java version $2"
-
-  ${VersionCompare} $2 ${JRE_VERSION} $3
-
-  IntCmp $3 1 yes yes no
-
-hkcuwow_version:
-
-  ; Check in HKCU Wow6432Node for CurrentVersion
-
-  ClearErrors
-  ReadRegStr $2 HKCU "SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment" \
-	     "CurrentVersion"
-
-  Iferrors hklm_version
-
-  DetailPrint "HKEY_CURRENT_USER Wow6432Node Java version $2"
-
-  ${VersionCompare} $2 ${JRE_VERSION} $3
-
-  IntCmp $3 1 yes yes no
-
-hklm_version:
-
-  ; Check in HKLM for CurrentVersion
-
-  ClearErrors
-  ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" \
-             "CurrentVersion"
+  SearchPath $0 javaw.exe
+  IfErrors no
   
-  IfErrors hklmwow_version
+  DetailPrint "Detected java in $0"
 
-  DetailPrint "HKEY_LOCAL_MACHINE Java version $2"
+  ${GetFileVersion} "$0" $1
+  IfErrors no
 
-  ${VersionCompare} $2 ${JRE_VERSION} $3
+  DetailPrint "Java version $1"
 
-  IntCmp $3 1 yes yes no
-
-hklmwow_version:
-
-  ; Check in HKLM Wow6432Node for CurrentVersion
-
-  ClearErrors
-  ReadRegStr $2 HKLM "SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment" \
-	     "CurrentVersion"
-
-  Iferrors hkcu_any
-
-  DetailPrint "HKEY_LOCAL_MACHINE Wow6432Node Java version $2"
-
-  ${VersionCompare} $2 ${JRE_VERSION} $3
-
-  IntCmp $3 1 yes yes no
-
-hkcu_any:
-
-  ; Check in HKCU for any Java install
-
-  StrCpy $0 0
-
-hkcu_any_loop:
-  EnumRegKey $1 HKCU "SOFTWARE\JavaSoft" $0
-
-  StrCmp $1 "Java Runtime Environment" found_hkcu
-
-  StrCmp $1 "" hklm_any
-  
-  IntOp $0 $0 + 1
-
-  Goto hkcu_any_loop
-  
-found_hkcu:
-
-  DetailPrint "HKEY_CURRENT_USER has SOFTWARE\JavaSoft\$1"
-
-  Goto maybe
-
-hklm_any:
-
-  ; Check in HKCU for any Java install
-
-  StrCpy $0 0
-
-hklm_any_loop:
-  EnumRegKey $1 HKLM "SOFTWARE\JavaSoft" $0
-
-  StrCmp $1 "Java Runtime Environment" found_hklm
-
-  StrCmp $1 "" no
-  
-  IntOp $0 $0 + 1
-
-  Goto hklm_any_loop
-  
-found_hklm:
-
-  DetailPrint "HKEY_CURRENT_USER has SOFTWARE\JavaSoft\$1"
-
-  Goto maybe
+  ${VersionCompare} $1 ${JAVA_VERSION} $2
+  IntCmp $2 1 yes yes old
 
 yes:
   StrCpy $0 2
   Goto done
 
-maybe:
+old:
   StrCpy $0 1
   Goto done
 
@@ -168,25 +149,27 @@ var install
 var quit
 var skip
 
+Function GetJRE
+  ${OpenURL} "java.com"
+  MessageBox MB_OK "Click OK to continue after completing the Java Install."
+FunctionEnd
+
 Function DetectJRE
 
   Call DoDetectJRE
 
-  IntCmp $0 1 ask_maybe ask_no yes
+  IntCmp $0 1 ask_old ask_no yes
 
 ask_no:
-  StrCpy $0 "No Java detected. Download and install?"
+  StrCpy $0 "Cannot find Java. Download and install?"
   Goto ask
 
-ask_maybe:
-  StrCpy $0 "Cannot determine installed Java version. Download and install?"
+ask_old:
+  StrCpy $0 "Java version appears to be too old. Download and install?"
   Goto ask
 
 ask:
   MessageBox MB_YESNOCANCEL $0 IDYES do_java IDNO skip_java
-
-bail:
-  Abort
 
 do_java:
   Call GetJRE

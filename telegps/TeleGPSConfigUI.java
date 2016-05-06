@@ -22,8 +22,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_9.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class TeleGPSConfigUI
 	extends AltosUIDialog
@@ -54,7 +54,7 @@ public class TeleGPSConfigUI
 	JLabel			version_value;
 	JLabel			serial_value;
 	AltosUIFreqList		radio_frequency_value;
-	JTextField		radio_calibration_value;
+	JLabel			radio_calibration_value;
 	JRadioButton		radio_enable_value;
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
@@ -136,13 +136,6 @@ public class TeleGPSConfigUI
 	boolean is_telemetrum() {
 		String	product = product_value.getText();
 		return product != null && product.startsWith("TeleGPS");
-	}
-
-	void set_radio_calibration_tool_tip() {
-		if (radio_calibration_value.isEnabled())
-			radio_calibration_value.setToolTipText("Tune radio output to match desired frequency");
-		else
-			radio_calibration_value.setToolTipText("Cannot tune radio while connected over packet mode");
 	}
 
 	void set_radio_enable_tool_tip() {
@@ -316,10 +309,8 @@ public class TeleGPSConfigUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		radio_calibration_value = new JTextField(String.format("%d", 1186611));
-		radio_calibration_value.getDocument().addDocumentListener(this);
+		radio_calibration_value = new JLabel(String.format("%d", 1186611));
 		pane.add(radio_calibration_value, c);
-		set_radio_calibration_tool_tip();
 		row++;
 
 		/* Radio Enable */
@@ -758,10 +749,6 @@ public class TeleGPSConfigUI
 		} catch (NumberFormatException ne) {
 			throw new AltosConfigDataException("Invalid %s \"%s\"", name, s);
 		}
-	}
-
-	public int radio_calibration() throws AltosConfigDataException {
-		return parse_int("radio calibration", radio_calibration_value.getText(), false);
 	}
 
 	public void set_radio_enable(int new_radio_enable) {

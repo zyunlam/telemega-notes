@@ -16,8 +16,12 @@
  */
 package org.altusmetrum.AltosDroid;
 
+import java.io.*;
+import java.util.*;
+import java.text.*;
+
 import android.content.Context;
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 public class AltosDroidPreferences extends AltosPreferences {
 
@@ -65,17 +69,38 @@ public class AltosDroidPreferences extends AltosPreferences {
 		}
 	}
 
+	static LinkedList<AltosDroidMapSourceListener> map_source_listeners;
+
 	public static void set_map_source(int map_source) {
 		synchronized(backend) {
 			AltosDroidPreferences.map_source = map_source;
 			backend.putInt(mapSourcePreference, map_source);
 			flush_preferences();
 		}
+		if (map_source_listeners != null) {
+			for (AltosDroidMapSourceListener l : map_source_listeners) {
+				l.map_source_changed(map_source);
+			}
+		}
 	}
 
 	public static int map_source() {
 		synchronized(backend) {
 			return map_source;
+		}
+	}
+
+	public static void register_map_source_listener(AltosDroidMapSourceListener l) {
+		synchronized(backend) {
+			if (map_source_listeners == null)
+				map_source_listeners = new LinkedList<AltosDroidMapSourceListener>();
+			map_source_listeners.add(l);
+		}
+	}
+
+	public static void unregister_map_source_listener(AltosDroidMapSourceListener l) {
+		synchronized(backend) {
+			map_source_listeners.remove(l);
 		}
 	}
 }

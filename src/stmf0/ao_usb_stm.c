@@ -18,13 +18,19 @@
 #include "ao.h"
 #include "ao_usb.h"
 #include "ao_product.h"
+#include "ao_power.h"
 
 #define USB_DEBUG 	0
+#define USB_STATUS	0
 #define USB_DEBUG_DATA	0
 #define USB_ECHO	0
 
 #ifndef AO_PA11_PA12_RMP
 #error "must define AO_PA11_PA12_RMP"
+#endif
+
+#ifndef AO_POWER_MANAGEMENT
+#define AO_POWER_MANAGEMENT	0
 #endif
 
 #ifndef USE_USB_STDIO
@@ -83,22 +89,41 @@ static uint16_t	ao_usb_sram_addr;
 static uint16_t	*ao_usb_ep0_tx_buffer;
 static uint16_t	*ao_usb_ep0_rx_buffer;
 
+#if AO_USB_HAS_INT
 /* Pointer to interrupt buffer in USB memory */
 static uint16_t ao_usb_int_tx_offset;
+#endif
 
 /* Pointer to bulk data tx/rx buffers in USB memory */
+#if AO_USB_HAS_IN
 static uint16_t ao_usb_in_tx_offset;
 static uint16_t	*ao_usb_in_tx_buffer;
-static uint16_t ao_usb_out_rx_offset;
-static uint16_t	*ao_usb_out_rx_buffer;
 
 /* System ram shadow of USB buffer; writing individual bytes is
  * too much of a pain (sigh) */
 static uint8_t	ao_usb_tx_buffer[AO_USB_IN_SIZE];
 static uint8_t	ao_usb_tx_count;
 
+#endif
+#if AO_USB_HAS_OUT
+static uint16_t ao_usb_out_rx_offset;
+static uint16_t	*ao_usb_out_rx_buffer;
+
+/* System ram shadow of USB buffer; writing individual bytes is
+ * too much of a pain (sigh) */
 static uint8_t	ao_usb_rx_buffer[AO_USB_OUT_SIZE];
 static uint8_t	ao_usb_rx_count, ao_usb_rx_pos;
+
+#endif
+#if AO_USB_HAS_IN2
+static uint16_t ao_usb_in2_tx_offset;
+static uint16_t *ao_usb_in2_tx_buffer;
+
+/* System ram shadow of USB buffer; writing individual bytes is
+ * too much of a pain (sigh) */
+static uint8_t	ao_usb_tx2_buffer[AO_USB_IN_SIZE];
+static uint8_t	ao_usb_tx2_count;
+#endif
 
 /*
  * End point register indices
@@ -108,6 +133,7 @@ static uint8_t	ao_usb_rx_count, ao_usb_rx_pos;
 #define AO_USB_INT_EPR		1
 #define AO_USB_OUT_EPR		2
 #define AO_USB_IN_EPR		3
+#define AO_USB_IN2_EPR		4
 
 /* Marks when we don't need to send an IN packet.
  * This happens only when the last IN packet is not full,
@@ -122,6 +148,16 @@ static uint8_t	ao_usb_in_flushed;
  */
 static uint8_t	ao_usb_in_pending;
 
+#if AO_USB_HAS_IN2
+/* Marks when we have delivered an IN packet to the hardware
+ * and it has not been received yet. ao_sleep on this address
+ * to wait for it to be delivered.
+ */
+static uint8_t	ao_usb_in2_pending;
+static uint16_t	in2_count;
+static uint8_t	ao_usb_in2_flushed;
+#endif
+
 /* Marks when an OUT packet has been received by the hardware
  * but not pulled to the shadow buffer.
  */
@@ -129,10 +165,9 @@ static uint8_t	ao_usb_out_avail;
 uint8_t		ao_usb_running;
 static uint8_t	ao_usb_configuration;
 
-#define AO_USB_EP0_GOT_RESET	1
-#define AO_USB_EP0_GOT_SETUP	2
-#define AO_USB_EP0_GOT_RX_DATA	4
-#define AO_USB_EP0_GOT_TX_ACK	8
+#define AO_USB_EP0_GOT_SETUP	1
+#define AO_USB_EP0_GOT_RX_DATA	2
+#define AO_USB_EP0_GOT_TX_ACK	4
 
 static uint8_t	ao_usb_ep0_receive;
 static uint8_t	ao_usb_address;
@@ -338,16 +373,29 @@ ao_usb_alloc_buffers(void)
 	ao_usb_ep0_rx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
 	ao_usb_sram_addr += AO_USB_CONTROL_SIZE;
 
+
+#if AO_USB_HAS_INT
 	ao_usb_int_tx_offset = ao_usb_sram_addr;
 	ao_usb_sram_addr += AO_USB_INT_SIZE;
+#endif
 
+#if AO_USB_HAS_OUT
 	ao_usb_out_rx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
 	ao_usb_out_rx_offset = ao_usb_sram_addr;
 	ao_usb_sram_addr += AO_USB_OUT_SIZE;
+#endif
 
+#if AO_USB_HAS_IN
 	ao_usb_in_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
 	ao_usb_in_tx_offset = ao_usb_sram_addr;
 	ao_usb_sram_addr += AO_USB_IN_SIZE;
+#endif
+
+#if AO_USB_HAS_IN2
+	ao_usb_in2_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
+	ao_usb_in2_tx_offset = ao_usb_sram_addr;
+	ao_usb_sram_addr += AO_USB_IN_SIZE;
+#endif
 }
 
 static void
@@ -396,6 +444,7 @@ ao_usb_set_configuration(void)
 {
 	debug ("ao_usb_set_configuration\n");
 
+#if AO_USB_HAS_INT
 	/* Set up the INT end point */
 	ao_usb_bdt[AO_USB_INT_EPR].single.addr_tx = ao_usb_int_tx_offset;
 	ao_usb_bdt[AO_USB_INT_EPR].single.count_tx = 0;
@@ -405,7 +454,9 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_EP_TYPE_INTERRUPT,
 		       STM_USB_EPR_STAT_RX_DISABLED,
 		       STM_USB_EPR_STAT_TX_NAK);
+#endif
 
+#if AO_USB_HAS_OUT
 	/* Set up the OUT end point */
 	ao_usb_bdt[AO_USB_OUT_EPR].single.addr_rx = ao_usb_out_rx_offset;
 	ao_usb_bdt[AO_USB_OUT_EPR].single.count_rx = ((1 << STM_USB_BDT_COUNT_RX_BL_SIZE) |
@@ -416,7 +467,9 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_EP_TYPE_BULK,
 		       STM_USB_EPR_STAT_RX_VALID,
 		       STM_USB_EPR_STAT_TX_DISABLED);
+#endif
 
+#if AO_USB_HAS_IN
 	/* Set up the IN end point */
 	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_in_tx_offset;
 	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = 0;
@@ -426,6 +479,19 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_EP_TYPE_BULK,
 		       STM_USB_EPR_STAT_RX_DISABLED,
 		       STM_USB_EPR_STAT_TX_NAK);
+#endif
+
+#if AO_USB_HAS_IN2
+	/* Set up the IN2 end point */
+	ao_usb_bdt[AO_USB_IN2_EPR].single.addr_tx = ao_usb_in2_tx_offset;
+	ao_usb_bdt[AO_USB_IN2_EPR].single.count_tx = 0;
+
+	ao_usb_init_ep(AO_USB_IN2_EPR,
+		       AO_USB_IN2_EP,
+		       STM_USB_EPR_EP_TYPE_BULK,
+		       STM_USB_EPR_STAT_RX_DISABLED,
+		       STM_USB_EPR_STAT_TX_NAK);
+#endif
 
 	ao_usb_running = 1;
 #if AO_USB_DIRECTIO
@@ -559,6 +625,36 @@ ao_usb_ep0_in_start(uint16_t max)
 
 static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 
+#if AO_USB_DEVICE_ID_SERIAL
+static uint8_t ao_usb_serial[2 + 48];
+
+/* Convert a 32-bit value to 8 hexidecimal UCS2 characters */
+static void
+hex_to_ucs2(uint32_t in, uint8_t *out)
+{
+	int	i;
+
+	for (i = 28; i >= 0; i -= 4) {
+		uint8_t	bits = (in >> i) & 0xf;
+		*out++ = ((bits < 10) ? '0' : ('a' - 10)) + bits;
+		*out++ = 0;
+	}
+}
+
+/* Encode the device ID (96 bits) in hexidecimal to use as a device
+ * serial number
+ */
+static void
+ao_usb_serial_init(void)
+{
+	ao_usb_serial[0] = 50;	/* length */
+	ao_usb_serial[1] = AO_USB_DESC_STRING;
+	hex_to_ucs2(stm_device_id.u_id0, ao_usb_serial + 2 + 0);
+	hex_to_ucs2(stm_device_id.u_id1, ao_usb_serial + 2 + 16);
+	hex_to_ucs2(stm_device_id.u_id2, ao_usb_serial + 2 + 32);
+}
+#endif
+
 /* Walk through the list of descriptors and find a match
  */
 static void
@@ -576,6 +672,13 @@ ao_usb_get_descriptor(uint16_t value)
 				len = descriptor[2];
 			else
 				len = descriptor[0];
+#if AO_USB_DEVICE_ID_SERIAL
+			/* Slightly hacky - the serial number is string 3 */
+			if (type == AO_USB_DESC_STRING && (value & 0xff) == 3) {
+				descriptor = ao_usb_serial;
+				len = sizeof (ao_usb_serial);
+			}
+#endif
 			ao_usb_ep0_in_set(descriptor, len);
 			break;
 		}
@@ -686,11 +789,6 @@ static void
 ao_usb_ep0_handle(uint8_t receive)
 {
 	ao_usb_ep0_receive = 0;
-	if (receive & AO_USB_EP0_GOT_RESET) {
-		debug ("\treset\n");
-		ao_usb_set_ep0();
-		return;
-	}
 	if (receive & AO_USB_EP0_GOT_SETUP) {
 		debug ("\tsetup\n");
 		ao_usb_ep0_setup();
@@ -720,6 +818,25 @@ ao_usb_ep0_handle(uint8_t receive)
 			ao_usb_ep0_flush();
 	}
 }
+
+#if AO_POWER_MANAGEMENT
+void
+ao_usb_suspend(void)
+{
+	stm_usb.cntr |= (1 << STM_USB_CNTR_FSUSP);
+	ao_power_suspend();
+	stm_usb.cntr |= (1 << STM_USB_CNTR_LP_MODE);
+	ao_clock_suspend();
+}
+
+void
+ao_usb_wakeup(void)
+{
+	ao_clock_resume();
+	stm_usb.cntr &= ~(1 << STM_USB_CNTR_FSUSP);
+	ao_power_resume();
+}
+#endif
 
 void
 stm_usb_isr(void)
@@ -773,6 +890,16 @@ stm_usb_isr(void)
 				ao_wakeup(&ao_usb_in_pending);
 			}
 			break;
+#if AO_USB_HAS_IN2
+		case AO_USB_IN2_EPR:
+			++in2_count;
+			_tx_dbg1("TX2 ISR", epr);
+			if (ao_usb_epr_ctr_tx(epr)) {
+				ao_usb_in2_pending = 0;
+				ao_wakeup(&ao_usb_in2_pending);
+			}
+			break;
+#endif
 		case AO_USB_INT_EPR:
 			++int_count;
 			if (ao_usb_epr_ctr_tx(epr))
@@ -784,12 +911,22 @@ stm_usb_isr(void)
 
 	if (istr & (1 << STM_USB_ISTR_RESET)) {
 		++reset_count;
-		ao_usb_ep0_receive |= AO_USB_EP0_GOT_RESET;
-		ao_usb_ep0_handle(ao_usb_ep0_receive);
+		debug ("\treset\n");
+		ao_usb_set_ep0();
 	}
-
+#if AO_POWER_MANAGEMENT
+	if (istr & (1 << STM_USB_ISTR_SUSP)) {
+		debug ("\tsuspend\n");
+		ao_usb_suspend();
+	}
+	if (istr & (1 << STM_USB_ISTR_WKUP)) {
+		debug ("\twakeup\n");
+		ao_usb_wakeup();
+	}
+#endif
 }
 
+#if AO_USB_HAS_IN
 /* Queue the current IN buffer for transmission */
 static void
 _ao_usb_in_send(void)
@@ -868,7 +1005,90 @@ ao_usb_putchar(char c)
 	}
 	ao_arch_release_interrupts();
 }
+#endif
 
+#if AO_USB_HAS_IN2
+/* Queue the current IN buffer for transmission */
+static void
+_ao_usb_in2_send(void)
+{
+	_tx_dbg0("in2_send start");
+	debug ("send2 %d\n", ao_usb_tx_count);
+	while (ao_usb_in2_pending)
+		ao_sleep(&ao_usb_in2_pending);
+	ao_usb_in2_pending = 1;
+	if (ao_usb_tx2_count != AO_USB_IN_SIZE)
+		ao_usb_in2_flushed = 1;
+	ao_usb_copy_tx(ao_usb_tx2_buffer, ao_usb_in2_tx_buffer, ao_usb_tx2_count);
+	ao_usb_bdt[AO_USB_IN2_EPR].single.addr_tx = ao_usb_in_tx_offset;
+	ao_usb_bdt[AO_USB_IN2_EPR].single.count_tx = ao_usb_tx_count;
+	ao_usb_tx2_count = 0;
+	_ao_usb_set_stat_tx(AO_USB_IN2_EPR, STM_USB_EPR_STAT_TX_VALID);
+	_tx_dbg0("in2_send end");
+}
+
+/* Wait for a free IN buffer. Interrupts are blocked */
+static void
+_ao_usb_in2_wait(void)
+{
+	for (;;) {
+		/* Check if the current buffer is writable */
+		if (ao_usb_tx2_count < AO_USB_IN_SIZE)
+			break;
+
+		_tx_dbg0("in2_wait top");
+		/* Wait for an IN buffer to be ready */
+		while (ao_usb_in2_pending)
+			ao_sleep(&ao_usb_in2_pending);
+		_tx_dbg0("in_wait bottom");
+	}
+}
+
+void
+ao_usb_flush2(void)
+{
+	if (!ao_usb_running)
+		return;
+
+	/* Anytime we've sent a character since
+	 * the last time we flushed, we'll need
+	 * to send a packet -- the only other time
+	 * we would send a packet is when that
+	 * packet was full, in which case we now
+	 * want to send an empty packet
+	 */
+	ao_arch_block_interrupts();
+	while (!ao_usb_in2_flushed) {
+		_tx_dbg0("flush2 top");
+		_ao_usb_in2_send();
+		_tx_dbg0("flush2 end");
+	}
+	ao_arch_release_interrupts();
+}
+
+void
+ao_usb_putchar2(char c)
+{
+	if (!ao_usb_running)
+		return;
+
+	ao_arch_block_interrupts();
+	_ao_usb_in2_wait();
+
+	ao_usb_in2_flushed = 0;
+	ao_usb_tx2_buffer[ao_usb_tx2_count++] = (uint8_t) c;
+
+	/* Send the packet when full */
+	if (ao_usb_tx2_count == AO_USB_IN_SIZE) {
+		_tx_dbg0("putchar2 full");
+		_ao_usb_in2_send();
+		_tx_dbg0("putchar2 flushed");
+	}
+	ao_arch_release_interrupts();
+}
+#endif
+
+#if AO_USB_HAS_OUT
 static void
 _ao_usb_out_recv(void)
 {
@@ -925,6 +1145,7 @@ ao_usb_getchar(void)
 	ao_arch_release_interrupts();
 	return c;
 }
+#endif
 
 #if AO_USB_DIRECTIO
 uint16_t *
@@ -979,6 +1200,43 @@ ao_usb_write(uint16_t *buffer, uint16_t len)
 	_ao_usb_set_stat_tx(AO_USB_IN_EPR, STM_USB_EPR_STAT_TX_VALID);
 	ao_arch_release_interrupts();
 }
+
+#if AO_USB_HAS_IN2
+void
+ao_usb_write2(uint16_t *buffer, uint16_t len)
+{
+	ao_arch_block_interrupts();
+
+	/* Wait for everything to be ready at the same time */
+	for (;;) {
+		/* Make sure USB is connected */
+		if (!ao_usb_running) {
+			ao_sleep(&ao_usb_running);
+			continue;
+		}
+
+		/* Flush any pending regular I/O */
+		if (ao_usb_tx2_count) {
+			_ao_usb_in2_send();
+			continue;
+		}
+
+		/* Wait for an idle IN buffer */
+		if (ao_usb_in2_pending) {
+			ao_sleep(&ao_usb_in2_pending);
+			continue;
+		}
+		break;
+	}
+
+	ao_usb_in2_pending = 1;
+	ao_usb_in2_flushed = (len != AO_USB_IN_SIZE);
+	ao_usb_bdt[AO_USB_IN2_EPR].single.addr_tx = ao_usb_packet_buffer_offset(buffer);
+	ao_usb_bdt[AO_USB_IN2_EPR].single.count_tx = len;
+	_ao_usb_set_stat_tx(AO_USB_IN2_EPR, STM_USB_EPR_STAT_TX_VALID);
+	ao_arch_release_interrupts();
+}
+#endif
 #endif
 
 void
@@ -1050,8 +1308,8 @@ ao_usb_enable(void)
 	stm_usb.cntr = ((1 << STM_USB_CNTR_CTRM) |
 			(0 << STM_USB_CNTR_PMAOVRM) |
 			(0 << STM_USB_CNTR_ERRM) |
-			(0 << STM_USB_CNTR_WKUPM) |
-			(0 << STM_USB_CNTR_SUSPM) |
+			(AO_POWER_MANAGEMENT << STM_USB_CNTR_WKUPM) |
+			(AO_POWER_MANAGEMENT << STM_USB_CNTR_SUSPM) |
 			(1 << STM_USB_CNTR_RESETM) |
 			(0 << STM_USB_CNTR_SOFM) |
 			(0 << STM_USB_CNTR_ESOFM) |
@@ -1086,7 +1344,7 @@ ao_usb_echo(void)
 }
 #endif
 
-#if USB_DEBUG
+#if USB_STATUS
 static void
 ao_usb_irq(void)
 {
@@ -1109,7 +1367,13 @@ ao_usb_init(void)
 	/* Set PA11/PA12 remapping bit */
 	stm_syscfg.cfgr1 |= (AO_PA11_PA12_RMP << STM_SYSCFG_CFGR1_PA11_PA12_RMP);
 
+#ifndef AO_USB_START_DISABLED
 	ao_usb_enable();
+#endif
+
+#if AO_USB_DEVICE_ID_SERIAL
+	ao_usb_serial_init();
+#endif
 
 	debug ("ao_usb_init\n");
 	ao_usb_ep0_state = AO_USB_EP0_IDLE;
@@ -1119,7 +1383,7 @@ ao_usb_init(void)
 #if USB_ECHO
 	ao_add_task(&ao_usb_echo_task, ao_usb_echo, "usb echo");
 #endif
-#if USB_DEBUG
+#if USB_STATUS
 	ao_cmd_register(&ao_usb_cmds[0]);
 #endif
 #if !USB_ECHO

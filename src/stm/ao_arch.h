@@ -25,7 +25,9 @@
  * STM32L definitions and code fragments for AltOS
  */
 
+#ifndef AO_STACK_SIZE
 #define AO_STACK_SIZE	512
+#endif
 
 #define AO_LED_TYPE	uint16_t
 

@@ -117,6 +117,7 @@ ao_packet_forward(void) __reentrant
 {
 	char c;
 	ao_packet_enable = 1;
+	ao_packet_tx_used = 0;
 	ao_cmd_white();
 
 	flush();

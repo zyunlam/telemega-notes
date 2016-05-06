@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -87,7 +87,7 @@ public class TabFlight extends AltosDroidTab {
 			set_value(speed_view, AltosConvert.speed, 6, state.speed());
 			set_value(height_view, AltosConvert.height, 6, state.height());
 			set_value(max_speed_view, AltosConvert.speed, 6, state.max_speed());
-			set_value(max_height_view, AltosConvert.speed, 6, state.max_height());
+			set_value(max_height_view, AltosConvert.height, 6, state.max_height());
 			if (from_receiver != null) {
 				elevation_view.setText(AltosDroid.number("%3.0f°", from_receiver.elevation));
 				set_value(range_view, AltosConvert.distance, 6, from_receiver.range);

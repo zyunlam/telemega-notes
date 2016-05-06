@@ -355,7 +355,6 @@ ao_yield(void) ao_arch_naked_define
 	 */
 	if (ao_cur_task->wchan == NULL)
 		ao_task_to_run_queue(ao_cur_task);
-	ao_cur_task = NULL;
 	for (;;) {
 		ao_arch_memory_barrier();
 		if (!ao_list_is_empty(&run_queue))
@@ -425,6 +424,7 @@ ao_sleep(__xdata void *wchan)
 void
 ao_wakeup(__xdata void *wchan) __reentrant
 {
+	ao_validate_cur_stack();
 #if HAS_TASK_QUEUE
 	struct ao_task	*sleep, *next;
 	struct ao_list	*sleep_queue;
@@ -442,10 +442,12 @@ ao_wakeup(__xdata void *wchan) __reentrant
 	}
 	ao_arch_irqrestore(flags);
 #else
+	{
 	uint8_t	i;
 	for (i = 0; i < ao_num_tasks; i++)
 		if (ao_tasks[i]->wchan == wchan)
 			ao_tasks[i]->wchan = NULL;
+	}
 #endif
 	ao_check_stack();
 }

@@ -5,9 +5,11 @@ OS:=$(shell uname)
 #
 ifeq ($(OS),Linux)
 
-JAVA_CFLAGS=-I/usr/lib/jvm/java-6-openjdk/include
+OS_SRCS=libaltos_posix.c libaltos_linux.c
 
-OS_LIB_CFLAGS=-DLINUX -DPOSIX_TTY $(JAVA_CFLAGS)
+JAVA_CFLAGS=-I/usr/lib/jvm/default-java/include -I/usr/lib/jvm/default-java/include/linux
+
+OS_LIB_CFLAGS=-DLINUX -DPOSIX_TTY $(JAVA_CFLAGS) -shared -fPIC
 
 OS_APP_CFLAGS=$(OS_LIB_CFLAGS)
 
@@ -22,6 +24,8 @@ endif
 #
 ifeq ($(OS),Darwin)
 
+OS_SRCS=libaltos_posix.c libaltos_darwin.c
+
 #OS_LIB_CFLAGS=\
 #	-DDARWIN -DPOSIX_TTY -arch i386 -arch x86_64 \
 #	--sysroot=/Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 \
@@ -29,8 +33,8 @@ ifeq ($(OS),Darwin)
 #	-iwithsysroot /System/Library/Frameworks/IOKit.framework/Headers \
 #	-iwithsysroot /System/Library/Frameworks/CoreFoundation.framework/Headers
 
-XCODE=/Applications/Xcode.app
-SDK=$(XCODE)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+XCODE=/Applications/Xcode-beta.app
+SDK=$(XCODE)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk
 MINVERSION=10.5
 
 OS_LIB_CFLAGS=\
@@ -39,7 +43,7 @@ OS_LIB_CFLAGS=\
 	-iwithsysroot /System/Library/Frameworks/JavaVM.framework/Headers \
 	-iwithsysroot /System/Library/Frameworks/IOKit.framework/Headers \
 	-iwithsysroot /System/Library/Frameworks/CoreFoundation.framework/Headers
-OS_APP_CFLAGS=$(OS_LIB_CFLAGS)
+OS_APP_CFLAGS=$(OS_LIB_CFLAGS) -O0 -g
 
 OS_LDFLAGS =\
 	-framework IOKit -framework CoreFoundation
@@ -53,6 +57,8 @@ endif
 # Windows
 #
 ifneq (,$(findstring MINGW,$(OS)))
+
+OS_SRCS=libaltos_windows.c
 
 CC=gcc
 
@@ -103,7 +109,7 @@ CFLAGS=$(OS_LIB_CFLAGS) -O -I.
 LDFLAGS=$(OS_LDFLAGS)
 
 HEADERS=libaltos.h
-SRCS = libaltos.c $(SWIG_WRAP)
+SRCS = libaltos_common.c $(OS_SRCS) $(SWIG_WRAP)
 OBJS = $(SRCS:%.c=%.o)
 LIBS = $(DARWIN_LIBS)
 
@@ -111,7 +117,7 @@ $(CJNITEST): cjnitest.c $(LIBNAME)
 	$(CC) -o $@ $(OS_APP_CFLAGS) cjnitest.c $(LIBNAME) $(LIBS) $(LDFLAGS)
 
 $(LIBNAME): $(OBJS)
-	$(CC) -shared $(CFLAGS) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+	$(CC) -shared -fPIC $(CFLAGS) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 clean:
 	rm -f $(CLASSFILES) $(OBJS) $(LIBNAME) $(CJNITEST) cjnitest.o

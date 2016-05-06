@@ -82,6 +82,34 @@ ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
 void
 ao_spi_send_sync(void *block, uint16_t len, uint8_t spi_index);
 
+static inline void
+ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
+{
+	struct stm_spi	*stm_spi;
+
+	switch (AO_SPI_INDEX(spi_index)) {
+	case 0:
+		stm_spi = &stm_spi1;
+		break;
+	case 1:
+		stm_spi = &stm_spi2;
+		break;
+	}
+
+	stm_spi->cr2 = ((0 << STM_SPI_CR2_TXEIE) |
+			(0 << STM_SPI_CR2_RXNEIE) |
+			(0 << STM_SPI_CR2_ERRIE) |
+			(0 << STM_SPI_CR2_SSOE) |
+			(0 << STM_SPI_CR2_TXDMAEN) |
+			(0 << STM_SPI_CR2_RXDMAEN));
+
+	/* Clear RXNE */
+	(void) stm_spi->dr;
+
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)));
+	stm_spi->dr = byte;
+}
+
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
 
@@ -148,6 +176,11 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 #define ao_gpio_set(port, bit, pin, v) stm_gpio_set(port, bit, v)
 
 #define ao_gpio_get(port, bit, pin) stm_gpio_get(port, bit)
+
+#define ao_gpio_set_bits(port, bits) stm_gpio_set_bits(port, bits)
+
+#define ao_gpio_clr_bits(port, bits) stm_gpio_clr_bits(port, bits);
+
 
 #define ao_enable_output(port,bit,pin,v) do {			\
 		ao_enable_port(port);				\
@@ -245,12 +278,35 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t i2c_index, uint8_t stop);
 void
 ao_i2c_init(void);
 
+#if USE_SERIAL_1_SW_FLOW || USE_SERIAL_2_SW_FLOW || USE_SERIAL_3_SW_FLOW
+#define HAS_SERIAL_SW_FLOW 1
+#else
+#define HAS_SERIAL_SW_FLOW 0
+#endif
+
+#if USE_SERIAL_1_FLOW && !USE_SERIAL_1_SW_FLOW || USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW || USE_SERIAL_3_FLOW && !USE_SERIAL_3_SW_FLOW
+#define HAS_SERIAL_HW_FLOW 1
+#else
+#define HAS_SERIAL_HW_FLOW 0
+#endif
+
 /* ao_serial_stm.c */
 struct ao_stm_usart {
 	struct ao_fifo		rx_fifo;
 	struct ao_fifo		tx_fifo;
 	struct stm_usart	*reg;
-	uint8_t			tx_started;
+	uint8_t			tx_running;
+	uint8_t			draining;
+#if HAS_SERIAL_SW_FLOW
+	/* RTS - 0 if we have FIFO space, 1 if not
+	 * CTS - 0 if we can send, 0 if not
+	 */
+	struct stm_gpio		*gpio_rts;
+	struct stm_gpio		*gpio_cts;
+	uint8_t			pin_rts;
+	uint8_t			pin_cts;
+	uint8_t			rts;
+#endif
 };
 
 #if HAS_SERIAL_1
@@ -357,6 +413,22 @@ static inline void ao_arch_restore_stack(void) {
 
 #ifndef HAS_SAMPLE_PROFILE
 #define HAS_SAMPLE_PROFILE 0
+#endif
+
+#if DEBUG
+#define HAS_ARCH_VALIDATE_CUR_STACK	1
+
+static inline void
+ao_validate_cur_stack(void)
+{
+	uint8_t		*psp;
+
+	asm("mrs %0,psp" : "=&r" (psp));
+	if (ao_cur_task &&
+	    psp <= ao_cur_task->stack &&
+	    psp >= ao_cur_task->stack - 256)
+		ao_panic(AO_PANIC_STACK);
+}
 #endif
 
 #if !HAS_SAMPLE_PROFILE

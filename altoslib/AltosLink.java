@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -170,8 +170,8 @@ public abstract class AltosLink implements Runnable {
 		boolean	can_cancel = can_cancel_reply();
 		String	reply = null;
 
-		if (!can_cancel && remote)
-			System.out.printf("Uh-oh, reading remote serial device from swing thread\n");
+//		if (!can_cancel && remote)
+//			System.out.printf("Uh-oh, reading remote serial device from swing thread\n");
 
 		if (remote && can_cancel) {
 			timeout = 500;
@@ -539,15 +539,15 @@ public abstract class AltosLink implements Runnable {
 
 		if (config_data.has_monitor_battery()) {
 			try {
-			String[] items = adc();
-			for (int i = 0; i < items.length;) {
-				if (items[i].equals("batt")) {
-					monitor_batt = Integer.parseInt(items[i+1]);
-					i += 2;
-					continue;
+				String[] items = adc();
+				for (int i = 0; i < items.length;) {
+					if (items[i].equals("batt")) {
+						monitor_batt = Integer.parseInt(items[i+1]);
+						i += 2;
+						continue;
+					}
+					i++;
 				}
-				i++;
-			}
 			} catch (TimeoutException te) {
 			}
 		}

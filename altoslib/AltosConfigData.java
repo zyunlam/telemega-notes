@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.util.*;
 import java.text.*;
@@ -476,6 +476,18 @@ public class AltosConfigData implements Iterable<String> {
 	}
 
 
+	public boolean mma655x_inverted() throws AltosUnknownProduct {
+		if (product.startsWith("EasyMega-v1"))
+			return false;
+		if (product.startsWith("TeleMetrum-v2"))
+			return true;
+		if (product.startsWith("TeleMega-v2"))
+			return false;
+		if (product.startsWith("TeleMega-v1"))
+			return false;
+		throw new AltosUnknownProduct(product);
+	}
+
 	public void get_values(AltosConfigValues source) throws AltosConfigDataException {
 
 		/* HAS_FLIGHT */
@@ -493,8 +505,6 @@ public class AltosConfigData implements Iterable<String> {
 			radio_enable = source.radio_enable();
 		if (callsign != null)
 			callsign = source.callsign();
-		if (radio_calibration >= 0)
-			radio_calibration = source.radio_calibration();
 		if (telemetry_rate >= 0)
 			telemetry_rate = source.telemetry_rate();
 
@@ -600,10 +610,6 @@ public class AltosConfigData implements Iterable<String> {
 			link.printf("c d %d\n", apogee_delay);
 		if (apogee_lockout >= 0)
 			link.printf("c L %d\n", apogee_lockout);
-
-		/* Don't mess with radio calibration when remote */
-		if (radio_calibration > 0 && !remote)
-			link.printf("c f %d\n", radio_calibration);
 
 		/* HAS_RADIO */
 		if (has_frequency()) {

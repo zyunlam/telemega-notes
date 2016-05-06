@@ -206,7 +206,7 @@ get_load(Elf *e)
 #endif
 	size_t		nshdr;
 	size_t		s;
-	
+
 	if (elf_getshdrstrndx(e, &shstrndx) < 0)
 		return 0;
 
@@ -238,7 +238,7 @@ get_load(Elf *e)
 			 (uint32_t) phdr.p_filesz,
 			 (uint32_t) phdr.p_memsz);
 #endif
-		
+
 		for (s = 0; s < nshdr; s++) {
 			scn = elf_getscn(e, s);
 
@@ -256,7 +256,7 @@ get_load(Elf *e)
 #endif
 
 			if (phdr.p_offset <= shdr.sh_offset && shdr.sh_offset < phdr.p_offset + phdr.p_filesz) {
-					
+
 				if (shdr.sh_size == 0)
 					continue;
 

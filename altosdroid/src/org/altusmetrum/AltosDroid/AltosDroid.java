@@ -45,13 +45,15 @@ import android.view.*;
 import android.widget.*;
 import android.app.AlertDialog;
 import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
 import android.hardware.usb.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
-public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
+public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener {
 
 	// Actions sent to the telemetry server at startup time
 
@@ -62,14 +64,26 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 	public static final int MSG_STATE           = 1;
 	public static final int MSG_UPDATE_AGE      = 2;
+	public static final int	MSG_IDLE_MODE	    = 3;
+	public static final int MSG_IGNITER_STATUS  = 4;
 
 	// Intent request codes
 	public static final int REQUEST_CONNECT_DEVICE = 1;
 	public static final int REQUEST_ENABLE_BT      = 2;
 	public static final int REQUEST_PRELOAD_MAPS   = 3;
-	public static final int REQUEST_MAP_TYPE       = 4;
+	public static final int REQUEST_IDLE_MODE      = 5;
+	public static final int REQUEST_IGNITERS       = 6;
+	public static final int REQUEST_SETUP	       = 7;
 
-	public int map_type = AltosMap.maptype_hybrid;
+	public static final String EXTRA_IDLE_MODE = "idle_mode";
+	public static final String EXTRA_IDLE_RESULT = "idle_result";
+	public static final String EXTRA_TELEMETRY_SERVICE = "telemetry_service";
+
+	// Setup result bits
+	public static final int SETUP_BAUD = 1;
+	public static final int SETUP_UNITS = 2;
+	public static final int SETUP_MAP_SOURCE = 4;
+	public static final int SETUP_MAP_TYPE = 8;
 
 	public static FragmentManager	fm;
 
@@ -95,8 +109,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	// field to display the version at the bottom of the screen
 	private TextView mVersion;
 
-	private double frequency;
-	private int telemetry_rate;
+	private boolean idle_mode = false;
+
+	public Location location = null;
 
 	// Tabs
 	TabHost         mTabHost;
@@ -141,6 +156,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				break;
 			case MSG_UPDATE_AGE:
 				ad.update_age();
+				break;
+			case MSG_IDLE_MODE:
+				ad.idle_mode = (Boolean) msg.obj;
+				ad.update_state(null);
 				break;
 			}
 		}
@@ -212,8 +231,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		switch (telemetry_state.connect) {
 		case TelemetryState.CONNECT_CONNECTED:
 			if (telemetry_state.config != null) {
-				String str = String.format("S/N %d %6.3f MHz", telemetry_state.config.serial,
-							   telemetry_state.frequency);
+				String str = String.format("S/N %d %6.3f MHz%s", telemetry_state.config.serial,
+							   telemetry_state.frequency, idle_mode ? " (idle)" : "");
 				if (telemetry_state.telemetry_rate != AltosLib.ao_telemetry_rate_38400)
 					str = str.concat(String.format(" %d bps",
 								       AltosLib.ao_telemetry_rate_values[telemetry_state.telemetry_rate]));
@@ -314,7 +333,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				state = newest_state;
 		}
 
-		update_ui(telemetry_state, state, telemetry_state.location);
+		update_ui(telemetry_state, state);
 
 		start_timer();
 	}
@@ -379,7 +398,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
-	void update_ui(TelemetryState telem_state, AltosState state, Location location) {
+	void update_ui(TelemetryState telem_state, AltosState state) {
 
 		int prev_state = AltosLib.ao_flight_invalid;
 
@@ -440,7 +459,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				mCallsignView.setText(state.callsign);
 			}
 			if (saved_state == null || state.serial != saved_state.serial) {
-				mSerialView.setText(String.format("%d", state.serial));
+				if (state.serial == AltosLib.MISSING)
+					mSerialView.setText("");
+				else
+					mSerialView.setText(String.format("%d", state.serial));
 			}
 			if (saved_state == null || state.flight != saved_state.flight) {
 				if (state.flight == AltosLib.MISSING)
@@ -457,7 +479,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 				}
 			}
 			if (saved_state == null || state.rssi != saved_state.rssi) {
-				mRSSIView.setText(String.format("%d", state.rssi));
+				if (state.rssi == AltosLib.MISSING)
+					mRSSIView.setText("");
+				else
+					mRSSIView.setText(String.format("%d", state.rssi));
 			}
 		}
 
@@ -510,11 +535,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		return tab_view;
 	}
 
-	public void set_map_source(int source) {
-		for (AltosDroidTab mTab : mTabs)
-			mTab.set_map_source(source);
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -560,22 +580,15 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		mAgeOldColor   = getResources().getColor(R.color.old_color);
 	}
 
-	private boolean ensureBluetooth() {
+	private void ensureBluetooth() {
 		// Get local Bluetooth adapter
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-		// If the adapter is null, then Bluetooth is not supported
-		if (mBluetoothAdapter == null) {
-			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-			return false;
-		}
-
-		if (!mBluetoothAdapter.isEnabled()) {
+		/* if there is a BT adapter and it isn't turned on, then turn it on */
+		if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
 			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, AltosDroid.REQUEST_ENABLE_BT);
 		}
-
-		return true;
 	}
 
 	private boolean check_usb() {
@@ -641,9 +654,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 					return;
 			}
 			AltosDebug.debug("Starting by looking for bluetooth devices");
-			if (ensureBluetooth())
-				return;
-			finish();
+			ensureBluetooth();
 		}
 	}
 
@@ -679,12 +690,27 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 	public void onResume() {
 		super.onResume();
 		AltosDebug.debug("+ ON RESUME +");
+
+		// Listen for GPS and Network position updates
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+
+		location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+		if (location != null)
+			AltosDebug.debug("Resume, location is %f,%f\n",
+					 location.getLatitude(),
+					 location.getLongitude());
+
+		update_ui(telemetry_state, saved_state);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		AltosDebug.debug("- ON PAUSE -");
+		// Stop listening for location updates
+		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
 	}
 
 	@Override
@@ -720,19 +746,46 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			if (resultCode == Activity.RESULT_OK) {
 				// Bluetooth is now enabled, so set up a chat session
 				//setupChat();
+				AltosDebug.debug("BT enabled");
+				bluetoothEnabled(data);
 			} else {
 				// User did not enable Bluetooth or an error occured
-				AltosDebug.error("BT not enabled");
-				stopService(new Intent(AltosDroid.this, TelemetryService.class));
-				Toast.makeText(this, R.string.bt_not_enabled, Toast.LENGTH_SHORT).show();
-				finish();
+				AltosDebug.debug("BT not enabled");
 			}
 			break;
-		case REQUEST_MAP_TYPE:
+		case REQUEST_IDLE_MODE:
 			if (resultCode == Activity.RESULT_OK)
-				set_map_type(data);
+				idle_mode(data);
+			break;
+		case REQUEST_IGNITERS:
+			break;
+		case REQUEST_SETUP:
+			if (resultCode == Activity.RESULT_OK)
+				note_setup_changes(data);
 			break;
 		}
+	}
+
+	private void note_setup_changes(Intent data) {
+		int changes = data.getIntExtra(SetupActivity.EXTRA_SETUP_CHANGES, 0);
+
+		if ((changes & SETUP_BAUD) != 0) {
+			try {
+				mService.send(Message.obtain(null, TelemetryService.MSG_SETBAUD,
+							     AltosPreferences.telemetry_rate(1)));
+			} catch (RemoteException re) {
+			}
+		}
+		if ((changes & SETUP_UNITS) != 0) {
+			/* nothing to do here */
+		}
+		if ((changes & SETUP_MAP_SOURCE) != 0) {
+			/* nothing to do here */
+		}
+		if ((changes & SETUP_MAP_TYPE) != 0) {
+			/* nothing to do here */
+		}
+		set_switch_time();
 	}
 
 	private void connectUsb(UsbDevice device) {
@@ -746,6 +799,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			} catch (RemoteException e) {
 				AltosDebug.debug("connect device message failed");
 			}
+		}
+	}
+
+	private void bluetoothEnabled(Intent data) {
+		try {
+			mService.send(Message.obtain(null, TelemetryService.MSG_BLUETOOTH_ENABLED, null));
+		} catch (RemoteException e) {
+			AltosDebug.debug("send BT enabled message failed");
 		}
 	}
 
@@ -771,14 +832,37 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
-	private void set_map_type(Intent data) {
-		int type = data.getIntExtra(MapTypeActivity.EXTRA_MAP_TYPE, -1);
+	private void idle_mode(Intent data) {
+		int type = data.getIntExtra(IdleModeActivity.EXTRA_IDLE_RESULT, -1);
+		Message msg;
 
-		AltosDebug.debug("intent set_map_type %d\n", type);
-		if (type != -1) {
-			map_type = type;
-			for (AltosDroidTab mTab : mTabs)
-				mTab.set_map_type(map_type);
+		AltosDebug.debug("intent idle_mode %d", type);
+		switch (type) {
+		case IdleModeActivity.IDLE_MODE_CONNECT:
+			msg = Message.obtain(null, TelemetryService.MSG_MONITOR_IDLE_START);
+			try {
+				mService.send(msg);
+			} catch (RemoteException re) {
+			}
+			break;
+		case IdleModeActivity.IDLE_MODE_DISCONNECT:
+			msg = Message.obtain(null, TelemetryService.MSG_MONITOR_IDLE_STOP);
+			try {
+				mService.send(msg);
+			} catch (RemoteException re) {
+			}
+			break;
+		case IdleModeActivity.IDLE_MODE_REBOOT:
+			msg = Message.obtain(null, TelemetryService.MSG_REBOOT);
+			try {
+				mService.send(msg);
+			} catch (RemoteException re) {
+			}
+			break;
+		case IdleModeActivity.IDLE_MODE_IGNITERS:
+			Intent serverIntent = new Intent(this, IgniterActivity.class);
+			startActivityForResult(serverIntent, REQUEST_IGNITERS);
+			break;
 		}
 	}
 
@@ -797,11 +881,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		}
 	}
 
-	void setFrequency(String freq) {
-		try {
-			setFrequency (AltosParse.parse_double_net(freq.substring(11, 17)));
-		} catch (ParseException e) {
-		}
+	void setFrequency(AltosFrequency frequency) {
+		setFrequency (frequency.frequency);
 	}
 
 	void setBaud(int baud) {
@@ -889,11 +970,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 		Intent serverIntent = null;
 		switch (item.getItemId()) {
 		case R.id.connect_scan:
-			if (ensureBluetooth()) {
-				// Launch the DeviceListActivity to see devices and do scan
-				serverIntent = new Intent(this, DeviceListActivity.class);
-				startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
-			}
+			ensureBluetooth();
+			// Launch the DeviceListActivity to see devices and do scan
+			serverIntent = new Intent(this, DeviceListActivity.class);
+			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
 			return true;
 		case R.id.disconnect:
 			/* Disconnect the device
@@ -905,25 +985,21 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			disconnectDevice();
 			finish();
 			return true;
+		case R.id.setup:
+			serverIntent = new Intent(this, SetupActivity.class);
+			startActivityForResult(serverIntent, REQUEST_SETUP);
+			return true;
 		case R.id.select_freq:
 			// Set the TBT radio frequency
 
-			final String[] frequencies = {
-				"Channel 0 (434.550MHz)",
-				"Channel 1 (434.650MHz)",
-				"Channel 2 (434.750MHz)",
-				"Channel 3 (434.850MHz)",
-				"Channel 4 (434.950MHz)",
-				"Channel 5 (435.050MHz)",
-				"Channel 6 (435.150MHz)",
-				"Channel 7 (435.250MHz)",
-				"Channel 8 (435.350MHz)",
-				"Channel 9 (435.450MHz)"
-			};
+			final AltosFrequency[] frequencies = AltosPreferences.common_frequencies();
+			String[] frequency_strings = new String[frequencies.length];
+			for (int i = 0; i < frequencies.length; i++)
+				frequency_strings[i] = frequencies[i].toString();
 
 			AlertDialog.Builder builder_freq = new AlertDialog.Builder(this);
 			builder_freq.setTitle("Pick a frequency");
-			builder_freq.setItems(frequencies,
+			builder_freq.setItems(frequency_strings,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
 							 setFrequency(frequencies[item]);
@@ -931,44 +1007,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 					 });
 			AlertDialog alert_freq = builder_freq.create();
 			alert_freq.show();
-			return true;
-		case R.id.select_rate:
-			// Set the TBT baud rate
-
-			final String[] rates = {
-				"38400",
-				"9600",
-				"2400",
-			};
-
-			AlertDialog.Builder builder_rate = new AlertDialog.Builder(this);
-			builder_rate.setTitle("Pick a baud rate");
-			builder_rate.setItems(rates,
-					 new DialogInterface.OnClickListener() {
-						 public void onClick(DialogInterface dialog, int item) {
-							 setBaud(rates[item]);
-						 }
-					 });
-			AlertDialog alert_rate = builder_rate.create();
-			alert_rate.show();
-			return true;
-		case R.id.change_units:
-			boolean	imperial = AltosPreferences.imperial_units();
-			AltosPreferences.set_imperial_units(!imperial);
-			return true;
-		case R.id.preload_maps:
-			serverIntent = new Intent(this, PreloadMapActivity.class);
-			startActivityForResult(serverIntent, REQUEST_PRELOAD_MAPS);
-			return true;
-		case R.id.map_type:
-			serverIntent = new Intent(this, MapTypeActivity.class);
-			startActivityForResult(serverIntent, REQUEST_MAP_TYPE);
-			return true;
-		case R.id.map_source:
-			int source = AltosDroidPreferences.map_source();
-			int new_source = source == AltosDroidPreferences.MAP_SOURCE_ONLINE ? AltosDroidPreferences.MAP_SOURCE_OFFLINE : AltosDroidPreferences.MAP_SOURCE_ONLINE;
-			AltosDroidPreferences.set_map_source(new_source);
-			set_map_source(new_source);
 			return true;
 		case R.id.select_tracker:
 			if (serials != null) {
@@ -1010,12 +1048,17 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 
 			}
 			return true;
+		case R.id.idle_mode:
+			serverIntent = new Intent(this, IdleModeActivity.class);
+			serverIntent.putExtra(EXTRA_IDLE_MODE, idle_mode);
+			startActivityForResult(serverIntent, REQUEST_IDLE_MODE);
+			return true;
 		}
 		return false;
 	}
 
 	static String direction(AltosGreatCircle from_receiver,
-			     Location receiver) {
+				Location receiver) {
 		if (from_receiver == null)
 			return null;
 
@@ -1043,5 +1086,25 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener {
 			return String.format("left %d°", -iheading);
 		else
 			return String.format("right %d°", iheading);
+	}
+
+	public void onLocationChanged(Location location) {
+		this.location = location;
+		AltosDebug.debug("Location changed to %f,%f",
+				 location.getLatitude(),
+				 location.getLongitude());
+		update_ui(telemetry_state, saved_state);
+	}
+
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		AltosDebug.debug("Location status now %d\n", status);
+	}
+
+	public void onProviderEnabled(String provider) {
+		AltosDebug.debug("Location provider enabled %s\n", provider);
+	}
+
+	public void onProviderDisabled(String provider) {
+		AltosDebug.debug("Location provider disabled %s\n", provider);
 	}
 }

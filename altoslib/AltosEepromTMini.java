@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosEepromTm extends AltosEeprom {
+public class AltosEepromTMini extends AltosEeprom {
 	public int	i;
 	public int	a;
 	public int	b;
@@ -58,7 +58,7 @@ public class AltosEepromTm extends AltosEeprom {
 		}
 	}
 
-	public AltosEepromTm (AltosEepromChunk chunk, int start, AltosState state) throws ParseException {
+	public AltosEepromTMini (AltosEepromChunk chunk, int start, AltosState state) throws ParseException {
 		int	value = chunk.data16(start);
 
 		int	i = (chunk.address + start) / record_length;
@@ -100,7 +100,7 @@ public class AltosEepromTm extends AltosEeprom {
 		}
 	}
 
-	public AltosEepromTm (String line) {
+	public AltosEepromTMini (String line) {
 		valid = false;
 		tick = 0;
 		a = 0;
@@ -130,7 +130,7 @@ public class AltosEepromTm extends AltosEeprom {
 		}
 	}
 
-	public AltosEepromTm(int in_cmd, int in_tick, int in_a, int in_b) {
+	public AltosEepromTMini(int in_cmd, int in_tick, int in_a, int in_b) {
 		valid = true;
 		cmd = in_cmd;
 		tick = in_tick;
@@ -146,7 +146,7 @@ public class AltosEepromTm extends AltosEeprom {
 				String line = AltosLib.gets(input);
 				if (line == null)
 					break;
-				AltosEepromTm tm = new AltosEepromTm(line);
+				AltosEepromTMini tm = new AltosEepromTMini(line);
 				tms.add(tm);
 			} catch (IOException ie) {
 				break;

@@ -166,6 +166,16 @@ stm_gpio_set(struct stm_gpio *gpio, int pin, uint8_t value) {
 	gpio->bsrr = ((uint32_t) (value ^ 1) << (pin + 16)) | ((uint32_t) value << pin);
 }
 
+static inline void
+stm_gpio_set_bits(struct stm_gpio *gpio, uint16_t bits) {
+	gpio->bsrr = bits;
+}
+
+static inline void
+stm_gpio_clr_bits(struct stm_gpio *gpio, uint16_t bits) {
+	gpio->bsrr = ((uint32_t) bits) << 16;
+}
+
 static inline uint8_t
 stm_gpio_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->idr >> pin) & 1;

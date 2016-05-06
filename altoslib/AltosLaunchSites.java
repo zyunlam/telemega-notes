@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.lang.*;
@@ -47,7 +47,12 @@ public class AltosLaunchSites extends Thread {
 
 	public void run() {
 		try {
-			url = new URL(AltosLib.launch_sites_url);
+			String	path;
+
+			path = System.getenv(AltosLib.launch_sites_env);
+			if (path == null)
+				path = AltosLib.launch_sites_url;
+			url = new URL(path);
 			URLConnection uc = url.openConnection();
 
 			InputStreamReader in_stream = new InputStreamReader(uc.getInputStream(), AltosLib.unicode_set);
@@ -60,6 +65,7 @@ public class AltosLaunchSites extends Thread {
 				add(line);
 			}
 		} catch (Exception e) {
+			System.out.printf("file exception %s\n", e.toString());
 		} finally {
 			notify_complete();
 		}

@@ -20,7 +20,7 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 import java.io.*;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 import android.app.Activity;
 import android.graphics.*;
@@ -79,7 +79,7 @@ class Rocket implements Comparable {
 	}
 }
 
-public class AltosMapOffline extends View implements ScaleGestureDetector.OnScaleGestureListener, AltosMapInterface, AltosDroidMapInterface {
+public class AltosMapOffline extends View implements ScaleGestureDetector.OnScaleGestureListener, AltosMapInterface, AltosDroidMapInterface, AltosMapTypeListener {
 	ScaleGestureDetector	scale_detector;
 	boolean			scaling;
 	AltosMap		map;
@@ -133,7 +133,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			if (canvas.quickReject(pt.x, pt.y, pt.x + px_size, pt.y + px_size, Canvas.EdgeType.AA))
 				return;
 
-			AltosImage		altos_image = cache.get(this, store, px_size, px_size);
+			AltosImage		altos_image = this.get_image();
 
 			MapImage 		map_image = (MapImage) altos_image;
 
@@ -150,8 +150,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 				if (t.has_location()) {
 					String	message = null;
 					switch (status) {
-					case AltosMapTile.loading:
-						message = "Loading...";
+					case AltosMapTile.fetching:
+						message = "Fetching...";
 						break;
 					case AltosMapTile.bad_request:
 						message = "Internal error";
@@ -181,14 +181,14 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			}
 		}
 
-		public MapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(listener, upper_left, center, zoom, maptype, px_size, 2);
+		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+			super(cache, upper_left, center, zoom, maptype, px_size, 2);
 		}
 
 	}
 
-	public AltosMapTile new_tile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new MapTile(listener, upper_left, center, zoom, maptype, px_size);
+	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+		return new MapTile(cache, upper_left, center, zoom, maptype, px_size);
 	}
 
 	public AltosMapPath new_path() {
@@ -441,6 +441,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	}
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+		boolean	changed = false;
+
 		if (state != null) {
 			map.show(state, null);
 			if (state.pad_lat != AltosLib.MISSING && pad == null)
@@ -479,14 +481,20 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			}
 		}
 		if (receiver != null) {
-			here = new AltosLatLon(receiver.getLatitude(), receiver.getLongitude());
+			AltosLatLon new_here = new AltosLatLon(receiver.getLatitude(), receiver.getLongitude());
+			if (!new_here.equals(here)) {
+				here = new_here;
+				AltosDebug.debug("Location changed, redraw");
+				repaint();
+			}
 		}
 	}
 
 	public void onCreateView(AltosDroid altos_droid) {
 		this.altos_droid = altos_droid;
 		map = new AltosMap(this);
-		map.set_maptype(altos_droid.map_type);
+		AltosPreferences.register_map_type_listener(this);
+		map.set_maptype(AltosPreferences.map_type());
 
 		pad_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pad);
 		/* arrow at the bottom of the launchpad image */
@@ -504,7 +512,11 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 		here_off_y = here_bitmap.getHeight() / 2;
 	}
 
-	public void set_map_type(int map_type) {
+	public void onDestroyView() {
+		AltosPreferences.unregister_map_type_listener(this);
+	}
+
+	public void map_type_changed(int map_type) {
 		if (map != null)
 			map.set_maptype(map_type);
 	}

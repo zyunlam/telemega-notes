@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_9;
+package org.altusmetrum.altosuilib_10;
 
 import java.awt.*;
 import javax.swing.*;
 import java.util.*;
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 public class AltosFlightStatsTable extends JComponent implements AltosFontListener {
 	GridBagLayout	layout;
@@ -117,18 +117,18 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 		}
 		new FlightStat(layout, y++, "Maximum speed",
 			       String.format("%5.0f m/s", stats.max_speed),
-			       String.format("%5.0f mph", AltosConvert.meters_to_mph(stats.max_speed)),
+			       String.format("%5.0f fps", AltosConvert.mps_to_fps(stats.max_speed)),
 			       String.format("Mach %4.1f", AltosConvert.meters_to_mach(stats.max_speed)));
-		if (stats.max_acceleration != AltosLib.MISSING) {
+		if (stats.max_acceleration != AltosLib.MISSING)
 			new FlightStat(layout, y++, "Maximum boost acceleration",
 				       String.format("%5.0f m/s²", stats.max_acceleration),
 				       String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.max_acceleration)),
 				       String.format("%5.0f G", AltosConvert.meters_to_g(stats.max_acceleration)));
+		if (stats.state_accel[AltosLib.ao_flight_boost] != AltosLib.MISSING)
 			new FlightStat(layout, y++, "Average boost acceleration",
 				       String.format("%5.0f m/s²", stats.state_accel[AltosLib.ao_flight_boost]),
 				       String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.state_accel[AltosLib.ao_flight_boost])),
 				       String.format("%5.0f G", AltosConvert.meters_to_g(stats.state_accel[AltosLib.ao_flight_boost])));
-		}
 		if (stats.state_speed[AltosLib.ao_flight_drogue] != AltosLib.MISSING)
 			new FlightStat(layout, y++, "Drogue descent rate",
 				       String.format("%5.0f m/s", stats.state_speed[AltosLib.ao_flight_drogue]),
