@@ -39,6 +39,13 @@
 <revhistory>
   <?dbhtml filename="easymini-revhistory.html"?>
   <revision>
+    <revnumber>1.6.3</revnumber>
+    <date>21 April 2016</date>
+    <revremark>
+      Minor release fixing various host software bugs.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.6.2</revnumber>
     <date>10 January 2016</date>
     <revremark>

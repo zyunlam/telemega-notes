@@ -60,6 +60,7 @@ ao-list | while read product serial dev; do
 	    echo""
 
 	    echo "$PRODUCT-v$VERSION" serial "$serial" is ready to ship
+	    echo "\007"
 	    ret=0
 	    ;;
     esac

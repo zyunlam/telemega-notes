@@ -20,7 +20,7 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 import java.io.*;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 import android.app.Activity;
 import android.graphics.*;
@@ -32,7 +32,7 @@ import android.widget.*;
 import android.location.Location;
 import android.content.*;
 
-public class TabMap extends AltosDroidTab {
+public class TabMap extends AltosDroidTab implements AltosDroidMapSourceListener {
 
 	AltosLatLon	here;
 
@@ -74,7 +74,8 @@ public class TabMap extends AltosDroidTab {
 		map_offline.onCreateView(altos_droid);
 		map_online = new AltosMapOnline(view.getContext());
 		map_online.onCreateView(altos_droid);
-		set_map_source(AltosDroidPreferences.map_source());
+		map_source_changed(AltosDroidPreferences.map_source());
+		AltosDroidPreferences.register_map_source_listener(this);
 		return view;
 	}
 
@@ -88,6 +89,9 @@ public class TabMap extends AltosDroidTab {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		map_offline.onDestroyView();
+		map_online.onDestroyView();
+		AltosDroidPreferences.unregister_map_source_listener(this);
 	}
 
 	public String tab_name() { return AltosDroid.tab_map_name; }
@@ -144,16 +148,7 @@ public class TabMap extends AltosDroidTab {
 		}
 	}
 
-	@Override
-	public void set_map_type(int map_type) {
-		if (map_offline != null)
-			map_offline.set_map_type(map_type);
-		if (map_online != null)
-			map_online.set_map_type(map_type);
-	}
-
-	@Override
-	public void set_map_source(int map_source) {
+	public void map_source_changed(int map_source) {
 		this.map_source = map_source;
 		if (map_source == AltosDroidPreferences.MAP_SOURCE_OFFLINE) {
 			if (map_online != null)

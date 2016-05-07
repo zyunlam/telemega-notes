@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_9;
+package org.altusmetrum.altosuilib_10;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -27,7 +27,7 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.imageio.*;
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, AltosMapInterface {
 
@@ -241,8 +241,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 	}
 
 	class MapTile extends AltosMapTile {
-		public MapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(listener, upper_left, center, zoom, maptype, px_size);
+		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+			super(cache, upper_left, center, zoom, maptype, px_size);
 		}
 
 		public void paint(AltosMapTransform t) {
@@ -254,11 +254,9 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 			if (!g.hitClip(point.x, point.y, px_size, px_size))
 				return;
 
-			AltosImage altos_image = cache.get(this, store, px_size, px_size);
-
+			AltosImage	altos_image = get_image();
 			AltosUIImage	ui_image = (AltosUIImage) altos_image;
-
-			Image image = null;
+			Image		image = null;
 
 			if (ui_image != null)
 				image = ui_image.image;
@@ -272,8 +270,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 				if (t.has_location()) {
 					String	message = null;
 					switch (status) {
-					case AltosMapTile.loading:
-						message = "Loading...";
+					case AltosMapTile.fetching:
+						message = "Fetching...";
 						break;
 					case AltosMapTile.bad_request:
 						message = "Internal error";
@@ -334,8 +332,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 		return new MapMark(lat, lon, state);
 	}
 
-	public AltosMapTile new_tile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new MapTile(listener, upper_left, center, zoom, maptype, px_size);
+	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+		return new MapTile(cache, upper_left, center, zoom, maptype, px_size);
 	}
 
 	public int width() {

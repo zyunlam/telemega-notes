@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.altusmetrum.altoslib_9.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class MicroExport extends JFileChooser {
 

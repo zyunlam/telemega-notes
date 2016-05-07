@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_9;
+package org.altusmetrum.altosuilib_10;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,7 +26,7 @@ import java.text.*;
 import java.lang.Math;
 import java.net.URL;
 import java.net.URLConnection;
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 class AltosUIMapPos extends Box {
 	AltosUIFrame	owner;
@@ -127,8 +127,6 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 	JProgressBar	pbar;
 
-	AltosMapLoader	loader;
-
 	JLabel		site_list_label;
 	JComboBox<AltosLaunchSite>	site_list;
 
@@ -189,7 +187,8 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	}
 
 	public void debug(String format, Object ... arguments) {
-		System.out.printf(format, arguments);
+		if (AltosSerial.debug)
+			System.out.printf(format, arguments);
 	}
 
 
@@ -237,7 +236,10 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 						r = r * 1000;
 					loading = true;
 
-					loader.load(latitude, longitude, min_z, max_z, r, all_types());
+					new AltosMapLoader(map.map, this,
+							   latitude, longitude,
+							   min_z, max_z, r, all_types());
+
 				} catch (ParseException pe) {
 					load_button.setSelected(false);
 				}
@@ -269,8 +271,6 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		pane.setLayout(new GridBagLayout());
 
 		map = new AltosUIMapNew();
-
-		loader = new AltosMapLoader(map.map, this);
 
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;

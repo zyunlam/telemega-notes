@@ -38,9 +38,13 @@ fat_windows = \
 	telegps/TeleGPS-Windows-$(VERSION_DASH).exe \
 	micropeak/MicroPeak-Windows-$(VERSION_DASH).exe
 
+fat_android = \
+	altosdroid/bin/AltosDroid-debug.apk \
+	altosdroid/bin/AltosDroid-release.apk
+
 keithp-fat: fat
 	ssh keithp.com mkdir -p public_html/altos-$(VERSION)
-	scp -p $(fat_linux) $(fat_mac) $(fat_windows) keithp.com:public_html/altos-$(VERSION)
+	scp -p $(fat_linux) $(fat_mac) $(fat_windows) $(fat_android) keithp.com:public_html/altos-$(VERSION)
 
 set-java-versions:
 	$(top_srcdir)/fix-java-versions org.altusmetrum.altoslib=$(ALTOSLIB_VERSION) org.altusmetrum.altosuilib=$(ALTOSUILIB_VERSION)

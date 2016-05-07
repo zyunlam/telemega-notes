@@ -31,7 +31,6 @@ main(void)
 	ao_clock_init();
 
 	ao_task_init();
-	ao_serial_init();
 	ao_led_init(LEDS_AVAILABLE);
 	ao_led_on(AO_LED_RED);
 	ao_timer_init();

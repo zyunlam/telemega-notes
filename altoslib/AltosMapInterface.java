@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.net.*;
@@ -29,7 +29,7 @@ public interface AltosMapInterface {
 
 	public abstract AltosMapMark new_mark(double lat, double lon, int state);
 
-	public abstract AltosMapTile new_tile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size);
+	public abstract AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size);
 
 	public abstract int width();
 

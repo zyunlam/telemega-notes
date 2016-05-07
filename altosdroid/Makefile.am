@@ -47,7 +47,7 @@ DRAWABLES=\
 LAYOUTS=$(LAYOUT_DIR)/*.xml
 MENUS=$(MENU_DIR)/*.xml
 VALUES=$(VALUES_DIR)/*.xml
-XMLS=$(XML_DIR)/*.xml
+XMLS=$(XML_DIR)/*.xml AndroidManifest.xml
 
 RES=$(LAYOUTS) $(MENUS) $(VALUES) $(XMLS)
 

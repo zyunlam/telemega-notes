@@ -22,8 +22,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.text.*;
-import org.altusmetrum.altoslib_9.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class AltosConfig implements ActionListener {
 

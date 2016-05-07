@@ -24,9 +24,9 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.*;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
-public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
+public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	public final static String        NAME    = "org.altusmetrum.AltosDroid";
 	private Context                   context = null;
 	private SharedPreferences         prefs   = null;
@@ -53,6 +53,8 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 	}
 
 	public AltosPreferencesBackend node(String key) {
+		if (!nodeExists(key))
+			putBoolean(key, true);
 		return new AltosDroidPreferencesBackend(context, key);
 	}
 
@@ -119,5 +121,9 @@ public class AltosDroidPreferencesBackend implements AltosPreferencesBackend {
 
 	public File homeDirectory() {
 		return Environment.getExternalStorageDirectory();
+	}
+
+	public void debug(String format, Object ... arguments) {
+		AltosDebug.debug(format, arguments);
 	}
 }

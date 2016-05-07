@@ -39,6 +39,8 @@
 #define PACKET_HAS_MASTER	0
 #define PACKET_HAS_SLAVE	0
 
+#define PAD_BOX			0
+
 #define AO_LED_CONTINUITY(c)	(1 << ((c) + 2))
 #define AO_LED_CONTINUITY_MASK	(0xc)
 #define AO_LED_ARMED		0x10

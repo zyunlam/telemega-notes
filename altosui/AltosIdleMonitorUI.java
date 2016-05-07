@@ -24,8 +24,8 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.Arrays;
-import org.altusmetrum.altoslib_9.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDisplay, AltosIdleMonitorListener, DocumentListener {
 	AltosDevice		device;
@@ -123,6 +123,19 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		Runnable r = new Runnable() {
 				public void run() {
 					close();
+				}
+			};
+		SwingUtilities.invokeLater(r);
+	}
+
+	public void error(final String reason) {
+		Runnable r = new Runnable() {
+				public void run() {
+					disconnect();
+					JOptionPane.showMessageDialog(AltosIdleMonitorUI.this,
+								      reason,
+								      "Error fetching data",
+								      JOptionPane.ERROR_MESSAGE);
 				}
 			};
 		SwingUtilities.invokeLater(r);

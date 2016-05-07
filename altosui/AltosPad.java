@@ -18,8 +18,8 @@
 package altosui;
 
 import java.util.*;
-import org.altusmetrum.altoslib_9.*;
-import org.altusmetrum.altosuilib_9.*;
+import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altosuilib_10.*;
 
 public class AltosPad extends AltosUIFlightTab {
 

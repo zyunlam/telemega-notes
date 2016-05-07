@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.util.*;
@@ -40,7 +40,7 @@ class AltosIdler {
 	static final int	idle_sensor_tmini = 14;
 	static final int	idle_sensor_tgps = 15;
 
-	public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException {
+	public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
 			AltosIdle idle = null;
 			switch (idler) {
@@ -137,8 +137,9 @@ public class AltosIdleFetch implements AltosStateUpdate {
 	double			frequency;
 	String			callsign;
 
-	public void update_state(AltosState state) throws InterruptedException {
+	public void update_state(AltosState state) throws InterruptedException, AltosUnknownProduct {
 		try {
+			boolean	matched = false;
 			/* Fetch config data from remote */
 			AltosConfigData config_data = new AltosConfigData(link);
 			state.set_state(AltosLib.ao_flight_stateless);
@@ -150,9 +151,12 @@ public class AltosIdleFetch implements AltosStateUpdate {
 			for (AltosIdler idler : idlers) {
 				if (idler.matches(config_data)) {
 					idler.update_state(state, link, config_data);
+					matched = true;
 					break;
 				}
 			}
+			if (!matched)
+				throw new AltosUnknownProduct(config_data.product);
 			state.set_received_time(System.currentTimeMillis());
 		} catch (TimeoutException te) {
 		}

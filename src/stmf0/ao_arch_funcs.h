@@ -18,25 +18,27 @@
 #ifndef _AO_ARCH_FUNCS_H_
 #define _AO_ARCH_FUNCS_H_
 
+#include <ao_power.h>
+
 /* ao_spi_stm.c
  */
 
-/* PCLK is set to 16MHz (HCLK 32MHz, APB prescaler 2) */
+/* PCLK is set to 48MHz (HCLK 48MHz, HPRE 1, PPRE 1) */
 
-#define AO_SPI_SPEED_8MHz	STM_SPI_CR1_BR_PCLK_2
-#define AO_SPI_SPEED_4MHz	STM_SPI_CR1_BR_PCLK_4
-#define AO_SPI_SPEED_2MHz	STM_SPI_CR1_BR_PCLK_8
-#define AO_SPI_SPEED_1MHz	STM_SPI_CR1_BR_PCLK_16
-#define AO_SPI_SPEED_500kHz	STM_SPI_CR1_BR_PCLK_32
-#define AO_SPI_SPEED_250kHz	STM_SPI_CR1_BR_PCLK_64
-#define AO_SPI_SPEED_125kHz	STM_SPI_CR1_BR_PCLK_128
-#define AO_SPI_SPEED_62500Hz	STM_SPI_CR1_BR_PCLK_256
+#define AO_SPI_SPEED_24MHz	STM_SPI_CR1_BR_PCLK_2
+#define AO_SPI_SPEED_12MHz	STM_SPI_CR1_BR_PCLK_4
+#define AO_SPI_SPEED_6MHz	STM_SPI_CR1_BR_PCLK_8
+#define AO_SPI_SPEED_3MHz	STM_SPI_CR1_BR_PCLK_16
+#define AO_SPI_SPEED_1500kHz	STM_SPI_CR1_BR_PCLK_32
+#define AO_SPI_SPEED_750kHz	STM_SPI_CR1_BR_PCLK_64
+#define AO_SPI_SPEED_375kHz	STM_SPI_CR1_BR_PCLK_128
+#define AO_SPI_SPEED_187500Hz	STM_SPI_CR1_BR_PCLK_256
 
-#define AO_SPI_SPEED_FAST	AO_SPI_SPEED_8MHz
+#define AO_SPI_SPEED_FAST	AO_SPI_SPEED_24MHz
 
 /* Companion bus wants something no faster than 200kHz */
 
-#define AO_SPI_SPEED_200kHz	AO_SPI_SPEED_125kHz
+#define AO_SPI_SPEED_200kHz	AO_SPI_SPEED_187500Hz
 
 #define AO_SPI_CONFIG_1		0x00
 #define AO_SPI_1_CONFIG_PA5_PA6_PA7	AO_SPI_CONFIG_1
@@ -118,27 +120,44 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 #define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
 #define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
-#define ao_enable_port(port) do {					\
-		if ((port) == &stm_gpioa)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN); \
-		else if ((port) == &stm_gpiob)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPBEN); \
-		else if ((port) == &stm_gpioc)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPCEN); \
-		else if ((port) == &stm_gpiof)				\
-			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPFEN); \
-	} while (0)
+extern struct ao_power	ao_power_gpioa;
+extern struct ao_power	ao_power_gpiob;
+extern struct ao_power	ao_power_gpioc;
+extern struct ao_power	ao_power_gpiof;
 
-#define ao_disable_port(port) do {					\
-		if ((port) == &stm_gpioa)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPAEN); \
-		else if ((port) == &stm_gpiob)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPBEN); \
-		else if ((port) == &stm_gpioc)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPCEN); \
-		else if ((port) == &stm_gpiof)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPFEN); \
-	} while (0)
+static inline void ao_enable_port(struct stm_gpio *port)
+{
+	if ((port) == &stm_gpioa) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN);
+		ao_power_register(&ao_power_gpioa);
+	} else if ((port) == &stm_gpiob) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPBEN);
+		ao_power_register(&ao_power_gpiob);
+	} else if ((port) == &stm_gpioc) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPCEN);
+		ao_power_register(&ao_power_gpioc);
+	} else if ((port) == &stm_gpiof) {
+		stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPFEN);
+		ao_power_register(&ao_power_gpiof);
+	}
+}
+
+static inline void ao_disable_port(struct stm_gpio *port)
+{
+	if ((port) == &stm_gpioa) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPAEN);
+		ao_power_unregister(&ao_power_gpioa);
+	} else if ((port) == &stm_gpiob) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPBEN);
+		ao_power_unregister(&ao_power_gpiob);
+	} else if ((port) == &stm_gpioc) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPCEN);
+		ao_power_unregister(&ao_power_gpioc);
+	} else if ((port) == &stm_gpiof) {
+		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPFEN);
+		ao_power_unregister(&ao_power_gpiof);
+	}
+}
 
 #define ao_gpio_set(port, bit, pin, v) stm_gpio_set(port, bit, v)
 
@@ -166,8 +185,7 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 	} while (0)
 
 #define ao_enable_cs(port,bit) do {				\
-		stm_gpio_set((port), bit, 1);			\
-		stm_moder_set((port), bit, STM_MODER_OUTPUT);	\
+		ao_enable_output(port, bit, pin, 1);		\
 	} while (0)
 
 #define ao_spi_init_cs(port, mask) do {				\
@@ -395,6 +413,9 @@ ao_usb_free(uint16_t *buffer);
 
 void
 ao_usb_write(uint16_t *buffer, uint16_t len);
+
+void
+ao_usb_write2(uint16_t *buffer, uint16_t len);
 #endif /* AO_USB_DIRECTIO */
 
 #endif /* _AO_ARCH_FUNCS_H_ */

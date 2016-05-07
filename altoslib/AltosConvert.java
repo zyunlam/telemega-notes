@@ -18,7 +18,7 @@
 /*
  * Sensor data conversion functions
  */
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 public class AltosConvert {
 	/*
@@ -323,6 +323,14 @@ public class AltosConvert {
 
 	public static double mph_to_meters(double mps) {
 		return miles_to_meters(mps) / 3600;
+ 	}
+
+	public static double mps_to_fps(double mps) {
+		return meters_to_miles(mps) * 5280;
+ 	}
+
+	public static double fps_to_mps(double mps) {
+		return miles_to_meters(mps) / 5280;
  	}
 
 	public static double meters_to_mach(double meters) {

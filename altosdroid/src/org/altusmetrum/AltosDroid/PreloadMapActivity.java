@@ -41,7 +41,7 @@ import android.location.LocationManager;
 import android.location.LocationListener;
 import android.location.Criteria;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and
@@ -107,7 +107,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	}
 
 	AltosMap	map;
-	AltosMapLoader	loader;
 
 	class PreloadMapImage implements AltosImage {
 		public void flush() {
@@ -137,14 +136,14 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		public void paint(AltosMapTransform t) {
 		}
 
-		public PreloadMapTile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(listener, upper_left, center, zoom, maptype, px_size, 2);
+		public PreloadMapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+			super(cache, upper_left, center, zoom, maptype, px_size, 2);
 		}
 
 	}
 
-	public AltosMapTile new_tile(AltosMapTileListener listener, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new PreloadMapTile(listener, upper_left, center, zoom, maptype, px_size);
+	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
+		return new PreloadMapTile(cache, upper_left, center, zoom, maptype, px_size);
 	}
 
 	public int width() {
@@ -265,7 +264,7 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 			AltosDebug.debug("PreloadMap load %f %f %d %d %f %d\n",
 					 lat, lon, min, max, r, t);
-			loader.load(lat, lon, min, max, r, t);
+			new AltosMapLoader(map, this, lat, lon, min, max, r, t);
 		} catch (ParseException e) {
 			AltosDebug.debug("PreloadMap load raised exception %s", e.toString());
 		}
@@ -397,8 +396,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		known_sites_spinner.setOnItemSelectedListener(new SiteListListener());
 
 		map = new AltosMap(this);
-
-		loader = new AltosMapLoader(map, this);
 
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);

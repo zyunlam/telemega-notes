@@ -15,9 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
+import java.text.*;
+import java.util.concurrent.*;
+import java.io.*;
 
-public class AltosGPSSat {
+public class AltosGPSSat implements Serializable {
 	public int	svid;
 	public int	c_n0;
 

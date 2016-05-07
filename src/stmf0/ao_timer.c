@@ -50,12 +50,14 @@ void stm_systick_isr(void)
 #if AO_DATA_ALL
 		if (++ao_data_count == ao_data_interval) {
 			ao_data_count = 0;
+#if HAS_ADC
 #if HAS_FAKE_FLIGHT
 			if (ao_fake_flight_active)
 				ao_fake_flight_poll();
 			else
 #endif
 				ao_adc_poll();
+#endif
 #if (AO_DATA_ALL & ~(AO_DATA_ADC))
 			ao_wakeup((void *) &ao_data_count);
 #endif
@@ -92,6 +94,7 @@ ao_timer_init(void)
 
 #endif
 
+#if AO_HSI48
 static void
 ao_clock_enable_crs(void)
 {
@@ -127,15 +130,12 @@ ao_clock_enable_crs(void)
 		      (0 << STM_CRS_CR_ERRIE) |
 		      (0 << STM_CRS_CR_SYNCWARNIE) |
 		      (0 << STM_CRS_CR_SYNCOKIE));
-
 }
+#endif
 
-void
-ao_clock_init(void)
+static void
+ao_clock_hsi(void)
 {
-	uint32_t	cfgr;
-
-	/* Switch to HSI while messing about */
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSION);
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSIRDY)))
 		ao_arch_nop();
@@ -153,15 +153,17 @@ ao_clock_init(void)
 
 	/* reset PLLON, CSSON, HSEBYP, HSEON */
 	stm_rcc.cr &= 0x0000ffff;
+}
 
-	/* Disable all interrupts */
-	stm_rcc.cir = 0;
-
+static void
+ao_clock_normal_start(void)
+{
 #if AO_HSE
-#define STM_RCC_CFGR_SWS_TARGET_CLOCK		STM_RCC_CFGR_SWS_HSE
-#define STM_RCC_CFGR_SW_TARGET_CLOCK		STM_RCC_CFGR_SW_HSE
+	uint32_t	cfgr;
+#define STM_RCC_CFGR_SWS_TARGET_CLOCK		STM_RCC_CFGR_SWS_PLL
+#define STM_RCC_CFGR_SW_TARGET_CLOCK		STM_RCC_CFGR_SW_PLL
 #define STM_PLLSRC				AO_HSE
-#define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	1
+#define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	STM_RCC_CFGR_PLLSRC_HSE
 
 #if AO_HSE_BYPASS
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEBYP);
@@ -172,6 +174,33 @@ ao_clock_init(void)
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEON);
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSERDY)))
 		asm("nop");
+
+#ifdef STM_PLLSRC
+	/* Disable the PLL */
+	stm_rcc.cr &= ~(1 << STM_RCC_CR_PLLON);
+	while (stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY))
+		asm("nop");
+
+	/* PLLVCO to 48MHz (for USB) -> PLLMUL = 3 */
+	cfgr = stm_rcc.cfgr;
+	cfgr &= ~(STM_RCC_CFGR_PLLMUL_MASK << STM_RCC_CFGR_PLLMUL);
+	cfgr |= (AO_RCC_CFGR_PLLMUL << STM_RCC_CFGR_PLLMUL);
+
+	/* PLL source */
+	cfgr &= ~(1 << STM_RCC_CFGR_PLLSRC);
+	cfgr |= (STM_RCC_CFGR_PLLSRC_TARGET_CLOCK  << STM_RCC_CFGR_PLLSRC);
+	stm_rcc.cfgr = cfgr;
+
+	/* Disable pre divider */
+	stm_rcc.cfgr2 = (STM_RCC_CFGR2_PREDIV_1 << STM_RCC_CFGR2_PREDIV);
+
+	/* Enable the PLL and wait for it */
+	stm_rcc.cr |= (1 << STM_RCC_CR_PLLON);
+	while (!(stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY)))
+		asm("nop");
+
+#endif
+
 #endif
 
 
@@ -196,10 +225,50 @@ ao_clock_init(void)
 #define STM_PLLSRC				STM_HSI
 #define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	0
 #endif
+}
 
-#ifdef STM_PLLSRC
-#error No code for PLL initialization yet
+static void
+ao_clock_normal_switch(void)
+{
+	uint32_t	cfgr;
+
+	cfgr = stm_rcc.cfgr;
+	cfgr &= ~(STM_RCC_CFGR_SW_MASK << STM_RCC_CFGR_SW);
+	cfgr |= (STM_RCC_CFGR_SW_TARGET_CLOCK << STM_RCC_CFGR_SW);
+	stm_rcc.cfgr = cfgr;
+	for (;;) {
+		uint32_t	c, part, mask, val;
+
+		c = stm_rcc.cfgr;
+		mask = (STM_RCC_CFGR_SWS_MASK << STM_RCC_CFGR_SWS);
+		val = (STM_RCC_CFGR_SWS_TARGET_CLOCK << STM_RCC_CFGR_SWS);
+		part = c & mask;
+		if (part == val)
+			break;
+	}
+#if !AO_HSI && !AO_NEED_HSI
+	/* Turn off the HSI clock */
+	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
 #endif
+#ifdef STM_PLLSRC
+	/* USB PLL source */
+	stm_rcc.cfgr3 |= (1 << STM_RCC_CFGR3_USBSW);
+#endif
+}
+
+void
+ao_clock_init(void)
+{
+	uint32_t	cfgr;
+
+	/* Switch to HSI while messing about */
+	ao_clock_hsi();
+
+	/* Disable all interrupts */
+	stm_rcc.cir = 0;
+
+	/* Start high speed clock */
+	ao_clock_normal_start();
 
 	/* Set flash latency to tolerate 48MHz SYSCLK  -> 1 wait state */
 
@@ -228,29 +297,11 @@ ao_clock_init(void)
 	stm_rcc.cfgr = cfgr;
 
 	/* Switch to the desired system clock */
-
-	cfgr = stm_rcc.cfgr;
-	cfgr &= ~(STM_RCC_CFGR_SW_MASK << STM_RCC_CFGR_SW);
-	cfgr |= (STM_RCC_CFGR_SW_TARGET_CLOCK << STM_RCC_CFGR_SW);
-	stm_rcc.cfgr = cfgr;
-	for (;;) {
-		uint32_t	c, part, mask, val;
-
-		c = stm_rcc.cfgr;
-		mask = (STM_RCC_CFGR_SWS_MASK << STM_RCC_CFGR_SWS);
-		val = (STM_RCC_CFGR_SWS_TARGET_CLOCK << STM_RCC_CFGR_SWS);
-		part = c & mask;
-		if (part == val)
-			break;
-	}
+	ao_clock_normal_switch();
 
 	/* Clear reset flags */
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
-#if !AO_HSI && !AO_NEED_HSI
-	/* Turn off the HSI clock */
-	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
-#endif
 #if DEBUG_THE_CLOCK
 	/* Output SYSCLK on PA8 for measurments */
 
@@ -264,3 +315,18 @@ ao_clock_init(void)
 	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOSEL_HSE << STM_RCC_CFGR_MCOSEL);
 #endif
 }
+
+#if AO_POWER_MANAGEMENT
+void
+ao_clock_suspend(void)
+{
+	ao_clock_hsi();
+}
+
+void
+ao_clock_resume(void)
+{
+	ao_clock_normal_start();
+	ao_clock_normal_switch();
+}
+#endif

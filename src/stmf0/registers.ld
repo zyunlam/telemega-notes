@@ -54,4 +54,4 @@ stm_mpu    = 0xe000ed90;
 /* calibration data in system memory */
 stm_cal = 0x1ffff7b8;
 stm_flash_size_04x = 0x1ffff7cc;
-stm_device_id = 0x1ff80050;
+stm_device_id = 0x1ffff7ac;

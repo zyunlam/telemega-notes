@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.io.*;
 import java.util.*;
@@ -116,6 +116,7 @@ public class AltosPreferences {
 	public final static String	frequency_count = "COUNT";
 	public final static String	frequency_format = "FREQUENCY-%d";
 	public final static String	description_format = "DESCRIPTION-%d";
+	public final static String	frequenciesPreference = "FREQUENCIES";
 
 	/* Units preference */
 
@@ -128,25 +129,33 @@ public class AltosPreferences {
 
 	public static int map_cache = 9;
 
+	final static String mapTypePreference = "MAP-TYPE";
+	static int	map_type;
+
 	public static AltosFrequency[] load_common_frequencies() {
+
 		AltosFrequency[] frequencies = null;
-		boolean	existing = false;
-		existing = backend.nodeExists(common_frequencies_node_name);
 
-		if (existing) {
-			AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
-			int		count = node.getInt(frequency_count, 0);
+		frequencies = (AltosFrequency[]) backend.getSerializable(frequenciesPreference, null);
 
-			frequencies = new AltosFrequency[count];
-			for (int i = 0; i < count; i++) {
-				double	frequency;
-				String	description;
+		if (frequencies == null) {
+			if (backend.nodeExists(common_frequencies_node_name)) {
+				AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
+				int		count = node.getInt(frequency_count, 0);
 
-				frequency = node.getDouble(String.format(frequency_format, i), 0.0);
-				description = node.getString(String.format(description_format, i), null);
-				frequencies[i] = new AltosFrequency(frequency, description);
+				frequencies = new AltosFrequency[count];
+				for (int i = 0; i < count; i++) {
+					double	frequency;
+					String	description;
+
+					frequency = node.getDouble(String.format(frequency_format, i), 0.0);
+					description = node.getString(String.format(description_format, i), null);
+					frequencies[i] = new AltosFrequency(frequency, description);
+				}
 			}
-		} else {
+		}
+
+		if (frequencies == null) {
 			frequencies = new AltosFrequency[10];
 			for (int i = 0; i < 10; i++) {
 				frequencies[i] = new AltosFrequency(434.550 + i * .1,
@@ -156,15 +165,6 @@ public class AltosPreferences {
 		return frequencies;
 	}
 
-	public static void save_common_frequencies(AltosFrequency[] frequencies) {
-		AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
-
-		node.putInt(frequency_count, frequencies.length);
-		for (int i = 0; i < frequencies.length; i++) {
-			node.putDouble(String.format(frequency_format, i), frequencies[i].frequency);
-			node.putString(String.format(description_format, i), frequencies[i].description);
-		}
-	}
 	public static int launcher_serial;
 
 	public static int launcher_channel;
@@ -221,6 +221,7 @@ public class AltosPreferences {
 
 		map_cache = backend.getInt(mapCachePreference, 9);
 		map_cache_listeners = new LinkedList<AltosMapCacheListener>();
+		map_type = backend.getInt(mapTypePreference, AltosMap.maptype_hybrid);
 	}
 
 	public static void flush_preferences() {
@@ -349,24 +350,12 @@ public class AltosPreferences {
 		}
 	}
 
-	public static void set_state(int serial, AltosState state, AltosListenerState listener_state) {
+	public static void set_state(AltosState state) {
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		try {
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-
-			AltosSavedState	saved_state = new AltosSavedState(state, listener_state);
-			oos.writeObject(saved_state);
-
-			byte[] bytes = baos.toByteArray();
-
-			synchronized(backend) {
-				backend.putBytes(String.format(statePreferenceFormat, serial), bytes);
-				backend.putInt(statePreferenceLatest, serial);
-				flush_preferences();
-			}
-		} catch (IOException ie) {
+		synchronized(backend) {
+			backend.putSerializable(String.format(statePreferenceFormat, state.serial), state);
+			backend.putInt(statePreferenceLatest, state.serial);
+			flush_preferences();
 		}
 	}
 
@@ -400,26 +389,14 @@ public class AltosPreferences {
 		return latest;
 	}
 
-	public static AltosSavedState state(int serial) {
-		byte[] bytes = null;
-
+	public static AltosState state(int serial) {
 		synchronized(backend) {
-			bytes = backend.getBytes(String.format(statePreferenceFormat, serial), null);
+			try {
+				return (AltosState) backend.getSerializable(String.format(statePreferenceFormat, serial), null);
+			} catch (Exception e) {
+				return null;
+			}
 		}
-
-		if (bytes == null)
-			return null;
-
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-
-		try {
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			AltosSavedState saved_state = (AltosSavedState) ois.readObject();
-			return saved_state;
-		} catch (IOException ie) {
-		} catch (ClassNotFoundException ce) {
-		}
-		return null;
 	}
 
 	public static void set_scanning_telemetry(int new_scanning_telemetry) {
@@ -535,7 +512,7 @@ public class AltosPreferences {
 	public static void set_common_frequencies(AltosFrequency[] frequencies) {
 		synchronized(backend) {
 			common_frequencies = frequencies;
-			save_common_frequencies(frequencies);
+			backend.putSerializable(frequenciesPreference, frequencies);
 			flush_preferences();
 		}
 	}
@@ -619,6 +596,41 @@ public class AltosPreferences {
 	public static int map_cache() {
 		synchronized(backend) {
 			return map_cache;
+		}
+	}
+
+	static LinkedList<AltosMapTypeListener> map_type_listeners;
+
+	public static void set_map_type(int map_type) {
+		synchronized(backend) {
+			AltosPreferences.map_type = map_type;
+			backend.putInt(mapTypePreference, map_type);
+			flush_preferences();
+		}
+		if (map_type_listeners != null) {
+			for (AltosMapTypeListener l : map_type_listeners) {
+				l.map_type_changed(map_type);
+			}
+		}
+	}
+
+	public static int map_type() {
+		synchronized(backend) {
+			return map_type;
+		}
+	}
+
+	public static void register_map_type_listener(AltosMapTypeListener l) {
+		synchronized(backend) {
+			if (map_type_listeners == null)
+				map_type_listeners = new LinkedList<AltosMapTypeListener>();
+			map_type_listeners.add(l);
+		}
+	}
+
+	public static void unregister_map_type_listener(AltosMapTypeListener l) {
+		synchronized(backend) {
+			map_type_listeners.remove(l);
 		}
 	}
 }

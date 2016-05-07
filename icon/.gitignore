@@ -1,5 +1,7 @@
 application-*.png
 altusmetrum-*.png
+altusmetrum.xpm
+application-vnd.altusmetrum.micropeak.svg
 *.rc
 *.ico
 *.icns

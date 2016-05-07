@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 import java.util.*;
 import java.io.*;
@@ -198,6 +198,7 @@ public class AltosLib {
 	};
 
 	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
+	public static final String launch_sites_env = "LAUNCH_SITES";
 //	public static final String launch_sites_url = "file:///home/keithp/misc/text/altusmetrum/AltOS/launch-sites.txt";
 
 	public static final int ao_telemetry_standard_len = 32;

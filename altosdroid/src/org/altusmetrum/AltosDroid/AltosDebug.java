@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.io.*;
 import java.lang.*;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 import android.app.Activity;
 import android.graphics.*;

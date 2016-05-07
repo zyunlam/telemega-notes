@@ -41,6 +41,7 @@ volatile __data uint8_t	ao_data_count;
 
 void stm_systick_isr(void)
 {
+	ao_validate_cur_stack();
 	if (stm_systick.csr & (1 << STM_SYSTICK_CSR_COUNTFLAG)) {
 		++ao_tick_count;
 #if HAS_TASK_QUEUE

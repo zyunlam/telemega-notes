@@ -28,7 +28,7 @@
 #define AO_EXTI_PIN_NOCONFIGURE	64
 
 void
-ao_exti_setup(struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback)());
+ao_exti_setup(struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback)(void));
 
 void
 ao_exti_set_mode(struct stm_gpio *gpio, uint8_t pin, uint8_t mode);

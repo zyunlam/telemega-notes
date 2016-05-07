@@ -370,8 +370,10 @@ ao_flight(void)
 				{
 					ao_flight_state = ao_flight_landed;
 
+#if HAS_ADC
 					/* turn off the ADC capture */
 					ao_timer_set_adc_interval(0);
+#endif
 
 					ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
 				}

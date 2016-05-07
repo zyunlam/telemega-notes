@@ -294,7 +294,7 @@ load_symbols(struct ao_hex_file *hex,
 	struct ao_sym		*symbol;
 	int			num_symbols = 0;
 	int			size_symbols = 0;
-	
+
 	extended_addr = 0;
 	for (i = 0; i < hex->nrecord; i++) {
 		record = hex->records[i];
@@ -451,6 +451,31 @@ ao_hex_image_free(struct ao_hex_image *image)
 	free(image);
 }
 
+uint32_t min(uint32_t a, uint32_t b) { return a < b ? a : b; }
+uint32_t max(uint32_t a, uint32_t b) { return a > b ? a : b; }
+
+struct ao_hex_image *
+ao_hex_image_cat(struct ao_hex_image *a, struct ao_hex_image *b)
+{
+	struct ao_hex_image	*n;
+	uint32_t		base, bound;
+	uint32_t		length;
+
+	base = min(a->address, b->address);
+	bound = max(a->address + a->length, b->address + b->length);
+	length = bound - base;
+
+	n = calloc (sizeof (struct ao_hex_image) + length, 1);
+	if (!n)
+		return NULL;
+	n->address = base;
+	n->length = length;
+	memset(n->data, 0xff, length);
+	memcpy(n->data + a->address - n->address, a->data, a->length);
+	memcpy(n->data + b->address - n->address, b->data, b->length);
+	return n;
+}
+
 int
 ao_hex_image_equal(struct ao_hex_image *a, struct ao_hex_image *b)
 {
@@ -471,7 +496,7 @@ ao_hex_load(char *filename, struct ao_sym **symbols, int *num_symbolsp)
 	file = fopen (filename, "r");
 	if (!file)
 		return NULL;
-	
+
 	hex_file = ao_hex_file_read(file, filename);
 	fclose(file);
 	if (!hex_file)
@@ -549,7 +574,7 @@ ao_hex_file_create(struct ao_hex_image *image, struct ao_sym *symbols, int num_s
 	ao_hex_record_set_checksum(record);
 
 	hex_file->records[nrecord++] = record;
-	
+
 	/* Add the symbols
 	 */
 
@@ -616,7 +641,7 @@ ao_hex_save(FILE *file, struct ao_hex_image *image,
 			goto write_failed;
 	}
 	ret = true;
-	
+
 	if (fflush(file) != 0)
 		ret = false;
 write_failed:

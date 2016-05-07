@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if [ -x /usr/bin/dfu-util ]; then
+    DFU_UTIL=/usr/bin/dfu-util
+else
+    echo "Can't find dfu-util! Aborting."
+    exit 1
+fi
+
+if [ -x /usr/bin/ao-usbload ]; then
+	USBLOAD=/usr/bin/ao-usbload
+else
+	echo "Can't find ao-usbload!  Aborting."
+	exit 1
+fi
+
+VERSION=1.0
+PRODUCT=ChaosKey
+
+echo "ChaosKey v$VERSION Turn-On and Calibration Program"
+echo "Copyright 2015 by Keith Packard.  Released under GPL v2"
+echo
+echo "Expectations:"
+echo "\tChaosKey v$VERSION powered from USB"
+echo
+
+$DFU_UTIL -a 0 -s 0x08000000:leave -D ../src/chaoskey-v$VERSION/flash-loader/chaoskey-v$VERSION*.bin || exit 1
+
+sleep 2
+
+$USBLOAD --serial=1 ../src/chaoskey-v$VERSION/chaoskey-v$VERSION*.ihx || exit 1
+
+exit $?

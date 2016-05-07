@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
 public interface AltosConfigValues {
 	/* set and get all of the dialog values */
@@ -44,8 +44,6 @@ public interface AltosConfigValues {
 	public abstract double radio_frequency() throws AltosConfigDataException;
 
 	public abstract void set_radio_calibration(int new_radio_calibration);
-
-	public abstract int radio_calibration() throws AltosConfigDataException;
 
 	public abstract void set_radio_enable(int new_radio_enable);
 

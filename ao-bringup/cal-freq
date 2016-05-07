@@ -10,7 +10,7 @@ case $# in
 	;;
 esac
 
-../ao-tools/ao-cal-freq/ao-cal-freq --dev=$dev
+../ao-tools/ao-cal-freq/ao-cal-freq --tty=$dev
 case $? in
     0)
 	calline=`./get-radio-cal $dev`

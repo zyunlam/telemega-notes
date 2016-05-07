@@ -46,6 +46,8 @@ libao_tools_a_SOURCES = \
 	ao-editaltos.h \
 	ao-elf.c \
 	ao-elf.h \
+	ao-dfu.c \
+	ao-dfu.h \
 	ao-selfload.c \
 	ao-selfload.h \
 	ao-verbose.c \

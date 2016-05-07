@@ -17,7 +17,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 import android.location.Location;
 import android.app.Activity;
 import android.graphics.Color;
@@ -38,12 +38,6 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 	public abstract void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver);
 
 	public abstract String tab_name();
-
-	public void set_map_type(int map_type) {
-	}
-
-	public void set_map_source(int map_source) {
-	}
 
 	public void units_changed(boolean imperial_units) {
 		if (!isHidden())

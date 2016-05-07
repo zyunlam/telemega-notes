@@ -71,6 +71,9 @@ ao_hex_image_free(struct ao_hex_image *image);
 struct ao_hex_image *
 ao_hex_load(char *filename, struct ao_sym **symbols, int *num_symbols);
 
+struct ao_hex_image *
+ao_hex_image_cat(struct ao_hex_image *a, struct ao_hex_image *b);
+
 int
 ao_hex_image_equal(struct ao_hex_image *a, struct ao_hex_image *b);
 

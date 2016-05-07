@@ -18,7 +18,7 @@
 package org.altusmetrum.AltosDroid;
 
 import java.util.*;
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 import android.location.Location;
 
 public class TelemetryState {
@@ -30,7 +30,6 @@ public class TelemetryState {
 	int		connect;
 	DeviceAddress	address;
 	AltosConfigData	config;
-	Location	location;
 	int		crc_errors;
 	double		receiver_battery;
 	double		frequency;
@@ -44,7 +43,6 @@ public class TelemetryState {
 		connect = CONNECT_NONE;
 		config = null;
 		states = new HashMap<Integer,AltosState>();
-		location = null;
 		crc_errors = 0;
 		receiver_battery = AltosLib.MISSING;
 		frequency = AltosPreferences.frequency(0);

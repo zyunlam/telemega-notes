@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import android.os.Handler;
 
-import org.altusmetrum.altoslib_9.*;
+import org.altusmetrum.altoslib_10.*;
 
 public abstract class AltosDroidLink extends AltosLink {
 
@@ -170,8 +170,8 @@ public abstract class AltosDroidLink extends AltosLink {
 			}
 			buffer_off = 0;
 		}
-		if (AltosDebug.D)
-			debug_input(in_buffer[buffer_off]);
+//		if (AltosDebug.D)
+//			debug_input(in_buffer[buffer_off]);
 		return in_buffer[buffer_off++];
 	}
 
@@ -207,10 +207,9 @@ public abstract class AltosDroidLink extends AltosLink {
 
 	public void print(String data) {
 		byte[] bytes = data.getBytes();
-		AltosDebug.debug("print(): begin");
+//		AltosDebug.debug(data.replace('\n', '\\'));
 		for (byte b : bytes)
 			putchar(b);
-		AltosDebug.debug("print(): Wrote bytes: '" + data.replace('\n', '\\') + "'");
 	}
 
 	public AltosDroidLink(Handler handler) {

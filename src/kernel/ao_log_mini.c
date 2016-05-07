@@ -110,9 +110,11 @@ ao_log(void)
 					      ao_data_ring[ao_log_data_pos].ms5607_raw.pres);
 				ao_log_pack24(log.u.sensor.temp,
 					      ao_data_ring[ao_log_data_pos].ms5607_raw.temp);
+#if AO_LOG_FORMAT != AO_LOG_FORMAT_DETHERM
 				log.u.sensor.sense_a = ao_data_ring[ao_log_data_pos].adc.sense_a;
 				log.u.sensor.sense_m = ao_data_ring[ao_log_data_pos].adc.sense_m;
 				log.u.sensor.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
+#endif
 				ao_log_mini(&log);
 				if (ao_log_state <= ao_flight_coast)
 					next_sensor = log.tick + AO_SENSOR_INTERVAL_ASCENT;

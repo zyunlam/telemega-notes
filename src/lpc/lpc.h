@@ -411,7 +411,7 @@ struct lpc_scb {
 	vuint32_t	mainclksel;	/* 0x70 */
 	vuint32_t	mainclkuen;
 	vuint32_t	sysahbclkdiv;
-	uint32_t	r7c;		
+	uint32_t	r7c;
 
 	vuint32_t	sysahbclkctrl;	/* 0x80 */
 	uint32_t	r84[3];
@@ -429,14 +429,14 @@ struct lpc_scb {
 	uint32_t	rcc;
 
 	uint32_t	rd0[4];
-	
+
 	vuint32_t	clkoutsel;	/* 0xe0 */
 	vuint32_t	clkoutuen;
 	vuint32_t	clkoutdiv;
 	uint32_t	rec;
-	
+
 	uint32_t	rf0[4];		/* 0xf0 */
-	
+
 	vuint32_t	pioporcap0;	/* 0x100 */
 	vuint32_t	pioporcap1;
 	uint32_t	r102[2];
@@ -445,7 +445,7 @@ struct lpc_scb {
 	uint32_t	r120[4];	/* 0x120 */
 	uint32_t	r130[4];	/* 0x130 */
 	uint32_t	r140[4];	/* 0x140 */
-	
+
 	vuint32_t	bodctrl;	/* 0x150 */
 	vuint32_t	systckcal;
 	uint32_t	r158[2];
@@ -479,7 +479,7 @@ struct lpc_scb {
 	uint32_t	r240[12 * 4];	/* 0x240 */
 
 	uint32_t	r300[15 * 4];	/* 0x300 */
-			     
+
 	uint32_t	r3f0;		/* 0x3f0 */
 	vuint32_t	device_id;
 };
@@ -680,7 +680,7 @@ struct lpc_gpio {
 	vuint32_t	word[0x40];	/* 0x1000 */
 
 	uint8_t		r1100[0x2000 - 0x1100];
-	
+
 	vuint32_t	dir[2];		/* 0x2000 */
 
 	uint8_t		r2008[0x2080 - 0x2008];
@@ -1032,7 +1032,7 @@ lpc_nvic_enabled(int irq) {
 	return (lpc_nvic.iser >> irq) & 1;
 }
 
-	
+
 static inline void
 lpc_nvic_set_pending(int irq) {
 	lpc_nvic.ispr = (1 << irq);
@@ -1201,18 +1201,118 @@ extern struct lpc_adc lpc_adc;
 #define LPC_ADC_STAT_OVERRUN	8
 #define LPC_ADC_STAT_ADINT	16
 
-struct lpc_ct32b {
+struct lpc_ct16b {
 	vuint32_t	ir;	/* 0x00 */
 	vuint32_t	tcr;
 	vuint32_t	tc;
 	vuint32_t	pr;
-	
+
 	vuint32_t	pc;	/* 0x10 */
 	vuint32_t	mcr;
 	vuint32_t	mr[4];	/* 0x18 */
 	vuint32_t	ccr;	/* 0x28 */
 	vuint32_t	cr0;
-	
+
+	vuint32_t	cr1_0;	/* 0x30 (only for ct16b0 */
+	vuint32_t	cr1_1;	/* 0x34 (only for ct16b1 */
+	uint32_t	r38;
+	vuint32_t	emr;
+
+	uint8_t		r40[0x70 - 0x40];
+
+	vuint32_t	ctcr;	/* 0x70 */
+	vuint32_t	pwmc;
+};
+
+extern struct lpc_ct16b	lpc_ct16b0, lpc_ct16b1;
+
+#define lpc_ct16b0	(*(struct lpc_ct16b *) 0x4000c000)
+#define lpc_ct16b1	(*(struct lpc_ct16b *) 0x40010000)
+
+#define LPC_CT16B_IR_MR0INT	0
+#define LPC_CT16B_IR_MR1INT	1
+#define LPC_CT16B_IR_MR2INT	2
+#define LPC_CT16B_IR_MR3INT	3
+#define LPC_CT16B_IR_CR0INT	4
+#define LPC_CT16B0_IR_CR1INT	6
+#define LPC_CT16B1_IR_CR1INT	5
+
+#define LPC_CT16B_TCR_CEN	0
+#define LPC_CT16B_TCR_CRST	1
+
+#define LPC_CT16B_MCR_MR0I	0
+#define LPC_CT16B_MCR_MR0R	1
+#define LPC_CT16B_MCR_MR0S	2
+#define LPC_CT16B_MCR_MR1I	3
+#define LPC_CT16B_MCR_MR1R	4
+#define LPC_CT16B_MCR_MR1S	5
+#define LPC_CT16B_MCR_MR2I	6
+#define LPC_CT16B_MCR_MR2R	7
+#define LPC_CT16B_MCR_MR2S	8
+#define LPC_CT16B_MCR_MR3I	9
+#define LPC_CT16B_MCR_MR3R	10
+#define LPC_CT16B_MCR_MR3S	11
+
+#define LPC_CT16B_CCR_CAP0RE	0
+#define LPC_CT16B_CCR_CAP0FE	1
+#define LPC_CT16B_CCR_CAP0I	2
+#define LPC_CT16B0_CCR_CAP1RE	6
+#define LPC_CT16B0_CCR_CAP1FE	7
+#define LPC_CT16B0_CCR_CAP1I	8
+#define LPC_CT16B1_CCR_CAP1RE	3
+#define LPC_CT16B1_CCR_CAP1FE	4
+#define LPC_CT16B1_CCR_CAP1I	5
+
+#define LPC_CT16B_EMR_EM0	0
+#define LPC_CT16B_EMR_EM1	1
+#define LPC_CT16B_EMR_EM2	2
+#define LPC_CT16B_EMR_EM3	3
+#define LPC_CT16B_EMR_EMC0	4
+#define LPC_CT16B_EMR_EMC1	6
+#define LPC_CT16B_EMR_EMC2	8
+#define LPC_CT16B_EMR_EMC3	10
+
+#define LPC_CT16B_EMR_EMC_NOTHING	0
+#define LPC_CT16B_EMR_EMC_CLEAR		1
+#define LPC_CT16B_EMR_EMC_SET		2
+#define LPC_CT16B_EMR_EMC_TOGGLE	3
+
+#define LPC_CT16B_CCR_CTM	0
+#define  LPC_CT16B_CCR_CTM_TIMER		0
+#define  LPC_CT16B_CCR_CTM_COUNTER_RISING	1
+#define  LPC_CT16B_CCR_CTM_COUNTER_FALLING	2
+#define  LPC_CT16B_CCR_CTM_COUNTER_BOTH		3
+#define LPC_CT16B_CCR_CIS	2
+#define  LPC_CT16B_CCR_CIS_CAP0			0
+#define  LPC_CT16B0_CCR_CIS_CAP1		2
+#define  LPC_CT16B1_CCR_CIS_CAP1		1
+#define LPC_CT16B_CCR_ENCC	4
+#define LPC_CT16B_CCR_SELCC	5
+#define  LPC_CT16B_CCR_SELCC_RISING_CAP0	0
+#define  LPC_CT16B_CCR_SELCC_FALLING_CAP0	1
+#define  LPC_CT16B0_CCR_SELCC_RISING_CAP1	4
+#define  LPC_CT16B0_CCR_SELCC_FALLING_CAP1	5
+#define  LPC_CT16B1_CCR_SELCC_RISING_CAP1	2
+#define  LPC_CT16B1_CCR_SELCC_FALLING_CAP1	3
+#define LPC_CT16B_CCR_
+
+#define LPC_CT16B_PWMC_PWMEN0	0
+#define LPC_CT16B_PWMC_PWMEN1	1
+#define LPC_CT16B_PWMC_PWMEN2	2
+#define LPC_CT16B_PWMC_PWMEN3	3
+
+struct lpc_ct32b {
+	vuint32_t	ir;	/* 0x00 */
+	vuint32_t	tcr;
+	vuint32_t	tc;
+	vuint32_t	pr;
+
+	vuint32_t	pc;	/* 0x10 */
+	vuint32_t	mcr;
+	vuint32_t	mr[4];	/* 0x18 */
+	vuint32_t	ccr;	/* 0x28 */
+	vuint32_t	cr0;
+
 	vuint32_t	cr1_0;	/* 0x30 (only for ct32b0 */
 	vuint32_t	cr1_1;	/* 0x34 (only for ct32b1 */
 	uint32_t	r38;

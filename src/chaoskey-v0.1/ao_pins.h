@@ -27,6 +27,9 @@
 
 #define LEDS_AVAILABLE	(AO_LED_RED | AO_LED_GREEN)
 
+#define AO_POWER_MANAGEMENT	1
+#define AO_LED_POWER		AO_LED_RED
+
 #define HAS_BEEP	0
 
 /* 48MHz clock based on USB */
@@ -40,10 +43,18 @@
 #define AO_APB_PRESCALER	1
 #define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
 
-#define HAS_USB			1
-#define AO_USB_DIRECTIO		1
-#define AO_PA11_PA12_RMP	0
-#define AO_USB_INTERFACE_CLASS	0xff
+#define HAS_USB				1
+#define AO_USB_DIRECTIO			1
+#define AO_PA11_PA12_RMP		0
+#define AO_USB_DEVICE_CLASS		0xff
+#define AO_USB_INTERFACE_CLASS_DATA	0xff
+#define AO_USB_HAS_OUT			0
+#define AO_USB_HAS_IN			1
+#define AO_USB_HAS_IN2			1
+#define AO_USB_HAS_INT			0
+#define USE_USB_STDIO			0
+#define AO_USB_SELF_POWER		0
+#define AO_USB_DEVICE_ID_SERIAL		1
 
 #define IS_FLASH_LOADER	0
 
@@ -57,11 +68,21 @@
 
 #define AO_NUM_ADC		1
 
+/* TRNG enable */
+
+#define AO_TRNG_ENABLE_PORT	(&stm_gpioa)
+#define AO_TRNG_ENABLE_BIT	8
+
 /* CRC */
 #define AO_CRC_WIDTH	32
 #define AO_CRC_INIT	0xffffffff
 
 /* TRNG */
-#define AO_LED_TRNG_ACTIVE	AO_LED_GREEN
+#define AO_LED_TRNG_COOKED	AO_LED_GREEN
+#define AO_LED_TRNG_RAW		AO_LED_GREEN
+
+/* Mode pin */
+#define AO_RAW_PORT		(&stm_gpioa)
+#define AO_RAW_BIT		15
 
 #endif /* _AO_PINS_H_ */

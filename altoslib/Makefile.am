@@ -39,7 +39,7 @@ altoslib_JAVA = \
 	AltosEepromDownload.java \
 	AltosEepromFile.java \
 	AltosEepromTM.java \
-	AltosEepromTm.java \
+	AltosEepromTMini.java \
 	AltosEepromHeader.java \
 	AltosEepromIterable.java \
 	AltosEepromList.java \
@@ -113,6 +113,7 @@ altoslib_JAVA = \
 	AltosTelemetrySatellite.java \
 	AltosTelemetryStandard.java \
 	AltosUnitsListener.java \
+	AltosUnknownProduct.java \
 	AltosMs5607.java \
 	AltosIMU.java \
 	AltosMag.java \
@@ -157,6 +158,7 @@ altoslib_JAVA = \
 	AltosLaunchSites.java \
 	AltosMapLoaderListener.java \
 	AltosMapLoader.java \
+	AltosMapTypeListener.java \
 	AltosVersion.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar

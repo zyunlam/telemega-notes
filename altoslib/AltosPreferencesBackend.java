@@ -15,34 +15,74 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_9;
+package org.altusmetrum.altoslib_10;
 
-import java.io.File;
+import java.io.*;
+import java.util.*;
+import java.text.*;
 
-public interface AltosPreferencesBackend {
+public abstract class AltosPreferencesBackend {
 
-	public String  getString(String key, String def);
-	public void    putString(String key, String value);
+	public abstract String  getString(String key, String def);
+	public abstract void    putString(String key, String value);
 
-	public int     getInt(String key, int def);
-	public void    putInt(String key, int value);
+	public abstract int     getInt(String key, int def);
+	public abstract void    putInt(String key, int value);
 
-	public double  getDouble(String key, double def);
-	public void    putDouble(String key, double value);
+	public abstract double  getDouble(String key, double def);
+	public abstract void    putDouble(String key, double value);
 
-	public boolean getBoolean(String key, boolean def);
-	public void    putBoolean(String key, boolean value);
+	public abstract boolean getBoolean(String key, boolean def);
+	public abstract void    putBoolean(String key, boolean value);
 
-	public byte[]  getBytes(String key, byte[] def);
-	public void    putBytes(String key, byte[] value);
+	public abstract byte[]  getBytes(String key, byte[] def);
+	public abstract void    putBytes(String key, byte[] value);
 
-	public boolean nodeExists(String key);
-	public AltosPreferencesBackend node(String key);
+	public Serializable getSerializable(String key, Serializable def) {
+		byte[] bytes = null;
 
-	public String[] keys();
-	public void    remove(String key);
+		bytes = getBytes(key, null);
+		if (bytes == null)
+			return def;
 
-	public void    flush();
+		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
-	public File homeDirectory();
+		try {
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			Serializable object = (Serializable) ois.readObject();
+			return object;
+		} catch (IOException ie) {
+			debug("IO exception %s\n", ie.toString());
+		} catch (ClassNotFoundException ce) {
+			debug("ClassNotFoundException %s\n", ce.toString());
+		}
+		return def;
+	}
+
+	public void putSerializable(String key, Serializable object) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+			oos.writeObject(object);
+			byte[] bytes = baos.toByteArray();
+
+			putBytes(key, bytes);
+		} catch (IOException ie) {
+			debug("set_state failed %s\n", ie.toString());
+		}
+	}
+
+	public abstract boolean nodeExists(String key);
+	public abstract AltosPreferencesBackend node(String key);
+
+	public abstract String[] keys();
+	public abstract void    remove(String key);
+
+	public abstract void    flush();
+
+	public abstract File homeDirectory();
+
+	public abstract void debug(String format, Object ... arguments);
 }

@@ -1,5 +1,5 @@
 JAVAC=javac
-AM_CFLAGS=-DLINUX -DPOSIX_TTY -I$(JVM_INCLUDE)
+AM_CFLAGS=-DLINUX -DPOSIX_TTY -I$(JVM_INCLUDE) -I$(JVM_INCLUDE)/linux
 AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -source 6
 
 altoslibdir=$(libdir)/altos
@@ -8,8 +8,21 @@ altoslib_LTLIBRARIES=libaltos.la
 libaltos_la_LDFLAGS=-version-info 1:0:1 -Wl,-znoexecstack
 
 libaltos_la_SOURCES=\
-	libaltos.c \
+	libaltos_common.c \
+	libaltos_posix.c \
+	libaltos_linux.c \
+	libaltos_wrap.c \
+	libaltos.h \
+	libaltos_posix.h \
+	libaltos_private.h
+
+WINDOWS_SRC=\
+	libaltos_common.c\
+	libaltos_windows.c\
 	libaltos_wrap.c
+
+WINDOWS_H=\
+	libaltos.h
 
 noinst_PROGRAMS=cjnitest
 
@@ -64,16 +77,16 @@ classlibaltos.stamp: $(SWIG_FILE)
 
 MINGCC32=i686-w64-mingw32-gcc
 MINGCC64=x86_64-w64-mingw32-gcc
-MINGFLAGS=-Wall -DWINDOWS -DBUILD_DLL -I$(JVM_INCLUDE)
-MINGLIBS=-lsetupapi
+MINGFLAGS=-Wall -Wextra -DWINDOWS -DBUILD_DLL -mconsole -I$(JVM_INCLUDE) -I$(JVM_INCLUDE)/linux
+MINGLIBS=-lsetupapi -lws2_32
 
 fat: all altos.dll altos64.dll
 
-altos.dll: $(libaltos_la_SOURCES)
-	$(MINGCC32) -o $@ $(MINGFLAGS) -shared $(libaltos_la_SOURCES) $(MINGLIBS)
+altos.dll: $(WINDOWS_SRC) $(WINDOWS_H)
+	$(MINGCC32) -o $@ $(MINGFLAGS) -shared $(WINDOWS_SRC) $(MINGLIBS)
 
-altos64.dll: $(libaltos_la_SOURCES)
-	$(MINGCC64) -o $@ $(MINGFLAGS) -shared $(libaltos_la_SOURCES) $(MINGLIBS)
+altos64.dll: $(WINDOWS_SRC) $(WINDOWS_H)
+	$(MINGCC64) -o $@ $(MINGFLAGS) -shared $(WINDOWS_SRC) $(MINGLIBS)
 
 clean-local:
 	-rm -rf libaltosJNI *.class *.java classlibaltos.stamp $(SWIG_FILE) libaltos_wrap.c altos.dll altos64.dll
