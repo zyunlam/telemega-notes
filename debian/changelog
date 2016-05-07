@@ -1,3 +1,136 @@
+altos (1.6.3-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * Releasing: Copy TeleMega v2.0 bits to Binaries
+  * src/chaoskey-v0.1: Add HV enable support
+  * altos/chaoskey: Add support for flipping between raw and cooked bits
+  * altos/chaoskey: Delay ADC reading for 250ms at startup
+  * altos: remove blank line in stmf0/ao_timer.c
+  * altos/stmf0: Allow projects to specify non-default stack size
+  * altos: Add power management APIs
+  * altos/stmf0: Add suspend/resume support
+  * altos: Allow USB drivers to skip CDC-ACM -specific descriptors
+  * altos: Add power management to TRNG driver
+  * altos/chaoskey-v0.1: Add power management and change USB classes
+  * altos: Delay TRNG ADC long enough for HV supply to stabilize
+  * altos: Add simple stats test to TRNG code
+  * altos/stmf0: Add missing ao_gpio.c
+  * altos: Another fix for non CDC-ACM devices
+  * altos/stmf0: Fix location of device_id register
+  * altos/chaoskey: Encode both hardware and software versions in product ID
+  * altos/stmf0: Use device ID as usb serial number if requested
+  * altos/chaoskey: Use SoC device ID as serial number
+  * altos/chaoskey: Add another USB endpoint to read raw data
+  * altos: Add ChaosKey v1.0 product
+  * ao-bringup: Switch to v1.0 for chaoskey
+  * ao-tools: Add ao-chaosread
+  * altos/stmf0: Fix build without second USB IN endpoint
+  * libaltos: jni_md.h moved to linux subdir in Java install
+  * libaltos: Add unistd.h to get defines for various syscalls
+  * altos: Expose fast timer API from kernel/
+  * Change how we detect and install java
+  * ao-tools/ao-dump-up: Remove spurious flight state strings
+  * ao-tools/lib: Remove trailing whitespace from ao-elf.c
+  * ao-tools/lib: Add ao_hex_image_cat function
+  * ao-tools: Add ao-makebin
+  * altos/stmf0: Construct .bin files for flash loaders
+  * ao-bringup: Use dfu-util to install flash loader on chaoskey
+  * libaltos: Add Windows BT support. Split into separate source files.
+  * altosui: Delay between polling for igniter status in Fire Igniters
+  * altosuilib: Note that Windows now supports Bluetooth
+  * libaltos: Fix warning in linux libaltos code
+  * altoslib: use env var LAUNCH_SITES to override default URL
+  * altosuilib: Control map debugging output with Serial.debug
+  * altosui,telegps: Do not allow radio calibration to be edited
+  * altos/stm: Run scheduler code on interrupt stack
+  * altos/stm: Validate current task SP in interrupt by looking at PSP
+  * altos/stm: Allow apps to define different stack size
+  * altos/lpc: Add fast timer
+  * altos: Add one-byte SPI output routine for LPC and STM cores
+  * altos: Allow for flight hardware without any ADC values
+  * altos: Add Detherm log format (easymini without ADC)
+  * altos: Use mini logging for detherm, just without ADC
+  * altos/stmf0: Add SPI driver.
+  * altos/stmf0: Support HPE clock source
+  * doc: Note that EasyMega and TeleMega report A-D continuity
+  * altos: Add detherm product
+  * altos/stmf0: Add pwm and exti drivers
+  * altos: Add ao_gpi_set/clr_bits functions
+  * altos: Add easy mini plotting helper in test code
+  * altos/detherm: Add ms5607 to detherm
+  * altos/detherm: Add servo driver
+  * altos: Support telefire products in cc1200 driver
+  * altos: Add pad support for new telefire versions
+  * altos: telefiretwo-v0.1 bits
+  * altos: Allow for pad boxes with different sensor configurations
+  * altos: Support pad/lco boxes with fixed box numbers
+  * altos: Add TeleLCOTwo firmware
+  * altos: Fix telefiretwo .gitignore
+  * altos: Add ao_lco_two.c; alternate LCO interface code
+  * altos: Use simpler debounce logic for buttons
+  * altos/telelcotwo: Add idle timeout
+  * Add TeleFireTwo v0.2 project
+  * altos/stmf0: Fix external interrupts
+  * altos/telefiretwo-v0.2: Change alarm names in comment
+  * altosdroid: Don't set target location if lat/lon is MISSING
+  * altoslib: Add debugging to AltosPreferences.state() etc
+  * altoslib: Make AltosGPSSat implement Serializable
+  * altoslib: switch from keySet() to keys() in altos map tiles
+  * altos: avoid mixed declarations and code in ao_task.c
+  * Update java library version numbers
+  * AltosDroid play store keys have moved, update configure.ac
+  * Prepare for new Android release by updating version number
+  * libaltos: Fix for Mac OS X El Capitan
+  * Add preliminary 1.6.3 release notes
+  * altosdroid: Can only use message once
+  * Bump version to 1.6.3
+  * altosdroid: Track device location in app, not telemetry service
+  * altosdroid: Redraw offline map when my location changes
+  * altosdroid: Run even without Bluetooth
+  * altoslib: Use feet per second for imperial speed
+  * altoslib: Report exceptions caught while opening launch sites URL
+  * altoslib: Don't try to drag lines around until map is loaded
+  * Debug bits for telebt
+  * altos: Use TXE instead of TC for serial on STM32l
+  * altos/stm32l: Add support for software-driven HW flow control
+  * altos/telebt-v3.0: Flip CTS/RTS pins for BT module
+  * altos: Clear packet queue when starting packet master
+  * altosdroid: Add idle mode monitoring, reboot. Start igniters
+  * altosdroid: Split setup functions to separate dialog
+  * Fix key in AndroidManifest.xml.in
+  * altosdroid: Add configurable frequency set
+  * altoslib: Make AltosPreferencesBackend abstract. Add set/put Serializable
+  * doc: Add idle mode info to 1.6.3 release note
+  * Revert "altos/stm: Run scheduler code on interrupt stack"
+  * altosdroid: max height is a height, not a speed
+  * altoslib: Correct stats for flights without a real landing
+  * altoslib: Flush during set_state. Don't store listener state.
+  * publish AltosDroid in keithp-fat target
+  * altoslib: Deal with TeleMetrum v2.0 MMA6555 being inverted
+  * altos: Make sure AO_MMA655X_INVERT is declared where needed
+  * doc: Update AltosDroid chapter for 1.6.3
+  * doc: 1.6.3 release notes note TeleBT rts/cts and TM 2.0 monitor idle fixes
+  * micropeak: Change order of windows install so that java detect works
+  * altoslib: Fix map preloading callbacks, run in separate thread
+  * windows: Change install to look for browser in a different place
+  * Ignore some built files for 1.6.3
+
+  [ Robert Garbee ]
+  * fix argument to ao-cal-freq so devices other than /dev/ttyACM0 work
+
+  [ Bart Massey ]
+  * Clean up stmf0 adc init.
+  * altos: Fixed timing of panic display LED to be readable
+
+  [ Justin Vreeland ]
+  * Fix java class differing only by case
+
+  [ Bdale Garbee ]
+  * add beep to TeleMega turnon script
+  * releasing 1.6.3
+
+ -- Bdale Garbee <bdale@gag.com>  Fri, 06 May 2016 18:14:11 -0600
+
 altos (1.6.2-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
