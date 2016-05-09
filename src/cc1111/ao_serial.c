@@ -42,6 +42,18 @@ const __code struct ao_serial_speed ao_serial_speeds[] = {
 
 #define AO_SERIAL_SPEED_MAX	AO_SERIAL_SPEED_115200
 
+#if HAS_SERIAL_1_ALT_1
+#define SERIAL_1_RTS P0_3
+#else
+#define SERIAL_1_RTS P1_5
+#endif
+
+#if HAS_SERIAL_0_ALT_1
+#define SERIAL_0_RTS P0_5
+#else
+#define SERIAL_0_RTS P1_3
+#endif
+
 #if HAS_SERIAL_0
 
 volatile __xdata struct ao_fifo	ao_serial0_rx_fifo;
@@ -55,6 +67,10 @@ ao_serial0_rx_isr(void) __interrupt 2
 	ao_wakeup(&ao_serial0_rx_fifo);
 #if USE_SERIAL_0_STDIN
 	ao_wakeup(&ao_stdin_ready);
+#endif
+#if HAS_SERIAL_0_HW_FLOW
+	if (ao_fifo_mostly(ao_serial0_rx_fifo))
+		SERIAL_0_RTS = 1;
 #endif
 }
 
@@ -87,6 +103,10 @@ ao_serial0_getchar(void) __critical
 	while (ao_fifo_empty(ao_serial0_rx_fifo))
 		ao_sleep(&ao_serial0_rx_fifo);
 	ao_fifo_remove(ao_serial0_rx_fifo, c);
+#if HAS_SERIAL_0_HW_FLOW
+	if (ao_fifo_barely(ao_serial0_rx_fifo))
+		SERIAL_0_RTS = 0;
+#endif
 	return c;
 }
 
@@ -98,6 +118,10 @@ _ao_serial0_pollchar(void)
 	if (ao_fifo_empty(ao_serial0_rx_fifo))
 		return AO_READ_AGAIN;
 	ao_fifo_remove(ao_serial0_rx_fifo,c);
+#if HAS_SERIAL_0_HW_FLOW
+	if (ao_fifo_barely(ao_serial0_rx_fifo))
+		SERIAL_0_RTS = 0;
+#endif
 	return c;
 }
 #endif
@@ -144,6 +168,10 @@ ao_serial1_rx_isr(void) __interrupt 3
 #if USE_SERIAL_1_STDIN
 	ao_wakeup(&ao_stdin_ready);
 #endif
+#if HAS_SERIAL_1_HW_FLOW
+	if (ao_fifo_mostly(ao_serial1_rx_fifo))
+		SERIAL_1_RTS = 1;
+#endif
 }
 
 static __xdata uint8_t ao_serial1_tx_started;
@@ -175,6 +203,10 @@ ao_serial1_getchar(void) __critical
 	while (ao_fifo_empty(ao_serial1_rx_fifo))
 		ao_sleep(&ao_serial1_rx_fifo);
 	ao_fifo_remove(ao_serial1_rx_fifo, c);
+#if HAS_SERIAL_1_HW_FLOW
+	if (ao_fifo_barely(ao_serial1_rx_fifo))
+		SERIAL_1_RTS = 0;
+#endif
 	return c;
 }
 
@@ -186,6 +218,10 @@ _ao_serial1_pollchar(void)
 	if (ao_fifo_empty(ao_serial1_rx_fifo))
 		return AO_READ_AGAIN;
 	ao_fifo_remove(ao_serial1_rx_fifo,c);
+#if HAS_SERIAL_1_HW_FLOW
+	if (ao_fifo_barely(ao_serial1_rx_fifo))
+		SERIAL_1_RTS = 0;
+#endif
 	return c;
 }
 #endif
@@ -232,7 +268,11 @@ ao_serial_init(void)
 	/* Make the USART pins be controlled by the USART */
 	P0SEL |= (1 << 2) | (1 << 3);
 #if HAS_SERIAL_0_HW_FLOW
-	P0SEL |= (1 << 4) | (1 << 5);
+	SERIAL_0_RTS = 0;
+	P0DIR |= (1 << 5);
+
+	P0SEL |= (1 << 4);
+	P0INP |= (1 << 4);
 #endif
 #else
 	/* Set up the USART pin assignment */
@@ -244,7 +284,11 @@ ao_serial_init(void)
 	/* Make the USART pins be controlled by the USART */
 	P1SEL |= (1 << 5) | (1 << 4);
 #if HAS_SERIAL_0_HW_FLOW
-	P1SEL |= (1 << 3) | (1 << 2);
+	SERIAL_0_RTS = 0;
+	P1DIR |= (1 << 3);
+
+	P1SEL |= (1 << 2);
+	P1INP |= (1 << 2);
 #endif
 #endif
 
@@ -287,7 +331,13 @@ ao_serial_init(void)
 	/* Make the USART pins be controlled by the USART */
 	P0SEL |= (1 << 5) | (1 << 4);
 #if HAS_SERIAL_1_HW_FLOW
-	P0SEL |= (1 << 3) | (1 << 2);
+	/* SW RTS control (hw doesn't work) */
+	SERIAL_1_RTS = 0;
+	P0DIR |= 1 << 3;
+
+	/* HW CTS. Maybe this works? */
+	P0SEL |= 1 << 2;
+	P0INP |= 1 << 2;
 #endif
 #else
 	/* Set up the USART pin assignment */
@@ -299,7 +349,13 @@ ao_serial_init(void)
 	/* Make the USART pins be controlled by the USART */
 	P1SEL |= (1 << 6) | (1 << 7);
 #if HAS_SERIAL_1_HW_FLOW
-	P1SEL |= (1 << 5) | (1 << 4);
+	/* SW RTS control (hw doesn't work) */
+	SERIAL_1_RTS = 0;
+	P1DIR |= (1 << 5);
+
+	/* HW CTS. Maybe this works? */
+	P1SEL |= (1 << 4);
+	P1INP |= (1 << 4);
 #endif
 #endif
 
