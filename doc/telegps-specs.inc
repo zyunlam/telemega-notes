@@ -5,6 +5,11 @@
       
 		TeleGPS uses the u-Blox Max-7Q GPS receiver.
       
+	=== 70cm Transmitter
+
+		TeleGPS uses a TI CC115L transmitter. This radio
+		produces 10mW of RF output.
+
 	=== Micro-controller
       
 		TeleGPS uses an NXP LPC11U14 micro-controller. This
