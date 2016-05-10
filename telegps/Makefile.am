@@ -101,7 +101,8 @@ FIRMWARE_TD_3_0=$(top_srcdir)/src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx
 FIRMWARE_TD=$(FIRMWARE_TD_0_2) $(FIRMWARE_TD_3_0)
 
 FIRMWARE_TBT_1_0=$(top_srcdir)/src/telebt-v1.0/telebt-v1.0-$(VERSION).ihx
-FIRMWARE_TBT=$(FIRMWARE_TBT_1_0)
+FIRMWARE_TBT_3_0=$(top_srcdir)/src/telebt-v3.0/telebt-v3.0-$(VERSION).ihx
+FIRMWARE_TBT=$(FIRMWARE_TBT_1_0) $(FIRMWARE_TBT_3_0)
 
 FIRMWARE_TG_1_0=$(top_srcdir)/src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx
 FIRMWARE_TG=$(FIRMWARE_TG_1_0)
