@@ -138,6 +138,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	JComboBox<Integer>	min_zoom;
 	JComboBox<Integer>	max_zoom;
 	JComboBox<Double>	radius;
+	int scale = 1;
 
 	Integer[]		zooms = { -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6 };
 
@@ -249,9 +250,12 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 					else
 						r = r * 1000;
 
-					loader = new AltosMapLoader(map.map, this,
+					map.map.centre(new AltosLatLon(latitude, longitude));
+
+					loader = new AltosMapLoader(this,
 								    latitude, longitude,
-								    min_z, max_z, r, all_types());
+								    min_z, max_z, r,
+								    all_types(), scale);
 
 				} catch (ParseException pe) {
 					load_button.setSelected(false);

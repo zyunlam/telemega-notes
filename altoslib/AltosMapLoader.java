@@ -25,7 +25,7 @@ import java.lang.Math;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class AltosMapLoader extends Thread implements AltosMapTileListener {
+public class AltosMapLoader extends Thread implements AltosMapStoreListener {
 	AltosMapLoaderListener	listener;
 
 	double	latitude, longitude;
@@ -35,6 +35,7 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 	int	all_types;
 	int	cur_type;
 	double	radius;
+	int	scale;
 
 	int	tiles_loaded_layer;
 	int	tiles_loaded_total;
@@ -48,8 +49,6 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 	private Semaphore	loading = new Semaphore(MAX_LOADING);
 
 	boolean	abort;
-
-	AltosMap	map;
 
 	int tile_radius(int zoom) {
 		double	delta_lon = AltosMapTransform.lon_from_distance(latitude, radius);
@@ -80,8 +79,6 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 		AltosLatLon load_centre = new AltosLatLon(latitude, longitude);
 		AltosMapTransform transform = new AltosMapTransform(256, 256, zoom, load_centre);
 
-		map.centre(load_centre);
-
 		AltosPointInt	upper_left;
 		AltosPointInt	lower_right;
 
@@ -103,8 +100,9 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 				AltosPointInt	point = new AltosPointInt(x, y);
 				AltosLatLon	ul = transform.lat_lon(point);
 				AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
-				AltosMapTile	tile = new AltosMapTile(null, ul, center, zoom, maptype, AltosMap.px_size);
-				tile.add_listener(this);
+				AltosMapStore	store = AltosMapStore.get(center, zoom, maptype, AltosMap.px_size, scale);
+				listener.debug("load state %s url %s\n", AltosMapTile.status_name(store.status()), store.url);
+				store.add_listener(this);
 				if (abort)
 					return false;
 			}
@@ -170,14 +168,14 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 			listener.loader_done(tiles_total);
 	}
 
-	public synchronized void notify_tile(AltosMapTile tile, int status) {
+	public synchronized void notify_store(AltosMapStore store, int status) {
 		boolean	do_next = false;
 		if (status == AltosMapTile.fetching)
 			return;
 
 		loading.release();
 
-		tile.remove_listener(this);
+		store.remove_listener(this);
 
 		if (layers_loaded >= layers_total)
 			return;
@@ -185,7 +183,7 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 		++tiles_loaded_total;
 		++tiles_loaded_layer;
 
-		listener.debug("AltosMapLoader.notify_tile status %d total %d of %d layer %d of %d\n",
+		listener.debug("AltosMapLoader.notify_store status %d total %d of %d layer %d of %d\n",
 			       status, tiles_loaded_total, tiles_total, tiles_loaded_layer, tiles_this_layer);
 
 		if (tiles_loaded_layer == tiles_this_layer) {
@@ -198,18 +196,17 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 			listener.loader_done(tiles_total);
 		else
 			listener.loader_notify(tiles_loaded_total,
-					       tiles_total, tile.store.file.toString());
+					       tiles_total, store.file.toString());
 	}
 
 	public void abort() {
 		this.abort = true;
 	}
 
-	public AltosMapLoader(AltosMap map, AltosMapLoaderListener listener,
-			      double latitude, double longitude, int min_z, int max_z, double radius, int all_types) {
+	public AltosMapLoader(AltosMapLoaderListener listener,
+			      double latitude, double longitude, int min_z, int max_z, double radius, int all_types, int scale) {
 		listener.debug("lat %f lon %f min_z %d max_z %d radius %f all_types %d\n",
 			       latitude, longitude, min_z, max_z, radius, all_types);
-		this.map = map;
 		this.listener = listener;
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -217,6 +214,7 @@ public class AltosMapLoader extends Thread implements AltosMapTileListener {
 		this.max_z = max_z;
 		this.radius = radius;
 		this.all_types = all_types;
+		this.scale = scale;
 		this.abort = false;
 		start();
 	}

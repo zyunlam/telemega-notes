@@ -38,6 +38,25 @@ public class AltosMapTile implements AltosFontListener, AltosMapStoreListener {
 	static public final int	bad_request = 4;/* downloading failed */
 	static public final int	forbidden = 5;	/* downloading failed */
 
+	static public String status_name(int status) {
+		switch (status) {
+		case loaded:
+			return "loaded";
+		case fetched:
+			return "fetched";
+		case fetching:
+			return "fetching";
+		case failed:
+			return "failed";
+		case bad_request:
+			return "bad_request";
+		case forbidden:
+			return "forbidden";
+		default:
+			return "unknown";
+		}
+	}
+
 	public void font_size_changed(int font_size) {
 	}
 
@@ -95,9 +114,5 @@ public class AltosMapTile implements AltosFontListener, AltosMapStoreListener {
 
 		store = AltosMapStore.get(center, zoom, maptype, px_size, scale);
 		store.add_listener(this);
-	}
-
-	public AltosMapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		this(cache, upper_left, center, zoom, maptype, px_size, 1);
 	}
 }

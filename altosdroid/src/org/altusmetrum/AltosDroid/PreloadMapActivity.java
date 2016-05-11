@@ -49,7 +49,7 @@ import org.altusmetrum.altoslib_10.*;
  * by the user, the MAC address of the device is sent back to the parent
  * Activity in the result Intent.
  */
-public class PreloadMapActivity extends Activity implements AltosLaunchSiteListener, AltosMapInterface, AltosMapLoaderListener, LocationListener {
+public class PreloadMapActivity extends Activity implements AltosLaunchSiteListener, AltosMapLoaderListener, LocationListener {
 
 	private ArrayAdapter<AltosLaunchSite> known_sites_adapter;
 
@@ -110,7 +110,12 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 			});
 	}
 
+	public void debug(String format, Object ... arguments) {
+		AltosDebug.debug(format, arguments);
+	}
+
 	/* AltosLaunchSiteListener interface */
+
 	public void notify_launch_sites(final List<AltosLaunchSite> sites) {
 		this.runOnUiThread(new Runnable() {
 				public void run() {
@@ -118,70 +123,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 						known_sites_adapter.add(site);
 				}
 			});
-	}
-
-	AltosMap	map;
-
-	class PreloadMapImage implements AltosImage {
-		public void flush() {
-		}
-
-		public PreloadMapImage(File file) {
-		}
-	}
-
-	public AltosMapPath new_path() {
-		return null;
-	}
-
-	public AltosMapLine new_line() {
-		return null;
-	}
-
-	public AltosImage load_image(File file) throws Exception {
-		return new PreloadMapImage(file);
-	}
-
-	public AltosMapMark new_mark(double lat, double lon, int state) {
-		return null;
-	}
-
-	class PreloadMapTile extends AltosMapTile {
-		public void paint(AltosMapTransform t) {
-		}
-
-		public PreloadMapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(cache, upper_left, center, zoom, maptype, px_size, 2);
-		}
-
-	}
-
-	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new PreloadMapTile(cache, upper_left, center, zoom, maptype, px_size);
-	}
-
-	public int width() {
-		return AltosMap.px_size;
-	}
-
-	public int height() {
-		return AltosMap.px_size;
-	}
-
-	public void repaint() {
-	}
-
-	public void repaint(AltosRectangle damage) {
-	}
-
-	public void set_zoom_label(String label) {
-	}
-
-	public void select_object(AltosLatLon latlon) {
-	}
-
-	public void debug(String format, Object ... arguments) {
-		AltosDebug.debug(format, arguments);
 	}
 
 	/* LocationProvider interface */
@@ -281,7 +222,7 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 			AltosDebug.debug("PreloadMap load %f %f %d %d %f %d\n",
 					 lat, lon, min, max, r, t);
-			loader = new AltosMapLoader(map, this, lat, lon, min, max, r, t);
+			loader = new AltosMapLoader(this, lat, lon, min, max, r, t, AltosMapOffline.scale);
 		} catch (ParseException e) {
 			AltosDebug.debug("PreloadMap load raised exception %s", e.toString());
 		}
@@ -411,8 +352,6 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 		known_sites_spinner.setAdapter(known_sites_adapter);
 		known_sites_spinner.setOnItemSelectedListener(new SiteListListener());
-
-		map = new AltosMap(this);
 
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);

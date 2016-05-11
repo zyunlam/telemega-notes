@@ -241,8 +241,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 	}
 
 	class MapTile extends AltosMapTile {
-		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(cache, upper_left, center, zoom, maptype, px_size);
+		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+			super(cache, upper_left, center, zoom, maptype, px_size, scale);
 		}
 
 		public void paint(AltosMapTransform t) {
@@ -332,8 +332,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 		return new MapMark(lat, lon, state);
 	}
 
-	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new MapTile(cache, upper_left, center, zoom, maptype, px_size);
+	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+		return new MapTile(cache, upper_left, center, zoom, maptype, px_size, scale);
 	}
 
 	public int width() {
