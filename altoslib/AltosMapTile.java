@@ -87,7 +87,6 @@ public abstract class AltosMapTile implements AltosFontListener, AltosMapStoreLi
 	}
 
 	public void notify_store(AltosMapStore store, int status) {
-//		System.out.printf("AltosMapTile.notify_store %d\n", status);
 		notify_listeners(status);
 	}
 

@@ -60,7 +60,6 @@ public class AltosMapCache implements AltosMapCacheListener {
 
 		public synchronized void notify_tile(AltosMapTile tile, int status) {
 			if (status == AltosMapTile.fetched) {
-				System.out.printf("tile fetched, loading image\n");
 				load();
 			}
 		}
@@ -139,8 +138,6 @@ public class AltosMapCache implements AltosMapCacheListener {
 				elements[oldest].flush();
 
 			elements[oldest] = element;
-			System.out.printf("AltosMapCache.get image ? %s\n",
-					  element.image == null ? "false" : "true");
 			return element.image;
 		}
 	}

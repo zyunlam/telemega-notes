@@ -32,7 +32,6 @@ public abstract class AltosStateIterable implements Iterable<AltosState> {
 		try {
 			in = new FileInputStream(file);
 		} catch (Exception e) {
-			System.out.printf("Failed to open file '%s'\n", file);
 			return null;
 		}
 		if (file.getName().endsWith("telem"))
