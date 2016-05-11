@@ -30,7 +30,7 @@ public abstract class AltosUIVoltageIndicator extends AltosUIUnitsIndicator {
 		return voltage(state);
 	}
 
-	double last_voltage = -1;
+	double last_voltage = AltosLib.MISSING;
 
 	public AltosUIVoltageIndicator (Container container, int x, int y, String name, int width) {
 		super(container, x, y, AltosConvert.voltage, name, 1, true, width);
