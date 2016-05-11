@@ -129,6 +129,7 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 			case MSG_DISCONNECT:
 				AltosDebug.debug("Disconnect command received");
 				s.address = null;
+				AltosDroidPreferences.set_active_device(null);
 				s.disconnect(true);
 				break;
 			case MSG_DELETE_SERIAL:

@@ -57,8 +57,13 @@ public class AltosDroidPreferences extends AltosPreferences {
 	public static void set_active_device(DeviceAddress address) {
 		synchronized(backend) {
 			active_device_address = address;
-			backend.putString(activeDeviceAddressPreference, active_device_address.address);
-			backend.putString(activeDeviceNamePreference, active_device_address.name);
+			if (active_device_address != null) {
+				backend.putString(activeDeviceAddressPreference, active_device_address.address);
+				backend.putString(activeDeviceNamePreference, active_device_address.name);
+			} else {
+				backend.remove(activeDeviceAddressPreference);
+				backend.remove(activeDeviceNamePreference);
+			}
 			flush_preferences();
 		}
 	}
