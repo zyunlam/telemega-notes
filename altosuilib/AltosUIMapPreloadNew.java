@@ -153,8 +153,12 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 	double	latitude, longitude;
 
+	long	loader_notify_time;
+
 	/* AltosMapLoaderListener interfaces */
 	public void loader_start(final int max) {
+		loader_notify_time = System.currentTimeMillis();
+
 		SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					pbar.setMaximum(max);
@@ -167,6 +171,13 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	}
 
 	public void loader_notify(final int cur, final int max, final String name) {
+		long	now = System.currentTimeMillis();
+
+		if (now - loader_notify_time < 100)
+			return;
+
+		loader_notify_time = now;
+
 		SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					pbar.setValue(cur);
