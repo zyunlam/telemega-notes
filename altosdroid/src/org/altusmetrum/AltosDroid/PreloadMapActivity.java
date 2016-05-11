@@ -75,6 +75,8 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 	/* AltosMapLoaderListener interfaces */
 	public void loader_start(final int max) {
+		loader_notify_time = System.currentTimeMillis();
+
 		this.runOnUiThread(new Runnable() {
 				public void run() {
 					progress.setMax(max);
@@ -84,6 +86,13 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	}
 
 	public void loader_notify(final int cur, final int max, final String name) {
+		long	now = System.currentTimeMillis();
+
+		if (now - loader_notify_time < 100)
+			return;
+
+		loader_notify_time = now;
+
 		this.runOnUiThread(new Runnable() {
 				public void run() {
 					progress.setProgress(cur);
