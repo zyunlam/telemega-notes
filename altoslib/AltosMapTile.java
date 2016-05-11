@@ -38,45 +38,6 @@ public class AltosMapTile implements AltosFontListener, AltosMapStoreListener {
 	static public final int	bad_request = 4;/* downloading failed */
 	static public final int	forbidden = 5;	/* downloading failed */
 
-	private File map_file() {
-		double lat = center.lat;
-		double lon = center.lon;
-		char chlat = lat < 0 ? 'S' : 'N';
-		char chlon = lon < 0 ? 'W' : 'E';
-
-		if (lat < 0) lat = -lat;
-		if (lon < 0) lon = -lon;
-		String maptype_string = String.format("%s-", AltosMap.maptype_names[maptype]);
-		String format_string;
-		if (maptype == AltosMap.maptype_hybrid || maptype == AltosMap.maptype_satellite || maptype == AltosMap.maptype_terrain)
-			format_string = "jpg";
-		else
-			format_string = "png";
-		return new File(AltosPreferences.mapdir(),
-				String.format("map-%c%.6f,%c%.6f-%s%d%s.%s",
-					      chlat, lat, chlon, lon, maptype_string, zoom, scale == 1 ? "" : String.format("-%d", scale), format_string));
-	}
-
-	private String map_url() {
-		String format_string;
-		int z = zoom;
-
-		if (maptype == AltosMap.maptype_hybrid || maptype == AltosMap.maptype_satellite || maptype == AltosMap.maptype_terrain)
-			format_string = "jpg";
-		else
-			format_string = "png32";
-
-		for (int s = 1; s < scale; s <<= 1)
-			z--;
-
-		if (AltosVersion.has_google_maps_api_key())
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s&key=%s",
-					     center.lat, center.lon, z, px_size/scale, px_size/scale, scale, AltosMap.maptype_names[maptype], format_string, AltosVersion.google_maps_api_key);
-		else
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s",
-					     center.lat, center.lon, z, px_size/scale, px_size/scale, AltosMap.maptype_names[maptype], format_string);
-	}
-
 	public void font_size_changed(int font_size) {
 	}
 
@@ -132,7 +93,7 @@ public class AltosMapTile implements AltosFontListener, AltosMapStoreListener {
 		this.px_size = px_size;
 		this.scale = scale;
 
-		store = AltosMapStore.get(map_url(), map_file());
+		store = AltosMapStore.get(center, zoom, maptype, px_size, scale);
 		store.add_listener(this);
 	}
 
