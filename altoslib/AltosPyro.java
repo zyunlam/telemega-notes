@@ -138,7 +138,7 @@ public class AltosPyro {
 			units = pyro_to_units.get(flag);
 		if (units == null)
 			return name;
-		return String.format ("%s (%s)", name, units.show_units());
+		return String.format ("%s (%s)", name, units.parse_units());
 	}
 
 	public static AltosUnits pyro_to_units(int flag) {

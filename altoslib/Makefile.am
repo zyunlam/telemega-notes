@@ -118,6 +118,7 @@ altoslib_JAVA = \
 	AltosIMU.java \
 	AltosMag.java \
 	AltosUnits.java \
+	AltosUnitsRange.java \
 	AltosDistance.java \
 	AltosHeight.java \
 	AltosSpeed.java \

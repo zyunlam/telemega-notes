@@ -231,7 +231,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 					Double r = (Double) radius.getSelectedItem();
 
 					if (AltosPreferences.imperial_units())
-						r = AltosConvert.distance.inverse(r);
+						r = AltosConvert.miles_to_meters(r);
 					else
 						r = r * 1000;
 					loading = true;

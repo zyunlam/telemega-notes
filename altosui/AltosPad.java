@@ -101,7 +101,11 @@ public class AltosPad extends AltosUIFlightTab {
 
 	class ReceiverBattery extends AltosUIVoltageIndicator {
 
-		public double voltage(AltosState state) { return AltosLib.MISSING; }
+		double	last_voltage = AltosLib.MISSING;
+
+		public double voltage(AltosState state) {
+			return last_voltage;
+		}
 
 		public double good() { return AltosLib.ao_battery_good; }
 
@@ -111,8 +115,10 @@ public class AltosPad extends AltosUIFlightTab {
 
 		public double value(AltosState state, AltosListenerState listener_state, int i) {
 			if (listener_state == null)
-				return AltosLib.MISSING;
-			return listener_state.battery;
+				last_voltage = AltosLib.MISSING;
+			else
+				last_voltage = listener_state.battery;
+			return last_voltage;
 		}
 
 		public ReceiverBattery (AltosUIFlightTab container, int y) {
@@ -205,40 +211,26 @@ public class AltosPad extends AltosUIFlightTab {
 		}
 	}
 
-	class PadAlt extends AltosUIIndicator {
+	class PadAlt extends AltosUIUnitsIndicator {
 
-		double	last_alt = AltosLib.MISSING - 1;
-
-		public void show (AltosState state, AltosListenerState listener_state) {
-			double alt = AltosLib.MISSING;
-			String label = null;
-
-			if (state != null) {
-				if (report_pad(state)) {
-					alt = state.pad_alt;
-					label = "Pad Altitude";
-				} else {
-					alt = state.gps.alt;
-					label = "Altitude";
-				}
-			}
-			if (alt != last_alt) {
-				if (alt != AltosLib.MISSING) {
-					show(AltosConvert.height.show(5, alt));
-					set_label(label);
-				} else
-					hide();
-				last_alt = alt;
-			}
+		public double value(AltosState state, int i) {
+			if (report_pad(state))
+				return state.pad_alt;
+			else
+				return state.gps.alt;
 		}
 
-		public void reset() {
-			super.reset();
-			last_alt =  AltosLib.MISSING - 1;
+		public void show (AltosState state, AltosListenerState listener_state) {
+			String label = "Altitude";
+
+			if (state != null && report_pad(state))
+				label = "Pad Altitude";
+			set_label(label);
+			super.show(state, listener_state);
 		}
 
 		public PadAlt (AltosUIFlightTab container, int y) {
-			super (container, y, "Pad Altitude", 1, false, 2);
+			super (container, y, AltosConvert.height, "Pad Altitude", 1, false, 2);
 		}
 	}
 	public String getName() { return "Pad"; }

@@ -234,7 +234,7 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	private double radius() {
 		double r = value_distance(radius);
 		if (AltosPreferences.imperial_units())
-			r = AltosConvert.distance.inverse(r);
+			r = AltosConvert.miles_to_meters(r);
 		else
 			r = r * 1000;
 		return r;

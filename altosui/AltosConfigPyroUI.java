@@ -105,7 +105,7 @@ public class AltosConfigPyroUI
 				double 	unit_value = new_value;
 				AltosUnits units = AltosPyro.pyro_to_units(flag);
 				if (units != null)
-					unit_value = units.value(new_value);
+					unit_value = units.parse_value(new_value);
 				String	format;
 				if (scale >= 100)
 					format = "%6.2f";

@@ -69,7 +69,7 @@ public class AltosUISeries extends XYSeries implements AltosUIGrapher {
 		String  example = units.graph_format(7);
 
 		ttg = new StandardXYToolTipGenerator(String.format("{1}s: {2}%s ({0})",
-								   units.show_units()),
+								   units.graph_units()),
 						     new java.text.DecimalFormat(time_example),
 						     new java.text.DecimalFormat(example));
 		renderer.setBaseToolTipGenerator(ttg);
@@ -85,7 +85,7 @@ public class AltosUISeries extends XYSeries implements AltosUIGrapher {
 
 	public void add(AltosUIDataPoint dataPoint) {
 		try {
-			super.add(dataPoint.x(), units.value(dataPoint.y(fetch)));
+			super.add(dataPoint.x(), units.graph_value(dataPoint.y(fetch)));
 		} catch (AltosUIDataMissing dm) {
 		}
 	}
