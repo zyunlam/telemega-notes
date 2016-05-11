@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_10;
 import java.io.*;
 import java.util.*;
 
-public abstract class AltosMapTile implements AltosFontListener, AltosMapStoreListener {
+public class AltosMapTile implements AltosFontListener, AltosMapStoreListener {
 	LinkedList<AltosMapTileListener>	listeners = new LinkedList<AltosMapTileListener>();
 	public AltosLatLon	upper_left, center;
 	public int		px_size;
@@ -98,7 +98,8 @@ public abstract class AltosMapTile implements AltosFontListener, AltosMapStoreLi
 		notify_listeners(status);
 	}
 
-	public abstract void paint(AltosMapTransform t);
+	public void paint(AltosMapTransform t) {
+	}
 
 	public AltosImage get_image() {
 		if (cache == null)

@@ -69,6 +69,10 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 	private ProgressBar	progress;
 
+	private AltosMapLoader	loader;
+
+	long	loader_notify_time;
+
 	/* AltosMapLoaderListener interfaces */
 	public void loader_start(final int max) {
 		this.runOnUiThread(new Runnable() {
@@ -88,6 +92,7 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	}
 
 	public void loader_done(int max) {
+		loader = null;
 		this.runOnUiThread(new Runnable() {
 				public void run() {
 					progress.setProgress(0);
@@ -254,6 +259,9 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	}
 
 	private void load() {
+		if (loader != null)
+			return;
+
 		try {
 			double	lat = latitude();
 			double	lon = longitude();
@@ -264,7 +272,7 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 			AltosDebug.debug("PreloadMap load %f %f %d %d %f %d\n",
 					 lat, lon, min, max, r, t);
-			new AltosMapLoader(map, this, lat, lon, min, max, r, t);
+			loader = new AltosMapLoader(map, this, lat, lon, min, max, r, t);
 		} catch (ParseException e) {
 			AltosDebug.debug("PreloadMap load raised exception %s", e.toString());
 		}
@@ -408,6 +416,9 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+
+		if (loader != null)
+			loader.abort();
 
 		// Stop listening for location updates
 		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);

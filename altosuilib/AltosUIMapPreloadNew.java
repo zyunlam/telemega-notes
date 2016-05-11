@@ -131,7 +131,6 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	JComboBox<AltosLaunchSite>	site_list;
 
 	JToggleButton	load_button;
-	boolean		loading;
 	JButton		close_button;
 
 	JCheckBox[]	maptypes = new JCheckBox[AltosMap.maptype_terrain - AltosMap.maptype_hybrid + 1];
@@ -147,6 +146,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	Double[]	radius_km = { 2.0, 5.0, 10.0, 20.0, 30.0 };
 	Double		radius_def_km = 10.0;
 
+	AltosMapLoader	loader;
 
 	static final String[]	lat_hemi_names = { "N", "S" };
 	static final String[]	lon_hemi_names = { "E", "W" };
@@ -187,12 +187,12 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	}
 
 	public void loader_done(int max) {
+		loader = null;
 		SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					pbar.setValue(0);
 					pbar.setString("");
 					load_button.setSelected(false);
-					loading = false;
 				}
 			});
 	}
@@ -227,11 +227,14 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	public void actionPerformed(ActionEvent e) {
 		String	cmd = e.getActionCommand();
 
-		if (cmd.equals("close"))
+		if (cmd.equals("close")) {
+			if (loader != null)
+				loader.abort();
 			setVisible(false);
+		}
 
 		if (cmd.equals("load")) {
-			if (!loading) {
+			if (loader == null) {
 				try {
 					latitude = lat.get_value();
 					longitude = lon.get_value();
@@ -245,11 +248,10 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 						r = AltosConvert.miles_to_meters(r);
 					else
 						r = r * 1000;
-					loading = true;
 
-					new AltosMapLoader(map.map, this,
-							   latitude, longitude,
-							   min_z, max_z, r, all_types());
+					loader = new AltosMapLoader(map.map, this,
+								    latitude, longitude,
+								    min_z, max_z, r, all_types());
 
 				} catch (ParseException pe) {
 					load_button.setSelected(false);
