@@ -854,7 +854,7 @@ public class TeleGPSConfigUI
 	}
 
 	String get_tracker_motion_label() {
-		return String.format("Logging Trigger Motion (%s):", AltosConvert.height.show_units());
+		return String.format("Logging Trigger Motion (%s):", AltosConvert.height.parse_units());
 	}
 
 	void set_tracker_tool_tip() {
