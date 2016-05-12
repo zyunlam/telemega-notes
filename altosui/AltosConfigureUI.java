@@ -22,7 +22,7 @@ import java.awt.event.*;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class AltosConfigureUI
 	extends AltosUIConfigure

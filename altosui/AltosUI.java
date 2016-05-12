@@ -22,8 +22,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_10.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class AltosUI extends AltosUIFrame {
 	public AltosVoice voice = new AltosVoice();

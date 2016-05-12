@@ -30,7 +30,7 @@ import android.view.View.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 public class SetupActivity extends Activity {
 	private Spinner select_rate;

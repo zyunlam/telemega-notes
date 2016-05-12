@@ -40,7 +40,7 @@ import android.os.Looper;
 import android.widget.Toast;
 import android.location.Criteria;
 
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 public class TelemetryService extends Service implements AltosIdleMonitorListener {
 
