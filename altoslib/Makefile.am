@@ -160,6 +160,7 @@ altoslib_JAVA = \
 	AltosMapLoaderListener.java \
 	AltosMapLoader.java \
 	AltosMapTypeListener.java \
+	AltosHashSet.java \
 	AltosVersion.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar

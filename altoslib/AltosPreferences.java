@@ -116,7 +116,7 @@ public class AltosPreferences {
 	public final static String	frequency_count = "COUNT";
 	public final static String	frequency_format = "FREQUENCY-%d";
 	public final static String	description_format = "DESCRIPTION-%d";
-	public final static String	frequenciesPreference = "FREQUENCIES";
+	public final static String	frequenciesPreference = "FREQUENCIES-1";
 
 	/* Units preference */
 
@@ -136,7 +136,17 @@ public class AltosPreferences {
 
 		AltosFrequency[] frequencies = null;
 
-		frequencies = (AltosFrequency[]) backend.getSerializable(frequenciesPreference, null);
+		try {
+			AltosHashSet[]	sets = AltosHashSet.array(backend.getString(frequenciesPreference,null));
+			if (sets != null) {
+				frequencies = new AltosFrequency[sets.length];
+				for (int i = 0; i < frequencies.length; i++)
+					frequencies[i] = new AltosFrequency(sets[i]);
+			}
+
+		} catch (IOException ie) {
+			frequencies = null;
+		}
 
 		if (frequencies == null) {
 			if (backend.nodeExists(common_frequencies_node_name)) {
@@ -163,6 +173,17 @@ public class AltosPreferences {
 			}
 		}
 		return frequencies;
+	}
+
+	public static void save_common_frequencies() {
+		try {
+			AltosHashSet[]	sets = new AltosHashSet[common_frequencies.length];
+			for (int i = 0; i < sets.length; i++)
+				sets[i] = common_frequencies[i].hashSet();
+			backend.putString(frequenciesPreference, AltosHashSet.toString(sets));
+		} catch (IOException ie) {
+		}
+		flush_preferences();
 	}
 
 	public static int launcher_serial;
@@ -512,8 +533,8 @@ public class AltosPreferences {
 	public static void set_common_frequencies(AltosFrequency[] frequencies) {
 		synchronized(backend) {
 			common_frequencies = frequencies;
-			backend.putSerializable(frequenciesPreference, frequencies);
-			flush_preferences();
+
+			save_common_frequencies();
 		}
 	}
 

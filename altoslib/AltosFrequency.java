@@ -58,8 +58,21 @@ public class AltosFrequency implements Serializable {
 		return diff < 0.010;
 	}
 
+	public AltosHashSet hashSet() {
+		AltosHashSet	h = new AltosHashSet();
+
+		h.putDouble("frequency", frequency);
+		h.putString("description", description);
+		return h;
+	}
+
 	public AltosFrequency(double f, String d) {
 		frequency = f;
 		description = d;
+	}
+
+	public AltosFrequency(AltosHashSet h) {
+		frequency = h.getDouble("frequency", 0.0);
+		description = h.getString("description", "");
 	}
 }

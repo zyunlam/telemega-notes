@@ -53,12 +53,20 @@ public class AltosParse {
 		}
 	}
 
+	public static String format_double_locale(double number) {
+		return nf_locale.format(number);
+	}
+
 	public static double parse_double_net(String str) throws ParseException {
 		try {
 			return nf_net.parse(str.trim()).doubleValue();
 		} catch (ParseException pe) {
 			throw new ParseException("error parsing double " + str, 0);
 		}
+	}
+
+	public static String format_double_net(double number) {
+		return nf_net.format(number);
 	}
 
 	public static double parse_coord(String coord) throws ParseException {
