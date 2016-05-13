@@ -21,7 +21,7 @@ import java.text.*;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosGPS implements Cloneable, Serializable {
+public class AltosGPS implements Cloneable, AltosHashable {
 
 	public final static int MISSING = AltosLib.MISSING;
 
@@ -387,5 +387,66 @@ public class AltosGPS implements Cloneable, Serializable {
 			if (!parse_string(line, says_done))
 				break;
 		}
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet	h = new AltosHashSet();
+
+		h.putInt("nsat", nsat);
+		h.putBoolean("locked", locked);
+		h.putBoolean("connected", connected);
+		h.putDouble("lat", lat);
+		h.putDouble("lon", lon);
+		h.putDouble("alt", alt);
+		h.putInt("year", year);
+		h.putInt("month", month);
+		h.putInt("day", day);
+		h.putInt("hour", hour);
+		h.putInt("minute", minute);
+		h.putInt("second", second);
+
+		h.putDouble("ground_speed", ground_speed);
+		h.putInt("course", course);
+		h.putDouble("climb_rate", climb_rate);
+		h.putDouble("pdop", pdop);
+		h.putDouble("hdop", hdop);
+		h.putDouble("vdop", vdop);
+		h.putDouble("h_error", h_error);
+		h.putDouble("v_error", v_error);
+		h.putString("cc_gps_sat", AltosGPSSat.toString(cc_gps_sat));
+		return h;
+	}
+
+	public AltosGPS(AltosHashSet h) {
+		init();
+		nsat = h.getInt("nsat", nsat);
+		locked = h.getBoolean("locked", locked);
+		connected = h.getBoolean("connected", connected);
+		lat = h.getDouble("lat", lat);
+		lon = h.getDouble("lon", lon);
+		alt = h.getDouble("alt", alt);
+		year = h.getInt("year", year);
+		month = h.getInt("month", month);
+		day = h.getInt("day", day);
+		hour = h.getInt("hour", hour);
+		minute = h.getInt("minute", minute);
+		second = h.getInt("second", second);
+
+		ground_speed = h.getDouble("ground_speed", ground_speed);
+		course = h.getInt("course", course);
+		climb_rate = h.getDouble("climb_rate", climb_rate);
+		pdop = h.getDouble("pdop", pdop);
+		hdop = h.getDouble("hdop", hdop);
+		vdop = h.getDouble("vdop", vdop);
+		h_error = h.getDouble("h_error", h_error);
+		v_error = h.getDouble("v_error", v_error);
+		cc_gps_sat = AltosGPSSat.array(h.getString("cc_gps_sat", null));
+	}
+
+	public static AltosGPS fromHashSet(AltosHashSet h, AltosGPS def) {
+		if (h == null)
+			return def;
+
+		return new AltosGPS(h);
 	}
 }

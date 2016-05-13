@@ -19,7 +19,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosSavedState implements Serializable {
+public class AltosSavedState {
 	public AltosState		state;
 	public AltosListenerState	listener_state;
 

@@ -23,7 +23,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosState implements Cloneable, Serializable {
+public class AltosState implements Cloneable, AltosHashable {
 
 	public static final int set_position = 1;
 	public static final int set_gps = 2;
@@ -46,7 +46,7 @@ public class AltosState implements Cloneable, Serializable {
 	private int	prev_tick;
 	public int	boost_tick;
 
-	class AltosValue implements Serializable{
+	class AltosValue implements AltosHashable {
 		double	value;
 		double	prev_value;
 		private double	max_value;
@@ -177,18 +177,55 @@ public class AltosState implements Cloneable, Serializable {
 			prev_set_time = set_time;
 		}
 
+		public AltosHashSet hashSet() {
+			AltosHashSet h = new AltosHashSet();
+
+			h.putDouble("value", value);
+			h.putDouble("prev_value", prev_value);
+			h.putDouble("max_value", max_value);
+			h.putDouble("set_time", set_time);
+			h.putDouble("prev_set_time", prev_set_time);
+			return h;
+		}
+
+		AltosValue(AltosHashSet h) {
+			this();
+			if (h != null) {
+				value = h.getDouble("value", value);
+				prev_value = h.getDouble("prev_value", prev_value);
+				max_value = h.getDouble("max_value", max_value);
+				set_time = h.getDouble("set_time", 0);
+				prev_set_time = h.getDouble("prev_set_time", 0);
+			}
+		}
+
 		AltosValue() {
 			value = AltosLib.MISSING;
 			prev_value = AltosLib.MISSING;
 			max_value = AltosLib.MISSING;
 		}
+
 	}
 
-	class AltosCValue implements Serializable {
+	AltosValue AltosValue_fromHashSet(AltosHashSet h, AltosValue def) {
+		if (h == null)
+			return def;
+		return new AltosValue(h);
+	}
 
-		class AltosIValue extends AltosValue implements Serializable {
+	class AltosCValue implements AltosHashable {
+
+		class AltosIValue extends AltosValue implements AltosHashable {
 			boolean can_max() {
 				return c_can_max();
+			}
+
+			AltosIValue() {
+				super();
+			}
+
+			AltosIValue(AltosHashSet h) {
+				super(h);
 			}
 		};
 
@@ -282,6 +319,26 @@ public class AltosState implements Cloneable, Serializable {
 			measured = new AltosIValue();
 			computed = new AltosIValue();
 		}
+
+
+		public AltosHashSet hashSet() {
+			AltosHashSet h = new AltosHashSet();
+
+			h.putHashable("measured", measured);
+			h.putHashable("computed", computed);
+			return h;
+		}
+
+		AltosCValue(AltosHashSet h) {
+			measured = new AltosIValue(h.getHash("measured"));
+			computed = new AltosIValue(h.getHash("computed"));
+		}
+	}
+
+	AltosCValue AltosCValue_fromHashSet(AltosHashSet h, AltosCValue def) {
+		if (h == null)
+			return def;
+		return new AltosCValue(h);
 	}
 
 	private int	state;
@@ -317,7 +374,7 @@ public class AltosState implements Cloneable, Serializable {
 		ground_altitude.set_measured(a, time);
 	}
 
-	class AltosGpsGroundAltitude extends AltosValue implements Serializable {
+	class AltosGpsGroundAltitude extends AltosValue {
 		void set(double a, double t) {
 			super.set(a, t);
 			pad_alt = value();
@@ -329,6 +386,19 @@ public class AltosState implements Cloneable, Serializable {
 			pad_alt = value();
 			gps_altitude.set_gps_height();
 		}
+
+		AltosGpsGroundAltitude() {
+			super();
+		}
+
+		AltosGpsGroundAltitude (AltosHashSet h) {
+			super(h);
+		}
+	}
+
+	AltosGpsGroundAltitude AltosGpsGroundAltitude_fromHashSet(AltosHashSet h, AltosGpsGroundAltitude def) {
+		if (h == null) return def;
+		return new AltosGpsGroundAltitude(h);
 	}
 
 	private AltosGpsGroundAltitude gps_ground_altitude;
@@ -341,7 +411,7 @@ public class AltosState implements Cloneable, Serializable {
 		gps_ground_altitude.set(a, time);
 	}
 
-	class AltosGroundPressure extends AltosCValue implements Serializable {
+	class AltosGroundPressure extends AltosCValue {
 		void set_filtered(double p, double time) {
 			computed.set_filtered(p, time);
 			if (!is_measured())
@@ -352,6 +422,19 @@ public class AltosState implements Cloneable, Serializable {
 			super.set_measured(p, time);
 			ground_altitude.set_computed(pressure_to_altitude(p), time);
 		}
+
+		AltosGroundPressure () {
+			super();
+		}
+
+		AltosGroundPressure (AltosHashSet h) {
+			super(h);
+		}
+	}
+
+	AltosGroundPressure AltosGroundPressure_fromHashSet(AltosHashSet h, AltosGroundPressure def) {
+		if (h == null) return def;
+		return new AltosGroundPressure(h);
 	}
 
 	private AltosGroundPressure ground_pressure;
@@ -364,7 +447,7 @@ public class AltosState implements Cloneable, Serializable {
 		ground_pressure.set_measured(pressure, time);
 	}
 
-	class AltosAltitude extends AltosCValue implements Serializable {
+	class AltosAltitude extends AltosCValue implements AltosHashable {
 
 		private void set_speed(AltosValue v) {
 			if (!acceleration.is_measured() || !ascent)
@@ -382,11 +465,24 @@ public class AltosState implements Cloneable, Serializable {
 			set_speed(measured);
 			set |= set_position;
 		}
+
+		AltosAltitude() {
+			super();
+		}
+
+		AltosAltitude (AltosHashSet h) {
+			super(h);
+		}
+	}
+
+	AltosAltitude AltosAltitude_fromHashSet(AltosHashSet h, AltosAltitude def) {
+		if (h == null) return def;
+		return new AltosAltitude(h);
 	}
 
 	private AltosAltitude	altitude;
 
-	class AltosGpsAltitude extends AltosValue implements Serializable {
+	class AltosGpsAltitude extends AltosValue implements AltosHashable {
 
 		private void set_gps_height() {
 			double	a = value();
@@ -402,6 +498,19 @@ public class AltosState implements Cloneable, Serializable {
 			super.set(a, t);
 			set_gps_height();
 		}
+
+		AltosGpsAltitude() {
+			super();
+		}
+
+		AltosGpsAltitude (AltosHashSet h) {
+			super(h);
+		}
+	}
+
+	AltosGpsAltitude AltosGpsAltitude_fromHashSet(AltosHashSet h, AltosGpsAltitude def) {
+		if (h == null) return def;
+		return new AltosGpsAltitude(h);
 	}
 
 	private AltosGpsAltitude	gps_altitude;
@@ -469,7 +578,7 @@ public class AltosState implements Cloneable, Serializable {
 		return gps_speed.max();
 	}
 
-	class AltosPressure extends AltosValue implements Serializable {
+	class AltosPressure extends AltosValue {
 		void set(double p, double time) {
 			super.set(p, time);
 			if (state == AltosLib.ao_flight_pad)
@@ -477,6 +586,19 @@ public class AltosState implements Cloneable, Serializable {
 			double a = pressure_to_altitude(p);
 			altitude.set_computed(a, time);
 		}
+
+		AltosPressure() {
+			super();
+		}
+
+		AltosPressure (AltosHashSet h) {
+			super(h);
+		}
+	}
+
+	AltosPressure AltosPressure_fromHashSet(AltosHashSet h, AltosPressure def) {
+		if (h == null) return def;
+		return new AltosPressure(h);
 	}
 
 	private AltosPressure	pressure;
@@ -539,7 +661,7 @@ public class AltosState implements Cloneable, Serializable {
 		return AltosLib.MISSING;
 	}
 
-	class AltosSpeed extends AltosCValue implements Serializable {
+	class AltosSpeed extends AltosCValue implements AltosHashable {
 
 		boolean can_max() {
 			return state < AltosLib.ao_flight_fast || state == AltosLib.ao_flight_stateless;
@@ -563,6 +685,19 @@ public class AltosState implements Cloneable, Serializable {
 			super.set_measured(new_value, time);
 			set_accel();
 		}
+
+		AltosSpeed() {
+			super();
+		}
+
+		AltosSpeed (AltosHashSet h) {
+			super(h);
+		}
+	}
+
+	AltosSpeed AltosSpeed_fromHashSet(AltosHashSet h, AltosSpeed def) {
+		if (h == null) return def;
+		return new AltosSpeed(h);
 	}
 
 	private AltosSpeed speed;
@@ -593,7 +728,7 @@ public class AltosState implements Cloneable, Serializable {
 		return AltosLib.MISSING;
 	}
 
-	class AltosAccel extends AltosCValue implements Serializable {
+	class AltosAccel extends AltosCValue implements AltosHashable {
 
 		boolean can_max() {
 			return state < AltosLib.ao_flight_fast || state == AltosLib.ao_flight_stateless;
@@ -604,6 +739,19 @@ public class AltosState implements Cloneable, Serializable {
 			if (ascent)
 				speed.set_integral(this.measured);
 		}
+
+		AltosAccel() {
+			super();
+		}
+
+		AltosAccel (AltosHashSet h) {
+			super(h);
+		}
+	}
+
+	AltosAccel AltosAccel_fromHashSet(AltosHashSet h, AltosAccel def) {
+		if (h == null) return def;
+		return new AltosAccel(h);
 	}
 
 	AltosAccel acceleration;
@@ -1483,10 +1631,238 @@ public class AltosState implements Cloneable, Serializable {
 	public AltosState clone() {
 		AltosState s = new AltosState();
 		s.copy(this);
+
+		AltosHashSet	hash = hashSet();
+		String		onetrip = hash.toString();
+		AltosHashSet	back = AltosHashSet.fromString(onetrip);
+		AltosState	tripstate = AltosState.fromHashSet(back);
+		AltosHashSet	triphash = tripstate.hashSet();
+		String		twotrip = triphash.toString();
+
+		if (!onetrip.equals(twotrip)) {
+			System.out.printf("%s\n%s\n", onetrip, twotrip);
+			System.exit(1);
+		}
 		return s;
 	}
 
 	public AltosState () {
 		init();
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet	h = new AltosHashSet();
+
+		h.putBoolean("valid", true);
+		h.putInt("set", set);
+		h.putLong("received_time", received_time);
+		h.putDouble("time", time);
+		h.putDouble("prev_time", prev_time);
+		h.putDouble("time_change", time_change);
+		h.putInt("tick", tick);
+		h.putInt("prev_tick", prev_tick);
+		h.putInt("boost_tick", boost_tick);
+		h.putInt("state", state);
+		h.putInt("flight", flight);
+		h.putInt("serial", serial);
+		h.putInt("altitude_32", altitude_32);
+		h.putInt("receiver_serial", receiver_serial);
+		h.putBoolean("landed", landed);
+		h.putBoolean("ascent", ascent);
+		h.putBoolean("boost", boost);
+		h.putInt("rssi", rssi);
+		h.putInt("status", status);
+		h.putInt("device_type", device_type);
+		h.putInt("config_major", config_major);
+		h.putInt("config_minor", config_minor);
+		h.putInt("apogee_delay", apogee_delay);
+		h.putInt("main_deploy", main_deploy);
+		h.putInt("flight_log_max", flight_log_max);
+		h.putHashable("ground_altitude", ground_altitude);
+		h.putHashable("gps_ground_altitude", gps_ground_altitude);
+		h.putHashable("ground_pressure", ground_pressure);
+		h.putHashable("altitude", altitude);
+		h.putHashable("gps_altitude", gps_altitude);
+		h.putHashable("gps_ground_speed", gps_ground_speed);
+		h.putHashable("gps_ascent_rate", gps_ascent_rate);
+		h.putHashable("gps_course", gps_course);
+		h.putHashable("gps_speed", gps_speed);
+		h.putHashable("pressure", pressure);
+		h.putHashable("speed", speed);
+		h.putHashable("acceleration", acceleration);
+		h.putHashable("orient", orient);
+		h.putHashable("kalman_height", kalman_height);
+		h.putHashable("kalman_speed", kalman_speed);
+		h.putHashable("kalman_acceleration", kalman_acceleration);
+
+		h.putDouble("battery_voltage",battery_voltage);
+		h.putDouble("pyro_voltage",pyro_voltage);
+		h.putDouble("temperature",temperature);
+		h.putDouble("apogee_voltage",apogee_voltage);
+		h.putDouble("main_voltage",main_voltage);
+		h.putDoubleArray("ignitor_voltage",ignitor_voltage);
+		h.putHashable("gps", gps);
+		h.putHashable("temp_gps", temp_gps);
+		h.putInt("temp_gps_sat_tick", temp_gps_sat_tick);
+		h.putBoolean("gps_pending", gps_pending);
+		h.putInt("gps_sequence", gps_sequence);
+		h.putHashable("imu", imu);
+		h.putHashable("mag", mag);
+
+		h.putInt("npad", npad);
+		h.putInt("gps_waiting", gps_waiting);
+		h.putBoolean("gps_ready", gps_ready);
+		h.putInt("ngps", ngps);
+		h.putHashable("from_pad", from_pad);
+		h.putDouble("elevation", elevation);
+		h.putDouble("range", range);
+		h.putDouble("gps_height", gps_height);
+		h.putDouble("pad_lat", pad_lat);
+		h.putDouble("pad_lon", pad_lon);
+		h.putDouble("pad_alt", pad_alt);
+		h.putInt("speak_tick", speak_tick);
+		h.putDouble("speak_altitude", speak_altitude);
+		h.putString("callsign", callsign);
+		h.putString("firmware_version", firmware_version);
+		h.putDouble("accel_plus_g", accel_plus_g);
+		h.putDouble("accel_minus_g", accel_minus_g);
+		h.putDouble("accel", accel);
+		h.putDouble("ground_accel", ground_accel);
+		h.putDouble("ground_accel_avg", ground_accel_avg);
+		h.putInt("log_format", log_format);
+		h.putString("product", product);
+		h.putHashable("baro", baro);
+		h.putHashable("companion", companion);
+		h.putInt("pyro_fired", pyro_fired);
+		h.putDouble("accel_zero_along", accel_zero_along);
+		h.putDouble("accel_zero_across", accel_zero_across);
+		h.putDouble("accel_zero_through", accel_zero_through);
+
+		h.putHashable("rotation", rotation);
+		h.putHashable("ground_rotation", ground_rotation);
+
+		h.putInt("pad_orientation", pad_orientation);
+
+		h.putDouble("accel_ground_along", accel_ground_along);
+		h.putDouble("accel_ground_across", accel_ground_across);
+		h.putDouble("accel_ground_through", accel_ground_through);
+
+		h.putDouble("gyro_zero_roll", gyro_zero_roll);
+		h.putDouble("gyro_zero_pitch", gyro_zero_pitch);
+		h.putDouble("gyro_zero_yaw", gyro_zero_yaw);
+
+		h.putDouble("last_imu_time", last_imu_time);
+		return h;
+	}
+
+	public AltosState(AltosHashSet h) {
+		this();
+
+		set = h.getInt("set", set);
+		received_time = h.getLong("received_time", received_time);
+		time = h.getDouble("time", time);
+		prev_time = h.getDouble("prev_time", prev_time);
+		time_change = h.getDouble("time_change", time_change);
+		tick = h.getInt("tick", tick);
+		prev_tick = h.getInt("prev_tick", prev_tick);
+		boost_tick = h.getInt("boost_tick", boost_tick);
+		state = h.getInt("state", state);
+		flight = h.getInt("flight", flight);
+		serial = h.getInt("serial", serial);
+		altitude_32 = h.getInt("altitude_32", altitude_32);
+		receiver_serial = h.getInt("receiver_serial", receiver_serial);
+		landed = h.getBoolean("landed", landed);
+		ascent = h.getBoolean("ascent", ascent);
+		boost = h.getBoolean("boost", boost);
+		rssi = h.getInt("rssi", rssi);
+		status = h.getInt("status", status);
+		device_type = h.getInt("device_type", device_type);
+		config_major = h.getInt("config_major", config_major);
+		config_minor = h.getInt("config_minor", config_minor);
+		apogee_delay = h.getInt("apogee_delay", apogee_delay);
+		main_deploy = h.getInt("main_deploy", main_deploy);
+		flight_log_max = h.getInt("flight_log_max", flight_log_max);
+		ground_altitude = AltosCValue_fromHashSet(h.getHash("ground_altitude"), ground_altitude);
+		gps_ground_altitude = AltosGpsGroundAltitude_fromHashSet(h.getHash("gps_ground_altitude"), gps_ground_altitude);
+		ground_pressure = AltosGroundPressure_fromHashSet(h.getHash("ground_pressure"), ground_pressure);
+		altitude = AltosAltitude_fromHashSet(h.getHash("altitude"), altitude);
+		gps_altitude = AltosGpsAltitude_fromHashSet(h.getHash("gps_altitude"), gps_altitude);
+		gps_ground_speed = AltosValue_fromHashSet(h.getHash("gps_ground_speed"), gps_ground_speed);
+		gps_ascent_rate = AltosValue_fromHashSet(h.getHash("gps_ascent_rate"), gps_ascent_rate);
+		gps_course = AltosValue_fromHashSet(h.getHash("gps_course"), gps_course);
+		gps_speed = AltosValue_fromHashSet(h.getHash("gps_speed"), gps_speed);
+		pressure = AltosPressure_fromHashSet(h.getHash("pressure"), pressure);
+		speed = AltosSpeed_fromHashSet(h.getHash("speed"), speed);
+		acceleration = AltosAccel_fromHashSet(h.getHash("acceleration"), acceleration);
+		orient = AltosCValue_fromHashSet(h.getHash("orient"), orient);
+		kalman_height = AltosValue_fromHashSet(h.getHash("kalman_height"), kalman_height);
+		kalman_speed = AltosValue_fromHashSet(h.getHash("kalman_speed"), kalman_speed);
+		kalman_acceleration = AltosValue_fromHashSet(h.getHash("kalman_acceleration"), kalman_acceleration);
+
+		battery_voltage = h.getDouble("battery_voltage", battery_voltage);
+		pyro_voltage = h.getDouble("pyro_voltage", pyro_voltage);
+		temperature = h.getDouble("temperature", temperature);
+		apogee_voltage = h.getDouble("apogee_voltage", apogee_voltage);
+		main_voltage=  h.getDouble("main_voltage", main_voltage);
+		ignitor_voltage = h.getDoubleArray("ignitor_voltage", ignitor_voltage);
+		gps = AltosGPS.fromHashSet(h.getHash("gps"), gps);
+		temp_gps = AltosGPS.fromHashSet(h.getHash("temp_gps"), temp_gps);
+		temp_gps_sat_tick = h.getInt("temp_gps_sat_tick", temp_gps_sat_tick);
+		gps_pending = h.getBoolean("gps_pending", gps_pending);
+		gps_sequence = h.getInt("gps_sequence", gps_sequence);
+		imu = AltosIMU.fromHashSet(h.getHash("imu"), imu);
+		mag = AltosMag.fromHashSet(h.getHash("mag"), mag);
+
+		npad = h.getInt("npad", npad);
+		gps_waiting = h.getInt("gps_waiting", gps_waiting);
+		gps_ready = h.getBoolean("gps_ready", gps_ready);
+		ngps = h.getInt("ngps", ngps);
+		from_pad = AltosGreatCircle.fromHashSet(h.getHash("from_pad"), from_pad);
+		elevation = h.getDouble("elevation", elevation);
+		range = h.getDouble("range", range);
+		gps_height = h.getDouble("gps_height", gps_height);
+		pad_lat = h.getDouble("pad_lat", pad_lat);
+		pad_lon = h.getDouble("pad_lon", pad_lon);
+		pad_alt = h.getDouble("pad_alt", pad_alt);
+		speak_tick = h.getInt("speak_tick", speak_tick);
+		speak_altitude = h.getDouble("speak_altitude", speak_altitude);
+		callsign = h.getString("callsign", callsign);
+		firmware_version = h.getString("firmware_version", firmware_version);
+		accel_plus_g = h.getDouble("accel_plus_g", accel_plus_g);
+		accel_minus_g = h.getDouble("accel_minus_g", accel_minus_g);
+		accel = h.getDouble("accel", accel);
+		ground_accel = h.getDouble("ground_accel", ground_accel);
+		ground_accel_avg = h.getDouble("ground_accel_avg", ground_accel_avg);
+		log_format = h.getInt("log_format", log_format);
+		product = h.getString("product", product);
+		baro = AltosMs5607.fromHashSet(h.getHash("baro"), baro);
+		companion = AltosCompanion.fromHashSet(h.getHash("companion"), companion);
+		pyro_fired = h.getInt("pyro_fired", pyro_fired);
+		accel_zero_along = h.getDouble("accel_zero_along", accel_zero_along);
+		accel_zero_across = h.getDouble("accel_zero_across", accel_zero_across);
+		accel_zero_through = h.getDouble("accel_zero_through", accel_zero_through);
+
+		rotation = AltosRotation.fromHashSet(h.getHash("rotation"), rotation);
+		ground_rotation = AltosRotation.fromHashSet(h.getHash("ground_rotation"), ground_rotation);
+
+		pad_orientation = h.getInt("pad_orientation", pad_orientation);
+
+		accel_ground_along = h.getDouble("accel_ground_along", accel_ground_along);
+		accel_ground_across = h.getDouble("accel_ground_across", accel_ground_across);
+		accel_ground_through = h.getDouble("accel_ground_through", accel_ground_through);
+
+		gyro_zero_roll = h.getDouble("gyro_zero_roll", gyro_zero_roll);
+		gyro_zero_pitch = h.getDouble("gyro_zero_pitch", gyro_zero_pitch);
+		gyro_zero_yaw = h.getDouble("gyro_zero_yaw", gyro_zero_yaw);
+
+		last_imu_time = h.getDouble("last_imu_time", last_imu_time);
+	}
+
+	public static AltosState fromHashSet(AltosHashSet h) {
+		if (h == null)
+			return null;
+		if (!h.getBoolean("valid", false))
+			return null;
+		return new AltosState(h);
 	}
 }

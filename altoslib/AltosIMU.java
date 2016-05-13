@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosIMU implements Cloneable, Serializable {
+public class AltosIMU implements Cloneable, AltosHashable {
 	public int		accel_along;
 	public int		accel_across;
 	public int		accel_through;
@@ -29,13 +29,13 @@ public class AltosIMU implements Cloneable, Serializable {
 	public int		gyro_pitch;
 	public int		gyro_yaw;
 
-	public static double	counts_per_g = 2048.0;
+	public static final double	counts_per_g = 2048.0;
 
 	public static double convert_accel(double counts) {
 		return counts / counts_per_g * (-AltosConvert.GRAVITATIONAL_ACCELERATION);
 	}
 
-	public static double	counts_per_degsec = 16.4;
+	public static final double	counts_per_degsec = 16.4;
 
 	public static double convert_gyro(double counts) {
 		return counts / counts_per_degsec;
@@ -114,5 +114,36 @@ public class AltosIMU implements Cloneable, Serializable {
 			if (parse_string(line))
 				break;
 		}
+	}
+
+	public AltosIMU (AltosHashSet h) {
+		this();
+
+		accel_along = h.getInt("accel_along", accel_along);
+		accel_across = h.getInt("accel_across", accel_across);
+		accel_through = h.getInt("accel_through", accel_through);
+
+		gyro_roll = h.getInt("gyro_roll", gyro_roll);
+		gyro_pitch = h.getInt("gyro_pitch", gyro_pitch);
+		gyro_yaw = h.getInt("gyro_yaw", gyro_yaw);
+	}
+
+	static public AltosIMU fromHashSet(AltosHashSet h, AltosIMU def) {
+		if (h == null)
+			return def;
+		return new AltosIMU(h);
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet	h = new AltosHashSet();
+
+		h.putInt("accel_along", accel_along);
+		h.putInt("accel_across", accel_across);
+		h.putInt("accel_through", accel_through);
+
+		h.putInt("gyro_roll", gyro_roll);
+		h.putInt("gyro_pitch", gyro_pitch);
+		h.putInt("gyro_yaw", gyro_yaw);
+		return h;
 	}
 }

@@ -17,7 +17,7 @@
 
 package org.altusmetrum.altoslib_11;
 
-public class AltosRotation {
+public class AltosRotation implements AltosHashable {
 	private AltosQuaternion		rotation;
 
 	public double tilt() {
@@ -46,5 +46,23 @@ public class AltosRotation {
 		double sky = pad_orientation == 0 ? 1 : -1;
 		AltosQuaternion	up = new AltosQuaternion(0, 0, 0, sky);
 		rotation = up.vectors_to_rotation(orient);
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet h = new AltosHashSet();
+
+		h.putHashable("rotation", rotation);
+		return h;
+	}
+
+	public AltosRotation(AltosHashSet h) {
+		rotation = new AltosQuaternion(h.getHash("rotation"));
+	}
+
+	public static AltosRotation fromHashSet(AltosHashSet h, AltosRotation def) {
+		if (h == null)
+			return def;
+
+		return new AltosRotation(h);
 	}
 }

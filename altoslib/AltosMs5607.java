@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosMs5607 implements Serializable {
+public class AltosMs5607 implements AltosHashable {
 	public int	reserved;
 	public int	sens;
 	public int	off;
@@ -165,5 +165,47 @@ public class AltosMs5607 implements Serializable {
 			}
 		}
 		convert();
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet h = new AltosHashSet();
+
+		h.putInt("reserved", reserved);
+		h.putInt("sens", sens);
+		h.putInt("off", off);
+		h.putInt("tcs", tcs);
+		h.putInt("tco", tco);
+		h.putInt("tref", tref);
+		h.putInt("tempsens", tempsens);
+		h.putInt("crc", crc);
+		h.putInt("raw_pres", raw_pres);
+		h.putInt("raw_temp", raw_temp);
+		h.putInt("pa", pa);
+		h.putInt("cc", cc);
+		return h;
+	}
+
+	public AltosMs5607(AltosHashSet h) {
+		this();
+
+		reserved = h.getInt("reserved", reserved);
+		sens = h.getInt("sens", sens);
+		off = h.getInt("off", off);
+		tcs = h.getInt("tcs", tcs);
+		tco = h.getInt("tco", tco);
+		tref = h.getInt("tref", tref);
+		tempsens = h.getInt("tempsens", tempsens);
+		crc = h.getInt("crc", crc);
+		raw_pres = h.getInt("raw_pres", raw_pres);
+		raw_temp = h.getInt("raw_temp", raw_temp);
+		pa = h.getInt("pa", pa);
+		cc = h.getInt("cc", cc);
+	}
+
+	public static AltosMs5607 fromHashSet(AltosHashSet h, AltosMs5607 def) {
+		if (h == null)
+			return def;
+
+		return new AltosMs5607(h);
 	}
 }

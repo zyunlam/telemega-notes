@@ -91,7 +91,7 @@ public class AltosLaunch {
 				throw new TimeoutException();
 			if (get_string(line, "Rssi: ", status_name)) {
 				try {
-					rssi = Altos.fromdec(status_name.get());
+					rssi = (int) Altos.fromdec(status_name.get());
 				} catch (NumberFormatException ne) {
 				}
 				break;

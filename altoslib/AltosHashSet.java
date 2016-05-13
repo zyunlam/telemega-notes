@@ -22,13 +22,11 @@ import java.util.*;
 import java.text.*;
 
 public class AltosHashSet extends Hashtable<String,String> {
-	private StringWriter	writer;
-
 	static private int get(StringReader reader) throws IOException {
 		return reader.read();
 	}
 
-	static private String get_token(StringReader reader) throws IOException {
+	static public String get_token(StringReader reader) throws IOException {
 		int	c = get(reader);
 
 		if (c == -1)
@@ -54,7 +52,7 @@ public class AltosHashSet extends Hashtable<String,String> {
 		writer.write(c);
 	}
 
-	static private void put_token(StringWriter writer, String token) throws IOException {
+	static public void put_token(StringWriter writer, String token) throws IOException {
 		for (int i = 0; i < token.length(); i++) {
 			int c = token.codePointAt(i);
 
@@ -83,6 +81,22 @@ public class AltosHashSet extends Hashtable<String,String> {
 		}
 	}
 
+	public void putBoolean(String key, boolean value) {
+		put(key, value ? "t" : "f");
+	}
+
+	public boolean getBoolean(String key, boolean def) {
+		String	value = get(key);
+
+		if (value == null)
+			return def;
+		if (value.equals("t"))
+			return true;
+		if (value.equals("f"))
+			return false;
+		return def;
+	}
+
 	public void putInt(String key, int value) {
 		put(key, Integer.toString(value));
 	}
@@ -94,6 +108,59 @@ public class AltosHashSet extends Hashtable<String,String> {
 			return def;
 		try {
 			return AltosParse.parse_int(value);
+		} catch (ParseException pe) {
+			return def;
+		}
+	}
+
+	public void putIntArray(String key, int value[]) {
+		if (value == null)
+			return;
+
+		StringWriter	writer = new StringWriter();
+
+		try {
+			for (int i = 0; i < value.length; i++)
+				put_token(writer, Integer.toString(value[i]));
+			put(key, writer.toString());
+		} catch (IOException ie) {
+		}
+	}
+
+	public int[] getIntArray(String key, int[] def) {
+		String		value = get(key);
+
+		if (value == null)
+			return def;
+		try {
+			StringReader		reader = new StringReader(value);
+			ArrayList<Integer>	array = new ArrayList<Integer>();
+			String			elt;
+
+			while ((elt = get_token(reader)) != null)
+				array.add(AltosParse.parse_int(elt));
+			int[] ret = new int[array.size()];
+			for (int i = 0; i < ret.length; i++)
+				ret[i] = array.get(i);
+			return ret;
+		} catch (ParseException pe) {
+			return def;
+		} catch (IOException ie) {
+			return def;
+		}
+	}
+
+	public void putLong(String key, long value) {
+		put(key, Long.toString(value));
+	}
+
+	public long getLong(String key, long def) {
+		String	value = get(key);
+
+		if (value == null)
+			return def;
+		try {
+			return AltosParse.parse_long(value);
 		} catch (ParseException pe) {
 			return def;
 		}
@@ -115,6 +182,43 @@ public class AltosHashSet extends Hashtable<String,String> {
 		}
 	}
 
+	public void putDoubleArray(String key, double value[]) {
+		if (value == null)
+			return;
+
+		StringWriter	writer = new StringWriter();
+
+		try {
+			for (int i = 0; i < value.length; i++)
+				put_token(writer, AltosParse.format_double_net(value[i]));
+			put(key, writer.toString());
+		} catch (IOException ie) {
+		}
+	}
+
+	public double[] getDoubleArray(String key, double[] def) {
+		String		value = get(key);
+
+		if (value == null)
+			return def;
+		try {
+			StringReader		reader = new StringReader(value);
+			ArrayList<Double>	array = new ArrayList<Double>();
+			String			elt;
+
+			while ((elt = get_token(reader)) != null)
+				array.add(AltosParse.parse_double_net(elt));
+			double[] ret = new double[array.size()];
+			for (int i = 0; i < ret.length; i++)
+				ret[i] = array.get(i);
+			return ret;
+		} catch (ParseException pe) {
+			return def;
+		} catch (IOException ie) {
+			return def;
+		}
+	}
+
 	public String getString(String key, String def) {
 		String	value = get(key);
 
@@ -124,10 +228,34 @@ public class AltosHashSet extends Hashtable<String,String> {
 	}
 
 	public void putString(String key, String value) {
-		put(key, value);
+		if (value != null)
+		    put(key, value);
 	}
 
-	public AltosHashSet (String string) throws IOException {
+	public AltosHashSet getHash(String key) {
+		String	value = get(key);
+
+		if (value == null)
+			return null;
+		try {
+			return new AltosHashSet(value);
+		} catch (IOException ie) {
+			return null;
+		}
+	}
+
+	public void putHash(String key, AltosHashSet h) {
+		put(key, h.toString());
+	}
+
+	public void putHashable(String key, AltosHashable h) {
+		if (h == null)
+			return;
+
+		put(key, h.hashSet().toString());
+	}
+
+	private AltosHashSet (String string) throws IOException {
 		StringReader reader = new StringReader(string);
 		String	key, value;
 
@@ -143,31 +271,46 @@ public class AltosHashSet extends Hashtable<String,String> {
 	public AltosHashSet() {
 	}
 
-	static public AltosHashSet[] array(String string) throws IOException {
+	static public AltosHashSet fromString(String string) {
+		try {
+			return new AltosHashSet(string);
+		} catch (IOException ie) {
+			return null;
+		}
+	}
+
+	static public AltosHashSet[] array(String string) {
 
 		if (string == null)
 			return null;
 
-		StringReader 		reader = new StringReader(string);
-		ArrayList<AltosHashSet>	array = new ArrayList<AltosHashSet>();
-		String			element;
+		try {
+			StringReader 		reader = new StringReader(string);
+			ArrayList<AltosHashSet>	array = new ArrayList<AltosHashSet>();
+			String			element;
 
-		while ((element = get_token(reader)) != null)
-			array.add(new AltosHashSet(element));
-		return array.toArray(new AltosHashSet[0]);
+			while ((element = get_token(reader)) != null)
+				array.add(new AltosHashSet(element));
+			return array.toArray(new AltosHashSet[0]);
+		} catch (IOException ie) {
+			return null;
+		}
 	}
 
-	static public String toString(AltosHashSet[] sets) throws IOException {
-
+	static public String toString(AltosHashSet[] sets) {
 		if (sets == null)
 			return null;
 
-		StringWriter		writer = new StringWriter();
+		try {
+			StringWriter		writer = new StringWriter();
 
-		for (AltosHashSet h : sets) {
-			String		element = h.toString();
-			put_token(writer, element);
+			for (AltosHashSet h : sets) {
+				String		element = h.toString();
+				put_token(writer, element);
+			}
+			return writer.toString();
+		} catch (IOException ie) {
+			return null;
 		}
-		return writer.toString();
 	}
 }

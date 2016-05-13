@@ -136,16 +136,16 @@ public class AltosPreferences {
 
 		AltosFrequency[] frequencies = null;
 
-		try {
-			AltosHashSet[]	sets = AltosHashSet.array(backend.getString(frequenciesPreference,null));
-			if (sets != null) {
-				frequencies = new AltosFrequency[sets.length];
-				for (int i = 0; i < frequencies.length; i++)
-					frequencies[i] = new AltosFrequency(sets[i]);
-			}
+		AltosHashSet[]	sets = AltosHashSet.array(backend.getString(frequenciesPreference,null));
+		if (sets != null) {
+			ArrayList<AltosFrequency>	freqs = new ArrayList<AltosFrequency>();
 
-		} catch (IOException ie) {
-			frequencies = null;
+			for (int i = 0; i < sets.length; i++) {
+				AltosFrequency f = AltosFrequency.fromHashSet(sets[i], null);
+				if (f != null)
+					freqs.add(f);
+			}
+			frequencies = freqs.toArray(new AltosFrequency[0]);
 		}
 
 		if (frequencies == null) {
@@ -153,14 +153,16 @@ public class AltosPreferences {
 				AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
 				int		count = node.getInt(frequency_count, 0);
 
-				frequencies = new AltosFrequency[count];
-				for (int i = 0; i < count; i++) {
-					double	frequency;
-					String	description;
+				if (count > 0) {
+					frequencies = new AltosFrequency[count];
+					for (int i = 0; i < count; i++) {
+						double	frequency;
+						String	description;
 
-					frequency = node.getDouble(String.format(frequency_format, i), 0.0);
-					description = node.getString(String.format(description_format, i), null);
-					frequencies[i] = new AltosFrequency(frequency, description);
+						frequency = node.getDouble(String.format(frequency_format, i), 0.0);
+						description = node.getString(String.format(description_format, i), null);
+						frequencies[i] = new AltosFrequency(frequency, description);
+					}
 				}
 			}
 		}
@@ -176,13 +178,10 @@ public class AltosPreferences {
 	}
 
 	public static void save_common_frequencies() {
-		try {
-			AltosHashSet[]	sets = new AltosHashSet[common_frequencies.length];
-			for (int i = 0; i < sets.length; i++)
-				sets[i] = common_frequencies[i].hashSet();
-			backend.putString(frequenciesPreference, AltosHashSet.toString(sets));
-		} catch (IOException ie) {
-		}
+		AltosHashSet[]	sets = new AltosHashSet[common_frequencies.length];
+		for (int i = 0; i < sets.length; i++)
+			sets[i] = common_frequencies[i].hashSet();
+		backend.putString(frequenciesPreference, AltosHashSet.toString(sets));
 		flush_preferences();
 	}
 
@@ -374,7 +373,7 @@ public class AltosPreferences {
 	public static void set_state(AltosState state) {
 
 		synchronized(backend) {
-			backend.putSerializable(String.format(statePreferenceFormat, state.serial), state);
+			backend.putHashSet(String.format(statePreferenceFormat, state.serial), state.hashSet());
 			backend.putInt(statePreferenceLatest, state.serial);
 			flush_preferences();
 		}
@@ -399,6 +398,7 @@ public class AltosPreferences {
 	public static void remove_state(int serial) {
 		synchronized(backend) {
 			backend.remove(String.format(statePreferenceFormat, serial));
+			flush_preferences();
 		}
 	}
 
@@ -413,7 +413,7 @@ public class AltosPreferences {
 	public static AltosState state(int serial) {
 		synchronized(backend) {
 			try {
-				return (AltosState) backend.getSerializable(String.format(statePreferenceFormat, serial), null);
+				return AltosState.fromHashSet(backend.getHashSet(String.format(statePreferenceFormat, serial)));
 			} catch (Exception e) {
 				return null;
 			}

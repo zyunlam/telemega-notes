@@ -19,7 +19,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosAccel extends AltosUnits implements Serializable {
+public class AltosAccel extends AltosUnits {
 
 	public double value(double v, boolean imperial_units) {
 		if (imperial_units)

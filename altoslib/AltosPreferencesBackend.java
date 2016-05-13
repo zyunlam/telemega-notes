@@ -38,40 +38,16 @@ public abstract class AltosPreferencesBackend {
 	public abstract byte[]  getBytes(String key, byte[] def);
 	public abstract void    putBytes(String key, byte[] value);
 
-	public Serializable getSerializable(String key, Serializable def) {
-		byte[] bytes = null;
+	public AltosHashSet	getHashSet(String key) {
+		String	value = getString(key, null);
 
-		bytes = getBytes(key, null);
-		if (bytes == null)
-			return def;
-
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-
-		try {
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			Serializable object = (Serializable) ois.readObject();
-			return object;
-		} catch (IOException ie) {
-			debug("IO exception %s\n", ie.toString());
-		} catch (ClassNotFoundException ce) {
-			debug("ClassNotFoundException %s\n", ce.toString());
-		}
-		return def;
+		if (value == null)
+			return null;
+		return AltosHashSet.fromString(value);
 	}
 
-	public void putSerializable(String key, Serializable object) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		try {
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-
-			oos.writeObject(object);
-			byte[] bytes = baos.toByteArray();
-
-			putBytes(key, bytes);
-		} catch (IOException ie) {
-			debug("set_state failed %s\n", ie.toString());
-		}
+	public void	       	putHashSet(String key, AltosHashSet h) {
+		putString(key, h.toString());
 	}
 
 	public abstract boolean nodeExists(String key);

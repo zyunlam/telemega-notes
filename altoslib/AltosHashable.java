@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 Keith Packard <keithp@keithp.com>
+ * Copyright © 2016 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosListenerState {
-	public int	crc_errors;
-	public double	battery;
-	public boolean	running;
+public interface AltosHashable {
 
-	public AltosListenerState() {
-		crc_errors = 0;
-		battery = AltosLib.MISSING;
-		running = true;
-	}
+	public AltosHashSet hashSet();
 }

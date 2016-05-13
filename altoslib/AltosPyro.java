@@ -277,7 +277,7 @@ public class AltosPyro {
 				int	value = 0;
 				++i;
 				try {
-					value = AltosLib.fromdec(tokens[i]);
+					value = (int) AltosLib.fromdec(tokens[i]);
 				} catch (NumberFormatException n) {
 					throw new ParseException(String.format("Invalid pyro value \"%s\"",
 									       tokens[i]), i);

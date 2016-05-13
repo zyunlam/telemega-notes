@@ -17,7 +17,7 @@
 
 package org.altusmetrum.altoslib_11;
 
-public class AltosQuaternion {
+public class AltosQuaternion implements AltosHashable {
 	double	r;		/* real bit */
 	double	x, y, z;	/* imaginary bits */
 
@@ -146,5 +146,25 @@ public class AltosQuaternion {
 					   s_x * c_y * c_z - c_x * s_y * s_z,
 					   c_x * s_y * c_z + s_x * c_y * s_z,
 					   c_x * c_y * s_z - s_x * s_y * c_z);
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet h = new AltosHashSet();
+
+		h.putDouble("r", r);
+		h.putDouble("x", x);
+		h.putDouble("y", y);
+		h.putDouble("z", z);
+		return h;
+	}
+
+	public AltosQuaternion(AltosHashSet h) {
+		if (h == null)
+			return;
+
+		r = h.getDouble("r", 1);
+		x = h.getDouble("x", 0);
+	        y = h.getDouble("y", 0);
+		z = h.getDouble("z", 0);
 	}
 }

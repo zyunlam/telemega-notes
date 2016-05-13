@@ -20,12 +20,12 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosMag implements Cloneable, Serializable {
+public class AltosMag implements Cloneable, AltosHashable {
 	public int		along;
 	public int		across;
 	public int		through;
 
-	public static double counts_per_gauss = 1090;
+	public static final double counts_per_gauss = 1090;
 
 	public static double convert_gauss(double counts) {
 		return counts / counts_per_gauss;
@@ -92,5 +92,29 @@ public class AltosMag implements Cloneable, Serializable {
 			if (parse_string(line))
 				break;
 		}
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet	h = new AltosHashSet();
+
+		h.putInt("along", along);
+		h.putInt("across", across);
+		h.putInt("through", through);
+		return h;
+	}
+
+	public AltosMag(AltosHashSet h) {
+		this();
+
+		along = h.getInt("along", along);
+		across = h.getInt("across", across);
+		through = h.getInt("through", through);
+	}
+
+	public static AltosMag fromHashSet(AltosHashSet h, AltosMag def) {
+		if (h == null)
+			return def;
+
+		return new AltosMag(h);
 	}
 }

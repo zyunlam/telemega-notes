@@ -27,6 +27,14 @@ public class AltosParse {
 
 	public static int parse_int(String v) throws ParseException {
 		try {
+			return (int) AltosLib.fromdec(v);
+		} catch (NumberFormatException e) {
+			throw new ParseException("error parsing int " + v, 0);
+		}
+	}
+
+	public static long parse_long(String v) throws ParseException {
+		try {
 			return AltosLib.fromdec(v);
 		} catch (NumberFormatException e) {
 			throw new ParseException("error parsing int " + v, 0);

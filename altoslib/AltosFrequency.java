@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosFrequency implements Serializable {
+public class AltosFrequency {
 	public double	frequency;
 	public String	description;
 
@@ -71,8 +71,14 @@ public class AltosFrequency implements Serializable {
 		description = d;
 	}
 
-	public AltosFrequency(AltosHashSet h) {
+	private AltosFrequency(AltosHashSet h) {
 		frequency = h.getDouble("frequency", 0.0);
 		description = h.getString("description", "");
+	}
+
+	public static AltosFrequency fromHashSet(AltosHashSet h, AltosFrequency def) {
+		if (h == null)
+			return def;
+		return new AltosFrequency(h);
 	}
 }

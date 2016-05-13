@@ -16,11 +16,13 @@
  */
 
 package org.altusmetrum.altoslib_11;
-import java.text.*;
-import java.util.concurrent.*;
-import java.io.*;
 
-public class AltosGPSSat implements Serializable {
+import java.io.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+public class AltosGPSSat {
 	public int	svid;
 	public int	c_n0;
 
@@ -30,6 +32,62 @@ public class AltosGPSSat implements Serializable {
 	}
 
 	public AltosGPSSat() {
+	}
+
+	public AltosHashSet hashSet() {
+		AltosHashSet h = new AltosHashSet();
+		h.putInt("svid", svid);
+		h.putInt("c_n0", c_n0);
+		return h;
+	}
+
+	private AltosGPSSat(AltosHashSet h) {
+		svid = h.getInt("svid", 0);
+		c_n0 = h.getInt("c_n0", 0);
+	}
+
+	static public AltosGPSSat fromHashSet(AltosHashSet h, AltosGPSSat def) {
+		if (h == null)
+			return def;
+		return new AltosGPSSat(h);
+	}
+
+	static public AltosGPSSat[] array(String string) {
+
+		if (string == null)
+			return null;
+
+		try {
+			StringReader 		reader = new StringReader(string);
+			ArrayList<AltosGPSSat>	array = new ArrayList<AltosGPSSat>();
+			String			element;
+
+			while ((element = AltosHashSet.get_token(reader)) != null) {
+				AltosGPSSat sat = AltosGPSSat.fromHashSet(AltosHashSet.fromString(element), null);
+				if (sat != null)
+					array.add(sat);
+			}
+			return array.toArray(new AltosGPSSat[0]);
+		} catch (IOException ie) {
+			return null;
+		}
+	}
+
+	public static String toString(AltosGPSSat[] sats) {
+		if (sats == null)
+			return null;
+
+		try {
+			StringWriter		writer = new StringWriter();
+
+			for (AltosGPSSat g : sats) {
+				String		element = g.hashSet().toString();
+				AltosHashSet.put_token(writer, element);
+			}
+			return writer.toString();
+		} catch (IOException ie) {
+			return null;
+		}
 	}
 }
 
