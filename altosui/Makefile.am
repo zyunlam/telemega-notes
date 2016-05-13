@@ -56,11 +56,17 @@ ALTOSLIB_CLASS=\
 ALTOSUILIB_CLASS=\
 	altosuilib_$(ALTOSUILIB_VERSION).jar
 
+if MULTI_ARCH
+LIBALTOS_LINUX=libaltos32.so libaltos64.so
+else
+LIBALTOS_LINUX=libaltos.so
+endif
+
 LIBALTOS= \
-	libaltos32.so \
-	libaltos64.so \
+	$(LIBALTOS_LINUX) \
 	libaltos.dylib \
-	altos.dll
+	altos.dll \
+	altos64.dll
 
 desktopdir = $(datadir)/applications
 desktop_file = altusmetrum-altosui.desktop
@@ -163,7 +169,7 @@ WINDOWS_DIST=Altos-Windows-$(VERSION_DASH).exe
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_LIBS=libaltos32.so libaltos64.so
+LINUX_LIBS=$(LIBALTOS_LINUX)
 
 LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
 LINUX_EXTRA=altosui-fat
@@ -178,7 +184,8 @@ all-local: classes/altosui $(JAR) altosui altosui-test altosui-jdb
 
 clean-local:
 	-rm -rf classes $(JAR) $(FATJAR) \
-		$(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) windows $(WINDOWS_DIST) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) \
+		Altos-Linux-*.tar.bz2 Altos-Linux-*.sh Altos-Mac-*.dmg Altos-Windows-*.exe \
+		windows altoslib_*.jar altosuilib_*.jar $(FREETTS_CLASS) \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt altos-windows.log altos-windows.nsi \
 		altosui altosui-test altosui-jdb macosx linux *.desktop
 
@@ -269,6 +276,10 @@ altosui-jdb: Makefile
 	echo 'exec jdb -classpath "classes:./*:../libaltos:$(FREETTS)/freetts.jar:$(JCOMMON)/jcommon.jar:$(JFREECHART)/jfreechart.jar" -Djava.library.path="../libaltos/.libs" altosui/AltosUI "$$@"' >> $@
 	chmod +x $@
 
+libaltos.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
 libaltos32.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
@@ -292,6 +303,8 @@ altos64.dll: ../libaltos/altos64.dll
 ../libaltos/.libs/libaltos64.so: ../libaltos/.libs/libaltos32.so
 
 ../libaltos/.libs/libaltos32.so: build-libaltos
+
+../libaltos/.libs/libaltos.so: build-libaltos
 
 ../libaltos/altos.dll: build-altos-dll
 

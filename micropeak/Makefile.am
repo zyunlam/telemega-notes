@@ -40,8 +40,14 @@ JAR=micropeak.jar
 
 FATJAR=micropeak-fat.jar
 
+if MULTI_ARCH
+LIBALTOS_LINUX=libaltos32.so libaltos64.so
+else
+LIBALTOS_LINUX=libaltos.so
+endif
+
 LIBALTOS= \
-	libaltos.so \
+	$(LIBALTOS_LINUX) \
 	libaltos.dylib \
 	altos64.dll \
 	altos.dll
@@ -98,8 +104,7 @@ all-local: micropeak-test micropeak-jdb $(JAR)
 clean-local:
 	-rm -rf classes $(JAR) $(FATJAR) \
 		MicroPeak-Linux-*.tar.bz2 MicroPeak-Mac-*.dmg MicroPeak-Windows-*.exe \
-		$(ALTOSLIB_CLASS) \
-		$(ALTOSUILIB_CLASS) \
+		altoslib_*.jar altosuilib_*.jar \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		micropeak micropeak-test micropeak-jdb macosx linux windows micropeak-windows.log \
 		micropeak-windows.nsi *.desktop
@@ -121,7 +126,7 @@ DOC=$(MICROPEAK_DOC)
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
+LINUX_FILES=$(FAT_FILES) $(LIBALTOS_LINUX) $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
 LINUX_EXTRA=micropeak-fat $(desktop_file).in
 
 MACOSX_DRIVER_0_URL=http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg
@@ -220,6 +225,14 @@ libaltos.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
+libaltos32.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
 libaltos.dylib:
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
@@ -231,6 +244,10 @@ altos.dll: ../libaltos/altos.dll
 altos64.dll: ../libaltos/altos64.dll
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
+
+../libaltos/.libs/libaltos64.so: ../libaltos/.libs/libaltos32.so
+
+../libaltos/.libs/libaltos32.so: build-libaltos
 
 ../libaltos/.libs/libaltos.so: build-libaltos
 
