@@ -832,6 +832,7 @@ public class AltosState implements Cloneable, AltosHashable {
 	public double	ground_accel_avg;
 
 	public int	log_format;
+	public int	log_space;
 	public String	product;
 
 	public AltosMs5607	baro;
@@ -949,6 +950,7 @@ public class AltosState implements Cloneable, AltosHashable {
 		ground_accel_avg = AltosLib.MISSING;
 
 		log_format = AltosLib.MISSING;
+		log_space = AltosLib.MISSING;
 		product = null;
 		serial = AltosLib.MISSING;
 		receiver_serial = AltosLib.MISSING;
@@ -1108,6 +1110,7 @@ public class AltosState implements Cloneable, AltosHashable {
 		ground_accel_avg = old.ground_accel_avg;
 
 		log_format = old.log_format;
+		log_space = old.log_space;
 		product = old.product;
 		serial = old.serial;
 		receiver_serial = old.receiver_serial;
@@ -1224,6 +1227,10 @@ public class AltosState implements Cloneable, AltosHashable {
 			this.state = AltosLib.ao_flight_stateless;
 			break;
 		}
+	}
+
+	public void set_log_space(int log_space) {
+		this.log_space = log_space;
 	}
 
 	public void set_flight_params(int apogee_delay, int main_deploy) {
@@ -1730,6 +1737,7 @@ public class AltosState implements Cloneable, AltosHashable {
 		h.putDouble("ground_accel", ground_accel);
 		h.putDouble("ground_accel_avg", ground_accel_avg);
 		h.putInt("log_format", log_format);
+		h.putInt("log_space", log_space);
 		h.putString("product", product);
 		h.putHashable("baro", baro);
 		h.putHashable("companion", companion);
@@ -1834,6 +1842,7 @@ public class AltosState implements Cloneable, AltosHashable {
 		ground_accel = h.getDouble("ground_accel", ground_accel);
 		ground_accel_avg = h.getDouble("ground_accel_avg", ground_accel_avg);
 		log_format = h.getInt("log_format", log_format);
+		log_space = h.getInt("log_space", log_space);
 		product = h.getString("product", product);
 		baro = AltosMs5607.fromHashSet(h.getHash("baro"), baro);
 		companion = AltosCompanion.fromHashSet(h.getHash("companion"), companion);
