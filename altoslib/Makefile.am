@@ -64,6 +64,7 @@ altoslib_JAVA = \
 	AltosIdleFetch.java \
 	AltosIdleMonitor.java \
 	AltosIdleMonitorListener.java \
+	AltosIdleReader.java \
 	AltosIgnite.java \
 	AltosIMU.java \
 	AltosKML.java \
