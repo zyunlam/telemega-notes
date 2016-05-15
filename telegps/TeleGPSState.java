@@ -136,10 +136,13 @@ public class TeleGPSState extends AltosUIFlightTab {
 
 	class FlightLogMax extends AltosUIIndicator {
 		public void show(AltosState state, AltosListenerState listener_state) {
-			if (state.flight_log_max == AltosLib.MISSING)
+			int storage = state.flight_log_max;
+			if (storage == AltosLib.MISSING)
+				storage = state.log_space >> 10;
+			if (storage == AltosLib.MISSING)
 				show("Missing");
 			else
-				show(String.format("%dkB", state.flight_log_max));
+				show(String.format("%dkB", storage));
 		}
 
 		public FlightLogMax(Container container, int y) {
