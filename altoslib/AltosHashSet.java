@@ -35,12 +35,12 @@ public class AltosHashSet extends Hashtable<String,String> {
 		ArrayList<Integer>	chars = new ArrayList<Integer>();
 
 		for (;;) {
-			chars.add(c);
-			c = get(reader);
 			if (c == -1 || c == ';')
 				break;
 			if (c == '\\')
 				c = get(reader);
+			chars.add(c);
+			c = get(reader);
 		}
 		int[] ch = new int[chars.size()];
 		for (int i = 0; i < ch.length; i++)
