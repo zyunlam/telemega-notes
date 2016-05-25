@@ -29,7 +29,7 @@ import java.util.concurrent.*;
 import javax.imageio.*;
 import org.altusmetrum.altoslib_11.*;
 
-public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, AltosMapInterface {
+public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosMapInterface {
 
 	AltosMap	map;
 	Graphics2D	g;
@@ -52,10 +52,10 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 					   RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setStroke(new BasicStroke(stroke_width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-			if (0 <= state && state < AltosUIMapNew.stateColors.length)
-				g.setColor(AltosUIMapNew.stateColors[state]);
+			if (0 <= state && state < AltosUIMap.stateColors.length)
+				g.setColor(AltosUIMap.stateColors[state]);
 			else
-				g.setColor(AltosUIMapNew.stateColors[AltosLib.ao_flight_invalid]);
+				g.setColor(AltosUIMap.stateColors[AltosLib.ao_flight_invalid]);
 
 			g.drawOval((int)pt.x-5, (int)pt.y-5, 10, 10);
 			g.drawOval((int)pt.x-20, (int)pt.y-20, 40, 40);
@@ -227,10 +227,10 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 					Rectangle	bounds = line.getBounds();
 
 					if (g.hitClip(bounds.x, bounds.y, bounds.width, bounds.height)) {
-						if (0 <= point.state && point.state < AltosUIMapNew.stateColors.length)
-							g.setColor(AltosUIMapNew.stateColors[point.state]);
+						if (0 <= point.state && point.state < AltosUIMap.stateColors.length)
+							g.setColor(AltosUIMap.stateColors[point.state]);
 						else
-							g.setColor(AltosUIMapNew.stateColors[AltosLib.ao_flight_invalid]);
+							g.setColor(AltosUIMap.stateColors[AltosLib.ao_flight_invalid]);
 
 						g.draw(line);
 					}
@@ -427,7 +427,7 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 
 	MapView	view;
 
-	public AltosUIMapNew() {
+	public AltosUIMap() {
 
 		set_font();
 

@@ -118,9 +118,9 @@ class AltosUIMapPos extends Box {
 	}
 }
 
-public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener, AltosUnitsListener, AltosFontListener  {
+public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener, AltosUnitsListener, AltosFontListener  {
 	AltosUIFrame	owner;
-	AltosUIMapNew	map;
+	AltosUIMap	map;
 
 	AltosUIMapPos	lat;
 	AltosUIMapPos	lon;
@@ -290,7 +290,6 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 		radius.removeAllItems();
 		for (Double r : radii) {
-			System.out.printf("adding radius %f\n",r);
 			radius.addItem(r);
 		}
 		radius.setSelectedItem(radii[2]);
@@ -306,7 +305,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		map.font_size_changed(font_size);
 	}
 
-	public AltosUIMapPreloadNew(AltosUIFrame in_owner) {
+	public AltosUIMapPreload(AltosUIFrame in_owner) {
 		owner = in_owner;
 
 		Container		pane = getContentPane();
@@ -320,8 +319,8 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
-					AltosUIPreferences.unregister_font_listener(AltosUIMapPreloadNew.this);
-					AltosPreferences.unregister_units_listener(AltosUIMapPreloadNew.this);
+					AltosUIPreferences.unregister_font_listener(AltosUIMapPreload.this);
+					AltosPreferences.unregister_units_listener(AltosUIMapPreload.this);
 				}
 			});
 
@@ -329,7 +328,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		AltosPreferences.register_units_listener(this);
 		AltosUIPreferences.register_font_listener(this);
 
-		map = new AltosUIMapNew();
+		map = new AltosUIMap();
 
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;

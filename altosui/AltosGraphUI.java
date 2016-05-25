@@ -35,7 +35,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	JTabbedPane		pane;
 	AltosGraph		graph;
 	AltosUIEnable		enable;
-	AltosUIMapNew		map;
+	AltosUIMap		map;
 	AltosState		state;
 	AltosGraphDataSet	graphDataSet;
 	AltosFlightStats	stats;
@@ -47,7 +47,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		for (AltosState state : states) {
 			if (state.gps != null && state.gps.locked && state.gps.nsat >= 4) {
 				if (map == null)
-					map = new AltosUIMapNew();
+					map = new AltosUIMap();
 				map.show(state, null);
 				has_gps = true;
 			}

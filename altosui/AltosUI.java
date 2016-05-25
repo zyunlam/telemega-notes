@@ -295,7 +295,7 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	void LoadMaps() {
-		new AltosUIMapPreloadNew(AltosUI.this);
+		new AltosUIMapPreload(AltosUI.this);
 	}
 
 	void LaunchController() {

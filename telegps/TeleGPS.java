@@ -72,7 +72,7 @@ public class TeleGPS
 
 	JTabbedPane		pane;
 
-	AltosUIMapNew  		map;
+	AltosUIMap  		map;
 	TeleGPSInfo		gps_info;
 	TeleGPSState		gps_state;
 	AltosInfoTable		info_table;
@@ -174,7 +174,7 @@ public class TeleGPS
 	}
 
 	void load_maps() {
-		new AltosUIMapPreloadNew(this);
+		new AltosUIMapPreload(this);
 	}
 
 	void disconnect() {
@@ -567,7 +567,7 @@ public class TeleGPS
 		/* Make the tabbed pane use the rest of the window space */
 		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));
 
-		map = new AltosUIMapNew();
+		map = new AltosUIMap();
 		pane.add(map.getName(), map);
 		displays.add(map);
 

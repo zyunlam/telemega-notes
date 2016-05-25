@@ -40,7 +40,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosDescent	descent;
 	AltosLanded	landed;
 	AltosCompanionInfo	companion;
-	AltosUIMapNew      sitemap;
+	AltosUIMap      sitemap;
 	boolean		has_map;
 	boolean		has_companion;
 	boolean		has_state;
@@ -289,7 +289,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		has_companion = false;
 		has_state = false;
 
-		sitemap = new AltosUIMapNew();
+		sitemap = new AltosUIMap();
 		displays.add(sitemap);
 		has_map = false;
 
