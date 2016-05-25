@@ -50,7 +50,7 @@ public abstract class AltosMapLine {
 
 		if (AltosConvert.imperial_units) {
 			distance = AltosConvert.meters_to_feet(distance);
-			if (distance < 10000) {
+			if (distance < 1000) {
 				format = "%4.0fft";
 			} else {
 				distance /= 5280;
@@ -64,7 +64,7 @@ public abstract class AltosMapLine {
 					format = "%5.0fmi";
 			}
 		} else {
-			if (distance < 10000) {
+			if (distance < 1000) {
 				format = "%4.0fm";
 			} else {
 				distance /= 1000;
