@@ -118,7 +118,7 @@ class AltosUIMapPos extends Box {
 	}
 }
 
-public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener  {
+public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener, AltosUnitsListener, AltosFontListener  {
 	AltosUIFrame	owner;
 	AltosUIMapNew	map;
 
@@ -137,6 +137,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 	JComboBox<Integer>	min_zoom;
 	JComboBox<Integer>	max_zoom;
+	JLabel			radius_label;
 	JComboBox<Double>	radius;
 	int scale = 1;
 
@@ -276,6 +277,35 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 			});
 	}
 
+	private void set_radius_values() {
+		radius_label.setText(String.format("Map Radius (%s)",
+						   AltosPreferences.imperial_units() ? "mi" : "km"));
+
+		Double[]	radii;
+
+		if (AltosPreferences.imperial_units())
+			radii = radius_mi;
+		else
+			radii = radius_km;
+
+		radius.removeAllItems();
+		for (Double r : radii) {
+			System.out.printf("adding radius %f\n",r);
+			radius.addItem(r);
+		}
+		radius.setSelectedItem(radii[2]);
+		radius.setMaximumRowCount(radii.length);
+	}
+
+	public void units_changed(boolean imperial_units) {
+		map.units_changed(imperial_units);
+		set_radius_values();
+	}
+
+	public void font_size_changed(int font_size) {
+		map.font_size_changed(font_size);
+	}
+
 	public AltosUIMapPreloadNew(AltosUIFrame in_owner) {
 		owner = in_owner;
 
@@ -286,6 +316,18 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		setTitle("AltOS Load Maps");
 
 		pane.setLayout(new GridBagLayout());
+
+		addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					AltosUIPreferences.unregister_font_listener(AltosUIMapPreloadNew.this);
+					AltosPreferences.unregister_units_listener(AltosUIMapPreloadNew.this);
+				}
+			});
+
+
+		AltosPreferences.register_units_listener(this);
+		AltosUIPreferences.register_font_listener(this);
 
 		map = new AltosUIMapNew();
 
@@ -462,25 +504,19 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		c.gridy = 3;
 		pane.add(max_zoom, c);
 
-		JLabel radius_label = new JLabel(String.format("Map Radius (%s)",
-							       AltosPreferences.imperial_units() ? "miles" : "km"));
+		radius_label = new JLabel();
+
 		c.gridx = 4;
 		c.gridy = 4;
 		pane.add(radius_label, c);
 
-		Double[]	radii;
-		Double		radius_default;
-
-		if (AltosPreferences.imperial_units())
-			radii = radius_mi;
-		else
-			radii = radius_km;
-		radius = new JComboBox<Double>(radii);
-		radius.setSelectedItem(radii[2]);
+		radius = new JComboBox<Double>();
 		radius.setEditable(true);
 		c.gridx = 5;
 		c.gridy = 4;
 		pane.add(radius, c);
+
+		set_radius_values();
 
 		pack();
 		setLocationRelativeTo(owner);
