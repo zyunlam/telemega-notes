@@ -361,7 +361,8 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	}
 
 	public void debug(String format, Object ... arguments) {
-		System.out.printf(format, arguments);
+		if (AltosUIPreferences.serial_debug())
+			System.out.printf(format, arguments);
 	}
 
 
