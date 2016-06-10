@@ -437,6 +437,17 @@ ao_usb_set_ep0(void)
 	ao_usb_set_address(0);
 
 	ao_usb_running = 0;
+
+	/* Reset our internal state
+	 */
+
+	ao_usb_ep0_state = AO_USB_EP0_IDLE;
+
+	ao_usb_ep0_in_data = NULL;
+	ao_usb_ep0_in_len = 0;
+
+	ao_usb_ep0_out_data = 0;
+	ao_usb_ep0_out_len = 0;
 }
 
 static void
@@ -492,6 +503,20 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_STAT_RX_DISABLED,
 		       STM_USB_EPR_STAT_TX_NAK);
 #endif
+
+	ao_usb_in_flushed = 0;
+	ao_usb_in_pending = 0;
+	ao_wakeup(&ao_usb_in_pending);
+#if AO_USB_HAS_IN2
+	ao_usb_in2_flushed = 0;
+	ao_usb_in2_pending = 0;
+	ao_wakeup(&ao_usb_in2_pending);
+#endif
+
+	ao_usb_out_avail = 0;
+	ao_usb_configuration = 0;
+
+	ao_wakeup(AO_USB_OUT_SLEEP_ADDR);
 
 	ao_usb_running = 1;
 #if AO_USB_DIRECTIO
