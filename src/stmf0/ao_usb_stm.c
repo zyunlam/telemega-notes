@@ -683,7 +683,7 @@ ao_usb_serial_init(void)
 /* Walk through the list of descriptors and find a match
  */
 static void
-ao_usb_get_descriptor(uint16_t value)
+ao_usb_get_descriptor(uint16_t value, uint16_t length)
 {
 	const uint8_t		*descriptor;
 	uint8_t		type = value >> 8;
@@ -704,6 +704,8 @@ ao_usb_get_descriptor(uint16_t value)
 				len = sizeof (ao_usb_serial);
 			}
 #endif
+			if (len > length)
+				len = length;
 			ao_usb_ep0_in_set(descriptor, len);
 			break;
 		}
@@ -748,7 +750,7 @@ ao_usb_ep0_setup(void)
 				break;
 			case AO_USB_REQ_GET_DESCRIPTOR:
 				debug ("get descriptor %d\n", ao_usb_setup.value);
-				ao_usb_get_descriptor(ao_usb_setup.value);
+				ao_usb_get_descriptor(ao_usb_setup.value, ao_usb_setup.length);
 				break;
 			case AO_USB_REQ_GET_CONFIGURATION:
 				debug ("get configuration %d\n", ao_usb_configuration);
