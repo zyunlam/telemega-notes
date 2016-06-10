@@ -70,7 +70,7 @@ struct ao_cc115l_trace {
 	const char			*comment;
 };
 
-#define NUM_TRACE	256
+#define NUM_TRACE	32
 
 static struct ao_cc115l_trace	trace[NUM_TRACE];
 static int			trace_i;
