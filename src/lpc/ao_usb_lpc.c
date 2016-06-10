@@ -269,13 +269,10 @@ ao_usb_epn_in_count(uint8_t n)
 	return ao_usb_ep_count(ao_usb_epn_in(n, 0));
 }
 
-static uint8_t *
-ao_usb_enable_ep(vuint32_t *ep, uint16_t nbytes, uint16_t set_nbytes)
+static void
+ao_usb_enable_ep(vuint32_t *ep, uint8_t *addr, uint16_t set_nbytes)
 {
-	uint8_t	*addr = ao_usb_alloc_sram(nbytes);
-
 	ao_usb_set_ep(ep, addr, set_nbytes);
-	return addr;
 }
 
 static void
@@ -293,23 +290,13 @@ ao_usb_disable_ep(vuint32_t *ep)
 
 static void
 ao_usb_enable_epn(uint8_t n,
-		  uint16_t out_bytes, uint8_t *out_addrs[2],
-		  uint16_t in_bytes, uint8_t *in_addrs[2])
+		  uint16_t out_bytes, uint8_t *out_addr,
+		  uint8_t *in_addr)
 {
-	uint8_t	*addr;
-
-	addr = ao_usb_enable_ep(ao_usb_epn_out(n, 0), out_bytes * 2, out_bytes);
-	if (out_addrs) {
-		out_addrs[0] = addr;
-		out_addrs[1] = addr + out_bytes;
-	}
+	ao_usb_enable_ep(ao_usb_epn_out(n, 0), out_addr, out_bytes);
 	ao_usb_disable_ep(ao_usb_epn_out(n, 1));
 
-	addr = ao_usb_enable_ep(ao_usb_epn_in(n, 0), in_bytes * 2, 0);
-	if (in_addrs) {
-		in_addrs[0] = addr;
-		in_addrs[1] = addr + in_bytes;
-	}
+	ao_usb_enable_ep(ao_usb_epn_in(n, 0), in_addr, 0);
 	ao_usb_disable_ep(ao_usb_epn_in(n, 1));
 }
 
@@ -327,6 +314,14 @@ ao_usb_reset(void)
 {
 	ao_usb_set_address(0);
 	ao_usb_configuration = 0;
+
+	ao_usb_ep0_state = AO_USB_EP0_IDLE;
+	ao_usb_ep0_in_data = NULL;
+	ao_usb_ep0_in_len = 0;
+	ao_usb_ep0_in_max = 0;
+
+	ao_usb_ep0_out_data = NULL;
+	ao_usb_ep0_out_len = 0;
 }
 
 static void
@@ -341,17 +336,14 @@ ao_usb_set_ep0(void)
 
 	lpc_usb.intstat = 0xc00003ff;
 
-	ao_usb_sram = lpc_usb_sram;
-
 	lpc_usb.epliststart = (uint32_t) (intptr_t) &lpc_usb_endpoint;
 	lpc_usb.databufstart = ((uint32_t) (intptr_t) ao_usb_sram) & 0xffc00000;
 
 	/* Set up EP 0 - a Control end point with 32 bytes of in and out buffers */
 
-	ao_usb_ep0_rx_buffer = ao_usb_enable_ep(ao_usb_ep0_out(), AO_USB_CONTROL_SIZE, AO_USB_CONTROL_SIZE);
-	ao_usb_ep0_setup_buffer = ao_usb_alloc_sram(AO_USB_CONTROL_SIZE);
+	ao_usb_enable_ep(ao_usb_ep0_out(), ao_usb_ep0_rx_buffer, AO_USB_CONTROL_SIZE);
 	lpc_usb_endpoint.setup = ao_usb_sram_offset(ao_usb_ep0_setup_buffer);
-	ao_usb_ep0_tx_buffer = ao_usb_enable_ep(ao_usb_ep0_in(), AO_USB_CONTROL_SIZE, 0);
+	ao_usb_enable_ep(ao_usb_ep0_in(), ao_usb_ep0_tx_buffer, 0);
 
 	/* Clear all of the other endpoints */
 	for (e = 1; e <= 4; e++)
@@ -365,10 +357,10 @@ ao_usb_set_configuration(void)
 	debug ("ao_usb_set_configuration\n");
 
 	/* Set up the INT end point */
-	ao_usb_enable_epn(AO_USB_INT_EP, 0, NULL, 0, NULL);
+	ao_usb_enable_epn(AO_USB_INT_EP, 0, NULL, NULL);
 
 	/* Set up the OUT end point */
-	ao_usb_enable_epn(AO_USB_OUT_EP, AO_USB_OUT_SIZE, ao_usb_out_rx_buffer, 0, NULL);
+	ao_usb_enable_epn(AO_USB_OUT_EP, AO_USB_OUT_SIZE, ao_usb_out_rx_buffer[0], NULL);
 
 	/* Set the current RX pointer to the *other* buffer so that when buffer 0 gets
 	 * data, we'll switch to it and pull bytes from there
@@ -376,10 +368,18 @@ ao_usb_set_configuration(void)
 	ao_usb_out_rx_cur = 1;
 
 	/* Set up the IN end point */
-	ao_usb_enable_epn(AO_USB_IN_EP, 0, NULL, AO_USB_IN_SIZE, ao_usb_in_tx_buffer);
+	ao_usb_enable_epn(AO_USB_IN_EP, 0, NULL, ao_usb_in_tx_buffer[0]);
 	ao_usb_in_tx_cur = 0;
 
+	ao_usb_in_flushed = 0;
+	ao_usb_in_pending = 0;
+	ao_wakeup(&ao_usb_in_pending);
+
+	ao_usb_out_avail = 0;
+	ao_usb_configuration = 0;
+
 	ao_usb_running = 1;
+	ao_wakeup(&ao_usb_running);
 }
 
 /* Send an IN data packet */
@@ -481,7 +481,7 @@ static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 /* Walk through the list of descriptors and find a match
  */
 static void
-ao_usb_get_descriptor(uint16_t value)
+ao_usb_get_descriptor(uint16_t value, uint16_t length)
 {
 	const uint8_t		*descriptor;
 	uint8_t		type = value >> 8;
@@ -495,6 +495,8 @@ ao_usb_get_descriptor(uint16_t value)
 				len = descriptor[2];
 			else
 				len = descriptor[0];
+			if (len > length)
+				len = length;
 			ao_usb_ep0_in_set(descriptor, len);
 			break;
 		}
@@ -539,7 +541,7 @@ ao_usb_ep0_setup(void)
 				break;
 			case AO_USB_REQ_GET_DESCRIPTOR:
 				debug ("get descriptor %d\n", ao_usb_setup.value);
-				ao_usb_get_descriptor(ao_usb_setup.value);
+				ao_usb_get_descriptor(ao_usb_setup.value, ao_usb_setup.length);
 				break;
 			case AO_USB_REQ_GET_CONFIGURATION:
 				debug ("get configuration %d\n", ao_usb_configuration);
@@ -958,6 +960,17 @@ ao_usb_enable(void)
 	for (t = 0; t < 1000; t++)
 		ao_arch_nop();
 
+	ao_usb_sram = lpc_usb_sram;
+
+	ao_usb_ep0_rx_buffer    = ao_usb_alloc_sram(AO_USB_CONTROL_SIZE);
+	ao_usb_ep0_tx_buffer    = ao_usb_alloc_sram(AO_USB_CONTROL_SIZE);
+	ao_usb_ep0_setup_buffer = ao_usb_alloc_sram(AO_USB_CONTROL_SIZE);
+
+	ao_usb_out_rx_buffer[0] = ao_usb_alloc_sram(AO_USB_OUT_SIZE);
+	ao_usb_out_rx_buffer[1] = ao_usb_alloc_sram(AO_USB_OUT_SIZE);
+	ao_usb_in_tx_buffer[0]  = ao_usb_alloc_sram(AO_USB_IN_SIZE);
+	ao_usb_in_tx_buffer[1]  = ao_usb_alloc_sram(AO_USB_IN_SIZE);
+
 	ao_usb_set_ep0();
 
 #if HAS_USB_PULLUP
@@ -1001,7 +1014,6 @@ ao_usb_init(void)
 #if HAS_USB_PULLUP
 	ao_enable_output(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, AO_USB_PULLUP, 0);
 #endif
-
 	ao_usb_enable();
 
 	debug ("ao_usb_init\n");
