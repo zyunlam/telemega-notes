@@ -349,6 +349,19 @@ ao_usb_set_ep0(void)
 	}
 
 	ao_usb_set_address(0);
+
+	ao_usb_running = 0;
+
+	/* Reset our internal state
+	 */
+
+	ao_usb_ep0_state = AO_USB_EP0_IDLE;
+
+	ao_usb_ep0_in_data = NULL;
+	ao_usb_ep0_in_len = 0;
+
+	ao_usb_ep0_out_data = 0;
+	ao_usb_ep0_out_len = 0;
 }
 
 static void
@@ -393,7 +406,15 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_STAT_RX_DISABLED,
 		       STM_USB_EPR_STAT_TX_NAK);
 
+	ao_usb_in_flushed = 0;
+	ao_usb_in_pending = 0;
+	ao_wakeup(&ao_usb_in_pending);
+
+	ao_usb_out_avail = 0;
+	ao_usb_configuration = 0;
+
 	ao_usb_running = 1;
+	ao_wakeup(&ao_usb_running);
 }
 
 static uint16_t	control_count;
@@ -581,7 +602,7 @@ static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 /* Walk through the list of descriptors and find a match
  */
 static void
-ao_usb_get_descriptor(uint16_t value)
+ao_usb_get_descriptor(uint16_t value, uint16_t length)
 {
 	const uint8_t		*descriptor;
 	uint8_t		type = value >> 8;
@@ -595,6 +616,8 @@ ao_usb_get_descriptor(uint16_t value)
 				len = descriptor[2];
 			else
 				len = descriptor[0];
+			if (len > length)
+				len = length;
 			ao_usb_ep0_in_set(descriptor, len);
 			break;
 		}
@@ -639,7 +662,7 @@ ao_usb_ep0_setup(void)
 				break;
 			case AO_USB_REQ_GET_DESCRIPTOR:
 				debug ("get descriptor %d\n", ao_usb_setup.value);
-				ao_usb_get_descriptor(ao_usb_setup.value);
+				ao_usb_get_descriptor(ao_usb_setup.value, ao_usb_setup.length);
 				break;
 			case AO_USB_REQ_GET_CONFIGURATION:
 				debug ("get configuration %d\n", ao_usb_configuration);
