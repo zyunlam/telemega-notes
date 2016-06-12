@@ -1192,14 +1192,6 @@ ao_usb_alloc(void)
 }
 
 void
-ao_usb_free(uint16_t *addr)
-{
-	uint16_t	offset = ao_usb_packet_buffer_offset(addr);
-	if (offset < ao_usb_sram_addr)
-		ao_usb_sram_addr = offset;
-}
-
-void
 ao_usb_write(uint16_t *buffer, uint16_t len)
 {
 	ao_arch_block_interrupts();
