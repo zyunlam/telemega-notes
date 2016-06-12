@@ -169,7 +169,7 @@ do_baro(struct cc_usb *usb) {
 		return 0;
 	}
 
-	if (temperature < 20 || 35 < temperature) {
+	if (temperature < 20 || 40 < temperature) {
 		printf ("weird temperature %f\n", temperature);
 		free_baro(b);
 		return 0;
