@@ -125,6 +125,8 @@ public class ManageFrequenciesActivity extends Activity {
 
 	private void done() {
 
+		set();
+
 		if (changed) {
 			AltosFrequency[] frequencies = new AltosFrequency[frequencies_adapter.count()];
 			for (int i = 0; i < frequencies.length; i++)
@@ -164,6 +166,16 @@ public class ManageFrequenciesActivity extends Activity {
 		load_item();
 	}
 
+	private int find(AltosFrequency frequency) {
+		for (int pos = 0; pos < frequencies_adapter.getCount(); pos++) {
+			FrequencyItem	item = frequencies_adapter.getItem(pos);
+			if (item.frequency.frequency == frequency.frequency &&
+			    item.frequency.description.equals(frequency.description))
+				return pos;
+		}
+		return -1;
+	}
+
 	private int insert_item(AltosFrequency frequency) {
 		FrequencyItem new_item = new FrequencyItem(frequency);
 		int	pos;
@@ -200,11 +212,16 @@ public class ManageFrequenciesActivity extends Activity {
 
 		try {
 			double	f = AltosParse.parse_double_locale(frequency_text);
+			AltosFrequency frequency = new AltosFrequency(f, description_text);
+			int pos;
 
-			int pos = insert_item(new AltosFrequency(f, description_text));
+			pos = find(frequency);
+			if (pos < 0) {
+				pos = insert_item(frequency);
+				changed = true;
+			}
 			frequencies_adapter.selected_item = -1;
 			select_item(pos);
-			changed = true;
 		} catch (ParseException pe) {
 		}
 		hide_keyboard();
