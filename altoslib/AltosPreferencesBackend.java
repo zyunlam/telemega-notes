@@ -50,6 +50,22 @@ public abstract class AltosPreferencesBackend {
 		putString(key, h.toString());
 	}
 
+	public AltosJson	getJson(String key) {
+		String	value = getString(key, null);
+
+		if (value == null)
+			return null;
+		try {
+			return AltosJson.fromString(value);
+		} catch (IllegalArgumentException ie) {
+			return null;
+		}
+	}
+
+	public void	       	putJson(String key, AltosJson j) {
+		putString(key, j.toString());
+	}
+
 	public abstract boolean nodeExists(String key);
 	public abstract AltosPreferencesBackend node(String key);
 

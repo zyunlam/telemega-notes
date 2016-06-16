@@ -22,7 +22,7 @@ import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class AltosGPSSat {
+public class AltosGPSSat implements AltosJsonable {
 	public int	svid;
 	public int	c_n0;
 
@@ -41,15 +41,38 @@ public class AltosGPSSat {
 		return h;
 	}
 
+	public AltosJson json() {
+		AltosJson j = new AltosJson();
+		j.put("svid", svid);
+		j.put("c_n0", c_n0);
+		return j;
+	}
+
 	private AltosGPSSat(AltosHashSet h) {
 		svid = h.getInt("svid", 0);
 		c_n0 = h.getInt("c_n0", 0);
+	}
+
+	private AltosGPSSat(AltosJson j) {
+		svid = j.get_int("svid", 0);
+		c_n0 = j.get_int("c_n0", 0);
 	}
 
 	static public AltosGPSSat fromHashSet(AltosHashSet h, AltosGPSSat def) {
 		if (h == null)
 			return def;
 		return new AltosGPSSat(h);
+	}
+
+	static public AltosGPSSat[] json_array(AltosJson j) {
+		if (j == null)
+			return null;
+
+		int size = j.size();
+		AltosGPSSat[] sats = new AltosGPSSat[size];
+		for (int i = 0; i < size; i++)
+			sats[i] = new AltosGPSSat(j.get(i));
+		return sats;
 	}
 
 	static public AltosGPSSat[] array(String string) {

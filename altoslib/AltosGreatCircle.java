@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.lang.Math;
 import java.io.*;
 
-public class AltosGreatCircle implements Cloneable, AltosHashable {
+public class AltosGreatCircle implements Cloneable, AltosHashable, AltosJsonable {
 	public double	distance;
 	public double	bearing;
 	public double	range;
@@ -115,6 +115,17 @@ public class AltosGreatCircle implements Cloneable, AltosHashable {
 		return h;
 	}
 
+	public AltosJson json() {
+		AltosJson j = new AltosJson();
+
+		j.put("distance", distance);
+		j.put("bearing", bearing);
+		j.put("range", range);
+		j.put("elevation", elevation);
+
+		return j;
+	}
+
 	public AltosGreatCircle(AltosHashSet h) {
 		this();
 
@@ -129,5 +140,21 @@ public class AltosGreatCircle implements Cloneable, AltosHashable {
 			return def;
 
 		return new AltosGreatCircle(h);
+	}
+
+	public AltosGreatCircle(AltosJson j) {
+		this();
+
+		distance = j.get_double("distance", distance);
+		bearing = j.get_double("bearing", bearing);
+		range = j.get_double("range", range);
+		elevation = j.get_double("elevation", elevation);
+	}
+
+	public static AltosGreatCircle fromJson(AltosJson j, AltosGreatCircle def) {
+		if (j == null)
+			return def;
+
+		return new AltosGreatCircle(j);
 	}
 }

@@ -133,19 +133,25 @@ public class AltosPreferences {
 	static int	map_type;
 
 	public static AltosFrequency[] load_common_frequencies() {
-
 		AltosFrequency[] frequencies = null;
 
-		AltosHashSet[]	sets = AltosHashSet.array(backend.getString(frequenciesPreference,null));
-		if (sets != null) {
-			ArrayList<AltosFrequency>	freqs = new ArrayList<AltosFrequency>();
+		AltosJson sets;
 
-			for (int i = 0; i < sets.length; i++) {
-				AltosFrequency f = AltosFrequency.fromHashSet(sets[i], null);
-				if (f != null)
-					freqs.add(f);
+		try {
+			sets = AltosJson.fromString(backend.getString(frequenciesPreference,null));
+
+			if (sets != null) {
+				ArrayList<AltosFrequency>	freqs = new ArrayList<AltosFrequency>();
+
+				for (int i = 0; i < sets.size(); i++) {
+					AltosFrequency f = AltosFrequency.fromJson(sets.get(i), null);
+					if (f != null)
+						freqs.add(f);
+				}
+				frequencies = freqs.toArray(new AltosFrequency[0]);
 			}
-			frequencies = freqs.toArray(new AltosFrequency[0]);
+		} catch (Exception e) {
+			sets = null;
 		}
 
 		if (frequencies == null) {
@@ -178,10 +184,8 @@ public class AltosPreferences {
 	}
 
 	public static void save_common_frequencies() {
-		AltosHashSet[]	sets = new AltosHashSet[common_frequencies.length];
-		for (int i = 0; i < sets.length; i++)
-			sets[i] = common_frequencies[i].hashSet();
-		backend.putString(frequenciesPreference, AltosHashSet.toString(sets));
+		AltosJson	json = new AltosJson(common_frequencies);
+		backend.putString(frequenciesPreference, json.toString());
 		flush_preferences();
 	}
 
@@ -373,7 +377,7 @@ public class AltosPreferences {
 	public static void set_state(AltosState state) {
 
 		synchronized(backend) {
-			backend.putHashSet(String.format(statePreferenceFormat, state.serial), state.hashSet());
+			backend.putJson(String.format(statePreferenceFormat, state.serial), state.json());
 			backend.putInt(statePreferenceLatest, state.serial);
 			flush_preferences();
 		}
@@ -413,7 +417,7 @@ public class AltosPreferences {
 	public static AltosState state(int serial) {
 		synchronized(backend) {
 			try {
-				return AltosState.fromHashSet(backend.getHashSet(String.format(statePreferenceFormat, serial)));
+				return AltosState.fromJson(backend.getJson(String.format(statePreferenceFormat, serial)));
 			} catch (Exception e) {
 				return null;
 			}

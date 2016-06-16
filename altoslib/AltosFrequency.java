@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosFrequency {
+public class AltosFrequency implements AltosJsonable {
 	public double	frequency;
 	public String	description;
 
@@ -66,6 +66,14 @@ public class AltosFrequency {
 		return h;
 	}
 
+	public AltosJson json() {
+		AltosJson	j = new AltosJson();
+
+		j.put("frequency", frequency);
+		j.put("description", description);
+		return j;
+	}
+
 	public AltosFrequency(double f, String d) {
 		frequency = f;
 		description = d;
@@ -80,5 +88,16 @@ public class AltosFrequency {
 		if (h == null)
 			return def;
 		return new AltosFrequency(h);
+	}
+
+	private AltosFrequency(AltosJson j) {
+		frequency = j.get_double("frequency", 0.0);
+		description = j.get_string("description", "");
+	}
+
+	public static AltosFrequency fromJson(AltosJson j, AltosFrequency def) {
+		if (j == null)
+			return def;
+		return new AltosFrequency(j);
 	}
 }
