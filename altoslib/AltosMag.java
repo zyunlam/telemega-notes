@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosMag implements Cloneable, AltosHashable, AltosJsonable {
+public class AltosMag implements Cloneable, AltosJsonable {
 	public int		along;
 	public int		across;
 	public int		through;
@@ -94,15 +94,6 @@ public class AltosMag implements Cloneable, AltosHashable, AltosJsonable {
 		}
 	}
 
-	public AltosHashSet hashSet() {
-		AltosHashSet	h = new AltosHashSet();
-
-		h.putInt("along", along);
-		h.putInt("across", across);
-		h.putInt("through", through);
-		return h;
-	}
-
 	public AltosJson json() {
 		AltosJson	j = new AltosJson();
 
@@ -110,21 +101,6 @@ public class AltosMag implements Cloneable, AltosHashable, AltosJsonable {
 		j.put("across", across);
 		j.put("through", through);
 		return j;
-	}
-
-	public AltosMag(AltosHashSet h) {
-		this();
-
-		along = h.getInt("along", along);
-		across = h.getInt("across", across);
-		through = h.getInt("through", through);
-	}
-
-	public static AltosMag fromHashSet(AltosHashSet h, AltosMag def) {
-		if (h == null)
-			return def;
-
-		return new AltosMag(h);
 	}
 
 	public AltosMag(AltosJson j) {

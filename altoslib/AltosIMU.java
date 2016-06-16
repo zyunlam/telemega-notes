@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosIMU implements Cloneable, AltosHashable, AltosJsonable {
+public class AltosIMU implements Cloneable, AltosJsonable {
 	public int		accel_along;
 	public int		accel_across;
 	public int		accel_through;
@@ -116,18 +116,6 @@ public class AltosIMU implements Cloneable, AltosHashable, AltosJsonable {
 		}
 	}
 
-	public AltosIMU (AltosHashSet h) {
-		this();
-
-		accel_along = h.getInt("accel_along", accel_along);
-		accel_across = h.getInt("accel_across", accel_across);
-		accel_through = h.getInt("accel_through", accel_through);
-
-		gyro_roll = h.getInt("gyro_roll", gyro_roll);
-		gyro_pitch = h.getInt("gyro_pitch", gyro_pitch);
-		gyro_yaw = h.getInt("gyro_yaw", gyro_yaw);
-	}
-
 	public AltosIMU (AltosJson j) {
 		this();
 
@@ -140,29 +128,10 @@ public class AltosIMU implements Cloneable, AltosHashable, AltosJsonable {
 		gyro_yaw = j.get_int("gyro_yaw", gyro_yaw);
 	}
 
-	static public AltosIMU fromHashSet(AltosHashSet h, AltosIMU def) {
-		if (h == null)
-			return def;
-		return new AltosIMU(h);
-	}
-
 	static public AltosIMU fromJson(AltosJson j, AltosIMU def) {
 		if (j == null)
 			return def;
 		return new AltosIMU(j);
-	}
-
-	public AltosHashSet hashSet() {
-		AltosHashSet	h = new AltosHashSet();
-
-		h.putInt("accel_along", accel_along);
-		h.putInt("accel_across", accel_across);
-		h.putInt("accel_through", accel_through);
-
-		h.putInt("gyro_roll", gyro_roll);
-		h.putInt("gyro_pitch", gyro_pitch);
-		h.putInt("gyro_yaw", gyro_yaw);
-		return h;
 	}
 
 	public AltosJson json() {

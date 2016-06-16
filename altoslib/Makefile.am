@@ -161,8 +161,6 @@ altoslib_JAVA = \
 	AltosMapLoaderListener.java \
 	AltosMapLoader.java \
 	AltosMapTypeListener.java \
-	AltosHashSet.java \
-	AltosHashable.java \
 	AltosJson.java \
 	AltosJsonable.java \
 	AltosVersion.java

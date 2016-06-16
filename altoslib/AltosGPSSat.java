@@ -34,13 +34,6 @@ public class AltosGPSSat implements AltosJsonable {
 	public AltosGPSSat() {
 	}
 
-	public AltosHashSet hashSet() {
-		AltosHashSet h = new AltosHashSet();
-		h.putInt("svid", svid);
-		h.putInt("c_n0", c_n0);
-		return h;
-	}
-
 	public AltosJson json() {
 		AltosJson j = new AltosJson();
 		j.put("svid", svid);
@@ -48,20 +41,9 @@ public class AltosGPSSat implements AltosJsonable {
 		return j;
 	}
 
-	private AltosGPSSat(AltosHashSet h) {
-		svid = h.getInt("svid", 0);
-		c_n0 = h.getInt("c_n0", 0);
-	}
-
 	private AltosGPSSat(AltosJson j) {
 		svid = j.get_int("svid", 0);
 		c_n0 = j.get_int("c_n0", 0);
-	}
-
-	static public AltosGPSSat fromHashSet(AltosHashSet h, AltosGPSSat def) {
-		if (h == null)
-			return def;
-		return new AltosGPSSat(h);
 	}
 
 	static public AltosGPSSat[] json_array(AltosJson j) {
@@ -73,44 +55,6 @@ public class AltosGPSSat implements AltosJsonable {
 		for (int i = 0; i < size; i++)
 			sats[i] = new AltosGPSSat(j.get(i));
 		return sats;
-	}
-
-	static public AltosGPSSat[] array(String string) {
-
-		if (string == null)
-			return null;
-
-		try {
-			StringReader 		reader = new StringReader(string);
-			ArrayList<AltosGPSSat>	array = new ArrayList<AltosGPSSat>();
-			String			element;
-
-			while ((element = AltosHashSet.get_token(reader)) != null) {
-				AltosGPSSat sat = AltosGPSSat.fromHashSet(AltosHashSet.fromString(element), null);
-				if (sat != null)
-					array.add(sat);
-			}
-			return array.toArray(new AltosGPSSat[0]);
-		} catch (IOException ie) {
-			return null;
-		}
-	}
-
-	public static String toString(AltosGPSSat[] sats) {
-		if (sats == null)
-			return null;
-
-		try {
-			StringWriter		writer = new StringWriter();
-
-			for (AltosGPSSat g : sats) {
-				String		element = g.hashSet().toString();
-				AltosHashSet.put_token(writer, element);
-			}
-			return writer.toString();
-		} catch (IOException ie) {
-			return null;
-		}
 	}
 }
 

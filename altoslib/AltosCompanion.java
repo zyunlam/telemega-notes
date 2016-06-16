@@ -19,7 +19,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosCompanion implements AltosHashable, AltosJsonable {
+public class AltosCompanion implements AltosJsonable {
 	public final static int	board_id_telescience = 0x0a;
 	public final static int	MAX_CHANNELS = 12;
 
@@ -38,17 +38,6 @@ public class AltosCompanion implements AltosHashable, AltosJsonable {
 		companion_data = new int[channels];
 	}
 
-	public AltosHashSet hashSet() {
-		AltosHashSet h = new AltosHashSet();
-
-		h.putInt("tick", tick);
-		h.putInt("board_id", board_id);
-		h.putInt("update_period", update_period);
-		h.putInt("channels", channels);
-		h.putIntArray("companion_data", companion_data);
-		return h;
-	}
-
 	public AltosJson json() {
 		AltosJson j = new AltosJson();
 
@@ -58,21 +47,6 @@ public class AltosCompanion implements AltosHashable, AltosJsonable {
 		j.put("channels", channels);
 		j.put("companion_data", companion_data);
 		return j;
-	}
-
-	public AltosCompanion(AltosHashSet h) {
-		tick = h.getInt("tick", tick);
-		board_id = h.getInt("board_id", board_id);
-		update_period = h.getInt("update_period", update_period);
-		channels = h.getInt("channels", channels);
-		companion_data = h.getIntArray("companion_data", new int[channels]);
-	}
-
-	public static AltosCompanion fromHashSet(AltosHashSet h, AltosCompanion def) {
-		if (h == null)
-			return def;
-
-		return new AltosCompanion(h);
 	}
 
 	public AltosCompanion(AltosJson j) {

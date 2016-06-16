@@ -38,18 +38,6 @@ public abstract class AltosPreferencesBackend {
 	public abstract byte[]  getBytes(String key, byte[] def);
 	public abstract void    putBytes(String key, byte[] value);
 
-	public AltosHashSet	getHashSet(String key) {
-		String	value = getString(key, null);
-
-		if (value == null)
-			return null;
-		return AltosHashSet.fromString(value);
-	}
-
-	public void	       	putHashSet(String key, AltosHashSet h) {
-		putString(key, h.toString());
-	}
-
 	public AltosJson	getJson(String key) {
 		String	value = getString(key, null);
 

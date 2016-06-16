@@ -17,7 +17,7 @@
 
 package org.altusmetrum.altoslib_11;
 
-public class AltosQuaternion implements AltosHashable, AltosJsonable {
+public class AltosQuaternion implements AltosJsonable {
 	double	r;		/* real bit */
 	double	x, y, z;	/* imaginary bits */
 
@@ -148,16 +148,6 @@ public class AltosQuaternion implements AltosHashable, AltosJsonable {
 					   c_x * c_y * s_z - s_x * s_y * c_z);
 	}
 
-	public AltosHashSet hashSet() {
-		AltosHashSet h = new AltosHashSet();
-
-		h.putDouble("r", r);
-		h.putDouble("x", x);
-		h.putDouble("y", y);
-		h.putDouble("z", z);
-		return h;
-	}
-
 	public AltosJson json() {
 		AltosJson j = new AltosJson();
 
@@ -166,16 +156,6 @@ public class AltosQuaternion implements AltosHashable, AltosJsonable {
 		j.put("y", y);
 		j.put("z", z);
 		return j;
-	}
-
-	public AltosQuaternion(AltosHashSet h) {
-		if (h == null)
-			return;
-
-		r = h.getDouble("r", 1);
-		x = h.getDouble("x", 0);
-	        y = h.getDouble("y", 0);
-		z = h.getDouble("z", 0);
 	}
 
 	public AltosQuaternion(AltosJson j) {

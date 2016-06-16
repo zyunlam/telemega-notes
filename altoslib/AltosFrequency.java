@@ -58,14 +58,6 @@ public class AltosFrequency implements AltosJsonable {
 		return diff < 0.010;
 	}
 
-	public AltosHashSet hashSet() {
-		AltosHashSet	h = new AltosHashSet();
-
-		h.putDouble("frequency", frequency);
-		h.putString("description", description);
-		return h;
-	}
-
 	public AltosJson json() {
 		AltosJson	j = new AltosJson();
 
@@ -77,17 +69,6 @@ public class AltosFrequency implements AltosJsonable {
 	public AltosFrequency(double f, String d) {
 		frequency = f;
 		description = d;
-	}
-
-	private AltosFrequency(AltosHashSet h) {
-		frequency = h.getDouble("frequency", 0.0);
-		description = h.getString("description", "");
-	}
-
-	public static AltosFrequency fromHashSet(AltosHashSet h, AltosFrequency def) {
-		if (h == null)
-			return def;
-		return new AltosFrequency(h);
 	}
 
 	private AltosFrequency(AltosJson j) {

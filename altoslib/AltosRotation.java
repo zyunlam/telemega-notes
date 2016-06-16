@@ -17,7 +17,7 @@
 
 package org.altusmetrum.altoslib_11;
 
-public class AltosRotation implements AltosHashable, AltosJsonable {
+public class AltosRotation implements AltosJsonable {
 	private AltosQuaternion		rotation;
 
 	public double tilt() {
@@ -48,26 +48,8 @@ public class AltosRotation implements AltosHashable, AltosJsonable {
 		rotation = up.vectors_to_rotation(orient);
 	}
 
-	public AltosHashSet hashSet() {
-		AltosHashSet h = new AltosHashSet();
-
-		h.putHashable("rotation", rotation);
-		return h;
-	}
-
 	public AltosJson json() {
 		return rotation.json();
-	}
-
-	public AltosRotation(AltosHashSet h) {
-		rotation = new AltosQuaternion(h.getHash("rotation"));
-	}
-
-	public static AltosRotation fromHashSet(AltosHashSet h, AltosRotation def) {
-		if (h == null)
-			return def;
-
-		return new AltosRotation(h);
 	}
 
 	public AltosRotation(AltosJson j) {
