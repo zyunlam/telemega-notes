@@ -23,8 +23,13 @@ import javax.swing.*;
 import java.util.*;
 
 class AltosUIFrameListener extends WindowAdapter {
+	@Override
 	public void windowClosing (WindowEvent e) {
-		AltosUIPreferences.unregister_ui_listener((AltosUIFrame) e.getWindow());
+		AltosUIFrame frame = (AltosUIFrame) e.getWindow();
+		AltosUIPreferences.unregister_ui_listener(frame);
+		AltosUIFrame.frame_closed();
+		frame.setVisible(false);
+		frame.dispose();
 	}
 }
 
@@ -263,10 +268,23 @@ public class AltosUIFrame extends JFrame implements AltosUIListener, AltosPositi
 		return constraints(x, width, GridBagConstraints.NONE);
 	}
 
+	static int open_frames;
+
+	public static void frame_opened() {
+		++open_frames;
+	}
+
+	public static void frame_closed() {
+		--open_frames;
+		if (open_frames == 0)
+			System.exit(0);
+	}
+
 	void init() {
 		AltosUIPreferences.register_ui_listener(this);
 		AltosUIPreferences.register_position_listener(this);
 		position = AltosUIPreferences.position();
+		frame_opened();
 		addWindowListener(new AltosUIFrameListener());
 
 		/* Try to make menus live in the menu bar like regular Mac apps */

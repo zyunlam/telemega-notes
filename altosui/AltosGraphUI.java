@@ -100,8 +100,6 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
-					setVisible(false);
-					dispose();
 					AltosUIPreferences.unregister_font_listener(AltosGraphUI.this);
 					AltosPreferences.unregister_units_listener(AltosGraphUI.this);
 				}
