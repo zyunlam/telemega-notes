@@ -612,15 +612,13 @@ public class AltosUI extends AltosUIFrame {
 					File file = new File(args[i]);
 					switch (process) {
 					case process_none:
-					case process_graph:
 						if (altosui == null)
 							altosui = new AltosUI();
+					case process_graph:
 						if (!process_graph(file))
 							++errors;
 						break;
 					case process_replay:
-						if (altosui == null)
-							altosui = new AltosUI();
 						if (!process_replay(file))
 							++errors;
 						break;
