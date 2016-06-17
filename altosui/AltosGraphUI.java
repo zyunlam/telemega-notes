@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_10.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altosuilib_11.*;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -35,7 +35,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	JTabbedPane		pane;
 	AltosGraph		graph;
 	AltosUIEnable		enable;
-	AltosUIMapNew		map;
+	AltosUIMap		map;
 	AltosState		state;
 	AltosGraphDataSet	graphDataSet;
 	AltosFlightStats	stats;
@@ -47,7 +47,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		for (AltosState state : states) {
 			if (state.gps != null && state.gps.locked && state.gps.nsat >= 4) {
 				if (map == null)
-					map = new AltosUIMapNew();
+					map = new AltosUIMap();
 				map.show(state, null);
 				has_gps = true;
 			}
@@ -100,8 +100,6 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
-					setVisible(false);
-					dispose();
 					AltosUIPreferences.unregister_font_listener(AltosGraphUI.this);
 					AltosPreferences.unregister_units_listener(AltosGraphUI.this);
 				}

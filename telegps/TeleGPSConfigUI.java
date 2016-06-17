@@ -22,8 +22,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_10.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class TeleGPSConfigUI
 	extends AltosUIDialog
@@ -854,7 +854,7 @@ public class TeleGPSConfigUI
 	}
 
 	String get_tracker_motion_label() {
-		return String.format("Logging Trigger Motion (%s):", AltosConvert.height.show_units());
+		return String.format("Logging Trigger Motion (%s):", AltosConvert.height.parse_units());
 	}
 
 	void set_tracker_tool_tip() {

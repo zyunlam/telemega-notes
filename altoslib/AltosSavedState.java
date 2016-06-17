@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosSavedState implements Serializable {
+public class AltosSavedState {
 	public AltosState		state;
 	public AltosListenerState	listener_state;
 

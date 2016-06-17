@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 import java.net.*;
@@ -27,6 +27,45 @@ public class AltosMapStore {
 	LinkedList<AltosMapStoreListener>	listeners = new LinkedList<AltosMapStoreListener>();
 
 	int					status;
+
+	private static File map_file(AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+		double lat = center.lat;
+		double lon = center.lon;
+		char chlat = lat < 0 ? 'S' : 'N';
+		char chlon = lon < 0 ? 'W' : 'E';
+
+		if (lat < 0) lat = -lat;
+		if (lon < 0) lon = -lon;
+		String maptype_string = String.format("%s-", AltosMap.maptype_names[maptype]);
+		String format_string;
+		if (maptype == AltosMap.maptype_hybrid || maptype == AltosMap.maptype_satellite || maptype == AltosMap.maptype_terrain)
+			format_string = "jpg";
+		else
+			format_string = "png";
+		return new File(AltosPreferences.mapdir(),
+				String.format("map-%c%.6f,%c%.6f-%s%d%s.%s",
+					      chlat, lat, chlon, lon, maptype_string, zoom, scale == 1 ? "" : String.format("-%d", scale), format_string));
+	}
+
+	private static String map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+		String format_string;
+		int z = zoom;
+
+		if (maptype == AltosMap.maptype_hybrid || maptype == AltosMap.maptype_satellite || maptype == AltosMap.maptype_terrain)
+			format_string = "jpg";
+		else
+			format_string = "png32";
+
+		for (int s = 1; s < scale; s <<= 1)
+			z--;
+
+		if (AltosVersion.has_google_maps_api_key())
+			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s&key=%s",
+					     center.lat, center.lon, z, px_size/scale, px_size/scale, scale, AltosMap.maptype_names[maptype], format_string, AltosVersion.google_maps_api_key);
+		else
+			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s",
+					     center.lat, center.lon, z, px_size/scale, px_size/scale, AltosMap.maptype_names[maptype], format_string);
+	}
 
 	public int status() {
 		return status;
@@ -229,16 +268,19 @@ public class AltosMapStore {
 
 	static HashMap<String,AltosMapStore> stores = new HashMap<String,AltosMapStore>();
 
-	public static AltosMapStore get(String url, File file) {
+	public static AltosMapStore get(AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+		String url = map_url(center, zoom, maptype, px_size, scale);
+
 		AltosMapStore	store;
 		synchronized(stores) {
 			if (stores.containsKey(url)) {
 				store = stores.get(url);
 			} else {
-				store = new AltosMapStore(url, file);
+				store = new AltosMapStore(url, map_file(center, zoom, maptype, px_size, scale));
 				stores.put(url, store);
 			}
 		}
 		return store;
 	}
+
 }

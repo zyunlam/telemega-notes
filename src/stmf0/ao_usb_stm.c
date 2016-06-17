@@ -83,7 +83,9 @@ static uint8_t 	ao_usb_ep0_out_len;
 /* Buffer description tables */
 static union stm_usb_bdt	*ao_usb_bdt;
 /* USB address of end of allocated storage */
+#if AO_USB_DIRECTIO
 static uint16_t	ao_usb_sram_addr;
+#endif
 
 /* Pointer to ep0 tx/rx buffers in USB memory */
 static uint16_t	*ao_usb_ep0_tx_buffer;
@@ -362,39 +364,43 @@ ao_usb_init_ep(uint8_t ep, uint32_t addr, uint32_t type, uint32_t stat_rx, uint3
 static void
 ao_usb_alloc_buffers(void)
 {
-	ao_usb_sram_addr = 0;
+	uint16_t sram_addr = 0;
 
 	ao_usb_bdt = (void *) stm_usb_sram;
-	ao_usb_sram_addr += 8 * STM_USB_BDT_SIZE;
+	sram_addr += 8 * STM_USB_BDT_SIZE;
 
-	ao_usb_ep0_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
-	ao_usb_sram_addr += AO_USB_CONTROL_SIZE;
+	ao_usb_ep0_tx_buffer = ao_usb_packet_buffer_addr(sram_addr);
+	sram_addr += AO_USB_CONTROL_SIZE;
 
-	ao_usb_ep0_rx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
-	ao_usb_sram_addr += AO_USB_CONTROL_SIZE;
+	ao_usb_ep0_rx_buffer = ao_usb_packet_buffer_addr(sram_addr);
+	sram_addr += AO_USB_CONTROL_SIZE;
 
 
 #if AO_USB_HAS_INT
-	ao_usb_int_tx_offset = ao_usb_sram_addr;
-	ao_usb_sram_addr += AO_USB_INT_SIZE;
+	ao_usb_int_tx_offset = sram_addr;
+	sram_addr += AO_USB_INT_SIZE;
 #endif
 
 #if AO_USB_HAS_OUT
-	ao_usb_out_rx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
-	ao_usb_out_rx_offset = ao_usb_sram_addr;
-	ao_usb_sram_addr += AO_USB_OUT_SIZE;
+	ao_usb_out_rx_buffer = ao_usb_packet_buffer_addr(sram_addr);
+	ao_usb_out_rx_offset = sram_addr;
+	sram_addr += AO_USB_OUT_SIZE;
 #endif
 
 #if AO_USB_HAS_IN
-	ao_usb_in_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
-	ao_usb_in_tx_offset = ao_usb_sram_addr;
-	ao_usb_sram_addr += AO_USB_IN_SIZE;
+	ao_usb_in_tx_buffer = ao_usb_packet_buffer_addr(sram_addr);
+	ao_usb_in_tx_offset = sram_addr;
+	sram_addr += AO_USB_IN_SIZE;
 #endif
 
 #if AO_USB_HAS_IN2
-	ao_usb_in2_tx_buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
-	ao_usb_in2_tx_offset = ao_usb_sram_addr;
-	ao_usb_sram_addr += AO_USB_IN_SIZE;
+	ao_usb_in2_tx_buffer = ao_usb_packet_buffer_addr(sram_addr);
+	ao_usb_in2_tx_offset = sram_addr;
+	sram_addr += AO_USB_IN_SIZE;
+#endif
+
+#if AO_USB_DIRECTIO
+	ao_usb_sram_addr = sram_addr;
 #endif
 }
 
@@ -437,6 +443,17 @@ ao_usb_set_ep0(void)
 	ao_usb_set_address(0);
 
 	ao_usb_running = 0;
+
+	/* Reset our internal state
+	 */
+
+	ao_usb_ep0_state = AO_USB_EP0_IDLE;
+
+	ao_usb_ep0_in_data = NULL;
+	ao_usb_ep0_in_len = 0;
+
+	ao_usb_ep0_out_data = 0;
+	ao_usb_ep0_out_len = 0;
 }
 
 static void
@@ -492,6 +509,20 @@ ao_usb_set_configuration(void)
 		       STM_USB_EPR_STAT_RX_DISABLED,
 		       STM_USB_EPR_STAT_TX_NAK);
 #endif
+
+	ao_usb_in_flushed = 0;
+	ao_usb_in_pending = 0;
+	ao_wakeup(&ao_usb_in_pending);
+#if AO_USB_HAS_IN2
+	ao_usb_in2_flushed = 0;
+	ao_usb_in2_pending = 0;
+	ao_wakeup(&ao_usb_in2_pending);
+#endif
+
+	ao_usb_out_avail = 0;
+	ao_usb_configuration = 0;
+
+	ao_wakeup(AO_USB_OUT_SLEEP_ADDR);
 
 	ao_usb_running = 1;
 #if AO_USB_DIRECTIO
@@ -658,7 +689,7 @@ ao_usb_serial_init(void)
 /* Walk through the list of descriptors and find a match
  */
 static void
-ao_usb_get_descriptor(uint16_t value)
+ao_usb_get_descriptor(uint16_t value, uint16_t length)
 {
 	const uint8_t		*descriptor;
 	uint8_t		type = value >> 8;
@@ -679,6 +710,8 @@ ao_usb_get_descriptor(uint16_t value)
 				len = sizeof (ao_usb_serial);
 			}
 #endif
+			if (len > length)
+				len = length;
 			ao_usb_ep0_in_set(descriptor, len);
 			break;
 		}
@@ -723,7 +756,7 @@ ao_usb_ep0_setup(void)
 				break;
 			case AO_USB_REQ_GET_DESCRIPTOR:
 				debug ("get descriptor %d\n", ao_usb_setup.value);
-				ao_usb_get_descriptor(ao_usb_setup.value);
+				ao_usb_get_descriptor(ao_usb_setup.value, ao_usb_setup.length);
 				break;
 			case AO_USB_REQ_GET_CONFIGURATION:
 				debug ("get configuration %d\n", ao_usb_configuration);
@@ -1156,14 +1189,6 @@ ao_usb_alloc(void)
 	buffer = ao_usb_packet_buffer_addr(ao_usb_sram_addr);
 	ao_usb_sram_addr += AO_USB_IN_SIZE;
 	return buffer;
-}
-
-void
-ao_usb_free(uint16_t *addr)
-{
-	uint16_t	offset = ao_usb_packet_buffer_offset(addr);
-	if (offset < ao_usb_sram_addr)
-		ao_usb_sram_addr = offset;
 }
 
 void

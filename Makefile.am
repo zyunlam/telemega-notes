@@ -6,6 +6,12 @@ MAINTAINERCLEANFILES = ChangeLog
 
 .PHONY: ChangeLog
 
+all: pdclib/Makefile
+all-recursive: pdclib/Makefile
+
+pdclib/Makefile:
+	git submodule update
+
 ChangeLog:
 	(GIT_DIR=$(top_srcdir)/.git git log > .changelog.tmp && mv .changelog.tmp ChangeLog; rm -f .changelog.tmp) || \
 	(touch ChangeLog; echo 'git directory not found: installing possibly empty changelog.' >&2)
@@ -42,9 +48,25 @@ fat_android = \
 	altosdroid/bin/AltosDroid-debug.apk \
 	altosdroid/bin/AltosDroid-release.apk
 
+fat_altos = \
+	src/easymega-v1.0/easymega-v1.0-$(VERSION).ihx \
+	src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx \
+	src/telebt-v1.0/telebt-v1.0-$(VERSION).ihx \
+	src/telebt-v3.0/telebt-v3.0-$(VERSION).ihx \
+	src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx \
+	src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx \
+	src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx \
+	src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx \
+	src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx \
+	src/telemetrum-v1.0/telemetrum-v1.0-$(VERSION).ihx \
+	src/telemetrum-v1.1/telemetrum-v1.1-$(VERSION).ihx \
+	src/telemetrum-v1.2/telemetrum-v1.2-$(VERSION).ihx \
+	src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx \
+	src/telemini-v1.0/telemini-v1.0-$(VERSION).ihx
+
 keithp-fat: fat
 	ssh keithp.com mkdir -p public_html/altos-$(VERSION)
-	scp -p $(fat_linux) $(fat_mac) $(fat_windows) $(fat_android) keithp.com:public_html/altos-$(VERSION)
+	scp -p $(fat_linux) $(fat_mac) $(fat_windows) $(fat_android) $(fat_altos) keithp.com:public_html/altos-$(VERSION)
 
 set-java-versions:
 	$(top_srcdir)/fix-java-versions org.altusmetrum.altoslib=$(ALTOSLIB_VERSION) org.altusmetrum.altosuilib=$(ALTOSUILIB_VERSION)

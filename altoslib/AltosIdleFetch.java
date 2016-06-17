@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 import java.util.*;
@@ -134,9 +134,6 @@ public class AltosIdleFetch implements AltosStateUpdate {
 
 	AltosLink		link;
 
-	double			frequency;
-	String			callsign;
-
 	public void update_state(AltosState state) throws InterruptedException, AltosUnknownProduct {
 		try {
 			boolean	matched = false;
@@ -148,6 +145,8 @@ public class AltosIdleFetch implements AltosStateUpdate {
 			state.set_ground_accel(config_data.accel_cal_plus);
 			state.set_accel_g(config_data.accel_cal_plus, config_data.accel_cal_minus);
 			state.set_product(config_data.product);
+			state.set_firmware_version(config_data.version);
+			state.set_log_space(config_data.log_space);
 			for (AltosIdler idler : idlers) {
 				if (idler.matches(config_data)) {
 					idler.update_state(state, link, config_data);

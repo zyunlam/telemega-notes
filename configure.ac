@@ -18,8 +18,8 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.6.3)
-ANDROID_VERSION=11
+AC_INIT([altos], 1.6.4)
+ANDROID_VERSION=12
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
@@ -31,8 +31,8 @@ AC_SUBST(ANDROID_VERSION)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=10
-ALTOSLIB_VERSION=10
+ALTOSUILIB_VERSION=11
+ALTOSLIB_VERSION=11
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])

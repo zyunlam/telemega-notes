@@ -20,7 +20,7 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 import java.io.*;
 
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 import android.app.Activity;
 import android.graphics.*;
@@ -84,6 +84,8 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	boolean			scaling;
 	AltosMap		map;
 	AltosDroid		altos_droid;
+
+	static int scale = 2;
 
 	AltosLatLon	here;
 	AltosLatLon	there;
@@ -181,14 +183,14 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			}
 		}
 
-		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(cache, upper_left, center, zoom, maptype, px_size, 2);
+		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+			super(cache, upper_left, center, zoom, maptype, px_size, scale);
 		}
 
 	}
 
-	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new MapTile(cache, upper_left, center, zoom, maptype, px_size);
+	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+		return new MapTile(cache, upper_left, center, zoom, maptype, px_size, scale);
 	}
 
 	public AltosMapPath new_path() {
@@ -492,7 +494,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 
 	public void onCreateView(AltosDroid altos_droid) {
 		this.altos_droid = altos_droid;
-		map = new AltosMap(this);
+		map = new AltosMap(this, scale);
 		AltosPreferences.register_map_type_listener(this);
 		map.set_maptype(AltosPreferences.map_type());
 

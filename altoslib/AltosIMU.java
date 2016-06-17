@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosIMU implements Cloneable, Serializable {
+public class AltosIMU implements Cloneable {
 	public int		accel_along;
 	public int		accel_across;
 	public int		accel_through;
@@ -29,13 +29,13 @@ public class AltosIMU implements Cloneable, Serializable {
 	public int		gyro_pitch;
 	public int		gyro_yaw;
 
-	public static double	counts_per_g = 2048.0;
+	public static final double	counts_per_g = 2048.0;
 
 	public static double convert_accel(double counts) {
 		return counts / counts_per_g * (-AltosConvert.GRAVITATIONAL_ACCELERATION);
 	}
 
-	public static double	counts_per_degsec = 16.4;
+	public static final double	counts_per_degsec = 16.4;
 
 	public static double convert_gyro(double counts) {
 		return counts / counts_per_degsec;

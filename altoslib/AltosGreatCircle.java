@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.lang.Math;
 import java.io.*;
 
-public class AltosGreatCircle implements Cloneable, Serializable {
+public class AltosGreatCircle implements Cloneable {
 	public double	distance;
 	public double	bearing;
 	public double	range;
@@ -71,7 +71,10 @@ public class AltosGreatCircle implements Cloneable, Serializable {
 				course = 2 * Math.PI-course;
 		}
 		distance = d * earth_radius;
-		bearing = course * 180/Math.PI;
+		if (Double.isNaN(course) || Double.isInfinite(course))
+			bearing = 0;
+		else
+			bearing = course * 180/Math.PI;
 
 		double height_diff = end_alt - start_alt;
 		range = Math.sqrt(distance * distance + height_diff * height_diff);

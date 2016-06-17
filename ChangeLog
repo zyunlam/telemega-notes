@@ -1,3 +1,688 @@
+commit 31cf047113ec72a78f4b500223a2c6be23bc86fd
+Merge: 2f0c977 afe74c0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Jun 17 10:00:10 2016 -0600
+
+    Merge branch 'master' into branch-1.6
+
+commit afe74c067a31ce420d0d4cdac2069c1d258a5114
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 08:58:06 2016 -0700
+
+    Bump version to 1.6.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0c5a1bea3ffa7c4b6b1503733e33911cbfcb3e80
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 08:54:19 2016 -0700
+
+    altoslib: Stop reflective JSON class walk at Object instead of null
+    
+    Android has classes above Object which are all tied together which
+    cause the object walking to fail in pretty spectacular ways. As Object
+    has no interesting fields, that serves as a fine barrier to the super
+    class walk and works on both android and real java.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 383dec4449f8160c06804fba06290e7a07335934
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 08:27:12 2016 -0700
+
+    altosui: Print filename before attempting to parse in --summary mode
+    
+    Any problems handling the file are easier to debug if the filename is
+    visible above the error message.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e8250fcb267a34fbbd8b88c6dcc8eec419bbcc68
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 08:26:31 2016 -0700
+
+    altoslib: Add back some JSON exception debugging printfs
+    
+    These make it possible to figure out where the JSON code went wrong.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a46df4f69984e3ef0064c2b211438c8d8ffaab68
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 08:17:57 2016 -0700
+
+    altoslib: Add construction for remaining primitive array types to JSON
+    
+    AltosCompanion has an array of ints, which was missed until I tried a
+    telemetry file with companion data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1ed6a3fb6356415c0d57ce2ce556435c6ff06e73
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 08:17:15 2016 -0700
+
+    altoslib: Add null constructor for AltosCompanion
+    
+    This lets it be used by the JSON code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1dce20f7eee56166ac61798ca26eeb323dc8f012
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 00:52:38 2016 -0700
+
+    altoslib: Get rid of manual JSON encoding stuff
+    
+    Now that the reflective JSON stuff is working, we can delete all of
+    the manual code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7175774c4f60ed3efd54417f2035b50ea0108c7b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 00:02:05 2016 -0700
+
+    altoslib: Improve AltosState save/restore debugging
+    
+    When save/restore generate different values, write out the two
+    versions to one.json and two.json for easy comparison.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8df6afe843e184e98e5d965cee3af562dfa30a3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 00:01:15 2016 -0700
+
+    altoslib: Use reflection JSON code for frequency preferences
+    
+    This replaces the non-reflective JSON code with reflective code, which
+    is much shorter.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 93de1d7ec841c55f5a1a63d34b422780a6fbe3c3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 00:00:09 2016 -0700
+
+    altoslib: Add JSON-based object saving/restoring code
+    
+    This uses Java reflection to construct JSON strings for
+    most Java objects.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2a1b7c6c509d4d19de21abf02b63aeacba269d13
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 16 23:59:06 2016 -0700
+
+    altoslib: Add null constructors to AltosQuaternion and AltosRotation
+    
+    These will be used in the reflection-based JSON code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f7e2f7f430e612c682bf55478860054ce94b995f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 15 22:52:08 2016 -0700
+
+    altoslib: Remove AltosHashSet code
+    
+    Everything has switched to JSON now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1b5ea911049a8afae6af475a4a2bf62a6e3aa57b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 15 22:40:27 2016 -0700
+
+    altoslib: Switch preserved state format to JSON
+    
+    This is much easier to debug than the icky strings with backslashes everywhere.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1de8b6c340cec0b5a327392686c5a4e00f201e98
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 15 22:39:31 2016 -0700
+
+    doc: Updates to 1.6.4 release notes.
+    
+    Note USB fixes for host reboot and other changes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f28db1102685c87b9f4278268f7e91f5df18374a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 15 22:38:32 2016 -0700
+
+    altosui: Don't open command window when --graph is provided
+    
+    When the user explicitly asks to open a graph, don't bring up the
+    command button window too.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2a4d741872449b5332f28e018fa3acc53ed7d891
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 15 22:37:39 2016 -0700
+
+    altosuilib: Track open frames, exit when none remain
+    
+    This will let us not have the altosui window open by causing the
+    application to shut down when the last frame closes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 04c6f4c54ac10f6464ffb8cab2186ac2b2eafb00
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 15 22:36:35 2016 -0700
+
+    altosui: Remove missing items from --summary output
+    
+    Check all values for MISSING before printing them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7fd28830b6f7a20b35d85a92047ccb94c965fe29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 15 22:33:55 2016 -0700
+
+    altosdroid: Auto save freq changes on 'ok'
+    
+    Add any pending changes in the edit entries to the frequency set when
+    the user selects 'ok'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96eb350d3dfc83f6dfb31bbab1427f9206acde79
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jun 12 09:23:36 2016 -0600
+
+    extend "ok" temp range to 40C, since battery charger on bench can drive temp above
+    35C at times in Bdale and Robert's production testing
+
+commit eee7fa303fb0d80ac5d7b9c5a86af60333f61951
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 11 22:17:01 2016 -0700
+
+    altos/stmf0: Remove ao_usb_free
+    
+    This can't work without a lot more effort.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1704d27248f1845c545ec61cf1bad58bf41189af
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 11 22:16:12 2016 -0700
+
+    altos/stmf0: Rework the sram allocation to save a few text bytes
+    
+    Boot loaders were going over 4096 bytes of ROM. I suspect we'll need
+    more serious work soon.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 36a08dc89ece6e2a2f0f69e3b31da17d66ceb2e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 10 14:40:26 2016 -0700
+
+    altos/cc1115l: Reduce trace buffer size
+    
+    A 32-element trace buffer is all the larger we can fit in teledongle.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7d21ff641a7bc35318f0f637589eabb5bb6c5152
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 10 14:39:25 2016 -0700
+
+    altos/stm: Handle USB reset in STM32L usb driver
+    
+    Just like lpc and stmf0, deal with the host resetting the bus while
+    rebooting by restoring all usb-related data to the initial values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54f8d53584d0a902676b441cd122c01cd54f2283
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 10 14:33:50 2016 -0700
+
+    altos/lpc: Handle USB reset by resetting internal state
+    
+    Just like stmf0, this clears internal state at USB reset time so the
+    driver can survive host OS reboots.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 36ba97fabbed2f2a4a89da5be221c630ea3ff66f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 9 22:06:30 2016 -0700
+
+    stmf0: Do not send more data than requested for GET_DESCRIPTOR
+    
+    When Linux boots, it asks for only the first 8 bytes of the device
+    descriptor; we must limit the amount of data sent back to that amount
+    or USB will get wedged.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2970de9f92243b11d3beef56f3b1df3ef3579b95
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 9 22:05:24 2016 -0700
+
+    stmf0: Clear all USB state when resetting chip. Wakeup all sleepers
+    
+    When USB is reset, but the board is not power cycled, all of the
+    internal USB state needs to be reset, and any tasks blocked on sending
+    or receiving packets need to be awoken so they can go wait for USB to
+    start running again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55c8e5aff2cc7b941503a04970f7d368261af52a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 9 22:03:45 2016 -0700
+
+    telegps-v1.0: Document how SN 1959 was fixed
+    
+    SN1959 was fixed by jumpering pin 8 to pin 10 so that the DONE_INT_PIN
+    could be switched from PIO 2 to PIO 4 as pin 8 appeared to have failed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4d57c8b87f29f23beb0d88f1cef179209b1c5992
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 5 09:17:12 2016 -0700
+
+    altosuilib: Only display map debugging when serial_debug is enabled
+    
+    This keeps the application quiet for most users.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f982248573c1b646ac53fde980a60ada5404f6aa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 27 20:30:18 2016 -0700
+
+    altosuilib: Fill preload map on site or lat/lon change
+    
+    This loads the map view with the selected area when the site entry is
+    changed or the user hits return in the lat/lon fields. This lets you
+    see the target launch site without having to load the whole preload set.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f5944ba4eb3f419f8cad461872d048b5adf7b566
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 26 14:33:44 2016 -0700
+
+    doc: pad/idle indicator table was busted
+    
+    I stuck a pile of extra '|' characters in the table by mistake.
+    
+    Reported-by: Stan <stanleyosmith@gmail.com>
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d966b74f756e88e5dffa92400b105f540429262
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 24 23:44:50 2016 -0700
+
+    altosuilib: Rename AltosUIMap*New.java to AltosUIMap*.java
+    
+    This code isn't really new anymore...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 59a9bdd73b580a9c934a574be7bf45c5033e14b5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 24 23:40:47 2016 -0700
+
+    altosuilib: Have map preload respond to units and font size changes
+    
+    Just add suitable listeners so that the display updates when
+    preferences change.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b5521966119fcc290591bf1b397506ef44cedea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 24 23:40:03 2016 -0700
+
+    altoslib: use miles for distances > 1000ft.
+    
+    This makes both the map line and the other distance displays use miles
+    for distances greater than 1000 feet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1ea855f95772a8a394407e0070be1ed9cc0f6650
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 15 13:59:12 2016 -0700
+
+    telegps: Add monitor idle mode
+    
+    This monitors directly connected devices. No support for doing monitor
+    idle using packet mode, as TeleGPS doesn't support that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit df276262900551a5eecd94903eefe9a264b161ec
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 15 13:58:41 2016 -0700
+
+    telegps: Use log_space when flight_log_max is missing
+    
+    TeleGPS has this, but not flight_log_max
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9287122edc0e2dec6b2542f4cc8cb9cf2900bb33
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 15 13:57:28 2016 -0700
+
+    altoslib: Add AltosIdleReader
+    
+    This provides an AltosFlightReader interface for monitor idle mode,
+    making that easier to provide in TeleGPS
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3c4278a29082a2af5911e22e59f8f52549f549e3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 15 13:56:21 2016 -0700
+
+    altoslib: Add log_space to AltosState
+    
+    TeleGPS doesn't have flight_log_max value, but does have log_space
+    which we can use for the same thing in monitor idle mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f484216e72f81decb2aaa7289d6f69678990b7af
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 15 13:55:12 2016 -0700
+
+    altoslib: Set version and log space from AltosIdleFetch
+    
+    Just more data for monitor idle mode
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 29123a60272777916e5aae08369d0f03c2f135b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 15 13:53:38 2016 -0700
+
+    altoslib: Allow empty values in AltosHashSet representation
+    
+    Check for value termination before appending the first character.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b1a90adac9f6e2a609ce1ccd6749462bb5c9adbe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 12 23:33:53 2016 -0700
+
+    altoslib: Store saved state in version-independent format
+    
+    Use AltosHashSet for AltosState so that AltosDroid doesn't lose
+    tracker information when the application is upgraded.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b13037fad0905c5933d1ff579122ba1357b02eea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 12 19:13:05 2016 -0700
+
+    altoslib: Store common frequencies in library version-independent form
+    
+    Serializable Objects in java are very specific to the class being
+    serialized. As we bump the name of the library on a regular basis to
+    note API/ABI issues, this mean a saved a Serializable object in
+    the preferences database will fail to load across library version
+    upgrades.
+    
+    The saved tracker state and saved common frequencies were the only
+    objects saved in this form; this patch adds infrastructure for writing
+    objects in a version-independent form, and then adds support for
+    saving frequencies in that form.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2f4903f903223312d0a3a03dfd413059f24a07f5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 12 19:10:19 2016 -0700
+
+    altosui/telegps/micropeak: Handle both MULTI_LIB and non-MULTI_LIB builds
+    
+    On x86 systems with -m32 and -m64 compilers, both libaltos32.so and
+    libaltos64.so are built. Otherwise, we should use libaltos.so
+    
+    altosui only dealt with libaltos32.so and libaltos64.so, so it only
+    worked on MULTI_LIB systems. telegps and micropeak only used
+    libaltos.so, so they wouldn't work correctly on multi-lib systems.
+    
+    Fix all of them to work either way.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 64ed56fe3132faa8585c9cd7b0261ac85f70a7bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 12 18:05:14 2016 -0700
+
+    Automatically run 'git submodule update' if necessary
+    
+    This makes sure pdclib exists by updating for the all and
+    all-recursive targets
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 97adfff4cfb67c17a96f3ff46606b4e439422b01
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 12 12:14:03 2016 -0700
+
+    Bump java library versions
+    
+    Prepare for 1.6.4 release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3450efdf8bd736a33900493eeda348ec2dacf7e8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 12 12:13:45 2016 -0700
+
+    Bump android app version
+    
+    Prepare for 1.6.4 release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ba84b9c908d5909ea5a148c249709b21640f1eac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 11 23:31:53 2016 -0700
+
+    telegps: Adapt to distance units switching changes
+    
+    'show_units' is no longer available; use 'parse_units' instead
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2ec7e14f0104e3a227ff566fa2fc1f6286ddd9d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 11 12:48:10 2016 -0700
+
+    altoslib: Get rid of AltosMap from AltosMapLoader
+    
+    Cleans up the loader API and eliminates a AltosMapTile for every chunk
+    of map data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ab905d2f7d8929080042cfd16cc418ea5792c3cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 11 12:43:51 2016 -0700
+
+    altosdroid: make disconnect stick past pause/restart
+    
+    Clear the active_device preference on disconnect so we don't reconnect
+    anytime the service gets activated.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0a50669b1fde3e3c1cbc08c4836613b58ead219b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 11 10:47:31 2016 -0700
+
+    altoslib: Clean up map file and url handling
+    
+    move it all to AltosMapStore.java
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 471091d0fddf09ed69df75e4f2fdd92e5f57b9c5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 23:13:14 2016 -0700
+
+    doc: Start update for 1.6.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b2710128a715a109745ec40553a3d4149a7f49ab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 23:04:23 2016 -0700
+
+    altosuilib: Don't flicker missing voltages when changing units
+    
+    For some reason, a value of MISSING -1 was getting used, which caused
+    displays to light up briefly with a weird value when switching between
+    metric and imperial units.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 895cb58a6cd7424ee63c24d791b5988f41f85d31
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 23:03:45 2016 -0700
+
+    altosdroid: Rate limit map loading pacifier
+    
+    Just like in altosui.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c5f49d0ac254047f13c6c1ecfb5520eff72109ac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 23:02:09 2016 -0700
+
+    altoslib: Allow map preloading to be aborted
+    
+    Close the map preload dialog and it would be nice to stop loading map
+    bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2e551e7c5f82a7e35d39e8f73e8e526e5484cd5d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 22:50:23 2016 -0700
+
+    altosuilib: Rate limit map loading pacifier updates
+    
+    Just updating the pacifier was consuming a huge amount of CPU. Update
+    no more than once every 100ms.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 42021d9fdc6f7a74cc9b20ebf3cf60b4c5f4ea82
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 22:49:04 2016 -0700
+
+    altoslib: Remove some debug printf calls
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 60f4d69592c440ab7bb67a04f4c07fc7279d2c20
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 22:46:58 2016 -0700
+
+    altoslib: Switch distance from m/ft to km/miles for large values
+    
+    This adds lots of infrastructure to deal with making the unit used
+    depend on the value itself, and then uses it only for distances.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a6da23335e6e5864387c7a22946f80f51056a4f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 12:29:14 2016 -0700
+
+    Add TeleMega to spec list. Add TeleGPS RF output.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d92ca1cd4dfbacebd7aa1bbcfc671daee35dc808
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 10 12:28:51 2016 -0700
+
+    Publish firmware with keithp-fat
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a371253bb5fc25e34d87507dc9b814530f4e28f6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 9 17:57:12 2016 -0700
+
+    altosdroid: Check for closed before writing/reading bluetooth
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c57d86f6c9b56e90c986f460f93663a3e16cdf7a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 9 17:56:28 2016 -0700
+
+    altosui/telegps: Ship firmware for new hardware
+    
+    TBT v3.0 and Tmega v2.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f078235803a80403014b3e54039fd2d0e0704367
+Merge: 04759dd c457c82
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon May 9 15:52:38 2016 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 04759dddeb29e4de9f7e6b3673dc06c633fa2369
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon May 9 15:52:21 2016 -0600
+
+    process updates made during 1.6.3 release cycle
+
+commit c457c827a7445098ba5effd410de754ff5c65843
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 9 11:48:42 2016 -0700
+
+    Bump version to 1.6.3.1
+    
+    Post 1.6.3 release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b25785ee0afebaf516b8a1b8d08d36fbdadd74ca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 9 11:33:48 2016 -0700
+
+    altos/cc1111: Use SW to drive UART RTS pin
+    
+    Can't get the hw to work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2f0c977c747824d0798550ac64eceb1d66c50efd
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri May 6 18:12:20 2016 -0600
+
+    releasing 1.6.3
+
 commit 15ae97fbdb4e75a74ea2e716194661d19dec46ff
 Merge: ac7be4a 1216c0c
 Author: Bdale Garbee <bdale@gag.com>

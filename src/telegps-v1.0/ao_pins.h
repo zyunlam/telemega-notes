@@ -105,6 +105,16 @@
 #define AO_CC115L_DONE_INT_PORT		0
 #define AO_CC115L_DONE_INT_PIN		2
 
+/* SN 1959, owned by J. Patrick Bowers, had a hard landing and appears to have broken the
+ * internal connection between pin 8 and the chip. This board
+ * has been fixed by jumpering pin 8 to pin 10, which means that
+ * the DONE_INT_PIN is now 4 instead of 2. When building custom firmware for
+ * this board, just adjust the ao_pins.h value before compiling
+
+ #define AO_CC115L_DONE_INT_PIN_SN_1959	4
+
+ */
+
 /*
  * Flash (M25)
  */

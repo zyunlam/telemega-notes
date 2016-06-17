@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_10;
+package org.altusmetrum.altosuilib_11;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 public abstract class AltosUIVoltageIndicator extends AltosUIUnitsIndicator {
 
@@ -30,7 +30,7 @@ public abstract class AltosUIVoltageIndicator extends AltosUIUnitsIndicator {
 		return voltage(state);
 	}
 
-	double last_voltage = -1;
+	double last_voltage = AltosLib.MISSING;
 
 	public AltosUIVoltageIndicator (Container container, int x, int y, String name, int width) {
 		super(container, x, y, AltosConvert.voltage, name, 1, true, width);

@@ -409,9 +409,6 @@ uint16_t *
 ao_usb_alloc(void);
 
 void
-ao_usb_free(uint16_t *buffer);
-
-void
 ao_usb_write(uint16_t *buffer, uint16_t len);
 
 void

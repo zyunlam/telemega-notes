@@ -40,7 +40,7 @@ import android.os.Looper;
 import android.widget.Toast;
 import android.location.Criteria;
 
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 public class TelemetryService extends Service implements AltosIdleMonitorListener {
 
@@ -129,6 +129,8 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 			case MSG_DISCONNECT:
 				AltosDebug.debug("Disconnect command received");
 				s.address = null;
+				if (!(Boolean) msg.obj)
+					AltosDroidPreferences.set_active_device(null);
 				s.disconnect(true);
 				break;
 			case MSG_DELETE_SERIAL:
@@ -612,6 +614,8 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 
 		telemetry_state.latest_serial = AltosPreferences.latest_state();
 
+		AltosDebug.debug("latest serial %d\n", telemetry_state.latest_serial);
+
 		for (int serial : serials) {
 			AltosState saved_state = AltosPreferences.state(serial);
 			if (saved_state != null) {
@@ -628,6 +632,7 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 				telemetry_state.states.put(serial, saved_state);
 			} else {
 				AltosDebug.debug("Failed to recover state for %d", serial);
+				AltosPreferences.remove_state(serial);
 			}
 		}
 	}

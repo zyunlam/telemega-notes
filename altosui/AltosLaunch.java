@@ -20,7 +20,7 @@ package altosui;
 import java.io.*;
 import java.util.concurrent.*;
 import java.awt.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class AltosLaunch {
 	AltosDevice	device;
@@ -91,7 +91,7 @@ public class AltosLaunch {
 				throw new TimeoutException();
 			if (get_string(line, "Rssi: ", status_name)) {
 				try {
-					rssi = Altos.fromdec(status_name.get());
+					rssi = (int) Altos.fromdec(status_name.get());
 				} catch (NumberFormatException ne) {
 				}
 				break;

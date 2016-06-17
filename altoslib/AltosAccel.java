@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosAccel extends AltosUnits implements Serializable {
+public class AltosAccel extends AltosUnits {
 
 	public double value(double v, boolean imperial_units) {
 		if (imperial_units)

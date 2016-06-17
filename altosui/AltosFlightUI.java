@@ -22,8 +22,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_10.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosVoice		voice;
@@ -40,7 +40,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosDescent	descent;
 	AltosLanded	landed;
 	AltosCompanionInfo	companion;
-	AltosUIMapNew      sitemap;
+	AltosUIMap      sitemap;
 	boolean		has_map;
 	boolean		has_companion;
 	boolean		has_state;
@@ -289,7 +289,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		has_companion = false;
 		has_state = false;
 
-		sitemap = new AltosUIMapNew();
+		sitemap = new AltosUIMap();
 		displays.add(sitemap);
 		has_map = false;
 
