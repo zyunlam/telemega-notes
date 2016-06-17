@@ -492,8 +492,8 @@ public class AltosUI extends AltosUIFrame {
 		if (states == null)
 			return false;
 		try {
-			AltosFlightStats stats = new AltosFlightStats(states);
 			System.out.printf("%s:\n", file.toString());
+			AltosFlightStats stats = new AltosFlightStats(states);
 			if (stats.serial != AltosLib.MISSING)
 				System.out.printf("Serial:       %5d\n", stats.serial);
 			if (stats.flight != AltosLib.MISSING)
