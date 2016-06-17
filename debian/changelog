@@ -1,3 +1,75 @@
+altos (1.6.4-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altos/cc1111: Use SW to drive UART RTS pin
+  * Bump version to 1.6.3.1
+  * altosui/telegps: Ship firmware for new hardware
+  * altosdroid: Check for closed before writing/reading bluetooth
+  * Publish firmware with keithp-fat
+  * Add TeleMega to spec list. Add TeleGPS RF output.
+  * altoslib: Switch distance from m/ft to km/miles for large values
+  * altoslib: Remove some debug printf calls
+  * altosuilib: Rate limit map loading pacifier updates
+  * altoslib: Allow map preloading to be aborted
+  * altosdroid: Rate limit map loading pacifier
+  * altosuilib: Don't flicker missing voltages when changing units
+  * doc: Start update for 1.6.4
+  * altoslib: Clean up map file and url handling
+  * altosdroid: make disconnect stick past pause/restart
+  * altoslib: Get rid of AltosMap from AltosMapLoader
+  * telegps: Adapt to distance units switching changes
+  * Bump android app version
+  * Bump java library versions
+  * Automatically run 'git submodule update' if necessary
+  * altosui/telegps/micropeak: Handle both MULTI_LIB and non-MULTI_LIB builds
+  * altoslib: Store common frequencies in library version-independent form
+  * altoslib: Store saved state in version-independent format
+  * altoslib: Allow empty values in AltosHashSet representation
+  * altoslib: Set version and log space from AltosIdleFetch
+  * altoslib: Add log_space to AltosState
+  * altoslib: Add AltosIdleReader
+  * telegps: Use log_space when flight_log_max is missing
+  * telegps: Add monitor idle mode
+  * altoslib: use miles for distances > 1000ft.
+  * altosuilib: Have map preload respond to units and font size changes
+  * altosuilib: Rename AltosUIMap*New.java to AltosUIMap*.java
+  * doc: pad/idle indicator table was busted
+  * altosuilib: Fill preload map on site or lat/lon change
+  * altosuilib: Only display map debugging when serial_debug is enabled
+  * telegps-v1.0: Document how SN 1959 was fixed
+  * stmf0: Clear all USB state when resetting chip. Wakeup all sleepers
+  * stmf0: Do not send more data than requested for GET_DESCRIPTOR
+  * altos/lpc: Handle USB reset by resetting internal state
+  * altos/stm: Handle USB reset in STM32L usb driver
+  * altos/cc1115l: Reduce trace buffer size
+  * altos/stmf0: Rework the sram allocation to save a few text bytes
+  * altos/stmf0: Remove ao_usb_free
+  * altosdroid: Auto save freq changes on 'ok'
+  * altosui: Remove missing items from --summary output
+  * altosuilib: Track open frames, exit when none remain
+  * altosui: Don't open command window when --graph is provided
+  * doc: Updates to 1.6.4 release notes.
+  * altoslib: Switch preserved state format to JSON
+  * altoslib: Remove AltosHashSet code
+  * altoslib: Add null constructors to AltosQuaternion and AltosRotation
+  * altoslib: Add JSON-based object saving/restoring code
+  * altoslib: Use reflection JSON code for frequency preferences
+  * altoslib: Improve AltosState save/restore debugging
+  * altoslib: Get rid of manual JSON encoding stuff
+  * altoslib: Add null constructor for AltosCompanion
+  * altoslib: Add construction for remaining primitive array types to JSON
+  * altoslib: Add back some JSON exception debugging printfs
+  * altosui: Print filename before attempting to parse in --summary mode
+  * altoslib: Stop reflective JSON class walk at Object instead of null
+  * Bump version to 1.6.4
+
+  [ Bdale Garbee ]
+  * process updates made during 1.6.3 release cycle
+  * extend "ok" temp range to 40C, since battery charger on bench can drive temp above 35C at times in Bdale and Robert's production testing
+  * releasing 1.6.4
+
+ -- Bdale Garbee <bdale@gag.com>  Fri, 17 Jun 2016 10:02:32 -0600
+
 altos (1.6.3-1) unstable; urgency=medium
 
   [ Keith Packard ]
