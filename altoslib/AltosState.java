@@ -19,11 +19,11 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosState implements Cloneable, Serializable {
+public class AltosState implements Cloneable {
 
 	public static final int set_position = 1;
 	public static final int set_gps = 2;
@@ -46,7 +46,7 @@ public class AltosState implements Cloneable, Serializable {
 	private int	prev_tick;
 	public int	boost_tick;
 
-	class AltosValue implements Serializable{
+	class AltosValue {
 		double	value;
 		double	prev_value;
 		private double	max_value;
@@ -182,13 +182,18 @@ public class AltosState implements Cloneable, Serializable {
 			prev_value = AltosLib.MISSING;
 			max_value = AltosLib.MISSING;
 		}
+
 	}
 
-	class AltosCValue implements Serializable {
+	class AltosCValue {
 
-		class AltosIValue extends AltosValue implements Serializable {
+		class AltosIValue extends AltosValue {
 			boolean can_max() {
 				return c_can_max();
+			}
+
+			AltosIValue() {
+				super();
 			}
 		};
 
@@ -278,7 +283,7 @@ public class AltosState implements Cloneable, Serializable {
 			computed.finish_update();
 		}
 
-		AltosCValue() {
+		public AltosCValue() {
 			measured = new AltosIValue();
 			computed = new AltosIValue();
 		}
@@ -317,7 +322,7 @@ public class AltosState implements Cloneable, Serializable {
 		ground_altitude.set_measured(a, time);
 	}
 
-	class AltosGpsGroundAltitude extends AltosValue implements Serializable {
+	class AltosGpsGroundAltitude extends AltosValue {
 		void set(double a, double t) {
 			super.set(a, t);
 			pad_alt = value();
@@ -328,6 +333,10 @@ public class AltosState implements Cloneable, Serializable {
 			super.set_filtered(a, t);
 			pad_alt = value();
 			gps_altitude.set_gps_height();
+		}
+
+		AltosGpsGroundAltitude() {
+			super();
 		}
 	}
 
@@ -341,7 +350,7 @@ public class AltosState implements Cloneable, Serializable {
 		gps_ground_altitude.set(a, time);
 	}
 
-	class AltosGroundPressure extends AltosCValue implements Serializable {
+	class AltosGroundPressure extends AltosCValue {
 		void set_filtered(double p, double time) {
 			computed.set_filtered(p, time);
 			if (!is_measured())
@@ -351,6 +360,10 @@ public class AltosState implements Cloneable, Serializable {
 		void set_measured(double p, double time) {
 			super.set_measured(p, time);
 			ground_altitude.set_computed(pressure_to_altitude(p), time);
+		}
+
+		AltosGroundPressure () {
+			super();
 		}
 	}
 
@@ -364,7 +377,7 @@ public class AltosState implements Cloneable, Serializable {
 		ground_pressure.set_measured(pressure, time);
 	}
 
-	class AltosAltitude extends AltosCValue implements Serializable {
+	class AltosAltitude extends AltosCValue {
 
 		private void set_speed(AltosValue v) {
 			if (!acceleration.is_measured() || !ascent)
@@ -382,11 +395,15 @@ public class AltosState implements Cloneable, Serializable {
 			set_speed(measured);
 			set |= set_position;
 		}
+
+		AltosAltitude() {
+			super();
+		}
 	}
 
 	private AltosAltitude	altitude;
 
-	class AltosGpsAltitude extends AltosValue implements Serializable {
+	class AltosGpsAltitude extends AltosValue {
 
 		private void set_gps_height() {
 			double	a = value();
@@ -401,6 +418,10 @@ public class AltosState implements Cloneable, Serializable {
 		void set(double a, double t) {
 			super.set(a, t);
 			set_gps_height();
+		}
+
+		AltosGpsAltitude() {
+			super();
 		}
 	}
 
@@ -469,13 +490,17 @@ public class AltosState implements Cloneable, Serializable {
 		return gps_speed.max();
 	}
 
-	class AltosPressure extends AltosValue implements Serializable {
+	class AltosPressure extends AltosValue {
 		void set(double p, double time) {
 			super.set(p, time);
 			if (state == AltosLib.ao_flight_pad)
 				ground_pressure.set_filtered(p, time);
 			double a = pressure_to_altitude(p);
 			altitude.set_computed(a, time);
+		}
+
+		AltosPressure() {
+			super();
 		}
 	}
 
@@ -539,7 +564,7 @@ public class AltosState implements Cloneable, Serializable {
 		return AltosLib.MISSING;
 	}
 
-	class AltosSpeed extends AltosCValue implements Serializable {
+	class AltosSpeed extends AltosCValue {
 
 		boolean can_max() {
 			return state < AltosLib.ao_flight_fast || state == AltosLib.ao_flight_stateless;
@@ -562,6 +587,10 @@ public class AltosState implements Cloneable, Serializable {
 		void set_measured(double new_value, double time) {
 			super.set_measured(new_value, time);
 			set_accel();
+		}
+
+		AltosSpeed() {
+			super();
 		}
 	}
 
@@ -593,7 +622,7 @@ public class AltosState implements Cloneable, Serializable {
 		return AltosLib.MISSING;
 	}
 
-	class AltosAccel extends AltosCValue implements Serializable {
+	class AltosAccel extends AltosCValue {
 
 		boolean can_max() {
 			return state < AltosLib.ao_flight_fast || state == AltosLib.ao_flight_stateless;
@@ -603,6 +632,10 @@ public class AltosState implements Cloneable, Serializable {
 			super.set_measured(a, time);
 			if (ascent)
 				speed.set_integral(this.measured);
+		}
+
+		AltosAccel() {
+			super();
 		}
 	}
 
@@ -684,6 +717,7 @@ public class AltosState implements Cloneable, Serializable {
 	public double	ground_accel_avg;
 
 	public int	log_format;
+	public int	log_space;
 	public String	product;
 
 	public AltosMs5607	baro;
@@ -801,6 +835,7 @@ public class AltosState implements Cloneable, Serializable {
 		ground_accel_avg = AltosLib.MISSING;
 
 		log_format = AltosLib.MISSING;
+		log_space = AltosLib.MISSING;
 		product = null;
 		serial = AltosLib.MISSING;
 		receiver_serial = AltosLib.MISSING;
@@ -960,6 +995,7 @@ public class AltosState implements Cloneable, Serializable {
 		ground_accel_avg = old.ground_accel_avg;
 
 		log_format = old.log_format;
+		log_space = old.log_space;
 		product = old.product;
 		serial = old.serial;
 		receiver_serial = old.receiver_serial;
@@ -1076,6 +1112,10 @@ public class AltosState implements Cloneable, Serializable {
 			this.state = AltosLib.ao_flight_stateless;
 			break;
 		}
+	}
+
+	public void set_log_space(int log_space) {
+		this.log_space = log_space;
 	}
 
 	public void set_flight_params(int apogee_delay, int main_deploy) {
@@ -1483,6 +1523,31 @@ public class AltosState implements Cloneable, Serializable {
 	public AltosState clone() {
 		AltosState s = new AltosState();
 		s.copy(this);
+
+		/* Code to test state save/restore. Enable only for that purpose
+		 */
+		if (false) {
+			AltosJson	json = new AltosJson(this);
+			String		onetrip = json.toPrettyString();
+			AltosJson	back = AltosJson.fromString(onetrip);
+			AltosState	tripstate = (AltosState) back.make(this.getClass());
+			AltosJson	tripjson = new AltosJson(tripstate);
+			String		twotrip = tripjson.toPrettyString();
+
+			if (!onetrip.equals(twotrip)) {
+				try {
+					FileWriter one_file = new FileWriter("one.json", true);
+					one_file.write(onetrip);
+					one_file.flush();
+					FileWriter two_file = new FileWriter("two.json", true);
+					two_file.write(twotrip);
+					two_file.flush();
+				} catch (Exception e) {
+				}
+				System.out.printf("json error\n");
+				System.exit(1);
+			}
+		}
 		return s;
 	}
 

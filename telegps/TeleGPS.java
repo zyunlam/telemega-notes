@@ -24,8 +24,8 @@ import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
 import java.text.*;
-import org.altusmetrum.altoslib_10.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class TeleGPS
 	extends AltosUIFrame
@@ -53,6 +53,7 @@ public class TeleGPS
 
 	AltosFlightReader	reader;
 	TeleGPSDisplayThread	thread;
+	boolean			idle_mode;
 
 	JMenuBar		menu_bar;
 
@@ -71,7 +72,7 @@ public class TeleGPS
 
 	JTabbedPane		pane;
 
-	AltosUIMapNew  		map;
+	AltosUIMap  		map;
 	TeleGPSInfo		gps_info;
 	TeleGPSState		gps_state;
 	AltosInfoTable		info_table;
@@ -173,7 +174,7 @@ public class TeleGPS
 	}
 
 	void load_maps() {
-		new AltosUIMapPreloadNew(this);
+		new AltosUIMapPreload(this);
 	}
 
 	void disconnect() {
@@ -186,12 +187,10 @@ public class TeleGPS
 		disable_rate_menu();
 	}
 
-	void connect(AltosDevice device) {
-		if (reader != null)
-			disconnect();
+	void connect_flight(AltosDevice device) {
 		try {
 			AltosFlightReader	reader = new AltosTelemetryReader(new AltosSerial(device));
-			set_reader(reader, device);
+			set_reader(reader, device, false);
 		} catch (FileNotFoundException ee) {
 			JOptionPane.showMessageDialog(this,
 						      ee.getMessage(),
@@ -221,9 +220,51 @@ public class TeleGPS
 		}
 	}
 
+	void connect_idle(AltosDevice device) {
+		try {
+       			AltosFlightReader	reader = new AltosIdleReader(new AltosSerial(device), false);
+			set_reader(reader, device, true);
+		} catch (FileNotFoundException ee) {
+			JOptionPane.showMessageDialog(this,
+						      ee.getMessage(),
+						      String.format ("Cannot open %s", device.toShortString()),
+						      JOptionPane.ERROR_MESSAGE);
+		} catch (AltosSerialInUseException si) {
+			JOptionPane.showMessageDialog(this,
+						      String.format("Device \"%s\" already in use",
+								    device.toShortString()),
+						      "Device in use",
+						      JOptionPane.ERROR_MESSAGE);
+		} catch (IOException ee) {
+			JOptionPane.showMessageDialog(this,
+						      String.format ("Unknown I/O error on %s", device.toShortString()),
+						      "Unknown I/O error",
+						      JOptionPane.ERROR_MESSAGE);
+		} catch (TimeoutException te) {
+			JOptionPane.showMessageDialog(this,
+						      String.format ("Timeout on %s", device.toShortString()),
+						      "Timeout error",
+						      JOptionPane.ERROR_MESSAGE);
+		} catch (InterruptedException ie) {
+			JOptionPane.showMessageDialog(this,
+						      String.format("Interrupted %s", device.toShortString()),
+						      "Interrupted exception",
+						      JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	void connect(AltosDevice device) {
+		if (reader != null)
+			disconnect();
+		if (device.matchProduct(AltosLib.product_basestation))
+			connect_flight(device);
+		else
+			connect_idle(device);
+	}
+
 	void connect() {
 		AltosDevice	device = AltosDeviceUIDialog.show(this,
-								  AltosLib.product_basestation);
+								  AltosLib.product_any);
 		if (device == null)
 			return;
 		connect(device);
@@ -397,7 +438,8 @@ public class TeleGPS
 
 	}
 
-	public void set_reader(AltosFlightReader reader, AltosDevice device) {
+	public void set_reader(AltosFlightReader reader, AltosDevice device, boolean idle_mode) {
+		this.idle_mode = idle_mode;
 		status_update = new TeleGPSStatusUpdate(telegps_status);
 
 		telegps_status.start(status_update);
@@ -407,8 +449,13 @@ public class TeleGPS
 		thread.start();
 
 		if (device != null) {
-			enable_frequency_menu(device.getSerial(), reader);
-			enable_rate_menu(device.getSerial(), reader);
+			if (idle_mode) {
+				disable_frequency_menu();
+				disable_rate_menu();
+			} else {
+				enable_frequency_menu(device.getSerial(), reader);
+				enable_rate_menu(device.getSerial(), reader);
+			}
 		}
 	}
 
@@ -520,7 +567,7 @@ public class TeleGPS
 		/* Make the tabbed pane use the rest of the window space */
 		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));
 
-		map = new AltosUIMapNew();
+		map = new AltosUIMap();
 		pane.add(map.getName(), map);
 		displays.add(map);
 
@@ -554,9 +601,9 @@ public class TeleGPS
 		add_window();
 	}
 
-	public TeleGPS(AltosFlightReader reader) {
+	public TeleGPS(AltosFlightReader reader, boolean idle_mode) {
 		this();
-		set_reader(reader, null);
+		set_reader(reader, null, idle_mode);
 	}
 
 	public TeleGPS(AltosDevice device) {
@@ -602,7 +649,7 @@ public class TeleGPS
 		if (new_reader == null)
 			return false;
 
-		new TeleGPS(new_reader);
+		new TeleGPS(new_reader, true);
 		return true;
 	}
 

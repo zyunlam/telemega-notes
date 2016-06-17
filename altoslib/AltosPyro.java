@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.util.*;
 import java.text.*;
@@ -138,7 +138,7 @@ public class AltosPyro {
 			units = pyro_to_units.get(flag);
 		if (units == null)
 			return name;
-		return String.format ("%s (%s)", name, units.show_units());
+		return String.format ("%s (%s)", name, units.parse_units());
 	}
 
 	public static AltosUnits pyro_to_units(int flag) {
@@ -277,7 +277,7 @@ public class AltosPyro {
 				int	value = 0;
 				++i;
 				try {
-					value = AltosLib.fromdec(tokens[i]);
+					value = (int) AltosLib.fromdec(tokens[i]);
 				} catch (NumberFormatException n) {
 					throw new ParseException(String.format("Invalid pyro value \"%s\"",
 									       tokens[i]), i);

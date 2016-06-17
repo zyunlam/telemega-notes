@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.text.*;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosGPS implements Cloneable, Serializable {
+public class AltosGPS implements Cloneable {
 
 	public final static int MISSING = AltosLib.MISSING;
 

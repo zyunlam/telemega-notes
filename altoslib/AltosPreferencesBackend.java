@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 import java.util.*;
@@ -38,40 +38,20 @@ public abstract class AltosPreferencesBackend {
 	public abstract byte[]  getBytes(String key, byte[] def);
 	public abstract void    putBytes(String key, byte[] value);
 
-	public Serializable getSerializable(String key, Serializable def) {
-		byte[] bytes = null;
+	public AltosJson	getJson(String key) {
+		String	value = getString(key, null);
 
-		bytes = getBytes(key, null);
-		if (bytes == null)
-			return def;
-
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-
+		if (value == null)
+			return null;
 		try {
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			Serializable object = (Serializable) ois.readObject();
-			return object;
-		} catch (IOException ie) {
-			debug("IO exception %s\n", ie.toString());
-		} catch (ClassNotFoundException ce) {
-			debug("ClassNotFoundException %s\n", ce.toString());
+			return AltosJson.fromString(value);
+		} catch (IllegalArgumentException ie) {
+			return null;
 		}
-		return def;
 	}
 
-	public void putSerializable(String key, Serializable object) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		try {
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-
-			oos.writeObject(object);
-			byte[] bytes = baos.toByteArray();
-
-			putBytes(key, bytes);
-		} catch (IOException ie) {
-			debug("set_state failed %s\n", ie.toString());
-		}
+	public void	       	putJson(String key, AltosJson j) {
+		putString(key, j.toString());
 	}
 
 	public abstract boolean nodeExists(String key);

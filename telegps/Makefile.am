@@ -42,8 +42,14 @@ JAR=telegps.jar
 
 FATJAR=telegps-fat.jar
 
+if MULTI_ARCH
+LIBALTOS_LINUX=libaltos32.so libaltos64.so
+else
+LIBALTOS_LINUX=libaltos.so
+endif
+
 LIBALTOS= \
-	libaltos.so \
+	$(LIBALTOS_LINUX) \
 	libaltos.dylib \
 	altos64.dll \
 	altos.dll
@@ -101,7 +107,8 @@ FIRMWARE_TD_3_0=$(top_srcdir)/src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx
 FIRMWARE_TD=$(FIRMWARE_TD_0_2) $(FIRMWARE_TD_3_0)
 
 FIRMWARE_TBT_1_0=$(top_srcdir)/src/telebt-v1.0/telebt-v1.0-$(VERSION).ihx
-FIRMWARE_TBT=$(FIRMWARE_TBT_1_0)
+FIRMWARE_TBT_3_0=$(top_srcdir)/src/telebt-v3.0/telebt-v3.0-$(VERSION).ihx
+FIRMWARE_TBT=$(FIRMWARE_TBT_1_0) $(FIRMWARE_TBT_3_0)
 
 FIRMWARE_TG_1_0=$(top_srcdir)/src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx
 FIRMWARE_TG=$(FIRMWARE_TG_1_0)
@@ -117,9 +124,8 @@ all-local: telegps-test telegps-jdb $(JAR)
 clean-local:
 	-rm -rf classes $(JAR) $(FATJAR) \
 		TeleGPS-Linux-*.tar.bz2 TeleGPS-Mac-*.dmg TeleGPS-Windows-*.exe \
-		$(ALTOSLIB_CLASS) \
-		$(ALTOSUILIB_CLASS) \
-		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
+		altoslib_*.jar altosuilib_*.jar \
+		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(FREETTS_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		telegps telegps-test telegps-jdb macosx linux windows telegps-windows.log \
 		telegps-windows.nsi *.desktop
 
@@ -140,7 +146,7 @@ DOC=$(TELEGPS_DOC)
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
-LINUX_FILES=$(FAT_FILES) libaltos.so $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
+LINUX_FILES=$(FAT_FILES) $(LIBALTOS_LINUX) $(FIRMWARE) $(DOC) $(desktop_file).in $(LINUX_ICONS) $(LINUX_MIMETYPE)
 LINUX_EXTRA=telegps-fat $(desktop_file).in
 
 MACOSX_INFO_PLIST=Info.plist
@@ -218,6 +224,14 @@ libaltos.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
+libaltos32.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
 libaltos.dylib:
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
@@ -229,6 +243,10 @@ altos.dll: ../libaltos/altos.dll
 altos64.dll: ../libaltos/altos64.dll
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
+
+../libaltos/.libs/libaltos64.so: ../libaltos/.libs/libaltos32.so
+
+../libaltos/.libs/libaltos32.so: build-libaltos
 
 ../libaltos/.libs/libaltos.so: build-libaltos
 

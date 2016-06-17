@@ -15,12 +15,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosMs5607 implements Serializable {
+public class AltosMs5607 {
 	public int	reserved;
 	public int	sens;
 	public int	off;

@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 import java.lang.*;
@@ -51,6 +51,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	};
 
 	AltosMapInterface	map_interface;
+	int			scale;
 
 	AltosMapCache		cache;
 
@@ -328,7 +329,8 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 				if (!tiles.containsKey(point)) {
 					AltosLatLon	ul = transform.lat_lon(point);
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
-					AltosMapTile tile = map_interface.new_tile(cache, ul, center, zoom, maptype, px_size);
+					AltosMapTile tile = map_interface.new_tile(cache, ul, center, zoom, maptype, px_size, scale);
+					debug("show state %s url %s\n", AltosMapTile.status_name(tile.store.status()), tile.store.url);
 					tile.add_listener(this);
 					tiles.put(point, tile);
 				}
@@ -475,11 +477,16 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			drag_stop(x, y);
 	}
 
-	public AltosMap(AltosMapInterface map_interface) {
+	public AltosMap(AltosMapInterface map_interface, int scale) {
 		this.map_interface = map_interface;
+		this.scale = scale;
 		cache = new AltosMapCache(map_interface);
 		line = map_interface.new_line();
 		path = map_interface.new_path();
 		set_zoom_label();
+	}
+
+	public AltosMap(AltosMapInterface map_interface) {
+		this(map_interface, 1);
 	}
 }

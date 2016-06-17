@@ -167,13 +167,15 @@
 		 signals, but no record of the flight will be
 		 stored in on-board flash.
 
+		ifdef::easymega,telemega[]
 		|Additional Igniters
 		|four very short beeps
 		|Continuity indication for the four additional pyro
-		|channels on TeleMega and EasyMega. One high tone for
-		|no continuity, one low tone for continuity. These are
-		|produced after the continuity indicators for the two
-		|primary igniter channels.
+		 channels on TeleMega and EasyMega. One high tone for
+		 no continuity, one low tone for continuity. These are
+		 produced after the continuity indicators for the two
+		 primary igniter channels.
+		endif::easymega,telemega[]
 
 		|====
 

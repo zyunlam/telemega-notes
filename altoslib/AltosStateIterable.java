@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 import java.util.*;
@@ -32,7 +32,6 @@ public abstract class AltosStateIterable implements Iterable<AltosState> {
 		try {
 			in = new FileInputStream(file);
 		} catch (Exception e) {
-			System.out.printf("Failed to open file '%s'\n", file);
 			return null;
 		}
 		if (file.getName().endsWith("telem"))

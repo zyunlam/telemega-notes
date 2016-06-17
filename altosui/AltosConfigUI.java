@@ -22,8 +22,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.text.*;
-import org.altusmetrum.altoslib_10.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class AltosConfigUI
 	extends AltosUIDialog
@@ -976,7 +976,7 @@ public class AltosConfigUI
 	}
 
 	String get_main_deploy_label() {
-		return String.format("Main Deploy Altitude(%s):", AltosConvert.height.show_units());
+		return String.format("Main Deploy Altitude(%s):", AltosConvert.height.parse_units());
 	}
 
 	String[] main_deploy_values() {
@@ -1243,7 +1243,7 @@ public class AltosConfigUI
 	}
 
 	String get_tracker_motion_label() {
-		return String.format("Logging Trigger Motion (%s):", AltosConvert.height.show_units());
+		return String.format("Logging Trigger Motion (%s):", AltosConvert.height.parse_units());
 	}
 
 	void set_tracker_tool_tip() {

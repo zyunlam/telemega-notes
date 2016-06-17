@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 import java.util.*;
@@ -116,7 +116,7 @@ public class AltosPreferences {
 	public final static String	frequency_count = "COUNT";
 	public final static String	frequency_format = "FREQUENCY-%d";
 	public final static String	description_format = "DESCRIPTION-%d";
-	public final static String	frequenciesPreference = "FREQUENCIES";
+	public final static String	frequenciesPreference = "FREQUENCIES-1";
 
 	/* Units preference */
 
@@ -133,24 +133,30 @@ public class AltosPreferences {
 	static int	map_type;
 
 	public static AltosFrequency[] load_common_frequencies() {
-
 		AltosFrequency[] frequencies = null;
 
-		frequencies = (AltosFrequency[]) backend.getSerializable(frequenciesPreference, null);
+		try {
+			AltosJson json = AltosJson.fromString(backend.getString(frequenciesPreference,
+										null));
+			frequencies = (AltosFrequency[]) json.make(frequencies.getClass());
+		} catch (Exception e) {
+		}
 
 		if (frequencies == null) {
 			if (backend.nodeExists(common_frequencies_node_name)) {
 				AltosPreferencesBackend	node = backend.node(common_frequencies_node_name);
 				int		count = node.getInt(frequency_count, 0);
 
-				frequencies = new AltosFrequency[count];
-				for (int i = 0; i < count; i++) {
-					double	frequency;
-					String	description;
+				if (count > 0) {
+					frequencies = new AltosFrequency[count];
+					for (int i = 0; i < count; i++) {
+						double	frequency;
+						String	description;
 
-					frequency = node.getDouble(String.format(frequency_format, i), 0.0);
-					description = node.getString(String.format(description_format, i), null);
-					frequencies[i] = new AltosFrequency(frequency, description);
+						frequency = node.getDouble(String.format(frequency_format, i), 0.0);
+						description = node.getString(String.format(description_format, i), null);
+						frequencies[i] = new AltosFrequency(frequency, description);
+					}
 				}
 			}
 		}
@@ -163,6 +169,12 @@ public class AltosPreferences {
 			}
 		}
 		return frequencies;
+	}
+
+	public static void save_common_frequencies() {
+		AltosJson	json = new AltosJson(common_frequencies);
+		backend.putString(frequenciesPreference, json.toString());
+		flush_preferences();
 	}
 
 	public static int launcher_serial;
@@ -353,7 +365,7 @@ public class AltosPreferences {
 	public static void set_state(AltosState state) {
 
 		synchronized(backend) {
-			backend.putSerializable(String.format(statePreferenceFormat, state.serial), state);
+			backend.putJson(String.format(statePreferenceFormat, state.serial), new AltosJson(state));
 			backend.putInt(statePreferenceLatest, state.serial);
 			flush_preferences();
 		}
@@ -378,6 +390,7 @@ public class AltosPreferences {
 	public static void remove_state(int serial) {
 		synchronized(backend) {
 			backend.remove(String.format(statePreferenceFormat, serial));
+			flush_preferences();
 		}
 	}
 
@@ -392,10 +405,12 @@ public class AltosPreferences {
 	public static AltosState state(int serial) {
 		synchronized(backend) {
 			try {
-				return (AltosState) backend.getSerializable(String.format(statePreferenceFormat, serial), null);
+				AltosJson json = backend.getJson(String.format(statePreferenceFormat, serial));
+				if (json != null)
+					return (AltosState) (json.make(AltosState.class));
 			} catch (Exception e) {
-				return null;
 			}
+			return null;
 		}
 	}
 
@@ -512,8 +527,8 @@ public class AltosPreferences {
 	public static void set_common_frequencies(AltosFrequency[] frequencies) {
 		synchronized(backend) {
 			common_frequencies = frequencies;
-			backend.putSerializable(frequenciesPreference, frequencies);
-			flush_preferences();
+
+			save_common_frequencies();
 		}
 	}
 

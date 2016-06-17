@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosFrequency implements Serializable {
+public class AltosFrequency {
 	public double	frequency;
 	public String	description;
 
@@ -57,7 +57,6 @@ public class AltosFrequency implements Serializable {
 
 		return diff < 0.010;
 	}
-
 	public AltosFrequency(double f, String d) {
 		frequency = f;
 		description = d;

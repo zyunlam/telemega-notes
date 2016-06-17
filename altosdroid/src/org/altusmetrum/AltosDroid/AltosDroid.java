@@ -51,7 +51,7 @@ import android.hardware.usb.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener {
 
@@ -825,9 +825,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 	}
 
-	private void disconnectDevice() {
+	private void disconnectDevice(boolean remember) {
 		try {
-			mService.send(Message.obtain(null, TelemetryService.MSG_DISCONNECT, null));
+			mService.send(Message.obtain(null, TelemetryService.MSG_DISCONNECT, (Boolean) remember));
 		} catch (RemoteException e) {
 		}
 	}
@@ -978,11 +978,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		case R.id.disconnect:
 			/* Disconnect the device
 			 */
-			disconnectDevice();
+			disconnectDevice(false);
 			return true;
 		case R.id.quit:
 			AltosDebug.debug("R.id.quit");
-			disconnectDevice();
+			disconnectDevice(true);
 			finish();
 			return true;
 		case R.id.setup:

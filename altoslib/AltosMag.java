@@ -15,17 +15,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosMag implements Cloneable, Serializable {
+public class AltosMag implements Cloneable {
 	public int		along;
 	public int		across;
 	public int		through;
 
-	public static double counts_per_gauss = 1090;
+	public static final double counts_per_gauss = 1090;
 
 	public static double convert_gauss(double counts) {
 		return counts / counts_per_gauss;

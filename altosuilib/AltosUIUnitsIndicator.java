@@ -15,11 +15,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_10;
+package org.altusmetrum.altosuilib_11;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 
@@ -46,10 +46,10 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 
 	public double[] last_values;
 
-	public void show(double... v) {
+	private void show(boolean force, double... v) {
 		show();
 		for (int i = 0; i < values.length; i++) {
-			if (v[i] != last_values[i]) {
+			if (force || v[i] != last_values[i]) {
 				String	value_text;
 				boolean	good = false;
 
@@ -68,13 +68,19 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 		}
 	}
 
+	boolean hide = false;
+
+	public void show(double... v) {
+		show(false, v);
+	}
+
 	public void units_changed(boolean imperial_units) {
-		show(last_values);
+		if (!hide)
+			show(true, last_values);
 	}
 
 	public void show (AltosState state, AltosListenerState listener_state) {
 		double[] v = new double[values.length];
-		boolean hide = false;
 
 		for (int i = 0; i < values.length; i++) {
 			if (state != null)
@@ -93,7 +99,7 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 
 	public void reset() {
 		for (int i = 0; i < last_values.length; i++)
-			last_values[i] = AltosLib.MISSING - 1;
+			last_values[i] = AltosLib.MISSING;
 	}
 
 	public AltosUIUnitsIndicator (Container container, int x, int y, int label_width, AltosUnits units, String name, int number_values, boolean has_lights, int width) {
@@ -101,7 +107,7 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 		this.units = units;
 		last_values = new double[values.length];
 		for (int i = 0; i < last_values.length; i++)
-			last_values[i] = AltosLib.MISSING - 1;
+			last_values[i] = AltosLib.MISSING;
 	}
 
 	public AltosUIUnitsIndicator (Container container, int x, int y, AltosUnits units, String name, int number_values, boolean has_lights, int width) {

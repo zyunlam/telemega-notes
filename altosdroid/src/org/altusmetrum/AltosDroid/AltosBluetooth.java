@@ -30,7 +30,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 //import android.os.Message;
 
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
 public class AltosBluetooth extends AltosDroidLink {
 
@@ -199,6 +199,8 @@ public class AltosBluetooth extends AltosDroidLink {
 	}
 
 	int write(byte[] buffer, int len) {
+		if (output == null)
+			return -1;
 		try {
 			output.write(buffer, 0, len);
 		} catch (IOException ie) {
@@ -208,6 +210,8 @@ public class AltosBluetooth extends AltosDroidLink {
 	}
 
 	int read(byte[] buffer, int len) {
+		if (input == null)
+			return -1;
 		try {
 			return input.read(buffer, 0, len);
 		} catch (IOException ie) {

@@ -22,13 +22,17 @@
 #include <ao_exti.h>
 #include <ao_power.h>
 
-static struct ao_task	ao_trng_send_task, ao_trng_send_raw_task;
+static struct ao_task	ao_trng_send_task;
 static uint8_t		trng_running;
 static AO_TICK_TYPE	trng_power_time;
 
 #define TRNG_ENABLE_DELAY	AO_MS_TO_TICKS(100)
 
 static uint8_t		random_mutex;
+
+#if AO_USB_HAS_IN2
+
+static struct ao_task	ao_trng_send_raw_task;
 
 static void
 ao_trng_get_raw(uint16_t *buf)
@@ -89,6 +93,8 @@ ao_trng_send_raw(void)
 		usb_buf_id = 1-usb_buf_id;
 	}
 }
+
+#endif
 
 /* Make sure there's at least 8 bits of variance in the samples */
 #define MIN_VARIANCE		(128 * 128)
@@ -181,7 +187,9 @@ ao_trng_send(void)
 	if (failed > AO_TRNG_START_CHECK / 4)
 		ao_panic(AO_PANIC_DMA);
 
+#if AO_USB_HAS_IN2
 	ao_add_task(&ao_trng_send_raw_task, ao_trng_send_raw, "trng_send_raw");
+#endif
 
 #ifdef AO_USB_START_DISABLED
 	ao_usb_enable();

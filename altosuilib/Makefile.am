@@ -57,8 +57,8 @@ altosuilib_JAVA = \
 	AltosBTDeviceIterator.java \
 	AltosBTManage.java \
 	AltosBTKnown.java \
-	AltosUIMapNew.java \
-	AltosUIMapPreloadNew.java \
+	AltosUIMap.java \
+	AltosUIMapPreload.java \
 	AltosUIFlightTab.java \
 	AltosUIIndicator.java \
 	AltosUIUnitsIndicator.java \

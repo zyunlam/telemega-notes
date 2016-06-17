@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.util.*;
 import java.text.*;
@@ -204,7 +204,7 @@ public class AltosConfigData implements Iterable<String> {
 
 		for (int i = 0; i < parts.length; i++) {
 			try {
-				r[i] = AltosLib.fromdec(parts[i]);
+				r[i] = (int) AltosLib.fromdec(parts[i]);
 			} catch (NumberFormatException n) {
 				r[i] = 0;
 			}

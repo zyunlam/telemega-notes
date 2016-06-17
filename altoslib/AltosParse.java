@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 import java.util.*;
 import java.text.*;
@@ -26,6 +26,14 @@ public class AltosParse {
 	}
 
 	public static int parse_int(String v) throws ParseException {
+		try {
+			return (int) AltosLib.fromdec(v);
+		} catch (NumberFormatException e) {
+			throw new ParseException("error parsing int " + v, 0);
+		}
+	}
+
+	public static long parse_long(String v) throws ParseException {
 		try {
 			return AltosLib.fromdec(v);
 		} catch (NumberFormatException e) {
@@ -41,9 +49,23 @@ public class AltosParse {
 		}
 	}
 
-	static NumberFormat nf_locale = NumberFormat.getInstance();
+	static NumberFormat get_nf_locale() {
+		NumberFormat nf = NumberFormat.getInstance();
+		nf.setParseIntegerOnly(false);
+		nf.setGroupingUsed(false);
+		return nf;
+	}
 
-	static NumberFormat nf_net = NumberFormat.getInstance(Locale.ROOT);
+	static NumberFormat nf_locale = get_nf_locale();
+
+	static NumberFormat get_nf_net() {
+		NumberFormat nf = NumberFormat.getInstance(Locale.ROOT);
+		nf.setParseIntegerOnly(false);
+		nf.setGroupingUsed(false);
+		return nf;
+	}
+
+	static NumberFormat nf_net = get_nf_net();
 
 	public static double parse_double_locale(String str) throws ParseException {
 		try {
@@ -53,12 +75,24 @@ public class AltosParse {
 		}
 	}
 
+	public static String format_double_locale(double number) {
+		return nf_locale.format(number);
+	}
+
 	public static double parse_double_net(String str) throws ParseException {
 		try {
-			return nf_net.parse(str.trim()).doubleValue();
+			String t = str.trim();
+//			System.out.printf("Parse string \"%s\" trim \"%s\"\n", str, t);
+			return nf_net.parse(t).doubleValue();
 		} catch (ParseException pe) {
 			throw new ParseException("error parsing double " + str, 0);
 		}
+	}
+
+	public static String format_double_net(double number) {
+		String ret = nf_net.format(number);
+//		System.out.printf("format double %f \"%s\"\n", number, ret);
+		return ret;
 	}
 
 	public static double parse_coord(String coord) throws ParseException {

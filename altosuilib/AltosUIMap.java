@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_10;
+package org.altusmetrum.altosuilib_11;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -27,9 +27,9 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.imageio.*;
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
-public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, AltosMapInterface {
+public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosMapInterface {
 
 	AltosMap	map;
 	Graphics2D	g;
@@ -52,10 +52,10 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 					   RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setStroke(new BasicStroke(stroke_width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-			if (0 <= state && state < AltosUIMapNew.stateColors.length)
-				g.setColor(AltosUIMapNew.stateColors[state]);
+			if (0 <= state && state < AltosUIMap.stateColors.length)
+				g.setColor(AltosUIMap.stateColors[state]);
 			else
-				g.setColor(AltosUIMapNew.stateColors[AltosLib.ao_flight_invalid]);
+				g.setColor(AltosUIMap.stateColors[AltosLib.ao_flight_invalid]);
 
 			g.drawOval((int)pt.x-5, (int)pt.y-5, 10, 10);
 			g.drawOval((int)pt.x-20, (int)pt.y-20, 40, 40);
@@ -227,10 +227,10 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 					Rectangle	bounds = line.getBounds();
 
 					if (g.hitClip(bounds.x, bounds.y, bounds.width, bounds.height)) {
-						if (0 <= point.state && point.state < AltosUIMapNew.stateColors.length)
-							g.setColor(AltosUIMapNew.stateColors[point.state]);
+						if (0 <= point.state && point.state < AltosUIMap.stateColors.length)
+							g.setColor(AltosUIMap.stateColors[point.state]);
 						else
-							g.setColor(AltosUIMapNew.stateColors[AltosLib.ao_flight_invalid]);
+							g.setColor(AltosUIMap.stateColors[AltosLib.ao_flight_invalid]);
 
 						g.draw(line);
 					}
@@ -241,8 +241,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 	}
 
 	class MapTile extends AltosMapTile {
-		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-			super(cache, upper_left, center, zoom, maptype, px_size);
+		public MapTile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+			super(cache, upper_left, center, zoom, maptype, px_size, scale);
 		}
 
 		public void paint(AltosMapTransform t) {
@@ -332,8 +332,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 		return new MapMark(lat, lon, state);
 	}
 
-	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size) {
-		return new MapTile(cache, upper_left, center, zoom, maptype, px_size);
+	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
+		return new MapTile(cache, upper_left, center, zoom, maptype, px_size, scale);
 	}
 
 	public int width() {
@@ -361,7 +361,8 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 	}
 
 	public void debug(String format, Object ... arguments) {
-		System.out.printf(format, arguments);
+		if (AltosUIPreferences.serial_debug())
+			System.out.printf(format, arguments);
 	}
 
 
@@ -427,7 +428,7 @@ public class AltosUIMapNew extends JComponent implements AltosFlightDisplay, Alt
 
 	MapView	view;
 
-	public AltosUIMapNew() {
+	public AltosUIMap() {
 
 		set_font();
 

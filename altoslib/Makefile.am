@@ -64,6 +64,7 @@ altoslib_JAVA = \
 	AltosIdleFetch.java \
 	AltosIdleMonitor.java \
 	AltosIdleMonitorListener.java \
+	AltosIdleReader.java \
 	AltosIgnite.java \
 	AltosIMU.java \
 	AltosKML.java \
@@ -118,6 +119,7 @@ altoslib_JAVA = \
 	AltosIMU.java \
 	AltosMag.java \
 	AltosUnits.java \
+	AltosUnitsRange.java \
 	AltosDistance.java \
 	AltosHeight.java \
 	AltosSpeed.java \
@@ -159,6 +161,7 @@ altoslib_JAVA = \
 	AltosMapLoaderListener.java \
 	AltosMapLoader.java \
 	AltosMapTypeListener.java \
+	AltosJson.java \
 	AltosVersion.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar

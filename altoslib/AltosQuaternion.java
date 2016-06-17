@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_10;
+package org.altusmetrum.altoslib_11;
 
 public class AltosQuaternion {
 	double	r;		/* real bit */
@@ -115,10 +115,17 @@ public class AltosQuaternion {
 	}
 
 	public AltosQuaternion(AltosQuaternion q) {
-		this.r = q.r;
-		this.x = q.x;
-		this.y = q.y;
-		this.z = q.z;
+		r = q.r;
+		x = q.x;
+		y = q.y;
+		z = q.z;
+	}
+
+	public AltosQuaternion() {
+		r = 1;
+		x = 0;
+		y = 0;
+		z = 0;
 	}
 
 	static public AltosQuaternion vector(double x, double y, double z) {

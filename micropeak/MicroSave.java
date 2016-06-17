@@ -24,8 +24,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_10.*;
-import org.altusmetrum.altosuilib_10.*;
+import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altosuilib_11.*;
 
 public class MicroSave extends JFileChooser {
 

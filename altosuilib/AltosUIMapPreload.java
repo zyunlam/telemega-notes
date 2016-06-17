@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_10;
+package org.altusmetrum.altosuilib_11;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,9 +26,10 @@ import java.text.*;
 import java.lang.Math;
 import java.net.URL;
 import java.net.URLConnection;
-import org.altusmetrum.altoslib_10.*;
+import org.altusmetrum.altoslib_11.*;
 
-class AltosUIMapPos extends Box {
+class AltosUIMapPos extends Box implements ActionListener {
+	AltosUIMapPreload	preload;
 	AltosUIFrame	owner;
 	JLabel		label;
 	JComboBox	hemi;
@@ -36,6 +37,11 @@ class AltosUIMapPos extends Box {
 	JLabel		deg_label;
 	JTextField	min;
 	JLabel		min_label;
+
+	/* ActionListener interface */
+	public void actionPerformed(ActionEvent e) {
+		preload.center_map();
+	}
 
 	public void set_value(double new_value) {
 		double	d, m;
@@ -88,19 +94,23 @@ class AltosUIMapPos extends Box {
 	}
 
 	public AltosUIMapPos(AltosUIFrame in_owner,
-			   String label_value,
-			   String[] hemi_names,
-			   double default_value) {
+			     AltosUIMapPreload preload,
+			     String label_value,
+			     String[] hemi_names,
+			     double default_value) {
 		super(BoxLayout.X_AXIS);
 		owner = in_owner;
+		this.preload = preload;
 		label = new JLabel(label_value);
 		hemi = new JComboBox<String>(hemi_names);
 		hemi.setEditable(false);
 		deg = new JTextField(5);
+		deg.addActionListener(this);
 		deg.setMinimumSize(deg.getPreferredSize());
 		deg.setHorizontalAlignment(JTextField.RIGHT);
 		deg_label = new JLabel("°");
 		min = new JTextField(9);
+		min.addActionListener(this);
 		min.setMinimumSize(min.getPreferredSize());
 		min_label = new JLabel("'");
 		set_value(default_value);
@@ -118,9 +128,9 @@ class AltosUIMapPos extends Box {
 	}
 }
 
-public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener  {
+public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, ItemListener, AltosLaunchSiteListener, AltosMapLoaderListener, AltosUnitsListener, AltosFontListener  {
 	AltosUIFrame	owner;
-	AltosUIMapNew	map;
+	AltosUIMap	map;
 
 	AltosUIMapPos	lat;
 	AltosUIMapPos	lon;
@@ -131,14 +141,15 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	JComboBox<AltosLaunchSite>	site_list;
 
 	JToggleButton	load_button;
-	boolean		loading;
 	JButton		close_button;
 
 	JCheckBox[]	maptypes = new JCheckBox[AltosMap.maptype_terrain - AltosMap.maptype_hybrid + 1];
 
 	JComboBox<Integer>	min_zoom;
 	JComboBox<Integer>	max_zoom;
+	JLabel			radius_label;
 	JComboBox<Double>	radius;
+	int scale = 1;
 
 	Integer[]		zooms = { -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6 };
 
@@ -147,26 +158,36 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	Double[]	radius_km = { 2.0, 5.0, 10.0, 20.0, 30.0 };
 	Double		radius_def_km = 10.0;
 
+	AltosMapLoader	loader;
 
 	static final String[]	lat_hemi_names = { "N", "S" };
 	static final String[]	lon_hemi_names = { "E", "W" };
 
 	double	latitude, longitude;
 
+	long	loader_notify_time;
+
 	/* AltosMapLoaderListener interfaces */
 	public void loader_start(final int max) {
+		loader_notify_time = System.currentTimeMillis();
+
 		SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					pbar.setMaximum(max);
 					pbar.setValue(0);
 					pbar.setString("");
-					map.clear_marks();
-					map.add_mark(latitude, longitude, AltosLib.ao_flight_boost);
 				}
 			});
 	}
 
 	public void loader_notify(final int cur, final int max, final String name) {
+		long	now = System.currentTimeMillis();
+
+		if (now - loader_notify_time < 100)
+			return;
+
+		loader_notify_time = now;
+
 		SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					pbar.setValue(cur);
@@ -176,12 +197,12 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	}
 
 	public void loader_done(int max) {
+		loader = null;
 		SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					pbar.setValue(0);
 					pbar.setString("");
 					load_button.setSelected(false);
-					loading = false;
 				}
 			});
 	}
@@ -200,6 +221,19 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		return all_types;
 	}
 
+	void center_map(double latitude, double longitude) {
+		map.map.centre(new AltosLatLon(latitude, longitude));
+		map.clear_marks();
+		map.add_mark(latitude, longitude, AltosLib.ao_flight_boost);
+	}
+
+	void center_map() {
+		try {
+			center_map(lat.get_value(), lon.get_value());
+		} catch (ParseException pe) {
+		}
+	}
+
 	public void itemStateChanged(ItemEvent e) {
 		int		state = e.getStateChange();
 
@@ -209,6 +243,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 				AltosLaunchSite	site = (AltosLaunchSite) o;
 				lat.set_value(site.latitude);
 				lon.set_value(site.longitude);
+				center_map(site.latitude, site.longitude);
 			}
 		}
 	}
@@ -216,11 +251,14 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 	public void actionPerformed(ActionEvent e) {
 		String	cmd = e.getActionCommand();
 
-		if (cmd.equals("close"))
+		if (cmd.equals("close")) {
+			if (loader != null)
+				loader.abort();
 			setVisible(false);
+		}
 
 		if (cmd.equals("load")) {
-			if (!loading) {
+			if (loader == null) {
 				try {
 					latitude = lat.get_value();
 					longitude = lon.get_value();
@@ -231,14 +269,16 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 					Double r = (Double) radius.getSelectedItem();
 
 					if (AltosPreferences.imperial_units())
-						r = AltosConvert.distance.inverse(r);
+						r = AltosConvert.miles_to_meters(r);
 					else
 						r = r * 1000;
-					loading = true;
 
-					new AltosMapLoader(map.map, this,
-							   latitude, longitude,
-							   min_z, max_z, r, all_types());
+					center_map(latitude, longitude);
+
+					loader = new AltosMapLoader(this,
+								    latitude, longitude,
+								    min_z, max_z, r,
+								    all_types(), scale);
 
 				} catch (ParseException pe) {
 					load_button.setSelected(false);
@@ -259,7 +299,35 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 			});
 	}
 
-	public AltosUIMapPreloadNew(AltosUIFrame in_owner) {
+	private void set_radius_values() {
+		radius_label.setText(String.format("Map Radius (%s)",
+						   AltosPreferences.imperial_units() ? "mi" : "km"));
+
+		Double[]	radii;
+
+		if (AltosPreferences.imperial_units())
+			radii = radius_mi;
+		else
+			radii = radius_km;
+
+		radius.removeAllItems();
+		for (Double r : radii) {
+			radius.addItem(r);
+		}
+		radius.setSelectedItem(radii[2]);
+		radius.setMaximumRowCount(radii.length);
+	}
+
+	public void units_changed(boolean imperial_units) {
+		map.units_changed(imperial_units);
+		set_radius_values();
+	}
+
+	public void font_size_changed(int font_size) {
+		map.font_size_changed(font_size);
+	}
+
+	public AltosUIMapPreload(AltosUIFrame in_owner) {
 		owner = in_owner;
 
 		Container		pane = getContentPane();
@@ -270,7 +338,19 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 		pane.setLayout(new GridBagLayout());
 
-		map = new AltosUIMapNew();
+		addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					AltosUIPreferences.unregister_font_listener(AltosUIMapPreload.this);
+					AltosPreferences.unregister_units_listener(AltosUIMapPreload.this);
+				}
+			});
+
+
+		AltosPreferences.register_units_listener(this);
+		AltosUIPreferences.register_font_listener(this);
+
+		map = new AltosUIMap();
 
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;
@@ -335,7 +415,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 		pane.add(site_list, c);
 
-		lat = new AltosUIMapPos(owner,
+		lat = new AltosUIMapPos(owner, this,
 					"Latitude:",
 					lat_hemi_names,
 					37.167833333);
@@ -352,7 +432,7 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 
 		pane.add(lat, c);
 
-		lon = new AltosUIMapPos(owner,
+		lon = new AltosUIMapPos(owner, this,
 					"Longitude:",
 					lon_hemi_names,
 					-97.73975);
@@ -445,25 +525,19 @@ public class AltosUIMapPreloadNew extends AltosUIFrame implements ActionListener
 		c.gridy = 3;
 		pane.add(max_zoom, c);
 
-		JLabel radius_label = new JLabel(String.format("Map Radius (%s)",
-							       AltosPreferences.imperial_units() ? "miles" : "km"));
+		radius_label = new JLabel();
+
 		c.gridx = 4;
 		c.gridy = 4;
 		pane.add(radius_label, c);
 
-		Double[]	radii;
-		Double		radius_default;
-
-		if (AltosPreferences.imperial_units())
-			radii = radius_mi;
-		else
-			radii = radius_km;
-		radius = new JComboBox<Double>(radii);
-		radius.setSelectedItem(radii[2]);
+		radius = new JComboBox<Double>();
 		radius.setEditable(true);
 		c.gridx = 5;
 		c.gridy = 4;
 		pane.add(radius, c);
+
+		set_radius_values();
 
 		pack();
 		setLocationRelativeTo(owner);

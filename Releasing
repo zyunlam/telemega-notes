@@ -21,10 +21,10 @@ These are Bdale's notes on how to do a release.
 		git checkout branch-<version>		# the x.y parts only
 		- cherry-pick or merge appropriate content from master
 	
-	- make sure there is a doc/release-notes-<version>.xsl
-	- make sure that doc/altusmetrum.xsl has the right copyright year,
-	  and add release to the revision history at the front (release notes
-	  will be pulled in automatically)
+	- make sure there is a doc/release-notes-<version>.inc
+	- make sure that doc/altusmetrum-docinfo.xml has the right copyright 
+	  year, and add release to the revision history at the front (release 
+	  notes will be pulled in automatically)
 	- make absolutely sure checked-out tree is "clean" 
 	- make absolutely sure the pdclib/ submodule is on the master branch,
 	  up to date, and "clean"
@@ -89,7 +89,7 @@ These are Bdale's notes on how to do a release.
 	(cd ~/altusmetrumllc ; git add Binaries ; git commit -a) 
 	(cd ~/altusmetrumllc ; git push) 
 
-	- copy the relevant release notes file from doc/ to 
+	- copy the relevant release notes .html file from doc/ to 
 	    /home/bdale/web/altusmetrum/AltOS/releases/<rev>
 
 	(cd ~/web/altusmetrum/AltOS/releases/<rev> ; rm *.tar.bz2)
