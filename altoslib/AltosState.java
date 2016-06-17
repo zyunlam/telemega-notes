@@ -315,7 +315,7 @@ public class AltosState implements Cloneable, AltosJsonable {
 			computed.finish_update();
 		}
 
-		AltosCValue() {
+		public AltosCValue() {
 			measured = new AltosIValue();
 			computed = new AltosIValue();
 		}
@@ -1638,16 +1638,27 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosState s = new AltosState();
 		s.copy(this);
 
+		/* Code to test state save/restore. Enable only for that purpose
+		 */
 		if (false) {
-			AltosJson	json = json();
+			AltosJson	json = new AltosJson(this);
 			String		onetrip = json.toPrettyString();
 			AltosJson	back = AltosJson.fromString(onetrip);
-			AltosState	tripstate = AltosState.fromJson(back);
-			AltosJson	tripjson = tripstate.json();
+			AltosState	tripstate = (AltosState) back.make(this.getClass());
+			AltosJson	tripjson = new AltosJson(tripstate);
 			String		twotrip = tripjson.toPrettyString();
 
 			if (!onetrip.equals(twotrip)) {
-				System.out.printf("one:\n%s\ntwo:\n%s\n", onetrip, twotrip);
+				try {
+					FileWriter one_file = new FileWriter("one.json", true);
+					one_file.write(onetrip);
+					one_file.flush();
+					FileWriter two_file = new FileWriter("two.json", true);
+					two_file.write(twotrip);
+					two_file.flush();
+				} catch (Exception e) {
+				}
+				System.out.printf("json error\n");
 				System.exit(1);
 			}
 		}
