@@ -1012,7 +1012,32 @@ public class AltosJson extends JsonUtil {
 			assert_array(false);
 
 			Class element_class = c.getComponentType();
-			if (element_class == Double.TYPE) {
+			if (element_class == Boolean.TYPE) {
+				boolean[] array = (boolean[]) Array.newInstance(element_class, size());
+				for (int i = 0; i < array.length; i++)
+					array[i] = (Boolean) get(i).make(element_class);
+				ret = array;
+			} else if (element_class == Byte.TYPE) {
+				byte[] array = (byte[]) Array.newInstance(element_class, size());
+				for (int i = 0; i < array.length; i++)
+					array[i] = (Byte) get(i).make(element_class);
+				ret = array;
+			} else if (element_class == Character.TYPE) {
+				char[] array = (char[]) Array.newInstance(element_class, size());
+				for (int i = 0; i < array.length; i++)
+					array[i] = (Character) get(i).make(element_class);
+				ret = array;
+			} else if (element_class == Integer.TYPE) {
+				int[] array = (int[]) Array.newInstance(element_class, size());
+				for (int i = 0; i < array.length; i++)
+					array[i] = (Integer) get(i).make(element_class);
+				ret = array;
+			} else if (element_class == Long.TYPE) {
+				long[] array = (long[]) Array.newInstance(element_class, size());
+				for (int i = 0; i < array.length; i++)
+					array[i] = (Long) get(i).make(element_class);
+				ret = array;
+			} else if (element_class == Double.TYPE) {
 				double[] array = (double[]) Array.newInstance(element_class, size());
 				for (int i = 0; i < array.length; i++)
 					array[i] = (Double) get(i).make(element_class);
