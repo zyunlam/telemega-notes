@@ -48,12 +48,16 @@ public class AltosRotation implements AltosJsonable {
 		rotation = up.vectors_to_rotation(orient);
 	}
 
-	public AltosJson json() {
-		return rotation.json();
-	}
-
 	public AltosRotation(AltosJson j) {
 		rotation = new AltosQuaternion(j);
+	}
+
+	public AltosRotation() {
+		rotation = new AltosQuaternion();
+	}
+
+	public AltosJson json() {
+		return rotation.json();
 	}
 
 	public static AltosRotation fromJson(AltosJson j, AltosRotation def) {

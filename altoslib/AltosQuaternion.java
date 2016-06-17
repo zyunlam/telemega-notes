@@ -115,10 +115,17 @@ public class AltosQuaternion implements AltosJsonable {
 	}
 
 	public AltosQuaternion(AltosQuaternion q) {
-		this.r = q.r;
-		this.x = q.x;
-		this.y = q.y;
-		this.z = q.z;
+		r = q.r;
+		x = q.x;
+		y = q.y;
+		z = q.z;
+	}
+
+	public AltosQuaternion() {
+		r = 1;
+		x = 0;
+		y = 0;
+		z = 0;
 	}
 
 	static public AltosQuaternion vector(double x, double y, double z) {
