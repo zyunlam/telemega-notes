@@ -1063,7 +1063,7 @@ public class AltosJson extends JsonUtil {
 				} else {
 					object = c.newInstance();
 				}
-				for (; c != null; c = c.getSuperclass()) {
+				for (; c != Object.class; c = c.getSuperclass()) {
 					for (Field field : c.getDeclaredFields()) {
 						String	fieldName = field.getName();
 						Class	fieldClass = field.getType();
@@ -1208,7 +1208,7 @@ public class AltosJson extends JsonUtil {
 			}
 		} else {
 			assert_hash(true);
-			for (Class c = object.getClass(); c != null; c = c.getSuperclass()) {
+			for (Class c = object.getClass(); c != Object.class; c = c.getSuperclass()) {
 				for (Field field : c.getDeclaredFields()) {
 					String	fieldName = field.getName();
 
