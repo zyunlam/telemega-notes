@@ -21,7 +21,7 @@ import java.text.*;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosGPS implements Cloneable, AltosJsonable {
+public class AltosGPS implements Cloneable {
 
 	public final static int MISSING = AltosLib.MISSING;
 
@@ -387,66 +387,5 @@ public class AltosGPS implements Cloneable, AltosJsonable {
 			if (!parse_string(line, says_done))
 				break;
 		}
-	}
-
-	public AltosJson json() {
-		AltosJson	j = new AltosJson();
-
-		j.put("nsat", nsat);
-		j.put("locked", locked);
-		j.put("connected", connected);
-		j.put("lat", lat);
-		j.put("lon", lon);
-		j.put("alt", alt);
-		j.put("year", year);
-		j.put("month", month);
-		j.put("day", day);
-		j.put("hour", hour);
-		j.put("minute", minute);
-		j.put("second", second);
-
-		j.put("ground_speed", ground_speed);
-		j.put("course", course);
-		j.put("climb_rate", climb_rate);
-		j.put("pdop", pdop);
-		j.put("hdop", hdop);
-		j.put("vdop", vdop);
-		j.put("h_error", h_error);
-		j.put("v_error", v_error);
-		j.put("cc_gps_sat", cc_gps_sat);
-		return j;
-	}
-
-	public AltosGPS(AltosJson j) {
-		init();
-		nsat = j.get_int("nsat", nsat);
-		locked = j.get_boolean("locked", locked);
-		connected = j.get_boolean("connected", connected);
-		lat = j.get_double("lat", lat);
-		lon = j.get_double("lon", lon);
-		alt = j.get_double("alt", alt);
-		year = j.get_int("year", year);
-		month = j.get_int("month", month);
-		day = j.get_int("day", day);
-		hour = j.get_int("hour", hour);
-		minute = j.get_int("minute", minute);
-		second = j.get_int("second", second);
-
-		ground_speed = j.get_double("ground_speed", ground_speed);
-		course = j.get_int("course", course);
-		climb_rate = j.get_double("climb_rate", climb_rate);
-		pdop = j.get_double("pdop", pdop);
-		hdop = j.get_double("hdop", hdop);
-		vdop = j.get_double("vdop", vdop);
-		h_error = j.get_double("h_error", h_error);
-		v_error = j.get_double("v_error", v_error);
-		cc_gps_sat = AltosGPSSat.json_array(j.get("cc_gps_sat"));
-	}
-
-	public static AltosGPS fromJson(AltosJson j, AltosGPS def) {
-		if (j == null)
-			return def;
-
-		return new AltosGPS(j);
 	}
 }

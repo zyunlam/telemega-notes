@@ -19,7 +19,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosCompanion implements AltosJsonable {
+public class AltosCompanion {
 	public final static int	board_id_telescience = 0x0a;
 	public final static int	MAX_CHANNELS = 12;
 
@@ -36,31 +36,5 @@ public class AltosCompanion implements AltosJsonable {
 		if (channels > MAX_CHANNELS)
 			channels = MAX_CHANNELS;
 		companion_data = new int[channels];
-	}
-
-	public AltosJson json() {
-		AltosJson j = new AltosJson();
-
-		j.put("tick", tick);
-		j.put("board_id", board_id);
-		j.put("update_period", update_period);
-		j.put("channels", channels);
-		j.put("companion_data", companion_data);
-		return j;
-	}
-
-	public AltosCompanion(AltosJson j) {
-		tick = j.get_int("tick", tick);
-		board_id = j.get_int("board_id", board_id);
-		update_period = j.get_int("update_period", update_period);
-		channels = j.get_int("channels", channels);
-		companion_data = j.get_int_array("companion_data", new int[channels]);
-	}
-
-	public static AltosCompanion fromJson(AltosJson j, AltosCompanion def) {
-		if (j == null)
-			return def;
-
-		return new AltosCompanion(j);
 	}
 }

@@ -280,6 +280,9 @@ class JsonLexer extends JsonUtil {
 	static keyword[] keywords = {
 		new keyword("true", new JsonToken(JsonToken._boolean, true)),
 		new keyword("false", new JsonToken(JsonToken._boolean, false)),
+		new keyword("NegInfinity", new JsonToken(JsonToken._double, Double.NEGATIVE_INFINITY)),
+		new keyword("Infinity", new JsonToken(JsonToken._double, Double.POSITIVE_INFINITY)),
+		new keyword("NaN", new JsonToken(JsonToken._double, Double.NaN))
 	};
 
 	static JsonToken keyword(String word) {
@@ -583,10 +586,19 @@ public class AltosJson extends JsonUtil {
 			array.append_array(result, indent, pretty);
 			break;
 		case type_double:
-			String dval = nf_json.format(d_number);
-			if (dval.equals("-0"))
-				dval = "0";
-			result.append(dval);
+			if (Double.isInfinite(d_number)) {
+				if (d_number < 0)
+					result.append("NegInfinity");
+				else
+					result.append("Infinity");
+			} else if (Double.isNaN(d_number)) {
+				result.append("NaN");
+			} else {
+				String dval = nf_json.format(d_number);
+				if (dval.equals("-0"))
+					dval = "0";
+				result.append(dval);
+			}
 			break;
 		case type_long:
 			result.append(new Long(l_number).toString());
@@ -1030,7 +1042,6 @@ public class AltosJson extends JsonUtil {
 					for (Field field : c.getDeclaredFields()) {
 						String	fieldName = field.getName();
 						Class	fieldClass = field.getType();
-						String	className = fieldClass.getName();
 
 						if (Modifier.isStatic(field.getModifiers()))
 							continue;
@@ -1165,8 +1176,6 @@ public class AltosJson extends JsonUtil {
 			for (Class c = object.getClass(); c != null; c = c.getSuperclass()) {
 				for (Field field : c.getDeclaredFields()) {
 					String	fieldName = field.getName();
-					Class	fieldClass = field.getType();
-					String	className = fieldClass.getName();
 
 					/* Skip static fields */
 					if (Modifier.isStatic(field.getModifiers()))

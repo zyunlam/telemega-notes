@@ -365,7 +365,7 @@ public class AltosPreferences {
 	public static void set_state(AltosState state) {
 
 		synchronized(backend) {
-			backend.putJson(String.format(statePreferenceFormat, state.serial), state.json());
+			backend.putJson(String.format(statePreferenceFormat, state.serial), new AltosJson(state));
 			backend.putInt(statePreferenceLatest, state.serial);
 			flush_preferences();
 		}
@@ -405,10 +405,12 @@ public class AltosPreferences {
 	public static AltosState state(int serial) {
 		synchronized(backend) {
 			try {
-				return AltosState.fromJson(backend.getJson(String.format(statePreferenceFormat, serial)));
+				AltosJson json = backend.getJson(String.format(statePreferenceFormat, serial));
+				if (json != null)
+					return (AltosState) (json.make(AltosState.class));
 			} catch (Exception e) {
-				return null;
 			}
+			return null;
 		}
 	}
 

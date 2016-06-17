@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosIMU implements Cloneable, AltosJsonable {
+public class AltosIMU implements Cloneable {
 	public int		accel_along;
 	public int		accel_across;
 	public int		accel_through;
@@ -114,36 +114,5 @@ public class AltosIMU implements Cloneable, AltosJsonable {
 			if (parse_string(line))
 				break;
 		}
-	}
-
-	public AltosIMU (AltosJson j) {
-		this();
-
-		accel_along = j.get_int("accel_along", accel_along);
-		accel_across = j.get_int("accel_across", accel_across);
-		accel_through = j.get_int("accel_through", accel_through);
-
-		gyro_roll = j.get_int("gyro_roll", gyro_roll);
-		gyro_pitch = j.get_int("gyro_pitch", gyro_pitch);
-		gyro_yaw = j.get_int("gyro_yaw", gyro_yaw);
-	}
-
-	static public AltosIMU fromJson(AltosJson j, AltosIMU def) {
-		if (j == null)
-			return def;
-		return new AltosIMU(j);
-	}
-
-	public AltosJson json() {
-		AltosJson	j = new AltosJson();
-
-		j.put("accel_along", accel_along);
-		j.put("accel_across", accel_across);
-		j.put("accel_through", accel_through);
-
-		j.put("gyro_roll", gyro_roll);
-		j.put("gyro_pitch", gyro_pitch);
-		j.put("gyro_yaw", gyro_yaw);
-		return j;
 	}
 }

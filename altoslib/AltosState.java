@@ -23,7 +23,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosState implements Cloneable, AltosJsonable {
+public class AltosState implements Cloneable {
 
 	public static final int set_position = 1;
 	public static final int set_gps = 2;
@@ -46,7 +46,7 @@ public class AltosState implements Cloneable, AltosJsonable {
 	private int	prev_tick;
 	public int	boost_tick;
 
-	class AltosValue implements AltosJsonable {
+	class AltosValue {
 		double	value;
 		double	prev_value;
 		private double	max_value;
@@ -177,28 +177,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 			prev_set_time = set_time;
 		}
 
-		public AltosJson json() {
-			AltosJson j = new AltosJson();
-
-			j.put("value", value);
-			j.put("prev_value", prev_value);
-			j.put("max_value", max_value);
-			j.put("set_time", set_time);
-			j.put("prev_set_time", prev_set_time);
-			return j;
-		}
-
-		AltosValue(AltosJson j) {
-			this();
-			if (j != null) {
-				value = j.get_double("value", value);
-				prev_value = j.get_double("prev_value", prev_value);
-				max_value = j.get_double("max_value", max_value);
-				set_time = j.get_double("set_time", 0);
-				prev_set_time = j.get_double("prev_set_time", 0);
-			}
-		}
-
 		AltosValue() {
 			value = AltosLib.MISSING;
 			prev_value = AltosLib.MISSING;
@@ -207,25 +185,15 @@ public class AltosState implements Cloneable, AltosJsonable {
 
 	}
 
-	AltosValue AltosValue_fromJson(AltosJson j, AltosValue def) {
-		if (j == null)
-			return def;
-		return new AltosValue(j);
-	}
+	class AltosCValue {
 
-	class AltosCValue implements AltosJsonable {
-
-		class AltosIValue extends AltosValue implements AltosJsonable {
+		class AltosIValue extends AltosValue {
 			boolean can_max() {
 				return c_can_max();
 			}
 
 			AltosIValue() {
 				super();
-			}
-
-			AltosIValue(AltosJson j) {
-				super(j);
 			}
 		};
 
@@ -319,25 +287,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 			measured = new AltosIValue();
 			computed = new AltosIValue();
 		}
-
-		public AltosJson json() {
-			AltosJson	j = new AltosJson();
-
-			j.put("measured", measured.json());
-			j.put("computed", computed.json());
-			return j;
-		}
-
-		AltosCValue(AltosJson j) {
-			measured = new AltosIValue(j.get("measured"));
-			computed = new AltosIValue(j.get("computed"));
-		}
-	}
-
-	AltosCValue AltosCValue_fromJson(AltosJson j, AltosCValue def) {
-		if (j == null)
-			return def;
-		return new AltosCValue(j);
 	}
 
 	private int	state;
@@ -389,15 +338,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosGpsGroundAltitude() {
 			super();
 		}
-
-		AltosGpsGroundAltitude (AltosJson j) {
-			super(j);
-		}
-	}
-
-	AltosGpsGroundAltitude AltosGpsGroundAltitude_fromJson(AltosJson j, AltosGpsGroundAltitude def) {
-		if (j == null) return def;
-		return new AltosGpsGroundAltitude(j);
 	}
 
 	private AltosGpsGroundAltitude gps_ground_altitude;
@@ -425,15 +365,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosGroundPressure () {
 			super();
 		}
-
-		AltosGroundPressure (AltosJson j) {
-			super(j);
-		}
-	}
-
-	AltosGroundPressure AltosGroundPressure_fromJson(AltosJson j, AltosGroundPressure def) {
-		if (j == null) return def;
-		return new AltosGroundPressure(j);
 	}
 
 	private AltosGroundPressure ground_pressure;
@@ -468,15 +399,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosAltitude() {
 			super();
 		}
-
-		AltosAltitude (AltosJson j) {
-			super(j);
-		}
-	}
-
-	AltosAltitude AltosAltitude_fromJson(AltosJson j, AltosAltitude def) {
-		if (j == null) return def;
-		return new AltosAltitude(j);
 	}
 
 	private AltosAltitude	altitude;
@@ -501,15 +423,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosGpsAltitude() {
 			super();
 		}
-
-		AltosGpsAltitude (AltosJson j) {
-			super(j);
-		}
-	}
-
-	AltosGpsAltitude AltosGpsAltitude_fromJson(AltosJson j, AltosGpsAltitude def) {
-		if (j == null) return def;
-		return new AltosGpsAltitude(j);
 	}
 
 	private AltosGpsAltitude	gps_altitude;
@@ -589,15 +502,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosPressure() {
 			super();
 		}
-
-		AltosPressure (AltosJson j) {
-			super(j);
-		}
-	}
-
-	AltosPressure AltosPressure_fromJson(AltosJson j, AltosPressure def) {
-		if (j == null) return def;
-		return new AltosPressure(j);
 	}
 
 	private AltosPressure	pressure;
@@ -688,15 +592,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosSpeed() {
 			super();
 		}
-
-		AltosSpeed (AltosJson j) {
-			super(j);
-		}
-	}
-
-	AltosSpeed AltosSpeed_fromJson(AltosJson j, AltosSpeed def) {
-		if (j == null) return def;
-		return new AltosSpeed(j);
 	}
 
 	private AltosSpeed speed;
@@ -742,15 +637,6 @@ public class AltosState implements Cloneable, AltosJsonable {
 		AltosAccel() {
 			super();
 		}
-
-		AltosAccel (AltosJson j) {
-			super(j);
-		}
-	}
-
-	AltosAccel AltosAccel_fromJson(AltosJson j, AltosAccel def) {
-		if (j == null) return def;
-		return new AltosAccel(j);
 	}
 
 	AltosAccel acceleration;
@@ -1667,223 +1553,5 @@ public class AltosState implements Cloneable, AltosJsonable {
 
 	public AltosState () {
 		init();
-	}
-
-	public AltosJson json() {
-		AltosJson	j = new AltosJson();
-
-		j.put("valid", true);
-		j.put("set", set);
-		j.put("received_time", received_time);
-		j.put("time", time);
-		j.put("prev_time", prev_time);
-		j.put("time_change", time_change);
-		j.put("tick", tick);
-		j.put("prev_tick", prev_tick);
-		j.put("boost_tick", boost_tick);
-		j.put("state", state);
-		j.put("flight", flight);
-		j.put("serial", serial);
-		j.put("altitude_32", altitude_32);
-		j.put("receiver_serial", receiver_serial);
-		j.put("landed", landed);
-		j.put("ascent", ascent);
-		j.put("boost", boost);
-		j.put("rssi", rssi);
-		j.put("status", status);
-		j.put("device_type", device_type);
-		j.put("config_major", config_major);
-		j.put("config_minor", config_minor);
-		j.put("apogee_delay", apogee_delay);
-		j.put("main_deploy", main_deploy);
-		j.put("flight_log_max", flight_log_max);
-		j.put("ground_altitude", ground_altitude);
-		j.put("gps_ground_altitude", gps_ground_altitude);
-		j.put("ground_pressure", ground_pressure);
-		j.put("altitude", altitude);
-		j.put("gps_altitude", gps_altitude);
-		j.put("gps_ground_speed", gps_ground_speed);
-		j.put("gps_ascent_rate", gps_ascent_rate);
-		j.put("gps_course", gps_course);
-		j.put("gps_speed", gps_speed);
-		j.put("pressure", pressure);
-		j.put("speed", speed);
-		j.put("acceleration", acceleration);
-		j.put("orient", orient);
-		j.put("kalman_height", kalman_height);
-		j.put("kalman_speed", kalman_speed);
-		j.put("kalman_acceleration", kalman_acceleration);
-
-		j.put("battery_voltage",battery_voltage);
-		j.put("pyro_voltage",pyro_voltage);
-		j.put("temperature",temperature);
-		j.put("apogee_voltage",apogee_voltage);
-		j.put("main_voltage",main_voltage);
-		j.put("ignitor_voltage",ignitor_voltage);
-		j.put("gps", gps);
-		j.put("temp_gps", temp_gps);
-		j.put("temp_gps_sat_tick", temp_gps_sat_tick);
-		j.put("gps_pending", gps_pending);
-		j.put("gps_sequence", gps_sequence);
-		j.put("imu", imu);
-		j.put("mag", mag);
-
-		j.put("npad", npad);
-		j.put("gps_waiting", gps_waiting);
-		j.put("gps_ready", gps_ready);
-		j.put("ngps", ngps);
-		j.put("from_pad", from_pad);
-		j.put("elevation", elevation);
-		j.put("range", range);
-		j.put("gps_height", gps_height);
-		j.put("pad_lat", pad_lat);
-		j.put("pad_lon", pad_lon);
-		j.put("pad_alt", pad_alt);
-		j.put("speak_tick", speak_tick);
-		j.put("speak_altitude", speak_altitude);
-		j.put("callsign", callsign);
-		j.put("firmware_version", firmware_version);
-		j.put("accel_plus_g", accel_plus_g);
-		j.put("accel_minus_g", accel_minus_g);
-		j.put("accel", accel);
-		j.put("ground_accel", ground_accel);
-		j.put("ground_accel_avg", ground_accel_avg);
-		j.put("log_format", log_format);
-		j.put("log_space", log_space);
-		j.put("product", product);
-		j.put("baro", baro);
-		j.put("companion", companion);
-		j.put("pyro_fired", pyro_fired);
-		j.put("accel_zero_along", accel_zero_along);
-		j.put("accel_zero_across", accel_zero_across);
-		j.put("accel_zero_through", accel_zero_through);
-
-		j.put("rotation", rotation);
-		j.put("ground_rotation", ground_rotation);
-
-		j.put("pad_orientation", pad_orientation);
-
-		j.put("accel_ground_along", accel_ground_along);
-		j.put("accel_ground_across", accel_ground_across);
-		j.put("accel_ground_through", accel_ground_through);
-
-		j.put("gyro_zero_roll", gyro_zero_roll);
-		j.put("gyro_zero_pitch", gyro_zero_pitch);
-		j.put("gyro_zero_yaw", gyro_zero_yaw);
-
-		j.put("last_imu_time", last_imu_time);
-		return j;
-	}
-
-	public AltosState(AltosJson j) {
-		this();
-
-		set = j.get_int("set", set);
-		received_time = j.get_long("received_time", received_time);
-		time = j.get_double("time", time);
-		prev_time = j.get_double("prev_time", prev_time);
-		time_change = j.get_double("time_change", time_change);
-		tick = j.get_int("tick", tick);
-		prev_tick = j.get_int("prev_tick", prev_tick);
-		boost_tick = j.get_int("boost_tick", boost_tick);
-		state = j.get_int("state", state);
-		flight = j.get_int("flight", flight);
-		serial = j.get_int("serial", serial);
-		altitude_32 = j.get_int("altitude_32", altitude_32);
-		receiver_serial = j.get_int("receiver_serial", receiver_serial);
-		landed = j.get_boolean("landed", landed);
-		ascent = j.get_boolean("ascent", ascent);
-		boost = j.get_boolean("boost", boost);
-		rssi = j.get_int("rssi", rssi);
-		status = j.get_int("status", status);
-		device_type = j.get_int("device_type", device_type);
-		config_major = j.get_int("config_major", config_major);
-		config_minor = j.get_int("config_minor", config_minor);
-		apogee_delay = j.get_int("apogee_delay", apogee_delay);
-		main_deploy = j.get_int("main_deploy", main_deploy);
-		flight_log_max = j.get_int("flight_log_max", flight_log_max);
-		ground_altitude = AltosCValue_fromJson(j.get("ground_altitude"), ground_altitude);
-		gps_ground_altitude = AltosGpsGroundAltitude_fromJson(j.get("gps_ground_altitude"), gps_ground_altitude);
-		ground_pressure = AltosGroundPressure_fromJson(j.get("ground_pressure"), ground_pressure);
-		altitude = AltosAltitude_fromJson(j.get("altitude"), altitude);
-		gps_altitude = AltosGpsAltitude_fromJson(j.get("gps_altitude"), gps_altitude);
-		gps_ground_speed = AltosValue_fromJson(j.get("gps_ground_speed"), gps_ground_speed);
-		gps_ascent_rate = AltosValue_fromJson(j.get("gps_ascent_rate"), gps_ascent_rate);
-		gps_course = AltosValue_fromJson(j.get("gps_course"), gps_course);
-		gps_speed = AltosValue_fromJson(j.get("gps_speed"), gps_speed);
-		pressure = AltosPressure_fromJson(j.get("pressure"), pressure);
-		speed = AltosSpeed_fromJson(j.get("speed"), speed);
-		acceleration = AltosAccel_fromJson(j.get("acceleration"), acceleration);
-		orient = AltosCValue_fromJson(j.get("orient"), orient);
-		kalman_height = AltosValue_fromJson(j.get("kalman_height"), kalman_height);
-		kalman_speed = AltosValue_fromJson(j.get("kalman_speed"), kalman_speed);
-		kalman_acceleration = AltosValue_fromJson(j.get("kalman_acceleration"), kalman_acceleration);
-
-		battery_voltage = j.get_double("battery_voltage", battery_voltage);
-		pyro_voltage = j.get_double("pyro_voltage", pyro_voltage);
-		temperature = j.get_double("temperature", temperature);
-		apogee_voltage = j.get_double("apogee_voltage", apogee_voltage);
-		main_voltage=  j.get_double("main_voltage", main_voltage);
-		ignitor_voltage = j.get_double_array("ignitor_voltage", ignitor_voltage);
-		gps = AltosGPS.fromJson(j.get("gps"), gps);
-		temp_gps = AltosGPS.fromJson(j.get("temp_gps"), temp_gps);
-		temp_gps_sat_tick = j.get_int("temp_gps_sat_tick", temp_gps_sat_tick);
-		gps_pending = j.get_boolean("gps_pending", gps_pending);
-		gps_sequence = j.get_int("gps_sequence", gps_sequence);
-		imu = AltosIMU.fromJson(j.get("imu"), imu);
-		mag = AltosMag.fromJson(j.get("mag"), mag);
-
-		npad = j.get_int("npad", npad);
-		gps_waiting = j.get_int("gps_waiting", gps_waiting);
-		gps_ready = j.get_boolean("gps_ready", gps_ready);
-		ngps = j.get_int("ngps", ngps);
-		from_pad = AltosGreatCircle.fromJson(j.get("from_pad"), from_pad);
-		elevation = j.get_double("elevation", elevation);
-		range = j.get_double("range", range);
-		gps_height = j.get_double("gps_height", gps_height);
-		pad_lat = j.get_double("pad_lat", pad_lat);
-		pad_lon = j.get_double("pad_lon", pad_lon);
-		pad_alt = j.get_double("pad_alt", pad_alt);
-		speak_tick = j.get_int("speak_tick", speak_tick);
-		speak_altitude = j.get_double("speak_altitude", speak_altitude);
-		callsign = j.get_string("callsign", callsign);
-		firmware_version = j.get_string("firmware_version", firmware_version);
-		accel_plus_g = j.get_double("accel_plus_g", accel_plus_g);
-		accel_minus_g = j.get_double("accel_minus_g", accel_minus_g);
-		accel = j.get_double("accel", accel);
-		ground_accel = j.get_double("ground_accel", ground_accel);
-		ground_accel_avg = j.get_double("ground_accel_avg", ground_accel_avg);
-		log_format = j.get_int("log_format", log_format);
-		log_space = j.get_int("log_space", log_space);
-		product = j.get_string("product", product);
-		baro = AltosMs5607.fromJson(j.get("baro"), baro);
-		companion = AltosCompanion.fromJson(j.get("companion"), companion);
-		pyro_fired = j.get_int("pyro_fired", pyro_fired);
-		accel_zero_along = j.get_double("accel_zero_along", accel_zero_along);
-		accel_zero_across = j.get_double("accel_zero_across", accel_zero_across);
-		accel_zero_through = j.get_double("accel_zero_through", accel_zero_through);
-
-		rotation = AltosRotation.fromJson(j.get("rotation"), rotation);
-		ground_rotation = AltosRotation.fromJson(j.get("ground_rotation"), ground_rotation);
-
-		pad_orientation = j.get_int("pad_orientation", pad_orientation);
-
-		accel_ground_along = j.get_double("accel_ground_along", accel_ground_along);
-		accel_ground_across = j.get_double("accel_ground_across", accel_ground_across);
-		accel_ground_through = j.get_double("accel_ground_through", accel_ground_through);
-
-		gyro_zero_roll = j.get_double("gyro_zero_roll", gyro_zero_roll);
-		gyro_zero_pitch = j.get_double("gyro_zero_pitch", gyro_zero_pitch);
-		gyro_zero_yaw = j.get_double("gyro_zero_yaw", gyro_zero_yaw);
-
-		last_imu_time = j.get_double("last_imu_time", last_imu_time);
-	}
-
-	public static AltosState fromJson(AltosJson j) {
-		if (j == null)
-			return null;
-		if (!j.get_boolean("valid", false))
-			return null;
-		return new AltosState(j);
 	}
 }

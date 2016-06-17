@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosMs5607 implements AltosJsonable {
+public class AltosMs5607 {
 	public int	reserved;
 	public int	sens;
 	public int	off;
@@ -165,47 +165,5 @@ public class AltosMs5607 implements AltosJsonable {
 			}
 		}
 		convert();
-	}
-
-	public AltosJson json() {
-		AltosJson j = new AltosJson();
-
-		j.put("reserved", reserved);
-		j.put("sens", sens);
-		j.put("off", off);
-		j.put("tcs", tcs);
-		j.put("tco", tco);
-		j.put("tref", tref);
-		j.put("tempsens", tempsens);
-		j.put("crc", crc);
-		j.put("raw_pres", raw_pres);
-		j.put("raw_temp", raw_temp);
-		j.put("pa", pa);
-		j.put("cc", cc);
-		return j;
-	}
-
-	public AltosMs5607(AltosJson j) {
-		this();
-
-		reserved = j.get_int("reserved", reserved);
-		sens = j.get_int("sens", sens);
-		off = j.get_int("off", off);
-		tcs = j.get_int("tcs", tcs);
-		tco = j.get_int("tco", tco);
-		tref = j.get_int("tref", tref);
-		tempsens = j.get_int("tempsens", tempsens);
-		crc = j.get_int("crc", crc);
-		raw_pres = j.get_int("raw_pres", raw_pres);
-		raw_temp = j.get_int("raw_temp", raw_temp);
-		pa = j.get_int("pa", pa);
-		cc = j.get_int("cc", cc);
-	}
-
-	public static AltosMs5607 fromJson(AltosJson j, AltosMs5607 def) {
-		if (j == null)
-			return def;
-
-		return new AltosMs5607(j);
 	}
 }

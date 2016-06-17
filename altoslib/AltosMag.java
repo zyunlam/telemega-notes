@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.concurrent.*;
 import java.io.*;
 
-public class AltosMag implements Cloneable, AltosJsonable {
+public class AltosMag implements Cloneable {
 	public int		along;
 	public int		across;
 	public int		through;
@@ -92,29 +92,5 @@ public class AltosMag implements Cloneable, AltosJsonable {
 			if (parse_string(line))
 				break;
 		}
-	}
-
-	public AltosJson json() {
-		AltosJson	j = new AltosJson();
-
-		j.put("along", along);
-		j.put("across", across);
-		j.put("through", through);
-		return j;
-	}
-
-	public AltosMag(AltosJson j) {
-		this();
-
-		along = j.get_int("along", along);
-		across = j.get_int("across", across);
-		through = j.get_int("through", through);
-	}
-
-	public static AltosMag fromJson(AltosJson j, AltosMag def) {
-		if (j == null)
-			return def;
-
-		return new AltosMag(j);
 	}
 }

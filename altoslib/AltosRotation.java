@@ -17,7 +17,7 @@
 
 package org.altusmetrum.altoslib_11;
 
-public class AltosRotation implements AltosJsonable {
+public class AltosRotation extends AltosQuaternion {
 	private AltosQuaternion		rotation;
 
 	public double tilt() {
@@ -48,22 +48,7 @@ public class AltosRotation implements AltosJsonable {
 		rotation = up.vectors_to_rotation(orient);
 	}
 
-	public AltosRotation(AltosJson j) {
-		rotation = new AltosQuaternion(j);
-	}
-
 	public AltosRotation() {
 		rotation = new AltosQuaternion();
-	}
-
-	public AltosJson json() {
-		return rotation.json();
-	}
-
-	public static AltosRotation fromJson(AltosJson j, AltosRotation def) {
-		if (j == null)
-			return def;
-
-		return new AltosRotation(j);
 	}
 }
