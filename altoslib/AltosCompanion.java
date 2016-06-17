@@ -37,4 +37,9 @@ public class AltosCompanion {
 			channels = MAX_CHANNELS;
 		companion_data = new int[channels];
 	}
+
+	public AltosCompanion() {
+		channels = 0;
+		companion_data = new int[0];
+	}
 }
