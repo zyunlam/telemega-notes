@@ -1080,17 +1080,27 @@ public class AltosJson extends JsonUtil {
 								field.set(object, val);
 							}
 						} catch (IllegalAccessException ie) {
+							System.out.printf("%s:%s %s\n",
+									  c.getName(), fieldName, ie.toString());
 						}
 					}
 				}
 				ret = object;
 			} catch (InvocationTargetException ie) {
+				System.out.printf("%s: %s\n",
+						  c.getName(), ie.toString());
 				ret = null;
 			} catch (NoSuchMethodException ie) {
+				System.out.printf("%s: %s\n",
+						  c.getName(), ie.toString());
 				ret = null;
 			} catch (InstantiationException ie) {
+				System.out.printf("%s: %s\n",
+						  c.getName(), ie.toString());
 				ret = null;
 			} catch (IllegalAccessException ie) {
+				System.out.printf("%s: %s\n",
+						  c.getName(), ie.toString());
 				ret = null;
 			}
 		}
@@ -1223,6 +1233,8 @@ public class AltosJson extends JsonUtil {
 							put(fieldName, json);
 						}
 					} catch (IllegalAccessException ie) {
+						System.out.printf("%s:%s %s\n",
+								  c.getName(), fieldName, ie.toString());
 					}
 				}
 			}
