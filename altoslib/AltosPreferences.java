@@ -135,23 +135,11 @@ public class AltosPreferences {
 	public static AltosFrequency[] load_common_frequencies() {
 		AltosFrequency[] frequencies = null;
 
-		AltosJson sets;
-
 		try {
-			sets = AltosJson.fromString(backend.getString(frequenciesPreference,null));
-
-			if (sets != null) {
-				ArrayList<AltosFrequency>	freqs = new ArrayList<AltosFrequency>();
-
-				for (int i = 0; i < sets.size(); i++) {
-					AltosFrequency f = AltosFrequency.fromJson(sets.get(i), null);
-					if (f != null)
-						freqs.add(f);
-				}
-				frequencies = freqs.toArray(new AltosFrequency[0]);
-			}
+			AltosJson json = AltosJson.fromString(backend.getString(frequenciesPreference,
+										null));
+			frequencies = (AltosFrequency[]) json.make(frequencies.getClass());
 		} catch (Exception e) {
-			sets = null;
 		}
 
 		if (frequencies == null) {
