@@ -29,6 +29,10 @@ reads ADC values from the noise source on the attached ChaosKey device.
 \-s serial | --serial serial
 This selects a ChaosKey by serial number instead of using the first
 one found.
+.TP
+\-l length | --length length
+Set the amount of data to read. Suffixes 'k', 'M' and 'G' are
+supported. The default is 1k.
 .SH USAGE
 .I ao-chaosread
 reads noise data.
