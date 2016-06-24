@@ -15,7 +15,7 @@ ADB=$(SDK)/platform-tools/adb
 AAPT=$(SDK)/platform-tools/aapt
 APKBUILDER=$(SDK)/tools/apkbuilder
 ZIPALIGN_A=$(SDK)/tools/zipalign
-ZIPALIGN_B=$(SDK)/build-tools/*/zipalign
+ZIPALIGN_B=$(shell ls $(SDK)/build-tools/*/zipalign | tail -1)
 
 JAVA_SRC_DIR=src/org/altusmetrum/AltosDroid
 EXT_LIBDIR=libs
