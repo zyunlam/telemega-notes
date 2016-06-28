@@ -41,6 +41,49 @@ static const struct ao_spi_stm_info ao_spi_stm_info[STM_NUM_SPI] = {
 
 static uint8_t	spi_dev_null;
 
+#if DEBUG
+static struct {
+	uint8_t	task;
+	uint8_t	which;
+	AO_TICK_TYPE tick;
+	uint16_t len;
+} spi_tasks[64];
+static uint8_t	spi_task_index;
+
+static void
+validate_spi(struct stm_spi *stm_spi, int which, uint16_t len)
+{
+	uint32_t	sr = stm_spi->sr;
+
+	if (stm_spi != &stm_spi2)
+		return;
+	spi_tasks[spi_task_index].task = ao_cur_task ? ao_cur_task->task_id : 0;
+	spi_tasks[spi_task_index].which = which;
+	spi_tasks[spi_task_index].tick = ao_time();
+	spi_tasks[spi_task_index].len = len;
+	spi_task_index = (spi_task_index + 1) & (63);
+	if (sr & (1 << STM_SPI_SR_FRE))
+		ao_panic(0x40 | 1);
+	if (sr & (1 << STM_SPI_SR_BSY))
+		ao_panic(0x40 | 2);
+	if (sr & (1 << STM_SPI_SR_OVR))
+		ao_panic(0x40 | 3);
+	if (sr & (1 << STM_SPI_SR_MODF))
+		ao_panic(0x40 | 4);
+	if (sr & (1 << STM_SPI_SR_UDR))
+		ao_panic(0x40 | 5);
+	if ((sr & (1 << STM_SPI_SR_TXE)) == 0)
+		ao_panic(0x40 | 6);
+	if (sr & (1 << STM_SPI_SR_RXNE))
+		ao_panic(0x40 | 7);
+	if (which != 5 && which != 6 && which != 13)
+		if (ao_cur_task->task_id != ao_spi_mutex[1])
+			ao_panic(0x40 | 8);
+}
+#else
+#define validate_spi(stm_spi, which, len) do { (void) (which); (void) (len); } while (0)
+#endif
+
 void
 ao_spi_send(const void *block, uint16_t len, uint8_t spi_index)
 {
@@ -460,6 +503,50 @@ ao_spi_channel_init(uint8_t spi_index)
 			(0 << STM_SPI_CR2_RXDMAEN));
 }
 
+#if DEBUG
+void
+ao_spi_dump_cmd(void)
+{
+	int s;
+
+	for (s = 0; s < 64; s++) {
+		int i = (spi_task_index + s) & 63;
+		if (spi_tasks[i].which) {
+			int t;
+			const char *name = "(none)";
+			for (t = 0; t < ao_num_tasks; t++)
+				if (ao_tasks[t]->task_id == spi_tasks[i].task) {
+					name = ao_tasks[t]->name;
+					break;
+				}
+			printf("%2d: %5d task %2d which %2d len %5d %s\n",
+			       s,
+			       spi_tasks[i].tick,
+			       spi_tasks[i].task,
+			       spi_tasks[i].which,
+			       spi_tasks[i].len,
+			       name);
+		}
+	}
+	for (s = 0; s < STM_NUM_SPI; s++) {
+		struct stm_spi *spi = ao_spi_stm_info[s].stm_spi;
+
+		printf("%1d: mutex %2d index %3d miso dma %3d mosi dma %3d",
+		       s, ao_spi_mutex[s], ao_spi_index[s],
+		       ao_spi_stm_info[s].miso_dma_index,
+		       ao_spi_stm_info[s].mosi_dma_index);
+		printf(" cr1 %04x cr2 %02x sr %03x\n",
+		       spi->cr1, spi->cr2, spi->sr);
+	}
+
+}
+
+static const struct ao_cmds ao_spi_cmds[] = {
+	{ ao_spi_dump_cmd, 	"S\0Dump SPI status" },
+	{ 0, NULL }
+};
+#endif
+
 void
 ao_spi_init(void)
 {
@@ -503,5 +590,8 @@ ao_spi_init(void)
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_SPI2EN);
 	ao_spi_index[1] = AO_SPI_CONFIG_NONE;
 	ao_spi_channel_init(1);
+#endif
+#if DEBUG
+	ao_cmd_register(&ao_spi_cmds[0]);
 #endif
 }
