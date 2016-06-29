@@ -54,6 +54,12 @@ static inline void ao_check_stack(void) {
 #define ao_check_stack()
 #endif
 
+#if DEBUG
+#define ao_task_irq_check()	ao_arch_irq_check()
+#else
+#define ao_task_irq_check()
+#endif
+
 #if HAS_TASK_QUEUE
 
 #define SLEEP_HASH_SIZE	17
@@ -65,6 +71,7 @@ static struct ao_list	sleep_queue[SLEEP_HASH_SIZE];
 static void
 ao_task_to_run_queue(struct ao_task *task)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->queue);
 	ao_list_append(&task->queue, &run_queue);
 }
@@ -78,6 +85,7 @@ ao_task_sleep_queue(void *wchan)
 static void
 ao_task_to_sleep_queue(struct ao_task *task, void *wchan)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->queue);
 	ao_list_append(&task->queue, ao_task_sleep_queue(wchan));
 }
@@ -122,6 +130,7 @@ static void
 ao_task_to_alarm_queue(struct ao_task *task)
 {
 	struct ao_task	*alarm;
+	ao_task_irq_check();
 	ao_list_for_each_entry(alarm, &alarm_queue, struct ao_task, alarm_queue) {
 		if ((int16_t) (alarm->alarm - task->alarm) >= 0) {
 			ao_list_insert(&task->alarm_queue, alarm->alarm_queue.prev);
@@ -138,6 +147,7 @@ ao_task_to_alarm_queue(struct ao_task *task)
 static void
 ao_task_from_alarm_queue(struct ao_task *task)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->alarm_queue);
 	if (ao_list_is_empty(&alarm_queue))
 		ao_task_alarm_tick = 0;
@@ -156,6 +166,7 @@ ao_task_init_queue(struct ao_task *task)
 static void
 ao_task_exit_queue(struct ao_task *task)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->queue);
 	ao_list_del(&task->alarm_queue);
 }
