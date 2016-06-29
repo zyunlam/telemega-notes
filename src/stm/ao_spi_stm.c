@@ -315,44 +315,36 @@ ao_spi_disable_index(uint8_t spi_index)
 {
 	/* Disable current config
 	 */
-	switch (AO_SPI_INDEX(spi_index)) {
-	case STM_SPI_INDEX(1):
-		switch (spi_index) {
-		case AO_SPI_1_PA5_PA6_PA7:
-			stm_gpio_set(&stm_gpioa, 5, 1);
-			stm_moder_set(&stm_gpioa, 5, STM_MODER_OUTPUT);
-			stm_moder_set(&stm_gpioa, 6, STM_MODER_INPUT);
-			stm_moder_set(&stm_gpioa, 7, STM_MODER_OUTPUT);
-			break;
-		case AO_SPI_1_PB3_PB4_PB5:
-			stm_gpio_set(&stm_gpiob, 3, 1);
-			stm_moder_set(&stm_gpiob, 3, STM_MODER_OUTPUT);
-			stm_moder_set(&stm_gpiob, 4, STM_MODER_INPUT);
-			stm_moder_set(&stm_gpiob, 5, STM_MODER_OUTPUT);
-			break;
-		case AO_SPI_1_PE13_PE14_PE15:
-			stm_gpio_set(&stm_gpioe, 13, 1);
-			stm_moder_set(&stm_gpioe, 13, STM_MODER_OUTPUT);
-			stm_moder_set(&stm_gpioe, 14, STM_MODER_INPUT);
-			stm_moder_set(&stm_gpioe, 15, STM_MODER_OUTPUT);
-			break;
-		}
+	switch (spi_index) {
+	case AO_SPI_1_PA5_PA6_PA7:
+		stm_gpio_set(&stm_gpioa, 5, 1);
+		stm_moder_set(&stm_gpioa, 5, STM_MODER_OUTPUT);
+		stm_moder_set(&stm_gpioa, 6, STM_MODER_INPUT);
+		stm_moder_set(&stm_gpioa, 7, STM_MODER_OUTPUT);
 		break;
-	case STM_SPI_INDEX(2):
-		switch (spi_index) {
-		case AO_SPI_2_PB13_PB14_PB15:
-			stm_gpio_set(&stm_gpiob, 13, 1);
-			stm_moder_set(&stm_gpiob, 13, STM_MODER_OUTPUT);
-			stm_moder_set(&stm_gpiob, 14, STM_MODER_INPUT);
-			stm_moder_set(&stm_gpiob, 15, STM_MODER_OUTPUT);
-			break;
-		case AO_SPI_2_PD1_PD3_PD4:
-			stm_gpio_set(&stm_gpiod, 1, 1);
-			stm_moder_set(&stm_gpiod, 1, STM_MODER_OUTPUT);
-			stm_moder_set(&stm_gpiod, 3, STM_MODER_INPUT);
-			stm_moder_set(&stm_gpiod, 4, STM_MODER_OUTPUT);
-			break;
-		}
+	case AO_SPI_1_PB3_PB4_PB5:
+		stm_gpio_set(&stm_gpiob, 3, 1);
+		stm_moder_set(&stm_gpiob, 3, STM_MODER_OUTPUT);
+		stm_moder_set(&stm_gpiob, 4, STM_MODER_INPUT);
+		stm_moder_set(&stm_gpiob, 5, STM_MODER_OUTPUT);
+		break;
+	case AO_SPI_1_PE13_PE14_PE15:
+		stm_gpio_set(&stm_gpioe, 13, 1);
+		stm_moder_set(&stm_gpioe, 13, STM_MODER_OUTPUT);
+		stm_moder_set(&stm_gpioe, 14, STM_MODER_INPUT);
+		stm_moder_set(&stm_gpioe, 15, STM_MODER_OUTPUT);
+		break;
+	case AO_SPI_2_PB13_PB14_PB15:
+		stm_gpio_set(&stm_gpiob, 13, 1);
+		stm_moder_set(&stm_gpiob, 13, STM_MODER_OUTPUT);
+		stm_moder_set(&stm_gpiob, 14, STM_MODER_INPUT);
+		stm_moder_set(&stm_gpiob, 15, STM_MODER_OUTPUT);
+		break;
+	case AO_SPI_2_PD1_PD3_PD4:
+		stm_gpio_set(&stm_gpiod, 1, 1);
+		stm_moder_set(&stm_gpiod, 1, STM_MODER_OUTPUT);
+		stm_moder_set(&stm_gpiod, 3, STM_MODER_INPUT);
+		stm_moder_set(&stm_gpiod, 4, STM_MODER_OUTPUT);
 		break;
 	}
 }
@@ -360,39 +352,33 @@ ao_spi_disable_index(uint8_t spi_index)
 static void
 ao_spi_enable_index(uint8_t spi_index)
 {
-	switch (AO_SPI_INDEX(spi_index)) {
-	case STM_SPI_INDEX(1):
-		switch (spi_index) {
-		case AO_SPI_1_PA5_PA6_PA7:
-			stm_afr_set(&stm_gpioa, 5, STM_AFR_AF5);
-			stm_afr_set(&stm_gpioa, 6, STM_AFR_AF5);
-			stm_afr_set(&stm_gpioa, 7, STM_AFR_AF5);
-			break;
-		case AO_SPI_1_PB3_PB4_PB5:
-			stm_afr_set(&stm_gpiob, 3, STM_AFR_AF5);
-			stm_afr_set(&stm_gpiob, 4, STM_AFR_AF5);
-			stm_afr_set(&stm_gpiob, 5, STM_AFR_AF5);
-			break;
-		case AO_SPI_1_PE13_PE14_PE15:
-			stm_afr_set(&stm_gpioe, 13, STM_AFR_AF5);
-			stm_afr_set(&stm_gpioe, 14, STM_AFR_AF5);
-			stm_afr_set(&stm_gpioe, 15, STM_AFR_AF5);
-			break;
-		}
+	/* Enable new config
+	 */
+	switch (spi_index) {
+	case AO_SPI_1_PA5_PA6_PA7:
+		stm_afr_set(&stm_gpioa, 5, STM_AFR_AF5);
+		stm_afr_set(&stm_gpioa, 6, STM_AFR_AF5);
+		stm_afr_set(&stm_gpioa, 7, STM_AFR_AF5);
 		break;
-	case STM_SPI_INDEX(2):
-		switch (spi_index) {
-		case AO_SPI_2_PB13_PB14_PB15:
-			stm_afr_set(&stm_gpiob, 13, STM_AFR_AF5);
-			stm_afr_set(&stm_gpiob, 14, STM_AFR_AF5);
-			stm_afr_set(&stm_gpiob, 15, STM_AFR_AF5);
-			break;
-		case AO_SPI_2_PD1_PD3_PD4:
-			stm_afr_set(&stm_gpiod, 1, STM_AFR_AF5);
-			stm_afr_set(&stm_gpiod, 3, STM_AFR_AF5);
-			stm_afr_set(&stm_gpiod, 4, STM_AFR_AF5);
-			break;
-		}
+	case AO_SPI_1_PB3_PB4_PB5:
+		stm_afr_set(&stm_gpiob, 3, STM_AFR_AF5);
+		stm_afr_set(&stm_gpiob, 4, STM_AFR_AF5);
+		stm_afr_set(&stm_gpiob, 5, STM_AFR_AF5);
+		break;
+	case AO_SPI_1_PE13_PE14_PE15:
+		stm_afr_set(&stm_gpioe, 13, STM_AFR_AF5);
+		stm_afr_set(&stm_gpioe, 14, STM_AFR_AF5);
+		stm_afr_set(&stm_gpioe, 15, STM_AFR_AF5);
+		break;
+	case AO_SPI_2_PB13_PB14_PB15:
+		stm_afr_set(&stm_gpiob, 13, STM_AFR_AF5);
+		stm_afr_set(&stm_gpiob, 14, STM_AFR_AF5);
+		stm_afr_set(&stm_gpiob, 15, STM_AFR_AF5);
+		break;
+	case AO_SPI_2_PD1_PD3_PD4:
+		stm_afr_set(&stm_gpiod, 1, STM_AFR_AF5);
+		stm_afr_set(&stm_gpiod, 3, STM_AFR_AF5);
+		stm_afr_set(&stm_gpiod, 4, STM_AFR_AF5);
 		break;
 	}
 }
