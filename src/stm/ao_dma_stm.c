@@ -64,7 +64,7 @@ ao_dma_set_transfer(uint8_t 		index,
 	if (ao_dma_allocated[index]) {
 		if (ao_dma_mutex[index])
 			ao_panic(AO_PANIC_DMA);
-		ao_dma_mutex[index] = 1;
+		ao_dma_mutex[index] = 0xff;
 	} else
 		ao_mutex_get(&ao_dma_mutex[index]);
 	ao_arch_critical(
