@@ -504,6 +504,8 @@ static __xdata uint8_t ao_forever;
 void
 ao_delay(uint16_t ticks)
 {
+	if (!ticks)
+		ticks = 1;
 	ao_sleep_for(&ao_forever, ticks);
 }
 
