@@ -250,9 +250,6 @@ void
 ao_dma_done_transfer(uint8_t index);
 
 void
-ao_dma_abort(uint8_t index);
-
-void
 ao_dma_alloc(uint8_t index);
 
 void
