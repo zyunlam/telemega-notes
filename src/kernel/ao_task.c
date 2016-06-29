@@ -460,11 +460,11 @@ ao_sleep_for(__xdata void *wchan, uint16_t timeout)
 	if (timeout) {
 #if HAS_TASK_QUEUE
 		uint32_t flags;
+		flags = ao_arch_irqsave();
+#endif
 		/* Make sure we sleep *at least* delay ticks, which means adding
 		 * one to account for the fact that we may be close to the next tick
 		 */
-		flags = ao_arch_irqsave();
-#endif
 		if (!(ao_cur_task->alarm = ao_time() + timeout + 1))
 			ao_cur_task->alarm = 1;
 #if HAS_TASK_QUEUE
