@@ -80,7 +80,7 @@ void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
 
 void
-ao_spi_send_sync(void *block, uint16_t len, uint8_t spi_index);
+ao_spi_send_sync(const void *block, uint16_t len, uint8_t spi_index);
 
 static inline void
 ao_spi_send_byte(uint8_t byte, uint8_t spi_index)

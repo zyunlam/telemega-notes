@@ -154,7 +154,7 @@ ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index)
 }
 
 void
-ao_spi_send_sync(void *block, uint16_t len, uint8_t spi_index)
+ao_spi_send_sync(const void *block, uint16_t len, uint8_t spi_index)
 {
 	uint8_t		*b = block;
 	struct stm_spi	*stm_spi = ao_spi_stm_info[AO_SPI_INDEX(spi_index)].stm_spi;
