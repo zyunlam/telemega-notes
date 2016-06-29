@@ -343,6 +343,14 @@ ao_arch_memory_barrier() {
 	asm volatile("" ::: "memory");
 }
 
+static inline void
+ao_arch_irq_check(void) {
+	uint32_t	primask;
+	asm("mrs %0,primask" : "=&r" (primask));
+	if ((primask & 1) == 0)
+		ao_panic(AO_PANIC_IRQ);
+}
+
 #if HAS_TASK
 static inline void
 ao_arch_init_stack(struct ao_task *task, void *start)

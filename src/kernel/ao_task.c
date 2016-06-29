@@ -165,13 +165,14 @@ ao_task_check_alarm(uint16_t tick)
 {
 	struct ao_task	*alarm, *next;
 
-	ao_list_for_each_entry_safe(alarm, next, &alarm_queue, struct ao_task, alarm_queue) {
-		if ((int16_t) (tick - alarm->alarm) < 0)
-			break;
-		alarm->alarm = 0;
-		ao_task_from_alarm_queue(alarm);
-		ao_task_to_run_queue(alarm);
-	}
+	ao_arch_critical(
+		ao_list_for_each_entry_safe(alarm, next, &alarm_queue, struct ao_task, alarm_queue) {
+			if ((int16_t) (tick - alarm->alarm) < 0)
+				break;
+			alarm->alarm = 0;
+			ao_task_from_alarm_queue(alarm);
+			ao_task_to_run_queue(alarm);
+		});
 }
 
 void
