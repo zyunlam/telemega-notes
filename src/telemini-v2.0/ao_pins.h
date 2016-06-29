@@ -44,6 +44,7 @@
 #define PACKET_HAS_SLAVE	1
 #define HAS_RADIO_RATE		1
 #define HAS_TELEMETRY		1
+#define HAS_TASK_INFO		0
 
 #define AO_LED_RED		2
 #define LEDS_AVAILABLE		AO_LED_RED
