@@ -307,7 +307,6 @@ struct ao_adc {
 #define AO_CC1120_SPI_CS_PORT	(&stm_gpioc)
 #define AO_CC1120_SPI_CS_PIN	5
 #define AO_CC1120_SPI_BUS	AO_SPI_2_PB13_PB14_PB15
-#define AO_CC1120_SPI		stm_spi2
 
 #define AO_CC1120_INT_PORT		(&stm_gpioe)
 #define AO_CC1120_INT_PIN		1

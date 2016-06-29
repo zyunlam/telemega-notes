@@ -44,7 +44,10 @@ extern const uint32_t	ao_radio_cal;
 #define ao_radio_try_select(task_id)	ao_spi_try_get_mask(AO_CC1120_SPI_CS_PORT,(1 << AO_CC1120_SPI_CS_PIN),AO_CC1120_SPI_BUS,AO_SPI_SPEED_4MHz, task_id)
 #define ao_radio_select()	ao_spi_get_mask(AO_CC1120_SPI_CS_PORT,(1 << AO_CC1120_SPI_CS_PIN),AO_CC1120_SPI_BUS,AO_SPI_SPEED_4MHz)
 #define ao_radio_deselect()	ao_spi_put_mask(AO_CC1120_SPI_CS_PORT,(1 << AO_CC1120_SPI_CS_PIN),AO_CC1120_SPI_BUS)
-#define ao_radio_spi_send_sync(d,l)	ao_spi_send_sync((d), (l), AO_CC1120_SPI_BUS)
+#define ao_radio_spi_start_bytes()	ao_spi_start_bytes(AO_CC1120_SPI_BUS)
+#define ao_radio_spi_stop_bytes()	ao_spi_stop_bytes(AO_CC1120_SPI_BUS)
+#define ao_radio_spi_send_byte(b)	ao_spi_send_byte(b, AO_CC1120_SPI_BUS)
+#define ao_radio_spi_recv_byte()	ao_spi_recv_byte(AO_CC1120_SPI_BUS)
 #define ao_radio_spi_send(d,l)	ao_spi_send((d), (l), AO_CC1120_SPI_BUS)
 #define ao_radio_spi_send_fixed(d,l) ao_spi_send_fixed((d), (l), AO_CC1120_SPI_BUS)
 #define ao_radio_spi_recv(d,l)	ao_spi_recv((d), (l), AO_CC1120_SPI_BUS)
@@ -111,28 +114,23 @@ ao_radio_reg_write(uint16_t addr, uint8_t value)
 static void
 _ao_radio_burst_read_start (uint16_t addr)
 {
-	uint8_t data[2];
-	uint8_t d;
+	ao_radio_spi_start_bytes();
 
 	if (CC1120_IS_EXTENDED(addr)) {
-		data[0] = ((1 << CC1120_READ)  |
-			   (1 << CC1120_BURST) |
-			   CC1120_EXTENDED);
-		data[1] = addr;
-		d = 2;
+		ao_radio_spi_send_byte((1 << CC1120_READ)  |
+				       (1 << CC1120_BURST) |
+				       CC1120_EXTENDED);
 	} else {
-		data[0] = ((1 << CC1120_READ)  |
-			   (1 << CC1120_BURST) |
-			   addr);
-		d = 1;
+		addr |= ((1 << CC1120_READ)  |
+			 (1 << CC1120_BURST));
 	}
-
-	ao_radio_spi_send_sync(data, d);
+	ao_radio_spi_send_byte(addr);
 }
 
 static void
 ao_radio_burst_read_stop (void)
 {
+	ao_radio_spi_stop_bytes();
 	ao_radio_deselect();
 }
 
@@ -1029,8 +1027,7 @@ ao_radio_rx_isr(void)
 		rx_starting = 0;
 		ao_wakeup(&ao_radio_wake);
 	}
-	d = AO_CC1120_SPI.dr;
-	AO_CC1120_SPI.dr = 0;
+	d = ao_radio_spi_recv_byte();
 	if (rx_ignore == 0) {
 		if (rx_data_cur < rx_data_count)
 			rx_data[rx_data_cur++] = d;
@@ -1099,7 +1096,7 @@ ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 	rx_data_count = len * 8;	/* bytes to bits */
 	rx_data_cur = 0;
 	rx_data_consumed = 0;
-	rx_ignore = 2;
+	rx_ignore = 1;
 
 	/* Must be set before changing the frequency; any abort
 	 * after the frequency is set needs to terminate the read
@@ -1149,9 +1146,7 @@ ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
 		ao_radio_select();
 		_ao_radio_burst_read_start(CC1120_SOFT_RX_DATA_OUT);
 		if (rx_ignore) {
-			uint8_t ignore = AO_CC1120_SPI.dr;
-			(void) ignore;
-			AO_CC1120_SPI.dr = 0;
+			(void) ao_radio_spi_recv_byte();
 			--rx_ignore;
 		}
 	}
