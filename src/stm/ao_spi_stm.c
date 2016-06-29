@@ -204,6 +204,38 @@ ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index)
 }
 
 void
+ao_spi_start_bytes(uint8_t spi_index)
+{
+	uint8_t		id = AO_SPI_INDEX(spi_index);
+	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
+
+	stm_spi->cr2 = ((0 << STM_SPI_CR2_TXEIE) |
+			(0 << STM_SPI_CR2_RXNEIE) |
+			(0 << STM_SPI_CR2_ERRIE) |
+			(0 << STM_SPI_CR2_SSOE) |
+			(0 << STM_SPI_CR2_TXDMAEN) |
+			(0 << STM_SPI_CR2_RXDMAEN));
+	validate_spi(stm_spi, 5, 0xffff);
+}
+
+void
+ao_spi_stop_bytes(uint8_t spi_index)
+{
+	uint8_t		id = AO_SPI_INDEX(spi_index);
+	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
+
+	while ((stm_spi->sr & (1 << STM_SPI_SR_TXE)) == 0)
+		;
+	while (stm_spi->sr & (1 << STM_SPI_SR_BSY))
+		;
+	/* Clear the OVR flag */
+	(void) stm_spi->dr;
+	(void) stm_spi->sr;
+	validate_spi(stm_spi, 6, 0xffff);
+	stm_spi->cr2 = 0;
+}
+
+void
 ao_spi_send_sync(const void *block, uint16_t len, uint8_t spi_index)
 {
 	uint8_t		id = AO_SPI_INDEX(spi_index);
