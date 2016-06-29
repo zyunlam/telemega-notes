@@ -537,12 +537,15 @@ ao_task_info(void)
 {
 	uint8_t		i;
 	__xdata struct ao_task *task;
+	uint16_t	now = ao_time();
 
 	for (i = 0; i < ao_num_tasks; i++) {
 		task = ao_tasks[i];
-		printf("%12s: wchan %04x\n",
-		       task->name,
-		       (int) task->wchan);
+		printf("%2d: wchan %08x alarm %5d %s\n",
+		       task->task_id,
+		       (int) task->wchan,
+		       task->alarm ? (int16_t) (task->alarm - now) : 9999,
+		       task->name);
 	}
 #if HAS_TASK_QUEUE && DEBUG
 	ao_task_validate();
