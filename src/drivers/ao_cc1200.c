@@ -185,9 +185,9 @@ ao_radio_fifo_write_fixed(uint8_t data, uint8_t len)
 }
 
 static uint8_t
-ao_radio_tx_fifo_space(void)
+ao_radio_int_pin(void)
 {
-	return CC1200_FIFO_SIZE - ao_radio_reg_read(CC1200_NUM_TXBYTES);
+	return ao_gpio_get(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_CC1200_INT);
 }
 
 static uint8_t
@@ -482,6 +482,7 @@ static const uint16_t rdf_setup[] = {
  */
 #define APRS_SYMBOL_RATE_E	6
 #define APRS_SYMBOL_RATE_M	1013008
+#define APRS_BUFFER_SIZE	64
 
 static const uint16_t aprs_setup[] = {
 	CC1200_DEVIATION_M,	APRS_DEV_M,
@@ -516,6 +517,9 @@ static const uint16_t aprs_setup[] = {
 		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
 		 (CC1200_MDMCFG2_UPSAMPLER_P_8 << CC1200_MDMCFG2_UPSAMPLER_P) |
 		 (0 << CC1200_MDMCFG2_CFM_DATA_EN)),
+	CC1200_FIFO_CFG,
+		((0 << CC1200_FIFO_CFG_CRC_AUTOFLUSH) |
+		 (APRS_BUFFER_SIZE << CC1200_FIFO_CFG_FIFO_THR)),
 };
 
 /*
@@ -861,105 +865,58 @@ ao_radio_send(const void *d, uint8_t size)
 	ao_radio_run();
 }
 
-
-#define AO_RADIO_LOTS	64
-
 void
 ao_radio_send_aprs(ao_radio_fill_func fill)
 {
-	uint8_t	buf[AO_RADIO_LOTS], *b;
+	uint8_t	buf[APRS_BUFFER_SIZE];
 	int	cnt;
 	int	total = 0;
 	uint8_t	done = 0;
 	uint8_t	started = 0;
-	uint8_t	fifo_space;
 
 	ao_radio_abort = 0;
 	ao_radio_get(0xff);
-	fifo_space = CC1200_FIFO_SIZE;
-	while (!done) {
+	ao_radio_wake = 0;
+	while (!done && !ao_radio_abort) {
 		cnt = (*fill)(buf, sizeof(buf));
 		if (cnt < 0) {
 			done = 1;
 			cnt = -cnt;
 		}
-#if CC1200_APRS_TRACE
-		printf("APRS fill %d bytes done %d\n", cnt, done);
-#endif
 		total += cnt;
 
 		/* At the last buffer, set the total length */
 		if (done)
 			ao_radio_set_len(total & 0xff);
 
-		b = buf;
-		while (cnt) {
-			uint8_t	this_len = cnt;
-
-			/* Wait for some space in the fifo */
-			while (!ao_radio_abort && (fifo_space = ao_radio_tx_fifo_space()) == 0) {
-#if CC1200_APRS_TRACE
-				printf("APRS space %d cnt %d\n", fifo_space, cnt); flush();
-#endif
-				ao_radio_wake = 0;
-				ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
-			}
-			if (ao_radio_abort)
-				break;
-			if (this_len > fifo_space)
-				this_len = fifo_space;
-
-			cnt -= this_len;
-
-			if (done) {
-				if (cnt)
-					ao_radio_set_mode(AO_RADIO_MODE_APRS_LAST_BUF);
-				else
-					ao_radio_set_mode(AO_RADIO_MODE_APRS_FINISH);
-			} else
-				ao_radio_set_mode(AO_RADIO_MODE_APRS_BUF);
-
+		/* Wait for some space in the fifo */
+		while (started && ao_radio_int_pin() != 0 && !ao_radio_abort) {
+			ao_radio_wake = 0;
 			ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
-
-			ao_radio_fifo_write(b, this_len);
-			b += this_len;
-#if CC1200_APRS_TRACE
-			printf("APRS write fifo %d space now %d\n", this_len, ao_radio_tx_fifo_space());
-#endif
-			if (!started) {
-#if CC1200_APRS_TRACE
-				printf("APRS start\n");
-#endif
-				ao_radio_strobe(CC1200_STX);
-#if CC1200_APRS_TRACE
-				{ int t;
-					for (t = 0; t < 20; t++) {
-						uint8_t	status = ao_radio_status();
-						uint8_t space = ao_radio_tx_fifo_space();
-						printf ("status: %02x fifo %d\n", status, space);
-						if ((status >> 4) == 2)
-							break;
-						ao_delay(AO_MS_TO_TICKS(0));
-					}
-				}
-#endif
-				started = 1;
-			}
+			ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
 		}
-		if (ao_radio_abort) {
-			ao_radio_idle();
+		if (ao_radio_abort)
 			break;
+
+		if (done)
+			ao_radio_set_mode(AO_RADIO_MODE_APRS_FINISH);
+		else
+			ao_radio_set_mode(AO_RADIO_MODE_APRS_BUF);
+
+		ao_radio_fifo_write(buf, cnt);
+		if (!started) {
+			ao_radio_strobe(CC1200_STX);
+			started = 1;
 		}
 	}
 	/* Wait for the transmitter to go idle */
-	ao_radio_wake = 0;
-#if CC1200_APRS_TRACE
-	printf("APRS wait idle\n"); flush();
-#endif
-	ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
-#if CC1200_APRS_TRACE
-	printf("APRS abort %d\n", ao_radio_abort);
-#endif
+	while (started && ao_radio_int_pin() != 0 && !ao_radio_abort) {
+		ao_radio_wake = 0;
+		ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
+		ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
+	}
+	if (ao_radio_abort)
+		ao_radio_idle();
 	ao_radio_put();
 }
 
