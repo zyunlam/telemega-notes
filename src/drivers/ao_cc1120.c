@@ -204,9 +204,9 @@ ao_radio_fifo_write_fixed(uint8_t data, uint8_t len)
 }
 
 static uint8_t
-ao_radio_tx_fifo_space(void)
+ao_radio_int_pin(void)
 {
-	return CC1120_FIFO_SIZE - ao_radio_reg_read(CC1120_NUM_TXBYTES);
+	return ao_gpio_get(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN, AO_CC1120_INT);
 }
 
 #if CC1120_DEBUG
@@ -262,11 +262,16 @@ ao_radio_isr(void)
 }
 
 static void
+ao_radio_enable_isr(void)
+{
+	ao_exti_enable(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
+	ao_exti_enable(AO_CC1120_MCU_WAKEUP_PORT, AO_CC1120_MCU_WAKEUP_PIN);
+}
+
+static void
 ao_radio_start_tx(void)
 {
 	ao_exti_set_callback(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN, ao_radio_isr);
-	ao_exti_enable(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
-	ao_exti_enable(AO_CC1120_MCU_WAKEUP_PORT, AO_CC1120_MCU_WAKEUP_PIN);
 	ao_radio_tx_finished = 0;
 	ao_radio_strobe(CC1120_STX);
 }
@@ -422,10 +427,13 @@ static const uint16_t packet_setup_24[] = {
 	CC1120_PA_CFG0,		0x7e,
 };
 
+#define AO_CC1120_TX_BUFFER	64
+
 static const uint16_t packet_tx_setup[] = {
 	CC1120_PKT_CFG2,	((CC1120_PKT_CFG2_CCA_MODE_ALWAYS_CLEAR << CC1120_PKT_CFG2_CCA_MODE) |
 				 (CC1120_PKT_CFG2_PKT_FORMAT_NORMAL << CC1120_PKT_CFG2_PKT_FORMAT)),
-	AO_CC1120_INT_GPIO_IOCFG, 		CC1120_IOCFG_GPIO_CFG_RX0TX1_CFG,
+	CC1120_FIFO_CFG,	((0 << CC1120_FIFO_CFG_CRC_AUTOFLUSH) |
+				 (AO_CC1120_TX_BUFFER << CC1120_FIFO_CFG_FIFO_THR)),
 };
 
 static const uint16_t packet_rx_setup[] = {
@@ -532,6 +540,8 @@ static const uint16_t aprs_setup[] = {
         CC1120_PREAMBLE_CFG1,	((CC1120_PREAMBLE_CFG1_NUM_PREAMBLE_NONE << CC1120_PREAMBLE_CFG1_NUM_PREAMBLE) |
 				 (CC1120_PREAMBLE_CFG1_PREAMBLE_WORD_AA << CC1120_PREAMBLE_CFG1_PREAMBLE_WORD)),
 	CC1120_PA_CFG0,		0x7d,
+	CC1120_FIFO_CFG,	((0 << CC1120_FIFO_CFG_CRC_AUTOFLUSH) |
+				 (AO_CC1120_TX_BUFFER << CC1120_FIFO_CFG_FIFO_THR)),
 };
 
 /*
@@ -737,8 +747,10 @@ ao_rdf_run(void)
 	ao_radio_start_tx();
 
 	ao_arch_block_interrupts();
-	while (!ao_radio_wake && !ao_radio_abort && !ao_radio_mcu_wake)
+	while (!ao_radio_wake && !ao_radio_abort && !ao_radio_mcu_wake) {
+		ao_radio_enable_isr();
 		ao_sleep(&ao_radio_wake);
+	}
 	ao_arch_release_interrupts();
 	if (ao_radio_mcu_wake)
 		ao_radio_check_marc_status();
@@ -844,18 +856,14 @@ ao_radio_wait_isr(uint16_t timeout)
 		ao_radio_check_marc_status();
 }
 
-static uint8_t
-ao_radio_wait_tx(uint8_t wait_fifo)
+static void
+ao_radio_wait_fifo(void)
 {
-	uint8_t	fifo_space = 0;
-
-	do {
+	while (ao_radio_int_pin() != 0 && !ao_radio_abort) {
+		ao_radio_wake = 0;
+		ao_radio_enable_isr();
 		ao_radio_wait_isr(0);
-		if (!wait_fifo)
-			return 0;
-		fifo_space = ao_radio_tx_fifo_space();
-	} while (!fifo_space && !ao_radio_abort);
-	return fifo_space;
+	}
 }
 
 static uint8_t	tx_data[(AO_RADIO_MAX_SEND + 4) * 2];
@@ -867,7 +875,6 @@ ao_radio_send(const void *d, uint8_t size)
 	uint8_t		encode_len;
 	uint8_t		this_len;
 	uint8_t		started = 0;
-	uint8_t		fifo_space;
 
 	encode_len = ao_fec_encode(d, size, tx_data);
 
@@ -878,14 +885,17 @@ ao_radio_send(const void *d, uint8_t size)
 	/* Flush any pending TX bytes */
 	ao_radio_strobe(CC1120_SFTX);
 
-	started = 0;
-	fifo_space = CC1120_FIFO_SIZE;
 	while (encode_len) {
 		this_len = encode_len;
 
-		ao_radio_wake = 0;
-		if (this_len > fifo_space) {
-			this_len = fifo_space;
+		if (started) {
+			ao_radio_wait_fifo();
+			if (ao_radio_abort)
+				break;
+		}
+
+		if (this_len > AO_CC1120_TX_BUFFER) {
+			this_len = AO_CC1120_TX_BUFFER;
 			ao_radio_set_mode(AO_RADIO_MODE_PACKET_TX_BUF);
 		} else {
 			ao_radio_set_mode(AO_RADIO_MODE_PACKET_TX_FINISH);
@@ -898,35 +908,32 @@ ao_radio_send(const void *d, uint8_t size)
 		if (!started) {
 			ao_radio_start_tx();
 			started = 1;
-		} else {
-			ao_exti_enable(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
-		}
-
-		fifo_space = ao_radio_wait_tx(encode_len != 0);
-		if (ao_radio_abort) {
-			ao_radio_idle();
-			break;
 		}
 	}
-	while (started && !ao_radio_abort && !ao_radio_tx_finished)
+	while (started && !ao_radio_abort && !ao_radio_tx_finished) {
+		ao_radio_wake = 0;
+		ao_radio_enable_isr();
 		ao_radio_wait_isr(0);
+	}
+	if (ao_radio_abort)
+		ao_radio_idle();
 	ao_radio_put();
 }
-
-#define AO_RADIO_LOTS	64
 
 void
 ao_radio_send_aprs(ao_radio_fill_func fill)
 {
-	uint8_t	buf[AO_RADIO_LOTS], *b;
+	uint8_t	buf[AO_CC1120_TX_BUFFER];
 	int	cnt;
 	int	total = 0;
 	uint8_t	done = 0;
 	uint8_t	started = 0;
-	uint8_t	fifo_space;
 
 	ao_radio_get(0xff);
-	fifo_space = CC1120_FIFO_SIZE;
+
+	ao_radio_abort = 0;
+
+	ao_exti_set_callback(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN, ao_radio_isr);
 	while (!done) {
 		cnt = (*fill)(buf, sizeof(buf));
 		if (cnt < 0) {
@@ -935,51 +942,34 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 		}
 		total += cnt;
 
-		/* At the last buffer, set the total length */
-		if (done)
-			ao_radio_set_len(total & 0xff);
-
-		b = buf;
-		while (cnt) {
-			uint8_t	this_len = cnt;
-
-			/* Wait for some space in the fifo */
-			while (!ao_radio_abort && (fifo_space = ao_radio_tx_fifo_space()) == 0) {
-				ao_radio_wake = 0;
-				ao_radio_wait_isr(0);
-			}
+		/* Wait for some space in the fifo */
+		if (started) {
+			ao_radio_wait_fifo();
 			if (ao_radio_abort)
 				break;
-			if (this_len > fifo_space)
-				this_len = fifo_space;
-
-			cnt -= this_len;
-
-			if (done) {
-				if (cnt)
-					ao_radio_set_mode(AO_RADIO_MODE_APRS_LAST_BUF);
-				else
-					ao_radio_set_mode(AO_RADIO_MODE_APRS_FINISH);
-			} else
-				ao_radio_set_mode(AO_RADIO_MODE_APRS_BUF);
-
-			ao_radio_fifo_write(b, this_len);
-			b += this_len;
-
-			if (!started) {
-				ao_radio_start_tx();
-				started = 1;
-			} else
-				ao_exti_enable(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
 		}
-		if (ao_radio_abort) {
-			ao_radio_idle();
-			break;
+
+		if (done) {
+			ao_radio_set_len(total & 0xff);
+			ao_radio_set_mode(AO_RADIO_MODE_APRS_FINISH);
+		} else
+			ao_radio_set_mode(AO_RADIO_MODE_APRS_BUF);
+
+		ao_radio_fifo_write(buf, cnt);
+
+		if (!started) {
+			ao_radio_start_tx();
+			started = 1;
 		}
-		/* Wait for the transmitter to go idle */
+	}
+	/* Wait for the transmitter to go idle */
+	while (started && ao_radio_int_pin() != 0 && !ao_radio_abort) {
 		ao_radio_wake = 0;
+		ao_radio_enable_isr();
 		ao_radio_wait_isr(0);
 	}
+	if (ao_radio_abort)
+		ao_radio_idle();
 	ao_radio_put();
 }
 
