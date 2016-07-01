@@ -61,6 +61,7 @@
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
 	#define HAS_MUTEX_TRY		0
+	#define HAS_TASK_INFO		0	/* not enough space for this either */
 #endif
 
 #if defined(TELEMETRUM_V_1_1)
