@@ -52,7 +52,8 @@
     <revremark>
       Minor release fixing TeleMega and TeleMetrum v2.0 bug which
       would often result in loss of data logging and telemetry in
-      flight.
+      flight. Thanks to Chuck Haskin for help characterizing the bug
+      and testing this release.
     </revremark>
   </revision>
   <revision>

@@ -13,7 +13,8 @@
 
 	* Fix STM32L SPI driver to prevent lock-up in the logging or
           radio code, either of which could stop data logging and
-          telemetry.
+          telemetry. Found and characterized by Chuck Haskin, who also
+          tested the new firmware before release.
 
 	== AltosUI, TeleGPS and AltosDroid Applications
 
