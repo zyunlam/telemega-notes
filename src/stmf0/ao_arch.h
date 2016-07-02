@@ -115,21 +115,14 @@ extern const uint32_t ao_radio_cal;
 #endif
 
 #define AO_HCLK		(AO_SYSCLK / AO_AHB_PRESCALER)
-#define AO_PCLK1	(AO_HCLK / AO_APB1_PRESCALER)
-#define AO_PCLK2	(AO_HCLK / AO_APB2_PRESCALER)
+#define AO_PCLK		(AO_HCLK / AO_APB_PRESCALER)
 #define AO_SYSTICK	(AO_HCLK)
 #define AO_PANIC_DELAY_SCALE  (AO_SYSCLK / 12000000)
 
-#if AO_APB1_PRESCALER == 1
-#define AO_TIM23467_CLK		AO_PCLK1
+#if AO_APB_PRESCALER == 1
+#define AO_TIM_CLK		AO_PCLK
 #else
-#define AO_TIM23467_CLK		(2 * AO_PCLK1)
-#endif
-
-#if AO_APB2_PRESCALER == 1
-#define AO_TIM91011_CLK		AO_PCLK2
-#else
-#define AO_TIM91011_CLK		(2 * AO_PCLK2)
+#define AO_TIM_CLK		(2 * AO_PCLK)
 #endif
 
 #define AO_STM_NVIC_HIGH_PRIORITY	(0 << 6)
