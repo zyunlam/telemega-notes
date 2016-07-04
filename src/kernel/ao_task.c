@@ -54,6 +54,12 @@ static inline void ao_check_stack(void) {
 #define ao_check_stack()
 #endif
 
+#if DEBUG
+#define ao_task_irq_check()	ao_arch_irq_check()
+#else
+#define ao_task_irq_check()
+#endif
+
 #if HAS_TASK_QUEUE
 
 #define SLEEP_HASH_SIZE	17
@@ -65,6 +71,7 @@ static struct ao_list	sleep_queue[SLEEP_HASH_SIZE];
 static void
 ao_task_to_run_queue(struct ao_task *task)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->queue);
 	ao_list_append(&task->queue, &run_queue);
 }
@@ -78,6 +85,7 @@ ao_task_sleep_queue(void *wchan)
 static void
 ao_task_to_sleep_queue(struct ao_task *task, void *wchan)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->queue);
 	ao_list_append(&task->queue, ao_task_sleep_queue(wchan));
 }
@@ -122,6 +130,7 @@ static void
 ao_task_to_alarm_queue(struct ao_task *task)
 {
 	struct ao_task	*alarm;
+	ao_task_irq_check();
 	ao_list_for_each_entry(alarm, &alarm_queue, struct ao_task, alarm_queue) {
 		if ((int16_t) (alarm->alarm - task->alarm) >= 0) {
 			ao_list_insert(&task->alarm_queue, alarm->alarm_queue.prev);
@@ -138,6 +147,7 @@ ao_task_to_alarm_queue(struct ao_task *task)
 static void
 ao_task_from_alarm_queue(struct ao_task *task)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->alarm_queue);
 	if (ao_list_is_empty(&alarm_queue))
 		ao_task_alarm_tick = 0;
@@ -156,6 +166,7 @@ ao_task_init_queue(struct ao_task *task)
 static void
 ao_task_exit_queue(struct ao_task *task)
 {
+	ao_task_irq_check();
 	ao_list_del(&task->queue);
 	ao_list_del(&task->alarm_queue);
 }
@@ -165,13 +176,14 @@ ao_task_check_alarm(uint16_t tick)
 {
 	struct ao_task	*alarm, *next;
 
-	ao_list_for_each_entry_safe(alarm, next, &alarm_queue, struct ao_task, alarm_queue) {
-		if ((int16_t) (tick - alarm->alarm) < 0)
-			break;
-		alarm->alarm = 0;
-		ao_task_from_alarm_queue(alarm);
-		ao_task_to_run_queue(alarm);
-	}
+	ao_arch_critical(
+		ao_list_for_each_entry_safe(alarm, next, &alarm_queue, struct ao_task, alarm_queue) {
+			if ((int16_t) (tick - alarm->alarm) < 0)
+				break;
+			alarm->alarm = 0;
+			ao_task_from_alarm_queue(alarm);
+			ao_task_to_run_queue(alarm);
+		});
 }
 
 void
@@ -459,11 +471,11 @@ ao_sleep_for(__xdata void *wchan, uint16_t timeout)
 	if (timeout) {
 #if HAS_TASK_QUEUE
 		uint32_t flags;
+		flags = ao_arch_irqsave();
+#endif
 		/* Make sure we sleep *at least* delay ticks, which means adding
 		 * one to account for the fact that we may be close to the next tick
 		 */
-		flags = ao_arch_irqsave();
-#endif
 		if (!(ao_cur_task->alarm = ao_time() + timeout + 1))
 			ao_cur_task->alarm = 1;
 #if HAS_TASK_QUEUE
@@ -492,6 +504,8 @@ static __xdata uint8_t ao_forever;
 void
 ao_delay(uint16_t ticks)
 {
+	if (!ticks)
+		ticks = 1;
 	ao_sleep_for(&ao_forever, ticks);
 }
 
@@ -523,12 +537,15 @@ ao_task_info(void)
 {
 	uint8_t		i;
 	__xdata struct ao_task *task;
+	uint16_t	now = ao_time();
 
 	for (i = 0; i < ao_num_tasks; i++) {
 		task = ao_tasks[i];
-		printf("%12s: wchan %04x\n",
-		       task->name,
-		       (int) task->wchan);
+		printf("%2d: wchan %08x alarm %5d %s\n",
+		       task->task_id,
+		       (int) task->wchan,
+		       task->alarm ? (int16_t) (task->alarm - now) : 9999,
+		       task->name);
 	}
 #if HAS_TASK_QUEUE && DEBUG
 	ao_task_validate();

@@ -64,7 +64,7 @@ ao_dma_set_transfer(uint8_t 		index,
 	if (ao_dma_allocated[index]) {
 		if (ao_dma_mutex[index])
 			ao_panic(AO_PANIC_DMA);
-		ao_dma_mutex[index] = 1;
+		ao_dma_mutex[index] = 0xff;
 	} else
 		ao_mutex_get(&ao_dma_mutex[index]);
 	ao_arch_critical(
@@ -106,19 +106,46 @@ ao_dma_done_transfer(uint8_t index)
 }
 
 void
-ao_dma_abort(uint8_t index)
-{
-	stm_dma.channel[index].ccr &= ~(1 << STM_DMA_CCR_EN);
-	ao_wakeup(&ao_dma_done[index]);
-}
-
-void
 ao_dma_alloc(uint8_t index)
 {
 	if (ao_dma_allocated[index])
 		ao_panic(AO_PANIC_DMA);
 	ao_dma_allocated[index] = 1;
 }
+
+#if DEBUG
+void
+ao_dma_dump_cmd(void)
+{
+	int i;
+
+	ao_arch_critical(
+		if (ao_dma_active++ == 0)
+			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_DMA1EN);
+		);
+	printf ("isr %08x ifcr%08x\n", stm_dma.isr, stm_dma.ifcr);
+	for (i = 0; i < NUM_DMA; i++)
+		printf("%d: done %d allocated %d mutex %2d ccr %04x cndtr %04x cpar %08x cmar %08x isr %08x\n",
+		       i,
+		       ao_dma_done[i],
+		       ao_dma_allocated[i],
+		       ao_dma_mutex[i],
+		       stm_dma.channel[i].ccr,
+		       stm_dma.channel[i].cndtr,
+		       stm_dma.channel[i].cpar,
+		       stm_dma.channel[i].cmar,
+		       ao_dma_config[i].isr);
+	ao_arch_critical(
+		if (--ao_dma_active == 0)
+			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_DMA1EN);
+		);
+}
+
+static const struct ao_cmds ao_dma_cmds[] = {
+	{ ao_dma_dump_cmd, 	"D\0Dump DMA status" },
+	{ 0, NULL }
+};
+#endif
 
 void
 ao_dma_init(void)
@@ -131,5 +158,7 @@ ao_dma_init(void)
 		ao_dma_allocated[index] = 0;
 		ao_dma_mutex[index] = 0;
 	}
-	
+#if DEBUG
+	ao_cmd_register(&ao_dma_cmds[0]);
+#endif
 }

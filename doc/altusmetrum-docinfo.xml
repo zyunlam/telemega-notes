@@ -47,6 +47,16 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.6.5</revnumber>
+    <date>8 Jul 2016</date>
+    <revremark>
+      Minor release fixing TeleMega and TeleMetrum v2.0 bug which
+      would often result in loss of data logging and telemetry in
+      flight. Thanks to Chuck Haskin for help characterizing the bug
+      and testing this release.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.6.4</revnumber>
     <date>10 May 2016</date>
     <revremark>
