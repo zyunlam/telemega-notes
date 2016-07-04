@@ -1359,10 +1359,13 @@ extern struct stm_spi stm_spi1, stm_spi2, stm_spi3;
 #define STM_SPI_CR2_TXDMAEN	1
 #define STM_SPI_CR2_RXDMAEN	0
 
+#define STM_SPI_SR_FRE		8
 #define STM_SPI_SR_BSY		7
 #define STM_SPI_SR_OVR		6
 #define STM_SPI_SR_MODF		5
 #define STM_SPI_SR_CRCERR	4
+#define STM_SPI_SR_UDR		3
+#define STM_SPI_SR_CHSIDE	2
 #define STM_SPI_SR_TXE		1
 #define STM_SPI_SR_RXNE		0
 

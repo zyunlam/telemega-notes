@@ -80,7 +80,13 @@ void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
 
 void
-ao_spi_send_sync(void *block, uint16_t len, uint8_t spi_index);
+ao_spi_send_sync(const void *block, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_start_bytes(uint8_t spi_index);
+
+void
+ao_spi_stop_bytes(uint8_t spi_index);
 
 static inline void
 ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
@@ -96,18 +102,34 @@ ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
 		break;
 	}
 
-	stm_spi->cr2 = ((0 << STM_SPI_CR2_TXEIE) |
-			(0 << STM_SPI_CR2_RXNEIE) |
-			(0 << STM_SPI_CR2_ERRIE) |
-			(0 << STM_SPI_CR2_SSOE) |
-			(0 << STM_SPI_CR2_TXDMAEN) |
-			(0 << STM_SPI_CR2_RXDMAEN));
-
-	/* Clear RXNE */
-	(void) stm_spi->dr;
-
-	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)));
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
+		;
 	stm_spi->dr = byte;
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
+		;
+	(void) stm_spi->dr;
+}
+
+static inline uint8_t
+ao_spi_recv_byte(uint8_t spi_index)
+{
+	struct stm_spi	*stm_spi;
+
+	switch (AO_SPI_INDEX(spi_index)) {
+	case 0:
+		stm_spi = &stm_spi1;
+		break;
+	case 1:
+		stm_spi = &stm_spi2;
+		break;
+	}
+
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
+		;
+	stm_spi->dr = 0xff;
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
+		;
+	return stm_spi->dr;
 }
 
 void
@@ -250,9 +272,6 @@ void
 ao_dma_done_transfer(uint8_t index);
 
 void
-ao_dma_abort(uint8_t index);
-
-void
 ao_dma_alloc(uint8_t index);
 
 void
@@ -341,6 +360,14 @@ ao_arch_irqrestore(uint32_t primask) {
 static inline void
 ao_arch_memory_barrier() {
 	asm volatile("" ::: "memory");
+}
+
+static inline void
+ao_arch_irq_check(void) {
+	uint32_t	primask;
+	asm("mrs %0,primask" : "=&r" (primask));
+	if ((primask & 1) == 0)
+		ao_panic(AO_PANIC_IRQ);
 }
 
 #if HAS_TASK

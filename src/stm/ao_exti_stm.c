@@ -144,7 +144,7 @@ ao_exti_enable(struct stm_gpio *gpio, uint8_t pin) {
 	uint32_t	mask = (1 << pin);
 	(void) gpio;
 	stm_exti.pr = mask;
-	stm_exti.imr |= (1 << pin);
+	stm_exti.imr |= mask;
 }
 
 void

@@ -1,3 +1,341 @@
+commit 2e26d1ab42163988dc26b06b016c3b05efe17659
+Merge: 639e461 65ed2f5
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jul 4 23:47:24 2016 +0200
+
+    Merge branch 'master' into branch-1.6
+
+commit 65ed2f588ca596fe9aa559bebd590a2a11b9859b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jul 3 12:00:10 2016 +0200
+
+    doc: Build 1.6.5 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d60133c65b4592f0f8c832135664a8e0c922b4f0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 2 22:52:38 2016 +0200
+
+    Credit Chuck Haskin for helping fix the SPI bug.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14e73d89d7dbb44e9ffab2820aefb693b6e8ef24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 2 22:08:58 2016 +0200
+
+    Bump to 1.6.5. Add preliminary release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8a6a95bb24517af00717fd377bad82ddb2289cf0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 30 20:43:03 2016 -0700
+
+    altos/cc1111: Remove 'show tasks' command
+    
+    This saves space on cc1111 parts.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2e286f66d2b15df128ffe9b40a201242fc4a10a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 14:22:32 2016 -0700
+
+    Bump to testing version 1.6.4.2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a04830a636a71808ea8ef5ac5dfa59d6978d9f3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 18:41:24 2016 -0700
+
+    altos: Use FIFO_THR pin for cc1120 transmit buffering
+    
+    Instead of reading NUM_TXBYTES, set the FIFO_THR pin to indicate when
+    64 bytes are available in the buffer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit caf3fc2628c13ff38ffbaabda8aa8d146cda748e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 18:33:56 2016 -0700
+
+    altos: Leave USB enabled in flight with -DDEBUG=1
+    
+    This leaves the command line available for diagnostics when debugging.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c6c250711355ae8060e956e786702be250ef4527
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 12:55:30 2016 -0700
+
+    altos/stm: clean up ao_exti_enable
+    
+    Was computing (1 << pin) twice for no good reason.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a35424cd48205af89ba023db979959dc75b06706
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 12:54:31 2016 -0700
+
+    altos: Make task list output more useful
+    
+    Add the timeout value and task id
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6c022e094f6f3c551355742a6f9c3deb6e554fe1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 16:07:22 2016 -0700
+
+    altos/telemini-v2.0: Remove show tasks command
+    
+    There's not enough memory for this command, and it isn't necessary.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 349a63aeed6cdeb89bf18c7b2e2c40782c79cc00
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 12:52:37 2016 -0700
+
+    altos: Make ao_delay(0) not wait forever
+    
+    ao_delay() is implemented on top of ao_sleep_for, and ao_sleep_for
+    uses the timeout value of 0 to indicate an infinite timeout. Calls to
+    ao_delay for 0 ticks would unintentionally hit this case and end up
+    waiting forever.x
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b3a24f5f39a1b72cc8947c33b609f454b46aff8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 29 12:49:16 2016 -0700
+
+    altos: cc1200: use FIFO threshold pin output for APRS buffering
+    
+    Instead of polling the device for fifo space, just use the available
+    pin configuration to figure out if there is enough space for a single
+    APRS buffer. Then set the APRS buffer size to match the fifo threshold
+    setting in the chip so that we know we can write the whole APRS buffer
+    once the pin says there's space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 658d8be170f9aea683fe62b68368736a177411a5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 17:03:34 2016 -0700
+
+    altos: Add debug check for irq block when editing task queues
+    
+    List manipulation operations are not atomic, so interrupts need to be
+    blocked while changing them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 30eb5d2fa77e036690170e7057fa9df669375ae5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 18:40:46 2016 -0700
+
+    altos/drivers: Use more reliable byte interface for CC1120 reception
+    
+    This replaces direct register access with function calls to allow that
+    code to respect the hardware requirements.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 61ad8e5bf428246ac89cad7cb9a1edf2ef735fd5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 18:39:31 2016 -0700
+
+    altos/stm: Add better byte-level SPI api
+    
+    This provides inline functions for sending and receiving individual
+    bytes, and setup/finish functions to wrap them in. This make the byte
+    sending respect the SPI hardware interface requirements.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5866d191cee56949ccab4c154a14604e83163d42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 18:37:49 2016 -0700
+
+    altos/stm: Clean up spi_enable/disable_index functions
+    
+    These had an extra level of switch nesting for no good reason.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5ab4a8b911e254dc829b61cb0abc9fd0b46b84b3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 27 23:25:01 2016 -0700
+
+    altos/stm: move spi execution to common ao_spi_run
+    
+    This regularizes SPI hardware use and ensures that the device is
+    turned off after it has been used and that the status register is back
+    to 'normal' the next time through.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 69791ef235161fef404f682fd6955e7eed8dc125
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 27 23:26:20 2016 -0700
+
+    altos: Add STM SPI debugging
+    
+    This dumps out the SPI hardware state and history of SPI operations
+    when compiled with -DDEBUG=1. Without that, this patch does nothing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f418584d4d225827e08f56de86055eb3f074f8d1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 27 17:26:19 2016 -0700
+
+    altos: Add STM DMA debugging
+    
+    This provides a command that shows current DMA operations when
+    compiled with -DDEBUG=1. Without that, this patch has no effect.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2e60cd22f6789c94343e6432822cedab028dc1ba
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 18:25:44 2016 -0700
+
+    altos/stm: Change ao_spi_send_sync definition to take const source
+    
+    Provides for a bit better error checking.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 21a29c7452398e0cca0fb90f99fa42a2a0684668
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 17:15:27 2016 -0700
+
+    altos/stm: Add more SPI status register bits
+    
+    These weren't the original version of the docs that we had.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 785d2697376ebd20531d22441a60c41bd927b42a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 17:12:48 2016 -0700
+
+    altos/stm: use 0xff for dma mutex value for allocated mutexes
+    
+    DMA channels which are 'allocated' can't be shared. Instead of using
+    the value '1' in the related 'mutex', use 0xff which won't match any task.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0dec7d0885970a7d73468dd77220bae78e161b40
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 17:11:38 2016 -0700
+
+    altos/stm: remove ao_dma_abort
+    
+    This function isn't used anywhere.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 974aaf73cbb720f1b1183cc239001528b6c7a5b9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 17:09:00 2016 -0700
+
+    altos: Move comment in ao_sleep_for next to related code
+    
+    The comment got moved to the wrong place
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a7e0bb5eb661cfde31c383d605cb9cb8ca568bc7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 17:04:59 2016 -0700
+
+    altos: Block interrupts while waking tasks sleeping on timers.
+    
+    Interrupts may not be blocked in the timer ISR, but they need to be
+    while walking the pending timer list and moving tasks back to the run
+    queue.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 40abb0d1e2f43a60ffa34b055ebb913ee3e20faf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 28 00:07:23 2016 -0700
+
+    altosui: Deliver firmware for Tmega 2.0 and TBT 3.0 for Windows too
+    
+    1.6.4 added Tmega 2.0 and TBT 3.0 firmware to linux and mac, but
+    neglected windows.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5b7e81628437389014fdd39e323a6f0176e02ba6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 27 23:28:28 2016 -0700
+
+    Mark testing version 1.6.4.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6d15cf1580563aea90e9c47f5b268c9c7bb9ba26
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 24 12:07:36 2016 -0700
+
+    altosdroid: Deal with multiple installed android SDKs
+    
+    Use the latest SDK's zipalign
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3374a9069618658a33af54472d8670e3086af1e0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 24 12:06:32 2016 -0700
+
+    ao-tools/ao-chaosread: Document length (-l) option
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca59786b5022f592f6516a3ac54708789db14c94
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 20 10:19:32 2016 -0700
+
+    Bump android version to 13
+    
+    Need to update the maps API key in the package
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 10fa950cb9fee0ba28adfc5ead108657655bb289
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jun 22 15:01:09 2016 -0600
+
+    switch libgtk-3-bin build-dep to gtk-update-icon-cache, closes: #825455
+
+commit ed6eb010614b5b27757619fc629d7330fc8c4122
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 17 10:18:20 2016 -0700
+
+    doc: Add install-html script
+    
+    This script strips the XML-ish bits from html files so that ikiwiki
+    can parse them correctly
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 639e461ded29a48c155afea12171cbfc191ccfd7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Jun 17 10:01:17 2016 -0600
+
+    releasing 1.6.4
+
 commit 31cf047113ec72a78f4b500223a2c6be23bc86fd
 Merge: 2f0c977 afe74c0
 Author: Bdale Garbee <bdale@gag.com>
