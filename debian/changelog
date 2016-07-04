@@ -1,3 +1,44 @@
+altos (1.6.5-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * doc: Add install-html script
+  * Bump android version to 13
+  * ao-tools/ao-chaosread: Document length (-l) option
+  * altosdroid: Deal with multiple installed android SDKs
+  * Mark testing version 1.6.4.1
+  * altosui: Deliver firmware for Tmega 2.0 and TBT 3.0 for Windows too
+  * altos: Block interrupts while waking tasks sleeping on timers.
+  * altos: Move comment in ao_sleep_for next to related code
+  * altos/stm: remove ao_dma_abort
+  * altos/stm: use 0xff for dma mutex value for allocated mutexes
+  * altos/stm: Add more SPI status register bits
+  * altos/stm: Change ao_spi_send_sync definition to take const source
+  * altos: Add STM DMA debugging
+  * altos: Add STM SPI debugging
+  * altos/stm: move spi execution to common ao_spi_run
+  * altos/stm: Clean up spi_enable/disable_index functions
+  * altos/stm: Add better byte-level SPI api
+  * altos/drivers: Use more reliable byte interface for CC1120 reception
+  * altos: Add debug check for irq block when editing task queues
+  * altos: cc1200: use FIFO threshold pin output for APRS buffering
+  * altos: Make ao_delay(0) not wait forever
+  * altos/telemini-v2.0: Remove show tasks command
+  * altos: Make task list output more useful
+  * altos/stm: clean up ao_exti_enable
+  * altos: Leave USB enabled in flight with -DDEBUG=1
+  * altos: Use FIFO_THR pin for cc1120 transmit buffering
+  * Bump to testing version 1.6.4.2
+  * altos/cc1111: Remove 'show tasks' command
+  * Bump to 1.6.5. Add preliminary release notes
+  * Credit Chuck Haskin for helping fix the SPI bug.
+  * doc: Build 1.6.5 release notes
+
+  [ Bdale Garbee ]
+  * switch libgtk-3-bin build-dep to gtk-update-icon-cache, closes: #825455
+  * updating ChangeLog for 1.6.5 release
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 04 Jul 2016 23:48:50 +0200
+
 altos (1.6.4-1) unstable; urgency=medium
 
   [ Keith Packard ]
