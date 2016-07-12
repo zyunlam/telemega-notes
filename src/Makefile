@@ -31,6 +31,7 @@ ARMM3DIRS=\
 	telemega-v1.0 telemega-v1.0/flash-loader \
 	telemega-v2.0 telemega-v2.0/flash-loader \
 	telemetrum-v2.0 telemetrum-v2.0/flash-loader \
+	telemetrum-v3.0 telemetrum-v3.0/flash-loader \
 	megadongle-v0.1 megadongle-v0.1/flash-loader \
 	telegps-v0.3 telegps-v0.3/flash-loader \
 	telegps-v1.0 telegps-v1.0/flash-loader \
