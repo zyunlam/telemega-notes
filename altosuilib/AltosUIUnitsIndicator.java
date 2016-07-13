@@ -83,6 +83,7 @@ public abstract class AltosUIUnitsIndicator extends AltosUIIndicator {
 	public void show (AltosState state, AltosListenerState listener_state) {
 		double[] v = new double[values.length];
 
+		hide = false;
 		for (int i = 0; i < values.length; i++) {
 			if (state != null)
 				v[i] = value(state, listener_state, i);
