@@ -394,11 +394,17 @@ ao_cmd(void)
 			if (func)
 				break;
 		}
+#if HAS_MONITOR
+		ao_mutex_get(&ao_monitoring_mutex);
+#endif
 		if (func)
 			(*func)();
 		else
 			ao_cmd_status = ao_cmd_syntax_error;
 		report();
+#if HAS_MONITOR
+		ao_mutex_put(&ao_monitoring_mutex);
+#endif
 	}
 }
 
