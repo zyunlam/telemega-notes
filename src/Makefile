@@ -19,7 +19,7 @@ include Makedefs
 SDCCDIRS=\
 	telemetrum-v1.2 telemetrum-v1.1 telemetrum-v1.0 \
 	teledongle-v0.2 \
-	telemini-v1.0 telemini-v2.0 \
+	telemini-v1.0 \
 	telebt-v1.0 \
 	teleterra-v0.2 teleshield-v0.1 \
 	telefire-v0.1 telefire-v0.2 \
