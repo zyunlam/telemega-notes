@@ -36,7 +36,7 @@
 #error Must define AO_MONITOR_LED
 #endif
 
-__data uint8_t ao_monitoring_mutex;
+__xdata uint8_t ao_monitoring_mutex;
 __data uint8_t ao_monitoring;
 static __data uint8_t ao_monitor_disabled;
 static __data uint8_t ao_internal_monitoring;

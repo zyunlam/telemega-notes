@@ -667,7 +667,7 @@ extern __xdata union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
 #define ao_monitor_ring_next(n)	(((n) + 1) & (AO_MONITOR_RING - 1))
 #define ao_monitor_ring_prev(n)	(((n) - 1) & (AO_MONITOR_RING - 1))
 
-extern __data uint8_t ao_monitoring_mutex;
+extern __xdata uint8_t ao_monitoring_mutex;
 extern __data uint8_t ao_monitoring;
 extern __data uint8_t ao_monitor_head;
 
