@@ -588,13 +588,13 @@ ao_radio_rdf_abort(void)
 
 /* Output carrier */
 
-static __xdata	ao_radio_test_on;
+static __xdata	radio_test_on;
 
 void
 ao_radio_test(uint8_t on)
 {
 	if (on) {
-		if (!ao_radio_test_on) {
+		if (!radio_test_on) {
 #if HAS_MONITOR
 			ao_monitor_disable();
 #endif
@@ -606,13 +606,13 @@ ao_radio_test(uint8_t on)
 #endif
 			ao_radio_get(0xff);
 			RFST = RFST_STX;
-			ao_radio_test_on = 1;
+			radio_test_on = 1;
 		}
 	} else  {
-		if (ao_radio_test_on) {
+		if (radio_test_on) {
 			ao_radio_idle();
 			ao_radio_put();
-			ao_radio_test_on = 0;
+			radio_test_on = 0;
 #if HAS_MONITOR
 			ao_monitor_enable();
 #endif

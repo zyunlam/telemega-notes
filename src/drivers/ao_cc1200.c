@@ -803,18 +803,12 @@ ao_radio_rdf_abort(void)
 	ao_wakeup(&ao_radio_wake);
 }
 
-static void
-ao_radio_test_cmd(void)
+static uint8_t radio_on;
+
+void
+ao_radio_test_on(void)
 {
-	uint8_t	mode = 2;
-	static uint8_t radio_on;
-	ao_cmd_white();
-	if (ao_cmd_lex_c != '\n') {
-		ao_cmd_decimal();
-		mode = (uint8_t) ao_cmd_lex_u32;
-	}
-	mode++;
-	if ((mode & 2) && !radio_on) {
+	if (!radio_on) {
 #if HAS_MONITOR
 		ao_monitor_disable();
 #endif
@@ -837,12 +831,12 @@ ao_radio_test_cmd(void)
 #endif
 		radio_on = 1;
 	}
-	if (mode == 3) {
-		printf ("Hit a character to stop..."); flush();
-		getchar();
-		putchar('\n');
-	}
-	if ((mode & 1) && radio_on) {
+}
+
+void
+ao_radio_test_off(void)
+{
+	if (radio_on) {
 		ao_radio_idle();
 		ao_radio_put();
 		radio_on = 0;
@@ -853,6 +847,27 @@ ao_radio_test_cmd(void)
 		ao_pad_enable();
 #endif
 	}
+}
+
+static void
+ao_radio_test_cmd(void)
+{
+	uint8_t	mode = 2;
+	ao_cmd_white();
+	if (ao_cmd_lex_c != '\n') {
+		ao_cmd_decimal();
+		mode = (uint8_t) ao_cmd_lex_u32;
+	}
+	mode++;
+	if ((mode & 2))
+		ao_radio_test_on();
+	if (mode == 3) {
+		printf ("Hit a character to stop..."); flush();
+		getchar();
+		putchar('\n');
+	}
+	if ((mode & 1))
+		ao_radio_test_off();
 }
 
 void

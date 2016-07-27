@@ -641,6 +641,12 @@ void
 ao_radio_rdf_abort(void);
 
 void
+ao_radio_test_on(void);
+
+void
+ao_radio_test_off(void);
+
+void
 ao_radio_init(void);
 
 /*
