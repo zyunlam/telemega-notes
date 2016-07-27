@@ -999,6 +999,8 @@ ao_radio_rx_isr(void)
 {
 	uint8_t	d;
 
+	if (ao_radio_abort)
+		return;
 	if (rx_task_id) {
 		if (ao_radio_try_select(rx_task_id)) {
 			++rx_fast_start;
