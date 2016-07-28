@@ -93,6 +93,12 @@ _ao_button_init(uint8_t b)
 
 }
 
+uint8_t
+ao_button_get(uint8_t b)
+{
+	return ao_button_state[b].value;
+}
+
 static void
 ao_button_isr(void)
 {

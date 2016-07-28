@@ -19,6 +19,9 @@
 #ifndef _AO_BUTTON_H_
 #define _AO_BUTTON_H_
 
+uint8_t
+ao_button_get(uint8_t b);
+
 void
 ao_button_init(void);
 
