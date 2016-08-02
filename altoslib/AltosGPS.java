@@ -21,6 +21,7 @@ package org.altusmetrum.altoslib_11;
 import java.text.*;
 import java.util.concurrent.*;
 import java.io.*;
+import java.time.*;
 
 public class AltosGPS implements Cloneable {
 
@@ -71,6 +72,24 @@ public class AltosGPS implements Cloneable {
 	public void ClearGPSTime() {
 		year = month = day = AltosLib.MISSING;
 		hour = minute = second = AltosLib.MISSING;
+	}
+
+	/* Return time since epoc in seconds */
+	public long seconds() {
+		if (year == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (month == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (day == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (hour == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (minute == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (second == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		OffsetDateTime	odt = OffsetDateTime.of(year, month, day, hour, minute, second, 0, ZoneOffset.UTC);
+		return odt.toEpochSecond();
 	}
 
 	public AltosGPS(AltosTelemetryMap map) throws ParseException {
