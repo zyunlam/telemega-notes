@@ -30,4 +30,12 @@ sleep 2
 
 $USBLOAD --serial=1 ../src/chaoskey-v$VERSION/chaoskey-v$VERSION*.ihx || exit 1
 
+sleep 1
+
+serial=`dmesg | grep 'on chaoskey' | tail -1 | sed 's/.*chaoskey \([0-9a-f][0-9a-f]*\) on chaoskey.*/\1/'`
+
+echo 'Testing ChaosKey' $serial
+
+./test-chaoskey $serial
+
 exit $?
