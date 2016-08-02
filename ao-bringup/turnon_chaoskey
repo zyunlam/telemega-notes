@@ -24,11 +24,14 @@ echo "Expectations:"
 echo "\tChaosKey v$VERSION powered from USB"
 echo
 
-$DFU_UTIL -a 0 -s 0x08000000:leave -D ../src/chaoskey-v$VERSION/flash-loader/chaoskey-v$VERSION*.bin || exit 1
+FLASH_FILE=~/altusmetrumllc/Binaries/loaders/chaoskey-v1.0-altos-flash-*.bin
+ALTOS_FILE=~/altusmetrumllc/Binaries/chaoskey-v1.0-*.elf
+
+$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
 
 sleep 2
 
-$USBLOAD --serial=1 ../src/chaoskey-v$VERSION/chaoskey-v$VERSION*.ihx || exit 1
+$USBLOAD --serial=1 $ALTOS_FILE || exit 1
 
 sleep 1
 
