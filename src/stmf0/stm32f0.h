@@ -313,6 +313,15 @@ extern struct stm_rcc stm_rcc;
 
 #define STM_RCC_CFGR_MCO	(24)
 # define STM_RCC_CFGR_MCO_DISABLE	0
+# define STM_RCC_CFGR_MCO_RC		1
+# define STM_RCC_CFGR_MCO_LSI		2
+# define STM_RCC_CFGR_MCO_LSE		3
+# define STM_RCC_CFGR_MCO_SYSCLK	4
+# define STM_RCC_CFGR_MCO_HSI		5
+# define STM_RCC_CFGR_MCO_HSE		6
+# define STM_RCC_CFGR_MCO_PLLCLK	7
+# define STM_RCC_CFGR_MCO_HSI48		8
+# define STM_RCC_CFGR_MCO_MASK		(0xf)
 
 #define STM_RCC_CFGR_PLLMUL	(18)
 #define  STM_RCC_CFGR_PLLMUL_2		0
