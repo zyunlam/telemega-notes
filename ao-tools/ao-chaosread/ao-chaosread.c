@@ -183,15 +183,16 @@ chaoskey_transfer_callback(struct libusb_transfer *transfer)
 #define ENDPOINT	0x86
 
 int
-chaoskey_read(struct chaoskey *ck, uint8_t *buffer, int len)
+chaoskey_read(struct chaoskey *ck, void *buffer, int len)
 {
+	uint8_t	*buf = buffer;
 	int	total = 0;
 
 	while (len) {
 		int	ret;
 		int	transferred;
 
-		ret = libusb_bulk_transfer(ck->handle, ENDPOINT, buffer, len, &transferred, 10000);
+		ret = libusb_bulk_transfer(ck->handle, ENDPOINT, buf, len, &transferred, 10000);
 		if (ret) {
 			if (total)
 				return total;
@@ -201,19 +202,21 @@ chaoskey_read(struct chaoskey *ck, uint8_t *buffer, int len)
 			}
 		}
 		len -= transferred;
-		buffer += transferred;
+		buf += transferred;
 	}
 }
 
 static const struct option options[] = {
 	{ .name = "serial", .has_arg = 1, .val = 's' },
 	{ .name = "length", .has_arg = 1, .val = 'l' },
+	{ .name = "infinite", .has_arg = 0, .val = 'i' },
+	{ .name = "bytes", .has_arg = 0, .val = 'b' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--serial=<serial>] [--length=<length>[kMG]]\n", program);
+	fprintf(stderr, "usage: %s [--serial=<serial>] [--length=<length>[kMG]] [--infinite] [--bytes]\n", program);
 	exit(1);
 }
 
@@ -221,14 +224,16 @@ int
 main (int argc, char **argv)
 {
 	struct chaoskey	*ck;
-	char	buf[1024];
+	uint16_t	buf[512];
 	int	got;
 	int	c;
 	char	*serial = NULL;
 	char	*length_string;
 	char	*length_end;
 	unsigned long	length = sizeof(buf);
-	int		this_time;
+	int	this_time;
+	int	infinite = 0;
+	int	bytes = 0;
 
 	while ((c = getopt_long(argc, argv, "s:l:", options, NULL)) != -1) {
 		switch (c) {
@@ -247,6 +252,12 @@ main (int argc, char **argv)
 			else if (strlen(length_end))
 				 usage(argv[0]);
 			break;
+		case 'i':
+			infinite = 1;
+			break;
+		case 'b':
+			bytes = 1;
+			break;
 		default:
 			usage(argv[0]);
 			break;
@@ -257,16 +268,24 @@ main (int argc, char **argv)
 	if (!ck)
 		exit(1);
 
-	while (length) {
+	if (bytes)
+		length *= 2;
+
+	while (length || infinite) {
 		this_time = sizeof(buf);
-		if (length < sizeof(buf))
+		if (!infinite && length < sizeof(buf))
 			this_time = (int) length;
 		got = chaoskey_read(ck, buf, this_time);
 		if (got < 0) {
 			perror("read");
 			exit(1);
 		}
-		write(1, buf, got);
+		if (bytes) {
+			int i;
+			for (i = 0; i < got / 2; i++)
+				putchar((buf[i] >> 1 & 0xff));
+		} else
+			write(1, buf, got);
 		length -= got;
 	}
 	exit(0);
