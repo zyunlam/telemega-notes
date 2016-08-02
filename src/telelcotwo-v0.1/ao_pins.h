@@ -156,14 +156,12 @@
 #define AO_BUTTON_0_PORT	&stm_gpioa
 #define AO_BUTTON_0		0
 
-#define AO_BUTTON_ARM_0		0
+#define AO_BUTTON_BOX		0
 
 #define AO_BUTTON_1_PORT	&stm_gpioa
 #define AO_BUTTON_1		1
 
-#define AO_BUTTON_ARM_1		1
-
-#define AO_BUTTON_ARM_NUM	2
+#define AO_BUTTON_ARM		1
 
 #define AO_BUTTON_2_PORT	&stm_gpioa
 #define AO_BUTTON_2		2
