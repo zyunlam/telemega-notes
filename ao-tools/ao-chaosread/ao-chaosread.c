@@ -91,7 +91,6 @@ chaoskey_match(libusb_device *dev, char *match_serial)
 	return handle;
 
 out:
-	free(device_serial);
 	if (handle)
 		libusb_close(handle);
 	return 0;
