@@ -32,7 +32,7 @@ main(void)
 
 	ao_task_init();
 	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_RED);
+	ao_led_on(LEDS_AVAILABLE);
 	ao_timer_init();
 
 	ao_spi_init();
@@ -48,7 +48,7 @@ main(void)
 
 	ao_config_init();
 
-	ao_led_off(AO_LED_RED);
+	ao_led_off(LEDS_AVAILABLE);
 	ao_start_scheduler();
 	return 0;
 }
