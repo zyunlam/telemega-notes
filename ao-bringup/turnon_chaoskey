@@ -35,10 +35,6 @@ $USBLOAD --serial=1 $ALTOS_FILE || exit 1
 
 sleep 1
 
-serial=`dmesg | grep 'on chaoskey' | tail -1 | sed 's/.*chaoskey \([0-9a-f][0-9a-f]*\) on chaoskey.*/\1/'`
-
-echo 'Testing ChaosKey' $serial
-
-./test-chaoskey $serial
+./test-chaoskey
 
 exit $?

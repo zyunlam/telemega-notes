@@ -12,13 +12,23 @@ case "$#" in
 	serial="--serial $1"
 	;;
     0)
-	serial=""
+	snum=`dmesg | grep 'on chaoskey' | tail -1 | sed 's/.*chaoskey \([0-9a-f][0-9a-f]*\) on chaoskey.*/\1/'`
+	case "$snum" in
+	    "")
+		serial=""
+		;;
+	    *)
+		serial="--serial $snum"
+		;;
+	esac
 	;;
     *)
 	echo "Usage: $0 [serial]"
 	exit 1
 	;;
 esac
+
+echo -e '\e[34mTesting ChaosKey' $snum '\e[39m'
 
 tests="0:100 1:100 2:100 3:100 12:10 13:100 15:10000 16:250 202:1000 203:100 204:500 206:20 207:1000:32 209:1000"
 
@@ -72,11 +82,11 @@ done | while read result; do
 	    echo pass $PASS weak $WEAK fail $FAIL
 	    case $PASS:$FAIL in
 		[1-9]*:0)
-		    echo ChaosKey $snum is ready to ship
+		    echo -e '\e[32m'ChaosKey $snum is ready to ship'\e[39m'
 		    exit 0
 		    ;;
 		*)
-		    echo ChaosKey $snum failed
+		    echo -e '\e[31m'ChaosKey $snum failed'\e[39m'
 		    exit 1
 		    ;;
 	    esac
