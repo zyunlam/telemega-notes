@@ -157,3 +157,40 @@ ao_self_get_uint32(struct cc_usb *cc, uint32_t addr)
 	free(hex);
 	return v;
 }
+
+bool
+ao_self_get_usb_id(struct cc_usb *cc, struct ao_usb_id *id)
+{
+	struct ao_hex_image	*hex;
+	bool			ret;
+
+	if (!AO_USB_DESCRIPTORS)
+		return false;
+
+	hex = ao_self_read(cc, AO_USB_DESCRIPTORS, 512);
+	if (!hex)
+		return false;
+
+	ret = ao_heximage_usb_id(hex, id);
+	free(hex);
+	return ret;
+}
+
+uint16_t *
+ao_self_get_usb_product(struct cc_usb *cc)
+{
+	struct ao_hex_image	*hex;
+	uint16_t 		*ret;
+
+	if (!AO_USB_DESCRIPTORS)
+		return NULL;
+
+	hex = ao_self_read(cc, AO_USB_DESCRIPTORS, 512);
+	if (!hex)
+		return NULL;
+
+	ret = ao_heximage_usb_product(hex);
+	free(hex);
+	return ret;
+}
+

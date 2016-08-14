@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include "ao-hex.h"
 #include "cc-usb.h"
+#include "ao-editaltos.h"
 
 struct ao_hex_image *
 ao_self_read(struct cc_usb *cc, uint32_t address, uint32_t length);
@@ -34,5 +35,14 @@ ao_self_get_uint16(struct cc_usb *cc, uint32_t addr);
 
 uint32_t
 ao_self_get_uint32(struct cc_usb *cc, uint32_t addr);
+
+bool
+ao_self_get_usb_id(struct cc_usb *cc, struct ao_usb_id *id);
+
+uint16_t *
+ao_self_get_usb_product(struct cc_usb *cc);
+
+uint16_t *
+ao_self_get_usb_product(struct cc_usb *cc);
 
 #endif /* _AO_SELFLOAD_H_ */
