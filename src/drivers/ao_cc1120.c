@@ -183,9 +183,8 @@ ao_radio_fifo_write_start(void)
 	return status;
 }
 
-static inline uint8_t ao_radio_fifo_write_stop(uint8_t status) {
+static inline void ao_radio_fifo_write_stop(void) {
 	ao_radio_deselect();
-	return status;
 }
 
 static uint8_t
@@ -193,7 +192,8 @@ ao_radio_fifo_write(uint8_t *data, uint8_t len)
 {
 	uint8_t	status = ao_radio_fifo_write_start();
 	ao_radio_spi_send(data, len);
-	return ao_radio_fifo_write_stop(status);
+	ao_radio_fifo_write_stop();
+	return status;
 }
 
 static uint8_t
@@ -201,7 +201,8 @@ ao_radio_fifo_write_fixed(uint8_t data, uint8_t len)
 {
 	uint8_t status = ao_radio_fifo_write_start();
 	ao_radio_spi_send_fixed(data, len);
-	return ao_radio_fifo_write_stop(status);
+	ao_radio_fifo_write_stop();
+	return status;
 }
 
 static uint8_t
@@ -774,11 +775,10 @@ void
 ao_radio_continuity(uint8_t c)
 {
 	uint8_t	i;
-	uint8_t status;
 
 	ao_rdf_start(AO_RADIO_CONT_TOTAL_LEN);
 
-	status = ao_radio_fifo_write_start();
+	(void) ao_radio_fifo_write_start();
 	for (i = 0; i < 3; i++) {
 		ao_radio_spi_send_fixed(0x00, AO_RADIO_CONT_PAUSE_LEN);
 		if (i < c)
@@ -787,8 +787,7 @@ ao_radio_continuity(uint8_t c)
 			ao_radio_spi_send_fixed(0x00, AO_RADIO_CONT_TONE_LEN);
 	}
 	ao_radio_spi_send_fixed(0x00, AO_RADIO_CONT_PAUSE_LEN);
-	status = ao_radio_fifo_write_stop(status);
-	(void) status;
+	ao_radio_fifo_write_stop();
 	ao_rdf_run();
 }
 
