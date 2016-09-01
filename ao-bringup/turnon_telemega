@@ -16,17 +16,31 @@ fi
 
 VERSION=2.0
 REPO=~/altusmetrumllc/Binaries
+PRODUCT=TeleMega
 
-echo "TeleMega v$VERSION Turn-On and Calibration Program"
+echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
 echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
 echo
 echo "Expectations:"
-echo "\tTeleMega v$VERSION powered from USB"
+echo "\t$PRODUCT v$VERSION powered from USB"
 echo "\t\twith ST-Link-V2 cabled to debug header"
 echo "\t\twith coax from UHF to frequency counter"
 echo
-echo -n "TeleMega-$VERSION serial number: "
-read SERIAL
+
+case $# in
+    1)
+	SERIAL="$1"
+	echo "$PRODUCT-$VERSION serial number: $SERIAL" 
+	;;
+    0)
+	echo -n "$PRODUCT-$VERSION serial number: "
+	read SERIAL
+	;;
+    *)
+	echo "Usage: $0 <serial-number>" 1>&2
+	exit 1;
+	;;
+esac
 
 echo $FLASH_STM
 
@@ -54,7 +68,11 @@ echo 'E 0' > $dev
 
 SERIAL=$SERIAL ./cal-freq $dev
 
-../ao-tools/ao-cal-accel/ao-cal-accel $dev
+failed=1
+while [ $failed = 1 ]; do
+    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
+    failed=$?
+done
 
 echo 'E 1' > $dev
 
