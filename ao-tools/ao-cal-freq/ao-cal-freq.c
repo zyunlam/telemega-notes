@@ -39,13 +39,13 @@ static const struct option options[] = {
 	{ .name = "tty", .has_arg = 1, .val = 'T' },
 	{ .name = "device", .has_arg = 1, .val = 'D' },
 	{ .name = "raw", .has_arg = 0, .val = 'r' },
-	{ .name = "verbose", .has_arg = 1, .val = 'v' },
+	{ .name = "verbose", .has_arg = 0, .val = 'v' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--verbose=<verbose>] [--device=<device>] [-tty=<tty>]\n", program);
+	fprintf(stderr, "usage: %s [--verbose] [--device=<device>] [-tty=<tty>]\n", program);
 	exit(1);
 }
 
@@ -239,7 +239,7 @@ main (int argc, char **argv)
 	int			ret = 0;
 	int			expected_size;
 
-	while ((c = getopt_long(argc, argv, "rT:D:c:s:v:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "vrT:D:c:s:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
