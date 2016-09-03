@@ -116,7 +116,7 @@ ao_spi_set_dma_miso(uint8_t id, void *data, uint16_t len, uint32_t minc)
 			    data,
 			    len,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
+			    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
 			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
 			    (minc << STM_DMA_CCR_MINC) |
