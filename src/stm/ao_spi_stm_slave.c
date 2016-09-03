@@ -55,7 +55,7 @@ ao_spi_slave_send(void *block, uint16_t len)
 			    block,
 			    len,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
+			    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
 			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
 			    (1 << STM_DMA_CCR_MINC) |
@@ -75,7 +75,7 @@ ao_spi_slave_send(void *block, uint16_t len)
 			    &spi_dev_null,
 			    len,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
+			    (STM_DMA_CCR_PL_VERY_HIGH << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
 			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
 			    (0 << STM_DMA_CCR_MINC) |
@@ -111,7 +111,7 @@ ao_spi_slave_recv(void *block, uint16_t len)
 			    &spi_dev_null,
 			    len,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
+			    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
 			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
 			    (0 << STM_DMA_CCR_MINC) |
@@ -128,7 +128,7 @@ ao_spi_slave_recv(void *block, uint16_t len)
 			    block,
 			    len,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
+			    (STM_DMA_CCR_PL_VERY_HIGH << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
 			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
 			    (1 << STM_DMA_CCR_MINC) |
