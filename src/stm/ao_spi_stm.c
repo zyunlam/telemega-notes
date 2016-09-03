@@ -306,7 +306,7 @@ ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
 }
 
 void
-ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t spi_index)
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index)
 {
 	uint8_t		id = AO_SPI_INDEX(spi_index);
 	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
