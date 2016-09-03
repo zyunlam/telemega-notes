@@ -189,7 +189,7 @@ main (int argc, char **argv)
 	int			has_flash_size = 0;
 	int			force = 0;
 
-	while ((c = getopt_long(argc, argv, "wrT:D:c:s:v:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "wrfT:D:c:s:v:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
@@ -400,7 +400,7 @@ main (int argc, char **argv)
 			}
 			new_len = ucs2len(new_product);
 			old_len = ucs2len(old_product);
-			if (1 || new_len != old_len || memcmp(new_product, old_product, new_len * 2) != 0) {
+			if (new_len != old_len || memcmp(new_product, old_product, new_len * 2) != 0) {
 				fprintf(stderr, "USB product mismatch (device is ");
 				putucs2str(new_product, stderr);
 				fprintf(stderr, ", image is ");
@@ -413,7 +413,6 @@ main (int argc, char **argv)
 		if (!ao_editaltos(load, serial, cal))
 			done(cc, 1);
 	}
-	done(cc, 0);
 
 	/* And flash the resulting image to the device
 	 */
