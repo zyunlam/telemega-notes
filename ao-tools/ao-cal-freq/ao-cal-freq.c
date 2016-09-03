@@ -168,7 +168,8 @@ await_key(void)
 }
 
 int
-do_cal(struct cc_usb *usb) {
+do_cal(char *tty) {
+	struct cc_usb *usb = NULL;
 	struct flash	*b;
 	char	line[1024];
 	double	measured_freq;
@@ -178,10 +179,17 @@ do_cal(struct cc_usb *usb) {
 	int	cur_freq;
 	int	cur_cal;
 	int	new_cal;
-
-	cc_usb_printf(usb, "E 0\n");
+	int	ret = 1;
 
 	for(;;) {
+		usb = cc_usb_open(tty);
+
+		if (!usb)
+			exit(1);
+
+		cc_usb_printf(usb, "E 0\n");
+
+		cc_usb_sync(usb);
 		cc_usb_printf(usb, "C 1\n");
 		cc_usb_sync(usb);
 
@@ -202,7 +210,8 @@ do_cal(struct cc_usb *usb) {
 
 		if (!cur_cal_words || !cur_freq_words) {
 			printf("no response\n");
-			return 0;
+			ret = 0;
+			break;
 		}
 
 		cur_cal = atoi(cur_cal_words[2]);
@@ -218,8 +227,11 @@ do_cal(struct cc_usb *usb) {
 
 		cc_usb_printf (usb, "c f %d\nc w\n", new_cal);
 		cc_usb_sync(usb);
+		cc_usb_close(usb);
 	}
-	return 1;
+	if (usb)
+		cc_usb_close(usb);
+	return ret;
 }
 
 int
@@ -232,7 +244,6 @@ main (int argc, char **argv)
 	int			i;
 	int			c;
 	int			tries;
-	struct cc_usb		*cc = NULL;
 	char			*tty = NULL;
 	int			success;
 	int			verbose = 0;
@@ -270,12 +281,6 @@ main (int argc, char **argv)
 	if (!tty)
 		tty="/dev/ttyACM0";
 
-	cc = cc_usb_open(tty);
-
-	if (!cc)
-		exit(1);
-
-	if (!do_cal(cc))
+	if (!do_cal(tty))
 		ret = 1;
-	done(cc, ret);
 }
