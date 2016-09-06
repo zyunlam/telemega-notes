@@ -1,3 +1,61 @@
+altos (1.6.8-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * updates made during 1.6.5 release process
+  * remove debian/ from master branch, it should live only on the debian branch
+  * reinstate debian/ content on the debian branch only
+  * update to latest Debian standards version
+  * update Changelog for release
+
+  [ Keith Packard ]
+  * Switch from GPLv2 to GPLv2+
+  * altos: Add telemetrum v3.0
+  * Bump version to 1.6.5.1 after 1.6.5 release
+  * altosuilib: Show indicator when they switch from invalid back to valid
+  * altos: Add STM32F0 beep and SPI byte API.
+  * altos: Keep telemetry and command output from interleaving
+  * altos: Don't access cc1120 SPI bus during recv after abort has started
+  * fixup for interleave
+  * altos: Expose cc1200 radio test functions for telemini bringup
+  * altos: Don't switch to flight 0 when log fills in flight
+  * altos: Stop building cc1111-based telemini v2.0 firmware
+  * altoslib: Add a 'seconds' method to AltosGPS
+  * altos: Add 'ao_button_get' to button driver
+  * altos: Make telelcotwo control two boxes instead of two pads
+  * altos/stmf0: Hook up clock output support
+  * altos/stmf0: Clean .bin files from flash-loader dirs
+  * altos: Use standard FIPS testing for chaoskey
+  * ao-chaosread: Add --infinite and --bytes options
+  * ao-chaosread: Eliminate double-free when serial match fails
+  * ao-bringup: Test chaoskey using dieharder
+  * ao-bringup: Use released files for chaoskey turnon
+  * Bump to version 1.6.6
+  * ao-bringup: Add colors to chaoskey test result reporting
+  * altos: Flash all LEDS during power on
+  * altos/stmf0: Switch ADC fast to ADC clock
+  * Bump verison to 1.6.7
+  * ao-chaosread: Parse -i and -b options
+  * ao-usbload: Check target device name to avoid mis-flashing
+  * altos/cc1120: remove unused status from ao_radio_fifo_write_stop
+  * ao-bringup: telemega allow serial on command line, loop on accel fail
+  * ao-tools/ao-cal-freq: --verbose option has no parameter
+  * altosui: Deal with connect failure in AltosConfigTD
+  * ao-bringup/turnon_telemetrum: serial on cmd line. Loop on accel fail
+  * ao-tools/ao-usbload: Fix -f flag, remove debug hacks
+  * ao-tools/ao-cal-freq: Re-open usb device each try
+  * Bump version to 1.6.7.1
+  * altos/stm: Make ao_spi_duplex out pointer const
+  * altos/stm: Create funcs to set SPI DMA parameters
+  * altos/stm: Set MISO DMA priority to HIGH to avoid OVR
+  * altos/stm: Set i2c recv DMA to HIGH
+  * altos/stm: Set SPI slave DMA priority to HIGH/VERY_HIGH
+  * Add 1.6.8 release notes
+  * altosui: Don't ship TeleMetrum v3.0 firmware (yet)
+  * Bump version to 1.6.8
+  * Remove pyro wizard file from master
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 05 Sep 2016 21:02:09 -0600
+
 altos (1.6.5-1) unstable; urgency=medium
 
   [ Keith Packard ]
