@@ -60,7 +60,7 @@ $(OBJ): $(INC)
 distclean:	clean
 
 clean:
-	rm -f *.o $(HARDWARE)-$(PROGNAME)-*.elf
+	rm -f *.o $(HARDWARE)-$(PROGNAME)-*.elf $(HARDWARE)-$(PROGNAME)-*.bin
 	rm -f ao_product.h
 
 install:

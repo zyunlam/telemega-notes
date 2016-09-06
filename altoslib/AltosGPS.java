@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,6 +21,7 @@ package org.altusmetrum.altoslib_11;
 import java.text.*;
 import java.util.concurrent.*;
 import java.io.*;
+import java.time.*;
 
 public class AltosGPS implements Cloneable {
 
@@ -70,6 +72,24 @@ public class AltosGPS implements Cloneable {
 	public void ClearGPSTime() {
 		year = month = day = AltosLib.MISSING;
 		hour = minute = second = AltosLib.MISSING;
+	}
+
+	/* Return time since epoc in seconds */
+	public long seconds() {
+		if (year == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (month == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (day == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (hour == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (minute == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		if (second == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		OffsetDateTime	odt = OffsetDateTime.of(year, month, day, hour, minute, second, 0, ZoneOffset.UTC);
+		return odt.toEpochSecond();
 	}
 
 	public AltosGPS(AltosTelemetryMap map) throws ParseException {

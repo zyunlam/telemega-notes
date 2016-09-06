@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -197,6 +198,9 @@ public class AltosConfigTD implements ActionListener {
 	final static int	serial_mode_save = 1;
 	final static int	serial_mode_reboot = 2;
 
+	SerialData serial_data;
+	Thread serial_thread;
+
 	class SerialData implements Runnable {
 		AltosConfigTD	config;
 		int		serial_mode;
@@ -206,9 +210,9 @@ public class AltosConfigTD implements ActionListener {
 				boolean	been_there = false;
 				config.reset_data();
 
-				for (;;) {
+				while (config.serial_line != null) {
 					config.serial_line.printf("c s\nf\nv\n");
-					for (;;) {
+					while (config.serial_line != null) {
 						try {
 							String line = config.serial_line.get_reply(5000);
 							config.process_line(line);
@@ -255,6 +259,7 @@ public class AltosConfigTD implements ActionListener {
 				/* fall through ... */
 			case serial_mode_read:
 				get_data();
+				serial_thread = null;
 				break;
 			}
 		}
@@ -266,11 +271,17 @@ public class AltosConfigTD implements ActionListener {
 	}
 
 	void run_serial_thread(int serial_mode) {
-		SerialData	sd = new SerialData(this, serial_mode);
-		Thread		st = new Thread(sd);
-		st.start();
+		serial_data = new SerialData(this, serial_mode);
+		serial_thread = new Thread(serial_data);
+		serial_thread.start();
 	}
 
+	void abort_serial_thread() {
+		if (serial_thread != null) {
+			serial_thread.interrupt();
+			serial_thread = null;
+		}
+	}
 	void init_ui () throws InterruptedException, TimeoutException {
 		config_ui = new AltosConfigTDUI(owner);
 		config_ui.addActionListener(this);
@@ -279,6 +290,7 @@ public class AltosConfigTD implements ActionListener {
 	}
 
 	void abort() {
+		abort_serial_thread();
 		if (serial_line != null) {
 			serial_line.close();
 			serial_line = null;

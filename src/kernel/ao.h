@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -640,6 +641,12 @@ void
 ao_radio_rdf_abort(void);
 
 void
+ao_radio_test_on(void);
+
+void
+ao_radio_test_off(void);
+
+void
 ao_radio_init(void);
 
 /*
@@ -666,6 +673,7 @@ extern __xdata union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
 #define ao_monitor_ring_next(n)	(((n) + 1) & (AO_MONITOR_RING - 1))
 #define ao_monitor_ring_prev(n)	(((n) - 1) & (AO_MONITOR_RING - 1))
 
+extern __xdata uint8_t ao_monitoring_mutex;
 extern __data uint8_t ao_monitoring;
 extern __data uint8_t ao_monitor_head;
 

@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -175,13 +176,12 @@ ao_clock_normal_start(void)
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSERDY)))
 		asm("nop");
 
-#ifdef STM_PLLSRC
 	/* Disable the PLL */
 	stm_rcc.cr &= ~(1 << STM_RCC_CR_PLLON);
 	while (stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY))
 		asm("nop");
 
-	/* PLLVCO to 48MHz (for USB) -> PLLMUL = 3 */
+	/* Set multiplier */
 	cfgr = stm_rcc.cfgr;
 	cfgr &= ~(STM_RCC_CFGR_PLLMUL_MASK << STM_RCC_CFGR_PLLMUL);
 	cfgr |= (AO_RCC_CFGR_PLLMUL << STM_RCC_CFGR_PLLMUL);
@@ -191,8 +191,8 @@ ao_clock_normal_start(void)
 	cfgr |= (STM_RCC_CFGR_PLLSRC_TARGET_CLOCK  << STM_RCC_CFGR_PLLSRC);
 	stm_rcc.cfgr = cfgr;
 
-	/* Disable pre divider */
-	stm_rcc.cfgr2 = (STM_RCC_CFGR2_PREDIV_1 << STM_RCC_CFGR2_PREDIV);
+	/* Set pre divider */
+	stm_rcc.cfgr2 = (AO_RCC_CFGR2_PLLDIV << STM_RCC_CFGR2_PREDIV);
 
 	/* Enable the PLL and wait for it */
 	stm_rcc.cr |= (1 << STM_RCC_CR_PLLON);
@@ -200,9 +200,6 @@ ao_clock_normal_start(void)
 		asm("nop");
 
 #endif
-
-#endif
-
 
 #if AO_HSI48
 #define STM_RCC_CFGR_SWS_TARGET_CLOCK		STM_RCC_CFGR_SWS_HSI48
@@ -225,6 +222,8 @@ ao_clock_normal_start(void)
 #define STM_PLLSRC				STM_HSI
 #define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	0
 #endif
+
+
 }
 
 static void
@@ -302,14 +301,34 @@ ao_clock_init(void)
 	/* Clear reset flags */
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
+#ifdef AO_MCO_PORT
+	cfgr = stm_rcc.cfgr;
+
+	/* Send PLL clock to MCO */
+	cfgr &= ~(STM_RCC_CFGR_MCO_MASK << STM_RCC_CFGR_MCO);
+	cfgr |= (STM_RCC_CFGR_MCO_PLLCLK << STM_RCC_CFGR_MCO);
+
+	/* Divide by 1 */
+	cfgr &= ~(STM_RCC_CFGR_MCOPRE_DIV_MASK << STM_RCC_CFGR_MCOPRE);
+	cfgr |= (STM_RCC_CFGR_MCOPRE_DIV_1 << STM_RCC_CFGR_MCOPRE);
+
+	/* Don't divide PLL */
+	cfgr |= (1 << STM_RCC_CFGR_PLL_NODIV);
+
+	stm_rcc.cfgr = cfgr;
+
+	ao_enable_port(AO_MCO_PORT);
+	stm_ospeedr_set(AO_MCO_PORT, AO_MCO_PIN, STM_OSPEEDR_HIGH);
+	stm_afr_set(AO_MCO_PORT, AO_MCO_PIN, AO_MCO_AF);
+#endif
+
 #if DEBUG_THE_CLOCK
 	/* Output SYSCLK on PA8 for measurments */
 
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOAEN);
 
 	stm_afr_set(&stm_gpioa, 8, STM_AFR_AF0);
-	stm_moder_set(&stm_gpioa, 8, STM_MODER_ALTERNATE);
-	stm_ospeedr_set(&stm_gpioa, 8, STM_OSPEEDR_40MHz);
+	stm_ospeedr_set(&stm_gpioa, 8, STM_OSPEEDR_HIGH);
 
 	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOPRE_DIV_1 << STM_RCC_CFGR_MCOPRE);
 	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOSEL_HSE << STM_RCC_CFGR_MCOSEL);

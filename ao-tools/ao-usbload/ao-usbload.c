@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,7 +41,6 @@ get_uint16(struct cc_usb *cc, uint32_t addr)
 {
 	uint16_t	result;
 	result = ao_self_get_uint16(cc, addr);
-	printf ("read 0x%08x = 0x%04x\n", addr, result);
 	return result;
 }
 
@@ -54,7 +54,6 @@ get_uint32(struct cc_usb *cc, uint32_t addr)
 	uint32_t	result;
 
 	result = ao_self_get_uint32(cc, addr);
-	printf ("read 0x%08x = 0x%08x\n", addr, result);
 	return result;
 }
 
@@ -87,12 +86,13 @@ static const struct option options[] = {
 	{ .name = "serial", .has_arg = 1, .val = 's' },
 	{ .name = "verbose", .has_arg = 1, .val = 'v' },
 	{ .name = "wait", .has_arg = 0, .val = 'w' },
+	{ .name = "force", .has_arg = 0, .val = 'f' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--raw] [--verbose=<verbose>] [--device=<device>] [-tty=<tty>] [--cal=<radio-cal>] [--serial=<serial>] [--wait] file.{elf,ihx}\n", program);
+	fprintf(stderr, "usage: %s [--raw] [--verbose=<verbose>] [--device=<device>] [-tty=<tty>] [--cal=<radio-cal>] [--serial=<serial>] [--wait] [--force] file.{elf,ihx}\n", program);
 	exit(1);
 }
 
@@ -113,6 +113,48 @@ ends_with(char *whole, char *suffix)
 	if (suffix_len > whole_len)
 		return 0;
 	return strcmp(whole + whole_len - suffix_len, suffix) == 0;
+}
+
+static int
+ucs2len(uint16_t *ucs2)
+{
+	int	len = 0;
+	while (*ucs2++)
+		len++;
+	return len;
+}
+
+int
+putucs4(uint32_t c, FILE *file)
+{
+	char d;
+	int	bits;
+
+	     if (c <       0x80) { d = c;                         bits= -6; }
+	else if (c <      0x800) { d= ((c >>  6) & 0x1F) | 0xC0;  bits=  0; }
+	else if (c <    0x10000) { d= ((c >> 12) & 0x0F) | 0xE0;  bits=  6; }
+	else if (c <   0x200000) { d= ((c >> 18) & 0x07) | 0xF0;  bits= 12; }
+	else if (c <  0x4000000) { d= ((c >> 24) & 0x03) | 0xF8;  bits= 18; }
+	else if (c < 0x80000000) { d= ((c >> 30) & 0x01) | 0xFC;  bits= 24; }
+	else return EOF;
+
+	if (putc (d, file) < 0)
+		return EOF;
+
+	for ( ; bits >= 0; bits-= 6)
+		if (putc (((c >> bits) & 0x3F) | 0x80, file) < 0)
+			return EOF;
+
+	return 0;
+}
+
+static void
+putucs2str(uint16_t *ucs2str, FILE *file)
+{
+	uint16_t	ucs2;
+
+	while ((ucs2 = *ucs2str++) != 0)
+		putucs4(ucs2, file);
 }
 
 int
@@ -145,8 +187,9 @@ main (int argc, char **argv)
 	int			num_file_symbols;
 	uint32_t		flash_base, flash_bound;
 	int			has_flash_size = 0;
+	int			force = 0;
 
-	while ((c = getopt_long(argc, argv, "wrT:D:c:s:v:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "wrfT:D:c:s:v:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
@@ -172,6 +215,9 @@ main (int argc, char **argv)
 			break;
 		case 'v':
 			verbose++;
+			break;
+		case 'f':
+			force = 1;
 			break;
 		default:
 			usage(argv[0]);
@@ -318,6 +364,48 @@ main (int argc, char **argv)
 			cal = get_uint32(cc, AO_RADIO_CAL);
 			if (!cal || cal == 0xffffffff) {
 				fprintf (stderr, "Invalid existing rf cal %d\n", cal);
+				done(cc, 1);
+			}
+		}
+
+		if (!force && was_flashed) {
+			struct ao_usb_id	new_id, old_id;
+			uint16_t		*new_product, *old_product;
+			int			new_len, old_len;
+
+			if (!ao_heximage_usb_id(load, &new_id)) {
+				fprintf(stderr, "Can't get new USB id\n");
+				done(cc, 1);
+			}
+
+			if (!ao_self_get_usb_id(cc, &old_id)) {
+				fprintf(stderr, "Can't get old USB id\n");
+				done(cc, 1);
+			}
+			if (new_id.vid != old_id.vid || new_id.pid != old_id.pid) {
+				fprintf(stderr, "USB ID mismatch (device is %04x/%04x image is %04x/%04x)\n",
+					old_id.vid, old_id.pid, new_id.vid, new_id.pid);
+				done(cc, 1);
+			}
+
+			new_product = ao_heximage_usb_product(load);
+			if (!new_product) {
+				fprintf(stderr, "Can't get new USB product name\n");
+				done(cc, 1);
+			}
+			old_product = ao_self_get_usb_product(cc);
+			if (!old_product) {
+				fprintf(stderr, "Can't get existing USB product name\n");
+				done(cc, 1);
+			}
+			new_len = ucs2len(new_product);
+			old_len = ucs2len(old_product);
+			if (new_len != old_len || memcmp(new_product, old_product, new_len * 2) != 0) {
+				fprintf(stderr, "USB product mismatch (device is ");
+				putucs2str(new_product, stderr);
+				fprintf(stderr, ", image is ");
+				putucs2str(old_product, stderr);
+				fprintf(stderr, ")\n");
 				done(cc, 1);
 			}
 		}

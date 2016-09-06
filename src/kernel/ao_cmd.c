@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -393,11 +394,17 @@ ao_cmd(void)
 			if (func)
 				break;
 		}
+#if HAS_MONITOR
+		ao_mutex_get(&ao_monitoring_mutex);
+#endif
 		if (func)
 			(*func)();
 		else
 			ao_cmd_status = ao_cmd_syntax_error;
 		report();
+#if HAS_MONITOR
+		ao_mutex_put(&ao_monitoring_mutex);
+#endif
 	}
 }
 

@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -85,6 +86,46 @@ validate_spi(struct stm_spi *stm_spi, int which, uint16_t len)
 #endif
 
 static void
+ao_spi_set_dma_mosi(uint8_t id, const void *data, uint16_t len, uint32_t minc)
+{
+	struct stm_spi *stm_spi = ao_spi_stm_info[id].stm_spi;
+	uint8_t	mosi_dma_index = ao_spi_stm_info[id].mosi_dma_index;
+
+	ao_dma_set_transfer(mosi_dma_index,
+			    &stm_spi->dr,
+			    (void *) data,
+			    len,
+			    (0 << STM_DMA_CCR_MEM2MEM) |
+			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
+			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
+			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
+			    (minc << STM_DMA_CCR_MINC) |
+			    (0 << STM_DMA_CCR_PINC) |
+			    (0 << STM_DMA_CCR_CIRC) |
+			    (STM_DMA_CCR_DIR_MEM_TO_PER << STM_DMA_CCR_DIR));
+}
+
+static void
+ao_spi_set_dma_miso(uint8_t id, void *data, uint16_t len, uint32_t minc)
+{
+	struct stm_spi *stm_spi = ao_spi_stm_info[id].stm_spi;
+	uint8_t	miso_dma_index = ao_spi_stm_info[id].miso_dma_index;
+
+	ao_dma_set_transfer(miso_dma_index,
+			    &stm_spi->dr,
+			    data,
+			    len,
+			    (0 << STM_DMA_CCR_MEM2MEM) |
+			    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
+			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
+			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
+			    (minc << STM_DMA_CCR_MINC) |
+			    (0 << STM_DMA_CCR_PINC) |
+			    (0 << STM_DMA_CCR_CIRC) |
+			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+}
+
+static void
 ao_spi_run(uint8_t id, uint8_t which, uint16_t len)
 {
 	struct stm_spi *stm_spi = ao_spi_stm_info[id].stm_spi;
@@ -123,40 +164,15 @@ void
 ao_spi_send(const void *block, uint16_t len, uint8_t spi_index)
 {
 	uint8_t id = AO_SPI_INDEX(spi_index);
-	struct stm_spi *stm_spi = ao_spi_stm_info[id].stm_spi;
-	uint8_t	mosi_dma_index = ao_spi_stm_info[id].mosi_dma_index;
-	uint8_t	miso_dma_index = ao_spi_stm_info[id].miso_dma_index;
 
 	/* Set up the transmit DMA to deliver data */
-	ao_dma_set_transfer(mosi_dma_index,
-			    &stm_spi->dr,
-			    (void *) block,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (1 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_MEM_TO_PER << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_mosi(id, block, len, 1);
 
 	/* Set up the receive DMA -- when this is done, we know the SPI unit
 	 * is idle. Without this, we'd have to poll waiting for the BSY bit to
 	 * be cleared
 	 */
-	ao_dma_set_transfer(miso_dma_index,
-			    &stm_spi->dr,
-			    &spi_dev_null,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (0 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_miso(id, &spi_dev_null, len, 0);
 
 	ao_spi_run(id, 1, len);
 }
@@ -165,40 +181,15 @@ void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index)
 {
 	uint8_t id = AO_SPI_INDEX(spi_index);
-	struct stm_spi *stm_spi = ao_spi_stm_info[id].stm_spi;
-	uint8_t	mosi_dma_index = ao_spi_stm_info[id].mosi_dma_index;
-	uint8_t	miso_dma_index = ao_spi_stm_info[id].miso_dma_index;
 
 	/* Set up the transmit DMA to deliver data */
-	ao_dma_set_transfer(mosi_dma_index,
-			    &stm_spi->dr,
-			    &value,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (0 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_MEM_TO_PER << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_mosi(id, &value, len, 0);
 
 	/* Set up the receive DMA -- when this is done, we know the SPI unit
 	 * is idle. Without this, we'd have to poll waiting for the BSY bit to
 	 * be cleared
 	 */
-	ao_dma_set_transfer(miso_dma_index,
-			    &stm_spi->dr,
-			    &spi_dev_null,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (0 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_miso(id, &spi_dev_null, len, 0);
 
 	ao_spi_run(id, 3, len);
 }
@@ -267,78 +258,29 @@ void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
 {
 	uint8_t		id = AO_SPI_INDEX(spi_index);
-	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
-	uint8_t		mosi_dma_index = ao_spi_stm_info[id].mosi_dma_index;
-	uint8_t		miso_dma_index = ao_spi_stm_info[id].miso_dma_index;
 
 	spi_dev_null = 0xff;
 
 	/* Set up transmit DMA to make the SPI hardware actually run */
-	ao_dma_set_transfer(mosi_dma_index,
-			    &stm_spi->dr,
-			    &spi_dev_null,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (0 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_MEM_TO_PER << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_mosi(id, &spi_dev_null, len, 0);
 
 	/* Set up the receive DMA to capture data */
-	ao_dma_set_transfer(miso_dma_index,
-			    &stm_spi->dr,
-			    block,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (1 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_miso(id, block, len, 1);
 
 	ao_spi_run(id, 9, len);
 }
 
 void
-ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t spi_index)
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index)
 {
 	uint8_t		id = AO_SPI_INDEX(spi_index);
-	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
-	uint8_t		mosi_dma_index = ao_spi_stm_info[id].mosi_dma_index;
-	uint8_t		miso_dma_index = ao_spi_stm_info[id].miso_dma_index;
 
 	/* Set up transmit DMA to send data */
-	ao_dma_set_transfer(mosi_dma_index,
-			    &stm_spi->dr,
-			    out,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (1 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_MEM_TO_PER << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_mosi(id, out, len, 1);
 
 	/* Set up the receive DMA to capture data */
-	ao_dma_set_transfer(miso_dma_index,
-			    &stm_spi->dr,
-			    in,
-			    len,
-			    (0 << STM_DMA_CCR_MEM2MEM) |
-			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
-			    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
-			    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
-			    (1 << STM_DMA_CCR_MINC) |
-			    (0 << STM_DMA_CCR_PINC) |
-			    (0 << STM_DMA_CCR_CIRC) |
-			    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+	ao_spi_set_dma_miso(id, in, len, 1);
+
 	ao_spi_run(id, 11, len);
 }
 
