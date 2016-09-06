@@ -237,6 +237,7 @@ DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 .raw.pdf:
 	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
+	case $* in release-notes*) ./fix-html $*.html ;; esac
 
 .pdf.html:
 	@touch $@
