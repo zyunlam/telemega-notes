@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,7 +36,7 @@ int
 main(void)
 {
 	ao_clock_init();
-	
+
 #if HAS_STACK_GUARD
 	ao_mpu_init();
 #endif
@@ -43,7 +44,7 @@ main(void)
 	ao_task_init();
 	ao_serial_init();
 	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_RED);
+	ao_led_on(LEDS_AVAILABLE);
 	ao_timer_init();
 
 	ao_spi_init();
@@ -66,7 +67,7 @@ main(void)
 	ao_eeprom_init();
 
 	ao_storage_init();
-	
+
 	ao_flight_init();
 	ao_log_init();
 	ao_report_init();
@@ -87,7 +88,8 @@ main(void)
 #if HAS_SAMPLE_PROFILE
 	ao_sample_profile_init();
 #endif
-	
+	ao_led_off(LEDS_AVAILABLE);
+
 	ao_start_scheduler();
 	return 0;
 }

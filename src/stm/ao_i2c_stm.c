@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -137,7 +138,7 @@ ao_i2c_ev_isr(uint8_t index)
 		ao_wakeup(&ao_i2c_state[index]);
 	}
 	if (sr1 & (1 << STM_I2C_SR1_RXNE)) {
-		if (ao_i2c_recv_len[index]) {			
+		if (ao_i2c_recv_len[index]) {
 			*(ao_i2c_recv_data[index]++) = stm_i2c->dr;
 			if (!--ao_i2c_recv_len[index])
 				ao_wakeup(&ao_i2c_recv_len[index]);
@@ -254,7 +255,7 @@ ao_i2c_send(void *block, uint16_t len, uint8_t index, uint8_t stop)
 			    (0 << STM_DMA_CCR_PINC) |
 			    (0 << STM_DMA_CCR_CIRC) |
 			    (STM_DMA_CCR_DIR_MEM_TO_PER << STM_DMA_CCR_DIR));
-			   
+
 	ao_dma_start(tx_dma_index);
 	ao_arch_block_interrupts();
 	while (!ao_dma_done[tx_dma_index])
@@ -330,7 +331,7 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t index, uint8_t stop)
 				    block,
 				    len,
 				    (0 << STM_DMA_CCR_MEM2MEM) |
-				    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
+				    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
 				    (STM_DMA_CCR_MSIZE_8 << STM_DMA_CCR_MSIZE) |
 				    (STM_DMA_CCR_PSIZE_8 << STM_DMA_CCR_PSIZE) |
 				    (1 << STM_DMA_CCR_MINC) |

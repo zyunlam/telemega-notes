@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -155,14 +156,12 @@
 #define AO_BUTTON_0_PORT	&stm_gpioa
 #define AO_BUTTON_0		0
 
-#define AO_BUTTON_ARM_0		0
+#define AO_BUTTON_BOX		0
 
 #define AO_BUTTON_1_PORT	&stm_gpioa
 #define AO_BUTTON_1		1
 
-#define AO_BUTTON_ARM_1		1
-
-#define AO_BUTTON_ARM_NUM	2
+#define AO_BUTTON_ARM		1
 
 #define AO_BUTTON_2_PORT	&stm_gpioa
 #define AO_BUTTON_2		2

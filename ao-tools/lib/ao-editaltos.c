@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,23 +21,23 @@
 #include "ao-editaltos.h"
 
 struct ao_sym ao_symbols[] = {
-	{
+	[AO_ROMCONFIG_VERSION_INDEX] = {
 		.name = "ao_romconfig_version",
 		.required = 1
 	},
-	{
+	[AO_ROMCONFIG_CHECK_INDEX] = {
 		.name = "ao_romconfig_check",
 		.required = 1
 	},
-	{
+	[AO_SERIAL_NUMBER_INDEX] = {
 		.name = "ao_serial_number",
 		.required = 1
 	},
-	{
+	[AO_RADIO_CAL_INDEX] = {
 		.name = "ao_radio_cal",
 		.required = 0
 	},
-	{
+	[AO_USB_DESCRIPTORS_INDEX] = {
 		.name = "ao_usb_descriptors",
 		.required = 0
 	},
@@ -57,13 +58,6 @@ rewrite(struct ao_hex_image *load, unsigned address, uint8_t *data, int length)
 	if (address < load->address || load->address + load->length < address + length)
 		return false;
 
-	printf("rewrite %04x:", address);
-	for (i = 0; i < length; i++)
-		printf (" %02x", load->data[address - load->address + i]);
-	printf(" ->");
-	for (i = 0; i < length; i++)
-		printf (" %02x", data[i]);
-	printf("\n");
 	memcpy(load->data + address - load->address, data, length);
 	return true;
 }
@@ -164,4 +158,82 @@ ao_editaltos(struct ao_hex_image *image,
 		}
 	}
 	return true;
+}
+
+static uint16_t
+read_le16(uint8_t *src)
+{
+	return (uint16_t) src[0] | ((uint16_t) src[1] << 8);
+}
+
+bool
+ao_heximage_usb_id(struct ao_hex_image *image, struct ao_usb_id *id)
+{
+	uint32_t	usb_descriptors;
+
+	if (!AO_USB_DESCRIPTORS)
+		return false;
+	usb_descriptors = AO_USB_DESCRIPTORS - image->address;
+
+	while (image->data[usb_descriptors] != 0 && usb_descriptors < image->length) {
+		if (image->data[usb_descriptors+1] == AO_USB_DESC_DEVICE) {
+			break;
+		}
+		usb_descriptors += image->data[usb_descriptors];
+	}
+
+	/*
+	 * check to make sure there's at least 0x12 (size of a USB
+	 * device descriptor) available
+	 */
+	if (usb_descriptors >= image->length || image->data[usb_descriptors] != 0x12)
+		return false;
+
+	id->vid = read_le16(image->data + usb_descriptors + 8);
+	id->pid = read_le16(image->data + usb_descriptors + 10);
+
+	return true;
+}
+
+uint16_t *
+ao_heximage_usb_product(struct ao_hex_image *image)
+{
+	uint32_t	usb_descriptors;
+	int		string_num;
+	uint16_t	*product;
+	uint8_t		product_len;
+
+	if (!AO_USB_DESCRIPTORS)
+		return NULL;
+	usb_descriptors = AO_USB_DESCRIPTORS - image->address;
+
+	string_num = 0;
+	while (image->data[usb_descriptors] != 0 && usb_descriptors < image->length) {
+		if (image->data[usb_descriptors+1] == AO_USB_DESC_STRING) {
+			++string_num;
+			if (string_num == 3)
+				break;
+		}
+		usb_descriptors += image->data[usb_descriptors];
+	}
+
+	/*
+	 * check to make sure there's at least 0x12 (size of a USB
+	 * device descriptor) available
+	 */
+	if (usb_descriptors >= image->length || image->data[usb_descriptors] == 0)
+		return NULL;
+
+	product_len = image->data[usb_descriptors] - 2;
+
+	if (usb_descriptors < product_len + 2)
+		return NULL;
+
+	product = malloc (product_len + 2);
+	if (!product)
+		return NULL;
+
+	memcpy(product, image->data + usb_descriptors + 2, product_len);
+	product[product_len/2] = 0;
+	return product;
 }

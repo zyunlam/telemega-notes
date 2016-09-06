@@ -47,6 +47,16 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.6.8</revnumber>
+    <date>4 Sep 2016</date>
+    <revremark>
+      Minor release fixing another TeleMega and TeleMetrum v2.0 bug
+      which could result in loss of data logging and telemetry in
+      flight. Also fixed an AltosUI bug which would hide some pad
+      status values and never show them again.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.6.5</revnumber>
     <date>8 Jul 2016</date>
     <revremark>

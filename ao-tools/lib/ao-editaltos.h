@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,17 +26,29 @@
 extern struct ao_sym ao_symbols[];
 extern int ao_num_symbols;
 
+#define AO_USB_DESC_DEVICE		1
 #define AO_USB_DESC_STRING		3
 
-#define AO_ROMCONFIG_VERSION	(ao_symbols[0].addr)
-#define AO_ROMCONFIG_CHECK	(ao_symbols[1].addr)
-#define AO_SERIAL_NUMBER	(ao_symbols[2].addr)
-#define AO_RADIO_CAL		(ao_symbols[3].addr)
-#define AO_USB_DESCRIPTORS	(ao_symbols[4].addr)
+#define AO_ROMCONFIG_VERSION_INDEX	0
+#define AO_ROMCONFIG_CHECK_INDEX	1
+#define AO_SERIAL_NUMBER_INDEX		2
+#define AO_RADIO_CAL_INDEX		3
+#define AO_USB_DESCRIPTORS_INDEX	4
+
+#define AO_ROMCONFIG_VERSION	(ao_symbols[AO_ROMCONFIG_VERSION_INDEX].addr)
+#define AO_ROMCONFIG_CHECK	(ao_symbols[AO_ROMCONFIG_CHECK_INDEX].addr)
+#define AO_SERIAL_NUMBER	(ao_symbols[AO_SERIAL_NUMBER_INDEX].addr)
+#define AO_RADIO_CAL		(ao_symbols[AO_RADIO_CAL_INDEX].addr)
+#define AO_USB_DESCRIPTORS	(ao_symbols[AO_USB_DESCRIPTORS_INDEX].addr)
 
 struct ao_editaltos_funcs {
 	uint16_t	(*get_uint16)(void *closure, uint32_t addr);
 	uint32_t	(*get_uint32)(void *closure, uint32_t addr);
+};
+
+struct ao_usb_id {
+	uint16_t	vid;
+	uint16_t	pid;
 };
 
 bool
@@ -46,5 +59,11 @@ bool
 ao_editaltos(struct ao_hex_image *image,
 	     uint16_t serial,
 	     uint32_t radio_cal);
+
+bool
+ao_heximage_usb_id(struct ao_hex_image *image, struct ao_usb_id *id);
+
+uint16_t *
+ao_heximage_usb_product(struct ao_hex_image *image);
 
 #endif /* _AO_EDITALTOS_H_ */

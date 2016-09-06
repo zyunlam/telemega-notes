@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -136,7 +137,7 @@ void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
 
 void
-ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t spi_index);
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
 
 extern uint16_t	ao_spi_speed[STM_NUM_SPI];
 

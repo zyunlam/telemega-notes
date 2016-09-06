@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -293,6 +294,7 @@ ao_send_mini(void)
 
 static __pdata int8_t ao_telemetry_config_max;
 static __pdata int8_t ao_telemetry_config_cur;
+static __pdata uint16_t ao_telemetry_flight_number;
 
 static void
 ao_send_configuration(void)
@@ -301,11 +303,7 @@ ao_send_configuration(void)
 	{
 		telemetry.generic.type = AO_TELEMETRY_CONFIGURATION;
 		telemetry.configuration.device = AO_idProduct_NUMBER;
-#if HAS_LOG
-		telemetry.configuration.flight = ao_log_full() ? 0 : ao_flight_number;
-#else
-		telemetry.configuration.flight = ao_flight_number;
-#endif
+		telemetry.configuration.flight = ao_telemetry_flight_number;
 		telemetry.configuration.config_major = AO_CONFIG_MAJOR;
 		telemetry.configuration.config_minor = AO_CONFIG_MINOR;
 #if AO_idProduct_NUMBER == 0x25 && HAS_ADC
@@ -405,6 +403,11 @@ ao_telemetry(void)
 	while (!ao_flight_number)
 		ao_sleep(&ao_flight_number);
 
+	ao_telemetry_flight_number = ao_flight_number;
+#if HAS_LOG
+	if (ao_log_full())
+		ao_telemetry_flight_number = 0;
+#endif
 	telemetry.generic.serial = ao_serial_number;
 	for (;;) {
 		while (ao_telemetry_interval == 0)

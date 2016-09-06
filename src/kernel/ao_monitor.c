@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,6 +36,7 @@
 #error Must define AO_MONITOR_LED
 #endif
 
+__xdata uint8_t ao_monitoring_mutex;
 __data uint8_t ao_monitoring;
 static __data uint8_t ao_monitor_disabled;
 static __data uint8_t ao_internal_monitoring;
@@ -240,6 +242,7 @@ ao_monitor_put(void)
 			printf ("rx cleanup: %d\n", ao_rx_done_tick - ao_fec_decode_end);
 		}
 #endif
+			ao_mutex_get(&ao_monitoring_mutex);
 			printf("TELEM ");
 			hex((uint8_t) (ao_monitoring + 2));
 			sum = 0x5a;
@@ -250,6 +253,7 @@ ao_monitor_put(void)
 			}
 			hex(sum);
 			putchar ('\n');
+			ao_mutex_put(&ao_monitoring_mutex);
 #if HAS_RSSI
 			if (recv_raw.packet[ao_monitoring + 1] & AO_RADIO_STATUS_CRC_OK) {
 				rssi = AO_RSSI_FROM_RADIO(recv_raw.packet[ao_monitoring]);

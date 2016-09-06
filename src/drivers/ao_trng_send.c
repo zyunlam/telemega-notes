@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -96,18 +97,7 @@ ao_trng_send_raw(void)
 
 #endif
 
-/* Make sure there's at least 8 bits of variance in the samples */
-#define MIN_VARIANCE		(128 * 128)
-
-/* Make sure the signal is spread around a bit */
-#define MAX_VARIANCE		(512 * 512)
-
-#define ADD_STATS(value) do {			\
-		sum += (value);			\
-		sum2 += (value) * (value);	\
-	} while(0)
-
-#define VARIANCE(n)	((sum2 - (sum / (n) * sum)) / (n))
+static uint32_t	previous[AO_USB_IN_SIZE / sizeof (uint16_t)];
 
 static int
 ao_trng_get_cooked(uint16_t *buf)
@@ -115,29 +105,24 @@ ao_trng_get_cooked(uint16_t *buf)
 	uint16_t	i;
 	uint16_t	t;
 	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
-	int32_t 	sum, sum2, var;
+	uint8_t		mismatch = 0;
 
-	sum = sum2 = 0;
 	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;		/* one 16-bit value per output byte */
 	for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
 		uint32_t	v;
-		uint16_t	v1, v2;
 
 		/* Fetch two values in one operation */
 		v = rnd[t];
+		if (v != previous[i]) {
+			mismatch = 1;
+			previous[i] = v;
+		}
 		t = (t + 1) & ((AO_ADC_RING_SIZE >> 1) - 1);
 
 		*buf++ = ao_crc_in_32_out_16(v);
-
-		v1 = v;
-		v2 = v >> 16;
-
-		ADD_STATS(v1);
-		ADD_STATS(v2);
 	}
 	ao_adc_ack(AO_USB_IN_SIZE);
-	var = VARIANCE(2 * AO_USB_IN_SIZE / sizeof (uint16_t));
-	return var >= MIN_VARIANCE && var <= MAX_VARIANCE;
+	return mismatch;
 }
 
 #define AO_TRNG_START_WAIT	1024

@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -545,14 +546,22 @@ public class AltosUI extends AltosUIFrame {
 			AltosStateIterable eef = record_iterable(file);
 
 			for (AltosState state : eef) {
-				System.out.printf ("tick %d state %d height %g\n",
-						   state.tick, state.state(), state.height());
-				if ((state.set & AltosState.set_gps) != 0)
-					System.out.printf ("time %g lat %g lon %g alt %g\n",
-							   state.time_since_boost(),
+				if ((state.set & AltosState.set_gps) != 0) {
+					System.out.printf ("time %d %d-%d-%d %d:%d:%d lat %g lon %g alt %g\n",
+							   state.gps.seconds(),
+							   state.gps.year,
+							   state.gps.month,
+							   state.gps.day,
+							   state.gps.hour,
+							   state.gps.minute,
+							   state.gps.second,
 							   state.gps.lat,
 							   state.gps.lon,
 							   state.gps.alt);
+				} else {
+					System.out.printf ("tick %d state %d height %g\n",
+							   state.tick, state.state(), state.height());
+				}
 			}
 
 		} catch (Exception e) {

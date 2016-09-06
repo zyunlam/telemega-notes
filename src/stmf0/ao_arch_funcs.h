@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -82,7 +83,57 @@ void
 ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
 
 void
-ao_spi_send_sync(void *block, uint16_t len, uint8_t spi_index);
+ao_spi_send_sync(const void *block, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_start_bytes(uint8_t spi_index);
+
+void
+ao_spi_stop_bytes(uint8_t spi_index);
+
+static inline void
+ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
+{
+	struct stm_spi	*stm_spi;
+
+	switch (AO_SPI_INDEX(spi_index)) {
+	case 0:
+		stm_spi = &stm_spi1;
+		break;
+	case 1:
+		stm_spi = &stm_spi2;
+		break;
+	}
+
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
+		;
+	stm_spi->dr = byte;
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
+		;
+	(void) stm_spi->dr;
+}
+
+static inline uint8_t
+ao_spi_recv_byte(uint8_t spi_index)
+{
+	struct stm_spi	*stm_spi;
+
+	switch (AO_SPI_INDEX(spi_index)) {
+	case 0:
+		stm_spi = &stm_spi1;
+		break;
+	case 1:
+		stm_spi = &stm_spi2;
+		break;
+	}
+
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
+		;
+	stm_spi->dr = 0xff;
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
+		;
+	return stm_spi->dr;
+}
 
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);

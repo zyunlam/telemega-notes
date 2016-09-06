@@ -3,7 +3,8 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -90,6 +91,12 @@ _ao_button_init(uint8_t b)
 	ao_button_queue(b, value);
 	ao_arch_irqrestore(m);
 
+}
+
+uint8_t
+ao_button_get(uint8_t b)
+{
+	return ao_button_state[b].value;
 }
 
 static void
