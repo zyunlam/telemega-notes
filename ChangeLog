@@ -1,3 +1,515 @@
+commit c0ad087008856cfc2233b977abfc3f1dcbaccdcc
+Merge: 148b013 4fdf8ca
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 5 20:59:11 2016 -0600
+
+    Merge branch 'master' into branch-1.6
+
+commit 4fdf8ca9ca1cd5a84b03bd7a03c5806af64b413d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 5 20:55:17 2016 -0600
+
+    Remove pyro wizard file from master
+    
+    This isn't done yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 89b8b2ee98e8d329559f54058c574ba9122ced8e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 5 20:46:05 2016 -0600
+
+    Bump version to 1.6.8
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a37b687670dd1ccb0274e5fe6bf6145c4fc5acc8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 5 20:45:12 2016 -0600
+
+    altosui: Don't ship TeleMetrum v3.0 firmware (yet)
+    
+    We haven't finished this yet, so don't deliver firmware for it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 45084fd04326b979f349870f09ff9af1b3155cbe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 3 21:02:35 2016 -0500
+
+    Add 1.6.8 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9279b0cd52333a846b57af890f708ebb364b62b7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 3 01:21:34 2016 -0500
+
+    altos/stm: Set SPI slave DMA priority to HIGH/VERY_HIGH
+    
+    Set spi slave DMA priority MOSI to HIGH and MISO to VERY_HIGH. Slave
+    SPI doesn't have the luxury of slowing down when the system is busy,
+    so provide it maximum memory bandwidth to try and keep up with the
+    master.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d80995c4535a3655ca1b9ca674d6839cfef84c4e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 3 01:20:20 2016 -0500
+
+    altos/stm: Set i2c recv DMA to HIGH
+    
+    Make sure receive DMA is higher than any TX dma so that
+    it always runs in preference.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit af2eefbed43e56885a7321319d69b7be17354cdd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 3 00:55:19 2016 -0500
+
+    altos/stm: Set MISO DMA priority to HIGH to avoid OVR
+    
+    When the MISO DMA priority is too low, and the processor gets busy,
+    it's possible for SPI input to overrun the processor, which causes the
+    MISO DMA to get out of sync and never finish. Set the MISO DMA
+    priority to HIGH to avoid this.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4fc5cfa2c63c43ab0a9ef7e0cc6832fb1c163bd6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 3 00:53:44 2016 -0500
+
+    altos/stm: Create funcs to set SPI DMA parameters
+    
+    Instead of having nearly duplicate versions of the SPI DMA
+    configuration calls, create helper funcs that do most of the work so
+    that the SPI API funcs are shorter and clearer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1710a4921d4f408300c7d5adf0e83d08cc86be20
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 3 00:52:12 2016 -0500
+
+    altos/stm: Make ao_spi_duplex out pointer const
+    
+    Provides a bit better typechecking opportunities for this function.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5d913dde1fa58cbcb5edbc88405180e37ba0dbcd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 2 23:40:03 2016 -0500
+
+    Bump version to 1.6.7.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 30e8f003381c30434058905f53f5a219ac5feb4f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 2 23:36:36 2016 -0500
+
+    ao-tools/ao-cal-freq: Re-open usb device each try
+    
+    Instead of trying to re-use the same file descriptor, close and
+    re-open the device each time around the loop to avoid getting stuck
+    when calibrating TeleMega boards.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3ea30c1909b3ae23918ea6d0a53d2c4065b08763
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 2 23:34:47 2016 -0500
+
+    ao-tools/ao-usbload: Fix -f flag, remove debug hacks
+    
+    The code to validate the usb id and product name had some debug hacks
+    left enabled, which caused it to fail. The short -f version of the
+    force flag was also not getting parsed correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dfaabc1ca3aaad0d249283308b06d3e0567f0c59
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 2 23:33:27 2016 -0500
+
+    ao-bringup/turnon_telemetrum: serial on cmd line. Loop on accel fail
+    
+    These make the script easier to use
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8bbef0c7039f4a0c6ac368fd994c2e52d84d293c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 2 16:13:25 2016 -0500
+
+    altosui: Deal with connect failure in AltosConfigTD
+    
+    When the USB connection times out, abort any pending operations and
+    clean up the thread correctly. Also, deal with the serial line being
+    closed by checking for null.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b2d013aef5b76ff527e8174dff7f6ffe0dfaefae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 31 21:27:10 2016 -0600
+
+    ao-tools/ao-cal-freq: --verbose option has no parameter
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 08923aa0cf31ae7bd73b66b4d1cd81fae4241ff0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 31 21:25:59 2016 -0600
+
+    ao-bringup: telemega allow serial on command line, loop on accel fail
+    
+    Allow the serial number on the turnon_telemega command line, instead
+    of reading it.
+    
+    When accel cal fails, loop waiting for it to succeed instead of
+    continuing blindly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ab75ab10564c4d5d05719c382a3b71585cd70710
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 29 09:27:53 2016 -0700
+
+    altos/cc1120: remove unused status from ao_radio_fifo_write_stop
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 462039c769f2db9328b04759807c30691f2b96c2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 14 15:57:39 2016 -0700
+
+    ao-usbload: Check target device name to avoid mis-flashing
+    
+    Instead of blindly loading firmware, go get the old device's name and
+    make sure it matches the new firmware.
+    
+    Add --force option to allow this to be overridden.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c62816a00b9aa40879a2ea98da2d10667e09b704
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 14 15:55:13 2016 -0700
+
+    ao-chaosread: Parse -i and -b options
+    
+    Need to pass the single-byte verisons to getopt_long
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit af1d41e32fc04d5897fd2dc736391d263af48727
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 8 22:40:41 2016 -0700
+
+    Bump verison to 1.6.7
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 46b1234140c04dbfac22be0fdf80be96506b6948
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 8 22:39:16 2016 -0700
+
+    altos/stmf0: Switch ADC fast to ADC clock
+    
+    Using this slower clock eliminates sampling problems with the ADC and
+    cleans up the chaoskey raw data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 48088d1d6a66c5d5271b52191367f07b09626b29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 4 09:54:16 2016 -0700
+
+    altos: Flash all LEDS during power on
+    
+    This tests the LEDS to make sure they all work on the following devices:
+    
+    easymega-v1.0
+    telebt-v3.0
+    teledongle-v3.0
+    telemega-v1.0
+    telemega-v2.0
+    telemetrum-v2.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71e3a59e42c284fde8ac2767abd029230ed86e07
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 4 09:52:05 2016 -0700
+
+    ao-bringup: Add colors to chaoskey test result reporting
+    
+    This makes them show up nice and bright in the terminal window.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bc920c80ef447a5bcdf8165b69fb28b8f63609df
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:35:36 2016 -0700
+
+    Bump to version 1.6.6
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 165868999f45f4572ff2585fcb3986974a5bbd5c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:52:39 2016 -0700
+
+    ao-bringup: Use released files for chaoskey turnon
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c4926a69d6e72a035197b3d617c62893a7ea1861
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:30:15 2016 -0700
+
+    ao-bringup: Test chaoskey using dieharder
+    
+    This uses a subset of the dieharder tests which run in reasonable time
+    and don't appear to emit false negatives on a regular basis.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d52cb9dac725206ba7b2d26818c84f134d5bf183
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:53:17 2016 -0700
+
+    ao-chaosread: Eliminate double-free when serial match fails
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3bdc9028502c766d1c8ddb4f0dedba4bbc22384e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:28:17 2016 -0700
+
+    ao-chaosread: Add --infinite and --bytes options
+    
+    The --infinite option keeps writing data.
+    The --bytes options pulls out bits 1-8 which should provide 8 true
+    bits of entropy.
+    
+    This combination allows ao-chaosread to be fed directly into dieharder
+    to validate the hardware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 826ad792389150ea8d80e341cb8ea023db83c9a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:26:49 2016 -0700
+
+    altos: Use standard FIPS testing for chaoskey
+    
+    Check to make sure we aren't repeating a block coming from the
+    unwhitened source, which is the standard online FIPS test for RNGs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1934468e96ea9d179abf6e3e728b6b14ce793f46
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:53:50 2016 -0700
+
+    altos/stmf0: Clean .bin files from flash-loader dirs
+    
+    The .bin files are what the DFU utility uses to flash the boot loader
+    using USB.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 782013d0ff2c9f076952c0e172bfcb7016699d5f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:32:43 2016 -0700
+
+    altos/stmf0: Hook up clock output support
+    
+    This was used to try and not have two xtals on telemini, but failed
+    because the provided clock has too much noise.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 99753673a4a97423300427e276bf550ae5353842
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:31:41 2016 -0700
+
+    altos: Make telelcotwo control two boxes instead of two pads
+    
+    telefiretwo is now a single pad box, so telelcotwo needs to switch
+    between boxes instead of pads on the same box. Do this by re-purposing
+    the pad arming switches into a box selector and arming switch.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit be84201495fa3cabd699012e57e797355e2bd792
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 27 21:28:34 2016 -0700
+
+    altos: Add 'ao_button_get' to button driver
+    
+    This returns the current state of the button; useful to check what the
+    value is at startup.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a6701283af7ed2b3016a910d6edbe4a5e8304581
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 2 16:33:52 2016 -0700
+
+    altoslib: Add a 'seconds' method to AltosGPS
+    
+    This computes the time in seconds since the epoch from GPS time
+    information.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 647690dbe084d188ba3973da631871a65f2dc50d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 27 13:29:20 2016 -0700
+
+    altos: Stop building cc1111-based telemini v2.0 firmware
+    
+    This product never worked, so stop insisting that it actually build.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fe13426daff08f2beface2c1906f9a6184f6b987
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 27 13:26:22 2016 -0700
+
+    altos: Don't switch to flight 0 when log fills in flight
+    
+    If the log is full at startup, we want to transmit flight 0 to let the
+    ground station know. However, we don't want to switch to flight 0 in
+    flight, so save the initial telemetry flight number (0 or the real
+    flight number) at startup and use that throughout the flight.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71ddb973ff75680e78fbbef7978ab3893c367629
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 27 13:24:57 2016 -0700
+
+    altos: Expose cc1200 radio test functions for telemini bringup
+    
+    This exposes the cc1200 radio test function so we can load special
+    test firmware in telemini to do the radio cal as it has no USB to
+    perform that interactively.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 59874a062543c61d164089e8b31f55a9b860c0b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 27 13:23:06 2016 -0700
+
+    fixup for interleave
+
+commit 2507b9f29d25f77de249103805087a704069c625
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 27 13:17:51 2016 -0700
+
+    altos: Don't access cc1120 SPI bus during recv after abort has started
+    
+    When the receive timeout happens, the radio may still interrupt while
+    the SPI bus is getting shut down. If this happens, the interrupt
+    handler shouldn't touch the SPI bus at all as it may well be turned
+    off, which would cause the receive function to wedge waiting for a spi
+    byte transfer to happen.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 17adfd7939ff697afa96f7207a3fe17b6af789bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 27 12:24:27 2016 -0700
+
+    altos: Keep telemetry and command output from interleaving
+    
+    When monitoring telemetry, the frame needs to be sent together on one
+    line, not split with the output of a command (like 'a') mixed in.
+    
+    Use a mutex for products with monitoring to keep command output and
+    telemetry output each on separate lines.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1667cb8e8b702b05fc3ec39ee49029885df64a4a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 2 20:00:01 2016 +0200
+
+    altos: Add STM32F0 beep and SPI byte API.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f39bee8875a0595b3d7ec7f5575d1e5eeb7544ec
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 12 21:06:23 2016 -0700
+
+    altosuilib: Show indicator when they switch from invalid back to valid
+    
+    The 'hide' value wasn't getting reset to 'false' each time the state
+    of the indicators was checked, so indicators would get hidden and then
+    never shown again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit efd91febfa9bebd2f03508b2240916551450f831
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 12 21:06:05 2016 -0700
+
+    Bump version to 1.6.5.1 after 1.6.5 release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 639d8b3c4353ee25a0536e01653f3a86feb90ad5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 12 15:53:47 2016 -0700
+
+    altos: Add telemetrum v3.0
+    
+    Like Telemetrum v2.0, but with cc1200 instead of cc1120
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1085ec5d57e0ed5d132f2bbdac1a0b6a32c0ab4a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 5 18:03:49 2016 +0200
+
+    Switch from GPLv2 to GPLv2+
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 148b013dd29c26920ddfb53449ed4d8cc5a4b5ee
+Merge: ea1ff22 cd97128
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jul 5 10:23:18 2016 +0200
+
+    Merge branch 'master' into branch-1.6
+
+commit cd97128e30c47edfcc71f7d872cbdad14867934c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jul 5 10:21:29 2016 +0200
+
+    remove debian/ from master branch, it should live only on the debian branch
+
+commit a439ee4ac0398f70209292d015c5b82cd58d1d9f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jul 5 00:48:07 2016 +0200
+
+    updates made during 1.6.5 release process
+
+commit ea1ff225f1f450ee3fc377807d1bb7b982bf792d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jul 4 23:47:56 2016 +0200
+
+    updating ChangeLog for 1.6.5 release
+
 commit 2e26d1ab42163988dc26b06b016c3b05efe17659
 Merge: 639e461 65ed2f5
 Author: Bdale Garbee <bdale@gag.com>
