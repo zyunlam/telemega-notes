@@ -1,3 +1,10 @@
+altos (1.6.8-2) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * Update pdclib to version using arm-specific 'ar' program, closes: #838357
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 02 Oct 2016 17:49:32 -0600
+
 altos (1.6.8-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
