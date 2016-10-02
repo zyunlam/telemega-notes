@@ -1,0 +1,21 @@
+diff --git a/pdclib/Makefile b/pdclib/Makefile
+index 97da5cc..cca5a4f 100644
+--- a/pdclib/Makefile
++++ b/pdclib/Makefile
+@@ -27,6 +27,7 @@ endif
+ 
+ #CC=$(bindir)/arm-none-eabi-gcc
+ CC=/usr/bin/arm-none-eabi-gcc
++AR=/usr/bin/arm-none-eabi-ar
+ 
+ # This is where you chose which platform to compile for (see 'make links' / './platform')
+ PLATFORM := altos
+@@ -98,7 +99,7 @@ check: all testdrivers regtestdrivers
+ 
+ $(PDCLIB): $(BUILD) $(OBJFILES)
+ 	@echo " AR	$@"
+-	@ar rc $@ $(OBJFILES)
++	@$(AR) rc $@ $(OBJFILES)
+ 	@echo
+ 
+ install-$(CPU): install-$(CPU)-lib install-hdr
