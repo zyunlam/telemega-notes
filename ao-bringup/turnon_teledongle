@@ -28,8 +28,21 @@ echo "\t$PRODUCT_NAME v$VERSION powered from USB"
 echo "\t\twith ST-Link-V2 cabled to debug header"
 echo "\t\twith coax from UHF to frequency counter"
 echo
-echo -n "$PRODUCT_NAME-$VERSION serial number: "
-read SERIAL
+
+case $# in
+    1)
+	SERIAL="$1"
+	echo "$PRODUCT-$VERSION serial number: $SERIAL" 
+	;;
+    0)
+	echo -n "$PRODUCT-$VERSION serial number: "
+	read SERIAL
+	;;
+    *)
+	echo "Usage: $0 <serial-number>" 1>&2
+	exit 1;
+	;;
+esac
 
 BINARIES=$HOME/altusmetrumllc/Binaries
 
