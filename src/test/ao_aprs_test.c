@@ -60,6 +60,20 @@ ao_aprs_bit(uint8_t bit)
 void
 ao_radio_send_aprs(ao_radio_fill_func fill);
 
+static void
+aprs_bit_debug(uint8_t tx_bit)
+{
+	fprintf (stderr, "bit %d\n", tx_bit);
+}
+
+static void
+aprs_byte_debug(uint8_t tx_byte)
+{
+	fprintf(stderr, "byte %02x\n", tx_byte);
+}
+#define APRS_BIT_DEBUG(x) aprs_bit_debug(x)
+#define APRS_BYTE_DEBUG(y) aprs_byte_debug(y)
+
 #include <ao_aprs.c>
 
 /*
@@ -103,7 +117,7 @@ audio_gap(int secs)
 // This is where we go after reset.
 int main(int argc, char **argv)
 {
-    audio_gap(1);
+//    audio_gap(1);
 
     ao_gps_data.latitude = (45.0 + 28.25 / 60.0) * 10000000;
     ao_gps_data.longitude = (-(122 + 44.2649 / 60.0)) * 10000000;
