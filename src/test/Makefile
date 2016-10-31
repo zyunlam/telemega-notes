@@ -1,16 +1,16 @@
-vpath % ..:../kernel:../drivers:../util:../micropeak:../aes:../product
+vpath % ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
 
 PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noisy_accel ao_flight_test_mm \
 	ao_flight_test_metrum \
 	ao_gps_test ao_gps_test_skytraq ao_gps_test_ublox ao_convert_test ao_convert_pa_test ao_fec_test \
 	ao_aprs_test ao_micropeak_test ao_fat_test ao_aes_test ao_int64_test \
-	ao_ms5607_convert_test ao_quaternion_test
+	ao_ms5607_convert_test ao_quaternion_test ao_lisp_test
 
 INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quaternion.h
 
 KALMAN=make-kalman 
 
-CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -O0 -g -Wall
+CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -I../lisp -O0 -g -Wall
 
 all: $(PROGS) ao_aprs_data.wav
 
@@ -88,3 +88,10 @@ ao_ms5607_convert_test: ao_ms5607_convert_test.c ao_ms5607_convert_8051.c ao_int
 ao_quaternion_test: ao_quaternion_test.c ao_quaternion.h
 	cc $(CFLAGS) -o $@ ao_quaternion_test.c -lm
 
+
+AO_LISP_OBJS = ao_lisp_test.o ao_lisp_mem.o ao_lisp_lex.o ao_lisp_cons.o ao_lisp_string.o ao_lisp_atom.o ao_lisp_int.o ao_lisp_prim.o ao_lisp_eval.o ao_lisp_poly.o ao_lisp_builtin.o
+
+ao_lisp_test: $(AO_LISP_OBJS)
+	cc $(CFLAGS) -o $@ $(AO_LISP_OBJS)
+
+$(AO_LISP_OBJS): ao_lisp.h
