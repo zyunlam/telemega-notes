@@ -2010,4 +2010,129 @@ struct stm_exti {
 
 extern struct stm_exti stm_exti;
 
+struct stm_usart {
+	vuint32_t	cr1;	/* control register 1 */
+	vuint32_t	cr2;	/* control register 2 */
+	vuint32_t	cr3;	/* control register 3 */
+	vuint32_t	brr;	/* baud rate register */
+
+	vuint32_t	gtpr;	/* guard time and prescaler */
+	vuint32_t	rtor;	/* receiver timeout register */
+	vuint32_t	rqr;	/* request register */
+	vuint32_t	isr;	/* interrupt and status register */
+
+	vuint32_t	icr;	/* interrupt flag clear register */
+	vuint32_t	rdr;	/* receive data register */
+	vuint32_t	tdr;	/* transmit data register */
+};
+
+#define STM_USART_CR1_M1	28
+#define STM_USART_CR1_EOBIE	27
+#define STM_USART_CR1_RTOIE	26
+#define STM_USART_CR1_DEAT	21
+#define STM_USART_CR1_DEDT	16
+#define STM_USART_CR1_OVER8	15
+#define STM_USART_CR1_CMIE	14
+#define STM_USART_CR1_MME	13
+#define STM_USART_CR1_M0	12
+#define STM_USART_CR1_WAKE	11
+#define STM_USART_CR1_PCE	10
+#define STM_USART_CR1_PS	9
+#define STM_USART_CR1_PEIE	8
+#define STM_USART_CR1_TXEIE	7
+#define STM_USART_CR1_TCIE	6
+#define STM_USART_CR1_RXNEIE	5
+#define STM_USART_CR1_IDLEIE	4
+#define STM_USART_CR1_TE	3
+#define STM_USART_CR1_RE	2
+#define STM_USART_CR1_UESM	1
+#define STM_USART_CR1_UE	0
+
+#define STM_USART_CR2_ADD	24
+#define STM_USART_CR2_RTOEN	23
+#define STM_USART_CR2_ABRMOD	21
+#define STM_USART_CR2_ABREN	20
+#define STM_USART_CR2_MSBFIRST	19
+#define STM_USART_CR2_DATAINV	18
+#define STM_USART_CR2_TXINV	17
+#define STM_USART_CR2_RXINV	16
+#define STM_USART_CR2_SWAP	15
+#define STM_USART_CR2_LINEN	14
+#define STM_USART_CR2_STOP	12
+#define STM_USART_CR2_CLKEN	11
+#define STM_USART_CR2_CPOL	10
+#define STM_USART_CR2_CHPA	9
+#define STM_USART_CR2_LBCL	8
+#define STM_USART_CR2_LBDIE	6
+#define STM_USART_CR2_LBDL	5
+#define STM_USART_CR2_ADDM7	4
+
+#define STM_USART_CR3_WUFIE	22
+#define STM_USART_CR3_WUS	20
+#define STM_USART_CR3_SCARCNT	17
+#define STM_USART_CR3_DEP	15
+#define STM_USART_CR3_DEM	14
+#define STM_USART_CR3_DDRE	13
+#define STM_USART_CR3_OVRDIS	12
+#define STM_USART_CR3_ONEBIT	11
+#define STM_USART_CR3_CTIIE	10
+#define STM_USART_CR3_CTSE	9
+#define STM_USART_CR3_RTSE	8
+#define STM_USART_CR3_DMAT	7
+#define STM_USART_CR3_DMAR	6
+#define STM_USART_CR3_SCEN	5
+#define STM_USART_CR3_NACK	4
+#define STM_USART_CR3_HDSEL	3
+#define STM_USART_CR3_IRLP	2
+#define STM_USART_CR3_IREN	1
+#define STM_USART_CR3_EIE	0
+
+#define STM_USART_GTPR_GT	8
+#define STM_USART_GTPR_PSC	0
+
+#define STM_USART_RQR_TXFRQ	4
+#define STM_USART_RQR_RXFRQ	3
+#define STM_USART_RQR_MMRQ	2
+#define STM_USART_RQR_SBKRQ	1
+#define STM_USART_RQR_ABRRQ	0
+
+#define STM_USART_ISR_REACK	22
+#define STM_USART_ISR_TEACK	21
+#define STM_USART_ISR_WUF	20
+#define STM_USART_ISR_RWU	19
+#define STM_USART_ISR_SBKF	18
+#define STM_USART_ISR_CMF	17
+#define STM_USART_ISR_BUSY	16
+#define STM_USART_ISR_ABRF	15
+#define STM_USART_ISR_ABRE	14
+#define STM_USART_ISR_EOBF	12
+#define STM_USART_ISR_RTOF	11
+#define STM_USART_ISR_CTS	10
+#define STM_USART_ISR_CTSIF	9
+#define STM_USART_ISR_LBDF	8
+#define STM_USART_ISR_TXE	7
+#define STM_USART_ISR_TC	6
+#define STM_USART_ISR_RXNE	5
+#define STM_USART_ISR_IDLE	4
+#define STM_USART_ISR_ORE	3
+#define STM_USART_ISR_NF	2
+#define STM_USART_ISR_FE	1
+#define STM_USART_ISR_PE	0
+
+#define STM_USART_ICR_WUCF	20
+#define STM_USART_ICR_CMCF	17
+#define STM_USART_ICR_EOBCF	12
+#define STM_USART_ICR_RTOCF	11
+#define STM_USART_ICR_CTSCF	9
+#define STM_USART_ICR_LBDCF	8
+#define STM_USART_ICR_TCCF	6
+#define STM_USART_ICR_IDLECF	4
+#define STM_USART_ICR_ORECF	3
+#define STM_USART_ICR_NCF	2
+#define STM_USART_ICR_FECF	1
+#define STM_USART_ICR_PECF	0
+
+extern struct stm_usart	stm_usart1;
+extern struct stm_usart stm_usart2;
+
 #endif /* _STM32F0_H_ */
