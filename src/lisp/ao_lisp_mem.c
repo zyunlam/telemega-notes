@@ -120,7 +120,6 @@ collect(void)
 {
 	int	i;
 
-	printf("collect\n");
 	/* Mark */
 	memset(ao_lisp_busy, '\0', sizeof (ao_lisp_busy));
 	for (i = 0; i < AO_LISP_ROOT; i++)
