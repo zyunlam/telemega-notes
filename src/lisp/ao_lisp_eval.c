@@ -30,6 +30,16 @@ static struct ao_lisp_cons	*formals;
 static struct ao_lisp_cons	*formals_tail;
 static uint8_t been_here;
 
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#define DBG_CONS(a)	ao_lisp_cons_print(a)
+#define DBG_POLY(a)	ao_lisp_poly_print(a)
+#else
+#define DBG(...)
+#define DBG_CONS(a)
+#define DBG_POLY(a)
+#endif
+
 ao_lisp_poly
 ao_lisp_eval(ao_lisp_poly v)
 {
@@ -66,9 +76,9 @@ ao_lisp_eval(ao_lisp_poly v)
 			formals_tail = NULL;
 			v = actuals->car;
 
-			printf("start: stack"); ao_lisp_cons_print(stack); printf("\n");
-			printf("start: actuals"); ao_lisp_cons_print(actuals); printf("\n");
-			printf("start: formals"); ao_lisp_cons_print(formals); printf("\n");
+			DBG("start: stack"); DBG_CONS(stack); DBG("\n");
+			DBG("start: actuals"); DBG_CONS(actuals); DBG("\n");
+			DBG("start: formals"); DBG_CONS(formals); DBG("\n");
 		}
 
 		/* Evaluate primitive types */
@@ -83,7 +93,7 @@ ao_lisp_eval(ao_lisp_poly v)
 		}
 
 		for (;;) {
-			printf("add formal: "); ao_lisp_poly_print(v); printf("\n");
+			DBG("add formal: "); DBG_POLY(v); DBG("\n");
 
 			formal = ao_lisp_cons(v, NULL);
 			if (formals_tail)
@@ -93,17 +103,17 @@ ao_lisp_eval(ao_lisp_poly v)
 			formals_tail = formal;
 			actuals = actuals->cdr;
 
-			printf("formals: ");
-			ao_lisp_cons_print(formals);
-			printf("\n");
-			printf("actuals: ");
-			ao_lisp_cons_print(actuals);
-			printf("\n");
+			DBG("formals: ");
+			DBG_CONS(formals);
+			DBG("\n");
+			DBG("actuals: ");
+			DBG_CONS(actuals);
+			DBG("\n");
 
 			/* Process all of the arguments */
 			if (actuals) {
 				v = actuals->car;
-				printf ("actual: "); ao_lisp_poly_print(v); printf("\n");
+				DBG ("actual: "); DBG_POLY(v); DBG("\n");
 				break;
 			}
 
@@ -115,13 +125,13 @@ ao_lisp_eval(ao_lisp_poly v)
 
 				v = b->func(formals->cdr);
 
-				printf ("eval: ");
-				ao_lisp_cons_print(formals);
-				printf(" -> ");
-				ao_lisp_poly_print(v);
-				printf ("\n");
+				DBG ("eval: ");
+				DBG_CONS(formals);
+				DBG(" -> ");
+				DBG_POLY(v);
+				DBG ("\n");
 			} else {
-				printf ("invalid eval\n");
+				DBG ("invalid eval\n");
 			}
 
 			if (--cons) {
@@ -137,11 +147,11 @@ ao_lisp_eval(ao_lisp_poly v)
 				formals_tail = formal;
 
 				stack = stack->cdr;
-				printf("stack pop: stack"); ao_lisp_cons_print(stack); printf("\n");
-				printf("stack pop: actuals"); ao_lisp_cons_print(actuals); printf("\n");
-				printf("stack pop: formals"); ao_lisp_cons_print(formals); printf("\n");
+				DBG("stack pop: stack"); DBG_CONS(stack); DBG("\n");
+				DBG("stack pop: actuals"); DBG_CONS(actuals); DBG("\n");
+				DBG("stack pop: formals"); DBG_CONS(formals); DBG("\n");
 			} else {
-				printf("done func\n");
+				DBG("done func\n");
 				break;
 			}
 		}

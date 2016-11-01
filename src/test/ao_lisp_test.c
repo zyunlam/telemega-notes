@@ -23,6 +23,7 @@ main (int argc, char **argv)
 {
 	int	i, j;
 	struct ao_lisp_atom	*atom;
+	ao_lisp_poly		poly;
 	ao_lisp_root_add(&ao_lisp_cons_type, (void **) &list);
 	ao_lisp_root_add(&ao_lisp_string_type, (void **) &string);
 
@@ -55,4 +56,12 @@ main (int argc, char **argv)
 	printf ("\n");
 	ao_lisp_poly_print(ao_lisp_eval(ao_lisp_cons_poly(list)));
 	printf ("\n");
+
+	while ((poly = ao_lisp_read())) {
+		poly = ao_lisp_eval(poly);
+		ao_lisp_poly_print(poly);
+		putchar ('\n');
+		fflush(stdout);
+	}
+
 }

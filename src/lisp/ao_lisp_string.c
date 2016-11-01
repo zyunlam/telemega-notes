@@ -44,6 +44,18 @@ ao_lisp_string_new(int len) {
 }
 
 char *
+ao_lisp_string_copy(char *a)
+{
+	int	alen = strlen(a);
+
+	char	*r = ao_lisp_alloc(alen + 1);
+	if (!r)
+		return NULL;
+	strcpy(r, a);
+	return r;
+}
+
+char *
 ao_lisp_string_cat(char *a, char *b)
 {
 	int	alen = strlen(a);
