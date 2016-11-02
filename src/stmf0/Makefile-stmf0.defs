@@ -27,7 +27,10 @@ CC=$(ARM_CC)
 
 WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align
 
-AO_CFLAGS=-I. -I$(TOPDIR)/stmf0 -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers -I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math $(PDCLIB_INCLUDES) 
+AO_CFLAGS=-I. -I$(TOPDIR)/stmf0 -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers \
+	-I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math -I$(TOPDIR)/lisp \
+	$(PDCLIB_INCLUDES) 
+
 STMF0_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m0 -mthumb\
 	-ffreestanding -nostdlib $(AO_CFLAGS) $(WARN_FLAGS)
 
