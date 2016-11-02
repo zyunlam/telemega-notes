@@ -21,9 +21,9 @@ static char			*string;
 int
 main (int argc, char **argv)
 {
-	int	i, j;
+	int			i, j;
 	struct ao_lisp_atom	*atom;
-	ao_lisp_poly		poly;
+
 	ao_lisp_root_add(&ao_lisp_cons_type, (void **) &list);
 	ao_lisp_root_add(&ao_lisp_string_type, (void **) &string);
 
@@ -31,37 +31,35 @@ main (int argc, char **argv)
 	for (j = 0; j < 10; j++) {
 		list = 0;
 		string = ao_lisp_string_new(0);
-		for (i = 0; i < 7; i++) {
+		for (i = 0; i < 2; i++) {
 			string = ao_lisp_string_cat(string, "a");
-			list = ao_lisp_cons(ao_lisp_string_poly(string), list);
-			list = ao_lisp_cons(ao_lisp_int_poly(i), list);
+			list = ao_lisp_cons_cons(ao_lisp_string_poly(string), list);
+			list = ao_lisp_cons_cons(ao_lisp_int_poly(i), list);
 			atom = ao_lisp_atom_intern("ant");
 			atom->val = ao_lisp_cons_poly(list);
-			list = ao_lisp_cons(ao_lisp_atom_poly(atom), list);
+			list = ao_lisp_cons_cons(ao_lisp_atom_poly(atom), list);
 		}
 		ao_lisp_poly_print(ao_lisp_cons_poly(list));
 		printf("\n");
 	}
 
-	atom = ao_lisp_atom_intern("ant");
-	atom->val = ao_lisp_string_poly(ao_lisp_string_cat("hello world", ""));
-
-	list = ao_lisp_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("plus")),
-			    ao_lisp_cons(ao_lisp_cons_poly(ao_lisp_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("plus")),
-									ao_lisp_cons(ao_lisp_int_poly(3),
-										     ao_lisp_cons(ao_lisp_int_poly(4), NULL)))),
-					 ao_lisp_cons(ao_lisp_int_poly(2), NULL)));
+	for (atom = ao_lisp_poly_atom(ao_builtin_atoms); atom; atom = ao_lisp_poly_atom(atom->next)) {
+		printf("%s = ", atom->name);
+		ao_lisp_poly_print(atom->val);
+		printf("\n");
+	}
+#if 1
+	list = ao_lisp_cons_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("+")),
+				 ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_cons_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("+")),
+										       ao_lisp_cons_cons(ao_lisp_int_poly(3),
+													 ao_lisp_cons_cons(ao_lisp_int_poly(4), NULL)))),
+						   ao_lisp_cons_cons(ao_lisp_int_poly(2), NULL)));
 	printf("list: ");
 	ao_lisp_poly_print(ao_lisp_cons_poly(list));
 	printf ("\n");
 	ao_lisp_poly_print(ao_lisp_eval(ao_lisp_cons_poly(list)));
 	printf ("\n");
 
-	while ((poly = ao_lisp_read())) {
-		poly = ao_lisp_eval(poly);
-		ao_lisp_poly_print(poly);
-		putchar ('\n');
-		fflush(stdout);
-	}
-
+	ao_lisp_read_eval_print();
+#endif
 }

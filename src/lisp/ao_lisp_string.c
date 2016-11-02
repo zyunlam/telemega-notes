@@ -68,16 +68,18 @@ ao_lisp_string_cat(char *a, char *b)
 	return r;
 }
 
-const struct ao_lisp_mem_type ao_lisp_string_type = {
+const struct ao_lisp_type ao_lisp_string_type = {
 	.mark = string_mark,
 	.size = string_size,
 	.move = string_move,
 };
 
 void
-ao_lisp_string_print(char *s)
+ao_lisp_string_print(ao_poly p)
 {
+	char	*s = ao_lisp_poly_string(p);
 	char	c;
+
 	putchar('"');
 	while ((c = *s++)) {
 		switch (c) {

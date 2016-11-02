@@ -155,8 +155,21 @@ lex_get()
 	if (lex_unget_c) {
 		c = lex_unget_c;
 		lex_unget_c = 0;
-	} else
+	} else {
+#if AO_LISP_ALTOS
+		static uint8_t	at_eol;
+
+		if (at_eol) {
+			ao_cmd_readline();
+			at_eol = 0;
+		}
+		c = ao_cmd_lex();
+		if (c == '\n')
+			at_eol = 1;
+#else
 		c = getchar();
+#endif
+	}
 	return c;
 }
 
@@ -362,13 +375,13 @@ static struct ao_lisp_cons	*read_cons;
 static struct ao_lisp_cons	*read_cons_tail;
 static struct ao_lisp_cons	*read_stack;
 
-static ao_lisp_poly
+static ao_poly
 read_item(void)
 {
 	struct ao_lisp_atom	*atom;
 	char			*string;
 	int			cons;
-	ao_lisp_poly		v;
+	ao_poly			v;
 
 	if (!been_here) {
 		ao_lisp_root_add(&ao_lisp_cons_type, &read_cons);
@@ -381,7 +394,7 @@ read_item(void)
 	for (;;) {
 		while (parse_token == OPEN) {
 			if (cons++)
-				read_stack = ao_lisp_cons(ao_lisp_cons_poly(read_cons), read_stack);
+				read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(read_cons), read_stack);
 			read_cons = NULL;
 			read_cons_tail = NULL;
 			parse_token = lex();
@@ -416,10 +429,10 @@ read_item(void)
 				v = AO_LISP_NIL;
 			if (--cons) {
 				read_cons = ao_lisp_poly_cons(read_stack->car);
-				read_stack = read_stack->cdr;
+				read_stack = ao_lisp_poly_cons(read_stack->cdr);
 				for (read_cons_tail = read_cons;
 				     read_cons_tail && read_cons_tail->cdr;
-				     read_cons_tail = read_cons_tail->cdr)
+				     read_cons_tail = ao_lisp_poly_cons(read_cons_tail->cdr))
 					;
 			}
 			break;
@@ -428,9 +441,9 @@ read_item(void)
 		if (!cons)
 			break;
 
-		struct ao_lisp_cons	*read = ao_lisp_cons(v, NULL);
+		struct ao_lisp_cons	*read = ao_lisp_cons_cons(v, NULL);
 		if (read_cons_tail)
-			read_cons_tail->cdr = read;
+			read_cons_tail->cdr = ao_lisp_cons_poly(read);
 		else
 			read_cons = read;
 		read_cons_tail = read;
@@ -440,7 +453,7 @@ read_item(void)
 	return v;
 }
 
-ao_lisp_poly
+ao_poly
 ao_lisp_read(void)
 {
 	parse_token = lex();

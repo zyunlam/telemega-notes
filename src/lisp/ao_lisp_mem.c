@@ -12,15 +12,26 @@
  * General Public License for more details.
  */
 
+#define AO_LISP_CONST_BITS
+
 #include "ao_lisp.h"
 #include <stdio.h>
 
-uint8_t	ao_lisp_pool[AO_LISP_POOL];
+uint8_t	ao_lisp_pool[AO_LISP_POOL] __attribute__((aligned(4)));
+
+#ifdef AO_LISP_MAKE_CONST
+#include <stdlib.h>
+uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
+#endif
+
+uint8_t	ao_lisp_exception;
 
 struct ao_lisp_root {
 	void				**addr;
-	const struct ao_lisp_mem_type	*type;
+	const struct ao_lisp_type	*type;
 };
+
+#define AO_LISP_ROOT	16
 
 static struct ao_lisp_root	ao_lisp_root[AO_LISP_ROOT];
 
@@ -28,7 +39,7 @@ static uint8_t	ao_lisp_busy[AO_LISP_POOL / 32];
 
 static uint8_t	ao_lisp_moving[AO_LISP_POOL / 32];
 
-static uint16_t	ao_lisp_top;
+uint16_t	ao_lisp_top;
 
 static inline void mark(uint8_t *tag, int offset) {
 	int	byte = offset >> 5;
@@ -59,7 +70,11 @@ static int
 mark_object(uint8_t *tag, void *addr, int size) {
 	int	base;
 	int	bound;
+
 	if (!addr)
+		return 1;
+
+	if ((uint8_t *) addr < ao_lisp_pool || ao_lisp_pool + AO_LISP_POOL <= (uint8_t*) addr)
 		return 1;
 
 	base = (uint8_t *) addr - ao_lisp_pool;
@@ -150,7 +165,7 @@ collect(void)
 
 
 void
-ao_lisp_mark(const struct ao_lisp_mem_type *type, void *addr)
+ao_lisp_mark(const struct ao_lisp_type *type, void *addr)
 {
 	if (mark_object(ao_lisp_busy, addr, type->size(addr)))
 		return;
@@ -175,7 +190,7 @@ check_move(void *addr, int size)
 }
 
 void *
-ao_lisp_move(const struct ao_lisp_mem_type *type, void *addr)
+ao_lisp_move(const struct ao_lisp_type *type, void *addr)
 {
 	int	size = type->size(addr);
 
@@ -206,19 +221,29 @@ ao_lisp_alloc(int size)
 {
 	void	*addr;
 
-	size = (size + 3) & ~3;
+	size = ao_lisp_mem_round(size);
+#ifdef AO_LISP_MAKE_CONST
+	if (ao_lisp_top + size > AO_LISP_POOL_CONST) {
+		fprintf(stderr, "Too much constant data, increase AO_LISP_POOL_CONST\n");
+		exit(1);
+	}
+	addr = ao_lisp_const + ao_lisp_top;
+#else
 	if (ao_lisp_top + size > AO_LISP_POOL) {
 		collect();
-		if (ao_lisp_top + size > AO_LISP_POOL)
+		if (ao_lisp_top + size > AO_LISP_POOL) {
+			ao_lisp_exception |= AO_LISP_OOM;
 			return NULL;
+		}
 	}
 	addr = ao_lisp_pool + ao_lisp_top;
+#endif
 	ao_lisp_top += size;
 	return addr;
 }
 
 int
-ao_lisp_root_add(const struct ao_lisp_mem_type *type, void *addr)
+ao_lisp_root_add(const struct ao_lisp_type *type, void *addr)
 {
 	int	i;
 	for (i = 0; i < AO_LISP_ROOT; i++) {

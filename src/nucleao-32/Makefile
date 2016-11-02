@@ -32,6 +32,17 @@ ALTOS_SRC = \
 	ao_mutex.c \
 	ao_usb_stm.c \
 	ao_serial_stm.c \
+	ao_lisp_lex.c \
+	ao_lisp_mem.c \
+	ao_lisp_cons.c \
+	ao_lisp_eval.c \
+	ao_lisp_string.c \
+	ao_lisp_atom.c \
+	ao_lisp_int.c \
+	ao_lisp_prim.c \
+	ao_lisp_builtin.c \
+	ao_lisp_read.c \
+	ao_lisp_rep.c \
 	ao_exti_stm.c
 
 PRODUCT=Nucleo-32
