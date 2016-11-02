@@ -22,6 +22,7 @@ ao_lisp_read_eval_print(void)
 		in = ao_lisp_read();
 		if (!in)
 			break;
+//		printf ("in: "); ao_lisp_poly_print(in); printf("\n");
 		out = ao_lisp_eval(in);
 		if (ao_lisp_exception) {
 			if (ao_lisp_exception & AO_LISP_OOM)

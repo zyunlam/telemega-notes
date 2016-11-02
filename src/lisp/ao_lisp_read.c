@@ -375,12 +375,45 @@ static struct ao_lisp_cons	*read_cons;
 static struct ao_lisp_cons	*read_cons_tail;
 static struct ao_lisp_cons	*read_stack;
 
-static ao_poly
-read_item(void)
+static int
+push_read_stack(int cons, int in_quote)
+{
+	if (cons) {
+		read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(read_cons),
+					       ao_lisp_cons_cons(ao_lisp_int_poly(in_quote),
+								 read_stack));
+		if (!read_stack)
+			return 0;
+	}
+	read_cons = NULL;
+	read_cons_tail = NULL;
+	return 1;
+}
+
+static int
+pop_read_stack(int cons)
+{
+	int	in_quote = 0;
+	if (cons) {
+		read_cons = ao_lisp_poly_cons(read_stack->car);
+		read_stack = ao_lisp_poly_cons(read_stack->cdr);
+		in_quote = ao_lisp_poly_int(read_stack->car);
+		read_stack = ao_lisp_poly_cons(read_stack->cdr);
+		for (read_cons_tail = read_cons;
+		     read_cons_tail && read_cons_tail->cdr;
+		     read_cons_tail = ao_lisp_poly_cons(read_cons_tail->cdr))
+			;
+	}
+	return in_quote;
+}
+
+ao_poly
+ao_lisp_read(void)
 {
 	struct ao_lisp_atom	*atom;
 	char			*string;
 	int			cons;
+	int			in_quote;
 	ao_poly			v;
 
 	if (!been_here) {
@@ -388,15 +421,17 @@ read_item(void)
 		ao_lisp_root_add(&ao_lisp_cons_type, &read_cons_tail);
 		ao_lisp_root_add(&ao_lisp_cons_type, &read_stack);
 	}
+	parse_token = lex();
 
 	cons = 0;
+	in_quote = 0;
 	read_cons = read_cons_tail = read_stack = 0;
 	for (;;) {
 		while (parse_token == OPEN) {
-			if (cons++)
-				read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(read_cons), read_stack);
-			read_cons = NULL;
-			read_cons_tail = NULL;
+			if (!push_read_stack(cons, in_quote))
+				return AO_LISP_NIL;
+			cons++;
+			in_quote = 0;
 			parse_token = lex();
 		}
 
@@ -422,40 +457,48 @@ read_item(void)
 			else
 				v = AO_LISP_NIL;
 			break;
+		case QUOTE:
+			if (!push_read_stack(cons, in_quote))
+				return AO_LISP_NIL;
+			cons++;
+			in_quote = 1;
+			v = _ao_lisp_atom_quote;
+			break;
 		case CLOSE:
-			if (cons)
-				v = ao_lisp_cons_poly(read_cons);
-			else
+			if (!cons) {
 				v = AO_LISP_NIL;
-			if (--cons) {
-				read_cons = ao_lisp_poly_cons(read_stack->car);
-				read_stack = ao_lisp_poly_cons(read_stack->cdr);
-				for (read_cons_tail = read_cons;
-				     read_cons_tail && read_cons_tail->cdr;
-				     read_cons_tail = ao_lisp_poly_cons(read_cons_tail->cdr))
-					;
+				break;
 			}
+			v = ao_lisp_cons_poly(read_cons);
+			--cons;
+			in_quote = pop_read_stack(cons);
 			break;
 		}
 
-		if (!cons)
-			break;
+		/* loop over QUOTE ends */
+		for (;;) {
+			if (!cons)
+				return v;
 
-		struct ao_lisp_cons	*read = ao_lisp_cons_cons(v, NULL);
-		if (read_cons_tail)
-			read_cons_tail->cdr = ao_lisp_cons_poly(read);
-		else
-			read_cons = read;
-		read_cons_tail = read;
+			struct ao_lisp_cons	*read = ao_lisp_cons_cons(v, NULL);
+			if (!read)
+				return AO_LISP_NIL;
+
+			if (read_cons_tail)
+				read_cons_tail->cdr = ao_lisp_cons_poly(read);
+			else
+				read_cons = read;
+			read_cons_tail = read;
+
+			if (!in_quote || !read_cons->cdr)
+				break;
+
+			v = ao_lisp_cons_poly(read_cons);
+			--cons;
+			in_quote = pop_read_stack(cons);
+		}
 
 		parse_token = lex();
 	}
 	return v;
-}
-
-ao_poly
-ao_lisp_read(void)
-{
-	parse_token = lex();
-	return read_item();
 }
