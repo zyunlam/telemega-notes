@@ -27,6 +27,7 @@
 #ifdef AO_LISP_MAKE_CONST
 #define AO_LISP_POOL_CONST	16384
 extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
+#define _ao_lisp_atom_quote ao_lisp_atom_poly(ao_lisp_atom_intern("quote"))
 #else
 #include "ao_lisp_const.h"
 #endif
@@ -61,6 +62,11 @@ extern uint16_t		ao_lisp_top;
 extern uint8_t		ao_lisp_exception;
 
 typedef uint16_t	ao_poly;
+
+static inline int
+ao_lisp_is_const(ao_poly poly) {
+	return poly & AO_LISP_CONST;
+}
 
 static inline void *
 ao_lisp_ref(ao_poly poly) {
@@ -128,6 +134,8 @@ enum ao_lisp_builtin_id {
 	builtin_cdr,
 	builtin_cons,
 	builtin_quote,
+	builtin_set,
+	builtin_setq,
 	builtin_print,
 	builtin_plus,
 	builtin_minus,

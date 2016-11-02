@@ -21,20 +21,46 @@ ao_lisp_builtin_print(ao_poly b)
 	printf("[builtin]");
 }
 
+static int check_argc(struct ao_lisp_cons *cons, int min, int max)
+{
+	int	argc = 0;
+
+	while (cons && argc <= max) {
+		argc++;
+		cons = ao_lisp_poly_cons(cons->cdr);
+	}
+	if (argc < min || argc > max) {
+		ao_lisp_exception |= AO_LISP_INVALID;
+		return 0;
+	}
+	return 1;
+}
+
+static int check_argt(struct ao_lisp_cons *cons, int argc, int type, int nil_ok)
+{
+	ao_poly car;
+
+	/* find the desired arg */
+	while (argc--)
+		cons = ao_lisp_poly_cons(cons->cdr);
+	car = cons->car;
+	if ((!car && !nil_ok) ||
+	    ao_lisp_poly_type(car) != type)
+	{
+		ao_lisp_exception |= AO_LISP_INVALID;
+		return 0;
+	}
+	return 1;
+}
+
 enum math_op { math_plus, math_minus, math_times, math_divide, math_mod };
 
 ao_poly
 ao_lisp_car(struct ao_lisp_cons *cons)
 {
-	if (!cons) {
-		ao_lisp_exception |= AO_LISP_INVALID;
+	if (!check_argc(cons, 1, 1))
 		return AO_LISP_NIL;
-	}
-	if (!cons->car) {
-		ao_lisp_exception |= AO_LISP_INVALID;
-		return AO_LISP_NIL;
-	}
-	if (ao_lisp_poly_type(cons->car) != AO_LISP_CONS) {
+	if (!check_argt(cons, 0, AO_LISP_CONS, 0)) {
 		ao_lisp_exception |= AO_LISP_INVALID;
 		return AO_LISP_NIL;
 	}
@@ -89,6 +115,38 @@ ao_lisp_quote(struct ao_lisp_cons *cons)
 		return AO_LISP_NIL;
 	}
 	return cons->car;
+}
+
+ao_poly
+ao_lisp_set(struct ao_lisp_cons *cons)
+{
+	ao_poly	atom, val;
+	if (!check_argc(cons, 2, 2))
+		return AO_LISP_NIL;
+	if (!check_argt(cons, 0, AO_LISP_ATOM, 0))
+		return AO_LISP_NIL;
+
+	atom = cons->car;
+	val = ao_lisp_poly_cons(cons->cdr)->car;
+	if (ao_lisp_is_const(atom)) {
+		ao_lisp_exception |= AO_LISP_INVALID;
+		return AO_LISP_NIL;
+	}
+	ao_lisp_poly_atom(atom)->val = val;
+	return val;
+}
+
+ao_poly
+ao_lisp_setq(struct ao_lisp_cons *cons)
+{
+	struct ao_lisp_cons	*expand = 0;
+	if (!check_argc(cons, 2, 2))
+		return AO_LISP_NIL;
+	expand = ao_lisp_cons_cons(_ao_lisp_atom_set,
+				   ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_cons_cons(_ao_lisp_atom_quote,
+								       ao_lisp_cons_cons(cons->car, NULL))),
+						     ao_lisp_poly_cons(cons->cdr)));
+	return ao_lisp_cons_poly(expand);
 }
 
 ao_poly
@@ -196,6 +254,8 @@ ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_cdr] = ao_lisp_cdr,
 	[builtin_cons] = ao_lisp_cons,
 	[builtin_quote] = ao_lisp_quote,
+	[builtin_set] = ao_lisp_set,
+	[builtin_setq] = ao_lisp_setq,
 	[builtin_print] = ao_lisp_print,
 	[builtin_plus] = ao_lisp_plus,
 	[builtin_minus] = ao_lisp_minus,

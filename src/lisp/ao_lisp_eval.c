@@ -111,6 +111,9 @@ ao_lisp_eval(ao_poly v)
 
 					case AO_LISP_MACRO:
 						v = ao_lisp_func(b)(ao_lisp_poly_cons(actuals->cdr));
+						DBG("macro "); DBG_POLY(ao_lisp_cons_poly(actuals));
+						DBG(" -> "); DBG_POLY(v);
+						DBG("\n");
 						if (ao_lisp_poly_type(v) != AO_LISP_CONS) {
 							ao_lisp_exception |= AO_LISP_INVALID;
 							return AO_LISP_NIL;
@@ -160,8 +163,9 @@ ao_lisp_eval(ao_poly v)
 				DBG ("\n");
 			} else {
 				ao_lisp_exception |= AO_LISP_INVALID;
-				return AO_LISP_NIL;
 			}
+			if (ao_lisp_exception)
+				return AO_LISP_NIL;
 		done_eval:
 			if (--cons) {
 				struct ao_lisp_cons	*frame;
@@ -170,10 +174,13 @@ ao_lisp_eval(ao_poly v)
 				frame = ao_lisp_poly_cons(stack->car);
 				actuals = ao_lisp_poly_cons(frame->car);
 				formals = ao_lisp_poly_cons(frame->cdr);
+				formals_tail = NULL;
 
 				/* Recompute the tail of the formals list */
-				for (formal = formals; formal->cdr != AO_LISP_NIL; formal = ao_lisp_poly_cons(formal->cdr));
-				formals_tail = formal;
+				if (formals) {
+					for (formal = formals; formal->cdr != AO_LISP_NIL; formal = ao_lisp_poly_cons(formal->cdr));
+					formals_tail = formal;
+				}
 
 				stack = ao_lisp_poly_cons(stack->cdr);
 				DBG("stack pop: stack"); DBG_CONS(stack); DBG("\n");
