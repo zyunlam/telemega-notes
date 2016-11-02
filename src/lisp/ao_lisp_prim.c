@@ -14,31 +14,25 @@
 
 #include "ao_lisp.h"
 
-ao_lisp_poly
-ao_lisp_poly_print(ao_lisp_poly p)
+static void (*const ao_lisp_print_funcs[AO_LISP_NUM_TYPE])(ao_poly) = {
+	[AO_LISP_CONS] = ao_lisp_cons_print,
+	[AO_LISP_STRING] = ao_lisp_string_print,
+	[AO_LISP_INT] = ao_lisp_int_print,
+	[AO_LISP_ATOM] = ao_lisp_atom_print,
+	[AO_LISP_BUILTIN] = ao_lisp_builtin_print
+};
+
+ao_poly
+ao_lisp_poly_print(ao_poly p)
 {
-	switch (ao_lisp_poly_type(p)) {
-	case AO_LISP_CONS:
-		ao_lisp_cons_print(ao_lisp_poly_cons(p));
-		break;
-	case AO_LISP_STRING:
-		ao_lisp_string_print(ao_lisp_poly_string(p));
-		break;
-	case AO_LISP_INT:
-		ao_lisp_int_print(ao_lisp_poly_int(p));
-		break;
-	case AO_LISP_ATOM:
-		ao_lisp_atom_print(ao_lisp_poly_atom(p));
-		break;
-	case AO_LISP_BUILTIN:
-		ao_lisp_builtin_print(ao_lisp_poly_builtin(p));
-		break;
-	}
-	return AO_LISP_NIL;
+	void (*print)(ao_poly) = ao_lisp_print_funcs[ao_lisp_poly_type(p)];
+	if (print)
+		print(p);
+	return p;
 }
 
 void
-ao_lisp_poly_mark(ao_lisp_poly p)
+ao_lisp_poly_mark(ao_poly p)
 {
 	switch (ao_lisp_poly_type(p)) {
 	case AO_LISP_CONS:
@@ -53,8 +47,8 @@ ao_lisp_poly_mark(ao_lisp_poly p)
 	}
 }
 
-ao_lisp_poly
-ao_lisp_poly_move(ao_lisp_poly p)
+ao_poly
+ao_lisp_poly_move(ao_poly p)
 {
 	switch (ao_lisp_poly_type(p)) {
 	case AO_LISP_CONS:

@@ -10,7 +10,7 @@ INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quat
 
 KALMAN=make-kalman 
 
-CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -I../lisp -O0 -g -Wall
+CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -I../lisp -O0 -g -Wall -DAO_LISP_TEST
 
 all: $(PROGS) ao_aprs_data.wav
 
@@ -89,9 +89,11 @@ ao_quaternion_test: ao_quaternion_test.c ao_quaternion.h
 	cc $(CFLAGS) -o $@ ao_quaternion_test.c -lm
 
 
-AO_LISP_OBJS = ao_lisp_test.o ao_lisp_mem.o ao_lisp_lex.o ao_lisp_cons.o ao_lisp_string.o ao_lisp_atom.o ao_lisp_int.o ao_lisp_prim.o ao_lisp_eval.o ao_lisp_poly.o ao_lisp_builtin.o ao_lisp_read.o
+#AO_LISP_OBJS = ao_lisp_test.o ao_lisp_mem.o ao_lisp_lex.o ao_lisp_cons.o ao_lisp_string.o ao_lisp_atom.o ao_lisp_int.o ao_lisp_prim.o ao_lisp_eval.o ao_lisp_poly.o ao_lisp_builtin.o ao_lisp_read.o
+
+AO_LISP_OBJS = ao_lisp_test.o ao_lisp_mem.o  ao_lisp_cons.o ao_lisp_string.o ao_lisp_atom.o ao_lisp_int.o ao_lisp_prim.o ao_lisp_eval.o ao_lisp_poly.o ao_lisp_builtin.o ao_lisp_read.o ao_lisp_rep.o
 
 ao_lisp_test: $(AO_LISP_OBJS)
 	cc $(CFLAGS) -o $@ $(AO_LISP_OBJS)
 
-$(AO_LISP_OBJS): ao_lisp.h
+$(AO_LISP_OBJS): ao_lisp.h ao_lisp_const.h

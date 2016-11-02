@@ -40,8 +40,8 @@ static uint8_t been_here;
 #define DBG_POLY(a)
 #endif
 
-ao_lisp_poly
-ao_lisp_eval(ao_lisp_poly v)
+ao_poly
+ao_lisp_eval(ao_poly v)
 {
 	struct ao_lisp_cons	*formal;
 	int			cons = 0;
@@ -59,6 +59,7 @@ ao_lisp_eval(ao_lisp_poly v)
 	formals_tail = 0;
 	for (;;) {
 
+	restart:
 		/* Build stack frames for each list */
 		while (ao_lisp_poly_type(v) == AO_LISP_CONS) {
 			if (v == AO_LISP_NIL)
@@ -68,8 +69,8 @@ ao_lisp_eval(ao_lisp_poly v)
 			if (cons++) {
 				struct ao_lisp_cons *frame;
 
-				frame = ao_lisp_cons(ao_lisp_cons_poly(actuals), formals);
-				stack = ao_lisp_cons(ao_lisp_cons_poly(frame), stack);
+				frame = ao_lisp_cons_cons(ao_lisp_cons_poly(actuals), formals);
+				stack = ao_lisp_cons_cons(ao_lisp_cons_poly(frame), stack);
 			}
 			actuals = ao_lisp_poly_cons(v);
 			formals = NULL;
@@ -83,6 +84,8 @@ ao_lisp_eval(ao_lisp_poly v)
 
 		/* Evaluate primitive types */
 
+		DBG ("actual: "); DBG_POLY(v); DBG("\n");
+
 		switch (ao_lisp_poly_type(v)) {
 		case AO_LISP_INT:
 		case AO_LISP_STRING:
@@ -92,16 +95,42 @@ ao_lisp_eval(ao_lisp_poly v)
 			break;
 		}
 
+		if (!cons)
+			break;
+
 		for (;;) {
 			DBG("add formal: "); DBG_POLY(v); DBG("\n");
 
-			formal = ao_lisp_cons(v, NULL);
+			if (formals == NULL) {
+				if (ao_lisp_poly_type(v) == AO_LISP_BUILTIN) {
+					struct ao_lisp_builtin *b = ao_lisp_poly_builtin(v);
+					switch (b->args) {
+					case AO_LISP_NLAMBDA:
+						v = ao_lisp_func(b)(ao_lisp_poly_cons(actuals->cdr));
+						goto done_eval;
+
+					case AO_LISP_MACRO:
+						v = ao_lisp_func(b)(ao_lisp_poly_cons(actuals->cdr));
+						if (ao_lisp_poly_type(v) != AO_LISP_CONS) {
+							ao_lisp_exception |= AO_LISP_INVALID;
+							return AO_LISP_NIL;
+						}
+
+						/* Reset frame to the new list */
+						actuals = ao_lisp_poly_cons(v);
+						v = actuals->car;
+						goto restart;
+					}
+				}
+			}
+
+			formal = ao_lisp_cons_cons(v, NULL);
 			if (formals_tail)
-				formals_tail->cdr = formal;
+				formals_tail->cdr = ao_lisp_cons_poly(formal);
 			else
 				formals = formal;
 			formals_tail = formal;
-			actuals = actuals->cdr;
+			actuals = ao_lisp_poly_cons(actuals->cdr);
 
 			DBG("formals: ");
 			DBG_CONS(formals);
@@ -113,7 +142,6 @@ ao_lisp_eval(ao_lisp_poly v)
 			/* Process all of the arguments */
 			if (actuals) {
 				v = actuals->car;
-				DBG ("actual: "); DBG_POLY(v); DBG("\n");
 				break;
 			}
 
@@ -123,7 +151,7 @@ ao_lisp_eval(ao_lisp_poly v)
 			if (ao_lisp_poly_type(v) == AO_LISP_BUILTIN) {
 				struct ao_lisp_builtin *b = ao_lisp_poly_builtin(v);
 
-				v = b->func(formals->cdr);
+				v = ao_lisp_func(b) (ao_lisp_poly_cons(formals->cdr));
 
 				DBG ("eval: ");
 				DBG_CONS(formals);
@@ -131,22 +159,23 @@ ao_lisp_eval(ao_lisp_poly v)
 				DBG_POLY(v);
 				DBG ("\n");
 			} else {
-				DBG ("invalid eval\n");
+				ao_lisp_exception |= AO_LISP_INVALID;
+				return AO_LISP_NIL;
 			}
-
+		done_eval:
 			if (--cons) {
 				struct ao_lisp_cons	*frame;
 
 				/* Pop the previous frame off the stack */
 				frame = ao_lisp_poly_cons(stack->car);
 				actuals = ao_lisp_poly_cons(frame->car);
-				formals = frame->cdr;
+				formals = ao_lisp_poly_cons(frame->cdr);
 
 				/* Recompute the tail of the formals list */
-				for (formal = formals; formal->cdr != NULL; formal = formal->cdr);
+				for (formal = formals; formal->cdr != AO_LISP_NIL; formal = ao_lisp_poly_cons(formal->cdr));
 				formals_tail = formal;
 
-				stack = stack->cdr;
+				stack = ao_lisp_poly_cons(stack->cdr);
 				DBG("stack pop: stack"); DBG_CONS(stack); DBG("\n");
 				DBG("stack pop: actuals"); DBG_CONS(actuals); DBG("\n");
 				DBG("stack pop: formals"); DBG_CONS(formals); DBG("\n");

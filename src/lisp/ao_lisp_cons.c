@@ -20,7 +20,7 @@ static void cons_mark(void *addr)
 
 	for (;;) {
 		ao_lisp_poly_mark(cons->car);
-		cons = cons->cdr;
+		cons = ao_lisp_poly_cons(cons->cdr);
 		if (!cons)
 			break;
 		if (ao_lisp_mark_memory(cons, sizeof (struct ao_lisp_cons)))
@@ -42,42 +42,43 @@ static void cons_move(void *addr)
 		struct ao_lisp_cons	*cdr;
 
 		cons->car = ao_lisp_poly_move(cons->car);
-		cdr = ao_lisp_move_memory(cons->cdr, sizeof (struct ao_lisp_cons));
+		cdr = ao_lisp_poly_cons(cons->cdr);
+		cdr = ao_lisp_move_memory(cdr, sizeof (struct ao_lisp_cons));
 		if (!cdr)
 			break;
-		cons->cdr = cdr;
+		cons->cdr = ao_lisp_cons_poly(cdr);
 		cons = cdr;
 	}
 }
 
-const struct ao_lisp_mem_type ao_lisp_cons_type = {
+const struct ao_lisp_type ao_lisp_cons_type = {
 	.mark = cons_mark,
 	.size = cons_size,
 	.move = cons_move,
 };
 
 struct ao_lisp_cons *
-ao_lisp_cons(ao_lisp_poly car, struct ao_lisp_cons *cdr)
+ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr)
 {
 	struct ao_lisp_cons	*cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
 	if (!cons)
 		return NULL;
 	cons->car = car;
-	cons->cdr = cdr;
+	cons->cdr = ao_lisp_cons_poly(cdr);
 	return cons;
 }
 
 void
-ao_lisp_cons_print(struct ao_lisp_cons *cons)
+ao_lisp_cons_print(ao_poly c)
 {
+	struct ao_lisp_cons *cons = ao_lisp_poly_cons(c);
 	int	first = 1;
 	printf("(");
 	while (cons) {
 		if (!first)
 			printf(" ");
-		fflush(stdout);
 		ao_lisp_poly_print(cons->car);
-		cons = cons->cdr;
+		cons = ao_lisp_poly_cons(cons->cdr);
 		first = 0;
 	}
 	printf(")");

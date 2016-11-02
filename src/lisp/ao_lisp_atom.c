@@ -34,12 +34,9 @@ static void atom_mark(void *addr)
 {
 	struct ao_lisp_atom	*atom = addr;
 
-	if (atom->next == AO_LISP_ATOM_CONST)
-		return;
-
 	for (;;) {
 		ao_lisp_poly_mark(atom->val);
-		atom = atom->next;
+		atom = ao_lisp_poly_atom(atom->next);
 		if (!atom)
 			break;
 		if (ao_lisp_mark_memory(atom, atom_size(atom)))
@@ -51,49 +48,50 @@ static void atom_move(void *addr)
 {
 	struct ao_lisp_atom	*atom = addr;
 
-	if (atom->next == AO_LISP_ATOM_CONST)
-		return;
-
 	for (;;) {
 		struct ao_lisp_atom	*next;
 
 		atom->val = ao_lisp_poly_move(atom->val);
-		next = ao_lisp_move_memory(atom->next, atom_size(atom->next));
+		next = ao_lisp_poly_atom(atom->next);
+		next = ao_lisp_move_memory(next, atom_size(next));
 		if (!next)
 			break;
-		atom->next = next;
+		atom->next = ao_lisp_atom_poly(next);
 		atom = next;
 	}
 }
 
-const struct ao_lisp_mem_type ao_lisp_atom_type = {
+const struct ao_lisp_type ao_lisp_atom_type = {
 	.mark = atom_mark,
 	.size = atom_size,
 	.move = atom_move,
 };
 
-struct ao_lisp_atom	*atoms;
+struct ao_lisp_atom	*ao_lisp_atoms;
 
 struct ao_lisp_atom *
 ao_lisp_atom_intern(char *name)
 {
 	struct ao_lisp_atom	*atom;
-	int			b;
+//	int			b;
 
-	for (atom = atoms; atom; atom = atom->next) {
+	for (atom = ao_lisp_atoms; atom; atom = ao_lisp_poly_atom(atom->next)) {
 		if (!strcmp(atom->name, name))
 			return atom;
 	}
-	for (b = 0; ao_lisp_builtins[b]; b++)
-		if (!strcmp(ao_lisp_builtins[b]->name, name))
-			return (struct ao_lisp_atom *) ao_lisp_builtins[b];
-	if (!atoms)
-		ao_lisp_root_add(&ao_lisp_atom_type, (void **) &atoms);
+#ifdef ao_builtin_atoms
+	for (atom = ao_lisp_poly_atom(ao_builtin_atoms); atom; atom = ao_lisp_poly_atom(atom->next)) {
+		if (!strcmp(atom->name, name))
+			return atom;
+	}
+#endif
+	if (!ao_lisp_atoms)
+		ao_lisp_root_add(&ao_lisp_atom_type, (void **) &ao_lisp_atoms);
 	atom = ao_lisp_alloc(name_size(name));
 	if (atom) {
 		atom->type = AO_LISP_ATOM;
-		atom->next = atoms;
-		atoms = atom;
+		atom->next = ao_lisp_atom_poly(ao_lisp_atoms);
+		ao_lisp_atoms = atom;
 		strcpy(atom->name, name);
 		atom->val = AO_LISP_NIL;
 	}
@@ -101,7 +99,8 @@ ao_lisp_atom_intern(char *name)
 }
 
 void
-ao_lisp_atom_print(struct ao_lisp_atom *a)
+ao_lisp_atom_print(ao_poly a)
 {
-	fputs(a->name, stdout);
+	struct ao_lisp_atom *atom = ao_lisp_poly_atom(a);
+	printf("%s", atom->name);
 }

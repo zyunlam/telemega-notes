@@ -14,9 +14,27 @@
 
 #include "ao_lisp.h"
 
-void
-ao_lisp_int_print(ao_poly p)
+ao_poly
+ao_lisp_read_eval_print(void)
 {
-	int i = ao_lisp_poly_int(p);
-	printf("%d", i);
+	ao_poly	in, out = AO_LISP_NIL;
+	for(;;) {
+		in = ao_lisp_read();
+		if (!in)
+			break;
+		out = ao_lisp_eval(in);
+		if (ao_lisp_exception) {
+			if (ao_lisp_exception & AO_LISP_OOM)
+				printf("out of memory\n");
+			if (ao_lisp_exception & AO_LISP_DIVIDE_BY_ZERO)
+				printf("divide by zero\n");
+			if (ao_lisp_exception & AO_LISP_INVALID)
+				printf("invalid operation\n");
+			ao_lisp_exception = 0;
+		} else {
+			ao_lisp_poly_print(out);
+			putchar ('\n');
+		}
+	}
+	return out;
 }
