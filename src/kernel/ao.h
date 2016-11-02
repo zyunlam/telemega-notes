@@ -170,6 +170,9 @@ void
 ao_put_string(__code char *s);
 
 void
+ao_cmd_readline(void);
+
+char
 ao_cmd_lex(void);
 
 void
