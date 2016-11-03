@@ -188,8 +188,6 @@ lex_quoted (void)
 	int	count;
 
 	c = lex_get();
-//	if (jumping)
-//		return nil;
 	if (c == EOF)
 		return EOF;
 	c &= 0x7f;
@@ -218,8 +216,6 @@ lex_quoted (void)
 		count = 1;
 		while (count <= 3) {
 			c = lex_get();
-//			if (jumping)
-//				return nil;
 			if (c == EOF)
 				return EOF;
 			c &= 0x7f;
@@ -288,10 +284,16 @@ lex(void)
 		if (lex_class & ENDOFFILE)
 			return AO_LISP_NIL;
 
-//		if (jumping)
-//			return nil;
 		if (lex_class & WHITE)
 			continue;
+
+		if (lex_class & COMMENT) {
+			while ((c = lexc()) != '\n') {
+				if (lex_class & ENDOFFILE)
+					return AO_LISP_NIL;
+			}
+			continue;
+		}
 
 		if (lex_class & (BRA|KET|QUOTEC)) {
 			add_token(c);
@@ -312,8 +314,6 @@ lex(void)
 		if (lex_class & STRINGC) {
 			for (;;) {
 				c = lexc();
-//				if (jumping)
-//					return nil;
 				if (lex_class & (STRINGC|ENDOFFILE)) {
 					end_token();
 					return STRING;
@@ -349,8 +349,6 @@ lex(void)
 				}
 				add_token (c);
 				c = lexc ();
-//				if (jumping)
-//					return nil;
 				if (lex_class & (NOTNAME)) {
 //					if (lex_class & ENDOFFILE)
 //						clearerr (f);
@@ -403,6 +401,10 @@ pop_read_stack(int cons)
 		     read_cons_tail && read_cons_tail->cdr;
 		     read_cons_tail = ao_lisp_poly_cons(read_cons_tail->cdr))
 			;
+	} else {
+		read_cons = 0;
+		read_cons_tail = 0;
+		read_stack = 0;
 	}
 	return in_quote;
 }
@@ -420,6 +422,7 @@ ao_lisp_read(void)
 		ao_lisp_root_add(&ao_lisp_cons_type, &read_cons);
 		ao_lisp_root_add(&ao_lisp_cons_type, &read_cons_tail);
 		ao_lisp_root_add(&ao_lisp_cons_type, &read_stack);
+		been_here = 1;
 	}
 	parse_token = lex();
 

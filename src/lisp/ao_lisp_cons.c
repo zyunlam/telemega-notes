@@ -14,6 +14,23 @@
 
 #include "ao_lisp.h"
 
+#define OFFSET(a)	((int) ((uint8_t *) (a) - ao_lisp_const))
+
+#if 0
+static int cons_depth;
+#define DBG(...)	do { int d; for (d = 0; d < cons_depth; d++) printf ("  "); printf(__VA_ARGS__); } while(0)
+#define DBG_IN()	(cons_depth++)
+#define DBG_OUT()	(cons_depth--)
+#define DBG_PR(c)	ao_lisp_cons_print(ao_lisp_cons_poly(c))
+#define DBG_PRP(p)	ao_lisp_poly_print(p)
+#else
+#define DBG(...)
+#define DBG_IN()
+#define DBG_OUT()
+#define DBG_PR(c)
+#define DBG_PRP(p)
+#endif
+
 static void cons_mark(void *addr)
 {
 	struct ao_lisp_cons	*cons = addr;
@@ -38,17 +55,25 @@ static void cons_move(void *addr)
 {
 	struct ao_lisp_cons	*cons = addr;
 
+	DBG_IN();
+	DBG("move cons start %d\n", OFFSET(cons));
 	for (;;) {
 		struct ao_lisp_cons	*cdr;
+		ao_poly			car;
 
-		cons->car = ao_lisp_poly_move(cons->car);
+		car = ao_lisp_poly_move(cons->car);
+		DBG(" moved car %d -> %d\n", OFFSET(ao_lisp_ref(cons->car)), OFFSET(ao_lisp_ref(car)));
+		cons->car = car;
 		cdr = ao_lisp_poly_cons(cons->cdr);
 		cdr = ao_lisp_move_memory(cdr, sizeof (struct ao_lisp_cons));
 		if (!cdr)
 			break;
+		DBG(" moved cdr %d -> %d\n", OFFSET(ao_lisp_poly_cons(cons->cdr)), OFFSET(cdr));
 		cons->cdr = ao_lisp_cons_poly(cdr);
 		cons = cdr;
 	}
+	DBG("move cons end\n");
+	DBG_OUT();
 }
 
 const struct ao_lisp_type ao_lisp_cons_type = {

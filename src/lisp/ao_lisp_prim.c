@@ -31,35 +31,32 @@ ao_lisp_poly_print(ao_poly p)
 	return p;
 }
 
+static const struct ao_lisp_type const *ao_lisp_types[AO_LISP_NUM_TYPE] = {
+	[AO_LISP_CONS] = &ao_lisp_cons_type,
+	[AO_LISP_STRING] = &ao_lisp_string_type,
+	[AO_LISP_ATOM] = &ao_lisp_atom_type,
+	[AO_LISP_BUILTIN] = &ao_lisp_builtin_type,
+};
+
 void
 ao_lisp_poly_mark(ao_poly p)
 {
-	switch (ao_lisp_poly_type(p)) {
-	case AO_LISP_CONS:
-		ao_lisp_mark(&ao_lisp_cons_type, ao_lisp_poly_cons(p));
-		break;
-	case AO_LISP_STRING:
-		ao_lisp_mark(&ao_lisp_string_type, ao_lisp_poly_string(p));
-		break;
-	case AO_LISP_ATOM:
-		ao_lisp_mark(&ao_lisp_atom_type, ao_lisp_poly_atom(p));
-		break;
-	}
+	const struct ao_lisp_type *lisp_type = ao_lisp_types[ao_lisp_poly_type(p)];
+	if (lisp_type)
+		ao_lisp_mark(lisp_type, ao_lisp_ref(p));
 }
 
 ao_poly
 ao_lisp_poly_move(ao_poly p)
 {
-	switch (ao_lisp_poly_type(p)) {
-	case AO_LISP_CONS:
-		p = ao_lisp_cons_poly(ao_lisp_move(&ao_lisp_cons_type, ao_lisp_poly_cons(p)));
-		break;
-	case AO_LISP_STRING:
-		p = ao_lisp_string_poly(ao_lisp_move(&ao_lisp_string_type, ao_lisp_poly_string(p)));
-		break;
-	case AO_LISP_ATOM:
-		p = ao_lisp_atom_poly(ao_lisp_move(&ao_lisp_atom_type, ao_lisp_poly_atom(p)));
-		break;
-	}
+	uint8_t				type = p & AO_LISP_TYPE_MASK;
+	const struct ao_lisp_type	*lisp_type;
+
+	if (type == AO_LISP_OTHER)
+		type = ao_lisp_other_type(ao_lisp_move_map(ao_lisp_poly_other(p)));
+
+	lisp_type = ao_lisp_types[type];
+	if (lisp_type)
+		p = ao_lisp_poly(ao_lisp_move(lisp_type, ao_lisp_ref(p)), p & AO_LISP_TYPE_MASK);
 	return p;
 }

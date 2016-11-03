@@ -91,7 +91,7 @@ ao_lisp_eval(ao_poly v)
 		case AO_LISP_STRING:
 			break;
 		case AO_LISP_ATOM:
-			v = ao_lisp_poly_atom(v)->val;
+			v = ao_lisp_atom_get(v);
 			break;
 		}
 
@@ -187,6 +187,9 @@ ao_lisp_eval(ao_poly v)
 				DBG("stack pop: actuals"); DBG_CONS(actuals); DBG("\n");
 				DBG("stack pop: formals"); DBG_CONS(formals); DBG("\n");
 			} else {
+				actuals = 0;
+				formals = 0;
+				formals_tail = 0;
 				DBG("done func\n");
 				break;
 			}

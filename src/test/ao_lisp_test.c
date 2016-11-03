@@ -36,7 +36,6 @@ main (int argc, char **argv)
 			list = ao_lisp_cons_cons(ao_lisp_string_poly(string), list);
 			list = ao_lisp_cons_cons(ao_lisp_int_poly(i), list);
 			atom = ao_lisp_atom_intern("ant");
-			atom->val = ao_lisp_cons_poly(list);
 			list = ao_lisp_cons_cons(ao_lisp_atom_poly(atom), list);
 		}
 		ao_lisp_poly_print(ao_lisp_cons_poly(list));
@@ -45,7 +44,7 @@ main (int argc, char **argv)
 
 	for (atom = ao_lisp_poly_atom(ao_builtin_atoms); atom; atom = ao_lisp_poly_atom(atom->next)) {
 		printf("%s = ", atom->name);
-		ao_lisp_poly_print(atom->val);
+		ao_lisp_poly_print(ao_lisp_atom_get(ao_lisp_atom_poly(atom)));
 		printf("\n");
 	}
 #if 1
