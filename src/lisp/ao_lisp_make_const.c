@@ -49,18 +49,42 @@ struct builtin_func funcs[] = {
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])
 
+struct ao_lisp_frame	*globals;
+
+static int
+is_atom(int offset)
+{
+	struct ao_lisp_atom *a;
+
+	for (a = ao_lisp_atoms; a; a = ao_lisp_poly_atom(a->next))
+		if (((uint8_t *) a->name - ao_lisp_const) == offset)
+			return strlen(a->name);
+	return 0;
+}
+
 int
 main(int argc, char **argv)
 {
 	int	f, o;
 	ao_poly	atom, val;
 	struct ao_lisp_atom	*a;
+	int	in_atom;
 
+	printf("/*\n");
+	printf(" * Generated file, do not edit\n");
+	ao_lisp_root_add(&ao_lisp_frame_type, &globals);
+	globals = ao_lisp_frame_new(0, 0);
 	for (f = 0; f < N_FUNC; f++) {
 		struct ao_lisp_builtin	*b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
 		struct ao_lisp_atom	*a = ao_lisp_atom_intern(funcs[f].name);
-		a->val = ao_lisp_builtin_poly(b);
+		globals = ao_lisp_frame_add(globals, ao_lisp_atom_poly(a), ao_lisp_builtin_poly(b));
 	}
+
+	/* boolean constants */
+	a = ao_lisp_atom_intern("nil");
+	globals = ao_lisp_frame_add(globals, ao_lisp_atom_poly(a), AO_LISP_NIL);
+	a = ao_lisp_atom_intern("t");
+	globals = ao_lisp_frame_add(globals, ao_lisp_atom_poly(a), ao_lisp_atom_poly(a));
 
 	for (;;) {
 		atom = ao_lisp_read();
@@ -73,13 +97,19 @@ main(int argc, char **argv)
 			fprintf(stderr, "input must be atom val pairs\n");
 			exit(1);
 		}
-		ao_lisp_poly_atom(atom)->val = val;
+		globals = ao_lisp_frame_add(globals, atom, val);
 	}
 
-	printf("/* constant objects, all referenced from atoms */\n\n");
+	/* Reduce to referenced values */
+	ao_lisp_collect();
+	printf(" */\n");
+
+	globals->readonly = 1;
+
 	printf("#define AO_LISP_POOL_CONST %d\n", ao_lisp_top);
 	printf("extern const uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));\n");
 	printf("#define ao_builtin_atoms 0x%04x\n", ao_lisp_atom_poly(ao_lisp_atoms));
+	printf("#define ao_builtin_frame 0x%04x\n", ao_lisp_frame_poly(globals));
 
 	for (a = ao_lisp_atoms; a; a = ao_lisp_poly_atom(a->next)) {
 		char	*n = a->name, c;
@@ -101,10 +131,14 @@ main(int argc, char **argv)
 		else
 			printf(" ");
 		c = ao_lisp_const[o];
-		if (' ' < c && c <= '~' && c != '\'')
+		if (!in_atom)
+			in_atom = is_atom(o);
+		if (in_atom) {
 			printf (" '%c',", c);
-		else
+			in_atom--;
+		} else {
 			printf("0x%02x,", c);
+		}
 	}
 	printf("\n};\n");
 	printf("#endif /* AO_LISP_CONST_BITS */\n");

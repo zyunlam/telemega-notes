@@ -14,6 +14,31 @@
 
 #include "ao_lisp.h"
 
+static int
+builtin_size(void *addr)
+{
+	(void) addr;
+	return sizeof (struct ao_lisp_builtin);
+}
+
+static void
+builtin_mark(void *addr)
+{
+	(void) addr;
+}
+
+static void
+builtin_move(void *addr)
+{
+	(void) addr;
+}
+
+const struct ao_lisp_type ao_lisp_builtin_type = {
+	.size = builtin_size,
+	.mark = builtin_mark,
+	.move = builtin_move
+};
+
 void
 ao_lisp_builtin_print(ao_poly b)
 {
@@ -120,20 +145,12 @@ ao_lisp_quote(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_set(struct ao_lisp_cons *cons)
 {
-	ao_poly	atom, val;
 	if (!check_argc(cons, 2, 2))
 		return AO_LISP_NIL;
 	if (!check_argt(cons, 0, AO_LISP_ATOM, 0))
 		return AO_LISP_NIL;
 
-	atom = cons->car;
-	val = ao_lisp_poly_cons(cons->cdr)->car;
-	if (ao_lisp_is_const(atom)) {
-		ao_lisp_exception |= AO_LISP_INVALID;
-		return AO_LISP_NIL;
-	}
-	ao_lisp_poly_atom(atom)->val = val;
-	return val;
+	return ao_lisp_atom_set(cons->car, ao_lisp_poly_cons(cons->cdr)->car);
 }
 
 ao_poly
@@ -157,6 +174,8 @@ ao_lisp_print(struct ao_lisp_cons *cons)
 		val = cons->car;
 		ao_lisp_poly_print(val);
 		cons = ao_lisp_poly_cons(cons->cdr);
+		if (cons)
+			printf(" ");
 	}
 	return val;
 }

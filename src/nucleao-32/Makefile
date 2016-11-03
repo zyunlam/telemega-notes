@@ -13,6 +13,8 @@ INC = \
 	ao_pins.h \
 	ao_product.h \
 	ao_task.h \
+	ao_lisp.h \
+	ao_lisp_const.h \
 	stm32f0.h \
 	Makefile
 
@@ -43,6 +45,7 @@ ALTOS_SRC = \
 	ao_lisp_builtin.c \
 	ao_lisp_read.c \
 	ao_lisp_rep.c \
+	ao_lisp_frame.c \
 	ao_exti_stm.c
 
 PRODUCT=Nucleo-32
