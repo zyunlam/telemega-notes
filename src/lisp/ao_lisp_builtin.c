@@ -132,7 +132,7 @@ ao_lisp_set(struct ao_lisp_cons *cons)
 	if (!ao_lisp_check_argt(_ao_lisp_atom_set, cons, 0, AO_LISP_ATOM, 0))
 		return AO_LISP_NIL;
 
-	return ao_lisp_atom_set(ao_lisp_arg(cons, 0), ao_lisp_poly_cons(ao_lisp_arg(cons, 1))->car);
+	return ao_lisp_atom_set(ao_lisp_arg(cons, 0), ao_lisp_arg(cons, 1));
 }
 
 ao_poly
