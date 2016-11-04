@@ -44,6 +44,7 @@ enum eval_state {
 struct ao_lisp_stack {
 	ao_poly			prev;
 	uint8_t			state;
+	uint8_t			macro;
 	ao_poly			actuals;
 	ao_poly			formals;
 	ao_poly			formals_tail;
@@ -120,6 +121,7 @@ static void
 ao_lisp_stack_reset(struct ao_lisp_stack *stack)
 {
 	stack->state = eval_sexpr;
+	stack->macro = 0;
 	stack->actuals = AO_LISP_NIL;
 	stack->formals = AO_LISP_NIL;
 	stack->formals_tail = AO_LISP_NIL;
@@ -319,10 +321,11 @@ ao_lisp_eval(ao_poly v)
 				case _ao_lisp_atom_lexpr:
 					DBGI(".. lambda or lexpr\n");
 					break;
-				case AO_LISP_NLAMBDA:
-				case _ao_lisp_atom_nlambda:
 				case AO_LISP_MACRO:
 				case _ao_lisp_atom_macro:
+					stack->macro = 1;
+				case AO_LISP_NLAMBDA:
+				case _ao_lisp_atom_nlambda:
 					DBGI(".. nlambda or macro\n");
 					stack->formals = stack->actuals;
 					stack->state = eval_exec_direct;
@@ -352,17 +355,23 @@ ao_lisp_eval(ao_poly v)
 		case eval_exec:
 			v = ao_lisp_poly_cons(stack->formals)->car;
 		case eval_exec_direct:
-			DBGI("exec: "); DBG_POLY(v); DBG(" formals "); DBG_POLY(stack->formals); DBG ("\n");
+			DBGI("exec: macro %d ", stack->macro); DBG_POLY(v); DBG(" formals "); DBG_POLY(stack->formals); DBG ("\n");
 			if (ao_lisp_poly_type(v) == AO_LISP_BUILTIN) {
 				struct ao_lisp_builtin *b = ao_lisp_poly_builtin(v);
+				struct ao_lisp_cons	*f = ao_lisp_poly_cons(ao_lisp_poly_cons(stack->formals)->cdr);
 
-				v = ao_lisp_func(b) (ao_lisp_poly_cons(ao_lisp_poly_cons(stack->formals)->cdr));
+				DBGI(".. builtin formals "); DBG_CONS(f); DBG("\n");
+				v = ao_lisp_func(b) (f);
 				DBGI("builtin result:"); DBG_POLY(v); DBG ("\n");
 				if (ao_lisp_exception) {
 					ao_lisp_stack_clear();
 					return AO_LISP_NIL;
 				}
-				stack->state = eval_val;
+				if (stack->macro)
+					stack->state = eval_sexpr;
+				else
+					stack->state = eval_val;
+				stack->macro = 0;
 				break;
 			} else {
 				v = ao_lisp_lambda(ao_lisp_poly_cons(stack->formals));
