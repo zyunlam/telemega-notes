@@ -32,11 +32,22 @@
 extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define ao_lisp_pool ao_lisp_const
 #define AO_LISP_POOL AO_LISP_POOL_CONST
-#define _ao_lisp_atom_quote ao_lisp_atom_poly(ao_lisp_atom_intern("quote"))
-#define _ao_lisp_atom_set ao_lisp_atom_poly(ao_lisp_atom_intern("set"))
+
+#define _atom(n) ao_lisp_atom_poly(ao_lisp_atom_intern(n))
+
+#define _ao_lisp_atom_quote	_atom("quote")
+#define _ao_lisp_atom_set 	_atom("set")
+#define _ao_lisp_atom_setq 	_atom("setq")
+#define _ao_lisp_atom_t 	_atom("t")
+#define _ao_lisp_atom_car 	_atom("car")
+#define _ao_lisp_atom_cdr	_atom("cdr")
+#define _ao_lisp_atom_cons	_atom("cons")
+#define _ao_lisp_atom_cond	_atom("cond")
 #else
 #include "ao_lisp_const.h"
+#ifndef AO_LISP_POOL
 #define AO_LISP_POOL	1024
+#endif
 extern uint8_t		ao_lisp_pool[AO_LISP_POOL];
 #endif
 
@@ -68,6 +79,7 @@ extern uint16_t		ao_lisp_top;
 extern uint8_t		ao_lisp_exception;
 
 typedef uint16_t	ao_poly;
+typedef int16_t		ao_signed_poly;
 
 static inline int
 ao_lisp_is_const(ao_poly poly) {
@@ -157,6 +169,7 @@ enum ao_lisp_builtin_id {
 	builtin_quote,
 	builtin_set,
 	builtin_setq,
+	builtin_cond,
 	builtin_print,
 	builtin_plus,
 	builtin_minus,
@@ -222,13 +235,13 @@ ao_lisp_cons_poly(struct ao_lisp_cons *cons)
 static inline int
 ao_lisp_poly_int(ao_poly poly)
 {
-	return (int) poly >> AO_LISP_TYPE_SHIFT;
+	return (int) ((ao_signed_poly) poly >> AO_LISP_TYPE_SHIFT);
 }
 
 static inline ao_poly
 ao_lisp_int_poly(int i)
 {
-	return ((ao_poly) i << 2) + AO_LISP_INT;
+	return ((ao_poly) i << 2) | AO_LISP_INT;
 }
 
 static inline char *
@@ -326,8 +339,7 @@ extern const struct ao_lisp_type ao_lisp_atom_type;
 
 extern struct ao_lisp_atom *ao_lisp_atoms;
 
-void
-ao_lisp_atom_init(void);
+extern struct ao_lisp_frame *ao_lisp_frame_current;
 
 void
 ao_lisp_atom_print(ao_poly a);
@@ -359,11 +371,26 @@ ao_lisp_poly_move(ao_poly p);
 ao_poly
 ao_lisp_eval(ao_poly p);
 
+ao_poly
+ao_lisp_set_cond(struct ao_lisp_cons *cons);
+
 /* builtin */
 void
 ao_lisp_builtin_print(ao_poly b);
 
 extern const struct ao_lisp_type ao_lisp_builtin_type;
+
+/* Check argument count */
+ao_poly
+ao_lisp_check_argc(ao_poly name, struct ao_lisp_cons *cons, int min, int max);
+
+/* Check argument type */
+ao_poly
+ao_lisp_check_argt(ao_poly name, struct ao_lisp_cons *cons, int argc, int type, int nil_ok);
+
+/* Fetch an arg (nil if off the end) */
+ao_poly
+ao_lisp_arg(struct ao_lisp_cons *cons, int argc);
 
 /* read */
 ao_poly
@@ -376,16 +403,18 @@ ao_lisp_read_eval_print(void);
 /* frame */
 extern const struct ao_lisp_type ao_lisp_frame_type;
 
-int
-ao_lisp_frame_set(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val);
-
-ao_poly
-ao_lisp_frame_get(struct ao_lisp_frame *frame, ao_poly atom);
+ao_poly *
+ao_lisp_frame_ref(struct ao_lisp_frame *frame, ao_poly atom);
 
 struct ao_lisp_frame *
 ao_lisp_frame_new(int num, int readonly);
 
 struct ao_lisp_frame *
 ao_lisp_frame_add(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val);
+
+/* error */
+
+ao_poly
+ao_lisp_error(int error, char *format, ...);
 
 #endif /* _AO_LISP_H_ */

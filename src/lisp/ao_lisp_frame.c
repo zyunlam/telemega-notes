@@ -95,7 +95,7 @@ const struct ao_lisp_type ao_lisp_frame_type = {
 	.move = frame_move
 };
 
-static ao_poly *
+ao_poly *
 ao_lisp_frame_ref(struct ao_lisp_frame *frame, ao_poly atom)
 {
 	int f;

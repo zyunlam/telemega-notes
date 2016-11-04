@@ -39,6 +39,7 @@ struct builtin_func funcs[] = {
 	"quote",	AO_LISP_NLAMBDA,builtin_quote,
 	"set",		AO_LISP_LEXPR,	builtin_set,
 	"setq",		AO_LISP_MACRO,	builtin_setq,
+	"cond",		AO_LISP_NLAMBDA,builtin_cond,
 	"print",	AO_LISP_LEXPR,	builtin_print,
 	"+",		AO_LISP_LEXPR,	builtin_plus,
 	"-",		AO_LISP_LEXPR,	builtin_minus,
@@ -47,7 +48,24 @@ struct builtin_func funcs[] = {
 	"%",		AO_LISP_LEXPR,	builtin_mod
 };
 
+ao_poly
+ao_lisp_set_cond(struct ao_lisp_cons *c)
+{
+	(void) c;
+	return AO_LISP_NIL;
+}
+
 #define N_FUNC (sizeof funcs / sizeof funcs[0])
+
+/* Syntactic atoms */
+char *atoms[] = {
+	"lambda",
+	"nlambda",
+	"lexpr",
+	"macro"
+};
+
+#define N_ATOM (sizeof atoms / sizeof atoms[0])
 
 struct ao_lisp_frame	*globals;
 
@@ -65,9 +83,10 @@ is_atom(int offset)
 int
 main(int argc, char **argv)
 {
-	int	f, o;
+	int	f, o, i;
 	ao_poly	atom, val;
 	struct ao_lisp_atom	*a;
+	struct ao_lisp_builtin	*b;
 	int	in_atom;
 
 	printf("/*\n");
@@ -75,10 +94,14 @@ main(int argc, char **argv)
 	ao_lisp_root_add(&ao_lisp_frame_type, &globals);
 	globals = ao_lisp_frame_new(0, 0);
 	for (f = 0; f < N_FUNC; f++) {
-		struct ao_lisp_builtin	*b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
-		struct ao_lisp_atom	*a = ao_lisp_atom_intern(funcs[f].name);
+		b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
+		a = ao_lisp_atom_intern(funcs[f].name);
 		globals = ao_lisp_frame_add(globals, ao_lisp_atom_poly(a), ao_lisp_builtin_poly(b));
 	}
+
+	/* atoms for syntax */
+	for (i = 0; i < N_ATOM; i++)
+		(void) ao_lisp_atom_intern(atoms[i]);
 
 	/* boolean constants */
 	a = ao_lisp_atom_intern("nil");

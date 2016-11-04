@@ -109,31 +109,65 @@ ao_lisp_atom_intern(char *name)
 	return atom;
 }
 
-static struct ao_lisp_frame	*globals;
+static struct ao_lisp_frame	*ao_lisp_frame_global;
+struct ao_lisp_frame		*ao_lisp_frame_current;
+
+static void
+ao_lisp_atom_init(void)
+{
+	if (!ao_lisp_frame_global) {
+		ao_lisp_frame_global = ao_lisp_frame_new(0, 0);
+		ao_lisp_root_add(&ao_lisp_frame_type, &ao_lisp_frame_global);
+		ao_lisp_root_add(&ao_lisp_frame_type, &ao_lisp_frame_current);
+	}
+}
+
+static ao_poly *
+ao_lisp_atom_ref(struct ao_lisp_frame *frame, ao_poly atom)
+{
+	ao_poly	*ref;
+	ao_lisp_atom_init();
+	while (frame) {
+		ref = ao_lisp_frame_ref(frame, atom);
+		if (ref)
+			return ref;
+		frame = ao_lisp_poly_frame(frame->next);
+	}
+	if (ao_lisp_frame_global) {
+		ref = ao_lisp_frame_ref(ao_lisp_frame_global, atom);
+		if (ref)
+			return ref;
+	}
+	return NULL;
+}
 
 ao_poly
 ao_lisp_atom_get(ao_poly atom)
 {
-	struct ao_lisp_frame	*frame = globals;
+	ao_poly *ref = ao_lisp_atom_ref(ao_lisp_frame_current, atom);
+
+	if (!ref && ao_lisp_frame_global)
+		ref = ao_lisp_frame_ref(ao_lisp_frame_global, atom);
 #ifdef ao_builtin_frame
-	if (!frame)
-		frame = ao_lisp_poly_frame(ao_builtin_frame);
+	if (!ref)
+		ref = ao_lisp_frame_ref(ao_lisp_poly_frame(ao_builtin_frame), atom);
 #endif
-	return ao_lisp_frame_get(frame, atom);
+	if (ref)
+		return *ref;
+	return AO_LISP_NIL;
 }
 
 ao_poly
 ao_lisp_atom_set(ao_poly atom, ao_poly val)
 {
-	if (!ao_lisp_frame_set(globals, atom, val)) {
-		globals = ao_lisp_frame_add(globals, atom, val);
-		if (!globals->next) {
-			ao_lisp_root_add(&ao_lisp_frame_type, &globals);
-#ifdef ao_builtin_frame
-			globals->next = ao_builtin_frame;
-#endif
-		}
-	}
+	ao_poly *ref = ao_lisp_atom_ref(ao_lisp_frame_current, atom);
+
+	if (!ref && ao_lisp_frame_global)
+		ref = ao_lisp_frame_ref(ao_lisp_frame_global, atom);
+	if (ref)
+		*ref = val;
+	else
+		ao_lisp_frame_global = ao_lisp_frame_add(ao_lisp_frame_global, atom, val);
 	return val;
 }
 
