@@ -13,23 +13,17 @@
  */
 
 #include "ao_lisp.h"
+#include <stdarg.h>
 
 ao_poly
-ao_lisp_read_eval_print(void)
+ao_lisp_error(int error, char *format, ...)
 {
-	ao_poly	in, out = AO_LISP_NIL;
-	for(;;) {
-		in = ao_lisp_read();
-		if (!in)
-			break;
-//		printf ("in: "); ao_lisp_poly_print(in); printf("\n");
-		out = ao_lisp_eval(in);
-		if (ao_lisp_exception) {
-			ao_lisp_exception = 0;
-		} else {
-			ao_lisp_poly_print(out);
-			putchar ('\n');
-		}
-	}
-	return out;
+	va_list	args;
+
+	ao_lisp_exception |= error;
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+	printf("\n");
+	return AO_LISP_NIL;
 }

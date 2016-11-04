@@ -15,15 +15,18 @@
 #include "ao_lisp.h"
 #include <stdio.h>
 
+#if 0
 static struct ao_lisp_cons	*list;
 static char			*string;
+#endif
 
 int
 main (int argc, char **argv)
 {
+#if 0
 	int			i, j;
-	struct ao_lisp_atom	*atom;
 
+	struct ao_lisp_atom	*atom;
 	ao_lisp_root_add(&ao_lisp_cons_type, (void **) &list);
 	ao_lisp_root_add(&ao_lisp_string_type, (void **) &string);
 
@@ -47,7 +50,8 @@ main (int argc, char **argv)
 		ao_lisp_poly_print(ao_lisp_atom_get(ao_lisp_atom_poly(atom)));
 		printf("\n");
 	}
-#if 1
+#endif
+#if 0
 	list = ao_lisp_cons_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("+")),
 				 ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_cons_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("+")),
 										       ao_lisp_cons_cons(ao_lisp_int_poly(3),
@@ -58,7 +62,8 @@ main (int argc, char **argv)
 	printf ("\n");
 	ao_lisp_poly_print(ao_lisp_eval(ao_lisp_cons_poly(list)));
 	printf ("\n");
-
+#endif
+#if 1
 	ao_lisp_read_eval_print();
 #endif
 }
