@@ -45,7 +45,12 @@ struct builtin_func funcs[] = {
 	"-",		AO_LISP_LEXPR,	builtin_minus,
 	"*",		AO_LISP_LEXPR,	builtin_times,
 	"/",		AO_LISP_LEXPR,	builtin_divide,
-	"%",		AO_LISP_LEXPR,	builtin_mod
+	"%",		AO_LISP_LEXPR,	builtin_mod,
+	"=",		AO_LISP_LEXPR,	builtin_equal,
+	"<",		AO_LISP_LEXPR,	builtin_less,
+	">",		AO_LISP_LEXPR,	builtin_greater,
+	"<=",		AO_LISP_LEXPR,	builtin_less_equal,
+	">=",		AO_LISP_LEXPR,	builtin_greater_equal,
 };
 
 ao_poly
@@ -92,7 +97,7 @@ main(int argc, char **argv)
 	printf("/*\n");
 	printf(" * Generated file, do not edit\n");
 	ao_lisp_root_add(&ao_lisp_frame_type, &globals);
-	globals = ao_lisp_frame_new(0, 0);
+	globals = ao_lisp_frame_new(0);
 	for (f = 0; f < N_FUNC; f++) {
 		b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
 		a = ao_lisp_atom_intern(funcs[f].name);
@@ -126,8 +131,6 @@ main(int argc, char **argv)
 	/* Reduce to referenced values */
 	ao_lisp_collect();
 	printf(" */\n");
-
-	globals->readonly = 1;
 
 	printf("#define AO_LISP_POOL_CONST %d\n", ao_lisp_top);
 	printf("extern const uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));\n");
