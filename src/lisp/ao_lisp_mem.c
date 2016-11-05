@@ -35,8 +35,8 @@ uint8_t	ao_lisp_pool[AO_LISP_POOL] __attribute__((aligned(4)));
 #define DBG_POOL
 #endif
 
-#if 1
-#define DBG_DUMP
+#if 0
+#define DBG_DUMP	0
 #define DBG_OFFSET(a)	((int) ((uint8_t *) (a) - ao_lisp_pool))
 #define DBG(...) printf(__VA_ARGS__)
 #define DBG_DO(a)	a
@@ -194,7 +194,7 @@ move_object(void)
 	DBG_MOVE("move done\n");
 }
 
-#ifdef DBG_DUMP
+#if DBG_DUMP
 static void
 dump_busy(void)
 {

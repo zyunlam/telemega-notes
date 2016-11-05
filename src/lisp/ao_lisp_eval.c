@@ -14,7 +14,7 @@
 
 #include "ao_lisp.h"
 
-#if 1
+#if 0
 static int stack_depth;
 #define DBG_INDENT()	do { int _s; for(_s = 0; _s < stack_depth; _s++) printf("  "); } while(0)
 #define DBG_IN()	(++stack_depth)
@@ -80,6 +80,7 @@ stack_mark(void *addr)
 	for (;;) {
 		ao_lisp_poly_mark(stack->actuals);
 		ao_lisp_poly_mark(stack->formals);
+		/* no need to mark formals_tail */
 		ao_lisp_poly_mark(stack->frame);
 		stack = ao_lisp_poly_stack(stack->prev);
 		if (ao_lisp_mark_memory(stack, sizeof (struct ao_lisp_stack)))
@@ -99,6 +100,7 @@ stack_move(void *addr)
 		int	ret;
 		(void) ao_lisp_poly_move(&stack->actuals);
 		(void) ao_lisp_poly_move(&stack->formals);
+		(void) ao_lisp_poly_move(&stack->formals_tail);
 		(void) ao_lisp_poly_move(&stack->frame);
 		prev = ao_lisp_poly_stack(stack->prev);
 		ret = ao_lisp_move(&ao_lisp_stack_type, &prev);
@@ -250,7 +252,7 @@ ao_lisp_lambda(struct ao_lisp_cons *cons)
 	if (args_wanted != args_provided)
 		return ao_lisp_error(AO_LISP_INVALID, "need %d args, not %d", args_wanted, args_provided);
 	next_frame = ao_lisp_frame_new(args_wanted);
-	DBGI("new frame %d\n", OFFSET(next_frame));
+//	DBGI("new frame %d\n", OFFSET(next_frame));
 	switch (type) {
 	case _ao_lisp_atom_lambda: {
 		int			f;
