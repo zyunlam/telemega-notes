@@ -17,12 +17,6 @@
 
 #include "ao_lisp.h"
 
-#if 0
-#define DBG(...)	printf(__VA_ARGS__)
-#else
-#define DBG(...)
-#endif
-
 static int name_size(char *name)
 {
 	return sizeof(struct ao_lisp_atom) + strlen(name) + 1;
@@ -40,38 +34,24 @@ static void atom_mark(void *addr)
 {
 	struct ao_lisp_atom	*atom = addr;
 
-	DBG ("\tatom start %s\n", atom->name);
 	for (;;) {
 		atom = ao_lisp_poly_atom(atom->next);
 		if (!atom)
 			break;
-		DBG("\t\tatom mark %s %d\n", atom->name, (uint8_t *) atom - ao_lisp_const);
 		if (ao_lisp_mark_memory(atom, atom_size(atom)))
 			break;
 	}
-	DBG ("\tatom done\n");
 }
 
 static void atom_move(void *addr)
 {
 	struct ao_lisp_atom	*atom = addr;
 
-	DBG("\tatom move start %s %d next %s %d\n",
-	    atom->name, ((uint8_t *) atom - ao_lisp_const),
-	    atom->next ? ao_lisp_poly_atom(atom->next)->name : "(none)",
-	    atom->next ? ((uint8_t *) ao_lisp_poly_atom(atom->next) - ao_lisp_const) : 0);
 	for (;;) {
-		struct ao_lisp_atom	*next;
-
-		next = ao_lisp_poly_atom(atom->next);
-		next = ao_lisp_move_memory(next, atom_size(next));
-		if (!next)
+		if (ao_lisp_poly_move(&atom->next))
 			break;
-		DBG("\t\tatom move %s %d->%d\n", next->name, ((uint8_t *) ao_lisp_poly_atom(atom->next) - ao_lisp_const), ((uint8_t *) next - ao_lisp_const));
-		atom->next = ao_lisp_atom_poly(next);
-		atom = next;
+		atom = ao_lisp_poly_atom(atom->next);
 	}
-	DBG("\tatom move end\n");
 }
 
 const struct ao_lisp_type ao_lisp_atom_type = {
@@ -116,7 +96,7 @@ static void
 ao_lisp_atom_init(void)
 {
 	if (!ao_lisp_frame_global) {
-		ao_lisp_frame_global = ao_lisp_frame_new(0, 0);
+		ao_lisp_frame_global = ao_lisp_frame_new(0);
 		ao_lisp_root_add(&ao_lisp_frame_type, &ao_lisp_frame_global);
 		ao_lisp_root_add(&ao_lisp_frame_type, &ao_lisp_frame_current);
 	}

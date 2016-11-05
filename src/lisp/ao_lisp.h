@@ -46,7 +46,7 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
-#define AO_LISP_POOL	1024
+#define AO_LISP_POOL	16384
 #endif
 extern uint8_t		ao_lisp_pool[AO_LISP_POOL];
 #endif
@@ -94,6 +94,8 @@ ao_lisp_is_const(ao_poly poly) {
 
 static inline void *
 ao_lisp_ref(ao_poly poly) {
+	if (poly == 0xBEEF)
+		abort();
 	if (poly == AO_LISP_NIL)
 		return NULL;
 	if (poly & AO_LISP_CONST)
@@ -135,8 +137,8 @@ struct ao_lisp_val {
 };
 
 struct ao_lisp_frame {
+	uint8_t			type;
 	uint8_t			num;
-	uint8_t			readonly;
 	ao_poly			next;
 	struct ao_lisp_val	vals[];
 };
@@ -176,6 +178,11 @@ enum ao_lisp_builtin_id {
 	builtin_times,
 	builtin_divide,
 	builtin_mod,
+	builtin_equal,
+	builtin_less,
+	builtin_greater,
+	builtin_less_equal,
+	builtin_greater_equal,
 	builtin_last
 };
 
@@ -281,7 +288,8 @@ ao_lisp_builtin_poly(struct ao_lisp_builtin *b)
 }
 
 /* memory functions */
-void
+/* returns 1 if the object was already marked */
+int
 ao_lisp_mark(const struct ao_lisp_type *type, void *addr);
 
 /* returns 1 if the object was already marked */
@@ -291,12 +299,13 @@ ao_lisp_mark_memory(void *addr, int size);
 void *
 ao_lisp_move_map(void *addr);
 
-void *
-ao_lisp_move(const struct ao_lisp_type *type, void *addr);
+/* returns 1 if the object was already moved */
+int
+ao_lisp_move(const struct ao_lisp_type *type, void **ref);
 
-/* returns NULL if the object was already moved */
-void *
-ao_lisp_move_memory(void *addr, int size);
+/* returns 1 if the object was already moved */
+int
+ao_lisp_move_memory(void **ref, int size);
 
 void *
 ao_lisp_alloc(int size);
@@ -306,6 +315,9 @@ ao_lisp_collect(void);
 
 int
 ao_lisp_root_add(const struct ao_lisp_type *type, void *addr);
+
+int
+ao_lisp_root_poly_add(ao_poly *p);
 
 void
 ao_lisp_root_clear(void *addr);
@@ -361,13 +373,15 @@ ao_lisp_int_print(ao_poly i);
 ao_poly
 ao_lisp_poly_print(ao_poly p);
 
-void
+int
 ao_lisp_poly_mark(ao_poly p);
 
-ao_poly
-ao_lisp_poly_move(ao_poly p);
+/* returns 1 if the object has already been moved */
+int
+ao_lisp_poly_move(ao_poly *p);
 
 /* eval */
+
 ao_poly
 ao_lisp_eval(ao_poly p);
 
@@ -407,7 +421,7 @@ ao_poly *
 ao_lisp_frame_ref(struct ao_lisp_frame *frame, ao_poly atom);
 
 struct ao_lisp_frame *
-ao_lisp_frame_new(int num, int readonly);
+ao_lisp_frame_new(int num);
 
 struct ao_lisp_frame *
 ao_lisp_frame_add(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val);

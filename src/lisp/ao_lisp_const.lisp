@@ -1,4 +1,7 @@
 cadr (lambda (l) (car (cdr l)))
+caddr (lambda (l) (car (cdr (cdr l))))
 list (lexpr (l) l)
 1+ (lambda (x) (+ x 1))
 1- (lambda (x) (- x 1))
+last (lambda (x) (cond ((cdr x) (last (cdr x))) ((car x))))
+prog* (lexpr (l) (last l))
