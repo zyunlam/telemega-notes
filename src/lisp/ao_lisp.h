@@ -221,6 +221,10 @@ ao_lisp_mem_round(int size)
 
 #define AO_LISP_OTHER_POLY(other) ((ao_poly)(other) + AO_LISP_OTHER)
 
+static inline int ao_lisp_poly_base_type(ao_poly poly) {
+	return poly & AO_LISP_TYPE_MASK;
+}
+
 static inline int ao_lisp_poly_type(ao_poly poly) {
 	int	type = poly & AO_LISP_TYPE_MASK;
 	if (type == AO_LISP_OTHER)
@@ -384,11 +388,11 @@ void
 ao_lisp_poly_patom(ao_poly p);
 
 int
-ao_lisp_poly_mark(ao_poly p);
+ao_lisp_poly_mark(ao_poly p, uint8_t note_cons);
 
 /* returns 1 if the object has already been moved */
 int
-ao_lisp_poly_move(ao_poly *p);
+ao_lisp_poly_move(ao_poly *p, uint8_t note_cons);
 
 /* eval */
 

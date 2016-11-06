@@ -48,7 +48,7 @@ frame_mark(void *addr)
 		for (f = 0; f < frame->num; f++) {
 			struct ao_lisp_val	*v = &frame->vals[f];
 
-			ao_lisp_poly_mark(v->val);
+			ao_lisp_poly_mark(v->val, 0);
 			DBG ("\tframe mark atom %s %d val %d at %d\n",
 			     ao_lisp_poly_atom(v->atom)->name,
 			     OFFSET(v->atom), OFFSET(v->val), f);
@@ -69,19 +69,28 @@ frame_move(void *addr)
 	int			f;
 
 	for (;;) {
+		struct ao_lisp_frame	*next;
+		int			ret;
+
 		DBG("frame move %p\n", frame);
 		if (!AO_LISP_IS_POOL(frame))
 			break;
 		for (f = 0; f < frame->num; f++) {
 			struct ao_lisp_val	*v = &frame->vals[f];
 
-			ao_lisp_poly_move(&v->atom);
+			ao_lisp_poly_move(&v->atom, 0);
 			DBG("moved atom %s\n", ao_lisp_poly_atom(v->atom)->name);
-			ao_lisp_poly_move(&v->val);
+			ao_lisp_poly_move(&v->val, 0);
 		}
-		if (ao_lisp_poly_move(&frame->next))
+		next = ao_lisp_poly_frame(frame->next);
+		ret = 1;
+		if (next)
+			ret = ao_lisp_move_memory((void **) &next, frame_size(next));
+		if (next != ao_lisp_poly_frame(frame->next))
+			frame->next = ao_lisp_frame_poly(next);
+		if (ret)
 			break;
-		frame = ao_lisp_poly_frame(frame->next);
+		frame = next;
 	}
 }
 
