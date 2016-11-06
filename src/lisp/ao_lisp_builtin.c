@@ -180,6 +180,18 @@ ao_lisp_print(struct ao_lisp_cons *cons)
 }
 
 ao_poly
+ao_lisp_patom(struct ao_lisp_cons *cons)
+{
+	ao_poly	val = AO_LISP_NIL;
+	while (cons) {
+		val = cons->car;
+		ao_lisp_poly_patom(val);
+		cons = ao_lisp_poly_cons(cons->cdr);
+	}
+	return val;
+}
+
+ao_poly
 ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 {
 	ao_poly	ret = AO_LISP_NIL;
@@ -376,6 +388,7 @@ ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_setq] = ao_lisp_setq,
 	[builtin_cond] = ao_lisp_cond,
 	[builtin_print] = ao_lisp_print,
+	[builtin_patom] = ao_lisp_patom,
 	[builtin_plus] = ao_lisp_plus,
 	[builtin_minus] = ao_lisp_minus,
 	[builtin_times] = ao_lisp_times,

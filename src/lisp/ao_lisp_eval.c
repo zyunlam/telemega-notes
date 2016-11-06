@@ -15,12 +15,13 @@
 #include "ao_lisp.h"
 
 #if 0
+#define DBG_CODE	1
 static int stack_depth;
 #define DBG_INDENT()	do { int _s; for(_s = 0; _s < stack_depth; _s++) printf("  "); } while(0)
 #define DBG_IN()	(++stack_depth)
 #define DBG_OUT()	(--stack_depth)
 #define DBG(...) 	printf(__VA_ARGS__)
-#define DBGI(...)	do { DBG_INDENT(); DBG(__VA_ARGS__); } while (0)
+#define DBGI(...)	do { DBG_INDENT(); DBG("%4d: ", __LINE__); DBG(__VA_ARGS__); } while (0)
 #define DBG_CONS(a)	ao_lisp_cons_print(ao_lisp_cons_poly(a))
 #define DBG_POLY(a)	ao_lisp_poly_print(a)
 #define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_lisp_pool) : -1)
@@ -90,6 +91,29 @@ stack_mark(void *addr)
 
 static const struct ao_lisp_type ao_lisp_stack_type;
 
+#if DBG_CODE
+static void
+stack_validate_tail(struct ao_lisp_stack *stack)
+{
+	struct ao_lisp_cons *head = ao_lisp_poly_cons(stack->formals);
+	struct ao_lisp_cons *tail = ao_lisp_poly_cons(stack->formals_tail);
+	struct ao_lisp_cons *cons;
+	for (cons = head; cons && cons->cdr && cons != tail; cons = ao_lisp_poly_cons(cons->cdr))
+		;
+	if (cons != tail || (tail && tail->cdr)) {
+		if (!tail) {
+			printf("tail null\n");
+		} else {
+			printf("tail validate fail head %d actual %d recorded %d\n",
+			       OFFSET(head), OFFSET(cons), OFFSET(tail));
+			abort();
+		}
+	}
+}
+#else
+#define stack_validate_tail(s)
+#endif
+
 static void
 stack_move(void *addr)
 {
@@ -106,7 +130,8 @@ stack_move(void *addr)
 		ret = ao_lisp_move(&ao_lisp_stack_type, &prev);
 		if (prev != ao_lisp_poly_stack(stack->prev))
 			stack->prev = ao_lisp_stack_poly(prev);
-		if (ret);
+		stack_validate_tail(stack);
+		if (ret)
 			break;
 		stack = ao_lisp_poly_stack(stack->prev);
 	}
@@ -121,6 +146,19 @@ static const struct ao_lisp_type ao_lisp_stack_type = {
 static struct ao_lisp_stack	*ao_lisp_stack;
 static ao_poly			ao_lisp_v;
 static uint8_t been_here;
+
+#if DBG_CODE
+static void
+stack_validate_tails(void)
+{
+	struct ao_lisp_stack	*stack;
+
+	for (stack = ao_lisp_stack; stack; stack = ao_lisp_poly_stack(stack->prev))
+		stack_validate_tail(stack);
+}
+#else
+#define stack_validate_tails(s)
+#endif
 
 ao_poly
 ao_lisp_set_cond(struct ao_lisp_cons *c)
@@ -139,27 +177,35 @@ ao_lisp_stack_reset(struct ao_lisp_stack *stack)
 	stack->formals = AO_LISP_NIL;
 	stack->formals_tail = AO_LISP_NIL;
 	stack->frame = ao_lisp_frame_poly(ao_lisp_frame_current);
+	stack_validate_tails();
 }
 
-struct ao_lisp_stack *
+int
 ao_lisp_stack_push(void)
 {
+	stack_validate_tails();
+	if (ao_lisp_stack) {
+		DBGI("formals "); DBG_POLY(ao_lisp_stack->formals); DBG("\n");
+		DBGI("actuals "); DBG_POLY(ao_lisp_stack->actuals); DBG("\n");
+	}
+	DBGI("stack push\n");
+	DBG_IN();
 	struct ao_lisp_stack	*stack = ao_lisp_alloc(sizeof (struct ao_lisp_stack));
 	if (!stack)
-		return NULL;
+		return 0;
 	stack->prev = ao_lisp_stack_poly(ao_lisp_stack);
 	ao_lisp_stack = stack;
 	ao_lisp_stack_reset(stack);
-	DBGI("stack push\n");
-	DBG_IN();
-	return stack;
+	stack_validate_tails();
+	return 1;
 }
 
-struct ao_lisp_stack *
+void
 ao_lisp_stack_pop(void)
 {
 	if (!ao_lisp_stack)
-		return NULL;
+		return;
+	stack_validate_tails();
 	DBG_OUT();
 	DBGI("stack pop\n");
 	ao_lisp_stack = ao_lisp_poly_stack(ao_lisp_stack->prev);
@@ -167,12 +213,16 @@ ao_lisp_stack_pop(void)
 		ao_lisp_frame_current = ao_lisp_poly_frame(ao_lisp_stack->frame);
 	else
 		ao_lisp_frame_current = NULL;
-	return ao_lisp_stack;
+	if (ao_lisp_stack) {
+		DBGI("formals "); DBG_POLY(ao_lisp_stack->formals); DBG("\n");
+		DBGI("actuals "); DBG_POLY(ao_lisp_stack->actuals); DBG("\n");
+	}
 }
 
 static void
 ao_lisp_stack_clear(void)
 {
+	stack_validate_tails();
 	ao_lisp_stack = NULL;
 	ao_lisp_frame_current = NULL;
 }
@@ -285,7 +335,6 @@ ao_lisp_lambda(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_eval(ao_poly _v)
 {
-	struct ao_lisp_stack	*stack;
 	ao_poly			formal;
 
 	ao_lisp_v = _v;
@@ -295,45 +344,50 @@ ao_lisp_eval(ao_poly _v)
 		ao_lisp_root_poly_add(&ao_lisp_v);
 	}
 
-	stack = ao_lisp_stack_push();
+	if (!ao_lisp_stack_push())
+		goto bail;
 
 	for (;;) {
 		if (ao_lisp_exception)
-			return AO_LISP_NIL;
-		switch (stack->state) {
+			goto bail;
+		switch (ao_lisp_stack->state) {
 		case eval_sexpr:
 			DBGI("sexpr: "); DBG_POLY(ao_lisp_v); DBG("\n");
 			switch (ao_lisp_poly_type(ao_lisp_v)) {
 			case AO_LISP_CONS:
 				if (ao_lisp_v == AO_LISP_NIL) {
-					stack->state = eval_exec;
+					ao_lisp_stack->state = eval_exec;
 					break;
 				}
-				stack->actuals = ao_lisp_v;
-				stack->state = eval_formal;
-				stack = ao_lisp_stack_push();
+				ao_lisp_stack->actuals = ao_lisp_v;
+				DBGI("actuals now "); DBG_POLY(ao_lisp_v); DBG("\n");
+				ao_lisp_stack->state = eval_formal;
+				if (!ao_lisp_stack_push())
+					goto bail;
 				ao_lisp_v = ao_lisp_poly_cons(ao_lisp_v)->car;
+				stack_validate_tails();
 				break;
 			case AO_LISP_ATOM:
 				ao_lisp_v = ao_lisp_atom_get(ao_lisp_v);
 				/* fall through */
 			case AO_LISP_INT:
 			case AO_LISP_STRING:
-				stack->state = eval_val;
+			case AO_LISP_BUILTIN:
+				ao_lisp_stack->state = eval_val;
 				break;
 			}
 			break;
 		case eval_val:
 			DBGI("val: "); DBG_POLY(ao_lisp_v); DBG("\n");
-			stack = ao_lisp_stack_pop();
-			if (!stack)
+			ao_lisp_stack_pop();
+			if (!ao_lisp_stack)
 				return ao_lisp_v;
-			DBGI("..state %d\n", stack->state);
+			DBGI("..state %d\n", ao_lisp_stack->state);
 			break;
 
 		case eval_formal:
 			/* Check what kind of function we've got */
-			if (!stack->formals) {
+			if (!ao_lisp_stack->formals) {
 				switch (func_type(ao_lisp_v)) {
 				case AO_LISP_LAMBDA:
 				case _ao_lisp_atom_lambda:
@@ -343,99 +397,108 @@ ao_lisp_eval(ao_poly _v)
 					break;
 				case AO_LISP_MACRO:
 				case _ao_lisp_atom_macro:
-					stack->macro = 1;
+					ao_lisp_stack->macro = 1;
 				case AO_LISP_NLAMBDA:
 				case _ao_lisp_atom_nlambda:
 					DBGI(".. nlambda or macro\n");
-					stack->formals = stack->actuals;
-					stack->state = eval_exec_direct;
+					ao_lisp_stack->formals = ao_lisp_stack->actuals;
+					ao_lisp_stack->formals_tail = AO_LISP_NIL;
+					ao_lisp_stack->state = eval_exec_direct;
+					stack_validate_tails();
 					break;
 				}
-				if (stack->state == eval_exec_direct)
+				if (ao_lisp_stack->state == eval_exec_direct)
 					break;
 			}
 
+			DBGI("add formal "); DBG_POLY(ao_lisp_v); DBG("\n");
+			stack_validate_tails();
 			formal = ao_lisp_cons_poly(ao_lisp_cons_cons(ao_lisp_v, NULL));
-			if (!formal) {
-				ao_lisp_stack_clear();
-				return AO_LISP_NIL;
-			}
+			stack_validate_tails();
+			if (!formal)
+				goto bail;
 
-			if (stack->formals_tail)
-				ao_lisp_poly_cons(stack->formals_tail)->cdr = formal;
+			if (ao_lisp_stack->formals_tail)
+				ao_lisp_poly_cons(ao_lisp_stack->formals_tail)->cdr = formal;
 			else
-				stack->formals = formal;
-			stack->formals_tail = formal;
+				ao_lisp_stack->formals = formal;
+			ao_lisp_stack->formals_tail = formal;
 
-			DBGI("formals now "); DBG_POLY(stack->formals); DBG("\n");
+			DBGI("formals now "); DBG_POLY(ao_lisp_stack->formals); DBG("\n");
 
-			ao_lisp_v = ao_lisp_poly_cons(stack->actuals)->cdr;
+			ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->actuals)->cdr;
 
-			stack->state = eval_sexpr;
+			stack_validate_tails();
+			ao_lisp_stack->state = eval_sexpr;
 
 			break;
 		case eval_exec:
-			if (!stack->formals) {
+			if (!ao_lisp_stack->formals) {
 				ao_lisp_v = AO_LISP_NIL;
-				stack->state = eval_val;
+				ao_lisp_stack->state = eval_val;
 				break;
 			}
-			ao_lisp_v = ao_lisp_poly_cons(stack->formals)->car;
+			ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->formals)->car;
 		case eval_exec_direct:
-			DBGI("exec: macro %d ", stack->macro); DBG_POLY(ao_lisp_v); DBG(" formals "); DBG_POLY(stack->formals); DBG ("\n");
+			DBGI("exec: macro %d ", ao_lisp_stack->macro); DBG_POLY(ao_lisp_v); DBG(" formals "); DBG_POLY(ao_lisp_stack->formals); DBG ("\n");
 			if (ao_lisp_poly_type(ao_lisp_v) == AO_LISP_BUILTIN) {
-				struct ao_lisp_builtin *b = ao_lisp_poly_builtin(ao_lisp_v);
-				struct ao_lisp_cons	*f = ao_lisp_poly_cons(ao_lisp_poly_cons(stack->formals)->cdr);
+				stack_validate_tails();
+				struct ao_lisp_builtin	*b = ao_lisp_poly_builtin(ao_lisp_v);
+				stack_validate_tails();
+				struct ao_lisp_cons	*f = ao_lisp_poly_cons(ao_lisp_poly_cons(ao_lisp_stack->formals)->cdr);
 
 				DBGI(".. builtin formals "); DBG_CONS(f); DBG("\n");
-				if (stack->macro)
-					stack->state = eval_sexpr;
+				stack_validate_tails();
+				if (ao_lisp_stack->macro)
+					ao_lisp_stack->state = eval_sexpr;
 				else
-					stack->state = eval_val;
-				stack->macro = 0;
+					ao_lisp_stack->state = eval_val;
+				ao_lisp_stack->macro = 0;
+				ao_lisp_stack->actuals = ao_lisp_stack->formals = ao_lisp_stack->formals_tail = AO_LISP_NIL;
 				ao_lisp_v = ao_lisp_func(b) (f);
 				DBGI("builtin result:"); DBG_POLY(ao_lisp_v); DBG ("\n");
-				if (ao_lisp_exception) {
-					ao_lisp_stack_clear();
-					return AO_LISP_NIL;
-				}
+				if (ao_lisp_exception)
+					goto bail;
 				break;
 			} else {
-				ao_lisp_v = ao_lisp_lambda(ao_lisp_poly_cons(stack->formals));
-				ao_lisp_stack_reset(stack);
+				ao_lisp_v = ao_lisp_lambda(ao_lisp_poly_cons(ao_lisp_stack->formals));
+				ao_lisp_stack_reset(ao_lisp_stack);
 			}
 			break;
 		case eval_cond:
-			DBGI("cond: "); DBG_POLY(stack->actuals); DBG("\n");
-			if (!stack->actuals) {
+			DBGI("cond: "); DBG_POLY(ao_lisp_stack->actuals); DBG("\n");
+			if (!ao_lisp_stack->actuals) {
 				ao_lisp_v = AO_LISP_NIL;
-				stack->state = eval_val;
+				ao_lisp_stack->state = eval_val;
 			} else {
-				ao_lisp_v = ao_lisp_poly_cons(stack->actuals)->car;
+				ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->actuals)->car;
 				if (!ao_lisp_v || ao_lisp_poly_type(ao_lisp_v) != AO_LISP_CONS) {
 					ao_lisp_error(AO_LISP_INVALID, "invalid cond clause");
 					goto bail;
 				}
 				ao_lisp_v = ao_lisp_poly_cons(ao_lisp_v)->car;
-				stack->state = eval_cond_test;
-				stack = ao_lisp_stack_push();
-				stack->state = eval_sexpr;
+				ao_lisp_stack->state = eval_cond_test;
+				stack_validate_tails();
+				ao_lisp_stack_push();
+				stack_validate_tails();
+				ao_lisp_stack->state = eval_sexpr;
 			}
 			break;
 		case eval_cond_test:
-			DBGI("cond_test "); DBG_POLY(ao_lisp_v); DBG("\n");
+			DBGI("cond_test: "); DBG_POLY(ao_lisp_v); DBG(" actuals "); DBG_POLY(ao_lisp_stack->actuals); DBG("\n");
 			if (ao_lisp_v) {
-				struct ao_lisp_cons *car = ao_lisp_poly_cons(ao_lisp_poly_cons(stack->actuals)->car);
+				struct ao_lisp_cons *car = ao_lisp_poly_cons(ao_lisp_poly_cons(ao_lisp_stack->actuals)->car);
 				struct ao_lisp_cons *c = ao_lisp_poly_cons(car->cdr);
 				if (c) {
 					ao_lisp_v = c->car;
-					stack->state = eval_sexpr;
+					ao_lisp_stack->state = eval_sexpr;
 				} else {
-					stack->state = eval_val;
+					ao_lisp_stack->state = eval_val;
 				}
 			} else {
-				stack->actuals = ao_lisp_poly_cons(stack->actuals)->cdr;
-				stack->state = eval_cond;
+				ao_lisp_stack->actuals = ao_lisp_poly_cons(ao_lisp_stack->actuals)->cdr;
+				DBGI("actuals now "); DBG_POLY(ao_lisp_stack->actuals); DBG("\n");
+				ao_lisp_stack->state = eval_cond;
 			}
 			break;
 		}

@@ -36,6 +36,7 @@ uint8_t	ao_lisp_pool[AO_LISP_POOL] __attribute__((aligned(4)));
 #endif
 
 #if 0
+#define DBG_INCLUDE
 #define DBG_DUMP	0
 #define DBG_OFFSET(a)	((int) ((uint8_t *) (a) - ao_lisp_pool))
 #define DBG(...) printf(__VA_ARGS__)
@@ -179,15 +180,17 @@ move_object(void)
 			DBG_DO(void *addr = *ao_lisp_root[i].addr);
 			DBG_MOVE("root %d\n", DBG_OFFSET(addr));
 			if (!ao_lisp_move(ao_lisp_root[i].type,
-					  ao_lisp_root[i].addr))
+					  ao_lisp_root[i].addr)) {
 				DBG_MOVE("root moves from %p to %p\n",
 					 addr,
 					 *ao_lisp_root[i].addr);
+			}
 		} else {
 			DBG_DO(ao_poly p = *(ao_poly *) ao_lisp_root[i].addr);
-			if (!ao_lisp_poly_move((ao_poly *) ao_lisp_root[i].addr))
+			if (!ao_lisp_poly_move((ao_poly *) ao_lisp_root[i].addr)) {
 				DBG_MOVE("root poly move from %04x to %04x\n",
 					 p, *(ao_poly *) ao_lisp_root[i].addr);
+			}
 		}
 	}
 	DBG_MOVE_OUT();
@@ -338,7 +341,7 @@ ao_lisp_move(const struct ao_lisp_type *type, void **ref)
 	int		size = type->size(addr);
 
 	if (!addr)
-		return NULL;
+		return 1;
 
 #ifndef AO_LISP_MAKE_CONST
 	if (AO_LISP_IS_CONST(addr))
@@ -370,7 +373,7 @@ ao_lisp_move_memory(void **ref, int size)
 {
 	void *addr = *ref;
 	if (!addr)
-		return NULL;
+		return 1;
 
 	DBG_MOVE("memory %d\n", DBG_OFFSET(addr));
 	DBG_MOVE_IN();
