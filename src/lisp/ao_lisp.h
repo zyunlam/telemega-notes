@@ -173,6 +173,7 @@ enum ao_lisp_builtin_id {
 	builtin_setq,
 	builtin_cond,
 	builtin_print,
+	builtin_patom,
 	builtin_plus,
 	builtin_minus,
 	builtin_times,
@@ -331,6 +332,9 @@ ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr);
 void
 ao_lisp_cons_print(ao_poly);
 
+void
+ao_lisp_cons_patom(ao_poly);
+
 /* string */
 extern const struct ao_lisp_type ao_lisp_string_type;
 
@@ -345,6 +349,9 @@ ao_lisp_string_cat(char *a, char *b);
 
 void
 ao_lisp_string_print(ao_poly s);
+
+void
+ao_lisp_string_patom(ao_poly s);
 
 /* atom */
 extern const struct ao_lisp_type ao_lisp_atom_type;
@@ -370,8 +377,11 @@ void
 ao_lisp_int_print(ao_poly i);
 
 /* prim */
-ao_poly
+void
 ao_lisp_poly_print(ao_poly p);
+
+void
+ao_lisp_poly_patom(ao_poly p);
 
 int
 ao_lisp_poly_mark(ao_poly p);

@@ -41,6 +41,7 @@ struct builtin_func funcs[] = {
 	"setq",		AO_LISP_MACRO,	builtin_setq,
 	"cond",		AO_LISP_NLAMBDA,builtin_cond,
 	"print",	AO_LISP_LEXPR,	builtin_print,
+	"patom",	AO_LISP_LEXPR,	builtin_patom,
 	"+",		AO_LISP_LEXPR,	builtin_plus,
 	"-",		AO_LISP_LEXPR,	builtin_minus,
 	"*",		AO_LISP_LEXPR,	builtin_times,

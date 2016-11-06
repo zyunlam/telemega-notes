@@ -15,39 +15,11 @@
 #include <ao.h>
 #include <ao_lisp.h>
 
-static uint16_t	blink_delay, blink_running;
-
-static void blink(void) {
-	blink_running = 1;
-	while (blink_delay) {
-		ao_led_on(AO_LED_RED);
-		ao_delay(blink_delay);
-		ao_led_off(AO_LED_RED);
-		ao_delay(blink_delay);
-	}
-	blink_running = 0;
-	ao_wakeup(&blink_running);
-	ao_exit();
-}
-
-struct ao_task blink_task;
-
-static void blink_cmd() {
-	ao_cmd_decimal();
-	blink_delay = ao_cmd_lex_i;
-	if (blink_delay && !blink_running)
-		ao_add_task(&blink_task, blink, "blink");
-	if (!blink_delay)
-		while (blink_running)
-			ao_sleep(&blink_running);
-}
-
 static void lisp_cmd() {
 	ao_lisp_read_eval_print();
 }
 
 static const struct ao_cmds blink_cmds[] = {
-	{ blink_cmd,	"b <delay, 0 off>\0Blink the green LED" },
 	{ lisp_cmd,	"l\0Run lisp interpreter" },
 	{ 0, 0 }
 };

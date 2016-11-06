@@ -83,3 +83,14 @@ ao_lisp_cons_print(ao_poly c)
 	}
 	printf(")");
 }
+
+void
+ao_lisp_cons_patom(ao_poly c)
+{
+	struct ao_lisp_cons *cons = ao_lisp_poly_cons(c);
+
+	while (cons) {
+		ao_lisp_poly_patom(cons->car);
+		cons = ao_lisp_poly_cons(cons->cdr);
+	}
+}
