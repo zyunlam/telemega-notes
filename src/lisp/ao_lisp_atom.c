@@ -48,7 +48,7 @@ static void atom_move(void *addr)
 	struct ao_lisp_atom	*atom = addr;
 
 	for (;;) {
-		if (ao_lisp_poly_move(&atom->next))
+		if (ao_lisp_poly_move(&atom->next, 0))
 			break;
 		atom = ao_lisp_poly_atom(atom->next);
 	}

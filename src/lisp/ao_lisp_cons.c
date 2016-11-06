@@ -21,7 +21,7 @@ static void cons_mark(void *addr)
 	struct ao_lisp_cons	*cons = addr;
 
 	for (;;) {
-		ao_lisp_poly_mark(cons->car);
+		ao_lisp_poly_mark(cons->car, 1);
 		cons = ao_lisp_poly_cons(cons->cdr);
 		if (!cons)
 			break;
@@ -44,10 +44,17 @@ static void cons_move(void *addr)
 		return;
 
 	for (;;) {
-		(void) ao_lisp_poly_move(&cons->car);
-		if (ao_lisp_poly_move(&cons->cdr))
+		struct ao_lisp_cons	*cdr;
+		int			ret;
+
+		(void) ao_lisp_poly_move(&cons->car, 1);
+		cdr = ao_lisp_poly_cons(cons->cdr);
+		ret = ao_lisp_move_memory((void **) &cdr, sizeof (struct ao_lisp_cons));
+		if (cdr != ao_lisp_poly_cons(cons->cdr))
+			cons->cdr = ao_lisp_cons_poly(cdr);
+		if (ret)
 			break;
-		cons = ao_lisp_poly_cons(cons->cdr);
+		cons = cdr;
 	}
 }
 
