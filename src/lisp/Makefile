@@ -18,7 +18,9 @@ SRCS=\
 	ao_lisp_builtin.c \
 	ao_lisp_read.c \
 	ao_lisp_frame.c \
-	ao_lisp_error.c
+	ao_lisp_lambda.c \
+	ao_lisp_eval.c \
+	ao_lisp_error.c 
 
 OBJS=$(SRCS:.c=.o)
 

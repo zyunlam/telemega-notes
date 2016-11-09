@@ -89,8 +89,8 @@ ao_lisp_atom_intern(char *name)
 	return atom;
 }
 
-static struct ao_lisp_frame	*ao_lisp_frame_global;
-struct ao_lisp_frame		*ao_lisp_frame_current;
+struct ao_lisp_frame	*ao_lisp_frame_global;
+struct ao_lisp_frame	*ao_lisp_frame_current;
 
 static void
 ao_lisp_atom_init(void)
