@@ -80,17 +80,16 @@ ao_lisp_stack_print(void)
 {
 	struct ao_lisp_stack *s;
 	printf("Value:  "); ao_lisp_poly_print(ao_lisp_v); printf("\n");
-	ao_lisp_error_frame(0, "Frame:  ", ao_lisp_frame_current);
 	printf("Stack:\n");
 	for (s = ao_lisp_stack; s; s = ao_lisp_poly_stack(s->prev)) {
 		printf("\t[\n");
 		printf("\t\texpr:   "); ao_lisp_poly_print(s->list); printf("\n");
 		printf("\t\tstate:  %s\n", state_names[s->state]);
-		printf("\t\tmacro:  %s\n", s->macro ? "true" : "false");
+//		printf("\t\tmacro:  %s\n", s->macro ? "true" : "false");
 		ao_lisp_error_cons ("sexprs: ", ao_lisp_poly_cons(s->sexprs));
 		ao_lisp_error_cons ("values: ", ao_lisp_poly_cons(s->values));
 		ao_lisp_error_frame(2, "frame:  ", ao_lisp_poly_frame(s->frame));
-		ao_lisp_error_frame(2, "mframe: ", ao_lisp_poly_frame(s->macro_frame));
+//		ao_lisp_error_frame(2, "mframe: ", ao_lisp_poly_frame(s->macro_frame));
 		printf("\t]\n");
 	}
 }

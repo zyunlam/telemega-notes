@@ -78,6 +78,7 @@ extern uint16_t		ao_lisp_top;
 #define AO_LISP_OOM		0x01
 #define AO_LISP_DIVIDE_BY_ZERO	0x02
 #define AO_LISP_INVALID		0x04
+#define AO_LISP_UNDEFINED	0x08
 
 extern uint8_t		ao_lisp_exception;
 
@@ -156,26 +157,23 @@ ao_lisp_frame_poly(struct ao_lisp_frame *frame) {
 	return ao_lisp_poly(frame, AO_LISP_OTHER);
 }
 
-struct ao_lisp_stack {
-	ao_poly			prev;
-	uint8_t			state;
-	uint8_t			macro;
-	ao_poly			sexprs;
-	ao_poly			values;
-	ao_poly			values_tail;
-	ao_poly			frame;
-	ao_poly			macro_frame;
-	ao_poly			list;
-};
-
 enum eval_state {
-	eval_sexpr,
+	eval_sexpr,		/* Evaluate an sexpr */
 	eval_val,
 	eval_formal,
 	eval_exec,
-	eval_lambda_done,
 	eval_cond,
 	eval_cond_test
+};
+
+struct ao_lisp_stack {
+	uint8_t			state;		/* enum eval_state */
+	ao_poly			prev;		/* previous stack frame */
+	ao_poly			sexprs;		/* expressions to evaluate */
+	ao_poly			values;		/* values computed */
+	ao_poly			values_tail;	/* end of the values list for easy appending */
+	ao_poly			frame;		/* current lookup frame */
+	ao_poly			list;		/* most recent function call */
 };
 
 static inline struct ao_lisp_stack *
@@ -559,6 +557,16 @@ int ao_lisp_stack_depth;
 #define DBG_POLY(a)	ao_lisp_poly_print(a)
 #define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_lisp_pool) : -1)
 #define DBG_STACK()	ao_lisp_stack_print()
+static inline void
+ao_lisp_frames_dump(void)
+{
+	struct ao_lisp_stack *s;
+	DBGI(".. current frame: "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
+	for (s = ao_lisp_stack; s; s = ao_lisp_poly_stack(s->prev)) {
+		DBGI(".. stack frame: "); DBG_POLY(s->frame); DBG("\n");
+	}
+}
+#define DBG_FRAMES()	ao_lisp_frames_dump()
 #else
 #define DBG_DO(a)
 #define DBG_INDENT()
@@ -570,6 +578,7 @@ int ao_lisp_stack_depth;
 #define DBG_POLY(a)
 #define DBG_RESET()
 #define DBG_STACK()
+#define DBG_FRAMES()
 #endif
 
 #endif /* _AO_LISP_H_ */

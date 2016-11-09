@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-#define DBG_EVAL 1
+#define DBG_EVAL 0
 #include "ao_lisp.h"
 #include <assert.h>
 
@@ -32,7 +32,6 @@ stack_mark(void *addr)
 		ao_lisp_poly_mark(stack->values, 0);
 		/* no need to mark values_tail */
 		ao_lisp_poly_mark(stack->frame, 0);
-		ao_lisp_poly_mark(stack->macro_frame, 0);
 		stack = ao_lisp_poly_stack(stack->prev);
 		if (ao_lisp_mark_memory(stack, sizeof (struct ao_lisp_stack)))
 			break;
@@ -53,7 +52,6 @@ stack_move(void *addr)
 		(void) ao_lisp_poly_move(&stack->values, 0);
 		(void) ao_lisp_poly_move(&stack->values_tail, 0);
 		(void) ao_lisp_poly_move(&stack->frame, 0);
-		(void) ao_lisp_poly_move(&stack->macro_frame, 0);
 		prev = ao_lisp_poly_stack(stack->prev);
 		ret = ao_lisp_move(&ao_lisp_stack_type, &prev);
 		if (prev != ao_lisp_poly_stack(stack->prev))
@@ -85,28 +83,15 @@ static void
 ao_lisp_stack_reset(struct ao_lisp_stack *stack)
 {
 	stack->state = eval_sexpr;
-	stack->macro = 0;
 	stack->sexprs = AO_LISP_NIL;
 	stack->values = AO_LISP_NIL;
 	stack->values_tail = AO_LISP_NIL;
 }
 
-static void
-ao_lisp_frames_dump(void)
-{
-	struct ao_lisp_stack *s;
-	DBGI(".. current frame: "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
-	for (s = ao_lisp_stack; s; s = ao_lisp_poly_stack(s->prev)) {
-		DBGI(".. stack frame: "); DBG_POLY(s->frame); DBG("\n");
-		DBGI(".. macro frame: "); DBG_POLY(s->frame); DBG("\n");
-	}
-}
 
 static int
 ao_lisp_stack_push(void)
 {
-	DBGI("stack push\n");
-	DBG_IN();
 	struct ao_lisp_stack	*stack = ao_lisp_alloc(sizeof (struct ao_lisp_stack));
 	if (!stack)
 		return 0;
@@ -115,7 +100,9 @@ ao_lisp_stack_push(void)
 	stack->list = AO_LISP_NIL;
 	ao_lisp_stack = stack;
 	ao_lisp_stack_reset(stack);
-	ao_lisp_frames_dump();
+	DBGI("stack push\n");
+	DBG_IN();
+	DBG_FRAMES();
 	return 1;
 }
 
@@ -124,11 +111,14 @@ ao_lisp_stack_pop(void)
 {
 	if (!ao_lisp_stack)
 		return;
-	ao_lisp_frame_current = ao_lisp_poly_frame(ao_lisp_stack->frame);
 	ao_lisp_stack = ao_lisp_poly_stack(ao_lisp_stack->prev);
+	if (ao_lisp_stack)
+		ao_lisp_frame_current = ao_lisp_poly_frame(ao_lisp_stack->frame);
+	else
+		ao_lisp_frame_current = NULL;
 	DBG_OUT();
 	DBGI("stack pop\n");
-	ao_lisp_frames_dump();
+	DBG_FRAMES();
 }
 
 static void
@@ -246,19 +236,20 @@ static int
 ao_lisp_eval_val(void)
 {
 	DBGI("val: "); DBG_POLY(ao_lisp_v); DBG("\n");
+#if 0
 	if (ao_lisp_stack->macro) {
-		DBGI("..macro %d\n", ao_lisp_stack->macro);
-		DBGI("..current frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
-		DBGI("..saved frame   "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
-		DBGI("..macro frame   "); DBG_POLY(ao_lisp_stack->macro_frame); DBG("\n");
-		DBGI("..sexprs       "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
-		DBGI("..values       "); DBG_POLY(ao_lisp_stack->values); DBG("\n");
+		DBGI(".. end macro %d\n", ao_lisp_stack->macro);
+		DBGI(".. sexprs       "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+		DBGI(".. values       "); DBG_POLY(ao_lisp_stack->values); DBG("\n");
+		ao_lisp_frames_dump();
+
+		ao_lisp_stack_pop();
+#if 0
 		/*
 		 * Re-use the current stack to evaluate
 		 * the value from the macro
 		 */
 		ao_lisp_stack->state = eval_sexpr;
-//		assert(ao_lisp_stack->frame == ao_lisp_stack->macro_frame);
 		ao_lisp_frame_current = ao_lisp_poly_frame(ao_lisp_stack->macro_frame);
 		ao_lisp_stack->frame = ao_lisp_stack->macro_frame;
 		ao_lisp_stack->macro = 0;
@@ -266,7 +257,10 @@ ao_lisp_eval_val(void)
 		ao_lisp_stack->sexprs = AO_LISP_NIL;
 		ao_lisp_stack->values = AO_LISP_NIL;
 		ao_lisp_stack->values_tail = AO_LISP_NIL;
-	} else {
+#endif
+	} else
+#endif
+	{
 		/*
 		 * Value computed, pop the stack
 		 * to figure out what to do with the value
@@ -280,22 +274,25 @@ ao_lisp_eval_val(void)
 /*
  * A formal has been computed.
  *
- * If this is the first formal, then
- * check to see if we've got a lamda/lexpr or
- * macro/nlambda.
+ * If this is the first formal, then check to see if we've got a
+ * lamda/lexpr or macro/nlambda.
  *
- * For lambda/lexpr, go compute another formal.
- * This will terminate when the sexpr state
- * sees nil.
+ * For lambda/lexpr, go compute another formal.  This will terminate
+ * when the sexpr state sees nil.
  *
- * For macro/nlambda, we're done, so move the
- * sexprs into the values and go execute it.
+ * For macro/nlambda, we're done, so move the sexprs into the values
+ * and go execute it.
+ *
+ * Macros have an additional step of saving a stack frame holding the
+ * macro value execution context, which then gets the result of the
+ * macro to run
  */
 
 static int
 ao_lisp_eval_formal(void)
 {
-	ao_poly formal;
+	ao_poly			formal;
+	struct ao_lisp_stack	*prev;
 
 	DBGI("formal: "); DBG_POLY(ao_lisp_v); DBG("\n");
 
@@ -307,17 +304,34 @@ ao_lisp_eval_formal(void)
 			DBGI(".. lambda or lexpr\n");
 			break;
 		case AO_LISP_FUNC_MACRO:
-			ao_lisp_stack->macro = 1;
-			DBGI(".. macro %d\n", ao_lisp_stack->macro);
-			DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
-			DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
-			ao_lisp_stack->macro_frame = ao_lisp_stack->frame;
+			/* Evaluate the result once more */
+			prev = ao_lisp_stack;
+			ao_lisp_stack->state = eval_sexpr;
+			if (!ao_lisp_stack_push())
+				return 0;
+
+			/* After the function returns, take that
+			 * value and re-evaluate it
+			 */
+			ao_lisp_stack->state = eval_sexpr;
+			ao_lisp_stack->sexprs = prev->sexprs;
+			prev->sexprs = AO_LISP_NIL;
+
+			DBGI(".. start macro\n");
+			DBGI(".. sexprs       "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+			DBGI(".. values       "); DBG_POLY(ao_lisp_stack->values); DBG("\n");
+			DBG_FRAMES();
+
 			/* fall through ... */
 		case AO_LISP_FUNC_NLAMBDA:
 			DBGI(".. nlambda or macro\n");
+
+			/* use the raw sexprs as values */
 			ao_lisp_stack->values = ao_lisp_stack->sexprs;
 			ao_lisp_stack->values_tail = AO_LISP_NIL;
 			ao_lisp_stack->state = eval_exec;
+
+			/* ready to execute now */
 			return 1;
 		case -1:
 			return 0;
@@ -394,14 +408,6 @@ ao_lisp_eval_exec(void)
 	}
 	ao_lisp_stack->values = AO_LISP_NIL;
 	ao_lisp_stack->values_tail = AO_LISP_NIL;
-	return 1;
-}
-
-static int
-ao_lisp_eval_lambda_done(void)
-{
-	DBGI("lambda_done: "); DBG_POLY(ao_lisp_v); DBG("\n");
-	DBG_STACK();
 	return 1;
 }
 
@@ -497,7 +503,6 @@ ao_lisp_eval(ao_poly _v)
 		return AO_LISP_NIL;
 
 	while (ao_lisp_stack) {
-//		DBG_STACK();
 		if (!(*evals[ao_lisp_stack->state])() || ao_lisp_exception) {
 			ao_lisp_stack_clear();
 			return AO_LISP_NIL;
