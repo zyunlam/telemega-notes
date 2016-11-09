@@ -39,11 +39,71 @@ const struct ao_lisp_type ao_lisp_builtin_type = {
 	.move = builtin_move
 };
 
+#ifdef AO_LISP_MAKE_CONST
+char *ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {
+	return "???";
+}
+char *ao_lisp_args_name(uint8_t args) {
+	return "???";
+}
+#else
+static const ao_poly builtin_names[] = {
+	[builtin_lambda] = _ao_lisp_atom_lambda,
+	[builtin_lexpr] = _ao_lisp_atom_lexpr,
+	[builtin_nlambda] = _ao_lisp_atom_nlambda,
+	[builtin_macro] = _ao_lisp_atom_macro,
+	[builtin_car] = _ao_lisp_atom_car,
+	[builtin_cdr] = _ao_lisp_atom_cdr,
+	[builtin_cons] = _ao_lisp_atom_cons,
+	[builtin_last] = _ao_lisp_atom_last,
+	[builtin_quote] = _ao_lisp_atom_quote,
+	[builtin_set] = _ao_lisp_atom_set,
+	[builtin_setq] = _ao_lisp_atom_setq,
+	[builtin_cond] = _ao_lisp_atom_cond,
+	[builtin_print] = _ao_lisp_atom_print,
+	[builtin_patom] = _ao_lisp_atom_patom,
+	[builtin_plus] = _ao_lisp_atom_2b,
+	[builtin_minus] = _ao_lisp_atom_2d,
+	[builtin_times] = _ao_lisp_atom_2a,
+	[builtin_divide] = _ao_lisp_atom_2f,
+	[builtin_mod] = _ao_lisp_atom_25,
+	[builtin_equal] = _ao_lisp_atom_3d,
+	[builtin_less] = _ao_lisp_atom_3c,
+	[builtin_greater] = _ao_lisp_atom_3e,
+	[builtin_less_equal] = _ao_lisp_atom_3c3d,
+	[builtin_greater_equal] = _ao_lisp_atom_3e3d,
+};
+
+static char *
+ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {
+	if (0 <= b && b < _builtin_last)
+		return ao_lisp_poly_atom(builtin_names[b])->name;
+	return "???";
+}
+
+static const ao_poly ao_lisp_args_atoms[] = {
+	[AO_LISP_FUNC_LAMBDA] = _ao_lisp_atom_lambda,
+	[AO_LISP_FUNC_LEXPR] = _ao_lisp_atom_lexpr,
+	[AO_LISP_FUNC_NLAMBDA] = _ao_lisp_atom_nlambda,
+	[AO_LISP_FUNC_MACRO] = _ao_lisp_atom_macro,
+};
+
+char *
+ao_lisp_args_name(uint8_t args)
+{
+	if (args < sizeof ao_lisp_args_atoms / sizeof ao_lisp_args_atoms[0])
+		return ao_lisp_poly_atom(ao_lisp_args_atoms[args])->name;
+	return "(unknown)";
+}
+#endif
+
 void
 ao_lisp_builtin_print(ao_poly b)
 {
-	(void) b;
-	printf("[builtin]");
+	struct ao_lisp_builtin *builtin = ao_lisp_poly_builtin(b);
+	printf("[builtin %s %s]",
+	       ao_lisp_args_name(builtin->args),
+	       ao_lisp_builtin_name(builtin->func));
 }
 
 ao_poly
@@ -117,6 +177,24 @@ ao_lisp_cons(struct ao_lisp_cons *cons)
 }
 
 ao_poly
+ao_lisp_last(struct ao_lisp_cons *cons)
+{
+	ao_poly	l;
+	if (!ao_lisp_check_argc(_ao_lisp_atom_last, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_last, cons, 0, AO_LISP_CONS, 1))
+		return AO_LISP_NIL;
+	l = ao_lisp_arg(cons, 0);
+	while (l) {
+		struct ao_lisp_cons *list = ao_lisp_poly_cons(l);
+		if (!list->cdr)
+			return list->car;
+		l = list->cdr;
+	}
+	return AO_LISP_NIL;
+}
+
+ao_poly
 ao_lisp_quote(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_quote, cons, 1, 1))
@@ -151,15 +229,6 @@ ao_lisp_setq(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_cond(struct ao_lisp_cons *cons)
 {
-	int			argc;
-	struct ao_lisp_cons	*arg;
-
-	argc = 0;
-	for (arg = cons, argc = 0; arg; arg = ao_lisp_poly_cons(arg->cdr), argc++) {
-		if (ao_lisp_poly_type(arg->car) != AO_LISP_CONS)
-			return ao_lisp_error(AO_LISP_INVALID, "%s: invalid type for arg %d",
-					     ao_lisp_poly_atom(_ao_lisp_atom_cond)->name, argc);
-	}
 	ao_lisp_set_cond(cons);
 	return AO_LISP_NIL;
 }
@@ -380,9 +449,14 @@ ao_lisp_greater_equal(struct ao_lisp_cons *cons)
 }
 
 ao_lisp_func_t ao_lisp_builtins[] = {
+	[builtin_lambda] = ao_lisp_lambda,
+	[builtin_lexpr] = ao_lisp_lexpr,
+	[builtin_nlambda] = ao_lisp_nlambda,
+	[builtin_macro] = ao_lisp_macro,
 	[builtin_car] = ao_lisp_car,
 	[builtin_cdr] = ao_lisp_cdr,
 	[builtin_cons] = ao_lisp_cons,
+	[builtin_last] = ao_lisp_last,
 	[builtin_quote] = ao_lisp_quote,
 	[builtin_set] = ao_lisp_set,
 	[builtin_setq] = ao_lisp_setq,

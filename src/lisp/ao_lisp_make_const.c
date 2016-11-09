@@ -33,33 +33,31 @@ struct builtin_func {
 };
 
 struct builtin_func funcs[] = {
-	"car",		AO_LISP_LEXPR,	builtin_car,
-	"cdr",		AO_LISP_LEXPR,	builtin_cdr,
-	"cons",		AO_LISP_LEXPR,	builtin_cons,
-	"quote",	AO_LISP_NLAMBDA,builtin_quote,
-	"set",		AO_LISP_LEXPR,	builtin_set,
-	"setq",		AO_LISP_MACRO,	builtin_setq,
-	"cond",		AO_LISP_NLAMBDA,builtin_cond,
-	"print",	AO_LISP_LEXPR,	builtin_print,
-	"patom",	AO_LISP_LEXPR,	builtin_patom,
-	"+",		AO_LISP_LEXPR,	builtin_plus,
-	"-",		AO_LISP_LEXPR,	builtin_minus,
-	"*",		AO_LISP_LEXPR,	builtin_times,
-	"/",		AO_LISP_LEXPR,	builtin_divide,
-	"%",		AO_LISP_LEXPR,	builtin_mod,
-	"=",		AO_LISP_LEXPR,	builtin_equal,
-	"<",		AO_LISP_LEXPR,	builtin_less,
-	">",		AO_LISP_LEXPR,	builtin_greater,
-	"<=",		AO_LISP_LEXPR,	builtin_less_equal,
-	">=",		AO_LISP_LEXPR,	builtin_greater_equal,
+	"lambda",	AO_LISP_FUNC_NLAMBDA,	builtin_lambda,
+	"lexpr",	AO_LISP_FUNC_NLAMBDA,	builtin_lexpr,
+	"nlambda",	AO_LISP_FUNC_NLAMBDA,	builtin_nlambda,
+	"macro",	AO_LISP_FUNC_NLAMBDA,	builtin_macro,
+	"car",		AO_LISP_FUNC_LAMBDA,	builtin_car,
+	"cdr",		AO_LISP_FUNC_LAMBDA,	builtin_cdr,
+	"cons",		AO_LISP_FUNC_LAMBDA,	builtin_cons,
+	"last",		AO_LISP_FUNC_LAMBDA,	builtin_last,
+	"quote",	AO_LISP_FUNC_NLAMBDA,	builtin_quote,
+	"set",		AO_LISP_FUNC_LAMBDA,	builtin_set,
+	"setq",		AO_LISP_FUNC_MACRO,	builtin_setq,
+	"cond",		AO_LISP_FUNC_NLAMBDA,	builtin_cond,
+	"print",	AO_LISP_FUNC_LEXPR,	builtin_print,
+	"patom",	AO_LISP_FUNC_LEXPR,	builtin_patom,
+	"+",		AO_LISP_FUNC_LEXPR,	builtin_plus,
+	"-",		AO_LISP_FUNC_LEXPR,	builtin_minus,
+	"*",		AO_LISP_FUNC_LEXPR,	builtin_times,
+	"/",		AO_LISP_FUNC_LEXPR,	builtin_divide,
+	"%",		AO_LISP_FUNC_LEXPR,	builtin_mod,
+	"=",		AO_LISP_FUNC_LEXPR,	builtin_equal,
+	"<",		AO_LISP_FUNC_LEXPR,	builtin_less,
+	">",		AO_LISP_FUNC_LEXPR,	builtin_greater,
+	"<=",		AO_LISP_FUNC_LEXPR,	builtin_less_equal,
+	">=",		AO_LISP_FUNC_LEXPR,	builtin_greater_equal,
 };
-
-ao_poly
-ao_lisp_set_cond(struct ao_lisp_cons *c)
-{
-	(void) c;
-	return AO_LISP_NIL;
-}
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])
 
@@ -90,19 +88,18 @@ int
 main(int argc, char **argv)
 {
 	int	f, o, i;
-	ao_poly	atom, val;
+	ao_poly	sexpr, val;
 	struct ao_lisp_atom	*a;
 	struct ao_lisp_builtin	*b;
 	int	in_atom;
 
 	printf("/*\n");
 	printf(" * Generated file, do not edit\n");
-	ao_lisp_root_add(&ao_lisp_frame_type, &globals);
-	globals = ao_lisp_frame_new(0);
 	for (f = 0; f < N_FUNC; f++) {
 		b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
 		a = ao_lisp_atom_intern(funcs[f].name);
-		globals = ao_lisp_frame_add(globals, ao_lisp_atom_poly(a), ao_lisp_builtin_poly(b));
+		ao_lisp_atom_set(ao_lisp_atom_poly(a),
+				 ao_lisp_builtin_poly(b));
 	}
 
 	/* atoms for syntax */
@@ -110,23 +107,25 @@ main(int argc, char **argv)
 		(void) ao_lisp_atom_intern(atoms[i]);
 
 	/* boolean constants */
-	a = ao_lisp_atom_intern("nil");
-	globals = ao_lisp_frame_add(globals, ao_lisp_atom_poly(a), AO_LISP_NIL);
+	ao_lisp_atom_set(ao_lisp_atom_poly(ao_lisp_atom_intern("nil")),
+			 AO_LISP_NIL);
 	a = ao_lisp_atom_intern("t");
-	globals = ao_lisp_frame_add(globals, ao_lisp_atom_poly(a), ao_lisp_atom_poly(a));
+	ao_lisp_atom_set(ao_lisp_atom_poly(a),
+			 ao_lisp_atom_poly(a));
 
 	for (;;) {
-		atom = ao_lisp_read();
-		if (!atom)
+		sexpr = ao_lisp_read();
+		if (!sexpr)
 			break;
-		val = ao_lisp_read();
-		if (!val)
-			break;
-		if (ao_lisp_poly_type(atom) != AO_LISP_ATOM) {
-			fprintf(stderr, "input must be atom val pairs\n");
+		printf ("sexpr: ");
+		ao_lisp_poly_print(sexpr);
+		printf("\n");
+		val = ao_lisp_eval(sexpr);
+		if (ao_lisp_exception)
 			exit(1);
-		}
-		globals = ao_lisp_frame_add(globals, atom, val);
+		printf("\t");
+		ao_lisp_poly_print(val);
+		printf("\n");
 	}
 
 	/* Reduce to referenced values */
@@ -136,7 +135,7 @@ main(int argc, char **argv)
 	printf("#define AO_LISP_POOL_CONST %d\n", ao_lisp_top);
 	printf("extern const uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));\n");
 	printf("#define ao_builtin_atoms 0x%04x\n", ao_lisp_atom_poly(ao_lisp_atoms));
-	printf("#define ao_builtin_frame 0x%04x\n", ao_lisp_frame_poly(globals));
+	printf("#define ao_builtin_frame 0x%04x\n", ao_lisp_frame_poly(ao_lisp_frame_global));
 
 	for (a = ao_lisp_atoms; a; a = ao_lisp_poly_atom(a->next)) {
 		char	*n = a->name, c;

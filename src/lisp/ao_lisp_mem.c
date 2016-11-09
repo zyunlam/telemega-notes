@@ -262,6 +262,7 @@ static const struct ao_lisp_type const *ao_lisp_types[AO_LISP_NUM_TYPE] = {
 	[AO_LISP_ATOM] = &ao_lisp_atom_type,
 	[AO_LISP_BUILTIN] = &ao_lisp_builtin_type,
 	[AO_LISP_FRAME] = &ao_lisp_frame_type,
+	[AO_LISP_LAMBDA] = &ao_lisp_lambda_type,
 };
 
 

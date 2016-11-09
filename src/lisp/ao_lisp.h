@@ -42,7 +42,9 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_car 	_atom("car")
 #define _ao_lisp_atom_cdr	_atom("cdr")
 #define _ao_lisp_atom_cons	_atom("cons")
+#define _ao_lisp_atom_last	_atom("last")
 #define _ao_lisp_atom_cond	_atom("cond")
+#define _ao_lisp_atom_lambda	_atom("lambda")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
@@ -66,7 +68,8 @@ extern uint8_t		ao_lisp_pool[AO_LISP_POOL];
 #define AO_LISP_ATOM		4
 #define AO_LISP_BUILTIN		5
 #define AO_LISP_FRAME		6
-#define AO_LISP_NUM_TYPE	7
+#define AO_LISP_LAMBDA		7
+#define AO_LISP_NUM_TYPE	8
 
 #define AO_LISP_NIL	0
 
@@ -114,8 +117,8 @@ ao_lisp_poly(const void *addr, ao_poly type) {
 }
 
 struct ao_lisp_type {
-	void	(*mark)(void *addr);
 	int	(*size)(void *addr);
+	void	(*mark)(void *addr);
 	void	(*move)(void *addr);
 };
 
@@ -153,10 +156,47 @@ ao_lisp_frame_poly(struct ao_lisp_frame *frame) {
 	return ao_lisp_poly(frame, AO_LISP_OTHER);
 }
 
-#define AO_LISP_LAMBDA	0
-#define AO_LISP_NLAMBDA	1
-#define AO_LISP_MACRO	2
-#define AO_LISP_LEXPR	3
+struct ao_lisp_stack {
+	ao_poly			prev;
+	uint8_t			state;
+	uint8_t			macro;
+	ao_poly			sexprs;
+	ao_poly			values;
+	ao_poly			values_tail;
+	ao_poly			frame;
+	ao_poly			macro_frame;
+	ao_poly			list;
+};
+
+enum eval_state {
+	eval_sexpr,
+	eval_val,
+	eval_formal,
+	eval_exec,
+	eval_lambda_done,
+	eval_cond,
+	eval_cond_test
+};
+
+static inline struct ao_lisp_stack *
+ao_lisp_poly_stack(ao_poly p)
+{
+	return ao_lisp_ref(p);
+}
+
+static inline ao_poly
+ao_lisp_stack_poly(struct ao_lisp_stack *stack)
+{
+	return ao_lisp_poly(stack, AO_LISP_OTHER);
+}
+
+extern struct ao_lisp_stack	*ao_lisp_stack;
+extern ao_poly			ao_lisp_v;
+
+#define AO_LISP_FUNC_LAMBDA	0
+#define AO_LISP_FUNC_NLAMBDA	1
+#define AO_LISP_FUNC_MACRO	2
+#define AO_LISP_FUNC_LEXPR	3
 
 struct ao_lisp_builtin {
 	uint8_t		type;
@@ -165,9 +205,14 @@ struct ao_lisp_builtin {
 };
 
 enum ao_lisp_builtin_id {
+	builtin_lambda,
+	builtin_lexpr,
+	builtin_nlambda,
+	builtin_macro,
 	builtin_car,
 	builtin_cdr,
 	builtin_cons,
+	builtin_last,
 	builtin_quote,
 	builtin_set,
 	builtin_setq,
@@ -184,7 +229,7 @@ enum ao_lisp_builtin_id {
 	builtin_greater,
 	builtin_less_equal,
 	builtin_greater_equal,
-	builtin_last
+	_builtin_last
 };
 
 typedef ao_poly (*ao_lisp_func_t)(struct ao_lisp_cons *cons);
@@ -195,6 +240,25 @@ static inline ao_lisp_func_t
 ao_lisp_func(struct ao_lisp_builtin *b)
 {
 	return ao_lisp_builtins[b->func];
+}
+
+struct ao_lisp_lambda {
+	uint8_t		type;
+	uint8_t		args;
+	ao_poly		code;
+	ao_poly		frame;
+};
+
+static inline struct ao_lisp_lambda *
+ao_lisp_poly_lambda(ao_poly poly)
+{
+	return ao_lisp_ref(poly);
+}
+
+static inline ao_poly
+ao_lisp_lambda_poly(struct ao_lisp_lambda *lambda)
+{
+	return ao_lisp_poly(lambda, AO_LISP_OTHER);
 }
 
 static inline void *
@@ -360,9 +424,9 @@ ao_lisp_string_patom(ao_poly s);
 /* atom */
 extern const struct ao_lisp_type ao_lisp_atom_type;
 
-extern struct ao_lisp_atom *ao_lisp_atoms;
-
-extern struct ao_lisp_frame *ao_lisp_frame_current;
+extern struct ao_lisp_atom	*ao_lisp_atoms;
+extern struct ao_lisp_frame	*ao_lisp_frame_global;
+extern struct ao_lisp_frame	*ao_lisp_frame_current;
 
 void
 ao_lisp_atom_print(ao_poly a);
@@ -420,6 +484,9 @@ ao_lisp_check_argt(ao_poly name, struct ao_lisp_cons *cons, int argc, int type, 
 ao_poly
 ao_lisp_arg(struct ao_lisp_cons *cons, int argc);
 
+char *
+ao_lisp_args_name(uint8_t args);
+
 /* read */
 ao_poly
 ao_lisp_read(void);
@@ -440,9 +507,69 @@ ao_lisp_frame_new(int num);
 struct ao_lisp_frame *
 ao_lisp_frame_add(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val);
 
+void
+ao_lisp_frame_print(ao_poly p);
+
+/* lambda */
+extern const struct ao_lisp_type ao_lisp_lambda_type;
+
+struct ao_lisp_lambda *
+ao_lisp_lambda_new(ao_poly cons);
+
+void
+ao_lisp_lambda_print(ao_poly lambda);
+
+ao_poly
+ao_lisp_lambda(struct ao_lisp_cons *cons);
+
+ao_poly
+ao_lisp_lexpr(struct ao_lisp_cons *cons);
+
+ao_poly
+ao_lisp_nlambda(struct ao_lisp_cons *cons);
+
+ao_poly
+ao_lisp_macro(struct ao_lisp_cons *cons);
+
+ao_poly
+ao_lisp_lambda_eval(struct ao_lisp_lambda *lambda,
+		    struct ao_lisp_cons *cons);
+
 /* error */
+
+void
+ao_lisp_stack_print(void);
 
 ao_poly
 ao_lisp_error(int error, char *format, ...);
+
+/* debugging macros */
+
+#if DBG_EVAL
+#define DBG_CODE	1
+int ao_lisp_stack_depth;
+#define DBG_DO(a)	a
+#define DBG_INDENT()	do { int _s; for(_s = 0; _s < ao_lisp_stack_depth; _s++) printf("  "); } while(0)
+#define DBG_IN()	(++ao_lisp_stack_depth)
+#define DBG_OUT()	(--ao_lisp_stack_depth)
+#define DBG_RESET()	(ao_lisp_stack_depth = 0)
+#define DBG(...) 	printf(__VA_ARGS__)
+#define DBGI(...)	do { DBG("%4d: ", __LINE__); DBG_INDENT(); DBG(__VA_ARGS__); } while (0)
+#define DBG_CONS(a)	ao_lisp_cons_print(ao_lisp_cons_poly(a))
+#define DBG_POLY(a)	ao_lisp_poly_print(a)
+#define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_lisp_pool) : -1)
+#define DBG_STACK()	ao_lisp_stack_print()
+#else
+#define DBG_DO(a)
+#define DBG_INDENT()
+#define DBG_IN()
+#define DBG_OUT()
+#define DBG(...)
+#define DBGI(...)
+#define DBG_CONS(a)
+#define DBG_POLY(a)
+#define DBG_RESET()
+#define DBG_STACK()
+#endif
 
 #endif /* _AO_LISP_H_ */
