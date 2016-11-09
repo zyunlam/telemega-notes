@@ -134,7 +134,7 @@ ao_lisp_atom_get(ao_poly atom)
 #endif
 	if (ref)
 		return *ref;
-	return AO_LISP_NIL;
+	return ao_lisp_error(AO_LISP_UNDEFINED, "undefined atom %s", ao_lisp_poly_atom(atom)->name);
 }
 
 ao_poly
