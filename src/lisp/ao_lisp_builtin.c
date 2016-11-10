@@ -48,6 +48,8 @@ char *ao_lisp_args_name(uint8_t args) {
 }
 #else
 static const ao_poly builtin_names[] = {
+	[builtin_eval] = _ao_lisp_atom_eval,
+	[builtin_read] = _ao_lisp_atom_read,
 	[builtin_lambda] = _ao_lisp_atom_lambda,
 	[builtin_lexpr] = _ao_lisp_atom_lexpr,
 	[builtin_nlambda] = _ao_lisp_atom_nlambda,
@@ -60,6 +62,8 @@ static const ao_poly builtin_names[] = {
 	[builtin_set] = _ao_lisp_atom_set,
 	[builtin_setq] = _ao_lisp_atom_setq,
 	[builtin_cond] = _ao_lisp_atom_cond,
+	[builtin_progn] = _ao_lisp_atom_progn,
+	[builtin_while] = _ao_lisp_atom_while,
 	[builtin_print] = _ao_lisp_atom_print,
 	[builtin_patom] = _ao_lisp_atom_patom,
 	[builtin_plus] = _ao_lisp_atom_2b,
@@ -232,6 +236,22 @@ ao_poly
 ao_lisp_cond(struct ao_lisp_cons *cons)
 {
 	ao_lisp_set_cond(cons);
+	return AO_LISP_NIL;
+}
+
+ao_poly
+ao_lisp_progn(struct ao_lisp_cons *cons)
+{
+	ao_lisp_stack->state = eval_progn;
+	ao_lisp_stack->sexprs = ao_lisp_cons_poly(cons);
+	return AO_LISP_NIL;
+}
+
+ao_poly
+ao_lisp_while(struct ao_lisp_cons *cons)
+{
+	ao_lisp_stack->state = eval_while;
+	ao_lisp_stack->sexprs = ao_lisp_cons_poly(cons);
 	return AO_LISP_NIL;
 }
 
@@ -476,7 +496,26 @@ ao_lisp_delay(struct ao_lisp_cons *cons)
 	return delay;
 }
 
+ao_poly
+ao_lisp_do_eval(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_eval, cons, 1, 1))
+		return AO_LISP_NIL;
+	ao_lisp_stack->state = eval_sexpr;
+	return cons->car;
+}
+
+ao_poly
+ao_lisp_do_read(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_read, cons, 0, 0))
+		return AO_LISP_NIL;
+	return ao_lisp_read();
+}
+
 const ao_lisp_func_t ao_lisp_builtins[] = {
+	[builtin_eval] = ao_lisp_do_eval,
+	[builtin_read] = ao_lisp_do_read,
 	[builtin_lambda] = ao_lisp_lambda,
 	[builtin_lexpr] = ao_lisp_lexpr,
 	[builtin_nlambda] = ao_lisp_nlambda,
@@ -489,6 +528,8 @@ const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_set] = ao_lisp_set,
 	[builtin_setq] = ao_lisp_setq,
 	[builtin_cond] = ao_lisp_cond,
+	[builtin_progn] = ao_lisp_progn,
+	[builtin_while] = ao_lisp_while,
 	[builtin_print] = ao_lisp_print,
 	[builtin_patom] = ao_lisp_patom,
 	[builtin_plus] = ao_lisp_plus,
