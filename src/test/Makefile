@@ -88,11 +88,8 @@ ao_ms5607_convert_test: ao_ms5607_convert_test.c ao_ms5607_convert_8051.c ao_int
 ao_quaternion_test: ao_quaternion_test.c ao_quaternion.h
 	cc $(CFLAGS) -o $@ ao_quaternion_test.c -lm
 
-
-#AO_LISP_OBJS = ao_lisp_test.o ao_lisp_mem.o ao_lisp_lex.o ao_lisp_cons.o ao_lisp_string.o ao_lisp_atom.o ao_lisp_int.o ao_lisp_prim.o ao_lisp_eval.o ao_lisp_poly.o ao_lisp_builtin.o ao_lisp_read.o
-
 AO_LISP_OBJS = ao_lisp_test.o ao_lisp_mem.o  ao_lisp_cons.o ao_lisp_string.o \
-	ao_lisp_atom.o ao_lisp_int.o ao_lisp_prim.o ao_lisp_eval.o ao_lisp_poly.o \
+	ao_lisp_atom.o ao_lisp_int.o ao_lisp_eval.o ao_lisp_poly.o \
 	ao_lisp_builtin.o ao_lisp_read.o ao_lisp_rep.o ao_lisp_frame.o \
 	ao_lisp_lambda.o ao_lisp_error.o
 

@@ -14,9 +14,13 @@
 (setq 1+ (lambda (x) (+ x 1)))
 (setq 1- (lambda (x) (- x 1)))
 
-					; define a variable without returning the value
+					;
+					; Define a variable without returning the value
+					; Useful when defining functions to avoid
+					; having lots of output generated
+					;
 
-(set 'def (macro (def-param)
+(setq def (macro (def-param)
 		 (list
 		  'progn
 		  (list
@@ -126,4 +130,31 @@
 		 ()
 		 )
 		)
+     )
+
+					;
+					; A slightly more convenient form
+					; for defining lambdas.
+					;
+					; (defun <name> (<params>) s-exprs)
+					;
+
+(def defun (macro (defun-param)
+		    (let ((name (car defun-param))
+			  (args (cadr defun-param))
+			  (exprs (cdr (cdr defun-param))))
+		      (list
+		       def
+		       name
+		       (list
+			'lambda
+			args
+			(cond ((cdr exprs)
+			       (cons progn exprs))
+			      ((car exprs))
+			      )
+			)
+		       )
+		      )
+		    )
      )

@@ -57,19 +57,11 @@ struct builtin_func funcs[] = {
 	">",		AO_LISP_FUNC_LEXPR,	builtin_greater,
 	"<=",		AO_LISP_FUNC_LEXPR,	builtin_less_equal,
 	">=",		AO_LISP_FUNC_LEXPR,	builtin_greater_equal,
+	"delay",	AO_LISP_FUNC_LAMBDA,	builtin_delay,
+	"led",		AO_LISP_FUNC_LEXPR,	builtin_led,
 };
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])
-
-/* Syntactic atoms */
-char *atoms[] = {
-	"lambda",
-	"nlambda",
-	"lexpr",
-	"macro"
-};
-
-#define N_ATOM (sizeof atoms / sizeof atoms[0])
 
 struct ao_lisp_frame	*globals;
 
@@ -101,10 +93,6 @@ main(int argc, char **argv)
 		ao_lisp_atom_set(ao_lisp_atom_poly(a),
 				 ao_lisp_builtin_poly(b));
 	}
-
-	/* atoms for syntax */
-	for (i = 0; i < N_ATOM; i++)
-		(void) ao_lisp_atom_intern(atoms[i]);
 
 	/* boolean constants */
 	ao_lisp_atom_set(ao_lisp_atom_poly(ao_lisp_atom_intern("nil")),
