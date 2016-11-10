@@ -73,6 +73,7 @@ static const char *state_names[] = {
 	"exec",
 	"cond",
 	"cond_test",
+	"progn",
 };
 
 void

@@ -33,6 +33,8 @@ struct builtin_func {
 };
 
 struct builtin_func funcs[] = {
+	"eval",		AO_LISP_FUNC_LAMBDA,	builtin_eval,
+	"read",		AO_LISP_FUNC_LAMBDA,	builtin_read,
 	"lambda",	AO_LISP_FUNC_NLAMBDA,	builtin_lambda,
 	"lexpr",	AO_LISP_FUNC_NLAMBDA,	builtin_lexpr,
 	"nlambda",	AO_LISP_FUNC_NLAMBDA,	builtin_nlambda,
@@ -45,6 +47,8 @@ struct builtin_func funcs[] = {
 	"set",		AO_LISP_FUNC_LAMBDA,	builtin_set,
 	"setq",		AO_LISP_FUNC_MACRO,	builtin_setq,
 	"cond",		AO_LISP_FUNC_NLAMBDA,	builtin_cond,
+	"progn",	AO_LISP_FUNC_NLAMBDA,	builtin_progn,
+	"while",	AO_LISP_FUNC_NLAMBDA,	builtin_while,
 	"print",	AO_LISP_FUNC_LEXPR,	builtin_print,
 	"patom",	AO_LISP_FUNC_LEXPR,	builtin_patom,
 	"+",		AO_LISP_FUNC_LEXPR,	builtin_plus,

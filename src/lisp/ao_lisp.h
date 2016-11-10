@@ -40,6 +40,8 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_lambda	_atom("lambda")
 #define _ao_lisp_atom_led	_atom("led")
 #define _ao_lisp_atom_delay	_atom("delay")
+#define _ao_lisp_atom_eval	_atom("eval")
+#define _ao_lisp_atom_read	_atom("read")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
@@ -158,7 +160,10 @@ enum eval_state {
 	eval_formal,
 	eval_exec,
 	eval_cond,
-	eval_cond_test
+	eval_cond_test,
+	eval_progn,
+	eval_while,
+	eval_while_test,
 };
 
 struct ao_lisp_stack {
@@ -198,6 +203,8 @@ struct ao_lisp_builtin {
 };
 
 enum ao_lisp_builtin_id {
+	builtin_eval,
+	builtin_read,
 	builtin_lambda,
 	builtin_lexpr,
 	builtin_nlambda,
@@ -210,6 +217,8 @@ enum ao_lisp_builtin_id {
 	builtin_set,
 	builtin_setq,
 	builtin_cond,
+	builtin_progn,
+	builtin_while,
 	builtin_print,
 	builtin_patom,
 	builtin_plus,

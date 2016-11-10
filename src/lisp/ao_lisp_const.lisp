@@ -7,7 +7,7 @@
 
 					; evaluate a list of sexprs
 
-(setq progn (lexpr (l) (last l)))
+;(setq progn (lexpr (l) (last l)))
 
 					; simple math operators
 

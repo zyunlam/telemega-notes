@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-#define DBG_EVAL 0
+#define DBG_EVAL 1
 #include "ao_lisp.h"
 #include <assert.h>
 
@@ -478,6 +478,85 @@ ao_lisp_eval_cond_test(void)
 	return 1;
 }
 
+/*
+ * Evaluate a list of sexprs, returning the value from the last one.
+ *
+ * ao_lisp_progn records the list in stack->sexprs, so we just need to
+ * walk that list. Set ao_lisp_v to the car of the list and jump to
+ * eval_sexpr. When that's done, it will land in eval_val. For all but
+ * the last, leave a stack frame with eval_progn set so that we come
+ * back here. For the last, don't add a stack frame so that we can
+ * just continue on.
+ */
+static int
+ao_lisp_eval_progn(void)
+{
+	DBGI("progn: "); DBG_POLY(ao_lisp_v); DBG(" sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
+	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
+
+	if (!ao_lisp_stack->sexprs) {
+		ao_lisp_v = AO_LISP_NIL;
+		ao_lisp_stack->state = eval_val;
+	} else {
+		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->car;
+		ao_lisp_stack->sexprs = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->cdr;
+		if (ao_lisp_stack->sexprs) {
+			ao_lisp_stack->state = eval_progn;
+			if (!ao_lisp_stack_push())
+				return 0;
+		}
+		ao_lisp_stack->state = eval_sexpr;
+	}
+	return 1;
+}
+
+/*
+ * Conditionally execute a list of sexprs while the first is true
+ */
+static int
+ao_lisp_eval_while(void)
+{
+	DBGI("while: "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
+	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
+
+	if (!ao_lisp_stack->sexprs) {
+		ao_lisp_v = AO_LISP_NIL;
+		ao_lisp_stack->state = eval_val;
+	} else {
+		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->car;
+		ao_lisp_stack->state = eval_while_test;
+		if (!ao_lisp_stack_push())
+			return 0;
+		ao_lisp_stack->state = eval_sexpr;
+	}
+	return 1;
+}
+
+/*
+ * Check the while condition, terminate the loop if nil. Otherwise keep going
+ */
+static int
+ao_lisp_eval_while_test(void)
+{
+	DBGI("while_test: "); DBG_POLY(ao_lisp_v); DBG(" sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
+	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
+
+	if (ao_lisp_v) {
+		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->cdr;
+		if (ao_lisp_v)
+			ao_lisp_v = ao_lisp_poly_cons(ao_lisp_v)->car;
+		ao_lisp_stack->state = eval_while;
+		if (!ao_lisp_stack_push())
+			return 0;
+	}
+	else
+		ao_lisp_stack->state = eval_val;
+	return 1;
+}
+
 static int (*const evals[])(void) = {
 	[eval_sexpr] = ao_lisp_eval_sexpr,
 	[eval_val] = ao_lisp_eval_val,
@@ -485,6 +564,9 @@ static int (*const evals[])(void) = {
 	[eval_exec] = ao_lisp_eval_exec,
 	[eval_cond] = ao_lisp_eval_cond,
 	[eval_cond_test] = ao_lisp_eval_cond_test,
+	[eval_progn] = ao_lisp_eval_progn,
+	[eval_while] = ao_lisp_eval_while,
+	[eval_while_test] = ao_lisp_eval_while_test,
 };
 
 ao_poly
