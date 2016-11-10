@@ -156,19 +156,7 @@ lex_get()
 		c = lex_unget_c;
 		lex_unget_c = 0;
 	} else {
-#if AO_LISP_ALTOS
-		static uint8_t	at_eol;
-
-		if (at_eol) {
-			ao_cmd_readline();
-			at_eol = 0;
-		}
-		c = ao_cmd_lex();
-		if (c == '\n')
-			at_eol = 1;
-#else
-		c = getchar();
-#endif
+		c = ao_lisp_getc();
 	}
 	return c;
 }

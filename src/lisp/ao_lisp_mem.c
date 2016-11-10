@@ -331,7 +331,7 @@ ao_lisp_collect(void)
 			move_object();
 			DBG("\tbusy size %d\n", move_size);
 			if (move_size == 0)
-				abort();
+				ao_lisp_abort();
 			clear_object(ao_lisp_busy, move_old, move_size);
 			mark_object(ao_lisp_busy, move_new, move_size);
 			if (busy_object(ao_lisp_cons, move_old)) {
@@ -431,7 +431,7 @@ ao_lisp_move(const struct ao_lisp_type *type, void **ref)
 #endif
 	DBG_MOVE("object %d\n", DBG_OFFSET(addr));
 	if (!AO_LISP_IS_POOL(a))
-		abort();
+		ao_lisp_abort();
 	DBG_MOVE_IN();
 	addr = check_move(addr, size);
 	if (addr != *ref)
@@ -495,7 +495,7 @@ ao_lisp_poly_move(ao_poly *ref, uint8_t do_note_cons)
 			type = ao_lisp_other_type(ao_lisp_move_map(ao_lisp_poly_other(p)));
 
 		if (type >= AO_LISP_NUM_TYPE)
-			abort();
+			ao_lisp_abort();
 
 		lisp_type = ao_lisp_types[type];
 		if (!lisp_type)
@@ -601,7 +601,7 @@ ao_lisp_root_add(const struct ao_lisp_type *type, void *addr)
 			return 1;
 		}
 	}
-	abort();
+	ao_lisp_abort();
 	return 0;
 }
 

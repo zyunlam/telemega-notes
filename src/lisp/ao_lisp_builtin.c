@@ -72,11 +72,13 @@ static const ao_poly builtin_names[] = {
 	[builtin_greater] = _ao_lisp_atom_3e,
 	[builtin_less_equal] = _ao_lisp_atom_3c3d,
 	[builtin_greater_equal] = _ao_lisp_atom_3e3d,
+	[builtin_delay] = _ao_lisp_atom_delay,
+	[builtin_led] = _ao_lisp_atom_led,
 };
 
 static char *
 ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {
-	if (0 <= b && b < _builtin_last)
+	if (b < _builtin_last)
 		return ao_lisp_poly_atom(builtin_names[b])->name;
 	return "???";
 }
@@ -448,7 +450,33 @@ ao_lisp_greater_equal(struct ao_lisp_cons *cons)
 	return ao_lisp_compare(cons, builtin_greater_equal);
 }
 
-ao_lisp_func_t ao_lisp_builtins[] = {
+ao_poly
+ao_lisp_led(struct ao_lisp_cons *cons)
+{
+	ao_poly led;
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_INT, 0))
+		return AO_LISP_NIL;
+	led = ao_lisp_arg(cons, 0);
+	ao_lisp_os_led(ao_lisp_poly_int(led));
+	return led;
+}
+
+ao_poly
+ao_lisp_delay(struct ao_lisp_cons *cons)
+{
+	ao_poly delay;
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_INT, 0))
+		return AO_LISP_NIL;
+	delay = ao_lisp_arg(cons, 0);
+	ao_lisp_os_delay(ao_lisp_poly_int(delay));
+	return delay;
+}
+
+const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_lambda] = ao_lisp_lambda,
 	[builtin_lexpr] = ao_lisp_lexpr,
 	[builtin_nlambda] = ao_lisp_nlambda,
@@ -472,6 +500,8 @@ ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_less] = ao_lisp_less,
 	[builtin_greater] = ao_lisp_greater,
 	[builtin_less_equal] = ao_lisp_less_equal,
-	[builtin_greater_equal] = ao_lisp_greater_equal
+	[builtin_greater_equal] = ao_lisp_greater_equal,
+	[builtin_led] = ao_lisp_led,
+	[builtin_delay] = ao_lisp_delay,
 };
 

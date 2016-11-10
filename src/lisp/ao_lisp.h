@@ -15,17 +15,10 @@
 #ifndef _AO_LISP_H_
 #define _AO_LISP_H_
 
-#include <stdlib.h>
-
-#if !defined(AO_LISP_TEST) && !defined(AO_LISP_MAKE_CONST)
-#include <ao.h>
-#define AO_LISP_ALTOS	1
-#define abort() ao_panic(1)
-#endif
-
 #include <stdint.h>
 #include <string.h>
-#include <stdio.h>
+//#include <stdio.h>
+#include <ao_lisp_os.h>
 
 #ifdef AO_LISP_MAKE_CONST
 #define AO_LISP_POOL_CONST	16384
@@ -45,6 +38,8 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_last	_atom("last")
 #define _ao_lisp_atom_cond	_atom("cond")
 #define _ao_lisp_atom_lambda	_atom("lambda")
+#define _ao_lisp_atom_led	_atom("led")
+#define _ao_lisp_atom_delay	_atom("delay")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
@@ -99,7 +94,7 @@ ao_lisp_is_const(ao_poly poly) {
 static inline void *
 ao_lisp_ref(ao_poly poly) {
 	if (poly == 0xBEEF)
-		abort();
+		ao_lisp_abort();
 	if (poly == AO_LISP_NIL)
 		return NULL;
 	if (poly & AO_LISP_CONST)
@@ -227,12 +222,14 @@ enum ao_lisp_builtin_id {
 	builtin_greater,
 	builtin_less_equal,
 	builtin_greater_equal,
+	builtin_delay,
+	builtin_led,
 	_builtin_last
 };
 
 typedef ao_poly (*ao_lisp_func_t)(struct ao_lisp_cons *cons);
 
-extern ao_lisp_func_t	ao_lisp_builtins[];
+extern const ao_lisp_func_t	ao_lisp_builtins[];
 
 static inline ao_lisp_func_t
 ao_lisp_func(struct ao_lisp_builtin *b)

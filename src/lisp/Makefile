@@ -14,7 +14,6 @@ SRCS=\
 	ao_lisp_atom.c \
 	ao_lisp_int.c \
 	ao_lisp_poly.c \
-	ao_lisp_prim.c \
 	ao_lisp_builtin.c \
 	ao_lisp_read.c \
 	ao_lisp_frame.c \
@@ -24,7 +23,7 @@ SRCS=\
 
 OBJS=$(SRCS:.c=.o)
 
-CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g
+CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g -I.
 
 HDRS=\
 	ao_lisp.h \
