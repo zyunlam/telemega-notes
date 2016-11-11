@@ -105,20 +105,12 @@ main(int argc, char **argv)
 	ao_lisp_atom_set(ao_lisp_atom_poly(a),
 			 ao_lisp_atom_poly(a));
 
-	for (;;) {
-		sexpr = ao_lisp_read();
-		if (!sexpr)
-			break;
-		printf ("sexpr: ");
-		ao_lisp_poly_print(sexpr);
-		printf("\n");
-		val = ao_lisp_eval(sexpr);
-		if (ao_lisp_exception)
-			exit(1);
-		printf("\t");
-		ao_lisp_poly_print(val);
-		printf("\n");
-	}
+	/* end of file value */
+	a = ao_lisp_atom_intern("eof");
+	ao_lisp_atom_set(ao_lisp_atom_poly(a),
+			 ao_lisp_atom_poly(a));
+
+	ao_lisp_read_eval_print();
 
 	/* Reduce to referenced values */
 	ao_lisp_collect();
