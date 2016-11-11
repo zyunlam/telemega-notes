@@ -34,6 +34,12 @@ static void string_move(void *addr)
 	(void) addr;
 }
 
+const struct ao_lisp_type ao_lisp_string_type = {
+	.mark = string_mark,
+	.size = string_size,
+	.move = string_move,
+};
+
 char *
 ao_lisp_string_new(int len) {
 	char	*a = ao_lisp_alloc(len + 1);
@@ -68,11 +74,47 @@ ao_lisp_string_cat(char *a, char *b)
 	return r;
 }
 
-const struct ao_lisp_type ao_lisp_string_type = {
-	.mark = string_mark,
-	.size = string_size,
-	.move = string_move,
-};
+ao_poly
+ao_lisp_string_pack(struct ao_lisp_cons *cons)
+{
+	int	len = ao_lisp_cons_length(cons);
+	char	*r = ao_lisp_alloc(len + 1);
+	char	*s = r;
+
+	while (cons) {
+		if (ao_lisp_poly_type(cons->car) != AO_LISP_INT)
+			return ao_lisp_error(AO_LISP_INVALID, "non-int passed to pack");
+		*s++ = ao_lisp_poly_int(cons->car);
+		cons = ao_lisp_poly_cons(cons->cdr);
+	}
+	*s++ = 0;
+	return ao_lisp_string_poly(r);
+}
+
+ao_poly
+ao_lisp_string_unpack(char *a)
+{
+	struct ao_lisp_cons	*cons = NULL, *tail = NULL;
+	int			c;
+
+	ao_lisp_root_add(&ao_lisp_cons_type, &cons);
+	ao_lisp_root_add(&ao_lisp_cons_type, &tail);
+	while ((c = *a++)) {
+		struct ao_lisp_cons	*n = ao_lisp_cons_cons(ao_lisp_int_poly(c), NULL);
+		if (!n) {
+			cons = NULL;
+			break;
+		}
+		if (tail)
+			tail->cdr = ao_lisp_cons_poly(n);
+		else
+			cons = n;
+		tail = n;
+	}
+	ao_lisp_root_clear(&cons);
+	ao_lisp_root_clear(&tail);
+	return ao_lisp_cons_poly(cons);
+}
 
 void
 ao_lisp_string_print(ao_poly p)
