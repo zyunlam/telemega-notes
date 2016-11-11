@@ -107,3 +107,14 @@ ao_lisp_cons_patom(ao_poly c)
 		cons = ao_lisp_poly_cons(cons->cdr);
 	}
 }
+
+int
+ao_lisp_cons_length(struct ao_lisp_cons *cons)
+{
+	int	len = 0;
+	while (cons) {
+		len++;
+		cons = ao_lisp_poly_cons(cons->cdr);
+	}
+	return len;
+}

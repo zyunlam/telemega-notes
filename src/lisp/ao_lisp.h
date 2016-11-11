@@ -36,10 +36,14 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_cdr	_atom("cdr")
 #define _ao_lisp_atom_cons	_atom("cons")
 #define _ao_lisp_atom_last	_atom("last")
+#define _ao_lisp_atom_length	_atom("length")
 #define _ao_lisp_atom_cond	_atom("cond")
 #define _ao_lisp_atom_lambda	_atom("lambda")
 #define _ao_lisp_atom_led	_atom("led")
 #define _ao_lisp_atom_delay	_atom("delay")
+#define _ao_lisp_atom_pack	_atom("pack")
+#define _ao_lisp_atom_unpack	_atom("unpack")
+#define _ao_lisp_atom_flush	_atom("flush")
 #define _ao_lisp_atom_eval	_atom("eval")
 #define _ao_lisp_atom_read	_atom("read")
 #define _ao_lisp_atom_eof	_atom("eof")
@@ -215,6 +219,7 @@ enum ao_lisp_builtin_id {
 	builtin_cdr,
 	builtin_cons,
 	builtin_last,
+	builtin_length,
 	builtin_quote,
 	builtin_set,
 	builtin_setq,
@@ -233,6 +238,9 @@ enum ao_lisp_builtin_id {
 	builtin_greater,
 	builtin_less_equal,
 	builtin_greater_equal,
+	builtin_pack,
+	builtin_unpack,
+	builtin_flush,
 	builtin_delay,
 	builtin_led,
 	_builtin_last
@@ -409,6 +417,9 @@ ao_lisp_cons_print(ao_poly);
 void
 ao_lisp_cons_patom(ao_poly);
 
+int
+ao_lisp_cons_length(struct ao_lisp_cons *cons);
+
 /* string */
 extern const struct ao_lisp_type ao_lisp_string_type;
 
@@ -420,6 +431,12 @@ ao_lisp_string_copy(char *a);
 
 char *
 ao_lisp_string_cat(char *a, char *b);
+
+ao_poly
+ao_lisp_string_pack(struct ao_lisp_cons *cons);
+
+ao_poly
+ao_lisp_string_unpack(char *a);
 
 void
 ao_lisp_string_print(ao_poly s);

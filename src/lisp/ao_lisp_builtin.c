@@ -58,6 +58,7 @@ static const ao_poly builtin_names[] = {
 	[builtin_cdr] = _ao_lisp_atom_cdr,
 	[builtin_cons] = _ao_lisp_atom_cons,
 	[builtin_last] = _ao_lisp_atom_last,
+	[builtin_length] = _ao_lisp_atom_length,
 	[builtin_quote] = _ao_lisp_atom_quote,
 	[builtin_set] = _ao_lisp_atom_set,
 	[builtin_setq] = _ao_lisp_atom_setq,
@@ -76,6 +77,9 @@ static const ao_poly builtin_names[] = {
 	[builtin_greater] = _ao_lisp_atom_3e,
 	[builtin_less_equal] = _ao_lisp_atom_3c3d,
 	[builtin_greater_equal] = _ao_lisp_atom_3e3d,
+	[builtin_pack] = _ao_lisp_atom_pack,
+	[builtin_unpack] = _ao_lisp_atom_unpack,
+	[builtin_flush] = _ao_lisp_atom_flush,
 	[builtin_delay] = _ao_lisp_atom_delay,
 	[builtin_led] = _ao_lisp_atom_led,
 };
@@ -198,6 +202,16 @@ ao_lisp_last(struct ao_lisp_cons *cons)
 		l = list->cdr;
 	}
 	return AO_LISP_NIL;
+}
+
+ao_poly
+ao_lisp_length(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_last, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_last, cons, 0, AO_LISP_CONS, 1))
+		return AO_LISP_NIL;
+	return ao_lisp_int_poly(ao_lisp_cons_length(ao_lisp_poly_cons(ao_lisp_arg(cons, 0))));
 }
 
 ao_poly
@@ -471,6 +485,35 @@ ao_lisp_greater_equal(struct ao_lisp_cons *cons)
 }
 
 ao_poly
+ao_lisp_pack(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_pack, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_pack, cons, 0, AO_LISP_CONS, 1))
+		return AO_LISP_NIL;
+	return ao_lisp_string_pack(ao_lisp_poly_cons(ao_lisp_arg(cons, 0)));
+}
+
+ao_poly
+ao_lisp_unpack(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_unpack, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_unpack, cons, 0, AO_LISP_STRING, 0))
+		return AO_LISP_NIL;
+	return ao_lisp_string_unpack(ao_lisp_poly_string(ao_lisp_arg(cons, 0)));
+}
+
+ao_poly
+ao_lisp_flush(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_flush, cons, 0, 0))
+		return AO_LISP_NIL;
+	ao_lisp_os_flush();
+	return _ao_lisp_atom_t;
+}
+
+ao_poly
 ao_lisp_led(struct ao_lisp_cons *cons)
 {
 	ao_poly led;
@@ -524,6 +567,7 @@ const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_cdr] = ao_lisp_cdr,
 	[builtin_cons] = ao_lisp_cons,
 	[builtin_last] = ao_lisp_last,
+	[builtin_length] = ao_lisp_length,
 	[builtin_quote] = ao_lisp_quote,
 	[builtin_set] = ao_lisp_set,
 	[builtin_setq] = ao_lisp_setq,
@@ -542,6 +586,9 @@ const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_greater] = ao_lisp_greater,
 	[builtin_less_equal] = ao_lisp_less_equal,
 	[builtin_greater_equal] = ao_lisp_greater_equal,
+	[builtin_pack] = ao_lisp_pack,
+	[builtin_unpack] = ao_lisp_unpack,
+	[builtin_flush] = ao_lisp_flush,
 	[builtin_led] = ao_lisp_led,
 	[builtin_delay] = ao_lisp_delay,
 };

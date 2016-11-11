@@ -28,6 +28,11 @@ ao_lisp_getc() {
 }
 
 static inline void
+ao_lisp_os_flush() {
+	fflush(stdout);
+}
+
+static inline void
 ao_lisp_abort(void)
 {
 	abort();

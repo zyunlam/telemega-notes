@@ -43,6 +43,7 @@ struct builtin_func funcs[] = {
 	"cdr",		AO_LISP_FUNC_LAMBDA,	builtin_cdr,
 	"cons",		AO_LISP_FUNC_LAMBDA,	builtin_cons,
 	"last",		AO_LISP_FUNC_LAMBDA,	builtin_last,
+	"length",	AO_LISP_FUNC_LAMBDA,	builtin_length,
 	"quote",	AO_LISP_FUNC_NLAMBDA,	builtin_quote,
 	"set",		AO_LISP_FUNC_LAMBDA,	builtin_set,
 	"setq",		AO_LISP_FUNC_MACRO,	builtin_setq,
@@ -61,6 +62,9 @@ struct builtin_func funcs[] = {
 	">",		AO_LISP_FUNC_LEXPR,	builtin_greater,
 	"<=",		AO_LISP_FUNC_LEXPR,	builtin_less_equal,
 	">=",		AO_LISP_FUNC_LEXPR,	builtin_greater_equal,
+	"pack",		AO_LISP_FUNC_LAMBDA,	builtin_pack,
+	"unpack",	AO_LISP_FUNC_LAMBDA,	builtin_unpack,
+	"flush",	AO_LISP_FUNC_LAMBDA,	builtin_flush,
 	"delay",	AO_LISP_FUNC_LAMBDA,	builtin_delay,
 	"led",		AO_LISP_FUNC_LEXPR,	builtin_led,
 };

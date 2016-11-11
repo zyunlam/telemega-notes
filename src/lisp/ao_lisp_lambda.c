@@ -49,17 +49,6 @@ const struct ao_lisp_type ao_lisp_lambda_type = {
 	.move = lambda_move,
 };
 
-static int
-ao_lisp_cons_length(struct ao_lisp_cons *cons)
-{
-	int	len = 0;
-	while (cons) {
-		len++;
-		cons = ao_lisp_poly_cons(cons->cdr);
-	}
-	return len;
-}
-
 void
 ao_lisp_lambda_print(ao_poly poly)
 {

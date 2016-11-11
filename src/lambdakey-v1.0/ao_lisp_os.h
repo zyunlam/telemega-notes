@@ -36,6 +36,12 @@ ao_lisp_getc() {
 }
 
 static inline void
+ao_lisp_os_flush(void)
+{
+	flush();
+}
+
+static inline void
 ao_lisp_abort(void)
 {
 	ao_panic(1);
