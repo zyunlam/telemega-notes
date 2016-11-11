@@ -20,9 +20,8 @@ ao_lisp_read_eval_print(void)
 	ao_poly	in, out = AO_LISP_NIL;
 	for(;;) {
 		in = ao_lisp_read();
-		if (!in)
+		if (in == _ao_lisp_atom_eof)
 			break;
-//		printf ("in: "); ao_lisp_poly_print(in); printf("\n");
 		out = ao_lisp_eval(in);
 		if (ao_lisp_exception) {
 			ao_lisp_exception = 0;
