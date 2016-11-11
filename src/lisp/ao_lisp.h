@@ -510,8 +510,8 @@ ao_lisp_frame_ref(struct ao_lisp_frame *frame, ao_poly atom);
 struct ao_lisp_frame *
 ao_lisp_frame_new(int num);
 
-struct ao_lisp_frame *
-ao_lisp_frame_add(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val);
+int
+ao_lisp_frame_add(struct ao_lisp_frame **frame, ao_poly atom, ao_poly val);
 
 void
 ao_lisp_frame_print(ao_poly p);
@@ -538,8 +538,7 @@ ao_poly
 ao_lisp_macro(struct ao_lisp_cons *cons);
 
 ao_poly
-ao_lisp_lambda_eval(struct ao_lisp_lambda *lambda,
-		    struct ao_lisp_cons *cons);
+ao_lisp_lambda_eval(void);
 
 /* error */
 

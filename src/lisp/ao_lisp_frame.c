@@ -174,8 +174,9 @@ ao_lisp_frame_new(int num)
 }
 
 static struct ao_lisp_frame *
-ao_lisp_frame_realloc(struct ao_lisp_frame *frame, int new_num)
+ao_lisp_frame_realloc(struct ao_lisp_frame **frame_ref, int new_num)
 {
+	struct ao_lisp_frame	*frame = *frame_ref;
 	struct ao_lisp_frame	*new;
 	int			copy;
 
@@ -184,34 +185,45 @@ ao_lisp_frame_realloc(struct ao_lisp_frame *frame, int new_num)
 	new = ao_lisp_frame_new(new_num);
 	if (!new)
 		return NULL;
+	/*
+	 * Re-fetch the frame as it may have moved
+	 * during the allocation
+	 */
+	frame = *frame_ref;
 	copy = new_num;
 	if (copy > frame->num)
 		copy = frame->num;
 	memcpy(new->vals, frame->vals, copy * sizeof (struct ao_lisp_val));
-	if (frame)
-		new->next = frame->next;
+	new->next = frame->next;
 	return new;
 }
 
-struct ao_lisp_frame *
-ao_lisp_frame_add(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val)
+int
+ao_lisp_frame_add(struct ao_lisp_frame **frame_ref, ao_poly atom, ao_poly val)
 {
+	struct ao_lisp_frame *frame = *frame_ref;
 	ao_poly *ref = frame ? ao_lisp_frame_ref(frame, atom) : NULL;
+
 	if (!ref) {
 		int f;
+		ao_lisp_root_poly_add(&atom);
+		ao_lisp_root_poly_add(&val);
 		if (frame) {
 			f = frame->num;
-			frame = ao_lisp_frame_realloc(frame, f + 1);
+			frame = ao_lisp_frame_realloc(frame_ref, f + 1);
 		} else {
 			f = 0;
 			frame = ao_lisp_frame_new(1);
 		}
+		ao_lisp_root_clear(&atom);
+		ao_lisp_root_clear(&val);
 		if (!frame)
-			return NULL;
+			return 0;
+		*frame_ref = frame;
 		DBG ("add atom %s %d, val %d at %d\n", ao_lisp_poly_atom(atom)->name, OFFSET(atom), OFFSET(val), f);
 		frame->vals[f].atom = atom;
 		ref = &frame->vals[f].val;
 	}
 	*ref = val;
-	return frame;
+	return 1;
 }

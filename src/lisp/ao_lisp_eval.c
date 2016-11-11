@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-#define DBG_EVAL 1
+#define DBG_EVAL 0
 #include "ao_lisp.h"
 #include <assert.h>
 
@@ -46,19 +46,20 @@ stack_move(void *addr)
 	struct ao_lisp_stack	*stack = addr;
 
 	while (stack) {
-		void	*prev;
+		struct ao_lisp_stack	*prev;
 		int	ret;
 		(void) ao_lisp_poly_move(&stack->sexprs, 0);
 		(void) ao_lisp_poly_move(&stack->values, 0);
 		(void) ao_lisp_poly_move(&stack->values_tail, 0);
 		(void) ao_lisp_poly_move(&stack->frame, 0);
 		prev = ao_lisp_poly_stack(stack->prev);
-		ret = ao_lisp_move(&ao_lisp_stack_type, &prev);
+		ret = ao_lisp_move_memory((void **) &prev,
+					  sizeof (struct ao_lisp_stack));
 		if (prev != ao_lisp_poly_stack(stack->prev))
 			stack->prev = ao_lisp_stack_poly(prev);
 		if (ret)
 			break;
-		stack = ao_lisp_poly_stack(stack->prev);
+		stack = prev;
 	}
 }
 
@@ -101,8 +102,8 @@ ao_lisp_stack_push(void)
 	ao_lisp_stack = stack;
 	ao_lisp_stack_reset(stack);
 	DBGI("stack push\n");
-	DBG_IN();
 	DBG_FRAMES();
+	DBG_IN();
 	return 1;
 }
 
@@ -236,37 +237,11 @@ static int
 ao_lisp_eval_val(void)
 {
 	DBGI("val: "); DBG_POLY(ao_lisp_v); DBG("\n");
-#if 0
-	if (ao_lisp_stack->macro) {
-		DBGI(".. end macro %d\n", ao_lisp_stack->macro);
-		DBGI(".. sexprs       "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
-		DBGI(".. values       "); DBG_POLY(ao_lisp_stack->values); DBG("\n");
-		ao_lisp_frames_dump();
-
-		ao_lisp_stack_pop();
-#if 0
-		/*
-		 * Re-use the current stack to evaluate
-		 * the value from the macro
-		 */
-		ao_lisp_stack->state = eval_sexpr;
-		ao_lisp_frame_current = ao_lisp_poly_frame(ao_lisp_stack->macro_frame);
-		ao_lisp_stack->frame = ao_lisp_stack->macro_frame;
-		ao_lisp_stack->macro = 0;
-		ao_lisp_stack->macro_frame = AO_LISP_NIL;
-		ao_lisp_stack->sexprs = AO_LISP_NIL;
-		ao_lisp_stack->values = AO_LISP_NIL;
-		ao_lisp_stack->values_tail = AO_LISP_NIL;
-#endif
-	} else
-#endif
-	{
-		/*
-		 * Value computed, pop the stack
-		 * to figure out what to do with the value
-		 */
-		ao_lisp_stack_pop();
-	}
+	/*
+	 * Value computed, pop the stack
+	 * to figure out what to do with the value
+	 */
+	ao_lisp_stack_pop();
 	DBGI("..state %d\n", ao_lisp_stack ? ao_lisp_stack->state : -1);
 	return 1;
 }
@@ -305,7 +280,6 @@ ao_lisp_eval_formal(void)
 			break;
 		case AO_LISP_FUNC_MACRO:
 			/* Evaluate the result once more */
-			prev = ao_lisp_stack;
 			ao_lisp_stack->state = eval_sexpr;
 			if (!ao_lisp_stack_push())
 				return 0;
@@ -313,6 +287,7 @@ ao_lisp_eval_formal(void)
 			/* After the function returns, take that
 			 * value and re-evaluate it
 			 */
+			prev = ao_lisp_poly_stack(ao_lisp_stack->prev);
 			ao_lisp_stack->state = eval_sexpr;
 			ao_lisp_stack->sexprs = prev->sexprs;
 			prev->sexprs = AO_LISP_NIL;
@@ -400,8 +375,7 @@ ao_lisp_eval_exec(void)
 	case AO_LISP_LAMBDA:
 		ao_lisp_stack->state = eval_sexpr;
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
-		ao_lisp_v = ao_lisp_lambda_eval(ao_lisp_poly_lambda(ao_lisp_v),
-						ao_lisp_poly_cons(ao_lisp_stack->values));
+		ao_lisp_v = ao_lisp_lambda_eval();
 		DBGI(".. sexpr "); DBG_POLY(ao_lisp_v); DBG("\n");
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 		break;
@@ -464,12 +438,11 @@ ao_lisp_eval_cond_test(void)
 		struct ao_lisp_cons *car = ao_lisp_poly_cons(ao_lisp_poly_cons(ao_lisp_stack->sexprs)->car);
 		struct ao_lisp_cons *c = ao_lisp_poly_cons(car->cdr);
 
-		ao_lisp_stack->state = eval_val;
 		if (c) {
+			ao_lisp_stack->state = eval_sexpr;
 			ao_lisp_v = c->car;
-			if (!ao_lisp_stack_push())
-				return 0;
-		}
+		} else
+			ao_lisp_stack->state = eval_val;
 	} else {
 		ao_lisp_stack->sexprs = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->cdr;
 		DBGI("next cond: "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
