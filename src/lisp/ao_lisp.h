@@ -42,6 +42,7 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_delay	_atom("delay")
 #define _ao_lisp_atom_eval	_atom("eval")
 #define _ao_lisp_atom_read	_atom("read")
+#define _ao_lisp_atom_eof	_atom("eof")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
@@ -76,6 +77,7 @@ extern uint16_t		ao_lisp_top;
 #define AO_LISP_DIVIDE_BY_ZERO	0x02
 #define AO_LISP_INVALID		0x04
 #define AO_LISP_UNDEFINED	0x08
+#define AO_LISP_EOF		0x10
 
 extern uint8_t		ao_lisp_exception;
 

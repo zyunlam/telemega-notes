@@ -12,6 +12,7 @@
  * General Public License for more details.
  */
 
+#define DBG_EVAL 0
 #include "ao_lisp.h"
 #include "ao_lisp_read.h"
 
@@ -270,7 +271,7 @@ lex(void)
 	for (;;) {
 		c = lexc();
 		if (lex_class & ENDOFFILE)
-			return AO_LISP_NIL;
+			return END;
 
 		if (lex_class & WHITE)
 			continue;
@@ -278,7 +279,7 @@ lex(void)
 		if (lex_class & COMMENT) {
 			while ((c = lexc()) != '\n') {
 				if (lex_class & ENDOFFILE)
-					return AO_LISP_NIL;
+					return END;
 			}
 			continue;
 		}
@@ -364,6 +365,8 @@ static struct ao_lisp_cons	*read_stack;
 static int
 push_read_stack(int cons, int in_quote)
 {
+	DBGI("push read stack %p %d\n", read_cons, in_quote);
+	DBG_IN();
 	if (cons) {
 		read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(read_cons),
 					       ao_lisp_cons_cons(ao_lisp_int_poly(in_quote),
@@ -394,6 +397,8 @@ pop_read_stack(int cons)
 		read_cons_tail = 0;
 		read_stack = 0;
 	}
+	DBG_OUT();
+	DBGI("pop read stack %p %d\n", read_cons, in_quote);
 	return in_quote;
 }
 
@@ -413,6 +418,7 @@ ao_lisp_read(void)
 		been_here = 1;
 	}
 	parse_token = lex();
+	DBGI("token %d (%s)\n", parse_token, token_string);
 
 	cons = 0;
 	in_quote = 0;
@@ -424,12 +430,15 @@ ao_lisp_read(void)
 			cons++;
 			in_quote = 0;
 			parse_token = lex();
+			DBGI("token %d (%s)\n", parse_token, token_string);
 		}
 
 		switch (parse_token) {
-		case ENDOFFILE:
+		case END:
 		default:
-			v = AO_LISP_NIL;
+			if (cons)
+				ao_lisp_error(AO_LISP_EOF, "unexpected end of file");
+			return _ao_lisp_atom_eof;
 			break;
 		case NAME:
 			atom = ao_lisp_atom_intern(token_string);
@@ -490,6 +499,7 @@ ao_lisp_read(void)
 		}
 
 		parse_token = lex();
+		DBGI("token %d (%s)\n", parse_token, token_string);
 	}
 	return v;
 }
