@@ -15,55 +15,39 @@
 #include "ao_lisp.h"
 #include <stdio.h>
 
-#if 0
-static struct ao_lisp_cons	*list;
-static char			*string;
-#endif
+static FILE *ao_lisp_file;
+static int newline = 1;
+
+int
+ao_lisp_getc(void)
+{
+	int c;
+
+	if (ao_lisp_file)
+		return getc(ao_lisp_file);
+
+	if (newline) {
+		printf("> ");
+		newline = 0;
+	}
+	c = getchar();
+	if (c == '\n')
+		newline = 1;
+	return c;
+}
 
 int
 main (int argc, char **argv)
 {
-#if 0
-	int			i, j;
-
-	struct ao_lisp_atom	*atom;
-	ao_lisp_root_add(&ao_lisp_cons_type, (void **) &list);
-	ao_lisp_root_add(&ao_lisp_string_type, (void **) &string);
-
-	/* allocator test */
-	for (j = 0; j < 10; j++) {
-		list = 0;
-		string = ao_lisp_string_new(0);
-		for (i = 0; i < 2; i++) {
-			string = ao_lisp_string_cat(string, "a");
-			list = ao_lisp_cons_cons(ao_lisp_string_poly(string), list);
-			list = ao_lisp_cons_cons(ao_lisp_int_poly(i), list);
-			atom = ao_lisp_atom_intern("ant");
-			list = ao_lisp_cons_cons(ao_lisp_atom_poly(atom), list);
+	while (*++argv) {
+		ao_lisp_file = fopen(*argv, "r");
+		if (!ao_lisp_file) {
+			perror(*argv);
+			exit(1);
 		}
-		ao_lisp_poly_print(ao_lisp_cons_poly(list));
-		printf("\n");
+		ao_lisp_read_eval_print();
+		fclose(ao_lisp_file);
+		ao_lisp_file = NULL;
 	}
-
-	for (atom = ao_lisp_poly_atom(ao_builtin_atoms); atom; atom = ao_lisp_poly_atom(atom->next)) {
-		printf("%s = ", atom->name);
-		ao_lisp_poly_print(ao_lisp_atom_get(ao_lisp_atom_poly(atom)));
-		printf("\n");
-	}
-#endif
-#if 0
-	list = ao_lisp_cons_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("+")),
-				 ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_cons_cons(ao_lisp_atom_poly(ao_lisp_atom_intern("+")),
-										       ao_lisp_cons_cons(ao_lisp_int_poly(3),
-													 ao_lisp_cons_cons(ao_lisp_int_poly(4), NULL)))),
-						   ao_lisp_cons_cons(ao_lisp_int_poly(2), NULL)));
-	printf("list: ");
-	ao_lisp_poly_print(ao_lisp_cons_poly(list));
-	printf ("\n");
-	ao_lisp_poly_print(ao_lisp_eval(ao_lisp_cons_poly(list)));
-	printf ("\n");
-#endif
-#if 1
 	ao_lisp_read_eval_print();
-#endif
 }
