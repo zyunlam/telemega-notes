@@ -147,7 +147,7 @@ ao_lisp_atom_set(ao_poly atom, ao_poly val)
 	if (ref)
 		*ref = val;
 	else
-		ao_lisp_frame_global = ao_lisp_frame_add(ao_lisp_frame_global, atom, val);
+		ao_lisp_frame_add(&ao_lisp_frame_global, atom, val);
 	return val;
 }
 

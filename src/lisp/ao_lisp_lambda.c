@@ -133,18 +133,17 @@ ao_lisp_macro(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_lambda_eval(struct ao_lisp_lambda *lambda,
-		    struct ao_lisp_cons *cons)
+ao_lisp_lambda_eval(void)
 {
-	struct ao_lisp_cons	*code;
-	struct ao_lisp_cons	*args;
+	struct ao_lisp_lambda	*lambda = ao_lisp_poly_lambda(ao_lisp_v);
+	struct ao_lisp_cons	*cons = ao_lisp_poly_cons(ao_lisp_stack->values);
+	struct ao_lisp_cons	*code = ao_lisp_poly_cons(lambda->code);
+	struct ao_lisp_cons	*args = ao_lisp_poly_cons(ao_lisp_arg(code, 0));
 	struct ao_lisp_frame	*next_frame;
 	int			args_wanted;
 	int			args_provided;
 
-	code = ao_lisp_poly_cons(lambda->code);
 	DBGI("lambda "); DBG_POLY(ao_lisp_lambda_poly(lambda)); DBG("\n");
-	args = ao_lisp_poly_cons(ao_lisp_arg(code, 0));
 
 	args_wanted = ao_lisp_cons_length(args);
 
@@ -156,7 +155,15 @@ ao_lisp_lambda_eval(struct ao_lisp_lambda *lambda,
 		args_provided = 1;
 	if (args_wanted != args_provided)
 		return ao_lisp_error(AO_LISP_INVALID, "need %d args, not %d", args_wanted, args_provided);
+
 	next_frame = ao_lisp_frame_new(args_wanted);
+
+	/* Re-fetch all of the values in case something moved */
+	lambda = ao_lisp_poly_lambda(ao_lisp_v);
+	cons = ao_lisp_poly_cons(ao_lisp_stack->values);
+	code = ao_lisp_poly_cons(lambda->code);
+	args = ao_lisp_poly_cons(ao_lisp_arg(code, 0));
+
 	switch (lambda->args) {
 	case AO_LISP_FUNC_LAMBDA: {
 		int			f;

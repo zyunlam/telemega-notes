@@ -67,7 +67,13 @@ const struct ao_lisp_type ao_lisp_cons_type = {
 struct ao_lisp_cons *
 ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr)
 {
-	struct ao_lisp_cons	*cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
+	struct ao_lisp_cons	*cons;
+
+	ao_lisp_root_add(&ao_lisp_cons_type, &cdr);
+	ao_lisp_root_poly_add(&car);
+	cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
+	ao_lisp_root_clear(&car);
+	ao_lisp_root_clear(&cdr);
 	if (!cons)
 		return NULL;
 	cons->car = car;
