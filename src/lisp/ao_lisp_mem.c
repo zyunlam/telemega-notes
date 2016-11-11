@@ -79,7 +79,6 @@ uint16_t	ao_lisp_top;
 static inline void mark(uint8_t *tag, int offset) {
 	int	byte = offset >> 5;
 	int	bit = (offset >> 2) & 7;
-
 	tag[byte] |= (1 << bit);
 }
 
@@ -176,42 +175,32 @@ note_cons(void *addr)
 	}
 }
 
-
-static void	*move_old, *move_new;
-static int	move_size;
+/*
+ * Walk all referenced objects calling functions on each one
+ */
 
 static void
-move_object(void)
+walk_all(uint8_t *tag,
+	 int (*visit_addr)(const struct ao_lisp_type *type, void **addr),
+	 int (*visit_poly)(ao_poly *p, uint8_t do_note_cons))
 {
-	int	i;
+	int i;
 
-	MDBG_RESET();
-	MDBG_MOVE("move %d -> %d\n", MDBG_OFFSET(move_old), MDBG_OFFSET(move_new));
-	MDBG_MOVE_IN();
-	memset(ao_lisp_moving, '\0', sizeof (ao_lisp_moving));
+	memset(tag, '\0', sizeof (ao_lisp_busy));
 	memset(ao_lisp_cons_note, '\0', sizeof (ao_lisp_cons_note));
 	ao_lisp_cons_noted = 0;
 	for (i = 0; i < AO_LISP_ROOT; i++) {
-		if (!ao_lisp_root[i].addr)
-			continue;
 		if (ao_lisp_root[i].type) {
-			void *addr = *ao_lisp_root[i].addr;
-			if (!addr)
-				continue;
-			MDBG_MOVE("root %d\n", MDBG_OFFSET(addr));
-			if (!ao_lisp_move(ao_lisp_root[i].type,
-					  ao_lisp_root[i].addr)) {
-				MDBG_MOVE("root moves from %p to %p\n",
-					 addr,
-					 *ao_lisp_root[i].addr);
+			void **a = ao_lisp_root[i].addr, *v;
+			if (a && (v = *a)) {
+				MDBG("root %d\n", MDBG_OFFSET(v));
+				visit_addr(ao_lisp_root[i].type, a);
 			}
 		} else {
-			ao_poly p = *(ao_poly *) ao_lisp_root[i].addr;
-			if (!p)
-				continue;
-			if (!ao_lisp_poly_move((ao_poly *) ao_lisp_root[i].addr, 0)) {
-				MDBG_MOVE("root poly move from %04x to %04x\n",
-					 p, *(ao_poly *) ao_lisp_root[i].addr);
+			ao_poly *a = (ao_poly *) ao_lisp_root[i].addr, p;
+			if (a && (p = *a)) {
+				MDBG("root 0x%04x\n", p);
+				visit_poly(a, 0);
 			}
 		}
 	}
@@ -221,17 +210,21 @@ move_object(void)
 		ao_lisp_cons_noted = 0;
 		for (i = 0; i < AO_LISP_POOL; i += 4) {
 			if (busy(ao_lisp_cons_last, i)) {
-				void *addr = ao_lisp_pool + i;
-				MDBG_MOVE("cons %d\n", MDBG_OFFSET(addr));
-				if (!ao_lisp_move(&ao_lisp_cons_type, &addr)) {
-					MDBG_MOVE("cons moves from %p to %p\n",
-						 ao_lisp_pool + i, addr);
-				}
+				void *v = ao_lisp_pool + i;
+				MDBG("cons %d\n", MDBG_OFFSET(v));
+				visit_addr(&ao_lisp_cons_type, &v);
 			}
 		}
 	}
-	MDBG_MOVE_OUT();
-	MDBG_MOVE("move done\n");
+}
+
+static void	*move_old, *move_new;
+static int	move_size;
+
+static void
+move_object(void)
+{
+	walk_all(ao_lisp_moving, ao_lisp_move, ao_lisp_poly_move);
 }
 
 #if MDBG_DUMP
@@ -268,43 +261,22 @@ static const struct ao_lisp_type const *ao_lisp_types[AO_LISP_NUM_TYPE] = {
 	[AO_LISP_LAMBDA] = &ao_lisp_lambda_type,
 };
 
+static int
+ao_lisp_mark_ref(const struct ao_lisp_type *type, void **ref)
+{
+	return ao_lisp_mark(type, *ref);
+}
+
+static int
+ao_lisp_poly_mark_ref(ao_poly *p, uint8_t do_note_cons)
+{
+	return ao_lisp_poly_mark(*p, do_note_cons);
+}
 
 static void
 ao_lisp_mark_busy(void)
 {
-	int i;
-
-	memset(ao_lisp_busy, '\0', sizeof (ao_lisp_busy));
-	memset(ao_lisp_cons_note, '\0', sizeof (ao_lisp_cons_note));
-	ao_lisp_cons_noted = 0;
-	MDBG("mark\n");
-	for (i = 0; i < AO_LISP_ROOT; i++) {
-		if (ao_lisp_root[i].type) {
-			void **a = ao_lisp_root[i].addr, *v;
-			if (a && (v = *a)) {
-				MDBG("root %d\n", MDBG_OFFSET(v));
-				ao_lisp_mark(ao_lisp_root[i].type, v);
-			}
-		} else {
-			ao_poly *a = (ao_poly *) ao_lisp_root[i].addr, p;
-			if (a && (p = *a)) {
-				MDBG("root 0x%04x\n", p);
-				ao_lisp_poly_mark(p, 0);
-			}
-		}
-	}
-	while (ao_lisp_cons_noted) {
-		memcpy(ao_lisp_cons_last, ao_lisp_cons_note, sizeof (ao_lisp_cons_note));
-		memset(ao_lisp_cons_note, '\0', sizeof (ao_lisp_cons_note));
-		ao_lisp_cons_noted = 0;
-		for (i = 0; i < AO_LISP_POOL; i += 4) {
-			if (busy(ao_lisp_cons_last, i)) {
-				void *v = ao_lisp_pool + i;
-				MDBG("cons %d\n", MDBG_OFFSET(v));
-				ao_lisp_mark(&ao_lisp_cons_type, v);
-			}
-		}
-	}
+	walk_all(ao_lisp_busy, ao_lisp_mark_ref, ao_lisp_poly_mark_ref);
 }
 
 void

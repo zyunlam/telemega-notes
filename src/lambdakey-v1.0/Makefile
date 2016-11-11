@@ -56,6 +56,8 @@ IDPRODUCT=0x000a
 
 CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -Os -g
 
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tlambda.ld
+
 PROGNAME=lambdakey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
@@ -65,7 +67,7 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-$(PROG): Makefile $(OBJ) altos.ld
+$(PROG): Makefile $(OBJ) lambda.ld altos.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)

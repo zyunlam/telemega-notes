@@ -60,8 +60,8 @@
 
 (defun display ()
   (display-stacks 0 20 stacks)
-  (move-to 1 1)
-  (patom "\n")
+  (move-to 1 21)
+  (flush)
   )
 
 (defun length (l)
@@ -100,7 +100,7 @@
     (setq stacks (replace stacks from from-stack))
     (setq stacks (replace stacks to to-stack))
     (display)
-    (delay 500)
+    (delay 100)
     )
   )
 
@@ -125,3 +125,5 @@
   (clear)
   (_hanoi len 0 1 2)
   )
+
+(hanoi)
