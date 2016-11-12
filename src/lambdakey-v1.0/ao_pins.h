@@ -25,8 +25,12 @@
 #define AO_LED_RED	(1 << LED_PIN_RED)
 #define AO_LED_PANIC	AO_LED_RED
 #define AO_CMD_LEN	128
-#define AO_LISP_POOL	3072
+#define AO_LISP_POOL_TOTAL	3072
+#define AO_LISP_SAVE	1
 #define AO_STACK_SIZE	1024
+
+/* need HSI active to write to flash */
+#define AO_NEED_HSI	1
 
 #define LEDS_AVAILABLE	(AO_LED_RED)
 
