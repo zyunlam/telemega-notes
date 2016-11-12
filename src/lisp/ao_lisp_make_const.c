@@ -67,6 +67,8 @@ struct builtin_func funcs[] = {
 	"flush",	AO_LISP_FUNC_LAMBDA,	builtin_flush,
 	"delay",	AO_LISP_FUNC_LAMBDA,	builtin_delay,
 	"led",		AO_LISP_FUNC_LEXPR,	builtin_led,
+	"save",		AO_LISP_FUNC_LAMBDA,	builtin_save,
+	"restore",	AO_LISP_FUNC_LAMBDA,	builtin_restore,
 };
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])

@@ -20,6 +20,26 @@
 //#include <stdio.h>
 #include <ao_lisp_os.h>
 
+typedef uint16_t	ao_poly;
+typedef int16_t		ao_signed_poly;
+
+#ifdef AO_LISP_SAVE
+
+struct ao_lisp_os_save {
+	ao_poly	ao_lisp_atoms;
+	ao_poly	ao_lisp_globals;
+};
+
+#define AO_LISP_POOL	(AO_LISP_POOL_TOTAL - sizeof (struct ao_lisp_os_save))
+
+int
+ao_lisp_os_save(void);
+
+int
+ao_lisp_os_restore(void);
+
+#endif
+
 #ifdef AO_LISP_MAKE_CONST
 #define AO_LISP_POOL_CONST	16384
 extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
@@ -84,9 +104,6 @@ extern uint16_t		ao_lisp_top;
 #define AO_LISP_EOF		0x10
 
 extern uint8_t		ao_lisp_exception;
-
-typedef uint16_t	ao_poly;
-typedef int16_t		ao_signed_poly;
 
 static inline int
 ao_lisp_is_const(ao_poly poly) {
@@ -228,6 +245,8 @@ enum ao_lisp_builtin_id {
 	builtin_flush,
 	builtin_delay,
 	builtin_led,
+	builtin_save,
+	builtin_restore,
 	_builtin_last
 };
 
@@ -468,6 +487,12 @@ ao_lisp_poly_move(ao_poly *p, uint8_t note_cons);
 
 /* eval */
 
+void
+ao_lisp_eval_clear_globals(void);
+
+int
+ao_lisp_eval_restart(void);
+
 ao_poly
 ao_lisp_eval(ao_poly p);
 
@@ -541,6 +566,14 @@ ao_lisp_macro(struct ao_lisp_cons *cons);
 
 ao_poly
 ao_lisp_lambda_eval(void);
+
+/* save */
+
+ao_poly
+ao_lisp_save(struct ao_lisp_cons *cons);
+
+ao_poly
+ao_lisp_restore(struct ao_lisp_cons *cons);
 
 /* error */
 

@@ -546,6 +546,24 @@ static int (*const evals[])(void) = {
 	[eval_while_test] = ao_lisp_eval_while_test,
 };
 
+/*
+ * Called at restore time to reset all execution state
+ */
+
+void
+ao_lisp_eval_clear_globals(void)
+{
+	ao_lisp_stack = NULL;
+	ao_lisp_frame_current = NULL;
+	ao_lisp_v = AO_LISP_NIL;
+}
+
+int
+ao_lisp_eval_restart(void)
+{
+	return ao_lisp_stack_push();
+}
+
 ao_poly
 ao_lisp_eval(ao_poly _v)
 {
