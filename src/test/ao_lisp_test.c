@@ -18,6 +18,39 @@
 static FILE *ao_lisp_file;
 static int newline = 1;
 
+static char save_file[] = "lisp.image";
+
+int
+ao_lisp_os_save(void)
+{
+	FILE	*save = fopen(save_file, "w");
+
+	if (!save) {
+		perror(save_file);
+		return 0;
+	}
+	fwrite(ao_lisp_pool, 1, AO_LISP_POOL_TOTAL, save);
+	fclose(save);
+	return 1;
+}
+
+int
+ao_lisp_os_restore(void)
+{
+	FILE	*restore = fopen(save_file, "r");
+	size_t	ret;
+
+	if (!restore) {
+		perror(save_file);
+		return 0;
+	}
+	ret = fread(ao_lisp_pool, 1, AO_LISP_POOL_TOTAL, restore);
+	fclose(restore);
+	if (ret != AO_LISP_POOL_TOTAL)
+		return 0;
+	return 1;
+}
+
 int
 ao_lisp_getc(void)
 {

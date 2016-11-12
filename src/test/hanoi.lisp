@@ -125,5 +125,3 @@
   (clear)
   (_hanoi len 0 1 2)
   )
-
-(hanoi)
