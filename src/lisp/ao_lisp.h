@@ -26,14 +26,20 @@ typedef int16_t		ao_signed_poly;
 #ifdef AO_LISP_SAVE
 
 struct ao_lisp_os_save {
-	ao_poly	ao_lisp_atoms;
-	ao_poly	ao_lisp_globals;
+	ao_poly		atoms;
+	ao_poly		globals;
+	uint16_t	const_checksum;
+	uint16_t	const_checksum_inv;
 };
 
-#define AO_LISP_POOL	(AO_LISP_POOL_TOTAL - sizeof (struct ao_lisp_os_save))
+#define AO_LISP_POOL_EXTRA	(sizeof(struct ao_lisp_os_save))
+#define AO_LISP_POOL	((int) (AO_LISP_POOL_TOTAL - AO_LISP_POOL_EXTRA))
 
 int
 ao_lisp_os_save(void);
+
+int
+ao_lisp_os_restore_save(struct ao_lisp_os_save *save, int offset);
 
 int
 ao_lisp_os_restore(void);
@@ -67,12 +73,14 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_eval	_atom("eval")
 #define _ao_lisp_atom_read	_atom("read")
 #define _ao_lisp_atom_eof	_atom("eof")
+#define _ao_lisp_atom_save	_atom("save")
+#define _ao_lisp_atom_restore	_atom("restore")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
-#define AO_LISP_POOL	16384
+#define AO_LISP_POOL	3072
 #endif
-extern uint8_t		ao_lisp_pool[AO_LISP_POOL];
+extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA];
 #endif
 
 /* Primitive types */

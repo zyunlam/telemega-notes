@@ -24,7 +24,7 @@ uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
 #undef AO_LISP_POOL
 #define AO_LISP_POOL AO_LISP_POOL_CONST
 #else
-uint8_t	ao_lisp_pool[AO_LISP_POOL] __attribute__((aligned(4)));
+uint8_t	ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((aligned(4)));
 #endif
 
 #if 0

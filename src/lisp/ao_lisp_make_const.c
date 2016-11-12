@@ -86,6 +86,33 @@ is_atom(int offset)
 	return 0;
 }
 
+#define AO_FEC_CRC_INIT	0xffff
+
+static inline uint16_t
+ao_fec_crc_byte(uint8_t byte, uint16_t crc)
+{
+	uint8_t	bit;
+
+	for (bit = 0; bit < 8; bit++) {
+		if (((crc & 0x8000) >> 8) ^ (byte & 0x80))
+			crc = (crc << 1) ^ 0x8005;
+		else
+			crc = (crc << 1);
+		byte <<= 1;
+	}
+	return crc;
+}
+
+uint16_t
+ao_fec_crc(const uint8_t *bytes, uint8_t len)
+{
+	uint16_t	crc = AO_FEC_CRC_INIT;
+
+	while (len--)
+		crc = ao_fec_crc_byte(*bytes++, crc);
+	return crc;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -126,6 +153,7 @@ main(int argc, char **argv)
 	printf("extern const uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));\n");
 	printf("#define ao_builtin_atoms 0x%04x\n", ao_lisp_atom_poly(ao_lisp_atoms));
 	printf("#define ao_builtin_frame 0x%04x\n", ao_lisp_frame_poly(ao_lisp_frame_global));
+	printf("#define ao_lisp_const_checksum ((uint16_t) 0x%04x)\n", ao_fec_crc(ao_lisp_const, ao_lisp_top));
 
 	for (a = ao_lisp_atoms; a; a = ao_lisp_poly_atom(a->next)) {
 		char	*n = a->name, c;
