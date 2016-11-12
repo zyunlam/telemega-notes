@@ -6,19 +6,11 @@
   (patom "\033[2J" nil)
   )
 
-(defun test ()
-  (clear)
-  (move-to 30 12)
-  (patom "hello, world")
-  (move-to 0 19)
-  )
-
 (setq stack '("*" "**" "***" "****" "*****" "******" "*******"))
 
 (setq stacks nil)
 
 (defun display-string (x y str)
-  (move-to x y)
   (move-to x y)
   (patom str)
   )

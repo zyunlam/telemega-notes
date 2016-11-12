@@ -17,12 +17,18 @@
 ao_poly
 ao_lisp_save(struct ao_lisp_cons *cons)
 {
+	if (!ao_lisp_check_argc(_ao_lisp_atom_save, cons, 0, 0))
+		return AO_LISP_NIL;
+
 #ifdef AO_LISP_SAVE
 	struct ao_lisp_os_save *os = (struct ao_lisp_os_save *) &ao_lisp_pool[AO_LISP_POOL];
 
 	ao_lisp_collect();
-	os->ao_lisp_atoms = ao_lisp_atom_poly(ao_lisp_atoms);
-	os->ao_lisp_globals = ao_lisp_frame_poly(ao_lisp_frame_global);
+	os->atoms = ao_lisp_atom_poly(ao_lisp_atoms);
+	os->globals = ao_lisp_frame_poly(ao_lisp_frame_global);
+	os->const_checksum = ao_lisp_const_checksum;
+	os->const_checksum_inv = ~ao_lisp_const_checksum;
+
 	if (ao_lisp_os_save())
 		return _ao_lisp_atom_t;
 #endif
@@ -32,13 +38,26 @@ ao_lisp_save(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_restore(struct ao_lisp_cons *cons)
 {
+	if (!ao_lisp_check_argc(_ao_lisp_atom_save, cons, 0, 0))
+		return AO_LISP_NIL;
+
 #ifdef AO_LISP_SAVE
+	struct ao_lisp_os_save save;
 	struct ao_lisp_os_save *os = (struct ao_lisp_os_save *) &ao_lisp_pool[AO_LISP_POOL];
+
+	if (!ao_lisp_os_restore_save(&save, AO_LISP_POOL))
+		return ao_lisp_error(AO_LISP_INVALID, "header restore failed");
+
+	if (save.const_checksum != ao_lisp_const_checksum ||
+	    save.const_checksum_inv != (uint16_t) ~ao_lisp_const_checksum)
+	{
+		return ao_lisp_error(AO_LISP_INVALID, "image is corrupted or stale");
+	}
 
 	if (ao_lisp_os_restore()) {
 
-		ao_lisp_atoms = ao_lisp_poly_atom(os->ao_lisp_atoms);
-		ao_lisp_frame_global = ao_lisp_poly_frame(os->ao_lisp_globals);
+		ao_lisp_atoms = ao_lisp_poly_atom(os->atoms);
+		ao_lisp_frame_global = ao_lisp_poly_frame(os->globals);
 
 		/* Clear the eval global variabls */
 		ao_lisp_eval_clear_globals();

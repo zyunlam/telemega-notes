@@ -35,6 +35,24 @@ ao_lisp_os_save(void)
 }
 
 int
+ao_lisp_os_restore_save(struct ao_lisp_os_save *save, int offset)
+{
+	FILE	*restore = fopen(save_file, "r");
+	size_t	ret;
+
+	if (!restore) {
+		perror(save_file);
+		return 0;
+	}
+	fseek(restore, offset, SEEK_SET);
+	ret = fread(save, sizeof (struct ao_lisp_os_save), 1, restore);
+	fclose(restore);
+	if (ret != 1)
+		return 0;
+	return 1;
+}
+
+int
 ao_lisp_os_restore(void)
 {
 	FILE	*restore = fopen(save_file, "r");
