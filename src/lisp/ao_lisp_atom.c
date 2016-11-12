@@ -46,11 +46,19 @@ static void atom_mark(void *addr)
 static void atom_move(void *addr)
 {
 	struct ao_lisp_atom	*atom = addr;
+	int			ret;
 
 	for (;;) {
-		if (ao_lisp_poly_move(&atom->next, 0))
+		struct ao_lisp_atom *next = ao_lisp_poly_atom(atom->next);
+
+		if (!next)
 			break;
-		atom = ao_lisp_poly_atom(atom->next);
+		ret = ao_lisp_move_memory((void **) &next, atom_size(next));
+		if (next != ao_lisp_poly_atom(atom->next))
+			atom->next = ao_lisp_atom_poly(next);
+		if (ret)
+			break;
+		atom = next;
 	}
 }
 

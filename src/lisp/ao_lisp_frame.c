@@ -83,9 +83,9 @@ frame_move(void *addr)
 			ao_lisp_poly_move(&v->val, 0);
 		}
 		next = ao_lisp_poly_frame(frame->next);
-		ret = 1;
-		if (next)
-			ret = ao_lisp_move_memory((void **) &next, frame_size(next));
+		if (!next)
+			break;
+		ret = ao_lisp_move_memory((void **) &next, frame_size(next));
 		if (next != ao_lisp_poly_frame(frame->next))
 			frame->next = ao_lisp_frame_poly(next);
 		if (ret)

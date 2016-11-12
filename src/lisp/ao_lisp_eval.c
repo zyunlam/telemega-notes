@@ -32,6 +32,7 @@ stack_mark(void *addr)
 		ao_lisp_poly_mark(stack->values, 0);
 		/* no need to mark values_tail */
 		ao_lisp_poly_mark(stack->frame, 0);
+		ao_lisp_poly_mark(stack->list, 0);
 		stack = ao_lisp_poly_stack(stack->prev);
 		if (ao_lisp_mark_memory(stack, sizeof (struct ao_lisp_stack)))
 			break;
@@ -47,12 +48,15 @@ stack_move(void *addr)
 
 	while (stack) {
 		struct ao_lisp_stack	*prev;
-		int	ret;
+		int			ret;
 		(void) ao_lisp_poly_move(&stack->sexprs, 0);
 		(void) ao_lisp_poly_move(&stack->values, 0);
 		(void) ao_lisp_poly_move(&stack->values_tail, 0);
 		(void) ao_lisp_poly_move(&stack->frame, 0);
+		(void) ao_lisp_poly_move(&stack->list, 0);
 		prev = ao_lisp_poly_stack(stack->prev);
+		if (!prev)
+			break;
 		ret = ao_lisp_move_memory((void **) &prev,
 					  sizeof (struct ao_lisp_stack));
 		if (prev != ao_lisp_poly_stack(stack->prev))
