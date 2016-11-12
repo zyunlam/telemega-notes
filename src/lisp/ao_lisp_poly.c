@@ -84,3 +84,21 @@ ao_lisp_poly_patom(ao_poly p)
 		f->patom(p);
 }
 
+void *
+ao_lisp_ref(ao_poly poly) {
+	if (poly == AO_LISP_NIL)
+		return NULL;
+	if (poly & AO_LISP_CONST)
+		return (void *) (AO_LISP_CONST_BASE + (poly & AO_LISP_REF_MASK));
+	return (void *) (AO_LISP_POOL_BASE + (poly & AO_LISP_REF_MASK));
+}
+
+ao_poly
+ao_lisp_poly(const void *addr, ao_poly type) {
+	const uint8_t	*a = addr;
+	if (a == NULL)
+		return AO_LISP_NIL;
+	if (AO_LISP_IS_CONST(a))
+		return AO_LISP_CONST | (a - AO_LISP_CONST_BASE) | type;
+	return (a - AO_LISP_POOL_BASE) | type;
+}
