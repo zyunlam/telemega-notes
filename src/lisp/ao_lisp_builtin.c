@@ -82,6 +82,9 @@ static const ao_poly builtin_names[] = {
 	[builtin_flush] = _ao_lisp_atom_flush,
 	[builtin_delay] = _ao_lisp_atom_delay,
 	[builtin_led] = _ao_lisp_atom_led,
+	[builtin_save] = _ao_lisp_atom_save,
+	[builtin_restore] = _ao_lisp_atom_restore,
+
 };
 
 static char *
@@ -591,5 +594,7 @@ const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_flush] = ao_lisp_flush,
 	[builtin_led] = ao_lisp_led,
 	[builtin_delay] = ao_lisp_delay,
+	[builtin_save] = ao_lisp_save,
+	[builtin_restore] = ao_lisp_restore,
 };
 
