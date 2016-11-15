@@ -14,8 +14,6 @@
 
 #include "ao_lisp.h"
 
-#define OFFSET(a)	((int) ((uint8_t *) (a) - ao_lisp_const))
-
 static void cons_mark(void *addr)
 {
 	struct ao_lisp_cons	*cons = addr;
@@ -25,7 +23,7 @@ static void cons_mark(void *addr)
 		cons = ao_lisp_poly_cons(cons->cdr);
 		if (!cons)
 			break;
-		if (ao_lisp_mark_memory(cons, sizeof (struct ao_lisp_cons)))
+		if (ao_lisp_mark_memory(&ao_lisp_cons_type, cons))
 			break;
 	}
 }
@@ -47,13 +45,17 @@ static void cons_move(void *addr)
 		struct ao_lisp_cons	*cdr;
 		int			ret;
 
+		MDBG_MOVE("cons_move start %d (%d, %d)\n",
+			  MDBG_OFFSET(cons), MDBG_OFFSET(ao_lisp_ref(cons->car)), MDBG_OFFSET(ao_lisp_ref(cons->cdr)));
 		(void) ao_lisp_poly_move(&cons->car, 1);
 		cdr = ao_lisp_poly_cons(cons->cdr);
 		if (!cdr)
 			break;
-		ret = ao_lisp_move_memory((void **) &cdr, sizeof (struct ao_lisp_cons));
+		ret = ao_lisp_move_memory(&ao_lisp_cons_type, (void **) &cdr);
 		if (cdr != ao_lisp_poly_cons(cons->cdr))
 			cons->cdr = ao_lisp_cons_poly(cdr);
+		MDBG_MOVE("cons_move end %d (%d, %d)\n",
+			  MDBG_OFFSET(cons), MDBG_OFFSET(ao_lisp_ref(cons->car)), MDBG_OFFSET(ao_lisp_ref(cons->cdr)));
 		if (ret)
 			break;
 		cons = cdr;
@@ -64,31 +66,23 @@ const struct ao_lisp_type ao_lisp_cons_type = {
 	.mark = cons_mark,
 	.size = cons_size,
 	.move = cons_move,
+	.name = "cons",
 };
-
-static ao_poly	cons_car;
-static struct ao_lisp_cons *cons_cdr;
-static int been_here;
 
 struct ao_lisp_cons *
 ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr)
 {
 	struct ao_lisp_cons	*cons;
 
-	if (!been_here) {
-		ao_lisp_root_add(&ao_lisp_cons_type, &cons_cdr);
-		ao_lisp_root_poly_add(&cons_car);
-		been_here = 1;
-	}
-	cons_car = car;
-	cons_cdr = cdr;
+	ao_lisp_poly_stash(0, car);
+	ao_lisp_cons_stash(0, cdr);
 	cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
+	car = ao_lisp_poly_fetch(0);
+	cdr = ao_lisp_cons_fetch(0);
 	if (!cons)
 		return NULL;
-	cons->car = cons_car;
-	cons->cdr = ao_lisp_cons_poly(cons_cdr);
-	cons_car = AO_LISP_NIL;
-	cons_cdr = NULL;
+	cons->car = car;
+	cons->cdr = ao_lisp_cons_poly(cdr);
 	return cons;
 }
 

@@ -38,7 +38,7 @@ static void atom_mark(void *addr)
 		atom = ao_lisp_poly_atom(atom->next);
 		if (!atom)
 			break;
-		if (ao_lisp_mark_memory(atom, atom_size(atom)))
+		if (ao_lisp_mark_memory(&ao_lisp_atom_type, atom))
 			break;
 	}
 }
@@ -53,7 +53,7 @@ static void atom_move(void *addr)
 
 		if (!next)
 			break;
-		ret = ao_lisp_move_memory((void **) &next, atom_size(next));
+		ret = ao_lisp_move_memory(&ao_lisp_atom_type, (void **) &next);
 		if (next != ao_lisp_poly_atom(atom->next))
 			atom->next = ao_lisp_atom_poly(next);
 		if (ret)
@@ -66,6 +66,7 @@ const struct ao_lisp_type ao_lisp_atom_type = {
 	.mark = atom_mark,
 	.size = atom_size,
 	.move = atom_move,
+	.name = "atom"
 };
 
 struct ao_lisp_atom	*ao_lisp_atoms;
@@ -85,12 +86,12 @@ ao_lisp_atom_intern(char *name)
 			return atom;
 	}
 #endif
+	ao_lisp_string_stash(0, name);
 	atom = ao_lisp_alloc(name_size(name));
+	name = ao_lisp_string_fetch(0);
 	if (atom) {
 		atom->type = AO_LISP_ATOM;
 		atom->next = ao_lisp_atom_poly(ao_lisp_atoms);
-		if (!ao_lisp_atoms)
-			ao_lisp_root_add(&ao_lisp_atom_type, &ao_lisp_atoms);
 		ao_lisp_atoms = atom;
 		strcpy(atom->name, name);
 	}
@@ -103,11 +104,8 @@ struct ao_lisp_frame	*ao_lisp_frame_current;
 static void
 ao_lisp_atom_init(void)
 {
-	if (!ao_lisp_frame_global) {
+	if (!ao_lisp_frame_global)
 		ao_lisp_frame_global = ao_lisp_frame_new(0);
-		ao_lisp_root_add(&ao_lisp_frame_type, &ao_lisp_frame_global);
-		ao_lisp_root_add(&ao_lisp_frame_type, &ao_lisp_frame_current);
-	}
 }
 
 static ao_poly *

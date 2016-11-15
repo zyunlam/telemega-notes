@@ -14,12 +14,6 @@
 
 #include "ao_lisp.h"
 
-#if 0
-#define DBG(...)	printf(__VA_ARGS__)
-#else
-#define DBG(...)
-#endif
-
 static inline int
 frame_num_size(int num)
 {
@@ -33,8 +27,6 @@ frame_size(void *addr)
 	return frame_num_size(frame->num);
 }
 
-#define OFFSET(a)	((int) ((uint8_t *) (ao_lisp_ref(a)) - ao_lisp_const))
-
 static void
 frame_mark(void *addr)
 {
@@ -42,22 +34,23 @@ frame_mark(void *addr)
 	int			f;
 
 	for (;;) {
-		DBG("frame mark %p\n", frame);
+		MDBG_MOVE("frame mark %d\n", MDBG_OFFSET(frame));
 		if (!AO_LISP_IS_POOL(frame))
 			break;
 		for (f = 0; f < frame->num; f++) {
 			struct ao_lisp_val	*v = &frame->vals[f];
 
 			ao_lisp_poly_mark(v->val, 0);
-			DBG ("\tframe mark atom %s %d val %d at %d\n",
-			     ao_lisp_poly_atom(v->atom)->name,
-			     OFFSET(v->atom), OFFSET(v->val), f);
+			MDBG_MOVE("frame mark atom %s %d val %d at %d\n",
+				  ao_lisp_poly_atom(v->atom)->name,
+				  MDBG_OFFSET(ao_lisp_ref(v->atom)),
+				  MDBG_OFFSET(ao_lisp_ref(v->val)), f);
 		}
 		frame = ao_lisp_poly_frame(frame->next);
-		DBG("frame next %p\n", frame);
+		MDBG_MOVE("frame next %d\n", MDBG_OFFSET(frame));
 		if (!frame)
 			break;
-		if (ao_lisp_mark_memory(frame, frame_size(frame)))
+		if (ao_lisp_mark_memory(&ao_lisp_frame_type, frame))
 			break;
 	}
 }
@@ -72,22 +65,29 @@ frame_move(void *addr)
 		struct ao_lisp_frame	*next;
 		int			ret;
 
-		DBG("frame move %p\n", frame);
+		MDBG_MOVE("frame move %d\n", MDBG_OFFSET(frame));
 		if (!AO_LISP_IS_POOL(frame))
 			break;
 		for (f = 0; f < frame->num; f++) {
 			struct ao_lisp_val	*v = &frame->vals[f];
 
 			ao_lisp_poly_move(&v->atom, 0);
-			DBG("moved atom %s\n", ao_lisp_poly_atom(v->atom)->name);
 			ao_lisp_poly_move(&v->val, 0);
+			MDBG_MOVE("frame move atom %s %d val %d at %d\n",
+				  ao_lisp_poly_atom(v->atom)->name,
+				  MDBG_OFFSET(ao_lisp_ref(v->atom)),
+				  MDBG_OFFSET(ao_lisp_ref(v->val)), f);
 		}
 		next = ao_lisp_poly_frame(frame->next);
 		if (!next)
 			break;
-		ret = ao_lisp_move_memory((void **) &next, frame_size(next));
-		if (next != ao_lisp_poly_frame(frame->next))
+		ret = ao_lisp_move_memory(&ao_lisp_frame_type, (void **) &next);
+		if (next != ao_lisp_poly_frame(frame->next)) {
+			MDBG_MOVE("frame next moved from %d to %d\n",
+				  MDBG_OFFSET(ao_lisp_poly_frame(frame->next)),
+				  MDBG_OFFSET(next));
 			frame->next = ao_lisp_frame_poly(next);
+		}
 		if (ret)
 			break;
 		frame = next;
@@ -97,7 +97,8 @@ frame_move(void *addr)
 const struct ao_lisp_type ao_lisp_frame_type = {
 	.mark = frame_mark,
 	.size = frame_size,
-	.move = frame_move
+	.move = frame_move,
+	.name = "frame",
 };
 
 void
@@ -206,8 +207,8 @@ ao_lisp_frame_add(struct ao_lisp_frame **frame_ref, ao_poly atom, ao_poly val)
 
 	if (!ref) {
 		int f;
-		ao_lisp_root_poly_add(&atom);
-		ao_lisp_root_poly_add(&val);
+		ao_lisp_poly_stash(0, atom);
+		ao_lisp_poly_stash(1, val);
 		if (frame) {
 			f = frame->num;
 			frame = ao_lisp_frame_realloc(frame_ref, f + 1);
@@ -215,12 +216,11 @@ ao_lisp_frame_add(struct ao_lisp_frame **frame_ref, ao_poly atom, ao_poly val)
 			f = 0;
 			frame = ao_lisp_frame_new(1);
 		}
-		ao_lisp_root_clear(&atom);
-		ao_lisp_root_clear(&val);
+		atom = ao_lisp_poly_fetch(0);
+		val = ao_lisp_poly_fetch(1);
 		if (!frame)
 			return 0;
 		*frame_ref = frame;
-		DBG ("add atom %s %d, val %d at %d\n", ao_lisp_poly_atom(atom)->name, OFFSET(atom), OFFSET(val), f);
 		frame->vals[f].atom = atom;
 		ref = &frame->vals[f].val;
 	}

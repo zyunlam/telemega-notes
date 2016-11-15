@@ -357,25 +357,25 @@ lex(void)
 }
 
 static int parse_token;
-static uint8_t			been_here;
-static struct ao_lisp_cons	*read_cons;
-static struct ao_lisp_cons	*read_cons_tail;
-static struct ao_lisp_cons	*read_stack;
+
+struct ao_lisp_cons	*ao_lisp_read_cons;
+struct ao_lisp_cons	*ao_lisp_read_cons_tail;
+struct ao_lisp_cons	*ao_lisp_read_stack;
 
 static int
 push_read_stack(int cons, int in_quote)
 {
-	DBGI("push read stack %p %d\n", read_cons, in_quote);
+	DBGI("push read stack %p %d\n", ao_lisp_read_cons, in_quote);
 	DBG_IN();
 	if (cons) {
-		read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(read_cons),
+		ao_lisp_read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_read_cons),
 					       ao_lisp_cons_cons(ao_lisp_int_poly(in_quote),
-								 read_stack));
-		if (!read_stack)
+								 ao_lisp_read_stack));
+		if (!ao_lisp_read_stack)
 			return 0;
 	}
-	read_cons = NULL;
-	read_cons_tail = NULL;
+	ao_lisp_read_cons = NULL;
+	ao_lisp_read_cons_tail = NULL;
 	return 1;
 }
 
@@ -384,21 +384,21 @@ pop_read_stack(int cons)
 {
 	int	in_quote = 0;
 	if (cons) {
-		read_cons = ao_lisp_poly_cons(read_stack->car);
-		read_stack = ao_lisp_poly_cons(read_stack->cdr);
-		in_quote = ao_lisp_poly_int(read_stack->car);
-		read_stack = ao_lisp_poly_cons(read_stack->cdr);
-		for (read_cons_tail = read_cons;
-		     read_cons_tail && read_cons_tail->cdr;
-		     read_cons_tail = ao_lisp_poly_cons(read_cons_tail->cdr))
+		ao_lisp_read_cons = ao_lisp_poly_cons(ao_lisp_read_stack->car);
+		ao_lisp_read_stack = ao_lisp_poly_cons(ao_lisp_read_stack->cdr);
+		in_quote = ao_lisp_poly_int(ao_lisp_read_stack->car);
+		ao_lisp_read_stack = ao_lisp_poly_cons(ao_lisp_read_stack->cdr);
+		for (ao_lisp_read_cons_tail = ao_lisp_read_cons;
+		     ao_lisp_read_cons_tail && ao_lisp_read_cons_tail->cdr;
+		     ao_lisp_read_cons_tail = ao_lisp_poly_cons(ao_lisp_read_cons_tail->cdr))
 			;
 	} else {
-		read_cons = 0;
-		read_cons_tail = 0;
-		read_stack = 0;
+		ao_lisp_read_cons = 0;
+		ao_lisp_read_cons_tail = 0;
+		ao_lisp_read_stack = 0;
 	}
 	DBG_OUT();
-	DBGI("pop read stack %p %d\n", read_cons, in_quote);
+	DBGI("pop read stack %p %d\n", ao_lisp_read_cons, in_quote);
 	return in_quote;
 }
 
@@ -411,18 +411,12 @@ ao_lisp_read(void)
 	int			in_quote;
 	ao_poly			v;
 
-	if (!been_here) {
-		ao_lisp_root_add(&ao_lisp_cons_type, &read_cons);
-		ao_lisp_root_add(&ao_lisp_cons_type, &read_cons_tail);
-		ao_lisp_root_add(&ao_lisp_cons_type, &read_stack);
-		been_here = 1;
-	}
 	parse_token = lex();
 	DBGI("token %d (%s)\n", parse_token, token_string);
 
 	cons = 0;
 	in_quote = 0;
-	read_cons = read_cons_tail = read_stack = 0;
+	ao_lisp_read_cons = ao_lisp_read_cons_tail = ao_lisp_read_stack = 0;
 	for (;;) {
 		while (parse_token == OPEN) {
 			if (!push_read_stack(cons, in_quote))
@@ -469,7 +463,7 @@ ao_lisp_read(void)
 				v = AO_LISP_NIL;
 				break;
 			}
-			v = ao_lisp_cons_poly(read_cons);
+			v = ao_lisp_cons_poly(ao_lisp_read_cons);
 			--cons;
 			in_quote = pop_read_stack(cons);
 			break;
@@ -484,16 +478,16 @@ ao_lisp_read(void)
 			if (!read)
 				return AO_LISP_NIL;
 
-			if (read_cons_tail)
-				read_cons_tail->cdr = ao_lisp_cons_poly(read);
+			if (ao_lisp_read_cons_tail)
+				ao_lisp_read_cons_tail->cdr = ao_lisp_cons_poly(read);
 			else
-				read_cons = read;
-			read_cons_tail = read;
+				ao_lisp_read_cons = read;
+			ao_lisp_read_cons_tail = read;
 
-			if (!in_quote || !read_cons->cdr)
+			if (!in_quote || !ao_lisp_read_cons->cdr)
 				break;
 
-			v = ao_lisp_cons_poly(read_cons);
+			v = ao_lisp_cons_poly(ao_lisp_read_cons);
 			--cons;
 			in_quote = pop_read_stack(cons);
 		}

@@ -47,6 +47,7 @@ const struct ao_lisp_type ao_lisp_lambda_type = {
 	.size = lambda_size,
 	.mark = lambda_mark,
 	.move = lambda_move,
+	.name = "lambda",
 };
 
 void
@@ -68,7 +69,9 @@ ao_lisp_lambda_print(ao_poly poly)
 ao_poly
 ao_lisp_lambda_alloc(struct ao_lisp_cons *code, int args)
 {
+	ao_lisp_cons_stash(0, code);
 	struct ao_lisp_lambda	*lambda = ao_lisp_alloc(sizeof (struct ao_lisp_lambda));
+	code = ao_lisp_cons_fetch(0);
 	struct ao_lisp_cons	*arg;
 	int			f;
 

@@ -134,6 +134,7 @@ struct ao_lisp_type {
 	int	(*size)(void *addr);
 	void	(*mark)(void *addr);
 	void	(*move)(void *addr);
+	char	name[];
 };
 
 struct ao_lisp_cons {
@@ -304,9 +305,15 @@ ao_lisp_other_poly(const void *other)
 }
 
 static inline int
-ao_lisp_mem_round(int size)
+ao_lisp_size_round(int size)
 {
 	return (size + 3) & ~3;
+}
+
+static inline int
+ao_lisp_size(const struct ao_lisp_type *type, void *addr)
+{
+	return ao_lisp_size_round(type->size(addr));
 }
 
 #define AO_LISP_OTHER_POLY(other) ((ao_poly)(other) + AO_LISP_OTHER)
@@ -389,7 +396,7 @@ ao_lisp_mark(const struct ao_lisp_type *type, void *addr);
 
 /* returns 1 if the object was already marked */
 int
-ao_lisp_mark_memory(void *addr, int size);
+ao_lisp_mark_memory(const struct ao_lisp_type *type, void *addr);
 
 void *
 ao_lisp_move_map(void *addr);
@@ -400,7 +407,7 @@ ao_lisp_move(const struct ao_lisp_type *type, void **ref);
 
 /* returns 1 if the object was already moved */
 int
-ao_lisp_move_memory(void **ref, int size);
+ao_lisp_move_memory(const struct ao_lisp_type *type, void **ref);
 
 void *
 ao_lisp_alloc(int size);
@@ -408,14 +415,23 @@ ao_lisp_alloc(int size);
 void
 ao_lisp_collect(void);
 
-int
-ao_lisp_root_add(const struct ao_lisp_type *type, void *addr);
+void
+ao_lisp_cons_stash(int id, struct ao_lisp_cons *cons);
 
-int
-ao_lisp_root_poly_add(ao_poly *p);
+struct ao_lisp_cons *
+ao_lisp_cons_fetch(int id);
 
 void
-ao_lisp_root_clear(void *addr);
+ao_lisp_string_stash(int id, char *string);
+
+char *
+ao_lisp_string_fetch(int id);
+
+void
+ao_lisp_poly_stash(int id, ao_poly poly);
+
+ao_poly
+ao_lisp_poly_fetch(int id);
 
 /* cons */
 extern const struct ao_lisp_type ao_lisp_cons_type;
@@ -434,9 +450,6 @@ ao_lisp_cons_length(struct ao_lisp_cons *cons);
 
 /* string */
 extern const struct ao_lisp_type ao_lisp_string_type;
-
-char *
-ao_lisp_string_new(int len);
 
 char *
 ao_lisp_string_copy(char *a);
@@ -529,6 +542,10 @@ char *
 ao_lisp_args_name(uint8_t args);
 
 /* read */
+extern struct ao_lisp_cons	*ao_lisp_read_cons;
+extern struct ao_lisp_cons	*ao_lisp_read_cons_tail;
+extern struct ao_lisp_cons	*ao_lisp_read_stack;
+
 ao_poly
 ao_lisp_read(void);
 
@@ -585,6 +602,8 @@ ao_lisp_restore(struct ao_lisp_cons *cons);
 
 /* error */
 
+extern const struct ao_lisp_type ao_lisp_stack_type;
+
 void
 ao_lisp_stack_print(void);
 
@@ -629,6 +648,34 @@ ao_lisp_frames_dump(void)
 #define DBG_RESET()
 #define DBG_STACK()
 #define DBG_FRAMES()
+#endif
+
+#define DBG_MEM		1
+#define DBG_MEM_START	1
+
+#if DBG_MEM
+
+#include <assert.h>
+extern int dbg_move_depth;
+#define MDBG_DUMP 1
+#define MDBG_OFFSET(a)	((int) ((uint8_t *) (a) - ao_lisp_pool))
+
+extern int dbg_mem;
+
+#define MDBG_DO(a)	a
+#define MDBG_MOVE(...) do { if (dbg_mem) { int d; for (d = 0; d < dbg_move_depth; d++) printf ("  "); printf(__VA_ARGS__); } } while (0)
+#define MDBG_MORE(...) do { if (dbg_mem) printf(__VA_ARGS__); } while (0)
+#define MDBG_MOVE_IN()	(dbg_move_depth++)
+#define MDBG_MOVE_OUT()	(assert(--dbg_move_depth >= 0))
+
+#else
+
+#define MDBG_DO(a)
+#define MDBG_MOVE(...)
+#define MDBG_MORE(...)
+#define MDBG_MOVE_IN()
+#define MDBG_MOVE_OUT()
+
 #endif
 
 #endif /* _AO_LISP_H_ */

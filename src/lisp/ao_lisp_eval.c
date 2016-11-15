@@ -16,6 +16,8 @@
 #include "ao_lisp.h"
 #include <assert.h>
 
+const struct ao_lisp_type ao_lisp_stack_type;
+
 static int
 stack_size(void *addr)
 {
@@ -34,12 +36,10 @@ stack_mark(void *addr)
 		ao_lisp_poly_mark(stack->frame, 0);
 		ao_lisp_poly_mark(stack->list, 0);
 		stack = ao_lisp_poly_stack(stack->prev);
-		if (ao_lisp_mark_memory(stack, sizeof (struct ao_lisp_stack)))
+		if (ao_lisp_mark_memory(&ao_lisp_stack_type, stack))
 			break;
 	}
 }
-
-static const struct ao_lisp_type ao_lisp_stack_type;
 
 static void
 stack_move(void *addr)
@@ -57,8 +57,7 @@ stack_move(void *addr)
 		prev = ao_lisp_poly_stack(stack->prev);
 		if (!prev)
 			break;
-		ret = ao_lisp_move_memory((void **) &prev,
-					  sizeof (struct ao_lisp_stack));
+		ret = ao_lisp_move_memory(&ao_lisp_stack_type, (void **) &prev);
 		if (prev != ao_lisp_poly_stack(stack->prev))
 			stack->prev = ao_lisp_stack_poly(prev);
 		if (ret)
@@ -67,10 +66,11 @@ stack_move(void *addr)
 	}
 }
 
-static const struct ao_lisp_type ao_lisp_stack_type = {
+const struct ao_lisp_type ao_lisp_stack_type = {
 	.size = stack_size,
 	.mark = stack_mark,
-	.move = stack_move
+	.move = stack_move,
+	.name = "stack"
 };
 
 struct ao_lisp_stack		*ao_lisp_stack;
@@ -567,14 +567,7 @@ ao_lisp_eval_restart(void)
 ao_poly
 ao_lisp_eval(ao_poly _v)
 {
-	static uint8_t been_here;
-
 	ao_lisp_v = _v;
-	if (!been_here) {
-		been_here = 1;
-		ao_lisp_root_add(&ao_lisp_stack_type, &ao_lisp_stack);
-		ao_lisp_root_poly_add(&ao_lisp_v);
-	}
 
 	if (!ao_lisp_stack_push())
 		return AO_LISP_NIL;
