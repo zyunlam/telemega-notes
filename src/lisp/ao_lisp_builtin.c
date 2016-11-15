@@ -106,6 +106,7 @@ static const ao_poly ao_lisp_args_atoms[] = {
 char *
 ao_lisp_args_name(uint8_t args)
 {
+	args &= AO_LISP_FUNC_MASK;
 	if (args < sizeof ao_lisp_args_atoms / sizeof ao_lisp_args_atoms[0])
 		return ao_lisp_poly_atom(ao_lisp_args_atoms[args])->name;
 	return "(unknown)";

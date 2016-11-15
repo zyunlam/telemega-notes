@@ -34,6 +34,7 @@ ALTOS_SRC = \
 	ao_mutex.c \
 	ao_usb_stm.c \
 	ao_serial_stm.c \
+	ao_flash_stm.c \
 	ao_lisp_lex.c \
 	ao_lisp_mem.c \
 	ao_lisp_cons.c \
@@ -41,19 +42,23 @@ ALTOS_SRC = \
 	ao_lisp_string.c \
 	ao_lisp_atom.c \
 	ao_lisp_int.c \
-	ao_lisp_prim.c \
+	ao_lisp_poly.c \
 	ao_lisp_builtin.c \
 	ao_lisp_read.c \
 	ao_lisp_rep.c \
 	ao_lisp_frame.c \
 	ao_lisp_error.c \
-	ao_exti_stm.c
+	ao_lisp_lambda.c \
+	ao_lisp_save.c \
+	ao_lisp_os_save.c
 
 PRODUCT=Nucleo-32
 PRODUCT_DEF=-DNUCLEO
 IDPRODUCT=0x000a
 
 CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -Os -g
+
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tload.ld
 
 PROGNAME=nucleo-32
 PROG=$(PROGNAME)-$(VERSION).elf
