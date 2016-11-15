@@ -62,14 +62,6 @@
 	)
   )
 
-; This should probably be included in the rom image...
-
-(defun length (list)
-  (cond (list (1+ (length (cdr list))))
-	(0)
-	)
-  )
-
 ; Position of the top of the stack on the screen
 ; Shorter stacks start further down the screen
 

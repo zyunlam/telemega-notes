@@ -15,6 +15,7 @@ INC = \
 	ao_task.h \
 	ao_lisp.h \
 	ao_lisp_const.h \
+	ao_lisp_os.h \
 	stm32f0.h \
 	Makefile
 
