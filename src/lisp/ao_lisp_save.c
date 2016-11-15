@@ -27,7 +27,7 @@ ao_lisp_save(struct ao_lisp_cons *cons)
 	os->atoms = ao_lisp_atom_poly(ao_lisp_atoms);
 	os->globals = ao_lisp_frame_poly(ao_lisp_frame_global);
 	os->const_checksum = ao_lisp_const_checksum;
-	os->const_checksum_inv = ~ao_lisp_const_checksum;
+	os->const_checksum_inv = (uint16_t) ~ao_lisp_const_checksum;
 
 	if (ao_lisp_os_save())
 		return _ao_lisp_atom_t;

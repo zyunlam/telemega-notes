@@ -206,12 +206,21 @@ ao_lisp_stack_poly(struct ao_lisp_stack *stack)
 }
 
 extern struct ao_lisp_stack	*ao_lisp_stack;
+extern struct ao_lisp_stack	*ao_lisp_stack_free_list;
 extern ao_poly			ao_lisp_v;
 
 #define AO_LISP_FUNC_LAMBDA	0
 #define AO_LISP_FUNC_NLAMBDA	1
 #define AO_LISP_FUNC_MACRO	2
 #define AO_LISP_FUNC_LEXPR	3
+
+#define AO_LISP_FUNC_FREE_ARGS	0x80
+#define AO_LISP_FUNC_MASK	0x7f
+
+#define AO_LISP_FUNC_F_LAMBDA	(AO_LISP_FUNC_FREE_ARGS | AO_LISP_FUNC_LAMBDA)
+#define AO_LISP_FUNC_F_NLAMBDA	(AO_LISP_FUNC_FREE_ARGS | AO_LISP_FUNC_NLAMBDA)
+#define AO_LISP_FUNC_F_MACRO	(AO_LISP_FUNC_FREE_ARGS | AO_LISP_FUNC_MACRO)
+#define AO_LISP_FUNC_F_LEXPR	(AO_LISP_FUNC_FREE_ARGS | AO_LISP_FUNC_LEXPR)
 
 struct ao_lisp_builtin {
 	uint8_t		type;
@@ -390,6 +399,9 @@ ao_lisp_builtin_poly(struct ao_lisp_builtin *b)
 }
 
 /* memory functions */
+
+extern int ao_lisp_collects;
+
 /* returns 1 if the object was already marked */
 int
 ao_lisp_mark(const struct ao_lisp_type *type, void *addr);
@@ -438,6 +450,11 @@ extern const struct ao_lisp_type ao_lisp_cons_type;
 
 struct ao_lisp_cons *
 ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr);
+
+extern struct ao_lisp_cons *ao_lisp_cons_free_list;
+
+void
+ao_lisp_cons_free(struct ao_lisp_cons *cons);
 
 void
 ao_lisp_cons_print(ao_poly);
