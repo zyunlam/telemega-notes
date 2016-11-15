@@ -101,4 +101,5 @@ main (int argc, char **argv)
 		ao_lisp_file = NULL;
 	}
 	ao_lisp_read_eval_print();
+	printf ("%d collects\n", ao_lisp_collects);
 }
