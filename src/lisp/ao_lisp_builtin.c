@@ -41,9 +41,11 @@ const struct ao_lisp_type ao_lisp_builtin_type = {
 
 #ifdef AO_LISP_MAKE_CONST
 char *ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {
+	(void) b;
 	return "???";
 }
 char *ao_lisp_args_name(uint8_t args) {
+	(void) args;
 	return "???";
 }
 #else

@@ -22,13 +22,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-static inline int
-ao_lisp_getc() {
-	return getchar();
-}
+extern int ao_lisp_getc(void);
 
 static inline void
-ao_lisp_os_flush() {
+ao_lisp_os_flush(void) {
 	fflush(stdout);
 }
 

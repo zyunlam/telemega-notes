@@ -9,10 +9,6 @@
 
 ;(setq progn (lexpr (l) (last l)))
 
-					; simple math operators
-
-(setq 1+ (lambda (x) (+ x 1)))
-(setq 1- (lambda (x) (- x 1)))
 
 					;
 					; Define a variable without returning the value
@@ -64,7 +60,7 @@
 					; make the list of names in the let
 					;
 
-		     (set 'make-names (lambda (vars)
+		     (setq make-names (lambda (vars)
 				       (cond (vars
 					      (cons (car (car vars))
 						    (make-names (cdr vars))))
@@ -77,7 +73,7 @@
 					; pre-pended to the
 					; expressions to evaluate
 					;
-		     (set 'make-exprs (lambda (vars exprs)
+		     (setq make-exprs (lambda (vars exprs)
 				       (progn
 					 (cond (vars (cons
 						      (list set
@@ -94,13 +90,13 @@
 					 )
 				       )
 			  )
-		     (set 'exprs (make-exprs vars exprs))
+		     (setq exprs (make-exprs vars exprs))
 
 					;
 					; the parameters to the lambda is a list
 					; of nils of the right length
 					;
-		     (set 'make-nils (lambda (vars)
+		     (setq make-nils (lambda (vars)
 				      (cond (vars (cons nil (make-nils (cdr vars))))
 					    )
 				      )
@@ -108,7 +104,6 @@
 					;
 					; build the lambda.
 					;
-		     (set 'last-let-value 
 		     (cons
 		      (list
 		       'lambda
@@ -120,8 +115,6 @@
 		      (make-nils vars)
 		      )
 		     )
-		     )
-		     
 		   )
 		 (car let-param)
 		 (cdr let-param)
@@ -158,3 +151,12 @@
 		      )
 		    )
      )
+
+					; simple math operators
+					;
+					; Do these last to run defun
+					; at least once so the let macro
+					; is resolved
+
+(defun 1+ (x) (+ x 1))
+(defun 1- (x) (- x 1))

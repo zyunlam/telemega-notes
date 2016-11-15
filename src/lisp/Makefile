@@ -4,7 +4,7 @@ clean:
 	rm -f ao_lisp_const.h $(OBJS) ao_lisp_make_const
 
 ao_lisp_const.h: ao_lisp_const.lisp ao_lisp_make_const
-	./ao_lisp_make_const < ao_lisp_const.lisp > $@
+	./ao_lisp_make_const -o $@ ao_lisp_const.lisp
 
 SRCS=\
 	ao_lisp_make_const.c\
@@ -25,10 +25,11 @@ SRCS=\
 
 OBJS=$(SRCS:.c=.o)
 
-CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g -I.
+CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g -I. -Wall -Wextra
 
 HDRS=\
 	ao_lisp.h \
+	ao_lisp_os.h \
 	ao_lisp_read.h
 
 ao_lisp_make_const:  $(OBJS)
