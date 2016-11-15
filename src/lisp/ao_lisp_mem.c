@@ -43,7 +43,6 @@ uint8_t	ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((aligned(4
 #if DBG_MEM
 int dbg_move_depth;
 int dbg_mem = DBG_MEM_START;
-int dbg_collects = 0;
 int dbg_validate = 0;
 
 struct ao_lisp_record {
@@ -212,6 +211,13 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 
 #define AO_LISP_ROOT	(sizeof (ao_lisp_root) / sizeof (ao_lisp_root[0]))
 
+static const void ** const ao_lisp_cache[] = {
+	(const void **) &ao_lisp_cons_free_list,
+	(const void **) &ao_lisp_stack_free_list,
+};
+
+#define AO_LISP_CACHE	(sizeof (ao_lisp_cache) / sizeof (ao_lisp_cache[0]))
+
 #define AO_LISP_BUSY_SIZE	((AO_LISP_POOL + 31) / 32)
 
 static uint8_t	ao_lisp_busy[AO_LISP_BUSY_SIZE];
@@ -229,14 +235,16 @@ struct ao_lisp_chunk {
 	};
 };
 
-#define AO_LISP_NCHUNK	32
+#define AO_LISP_NCHUNK	64
 
 static struct ao_lisp_chunk ao_lisp_chunk[AO_LISP_NCHUNK];
 
 /* Offset of an address within the pool. */
 static inline uint16_t pool_offset(void *addr) {
+#if DBG_MEM
 	if (!AO_LISP_IS_POOL(addr))
 		ao_lisp_abort();
+#endif
 	return ((uint8_t *) addr) - ao_lisp_pool;
 }
 
@@ -246,8 +254,10 @@ static inline uint16_t pool_offset(void *addr) {
  * These are used in the chunk code.
  */
 static inline ao_poly pool_poly(void *addr) {
+#if DBG_MEM
 	if (!AO_LISP_IS_POOL(addr))
 		ao_lisp_abort();
+#endif
 	return ((uint8_t *) addr) - AO_LISP_POOL_BASE;
 }
 
@@ -306,8 +316,10 @@ note_chunk(uint16_t addr, uint16_t size)
 
 	for (i = 0; i < AO_LISP_NCHUNK; i++) {
 		if (ao_lisp_chunk[i].size && ao_lisp_chunk[i].old_addr == addr) {
+#if DBG_MEM
 			if (ao_lisp_chunk[i].size != size)
 				ao_lisp_abort();
+#endif
 			return;
 		}
 		if (ao_lisp_chunk[i].old_addr > addr) {
@@ -339,7 +351,7 @@ walk(int (*visit_addr)(const struct ao_lisp_type *type, void **addr),
 	memset(ao_lisp_busy, '\0', sizeof (ao_lisp_busy));
 	memset(ao_lisp_cons_note, '\0', sizeof (ao_lisp_cons_note));
 	ao_lisp_cons_noted = 0;
-	for (i = 0; i < AO_LISP_ROOT; i++) {
+	for (i = 0; i < (int) AO_LISP_ROOT; i++) {
 		if (ao_lisp_root[i].type) {
 			void **a = ao_lisp_root[i].addr, *v;
 			if (a && (v = *a)) {
@@ -416,6 +428,8 @@ ao_lisp_poly_mark_ref(ao_poly *p, uint8_t do_note_cons)
 	return ao_lisp_poly_mark(*p, do_note_cons);
 }
 
+int ao_lisp_collects;
+
 void
 ao_lisp_collect(void)
 {
@@ -427,10 +441,15 @@ ao_lisp_collect(void)
 	int	moved;
 	struct ao_lisp_record	*mark_record = NULL, *move_record = NULL;
 
-	++dbg_collects;
-	MDBG_MOVE("collect %d\n", dbg_collects);
+	MDBG_MOVE("collect %d\n", ao_lisp_collects);
 	marked = moved = 0;
 #endif
+
+	++ao_lisp_collects;
+
+	/* Clear references to all caches */
+	for (i = 0; i < (int) AO_LISP_CACHE; i++)
+		*ao_lisp_cache[i] = NULL;
 	chunk_low = 0;
 	top = 0;
 	for (;;) {
@@ -462,8 +481,10 @@ ao_lisp_collect(void)
 
 			if (ao_lisp_chunk[i].old_addr > top)
 				break;
+#if DBG_MEM
 			if (ao_lisp_chunk[i].old_addr != top)
 				ao_lisp_abort();
+#endif
 
 			top += size;
 			MDBG_MOVE("chunk %d %d not moving\n",
@@ -585,8 +606,10 @@ ao_lisp_poly_mark(ao_poly p, uint8_t do_note_cons)
 
 		if (type == AO_LISP_OTHER) {
 			type = ao_lisp_other_type(ao_lisp_poly_other(p));
+#if DBG_MEM
 			if (type <= AO_LISP_OTHER || AO_LISP_NUM_TYPE <= type)
 				ao_lisp_abort();
+#endif
 		}
 
 		lisp_type = ao_lisp_types[ao_lisp_poly_type(p)];
@@ -621,6 +644,8 @@ ao_lisp_move_memory(const struct ao_lisp_type *type, void **ref)
 
 	if (!AO_LISP_IS_POOL(addr))
 		return 1;
+
+	(void) type;
 
 	MDBG_MOVE("move memory %d\n", MDBG_OFFSET(addr));
 	addr = move_map(addr);
@@ -682,8 +707,10 @@ ao_lisp_poly_move(ao_poly *ref, uint8_t do_note_cons)
 
 		if (type == AO_LISP_OTHER) {
 			type = ao_lisp_other_type(move_map(ao_lisp_poly_other(p)));
+#if DBG_MEM
 			if (type <= AO_LISP_OTHER || AO_LISP_NUM_TYPE <= type)
 				ao_lisp_abort();
+#endif
 		}
 
 		lisp_type = ao_lisp_types[type];
@@ -795,8 +822,6 @@ ao_lisp_alloc(int size)
 void
 ao_lisp_cons_stash(int id, struct ao_lisp_cons *cons)
 {
-	if (save_cons[id] != NULL)
-		ao_lisp_abort();
 	save_cons[id] = cons;
 }
 
@@ -811,8 +836,6 @@ ao_lisp_cons_fetch(int id)
 void
 ao_lisp_string_stash(int id, char *string)
 {
-	if (save_cons[id] != NULL)
-		ao_lisp_abort();
 	save_string[id] = string;
 }
 

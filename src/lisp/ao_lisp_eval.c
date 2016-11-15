@@ -76,6 +76,8 @@ const struct ao_lisp_type ao_lisp_stack_type = {
 struct ao_lisp_stack		*ao_lisp_stack;
 ao_poly				ao_lisp_v;
 
+struct ao_lisp_stack		*ao_lisp_stack_free_list;
+
 ao_poly
 ao_lisp_set_cond(struct ao_lisp_cons *c)
 {
@@ -97,9 +99,15 @@ ao_lisp_stack_reset(struct ao_lisp_stack *stack)
 static int
 ao_lisp_stack_push(void)
 {
-	struct ao_lisp_stack	*stack = ao_lisp_alloc(sizeof (struct ao_lisp_stack));
-	if (!stack)
-		return 0;
+	struct ao_lisp_stack	*stack;
+	if (ao_lisp_stack_free_list) {
+		stack = ao_lisp_stack_free_list;
+		ao_lisp_stack_free_list = ao_lisp_poly_stack(stack->prev);
+	} else {
+		stack = ao_lisp_alloc(sizeof (struct ao_lisp_stack));
+		if (!stack)
+			return 0;
+	}
 	stack->prev = ao_lisp_stack_poly(ao_lisp_stack);
 	stack->frame = ao_lisp_frame_poly(ao_lisp_frame_current);
 	stack->list = AO_LISP_NIL;
@@ -114,9 +122,15 @@ ao_lisp_stack_push(void)
 static void
 ao_lisp_stack_pop(void)
 {
+	ao_poly	prev;
+
 	if (!ao_lisp_stack)
 		return;
-	ao_lisp_stack = ao_lisp_poly_stack(ao_lisp_stack->prev);
+	prev = ao_lisp_stack->prev;
+	ao_lisp_stack->prev = ao_lisp_stack_poly(ao_lisp_stack_free_list);
+	ao_lisp_stack_free_list = ao_lisp_stack;
+
+	ao_lisp_stack = ao_lisp_poly_stack(prev);
 	if (ao_lisp_stack)
 		ao_lisp_frame_current = ao_lisp_poly_frame(ao_lisp_stack->frame);
 	else
@@ -141,7 +155,7 @@ func_type(ao_poly func)
 		return ao_lisp_error(AO_LISP_INVALID, "func is nil");
 	switch (ao_lisp_poly_type(func)) {
 	case AO_LISP_BUILTIN:
-		return ao_lisp_poly_builtin(func)->args;
+		return ao_lisp_poly_builtin(func)->args & AO_LISP_FUNC_MASK;
 	case AO_LISP_LAMBDA:
 		return ao_lisp_poly_lambda(func)->args;
 	default:
@@ -359,12 +373,15 @@ static int
 ao_lisp_eval_exec(void)
 {
 	ao_poly v;
+	struct ao_lisp_builtin	*builtin;
+
 	DBGI("exec: "); DBG_POLY(ao_lisp_v); DBG(" values "); DBG_POLY(ao_lisp_stack->values); DBG ("\n");
 	ao_lisp_stack->sexprs = AO_LISP_NIL;
 	switch (ao_lisp_poly_type(ao_lisp_v)) {
 	case AO_LISP_BUILTIN:
 		ao_lisp_stack->state = eval_val;
-		v = ao_lisp_func(ao_lisp_poly_builtin(ao_lisp_v)) (
+		builtin = ao_lisp_poly_builtin(ao_lisp_v);
+		v = ao_lisp_func(builtin) (
 			ao_lisp_poly_cons(ao_lisp_poly_cons(ao_lisp_stack->values)->cdr));
 		DBG_DO(if (!ao_lisp_exception && ao_lisp_poly_builtin(ao_lisp_v)->func == builtin_set) {
 				struct ao_lisp_cons *cons = ao_lisp_poly_cons(ao_lisp_stack->values);
@@ -372,6 +389,10 @@ ao_lisp_eval_exec(void)
 				ao_poly val = ao_lisp_arg(cons, 2);
 				DBGI("set "); DBG_POLY(atom); DBG(" = "); DBG_POLY(val); DBG("\n");
 			});
+		builtin = ao_lisp_poly_builtin(ao_lisp_v);
+		if (builtin->args & AO_LISP_FUNC_FREE_ARGS)
+			ao_lisp_cons_free(ao_lisp_poly_cons(ao_lisp_stack->values));
+
 		ao_lisp_v = v;
 		DBGI(".. result "); DBG_POLY(ao_lisp_v); DBG ("\n");
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");

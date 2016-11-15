@@ -69,21 +69,39 @@ const struct ao_lisp_type ao_lisp_cons_type = {
 	.name = "cons",
 };
 
+struct ao_lisp_cons *ao_lisp_cons_free_list;
+
 struct ao_lisp_cons *
 ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr)
 {
 	struct ao_lisp_cons	*cons;
 
-	ao_lisp_poly_stash(0, car);
-	ao_lisp_cons_stash(0, cdr);
-	cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
-	car = ao_lisp_poly_fetch(0);
-	cdr = ao_lisp_cons_fetch(0);
-	if (!cons)
-		return NULL;
+	if (ao_lisp_cons_free_list) {
+		cons = ao_lisp_cons_free_list;
+		ao_lisp_cons_free_list = ao_lisp_poly_cons(cons->cdr);
+	} else {
+		ao_lisp_poly_stash(0, car);
+		ao_lisp_cons_stash(0, cdr);
+		cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
+		car = ao_lisp_poly_fetch(0);
+		cdr = ao_lisp_cons_fetch(0);
+		if (!cons)
+			return NULL;
+	}
 	cons->car = car;
 	cons->cdr = ao_lisp_cons_poly(cdr);
 	return cons;
+}
+
+void
+ao_lisp_cons_free(struct ao_lisp_cons *cons)
+{
+	while (cons) {
+		ao_poly cdr = cons->cdr;
+		cons->cdr = ao_lisp_cons_poly(ao_lisp_cons_free_list);
+		ao_lisp_cons_free_list = cons;
+		cons = ao_lisp_poly_cons(cdr);
+	}
 }
 
 void

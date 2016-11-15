@@ -168,6 +168,7 @@ ao_lisp_lambda_eval(void)
 			args = ao_lisp_poly_cons(args->cdr);
 			vals = ao_lisp_poly_cons(vals->cdr);
 		}
+		ao_lisp_cons_free(cons);
 		break;
 	}
 	case AO_LISP_FUNC_LEXPR:
