@@ -282,62 +282,11 @@ static inline int limit(int offset) {
 
 static int total_marked;
 
-/*
- * Mark a range of addresses
- */
-static int
-mark_object(uint8_t *tag, void *addr, int size) {
-	int	base;
-	int	bound;
-
-	MDBG_DO(if (!AO_LISP_IS_POOL((uint8_t *) addr + size - 1))
-			ao_lisp_abort());
-
-	base = pool_offset(addr);
-	bound = base + size;
-
-	MDBG_DO(if (bound > ao_lisp_top) ao_lisp_abort());
-
-	if (busy(tag, base))
-		return 1;
-	if (tag == ao_lisp_busy)
-		total_marked += size;
-	while (base < bound) {
-		mark(tag, base);
-		base += 4;
-	}
-	return 0;
-}
-
-MDBG_DO(
-static int
-clear_object(uint8_t *tag, void *addr, int size) {
-	int	base;
-	int	bound;
-
-	MDBG_DO(if (!AO_LISP_IS_POOL((uint8_t *) addr + size - 1))
-			ao_lisp_abort());
-
-	base = (uint8_t *) addr - ao_lisp_pool;
-	bound = base + size;
-
-	base = limit(base);
-	bound = limit(bound);
-	if (!busy(tag, base))
-		return 1;
-	total_marked -= size;
-	while (base < bound) {
-		clear(tag, base);
-		base += 4;
-	}
-	return 0;
-})
-
 static void
 note_cons(void *addr)
 {
 	if (AO_LISP_IS_POOL(addr)) {
-		int	offset = (uint8_t *) addr - ao_lisp_pool;
+		int	offset = pool_offset(addr);
 		MDBG_MOVE("note cons %d\n", MDBG_OFFSET(addr));
 		ao_lisp_cons_noted = 1;
 		mark(ao_lisp_cons_note, offset);
@@ -539,14 +488,10 @@ ao_lisp_collect(void)
 			memmove(&ao_lisp_pool[top],
 				&ao_lisp_pool[ao_lisp_chunk[i].old_addr],
 				size);
-			MDBG_DO(clear_object(ao_lisp_busy, &ao_lisp_pool[ao_lisp_chunk[i].old_addr], size));
-			MDBG_DO(mark_object(ao_lisp_busy, &ao_lisp_pool[top], size));
 			top += size;
 			chunk_low = ao_lisp_chunk[i].old_addr + size;
 		}
 
-		MDBG_MOVE("after moving objects, busy is now:\n");
-		DUMP_BUSY();
 		chunk_last = i;
 
 		if (chunk_first < chunk_last) {
@@ -587,19 +532,19 @@ ao_lisp_collect(void)
 int
 ao_lisp_mark_memory(const struct ao_lisp_type *type, void *addr)
 {
-	int size;
+	int offset;
 	if (!AO_LISP_IS_POOL(addr))
 		return 1;
 
-	size = ao_lisp_size(type, addr);
+	offset = pool_offset(addr);
 	MDBG_MOVE("mark memory %d\n", MDBG_OFFSET(addr));
-	if (!mark_object(ao_lisp_busy, addr, size)) {
-		note_chunk(pool_offset(addr), size);
-		MDBG_DO(ao_lisp_record(type, addr, size));
-		return 0;
+	if (busy(ao_lisp_busy, offset)) {
+		MDBG_MOVE("already marked\n");
+		return 1;
 	}
-	MDBG_MOVE("already marked\n");
-	return 1;
+	mark(ao_lisp_busy, offset);
+	note_chunk(offset, ao_lisp_size(type, addr));
+	return 0;
 }
 
 int
@@ -672,26 +617,27 @@ int
 ao_lisp_move_memory(const struct ao_lisp_type *type, void **ref)
 {
 	void		*addr = *ref;
-	int		size;
+	int		offset;
 
 	if (!AO_LISP_IS_POOL(addr))
 		return 1;
 
 	MDBG_MOVE("move memory %d\n", MDBG_OFFSET(addr));
 	addr = move_map(addr);
-	size = ao_lisp_size(type, addr);
 	if (addr != *ref) {
 		MDBG_MOVE("update ref %d %d -> %d\n",
 			  AO_LISP_IS_POOL(ref) ? MDBG_OFFSET(ref) : -1,
 			  MDBG_OFFSET(*ref), MDBG_OFFSET(addr));
 		*ref = addr;
 	}
-	if (!mark_object(ao_lisp_busy, addr, size)) {
-		MDBG_DO(ao_lisp_record(type, addr, size));
-		return 0;
+	offset = pool_offset(addr);
+	if (busy(ao_lisp_busy, offset)) {
+		MDBG_MOVE("already moved\n");
+		return 1;
 	}
-	MDBG_MOVE("already moved\n");
-	return 1;
+	mark(ao_lisp_busy, offset);
+	MDBG_DO(ao_lisp_record(type, addr, ao_lisp_size(type, addr)));
+	return 0;
 }
 
 int
@@ -720,16 +666,14 @@ ao_lisp_poly_move(ao_poly *ref, uint8_t do_note_cons)
 	if (!p)
 		return 1;
 
-	type = ao_lisp_poly_base_type(p);
 	addr = ao_lisp_ref(p);
 
 	if (!AO_LISP_IS_POOL(addr))
 		return 1;
 
-	if (type == AO_LISP_CONS && do_note_cons) {
-//		addr = move_map(addr);
-		MDBG_DO(if (addr != move_map(addr)) MDBG_MOVE("noting cons at old addr %d instead of new addr %d\n", MDBG_OFFSET(addr), MDBG_OFFSET(move_map(addr))););
+	type = ao_lisp_poly_base_type(p);
 
+	if (type == AO_LISP_CONS && do_note_cons) {
 		note_cons(addr);
 		addr = move_map(addr);
 		ret = 1;
