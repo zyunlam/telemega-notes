@@ -173,14 +173,15 @@ ao_lisp_frame_poly(struct ao_lisp_frame *frame) {
 
 enum eval_state {
 	eval_sexpr,		/* Evaluate an sexpr */
-	eval_val,
-	eval_formal,
-	eval_exec,
-	eval_cond,
-	eval_cond_test,
-	eval_progn,
-	eval_while,
-	eval_while_test,
+	eval_val,		/* Value computed */
+	eval_formal,		/* Formal computed */
+	eval_exec,		/* Start a lambda evaluation */
+	eval_cond,		/* Start next cond clause */
+	eval_cond_test,		/* Check cond condition */
+	eval_progn,		/* Start next progn entry */
+	eval_while,		/* Start while condition */
+	eval_while_test,	/* Check while condition */
+	eval_macro,		/* Finished with macro generation */
 };
 
 struct ao_lisp_stack {

@@ -298,7 +298,7 @@ ao_lisp_eval_formal(void)
 			break;
 		case AO_LISP_FUNC_MACRO:
 			/* Evaluate the result once more */
-			ao_lisp_stack->state = eval_sexpr;
+			ao_lisp_stack->state = eval_macro;
 			if (!ao_lisp_stack_push())
 				return 0;
 
@@ -308,7 +308,6 @@ ao_lisp_eval_formal(void)
 			prev = ao_lisp_poly_stack(ao_lisp_stack->prev);
 			ao_lisp_stack->state = eval_sexpr;
 			ao_lisp_stack->sexprs = prev->sexprs;
-			prev->sexprs = AO_LISP_NIL;
 
 			DBGI(".. start macro\n");
 			DBGI(".. sexprs       "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
@@ -555,6 +554,25 @@ ao_lisp_eval_while_test(void)
 	return 1;
 }
 
+/*
+ * Replace the original sexpr with the macro expansion, then
+ * execute that
+ */
+static int
+ao_lisp_eval_macro(void)
+{
+	DBGI("macro: "); DBG_POLY(ao_lisp_v); DBG(" sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+
+	if (ao_lisp_poly_type(ao_lisp_v) == AO_LISP_CONS) {
+		*ao_lisp_poly_cons(ao_lisp_stack->sexprs) = *ao_lisp_poly_cons(ao_lisp_v);
+		ao_lisp_v = ao_lisp_stack->sexprs;
+		DBGI("sexprs rewritten to: "); DBG_POLY(ao_lisp_v); DBG("\n");
+	}
+	ao_lisp_stack->sexprs = AO_LISP_NIL;
+	ao_lisp_stack->state = eval_sexpr;
+	return 1;
+}
+
 static int (*const evals[])(void) = {
 	[eval_sexpr] = ao_lisp_eval_sexpr,
 	[eval_val] = ao_lisp_eval_val,
@@ -565,6 +583,7 @@ static int (*const evals[])(void) = {
 	[eval_progn] = ao_lisp_eval_progn,
 	[eval_while] = ao_lisp_eval_while,
 	[eval_while_test] = ao_lisp_eval_while_test,
+	[eval_macro] = ao_lisp_eval_macro,
 };
 
 /*

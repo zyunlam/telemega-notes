@@ -15,6 +15,8 @@
 #include "ao_lisp.h"
 #include <stdlib.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <getopt.h>
 
 static struct ao_lisp_builtin *
 ao_lisp_make_builtin(enum ao_lisp_builtin_id func, int args) {
@@ -33,42 +35,42 @@ struct builtin_func {
 };
 
 struct builtin_func funcs[] = {
-	"eval",		AO_LISP_FUNC_F_LAMBDA,	builtin_eval,
-	"read",		AO_LISP_FUNC_F_LAMBDA,	builtin_read,
-	"lambda",	AO_LISP_FUNC_NLAMBDA,	builtin_lambda,
-	"lexpr",	AO_LISP_FUNC_NLAMBDA,	builtin_lexpr,
-	"nlambda",	AO_LISP_FUNC_NLAMBDA,	builtin_nlambda,
-	"macro",	AO_LISP_FUNC_NLAMBDA,	builtin_macro,
-	"car",		AO_LISP_FUNC_F_LAMBDA,	builtin_car,
-	"cdr",		AO_LISP_FUNC_F_LAMBDA,	builtin_cdr,
-	"cons",		AO_LISP_FUNC_F_LAMBDA,	builtin_cons,
-	"last",		AO_LISP_FUNC_F_LAMBDA,	builtin_last,
-	"length",	AO_LISP_FUNC_F_LAMBDA,	builtin_length,
-	"quote",	AO_LISP_FUNC_NLAMBDA,	builtin_quote,
-	"set",		AO_LISP_FUNC_F_LAMBDA,	builtin_set,
-	"setq",		AO_LISP_FUNC_MACRO,	builtin_setq,
-	"cond",		AO_LISP_FUNC_NLAMBDA,	builtin_cond,
-	"progn",	AO_LISP_FUNC_NLAMBDA,	builtin_progn,
-	"while",	AO_LISP_FUNC_NLAMBDA,	builtin_while,
-	"print",	AO_LISP_FUNC_F_LEXPR,	builtin_print,
-	"patom",	AO_LISP_FUNC_F_LEXPR,	builtin_patom,
-	"+",		AO_LISP_FUNC_F_LEXPR,	builtin_plus,
-	"-",		AO_LISP_FUNC_F_LEXPR,	builtin_minus,
-	"*",		AO_LISP_FUNC_F_LEXPR,	builtin_times,
-	"/",		AO_LISP_FUNC_F_LEXPR,	builtin_divide,
-	"%",		AO_LISP_FUNC_F_LEXPR,	builtin_mod,
-	"=",		AO_LISP_FUNC_F_LEXPR,	builtin_equal,
-	"<",		AO_LISP_FUNC_F_LEXPR,	builtin_less,
-	">",		AO_LISP_FUNC_F_LEXPR,	builtin_greater,
-	"<=",		AO_LISP_FUNC_F_LEXPR,	builtin_less_equal,
-	">=",		AO_LISP_FUNC_F_LEXPR,	builtin_greater_equal,
-	"pack",		AO_LISP_FUNC_F_LAMBDA,	builtin_pack,
-	"unpack",	AO_LISP_FUNC_F_LAMBDA,	builtin_unpack,
-	"flush",	AO_LISP_FUNC_F_LAMBDA,	builtin_flush,
-	"delay",	AO_LISP_FUNC_F_LAMBDA,	builtin_delay,
-	"led",		AO_LISP_FUNC_F_LEXPR,	builtin_led,
-	"save",		AO_LISP_FUNC_F_LAMBDA,	builtin_save,
-	"restore",	AO_LISP_FUNC_F_LAMBDA,	builtin_restore,
+	{ .name = "eval",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_eval },
+	{ .name = "read",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_read },
+	{ .name = "lambda",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_lambda },
+	{ .name = "lexpr",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_lexpr },
+	{ .name = "nlambda",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_nlambda },
+	{ .name = "macro",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_macro },
+	{ .name = "car",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_car },
+	{ .name = "cdr",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_cdr },
+	{ .name = "cons",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_cons },
+	{ .name = "last",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_last },
+	{ .name = "length",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_length },
+	{ .name = "quote",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_quote },
+	{ .name = "set",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_set },
+	{ .name = "setq",	.args = AO_LISP_FUNC_MACRO,	.func = builtin_setq },
+	{ .name = "cond",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_cond },
+	{ .name = "progn",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_progn },
+	{ .name = "while",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_while },
+	{ .name = "print",	.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_print },
+	{ .name = "patom",	.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_patom },
+	{ .name = "+",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_plus },
+	{ .name = "-",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_minus },
+	{ .name = "*",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_times },
+	{ .name = "/",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_divide },
+	{ .name = "%",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_mod },
+	{ .name = "=",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_equal },
+	{ .name = "<",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_less },
+	{ .name = ">",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_greater },
+	{ .name = "<=",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_less_equal },
+	{ .name = ">=",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_greater_equal },
+	{ .name = "pack",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_pack },
+	{ .name = "unpack",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_unpack },
+	{ .name = "flush",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_flush },
+	{ .name = "delay",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_delay },
+	{ .name = "led",	.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_led },
+	{ .name = "save",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_save },
+	{ .name = "restore",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_restore },
 };
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])
@@ -114,17 +116,126 @@ ao_fec_crc(const uint8_t *bytes, uint8_t len)
 }
 
 int
+ao_is_macro(ao_poly p)
+{
+	struct ao_lisp_builtin	*builtin;
+	struct ao_lisp_lambda	*lambda;
+
+//	printf ("macro scanning "); ao_lisp_poly_print(p); printf("\n");
+	switch (ao_lisp_poly_type(p)) {
+	case AO_LISP_ATOM:
+		return ao_is_macro(ao_lisp_atom_get(p));
+	case AO_LISP_BUILTIN:
+		builtin = ao_lisp_poly_builtin(p);
+		if ((builtin->args & AO_LISP_FUNC_MASK) == AO_LISP_FUNC_MACRO)
+			return 1;
+		return 0;
+	case AO_LISP_LAMBDA:
+		lambda = ao_lisp_poly_lambda(p);
+		if (lambda->args == AO_LISP_FUNC_MACRO)
+			return 1;
+		return 0;
+	default:
+		return 0;
+	}
+}
+
+ao_poly
+ao_has_macro(ao_poly p)
+{
+	struct ao_lisp_cons	*cons;
+	struct ao_lisp_lambda	*lambda;
+	ao_poly			m;
+
+	if (p == AO_LISP_NIL)
+		return AO_LISP_NIL;
+
+	switch (ao_lisp_poly_type(p)) {
+	case AO_LISP_LAMBDA:
+		lambda = ao_lisp_poly_lambda(p);
+		return ao_has_macro(lambda->code);
+	case AO_LISP_CONS:
+		cons = ao_lisp_poly_cons(p);
+		if (ao_is_macro(cons->car))
+			return cons->car;
+
+		cons = ao_lisp_poly_cons(cons->cdr);
+		while (cons) {
+			m = ao_has_macro(cons->car);
+			if (m)
+				return m;
+			cons = ao_lisp_poly_cons(cons->cdr);
+		}
+		return AO_LISP_NIL;
+
+	default:
+		return AO_LISP_NIL;
+	}
+}
+
+int
+ao_lisp_read_eval_abort(void)
+{
+	ao_poly	in, out = AO_LISP_NIL;
+	for(;;) {
+		in = ao_lisp_read();
+		if (in == _ao_lisp_atom_eof)
+			break;
+		out = ao_lisp_eval(in);
+		if (ao_lisp_exception)
+			return 0;
+		ao_lisp_poly_print(out);
+		putchar ('\n');
+	}
+	return 1;
+}
+
+static FILE	*in;
+static FILE	*out;
+
+int
+ao_lisp_getc(void)
+{
+	return getc(in);
+}
+
+static const struct option options[] = {
+	{ .name = "out", .has_arg = 1, .val = 'o' },
+	{ 0, 0, 0, 0 }
+};
+
+static void usage(char *program)
+{
+	fprintf(stderr, "usage: %s [--out=<output>] [input]\n", program);
+	exit(1);
+}
+
+int
 main(int argc, char **argv)
 {
-	int	f, o, i;
-	ao_poly	sexpr, val;
+	int	f, o;
+	ao_poly	val;
 	struct ao_lisp_atom	*a;
 	struct ao_lisp_builtin	*b;
 	int	in_atom;
+	char	*out_name;
+	int	c;
 
-	printf("/*\n");
-	printf(" * Generated file, do not edit\n");
-	for (f = 0; f < N_FUNC; f++) {
+	in = stdin;
+	out = stdout;
+
+	while ((c = getopt_long(argc, argv, "o:", options, NULL)) != -1) {
+		switch (c) {
+		case 'o':
+			out_name = optarg;
+			break;
+		default:
+			usage(argv[0]);
+			break;
+		}
+	}
+
+	for (f = 0; f < (int) N_FUNC; f++) {
 		b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
 		a = ao_lisp_atom_intern(funcs[f].name);
 		ao_lisp_atom_set(ao_lisp_atom_poly(a),
@@ -143,47 +254,79 @@ main(int argc, char **argv)
 	ao_lisp_atom_set(ao_lisp_atom_poly(a),
 			 ao_lisp_atom_poly(a));
 
-	ao_lisp_read_eval_print();
+	if (argv[optind]){
+		in = fopen(argv[optind], "r");
+		if (!in) {
+			perror(argv[optind]);
+			exit(1);
+		}
+	}
+	if (!ao_lisp_read_eval_abort()) {
+		fprintf(stderr, "eval failed\n");
+		exit(1);
+	}
 
 	/* Reduce to referenced values */
 	ao_lisp_collect();
-	printf(" */\n");
 
-	printf("#define AO_LISP_POOL_CONST %d\n", ao_lisp_top);
-	printf("extern const uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));\n");
-	printf("#define ao_builtin_atoms 0x%04x\n", ao_lisp_atom_poly(ao_lisp_atoms));
-	printf("#define ao_builtin_frame 0x%04x\n", ao_lisp_frame_poly(ao_lisp_frame_global));
-	printf("#define ao_lisp_const_checksum ((uint16_t) 0x%04x)\n", ao_fec_crc(ao_lisp_const, ao_lisp_top));
+	for (f = 0; f < ao_lisp_frame_global->num; f++) {
+		val = ao_has_macro(ao_lisp_frame_global->vals[f].val);
+		if (val != AO_LISP_NIL) {
+			printf("error: function %s contains unresolved macro: ",
+			       ao_lisp_poly_atom(ao_lisp_frame_global->vals[f].atom)->name);
+			ao_lisp_poly_print(val);
+			printf(stderr, "\n");
+			exit(1);
+		}
+	}
+
+	if (out_name) {
+		out = fopen(out_name, "w");
+		if (!out) {
+			perror(out_name);
+			exit(1);
+		}
+	}
+
+	fprintf(out, "/* Generated file, do not edit */\n\n");
+
+	fprintf(out, "#define AO_LISP_POOL_CONST %d\n", ao_lisp_top);
+	fprintf(out, "extern const uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));\n");
+	fprintf(out, "#define ao_builtin_atoms 0x%04x\n", ao_lisp_atom_poly(ao_lisp_atoms));
+	fprintf(out, "#define ao_builtin_frame 0x%04x\n", ao_lisp_frame_poly(ao_lisp_frame_global));
+	fprintf(out, "#define ao_lisp_const_checksum ((uint16_t) 0x%04x)\n", ao_fec_crc(ao_lisp_const, ao_lisp_top));
+
 
 	for (a = ao_lisp_atoms; a; a = ao_lisp_poly_atom(a->next)) {
 		char	*n = a->name, c;
-		printf ("#define _ao_lisp_atom_");
+		fprintf(out, "#define _ao_lisp_atom_");
 		while ((c = *n++)) {
 			if (isalnum(c))
-				printf("%c", c);
+				fprintf(out, "%c", c);
 			else
-				printf("%02x", c);
+				fprintf(out, "%02x", c);
 		}
-		printf("  0x%04x\n", ao_lisp_atom_poly(a));
+		fprintf(out, "  0x%04x\n", ao_lisp_atom_poly(a));
 	}
-	printf("#ifdef AO_LISP_CONST_BITS\n");
-	printf("const uint8_t ao_lisp_const[] = {");
+	fprintf(out, "#ifdef AO_LISP_CONST_BITS\n");
+	fprintf(out, "const uint8_t ao_lisp_const[] = {");
 	for (o = 0; o < ao_lisp_top; o++) {
 		uint8_t	c;
 		if ((o & 0xf) == 0)
-			printf("\n\t");
+			fprintf(out, "\n\t");
 		else
-			printf(" ");
+			fprintf(out, " ");
 		c = ao_lisp_const[o];
 		if (!in_atom)
 			in_atom = is_atom(o);
 		if (in_atom) {
-			printf (" '%c',", c);
+			fprintf(out, " '%c',", c);
 			in_atom--;
 		} else {
-			printf("0x%02x,", c);
+			fprintf(out, "0x%02x,", c);
 		}
 	}
-	printf("\n};\n");
-	printf("#endif /* AO_LISP_CONST_BITS */\n");
+	fprintf(out, "\n};\n");
+	fprintf(out, "#endif /* AO_LISP_CONST_BITS */\n");
+	exit(0);
 }
