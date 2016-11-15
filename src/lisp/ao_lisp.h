@@ -650,7 +650,7 @@ ao_lisp_frames_dump(void)
 #define DBG_FRAMES()
 #endif
 
-#define DBG_MEM		1
+#define DBG_MEM		0
 #define DBG_MEM_START	1
 
 #if DBG_MEM
