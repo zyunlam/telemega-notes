@@ -38,23 +38,17 @@ const struct ao_lisp_type ao_lisp_string_type = {
 	.mark = string_mark,
 	.size = string_size,
 	.move = string_move,
+	.name = "string",
 };
-
-char *
-ao_lisp_string_new(int len) {
-	char	*a = ao_lisp_alloc(len + 1);
-	if (!a)
-		return NULL;
-	a[len] = '\0';
-	return a;
-}
 
 char *
 ao_lisp_string_copy(char *a)
 {
 	int	alen = strlen(a);
 
+	ao_lisp_string_stash(0, a);
 	char	*r = ao_lisp_alloc(alen + 1);
+	a = ao_lisp_string_fetch(0);
 	if (!r)
 		return NULL;
 	strcpy(r, a);
@@ -66,7 +60,12 @@ ao_lisp_string_cat(char *a, char *b)
 {
 	int	alen = strlen(a);
 	int	blen = strlen(b);
+
+	ao_lisp_string_stash(0, a);
+	ao_lisp_string_stash(1, b);
 	char	*r = ao_lisp_alloc(alen + blen + 1);
+	a = ao_lisp_string_fetch(0);
+	b = ao_lisp_string_fetch(1);
 	if (!r)
 		return NULL;
 	strcpy(r, a);
@@ -78,7 +77,9 @@ ao_poly
 ao_lisp_string_pack(struct ao_lisp_cons *cons)
 {
 	int	len = ao_lisp_cons_length(cons);
+	ao_lisp_cons_stash(0, cons);
 	char	*r = ao_lisp_alloc(len + 1);
+	cons = ao_lisp_cons_fetch(0);
 	char	*s = r;
 
 	while (cons) {
@@ -96,11 +97,17 @@ ao_lisp_string_unpack(char *a)
 {
 	struct ao_lisp_cons	*cons = NULL, *tail = NULL;
 	int			c;
+	int			i;
 
-	ao_lisp_root_add(&ao_lisp_cons_type, &cons);
-	ao_lisp_root_add(&ao_lisp_cons_type, &tail);
-	while ((c = *a++)) {
+	for (i = 0; (c = a[i]); i++) {
+		ao_lisp_cons_stash(0, cons);
+		ao_lisp_cons_stash(1, tail);
+		ao_lisp_string_stash(0, a);
 		struct ao_lisp_cons	*n = ao_lisp_cons_cons(ao_lisp_int_poly(c), NULL);
+		cons = ao_lisp_cons_fetch(0);
+		tail = ao_lisp_cons_fetch(1);
+		a = ao_lisp_string_fetch(0);
+
 		if (!n) {
 			cons = NULL;
 			break;
@@ -111,8 +118,6 @@ ao_lisp_string_unpack(char *a)
 			cons = n;
 		tail = n;
 	}
-	ao_lisp_root_clear(&cons);
-	ao_lisp_root_clear(&tail);
 	return ao_lisp_cons_poly(cons);
 }
 
