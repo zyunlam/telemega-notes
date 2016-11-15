@@ -8,6 +8,8 @@
 
 (setq stack '("*" "**" "***" "****" "*****" "******" "*******"))
 
+(setq top (+ (length stack) 3))
+
 (setq stacks nil)
 
 (defun display-string (x y str)
@@ -15,19 +17,20 @@
   (patom str)
   )
 
-(defun display-stack (x y stack)
-  (cond (stack (progn
-		 (display-string x y (car stack))
-		 (display-stack x (1+ y) (cdr stack)))))
-  )
-
-(defun clear-stack (x y)
-  (cond ((> y 0) (progn
-		   (move-to x y)
-		   (patom "            ")
-		   (clear-stack x (1- y))
-		   )
+(defun display-stack (x y clear stack)
+  (cond ((= 0 clear)
+	 (cond (stack (progn
+			(display-string x y (car stack))
+			(display-stack x (1+ y) 0 (cdr stack))
+			)
+		      )
+	       )
 	 )
+	(t (progn
+	     (display-string x y "          ")
+	     (display-stack x (1+ y) (1- clear) stack)
+	     )
+	   )
 	)
   )
 
@@ -43,15 +46,14 @@
 
 (defun display-stacks (x y stacks)
   (cond (stacks (progn
-		  (clear-stack x 20)
-		  (display-stack x (stack-pos y (car stacks)) (car stacks))
+		  (display-stack x 0 (stack-pos y (car stacks)) (car stacks))
 		  (display-stacks (+ x 20) y (cdr stacks)))
 		)
 	)
   )
 
 (defun display ()
-  (display-stacks 0 20 stacks)
+  (display-stacks 0 top stacks)
   (move-to 1 21)
   (flush)
   )
