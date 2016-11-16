@@ -1,14 +1,21 @@
-					; basic list accessors
+;
+; Copyright © 2016 Keith Packard <keithp@keithp.com>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation, either version 2 of the License, or
+; (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General Public License for more details.
+;
+; Lisp code placed in ROM
 
+					; return a list containing all of the arguments
 
-(setq cadr (lambda (l) (car (cdr l))))
-(setq caddr (lambda (l) (car (cdr (cdr l)))))
-(setq list (lexpr (l) l))
-
-					; evaluate a list of sexprs
-
-;(setq progn (lexpr (l) (last l)))
-
+(set (quote list) (lexpr (l) l))
 
 					;
 					; Define a variable without returning the value
@@ -16,22 +23,82 @@
 					; having lots of output generated
 					;
 
-(setq def (macro (def-param)
+(setq def (macro (name val rest)
 		 (list
 		  'progn
 		  (list
 		   'set
-		   (list
-		    'quote
-		    (car def-param))
-		   (cadr def-param)
-		   )
-		  (list
-		   'quote
-		   (car def-param)
-		   )
+		   (list 'quote name)
+		   val)
+		  (list 'quote name)
 		  )
 		 )
+      )
+
+					;
+					; A slightly more convenient form
+					; for defining lambdas.
+					;
+					; (defun <name> (<params>) s-exprs)
+					;
+
+(def defun (macro (name args exprs)
+		  (list
+		   def
+		   name
+		   (list
+		    'lambda
+		    args
+		    (cond ((cdr exprs)
+			   (cons progn exprs))
+			  ((car exprs))
+			  )
+		    )
+		   )
+		  )
+     )
+					; basic list accessors
+
+
+(defun cadr (l) (car (cdr l)))
+
+(defun caddr (l) (car (cdr (cdr l))))
+
+(defun nth (list n)
+  (cond ((= n 0) (car list))
+	((nth (cdr list) (1- n)))
+	)
+  )
+
+					; simple math operators
+
+(defun 1+ (x) (+ x 1))
+(defun 1- (x) (- x 1))
+
+					; boolean operators
+
+(def or (lexpr (l)
+	       (let ((ret nil))
+		 (while l
+		   (cond ((setq ret (car l))
+			  (setq l nil))
+			 ((setq l (cdr l)))))
+		 ret
+		 )
+	       )
+     )
+
+(def and (lexpr (l)
+	       (let ((ret t))
+		 (while l
+		   (cond ((setq ret (car l))
+			  (setq l (cdr l)))
+			 ((setq ret (setq l nil)))
+			 )
+		   )
+		 ret
+		 )
+	       )
      )
 
 					; define a set of local
@@ -52,8 +119,8 @@
 					;
 					; (let ((x 1) (y)) (setq y (+ x 1)) y)
 
-(def let (macro (let-param)
-		((lambda (vars exprs make-names make-exprs make-nils)
+(def let (macro (vars exprs)
+		((lambda (make-names make-exprs make-nils)
 		   (progn
 
 					;
@@ -67,12 +134,12 @@
 					     )
 				       )
 			  )
-					;
+
 					; the set of expressions is
 					; the list of set expressions
 					; pre-pended to the
 					; expressions to evaluate
-					;
+
 		     (setq make-exprs (lambda (vars exprs)
 				       (progn
 					 (cond (vars (cons
@@ -90,20 +157,22 @@
 					 )
 				       )
 			  )
-		     (setq exprs (make-exprs vars exprs))
 
-					;
 					; the parameters to the lambda is a list
 					; of nils of the right length
-					;
+
 		     (setq make-nils (lambda (vars)
 				      (cond (vars (cons nil (make-nils (cdr vars))))
 					    )
 				      )
 			  )
-					;
+					; prepend the set operations
+					; to the expressions
+
+		     (setq exprs (make-exprs vars exprs))
+
 					; build the lambda.
-					;
+
 		     (cons
 		      (list
 		       'lambda
@@ -116,8 +185,6 @@
 		      )
 		     )
 		   )
-		 (car let-param)
-		 (cdr let-param)
 		 ()
 		 ()
 		 ()
@@ -125,38 +192,9 @@
 		)
      )
 
-					;
-					; A slightly more convenient form
-					; for defining lambdas.
-					;
-					; (defun <name> (<params>) s-exprs)
-					;
+					; run the let macro once to
+					; evaluate all of the internal
+					; macro calls
 
-(def defun (macro (defun-param)
-		    (let ((name (car defun-param))
-			  (args (cadr defun-param))
-			  (exprs (cdr (cdr defun-param))))
-		      (list
-		       def
-		       name
-		       (list
-			'lambda
-			args
-			(cond ((cdr exprs)
-			       (cons progn exprs))
-			      ((car exprs))
-			      )
-			)
-		       )
-		      )
-		    )
-     )
+(let ((let-param 1)))
 
-					; simple math operators
-					;
-					; Do these last to run defun
-					; at least once so the let macro
-					; is resolved
-
-(defun 1+ (x) (+ x 1))
-(defun 1- (x) (- x 1))
