@@ -89,8 +89,8 @@ ao_lisp_ref(ao_poly poly) {
 	if (poly == AO_LISP_NIL)
 		return NULL;
 	if (poly & AO_LISP_CONST)
-		return (void *) (AO_LISP_CONST_BASE + (poly & AO_LISP_REF_MASK));
-	return (void *) (AO_LISP_POOL_BASE + (poly & AO_LISP_REF_MASK));
+		return (void *) (ao_lisp_const + (poly & AO_LISP_REF_MASK) - 4);
+	return (void *) (ao_lisp_pool + (poly & AO_LISP_REF_MASK) - 4);
 }
 
 ao_poly
@@ -99,6 +99,6 @@ ao_lisp_poly(const void *addr, ao_poly type) {
 	if (a == NULL)
 		return AO_LISP_NIL;
 	if (AO_LISP_IS_CONST(a))
-		return AO_LISP_CONST | (a - AO_LISP_CONST_BASE) | type;
-	return (a - AO_LISP_POOL_BASE) | type;
+		return AO_LISP_CONST | (a - ao_lisp_const + 4) | type;
+	return (a - ao_lisp_pool + 4) | type;
 }

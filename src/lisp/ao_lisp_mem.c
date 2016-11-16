@@ -252,23 +252,6 @@ static inline uint16_t pool_offset(void *addr) {
 	return ((uint8_t *) addr) - ao_lisp_pool;
 }
 
-/*
- * Convert back and forth between 'poly's used
- * as short addresses in the pool and addresses.
- * These are used in the chunk code.
- */
-static inline ao_poly pool_poly(void *addr) {
-#if DBG_MEM
-	if (!AO_LISP_IS_POOL(addr))
-		ao_lisp_abort();
-#endif
-	return ((uint8_t *) addr) - AO_LISP_POOL_BASE;
-}
-
-static inline void *pool_ref(ao_poly p) {
-	return AO_LISP_POOL_BASE + p;
-}
-
 static inline void mark(uint8_t *tag, int offset) {
 	int	byte = offset >> 5;
 	int	bit = (offset >> 2) & 7;
