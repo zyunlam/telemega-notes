@@ -115,29 +115,109 @@ ao_fec_crc(const uint8_t *bytes, uint8_t len)
 	return crc;
 }
 
+struct ao_lisp_macro_stack {
+	struct ao_lisp_macro_stack *next;
+	ao_poly	p;
+};
+
+struct ao_lisp_macro_stack *macro_stack;
+
 int
+ao_lisp_macro_push(ao_poly p)
+{
+	struct ao_lisp_macro_stack *m = macro_stack;
+
+	while (m) {
+		if (m->p == p)
+			return 1;
+		m = m->next;
+	}
+	m = malloc (sizeof (struct ao_lisp_macro_stack));
+	m->p = p;
+	m->next = macro_stack;
+	macro_stack = m;
+}
+
+void
+ao_lisp_macro_pop(void)
+{
+	struct ao_lisp_macro_stack *m = macro_stack;
+
+	macro_stack = m->next;
+	free(m);
+}
+
+#define DBG_MACRO 1
+#if DBG_MACRO
+int macro_scan_depth;
+
+void indent(void)
+{
+	int i;
+	for (i = 0; i < macro_scan_depth; i++)
+		printf("  ");
+}
+#define MACRO_DEBUG(a)	a
+#else
+#define MACRO_DEBUG(a)
+#endif
+
+ao_poly
+ao_has_macro(ao_poly p);
+
+ao_poly
+ao_macro_test_get(ao_poly atom)
+{
+	ao_poly	*ref = ao_lisp_atom_ref(ao_lisp_frame_global, atom);
+	if (ref)
+		return *ref;
+	return AO_LISP_NIL;
+}
+
+ao_poly
 ao_is_macro(ao_poly p)
 {
 	struct ao_lisp_builtin	*builtin;
 	struct ao_lisp_lambda	*lambda;
+	ao_poly ret;
 
-//	printf ("macro scanning "); ao_lisp_poly_print(p); printf("\n");
+	MACRO_DEBUG(indent(); printf ("is macro "); ao_lisp_poly_print(p); printf("\n"); ++macro_scan_depth);
 	switch (ao_lisp_poly_type(p)) {
 	case AO_LISP_ATOM:
-		return ao_is_macro(ao_lisp_atom_get(p));
+		if (ao_lisp_macro_push(p))
+			ret = AO_LISP_NIL;
+		else {
+			if (ao_is_macro(ao_macro_test_get(p)))
+				ret = p;
+			else
+				ret = AO_LISP_NIL;
+			ao_lisp_macro_pop();
+		}
+		break;
+	case AO_LISP_CONS:
+		ret = ao_has_macro(p);
+		break;
 	case AO_LISP_BUILTIN:
 		builtin = ao_lisp_poly_builtin(p);
 		if ((builtin->args & AO_LISP_FUNC_MASK) == AO_LISP_FUNC_MACRO)
-			return 1;
-		return 0;
+			ret = p;
+		else
+			ret = 0;
+		break;
+
 	case AO_LISP_LAMBDA:
 		lambda = ao_lisp_poly_lambda(p);
 		if (lambda->args == AO_LISP_FUNC_MACRO)
-			return 1;
-		return 0;
+			ret = p;
+		else
+			ret = ao_has_macro(lambda->code);
+		break;
 	default:
-		return 0;
+		ret = AO_LISP_NIL;
+		break;
 	}
+	MACRO_DEBUG(--macro_scan_depth;	indent(); printf ("... "); ao_lisp_poly_print(ret); printf("\n"));
+	return ret;
 }
 
 ao_poly
@@ -150,27 +230,35 @@ ao_has_macro(ao_poly p)
 	if (p == AO_LISP_NIL)
 		return AO_LISP_NIL;
 
+	MACRO_DEBUG(indent(); printf("has macro "); ao_lisp_poly_print(p); printf("\n"); ++macro_scan_depth);
 	switch (ao_lisp_poly_type(p)) {
 	case AO_LISP_LAMBDA:
 		lambda = ao_lisp_poly_lambda(p);
-		return ao_has_macro(lambda->code);
+		p = ao_has_macro(lambda->code);
+		break;
 	case AO_LISP_CONS:
 		cons = ao_lisp_poly_cons(p);
-		if (ao_is_macro(cons->car))
-			return cons->car;
+		if ((p = ao_is_macro(cons->car)))
+			break;
 
 		cons = ao_lisp_poly_cons(cons->cdr);
+		p = AO_LISP_NIL;
 		while (cons) {
 			m = ao_has_macro(cons->car);
-			if (m)
-				return m;
+			if (m) {
+				p = m;
+				break;
+			}
 			cons = ao_lisp_poly_cons(cons->cdr);
 		}
-		return AO_LISP_NIL;
+		break;
 
 	default:
-		return AO_LISP_NIL;
+		p = AO_LISP_NIL;
+		break;
 	}
+	MACRO_DEBUG(--macro_scan_depth;	indent(); printf("... "); ao_lisp_poly_print(p); printf("\n"));
+	return p;
 }
 
 int
@@ -269,13 +357,13 @@ main(int argc, char **argv)
 	/* Reduce to referenced values */
 	ao_lisp_collect();
 
-	for (f = 0; f < ao_lisp_frame_global->num; f++) {
+	for (f = 0; f < ao_lisp_frame_num(ao_lisp_frame_global); f++) {
 		val = ao_has_macro(ao_lisp_frame_global->vals[f].val);
 		if (val != AO_LISP_NIL) {
 			printf("error: function %s contains unresolved macro: ",
 			       ao_lisp_poly_atom(ao_lisp_frame_global->vals[f].atom)->name);
 			ao_lisp_poly_print(val);
-			printf(stderr, "\n");
+			printf("\n");
 			exit(1);
 		}
 	}
