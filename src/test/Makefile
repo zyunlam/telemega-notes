@@ -10,7 +10,7 @@ INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quat
 
 KALMAN=make-kalman 
 
-CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -I../lisp -O0 -g -Wall -DAO_LISP_TEST
+CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -I../lisp -O3 -g -Wall -DAO_LISP_TEST -no-pie
 
 all: $(PROGS) ao_aprs_data.wav
 
