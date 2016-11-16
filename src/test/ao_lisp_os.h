@@ -23,7 +23,7 @@
 #include <time.h>
 
 #define AO_LISP_POOL_TOTAL	3072
-#define AO_LISP_SAVE
+#define AO_LISP_SAVE		1
 
 extern int ao_lisp_getc(void);
 

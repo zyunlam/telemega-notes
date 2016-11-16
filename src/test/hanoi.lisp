@@ -106,12 +106,6 @@
 	)
   )
 
-(defun nth (list n)
-  (cond ((= n 0) (car list))
-	((nth (cdr list) (1- n)))
-	)
-  )
-
 ; Replace a stack in the list of stacks
 ; with a new value
 
