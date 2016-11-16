@@ -36,10 +36,6 @@ uint8_t	ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((aligned(4
 
 #endif
 
-#if 0
-#define MDBG_POOL
-#endif
-
 #if DBG_MEM
 int dbg_move_depth;
 int dbg_mem = DBG_MEM_START;
@@ -436,15 +432,19 @@ ao_lisp_poly_mark_ref(ao_poly *p, uint8_t do_note_cons)
 	return ao_lisp_poly_mark(*p, do_note_cons);
 }
 
-int ao_lisp_collects;
+int ao_lisp_collects[2];
+int ao_lisp_freed[2];
 
-void
-ao_lisp_collect(void)
+int ao_lisp_last_top;
+
+int
+ao_lisp_collect(uint8_t style)
 {
+	int	ret;
 	int	i;
 	int	top;
-#if DBG_MEM
 	int	loops = 0;
+#if DBG_MEM
 	int	marked;
 	int	moved;
 	struct ao_lisp_record	*mark_record = NULL, *move_record = NULL;
@@ -453,15 +453,18 @@ ao_lisp_collect(void)
 	marked = moved = 0;
 #endif
 
-	++ao_lisp_collects;
+	++ao_lisp_collects[style];
 
 	/* Clear references to all caches */
 	for (i = 0; i < (int) AO_LISP_CACHE; i++)
 		*ao_lisp_cache[i] = NULL;
-	chunk_low = 0;
-	top = 0;
+	if (style == AO_LISP_COLLECT_FULL) {
+		chunk_low = top = 0;
+	} else {
+		chunk_low = top = ao_lisp_last_top;
+	}
 	for (;;) {
-		MDBG_DO(loops++);
+		loops++;
 		MDBG_MOVE("move chunks from %d to %d\n", chunk_low, top);
 		/* Find the sizes of the first chunk of objects to move */
 		memset(ao_lisp_chunk, '\0', sizeof (ao_lisp_chunk));
@@ -542,12 +545,18 @@ ao_lisp_collect(void)
 		if (chunk_last != AO_LISP_NCHUNK)
 			break;
 	}
+	ret = ao_lisp_top - top;
+	ao_lisp_freed[style] += ret;
+
 	ao_lisp_top = top;
+	if (style == AO_LISP_COLLECT_FULL || ao_lisp_last_top == 0)
+		ao_lisp_last_top = top;
 
 	MDBG_DO(memset(ao_lisp_chunk, '\0', sizeof (ao_lisp_chunk));
 		walk(ao_lisp_mark_ref, ao_lisp_poly_mark_ref));
 
-//	printf ("collect. top %d loops %d\n", top, loops);
+//	printf ("collect. style %d loops %d freed %d\n", style, loops, ret);
+	return ret;
 }
 
 /*
@@ -737,45 +746,6 @@ ao_lisp_poly_move(ao_poly *ref, uint8_t do_note_cons)
 	return ret;
 }
 
-#ifdef MDBG_POOL
-static int AO_LISP_POOL_CUR = AO_LISP_POOL / 8;
-
-static void
-ao_lisp_poison(void)
-{
-	int	i;
-
-	printf("poison\n");
-	ao_lisp_mark_busy();
-	for (i = 0; i < AO_LISP_POOL_CUR; i += 4) {
-		uint32_t	*a = (uint32_t *) &ao_lisp_pool[i];
-		if (!busy_object(ao_lisp_busy, a))
-			*a = 0xBEEFBEEF;
-	}
-	for (i = 0; i < AO_LISP_POOL_CUR; i += 2) {
-		ao_poly		*a = (uint16_t *) &ao_lisp_pool[i];
-		ao_poly		p = *a;
-
-		if (!ao_lisp_is_const(p)) {
-			void	*r = ao_lisp_ref(p);
-
-			if (ao_lisp_pool <= (uint8_t *) r &&
-			    (uint8_t *) r <= ao_lisp_pool + AO_LISP_POOL_CUR)
-			{
-				if (!busy_object(ao_lisp_busy, r)) {
-					printf("missing reference from %d to %d\n",
-					       (int) ((uint8_t *) a - ao_lisp_pool),
-					       (int) ((uint8_t *) r - ao_lisp_pool));
-				}
-			}
-		}
-	}
-}
-
-#else
-#define AO_LISP_POOL_CUR AO_LISP_POOL
-#endif
-
 #if DBG_MEM
 void
 ao_lisp_validate(void)
@@ -789,7 +759,6 @@ int dbg_allocs;
 
 #endif
 
-
 void *
 ao_lisp_alloc(int size)
 {
@@ -798,26 +767,10 @@ ao_lisp_alloc(int size)
 	MDBG_DO(++dbg_allocs);
 	MDBG_DO(if (dbg_validate) ao_lisp_validate());
 	size = ao_lisp_size_round(size);
-	if (ao_lisp_top + size > AO_LISP_POOL_CUR) {
-#ifdef MDBG_POOL
-		if (AO_LISP_POOL_CUR < AO_LISP_POOL) {
-			AO_LISP_POOL_CUR += AO_LISP_POOL / 8;
-			ao_lisp_poison();
-		} else
-#endif
-		ao_lisp_collect();
-#ifdef MDBG_POOL
+	if (ao_lisp_top + size > AO_LISP_POOL) {
+		if (!ao_lisp_collect(AO_LISP_COLLECT_INCREMENTAL) &&
+		    !ao_lisp_collect(AO_LISP_COLLECT_FULL))
 		{
-			int	i;
-
-			for (i = ao_lisp_top; i < AO_LISP_POOL; i += 4) {
-				uint32_t	*p = (uint32_t *) &ao_lisp_pool[i];
-				*p = 0xbeefbeef;
-			}
-		}
-#endif
-
-		if (ao_lisp_top + size > AO_LISP_POOL) {
 			ao_lisp_error(AO_LISP_OOM, "out of memory");
 			return NULL;
 		}

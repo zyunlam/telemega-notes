@@ -421,7 +421,8 @@ ao_lisp_builtin_poly(struct ao_lisp_builtin *b)
 
 /* memory functions */
 
-extern int ao_lisp_collects;
+extern int ao_lisp_collects[2];
+extern int ao_lisp_freed[2];
 
 /* returns 1 if the object was already marked */
 int
@@ -445,8 +446,11 @@ ao_lisp_move_memory(const struct ao_lisp_type *type, void **ref);
 void *
 ao_lisp_alloc(int size);
 
-void
-ao_lisp_collect(void);
+#define AO_LISP_COLLECT_FULL		1
+#define AO_LISP_COLLECT_INCREMENTAL	0
+
+int
+ao_lisp_collect(uint8_t style);
 
 void
 ao_lisp_cons_stash(int id, struct ao_lisp_cons *cons);

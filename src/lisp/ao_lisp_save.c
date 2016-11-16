@@ -23,7 +23,7 @@ ao_lisp_save(struct ao_lisp_cons *cons)
 #ifdef AO_LISP_SAVE
 	struct ao_lisp_os_save *os = (struct ao_lisp_os_save *) &ao_lisp_pool[AO_LISP_POOL];
 
-	ao_lisp_collect();
+	ao_lisp_collect(AO_LISP_COLLECT_FULL);
 	os->atoms = ao_lisp_atom_poly(ao_lisp_atoms);
 	os->globals = ao_lisp_frame_poly(ao_lisp_frame_global);
 	os->const_checksum = ao_lisp_const_checksum;
@@ -64,7 +64,7 @@ ao_lisp_restore(struct ao_lisp_cons *cons)
 
 		/* Reset the allocator */
 		ao_lisp_top = AO_LISP_POOL;
-		ao_lisp_collect();
+		ao_lisp_collect(AO_LISP_COLLECT_FULL);
 
 		/* Re-create the evaluator stack */
 		if (!ao_lisp_eval_restart())

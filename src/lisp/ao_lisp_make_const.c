@@ -147,7 +147,7 @@ ao_lisp_macro_pop(void)
 	free(m);
 }
 
-#define DBG_MACRO 1
+#define DBG_MACRO 0
 #if DBG_MACRO
 int macro_scan_depth;
 
@@ -355,7 +355,7 @@ main(int argc, char **argv)
 	}
 
 	/* Reduce to referenced values */
-	ao_lisp_collect();
+	ao_lisp_collect(AO_LISP_COLLECT_FULL);
 
 	for (f = 0; f < ao_lisp_frame_num(ao_lisp_frame_global); f++) {
 		val = ao_has_macro(ao_lisp_frame_global->vals[f].val);
