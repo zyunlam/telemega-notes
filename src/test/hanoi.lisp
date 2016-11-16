@@ -32,9 +32,7 @@
 
 ; Here's the pieces to display
 
-(setq stack '("*" "**" "***" "****" "*****" "******" "*******"))
-
-(setq top (+ (length stack) 3))
+(setq stack '("     *     " "    ***    " "   *****   " "  *******  " " ********* " "***********"))
 
 ;
 ; Here's all of the stacks of pieces
@@ -55,7 +53,7 @@
 	       )
 	 )
 	(t (progn
-	     (display-string x y "          ")
+	     (display-string x y "                    ")
 	     (display-stack x (1+ y) (1- clear) stack)
 	     )
 	   )
@@ -94,6 +92,7 @@
 
 (defun reset-stacks ()
   (setq stacks (list stack nil nil))
+  (setq top (+ (length stack) 3))
   (length stack)
   )
 
