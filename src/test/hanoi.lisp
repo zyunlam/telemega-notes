@@ -14,8 +14,7 @@
 ; General Public License for more details.
 ;
 
-
-; ANSI control sequences
+					; ANSI control sequences
 
 (defun move-to (col row)
   (patom "\033[" row ";" col "H" nil)
@@ -30,18 +29,17 @@
   (patom str)
   )
 
-; Here's the pieces to display
+					; Here's the pieces to display
 
 (setq stack '("     *     " "    ***    " "   *****   " "  *******  " " ********* " "***********"))
 
-;
-; Here's all of the stacks of pieces
-; This is generated when the program is run
-;
+					; Here's all of the stacks of pieces
+					; This is generated when the program is run
+
 (setq stacks nil)
 
-; Display one stack, clearing any
-; space above it
+					; Display one stack, clearing any
+					; space above it
 
 (defun display-stack (x y clear stack)
   (cond ((= 0 clear)
@@ -60,14 +58,14 @@
 	)
   )
 
-; Position of the top of the stack on the screen
-; Shorter stacks start further down the screen
+					; Position of the top of the stack on the screen
+					; Shorter stacks start further down the screen
 
 (defun stack-pos (y stack)
   (- y (length stack))
   )
 
-; Display all of the stacks, spaced 20 columns apart
+					; Display all of the stacks, spaced 20 columns apart
 
 (defun display-stacks (x y stacks)
   (cond (stacks (progn
@@ -77,8 +75,8 @@
 	)
   )
 
-; Display all of the stacks, then move the cursor
-; out of the way and flush the output
+					; Display all of the stacks, then move the cursor
+					; out of the way and flush the output
 
 (defun display ()
   (display-stacks 0 top stacks)
@@ -86,9 +84,9 @@
   (flush)
   )
 
-; Reset stacks to the starting state, with
-; all of the pieces in the first stack and the
-; other two empty
+					; Reset stacks to the starting state, with
+					; all of the pieces in the first stack and the
+					; other two empty
 
 (defun reset-stacks ()
   (setq stacks (list stack nil nil))
@@ -96,8 +94,8 @@
   (length stack)
   )
 
-; more functions which could usefully
-; be in the rom image
+					; more functions which could usefully
+					; be in the rom image
 
 (defun min (a b)
   (cond ((< a b) a)
@@ -105,8 +103,8 @@
 	)
   )
 
-; Replace a stack in the list of stacks
-; with a new value
+					; Replace a stack in the list of stacks
+					; with a new value
 
 (defun replace (list pos member)
   (cond ((= pos 0) (cons member (cdr list)))
@@ -114,8 +112,8 @@
 	)
   )
 
-; Move a piece from the top of one stack
-; to the top of another
+					; Move a piece from the top of one stack
+					; to the top of another
 
 (defun move-piece (from to)
   (let ((from-stack (nth stacks from))
@@ -126,7 +124,7 @@
     (setq stacks (replace stacks from from-stack))
     (setq stacks (replace stacks to to-stack))
     (display)
-;    (delay 100)
+    (delay 100)
     )
   )
 
@@ -148,10 +146,10 @@
 	)
   )
 
-; A pretty interface which
-; resets the state of the game,
-; clears the screen and runs
-; the program
+					; A pretty interface which
+					; resets the state of the game,
+					; clears the screen and runs
+					; the program
 
 (defun hanoi ()
   (setq len (reset-stacks))
@@ -159,11 +157,14 @@
   (_hanoi len 0 1 2)
   )
 
+					; Run many in a row to time them
+
 (defun hanois(n)
-  (while (> n 0)
-    (progn
-      (hanoi)
-      (setq l (1- l))
-      )
-    )
+  (cond ((> n 0)
+	 (progn
+	   (hanoi)
+	   (hanois (1- n))
+	   )
+	 )
+	)
   )
