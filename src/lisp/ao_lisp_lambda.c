@@ -134,6 +134,8 @@ ao_lisp_lambda_eval(void)
 	struct ao_lisp_frame	*next_frame;
 	int			args_wanted;
 	int			args_provided;
+	int			f;
+	struct ao_lisp_cons	*vals
 
 	DBGI("lambda "); DBG_POLY(ao_lisp_lambda_poly(lambda)); DBG("\n");
 
@@ -141,12 +143,14 @@ ao_lisp_lambda_eval(void)
 
 	/* Create a frame to hold the variables
 	 */
-	if (lambda->args == AO_LISP_FUNC_LAMBDA)
-		args_provided = ao_lisp_cons_length(cons) - 1;
-	else
-		args_provided = 1;
-	if (args_wanted != args_provided)
-		return ao_lisp_error(AO_LISP_INVALID, "need %d args, not %d", args_wanted, args_provided);
+	args_provided = ao_lisp_cons_length(cons) - 1;
+	if (lambda->args == AO_LISP_FUNC_LAMBDA) {
+		if (args_wanted != args_provided)
+			return ao_lisp_error(AO_LISP_INVALID, "need %d args, got %d", args_wanted, args_provided);
+	} else {
+		if (args_provided < args_wanted - 1)
+			return ao_lisp_error(AO_LISP_INVALID, "need at least %d args, got %d", args_wanted, args_provided);
+	}
 
 	next_frame = ao_lisp_frame_new(args_wanted);
 
@@ -155,12 +159,10 @@ ao_lisp_lambda_eval(void)
 	cons = ao_lisp_poly_cons(ao_lisp_stack->values);
 	code = ao_lisp_poly_cons(lambda->code);
 	args = ao_lisp_poly_cons(ao_lisp_arg(code, 0));
+	vals = ao_lisp_poly_cons(cons->cdr);
 
 	switch (lambda->args) {
-	case AO_LISP_FUNC_LAMBDA: {
-		int			f;
-		struct ao_lisp_cons	*vals = ao_lisp_poly_cons(cons->cdr);
-
+	case AO_LISP_FUNC_LAMBDA:
 		for (f = 0; f < args_wanted; f++) {
 			DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(vals->car); DBG("\n");
 			next_frame->vals[f].atom = args->car;
@@ -170,13 +172,19 @@ ao_lisp_lambda_eval(void)
 		}
 		ao_lisp_cons_free(cons);
 		break;
-	}
 	case AO_LISP_FUNC_LEXPR:
 	case AO_LISP_FUNC_NLAMBDA:
 	case AO_LISP_FUNC_MACRO:
-		DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(cons->cdr); DBG("\n");
-		next_frame->vals[0].atom = args->car;
-		next_frame->vals[0].val = cons->cdr;
+		for (f = 0; f < args_wanted - 1; f++) {
+			DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(vals->car); DBG("\n");
+			next_frame->vals[f].atom = args->car;
+			next_frame->vals[f].val = vals->car;
+			args = ao_lisp_poly_cons(args->cdr);
+			vals = ao_lisp_poly_cons(vals->cdr);
+		}
+		DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(); DBG("\n");
+		next_frame->vals[f].atom = args->car;
+		next_frame->vals[f].val = ao_lisp_cons_poly(vals);
 		break;
 	}
 	next_frame->prev = lambda->frame;
