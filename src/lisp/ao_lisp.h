@@ -118,9 +118,6 @@ ao_lisp_is_const(ao_poly poly) {
 	return poly & AO_LISP_CONST;
 }
 
-#define AO_LISP_POOL_BASE	(ao_lisp_pool - 4)
-#define AO_LISP_CONST_BASE	(ao_lisp_const - 4)
-
 #define AO_LISP_IS_CONST(a)	(ao_lisp_const <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_lisp_const + AO_LISP_POOL_CONST)
 #define AO_LISP_IS_POOL(a)	(ao_lisp_pool <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_lisp_pool + AO_LISP_POOL)
 
