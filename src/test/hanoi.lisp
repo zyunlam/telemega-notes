@@ -126,7 +126,7 @@
     (setq stacks (replace stacks from from-stack))
     (setq stacks (replace stacks to to-stack))
     (display)
-    (delay 100)
+;    (delay 100)
     )
   )
 
@@ -157,4 +157,13 @@
   (setq len (reset-stacks))
   (clear)
   (_hanoi len 0 1 2)
+  )
+
+(defun hanois(n)
+  (while (> n 0)
+    (progn
+      (hanoi)
+      (setq l (1- l))
+      )
+    )
   )

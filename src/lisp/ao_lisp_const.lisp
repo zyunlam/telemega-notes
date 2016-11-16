@@ -75,32 +75,6 @@
 (defun 1+ (x) (+ x 1))
 (defun 1- (x) (- x 1))
 
-					; boolean operators
-
-(def or (lexpr (l)
-	       (let ((ret nil))
-		 (while l
-		   (cond ((setq ret (car l))
-			  (setq l nil))
-			 ((setq l (cdr l)))))
-		 ret
-		 )
-	       )
-     )
-
-(def and (lexpr (l)
-	       (let ((ret t))
-		 (while l
-		   (cond ((setq ret (car l))
-			  (setq l (cdr l)))
-			 ((setq ret (setq l nil)))
-			 )
-		   )
-		 ret
-		 )
-	       )
-     )
-
 					; define a set of local
 					; variables and then evaluate
 					; a list of sexprs
@@ -192,9 +166,37 @@
 		)
      )
 
-					; run the let macro once to
-					; evaluate all of the internal
-					; macro calls
+					; boolean operators
 
-(let ((let-param 1)))
+(def or (lexpr (l)
+	       (let ((ret nil))
+		 (while l
+		   (cond ((setq ret (car l))
+			  (setq l nil))
+			 ((setq l (cdr l)))))
+		 ret
+		 )
+	       )
+     )
+
+					; execute to resolve macros
+
+(or nil t)
+
+(def and (lexpr (l)
+	       (let ((ret t))
+		 (while l
+		   (cond ((setq ret (car l))
+			  (setq l (cdr l)))
+			 ((setq ret (setq l nil)))
+			 )
+		   )
+		 ret
+		 )
+	       )
+     )
+
+					; execute to resolve macros
+
+(and t nil)
 

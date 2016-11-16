@@ -136,6 +136,7 @@ ao_lisp_macro_push(ao_poly p)
 	m->p = p;
 	m->next = macro_stack;
 	macro_stack = m;
+	return 0;
 }
 
 void
@@ -397,7 +398,7 @@ main(int argc, char **argv)
 		fprintf(out, "  0x%04x\n", ao_lisp_atom_poly(a));
 	}
 	fprintf(out, "#ifdef AO_LISP_CONST_BITS\n");
-	fprintf(out, "const uint8_t ao_lisp_const[] = {");
+	fprintf(out, "const uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute((aligned(4))) = {");
 	for (o = 0; o < ao_lisp_top; o++) {
 		uint8_t	c;
 		if ((o & 0xf) == 0)

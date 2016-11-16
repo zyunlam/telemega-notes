@@ -101,10 +101,34 @@ main (int argc, char **argv)
 		ao_lisp_file = NULL;
 	}
 	ao_lisp_read_eval_print();
+
 	printf ("collects: full: %d incremental %d\n",
 		ao_lisp_collects[AO_LISP_COLLECT_FULL],
 		ao_lisp_collects[AO_LISP_COLLECT_INCREMENTAL]);
+
 	printf ("freed: full %d incremental %d\n",
 		ao_lisp_freed[AO_LISP_COLLECT_FULL],
 		ao_lisp_freed[AO_LISP_COLLECT_INCREMENTAL]);
+
+	printf("loops: full %d incremental %d\n",
+		ao_lisp_loops[AO_LISP_COLLECT_FULL],
+		ao_lisp_loops[AO_LISP_COLLECT_INCREMENTAL]);
+
+	printf("loops per collect: full %f incremental %f\n",
+	       (double) ao_lisp_loops[AO_LISP_COLLECT_FULL] /
+	       (double) ao_lisp_collects[AO_LISP_COLLECT_FULL],
+	       (double) ao_lisp_loops[AO_LISP_COLLECT_INCREMENTAL] /
+	       (double) ao_lisp_collects[AO_LISP_COLLECT_INCREMENTAL]);
+
+	printf("freed per collect: full %f incremental %f\n",
+	       (double) ao_lisp_freed[AO_LISP_COLLECT_FULL] /
+	       (double) ao_lisp_collects[AO_LISP_COLLECT_FULL],
+	       (double) ao_lisp_freed[AO_LISP_COLLECT_INCREMENTAL] /
+	       (double) ao_lisp_collects[AO_LISP_COLLECT_INCREMENTAL]);
+
+	printf("freed per loop: full %f incremental %f\n",
+	       (double) ao_lisp_freed[AO_LISP_COLLECT_FULL] /
+	       (double) ao_lisp_loops[AO_LISP_COLLECT_FULL],
+	       (double) ao_lisp_freed[AO_LISP_COLLECT_INCREMENTAL] /
+	       (double) ao_lisp_loops[AO_LISP_COLLECT_INCREMENTAL]);
 }

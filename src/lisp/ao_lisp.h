@@ -423,6 +423,7 @@ ao_lisp_builtin_poly(struct ao_lisp_builtin *b)
 
 extern int ao_lisp_collects[2];
 extern int ao_lisp_freed[2];
+extern int ao_lisp_loops[2];
 
 /* returns 1 if the object was already marked */
 int
