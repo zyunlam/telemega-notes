@@ -49,9 +49,12 @@
 		   (list
 		    'lambda
 		    args
-		    (cond ((cdr exprs)
-			   (cons progn exprs))
-			  ((car exprs))
+		    (cond (exprs
+			   (cond ((cdr exprs)
+				  (cons progn exprs))
+				 ((car exprs))
+				 )
+			   )
 			  )
 		    )
 		   )
