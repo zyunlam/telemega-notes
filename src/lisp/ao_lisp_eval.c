@@ -122,7 +122,8 @@ ao_lisp_stack_push(void)
 static void
 ao_lisp_stack_pop(void)
 {
-	ao_poly	prev;
+	ao_poly			prev;
+	struct ao_lisp_frame	*prev_frame;
 
 	if (!ao_lisp_stack)
 		return;
@@ -131,10 +132,13 @@ ao_lisp_stack_pop(void)
 	ao_lisp_stack_free_list = ao_lisp_stack;
 
 	ao_lisp_stack = ao_lisp_poly_stack(prev);
+	prev_frame = ao_lisp_frame_current;
 	if (ao_lisp_stack)
 		ao_lisp_frame_current = ao_lisp_poly_frame(ao_lisp_stack->frame);
 	else
 		ao_lisp_frame_current = NULL;
+	if (ao_lisp_frame_current != prev_frame)
+		ao_lisp_frame_free(prev_frame);
 	DBG_OUT();
 	DBGI("stack pop\n");
 	DBG_FRAMES();

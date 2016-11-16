@@ -49,7 +49,7 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 	tabs(indent);
 	printf ("%s{", name);
 	if (frame) {
-		for (f = 0; f < frame->num; f++) {
+		for (f = 0; f < ao_lisp_frame_num(frame); f++) {
 			if (f != 0) {
 				tabs(indent);
 				printf("         ");
@@ -59,8 +59,8 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 			ao_lisp_poly_print(frame->vals[f].val);
 			printf("\n");
 		}
-		if (frame->next)
-			ao_lisp_error_frame(indent + 1, "next:   ", ao_lisp_poly_frame(frame->next));
+		if (frame->prev)
+			ao_lisp_error_frame(indent + 1, "prev:   ", ao_lisp_poly_frame(frame->prev));
 	}
 	tabs(indent);
 	printf("        }\n");

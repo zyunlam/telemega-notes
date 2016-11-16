@@ -214,7 +214,15 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 static const void ** const ao_lisp_cache[] = {
 	(const void **) &ao_lisp_cons_free_list,
 	(const void **) &ao_lisp_stack_free_list,
+	(const void **) &ao_lisp_frame_free_list[0],
+	(const void **) &ao_lisp_frame_free_list[1],
+	(const void **) &ao_lisp_frame_free_list[2],
+	(const void **) &ao_lisp_frame_free_list[3],
 };
+
+#if AO_LISP_FRAME_FREE != 4
+#error Unexpected AO_LISP_FRAME_FREE value
+#endif
 
 #define AO_LISP_CACHE	(sizeof (ao_lisp_cache) / sizeof (ao_lisp_cache[0]))
 
