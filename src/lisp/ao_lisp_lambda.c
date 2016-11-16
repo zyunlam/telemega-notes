@@ -94,7 +94,7 @@ ao_lisp_lambda_alloc(struct ao_lisp_cons *code, int args)
 	lambda->type = AO_LISP_LAMBDA;
 	lambda->args = args;
 	lambda->code = ao_lisp_cons_poly(code);
-	lambda->frame = ao_lisp_frame_poly(ao_lisp_frame_current);
+	lambda->frame = ao_lisp_frame_mark(ao_lisp_frame_current);
 	DBGI("build frame: "); DBG_POLY(lambda->frame); DBG("\n");
 	DBG_STACK();
 	return ao_lisp_lambda_poly(lambda);
@@ -179,7 +179,7 @@ ao_lisp_lambda_eval(void)
 		next_frame->vals[0].val = cons->cdr;
 		break;
 	}
-	next_frame->next = lambda->frame;
+	next_frame->prev = lambda->frame;
 	DBGI("eval frame: "); DBG_POLY(ao_lisp_frame_poly(next_frame)); DBG("\n");
 	ao_lisp_frame_current = next_frame;
 	ao_lisp_stack->frame = ao_lisp_frame_poly(ao_lisp_frame_current);

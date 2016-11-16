@@ -156,13 +156,33 @@ struct ao_lisp_val {
 
 struct ao_lisp_frame {
 	uint8_t			type;
-	uint8_t			num;
-	ao_poly			next;
+	uint8_t			_num;
+	ao_poly			prev;
 	struct ao_lisp_val	vals[];
 };
 
+#define AO_LISP_FRAME_NUM_MASK	0x7f
+
+/* Set when the frame escapes the lambda */
+#define AO_LISP_FRAME_MARK	0x80
+
+static inline int ao_lisp_frame_num(struct ao_lisp_frame *f) {
+	if (f->_num == 0xff)
+		ao_lisp_abort();
+	return f->_num & AO_LISP_FRAME_NUM_MASK;
+}
+
+static inline int ao_lisp_frame_marked(struct ao_lisp_frame *f) {
+	if (f->_num == 0xff)
+		ao_lisp_abort();
+	return f->_num & AO_LISP_FRAME_MARK;
+}
+
 static inline struct ao_lisp_frame *
 ao_lisp_poly_frame(ao_poly poly) {
+	struct ao_lisp_frame *frame = ao_lisp_ref(poly);
+	if (frame && frame->_num == 0xff)
+		ao_lisp_abort();
 	return ao_lisp_ref(poly);
 }
 
@@ -500,6 +520,9 @@ ao_lisp_atom_print(ao_poly a);
 struct ao_lisp_atom *
 ao_lisp_atom_intern(char *name);
 
+ao_poly *
+ao_lisp_atom_ref(struct ao_lisp_frame *frame, ao_poly atom);
+
 ao_poly
 ao_lisp_atom_get(ao_poly atom);
 
@@ -574,11 +597,21 @@ ao_lisp_read_eval_print(void);
 /* frame */
 extern const struct ao_lisp_type ao_lisp_frame_type;
 
+#define AO_LISP_FRAME_FREE	4
+
+extern struct ao_lisp_frame	*ao_lisp_frame_free_list[AO_LISP_FRAME_FREE];
+
+ao_poly
+ao_lisp_frame_mark(struct ao_lisp_frame *frame);
+
 ao_poly *
 ao_lisp_frame_ref(struct ao_lisp_frame *frame, ao_poly atom);
 
 struct ao_lisp_frame *
 ao_lisp_frame_new(int num);
+
+void
+ao_lisp_frame_free(struct ao_lisp_frame *frame);
 
 int
 ao_lisp_frame_add(struct ao_lisp_frame **frame, ao_poly atom, ao_poly val);

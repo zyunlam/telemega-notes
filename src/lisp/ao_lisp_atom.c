@@ -108,7 +108,7 @@ ao_lisp_atom_init(void)
 		ao_lisp_frame_global = ao_lisp_frame_new(0);
 }
 
-static ao_poly *
+ao_poly *
 ao_lisp_atom_ref(struct ao_lisp_frame *frame, ao_poly atom)
 {
 	ao_poly	*ref;
@@ -117,7 +117,7 @@ ao_lisp_atom_ref(struct ao_lisp_frame *frame, ao_poly atom)
 		ref = ao_lisp_frame_ref(frame, atom);
 		if (ref)
 			return ref;
-		frame = ao_lisp_poly_frame(frame->next);
+		frame = ao_lisp_poly_frame(frame->prev);
 	}
 	if (ao_lisp_frame_global) {
 		ref = ao_lisp_frame_ref(ao_lisp_frame_global, atom);
