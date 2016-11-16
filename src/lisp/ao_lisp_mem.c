@@ -314,36 +314,55 @@ static int chunk_busy;
 static void
 note_chunk(uint16_t addr, uint16_t size)
 {
-	int i;
+	int l, r;
 
-	if (addr < chunk_low || chunk_high < addr)
+	if (addr < chunk_low || chunk_high <= addr)
 		return;
 
-	for (i = 0; i < chunk_busy; i++) {
-		if (ao_lisp_chunk[i].size && ao_lisp_chunk[i].old_addr == addr) {
-#if DBG_MEM
-			if (ao_lisp_chunk[i].size != size)
-				ao_lisp_abort();
-#endif
-			return;
-		}
-		if (ao_lisp_chunk[i].old_addr > addr) {
-			int end = min(AO_LISP_NCHUNK, chunk_busy + 1);
-			memmove(&ao_lisp_chunk[i+1],
-				&ao_lisp_chunk[i],
-				(end - (i+1)) * sizeof (struct ao_lisp_chunk));
-			break;
-		}
-	}
-	if (i < AO_LISP_NCHUNK) {
-		ao_lisp_chunk[i].old_addr = addr;
-		ao_lisp_chunk[i].size = size;
-		if (chunk_busy < AO_LISP_NCHUNK)
-			chunk_busy++;
+	/* Binary search for the location */
+	l = 0;
+	r = chunk_busy - 1;
+	while (l <= r) {
+		int m = (l + r) >> 1;
+		if (ao_lisp_chunk[m].old_addr < addr)
+			l = m + 1;
 		else
-			chunk_high = ao_lisp_chunk[AO_LISP_NCHUNK-1].old_addr +
-				ao_lisp_chunk[AO_LISP_NCHUNK-1].size;
+			r = m - 1;
 	}
+	/*
+	 * The correct location is always in 'l', with r = l-1 being
+	 * the entry before the right one
+	 */
+
+#if DBG_MEM
+	/* Off the right side */
+	if (l >= AO_LISP_NCHUNK)
+		ao_lisp_abort();
+
+	/* Off the left side */
+	if (l == 0 && chunk_busy && addr > ao_lisp_chunk[0].old_addr)
+		ao_lisp_abort();
+#endif
+
+	/* Shuffle existing entries right */
+	int end = min(AO_LISP_NCHUNK, chunk_busy + 1);
+
+	memmove(&ao_lisp_chunk[l+1],
+		&ao_lisp_chunk[l],
+		(end - (l+1)) * sizeof (struct ao_lisp_chunk));
+
+	/* Add new entry */
+	ao_lisp_chunk[l].old_addr = addr;
+	ao_lisp_chunk[l].size = size;
+
+	/* Increment the number of elements up to the size of the array */
+	if (chunk_busy < AO_LISP_NCHUNK)
+		chunk_busy++;
+
+	/* Set the top address if the array is full */
+	if (chunk_busy == AO_LISP_NCHUNK)
+		chunk_high = ao_lisp_chunk[AO_LISP_NCHUNK-1].old_addr +
+			ao_lisp_chunk[AO_LISP_NCHUNK-1].size;
 }
 
 static void
