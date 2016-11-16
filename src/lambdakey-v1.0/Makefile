@@ -30,11 +30,10 @@ ALTOS_SRC = \
 	ao_led.c \
 	ao_dma_stm.c \
 	ao_stdio.c \
+	ao_mutex.c \
 	ao_panic.c \
 	ao_timer.c \
-	ao_mutex.c \
 	ao_usb_stm.c \
-	ao_serial_stm.c \
 	ao_flash_stm.c \
 	ao_lisp_lex.c \
 	ao_lisp_mem.c \

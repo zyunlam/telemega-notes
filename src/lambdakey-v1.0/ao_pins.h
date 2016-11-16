@@ -54,10 +54,4 @@
 
 #define IS_FLASH_LOADER	0
 
-#define HAS_SERIAL_2		1
-#define SERIAL_2_PA2_PA15	1
-#define USE_SERIAL_2_FLOW	0
-#define USE_SERIAL_2_STDIN	1
-#define DELAY_SERIAL_2_STDIN	0
-
 #endif /* _AO_PINS_H_ */
