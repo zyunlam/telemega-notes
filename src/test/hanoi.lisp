@@ -43,18 +43,16 @@
 
 (defun display-stack (x y clear stack)
   (cond ((= 0 clear)
-	 (cond (stack (progn
-			(display-string x y (car stack))
-			(display-stack x (1+ y) 0 (cdr stack))
-			)
-		      )
+	 (cond (stack 
+		(display-string x y (car stack))
+		(display-stack x (1+ y) 0 (cdr stack))
+		)
 	       )
 	 )
-	(t (progn
-	     (display-string x y "                    ")
-	     (display-stack x (1+ y) (1- clear) stack)
-	     )
-	   )
+	(t 
+	 (display-string x y "                   ")
+	 (display-stack x (1+ y) (1- clear) stack)
+	 )
 	)
   )
 
@@ -68,10 +66,9 @@
 					; Display all of the stacks, spaced 20 columns apart
 
 (defun display-stacks (x y stacks)
-  (cond (stacks (progn
-		  (display-stack x 0 (stack-pos y (car stacks)) (car stacks))
-		  (display-stacks (+ x 20) y (cdr stacks)))
-		)
+  (cond (stacks
+	 (display-stack x 0 (stack-pos y (car stacks)) (car stacks))
+	 (display-stacks (+ x 20) y (cdr stacks)))
 	)
   )
 
@@ -132,16 +129,12 @@
 
 (defun _hanoi (n from to use)
   (cond ((= 1 n)
-	 (progn
-	  (move-piece from to)
-	  nil)
+	 (move-piece from to)
 	 )
 	(t
-	 (progn
-	  (_hanoi (1- n) from use to)
-	  (_hanoi 1 from to use)
-	  (_hanoi (1- n) use to from)
-	  )
+	 (_hanoi (1- n) from use to)
+	 (_hanoi 1 from to use)
+	 (_hanoi (1- n) use to from)
 	 )
 	)
   )
@@ -155,16 +148,5 @@
   (setq len (reset-stacks))
   (clear)
   (_hanoi len 0 1 2)
-  )
-
-					; Run many in a row to time them
-
-(defun hanois(n)
-  (cond ((> n 0)
-	 (progn
-	   (hanoi)
-	   (hanois (1- n))
-	   )
-	 )
-	)
+  (move-to 0 23)
   )
