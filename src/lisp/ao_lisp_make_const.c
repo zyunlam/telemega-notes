@@ -306,8 +306,8 @@ main(int argc, char **argv)
 	ao_poly	val;
 	struct ao_lisp_atom	*a;
 	struct ao_lisp_builtin	*b;
-	int	in_atom;
-	char	*out_name;
+	int	in_atom = 0;
+	char	*out_name = NULL;
 	int	c;
 
 	in = stdin;
