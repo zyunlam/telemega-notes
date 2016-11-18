@@ -46,20 +46,11 @@
 		  (list
 		   def
 		   name
-		   (list
-		    'lambda
-		    args
-		    (cond (exprs
-			   (cond ((cdr exprs)
-				  (cons progn exprs))
-				 ((car exprs))
-				 )
-			   )
-			  )
-		    )
+		   (cons 'lambda (cons args exprs))
 		   )
 		  )
      )
+
 					; basic list accessors
 
 
@@ -98,69 +89,58 @@
 
 (def let (macro (vars exprs)
 		((lambda (make-names make-exprs make-nils)
-		   (progn
 
 					;
 					; make the list of names in the let
 					;
 
-		     (setq make-names (lambda (vars)
-				       (cond (vars
-					      (cons (car (car vars))
-						    (make-names (cdr vars))))
-					     )
-				       )
-			  )
+		   (setq make-names (lambda (vars)
+				      (cond (vars
+					     (cons (car (car vars))
+						   (make-names (cdr vars))))
+					    )
+				      )
+			 )
 
 					; the set of expressions is
 					; the list of set expressions
 					; pre-pended to the
 					; expressions to evaluate
 
-		     (setq make-exprs (lambda (vars exprs)
-				       (progn
-					 (cond (vars (cons
-						      (list set
-							    (list quote
-								  (car (car vars))
-								  )
-							    (cadr (car vars))
-							    )
-						      (make-exprs (cdr vars) exprs)
-						      )
-						     )
-					       (exprs)
-					       )
-					 )
-				       )
-			  )
+		   (setq make-exprs (lambda (vars exprs)
+				      (cond (vars (cons
+						   (list set
+							 (list quote
+							       (car (car vars))
+							       )
+							 (cadr (car vars))
+							 )
+						   (make-exprs (cdr vars) exprs)
+						   )
+						  )
+					    (exprs)
+					    )
+				      )
+			 )
 
 					; the parameters to the lambda is a list
 					; of nils of the right length
 
-		     (setq make-nils (lambda (vars)
-				      (cond (vars (cons nil (make-nils (cdr vars))))
-					    )
-				      )
-			  )
+		   (setq make-nils (lambda (vars)
+				     (cond (vars (cons nil (make-nils (cdr vars))))
+					   )
+				     )
+			 )
 					; prepend the set operations
 					; to the expressions
 
-		     (setq exprs (make-exprs vars exprs))
+		   (setq exprs (make-exprs vars exprs))
 
 					; build the lambda.
 
-		     (cons
-		      (list
-		       'lambda
-		       (make-names vars)
-		       (cond ((cdr exprs) (cons 'progn exprs))
-			     ((car exprs))
-			     )
-		       )
-		      (make-nils vars)
-		      )
-		     )
+		   (cons (cons 'lambda (cons (make-names vars) exprs))
+			 (make-nils vars)
+			 )
 		   )
 		 ()
 		 ()
@@ -202,4 +182,3 @@
 					; execute to resolve macros
 
 (and t nil)
-
