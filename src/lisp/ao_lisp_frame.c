@@ -186,8 +186,6 @@ ao_lisp_frame_mark(struct ao_lisp_frame *frame)
 {
 	if (!frame)
 		return AO_LISP_NIL;
-	if (frame->_num == 0xff)
-		ao_lisp_abort();
 	frame->_num |= AO_LISP_FRAME_MARK;
 	return ao_lisp_frame_poly(frame);
 }
