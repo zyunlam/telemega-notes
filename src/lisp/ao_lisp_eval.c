@@ -310,7 +310,6 @@ ao_lisp_eval_formal(void)
 			 * value and re-evaluate it
 			 */
 			prev = ao_lisp_poly_stack(ao_lisp_stack->prev);
-			ao_lisp_stack->state = eval_sexpr;
 			ao_lisp_stack->sexprs = prev->sexprs;
 
 			DBGI(".. start macro\n");
@@ -401,10 +400,11 @@ ao_lisp_eval_exec(void)
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 		break;
 	case AO_LISP_LAMBDA:
-		ao_lisp_stack->state = eval_sexpr;
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
-		ao_lisp_v = ao_lisp_lambda_eval();
-		DBGI(".. sexpr "); DBG_POLY(ao_lisp_v); DBG("\n");
+		ao_lisp_stack->state = eval_progn;
+		v = ao_lisp_lambda_eval();
+		ao_lisp_stack->sexprs = v;
+		DBGI(".. sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 		break;
 	}
@@ -442,7 +442,6 @@ ao_lisp_eval_cond(void)
 		ao_lisp_stack->state = eval_cond_test;
 		if (!ao_lisp_stack_push())
 			return 0;
-		ao_lisp_stack->state = eval_sexpr;
 	}
 	return 1;
 }
@@ -464,11 +463,11 @@ ao_lisp_eval_cond_test(void)
 	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
 	if (ao_lisp_v) {
 		struct ao_lisp_cons *car = ao_lisp_poly_cons(ao_lisp_poly_cons(ao_lisp_stack->sexprs)->car);
-		struct ao_lisp_cons *c = ao_lisp_poly_cons(car->cdr);
+		ao_poly c = car->cdr;
 
 		if (c) {
-			ao_lisp_stack->state = eval_sexpr;
-			ao_lisp_v = c->car;
+			ao_lisp_stack->state = eval_progn;
+			ao_lisp_stack->sexprs = c;
 		} else
 			ao_lisp_stack->state = eval_val;
 	} else {
@@ -502,6 +501,10 @@ ao_lisp_eval_progn(void)
 	} else {
 		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->car;
 		ao_lisp_stack->sexprs = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->cdr;
+
+		/* If there are more sexprs to do, then come back here, otherwise
+		 * return the value of the last one by just landing in eval_sexpr
+		 */
 		if (ao_lisp_stack->sexprs) {
 			ao_lisp_stack->state = eval_progn;
 			if (!ao_lisp_stack_push())
@@ -530,7 +533,6 @@ ao_lisp_eval_while(void)
 		ao_lisp_stack->state = eval_while_test;
 		if (!ao_lisp_stack_push())
 			return 0;
-		ao_lisp_stack->state = eval_sexpr;
 	}
 	return 1;
 }
@@ -547,11 +549,11 @@ ao_lisp_eval_while_test(void)
 
 	if (ao_lisp_v) {
 		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->cdr;
-		if (ao_lisp_v)
-			ao_lisp_v = ao_lisp_poly_cons(ao_lisp_v)->car;
 		ao_lisp_stack->state = eval_while;
 		if (!ao_lisp_stack_push())
 			return 0;
+		ao_lisp_stack->state = eval_progn;
+		ao_lisp_stack->sexprs = ao_lisp_v;
 	}
 	else
 		ao_lisp_stack->state = eval_val;
@@ -567,6 +569,8 @@ ao_lisp_eval_macro(void)
 {
 	DBGI("macro: "); DBG_POLY(ao_lisp_v); DBG(" sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
 
+	if (ao_lisp_v == AO_LISP_NIL)
+		ao_lisp_abort();
 	if (ao_lisp_poly_type(ao_lisp_v) == AO_LISP_CONS) {
 		*ao_lisp_poly_cons(ao_lisp_stack->sexprs) = *ao_lisp_poly_cons(ao_lisp_v);
 		ao_lisp_v = ao_lisp_stack->sexprs;

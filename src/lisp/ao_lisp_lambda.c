@@ -78,8 +78,9 @@ ao_lisp_lambda_alloc(struct ao_lisp_cons *code, int args)
 	if (!lambda)
 		return AO_LISP_NIL;
 
-	if (!ao_lisp_check_argc(_ao_lisp_atom_lambda, code, 2, 2))
-		return AO_LISP_NIL;
+	if (!code->cdr)
+		return ao_lisp_error(AO_LISP_INVALID, "missing parameters to lambda");
+
 	if (!ao_lisp_check_argt(_ao_lisp_atom_lambda, code, 0, AO_LISP_CONS, 1))
 		return AO_LISP_NIL;
 	f = 0;
@@ -135,7 +136,7 @@ ao_lisp_lambda_eval(void)
 	int			args_wanted;
 	int			args_provided;
 	int			f;
-	struct ao_lisp_cons	*vals
+	struct ao_lisp_cons	*vals;
 
 	DBGI("lambda "); DBG_POLY(ao_lisp_lambda_poly(lambda)); DBG("\n");
 
@@ -161,6 +162,10 @@ ao_lisp_lambda_eval(void)
 	args = ao_lisp_poly_cons(ao_lisp_arg(code, 0));
 	vals = ao_lisp_poly_cons(cons->cdr);
 
+	next_frame->prev = lambda->frame;
+	ao_lisp_frame_current = next_frame;
+	ao_lisp_stack->frame = ao_lisp_frame_poly(ao_lisp_frame_current);
+
 	switch (lambda->args) {
 	case AO_LISP_FUNC_LAMBDA:
 		for (f = 0; f < args_wanted; f++) {
@@ -171,6 +176,7 @@ ao_lisp_lambda_eval(void)
 			vals = ao_lisp_poly_cons(vals->cdr);
 		}
 		ao_lisp_cons_free(cons);
+		cons = NULL;
 		break;
 	case AO_LISP_FUNC_LEXPR:
 	case AO_LISP_FUNC_NLAMBDA:
@@ -182,15 +188,15 @@ ao_lisp_lambda_eval(void)
 			args = ao_lisp_poly_cons(args->cdr);
 			vals = ao_lisp_poly_cons(vals->cdr);
 		}
-		DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(); DBG("\n");
+		DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(ao_lisp_cons_poly(vals)); DBG("\n");
 		next_frame->vals[f].atom = args->car;
 		next_frame->vals[f].val = ao_lisp_cons_poly(vals);
 		break;
+	default:
+		break;
 	}
-	next_frame->prev = lambda->frame;
 	DBGI("eval frame: "); DBG_POLY(ao_lisp_frame_poly(next_frame)); DBG("\n");
-	ao_lisp_frame_current = next_frame;
-	ao_lisp_stack->frame = ao_lisp_frame_poly(ao_lisp_frame_current);
 	DBG_STACK();
-	return ao_lisp_arg(code, 1);
+	DBGI("eval code: "); DBG_POLY(code->cdr); DBG("\n");
+	return code->cdr;
 }
