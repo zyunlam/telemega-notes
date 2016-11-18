@@ -16,23 +16,30 @@
 #include <stdarg.h>
 
 static void
-ao_lisp_error_cons(char *name, struct ao_lisp_cons *cons)
+ao_lisp_error_poly(char *name, ao_poly poly)
 {
 	int first = 1;
 	printf("\t\t%s(", name);
-	if (cons) {
-		while (cons) {
-			if (!first)
-				printf("\t\t         ");
-			else
-				first = 0;
-			ao_lisp_poly_print(cons->car);
-			printf("\n");
-			cons = ao_lisp_poly_cons(cons->cdr);
-		}
-		printf("\t\t         )\n");
-	} else
-		printf(")\n");
+	if (ao_lisp_poly_type(poly) == AO_LISP_CONS) {
+		struct ao_lisp_cons *cons = ao_lisp_poly_cons(poly);
+
+		if (cons) {
+			while (cons) {
+				if (!first)
+					printf("\t\t         ");
+				else
+					first = 0;
+				ao_lisp_poly_print(cons->car);
+				printf("\n");
+				cons = ao_lisp_poly_cons(cons->cdr);
+			}
+			printf("\t\t         )\n");
+		} else
+			printf(")\n");
+	} else {
+		ao_lisp_poly_print(poly);
+		printf("\n");
+	}
 }
 
 static void tabs(int indent)
@@ -87,8 +94,8 @@ ao_lisp_stack_print(void)
 		printf("\t\texpr:   "); ao_lisp_poly_print(s->list); printf("\n");
 		printf("\t\tstate:  %s\n", state_names[s->state]);
 //		printf("\t\tmacro:  %s\n", s->macro ? "true" : "false");
-		ao_lisp_error_cons ("sexprs: ", ao_lisp_poly_cons(s->sexprs));
-		ao_lisp_error_cons ("values: ", ao_lisp_poly_cons(s->values));
+		ao_lisp_error_poly ("sexprs: ", s->sexprs);
+		ao_lisp_error_poly ("values: ", s->values);
 		ao_lisp_error_frame(2, "frame:  ", ao_lisp_poly_frame(s->frame));
 //		ao_lisp_error_frame(2, "mframe: ", ao_lisp_poly_frame(s->macro_frame));
 		printf("\t]\n");

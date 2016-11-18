@@ -525,6 +525,7 @@ ao_lisp_eval_while(void)
 	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
 
+	ao_lisp_stack->values = ao_lisp_v;
 	if (!ao_lisp_stack->sexprs) {
 		ao_lisp_v = AO_LISP_NIL;
 		ao_lisp_stack->state = eval_val;
@@ -548,6 +549,7 @@ ao_lisp_eval_while_test(void)
 	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
 
 	if (ao_lisp_v) {
+		ao_lisp_stack->values = ao_lisp_v;
 		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->cdr;
 		ao_lisp_stack->state = eval_while;
 		if (!ao_lisp_stack_push())
@@ -556,7 +558,10 @@ ao_lisp_eval_while_test(void)
 		ao_lisp_stack->sexprs = ao_lisp_v;
 	}
 	else
+	{
 		ao_lisp_stack->state = eval_val;
+		ao_lisp_v = ao_lisp_stack->values;
+	}
 	return 1;
 }
 
