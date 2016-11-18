@@ -164,22 +164,15 @@ struct ao_lisp_frame {
 #define AO_LISP_FRAME_MARK	0x80
 
 static inline int ao_lisp_frame_num(struct ao_lisp_frame *f) {
-	if (f->_num == 0xff)
-		ao_lisp_abort();
 	return f->_num & AO_LISP_FRAME_NUM_MASK;
 }
 
 static inline int ao_lisp_frame_marked(struct ao_lisp_frame *f) {
-	if (f->_num == 0xff)
-		ao_lisp_abort();
 	return f->_num & AO_LISP_FRAME_MARK;
 }
 
 static inline struct ao_lisp_frame *
 ao_lisp_poly_frame(ao_poly poly) {
-	struct ao_lisp_frame *frame = ao_lisp_ref(poly);
-	if (frame && frame->_num == 0xff)
-		ao_lisp_abort();
 	return ao_lisp_ref(poly);
 }
 
