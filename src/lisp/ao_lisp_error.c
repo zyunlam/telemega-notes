@@ -106,5 +106,8 @@ ao_lisp_error(int error, char *format, ...)
 	va_end(args);
 	printf("\n");
 	ao_lisp_stack_print();
+	printf("Globals:\n\t");
+	ao_lisp_frame_print(ao_lisp_frame_poly(ao_lisp_frame_global));
+	printf("\n");
 	return AO_LISP_NIL;
 }
