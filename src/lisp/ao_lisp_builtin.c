@@ -213,9 +213,9 @@ ao_lisp_last(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_length(struct ao_lisp_cons *cons)
 {
-	if (!ao_lisp_check_argc(_ao_lisp_atom_last, cons, 1, 1))
+	if (!ao_lisp_check_argc(_ao_lisp_atom_length, cons, 1, 1))
 		return AO_LISP_NIL;
-	if (!ao_lisp_check_argt(_ao_lisp_atom_last, cons, 0, AO_LISP_CONS, 1))
+	if (!ao_lisp_check_argt(_ao_lisp_atom_length, cons, 0, AO_LISP_CONS, 1))
 		return AO_LISP_NIL;
 	return ao_lisp_int_poly(ao_lisp_cons_length(ao_lisp_poly_cons(ao_lisp_arg(cons, 0))));
 }
