@@ -25,7 +25,7 @@ SRCS=\
 
 OBJS=$(SRCS:.c=.o)
 
-CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g -I. -Wall -Wextra
+CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g -I. -Wall -Wextra -no-pie
 
 HDRS=\
 	ao_lisp.h \
