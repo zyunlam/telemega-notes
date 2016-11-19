@@ -160,11 +160,11 @@ ao_lisp_stack_print(ao_poly poly)
 {
 	struct ao_lisp_stack *s = ao_lisp_poly_stack(poly);
 
-	if (s->type & AO_LISP_STACK_PRINT) {
-		printf("[recurse...]");
-		return;
-	}
 	while (s) {
+		if (s->type & AO_LISP_STACK_PRINT) {
+			printf("[recurse...]");
+			return;
+		}
 		s->type |= AO_LISP_STACK_PRINT;
 		printf("\t[\n");
 		printf("\t\texpr:   "); ao_lisp_poly_print(s->list); printf("\n");
