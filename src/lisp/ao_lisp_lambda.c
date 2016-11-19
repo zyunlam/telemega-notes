@@ -15,7 +15,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#define DBG_EVAL 0
 #include "ao_lisp.h"
 
 int

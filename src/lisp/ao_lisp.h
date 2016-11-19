@@ -15,6 +15,9 @@
 #ifndef _AO_LISP_H_
 #define _AO_LISP_H_
 
+#define DBG_MEM		0
+#define DBG_EVAL	0
+
 #include <stdint.h>
 #include <string.h>
 //#include <stdio.h>
@@ -326,6 +329,10 @@ ao_lisp_poly_other(ao_poly poly) {
 
 static inline uint8_t
 ao_lisp_other_type(void *other) {
+#if DBG_MEM
+	if ((*((uint8_t *) other) & AO_LISP_OTHER_TYPE_MASK) >= AO_LISP_NUM_TYPE)
+		ao_lisp_abort();
+#endif
 	return *((uint8_t *) other) & AO_LISP_OTHER_TYPE_MASK;
 }
 
@@ -743,7 +750,6 @@ ao_lisp_frames_dump(void)
 #define DBG_FRAMES()
 #endif
 
-#define DBG_MEM		0
 #define DBG_MEM_START	1
 
 #if DBG_MEM
