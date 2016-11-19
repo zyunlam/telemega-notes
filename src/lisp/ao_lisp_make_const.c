@@ -71,6 +71,7 @@ struct builtin_func funcs[] = {
 	{ .name = "led",	.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_led },
 	{ .name = "save",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_save },
 	{ .name = "restore",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_restore },
+	{ .name = "call/cc",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_call_cc },
 };
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])
@@ -358,7 +359,7 @@ main(int argc, char **argv)
 	/* Reduce to referenced values */
 	ao_lisp_collect(AO_LISP_COLLECT_FULL);
 
-	for (f = 0; f < ao_lisp_frame_num(ao_lisp_frame_global); f++) {
+	for (f = 0; f < ao_lisp_frame_global->num; f++) {
 		val = ao_has_macro(ao_lisp_frame_global->vals[f].val);
 		if (val != AO_LISP_NIL) {
 			printf("error: function %s contains unresolved macro: ",

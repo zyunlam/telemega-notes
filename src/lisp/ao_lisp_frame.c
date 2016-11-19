@@ -24,7 +24,7 @@ static int
 frame_size(void *addr)
 {
 	struct ao_lisp_frame	*frame = addr;
-	return frame_num_size(ao_lisp_frame_num(frame));
+	return frame_num_size(frame->num);
 }
 
 static void
@@ -37,7 +37,7 @@ frame_mark(void *addr)
 		MDBG_MOVE("frame mark %d\n", MDBG_OFFSET(frame));
 		if (!AO_LISP_IS_POOL(frame))
 			break;
-		for (f = 0; f < ao_lisp_frame_num(frame); f++) {
+		for (f = 0; f < frame->num; f++) {
 			struct ao_lisp_val	*v = &frame->vals[f];
 
 			ao_lisp_poly_mark(v->val, 0);
@@ -68,7 +68,7 @@ frame_move(void *addr)
 		MDBG_MOVE("frame move %d\n", MDBG_OFFSET(frame));
 		if (!AO_LISP_IS_POOL(frame))
 			break;
-		for (f = 0; f < ao_lisp_frame_num(frame); f++) {
+		for (f = 0; f < frame->num; f++) {
 			struct ao_lisp_val	*v = &frame->vals[f];
 
 			ao_lisp_poly_move(&v->atom, 0);
@@ -109,15 +109,21 @@ ao_lisp_frame_print(ao_poly p)
 
 	printf ("{");
 	if (frame) {
-		for (f = 0; f < ao_lisp_frame_num(frame); f++) {
-			if (f != 0)
-				printf(", ");
-			ao_lisp_poly_print(frame->vals[f].atom);
-			printf(" = ");
-			ao_lisp_poly_print(frame->vals[f].val);
+		if (frame->type & AO_LISP_FRAME_PRINT)
+			printf("recurse...");
+		else {
+			frame->type |= AO_LISP_FRAME_PRINT;
+			for (f = 0; f < frame->num; f++) {
+				if (f != 0)
+					printf(", ");
+				ao_lisp_poly_print(frame->vals[f].atom);
+				printf(" = ");
+				ao_lisp_poly_print(frame->vals[f].val);
+			}
+			if (frame->prev)
+				ao_lisp_poly_print(frame->prev);
+			frame->type &= ~AO_LISP_FRAME_PRINT;
 		}
-		if (frame->prev)
-			ao_lisp_poly_print(frame->prev);
 	}
 	printf("}");
 }
@@ -126,7 +132,7 @@ ao_poly *
 ao_lisp_frame_ref(struct ao_lisp_frame *frame, ao_poly atom)
 {
 	int f;
-	for (f = 0; f < ao_lisp_frame_num(frame); f++)
+	for (f = 0; f < frame->num; f++)
 		if (frame->vals[f].atom == atom)
 			return &frame->vals[f].val;
 	return NULL;
@@ -175,7 +181,7 @@ ao_lisp_frame_new(int num)
 			return NULL;
 	}
 	frame->type = AO_LISP_FRAME;
-	frame->_num = num;
+	frame->num = num;
 	frame->prev = AO_LISP_NIL;
 	memset(frame->vals, '\0', num * sizeof (struct ao_lisp_val));
 	return frame;
@@ -186,7 +192,7 @@ ao_lisp_frame_mark(struct ao_lisp_frame *frame)
 {
 	if (!frame)
 		return AO_LISP_NIL;
-	frame->_num |= AO_LISP_FRAME_MARK;
+	frame->type |= AO_LISP_FRAME_MARK;
 	return ao_lisp_frame_poly(frame);
 }
 
@@ -194,7 +200,7 @@ void
 ao_lisp_frame_free(struct ao_lisp_frame *frame)
 {
 	if (!ao_lisp_frame_marked(frame)) {
-		int	num = ao_lisp_frame_num(frame);
+		int	num = frame->num;
 		if (num < AO_LISP_FRAME_FREE) {
 			frame->prev = ao_lisp_frame_poly(ao_lisp_frame_free_list[num]);
 			ao_lisp_frame_free_list[num] = frame;
@@ -209,7 +215,7 @@ ao_lisp_frame_realloc(struct ao_lisp_frame **frame_ref, int new_num)
 	struct ao_lisp_frame	*new;
 	int			copy;
 
-	if (new_num == ao_lisp_frame_num(frame))
+	if (new_num == frame->num)
 		return frame;
 	new = ao_lisp_frame_new(new_num);
 	if (!new)
@@ -220,8 +226,8 @@ ao_lisp_frame_realloc(struct ao_lisp_frame **frame_ref, int new_num)
 	 */
 	frame = *frame_ref;
 	copy = new_num;
-	if (copy > ao_lisp_frame_num(frame))
-		copy = ao_lisp_frame_num(frame);
+	if (copy > frame->num)
+		copy = frame->num;
 	memcpy(new->vals, frame->vals, copy * sizeof (struct ao_lisp_val));
 	new->prev = frame->prev;
 	ao_lisp_frame_free(frame);
@@ -239,7 +245,7 @@ ao_lisp_frame_add(struct ao_lisp_frame **frame_ref, ao_poly atom, ao_poly val)
 		ao_lisp_poly_stash(0, atom);
 		ao_lisp_poly_stash(1, val);
 		if (frame) {
-			f = ao_lisp_frame_num(frame);
+			f = frame->num;
 			frame = ao_lisp_frame_realloc(frame_ref, f + 1);
 		} else {
 			f = 0;

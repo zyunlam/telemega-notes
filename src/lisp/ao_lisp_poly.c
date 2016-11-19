@@ -54,6 +54,10 @@ static const struct ao_lisp_funcs ao_lisp_funcs[AO_LISP_NUM_TYPE] = {
 		.print = ao_lisp_lambda_print,
 		.patom = ao_lisp_lambda_print,
 	},
+	[AO_LISP_STACK] = {
+		.print = ao_lisp_stack_print,
+		.patom = ao_lisp_stack_print,
+	},
 };
 
 static const struct ao_lisp_funcs *

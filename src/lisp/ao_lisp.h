@@ -75,6 +75,7 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_eof	_atom("eof")
 #define _ao_lisp_atom_save	_atom("save")
 #define _ao_lisp_atom_restore	_atom("restore")
+#define _ao_lisp_atom_call2fcc	_atom("call/cc")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
@@ -99,7 +100,11 @@ extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA];
 #define AO_LISP_BUILTIN		5
 #define AO_LISP_FRAME		6
 #define AO_LISP_LAMBDA		7
-#define AO_LISP_NUM_TYPE	8
+#define AO_LISP_STACK		8
+#define AO_LISP_NUM_TYPE	9
+
+/* Leave two bits for types to use as they please */
+#define AO_LISP_OTHER_TYPE_MASK	0x3f
 
 #define AO_LISP_NIL	0
 
@@ -153,22 +158,17 @@ struct ao_lisp_val {
 
 struct ao_lisp_frame {
 	uint8_t			type;
-	uint8_t			_num;
+	uint8_t			num;
 	ao_poly			prev;
 	struct ao_lisp_val	vals[];
 };
 
-#define AO_LISP_FRAME_NUM_MASK	0x7f
-
-/* Set when the frame escapes the lambda */
+/* Set on type when the frame escapes the lambda */
 #define AO_LISP_FRAME_MARK	0x80
-
-static inline int ao_lisp_frame_num(struct ao_lisp_frame *f) {
-	return f->_num & AO_LISP_FRAME_NUM_MASK;
-}
+#define AO_LISP_FRAME_PRINT	0x40
 
 static inline int ao_lisp_frame_marked(struct ao_lisp_frame *f) {
-	return f->_num & AO_LISP_FRAME_MARK;
+	return f->type & AO_LISP_FRAME_MARK;
 }
 
 static inline struct ao_lisp_frame *
@@ -195,6 +195,7 @@ enum eval_state {
 };
 
 struct ao_lisp_stack {
+	uint8_t			type;		/* AO_LISP_STACK */
 	uint8_t			state;		/* enum eval_state */
 	ao_poly			prev;		/* previous stack frame */
 	ao_poly			sexprs;		/* expressions to evaluate */
@@ -203,6 +204,17 @@ struct ao_lisp_stack {
 	ao_poly			frame;		/* current lookup frame */
 	ao_poly			list;		/* most recent function call */
 };
+
+#define AO_LISP_STACK_MARK	0x80	/* set on type when a reference has been taken */
+#define AO_LISP_STACK_PRINT	0x40	/* stack is being printed */
+
+static inline int ao_lisp_stack_marked(struct ao_lisp_stack *s) {
+	return s->type & AO_LISP_STACK_MARK;
+}
+
+static inline void ao_lisp_stack_mark(struct ao_lisp_stack *s) {
+	s->type |= AO_LISP_STACK_MARK;
+}
 
 static inline struct ao_lisp_stack *
 ao_lisp_poly_stack(ao_poly p)
@@ -216,8 +228,6 @@ ao_lisp_stack_poly(struct ao_lisp_stack *stack)
 	return ao_lisp_poly(stack, AO_LISP_OTHER);
 }
 
-extern struct ao_lisp_stack	*ao_lisp_stack;
-extern struct ao_lisp_stack	*ao_lisp_stack_free_list;
 extern ao_poly			ao_lisp_v;
 
 #define AO_LISP_FUNC_LAMBDA	0
@@ -276,6 +286,7 @@ enum ao_lisp_builtin_id {
 	builtin_led,
 	builtin_save,
 	builtin_restore,
+	builtin_call_cc,
 	_builtin_last
 };
 
@@ -315,7 +326,7 @@ ao_lisp_poly_other(ao_poly poly) {
 
 static inline uint8_t
 ao_lisp_other_type(void *other) {
-	return *((uint8_t *) other);
+	return *((uint8_t *) other) & AO_LISP_OTHER_TYPE_MASK;
 }
 
 static inline ao_poly
@@ -454,6 +465,12 @@ ao_lisp_string_stash(int id, char *string);
 
 char *
 ao_lisp_string_fetch(int id);
+
+void
+ao_lisp_stack_stash(int id, struct ao_lisp_stack *stack);
+
+struct ao_lisp_stack *
+ao_lisp_stack_fetch(int id);
 
 void
 ao_lisp_poly_stash(int id, ao_poly poly);
@@ -617,6 +634,8 @@ ao_lisp_frame_print(ao_poly p);
 /* lambda */
 extern const struct ao_lisp_type ao_lisp_lambda_type;
 
+extern const char *ao_lisp_state_names[];
+
 struct ao_lisp_lambda *
 ao_lisp_lambda_new(ao_poly cons);
 
@@ -646,12 +665,40 @@ ao_lisp_save(struct ao_lisp_cons *cons);
 ao_poly
 ao_lisp_restore(struct ao_lisp_cons *cons);
 
-/* error */
+/* stack */
 
 extern const struct ao_lisp_type ao_lisp_stack_type;
+extern struct ao_lisp_stack	*ao_lisp_stack;
+extern struct ao_lisp_stack	*ao_lisp_stack_free_list;
 
 void
-ao_lisp_stack_print(void);
+ao_lisp_stack_reset(struct ao_lisp_stack *stack);
+
+int
+ao_lisp_stack_push(void);
+
+void
+ao_lisp_stack_pop(void);
+
+void
+ao_lisp_stack_clear(void);
+
+void
+ao_lisp_stack_print(ao_poly stack);
+
+ao_poly
+ao_lisp_stack_eval(void);
+
+ao_poly
+ao_lisp_call_cc(struct ao_lisp_cons *cons);
+
+/* error */
+
+void
+ao_lisp_error_poly(char *name, ao_poly poly, ao_poly last);
+
+void
+ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame);
 
 ao_poly
 ao_lisp_error(int error, char *format, ...);

@@ -144,6 +144,7 @@ struct ao_lisp_root {
 
 static struct ao_lisp_cons 	*save_cons[2];
 static char			*save_string[2];
+static struct ao_lisp_stack	*save_stack[3];
 static ao_poly			save_poly[2];
 
 static const struct ao_lisp_root	ao_lisp_root[] = {
@@ -154,6 +155,18 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 	{
 		.type = &ao_lisp_cons_type,
 		.addr = (void **) &save_cons[1],
+	},
+	{
+		.type = &ao_lisp_stack_type,
+		.addr = (void **) &save_stack[0]
+	},
+	{
+		.type = &ao_lisp_stack_type,
+		.addr = (void **) &save_stack[1]
+	},
+	{
+		.type = &ao_lisp_stack_type,
+		.addr = (void **) &save_stack[2]
 	},
 	{
 		.type = &ao_lisp_string_type,
@@ -434,6 +447,7 @@ static const struct ao_lisp_type const *ao_lisp_types[AO_LISP_NUM_TYPE] = {
 	[AO_LISP_BUILTIN] = &ao_lisp_builtin_type,
 	[AO_LISP_FRAME] = &ao_lisp_frame_type,
 	[AO_LISP_LAMBDA] = &ao_lisp_lambda_type,
+	[AO_LISP_STACK] = &ao_lisp_stack_type,
 };
 
 static int
@@ -816,6 +830,20 @@ ao_lisp_cons_fetch(int id)
 	struct ao_lisp_cons *cons = save_cons[id];
 	save_cons[id] = NULL;
 	return cons;
+}
+
+void
+ao_lisp_stack_stash(int id, struct ao_lisp_stack *stack)
+{
+	save_stack[id] = stack;
+}
+
+struct ao_lisp_stack *
+ao_lisp_stack_fetch(int id)
+{
+	struct ao_lisp_stack *stack = save_stack[id];
+	save_stack[id] = NULL;
+	return stack;
 }
 
 void
