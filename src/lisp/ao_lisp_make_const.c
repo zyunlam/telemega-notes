@@ -72,6 +72,7 @@ struct builtin_func funcs[] = {
 	{ .name = "save",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_save },
 	{ .name = "restore",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_restore },
 	{ .name = "call/cc",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_call_cc },
+	{ .name = "collect",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_collect },
 };
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])

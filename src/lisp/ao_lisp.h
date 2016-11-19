@@ -79,6 +79,7 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #define _ao_lisp_atom_save	_atom("save")
 #define _ao_lisp_atom_restore	_atom("restore")
 #define _ao_lisp_atom_call2fcc	_atom("call/cc")
+#define _ao_lisp_atom_collect	_atom("collect")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
@@ -291,6 +292,7 @@ enum ao_lisp_builtin_id {
 	builtin_save,
 	builtin_restore,
 	builtin_call_cc,
+	builtin_collect,
 	_builtin_last
 };
 
