@@ -24,6 +24,7 @@
 
 #define AO_LISP_POOL_TOTAL	3072
 #define AO_LISP_SAVE		1
+#define DBG_MEM_STATS		1
 
 extern int ao_lisp_getc(void);
 
@@ -47,6 +48,8 @@ ao_lisp_os_led(int led)
 static inline void
 ao_lisp_os_delay(int delay)
 {
+	if (!delay)
+		return;
 	struct timespec ts = {
 		.tv_sec = delay / 1000,
 		.tv_nsec = (delay % 1000) * 1000000,
