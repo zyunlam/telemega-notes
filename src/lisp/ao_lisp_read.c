@@ -12,7 +12,6 @@
  * General Public License for more details.
  */
 
-#define DBG_EVAL 0
 #include "ao_lisp.h"
 #include "ao_lisp_read.h"
 

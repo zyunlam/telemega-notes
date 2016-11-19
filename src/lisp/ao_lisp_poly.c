@@ -14,12 +14,6 @@
 
 #include "ao_lisp.h"
 
-#if 0
-#define DBG(...) printf (__VA_ARGS__)
-#else
-#define DBG(...)
-#endif
-
 struct ao_lisp_funcs {
 	void (*print)(ao_poly);
 	void (*patom)(ao_poly);
