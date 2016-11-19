@@ -468,22 +468,26 @@ struct ao_lisp_cons *
 ao_lisp_cons_fetch(int id);
 
 void
+ao_lisp_poly_stash(int id, ao_poly poly);
+
+ao_poly
+ao_lisp_poly_fetch(int id);
+
+void
 ao_lisp_string_stash(int id, char *string);
 
 char *
 ao_lisp_string_fetch(int id);
 
-void
-ao_lisp_stack_stash(int id, struct ao_lisp_stack *stack);
+static inline void
+ao_lisp_stack_stash(int id, struct ao_lisp_stack *stack) {
+	ao_lisp_poly_stash(id, ao_lisp_stack_poly(stack));
+}
 
-struct ao_lisp_stack *
-ao_lisp_stack_fetch(int id);
-
-void
-ao_lisp_poly_stash(int id, ao_poly poly);
-
-ao_poly
-ao_lisp_poly_fetch(int id);
+static inline struct ao_lisp_stack *
+ao_lisp_stack_fetch(int id) {
+	return ao_lisp_poly_stack(ao_lisp_poly_fetch(id));
+}
 
 /* cons */
 extern const struct ao_lisp_type ao_lisp_cons_type;
