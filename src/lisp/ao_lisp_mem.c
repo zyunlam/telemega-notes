@@ -36,6 +36,10 @@ uint8_t	ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((aligned(4
 
 #endif
 
+#ifndef DBG_MEM_STATS
+#define DBG_MEM_STATS	DBG_MEM
+#endif
+
 #if DBG_MEM
 int dbg_move_depth;
 int dbg_mem = DBG_MEM_START;
@@ -283,8 +287,6 @@ static inline int limit(int offset) {
 	return min(AO_LISP_POOL, max(offset, 0));
 }
 
-static int total_marked;
-
 static void
 note_cons(uint16_t offset)
 {
@@ -295,19 +297,14 @@ note_cons(uint16_t offset)
 
 static uint16_t	chunk_low, chunk_high;
 static uint16_t	chunk_first, chunk_last;
-static int chunk_busy;
 
-static void
-note_chunk(uint16_t offset, uint16_t size)
+static int
+find_chunk(uint16_t offset)
 {
 	int l, r;
-
-	if (offset < chunk_low || chunk_high <= offset)
-		return;
-
 	/* Binary search for the location */
-	l = 0;
-	r = chunk_busy - 1;
+	l = chunk_first;
+	r = chunk_last - 1;
 	while (l <= r) {
 		int m = (l + r) >> 1;
 		if (ao_lisp_chunk[m].old_offset < offset)
@@ -315,6 +312,19 @@ note_chunk(uint16_t offset, uint16_t size)
 		else
 			r = m - 1;
 	}
+	return l;
+}
+
+static void
+note_chunk(uint16_t offset, uint16_t size)
+{
+	int l;
+
+	if (offset < chunk_low || chunk_high <= offset)
+		return;
+
+	l = find_chunk(offset);
+
 	/*
 	 * The correct location is always in 'l', with r = l-1 being
 	 * the entry before the right one
@@ -326,12 +336,12 @@ note_chunk(uint16_t offset, uint16_t size)
 		ao_lisp_abort();
 
 	/* Off the left side */
-	if (l == 0 && chunk_busy && offset > ao_lisp_chunk[0].old_offset)
+	if (l == 0 && chunk_last && offset > ao_lisp_chunk[0].old_offset)
 		ao_lisp_abort();
 #endif
 
 	/* Shuffle existing entries right */
-	int end = min(AO_LISP_NCHUNK, chunk_busy + 1);
+	int end = min(AO_LISP_NCHUNK, chunk_last + 1);
 
 	memmove(&ao_lisp_chunk[l+1],
 		&ao_lisp_chunk[l],
@@ -342,11 +352,11 @@ note_chunk(uint16_t offset, uint16_t size)
 	ao_lisp_chunk[l].size = size;
 
 	/* Increment the number of elements up to the size of the array */
-	if (chunk_busy < AO_LISP_NCHUNK)
-		chunk_busy++;
+	if (chunk_last < AO_LISP_NCHUNK)
+		chunk_last++;
 
 	/* Set the top address if the array is full */
-	if (chunk_busy == AO_LISP_NCHUNK)
+	if (chunk_last == AO_LISP_NCHUNK)
 		chunk_high = ao_lisp_chunk[AO_LISP_NCHUNK-1].old_offset +
 			ao_lisp_chunk[AO_LISP_NCHUNK-1].size;
 }
@@ -354,9 +364,9 @@ note_chunk(uint16_t offset, uint16_t size)
 static void
 reset_chunks(void)
 {
-	memset(ao_lisp_chunk, '\0', sizeof (ao_lisp_chunk));
 	chunk_high = ao_lisp_top;
-	chunk_busy = 0;
+	chunk_last = 0;
+	chunk_first = 0;
 }
 
 /*
@@ -369,7 +379,6 @@ walk(int (*visit_addr)(const struct ao_lisp_type *type, void **addr),
 {
 	int i;
 
-	total_marked = 0;
 	ao_lisp_record_reset();
 	memset(ao_lisp_busy, '\0', sizeof (ao_lisp_busy));
 	memset(ao_lisp_cons_note, '\0', sizeof (ao_lisp_cons_note));
@@ -452,26 +461,26 @@ ao_lisp_poly_mark_ref(ao_poly *p, uint8_t do_note_cons)
 	return ao_lisp_poly_mark(*p, do_note_cons);
 }
 
+#if DBG_MEM_STATS
 int ao_lisp_collects[2];
 int ao_lisp_freed[2];
 int ao_lisp_loops[2];
+#endif
 
 int ao_lisp_last_top;
 
 int
 ao_lisp_collect(uint8_t style)
 {
-	int	ret;
 	int	i;
 	int	top;
+#if DBG_MEM_STATS
 	int	loops = 0;
+#endif
 #if DBG_MEM
-	int	marked;
-	int	moved;
 	struct ao_lisp_record	*mark_record = NULL, *move_record = NULL;
 
-	MDBG_MOVE("collect %d\n", ao_lisp_collects);
-	marked = moved = 0;
+	MDBG_MOVE("collect %d\n", ao_lisp_collects[style]);
 #endif
 
 	/* The first time through, we're doing a full collect */
@@ -487,27 +496,25 @@ ao_lisp_collect(uint8_t style)
 		chunk_low = top = ao_lisp_last_top;
 	}
 	for (;;) {
+#if DBG_MEM_STATS
 		loops++;
+#endif
 		MDBG_MOVE("move chunks from %d to %d\n", chunk_low, top);
 		/* Find the sizes of the first chunk of objects to move */
 		reset_chunks();
 		walk(ao_lisp_mark_ref, ao_lisp_poly_mark_ref);
 #if DBG_MEM
-		marked = total_marked;
 
 		ao_lisp_record_free(mark_record);
 		mark_record = ao_lisp_record_save();
 		if (mark_record && move_record)
 			ao_lisp_record_compare("mark", move_record, mark_record);
-
-		if (moved && moved != marked)
-			ao_lisp_abort();
 #endif
 
 		DUMP_BUSY();
 
 		/* Find the first moving object */
-		for (i = 0; i < chunk_busy; i++) {
+		for (i = 0; i < chunk_last; i++) {
 			uint16_t	size = ao_lisp_chunk[i].size;
 
 #if DBG_MEM
@@ -536,7 +543,7 @@ ao_lisp_collect(uint8_t style)
 		chunk_low = ao_lisp_chunk[i].old_offset;
 
 		/* Copy all of the objects */
-		for (; i < chunk_busy; i++) {
+		for (; i < chunk_last; i++) {
 			uint16_t	size = ao_lisp_chunk[i].size;
 
 #if DBG_MEM
@@ -557,8 +564,6 @@ ao_lisp_collect(uint8_t style)
 			top += size;
 		}
 
-		chunk_last = i;
-
 		if (chunk_first < chunk_last) {
 			/* Relocate all references to the objects */
 			walk(ao_lisp_move, ao_lisp_poly_move);
@@ -568,10 +573,6 @@ ao_lisp_collect(uint8_t style)
 			move_record = ao_lisp_record_save();
 			if (mark_record && move_record)
 				ao_lisp_record_compare("move", mark_record, move_record);
-
-			moved = total_marked;
-			if (moved != marked)
-				ao_lisp_abort();
 #endif
 		}
 
@@ -585,13 +586,12 @@ ao_lisp_collect(uint8_t style)
 		chunk_low = chunk_high;
 	}
 
-	/* Compute amount of memory freed */
-	ret = ao_lisp_top - top;
-
+#if DBG_MEM_STATS
 	/* Collect stats */
 	++ao_lisp_collects[style];
-	ao_lisp_freed[style] += ret;
+	ao_lisp_freed[style] += ao_lisp_top - top;
 	ao_lisp_loops[style] += loops;
+#endif
 
 	ao_lisp_top = top;
 	if (style == AO_LISP_COLLECT_FULL)
@@ -600,7 +600,7 @@ ao_lisp_collect(uint8_t style)
 	MDBG_DO(memset(ao_lisp_chunk, '\0', sizeof (ao_lisp_chunk));
 		walk(ao_lisp_mark_ref, ao_lisp_poly_mark_ref));
 
-	return ret;
+	return AO_LISP_POOL - ao_lisp_top;
 }
 
 /*
@@ -697,21 +697,13 @@ ao_lisp_poly_mark(ao_poly p, uint8_t do_note_cons)
 static uint16_t
 move_map(uint16_t offset)
 {
-	int		l, r;
+	int		l;
 
 	if (offset < chunk_low || chunk_high <= offset)
 		return offset;
 
-	/* Binary search for the location */
-	l = chunk_first;
-	r = chunk_busy - 1;
-	while (l <= r) {
-		int m = (l + r) >> 1;
-		if (ao_lisp_chunk[m].old_offset < offset)
-			l = m + 1;
-		else
-			r = m - 1;
-	}
+	l = find_chunk(offset);
+
 #if DBG_MEM
 	if (ao_lisp_chunk[l].old_offset != offset)
 		ao_lisp_abort();
@@ -832,13 +824,12 @@ ao_lisp_alloc(int size)
 	MDBG_DO(++dbg_allocs);
 	MDBG_DO(if (dbg_validate) ao_lisp_validate());
 	size = ao_lisp_size_round(size);
-	if (ao_lisp_top + size > AO_LISP_POOL) {
-		if (ao_lisp_collect(AO_LISP_COLLECT_INCREMENTAL) < size &&
-		    ao_lisp_collect(AO_LISP_COLLECT_FULL) < size)
-		{
-			ao_lisp_error(AO_LISP_OOM, "out of memory");
-			return NULL;
-		}
+	if (AO_LISP_POOL - ao_lisp_top < size &&
+	    ao_lisp_collect(AO_LISP_COLLECT_INCREMENTAL) < size &&
+	    ao_lisp_collect(AO_LISP_COLLECT_FULL) < size)
+	{
+		ao_lisp_error(AO_LISP_OOM, "out of memory");
+		return NULL;
 	}
 	addr = ao_lisp_pool + ao_lisp_top;
 	ao_lisp_top += size;
