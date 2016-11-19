@@ -236,10 +236,10 @@ static uint8_t	ao_lisp_cons_noted;
 uint16_t	ao_lisp_top;
 
 struct ao_lisp_chunk {
-	uint16_t		old_addr;
+	uint16_t		old_offset;
 	union {
 		uint16_t	size;
-		uint16_t	new_addr;
+		uint16_t	new_offset;
 	};
 };
 
@@ -284,14 +284,11 @@ static inline int limit(int offset) {
 static int total_marked;
 
 static void
-note_cons(void *addr)
+note_cons(uint16_t offset)
 {
-	if (AO_LISP_IS_POOL(addr)) {
-		int	offset = pool_offset(addr);
-		MDBG_MOVE("note cons %d\n", MDBG_OFFSET(addr));
-		ao_lisp_cons_noted = 1;
-		mark(ao_lisp_cons_note, offset);
-	}
+	MDBG_MOVE("note cons %d\n", offset);
+	ao_lisp_cons_noted = 1;
+	mark(ao_lisp_cons_note, offset);
 }
 
 static uint16_t	chunk_low, chunk_high;
@@ -299,11 +296,11 @@ static uint16_t	chunk_first, chunk_last;
 static int chunk_busy;
 
 static void
-note_chunk(uint16_t addr, uint16_t size)
+note_chunk(uint16_t offset, uint16_t size)
 {
 	int l, r;
 
-	if (addr < chunk_low || chunk_high <= addr)
+	if (offset < chunk_low || chunk_high <= offset)
 		return;
 
 	/* Binary search for the location */
@@ -311,7 +308,7 @@ note_chunk(uint16_t addr, uint16_t size)
 	r = chunk_busy - 1;
 	while (l <= r) {
 		int m = (l + r) >> 1;
-		if (ao_lisp_chunk[m].old_addr < addr)
+		if (ao_lisp_chunk[m].old_offset < offset)
 			l = m + 1;
 		else
 			r = m - 1;
@@ -327,7 +324,7 @@ note_chunk(uint16_t addr, uint16_t size)
 		ao_lisp_abort();
 
 	/* Off the left side */
-	if (l == 0 && chunk_busy && addr > ao_lisp_chunk[0].old_addr)
+	if (l == 0 && chunk_busy && offset > ao_lisp_chunk[0].old_offset)
 		ao_lisp_abort();
 #endif
 
@@ -339,7 +336,7 @@ note_chunk(uint16_t addr, uint16_t size)
 		(end - (l+1)) * sizeof (struct ao_lisp_chunk));
 
 	/* Add new entry */
-	ao_lisp_chunk[l].old_addr = addr;
+	ao_lisp_chunk[l].old_offset = offset;
 	ao_lisp_chunk[l].size = size;
 
 	/* Increment the number of elements up to the size of the array */
@@ -348,7 +345,7 @@ note_chunk(uint16_t addr, uint16_t size)
 
 	/* Set the top address if the array is full */
 	if (chunk_busy == AO_LISP_NCHUNK)
-		chunk_high = ao_lisp_chunk[AO_LISP_NCHUNK-1].old_addr +
+		chunk_high = ao_lisp_chunk[AO_LISP_NCHUNK-1].old_offset +
 			ao_lisp_chunk[AO_LISP_NCHUNK-1].size;
 }
 
@@ -508,41 +505,53 @@ ao_lisp_collect(uint8_t style)
 		DUMP_BUSY();
 
 		/* Find the first moving object */
-		for (i = 0; i < AO_LISP_NCHUNK; i++) {
+		for (i = 0; i < chunk_busy; i++) {
 			uint16_t	size = ao_lisp_chunk[i].size;
 
-			if (!size)
-				break;
-
-			if (ao_lisp_chunk[i].old_addr > top)
-				break;
 #if DBG_MEM
-			if (ao_lisp_chunk[i].old_addr != top)
+			if (!size)
 				ao_lisp_abort();
 #endif
 
-			top += size;
-			MDBG_MOVE("chunk %d %d not moving\n",
-				  ao_lisp_chunk[i].old_addr,
-				  ao_lisp_chunk[i].size);
-		}
-
-		chunk_first = i;
-		/* Copy all of the objects */
-		for (; i < AO_LISP_NCHUNK; i++) {
-			uint16_t	size = ao_lisp_chunk[i].size;
-
-			if (!size)
+			if (ao_lisp_chunk[i].old_offset > top)
 				break;
 
+			MDBG_MOVE("chunk %d %d not moving\n",
+				  ao_lisp_chunk[i].old_offset,
+				  ao_lisp_chunk[i].size);
+#if DBG_MEM
+			if (ao_lisp_chunk[i].old_offset != top)
+				ao_lisp_abort();
+#endif
+			top += size;
+		}
+
+		/*
+		 * Limit amount of chunk array used in mapping moves
+		 * to the active region
+		 */
+		chunk_first = i;
+		chunk_low = ao_lisp_chunk[i].old_offset;
+
+		/* Copy all of the objects */
+		for (; i < chunk_busy; i++) {
+			uint16_t	size = ao_lisp_chunk[i].size;
+
+#if DBG_MEM
+			if (!size)
+				ao_lisp_abort();
+#endif
+
 			MDBG_MOVE("chunk %d %d -> %d\n",
-				  ao_lisp_chunk[i].old_addr,
+				  ao_lisp_chunk[i].old_offset,
 				  size,
 				  top);
-			ao_lisp_chunk[i].new_addr = top;
+			ao_lisp_chunk[i].new_offset = top;
+
 			memmove(&ao_lisp_pool[top],
-				&ao_lisp_pool[ao_lisp_chunk[i].old_addr],
+				&ao_lisp_pool[ao_lisp_chunk[i].old_offset],
 				size);
+
 			top += size;
 		}
 
@@ -564,9 +573,13 @@ ao_lisp_collect(uint8_t style)
 #endif
 		}
 
+		/* If we ran into the end of the heap, then
+		 * there's no need to keep walking
+		 */
 		if (chunk_last != AO_LISP_NCHUNK)
 			break;
 
+		/* Next loop starts right above this loop */
 		chunk_low = chunk_high;
 	}
 
@@ -590,10 +603,11 @@ ao_lisp_collect(uint8_t style)
 
 /*
  * Mark interfaces for objects
- *
- * Note a reference to memory and
- * collect information about a few object sizes
- * at a time
+ */
+
+/*
+ * Note a reference to memory and collect information about a few
+ * object sizes at a time
  */
 
 int
@@ -614,6 +628,9 @@ ao_lisp_mark_memory(const struct ao_lisp_type *type, void *addr)
 	return 0;
 }
 
+/*
+ * Mark an object and all that it refereces
+ */
 int
 ao_lisp_mark(const struct ao_lisp_type *type, void *addr)
 {
@@ -629,64 +646,82 @@ ao_lisp_mark(const struct ao_lisp_type *type, void *addr)
 	return ret;
 }
 
+/*
+ * Mark an object, unless it is a cons cell and
+ * do_note_cons is set. In that case, just
+ * set a bit in the cons note array; those
+ * will be marked in a separate pass to avoid
+ * deep recursion in the collector
+ */
 int
 ao_lisp_poly_mark(ao_poly p, uint8_t do_note_cons)
 {
 	uint8_t type;
 	void	*addr;
 
-	if (!p)
+	type = ao_lisp_poly_base_type(p);
+
+	if (type == AO_LISP_INT)
 		return 1;
 
-	type = ao_lisp_poly_base_type(p);
 	addr = ao_lisp_ref(p);
-
 	if (!AO_LISP_IS_POOL(addr))
 		return 1;
 
 	if (type == AO_LISP_CONS && do_note_cons) {
-		note_cons(ao_lisp_ref(p));
+		note_cons(pool_offset(addr));
 		return 1;
 	} else {
-		const struct ao_lisp_type	*lisp_type;
+		if (type == AO_LISP_OTHER)
+			type = ao_lisp_other_type(addr);
 
-		if (type == AO_LISP_OTHER) {
-			type = ao_lisp_other_type(ao_lisp_poly_other(p));
+		const struct ao_lisp_type *lisp_type = ao_lisp_types[type];
 #if DBG_MEM
-			if (type <= AO_LISP_OTHER || AO_LISP_NUM_TYPE <= type)
-				ao_lisp_abort();
-#endif
-		}
-
-		lisp_type = ao_lisp_types[ao_lisp_poly_type(p)];
 		if (!lisp_type)
-			return 1;
-		return ao_lisp_mark(lisp_type, ao_lisp_ref(p));
+			ao_lisp_abort();
+#endif
+
+		return ao_lisp_mark(lisp_type, addr);
 	}
 }
 
-static void *
-move_map(void *addr)
-{
-	uint16_t	offset = pool_offset(addr);
-	int		i;
+/*
+ * Find the current location of an object
+ * based on the original location. For unmoved
+ * objects, this is simple. For moved objects,
+ * go search for it
+ */
 
-	for (i = chunk_first; i < chunk_last; i++) {
-		if (ao_lisp_chunk[i].old_addr == offset) {
-			MDBG_MOVE("move %d -> %d\n",
-				  ao_lisp_chunk[i].old_addr,
-				  ao_lisp_chunk[i].new_addr);
-			return ao_lisp_pool + ao_lisp_chunk[i].new_addr;
-		}
+static uint16_t
+move_map(uint16_t offset)
+{
+	int		l, r;
+
+	if (offset < chunk_low || chunk_high <= offset)
+		return offset;
+
+	/* Binary search for the location */
+	l = chunk_first;
+	r = chunk_busy - 1;
+	while (l <= r) {
+		int m = (l + r) >> 1;
+		if (ao_lisp_chunk[m].old_offset < offset)
+			l = m + 1;
+		else
+			r = m - 1;
 	}
-	return addr;
+#if DBG_MEM
+	if (ao_lisp_chunk[l].old_offset != offset)
+		ao_lisp_abort();
+#endif
+	return ao_lisp_chunk[l].new_offset;
 }
 
 int
 ao_lisp_move_memory(const struct ao_lisp_type *type, void **ref)
 {
 	void		*addr = *ref;
-	int		offset;
+	uint16_t	offset, orig_offset;
 
 	if (!AO_LISP_IS_POOL(addr))
 		return 1;
@@ -694,14 +729,14 @@ ao_lisp_move_memory(const struct ao_lisp_type *type, void **ref)
 	(void) type;
 
 	MDBG_MOVE("move memory %d\n", MDBG_OFFSET(addr));
-	addr = move_map(addr);
-	if (addr != *ref) {
+	orig_offset = pool_offset(addr);
+	offset = move_map(orig_offset);
+	if (offset != orig_offset) {
 		MDBG_MOVE("update ref %d %d -> %d\n",
 			  AO_LISP_IS_POOL(ref) ? MDBG_OFFSET(ref) : -1,
-			  MDBG_OFFSET(*ref), MDBG_OFFSET(addr));
-		*ref = addr;
+			  orig_offset, offset);
+		*ref = ao_lisp_pool + offset;
 	}
-	offset = pool_offset(addr);
 	if (busy(ao_lisp_busy, offset)) {
 		MDBG_MOVE("already moved\n");
 		return 1;
@@ -729,47 +764,46 @@ ao_lisp_move(const struct ao_lisp_type *type, void **ref)
 int
 ao_lisp_poly_move(ao_poly *ref, uint8_t do_note_cons)
 {
-	uint8_t				type;
-	ao_poly				p = *ref;
-	int				ret;
-	void				*addr;
+	uint8_t		type;
+	ao_poly		p = *ref;
+	int		ret;
+	void		*addr;
+	uint16_t	offset, orig_offset;
+	uint8_t		base_type;
 
-	if (!p)
+	base_type = type = ao_lisp_poly_base_type(p);
+
+	if (type == AO_LISP_INT)
 		return 1;
 
 	addr = ao_lisp_ref(p);
-
 	if (!AO_LISP_IS_POOL(addr))
 		return 1;
 
-	type = ao_lisp_poly_base_type(p);
+	orig_offset = pool_offset(addr);
+	offset = move_map(orig_offset);
 
 	if (type == AO_LISP_CONS && do_note_cons) {
-		note_cons(addr);
-		addr = move_map(addr);
+		note_cons(orig_offset);
 		ret = 1;
 	} else {
-		const struct ao_lisp_type	*lisp_type;
+		if (type == AO_LISP_OTHER)
+			type = ao_lisp_other_type(ao_lisp_pool + offset);
 
-		if (type == AO_LISP_OTHER) {
-			type = ao_lisp_other_type(move_map(ao_lisp_poly_other(p)));
+		const struct ao_lisp_type *lisp_type = ao_lisp_types[type];
 #if DBG_MEM
-			if (type <= AO_LISP_OTHER || AO_LISP_NUM_TYPE <= type)
-				ao_lisp_abort();
-#endif
-		}
-
-		lisp_type = ao_lisp_types[type];
 		if (!lisp_type)
-			return 1;
+			ao_lisp_abort();
+#endif
+
 		ret = ao_lisp_move(lisp_type, &addr);
 	}
 
 	/* Re-write the poly value */
-	if (addr != ao_lisp_ref(p)) {
-		ao_poly np = ao_lisp_poly(addr, p & AO_LISP_TYPE_MASK);
+	if (offset != orig_offset) {
+		ao_poly np = ao_lisp_poly(ao_lisp_pool + offset, base_type);
 		MDBG_MOVE("poly %d moved %d -> %d\n",
-			  type, MDBG_OFFSET(ao_lisp_ref(p)), MDBG_OFFSET(ao_lisp_ref(np)));
+			  type, orig_offset, offset);
 		*ref = np;
 	}
 	return ret;
@@ -797,8 +831,8 @@ ao_lisp_alloc(int size)
 	MDBG_DO(if (dbg_validate) ao_lisp_validate());
 	size = ao_lisp_size_round(size);
 	if (ao_lisp_top + size > AO_LISP_POOL) {
-		if (!ao_lisp_collect(AO_LISP_COLLECT_INCREMENTAL) &&
-		    !ao_lisp_collect(AO_LISP_COLLECT_FULL))
+		if (ao_lisp_collect(AO_LISP_COLLECT_INCREMENTAL) < size &&
+		    ao_lisp_collect(AO_LISP_COLLECT_FULL) < size)
 		{
 			ao_lisp_error(AO_LISP_OOM, "out of memory");
 			return NULL;
