@@ -621,7 +621,7 @@ ao_lisp_read_eval_print(void);
 /* frame */
 extern const struct ao_lisp_type ao_lisp_frame_type;
 
-#define AO_LISP_FRAME_FREE	4
+#define AO_LISP_FRAME_FREE	6
 
 extern struct ao_lisp_frame	*ao_lisp_frame_free_list[AO_LISP_FRAME_FREE];
 
@@ -636,6 +636,9 @@ ao_lisp_frame_new(int num);
 
 void
 ao_lisp_frame_free(struct ao_lisp_frame *frame);
+
+void
+ao_lisp_frame_bind(struct ao_lisp_frame *frame, int num, ao_poly atom, ao_poly val);
 
 int
 ao_lisp_frame_add(struct ao_lisp_frame **frame, ao_poly atom, ao_poly val);
