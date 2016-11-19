@@ -20,7 +20,6 @@
 
 #include <stdint.h>
 #include <string.h>
-//#include <stdio.h>
 #include <ao_lisp_os.h>
 
 typedef uint16_t	ao_poly;
@@ -735,7 +734,7 @@ int ao_lisp_stack_depth;
 #define DBG_CONS(a)	ao_lisp_cons_print(ao_lisp_cons_poly(a))
 #define DBG_POLY(a)	ao_lisp_poly_print(a)
 #define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_lisp_pool) : -1)
-#define DBG_STACK()	ao_lisp_stack_print()
+#define DBG_STACK()	ao_lisp_stack_print(ao_lisp_stack_poly(ao_lisp_stack))
 static inline void
 ao_lisp_frames_dump(void)
 {

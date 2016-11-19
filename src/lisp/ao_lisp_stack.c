@@ -12,7 +12,6 @@
  * General Public License for more details.
  */
 
-#define DBG_EVAL 0
 #include "ao_lisp.h"
 
 const struct ao_lisp_type ao_lisp_stack_type;
