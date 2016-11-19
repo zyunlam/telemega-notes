@@ -218,9 +218,11 @@ static const void ** const ao_lisp_cache[] = {
 	(const void **) &ao_lisp_frame_free_list[1],
 	(const void **) &ao_lisp_frame_free_list[2],
 	(const void **) &ao_lisp_frame_free_list[3],
+	(const void **) &ao_lisp_frame_free_list[4],
+	(const void **) &ao_lisp_frame_free_list[5],
 };
 
-#if AO_LISP_FRAME_FREE != 4
+#if AO_LISP_FRAME_FREE != 6
 #error Unexpected AO_LISP_FRAME_FREE value
 #endif
 

@@ -166,8 +166,7 @@ ao_lisp_lambda_eval(void)
 	case AO_LISP_FUNC_LAMBDA:
 		for (f = 0; f < args_wanted; f++) {
 			DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(vals->car); DBG("\n");
-			next_frame->vals[f].atom = args->car;
-			next_frame->vals[f].val = vals->car;
+			ao_lisp_frame_bind(next_frame, f, args->car, vals->car);
 			args = ao_lisp_poly_cons(args->cdr);
 			vals = ao_lisp_poly_cons(vals->cdr);
 		}
@@ -180,14 +179,12 @@ ao_lisp_lambda_eval(void)
 	case AO_LISP_FUNC_MACRO:
 		for (f = 0; f < args_wanted - 1; f++) {
 			DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(vals->car); DBG("\n");
-			next_frame->vals[f].atom = args->car;
-			next_frame->vals[f].val = vals->car;
+			ao_lisp_frame_bind(next_frame, f, args->car, vals->car);
 			args = ao_lisp_poly_cons(args->cdr);
 			vals = ao_lisp_poly_cons(vals->cdr);
 		}
 		DBGI("bind "); DBG_POLY(args->car); DBG(" = "); DBG_POLY(ao_lisp_cons_poly(vals)); DBG("\n");
-		next_frame->vals[f].atom = args->car;
-		next_frame->vals[f].val = ao_lisp_cons_poly(vals);
+		ao_lisp_frame_bind(next_frame, f, args->car, ao_lisp_cons_poly(vals));
 		break;
 	default:
 		break;

@@ -128,14 +128,32 @@ ao_lisp_frame_print(ao_poly p)
 	printf("}");
 }
 
+static int
+ao_lisp_frame_find(struct ao_lisp_frame *frame, int top, ao_poly atom)
+{
+	int l = 0;
+	int r = top - 1;
+	while (l <= r) {
+		int m = (l + r) >> 1;
+		if (frame->vals[m].atom < atom)
+			l = m + 1;
+		else
+			r = m - 1;
+	}
+	return l;
+}
+
 ao_poly *
 ao_lisp_frame_ref(struct ao_lisp_frame *frame, ao_poly atom)
 {
-	int f;
-	for (f = 0; f < frame->num; f++)
-		if (frame->vals[f].atom == atom)
-			return &frame->vals[f].val;
-	return NULL;
+	int l = ao_lisp_frame_find(frame, frame->num, atom);
+
+	if (l >= frame->num)
+		return NULL;
+
+	if (frame->vals[l].atom != atom)
+		return NULL;
+	return &frame->vals[l].val;
 }
 
 int
@@ -234,6 +252,18 @@ ao_lisp_frame_realloc(struct ao_lisp_frame **frame_ref, int new_num)
 	return new;
 }
 
+void
+ao_lisp_frame_bind(struct ao_lisp_frame *frame, int num, ao_poly atom, ao_poly val)
+{
+	int l = ao_lisp_frame_find(frame, num, atom);
+
+	memmove(&frame->vals[l+1],
+		&frame->vals[l],
+		(num - l) * sizeof (struct ao_lisp_val));
+	frame->vals[l].atom = atom;
+	frame->vals[l].val = val;
+}
+
 int
 ao_lisp_frame_add(struct ao_lisp_frame **frame_ref, ao_poly atom, ao_poly val)
 {
@@ -251,14 +281,13 @@ ao_lisp_frame_add(struct ao_lisp_frame **frame_ref, ao_poly atom, ao_poly val)
 			f = 0;
 			frame = ao_lisp_frame_new(1);
 		}
-		atom = ao_lisp_poly_fetch(0);
-		val = ao_lisp_poly_fetch(1);
 		if (!frame)
 			return 0;
 		*frame_ref = frame;
-		frame->vals[f].atom = atom;
-		ref = &frame->vals[f].val;
-	}
-	*ref = val;
+		atom = ao_lisp_poly_fetch(0);
+		val = ao_lisp_poly_fetch(1);
+		ao_lisp_frame_bind(frame, frame->num - 1, atom, val);
+	} else
+		*ref = val;
 	return 1;
 }
