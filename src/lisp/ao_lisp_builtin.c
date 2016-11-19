@@ -87,6 +87,7 @@ static const ao_poly builtin_names[] = {
 	[builtin_save] = _ao_lisp_atom_save,
 	[builtin_restore] = _ao_lisp_atom_restore,
 	[builtin_call_cc] = _ao_lisp_atom_call2fcc,
+	[builtin_collect] = _ao_lisp_atom_collect,
 
 };
 
@@ -561,6 +562,15 @@ ao_lisp_do_read(struct ao_lisp_cons *cons)
 	return ao_lisp_read();
 }
 
+ao_poly
+ao_lisp_do_collect(struct ao_lisp_cons *cons)
+{
+	int	free;
+	(void) cons;
+	free = ao_lisp_collect(AO_LISP_COLLECT_FULL);
+	return ao_lisp_int_poly(free);
+}
+
 const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_eval] = ao_lisp_do_eval,
 	[builtin_read] = ao_lisp_do_read,
@@ -599,5 +609,6 @@ const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_save] = ao_lisp_save,
 	[builtin_restore] = ao_lisp_restore,
 	[builtin_call_cc] = ao_lisp_call_cc,
+	[builtin_collect] = ao_lisp_do_collect,
 };
 
