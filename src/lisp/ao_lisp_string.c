@@ -104,9 +104,9 @@ ao_lisp_string_unpack(char *a)
 		ao_lisp_cons_stash(1, tail);
 		ao_lisp_string_stash(0, a);
 		struct ao_lisp_cons	*n = ao_lisp_cons_cons(ao_lisp_int_poly(c), NULL);
+		a = ao_lisp_string_fetch(0);
 		cons = ao_lisp_cons_fetch(0);
 		tail = ao_lisp_cons_fetch(1);
-		a = ao_lisp_string_fetch(0);
 
 		if (!n) {
 			cons = NULL;

@@ -144,8 +144,7 @@ struct ao_lisp_root {
 
 static struct ao_lisp_cons 	*save_cons[2];
 static char			*save_string[2];
-static struct ao_lisp_stack	*save_stack[3];
-static ao_poly			save_poly[2];
+static ao_poly			save_poly[3];
 
 static const struct ao_lisp_root	ao_lisp_root[] = {
 	{
@@ -157,24 +156,12 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 		.addr = (void **) &save_cons[1],
 	},
 	{
-		.type = &ao_lisp_stack_type,
-		.addr = (void **) &save_stack[0]
-	},
-	{
-		.type = &ao_lisp_stack_type,
-		.addr = (void **) &save_stack[1]
-	},
-	{
-		.type = &ao_lisp_stack_type,
-		.addr = (void **) &save_stack[2]
+		.type = &ao_lisp_string_type,
+		.addr = (void **) &save_string[0],
 	},
 	{
 		.type = &ao_lisp_string_type,
-		.addr = (void **) &save_string[0]
-	},
-	{
-		.type = &ao_lisp_string_type,
-		.addr = (void **) &save_string[1]
+		.addr = (void **) &save_string[1],
 	},
 	{
 		.type = NULL,
@@ -183,6 +170,10 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 	{
 		.type = NULL,
 		.addr = (void **) &save_poly[1]
+	},
+	{
+		.type = NULL,
+		.addr = (void **) &save_poly[2]
 	},
 	{
 		.type = &ao_lisp_atom_type,
@@ -833,17 +824,17 @@ ao_lisp_cons_fetch(int id)
 }
 
 void
-ao_lisp_stack_stash(int id, struct ao_lisp_stack *stack)
+ao_lisp_poly_stash(int id, ao_poly poly)
 {
-	save_stack[id] = stack;
+	save_poly[id] = poly;
 }
 
-struct ao_lisp_stack *
-ao_lisp_stack_fetch(int id)
+ao_poly
+ao_lisp_poly_fetch(int id)
 {
-	struct ao_lisp_stack *stack = save_stack[id];
-	save_stack[id] = NULL;
-	return stack;
+	ao_poly poly = save_poly[id];
+	save_poly[id] = AO_LISP_NIL;
+	return poly;
 }
 
 void
@@ -859,16 +850,4 @@ ao_lisp_string_fetch(int id)
 	save_string[id] = NULL;
 	return string;
 }
-void
-ao_lisp_poly_stash(int id, ao_poly poly)
-{
-	save_poly[id] = poly;
-}
 
-ao_poly
-ao_lisp_poly_fetch(int id)
-{
-	ao_poly poly = save_poly[id];
-	save_poly[id] = AO_LISP_NIL;
-	return poly;
-}
