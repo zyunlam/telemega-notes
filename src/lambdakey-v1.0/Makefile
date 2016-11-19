@@ -50,6 +50,7 @@ ALTOS_SRC = \
 	ao_lisp_error.c \
 	ao_lisp_lambda.c \
 	ao_lisp_save.c \
+	ao_lisp_stack.c \
 	ao_lisp_os_save.c
 
 PRODUCT=LambdaKey-v1.0
