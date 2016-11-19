@@ -77,9 +77,6 @@ ao_lisp_lambda_alloc(struct ao_lisp_cons *code, int args)
 	if (!lambda)
 		return AO_LISP_NIL;
 
-	if (!code->cdr)
-		return ao_lisp_error(AO_LISP_INVALID, "missing parameters to lambda");
-
 	if (!ao_lisp_check_argt(_ao_lisp_atom_lambda, code, 0, AO_LISP_CONS, 1))
 		return AO_LISP_NIL;
 	f = 0;
