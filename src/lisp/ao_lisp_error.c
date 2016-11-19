@@ -15,23 +15,24 @@
 #include "ao_lisp.h"
 #include <stdarg.h>
 
-static void
-ao_lisp_error_poly(char *name, ao_poly poly)
+void
+ao_lisp_error_poly(char *name, ao_poly poly, ao_poly last)
 {
 	int first = 1;
 	printf("\t\t%s(", name);
 	if (ao_lisp_poly_type(poly) == AO_LISP_CONS) {
-		struct ao_lisp_cons *cons = ao_lisp_poly_cons(poly);
-
-		if (cons) {
-			while (cons) {
+		if (poly) {
+			while (poly) {
+				struct ao_lisp_cons *cons = ao_lisp_poly_cons(poly);
 				if (!first)
 					printf("\t\t         ");
 				else
 					first = 0;
 				ao_lisp_poly_print(cons->car);
 				printf("\n");
-				cons = ao_lisp_poly_cons(cons->cdr);
+				if (poly == last)
+					break;
+				poly = cons->cdr;
 			}
 			printf("\t\t         )\n");
 		} else
@@ -48,7 +49,7 @@ static void tabs(int indent)
 		printf("\t");
 }
 
-static void
+void
 ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 {
 	int			f;
@@ -56,51 +57,30 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 	tabs(indent);
 	printf ("%s{", name);
 	if (frame) {
-		for (f = 0; f < ao_lisp_frame_num(frame); f++) {
-			if (f != 0) {
-				tabs(indent);
-				printf("         ");
+		if (frame->type & AO_LISP_FRAME_PRINT)
+			printf("recurse...");
+		else {
+			frame->type |= AO_LISP_FRAME_PRINT;
+			for (f = 0; f < frame->num; f++) {
+				if (f != 0) {
+					tabs(indent);
+					printf("         ");
+				}
+				ao_lisp_poly_print(frame->vals[f].atom);
+				printf(" = ");
+				ao_lisp_poly_print(frame->vals[f].val);
+				printf("\n");
 			}
-			ao_lisp_poly_print(frame->vals[f].atom);
-			printf(" = ");
-			ao_lisp_poly_print(frame->vals[f].val);
-			printf("\n");
+			if (frame->prev)
+				ao_lisp_error_frame(indent + 1, "prev:   ", ao_lisp_poly_frame(frame->prev));
+			frame->type &= ~AO_LISP_FRAME_PRINT;
 		}
-		if (frame->prev)
-			ao_lisp_error_frame(indent + 1, "prev:   ", ao_lisp_poly_frame(frame->prev));
-	}
-	tabs(indent);
-	printf("        }\n");
+		tabs(indent);
+		printf("        }\n");
+	} else
+		printf ("}\n");
 }
 
-static const char *state_names[] = {
-	"sexpr",
-	"val",
-	"formal",
-	"exec",
-	"cond",
-	"cond_test",
-	"progn",
-};
-
-void
-ao_lisp_stack_print(void)
-{
-	struct ao_lisp_stack *s;
-	printf("Value:  "); ao_lisp_poly_print(ao_lisp_v); printf("\n");
-	printf("Stack:\n");
-	for (s = ao_lisp_stack; s; s = ao_lisp_poly_stack(s->prev)) {
-		printf("\t[\n");
-		printf("\t\texpr:   "); ao_lisp_poly_print(s->list); printf("\n");
-		printf("\t\tstate:  %s\n", state_names[s->state]);
-//		printf("\t\tmacro:  %s\n", s->macro ? "true" : "false");
-		ao_lisp_error_poly ("sexprs: ", s->sexprs);
-		ao_lisp_error_poly ("values: ", s->values);
-		ao_lisp_error_frame(2, "frame:  ", ao_lisp_poly_frame(s->frame));
-//		ao_lisp_error_frame(2, "mframe: ", ao_lisp_poly_frame(s->macro_frame));
-		printf("\t]\n");
-	}
-}
 
 ao_poly
 ao_lisp_error(int error, char *format, ...)
@@ -112,7 +92,9 @@ ao_lisp_error(int error, char *format, ...)
 	vprintf(format, args);
 	va_end(args);
 	printf("\n");
-	ao_lisp_stack_print();
+	printf("Value: "); ao_lisp_poly_print(ao_lisp_v); printf("\n");
+	printf("Stack:\n");
+	ao_lisp_stack_print(ao_lisp_stack_poly(ao_lisp_stack));
 	printf("Globals:\n\t");
 	ao_lisp_frame_print(ao_lisp_frame_poly(ao_lisp_frame_global));
 	printf("\n");

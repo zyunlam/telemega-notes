@@ -86,6 +86,7 @@ static const ao_poly builtin_names[] = {
 	[builtin_led] = _ao_lisp_atom_led,
 	[builtin_save] = _ao_lisp_atom_save,
 	[builtin_restore] = _ao_lisp_atom_restore,
+	[builtin_call_cc] = _ao_lisp_atom_call2fcc,
 
 };
 
@@ -117,9 +118,7 @@ void
 ao_lisp_builtin_print(ao_poly b)
 {
 	struct ao_lisp_builtin *builtin = ao_lisp_poly_builtin(b);
-	printf("[builtin %s %s]",
-	       ao_lisp_args_name(builtin->args),
-	       ao_lisp_builtin_name(builtin->func));
+	printf("%s", ao_lisp_builtin_name(builtin->func));
 }
 
 ao_poly
@@ -599,5 +598,6 @@ const ao_lisp_func_t ao_lisp_builtins[] = {
 	[builtin_delay] = ao_lisp_delay,
 	[builtin_save] = ao_lisp_save,
 	[builtin_restore] = ao_lisp_restore,
+	[builtin_call_cc] = ao_lisp_call_cc,
 };
 

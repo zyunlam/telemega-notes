@@ -175,7 +175,8 @@ ao_lisp_lambda_eval(void)
 			args = ao_lisp_poly_cons(args->cdr);
 			vals = ao_lisp_poly_cons(vals->cdr);
 		}
-		ao_lisp_cons_free(cons);
+		if (!ao_lisp_stack_marked(ao_lisp_stack))
+			ao_lisp_cons_free(cons);
 		cons = NULL;
 		break;
 	case AO_LISP_FUNC_LEXPR:
