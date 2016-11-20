@@ -17,11 +17,11 @@
 					; ANSI control sequences
 
 (defun move-to (col row)
-  (patom "\033[" row ";" col "H" nil)
+  (patom "\033[" row ";" col "H")
   )
 
 (defun clear ()
-  (patom "\033[2J" nil)
+  (patom "\033[2J")
   )
 
 (defun display-string (x y str)
@@ -112,6 +112,8 @@
 					; Move a piece from the top of one stack
 					; to the top of another
 
+(setq move-delay 100)
+
 (defun move-piece (from to)
   (let ((from-stack (nth stacks from))
 	(to-stack (nth stacks to))
@@ -121,7 +123,7 @@
     (setq stacks (replace stacks from from-stack))
     (setq stacks (replace stacks to to-stack))
     (display)
-    (delay 100)
+    (delay move-delay)
     )
   )
 
@@ -149,4 +151,5 @@
   (clear)
   (_hanoi len 0 1 2)
   (move-to 0 23)
+  t
   )
