@@ -1109,7 +1109,7 @@ struct ao_usb_dbg {
 	int		line;
 	char		*msg;
 	uint32_t	value;
-	uint32_t	primask;
+	uint32_t	prival;
 #if TX_DBG
 	uint16_t	in_count;
 	uint32_t	in_epr;
@@ -1125,19 +1125,23 @@ struct ao_usb_dbg {
 #endif
 };
 
-#define NUM_USB_DBG	128
+#define NUM_USB_DBG	16
 
-static struct ao_usb_dbg dbg[128];
+static struct ao_usb_dbg dbg[NUM_USB_DBG];
 static int dbg_i;
 
 static void _dbg(int line, char *msg, uint32_t value)
 {
-	uint32_t	primask;
+	uint32_t	prival;
 	dbg[dbg_i].line = line;
 	dbg[dbg_i].msg = msg;
 	dbg[dbg_i].value = value;
-	asm("mrs %0,primask" : "=&r" (primask));
-	dbg[dbg_i].primask = primask;
+#if AO_NONMASK_INTERRUPT
+	asm("mrs %0,basepri" : "=&r" (prival));
+#else
+	asm("mrs %0,primask" : "=&r" (prival));
+#endif
+	dbg[dbg_i].prival = prival;
 #if TX_DBG
 	dbg[dbg_i].in_count = in_count;
 	dbg[dbg_i].in_epr = stm_usb.epr[AO_USB_IN_EPR];
