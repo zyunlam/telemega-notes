@@ -42,31 +42,30 @@ volatile __data uint8_t	ao_data_count;
 
 void stm_systick_isr(void)
 {
+	ao_arch_release_interrupts();
 	ao_validate_cur_stack();
-	if (stm_systick.csr & (1 << STM_SYSTICK_CSR_COUNTFLAG)) {
-		++ao_tick_count;
+	++ao_tick_count;
 #if HAS_TASK_QUEUE
-		if (ao_task_alarm_tick && (int16_t) (ao_tick_count - ao_task_alarm_tick) >= 0)
-			ao_task_check_alarm((uint16_t) ao_tick_count);
+	if (ao_task_alarm_tick && (int16_t) (ao_tick_count - ao_task_alarm_tick) >= 0)
+		ao_task_check_alarm((uint16_t) ao_tick_count);
 #endif
 #if AO_DATA_ALL
-		if (++ao_data_count == ao_data_interval) {
-			ao_data_count = 0;
+	if (++ao_data_count == ao_data_interval) {
+		ao_data_count = 0;
 #if HAS_FAKE_FLIGHT
-			if (ao_fake_flight_active)
-				ao_fake_flight_poll();
-			else
+		if (ao_fake_flight_active)
+			ao_fake_flight_poll();
+		else
 #endif
-				ao_adc_poll();
+			ao_adc_poll();
 #if (AO_DATA_ALL & ~(AO_DATA_ADC))
-			ao_wakeup((void *) &ao_data_count);
-#endif
-		}
-#endif
-#ifdef AO_TIMER_HOOK
-		AO_TIMER_HOOK;
+		ao_wakeup((void *) &ao_data_count);
 #endif
 	}
+#endif
+#ifdef AO_TIMER_HOOK
+	AO_TIMER_HOOK;
+#endif
 }
 
 #if HAS_ADC
@@ -90,6 +89,7 @@ ao_timer_init(void)
 	stm_systick.csr = ((1 << STM_SYSTICK_CSR_ENABLE) |
 			   (1 << STM_SYSTICK_CSR_TICKINT) |
 			   (STM_SYSTICK_CSR_CLKSOURCE_HCLK_8 << STM_SYSTICK_CSR_CLKSOURCE));
+	stm_nvic.shpr15_12 |= 0xff << 24;
 }
 
 #endif
