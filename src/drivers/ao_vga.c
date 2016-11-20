@@ -89,7 +89,6 @@ int vblank_off = 25;
 
 void stm_tim2_isr(void)
 {
-	ao_arch_block_interrupts();
 	if (!vblank) {
 		/* Disable */
 		stm_dma.channel[DMA_INDEX].ccr = DMA_CCR(0);
@@ -101,18 +100,17 @@ void stm_tim2_isr(void)
 	}
 	stm_tim2.sr = ~(1 << STM_TIM234_SR_CC2IF);
 	line = stm_tim3.cnt;
- 	if (vblank_off <= line && line < (AO_VGA_HEIGHT << 1) + vblank_off) {
+ 	if (vblank_off <= line && line < ((AO_VGA_HEIGHT-1) << 1) + vblank_off) {
 		vblank = 0;
 		if (((line - vblank_off) & 1) == 0)
 			scanline += AO_VGA_STRIDE;
 	} else {
 		if (!vblank) {
-			stm_systick_isr();
+//			stm_systick_isr();
 			scanline = ao_vga_fb;
 			vblank = 1;
 		}
 	}
-	ao_arch_release_interrupts();
 }
 
 static void
@@ -359,9 +357,9 @@ ao_vga_enable(int enable)
 		vblank_off = enable;
 		ao_vga_fb_init();
 		stm_tim2.cr1 |= (1 << STM_TIM234_CR1_CEN);
-		stm_systick.csr &= ~(1 << STM_SYSTICK_CSR_ENABLE);
+//		stm_systick.csr &= ~(1 << STM_SYSTICK_CSR_ENABLE);
 	} else {
 		stm_tim2.cr1 &= ~(1 << STM_TIM234_CR1_CEN);
-		stm_systick.csr |= (1 << STM_SYSTICK_CSR_ENABLE);
+//		stm_systick.csr |= (1 << STM_SYSTICK_CSR_ENABLE);
 	}
 }

@@ -85,9 +85,6 @@ extern const uint32_t ao_radio_cal;
 #define ao_arch_task_members\
 	uint32_t *sp;			/* saved stack pointer */
 
-#define ao_arch_block_interrupts()	asm("cpsid i")
-#define ao_arch_release_interrupts()	asm("cpsie i")
-
 
 /*
  * For now, we're running at a weird frequency

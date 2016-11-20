@@ -345,17 +345,29 @@ extern struct ao_stm_usart	ao_stm_usart3;
 
 typedef uint32_t	ao_arch_irq_t;
 
-static inline uint32_t
-ao_arch_irqsave(void) {
-	uint32_t	primask;
-	asm("mrs %0,primask" : "=&r" (primask));
-	ao_arch_block_interrupts();
-	return primask;
+static inline void
+ao_arch_block_interrupts(void) {
+	uint32_t	basepri = AO_STM_NVIC_BASEPRI_MASK;
+	asm("msr basepri,%0" : : "r" (basepri));
 }
 
 static inline void
-ao_arch_irqrestore(uint32_t primask) {
-	asm("msr primask,%0" : : "r" (primask));
+ao_arch_release_interrupts(void) {
+	uint32_t	basepri = 0x00;
+	asm("msr basepri,%0" : : "r" (basepri));
+}
+
+static inline uint32_t
+ao_arch_irqsave(void) {
+	uint32_t	basepri;
+	asm("mrs %0,basepri" : "=r" (basepri));
+	ao_arch_block_interrupts();
+	return basepri;
+}
+
+static inline void
+ao_arch_irqrestore(uint32_t basepri) {
+	asm("msr basepri,%0" : : "r" (basepri));
 }
 
 static inline void
@@ -365,9 +377,9 @@ ao_arch_memory_barrier() {
 
 static inline void
 ao_arch_irq_check(void) {
-	uint32_t	primask;
-	asm("mrs %0,primask" : "=&r" (primask));
-	if ((primask & 1) == 0)
+	uint32_t	basepri;
+	asm("mrs %0,basepri" : "=r" (basepri));
+	if (basepri == 0)
 		ao_panic(AO_PANIC_IRQ);
 }
 
@@ -390,7 +402,7 @@ ao_arch_init_stack(struct ao_task *task, void *start)
 	/* APSR */
 	ARM_PUSH32(sp, 0);
 
-	/* PRIMASK with interrupts enabled */
+	/* BASEPRI with interrupts enabled */
 	ARM_PUSH32(sp, 0);
 
 	task->sp = sp;
@@ -404,8 +416,8 @@ static inline void ao_arch_save_regs(void) {
 	asm("mrs r0,apsr");
 	asm("push {r0}");
 
-	/* Save PRIMASK */
-	asm("mrs r0,primask");
+	/* Save BASEPRI */
+	asm("mrs r0,basepri");
 	asm("push {r0}");
 }
 
@@ -424,9 +436,9 @@ static inline void ao_arch_restore_stack(void) {
 	/* Switch stacks */
 	asm("mov sp, %0" : : "r" (sp) );
 
-	/* Restore PRIMASK */
+	/* Restore BASEPRI */
 	asm("pop {r0}");
-	asm("msr primask,r0");
+	asm("msr basepri,r0");
 
 	/* Restore APSR */
 	asm("pop {r0}");
@@ -468,7 +480,7 @@ static inline void ao_arch_start_scheduler(void) {
 
 	asm("mrs %0,msp" : "=&r" (sp));
 	asm("msr psp,%0" : : "r" (sp));
-	asm("mrs %0,control" : "=&r" (control));
+	asm("mrs %0,control" : "=r" (control));
 	control |= (1 << 1);
 	asm("msr control,%0" : : "r" (control));
 	asm("isb");
@@ -479,12 +491,21 @@ static inline void ao_arch_start_scheduler(void) {
 
 #endif
 
-#define ao_arch_wait_interrupt() do {				\
-		asm("\twfi\n");					\
-		ao_arch_release_interrupts();			\
-		asm(".global ao_idle_loc\nao_idle_loc:");	\
-		ao_arch_block_interrupts();			\
-	} while (0)
+static inline void
+ao_arch_wait_interrupt(void) {
+	uint32_t	enable_int = 0x00;
+	uint32_t	disable_int = AO_STM_NVIC_BASEPRI_MASK;
+
+	asm(
+	    "dsb\n"			/* Serialize data */
+	    "isb\n"			/* Serialize instructions */
+	    "cpsid i\n"			/* Block all interrupts */
+	    "msr basepri,%0\n"		/* Allow all interrupts through basepri */
+	    "wfi\n"			/* Wait for an interrupt */
+	    "cpsie i\n"			/* Allow all interrupts */
+	    "msr basepri,%1\n"		/* Block interrupts through basepri */
+	    : : "r" (enable_int), "r" (disable_int));
+}
 
 #define ao_arch_critical(b) do {			\
 		uint32_t __mask = ao_arch_irqsave();	\
