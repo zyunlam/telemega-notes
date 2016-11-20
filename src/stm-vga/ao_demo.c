@@ -24,6 +24,67 @@
 #include <ao_boot.h>
 #include <ao_vga.h>
 
+struct ao_task ball_task;
+
+#define BALL_WIDTH	5
+#define BALL_HEIGHT	5
+
+static int	ball_x;
+static int	ball_y;
+static int	ball_dx, ball_dy;
+
+uint8_t		ball_enable;
+
+void
+ao_ball(void)
+{
+	ball_dx = 1;
+	ball_dy = 1;
+	ball_x = 0;
+	ball_y = 0;
+	for (;;) {
+		while (!ball_enable)
+			ao_sleep(&ball_enable);
+		for (;;) {
+			ao_solid(AO_ALLONES,
+				 AO_ALLONES,
+				 ao_vga_fb + ball_y * AO_VGA_STRIDE,
+				 AO_VGA_STRIDE,
+				 ball_x,
+				 BALL_WIDTH,
+				 BALL_HEIGHT);
+			ao_delay(AO_MS_TO_TICKS(10));
+			ao_solid(AO_ALLONES,
+				 AO_ALLONES,
+				 ao_vga_fb + ball_y * AO_VGA_STRIDE,
+				 AO_VGA_STRIDE,
+				 ball_x,
+				 BALL_WIDTH,
+				 BALL_HEIGHT);
+			if (!ball_enable)
+				break;
+			ball_x += ball_dx;
+			ball_y += ball_dy;
+			if (ball_x + BALL_WIDTH > AO_VGA_WIDTH) {
+				ball_x = AO_VGA_WIDTH - BALL_WIDTH;
+				ball_dx = -ball_dx;
+			}
+			if (ball_x < 0) {
+				ball_x = -ball_x;
+				ball_dx = -ball_dx;
+			}
+			if (ball_y + BALL_HEIGHT > AO_VGA_HEIGHT) {
+				ball_y = AO_VGA_HEIGHT - BALL_HEIGHT;
+				ball_dy = -ball_dy;
+			}
+			if (ball_y < 0) {
+				ball_y = -ball_y;
+				ball_dy = -ball_dy;
+			}
+		}
+	}
+}
+
 static void
 ao_video_toggle(void)
 {
@@ -31,8 +92,17 @@ ao_video_toggle(void)
 	ao_vga_enable(ao_cmd_lex_i);
 }
 
+static void
+ao_ball_toggle(void)
+{
+	ao_cmd_decimal();
+	ball_enable = ao_cmd_lex_i;
+	ao_wakeup(&ball_enable);
+}
+
 __code struct ao_cmds ao_demo_cmds[] = {
 	{ ao_video_toggle, "V\0Toggle video" },
+	{ ao_ball_toggle, "B\0Toggle ball" },
 	{ 0, NULL }
 };
 
@@ -52,6 +122,7 @@ main(void)
 	ao_vga_init();
 	ao_usb_init();
 
+	ao_add_task(&ball_task, ao_ball, "ball");
 	ao_cmd_register(&ao_demo_cmds[0]);
 
 	ao_start_scheduler();

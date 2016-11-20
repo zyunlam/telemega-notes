@@ -55,21 +55,21 @@ const struct ao_modeline vga_640x480x30 = {
 	.htotal		= 800,
 
 	.vactive	= 480,
-	.vsync_start	= 481,
-	.vsync_end	= 484,
-	.vtotal		= 497
+	.vsync_start	= 490,
+	.vsync_end	= 492,
+	.vtotal		= 525,
 };
 
 #define	mode	vga_640x480x60
 
 #define WIDTH_BYTES	(AO_VGA_WIDTH >> 3)
-#define SCANOUT		((WIDTH_BYTES + 2) >> 1)
+#define SCANOUT		((WIDTH_BYTES+2) >> 1)
 
 uint32_t	ao_vga_fb[AO_VGA_STRIDE * AO_VGA_HEIGHT];
 
 static uint32_t	*scanline;
 
-#define DMA_INDEX	STM_DMA_INDEX(STM_DMA_CHANNEL_SPI2_TX)
+#define DMA_INDEX	STM_DMA_INDEX(STM_DMA_CHANNEL_SPI1_TX)
 
 static int	line;
 static int	vblank;
@@ -85,7 +85,7 @@ static int	vblank;
 			 (0 << STM_DMA_CCR_TCIE) |			\
 			 (en << STM_DMA_CCR_EN))
 
-int vblank_off = 13;
+int vblank_off = 25;
 
 void stm_tim2_isr(void)
 {
@@ -94,21 +94,24 @@ void stm_tim2_isr(void)
 		/* Disable */
 		stm_dma.channel[DMA_INDEX].ccr = DMA_CCR(0);
 		/* Reset DMA engine for the next scanline */
+		stm_dma.channel[DMA_INDEX].cmar = scanline;
 		stm_dma.channel[DMA_INDEX].cndtr = SCANOUT;
 		/* Enable */
 		stm_dma.channel[DMA_INDEX].ccr = DMA_CCR(1);
 	}
 	stm_tim2.sr = ~(1 << STM_TIM234_SR_CC2IF);
 	line = stm_tim3.cnt;
- 	if (vblank_off <= line && line < (AO_VGA_HEIGHT << 1) + vblank_off + 12) {
+ 	if (vblank_off <= line && line < (AO_VGA_HEIGHT << 1) + vblank_off) {
 		vblank = 0;
-		if ((line - vblank_off) & 1)
+		if (((line - vblank_off) & 1) == 0)
 			scanline += AO_VGA_STRIDE;
 	} else {
-		scanline = ao_vga_fb;
-		vblank = 1;
+		if (!vblank) {
+			stm_systick_isr();
+			scanline = ao_vga_fb;
+			vblank = 1;
+		}
 	}
-	stm_dma.channel[DMA_INDEX].cmar = scanline;
 	ao_arch_release_interrupts();
 }
 
@@ -159,27 +162,29 @@ ao_vga_fb_init(void)
 	ao_text("UL",
 		ao_vga_fb,
 		AO_VGA_STRIDE,
-		0);
+		1);
 
 	ao_text("BL",
 		ao_vga_fb + (240 - 7) * AO_VGA_STRIDE,
 		AO_VGA_STRIDE,
-		0);
+		1);
+
+	memset(ao_vga_fb + 120 * AO_VGA_STRIDE, '\0', WIDTH_BYTES);
 }
 
 void
 ao_vga_init(void)
 {
-	/* Initialize spi2 using PB15 for output */
+	/* Initialize spi1 using PB5 for output */
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOBEN);
 
-	stm_ospeedr_set(&stm_gpiob, 15, STM_OSPEEDR_40MHz);
-	stm_afr_set(&stm_gpiob, 15, STM_AFR_AF5);
+	stm_ospeedr_set(&stm_gpiob, 5, STM_OSPEEDR_40MHz);
+	stm_afr_set(&stm_gpiob, 5, STM_AFR_AF5);
 
 	/* turn on SPI */
-	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_SPI2EN);
+	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SPI1EN);
 
-	stm_spi2.cr1 = ((1 << STM_SPI_CR1_BIDIMODE) |		/* Two wire mode */
+	stm_spi1.cr1 = ((1 << STM_SPI_CR1_BIDIMODE) |		/* Two wire mode */
 			(1 << STM_SPI_CR1_BIDIOE) |
 			(0 << STM_SPI_CR1_CRCEN) |		/* CRC disabled */
 			(0 << STM_SPI_CR1_CRCNEXT) |
@@ -193,18 +198,18 @@ ao_vga_init(void)
 			(1 << STM_SPI_CR1_MSTR) |
 			(0 << STM_SPI_CR1_CPOL) |		/* Format 0 */
 			(0 << STM_SPI_CR1_CPHA));
-	stm_spi2.cr2 = ((0 << STM_SPI_CR2_TXEIE) |
+	stm_spi1.cr2 = ((0 << STM_SPI_CR2_TXEIE) |
 			(0 << STM_SPI_CR2_RXNEIE) |
 			(0 << STM_SPI_CR2_ERRIE) |
 			(0 << STM_SPI_CR2_SSOE) |
 			(1 << STM_SPI_CR2_TXDMAEN) |
 			(0 << STM_SPI_CR2_RXDMAEN));
 
-	(void) stm_spi2.dr;
-	(void) stm_spi2.sr;
+	(void) stm_spi1.dr;
+	(void) stm_spi1.sr;
 
-	/* Grab the DMA channel for SPI2 MOSI */
-	stm_dma.channel[DMA_INDEX].cpar = &stm_spi2.dr;
+	/* Grab the DMA channel for SPI1 MOSI */
+	stm_dma.channel[DMA_INDEX].cpar = &stm_spi1.dr;
 	stm_dma.channel[DMA_INDEX].cmar = ao_vga_fb;
 
 	/* hclock on timer 2 */
@@ -225,7 +230,7 @@ ao_vga_init(void)
 
 	/* Channel 2 trigger scanout */
 	/* wait for the time to start scanout */
-	stm_tim2.ccr2 = 90;
+	stm_tim2.ccr2 = mode.htotal - mode.hsync_end;
 
 	stm_tim2.ccmr1 = ((0 << STM_TIM234_CCMR1_OC2CE) |
 			  (STM_TIM234_CCMR1_OC2M_SET_HIGH_ON_MATCH << STM_TIM234_CCMR1_OC2M)  |
@@ -341,7 +346,6 @@ ao_vga_init(void)
 	/* PB4 is Timer 3 CH1 output */
 	stm_ospeedr_set(&stm_gpiob, 4, STM_OSPEEDR_40MHz);
 	stm_afr_set(&stm_gpiob, 4, STM_AFR_AF2);
-
 
 	/* Enable the scanline interrupt */
 	stm_nvic_set_priority(STM_ISR_TIM2_POS, 0);

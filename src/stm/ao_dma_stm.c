@@ -48,7 +48,11 @@ ao_dma_isr(uint8_t index) {
 
 void stm_dma1_channel1_isr(void) { ao_dma_isr(STM_DMA_INDEX(1)); }
 void stm_dma1_channel2_isr(void) { ao_dma_isr(STM_DMA_INDEX(2)); }
+#ifdef STM_DMA1_3_STOLEN
+#define LEAVE_DMA_ON
+#else
 void stm_dma1_channel3_isr(void) { ao_dma_isr(STM_DMA_INDEX(3)); }
+#endif
 void stm_dma1_channel4_isr(void) { ao_dma_isr(STM_DMA_INDEX(4)); }
 #ifdef STM_DMA1_5_STOLEN
 #define LEAVE_DMA_ON
@@ -174,6 +178,13 @@ ao_dma_init(void)
 	for (index = 0; index < STM_NUM_DMA; index++) {
 #if STM_DMA1_5_STOLEN
 		if (index == STM_DMA_INDEX(5)) {
+			ao_dma_allocated[index] = 1;
+			ao_dma_mutex[index] = 0xff;
+			continue;
+		}
+#endif
+#if STM_DMA1_3_STOLEN
+		if (index == STM_DMA_INDEX(3)) {
 			ao_dma_allocated[index] = 1;
 			ao_dma_mutex[index] = 0xff;
 			continue;
