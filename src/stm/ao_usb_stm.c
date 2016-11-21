@@ -1015,7 +1015,7 @@ ao_usb_enable(void)
 	ao_arch_block_interrupts();
 
 	/* Route interrupts */
-	stm_nvic_set_priority(STM_ISR_USB_LP_POS, 3);
+	stm_nvic_set_priority(STM_ISR_USB_LP_POS, AO_STM_NVIC_LOW_PRIORITY);
 	stm_nvic_set_enable(STM_ISR_USB_LP_POS);
 
 	ao_usb_configuration = 0;

@@ -155,7 +155,8 @@ ao_dma_init(void)
 
 	for (index = 0; index < STM_NUM_DMA; index++) {
 		stm_nvic_set_enable(STM_ISR_DMA1_CHANNEL1_POS + index);
-		stm_nvic_set_priority(STM_ISR_DMA1_CHANNEL1_POS + index, 4);
+		stm_nvic_set_priority(STM_ISR_DMA1_CHANNEL1_POS + index,
+				      AO_STM_NVIC_MED_PRIORITY);
 		ao_dma_allocated[index] = 0;
 		ao_dma_mutex[index] = 0;
 	}
