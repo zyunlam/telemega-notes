@@ -42,7 +42,6 @@ volatile __data uint8_t	ao_data_count;
 
 void stm_systick_isr(void)
 {
-	ao_arch_release_interrupts();
 	ao_validate_cur_stack();
 	++ao_tick_count;
 #if HAS_TASK_QUEUE
@@ -89,7 +88,7 @@ ao_timer_init(void)
 	stm_systick.csr = ((1 << STM_SYSTICK_CSR_ENABLE) |
 			   (1 << STM_SYSTICK_CSR_TICKINT) |
 			   (STM_SYSTICK_CSR_CLKSOURCE_HCLK_8 << STM_SYSTICK_CSR_CLKSOURCE));
-	stm_nvic.shpr15_12 |= 0xff << 24;
+	stm_nvic.shpr15_12 |= AO_STM_NVIC_CLOCK_PRIORITY << 24;
 }
 
 #endif

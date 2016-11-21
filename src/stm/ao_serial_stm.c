@@ -444,7 +444,7 @@ ao_serial_init(void)
 	ao_usart_init(&ao_stm_usart1);
 
 	stm_nvic_set_enable(STM_ISR_USART1_POS);
-	stm_nvic_set_priority(STM_ISR_USART1_POS, 4);
+	stm_nvic_set_priority(STM_ISR_USART1_POS, AO_STM_NVIC_MED_PRIORITY);
 #if USE_SERIAL_1_STDIN && !DELAY_SERIAL_1_STDIN
 	ao_add_stdio(_ao_serial1_pollchar,
 		     ao_serial1_putchar,
@@ -500,7 +500,7 @@ ao_serial_init(void)
 #endif
 
 	stm_nvic_set_enable(STM_ISR_USART2_POS);
-	stm_nvic_set_priority(STM_ISR_USART2_POS, 4);
+	stm_nvic_set_priority(STM_ISR_USART2_POS, AO_STM_NVIC_MED_PRIORITY);
 #if USE_SERIAL_2_STDIN && !DELAY_SERIAL_2_STDIN
 	ao_add_stdio(_ao_serial2_pollchar,
 		     ao_serial2_putchar,
@@ -544,7 +544,7 @@ ao_serial_init(void)
 	ao_usart_init(&ao_stm_usart3);
 
 	stm_nvic_set_enable(STM_ISR_USART3_POS);
-	stm_nvic_set_priority(STM_ISR_USART3_POS, 4);
+	stm_nvic_set_priority(STM_ISR_USART3_POS, AO_STM_NVIC_MED_PRIORITY);
 #if USE_SERIAL_3_STDIN && !DELAY_SERIAL_3_STDIN
 	ao_add_stdio(_ao_serial3_pollchar,
 		     ao_serial3_putchar,
