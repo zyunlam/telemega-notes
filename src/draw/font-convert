@@ -11,6 +11,7 @@ typedef struct {
 typedef struct {
 	glyph_t[...]	glyphs;
 	int		default_char;
+	int		ascent;
 } font_t;
 
 glyph_t
@@ -29,8 +30,10 @@ read_glyph(file f)
 		case "ENCODING":
 			glyph.encoding = atoi(tokens[1]);
 			break;
-		case "BBX":
+		case "DWIDTH":
 			glyph.width = atoi(tokens[1]);
+			break;
+		case "BBX":
 			glyph.height = atoi(tokens[2]);
 			break;
 		case "ENDCHAR":
@@ -50,15 +53,23 @@ read_glyph(file f)
 
 font_t read_font(file f) {
 	font_t	font = { .glyphs = {}, .default_char = -1 };
+	bool in_head = true;
 
-	while (!File::end(f)) {
+	while (in_head && !File::end(f)) {
 		string l = File::fgets(f);
 
 		string[*] tokens = String::split(l, " ");
-		if (tokens[0] == "DEFAULT_CHAR")
+		switch (tokens[0]) {
+		case "DEFAULT_CHAR":
 			font.default_char = atoi(tokens[1]);
-		if (tokens[0] == "CHARS")
 			break;
+		case "FONT_ASCENT":
+			font.ascent = atoi(tokens[1]);
+			break;
+		case "CHARS":
+			in_head = false;
+			break;
+		}
 	}
 	while (!File::end(f)) {
 		glyph_t	glyph = read_glyph(f);
@@ -130,6 +141,7 @@ void print_font(font_t font) {
 
 	printf("#define GLYPH_WIDTH %d\n", width);
 	printf("#define GLYPH_HEIGHT %d\n", height);
+	printf("#define GLYPH_ASCENT %d\n", font.ascent);
 }
 
 twixt (file f = File::open(argv[1], "r"); File::close(f)) {

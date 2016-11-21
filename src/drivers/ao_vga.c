@@ -17,55 +17,52 @@
 
 /* VGA output from the SPI port */
 
-struct ao_modeline {
-	long	dot_clock;	/* in Hz */
+/* GRF formula for 640x480 yields a pixel clock very close to 24MHz. Pad by
+ * three scanlines to hit exactly that value
+ */
 
-	/* All timings are in pixels, with the first pixel out at 0,0 */
-	int	hactive;	/* active pixels */
-	int	hsync_start;	/* start of hsync pulse */
-	int	hsync_end;	/* end of hsync pulse */
-	int	htotal;		/* total h pixels */
+#define HACTIVE 	640
+#define HSYNC_START 	656
+#define HSYNC_END	720
+#define HTOTAL		800
 
-	int	vactive;	/* active scalines */
-	int	vsync_start;	/* start of vsync pulse */
-	int	vsync_end;	/* end of vsync pulse */
-	int	vtotal;		/* total scanlines */
-};
+#define	VACTIVE		480
+#define VSYNC_START	481
+#define VSYNC_END	484
+#define VTOTAL		500
 
-const struct ao_modeline vga_640x480x60 = {
-	.dot_clock	= 23856000,	/* 23.86MHz dot, 29.82kHz line, 60.00Hz frame */
+/*
+ * The horizontal counter is set so that the end of hsync is reached
+ * at the maximum counter value. That means that the hblank interval
+ * is offset by HSYNC_END. We send 16 bits of zeros (which looks like
+ * 32 pixels), so the start is offset by this much
+ */
 
-	.hactive	= 640,
-	.hsync_start	= 656,
-	.hsync_end	= 720,
-	.htotal		= 800,
+#define HSYNC		(HSYNC_END - HSYNC_START)
+#define HBLANK_END	(HTOTAL - HSYNC_END)
+#define HBLANK_START	(HBLANK_END + HACTIVE + 32)
 
-	.vactive	= 480,
-	.vsync_start	= 481,
-	.vsync_end	= 484,
-	.vtotal		= 497
-};
-
-const struct ao_modeline vga_640x480x30 = {
-	.dot_clock	= 120000000,	/* 12.00MHz dot, 29.82kHz line, 30.00Hz frame */
-
-	.hactive	= 640,
-	.hsync_start	= 656,
-	.hsync_end	= 720,
-	.htotal		= 800,
-
-	.vactive	= 480,
-	.vsync_start	= 490,
-	.vsync_end	= 492,
-	.vtotal		= 525,
-};
-
-#define	mode	vga_640x480x60
+/*
+ * The vertical counter is set so that the end of vsync is reached at
+ * the maximum counter value.  That means that the vblank interval is
+ * offset by VSYNC_END. We send a blank line at the start of the
+ * frame, so each of these is off by one
+ */
+#define VSYNC		(VSYNC_END - VSYNC_START)
+#define VBLANK_END	(VTOTAL - VSYNC_END - 1)
+#define VBLANK_START	(VBLANK_END + VACTIVE + 1)
 
 #define WIDTH_BYTES	(AO_VGA_WIDTH >> 3)
 #define SCANOUT		((WIDTH_BYTES+2) >> 1)
 
-uint32_t	ao_vga_fb[AO_VGA_STRIDE * AO_VGA_HEIGHT];
+uint32_t	ao_vga_fb_all[AO_VGA_STRIDE * (AO_VGA_HEIGHT + AO_VGA_VPAD)];
+
+const struct ao_bitmap ao_vga_bitmap = {
+	.base = ao_vga_fb,
+	.stride = AO_VGA_STRIDE,
+	.width = AO_VGA_WIDTH,
+	.height = AO_VGA_HEIGHT
+};
 
 static uint32_t	*scanline;
 
@@ -85,7 +82,6 @@ static int	vblank;
 			 (0 << STM_DMA_CCR_TCIE) |			\
 			 (en << STM_DMA_CCR_EN))
 
-int vblank_off = 25;
 
 void stm_tim2_isr(void)
 {
@@ -100,75 +96,17 @@ void stm_tim2_isr(void)
 	}
 	stm_tim2.sr = ~(1 << STM_TIM234_SR_CC2IF);
 	line = stm_tim3.cnt;
- 	if (vblank_off <= line && line < ((AO_VGA_HEIGHT-1) << 1) + vblank_off) {
+
+ 	if (VBLANK_END <= line && line < VBLANK_START) {
 		vblank = 0;
-		if (((line - vblank_off) & 1) == 0)
+		if (((line - VBLANK_END) & 1))
 			scanline += AO_VGA_STRIDE;
-	} else {
-		if (!vblank) {
-//			stm_systick_isr();
-			scanline = ao_vga_fb;
-			vblank = 1;
-		}
+	} else if (!vblank) {
+		scanline = ao_vga_fb_all;
+		vblank = 1;
 	}
 }
 
-static void
-ao_vga_fb_init(void)
-{
-	ao_solid(0x0, AO_ALLONES,
-		 ao_vga_fb,
-		 AO_VGA_STRIDE,
-		 0,
-		 AO_VGA_WIDTH,
-		 AO_VGA_HEIGHT);
-
-	ao_solid(0x0, 0x0,
-		 ao_vga_fb + 10 * AO_VGA_STRIDE,
-		 AO_VGA_STRIDE,
-		 10,
-		 10,
-		 10);
-
-
-	ao_solid(0x0, 0x0,
-		 ao_vga_fb + 220 * AO_VGA_STRIDE,
-		 AO_VGA_STRIDE,
-		 10,
-		 10,
-		 10);
-
-	ao_solid(0x0, 0x0,
-		 ao_vga_fb + 10 * AO_VGA_STRIDE,
-		 AO_VGA_STRIDE,
-		 220,
-		 10,
-		 10);
-
-	ao_solid(0x0, 0x0,
-		 ao_vga_fb + 220 * AO_VGA_STRIDE,
-		 AO_VGA_STRIDE,
-		 220,
-		 10,
-		 10);
-
-	ao_text("Hello, Bdale!",
-		ao_vga_fb + 100 * AO_VGA_STRIDE,
-		AO_VGA_STRIDE,
-		20);
-
-	ao_text("UL",
-		ao_vga_fb,
-		AO_VGA_STRIDE,
-		1);
-
-	ao_text("BL",
-		ao_vga_fb + (240 - 7) * AO_VGA_STRIDE,
-		AO_VGA_STRIDE,
-		1);
-
-	memset(ao_vga_fb + 120 * AO_VGA_STRIDE, '\0', WIDTH_BYTES);
-}
 
 void
 ao_vga_init(void)
@@ -210,26 +148,28 @@ ao_vga_init(void)
 	stm_dma.channel[DMA_INDEX].cpar = &stm_spi1.dr;
 	stm_dma.channel[DMA_INDEX].cmar = ao_vga_fb;
 
-	/* hclock on timer 2 */
-
+	/*
+	 * Hsync Configuration
+	 */
 	/* Turn on timer 2 */
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_TIM2EN);
 
-	/* Turn on GPIOA */
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOAEN);
-
+	/* tim2 runs at full speed */
 	stm_tim2.psc = 0;
 
 	/* Disable channels while modifying */
 	stm_tim2.ccer = 0;
 
 	/* Channel 1 hsync PWM values */
-	stm_tim2.ccr1 = mode.hsync_end - mode.hsync_start;
+	stm_tim2.ccr1 = HSYNC;
 
 	/* Channel 2 trigger scanout */
 	/* wait for the time to start scanout */
-	stm_tim2.ccr2 = mode.htotal - mode.hsync_end;
+	stm_tim2.ccr2 = HBLANK_END - 10;
 
+	/* Configure channel 1 to output on the pin and
+	 * channel 2 to to set the trigger for the vsync timer
+	 */
 	stm_tim2.ccmr1 = ((0 << STM_TIM234_CCMR1_OC2CE) |
 			  (STM_TIM234_CCMR1_OC2M_SET_HIGH_ON_MATCH << STM_TIM234_CCMR1_OC2M)  |
 			  (1 << STM_TIM234_CCMR1_OC2PE) |
@@ -241,7 +181,9 @@ ao_vga_init(void)
 			  (0 << STM_TIM234_CCMR1_OC1FE) |
 			  (STM_TIM234_CCMR1_CC1S_OUTPUT << STM_TIM234_CCMR1_CC1S));
 
-	stm_tim2.arr = mode.htotal;
+	/* One scanline */
+	stm_tim2.arr = HTOTAL;
+
 	stm_tim2.cnt = 0;
 
 	/* Update the register contents */
@@ -258,8 +200,10 @@ ao_vga_init(void)
 			(STM_TIM234_CR2_MMS_UPDATE << STM_TIM234_CR2_MMS) |
 			(0 << STM_TIM234_CR2_CCDS));
 
+	/* hsync is not a slave timer */
 	stm_tim2.smcr = 0;
 
+	/* Send an interrupt on channel 2 */
 	stm_tim2.dier = ((1 << STM_TIM234_DIER_CC2IE));
 
 	stm_tim2.cr1 = ((STM_TIM234_CR1_CKD_1 << STM_TIM234_CR1_CKD) |
@@ -271,26 +215,24 @@ ao_vga_init(void)
 			(0 << STM_TIM234_CR1_UDIS) |
 			(0 << STM_TIM234_CR1_CEN));
 
-	/* Configure pins */
-
-	/* PA5 is Timer 2 CH1 output */
+	/* Hsync is on PA5 which is Timer 2 CH1 output */
+	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOAEN);
 	stm_ospeedr_set(&stm_gpioa, 5, STM_OSPEEDR_40MHz);
 	stm_afr_set(&stm_gpioa, 5, STM_AFR_AF1);
 
+	/*
+	 * Vsync configuration
+	 */
+
 	/* Turn on timer 3, slaved to timer 1 using ITR1 (table 61) */
-
-	/* Use CH1 on PB6 (AF2) */
-
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_TIM3EN);
-
-	/* Turn on GPIOB */
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOBEN);
 
 	/* No prescale */
 	stm_tim3.psc = 0;
 
 	/* Channel 1 vsync PWM values */
-	stm_tim3.ccr1 = mode.vsync_end - mode.vsync_start;
+	stm_tim3.ccr1 = VSYNC;
+
 	stm_tim3.ccmr1 = ((0 << STM_TIM234_CCMR1_OC2CE) |
 			  (0 << STM_TIM234_CCMR1_OC2PE) |
 			  (0 << STM_TIM234_CCMR1_OC2FE) |
@@ -301,7 +243,7 @@ ao_vga_init(void)
 			  (0 << STM_TIM234_CCMR1_OC1FE) |
 			  (STM_TIM234_CCMR1_CC1S_OUTPUT << STM_TIM234_CCMR1_CC1S));
 
-	stm_tim3.arr = mode.vtotal;
+	stm_tim3.arr = VTOTAL;
 	stm_tim3.cnt = 0;
 
 	/* Update the register contents */
@@ -339,27 +281,32 @@ ao_vga_init(void)
 			(0 << STM_TIM234_CR1_UDIS) |
 			(1 << STM_TIM234_CR1_CEN));
 
-	/* Configure pins */
-
-	/* PB4 is Timer 3 CH1 output */
+	/* Vsync is on PB4 which is is Timer 3 CH1 output */
+	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOBEN);
 	stm_ospeedr_set(&stm_gpiob, 4, STM_OSPEEDR_40MHz);
 	stm_afr_set(&stm_gpiob, 4, STM_AFR_AF2);
 
 	/* Enable the scanline interrupt */
-	stm_nvic_set_priority(STM_ISR_TIM2_POS, 0);
+	stm_nvic_set_priority(STM_ISR_TIM2_POS, AO_STM_NVIC_NON_MASK_PRIORITY);
 	stm_nvic_set_enable(STM_ISR_TIM2_POS);
 }
+
+uint8_t	enabled;
 
 void
 ao_vga_enable(int enable)
 {
 	if (enable) {
-		vblank_off = enable;
-		ao_vga_fb_init();
+		if (!enabled) {
+			++ao_task_minimize_latency;
+			enabled = 1;
+		}
 		stm_tim2.cr1 |= (1 << STM_TIM234_CR1_CEN);
-//		stm_systick.csr &= ~(1 << STM_SYSTICK_CSR_ENABLE);
 	} else {
+		if (enabled) {
+			--ao_task_minimize_latency;
+			enabled = 0;
+		}
 		stm_tim2.cr1 &= ~(1 << STM_TIM234_CR1_CEN);
-//		stm_systick.csr |= (1 << STM_SYSTICK_CSR_ENABLE);
 	}
 }

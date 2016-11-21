@@ -46,21 +46,33 @@ ao_ball(void)
 		while (!ball_enable)
 			ao_sleep(&ball_enable);
 		for (;;) {
-			ao_solid(AO_ALLONES,
-				 AO_ALLONES,
-				 ao_vga_fb + ball_y * AO_VGA_STRIDE,
-				 AO_VGA_STRIDE,
-				 ball_x,
-				 BALL_WIDTH,
-				 BALL_HEIGHT);
+			ao_line(&ao_vga_bitmap,
+				-100, -100, ball_x*2, ball_y*2,
+				1, AO_XOR);
+			ao_text(&ao_vga_bitmap,
+				ball_x, ball_y - 10,
+				"Hello, Bdale!",
+				1, AO_XOR);
+			ao_rect(&ao_vga_bitmap,
+				ball_x, ball_y,
+				BALL_WIDTH,
+				BALL_HEIGHT,
+				1,
+				AO_XOR);
 			ao_delay(AO_MS_TO_TICKS(10));
-			ao_solid(AO_ALLONES,
-				 AO_ALLONES,
-				 ao_vga_fb + ball_y * AO_VGA_STRIDE,
-				 AO_VGA_STRIDE,
-				 ball_x,
-				 BALL_WIDTH,
-				 BALL_HEIGHT);
+			ao_rect(&ao_vga_bitmap,
+				ball_x, ball_y,
+				BALL_WIDTH,
+				BALL_HEIGHT,
+				1,
+				AO_XOR);
+			ao_text(&ao_vga_bitmap,
+				ball_x, ball_y - 10,
+				"Hello, Bdale!",
+				1, AO_XOR);
+			ao_line(&ao_vga_bitmap,
+				-100, -100, ball_x*2, ball_y*2,
+				1, AO_XOR);
 			if (!ball_enable)
 				break;
 			ball_x += ball_dx;
@@ -86,9 +98,50 @@ ao_ball(void)
 }
 
 static void
+ao_fb_init(void)
+{
+	ao_rect(&ao_vga_bitmap,
+		0, 0, AO_VGA_WIDTH, AO_VGA_HEIGHT,
+		1, AO_COPY);
+
+	ao_rect(&ao_vga_bitmap,
+		10, 10, 10, 10,
+		0, AO_COPY);
+
+	ao_rect(&ao_vga_bitmap,
+		AO_VGA_WIDTH - 20, 10, 10, 10,
+		0, AO_COPY);
+
+	ao_rect(&ao_vga_bitmap,
+		10, AO_VGA_HEIGHT - 20, 10, 10,
+		0, AO_COPY);
+
+	ao_rect(&ao_vga_bitmap,
+		AO_VGA_WIDTH - 20, AO_VGA_HEIGHT - 20, 10, 10,
+		0, AO_COPY);
+
+	ao_text(&ao_vga_bitmap,
+		20, 100,
+		"Hello, Bdale!",
+		0, AO_COPY);
+
+	ao_text(&ao_vga_bitmap,
+		1, ao_font.ascent,
+		"UL",
+		0, AO_COPY);
+
+	ao_text(&ao_vga_bitmap,
+		1, AO_VGA_HEIGHT - ao_font.descent,
+		"BL",
+		0, AO_COPY);
+}
+
+static void
 ao_video_toggle(void)
 {
 	ao_cmd_decimal();
+	if (ao_cmd_lex_i)
+		ao_fb_init();
 	ao_vga_enable(ao_cmd_lex_i);
 }
 

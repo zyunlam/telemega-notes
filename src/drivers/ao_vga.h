@@ -23,11 +23,22 @@ ao_vga_init(void);
 void
 ao_vga_enable(int active);
 
+/* Active frame buffer */
 #define AO_VGA_WIDTH		320
 #define AO_VGA_HEIGHT		240
-#define AO_VGA_PAD		64
-#define AO_VGA_STRIDE		((AO_VGA_WIDTH + AO_VGA_PAD) >> AO_SHIFT)
 
-extern uint32_t	ao_vga_fb[AO_VGA_STRIDE * AO_VGA_HEIGHT];
+/* Pad on the right so that there are zeros on the output after the line */
+#define AO_VGA_HPAD		64
+
+/* Pad above so there's a scanline of zeros before the screen starts */
+#define AO_VGA_VPAD		1
+
+#define AO_VGA_STRIDE		((AO_VGA_WIDTH + AO_VGA_HPAD) >> AO_SHIFT)
+
+extern uint32_t	ao_vga_fb_all[AO_VGA_STRIDE * (AO_VGA_HEIGHT + AO_VGA_VPAD)];
+
+#define ao_vga_fb		(ao_vga_fb_all + AO_VGA_STRIDE)
+
+extern const struct ao_bitmap ao_vga_bitmap;
 
 #endif /* _AO_VGA_H_ */

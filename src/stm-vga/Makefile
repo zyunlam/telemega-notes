@@ -14,6 +14,7 @@ INC = \
 	ao_product.h \
 	ao_vga.h \
 	ao_draw.h \
+	ao_draw_int.h \
 	ao_font.h
 
 #
@@ -32,16 +33,19 @@ ALTOS_SRC = \
 	ao_timer.c \
 	ao_lcd_stm.c \
 	ao_lcd_font.c \
+	ao_vga.c \
 	ao_blt.c \
+	ao_copy.c \
+	ao_rect.c \
 	ao_text.c \
+	ao_line.c \
 	ao_mutex.c \
 	ao_dma_stm.c \
 	ao_adc_stm.c \
 	ao_data.c \
 	ao_i2c_stm.c \
 	ao_usb_stm.c \
-	ao_exti_stm.c \
-	ao_vga.c
+	ao_exti_stm.c
 
 PRODUCT=StmVga-v0.0
 IDPRODUCT=0x000a

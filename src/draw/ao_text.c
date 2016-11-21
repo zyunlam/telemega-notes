@@ -14,31 +14,52 @@
 
 #include "ao.h"
 #include "ao_draw.h"
+#include "ao_draw_int.h"
 #include "ao_font.h"
 
+const struct ao_font ao_font = {
+	.width = GLYPH_WIDTH,
+	.height = GLYPH_HEIGHT,
+	.ascent = GLYPH_ASCENT,
+	.descent = GLYPH_HEIGHT - GLYPH_ASCENT,
+};
+
 void
-ao_text(char		*string,
-	uint32_t	*dst_line,
-	int16_t		dst_stride,
-	int16_t		dst_x)
+ao_text(const struct ao_bitmap	*dst,
+	int16_t			x,
+	int16_t			y,
+	char			*string,
+	uint32_t		fill,
+	uint8_t			rop)
 {
-	char		c;
 	uint32_t	src[GLYPH_HEIGHT];
+	char		c;
+	int		h;
+
+	struct ao_bitmap	src_bitmap = {
+		.base = src,
+		.stride = 1,
+		.width = GLYPH_WIDTH,
+		.height = GLYPH_HEIGHT
+	};
+
+	y -= GLYPH_ASCENT;
+
+	rop = (rop & 3) | 0x4;
+
+	if ((fill&1) == 0)
+		rop ^= 3;
 
 	while ((c = *string++)) {
-		uint8_t	*bytes = &glyph_bytes[glyph_pos[(uint8_t) c]];
-		int	h;
+		uint8_t		*bytes = &glyph_bytes[glyph_pos[(uint8_t) c]];
 
 		for (h = 0; h < GLYPH_HEIGHT; h++)
 			src[h] = bytes[h];
 
-		ao_blt(src, 1, 0,
-		       dst_line, dst_stride,
-		       dst_x,
-		       GLYPH_WIDTH,
-		       GLYPH_HEIGHT,
-		       AO_AND_INVERTED,
-		       0, 0);
-		dst_x += GLYPH_WIDTH;
+		ao_copy(dst,
+			x, y, GLYPH_WIDTH, GLYPH_HEIGHT,
+			&src_bitmap,
+			0, 0, rop);
+		x += GLYPH_WIDTH;
 	}
 }

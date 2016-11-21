@@ -15,99 +15,74 @@
 #ifndef _AO_DRAW_H_
 #define _AO_DRAW_H_
 
-void
-ao_blt(uint32_t		*src_line,
-       int16_t		src_stride,
-       int16_t		src_x,
-       uint32_t		*dst_line,
-       int16_t		dst_stride,
-       int16_t		dst_x,
-       int16_t		width,
-       int16_t		height,
-       uint8_t		rop,
-       uint8_t		reverse,
-       uint8_t		upsidedown);
+struct ao_bitmap {
+	uint32_t	*base;
+	int16_t		stride;	/* in units */
+	int16_t		width;	/* in pixels */
+	int16_t		height;	/* in pixels */
+};
 
 void
-ao_solid(uint32_t	and,
-	 uint32_t	xor,
-	 uint32_t	*dst,
-	 int16_t	dst_stride,
-	 int16_t	dst_x,
-	 int16_t	width,
-	 int16_t	height);
+ao_copy(const struct ao_bitmap	*dst,
+	int16_t			dst_x,
+	int16_t			dst_y,
+	int16_t			width,
+	int16_t			height,
+	const struct ao_bitmap	*src,
+	int16_t			src_x,
+	int16_t			src_y,
+	uint8_t			rop);
 
 void
-ao_text(char		*string,
-	uint32_t	*dst_line,
-	int16_t		dst_stride,
-	int16_t		dst_x);
+ao_rect(const struct ao_bitmap	*dst,
+	int16_t			x,
+	int16_t			y,
+	int16_t			width,
+	int16_t			height,
+	uint32_t		fill,
+	uint8_t			rop);
 
-#define AO_ROP_CLEAR	0x0
-#define AO_ROP_COPY	0x3
-#define AO_ROP_SET	0xf
+void
+ao_line(const struct ao_bitmap	*dst,
+	int16_t			x1,
+	int16_t			y1,
+	int16_t			x2,
+	int16_t			y2,
+	uint32_t		fill,
+	uint8_t			rop);
+
+void
+ao_text(const struct ao_bitmap	*dst,
+	int16_t			x,
+	int16_t			y,
+	char			*string,
+	uint32_t		fill,
+	uint8_t			rop);
+
+struct ao_font {
+	int	width;
+	int	height;
+	int	ascent;
+	int	descent;
+};
+
+extern const struct ao_font ao_font;
 
 #define AO_SHIFT	5
 #define AO_UNIT		(1 << AO_SHIFT)
 #define AO_MASK		(AO_UNIT - 1)
 #define AO_ALLONES	((uint32_t) -1)
 
-static inline uint32_t
-ao_left(uint32_t bits, int16_t shift) {
-	return bits >> shift;
-}
-
-static inline uint32_t
-ao_right(uint32_t bits, int16_t shift) {
-	return bits << shift;
-}
-
-static inline uint32_t
-ao_right_mask(int16_t x) {
-	if ((AO_UNIT - x) & AO_MASK)
-		return ao_left(AO_ALLONES,(AO_UNIT - x) & AO_MASK);
-	else
-		return 0;
-}
-
-static inline uint32_t
-ao_left_mask(int16_t x) {
-	if (x & AO_MASK)
-		return ao_right(AO_ALLONES, x & AO_MASK);
-	else
-		return 0;
-}
-
-static inline uint32_t
-ao_bits_mask(int16_t x, int16_t w) {
-	return ao_right(AO_ALLONES, x & AO_MASK) &
-		ao_left(AO_ALLONES,(AO_UNIT - (x + w)) & AO_MASK);
-}
-
-#define ao_mask_bits(x,w,l,n,r) { \
-    n = (w); \
-    r = ao_right_mask((x)+n); \
-    l = ao_left_mask(x); \
-    if (l) { \
-	n -= AO_UNIT - ((x) & AO_MASK); \
-	if (n < 0) { \
-	    n = 0; \
-	    l &= r; \
-	    r = 0; \
-	} \
-    } \
-    n >>= AO_SHIFT; \
-}
-
-static inline uint32_t
-ao_do_mask_rrop(uint32_t dst, uint32_t and, uint32_t xor, uint32_t mask) {
-	return (dst & (and | ~mask)) ^ (xor & mask);
-}
-
-static inline uint32_t
-ao_do_rrop(uint32_t dst, uint32_t and, uint32_t xor) {
-	return (dst & and) ^ xor;
-}
+/*
+ *	    dst
+ *	   0   1
+ *
+ *	0  a   b
+ *  src
+ *	1  c   d
+ *
+ *	ROP = abcd
+ */
 
 #define AO_CLEAR         0x0	/* 0 */
 #define AO_AND           0x1	/* src AND dst */
