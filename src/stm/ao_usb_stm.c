@@ -174,7 +174,7 @@ static inline uint32_t ao_usb_epr_dtog_tx(uint32_t epr) {
  * Set current device address and mark the
  * interface as active
  */
-void
+static void
 ao_usb_set_address(uint8_t address)
 {
 	debug("ao_usb_set_address %02x\n", address);
