@@ -1,3 +1,11 @@
+altos (1.6.8-3) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altos/stm: Make ao_usb_set_address static. Saves a bunch of text space,
+    closes: #844816
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 13 Dec 2016 00:19:44 -0700
+
 altos (1.6.8-2) unstable; urgency=medium
 
   [ Keith Packard ]
