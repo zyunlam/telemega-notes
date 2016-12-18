@@ -139,7 +139,7 @@ static inline uint32_t set_toggle(uint32_t 	current_value,
 
 static inline uint32_t *ao_usb_packet_buffer_addr(uint16_t sram_addr)
 {
-	return (uint32_t *) (stm_usb_sram + 2 * sram_addr);
+	return (uint32_t *) (((void *) ((uint8_t *) stm_usb_sram + 2 * sram_addr)));
 }
 
 static inline uint32_t ao_usb_epr_stat_rx(uint32_t epr) {

@@ -156,7 +156,7 @@ static char __xdata *ublox_target;
 
 static void ublox_u16(uint8_t offset)
 {
-	uint16_t __xdata *ptr = (uint16_t __xdata *) (ublox_target + offset);
+	uint16_t __xdata *ptr = (uint16_t __xdata *) (void __xdata *) (ublox_target + offset);
 	uint16_t val;
 
 	val = data_byte();
@@ -175,7 +175,7 @@ static void ublox_u8(uint8_t offset)
 
 static void ublox_u32(uint8_t offset) __reentrant
 {
-	uint32_t __xdata *ptr = (uint32_t __xdata *) (ublox_target + offset);
+	uint32_t __xdata *ptr = (uint32_t __xdata *) (void __xdata *) (ublox_target + offset);
 	uint32_t val;
 
 	val = ((uint32_t) data_byte ());

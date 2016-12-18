@@ -27,7 +27,7 @@ LIBS=$(PDCLIB_LIBS_M3) -lgcc
 WARN_FLAGS=-Wall -Wextra -Werror
 
 AO_CFLAGS=-I. -I../stm -I../kernel -I../drivers -I../math -I.. $(PDCLIB_INCLUDES)
-STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb \
+STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb -Wcast-align \
 	-ffreestanding -nostdlib $(AO_CFLAGS) $(WARN_FLAGS)
 
 LDFLAGS=-L../stm -Wl,-Taltos.ld

@@ -1996,7 +1996,7 @@ union stm_usb_bdt {
 
 #define STM_USB_BDT_SIZE	8
 
-extern uint8_t stm_usb_sram[];
+extern uint8_t stm_usb_sram[] __attribute__((aligned(4)));
 
 struct stm_exti {
 	vuint32_t	imr;

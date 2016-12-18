@@ -185,7 +185,7 @@ static inline uint32_t set_toggle(uint32_t 	current_value,
 
 static inline uint16_t *ao_usb_packet_buffer_addr(uint16_t sram_addr)
 {
-	return (uint16_t *) (stm_usb_sram + sram_addr);
+	return (uint16_t *) (void *) (stm_usb_sram + sram_addr);
 }
 
 static inline uint16_t ao_usb_packet_buffer_offset(uint16_t *addr)

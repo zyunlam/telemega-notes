@@ -104,7 +104,7 @@ ao_trng_get_cooked(uint16_t *buf)
 {
 	uint16_t	i;
 	uint16_t	t;
-	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
+	uint32_t	*rnd = (uint32_t *) (void *) ao_adc_ring;
 	uint8_t		mismatch = 0;
 
 	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;		/* one 16-bit value per output byte */

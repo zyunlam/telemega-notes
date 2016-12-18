@@ -28,7 +28,7 @@ ao_adc_init(void);
 /* Total ring size in samples */
 #define AO_ADC_RING_SIZE	256
 
-extern uint16_t	ao_adc_ring[AO_ADC_RING_SIZE];
+extern uint16_t	ao_adc_ring[AO_ADC_RING_SIZE] __attribute__((aligned(4)));
 
 #define ao_adc_ring_step(pos,inc)	(((pos) + (inc)) & (AO_ADC_RING_SIZE - 1))
 
