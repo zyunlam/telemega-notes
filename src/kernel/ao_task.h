@@ -26,6 +26,17 @@
 #define HAS_TASK_INFO 1
 #endif
 
+/* arm stacks must be 32-bit aligned */
+#ifdef __arm__
+#define AO_STACK_ALIGNMENT __attribute__ ((aligned(4)))
+#endif
+#ifdef SDCC
+#define AO_STACK_ALIGNMENT
+#endif
+#ifdef __AVR__
+#define AO_STACK_ALIGNMENT
+#endif
+
 /* An AltOS task */
 struct ao_task {
 	__xdata void *wchan;		/* current wait channel (NULL if running) */
@@ -37,7 +48,7 @@ struct ao_task {
 	struct ao_list	queue;
 	struct ao_list	alarm_queue;
 #endif
-	uint8_t	stack[AO_STACK_SIZE];	/* saved stack */
+	uint8_t stack[AO_STACK_SIZE] AO_STACK_ALIGNMENT;	/* saved stack */
 #if HAS_SAMPLE_PROFILE
 	uint32_t ticks;
 	uint32_t yields;

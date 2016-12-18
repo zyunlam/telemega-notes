@@ -83,7 +83,7 @@ ao_intflash_write32(uint16_t pos, uint32_t w)
 {
 	volatile uint32_t	*addr;
 
-	addr = (uint32_t *) (stm_eeprom + pos);
+	addr = (uint32_t *) (void *) (stm_eeprom + pos);
 
 	/* Write a word to a valid address in the data EEPROM */
 	*addr = w;
@@ -96,7 +96,7 @@ ao_intflash_write8(uint16_t pos, uint8_t d)
 	uint32_t	w, *addr, mask;
 	uint8_t		shift;
 	
-	addr = (uint32_t *) (stm_eeprom + (pos & ~3));
+	addr = (uint32_t *) (void *) (stm_eeprom + (pos & ~3));
 
 	/* Compute word to be written */
 	shift = (pos & 3) << 3;

@@ -375,7 +375,7 @@ ao_arch_irq_check(void) {
 static inline void
 ao_arch_init_stack(struct ao_task *task, void *start)
 {
-	uint32_t	*sp = (uint32_t *) (task->stack + AO_STACK_SIZE);
+	uint32_t	*sp = (uint32_t *) ((void*) task->stack + AO_STACK_SIZE);
 	uint32_t	a = (uint32_t) start;
 	int		i;
 
@@ -413,16 +413,11 @@ static inline void ao_arch_save_stack(void) {
 	uint32_t	*sp;
 	asm("mov %0,sp" : "=&r" (sp) );
 	ao_cur_task->sp = (sp);
-	if ((uint8_t *) sp < &ao_cur_task->stack[0])
-		ao_panic (AO_PANIC_STACK);
 }
 
 static inline void ao_arch_restore_stack(void) {
-	uint32_t	sp;
-	sp = (uint32_t) ao_cur_task->sp;
-
 	/* Switch stacks */
-	asm("mov sp, %0" : : "r" (sp) );
+	asm("mov sp, %0" : : "r" (ao_cur_task->sp) );
 
 	/* Restore PRIMASK */
 	asm("pop {r0}");

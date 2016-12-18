@@ -359,10 +359,10 @@ void xrijndaelDecrypt(word32 block[], roundkey *rkk)
 #endif
 
 uint8_t ao_aes_mutex;
-static uint8_t key[16];
+static word32 key[16/4];
 static roundkey	rkk;
 
-static uint8_t iv[16];
+static word32 iv[16/4];
 
 void
 ao_aes_set_mode(enum ao_aes_mode mode)
@@ -389,10 +389,11 @@ ao_aes_run(__xdata uint8_t *in,
 	   __xdata uint8_t *out)
 {
 	uint8_t	i;
+	uint8_t *_iv = (uint8_t *) iv;
 
 	for (i = 0; i < 16; i++)
-		iv[i] ^= in[i];
-	xrijndaelEncrypt((word32 *) iv, &rkk);
+		_iv[i] ^= in[i];
+	xrijndaelEncrypt(iv, &rkk);
 	if (out)
 		memcpy(out, iv, 16);
 }

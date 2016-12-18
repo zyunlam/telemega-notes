@@ -438,7 +438,7 @@ ao_pyro_show(void)
 				if (ao_pyro_values[v].flag & AO_PYRO_8_BIT_VALUE)
 					value = *((uint8_t *) ((char *) pyro + ao_pyro_values[v].offset));
 				else
-					value = *((int16_t *) ((char *) pyro + ao_pyro_values[v].offset));
+					value = *((int16_t *) (void *) ((char *) pyro + ao_pyro_values[v].offset));
 				printf ("%6d ", value);
 			} else {
 				printf ("       ");
@@ -517,7 +517,7 @@ ao_pyro_set(void)
 			} else {
 				if (negative)
 					ao_cmd_lex_i = -ao_cmd_lex_i;
-				*((int16_t *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
+				*((int16_t *) (void *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
 			}
 		}
 	}
