@@ -62,7 +62,7 @@ ao_timer_init(void)
 	/* NOTE:  This uses a timer only present on cc1111 architecture. */
 
 	/* disable timer 1 */
-	T1CTL = 0;
+/*	T1CTL = 0; */
 
 	/* set the sample rate */
 	T1CC0H = T1_SAMPLE_TIME >> 8;
