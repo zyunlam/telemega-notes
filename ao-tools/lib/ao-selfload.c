@@ -110,6 +110,7 @@ ao_self_write(struct cc_usb *cc, struct ao_hex_image *image)
 			start = image->address;
 		if (stop > image->address + image->length)
 			stop = image->address + image->length;
+		memset(block, 0xff, 0x100);
 		memcpy(block + start - address, image->data + start - image->address, stop - start);
 		ao_self_block_write(cc, address, block);
 		ao_self_block_read(cc, address, check);
