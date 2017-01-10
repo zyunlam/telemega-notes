@@ -24,6 +24,9 @@ AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
+RELEASE_DATE=2017-01-10
+AC_SUBST(RELEASE_DATE)
+
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
 AC_SUBST(VERSION_DASH)
 AC_SUBST(ANDROID_VERSION)
@@ -515,6 +518,7 @@ AM_CONDITIONAL([INSTALL_SHARED_MIME_INFO], [test x$INSTALL_SHARED_MIME_INFO = xy
 AC_OUTPUT([
 Makefile
 src/Makedefs
+src/chaoskey-v1.0/org.altusmetrum.ChaosKey.metainfo.xml
 altoslib/Makefile
 altoslib/AltosVersion.java
 icon/Makefile
