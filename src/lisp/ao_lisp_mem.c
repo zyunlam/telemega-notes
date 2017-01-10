@@ -169,15 +169,15 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 	},
 	{
 		.type = NULL,
-		.addr = (void **) &save_poly[0]
+		.addr = (void **) (void *) &save_poly[0]
 	},
 	{
 		.type = NULL,
-		.addr = (void **) &save_poly[1]
+		.addr = (void **) (void *) &save_poly[1]
 	},
 	{
 		.type = NULL,
-		.addr = (void **) &save_poly[2]
+		.addr = (void **) (void *) &save_poly[2]
 	},
 	{
 		.type = &ao_lisp_atom_type,
@@ -197,7 +197,7 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 	},
 	{
 		.type = NULL,
-		.addr = (void **) &ao_lisp_v,
+		.addr = (void **) (void *) &ao_lisp_v,
 	},
 	{
 		.type = &ao_lisp_cons_type,

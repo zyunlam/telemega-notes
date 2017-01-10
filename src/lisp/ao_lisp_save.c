@@ -21,7 +21,7 @@ ao_lisp_save(struct ao_lisp_cons *cons)
 		return AO_LISP_NIL;
 
 #ifdef AO_LISP_SAVE
-	struct ao_lisp_os_save *os = (struct ao_lisp_os_save *) &ao_lisp_pool[AO_LISP_POOL];
+	struct ao_lisp_os_save *os = (struct ao_lisp_os_save *) (void *) &ao_lisp_pool[AO_LISP_POOL];
 
 	ao_lisp_collect(AO_LISP_COLLECT_FULL);
 	os->atoms = ao_lisp_atom_poly(ao_lisp_atoms);
@@ -43,7 +43,7 @@ ao_lisp_restore(struct ao_lisp_cons *cons)
 
 #ifdef AO_LISP_SAVE
 	struct ao_lisp_os_save save;
-	struct ao_lisp_os_save *os = (struct ao_lisp_os_save *) &ao_lisp_pool[AO_LISP_POOL];
+	struct ao_lisp_os_save *os = (struct ao_lisp_os_save *) (void *) &ao_lisp_pool[AO_LISP_POOL];
 
 	if (!ao_lisp_os_restore_save(&save, AO_LISP_POOL))
 		return ao_lisp_error(AO_LISP_INVALID, "header restore failed");
