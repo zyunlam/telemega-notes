@@ -50,7 +50,7 @@ ao_lisp_os_restore(void);
 
 #ifdef AO_LISP_MAKE_CONST
 #define AO_LISP_POOL_CONST	16384
-extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
+extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
 #define ao_lisp_pool ao_lisp_const
 #define AO_LISP_POOL AO_LISP_POOL_CONST
 
@@ -84,7 +84,7 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST];
 #ifndef AO_LISP_POOL
 #define AO_LISP_POOL	3072
 #endif
-extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA];
+extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((aligned(4)));
 #endif
 
 /* Primitive types */
