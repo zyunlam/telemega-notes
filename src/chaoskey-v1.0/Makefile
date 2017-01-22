@@ -14,6 +14,7 @@ INC = \
 	ao_task.h \
 	ao_adc_fast.h \
 	ao_power.h \
+	ao_crc.h \
 	stm32f0.h
 
 #
