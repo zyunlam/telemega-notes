@@ -1,0 +1,289 @@
+diff --git a/src/aes/ao_aes.c b/src/aes/ao_aes.c
+index a04174c6..fd90c5bf 100644
+--- a/src/aes/ao_aes.c
++++ b/src/aes/ao_aes.c
+@@ -359,10 +359,10 @@ void xrijndaelDecrypt(word32 block[], roundkey *rkk)
+ #endif
+ 
+ uint8_t ao_aes_mutex;
+-static uint8_t key[16];
++static word32 key[16/4];
+ static roundkey	rkk;
+ 
+-static uint8_t iv[16];
++static word32 iv[16/4];
+ 
+ void
+ ao_aes_set_mode(enum ao_aes_mode mode)
+@@ -389,10 +389,11 @@ ao_aes_run(__xdata uint8_t *in,
+ 	   __xdata uint8_t *out)
+ {
+ 	uint8_t	i;
++	uint8_t *_iv = (uint8_t *) iv;
+ 
+ 	for (i = 0; i < 16; i++)
+-		iv[i] ^= in[i];
+-	xrijndaelEncrypt((word32 *) iv, &rkk);
++		_iv[i] ^= in[i];
++	xrijndaelEncrypt(iv, &rkk);
+ 	if (out)
+ 		memcpy(out, iv, 16);
+ }
+diff --git a/src/drivers/ao_gps_ublox.c b/src/drivers/ao_gps_ublox.c
+index 22af413a..c720f802 100644
+--- a/src/drivers/ao_gps_ublox.c
++++ b/src/drivers/ao_gps_ublox.c
+@@ -156,7 +156,7 @@ static char __xdata *ublox_target;
+ 
+ static void ublox_u16(uint8_t offset)
+ {
+-	uint16_t __xdata *ptr = (uint16_t __xdata *) (ublox_target + offset);
++	uint16_t __xdata *ptr = (uint16_t __xdata *) (void __xdata *) (ublox_target + offset);
+ 	uint16_t val;
+ 
+ 	val = data_byte();
+@@ -175,7 +175,7 @@ static void ublox_u8(uint8_t offset)
+ 
+ static void ublox_u32(uint8_t offset) __reentrant
+ {
+-	uint32_t __xdata *ptr = (uint32_t __xdata *) (ublox_target + offset);
++	uint32_t __xdata *ptr = (uint32_t __xdata *) (void __xdata *) (ublox_target + offset);
+ 	uint32_t val;
+ 
+ 	val = ((uint32_t) data_byte ());
+diff --git a/src/drivers/ao_trng_send.c b/src/drivers/ao_trng_send.c
+index 85034efd..b1227aaa 100644
+--- a/src/drivers/ao_trng_send.c
++++ b/src/drivers/ao_trng_send.c
+@@ -104,7 +104,7 @@ ao_trng_get_cooked(uint16_t *buf)
+ {
+ 	uint16_t	i;
+ 	uint16_t	t;
+-	uint32_t	*rnd = (uint32_t *) ao_adc_ring;
++	uint32_t	*rnd = (uint32_t *) (void *) ao_adc_ring;
+ 	uint8_t		mismatch = 0;
+ 
+ 	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;		/* one 16-bit value per output byte */
+diff --git a/src/kernel/ao_list.h b/src/kernel/ao_list.h
+index e2df6885..45a3df5b 100644
+--- a/src/kernel/ao_list.h
++++ b/src/kernel/ao_list.h
+@@ -138,7 +138,7 @@ ao_list_is_empty(struct ao_list *head)
+  * @return A pointer to the data struct containing the list head.
+  */
+ #define ao_container_of(ptr, type, member) \
+-	((type *)((char *)(ptr) - offsetof(type, member)))
++	((type *)((void *) ((char *)(ptr) - offsetof(type, member))))
+ 
+ /**
+  * Alias of ao_container_of
+diff --git a/src/kernel/ao_pyro.c b/src/kernel/ao_pyro.c
+index c9920ab3..813e866a 100644
+--- a/src/kernel/ao_pyro.c
++++ b/src/kernel/ao_pyro.c
+@@ -437,7 +437,7 @@ ao_pyro_show(void)
+ 				if (ao_pyro_values[v].flag & AO_PYRO_8_BIT_VALUE)
+ 					value = *((uint8_t *) ((char *) pyro + ao_pyro_values[v].offset));
+ 				else
+-					value = *((int16_t *) ((char *) pyro + ao_pyro_values[v].offset));
++					value = *((int16_t *) (void *) ((char *) pyro + ao_pyro_values[v].offset));
+ 				printf ("%6d ", value);
+ 			} else {
+ 				printf ("       ");
+@@ -516,7 +516,7 @@ ao_pyro_set(void)
+ 			} else {
+ 				if (negative)
+ 					ao_cmd_lex_i = -ao_cmd_lex_i;
+-				*((int16_t *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
++				*((int16_t *) (void *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
+ 			}
+ 		}
+ 	}
+diff --git a/src/kernel/ao_task.h b/src/kernel/ao_task.h
+index f1dbd654..30b018ff 100644
+--- a/src/kernel/ao_task.h
++++ b/src/kernel/ao_task.h
+@@ -26,6 +26,17 @@
+ #define HAS_TASK_INFO 1
+ #endif
+ 
++/* arm stacks must be 32-bit aligned */
++#ifdef __arm__
++#define AO_STACK_ALIGNMENT __attribute__ ((aligned(4)))
++#endif
++#ifdef SDCC
++#define AO_STACK_ALIGNMENT
++#endif
++#ifdef __AVR__
++#define AO_STACK_ALIGNMENT
++#endif
++
+ /* An AltOS task */
+ struct ao_task {
+ 	__xdata void *wchan;		/* current wait channel (NULL if running) */
+@@ -37,7 +48,7 @@ struct ao_task {
+ 	struct ao_list	queue;
+ 	struct ao_list	alarm_queue;
+ #endif
+-	uint8_t	stack[AO_STACK_SIZE];	/* saved stack */
++	uint8_t stack[AO_STACK_SIZE] AO_STACK_ALIGNMENT;	/* saved stack */
+ #if HAS_SAMPLE_PROFILE
+ 	uint32_t ticks;
+ 	uint32_t yields;
+diff --git a/src/stm/Makefile.defs b/src/stm/Makefile.defs
+index c3d2707f..0ba86f5a 100644
+--- a/src/stm/Makefile.defs
++++ b/src/stm/Makefile.defs
+@@ -27,7 +27,7 @@ LIBS=$(PDCLIB_LIBS_M3) -lgcc
+ WARN_FLAGS=-Wall -Wextra -Werror
+ 
+ AO_CFLAGS=-I. -I../stm -I../kernel -I../drivers -I../math -I.. $(PDCLIB_INCLUDES)
+-STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb \
++STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb -Wcast-align \
+ 	-ffreestanding -nostdlib $(AO_CFLAGS) $(WARN_FLAGS)
+ 
+ LDFLAGS=-L../stm -Wl,-Taltos.ld
+diff --git a/src/stm/ao_arch_funcs.h b/src/stm/ao_arch_funcs.h
+index 18ca20da..a9d0fa34 100644
+--- a/src/stm/ao_arch_funcs.h
++++ b/src/stm/ao_arch_funcs.h
+@@ -375,7 +375,7 @@ ao_arch_irq_check(void) {
+ static inline void
+ ao_arch_init_stack(struct ao_task *task, void *start)
+ {
+-	uint32_t	*sp = (uint32_t *) (task->stack + AO_STACK_SIZE);
++	uint32_t	*sp = (uint32_t *) ((void*) task->stack + AO_STACK_SIZE);
+ 	uint32_t	a = (uint32_t) start;
+ 	int		i;
+ 
+@@ -413,16 +413,11 @@ static inline void ao_arch_save_stack(void) {
+ 	uint32_t	*sp;
+ 	asm("mov %0,sp" : "=&r" (sp) );
+ 	ao_cur_task->sp = (sp);
+-	if ((uint8_t *) sp < &ao_cur_task->stack[0])
+-		ao_panic (AO_PANIC_STACK);
+ }
+ 
+ static inline void ao_arch_restore_stack(void) {
+-	uint32_t	sp;
+-	sp = (uint32_t) ao_cur_task->sp;
+-
+ 	/* Switch stacks */
+-	asm("mov sp, %0" : : "r" (sp) );
++	asm("mov sp, %0" : : "r" (ao_cur_task->sp) );
+ 
+ 	/* Restore PRIMASK */
+ 	asm("pop {r0}");
+diff --git a/src/stm/ao_eeprom_stm.c b/src/stm/ao_eeprom_stm.c
+index 05f880b8..4f477122 100644
+--- a/src/stm/ao_eeprom_stm.c
++++ b/src/stm/ao_eeprom_stm.c
+@@ -83,7 +83,7 @@ ao_intflash_write32(uint16_t pos, uint32_t w)
+ {
+ 	volatile uint32_t	*addr;
+ 
+-	addr = (uint32_t *) (stm_eeprom + pos);
++	addr = (uint32_t *) (void *) (stm_eeprom + pos);
+ 
+ 	/* Write a word to a valid address in the data EEPROM */
+ 	*addr = w;
+@@ -96,7 +96,7 @@ ao_intflash_write8(uint16_t pos, uint8_t d)
+ 	uint32_t	w, *addr, mask;
+ 	uint8_t		shift;
+ 	
+-	addr = (uint32_t *) (stm_eeprom + (pos & ~3));
++	addr = (uint32_t *) (void *) (stm_eeprom + (pos & ~3));
+ 
+ 	/* Compute word to be written */
+ 	shift = (pos & 3) << 3;
+diff --git a/src/stm/ao_usb_stm.c b/src/stm/ao_usb_stm.c
+index f2b8ea94..9d72844e 100644
+--- a/src/stm/ao_usb_stm.c
++++ b/src/stm/ao_usb_stm.c
+@@ -139,7 +139,7 @@ static inline uint32_t set_toggle(uint32_t 	current_value,
+ 
+ static inline uint32_t *ao_usb_packet_buffer_addr(uint16_t sram_addr)
+ {
+-	return (uint32_t *) (stm_usb_sram + 2 * sram_addr);
++	return (uint32_t *) (((void *) ((uint8_t *) stm_usb_sram + 2 * sram_addr)));
+ }
+ 
+ static inline uint32_t ao_usb_epr_stat_rx(uint32_t epr) {
+diff --git a/src/stm/stm32l.h b/src/stm/stm32l.h
+index 463125e2..be1e1d65 100644
+--- a/src/stm/stm32l.h
++++ b/src/stm/stm32l.h
+@@ -1961,7 +1961,7 @@ union stm_usb_bdt {
+ 
+ #define STM_USB_BDT_SIZE	8
+ 
+-extern uint8_t stm_usb_sram[];
++extern uint8_t stm_usb_sram[] __attribute__ ((aligned(4)));
+ 
+ struct stm_exti {
+ 	vuint32_t	imr;
+diff --git a/src/stmf0/Makefile-stmf0.defs b/src/stmf0/Makefile-stmf0.defs
+index 4862f46e..f3296b69 100644
+--- a/src/stmf0/Makefile-stmf0.defs
++++ b/src/stmf0/Makefile-stmf0.defs
+@@ -25,7 +25,7 @@ endif
+ ELFTOHEX=$(TOPDIR)/../ao-tools/ao-elftohex/ao-elftohex
+ CC=$(ARM_CC)
+ 
+-WARN_FLAGS=-Wall -Wextra -Werror
++WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align
+ 
+ AO_CFLAGS=-I. -I$(TOPDIR)/stmf0 -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers -I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math $(PDCLIB_INCLUDES) 
+ STMF0_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m0 -mthumb\
+diff --git a/src/stmf0/ao_adc_fast.h b/src/stmf0/ao_adc_fast.h
+index b8b5e003..3f0b0547 100644
+--- a/src/stmf0/ao_adc_fast.h
++++ b/src/stmf0/ao_adc_fast.h
+@@ -28,7 +28,7 @@ ao_adc_init(void);
+ /* Total ring size in samples */
+ #define AO_ADC_RING_SIZE	256
+ 
+-extern uint16_t	ao_adc_ring[AO_ADC_RING_SIZE];
++extern uint16_t	ao_adc_ring[AO_ADC_RING_SIZE] __attribute__((aligned(4)));
+ 
+ #define ao_adc_ring_step(pos,inc)	(((pos) + (inc)) & (AO_ADC_RING_SIZE - 1))
+ 
+diff --git a/src/stmf0/ao_arch_funcs.h b/src/stmf0/ao_arch_funcs.h
+index 8b6234c4..0cb0e43d 100644
+--- a/src/stmf0/ao_arch_funcs.h
++++ b/src/stmf0/ao_arch_funcs.h
+@@ -355,7 +355,7 @@ ao_arch_memory_barrier() {
+ static inline void
+ ao_arch_init_stack(struct ao_task *task, void *start)
+ {
+-	uint32_t	*sp = (uint32_t *) (task->stack + AO_STACK_SIZE);
++	uint32_t	*sp = (uint32_t *) ((void *) task->stack + AO_STACK_SIZE);
+ 	uint32_t	a = (uint32_t) start;
+ 	int		i;
+ 
+diff --git a/src/stmf0/ao_usb_stm.c b/src/stmf0/ao_usb_stm.c
+index cbedb996..652b3b6c 100644
+--- a/src/stmf0/ao_usb_stm.c
++++ b/src/stmf0/ao_usb_stm.c
+@@ -185,7 +185,7 @@ static inline uint32_t set_toggle(uint32_t 	current_value,
+ 
+ static inline uint16_t *ao_usb_packet_buffer_addr(uint16_t sram_addr)
+ {
+-	return (uint16_t *) (stm_usb_sram + sram_addr);
++	return (uint16_t *) (void *) (stm_usb_sram + sram_addr);
+ }
+ 
+ static inline uint16_t ao_usb_packet_buffer_offset(uint16_t *addr)
+diff --git a/src/stmf0/stm32f0.h b/src/stmf0/stm32f0.h
+index 054200e0..bafa763a 100644
+--- a/src/stmf0/stm32f0.h
++++ b/src/stmf0/stm32f0.h
+@@ -1996,7 +1996,7 @@ union stm_usb_bdt {
+ 
+ #define STM_USB_BDT_SIZE	8
+ 
+-extern uint8_t stm_usb_sram[];
++extern uint8_t stm_usb_sram[] __attribute__((aligned(4)));
+ 
+ struct stm_exti {
+ 	vuint32_t	imr;
