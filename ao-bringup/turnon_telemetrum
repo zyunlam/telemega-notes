@@ -48,7 +48,7 @@ $FLASH_STM ~/altusmetrumllc/Binaries/loaders/telemetrum-v$VERSION-*.elf || exit 
 
 sleep 2
 
-$USBLOAD --serial=$SERIAL /usr/share/altos/telemetrum-v$VERSION*.ihx || exit 1
+$USBLOAD --serial=$SERIAL ~/altusmetrumllc/Binaries/telemetrum-v$VERSION*.ihx || exit 1
 
 sleep 5
 
