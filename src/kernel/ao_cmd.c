@@ -310,7 +310,7 @@ version(void)
 #endif
 #endif
 #if defined(AO_BOOT_APPLICATION_BASE) && defined(AO_BOOT_APPLICATION_BOUND)
-	       , (uint32_t) AO_BOOT_APPLICATION_BOUND - (uint32_t) AO_BOOT_APPLICATION_BASE
+	       , (unsigned) ((uint32_t) AO_BOOT_APPLICATION_BOUND - (uint32_t) AO_BOOT_APPLICATION_BASE)
 #endif
 		);
 	printf("software-version %s\n", ao_version);
