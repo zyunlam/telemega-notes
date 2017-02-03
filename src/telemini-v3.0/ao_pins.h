@@ -20,28 +20,25 @@
 
 #define AO_STACK_SIZE	384
 
+#define RELOCATE_INTERRUPT 0
+
 #define IS_FLASH_LOADER	0
 
-/* 40MHz clock based on 16MHz reference */
+/* 48MHz clock based on 16MHz reference */
 //#define AO_HSI48	1
 #define AO_HSE			16000000
-#define AO_RCC_CFGR_PLLMUL	STM_RCC_CFGR_PLLMUL_5
-#define AO_RCC_CFGR2_PLLDIV	STM_RCC_CFGR2_PREDIV_2
-#define AO_PLLMUL		5
-#define AO_PLLDIV		2
+#define AO_RCC_CFGR_PLLMUL	STM_RCC_CFGR_PLLMUL_3
+#define AO_RCC_CFGR2_PLLDIV	STM_RCC_CFGR2_PREDIV_1
+#define AO_PLLMUL		3
+#define AO_PLLDIV		1
 
-/* HCLK = 40MHz */
+/* HCLK = 48MHz */
 #define AO_AHB_PRESCALER	1
 #define AO_RCC_CFGR_HPRE_DIV	STM_RCC_CFGR_HPRE_DIV_1
 
 /* APB = 40MHz */
 #define AO_APB_PRESCALER	1
 #define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
-
-/* Send PLL clock to cc1200 */
-#define AO_MCO_PORT		(&stm_gpioa)
-#define AO_MCO_PIN		9
-#define AO_MCO_AF		STM_AFR_AF5
 
 #define HAS_USB			0
 #define AO_USB_DIRECTIO		0
@@ -89,8 +86,6 @@
 
 /* SPI */
 
-#define HAS_SPI_0		1
-#define SPI_SCK0_P0_6		1
 #define HAS_SPI_1		1
 #define SPI_SCK1_P1_15		1
 #define SPI_MISO1_P0_22		1
@@ -119,7 +114,7 @@
 /* CC1200 */
 
 // #define AO_RADIO_CAL_DEFAULT 	5695733
-#define AO_RADIO_CAL_DEFAULT 	5695947
+#define AO_RADIO_CAL_DEFAULT 	5695717
 
 #define AO_FEC_DEBUG		0
 #define AO_CC1200_SPI_CS_PORT	(&stm_gpiob)
@@ -187,8 +182,8 @@ struct ao_adc {
 /*
  * Voltage divider on ADC battery sampler
  */
-#define AO_BATTERY_DIV_PLUS	100	/* 100k */
-#define AO_BATTERY_DIV_MINUS	27	/* 27k */
+#define AO_BATTERY_DIV_PLUS	56	/* 5.6k */
+#define AO_BATTERY_DIV_MINUS	100	/* 10k */
 
 /*
  * Voltage divider on ADC igniter samplers

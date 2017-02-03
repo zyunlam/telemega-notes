@@ -36,17 +36,19 @@ main(void)
 	ao_beep_init();
 	ao_cmd_init();
 
-	ao_ms5607_init();
+//	ao_ms5607_init();
 
 	ao_storage_init();
-	ao_flight_init();
-	ao_log_init();
-	ao_report_init();
-	ao_telemetry_init();
+//	ao_flight_init();
+//	ao_log_init();
+//	ao_report_init();
+//	ao_telemetry_init();
 	ao_radio_init();
 	ao_packet_slave_init(TRUE);
-	ao_igniter_init();
+//	ao_igniter_init();
 	ao_config_init();
+
+	ao_flight_force_idle = TRUE;
 
 	ao_start_scheduler();
 }
