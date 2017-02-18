@@ -79,6 +79,10 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
 #define _ao_lisp_atom_restore	_atom("restore")
 #define _ao_lisp_atom_call2fcc	_atom("call/cc")
 #define _ao_lisp_atom_collect	_atom("collect")
+#define _ao_lisp_atom_symbolp   _atom("symbol?")
+#define _ao_lisp_atom_builtin   _atom("builtin?")
+#define _ao_lisp_atom_symbolp   _atom("symbol?")
+#define _ao_lisp_atom_symbolp   _atom("symbol?")
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL

@@ -88,6 +88,10 @@ static const ao_poly builtin_names[] = {
 	[builtin_restore] = _ao_lisp_atom_restore,
 	[builtin_call_cc] = _ao_lisp_atom_call2fcc,
 	[builtin_collect] = _ao_lisp_atom_collect,
+	[builtin_symbolp] = _ao_lisp_atom_symbolp,
+	[builtin_listp] = _ao_lisp_atom_listp,
+	[builtin_stringp] = _ao_lisp_atom_stringp,
+	[builtin_numberp] = _ao_lisp_atom_numberp,
 
 };
 
