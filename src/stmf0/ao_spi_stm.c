@@ -536,11 +536,17 @@ void
 ao_spi_init(void)
 {
 #if HAS_SPI_1
+#ifndef SPI_1_PA5_PA6_PA7
+#error SPI_1_PA5_PA6_PA7 undefined
+#endif
 # if SPI_1_PA5_PA6_PA7
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN);
 	stm_ospeedr_set(&stm_gpioa, 5, SPI_1_OSPEEDR);
 	stm_ospeedr_set(&stm_gpioa, 6, SPI_1_OSPEEDR);
 	stm_ospeedr_set(&stm_gpioa, 7, SPI_1_OSPEEDR);
+# endif
+# ifndef SPI_1_PB3_PB4_PB5
+# error SPI_1_PB3_PB4_PB5 undefined
 # endif
 # if SPI_1_PB3_PB4_PB5
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPBEN);
