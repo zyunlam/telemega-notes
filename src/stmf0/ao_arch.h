@@ -144,10 +144,15 @@ ao_adc_init();
 /* ADC maximum reported value */
 #define AO_ADC_MAX			4095
 
+#ifndef HAS_BOOT_LOADER
+#define HAS_BOOT_LOADER			1
+#endif
+
+#if HAS_BOOT_LOADER
 #define AO_BOOT_APPLICATION_BASE	((uint32_t *) 0x08001000)
 #define AO_BOOT_APPLICATION_BOUND	((uint32_t *) (0x08000000 + stm_flash_size()))
 #define AO_BOOT_LOADER_BASE		((uint32_t *) 0x08000000)
-#define HAS_BOOT_LOADER			1
+#endif
 
 #endif /* _AO_ARCH_H_ */
 
