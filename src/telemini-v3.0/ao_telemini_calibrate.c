@@ -22,7 +22,11 @@ static void
 ao_cal(void)
 {
 	ao_config_get();
+#if HAS_BEEP
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(500));
+#else
+	ao_led_for(AO_LED_MID, AO_MS_TO_TICKS(500));
+#endif
 	for (;;) {
 		ao_led_on(AO_LED_GREEN);
 		ao_radio_test_on();
@@ -49,7 +53,12 @@ main(void)
 	ao_exti_init();
 
 //	ao_adc_init();
+#if HAS_BEEP
 	ao_beep_init();
+#endif
+#if HAS_SERIAL_1
+	ao_serial_init();
+#endif
 //	ao_cmd_init();
 //	ao_ms5607_init();
 

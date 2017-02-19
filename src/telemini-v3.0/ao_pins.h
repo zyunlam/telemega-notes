@@ -16,9 +16,11 @@
  */
 
 #define HAS_BEEP		1
+#define HAS_SERIAL_1		0
 #define HAS_BATTERY_REPORT	1
+#define HAS_BOOT_LOADER		0
 
-#define AO_STACK_SIZE	384
+#define AO_STACK_SIZE	448
 
 #define RELOCATE_INTERRUPT 0
 
@@ -72,24 +74,23 @@
 #define LED_PIN_GREEN		15
 #define AO_LED_GREEN		(1 << 15)
 #define AO_LED_PANIC		AO_LED_GREEN
+#define AO_LED_LOW		AO_LED_GREEN
+#define AO_LED_MID		AO_LED_GREEN
 
 #define LEDS_AVAILABLE		AO_LED_GREEN
 
-/* USART */
+/* Serial. Hooked to the spare pin (PA9/19) and the beeper (PA10/20) */
 
-#define HAS_SERIAL		0
-#define USE_SERIAL_0_STDIN	1
-#define SERIAL_0_18_19		1
-#define SERIAL_0_14_15		0
-#define SERIAL_0_17_18		0
-#define SERIAL_0_26_27		0
+#define SERIAL_1_PA9_PA10	1
+#define USE_SERIAL_1_STDIN	HAS_SERIAL_1
+#define DELAY_SERIAL_1_STDIN	0
 
 /* SPI */
 
 #define HAS_SPI_1		1
-#define SPI_SCK1_P1_15		1
-#define SPI_MISO1_P0_22		1
-#define SPI_MOSI1_P0_21		1
+#define SPI_1_PA5_PA6_PA7	1
+#define SPI_1_PB3_PB4_PB5	1
+#define SPI_1_OSPEEDR		STM_OSPEEDR_MEDIUM
 
 /* M25 */
 
@@ -110,6 +111,7 @@
 #define AO_MS5607_MISO_PIN	4
 #define AO_MS5607_MISO_MASK	(1 << AO_MS5607_MISO_PIN)
 #define AO_MS5607_SPI_INDEX	AO_SPI_1_PB3_PB4_PB5
+#define AO_MS5607_SPI_SPEED	AO_SPI_SPEED_12MHz
 
 /* CC1200 */
 
@@ -117,10 +119,12 @@
 #define AO_RADIO_CAL_DEFAULT 	5695717
 
 #define AO_FEC_DEBUG		0
+#define CC1200_DEBUG		0
 #define AO_CC1200_SPI_CS_PORT	(&stm_gpiob)
 #define AO_CC1200_SPI_CS_PIN	0
 #define AO_CC1200_SPI_BUS	AO_SPI_1_PA5_PA6_PA7
 #define AO_CC1200_SPI		stm_spi1
+#define AO_CC1200_SPI_SPEED	AO_SPI_SPEED_12MHz
 
 #define AO_CC1200_INT_PORT		(&stm_gpiob)
 #define AO_CC1200_INT_PIN		1
