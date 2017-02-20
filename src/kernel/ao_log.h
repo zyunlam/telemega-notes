@@ -47,10 +47,11 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELEMEGA_OLD	5	/* 32 byte typed telemega records */
 #define AO_LOG_FORMAT_EASYMINI		6	/* 16-byte MS5607 baro only, 3.0V supply */
 #define AO_LOG_FORMAT_TELEMETRUM	7	/* 16-byte typed telemetrum records */
-#define AO_LOG_FORMAT_TELEMINI		8	/* 16-byte MS5607 baro only, 3.3V supply */
+#define AO_LOG_FORMAT_TELEMINI2		8	/* 16-byte MS5607 baro only, 3.3V supply, cc1111 SoC */
 #define AO_LOG_FORMAT_TELEGPS		9	/* 32 byte telegps records */
 #define AO_LOG_FORMAT_TELEMEGA		10	/* 32 byte typed telemega records with 32 bit gyro cal */
 #define AO_LOG_FORMAT_DETHERM		11	/* 16-byte MS5607 baro only, no ADC */
+#define AO_LOG_FORMAT_TELEMINI3		12	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 extern __code uint8_t ao_log_format;

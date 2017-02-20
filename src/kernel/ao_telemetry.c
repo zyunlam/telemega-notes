@@ -270,7 +270,7 @@ ao_send_mini(void)
 	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 	telemetry.generic.tick = packet->tick;
-	telemetry.generic.type = AO_TELEMETRY_MINI;
+	telemetry.generic.type = AO_SEND_MINI;
 
 	telemetry.mini.state = ao_flight_state;
 
