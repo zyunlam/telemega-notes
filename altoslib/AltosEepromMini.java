@@ -42,11 +42,24 @@ public class AltosEepromMini extends AltosEeprom {
 	public int sense_m() { return data16(8); }
 	public int v_batt() { return data16(10); }
 
-	double voltage(AltosState state, int sensor) {
+	private double battery_voltage(AltosState state, int sensor) {
 		if (state.log_format == AltosLib.AO_LOG_FORMAT_EASYMINI)
 			return AltosConvert.easy_mini_voltage(sensor, state.serial);
-		else
-			return AltosConvert.tele_mini_voltage(sensor);
+		if (state.log_format == AltosLib.AO_LOG_FORMAT_TELEMINI2)
+			return AltosConvert.tele_mini_2_voltage(sensor);
+		if (state.log_format == AltosLib.AO_LOG_FORMAT_TELEMINI3)
+			return AltosConvert.tele_mini_3_battery_voltage(sensor);
+		return -1;
+	}
+
+	private double pyro_voltage(AltosState state, int sensor) {
+		if (state.log_format == AltosLib.AO_LOG_FORMAT_EASYMINI)
+			return AltosConvert.easy_mini_voltage(sensor, state.serial);
+		if (state.log_format == AltosLib.AO_LOG_FORMAT_TELEMINI2)
+			return AltosConvert.tele_mini_2_voltage(sensor);
+		if (state.log_format == AltosLib.AO_LOG_FORMAT_TELEMINI3)
+			return AltosConvert.tele_mini_3_pyro_voltage(sensor);
+		return -1;
 	}
 
 	public void update_state(AltosState state) {
@@ -62,9 +75,9 @@ public class AltosEepromMini extends AltosEeprom {
 			break;
 		case AltosLib.AO_LOG_SENSOR:
 			state.set_ms5607(pres(), temp());
-			state.set_apogee_voltage(voltage(state, sense_a()));
-			state.set_main_voltage(voltage(state, sense_m()));
-			state.set_battery_voltage(voltage(state, v_batt()));
+			state.set_apogee_voltage(pyro_voltage(state, sense_a()));
+			state.set_main_voltage(pyro_voltage(state, sense_m()));
+			state.set_battery_voltage(battery_voltage(state, v_batt()));
 			break;
 		}
 	}

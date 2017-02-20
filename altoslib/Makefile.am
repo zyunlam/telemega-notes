@@ -88,7 +88,8 @@ altoslib_JAVA = \
 	AltosSensorMM.java \
 	AltosSensorEMini.java \
 	AltosSensorTM.java \
-	AltosSensorTMini.java \
+	AltosSensorTMini2.java \
+	AltosSensorTMini3.java \
 	AltosSensorMega.java \
 	AltosSensorMetrum.java \
 	AltosSensorTGPS.java \
@@ -105,7 +106,8 @@ altoslib_JAVA = \
 	AltosTelemetryMap.java \
 	AltosTelemetryMegaSensor.java \
 	AltosTelemetryMegaData.java \
-	AltosTelemetryMini.java \
+	AltosTelemetryMini2.java \
+	AltosTelemetryMini3.java \
 	AltosTelemetryMetrumSensor.java \
 	AltosTelemetryMetrumData.java \
 	AltosTelemetryReader.java \

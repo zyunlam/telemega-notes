@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Keith Packard <keithp@keithp.com>
+ * Copyright © 2017 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,8 @@
 package org.altusmetrum.altoslib_11;
 
 
-public class AltosTelemetryMini extends AltosTelemetryStandard {
+public class AltosTelemetryMini3 extends AltosTelemetryStandard {
+
 	int	state;
 
 	int	v_batt;
@@ -31,14 +32,14 @@ public class AltosTelemetryMini extends AltosTelemetryStandard {
 
 	int	acceleration;
 	int	speed;
-	int	height;
+	int	height_16;
 
 	int	ground_pres;
 
-	public AltosTelemetryMini(int[] bytes) {
+	public AltosTelemetryMini3(int[] bytes) {
 		super(bytes);
 
-		state	      = int8(5);
+		state         = int8(5);
 
 		v_batt        = int16(6);
 		sense_a       = int16(8);
@@ -49,7 +50,7 @@ public class AltosTelemetryMini extends AltosTelemetryStandard {
 
 		acceleration  = int16(18);
 		speed         = int16(20);
-		height        = int16(22);
+		height_16     = int16(22);
 
 		ground_pres   = int32(24);
 	}
@@ -59,15 +60,17 @@ public class AltosTelemetryMini extends AltosTelemetryStandard {
 
 		state.set_state(this.state);
 
-		state.set_battery_voltage(AltosConvert.tele_mini_voltage(v_batt));
-		state.set_apogee_voltage(AltosConvert.tele_mini_voltage(sense_a));
-		state.set_main_voltage(AltosConvert.tele_mini_voltage(sense_m));
+		state.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(v_batt));
 
-		state.set_ground_pressure(ground_pres);
+		state.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_a));
+		state.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_m));
 
 		state.set_pressure(pres);
 		state.set_temperature(temp/100.0);
 
-		state.set_kalman(height, speed/16.0, acceleration/16.0);
+		state.set_kalman(extend_height(state, height_16),
+				 speed/16.0, acceleration/16.0);
+
+		state.set_ground_pressure(ground_pres);
 	}
 }
