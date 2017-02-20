@@ -143,13 +143,13 @@
 
 #define HAS_ADC			1
 
-#define AO_ADC_PIN0_PORT	(&stm_gpioa)
+#define AO_ADC_PIN0_PORT	(&stm_gpioa)	/* sense_m */
 #define AO_ADC_PIN0_PIN		0
 #define AO_ADC_PIN0_CH		0
-#define AO_ADC_PIN1_PORT	(&stm_gpioa)
+#define AO_ADC_PIN1_PORT	(&stm_gpioa)	/* sense_a */
 #define AO_ADC_PIN1_PIN		1
 #define AO_ADC_PIN1_CH		1
-#define AO_ADC_PIN2_PORT	(&stm_gpioa)
+#define AO_ADC_PIN2_PORT	(&stm_gpioa)	/* v_batt */
 #define AO_ADC_PIN2_PIN		2
 #define AO_ADC_PIN2_CH		2
 
@@ -158,8 +158,8 @@
 #define AO_NUM_ADC		3
 
 struct ao_adc {
-	int16_t		sense_a;
 	int16_t		sense_m;
+	int16_t		sense_a;
 	int16_t		v_batt;
 };
 
