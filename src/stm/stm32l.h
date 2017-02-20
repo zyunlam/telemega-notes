@@ -518,7 +518,7 @@ extern struct stm_rcc stm_rcc;
 #define  STM_RCC_CFGR_MCOPRE_DIV_4	2
 #define  STM_RCC_CFGR_MCOPRE_DIV_8	3
 #define  STM_RCC_CFGR_MCOPRE_DIV_16	4
-#define  STM_RCC_CFGR_MCOPRE_DIV_MASK	7
+#define  STM_RCC_CFGR_MCOPRE_MASK	7
 
 #define STM_RCC_CFGR_MCOSEL	(24)
 #define  STM_RCC_CFGR_MCOSEL_DISABLE	0
@@ -897,7 +897,11 @@ struct stm_nvic {
 	vuint32_t	sc;		/* 0xc10 0xe000ed10 System Control Register */
 	vuint32_t	cc;		/* 0xc14 0xe000ed14 Configuration Control Register */
 
-	uint8_t		_unusedc18[0xe00 - 0xc18];
+	vuint32_t	shpr7_4;	/* 0xc18 0xe000ed18 System Hander Priority Registers */
+	vuint32_t	shpr11_8;	/* 0xc1c */
+	vuint32_t	shpr15_12;	/* 0xc20 */
+
+	uint8_t		_unusedc18[0xe00 - 0xc24];
 
 	vuint32_t	stir;		/* 0xe00 */
 };
@@ -1594,6 +1598,7 @@ extern struct stm_i2c stm_i2c1, stm_i2c2;
 #define  STM_I2C_CR2_FREQ_4_MHZ		4
 #define  STM_I2C_CR2_FREQ_8_MHZ		8
 #define  STM_I2C_CR2_FREQ_16_MHZ	16
+#define  STM_I2C_CR2_FREQ_24_MHZ	24
 #define  STM_I2C_CR2_FREQ_32_MHZ	32
 #define  STM_I2C_CR2_FREQ_MASK		0x3f
 
@@ -1740,6 +1745,12 @@ extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
 #define  STM_TIM234_SMCR_SMS_EXTERNAL_CLOCK	7
 #define  STM_TIM234_SMCR_SMS_MASK		7
 
+#define STM_TIM234_DIER_CC4IE		4
+#define STM_TIM234_DIER_CC3IE		3
+#define STM_TIM234_DIER_CC2IE		2
+#define STM_TIM234_DIER_CC1IE		1
+#define STM_TIM234_DIER_UIE		0
+
 #define STM_TIM234_SR_CC4OF	12
 #define STM_TIM234_SR_CC3OF	11
 #define STM_TIM234_SR_CC2OF	10
@@ -1840,15 +1851,23 @@ extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
 
 #define STM_TIM234_CCER_CC4NP	15
 #define STM_TIM234_CCER_CC4P	13
+#define  STM_TIM234_CCER_CC4P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC4P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC4E	12
 #define STM_TIM234_CCER_CC3NP	11
 #define STM_TIM234_CCER_CC3P	9
+#define  STM_TIM234_CCER_CC3P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC3P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC3E	8
 #define STM_TIM234_CCER_CC2NP	7
 #define STM_TIM234_CCER_CC2P	5
+#define  STM_TIM234_CCER_CC2P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC2P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC2E	4
 #define STM_TIM234_CCER_CC1NP	3
 #define STM_TIM234_CCER_CC1P	1
+#define  STM_TIM234_CCER_CC1P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC1P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC1E	0
 
 struct stm_usb {
