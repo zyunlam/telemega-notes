@@ -66,16 +66,16 @@ ao_beep(uint8_t beep)
 
 #if BEEPER_CHANNEL == 1
 		stm_tim1.ccmr1 = ((0 << STM_TIM1_CCMR1_OC2CE) |
-				  (STM_TIM1_CCMR1_OCM_FROZEN << STM_TIM1_CCMR1_OC2M) |
+				  (STM_TIM1_CCMR_OCM_FROZEN << STM_TIM1_CCMR1_OC2M) |
 				  (0 << STM_TIM1_CCMR1_OC2PE) |
 				  (0 << STM_TIM1_CCMR1_OC2FE) |
-				  (STM_TIM1_CCMR1_CCS_OUTPUT << STM_TIM1_CCMR1_CC2S) |
+				  (STM_TIM1_CCMR_CCS_OUTPUT << STM_TIM1_CCMR1_CC2S) |
 
 				  (0 << STM_TIM1_CCMR1_OC1CE) |
-				  (STM_TIM1_CCMR1_OCM_TOGGLE << STM_TIM1_CCMR1_OC1M) |
+				  (STM_TIM1_CCMR_OCM_TOGGLE << STM_TIM1_CCMR1_OC1M) |
 				  (0 << STM_TIM1_CCMR1_OC1PE) |
 				  (0 << STM_TIM1_CCMR1_OC1FE) |
-				  (STM_TIM1_CCMR1_CCS_OUTPUT << STM_TIM1_CCMR1_CC1S));
+				  (STM_TIM1_CCMR_CCS_OUTPUT << STM_TIM1_CCMR1_CC1S));
 
 		stm_tim1.ccer = ((0 << STM_TIM1_CCER_CC4P) |
 				 (0 << STM_TIM1_CCER_CC4E) |
@@ -90,6 +90,33 @@ ao_beep(uint8_t beep)
 				 (0 << STM_TIM1_CCER_CC1NE) |
 				 (0 << STM_TIM1_CCER_CC1P) |
 				 (1 << STM_TIM1_CCER_CC1E));
+#endif
+#if BEEPER_CHANNEL == 2
+		stm_tim1.ccmr1 = ((0 << STM_TIM1_CCMR1_OC2CE) |
+				  (STM_TIM1_CCMR_OCM_TOGGLE << STM_TIM1_CCMR1_OC2M) |
+				  (0 << STM_TIM1_CCMR1_OC2PE) |
+				  (0 << STM_TIM1_CCMR1_OC2FE) |
+				  (STM_TIM1_CCMR_CCS_OUTPUT << STM_TIM1_CCMR1_CC2S) |
+
+				  (0 << STM_TIM1_CCMR1_OC1CE) |
+				  (STM_TIM1_CCMR_OCM_FROZEN << STM_TIM1_CCMR1_OC1M) |
+				  (0 << STM_TIM1_CCMR1_OC1PE) |
+				  (0 << STM_TIM1_CCMR1_OC1FE) |
+				  (STM_TIM1_CCMR_CCS_OUTPUT << STM_TIM1_CCMR1_CC1S));
+
+		stm_tim1.ccer = ((0 << STM_TIM1_CCER_CC4P) |
+				 (0 << STM_TIM1_CCER_CC4E) |
+				 (0 << STM_TIM1_CCER_CC3NP) |
+				 (0 << STM_TIM1_CCER_CC3NE) |
+				 (0 << STM_TIM1_CCER_CC3P) |
+				 (0 << STM_TIM1_CCER_CC3E) |
+				 (0 << STM_TIM1_CCER_CC2NP) |
+				 (0 << STM_TIM1_CCER_CC2NE) |
+				 (0 << STM_TIM1_CCER_CC2P) |
+				 (1 << STM_TIM1_CCER_CC2E) |
+				 (0 << STM_TIM1_CCER_CC1NE) |
+				 (0 << STM_TIM1_CCER_CC1P) |
+				 (0 << STM_TIM1_CCER_CC1E));
 #endif
 #if BEEPER_CHANNEL == 3
 		stm_tim1.ccmr2 = ((0 << STM_TIM1_CCMR2_OC4CE) |
@@ -177,7 +204,8 @@ ao_beep_init(void)
 	ao_enable_port(&stm_gpioa);
 	stm_afr_set(&stm_gpioa, 10, STM_AFR_AF2);
 #else
-#error unknown beeper channel
+	ao_enable_port(BEEPER_PORT);
+	stm_afr_set(BEEPER_PORT, BEEPER_PIN, STM_AFR_AF2);
 #endif
 	/* Leave the timer off until requested */
 
