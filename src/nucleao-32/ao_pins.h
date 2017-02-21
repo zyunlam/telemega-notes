@@ -47,7 +47,12 @@
 #define HAS_USB				1
 #define AO_USB_DIRECTIO			0
 #define AO_PA11_PA12_RMP		0
-#define HAS_BEEP			0
+#define HAS_BEEP			1
+
+#define BEEPER_TIMER			2
+#define BEEPER_CHANNEL			4
+#define BEEPER_PORT			(&stm_gpioa)
+#define BEEPER_PIN			3
 
 #define IS_FLASH_LOADER	0
 

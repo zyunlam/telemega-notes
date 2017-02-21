@@ -14,13 +14,19 @@
 
 #include <ao.h>
 #include <ao_lisp.h>
+#include <ao_beep.h>
 
 static void lisp_cmd() {
 	ao_lisp_read_eval_print();
 }
 
+static void beep() {
+	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
+}
+
 static const struct ao_cmds blink_cmds[] = {
 	{ lisp_cmd,	"l\0Run lisp interpreter" },
+	{ beep,		"b\0Beep" },
 	{ 0, 0 }
 };
 
@@ -33,6 +39,7 @@ void main(void)
 	ao_dma_init();
 	ao_usb_init();
 	ao_serial_init();
+	ao_beep_init();
 	ao_cmd_init();
 	ao_cmd_register(blink_cmds);
 	ao_start_scheduler();

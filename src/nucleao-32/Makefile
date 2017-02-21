@@ -27,6 +27,7 @@ ALTOS_SRC = \
 	ao_config.c \
 	ao_task.c \
 	ao_led.c \
+	ao_beep_stm.c \
 	ao_dma_stm.c \
 	ao_stdio.c \
 	ao_panic.c \
@@ -35,21 +36,22 @@ ALTOS_SRC = \
 	ao_usb_stm.c \
 	ao_serial_stm.c \
 	ao_flash_stm.c \
+	ao_lisp_atom.c \
+	ao_lisp_builtin.c \
+	ao_lisp_cons.c \
+	ao_lisp_error.c \
+	ao_lisp_eval.c \
+	ao_lisp_frame.c \
+	ao_lisp_int.c \
+	ao_lisp_lambda.c \
 	ao_lisp_lex.c \
 	ao_lisp_mem.c \
-	ao_lisp_cons.c \
-	ao_lisp_eval.c \
-	ao_lisp_string.c \
-	ao_lisp_atom.c \
-	ao_lisp_int.c \
 	ao_lisp_poly.c \
-	ao_lisp_builtin.c \
 	ao_lisp_read.c \
 	ao_lisp_rep.c \
-	ao_lisp_frame.c \
-	ao_lisp_error.c \
-	ao_lisp_lambda.c \
 	ao_lisp_save.c \
+	ao_lisp_stack.c \
+	ao_lisp_string.c \
 	ao_lisp_os_save.c
 
 PRODUCT=Nucleo-32
