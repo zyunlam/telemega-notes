@@ -69,6 +69,9 @@
 
 /* Beeper is on Tim1 CH3 */
 #define BEEPER_CHANNEL		3
+#define BEEPER_TIMER		1
+#define BEEPER_PORT		(&stm_gpioa)
+#define BEEPER_PIN		10
 
 /* LED */
 #define LED_PORT_ENABLE		STM_RCC_AHBENR_IOPAEN
