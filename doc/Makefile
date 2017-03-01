@@ -86,8 +86,10 @@ IMAGES=\
 	telemetrum.svg \
 	telemetrum-v1.1-thside.jpg \
 	telemetrum-v2.0-th.jpg \
-	telemini.svg \
+	telemini-v1.svg \
 	telemini-v1-top.jpg \
+	telemini-v3.svg \
+	telemini-v3.jpg \
 	altusmetrum-oneline.svg \
 	telegps-oneline.svg \
 	micropeak-oneline.svg
@@ -107,7 +109,7 @@ INC_FILES=\
 	getting-started.inc \
 	usage.inc \
 	telemetrum.inc \
-	telemini-v1.0.inc \
+	telemini.inc \
 	easymini-device.inc \
 	telemega.inc \
 	easymega.inc \
@@ -162,7 +164,8 @@ OUTLINE_TXT_FILES=\
 	easymini-outline.txt \
 	telemega-outline.txt \
 	telemetrum-outline.txt \
-	telemini-outline.txt
+	telemini-v1-outline.txt \
+	telemini-v3-outline.txt
 
 OUTLINE_RAW_FILES=$(OUTLINE_TXT_FILES:.txt=.raw)
 
@@ -172,7 +175,8 @@ SVG=\
 	easymini.svg \
 	telemega.svg \
 	telemetrum.svg \
-	telemini.svg \
+	telemini-v1.svg \
+	telemini-v3.svg \
 	easymega.svg
 
 RELNOTES_PDF=$(RELNOTES_INC:.inc=.pdf)
@@ -260,6 +264,10 @@ telegps.html telegps.pdf: telegps-docinfo.xml $(TELEGPS_RAW_FILES) $(IMAGES)
 micropeak.pdf micropeak.html: micropeak-docinfo.xml $(MICROPEAK_RAW_FILES) $(IMAGES)
 
 easymini.pdf easymini.html: easymini-docinfo.xml $(EASYMINI_RAW_FILES) $(IMAGES)
+
+telemini-v1-outline.pdf: telemini-v1-outline.txt telemini-v1.svg
+
+telemini-v3-outline.pdf: telemini-v3-outline.txt telemini-v3.svg
 
 install:	all
 
