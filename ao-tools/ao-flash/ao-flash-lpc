@@ -8,9 +8,9 @@ esac
 cmds=/tmp/flash$$
 trap "rm $cmds" 0 1 15
 file="$1"
-echo "program $file verify reset" > $cmds
+echo "program $file reset" > $cmds
 openocd \
 	-f interface/stlink-v2.cfg \
-	-f target/lpc11u14.cfg \
+	-f target/lpc11xx.cfg \
 	-f $cmds \
 	-c shutdown
