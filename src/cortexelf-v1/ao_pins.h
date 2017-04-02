@@ -44,6 +44,15 @@
 #define AO_APB2_PRESCALER	2
 #define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_2
 
+/* Allow for non-maskable interrupts at priority 0 */
+#define AO_NONMASK_INTERRUPT	1
+
+/* PS/2 keyboard connection */
+#define AO_PS2_CLOCK_PORT	(&stm_gpiod)
+#define AO_PS2_CLOCK_BIT	9
+#define AO_PS2_DATA_PORT	(&stm_gpiod)
+#define AO_PS2_DATA_BIT		8
+
 #define HAS_SERIAL_1		1
 #define USE_SERIAL_1_STDIN	0
 #define SERIAL_1_PB6_PB7	1

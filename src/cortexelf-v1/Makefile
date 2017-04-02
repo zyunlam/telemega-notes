@@ -15,18 +15,17 @@ INC = \
 	ao_product.h \
 	ao_profile.h \
 	ao_task.h \
-	ao_whiten.h \
-	ao_quaternion.h \
 	math.h \
 	ao_mpu.h \
 	stm32l.h \
 	math.h \
+	ao_vga.h \
+	ao_draw.h \
+	ao_draw_int.h \
+	ao_font.h \
+	ao_ps2.h \
 	Makefile
 
-#
-# Common AltOS sources
-#
-#	ao_hmc5883.c
 
 #PROFILE=ao_profile.c
 #PROFILE_DEF=-DAO_PROFILE=1
@@ -34,20 +33,6 @@ INC = \
 #STACK_GUARD=ao_mpu_stm.c
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
 
-MATH_SRC=\
-	ef_acos.c \
-	ef_sqrt.c \
-	ef_rem_pio2.c \
-	kf_cos.c \
-	kf_sin.c \
-	kf_rem_pio2.c \
-	sf_copysign.c \
-	sf_cos.c \
-	sf_fabs.c \
-	sf_floor.c \
-	sf_scalbn.c \
-	sf_sin.c \
-	ef_log.c
 
 ALTOS_SRC = \
 	ao_boot_chain.c \
@@ -63,8 +48,6 @@ ALTOS_SRC = \
 	ao_timer.c \
 	ao_mutex.c \
 	ao_serial_stm.c \
-	ao_ignite.c \
-	ao_freq.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
 	ao_storage.c \
@@ -72,8 +55,14 @@ ALTOS_SRC = \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
 	ao_i2c_stm.c \
-	ao_convert_volt.c \
-	$(MATH_SRC) \
+	ao_vga.c \
+	ao_blt.c \
+	ao_copy.c \
+	ao_rect.c \
+	ao_text.c \
+	ao_line.c \
+	ao_ps2.c \
+	ao_console.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)
