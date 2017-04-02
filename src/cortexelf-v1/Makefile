@@ -42,7 +42,6 @@ ALTOS_SRC = \
 	ao_cmd.c \
 	ao_config.c \
 	ao_task.c \
-	ao_led.c \
 	ao_stdio.c \
 	ao_panic.c \
 	ao_timer.c \
@@ -50,8 +49,6 @@ ALTOS_SRC = \
 	ao_serial_stm.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
-	ao_storage.c \
-	ao_m25.c \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
 	ao_i2c_stm.c \
@@ -63,6 +60,7 @@ ALTOS_SRC = \
 	ao_line.c \
 	ao_ps2.c \
 	ao_console.c \
+	ao_sdcard.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)

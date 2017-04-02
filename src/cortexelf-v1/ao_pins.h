@@ -28,21 +28,21 @@
 #define AO_PLLMUL		12
 #define AO_RCC_CFGR_PLLMUL	(STM_RCC_CFGR_PLLMUL_12)
 
-/* SYSCLK = 32MHz (no need to go faster than CPU) */
-#define AO_PLLDIV		3
-#define AO_RCC_CFGR_PLLDIV	(STM_RCC_CFGR_PLLDIV_3)
+/* SYSCLK = 24MHz */
+#define AO_PLLDIV		4
+#define AO_RCC_CFGR_PLLDIV	(STM_RCC_CFGR_PLLDIV_4)
 
-/* HCLK = 32MHz (CPU clock) */
+/* HCLK = 24MHz (CPU clock) */
 #define AO_AHB_PRESCALER	1
 #define AO_RCC_CFGR_HPRE_DIV	STM_RCC_CFGR_HPRE_DIV_1
 
-/* Run APB1 at 16MHz (HCLK/2) */
-#define AO_APB1_PRESCALER	2
-#define AO_RCC_CFGR_PPRE1_DIV	STM_RCC_CFGR_PPRE2_DIV_2
+/* Run APB1 at HCLK/1 */
+#define AO_APB1_PRESCALER	1
+#define AO_RCC_CFGR_PPRE1_DIV	STM_RCC_CFGR_PPRE2_DIV_1
 
-/* Run APB2 at 16MHz (HCLK/2) */
-#define AO_APB2_PRESCALER	2
-#define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_2
+/* Run APB2 at HCLK/1 */
+#define AO_APB2_PRESCALER	1
+#define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_1
 
 /* Allow for non-maskable interrupts at priority 0 */
 #define AO_NONMASK_INTERRUPT	1
@@ -108,84 +108,21 @@
 
 #define LOW_LEVEL_DEBUG		0
 
-#define LED_PORT_ENABLE		STM_RCC_AHBENR_GPIOCEN
-#define LED_PORT		(&stm_gpioc)
-#define LED_PIN_RED		0
-#define LED_PIN_GREEN		0
-#define AO_LED_RED		(1 << LED_PIN_RED)
-#define AO_LED_GREEN		(1 << LED_PIN_GREEN)
-
-#define LEDS_AVAILABLE		0
-
 #define HAS_GPS			0
 #define HAS_FLIGHT		0
 #define HAS_ADC			0
 #define HAS_ADC_TEMP		0
 #define HAS_LOG			0
 
-/*
- * Pressure sensor settings
- */
-#define HAS_MS5607		0
-#define HAS_MS5611		0
-#define AO_MS5607_PRIVATE_PINS	0
-#define AO_MS5607_CS_PORT	(&stm_gpioc)
-#define AO_MS5607_CS_PIN	4
-#define AO_MS5607_CS_MASK	(1 << AO_MS5607_CS)
-#define AO_MS5607_MISO_PORT	(&stm_gpioa)
-#define AO_MS5607_MISO_PIN	6
-#define AO_MS5607_MISO_MASK	(1 << AO_MS5607_MISO)
-#define AO_MS5607_SPI_INDEX	AO_SPI_1_PA5_PA6_PA7
-
-/*
- * SPI Flash memory
- */
-
-#define M25_MAX_CHIPS		0
-#define AO_M25_SPI_CS_PORT	(&stm_gpiod)
-#define AO_M25_SPI_CS_MASK	(1 << 3)
-#define AO_M25_SPI_BUS		AO_SPI_2_PB13_PB14_PB15
-
 #define NUM_CMDS		16
 
-/*
- * Monitor
- */
-
-#define HAS_MONITOR		0
-#define LEGACY_MONITOR		0
-#define HAS_MONITOR_PUT		0
-#define AO_MONITOR_LED		0
-#define HAS_RSSI		0
-
-/*
- * Profiling Viterbi decoding
- */
-
-#ifndef AO_PROFILE
-#define AO_PROFILE	       	0
-#endif
-
-/*
- * PWM output
- */
-
-#define NUM_PWM			0
-#define PWM_MAX			20000
-#define AO_PWM_TIMER		stm_tim4
-#define AO_PWM_TIMER_ENABLE	STM_RCC_APB1ENR_TIM4EN
-#define AO_PWM_TIMER_SCALE	32
-
-#define AO_PWM_0_GPIO		(&stm_gpiod)
-#define AO_PWM_0_PIN		12
-
-#define AO_PWM_1_GPIO		(&stm_gpiod)
-#define AO_PWM_1_PIN		13
-
-#define AO_PWM_2_GPIO		(&stm_gpiod)
-#define AO_PWM_2_PIN		14
-
-#define AO_PWM_3_GPIO		(&stm_gpiod)
-#define AO_PWM_3_PIN		15
+/* SD card */
+#define AO_SDCARD_SPI_BUS	AO_SPI_2_PD1_PD3_PD4
+#define AO_SDCARD_SPI_CS_PORT	(&stm_gpiod)
+#define AO_SDCARD_SPI_CS_PIN	2
+#define AO_SDCARD_SPI_PORT	(&stm_gpiod)
+#define AO_SDCARD_SPI_SCK_PIN	1
+#define AO_SDCARD_SPI_MISO_PIN	3
+#define AO_SDCARD_SPI_MOSI_PIN	4
 
 #endif /* _AO_PINS_H_ */

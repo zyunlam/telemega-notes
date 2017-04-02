@@ -25,6 +25,7 @@
 #include <ao_ps2.h>
 #include <ao_vga.h>
 #include <ao_console.h>
+#include <ao_sdcard.h>
 
 struct ao_task ball_task;
 
@@ -204,6 +205,8 @@ main(void)
 	ao_spi_init();
 	ao_dma_init();
 	ao_exti_init();
+
+	ao_sdcard_init();
 
 	ao_ps2_init();
 	ao_vga_init();
