@@ -74,11 +74,10 @@ static void __attribute__ ((section(".ramtext"),noinline))
 _ao_flash_erase_page(uint32_t *page)
 {
 	stm_flash.pecr |= (1 << STM_FLASH_PECR_ERASE) | (1 << STM_FLASH_PECR_PROG);
-	
+
 	*page = 0x00000000;
 
-	while (stm_flash.sr & (1 << STM_FLASH_SR_BSY))
-		;
+	ao_flash_wait_bsy();
 }
 
 void
@@ -101,9 +100,8 @@ _ao_flash_half_page(uint32_t *dst, uint32_t *src)
 
 	stm_flash.pecr |= (1 << STM_FLASH_PECR_FPRG);
 	stm_flash.pecr |= (1 << STM_FLASH_PECR_PROG);
-	
-	while (stm_flash.sr & (1 << STM_FLASH_SR_BSY))
-		;
+
+	ao_flash_wait_bsy();
 
 	for (i = 0; i < 32; i++) {
 		*dst++ = *src++;
