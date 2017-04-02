@@ -102,7 +102,7 @@ HEX=$(PROGNAME)-$(VERSION).ihx
 SRC=$(ALTOS_SRC) ao_cortexelf.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG) $(HEX)
+all:: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) cortexelf.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
@@ -117,9 +117,11 @@ ao_product.h: ao-make-product.5c ../Version
 
 distclean:	clean
 
-clean:
+clean::
 	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
 	rm -f ao_product.h
+
+include ../lisp/Makefile-lisp
 
 install:
 

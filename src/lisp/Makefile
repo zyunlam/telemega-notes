@@ -6,32 +6,15 @@ clean:
 ao_lisp_const.h: ao_lisp_const.lisp ao_lisp_make_const
 	./ao_lisp_make_const -o $@ ao_lisp_const.lisp
 
-SRCS=\
-	ao_lisp_make_const.c\
-	ao_lisp_mem.c \
-	ao_lisp_cons.c \
-	ao_lisp_string.c \
-	ao_lisp_atom.c \
-	ao_lisp_int.c \
-	ao_lisp_poly.c \
-	ao_lisp_builtin.c \
-	ao_lisp_read.c \
-	ao_lisp_frame.c \
-	ao_lisp_lambda.c \
-	ao_lisp_eval.c \
-	ao_lisp_rep.c \
-	ao_lisp_save.c \
-	ao_lisp_stack.c \
-	ao_lisp_error.c 
+include Makefile-inc
+SRCS=$(LISP_SRCS)
+
+HDRS=$(LISP_HDRS)
 
 OBJS=$(SRCS:.c=.o)
 
 CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g -I. -Wall -Wextra -no-pie
 
-HDRS=\
-	ao_lisp.h \
-	ao_lisp_os.h \
-	ao_lisp_read.h
 
 ao_lisp_make_const:  $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
