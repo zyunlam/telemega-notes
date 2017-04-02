@@ -28,6 +28,8 @@
 #include <ao_sdcard.h>
 #include <ao_fat.h>
 #include <ao_lisp.h>
+#include <ao_button.h>
+#include <ao_event.h>
 
 struct ao_task ball_task;
 
@@ -208,6 +210,21 @@ __code struct ao_cmds ao_demo_cmds[] = {
 	{ 0, NULL }
 };
 
+static struct ao_task event_task;
+
+static void
+ao_event_loop(void)
+{
+	for (;;) {
+		struct ao_event	ev;
+
+		ao_event_get(&ev);
+		printf("type %d uint %d tick %d value %d\n",
+		       ev.type, ev.unit, ev.tick, ev.value);
+		flush();
+	}
+}
+
 int
 main(void)
 {
@@ -236,9 +253,12 @@ main(void)
 
 	ao_usb_init();
 
+	ao_button_init();
+
 	ao_config_init();
 
 	ao_add_task(&ball_task, ao_ball, "ball");
+	ao_add_task(&event_task, ao_event_loop, "events");
 	ao_cmd_register(&ao_demo_cmds[0]);
 
 	ao_start_scheduler();

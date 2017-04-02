@@ -125,4 +125,28 @@
 #define AO_SDCARD_SPI_MISO_PIN	3
 #define AO_SDCARD_SPI_MOSI_PIN	4
 
+/* Buttons */
+
+#define AO_EVENT	1
+
+#define AO_BUTTON_COUNT		4
+#define AO_BUTTON_MODE		AO_EXTI_MODE_PULL_DOWN
+
+/* INPUT */
+#define AO_BUTTON_0_PORT	(&stm_gpioc)
+#define AO_BUTTON_0		8
+
+/* MP */
+#define AO_BUTTON_1_PORT	(&stm_gpioc)
+#define AO_BUTTON_1		9
+
+/* RUN */
+#define AO_BUTTON_2_PORT	(&stm_gpioc)
+#define AO_BUTTON_2		10
+
+/* LOAD */
+#define AO_BUTTON_3_PORT	(&stm_gpioc)
+#define AO_BUTTON_3		11
+
+
 #endif /* _AO_PINS_H_ */

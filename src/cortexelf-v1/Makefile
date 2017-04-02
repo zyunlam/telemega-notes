@@ -68,6 +68,8 @@ ALTOS_SRC = \
 	ao_bufio.c \
 	ao_fat.c \
 	ao_flash_stm.c \
+	ao_button.c \
+	ao_event.c \
 	ao_lisp_lex.c \
 	ao_lisp_mem.c \
 	ao_lisp_cons.c \
