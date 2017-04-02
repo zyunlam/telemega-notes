@@ -27,6 +27,7 @@
 #include <ao_console.h>
 #include <ao_sdcard.h>
 #include <ao_fat.h>
+#include <ao_lisp.h>
 
 struct ao_task ball_task;
 
@@ -182,11 +183,16 @@ ao_console_send(void)
 	}
 }
 
+static void lisp_cmd() {
+	ao_lisp_read_eval_print();
+}
+
 __code struct ao_cmds ao_demo_cmds[] = {
 	{ ao_video_toggle, "V\0Toggle video" },
 	{ ao_ball_toggle, "B\0Toggle ball" },
 	{ ao_ps2_read_keys, "K\0Read keys from keyboard" },
 	{ ao_console_send, "C\0Send data to console, end with ~" },
+	{ lisp_cmd, "l\0Run lisp interpreter" },
 	{ 0, NULL }
 };
 

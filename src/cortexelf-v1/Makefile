@@ -4,7 +4,7 @@
 #
 
 include ../stm/Makefile.defs
-LDFLAGS=-L../stm -Wl,-Taltos-512.ld
+LDFLAGS=-L../stm -Wl,-Tcortexelf.ld
 
 INC = \
 	ao.h \
@@ -25,6 +25,9 @@ INC = \
 	ao_draw_int.h \
 	ao_font.h \
 	ao_ps2.h \
+	ao_lisp.h \
+	ao_lisp_const.h \
+	ao_lisp_os.h \
 	Makefile
 
 
@@ -64,6 +67,24 @@ ALTOS_SRC = \
 	ao_sdcard.c \
 	ao_bufio.c \
 	ao_fat.c \
+	ao_flash_stm.c \
+	ao_lisp_lex.c \
+	ao_lisp_mem.c \
+	ao_lisp_cons.c \
+	ao_lisp_eval.c \
+	ao_lisp_string.c \
+	ao_lisp_atom.c \
+	ao_lisp_int.c \
+	ao_lisp_poly.c \
+	ao_lisp_builtin.c \
+	ao_lisp_read.c \
+	ao_lisp_rep.c \
+	ao_lisp_frame.c \
+	ao_lisp_error.c \
+	ao_lisp_lambda.c \
+	ao_lisp_save.c \
+	ao_lisp_stack.c \
+	ao_lisp_os_save.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)
@@ -83,7 +104,7 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-$(PROG): Makefile $(OBJ) altos-512.ld
+$(PROG): Makefile $(OBJ) cortexelf.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 ../altitude-pa.h: make-altitude-pa
