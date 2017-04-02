@@ -54,12 +54,12 @@
 #define AO_PS2_DATA_BIT		8
 
 #define HAS_SERIAL_1		1
-#define USE_SERIAL_1_STDIN	0
+#define USE_SERIAL_1_STDIN	1
 #define SERIAL_1_PB6_PB7	1
 #define SERIAL_1_PA9_PA10	0
 
 #define HAS_SERIAL_2		1
-#define USE_SERIAL_2_STDIN	0
+#define USE_SERIAL_2_STDIN	1
 #define SERIAL_2_PA2_PA3	0
 #define SERIAL_2_PD5_PD6	1
 
