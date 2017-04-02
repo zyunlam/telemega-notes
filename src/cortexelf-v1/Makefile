@@ -4,6 +4,7 @@
 #
 
 include ../stm/Makefile.defs
+LDFLAGS=-L../stm -Wl,-Taltos-512.ld
 
 INC = \
 	ao.h \
@@ -61,6 +62,8 @@ ALTOS_SRC = \
 	ao_ps2.c \
 	ao_console.c \
 	ao_sdcard.c \
+	ao_bufio.c \
+	ao_fat.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)
@@ -80,7 +83,7 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-$(PROG): Makefile $(OBJ) altos.ld
+$(PROG): Makefile $(OBJ) altos-512.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 ../altitude-pa.h: make-altitude-pa
