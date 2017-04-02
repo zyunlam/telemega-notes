@@ -187,11 +187,23 @@ static void lisp_cmd() {
 	ao_lisp_read_eval_print();
 }
 
+static void
+ao_serial_blather(void)
+{
+	char c;
+
+	while ((c = getchar()) != '~') {
+		ao_serial1_putchar(c);
+		ao_serial2_putchar(c);
+	}
+}
+
 __code struct ao_cmds ao_demo_cmds[] = {
 	{ ao_video_toggle, "V\0Toggle video" },
 	{ ao_ball_toggle, "B\0Toggle ball" },
 	{ ao_ps2_read_keys, "K\0Read keys from keyboard" },
 	{ ao_console_send, "C\0Send data to console, end with ~" },
+	{ ao_serial_blather, "S\0Blather on serial ports briefly" },
 	{ lisp_cmd, "l\0Run lisp interpreter" },
 	{ 0, NULL }
 };
