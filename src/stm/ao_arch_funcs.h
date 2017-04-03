@@ -211,6 +211,12 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);\
 	} while (0)
 
+#define AO_OUTPUT_PUSH_PULL	STM_OTYPER_PUSH_PULL
+#define AO_OUTPUT_OPEN_DRAIN	STM_OTYPER_OPEN_DRAIN
+
+#define ao_gpio_set_output_mode(port,bit,pin,mode) \
+	stm_otyper_set(port, pin, mode)
+
 #define ao_gpio_set_mode(port,bit,mode) do {				\
 		if (mode == AO_EXTI_MODE_PULL_UP)			\
 			stm_pupdr_set(port, bit, STM_PUPDR_PULL_UP);	\
@@ -219,7 +225,7 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		else							\
 			stm_pupdr_set(port, bit, STM_PUPDR_NONE);	\
 	} while (0)
-	
+
 #define ao_enable_input(port,bit,mode) do {				\
 		ao_enable_port(port);					\
 		stm_moder_set(port, bit, STM_MODER_INPUT);		\

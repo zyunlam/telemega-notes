@@ -22,6 +22,7 @@
 #define AO_EVENT_NONE		0
 #define AO_EVENT_QUADRATURE	1
 #define AO_EVENT_BUTTON		2
+#define AO_EVENT_KEY		3
 
 struct ao_event {
 	uint8_t		type;
