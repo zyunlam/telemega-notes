@@ -127,10 +127,11 @@
 
 /* Buttons */
 
-#define AO_EVENT	1
+#define AO_EVENT		1
 
 #define AO_BUTTON_COUNT		4
 #define AO_BUTTON_MODE		AO_EXTI_MODE_PULL_DOWN
+#define AO_BUTTON_INVERTED	0
 
 /* INPUT */
 #define AO_BUTTON_0_PORT	(&stm_gpioc)
@@ -153,16 +154,56 @@
 
 /* Set the hex digits up for decode, leave the extra leds alone */
 
-#define AO_AS1107_DECODE	((1 << 7) | \
-				 (1 << 6) | \
-				 (1 << 4) | \
-				 (1 << 3) | \
-				 (1 << 1) | \
+#define AO_AS1107_DECODE	((1 << 7) |	\
+				 (1 << 6) |	\
+				 (1 << 4) |	\
+				 (1 << 3) |	\
+				 (1 << 1) |	\
 				 (1 << 0))
 
 #define AO_AS1107_SPI_INDEX	AO_SPI_2_PD1_PD3_PD4
 #define AO_AS1107_SPI_SPEED	AO_SPI_SPEED_8MHz
 #define AO_AS1107_CS_PORT	(&stm_gpiod)
 #define AO_AS1107_CS_PIN	0
+
+/* Hex keypad */
+
+#define AO_MATRIX_ROWS	4
+#define AO_MATRIX_COLS	4
+
+#define AO_MATRIX_KEYCODES {			\
+		{ 0x0, 0x1, 0x2, 0x3 },		\
+		{ 0x4, 0x5, 0x6, 0x7 },		\
+		{ 0x8, 0x9, 0xa, 0xb },		\
+		{ 0xc, 0xd, 0xe, 0xf }		\
+	}
+
+#include <ao_matrix.h>
+
+#define AO_TIMER_HOOK	ao_matrix_poll()
+
+#define AO_MATRIX_ROW_0_PORT	(&stm_gpioc)
+#define AO_MATRIX_ROW_0_PIN	4
+
+#define AO_MATRIX_ROW_1_PORT	(&stm_gpioc)
+#define AO_MATRIX_ROW_1_PIN	1
+
+#define AO_MATRIX_ROW_2_PORT	(&stm_gpioc)
+#define AO_MATRIX_ROW_2_PIN	7
+
+#define AO_MATRIX_ROW_3_PORT	(&stm_gpioc)
+#define AO_MATRIX_ROW_3_PIN	0
+
+#define AO_MATRIX_COL_0_PORT	(&stm_gpioc)
+#define AO_MATRIX_COL_0_PIN	2
+
+#define AO_MATRIX_COL_1_PORT	(&stm_gpioc)
+#define AO_MATRIX_COL_1_PIN	3
+
+#define AO_MATRIX_COL_2_PORT	(&stm_gpioc)
+#define AO_MATRIX_COL_2_PIN	5
+
+#define AO_MATRIX_COL_3_PORT	(&stm_gpioc)
+#define AO_MATRIX_COL_3_PIN	6
 
 #endif /* _AO_PINS_H_ */

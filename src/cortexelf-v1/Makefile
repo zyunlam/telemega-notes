@@ -57,6 +57,7 @@ ALTOS_SRC = \
 	ao_exti_stm.c \
 	ao_i2c_stm.c \
 	ao_as1107.c \
+	ao_matrix.c \
 	ao_vga.c \
 	ao_blt.c \
 	ao_copy.c \
