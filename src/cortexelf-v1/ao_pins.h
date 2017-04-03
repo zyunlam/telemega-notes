@@ -206,4 +206,53 @@
 #define AO_MATRIX_COL_3_PORT	(&stm_gpioc)
 #define AO_MATRIX_COL_3_PIN	6
 
+/* 1802 connections */
+#define MA_PORT			(&stm_gpioe)
+#define MA_SHIFT		0
+
+#define DATA_PORT		(&stm_gpioe)
+#define DATA_SHIFT		8
+
+#define MRD_PORT		(&stm_gpiob)
+#define MRD_BIT			15
+
+#define MWR_PORT		(&stm_gpioa)
+#define MWR_BIT			3
+
+#define TPB_PORT		(&stm_gpioa)
+#define TPB_BIT			7
+
+#define TPA_PORT		(&stm_gpioa)
+#define TPA_BIT			6
+
+#define MUX_PORT		(&stm_gpiob)
+#define MUX_BIT			1
+
+#define WAIT_PORT		(&stm_gpioa)
+#define WAIT_PIN		4
+
+#define CLEAR_PORT		(&stm_gpioa)
+#define CLEAR_PIN		10
+
+#define Q_PORT			(&stm_gpiob)
+#define Q_BIT			12
+
+#define SC_PORT			(&stm_gpiob)
+#define SC_SHIFT		13
+
+#define N_PORT			(&stm_gpiod)
+#define N_SHIFT			13
+
+#define DMA_IN_PORT		(&stm_gpioa)
+#define DMA_IN_PIN		0
+
+#define DMA_OUT_PORT		(&stm_gpioa)
+#define DMA_OUT_PIN		9
+
+#define INTERRUPT_PORT		(&stm_gpioa)
+#define INTERRUPT_PIN		2
+
+#define EF_PORT			(&stm_gpiob)
+#define EF_SHIFT		8
+
 #endif /* _AO_PINS_H_ */
