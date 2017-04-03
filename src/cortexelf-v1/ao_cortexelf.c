@@ -30,6 +30,7 @@
 #include <ao_lisp.h>
 #include <ao_button.h>
 #include <ao_event.h>
+#include <ao_as1107.h>
 
 struct ao_task ball_task;
 
@@ -200,6 +201,21 @@ ao_serial_blather(void)
 	}
 }
 
+static void
+led_cmd(void)
+{
+	uint8_t	start;
+	uint8_t value;
+	ao_cmd_decimal();
+
+	start = ao_cmd_lex_i;
+	ao_cmd_hex();
+	value = ao_cmd_lex_i;
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	ao_as1107_write_8(start, value);
+}
+
 __code struct ao_cmds ao_demo_cmds[] = {
 	{ ao_video_toggle, "V\0Toggle video" },
 	{ ao_ball_toggle, "B\0Toggle ball" },
@@ -207,6 +223,7 @@ __code struct ao_cmds ao_demo_cmds[] = {
 	{ ao_console_send, "C\0Send data to console, end with ~" },
 	{ ao_serial_blather, "S\0Blather on serial ports briefly" },
 	{ lisp_cmd, "l\0Run lisp interpreter" },
+	{ led_cmd, "L start value\0Show value (byte) at digit start" },
 	{ 0, NULL }
 };
 
@@ -254,6 +271,8 @@ main(void)
 	ao_usb_init();
 
 	ao_button_init();
+
+	ao_as1107_init();
 
 	ao_config_init();
 

@@ -148,5 +148,21 @@
 #define AO_BUTTON_3_PORT	(&stm_gpioc)
 #define AO_BUTTON_3		11
 
+/* AS1107 */
+#define AO_AS1107_NUM_DIGITS	8
+
+/* Set the hex digits up for decode, leave the extra leds alone */
+
+#define AO_AS1107_DECODE	((1 << 7) | \
+				 (1 << 6) | \
+				 (1 << 4) | \
+				 (1 << 3) | \
+				 (1 << 1) | \
+				 (1 << 0))
+
+#define AO_AS1107_SPI_INDEX	AO_SPI_2_PD1_PD3_PD4
+#define AO_AS1107_SPI_SPEED	AO_SPI_SPEED_8MHz
+#define AO_AS1107_CS_PORT	(&stm_gpiod)
+#define AO_AS1107_CS_PIN	0
 
 #endif /* _AO_PINS_H_ */
