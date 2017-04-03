@@ -168,6 +168,12 @@ stm_gpio_set(struct stm_gpio *gpio, int pin, uint8_t value) {
 }
 
 static inline void
+stm_gpio_set_mask(struct stm_gpio *gpio, uint16_t bits, uint16_t mask) {
+	/* Use the bit set/reset register to do this atomically */
+	gpio->bsrr = ((uint32_t) (~bits & mask) << 16) | ((uint32_t) (bits & mask));
+}
+
+static inline void
 stm_gpio_set_bits(struct stm_gpio *gpio, uint16_t bits) {
 	gpio->bsrr = bits;
 }
