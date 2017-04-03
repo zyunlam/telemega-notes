@@ -28,8 +28,8 @@ INC = \
 	ao_lisp.h \
 	ao_lisp_const.h \
 	ao_lisp_os.h \
+	ao_flip_bits.h \
 	Makefile
-
 
 #PROFILE=ao_profile.c
 #PROFILE_DEF=-DAO_PROFILE=1
@@ -123,7 +123,10 @@ distclean:	clean
 
 clean::
 	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
-	rm -f ao_product.h
+	rm -f ao_product.h ao_flip_bits.h
+
+ao_flip_bits.h: ao_flip_bits.5c
+	nickle ao_flip_bits.5c > $@
 
 include ../lisp/Makefile-lisp
 

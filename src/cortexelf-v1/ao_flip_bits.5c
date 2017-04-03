@@ -1,0 +1,19 @@
+#!/usr/bin/nickle
+
+int flip_bits(int a)
+{
+	int result = 0;
+	for (int pos = 0; pos < 8; pos++)
+		if ((a & (1 << pos)) != 0)
+			result |= (1 << (7 - pos));
+	return result;
+}
+
+printf ("static uint8_t ao_flip_bits[256] = {\n");
+
+for (int i = 0; i < 256; i++) {
+	printf (" 0x%02x,", flip_bits(i));
+	if ((i & 0xf) == 0xf)
+		printf("\n");
+}
+printf("};\n");
