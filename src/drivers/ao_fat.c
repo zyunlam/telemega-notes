@@ -1615,7 +1615,7 @@ ao_fat_hexdump_cmd(void)
 		ao_cmd_status = ao_cmd_syntax_error;
 		return;
 	}
-		
+
 	fd = ao_fat_open(name, AO_FAT_OPEN_READ);
 	if (fd < 0) {
 		printf ("Open failed: %d\n", fd);
@@ -1649,5 +1649,7 @@ void
 ao_fat_init(void)
 {
 	ao_bufio_init();
+#if FAT_COMMANDS
 	ao_cmd_register(&ao_fat_cmds[0]);
+#endif
 }
