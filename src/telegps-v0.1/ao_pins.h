@@ -184,4 +184,8 @@
 #define AO_SDCARD_SPI_CS_PIN	4
 #define AO_SDCARD_SPI		stm_spi1
 
+#define SDCARD_DEBUG		1
+#define SDCARD_WARN		1
+#define SDCARD_TRACE		1
+
 #endif /* _AO_PINS_H_ */
