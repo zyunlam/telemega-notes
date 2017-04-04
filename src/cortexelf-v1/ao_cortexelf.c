@@ -31,6 +31,8 @@
 #include <ao_button.h>
 #include <ao_event.h>
 #include <ao_as1107.h>
+#include <ao_hex.h>
+#include <ao_1802.h>
 
 struct ao_task ball_task;
 
@@ -273,6 +275,10 @@ main(void)
 	ao_button_init();
 
 	ao_as1107_init();
+
+	ao_1802_init();
+
+	ao_hex_init();
 
 	ao_config_init();
 

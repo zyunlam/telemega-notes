@@ -73,6 +73,7 @@ ALTOS_SRC = \
 	ao_button.c \
 	ao_event.c \
 	ao_1802.c \
+	ao_hex.c \
 	ao_lisp_lex.c \
 	ao_lisp_mem.c \
 	ao_lisp_cons.c \

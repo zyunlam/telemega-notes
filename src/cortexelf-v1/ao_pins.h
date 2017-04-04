@@ -207,12 +207,6 @@
 #define AO_MATRIX_COL_3_PIN	6
 
 /* 1802 connections */
-#define MA_PORT			(&stm_gpioe)
-#define MA_SHIFT		0
-
-#define DATA_PORT		(&stm_gpioe)
-#define DATA_SHIFT		8
-
 #define MRD_PORT		(&stm_gpiob)
 #define MRD_BIT			15
 
@@ -225,34 +219,45 @@
 #define TPA_PORT		(&stm_gpioa)
 #define TPA_BIT			6
 
-#define MUX_PORT		(&stm_gpiob)
-#define MUX_BIT			1
+#define MA_PORT			(&stm_gpioe)
+#define MA_SHIFT		0
+#define MA_MASK			0xff
 
-#define WAIT_PORT		(&stm_gpioa)
-#define WAIT_PIN		4
+#define BUS_PORT		(&stm_gpioe)
+#define BUS_SHIFT		8
+#define BUS_MASK		0xff
 
-#define CLEAR_PORT		(&stm_gpioa)
-#define CLEAR_PIN		10
+#define SC_PORT			(&stm_gpiob)
+#define SC_SHIFT		13
+#define SC_MASK			3
 
 #define Q_PORT			(&stm_gpiob)
 #define Q_BIT			12
 
-#define SC_PORT			(&stm_gpiob)
-#define SC_SHIFT		13
-
 #define N_PORT			(&stm_gpiod)
 #define N_SHIFT			13
-
-#define DMA_IN_PORT		(&stm_gpioa)
-#define DMA_IN_PIN		0
-
-#define DMA_OUT_PORT		(&stm_gpioa)
-#define DMA_OUT_PIN		9
-
-#define INTERRUPT_PORT		(&stm_gpioa)
-#define INTERRUPT_PIN		2
+#define N_MASK			7
 
 #define EF_PORT			(&stm_gpiob)
 #define EF_SHIFT		8
+#define EF_MASK			0xf
+
+#define DMA_IN_PORT		(&stm_gpioa)
+#define DMA_IN_BIT		0
+
+#define DMA_OUT_PORT		(&stm_gpioa)
+#define DMA_OUT_BIT		9
+
+#define INT_PORT		(&stm_gpioa)
+#define INT_BIT			2
+
+#define CLEAR_PORT		(&stm_gpioa)
+#define CLEAR_BIT		10
+
+#define WAIT_PORT		(&stm_gpioa)
+#define WAIT_BIT		4
+
+#define MUX_PORT		(&stm_gpiob)
+#define MUX_BIT			1
 
 #endif /* _AO_PINS_H_ */
