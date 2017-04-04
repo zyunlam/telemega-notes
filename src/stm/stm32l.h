@@ -52,7 +52,32 @@ stm_moder_set(struct stm_gpio *gpio, int pin, vuint32_t value) {
 			~(STM_MODER_MASK << STM_MODER_SHIFT(pin))) |
 		       value << STM_MODER_SHIFT(pin));
 }
-	
+
+static inline uint32_t
+stm_spread_mask(uint16_t mask) {
+	uint32_t m = mask;
+
+	/* 0000000000000000mmmmmmmmmmmmmmmm */
+	m = (m & 0xff) | ((m & 0xff00) << 8);
+	/* 00000000mmmmmmmm00000000mmmmmmmm */
+	m = (m & 0x000f000f) | ((m & 0x00f000f0) << 4);
+	/* 0000mmmm0000mmmm0000mmmm0000mmmm */
+	m = (m & 0x03030303) | ((m & 0x0c0c0c0c) << 2);
+	/* 00mm00mm00mm00mm00mm00mm00mm00mm */
+	m = (m & 0x11111111) | ((m & 0x22222222) << 2);
+	/* 0m0m0m0m0m0m0m0m0m0m0m0m0m0m0m0m */
+	return m;
+}
+
+static inline void
+stm_moder_set_mask(struct stm_gpio *gpio, uint16_t mask, uint32_t value) {
+	uint32_t	bits32 = stm_spread_mask(mask);
+	uint32_t	mask32 = 3 * bits32;
+	uint32_t	value32 = (value & 3) * bits32;
+
+	gpio->moder = ((gpio->moder & ~mask32) | value32);
+}
+
 static inline uint32_t
 stm_moder_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->moder >> STM_MODER_SHIFT(pin)) & STM_MODER_MASK;
@@ -69,7 +94,7 @@ stm_otyper_set(struct stm_gpio *gpio, int pin, vuint32_t value) {
 			 ~(STM_OTYPER_MASK << STM_OTYPER_SHIFT(pin))) |
 			value << STM_OTYPER_SHIFT(pin));
 }
-	
+
 static inline uint32_t
 stm_otyper_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->otyper >> STM_OTYPER_SHIFT(pin)) & STM_OTYPER_MASK;
@@ -83,12 +108,21 @@ stm_otyper_get(struct stm_gpio *gpio, int pin) {
 #define STM_OSPEEDR_40MHz		3
 
 static inline void
-stm_ospeedr_set(struct stm_gpio *gpio, int pin, vuint32_t value) {
+stm_ospeedr_set(struct stm_gpio *gpio, int pin, uint32_t value) {
 	gpio->ospeedr = ((gpio->ospeedr &
 			~(STM_OSPEEDR_MASK << STM_OSPEEDR_SHIFT(pin))) |
 		       value << STM_OSPEEDR_SHIFT(pin));
 }
-	
+
+static inline void
+stm_ospeedr_set_mask(struct stm_gpio *gpio, uint16_t mask, uint32_t value) {
+	uint32_t	bits32 = stm_spread_mask(mask);
+	uint32_t	mask32 = 3 * bits32;
+	uint32_t	value32 = (value & 3) * bits32;
+
+	gpio->ospeedr = ((gpio->ospeedr & ~mask32) | value32);
+}
+
 static inline uint32_t
 stm_ospeedr_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->ospeedr >> STM_OSPEEDR_SHIFT(pin)) & STM_OSPEEDR_MASK;
@@ -107,7 +141,16 @@ stm_pupdr_set(struct stm_gpio *gpio, int pin, uint32_t value) {
 			~(STM_PUPDR_MASK << STM_PUPDR_SHIFT(pin))) |
 		       value << STM_PUPDR_SHIFT(pin));
 }
-	
+
+static inline void
+stm_pupdr_set_mask(struct stm_gpio *gpio, uint16_t mask, uint32_t value) {
+	uint32_t	bits32 = stm_spread_mask(mask);
+	uint32_t	mask32 = 3 * bits32;
+	uint32_t	value32 = (value & 3) * bits32;
+
+	gpio->pupdr = (gpio->pupdr & ~mask32) | value32;
+}
+
 static inline uint32_t
 stm_pupdr_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->pupdr >> STM_PUPDR_SHIFT(pin)) & STM_PUPDR_MASK;

@@ -214,6 +214,12 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);\
 	} while (0)
 
+#define ao_enable_output_mask(port,bits,mask) do {		\
+		ao_enable_port(port);				\
+		ao_gpio_set_mask(port, bits, mask);		\
+		ao_set_output_mask(port, mask);			\
+	} while (0)
+
 #define AO_OUTPUT_PUSH_PULL	STM_OTYPER_PUSH_PULL
 #define AO_OUTPUT_OPEN_DRAIN	STM_OTYPER_OPEN_DRAIN
 
@@ -229,35 +235,72 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 			stm_pupdr_set(port, bit, STM_PUPDR_NONE);	\
 	} while (0)
 
+#define ao_gpio_set_mode_mask(port,mask,mode) do {			\
+		if (mode == AO_EXTI_MODE_PULL_UP)			\
+			stm_pupdr_set_mask(port, mask, STM_PUPDR_PULL_UP); \
+		else if (mode == AO_EXTI_MODE_PULL_DOWN)		\
+			stm_pupdr_set_mask(port, mask, STM_PUPDR_PULL_DOWN); \
+		else							\
+			stm_pupdr_set_mask(port, mask, STM_PUPDR_NONE);	\
+	} while (0)
+
+#define ao_set_input(port, bit) do {				\
+		stm_moder_set(port, bit, STM_MODER_INPUT);	\
+	} while (0)
+
+#define ao_set_output(port, bit, pin, v) do {			\
+		ao_gpio_set(port, bit, pin, v);			\
+		stm_moder_set(port, bit, STM_MODER_OUTPUT);	\
+	} while (0)
+
+#define ao_set_output_mask(port, mask) do {			\
+		stm_moder_set_mask(port, mask, STM_MODER_OUTPUT);	\
+	} while (0)
+
+#define ao_set_input_mask(port, mask) do {				\
+		stm_moder_set_mask(port, mask, STM_MODER_INPUT);	\
+	} while (0)
+
 #define ao_enable_input(port,bit,mode) do {				\
 		ao_enable_port(port);					\
-		stm_moder_set(port, bit, STM_MODER_INPUT);		\
+		ao_set_input(port, bit);				\
 		ao_gpio_set_mode(port, bit, mode);			\
 	} while (0)
 
-#define ao_enable_cs(port,bit) do {				\
+#define ao_enable_input_mask(port,mask,mode) do {	\
+		ao_enable_port(port);			\
+		ao_gpio_set_mode_mask(port, mask, mode);	\
+		ao_set_input_mask(port, mask);		\
+	} while (0)
+
+#define _ao_enable_cs(port, bit) do {				\
 		stm_gpio_set((port), bit, 1);			\
 		stm_moder_set((port), bit, STM_MODER_OUTPUT);	\
 	} while (0)
 
+#define ao_enable_cs(port,bit) do {				\
+		ao_enable_port(port);				\
+		_ao_enable_cs(port, bit);			\
+	} while (0)
+
 #define ao_spi_init_cs(port, mask) do {				\
 		ao_enable_port(port);				\
-		if ((mask) & 0x0001) ao_enable_cs(port, 0);	\
-		if ((mask) & 0x0002) ao_enable_cs(port, 1);	\
-		if ((mask) & 0x0004) ao_enable_cs(port, 2);	\
-		if ((mask) & 0x0008) ao_enable_cs(port, 3);	\
-		if ((mask) & 0x0010) ao_enable_cs(port, 4);	\
-		if ((mask) & 0x0020) ao_enable_cs(port, 5);	\
-		if ((mask) & 0x0040) ao_enable_cs(port, 6);	\
-		if ((mask) & 0x0080) ao_enable_cs(port, 7);	\
-		if ((mask) & 0x0100) ao_enable_cs(port, 8);	\
-		if ((mask) & 0x0200) ao_enable_cs(port, 9);	\
-		if ((mask) & 0x0400) ao_enable_cs(port, 10);\
-		if ((mask) & 0x0800) ao_enable_cs(port, 11);\
-		if ((mask) & 0x1000) ao_enable_cs(port, 12);\
-		if ((mask) & 0x2000) ao_enable_cs(port, 13);\
-		if ((mask) & 0x4000) ao_enable_cs(port, 14);\
-		if ((mask) & 0x8000) ao_enable_cs(port, 15);\
+		if ((mask) & 0x0001) _ao_enable_cs(port, 0);	\
+		if ((mask) & 0x0002) _ao_enable_cs(port, 1);	\
+		if ((mask) & 0x0004) _ao_enable_cs(port, 2);	\
+		if ((mask) & 0x0008) _ao_enable_cs(port, 3);	\
+		if ((mask) & 0x0010) _ao_enable_cs(port, 4);	\
+		if ((mask) & 0x0020) _ao_enable_cs(port, 5);	\
+		if ((mask) & 0x0040) _ao_enable_cs(port, 6);	\
+		if ((mask) & 0x0080) _ao_enable_cs(port, 7);	\
+		if ((mask) & 0x0100) _ao_enable_cs(port, 8);	\
+		if ((mask) & 0x0200) _ao_enable_cs(port, 9);	\
+		if ((mask) & 0x0400) _ao_enable_cs(port, 10);\
+		if ((mask) & 0x0800) _ao_enable_cs(port, 11);\
+		if ((mask) & 0x1000) _ao_enable_cs(port, 12);\
+		if ((mask) & 0x2000) _ao_enable_cs(port, 13);\
+		if ((mask) & 0x4000) _ao_enable_cs(port, 14);\
+		if ((mask) & 0x8000) _ao_enable_cs(port, 15);\
 	} while (0)
 
 /* ao_dma_stm.c
