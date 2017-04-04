@@ -38,13 +38,19 @@ extern uint8_t ao_radio_mutex;
 #define ao_sdcard_deselect()		ao_gpio_set(AO_SDCARD_SPI_CS_PORT,AO_SDCARD_SPI_CS_PIN,AO_SDCARD_SPI_CS,1)
 
 /* Include SD card commands */
+#ifndef SDCARD_DEBUG
 #define SDCARD_DEBUG	0
+#endif
 
 /* Spew SD tracing */
+#ifndef SDCARD_TRACE
 #define SDCARD_TRACE	0
+#endif
 
 /* Emit error and warning messages */
+#ifndef SDCARD_WARN
 #define SDCARD_WARN	0
+#endif
 
 static uint8_t	initialized;
 static uint8_t	present;
