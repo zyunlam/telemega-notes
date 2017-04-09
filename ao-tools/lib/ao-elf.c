@@ -186,6 +186,7 @@ load_write(struct ao_hex_image *from, uint32_t address, uint32_t length, void *d
 	return new;
 }
 
+#define DBG 0
 /*
  * Construct a large in-memory block for all
  * of the loaded sections of the program
@@ -202,7 +203,7 @@ get_load(Elf *e)
 	GElf_Phdr	phdr;
 	GElf_Addr	sh_paddr;
 	struct ao_hex_image	*load = NULL;
-#if 0
+#if DBG
 	char		*section_name;
 #endif
 	size_t		nshdr;
@@ -231,7 +232,7 @@ get_load(Elf *e)
 
 		/* Get the associated file section */
 
-#if 0
+#if DBG
 		fprintf (stderr, "offset %08x vaddr %08x paddr %08x filesz %08x memsz %08x\n",
 			 (uint32_t) phdr.p_offset,
 			 (uint32_t) phdr.p_vaddr,
@@ -252,18 +253,16 @@ get_load(Elf *e)
 				abort();
 			}
 
-#if 0
+#if DBG
 			section_name = elf_strptr(e, shstrndx, shdr.sh_name);
 #endif
 
-			if (phdr.p_offset <= shdr.sh_offset && shdr.sh_offset < phdr.p_offset + phdr.p_filesz) {
-
-				if (shdr.sh_size == 0)
-					continue;
-
+			if (shdr.sh_size != 0 && shdr.sh_type != SHT_NOBITS && (shdr.sh_flags & SHF_ALLOC) &&
+			    phdr.p_offset <= shdr.sh_offset && shdr.sh_offset < phdr.p_offset + phdr.p_filesz)
+			{
 				sh_paddr = phdr.p_paddr + shdr.sh_offset - phdr.p_offset;
 
-#if 0
+#if DBG
 				fprintf (stderr, "\tsize %08x rom %08x exec %08x %s\n",
 					 (uint32_t) shdr.sh_size,
 					 (uint32_t) sh_paddr,
