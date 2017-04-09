@@ -24,12 +24,12 @@
 
 #include <ao_flash_stm_pins.h>
 
-/* Companion port cs_companion0 PB6 */
+/* MP switch, gpioc 9 */
 
 #define AO_BOOT_PIN			1
-#define AO_BOOT_APPLICATION_GPIO	stm_gpiob
-#define AO_BOOT_APPLICATION_PIN		0
+#define AO_BOOT_APPLICATION_GPIO	stm_gpioc
+#define AO_BOOT_APPLICATION_PIN		9
 #define AO_BOOT_APPLICATION_VALUE	1
-#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_UP
+#define AO_BOOT_APPLICATION_MODE	0
 
 #endif /* _AO_PINS_H_ */
