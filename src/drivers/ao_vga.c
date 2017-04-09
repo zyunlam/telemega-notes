@@ -139,13 +139,13 @@ ao_vga_init(void)
 			(0 << STM_SPI_CR1_CRCEN) |		/* CRC disabled */
 			(0 << STM_SPI_CR1_CRCNEXT) |
 			(1 << STM_SPI_CR1_DFF) |
-			(0 << STM_SPI_CR1_RXONLY) |
+			(0 << STM_SPI_CR1_RXONLY) |		/* transmit, not receive */
 			(0 << STM_SPI_CR1_SSM) |        	/* Software SS handling */
 			(1 << STM_SPI_CR1_SSI) |		/*  ... */
 			(1 << STM_SPI_CR1_LSBFIRST) |		/* Little endian */
 			(1 << STM_SPI_CR1_SPE) |		/* Enable SPI unit */
 			(0 << STM_SPI_CR1_BR) |			/* baud rate to pclk/2 */
-			(0 << STM_SPI_CR1_MSTR) |
+			(0 << STM_SPI_CR1_MSTR) |		/* slave */
 			(0 << STM_SPI_CR1_CPOL) |		/* Format 0 */
 			(0 << STM_SPI_CR1_CPHA));
 	stm_spi1.cr2 = ((0 << STM_SPI_CR2_TXEIE) |
