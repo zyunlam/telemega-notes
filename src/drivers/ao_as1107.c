@@ -44,8 +44,10 @@ _ao_as1107_setup(void)
 	if (!as1107_configured) {
 		as1107_configured = 1;
 		_ao_as1107_cmd(AO_AS1107_SHUTDOWN, AO_AS1107_SHUTDOWN_SHUTDOWN_RESET);
+		_ao_as1107_cmd(AO_AS1107_SHUTDOWN, AO_AS1107_SHUTDOWN_SHUTDOWN_NOP);
 		_ao_as1107_cmd(AO_AS1107_DECODE_MODE, AO_AS1107_DECODE);
 		_ao_as1107_cmd(AO_AS1107_SCAN_LIMIT, AO_AS1107_NUM_DIGITS - 1);
+		_ao_as1107_cmd(AO_AS1107_INTENSITY, 0x0f);
 		_ao_as1107_cmd(AO_AS1107_FEATURE,
 			       (0 << AO_AS1107_FEATURE_CLK_EN) |
 			       (0 << AO_AS1107_FEATURE_REG_RES) |
@@ -55,6 +57,7 @@ _ao_as1107_setup(void)
 			       (0 << AO_AS1107_FEATURE_BLINK_FREQ) |
 			       (0 << AO_AS1107_FEATURE_SYNC) |
 			       (0 << AO_AS1107_FEATURE_BLINK_START));
+		_ao_as1107_cmd(AO_AS1107_SHUTDOWN, AO_AS1107_SHUTDOWN_NORMAL_NOP);
 	}
 }
 
