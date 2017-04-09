@@ -19,6 +19,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "ao-hex.h"
 #include "ao-elf.h"
 #include "ao-verbose.h"
