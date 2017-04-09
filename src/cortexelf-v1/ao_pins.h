@@ -90,12 +90,12 @@
 #define HAS_SPI_2		1
 #define SPI_2_PB13_PB14_PB15	0
 #define SPI_2_PD1_PD3_PD4	1	/* LED displays, microSD */
-#define SPI_2_OSPEEDR		STM_OSPEEDR_10MHz
+#define SPI_2_OSPEEDR		STM_OSPEEDR_40MHz
 
 #define SPI_2_PORT		(&stm_gpiod)
-#define SPI_2_SCK_PIN		1
-#define SPI_2_MISO_PIN		3
-#define SPI_2_MOSI_PIN		4
+//#define SPI_2_SCK_PIN		1
+//#define SPI_2_MISO_PIN		3
+//#define SPI_2_MOSI_PIN		4
 
 #define HAS_I2C_1		0
 #define I2C_1_PB8_PB9		0
@@ -125,6 +125,8 @@
 #define AO_SDCARD_SPI_MISO_PIN	3
 #define AO_SDCARD_SPI_MOSI_PIN	4
 
+/* VGA */
+#define STM_DMA1_3_STOLEN	1
 /* Buttons */
 
 #define AO_EVENT		1
