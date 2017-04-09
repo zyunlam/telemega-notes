@@ -275,7 +275,7 @@ main(void)
 	ao_button_init();
 
 	ao_as1107_init();
-
+	ao_matrix_init();
 	ao_1802_init();
 
 	ao_hex_init();
