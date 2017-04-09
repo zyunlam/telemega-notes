@@ -89,9 +89,9 @@ _ao_matrix_read_cols(void)
 static uint8_t
 _ao_matrix_read(uint8_t row) {
 	uint8_t	state;
-	_ao_matrix_drive_row(row, 1);
-	state = _ao_matrix_read_cols();
 	_ao_matrix_drive_row(row, 0);
+	state = _ao_matrix_read_cols();
+	_ao_matrix_drive_row(row, 1);
 	return state;
 }
 
