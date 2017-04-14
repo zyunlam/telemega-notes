@@ -73,14 +73,14 @@ static void
 TPB_rising(void)
 {
 	ADDRESS = (ADDRESS & 0xff00) | MA();
+	if (MWR() == 0 || MRD() == 0)
+		DATA = BUS();
 	ao_wakeup(&ADDRESS);
 }
 
 static void
 TPB_falling(void)
 {
-	DATA = BUS();
-	ao_wakeup(&ADDRESS);
 }
 
 uint8_t
