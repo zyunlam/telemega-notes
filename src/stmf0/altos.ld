@@ -55,10 +55,16 @@ SECTIONS {
 		ao_product.o(.romconfig*)
 
 		*(.text*)	/* Executable code */
-		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
-		*(.rodata*)	/* Constants */
-
 	} > rom
+
+	.ARM.exidx : {
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+	} > rom
+
+	.rodata : {
+		*(.rodata*)	/* Constants */
+	} > rom
+
 	__text_end__ = .;
 
 	/* Boot data which must live at the start of ram so that
