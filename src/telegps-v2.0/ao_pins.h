@@ -26,6 +26,7 @@
 
 #define LEDS_AVAILABLE  (AO_LED_RED)
 
+#define IS_FLASH_LOADER		0
 #define HAS_BEEP 	       0
 
 #define AO_HSE                  32000000
@@ -120,6 +121,7 @@ struct ao_adc {
 #define HAS_LOG			1
 #define FLIGHT_LOG_APPEND	1
 #define HAS_TRACKER		1
+#define LOG_ADC			0
 
 #define AO_CONFIG_DEFAULT_APRS_INTERVAL		0
 #define AO_CONFIG_DEFAULT_RADIO_POWER		0xc0

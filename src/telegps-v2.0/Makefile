@@ -13,8 +13,7 @@ INC = \
 	ao_product.h \
 	ao_tracker.h \
 	ao_task.h \
-	ao_whiten.h \
-	ao_cc115l.h \
+	ao_cc1200.h \
 	ao_fec.h \
 	stm32f0.h \
 	Makefile
@@ -24,6 +23,7 @@ ALTOS_SRC = \
 	ao_adc_stm.c \
 	ao_led.c \
 	ao_interrupt.c \
+	ao_boot_chain.c \
 	ao_product.c \
 	ao_romconfig.c \
 	ao_cmd.c \
@@ -42,7 +42,6 @@ ALTOS_SRC = \
 	ao_gps_ublox.c \
 	ao_gps_show.c \
 	ao_cc1200.c \
-	ao_fec_tx.c \
 	ao_aprs.c \
 	ao_tracker.c \
 	ao_telemetry.c \
@@ -71,10 +70,8 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-LDFLAGS=-L../stmf0 -Wl,-Taltos.ld
-
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 
