@@ -175,13 +175,18 @@
 #define AO_PAD_ADC_PYRO		2
 #define AO_PAD_ADC_BATT		8
 
+#define AO_PAD_ADC_THRUST	3
+#define AO_PAD_ADC_PRESSURE	18
+
 #define AO_ADC_FIRST_PIN	0
 
-#define AO_NUM_ADC		3
+#define AO_NUM_ADC		5
 
 #define AO_ADC_SQ1		AO_PAD_ADC_0
 #define AO_ADC_SQ2		AO_PAD_ADC_PYRO
 #define AO_ADC_SQ3		AO_PAD_ADC_BATT
+#define AO_ADC_SQ4		AO_PAD_ADC_THRUST
+#define AO_ADC_SQ5		AO_PAD_ADC_PRESSURE
 
 #define AO_PYRO_R_PYRO_SENSE	200
 #define AO_PYRO_R_SENSE_GND	22
@@ -196,17 +201,23 @@ struct ao_adc {
 	int16_t		sense[AO_PAD_NUM];
 	int16_t		pyro;
 	int16_t		batt;
+	int16_t		thrust;
+	int16_t		pressure;
 };
 
 #define AO_ADC_DUMP(p)							\
-	printf ("tick: %5u 0: %5d pyro: %5d batt %5d\n", \
+	printf ("tick: %5u 0: %5d pyro: %5d batt %5d thrust %5d pressure %5d\n", \
 		(p)->tick,						\
 		(p)->adc.sense[0],					\
 		(p)->adc.pyro,						\
-		(p)->adc.batt)
+		(p)->adc.batt,						\
+		(p)->adc.thrust,					\
+		(p)->adc.pressure)
 
 #define AO_ADC_PINS	((1 << AO_PAD_ADC_0) | \
 			 (1 << AO_PAD_ADC_PYRO) | \
-			 (1 << AO_PAD_ADC_BATT))
+			 (1 << AO_PAD_ADC_BATT) | \
+			 (1 << AO_PAD_ADC_THRUST) | \
+			 (1 << AO_PAD_ADC_PRESSURE))
 
 #endif /* _AO_PINS_H_ */
