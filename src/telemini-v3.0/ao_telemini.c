@@ -23,8 +23,6 @@ main(void)
 {
 	ao_clock_init();
 	ao_task_init();
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_GREEN);
 	ao_timer_init();
 
 	ao_dma_init();
@@ -38,6 +36,9 @@ main(void)
 #endif
 #if HAS_SERIAL_1
 	ao_serial_init();
+#endif
+#if HAS_USB
+	ao_usb_init();
 #endif
 	ao_cmd_init();
 

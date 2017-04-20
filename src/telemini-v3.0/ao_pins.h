@@ -18,11 +18,8 @@
 #define HAS_BEEP		1
 #define HAS_SERIAL_1		0
 #define HAS_BATTERY_REPORT	1
-#define HAS_BOOT_LOADER		0
 
 #define AO_STACK_SIZE	448
-
-#define RELOCATE_INTERRUPT 0
 
 #define IS_FLASH_LOADER	0
 
@@ -42,9 +39,10 @@
 #define AO_APB_PRESCALER	1
 #define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
 
-#define HAS_USB			0
+#define HAS_USB			1
 #define AO_USB_DIRECTIO		0
-#define AO_PA11_PA12_RMP	0
+#define AO_PA11_PA12_RMP	1
+#define AO_USB_FORCE_IDLE	1
 
 #define PACKET_HAS_SLAVE	1
 
@@ -66,29 +64,13 @@
 #define USE_INTERNAL_FLASH	0
 #define HAS_IGNITE		1
 #define HAS_IGNITE_REPORT	1
+#define AO_SMALL_ALTITUDE_TABLE	1
 
 /* Beeper is on Tim1 CH3 */
-#define BEEPER_CHANNEL		3
-#define BEEPER_TIMER		1
+#define BEEPER_CHANNEL		4
+#define BEEPER_TIMER		2
 #define BEEPER_PORT		(&stm_gpioa)
-#define BEEPER_PIN		10
-
-/* LED */
-#define LED_PORT_ENABLE		STM_RCC_AHBENR_IOPAEN
-#define LED_PORT		(&stm_gpioa)
-#define LED_PIN_GREEN		15
-#define AO_LED_GREEN		(1 << 15)
-#define AO_LED_PANIC		AO_LED_GREEN
-#define AO_LED_LOW		AO_LED_GREEN
-#define AO_LED_MID		AO_LED_GREEN
-
-#define LEDS_AVAILABLE		AO_LED_GREEN
-
-/* Serial. Hooked to the spare pin (PA9/19) and the beeper (PA10/20) */
-
-#define SERIAL_1_PA9_PA10	1
-#define USE_SERIAL_1_STDIN	HAS_SERIAL_1
-#define DELAY_SERIAL_1_STDIN	0
+#define BEEPER_PIN		3
 
 /* SPI */
 
@@ -101,16 +83,16 @@
 
 #define M25_MAX_CHIPS		1
 #define AO_M25_SPI_CS_PORT	(&stm_gpioa)
-#define AO_M25_SPI_CS_MASK	(1 << 3)
+#define AO_M25_SPI_CS_MASK	(1 << 4)
 #define AO_M25_SPI_BUS		AO_SPI_1_PA5_PA6_PA7
 
 /* MS5607 */
 
 #define HAS_MS5607		1
 #define HAS_MS5611		0
-#define AO_MS5607_PRIVATE_PINS	0
+#define AO_MS5607_PRIVATE_PINS	1
 #define AO_MS5607_CS_PORT	(&stm_gpioa)
-#define AO_MS5607_CS_PIN	4
+#define AO_MS5607_CS_PIN	15
 #define AO_MS5607_CS_MASK	(1 << AO_MS5607_CS_PIN)
 #define AO_MS5607_MISO_PORT	(&stm_gpiob)
 #define AO_MS5607_MISO_PIN	4
