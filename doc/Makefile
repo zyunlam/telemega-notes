@@ -89,7 +89,8 @@ IMAGES=\
 	telemini-v1.svg \
 	telemini-v1-top.jpg \
 	telemini-v3.svg \
-	telemini-v3.jpg \
+	telemini-v3.0-top.jpg \
+	telemini-v3.0-bottom.jpg \
 	altusmetrum-oneline.svg \
 	telegps-oneline.svg \
 	micropeak-oneline.svg
