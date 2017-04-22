@@ -6,7 +6,6 @@
 	apogee and main ejection charges.  All Altus Metrum products are
 	designed for use with single-cell batteries with 3.7 volts
 	nominal.
-	ifdef::telemini[TeleMini v2.0 and]
 	EasyMini may also be used with other
 	batteries as long as they supply between 4 and 12 volts.
 

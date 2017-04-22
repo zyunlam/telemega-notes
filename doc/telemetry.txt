@@ -44,18 +44,18 @@
 		which device has transmitted the packet, when it was transmitted
 		and what the rest of the packet contains.
 
-	=== TeleMetrum v1.x, TeleMini and TeleNano Sensor Data
+	=== TeleMetrum v1.x, TeleMini v1.0 and TeleNano Sensor Data
 
 		.Sensor Packet Type
 		[options="border",cols="1,3"]
 		|====
 		|Type	|Description
 		|0x01	|TeleMetrum v1.x Sensor Data
-		|0x02	|TeleMini Sensor Data
+		|0x02	|TeleMini v1.0 Sensor Data
 		|0x03	|TeleNano Sensor Data
 		|====
 
-		TeleMetrum v1.x, TeleMini and TeleNano share this same
+		TeleMetrum v1.x, TeleMini v1.0 and TeleNano share this same
 		packet format for sensor data. Each uses a distinct
 		packet type so that the receiver knows which data
 		values are valid and which are undefined.
@@ -212,6 +212,41 @@
 		|18	|pad[14]	|pad bytes	|
 		|32
 		|====
+
+	=== TeleMini v3.0 Sensor Data
+	
+		.Sensor Packet Type
+		[options="border",cols="1,3"]
+		|====
+		|Type	|Description
+		|0x11	|TeleMini v3.0 Sensor Data
+		|====
+
+		TeleMini v3.0 uses this
+		packet format for sensor data.
+
+		Sensor Data packets are transmitted once per second on
+		the ground, 10 times per second during ascent and once
+		per second during descent and landing
+
+		.Sensor Packet Contents
+		[options="border",cols="2,3,3,9"]
+		|====
+		|Offset	|Data Type	|Name		|Description
+		|5	|uint8_t	|state		|Flight state
+		|6	|int16_t	|v_batt		|battery voltage
+		|8	|int16_t	|sense_a	|apogee continuity sense
+		|10	|int16_t	|sense_m	|main continuity sense
+		|12	|int32_t	|pres		|pressure sensor (Pa * 10)
+		|16	|int16_t	|temp		|temperature sensor (°C * 100)
+		|18	|int16_t	|acceleration	|m/s² * 16
+		|20	|int16_t	|speed		|m/s * 16
+		|22	|int16_t	|height		|m
+		|24	|int16_t	|ground_pres	|Average barometer reading on ground
+		|28	|pad[4]		|pad bytes	|
+		|32
+		|====
+
 
 	=== Configuration Data
 
