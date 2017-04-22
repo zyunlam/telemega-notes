@@ -43,6 +43,8 @@ ALTOS_SRC = \
 	ao_spi_stm.c \
 	ao_beep_stm.c \
 	ao_eeprom_stm.c \
+	ao_storage.c \
+	ao_m25.c \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
 	ao_cc1200.c \

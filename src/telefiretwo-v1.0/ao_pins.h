@@ -100,6 +100,15 @@
 #define FAST_TIMER_FREQ		10000	/* .1ms for debouncing */
 
 /*
+ * SPI Flash memory
+ */
+
+#define M25_MAX_CHIPS           1
+#define AO_M25_SPI_CS_PORT      (&stm_gpioa)
+#define AO_M25_SPI_CS_MASK      (1 << 15)
+#define AO_M25_SPI_BUS          AO_SPI_2_PB13_PB14_PB15
+
+/*
  * Radio is a cc1200 connected via SPI
  */
 

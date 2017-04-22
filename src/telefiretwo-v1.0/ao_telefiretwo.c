@@ -20,6 +20,7 @@
 #include <ao_pad.h>
 #include <ao_exti.h>
 #include <ao_radio_cmac_cmd.h>
+#include <ao_eeprom.h>
 
 void
 main(void)
@@ -40,6 +41,7 @@ main(void)
 	ao_adc_init();
 
 	ao_eeprom_init();
+	ao_storage_init();
 
 	ao_radio_init();
 
