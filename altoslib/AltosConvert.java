@@ -366,6 +366,10 @@ public class AltosConvert {
 		return (c - 32) * 5/9;
 	}
 
+	public static double psi_to_pa(double psi) {
+		return psi * 6894.76;
+	}
+
 	public static boolean imperial_units = false;
 
 	public static AltosDistance distance = new AltosDistance();

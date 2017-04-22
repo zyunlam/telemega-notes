@@ -49,6 +49,7 @@ altoslib_JAVA = \
 	AltosEepromMini.java \
 	AltosEepromGPS.java \
 	AltosEepromMonitor.java \
+	AltosEepromFireTwo.java \
 	AltosFile.java \
 	AltosFlash.java \
 	AltosFlashListener.java \
