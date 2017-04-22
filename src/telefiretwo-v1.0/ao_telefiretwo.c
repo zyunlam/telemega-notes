@@ -17,10 +17,24 @@
  */
 
 #include <ao.h>
+#include <ao_log.h>
 #include <ao_pad.h>
 #include <ao_exti.h>
 #include <ao_radio_cmac_cmd.h>
 #include <ao_eeprom.h>
+
+static void
+set_logging(void)
+{
+	ao_cmd_hex();
+	ao_log_running = ao_cmd_lex_i;
+	ao_wakeup(&ao_log_running);
+}
+
+__code struct ao_cmds ao_firetwo_cmds[] = {
+        { set_logging,  "L <0 off, 1 on>\0Log sensors to flash" },
+        { 0,    NULL },
+};
 
 void
 main(void)
@@ -36,12 +50,14 @@ main(void)
 	ao_dma_init();
 	ao_exti_init();
 
+	ao_cmd_register(&ao_firetwo_cmds[0]);
 	ao_cmd_init();
 
 	ao_adc_init();
 
 	ao_eeprom_init();
 	ao_storage_init();
+	ao_log_init();
 
 	ao_radio_init();
 
