@@ -4,7 +4,7 @@ endif
 
 include $(TOPDIR)/Makedefs
 
-vpath % $(TOPDIR)/stmf0:$(TOPDIR)/product:$(TOPDIR)/drivers:$(TOPDIR)/kernel:$(TOPDIR)/util:$(TOPDIR)/kalman:$(TOPDIR/aes):$(TOPDIR):$(TOPDIR)/math:$(TOPDIR)/lisp
+vpath % $(TOPDIR)/stmf0:$(TOPDIR)/product:$(TOPDIR)/drivers:$(TOPDIR)/kernel:$(TOPDIR)/util:$(TOPDIR)/kalman:$(TOPDIR)/aes:$(TOPDIR):$(TOPDIR)/math:$(TOPDIR)/lisp
 vpath make-altitude $(TOPDIR)/util
 vpath make-kalman $(TOPDIR)/util
 vpath kalman.5c $(TOPDIR)/kalman
