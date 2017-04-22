@@ -55,6 +55,9 @@ disable(void)
 	timer.bdtr = 0;
 #endif
 	stm_rcc_enr &= ~(1 << STM_RCC_TIMER);
+
+	/* Disconnect the timer from the pin */
+	stm_afr_set(BEEPER_PORT, BEEPER_PIN, STM_AFR_NONE);
 }
 
 void
@@ -361,6 +364,9 @@ ao_beep(uint8_t beep)
 
 		/* Update the values */
 		timer.egr = (1 << STM_TIM23_EGR_UG);
+
+		/* Hook the timer up to the beeper pin */
+		stm_afr_set(BEEPER_PORT, BEEPER_PIN, STM_AFR_AF2);
 #endif
 	}
 }
@@ -376,8 +382,7 @@ ao_beep_for(uint8_t beep, uint16_t ticks) __reentrant
 void
 ao_beep_init(void)
 {
-	ao_enable_port(BEEPER_PORT);
-	stm_afr_set(BEEPER_PORT, BEEPER_PIN, STM_AFR_AF2);
+	ao_enable_output(BEEPER_PORT, BEEPER_PIN, BEEPER, 0);
 
 	/* Leave the timer off until requested */
 	stm_rcc_enr &= ~(1 << STM_RCC_TIMER);
