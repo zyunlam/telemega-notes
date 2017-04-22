@@ -52,6 +52,7 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELEMEGA		10	/* 32 byte typed telemega records with 32 bit gyro cal */
 #define AO_LOG_FORMAT_DETHERM		11	/* 16-byte MS5607 baro only, no ADC */
 #define AO_LOG_FORMAT_TELEMINI3		12	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
+#define AO_LOG_FORMAT_TELEFIRETWO	13	/* 32-byte test stand data */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 extern __code uint8_t ao_log_format;
@@ -299,6 +300,32 @@ struct ao_log_mega {
 #define AO_LOG_MEGA_SET_GPS_ALTITUDE(l,a)	(((l)->u.gps.mode |= AO_GPS_MODE_ALTITUDE_24), \
 						 ((l)->u.gps.altitude_high = (a) >> 16), \
 						 (l)->u.gps.altitude_low = (a))
+
+struct ao_log_firetwo {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;		/* 4 */
+			uint16_t	idle_pressure;	/* 6 */
+			uint16_t	idle_thrust;	/* 8 */
+		} flight;	/* 16 */
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;		/* 4 */
+			uint16_t	reason;		/* 6 */
+		} state;	/* 8 */
+		/* AO_LOG_SENSOR */
+		struct {
+			uint16_t	pressure;	/* 4 */
+			uint16_t	thrust;		/* 6 */
+			uint16_t	thermistor[4];	/* 8 */
+		} sensor;	/* 24 */
+		uint8_t		align[28];		/* 4 */
+	} u;	/* 32 */
+};
 
 struct ao_log_metrum {
 	char			type;			/* 0 */
