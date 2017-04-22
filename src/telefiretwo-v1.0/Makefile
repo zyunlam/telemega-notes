@@ -55,7 +55,7 @@ ALTOS_SRC = \
 PRODUCT_SRC = \
 	ao_telefiretwo.c
 
-PRODUCT=TeleFire-v1.0
+PRODUCT=TeleFireTwo-v1.0
 PRODUCT_DEF=-DTELEFIRETWO_V_1_0
 IDPRODUCT=0x000f
 
