@@ -1,3 +1,4 @@
 pdclib-use-target-ar.diff
 need-more-static.diff
 fix-toolchain-insanity.diff
+linker-n+openocd.diff

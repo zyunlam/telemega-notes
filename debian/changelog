@@ -1,3 +1,14 @@
+altos (1.6.8-5) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altos/lpc,altos/stmf0: Use -n flag to work around link editor issue,
+    closes: #860601
+  * ao-elftohex: Add conditions for skipping ELF sections
+  * ao-tools/ao-flash-lpc: Adapt to current openocd LPC support
+  * altos/telegps: Inherit LDFLAGS from lpc make specification
+
+ -- Bdale Garbee <bdale@gag.com>  Sat, 22 Apr 2017 12:07:57 -0600
+
 altos (1.6.8-4) unstable; urgency=medium
 
   [ Keith Packard ]

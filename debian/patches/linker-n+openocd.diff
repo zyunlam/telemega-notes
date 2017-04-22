@@ -1,0 +1,133 @@
+diff --git a/ao-tools/ao-elftohex/ao-elftohex.c b/ao-tools/ao-elftohex/ao-elftohex.c
+index 265908c5..f3ab0c38 100644
+--- a/ao-tools/ao-elftohex/ao-elftohex.c
++++ b/ao-tools/ao-elftohex/ao-elftohex.c
+@@ -19,6 +19,7 @@
+ #include <getopt.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
+ #include "ao-hex.h"
+ #include "ao-elf.h"
+ #include "ao-verbose.h"
+diff --git a/ao-tools/ao-flash/ao-flash-lpc b/ao-tools/ao-flash/ao-flash-lpc
+index 7ac5b523..9e1d1cdb 100755
+--- a/ao-tools/ao-flash/ao-flash-lpc
++++ b/ao-tools/ao-flash/ao-flash-lpc
+@@ -8,9 +8,9 @@ esac
+ cmds=/tmp/flash$$
+ trap "rm $cmds" 0 1 15
+ file="$1"
+-echo "program $file verify reset" > $cmds
++echo "program $file reset" > $cmds
+ openocd \
+ 	-f interface/stlink-v2.cfg \
+-	-f target/lpc11u14.cfg \
++	-f target/lpc11xx.cfg \
+ 	-f $cmds \
+ 	-c shutdown
+diff --git a/ao-tools/lib/ao-elf.c b/ao-tools/lib/ao-elf.c
+index c44102f8..cc127b62 100644
+--- a/ao-tools/lib/ao-elf.c
++++ b/ao-tools/lib/ao-elf.c
+@@ -186,6 +186,7 @@ load_write(struct ao_hex_image *from, uint32_t address, uint32_t length, void *d
+ 	return new;
+ }
+ 
++#define DBG 0
+ /*
+  * Construct a large in-memory block for all
+  * of the loaded sections of the program
+@@ -202,7 +203,7 @@ get_load(Elf *e)
+ 	GElf_Phdr	phdr;
+ 	GElf_Addr	sh_paddr;
+ 	struct ao_hex_image	*load = NULL;
+-#if 0
++#if DBG
+ 	char		*section_name;
+ #endif
+ 	size_t		nshdr;
+@@ -231,7 +232,7 @@ get_load(Elf *e)
+ 
+ 		/* Get the associated file section */
+ 
+-#if 0
++#if DBG
+ 		fprintf (stderr, "offset %08x vaddr %08x paddr %08x filesz %08x memsz %08x\n",
+ 			 (uint32_t) phdr.p_offset,
+ 			 (uint32_t) phdr.p_vaddr,
+@@ -252,18 +253,16 @@ get_load(Elf *e)
+ 				abort();
+ 			}
+ 
+-#if 0
++#if DBG
+ 			section_name = elf_strptr(e, shstrndx, shdr.sh_name);
+ #endif
+ 
+-			if (phdr.p_offset <= shdr.sh_offset && shdr.sh_offset < phdr.p_offset + phdr.p_filesz) {
+-
+-				if (shdr.sh_size == 0)
+-					continue;
+-
++			if (shdr.sh_size != 0 && shdr.sh_type != SHT_NOBITS && (shdr.sh_flags & SHF_ALLOC) &&
++			    phdr.p_offset <= shdr.sh_offset && shdr.sh_offset < phdr.p_offset + phdr.p_filesz)
++			{
+ 				sh_paddr = phdr.p_paddr + shdr.sh_offset - phdr.p_offset;
+ 
+-#if 0
++#if DBG
+ 				fprintf (stderr, "\tsize %08x rom %08x exec %08x %s\n",
+ 					 (uint32_t) shdr.sh_size,
+ 					 (uint32_t) sh_paddr,
+diff --git a/src/lpc/Makefile.defs b/src/lpc/Makefile.defs
+index b6d739c2..5bb8133d 100644
+--- a/src/lpc/Makefile.defs
++++ b/src/lpc/Makefile.defs
+@@ -5,7 +5,7 @@ endif
+ include $(TOPDIR)/lpc/Makefile-lpc.defs
+ include $(TOPDIR)/Makedefs
+ 
+-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/lpc -Wl,-Taltos.ld
++LDFLAGS=$(CFLAGS) -L$(TOPDIR)/lpc -Wl,-Taltos.ld -n
+ 
+ ao_serial_lpc.h: $(TOPDIR)/lpc/baud_rate ao_pins.h
+ 	nickle $(TOPDIR)/lpc/baud_rate `awk '/AO_LPC_CLKOUT/{print $$3}' ao_pins.h` > $@
+diff --git a/src/stmf0/Makefile.defs b/src/stmf0/Makefile.defs
+index a1d93eb5..3da42874 100644
+--- a/src/stmf0/Makefile.defs
++++ b/src/stmf0/Makefile.defs
+@@ -4,6 +4,6 @@ endif
+ 
+ include $(TOPDIR)/stmf0/Makefile-stmf0.defs
+ 
+-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Taltos.ld
++LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Taltos.ld -n
+ 
+ .DEFAULT_GOAL=all
+diff --git a/src/telegps-v0.3/Makefile b/src/telegps-v0.3/Makefile
+index 1eaf7c47..834609d9 100644
+--- a/src/telegps-v0.3/Makefile
++++ b/src/telegps-v0.3/Makefile
+@@ -67,8 +67,6 @@ OBJ=$(SRC:.c=.o)
+ 
+ all: $(PROG) $(HEX)
+ 
+-LDFLAGS=-L../lpc -Wl,-Taltos.ld
+-
+ $(PROG): Makefile $(OBJ) altos.ld
+ 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+ 
+diff --git a/src/telegps-v1.0/Makefile b/src/telegps-v1.0/Makefile
+index bd13cfe7..76dc0371 100644
+--- a/src/telegps-v1.0/Makefile
++++ b/src/telegps-v1.0/Makefile
+@@ -70,8 +70,6 @@ OBJ=$(SRC:.c=.o)
+ 
+ all: $(PROG) $(HEX)
+ 
+-LDFLAGS=-L../lpc -Wl,-Taltos.ld
+-
+ $(PROG): Makefile $(OBJ) altos.ld
+ 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+ 
