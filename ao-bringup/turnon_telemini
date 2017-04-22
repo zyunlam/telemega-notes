@@ -1,59 +1,76 @@
 #!/bin/sh
 
-if [ -x ../ao-tools/ao-load/ao-load ]; then
-	AOLOAD=../ao-tools/ao-load/ao-load
-elif [ -x /usr/bin/ao-load ]; then
-	AOLOAD=/usr/bin/ao-load
+if [ -x /usr/bin/dfu-util ]; then
+    DFU_UTIL=/usr/bin/dfu-util
 else
-	echo "Can't find ao-load!  Aborting."
+    echo "Can't find dfu-util! Aborting."
+    exit 1
+fi
+
+if [ -x /usr/bin/ao-usbload ]; then
+	USBLOAD=/usr/bin/ao-usbload
+else
+	echo "Can't find ao-usbload!  Aborting."
 	exit 1
 fi
 
-if [ -x ../ao-tools/ao-rawload/ao-rawload ]; then
-	RAWLOAD=../ao-tools/ao-rawload/ao-rawload
-elif [ -x /usr/bin/ao-rawload ]; then
-	RAWLOAD=/usr/bin/ao-rawload
-else
-	echo "Can't find ao-rawload!  Aborting."
-	exit 1
-fi
+VERSION=3.0
+PRODUCT=TeleMini
 
-VERSION=1.0
-
-echo "TeleMini v$VERSION Turn-On and Calibration Program"
-echo "Copyright 2011 by Bdale Garbee.  Released under GPL v2"
+echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+echo "Copyright 2017 by Keith Packard.  Released under GPL v2 or later"
 echo
 echo "Expectations:"
-echo "\tTeleMini v$VERSION powered from LiPo"
-echo "\t\twith TeleDongle (on /dev/ttyACM0) cabled to debug header"
-echo "\t\twith frequency counter able to sample RF output"
+echo "\t$PRODUCT v$VERSION powered from USB"
 echo
-echo -n "TeleMini serial number: "
-read SERIAL
+echo -n "$PRODUCT-$VERSION serial number: "
 
-echo $RAWLOAD
-
-case $USER in
-    bdale)
-	programmer=100
+case $# in
+    1)
+	SERIAL="$1"
+	echo "$PRODUCT-$VERSION serial number: $SERIAL" 
 	;;
-    keithp)
-	programmer=186
+    0)
+	echo -n "$PRODUCT-$VERSION serial number: "
+	read SERIAL
+	;;
+    *)
+	echo "Usage: $0 <serial-number>" 1>&2
+	exit 1;
 	;;
 esac
 
-$RAWLOAD -D $programmer -r ao_led_blink.ihx
-echo "LEDs should be blinking"
-sleep 5
+FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telemini-v$VERSION-altos-flash-*.bin
+ALTOS_FILE=~/altusmetrumllc/Binaries/telemini-v$VERSION-*.elf
+#FLASH_FILE=../src/telemini-v3.0/flash-loader/telemini-v$VERSION-altos-flash-*.bin
+#ALTOS_FILE=../src/telemini-v3.0/telemini-v$VERSION-*.elf
 
-$RAWLOAD -D $programmer -r ao_radio_xmit.ihx
-echo -n "Generating RF carrier.  Please enter measured frequency: "
-read FREQ
+$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
 
-CAL_VALUE=`nickle -e "floor(434.55 / $FREQ * 1186611 + 0.5)"`
+sleep 2
 
-echo "Programming flash with cal value " $CAL_VALUE
-$AOLOAD -D $programmer --cal $CAL_VALUE ~/altusmetrumllc/Binaries/telemini-v$VERSION-*.ihx $SERIAL
+$USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 
-echo "Serial number "$SERIAL" programmed with RF cal value "$CAL_VALUE
-echo "Unplug and replug USB, cu to the board, confirm freq and record power"
+sleep 3
+
+dev=`ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
+
+case "$dev" in
+/dev/tty*)
+	echo "$PRODUCT found on $dev"
+	;;
+*)
+	echo 'No '"$PRODUCT"'-v'"$VERSION"' found'
+	exit 1
+	;;
+esac
+
+echo 'E 0' > $dev
+
+SERIAL=$SERIAL ./cal-freq $dev
+
+echo 'E 1' > $dev
+
+./test-telemini
+
+exit $?
