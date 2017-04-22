@@ -75,7 +75,9 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;
 void
 ao_log(void)
 {
-	__pdata uint16_t	next_sensor, next_other;
+	uint16_t ao_idle_pressure = 0;		// write code to capture pre-test values someday
+	uint16_t ao_idle_thrust = 0;
+	uint16_t ao_flight_state = ao_flight_startup;
 
 	ao_storage_setup();
 
@@ -84,37 +86,31 @@ ao_log(void)
 	while (!ao_log_running)
 		ao_sleep(&ao_log_running);
 
-#if HAS_FLIGHT
 	log.type = AO_LOG_FLIGHT;
-	log.tick = ao_sample_tick;
+	log.tick = ao_time();
 	log.u.flight.idle_pressure = ao_idle_pressure;
 	log.u.flight.idle_thrust = ao_idle_thrust;
 	log.u.flight.flight = ao_flight_number;
 	ao_log_firetwo(&log);
-#endif
 
 	/* Write the whole contents of the ring to the log
 	 * when starting up.
 	 */
 	ao_log_data_pos = ao_data_ring_next(ao_data_head);
-	next_other = next_sensor = ao_data_ring[ao_log_data_pos].tick;
 	ao_log_state = ao_flight_startup;
 	for (;;) {
 		/* Write samples to EEPROM */
 		while (ao_log_data_pos != ao_data_head) {
 			log.tick = ao_data_ring[ao_log_data_pos].tick;
-			if ((int16_t) (log.tick - next_sensor) >= 0) {
-				log.type = AO_LOG_SENSOR;
-				log.u.sensor.pressure = ao_data_ring[ao_log_data_pos].sensor.pressure;
-				log.u.sensor.thrust = ao_data_ring[ao_log_data_pos].sensor.thrust;
-				for (i = 0; i < 4; i++) {
-					log.u.sensor.thermistor[i] = ao_data_ring[ao_log_data_pos].sensor.thermistor[i];
-				}
-				ao_log_firetwo(&log);
-			}
+			log.type = AO_LOG_SENSOR;
+			log.u.sensor.pressure = ao_data_ring[ao_log_data_pos].adc.pressure;
+			log.u.sensor.thrust = ao_data_ring[ao_log_data_pos].adc.thrust;
+//			for (i = 0; i < 4; i++) {
+//				log.u.sensor.thermistor[i] = ao_data_ring[ao_log_data_pos].sensor.thermistor[i];
+//			}
+			ao_log_firetwo(&log);
 			ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 		}
-#if HAS_FLIGHT
 		/* Write state change to EEPROM */
 		if (ao_flight_state != ao_log_state) {
 			ao_log_state = ao_flight_state;
@@ -127,7 +123,6 @@ ao_log(void)
 			if (ao_log_state == ao_flight_landed)
 				ao_log_stop();
 		}
-#endif
 
 		ao_log_flush();
 
@@ -139,7 +134,6 @@ ao_log(void)
 			ao_sleep(&ao_log_running);
 	}
 }
-#endif
 
 uint16_t
 ao_log_flight(uint8_t slot)

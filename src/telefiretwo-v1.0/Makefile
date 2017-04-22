@@ -7,6 +7,7 @@ include ../stm/Makefile.defs
 INC = \
 	ao.h \
 	ao_pins.h \
+	ao_log.h \
 	ao_arch.h \
 	ao_arch_funcs.h \
 	ao_pad.h \
@@ -52,7 +53,9 @@ ALTOS_SRC = \
 	ao_aes.c \
 	ao_aes_tables.c \
 	ao_pad.c \
-	ao_radio_cmac_cmd.c
+	ao_radio_cmac_cmd.c \
+	ao_log.c \
+	ao_log_firetwo.c
 
 PRODUCT_SRC = \
 	ao_telefiretwo.c
