@@ -66,26 +66,18 @@ PROGNAME=telemini-v3.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
 
-CAL_ELF=$(PROGNAME)-cal-$(VERSION).elf
-CAL_HEX=$(PROGNAME)-cal-$(VERSION).ihx
-
 SRC=$(ALTOS_SRC) ao_telemini.c
 OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Taltos.ld
-
-$(PROG): Makefile $(OBJ) altos-raw.ld
+$(PROG): Makefile $(OBJ)
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-$(CAL_ELF):  Makefile $(OBJ_CAL) altos-raw.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(CAL_ELF) $(OBJ_CAL) $(LIBS)
 
 ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
-$(OBJ) $(OBJ_CAL): $(INC)
+$(OBJ): $(INC)
 
 load: $(PROG)
 	lpc-load $(PROG)
