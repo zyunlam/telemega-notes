@@ -81,58 +81,58 @@ ao_log(void)
 
 	ao_storage_setup();
 
-	ao_log_scan();
-
-	while (!ao_log_running)
-		ao_sleep(&ao_log_running);
-
-	log.type = AO_LOG_FLIGHT;
-	log.tick = ao_time();
-	log.u.flight.idle_pressure = ao_idle_pressure;
-	log.u.flight.idle_thrust = ao_idle_thrust;
-	log.u.flight.flight = ao_flight_number;
-	ao_log_firetwo(&log);
-
-	/* Write the whole contents of the ring to the log
-	 * when starting up.
-	 */
-	ao_log_data_pos = ao_data_ring_next(ao_data_head);
-	ao_log_state = ao_flight_startup;
-	for (;;) {
-		/* Write samples to EEPROM */
-		while (ao_log_data_pos != ao_data_head) {
-			log.tick = ao_data_ring[ao_log_data_pos].tick;
-			log.type = AO_LOG_SENSOR;
-			log.u.sensor.pressure = ao_data_ring[ao_log_data_pos].adc.pressure;
-			log.u.sensor.thrust = ao_data_ring[ao_log_data_pos].adc.thrust;
-//			for (i = 0; i < 4; i++) {
-//				log.u.sensor.thermistor[i] = ao_data_ring[ao_log_data_pos].sensor.thermistor[i];
-//			}
-			ao_log_firetwo(&log);
-			ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
-		}
-		/* Write state change to EEPROM */
-		if (ao_flight_state != ao_log_state) {
-			ao_log_state = ao_flight_state;
-			log.type = AO_LOG_STATE;
-			log.tick = ao_time();
-			log.u.state.state = ao_log_state;
-			log.u.state.reason = 0;
-			ao_log_firetwo(&log);
-
-			if (ao_log_state == ao_flight_landed)
-				ao_log_stop();
-		}
-
-		ao_log_flush();
-
-		/* Wait for a while */
-		ao_delay(AO_MS_TO_TICKS(100));
-
-		/* Stop logging when told to */
+	do {
+		ao_log_scan();
+	
 		while (!ao_log_running)
 			ao_sleep(&ao_log_running);
-	}
+	
+		log.type = AO_LOG_FLIGHT;
+		log.tick = ao_time();
+		log.u.flight.idle_pressure = ao_idle_pressure;
+		log.u.flight.idle_thrust = ao_idle_thrust;
+		log.u.flight.flight = ao_flight_number;
+		ao_log_firetwo(&log);
+
+		/* Write the whole contents of the ring to the log
+	 	* when starting up.
+	 	*/
+		ao_log_data_pos = ao_data_ring_next(ao_data_head);
+		ao_log_state = ao_flight_startup;
+		for (;;) {
+			/* Write samples to EEPROM */
+			while (ao_log_data_pos != ao_data_head) {
+				log.tick = ao_data_ring[ao_log_data_pos].tick;
+				log.type = AO_LOG_SENSOR;
+				log.u.sensor.pressure = ao_data_ring[ao_log_data_pos].adc.pressure;
+				log.u.sensor.thrust = ao_data_ring[ao_log_data_pos].adc.thrust;
+	//			for (i = 0; i < 4; i++) {
+	//				log.u.sensor.thermistor[i] = ao_data_ring[ao_log_data_pos].sensor.thermistor[i];
+	//			}
+				ao_log_firetwo(&log);
+				ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
+			}
+			/* Write state change to EEPROM */
+			if (ao_flight_state != ao_log_state) {
+				ao_log_state = ao_flight_state;
+				log.type = AO_LOG_STATE;
+				log.tick = ao_time();
+				log.u.state.state = ao_log_state;
+				log.u.state.reason = 0;
+				ao_log_firetwo(&log);
+	
+				if (ao_log_state == ao_flight_landed)
+					ao_log_stop();
+			}
+	
+			ao_log_flush();
+
+			if (!ao_log_running) break;
+
+			/* Wait for a while */
+			ao_delay(AO_MS_TO_TICKS(100));
+		}
+	} while (ao_log_running);
 }
 
 uint16_t
