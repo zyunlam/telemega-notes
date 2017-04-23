@@ -661,7 +661,7 @@ ao_lco_monitor(void)
 		       ao_lco_armed, ao_lco_firing);
 
 		if (ao_lco_armed && ao_lco_firing) {
-			ao_lco_ignite();
+			ao_lco_ignite(AO_PAD_FIRE);
 		} else {
 			ao_lco_update();
 			if (ao_lco_armed) {

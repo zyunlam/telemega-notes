@@ -61,9 +61,9 @@ lco_arm(void)
 }
 
 static void
-lco_ignite(void)
+lco_ignite(uint8_t cmd)
 {
-	ao_lco_ignite();
+	ao_lco_ignite(cmd);
 }
 
 static void
@@ -145,7 +145,40 @@ lco_fire_cmd(void) __reentrant
 		secs = 100;
 	for (i = 0; i < secs; i++) {
 		printf("fire %d\n", i); flush();
-		lco_ignite();
+		lco_ignite(AO_PAD_FIRE);
+		ao_delay(AO_MS_TO_TICKS(100));
+	}
+}
+
+static void
+lco_static_cmd(void) __reentrant
+{
+	uint8_t		secs;
+	uint8_t		i;
+	int8_t		r;
+
+	lco_args();
+	ao_cmd_decimal();
+	secs = ao_cmd_lex_i;
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	r = lco_query();
+	if (r != AO_RADIO_CMAC_OK) {
+		printf("query failed %d\n", r);
+		return;
+	}
+
+	for (i = 0; i < 4; i++) {
+		printf("arm %d\n", i); flush();
+		lco_arm();
+	}
+
+	secs = secs * 10 - 5;
+	if (secs > 100)
+		secs = 100;
+	for (i = 0; i < secs; i++) {
+		printf("fire %d\n", i); flush();
+		lco_ignite(AO_PAD_STATIC);
 		ao_delay(AO_MS_TO_TICKS(100));
 	}
 }
@@ -171,12 +204,22 @@ lco_ignite_cmd(void) __reentrant
 	uint8_t i;
 	lco_args();
 	for (i = 0; i < 4; i++)
-		lco_ignite();
+		lco_ignite(AO_PAD_FIRE);
+}
+
+
+static void
+lco_endstatic_cmd(void) __reentrant
+{
+	lco_ignite(AO_PAD_ENDSTATIC);
 }
 
 static __code struct ao_cmds ao_lco_cmds[] = {
 	{ lco_report_cmd,	"l <box> <channel>\0Get remote status" },
 	{ lco_fire_cmd,		"F <box> <channel> <secs>\0Fire remote igniters" },
+	{ lco_fire_cmd,		"F <box> <channel> <secs>\0Fire remote igniters" },
+	{ lco_static_cmd,	"S <box> <channel> <secs>\0Initiate static test" },
+	{ lco_endstatic_cmd,	"D\0End static test (and download someday)" },
 	{ lco_arm_cmd,		"a <box> <channel>\0Arm remote igniter" },
 	{ lco_ignite_cmd,	"i <box> <channel>\0Pulse remote igniter" },
 	{ 0, NULL },
