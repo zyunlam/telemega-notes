@@ -54,6 +54,11 @@ struct ao_pad_query {
  */
 #define AO_PAD_FIRE		3
 
+/* Fire current armed pads for 200ms, no report, logging test stand sensors
+ */
+#define AO_PAD_STATIC		4
+#define AO_PAD_ENDSTATIC	5
+
 #define AO_PAD_FIRE_TIME	AO_MS_TO_TICKS(200)
 
 #define AO_PAD_ARM_STATUS_DISARMED	0
