@@ -856,33 +856,6 @@ struct ao_fifo {
 #include <ao_aes.h>
 #endif
 
-/* ao_launch.c */
-
-struct ao_launch_command {
-	uint16_t	tick;
-	uint16_t	serial;
-	uint8_t		cmd;
-	uint8_t		channel;
-	uint16_t	unused;
-};
-
-#define AO_LAUNCH_QUERY		1
-
-struct ao_launch_query {
-	uint16_t	tick;
-	uint16_t	serial;
-	uint8_t		channel;
-	uint8_t		valid;
-	uint8_t		arm_status;
-	uint8_t		igniter_status;
-};
-
-#define AO_LAUNCH_ARM		2
-#define AO_LAUNCH_FIRE		3
-
-void
-ao_launch_init(void);
-
 /*
  * ao_log_single.c
  */

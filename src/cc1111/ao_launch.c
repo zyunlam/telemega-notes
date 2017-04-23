@@ -17,6 +17,7 @@
  */
 
 #include <ao.h>
+#include <ao_launch.h>
 #include <ao_radio_cmac.h>
 
 __xdata uint16_t ao_launch_ignite;
