@@ -372,7 +372,6 @@ ao_pad(void)
 			ao_pad_arm_time = ao_time();
 			ao_wakeup(&ao_pad_ignite);
 			break;
-		}
 		case AO_PAD_STATIC:
 			if (!ao_pad_armed) {
 				PRINTD ("not armed\n");
@@ -391,7 +390,6 @@ ao_pad(void)
 			ao_pad_arm_time = ao_time();
 			ao_wakeup(&ao_pad_ignite);
 			break;
-		}
 		case AO_PAD_ENDSTATIC:
 #ifdef HAS_LOG
 			ao_log_stop();
