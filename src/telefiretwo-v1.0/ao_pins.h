@@ -32,9 +32,9 @@
 #define HAS_ADC			1
 #define HAS_DBG			0
 #define HAS_EEPROM		1
-#define HAS_LOG			0
+#define HAS_LOG			1
 #define HAS_PAD			1
-#define USE_INTERNAL_FLASH	1
+#define USE_INTERNAL_FLASH	0
 #define IGNITE_ON_P0		0
 #define PACKET_HAS_MASTER	0
 #define PACKET_HAS_SLAVE	0
@@ -69,7 +69,6 @@
 #define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_2
 
 #define HAS_EEPROM		1
-#define USE_INTERNAL_FLASH	1
 #define USE_EEPROM_CONFIG	1
 #define USE_STORAGE_CONFIG	0
 #define HAS_USB			1
