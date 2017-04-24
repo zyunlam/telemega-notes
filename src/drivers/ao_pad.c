@@ -377,7 +377,7 @@ ao_pad(void)
 				PRINTD ("not armed\n");
 				break;
 			}
-#ifdef HAS_LOG
+#if HAS_LOG
 			if (!ao_log_running) ao_log_start();
 #endif
 			if ((uint16_t) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
@@ -391,7 +391,7 @@ ao_pad(void)
 			ao_wakeup(&ao_pad_ignite);
 			break;
 		case AO_PAD_ENDSTATIC:
-#ifdef HAS_LOG
+#if HAS_LOG
 			ao_log_stop();
 #endif
 			break;
