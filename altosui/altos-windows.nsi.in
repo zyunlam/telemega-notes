@@ -148,7 +148,8 @@ Section "Documentation"
 	File "../doc/telemetrum-outline.pdf"
 	File "../doc/telemega-outline.pdf"
 	File "../doc/easymini-outline.pdf"
-	File "../doc/telemini-outline.pdf"
+	File "../doc/telemini-v1-outline.pdf"
+	File "../doc/telemini-v3-outline.pdf"
 SectionEnd
 
 Section "File Associations"
