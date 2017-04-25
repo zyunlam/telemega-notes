@@ -74,7 +74,7 @@ class AltosIdler {
 				AltosSensorEMini.update_state(state, link, config_data);
 				break;
 			case idle_sensor_tmini2:
-				AltosSensorTMini.update_state(state, link, config_data);
+				AltosSensorTMini2.update_state(state, link, config_data);
 				break;
 			case idle_sensor_tgps:
 				AltosSensorTGPS.update_state(state, link, config_data);
