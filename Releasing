@@ -77,6 +77,7 @@ These are Bdale's notes on how to do a release.
 	   src/telemega-v1.0/*.elf \
 	   src/telemega-v2.0/*.elf \
 	   src/telemetrum-v2.0/*.elf \
+	   src/telemini-v3.0/*.elf \
 	   ~/altusmetrumllc/Binaries/
 	cp src/easymega-v1.0/flash-loader/*.elf \
 	   src/easymini-v1.0/flash-loader/*.elf \
@@ -86,6 +87,7 @@ These are Bdale's notes on how to do a release.
 	   src/telemega-v1.0/flash-loader/*.elf \
 	   src/telemega-v2.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
+	   src/telemini-v3.0/flash-loader/*.elf \
 	   ~/altusmetrumllc/Binaries/loaders/
 	(cd ~/altusmetrumllc ; git add Binaries ; git commit -a) 
 	(cd ~/altusmetrumllc ; git push) 
