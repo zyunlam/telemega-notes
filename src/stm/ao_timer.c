@@ -90,6 +90,7 @@ ao_timer_init(void)
 	stm_systick.csr = ((1 << STM_SYSTICK_CSR_ENABLE) |
 			   (1 << STM_SYSTICK_CSR_TICKINT) |
 			   (STM_SYSTICK_CSR_CLKSOURCE_HCLK_8 << STM_SYSTICK_CSR_CLKSOURCE));
+	stm_nvic.shpr15_12 |= AO_STM_NVIC_CLOCK_PRIORITY << 24;
 }
 
 #endif

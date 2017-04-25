@@ -17,9 +17,9 @@
 	Our second device was TeleMini, a dual deploy altimeter with
 	radio telemetry and radio direction finding. The first version
 	of this device was only 13mm by 38mm (½ inch by 1½ inches) and
-	could fit easily in an 18mm air-frame. The latest version, v2.0,
-	includes a beeper, USB data download and extended on-board
-	flight logging, along with an improved barometric sensor.
+	could fit easily in an 18mm air-frame. The latest version, v3.0,
+	includes a beeper, higher power radio, extended on-board
+	flight logging and an improved barometric sensor.
 
 	TeleMega is our most sophisticated device, including six pyro
 	channels (four of which are fully programmable), integrated GPS,

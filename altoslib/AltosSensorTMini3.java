@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.util.concurrent.TimeoutException;
 
-public class AltosSensorTMini {
+public class AltosSensorTMini3 {
 	public int	tick;
 	public int	apogee;
 	public int	main;
@@ -28,19 +28,19 @@ public class AltosSensorTMini {
 
 	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
 		try {
-			AltosSensorTMini	sensor_tmini = new AltosSensorTMini(link);
+			AltosSensorTMini3	sensor_tmini = new AltosSensorTMini3(link);
 
 			if (sensor_tmini == null)
 				return;
-			state.set_battery_voltage(AltosConvert.tele_mini_voltage(sensor_tmini.batt));
-			state.set_apogee_voltage(AltosConvert.tele_mini_voltage(sensor_tmini.apogee));
-			state.set_main_voltage(AltosConvert.tele_mini_voltage(sensor_tmini.main));
+			state.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(sensor_tmini.batt));
+			state.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sensor_tmini.apogee));
+			state.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sensor_tmini.main));
 
 		} catch (TimeoutException te) {
 		}
 	}
 
-	public AltosSensorTMini(AltosLink link) throws InterruptedException, TimeoutException {
+	public AltosSensorTMini3(AltosLink link) throws InterruptedException, TimeoutException {
 		String[] items = link.adc();
 		for (int i = 0; i < items.length;) {
 			if (items[i].equals("tick:")) {

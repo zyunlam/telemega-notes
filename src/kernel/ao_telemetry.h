@@ -270,7 +270,8 @@ struct ao_telemetry_metrum_data {
 	/* 32 */
 };
 
-#define AO_TELEMETRY_MINI		0x10
+#define AO_TELEMETRY_MINI2		0x10	/* CC1111 based */
+#define AO_TELEMETRY_MINI3		0x11	/* STMF042 based */
 
 struct ao_telemetry_mini {
 	uint16_t	serial;		/*  0 */

@@ -25,8 +25,9 @@
 		is selected if the board is connected via USB to a computer,
 		otherwise the board enters “flight” mode.
 		ifdef::telemini[]
-		TeleMini v1.0
-		selects “idle” mode if it receives a command packet within the
+		TeleMini
+		selects “idle” mode if it receives a command packet
+		within the
 		first five seconds of operation.
 		endif::telemini[]
 
@@ -60,7 +61,7 @@
 		mode for requests sent via TeleDongle.  Commands can be issued
 		in idle mode over either USB or the radio link
 		equivalently.
-		ifdef::telemini[TeleMini v1.0 only has the radio link.]
+		ifdef::telemini[TeleMini only has the radio link.]
 		endif::radio[]
 		Idle mode is useful for configuring the altimeter, for
 		extracting data from the on-board storage chip after
@@ -97,11 +98,13 @@
 		endif::telemetrum,telemega,easymega[]
 
 		ifdef::telemini[]
-		TeleMini v1.0 is configured solely via the radio link. Of course, that
+		TeleMini is configured solely via the radio link. Of course, that
 		means you need to know the TeleMini radio configuration values
 		or you won't be able to communicate with it. For situations
-		when you don't have the radio configuration values, TeleMini v1.0
-		offers an 'emergency recovery' mode. In this mode, TeleMini is
+		when you don't have the radio configuration values,
+		TeleMini v1.0
+		offers an 'emergency recovery' mode. In this mode,
+		TeleMini v1.0 is
 		configured as follows:
 
 
@@ -154,7 +157,7 @@
 		Any operation which can be performed with a flight computer can
 		either be done with the device directly connected to the
 		computer via the USB cable, or through the radio
-		link. TeleMini v1.0 doesn't provide a USB connector and so it is
+		link. TeleMini doesn't provide a USB connector and so it is
 		always communicated with over radio.  Select the appropriate
 		TeleDongle device when the list of devices is presented and
 		AltosUI will interact with an altimeter over the radio link.

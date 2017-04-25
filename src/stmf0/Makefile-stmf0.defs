@@ -4,7 +4,7 @@ endif
 
 include $(TOPDIR)/Makedefs
 
-vpath % $(TOPDIR)/stmf0:$(TOPDIR)/product:$(TOPDIR)/drivers:$(TOPDIR)/kernel:$(TOPDIR)/util:$(TOPDIR)/kalman:$(TOPDIR/aes):$(TOPDIR):$(TOPDIR)/math
+vpath % $(TOPDIR)/stmf0:$(TOPDIR)/product:$(TOPDIR)/drivers:$(TOPDIR)/kernel:$(TOPDIR)/util:$(TOPDIR)/kalman:$(TOPDIR)/aes:$(TOPDIR):$(TOPDIR)/math:$(TOPDIR)/lisp
 vpath make-altitude $(TOPDIR)/util
 vpath make-kalman $(TOPDIR)/util
 vpath kalman.5c $(TOPDIR)/kalman
@@ -27,7 +27,10 @@ CC=$(ARM_CC)
 
 WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align
 
-AO_CFLAGS=-I. -I$(TOPDIR)/stmf0 -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers -I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math $(PDCLIB_INCLUDES) 
+AO_CFLAGS=-I. -I$(TOPDIR)/stmf0 -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers \
+	-I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math -I$(TOPDIR)/lisp \
+	$(PDCLIB_INCLUDES) 
+
 STMF0_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m0 -mthumb\
 	-ffreestanding -nostdlib $(AO_CFLAGS) $(WARN_FLAGS)
 

@@ -164,7 +164,7 @@ do_baro(struct cc_usb *usb) {
 	double temperature = strtod(temp[2], NULL) / 100.0;
 	double altitude = strtod(alt[1], NULL);
 
-	if (altitude < -50 || 3000 < altitude) {
+	if (altitude < -100 || 3000 < altitude) {
 		printf ("weird altitude %f\n", altitude);
 		free_baro(b);
 		return 0;

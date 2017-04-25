@@ -51,7 +51,11 @@ extern const uint32_t	ao_radio_cal;
 #define FOSC	40000000
 #endif
 
-#define ao_radio_select()	ao_spi_get_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS,AO_SPI_SPEED_FAST)
+#ifndef AO_CC1200_SPI_SPEED
+#error AO_CC1200_SPI_SPEED undefined
+#endif
+
+#define ao_radio_select()	ao_spi_get_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS,AO_CC1200_SPI_SPEED)
 #define ao_radio_deselect()	ao_spi_put_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS)
 #define ao_radio_spi_send(d,l)	ao_spi_send((d), (l), AO_CC1200_SPI_BUS)
 #define ao_radio_spi_send_fixed(d,l) ao_spi_send_fixed((d), (l), AO_CC1200_SPI_BUS)
@@ -1323,7 +1327,7 @@ static void ao_radio_packet(void) {
 void
 ao_radio_test_recv(void)
 {
-	uint8_t	bytes[34];
+	static uint8_t	bytes[34];
 	uint8_t	b;
 
 	if (ao_radio_recv(bytes, 34, 0)) {

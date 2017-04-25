@@ -224,7 +224,7 @@
 		flights, there may not be any space left. TeleMetrum
 		and TeleMega can store multiple flights, depending on
 		the configured maximum flight log size. TeleGPS logs
-		data continuously. TeleMini stores only a single
+		data continuously. TeleMini v1.0 stores only a single
 		flight, so it will need to be downloaded and erased
 		after each flight to capture data. This only affects
 		on-board flight logging; the altimeter will still

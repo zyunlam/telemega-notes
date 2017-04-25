@@ -25,6 +25,7 @@
 	endif::telemetrum[]
 	ifdef::telemini[]
 	|TeleMini v1.0		|2	|5kB	|4
+	|TeleMini v3.0		|16	|512kB	|5
 	endif::telemini[]
 	ifdef::easymini[]
 	|EasyMini		|16	|1MB	|10
@@ -44,7 +45,7 @@
             
 	Configuration data is also stored in the flash memory on
 	ifdef::telemetrum[TeleMetrum v1.x,]
-	ifdef::telemini[TeleMini and]
+	ifdef::telemini[TeleMini v3.0 and]
 	ifdef::easymini[EasyMini.]
 	This consumes 64kB
 	of flash space.  This configuration space is not available

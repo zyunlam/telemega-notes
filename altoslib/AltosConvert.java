@@ -219,7 +219,23 @@ public class AltosConvert {
 		return AltosLib.MISSING;
 	}
 
-	static double tele_mini_voltage(int sensor) {
+	static double tele_mini_3_adc(int raw) {
+		return raw / 4095.0;
+	}
+
+	static public double tele_mini_3_battery_voltage(int v_batt) {
+		if (v_batt != AltosLib.MISSING)
+			return 3.3 * tele_mini_3_adc(v_batt) * (5.6 + 10.0) / 10.0;
+		return AltosLib.MISSING;
+	}
+
+	static double tele_mini_3_pyro_voltage(int raw) {
+		if (raw != AltosLib.MISSING)
+			return 3.3 * tele_mini_3_adc(raw) * (100.0 + 27.0) / 27.0;
+		return AltosLib.MISSING;
+	}
+
+	static double tele_mini_2_voltage(int sensor) {
 		double	supply = 3.3;
 
 		return sensor / 32767.0 * supply * 127/27;
@@ -348,6 +364,10 @@ public class AltosConvert {
 
 	public static double f_to_c(double c) {
 		return (c - 32) * 5/9;
+	}
+
+	public static double psi_to_pa(double psi) {
+		return psi * 6894.76;
 	}
 
 	public static boolean imperial_units = false;

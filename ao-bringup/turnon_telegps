@@ -1,10 +1,12 @@
 #!/bin/sh
 
-if [ -x /usr/bin/ao-flash-lpc ]; then
-	FLASH_LPC=/usr/bin/ao-flash-lpc
+if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+        FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+elif [ -x /usr/bin/ao-flash-lpc ]; then
+        FLASH_LPC=/usr/bin/ao-flash-lpc
 else
-	echo "Can't find ao-flash-lpc!  Aborting."
-	exit 1
+        echo "Can't find ao-flash-lpc!  Aborting."
+        exit 1
 fi
 
 if [ -x /usr/bin/ao-usbload ]; then
@@ -14,8 +16,8 @@ else
 	exit 1
 fi
 
-VERSION=1.0
 PRODUCT=TeleGPS
+VERSION=1.0
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 echo $FILE
 

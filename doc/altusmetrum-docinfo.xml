@@ -18,7 +18,7 @@
   <surname>Towns</surname>
 </author>
 <copyright>
-  <year>2016</year>
+  <year>2017</year>
   <holder>Bdale Garbee and Keith Packard</holder>
 </copyright>
 <mediaobject>
@@ -46,6 +46,13 @@
 </legalnotice>
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
+  <revision>
+    <revnumber>1.7</revnumber>
+    <date>21 Apr 2017</date>
+    <revremark>
+      Add support for TeleMini v3.0 in firmware, AltosUI and AltosDroid
+    </revremark>
+  </revision>
   <revision>
     <revnumber>1.6.8</revnumber>
     <date>4 Sep 2016</date>

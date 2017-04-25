@@ -58,7 +58,12 @@ ALTOS_SRC = \
 	ao_monitor.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
-	$(STACK_GUARD)
+	$(STACK_GUARD) \
+	ao_lco_func.c \
+	ao_radio_cmac.c \
+	ao_aes.c \
+	ao_aes_tables.c \
+	ao_lco_cmd.c
 
 PRODUCT=TeleBT-v3.0
 PRODUCT_DEF=-DTELEBT_V_3_0

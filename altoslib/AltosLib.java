@@ -332,9 +332,12 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_TELEMEGA_OLD = 5;
 	public static final int AO_LOG_FORMAT_EASYMINI = 6;
 	public static final int AO_LOG_FORMAT_TELEMETRUM = 7;
-	public static final int AO_LOG_FORMAT_TELEMINI = 8;
+	public static final int AO_LOG_FORMAT_TELEMINI2 = 8;
 	public static final int AO_LOG_FORMAT_TELEGPS = 9;
 	public static final int AO_LOG_FORMAT_TELEMEGA = 10;
+	public static final int AO_LOG_FORMAT_DETHERM = 11;
+	public static final int AO_LOG_FORMAT_TELEMINI3 = 12;
+	public static final int AO_LOG_FORMAT_TELEFIRETWO = 13;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {

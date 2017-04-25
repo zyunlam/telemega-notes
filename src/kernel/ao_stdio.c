@@ -55,6 +55,9 @@
 #ifndef PACKET_HAS_SLAVE
 #define PACKET_HAS_SLAVE	0
 #endif
+#ifndef CONSOLE_STDIN
+#define CONSOLE_STDIN		0
+#endif
 
 #define USE_SERIAL_STDIN (USE_SERIAL_0_STDIN +	\
 			  USE_SERIAL_1_STDIN +	\
@@ -67,7 +70,7 @@
 			  USE_SERIAL_8_STDIN +	\
 			  USE_SERIAL_9_STDIN)
 
-#define AO_NUM_STDIOS	(HAS_USB + PACKET_HAS_SLAVE + USE_SERIAL_STDIN)
+#define AO_NUM_STDIOS	(HAS_USB + PACKET_HAS_SLAVE + USE_SERIAL_STDIN + CONSOLE_STDIN)
 
 __xdata struct ao_stdio ao_stdios[AO_NUM_STDIOS];
 

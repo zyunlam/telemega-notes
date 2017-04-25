@@ -19,6 +19,12 @@
 #include <ao.h>
 #include <ao_flash.h>
 
+/* Note that the HSI clock must be running for this code to work.
+ * Also, special care must be taken with the linker to ensure that the
+ * functions marked 'ramtext' land in ram and not rom. An example of that
+ * can be found in altos-loader.ld
+ */
+
 static uint8_t
 ao_flash_is_locked(void)
 {
@@ -44,12 +50,7 @@ ao_flash_lock(void)
 	stm_flash.cr |= (1 << STM_FLASH_CR_LOCK);
 }
 
-static void
-ao_flash_wait_bsy(void)
-{
-	while (stm_flash.sr & (1 << STM_FLASH_SR_BSY))
-		;
-}
+#define ao_flash_wait_bsy() do { while (stm_flash.sr & (1 << STM_FLASH_SR_BSY)); } while (0)
 
 static void __attribute__ ((section(".ramtext"),noinline))
 _ao_flash_erase_page(uint32_t *page)

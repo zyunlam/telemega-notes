@@ -22,6 +22,7 @@
 #include <ao_eeprom.h>
 #include <ao_profile.h>
 #include <ao_btm.h>
+#include <ao_lco_cmd.h>
 #if HAS_SAMPLE_PROFILE
 #include <ao_sample_profile.h>
 #endif
@@ -43,6 +44,8 @@ main(void)
 	ao_adc_init();
 	ao_btm_init();
 	ao_cmd_init();
+
+	ao_lco_cmd_init();
 
 	ao_eeprom_init();
 

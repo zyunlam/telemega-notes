@@ -316,7 +316,7 @@ ao_pad(void)
 			command.tick, command.box, ao_pad_box, command.cmd, command.channels);
 
 		switch (command.cmd) {
-		case AO_LAUNCH_ARM:
+		case AO_PAD_ARM:
 			if (command.box != ao_pad_box) {
 				PRINTD ("box number mismatch\n");
 				break;
@@ -338,7 +338,7 @@ ao_pad(void)
 			ao_pad_arm_time = ao_time();
 			break;
 
-		case AO_LAUNCH_QUERY:
+		case AO_PAD_QUERY:
 			if (command.box != ao_pad_box) {
 				PRINTD ("box number mismatch\n");
 				break;
@@ -357,7 +357,7 @@ ao_pad(void)
 				query.igniter_status[3]);
 			ao_radio_cmac_send(&query, sizeof (query));
 			break;
-		case AO_LAUNCH_FIRE:
+		case AO_PAD_FIRE:
 			if (!ao_pad_armed) {
 				PRINTD ("not armed\n");
 				break;
@@ -371,6 +371,29 @@ ao_pad(void)
 			ao_pad_ignite = ao_pad_armed;
 			ao_pad_arm_time = ao_time();
 			ao_wakeup(&ao_pad_ignite);
+			break;
+		case AO_PAD_STATIC:
+			if (!ao_pad_armed) {
+				PRINTD ("not armed\n");
+				break;
+			}
+#if HAS_LOG
+			if (!ao_log_running) ao_log_start();
+#endif
+			if ((uint16_t) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
+				PRINTD ("late pad arm_time %d time %d\n",
+					ao_pad_arm_time, ao_time());
+				break;
+			}
+			PRINTD ("ignite\n");
+			ao_pad_ignite = ao_pad_armed;
+			ao_pad_arm_time = ao_time();
+			ao_wakeup(&ao_pad_ignite);
+			break;
+		case AO_PAD_ENDSTATIC:
+#if HAS_LOG
+			ao_log_stop();
+#endif
 			break;
 		}
 	}

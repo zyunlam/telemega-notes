@@ -26,8 +26,10 @@
 #define IS_FLASH_LOADER	0
 #endif
 
+#ifndef RELOCATE_INTERRUPT
 #if !IS_FLASH_LOADER
 #define RELOCATE_INTERRUPT	1
+#endif
 #endif
 
 extern void main(void);

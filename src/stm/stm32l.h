@@ -52,7 +52,32 @@ stm_moder_set(struct stm_gpio *gpio, int pin, vuint32_t value) {
 			~(STM_MODER_MASK << STM_MODER_SHIFT(pin))) |
 		       value << STM_MODER_SHIFT(pin));
 }
-	
+
+static inline uint32_t
+stm_spread_mask(uint16_t mask) {
+	uint32_t m = mask;
+
+	/* 0000000000000000mmmmmmmmmmmmmmmm */
+	m = (m & 0xff) | ((m & 0xff00) << 8);
+	/* 00000000mmmmmmmm00000000mmmmmmmm */
+	m = (m & 0x000f000f) | ((m & 0x00f000f0) << 4);
+	/* 0000mmmm0000mmmm0000mmmm0000mmmm */
+	m = (m & 0x03030303) | ((m & 0x0c0c0c0c) << 2);
+	/* 00mm00mm00mm00mm00mm00mm00mm00mm */
+	m = (m & 0x11111111) | ((m & 0x22222222) << 2);
+	/* 0m0m0m0m0m0m0m0m0m0m0m0m0m0m0m0m */
+	return m;
+}
+
+static inline void
+stm_moder_set_mask(struct stm_gpio *gpio, uint16_t mask, uint32_t value) {
+	uint32_t	bits32 = stm_spread_mask(mask);
+	uint32_t	mask32 = 3 * bits32;
+	uint32_t	value32 = (value & 3) * bits32;
+
+	gpio->moder = ((gpio->moder & ~mask32) | value32);
+}
+
 static inline uint32_t
 stm_moder_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->moder >> STM_MODER_SHIFT(pin)) & STM_MODER_MASK;
@@ -69,7 +94,7 @@ stm_otyper_set(struct stm_gpio *gpio, int pin, vuint32_t value) {
 			 ~(STM_OTYPER_MASK << STM_OTYPER_SHIFT(pin))) |
 			value << STM_OTYPER_SHIFT(pin));
 }
-	
+
 static inline uint32_t
 stm_otyper_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->otyper >> STM_OTYPER_SHIFT(pin)) & STM_OTYPER_MASK;
@@ -83,12 +108,21 @@ stm_otyper_get(struct stm_gpio *gpio, int pin) {
 #define STM_OSPEEDR_40MHz		3
 
 static inline void
-stm_ospeedr_set(struct stm_gpio *gpio, int pin, vuint32_t value) {
+stm_ospeedr_set(struct stm_gpio *gpio, int pin, uint32_t value) {
 	gpio->ospeedr = ((gpio->ospeedr &
 			~(STM_OSPEEDR_MASK << STM_OSPEEDR_SHIFT(pin))) |
 		       value << STM_OSPEEDR_SHIFT(pin));
 }
-	
+
+static inline void
+stm_ospeedr_set_mask(struct stm_gpio *gpio, uint16_t mask, uint32_t value) {
+	uint32_t	bits32 = stm_spread_mask(mask);
+	uint32_t	mask32 = 3 * bits32;
+	uint32_t	value32 = (value & 3) * bits32;
+
+	gpio->ospeedr = ((gpio->ospeedr & ~mask32) | value32);
+}
+
 static inline uint32_t
 stm_ospeedr_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->ospeedr >> STM_OSPEEDR_SHIFT(pin)) & STM_OSPEEDR_MASK;
@@ -107,7 +141,16 @@ stm_pupdr_set(struct stm_gpio *gpio, int pin, uint32_t value) {
 			~(STM_PUPDR_MASK << STM_PUPDR_SHIFT(pin))) |
 		       value << STM_PUPDR_SHIFT(pin));
 }
-	
+
+static inline void
+stm_pupdr_set_mask(struct stm_gpio *gpio, uint16_t mask, uint32_t value) {
+	uint32_t	bits32 = stm_spread_mask(mask);
+	uint32_t	mask32 = 3 * bits32;
+	uint32_t	value32 = (value & 3) * bits32;
+
+	gpio->pupdr = (gpio->pupdr & ~mask32) | value32;
+}
+
 static inline uint32_t
 stm_pupdr_get(struct stm_gpio *gpio, int pin) {
 	return (gpio->pupdr >> STM_PUPDR_SHIFT(pin)) & STM_PUPDR_MASK;
@@ -165,6 +208,12 @@ static inline void
 stm_gpio_set(struct stm_gpio *gpio, int pin, uint8_t value) {
 	/* Use the bit set/reset register to do this atomically */
 	gpio->bsrr = ((uint32_t) (value ^ 1) << (pin + 16)) | ((uint32_t) value << pin);
+}
+
+static inline void
+stm_gpio_set_mask(struct stm_gpio *gpio, uint16_t bits, uint16_t mask) {
+	/* Use the bit set/reset register to do this atomically */
+	gpio->bsrr = ((uint32_t) (~bits & mask) << 16) | ((uint32_t) (bits & mask));
 }
 
 static inline void
@@ -518,7 +567,7 @@ extern struct stm_rcc stm_rcc;
 #define  STM_RCC_CFGR_MCOPRE_DIV_4	2
 #define  STM_RCC_CFGR_MCOPRE_DIV_8	3
 #define  STM_RCC_CFGR_MCOPRE_DIV_16	4
-#define  STM_RCC_CFGR_MCOPRE_DIV_MASK	7
+#define  STM_RCC_CFGR_MCOPRE_MASK	7
 
 #define STM_RCC_CFGR_MCOSEL	(24)
 #define  STM_RCC_CFGR_MCOSEL_DISABLE	0
@@ -897,7 +946,11 @@ struct stm_nvic {
 	vuint32_t	sc;		/* 0xc10 0xe000ed10 System Control Register */
 	vuint32_t	cc;		/* 0xc14 0xe000ed14 Configuration Control Register */
 
-	uint8_t		_unusedc18[0xe00 - 0xc18];
+	vuint32_t	shpr7_4;	/* 0xc18 0xe000ed18 System Hander Priority Registers */
+	vuint32_t	shpr11_8;	/* 0xc1c */
+	vuint32_t	shpr15_12;	/* 0xc20 */
+
+	uint8_t		_unusedc18[0xe00 - 0xc24];
 
 	vuint32_t	stir;		/* 0xe00 */
 };
@@ -1594,6 +1647,7 @@ extern struct stm_i2c stm_i2c1, stm_i2c2;
 #define  STM_I2C_CR2_FREQ_4_MHZ		4
 #define  STM_I2C_CR2_FREQ_8_MHZ		8
 #define  STM_I2C_CR2_FREQ_16_MHZ	16
+#define  STM_I2C_CR2_FREQ_24_MHZ	24
 #define  STM_I2C_CR2_FREQ_32_MHZ	32
 #define  STM_I2C_CR2_FREQ_MASK		0x3f
 
@@ -1740,6 +1794,12 @@ extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
 #define  STM_TIM234_SMCR_SMS_EXTERNAL_CLOCK	7
 #define  STM_TIM234_SMCR_SMS_MASK		7
 
+#define STM_TIM234_DIER_CC4IE		4
+#define STM_TIM234_DIER_CC3IE		3
+#define STM_TIM234_DIER_CC2IE		2
+#define STM_TIM234_DIER_CC1IE		1
+#define STM_TIM234_DIER_UIE		0
+
 #define STM_TIM234_SR_CC4OF	12
 #define STM_TIM234_SR_CC3OF	11
 #define STM_TIM234_SR_CC2OF	10
@@ -1840,15 +1900,23 @@ extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
 
 #define STM_TIM234_CCER_CC4NP	15
 #define STM_TIM234_CCER_CC4P	13
+#define  STM_TIM234_CCER_CC4P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC4P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC4E	12
 #define STM_TIM234_CCER_CC3NP	11
 #define STM_TIM234_CCER_CC3P	9
+#define  STM_TIM234_CCER_CC3P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC3P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC3E	8
 #define STM_TIM234_CCER_CC2NP	7
 #define STM_TIM234_CCER_CC2P	5
+#define  STM_TIM234_CCER_CC2P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC2P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC2E	4
 #define STM_TIM234_CCER_CC1NP	3
 #define STM_TIM234_CCER_CC1P	1
+#define  STM_TIM234_CCER_CC1P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC1P_ACTIVE_LOW	1
 #define STM_TIM234_CCER_CC1E	0
 
 struct stm_usb {

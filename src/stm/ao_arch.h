@@ -85,10 +85,6 @@ extern const uint32_t ao_radio_cal;
 #define ao_arch_task_members\
 	uint32_t *sp;			/* saved stack pointer */
 
-#define ao_arch_block_interrupts()	asm("cpsid i")
-#define ao_arch_release_interrupts()	asm("cpsie i")
-
-
 /*
  * For now, we're running at a weird frequency
  */
@@ -122,10 +118,21 @@ extern const uint32_t ao_radio_cal;
 #define AO_TIM91011_CLK		(2 * AO_PCLK2)
 #endif
 
-#define AO_STM_NVIC_HIGH_PRIORITY	4
-#define AO_STM_NVIC_CLOCK_PRIORITY	6
-#define AO_STM_NVIC_MED_PRIORITY	8
-#define AO_STM_NVIC_LOW_PRIORITY	10
+/* The stm32l implements only 4 bits of the priority fields */
+
+#if AO_NONMASK_INTERRUPT
+#define AO_STM_NVIC_NONMASK_PRIORITY	0x00
+
+/* Set the basepri register to this value to mask all
+ * non-maskable priorities
+ */
+#define AO_STM_NVIC_BASEPRI_MASK	0x10
+#endif
+
+#define AO_STM_NVIC_HIGH_PRIORITY	0x40
+#define AO_STM_NVIC_MED_PRIORITY	0x80
+#define AO_STM_NVIC_LOW_PRIORITY	0xC0
+#define AO_STM_NVIC_CLOCK_PRIORITY	0xf0
 
 void ao_lcd_stm_init(void);
 

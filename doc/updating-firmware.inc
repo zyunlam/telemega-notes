@@ -11,7 +11,7 @@
 	programmed directly over their USB connectors (self
 	programming).
 	ifdef::telemega[]
-	TeleMetrum v1, TeleMini and TeleDongle v0.2 are
+	TeleMetrum v1, TeleMini v1.0 and TeleDongle v0.2 are
 	all programmed by using another device as a programmer (pair
 	programming). It's important to recognize which kind of devices
 	you have before trying to reprogram them.
@@ -228,10 +228,10 @@
 
 			If something goes wrong, give it another try.
 
-		==== Updating TeleMini Firmware
+		==== Updating TeleMini v1.0 Firmware
 
 			You'll need a special 'programming cable' to
-			reprogram the TeleMini.  You can make your own
+			reprogram the TeleMini v1.0.  You can make your own
 			using an 8-pin MicroMaTch connector on one end
 			and a set of four pins on the other.
 
@@ -242,19 +242,19 @@
 			. Plug the 8-pin end of the programming cable
 			  to the matching connector on the TeleDongle
 			  v0.2 or TeleBT v1.0, and the 4-pins into the
-			  holes in the TeleMini circuit board.  Note
+			  holes in the TeleMini v1.0 circuit board.  Note
 			  that the MicroMaTch connector has an
 			  alignment pin that goes through a hole in
 			  the PC board when you have the cable
 			  oriented correctly, and that pin 1 on the
-			  TeleMini board is marked with a square pad
+			  TeleMini v1.0 board is marked with a square pad
 			  while the other pins have round pads.
 
-			. Attach a battery to the TeleMini board.
+			. Attach a battery to the TeleMini v1.0 board.
 
 			. Plug the TeleDongle v0.2 or TeleBT v1.0 into
 			  your computer's USB port, and power up the
-			  TeleMini
+			  TeleMini v1.0
 
 			. Run AltosUI, and select 'Flash Image' from
 			  the File menu.
@@ -264,7 +264,7 @@
 			  programming device.
 
 			. Select the image you want put on the
-			  TeleMini, which should have a name in the
+			  TeleMini v1.0, which should have a name in the
 			  form telemini-v1.0-1.0.0.ihx.  It should be
 			  visible in the default directory, if not you
 			  may have to poke around your system to find
@@ -276,10 +276,10 @@
 			  you'll need to change them.
 
 			. Hit the 'OK' button and the software should
-			  proceed to flash the TeleMini with new
+			  proceed to flash the TeleMini v1.0 with new
 			  firmware, showing a progress bar.
 
-			. Confirm that the TeleMini board seems to
+			. Confirm that the TeleMini v1.0 board seems to
 			  have updated OK, which you can do by
 			  configuring it over the radio link through
 			  the TeleDongle, or letting it come up in
@@ -290,7 +290,7 @@
 		==== Updating TeleDongle v0.2 Firmware
 
 		Updating TeleDongle v0.2 firmware is just like
-		updating TeleMetrum v1.x or TeleMini firmware, but you
+		updating TeleMetrum v1.x or TeleMini v1.0 firmware, but you
 		use either a TeleMetrum v1.x, TeleDongle v0.2 or
 		TeleBT v1.0 as the programmer.
 

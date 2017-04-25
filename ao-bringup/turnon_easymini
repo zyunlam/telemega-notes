@@ -65,7 +65,7 @@ echo $USBLOAD $ALTOS_FILE
 
 $USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 
-sleep 2
+sleep 1
 
 ./test-easymini
 

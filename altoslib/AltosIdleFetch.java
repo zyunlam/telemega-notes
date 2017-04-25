@@ -38,8 +38,9 @@ class AltosIdler {
 	static final int	idle_sensor_metrum = 11;
 	static final int	idle_sensor_mega = 12;
 	static final int	idle_sensor_emini = 13;
-	static final int	idle_sensor_tmini = 14;
+	static final int	idle_sensor_tmini2 = 14;
 	static final int	idle_sensor_tgps = 15;
+	static final int	idle_sensor_tmini3 = 16;
 
 	public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
@@ -72,11 +73,14 @@ class AltosIdler {
 			case idle_sensor_emini:
 				AltosSensorEMini.update_state(state, link, config_data);
 				break;
-			case idle_sensor_tmini:
-				AltosSensorTMini.update_state(state, link, config_data);
+			case idle_sensor_tmini2:
+				AltosSensorTMini2.update_state(state, link, config_data);
 				break;
 			case idle_sensor_tgps:
 				AltosSensorTGPS.update_state(state, link, config_data);
+				break;
+			case idle_sensor_tmini3:
+				AltosSensorTMini3.update_state(state, link, config_data);
 				break;
 			}
 			if (idle != null)
@@ -108,7 +112,11 @@ public class AltosIdleFetch implements AltosStateUpdate {
 
 		new AltosIdler("TeleMini-v2",
 			       AltosIdler.idle_ms5607,
-			       AltosIdler.idle_sensor_tmini),
+			       AltosIdler.idle_sensor_tmini2),
+
+		new AltosIdler("TeleMini-v3",
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_sensor_tmini3),
 
 		new AltosIdler("TeleMetrum-v1",
 			       AltosIdler.idle_gps,

@@ -14,6 +14,7 @@ INC = \
 	ao_task.h \
 	ao_adc_fast.h \
 	ao_power.h \
+	ao_crc.h \
 	stm32f0.h
 
 #
@@ -38,6 +39,8 @@ ALTOS_SRC = \
 	ao_gpio.c \
 	ao_product.c
 
+VENDOR=AltusMetrum
+PROJECT_NAME=ChaosKey
 PRODUCT=ChaosKey-hw-1.0-sw-$(VERSION)
 PRODUCT_DEF=-DCHAOSKEY_V_1_0
 IDVENDOR=0x1d50
@@ -48,6 +51,7 @@ CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -g -Os
 PROGNAME=chaoskey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
+METAINFO=org.altusmetrum.ChaosKey.metainfo.xml
 
 SRC=$(ALTOS_SRC) ao_chaoskey.c
 OBJ=$(SRC:.c=.o)
@@ -62,11 +66,20 @@ ao_product.h: ao-make-product.5c ../Version
 
 $(OBJ): $(INC)
 
+%.cab: $(PROG) $(HEX) $(METAINFO)
+	gcab --create --nopath $@ $(PROG) $(HEX) $(METAINFO)
+
+cab: $(VENDOR)-$(PROJECT_NAME)-$(VERSION).cab
+
+check: $(METAINFO)
+	appstream-util validate-relax $(METAINFO)
+
 distclean:	clean
 
 clean:
 	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
 	rm -f ao_product.h
+	rm -f *.cab
 
 install:
 

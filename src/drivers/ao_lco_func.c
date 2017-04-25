@@ -47,7 +47,7 @@ ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 	ao_mutex_get(&ao_lco_mutex);
 	command.tick = ao_time();
 	command.box = box;
-	command.cmd = AO_LAUNCH_QUERY;
+	command.cmd = AO_PAD_QUERY;
 	command.channels = 0;
 	ao_radio_cmac_send(&command, sizeof (command));
 	sent_time = ao_time();
@@ -64,19 +64,19 @@ ao_lco_arm(uint16_t box, uint8_t channels, uint16_t tick_offset)
 	ao_mutex_get(&ao_lco_mutex);
 	command.tick = ao_time() - tick_offset;
 	command.box = box;
-	command.cmd = AO_LAUNCH_ARM;
+	command.cmd = AO_PAD_ARM;
 	command.channels = channels;
 	ao_radio_cmac_send(&command, sizeof (command));
 	ao_mutex_put(&ao_lco_mutex);
 }
 
 void
-ao_lco_ignite(void)
+ao_lco_ignite(uint8_t cmd)
 {
 	ao_mutex_get(&ao_lco_mutex);
 	command.tick = 0;
 	command.box = 0;
-	command.cmd = AO_LAUNCH_FIRE;
+	command.cmd = cmd;
 	command.channels = 0;
 	ao_radio_cmac_send(&command, sizeof (command));
 	ao_mutex_put(&ao_lco_mutex);

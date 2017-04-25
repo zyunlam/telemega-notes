@@ -12,7 +12,9 @@ case "$#" in
 	serial="--serial $1"
 	;;
     0)
-	snum=`dmesg | grep 'on chaoskey' | tail -1 | sed 's/.*chaoskey \([0-9a-f][0-9a-f]*\) on chaoskey.*/\1/'`
+	snum=`sudo dmesg | awk '/usb.*Product:/ { ck = index($0, "ChaosKey"); }
+		     /usb.*SerialNumber:/ { if (ck) print $5; }' | tail -1`
+
 	case "$snum" in
 	    "")
 		serial=""

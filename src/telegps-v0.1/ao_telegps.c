@@ -49,16 +49,16 @@ main(void)
 	ao_cmd_init();
 
 	ao_usb_init();
-	ao_radio_init();
+//	ao_radio_init();
 
 	ao_fat_init();
 
-	ao_gps_init();
-	ao_gps_report_mega_init();
+//	ao_gps_init();
+//	ao_gps_report_mega_init();
 
-	ao_telemetry_init();
-	ao_telemetry_set_interval(AO_SEC_TO_TICKS(1));
-	ao_rdf_set(1);
+//	ao_telemetry_init();
+//	ao_telemetry_set_interval(AO_SEC_TO_TICKS(1));
+//	ao_rdf_set(1);
 
 #if HAS_SAMPLE_PROFILE
 	ao_sample_profile_init();

@@ -592,8 +592,8 @@
 		This reprograms Altus Metrum devices with new
 		firmware.
 		ifdef::telemetrum,telemini[]
-			TeleMetrum v1.x, TeleDongle v0.2, TeleMini
-			and TeleBT are all reprogrammed by using another
+			TeleMetrum v1.x, TeleDongle v0.2, TeleMini v1.0
+			and TeleBT v1.0 are all reprogrammed by using another
 			similar unit as a programming dongle (pair
 			programming).
 		endif::telemetrum,telemini[]

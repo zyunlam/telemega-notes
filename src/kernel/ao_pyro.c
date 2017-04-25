@@ -75,7 +75,8 @@ uint16_t	ao_pyro_fired;
 #endif
 
 #if PYRO_DBG
-#define DBG(...)	do { printf("\t%d: ", (int) (pyro - ao_config.pyro)); printf(__VA_ARGS__); } while (0)
+int pyro_dbg;
+#define DBG(...)	do { if (pyro_dbg) printf("\t%d: ", (int) (pyro - ao_config.pyro)); printf(__VA_ARGS__); } while (0)
 #else
 #define DBG(...)
 #endif

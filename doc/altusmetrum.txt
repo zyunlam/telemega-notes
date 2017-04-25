@@ -22,7 +22,7 @@
 
 	include::telemetrum.raw[]
 
-	include::telemini-v1.0.raw[]
+	include::telemini.raw[]
 
 	include::easymini-device.raw[]
 

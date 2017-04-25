@@ -148,6 +148,7 @@
 #define AO_CC115L_SPI_CS_PIN	12
 #define AO_CC115L_SPI_BUS	AO_SPI_2_PB13_PB14_PB15
 #define AO_CC115L_SPI		stm_spi2
+#define AO_CC115L_SPI_SPEED	AO_SPI_SPEED_4MHz
 
 #define AO_CC115L_FIFO_INT_GPIO_IOCFG	CC115L_IOCFG2
 #define AO_CC115L_FIFO_INT_PORT		(&stm_gpioa)
@@ -182,5 +183,9 @@
 #define AO_SDCARD_SPI_CS_PORT	(&stm_gpioa)
 #define AO_SDCARD_SPI_CS_PIN	4
 #define AO_SDCARD_SPI		stm_spi1
+
+#define SDCARD_DEBUG		1
+#define SDCARD_WARN		1
+#define SDCARD_TRACE		1
 
 #endif /* _AO_PINS_H_ */

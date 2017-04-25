@@ -80,6 +80,7 @@
 #define HAS_TELEMETRY		0
 #define HAS_APRS		0
 #define HAS_ACCEL		0
+#define HAS_AES			1
 
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* CC1200 */
@@ -197,6 +198,7 @@ struct ao_adc {
 #define AO_CC1200_SPI_CS_PIN	10
 #define AO_CC1200_SPI_BUS	AO_SPI_1_PA5_PA6_PA7
 #define AO_CC1200_SPI		stm_spi1
+#define AO_CC1200_SPI_SPEED	AO_SPI_SPEED_FAST
 
 #define AO_CC1200_INT_PORT		(&stm_gpiob)
 #define AO_CC1200_INT_PIN		(11)

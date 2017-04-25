@@ -24,13 +24,15 @@ __pdata uint32_t ao_cmd_lex_u32;
 __pdata char	ao_cmd_lex_c;
 __pdata enum ao_cmd_status ao_cmd_status;
 
+#ifndef AO_CMD_LEN
 #if AO_PYRO_NUM
-#define CMD_LEN 128
+#define AO_CMD_LEN 128
 #else
-#define CMD_LEN	48
+#define AO_CMD_LEN	48
+#endif
 #endif
 
-static __xdata char	cmd_line[CMD_LEN];
+static __xdata char	cmd_line[AO_CMD_LEN];
 static __pdata uint8_t	cmd_len;
 static __pdata uint8_t	cmd_i;
 
@@ -48,8 +50,8 @@ backspace(void)
 	ao_put_string ("\010 \010");
 }
 
-static void
-readline(void)
+void
+ao_cmd_readline(void)
 {
 	char c;
 	if (ao_echo())
@@ -88,7 +90,7 @@ readline(void)
 			break;
 		}
 
-		if (cmd_len >= CMD_LEN - 2)
+		if (cmd_len >= AO_CMD_LEN - 2)
 			continue;
 		cmd_line[cmd_len++] = c;
 		if (ao_echo())
@@ -99,12 +101,13 @@ readline(void)
 	cmd_i = 0;
 }
 
-void
+char
 ao_cmd_lex(void)
 {
 	ao_cmd_lex_c = '\n';
 	if (cmd_i < cmd_len)
 		ao_cmd_lex_c = cmd_line[cmd_i++];
+	return ao_cmd_lex_c;
 }
 
 static void
@@ -307,7 +310,7 @@ version(void)
 #endif
 #endif
 #if defined(AO_BOOT_APPLICATION_BASE) && defined(AO_BOOT_APPLICATION_BOUND)
-	       , (uint32_t) AO_BOOT_APPLICATION_BOUND - (uint32_t) AO_BOOT_APPLICATION_BASE
+	       , (unsigned) ((uint32_t) AO_BOOT_APPLICATION_BOUND - (uint32_t) AO_BOOT_APPLICATION_BASE)
 #endif
 		);
 	printf("software-version %s\n", ao_version);
@@ -376,7 +379,7 @@ ao_cmd(void)
 	void (*__xdata func)(void);
 
 	for (;;) {
-		readline();
+		ao_cmd_readline();
 		ao_cmd_lex();
 		ao_cmd_white();
 		c = ao_cmd_lex_c;

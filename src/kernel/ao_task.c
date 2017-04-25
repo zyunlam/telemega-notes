@@ -373,7 +373,11 @@ ao_yield(void) ao_arch_naked_define
 		if (!ao_list_is_empty(&run_queue))
 			break;
 		/* Wait for interrupts when there's nothing ready */
-		ao_arch_wait_interrupt();
+		if (ao_task_minimize_latency) {
+			ao_arch_release_interrupts();
+			ao_arch_block_interrupts();
+		} else
+			ao_arch_wait_interrupt();
 	}
 	ao_cur_task = ao_list_first_entry(&run_queue, struct ao_task, queue);
 #else

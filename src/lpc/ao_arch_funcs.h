@@ -109,7 +109,7 @@ ao_arch_memory_barrier() {
 static inline void
 ao_arch_init_stack(struct ao_task *task, void *start)
 {
-	uint32_t	*sp = (uint32_t *) (task->stack + AO_STACK_SIZE);
+	uint32_t	*sp = (uint32_t *) (void *) (task->stack + AO_STACK_SIZE);
 	uint32_t	a = (uint32_t) start;
 	int		i;
 

@@ -1,9 +1,2142 @@
-commit c0ad087008856cfc2233b977abfc3f1dcbaccdcc
-Merge: 148b013 4fdf8ca
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Sep 5 20:59:11 2016 -0600
+commit 9c95bed92a45741e6c1ad0ab4941f13370b77648
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 24 15:47:08 2017 -0700
 
-    Merge branch 'master' into branch-1.6
+    Bump to version 1.7
+    
+    TeleMini v3.0 support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3544c33c2f386fb292de9e74982717a002f37440
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 24 17:11:03 2017 -0700
+
+    altoslib: renamed AltosSensorTMini2, but didn't update AltosIdleFetch
+    
+    Because Java found the old installed version of this library. Thanks!
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5914231bfe8220a92dde17901b952e919a40d568
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 24 17:18:10 2017 -0600
+
+    update copyright year in docs
+
+commit 8e5b4359050701513a807131564ae54f2e6b919b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 24 16:40:46 2017 -0700
+
+    altos/ao_pad.c: Use #if HAS_LOG instead of #ifdef HAS_LOG
+    
+    TeleFire v0.1 defines HAS_LOG to 0.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c57a5c018e4bd0a0033c8759132a648977bf45f7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 24 15:59:23 2017 -0700
+
+    doc: Errors in the TeleMini v3.0 updates found by Bdale
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b6b58aa2fbae1e7782b5a0b700544efe319fe34e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 22 22:04:31 2017 -0700
+
+    altos: Move old AO_LAUNCH defines to cc1111/ao_launch.h
+    
+    These were getting accidentally used by ao_pad.c
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cd291d38b92b31c3612e6de6cdf4e5988fc01c12
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 23 00:02:47 2017 -0600
+
+    allow multiple tests to be logged on telefiretwo without rebooting
+
+commit d75351c5a07241bcbb951758796b4f639ace6b1f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 23:42:23 2017 -0600
+
+    implement static test start and stop protocol for telefiretwo+telebt
+
+commit 6cfd9411026d536b5b75098b8c9ec3ceb3d945aa
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 23:02:53 2017 -0600
+
+    eliminate spurious close braces
+
+commit e3b30d4bd6faf68c885791fb87229558cc1157a6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 23:01:44 2017 -0600
+
+    add static test start and stop commands to radio protocol for telefiretwo
+
+commit e5e0ce18b2ae684896a6d7d0a4c10269199d95b5
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 23:01:26 2017 -0600
+
+    enable logging support in telefiretwo
+
+commit e05b281e6d1a7a4fa92d52f2491f27266045df96
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 17:20:41 2017 -0600
+
+    cobble up a command to toggle logging on/off on TeleFireTwo
+
+commit db12c17e9538bd82f2c2bf21357887ee7d894a1c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 16:59:03 2017 -0600
+
+    a stab at turning on rudimentary logging for telefiretwo
+
+commit 6804ead7f7e54ff34b257e10e381dc52d5a61b06
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 22 15:55:48 2017 -0700
+
+    altoslib: Add TeleFireTwo eeprom support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 359e2d6eca5258f4fabc59772f1320e195a7397c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 16:36:18 2017 -0600
+
+    fleshing out logging for telefiretwo
+
+commit 439a51ed503b74c1739cf150cdc91685653deed0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 15:45:52 2017 -0600
+
+    enable spi flash on telefiretwo
+
+commit ffc90fa3f932aef4dd85147817949aa9474b6d26
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 22 11:38:08 2017 -0600
+
+    fix TeleFireTwo product name in ao-list output
+
+commit 4682323a4bf147b9a908f5f9104bf01ab2cf0533
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 23:02:57 2017 -0700
+
+    altos/stmf0: Pull beeper pin low when beeper is off
+    
+    This avoids having the pin float and pick up noise from any adjacent
+    signals, like TeleMini's radio.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eb1c2bf5244840049c0a58e0ceecfcd9f5c290dd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 22:24:00 2017 -0700
+
+    doc: Finish updates for v1.7
+    
+    Scrub all TeleMini references and make sure they're fixed for v3.  No
+    'emergency' mode yet.  No reflashing yet.
+    
+    Add v1.7 release notes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5849ee6c09669e6d2e6940a76bcb5cc23178fc68
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 21:32:26 2017 -0700
+
+    altos/lpc: Really fix aes entry in lpc vpath
+    
+    I added another entry instead of fixing the existing one. Not ideal.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c833c93e812936125cfe9532523ea36b5046e58d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 18:16:45 2017 -0700
+
+    Replace turnon_telemini with v3 version. Add test-teleminiv3
+    
+    Prepare for TeleMini v3.0 release.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8978687dc2ae90e4005a8f7d598940b7df6a4359
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 18:08:25 2017 -0700
+
+    doc: Update TeleMini v3 photos to production unit
+    
+    Replace prototype photos
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 86a54146b58be86c58fb45386c7abcfa0bb11677
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 17:15:05 2017 -0700
+
+    alots/stmf0: Fix vpath entry for AES directory
+    
+    Mis-placed )
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 64ac93f5495db7a8b06f1eb4fe4eb2418125d792
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 17:06:23 2017 -0700
+
+    altos/lpc,altos/stmf0: Use -n flag to work around link editor issue
+    
+    Something changed in the link editor which makes it complain about 'no
+    space for program headers' on LPC and STMF0 builds. Somehow, adding
+    the '-n' flag to the linking step fixes it. It doesn't appear to break
+    the build, so I guess it's ok?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 77c76e429074a53c1c5230a7b5e665d1715b296f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 17:04:28 2017 -0700
+
+    altos/telemini-v3.0: Remove vestiges of the pre-USB code
+    
+    Pre-USB telemini v3 designs had a separate firmware load for radio
+    calibration. Now that we've got enough USB to perform flash/cal/test,
+    we don't need that other firmware load, so we can remove the remaining
+    Makefile remnants of the calibration load.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit adb842b64b04a7d70e543bad7ae59807d549e85a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 16:40:58 2017 -0700
+
+    altos/lpc: Add (void *) cast to fix alignment warning
+    
+    The -Wcast-align warning is generated when this cast is not present.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 51ce352d179835ca08e4cf9326e9e77d6b972fb7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 09:18:48 2017 -0700
+
+    altos/lpc: Fix up Makefile definitions
+    
+    vpath reference to aes was busted.
+    WARN_CFLAGS needs -Wcast-align.
+    Wrap AO_CFLAGS.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ec319edd2cda321d7542784b997acd0da040fa3d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 21 09:17:18 2017 -0700
+
+    ao-test-baro: Be more lax about altitude checks
+    
+    High pressure here today and the altimeter is reading -69m. Allow down
+    to -100m when testing baro values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7db49a2052ec905cdc02f626c0933ca6889d64a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 19 23:08:56 2017 -0700
+
+    altos/telemini-v3.0: Add flash loader
+    
+    Now that telemini has USB, use the boot loader to make it easy to
+    update firmware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d1ba276c6e54564f82920f65bf4c19df85c9ea56
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 19 23:08:06 2017 -0700
+
+    altos/telemini-v3.0: Update to production hardware
+    
+    Removed LEDs. Added USB. Flipped lots of pins around.
+    
+    This appears to make telemini work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 93983730a6628a2a85b6fc543df236b35d501ee9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 19 16:00:24 2017 -0700
+
+    altos/telebt-v3.0: Add LCO bits for testing
+    
+    Add the USB commands for LCO testing to TeleBT v3.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 944d8466a31842c34304b77364d632e259238018
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 19 14:19:28 2017 -0700
+
+    altos/telefiretwo-v0.2: Add AO_CC1200_SPI_SPEED
+    
+    Needed for products with different SPI speed options.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1e7143e5d448cd05c355f4a323ae4892b02022ac
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Apr 19 15:08:15 2017 -0600
+
+    add new ADC channels for telefiretwo
+
+commit 6e699fa4971668bbe569d2a0e2ed9f891877d140
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Apr 18 16:47:43 2017 -0600
+
+    need top level Makefile too
+
+commit 9fa46346d576081f99860cad96c91bcf63233649
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Apr 18 16:47:05 2017 -0600
+
+    builds, loads, runs, not very useful yet
+
+commit 207403e53cc80b0649ce3c004f97d8e1dad824c8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Apr 18 16:33:27 2017 -0600
+
+    copy telefiretwo-v0.2 to start firmware for v1.0
+
+commit f69d85e2b32370ab68e2725e739417cad6d7a590
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 13 21:48:46 2017 -0600
+
+    telegps-v2.0: Remove fec_tx code and ADC logging.
+    
+    This gets telegps-v2.0 to link.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4e561ae43a734d870470e36c41232482bd5f398f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 13 21:47:14 2017 -0600
+
+    altos/stmf0: Split up rom load in altos.ld to make linker happy
+    
+    The linker isn't happy when the .ld file tries to add text, the .exidx
+    and .rodata segments in the same block. Split them up for success.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a5c8b8c59f99108233d99ceceb6f85315694e4b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 13 21:18:58 2017 -0600
+
+    cortexelf-v1: Fetch data at TPB rising when MWR or MRD are low
+    
+    This should get the right value at least.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3390c62b6d0761764ec5249d72bda33b984a8f90
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 13 21:16:52 2017 -0600
+
+    altos/telegps: Inherit LDFLAGS from lpc make specification
+    
+    Somethings messed up with cortex-M0 linking, and this isn't helping as
+    it overrides the LDFLAGS coming from the architecture.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f18793efb1fbfd17963b9146fae084f2b843d7a3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Apr 13 19:36:49 2017 -0600
+
+    initial cut at telegps-v2.0 firmware
+
+commit eb0b2b4e9f56d1d6fc2b06e39c8372dfcdf3b1f5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 13:03:50 2017 -0700
+
+    cortexelf-v1: Initialize key matrix code
+    
+    This gets the hex keypad working.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6efa53bafda18313742849a6c4992f09c3e403c3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 12:59:07 2017 -0700
+
+    cortexelf-v1: Bump SPI pin speed to 40MHz to for sdcard. Fix VGA DMA.
+    
+    Tell the DMA code to leave the DMA engine enabled so the VGA output
+    can use it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c97b4c65d66078a4e187b782669e6b36ee92d30c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 12:56:59 2017 -0700
+
+    altos: Use MP switch in cortexelf boot loader for force loader mode
+    
+    Provide a way to get to the boot loader on the cortexelf board by
+    turning the MP switch on.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9e80b8bd10433ecc6ebe7c295e16b62b3883987d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 12:55:34 2017 -0700
+
+    altos: Escape lisp REP loop with () input
+    
+    Provide a way to get out of a lisp read-eval-print loop that can be
+    easily input from the keyboard.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 83c1e4e8ca684f555cba252efd3882f811d8e154
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 12:54:57 2017 -0700
+
+    altos: Document a few more SPI mode bits in VGA driver
+    
+    Just comment changes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 24cd5dd33ccf65c1b277911c460a89ec2b52e421
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 12:53:34 2017 -0700
+
+    altos: Drive row low instead of high in matrix driver
+    
+    Driving it high won't work all that well as we're looking for zero bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a68fb412589819980759d49565a084b23eee8b8f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 12:51:49 2017 -0700
+
+    altos: Place AS1107 in 'normal' mode at end of init sequence
+    
+    This makes sure the device is out of reset mode while initializing,
+    and then placed in normal mode to turn on the display.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 04d4b17635fc9395c70aa0840971c00082f509ba
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 12:48:54 2017 -0700
+
+    ao-elftohex: Add conditions for skipping ELF sections
+    
+    Skip sections with size 0, or which are of type SHT_NOBITS or which
+    don't have the SHF_ALLOC flag set.
+    
+    This avoids crashing on sections which don't have any data to copy.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 86d5119f19b5f3131d224982e011fd233b48aa22
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 4 16:05:15 2017 -0700
+
+    cortexelf-v1: More 1802 noodling
+    
+    Add code to track the address and data displays, change how 1802 pin
+    tracking works
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 301b724d2169f4ac46d921f518455c783e1dd894
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 4 16:04:25 2017 -0700
+
+    stm: Add more mask-based GPIO controls
+    
+    Lets cortexelf do more things with groups of pins, rather than one pin
+    at a time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71e430bb39fc97e543778f7bc1f1bef554ba8b75
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 4 16:03:36 2017 -0700
+
+    altos: Allow programs to enable SDCARD debugging if desired
+    
+    Provides for per-application control over SDCARD debugging
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4eced9224f40e48d7057352b3424c18025f43f25
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 4 16:02:46 2017 -0700
+
+    altos: Disable FAT commands unless requested
+    
+    This are debugging commands; don't provide them unless requested
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d4ff161e89d852c07934704ea2cbea20a48259a7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 4 16:00:56 2017 -0700
+
+    telegps-v0.1: Hack up for SDCARD debugging
+    
+    Disable everything not SDCARD related for debugging.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 920b70fd5f6b78461c7ebae6b1e6490a0e050bc2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 4 15:59:56 2017 -0700
+
+    altos: Define CC115L spi speed in each product
+    
+    Different SoCs have different SPI speeds available; have each product
+    specify the speed to use instead of trying to use 4Mhz everywhere.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 280eefc8f86e90e742c536a074d7284cce03af15
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 3 11:41:51 2017 -0700
+
+    cortexelf-v1: Add pin definitions for 1802 connections
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0197157a295d848bac65cf7f4457dd5a99af24e3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 3 11:37:21 2017 -0700
+
+    stm: Add a few more GPIO functions to make dealing with the 1802 easier
+    
+    ao_gpio_set_mask and ao_gpio_get_all
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 89c8e0299504e66fc416a778055958cff467e008
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 3 11:36:52 2017 -0700
+
+    cortexelf-v1: Make bit flipping array constant
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 47004dfe8ee8c8b31085b066d3d0fd5142fd49da
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 3 09:36:00 2017 -0700
+
+    cortexelf-v1: doodling with 1802 bits
+    
+    Just some random ideas about how to manage the 1802
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5bb9cf38c84663713c178f54b684d40b6c00b11d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 20:33:49 2017 -0700
+
+    cortexelf-v1: Add bit flipping array generator
+    
+    Someone hooked up the data lines between the systems backwards, so we
+    get to swizzle the bits in software.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8c1478b55f5dbe9711b31a34d4f5e3563f1f42d2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 19:32:17 2017 -0700
+
+    cortexelf-v1: Hook up hex keypad using matrix input driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 79215de60d3e11b4abd1ecd2fa9575a323b76754
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 19:31:45 2017 -0700
+
+    altos: Allow buttons to be high when pressed rather than low
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 09f8710eb320f37f20dda8c635497c2b505d25e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 19:30:57 2017 -0700
+
+    altos: add button matrix driver
+    
+    Scans the matrix once per clock tick queuing events for changed keys.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 17ec1c510ccc42bbc387940b5805f452697f78d6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 17:39:26 2017 -0700
+
+    cortexelf-v1: Hook up AS1107 in test mode
+    
+    Provide a 'L' command to display values
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cc1b56faa88c75c9c86af89c77d7f1349573b7b0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 17:39:05 2017 -0700
+
+    altos: Add AS1107 LED display driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1bc48b075f76bfef258f516549573429b24f284c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 16:37:42 2017 -0700
+
+    cortexelf-v1: Add buttons
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8284d3639cd24e2fa0faf1e35e7276ba35a24f8f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 16:22:28 2017 -0700
+
+    cortexelf-v1: Add serialblather command.
+    
+    This reads from stdin and dumps it to both serial ports until you type ~
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6fb817f218a69b28973b0d059d71809717b1e2d1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 16:17:33 2017 -0700
+
+    lisp: Fix up lisp build so projects can get ao_lisp_const.h built as needed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3ce663875d69739cc2d43fcd88b22820cd9d6500
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 15:56:17 2017 -0700
+
+    stm: Use common flash wait loop instead of inlining
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1f5f0638f283fbb784021873c649109d4ed0257c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 15:53:17 2017 -0700
+
+    cortexelf: Add lisp interpreter
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54c76d48924fecc2aeabbc352c553822a87f9d19
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 15:40:03 2017 -0700
+
+    cortexelf-v1: Use new memory map to access all flash and ram. Add fat.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b031d5a86213364196b67f7e3f92865da8adbf9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 15:28:45 2017 -0700
+
+    cortexelf-v1: Hook up serial consoles for debugging
+    
+    This will make playing with serial ports easier for now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 62b0228aed5191c8d769f9f34143a13036e210a7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 15:18:34 2017 -0700
+
+    cortexelf-v1: Fix clock to drive VGA at 640/480. Add sdcard, remove others
+    
+    VGA requires the CPU to run at 24MHz.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 637d522c6a15b47051103ccc3626be3206a7a2df
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 2 15:04:09 2017 -0700
+
+    cortexelf-v1: Add ps/2 and vga with graphics
+    
+    Start hooking up devices with known drivers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9f451db9889cd578c3032356fd2aa4b5ed45878d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 2 15:47:31 2017 -0600
+
+    capture pnpservo makefiles too
+
+commit bc150497de8539827177805c7f4430c67ca6762f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 2 15:47:14 2017 -0600
+
+    makefiles too
+
+commit 66b06332dadd83c309bbfe02240b7a071fd57ff2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 2 15:41:56 2017 -0600
+
+    initial skeleton of CortexELF support
+
+commit d318b5cfc1a0312697739576d35cc1a190d88849
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 1 12:23:24 2017 -0600
+
+    first rough cut at skeleton of code for pnpservo .. altos boots and runs
+
+commit 190cdaa5cb18e78caeeaaaaed6a9d304e939eb6b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 5 22:42:37 2017 -0800
+
+    doc: Rename telemini doc file from telemini-v1.0.inc to telemini.inc
+    
+    This file now contains information on both TeleMini versions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7bb4dbab45f98dd5fd85d9daf12d27b153c0ef3a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 5 22:33:36 2017 -0800
+
+    ao-tools/ao-flash-stm: Use openocd instead of st-utils
+    
+    openocd upstream and debian package can both flash stm32l processors,
+    so use that in preference to st-flash.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f004eaa2c26b4c61a8c3de2c0667a4e9865e704d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 2 13:37:12 2017 -0800
+
+    ao-tools/ao-flash-lpc: Adapt to current openocd LPC support
+    
+    Openocd 0.9.0 has generalized the lpc11xx support for all lpc11xx
+    processors, not just the lpc11u14. This replaces the specific
+    lpc11u14.cfg with the general lpc11xx.cfg file.
+    
+    Unlike the build we were using, this doesn't adjust the
+    'verify' command to adapt for the checksum which gets added during the
+    flashing process. Hence, we disable verification and trust that if the
+    flash loader works to load the OS, it's fine.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 59aaac44e3e164b326518b324b52d115fbb76fca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 1 14:01:59 2017 -0800
+
+    telemini outline svg had wrong version number
+
+commit b5a42665d7811707b6bd4a67d7d8e6532daa29e4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 1 13:53:36 2017 -0800
+
+    Add initial TeleMini v3 docs
+    
+    Uses pictures of the prototype.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d1c2a5729da00be9d393015bbaa2d2f58e936d84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 17:34:43 2017 -0800
+
+    altos/nucleo-32: Update lisp files, add beeper support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d1956000ba2e6260977aa669475d3ff725578b55
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 17:32:09 2017 -0800
+
+    altos/lisp: Not quite ready to start making it look like scheme yet
+    
+    Lots more code to write before these symbols can be exposed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9603d737e9ea58217ff2c2dd7c350c7a29fba980
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 17:29:15 2017 -0800
+
+    altos/stmf0: Support timer 2/3 for the beeper
+    
+    Tested on timer 2, all four channels.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 003e9479ad4364d9f7acf189b35f32ccdfd43be0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 16:51:09 2017 -0800
+
+    altos/stmf0: Support tim1 beeper channel other than 3
+    
+    ch1 was broken and ch2 didn't have any code at all.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3c3f5e316c0c2464568db883d50881f5b898abac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 17:33:37 2017 -0800
+
+    altos/telemini-v3.0: Add beeper defines needed for more general beeper code
+    
+    The beeper code now wants to know which timer, port and pin are in use.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dc4bee9600be22531fd3c5bec15f712eb2e7ed2d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:18:58 2017 -0800
+
+    altos: Add stm-vga demo project
+    
+    Uses the VGA and PS/2 drivers to provide an interactive console.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0eadc2d50417408beebd50e4a0e7e12430ed67ef
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:16:27 2017 -0800
+
+    altos/stm: Add draw and lisp to make search paths.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c296acd643698d0128e2f58f91a9cfeea63f580a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:21:39 2017 -0800
+
+    altos: Add console driver using VGA and PS/2
+    
+    Provides an interactive text console.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c1d52178ce63ebdc44c83d1bca5027942e2d778c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:19:42 2017 -0800
+
+    altos: Add PS/2 keyboard driver
+    
+    Interrupt driven, includes standard US keymap.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6b39d3093c3b87689717bb03988d160473c53c64
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 00:04:27 2016 -0800
+
+    altos: Add VGA driver for STM32L processors
+    
+    Generates vsync/hsync using timers and pixel data using the SPI port.
+    320x240 video using 640x480 mode and a 24MHz "pixel" clock.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1301d576d9bface4cc625e4a4187401f93f54444
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:17:42 2017 -0800
+
+    altos: Add bitmap drawing code
+    
+    Includes solid fills, text and lines.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a487d2fcba57141f6b083d5612c76bac5ad1ac7c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:15:45 2017 -0800
+
+    altos/stm: Add nvic priority register fields. Add more TIM234 defines.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 80fd7f7bef5320ce86048d74dc4a72e1ec361120
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:14:10 2017 -0800
+
+    altos/stm: Make i2c code handle PCLK1 of 24MHz
+    
+    Just adds the necessary defines to the code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 72ea90d28817549c4343d2fea03a4c951f849cbe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 20 12:12:43 2017 -0800
+
+    altos/stm: Allow DMA channels to be hijacked by other code
+    
+    This lets code which needs finer control over DMA to use the channel
+    without interference, and leaves the DMA engine running so that it can.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5dc5e2e238f8c1a8ca35d85ec046124afa9385ad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 10 14:45:25 2017 -0800
+
+    altos: Allow for console to be used for stdio
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e6fb0f13ba230ad9ce86cfa7f56491a0a3bd4b3d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 10 14:43:07 2017 -0800
+
+    altos/avr: Avoid warning about unused args in stdio_put and stdio_get
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 839eadbc8e5694842eb498c6e47cfbf08ba8fbf4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 02:59:40 2016 -0800
+
+    altos/stm: Allow use basepri instead of primask for masking interrupts
+    
+    This allows for high priority interrupts (priority 0) to run, even
+    when other interrupts are blocked. Code executing in such interrupt
+    handlers must not attempt to control task execution as that will race
+    with the scheduler.
+    
+    Select this by defining AO_NONMASK_INTERRUPT in ao_pins.h.
+    non-maskable interrupt priority is AO_STM_NVIC_NONMASK_PRIORITY
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 088ddbb177efc8be2fc467524dc1668553080d3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 20:54:10 2016 -0800
+
+    altos/stm: Interrupt priority is in the upper bits of the priority mask
+    
+    Because the STM32L only offers 16 priority levels, the bottom four
+    bits of each priority mask are not used. All of the interrupt priority
+    settings in the system were using values < 16, making them all
+    effectively the same. Fix that by moving them into the upper 4 bits
+    and using symbolic constants everywhere.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 992eee8e0b4c6c774f3355af107fb422019ff4e5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 20:56:01 2016 -0800
+
+    altos: Don't wait while idle if trying to minimize interrupt latency
+    
+    Keeping the scanout running reasonably means keeping interrupt latency
+    constant, and that requires leaving the CPU running. Don't wait for
+    interrupts when the system is running in this mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f0c187dd6479996b83f85b6decf303ec0fc70fe5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 6 09:10:23 2017 -0800
+
+    ao-tools/ao-usbload: Pad image with 0xff instead of random bits
+    
+    Clear the temporary block to 0xff before copying in the target data so
+    that any unused bytes end up being left at 0xff instead of inheriting
+    whatever data was in the block before.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 61f729567ff6355ab52c3e83399761103022a41a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Dec 17 20:57:38 2016 -0800
+
+    altos/cc1111: Remove unneeded initialization in ao_timer.c
+    
+    The timers are all stopped when the chip boots, so no need to stop
+    them. This saves some text space, allowing the current code to (just
+    barely) fit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1029a6e4a61b20698e00e29fc0c8c3877f1e7b0f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 19 17:36:04 2017 -0800
+
+    altoslib: Add TeleMini v3 support
+    
+    eeprom, telemetry and monitor idle. This is just like TeleMini v2,
+    except the ADC ranges are all difference as the voltage dividers are
+    different and the ADC itself has a different range.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5c272d8e50d0b23f31a6a9ebdad81fc514936222
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 19 17:40:28 2017 -0800
+
+    altos/telemini-v3.0: Swap main and apogee sense pins.
+    
+    These were just hooked up wrong in the software.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 59ac667c4ae14e0fa699fb0f398d31763a237646
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 19 17:39:21 2017 -0800
+
+    altos: Split out TeleMini v3 log/telem labeling
+    
+    Allow the ground software to know which TeleMini version is in use,
+    even though they are very similar with only ADC values differing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c75736c9cd8f869c257a3024efda843cf0edf2a3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 22:56:49 2017 -0800
+
+    altos/telemini-v3.0: Finish initial turn-on
+    
+    TeleMini v3.0 is nearly working; there are some ADC issues still, and
+    lots of altosui work left to decode the new telemetry packet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit efdeb402d04e7f04ad4bd2764f8f1ca7270b3dff
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 3 06:52:57 2017 +0100
+
+    altos/telemini-v3.0: Update to second prototype version
+    
+    Separate radio xtal means we run the processor at 48MHz.
+    Fix the battery monitoring voltage divider resistor values.
+    Disable most of the code until we've got the radio working.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 97c814bc12893bee40f9dc38fabbaa69e0dc6aed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 28 15:35:48 2017 -0800
+
+    altos: Initial TeleMini v3.0 code
+    
+    For first prototype, which attempted to use the SoC clock for the radio.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b94fe9915b33283df6b86bcdc96ceada1fc71ce6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 19 17:42:05 2017 -0800
+
+    altos/stmf0: Add adc and beep support for TeleMini v3.0
+    
+    Note that the ADC code is running very slowly as required by the high
+    impedance dividers on the TeleMini v3.0 pyro circuits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1dc31a46f1d1adfdeab444664e581a780d995bf7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 22:49:34 2017 -0800
+
+    altos: Require SPI speed to be declared for cc1200
+    
+    The cc1200 can't run SPI faster than 10MHz, so make sure every device
+    picks a SPI clock slower than that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0bf267a6e2d401c8bd6a06d995e3d000777d622a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 22:55:41 2017 -0800
+
+    altos: Allow applications to define LEDs for ao_report.c
+    
+    In case they don't have both a red and green LED.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cf10239e5485a101fcd7a12b28be927af94d577a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 22:54:35 2017 -0800
+
+    altos/stmf0: Allow projects to not use the USB boot loader
+    
+    Let applications define HAS_BOOT_LOADER on their own if desired.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3770a5f527cb6d519ce22fe91e0cc4078bf72661
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 22:53:03 2017 -0800
+
+    altos/stmf0: Complain if the SPI configuration isn't complete
+    
+    If the pin usage values SPI_1_PA5_PA6_PA7 or SPI_1_PB3_PB4_PB5 aren't
+    defined, then the speed values for the pins aren't going to get set
+    correctly, which results in erratic SPI behaviour.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f85997eb53779e637dca697d0d96da7d1235fa80
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 3 06:51:11 2017 +0100
+
+    altos/stmf0: Allow apps to leave interrupt vectors at 0
+    
+    TeleMini v3.0 doesn't need a boot loader, so we'll have the app run
+    its interrupt vector right at the bottom of the address space instead
+    of copying it to the bottom of ram and reconfiguring the chip to use that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f43c3ad0c643f714c523e513bdc8585c6d5a4050
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 22:46:29 2017 -0800
+
+    ao-bringup: test-chaoskey needs to use the SerialNumber dmesg line
+    
+    I had a locally hacked kernel which was reporting the serial number
+    along with the device name. Instead of depending on that, just look
+    for the regular SerialNumber report which is in all kernel versions
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a21c7b5156e428a4f8e029fdb652c8ca1c63823b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 3 06:47:32 2017 +0100
+
+    ao-bringup: Allow serial number on turnon_easymega cmdline
+    
+    This makes it a bit quicker to do a batch of them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 51edc29f5ba758ef8ba4fdd5f53fdabc6a31c98a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 28 15:33:53 2017 -0800
+
+    altos: Eliminate printf format warning with long vs int
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d96224c2fdc535d08de23aec30d62d4ada9fb8d3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 22 15:29:13 2017 -0800
+
+    altos/chaoskey: use both halves of the CRC
+    
+    When pulling 16 bits from the 32-bit crc, instead of just using the
+    low bits, xor the two halves together. This appears to even out the
+    number of zero and one bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bc076747f6cc00508aef909a3a5bd3edf8c9bd66
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 12:14:59 2017 -0800
+
+    altos/lisp: Start adding scheme symbols
+    
+    Migrating to something more like scheme
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9c85c9d60334edc2af65a47124873e94e0ff1e9c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 10 14:47:03 2017 -0800
+
+    altos/lisp: Add casts to keep the latest GCC from whinging
+    
+    Something about alignment issues.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 399ba0a62422f71ff9669ba03b6a058bb2981c27
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 10 14:45:59 2017 -0800
+
+    altos/lisp: Tell compiler that the two lisp memory pools are aligned
+    
+    Otherwise, it will generate unaligned accesses to things fetched from
+    them. Sigh.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 30d6b241447cb922b9316e86817f6e31eb973eed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 01:41:59 2016 -0800
+
+    altos/lisp: Clean up hanoi.lisp demo a bit
+    
+    No serious changes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 329f76d5e2732ab1c1b10223842d7816275c7e8b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 23:37:44 2016 -0800
+
+    altos/lisp: Move stack recursion check after null check
+    
+    Don't crash when printing null stack this way.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1999b2c915bd5b7df70cffa7777e411d3032d2d5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 22:57:22 2016 -0800
+
+    altos/lisp: Include memory stats for test program
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 129e07ccc9b8a33491a905a91ca6c5b0509aba9c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 22:53:36 2016 -0800
+
+    altos/lisp: Cleanup some DBG defines
+    
+    Get rid of the remaining duplicate defines.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2c80fea1936ff956df127b43e65139afec3929a0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 22:52:53 2016 -0800
+
+    altos/lisp: Share binary search for memory chunk between mark and move
+    
+    Save some text space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1b1bc92e6781c563e3d3b117b9cda2dddccc44de
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 22:52:10 2016 -0800
+
+    altos/lisp: Add builtin 'collect'
+    
+    Collect memory, return amount free.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c3a4d7721f0f5d082336b8cc9c9d765ad2f7d17e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 22:41:46 2016 -0800
+
+    altos/lisp: Sort frames by atom
+    
+    Fortunately, the collector always retains the relative order between
+    addresses, so we can sort based on the atom address itself. This
+    reduces the time spent looking for names in larger (e.g. global)
+    frames.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8f833f31f625526a5f1e9a1bd561733b5bb2bcaa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 21:17:54 2016 -0800
+
+    altos/lisp: Build new ao_lisp_stack.c into test and lambdakey
+    
+    Helpful to include the new source file.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 35424031747b41b1125e715a975f1679b89fc27a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 21:16:11 2016 -0800
+
+    altos/lisp: bounds check in move_map plus binary search
+    
+    This makes move_map faster by skipping all addresses which aren't
+    changing.
+    
+    Also changed the interface from address to offset to avoid computing
+    the offset multiple times.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 85db6d68a273859482e036b60fec7e2b84e9c262
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 21:15:33 2016 -0800
+
+    altos/lisp: Empty lambda body is not an error
+    
+    It's not very exciting, but it's still legal
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ecef616599d5ec4fd5d42e67d0dc779a0630079b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 21:14:47 2016 -0800
+
+    altos/lisp: Use poly stashes for stacks
+    
+    Saves some memory.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4c812b8c903bd7e689572f8800ecc092af9cfe18
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 21:12:50 2016 -0800
+
+    altos/lisp: Make DBG settings global
+    
+    This avoids having different values in different files, which wasn't useful.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e600fc409c577eec02af612a36431c477a9c875e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 18 19:04:05 2016 -0800
+
+    altos/lisp: Add continuations
+    
+    This provides call/cc and makes 'stacks' visible to the application.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2cc8ca2b781be0a6e7ce14405eb4611bc00a3a3e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 18:45:31 2016 -0800
+
+    altos/lisp: Take advantage of implicit progns in hanoi demo
+    
+    Remove extra progn wrappers now that cond, lambda and while all
+    support implicit ones.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 11c79167cdd56015bbd1645db2d4394dcb4f0fbb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:52:30 2016 -0800
+
+    altos/lisp: have 'while' return the last body value
+    
+    Instead of always returning 'nil', let while return the last body
+    value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9126ae10b3c5acf0055caa31b1f08215675af784
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:51:34 2016 -0800
+
+    altos/lisp: Take advantage of implicit progn in ROM code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eaa528e4e62ba1d9765888760d387303487b2e01
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:08:15 2016 -0800
+
+    altos/lisp: Make lambda, cond and while all have implicit progns
+    
+    This lets all of these execute more than one sexpr, returning the
+    value of the last.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ffaf73407bcdf6bc4120c90212de4a2f52cf7991
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:07:42 2016 -0800
+
+    altos/lisp: Compile ao_lisp_make_const -no-pie
+    
+    Makes debugging easier
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 51bdee662fdfad1937c576daadd2e5eacac17905
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:06:55 2016 -0800
+
+    altos/lisp: Fix uninitialized values in ao_lisp_make_const
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 84732aebd10c293101727ba567bfc733dc30efca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:06:05 2016 -0800
+
+    altos/lisp: Dump globals on error
+    
+    Useful for debugging
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 05ac336ea954c0f5eefabdefb0c8c5747be3fd32
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:05:29 2016 -0800
+
+    altos/lisp: Fix error atom name in ao_lisp_length
+    
+    Cut&paste error.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2ce7ab37df07b3c1ea1ca9befc06477e3b6cdeac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 16:04:38 2016 -0800
+
+    altos/lisp: Remove some stale frame debugging checks
+    
+    No-one sets frame->_num to 0xff to hit these
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d37945f1404043e6bd287ce7ad7a57bc3289609b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 16 14:59:08 2016 -0800
+
+    altos/lisp: Clean up hanoi.lisp comments.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bcf5eb5825b1217d74f117b02d09b4ce4b007beb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 16 14:12:59 2016 -0800
+
+    altos/lisp: Eliminate compiler warning about array bounds at -O3
+    
+    Using ao_lisp_pool - 4 caused the compiler to whinge about computing
+    an address outside the bounds of the array. Sigh. Restructure the code
+    to do the adjustment-by-4 in the integer computations instead of the
+    pointer ones.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a5ef084659205700aab33e81d20fb89833c03249
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 16 14:00:38 2016 -0800
+
+    altos/lisp: binary search for chunk in collect
+    
+    Speeds up collect a bit
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9f19cb10cd12f86b12d0599bab5c2ee351d814ae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 16 13:59:54 2016 -0800
+
+    altos/test: Disable position independent executables
+    
+    This makes debugging programs so much harder
+
+commit a7fcf80e22e70516d0b2da314fb17ced20a3f775
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 16 13:47:49 2016 -0800
+
+    altos/lisp: Allow empty defun bodies
+    
+    This allows for (defun foo())
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit daa06c8dedc6dc1cf21936ee2769d9d25f0567bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 16 13:19:20 2016 -0800
+
+    altos/lisp: Optimize chunk searching in collect
+    
+    Note range of existing chunks to exclude objects outside.
+    Only look at chunks which have been set to reduce loop cost.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c8f9db184cc929ebde845730a6d4b7864e423a84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 16 12:34:14 2016 -0800
+
+    altos/lisp: Add incremental collection
+    
+    Realizing that long-lived objects will eventually float to the bottom
+    of the heap, I added a simple hack to the collector that 'remembers'
+    the top of the heap the last time a full collect was run and then runs
+    incremental collects looking to shift only objects above that
+    boundary. That doesn't perfectly capture the bounds of transient
+    objects, but does manage to reduce the amount of time spent not moving
+    persistent objects each time through the collector.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8406ddf8f0bd5453d6213973daed35991f80972a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 20:37:59 2016 -0800
+
+    altos/lisp: Make hanoi example output a bit prettier
+    
+    Make the towers symmetrical instead of lopsided. Much nicer looking.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 472ecec64213e6c37b588d69ca2e8efd5e9abe36
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 20:25:03 2016 -0800
+
+    altos/lisp: remove nth from hanoi.lisp
+    
+    It's now in ROM.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5161f6d78647591cc7ab8774a04edbc68a09f689
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 20:24:33 2016 -0800
+
+    altos/lambdakey: Strip out unused code
+    
+    Make space for more lisp bits!
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac0f7768659e288338bf452b4248ae3572ea2f7d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 20:22:54 2016 -0800
+
+    altos/lisp: Take advantage of multi-arg macros. Add more ROM funcs
+    
+    Added nth, or and and.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1a00bf4ac12a6505d4b23d94e99b4b46bf679020
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 20:21:47 2016 -0800
+
+    altos/lisp: Allow macro/nlambda/lexpr to have multiple args
+    
+    Entries from the params are bound to the formals with whatever
+    remaining formals there are bound to the last argument as a list.
+    This makes writing functions a bit easier.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5c1fa73f159de9d9839e8619494c26931521d2d4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 20:20:14 2016 -0800
+
+    altos/lisp: Do better checking for un-evaluated macros in ROM
+    
+    Need to look at immediate lambdas as well, and also deal with
+    recursive functions by checking for recursion at each atom
+    dereference.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 881161fe1c5fb0e2b1220c30572eb2c45bedbafe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 20:18:59 2016 -0800
+
+    altos/lisp: re-use small frames
+    
+    This saves a pile more use of the allocator by noting when frames have
+    not been referenced from another frame and freeing them when they go
+    out of scope. Frames with references are left to the allocator to deal
+    with.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 994adc7a47cbf3cbf6041eca7430273f8018de08
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 10:32:36 2016 -0800
+
+    altos/lisp: remove duplicate 'length' lambda from hanoi example
+    
+    This function is now a builtin.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41175ff82bc0e35c99c60b49aa62944a12917157
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 10:18:12 2016 -0800
+
+    altos/lisp: Get lambdakey and nucleo-32 building again
+    
+    Remove exti from the build list to make things fit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 974717eb9dad105c9897ee24f953d98d57eaec77
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 15 09:55:22 2016 -0800
+
+    altos/lisp: Evaluate macros once, then smash them into place
+    
+    This assumes that macros are all pure functions, which should be true
+    for syntactic macros.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b3b5bd2c14cfcde6c551a87ee6da08a53f1e4bc6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 14 23:04:05 2016 -0800
+
+    altos/lisp: Add license to hanoi demo
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 13a4d451b903d08e52005bcf531efa8de351bf2b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 14 21:27:41 2016 -0800
+
+    altos/lisp: Improve hanoi demo
+    
+    Repaint in place, without first clearing. This makes the updates a lot
+    clealyer looking.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 74ff0c6fd6c41cdaa054dcdb3d05c7d333bc24ff
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 14 21:27:03 2016 -0800
+
+    altos/lisp: Show number of collect calls in ao_lisp_test
+    
+    This helps tune the allocator
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5557f6b87a9b8bc9716de8191f2062a772a6ae6c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 14 21:25:38 2016 -0800
+
+    altos/lisp: Cache freed cons and stack items
+    
+    Track freed cons cells and stack items from the eval process where
+    possible so that they can be re-used without needing to collect.
+    
+    This dramatically reduces the number of collect calls.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ce549b2c11e6b2571590021e1c0503d8a6e7a702
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 14 19:55:36 2016 -0800
+
+    altos/lisp: Simplify GC a bit by only marking the head of each object
+    
+    We don't need to mark the whole object now as we're getting
+    information about where objects are by walking the tree each time
+    around the loop; ao_lisp_busy is only useful for terminating the walk
+    now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ddb4b8d90478ae324aa207a7541352c1ac9451ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 14 18:45:12 2016 -0800
+
+    altos/lisp: Change GC to do moves in batches of 32
+    
+    This should make it quite a bit faster than doing one at a time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit affcf6ffc08313151541993ee543bfe390165e81
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 23:38:03 2016 -0800
+
+    altos/stmf0: Add a comment about the requirements for using ao_flash_stm
+    
+    Need HSI clock and the flashing functions loaded in ram.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 30db58ade19ec69272a8c39c2f13d7919ca491a9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 23:36:22 2016 -0800
+
+    altos/lambdakey: Get save/restore working
+    
+    Need the HSI clock running for the flash hardware to work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 33aeffc123af1f9063969acf585f1caac885ced4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 23:34:54 2016 -0800
+
+    altos/lisp: Append a CRC to the saved image to validate on restore
+    
+    The CRC is actually of the ROM bits, so we can tell if the restored
+    image relates to the currently running code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8f2d60b4c029bffaa559bd1f31f5b15230dfa674
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 21:18:50 2016 -0800
+
+    altos/lisp: Add save/restore to ao_lisp_test
+    
+    Allow testing of the save/restore code under Linux.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dba374516ed396633659dec571b6a44b03da8ad1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 21:16:09 2016 -0800
+
+    altos/lisp: Add save/restore infrastructure. Needs OS support to work.
+    
+    This sticks a few globals past the end of the heap and then asks the
+    OS to save the heap. On restore, the heap is re-populated by the OS
+    and then various global variables reset.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 29c890b4599b3bbdbd09a5915ea68a63f4e0a9ac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 21:11:13 2016 -0800
+
+    altos/lisp: Make sure memmove only happens once per object. Other GC fixes
+    
+    The memmove may be overlapping, so make sure it happens only once by
+    just checking whether move_size has been set, rather than looking at
+    ao_lisp_moving; that doesn't get set when moving a noted cons as that
+    still needs to be walked at a later time.
+    
+    Fix up the various looping move functions to all use the same
+    pattern. Atom was busted.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d46ca67f93e9ecbc4d8c051c3fbdead85490b690
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 21:07:09 2016 -0800
+
+    altos/lisp: Make ao_lisp_ref and ao_lisp_poly non-inline
+    
+    These functions are pretty large and end up consuming quite a bit of
+    space if inlined everywhere they are used.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 00827a0ffe30938c26be216369fd2d8f8946d2c4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 00:28:57 2016 -0800
+
+    altos/lisp: Share mark function for mark and move
+    
+    These two operations both wanted to walk the referenced objects;
+    sharing is caring.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7f7e2431f5d1f7c1782ed6e774ccfc70fb4c87cf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 11 00:28:31 2016 -0800
+
+    altos/lisp: add length, pack, unpack and flush
+    
+    lots more builtins
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f5a36c15f894803f8804bbc3daf105eed53d5ff6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 23:31:10 2016 -0800
+
+    altos/lisp: Add towers of hanoi example
+    
+    Uses vt100 escape sequences to animate the display even.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7da6bfc195fad97e3afc576c609897c131fd4d8c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 23:29:21 2016 -0800
+
+    altos/lisp: Deal with memory compation in the middle of operations
+    
+    Handle memory compaction in places where we've got pointers into the
+    heap across an allocation operation. Either re-compute the values from
+    managed global references or add new roots across the allocation.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 137898e3431d887e75b09d8c1ce57297a1558e43
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 23:28:26 2016 -0800
+
+    altos/lisp: Improve lisp test program UI
+    
+    Add a prompt for stdin, read from other files on command line before
+    stdin.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 92cdc0cf0e80c1ff3f31cce20fc2b9bda86e3638
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 23:25:56 2016 -0800
+
+    altos/lisp: Make read() return eof atom on end of file
+    
+    Also make it an exception to hit eof in the middle of an sexpr.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fb710f7f4f24f74ac3d45fcc423803384d986bb2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 23:24:11 2016 -0800
+
+    altos/lisp: use regular read-eval-print loop for make const
+    
+    No need to open code this sequence of operations.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c7d7cdc2318a97534c4c1f9c6fd2b51644be729d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 11:30:55 2016 -0800
+
+    altos/lisp: add progn, while, read and eval
+    
+    Progn as a builtin will help with tail-recursion.
+    while provides for loops until tail-recursion works :-)
+    read and eval are kinda useful.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 417161dbb36323b5a6572859dedad02ca92fc65c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 9 16:22:43 2016 -0800
+
+    altos/lisp: Clean up OS integration bits, add defun
+    
+    Provide an abstraction for the OS interface so that it
+    can build more cleanly on Linux and AltOS. Add defun macro.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0ee44c8e4bf5dabe6a97bf76b366c8b767c387f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 9 11:13:58 2016 -0800
+
+    altos/lisp: macros appear to work now
+    
+    Needed an extra stack frame to stash the pre-macro state. This
+    simplified macro processing quite a bit; a macro now just evaluates
+    the function and then sends that result to be evaluated again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 794718abc62f4610495fe2bd535a2b67bc46573c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 9 09:14:50 2016 -0800
+
+    altos/lisp: working on lexical scoping
+    
+    Not working yet
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cb4cdb115ad83ae0d75eb58e68f561d20279f027
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 21:47:31 2016 -0800
+
+    altos/lambdakey-v1.0: Tweak memory allocations
+    
+    With non-recursive GC, more memory is available for the heap
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e5c1308ce33a864095eae02e7db18b0e043ab6e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 10:53:46 2016 -0800
+
+    altos/lisp: convert GC to non-recursive
+    
+    Use a boolean array to note cons cells which would otherwise recurse,
+    then loop until that array is empty.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d8cf97fe22acefab40d7bb321138e46d4483fef7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 5 17:53:15 2016 -0700
+
+    altos/lisp: more GC issues. add patom
+    
+    Use global ao_lisp_stack instead of local stack so that gc
+    moves of that item work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 286d07d83bd7ff361e5a904c151a75e5a9c8b071
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 5 15:12:05 2016 -0700
+
+    altos/lisp: make sure stack->formals_last gets moved during GC
+    
+    Failing this leads to broken formals chains
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3366efb139653939f053c1fe4aba352ba3b66c94
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 5 14:51:58 2016 -0700
+
+    altos/lisp: Change GC move API
+    
+    Pass reference to move API so it can change the values in-place, then
+    let it return '1' when the underlying object has already been moved to
+    shorten GC times.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6fc1ee0f7adc6fcb3e850bcbaabc1db705314234
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 4 16:51:12 2016 -0700
+
+    altos/lisp: get builtin macros working again
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c9456362c8bad8cd9be717f591f2d0841f88eb50
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 4 16:31:34 2016 -0700
+
+    altos/lisp: Start rewriting eval as state machine
+    
+    Ad-hoc code was incomprehensible and I couldn't make 'cond' work, so
+    I'm starting over.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c48bda3625fc507134da7b4af87a634e8eb3715b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 3 21:51:26 2016 -0700
+
+    altos: Add lambdakey
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 77db0e8162cd01c2b42737b3d71b38cea942484f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 3 21:49:50 2016 -0700
+
+    altos: Add lambda support to lisp
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 11cb03b1d336ee90c422be27588f57be573a9546
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 2 22:56:01 2016 -0700
+
+    altos/lisp: Separate out values from atoms
+    
+    This enables changing values of atoms declared as constants, should
+    enable lets, and with some work, even lexical scoping.
+    
+    this required changing the constant computation to run
+    ao_lisp_collect() before dumping the block of constant data, and that
+    uncovered some minor memory manager bugs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9e1a787f8828fb7b750ad3310c89a89536ea5286
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 2 14:18:54 2016 -0700
+
+    altos/lisp: add set/setq and ' in reader
+    
+    Along with other small fixes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8362393a621ea78a96e7f65f602f4bfc7bbd1158
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 2 14:18:31 2016 -0700
+
+    altos/stmf0: Add lisp to include directories
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit caba623cb013b73e1f0ca369edf98e0376bec41a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 2 14:14:23 2016 -0700
+
+    altos/kernel: Make ao_cmd_readline public. Return char from ao_cmd_lex.
+    
+    With these two changes, the readline function can be used by other
+    code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2408e72d1e0d3459918601712b09860ab17e200
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 1 21:14:45 2016 -0700
+
+    altos/lisp: Change lisp objects to use ao_poly everywhere. Add const
+    
+    This makes all lisp objects use 16-bit ints for references so we can
+    hold more stuff in small amounts of memory. Also adds a separate
+    constant pool of lisp objects for builtins, initial atoms and constant
+    lisp code.
+    
+    Now builds (and runs!) on the nucleo-32 boards.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e2f4d25cd6f6f3787d4ee99264732d5b2ce23d4c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 31 18:53:09 2016 -0700
+
+    altos: Add lisp reader
+
+commit 56d46ceaa1413415f25e47e81036426132f99924
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 31 16:43:44 2016 -0700
+
+    Add first lisp bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2cfcc622c94d87cdbee099f457b7d63cb2fcbc71
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 25 12:21:29 2017 -0700
+
+    use elf, not ihx
+
+commit 4ae8eeb426ef60105ec8e53e289739e5a8ae5dae
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 25 12:00:20 2017 -0700
+
+    stop using /usr/share for binaries in remaining turnon scripts
+
+commit f2c7bb5879ba22df05fd1e39f01ea692313306fd
+Author: Richard Hughes <richard@hughsie.com>
+Date:   Tue Jan 10 17:15:24 2017 +0000
+
+    altos/chaoskey: Add a metainfo for the ChaosKey
+    
+    This provides the information necessary to reflash chaoskey using
+    standard Linux device firmware tooling.
+
+commit 89ecc32b90565ace078c4a84d4406a4d1f86821a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Dec 17 20:58:36 2016 -0800
+
+    altos/arm: Align data so that gcc 5.4 doesn't do byte-accesses. Add -Wcast-align
+    
+    Gcc 5.4.1 tracks alignment of data through assignments, so that a
+    uint32_t pointer which comes from byte-aligned uint8_t data:
+    
+    extern uint8_t foo[];
+    
+            uint32_t        *q = (void *) foo;
+    
+    Fetches and stores through this pointer are done bytewise. This is
+    slow (meh), but if q references a device register, things to bad very
+    quickly.
+    
+    This patch works around this bug in the compiler by adding
+    __attribute__((aligned(4))) tags to some variables, or changing them
+    from uint8_t to uint32_t. Places doing this will now be caught as I've
+    added -Wcast-align to the compiler flags. That required adding (void
+    *) casts, after the relevant code was checked to make sure the
+    compiler could tell that the addresses were aligned.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f650211f9e99e1d3d0ae13ae559dd1c082f71545
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 12 16:44:47 2016 -0800
+
+    altos/stm: Make ao_usb_set_address static. Saves a bunch of text space
+    
+    I'm sure this makes the function end up in-lined, which saves enough
+    text space to fit the flash loader in ROM again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d46698a01ed4903d36635b34867bfc4bb8fbafc6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 17 22:17:20 2016 -0800
+
+    ao-bringup: Improve EasyMini turnon and test scripts
+    
+    Wait less time before trying the test script.
+    Have the test script wait for the device to appear. And then use
+    colors to help make the results clear.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5e24d637a8af09bf64beb7fcf7be4c13eee76a43
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 9 19:42:42 2016 -0700
+
+    altos/test: Fix tests
+    
+    A couple of fixups for ao_flight_test to dump pyro info only when
+    running in debug mode, and to change the aprs testing
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e3d8ad6de7d2dfabe45a285b27f465ba68844f05
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 30 19:08:14 2016 -0700
+
+    altos/nucleo-32: Add basic support for STM32F042 Nucleo-32 board
+    
+    This hooks up the LED, USB and the USART.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 148f6e0a107d9e88509958700351794f2f971312
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 30 19:06:20 2016 -0700
+
+    altos/stmf0: Add USART support
+    
+    The STM32F0 usart can be operated much like the STM32L usart, but the
+    registers are all moved around.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 26f2727eac0cca8930dde9d757bc094f73801859
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Oct 2 17:19:14 2016 -0600
+
+    augment TeleDongle turn on script to support serial number on command line
+
+commit 66d4b5ea4031193e3c79ebdabeb381aae46fe93b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Sep 22 03:23:34 2016 +0300
+
+    Update pdclib to version using arm-specific 'ar' program
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2c1ab416728c942ddf176f881f025840ada6bf93
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 5 22:25:07 2016 -0600
+
+    Fix release note html to remove xml bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 4fdf8ca9ca1cd5a84b03bd7a03c5806af64b413d
 Author: Keith Packard <keithp@keithp.com>
@@ -485,13 +2618,6 @@ Date:   Tue Jul 5 18:03:49 2016 +0200
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit 148b013dd29c26920ddfb53449ed4d8cc5a4b5ee
-Merge: ea1ff22 cd97128
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Tue Jul 5 10:23:18 2016 +0200
-
-    Merge branch 'master' into branch-1.6
-
 commit cd97128e30c47edfcc71f7d872cbdad14867934c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jul 5 10:21:29 2016 +0200
@@ -503,19 +2629,6 @@ Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jul 5 00:48:07 2016 +0200
 
     updates made during 1.6.5 release process
-
-commit ea1ff225f1f450ee3fc377807d1bb7b982bf792d
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Jul 4 23:47:56 2016 +0200
-
-    updating ChangeLog for 1.6.5 release
-
-commit 2e26d1ab42163988dc26b06b016c3b05efe17659
-Merge: 639e461 65ed2f5
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Jul 4 23:47:24 2016 +0200
-
-    Merge branch 'master' into branch-1.6
 
 commit 65ed2f588ca596fe9aa559bebd590a2a11b9859b
 Author: Keith Packard <keithp@keithp.com>
@@ -841,19 +2954,6 @@ Date:   Fri Jun 17 10:18:20 2016 -0700
     can parse them correctly
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
-
-commit 639e461ded29a48c155afea12171cbfc191ccfd7
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Fri Jun 17 10:01:17 2016 -0600
-
-    releasing 1.6.4
-
-commit 31cf047113ec72a78f4b500223a2c6be23bc86fd
-Merge: 2f0c977 afe74c0
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Fri Jun 17 10:00:10 2016 -0600
-
-    Merge branch 'master' into branch-1.6
 
 commit afe74c067a31ce420d0d4cdac2069c1d258a5114
 Author: Keith Packard <keithp@keithp.com>
@@ -1495,7 +3595,7 @@ Date:   Mon May 9 17:56:28 2016 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f078235803a80403014b3e54039fd2d0e0704367
-Merge: 04759dd c457c82
+Merge: 04759ddd c457c827
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon May 9 15:52:38 2016 -0600
 
@@ -1527,19 +3627,6 @@ Date:   Mon May 9 11:33:48 2016 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit 2f0c977c747824d0798550ac64eceb1d66c50efd
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Fri May 6 18:12:20 2016 -0600
-
-    releasing 1.6.3
-
-commit 15ae97fbdb4e75a74ea2e716194661d19dec46ff
-Merge: ac7be4a 1216c0c
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Fri May 6 18:11:01 2016 -0600
-
-    Merge branch 'master' into branch-1.6
-
 commit 1216c0ccece4ca1492967a341c5d01e9e5068ed8
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri May 6 17:10:14 2016 -0700
@@ -1548,15 +3635,8 @@ Date:   Fri May 6 17:10:14 2016 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit ac7be4a40df88ee3a0992e041635e4ac4cf5ac48
-Merge: b53c78e ce4c8a8
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Fri May 6 17:59:39 2016 -0600
-
-    Merge branch 'master' into branch-1.6
-
 commit ce4c8a8ad57515e851207b0a82f3af791bb30d3e
-Merge: aa9630c 320e312
+Merge: aa9630c3 320e312d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri May 6 17:49:30 2016 -0600
 
@@ -2798,50 +4878,17 @@ Date:   Sun Jan 10 21:39:38 2016 -0800
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit b53c78e75879d647935a30acb88fdd69467617a7
-Merge: a2ea621 64adfbb
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Jan 10 19:15:16 2016 -0700
-
-    Merge branch 'master' into branch-1.6
-
 commit 64adfbbb80c90dfe244179d81beaef8a84ed8bd6
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Jul 16 14:47:10 2015 -0600
 
     process updates from 1.6.1 release
 
-commit a2ea621eac3263348aff50885c79296f8ece26ed
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Jan 10 19:08:12 2016 -0700
-
-    update Changelog from git log
-
-commit 1681776abc0873bcbbbc5b2b17e15d54a1031f51
-Merge: 8830926 aebdcaf
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Jan 10 19:07:49 2016 -0700
-
-    Merge branch 'master' into branch-1.6
-
 commit aebdcaf37eafbc13cce695fe65a455e49c6108c3
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Jan 10 19:06:19 2016 -0700
 
     one more time, with feeling .. this time, I've updated pdclib
-
-commit 88309264656220bae6ee941211f7aa1b1dc19944
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Jan 10 19:06:19 2016 -0700
-
-    one more time, with feeling .. this time, I've updated pdclib
-
-commit 70e9064ca962dfd345f8a342afa130f969606553
-Merge: 489d22f 73ce3f7
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Jan 10 19:04:49 2016 -0700
-
-    Merge branch 'master' into branch-1.6
 
 commit 73ce3f73526edfabccd3b98e6e67de6d82a84b63
 Author: Bdale Garbee <bdale@gag.com>
@@ -2850,7 +4897,7 @@ Date:   Sun Jan 10 18:58:31 2016 -0700
     submodule madness
 
 commit cbec66452ecd01bbd5aebf6f98443d5e0540f5d2
-Merge: 4043e07 81b8f4d
+Merge: 4043e070 81b8f4da
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Jan 10 18:29:07 2016 -0700
 
@@ -2903,7 +4950,7 @@ Date:   Sun Jan 10 17:45:45 2016 -0700
     modify release procedure to reflect Keith setting version in confgure.ac
 
 commit 2f35e0ba52f538ea1061bfff5bbd772b8a241386
-Merge: 86ccbac 3fdaf74
+Merge: 86ccbac1 3fdaf745
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Jan 10 17:44:03 2016 -0700
 
@@ -3475,7 +5522,7 @@ Date:   Sat Sep 12 19:20:49 2015 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7064bc685aebeef07711e525dea4d5fbe33d235b
-Merge: ea1d241 dda3f45
+Merge: ea1d2415 dda3f459
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Sep 29 00:46:42 2015 -0600
 
@@ -3585,13 +5632,6 @@ Date:   Thu Aug 20 10:50:30 2015 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-commit 489d22f448d9927533e90da4d16c5a332a234a8d
-Merge: 570daac eaab49a
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Aug 16 17:53:40 2015 +0200
-
-    Merge branch 'master' into branch-1.6
-
 commit eaab49ab1859ebe236a201f93b5352e67aa7ed2b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Aug 16 17:43:32 2015 +0200
@@ -3616,21 +5656,8 @@ Date:   Tue Jul 28 01:34:25 2015 -0600
 
     move turnon_teledongle to new cal-freq code
 
-commit 570daace9caf7647a09c53d5c75593cc4c98b93b
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Thu Jul 16 13:36:13 2015 -0600
-
-    changelog for 1.6.1 release
-
-commit 6e9bb9178356620bd47d9f2e31abf42b7f1a8f11
-Merge: e2cefd8 87c8bb3
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Thu Jul 16 13:31:42 2015 -0600
-
-    Merge branch 'master' into branch-1.6
-
 commit 87c8bb3956897830da1f7aaca2990a9571767b73
-Merge: 643c2fb d6445b3
+Merge: 643c2fb0 d6445b37
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Jul 16 07:54:35 2015 -0600
 
@@ -3647,7 +5674,7 @@ Date:   Wed Jul 15 18:31:05 2015 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 643c2fb03833d658320f476ef731bbb06fe3cc31
-Merge: e41786f 271f56a
+Merge: e41786fb 271f56a4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Jul 15 16:43:50 2015 -0600
 
@@ -4008,19 +6035,19 @@ Date:   Tue Jun 23 21:39:09 2015 -0700
     
     Pad
     
-    	Reports igniter and GPS status changes
+            Reports igniter and GPS status changes
     
     Flight
     
-    	Report flight state changes and max height after apogee
-    	Report current speed, height and bearing/elevation/range once
-    	every 10 seconds while the rocket is in motion.
+            Report flight state changes and max height after apogee
+            Report current speed, height and bearing/elevation/range once
+            every 10 seconds while the rocket is in motion.
     
     Recovery
     
-    	Report distance and bearing when the location of either the
-    	tracker or the receiver changes by more than 10m, but not more
-    	than once every 10 seconds.
+            Report distance and bearing when the location of either the
+            tracker or the receiver changes by more than 10m, but not more
+            than once every 10 seconds.
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
@@ -4367,7 +6394,7 @@ Date:   Tue Jun 16 23:38:07 2015 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit c46c2c5767c6e909fa58587e6c864a4fbaa9fa20
-Merge: 39f4361 6cb7d76
+Merge: 39f43616 6cb7d76c
 Author: Robert Garbee <robert@gag.com>
 Date:   Sat Jun 13 17:40:59 2015 -0600
 
@@ -5321,7 +7348,7 @@ Date:   Sat Feb 28 15:07:16 2015 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 4af4e36cda96d053458eeb040e35886890917385
-Merge: 91b1a80 106b16b
+Merge: 91b1a806 106b16b4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Feb 22 14:55:40 2015 -0700
 
@@ -5524,12 +7551,6 @@ Author: Tom Marble <tmarble@info9.net>
 Date:   Mon Feb 9 08:35:24 2015 -0600
 
     Minor typo in man page
-
-commit e2cefd8593d269ce603aaf33f4a53a5c2dcb3350
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sat Feb 7 22:36:22 2015 -0700
-
-    update ChangeLog for release
 
 commit 26f61380ce6b4df80fa0b5a8a242cef79d5ae339
 Author: Bdale Garbee <bdale@gag.com>
@@ -5914,7 +7935,7 @@ Date:   Fri Jan 16 22:09:26 2015 +1300
     Signed-off-by: Keith Packard <keithp@keithp.com>
     
     Conflicts:
-    	src/lpc/ao_usb_lpc.c
+            src/lpc/ao_usb_lpc.c
 
 commit 0671b3c8c24c9f33be77a10315c4669f33c516d7
 Author: Keith Packard <keithp@keithp.com>
@@ -6379,7 +8400,7 @@ Date:   Sat Dec 6 15:08:29 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7339d2379713b5b7e4c4fe6bad89ed93f9d39e82
-Merge: d1f9121 b6462ca
+Merge: d1f91215 b6462ca3
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Dec 6 15:39:53 2014 -0700
 
@@ -6907,11 +8928,11 @@ Date:   Sat Oct 4 00:11:13 2014 -0700
     This change also renames all of the imu values to make them easier to
     understand:
     
-    	accel	gyro	axis
+            accel   gyro    axis
     
-    	along	roll	length of the board
-    	across	pitch	across the board
-    	through	yaw	through the board.
+            along   roll    length of the board
+            across  pitch   across the board
+            through yaw     through the board.
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
@@ -7227,7 +9248,7 @@ Date:   Wed Sep 10 00:26:10 2014 -0600
     another build dep
 
 commit 615b69b19557a9683eeb0475b30a053a35ca51ac
-Merge: a72b768 0365493
+Merge: a72b7683 03654934
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 10 01:30:37 2014 -0600
 
@@ -7337,7 +9358,7 @@ Date:   Sat Sep 6 22:56:25 2014 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f0d2d34f84980ab45ecedae17546f4d71e020c5e
-Merge: 8c212cd 6c812f1
+Merge: 8c212cd5 6c812f10
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Sep 6 23:42:47 2014 -0600
 
@@ -7404,14 +9425,14 @@ Date:   Sat Sep 6 20:39:37 2014 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8c212cd5bfa03f71a31d84bd0051314e77d88461
-Merge: e9714e3 dd26ec2
+Merge: e9714e34 dd26ec2e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Sep 6 13:41:36 2014 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
     
     Conflicts:
-    	ao-bringup/turnon_telemega
+            ao-bringup/turnon_telemega
 
 commit e9714e34091abe657aa1b30aeda9466331aa39c1
 Author: Bdale Garbee <bdale@gag.com>
@@ -7851,7 +9872,7 @@ Date:   Thu Aug 14 18:16:14 2014 -0600
     change easymega from v0.1 to v1.0, tweak to build on master, add to Makefile
 
 commit 4828be0ca5252ac9cd6061209385dcd6c4c57965
-Merge: 17e894d 165b7dc
+Merge: 17e894d1 165b7dcf
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Aug 14 17:08:36 2014 -0600
 
@@ -8534,7 +10555,7 @@ Date:   Tue Jun 24 21:22:26 2014 -0600
     need the api key in Bdale's root too
 
 commit bd440afc2a6e37b74fffcf1b977e149485095316
-Merge: 5d4f912 a0ccab8
+Merge: 5d4f912b a0ccab8e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jun 24 21:17:53 2014 -0600
 
@@ -8916,7 +10937,7 @@ Date:   Sun Jun 15 17:40:27 2014 -0600
     tweaks
 
 commit a6c61fb993d3fd15183f8755d9058f05c606c9c0
-Merge: 0634119 4384899
+Merge: 0634119d 43848991
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Jun 15 16:31:01 2014 -0700
 
@@ -11154,7 +13175,7 @@ Date:   Tue May 13 17:30:47 2014 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8124af8c27b2b9e446aa3a4f1da83d4db7c1ea87
-Merge: 6dd7eae 3bcf4bd
+Merge: 6dd7eae5 3bcf4bdd
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon May 12 23:21:55 2014 -0700
 
@@ -11894,7 +13915,7 @@ Date:   Sun Feb 23 17:42:08 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 104b8bfc9b37fda175f2cb2a1e33601fbf6f48f6
-Merge: 403b95e 1edf7ef
+Merge: 403b95ee 1edf7ef8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Feb 20 13:23:52 2014 -0700
 
@@ -12035,7 +14056,7 @@ Date:   Sun Feb 16 14:57:38 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 95f5a6ef52947088993d395874cf6aa502fd2503
-Merge: 135b6d4 de2a619
+Merge: 135b6d40 de2a6199
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Feb 16 15:53:35 2014 -0700
 
@@ -12547,7 +14568,7 @@ Date:   Tue Jan 21 21:34:58 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 13cf4000bd53ac4af66231d56e24c9eb11178a5f
-Merge: 7a8551f 99fedbf
+Merge: 7a8551fe 99fedbf0
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Jan 21 20:59:06 2014 -0800
 
@@ -13049,7 +15070,7 @@ Date:   Thu Dec 19 03:22:21 2013 -0700
     updated notes from 1.3 release
 
 commit 27528961457865acc3a38b822268df6d7cb86cfd
-Merge: 4006eff a31629d
+Merge: 4006effc a31629df
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Dec 19 02:00:10 2013 -0700
 
@@ -13152,7 +15173,7 @@ Date:   Wed Dec 18 21:02:15 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 39cb8c2896317b7538353be979ac99baffc14489
-Merge: 2a6016c ee42796
+Merge: 2a6016cf ee427961
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Dec 18 21:53:52 2013 -0700
 
@@ -13204,7 +15225,7 @@ Date:   Wed Dec 18 18:30:54 2013 -0700
     update release docs to include option for submodules
 
 commit d9982c257463f23be940eea66bd4dc3aadff0043
-Merge: 1b97ed2 b63fc05
+Merge: 1b97ed2b b63fc054
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Dec 18 18:25:35 2013 -0700
 
@@ -13331,7 +15352,7 @@ Date:   Wed Dec 18 11:25:05 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6df58bb0115a8da13d35ab38861f6231bea7f2a7
-Merge: 4383baf 02195f2
+Merge: 4383bafc 02195f29
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Dec 18 12:19:31 2013 -0700
 
@@ -13538,14 +15559,14 @@ Date:   Tue Dec 17 14:53:59 2013 -0700
     further documentation tweaks
 
 commit 90c88bab305c43eb62f964fd3ff350b8b0b5320d
-Merge: d5d6d10 dffbdd9
+Merge: d5d6d10c dffbdd93
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Dec 17 14:09:30 2013 -0700
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
     
     Conflicts:
-    	doc/altusmetrum.xsl
+            doc/altusmetrum.xsl
 
 commit d5d6d10ceb724081c7cf89a3885d7e6c3da14604
 Author: Bdale Garbee <bdale@gag.com>
@@ -14831,7 +16852,7 @@ Date:   Tue Oct 8 09:39:29 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 488a527267decece48e6682e0e0c7fc29cbed329
-Merge: 6a1e398 f6661cc
+Merge: 6a1e398e f6661cc0
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Oct 8 09:26:41 2013 -0700
 
@@ -14840,7 +16861,7 @@ Date:   Tue Oct 8 09:26:41 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
     
     Conflicts:
-    	configure.ac
+            configure.ac
 
 commit 6a1e398e590121458176758858bb4210f3eb5a55
 Author: Keith Packard <keithp@keithp.com>
@@ -15223,7 +17244,7 @@ Date:   Thu Sep 5 03:11:42 2013 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
     
     Conflicts:
-    	altosdroid/src/org/altusmetrum/AltosDroid/AltosVoice.java
+            altosdroid/src/org/altusmetrum/AltosDroid/AltosVoice.java
 
 commit ee14ad16c242e8bd7a9d33ebf569211d1490b8e1
 Author: Mike Beattie <mike@ethernal.org>
@@ -15234,9 +17255,9 @@ Date:   Tue Sep 3 15:10:23 2013 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
     
     Conflicts:
-    	altosdroid/src/org/altusmetrum/AltosDroid/TabAscent.java
-    	altosdroid/src/org/altusmetrum/AltosDroid/TabDescent.java
-    	altosdroid/src/org/altusmetrum/AltosDroid/TabPad.java
+            altosdroid/src/org/altusmetrum/AltosDroid/TabAscent.java
+            altosdroid/src/org/altusmetrum/AltosDroid/TabDescent.java
+            altosdroid/src/org/altusmetrum/AltosDroid/TabPad.java
 
 commit 5b976a6651f4eb05d30afc08b9e1f27c7e52ae00
 Author: Keith Packard <keithp@keithp.com>
@@ -15397,7 +17418,7 @@ Date:   Sat Aug 31 23:10:56 2013 -0500
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7ec1b97d278c7aec3199fb7270f0dcf9484c879f
-Merge: 017ed54 4188153
+Merge: 017ed54f 41881535
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Aug 31 08:22:09 2013 -0500
 
@@ -15466,7 +17487,7 @@ Date:   Tue Aug 27 21:28:07 2013 -0600
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit dcc51bb18985c24fa35bce0dd42ea3d847b960bf
-Merge: 7c82acc a73b025
+Merge: 7c82acc1 a73b0251
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Aug 28 22:52:58 2013 -0600
 
@@ -15475,8 +17496,8 @@ Date:   Wed Aug 28 22:52:58 2013 -0600
     Signed-off-by: Keith Packard <keithp@keithp.com>
     
     Conflicts:
-    	src/core/ao_telemetry.c
-    	src/core/ao_telemetry.h
+            src/core/ao_telemetry.c
+            src/core/ao_telemetry.h
     
     Added both Mini and Metrum telemetry defines
 
@@ -15853,7 +17874,7 @@ Date:   Sun Aug 25 22:22:55 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 203951f6e049ec7e95489849a2bfaa01aa19c0c9
-Merge: 4babe73 b363a62
+Merge: 4babe731 b363a628
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Aug 25 22:00:27 2013 -0700
 
@@ -16009,7 +18030,7 @@ Date:   Sat Aug 17 17:35:08 2013 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f0e126251360f050b7121f167771c057bda8747e
-Merge: d95a2c5 4fe47ad
+Merge: d95a2c5d 4fe47adc
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Aug 17 17:33:31 2013 +0200
 
@@ -16026,7 +18047,7 @@ Date:   Sat Aug 17 17:30:52 2013 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 4ff54bb96f6c00c0c2c7dd32f81403bac331621a
-Merge: fa0859a 01f8df0
+Merge: fa0859a5 01f8df08
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Aug 17 16:03:26 2013 +0200
 
@@ -16044,7 +18065,7 @@ Date:   Sat Aug 17 16:01:44 2013 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 01f8df088759ee7e6bc3900a013e0ea4fafaf984
-Merge: e2ebe60 15063cb
+Merge: e2ebe60a 15063cbb
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jul 30 00:15:06 2013 -0600
 
@@ -16514,7 +18535,7 @@ Date:   Tue May 21 11:30:44 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit fd5567882b732f8947b44b217552077c82a3d28e
-Merge: fd55c1f 57b4d82
+Merge: fd55c1fe 57b4d82d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue May 21 11:16:54 2013 -0700
 
@@ -16558,7 +18579,7 @@ Date:   Sun May 19 23:07:54 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 27e9b93f3d35890a49575b2ead1983ce3c2fc213
-Merge: a4df257 d9cbef8
+Merge: a4df2575 d9cbef8c
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun May 19 20:40:42 2013 -0700
 
@@ -17392,7 +19413,7 @@ Date:   Fri May 10 19:21:18 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 106d212ff5920c39d95751ef6249dc141970412c
-Merge: ecb1285 09d5d6f
+Merge: ecb12857 09d5d6f5
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu May 9 21:06:52 2013 -0700
 
@@ -18247,7 +20268,7 @@ Date:   Thu May 2 23:14:02 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7cce6c205e4595894e033ab8f0acc8064bf9f561
-Merge: 75f8229 5591509
+Merge: 75f8229d 55915098
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Apr 29 17:24:43 2013 -0600
 
@@ -18292,7 +20313,7 @@ Date:   Sat Apr 27 00:36:11 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit cef4e3ee95037050ae859fb2fdc0a57373764bd8
-Merge: fefc021 f3ee7de
+Merge: fefc0210 f3ee7deb
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Apr 25 22:22:50 2013 -0700
 
@@ -18465,7 +20486,7 @@ Date:   Sun Apr 21 14:52:56 2013 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 49caac78786014d443d9c05f47b5eb3070ec9bd3
-Merge: 5b7bbf1 cbf38c5
+Merge: 5b7bbf18 cbf38c55
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Apr 21 14:51:07 2013 +1200
 
@@ -18542,7 +20563,7 @@ Date:   Sat Apr 20 12:22:38 2013 -0600
     improve text in telebt turn-on script
 
 commit ff332e640b27c6be37dabef58ebac350ac2347b2
-Merge: b300060 87d6ed2
+Merge: b3000609 87d6ed24
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Apr 17 10:41:05 2013 -0700
 
@@ -18595,7 +20616,7 @@ Date:   Tue Apr 16 14:22:23 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit d5a557004c00d1ae25da04dc63c78b816562a236
-Merge: 6592a5b 5b04176
+Merge: 6592a5be 5b041769
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Apr 15 23:26:33 2013 -0700
 
@@ -18610,7 +20631,7 @@ Date:   Mon Apr 15 23:25:55 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6592a5be127a9c95d3b2e7d5aa6ffba71c6748b9
-Merge: c6f85cb eba3aa9
+Merge: c6f85cb1 eba3aa94
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Apr 15 23:19:44 2013 -0700
 
@@ -18630,7 +20651,7 @@ Date:   Mon Apr 15 23:14:22 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit c6f85cb149dff8732104521cb62b355e8a0d7148
-Merge: 3cd8ff1 58dd4b8
+Merge: 3cd8ff18 58dd4b88
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Apr 14 20:02:10 2013 -0700
 
@@ -18681,7 +20702,7 @@ Date:   Sat Apr 13 11:39:14 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2f7015afcca7c6042365d2124d3a5b7219e8e588
-Merge: 5077f3a 778daf0
+Merge: 5077f3ad 778daf0c
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Apr 13 10:51:04 2013 -0700
 
@@ -18884,7 +20905,7 @@ Date:   Mon Apr 8 17:42:18 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6ba0df9b440b69bf5bc5f4e435b431adf303fee2
-Merge: 1d3ab47 28adf55
+Merge: 1d3ab47d 28adf554
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Apr 8 18:02:37 2013 -0600
 
@@ -19577,7 +21598,7 @@ Date:   Mon Mar 11 18:16:55 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 90ee11542b111befa0e96e27292dc548e5c37396
-Merge: 97efce5 d7973de
+Merge: 97efce5f d7973de3
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Mar 10 11:43:06 2013 -0700
 
@@ -19622,7 +21643,7 @@ Date:   Sun Mar 10 20:40:13 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 8adadf6bd2ba623642675e4beafac4ac98b1916d
-Merge: d029aca 0c0c6d6
+Merge: d029acad 0c0c6d60
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Mar 10 20:24:56 2013 +1300
 
@@ -19653,7 +21674,7 @@ Date:   Sun Mar 10 20:22:09 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit d029acad6a992be9b7b4498e70605f8a1e1a4ef6
-Merge: eba7b2e 72c5b14
+Merge: eba7b2ef 72c5b142
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Mar 10 19:07:01 2013 +1300
 
@@ -19698,7 +21719,7 @@ Date:   Fri Mar 8 19:41:32 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 84d35e4cbd7ea2f681c43496b9b9db84f9dd923f
-Merge: 760b1f0 e0d9128
+Merge: 760b1f02 e0d9128b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Mar 7 13:00:44 2013 -0800
 
@@ -19848,7 +21869,7 @@ Date:   Thu Mar 7 18:54:45 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 760b1f02c178c600226f39b5e66d8cbadbf4a29b
-Merge: afd2674 cbad587
+Merge: afd26742 cbad587b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Mar 6 21:53:22 2013 -0800
 
@@ -19972,7 +21993,7 @@ Date:   Sun Feb 24 01:20:16 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2120d362cefceba69e75996b6391d9558978c01d
-Merge: 5246acb a04c4f7
+Merge: 5246acb7 a04c4f7b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Feb 24 00:20:54 2013 -0800
 
@@ -20155,7 +22176,7 @@ Date:   Sun Feb 10 11:58:36 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit bf88c5f829ea5d32043431945e862a9f6c96740a
-Merge: 3227029 d05a779
+Merge: 32270296 d05a7799
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Feb 10 01:21:52 2013 -0800
 
@@ -20493,7 +22514,7 @@ Date:   Wed Jan 16 22:05:32 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a04c4f7b07e97d568f8f6f56dd363329817fb52c
-Merge: 0c2fa96 bd84dfd
+Merge: 0c2fa961 bd84dfd8
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jan 16 15:22:46 2013 -0800
 
@@ -20545,8 +22566,8 @@ Date:   Wed Jan 16 15:01:12 2013 -0800
     The correct matrix is seen in this paper:
     
     On Reduced-Order Kalman Filters For GPS Position Filtering
-    	J. Shima
-    	6/2/2001
+            J. Shima
+            6/2/2001
     
     This references an older paper which is supposed to describe the
     derivation of the matrix:
@@ -20561,14 +22582,14 @@ Date:   Wed Jan 16 15:01:12 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 0c2fa9614ffe22901ba0fd089e1e02c362f9fbe0
-Merge: 456120d f2b59cf
+Merge: 456120d2 f2b59cf3
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jan 16 10:40:28 2013 -0800
 
     Merge remote-tracking branch 'origin/telescience-v0.2' into telescience-v0.2
 
 commit 456120d201d72c89576a0c8d69b2fcba44169507
-Merge: f24c421 994ff76
+Merge: f24c4219 994ff76a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jan 16 10:39:40 2013 -0800
 
@@ -20660,7 +22681,7 @@ Date:   Sat Jan 12 20:11:38 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 670034eef48d63cdaec8d271fa93da984ffe2ea9
-Merge: 8c5ebaf d374d6b
+Merge: 8c5ebaf8 d374d6be
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Jan 12 10:57:22 2013 -0700
 
@@ -20765,7 +22786,7 @@ Date:   Thu Jan 10 21:26:20 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1ed6b13e87c1cc2d6618b6ba3a293ea6e3b5752e
-Merge: acff2f4 d409417
+Merge: acff2f46 d409417f
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Jan 10 21:48:12 2013 -0800
 
@@ -20810,7 +22831,7 @@ Date:   Wed Jan 9 15:23:46 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8c5ebaf88b459b09924753a8077393a7b0639133
-Merge: 59f355f d7d259c
+Merge: 59f355f5 d7d259c7
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jan 8 22:12:17 2013 -0700
 
@@ -21147,7 +23168,7 @@ Date:   Tue Jan 1 15:30:11 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 65b512c890a3ccf487655b79305ab1cfcf49259c
-Merge: 434e946 d7d259c
+Merge: 434e946a d7d259c7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Dec 31 14:24:59 2012 -0800
 
@@ -21217,14 +23238,14 @@ Date:   Fri Dec 28 23:05:31 2012 -0700
     Signed-off-by: Keith Packard <keithp@gag.com>
 
 commit f7a56152808c7838c1886884bb77de2705ab076c
-Merge: daf8776 b70ca5e
+Merge: daf8776f b70ca5ea
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 28 21:50:13 2012 -0800
 
     Merge remote-tracking branch 'origin/master' into micropeak-logging
 
 commit 59f355f5288b42b2e47743d06e41e55819a55f64
-Merge: 099d2b0 b70ca5e
+Merge: 099d2b0e b70ca5ea
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Dec 28 22:30:26 2012 -0700
 
@@ -21286,7 +23307,7 @@ Date:   Tue Dec 25 14:23:29 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 868ef0c9c4b208c02a87180b0eede329369bdc77
-Merge: 669cde8 57487e7
+Merge: 669cde8a 57487e78
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Dec 25 14:20:42 2012 -0800
 
@@ -21380,7 +23401,7 @@ Date:   Sun Dec 16 16:08:33 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit dfff41c2bec16fe4c7b198a4720eb40d8e740ac4
-Merge: 22a58b0 00bc1a0
+Merge: 22a58b0f 00bc1a09
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Dec 16 16:06:41 2012 -0800
 
@@ -21468,7 +23489,7 @@ Date:   Sat Dec 15 14:47:22 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6fa1ec0dbf2a4eda8d061c67b3779b83b88f29f0
-Merge: f140931 73422bf
+Merge: f1409311 73422bf7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 14 19:29:50 2012 -0800
 
@@ -21522,7 +23543,7 @@ Date:   Wed Dec 12 22:53:36 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 688a9458bb03a81e71554c14295d1baacbbbd530
-Merge: 816c6b5 c8866fb
+Merge: 816c6b5d c8866fba
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Dec 12 22:36:59 2012 -0800
 
@@ -21537,7 +23558,7 @@ Date:   Wed Dec 12 22:35:05 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 816c6b5d087694a9db9c34cc5ec7671a1487d9b9
-Merge: a4a8418 a4678cd
+Merge: a4a84182 a4678cd8
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Dec 12 11:10:14 2012 -0800
 
@@ -21577,7 +23598,7 @@ Date:   Tue Dec 11 23:43:30 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a4a841828924ee37f5201d4ff0aec38459f2d802
-Merge: b26e837 d309fcf
+Merge: b26e837a d309fcff
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Dec 11 14:42:43 2012 -0800
 
@@ -21595,7 +23616,7 @@ Date:   Tue Dec 11 14:41:53 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit b26e837a6f18641aae9372aab22168849ff10812
-Merge: 1489c7f c233ef6
+Merge: 1489c7f7 c233ef67
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Dec 9 18:33:31 2012 -0800
 
@@ -21662,7 +23683,7 @@ Date:   Fri Dec 7 17:35:15 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit bd05421991b596fe9cf73ee25c9046b0fb4e32f7
-Merge: 1f79706 1489c7f
+Merge: 1f797066 1489c7f7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 7 17:34:10 2012 -0800
 
@@ -21714,7 +23735,7 @@ Date:   Fri Dec 7 10:15:25 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 748e42ebf1dfb1efd5dec6ddd93f5c7aeedeb01d
-Merge: 75912f8 c10f9a4
+Merge: 75912f8a c10f9a43
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 7 10:14:11 2012 -0800
 
@@ -21969,7 +23990,7 @@ Date:   Wed Dec 5 09:59:16 2012 -0800
     reporting. We're going to appropriate the code for use in Mega Metrum
     to (optionally) broadcast APRS packets.
     
-    	http://ad7zj.net/kd7lmo/aprsbeacon_code.html
+            http://ad7zj.net/kd7lmo/aprsbeacon_code.html
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
     (
@@ -22166,7 +24187,7 @@ Date:   Thu Nov 29 20:36:51 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit ceea0e75ac42acac4a20bf88f34bb93fd2768f4c
-Merge: 7738ddc 285fccf
+Merge: 7738ddc5 285fccfa
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Nov 20 12:37:38 2012 -0700
 
@@ -22442,7 +24463,7 @@ Date:   Mon Oct 29 11:43:02 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a46c9398a5f02ff4b52b7a4309a51498560cadb5
-Merge: e57ab2a 56023cf
+Merge: e57ab2a7 56023cf5
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 26 14:08:32 2012 -0700
 
@@ -22537,7 +24558,7 @@ Date:   Thu Oct 25 00:12:57 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 282f0451dd141db3304ab73e4020a849e59721eb
-Merge: 0680d62 78e1de4
+Merge: 0680d62d 78e1de48
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Oct 25 00:09:01 2012 -0700
 
@@ -22665,7 +24686,7 @@ Date:   Wed Oct 24 20:52:09 2012 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 055f3232decc07e064d596469b81cf9869411c2d
-Merge: 8ca58e2 9e60fa2
+Merge: 8ca58e20 9e60fa21
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Oct 23 09:38:36 2012 -0600
 
@@ -22693,7 +24714,7 @@ Date:   Tue Oct 23 19:22:52 2012 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 9e60fa214ad2c48fbe8f7e5c437681aa35d249fa
-Merge: 27c3157 4b41561
+Merge: 27c31572 4b41561a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Oct 22 22:39:31 2012 -0700
 
@@ -22925,7 +24946,7 @@ Date:   Sun Oct 21 13:01:03 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7f664da148ae15d46d179d8ecede6fc0bc710ffb
-Merge: 3aba5eb 23b0c2f
+Merge: 3aba5eb5 23b0c2fe
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Oct 18 16:49:28 2012 -0700
 
@@ -22963,7 +24984,7 @@ Date:   Thu Oct 18 15:34:41 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5a55501660ebab3b858a48483c5df1cfb4e858e4
-Merge: 0361235 440365b
+Merge: 0361235c 440365bd
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Oct 18 15:18:52 2012 -0700
 
@@ -23530,7 +25551,7 @@ Date:   Sat Oct 6 17:05:59 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 82fdc42d61340e6b76580ff12a9e1bea59eb8079
-Merge: 6b8881a 2cac8c5
+Merge: 6b8881a7 2cac8c57
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Oct 3 10:44:28 2012 -0700
 
@@ -23589,21 +25610,21 @@ Date:   Thu Sep 20 11:33:24 2012 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2f2734bb418f5c3a89fa3f1bf1b98ce4cfe432e1
-Merge: e69a433 3fe5c2f
+Merge: e69a433f 3fe5c2f9
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 20 11:30:19 2012 +0200
 
     Merge remote-tracking branch 'mjb/altosdroid'
 
 commit e69a433fd93b9f6bd2297d8045eb075fee29e73b
-Merge: 19243ec 6e0d672
+Merge: 19243ecc 6e0d672b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 20 11:30:11 2012 +0200
 
     Merge remote-tracking branch 'mjb/prefs_interface'
 
 commit 19243ecc9b5bbdcc069ae24acf1ca807322c84d8
-Merge: 90c1b6d 0ef8b71
+Merge: 90c1b6db 0ef8b714
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 20 11:29:55 2012 +0200
 
@@ -23691,7 +25712,7 @@ Date:   Mon Sep 17 01:29:33 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 52d3cad4f744140e1aa06fdfc0d49a0cf8734fd4
-Merge: 31f5a02 6e0d672
+Merge: 31f5a026 6e0d672b
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Sep 16 22:27:04 2012 +1200
 
@@ -23946,7 +25967,7 @@ Date:   Thu Sep 13 15:12:33 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 320d90c376dccfe1599505e3b485df8d46e34bb3
-Merge: 9a7d643 2e6c6a6
+Merge: 9a7d6431 2e6c6a6c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Sep 13 15:36:37 2012 -0600
 
@@ -23963,7 +25984,7 @@ Date:   Thu Sep 13 00:35:27 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 9a7d6431777ce3377b788ddac6cb9fadd53c039c
-Merge: 2439f53 9728b20
+Merge: 2439f53e 9728b20a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Sep 13 00:58:30 2012 -0600
 
@@ -24020,7 +26041,7 @@ Date:   Wed Sep 12 19:50:07 2012 -0600
     update Releasing for non-native versioning and builds on debian branch
 
 commit fe009534ce6846b6db96cac8f6c2d53ba8010d91
-Merge: 69d42b2 8ee29fe
+Merge: 69d42b26 8ee29fe4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 12 19:49:51 2012 -0600
 
@@ -24108,7 +26129,7 @@ Date:   Tue Sep 11 23:36:26 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 69d42b26223b45df4167aa3baafba100ad71baab
-Merge: 3e9078c 3fa5fbd
+Merge: 3e9078cb 3fa5fbdf
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 12 00:26:21 2012 -0600
 
@@ -24145,7 +26166,7 @@ Date:   Tue Sep 11 22:17:22 2012 -0600
     releasing 1.1
 
 commit 4563624638884b7b2f16cd4d396c00690e045999
-Merge: 11fbcf5 e5a55db
+Merge: 11fbcf5e e5a55dbf
 Author: Tom Marble <tmarble@info9.net>
 Date:   Tue Sep 11 22:50:18 2012 -0500
 
@@ -24203,7 +26224,7 @@ Date:   Tue Sep 11 12:44:24 2012 -0500
     Add appropriate Java build deps as given from autoconf
 
 commit 8e506274a35eccacd2d4523faa08d279a201753f
-Merge: 0bc3ed5 1fc97dd
+Merge: 0bc3ed53 1fc97dd9
 Author: Tom Marble <tmarble@info9.net>
 Date:   Tue Sep 11 11:39:22 2012 -0500
 
@@ -24216,7 +26237,7 @@ Date:   Tue Sep 11 11:37:14 2012 -0500
     Use explicit build deps for altosui (avoids * wildcarding)
 
 commit 1fc97dd9875a7639533a34438c4c7c999412eb3a
-Merge: 8397d2b 4420d4a
+Merge: 8397d2b0 4420d4a9
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Sep 11 10:35:04 2012 -0600
 
@@ -24382,7 +26403,7 @@ Date:   Sun Sep 9 13:09:27 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit e2b458a448106ba1ab207f0ea6824b56927d8547
-Merge: 9682e9e 3fe9322
+Merge: 9682e9e6 3fe93220
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Sep 9 13:03:47 2012 -0700
 
@@ -24562,7 +26583,7 @@ Date:   Sat Sep 1 00:14:27 2012 -0500
     This reverts commit ada6f2dfc045e77cb9499f20cdec1b4a54ef0db1.
 
 commit ec9e1186dce079a2f2b7be8050216ddb1bc1af66
-Merge: 503eabd 6d31f8d
+Merge: 503eabd0 6d31f8d1
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Aug 31 22:24:16 2012 -0500
 
@@ -24669,7 +26690,7 @@ Date:   Thu Aug 30 16:28:53 2012 -0500
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit b635cb26ba54c8f5c6a958e0ab0bc4d34d33b635
-Merge: 354c1fe a8ecf3a
+Merge: 354c1fed a8ecf3aa
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Aug 30 16:24:38 2012 -0500
 
@@ -24773,7 +26794,7 @@ Date:   Thu Aug 30 13:13:20 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 583458772746317b98fced907ec780edff465888
-Merge: aea10c1 17b6ffb
+Merge: aea10c10 17b6ffb6
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Aug 29 11:29:24 2012 -0700
 
@@ -24994,14 +27015,14 @@ Date:   Mon Aug 27 22:45:20 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5ed88fb72c3e3ecf3333c700d838667db71cfbdc
-Merge: adbe64c 621d093
+Merge: adbe64c5 621d0930
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 28 23:39:53 2012 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
     
     Conflicts:
-    	debian/control
+            debian/control
 
 commit adbe64c5a9402b7c5075a444a12629131b663877
 Author: Bdale Garbee <bdale@gag.com>
@@ -25967,21 +27988,21 @@ Date:   Wed Aug 8 07:07:49 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 9456332fc16269270a2e9b7ef0b54523800cfe27
-Merge: bd02349 4d4ad34
+Merge: bd023491 4d4ad34a
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Wed Aug 8 06:49:15 2012 +1200
 
     Merge branch 'master' of git://git.gag.com/fw/altos
 
 commit 4d4ad34aec0c75c66162b992f1e52947e4685730
-Merge: c7f2285 8e4ebd1
+Merge: c7f22850 8e4ebd1f
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Aug 7 11:48:20 2012 -0700
 
     Merge remote-tracking branch 'mjb/master'
 
 commit bd02349111ae0f39b320e6a10a330051ddc39fdf
-Merge: 8e4ebd1 c7f2285
+Merge: 8e4ebd1f c7f22850
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Wed Aug 8 06:46:56 2012 +1200
 
@@ -26168,7 +28189,7 @@ Date:   Thu Aug 2 21:20:23 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 7481d06bebc2dc1473f451971d8b744c9da4e726
-Merge: 599e28b c56dead
+Merge: 599e28b2 c56dead7
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Thu Aug 2 21:18:15 2012 +1200
 
@@ -26325,7 +28346,7 @@ Date:   Wed Jul 18 18:41:00 2012 -0600
     telescience: correctly calculating rate values with higher resolution
 
 commit e2b472bbb2418fc13be42dbc7c52beb88479c46d
-Merge: 75d6aa6 b242f27
+Merge: 75d6aa6f b242f275
 Author: Robert Garbee <robert@gag.com>
 Date:   Wed Jul 18 14:25:27 2012 -0600
 
@@ -28631,7 +30652,7 @@ Date:   Mon May 7 23:14:14 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6a973f788563ccc66b01cc7557a004dabef18d09
-Merge: d387f24 da2c920
+Merge: d387f246 da2c920b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed May 16 09:13:53 2012 -0600
 
@@ -30956,34 +32977,34 @@ Date:   Fri Oct 7 09:53:09 2011 -0600
     
     Conflicts:
     
-    	src/Makefile.proto
-    	src/cc1111/ao_adc.c
-    	src/cc1111/ao_packet_master.c
-    	src/core/ao.h
+            src/Makefile.proto
+            src/cc1111/ao_adc.c
+            src/cc1111/ao_packet_master.c
+            src/core/ao.h
     
     Fix up the new makefiles
 
 commit 128bbfa150f88c09f7adde2434b7bf0b5a9ed556
-Merge: f6f54d7 246864b
+Merge: f6f54d70 246864b0
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 7 08:41:56 2011 -0600
 
     Merge remote-tracking branch 'origin/simple-quiet' into multiarch
     
     Conflicts:
-    	configure.ac
+            configure.ac
     
     fix version number
 
 commit f6f54d70b768dca1715ddddea64a4df00d82b09e
-Merge: 1c344b7 0d10e25
+Merge: 1c344b76 0d10e257
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 7 08:40:14 2011 -0600
 
     Merge remote-tracking branch 'uniarch/master' into multiarch
     
     Conflicts:
-    	src/core/ao_cmd.c
+            src/core/ao_cmd.c
     
     Use ao_arch_reboot after waiting for a second
 
@@ -31017,14 +33038,14 @@ Date:   Mon Sep 26 11:50:28 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1c344b760776cd5d8c0297d8db9bf02687381b4e
-Merge: 4ed53ef fc4173f
+Merge: 4ed53ef8 fc4173ff
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 7 08:34:59 2011 -0600
 
     Merge remote-tracking branch 'origin/master' into multiarch
     
     Conflicts:
-    	configure.ac
+            configure.ac
     
     Fix version number and location of ao.h header
 
@@ -31035,7 +33056,7 @@ Date:   Tue Sep 27 00:59:08 2011 -0600
     add run-time dependency on libjfreechart-java
 
 commit 989aae5b18856e3420ea5b7a26ddd8dccae9d6d3
-Merge: 0552fbe e44f1ff
+Merge: 0552fbed e44f1ffb
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Sep 24 15:34:59 2011 -0600
 
@@ -31601,7 +33622,7 @@ Date:   Fri Aug 26 09:41:46 2011 -0600
     get ready for a 1.0.1 release
 
 commit 674231773256bacd7acb4b5718c47412e47b813f
-Merge: 08e3d54 3bfe8df
+Merge: 08e3d54b 3bfe8df4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Aug 26 09:37:01 2011 -0600
 
@@ -31663,11 +33684,11 @@ Date:   Thu Aug 25 20:43:44 2011 -0700
     
     Split out sources into separate directories:
     
-    	core:		architecture and product independent bits
-    	cc1111:		cc1111-specific code
-    	drivers:	architecture independent drivers
-    	product:	product-specific sources and Makefile fragments
-    	util:		scripts for building stuff
+            core:           architecture and product independent bits
+            cc1111:         cc1111-specific code
+            drivers:        architecture independent drivers
+            product:        product-specific sources and Makefile fragments
+            util:           scripts for building stuff
     
     This should have no effect on the built products, but testing is encouraged
     
@@ -31761,14 +33782,14 @@ Date:   Thu Aug 25 01:11:47 2011 -0600
     prepare to release
 
 commit 73abe19acf709c00f5352ec12e8cd6edae1d1963
-Merge: 1bd781d 5158493
+Merge: 1bd781da 5158493c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Aug 25 00:34:49 2011 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
     
     Conflicts:
-    	doc/altusmetrum.xsl
+            doc/altusmetrum.xsl
 
 commit 1bd781da934c738e0c9294197c7eb622b0710a9a
 Author: Bdale Garbee <bdale@gag.com>
@@ -31788,7 +33809,7 @@ Date:   Wed Aug 24 23:21:02 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit e268798dc260311f5f0167909481b41c9d27fc1c
-Merge: 458f816 242344d
+Merge: 458f816a 242344d3
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Aug 24 23:06:44 2011 -0700
 
@@ -31805,14 +33826,14 @@ Date:   Wed Aug 24 23:06:01 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 242344d3e32e7c7cd9270d708555923fa888e4d8
-Merge: 5c1cf74 94a1b22
+Merge: 5c1cf749 94a1b220
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 23:51:38 2011 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
     
     Conflicts:
-    	doc/altusmetrum.xsl
+            doc/altusmetrum.xsl
 
 commit 5c1cf7492b82e63a9db9d0238ecbcd2b59486893
 Author: Bdale Garbee <bdale@gag.com>
@@ -31829,7 +33850,7 @@ Date:   Wed Aug 24 22:29:56 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit edfb553bb4fa5b0c7c6c658505b2a99d05fb13bf
-Merge: c74ab82 ec96f11
+Merge: c74ab82a ec96f116
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 23:23:56 2011 -0600
 
@@ -31863,7 +33884,7 @@ Date:   Wed Aug 24 22:18:29 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 50769fbbeaaf61111d363411e0ef0b2868681cf4
-Merge: 425fa99 d92c173
+Merge: 425fa995 d92c1736
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 23:15:20 2011 -0600
 
@@ -31893,7 +33914,7 @@ Date:   Wed Aug 24 23:03:23 2011 -0600
     more tweaks
 
 commit 09981cd024297fd4ef093c7468de2b9d5f3c2691
-Merge: a476e76 03c8b27
+Merge: a476e766 03c8b270
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 22:42:39 2011 -0600
 
@@ -31960,7 +33981,7 @@ Date:   Wed Aug 24 21:39:21 2011 -0600
     doc tweaks through chap 3
 
 commit 3d88e0493ab446d7c7011786390d30618a72d045
-Merge: 02d6545 5a9972d
+Merge: 02d65453 5a9972d4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 21:26:26 2011 -0600
 
@@ -32035,7 +34056,7 @@ Date:   Wed Aug 24 01:41:53 2011 -0600
     another test round
 
 commit 4d94e8f9f807a0bbeab0cdead011e74eeca1d1b6
-Merge: 4b5369d 3b0a9a1
+Merge: 4b5369dc 3b0a9a1c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 01:38:58 2011 -0600
 
@@ -32287,7 +34308,7 @@ Date:   Sun Aug 21 22:12:04 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a08826292ebd802a1ff2effccac3b96fd061c47d
-Merge: 3366cfe 55be3db
+Merge: 3366cfe6 55be3db2
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Aug 22 16:08:55 2011 -0600
 
@@ -32805,7 +34826,7 @@ Date:   Wed Aug 10 15:00:44 2011 -0700
     
     The official URL is now:
     
-    	http://www.altusmetrum.org/AltOS/launch-sites.txt
+            http://www.altusmetrum.org/AltOS/launch-sites.txt
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
@@ -33361,7 +35382,7 @@ Date:   Sun Jul 17 11:25:47 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f7cd8317bf78ece334e1ceb0263b875ca43bbbd2
-Merge: 51796e2 a482d90
+Merge: 51796e2f a482d904
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Jul 17 08:17:44 2011 -0700
 
@@ -33419,7 +35440,7 @@ Date:   Sat Jul 16 22:34:44 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit abb8510b97ce9cbbff0275cc31f74780fe1ce138
-Merge: 0929ee3 00e6981
+Merge: 0929ee32 00e6981c
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Jul 16 21:06:37 2011 -0700
 
@@ -34285,7 +36306,7 @@ Date:   Tue Apr 19 15:29:39 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 44fb71ca3e5bccd5f601fc5a2d5da7292050b1d6
-Merge: 2ebdb88 c269e26
+Merge: 2ebdb888 c269e263
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Apr 19 14:06:39 2011 -0700
 
@@ -34494,7 +36515,7 @@ Date:   Thu Apr 7 22:00:38 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f28efe271f9670473249574f6bcf6e160fe58c7b
-Merge: 8db5c52 835ab3a
+Merge: 8db5c52f 835ab3a8
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Apr 1 19:35:22 2011 -0700
 
@@ -35286,7 +37307,7 @@ Date:   Fri Mar 18 20:26:12 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5db94e1e230bade966a997aa83165405a9ec9d83
-Merge: 1a8f45e cbb968f
+Merge: 1a8f45e7 cbb968f5
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Mar 18 21:12:39 2011 -0600
 
@@ -35793,7 +37814,7 @@ Date:   Tue Jan 18 17:27:11 2011 -0700
     update changelogs for Debian build
 
 commit da42f406e88ccc821cd45d5a94d5afec65ec50e9
-Merge: ea4cdfb cf550f9
+Merge: ea4cdfb8 cf550f9b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Jan 17 09:50:17 2011 -0700
 
@@ -36790,14 +38811,14 @@ Date:   Wed Nov 24 21:39:18 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 51c7741040d95c5deece939dae5e4136cc04afc4
-Merge: d1dbe3b 4e47c44
+Merge: d1dbe3b6 4e47c44d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Nov 24 21:00:52 2010 -0800
 
     Merge branch 'buttonbox'
     
     Conflicts:
-    	doc/telemetrum-doc.xsl
+            doc/telemetrum-doc.xsl
     
     Pull the buttbox version of the docs in as it had been updated.
     
@@ -36822,7 +38843,7 @@ Date:   Wed Nov 24 20:53:36 2010 -0700
     fix missing section close in Site Map content
 
 commit db2b19b8f0d452d682d53c7ed0ff6e359b46efa0
-Merge: b372f3c 915f881
+Merge: b372f3c0 915f881d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Nov 24 18:57:35 2010 -0800
 
@@ -36843,7 +38864,7 @@ Date:   Thu Nov 25 09:52:30 2010 +1000
     doc: Document altosui "Site Map" tab
 
 commit f01096c4b42f9a4720ed0414826c2a283a992545
-Merge: 357826a 3fbefb3
+Merge: 357826aa 3fbefb3e
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Thu Nov 25 09:10:50 2010 +1000
 
@@ -36864,7 +38885,7 @@ Date:   Thu Nov 25 09:07:34 2010 +1000
     docs: Document altosui "Graph Data" button
 
 commit 7811e6dfa6caf10251da7df7c24b98cdc3787892
-Merge: 71b1949 7a50837
+Merge: 71b1949e 7a50837e
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Thu Nov 25 08:47:36 2010 +1000
 
@@ -36966,7 +38987,7 @@ Date:   Tue Nov 23 18:56:46 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 71b1949e50f4533bcf44537da65b19bc67863c8e
-Merge: a79225c f1892b1
+Merge: a79225c2 f1892b13
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Wed Nov 24 12:14:11 2010 +1000
 
@@ -36980,7 +39001,7 @@ Date:   Tue Nov 23 18:58:11 2010 -0700
     while before I tackle that, if ever.
 
 commit a79225c215f17fa5218ddd9db4fc3f5c563a9f74
-Merge: 84cd5d4 853b711
+Merge: 84cd5d42 853b7112
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Wed Nov 24 11:55:14 2010 +1000
 
@@ -37005,7 +39026,7 @@ Date:   Wed Nov 24 02:11:36 2010 +1000
     altosui: don't switch away from user selected tab
 
 commit ae55a107f12546dc65f04618c7abc17beb920d73
-Merge: d1005f6 737f2fd
+Merge: d1005f68 737f2fdd
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Wed Nov 24 01:53:46 2010 +1000
 
@@ -37026,14 +39047,14 @@ Date:   Mon Nov 22 21:07:10 2010 -0700
     add a rudimentary --help for command line use
 
 commit d1005f68376d695039c314b8d7a68bbf9acbca4f
-Merge: 9a83e0d 22c0978
+Merge: 9a83e0dc 22c09781
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Nov 23 10:14:55 2010 +1000
 
     Merge branch 'buttonbox' of git://git.gag.com/fw/altos into buttonbox
 
 commit 22c09781af1df4b38562b577e9926c23e4a397f2
-Merge: b27327a a79606a
+Merge: b27327a0 a79606a6
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Nov 22 16:02:22 2010 -0800
 
@@ -37063,7 +39084,7 @@ Date:   Mon Nov 22 15:53:27 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 9a83e0dc79f7a7467c7814d58daa2a2b89e50972
-Merge: 902735f a79606a
+Merge: 902735ff a79606a6
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Nov 23 08:07:04 2010 +1000
 
@@ -37104,7 +39125,7 @@ Date:   Sun Nov 21 17:39:50 2010 +1000
     AltosSiteMap: ensure buffer around active tile
 
 commit ec47bc93a487614714a752cb30ec9fe3d8f72929
-Merge: 0393830 e7954c8
+Merge: 0393830f e7954c82
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 16:08:37 2010 +1000
 
@@ -37162,14 +39183,14 @@ Date:   Sun Nov 21 13:07:11 2010 +1000
     AltosSiteMap: extend map if rocket goes far away
 
 commit 835b903727a2eabda8d9659cc46e53301f92897c
-Merge: 440a0f3 8789135
+Merge: 440a0f3f 87891355
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 11:15:02 2010 +1000
 
     Merge branch 'sitemap' into buttonbox
     
     Conflicts:
-    	ao-tools/altosui/AltosSiteMap.java
+            ao-tools/altosui/AltosSiteMap.java
 
 commit 878913551a1e4e3c8f2b39fa4aeb234880735a1c
 Author: Anthony Towns <aj@erisian.com.au>
@@ -37188,24 +39209,24 @@ Date:   Sat Nov 20 16:55:12 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2a7dc3ba36bac81640a9498e0d0caf1470b57c19
-Merge: e5b1ada ece2c86
+Merge: e5b1adae ece2c86e
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 10:45:15 2010 +1000
 
     Merge branch 'buttonbox' into sitemap
     
     Conflicts:
-    	ao-tools/altosui/AltosFlightUI.java
+            ao-tools/altosui/AltosFlightUI.java
 
 commit 8df185cd95cfecbed8272dd1275d077c5b45535b
-Merge: ece2c86 1e71264
+Merge: ece2c86e 1e712647
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Nov 20 16:35:48 2010 -0800
 
     Merge remote branch 'aj/sitemap' into buttonbox
     
     Conflicts:
-    	ao-tools/altosui/AltosFlightUI.java
+            ao-tools/altosui/AltosFlightUI.java
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
@@ -37237,7 +39258,7 @@ Date:   Sun Nov 21 08:58:44 2010 +1000
     altosui: reindent
 
 commit a59a204e188e40ec8848a0dc63d6de710cee3039
-Merge: 8263630 37f0201
+Merge: 82636305 37f0201d
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 08:56:13 2010 +1000
 
@@ -37315,14 +39336,14 @@ Date:   Sat Nov 20 21:06:37 2010 +1000
     AltosSiteMap: add autoscroll and grabndrag scroll
 
 commit 74cab8503b51ba6fb05a4d12a031c749e870b0ef
-Merge: 0ecf033 9a99cab
+Merge: 0ecf0331 9a99cabc
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Nov 20 18:20:45 2010 +1000
 
     Merge branch 'buttonbox' of git://git.gag.com/fw/altos into buttonbox
 
 commit 0ecf033110084f1a8be98282d7029dc14f70dab5
-Merge: 081fbd5 71c41ea
+Merge: 081fbd57 71c41ead
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Nov 20 18:14:30 2010 +1000
 
@@ -37353,14 +39374,14 @@ Date:   Sat Nov 20 00:09:03 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 081fbd5715f9d3d81d98e149fb95d40447c07a79
-Merge: 90b9bc4 7920ed5
+Merge: 90b9bc44 7920ed5c
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Nov 20 17:40:49 2010 +1000
 
     Merge branch 'buttonbox' of git://git.gag.com/fw/altos into buttonbox
     
     Conflicts:
-    	ao-tools/altosui/AltosFlightUI.java
+            ao-tools/altosui/AltosFlightUI.java
 
 commit 7920ed5c34b088f45ce4213b061ddd1ffe22cee8
 Author: Keith Packard <keithp@keithp.com>
@@ -37504,14 +39525,14 @@ Date:   Fri Nov 19 12:09:46 2010 +1000
     altosui: tile site maps
 
 commit 939be6793238a275b7682ecc376fed14379cf044
-Merge: e68fe94 1a4b6e9
+Merge: e68fe945 1a4b6e96
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Thu Nov 18 05:54:06 2010 +1000
 
     Merge branch 'buttonbox' of git://git.gag.com/fw/altos into buttonbox
     
     Conflicts:
-    	ao-tools/altosui/AltosFlightUI.java
+            ao-tools/altosui/AltosFlightUI.java
 
 commit 1a4b6e96f823035b113f01d1bdfd61afc1f33e25
 Author: Keith Packard <keithp@keithp.com>
@@ -37654,7 +39675,7 @@ Date:   Sun Nov 14 00:57:45 2010 +1000
     AltosTelemetryReader: actually open serial port
 
 commit 9c32b93ef5fb43558fb0179ea1b047e35b7ed6e8
-Merge: 991541f a6f30fa
+Merge: 991541f5 a6f30fae
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 14 00:29:11 2010 +1000
 
@@ -37671,7 +39692,7 @@ Date:   Fri Nov 12 17:02:22 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1bdc6166f3bc5ce3f8e55acb1484923781412e21
-Merge: f111871 5c6a533
+Merge: f1118717 5c6a5335
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Nov 12 17:32:43 2010 -0700
 
@@ -37721,7 +39742,7 @@ Date:   Fri Nov 12 02:07:41 2010 +1000
     add site map tab, at least for QRS launches
 
 commit 5394548fa5c7bdbfcc01e8aa19e93e1cf6345e2a
-Merge: 891e629 75f7698
+Merge: 891e629f 75f7698b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Nov 10 22:11:21 2010 -0800
 
@@ -37937,7 +39958,7 @@ Date:   Tue Sep 28 17:56:49 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5a119fd92532d53e552efe1f7c61e87181fcace0
-Merge: 28da340 82744c3
+Merge: 28da3406 82744c34
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Sep 27 22:28:07 2010 -0700
 
@@ -37966,7 +39987,7 @@ Date:   Tue Sep 28 14:45:01 2010 +1000
     Hax0r graphing to support telem/eeprom files
 
 commit e2b9f47a205348d38756c70e928a2a9183de6884
-Merge: 7ef3ad0 8032031
+Merge: 7ef3ad0c 80320319
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Sep 28 12:55:47 2010 +1000
 
@@ -38014,7 +40035,7 @@ Date:   Mon Sep 27 17:11:48 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7ef3ad0c9354c0484c25badc69334b59c7f355e2
-Merge: eb74866 e66919a
+Merge: eb74866e e66919aa
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Fri Sep 24 10:28:06 2010 +1000
 
@@ -38053,7 +40074,7 @@ Date:   Mon Aug 30 14:00:04 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit eb74866e919e8c661153847871f5a79e66d37296
-Merge: af404b4 1260589
+Merge: af404b42 12605899
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Mon Sep 20 22:05:26 2010 +1000
 
@@ -38096,7 +40117,7 @@ Date:   Wed Sep 15 06:51:05 2010 +1000
     Add graphing.
 
 commit 3d64f5a6511529ca53699190f4d54de1ba62a9bd
-Merge: ec6da08 b9623f8
+Merge: ec6da082 b9623f8e
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Sep 11 15:15:14 2010 +1000
 
@@ -38131,7 +40152,7 @@ Date:   Fri Sep 10 10:42:35 2010 -0600
     make the column headers comma separated, too, so they align with the data
 
 commit ec6da0824474e46de842845d7b53fe1a1dde33ed
-Merge: 7c2e411 1031067
+Merge: 7c2e4114 10310672
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Fri Sep 10 16:11:34 2010 +1000
 
@@ -38194,7 +40215,7 @@ Date:   Thu Sep 9 23:51:23 2010 -0600
     rewind packaging changelog
 
 commit 7c2e4114a3a43f919a7a6c967d3f16e5d630f90f
-Merge: ddc83b4 af200f5
+Merge: ddc83b4c af200f5b
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Fri Sep 10 15:50:01 2010 +1000
 
@@ -38299,7 +40320,7 @@ Date:   Thu Sep 9 20:06:09 2010 -0600
     update changelogs for Debian build
 
 commit 0ea75761416bff299233991e961ba25b6c7dcf89
-Merge: 35d70c9 8ee3464
+Merge: 35d70c92 8ee3464d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Sep 9 20:05:27 2010 -0600
 
@@ -38412,7 +40433,7 @@ Date:   Thu Sep 9 15:43:47 2010 -0600
     update changelogs for Debian build
 
 commit ddc83b4c401be965a9947782becf20cc8c54e6a2
-Merge: afea6c2 3d49d5f
+Merge: afea6c26 3d49d5f6
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Sep 5 20:49:34 2010 +1000
 
@@ -39224,14 +41245,14 @@ Date:   Fri Aug 27 12:41:26 2010 -0600
     update changelogs for Debian build
 
 commit cf65c6b8056c4af7c26b52ec6f9fbd3400cef638
-Merge: 5f2f6a8 ae5eff7
+Merge: 5f2f6a8f ae5eff7b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Aug 27 12:38:25 2010 -0600
 
     Merge branch 'bdale'
     
     Conflicts:
-    	debian/control
+            debian/control
 
 commit ae5eff7bc0b63047737223423009707bedcb00f5
 Author: Bdale Garbee <bdale@gag.com>
@@ -39273,7 +41294,7 @@ Date:   Fri Aug 27 12:04:13 2010 -0600
     fix up the wrapper's path to the jar file
 
 commit 5f2f6a8f9ba56be867888758848bc7f152ccbd47
-Merge: 63bd34c 9d1b27f
+Merge: 63bd34cd 9d1b27fa
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Aug 27 11:00:31 2010 -0700
 
@@ -39312,7 +41333,7 @@ Date:   Fri Aug 27 11:17:54 2010 -0600
     add a dummy install target
 
 commit c443f43f8dee6e0fcbcecf9d09e948fd928b7af4
-Merge: 2950431 2923cf5
+Merge: 29504311 2923cf50
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Aug 27 03:08:53 2010 -0600
 
@@ -39537,7 +41558,7 @@ Date:   Mon Aug 23 23:15:05 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit afea6c264c5ebf12f1d629bd4bc724da86d11b7a
-Merge: 0e17853 9d1b27f
+Merge: 0e17853c 9d1b27fa
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Aug 24 00:02:31 2010 -0600
 
@@ -39555,7 +41576,7 @@ Date:   Mon Aug 23 23:01:36 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 295043112ccde35092945c286596f9045ee6fa05
-Merge: 2007288 ef8376c
+Merge: 2007288d ef8376c4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Aug 23 23:11:22 2010 -0600
 
@@ -39957,7 +41978,7 @@ Date:   Thu Jul 29 13:30:36 2010 -0600
     update changelogs for Debian build
 
 commit 7877496d47ce6d25210c0e1c6500666dbfc0876c
-Merge: c71061a 4cf39b1
+Merge: c71061a3 4cf39b13
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Jul 29 12:07:49 2010 -0700
 
@@ -40176,7 +42197,7 @@ Date:   Wed Jul 28 15:41:34 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8a6040e143ecc7830cc1c0114de85f3b72c067eb
-Merge: 024d077 554a97e
+Merge: 024d0773 554a97ef
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jul 28 13:29:51 2010 -0700
 
@@ -40220,7 +42241,7 @@ Date:   Wed Jul 28 12:24:53 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 172a2817dde6718724f2b5fad5a7761801446fa0
-Merge: f2a006f 81bf204
+Merge: f2a006fd 81bf2042
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jul 28 11:20:22 2010 -0700
 
@@ -40245,21 +42266,21 @@ Date:   Wed Jul 28 09:31:09 2010 -0700
     
     Here's what happens with the ao_gps_tracking_report and ao_log threads:
     
-      ao_gps_tracking_report		ao_log
+      ao_gps_tracking_report                ao_log
     
        Writes a bunch of records
        *blocks* in the eeprom flush
-    					sets ao_log_data 'log' to global 'log'
-    					computes checksum for 'log' block
-    					*blocks* on ao_log_mutex
+                                            sets ao_log_data 'log' to global 'log'
+                                            computes checksum for 'log' block
+                                            *blocks* on ao_log_mutex
        Wakes up
        sets ao_log_data 'log' to 'gps_log'
        writes remaining records
        'gps_log' is left with svid = 0
        *blocks* on ao_gps_tracking_data
-    					writes data, reading from
-    					the current ao_log_data 'log'
-    					pointer which points at 'gps_log'
+                                            writes data, reading from
+                                            the current ao_log_data 'log'
+                                            pointer which points at 'gps_log'
     
     Making ao_log_data re-entrant fixes this by ensuring that the 'ao_log'
     thread has its own copy of the ao_log_data 'log' parameter.
@@ -40463,7 +42484,7 @@ Date:   Tue Jul 20 22:08:56 2010 -0600
     update changelogs for Debian build
 
 commit e747954b6a9e71705f619684df8a118a909b1039
-Merge: bd40a5b 695879d
+Merge: bd40a5b4 695879db
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jul 20 22:07:22 2010 -0600
 
@@ -40534,14 +42555,14 @@ Date:   Mon Jun 21 11:44:32 2010 -0700
     ao-postflight: was walking off state.data array
 
 commit 11d155d558d0b121b66f089adee0a47d71f65a78
-Merge: 544003a 24393ea
+Merge: 544003a8 24393eab
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jun 16 21:54:06 2010 -0700
 
     Merge remote branch 'mjb/master'
 
 commit 544003a8da0248fd6f3c62ded86af74ab7cdadf6
-Merge: 267923e 93c1e29
+Merge: 267923e5 93c1e29b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jun 16 21:52:23 2010 -0700
 
@@ -40615,7 +42636,7 @@ Date:   Tue May 18 00:24:03 2010 -0600
     merge the altusmetrum-themes package
 
 commit 0c6cf621dfd8339b8bc3915750a3147235f1331b
-Merge: 32e430b 563a9dc
+Merge: 32e430b8 563a9dcd
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon May 17 23:59:43 2010 -0600
 
@@ -40640,7 +42661,7 @@ Date:   Mon May 17 21:30:57 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 69092ffd23ac1928d5c84413fd00c2423f313fc2
-Merge: 3c2211a cc002c0
+Merge: 3c2211ad cc002c0a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon May 17 20:10:46 2010 -0600
 
@@ -40742,7 +42763,7 @@ Date:   Thu May 6 12:48:00 2010 -0600
     update changelogs for Debian build
 
 commit 314d27a73c903fef2968dabac3d5313573713460
-Merge: fa77db2 823fc0a
+Merge: fa77db2f 823fc0ac
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu May 6 12:47:30 2010 -0600
 
@@ -40850,7 +42871,7 @@ Date:   Tue Apr 27 00:18:43 2010 -0600
     update changelogs for Debian build
 
 commit 99094f02bf4849ba1f6b9842ded6c39d894320f7
-Merge: 641e76c 75d8ffd
+Merge: 641e76c5 75d8ffd4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Apr 27 00:17:37 2010 -0600
 
@@ -40892,7 +42913,7 @@ Date:   Thu Apr 22 14:53:44 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f4383394b5d2b275b21e3ce8040d8cb9e48bb375
-Merge: 5f93cf8 c879b17
+Merge: 5f93cf8c c879b178
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Apr 18 08:36:07 2010 -0600
 
@@ -40997,7 +43018,7 @@ Date:   Thu Apr 8 17:28:17 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit baaaac499cfbc1286ae55374cfdc796d32983b92
-Merge: a4356b9 dec9971
+Merge: a4356b9b dec9971d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Apr 8 13:31:23 2010 -0700
 
@@ -41010,7 +43031,7 @@ Date:   Thu Apr 8 13:30:16 2010 -0700
     Use 16-bit flite voice (which appears to have changed symbols recently)
 
 commit 447c121fc1ceb878e45718ad1364a5349965a59a
-Merge: 10330d2 53ca3f9
+Merge: 10330d23 53ca3f98
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Apr 8 11:46:56 2010 -0700
 
@@ -41284,14 +43305,14 @@ Date:   Tue Mar 30 23:18:37 2010 -0600
     update changelogs for Debian build
 
 commit b41e617080fe825f7810ee5eee52ea37f7618ec6
-Merge: 28e40cc df7bda1
+Merge: 28e40ccf df7bda1f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Mar 30 23:15:32 2010 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
     
     Conflicts:
-    	ChangeLog
+            ChangeLog
 
 commit 28e40ccfcd80ab8764d4aa235257cea4d193a0c1
 Author: Bdale Garbee <bdale@gag.com>
@@ -41312,7 +43333,7 @@ Date:   Mon Mar 15 12:04:18 2010 -0600
     move gbp.conf into debian/
 
 commit df7bda1f32b0049c3878c325ea0b55999f3980e3
-Merge: 23da4f3 a7042fe
+Merge: 23da4f3b a7042fe7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Mar 12 10:38:26 2010 -0800
 
@@ -41374,7 +43395,7 @@ Date:   Sat Feb 27 17:36:13 2010 -0700
     update changelogs for Debian build
 
 commit a1478f65538fdaac7b58ffbd958a035b74956099
-Merge: 901fce5 bbf8c9f
+Merge: 901fce5f bbf8c9f1
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Feb 27 15:19:33 2010 -0800
 
@@ -42335,7 +44356,7 @@ Date:   Mon Nov 2 16:54:06 2009 -0700
     update changelogs for Debian build
 
 commit 7db9d86178ecfd58cc1c17ac9fcbdcfd2f13aaec
-Merge: b219801 f9de200
+Merge: b219801f f9de2000
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Nov 2 15:47:40 2009 -0800
 
@@ -42384,7 +44405,7 @@ Date:   Mon Nov 2 15:56:42 2009 -0700
     de-version the libreadline-dev build dependency
 
 commit 0b483233118673cbc2cda1be6acd379df82bc95a
-Merge: ca5d323 550482d
+Merge: ca5d323a 550482d9
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Nov 1 20:59:02 2009 -0800
 
@@ -42573,14 +44594,14 @@ Date:   Mon Oct 12 15:57:19 2009 -0600
     update changelogs for Debian build
 
 commit c57bd7fd2f80e50b0b4c87fccb024ab07c93773d
-Merge: adf8764 2b76572
+Merge: adf8764b 2b765728
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Oct 12 15:57:08 2009 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
 
 commit 69b6f6bb465163cf767bb68e0e4a716d8ad2b39c
-Merge: bc77da6 2b76572
+Merge: bc77da68 2b765728
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 17:16:21 2009 -0700
 
@@ -42598,7 +44619,7 @@ Date:   Sat Oct 10 17:15:38 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit bc77da68c9cb7d4cca483eadbbb7e9ccf71c0060
-Merge: 46cccf6 8f7ea3d
+Merge: 46cccf62 8f7ea3de
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 15:09:48 2009 -0700
 
@@ -42627,14 +44648,14 @@ Date:   Sat Oct 10 15:11:23 2009 -0600
     update changelogs for Debian build
 
 commit 541da6f3bbf81be93dfe3c01f7c8cfd757b28a2b
-Merge: dfc73cb 5f26ad6
+Merge: dfc73cba 5f26ad66
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Oct 10 15:05:50 2009 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
 
 commit 46cccf62fb40514b5930fcb2ffdaf2735415c764
-Merge: fb8f3fe 5f26ad6
+Merge: fb8f3fee 5f26ad66
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 14:00:03 2009 -0700
 
@@ -42655,7 +44676,7 @@ Date:   Sat Oct 10 13:58:16 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit fb8f3fee6a1bab1e46d782e84405845cee2dadb4
-Merge: 22856cf b8fc397
+Merge: 22856cf8 b8fc3975
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 13:41:00 2009 -0700
 
@@ -42675,7 +44696,7 @@ Date:   Sat Oct 10 13:39:01 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 22856cf8bb0f5e1f37c9b774132d9ef6934526ed
-Merge: 2f76034 e29961f
+Merge: 2f760349 e29961fd
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 11:44:20 2009 -0700
 
@@ -42744,7 +44765,7 @@ Date:   Mon Sep 21 11:00:32 2009 -0700
     update changelogs for Debian build
 
 commit 327c64305a59f48ababf19875874a550af6b9cef
-Merge: c8a81a4 74f0fb4
+Merge: c8a81a41 74f0fb4d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 21 11:00:22 2009 -0700
 
@@ -42775,7 +44796,7 @@ Date:   Sun Sep 20 09:21:00 2009 -0600
     update changelogs for Debian build
 
 commit df42ccaaf468cdc5d93cbd1c001f58df58419722
-Merge: 0b24e40 078e9cd
+Merge: 0b24e403 078e9cdb
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 20 09:19:28 2009 -0600
 
@@ -42871,7 +44892,7 @@ Date:   Sun Sep 6 17:46:39 2009 -0600
     update changelogs for Debian build
 
 commit 37e6c9a492a1d51373bf9333fb3172e0c377720f
-Merge: d256f82 2e6686b
+Merge: d256f820 2e6686b1
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 17:46:10 2009 -0600
 
@@ -42884,7 +44905,7 @@ Date:   Sun Sep 6 16:45:47 2009 -0700
     Use plplotd instead of plplotd-gnome2
 
 commit d256f8204e9fce53ae4309562bb4c0cde1fae43e
-Merge: 0fc344d 32d3536
+Merge: 0fc344df 32d35367
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 17:34:08 2009 -0600
 
@@ -42907,7 +44928,7 @@ Date:   Sun Sep 6 14:15:57 2009 -0600
     update changelogs for Debian build
 
 commit 4b0de757874c0ecaf38e3dfd3beefc398150e3d5
-Merge: 773c4ff d0eac98
+Merge: 773c4ffb d0eac989
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 14:15:53 2009 -0600
 
@@ -42940,7 +44961,7 @@ Date:   Sun Sep 6 14:05:55 2009 -0600
     update changelogs for Debian build
 
 commit 45ede4a4b203ef9da5bf05c49cb9c5a2e6382ec5
-Merge: 45e2938 e35e485
+Merge: 45e29381 e35e485f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 14:05:51 2009 -0600
 
@@ -42963,7 +44984,7 @@ Date:   Sun Sep 6 14:02:14 2009 -0600
     update changelogs for Debian build
 
 commit d42ebf0661ecf15455e5051de1e16ae66f8dd857
-Merge: 384dbe9 7a19aac
+Merge: 384dbe9f 7a19aac5
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 14:02:09 2009 -0600
 
@@ -42988,7 +45009,7 @@ Date:   Sun Sep 6 10:40:06 2009 -0600
     update changelogs for Debian build
 
 commit 35c54b3a278fa9bc2bc7f4b5ee04866697c93ba0
-Merge: 4f8eff7 6d018ab
+Merge: 4f8eff74 6d018ab9
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 10:39:23 2009 -0600
 
@@ -43138,7 +45159,7 @@ Date:   Wed Sep 2 23:18:15 2009 -0600
     update changelogs for Debian build
 
 commit cb4a73f3b65ba72f645fd37ab8712829c9537bf8
-Merge: 9ddd869 e2e449d
+Merge: 9ddd8696 e2e449d5
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 2 23:17:37 2009 -0600
 
@@ -43214,7 +45235,7 @@ Date:   Mon Aug 31 16:26:00 2009 -0600
     update changelogs for Debian build
 
 commit b34474c1f3083e73b7184d519f54d4c8031836fd
-Merge: 8df1697 0d65bff
+Merge: 8df16979 0d65bff4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Aug 31 16:25:32 2009 -0600
 
@@ -43282,7 +45303,7 @@ Date:   Wed Aug 19 00:52:57 2009 -0600
     update changelogs for Debian build
 
 commit 4486d9156e19e4280b42bcd422d81d04f2d04a92
-Merge: dd09f0b 33edd62
+Merge: dd09f0bc 33edd629
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 19 00:49:24 2009 -0600
 
@@ -43324,7 +45345,7 @@ Date:   Tue Aug 18 21:49:39 2009 -0600
     add support for building Debian package
 
 commit d996aa9b32fb0eb385bd3d158256c29788a42fe3
-Merge: b3b2d3c 7d4ceb7
+Merge: b3b2d3c4 7d4ceb75
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 18 18:56:09 2009 -0600
 
@@ -43341,7 +45362,7 @@ Date:   Tue Aug 18 17:55:22 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit b3b2d3c475a135084b5628c730fc6fca1ba0817b
-Merge: 4685fc5 da12b89
+Merge: 4685fc54 da12b89f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 18 18:36:03 2009 -0600
 
@@ -43360,18 +45381,18 @@ Date:   Tue Aug 18 17:29:29 2009 -0700
     Fix ao-bitbang examples to not have . in the first column
 
 commit 4685fc541466afbeefc151bcb64cd054739c048b
-Merge: 1c2a0b6 c29275b
+Merge: 1c2a0b66 c29275b7
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 18 18:09:38 2009 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
     
     Conflicts:
-    	ao-tools/ao-bitbang/Makefile.am
-    	ao-tools/ao-eeprom/Makefile.am
-    	ao-tools/ao-load/Makefile.am
-    	ao-tools/ao-load/ao-load.c
-    	ao-tools/ao-rawload/Makefile.am
+            ao-tools/ao-bitbang/Makefile.am
+            ao-tools/ao-eeprom/Makefile.am
+            ao-tools/ao-load/Makefile.am
+            ao-tools/ao-load/ao-load.c
+            ao-tools/ao-rawload/Makefile.am
 
 commit c29275b72438637d46d7a50742882d2736eb176a
 Author: Keith Packard <keithp@keithp.com>
@@ -43860,7 +45881,7 @@ Date:   Thu Jun 4 11:20:10 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 17d2432a8b9c15963cd3b821f025ad33972ef477
-Merge: 210dbaa 8a9a3f0
+Merge: 210dbaa2 8a9a3f02
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Jun 4 11:13:15 2009 -0700
 

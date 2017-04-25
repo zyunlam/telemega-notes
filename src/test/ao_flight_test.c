@@ -58,6 +58,7 @@ int ao_gps_new;
 #define HAS_HMC5883 		1
 #define HAS_BEEP		1
 #define AO_CONFIG_MAX_SIZE	1024
+#define AO_MMA655X_INVERT	0
 
 struct ao_adc {
 	int16_t			sense[AO_ADC_NUM_SENSE];
@@ -71,6 +72,7 @@ struct ao_adc {
 #define AO_ADC_NUM_SENSE	2
 #define HAS_MS5607		1
 #define HAS_MMA655X		1
+#define AO_MMA655X_INVERT	1
 #define HAS_BEEP		1
 #define AO_CONFIG_MAX_SIZE	1024
 
@@ -372,6 +374,8 @@ uint16_t	prev_tick;
 #define AO_PYRO_1	1
 #define AO_PYRO_2	2
 #define AO_PYRO_3	3
+
+#define PYRO_DBG	1
 
 static void
 ao_pyro_pin_set(uint8_t pin, uint8_t value)

@@ -18,11 +18,14 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.6.8)
-ANDROID_VERSION=13
+AC_INIT([altos], 1.7)
+ANDROID_VERSION=14
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
+
+RELEASE_DATE=2017-04-24
+AC_SUBST(RELEASE_DATE)
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
 AC_SUBST(VERSION_DASH)
@@ -515,6 +518,7 @@ AM_CONDITIONAL([INSTALL_SHARED_MIME_INFO], [test x$INSTALL_SHARED_MIME_INFO = xy
 AC_OUTPUT([
 Makefile
 src/Makedefs
+src/chaoskey-v1.0/org.altusmetrum.ChaosKey.metainfo.xml
 altoslib/Makefile
 altoslib/AltosVersion.java
 icon/Makefile

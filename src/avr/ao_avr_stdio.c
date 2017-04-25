@@ -21,6 +21,7 @@
 int
 stdio_put(char c, FILE *stream)
 {
+	(void) stream;
 	putchar(c);
 	return 0;
 }
@@ -28,6 +29,7 @@ stdio_put(char c, FILE *stream)
 int
 stdio_get(FILE *stream)
 {
+	(void) stream;
 	return (int) getchar() & 0xff;
 }
 

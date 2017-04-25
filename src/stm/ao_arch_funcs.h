@@ -202,14 +202,29 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 
 #define ao_gpio_set_bits(port, bits) stm_gpio_set_bits(port, bits)
 
+#define ao_gpio_set_mask(port, bits, mask) stm_gpio_set_mask(port, bits, mask)
+
 #define ao_gpio_clr_bits(port, bits) stm_gpio_clr_bits(port, bits);
 
+#define ao_gpio_get_all(port) stm_gpio_get_all(port)
 
 #define ao_enable_output(port,bit,pin,v) do {			\
 		ao_enable_port(port);				\
 		ao_gpio_set(port, bit, pin, v);			\
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);\
 	} while (0)
+
+#define ao_enable_output_mask(port,bits,mask) do {		\
+		ao_enable_port(port);				\
+		ao_gpio_set_mask(port, bits, mask);		\
+		ao_set_output_mask(port, mask);			\
+	} while (0)
+
+#define AO_OUTPUT_PUSH_PULL	STM_OTYPER_PUSH_PULL
+#define AO_OUTPUT_OPEN_DRAIN	STM_OTYPER_OPEN_DRAIN
+
+#define ao_gpio_set_output_mode(port,bit,pin,mode) \
+	stm_otyper_set(port, pin, mode)
 
 #define ao_gpio_set_mode(port,bit,mode) do {				\
 		if (mode == AO_EXTI_MODE_PULL_UP)			\
@@ -219,36 +234,73 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		else							\
 			stm_pupdr_set(port, bit, STM_PUPDR_NONE);	\
 	} while (0)
-	
+
+#define ao_gpio_set_mode_mask(port,mask,mode) do {			\
+		if (mode == AO_EXTI_MODE_PULL_UP)			\
+			stm_pupdr_set_mask(port, mask, STM_PUPDR_PULL_UP); \
+		else if (mode == AO_EXTI_MODE_PULL_DOWN)		\
+			stm_pupdr_set_mask(port, mask, STM_PUPDR_PULL_DOWN); \
+		else							\
+			stm_pupdr_set_mask(port, mask, STM_PUPDR_NONE);	\
+	} while (0)
+
+#define ao_set_input(port, bit) do {				\
+		stm_moder_set(port, bit, STM_MODER_INPUT);	\
+	} while (0)
+
+#define ao_set_output(port, bit, pin, v) do {			\
+		ao_gpio_set(port, bit, pin, v);			\
+		stm_moder_set(port, bit, STM_MODER_OUTPUT);	\
+	} while (0)
+
+#define ao_set_output_mask(port, mask) do {			\
+		stm_moder_set_mask(port, mask, STM_MODER_OUTPUT);	\
+	} while (0)
+
+#define ao_set_input_mask(port, mask) do {				\
+		stm_moder_set_mask(port, mask, STM_MODER_INPUT);	\
+	} while (0)
+
 #define ao_enable_input(port,bit,mode) do {				\
 		ao_enable_port(port);					\
-		stm_moder_set(port, bit, STM_MODER_INPUT);		\
+		ao_set_input(port, bit);				\
 		ao_gpio_set_mode(port, bit, mode);			\
 	} while (0)
 
-#define ao_enable_cs(port,bit) do {				\
+#define ao_enable_input_mask(port,mask,mode) do {	\
+		ao_enable_port(port);			\
+		ao_gpio_set_mode_mask(port, mask, mode);	\
+		ao_set_input_mask(port, mask);		\
+	} while (0)
+
+#define _ao_enable_cs(port, bit) do {				\
 		stm_gpio_set((port), bit, 1);			\
 		stm_moder_set((port), bit, STM_MODER_OUTPUT);	\
 	} while (0)
 
+#define ao_enable_cs(port,bit) do {				\
+		ao_enable_port(port);				\
+		_ao_enable_cs(port, bit);			\
+	} while (0)
+
 #define ao_spi_init_cs(port, mask) do {				\
 		ao_enable_port(port);				\
-		if ((mask) & 0x0001) ao_enable_cs(port, 0);	\
-		if ((mask) & 0x0002) ao_enable_cs(port, 1);	\
-		if ((mask) & 0x0004) ao_enable_cs(port, 2);	\
-		if ((mask) & 0x0008) ao_enable_cs(port, 3);	\
-		if ((mask) & 0x0010) ao_enable_cs(port, 4);	\
-		if ((mask) & 0x0020) ao_enable_cs(port, 5);	\
-		if ((mask) & 0x0040) ao_enable_cs(port, 6);	\
-		if ((mask) & 0x0080) ao_enable_cs(port, 7);	\
-		if ((mask) & 0x0100) ao_enable_cs(port, 8);	\
-		if ((mask) & 0x0200) ao_enable_cs(port, 9);	\
-		if ((mask) & 0x0400) ao_enable_cs(port, 10);\
-		if ((mask) & 0x0800) ao_enable_cs(port, 11);\
-		if ((mask) & 0x1000) ao_enable_cs(port, 12);\
-		if ((mask) & 0x2000) ao_enable_cs(port, 13);\
-		if ((mask) & 0x4000) ao_enable_cs(port, 14);\
-		if ((mask) & 0x8000) ao_enable_cs(port, 15);\
+		if ((mask) & 0x0001) _ao_enable_cs(port, 0);	\
+		if ((mask) & 0x0002) _ao_enable_cs(port, 1);	\
+		if ((mask) & 0x0004) _ao_enable_cs(port, 2);	\
+		if ((mask) & 0x0008) _ao_enable_cs(port, 3);	\
+		if ((mask) & 0x0010) _ao_enable_cs(port, 4);	\
+		if ((mask) & 0x0020) _ao_enable_cs(port, 5);	\
+		if ((mask) & 0x0040) _ao_enable_cs(port, 6);	\
+		if ((mask) & 0x0080) _ao_enable_cs(port, 7);	\
+		if ((mask) & 0x0100) _ao_enable_cs(port, 8);	\
+		if ((mask) & 0x0200) _ao_enable_cs(port, 9);	\
+		if ((mask) & 0x0400) _ao_enable_cs(port, 10);\
+		if ((mask) & 0x0800) _ao_enable_cs(port, 11);\
+		if ((mask) & 0x1000) _ao_enable_cs(port, 12);\
+		if ((mask) & 0x2000) _ao_enable_cs(port, 13);\
+		if ((mask) & 0x4000) _ao_enable_cs(port, 14);\
+		if ((mask) & 0x8000) _ao_enable_cs(port, 15);\
 	} while (0)
 
 /* ao_dma_stm.c
@@ -345,17 +397,43 @@ extern struct ao_stm_usart	ao_stm_usart3;
 
 typedef uint32_t	ao_arch_irq_t;
 
-static inline uint32_t
-ao_arch_irqsave(void) {
-	uint32_t	primask;
-	asm("mrs %0,primask" : "=&r" (primask));
-	ao_arch_block_interrupts();
-	return primask;
+static inline void
+ao_arch_block_interrupts(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("msr basepri,%0" : : "r" (AO_STM_NVIC_BASEPRI_MASK));
+#else
+	asm("cpsid i");
+#endif
 }
 
 static inline void
-ao_arch_irqrestore(uint32_t primask) {
-	asm("msr primask,%0" : : "r" (primask));
+ao_arch_release_interrupts(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("msr basepri,%0" : : "r" (0x0));
+#else
+	asm("cpsie i");
+#endif
+}
+
+static inline uint32_t
+ao_arch_irqsave(void) {
+	uint32_t	val;
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("mrs %0,basepri" : "=r" (val));
+#else
+	asm("mrs %0,primask" : "=r" (val));
+#endif
+	ao_arch_block_interrupts();
+	return val;
+}
+
+static inline void
+ao_arch_irqrestore(uint32_t basepri) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("msr basepri,%0" : : "r" (basepri));
+#else
+	asm("msr primask,%0" : : "r" (basepri));
+#endif
 }
 
 static inline void
@@ -365,10 +443,17 @@ ao_arch_memory_barrier() {
 
 static inline void
 ao_arch_irq_check(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	uint32_t	basepri;
+	asm("mrs %0,basepri" : "=r" (basepri));
+	if (basepri == 0)
+		ao_panic(AO_PANIC_IRQ);
+#else
 	uint32_t	primask;
-	asm("mrs %0,primask" : "=&r" (primask));
+	asm("mrs %0,primask" : "=r" (primask));
 	if ((primask & 1) == 0)
 		ao_panic(AO_PANIC_IRQ);
+#endif
 }
 
 #if HAS_TASK
@@ -390,7 +475,7 @@ ao_arch_init_stack(struct ao_task *task, void *start)
 	/* APSR */
 	ARM_PUSH32(sp, 0);
 
-	/* PRIMASK with interrupts enabled */
+	/* BASEPRI with interrupts enabled */
 	ARM_PUSH32(sp, 0);
 
 	task->sp = sp;
@@ -404,8 +489,13 @@ static inline void ao_arch_save_regs(void) {
 	asm("mrs r0,apsr");
 	asm("push {r0}");
 
+#ifdef AO_NONMASK_INTERRUPTS
+	/* Save BASEPRI */
+	asm("mrs r0,basepri");
+#else
 	/* Save PRIMASK */
 	asm("mrs r0,primask");
+#endif
 	asm("push {r0}");
 }
 
@@ -419,9 +509,15 @@ static inline void ao_arch_restore_stack(void) {
 	/* Switch stacks */
 	asm("mov sp, %0" : : "r" (ao_cur_task->sp) );
 
+#ifdef AO_NONMASK_INTERRUPTS
+	/* Restore BASEPRI */
+	asm("pop {r0}");
+	asm("msr basepri,r0");
+#else
 	/* Restore PRIMASK */
 	asm("pop {r0}");
 	asm("msr primask,r0");
+#endif
 
 	/* Restore APSR */
 	asm("pop {r0}");
@@ -463,7 +559,7 @@ static inline void ao_arch_start_scheduler(void) {
 
 	asm("mrs %0,msp" : "=&r" (sp));
 	asm("msr psp,%0" : : "r" (sp));
-	asm("mrs %0,control" : "=&r" (control));
+	asm("mrs %0,control" : "=r" (control));
 	control |= (1 << 1);
 	asm("msr control,%0" : : "r" (control));
 	asm("isb");
@@ -474,12 +570,24 @@ static inline void ao_arch_start_scheduler(void) {
 
 #endif
 
-#define ao_arch_wait_interrupt() do {				\
-		asm("\twfi\n");					\
-		ao_arch_release_interrupts();			\
-		asm(".global ao_idle_loc\nao_idle_loc:");	\
-		ao_arch_block_interrupts();			\
-	} while (0)
+static inline void
+ao_arch_wait_interrupt(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm(
+	    "dsb\n"			/* Serialize data */
+	    "isb\n"			/* Serialize instructions */
+	    "cpsid i\n"			/* Block all interrupts */
+	    "msr basepri,%0\n"		/* Allow all interrupts through basepri */
+	    "wfi\n"			/* Wait for an interrupt */
+	    "cpsie i\n"			/* Allow all interrupts */
+	    "msr basepri,%1\n"		/* Block interrupts through basepri */
+	    : : "r" (0), "r" (AO_STM_NVIC_BASEPRI_MASK));
+#else
+	asm("\twfi\n");
+	ao_arch_release_interrupts();
+	ao_arch_block_interrupts();
+#endif
+}
 
 #define ao_arch_critical(b) do {			\
 		uint32_t __mask = ao_arch_irqsave();	\

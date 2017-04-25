@@ -45,9 +45,16 @@ static const uint8_t flight_reports[] = {
 #define mid(time)	ao_beep_for(AO_BEEP_MID, time)
 #define high(time)	ao_beep_for(AO_BEEP_HIGH, time)
 #else
-#define low(time)	ao_led_for(AO_LED_GREEN, time)
-#define mid(time)	ao_led_for(AO_LED_RED, time)
-#define high(time)	ao_led_for(AO_LED_GREEN|AO_LED_RED, time)
+#ifndef AO_LED_LOW
+#define AO_LED_LOW	AO_LED_GREEN
+#endif
+#ifndef AO_LED_MID
+#define AO_LED_MID	AO_LED_RED
+#endif
+
+#define low(time)	ao_led_for(AO_LED_LOW, time)
+#define mid(time)	ao_led_for(AO_LED_MID, time)
+#define high(time)	ao_led_for(AO_LED_MID|AO_LED_LOW, time)
 #endif
 #define pause(time)	ao_delay(time)
 

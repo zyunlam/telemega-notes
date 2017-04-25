@@ -57,6 +57,14 @@
 	|10mW
 	|3.7V
 
+	|TeleMini v3.0
+	|MS5607 30km (100k')
+	|-
+	|-
+	|-
+	|512kB
+	|40mW
+	|3.7V
 	endif::telemini[]
 
 	ifdef::easymini[]

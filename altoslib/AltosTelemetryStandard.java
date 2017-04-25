@@ -84,8 +84,11 @@ public abstract class AltosTelemetryStandard extends AltosTelemetry {
 		case packet_type_metrum_data:
 			telem = new AltosTelemetryMetrumData(bytes);
 			break;
-		case packet_type_mini:
-			telem = new AltosTelemetryMini(bytes);
+		case packet_type_mini2:
+			telem = new AltosTelemetryMini2(bytes);
+			break;
+		case packet_type_mini3:
+			telem = new AltosTelemetryMini3(bytes);
 			break;
 		default:
 			telem = new AltosTelemetryRaw(bytes);

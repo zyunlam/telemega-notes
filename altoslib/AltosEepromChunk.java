@@ -82,12 +82,16 @@ public class AltosEepromChunk {
 		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
 			eeprom = new AltosEepromMetrum2(this, offset);
 			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMINI:
+		case AltosLib.AO_LOG_FORMAT_TELEMINI2:
+		case AltosLib.AO_LOG_FORMAT_TELEMINI3:
 		case AltosLib.AO_LOG_FORMAT_EASYMINI:
 			eeprom = new AltosEepromMini(this, offset);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEGPS:
 			eeprom = new AltosEepromGPS(this, offset);
+			break;
+		case AltosLib.AO_LOG_FORMAT_TELEFIRETWO:
+			eeprom = new AltosEepromFireTwo(this, offset);
 			break;
 		default:
 			throw new ParseException("unknown eeprom format " + log_format, 0);
