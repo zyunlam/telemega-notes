@@ -1,3 +1,228 @@
+altos (1.7-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * Fix release note html to remove xml bits
+  * Update pdclib to version using arm-specific 'ar' program
+  * altos/stmf0: Add USART support
+  * altos/nucleo-32: Add basic support for STM32F042 Nucleo-32 board
+  * altos/test: Fix tests
+  * ao-bringup: Improve EasyMini turnon and test scripts
+  * altos/stm: Make ao_usb_set_address static. Saves a bunch of text space
+  * altos/arm: Align data so that gcc 5.4 doesn't do byte-accesses. Add -Wcast-align
+  * Add first lisp bits
+  * altos: Add lisp reader
+  * altos/lisp: Change lisp objects to use ao_poly everywhere. Add const
+  * altos/kernel: Make ao_cmd_readline public. Return char from ao_cmd_lex.
+  * altos/stmf0: Add lisp to include directories
+  * altos/lisp: add set/setq and ' in reader
+  * altos/lisp: Separate out values from atoms
+  * altos: Add lambda support to lisp
+  * altos: Add lambdakey
+  * altos/lisp: Start rewriting eval as state machine
+  * altos/lisp: get builtin macros working again
+  * altos/lisp: Change GC move API
+  * altos/lisp: make sure stack->formals_last gets moved during GC
+  * altos/lisp: more GC issues. add patom
+  * altos/lisp: convert GC to non-recursive
+  * altos/lambdakey-v1.0: Tweak memory allocations
+  * altos/lisp: working on lexical scoping
+  * altos/lisp: macros appear to work now
+  * altos/lisp: Clean up OS integration bits, add defun
+  * altos/lisp: add progn, while, read and eval
+  * altos/lisp: use regular read-eval-print loop for make const
+  * altos/lisp: Make read() return eof atom on end of file
+  * altos/lisp: Improve lisp test program UI
+  * altos/lisp: Deal with memory compation in the middle of operations
+  * altos/lisp: Add towers of hanoi example
+  * altos/lisp: add length, pack, unpack and flush
+  * altos/lisp: Share mark function for mark and move
+  * altos/lisp: Make ao_lisp_ref and ao_lisp_poly non-inline
+  * altos/lisp: Make sure memmove only happens once per object. Other GC fixes
+  * altos/lisp: Add save/restore infrastructure. Needs OS support to work.
+  * altos/lisp: Add save/restore to ao_lisp_test
+  * altos/lisp: Append a CRC to the saved image to validate on restore
+  * altos/lambdakey: Get save/restore working
+  * altos/stmf0: Add a comment about the requirements for using ao_flash_stm
+  * altos/lisp: Change GC to do moves in batches of 32
+  * altos/lisp: Simplify GC a bit by only marking the head of each object
+  * altos/lisp: Cache freed cons and stack items
+  * altos/lisp: Show number of collect calls in ao_lisp_test
+  * altos/lisp: Improve hanoi demo
+  * altos/lisp: Add license to hanoi demo
+  * altos/lisp: Evaluate macros once, then smash them into place
+  * altos/lisp: Get lambdakey and nucleo-32 building again
+  * altos/lisp: remove duplicate 'length' lambda from hanoi example
+  * altos/lisp: re-use small frames
+  * altos/lisp: Do better checking for un-evaluated macros in ROM
+  * altos/lisp: Allow macro/nlambda/lexpr to have multiple args
+  * altos/lisp: Take advantage of multi-arg macros. Add more ROM funcs
+  * altos/lambdakey: Strip out unused code
+  * altos/lisp: remove nth from hanoi.lisp
+  * altos/lisp: Make hanoi example output a bit prettier
+  * altos/lisp: Add incremental collection
+  * altos/lisp: Optimize chunk searching in collect
+  * altos/lisp: Allow empty defun bodies
+  * altos/test: Disable position independent executables
+  * altos/lisp: binary search for chunk in collect
+  * altos/lisp: Eliminate compiler warning about array bounds at -O3
+  * altos/lisp: Clean up hanoi.lisp comments.
+  * altos/lisp: Remove some stale frame debugging checks
+  * altos/lisp: Fix error atom name in ao_lisp_length
+  * altos/lisp: Dump globals on error
+  * altos/lisp: Fix uninitialized values in ao_lisp_make_const
+  * altos/lisp: Compile ao_lisp_make_const -no-pie
+  * altos/lisp: Make lambda, cond and while all have implicit progns
+  * altos/lisp: Take advantage of implicit progn in ROM code
+  * altos/lisp: have 'while' return the last body value
+  * altos/lisp: Take advantage of implicit progns in hanoi demo
+  * altos/lisp: Add continuations
+  * altos/lisp: Make DBG settings global
+  * altos/lisp: Use poly stashes for stacks
+  * altos/lisp: Empty lambda body is not an error
+  * altos/lisp: bounds check in move_map plus binary search
+  * altos/lisp: Build new ao_lisp_stack.c into test and lambdakey
+  * altos/lisp: Sort frames by atom
+  * altos/lisp: Add builtin 'collect'
+  * altos/lisp: Share binary search for memory chunk between mark and move
+  * altos/lisp: Cleanup some DBG defines
+  * altos/lisp: Include memory stats for test program
+  * altos/lisp: Move stack recursion check after null check
+  * altos/lisp: Clean up hanoi.lisp demo a bit
+  * altos/lisp: Tell compiler that the two lisp memory pools are aligned
+  * altos/lisp: Add casts to keep the latest GCC from whinging
+  * altos/lisp: Start adding scheme symbols
+  * altos/chaoskey: use both halves of the CRC
+  * altos: Eliminate printf format warning with long vs int
+  * ao-bringup: Allow serial number on turnon_easymega cmdline
+  * ao-bringup: test-chaoskey needs to use the SerialNumber dmesg line
+  * altos/stmf0: Allow apps to leave interrupt vectors at 0
+  * altos/stmf0: Complain if the SPI configuration isn't complete
+  * altos/stmf0: Allow projects to not use the USB boot loader
+  * altos: Allow applications to define LEDs for ao_report.c
+  * altos: Require SPI speed to be declared for cc1200
+  * altos/stmf0: Add adc and beep support for TeleMini v3.0
+  * altos: Initial TeleMini v3.0 code
+  * altos/telemini-v3.0: Update to second prototype version
+  * altos/telemini-v3.0: Finish initial turn-on
+  * altos: Split out TeleMini v3 log/telem labeling
+  * altos/telemini-v3.0: Swap main and apogee sense pins.
+  * altoslib: Add TeleMini v3 support
+  * altos/cc1111: Remove unneeded initialization in ao_timer.c
+  * ao-tools/ao-usbload: Pad image with 0xff instead of random bits
+  * altos: Don't wait while idle if trying to minimize interrupt latency
+  * altos/stm: Interrupt priority is in the upper bits of the priority mask
+  * altos/stm: Allow use basepri instead of primask for masking interrupts
+  * altos/avr: Avoid warning about unused args in stdio_put and stdio_get
+  * altos: Allow for console to be used for stdio
+  * altos/stm: Allow DMA channels to be hijacked by other code
+  * altos/stm: Make i2c code handle PCLK1 of 24MHz
+  * altos/stm: Add nvic priority register fields. Add more TIM234 defines.
+  * altos: Add bitmap drawing code
+  * altos: Add VGA driver for STM32L processors
+  * altos: Add PS/2 keyboard driver
+  * altos: Add console driver using VGA and PS/2
+  * altos/stm: Add draw and lisp to make search paths.
+  * altos: Add stm-vga demo project
+  * altos/telemini-v3.0: Add beeper defines needed for more general beeper code
+  * altos/stmf0: Support tim1 beeper channel other than 3
+  * altos/stmf0: Support timer 2/3 for the beeper
+  * altos/lisp: Not quite ready to start making it look like scheme yet
+  * altos/nucleo-32: Update lisp files, add beeper support
+  * Add initial TeleMini v3 docs
+  * telemini outline svg had wrong version number
+  * ao-tools/ao-flash-lpc: Adapt to current openocd LPC support
+  * ao-tools/ao-flash-stm: Use openocd instead of st-utils
+  * doc: Rename telemini doc file from telemini-v1.0.inc to telemini.inc
+  * cortexelf-v1: Add ps/2 and vga with graphics
+  * cortexelf-v1: Fix clock to drive VGA at 640/480. Add sdcard, remove others
+  * cortexelf-v1: Hook up serial consoles for debugging
+  * cortexelf-v1: Use new memory map to access all flash and ram. Add fat.
+  * cortexelf: Add lisp interpreter
+  * stm: Use common flash wait loop instead of inlining
+  * lisp: Fix up lisp build so projects can get ao_lisp_const.h built as needed
+  * cortexelf-v1: Add serialblather command.
+  * cortexelf-v1: Add buttons
+  * altos: Add AS1107 LED display driver
+  * cortexelf-v1: Hook up AS1107 in test mode
+  * altos: add button matrix driver
+  * altos: Allow buttons to be high when pressed rather than low
+  * cortexelf-v1: Hook up hex keypad using matrix input driver
+  * cortexelf-v1: Add bit flipping array generator
+  * cortexelf-v1: doodling with 1802 bits
+  * cortexelf-v1: Make bit flipping array constant
+  * stm: Add a few more GPIO functions to make dealing with the 1802 easier
+  * cortexelf-v1: Add pin definitions for 1802 connections
+  * altos: Define CC115L spi speed in each product
+  * telegps-v0.1: Hack up for SDCARD debugging
+  * altos: Disable FAT commands unless requested
+  * altos: Allow programs to enable SDCARD debugging if desired
+  * stm: Add more mask-based GPIO controls
+  * cortexelf-v1: More 1802 noodling
+  * ao-elftohex: Add conditions for skipping ELF sections
+  * altos: Place AS1107 in 'normal' mode at end of init sequence
+  * altos: Drive row low instead of high in matrix driver
+  * altos: Document a few more SPI mode bits in VGA driver
+  * altos: Escape lisp REP loop with () input
+  * altos: Use MP switch in cortexelf boot loader for force loader mode
+  * cortexelf-v1: Bump SPI pin speed to 40MHz to for sdcard. Fix VGA DMA.
+  * cortexelf-v1: Initialize key matrix code
+  * altos/telegps: Inherit LDFLAGS from lpc make specification
+  * cortexelf-v1: Fetch data at TPB rising when MWR or MRD are low
+  * altos/stmf0: Split up rom load in altos.ld to make linker happy
+  * telegps-v2.0: Remove fec_tx code and ADC logging.
+  * altos/telefiretwo-v0.2: Add AO_CC1200_SPI_SPEED
+  * altos/telebt-v3.0: Add LCO bits for testing
+  * altos/telemini-v3.0: Update to production hardware
+  * altos/telemini-v3.0: Add flash loader
+  * ao-test-baro: Be more lax about altitude checks
+  * altos/lpc: Fix up Makefile definitions
+  * altos/lpc: Add (void *) cast to fix alignment warning
+  * altos/telemini-v3.0: Remove vestiges of the pre-USB code
+  * altos/lpc,altos/stmf0: Use -n flag to work around link editor issue
+  * alots/stmf0: Fix vpath entry for AES directory
+  * doc: Update TeleMini v3 photos to production unit
+  * Replace turnon_telemini with v3 version. Add test-teleminiv3
+  * altos/lpc: Really fix aes entry in lpc vpath
+  * doc: Finish updates for v1.7
+  * altos/stmf0: Pull beeper pin low when beeper is off
+  * altoslib: Add TeleFireTwo eeprom support
+  * altos: Move old AO_LAUNCH defines to cc1111/ao_launch.h
+  * doc: Errors in the TeleMini v3.0 updates found by Bdale
+  * altos/ao_pad.c: Use #if HAS_LOG instead of #ifdef HAS_LOG
+  * altoslib: renamed AltosSensorTMini2, but didn't update AltosIdleFetch
+  * Bump to version 1.7
+
+  [ Bdale Garbee ]
+  * augment TeleDongle turn on script to support serial number on command line
+  * stop using /usr/share for binaries in remaining turnon scripts
+  * use elf, not ihx
+  * first rough cut at skeleton of code for pnpservo .. altos boots and runs
+  * initial skeleton of CortexELF support
+  * makefiles too
+  * capture pnpservo makefiles too
+  * initial cut at telegps-v2.0 firmware
+  * copy telefiretwo-v0.2 to start firmware for v1.0
+  * builds, loads, runs, not very useful yet
+  * need top level Makefile too
+  * add new ADC channels for telefiretwo
+  * fix TeleFireTwo product name in ao-list output
+  * enable spi flash on telefiretwo
+  * fleshing out logging for telefiretwo
+  * a stab at turning on rudimentary logging for telefiretwo
+  * cobble up a command to toggle logging on/off on TeleFireTwo
+  * enable logging support in telefiretwo
+  * add static test start and stop commands to radio protocol for telefiretwo
+  * eliminate spurious close braces
+  * implement static test start and stop protocol for telefiretwo+telebt
+  * allow multiple tests to be logged on telefiretwo without rebooting
+  * update copyright year in docs
+  * update ChangeLog for 1.7 release
+
+  [ Richard Hughes ]
+  * altos/chaoskey: Add a metainfo for the ChaosKey
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 24 Apr 2017 18:22:58 -0600
+
 altos (1.6.8-5) unstable; urgency=medium
 
   [ Keith Packard ]
