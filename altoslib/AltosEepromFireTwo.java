@@ -78,12 +78,14 @@ public class AltosEepromFireTwo extends AltosEeprom {
 		case AltosLib.AO_LOG_FLIGHT:
 			state.set_flight(flight());
 			state.set_ground_pressure(adc_to_pa(idle_pres()));
+			state.set_accel_g(0, -1);
 			break;
 		case AltosLib.AO_LOG_STATE:
 			state.set_state(state());
 			break;
 		case AltosLib.AO_LOG_SENSOR:
 			state.set_pressure(adc_to_pa(pres()));
+			state.set_accel(firetwo_adc(thrust()) * 100);
 			break;
 		}
 	}
