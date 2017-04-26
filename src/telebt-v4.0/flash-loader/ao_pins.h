@@ -32,6 +32,6 @@
 /* USB */
 #define HAS_USB			1
 #define AO_USB_DIRECTIO		0
-#define AO_PA11_PA12_RMP	1
+#define AO_PA11_PA12_RMP	0
 
 #endif /* _AO_PINS_H_ */
