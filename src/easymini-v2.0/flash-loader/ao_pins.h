@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,44 +16,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include <ao.h>
-#include <ao_exti.h>
+#ifndef _AO_PINS_H_
+#define _AO_PINS_H_
 
-void
-main(void)
-{
-	ao_clock_init();
-	ao_task_init();
-	ao_timer_init();
+#include <ao_flash_stm_pins.h>
 
-	ao_dma_init();
-	ao_spi_init();
-	ao_exti_init();
+/* pin 5 (PB1) on debug header to gnd for boot mode */
 
-	ao_adc_init();
+#define AO_BOOT_PIN			1
+#define AO_BOOT_APPLICATION_GPIO	stm_gpiob
+#define AO_BOOT_APPLICATION_PIN		1
+#define AO_BOOT_APPLICATION_VALUE	1
+#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_UP
 
-#if HAS_BEEP
-	ao_beep_init();
-#endif
-#if HAS_SERIAL_1
-	ao_serial_init();
-#endif
-#if HAS_USB
-	ao_usb_init();
-#endif
-	ao_cmd_init();
+/* USB */
+#define HAS_USB			1
+#define AO_USB_DIRECTIO		0
+#define AO_PA11_PA12_RMP	1
 
-	ao_ms5607_init();
-
-	ao_storage_init();
-	ao_flight_init();
-	ao_log_init();
-	ao_report_init();
-	ao_telemetry_init();
-	ao_radio_init();
-	ao_packet_slave_init(TRUE);
-	ao_igniter_init();
-	ao_config_init();
-
-	ao_start_scheduler();
-}
+#endif /* _AO_PINS_H_ */

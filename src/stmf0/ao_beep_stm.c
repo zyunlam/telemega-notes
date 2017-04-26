@@ -25,6 +25,10 @@
 #define BEEPER_TIMER	1
 #endif
 
+#ifndef BEEPER_AFR
+#define BEEPER_AFR	STM_AFR_AF2
+#endif
+
 #if BEEPER_TIMER == 1
 #define timer stm_tim1
 #define STM_RCC_TIMER STM_RCC_APB2ENR_TIM1EN
@@ -366,7 +370,7 @@ ao_beep(uint8_t beep)
 		timer.egr = (1 << STM_TIM23_EGR_UG);
 
 		/* Hook the timer up to the beeper pin */
-		stm_afr_set(BEEPER_PORT, BEEPER_PIN, STM_AFR_AF2);
+		stm_afr_set(BEEPER_PORT, BEEPER_PIN, BEEPER_AFR);
 #endif
 	}
 }

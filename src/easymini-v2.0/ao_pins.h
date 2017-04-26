@@ -17,7 +17,6 @@
  */
 
 #define HAS_BEEP		1
-#define HAS_SERIAL_1		0
 #define HAS_BATTERY_REPORT	1
 
 #define AO_STACK_SIZE	448
@@ -45,33 +44,28 @@
 #define AO_PA11_PA12_RMP	1
 #define AO_USB_FORCE_IDLE	1
 
-#define PACKET_HAS_SLAVE	1
-
-#define AO_LOG_FORMAT		AO_LOG_FORMAT_TELEMINI3
-#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 112 * (uint32_t) 1024)
+#define AO_LOG_FORMAT		AO_LOG_FORMAT_EASYMINI
 
 #define HAS_BOOT_RADIO		0
 
 #define HAS_ACCEL		0
 #define HAS_GPS			0
-#define HAS_RADIO		1
-#define HAS_RADIO_RATE		1
+#define HAS_RADIO		0
 #define HAS_FLIGHT		1
 #define HAS_EEPROM		1
-#define HAS_TELEMETRY		1
-#define AO_SEND_MINI		AO_TELEMETRY_MINI3
+#define HAS_TELEMETRY		0
 #define HAS_APRS		0
 #define HAS_LOG			1
 #define USE_INTERNAL_FLASH	0
 #define HAS_IGNITE		1
 #define HAS_IGNITE_REPORT	1
-#define AO_SMALL_ALTITUDE_TABLE	1
 
-/* Beeper is on Tim1 CH3 */
-#define BEEPER_CHANNEL		4
-#define BEEPER_TIMER		2
-#define BEEPER_PORT		(&stm_gpioa)
-#define BEEPER_PIN		3
+/* Beeper is on Tim3 CH3 */
+#define BEEPER_TIMER		3
+#define BEEPER_CHANNEL		3
+#define BEEPER_PORT		(&stm_gpiob)
+#define BEEPER_PIN		0
+#define BEEPER_AFR		STM_AFR_AF1
 
 /* SPI */
 
@@ -84,8 +78,8 @@
 
 #define M25_MAX_CHIPS		1
 #define AO_M25_SPI_CS_PORT	(&stm_gpioa)
-#define AO_M25_SPI_CS_MASK	(1 << 4)
-#define AO_M25_SPI_BUS		AO_SPI_1_PA5_PA6_PA7
+#define AO_M25_SPI_CS_MASK	(1 << 15)
+#define AO_M25_SPI_BUS		AO_SPI_1_PB3_PB4_PB5
 
 /* MS5607 */
 
@@ -93,35 +87,15 @@
 #define HAS_MS5611		0
 #define AO_MS5607_PRIVATE_PINS	1
 #define AO_MS5607_CS_PORT	(&stm_gpioa)
-#define AO_MS5607_CS_PIN	15
+#define AO_MS5607_CS_PIN	4
 #define AO_MS5607_CS_MASK	(1 << AO_MS5607_CS_PIN)
-#define AO_MS5607_MISO_PORT	(&stm_gpiob)
-#define AO_MS5607_MISO_PIN	4
+#define AO_MS5607_MISO_PORT	(&stm_gpioa)
+#define AO_MS5607_MISO_PIN	6
 #define AO_MS5607_MISO_MASK	(1 << AO_MS5607_MISO_PIN)
-#define AO_MS5607_SPI_INDEX	AO_SPI_1_PB3_PB4_PB5
+#define AO_MS5607_SPI_INDEX	AO_SPI_1_PA5_PA6_PA7
 #define AO_MS5607_SPI_SPEED	AO_SPI_SPEED_12MHz
 
-/* CC1200 */
-
-// #define AO_RADIO_CAL_DEFAULT 	5695733
-#define AO_RADIO_CAL_DEFAULT 	5695717
-
-#define AO_FEC_DEBUG		0
-#define CC1200_DEBUG		0
-#define AO_CC1200_SPI_CS_PORT	(&stm_gpiob)
-#define AO_CC1200_SPI_CS_PIN	0
-#define AO_CC1200_SPI_BUS	AO_SPI_1_PA5_PA6_PA7
-#define AO_CC1200_SPI		stm_spi1
-#define AO_CC1200_SPI_SPEED	AO_SPI_SPEED_12MHz
-
-#define AO_CC1200_INT_PORT		(&stm_gpiob)
-#define AO_CC1200_INT_PIN		1
-
-#define AO_CC1200_INT_GPIO	2
-#define AO_CC1200_INT_GPIO_IOCFG	CC1200_IOCFG2
-
-
-#define AO_DATA_RING		16
+#define AO_DATA_RING		64
 
 /*
  * ADC
@@ -157,12 +131,12 @@ struct ao_adc {
 #define AO_IGNITER_OPEN		60
 
 #define AO_IGNITER_DROGUE_PORT	(&stm_gpiob)
-#define AO_IGNITER_DROGUE_PIN	7
+#define AO_IGNITER_DROGUE_PIN	6
 #define AO_IGNITER_SET_DROGUE(v)	ao_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, AO_IGNITER_DROGUE, v)
 
 #define AO_IGNITER_MAIN_PORT	(&stm_gpiob)
-#define AO_IGNITER_MAIN_PIN	6
-#define AO_IGNITER_SET_MAIN(v)		ao_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, AO_IGNITER_MAIN, v)
+#define AO_IGNITER_MAIN_PIN	7
+#define AO_IGNITER_SET_MAIN(v)	ao_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, AO_IGNITER_MAIN, v)
 
 #define AO_SENSE_DROGUE(p)	((p)->adc.sense_a)
 #define AO_SENSE_MAIN(p)	((p)->adc.sense_m)
@@ -174,8 +148,8 @@ struct ao_adc {
 /*
  * Voltage divider on ADC battery sampler
  */
-#define AO_BATTERY_DIV_PLUS	56	/* 5.6k */
-#define AO_BATTERY_DIV_MINUS	100	/* 10k */
+#define AO_BATTERY_DIV_PLUS	100	/* 100k */
+#define AO_BATTERY_DIV_MINUS	27	/* 27k */
 
 /*
  * Voltage divider on ADC igniter samplers

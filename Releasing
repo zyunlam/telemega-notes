@@ -1,3 +1,12 @@
+Adding a product to the release
+
+	Make sure the firmware and loader get built by default in
+	src/Makefile
+
+	Add the firmware to altosui/Makefile.am
+
+	Add the firmware to altosui/altos-windows.nsi.in
+
 These are Bdale's notes on how to do a release.
 
 	- make sure build environment is up to date
@@ -69,25 +78,29 @@ These are Bdale's notes on how to do a release.
 		this pushes packages for each platform to web site
 
 	# store a stable copy of ARM binaries for production use
-	cp src/easymega-v1.0/*.elf \
-	   src/easymini-v1.0/*.elf \
-	   src/telebt-v3.0/*.elf \
-	   src/teledongle-v3.0/*.elf \
-	   src/telegps-v1.0/*.elf \
-	   src/telemega-v1.0/*.elf \
-	   src/telemega-v2.0/*.elf \
-	   src/telemetrum-v2.0/*.elf \
-	   src/telemini-v3.0/*.elf \
+	cp src/chaoskey-v1.0/{*.elf,*.ihx} \
+	   src/easymega-v1.0/{*.elf,*.ihx} \
+	   src/easymini-v1.0/{*.elf,*.ihx} \
+	   src/easymini-v2.0/{*.elf,*.ihx} \
+	   src/telebt-v3.0/{*.elf,*.ihx} \
+	   src/teledongle-v3.0/{*.elf,*.ihx} \
+	   src/telegps-v1.0/{*.elf,*.ihx} \
+	   src/telemega-v1.0/{*.elf,*.ihx} \
+	   src/telemega-v2.0/{*.elf,*.ihx} \
+	   src/telemetrum-v2.0/{*.elf,*.ihx} \
+	   src/telemini-v3.0/{*.elf,*.ihx} \
 	   ~/altusmetrumllc/Binaries/
-	cp src/easymega-v1.0/flash-loader/*.elf \
+	cp src/chaoskey-v1.0/flash-loader/{*.elf,*.bin} \
+	   src/easymega-v1.0/flash-loader/*.elf \
 	   src/easymini-v1.0/flash-loader/*.elf \
+	   src/easymini-v2.0/flash-loader/{*.elf,*.bin} \
 	   src/telebt-v3.0/flash-loader/*.elf \
 	   src/teledongle-v3.0/flash-loader/*.elf \
 	   src/telegps-v1.0/flash-loader/*.elf \
 	   src/telemega-v1.0/flash-loader/*.elf \
 	   src/telemega-v2.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
-	   src/telemini-v3.0/flash-loader/*.elf \
+	   src/telemini-v3.0/flash-loader/{*.elf,*.bin} \
 	   ~/altusmetrumllc/Binaries/loaders/
 	(cd ~/altusmetrumllc ; git add Binaries ; git commit -a) 
 	(cd ~/altusmetrumllc ; git push) 
