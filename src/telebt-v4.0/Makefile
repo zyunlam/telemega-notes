@@ -42,7 +42,8 @@ ALTOS_SRC = \
 	ao_convert_volt.c \
 	ao_packet_master.c \
 	ao_packet.c \
-	ao_monitor.c 
+	ao_monitor.c \
+	ao_send_packet.c
 
 PRODUCT=TeleBT-v4.0
 PRODUCT_DEF=-DTELEBT_V_4_0
