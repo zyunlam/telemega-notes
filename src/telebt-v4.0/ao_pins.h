@@ -36,7 +36,7 @@
 
 #define HAS_USB			1
 #define AO_USB_DIRECTIO		0
-#define AO_PA11_PA12_RMP	1
+#define AO_PA11_PA12_RMP	0
 
 #define IS_FLASH_LOADER 0
 #define HAS_TASK_QUEUE		1
