@@ -29,8 +29,6 @@ public class AltosEepromFireTwo extends AltosEeprom {
 
 	/* AO_LOG_FLIGHT elements */
 	public int flight() { return data16(0); }
-	public int idle_pres() { return data16(2); }
-	public int idle_thrust() { return data16(4); }
 
 	/* AO_LOG_STATE elements */
 	public int state() { return data16(0); }
@@ -77,7 +75,7 @@ public class AltosEepromFireTwo extends AltosEeprom {
 		switch (cmd) {
 		case AltosLib.AO_LOG_FLIGHT:
 			state.set_flight(flight());
-			state.set_ground_pressure(adc_to_pa(idle_pres()));
+			state.set_ground_pressure(0.0);
 			state.set_accel_g(0, -1);
 			break;
 		case AltosLib.AO_LOG_STATE:
