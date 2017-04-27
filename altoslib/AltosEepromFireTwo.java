@@ -65,7 +65,7 @@ public class AltosEepromFireTwo extends AltosEeprom {
 		if (v < 0.5) v = 0.5;
 		if (v > 4.5) v = 4.5;
 
-		double	psi = (v - 0.5) / 4.0 * 1600.0;
+		double	psi = (v - 0.5) / 4.0 * 2500.0;
 		return AltosConvert.psi_to_pa(psi);
 	}
 
