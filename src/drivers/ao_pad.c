@@ -17,6 +17,7 @@
  */
 
 #include <ao.h>
+#include <ao_log.h>
 #include <ao_pad.h>
 #include <ao_74hc165.h>
 #include <ao_radio_cmac.h>
@@ -388,6 +389,9 @@ ao_pad(void)
 			PRINTD ("ignite\n");
 			ao_pad_ignite = ao_pad_armed;
 			ao_pad_arm_time = ao_time();
+#if HAS_LOG
+			ao_log_staticstart();
+#endif
 			ao_wakeup(&ao_pad_ignite);
 			break;
 		case AO_PAD_ENDSTATIC:

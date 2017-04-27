@@ -72,6 +72,16 @@ static __data uint8_t	ao_log_data_pos;
 typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;
 #endif
 
+/* log a state record recording pyro initiation time on test stand */
+void
+ao_log_staticstart(void)
+{
+	log.type = AO_LOG_STATE;
+	log.tick = ao_time();
+	log.u.state.state = ao_flight_boost;
+	ao_log_firetwo(&log);
+}
+
 void
 ao_log(void)
 {

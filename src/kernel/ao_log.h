@@ -481,6 +481,10 @@ ao_log_gps(__xdata struct ao_log_gps *log) __reentrant;
 void
 ao_log_flush(void);
 
+/* record a state record indicating pyro initiation time on test stand */
+void
+ao_log_staticstart(void);
+
 void
 ao_gps_report_metrum_init(void);
 
