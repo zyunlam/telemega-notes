@@ -191,9 +191,13 @@ ao_ms5607_sample(__xdata struct ao_ms5607_sample *sample)
 #include "ao_ms5607_convert.c"
 #endif
 
-#if HAS_TASK
+#ifndef HAS_MS5607_TASK
+#define HAS_MS5607_TASK HAS_TASK
+#endif
+
 __xdata struct ao_ms5607_sample	ao_ms5607_current;
 
+#if HAS_MS5607_TASK
 static void
 ao_ms5607(void)
 {
@@ -209,7 +213,9 @@ ao_ms5607(void)
 }
 
 __xdata struct ao_task ao_ms5607_task;
+#endif
 
+#if HAS_TASK
 void
 ao_ms5607_info(void)
 {
@@ -248,6 +254,8 @@ ao_ms5607_init(void)
 
 #if HAS_TASK
 	ao_cmd_register(&ao_ms5607_cmds[0]);
+#endif
+#if HAS_MS5607_TASK
 	ao_add_task(&ao_ms5607_task, ao_ms5607, "ms5607");
 #endif
 
