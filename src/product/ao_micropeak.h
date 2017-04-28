@@ -19,7 +19,9 @@
 #ifndef _AO_MICROPEAK_H_
 #define _AO_MICROPEAK_H_
 
+#ifndef SAMPLE_SLEEP
 #define SAMPLE_SLEEP		AO_MS_TO_TICKS(96)
+#endif
 
 /* 64 sample, or about six seconds worth */
 #define GROUND_AVG_SHIFT	6
@@ -36,6 +38,7 @@
 
 #define AO_LOG_ID_MICROPEAK	0
 #define AO_LOG_ID_MICROKITE	1
+#define AO_LOG_ID_MICROPEAK2	2
 
 #ifndef AO_LOG_ID
 #define AO_LOG_ID		AO_LOG_ID_MICROPEAK
