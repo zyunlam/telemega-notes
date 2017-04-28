@@ -17,6 +17,7 @@
  */
 
 #include <ao.h>
+#include <ao_report_micro.h>
 
 #define mid(time)	ao_led_for(AO_LED_REPORT, time)
 #define pause(time)	ao_delay(time)
