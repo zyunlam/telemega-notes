@@ -56,11 +56,13 @@
 /* ADC */
 
 #define HAS_ADC			1
-#define AO_ADC_PIN0_PORT        (&stm_gpioa)
-#define AO_ADC_PIN0_PIN         0
-#define AO_ADC_PIN0_CH          0
+#define AO_ADC_PIN0_PORT        (&stm_gpiob)
+#define AO_ADC_PIN0_PIN         1
+#define AO_ADC_PIN0_CH          9
 
-#define AO_ADC_RCC_AHBENR       ((1 << STM_RCC_AHBENR_IOPAEN))
+#define AO_ADC_RCC_AHBENR       ((1 << STM_RCC_AHBENR_IOPBEN))
+
+#define ao_telemetry_battery_convert(a)	((a) << 3)
 
 #define AO_NUM_ADC              1
 
