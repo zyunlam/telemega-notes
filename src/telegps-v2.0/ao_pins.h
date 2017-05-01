@@ -149,21 +149,16 @@ struct ao_adc {
 
 #define AO_FEC_DEBUG            0
 #define AO_CC1200_SPI_CS_PORT   (&stm_gpioa)
-#define AO_CC1200_SPI_CS_PIN    5
+#define AO_CC1200_SPI_CS_PIN    1
 #define AO_CC1200_SPI_BUS       AO_SPI_1_PA5_PA6_PA7
 #define AO_CC1200_SPI           stm_spi1
 #define AO_CC1200_SPI_SPEED     AO_SPI_SPEED_6MHz
 
 #define AO_CC1200_INT_PORT              (&stm_gpioa)
 #define AO_CC1200_INT_PIN               4
-#define AO_CC1200_MCU_WAKEUP_PORT       (&stm_gpioa)
-#define AO_CC1200_MCU_WAKEUP_PIN        (0)
 
 #define AO_CC1200_INT_GPIO      2
 #define AO_CC1200_INT_GPIO_IOCFG        CC1200_IOCFG2
-
-#define AO_CC1200_MARC_GPIO     3
-#define AO_CC1200_MARC_GPIO_IOCFG       CC1200_IOCFG3
 
 #define HAS_BOOT_RADIO          0
 
