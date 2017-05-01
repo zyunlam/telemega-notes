@@ -95,8 +95,6 @@ struct ao_adc {
 #define SPI_1_PB3_PB4_PB5       0
 #define SPI_1_OSPEEDR           STM_OSPEEDR_HIGH
 
-#define HAS_MS5607              0
-
 /* Flash */
 
 #define M25_MAX_CHIPS           1
@@ -119,7 +117,6 @@ struct ao_adc {
 #define HAS_TELEMETRY		1
 #define HAS_RDF			1
 #define HAS_APRS		1
-#define HAS_RADIO_RECV		0
 
 #define HAS_GPS			1
 #define HAS_FLIGHT		0
