@@ -21,10 +21,14 @@
 
 #define LED_PORT_ENABLE STM_RCC_AHBENR_IOPBEN
 #define LED_PORT        (&stm_gpiob)
-#define LED_PIN_RED     5
-#define AO_LED_RED      (1 << LED_PIN_RED)
+#define LED_PIN_GREEN   5
+#define AO_LED_GREEN    (1 << LED_PIN_GREEN)
+#define AO_LED_PANIC	AO_LED_GREEN
+#define AO_LED_GPS_LOCK	AO_LED_GREEN
 
-#define LEDS_AVAILABLE  (AO_LED_RED)
+#define LEDS_AVAILABLE  (AO_LED_GREEN)
+
+#define AO_STACK_SIZE		512
 
 #define IS_FLASH_LOADER		0
 #define HAS_BEEP 	       0
