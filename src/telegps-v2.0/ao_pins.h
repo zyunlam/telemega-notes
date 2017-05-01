@@ -102,14 +102,18 @@ struct ao_adc {
 #define AO_M25_SPI_CS_MASK      (1 << 0)
 #define AO_M25_SPI_BUS          AO_SPI_1_PA5_PA6_PA7
 
+/* Serial */
 #define HAS_SERIAL_1		1
 #define SERIAL_1_PB6_PB7	1
 #define USE_SERIAL_1_STDIN	0
 
-#define ao_gps_getchar		ao_serial1_getchar
-#define ao_gps_putchar		ao_serial1_putchar
-#define ao_gps_set_speed	ao_serial1_set_speed
-#define ao_gps_fifo		(ao_usart_rx_fifo)
+#define HAS_SERIAL_2		1
+#define SERIAL_2_PA2_PA3	1
+#define USE_SERIAL_2_STDIN	0
+
+#define ao_gps_getchar		ao_serial2_getchar
+#define ao_gps_putchar		ao_serial2_putchar
+#define ao_gps_set_speed	ao_serial2_set_speed
 
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
