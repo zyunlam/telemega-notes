@@ -103,11 +103,11 @@ struct ao_adc {
 #define AO_M25_SPI_BUS          AO_SPI_1_PA5_PA6_PA7
 
 /* Serial */
-#define HAS_SERIAL_1		1
+#define HAS_SERIAL_1		0
 #define SERIAL_1_PB6_PB7	1
 #define USE_SERIAL_1_STDIN	0
 
-#define HAS_SERIAL_2		1
+#define HAS_SERIAL_2	       	1
 #define SERIAL_2_PA2_PA3	1
 #define USE_SERIAL_2_STDIN	0
 
