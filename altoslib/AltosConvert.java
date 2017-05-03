@@ -366,6 +366,10 @@ public class AltosConvert {
 		return (c - 32) * 5/9;
 	}
 
+	public static double pa_to_psi(double pa) {
+		return pa / 6894.76;
+	}
+
 	public static double psi_to_pa(double psi) {
 		return psi * 6894.76;
 	}
