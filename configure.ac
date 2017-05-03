@@ -533,6 +533,9 @@ micropeak/micropeak-windows.nsi
 telegps/Makefile
 telegps/Info.plist
 telegps/telegps-windows.nsi
+teststand/Makefile
+teststand/Info.plist
+teststand/teststand-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
 altosdroid/AndroidManifest.xml
