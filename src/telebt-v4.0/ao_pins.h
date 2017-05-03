@@ -20,9 +20,10 @@
 #define _AO_PINS_H_
 
 #define AO_HSE                  32000000
-#define AO_RCC_CFGR_PLLMUL      STM_RCC_CFGR_PLLMUL_3
-#define AO_PLLMUL               3
-#define AO_PLLDIV               1
+#define AO_RCC_CFGR_PLLMUL	STM_RCC_CFGR_PLLMUL_3
+#define AO_RCC_CFGR2_PLLDIV	STM_RCC_CFGR2_PREDIV_2
+#define AO_PLLMUL		3
+#define AO_PLLDIV		2
 
 /* HCLK = 48MHz */
 #define AO_AHB_PRESCALER        1
@@ -31,8 +32,6 @@
 /* APB = 48MHz */
 #define AO_APB_PRESCALER        1
 #define AO_RCC_CFGR_PPRE_DIV    STM_RCC_CFGR_PPRE_DIV_1
-
-#define AO_RCC_CFGR2_PLLDIV     STM_RCC_CFGR2_PREDIV_1
 
 #define HAS_USB			1
 #define AO_USB_DIRECTIO		0
