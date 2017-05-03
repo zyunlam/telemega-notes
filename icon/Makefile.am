@@ -8,6 +8,7 @@ RES=$(shell echo $(JAVA_RES) $(MAC_RES) $(WIN_RES) | awk '{ for (i = 1; i <= NF;
 AM_NAME		= altusmetrum-altosui
 MP_NAME		= altusmetrum-micropeak
 TG_NAME		= altusmetrum-telegps
+TS_NAME		= altusmetrum-teststand
 
 # File icon base names
 
@@ -20,6 +21,7 @@ MPD_NAME	= application-vnd.altusmetrum.micropeak
 AM_ICON		= $(AM_NAME).svg
 MP_ICON		= $(MP_NAME).svg
 TG_ICON		= $(TG_NAME).svg
+TS_ICON		= $(TS_NAME).svg
 
 # File icons (note that MicroPeak uses the application icon for files)
 
@@ -36,7 +38,8 @@ MAC_EEPROM_FILES= $(shell for i in $(MAC_RES); do echo $(EEPROM_NAME)-$$i.png; d
 MAC_TELEM_FILES	= $(shell for i in $(MAC_RES); do echo $(TELEM_NAME)-$$i.png; done)
 MAC_MPD_FILES	= $(shell for i in $(MAC_RES); do echo $(MPD_NAME)-$$i.png; done)
 
-ICNS_FILES	= $(AM_NAME).icns $(MP_NAME).icns $(TG_NAME).icns \
+ICNS_FILES	= $(AM_NAME).icns $(MP_NAME).icns $(TG_NAME).icns\
+		  $(TS_NAME).icns\
 		  $(EEPROM_NAME).icns $(TELEM_NAME).icns $(MPD_NAME).icns
 
 # Files needed for Windows icons
@@ -44,14 +47,15 @@ ICNS_FILES	= $(AM_NAME).icns $(MP_NAME).icns $(TG_NAME).icns \
 WIN_AM_FILES	= $(shell for i in $(WIN_RES); do echo $(AM_NAME)-$$i.png; done)
 WIN_MP_FILES	= $(shell for i in $(WIN_RES); do echo $(MP_NAME)-$$i.png; done)
 WIN_TG_FILES	= $(shell for i in $(WIN_RES); do echo $(TG_NAME)-$$i.png; done)
+WIN_TS_FILES	= $(shell for i in $(WIN_RES); do echo $(TS_NAME)-$$i.png; done)
 WIN_EEPROM_FILES= $(shell for i in $(WIN_RES); do echo $(EEPROM_NAME)-$$i.png; done)
 WIN_TELEM_FILES	= $(shell for i in $(WIN_RES); do echo $(TELEM_NAME)-$$i.png; done)
 WIN_MPD_FILES	= $(shell for i in $(WIN_RES); do echo $(MPD_NAME)-$$i.png; done)
 
-ICO_FILES	= $(AM_NAME).ico $(MP_NAME).ico $(TG_NAME).ico \
+ICO_FILES	= $(AM_NAME).ico $(MP_NAME).ico $(TG_NAME).ico $(TS_NAME).ico \
 		  $(EEPROM_NAME).ico $(TELEM_NAME).ico $(MPD_NAME).ico
 
-EXE_FILES	= $(AM_NAME).exe $(MP_NAME).exe $(TG_NAME).exe \
+EXE_FILES	= $(AM_NAME).exe $(MP_NAME).exe $(TG_NAME).exe $(TS_NAME).exe \
 		  $(EEPROM_NAME).exe $(TELEM_NAME).exe $(MPD_NAME).exe
 
 # Files needed for Java internal icons
@@ -59,14 +63,17 @@ EXE_FILES	= $(AM_NAME).exe $(MP_NAME).exe $(TG_NAME).exe \
 JAVA_AM_FILES	= $(shell for i in $(JAVA_RES); do echo $(AM_NAME)-$$i.png; done)
 JAVA_MP_FILES	= $(shell for i in $(JAVA_RES); do echo $(MP_NAME)-$$i.png; done)
 JAVA_TG_FILES	= $(shell for i in $(JAVA_RES); do echo $(TG_NAME)-$$i.png; done)
+JAVA_TS_FILES	= $(shell for i in $(JAVA_RES); do echo $(TS_NAME)-$$i.png; done)
 
-JAVA_FILES	= $(JAVA_AM_FILES) $(JAVA_MP_FILES) $(JAVA_TG_FILES)
+JAVA_FILES	= $(JAVA_AM_FILES) $(JAVA_MP_FILES) $(JAVA_TG_FILES) \
+		  $(JAVA_TS_FILES)
 
 # PNG files needed by anyone
 
 AM_FILES	= $(shell for i in $(RES); do echo $(AM_NAME)-$$i.png; done)
 MP_FILES	= $(shell for i in $(RES); do echo $(MP_NAME)-$$i.png; done)
 TG_FILES	= $(shell for i in $(RES); do echo $(TG_NAME)-$$i.png; done)
+TS_FILES	= $(shell for i in $(RES); do echo $(TS_NAME)-$$i.png; done)
 EEPROM_FILES	= $(shell for i in $(RES); do echo $(EEPROM_NAME)-$$i.png; done)
 TELEM_FILES	= $(shell for i in $(RES); do echo $(TELEM_NAME)-$$i.png; done)
 IN_MPD_FILES	= $(shell for i in $(RES); do echo $(MPD_NAME)-$$i.png; done)
@@ -78,7 +85,7 @@ AM_XPM = altusmetrum.xpm
 ICON_THEME=$(datadir)/icons/hicolor
 
 appicondir = $(ICON_THEME)/scalable/apps
-appicon_DATA = $(AM_ICON) $(MP_ICON) $(TG_ICON)
+appicon_DATA = $(AM_ICON) $(MP_ICON) $(TG_ICON) $(TS_ICON)
 
 MIME_ICONS = $(EEPROM_ICON) $(TELEM_ICON) $(MPD_ICON)
 
@@ -107,12 +114,16 @@ java-micropeak:
 java-telegps:
 	@echo $(JAVA_TG_FILES)
 
+java-teststand:
+	@echo $(JAVA_TS_FILES)
+
 fat: all $(ICO_FILES) $(ICNS_FILES) $(EXE_FILES)
 
 all-local: $(JAVA_FILES) $(AM_XPM)
 
 clean-local:
 	$(RM) $(AM_NAME)-*.png $(TG_NAME)-*.png $(MP_NAME)-*.png
+	$(RM) $(TS_NAME)-*.png
 	$(RM) altus-metrum-*.png micropeak-*.png telegps-*.png
 	$(RM) $(EEPROM_NAME)-*.png $(TELEM_NAME)-*.png $(MPD_NAME)-*.png
 	$(RM) *.build *.ico *.rc *.icns *.o *.exe $(MPD_ICON)
@@ -137,6 +148,7 @@ altusmetrum.xpm: $(XPM_SRC)
 $(AM_FILES): $(AM_NAME).build
 $(MP_FILES): $(MP_NAME).build
 $(TG_FILES): $(TG_NAME).build
+$(TS_FILES): $(TS_NAME).build
 
 SUFFIXES=.svg .build .icns .ico .rc .o .exe
 
