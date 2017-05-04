@@ -64,7 +64,7 @@ public class AltosMs5607 {
 			int TEMPM = TEMP - 2000;
 			long OFF2 = ((long) 61 * (long) TEMPM * (long) TEMPM) >> 4;
 			long SENS2 = (long) 2 * (long) TEMPM * (long) TEMPM;
-			if (TEMP < 1500) {
+			if (TEMP < -1500) {
 				int TEMPP = TEMP + 1500;
 				long TEMPP2 = (long) TEMPP * (long) TEMPP;
 				OFF2 = OFF2 + 15 * TEMPP2;
