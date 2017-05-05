@@ -21,13 +21,13 @@
 
 #include <ao_flash_stm_pins.h>
 
-/* beeper to 3.3V for boot loader mode */
+/* SWDIO to gnd for boot loader mode */
 
 #define AO_BOOT_PIN			1
 #define AO_BOOT_APPLICATION_GPIO	stm_gpioa
-#define AO_BOOT_APPLICATION_PIN		3
-#define AO_BOOT_APPLICATION_VALUE	0
-#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_DOWN
+#define AO_BOOT_APPLICATION_PIN		13
+#define AO_BOOT_APPLICATION_VALUE	1
+#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_UP
 
 /* USB */
 #define HAS_USB			1
