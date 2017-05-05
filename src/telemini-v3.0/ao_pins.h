@@ -67,6 +67,13 @@
 #define HAS_IGNITE_REPORT	1
 #define AO_SMALL_ALTITUDE_TABLE	1
 
+/* Use debug connector clock for recovery mode */
+#define HAS_FORCE_FREQ		1
+#define AO_RECOVERY_PORT	(&stm_gpioa)
+#define AO_RECOVERY_PIN		14
+#define AO_RECOVERY_VALUE	0
+#define AO_RECOVERY_MODE	AO_EXTI_MODE_PULL_UP
+
 /* Beeper is on Tim1 CH3 */
 #define BEEPER_CHANNEL		4
 #define BEEPER_TIMER		2

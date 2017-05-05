@@ -19,9 +19,26 @@
 #include <ao.h>
 #include <ao_exti.h>
 
+static void
+ao_check_recovery(void)
+{
+	int	i;
+	ao_enable_input(AO_RECOVERY_PORT, AO_RECOVERY_PIN, AO_RECOVERY_MODE);
+	for (i = 0; i < 100; i++)
+		ao_arch_nop();
+	if (ao_gpio_get(AO_RECOVERY_PORT, AO_RECOVERY_PIN, AO_RECOVERY) == AO_RECOVERY_VALUE) {
+		ao_flight_force_idle = 1;
+		ao_force_freq = 1;
+	}
+	ao_gpio_set_mode(AO_RECOVERY_PORT, AO_RECOVERY_PIN, 0);
+	ao_disable_port(AO_RECOVERY_PORT);
+}
+
 void
 main(void)
 {
+	ao_check_recovery();
+
 	ao_clock_init();
 	ao_task_init();
 	ao_timer_init();
