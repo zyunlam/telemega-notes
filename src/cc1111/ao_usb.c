@@ -112,7 +112,7 @@ ao_usb_ep0_flush(void)
 	USBCS0 = cs0;
 }
 
-__xdata static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
+__xdata struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 
 /* Walk through the list of descriptors and find a match
  */

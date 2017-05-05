@@ -136,7 +136,7 @@ ISR(USB_GEN_vect)
 }
 
 
-__xdata static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
+struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 
 /* Walk through the list of descriptors and find a match
  */
