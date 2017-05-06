@@ -15,7 +15,6 @@ teststand_JAVA= \
 	TestStand.java \
 	TestStandStatus.java \
 	TestStandStatusUpdate.java \
-	TestStandInfo.java \
 	TestStandState.java \
 	TestStandConfig.java \
 	TestStandConfigUI.java \

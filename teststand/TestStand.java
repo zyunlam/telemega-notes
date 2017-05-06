@@ -73,8 +73,6 @@ public class TestStand
 
 	JTabbedPane		pane;
 
-	AltosUIMap  		map;
-	TestStandInfo		gps_info;
 	TestStandState		gps_state;
 	AltosInfoTable		info_table;
 
@@ -84,7 +82,6 @@ public class TestStand
 	final static String	new_command = "new";
 	final static String	graph_command = "graph";
 	final static String	export_command = "export";
-	final static String	load_maps_command = "loadmaps";
 	final static String	preferences_command = "preferences";
 	final static String	close_command = "close";
 	final static String	exit_command = "exit";
@@ -92,7 +89,6 @@ public class TestStand
 	static final String[][] file_menu_entries = new String[][] {
 		{ "Graph Data",		graph_command },
 		{ "Export Data",	export_command },
-		{ "Load Maps",		load_maps_command },
 		{ "Preferences",	preferences_command },
 		{ "Close",		close_command },
 		{ "Exit",		exit_command },
@@ -167,10 +163,6 @@ public class TestStand
 
 	void preferences() {
 		new TestStandPreferences(this, voice());
-	}
-
-	void load_maps() {
-		new AltosUIMapPreload(this);
 	}
 
 	void disconnect() {
@@ -313,10 +305,6 @@ public class TestStand
 		/* File menu */
 		if (preferences_command.equals(ev.getActionCommand())) {
 			preferences();
-			return;
-		}
-		if (load_maps_command.equals(ev.getActionCommand())) {
-			load_maps();
 			return;
 		}
 		if (close_command.equals(ev.getActionCommand())) {
@@ -558,14 +546,6 @@ public class TestStand
 
 		/* Make the tabbed pane use the rest of the window space */
 		bag.add(pane, constraints(0, 3, GridBagConstraints.BOTH));
-
-		map = new AltosUIMap();
-		pane.add(map.getName(), map);
-		displays.add(map);
-
-		gps_info = new TestStandInfo();
-		pane.add(gps_info.getName(), gps_info);
-		displays.add(gps_info);
 
 		gps_state = new TestStandState();
 		pane.add(gps_state.getName(), gps_state);

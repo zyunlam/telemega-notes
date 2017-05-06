@@ -39,18 +39,10 @@ public class TestStandGraphUI extends AltosUIFrame
 	JTabbedPane		pane;
 	AltosGraph		graph;
 	AltosUIEnable		enable;
-	AltosUIMap		map;
 	AltosState		state;
 	AltosFlightStats	stats;
 	AltosGraphDataSet	graphDataSet;
 	AltosFlightStatsTable	statsTable;
-
-	void fill_map(AltosStateIterable states) {
-		for (AltosState state : states) {
-			if (state.gps != null && state.gps.locked && state.gps.nsat >= 4)
-				map.show(state, null);
-		}
-	}
 
 	private void close() {
 		setVisible(false);
@@ -70,13 +62,9 @@ public class TestStandGraphUI extends AltosUIFrame
 		graph = new AltosGraph(enable, stats, graphDataSet);
 		statsTable = new AltosFlightStatsTable(stats);
 
-		map = new AltosUIMap();
-
 		pane.add("Graph", graph.panel);
 		pane.add("Configure Graph", enable);
 		pane.add("Statistics", statsTable);
-		fill_map(states);
-		pane.add("Map", map);
 
 		setContentPane (pane);
 
@@ -94,9 +82,6 @@ public class TestStandGraphUI extends AltosUIFrame
 		TestStand.add_window();
 
 		setVisible(true);
-
-		if (state != null)
-			map.centre(state);
 
 	}
 }
