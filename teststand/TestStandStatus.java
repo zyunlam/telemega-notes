@@ -141,7 +141,7 @@ public class TestStandStatus extends JComponent implements AltosFlightDisplay {
 		}
 
 		public Flight (GridBagLayout layout, int x) {
-			super (layout, x, "Flight");
+			super (layout, x, "Test");
 		}
 	}
 
