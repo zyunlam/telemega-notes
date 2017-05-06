@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=TestStand
+GenericName=TestStand monitor, download and analysis
+Comment=View and log data from TestStand tracking devices
+Icon=%icondir%/altusmetrum-teststand.svg
+Exec=%bindir%/teststand %F
+Terminal=false
+MimeType=application/vnd.altusmetrum.eeprom
+Categories=Education;Electronics;Science;
