@@ -34,6 +34,16 @@ altoslib_JAVA = \
 	AltosCRCException.java \
 	AltosCSV.java \
 	AltosDebug.java \
+	AltosEepromNew.java \
+	AltosEepromRecord.java \
+	AltosEepromRecordFull.java \
+	AltosEepromRecordTiny.java \
+	AltosEepromRecordMega.java \
+	AltosEepromRecordMetrum.java \
+	AltosEepromRecordMini.java \
+	AltosEepromRecordGps.java \
+	AltosEepromRecordFireTwo.java \
+	AltosEepromRecordSet.java \
 	AltosEeprom.java \
 	AltosEepromChunk.java \
 	AltosEepromDownload.java \
