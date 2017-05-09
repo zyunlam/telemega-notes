@@ -448,16 +448,23 @@ public class AltosUI extends AltosUIFrame {
 
 	static AltosStateIterable record_iterable(File file) {
 		FileInputStream in;
-		try {
-			in = new FileInputStream(file);
-		} catch (Exception e) {
-			System.out.printf("Failed to open file '%s'\n", file);
-			return null;
+		if (file.getName().endsWith("telem")) {
+			try {
+				in = new FileInputStream(file);
+				return new AltosTelemetryFile(in);
+			} catch (Exception e) {
+				System.out.printf("Failed to open file '%s'\n", file);
+			}
+		} else {
+
+			try {
+				AltosEepromFile f = new AltosEepromFile(new FileReader(file));
+				return f;
+			} catch (Exception e) {
+				System.out.printf("Failed to open file '%s'\n", file);
+			}
 		}
-		if (file.getName().endsWith("telem"))
-			return new AltosTelemetryFile(in);
-		else
-			return new AltosEepromFile(in);
+		return null;
 	}
 
 	static AltosReplayReader replay_file(File file) {
