@@ -367,15 +367,15 @@ public class AltosUI extends AltosUIFrame {
 
 	static AltosStateIterable open_logfile(File file) {
 		try {
-			FileInputStream in;
-
-			in = new FileInputStream(file);
 			if (file.getName().endsWith("telem"))
-				return new AltosTelemetryFile(in);
+				return new AltosTelemetryFile(new FileInputStream(file));
 			else
-				return new AltosEepromFile(in);
+				return new AltosEepromFile(new FileReader(file));
 		} catch (FileNotFoundException fe) {
 			System.out.printf("%s\n", fe.getMessage());
+			return null;
+		} catch (IOException ie) {
+			System.out.printf("%s\n", ie.getMessage());
 			return null;
 		}
 	}

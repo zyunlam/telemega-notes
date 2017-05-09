@@ -18,6 +18,7 @@ import java.io.*;
 import java.util.*;
 
 public class AltosEepromRecordSet implements Iterable<AltosState> {
+	AltosEepromNew			eeprom;
 	TreeSet<AltosEepromRecord>	ordered;
 	AltosState			start_state;
 
@@ -52,6 +53,8 @@ public class AltosEepromRecordSet implements Iterable<AltosState> {
 	}
 
 	public AltosEepromRecordSet(AltosEepromNew eeprom) {
+		this.eeprom = eeprom;
+
 		AltosConfigData 	config_data = eeprom.config_data();
 
 		AltosEepromRecord	record = null;

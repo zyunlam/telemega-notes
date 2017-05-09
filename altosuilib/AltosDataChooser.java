@@ -47,7 +47,7 @@ public class AltosDataChooser extends JFileChooser {
 			filename = file.getName();
 			try {
 				if (filename.endsWith("eeprom")) {
-					FileInputStream in = new FileInputStream(file);
+					FileReader in = new FileReader(file);
 					return new AltosEepromFile(in);
 				} else if (filename.endsWith("telem")) {
 					FileInputStream in = new FileInputStream(file);
@@ -59,6 +59,11 @@ public class AltosDataChooser extends JFileChooser {
 				JOptionPane.showMessageDialog(frame,
 							      fe.getMessage(),
 							      "Cannot open file",
+							      JOptionPane.ERROR_MESSAGE);
+			} catch (IOException ie) {
+				JOptionPane.showMessageDialog(frame,
+							      ie.getMessage(),
+							      "Error reading file",
 							      JOptionPane.ERROR_MESSAGE);
 			}
 		}
