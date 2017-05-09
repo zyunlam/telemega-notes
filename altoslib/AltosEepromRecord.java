@@ -51,8 +51,12 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		return data8(i) | (data8(i+1) << 8) | (data8(i+2) << 16) | (data8(i+3) << 24);
 	}
 
+	public boolean valid(int s) {
+		return AltosConvert.checksum(eeprom.data, s, length) == 0;
+	}
+
 	public boolean valid() {
-		return AltosConvert.checksum(eeprom.data, start, length) == 0;
+		return valid(start);
 	}
 
 	private int cmdi() {
@@ -81,8 +85,19 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 			state.set_tick(tick());
 	}
 
+	public int next_start() {
+		int	s = start + length;
+
+		while (s + length < eeprom.data.size()) {
+			if (valid(s))
+				return s;
+			s += length;
+		}
+		return -1;
+	}
+
 	public boolean hasNext() {
-		return start + length * 2 < eeprom.data.size();
+		return next_start() >= 0;
 	}
 
 	public abstract AltosEepromRecord next();
@@ -91,5 +106,8 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		this.eeprom = eeprom;
 		this.start = start;
 		this.length = length;
+
+		while (start + length < eeprom.data.size() && !valid())
+			start += length;
 	}
 }

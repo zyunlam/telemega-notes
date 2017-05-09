@@ -83,9 +83,10 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 	}
 
 	public AltosEepromRecord next() {
-		if (start + length + length < eeprom.data.size())
-			return new AltosEepromRecordMini(eeprom, start + length);
-		return null;
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordMini(eeprom, s);
 	}
 
 	public AltosEepromRecordMini(AltosEepromNew eeprom, int start) {

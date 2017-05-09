@@ -146,9 +146,10 @@ public class AltosEepromRecordMetrum extends AltosEepromRecord {
 	}
 
 	public AltosEepromRecord next() {
-		if (start + length + length < eeprom.data.size())
-			return new AltosEepromRecordMetrum(eeprom, start + length);
-		return null;
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordMetrum(eeprom, s);
 	}
 
 	public AltosEepromRecordMetrum(AltosEepromNew eeprom, int start) {

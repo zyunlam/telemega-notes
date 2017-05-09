@@ -21,6 +21,10 @@ public class AltosEepromRecordTiny extends AltosEepromRecord {
 		return eeprom.data16(start);
 	}
 
+	public boolean valid(int s) {
+		return eeprom.data16(s) != 0xffff;
+	}
+
 	public int cmd() {
 		if (start == 0)
 			return AltosLib.AO_LOG_FLIGHT;
@@ -66,9 +70,10 @@ public class AltosEepromRecordTiny extends AltosEepromRecord {
 	}
 
 	public AltosEepromRecord next() {
-		if (start + record_length * 2 < eeprom.data.size())
-			return new AltosEepromRecordTiny(eeprom, start + record_length);
-		return null;
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordTiny(eeprom, s);
 	}
 
 	public AltosEepromRecordTiny(AltosEepromNew eeprom, int start) {

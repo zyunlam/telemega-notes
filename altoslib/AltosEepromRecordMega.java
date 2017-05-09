@@ -237,9 +237,10 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	}
 
 	public AltosEepromRecord next() {
-		if (start + length + length < eeprom.data.size())
-			return new AltosEepromRecordMega(eeprom, start + length);
-		return null;
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordMega(eeprom, s);
 	}
 
 	public AltosEepromRecordMega(AltosEepromNew eeprom, int start) {

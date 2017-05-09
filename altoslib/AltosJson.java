@@ -185,6 +185,7 @@ class JsonToken {
 	static final int _colon = 9;
 	static final int _end = 10;
 	static final int _error = 11;
+	static final int _none = 12;
 
 	static String token_name(int token) {
 		switch (token) {
@@ -254,11 +255,11 @@ class JsonToken {
  * Lexer for json
  */
 class JsonLexer extends JsonUtil {
-	Reader		f;
-	int		line;
-	int		ungot = -2;
-	StringBuffer	pending_token;
-	JsonToken	token;
+	Reader			f;
+	int			line;
+	int			ungot = -2;
+	StringBuffer		pending_token;
+	private JsonToken	token;
 
 	static class keyword {
 		String		word;
@@ -424,11 +425,17 @@ class JsonLexer extends JsonUtil {
 	}
 
 	void next() {
-		token = lex();
+		token = null;
+	}
+
+	JsonToken token() {
+		if (token == null)
+			token = lex();
+		return token;
 	}
 
 	JsonToken expect(int e) {
-		JsonToken t = token;
+		JsonToken t = token();
 		if (t.token != e)
 			throw new IllegalArgumentException(String.format("got \"%s\" while expecting \"%s\"",
 									 token.token_name(),
@@ -470,7 +477,7 @@ class JsonParse {
 		lexer.next();
 		for (;;) {
 			/* Allow for empty hashes */
-			if (lexer.token.token == JsonToken._cc) {
+			if (lexer.token().token == JsonToken._cc) {
 				lexer.next();
 				return hash;
 			}
@@ -481,7 +488,7 @@ class JsonParse {
 			AltosJson value = value();
 			hash.put(key, value);
 
-			switch (lexer.token.token) {
+			switch (lexer.token().token) {
 			case JsonToken._comma:
 				lexer.next();
 				break;
@@ -489,7 +496,7 @@ class JsonParse {
 				lexer.next();
 				return hash;
 			default:
-				parse_error("got %s expect \",\" or \"}\"", lexer.token.token_name());
+				parse_error("got %s expect \",\" or \"}\"", lexer.token().token_name());
 				return null;
 			}
 		}
@@ -502,14 +509,14 @@ class JsonParse {
 		lexer.next();
 		for (int i = 0;; i++) {
 			/* Allow for empty arrays */
-			if (lexer.token.token == JsonToken._cs) {
+			if (lexer.token().token == JsonToken._cs) {
 				lexer.next();
 				return array;
 			}
 
 			AltosJson value = value();
 			array.put(i, value);
-			switch (lexer.token.token) {
+			switch (lexer.token().token) {
 			case JsonToken._comma:
 				lexer.next();
 				break;
@@ -517,7 +524,7 @@ class JsonParse {
 				lexer.next();
 				return array;
 			default:
-				parse_error("got %s expect \",\" or \"]\"", lexer.token.token_name());
+				parse_error("got %s expect \",\" or \"]\"", lexer.token().token_name());
 				return null;
 			}
 		}
@@ -527,29 +534,29 @@ class JsonParse {
 	 * identify the next object in the input
 	 */
 	AltosJson value() {
-		switch (lexer.token.token) {
+		switch (lexer.token().token) {
 		case JsonToken._oc:
 			return new AltosJson(hash());
 		case JsonToken._os:
 			return new AltosJson(array());
 		case JsonToken._double:
-			double dval = lexer.token.dval;
+			double dval = lexer.token().dval;
 			lexer.next();
 			return new AltosJson(dval);
 		case JsonToken._long:
-			long lval = lexer.token.lval;
+			long lval = lexer.token().lval;
 			lexer.next();
 			return new AltosJson(lval);
 		case JsonToken._string:
-			String sval = lexer.token.sval;
+			String sval = lexer.token().sval;
 			lexer.next();
 			return new AltosJson(sval);
 		case JsonToken._boolean:
-			boolean bval = lexer.token.bval;
+			boolean bval = lexer.token().bval;
 			lexer.next();
 			return new AltosJson(bval);
 		default:
-			parse_error("Unexpected token \"%s\"", lexer.token.token_name());
+			parse_error("Unexpected token \"%s\"", lexer.token().token_name());
 		}
 		return null;
 	}

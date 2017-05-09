@@ -108,9 +108,10 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 	}
 
 	public AltosEepromRecord next() {
-		if (start + length + length < eeprom.data.size())
-			return new AltosEepromRecordFull(eeprom, start + length);
-		return null;
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordFull(eeprom, s);
 	}
 
 	public AltosEepromRecordFull(AltosEepromNew eeprom, int start) {

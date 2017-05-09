@@ -90,9 +90,10 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 	}
 
 	public AltosEepromRecord next() {
-		if (start + length + length < eeprom.data.size())
-			return new AltosEepromRecordFireTwo(eeprom, start + length);
-		return null;
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordFireTwo(eeprom, s);
 	}
 
 	public AltosEepromRecordFireTwo(AltosEepromNew eeprom, int start) {

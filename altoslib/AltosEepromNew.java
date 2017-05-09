@@ -103,29 +103,22 @@ public class AltosEepromNew {
 		return true;
 	}
 
-	static private byte[] byte_list_to_array(List<Byte> bytes) {
-		byte[] data = new byte[bytes.size()];
-		int i = 0;
-
-		for (Byte b : bytes) {
-			data[i++] = b;
-		}
-		return data;
-	}
-
 	private boolean read_data(Reader r) throws IOException {
 		BufferedReader	br = new BufferedReader(r);
 		String		s;
 
 		data = new ArrayList<Byte>();
 		while ((s = br.readLine()) != null) {
+
 			String[] tokens = s.split("\\s+");
 
 			for (int i = 0; i < tokens.length; i++) {
-				try {
-					data.add((byte) AltosLib.fromhex(tokens[i]));
-				} catch (NumberFormatException e) {
-					throw new IOException(e.toString());
+				if (tokens[i].length() > 0) {
+					try {
+						data.add((byte) AltosLib.fromhex(tokens[i]));
+					} catch (NumberFormatException e) {
+						throw new IOException(e.toString());
+					}
 				}
 			}
 		}
@@ -268,6 +261,16 @@ public class AltosEepromNew {
 
 	public AltosEepromNew(String s) throws IOException {
 		read(new StringReader(s));
+	}
+
+	public AltosEepromNew(AltosJson config, ArrayList<Byte> data) {
+		this.config = config;
+		this.data = data;
+	}
+
+	public AltosEepromNew(AltosConfigData config_data, ArrayList<Byte> data) {
+		this.config = new AltosJson(config_data);
+		this.data = data;
 	}
 
 	public AltosEepromNew() {

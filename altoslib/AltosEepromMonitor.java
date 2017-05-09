@@ -20,9 +20,9 @@ package org.altusmetrum.altoslib_11;
 
 public interface AltosEepromMonitor {
 
-	public void set_states(int min_state, int max_state);
+	public void set_block(int in_block);
 
-	public void set_value(String in_state_name, int in_state, int in_state_block, int in_block);
+	public void set_max(int in_max);
 
 	public void set_serial(int in_serial);
 
