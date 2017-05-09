@@ -65,6 +65,7 @@ altoslib_JAVA = \
 	AltosFlashListener.java \
 	AltosFlightReader.java \
 	AltosFlightStats.java \
+	AltosForce.java \
 	AltosFrequency.java \
 	AltosGPS.java \
 	AltosGPSSat.java \
@@ -89,6 +90,7 @@ altoslib_JAVA = \
 	AltosNoSymbol.java \
 	AltosOrient.java \
 	AltosParse.java \
+	AltosPressure.java \
 	AltosPreferences.java \
 	AltosPreferencesBackend.java \
 	AltosProgrammer.java \
