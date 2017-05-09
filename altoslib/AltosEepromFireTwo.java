@@ -49,13 +49,11 @@ public class AltosEepromFireTwo extends AltosEeprom {
 	private static final double r_below = 10000.0;
 	private static final double v_adc = 3.3;
 
-	private static double
-	firetwo_adc(int raw) {
+	private static double firetwo_adc(int raw) {
 		return raw / 4095.0;
 	}
 
-	private static double
-	adc_to_pa(int adc) {
+	public static double adc_to_pa(int adc) {
 
 		/* raw adc to processor voltage, then back through the
 		 * voltage divider to the sensor voltage
@@ -69,6 +67,13 @@ public class AltosEepromFireTwo extends AltosEeprom {
 
 		double	psi = (v - 0.5) / 4.0 * 1600.0;
 		return AltosConvert.psi_to_pa(psi);
+	}
+
+	public static double adc_to_n(int adc) {
+		double v = firetwo_adc(adc);
+
+		/* this is a total guess */
+		return AltosConvert.lb_to_n(v * 298 * 9.807);
 	}
 
 	public void update_state(AltosState state) {
