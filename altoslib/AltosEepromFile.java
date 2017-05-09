@@ -58,6 +58,7 @@ public class AltosEepromFile extends AltosStateIterable {
 
 	AltosEepromIterable	headers;
 	AltosEepromIterable	body;
+	AltosEepromRecordSet	set;
 	AltosState		start;
 
 	public void write_comments(PrintStream out) {
@@ -67,6 +68,11 @@ public class AltosEepromFile extends AltosStateIterable {
 	public void write(PrintStream out) {
 		headers.write(out);
 		body.write(out);
+	}
+
+	public AltosEepromFile(Reader input) throws IOException {
+		set = new AltosEepromRecordSet(input);
+
 	}
 
 	public AltosEepromFile(FileInputStream input) {
@@ -130,6 +136,9 @@ public class AltosEepromFile extends AltosStateIterable {
 	}
 
 	public Iterator<AltosState> iterator() {
+		if (set != null)
+			return set.iterator();
+
 		AltosState		state = start.clone();
 		Iterator<AltosEeprom>	i = body.iterator();
 
