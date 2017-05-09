@@ -290,6 +290,10 @@ public class AltosPyro {
 		}
 	}
 
+	public AltosPyro() {
+		this(0);
+	}
+
 	public String toString() {
 		String	ret = String.format("%d", channel);
 
