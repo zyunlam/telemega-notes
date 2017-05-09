@@ -1388,7 +1388,7 @@ public class AltosState implements Cloneable {
 	public void set_ms5607(AltosMs5607 ms5607) {
 		baro = ms5607;
 
-		if (baro != null) {
+		if (baro != null && baro.pa != AltosLib.MISSING && baro.cc != AltosLib.MISSING) {
 			set_pressure(baro.pa);
 			set_temperature(baro.cc / 100.0);
 		}
@@ -1519,6 +1519,23 @@ public class AltosState implements Cloneable {
 		set_gps(temp_gps, gps_sequence + 1);
 		gps_pending = false;
 		temp_gps = null;
+	}
+
+	public void set_config_data(AltosConfigData config_data) {
+		if (config_data.callsign != null)
+			set_callsign(config_data.callsign);
+		if (config_data.accel_cal_plus != AltosLib.MISSING &&
+		    config_data.accel_cal_minus != AltosLib.MISSING)
+			set_accel_g(config_data.accel_cal_plus, config_data.accel_cal_minus);
+		if (config_data.product != null)
+			set_product(config_data.product);
+		if (config_data.log_format != AltosLib.MISSING)
+			set_log_format(config_data.log_format);
+		if (config_data.serial != AltosLib.MISSING)
+			set_serial(config_data.serial);
+		AltosMs5607 ms5607 = new AltosMs5607(config_data);
+		if (ms5607.valid_config())
+			set_ms5607(ms5607);
 	}
 
 	public AltosState clone() {
