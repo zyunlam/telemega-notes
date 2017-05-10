@@ -22,10 +22,8 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosEepromFireTwo extends AltosEeprom {
+public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 	public static final int	record_length = 32;
-
-	public int record_length() { return record_length; }
 
 	/* AO_LOG_FLIGHT elements */
 	public int flight() { return data16(0); }
@@ -39,21 +37,15 @@ public class AltosEepromFireTwo extends AltosEeprom {
 	public int thrust() { return data16(2); }
 	public int temp(int i) { return data16(4+i*2); }
 
-	public AltosEepromFireTwo (AltosEepromChunk chunk, int start) throws ParseException {
-		parse_chunk(chunk, start);
-	}
-
 	private static final double r_above = 5600.0;
 	private static final double r_below = 10000.0;
 	private static final double v_adc = 3.3;
 
-	private static double
-	firetwo_adc(int raw) {
+	private static double firetwo_adc(int raw) {
 		return raw / 4095.0;
 	}
 
-	private static double
-	adc_to_pa(int adc) {
+	public static double adc_to_pa(int adc) {
 
 		/* raw adc to processor voltage, then back through the
 		 * voltage divider to the sensor voltage
@@ -69,10 +61,17 @@ public class AltosEepromFireTwo extends AltosEeprom {
 		return AltosConvert.psi_to_pa(psi);
 	}
 
+	public static double adc_to_n(int adc) {
+		double v = firetwo_adc(adc);
+
+		/* this is a total guess */
+		return AltosConvert.lb_to_n(v * 298 * 9.807);
+	}
+
 	public void update_state(AltosState state) {
 		super.update_state(state);
 
-		switch (cmd) {
+		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
 			state.set_flight(flight());
 			state.set_ground_pressure(0.0);
@@ -83,36 +82,23 @@ public class AltosEepromFireTwo extends AltosEeprom {
 			break;
 		case AltosLib.AO_LOG_SENSOR:
 			state.set_pressure(adc_to_pa(pres()));
-			state.set_accel(firetwo_adc(thrust()) * 100);
+			state.set_accel(adc_to_n(thrust()));
 			break;
 		}
 	}
 
-	public AltosEepromFireTwo (String line) {
-		parse_string(line);
+	public AltosEepromRecord next() {
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordFireTwo(eeprom, s);
 	}
 
-	static public LinkedList<AltosEeprom> read(FileInputStream input) {
-		LinkedList<AltosEeprom> firetwos = new LinkedList<AltosEeprom>();
+	public AltosEepromRecordFireTwo(AltosEepromNew eeprom, int start) {
+		super(eeprom, start, record_length);
+	}
 
-		for (;;) {
-			try {
-				String line = AltosLib.gets(input);
-				if (line == null)
-					break;
-				try {
-					AltosEepromFireTwo firetwo = new AltosEepromFireTwo(line);
-
-					if (firetwo.cmd != AltosLib.AO_LOG_INVALID)
-						firetwos.add(firetwo);
-				} catch (Exception e) {
-					System.out.printf ("exception\n");
-				}
-			} catch (IOException ie) {
-				break;
-			}
-		}
-
-		return firetwos;
+	public AltosEepromRecordFireTwo(AltosEepromNew eeprom) {
+		this(eeprom, 0);
 	}
 }

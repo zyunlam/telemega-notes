@@ -163,24 +163,12 @@ ao_usart_drain(struct ao_stm_usart *usart)
 	ao_arch_release_interrupts();
 }
 
-static const struct {
-	uint32_t brr;
-} ao_usart_speeds[] = {
-	[AO_SERIAL_SPEED_4800] = {
-		AO_PCLK / 4800
-	},
-	[AO_SERIAL_SPEED_9600] = {
-		AO_PCLK / 9600
-	},
-	[AO_SERIAL_SPEED_19200] = {
-		AO_PCLK / 19200
-	},
-	[AO_SERIAL_SPEED_57600] = {
-		AO_PCLK / 57600
-	},
-	[AO_SERIAL_SPEED_115200] = {
-		AO_PCLK / 115200
-	},
+static const uint32_t ao_usart_speeds[] = {
+	[AO_SERIAL_SPEED_4800] = 4800,
+	[AO_SERIAL_SPEED_9600] = 9600,
+	[AO_SERIAL_SPEED_19200] = 19200,
+	[AO_SERIAL_SPEED_57600] = 57600,
+	[AO_SERIAL_SPEED_115200] = 115200,
 };
 
 static void
@@ -188,7 +176,7 @@ ao_usart_set_speed(struct ao_stm_usart *usart, uint8_t speed)
 {
 	if (speed > AO_SERIAL_SPEED_115200)
 		return;
-	usart->reg->brr = ao_usart_speeds[speed].brr;
+	usart->reg->brr = AO_PCLK / ao_usart_speeds[speed];
 }
 
 static void

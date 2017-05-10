@@ -35,7 +35,7 @@ public class AltosConfigData implements Iterable<String> {
 	public int	altitude_32;
 
 	/* Strings returned */
-	public LinkedList<String>	lines;
+	public LinkedList<String>	__lines;
 
 	/* Config information */
 	/* HAS_FLIGHT*/
@@ -143,7 +143,7 @@ public class AltosConfigData implements Iterable<String> {
 	}
 
 	public Iterator<String> iterator() {
-		return lines.iterator();
+		return __lines.iterator();
 	}
 
 	public int log_space() {
@@ -233,7 +233,7 @@ public class AltosConfigData implements Iterable<String> {
 	}
 
 	public void reset() {
-		lines = new LinkedList<String>();
+		__lines = new LinkedList<String>();
 
 		manufacturer = "unknown";
 		product = "unknown";
@@ -289,7 +289,7 @@ public class AltosConfigData implements Iterable<String> {
 	}
 
 	public void parse_line(String line) {
-		lines.add(line);
+		__lines.add(line);
 		/* Version replies */
 		try { manufacturer = get_string(line, "manufacturer"); } catch (Exception e) {}
 		try { product = get_string(line, "product"); } catch (Exception e) {}
@@ -719,5 +719,4 @@ public class AltosConfigData implements Iterable<String> {
 			break;
 		}
 	}
-
 }

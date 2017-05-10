@@ -34,27 +34,30 @@ altoslib_JAVA = \
 	AltosCRCException.java \
 	AltosCSV.java \
 	AltosDebug.java \
+	AltosEepromNew.java \
+	AltosEepromRecord.java \
+	AltosEepromRecordFull.java \
+	AltosEepromRecordTiny.java \
+	AltosEepromRecordMega.java \
+	AltosEepromRecordMetrum.java \
+	AltosEepromRecordMini.java \
+	AltosEepromRecordGps.java \
+	AltosEepromRecordFireTwo.java \
+	AltosEepromRecordSet.java \
 	AltosEeprom.java \
 	AltosEepromChunk.java \
 	AltosEepromDownload.java \
+	AltosEepromMonitor.java \
 	AltosEepromFile.java \
-	AltosEepromTM.java \
-	AltosEepromTMini.java \
-	AltosEepromHeader.java \
 	AltosEepromIterable.java \
 	AltosEepromList.java \
 	AltosEepromLog.java \
-	AltosEepromMega.java \
-	AltosEepromMetrum2.java \
-	AltosEepromMini.java \
-	AltosEepromGPS.java \
-	AltosEepromMonitor.java \
-	AltosEepromFireTwo.java \
 	AltosFile.java \
 	AltosFlash.java \
 	AltosFlashListener.java \
 	AltosFlightReader.java \
 	AltosFlightStats.java \
+	AltosForce.java \
 	AltosFrequency.java \
 	AltosGPS.java \
 	AltosGPSSat.java \
@@ -79,6 +82,7 @@ altoslib_JAVA = \
 	AltosNoSymbol.java \
 	AltosOrient.java \
 	AltosParse.java \
+	AltosPressure.java \
 	AltosPreferences.java \
 	AltosPreferencesBackend.java \
 	AltosProgrammer.java \

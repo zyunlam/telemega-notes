@@ -94,12 +94,17 @@ extern const uint32_t ao_radio_cal;
  * For the stm32f042, we want to use the USB-based HSI48 clock
  */
 
-#if AO_HSI48
-
-#define AO_SYSCLK	48000000
-#define AO_HCLK		(AO_SYSCLK / AO_AHB_PRESCALER)
-
+#ifndef AO_SYSCLK
+#if AO_HSI
+#define AO_SYSCLK	STM_HSI_FREQ
 #endif
+
+#if AO_HSI48
+#define AO_SYSCLK	48000000
+#endif
+#endif
+
+#define AO_HCLK		(AO_SYSCLK / AO_AHB_PRESCALER)
 
 #if AO_HSE || AO_HSI
 
@@ -150,7 +155,9 @@ ao_adc_init();
 
 #if HAS_BOOT_LOADER
 #define AO_BOOT_APPLICATION_BASE	((uint32_t *) 0x08001000)
+#ifndef AO_BOOT_APPLICATION_BOUND
 #define AO_BOOT_APPLICATION_BOUND	((uint32_t *) (0x08000000 + stm_flash_size()))
+#endif
 #define AO_BOOT_LOADER_BASE		((uint32_t *) 0x08000000)
 #endif
 

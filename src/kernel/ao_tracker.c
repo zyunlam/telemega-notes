@@ -164,6 +164,25 @@ ao_tracker(void)
 	}
 }
 
+#ifdef AO_LED_GPS_LOCK
+
+static struct ao_task ao_gps_lock_task;
+
+static void
+ao_gps_lock(void)
+{
+	for (;;) {
+		if ((gps_data.flags & (AO_GPS_VALID|AO_GPS_COURSE_VALID)) ==
+		    (AO_GPS_VALID|AO_GPS_COURSE_VALID))
+		{
+			ao_led_for(AO_LED_GPS_LOCK, AO_MS_TO_TICKS(20));
+		}
+		ao_delay(AO_SEC_TO_TICKS(3));
+	}
+}
+#endif
+
+
 static uint8_t erasing_current;
 
 void
@@ -222,4 +241,7 @@ ao_tracker_init(void)
 #endif
 	ao_cmd_register(&ao_tracker_cmds[0]);
 	ao_add_task(&ao_tracker_task, ao_tracker, "tracker");
+#ifdef AO_LED_GPS_LOCK
+	ao_add_task(&ao_gps_lock_task, ao_gps_lock, "gps lock");
+#endif
 }

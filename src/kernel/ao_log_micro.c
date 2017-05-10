@@ -19,7 +19,12 @@
 #include <ao.h>
 #include <ao_micropeak.h>
 #include <ao_log_micro.h>
+#ifndef ao_async_byte
 #include <ao_async.h>
+#else
+#include <ao_serial.h>
+#endif
+#include <ao_storage.h>
 
 static uint16_t ao_log_offset = STARTING_LOG_OFFSET;
 

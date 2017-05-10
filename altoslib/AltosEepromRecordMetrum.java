@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Keith Packard <keithp@keithp.com>
+ * Copyright © 2017 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,7 @@
 
 package org.altusmetrum.altoslib_11;
 
-import java.io.*;
-import java.util.*;
-import java.text.*;
-
-public class AltosEepromMetrum2 extends AltosEeprom {
+public class AltosEepromRecordMetrum extends AltosEepromRecord {
 	public static final int	record_length = 16;
 
 	public int record_length() { return record_length; }
@@ -69,10 +65,6 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 	public int svid(int n) { return data8(2 + n * 2); }
 	public int c_n(int n) { return data8(2 + n * 2 + 1); }
 
-	public AltosEepromMetrum2 (AltosEepromChunk chunk, int start) throws ParseException {
-		parse_chunk(chunk, start);
-	}
-
 	public void update_state(AltosState state) {
 		super.update_state(state);
 
@@ -80,7 +72,7 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 
 		/* Flush any pending GPS changes */
 		if (state.gps_pending) {
-			switch (cmd) {
+			switch (cmd()) {
 			case AltosLib.AO_LOG_GPS_POS:
 			case AltosLib.AO_LOG_GPS_LAT:
 			case AltosLib.AO_LOG_GPS_LON:
@@ -94,12 +86,11 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 			}
 		}
 
-		switch (cmd) {
+		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
 			state.set_flight(flight());
 			state.set_ground_accel(ground_accel());
 			state.set_ground_pressure(ground_pres());
-//			state.set_temperature(ground_temp() / 100.0);
 			break;
 		case AltosLib.AO_LOG_STATE:
 			state.set_state(state());
@@ -154,31 +145,18 @@ public class AltosEepromMetrum2 extends AltosEeprom {
 		}
 	}
 
-	public AltosEepromMetrum2 (String line) {
-		parse_string(line);
+	public AltosEepromRecord next() {
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordMetrum(eeprom, s);
 	}
 
-	static public LinkedList<AltosEeprom> read(FileInputStream input) {
-		LinkedList<AltosEeprom> metrums = new LinkedList<AltosEeprom>();
+	public AltosEepromRecordMetrum(AltosEepromNew eeprom, int start) {
+		super(eeprom, start, record_length);
+	}
 
-		for (;;) {
-			try {
-				String line = AltosLib.gets(input);
-				if (line == null)
-					break;
-				try {
-					AltosEepromMetrum2 metrum = new AltosEepromMetrum2(line);
-
-					if (metrum.cmd != AltosLib.AO_LOG_INVALID)
-						metrums.add(metrum);
-				} catch (Exception e) {
-					System.out.printf ("exception\n");
-				}
-			} catch (IOException ie) {
-				break;
-			}
-		}
-
-		return metrums;
+	public AltosEepromRecordMetrum(AltosEepromNew eeprom) {
+		this(eeprom, 0);
 	}
 }

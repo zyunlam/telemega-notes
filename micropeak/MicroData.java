@@ -104,8 +104,10 @@ public class MicroData implements AltosUIDataSet {
 
 	public static final int LOG_ID_MICROPEAK = 0;
 	public static final int LOG_ID_MICROKITE = 1;
+	public static final int LOG_ID_MICROPEAK2 = 2;
 
-	public static final double CLOCK = 0.096;
+	public static final double CLOCK_MP1 = 0.096;
+	public static final double CLOCK_MP2 = 0.1;
 
 	public class FileEndedException extends Exception {
 	}
@@ -388,11 +390,16 @@ public class MicroData implements AltosUIDataSet {
 
 			switch (log_id) {
 			case LOG_ID_MICROPEAK:
-				time_step = 2 * CLOCK;
+				time_step = 2 * CLOCK_MP1;
 				break;
 			case LOG_ID_MICROKITE:
-				time_step = 200 * CLOCK;
+				time_step = 200 * CLOCK_MP1;
 				break;
+			case LOG_ID_MICROPEAK2:
+				time_step = CLOCK_MP2;
+				break;
+			default:
+				throw new IOException(String.format("Unknown device type: %d", log_id));
 			}
 			stats = new MicroStats(this);
 		} catch (FileEndedException fe) {

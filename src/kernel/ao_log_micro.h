@@ -23,7 +23,9 @@
 #define PA_MIN_OFFSET		4
 #define N_SAMPLES_OFFSET	8
 #define STARTING_LOG_OFFSET	10
+#ifndef MAX_LOG_OFFSET
 #define MAX_LOG_OFFSET		512
+#endif
 
 void
 ao_log_micro_save(void);

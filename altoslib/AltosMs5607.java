@@ -64,7 +64,7 @@ public class AltosMs5607 {
 			int TEMPM = TEMP - 2000;
 			long OFF2 = ((long) 61 * (long) TEMPM * (long) TEMPM) >> 4;
 			long SENS2 = (long) 2 * (long) TEMPM * (long) TEMPM;
-			if (TEMP < 1500) {
+			if (TEMP < -1500) {
 				int TEMPP = TEMP + 1500;
 				long TEMPP2 = (long) TEMPP * (long) TEMPP;
 				OFF2 = OFF2 + 15 * TEMPP2;
@@ -138,6 +138,17 @@ public class AltosMs5607 {
 		}
 	}
 
+	public boolean valid_config() {
+		return reserved != AltosLib.MISSING &&
+			sens != AltosLib.MISSING &&
+			off != AltosLib.MISSING &&
+			tcs != AltosLib.MISSING &&
+			tco != AltosLib.MISSING &&
+			tref != AltosLib.MISSING &&
+			tempsens != AltosLib.MISSING &&
+			crc  != AltosLib.MISSING;
+	}
+
 	public AltosMs5607() {
 		raw_pres = AltosLib.MISSING;
 		raw_temp = AltosLib.MISSING;
@@ -145,7 +156,7 @@ public class AltosMs5607 {
 		cc = AltosLib.MISSING;
 	}
 
-	public AltosMs5607 (AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException {
+	public AltosMs5607(AltosConfigData config_data) {
 		this();
 		reserved = config_data.ms5607_reserved;
 		sens = config_data.ms5607_sens;
@@ -155,6 +166,10 @@ public class AltosMs5607 {
 		tref = config_data.ms5607_tref;
 		tempsens = config_data.ms5607_tempsens;
 		crc = config_data.ms5607_crc;
+	}
+
+	public AltosMs5607 (AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException {
+		this(config_data);
 		link.printf("B\n");
 		for (;;) {
 			String line = link.get_reply_no_dialog(5000);

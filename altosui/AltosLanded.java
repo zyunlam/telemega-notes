@@ -125,7 +125,7 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 				try {
 					AltosStateIterable states = null;
 					if (filename.endsWith("eeprom")) {
-						FileInputStream in = new FileInputStream(file);
+						FileReader in = new FileReader(file);
 						states = new AltosEepromFile(in);
 					} else if (filename.endsWith("telem")) {
 						FileInputStream in = new FileInputStream(file);
@@ -142,6 +142,11 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 					JOptionPane.showMessageDialog(null,
 								      fe.getMessage(),
 								      "Cannot open file",
+								      JOptionPane.ERROR_MESSAGE);
+				} catch (IOException ie) {
+					JOptionPane.showMessageDialog(null,
+								      ie.getMessage(),
+								      "Error reading file file",
 								      JOptionPane.ERROR_MESSAGE);
 				}
 			}

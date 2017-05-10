@@ -296,6 +296,10 @@ static __pdata int8_t ao_telemetry_config_max;
 static __pdata int8_t ao_telemetry_config_cur;
 static __pdata uint16_t ao_telemetry_flight_number;
 
+#ifndef ao_telemetry_battery_convert
+#define ao_telemetry_battery_convert(a) (a)
+#endif
+
 static void
 ao_send_configuration(void)
 {
@@ -308,7 +312,7 @@ ao_send_configuration(void)
 		telemetry.configuration.config_minor = AO_CONFIG_MINOR;
 #if AO_idProduct_NUMBER == 0x25 && HAS_ADC
 		/* TeleGPS gets battery voltage instead of apogee delay */
-		telemetry.configuration.apogee_delay = ao_data_ring[ao_data_ring_prev(ao_data_head)].adc.v_batt;
+		telemetry.configuration.apogee_delay = ao_telemetry_battery_convert(ao_data_ring[ao_data_ring_prev(ao_data_head)].adc.v_batt);
 #else
 		telemetry.configuration.apogee_delay = ao_config.apogee_delay;
 		telemetry.configuration.main_deploy = ao_config.main_deploy;

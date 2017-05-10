@@ -30,64 +30,37 @@ public class AltosEepromDownload implements Runnable {
 	Thread			eeprom_thread;
 	AltosEepromMonitor	monitor;
 
-	boolean			want_file;
-	FileWriter		eeprom_file;
-	LinkedList<String>	eeprom_pending;
-
 	AltosEepromList		flights;
-	boolean			success;
 	String			parse_errors;
-	AltosState		state;
 
-	private void FlushPending() throws IOException {
-		for (String s : flights.config_data) {
-			eeprom_file.write(s);
-			eeprom_file.write('\n');
-		}
+	private boolean has_gps_date(AltosState state) {
+		if (state == null)
+			return false;
 
-		for (String s : eeprom_pending)
-			eeprom_file.write(s);
+		AltosGPS gps = state.gps;
+
+		return gps != null &&
+			gps.year != AltosLib.MISSING &&
+			gps.month != AltosLib.MISSING &&
+			gps.day != AltosLib.MISSING;
 	}
 
-	private void CheckFile(boolean force) throws IOException {
-		if (eeprom_file != null)
-			return;
-		if (force || (state.flight != 0 && want_file)) {
-			AltosFile		eeprom_name;
+	private AltosFile MakeFile(int serial, int flight, AltosState state) throws IOException {
+		AltosFile		eeprom_name;
+
+		if (has_gps_date(state)) {
 			AltosGPS		gps = state.gps;
+			eeprom_name = new AltosFile(gps.year, gps.month, gps.day,
+						    serial, flight, "eeprom");
+		} else
+			eeprom_name = new AltosFile(serial, flight, "eeprom");
 
-			if (gps != null &&
-			    gps.year != AltosLib.MISSING &&
-			    gps.month != AltosLib.MISSING &&
-			    gps.day != AltosLib.MISSING)
-			{
-				eeprom_name = new AltosFile(gps.year, gps.month, gps.day,
-							    state.serial, state.flight, "eeprom");
-			} else
-				eeprom_name = new AltosFile(state.serial, state.flight, "eeprom");
-
-			eeprom_file = new FileWriter(eeprom_name);
-			if (eeprom_file != null) {
-				monitor.set_filename(eeprom_name.getName());
-				FlushPending();
-				eeprom_pending = null;
-			}
-		}
+		return eeprom_name;
 	}
 
 	boolean			done;
 	int			prev_state;
 	int			state_block;
-
-	void LogEeprom(AltosEeprom r) throws IOException {
-		if (r.cmd != AltosLib.AO_LOG_INVALID) {
-			String line = r.string();
-			if (eeprom_file != null)
-				eeprom_file.write(line);
-			else
-				eeprom_pending.add(line);
-		}
-	}
 
 	void LogError(String error) {
 		if (parse_errors != null)
@@ -96,112 +69,101 @@ public class AltosEepromDownload implements Runnable {
 			parse_errors = error;
 	}
 
-	void CaptureEeprom(AltosEepromChunk eechunk, int log_format) throws IOException, ParseException {
-		boolean any_valid = false;
-		boolean got_flight = false;
+	class BlockCache extends Hashtable<Integer,AltosEepromChunk> {
+		AltosEepromLog	log;
 
-		int record_length = 8;
-
-		state.set_serial(flights.config_data.serial);
-		monitor.set_serial(flights.config_data.serial);
-
-		for (int i = 0; i < AltosEepromChunk.chunk_size && !done; i += record_length) {
-			AltosEeprom r = null;
-
-			try {
-				r = eechunk.eeprom(i, log_format, state);
-			} catch (ParseException pe) {
-				LogError(pe.getMessage());
-				r = null;
-			}
-
-			if (r == null)
-				continue;
-
-			record_length = r.record_length();
-
-			r.update_state(state);
-
-			if (!got_flight && state.flight != AltosLib.MISSING)
-				monitor.set_flight(state.flight);
-
-			/* Monitor state transitions to update display */
-			if (state.state() != AltosLib.ao_flight_invalid &&
-			    state.state() <= AltosLib.ao_flight_landed)
-			{
-				if (state.state() > AltosLib.ao_flight_pad)
-					want_file = true;
-				if (state.state() == AltosLib.ao_flight_landed)
-					done = true;
-			}
-
-			if (state.gps != null)
-				want_file = true;
-
-			if (r.valid) {
-				any_valid = true;
-				LogEeprom(r);
-			}
+		AltosEepromChunk get(int start, boolean add) throws TimeoutException, InterruptedException {
+			if (contains(start))
+				return super.get(start);
+			AltosEepromChunk eechunk = new AltosEepromChunk(link, start, start == log.start_block);
+			if (add)
+				put(start, eechunk);
+			return eechunk;
 		}
-		if (!any_valid)
-			done = true;
 
-		CheckFile(false);
+		public BlockCache(AltosEepromLog log) {
+			this.log = log;
+		}
+	}
+
+	int FindLastLog(AltosEepromLog log, BlockCache cache) throws TimeoutException, InterruptedException {
+		int	low = log.start_block;
+		int	high = log.end_block - 1;
+
+		while (low <= high) {
+			int mid = (high + low) / 2;
+
+			if (!cache.get(mid, true).erased())
+				low = mid + 1;
+			else
+				high = mid - 1;
+		}
+		return low;
 	}
 
 	void CaptureLog(AltosEepromLog log) throws IOException, InterruptedException, TimeoutException, ParseException {
 		int			block, state_block = 0;
 		int			log_format = flights.config_data.log_format;
-
-		state = new AltosState();
+		BlockCache		cache = new BlockCache(log);
 
 		done = false;
 
 		if (flights.config_data.serial < 0)
 			throw new IOException("no serial number found");
 
-		/* Reset per-capture variables */
-		want_file = false;
-		eeprom_pending = new LinkedList<String>();
-
 		/* Set serial number in the monitor dialog window */
-		/* Now scan the eeprom, reading blocks of data and converting to .eeprom file form */
+		monitor.set_serial(log.serial);
+		monitor.set_flight(log.flight);
 
-		state_block = log.start_block;
-		prev_state = AltosLib.ao_flight_startup;
-		for (block = log.start_block; !done && block < log.end_block; block++) {
-			AltosEepromChunk	eechunk = new AltosEepromChunk(link, block, block == log.start_block);
+		int	start_block = log.start_block;
+		int	end_block = FindLastLog(log, cache);
 
-			/*
-			 * Guess what kind of data is there if the device
-			 * didn't tell us
-			 */
+		monitor.set_max(end_block - start_block - 1);
 
-			if (log_format == AltosLib.AO_LOG_FORMAT_UNKNOWN) {
-				if (block == log.start_block) {
-					if (eechunk.data(0) == AltosLib.AO_LOG_FLIGHT)
-						log_format = AltosLib.AO_LOG_FORMAT_FULL;
-					else
-						log_format = AltosLib.AO_LOG_FORMAT_TINY;
-				}
-			}
+		ArrayList<Byte> data = new ArrayList<Byte>();
 
-			CaptureEeprom (eechunk, log_format);
+		/* Now scan the eeprom, reading blocks of data to create a byte array of data */
 
-			if (state.state() != prev_state && state.state() != AltosLib.ao_flight_invalid) {
-				state_block = block;
-				prev_state = state.state();
-			}
+		for (block = start_block; block < end_block; block++) {
+			monitor.set_block(block - start_block);
 
-			monitor.set_value(state.state_name(),
-					  state.state(),
-					  block - state_block,
-					  block - log.start_block);
+			AltosEepromChunk	eechunk = cache.get(block, false);
+
+			for (int i = 0; i < eechunk.data.length; i++)
+				data.add((byte) eechunk.data[i]);
 		}
-		CheckFile(true);
+
+		/* Construct our internal representation of the eeprom data */
+		AltosEepromNew	eeprom = new AltosEepromNew(flights.config_data, data);
+
+		/* Now see if we can't actually parse the resulting
+		 * file to generate a better filename. Note that this
+		 * doesn't need to work; we'll still save the data using
+		 * a less accurate name.
+		 */
+		AltosEepromRecordSet	set = new AltosEepromRecordSet(eeprom);
+
+		AltosState state = new AltosState();
+
+		for (AltosState s : set) {
+			state = s;
+			if (state.gps != null)
+				break;
+		}
+
+		AltosFile f = MakeFile(flights.config_data.serial, log.flight, state);
+
+		monitor.set_filename(f.toString());
+
+		FileWriter w = new FileWriter(f);
+
+		eeprom.write(w);
+		w.close();
 	}
 
 	public void run () {
+		boolean success = false;
+
 		try {
 			boolean	failed = false;
 			if (remote)
@@ -211,15 +173,10 @@ public class AltosEepromDownload implements Runnable {
 				parse_errors = null;
 				if (log.selected) {
 					monitor.reset();
-					eeprom_file = null;
 					try {
 						CaptureLog(log);
 					} catch (ParseException e) {
 						LogError(e.getMessage());
-					}
-					if (eeprom_file != null) {
-						eeprom_file.flush();
-						eeprom_file.close();
 					}
 				}
 				if (parse_errors != null) {
@@ -273,12 +230,6 @@ public class AltosEepromDownload implements Runnable {
 		link = given_link;
 		remote = given_remote;
 		flights = given_flights;
-		success = false;
-
-		if (flights.config_data.log_has_state())
-			monitor.set_states(AltosLib.ao_flight_boost, AltosLib.ao_flight_landed);
-		else
-			monitor.set_states(AltosLib.ao_flight_invalid, AltosLib.ao_flight_invalid);
 
 		monitor.start();
 	}

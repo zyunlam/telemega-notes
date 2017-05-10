@@ -25,39 +25,39 @@ import java.lang.*;
 import java.lang.reflect.*;
 
 class JsonUtil {
-	StringBuffer quote(StringBuffer result, String a) {
-		result.append("\"");
+	Writer quote(Writer writer, String a) throws IOException {
+		writer.append("\"");
 		for (int i = 0; i < a.length(); i++) {
 			char c = a.charAt(i);
 
 			switch (c) {
 			case '"':
 			case '\\':
-				result.append('\\').append(c);
+				writer.append('\\').append(c);
 				break;
 			case '\n':
-				result.append("\\n");
+				writer.append("\\n");
 				break;
 			default:
-				result.append(c);
+				writer.append(c);
 				break;
 			}
 		}
-		result.append("\"");
-		return result;
+		writer.append("\"");
+		return writer;
 	}
 
-	StringBuffer append(StringBuffer result, AltosJson value, int indent, boolean pretty) {
+	Writer append(Writer result, AltosJson value, int indent, boolean pretty) throws IOException {
 		value.append(result, indent, pretty);
 		return result;
 	}
 
-	StringBuffer append(StringBuffer result, String string) {
+	Writer append(Writer result, String string) throws IOException {
 		result.append(string);
 		return result;
 	}
 
-	StringBuffer indent(StringBuffer result, int indent) {
+	Writer indent(Writer result, int indent) throws IOException {
 		result.append("\n");
 		for (int i = 0; i < indent; i++)
 			result.append("\t");
@@ -80,7 +80,7 @@ class JsonUtil {
 class JsonHash extends JsonUtil {
 	Hashtable<String,AltosJson> hash;
 
-	void append_hash(StringBuffer result, int indent, boolean pretty) {
+	void append_hash(Writer result, int indent, boolean pretty) throws IOException {
 		boolean		first = true;
 
 		result.append("{");
@@ -125,7 +125,7 @@ class JsonHash extends JsonUtil {
 class JsonArray extends JsonUtil {
 	ArrayList<AltosJson> array;
 
-	void append_array(StringBuffer result, int indent, boolean pretty) {
+	void append_array(Writer result, int indent, boolean pretty) throws IOException {
 		boolean first = true;
 
 		append(result, "[");
@@ -185,6 +185,7 @@ class JsonToken {
 	static final int _colon = 9;
 	static final int _end = 10;
 	static final int _error = 11;
+	static final int _none = 12;
 
 	static String token_name(int token) {
 		switch (token) {
@@ -245,7 +246,7 @@ class JsonToken {
 		this.sval = sval;
 	}
 
-	JsonToken(int token, StringBuffer bval) {
+	JsonToken(int token, Writer bval) {
 		this(token, bval.toString());
 	}
 }
@@ -254,11 +255,11 @@ class JsonToken {
  * Lexer for json
  */
 class JsonLexer extends JsonUtil {
-	StringReader	f;
-	int		line;
-	int		ungot = -2;
-	StringBuffer	pending_token;
-	JsonToken	token;
+	Reader			f;
+	int			line;
+	int			ungot = -2;
+	StringBuffer		pending_token;
+	private JsonToken	token;
 
 	static class keyword {
 		String		word;
@@ -382,7 +383,7 @@ class JsonLexer extends JsonUtil {
 						return new JsonToken(JsonToken._long, lval);
 					}
 				case '"':
-					StringBuffer bval = new StringBuffer();
+					Writer bval = new StringWriter();
 					for (;;) {
 						c = ch();
 						if (c == '"')
@@ -400,7 +401,7 @@ class JsonLexer extends JsonUtil {
 								break;
 							}
 						}
-						bval.appendCodePoint(c);
+						bval.write(c);
 					}
 					return new JsonToken(JsonToken._string, bval);
 				default:
@@ -424,11 +425,17 @@ class JsonLexer extends JsonUtil {
 	}
 
 	void next() {
-		token = lex();
+		token = null;
+	}
+
+	JsonToken token() {
+		if (token == null)
+			token = lex();
+		return token;
 	}
 
 	JsonToken expect(int e) {
-		JsonToken t = token;
+		JsonToken t = token();
 		if (t.token != e)
 			throw new IllegalArgumentException(String.format("got \"%s\" while expecting \"%s\"",
 									 token.token_name(),
@@ -439,6 +446,12 @@ class JsonLexer extends JsonUtil {
 
 	JsonLexer(String s) {
 		f = new StringReader(s);
+		line = 1;
+		token = null;
+	}
+
+	JsonLexer(Reader f) {
+		this.f = f;
 		line = 1;
 		token = null;
 	}
@@ -464,7 +477,7 @@ class JsonParse {
 		lexer.next();
 		for (;;) {
 			/* Allow for empty hashes */
-			if (lexer.token.token == JsonToken._cc) {
+			if (lexer.token().token == JsonToken._cc) {
 				lexer.next();
 				return hash;
 			}
@@ -475,7 +488,7 @@ class JsonParse {
 			AltosJson value = value();
 			hash.put(key, value);
 
-			switch (lexer.token.token) {
+			switch (lexer.token().token) {
 			case JsonToken._comma:
 				lexer.next();
 				break;
@@ -483,7 +496,7 @@ class JsonParse {
 				lexer.next();
 				return hash;
 			default:
-				parse_error("got %s expect \",\" or \"}\"", lexer.token.token_name());
+				parse_error("got %s expect \",\" or \"}\"", lexer.token().token_name());
 				return null;
 			}
 		}
@@ -496,14 +509,14 @@ class JsonParse {
 		lexer.next();
 		for (int i = 0;; i++) {
 			/* Allow for empty arrays */
-			if (lexer.token.token == JsonToken._cs) {
+			if (lexer.token().token == JsonToken._cs) {
 				lexer.next();
 				return array;
 			}
 
 			AltosJson value = value();
 			array.put(i, value);
-			switch (lexer.token.token) {
+			switch (lexer.token().token) {
 			case JsonToken._comma:
 				lexer.next();
 				break;
@@ -511,7 +524,7 @@ class JsonParse {
 				lexer.next();
 				return array;
 			default:
-				parse_error("got %s expect \",\" or \"]\"", lexer.token.token_name());
+				parse_error("got %s expect \",\" or \"]\"", lexer.token().token_name());
 				return null;
 			}
 		}
@@ -521,29 +534,29 @@ class JsonParse {
 	 * identify the next object in the input
 	 */
 	AltosJson value() {
-		switch (lexer.token.token) {
+		switch (lexer.token().token) {
 		case JsonToken._oc:
 			return new AltosJson(hash());
 		case JsonToken._os:
 			return new AltosJson(array());
 		case JsonToken._double:
-			double dval = lexer.token.dval;
+			double dval = lexer.token().dval;
 			lexer.next();
 			return new AltosJson(dval);
 		case JsonToken._long:
-			long lval = lexer.token.lval;
+			long lval = lexer.token().lval;
 			lexer.next();
 			return new AltosJson(lval);
 		case JsonToken._string:
-			String sval = lexer.token.sval;
+			String sval = lexer.token().sval;
 			lexer.next();
 			return new AltosJson(sval);
 		case JsonToken._boolean:
-			boolean bval = lexer.token.bval;
+			boolean bval = lexer.token().bval;
 			lexer.next();
 			return new AltosJson(bval);
 		default:
-			parse_error("Unexpected token \"%s\"", lexer.token.token_name());
+			parse_error("Unexpected token \"%s\"", lexer.token().token_name());
 		}
 		return null;
 	}
@@ -555,6 +568,10 @@ class JsonParse {
 
 	JsonParse(String s) {
 		lexer = new JsonLexer(s);
+	}
+
+	JsonParse(Reader f) {
+		lexer = new JsonLexer(f);
 	}
 }
 
@@ -578,7 +595,7 @@ public class AltosJson extends JsonUtil {
 
 	/* Generate string representation of the value
 	 */
-	StringBuffer append(StringBuffer result, int indent, boolean pretty) {
+	Writer append(Writer result, int indent, boolean pretty) throws IOException {
 		switch (type) {
 		case type_hash:
 			hash.append_hash(result, indent, pretty);
@@ -615,9 +632,13 @@ public class AltosJson extends JsonUtil {
 	}
 
 	private String toString(int indent, boolean pretty) {
-		StringBuffer result = new StringBuffer();
-		append(result, indent, pretty);
-		return result.toString();
+		try {
+			Writer result = new StringWriter();
+			append(result, indent, pretty);
+			return result.toString();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public String toString() {
@@ -626,6 +647,14 @@ public class AltosJson extends JsonUtil {
 
 	public String toPrettyString() {
 		return toString(0, true);
+	}
+
+	public void write(Writer w, int indent, boolean pretty) throws IOException {
+		append(w, indent, pretty);
+	}
+
+	public void write(Writer w) throws IOException {
+		write(w, 0, true);
 	}
 
 	/* Parse string representation to a value
@@ -637,6 +666,16 @@ public class AltosJson extends JsonUtil {
 			return parse.parse();
 		} catch (IllegalArgumentException ie) {
 			System.out.printf("json:\n%s\n%s\n", string, ie.getMessage());
+			return null;
+		}
+	}
+
+	public static AltosJson fromReader(Reader f) {
+		JsonParse	parse = new JsonParse(f);
+		try {
+			return parse.parse();
+		} catch (IllegalArgumentException ie) {
+			System.out.printf("json:\n%s\n", ie.getMessage());
 			return null;
 		}
 	}
@@ -1212,6 +1251,10 @@ public class AltosJson extends JsonUtil {
 			for (Class c = object.getClass(); c != Object.class; c = c.getSuperclass()) {
 				for (Field field : c.getDeclaredFields()) {
 					String	fieldName = field.getName();
+
+					/* XXX hack to allow fields to be not converted */
+					if (fieldName.startsWith("__"))
+						continue;
 
 					/* Skip static fields */
 					if (Modifier.isStatic(field.getModifiers()))

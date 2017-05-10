@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 Keith Packard <keithp@keithp.com>
+ * Copyright © 2017 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,29 +18,33 @@
 
 package org.altusmetrum.altoslib_11;
 
-public interface AltosEepromMonitor {
+public class AltosPressure extends AltosUnits {
 
-	public void set_block(int in_block);
+	public double value(double v, boolean imperial_units) {
+		if (imperial_units)
+			return AltosConvert.pa_to_psi(v);
+		return v;
+	}
 
-	public void set_max(int in_max);
+	public double inverse(double v, boolean imperial_units) {
+		if (imperial_units)
+			return AltosConvert.psi_to_pa(v);
+		return v;
+	}
 
-	public void set_serial(int in_serial);
+	public String show_units(boolean imperial_units) {
+		if (imperial_units)
+			return "psi";
+		return "Pa";
+	}
 
-	public void set_flight(int in_flight);
+	public String say_units(boolean imperial_units) {
+		if (imperial_units)
+			return "p s i";
+		return "pascals";
+	}
 
-	public void set_filename(String in_file);
-
-	public void set_thread(Thread eeprom_thread);
-
-	final static int INFO_MESSAGE = 0;
-	final static int WARNING_MESSAGE = 1;
-	final static int ERROR_MESSAGE = 2;
-
-	public void show_message(String message, String title, int message_type);
-
-	public void start();
-
-	public void done(boolean success);
-
-	public void reset();
+	public int show_fraction(int width, boolean imperial_units) {
+		return width / 9;
+	}
 }

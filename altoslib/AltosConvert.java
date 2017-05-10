@@ -21,6 +21,8 @@
  */
 package org.altusmetrum.altoslib_11;
 
+import java.util.*;
+
 public class AltosConvert {
 	/*
 	 * Pressure Sensor Model, version 1.1
@@ -374,11 +376,27 @@ public class AltosConvert {
 		return psi * 6894.76;
 	}
 
+	public static double pa_to_psi(double pa) {
+		return pa / 6894.76;
+	}
+
+	public static double n_to_lb(double n) {
+		return n * 0.22480894;
+	}
+
+	public static double lb_to_n(double lb) {
+		return lb / 0.22480894;
+	}
+
 	public static boolean imperial_units = false;
 
 	public static AltosDistance distance = new AltosDistance();
 
 	public static AltosHeight height = new AltosHeight();
+
+	public static AltosPressure pressure = new AltosPressure();
+
+	public static AltosForce force = new AltosForce();
 
 	public static AltosSpeed speed = new AltosSpeed();
 
@@ -408,6 +426,13 @@ public class AltosConvert {
 		int	csum = 0x5a;
 		for (int i = 0; i < length; i++)
 			csum += data[i + start];
+		return csum & 0xff;
+	}
+
+	public static int checksum(List<Byte> data, int start, int length) {
+		int	csum = 0x5a;
+		for (int i = 0; i < length; i++)
+			csum += data.get(i+start);
 		return csum & 0xff;
 	}
 

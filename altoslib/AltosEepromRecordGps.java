@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Keith Packard <keithp@keithp.com>
+ * Copyright © 2017 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,8 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosEepromGPS extends AltosEeprom {
+public class AltosEepromRecordGps extends AltosEepromRecord {
 	public static final int	record_length = 32;
-
-	public static final int max_sat = 12;
-
-	public int record_length() { return record_length; }
 
 	/* AO_LOG_FLIGHT elements */
 	public int flight() { return data16(0); }
@@ -55,10 +51,8 @@ public class AltosEepromGPS extends AltosEeprom {
 	public int mode() { return data8(25); }
 	public int altitude_high() { return data16(26); }
 
-	public boolean has_seconds() { return cmd == AltosLib.AO_LOG_GPS_TIME; }
-
-	public int seconds() {
-		switch (cmd) {
+	private int seconds() {
+		switch (cmd()) {
 		case AltosLib.AO_LOG_GPS_TIME:
 			return second() + 60 * (minute() + 60 * (hour() + 24 * (day() + 31 * month())));
 		default:
@@ -66,8 +60,15 @@ public class AltosEepromGPS extends AltosEeprom {
 		}
 	}
 
-	public AltosEepromGPS (AltosEepromChunk chunk, int start) throws ParseException {
-		parse_chunk(chunk, start);
+	public int compareTo(AltosEepromRecord o) {
+		AltosEepromRecordGps og = (AltosEepromRecordGps) o;
+
+		int	seconds_diff = seconds() - og.seconds();
+
+		if (seconds_diff != 0)
+			return seconds_diff;
+
+		return start - o.start;
 	}
 
 	public void update_state(AltosState state) {
@@ -75,9 +76,9 @@ public class AltosEepromGPS extends AltosEeprom {
 
 		AltosGPS	gps;
 
-		/* Flush any pending GPS changes */
+		/* Flush any pending RecordGps changes */
 		if (state.gps_pending) {
-			switch (cmd) {
+			switch (cmd()) {
 			case AltosLib.AO_LOG_GPS_LAT:
 			case AltosLib.AO_LOG_GPS_LON:
 			case AltosLib.AO_LOG_GPS_ALT:
@@ -90,20 +91,19 @@ public class AltosEepromGPS extends AltosEeprom {
 			}
 		}
 
-		switch (cmd) {
+		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
 			if (state.flight == AltosLib.MISSING) {
-				state.set_boost_tick(tick);
+				state.set_boost_tick(tick());
 				state.set_flight(flight());
 			}
 			/* no place to log start lat/lon yet */
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
-			state.set_tick(tick);
 			gps = state.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
-			if (state.altitude_32())
+			if (eeprom.config_data().altitude_32 == 1)
 				gps.alt = (altitude_low() & 0xffff) | (altitude_high() << 16);
 			else
 				gps.alt = altitude_low();
@@ -125,7 +125,7 @@ public class AltosEepromGPS extends AltosEeprom {
 			gps.ground_speed = ground_speed() * 1.0e-2;
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
-			if (state.compare_version("1.4.9") >= 0) {
+			if (eeprom.config_data().compare_version("1.4.9") >= 0) {
 				gps.pdop = pdop() / 10.0;
 				gps.hdop = hdop() / 10.0;
 				gps.vdop = vdop() / 10.0;
@@ -144,30 +144,18 @@ public class AltosEepromGPS extends AltosEeprom {
 		}
 	}
 
-	public AltosEepromGPS (String line) {
-		parse_string(line);
+	public AltosEepromRecord next() {
+		int	s = next_start();
+		if (s < 0)
+			return null;
+		return new AltosEepromRecordGps(eeprom, s);
 	}
 
-	static public LinkedList<AltosEeprom> read(FileInputStream input) {
-		LinkedList<AltosEeprom> tgpss = new LinkedList<AltosEeprom>();
+	public AltosEepromRecordGps(AltosEepromNew eeprom, int start) {
+		super(eeprom, start, record_length);
+	}
 
-		for (;;) {
-			try {
-				String line = AltosLib.gets(input);
-				if (line == null)
-					break;
-				try {
-					AltosEepromGPS tgps = new AltosEepromGPS(line);
-					if (tgps.cmd != AltosLib.AO_LOG_INVALID)
-						tgpss.add(tgps);
-				} catch (Exception e) {
-					System.out.printf ("exception\n");
-				}
-			} catch (IOException ie) {
-				break;
-			}
-		}
-
-		return tgpss;
+	public AltosEepromRecordGps(AltosEepromNew eeprom) {
+		this(eeprom, 0);
 	}
 }

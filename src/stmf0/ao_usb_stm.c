@@ -655,7 +655,7 @@ ao_usb_ep0_in_start(uint16_t max)
 	ao_usb_ep0_flush();
 }
 
-static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
+struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 
 #if AO_USB_DEVICE_ID_SERIAL
 static uint8_t ao_usb_serial[2 + 48];

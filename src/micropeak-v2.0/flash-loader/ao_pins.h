@@ -16,31 +16,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+#ifndef _AO_PINS_H_
+#define _AO_PINS_H_
 
-public interface AltosEepromMonitor {
+#include <ao_flash_stm_pins.h>
 
-	public void set_block(int in_block);
+/* LED anode (PA2) to 3.3 for boot mode */
 
-	public void set_max(int in_max);
+#define AO_BOOT_PIN			1
+#define AO_BOOT_APPLICATION_GPIO	stm_gpioa
+#define AO_BOOT_APPLICATION_PIN		2
+#define AO_BOOT_APPLICATION_VALUE	0
+#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_DOWN
 
-	public void set_serial(int in_serial);
+/* USB */
+#define HAS_USB			1
+#define AO_USB_DIRECTIO		0
+#define AO_PA11_PA12_RMP	1
 
-	public void set_flight(int in_flight);
-
-	public void set_filename(String in_file);
-
-	public void set_thread(Thread eeprom_thread);
-
-	final static int INFO_MESSAGE = 0;
-	final static int WARNING_MESSAGE = 1;
-	final static int ERROR_MESSAGE = 2;
-
-	public void show_message(String message, String title, int message_type);
-
-	public void start();
-
-	public void done(boolean success);
-
-	public void reset();
-}
+#endif /* _AO_PINS_H_ */
