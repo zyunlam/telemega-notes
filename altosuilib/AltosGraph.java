@@ -81,29 +81,6 @@ class AltosNsat extends AltosUnits {
 	}
 }
 
-class AltosPressure extends AltosUnits {
-
-	public double value(double p, boolean imperial_units) {
-		return p;
-	}
-
-	public double inverse(double p, boolean imperial_units) {
-		return p;
-	}
-
-	public String show_units(boolean imperial_units) {
-		return "Pa";
-	}
-
-	public String say_units(boolean imperial_units) {
-		return "pascals";
-	}
-
-	public int show_fraction(int width, boolean imperial_units) {
-		return 0;
-	}
-}
-
 class AltosDbm extends AltosUnits {
 
 	public double value(double d, boolean imperial_units) {
