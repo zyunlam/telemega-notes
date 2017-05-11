@@ -49,7 +49,6 @@ altoslib_JAVA = \
 	AltosEepromDownload.java \
 	AltosEepromMonitor.java \
 	AltosEepromFile.java \
-	AltosEepromIterable.java \
 	AltosEepromList.java \
 	AltosEepromLog.java \
 	AltosFile.java \
@@ -120,6 +119,9 @@ altoslib_JAVA = \
 	AltosTelemetrySensor.java \
 	AltosTelemetrySatellite.java \
 	AltosTelemetryStandard.java \
+	AltosTime.java \
+	AltosTimeSeries.java \
+	AltosTimeValue.java \
 	AltosUnitsListener.java \
 	AltosUnknownProduct.java \
 	AltosMs5607.java \
