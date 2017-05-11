@@ -19,7 +19,7 @@ teststand_JAVA= \
 	TestStandDataSet.java \
 	TestStandGraph.java \
 	TestStandGraphUI.java \
-	TestStandPreferences.java 
+	TestStandPreferences.java \
 	TestStandState.java \
 	TestStandStatus.java \
 	TestStandStatusUpdate.java
