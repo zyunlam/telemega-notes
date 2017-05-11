@@ -119,6 +119,9 @@ altoslib_JAVA = \
 	AltosTelemetrySensor.java \
 	AltosTelemetrySatellite.java \
 	AltosTelemetryStandard.java \
+	AltosTime.java \
+	AltosTimeSeries.java \
+	AltosTimeValue.java \
 	AltosUnitsListener.java \
 	AltosUnknownProduct.java \
 	AltosMs5607.java \
