@@ -67,6 +67,7 @@ altosuilib_JAVA = \
 	AltosUITelemetryList.java \
 	AltosUIRateList.java \
 	AltosUIImage.java \
+	AltosUITimeSeries.java \
 	OSXAdapter.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar
