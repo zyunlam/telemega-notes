@@ -13,13 +13,16 @@ teststanddir=$(datadir)/java
 
 teststand_JAVA= \
 	TestStand.java \
-	TestStandStatus.java \
-	TestStandStatusUpdate.java \
-	TestStandState.java \
 	TestStandConfig.java \
 	TestStandConfigUI.java \
-	TestStandPreferences.java \
-	TestStandGraphUI.java 
+	TestStandDataPoint.java \
+	TestStandDataSet.java \
+	TestStandGraph.java \
+	TestStandGraphUI.java \
+	TestStandPreferences.java 
+	TestStandState.java \
+	TestStandStatus.java \
+	TestStandStatusUpdate.java
 
 JFREECHART_CLASS= \
     jfreechart.jar

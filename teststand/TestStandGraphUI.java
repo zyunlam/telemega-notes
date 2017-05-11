@@ -37,11 +37,11 @@ import org.jfree.ui.RefineryUtilities;
 public class TestStandGraphUI extends AltosUIFrame
 {
 	JTabbedPane		pane;
-	AltosGraph		graph;
+	TestStandGraph		graph;
 	AltosUIEnable		enable;
 	AltosState		state;
 	AltosFlightStats	stats;
-	AltosGraphDataSet	graphDataSet;
+	TestStandDataSet	graphDataSet;
 	AltosFlightStatsTable	statsTable;
 
 	private void close() {
@@ -58,8 +58,8 @@ public class TestStandGraphUI extends AltosUIFrame
 
 		enable = new AltosUIEnable();
 		stats = new AltosFlightStats(states);
-		graphDataSet = new AltosGraphDataSet(states);
-		graph = new AltosGraph(enable, stats, graphDataSet);
+		graphDataSet = new TestStandDataSet(states);
+		graph = new TestStandGraph(enable, stats, graphDataSet);
 		statsTable = new AltosFlightStatsTable(stats);
 
 		pane.add("Graph", graph.panel);
