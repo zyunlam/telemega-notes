@@ -19,8 +19,7 @@ teststand_JAVA= \
 	TestStandConfig.java \
 	TestStandConfigUI.java \
 	TestStandPreferences.java \
-	TestStandGraphUI.java \
-	TestStandDisplayThread.java
+	TestStandGraphUI.java 
 
 JFREECHART_CLASS= \
     jfreechart.jar

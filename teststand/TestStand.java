@@ -53,7 +53,6 @@ public class TestStand
 	}
 
 	AltosFlightReader	reader;
-	TestStandDisplayThread	thread;
 	boolean			idle_mode;
 
 	JMenuBar		menu_bar;
@@ -116,16 +115,6 @@ public class TestStand
 		{ "Flash Device",	flash_command },
 	};
 
-	void stop_display() {
-		if (thread != null && thread.isAlive()) {
-			thread.interrupt();
-			try {
-				thread.join();
-			} catch (InterruptedException ie) {}
-		}
-		thread = null;
-	}
-
 	public void reset() {
 		for (AltosFlightDisplay display : displays)
 			display.reset();
@@ -167,7 +156,6 @@ public class TestStand
 
 	void disconnect() {
 		setTitle("TestStand");
-		stop_display();
 		teststand_status.stop();
 
 		teststand_status.disable_receive();
@@ -425,8 +413,6 @@ public class TestStand
 		teststand_status.start(status_update);
 
 		setTitle(String.format("TestStand %s", reader.name));
-		thread = new TestStandDisplayThread(this, voice(), this, reader);
-		thread.start();
 
 		if (device != null) {
 			if (idle_mode) {
