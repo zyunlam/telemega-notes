@@ -47,81 +47,6 @@ public class TestStandState extends AltosUIFlightTab {
 		}
 	}
 
-	class Height extends ValueHold {
-		public double value(AltosState state, int i) {
-			if (i == 0)
-				return state.height();
-			else
-				return state.max_height();
-		}
-
-		public Height(Container container, int y) {
-			super(container, y, AltosConvert.height, "Height");
-		}
-	}
-
-	class Speed extends ValueHold {
-		public double value(AltosState state, int i) {
-			if (i == 0)
-				return state.gps_speed();
-			else
-				return state.max_gps_speed();
-		}
-
-		public Speed(Container container, int y) {
-			super(container, y, AltosConvert.speed, "Speed");
-		}
-	}
-
-	class Distance extends Value {
-		public double value(AltosState state, int i) {
-			if (state.from_pad != null)
-				return state.from_pad.distance;
-			else
-				return AltosLib.MISSING;
-		}
-
-		public Distance(Container container, int y) {
-			super(container, y, AltosConvert.distance, "Distance");
-		}
-	}
-
-	class Range extends Value {
-		public double value(AltosState state, int i) {
-			return state.range;
-		}
-		public Range (Container container, int y) {
-			super (container, y, AltosConvert.distance, "Range");
-		}
-	}
-
-	class Bearing extends AltosUIIndicator {
-		public void show (AltosState state, AltosListenerState listener_state) {
-			if (state.from_pad != null && state.from_pad.bearing != AltosLib.MISSING) {
-				show( String.format("%3.0f°", state.from_pad.bearing),
-				      state.from_pad.bearing_words(
-					      AltosGreatCircle.BEARING_LONG));
-			} else {
-				show("Missing", "Missing");
-			}
-		}
-		public Bearing (Container container, int y) {
-			super (container, y, "Bearing", 2, false, 1);
-		}
-	}
-
-	class Elevation extends AltosUIIndicator {
-		public void show (AltosState state, AltosListenerState listener_state) {
-			if (state.elevation == AltosLib.MISSING)
-				show("Missing");
-			else
-				show("%3.0f°", state.elevation);
-		}
-		public Elevation (Container container, int y) {
-			super (container, y, "Elevation", 1, false, 2);
-		}
-	}
-
 	class FirmwareVersion extends AltosUIIndicator {
 		public void show(AltosState state, AltosListenerState listener_state) {
 			if (state.firmware_version == null)
@@ -218,12 +143,6 @@ public class TestStandState extends AltosUIFlightTab {
 	public TestStandState() {
 		int y = 0;
 		labels(this, y++);
-		add(new Height(this, y++));
-		add(new Speed(this, y++));
-		add(new Distance(this, y++));
-		add(new Range(this, y++));
-		add(new Bearing(this, y++));
-		add(new Elevation(this, y++));
 		add(new FirmwareVersion(this, y++));
 		add(new FlightLogMax(this, y++));
 		add(new BatteryVoltage(this, y++));

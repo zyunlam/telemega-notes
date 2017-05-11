@@ -241,11 +241,6 @@ public class TestStandStatus extends JComponent implements AltosFlightDisplay {
 			stop();
 	}
 
-	public int height() {
-		Dimension d = layout.preferredLayoutSize(this);
-		return d.height;
-	}
-
 	TestStandStatusUpdate	status_update;
 	javax.swing.Timer	timer;
 
