@@ -19,12 +19,12 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 
 	public static final int max_sat = 12;
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener state) {
 		super.update_state(state);
 		AltosGPS	gps;
 
 		/* Flush any pending GPS changes */
-		if (state.gps_pending) {
+		if (state.gps_pending()) {
 			switch (cmd()) {
 			case AltosLib.AO_LOG_GPS_LAT:
 			case AltosLib.AO_LOG_GPS_LON:
