@@ -43,6 +43,7 @@ public class AltosGraphNew extends AltosUIGraphNew {
 	static final private Color range_color = new Color(100, 31, 31);
 	static final private Color distance_color = new Color(100, 31, 194);
 	static final private Color speed_color = new Color(31,194,31);
+	static final private Color thrust_color = new Color(31,194,31);
 	static final private Color accel_color = new Color(31,31,194);
 	static final private Color voltage_color = new Color(194, 194, 31);
 	static final private Color battery_voltage_color = new Color(194, 194, 31);
@@ -82,13 +83,14 @@ public class AltosGraphNew extends AltosUIGraphNew {
 	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosRecordSet record_set) {
 
 		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
-		AltosUIAxis	distance_axis, pressure_axis;
+		AltosUIAxis	distance_axis, pressure_axis, thrust_axis;
 		AltosUIAxis	gyro_axis, orient_axis, mag_axis;
 		AltosUIAxis	course_axis, dop_axis;
 
 		height_axis = newAxis("Height", AltosConvert.height, height_color);
 		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
+		thrust_axis = newAxis("Thrust", AltosConvert.force, thrust_color);
 		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
 		voltage_axis = newAxis("Voltage", AltosConvert.voltage, voltage_color);
 		temperature_axis = newAxis("Temperature", AltosConvert.temperature, temperature_color, 0);
@@ -120,6 +122,11 @@ public class AltosGraphNew extends AltosUIGraphNew {
 					     true,
 					     pressure_axis);
 
+		flight_series.register_extra(AltosUIFlightSeries.thrust_name,
+					     thrust_color,
+					     true,
+					     thrust_axis);
+
 //		addMarker("State", AltosGraphDataPoint.data_state, state_color);
 
 		record_set.capture_series(flight_series);
@@ -139,6 +146,12 @@ public class AltosGraphNew extends AltosUIGraphNew {
 				  pressure_color,
 				  false,
 				  pressure_axis);
+			addSeries("Thrust",
+				  AltosGraphDataPoint.data_thrust,
+				  thrust_units,
+				  thrust_color,
+				  false,
+				  thrust_axis);
 			addSeries("Speed",
 				  AltosGraphDataPoint.data_speed,
 				  AltosConvert.speed,

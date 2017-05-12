@@ -82,7 +82,7 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 			break;
 		case AltosLib.AO_LOG_SENSOR:
 			state.set_pressure(adc_to_pa(pres()));
-			state.set_accel(adc_to_n(thrust()));
+			state.set_thrust(adc_to_n(thrust()));
 			break;
 		}
 	}
