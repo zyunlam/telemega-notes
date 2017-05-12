@@ -214,6 +214,10 @@ public class AltosConfigData implements Iterable<String> {
 		return r;
 	}
 
+	public boolean altitude_32() {
+		return altitude_32 == 1;
+	}
+
 	public int compare_version(String other) {
 		int[]	me = parse_version(version);
 		int[]	them = parse_version(other);
@@ -438,11 +442,11 @@ public class AltosConfigData implements Iterable<String> {
 
 		if (frequency > 0) {
 			radio_frequency = (int) Math.floor (freq * 1000 + 0.5);
-			radio_channel = -1;
+			radio_channel = AltosLib.MISSING;
 		} else if (setting > 0) {
 			radio_setting =AltosConvert.radio_frequency_to_setting(freq,
 										    radio_calibration);
-			radio_channel = -1;
+			radio_channel = AltosLib.MISSING;
 		} else {
 			radio_channel = AltosConvert.radio_frequency_to_channel(freq);
 		}
@@ -453,7 +457,7 @@ public class AltosConfigData implements Iterable<String> {
 		int	setting = radio_setting;
 
 		if (radio_frequency < 0 && channel < 0 && setting < 0)
-			return -1;
+			return AltosLib.MISSING;
 
 		if (channel < 0)
 			channel = 0;

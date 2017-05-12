@@ -17,7 +17,7 @@ package org.altusmetrum.altoslib_11;
 import java.io.*;
 import java.util.*;
 
-public class AltosEepromRecordSet implements Iterable<AltosState> {
+public class AltosEepromRecordSet implements Iterable<AltosState>, AltosRecordSet {
 	AltosEepromNew			eeprom;
 	TreeSet<AltosEepromRecord>	ordered;
 	AltosState			start_state;
@@ -50,6 +50,13 @@ public class AltosEepromRecordSet implements Iterable<AltosState> {
 
 	public Iterator<AltosState> iterator() {
 		return new RecordIterator();
+	}
+
+	public void capture_series(AltosFlightSeries series) {
+		series.set_config_data(eeprom.config_data());
+		for (AltosEepromRecord record : ordered) {
+			record.update_state(series);
+		}
 	}
 
 	public AltosEepromRecordSet(AltosEepromNew eeprom) {

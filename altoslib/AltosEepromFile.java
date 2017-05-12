@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosEepromFile extends AltosStateIterable {
+public class AltosEepromFile extends AltosStateIterable implements AltosRecordSet {
 
 	AltosEepromRecordSet	set;
 
@@ -43,5 +43,9 @@ public class AltosEepromFile extends AltosStateIterable {
 
 	public Iterator<AltosState> iterator() {
 		return set.iterator();
+	}
+
+	public void capture_series(AltosFlightSeries series) {
+		set.capture_series(series);
 	}
 }

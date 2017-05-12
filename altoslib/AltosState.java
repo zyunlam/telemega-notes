@@ -24,7 +24,7 @@ package org.altusmetrum.altoslib_11;
 
 import java.io.*;
 
-public class AltosState implements Cloneable {
+public class AltosState extends AltosFlightListener implements Cloneable {
 
 	public static final int set_position = 1;
 	public static final int set_gps = 2;
@@ -43,9 +43,7 @@ public class AltosState implements Cloneable {
 	public double	time;
 	public double	prev_time;
 	public double	time_change;
-	public int	tick;
 	private int	prev_tick;
-	public int	boost_tick;
 
 	class AltosValue {
 		double	value;
@@ -870,6 +868,8 @@ public class AltosState implements Cloneable {
 			return;
 		}
 
+		super.copy(old);
+
 		received_time = old.received_time;
 		time = old.time;
 		time_change = old.time_change;
@@ -1069,11 +1069,6 @@ public class AltosState implements Cloneable {
 			time = tick / 100.0;
 			time_change = time - prev_time;
 		}
-	}
-
-	public void set_boost_tick(int boost_tick) {
-		if (boost_tick != AltosLib.MISSING)
-			this.boost_tick = boost_tick;
 	}
 
 	public String state_name() {
@@ -1502,23 +1497,10 @@ public class AltosState implements Cloneable {
 		return tick != AltosLib.MISSING && serial != AltosLib.MISSING;
 	}
 
-	public AltosGPS make_temp_gps(boolean sats) {
-		if (temp_gps == null) {
-			temp_gps = new AltosGPS(gps);
-		}
-		gps_pending = true;
-		if (sats) {
-			if (tick != temp_gps_sat_tick)
-				temp_gps.cc_gps_sat = null;
-			temp_gps_sat_tick = tick;
-		}
-		return temp_gps;
-	}
-
 	public void set_temp_gps() {
 		set_gps(temp_gps, gps_sequence + 1);
 		gps_pending = false;
-		temp_gps = null;
+		super.set_temp_gps();
 	}
 
 	public void set_config_data(AltosConfigData config_data) {
