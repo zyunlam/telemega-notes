@@ -35,17 +35,92 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
-public class AltosUITimeSeries extends AltosTimeSeries {
+class AltosXYSeries extends XYSeries {
+
+	public AltosXYSeries(String label) {
+		super(label);
+	}
+}
+
+public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher {
 	Color		color;
-	boolean		enabled;
+	boolean		enable;
 	AltosUIAxis	axis;
+	XYItemRenderer	renderer;
+	AltosXYSeries	xy_series;
+
+	/* AltosUIGrapher interface */
+	public boolean need_reset() {
+		return false;
+	}
+
+	public void clear() {
+	}
+
+	public void add(AltosUIDataPoint dataPoint) {
+	}
+
+	public void setNotify(boolean notify) {
+	}
+
+	public void fireSeriesChanged() {
+	}
+
+	void set_data() {
+		xy_series.clear();
+
+		for (AltosTimeValue v : this) {
+			double y = v.y;
+			if (units != null)
+				y = units.graph_value(y);
+			xy_series.add(v.x, y);
+		}
+	}
+
+	public void set_units() {
+		axis.set_units();
+		StandardXYToolTipGenerator	ttg;
+
+		if (units != null) {
+			String	time_example = (new AltosUITime()).graph_format(7);
+			String  example = units.graph_format(7);
+
+			ttg = new StandardXYToolTipGenerator(String.format("{1}s: {2}%s ({0})",
+									   units.graph_units()),
+							     new java.text.DecimalFormat(time_example),
+							     new java.text.DecimalFormat(example));
+			renderer.setBaseToolTipGenerator(ttg);
+		}
+		set_data();
+	}
+
+	public AltosXYSeries xy_series() {
+		return xy_series;
+	}
+
+	public void set_enable(boolean enable) {
+		if (this.enable != enable) {
+			this.enable = enable;
+			renderer.setSeriesVisible(0, enable);
+			axis.set_enable(enable);
+		}
+	}
 
 	public AltosUITimeSeries(String label, AltosUnits units,
-				 Color color, boolean enabled,
+				 Color color, boolean enable,
 				 AltosUIAxis axis) {
 		super(label, units);
+		System.out.printf("time series %s units %s\n", label, units);
 		this.color = color;
-		this.enabled = enabled;
+		this.enable = enable;
 		this.axis = axis;
+
+		axis.ref(this.enable);
+
+		renderer = new XYLineAndShapeRenderer(true, false);
+		renderer.setSeriesPaint(0, color);
+		renderer.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		renderer.setSeriesVisible(0, enable);
+		xy_series = new AltosXYSeries(label);
 	}
 }

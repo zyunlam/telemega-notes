@@ -39,6 +39,8 @@ interface AltosUIGrapher {
 
 	public abstract void set_units();
 
+	public abstract boolean need_reset();
+
 	public abstract void clear();
 
 	public abstract void add(AltosUIDataPoint dataPoint);
