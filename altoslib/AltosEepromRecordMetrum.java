@@ -65,13 +65,13 @@ public class AltosEepromRecordMetrum extends AltosEepromRecord {
 	public int svid(int n) { return data8(2 + n * 2); }
 	public int c_n(int n) { return data8(2 + n * 2 + 1); }
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener state) {
 		super.update_state(state);
 
 		AltosGPS	gps;
 
 		/* Flush any pending GPS changes */
-		if (state.gps_pending) {
+		if (state.gps_pending()) {
 			switch (cmd()) {
 			case AltosLib.AO_LOG_GPS_POS:
 			case AltosLib.AO_LOG_GPS_LAT:
@@ -111,7 +111,7 @@ public class AltosEepromRecordMetrum extends AltosEepromRecord {
 			gps = state.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
-			if (state.altitude_32())
+			if (config_data().altitude_32())
 				gps.alt = (altitude_low() & 0xffff) | (altitude_high() << 16);
 			else
 				gps.alt = altitude_low();

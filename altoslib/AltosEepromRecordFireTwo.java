@@ -27,8 +27,6 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 
 	/* AO_LOG_FLIGHT elements */
 	public int flight() { return data16(0); }
-	public int idle_pres() { return data16(2); }
-	public int idle_thrust() { return data16(4); }
 
 	/* AO_LOG_STATE elements */
 	public int state() { return data16(0); }
@@ -59,7 +57,7 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 		if (v < 0.5) v = 0.5;
 		if (v > 4.5) v = 4.5;
 
-		double	psi = (v - 0.5) / 4.0 * 1600.0;
+		double	psi = (v - 0.5) / 4.0 * 2500.0;
 		return AltosConvert.psi_to_pa(psi);
 	}
 
@@ -70,13 +68,13 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 		return AltosConvert.lb_to_n(v * 298 * 9.807);
 	}
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener state) {
 		super.update_state(state);
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
 			state.set_flight(flight());
-			state.set_ground_pressure(adc_to_pa(idle_pres()));
+			state.set_ground_pressure(0.0);
 			state.set_accel_g(0, -1);
 			break;
 		case AltosLib.AO_LOG_STATE:

@@ -214,6 +214,10 @@ public class AltosConfigData implements Iterable<String> {
 		return r;
 	}
 
+	public boolean altitude_32() {
+		return altitude_32 == 1;
+	}
+
 	public int compare_version(String other) {
 		int[]	me = parse_version(version);
 		int[]	them = parse_version(other);
@@ -240,52 +244,52 @@ public class AltosConfigData implements Iterable<String> {
 		serial = 0;
 		flight = 0;
 		log_format = AltosLib.AO_LOG_FORMAT_UNKNOWN;
-		log_space = -1;
+		log_space = AltosLib.MISSING;
 		version = "unknown";
 
-		main_deploy = -1;
-		apogee_delay = -1;
-		apogee_lockout = -1;
+		main_deploy = AltosLib.MISSING;
+		apogee_delay = AltosLib.MISSING;
+		apogee_lockout = AltosLib.MISSING;
 
-		radio_frequency = -1;
+		radio_frequency = AltosLib.MISSING;
 		callsign = null;
-		radio_enable = -1;
-		radio_calibration = -1;
-		radio_channel = -1;
-		radio_setting = -1;
-		telemetry_rate = -1;
+		radio_enable = AltosLib.MISSING;
+		radio_calibration = AltosLib.MISSING;
+		radio_channel = AltosLib.MISSING;
+		radio_setting = AltosLib.MISSING;
+		telemetry_rate = AltosLib.MISSING;
 
-		accel_cal_plus = -1;
-		accel_cal_minus = -1;
-		pad_orientation = -1;
+		accel_cal_plus = AltosLib.MISSING;
+		accel_cal_minus = AltosLib.MISSING;
+		pad_orientation = AltosLib.MISSING;
 
-		flight_log_max = -1;
-		log_fixed = -1;
-		ignite_mode = -1;
+		flight_log_max = AltosLib.MISSING;
+		log_fixed = AltosLib.MISSING;
+		ignite_mode = AltosLib.MISSING;
 
 		aes_key = "";
 
 		pyro = 0;
 		npyro = 0;
 		pyros = null;
-		pyro_firing_time = -1;
+		pyro_firing_time = AltosLib.MISSING;
 
-		aprs_interval = -1;
-		aprs_ssid = -1;
-		aprs_format = -1;
+		aprs_interval = AltosLib.MISSING;
+		aprs_ssid = AltosLib.MISSING;
+		aprs_format = AltosLib.MISSING;
 
-		beep = -1;
+		beep = AltosLib.MISSING;
 
-		tracker_motion = -1;
-		tracker_interval = -1;
+		tracker_motion = AltosLib.MISSING;
+		tracker_interval = AltosLib.MISSING;
 
-		storage_size = -1;
-		storage_erase_unit = -1;
+		storage_size = AltosLib.MISSING;
+		storage_erase_unit = AltosLib.MISSING;
 		stored_flight = 0;
 
-		accel_zero_along = -1;
-		accel_zero_across = -1;
-		accel_zero_through = -1;
+		accel_zero_along = AltosLib.MISSING;
+		accel_zero_across = AltosLib.MISSING;
+		accel_zero_through = AltosLib.MISSING;
 	}
 
 	public void parse_line(String line) {
@@ -438,11 +442,11 @@ public class AltosConfigData implements Iterable<String> {
 
 		if (frequency > 0) {
 			radio_frequency = (int) Math.floor (freq * 1000 + 0.5);
-			radio_channel = -1;
+			radio_channel = AltosLib.MISSING;
 		} else if (setting > 0) {
 			radio_setting =AltosConvert.radio_frequency_to_setting(freq,
 										    radio_calibration);
-			radio_channel = -1;
+			radio_channel = AltosLib.MISSING;
 		} else {
 			radio_channel = AltosConvert.radio_frequency_to_channel(freq);
 		}
@@ -453,7 +457,7 @@ public class AltosConfigData implements Iterable<String> {
 		int	setting = radio_setting;
 
 		if (radio_frequency < 0 && channel < 0 && setting < 0)
-			return -1;
+			return AltosLib.MISSING;
 
 		if (channel < 0)
 			channel = 0;

@@ -75,8 +75,6 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;
 void
 ao_log(void)
 {
-	uint16_t ao_idle_pressure = 0;		// write code to capture pre-test values someday
-	uint16_t ao_idle_thrust = 0;
 	uint16_t ao_flight_state = ao_flight_startup;
 
 	ao_storage_setup();
@@ -89,8 +87,6 @@ ao_log(void)
 	
 		log.type = AO_LOG_FLIGHT;
 		log.tick = ao_time();
-		log.u.flight.idle_pressure = ao_idle_pressure;
-		log.u.flight.idle_thrust = ao_idle_thrust;
 		log.u.flight.flight = ao_flight_number;
 		ao_log_firetwo(&log);
 

@@ -309,9 +309,7 @@ struct ao_log_firetwo {
 		/* AO_LOG_FLIGHT */
 		struct {
 			uint16_t	flight;		/* 4 */
-			uint16_t	idle_pressure;	/* 6 */
-			uint16_t	idle_thrust;	/* 8 */
-		} flight;	/* 16 */
+		} flight;	/* 6 */
 		/* AO_LOG_STATE */
 		struct {
 			uint16_t	state;		/* 4 */

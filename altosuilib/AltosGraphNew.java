@@ -35,99 +35,7 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
-class AltosNsat extends AltosUnits {
-
-	public double value(double v, boolean imperial_units) {
-		return v;
-	}
-
-	public double inverse(double v, boolean imperial_units) {
-		return v;
-	}
-
-	public String show_units(boolean imperial_units) {
-		return "Sats";
-	}
-
-	public String say_units(boolean imperial_units) {
-		return "Satellites";
-	}
-
-	public int show_fraction(int width, boolean imperial_units) {
-		return 0;
-	}
-}
-
-class AltosDbm extends AltosUnits {
-
-	public double value(double d, boolean imperial_units) {
-		return d;
-	}
-
-	public double inverse(double d, boolean imperial_units) {
-		return d;
-	}
-
-	public String show_units(boolean imperial_units) {
-		return "dBm";
-	}
-
-	public String say_units(boolean imperial_units) {
-		return "D B M";
-	}
-
-	public int show_fraction(int width, boolean imperial_units) {
-		return 0;
-	}
-}
-
-class AltosMagUnits extends AltosUnits {
-
-	public double value(double p, boolean imperial_units) {
-		return p;
-	}
-
-	public double inverse(double p, boolean imperial_units) {
-		return p;
-	}
-
-	public String show_units(boolean imperial_units) {
-		return "Ga";
-	}
-
-	public String say_units(boolean imperial_units) {
-		return "gauss";
-	}
-
-	public int show_fraction(int width, boolean imperial_units) {
-		return 2;
-	}
-}
-
-class AltosDopUnits extends AltosUnits {
-
-	public double value(double p, boolean imperial_units) {
-		return p;
-	}
-
-	public double inverse(double p, boolean imperial_units) {
-		return p;
-	}
-
-	public String show_units(boolean imperial_units) {
-		return null;
-	}
-
-	public String say_units(boolean imperial_units) {
-		return null;
-	}
-
-	public int show_fraction(int width, boolean imperial_units) {
-		return 1;
-	}
-}
-
-public class AltosGraph extends AltosUIGraph {
+public class AltosGraphNew extends AltosUIGraphNew {
 
 	static final private Color height_color = new Color(194,31,31);
 	static final private Color gps_height_color = new Color(150,31,31);
@@ -163,42 +71,61 @@ public class AltosGraph extends AltosUIGraph {
 	static final private Color mag_z_color = new Color(0, 0, 128);
 	static final private Color orient_color = new Color(31, 31, 31);
 
-	static AltosVoltage voltage_units = new AltosVoltage();
-	static AltosPressure pressure_units = new AltosPressure();
 	static AltosNsat nsat_units = new AltosNsat();
 	static AltosDbm dbm_units = new AltosDbm();
-	static AltosRotationRate gyro_units = new AltosRotationRate();
 	static AltosOrient orient_units = new AltosOrient();
 	static AltosMagUnits mag_units = new AltosMagUnits();
 	static AltosDopUnits dop_units = new AltosDopUnits();
 
-	AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
-	AltosUIAxis	distance_axis, pressure_axis;
-	AltosUIAxis	gyro_axis, orient_axis, mag_axis;
-	AltosUIAxis	course_axis, dop_axis;
+	AltosUIFlightSeries flight_series;
 
-	public AltosGraph(AltosUIEnable enable, AltosFlightStats stats, AltosGraphDataSet dataSet) {
-		super(enable);
+	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosRecordSet record_set) {
+
+		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
+		AltosUIAxis	distance_axis, pressure_axis;
+		AltosUIAxis	gyro_axis, orient_axis, mag_axis;
+		AltosUIAxis	course_axis, dop_axis;
 
 		height_axis = newAxis("Height", AltosConvert.height, height_color);
-		pressure_axis = newAxis("Pressure", pressure_units, pressure_color, 0);
+		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
 		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
-		voltage_axis = newAxis("Voltage", voltage_units, voltage_color);
+		voltage_axis = newAxis("Voltage", AltosConvert.voltage, voltage_color);
 		temperature_axis = newAxis("Temperature", AltosConvert.temperature, temperature_color, 0);
 		nsat_axis = newAxis("Satellites", nsat_units, gps_nsat_color,
 				    AltosUIAxis.axis_include_zero | AltosUIAxis.axis_integer);
 		dbm_axis = newAxis("Signal Strength", dbm_units, dbm_color, 0);
 		distance_axis = newAxis("Distance", AltosConvert.distance, range_color);
 
-		gyro_axis = newAxis("Rotation Rate", gyro_units, gyro_z_color, 0);
+		gyro_axis = newAxis("Rotation Rate", AltosConvert.rotation_rate, gyro_z_color, 0);
 		orient_axis = newAxis("Tilt Angle", orient_units, orient_color, 0);
 		mag_axis = newAxis("Magnetic Field", mag_units, mag_x_color, 0);
 		course_axis = newAxis("Course", orient_units, gps_course_color, 0);
 		dop_axis = newAxis("Dilution of Precision", dop_units, gps_pdop_color, 0);
 
-		addMarker("State", AltosGraphDataPoint.data_state, state_color);
+		flight_series = new AltosUIFlightSeries();
 
+		flight_series.register_extra("default",
+					     speed_color,
+					     false,
+					     speed_axis);
+
+		flight_series.register_extra(AltosUIFlightSeries.accel_name,
+					     accel_color,
+					     true,
+					     accel_axis);
+
+		flight_series.register_extra(AltosUIFlightSeries.pressure_name,
+					     pressure_color,
+					     true,
+					     pressure_axis);
+
+//		addMarker("State", AltosGraphDataPoint.data_state, state_color);
+
+		record_set.capture_series(flight_series);
+
+		return flight_series.series();
+/*
 		if (stats.has_flight_data) {
 			addSeries("Height",
 				  AltosGraphDataPoint.data_height,
@@ -423,7 +350,12 @@ public class AltosGraph extends AltosUIGraph {
 			for (int i = 0; i < stats.num_ignitor; i++)
 				addMarker(AltosLib.ignitor_name(i), AltosGraphDataPoint.data_ignitor_fired_0 + i, state_color);
 		}
+*/
+	}
 
-		setDataSet(dataSet);
+	public AltosGraphNew(AltosUIEnable enable, AltosFlightStats stats, AltosRecordSet record_set) {
+		super(enable, "Flight");
+
+		set_series(setup(stats, record_set));
 	}
 }
