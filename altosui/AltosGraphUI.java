@@ -34,7 +34,7 @@ import org.jfree.ui.RefineryUtilities;
 public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, AltosUnitsListener
 {
 	JTabbedPane		pane;
-	AltosGraph		graph;
+	AltosGraphNew		graph;
 	AltosUIEnable		enable;
 	AltosUIMap		map;
 	AltosState		state;
@@ -69,7 +69,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 			enable.units_changed(imperial_units);
 	}
 
-	AltosGraphUI(AltosStateIterable states, File file) throws InterruptedException, IOException {
+	AltosGraphUI(AltosStateIterable states, AltosRecordSet record_set, File file) throws InterruptedException, IOException {
 		super(file.getName());
 		state = null;
 
@@ -78,9 +78,9 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		enable = new AltosUIEnable();
 
 		stats = new AltosFlightStats(states);
-		graphDataSet = new AltosGraphDataSet(states);
+//		graphDataSet = new AltosGraphDataSet(states);
 
-		graph = new AltosGraph(enable, stats, graphDataSet);
+		graph = new AltosGraphNew(enable, stats, record_set);
 
 		statsTable = new AltosFlightStatsTable(stats);
 

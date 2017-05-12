@@ -348,7 +348,7 @@ public class AltosUI extends AltosUIFrame {
 		if (states == null)
 			return;
 		try {
-			new AltosGraphUI(states, chooser.file());
+			new AltosGraphUI(states, new AltosEepromRecordSet(new FileReader(chooser.file())), chooser.file());
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
 		}
@@ -487,7 +487,7 @@ public class AltosUI extends AltosUIFrame {
 		if (states == null)
 			return false;
 		try {
-			new AltosGraphUI(states, file);
+			new AltosGraphUI(states, new AltosEepromRecordSet(new FileReader(file)), file);
 			return true;
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
