@@ -26,6 +26,8 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 #include <bluetooth/rfcomm.h>
+#include <bluetooth/sdp.h>
+#include <bluetooth/sdp_lib.h>
 
 static char *
 cc_fullname (char *dir, char *file)
@@ -380,6 +382,30 @@ bt_func(hci_get_route, int, -1, (bdaddr_t *bdaddr), (bdaddr))
 bt_func(hci_inquiry, int, -1, (int adapter_id, int len, int max_rsp, const uint8_t *lap, inquiry_info **devs, long flags), (adapter_id, len, max_rsp, lap, devs, flags))
 #define hci_inquiry altos_hci_inquiry
 
+bt_func(sdp_connect, sdp_session_t *, 0, (const bdaddr_t *src, const bdaddr_t *dst, uint32_t flags), (src, dst, flags))
+#define sdp_connect altos_sdp_connect
+
+bt_func(sdp_uuid16_create, uuid_t *, 0, (uuid_t *uuid, uint16_t data), (uuid, data))
+#define sdp_uuid16_create altos_sdp_uuid16_create
+
+bt_func(sdp_list_append, sdp_list_t *, 0, (sdp_list_t *list, void *d), (list, d))
+#define sdp_list_append altos_sdp_list_append
+
+bt_func(sdp_service_search_attr_req, int, -1, (sdp_session_t *session, const sdp_list_t *search, sdp_attrreq_type_t reqtype, const sdp_list_t *attrid_list, sdp_list_t **rsp_list), (session, search, reqtype, attrid_list, rsp_list))
+#define sdp_service_search_attr_req altos_sdp_service_search_attr_req
+
+bt_func(sdp_uuid_to_proto, int, 0, (uuid_t *uuid), (uuid))
+#define sdp_uuid_to_proto altos_sdp_uuid_to_proto
+
+bt_func(sdp_get_access_protos, int, 0, (const sdp_record_t *rec, sdp_list_t **protos), (rec, protos))
+#define sdp_get_access_protos altos_sdp_get_access_protos
+
+bt_func(sdp_get_proto_port, int, 0, (const sdp_list_t *list, int proto), (list, proto))
+#define sdp_get_proto_port altos_sdp_get_proto_port
+
+bt_func(sdp_close, int, 0, (sdp_session_t *session), (session))
+#define sdp_close altos_sdp_close
+
 struct altos_bt_list {
 	inquiry_info	*ii;
 	int		sock;
@@ -475,10 +501,67 @@ altos_bt_fill_in(char *name, char *addr, struct altos_bt_device *device)
 struct altos_file *
 altos_bt_open(struct altos_bt_device *device)
 {
+	static const uint8_t svc_uuid_int[] = {
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0x11, 0x01
+	};
+	uuid_t			svc_uuid;
 	struct sockaddr_rc 	addr = { 0 };
 	int			status, i;
 	struct altos_file_posix	*file;
+	sdp_session_t		*session = NULL;
+	sdp_list_t		*search_list, *attrid_list;
+	sdp_list_t		*response_list = NULL, *r;
+	uint32_t		range;
+	int			err;
+	int			channel = 1;
 
+	if (str2ba(device->addr, &addr.rc_bdaddr) < 0) {
+		altos_set_last_posix_error();
+		goto no_file;
+	}
+
+	/*
+	 * Search for the RFCOMM service to get the right channel
+	 */
+	session = sdp_connect(BDADDR_ANY, &addr.rc_bdaddr, SDP_RETRY_IF_BUSY);
+
+	if (session) {
+		sdp_uuid16_create(&svc_uuid, PUBLIC_BROWSE_GROUP);
+		search_list = sdp_list_append(NULL, &svc_uuid);
+
+		range = 0x0000ffff;
+		attrid_list = sdp_list_append(NULL, &range);
+
+		err = sdp_service_search_attr_req(session, search_list,
+						  SDP_ATTR_REQ_RANGE, attrid_list, &response_list);
+
+		if (err >= 0) {
+			for (r = response_list; r; r = r->next) {
+				sdp_record_t *rec = (sdp_record_t*) r->data;
+				sdp_list_t *proto_list;
+				sdp_list_t *access = NULL;
+				int proto;
+
+				proto = sdp_uuid_to_proto(&rec->svclass);
+
+				if (proto == SERIAL_PORT_SVCLASS_ID) {
+					sdp_get_access_protos(rec, &access);
+					if (access) {
+						int this_chan = sdp_get_proto_port(access, RFCOMM_UUID);
+						if (this_chan)
+							channel = this_chan;
+					}
+				}
+			}
+		}
+
+		/* Leave the session open so we don't disconnect from the device before opening
+		 * the RFCOMM channel
+		 */
+	}
+
+	/* Connect to the channel */
 	file = calloc(1, sizeof (struct altos_file_posix));
 	if (!file) {
 		errno = ENOMEM;
@@ -486,11 +569,7 @@ altos_bt_open(struct altos_bt_device *device)
 		goto no_file;
 	}
 	addr.rc_family = AF_BLUETOOTH;
-	addr.rc_channel = 1;
-	if (str2ba(device->addr, &addr.rc_bdaddr) < 0) {
-		altos_set_last_posix_error();
-		goto no_sock;
-	}
+	addr.rc_channel = channel;
 
 	for (i = 0; i < 5; i++) {
 		file->fd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -507,10 +586,16 @@ altos_bt_open(struct altos_bt_device *device)
 		close(file->fd);
 		usleep(100 * 1000);
 	}
+
+
 	if (status < 0) {
 		altos_set_last_posix_error();
 		goto no_link;
 	}
+
+	if (session)
+		sdp_close(session);
+
 	usleep(100 * 1000);
 
 #ifdef USE_POLL
@@ -524,6 +609,8 @@ no_link:
 no_sock:
 	free(file);
 no_file:
+	if (session)
+		sdp_close(session);
 	return NULL;
 }
 
