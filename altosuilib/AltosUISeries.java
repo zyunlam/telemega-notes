@@ -76,6 +76,8 @@ public class AltosUISeries extends XYSeries implements AltosUIGrapher {
 		renderer.setBaseToolTipGenerator(ttg);
 	}
 
+	public boolean need_reset() { return true; }
+
 	public void set_enable(boolean enable) {
 		if (this.enable != enable) {
 			this.enable = enable;

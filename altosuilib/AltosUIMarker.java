@@ -56,6 +56,8 @@ public class AltosUIMarker implements AltosUIGrapher {
 	public void set_units() {
 	}
 
+	public boolean need_reset() { return true; }
+
 	public void set_enable(boolean enable) {
 		if (enabled == enable)
 			return;
