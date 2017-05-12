@@ -50,7 +50,7 @@ public class AltosEepromRecordTiny extends AltosEepromRecord {
 		return tick;
 	}
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener state) {
 		int value = data16(-header_length);
 
 		state.set_tick(tick());

@@ -62,7 +62,7 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 		return -1;
 	}
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener state) {
 		super.update_state(state);
 
 		switch (cmd()) {

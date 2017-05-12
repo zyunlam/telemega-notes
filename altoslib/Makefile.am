@@ -35,6 +35,7 @@ altoslib_JAVA = \
 	AltosCSV.java \
 	AltosDebug.java \
 	AltosEepromNew.java \
+	AltosRecordSet.java \
 	AltosEepromRecord.java \
 	AltosEepromRecordFull.java \
 	AltosEepromRecordTiny.java \
@@ -54,6 +55,8 @@ altoslib_JAVA = \
 	AltosFile.java \
 	AltosFlash.java \
 	AltosFlashListener.java \
+	AltosFlightListener.java \
+	AltosFlightSeries.java \
 	AltosFlightReader.java \
 	AltosFlightStats.java \
 	AltosForce.java \
@@ -138,6 +141,7 @@ altoslib_JAVA = \
 	AltosLocation.java \
 	AltosLatitude.java \
 	AltosLongitude.java \
+	AltosRotationRate.java \
 	AltosPyro.java \
 	AltosWriter.java \
 	AltosQuaternion.java \

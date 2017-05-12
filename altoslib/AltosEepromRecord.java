@@ -14,7 +14,6 @@
 
 package org.altusmetrum.altoslib_11;
 
-
 public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord> {
 
 	AltosEepromNew		eeprom;
@@ -65,6 +64,10 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		return 1;
 	}
 
+	public AltosConfigData config_data() {
+		return eeprom.config_data();
+	}
+
 	public int compareTo(AltosEepromRecord o) {
 		int	cmd_diff = cmdi() - o.cmdi();
 
@@ -78,11 +81,11 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		return start - o.start;
 	}
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener listen) {
 		if (cmd() == AltosLib.AO_LOG_FLIGHT)
-			state.set_boost_tick(tick());
+			listen.set_boost_tick(tick());
 		else
-			state.set_tick(tick());
+			listen.set_tick(tick());
 	}
 
 	public int next_start() {

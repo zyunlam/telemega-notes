@@ -29,6 +29,62 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 		return values.iterator();
 	}
 
+	public void integrate(AltosTimeSeries integral) {
+		double	y = 0.0;
+		double 	x = 0.0;
+		boolean start = true;
+
+		for (AltosTimeValue v : values) {
+			if (start) {
+				y = 0.0;
+				x = v.x;
+				start = false;
+			} else {
+				y += v.y * (v.x - x);
+				x = v.x;
+			}
+			integral.add(x, y);
+		}
+	}
+
+	public void differentiate(AltosTimeSeries diff) {
+		double y = 0.0;
+		double x = 0.0;
+		boolean start = true;
+
+		for (AltosTimeValue v: values) {
+			if (start) {
+				y = 0.0;
+				x = v.x;
+				start = false;
+			} else {
+				double	dx = v.x - x;
+				double	dy = v.y - y;
+
+				x = v.x;
+				y = v.y;
+				if (dx != 0)
+					diff.add(x, dy);
+			}
+		}
+	}
+
+	private int find_left(int i, double dt) {
+		int j;
+		double t = values.get(i).x - dt;
+		for (j = i; j > 0; j--)	{
+			if (values.get(j).x < t)
+				break;
+		}
+		return j;
+
+	}
+
+	public void filter(AltosTimeSeries out, double width) {
+		for (int i = 0; i < values.size(); i++) {
+		}
+	}
+
 	public AltosTimeSeries(String label, AltosUnits units) {
 		this.label = label;
 		this.units = units;

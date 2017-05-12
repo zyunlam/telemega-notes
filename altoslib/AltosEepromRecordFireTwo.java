@@ -68,7 +68,7 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 		return AltosConvert.lb_to_n(v * 298 * 9.807);
 	}
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener state) {
 		super.update_state(state);
 
 		switch (cmd()) {

@@ -71,13 +71,13 @@ public class AltosEepromRecordGps extends AltosEepromRecord {
 		return start - o.start;
 	}
 
-	public void update_state(AltosState state) {
+	public void update_state(AltosFlightListener state) {
 		super.update_state(state);
 
 		AltosGPS	gps;
 
 		/* Flush any pending RecordGps changes */
-		if (state.gps_pending) {
+		if (state.gps_pending()) {
 			switch (cmd()) {
 			case AltosLib.AO_LOG_GPS_LAT:
 			case AltosLib.AO_LOG_GPS_LON:
@@ -93,7 +93,7 @@ public class AltosEepromRecordGps extends AltosEepromRecord {
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			if (state.flight == AltosLib.MISSING) {
+			if (state.flight() == AltosLib.MISSING) {
 				state.set_boost_tick(tick());
 				state.set_flight(flight());
 			}
