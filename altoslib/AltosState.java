@@ -513,6 +513,25 @@ public class AltosState extends AltosFlightListener implements Cloneable {
 		pressure.set(p, time);
 	}
 
+	class AltosForce extends AltosValue {
+		void set(double p, double time) {
+			super.set(p, time);
+		}
+
+		AltosForce() {
+			super();
+		}
+	}
+	private AltosForce	thrust;
+
+	public double thrust() {
+		return thrust.value();
+	}
+
+	public void set_thrust(double N) {
+		thrust.set(N, time);
+	}
+
 	public double baro_height() {
 		double a = altitude();
 		double g = ground_altitude();
@@ -760,6 +779,7 @@ public class AltosState extends AltosFlightListener implements Cloneable {
 		ground_pressure = new AltosGroundPressure();
 		altitude = new AltosAltitude();
 		pressure = new AltosPressure();
+		thrust = new AltosForce();
 		speed = new AltosSpeed();
 		acceleration = new AltosAccel();
 		orient = new AltosCValue();

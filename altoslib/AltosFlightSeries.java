@@ -136,6 +136,16 @@ public class AltosFlightSeries extends AltosFlightListener {
 		pressure_series.add(time(), pa);
 	}
 
+	AltosTimeSeries thrust_series;
+
+	public static final String thrust_name = "Thrust";
+
+	public	void set_thrust(double N) {
+		if (thrust_series == null)
+			thrust_series = add_series(thrust_name, AltosConvert.force);
+		thrust_series.add(time(), N);
+	}
+
 	public  void set_temperature(double deg_c) {
 	}
 

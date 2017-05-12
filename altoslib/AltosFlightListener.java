@@ -62,6 +62,7 @@ public abstract class AltosFlightListener {
 	public abstract void set_accel(double accel);
 	public abstract void set_accel_g(double accel_plus_g, double accel_minus_g);
 	public abstract void set_pressure(double pa);
+	public abstract void set_thrust(double N);
 
 	public abstract void set_temperature(double deg_c);
 	public abstract void set_battery_voltage(double volts);
