@@ -501,32 +501,33 @@ altos_bt_fill_in(char *name, char *addr, struct altos_bt_device *device)
 struct altos_file *
 altos_bt_open(struct altos_bt_device *device)
 {
-	static const uint8_t svc_uuid_int[] = {
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0x11, 0x01
-	};
-	uuid_t			svc_uuid;
 	struct sockaddr_rc 	addr = { 0 };
 	int			status, i;
 	struct altos_file_posix	*file;
 	sdp_session_t		*session = NULL;
-	sdp_list_t		*search_list, *attrid_list;
-	sdp_list_t		*response_list = NULL, *r;
-	uint32_t		range;
-	int			err;
-	int			channel = 1;
+	int			channel = 0;
 
 	if (str2ba(device->addr, &addr.rc_bdaddr) < 0) {
 		altos_set_last_posix_error();
 		goto no_file;
 	}
 
+#if 0
 	/*
 	 * Search for the RFCOMM service to get the right channel
 	 */
 	session = sdp_connect(BDADDR_ANY, &addr.rc_bdaddr, SDP_RETRY_IF_BUSY);
 
 	if (session) {
+		static const uint8_t svc_uuid_int[] = {
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0x11, 0x01
+		};
+		int			err;
+		uuid_t			svc_uuid;
+		uint32_t		range;
+		sdp_list_t		*search_list, *attrid_list;
+		sdp_list_t		*response_list = NULL, *r;
 		sdp_uuid16_create(&svc_uuid, PUBLIC_BROWSE_GROUP);
 		search_list = sdp_list_append(NULL, &svc_uuid);
 
@@ -560,6 +561,9 @@ altos_bt_open(struct altos_bt_device *device)
 		 * the RFCOMM channel
 		 */
 	}
+#endif
+	if (channel == 0)
+		channel = altos_bt_port(device);
 
 	/* Connect to the channel */
 	file = calloc(1, sizeof (struct altos_file_posix));
