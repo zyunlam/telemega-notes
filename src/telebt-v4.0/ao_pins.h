@@ -19,6 +19,8 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
+#define AO_STACK_SIZE		512
+
 #define AO_HSE                  32000000
 #define AO_RCC_CFGR_PLLMUL	STM_RCC_CFGR_PLLMUL_3
 #define AO_RCC_CFGR2_PLLDIV	STM_RCC_CFGR2_PREDIV_2
@@ -37,32 +39,28 @@
 #define AO_USB_DIRECTIO		0
 #define AO_PA11_PA12_RMP	0
 
-#define IS_FLASH_LOADER 0
+#define IS_FLASH_LOADER 	0
 #define HAS_TASK_QUEUE		1
 
+/*
+ * Serial ports
+ */
 #define HAS_SERIAL_1		0
 #define USE_SERIAL_1_STDIN	0
 #define SERIAL_1_PB6_PB7	0
-#define SERIAL_1_PA9_PA10	1
+#define SERIAL_1_PA9_PA10	0
 
 #define HAS_SERIAL_2		1
 #define USE_SERIAL_2_STDIN	1
 #define DELAY_SERIAL_2_STDIN	1
 #define USE_SERIAL_2_FLOW	1
-#define USE_SERIAL_2_SW_FLOW	0
-#define HAS_SERIAL_HW_FLOW	1
+#define USE_SERIAL_2_SW_FLOW	1
 #define SERIAL_2_PA2_PA3	1
 #define SERIAL_2_PD5_PD6	0
 #define SERIAL_2_PORT_RTS	(&stm_gpioa)
 #define SERIAL_2_PIN_RTS	1
 #define SERIAL_2_PORT_CTS	(&stm_gpioa)
 #define SERIAL_2_PIN_CTS	0
-
-#define HAS_SERIAL_3		0
-#define USE_SERIAL_3_STDIN	0
-#define SERIAL_3_PB10_PB11	1
-#define SERIAL_3_PC10_PC11	0
-#define SERIAL_3_PD8_PD9	0
 
 #define AO_CONFIG_MAX_SIZE	1024
 
@@ -77,6 +75,7 @@
 #define HAS_APRS		0
 #define HAS_ACCEL		0
 #define HAS_AES			0
+#define HAS_POLLCHAR		1
 
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* CC1200 */
@@ -165,22 +164,101 @@ struct ao_adc {
 #define AO_ADC_REFERENCE_DV	33
 
 /*
- * BTM
+ * RN4678
  */
-#define HAS_BTM			0
+#define HAS_RN			1
 
-#define ao_serial_btm_getchar	ao_serial2_getchar
-#define ao_serial_btm_putchar	ao_serial2_putchar
-#define _ao_serial_btm_pollchar	_ao_serial2_pollchar
-#define _ao_serial_btm_sleep_for	_ao_serial2_sleep_for
-#define ao_serial_btm_set_speed ao_serial2_set_speed
-#define ao_serial_btm_drain	ao_serial2_drain
-#define ao_serial_btm_rx_fifo	(ao_stm_usart2.rx_fifo)
+#define ao_serial_rn_getchar	ao_serial2_getchar
+#define ao_serial_rn_putchar	ao_serial2_putchar
+#define _ao_serial_rn_pollchar	_ao_serial2_pollchar
+#define _ao_serial_rn_sleep_for	_ao_serial2_sleep_for
+#define ao_serial_rn_set_speed ao_serial2_set_speed
+#define ao_serial_rn_drain	ao_serial2_drain
+#define ao_serial_rn_rx_fifo	(ao_stm_usart2.rx_fifo)
 
-#define AO_BTM_INT_PORT		(&stm_gpioa)
-#define AO_BTM_INT_PIN		15
-#define AO_BTM_RESET_PORT	(&stm_gpiob)
-#define AO_BTM_RESET_PIN	3
+/* Pin 5. BM70 P2_2 */
+#define AO_RN_SW_BTN_PORT	(&stm_gpioc)
+#define AO_RN_SW_BTN_PIN	14
+
+/* Pin 9. BM70 P2_3 */
+#define AO_RN_WAKEUP_PORT	(&stm_gpiob)
+#define AO_RN_WAKEUP_PIN	9
+
+/* Pin 11. BM70 P2_7/tx_ind. Status indication along with P1_5 */
+#define AO_RN_P0_4_PORT		(&stm_gpioc)
+#define AO_RN_P0_4_PIN		13
+
+/* Pin 12. BM70 P1_1. Status indication along with P0_4 */
+#define AO_RN_P1_5_PORT		(&stm_gpiob)
+#define AO_RN_P1_5_PIN		6
+
+/* Pin 13. BM70 P1_2. Also I2C SCL */
+#define AO_RN_P1_2_PORT		(&stm_gpiob)
+#define AO_RN_P1_2_PIN		7
+
+/* Pin 14. BM70 P1_3. Also I2C SDA */
+#define AO_RN_P1_3_PORT		(&stm_gpiob)
+#define AO_RN_P1_3_PIN		8
+
+/* Pin 15. BM70 P0_0/cts. */
+#define AO_RN_CTS_PORT		(&stm_gpioa)
+#define AO_RN_CTS_PIN		1
+
+/* Pin 16. BM70 P1_0. */
+#define AO_RN_P0_5_PORT		(&stm_gpiob)
+#define AO_RN_P0_5_PIN		5
+
+/* Pin 17. BM70 P3_6. */
+#define AO_RN_RTS_PORT		(&stm_gpioa)
+#define AO_RN_RTS_PIN		0
+
+/* Pin 18. BM70 P2_0. */
+#define AO_RN_P2_0_PORT		(&stm_gpiob)
+#define AO_RN_P2_0_PIN		3
+
+/* Pin 19. BM70 P2_4. */
+#define AO_RN_P2_4_PORT		(&stm_gpioa)
+#define AO_RN_P2_4_PIN		10
+
+/* Pin 20. BM70 NC. */
+#define AO_RN_EAN_PORT
+#define AO_RN_EAN_PIN
+
+/* Pin 21. BM70 RST_N. */
+#define AO_RN_RST_N_PORT	(&stm_gpioa)
+#define AO_RN_RST_N_PIN		15
+
+/* Pin 22. BM70 RXD. */
+#define AO_RN_RXD_PORT		(&stm_gpioa)
+#define AO_RN_RXD_PIN		2
+
+/* Pin 23. BM70 TXD. */
+#define AO_RN_TXD_PORT		(&stm_gpioa)
+#define AO_RN_TXD_PIN		3
+
+/* Pin 24. BM70 P3_1/RSSI_IND. */
+#define AO_RN_P3_1_PORT		(&stm_gpiob)
+#define AO_RN_P3_1_PIN		2
+
+/* Pin 25. BM70 P3_2/LINK_DROP. */
+#define AO_RN_P3_2_PORT		(&stm_gpioa)
+#define AO_RN_P3_2_PIN		8
+
+/* Pin 26. BM70 P3_3/UART_RX_IND. */
+#define AO_RN_P3_3_PORT		(&stm_gpiob)
+#define AO_RN_P3_3_PIN		15
+
+/* Pin 27. BM70 P3_4/PAIRING_KEY. */
+#define AO_RN_P3_4_PORT		(&stm_gpiob)
+#define AO_RN_P3_4_PIN		14
+
+/* Pin 28. BM70 P3_5. */
+#define AO_RN_P3_6_PORT		(&stm_gpiob)
+#define AO_RN_P3_6_PIN		13
+
+/* Pin 29. BM70 P0_7. */
+#define AO_RN_P3_7_PORT		(&stm_gpiob)
+#define AO_RN_P3_7_PIN		12
 
 /*
  * Radio (cc1200)

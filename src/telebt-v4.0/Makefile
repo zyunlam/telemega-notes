@@ -32,6 +32,7 @@ ALTOS_SRC = \
 	ao_timer.c \
 	ao_mutex.c \
 	ao_serial_stm.c \
+	ao_rn4678.c \
 	ao_freq.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \

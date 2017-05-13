@@ -20,6 +20,8 @@
 #include <ao_exti.h>
 #include <ao_packet.h>
 #include <ao_send_packet.h>
+#include <ao_usb.h>
+#include <ao_rn4678.h>
 
 int
 main(void)
@@ -40,9 +42,12 @@ main(void)
 	ao_send_packet_init();
 
 	ao_usb_init();
+	ao_serial_init();
+
 	ao_radio_init();
 	ao_packet_master_init();
 	ao_monitor_init();
+	ao_rn4678_init();
 
 	ao_config_init();
 
