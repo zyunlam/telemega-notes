@@ -57,7 +57,8 @@ public class AltosEepromNew {
 			if (config_data == null)
 				config_data = new AltosConfigData();
 
-			if (config_data.log_format == AltosLib.MISSING) {
+			if (config_data.log_format == AltosLib.AO_LOG_FORMAT_UNKNOWN) {
+				config_data.log_format = AltosLib.AO_LOG_FORMAT_FULL;
 				if (config_data.product != null) {
 					if (config_data.product.startsWith("TeleMetrum"))
 						config_data.log_format = AltosLib.AO_LOG_FORMAT_FULL;
