@@ -19,6 +19,8 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 
 	public static final int max_sat = 12;
 
+	public static final int two_g_default = 16294 - 15758;
+
 	public void update_state(AltosState state) {
 		super.update_state(state);
 		AltosGPS	gps;
@@ -43,6 +45,8 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 			state.set_state(AltosLib.ao_flight_pad);
 			state.set_ground_accel(data16(0));
 			state.set_flight(data16(2));
+			if (state.accel_plus_g == AltosLib.MISSING)
+				state.set_accel_g(data16(0), data16(0) + two_g_default);
 			break;
 		case AltosLib.AO_LOG_SENSOR:
 			state.set_accel(data16(0));
