@@ -348,7 +348,7 @@ ao_serial2_set_speed(uint8_t speed)
 	ao_usart_set_speed(&ao_stm_usart2, speed);
 }
 
-#if HAS_SERIAL_SW_FLOW
+#if USE_SERIAL_2_FLOW && USE_SERIAL_2_SW_FLOW
 void
 ao_serial2_cts(void)
 {

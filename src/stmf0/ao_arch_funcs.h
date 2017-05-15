@@ -310,6 +310,27 @@ void
 ao_i2c_init(void);
 
 /* ao_serial_stm.c */
+
+#if USE_SERIAL_1_FLOW && USE_SERIAL_1_SW_FLOW || USE_SERIAL_2_FLOW && USE_SERIAL_2_SW_FLOW
+#define HAS_SERIAL_SW_FLOW	1
+#else
+#define HAS_SERIAL_SW_FLOW	0
+#endif
+
+#if USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW
+#define USE_SERIAL_2_HW_FLOW	1
+#endif
+
+#if USE_SERIAL_1_FLOW && !USE_SERIAL_1_SW_FLOW
+#define USE_SERIAL_1_HW_FLOW	1
+#endif
+
+#if USE_SERIAL_1_HW_FLOW || USE_SERIAL_2_HW_FLOW
+#define HAS_SERIAL_HW_FLOW	1
+#else
+#define HAS_SERIAL_HW_FLOW	0
+#endif
+
 struct ao_stm_usart {
 	struct ao_fifo		rx_fifo;
 	struct ao_fifo		tx_fifo;
