@@ -235,57 +235,57 @@ public class AltosConfigData implements Iterable<String> {
 	public void reset() {
 		__lines = new LinkedList<String>();
 
-		manufacturer = "unknown";
-		product = "unknown";
-		serial = 0;
-		flight = 0;
+		manufacturer = null;
+		product = null;
+		serial = AltosLib.MISSING;
+		flight = AltosLib.MISSING;
 		log_format = AltosLib.AO_LOG_FORMAT_UNKNOWN;
-		log_space = -1;
+		log_space = AltosLib.MISSING;
 		version = "unknown";
 
-		main_deploy = -1;
-		apogee_delay = -1;
-		apogee_lockout = -1;
+		main_deploy = AltosLib.MISSING;
+		apogee_delay = AltosLib.MISSING;
+		apogee_lockout = AltosLib.MISSING;
 
-		radio_frequency = -1;
+		radio_frequency = AltosLib.MISSING;
 		callsign = null;
-		radio_enable = -1;
-		radio_calibration = -1;
-		radio_channel = -1;
-		radio_setting = -1;
-		telemetry_rate = -1;
+		radio_enable = AltosLib.MISSING;
+		radio_calibration = AltosLib.MISSING;
+		radio_channel = AltosLib.MISSING;
+		radio_setting = AltosLib.MISSING;
+		telemetry_rate = AltosLib.MISSING;
 
-		accel_cal_plus = -1;
-		accel_cal_minus = -1;
-		pad_orientation = -1;
+		accel_cal_plus = AltosLib.MISSING;
+		accel_cal_minus = AltosLib.MISSING;
+		pad_orientation = AltosLib.MISSING;
 
-		flight_log_max = -1;
-		log_fixed = -1;
-		ignite_mode = -1;
+		flight_log_max = AltosLib.MISSING;
+		log_fixed = AltosLib.MISSING;
+		ignite_mode = AltosLib.MISSING;
 
-		aes_key = "";
+		aes_key = null;
 
 		pyro = 0;
 		npyro = 0;
 		pyros = null;
-		pyro_firing_time = -1;
+		pyro_firing_time = AltosLib.MISSING;
 
-		aprs_interval = -1;
-		aprs_ssid = -1;
-		aprs_format = -1;
+		aprs_interval = AltosLib.MISSING;
+		aprs_ssid = AltosLib.MISSING;
+		aprs_format = AltosLib.MISSING;
 
-		beep = -1;
+		beep = AltosLib.MISSING;
 
-		tracker_motion = -1;
-		tracker_interval = -1;
+		tracker_motion = AltosLib.MISSING;
+		tracker_interval = AltosLib.MISSING;
 
-		storage_size = -1;
-		storage_erase_unit = -1;
-		stored_flight = 0;
+		storage_size = AltosLib.MISSING;
+		storage_erase_unit = AltosLib.MISSING;
+		stored_flight = AltosLib.MISSING;
 
-		accel_zero_along = -1;
-		accel_zero_across = -1;
-		accel_zero_through = -1;
+		accel_zero_along = AltosLib.MISSING;
+		accel_zero_across = AltosLib.MISSING;
+		accel_zero_through = AltosLib.MISSING;
 	}
 
 	public void parse_line(String line) {
