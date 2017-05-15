@@ -315,19 +315,15 @@ ao_rn_set_name(void)
 {
 	char	sn[8];
 	char	*s = sn + 8;
-	char	c;
 	int	n;
 
 	ao_rn_dbg("set name...\n");
-	ao_rn_send_cmd(AO_RN_SET_NAME_CMD, "TeleBT-");
 	*--s = '\0';
-	*--s = '\r';
 	n = ao_serial_number;
 	do {
 		*--s = '0' + n % 10;
 	} while (n /= 10);
-	while ((c = *s++))
-		ao_rn_putchar(c);
+	ao_rn_send_cmd(AO_RN_SET_NAME_CMD "TeleBT-", s);
 	return ao_rn_wait_status();
 }
 
@@ -408,6 +404,8 @@ ao_rn(void)
 			continue;
 		}
 
+		ao_rn_puts("$$$");
+
 		/* After it reboots, it can take a moment before it responds
 		 * to commands
 		 */
@@ -422,7 +420,7 @@ ao_rn(void)
 			continue;
 		}
 
-		if (strncmp(name, "TeleBT", 6) == 0) {
+		if (strncmp(name, "TeleBT-", 7) == 0) {
 			ao_rn_dbg("name is set\n");
 			status = AO_RN_OK;
 			break;
