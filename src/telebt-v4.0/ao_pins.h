@@ -75,7 +75,6 @@
 #define HAS_APRS		0
 #define HAS_ACCEL		0
 #define HAS_AES			0
-#define HAS_POLLCHAR		1
 
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* CC1200 */
