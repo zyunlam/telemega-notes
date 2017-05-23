@@ -19,7 +19,7 @@
 package org.altusmetrum.altoslib_11;
 
 public class AltosTelemetryRaw extends AltosTelemetryStandard {
-	public AltosTelemetryRaw(int[] bytes) {
+	public AltosTelemetryRaw(int[] bytes) throws AltosCRCException {
 		super(bytes);
 	}
 

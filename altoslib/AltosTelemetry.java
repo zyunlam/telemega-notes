@@ -25,12 +25,15 @@ import java.text.*;
  */
 
 public abstract class AltosTelemetry implements AltosStateUpdate {
+	int[]	bytes;
 
 	/* All telemetry packets have these fields */
-	public int	tick;
-	public int	serial;
-	public int	rssi;
-	public int	status;
+	public int rssi() { return AltosConvert.telem_to_rssi(AltosLib.int8(bytes, bytes.length - 3)); }
+	public int status() { return AltosLib.uint8(bytes, bytes.length - 2); }
+
+	/* All telemetry packets report these fields in some form */
+	public abstract int serial();
+	public abstract int tick();
 
 	/* Mark when we received the packet */
 	long		received_time;
@@ -44,11 +47,11 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 	}
 
 	public void update_state(AltosState state) {
-		state.set_serial(serial);
+		state.set_serial(serial());
 		if (state.state() == AltosLib.ao_flight_invalid)
 			state.set_state(AltosLib.ao_flight_startup);
-		state.set_tick(tick);
-		state.set_rssi(rssi, status);
+		state.set_tick(tick());
+		state.set_rssi(rssi(), status());
 		state.set_received_time(received_time);
 	}
 
@@ -88,12 +91,6 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 		if (!cksum(bytes))
 			throw new ParseException(String.format("invalid line \"%s\"", hex), 0);
 
-		int	rssi = AltosLib.int8(bytes, bytes.length - 3) / 2 - 74;
-		int	status = AltosLib.uint8(bytes, bytes.length - 2);
-
-		if ((status & PKT_APPEND_STATUS_1_CRC_OK) == 0)
-			throw new AltosCRCException(rssi);
-
 		/* length, data ..., rssi, status, checksum -- 4 bytes extra */
 		switch (bytes.length) {
 		case AltosLib.ao_telemetry_standard_len + 4:
@@ -107,11 +104,6 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 			break;
 		default:
 			throw new ParseException(String.format("Invalid packet length %d", bytes.length), 0);
-		}
-		if (telem != null) {
-			telem.received_time = System.currentTimeMillis();
-			telem.rssi = rssi;
-			telem.status = status;
 		}
 		return telem;
 	}
@@ -139,6 +131,17 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 		return height;
 	}
 
+	public AltosTelemetry() {
+		this.received_time = System.currentTimeMillis();
+	}
+
+	public AltosTelemetry(int[] bytes) throws AltosCRCException {
+		this();
+		this.bytes = bytes;
+		if ((status() & PKT_APPEND_STATUS_1_CRC_OK) == 0)
+			throw new AltosCRCException(rssi());
+	}
+
 	public static AltosTelemetry parse(String line) throws ParseException, AltosCRCException {
 		String[] word = line.split("\\s+");
 		int i =0;
@@ -149,7 +152,7 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 			throw new AltosCRCException(AltosParse.parse_int(word[i++]));
 		}
 
-		AltosTelemetry telem;
+		AltosTelemetry telem = null;
 
 		if (word[i].equals("TELEM")) {
 			telem = parse_hex(word[i+1]);

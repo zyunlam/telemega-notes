@@ -20,62 +20,45 @@ package org.altusmetrum.altoslib_11;
 
 
 public class AltosTelemetrySensor extends AltosTelemetryStandard {
-	int	state;
-	int	accel;
-	int	pres;
-	int	temp;
-	int	v_batt;
-	int	sense_d;
-	int	sense_m;
+	int	state() { return uint8(5); }
+	int	accel() { return int16(6); }
+	int	pres() { return int16(8); }
+	int	temp() { return int16(10); }
+	int	v_batt() { return int16(12); }
+	int	sense_d() { return int16(14); }
+	int	sense_m() { return int16(16); }
 
-	int	acceleration;
-	int	speed;
-	int	height;
+	int	acceleration() { return int16(18); }
+	int	speed() { return int16(20); }
+	int	height_16() { return int16(22); }
 
-	int	ground_accel;
-	int	ground_pres;
-	int	accel_plus_g;
-	int	accel_minus_g;
+	int	ground_accel() { return int16(24); }
+	int	ground_pres() { return int16(26); }
+	int	accel_plus_g() { return int16(28); }
+	int	accel_minus_g() { return int16(30); }
 
-	public AltosTelemetrySensor(int[] bytes) {
+	public AltosTelemetrySensor(int[] bytes) throws AltosCRCException {
 		super(bytes);
-		state         = uint8(5);
-
-		accel         = int16(6);
-		pres          = int16(8);
-		temp          = int16(10);
-		v_batt        = int16(12);
-		sense_d       = int16(14);
-		sense_m       = int16(16);
-
-		acceleration  = int16(18);
-		speed         = int16(20);
-		height        = int16(22);
-
-		ground_pres   = int16(24);
-		ground_accel  = int16(26);
-		accel_plus_g  = int16(28);
-		accel_minus_g = int16(30);
 	}
 
 	public void update_state(AltosState state) {
 		super.update_state(state);
 
-		state.set_state(this.state);
-		if (type == packet_type_TM_sensor) {
-			state.set_ground_accel(ground_accel);
-			state.set_accel_g(accel_plus_g, accel_minus_g);
-			state.set_accel(accel);
+		state.set_state(state());
+		if (type() == packet_type_TM_sensor) {
+			state.set_ground_accel(ground_accel());
+			state.set_accel_g(accel_plus_g(), accel_minus_g());
+			state.set_accel(accel());
 		}
-		state.set_ground_pressure(AltosConvert.barometer_to_pressure(ground_pres));
-		state.set_pressure(AltosConvert.barometer_to_pressure(pres));
-		state.set_temperature(AltosConvert.thermometer_to_temperature(temp));
-		state.set_battery_voltage(AltosConvert.cc_battery_to_voltage(v_batt));
-		if (type == packet_type_TM_sensor || type == packet_type_Tm_sensor) {
-			state.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sense_d));
-			state.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sense_m));
+		state.set_ground_pressure(AltosConvert.barometer_to_pressure(ground_pres()));
+		state.set_pressure(AltosConvert.barometer_to_pressure(pres()));
+		state.set_temperature(AltosConvert.thermometer_to_temperature(temp()));
+		state.set_battery_voltage(AltosConvert.cc_battery_to_voltage(v_batt()));
+		if (type() == packet_type_TM_sensor || type() == packet_type_Tm_sensor) {
+			state.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sense_d()));
+			state.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sense_m()));
 		}
 
-		state.set_kalman(height, speed/16.0, acceleration / 16.0);
+		state.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);
 	}
 }

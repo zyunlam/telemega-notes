@@ -19,21 +19,16 @@
 package org.altusmetrum.altoslib_11;
 
 public class AltosTelemetryCompanion extends AltosTelemetryStandard {
-	AltosCompanion	companion;
 
-	static final public int max_channels = 12;
-
-	public AltosTelemetryCompanion(int[] bytes) {
-		super(bytes);
-
+	AltosCompanion	companion() {
 		int	channels = uint8(7);
 
 		if (channels > max_channels)
 			channels = max_channels;
 
-		companion = new AltosCompanion(channels);
+		AltosCompanion companion = new AltosCompanion(channels);
 
-		companion.tick = tick;
+		companion.tick = tick();
 		companion.board_id = uint8(5);
 		companion.update_period = uint8(6);
 
@@ -45,11 +40,17 @@ public class AltosTelemetryCompanion extends AltosTelemetryStandard {
 			for (int i = 0; i < channels; i++)
 				companion.companion_data[i] = uint16(8 + i * 2);
 		}
+		return companion;
+	}
+
+	static final public int max_channels = 12;
+
+	public AltosTelemetryCompanion(int[] bytes) throws AltosCRCException {
+		super(bytes);
 	}
 
 	public void update_state(AltosState state) {
 		super.update_state(state);
-
-		state.set_companion(companion);
+		state.set_companion(companion());
 	}
 }

@@ -19,13 +19,12 @@
 package org.altusmetrum.altoslib_11;
 
 public class AltosTelemetrySatellite extends AltosTelemetryStandard {
-	int		channels;
-	AltosGPSSat[]	sats;
+	int		channels() { return uint8(5); }
 
-	public AltosTelemetrySatellite(int[] bytes) {
-		super(bytes);
+	AltosGPSSat[]	sats() {
+		int 		channels = channels();
+		AltosGPSSat[]	sats = null;
 
-		channels = uint8(5);
 		if (channels > 12)
 			channels = 12;
 		if (channels == 0)
@@ -38,6 +37,11 @@ public class AltosTelemetrySatellite extends AltosTelemetryStandard {
 				sats[i] = new AltosGPSSat(svid, c_n_1);
 			}
 		}
+		return sats;
+	}
+
+	public AltosTelemetrySatellite(int[] bytes) throws AltosCRCException {
+		super(bytes);
 	}
 
 	public void update_state(AltosState state) {
@@ -45,7 +49,7 @@ public class AltosTelemetrySatellite extends AltosTelemetryStandard {
 
 		AltosGPS	gps = state.make_temp_gps(true);
 
-		gps.cc_gps_sat = sats;
+		gps.cc_gps_sat = sats();
 		state.set_temp_gps();
 	}
 }

@@ -20,43 +20,32 @@ package org.altusmetrum.altoslib_11;
 
 
 public class AltosTelemetryConfiguration extends AltosTelemetryStandard {
-	int	device_type;
-	int	flight;
-	int	config_major;
-	int	config_minor;
-	int	apogee_delay;
-	int	main_deploy;
-	int	v_batt;
-	int	flight_log_max;
-	String	callsign;
-	String	version;
+	int	device_type() { return uint8(5); }
+	int	flight() { return uint16(6); }
+	int	config_major() { return uint8(8); }
+	int	config_minor() { return uint8(9); }
+	int	apogee_delay() { return uint16(10); }
+	int	main_deploy() { return uint16(12); }
+	int	v_batt() { return uint16(10); }
+	int	flight_log_max() { return uint16(14); }
+	String	callsign() { return string(16, 8); }
+	String	version() { return string(24, 8); }
 
-	public AltosTelemetryConfiguration(int[] bytes) {
+	public AltosTelemetryConfiguration(int[] bytes) throws AltosCRCException {
 		super(bytes);
-
-		device_type    = uint8(5);
-		flight         = uint16(6);
-		config_major   = uint8(8);
-		config_minor   = uint8(9);
-		v_batt	       = uint16(10);
-		apogee_delay   = uint16(10);
-		main_deploy    = uint16(12);
-		flight_log_max = uint16(14);
-		callsign       = string(16, 8);
-		version        = string(24, 8);
 	}
 
 	public void update_state(AltosState state) {
 		super.update_state(state);
-		state.set_device_type(device_type);
-		state.set_flight(flight);
-		state.set_config(config_major, config_minor, flight_log_max);
-		if (device_type == AltosLib.product_telegps)
-			state.set_battery_voltage(AltosConvert.tele_gps_voltage(v_batt));
+		state.set_device_type(device_type());
+		state.set_flight(flight());
+		state.set_config(config_major(), config_minor(), flight_log_max());
+		if (device_type() == AltosLib.product_telegps)
+			state.set_battery_voltage(AltosConvert.tele_gps_voltage(v_batt()));
 		else
-			state.set_flight_params(apogee_delay, main_deploy);
+			state.set_flight_params(apogee_delay(), main_deploy());
 
-		state.set_callsign(callsign);
-		state.set_firmware_version(version);
+		state.set_callsign(callsign());
+		state.set_firmware_version(version());
 	}
 }

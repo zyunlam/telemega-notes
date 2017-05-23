@@ -19,9 +19,6 @@
 package org.altusmetrum.altoslib_11;
 
 public abstract class AltosTelemetryStandard extends AltosTelemetry {
-	int[]	bytes;
-	int	type;
-
 	public int int8(int off) {
 		return AltosLib.int8(bytes, off + 1);
 	}
@@ -50,10 +47,16 @@ public abstract class AltosTelemetryStandard extends AltosTelemetry {
 		return AltosLib.string(bytes, off + 1, l);
 	}
 
-	public static AltosTelemetry parse_hex(int[] bytes) {
-		int	type = AltosLib.uint8(bytes, 4 + 1);
+	public int type() { return uint8(4); }
 
+	public int serial() { return uint16(0); }
+
+	public int tick() { return uint16(2); }
+
+	public static AltosTelemetry parse_hex(int[] bytes) throws AltosCRCException {
 		AltosTelemetry	telem;
+
+		int type = AltosLib.uint8(bytes, 4+1);
 		switch (type) {
 		case packet_type_TM_sensor:
 		case packet_type_Tm_sensor:
@@ -97,12 +100,8 @@ public abstract class AltosTelemetryStandard extends AltosTelemetry {
 		return telem;
 	}
 
-	public AltosTelemetryStandard(int[] bytes) {
-		this.bytes = bytes;
-
-		serial = uint16(0);
-		tick   = uint16(2);
-		type   = uint8(4);
+	public AltosTelemetryStandard(int[] bytes) throws AltosCRCException {
+		super(bytes);
 	}
 
 	public void update_state(AltosState state) {

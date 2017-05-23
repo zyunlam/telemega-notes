@@ -233,6 +233,17 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 	final static String AO_TELEM_SAT_SVID	= "s_v";
 	final static String AO_TELEM_SAT_C_N_0	= "s_c";
 
+	public int	tick;
+	public int	serial;
+	public int	rssi;
+	public int	status;
+
+	public int tick() { return tick; }
+	public int serial() { return serial; }
+
+	public int rssi() { return rssi; }
+	public int status() { return status; }
+
 	public int	version;
 	public String 	callsign;
 	public int	flight;
@@ -271,7 +282,6 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 		flight = map.get_int(AO_TELEM_FLIGHT, AltosLib.MISSING);
 		rssi = map.get_int(AO_TELEM_RSSI, AltosLib.MISSING);
 		state = AltosLib.state(map.get_string(AO_TELEM_STATE, "invalid"));
-		tick = map.get_int(AO_TELEM_TICK, 0);
 
 		/* raw sensor values */
 		accel = map.get_int(AO_TELEM_RAW_ACCEL, AltosLib.MISSING);
@@ -420,7 +430,6 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 	 * Given a hex dump of a legacy telemetry line, construct an AltosRecordTM from that
 	 */
 
-	int[]	bytes;
 	int	adjust;
 
 	/*
@@ -452,8 +461,9 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 	static final int AO_GPS_DATE_VALID	= (1 << 6);
 	static final int AO_GPS_COURSE_VALID	= (1 << 7);
 
-	public AltosTelemetryLegacy(int[] in_bytes) {
-		bytes = in_bytes;
+	public AltosTelemetryLegacy(int[] in_bytes) throws AltosCRCException {
+		super(in_bytes);
+
 		version = 4;
 		adjust = 0;
 
@@ -463,6 +473,7 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 		} else
 			serial = uint16(0);
 
+		rssi = super.rssi();
 		callsign = string(62, 8);
 		flight = uint16(2);
 		state = uint8(4);

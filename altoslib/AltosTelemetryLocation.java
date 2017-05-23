@@ -20,76 +20,60 @@ package org.altusmetrum.altoslib_11;
 
 
 public class AltosTelemetryLocation extends AltosTelemetryStandard {
-	int	flags;
-	int	altitude;
-	int	latitude;
-	int	longitude;
-	int	year;
-	int	month;
-	int	day;
-	int	hour;
-	int	minute;
-	int	second;
-	int	pdop;
-	int	hdop;
-	int	vdop;
-	int	mode;
-	int	ground_speed;
-	int	climb_rate;
-	int	course;
+	int	flags() { return uint8(5); }
+	int	altitude() {
+		if ((mode() & AO_GPS_MODE_ALTITUDE_24) != 0)
+			return (int8(31) << 16) | uint16(6);
+		else
+			return int16(6);
+	}
+	int	latitude() { return uint32(8); }
+	int	longitude() { return uint32(12); }
+	int	year() { return uint8(16); }
+	int	month() { return uint8(17); }
+	int	day() { return uint8(18); }
+	int	hour() { return uint8(19); }
+	int	minute() { return uint8(20); }
+	int	second() { return uint8(21); }
+	int	pdop() { return uint8(22); }
+	int	hdop() { return uint8(23); }
+	int	vdop() { return uint8(24); }
+	int	mode() { return uint8(25); }
+	int	ground_speed() { return uint16(26); }
+	int	climb_rate() { return int16(28); }
+	int	course() { return uint8(30); }
 
 	public static final int	AO_GPS_MODE_ALTITUDE_24 = (1 << 0);	/* Reports 24-bits of altitude */
 
-	public AltosTelemetryLocation(int[] bytes) {
+	public AltosTelemetryLocation(int[] bytes) throws AltosCRCException {
 		super(bytes);
-
-		flags          = uint8(5);
-		latitude       = uint32(8);
-		longitude      = uint32(12);
-		year	       = uint8(16);
-		month	       = uint8(17);
-		day	       = uint8(18);
-		hour	       = uint8(19);
-		minute	       = uint8(20);
-		second	       = uint8(21);
-		pdop	       = uint8(22);
-		hdop	       = uint8(23);
-		vdop	       = uint8(24);
-		mode	       = uint8(25);
-		ground_speed   = uint16(26);
-		climb_rate     = int16(28);
-		course	       = uint8(30);
-
-		if ((mode & AO_GPS_MODE_ALTITUDE_24) != 0) {
-			altitude = (int8(31) << 16) | uint16(6);
-		} else
-			altitude = int16(6);
 	}
 
 	public void update_state(AltosState state) {
 		super.update_state(state);
 		AltosGPS	gps = state.make_temp_gps(false);
 
+		int flags = flags();
 		gps.nsat = flags & 0xf;
 		gps.locked = (flags & (1 << 4)) != 0;
 		gps.connected = (flags & (1 << 5)) != 0;
 
 		if (gps.locked) {
-			gps.lat = latitude * 1.0e-7;
-			gps.lon = longitude * 1.0e-7;
-			gps.alt = altitude;
-			gps.year = 2000 + year;
-			gps.month = month;
-			gps.day = day;
-			gps.hour = hour;
-			gps.minute = minute;
-			gps.second = second;
-			gps.ground_speed = ground_speed * 1.0e-2;
-			gps.course = course * 2;
-			gps.climb_rate = climb_rate * 1.0e-2;
-			gps.pdop = pdop / 10.0;
-			gps.hdop = hdop / 10.0;
-			gps.vdop = vdop / 10.0;
+			gps.lat = latitude() * 1.0e-7;
+			gps.lon = longitude() * 1.0e-7;
+			gps.alt = altitude();
+			gps.year = 2000 + year();
+			gps.month = month();
+			gps.day = day();
+			gps.hour = hour();
+			gps.minute = minute();
+			gps.second = second();
+			gps.ground_speed = ground_speed() * 1.0e-2;
+			gps.course = course() * 2;
+			gps.climb_rate = climb_rate() * 1.0e-2;
+			gps.pdop = pdop() / 10.0;
+			gps.hdop = hdop() / 10.0;
+			gps.vdop = vdop() / 10.0;
 		}
 		state.set_temp_gps();
 	}
