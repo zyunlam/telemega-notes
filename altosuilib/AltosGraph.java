@@ -163,8 +163,6 @@ public class AltosGraph extends AltosUIGraph {
 	static final private Color mag_z_color = new Color(0, 0, 128);
 	static final private Color orient_color = new Color(31, 31, 31);
 
-	static AltosVoltage voltage_units = new AltosVoltage();
-	static AltosPressure pressure_units = new AltosPressure();
 	static AltosNsat nsat_units = new AltosNsat();
 	static AltosDbm dbm_units = new AltosDbm();
 	static AltosRotationRate gyro_units = new AltosRotationRate();
@@ -181,10 +179,10 @@ public class AltosGraph extends AltosUIGraph {
 		super(enable);
 
 		height_axis = newAxis("Height", AltosConvert.height, height_color);
-		pressure_axis = newAxis("Pressure", pressure_units, pressure_color, 0);
+		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
 		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
-		voltage_axis = newAxis("Voltage", voltage_units, voltage_color);
+		voltage_axis = newAxis("Voltage", AltosConvert.voltage, voltage_color);
 		temperature_axis = newAxis("Temperature", AltosConvert.temperature, temperature_color, 0);
 		nsat_axis = newAxis("Satellites", nsat_units, gps_nsat_color,
 				    AltosUIAxis.axis_include_zero | AltosUIAxis.axis_integer);
@@ -208,7 +206,7 @@ public class AltosGraph extends AltosUIGraph {
 				  height_axis);
 			addSeries("Pressure",
 				  AltosGraphDataPoint.data_pressure,
-				  pressure_units,
+				  AltosConvert.pressure,
 				  pressure_color,
 				  false,
 				  pressure_axis);
@@ -321,7 +319,7 @@ public class AltosGraph extends AltosUIGraph {
 		if (stats.has_battery)
 			addSeries("Battery Voltage",
 				  AltosGraphDataPoint.data_battery_voltage,
-				  voltage_units,
+				  AltosConvert.voltage,
 				  battery_voltage_color,
 				  false,
 				  voltage_axis);
@@ -335,13 +333,13 @@ public class AltosGraph extends AltosUIGraph {
 				  temperature_axis);
 			addSeries("Drogue Voltage",
 				  AltosGraphDataPoint.data_drogue_voltage,
-				  voltage_units,
+				  AltosConvert.voltage,
 				  drogue_voltage_color,
 				  false,
 				  voltage_axis);
 			addSeries("Main Voltage",
 				  AltosGraphDataPoint.data_main_voltage,
-				  voltage_units,
+				  AltosConvert.voltage,
 				  main_voltage_color,
 				  false,
 				  voltage_axis);
@@ -416,7 +414,7 @@ public class AltosGraph extends AltosUIGraph {
 			for (int i = 0; i < stats.num_ignitor; i++)
 				addSeries(AltosLib.ignitor_name(i),
 					  AltosGraphDataPoint.data_ignitor_0 + i,
-					  voltage_units,
+					  AltosConvert.voltage,
 					  main_voltage_color,
 					  false,
 					  voltage_axis);

@@ -38,13 +38,16 @@ import org.jfree.data.*;
 public class AltosGraphNew extends AltosUIGraphNew {
 
 	static final private Color height_color = new Color(194,31,31);
+	static final private Color kalman_height_color = new Color(255,0,0);
 	static final private Color gps_height_color = new Color(150,31,31);
 	static final private Color pressure_color = new Color (225,31,31);
 	static final private Color range_color = new Color(100, 31, 31);
 	static final private Color distance_color = new Color(100, 31, 194);
 	static final private Color speed_color = new Color(31,194,31);
+	static final private Color kalman_speed_color = new Color(0,255,0);
 	static final private Color thrust_color = new Color(31,194,31);
 	static final private Color accel_color = new Color(31,31,194);
+	static final private Color kalman_accel_color = new Color(0,0,255);
 	static final private Color voltage_color = new Color(194, 194, 31);
 	static final private Color battery_voltage_color = new Color(194, 194, 31);
 	static final private Color drogue_voltage_color = new Color(150, 150, 31);
@@ -54,6 +57,7 @@ public class AltosGraphNew extends AltosUIGraphNew {
 	static final private Color gps_nsat_view_color = new Color (150, 31, 150);
 	static final private Color gps_course_color = new Color (100, 31, 112);
 	static final private Color gps_ground_speed_color = new Color (31, 112, 100);
+	static final private Color gps_speed_color = new Color (31, 112, 100);
 	static final private Color gps_climb_rate_color = new Color (31, 31, 112);
 	static final private Color gps_pdop_color = new Color(50, 194, 0);
 	static final private Color gps_hdop_color = new Color(50, 0, 194);
@@ -72,15 +76,19 @@ public class AltosGraphNew extends AltosUIGraphNew {
 	static final private Color mag_z_color = new Color(0, 0, 128);
 	static final private Color orient_color = new Color(31, 31, 31);
 
-	static AltosNsat nsat_units = new AltosNsat();
-	static AltosDbm dbm_units = new AltosDbm();
+//	static AltosNsat nsat_units = new AltosNsat();
+	static AltosUnits nsat_units = null;
+//	static AltosDbm dbm_units = new AltosDbm();
+	static AltosUnits dbm_units = null;
 	static AltosOrient orient_units = new AltosOrient();
-	static AltosMagUnits mag_units = new AltosMagUnits();
-	static AltosDopUnits dop_units = new AltosDopUnits();
+//	static AltosMagUnits mag_units = new AltosMagUnits();
+	static AltosUnits mag_units = null;
+//	static AltosDopUnits dop_units = new AltosDopUnits();
+	static AltosUnits dop_units = null;
 
 	AltosUIFlightSeries flight_series;
 
-	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosRecordSet record_set) {
+	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosUIFlightSeries flight_series, AltosCalData cal_data) {
 
 		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
 		AltosUIAxis	distance_axis, pressure_axis, thrust_axis;
@@ -105,33 +113,109 @@ public class AltosGraphNew extends AltosUIGraphNew {
 		course_axis = newAxis("Course", orient_units, gps_course_color, 0);
 		dop_axis = newAxis("Dilution of Precision", dop_units, gps_pdop_color, 0);
 
-		flight_series = new AltosUIFlightSeries();
+		flight_series.register_axis("default",
+					    speed_color,
+					    false,
+					    speed_axis);
 
-		flight_series.register_extra("default",
-					     speed_color,
-					     false,
-					     speed_axis);
+		flight_series.register_marker(AltosUIFlightSeries.state_name,
+					      state_color,
+					      true,
+					      plot);
 
-		flight_series.register_extra(AltosUIFlightSeries.accel_name,
-					     accel_color,
-					     true,
-					     accel_axis);
+		flight_series.register_axis(AltosUIFlightSeries.accel_name,
+					    accel_color,
+					    true,
+					    accel_axis);
 
-		flight_series.register_extra(AltosUIFlightSeries.pressure_name,
-					     pressure_color,
-					     true,
-					     pressure_axis);
+		flight_series.register_axis(AltosUIFlightSeries.kalman_accel_name,
+					    kalman_accel_color,
+					    false,
+					    accel_axis);
 
-		flight_series.register_extra(AltosUIFlightSeries.thrust_name,
-					     thrust_color,
-					     true,
-					     thrust_axis);
+		flight_series.register_axis(AltosUIFlightSeries.rssi_name,
+					    dbm_color,
+					    false,
+					    dbm_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.speed_name,
+					    speed_color,
+					    true,
+					    speed_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.kalman_speed_name,
+					    kalman_speed_color,
+					    true,
+					    speed_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.pressure_name,
+					    pressure_color,
+					    false,
+					    pressure_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.height_name,
+					    height_color,
+					    true,
+					    height_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.kalman_height_name,
+					    kalman_height_color,
+					    false,
+					    height_axis);
+
+
+		flight_series.register_axis(AltosUIFlightSeries.sats_in_view_name,
+					    gps_nsat_view_color,
+					    false,
+					    nsat_axis);
+
+
+		flight_series.register_axis(AltosUIFlightSeries.sats_in_soln_name,
+					    gps_nsat_solution_color,
+					    false,
+					    nsat_axis);
+
+
+		flight_series.register_axis(AltosUIFlightSeries.gps_altitude_name,
+					    gps_height_color,
+					    false,
+					    height_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.gps_height_name,
+					    gps_height_color,
+					    false,
+					    height_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.gps_ground_speed_name,
+					    gps_ground_speed_color,
+					    false,
+					    speed_axis);
+
+
+		flight_series.register_axis(AltosUIFlightSeries.gps_ascent_rate_name,
+					    gps_climb_rate_color,
+					    false,
+					    speed_axis);
+
+
+		flight_series.register_axis(AltosUIFlightSeries.gps_course_name,
+					    gps_course_color,
+					    false,
+					    course_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.gps_speed_name,
+					    gps_speed_color,
+					    false,
+					    speed_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.thrust_name,
+					    thrust_color,
+					    true,
+					    thrust_axis);
 
 //		addMarker("State", AltosGraphDataPoint.data_state, state_color);
 
-		record_set.capture_series(flight_series);
-
-		return flight_series.series();
+		return flight_series.series(cal_data);
 /*
 		if (stats.has_flight_data) {
 			addSeries("Height",
@@ -366,9 +450,9 @@ public class AltosGraphNew extends AltosUIGraphNew {
 */
 	}
 
-	public AltosGraphNew(AltosUIEnable enable, AltosFlightStats stats, AltosRecordSet record_set) {
+	public AltosGraphNew(AltosUIEnable enable, AltosFlightStats stats, AltosUIFlightSeries flight_series, AltosCalData cal_data) {
 		super(enable, "Flight");
 
-		set_series(setup(stats, record_set));
+		set_series(setup(stats, flight_series, cal_data));
 	}
 }

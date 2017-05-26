@@ -413,6 +413,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		map.show(state, listener_state);
 	}
 
+	public void show(AltosGPS gps, int state) {
+		map.show(gps, state);
+	}
+
 	public String getName() {
 		return "Map";
 	}
@@ -420,6 +424,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	/* AltosGraphUI interface */
 	public void centre(AltosState state) {
 		map.centre(state);
+	}
+
+	public void centre(AltosGPS gps) {
+		map.centre(gps);
 	}
 
 	/* internal layout bits */

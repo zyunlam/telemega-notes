@@ -213,10 +213,10 @@ public class AltosScanUI
 						if (state == null)
 							continue;
 						packet_count++;
-						if (state.flight != AltosLib.MISSING) {
-							final AltosScanResult	result = new AltosScanResult(state.callsign,
-													     state.serial,
-													     state.flight,
+						if (reader.cal_data.flight != AltosLib.MISSING) {
+							final AltosScanResult	result = new AltosScanResult(reader.cal_data.callsign,
+													     reader.cal_data.serial,
+													     reader.cal_data.flight,
 													     frequencies[frequency_index],
 													     telemetry,
 													     rate);

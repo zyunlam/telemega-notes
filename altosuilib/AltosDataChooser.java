@@ -36,7 +36,7 @@ public class AltosDataChooser extends JFileChooser {
 		return file;
 	}
 
-	public AltosStateIterable runDialog() {
+	public AltosRecordSet runDialog() {
 		int	ret;
 
 		ret = showOpenDialog(frame);

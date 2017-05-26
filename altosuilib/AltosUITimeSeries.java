@@ -46,8 +46,12 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 	Color		color;
 	boolean		enable;
 	AltosUIAxis	axis;
+	boolean		marker;
 	XYItemRenderer	renderer;
+	XYPlot		plot;
 	AltosXYSeries	xy_series;
+	ArrayList<ValueMarker>	markers;
+
 
 	/* AltosUIGrapher interface */
 	public boolean need_reset() {
@@ -67,13 +71,32 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 	}
 
 	void set_data() {
-		xy_series.clear();
+		if (marker) {
+			if (markers != null) {
+				for (ValueMarker marker : markers)
+					plot.removeDomainMarker(marker);
+			}
+			markers = new ArrayList<ValueMarker>();
+			for (AltosTimeValue v : this) {
+				String s = units.string_value(v.value);
+				ValueMarker marker = new ValueMarker(v.time);
+				marker.setLabel(s);
+				marker.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
+				marker.setLabelTextAnchor(TextAnchor.TOP_LEFT);
+				marker.setPaint(color);
+				if (enable)
+					plot.addDomainMarker(marker);
+				markers.add(marker);
+			}
+		} else {
+			xy_series.clear();
 
-		for (AltosTimeValue v : this) {
-			double y = v.y;
-			if (units != null)
-				y = units.graph_value(y);
-			xy_series.add(v.x, y);
+			for (AltosTimeValue v : this) {
+				double value = v.value;
+				if (units != null)
+					value = units.graph_value(value);
+				xy_series.add(v.time, value);
+			}
 		}
 	}
 
@@ -101,19 +124,25 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 	public void set_enable(boolean enable) {
 		if (this.enable != enable) {
 			this.enable = enable;
-			renderer.setSeriesVisible(0, enable);
-			axis.set_enable(enable);
+			if (marker) {
+				for (ValueMarker marker : markers) {
+					if (enable)
+						plot.addDomainMarker(marker);
+					else
+						plot.removeDomainMarker(marker);
+				}
+			} else {
+				renderer.setSeriesVisible(0, enable);
+				axis.set_enable(enable);
+			}
 		}
 	}
 
-	public AltosUITimeSeries(String label, AltosUnits units,
-				 Color color, boolean enable,
-				 AltosUIAxis axis) {
-		super(label, units);
-		System.out.printf("time series %s units %s\n", label, units);
+	public void set_axis(Color color, boolean enable, AltosUIAxis axis) {
 		this.color = color;
 		this.enable = enable;
 		this.axis = axis;
+		this.marker = false;
 
 		axis.ref(this.enable);
 
@@ -122,5 +151,23 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 		renderer.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		renderer.setSeriesVisible(0, enable);
 		xy_series = new AltosXYSeries(label);
+	}
+
+	public void set_marker(Color color, boolean enable, XYPlot plot) {
+		this.color = color;
+		this.enable = enable;
+		this.marker = true;
+		this.plot = plot;
+	}
+
+	public AltosUITimeSeries(String label, AltosUnits units) {
+		super(label, units);
+	}
+
+	public AltosUITimeSeries(String label, AltosUnits units,
+				 Color color, boolean enable,
+				 AltosUIAxis axis) {
+		this(label, units);
+		set_axis(color, enable, axis);
 	}
 }

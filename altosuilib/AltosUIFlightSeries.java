@@ -19,50 +19,101 @@ import java.awt.*;
 import javax.swing.*;
 import org.altusmetrum.altoslib_11.*;
 
-class AltosUITimeSeriesExtra {
+import org.jfree.ui.*;
+import org.jfree.chart.*;
+import org.jfree.chart.plot.*;
+import org.jfree.chart.axis.*;
+import org.jfree.chart.renderer.*;
+import org.jfree.chart.renderer.xy.*;
+import org.jfree.chart.labels.*;
+import org.jfree.data.xy.*;
+import org.jfree.data.*;
+
+class AltosUITimeSeriesAxis {
 	Color		color;
 	boolean		enabled;
+	boolean		marker;
 	AltosUIAxis	axis;
+	XYPlot		plot;
 
-	public AltosUITimeSeriesExtra(Color color, boolean enabled, AltosUIAxis axis) {
+	public AltosUITimeSeriesAxis(Color color, boolean enabled, AltosUIAxis axis, XYPlot plot, boolean marker) {
 		this.color = color;
 		this.enabled = enabled;
 		this.axis = axis;
+		this.plot = plot;
+		this.marker = marker;
 	}
 }
 
 public class AltosUIFlightSeries extends AltosFlightSeries {
 
-	Hashtable<String,AltosUITimeSeriesExtra> extra;
+	Hashtable<String,AltosUITimeSeriesAxis> axes;
 
-	public void register_extra(String label,
-				   Color color,
-				   boolean enabled,
-				   AltosUIAxis axis) {
+	AltosUIFlightSeries flight_series;
 
-		AltosUITimeSeriesExtra e = new AltosUITimeSeriesExtra(color,
+	void fill_axes(String label, AltosUITimeSeriesAxis axis) {
+		for (AltosTimeSeries ts : series) {
+			AltosUITimeSeries uts = (AltosUITimeSeries) ts;
+
+			if (label.equals(ts.label) || (label.equals("default") && uts.color == null)) {
+				if (axis.marker)
+					uts.set_marker(axis.color, axis.enabled, axis.plot);
+				else
+					uts.set_axis(axis.color, axis.enabled, axis.axis);
+			}
+		}
+	}
+
+	public void register_axis(String label,
+				  Color color,
+				  boolean enabled,
+				  AltosUIAxis axis) {
+		AltosUITimeSeriesAxis tsa = new AltosUITimeSeriesAxis(color,
 								      enabled,
-								      axis);
-		System.out.printf("register extra label %s extra %s\n", label, e);
-		extra.put(label, e);
+								      axis,
+								      null,
+								      false);
+		axes.put(label, tsa);
+		fill_axes(label, tsa);
+	}
+
+	public void register_marker(String label,
+				    Color color,
+				    boolean enabled,
+				    XYPlot plot) {
+		AltosUITimeSeriesAxis tsa = new AltosUITimeSeriesAxis(color,
+								      enabled,
+								      null,
+								      plot,
+								      true);
+		axes.put(label, tsa);
+		fill_axes(label, tsa);
 	}
 
 	public AltosTimeSeries make_series(String label, AltosUnits units) {
 
-		AltosUITimeSeriesExtra e = extra.get(label);
 
-		if (e == null)
-			e = extra.get("default");
-		return new AltosUITimeSeries(label, units,
-					     e.color, e.enabled, e.axis);
+		AltosUITimeSeries time_series = new AltosUITimeSeries(label, units);
+
+		AltosUITimeSeriesAxis tsa = axes.get(label);
+		if (tsa == null)
+			tsa = axes.get("default");
+		if (tsa != null) {
+			if (tsa.marker)
+				time_series.set_marker(tsa.color, tsa.enabled, tsa.plot);
+			else
+				time_series.set_axis(tsa.color, tsa.enabled, tsa.axis);
+		}
+		return time_series;
 	}
 
-	public AltosUITimeSeries[] series() {
+	public AltosUITimeSeries[] series(AltosCalData cal_data) {
+		fill_in();
 		return series.toArray(new AltosUITimeSeries[0]);
 	}
 
-	public AltosUIFlightSeries () {
-		super();
-		extra = new Hashtable<String,AltosUITimeSeriesExtra>();
+	public AltosUIFlightSeries (AltosCalData cal_data) {
+		super(cal_data);
+		axes = new Hashtable<String,AltosUITimeSeriesAxis>();
 	}
 }

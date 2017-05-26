@@ -128,6 +128,8 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 
 	public void show(AltosState state, AltosListenerState listener_state) {
 
+		AltosCalData	cal_data = state.cal_data;
+
 		if (!isShowing()) {
 			last_state = state;
 			last_listener_state = listener_state;
@@ -136,14 +138,14 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 
 		reset();
 		if (state != null) {
-			if (state.device_type != AltosLib.MISSING)
-				info_add_row(0, "Device", "%s", AltosLib.product_name(state.device_type));
-			else if (state.product != null)
-				info_add_row(0, "Device", "%s", state.product);
+			if (cal_data.device_type != AltosLib.MISSING)
+				info_add_row(0, "Device", "%s", AltosLib.product_name(cal_data.device_type));
+			else if (cal_data.product != null)
+				info_add_row(0, "Device", "%s", cal_data.product);
 			if (state.altitude() != AltosLib.MISSING)
 				info_add_row(0, "Altitude", "%6.0f    m", state.altitude());
-			if (state.ground_altitude() != AltosLib.MISSING)
-				info_add_row(0, "Pad altitude", "%6.0f    m", state.ground_altitude());
+			if (cal_data.ground_altitude != AltosLib.MISSING)
+				info_add_row(0, "Pad altitude", "%6.0f    m", cal_data.ground_altitude);
 			if (state.height() != AltosLib.MISSING)
 				info_add_row(0, "Height", "%6.0f    m", state.height());
 			if (state.max_height() != AltosLib.MISSING)

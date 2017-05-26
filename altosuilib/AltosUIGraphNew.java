@@ -68,7 +68,6 @@ public class AltosUIGraphNew implements AltosUnitsListener {
 
 	void addAxis(AltosUIAxis axis) {
 		if (!axes_added.containsKey(axis.index)) {
-			System.out.printf("Add axis %s %d\n", axis.label, axis_index);
 			axes_added.put(axis.index, true);
 			plot.setRangeAxis(axis.index, axis);
 		}
@@ -88,12 +87,8 @@ public class AltosUIGraphNew implements AltosUnitsListener {
 		series_index++;
 	}
 
-/*
-	public void addMarker(String label, int fetch, Color color) {
-		AltosUIMarker		marker = new AltosUIMarker(fetch, color, plot);
-		this.graphers.add(marker);
+	public void addMarker(AltosUITimeSeries series) {
 	}
-*/
 
 	public void units_changed(boolean imperial_units) {
 		for (AltosUITimeSeries s : series)

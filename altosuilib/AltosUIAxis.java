@@ -49,14 +49,18 @@ public class AltosUIAxis extends NumberAxis {
 	public final static int axis_default = axis_include_zero;
 
 	public void set_units() {
-		String u = units.parse_units();
-		if (u != null)
-			setLabel(String.format("%s (%s)", label, u));
-		else
-			setLabel(label);
+		if (units != null) {
+			String u = units.parse_units();
+			if (u != null) {
+				setLabel(String.format("%s (%s)", label, u));
+				return;
+			}
+		}
+		setLabel(label);
 	}
 
 	public void set_enable(boolean enable) {
+		System.out.printf("axis %s set enable visible %d ref %d\n", label, visible, ref);
 		if (enable) {
 			visible++;
 			if (visible > ref)

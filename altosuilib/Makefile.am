@@ -53,9 +53,6 @@ altosuilib_JAVA = \
 	AltosInfoTable.java \
 	AltosFlightInfoTableModel.java \
 	AltosFlightStatsTable.java \
-	AltosGraph.java \
-	AltosGraphDataPoint.java \
-	AltosGraphDataSet.java \
 	AltosBTDevice.java \
 	AltosBTDeviceIterator.java \
 	AltosBTManage.java \

@@ -116,10 +116,12 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 				       String.format("%5.0f m", stats.max_gps_height),
 				       String.format("%5.0f ft", AltosConvert.meters_to_feet(stats.max_gps_height)));
 		}
-		new FlightStat(layout, y++, "Maximum speed",
-			       String.format("%5.0f m/s", stats.max_speed),
-			       String.format("%5.0f fps", AltosConvert.mps_to_fps(stats.max_speed)),
-			       String.format("Mach %4.1f", AltosConvert.meters_to_mach(stats.max_speed)));
+		if (stats.max_speed != AltosLib.MISSING) {
+			new FlightStat(layout, y++, "Maximum speed",
+				       String.format("%5.0f m/s", stats.max_speed),
+				       String.format("%5.0f fps", AltosConvert.mps_to_fps(stats.max_speed)),
+				       String.format("Mach %4.1f", AltosConvert.meters_to_mach(stats.max_speed)));
+		}
 		if (stats.max_acceleration != AltosLib.MISSING)
 			new FlightStat(layout, y++, "Maximum boost acceleration",
 				       String.format("%5.0f m/s²", stats.max_acceleration),
