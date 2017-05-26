@@ -41,24 +41,26 @@ public class AltosTelemetrySensor extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
-		state.set_state(state());
+		listener.set_state(state());
+		cal_data.set_state(state());
+
 		if (type() == packet_type_TM_sensor) {
-			state.set_ground_accel(ground_accel());
-			state.set_accel_g(accel_plus_g(), accel_minus_g());
-			state.set_accel(accel());
+			cal_data.set_ground_accel(ground_accel());
+			cal_data.set_accel_plus_minus(accel_plus_g(), accel_minus_g());
+			listener.set_acceleration(cal_data.acceleration(accel()));
 		}
-		state.set_ground_pressure(AltosConvert.barometer_to_pressure(ground_pres()));
-		state.set_pressure(AltosConvert.barometer_to_pressure(pres()));
-		state.set_temperature(AltosConvert.thermometer_to_temperature(temp()));
-		state.set_battery_voltage(AltosConvert.cc_battery_to_voltage(v_batt()));
+		cal_data.set_ground_pressure(AltosConvert.barometer_to_pressure(ground_pres()));
+		listener.set_pressure(AltosConvert.barometer_to_pressure(pres()));
+		listener.set_temperature(AltosConvert.thermometer_to_temperature(temp()));
+		listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(v_batt()));
 		if (type() == packet_type_TM_sensor || type() == packet_type_Tm_sensor) {
-			state.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sense_d()));
-			state.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sense_m()));
+			listener.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sense_d()));
+			listener.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sense_m()));
 		}
 
-		state.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);
+		listener.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);
 	}
 }

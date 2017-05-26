@@ -70,10 +70,6 @@ public class AltosEepromNew {
 		return config_data;
 	}
 
-	public void reset_config_data() {
-		config_data = null;
-	}
-
 	private void write_config(Writer w) throws IOException {
 		config.write(w, 0, true);
 		w.append('\n');

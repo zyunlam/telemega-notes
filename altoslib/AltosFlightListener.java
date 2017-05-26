@@ -16,13 +16,22 @@ package org.altusmetrum.altoslib_11;
 
 public abstract class AltosFlightListener {
 
-	int flight;
+	public int	flight;
+	public int	serial;
+	public int	tick;
+	public int	boost_tick;
+	public int	state;
 
-	public int tick;
-	int boost_tick;
+	public double	accel_plus_g;
+	public double	accel_minus_g;
+	public double	accel;
 
-	AltosGPS temp_gps;
-	int temp_gps_sat_tick;
+	public double	ground_pressure;
+	public double	ground_altitude;
+
+	AltosGPS	temp_gps;
+	int		temp_gps_sat_tick;
+	int		gps_sequence;
 
 	/* AltosEepromRecord */
 	public void set_boost_tick(int boost_tick) {
@@ -38,7 +47,10 @@ public abstract class AltosFlightListener {
 	public double time() {
 		if (tick == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return tick / 100.0;
+		if (boost_tick != AltosLib.MISSING)
+			return (tick - boost_tick) / 100.0;
+		else
+			return tick / 100.0;
 	}
 
 	public double boost_time() {
@@ -47,9 +59,23 @@ public abstract class AltosFlightListener {
 		return boost_tick / 100.0;
 	}
 
+	public abstract void set_rssi(int rssi, int status);
+	public abstract void set_received_time(long received_time);
+
 	/* AltosEepromRecordFull */
 
-	public abstract void set_state(int state);
+	public void set_serial(int serial) {
+		if (serial != AltosLib.MISSING)
+			this.serial = serial;
+	}
+
+	public void set_state(int state) {
+		if (state != AltosLib.MISSING)
+			this.state = state;
+	}
+
+	public int state() { return state; }
+
 	public abstract void set_ground_accel(double ground_accel);
 	public void set_flight(int flight) {
 		if (flight != AltosLib.MISSING)
@@ -60,6 +86,7 @@ public abstract class AltosFlightListener {
 	}
 
 	public abstract void set_accel(double accel);
+	public abstract void set_acceleration(double accel);
 	public abstract void set_accel_g(double accel_plus_g, double accel_minus_g);
 	public abstract void set_pressure(double pa);
 	public abstract void set_thrust(double N);
@@ -90,10 +117,15 @@ public abstract class AltosFlightListener {
 		return temp_gps;
 	}
 
-	public abstract void set_ground_pressure(double ground_pressure);
+	public void set_ground_pressure(double ground_pressure) {
+		if (ground_pressure != AltosLib.MISSING) {
+			this.ground_pressure = ground_pressure;
+			this.ground_altitude = AltosConvert.pressure_to_altitude(ground_pressure);
+		}
+	}
+
 	public abstract void set_accel_ground(double along, double across, double through);
 	public abstract void set_gyro_zero(double roll, double pitch, double yaw);
-	public abstract void set_ms5607(int pres_val, int temp_val);
 	public abstract void check_imu_wrap(AltosIMU imu);
 	public abstract void set_imu(AltosIMU imu);
 	public abstract void set_mag(AltosMag mag);
@@ -103,16 +135,28 @@ public abstract class AltosFlightListener {
 
 	public void copy(AltosFlightListener old) {
 		flight = old.flight;
+		serial = old.serial;
 		tick = old.tick;
 		boost_tick = old.boost_tick;
+		accel_plus_g = old.accel_plus_g;
+		accel_minus_g = old.accel_minus_g;
+		ground_pressure = old.ground_pressure;
+		ground_altitude = old.ground_altitude;
 		temp_gps = old.temp_gps;
 		temp_gps_sat_tick = old.temp_gps_sat_tick;
 	}
 
 	public void init() {
 		flight = AltosLib.MISSING;
+		serial = AltosLib.MISSING;
 		tick = AltosLib.MISSING;
 		boost_tick = AltosLib.MISSING;
+		accel_plus_g = AltosLib.MISSING;
+		accel_minus_g = AltosLib.MISSING;
+		accel = AltosLib.MISSING;
+		ground_pressure = AltosLib.MISSING;
+		ground_altitude = AltosLib.MISSING;
+		temp_gps = null;
 		temp_gps_sat_tick = AltosLib.MISSING;
 	}
 }

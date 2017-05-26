@@ -548,23 +548,25 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 		}
 	}
 
-	public void update_state(AltosState state) {
-		state.set_tick(tick);
-		state.set_state(this.state);
-		state.set_flight(flight);
-		state.set_serial(serial);
-		state.set_rssi(rssi, status);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		cal_data.set_tick(tick);
+		listener.set_time(cal_data.time());
+		listener.set_state(this.state);
+		cal_data.set_state(this.state);
+		cal_data.set_flight(flight);
+		cal_data.set_serial(serial);
+		listener.set_rssi(rssi, status);
 
-		state.set_pressure(AltosConvert.barometer_to_pressure(pres));
-		state.set_accel_g(accel_plus_g, accel_minus_g);
-		state.set_accel(accel);
+		listener.set_pressure(AltosConvert.barometer_to_pressure(pres));
+		cal_data.set_accel_plus_minus(accel_plus_g, accel_minus_g);
+		listener.set_acceleration(cal_data.acceleration(accel));
 		if (kalman_height != AltosLib.MISSING)
-			state.set_kalman(kalman_height, kalman_speed, kalman_acceleration);
-		state.set_temperature(AltosConvert.thermometer_to_temperature(temp));
-		state.set_battery_voltage(AltosConvert.cc_battery_to_voltage(batt));
-		state.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(apogee));
-		state.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(main));
+			listener.set_kalman(kalman_height, kalman_speed, kalman_acceleration);
+		listener.set_temperature(AltosConvert.thermometer_to_temperature(temp));
+		listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(batt));
+		listener.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(apogee));
+		listener.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(main));
 		if (gps != null)
-			state.set_gps(gps, gps_sequence);
+			listener.set_gps(gps);
 	}
 }

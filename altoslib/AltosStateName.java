@@ -14,9 +14,19 @@
 
 package org.altusmetrum.altoslib_11;
 
-import java.util.*;
+public class AltosStateName extends AltosUnits {
 
-public interface AltosRecordSet {
-	public AltosCalData cal_data();
-	public void capture_series(AltosDataListener listener);
+	public double value(double v, boolean imperial_units) { return v; }
+
+	public double inverse(double v, boolean imperial_units) { return v; }
+
+	public String string_value(double v, boolean imperial_units) {
+		return AltosLib.state_name((int) v);
+	}
+
+	public String show_units(boolean imperial_units) { return "state"; }
+
+	public String say_units(boolean imperial_units) { return "state"; }
+
+	public int show_fraction(int width, boolean imperial_units) { return 0; }
 }

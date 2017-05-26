@@ -383,17 +383,13 @@ public class AltosGPS implements Cloneable {
 		}
 	}
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
 		try {
-			AltosGPS	gps = new AltosGPS(link, config_data);
-
-			if (gps != null) {
-				state.set_gps(gps, state.gps_sequence++);
-				return;
-			}
+			AltosGPS gps = new AltosGPS(link, link.config_data());
+			if (gps != null)
+				listener.set_gps(gps);
 		} catch (TimeoutException te) {
 		}
-		state.set_gps(null, 0);
 	}
 
 	public AltosGPS (AltosLink link, AltosConfigData config_data) throws TimeoutException, InterruptedException {

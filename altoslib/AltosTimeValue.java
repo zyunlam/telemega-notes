@@ -18,10 +18,11 @@
 package org.altusmetrum.altoslib_11;
 
 public class AltosTimeValue {
-	public double	x, y;
+	public double	time;
+	public double	value;
 
-	public AltosTimeValue(double x, double y) {
-		this.x = x;
-		this.y = y;
+	public AltosTimeValue(double time, double value) {
+		this.time = time;
+		this.value = value;
 	}
 }

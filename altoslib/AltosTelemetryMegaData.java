@@ -39,34 +39,34 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
-		state.set_state(state());
+		listener.set_state(state());
+		cal_data.set_state(state());
 
-		state.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt()));
-		state.set_pyro_voltage(AltosConvert.mega_pyro_voltage(v_pyro()));
+		listener.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt()));
+		listener.set_pyro_voltage(AltosConvert.mega_pyro_voltage(v_pyro()));
 
-		state.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sense(4)));
-		state.set_main_voltage(AltosConvert.mega_pyro_voltage(sense(5)));
+		listener.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sense(4)));
+		listener.set_main_voltage(AltosConvert.mega_pyro_voltage(sense(5)));
 
 		double voltages[] = new double[4];
 		for (int i = 0; i < 4; i++)
 			voltages[i] = AltosConvert.mega_pyro_voltage(sense(i));
 
-		state.set_ignitor_voltage(voltages);
+		listener.set_ignitor_voltage(voltages);
 
-		state.set_ground_accel(ground_accel());
-		state.set_ground_pressure(ground_pres());
-		state.set_accel_g(accel_plus_g(), accel_minus_g());
+		cal_data.set_ground_accel(ground_accel());
+		cal_data.set_ground_pressure(ground_pres());
+		cal_data.set_accel_plus_minus(accel_plus_g(), accel_minus_g());
 
 		/* Fill in the high bits of height from recent GPS
 		 * data if available, otherwise guess using the
 		 * previous kalman height
 		 */
 
-		state.set_kalman(extend_height(state, height_16()),
-				 speed()/16.0, acceleration() / 16.0);
+		listener.set_kalman(height_16(), speed()/16.0, acceleration() / 16.0);
 	}
 }
 

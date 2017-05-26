@@ -17,68 +17,47 @@ package org.altusmetrum.altoslib_11;
 import java.io.*;
 import java.util.*;
 
-public class AltosEepromRecordSet implements AltosRecordSet {
-	AltosEepromNew			eeprom;
-	TreeSet<AltosEepromRecord>	ordered;
-	AltosCalData			cal_data;
+public class AltosTelemetryRecordSet implements AltosRecordSet {
+	AltosTelemetry			telemetry;
+	TreeSet<AltosTelemetryRecord>	ordered;
 
-	public AltosConfigData config_data() {
-		return eeprom.config_data();
-	}
-
-	public AltosCalData cal_data() {
-		if (cal_data == null) {
-			cal_data = new AltosCalData(config_data());
-			for (AltosEepromRecord record : ordered) {
-				if (record.cmd() == AltosLib.AO_LOG_FLIGHT) {
-					cal_data.set_tick(record.tick());
-					cal_data.set_boost_tick();
-				}
-			}
-		}
-		return cal_data;
-	}
-
-	public void capture_series(AltosDataListener listener) {
-		AltosCalData	cal_data = cal_data();
-		for (AltosEepromRecord record : ordered) {
-			record.provide_data(listener, cal_data);
+	public void capture_series(AltosDataListener series) {
+		for (AltosTelemetryRecord record : ordered) {
+			record.update_state(series);
 		}
 	}
 
-	public AltosEepromRecordSet(AltosEepromNew eeprom) {
-		this.eeprom = eeprom;
+	public AltosTelemetryRecordSet(AltosTelemetry telemetry) {
+		this.telemetry = telemetry;
 
-		AltosConfigData 	config_data = eeprom.config_data();
-
-		AltosEepromRecord	record = null;
+		AltosTelemetryRecord	record = null;
 
 		switch (config_data.log_format) {
 		case AltosLib.AO_LOG_FORMAT_FULL:
-			record = new AltosEepromRecordFull(eeprom);
+			record = new AltosTelemetryRecordFull(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TINY:
-			record = new AltosEepromRecordTiny(eeprom);
+			record = new AltosTelemetryRecordTiny(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
 		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
-			record = new AltosEepromRecordMega(eeprom);
+			record = new AltosTelemetryRecordMega(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
-			record = new AltosEepromRecordMetrum(eeprom);
+			record = new AltosTelemetryRecordMetrum(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMINI2:
 		case AltosLib.AO_LOG_FORMAT_TELEMINI3:
 		case AltosLib.AO_LOG_FORMAT_EASYMINI:
-			record = new AltosEepromRecordMini(eeprom);
+			record = new AltosTelemetryRecordMini(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEGPS:
-			record = new AltosEepromRecordGps(eeprom);
+			record = new AltosTelemetryRecordGps(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEFIRETWO:
-			record = new AltosEepromRecordFireTwo(eeprom);
+			record = new AltosTelemetryRecordFireTwo(eeprom);
 			break;
 		}
 
@@ -86,9 +65,12 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 			System.out.printf("failed to parse log format %d\n", config_data.log_format);
 			return;
 		}
-		ordered = new TreeSet<AltosEepromRecord>();
+		ordered = new TreeSet<AltosTelemetryRecord>();
 		int	tick = 0;
 		boolean first = true;
+
+		start_state = new AltosState();
+		start_state.set_config_data(record.eeprom.config_data());
 
 		for (;;) {
 			int	t = record.tick();
@@ -109,7 +91,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		}
 	}
 
-	public AltosEepromRecordSet(Reader input) throws IOException {
-		this(new AltosEepromNew(input));
+	public AltosTelemetryRecordSet(Reader input) throws IOException {
+		this(new AltosTelemetryNew(input));
 	}
 }

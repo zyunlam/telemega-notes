@@ -41,22 +41,41 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
-		state.set_accel(accel());
-		state.set_pressure(pres());
-		state.set_temperature(temp() / 100.0);
+		listener.set_acceleration(cal_data.acceleration(accel()));
+		listener.set_pressure(pres());
+		listener.set_temperature(temp() / 100.0);
 
-		state.set_orient(orient());
+		listener.set_orient(orient());
 
-		state.set_imu(new AltosIMU(accel_y(),	/* along */
-					   accel_x(),	/* across */
-					   accel_z(),	/* through */
-					   gyro_y(),	/* along */
-					   gyro_x(),	/* across */
-					   gyro_z()));	/* through */
+		/* XXX we have no calibration data for these values */
 
-		state.set_mag(new AltosMag(mag_x(), mag_y(), mag_z()));
+		if (cal_data.accel_zero_along == AltosLib.MISSING)
+			cal_data.set_accel_zero(0, 0, 0);
+		if (cal_data.gyro_zero_roll == AltosLib.MISSING)
+			cal_data.set_gyro_zero(0, 0, 0);
+
+		int	accel_along = accel_y();
+		int	accel_across = accel_x();
+		int	accel_through = accel_z();
+		int	gyro_roll = gyro_y();
+		int	gyro_pitch = gyro_x();
+		int	gyro_yaw = gyro_z();
+
+		int	mag_along = mag_x();
+		int	mag_across = mag_y();
+		int	mag_through = mag_z();
+
+		listener.set_accel(cal_data.accel_along(accel_along),
+				   cal_data.accel_across(accel_across),
+				   cal_data.accel_through(accel_through));
+		listener.set_gyro(cal_data.gyro_roll(gyro_roll),
+				  cal_data.gyro_pitch(gyro_pitch),
+				  cal_data.gyro_yaw(gyro_yaw));
+		listener.set_mag(cal_data.mag_along(mag_along),
+				 cal_data.mag_across(mag_across),
+				 cal_data.mag_through(mag_through));
 	}
 }

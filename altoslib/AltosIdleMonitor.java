@@ -52,20 +52,21 @@ public class AltosIdleMonitor extends Thread {
 		return link.reply_abort;
 	}
 
-	boolean update_state(AltosState state) throws InterruptedException, TimeoutException, AltosUnknownProduct {
+	boolean provide_data(AltosDataListener listener) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		boolean		worked = false;
 		boolean		aborted = false;
+		AltosCalData	cal_data = new AltosCalData(link.config_data());
 
 		try {
 			start_link();
-			fetch.update_state(state);
+			fetch.provide_data(listener, cal_data);
 			if (!link.has_error && !link.reply_abort)
 				worked = true;
 		} finally {
 			aborted = stop_link();
 			if (worked) {
 				if (remote)
-					state.set_rssi(link.rssi(), 0);
+					listener.set_rssi(link.rssi(), 0);
 				listener_state.battery = link.monitor_battery();
 			}
 		}
@@ -92,12 +93,14 @@ public class AltosIdleMonitor extends Thread {
 	}
 
 	public void run() {
-		AltosState state = new AltosState();
+		AltosState state = null;
 		try {
 			for (;;) {
 				try {
 					link.config_data();
-					update_state(state);
+					if (state == null)
+						state = new AltosState(new AltosCalData(link.config_data()));
+					provide_data(state);
 					listener.update(state, listener_state);
 				} catch (TimeoutException te) {
 				} catch (AltosUnknownProduct ae) {

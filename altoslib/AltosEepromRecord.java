@@ -81,11 +81,12 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		return start - o.start;
 	}
 
-	public void update_state(AltosFlightListener listen) {
+	/* AltosDataProvider */
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		cal_data.set_tick(tick());
 		if (cmd() == AltosLib.AO_LOG_FLIGHT)
-			listen.set_boost_tick(tick());
-		else
-			listen.set_tick(tick());
+			cal_data.set_boost_tick();
+		listener.set_time(cal_data.time());
 	}
 
 	public int next_start() {

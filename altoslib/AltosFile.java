@@ -66,7 +66,7 @@ public class AltosFile extends File {
 		     extension);
 	}
 
-	public AltosFile(AltosState state) {
-		this(state.serial, state.flight, state.receiver_serial, "telem");
+	public AltosFile(AltosCalData cal_data) {
+		this(cal_data.serial, cal_data.flight, cal_data.receiver_serial, "telem");
 	}
 }

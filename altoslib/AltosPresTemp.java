@@ -14,9 +14,12 @@
 
 package org.altusmetrum.altoslib_11;
 
-import java.util.*;
+public class AltosPresTemp {
+	double	pres = AltosLib.MISSING;
+	double	temp = AltosLib.MISSING;
 
-public interface AltosRecordSet {
-	public AltosCalData cal_data();
-	public void capture_series(AltosDataListener listener);
+	public AltosPresTemp(double pres, double temp) {
+		this.pres = pres;
+		this.temp = temp;
+	}
 }

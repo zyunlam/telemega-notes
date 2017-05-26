@@ -28,7 +28,8 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	double		frequency;
 	int		telemetry;
 	int		telemetry_rate;
-	AltosState	state = null;
+	public AltosState	state = null;
+	public AltosCalData	cal_data = null;
 
 	LinkedBlockingQueue<AltosLine> telem;
 
@@ -40,11 +41,11 @@ public class AltosTelemetryReader extends AltosFlightReader {
 				throw new IOException("IO error");
 		} while (!link.get_monitor());
 		AltosTelemetry	telem = AltosTelemetry.parse(l.line);
+		if (cal_data == null)
+			cal_data = new AltosCalData();
 		if (state == null)
-			state = new AltosState();
-		else
-			state = state.clone();
-		telem.update_state(state);
+			state = new AltosState(cal_data);
+		telem.provide_data(state, cal_data);
 		return state;
 	}
 
@@ -55,6 +56,7 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	public void reset() {
 		flush();
 		state = null;
+		cal_data = null;
 	}
 
 	public void close(boolean interrupted) {

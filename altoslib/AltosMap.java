@@ -220,11 +220,11 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		return false;
 	}
 
-	public void show(AltosState state, AltosListenerState listener_state) {
+	public void show(AltosGPS gps, int state) {
 
-		/* If insufficient gps data, nothing to update
+		/*
+		 * If insufficient gps data, nothing to update
 		 */
-		AltosGPS	gps = state.gps;
 
 		if (gps == null)
 			return;
@@ -232,23 +232,23 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		if (!gps.locked && gps.nsat < 4)
 			return;
 
-		switch (state.state()) {
+		switch (state) {
 		case AltosLib.ao_flight_boost:
 			if (!have_boost) {
-				add_mark(gps.lat, gps.lon, state.state());
+				add_mark(gps.lat, gps.lon, state);
 				have_boost = true;
 			}
 			break;
 		case AltosLib.ao_flight_landed:
 			if (!have_landed) {
-				add_mark(gps.lat, gps.lon, state.state());
+				add_mark(gps.lat, gps.lon, state);
 				have_landed = true;
 			}
 			break;
 		}
 
 		if (path != null) {
-			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state.state());
+			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state);
 
 			if (damage != null)
 				repaint(damage, AltosMapPath.stroke_width);
@@ -257,6 +257,10 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		last_position = new AltosLatLon(gps.lat, gps.lon);
 
 		maybe_centre(gps.lat, gps.lon);
+	}
+
+	public void show(AltosState state, AltosListenerState listener_state) {
+		show(state.gps, state.state());
 	}
 
 	public void centre(AltosLatLon lat_lon) {
@@ -268,10 +272,14 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		centre(new AltosLatLon(lat, lon));
 	}
 
-	public void centre(AltosState state) {
-		if (!state.gps.locked && state.gps.nsat < 4)
+	public void centre(AltosGPS gps) {
+		if (!gps.locked && gps.nsat < 4)
 			return;
-		centre(state.gps.lat, state.gps.lon);
+		centre(gps.lat, gps.lon);
+	}
+
+	public void centre(AltosState state) {
+		centre(state.gps);
 	}
 
 	public void maybe_centre(double lat, double lon) {

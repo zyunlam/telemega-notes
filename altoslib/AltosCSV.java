@@ -27,16 +27,17 @@ public class AltosCSV implements AltosWriter {
 	boolean			header_written;
 	boolean			seen_boost;
 	int			boost_tick;
-	LinkedList<AltosState>	pad_states;
-	AltosState		state;
 
-	static boolean		has_basic;
-	static boolean		has_battery;
-	static boolean		has_flight_state;
-	static boolean		has_advanced;
-	static boolean		has_gps;
-	static boolean		has_gps_sat;
-	static boolean		has_companion;
+	boolean			has_basic;
+	boolean			has_battery;
+	boolean			has_flight_state;
+	boolean			has_advanced;
+	boolean			has_gps;
+	boolean			has_gps_sat;
+	boolean			has_companion;
+
+	AltosFlightSeries	series;
+	int[]			indices;
 
 	static final int ALTOS_CSV_VERSION = 5;
 
@@ -117,63 +118,97 @@ public class AltosCSV implements AltosWriter {
 		out.printf("version,serial,flight,call,time,clock,rssi,lqi");
 	}
 
-	void write_general(AltosState state) {
+	double time() {
+		return series.time(indices);
+	}
+
+	int rssi() {
+		return (int) series.value(AltosFlightSeries.rssi_name, indices);
+	}
+
+	int status() {
+		return (int) series.value(AltosFlightSeries.status_name, indices);
+	}
+
+	void write_general() {
+		double time = time();
 		out.printf("%s, %d, %d, %s, %8.2f, %8.2f, %4d, %3d",
-			   ALTOS_CSV_VERSION, state.serial, state.flight, state.callsign,
-			   (double) state.time_since_boost(), (double) state.tick / 100.0,
-			   state.rssi,
-			   state.status & 0x7f);
+			   ALTOS_CSV_VERSION, series.cal_data.serial,
+			   series.cal_data.flight, series.cal_data.callsign,
+			   time, time,
+			   rssi(), status() & 0x7f);
 	}
 
 	void write_flight_header() {
 		out.printf("state,state_name");
 	}
 
-	void write_flight(AltosState state) {
-		out.printf("%d,%8s", state.state(), state.state_name());
+	int state() {
+		return (int) series.value(AltosFlightSeries.state_name, indices);
+	}
+
+	void write_flight() {
+		int state = state();
+		out.printf("%d,%8s", state, AltosLib.state_name(state));
 	}
 
 	void write_basic_header() {
 		out.printf("acceleration,pressure,altitude,height,accel_speed,baro_speed,temperature,drogue_voltage,main_voltage");
 	}
 
-	void write_basic(AltosState state) {
+	double acceleration() { return series.value(AltosFlightSeries.accel_name, indices); }
+	double pressure() { return series.value(AltosFlightSeries.pressure_name, indices); }
+	double altitude() { return series.value(AltosFlightSeries.altitude_name, indices); }
+	double height() { return series.value(AltosFlightSeries.height_name, indices); }
+	double speed() { return series.value(AltosFlightSeries.speed_name, indices); }
+	double temperature() { return series.value(AltosFlightSeries.temperature_name, indices); }
+	double apogee_voltage() { return series.value(AltosFlightSeries.apogee_voltage_name, indices); }
+	double main_voltage() { return series.value(AltosFlightSeries.main_voltage_name, indices); }
+
+	void write_basic() {
 		out.printf("%8.2f,%10.2f,%8.2f,%8.2f,%8.2f,%8.2f,%5.1f,%5.2f,%5.2f",
-			   state.acceleration(),
-			   state.pressure(),
-			   state.altitude(),
-			   state.height(),
-			   state.speed(),
-			   state.speed(),
-			   state.temperature,
-			   state.apogee_voltage,
-			   state.main_voltage);
+			   acceleration(),
+			   pressure(),
+			   altitude(),
+			   height(),
+			   speed(),
+			   speed(),
+			   temperature(),
+			   apogee_voltage(),
+			   main_voltage());
 	}
 
 	void write_battery_header() {
 		out.printf("battery_voltage");
 	}
 
-	void write_battery(AltosState state) {
-		out.printf("%5.2f", state.battery_voltage);
+	double battery_voltage() { return series.value(AltosFlightSeries.battery_voltage_name, indices); }
+
+	void write_battery() {
+		out.printf("%5.2f", battery_voltage());
 	}
 
 	void write_advanced_header() {
 		out.printf("accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,mag_x,mag_y,mag_z");
 	}
 
-	void write_advanced(AltosState state) {
+	void write_advanced() {
+/*
 		out.printf("%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
 			   state.accel_along(), state.accel_across(), state.accel_through(),
 			   state.gyro_roll(), state.gyro_pitch(), state.gyro_yaw(),
 			   state.mag_along(), state.mag_across(), state.mag_through());
+*/
 	}
 
 	void write_gps_header() {
+/*
 		out.printf("connected,locked,nsat,latitude,longitude,altitude,year,month,day,hour,minute,second,pad_dist,pad_range,pad_az,pad_el,pdop,hdop,vdop");
+*/
 	}
 
-	void write_gps(AltosState state) {
+	void write_gps() {
+/*
 		AltosGPS	gps = state.gps;
 		if (gps == null)
 			gps = new AltosGPS();
@@ -202,6 +237,7 @@ public class AltosCSV implements AltosWriter {
 			   gps.pdop,
 			   gps.hdop,
 			   gps.vdop);
+*/
 	}
 
 	void write_gps_sat_header() {
@@ -212,7 +248,8 @@ public class AltosCSV implements AltosWriter {
 		}
 	}
 
-	void write_gps_sat(AltosState state) {
+	void write_gps_sat() {
+/*
 		AltosGPS	gps = state.gps;
 		for(int i = 1; i <= 32; i++) {
 			int	c_n0 = 0;
@@ -227,6 +264,7 @@ public class AltosCSV implements AltosWriter {
 			if (i != 32)
 				out.printf(",");
 		}
+*/
 	}
 
 	void write_companion_header() {
@@ -235,7 +273,8 @@ public class AltosCSV implements AltosWriter {
 			out.printf(",companion_%02d", i);
 	}
 
-	void write_companion(AltosState state) {
+	void write_companion() {
+/*
 		AltosCompanion companion = state.companion;
 
 		int	channels_written = 0;
@@ -252,6 +291,7 @@ public class AltosCSV implements AltosWriter {
 		}
 		for (; channels_written < 12; channels_written++)
 			out.printf(",0");
+*/
 	}
 
 	void write_header() {
@@ -287,63 +327,47 @@ public class AltosCSV implements AltosWriter {
 		out.printf ("\n");
 	}
 
-	void write_one(AltosState state) {
-		write_general(state);
+	void write_one() {
+		write_general();
 		if (has_flight_state) {
 			out.printf(",");
-			write_flight(state);
+			write_flight();
 		}
 		if (has_basic) {
 			out.printf(",");
-			write_basic(state);
+			write_basic();
 		}
 		if (has_battery) {
 			out.printf(",");
-			write_battery(state);
+			write_battery();
 		}
 		if (has_advanced) {
 			out.printf(",");
-			write_advanced(state);
+			write_advanced();
 		}
 		if (has_gps) {
 			out.printf(",");
-			write_gps(state);
+			write_gps();
 		}
 		if (has_gps_sat) {
 			out.printf(",");
-			write_gps_sat(state);
+			write_gps_sat();
 		}
 		if (has_companion) {
 			out.printf(",");
-			write_companion(state);
+			write_companion();
 		}
 		out.printf ("\n");
 	}
 
-	private void flush_pad() {
-		while (!pad_states.isEmpty()) {
-			write_one (pad_states.remove());
-		}
-	}
-
-	private void write(AltosState state) {
-		if (state.state() == AltosLib.ao_flight_startup)
+	private void write() {
+		if (state() == AltosLib.ao_flight_startup)
 			return;
 		if (!header_written) {
 			write_header();
 			header_written = true;
 		}
-		if (!seen_boost) {
-			if (state.state() >= AltosLib.ao_flight_boost) {
-				seen_boost = true;
-				boost_tick = state.tick;
-				flush_pad();
-			}
-		}
-		if (seen_boost)
-			write_one(state);
-		else
-			pad_states.add(state);
+		write_one();
 	}
 
 	private PrintStream out() {
@@ -351,15 +375,15 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	public void close() {
-		if (!pad_states.isEmpty()) {
-			boost_tick = pad_states.element().tick;
-			flush_pad();
-		}
 		out.close();
 	}
 
-	public void write(AltosStateIterable states) {
-		states.write_comments(out());
+	public void write(AltosFlightSeries series) {
+//		series.write_comments(out());
+
+		this.series = series;
+
+		series.fill_in();
 
 		has_flight_state = false;
 		has_basic = false;
@@ -368,15 +392,16 @@ public class AltosCSV implements AltosWriter {
 		has_gps = false;
 		has_gps_sat = false;
 		has_companion = false;
-		for (AltosState state : states) {
-			if (state.state() != AltosLib.ao_flight_stateless && state.state() != AltosLib.ao_flight_invalid && state.state() != AltosLib.ao_flight_startup)
-				has_flight_state = true;
-			if (state.acceleration() != AltosLib.MISSING || state.pressure() != AltosLib.MISSING)
-				has_basic = true;
-			if (state.battery_voltage != AltosLib.MISSING)
-				has_battery = true;
-			if (state.accel_across() != AltosLib.MISSING)
-				has_advanced = true;
+
+		if (series.has_series(AltosFlightSeries.state_name))
+			has_flight_state = true;
+		if (series.has_series(AltosFlightSeries.accel_name) || series.has_series(AltosFlightSeries.pressure_name))
+			has_basic = true;
+		if (series.has_series(AltosFlightSeries.battery_voltage_name))
+			has_battery = true;
+		if (series.has_series(AltosFlightSeries.accel_across_name))
+			has_advanced = true;
+/*
 			if (state.gps != null) {
 				has_gps = true;
 				if (state.gps.cc_gps_sat != null)
@@ -385,14 +410,19 @@ public class AltosCSV implements AltosWriter {
 			if (state.companion != null)
 				has_companion = true;
 		}
-		for (AltosState state : states)
-			write(state);
+*/
+		indices = series.indices();
+
+		for (;;) {
+			write();
+			if (!series.step_indices(indices))
+				break;
+		}
 	}
 
 	public AltosCSV(PrintStream in_out, File in_name) {
 		name = in_name;
 		out = in_out;
-		pad_states = new LinkedList<AltosState>();
 	}
 
 	public AltosCSV(File in_name) throws FileNotFoundException {

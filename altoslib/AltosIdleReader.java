@@ -48,11 +48,6 @@ public class AltosIdleReader extends AltosFlightReader {
 		boolean worked = false;
 		boolean aborted = false;
 
-		if (state == null)
-			state = new AltosState();
-		else
-			state = state.clone();
-
 		long	delay = next_millis - System.currentTimeMillis();
 
 		if (delay > 0)
@@ -61,7 +56,9 @@ public class AltosIdleReader extends AltosFlightReader {
 		try {
 			try {
 				start_link();
-				fetch.update_state(state);
+				if (state == null)
+					state = new AltosState(new AltosCalData(link.config_data()));
+				fetch.provide_data(state, state.cal_data);
 				if (!link.has_error && !link.reply_abort)
 					worked = true;
 			} catch (TimeoutException te) {

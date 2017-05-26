@@ -22,28 +22,36 @@ import java.util.concurrent.*;
 import java.io.*;
 
 public class AltosMs5607 {
-	public int	reserved;
-	public int	sens;
-	public int	off;
-	public int	tcs;
-	public int	tco;
-	public int	tref;
-	public int	tempsens;
-	public int	crc;
+	public int	reserved = AltosLib.MISSING;
+	public int	sens = AltosLib.MISSING;
+	public int	off = AltosLib.MISSING;
+	public int	tcs = AltosLib.MISSING;
+	public int	tco = AltosLib.MISSING;
+	public int	tref = AltosLib.MISSING;
+	public int	tempsens = AltosLib.MISSING;
+	public int	crc = AltosLib.MISSING;
+	private boolean	ms5611 = false;
 
-	public int	raw_pres;
-	public int	raw_temp;
-	public int	pa;
-	public int	cc;
+	public boolean valid_config() {
+		return reserved != AltosLib.MISSING &&
+			sens != AltosLib.MISSING &&
+			off != AltosLib.MISSING &&
+			tcs != AltosLib.MISSING &&
+			tco != AltosLib.MISSING &&
+			tref != AltosLib.MISSING &&
+			tempsens != AltosLib.MISSING &&
+			crc  != AltosLib.MISSING;
+	}
 
-	static final boolean	ms5611 = false;
-
-	void convert() {
+	public AltosPresTemp pres_temp(int raw_pres, int raw_temp) {
 		int	dT;
-		int TEMP;
-		long OFF;
-		long SENS;
-		//int P;
+		int	TEMP;
+		long	OFF;
+		long	SENS;
+		int	P;
+
+		if (raw_pres == AltosLib.MISSING || raw_temp == AltosLib.MISSING)
+			return new AltosPresTemp(AltosLib.MISSING, AltosLib.MISSING);
 
 		dT = raw_temp - ((int) tref << 8);
 
@@ -75,111 +83,61 @@ public class AltosMs5607 {
 			SENS -= SENS2;
 		}
 
-		pa = (int) (((((long) raw_pres * SENS) >> 21) - OFF) >> 15);
-		cc = TEMP;
+		P = (int) (((((long) raw_pres * SENS) >> 21) - OFF) >> 15);
+
+		return new AltosPresTemp(P, TEMP / 100.0);
 	}
 
-	public int set(int in_pres, int in_temp) {
-		raw_pres = in_pres;
-		raw_temp = in_temp;
-		convert();
-		return pa;
-	}
+	public AltosPresTemp pres_temp(AltosLink link) throws InterruptedException, TimeoutException {
+		int	raw_pres = AltosLib.MISSING;
+		int	raw_temp = AltosLib.MISSING;
+		boolean	done = false;
 
-	public boolean parse_line(String line) {
-		String[] items = line.split("\\s+");
-		if (line.startsWith("Pressure:")) {
-			if (items.length >= 2) {
-				raw_pres = Integer.parseInt(items[1]);
+		link.printf("B\n");
+		while (!done) {
+			String line = link.get_reply_no_dialog(5000);
+			if (line == null)
+				throw new TimeoutException();
+
+			String[] items = line.split("\\s+");
+			if (line.startsWith("Pressure:")) {
+				if (items.length >= 2) {
+					raw_pres = Integer.parseInt(items[1]);
+				}
+			} else if (line.startsWith("Temperature:")) {
+				if (items.length >= 2)
+					raw_temp = Integer.parseInt(items[1]);
+			} else if (line.startsWith("Altitude:")) {
+				done = true;
 			}
-		} else if (line.startsWith("Temperature:")) {
-			if (items.length >= 2)
-				raw_temp = Integer.parseInt(items[1]);
-		} else if (line.startsWith("ms5607 reserved:")) {
-			if (items.length >= 3)
-				reserved = Integer.parseInt(items[2]);
-		} else if (line.startsWith("ms5607 sens:")) {
-			if (items.length >= 3) {
-				sens = Integer.parseInt(items[2]);
-			}
-		} else if (line.startsWith("ms5607 off:")) {
-			if (items.length >= 3)
-				off = Integer.parseInt(items[2]);
-		} else if (line.startsWith("ms5607 tcs:")) {
-			if (items.length >= 3)
-				tcs = Integer.parseInt(items[2]);
-		} else if (line.startsWith("ms5607 tco:")) {
-			if (items.length >= 3)
-				tco = Integer.parseInt(items[2]);
-		} else if (line.startsWith("ms5607 tref:")) {
-			if (items.length >= 3)
-				tref = Integer.parseInt(items[2]);
-		} else if (line.startsWith("ms5607 tempsens:")) {
-			if (items.length >= 3)
-				tempsens = Integer.parseInt(items[2]);
-		} else if (line.startsWith("ms5607 crc:")) {
-			if (items.length >= 3)
-				crc = Integer.parseInt(items[2]);
-		} else if (line.startsWith("Altitude:")) {
-			return false;
 		}
-		return true;
+		return pres_temp(raw_pres, raw_temp);
 	}
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
-		try {
-			AltosMs5607	ms5607 = new AltosMs5607(link, config_data);
-
-			if (ms5607 != null) {
-				state.set_ms5607(ms5607);
-				return;
-			}
-		} catch (TimeoutException te) {
-		}
-	}
-
-	public boolean valid_config() {
-		return reserved != AltosLib.MISSING &&
-			sens != AltosLib.MISSING &&
-			off != AltosLib.MISSING &&
-			tcs != AltosLib.MISSING &&
-			tco != AltosLib.MISSING &&
-			tref != AltosLib.MISSING &&
-			tempsens != AltosLib.MISSING &&
-			crc  != AltosLib.MISSING;
+	public AltosMs5607(boolean ms5611) {
+		this.ms5611 = ms5611;
 	}
 
 	public AltosMs5607() {
-		raw_pres = AltosLib.MISSING;
-		raw_temp = AltosLib.MISSING;
-		pa = AltosLib.MISSING;
-		cc = AltosLib.MISSING;
+		this(false);
+	}
+
+	public AltosMs5607(AltosMs5607 old) {
+		reserved = old.reserved;
+		sens = old.sens;
+		off = old.off;
+		tcs = old.tcs;
+		tco = old.tco;
+		tref = old.tref;
+		tempsens = old.tempsens;
+		crc = old.crc;
 	}
 
 	public AltosMs5607(AltosConfigData config_data) {
-		this();
-		reserved = config_data.ms5607_reserved;
-		sens = config_data.ms5607_sens;
-		off = config_data.ms5607_off;
-		tcs = config_data.ms5607_tcs;
-		tco = config_data.ms5607_tco;
-		tref = config_data.ms5607_tref;
-		tempsens = config_data.ms5607_tempsens;
-		crc = config_data.ms5607_crc;
+		this(config_data.ms5607());
 	}
 
 	public AltosMs5607 (AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException {
 		this(config_data);
-		link.printf("B\n");
-		for (;;) {
-			String line = link.get_reply_no_dialog(5000);
-			if (line == null) {
-				throw new TimeoutException();
-			}
-			if (!parse_line(line)) {
-				break;
-			}
-		}
-		convert();
 	}
 }

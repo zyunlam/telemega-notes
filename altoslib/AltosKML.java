@@ -36,7 +36,7 @@ public class AltosKML implements AltosWriter {
 	File			name;
 	PrintWriter		out;
 	int			flight_state = -1;
-	AltosState		prev = null;
+	AltosGPS		prev = null;
 	double			gps_start_altitude;
 
 	static final String[] kml_state_colors = {
@@ -101,42 +101,43 @@ public class AltosKML implements AltosWriter {
 		"</Document>\n" +
 		"</kml>\n";
 
-	void start (AltosState record) {
+	void start (int state) {
+/*
 		out.printf(kml_header_start, record.flight, record.serial);
 		out.printf("Date:   %04d-%02d-%02d\n",
 			   record.gps.year, record.gps.month, record.gps.day);
 		out.printf("Time:     %2d:%02d:%02d\n",
 			   record.gps.hour, record.gps.minute, record.gps.second);
 		out.printf("%s", kml_header_end);
+*/
 	}
 
 	boolean	started = false;
 
-	void state_start(AltosState state) {
-		String	state_name = AltosLib.state_name(state.state());
-		String	state_color = state_color(state.state());
+	void state_start(int state) {
+		String	state_name = AltosLib.state_name(state);
+		String	state_color = state_color(state);
 		out.printf(kml_style_start, state_name, state_color);
 		out.printf("\tState: %s\n", state_name);
 		out.printf("%s", kml_style_end);
 		out.printf(kml_placemark_start, state_name, state_name);
 	}
 
-	void state_end(AltosState state) {
+	void state_end() {
 		out.printf("%s", kml_placemark_end);
 	}
 
-	void coord(AltosState state) {
-		AltosGPS	gps = state.gps;
+	void coord(double time, AltosGPS gps, int state, double height) {
 		double		altitude;
 
-		if (state.height() != AltosLib.MISSING)
-			altitude = state.height() + gps_start_altitude;
+		if (height != AltosLib.MISSING)
+			altitude = height + gps_start_altitude;
 		else
 			altitude = gps.alt;
 		out.printf(kml_coord_fmt,
 			   gps.lon, gps.lat,
 			   altitude, (double) gps.alt,
-			   state.time, gps.nsat);
+			   time, gps.nsat);
 	}
 
 	void end() {
@@ -145,7 +146,7 @@ public class AltosKML implements AltosWriter {
 
 	public void close() {
 		if (prev != null) {
-			state_end(prev);
+			state_end();
 			end();
 			prev = null;
 		}
@@ -155,12 +156,7 @@ public class AltosKML implements AltosWriter {
 		}
 	}
 
-	public void write(AltosState state) {
-		AltosGPS	gps = state.gps;
-
-		if (gps == null)
-			return;
-
+	public void write(AltosGPS gps, int state, double height) {
 		if (gps.lat == AltosLib.MISSING)
 			return;
 		if (gps.lon == AltosLib.MISSING)
@@ -170,24 +166,41 @@ public class AltosKML implements AltosWriter {
 			started = true;
 			gps_start_altitude = gps.alt;
 		}
-		if (prev != null && prev.gps_sequence == state.gps_sequence)
-			return;
-		if (state.state() != flight_state) {
-			flight_state = state.state();
+		if (state != flight_state) {
+			flight_state = state;
 			if (prev != null) {
-				coord(state);
-				state_end(prev);
+//				coord(gps, state, height);
+				state_end();
 			}
 			state_start(state);
 		}
-		coord(state);
-		prev = state;
+//		coord(0, gps, state, height);
+		prev = gps;
 	}
 
-	public void write(AltosStateIterable states) {
-		for (AltosState state : states) {
-			if ((state.set & AltosState.set_gps) != 0)
-				write(state);
+	private int state(AltosFlightSeries series, double time) {
+		int s = AltosLib.MISSING;
+		for (AltosTimeValue state : series.state_series) {
+			if (state.time > time)
+				break;
+			s = (int) state.value;
+		}
+		return s;
+	}
+
+	private double height(AltosFlightSeries series, double time) {
+		double h = AltosLib.MISSING;
+		for (AltosTimeValue height : series.height_series) {
+			if (height.time > time)
+				break;
+			h = height.value;
+		}
+		return h;
+	}
+
+	public void write(AltosFlightSeries series) {
+		for (AltosGPSTimeValue gps : series.gps_series) {
+			write(gps.gps, state(series, gps.time), height(series, gps.time));
 		}
 	}
 

@@ -71,36 +71,19 @@ public class AltosEepromRecordGps extends AltosEepromRecord {
 		return start - o.start;
 	}
 
-	public void update_state(AltosFlightListener state) {
-		super.update_state(state);
-
-		AltosGPS	gps;
-
-		/* Flush any pending RecordGps changes */
-		if (state.gps_pending()) {
-			switch (cmd()) {
-			case AltosLib.AO_LOG_GPS_LAT:
-			case AltosLib.AO_LOG_GPS_LON:
-			case AltosLib.AO_LOG_GPS_ALT:
-			case AltosLib.AO_LOG_GPS_SAT:
-			case AltosLib.AO_LOG_GPS_DATE:
-				break;
-			default:
-				state.set_temp_gps();
-				break;
-			}
-		}
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			if (state.flight() == AltosLib.MISSING) {
-				state.set_boost_tick(tick());
-				state.set_flight(flight());
+			if (cal_data.flight == AltosLib.MISSING) {
+				cal_data.set_boost_tick();
+				cal_data.set_flight(flight());
 			}
 			/* no place to log start lat/lon yet */
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
-			gps = state.make_temp_gps(false);
+			AltosGPS gps = new AltosGPS();
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
 			if (eeprom.config_data().altitude_32 == 1)
@@ -140,6 +123,7 @@ public class AltosEepromRecordGps extends AltosEepromRecord {
 				if (gps.vdop < 0.8)
 					gps.vdop += 2.56;
 			}
+			listener.set_gps(gps);
 			break;
 		}
 	}

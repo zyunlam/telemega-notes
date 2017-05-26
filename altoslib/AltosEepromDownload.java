@@ -23,6 +23,53 @@ import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
 
+class AltosEepromNameData extends AltosDataListener {
+	AltosGPS	gps = null;
+
+	public void set_rssi(int rssi, int status) { }
+	public void set_received_time(long received_time) { }
+
+	public void set_acceleration(double accel) { }
+	public void set_pressure(double pa) { }
+	public void set_thrust(double N) { }
+
+	public void set_temperature(double deg_c) { }
+	public void set_battery_voltage(double volts) { }
+
+	public void set_apogee_voltage(double volts) { }
+	public void set_main_voltage(double volts) { }
+
+	public void set_gps(AltosGPS gps) {
+		if (gps != null &&
+		    gps.year != AltosLib.MISSING &&
+		    gps.month != AltosLib.MISSING &&
+		    gps.day != AltosLib.MISSING) {
+			this.gps = gps;
+		}
+	}
+
+	public boolean done() {
+		if (gps == null)
+			return false;
+		return true;
+	}
+
+	public void set_gyro(double roll, double pitch, double yaw) { }
+	public void set_accel_ground(double along, double across, double through) { }
+	public void set_accel(double along, double across, double through) { }
+	public void set_mag(double along, double across, double through) { }
+	public void set_pyro_voltage(double volts) { }
+	public void set_ignitor_voltage(double[] voltage) { }
+	public void set_pyro_fired(int pyro_mask) { }
+	public void set_companion(AltosCompanion companion) { }
+	public void set_kalman(double height, double speed, double acceleration) { }
+	public void set_orient(double new_orient) { }
+
+	public AltosEepromNameData(AltosCalData cal_data) {
+		super(cal_data);
+	}
+}
+
 public class AltosEepromDownload implements Runnable {
 
 	AltosLink		link;
@@ -45,11 +92,11 @@ public class AltosEepromDownload implements Runnable {
 			gps.day != AltosLib.MISSING;
 	}
 
-	private AltosFile MakeFile(int serial, int flight, AltosState state) throws IOException {
+	private AltosFile MakeFile(int serial, int flight, AltosEepromNameData name_data) throws IOException {
 		AltosFile		eeprom_name;
 
-		if (has_gps_date(state)) {
-			AltosGPS		gps = state.gps;
+		if (name_data.gps != null) {
+			AltosGPS		gps = name_data.gps;
 			eeprom_name = new AltosFile(gps.year, gps.month, gps.day,
 						    serial, flight, "eeprom");
 		} else
@@ -141,17 +188,16 @@ public class AltosEepromDownload implements Runnable {
 		 * doesn't need to work; we'll still save the data using
 		 * a less accurate name.
 		 */
-		AltosEepromRecordSet	set = new AltosEepromRecordSet(eeprom);
+		AltosEepromRecordSet		set = new AltosEepromRecordSet(eeprom);
+		AltosEepromNameData name_data = new AltosEepromNameData(set.cal_data());
 
-		AltosState state = new AltosState();
-
-		for (AltosState s : set) {
-			state = s;
-			if (state.gps != null)
+		for (AltosEepromRecord record : set.ordered) {
+			record.provide_data(name_data, set.cal_data());
+			if (name_data.done())
 				break;
 		}
 
-		AltosFile f = MakeFile(flights.config_data.serial, log.flight, state);
+		AltosFile f = MakeFile(flights.config_data.serial, log.flight, name_data);
 
 		monitor.set_filename(f.toString());
 

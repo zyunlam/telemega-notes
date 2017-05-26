@@ -23,7 +23,7 @@ public class AltosTelemetryRaw extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 	}
 }

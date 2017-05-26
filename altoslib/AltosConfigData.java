@@ -22,7 +22,7 @@ import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
 
-public class AltosConfigData implements Iterable<String> {
+public class AltosConfigData {
 
 	/* Version information */
 	public String	manufacturer;
@@ -33,9 +33,6 @@ public class AltosConfigData implements Iterable<String> {
 	public int	log_space;
 	public String	version;
 	public int	altitude_32;
-
-	/* Strings returned */
-	public LinkedList<String>	__lines;
 
 	/* Config information */
 	/* HAS_FLIGHT*/
@@ -96,14 +93,13 @@ public class AltosConfigData implements Iterable<String> {
 	public int	accel_zero_along, accel_zero_across, accel_zero_through;
 
 	/* ms5607 data */
-	public int	ms5607_reserved;
-	public int	ms5607_sens;
-	public int	ms5607_off;
-	public int	ms5607_tcs;
-	public int	ms5607_tco;
-	public int	ms5607_tref;
-	public int	ms5607_tempsens;
-	public int	ms5607_crc;
+	AltosMs5607	ms5607;
+
+	public AltosMs5607 ms5607() {
+		if (ms5607 == null)
+			ms5607 = new AltosMs5607();
+		return ms5607;
+	}
 
 	public static String get_string(String line, String label) throws  ParseException {
 		if (line.startsWith(label)) {
@@ -140,10 +136,6 @@ public class AltosConfigData implements Iterable<String> {
 			}
 		}
 		throw new ParseException("mismatch", 0);
-	}
-
-	public Iterator<String> iterator() {
-		return __lines.iterator();
 	}
 
 	public int log_space() {
@@ -237,8 +229,6 @@ public class AltosConfigData implements Iterable<String> {
 	}
 
 	public void reset() {
-		__lines = new LinkedList<String>();
-
 		manufacturer = null;
 		product = null;
 		serial = AltosLib.MISSING;
@@ -293,7 +283,6 @@ public class AltosConfigData implements Iterable<String> {
 	}
 
 	public void parse_line(String line) {
-		__lines.add(line);
 		/* Version replies */
 		try { manufacturer = get_string(line, "manufacturer"); } catch (Exception e) {}
 		try { product = get_string(line, "product"); } catch (Exception e) {}
@@ -306,14 +295,14 @@ public class AltosConfigData implements Iterable<String> {
 
 		/* Version also contains MS5607 info, which we ignore here */
 
-		try { ms5607_reserved = get_int(line, "ms5607 reserved:"); } catch (Exception e) {}
-		try { ms5607_sens = get_int(line, "ms5607 sens:"); } catch (Exception e) {}
-		try { ms5607_off = get_int(line, "ms5607 off:"); } catch (Exception e) {}
-		try { ms5607_tcs = get_int(line, "ms5607 tcs:"); } catch (Exception e) {}
-		try { ms5607_tco = get_int(line, "ms5607 tco:"); } catch (Exception e) {}
-		try { ms5607_tref = get_int(line, "ms5607 tref:"); } catch (Exception e) {}
-		try { ms5607_tempsens = get_int(line, "ms5607 tempsens:"); } catch (Exception e) {}
-		try { ms5607_crc = get_int(line, "ms5607 crc:"); } catch (Exception e) {}
+		try { ms5607().reserved = get_int(line, "ms5607 reserved:"); } catch (Exception e) {}
+		try { ms5607().sens = get_int(line, "ms5607 sens:"); } catch (Exception e) {}
+		try { ms5607().off = get_int(line, "ms5607 off:"); } catch (Exception e) {}
+		try { ms5607().tcs = get_int(line, "ms5607 tcs:"); } catch (Exception e) {}
+		try { ms5607().tco = get_int(line, "ms5607 tco:"); } catch (Exception e) {}
+		try { ms5607().tref = get_int(line, "ms5607 tref:"); } catch (Exception e) {}
+		try { ms5607().tempsens = get_int(line, "ms5607 tempsens:"); } catch (Exception e) {}
+		try { ms5607().crc = get_int(line, "ms5607 crc:"); } catch (Exception e) {}
 
 		/* Config show replies */
 

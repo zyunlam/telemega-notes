@@ -24,7 +24,7 @@ import java.text.*;
  * Telemetry data contents
  */
 
-public abstract class AltosTelemetry implements AltosStateUpdate {
+public abstract class AltosTelemetry implements AltosDataProvider {
 	int[]	bytes;
 
 	/* All telemetry packets have these fields */
@@ -46,13 +46,14 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 		return sum == bytes[bytes.length - 1];
 	}
 
-	public void update_state(AltosState state) {
-		state.set_serial(serial());
-		if (state.state() == AltosLib.ao_flight_invalid)
-			state.set_state(AltosLib.ao_flight_startup);
-		state.set_tick(tick());
-		state.set_rssi(rssi(), status());
-		state.set_received_time(received_time);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		cal_data.set_serial(serial());
+		if (listener.state == AltosLib.ao_flight_invalid)
+			listener.set_state(AltosLib.ao_flight_startup);
+		cal_data.set_tick(tick());
+		listener.set_time(cal_data.time());
+		listener.set_rssi(rssi(), status());
+		listener.set_received_time(received_time);
 	}
 
 	final static int PKT_APPEND_STATUS_1_CRC_OK		= (1 << 7);
@@ -106,29 +107,6 @@ public abstract class AltosTelemetry implements AltosStateUpdate {
 			throw new ParseException(String.format("Invalid packet length %d", bytes.length), 0);
 		}
 		return telem;
-	}
-
-	public static int extend_height(AltosState state, int height_16) {
-		double	compare_height;
-		int	height = height_16;
-
-		if (state.gps != null && state.gps.alt != AltosLib.MISSING) {
-			compare_height = state.gps_height();
-		} else {
-			compare_height = state.height();
-		}
-
-		if (compare_height != AltosLib.MISSING) {
-			int	high_bits = (int) Math.floor (compare_height / 65536.0);
-
-			height = (high_bits << 16) | (height_16 & 0xffff);
-
-			if (Math.abs(height + 65536 - compare_height) < Math.abs(height - compare_height))
-				height += 65536;
-			else if (Math.abs(height - 65536 - compare_height) < Math.abs(height - compare_height))
-				height -= 65536;
-		}
-		return height;
 	}
 
 	public AltosTelemetry() {

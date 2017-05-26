@@ -61,8 +61,8 @@ public class AltosLog implements Runnable {
 		return file;
 	}
 
-	boolean open (AltosState state) throws IOException, InterruptedException {
-		AltosFile	a = new AltosFile(state);
+	boolean open (AltosCalData cal_data) throws IOException, InterruptedException {
+		AltosFile	a = new AltosFile(cal_data);
 
 		log_file = new FileWriter(a, true);
 		if (log_file != null) {
@@ -80,24 +80,31 @@ public class AltosLog implements Runnable {
 
 	public void run () {
 		try {
-			AltosState	state = new AltosState();
 			AltosConfigData	receiver_config = link.config_data();
-			state.set_receiver_serial(receiver_config.serial);
+			AltosCalData	cal_data = new AltosCalData();
+			AltosState	state = null;
+			cal_data.set_receiver_serial(receiver_config.serial);
 			for (;;) {
 				AltosLine	line = input_queue.take();
 				if (line.line == null)
 					continue;
 				try {
 					AltosTelemetry	telem = AltosTelemetry.parse(line.line);
-					state = state.clone();
-					telem.update_state(state);
-					if (state.serial != serial || state.flight != flight || log_file == null)
+					if (state == null)
+						state = new AltosState(cal_data);
+					telem.provide_data(state, cal_data);
+
+					if (cal_data.serial != serial ||
+					    cal_data.flight != flight ||
+					    log_file == null)
 					{
 						close_log_file();
-						serial = state.serial;
-						flight = state.flight;
-						if (state.serial != AltosLib.MISSING && state.flight != AltosLib.MISSING)
-							open(state);
+						serial = cal_data.serial;
+						flight = cal_data.flight;
+						state = null;
+						if (cal_data.serial != AltosLib.MISSING &&
+						    cal_data.flight != AltosLib.MISSING)
+							open(cal_data);
 					}
 				} catch (ParseException pe) {
 				} catch (AltosCRCException ce) {

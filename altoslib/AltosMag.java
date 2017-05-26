@@ -72,12 +72,14 @@ public class AltosMag implements Cloneable {
 		this.through = through;
 	}
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
 		try {
 			AltosMag	mag = new AltosMag(link);
 
 			if (mag != null)
-				state.set_mag(mag);
+				listener.set_mag(cal_data.mag_along(mag.along),
+						 cal_data.mag_across(mag.across),
+						 cal_data.mag_through(mag.through));
 		} catch (TimeoutException te) {
 		}
 	}

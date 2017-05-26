@@ -44,12 +44,12 @@ public class AltosTelemetrySatellite extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
-		AltosGPS	gps = state.make_temp_gps(true);
+		AltosGPS	gps = new AltosGPS();
 
 		gps.cc_gps_sat = sats();
-		state.set_temp_gps();
+		listener.set_gps(gps);
 	}
 }

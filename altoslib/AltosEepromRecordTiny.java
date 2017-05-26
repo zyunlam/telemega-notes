@@ -14,7 +14,7 @@
 
 package org.altusmetrum.altoslib_11;
 
-public class AltosEepromRecordTiny extends AltosEepromRecord {
+public class AltosEepromRecordTiny extends AltosEepromRecord implements AltosDataProvider {
 	public static final int	record_length = 2;
 
 	private int value() {
@@ -50,21 +50,21 @@ public class AltosEepromRecordTiny extends AltosEepromRecord {
 		return tick;
 	}
 
-	public void update_state(AltosFlightListener state) {
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
 		int value = data16(-header_length);
 
-		state.set_tick(tick());
+		cal_data.set_tick(tick());
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			state.set_state(AltosLib.ao_flight_pad);
-			state.set_flight(value);
-			state.set_boost_tick(0);
+			listener.set_state(AltosLib.ao_flight_pad);
+			cal_data.set_flight(value);
+			cal_data.set_boost_tick();
 			break;
 		case AltosLib.AO_LOG_STATE:
-			state.set_state(value & 0x7fff);
+			listener.set_state(value & 0x7fff);
 			break;
 		case AltosLib.AO_LOG_SENSOR:
-			state.set_pressure(AltosConvert.barometer_to_pressure(value));
+			listener.set_pressure(AltosConvert.barometer_to_pressure(value));
 			break;
 		}
 	}

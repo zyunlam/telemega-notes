@@ -162,6 +162,16 @@ public class AltosLib {
 		return product_any;
 	}
 
+	public static boolean has_9dof(int device_type) {
+		return device_type == product_telemega || device_type == product_easymega;
+	}
+
+	public static boolean has_gps(int device_type) {
+		return device_type == product_telemetrum ||
+			device_type == product_telemega ||
+			device_type == product_telegps;
+	}
+
 	/* Bluetooth "identifier" (bluetooth sucks) */
 	public final static String bt_product_telebt = "TeleBT";
 

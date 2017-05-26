@@ -49,8 +49,8 @@ public class AltosTelemetryCompanion extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
-		state.set_companion(companion());
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
+		listener.set_companion(companion());
 	}
 }

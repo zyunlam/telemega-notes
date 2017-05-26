@@ -35,17 +35,17 @@ public class AltosTelemetryConfiguration extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
-		state.set_device_type(device_type());
-		state.set_flight(flight());
-		state.set_config(config_major(), config_minor(), flight_log_max());
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
+		cal_data.set_device_type(device_type());
+		cal_data.set_flight(flight());
+		cal_data.set_config(config_major(), config_minor(), flight_log_max());
 		if (device_type() == AltosLib.product_telegps)
-			state.set_battery_voltage(AltosConvert.tele_gps_voltage(v_batt()));
+			listener.set_battery_voltage(AltosConvert.tele_gps_voltage(v_batt()));
 		else
-			state.set_flight_params(apogee_delay(), main_deploy());
+			cal_data.set_flight_params(apogee_delay() / 100.0, main_deploy());
 
-		state.set_callsign(callsign());
-		state.set_firmware_version(version());
+		cal_data.set_callsign(callsign());
+		cal_data.set_firmware_version(version());
 	}
 }

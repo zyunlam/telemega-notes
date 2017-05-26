@@ -40,22 +40,22 @@ public class AltosTelemetryMini3 extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
-		state.set_state(state());
+		cal_data.set_ground_pressure(ground_pres());
 
-		state.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(v_batt()));
+		listener.set_state(state());
+		cal_data.set_state(state());
 
-		state.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_a()));
-		state.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_m()));
+		listener.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(v_batt()));
 
-		state.set_pressure(pres());
-		state.set_temperature(temp()/100.0);
+		listener.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_a()));
+		listener.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_m()));
 
-		state.set_kalman(extend_height(state, height_16()),
-				 speed()/16.0, acceleration()/16.0);
+		listener.set_pressure(pres());
+		listener.set_temperature(temp()/100.0);
 
-		state.set_ground_pressure(ground_pres());
+		listener.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);
 	}
 }

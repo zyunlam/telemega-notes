@@ -26,6 +26,7 @@ record_files = \
 
 altoslib_JAVA = \
 	AltosLib.java \
+	AltosCalData.java \
 	AltosCompanion.java \
 	AltosConfigData.java \
 	AltosConfigDataException.java \
@@ -55,13 +56,15 @@ altoslib_JAVA = \
 	AltosFile.java \
 	AltosFlash.java \
 	AltosFlashListener.java \
-	AltosFlightListener.java \
+	AltosDataListener.java \
+	AltosDataProvider.java \
 	AltosFlightSeries.java \
 	AltosFlightReader.java \
 	AltosFlightStats.java \
 	AltosForce.java \
 	AltosFrequency.java \
 	AltosGPS.java \
+	AltosGPSTimeValue.java \
 	AltosGPSSat.java \
 	AltosGreatCircle.java \
 	AltosHexfile.java \
@@ -85,6 +88,7 @@ altoslib_JAVA = \
 	AltosOrient.java \
 	AltosParse.java \
 	AltosPressure.java \
+	AltosPresTemp.java \
 	AltosPreferences.java \
 	AltosPreferencesBackend.java \
 	AltosProgrammer.java \
@@ -101,8 +105,7 @@ altoslib_JAVA = \
 	AltosSensorMetrum.java \
 	AltosSensorTGPS.java \
 	AltosState.java \
-	AltosStateIterable.java \
-	AltosStateUpdate.java \
+	AltosStateName.java \
 	AltosTelemetry.java \
 	AltosTelemetryConfiguration.java \
 	AltosTelemetryCompanion.java \

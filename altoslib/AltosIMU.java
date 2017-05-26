@@ -33,7 +33,7 @@ public class AltosIMU implements Cloneable {
 	public static final double	counts_per_g = 2048.0;
 
 	public static double convert_accel(double counts) {
-		return counts / counts_per_g * (-AltosConvert.GRAVITATIONAL_ACCELERATION);
+		return counts / counts_per_g * AltosConvert.gravity;
 	}
 
 	public static final double	counts_per_degsec = 16.4;
@@ -72,12 +72,18 @@ public class AltosIMU implements Cloneable {
 		return n;
 	}
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
 		try {
 			AltosIMU	imu = new AltosIMU(link);
 
-			if (imu != null)
-				state.set_imu(imu);
+			if (imu != null) {
+				listener.set_accel(cal_data.accel_along(imu.accel_along),
+						   cal_data.accel_across(imu.accel_across),
+						   cal_data.accel_through(imu.accel_through));
+				listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll),
+						  cal_data.gyro_pitch(imu.gyro_pitch),
+						  cal_data.gyro_yaw(imu.gyro_yaw));
+			}
 		} catch (TimeoutException te) {
 		}
 	}

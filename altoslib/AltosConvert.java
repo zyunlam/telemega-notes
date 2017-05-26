@@ -24,6 +24,9 @@ package org.altusmetrum.altoslib_11;
 import java.util.*;
 
 public class AltosConvert {
+
+	public static final double gravity = 9.80665;
+
 	/*
 	 * Pressure Sensor Model, version 1.1
 	 *
@@ -44,20 +47,20 @@ public class AltosConvert {
 	 *   in Joules/(kilogram-Kelvin).
 	 */
 
-	public static final double GRAVITATIONAL_ACCELERATION = -9.80665;
-	public static final double AIR_GAS_CONSTANT		= 287.053;
-	public static final double NUMBER_OF_LAYERS		= 7;
-	public static final double MAXIMUM_ALTITUDE		= 84852.0;
-	public static final double MINIMUM_PRESSURE		= 0.3734;
-	public static final double LAYER0_BASE_TEMPERATURE	= 288.15;
-	public static final double LAYER0_BASE_PRESSURE	= 101325;
+	private static final double GRAVITATIONAL_ACCELERATION = -gravity;
+	private static final double AIR_GAS_CONSTANT		= 287.053;
+	private static final double NUMBER_OF_LAYERS		= 7;
+	private static final double MAXIMUM_ALTITUDE		= 84852.0;
+	private static final double MINIMUM_PRESSURE		= 0.3734;
+	private static final double LAYER0_BASE_TEMPERATURE	= 288.15;
+	private static final double LAYER0_BASE_PRESSURE	= 101325;
 
 	/* lapse rate and base altitude for each layer in the atmosphere */
-	public static final double[] lapse_rate = {
+	private static final double[] lapse_rate = {
 		-0.0065, 0.0, 0.001, 0.0028, 0.0, -0.0028, -0.002
 	};
 
-	public static final int[] base_altitude = {
+	private static final int[] base_altitude = {
 		0, 11000, 20000, 32000, 47000, 51000, 71000
 	};
 
@@ -307,6 +310,10 @@ public class AltosConvert {
 		return 434.550 + channel * 0.100;
 	}
 
+	public static int telem_to_rssi(int telem) {
+		return telem / 2 - 74;
+	}
+
 	public static int[] ParseHex(String line) {
 		String[] tokens = line.split("\\s+");
 		int[] array = new int[tokens.length];
@@ -384,6 +391,21 @@ public class AltosConvert {
 		return lb / 0.22480894;
 	}
 
+	public static double acceleration_from_sensor(double sensor, double plus_g, double minus_g, double ground) {
+		if (sensor == AltosLib.MISSING)
+			return AltosLib.MISSING;
+
+		if (plus_g == AltosLib.MISSING || minus_g == AltosLib.MISSING)
+			return AltosLib.MISSING;
+
+		if (ground == AltosLib.MISSING)
+			ground = plus_g;
+
+		double counts_per_g = (plus_g - minus_g) / 2.0;
+		double counts_per_mss = counts_per_g / gravity;
+		return (sensor - ground) / counts_per_mss;
+	}
+
 	public static boolean imperial_units = false;
 
 	public static AltosDistance distance = new AltosDistance();
@@ -409,6 +431,8 @@ public class AltosConvert {
 	public static AltosLongitude longitude = new AltosLongitude();
 
 	public static AltosRotationRate rotation_rate = new AltosRotationRate();
+
+	public static AltosStateName state_name = new AltosStateName();
 
 	public static String show_gs(String format, double a) {
 		a = meters_to_g(a);

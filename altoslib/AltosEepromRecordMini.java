@@ -62,22 +62,24 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 		return -1;
 	}
 
-	public void update_state(AltosFlightListener state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			state.set_flight(flight());
-			state.set_ground_pressure(ground_pres());
+			cal_data.set_flight(flight());
+			cal_data.set_ground_pressure(ground_pres());
 			break;
 		case AltosLib.AO_LOG_STATE:
-			state.set_state(state());
+			listener.set_state(state());
 			break;
 		case AltosLib.AO_LOG_SENSOR:
-			state.set_ms5607(pres(), temp());
-			state.set_apogee_voltage(pyro_voltage(sense_a()));
-			state.set_main_voltage(pyro_voltage(sense_m()));
-			state.set_battery_voltage(battery_voltage(v_batt()));
+			AltosPresTemp pt = eeprom.config_data().ms5607().pres_temp(pres(), temp());
+			listener.set_pressure(pt.pres);
+			listener.set_temperature(pt.temp);
+			listener.set_apogee_voltage(pyro_voltage(sense_a()));
+			listener.set_main_voltage(pyro_voltage(sense_m()));
+			listener.set_battery_voltage(battery_voltage(v_batt()));
 			break;
 		}
 	}

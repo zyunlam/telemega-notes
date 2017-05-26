@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public abstract class AltosEeprom implements AltosStateUpdate {
+public abstract class AltosEeprom implements AltosDataProvider {
 	public int	cmd;
 	public int	tick;
 	public int	data8[];
@@ -52,11 +52,11 @@ public abstract class AltosEeprom implements AltosStateUpdate {
 
 	public abstract int record_length();
 
-	public void update_state(AltosState state) {
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		cal_data.set_tick(tick);
 		if (cmd == AltosLib.AO_LOG_FLIGHT)
-			state.set_boost_tick(tick);
-		else
-			state.set_tick(tick);
+			cal_data.set_boost_tick();
+		listener.set_time(cal_data.time());
 	}
 
 	public void write(PrintStream out) {

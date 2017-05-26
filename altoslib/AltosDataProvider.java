@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,6 @@
 
 package org.altusmetrum.altoslib_11;
 
-
-public class AltosTelemetryMetrumData extends AltosTelemetryStandard {
-
-	int	ground_pres() { return int32(8); }
-	int	ground_accel() { return int16(12); }
-	int	accel_plus_g() { return int16(14); }
-	int	accel_minus_g() { return int16(16); }
-
-	public AltosTelemetryMetrumData(int[] bytes) throws AltosCRCException {
-		super(bytes);
-	}
-
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		cal_data.set_ground_accel(ground_accel());
-		cal_data.set_accel_plus_minus(accel_plus_g(), accel_minus_g());
-		cal_data.set_ground_pressure(ground_pres());
-	}
+public interface AltosDataProvider {
+	public void	provide_data(AltosDataListener listener, AltosCalData cal_data) throws InterruptedException, AltosUnknownProduct;
 }

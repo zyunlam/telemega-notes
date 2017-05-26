@@ -20,7 +20,7 @@ package org.altusmetrum.altoslib_11;
 
 public interface AltosWriter {
 
-	public void write(AltosStateIterable states);
+	public void write(AltosFlightSeries series);
 
 	public void close();
 }

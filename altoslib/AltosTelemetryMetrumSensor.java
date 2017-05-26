@@ -38,21 +38,21 @@ public class AltosTelemetryMetrumSensor extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
-		state.set_state(state());
+		listener.set_state(state());
+		cal_data.set_state(state());
 
-		state.set_accel(accel());
-		state.set_pressure(pres());
-		state.set_temperature(temp()/100.0);
+		listener.set_acceleration(cal_data.acceleration(accel()));
+		listener.set_pressure(pres());
+		listener.set_temperature(temp()/100.0);
 
-		state.set_kalman(extend_height(state, height_16()),
-				 speed()/16.0, acceleration()/16.0);
+		listener.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);
 
-		state.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt()));
+		listener.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt()));
 
-		state.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sense_a()));
-		state.set_main_voltage(AltosConvert.mega_pyro_voltage(sense_m()));
+		listener.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sense_a()));
+		listener.set_main_voltage(AltosConvert.mega_pyro_voltage(sense_m()));
 	}
 }

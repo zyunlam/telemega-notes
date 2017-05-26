@@ -49,9 +49,10 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
-		AltosGPS	gps = state.make_temp_gps(false);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
+
+		AltosGPS	gps = new AltosGPS();
 
 		int flags = flags();
 		gps.nsat = flags & 0xf;
@@ -74,7 +75,10 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 			gps.pdop = pdop() / 10.0;
 			gps.hdop = hdop() / 10.0;
 			gps.vdop = vdop() / 10.0;
+
+			if (gps.nsat >= 4)
+				cal_data.set_gps_altitude(gps.alt);
 		}
-		state.set_temp_gps();
+		listener.set_gps(gps);
 	}
 }

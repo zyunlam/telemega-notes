@@ -21,13 +21,13 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 
 	public static final int two_g_default = 16294 - 15758;
 
-	public void update_state(AltosFlightListener state) {
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
 
-		super.update_state(state);
+		super.provide_data(listener, cal_data);
 		AltosGPS	gps;
 
 		/* Flush any pending GPS changes */
-		if (state.gps_pending()) {
+		if (cal_data.gps_pending()) {
 			switch (cmd()) {
 			case AltosLib.AO_LOG_GPS_LAT:
 			case AltosLib.AO_LOG_GPS_LON:
@@ -36,39 +36,40 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 			case AltosLib.AO_LOG_GPS_DATE:
 				break;
 			default:
-				state.set_temp_gps();
+				listener.set_gps(cal_data.temp_gps());
+				cal_data.reset_temp_gps();
 				break;
 			}
 		}
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			state.set_state(AltosLib.ao_flight_pad);
-			state.set_ground_accel(data16(0));
-			state.set_flight(data16(2));
-			if (state.accel_plus_g == AltosLib.MISSING)
-				state.set_accel_g(data16(0), data16(0) + two_g_default);
+			listener.set_state(AltosLib.ao_flight_pad);
+			cal_data.set_ground_accel(data16(0));
+			cal_data.set_flight(data16(2));
+			if (cal_data.accel_plus_g == AltosLib.MISSING)
+				cal_data.set_accel_plus_minus(data16(0), data16(0) + two_g_default);
 			break;
 		case AltosLib.AO_LOG_SENSOR:
-			state.set_accel(data16(0));
-			state.set_pressure(AltosConvert.barometer_to_pressure(data16(2)));
+			listener.set_acceleration(cal_data.acceleration(data16(0)));
+			listener.set_pressure(AltosConvert.barometer_to_pressure(data16(2)));
 			break;
 		case AltosLib.AO_LOG_PRESSURE:
-			state.set_pressure(AltosConvert.barometer_to_pressure(data16(2)));
+			listener.set_pressure(AltosConvert.barometer_to_pressure(data16(2)));
 			break;
 		case AltosLib.AO_LOG_TEMP_VOLT:
-			state.set_temperature(AltosConvert.thermometer_to_temperature(data16(0)));
-			state.set_battery_voltage(AltosConvert.cc_battery_to_voltage(data16(2)));
+			listener.set_temperature(AltosConvert.thermometer_to_temperature(data16(0)));
+			listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(data16(2)));
 			break;
 		case AltosLib.AO_LOG_DEPLOY:
-			state.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(data16(0)));
-			state.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(data16(2)));
+			listener.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(data16(0)));
+			listener.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(data16(2)));
 			break;
 		case AltosLib.AO_LOG_STATE:
-			state.set_state(data16(0));
+			listener.set_state(data16(0));
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
-			gps = state.make_temp_gps(false);
+			gps = cal_data.make_temp_gps(tick(),false);
 
 			gps.hour = data8(0);
 			gps.minute = data8(1);
@@ -82,29 +83,29 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 				AltosLib.AO_GPS_NUM_SAT_SHIFT;
 			break;
 		case AltosLib.AO_LOG_GPS_LAT:
-			gps = state.make_temp_gps(false);
+			gps = cal_data.make_temp_gps(tick(),false);
 
 			int lat32 = data32(0);
 			gps.lat = (double) lat32 / 1e7;
 			break;
 		case AltosLib.AO_LOG_GPS_LON:
-			gps = state.make_temp_gps(false);
+			gps = cal_data.make_temp_gps(tick(),false);
 
 			int lon32 = data32(0);
 			gps.lon = (double) lon32 / 1e7;
 			break;
 		case AltosLib.AO_LOG_GPS_ALT:
-			gps = state.make_temp_gps(false);
+			gps = cal_data.make_temp_gps(tick(),false);
 			gps.alt = data16(0);
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
-			gps = state.make_temp_gps(true);
+			gps = cal_data.make_temp_gps(tick(),true);
 			int svid = data16(0);
 			int c_n0 = data16(3);
 			gps.add_sat(svid, c_n0);
 			break;
 		case AltosLib.AO_LOG_GPS_DATE:
-			gps = state.make_temp_gps(false);
+			gps = cal_data.make_temp_gps(tick(),false);
 			gps.year = data8(0) + 2000;
 			gps.month = data8(1);
 			gps.day = data8(2);
