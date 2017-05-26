@@ -37,19 +37,23 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	AltosGraphNew		graph;
 	AltosUIEnable		enable;
 	AltosUIMap		map;
-	AltosState		state;
-	AltosGraphDataSet	graphDataSet;
 	AltosFlightStats	stats;
 	AltosFlightStatsTable	statsTable;
+	AltosGPS		gps;
 	boolean			has_gps;
 
-	void fill_map(AltosStateIterable states) {
-		boolean		any_gps = false;
-		for (AltosState state : states) {
-			if (state.gps != null && state.gps.locked && state.gps.nsat >= 4) {
+	void fill_map(AltosFlightSeries flight_series) {
+		boolean			any_gps = false;
+
+		for (AltosGPSTimeValue gtv : flight_series.gps_series) {
+			AltosGPS gps = gtv.gps;
+			if (gps != null &&
+			    gps.locked &&
+			    gps.nsat >= 4) {
 				if (map == null)
 					map = new AltosUIMap();
-				map.show(state, null);
+				map.show(gps, AltosLib.ao_flight_pad);
+				this.gps = gps;
 				has_gps = true;
 			}
 		}
@@ -69,18 +73,24 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 			enable.units_changed(imperial_units);
 	}
 
-	AltosGraphUI(AltosStateIterable states, AltosRecordSet record_set, File file) throws InterruptedException, IOException {
+	AltosGraphUI(AltosRecordSet set, File file) throws InterruptedException, IOException {
 		super(file.getName());
-		state = null;
+		AltosCalData	cal_data = set.cal_data();
+
 
 		pane = new JTabbedPane();
 
 		enable = new AltosUIEnable();
 
-		stats = new AltosFlightStats(states);
-//		graphDataSet = new AltosGraphDataSet(states);
+		AltosUIFlightSeries flight_series = new AltosUIFlightSeries(cal_data);
 
-		graph = new AltosGraphNew(enable, stats, record_set);
+		set.capture_series(flight_series);
+
+		flight_series.fill_in();
+
+		stats = new AltosFlightStats(flight_series);
+
+		graph = new AltosGraphNew(enable, stats, flight_series, cal_data);
 
 		statsTable = new AltosFlightStatsTable(stats);
 
@@ -89,7 +99,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pane.add("Flight Statistics", statsTable);
 
 		has_gps = false;
-		fill_map(states);
+		fill_map(flight_series);
 		if (has_gps)
 			pane.add("Map", map);
 
@@ -108,7 +118,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pack();
 
 		setVisible(true);
-		if (state != null && has_gps)
-			map.centre(state);
+		if (gps != null)
+			map.centre(gps);
 	}
 }

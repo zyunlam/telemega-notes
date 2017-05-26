@@ -123,20 +123,17 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 			if (file != null) {
 				String	filename = file.getName();
 				try {
-					AltosStateIterable states = null;
 					AltosRecordSet record_set = null;
 					if (filename.endsWith("eeprom")) {
-						FileReader in = new FileReader(file);
-						states = new AltosEepromFile(in);
 						record_set = new AltosEepromRecordSet(new FileReader(file));
 					} else if (filename.endsWith("telem")) {
 						FileInputStream in = new FileInputStream(file);
-						states = new AltosTelemetryFile(in);
+						record_set = new AltosTelemetryFile(in);
 					} else {
 						throw new FileNotFoundException(filename);
 					}
 					try {
-						new AltosGraphUI(states, record_set, file);
+						new AltosGraphUI(record_set, file);
 					} catch (InterruptedException ie) {
 					} catch (IOException ie) {
 					}

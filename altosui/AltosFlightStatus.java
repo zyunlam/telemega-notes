@@ -120,13 +120,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 
 		int	last_serial = -1;
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.serial != last_serial) {
+			AltosCalData	cal_data = state.cal_data;
+			if (cal_data.serial != last_serial) {
 				show();
-				if (state.serial == AltosLib.MISSING)
+				if (cal_data.serial == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.serial));
-				last_serial = state.serial;
+					value.setText(String.format("%d", cal_data.serial));
+				last_serial = cal_data.serial;
 			}
 		}
 
@@ -147,13 +148,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		int	last_flight = -1;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.flight != last_flight) {
+			AltosCalData cal_data = state.cal_data;
+			if (cal_data.flight != last_flight) {
 				show();
-				if (state.flight == AltosLib.MISSING)
+				if (cal_data.flight == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.flight));
-				last_flight = state.flight;
+					value.setText(String.format("%d", cal_data.flight));
+				last_flight = cal_data.flight;
 			}
 		}
 

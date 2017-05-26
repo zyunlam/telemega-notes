@@ -310,12 +310,13 @@ public class AltosUI extends AltosUIFrame {
 		AltosDataChooser chooser = new AltosDataChooser(
 			AltosUI.this);
 
-		Iterable<AltosState> states = chooser.runDialog();
-		if (states != null) {
-			AltosFlightReader reader = new AltosReplayReader(states.iterator(),
-									 chooser.file());
-			new AltosFlightUI(voice, reader);
-		}
+		AltosRecordSet set = chooser.runDialog();
+/* XXX fixme */
+//		if (states != null) {
+//			AltosFlightReader reader = new AltosReplayReader(states.iterator(),
+//									 chooser.file());
+//			new AltosFlightUI(voice, reader);
+//		}
 	}
 
 	/* Connect to TeleMetrum, either directly or through
@@ -325,6 +326,12 @@ public class AltosUI extends AltosUIFrame {
 		new AltosEepromManage(AltosUI.this, AltosLib.product_any);
 	}
 
+	private static AltosFlightSeries make_series(AltosRecordSet set) {
+		AltosFlightSeries series = new AltosFlightSeries(new AltosCalData());
+		set.capture_series(series);
+		return series;
+	}
+
 	/* Load a flight log file and write out a CSV file containing
 	 * all of the data in standard units
 	 */
@@ -332,10 +339,11 @@ public class AltosUI extends AltosUIFrame {
 	private void ExportData() {
 		AltosDataChooser chooser;
 		chooser = new AltosDataChooser(this);
-		AltosStateIterable states = chooser.runDialog();
-		if (states == null)
+		AltosRecordSet set = chooser.runDialog();
+		if (set == null)
 			return;
-		new AltosCSVUI(AltosUI.this, states, chooser.file());
+		AltosFlightSeries series = make_series(set);
+		new AltosCSVUI(AltosUI.this, series, series.cal_data, chooser.file());
 	}
 
 	/* Load a flight log CSV file and display a pretty graph.
@@ -344,11 +352,11 @@ public class AltosUI extends AltosUIFrame {
 	private void GraphData() {
 		AltosDataChooser chooser;
 		chooser = new AltosDataChooser(this);
-		AltosStateIterable states = chooser.runDialog();
-		if (states == null)
+		AltosRecordSet set = chooser.runDialog();
+		if (set == null)
 			return;
 		try {
-			new AltosGraphUI(states, new AltosEepromRecordSet(new FileReader(chooser.file())), chooser.file());
+			new AltosGraphUI(set, chooser.file());
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
 		}
@@ -365,7 +373,7 @@ public class AltosUI extends AltosUIFrame {
 		}
 	}
 
-	static AltosStateIterable open_logfile(File file) {
+	static AltosRecordSet open_logfile(File file) {
 		try {
 			if (file.getName().endsWith("telem"))
 				return new AltosTelemetryFile(new FileInputStream(file));
@@ -407,8 +415,8 @@ public class AltosUI extends AltosUIFrame {
 	static final int process_cat = 6;
 
 	static boolean process_csv(File input) {
-		AltosStateIterable states = open_logfile(input);
-		if (states == null)
+		AltosRecordSet set = open_logfile(input);
+		if (set == null)
 			return false;
 
 		File output = Altos.replace_extension(input,".csv");
@@ -420,15 +428,16 @@ public class AltosUI extends AltosUIFrame {
 			AltosWriter writer = open_csv(output);
 			if (writer == null)
 				return false;
-			writer.write(states);
+			AltosFlightSeries series = make_series(set);
+			writer.write(series);
 			writer.close();
 		}
 		return true;
 	}
 
 	static boolean process_kml(File input) {
-		AltosStateIterable states = open_logfile(input);
-		if (states == null)
+		AltosRecordSet set = open_logfile(input);
+		if (set == null)
 			return false;
 
 		File output = Altos.replace_extension(input,".kml");
@@ -440,13 +449,14 @@ public class AltosUI extends AltosUIFrame {
 			AltosWriter writer = open_kml(output);
 			if (writer == null)
 				return false;
-			writer.write(states);
+			AltosFlightSeries series = make_series(set);
+			writer.write(series);
 			writer.close();
 			return true;
 		}
 	}
 
-	static AltosStateIterable record_iterable(File file) {
+	static AltosRecordSet record_set(File file) {
 		FileInputStream in;
 		if (file.getName().endsWith("telem")) {
 			try {
@@ -468,10 +478,11 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	static AltosReplayReader replay_file(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return null;
-		return new AltosReplayReader(states.iterator(), file);
+//		return new AltosReplayReader(states.iterator(), file);
+		return null;
 	}
 
 	static boolean process_replay(File file) {
@@ -483,11 +494,11 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	static boolean process_graph(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return false;
 		try {
-			new AltosGraphUI(states, new AltosEepromRecordSet(new FileReader(file)), file);
+			new AltosGraphUI(set, file);
 			return true;
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
@@ -496,12 +507,13 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	static boolean process_summary(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return false;
 		try {
 			System.out.printf("%s:\n", file.toString());
-			AltosFlightStats stats = new AltosFlightStats(states);
+			AltosFlightSeries series = make_series(set);
+			AltosFlightStats stats = new AltosFlightStats(series);
 			if (stats.serial != AltosLib.MISSING)
 				System.out.printf("Serial:       %5d\n", stats.serial);
 			if (stats.flight != AltosLib.MISSING)
@@ -550,26 +562,26 @@ public class AltosUI extends AltosUIFrame {
 
 	static boolean process_cat(File file) {
 		try {
-			AltosStateIterable eef = record_iterable(file);
+			AltosRecordSet set = record_set(file);
 
-			for (AltosState state : eef) {
-				if ((state.set & AltosState.set_gps) != 0) {
-					System.out.printf ("time %d %d-%d-%d %d:%d:%d lat %g lon %g alt %g\n",
-							   state.gps.seconds(),
-							   state.gps.year,
-							   state.gps.month,
-							   state.gps.day,
-							   state.gps.hour,
-							   state.gps.minute,
-							   state.gps.second,
-							   state.gps.lat,
-							   state.gps.lon,
-							   state.gps.alt);
-				} else {
-					System.out.printf ("tick %d state %d height %g\n",
-							   state.tick, state.state(), state.height());
-				}
-			}
+//			for (AltosState state : eef) {
+//				if ((state.set & AltosState.set_gps) != 0) {
+//					System.out.printf ("time %d %d-%d-%d %d:%d:%d lat %g lon %g alt %g\n",
+//							   state.gps.seconds(),
+//							   state.gps.year,
+//							   state.gps.month,
+//							   state.gps.day,
+//							   state.gps.hour,
+//							   state.gps.minute,
+//							   state.gps.second,
+//							   state.gps.lat,
+//							   state.gps.lon,
+//							   state.gps.alt);
+//				} else {
+//					System.out.printf ("tick %d state %d height %g\n",
+//							   state.tick, state.state(), state.height());
+//				}
+//			}
 
 		} catch (Exception e) {
 			System.out.printf("Failed to open file '%s'\n", file);

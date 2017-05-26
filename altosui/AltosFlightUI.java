@@ -101,7 +101,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		status_update.saved_listener_state = listener_state;
 
 		if (state == null)
-			state = new AltosState();
+			state = new AltosState(new AltosCalData());
 
 		if (state.state() != Altos.ao_flight_startup) {
 			if (!has_state) {

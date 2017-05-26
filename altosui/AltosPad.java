@@ -46,10 +46,10 @@ public class AltosPad extends AltosUIFlightTab {
 
 	class LoggingReady extends AltosUIIndicator {
 		public void show (AltosState state, AltosListenerState listener_state) {
-			if (state == null || state.flight == AltosLib.MISSING) {
+			if (state == null || state.cal_data.flight == AltosLib.MISSING) {
 				hide();
 			} else {
-				if (state.flight != 0) {
+				if (state.cal_data.flight != 0) {
 					if (state.state() <= Altos.ao_flight_pad)
 						show("Ready to record");
 					else if (state.state() < Altos.ao_flight_landed ||
@@ -59,7 +59,7 @@ public class AltosPad extends AltosUIFlightTab {
 						show("Recorded data");
 				} else
 					show("Storage full");
-				set_lights(state.flight != 0);
+				set_lights(state.cal_data.flight != 0);
 			}
 		}
 		public LoggingReady (AltosUIFlightTab container, int y) {
