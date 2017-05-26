@@ -564,8 +564,8 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 			listener.set_kalman(kalman_height, kalman_speed, kalman_acceleration);
 		listener.set_temperature(AltosConvert.thermometer_to_temperature(temp));
 		listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(batt));
-		listener.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(apogee));
-		listener.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(main));
+		listener.set_apogee_voltage(AltosConvert.cc_igniter_to_voltage(apogee));
+		listener.set_main_voltage(AltosConvert.cc_igniter_to_voltage(main));
 		if (gps != null)
 			listener.set_gps(gps);
 	}

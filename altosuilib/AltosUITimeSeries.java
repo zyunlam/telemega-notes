@@ -47,6 +47,7 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 	boolean		enable;
 	AltosUIAxis	axis;
 	boolean		marker;
+	boolean		marker_top;
 	XYItemRenderer	renderer;
 	XYPlot		plot;
 	AltosXYSeries	xy_series;
@@ -81,8 +82,13 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 				String s = units.string_value(v.value);
 				ValueMarker marker = new ValueMarker(v.time);
 				marker.setLabel(s);
-				marker.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
-				marker.setLabelTextAnchor(TextAnchor.TOP_LEFT);
+				if (marker_top) {
+					marker.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
+					marker.setLabelTextAnchor(TextAnchor.TOP_LEFT);
+				} else {
+					marker.setLabelAnchor(RectangleAnchor.BOTTOM_RIGHT);
+					marker.setLabelTextAnchor(TextAnchor.BOTTOM_LEFT);
+				}
 				marker.setPaint(color);
 				if (enable)
 					plot.addDomainMarker(marker);
@@ -91,12 +97,14 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 		} else {
 			xy_series.clear();
 
+			xy_series.setNotify(false);
 			for (AltosTimeValue v : this) {
 				double value = v.value;
 				if (units != null)
 					value = units.graph_value(value);
 				xy_series.add(v.time, value);
 			}
+			xy_series.setNotify(true);
 		}
 	}
 
@@ -153,11 +161,12 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 		xy_series = new AltosXYSeries(label);
 	}
 
-	public void set_marker(Color color, boolean enable, XYPlot plot) {
+	public void set_marker(Color color, boolean enable, XYPlot plot, boolean marker_top) {
 		this.color = color;
 		this.enable = enable;
 		this.marker = true;
 		this.plot = plot;
+		this.marker_top = marker_top;
 	}
 
 	public AltosUITimeSeries(String label, AltosUnits units) {

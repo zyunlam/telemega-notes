@@ -36,7 +36,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	JTabbedPane	pane;
 
 	AltosPad	pad;
-	AltosIgnitor	ignitor;
+	AltosIgnitor	igniter;
 	AltosAscent	ascent;
 	AltosDescent	descent;
 	AltosLanded	landed;
@@ -45,7 +45,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	boolean		has_map;
 	boolean		has_companion;
 	boolean		has_state;
-	boolean		has_ignitor;
+	boolean		has_igniter;
 
 	private AltosFlightStatus flightStatus;
 	private AltosInfoTable flightInfo;
@@ -121,15 +121,15 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 			cur_tab = tab;
 		}
 
-		if (ignitor.should_show(state)) {
-			if (!has_ignitor) {
-				pane.add("Ignitor", ignitor);
-				has_ignitor = true;
+		if (igniter.should_show(state)) {
+			if (!has_igniter) {
+				pane.add("Ignitor", igniter);
+				has_igniter = true;
 			}
 		} else {
-			if (has_ignitor) {
-				pane.remove(ignitor);
-				has_ignitor = false;
+			if (has_igniter) {
+				pane.remove(igniter);
+				has_igniter = false;
 			}
 		}
 
@@ -272,8 +272,8 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		displays.add(pad);
 		pane.add("Status", pad);
 
-		ignitor = new AltosIgnitor();
-		displays.add(ignitor);
+		igniter = new AltosIgnitor();
+		displays.add(igniter);
 		ascent = new AltosAscent();
 		displays.add(ascent);
 		descent = new AltosDescent();

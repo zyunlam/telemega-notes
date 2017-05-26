@@ -92,6 +92,7 @@ altoslib_JAVA = \
 	AltosPreferences.java \
 	AltosPreferencesBackend.java \
 	AltosProgrammer.java \
+	AltosPyroName.java \
 	AltosReplayReader.java \
 	AltosRomconfig.java \
 	AltosSavedState.java \

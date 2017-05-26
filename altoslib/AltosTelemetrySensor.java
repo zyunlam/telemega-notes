@@ -57,8 +57,8 @@ public class AltosTelemetrySensor extends AltosTelemetryStandard {
 		listener.set_temperature(AltosConvert.thermometer_to_temperature(temp()));
 		listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(v_batt()));
 		if (type() == packet_type_TM_sensor || type() == packet_type_Tm_sensor) {
-			listener.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sense_d()));
-			listener.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sense_m()));
+			listener.set_apogee_voltage(AltosConvert.cc_igniter_to_voltage(sense_d()));
+			listener.set_main_voltage(AltosConvert.cc_igniter_to_voltage(sense_m()));
 		}
 
 		listener.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);

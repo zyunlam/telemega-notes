@@ -23,12 +23,17 @@ public class AltosFlightSeries extends AltosDataListener {
 	public int[] indices() {
 		int[] indices = new int[series.size()];
 		for (int i = 0; i < indices.length; i++)
-			indices[i] = 0;
+			indices[i] = -1;
+		step_indices(indices);
 		return indices;
 	}
 
 	private double time(int id, int index) {
 		AltosTimeSeries		s = series.get(id);
+
+		if (index < 0)
+			return Double.NEGATIVE_INFINITY;
+
 		if (index < s.values.size())
 			return s.values.get(index).time;
 		return Double.POSITIVE_INFINITY;
@@ -69,8 +74,30 @@ public class AltosFlightSeries extends AltosDataListener {
 	public double value(String name, int[] indices) {
 		for (int i = 0; i < indices.length; i++) {
 			AltosTimeSeries	s = series.get(i);
+			if (s.label.equals(name)) {
+				int index = indices[i];
+				if (index < 0)
+					index = 0;
+				if (index >= s.values.size())
+					index = s.values.size() - 1;
+				return s.values.get(index).value;
+			}
+		}
+		return AltosLib.MISSING;
+	}
+
+	public double value_before(String name, double time) {
+		for (AltosTimeSeries s : series) {
 			if (s.label.equals(name))
-				return s.values.get(indices[i]).value;
+				return s.value_before(time);
+		}
+		return AltosLib.MISSING;
+	}
+
+	public double value_after(String name, double time) {
+		for (AltosTimeSeries s : series) {
+			if (s.label.equals(name))
+				return s.value_after(time);
 		}
 		return AltosLib.MISSING;
 	}
@@ -105,11 +132,12 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String state_name = "State";
 
 	public void set_state(int state) {
-		this.state = state;
 		if (state_series == null)
 			state_series = add_series(state_name, AltosConvert.state_name);
-		else if ((int) state_series.get(state_series.size()-1).value == state)
+		else if (this.state == state)
 			return;
+		System.out.printf("state %s\n", AltosLib.state_name(state));
+		this.state = state;
 		state_series.add(time(), state);
 	}
 
@@ -146,14 +174,14 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	AltosTimeSeries status_series;
 
-	public static final String status_name = "Status";
+	public static final String status_name = "Radio Status";
 
 	public void set_rssi(int rssi, int status) {
-		if (rssi_series == null)
+		if (rssi_series == null) {
 			rssi_series = add_series(rssi_name, null);
-		rssi_series.add(time(), rssi);
-		if (status_series == null)
 			status_series = add_series(status_name, null);
+		}
+		rssi_series.add(time(), rssi);
 		status_series.add(time(), status);
 	}
 
@@ -329,6 +357,18 @@ public class AltosFlightSeries extends AltosDataListener {
 		main_voltage_series.add(time(), volts);
 	}
 
+	public ArrayList<AltosGPSTimeValue> gps_series;
+
+	public AltosGPS gps_before(double time) {
+		AltosGPS gps = null;
+		for (AltosGPSTimeValue gtv : gps_series)
+			if (gtv.time <= time)
+				gps = gtv.gps;
+			else
+				break;
+		return gps;
+	}
+
 	AltosTimeSeries	sats_in_view;
 	AltosTimeSeries sats_in_soln;
 	AltosTimeSeries gps_altitude;
@@ -337,8 +377,7 @@ public class AltosFlightSeries extends AltosDataListener {
 	AltosTimeSeries gps_ascent_rate;
 	AltosTimeSeries gps_course;
 	AltosTimeSeries gps_speed;
-
-	public ArrayList<AltosGPSTimeValue> gps_series;
+	AltosTimeSeries gps_pdop, gps_vdop, gps_hdop;
 
 	public static final String sats_in_view_name = "Satellites in view";
 	public static final String sats_in_soln_name = "Satellites in solution";
@@ -348,30 +387,42 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String gps_ascent_rate_name = "GPS Ascent Rate";
 	public static final String gps_course_name = "GPS Course";
 	public static final String gps_speed_name = "GPS Speed";
+	public static final String gps_pdop_name = "GPS Dilution of Precision";
+	public static final String gps_vdop_name = "GPS Vertical Dilution of Precision";
+	public static final String gps_hdop_name = "GPS Horizontal Dilution of Precision";
 
 	public void set_gps(AltosGPS gps) {
 		if (gps_series == null)
 			gps_series = new ArrayList<AltosGPSTimeValue>();
 		gps_series.add(new AltosGPSTimeValue(time(), gps));
 
-		if (sats_in_view == null) {
-			sats_in_view = add_series(sats_in_view_name, null);
+		if (sats_in_soln == null) {
 			sats_in_soln = add_series(sats_in_soln_name, null);
-			gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
-			gps_height = add_series(gps_height_name, AltosConvert.height);
-			gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
-			gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
-			gps_course = add_series(gps_course_name, null);
-			gps_speed = add_series(gps_speed_name, null);
 		}
-		if (gps.cc_gps_sat != null)
-			sats_in_view.add(time(), gps.cc_gps_sat.length);
+		sats_in_soln.add(time(), gps.nsat);
+		if (gps.pdop != AltosLib.MISSING) {
+			if (gps_pdop == null) {
+				gps_pdop = add_series(gps_pdop_name, null);
+				gps_hdop = add_series(gps_hdop_name, null);
+				gps_vdop = add_series(gps_vdop_name, null);
+			}
+			gps_pdop.add(time(), gps.pdop);
+			gps_hdop.add(time(), gps.hdop);
+			gps_vdop.add(time(), gps.vdop);
+		}
 		if (gps.locked) {
-			sats_in_soln.add(time(), gps.nsat);
+			if (gps_altitude == null) {
+				gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
+				gps_height = add_series(gps_height_name, AltosConvert.height);
+				gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
+				gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
+				gps_course = add_series(gps_course_name, null);
+				gps_speed = add_series(gps_speed_name, null);
+			}
 			if (gps.alt != AltosLib.MISSING) {
 				gps_altitude.add(time(), gps.alt);
-				if (cal_data.gps_ground_altitude != AltosLib.MISSING)
-					gps_height.add(time(), gps.alt - cal_data.gps_ground_altitude);
+				if (cal_data.gps_pad != null)
+					gps_height.add(time(), gps.alt - cal_data.gps_pad.alt);
 			}
 			if (gps.ground_speed != AltosLib.MISSING)
 				gps_ground_speed.add(time(), gps.ground_speed);
@@ -383,33 +434,141 @@ public class AltosFlightSeries extends AltosDataListener {
 				gps_speed.add(time(), Math.sqrt(gps.ground_speed * gps.ground_speed +
 								gps.climb_rate * gps.climb_rate));
 		}
+		if (gps.cc_gps_sat != null) {
+			if (sats_in_view == null)
+				sats_in_view = add_series(sats_in_view_name, null);
+			sats_in_view.add(time(), gps.cc_gps_sat.length);
+		}
 	}
 
-	public static final String accel_across_name = "Accel Across";
 	public static final String accel_along_name = "Accel Along";
+	public static final String accel_across_name = "Accel Across";
 	public static final String accel_through_name = "Accel Through";
 
+	AltosTimeSeries accel_along, accel_across, accel_through;
+
+	public static final String gyro_roll_name = "Roll Rate";
+	public static final String gyro_pitch_name = "Pitch Rate";
+	public static final String gyro_yaw_name = "Yaw Rate";
+
+	AltosTimeSeries gyro_roll, gyro_pitch, gyro_yaw;
+
+	public static final String mag_along_name = "Magnetic Field Along";
+	public static final String mag_across_name = "Magnetic Field Across";
+	public static final String mag_through_name = "Magnetic Field Through";
+
+	AltosTimeSeries mag_along, mag_across, mag_through;
+
 	public  void set_accel(double along, double across, double through) {
+		if (accel_along == null) {
+			accel_along = add_series(accel_along_name, AltosConvert.accel);
+			accel_across = add_series(accel_across_name, AltosConvert.accel);
+			accel_through = add_series(accel_through_name, AltosConvert.accel);
+		}
+		accel_along.add(time(), along);
+		accel_across.add(time(), across);
+		accel_through.add(time(), through);
 	}
 
 	public  void set_accel_ground(double along, double across, double through) {
 	}
 
 	public  void set_gyro(double roll, double pitch, double yaw) {
+		if (gyro_roll == null) {
+			gyro_roll = add_series(gyro_roll_name, AltosConvert.rotation_rate);
+			gyro_pitch = add_series(gyro_pitch_name, AltosConvert.rotation_rate);
+			gyro_yaw = add_series(gyro_yaw_name, AltosConvert.rotation_rate);
+		}
+		gyro_roll.add(time(), roll);
+		gyro_pitch.add(time(), pitch);
+		gyro_yaw.add(time(), yaw);
 	}
 
 	public  void set_mag(double along, double across, double through) {
+		if (mag_along == null) {
+			mag_along = add_series(mag_along_name, AltosConvert.magnetic_field);
+			mag_across = add_series(mag_across_name, AltosConvert.magnetic_field);
+			mag_through = add_series(mag_through_name, AltosConvert.magnetic_field);
+		}
+		mag_along.add(time(), along);
+		mag_across.add(time(), across);
+		mag_through.add(time(), through);
 	}
 
-	public void set_orient(double new_orient) { }
+	public static final String orient_name = "Tilt Angle";
+
+	AltosTimeSeries orient_series;
+
+	public void set_orient(double orient) {
+		if (orient_series == null)
+			orient_series = add_series(orient_name, AltosConvert.orient);
+		orient_series.add(time(), orient);
+	}
+
+	public static final String pyro_voltage_name = "Pyro Voltage";
+
+	AltosTimeSeries pyro_voltage;
 
 	public  void set_pyro_voltage(double volts) {
+		if (pyro_voltage == null)
+			pyro_voltage = add_series(pyro_voltage_name, AltosConvert.voltage);
+		pyro_voltage.add(time(), volts);
 	}
 
-	public  void set_ignitor_voltage(double[] voltage) {
+	private static String[] igniter_voltage_names;
+
+	public String igniter_voltage_name(int channel) {
+		if (igniter_voltage_names == null || igniter_voltage_names.length <= channel) {
+			String[] new_igniter_voltage_names = new String[channel + 1];
+			int	i = 0;
+
+			if (igniter_voltage_names != null) {
+				for (; i < igniter_voltage_names.length; i++)
+					new_igniter_voltage_names[i] = igniter_voltage_names[i];
+			}
+			for (; i < channel+1; i++)
+				new_igniter_voltage_names[i] = AltosLib.igniter_name(i);
+			igniter_voltage_names = new_igniter_voltage_names;
+		}
+		return igniter_voltage_names[channel];
 	}
+
+	AltosTimeSeries[] igniter_voltage;
+
+	public  void set_igniter_voltage(double[] voltage) {
+		int channels = voltage.length;
+		if (igniter_voltage == null || igniter_voltage.length <= channels) {
+			AltosTimeSeries[]	new_igniter_voltage = new AltosTimeSeries[channels + 1];
+			int			i = 0;
+
+			if (igniter_voltage != null) {
+				for (; i < igniter_voltage.length; i++)
+					new_igniter_voltage[i] = igniter_voltage[i];
+			}
+			for (; i < channels; i++)
+				new_igniter_voltage[i] = add_series(igniter_voltage_name(i), AltosConvert.voltage);
+			igniter_voltage = new_igniter_voltage;
+		}
+		for (int channel = 0; channel < voltage.length; channel++)
+			igniter_voltage[channel].add(time(), voltage[channel]);
+	}
+
+	public static final String pyro_fired_name = "Pyro Channel State";
+
+	AltosTimeSeries pyro_fired_series;
+
+	int	last_pyro_mask;
 
 	public  void set_pyro_fired(int pyro_mask) {
+		if (pyro_fired_series == null)
+			pyro_fired_series = add_series(pyro_fired_name, AltosConvert.pyro_name);
+		for (int channel = 0; channel < 32; channel++) {
+			if ((last_pyro_mask & (1 << channel)) == 0 &&
+			    (pyro_mask & (1 << channel)) != 0) {
+				pyro_fired_series.add(time(), channel);
+			}
+		}
+		last_pyro_mask = pyro_mask;
 	}
 
 	public void set_companion(AltosCompanion companion) {

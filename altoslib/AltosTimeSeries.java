@@ -17,9 +17,9 @@ package org.altusmetrum.altoslib_11;
 import java.util.*;
 
 public class AltosTimeSeries implements Iterable<AltosTimeValue> {
-	public String		label;
-	public AltosUnits	units;
-	List<AltosTimeValue>	values;
+	public String			label;
+	public AltosUnits		units;
+	ArrayList<AltosTimeValue>	values;
 
 	public void add(AltosTimeValue tv) {
 		values.add(tv);
@@ -31,6 +31,58 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 
 	public AltosTimeValue get(int i) {
 		return values.get(i);
+	}
+
+	private double lerp(AltosTimeValue v0, AltosTimeValue v1, double t) {
+		/* degenerate case */
+		if (v0.time == v1.time)
+			return (v0.value + v1.value) / 2;
+
+		return (v0.value * (v1.time - t) + v1.value * (t - v0.time)) / v1.time - v0.time;
+	}
+
+	private int after_index(double time) {
+		int	lo = 0;
+		int	hi = values.size() - 1;
+
+		while (lo <= hi) {
+			int mid = (lo + hi) / 2;
+
+			if (values.get(mid).time < time)
+				lo = mid + 1;
+			else
+				hi = mid - 1;
+		}
+		return lo;
+	}
+
+	/* Compute a value for an arbitrary time */
+	public double value(double time) {
+		int after = after_index(time);
+		if (after == 0)
+			return values.get(0).value;
+		if (after == values.size())
+			return values.get(after - 1).value;
+
+		return lerp(values.get(after-1), values.get(after), time);
+	}
+
+	/* Find the value just before an arbitrary time */
+	public double value_before(double time) {
+		int after = after_index(time);
+
+		if (after == 0)
+			return values.get(0).value;
+		return values.get(after-1).value;
+	}
+
+	/* Find the value just after an arbitrary time */
+	public double value_after(double time) {
+		int after = after_index(time);
+
+		if (after == values.size())
+			return values.get(after-1).value;
+		return values.get(after).value;
 	}
 
 	public int size() {
@@ -144,11 +196,16 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 
 			int	left = find_left(i, half_width);
 			int	right = find_right(i, half_width);
+
 			for (int j = left; j <= right; j++) {
 				double	j_time = values.get(j).time;
 
 				if (left_time <= j_time && j_time <= right_time) {
-					double	coeff = filter_coeff(j_time - center_time, width);
+					double	j_left = j == left ? left_time : values.get(j-1).time;
+					double	j_right = j == right ? right_time : values.get(j+1).time;
+					double	interval = (j_right - j_left) / 2.0;
+					double	coeff = filter_coeff(j_time - center_time, width) * interval;
+
 					total_coeff += coeff;
 					total_value += coeff * values.get(j).value;
 				}

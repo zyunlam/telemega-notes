@@ -44,39 +44,9 @@ public abstract class AltosMapLine {
 	}
 
 	public String line_dist() {
-		String	format;
 		AltosGreatCircle	g = new AltosGreatCircle(start.lat, start.lon,
 								 end.lat, end.lon);
-		double	distance = g.distance;
 
-		if (AltosConvert.imperial_units) {
-			distance = AltosConvert.meters_to_feet(distance);
-			if (distance < 1000) {
-				format = "%4.0fft";
-			} else {
-				distance /= 5280;
-				if (distance < 10)
-					format = "%5.3fmi";
-				else if (distance < 100)
-					format = "%5.2fmi";
-				else if (distance < 1000)
-					format = "%5.1fmi";
-				else
-					format = "%5.0fmi";
-			}
-		} else {
-			if (distance < 1000) {
-				format = "%4.0fm";
-			} else {
-				distance /= 1000;
-				if (distance < 100)
-					format = "%5.2fkm";
-				else if (distance < 1000)
-					format = "%5.1fkm";
-				else
-					format = "%5.0fkm";
-			}
-		}
-		return String.format(format, distance);
+		return AltosConvert.distance.show(7, g.distance);
 	}
 }

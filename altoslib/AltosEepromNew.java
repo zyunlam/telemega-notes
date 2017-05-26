@@ -165,7 +165,8 @@ public class AltosEepromNew {
 			int start = data.size();
 
 			if (config_data().log_format != AltosLib.AO_LOG_FORMAT_TINY) {
-				data.add((byte) tokens[0].codePointAt(0));
+				byte cmd = (byte) tokens[0].codePointAt(0);
+				data.add(cmd);
 
 				int time = AltosLib.fromhex(tokens[1]);
 

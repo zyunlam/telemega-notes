@@ -62,8 +62,8 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 			listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(data16(2)));
 			break;
 		case AltosLib.AO_LOG_DEPLOY:
-			listener.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(data16(0)));
-			listener.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(data16(2)));
+			listener.set_apogee_voltage(AltosConvert.cc_igniter_to_voltage(data16(0)));
+			listener.set_main_voltage(AltosConvert.cc_igniter_to_voltage(data16(2)));
 			break;
 		case AltosLib.AO_LOG_STATE:
 			listener.set_state(data16(0));

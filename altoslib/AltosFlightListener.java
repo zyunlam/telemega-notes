@@ -130,7 +130,7 @@ public abstract class AltosFlightListener {
 	public abstract void set_imu(AltosIMU imu);
 	public abstract void set_mag(AltosMag mag);
 	public abstract void set_pyro_voltage(double volts);
-	public abstract void set_ignitor_voltage(double[] voltage);
+	public abstract void set_igniter_voltage(double[] voltage);
 	public abstract void set_pyro_fired(int pyro_mask);
 
 	public void copy(AltosFlightListener old) {

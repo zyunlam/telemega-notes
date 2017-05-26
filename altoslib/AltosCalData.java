@@ -204,12 +204,11 @@ public class AltosCalData {
 		this.state = state;
 	}
 
-	public double		gps_ground_altitude = AltosLib.MISSING;
+	public AltosGPS		gps_pad = null;
 
-	public void set_gps_altitude(double altitude) {
-		if ((state != AltosLib.MISSING && state < AltosLib.ao_flight_boost) ||
-		    gps_ground_altitude == AltosLib.MISSING)
-			gps_ground_altitude = altitude;
+	public void set_gps(AltosGPS gps) {
+		if ((state != AltosLib.MISSING && state < AltosLib.ao_flight_boost) || gps_pad == null)
+			gps_pad = gps;
 	}
 
 	/*
@@ -226,7 +225,7 @@ public class AltosCalData {
 	public void reset_temp_gps() {
 		if (temp_gps != null) {
 			if (temp_gps.locked && temp_gps.nsat >= 4)
-				set_gps_altitude(temp_gps.alt);
+				set_gps(temp_gps);
 		}
 		temp_gps = null;
 	}

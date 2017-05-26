@@ -59,7 +59,7 @@ class AltosEepromNameData extends AltosDataListener {
 	public void set_accel(double along, double across, double through) { }
 	public void set_mag(double along, double across, double through) { }
 	public void set_pyro_voltage(double volts) { }
-	public void set_ignitor_voltage(double[] voltage) { }
+	public void set_igniter_voltage(double[] voltage) { }
 	public void set_pyro_fired(int pyro_mask) { }
 	public void set_companion(AltosCompanion companion) { }
 	public void set_kalman(double height, double speed, double acceleration) { }

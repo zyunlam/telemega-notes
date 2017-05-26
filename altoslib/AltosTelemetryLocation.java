@@ -58,6 +58,9 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 		gps.nsat = flags & 0xf;
 		gps.locked = (flags & (1 << 4)) != 0;
 		gps.connected = (flags & (1 << 5)) != 0;
+		gps.pdop = pdop() / 10.0;
+		gps.hdop = hdop() / 10.0;
+		gps.vdop = vdop() / 10.0;
 
 		if (gps.locked) {
 			gps.lat = latitude() * 1.0e-7;
@@ -72,12 +75,9 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 			gps.ground_speed = ground_speed() * 1.0e-2;
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
-			gps.pdop = pdop() / 10.0;
-			gps.hdop = hdop() / 10.0;
-			gps.vdop = vdop() / 10.0;
 
 			if (gps.nsat >= 4)
-				cal_data.set_gps_altitude(gps.alt);
+				cal_data.set_gps(gps);
 		}
 		listener.set_gps(gps);
 	}

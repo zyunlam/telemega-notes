@@ -143,6 +143,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 					       ground_yaw() / 512.0);
 			break;
 		case AltosLib.AO_LOG_STATE:
+			System.out.printf("log state %s\n", AltosLib.state_name(state()));
 			listener.set_state(state());
 			break;
 		case AltosLib.AO_LOG_SENSOR:
@@ -198,7 +199,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			for (int i = 0; i < nsense-2; i++)
 				voltages[i] = AltosConvert.mega_pyro_voltage(sense(i));
 
-			listener.set_ignitor_voltage(voltages);
+			listener.set_igniter_voltage(voltages);
 			listener.set_pyro_fired(pyro());
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:

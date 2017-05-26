@@ -571,7 +571,7 @@ public class AltosLib {
 		}
 	}
 
-	public static String ignitor_name(int i) {
+	public static String igniter_name(int i) {
 		return String.format("Ignitor %c", 'A' + i);
 	}
 }

@@ -327,7 +327,7 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	private static AltosFlightSeries make_series(AltosRecordSet set) {
-		AltosFlightSeries series = new AltosFlightSeries(new AltosCalData());
+		AltosFlightSeries series = new AltosFlightSeries(set.cal_data());
 		set.capture_series(series);
 		return series;
 	}

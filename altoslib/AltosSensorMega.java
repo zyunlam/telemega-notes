@@ -97,10 +97,10 @@ class AltosSensorMega {
 			state.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sensor_mega.sense[4]));
 			state.set_main_voltage(AltosConvert.mega_pyro_voltage(sensor_mega.sense[5]));
 
-			double[]	ignitor_voltage = new double[4];
+			double[]	igniter_voltage = new double[4];
 			for (int i = 0; i < 4; i++)
-				ignitor_voltage[i] = AltosConvert.mega_pyro_voltage(sensor_mega.sense[i]);
-			state.set_ignitor_voltage(ignitor_voltage);
+				igniter_voltage[i] = AltosConvert.mega_pyro_voltage(sensor_mega.sense[i]);
+			state.set_igniter_voltage(igniter_voltage);
 
 		} catch (TimeoutException te) {
 		}

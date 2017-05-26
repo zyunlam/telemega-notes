@@ -702,7 +702,7 @@ public class AltosState extends AltosDataListener {
 	public double	apogee_voltage;
 	public double	main_voltage;
 
-	public double	ignitor_voltage[];
+	public double	igniter_voltage[];
 
 	public AltosGPS	gps;
 	public AltosGPS	temp_gps;
@@ -786,7 +786,7 @@ public class AltosState extends AltosDataListener {
 		pyro_voltage = AltosLib.MISSING;
 		apogee_voltage = AltosLib.MISSING;
 		main_voltage = AltosLib.MISSING;
-		ignitor_voltage = null;
+		igniter_voltage = null;
 
 		kalman_height = new AltosValue();
 		kalman_speed = new AltosValue();
@@ -1221,8 +1221,8 @@ public class AltosState extends AltosDataListener {
 		}
 	}
 
-	public void set_ignitor_voltage(double[] voltage) {
-		this.ignitor_voltage = voltage;
+	public void set_igniter_voltage(double[] voltage) {
+		this.igniter_voltage = voltage;
 	}
 
 	public void set_pyro_fired(int fired) {

@@ -33,15 +33,17 @@ class AltosUITimeSeriesAxis {
 	Color		color;
 	boolean		enabled;
 	boolean		marker;
+	boolean		marker_top;
 	AltosUIAxis	axis;
 	XYPlot		plot;
 
-	public AltosUITimeSeriesAxis(Color color, boolean enabled, AltosUIAxis axis, XYPlot plot, boolean marker) {
+	public AltosUITimeSeriesAxis(Color color, boolean enabled, AltosUIAxis axis, XYPlot plot, boolean marker, boolean marker_top) {
 		this.color = color;
 		this.enabled = enabled;
 		this.axis = axis;
 		this.plot = plot;
 		this.marker = marker;
+		this.marker_top = marker_top;
 	}
 }
 
@@ -57,7 +59,7 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 
 			if (label.equals(ts.label) || (label.equals("default") && uts.color == null)) {
 				if (axis.marker)
-					uts.set_marker(axis.color, axis.enabled, axis.plot);
+					uts.set_marker(axis.color, axis.enabled, axis.plot, axis.marker_top);
 				else
 					uts.set_axis(axis.color, axis.enabled, axis.axis);
 			}
@@ -72,6 +74,7 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 								      enabled,
 								      axis,
 								      null,
+								      false,
 								      false);
 		axes.put(label, tsa);
 		fill_axes(label, tsa);
@@ -80,12 +83,14 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 	public void register_marker(String label,
 				    Color color,
 				    boolean enabled,
-				    XYPlot plot) {
+				    XYPlot plot,
+				    boolean marker_top) {
 		AltosUITimeSeriesAxis tsa = new AltosUITimeSeriesAxis(color,
 								      enabled,
 								      null,
 								      plot,
-								      true);
+								      true,
+								      marker_top);
 		axes.put(label, tsa);
 		fill_axes(label, tsa);
 	}
@@ -100,7 +105,7 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 			tsa = axes.get("default");
 		if (tsa != null) {
 			if (tsa.marker)
-				time_series.set_marker(tsa.color, tsa.enabled, tsa.plot);
+				time_series.set_marker(tsa.color, tsa.enabled, tsa.plot, tsa.marker_top);
 			else
 				time_series.set_axis(tsa.color, tsa.enabled, tsa.axis);
 		}

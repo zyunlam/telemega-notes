@@ -92,7 +92,7 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 	public int next_start() {
 		int	s = start + length;
 
-		while (s + length < eeprom.data.size()) {
+		while (s + length <= eeprom.data.size()) {
 			if (valid(s))
 				return s;
 			s += length;

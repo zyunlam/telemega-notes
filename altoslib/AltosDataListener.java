@@ -59,7 +59,7 @@ public abstract class AltosDataListener {
 	public abstract void set_accel(double along, double across, double through);
 	public abstract void set_mag(double along, double across, double through);
 	public abstract void set_pyro_voltage(double volts);
-	public abstract void set_ignitor_voltage(double[] voltage);
+	public abstract void set_igniter_voltage(double[] voltage);
 	public abstract void set_pyro_fired(int pyro_mask);
 	public abstract void set_companion(AltosCompanion companion);
 

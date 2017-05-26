@@ -191,7 +191,7 @@ public class AltosConvert {
 	}
 
 	public static double
-	cc_ignitor_to_voltage(double ignite)
+	cc_igniter_to_voltage(double ignite)
 	{
 		return ignite / 32767 * 15.0;
 	}
@@ -433,6 +433,10 @@ public class AltosConvert {
 	public static AltosRotationRate rotation_rate = new AltosRotationRate();
 
 	public static AltosStateName state_name = new AltosStateName();
+
+	public static AltosPyroName pyro_name = new AltosPyroName();
+
+	public static AltosUnits magnetic_field = null;
 
 	public static String show_gs(String format, double a) {
 		a = meters_to_g(a);

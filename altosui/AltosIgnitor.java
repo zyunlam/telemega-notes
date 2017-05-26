@@ -27,59 +27,59 @@ import org.altusmetrum.altosuilib_11.*;
 public class AltosIgnitor extends AltosUIFlightTab {
 
 	public class Ignitor extends AltosUIUnitsIndicator {
-		int		ignitor;
+		int		igniter;
 
 		public double value(AltosState state, int i) {
-			if (state.ignitor_voltage == null ||
-			    state.ignitor_voltage.length < ignitor)
+			if (state.igniter_voltage == null ||
+			    state.igniter_voltage.length < igniter)
 				return AltosLib.MISSING;
-			return state.ignitor_voltage[ignitor];
+			return state.igniter_voltage[igniter];
 		}
 
 		public double good() { return AltosLib.ao_igniter_good; }
 
 		public Ignitor (AltosUIFlightTab container, int y) {
-			super(container, y, AltosConvert.voltage, String.format ("%s Voltage", AltosLib.ignitor_name(y)), 1, true, 1);
-			ignitor = y;
+			super(container, y, AltosConvert.voltage, String.format ("%s Voltage", AltosLib.igniter_name(y)), 1, true, 1);
+			igniter = y;
 		}
 	}
 
-	Ignitor[] ignitors;
+	Ignitor[] igniters;
 
 	public void show(AltosState state, AltosListenerState listener_state) {
 		if (isShowing())
-			make_ignitors(state);
+			make_igniters(state);
 		super.show(state, listener_state);
 	}
 
 	public boolean should_show(AltosState state) {
 		if (state == null)
 			return false;
-		if (state.ignitor_voltage == null)
+		if (state.igniter_voltage == null)
 			return false;
-		return state.ignitor_voltage.length > 0;
+		return state.igniter_voltage.length > 0;
 	}
 
-	void make_ignitors(AltosState state) {
-		int n = (state == null || state.ignitor_voltage == null) ? 0 : state.ignitor_voltage.length;
-		int old_n = ignitors == null ? 0 : ignitors.length;
+	void make_igniters(AltosState state) {
+		int n = (state == null || state.igniter_voltage == null) ? 0 : state.igniter_voltage.length;
+		int old_n = igniters == null ? 0 : igniters.length;
 
 		if (n != old_n) {
 
-			if (ignitors != null) {
-				for (int i = 0; i < ignitors.length; i++) {
-					remove(ignitors[i]);
-					ignitors[i].remove(this);
-					ignitors = null;
+			if (igniters != null) {
+				for (int i = 0; i < igniters.length; i++) {
+					remove(igniters[i]);
+					igniters[i].remove(this);
+					igniters = null;
 				}
 			}
 
 			if (n > 0) {
 				setVisible(true);
-				ignitors = new Ignitor[n];
+				igniters = new Ignitor[n];
 				for (int i = 0; i < n; i++) {
-					ignitors[i] = new Ignitor(this, i);
-					add(ignitors[i]);
+					igniters[i] = new Ignitor(this, i);
+					add(igniters[i]);
 				}
 			} else
 				setVisible(false);

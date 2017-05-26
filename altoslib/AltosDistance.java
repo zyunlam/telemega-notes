@@ -96,7 +96,7 @@ public class AltosDistance extends AltosUnits {
 				}
 			};
 
-		range_imperial[1] = new AltosUnitsRange(AltosConvert.feet_to_meters(1000),
+		range_imperial[1] = new AltosUnitsRange(AltosConvert.feet_to_meters(5280),
 							"mi", "miles") {
 				double value(double v) {
 					return AltosConvert.meters_to_miles(v);

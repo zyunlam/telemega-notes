@@ -55,7 +55,7 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		for (int i = 0; i < 4; i++)
 			voltages[i] = AltosConvert.mega_pyro_voltage(sense(i));
 
-		listener.set_ignitor_voltage(voltages);
+		listener.set_igniter_voltage(voltages);
 
 		cal_data.set_ground_accel(ground_accel());
 		cal_data.set_ground_pressure(ground_pres());

@@ -39,8 +39,8 @@ public class AltosSensorTM {
 			listener.set_pressure(AltosConvert.barometer_to_pressure(sensor_tm.pres));
 			listener.set_temperature(AltosConvert.thermometer_to_temperature(sensor_tm.temp));
 			listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(sensor_tm.batt));
-			listener.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sensor_tm.drogue));
-			listener.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sensor_tm.main));
+			listener.set_apogee_voltage(AltosConvert.cc_igniter_to_voltage(sensor_tm.drogue));
+			listener.set_main_voltage(AltosConvert.cc_igniter_to_voltage(sensor_tm.main));
 
 		} catch (TimeoutException te) {
 		}
