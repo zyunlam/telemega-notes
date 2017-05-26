@@ -111,7 +111,6 @@ public class AltosTelemetryFile implements AltosRecordSet {
 				if (l.cal_data_complete())
 					break;
 			}
-			System.out.printf("Telemetry boost tick %d\n", cal_data.boost_tick);
 		}
 		return cal_data;
 	}

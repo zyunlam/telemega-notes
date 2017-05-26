@@ -136,7 +136,6 @@ public class AltosFlightSeries extends AltosDataListener {
 			state_series = add_series(state_name, AltosConvert.state_name);
 		else if (this.state == state)
 			return;
-		System.out.printf("state %s\n", AltosLib.state_name(state));
 		this.state = state;
 		state_series.add(time(), state);
 	}
@@ -147,7 +146,6 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public void set_acceleration(double acceleration) {
 		if (accel_series == null) {
-			System.out.printf("set acceleration %g\n", acceleration);
 			accel_series = add_series(accel_name, AltosConvert.accel);
 		}
 		accel_series.add(time(), acceleration);
@@ -221,10 +219,8 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String speed_name = "Speed";
 
 	private void compute_speed() {
-		if (speed_series != null) {
-			System.out.printf("speed series already made\n");
+		if (speed_series != null)
 			return;
-		}
 
 		AltosTimeSeries	alt_speed_series = null;
 		AltosTimeSeries accel_speed_series = null;
@@ -235,8 +231,6 @@ public class AltosFlightSeries extends AltosDataListener {
 
 			alt_speed_series = make_series(speed_name, AltosConvert.speed);
 			temp_series.filter(alt_speed_series, 10.0);
-		} else {
-			System.out.printf("no altitude series\n");
 		}
 		if (accel_series != null) {
 			AltosTimeSeries temp_series = make_series(speed_name, AltosConvert.speed);
@@ -244,8 +238,6 @@ public class AltosFlightSeries extends AltosDataListener {
 
 			accel_speed_series = make_series(speed_name, AltosConvert.speed);
 			temp_series.filter(accel_speed_series, 0.1);
-		} else {
-			System.out.printf("no accel series\n");
 		}
 
 		if (alt_speed_series != null && accel_speed_series != null) {
@@ -277,11 +269,8 @@ public class AltosFlightSeries extends AltosDataListener {
 		} else if (accel_speed_series != null) {
 			speed_series = accel_speed_series;
 		}
-		if (speed_series != null) {
+		if (speed_series != null)
 			add_series(speed_series);
-			System.out.printf("speed series for %s set to %s\n", this.toString(), speed_series.toString());
-		} else
-			System.out.printf("didn't manage to make speed series\n");
 	}
 
 	AltosTimeSeries	kalman_height_series, kalman_speed_series, kalman_accel_series;
@@ -575,7 +564,6 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	public void fill_in() {
-		System.out.printf("fill in %s\n", this.toString());
 		compute_speed();
 		compute_accel();
 		if (cal_data.ground_altitude != AltosLib.MISSING)
@@ -594,7 +582,6 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public AltosFlightSeries(AltosCalData cal_data) {
 		super(cal_data);
-		System.out.printf("new flight series %s\n", this.toString());
 		init();
 	}
 }

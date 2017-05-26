@@ -143,7 +143,6 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 					       ground_yaw() / 512.0);
 			break;
 		case AltosLib.AO_LOG_STATE:
-			System.out.printf("log state %s\n", AltosLib.state_name(state()));
 			listener.set_state(state());
 			break;
 		case AltosLib.AO_LOG_SENSOR:

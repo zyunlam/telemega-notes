@@ -481,8 +481,7 @@ public class AltosUI extends AltosUIFrame {
 		AltosRecordSet set = record_set(file);
 		if (set == null)
 			return null;
-//		return new AltosReplayReader(states.iterator(), file);
-		return null;
+		return new AltosReplayReader(set, file);
 	}
 
 	static boolean process_replay(File file) {

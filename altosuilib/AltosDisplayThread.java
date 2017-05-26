@@ -30,7 +30,9 @@ public class AltosDisplayThread extends Thread {
 	IdleThread		idle_thread;
 	AltosVoice		voice;
 	AltosFlightReader	reader;
-	AltosState		old_state, state;
+	AltosState		state;
+	int			old_state = AltosLib.ao_flight_invalid;
+	boolean			old_gps_ready = false;
 	AltosListenerState	listener_state;
 	AltosFlightDisplay	display;
 
@@ -164,7 +166,7 @@ public class AltosDisplayThread extends Thread {
 		}
 
 		public synchronized void notice(boolean spoken) {
-			if (old_state != null && old_state.state() != state.state()) {
+			if (old_state != state.state()) {
 				report_time = now();
 				this.notify();
 			} else if (spoken)
@@ -179,16 +181,16 @@ public class AltosDisplayThread extends Thread {
 
 	synchronized boolean tell() {
 		boolean	ret = false;
-		if (old_state == null || old_state.state() != state.state()) {
+		if (old_state != state.state()) {
 			if (state.state() != AltosLib.ao_flight_stateless)
 				voice.speak(state.state_name());
-			if ((old_state == null || old_state.state() <= AltosLib.ao_flight_boost) &&
+			if ((old_state == AltosLib.ao_flight_invalid || old_state <= AltosLib.ao_flight_boost) &&
 			    state.state() > AltosLib.ao_flight_boost) {
 				if (state.max_speed() != AltosLib.MISSING)
 					voice.speak("max speed: %s.",
 						    AltosConvert.speed.say_units(state.max_speed() + 0.5));
 				ret = true;
-			} else if ((old_state == null || old_state.state() < AltosLib.ao_flight_drogue) &&
+			} else if ((old_state == AltosLib.ao_flight_invalid || old_state < AltosLib.ao_flight_drogue) &&
 				   state.state() >= AltosLib.ao_flight_drogue) {
 				if (state.max_height() != AltosLib.MISSING)
 					voice.speak("max height: %s.",
@@ -196,17 +198,18 @@ public class AltosDisplayThread extends Thread {
 				ret = true;
 			}
 		}
-		if (old_state == null || old_state.gps_ready != state.gps_ready) {
+		if (old_gps_ready != state.gps_ready) {
 			if (state.gps_ready) {
 				voice.speak("GPS ready");
 				ret = true;
 			}
-			else if (old_state != null) {
+			else if (old_gps_ready) {
 				voice.speak("GPS lost");
 				ret = true;
 			}
 		}
-		old_state = state;
+		old_state = state.state();
+		old_gps_ready = state.gps_ready;
 		return ret;
 	}
 
@@ -220,14 +223,11 @@ public class AltosDisplayThread extends Thread {
 		try {
 			for (;;) {
 				try {
-					AltosState new_state = reader.read();
-					if (new_state == null) {
-						state = null;
+					state = reader.read();
+					if (state == null) {
 						listener_state.running = false;
 						break;
 					}
-					reader.update(new_state);
-					state = new_state;
 					show_safely();
 					told = tell();
 					idle_thread.notice(told);

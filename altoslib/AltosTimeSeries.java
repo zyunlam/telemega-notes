@@ -85,6 +85,16 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 		return values.get(after).value;
 	}
 
+	public double time_of(double value) {
+		double	last = AltosLib.MISSING;
+		for (AltosTimeValue v : values) {
+			if (v.value >= value)
+				return v.time;
+			last = v.time;
+		}
+		return last;
+	}
+
 	public int size() {
 		return values.size();
 	}
@@ -102,6 +112,16 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 		return max;
 	}
 
+	public double max(double start_time, double end_time) {
+		double max = AltosLib.MISSING;
+		for (AltosTimeValue tv : values) {
+			if (start_time <= tv.time && tv.time <= end_time)
+				if (max == AltosLib.MISSING || tv.value > max)
+					max = tv.value;
+		}
+		return max;
+	}
+
 	public double min() {
 		double min = AltosLib.MISSING;
 		for (AltosTimeValue tv : values) {
@@ -109,6 +129,42 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 				min = tv.value;
 		}
 		return min;
+	}
+
+	public double min(double start_time, double end_time) {
+		double min = AltosLib.MISSING;
+		for (AltosTimeValue tv : values) {
+			if (start_time <= tv.time && tv.time <= end_time)
+				if (min == AltosLib.MISSING || tv.value < min)
+					min = tv.value;
+		}
+		return min;
+	}
+
+	public double average() {
+		double total = 0;
+		int count = 0;
+		for (AltosTimeValue tv : values) {
+			total += tv.value;
+			count++;
+		}
+		if (count == 0)
+			return AltosLib.MISSING;
+		return total / count;
+	}
+
+	public double average(double start_time, double end_time) {
+		double total = 0;
+		int count = 0;
+		for (AltosTimeValue tv : values) {
+			if (start_time <= tv.time && tv.time <= end_time) {
+				total += tv.value;
+				count++;
+			}
+		}
+		if (count == 0)
+			return AltosLib.MISSING;
+		return total / count;
 	}
 
 	public AltosTimeSeries integrate(AltosTimeSeries integral) {

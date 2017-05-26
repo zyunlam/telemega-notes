@@ -45,8 +45,6 @@ public abstract class AltosFlightReader {
 
 	public void save_telemetry_rate() { }
 
-	public void update(AltosState state) throws InterruptedException { }
-
 	public boolean supports_telemetry(int telemetry) { return false; }
 
 	public boolean supports_telemetry_rate(int telemetry_rate) { return false; }
