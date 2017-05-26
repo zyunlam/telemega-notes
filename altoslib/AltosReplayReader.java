@@ -83,20 +83,8 @@ class AltosReplay extends AltosDataListener implements Runnable {
 	public void set_companion(AltosCompanion companion) { state.set_companion(companion); }
 
 	public void run () {
-		System.out.printf("ReplayReader running\n");
-		state = new AltosState(record_set.cal_data());
-
-		/* Tell the display that we're in pad mode */
-		state.set_state(AltosLib.ao_flight_pad);
-		semaphore.release();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException ie) {
-		}
-
 		/* Run the flight */
 		record_set.capture_series(this);
-
 		/* All done, signal that it's over */
 		done = true;
 		semaphore.release();
@@ -104,30 +92,44 @@ class AltosReplay extends AltosDataListener implements Runnable {
 
 	public AltosReplay(AltosRecordSet record_set) {
 		super(record_set.cal_data());
+		state = new AltosState(record_set.cal_data());
+		this.record_set = record_set;
 		try {
 			semaphore.acquire();
-		} catch (InterruptedException ie) { }
-		this.record_set = record_set;
-		Thread t = new Thread(this);
-		t.start();
+		} catch (InterruptedException ie) {
+		}
 	}
 }
 
 public class AltosReplayReader extends AltosFlightReader {
 	File		file;
 	AltosReplay	replay;
+	Thread		t;
+	int		reads;
 
 	public AltosState read() {
+		switch (reads) {
+		case 0:
+			/* Tell the display that we're in pad mode */
+			replay.state.set_state(AltosLib.ao_flight_pad);
+			break;
+		case 1:
+			t = new Thread(replay);
+			t.start();
+			/* fall through */
+		default:
+			/* Wait for something to change */
+			try {
+				replay.semaphore.acquire();
+			} catch (InterruptedException ie) {
+			}
+			break;
+		}
+		reads++;
 
 		/* When done, let the display know */
 		if (replay.done)
 			return null;
-
-		/* Wait for something to change */
-		try {
-			replay.semaphore.acquire();
-		} catch (InterruptedException ie) {
-		}
 
 		/* Fake out the received time */
 		replay.state.set_received_time(System.currentTimeMillis());
@@ -137,12 +139,10 @@ public class AltosReplayReader extends AltosFlightReader {
 	public void close (boolean interrupted) {
 	}
 
-	public void update(AltosState state) throws InterruptedException {
-	}
-
 	public File backing_file() { return file; }
 
 	public AltosReplayReader(AltosRecordSet record_set, File in_file) {
+		reads = 0;
 		file = in_file;
 		name = file.getName();
 		replay = new AltosReplay(record_set);

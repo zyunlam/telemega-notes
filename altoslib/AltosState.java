@@ -705,8 +705,6 @@ public class AltosState extends AltosDataListener {
 	public double	igniter_voltage[];
 
 	public AltosGPS	gps;
-	public AltosGPS	temp_gps;
-	public int temp_gps_sat_tick;
 	public boolean	gps_pending;
 
 	public AltosIMU	imu;
@@ -757,6 +755,7 @@ public class AltosState extends AltosDataListener {
 	public void init() {
 		set = 0;
 
+		System.out.printf("state init\n");
 		received_time = System.currentTimeMillis();
 		time = AltosLib.MISSING;
 		time_change = AltosLib.MISSING;
@@ -793,8 +792,6 @@ public class AltosState extends AltosDataListener {
 		kalman_acceleration = new AltosValue();
 
 		gps = null;
-		temp_gps = null;
-		temp_gps_sat_tick = 0;
 		gps_pending = false;
 
 		imu = null;

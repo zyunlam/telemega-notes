@@ -147,7 +147,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 			}
 		}
 
-		if (state.gps != null && state.gps.connected) {
+		if (state.gps != null) {
 			if (!has_map) {
 				pane.add("Site Map", sitemap);
 				has_map = true;
