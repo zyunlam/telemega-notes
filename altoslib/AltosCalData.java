@@ -220,6 +220,7 @@ public class AltosCalData {
 	 * object and then deliver the result atomically to the listener
 	 */
 	AltosGPS		temp_gps = null;
+	AltosGPS		prev_gps = null;
 	int			temp_gps_sat_tick = AltosLib.MISSING;
 
 	public AltosGPS temp_gps() {
@@ -230,6 +231,7 @@ public class AltosCalData {
 		if (temp_gps != null) {
 			if (temp_gps.locked && temp_gps.nsat >= 4)
 				set_gps(temp_gps);
+			prev_gps = temp_gps;
 			temp_gps = null;
 		}
 	}
@@ -239,8 +241,12 @@ public class AltosCalData {
 	}
 
 	public AltosGPS make_temp_gps(int tick, boolean sats) {
-		if (temp_gps == null)
-			temp_gps = new AltosGPS();
+		if (temp_gps == null) {
+			if (prev_gps != null)
+				temp_gps = prev_gps.clone();
+			else
+				temp_gps = new AltosGPS();
+		}
 		if (sats) {
 			if (tick != temp_gps_sat_tick)
 				temp_gps.cc_gps_sat = null;
