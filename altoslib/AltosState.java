@@ -1075,11 +1075,14 @@ public class AltosState extends AltosDataListener {
 	}
 
 	public AltosState() {
+		Thread.dumpStack();
 		init();
 	}
 
 	public AltosState (AltosCalData cal_data) {
 		super(cal_data);
+		if (cal_data == null)
+			Thread.dumpStack();
 		init();
 	}
 }

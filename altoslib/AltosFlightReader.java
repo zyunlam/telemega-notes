@@ -31,6 +31,8 @@ public abstract class AltosFlightReader {
 
 	public abstract AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException;
 
+	public abstract AltosCalData cal_data();
+
 	public abstract void close(boolean interrupted);
 
 	public void set_frequency(double frequency) throws InterruptedException, TimeoutException { }

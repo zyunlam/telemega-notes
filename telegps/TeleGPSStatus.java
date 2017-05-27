@@ -75,11 +75,13 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 		String	call;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.callsign != call) {
-				value.setText(state.callsign);
-				call = state.callsign;
+			if (state.cal_data == null)
+				System.out.printf("null cal data?\n");
+			if (state.cal_data.callsign != call) {
+				value.setText(state.cal_data.callsign);
+				call = state.cal_data.callsign;
 			}
-			if (state.callsign == null)
+			if (state.cal_data.callsign == null)
 				setVisible(false);
 			else
 				setVisible(true);
@@ -100,12 +102,12 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 	class Serial extends Value {
 		int	serial = -1;
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.serial != serial) {
-				if (state.serial == AltosLib.MISSING)
+			if (state.cal_data.serial != serial) {
+				if (state.cal_data.serial == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.serial));
-				serial = state.serial;
+					value.setText(String.format("%d", state.cal_data.serial));
+				serial = state.cal_data.serial;
 			}
 		}
 
@@ -126,12 +128,12 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 		int	last_flight = -1;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.flight != last_flight) {
-				if (state.flight == AltosLib.MISSING)
+			if (state.cal_data.flight != last_flight) {
+				if (state.cal_data.flight == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.flight));
-				last_flight = state.flight;
+					value.setText(String.format("%d", state.cal_data.flight));
+				last_flight = state.cal_data.flight;
 			}
 		}
 

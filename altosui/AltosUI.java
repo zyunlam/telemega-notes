@@ -311,12 +311,10 @@ public class AltosUI extends AltosUIFrame {
 			AltosUI.this);
 
 		AltosRecordSet set = chooser.runDialog();
-/* XXX fixme */
-//		if (states != null) {
-//			AltosFlightReader reader = new AltosReplayReader(states.iterator(),
-//									 chooser.file());
-//			new AltosFlightUI(voice, reader);
-//		}
+		if (set != null) {
+			AltosReplayReader reader = new AltosReplayReader(set, chooser.file());
+			new AltosFlightUI(voice, reader);
+		}
 	}
 
 	/* Connect to TeleMetrum, either directly or through
@@ -329,6 +327,7 @@ public class AltosUI extends AltosUIFrame {
 	private static AltosFlightSeries make_series(AltosRecordSet set) {
 		AltosFlightSeries series = new AltosFlightSeries(set.cal_data());
 		set.capture_series(series);
+		series.finish();
 		return series;
 	}
 

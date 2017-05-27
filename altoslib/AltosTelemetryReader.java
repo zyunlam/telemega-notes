@@ -23,13 +23,13 @@ import java.io.*;
 import java.util.concurrent.*;
 
 public class AltosTelemetryReader extends AltosFlightReader {
-	AltosLink	link;
-	AltosLog	log;
-	double		frequency;
-	int		telemetry;
-	int		telemetry_rate;
-	public AltosState	state = null;
-	public AltosCalData	cal_data = null;
+	AltosLink		link;
+	AltosLog		log;
+	double			frequency;
+	int			telemetry;
+	int			telemetry_rate;
+	private AltosState	state = null;
+	private AltosCalData	cal_data = null;
 
 	LinkedBlockingQueue<AltosLine> telem;
 
@@ -41,12 +41,20 @@ public class AltosTelemetryReader extends AltosFlightReader {
 				throw new IOException("IO error");
 		} while (!link.get_monitor());
 		AltosTelemetry	telem = AltosTelemetry.parse(l.line);
-		if (cal_data == null)
-			cal_data = new AltosCalData();
-		if (state == null)
-			state = new AltosState(cal_data);
-		telem.provide_data(state, cal_data);
+		if (state == null) {
+			System.out.printf("Make state\n");
+			state = new AltosState(cal_data());
+		}
+		telem.provide_data(state, state.cal_data);
 		return state;
+	}
+
+	public AltosCalData cal_data() {
+		if (cal_data == null) {
+			System.out.printf("Make cal data\n");
+			cal_data = new AltosCalData();
+		}
+		return cal_data;
 	}
 
 	public void flush() {

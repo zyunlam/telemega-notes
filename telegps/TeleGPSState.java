@@ -124,10 +124,10 @@ public class TeleGPSState extends AltosUIFlightTab {
 
 	class FirmwareVersion extends AltosUIIndicator {
 		public void show(AltosState state, AltosListenerState listener_state) {
-			if (state.firmware_version == null)
+			if (state.cal_data.firmware_version == null)
 				show("Missing");
 			else
-				show(state.firmware_version);
+				show(state.cal_data.firmware_version);
 		}
 
 		public FirmwareVersion(Container container, int y) {
@@ -137,9 +137,7 @@ public class TeleGPSState extends AltosUIFlightTab {
 
 	class FlightLogMax extends AltosUIIndicator {
 		public void show(AltosState state, AltosListenerState listener_state) {
-			int storage = state.flight_log_max;
-			if (storage == AltosLib.MISSING)
-				storage = state.log_space >> 10;
+			int storage = state.cal_data.flight_log_max;
 			if (storage == AltosLib.MISSING)
 				show("Missing");
 			else

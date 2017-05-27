@@ -34,21 +34,41 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.ui.RefineryUtilities;
 
-public class TeleGPSGraphUI extends AltosUIFrame
+public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, AltosUnitsListener
 {
 	JTabbedPane		pane;
-	AltosGraph		graph;
+	AltosGraphNew		graph;
 	AltosUIEnable		enable;
 	AltosUIMap		map;
 	AltosState		state;
 	AltosFlightStats	stats;
-	AltosGraphDataSet	graphDataSet;
 	AltosFlightStatsTable	statsTable;
+	AltosGPS		gps;
+	boolean			has_gps;
 
-	void fill_map(AltosStateIterable states) {
-		for (AltosState state : states) {
-			if (state.gps != null && state.gps.locked && state.gps.nsat >= 4)
-				map.show(state, null);
+	void fill_map(AltosFlightSeries flight_series) {
+		boolean			any_gps = false;
+		AltosGPSTimeValue	gtv_last = null;
+
+		if (flight_series.gps_series != null) {
+			for (AltosGPSTimeValue gtv : flight_series.gps_series) {
+				gtv_last = gtv;
+				AltosGPS gps = gtv.gps;
+				if (gps != null &&
+				    gps.locked &&
+				    gps.nsat >= 4) {
+					if (map == null)
+						map = new AltosUIMap();
+					map.show(gps, (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time));
+					this.gps = gps;
+					has_gps = true;
+				}
+			}
+		}
+		if (gtv_last != null) {
+			int state = (int) flight_series.value_after(AltosFlightSeries.state_name, gtv_last.time);
+			if (state == AltosLib.ao_flight_landed)
+				map.show(gtv_last.gps, state);
 		}
 	}
 
@@ -58,16 +78,35 @@ public class TeleGPSGraphUI extends AltosUIFrame
 		TeleGPS.subtract_window();
 	}
 
-	TeleGPSGraphUI(AltosStateIterable states, File file) throws InterruptedException, IOException {
+	public void font_size_changed(int font_size) {
+		if (map != null)
+			map.font_size_changed(font_size);
+		if (statsTable != null)
+			statsTable.font_size_changed(font_size);
+	}
+
+	public void units_changed(boolean imperial_units) {
+		if (map != null)
+			map.units_changed(imperial_units);
+		if (enable != null)
+			enable.units_changed(imperial_units);
+	}
+
+	TeleGPSGraphUI(AltosRecordSet set, File file) throws InterruptedException, IOException {
 		super(file.getName());
-		state = null;
+		AltosCalData cal_data = set.cal_data();
+
+		AltosUIFlightSeries flight_series = new AltosUIFlightSeries(cal_data);
+		set.capture_series(flight_series);
+		flight_series.finish();
 
 		pane = new JTabbedPane();
 
 		enable = new AltosUIEnable();
-		stats = new AltosFlightStats(states);
-		graphDataSet = new AltosGraphDataSet(states);
-		graph = new AltosGraph(enable, stats, graphDataSet);
+		stats = new AltosFlightStats(flight_series);
+
+		graph = new AltosGraphNew(enable, stats, flight_series, cal_data);
+
 		statsTable = new AltosFlightStatsTable(stats);
 
 		map = new AltosUIMap();
@@ -75,10 +114,13 @@ public class TeleGPSGraphUI extends AltosUIFrame
 		pane.add("Graph", graph.panel);
 		pane.add("Configure Graph", enable);
 		pane.add("Statistics", statsTable);
-		fill_map(states);
+		fill_map(flight_series);
 		pane.add("Map", map);
 
 		setContentPane (pane);
+
+		AltosUIPreferences.register_font_listener(this);
+		AltosPreferences.register_units_listener(this);
 
 		addWindowListener(new WindowAdapter() {
 				@Override
