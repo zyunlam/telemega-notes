@@ -412,7 +412,6 @@ public class AltosUI extends AltosUIFrame {
 	static final int process_graph = 3;
 	static final int process_replay = 4;
 	static final int process_summary = 5;
-	static final int process_cat = 6;
 
 	static boolean process_csv(File input) {
 		AltosRecordSet set = open_logfile(input);
@@ -559,36 +558,6 @@ public class AltosUI extends AltosUIFrame {
 		return false;
 	}
 
-	static boolean process_cat(File file) {
-		try {
-			AltosRecordSet set = record_set(file);
-
-//			for (AltosState state : eef) {
-//				if ((state.set & AltosState.set_gps) != 0) {
-//					System.out.printf ("time %d %d-%d-%d %d:%d:%d lat %g lon %g alt %g\n",
-//							   state.gps.seconds(),
-//							   state.gps.year,
-//							   state.gps.month,
-//							   state.gps.day,
-//							   state.gps.hour,
-//							   state.gps.minute,
-//							   state.gps.second,
-//							   state.gps.lat,
-//							   state.gps.lon,
-//							   state.gps.alt);
-//				} else {
-//					System.out.printf ("tick %d state %d height %g\n",
-//							   state.tick, state.state(), state.height());
-//				}
-//			}
-
-		} catch (Exception e) {
-			System.out.printf("Failed to open file '%s'\n", file);
-			return false;
-		}
-		return true;
-	}
-
 	public static void help(int code) {
 		System.out.printf("Usage: altosui [OPTION]... [FILE]...\n");
 		System.out.printf("  Options:\n");
@@ -631,8 +600,6 @@ public class AltosUI extends AltosUIFrame {
 					process = process_graph;
 				else if (args[i].equals("--summary"))
 					process = process_summary;
-				else if (args[i].equals("--cat"))
-					process = process_cat;
 				else if (args[i].startsWith("--"))
 					help(1);
 				else {
@@ -661,9 +628,6 @@ public class AltosUI extends AltosUIFrame {
 						if (!process_summary(file))
 							++errors;
 						break;
-					case process_cat:
-						if (!process_cat(file))
-							++errors;
 					}
 				}
 			}
