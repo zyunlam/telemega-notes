@@ -52,7 +52,7 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
 		super.provide_data(listener, cal_data);
 
-		AltosGPS	gps = new AltosGPS();
+		AltosGPS	gps = cal_data.make_temp_gps(tick(), false);
 
 		int flags = flags();
 		gps.nsat = flags & 0xf;
@@ -80,5 +80,7 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 				cal_data.set_gps(gps);
 		}
 		listener.set_gps(gps);
+		cal_data.set_gps(gps);
+		cal_data.reset_temp_gps();
 	}
 }
