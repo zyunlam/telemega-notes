@@ -124,6 +124,7 @@ public class AltosTelemetryFile implements AltosRecordSet {
 			if (cal_data.time() >= -1)
 				telem.provide_data(listener, cal_data);
 		}
+		listener.finish();
 	}
 
 	public AltosTelemetryFile(FileInputStream input) {

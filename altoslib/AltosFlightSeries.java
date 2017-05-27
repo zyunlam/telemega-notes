@@ -18,7 +18,7 @@ import java.util.*;
 
 public class AltosFlightSeries extends AltosDataListener {
 
-	public ArrayList<AltosTimeSeries> series;
+	public ArrayList<AltosTimeSeries> series = new ArrayList<AltosTimeSeries>();
 
 	public int[] indices() {
 		int[] indices = new int[series.size()];
@@ -206,8 +206,9 @@ public class AltosFlightSeries extends AltosDataListener {
 		altitude_series.add(time(), altitude);
 	}
 
-	private void compute_height(double ground_altitude) {
-		if (height_series == null) {
+	private void compute_height() {
+		double ground_altitude = cal_data.ground_altitude;
+		if (height_series == null && ground_altitude != AltosLib.MISSING) {
 			height_series = add_series(height_name, AltosConvert.height);
 			for (AltosTimeValue alt : altitude_series)
 				height_series.add(alt.time, alt.value - ground_altitude);
@@ -563,25 +564,18 @@ public class AltosFlightSeries extends AltosDataListener {
 	public void set_companion(AltosCompanion companion) {
 	}
 
-	public void fill_in() {
+	public void finish() {
 		compute_speed();
 		compute_accel();
-		if (cal_data.ground_altitude != AltosLib.MISSING)
-			compute_height(cal_data.ground_altitude);
-	}
-
-	public void init() {
-		time = AltosLib.MISSING;
-		series = new ArrayList<AltosTimeSeries>();
+		compute_height();
 	}
 
 	public AltosTimeSeries[] series() {
-		fill_in();
+		finish();
 		return series.toArray(new AltosTimeSeries[0]);
 	}
 
 	public AltosFlightSeries(AltosCalData cal_data) {
 		super(cal_data);
-		init();
 	}
 }

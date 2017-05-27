@@ -36,6 +36,10 @@ public abstract class AltosDataListener {
 			this.state = state;
 	}
 
+	/* Called after all records are captured */
+	public void finish() {
+	}
+
 	public abstract void set_rssi(int rssi, int status);
 	public abstract void set_received_time(long received_time);
 

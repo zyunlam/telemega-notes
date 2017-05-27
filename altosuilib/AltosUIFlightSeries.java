@@ -113,7 +113,7 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 	}
 
 	public AltosUITimeSeries[] series(AltosCalData cal_data) {
-		fill_in();
+		finish();
 		return series.toArray(new AltosUITimeSeries[0]);
 	}
 

@@ -59,7 +59,7 @@ public class AltosFlightStats {
 		}
 
 		if (landed_state_time == AltosLib.MISSING)
-			return AltosLib.MISSING;
+			landed_state_time = series.height_series.get(series.height_series.size()-1).time;
 
 		double landed_height = AltosLib.MISSING;
 		for (AltosTimeValue height : series.height_series) {
@@ -115,6 +115,8 @@ public class AltosFlightStats {
 		double		end_time = 0;
 		double		landed_time = landed_time(series);
 
+		series.finish();
+
 		year = month = day = AltosLib.MISSING;
 		hour = minute = second = AltosLib.MISSING;
 		serial = flight = AltosLib.MISSING;
@@ -136,7 +138,7 @@ public class AltosFlightStats {
 				state_start[s] = boost_time;
 			else
 				state_start[s] = series.state_series.time_of(s);
-			if (s == AltosLib.ao_flight_landed)
+			if (s == AltosLib.ao_flight_main)
 				state_end[s] = landed_time;
 			else
 				state_end[s] = series.state_series.time_of(s+1);

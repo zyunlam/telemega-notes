@@ -44,6 +44,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		for (AltosEepromRecord record : ordered) {
 			record.provide_data(listener, cal_data);
 		}
+		listener.finish();
 	}
 
 	public AltosEepromRecordSet(AltosEepromNew eeprom) {

@@ -393,7 +393,7 @@ public class AltosCSV implements AltosWriter {
 
 		this.series = series;
 
-		series.fill_in();
+		series.finish();
 
 		has_flight_state = false;
 		has_basic = false;

@@ -93,7 +93,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 
 		set.capture_series(flight_series);
 
-		flight_series.fill_in();
+		flight_series.finish();
 
 		stats = new AltosFlightStats(flight_series);
 
