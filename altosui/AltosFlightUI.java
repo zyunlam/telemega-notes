@@ -115,11 +115,8 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 
 		JComponent tab = which_tab(state);
 		if (tab != cur_tab) {
-			System.out.printf("checking tab for state %s\n", AltosLib.state_name(state.state()));
-			if (cur_tab == pane.getSelectedComponent()) {
-				System.out.printf("switch tabs\n");
+			if (cur_tab == pane.getSelectedComponent())
 				pane.setSelectedComponent(tab);
-			}
 			cur_tab = tab;
 		}
 
