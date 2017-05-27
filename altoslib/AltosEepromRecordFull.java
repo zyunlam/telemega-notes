@@ -26,22 +26,6 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 		super.provide_data(listener, cal_data);
 		AltosGPS	gps;
 
-		/* Flush any pending GPS changes */
-		if (cal_data.gps_pending()) {
-			switch (cmd()) {
-			case AltosLib.AO_LOG_GPS_LAT:
-			case AltosLib.AO_LOG_GPS_LON:
-			case AltosLib.AO_LOG_GPS_ALT:
-			case AltosLib.AO_LOG_GPS_SAT:
-			case AltosLib.AO_LOG_GPS_DATE:
-				break;
-			default:
-				listener.set_gps(cal_data.temp_gps());
-				cal_data.reset_temp_gps();
-				break;
-			}
-		}
-
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
 			listener.set_state(AltosLib.ao_flight_pad);

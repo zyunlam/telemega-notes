@@ -109,7 +109,7 @@ public class AltosFlightStats {
 	}
 
 
-	public AltosFlightStats(AltosFlightSeries series) throws InterruptedException, IOException {
+	public AltosFlightStats(AltosFlightSeries series) {
 		AltosCalData	cal_data = series.cal_data;
 		double		boost_time = boost_time(series);
 		double		end_time = 0;

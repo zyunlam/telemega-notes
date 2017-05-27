@@ -87,6 +87,15 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		if (cmd() == AltosLib.AO_LOG_FLIGHT)
 			cal_data.set_boost_tick();
 		listener.set_time(cal_data.time());
+
+		/* Flush any pending GPS changes */
+		if (!AltosLib.is_gps_cmd(cmd())) {
+			AltosGPS gps = cal_data.temp_gps();
+			if (gps != null) {
+				listener.set_gps(gps);
+				cal_data.reset_temp_gps();
+			}
+		}
 	}
 
 	public int next_start() {

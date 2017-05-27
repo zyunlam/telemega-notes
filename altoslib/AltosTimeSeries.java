@@ -38,7 +38,7 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 		if (v0.time == v1.time)
 			return (v0.value + v1.value) / 2;
 
-		return (v0.value * (v1.time - t) + v1.value * (t - v0.time)) / v1.time - v0.time;
+		return (v0.value * (v1.time - t) + v1.value * (t - v0.time)) / (v1.time - v0.time);
 	}
 
 	private int after_index(double time) {
@@ -59,12 +59,18 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 	/* Compute a value for an arbitrary time */
 	public double value(double time) {
 		int after = after_index(time);
-		if (after == 0)
-			return values.get(0).value;
-		if (after == values.size())
-			return values.get(after - 1).value;
+		double ret;
 
-		return lerp(values.get(after-1), values.get(after), time);
+		if (after == 0)
+			ret = values.get(0).value;
+		else if (after == values.size())
+			ret = values.get(after - 1).value;
+		else {
+			AltosTimeValue b = values.get(after-1);
+			AltosTimeValue a = values.get(after);
+			ret = lerp(b, a, time);
+		}
+		return ret;
 	}
 
 	/* Find the value just before an arbitrary time */
@@ -182,7 +188,6 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 			}
 			pvalue = v.value;
 			time = v.time;
-//			System.out.printf("%g %g %g\n", time, v.value, value);
 			integral.add(time, value);
 
 		}

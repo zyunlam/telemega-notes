@@ -86,6 +86,14 @@ public class AltosFlightSeries extends AltosDataListener {
 		return AltosLib.MISSING;
 	}
 
+	public double value(String name, double time) {
+		for (AltosTimeSeries s : series) {
+			if (s.label.equals(name))
+				return s.value(time);
+		}
+		return AltosLib.MISSING;
+	}
+
 	public double value_before(String name, double time) {
 		for (AltosTimeSeries s : series) {
 			if (s.label.equals(name))

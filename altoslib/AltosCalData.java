@@ -206,9 +206,13 @@ public class AltosCalData {
 
 	public AltosGPS		gps_pad = null;
 
+	public double		gps_pad_altitude = AltosLib.MISSING;
+
 	public void set_gps(AltosGPS gps) {
 		if ((state != AltosLib.MISSING && state < AltosLib.ao_flight_boost) || gps_pad == null)
 			gps_pad = gps;
+		if (gps_pad_altitude == AltosLib.MISSING && gps.alt != AltosLib.MISSING)
+			gps_pad_altitude = gps.alt;
 	}
 
 	/*
@@ -226,8 +230,8 @@ public class AltosCalData {
 		if (temp_gps != null) {
 			if (temp_gps.locked && temp_gps.nsat >= 4)
 				set_gps(temp_gps);
+			temp_gps = null;
 		}
-		temp_gps = null;
 	}
 
 	public boolean gps_pending() {
@@ -235,9 +239,8 @@ public class AltosCalData {
 	}
 
 	public AltosGPS make_temp_gps(int tick, boolean sats) {
-		if (temp_gps == null) {
+		if (temp_gps == null)
 			temp_gps = new AltosGPS();
-		}
 		if (sats) {
 			if (tick != temp_gps_sat_tick)
 				temp_gps.cc_gps_sat = null;

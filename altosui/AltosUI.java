@@ -449,6 +449,7 @@ public class AltosUI extends AltosUIFrame {
 			if (writer == null)
 				return false;
 			AltosFlightSeries series = make_series(set);
+			series.finish();
 			writer.write(series);
 			writer.close();
 			return true;
@@ -508,54 +509,49 @@ public class AltosUI extends AltosUIFrame {
 		AltosRecordSet set = record_set(file);
 		if (set == null)
 			return false;
-		try {
-			System.out.printf("%s:\n", file.toString());
-			AltosFlightSeries series = make_series(set);
-			AltosFlightStats stats = new AltosFlightStats(series);
-			if (stats.serial != AltosLib.MISSING)
-				System.out.printf("Serial:       %5d\n", stats.serial);
-			if (stats.flight != AltosLib.MISSING)
-				System.out.printf("Flight:       %5d\n", stats.flight);
-			if (stats.year != AltosLib.MISSING)
-				System.out.printf("Date:    %04d-%02d-%02d\n",
-						  stats.year, stats.month, stats.day);
-			if (stats.hour != AltosLib.MISSING)
-				System.out.printf("Time:      %02d:%02d:%02d UTC\n",
-						  stats.hour, stats.minute, stats.second);
-			if (stats.max_height != AltosLib.MISSING)
-				System.out.printf("Max height:  %6.0f m    %6.0f ft\n",
-						  stats.max_height,
-						  AltosConvert.meters_to_feet(stats.max_height));
-			if (stats.max_speed != AltosLib.MISSING)
-				System.out.printf("Max speed:   %6.0f m/s  %6.0f ft/s  %6.4f Mach\n",
-						  stats.max_speed,
-						  AltosConvert.meters_to_feet(stats.max_speed),
-						  AltosConvert.meters_to_mach(stats.max_speed));
-			if (stats.max_acceleration != AltosLib.MISSING) {
-				System.out.printf("Max accel:   %6.0f m/s² %6.0f ft/s² %6.2f g\n",
-						  stats.max_acceleration,
-						  AltosConvert.meters_to_feet(stats.max_acceleration),
-						  AltosConvert.meters_to_g(stats.max_acceleration));
-			}
-			if (stats.state_speed[Altos.ao_flight_drogue] != AltosLib.MISSING)
-				System.out.printf("Drogue rate: %6.0f m/s  %6.0f ft/s\n",
-						  stats.state_speed[Altos.ao_flight_drogue],
-						  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_drogue]));
-			if (stats.state_speed[Altos.ao_flight_main] != AltosLib.MISSING)
-				System.out.printf("Main rate:   %6.0f m/s  %6.0f ft/s\n",
-						  stats.state_speed[Altos.ao_flight_main],
-						  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_main]));
-			if (stats.state_end[Altos.ao_flight_main] != AltosLib.MISSING &&
-			    stats.state_start[Altos.ao_flight_boost] != AltosLib.MISSING)
-				System.out.printf("Flight time: %6.0f s\n",
-						  stats.state_end[Altos.ao_flight_main] -
-						  stats.state_start[Altos.ao_flight_boost]);
-			System.out.printf("\n");
-			return true;
-		} catch (InterruptedException ie) {
-		} catch (IOException ie) {
+		System.out.printf("%s:\n", file.toString());
+		AltosFlightSeries series = make_series(set);
+		AltosFlightStats stats = new AltosFlightStats(series);
+		if (stats.serial != AltosLib.MISSING)
+			System.out.printf("Serial:       %5d\n", stats.serial);
+		if (stats.flight != AltosLib.MISSING)
+			System.out.printf("Flight:       %5d\n", stats.flight);
+		if (stats.year != AltosLib.MISSING)
+			System.out.printf("Date:    %04d-%02d-%02d\n",
+					  stats.year, stats.month, stats.day);
+		if (stats.hour != AltosLib.MISSING)
+			System.out.printf("Time:      %02d:%02d:%02d UTC\n",
+					  stats.hour, stats.minute, stats.second);
+		if (stats.max_height != AltosLib.MISSING)
+			System.out.printf("Max height:  %6.0f m    %6.0f ft\n",
+					  stats.max_height,
+					  AltosConvert.meters_to_feet(stats.max_height));
+		if (stats.max_speed != AltosLib.MISSING)
+			System.out.printf("Max speed:   %6.0f m/s  %6.0f ft/s  %6.4f Mach\n",
+					  stats.max_speed,
+					  AltosConvert.meters_to_feet(stats.max_speed),
+					  AltosConvert.meters_to_mach(stats.max_speed));
+		if (stats.max_acceleration != AltosLib.MISSING) {
+			System.out.printf("Max accel:   %6.0f m/s² %6.0f ft/s² %6.2f g\n",
+					  stats.max_acceleration,
+					  AltosConvert.meters_to_feet(stats.max_acceleration),
+					  AltosConvert.meters_to_g(stats.max_acceleration));
 		}
-		return false;
+		if (stats.state_speed[Altos.ao_flight_drogue] != AltosLib.MISSING)
+			System.out.printf("Drogue rate: %6.0f m/s  %6.0f ft/s\n",
+					  stats.state_speed[Altos.ao_flight_drogue],
+					  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_drogue]));
+		if (stats.state_speed[Altos.ao_flight_main] != AltosLib.MISSING)
+			System.out.printf("Main rate:   %6.0f m/s  %6.0f ft/s\n",
+					  stats.state_speed[Altos.ao_flight_main],
+					  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_main]));
+		if (stats.state_end[Altos.ao_flight_main] != AltosLib.MISSING &&
+		    stats.state_start[Altos.ao_flight_boost] != AltosLib.MISSING)
+			System.out.printf("Flight time: %6.0f s\n",
+					  stats.state_end[Altos.ao_flight_main] -
+					  stats.state_start[Altos.ao_flight_boost]);
+		System.out.printf("\n");
+		return true;
 	}
 
 	public static void help(int code) {

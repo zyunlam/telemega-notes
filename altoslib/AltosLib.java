@@ -38,6 +38,20 @@ public class AltosLib {
 	public static final int AO_LOG_GPS_DATE = 'Y';
 	public static final int AO_LOG_PRESSURE = 'P';
 
+	public static boolean is_gps_cmd(int cmd) {
+		switch (cmd) {
+		case AltosLib.AO_LOG_GPS_POS:
+		case AltosLib.AO_LOG_GPS_TIME:
+		case AltosLib.AO_LOG_GPS_LAT:
+		case AltosLib.AO_LOG_GPS_LON:
+		case AltosLib.AO_LOG_GPS_ALT:
+		case AltosLib.AO_LOG_GPS_SAT:
+		case AltosLib.AO_LOG_GPS_DATE:
+			return true;
+		}
+		return false;
+	}
+
 	/* Added for header fields in eeprom files */
 	public static final int AO_LOG_CONFIG_VERSION = 1000;
 	public static final int AO_LOG_MAIN_DEPLOY = 1001;
