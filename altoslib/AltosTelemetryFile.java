@@ -123,6 +123,8 @@ public class AltosTelemetryFile implements AltosRecordSet {
 			cal_data.set_tick(tick);
 			if (cal_data.time() >= -1)
 				telem.provide_data(listener, cal_data);
+			if (listener.state == AltosLib.ao_flight_landed)
+				break;
 		}
 		listener.finish();
 	}

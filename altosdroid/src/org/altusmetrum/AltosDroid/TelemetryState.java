@@ -36,6 +36,8 @@ public class TelemetryState {
 	double		frequency;
 	int		telemetry_rate;
 
+	boolean		quiet;
+
 	HashMap<Integer,AltosState>	states;
 
 	int		latest_serial;

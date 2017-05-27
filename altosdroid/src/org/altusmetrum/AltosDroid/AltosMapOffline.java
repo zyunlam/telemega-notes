@@ -164,6 +164,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 						break;
 					case AltosMapTile.forbidden:
 						message = "Too many requests, try later";
+						AltosDebug.debug("Forbidden map response %d\n", AltosMapStore.forbidden_response);
 						break;
 					}
 					if (message != null) {
@@ -476,11 +477,11 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 				if (t_state.gps != null) {
 					AltosLatLon	latlon = new AltosLatLon(t_state.gps.lat, t_state.gps.lon);
 					rocket.set_position(latlon, t_state.received_time);
-					if (state.serial == serial)
+					if (state.cal_data.serial == serial)
 						there = latlon;
 				}
 				if (state != null)
-					rocket.set_active(state.serial == serial);
+					rocket.set_active(state.cal_data.serial == serial);
 			}
 		}
 		if (receiver != null) {

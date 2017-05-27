@@ -16,9 +16,9 @@ package org.altusmetrum.altoslib_11;
 
 public abstract class AltosDataListener {
 
-	public AltosCalData	cal_data;
-
-	public double	time = AltosLib.MISSING;
+	public AltosCalData	cal_data = null;
+	public double		time = AltosLib.MISSING;
+	public int		state = AltosLib.MISSING;
 
 	public void set_time(double time) {
 		if (time != AltosLib.MISSING)
@@ -28,8 +28,6 @@ public abstract class AltosDataListener {
 	public double time() {
 		return time;
 	}
-
-	public int	state = AltosLib.MISSING;
 
 	public void set_state(int state) {
 		if (state != AltosLib.MISSING)
@@ -66,6 +64,9 @@ public abstract class AltosDataListener {
 	public abstract void set_igniter_voltage(double[] voltage);
 	public abstract void set_pyro_fired(int pyro_mask);
 	public abstract void set_companion(AltosCompanion companion);
+
+	public AltosDataListener() {
+	}
 
 	public AltosDataListener(AltosCalData cal_data) {
 		this.cal_data = cal_data;

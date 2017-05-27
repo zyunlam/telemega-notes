@@ -216,7 +216,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	private void compute_height() {
 		double ground_altitude = cal_data.ground_altitude;
-		if (height_series == null && ground_altitude != AltosLib.MISSING) {
+		if (height_series == null && ground_altitude != AltosLib.MISSING && altitude_series != null) {
 			height_series = add_series(height_name, AltosConvert.height);
 			for (AltosTimeValue alt : altitude_series)
 				height_series.add(alt.time, alt.value - ground_altitude);

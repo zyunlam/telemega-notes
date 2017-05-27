@@ -54,6 +54,29 @@ import android.graphics.drawable.*;
 
 import org.altusmetrum.altoslib_11.*;
 
+class SavedState {
+	long	received_time;
+	int	state;
+	boolean	locked;
+	String	callsign;
+	int	serial;
+	int	flight;
+	int	rssi;
+
+	SavedState(AltosState state) {
+		received_time = state.received_time;
+		this.state = state.state();
+		if (state.gps != null)
+			locked = state.gps.locked;
+		else
+			locked = false;
+		callsign = state.cal_data.callsign;
+		serial = state.cal_data.serial;
+		flight = state.cal_data.flight;
+		rssi = state.rssi;
+	}
+}
+
 public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener {
 
 	// Actions sent to the telemetry server at startup time
@@ -114,6 +137,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	public Location location = null;
 
+	private AltosState	state;
+	private SavedState	saved_state;
+
 	// Tabs
 	TabHost         mTabHost;
 	AltosViewPager  mViewPager;
@@ -123,7 +149,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	// Timer and Saved flight state for Age calculation
 	private Timer timer;
-	AltosState saved_state;
+
 	TelemetryState	telemetry_state;
 	Integer[] 	serials;
 
@@ -307,7 +333,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 		if (telemetry_state.states.containsKey(current_serial)) {
 			state = telemetry_state.states.get(current_serial);
-			int age = state_age(state);
+			int age = state_age(state.received_time);
 			if (age < 20)
 				aged = false;
 			if (current_serial == selected_serial)
@@ -322,7 +348,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 			for (int serial : telemetry_state.states.keySet()) {
 				AltosState	existing = telemetry_state.states.get(serial);
-				int		existing_age = state_age(existing);
+				int		existing_age = state_age(existing.received_time);
 
 				if (newest_state == null || existing_age < newest_age) {
 					newest_state = existing;
@@ -334,7 +360,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				state = newest_state;
 		}
 
-		update_ui(telemetry_state, state);
+		update_ui(telemetry_state, state, telemetry_state.quiet);
 
 		start_timer();
 	}
@@ -362,8 +388,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			blend_component(a, b, r, 24, 0xff));
 	}
 
-	int state_age(AltosState state) {
-		return (int) ((System.currentTimeMillis() - state.received_time + 500) / 1000);
+	int state_age(long received_time) {
+		return (int) ((System.currentTimeMillis() - received_time + 500) / 1000);
 	}
 
 	void set_screen_on(int age) {
@@ -375,7 +401,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	void update_age() {
 		if (saved_state != null) {
-			int age = state_age(saved_state);
+			int age = state_age(saved_state.received_time);
 
 			double age_scale = age / 100.0;
 
@@ -399,17 +425,19 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 	}
 
-	void update_ui(TelemetryState telem_state, AltosState state) {
+	void update_ui(TelemetryState telem_state, AltosState state, boolean quiet) {
+
+		this.state = state;
 
 		int prev_state = AltosLib.ao_flight_invalid;
 
 		AltosGreatCircle from_receiver = null;
 
 		if (saved_state != null)
-			prev_state = saved_state.state();
+			prev_state = saved_state.state;
 
 		if (state != null) {
-			set_screen_on(state_age(state));
+			set_screen_on(state_age(state.received_time));
 
 			if (state.state() == AltosLib.ao_flight_stateless) {
 				boolean	prev_locked = false;
@@ -417,8 +445,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 				if(state.gps != null)
 					locked = state.gps.locked;
-				if (saved_state != null && saved_state.gps != null)
-					prev_locked = saved_state.gps.locked;
+				if (saved_state != null)
+					prev_locked = saved_state.locked;
 				if (prev_locked != locked) {
 					String currentTab = mTabHost.getCurrentTabTag();
 					if (locked) {
@@ -456,22 +484,22 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 								     state.gps.alt);
 			}
 
-			if (saved_state == null || !same_string(saved_state.callsign, state.callsign)) {
-				mCallsignView.setText(state.callsign);
+			if (saved_state == null || !same_string(saved_state.callsign, state.cal_data.callsign)) {
+				mCallsignView.setText(state.cal_data.callsign);
 			}
-			if (saved_state == null || state.serial != saved_state.serial) {
-				if (state.serial == AltosLib.MISSING)
+			if (saved_state == null || state.cal_data.serial != saved_state.serial) {
+				if (state.cal_data.serial == AltosLib.MISSING)
 					mSerialView.setText("");
 				else
-					mSerialView.setText(String.format("%d", state.serial));
+					mSerialView.setText(String.format("%d", state.cal_data.serial));
 			}
-			if (saved_state == null || state.flight != saved_state.flight) {
-				if (state.flight == AltosLib.MISSING)
+			if (saved_state == null || state.cal_data.flight != saved_state.flight) {
+				if (state.cal_data.flight == AltosLib.MISSING)
 					mFlightView.setText("");
 				else
-					mFlightView.setText(String.format("%d", state.flight));
+					mFlightView.setText(String.format("%d", state.cal_data.flight));
 			}
-			if (saved_state == null || state.state() != saved_state.state()) {
+			if (saved_state == null || state.state() != saved_state.state) {
 				if (state.state() == AltosLib.ao_flight_stateless) {
 					mStateLayout.setVisibility(View.GONE);
 				} else {
@@ -485,15 +513,16 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				else
 					mRSSIView.setText(String.format("%d", state.rssi));
 			}
+			saved_state = new SavedState(state);
 		}
 
 		for (AltosDroidTab mTab : mTabs)
 			mTab.update_ui(telem_state, state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
+		AltosDebug.debug("quiet %b\n", quiet);
 		if (mAltosVoice != null)
-			mAltosVoice.tell(telem_state, state, from_receiver, location, (AltosDroidTab) mTabsAdapter.currentItem());
+			mAltosVoice.tell(telem_state, state, from_receiver, location, (AltosDroidTab) mTabsAdapter.currentItem(), quiet);
 
-		saved_state = state;
 	}
 
 	private void onTimerTick() {
@@ -567,8 +596,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);
 		mVersion.setText("Version: " + BuildInfo.version +
-		                 "  Built: " + BuildInfo.builddate + " " + BuildInfo.buildtime + " " + BuildInfo.buildtz +
-		                 "  (" + BuildInfo.branch + "-" + BuildInfo.commitnum + "-" + BuildInfo.commithash + ")");
+				 (AltosVersion.has_google_maps_api_key() ? " maps" : "") +
+		                 " Built: " + BuildInfo.builddate + " " + BuildInfo.buildtime + " " + BuildInfo.buildtz +
+		                 " (" + BuildInfo.branch + "-" + BuildInfo.commitnum + "-" + BuildInfo.commithash + ")");
 
 		mCallsignView  = (TextView) findViewById(R.id.callsign_value);
 		mRSSIView      = (TextView) findViewById(R.id.rssi_value);
@@ -703,7 +733,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 					 location.getLatitude(),
 					 location.getLongitude());
 
-		update_ui(telemetry_state, saved_state);
+		update_ui(telemetry_state, state, true);
 	}
 
 	@Override
@@ -1094,7 +1124,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		AltosDebug.debug("Location changed to %f,%f",
 				 location.getLatitude(),
 				 location.getLongitude());
-		update_ui(telemetry_state, saved_state);
+		update_ui(telemetry_state, state, false);
 	}
 
 	public void onStatusChanged(String provider, int status, Bundle extras) {

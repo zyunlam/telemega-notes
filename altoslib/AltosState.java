@@ -43,8 +43,6 @@ public class AltosState extends AltosDataListener {
 	public int	rssi;
 	public int	status;
 
-	public double	time;
-
 	class AltosValue {
 		double	value;
 		double	prev_value;
@@ -288,7 +286,6 @@ public class AltosState extends AltosDataListener {
 		}
 	}
 
-	private int	state;
 	public boolean	landed;
 	public boolean	ascent;	/* going up? */
 	public boolean	boost;	/* under power */
@@ -506,23 +503,7 @@ public class AltosState extends AltosDataListener {
 		pressure.set(p, time);
 	}
 
-	class AltosForce extends AltosValue {
-		void set(double p, double time) {
-			super.set(p, time);
-		}
-
-		AltosForce() {
-			super();
-		}
-	}
-	private AltosForce	thrust;
-
-	public double thrust() {
-		return thrust.value();
-	}
-
 	public void set_thrust(double N) {
-		thrust.set(N, time);
 	}
 
 	public double baro_height() {
@@ -720,14 +701,7 @@ public class AltosState extends AltosDataListener {
 	public int	speak_tick;
 	public double	speak_altitude;
 
-	public String	callsign;
-	public String	firmware_version;
-
 	public double	ground_accel;
-
-	public int	log_format;
-	public int	log_space;
-	public String	product;
 
 	public AltosCompanion	companion;
 
@@ -756,7 +730,6 @@ public class AltosState extends AltosDataListener {
 		ground_pressure = new AltosGroundPressure();
 		altitude = new AltosAltitude();
 		pressure = new AltosPressure();
-		thrust = new AltosForce();
 		speed = new AltosSpeed();
 		acceleration = new AltosAccel();
 		orient = new AltosCValue();
@@ -810,14 +783,7 @@ public class AltosState extends AltosDataListener {
 		speak_tick = AltosLib.MISSING;
 		speak_altitude = AltosLib.MISSING;
 
-		callsign = null;
-		firmware_version = null;
-
 		ground_accel = AltosLib.MISSING;
-
-		log_format = AltosLib.MISSING;
-		log_space = AltosLib.MISSING;
-		product = null;
 
 		companion = null;
 
@@ -1106,6 +1072,10 @@ public class AltosState extends AltosDataListener {
 
 	public void set_pyro_fired(int fired) {
 		this.pyro_fired = fired;
+	}
+
+	public AltosState() {
+		init();
 	}
 
 	public AltosState (AltosCalData cal_data) {

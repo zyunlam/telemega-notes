@@ -259,14 +259,15 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 	private void telemetry(AltosTelemetry telem) {
 		AltosState	state;
 
-		if (telemetry_state.states.containsKey(telem.serial))
-			state = telemetry_state.states.get(telem.serial).clone();
+		if (telemetry_state.states.containsKey(telem.serial()))
+			state = telemetry_state.states.get(telem.serial());
 		else
-			state = new AltosState();
-		telem.update_state(state);
-		telemetry_state.states.put(telem.serial, state);
+			state = new AltosState(new AltosCalData());
+		telem.provide_data(state, state.cal_data);
+		telemetry_state.states.put(telem.serial(), state);
+		telemetry_state.quiet = false;
 		if (state != null) {
-			AltosPreferences.set_state(state);
+			AltosPreferences.set_state(state,telem.serial());
 		}
 		send_to_clients();
 	}
@@ -615,6 +616,8 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 
 		telemetry_state.latest_serial = AltosPreferences.latest_state();
 
+		telemetry_state.quiet = true;
+
 		AltosDebug.debug("latest serial %d\n", telemetry_state.latest_serial);
 
 		for (int serial : serials) {
@@ -625,7 +628,7 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 
 				AltosDebug.debug("recovered old state serial %d flight %d",
 						 serial,
-						 saved_state.flight);
+						 saved_state.cal_data.flight);
 				if (saved_state.gps != null)
 					AltosDebug.debug("\tposition %f,%f",
 							 saved_state.gps.lat,
@@ -699,7 +702,7 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 
 	/* AltosIdleMonitorListener */
 	public void update(AltosState state, AltosListenerState listener_state)	{
-		telemetry_state.states.put(state.serial, state);
+		telemetry_state.states.put(state.cal_data.serial, state);
 		telemetry_state.receiver_battery = listener_state.battery;
 		send_to_clients();
 	}
