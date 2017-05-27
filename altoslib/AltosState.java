@@ -44,8 +44,6 @@ public class AltosState extends AltosDataListener {
 	public int	status;
 
 	public double	time;
-	public double	prev_time;
-	public double	time_change;
 
 	class AltosValue {
 		double	value;
@@ -291,16 +289,9 @@ public class AltosState extends AltosDataListener {
 	}
 
 	private int	state;
-	public int	altitude_32;
-	public int	receiver_serial;
 	public boolean	landed;
 	public boolean	ascent;	/* going up? */
 	public boolean	boost;	/* under power */
-	public int	config_major;
-	public int	config_minor;
-	public int	apogee_delay;
-	public int	main_deploy;
-	public int	flight_log_max;
 
 	private double pressure_to_altitude(double p) {
 		if (p == AltosLib.MISSING)
@@ -738,8 +729,6 @@ public class AltosState extends AltosDataListener {
 	public int	log_space;
 	public String	product;
 
-	public AltosMs5607	baro;
-
 	public AltosCompanion	companion;
 
 	public int	pyro_fired;
@@ -755,21 +744,13 @@ public class AltosState extends AltosDataListener {
 	public void init() {
 		set = 0;
 
-		System.out.printf("state init\n");
 		received_time = System.currentTimeMillis();
 		time = AltosLib.MISSING;
-		time_change = AltosLib.MISSING;
-		prev_time = AltosLib.MISSING;
 		state = AltosLib.ao_flight_invalid;
 		landed = false;
 		boost = false;
 		rssi = AltosLib.MISSING;
 		status = 0;
-		config_major = AltosLib.MISSING;
-		config_minor = AltosLib.MISSING;
-		apogee_delay = AltosLib.MISSING;
-		main_deploy = AltosLib.MISSING;
-		flight_log_max = AltosLib.MISSING;
 
 		ground_altitude = new AltosCValue();
 		ground_pressure = new AltosGroundPressure();
@@ -800,9 +781,6 @@ public class AltosState extends AltosDataListener {
 		ground_rotation = null;
 
 		mag = null;
-		accel_zero_along = AltosLib.MISSING;
-		accel_zero_across = AltosLib.MISSING;
-		accel_zero_through = AltosLib.MISSING;
 
 		accel_ground_along = AltosLib.MISSING;
 		accel_ground_across = AltosLib.MISSING;
@@ -840,10 +818,7 @@ public class AltosState extends AltosDataListener {
 		log_format = AltosLib.MISSING;
 		log_space = AltosLib.MISSING;
 		product = null;
-		receiver_serial = AltosLib.MISSING;
-		altitude_32 = AltosLib.MISSING;
 
-		baro = null;
 		companion = null;
 
 		pyro_fired = 0;
@@ -916,10 +891,6 @@ public class AltosState extends AltosDataListener {
 		return AltosLib.state_name(state);
 	}
 
-	public void set_product(String product) {
-		this.product = product;
-	}
-
 	public void set_state(int state) {
 		if (state != AltosLib.ao_flight_invalid) {
 			this.state = state;
@@ -933,85 +904,8 @@ public class AltosState extends AltosDataListener {
 		return state;
 	}
 
-	public void set_log_format(int log_format) {
-		this.log_format = log_format;
-		switch (log_format) {
-		case AltosLib.AO_LOG_FORMAT_TELEGPS:
-			this.state = AltosLib.ao_flight_stateless;
-			break;
-		}
-	}
-
-	public void set_log_space(int log_space) {
-		this.log_space = log_space;
-	}
-
-	public void set_flight_params(int apogee_delay, int main_deploy) {
-		this.apogee_delay = apogee_delay;
-		this.main_deploy = main_deploy;
-	}
-
-	public void set_config(int major, int minor, int flight_log_max) {
-		config_major = major;
-		config_minor = minor;
-		this.flight_log_max = flight_log_max;
-	}
-
-	public void set_callsign(String callsign) {
-		this.callsign = callsign;
-	}
-
-	public void set_firmware_version(String version) {
-		firmware_version = version;
-	}
-
-	public int compare_version(String other_version) {
-		if (firmware_version == null)
-			return AltosLib.MISSING;
-		return AltosLib.compare_version(firmware_version, other_version);
-	}
-
 	private void re_init() {
-		int rs = receiver_serial;
 		init();
-		receiver_serial = rs;
-	}
-
-//	public void set_flight(int flight) {
-//
-//		/* When the flight changes, reset the state */
-//		if (flight != AltosLib.MISSING) {
-//			if (this.flight != AltosLib.MISSING &&
-//			    this.flight != flight) {
-//				re_init();
-//			}
-//			this.flight = flight;
-//		}
-//	}
-//
-//	public void set_serial(int serial) {
-//		/* When the serial changes, reset the state */
-//		if (serial != AltosLib.MISSING) {
-//			if (this.serial != AltosLib.MISSING &&
-//			    this.serial != serial) {
-//				re_init();
-//			}
-//			this.serial = serial;
-//		}
-//	}
-//
-//	public void set_receiver_serial(int serial) {
-//		if (serial != AltosLib.MISSING)
-//			receiver_serial = serial;
-//	}
-
-	public boolean altitude_32() {
-		return altitude_32 == 1;
-	}
-
-	public void set_altitude_32(int altitude_32) {
-		if (altitude_32 != AltosLib.MISSING)
-			this.altitude_32 = altitude_32;
 	}
 
 	public int rssi() {
@@ -1040,20 +934,8 @@ public class AltosState extends AltosDataListener {
 	}
 
 
-	public double	accel_zero_along;
-	public double	accel_zero_across;
-	public double	accel_zero_through;
-
 	public AltosRotation	rotation;
 	public AltosRotation	ground_rotation;
-
-	public void set_accel_zero(double zero_along, double zero_across, double zero_through) {
-		if (zero_along != AltosLib.MISSING) {
-			accel_zero_along = zero_along;
-			accel_zero_across = zero_across;
-			accel_zero_through = zero_through;
-		}
-	}
 
 	public int pad_orientation;
 
@@ -1061,9 +943,9 @@ public class AltosState extends AltosDataListener {
 
 	void update_pad_rotation() {
 		if (pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
-			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - accel_zero_across),
-						     AltosIMU.convert_accel(accel_ground_through - accel_zero_through),
-						     AltosIMU.convert_accel(accel_ground_along - accel_zero_along),
+			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data.accel_zero_across),
+						     AltosIMU.convert_accel(accel_ground_through - cal_data.accel_zero_through),
+						     AltosIMU.convert_accel(accel_ground_along - cal_data.accel_zero_along),
 						     pad_orientation);
 			ground_rotation = rotation;
 			orient.set_computed(rotation.tilt(), time);
