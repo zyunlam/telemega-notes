@@ -156,9 +156,11 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String accel_name = "Accel";
 
 	public void set_acceleration(double acceleration) {
-		if (accel_series == null) {
+		if (acceleration == AltosLib.MISSING)
+			return;
+		if (accel_series == null)
 			accel_series = add_series(accel_name, AltosConvert.accel);
-		}
+
 		accel_series.add(time(), acceleration);
 	}
 
@@ -207,6 +209,9 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String height_name = "Height";
 
 	public  void set_pressure(double pa) {
+		if (pa == AltosLib.MISSING)
+			return;
+
 		if (pressure_series == null)
 			pressure_series = add_series(pressure_name, AltosConvert.pressure);
 		pressure_series.add(time(), pa);
