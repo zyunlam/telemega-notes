@@ -99,7 +99,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 
 		stats = new AltosFlightStats(flight_series);
 
-		graph = new AltosGraphNew(enable, stats, flight_series, cal_data);
+		graph = new AltosGraphNew(enable, stats, flight_series);
 
 		statsTable = new AltosFlightStatsTable(stats);
 

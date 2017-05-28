@@ -82,7 +82,8 @@ public class AltosGraphNew extends AltosUIGraphNew {
 
 	AltosUIFlightSeries flight_series;
 
-	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosUIFlightSeries flight_series, AltosCalData cal_data) {
+	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosUIFlightSeries flight_series) {
+		AltosCalData	cal_data = flight_series.cal_data;
 
 		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
 		AltosUIAxis	distance_axis, pressure_axis, thrust_axis;
@@ -157,6 +158,11 @@ public class AltosGraphNew extends AltosUIGraphNew {
 		flight_series.register_axis(AltosUIFlightSeries.height_name,
 					    height_color,
 					    true,
+					    height_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.altitude_name,
+					    height_color,
+					    false,
 					    height_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.kalman_height_name,
@@ -305,9 +311,16 @@ public class AltosGraphNew extends AltosUIGraphNew {
 		return flight_series.series(cal_data);
 	}
 
-	public AltosGraphNew(AltosUIEnable enable, AltosFlightStats stats, AltosUIFlightSeries flight_series, AltosCalData cal_data) {
-		super(enable, "Flight");
+	public void set_data(AltosFlightStats stats, AltosUIFlightSeries flight_series) {
+		set_series(setup(stats, flight_series));
+	}
 
-		set_series(setup(stats, flight_series, cal_data));
+	public AltosGraphNew(AltosUIEnable enable) {
+		super(enable, "Flight");
+	}
+
+	public AltosGraphNew(AltosUIEnable enable, AltosFlightStats stats, AltosUIFlightSeries flight_series) {
+		this(enable);
+		set_series(setup(stats, flight_series));
 	}
 }
