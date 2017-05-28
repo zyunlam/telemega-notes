@@ -237,7 +237,7 @@ public class AltosFlightSeries extends AltosDataListener {
 				height_series.add(alt.time, alt.value - ground_altitude);
 		}
 
-		if (gps_height == null && cal_data.gps_pad != null && gps_altitude != null) {
+		if (gps_height == null && cal_data.gps_pad != null && cal_data.gps_pad.alt != AltosLib.MISSING && gps_altitude != null) {
 			double gps_ground_altitude = cal_data.gps_pad.alt;
 			gps_height = add_series(gps_height_name, AltosConvert.height);
 			for (AltosTimeValue gps_alt : gps_altitude)
