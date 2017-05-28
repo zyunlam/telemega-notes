@@ -33,6 +33,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 				if (record.cmd() == AltosLib.AO_LOG_FLIGHT) {
 					cal_data.set_tick(record.tick());
 					cal_data.set_boost_tick();
+					break;
 				}
 			}
 		}

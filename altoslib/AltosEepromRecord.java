@@ -74,7 +74,7 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		if (cmd_diff != 0)
 			return cmd_diff;
 
-		int	tick_diff = tick() - o.tick();
+		int	tick_diff = wide_tick - o.wide_tick;
 
 		if (tick_diff != 0)
 			return tick_diff;

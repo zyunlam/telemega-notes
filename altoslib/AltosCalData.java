@@ -172,6 +172,7 @@ public class AltosCalData {
 					tick += 65536;
 				}
 			}
+			prev_tick = tick;
 			this.tick = tick;
 		}
 	}
