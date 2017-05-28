@@ -403,6 +403,10 @@ public class AltosConvert {
 
 		double counts_per_g = (plus_g - minus_g) / 2.0;
 		double counts_per_mss = counts_per_g / gravity;
+
+		if (counts_per_mss == 0)
+			return AltosLib.MISSING;
+
 		return (sensor - ground) / counts_per_mss;
 	}
 

@@ -98,6 +98,8 @@ public class AltosCalData {
 
 	public void set_accel_plus_minus(double plus, double minus) {
 		if (plus != AltosLib.MISSING && minus != AltosLib.MISSING) {
+			if (plus == minus)
+				return;
 			accel_plus_g = plus;
 			accel_minus_g = minus;
 		}
