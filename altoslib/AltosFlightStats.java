@@ -254,8 +254,10 @@ public class AltosFlightStats {
 				max_acceleration = tv.value;
 		}
 		max_gps_height = AltosLib.MISSING;
-		if (series.gps_height != null)
-			max_gps_height = series.gps_height.max().value;
-
+		if (series.gps_height != null) {
+			AltosTimeValue tv = series.gps_height.max();
+			if (tv != null)
+				max_gps_height = tv.value;
+		}
 	}
 }
