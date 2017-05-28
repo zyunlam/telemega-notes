@@ -22,6 +22,7 @@ public class AltosTelemetryRecordSet implements AltosRecordSet {
 	TreeSet<AltosTelemetryRecord>	ordered;
 
 	public void capture_series(AltosDataListener listener) {
+		listener.cal_data.reset();
 		for (AltosTelemetryRecord record : ordered) {
 			record.update_state(listener);
 		}

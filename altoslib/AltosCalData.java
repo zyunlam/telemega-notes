@@ -65,8 +65,11 @@ public class AltosCalData {
 	public int		device_type = AltosLib.MISSING;
 
 	public void set_device_type(int device_type) {
-		if (device_type != AltosLib.MISSING)
+		if (device_type != AltosLib.MISSING) {
 			this.device_type = device_type;
+			if (product == null)
+				set_product(AltosLib.product_name(device_type));
+		}
 	}
 
 	public int		config_major = AltosLib.MISSING;
@@ -177,6 +180,18 @@ public class AltosCalData {
 			prev_tick = tick;
 			this.tick = tick;
 		}
+	}
+
+	/* Reset all values which change during flight
+	 */
+	public void reset() {
+		state = AltosLib.MISSING;
+		tick = AltosLib.MISSING;
+		prev_tick = AltosLib.MISSING;
+		temp_gps = null;
+		prev_gps = null;
+		temp_gps_sat_tick = AltosLib.MISSING;
+		accel = AltosLib.MISSING;
 	}
 
 	public int		boost_tick = AltosLib.MISSING;

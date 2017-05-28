@@ -42,6 +42,8 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 
 	public void capture_series(AltosDataListener listener) {
 		AltosCalData	cal_data = cal_data();
+
+		cal_data.reset();
 		for (AltosEepromRecord record : ordered) {
 			record.provide_data(listener, cal_data);
 		}

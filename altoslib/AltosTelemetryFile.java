@@ -118,10 +118,13 @@ public class AltosTelemetryFile implements AltosRecordSet {
 	public void capture_series(AltosDataListener listener) {
 		AltosCalData	cal_data = cal_data();
 
+		cal_data.reset();
 		for (AltosTelemetry telem : telems) {
 			int tick = telem.tick();
 			cal_data.set_tick(tick);
-			if (cal_data.time() >= -1)
+
+			/* Try to pick up at least one pre-boost value */
+			if (cal_data.time() >= -2)
 				telem.provide_data(listener, cal_data);
 			if (listener.state == AltosLib.ao_flight_landed)
 				break;
