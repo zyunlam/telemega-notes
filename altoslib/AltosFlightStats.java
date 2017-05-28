@@ -30,6 +30,8 @@ public class AltosFlightStats {
 	public int[]		state_count = new int[AltosLib.ao_flight_invalid + 1];
 	public double[]	state_start = new double[AltosLib.ao_flight_invalid + 1];
 	public double[]	state_end = new double[AltosLib.ao_flight_invalid + 1];
+	public String		product;
+	public String		firmware_version;
 	public int		serial;
 	public int		flight;
 	public int		year, month, day;
@@ -69,10 +71,9 @@ public class AltosFlightStats {
 
 		if (series.height_series != null) {
 			for (AltosTimeValue height : series.height_series) {
-				if (height.time >= landed_state_time) {
-					landed_height = height.value;
+				landed_height = height.value;
+				if (height.time >= landed_state_time)
 					break;
-				}
 			}
 		}
 
@@ -95,6 +96,9 @@ public class AltosFlightStats {
 				}
 			}
 		}
+
+		if (landed_time == AltosLib.MISSING)
+			landed_time = landed_state_time;
 		return landed_time;
 	}
 
@@ -132,6 +136,29 @@ public class AltosFlightStats {
 		boost_time = boost_time(series);
 		landed_time = landed_time(series);
 
+		if (series.state_series != null){
+			boolean fixed_boost = false;
+			boolean fixed_landed = false;
+			for (AltosTimeValue state : series.state_series) {
+				if ((int) state.value == AltosLib.ao_flight_boost)
+					if (boost_time != AltosLib.MISSING) {
+						state.time = boost_time;
+						fixed_boost = true;
+					}
+				if ((int) state.value == AltosLib.ao_flight_landed)
+					if (landed_time != AltosLib.MISSING) {
+						state.time = landed_time;
+						fixed_landed = true;
+					}
+			}
+			if (!fixed_boost && boost_time != AltosLib.MISSING)
+				series.state_series.add(boost_time, AltosLib.ao_flight_boost);
+			if (!fixed_landed && landed_time != AltosLib.MISSING)
+				series.state_series.add(landed_time, AltosLib.ao_flight_landed);
+		}
+
+		System.out.printf("boost time %g landed %g\n", boost_time, landed_time);
+
 		year = month = day = AltosLib.MISSING;
 		hour = minute = second = AltosLib.MISSING;
 		serial = flight = AltosLib.MISSING;
@@ -155,12 +182,15 @@ public class AltosFlightStats {
 				state_start[s] = series.state_series.time_of(s);
 			else
 				state_start[s] = AltosLib.MISSING;
+
 			if (s == AltosLib.ao_flight_main)
 				state_end[s] = landed_time;
 			else if (series.state_series != null)
 				state_end[s] = series.state_series.time_of(s+1);
 			else
 				state_end[s] = AltosLib.MISSING;
+
+			System.out.printf("state %s start %g end %g\n", AltosLib.state_name(s), state_start[s], state_end[s]);
 
 			if (state_end[s] > landed_time)
 				state_end[s] = landed_time;
@@ -172,6 +202,8 @@ public class AltosFlightStats {
 				state_accel[s] = series.accel_series.average(state_start[s], state_end[s]);
 		}
 
+		product = cal_data.product;
+		firmware_version = cal_data.firmware_version;
 		serial = cal_data.serial;
 		flight = cal_data.flight;
 
