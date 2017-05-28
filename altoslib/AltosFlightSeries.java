@@ -232,6 +232,13 @@ public class AltosFlightSeries extends AltosDataListener {
 			for (AltosTimeValue alt : altitude_series)
 				height_series.add(alt.time, alt.value - ground_altitude);
 		}
+
+		if (gps_height == null && cal_data.gps_pad != null && gps_altitude != null) {
+			double gps_ground_altitude = cal_data.gps_pad.alt;
+			gps_height = add_series(gps_height_name, AltosConvert.height);
+			for (AltosTimeValue gps_alt : gps_altitude)
+				gps_height.add(gps_alt.time, gps_alt.value - gps_ground_altitude);
+		}
 	}
 
 	public AltosTimeSeries speed_series;
@@ -425,28 +432,32 @@ public class AltosFlightSeries extends AltosDataListener {
 			gps_vdop.add(time(), gps.vdop);
 		}
 		if (gps.locked) {
-			if (gps_altitude == null) {
-				gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
-				gps_height = add_series(gps_height_name, AltosConvert.height);
-				gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
-				gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
-				gps_course = add_series(gps_course_name, null);
-				gps_speed = add_series(gps_speed_name, null);
-			}
 			if (gps.alt != AltosLib.MISSING) {
+				if (gps_altitude == null)
+					gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
 				gps_altitude.add(time(), gps.alt);
-				if (cal_data.gps_pad != null)
-					gps_height.add(time(), gps.alt - cal_data.gps_pad.alt);
 			}
-			if (gps.ground_speed != AltosLib.MISSING)
+			if (gps.ground_speed != AltosLib.MISSING) {
+				if (gps_ground_speed == null)
+					gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
 				gps_ground_speed.add(time(), gps.ground_speed);
-			if (gps.climb_rate != AltosLib.MISSING)
+			}
+			if (gps.climb_rate != AltosLib.MISSING) {
+				if (gps_ascent_rate == null)
+					gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
 				gps_ascent_rate.add(time(), gps.climb_rate);
-			if (gps.course != AltosLib.MISSING)
+			}
+			if (gps.course != AltosLib.MISSING) {
+				if (gps_course == null)
+					gps_course = add_series(gps_course_name, null);
 				gps_course.add(time(), gps.course);
-			if (gps.ground_speed != AltosLib.MISSING && gps.climb_rate != AltosLib.MISSING)
+			}
+			if (gps.ground_speed != AltosLib.MISSING && gps.climb_rate != AltosLib.MISSING) {
+				if (gps_speed == null)
+					gps_speed = add_series(gps_speed_name, null);
 				gps_speed.add(time(), Math.sqrt(gps.ground_speed * gps.ground_speed +
 								gps.climb_rate * gps.climb_rate));
+			}
 		}
 		if (gps.cc_gps_sat != null) {
 			if (sats_in_view == null)
