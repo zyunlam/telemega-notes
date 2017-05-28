@@ -129,7 +129,7 @@ public class AltosTelemetryFile implements AltosRecordSet {
 		listener.finish();
 	}
 
-	public AltosTelemetryFile(FileInputStream input) {
+	public AltosTelemetryFile(FileInputStream input) throws IOException {
 		telems = new AltosTelemetryIterable(input);
 	}
 }

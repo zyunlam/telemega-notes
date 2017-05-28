@@ -372,21 +372,6 @@ public class AltosUI extends AltosUIFrame {
 		}
 	}
 
-	static AltosRecordSet open_logfile(File file) {
-		try {
-			if (file.getName().endsWith("telem"))
-				return new AltosTelemetryFile(new FileInputStream(file));
-			else
-				return new AltosEepromFile(new FileReader(file));
-		} catch (FileNotFoundException fe) {
-			System.out.printf("%s\n", fe.getMessage());
-			return null;
-		} catch (IOException ie) {
-			System.out.printf("%s\n", ie.getMessage());
-			return null;
-		}
-	}
-
 	static AltosWriter open_csv(File file) {
 		try {
 			return new AltosCSV(file);
@@ -405,6 +390,18 @@ public class AltosUI extends AltosUIFrame {
 		}
 	}
 
+	static AltosRecordSet record_set(File input) {
+		try {
+			return AltosLib.record_set(input);
+		} catch (IOException ie) {
+			String message = ie.getMessage();
+			if (message == null)
+				message = String.format("%s (I/O error)", input.toString());
+			System.err.printf("%s\n", message);
+		}
+		return null;
+	}
+
 	static final int process_none = 0;
 	static final int process_csv = 1;
 	static final int process_kml = 2;
@@ -413,7 +410,7 @@ public class AltosUI extends AltosUIFrame {
 	static final int process_summary = 5;
 
 	static boolean process_csv(File input) {
-		AltosRecordSet set = open_logfile(input);
+		AltosRecordSet set = record_set(input);
 		if (set == null)
 			return false;
 
@@ -434,7 +431,7 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	static boolean process_kml(File input) {
-		AltosRecordSet set = open_logfile(input);
+		AltosRecordSet set = record_set(input);
 		if (set == null)
 			return false;
 
@@ -453,27 +450,6 @@ public class AltosUI extends AltosUIFrame {
 			writer.close();
 			return true;
 		}
-	}
-
-	static AltosRecordSet record_set(File file) {
-		FileInputStream in;
-		if (file.getName().endsWith("telem")) {
-			try {
-				in = new FileInputStream(file);
-				return new AltosTelemetryFile(in);
-			} catch (Exception e) {
-				System.out.printf("Failed to open file '%s'\n", file);
-			}
-		} else {
-
-			try {
-				AltosEepromFile f = new AltosEepromFile(new FileReader(file));
-				return f;
-			} catch (Exception e) {
-				System.out.printf("Failed to open file '%s'\n", file);
-			}
-		}
-		return null;
 	}
 
 	static AltosReplayReader replay_file(File file) {

@@ -33,7 +33,7 @@ public class AltosEepromFile implements AltosRecordSet {
 		out.printf("%s\n", set.eeprom.toString());
 	}
 
-	public AltosEepromFile(Reader input) throws IOException {
+	public AltosEepromFile(InputStream input) throws IOException {
 		set = new AltosEepromRecordSet(input);
 	}
 

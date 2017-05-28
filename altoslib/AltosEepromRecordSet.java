@@ -110,7 +110,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		}
 	}
 
-	public AltosEepromRecordSet(Reader input) throws IOException {
+	public AltosEepromRecordSet(InputStream input) throws IOException {
 		this(new AltosEepromNew(input));
 	}
 }

@@ -107,6 +107,7 @@ altoslib_JAVA = \
 	AltosSensorTGPS.java \
 	AltosState.java \
 	AltosStateName.java \
+	AltosStringInputStream.java \
 	AltosTelemetry.java \
 	AltosTelemetryConfiguration.java \
 	AltosTelemetryCompanion.java \

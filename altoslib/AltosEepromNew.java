@@ -93,19 +93,34 @@ public class AltosEepromNew {
 		w.append('\n');
 	}
 
-	private boolean read_config(Reader r) throws IOException {
-		config = AltosJson.fromReader(r);
+	private boolean read_config(InputStream stream) throws IOException {
+		config = AltosJson.fromInputStream(stream);
 		if (config == null)
 			return false;
 		return true;
 	}
 
-	private boolean read_data(Reader r) throws IOException {
-		BufferedReader	br = new BufferedReader(r);
-		String		s;
+	private String read_line(InputStream stream) throws IOException {
+		StringBuffer	buffer = null;
+		int		c;
+
+		for (;;) {
+			c = stream.read();
+			if (c == -1 && buffer == null)
+				return null;
+			if (buffer == null)
+				buffer = new StringBuffer();
+			if (c == -1 || c == '\n')
+				return buffer.toString();
+			buffer.append((char) c);
+		}
+	}
+
+	private boolean read_data(InputStream stream) throws IOException {
+		String			s;
 
 		data = new ArrayList<Byte>();
-		while ((s = br.readLine()) != null) {
+		while ((s = read_line(stream)) != null) {
 
 			String[] tokens = s.split("\\s+");
 
@@ -122,24 +137,24 @@ public class AltosEepromNew {
 		return true;
 	}
 
-	private boolean read_old_config(BufferedReader r) throws IOException {
+	private boolean read_old_config(InputStream stream) throws IOException {
 		AltosConfigData	cfg = new AltosConfigData();
 		for (;;) {
 			boolean	done = false;
 
 			/* The data starts with an upper case F character followed by a space */
-			r.mark(2);
-			int	first = r.read();
+			stream.mark(2);
+			int	first = stream.read();
 			if (first == 'F') {
-				int second =  r.read();
+				int second =  stream.read();
 				if (second == ' ')
 					done = true;
 			}
-			r.reset();
+			stream.reset();
 			if (done)
 				break;
 
-			String line = r.readLine();
+			String line = read_line(stream);
 			if (line == null)
 				return false;
 			cfg.parse_line(line);
@@ -148,11 +163,11 @@ public class AltosEepromNew {
 		return true;
 	}
 
-	private boolean read_old_data(BufferedReader r) throws IOException {
+	private boolean read_old_data(InputStream stream) throws IOException {
 		String line;
 
 		data = new ArrayList<Byte>();
-		while ((line = r.readLine()) != null) {
+		while ((line = read_line(stream)) != null) {
 			String[] tokens = line.split("\\s+");
 
 			/* Make sure there's at least a type and time */
@@ -207,22 +222,22 @@ public class AltosEepromNew {
 		return true;
 	}
 
-	private void read(Reader r) throws IOException {
-		BufferedReader	br = new BufferedReader(r);
+	private void read(InputStream stream) throws IOException {
+		BufferedInputStream	bis = new BufferedInputStream(stream);
 
-		br.mark(1);
-		int c = br.read();
-		br.reset();
+		bis.mark(1);
+		int c = bis.read();
+		bis.reset();
 
 		if (c == '{') {
-			if (!read_config(br))
+			if (!read_config(bis))
 				throw new IOException("failed to read config");
-			if (!read_data(br))
+			if (!read_data(bis))
 				throw new IOException("failed to read data");
 		} else {
-			if (!read_old_config(br))
+			if (!read_old_config(bis))
 				throw new IOException("failed to read old config");
-			if (!read_old_data(br))
+			if (!read_old_data(bis))
 				throw new IOException("failed to read old data");
 		}
 	}
@@ -253,12 +268,12 @@ public class AltosEepromNew {
 	/*
 	 * Constructors
 	 */
-	public AltosEepromNew(Reader r) throws IOException {
-		read(r);
+	public AltosEepromNew(InputStream stream) throws IOException {
+		read(stream);
 	}
 
 	public AltosEepromNew(String s) throws IOException {
-		read(new StringReader(s));
+		read(new AltosStringInputStream(s));
 	}
 
 	public AltosEepromNew(AltosJson config, ArrayList<Byte> data) {

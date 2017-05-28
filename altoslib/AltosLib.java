@@ -588,4 +588,28 @@ public class AltosLib {
 	public static String igniter_name(int i) {
 		return String.format("Ignitor %c", 'A' + i);
 	}
+
+	public static AltosRecordSet record_set(File file) throws FileNotFoundException, IOException {
+		FileInputStream in;
+		in = new FileInputStream(file);
+		if (file.getName().endsWith("telem")) {
+			return new AltosTelemetryFile(in);
+		} else if (file.getName().endsWith("eeprom")) {
+			return new AltosEepromFile(in);
+		} else {
+			String	name = file.getName();
+			int	dot = name.lastIndexOf('.');
+			String	extension;
+
+			if (dot == -1)
+				throw new IOException(String.format("%s (Missing extension)", file.toString()));
+			else {
+				extension = name.substring(dot);
+				throw new IOException(String.format("%s (Invalid extension '%s')",
+								    file.toString(),
+								    extension));
+			}
+		}
+	}
+
 }

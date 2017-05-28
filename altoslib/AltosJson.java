@@ -255,7 +255,7 @@ class JsonToken {
  * Lexer for json
  */
 class JsonLexer extends JsonUtil {
-	Reader			f;
+	InputStream		f;
 	int			line;
 	int			ungot = -2;
 	StringBuffer		pending_token;
@@ -445,12 +445,12 @@ class JsonLexer extends JsonUtil {
 	}
 
 	JsonLexer(String s) {
-		f = new StringReader(s);
+		f = new AltosStringInputStream(s);
 		line = 1;
 		token = null;
 	}
 
-	JsonLexer(Reader f) {
+	JsonLexer(InputStream f) {
 		this.f = f;
 		line = 1;
 		token = null;
@@ -570,7 +570,7 @@ class JsonParse {
 		lexer = new JsonLexer(s);
 	}
 
-	JsonParse(Reader f) {
+	JsonParse(InputStream f) {
 		lexer = new JsonLexer(f);
 	}
 }
@@ -670,7 +670,7 @@ public class AltosJson extends JsonUtil {
 		}
 	}
 
-	public static AltosJson fromReader(Reader f) {
+	public static AltosJson fromInputStream(InputStream f) {
 		JsonParse	parse = new JsonParse(f);
 		try {
 			return parse.parse();

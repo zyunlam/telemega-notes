@@ -124,10 +124,10 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 				String	filename = file.getName();
 				try {
 					AltosRecordSet record_set = null;
+					FileInputStream in = new FileInputStream(file);
 					if (filename.endsWith("eeprom")) {
-						record_set = new AltosEepromRecordSet(new FileReader(file));
+						record_set = new AltosEepromRecordSet(in);
 					} else if (filename.endsWith("telem")) {
-						FileInputStream in = new FileInputStream(file);
 						record_set = new AltosTelemetryFile(in);
 					} else {
 						throw new FileNotFoundException(filename);

@@ -620,21 +620,10 @@ public class TeleGPS
 	}
 
 	static AltosRecordSet record_set(File file) {
-		FileInputStream in;
-                if (file.getName().endsWith("telem")) {
-                        try {
-                                in = new FileInputStream(file);
-                                return new AltosTelemetryFile(in);
-                        } catch (Exception e) {
-                                System.out.printf("Failed to open file '%s'\n", file);
-                        }
-                } else {
-
-                        try {
-                                return new AltosEepromFile(new FileReader(file));
-                        } catch (Exception e) {
-                                System.out.printf("Failed to open file '%s'\n", file);
-                        }
+		try {
+			return AltosLib.record_set(file);
+		} catch (IOException ie) {
+			System.out.printf("%s\n", ie.getMessage());
                 }
                 return null;
 	}

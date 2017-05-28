@@ -80,29 +80,25 @@ public class AltosTelemetryIterable implements Iterable<AltosTelemetry> {
 		return new AltosTelemetryOrderedIterator(telems);
 	}
 
-	public AltosTelemetryIterable (FileInputStream input) {
+	public AltosTelemetryIterable (FileInputStream input) throws IOException {
 		telems = new TreeSet<AltosTelemetryOrdered> ();
 		tick = 0;
 		index = 0;
 
-		try {
-			for (;;) {
-				String line = AltosLib.gets(input);
-				if (line == null) {
-					break;
-				}
-				try {
-					AltosTelemetry telem = AltosTelemetry.parse(line);
-					if (telem == null)
-						break;
-					add(telem);
-				} catch (ParseException pe) {
-					System.out.printf("parse exception %s\n", pe.getMessage());
-				} catch (AltosCRCException ce) {
-				}
+		for (;;) {
+			String line = AltosLib.gets(input);
+			if (line == null) {
+				break;
 			}
-		} catch (IOException io) {
-			System.out.printf("io exception\n");
+			try {
+				AltosTelemetry telem = AltosTelemetry.parse(line);
+				if (telem == null)
+					break;
+				add(telem);
+			} catch (ParseException pe) {
+				System.out.printf("parse exception %s\n", pe.getMessage());
+			} catch (AltosCRCException ce) {
+			}
 		}
 	}
 }
