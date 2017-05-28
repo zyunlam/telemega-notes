@@ -89,8 +89,15 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 
 	public void set_stats(AltosFlightStats stats) {
 		int y = 0;
-		if (stats.serial != AltosLib.MISSING)
-			new FlightStat(layout, y++, "Serial", String.format("%d", stats.serial));
+		if (stats.serial != AltosLib.MISSING) {
+			if (stats.product != null && stats.firmware_version != null)
+				new FlightStat(layout, y++, "Device",
+					       stats.product,
+					       String.format("version %s", stats.firmware_version),
+					       String.format("serial %d", stats.serial));
+			else
+				new FlightStat(layout, y++, "Serial", String.format("%d", stats.serial));
+		}
 		if (stats.flight != AltosLib.MISSING)
 			new FlightStat(layout, y++, "Flight", String.format("%d", stats.flight));
 		if (stats.year != AltosLib.MISSING && stats.hour != AltosLib.MISSING)
