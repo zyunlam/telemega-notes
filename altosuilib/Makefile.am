@@ -18,7 +18,6 @@ altosuilib_JAVA = \
 	AltosUIDataMissing.java \
 	AltosUIDataPoint.java \
 	AltosUIDataSet.java \
-	AltosUIGraph.java \
 	AltosUIGrapher.java \
 	AltosUIDialog.java \
 	AltosUIEnable.java \
@@ -28,7 +27,6 @@ altosuilib_JAVA = \
 	AltosUIMarker.java \
 	AltosUIPreferencesBackend.java \
 	AltosUIPreferences.java \
-	AltosUISeries.java \
 	AltosUIFlightSeries.java \
 	AltosUIGraphNew.java \
 	AltosGraphNew.java \

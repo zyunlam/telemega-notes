@@ -194,10 +194,12 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 		if (stats.state_start[AltosLib.ao_flight_boost] < stats.state_start[AltosLib.ao_flight_landed])
 			new FlightStat(layout, y++, "Flight time",
 				       String.format("%6.1f s", stats.landed_time - stats.boost_time));
-		if (stats.has_gps) {
+		if (stats.pad_lat != AltosLib.MISSING) {
 			new FlightStat(layout, y++, "Pad location",
 				       pos(stats.pad_lat,"N","S"),
 				       pos(stats.pad_lon,"E","W"));
+		}
+		if (stats.lat != AltosLib.MISSING) {
 			new FlightStat(layout, y++, "Last reported location",
 				       pos(stats.lat,"N","S"),
 				       pos(stats.lon,"E","W"));

@@ -101,6 +101,15 @@ public class AltosUIGraphNew implements AltosUnitsListener {
 
 	public void set_series(AltosUITimeSeries[] series) {
 		this.series = series;
+		boolean any_enabled = false;
+
+		for (AltosUITimeSeries s : series)
+			if (s.enable)
+				any_enabled = true;
+
+		if (!any_enabled)
+			for (AltosUITimeSeries s : series)
+				s.set_enable(true);
 
 		for (AltosUITimeSeries s : series)
 			addSeries(s);

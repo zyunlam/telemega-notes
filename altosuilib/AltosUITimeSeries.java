@@ -35,6 +35,24 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
+class AltosUITime extends AltosUnits {
+	public double value(double v, boolean imperial_units) { return v; }
+
+	public double inverse(double v, boolean imperial_unis) { return v; }
+
+	public String show_units(boolean imperial_units) { return "s"; }
+
+	public String say_units(boolean imperial_units) { return "seconds"; }
+
+	public int show_fraction(int width, boolean imperial_units) {
+		if (width < 5)
+			return 0;
+		return width - 5;
+	}
+
+	public int say_fraction(boolean imperial_units) { return 0; }
+}
+
 class AltosXYSeries extends XYSeries {
 
 	public AltosXYSeries(String label) {
