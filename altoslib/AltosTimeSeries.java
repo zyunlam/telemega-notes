@@ -109,40 +109,39 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 		return values.iterator();
 	}
 
-	public double max() {
-		double max = AltosLib.MISSING;
-		for (AltosTimeValue tv : values) {
-			if (max == AltosLib.MISSING || tv.value > max)
-				max = tv.value;
-		}
+	public AltosTimeValue max() {
+		AltosTimeValue max = null;
+		for (AltosTimeValue tv : values)
+			if (max == null || tv.value > max.value)
+				max = tv;
 		return max;
 	}
 
-	public double max(double start_time, double end_time) {
-		double max = AltosLib.MISSING;
+	public AltosTimeValue max(double start_time, double end_time) {
+		AltosTimeValue max = null;
 		for (AltosTimeValue tv : values) {
 			if (start_time <= tv.time && tv.time <= end_time)
-				if (max == AltosLib.MISSING || tv.value > max)
-					max = tv.value;
+				if (max == null || tv.value > max.value)
+					max = tv;
 		}
 		return max;
 	}
 
-	public double min() {
-		double min = AltosLib.MISSING;
+	public AltosTimeValue min() {
+		AltosTimeValue min = null;
 		for (AltosTimeValue tv : values) {
-			if (min == AltosLib.MISSING || tv.value < min)
-				min = tv.value;
+			if (min == null || tv.value < min.value)
+				min = tv;
 		}
 		return min;
 	}
 
-	public double min(double start_time, double end_time) {
-		double min = AltosLib.MISSING;
+	public AltosTimeValue min(double start_time, double end_time) {
+		AltosTimeValue min = null;
 		for (AltosTimeValue tv : values) {
 			if (start_time <= tv.time && tv.time <= end_time)
-				if (min == AltosLib.MISSING || tv.value < min)
-					min = tv.value;
+				if (min == null || tv.value < min.value)
+					min = tv;
 		}
 		return min;
 	}
@@ -266,9 +265,11 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue> {
 					double	j_right = j == right ? right_time : values.get(j+1).time;
 					double	interval = (j_right - j_left) / 2.0;
 					double	coeff = filter_coeff(j_time - center_time, width) * interval;
+					double	value = values.get(j).value;
+					double	partial = value * coeff;
 
 					total_coeff += coeff;
-					total_value += coeff * values.get(j).value;
+					total_value += partial;
 				}
 			}
 			if (total_coeff != 0.0)
