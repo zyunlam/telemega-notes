@@ -20,6 +20,9 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public ArrayList<AltosTimeSeries> series = new ArrayList<AltosTimeSeries>();
 
+	public double	speed_filter_width = 4.0;
+	public double	accel_filter_width = 4.0;
+
 	public int[] indices() {
 		int[] indices = new int[series.size()];
 		for (int i = 0; i < indices.length; i++)
@@ -165,7 +168,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 		if (speed_series != null) {
 			AltosTimeSeries temp_series = make_series(speed_name, AltosConvert.speed);
-			speed_series.filter(temp_series, 2.0);
+			speed_series.filter(temp_series, accel_filter_width);
 			accel_series = add_series(accel_name, AltosConvert.accel);
 			temp_series.differentiate(accel_series);
 		}
@@ -236,7 +239,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 		if (altitude_series != null) {
 			AltosTimeSeries temp_series = make_series(altitude_name, AltosConvert.height);
-			altitude_series.filter(temp_series, 1.0);
+			altitude_series.filter(temp_series, speed_filter_width);
 
 			alt_speed_series = make_series(speed_name, AltosConvert.speed);
 			temp_series.differentiate(alt_speed_series);
@@ -399,13 +402,18 @@ public class AltosFlightSeries extends AltosDataListener {
 		}
 		sats_in_soln.add(time(), gps.nsat);
 		if (gps.pdop != AltosLib.MISSING) {
-			if (gps_pdop == null) {
+			if (gps_pdop == null)
 				gps_pdop = add_series(gps_pdop_name, null);
-				gps_hdop = add_series(gps_hdop_name, null);
-				gps_vdop = add_series(gps_vdop_name, null);
-			}
 			gps_pdop.add(time(), gps.pdop);
+		}
+		if (gps.hdop != AltosLib.MISSING) {
+			if (gps_hdop == null)
+				gps_hdop = add_series(gps_hdop_name, null);
 			gps_hdop.add(time(), gps.hdop);
+		}
+		if (gps.vdop != AltosLib.MISSING) {
+			if (gps_vdop == null)
+				gps_vdop = add_series(gps_vdop_name, null);
 			gps_vdop.add(time(), gps.vdop);
 		}
 		if (gps.locked) {
