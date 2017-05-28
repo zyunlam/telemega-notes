@@ -30,12 +30,11 @@ import org.altusmetrum.altosuilib_11.*;
 public class MicroPeak extends MicroFrame implements ActionListener, ItemListener {
 
 	File		filename;
-	MicroGraph	graph;
+	AltosGraphNew	graph;
 	AltosUIEnable	enable;
-	MicroStatsTable	statsTable;
+	AltosFlightStatsTable	statsTable;
 	MicroRaw	raw;
 	MicroData	data;
-	MicroStats	stats;
 	Container	container;
 	JTabbedPane	pane;
 	static int	number_of_windows;
@@ -47,9 +46,12 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 			return mp.SetData(data);
 		}
 		this.data = data;
-		stats = new MicroStats(data);
-		graph.setDataSet(data);
-		statsTable.setStats(stats);
+		if (data.flight_series == null)
+			System.out.printf("no data in flight\n");
+		if (data.flight_stats == null)
+			System.out.printf("no stats in flight\n");
+		graph.set_data(data.flight_stats, data.flight_series);
+		statsTable.set_stats(data.flight_stats);
 		raw.setData(data);
 		setTitle(data.name);
 		return this;
@@ -265,8 +267,9 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		});
 
 		enable = new AltosUIEnable();
-		graph = new MicroGraph(enable);
-		statsTable = new MicroStatsTable();
+
+		graph = new AltosGraphNew(enable);
+		statsTable = new AltosFlightStatsTable();
 		raw = new MicroRaw();
 		pane.add(graph.panel, "Graph");
 		pane.add(enable, "Configure Graph");
@@ -324,8 +327,9 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 						CommandExport(file);
 					opened = true;
 				} catch (Exception e) {
-					System.err.printf("Error processing \"%s\": %s\n",
-							  file.getName(), e.getMessage());
+					System.err.printf("Error processing \"%s\": %s %s\n",
+							  file.getName(), e.toString(), e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		}

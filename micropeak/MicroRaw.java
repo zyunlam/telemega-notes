@@ -30,7 +30,7 @@ public class MicroRaw extends JTextArea {
 		StringWriter	sw = new StringWriter();
 		try {
 			data.export(sw);
-			setRows(data.pressures.length + 1);
+			setRows(data.length());
 			setText(sw.toString());
 		} catch (IOException ie) {
 			setText(String.format("Error writing data: %s", ie.getMessage()));
