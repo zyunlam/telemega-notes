@@ -105,7 +105,7 @@ public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, A
 		enable = new AltosUIEnable();
 		stats = new AltosFlightStats(flight_series);
 
-		graph = new AltosGraphNew(enable, stats, flight_series, cal_data);
+		graph = new AltosGraphNew(enable, stats, flight_series);
 
 		statsTable = new AltosFlightStatsTable(stats);
 

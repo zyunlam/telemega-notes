@@ -93,14 +93,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		}
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (!same_call(state.callsign)) {
+			if (!same_call(state.cal_data.callsign)) {
 				show();
-				value.setText(state.callsign);
-				if (state.callsign == null)
+				value.setText(state.cal_data.callsign);
+				if (state.cal_data.callsign == null)
 					setVisible(false);
 				else
 					setVisible(true);
-				last_call = state.callsign;
+				last_call = state.cal_data.callsign;
 			}
 		}
 
