@@ -182,18 +182,24 @@ public class AltosCalData {
 		boost_tick = tick;
 	}
 
+	public double		ticks_per_sec = 100.0;
+
+	public void set_ticks_per_sec(double ticks_per_sec) {
+		this.ticks_per_sec = ticks_per_sec;
+	}
+
 	public double time() {
 		if (tick == AltosLib.MISSING)
 			return AltosLib.MISSING;
 		if (boost_tick == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return (tick - boost_tick) / 100.0;
+		return (tick - boost_tick) / ticks_per_sec;
 	}
 
 	public double boost_time() {
 		if (boost_tick == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return boost_tick / 100.0;
+		return boost_tick / ticks_per_sec;
 	}
 
 	public int		state = AltosLib.MISSING;
