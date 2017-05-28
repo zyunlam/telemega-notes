@@ -187,17 +187,11 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public static final String rssi_name = "RSSI";
 
-	public AltosTimeSeries status_series;
-
-	public static final String status_name = "Radio Status";
-
 	public void set_rssi(int rssi, int status) {
 		if (rssi_series == null) {
 			rssi_series = add_series(rssi_name, null);
-			status_series = add_series(status_name, null);
 		}
 		rssi_series.add(time(), rssi);
-		status_series.add(time(), status);
 	}
 
 	public AltosTimeSeries pressure_series;
