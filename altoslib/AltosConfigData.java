@@ -33,6 +33,7 @@ public class AltosConfigData {
 	public int	log_space;
 	public String	version;
 	public int	altitude_32;
+	public int	config_major, config_minor;
 
 	/* Config information */
 	/* HAS_FLIGHT*/
@@ -236,6 +237,8 @@ public class AltosConfigData {
 		log_format = AltosLib.AO_LOG_FORMAT_UNKNOWN;
 		log_space = AltosLib.MISSING;
 		version = "unknown";
+		config_major = AltosLib.MISSING;
+		config_minor = AltosLib.MISSING;
 
 		main_deploy = AltosLib.MISSING;
 		apogee_delay = AltosLib.MISSING;
@@ -283,6 +286,7 @@ public class AltosConfigData {
 	}
 
 	public void parse_line(String line) {
+
 		/* Version replies */
 		try { manufacturer = get_string(line, "manufacturer"); } catch (Exception e) {}
 		try { product = get_string(line, "product"); } catch (Exception e) {}
@@ -305,6 +309,21 @@ public class AltosConfigData {
 		try { ms5607().crc = get_int(line, "ms5607 crc:"); } catch (Exception e) {}
 
 		/* Config show replies */
+
+		try {
+			if (line.startsWith("Config version")) {
+				String[] bits = line.split("\\s+");
+				if (bits.length >= 3) {
+					String[] cfg = bits[2].split("\\.");
+
+					if (cfg.length >= 2) {
+						System.out.printf("major %s minor %s\n", cfg[0], cfg[1]);
+						config_major = Integer.parseInt(cfg[0]);
+						config_minor = Integer.parseInt(cfg[1]);
+					}
+				}
+			}
+		} catch (Exception e) {}
 
 		/* HAS_FLIGHT */
 		try { main_deploy = get_int(line, "Main deploy:"); } catch (Exception e) {}
