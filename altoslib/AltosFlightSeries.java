@@ -135,7 +135,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		return false;
 	}
 
-	AltosTimeSeries state_series;
+	public AltosTimeSeries state_series;
 
 	public static final String state_name = "State";
 
@@ -148,7 +148,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		state_series.add(time(), state);
 	}
 
-	AltosTimeSeries	accel_series;
+	public AltosTimeSeries	accel_series;
 
 	public static final String accel_name = "Accel";
 
@@ -164,21 +164,21 @@ public class AltosFlightSeries extends AltosDataListener {
 			return;
 
 		if (speed_series != null) {
-			AltosTimeSeries temp_series = make_series(accel_name, AltosConvert.accel);
-			speed_series.differentiate(temp_series);
+			AltosTimeSeries temp_series = make_series(speed_name, AltosConvert.speed);
+			speed_series.filter(temp_series, 2.0);
 			accel_series = add_series(accel_name, AltosConvert.accel);
-			temp_series.filter(accel_series, 0.25);
+			temp_series.differentiate(accel_series);
 		}
 	}
 
 	public void set_received_time(long received_time) {
 	}
 
-	AltosTimeSeries rssi_series;
+	public AltosTimeSeries rssi_series;
 
 	public static final String rssi_name = "RSSI";
 
-	AltosTimeSeries status_series;
+	public AltosTimeSeries status_series;
 
 	public static final String status_name = "Radio Status";
 
@@ -191,15 +191,15 @@ public class AltosFlightSeries extends AltosDataListener {
 		status_series.add(time(), status);
 	}
 
-	AltosTimeSeries pressure_series;
+	public AltosTimeSeries pressure_series;
 
 	public static final String pressure_name = "Pressure";
 
-	AltosTimeSeries altitude_series;
+	public AltosTimeSeries altitude_series;
 
 	public static final String altitude_name = "Altitude";
 
-	AltosTimeSeries height_series;
+	public AltosTimeSeries height_series;
 
 	public static final String height_name = "Height";
 
@@ -223,7 +223,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		}
 	}
 
-	AltosTimeSeries speed_series;
+	public AltosTimeSeries speed_series;
 
 	public static final String speed_name = "Speed";
 
@@ -235,11 +235,11 @@ public class AltosFlightSeries extends AltosDataListener {
 		AltosTimeSeries accel_speed_series = null;
 
 		if (altitude_series != null) {
-			AltosTimeSeries temp_series = make_series(speed_name, AltosConvert.speed);
-			altitude_series.differentiate(temp_series);
+			AltosTimeSeries temp_series = make_series(altitude_name, AltosConvert.height);
+			altitude_series.filter(temp_series, 1.0);
 
 			alt_speed_series = make_series(speed_name, AltosConvert.speed);
-			temp_series.filter(alt_speed_series, 10.0);
+			temp_series.differentiate(alt_speed_series);
 		}
 		if (accel_series != null) {
 			AltosTimeSeries temp_series = make_series(speed_name, AltosConvert.speed);
@@ -282,7 +282,7 @@ public class AltosFlightSeries extends AltosDataListener {
 			add_series(speed_series);
 	}
 
-	AltosTimeSeries	kalman_height_series, kalman_speed_series, kalman_accel_series;
+	public AltosTimeSeries	kalman_height_series, kalman_speed_series, kalman_accel_series;
 
 	public static final String kalman_height_name = "Kalman Height";
 	public static final String kalman_speed_name = "Kalman Speed";
@@ -299,7 +299,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		kalman_accel_series.add(time(), acceleration);
 	}
 
-	AltosTimeSeries thrust_series;
+	public AltosTimeSeries thrust_series;
 
 	public static final String thrust_name = "Thrust";
 
@@ -309,7 +309,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		thrust_series.add(time(), N);
 	}
 
-	AltosTimeSeries temperature_series;
+	public AltosTimeSeries temperature_series;
 
 	public static final String temperature_name = "Temperature";
 
@@ -319,7 +319,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		temperature_series.add(time(), deg_c);
 	}
 
-	AltosTimeSeries battery_voltage_series;
+	public AltosTimeSeries battery_voltage_series;
 
 	public static final String battery_voltage_name = "Battery Voltage";
 
@@ -331,7 +331,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		battery_voltage_series.add(time(), volts);
 	}
 
-	AltosTimeSeries apogee_voltage_series;
+	public AltosTimeSeries apogee_voltage_series;
 
 	public static final String apogee_voltage_name = "Apogee Voltage";
 
@@ -343,7 +343,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		apogee_voltage_series.add(time(), volts);
 	}
 
-	AltosTimeSeries main_voltage_series;
+	public AltosTimeSeries main_voltage_series;
 
 	public static final String main_voltage_name = "Main Voltage";
 
@@ -367,15 +367,15 @@ public class AltosFlightSeries extends AltosDataListener {
 		return gps;
 	}
 
-	AltosTimeSeries	sats_in_view;
-	AltosTimeSeries sats_in_soln;
-	AltosTimeSeries gps_altitude;
-	AltosTimeSeries gps_height;
-	AltosTimeSeries gps_ground_speed;
-	AltosTimeSeries gps_ascent_rate;
-	AltosTimeSeries gps_course;
-	AltosTimeSeries gps_speed;
-	AltosTimeSeries gps_pdop, gps_vdop, gps_hdop;
+	public AltosTimeSeries	sats_in_view;
+	public AltosTimeSeries sats_in_soln;
+	public AltosTimeSeries gps_altitude;
+	public AltosTimeSeries gps_height;
+	public AltosTimeSeries gps_ground_speed;
+	public AltosTimeSeries gps_ascent_rate;
+	public AltosTimeSeries gps_course;
+	public AltosTimeSeries gps_speed;
+	public AltosTimeSeries gps_pdop, gps_vdop, gps_hdop;
 
 	public static final String sats_in_view_name = "Satellites in view";
 	public static final String sats_in_soln_name = "Satellites in solution";
@@ -443,19 +443,19 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String accel_across_name = "Accel Across";
 	public static final String accel_through_name = "Accel Through";
 
-	AltosTimeSeries accel_along, accel_across, accel_through;
+	public AltosTimeSeries accel_along, accel_across, accel_through;
 
 	public static final String gyro_roll_name = "Roll Rate";
 	public static final String gyro_pitch_name = "Pitch Rate";
 	public static final String gyro_yaw_name = "Yaw Rate";
 
-	AltosTimeSeries gyro_roll, gyro_pitch, gyro_yaw;
+	public AltosTimeSeries gyro_roll, gyro_pitch, gyro_yaw;
 
 	public static final String mag_along_name = "Magnetic Field Along";
 	public static final String mag_across_name = "Magnetic Field Across";
 	public static final String mag_through_name = "Magnetic Field Through";
 
-	AltosTimeSeries mag_along, mag_across, mag_through;
+	public AltosTimeSeries mag_along, mag_across, mag_through;
 
 	public  void set_accel(double along, double across, double through) {
 		if (accel_along == null) {
@@ -495,7 +495,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public static final String orient_name = "Tilt Angle";
 
-	AltosTimeSeries orient_series;
+	public AltosTimeSeries orient_series;
 
 	public void set_orient(double orient) {
 		if (orient_series == null)
@@ -505,7 +505,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public static final String pyro_voltage_name = "Pyro Voltage";
 
-	AltosTimeSeries pyro_voltage;
+	public AltosTimeSeries pyro_voltage;
 
 	public  void set_pyro_voltage(double volts) {
 		if (pyro_voltage == null)
@@ -531,7 +531,7 @@ public class AltosFlightSeries extends AltosDataListener {
 		return igniter_voltage_names[channel];
 	}
 
-	AltosTimeSeries[] igniter_voltage;
+	public AltosTimeSeries[] igniter_voltage;
 
 	public  void set_igniter_voltage(double[] voltage) {
 		int channels = voltage.length;
@@ -553,7 +553,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public static final String pyro_fired_name = "Pyro Channel State";
 
-	AltosTimeSeries pyro_fired_series;
+	public AltosTimeSeries pyro_fired_series;
 
 	int	last_pyro_mask;
 
