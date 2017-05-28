@@ -143,6 +143,10 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String state_name = "State";
 
 	public void set_state(int state) {
+
+		if (state == AltosLib.ao_flight_pad)
+			return;
+
 		if (state_series == null)
 			state_series = add_series(state_name, AltosConvert.state_name);
 		else if (this.state == state)
