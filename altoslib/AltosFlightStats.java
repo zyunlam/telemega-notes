@@ -34,6 +34,8 @@ public class AltosFlightStats {
 	public int		flight;
 	public int		year, month, day;
 	public int		hour, minute, second;
+	public double		boost_time;
+	public double		landed_time;
 	public double		lat, lon;
 	public double		pad_lat, pad_lon;
 	public boolean		has_flight_data;
@@ -116,17 +118,19 @@ public class AltosFlightStats {
 					break;
 			}
 		}
+		if (boost_time == AltosLib.MISSING)
+			boost_time = boost_state_time;
 		return boost_time;
 	}
 
 
 	public AltosFlightStats(AltosFlightSeries series) {
 		AltosCalData	cal_data = series.cal_data;
-		double		boost_time = boost_time(series);
-		double		end_time = 0;
-		double		landed_time = landed_time(series);
 
 		series.finish();
+
+		boost_time = boost_time(series);
+		landed_time = landed_time(series);
 
 		year = month = day = AltosLib.MISSING;
 		hour = minute = second = AltosLib.MISSING;
@@ -157,6 +161,9 @@ public class AltosFlightStats {
 				state_end[s] = series.state_series.time_of(s+1);
 			else
 				state_end[s] = AltosLib.MISSING;
+
+			if (state_end[s] > landed_time)
+				state_end[s] = landed_time;
 
 			if (series.speed_series != null)
 				state_speed[s] = series.speed_series.average(state_start[s], state_end[s]);
@@ -197,22 +204,26 @@ public class AltosFlightStats {
 
 		max_height = AltosLib.MISSING;
 		if (series.height_series != null)
-			max_height = series.height_series.max();
+			max_height = series.height_series.max().value;
 		max_speed = AltosLib.MISSING;
 		if (series.speed_series != null) {
-			max_speed = series.speed_series.max(state_start[AltosLib.ao_flight_boost], state_start[AltosLib.ao_flight_drogue]);
-			if (max_speed == AltosLib.MISSING)
-				max_speed = series.speed_series.max();
+			AltosTimeValue tv = series.speed_series.max(state_start[AltosLib.ao_flight_boost], state_start[AltosLib.ao_flight_drogue]);
+			if (tv == null)
+				tv = series.speed_series.max();
+			if (tv != null)
+				max_speed = tv.value;
 		}
 		max_acceleration = AltosLib.MISSING;
 		if (series.accel_series != null) {
-			max_acceleration = series.accel_series.max(state_start[AltosLib.ao_flight_boost], state_start[AltosLib.ao_flight_drogue]);
-			if (max_acceleration == AltosLib.MISSING)
-				max_acceleration = series.accel_series.max();
+			AltosTimeValue tv = series.accel_series.max(state_start[AltosLib.ao_flight_boost], state_start[AltosLib.ao_flight_drogue]);
+			if (tv == null)
+				tv = series.accel_series.max();
+			if (tv != null)
+				max_acceleration = tv.value;
 		}
 		max_gps_height = AltosLib.MISSING;
 		if (series.gps_height != null)
-			max_gps_height = series.gps_height.max();
+			max_gps_height = series.gps_height.max().value;
 
 	}
 }
