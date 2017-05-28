@@ -168,6 +168,7 @@ public class AltosCalData {
 	}
 
 	public int		tick = AltosLib.MISSING;
+	private int		first_tick = AltosLib.MISSING;
 	private int		prev_tick = AltosLib.MISSING;
 
 	public void set_tick(int tick) {
@@ -177,6 +178,8 @@ public class AltosCalData {
 					tick += 65536;
 				}
 			}
+			if (first_tick == AltosLib.MISSING)
+				first_tick = tick;
 			prev_tick = tick;
 			this.tick = tick;
 		}
@@ -209,9 +212,11 @@ public class AltosCalData {
 	public double time() {
 		if (tick == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		if (boost_tick == AltosLib.MISSING)
-			return AltosLib.MISSING;
-		return (tick - boost_tick) / ticks_per_sec;
+		if (boost_tick != AltosLib.MISSING)
+			return (tick - boost_tick) / ticks_per_sec;
+		if (first_tick != AltosLib.MISSING)
+			return (tick - first_tick) / ticks_per_sec;
+		return tick / ticks_per_sec;
 	}
 
 	public double boost_time() {
