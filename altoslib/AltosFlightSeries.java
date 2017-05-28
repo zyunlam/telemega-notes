@@ -213,6 +213,9 @@ public class AltosFlightSeries extends AltosDataListener {
 		if (altitude_series == null)
 			altitude_series = add_series(altitude_name, AltosConvert.height);
 
+		if (cal_data.ground_pressure == AltosLib.MISSING)
+			cal_data.set_ground_pressure(pa);
+
 		double altitude = AltosConvert.pressure_to_altitude(pa);
 		altitude_series.add(time(), altitude);
 	}
