@@ -317,7 +317,6 @@ public class AltosConfigData {
 					String[] cfg = bits[2].split("\\.");
 
 					if (cfg.length >= 2) {
-						System.out.printf("major %s minor %s\n", cfg[0], cfg[1]);
 						config_major = Integer.parseInt(cfg[0]);
 						config_minor = Integer.parseInt(cfg[1]);
 					}

@@ -157,8 +157,6 @@ public class AltosFlightStats {
 				series.state_series.add(landed_time, AltosLib.ao_flight_landed);
 		}
 
-		System.out.printf("boost time %g landed %g\n", boost_time, landed_time);
-
 		year = month = day = AltosLib.MISSING;
 		hour = minute = second = AltosLib.MISSING;
 		serial = flight = AltosLib.MISSING;
