@@ -90,6 +90,9 @@ public class AltosGraphNew extends AltosUIGraphNew {
 		AltosUIAxis	gyro_axis, orient_axis, mag_axis;
 		AltosUIAxis	course_axis, dop_axis;
 
+		if (stats.serial != AltosLib.MISSING && stats.product != null && stats.flight != AltosLib.MISSING)
+			setName(String.format("%s %d flight %d\n", stats.product, stats.serial, stats.flight));
+
 		height_axis = newAxis("Height", AltosConvert.height, height_color);
 		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);

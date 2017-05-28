@@ -126,7 +126,7 @@ public class AltosUIGraphNew implements AltosUnitsListener {
 		plot.setDomainPannable(true);
 		plot.setRangePannable(true);
 
-		chart = new JFreeChart("Flight", JFreeChart.DEFAULT_TITLE_FONT,
+		chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT,
 				       plot, true);
 
 		ChartUtilities.applyCurrentTheme(chart);

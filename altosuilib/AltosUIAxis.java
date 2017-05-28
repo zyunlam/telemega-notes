@@ -60,7 +60,6 @@ public class AltosUIAxis extends NumberAxis {
 	}
 
 	public void set_enable(boolean enable) {
-		System.out.printf("axis %s set enable visible %d ref %d\n", label, visible, ref);
 		if (enable) {
 			visible++;
 			if (visible > ref)
