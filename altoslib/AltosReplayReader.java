@@ -107,6 +107,10 @@ public class AltosReplayReader extends AltosFlightReader {
 	Thread		t;
 	int		reads;
 
+	public AltosCalData cal_data() {
+		return replay.state.cal_data;
+	}
+
 	public AltosState read() {
 		switch (reads) {
 		case 0:
