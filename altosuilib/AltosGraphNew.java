@@ -47,6 +47,7 @@ public class AltosGraphNew extends AltosUIGraphNew {
 	static final private Color kalman_speed_color = new Color(0,255,0);
 	static final private Color thrust_color = new Color(31,194,31);
 	static final private Color accel_color = new Color(31,31,194);
+	static final private Color vert_accel_color = new Color(64,164,164);
 	static final private Color kalman_accel_color = new Color(0,0,255);
 	static final private Color voltage_color = new Color(194, 194, 31);
 	static final private Color battery_voltage_color = new Color(194, 194, 31);
@@ -130,6 +131,11 @@ public class AltosGraphNew extends AltosUIGraphNew {
 
 		flight_series.register_axis(AltosUIFlightSeries.accel_name,
 					    accel_color,
+					    true,
+					    accel_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.vert_accel_name,
+					    vert_accel_color,
 					    true,
 					    accel_axis);
 

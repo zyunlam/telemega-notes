@@ -159,6 +159,10 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public static final String accel_name = "Accel";
 
+	public AltosTimeSeries	vert_accel_series;
+
+	public static final String vert_accel_name = "Vertical Accel";
+
 	public void set_acceleration(double acceleration) {
 		if (acceleration == AltosLib.MISSING)
 			return;
@@ -264,8 +268,25 @@ public class AltosFlightSeries extends AltosDataListener {
 			temp_series.differentiate(alt_speed_series);
 		}
 		if (accel_series != null) {
+
+			if (orient_series != null) {
+				vert_accel_series = add_series(vert_accel_name, AltosConvert.accel);
+
+				for (AltosTimeValue a : accel_series) {
+					double	orient = orient_series.value(a.time);
+					double	a_abs = a.value + AltosConvert.gravity;
+					double	v_a = a_abs * Math.cos(AltosConvert.degrees_to_radians(orient)) - AltosConvert.gravity;
+
+					vert_accel_series.add(a.time, v_a);
+				}
+			}
+
 			AltosTimeSeries temp_series = make_series(speed_name, AltosConvert.speed);
-			accel_series.integrate(temp_series);
+
+			if (vert_accel_series != null)
+				vert_accel_series.integrate(temp_series);
+			else
+				accel_series.integrate(temp_series);
 
 			accel_speed_series = make_series(speed_name, AltosConvert.speed);
 			temp_series.filter(accel_speed_series, 0.1);
