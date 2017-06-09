@@ -36,10 +36,12 @@ public class AltosIMU implements Cloneable {
 		return counts / counts_per_g * AltosConvert.gravity;
 	}
 
-	public static final double	counts_per_degsec = 16.4;
+	/* In radians */
+	public static final double 	GYRO_FULLSCALE_DEGREES = 2000.0;
+	public static final double	GYRO_COUNTS = 32767.0;
 
-	public static double convert_gyro(double counts) {
-		return counts / counts_per_degsec;
+	public static double gyro_degrees_per_second(double counts, double cal) {
+		return (counts - cal) * GYRO_FULLSCALE_DEGREES / GYRO_COUNTS;
 	}
 
 	public boolean parse_string(String line) {

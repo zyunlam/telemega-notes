@@ -184,6 +184,18 @@ public class AltosConvert {
 		return altitude;
 	}
 
+	public static double degrees_to_radians(double degrees) {
+		if (degrees == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return degrees * (Math.PI / 180.0);
+	}
+
+	public static double radians_to_degrees(double radians) {
+		if (radians == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return radians * (180.0 / Math.PI);
+	}
+
 	public static double
 	cc_battery_to_voltage(double battery)
 	{
@@ -392,6 +404,7 @@ public class AltosConvert {
 	}
 
 	public static double acceleration_from_sensor(double sensor, double plus_g, double minus_g, double ground) {
+
 		if (sensor == AltosLib.MISSING)
 			return AltosLib.MISSING;
 

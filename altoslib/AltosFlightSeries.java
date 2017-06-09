@@ -304,6 +304,49 @@ public class AltosFlightSeries extends AltosDataListener {
 			add_series(speed_series);
 	}
 
+	public AltosTimeSeries orient_series;
+
+	public static final String orient_name = "Tilt Angle";
+
+	private void compute_orient() {
+
+		if (orient_series != null)
+			return;
+
+		if (accel_ground_across == AltosLib.MISSING)
+			return;
+
+		if (cal_data.pad_orientation == AltosLib.MISSING)
+			return;
+
+		if (cal_data.accel_zero_across == AltosLib.MISSING)
+			return;
+
+		AltosRotation rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data.accel_zero_across),
+							   AltosIMU.convert_accel(accel_ground_through - cal_data.accel_zero_through),
+							   AltosIMU.convert_accel(accel_ground_along - cal_data.accel_zero_along),
+							   cal_data.pad_orientation);
+		double prev_time = ground_time;
+
+		orient_series = add_series(orient_name, AltosConvert.orient);
+		orient_series.add(ground_time, rotation.tilt());
+
+		for (AltosTimeValue roll_v : gyro_roll) {
+			double	time = roll_v.time;
+			double	dt = time - prev_time;
+
+			if (dt > 0) {
+				double	roll = AltosConvert.degrees_to_radians(roll_v.value);
+				double	pitch = AltosConvert.degrees_to_radians(gyro_pitch.value(time));
+				double	yaw = AltosConvert.degrees_to_radians(gyro_yaw.value(time));
+
+				rotation.rotate(dt, pitch, yaw, roll);
+				orient_series.add(time, rotation.tilt());
+			}
+			prev_time = time;
+		}
+	}
+
 	public AltosTimeSeries	kalman_height_series, kalman_speed_series, kalman_accel_series;
 
 	public static final String kalman_height_name = "Kalman Height";
@@ -499,7 +542,17 @@ public class AltosFlightSeries extends AltosDataListener {
 		accel_through.add(time(), through);
 	}
 
+	private double	accel_ground_along = AltosLib.MISSING;
+	private double	accel_ground_across = AltosLib.MISSING;
+	private double	accel_ground_through = AltosLib.MISSING;
+
+	private double		ground_time;
+
 	public  void set_accel_ground(double along, double across, double through) {
+		accel_ground_along = along;
+		accel_ground_across = across;
+		accel_ground_through = through;
+		ground_time = time();
 	}
 
 	public  void set_gyro(double roll, double pitch, double yaw) {
@@ -523,10 +576,6 @@ public class AltosFlightSeries extends AltosDataListener {
 		mag_across.add(time(), across);
 		mag_through.add(time(), through);
 	}
-
-	public static final String orient_name = "Tilt Angle";
-
-	public AltosTimeSeries orient_series;
 
 	public void set_orient(double orient) {
 		if (orient_series == null)
@@ -604,6 +653,7 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	public void finish() {
+		compute_orient();
 		compute_speed();
 		compute_accel();
 		compute_height();

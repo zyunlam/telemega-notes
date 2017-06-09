@@ -313,25 +313,27 @@ public class AltosCalData {
 			gyro_zero_roll = roll;
 			gyro_zero_pitch = pitch;
 			gyro_zero_yaw = yaw;
+			imu_wrap_checked = false;
 		}
 	}
 
 	public double gyro_roll(double counts) {
 		if (gyro_zero_roll == AltosLib.MISSING || counts == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosIMU.convert_gyro(counts - gyro_zero_roll);
+
+		return AltosIMU.gyro_degrees_per_second(counts, gyro_zero_roll);
 	}
 
 	public double gyro_pitch(double counts) {
 		if (gyro_zero_pitch == AltosLib.MISSING || counts == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosIMU.convert_gyro(counts - gyro_zero_pitch);
+		return AltosIMU.gyro_degrees_per_second(counts, gyro_zero_pitch);
 	}
 
 	public double gyro_yaw(double counts) {
 		if (gyro_zero_yaw == AltosLib.MISSING || counts == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosIMU.convert_gyro(counts - gyro_zero_yaw);
+		return AltosIMU.gyro_degrees_per_second(counts, gyro_zero_yaw);
 	}
 
 	private double gyro_zero_overflow(double first) {
@@ -340,13 +342,25 @@ public class AltosCalData {
 			v = Math.ceil(v);
 		else
 			v = Math.floor(v);
+		if (v != 0)
+			System.out.printf("Adjusting gyro axis by %g steps\n", v);
 		return v * 128.0;
 	}
 
+	/* Initial TeleMega log format had only 16 bits for gyro cal, so the top 9 bits got lost as the
+	 * cal data are scaled by 512. Use the first sample to adjust the cal value, assuming that it is
+	 * from a time of fairly low rotation speed. Fixed in later TeleMega firmware by storing 32 bits
+	 * of cal values.
+	 */
+	private boolean imu_wrap_checked = false;
+
 	public void check_imu_wrap(double roll, double pitch, double yaw) {
-		gyro_zero_roll += gyro_zero_overflow(roll);
-		gyro_zero_pitch += gyro_zero_overflow(pitch);
-		gyro_zero_yaw += gyro_zero_overflow(yaw);
+		if (!imu_wrap_checked) {
+			gyro_zero_roll += gyro_zero_overflow(roll);
+			gyro_zero_pitch += gyro_zero_overflow(pitch);
+			gyro_zero_yaw += gyro_zero_overflow(yaw);
+			imu_wrap_checked = true;
+		}
 	}
 
 	public double mag_along(double along) {

@@ -22,8 +22,6 @@
 
 package org.altusmetrum.altoslib_11;
 
-import java.io.*;
-
 public class AltosState extends AltosDataListener {
 
 	public static final int set_position = 1;
@@ -759,8 +757,6 @@ public class AltosState extends AltosDataListener {
 		accel_ground_across = AltosLib.MISSING;
 		accel_ground_through = AltosLib.MISSING;
 
-		pad_orientation = AltosLib.MISSING;
-
 		set_npad(0);
 		ngps = 0;
 
@@ -903,16 +899,14 @@ public class AltosState extends AltosDataListener {
 	public AltosRotation	rotation;
 	public AltosRotation	ground_rotation;
 
-	public int pad_orientation;
-
 	public double	accel_ground_along, accel_ground_across, accel_ground_through;
 
 	void update_pad_rotation() {
-		if (pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
+		if (cal_data.pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
 			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data.accel_zero_across),
 						     AltosIMU.convert_accel(accel_ground_through - cal_data.accel_zero_through),
 						     AltosIMU.convert_accel(accel_ground_along - cal_data.accel_zero_along),
-						     pad_orientation);
+						     cal_data.pad_orientation);
 			ground_rotation = rotation;
 			orient.set_computed(rotation.tilt(), time);
 		}
@@ -925,28 +919,17 @@ public class AltosState extends AltosDataListener {
 		update_pad_rotation();
 	}
 
-	public void set_pad_orientation(int pad_orientation) {
-		this.pad_orientation = pad_orientation;
-		update_pad_rotation();
-	}
-
 	public double	last_imu_time;
-
-	private double radians(double degrees) {
-		if (degrees == AltosLib.MISSING)
-			return AltosLib.MISSING;
-		return degrees * Math.PI / 180.0;
-	}
 
 	private void update_orient() {
 		if (last_imu_time != AltosLib.MISSING) {
 			double	t = time - last_imu_time;
 
-			double	pitch = radians(gyro_pitch());
-			double	yaw = radians(gyro_yaw());
-			double	roll = radians(gyro_roll());
+			double	pitch = AltosConvert.degrees_to_radians(gyro_pitch());
+			double	yaw = AltosConvert.degrees_to_radians(gyro_yaw());
+			double	roll = AltosConvert.degrees_to_radians(gyro_roll());
 
-			if (t > 0 & pitch != AltosLib.MISSING && rotation != null) {
+			if (t > 0 && pitch != AltosLib.MISSING && rotation != null) {
 				rotation.rotate(t, pitch, yaw, roll);
 				orient.set_computed(rotation.tilt(), time);
 			}
@@ -958,8 +941,8 @@ public class AltosState extends AltosDataListener {
 
 	public void set_gyro(double roll, double pitch, double yaw) {
 		gyro_roll = roll;
-		gyro_pitch = roll;
-		gyro_roll = roll;
+		gyro_pitch = pitch;
+		gyro_roll = yaw;
 		update_orient();
 	}
 

@@ -161,11 +161,13 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 					 cal_data.mag_through(mag_through));
 
 
+			final double lsb_per_g = 1920.0/105.5;
+
 			double acceleration = AltosConvert.acceleration_from_sensor(
 				accel(),
-				config_data.accel_cal_plus,
-				config_data.accel_cal_minus,
-				AltosLib.MISSING);
+				cal_data.ground_accel,
+				cal_data.ground_accel + 2 * lsb_per_g,
+				cal_data.ground_accel);
 
 			listener.set_acceleration(acceleration);
 			break;
