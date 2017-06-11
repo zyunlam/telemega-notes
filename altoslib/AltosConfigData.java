@@ -140,16 +140,16 @@ public class AltosConfigData {
 	}
 
 	public int log_space() {
-		if (log_space > 0)
+		if (log_space != AltosLib.MISSING)
 			return log_space;
 
-		if (storage_size > 0) {
+		if (storage_size != AltosLib.MISSING) {
 			int	space = storage_size;
 
-			if (storage_erase_unit > 0 && use_flash_for_config())
+			if (storage_erase_unit != AltosLib.MISSING && use_flash_for_config())
 				space -= storage_erase_unit;
 
-			if (space > 0)
+			if (space != AltosLib.MISSING)
 				return space;
 		}
 		return 0;
@@ -262,8 +262,8 @@ public class AltosConfigData {
 
 		aes_key = null;
 
-		pyro = 0;
-		npyro = 0;
+		pyro = AltosLib.MISSING;
+		npyro = AltosLib.MISSING;
 		pyros = null;
 		pyro_firing_time = AltosLib.MISSING;
 
@@ -372,7 +372,7 @@ public class AltosConfigData {
 			pyros = new AltosPyro[npyro];
 			pyro = 0;
 		} catch (Exception e) {}
-		if (npyro > 0) {
+		if (npyro != AltosLib.MISSING) {
 			try {
 				AltosPyro p = new AltosPyro(pyro, line);
 				if (pyro < npyro)
@@ -436,21 +436,21 @@ public class AltosConfigData {
 	}
 
 	public boolean has_frequency() {
-		return radio_frequency >= 0 || radio_setting >= 0 || radio_channel >= 0;
+		return radio_frequency != AltosLib.MISSING || radio_setting != AltosLib.MISSING || radio_channel != AltosLib.MISSING;
 	}
 
 	public boolean has_telemetry_rate() {
-		return telemetry_rate >= 0;
+		return telemetry_rate != AltosLib.MISSING;
 	}
 
 	public void set_frequency(double freq) {
 		int	frequency = radio_frequency;
 		int	setting = radio_setting;
 
-		if (frequency > 0) {
+		if (frequency != AltosLib.MISSING) {
 			radio_frequency = (int) Math.floor (freq * 1000 + 0.5);
 			radio_channel = AltosLib.MISSING;
-		} else if (setting > 0) {
+		} else if (setting != AltosLib.MISSING) {
 			radio_setting =AltosConvert.radio_frequency_to_setting(freq,
 										    radio_calibration);
 			radio_channel = AltosLib.MISSING;
@@ -503,56 +503,56 @@ public class AltosConfigData {
 	public void get_values(AltosConfigValues source) throws AltosConfigDataException {
 
 		/* HAS_FLIGHT */
-		if (main_deploy >= 0)
+		if (main_deploy != AltosLib.MISSING)
 			main_deploy = source.main_deploy();
-		if (apogee_delay >= 0)
+		if (apogee_delay != AltosLib.MISSING)
 			apogee_delay = source.apogee_delay();
-		if (apogee_lockout >= 0)
+		if (apogee_lockout != AltosLib.MISSING)
 			apogee_lockout = source.apogee_lockout();
 
 		/* HAS_RADIO */
 		if (has_frequency())
 			set_frequency(source.radio_frequency());
-		if (radio_enable >= 0)
+		if (radio_enable != AltosLib.MISSING)
 			radio_enable = source.radio_enable();
 		if (callsign != null)
 			callsign = source.callsign();
-		if (telemetry_rate >= 0)
+		if (telemetry_rate != AltosLib.MISSING)
 			telemetry_rate = source.telemetry_rate();
 
 		/* HAS_ACCEL */
-		if (pad_orientation >= 0)
+		if (pad_orientation != AltosLib.MISSING)
 			pad_orientation = source.pad_orientation();
 
 		/* HAS_LOG */
-		if (flight_log_max >= 0)
+		if (flight_log_max != AltosLib.MISSING)
 			flight_log_max = source.flight_log_max();
 
 		/* HAS_IGNITE */
-		if (ignite_mode >= 0)
+		if (ignite_mode != AltosLib.MISSING)
 			ignite_mode = source.ignite_mode();
 
 		/* AO_PYRO_NUM */
-		if (npyro > 0)
+		if (npyro != AltosLib.MISSING)
 			pyros = source.pyros();
-		if (pyro_firing_time >= 0)
+		if (pyro_firing_time != AltosLib.MISSING)
 			pyro_firing_time = source.pyro_firing_time();
 
 		/* HAS_APRS */
-		if (aprs_interval >= 0)
+		if (aprs_interval != AltosLib.MISSING)
 			aprs_interval = source.aprs_interval();
-		if (aprs_ssid >= 0)
+		if (aprs_ssid != AltosLib.MISSING)
 			aprs_ssid = source.aprs_ssid();
-		if (aprs_format >= 0)
+		if (aprs_format != AltosLib.MISSING)
 			aprs_format = source.aprs_format();
 
 		/* HAS_BEEP */
-		if (beep >= 0)
+		if (beep != AltosLib.MISSING)
 			beep = source.beep();
 		/* HAS_TRACKER */
-		if (tracker_motion >= 0)
+		if (tracker_motion != AltosLib.MISSING)
 			tracker_motion = source.tracker_motion();
-		if (tracker_interval >= 0)
+		if (tracker_interval != AltosLib.MISSING)
 			tracker_interval = source.tracker_interval();
 	}
 
@@ -572,7 +572,7 @@ public class AltosConfigData {
 		if (log_space() == 0)
 			max_enabled = false;
 
-		if (log_fixed > 0)
+		if (log_fixed != AltosLib.MISSING)
 			max_enabled = false;
 
 		switch (log_format) {
@@ -580,7 +580,7 @@ public class AltosConfigData {
 			max_enabled = false;
 			break;
 		default:
-			if (stored_flight > 0)
+			if (stored_flight != AltosLib.MISSING)
 				max_enabled = false;
 			break;
 		}
@@ -592,7 +592,7 @@ public class AltosConfigData {
 		dest.set_ignite_mode(ignite_mode);
 		dest.set_pad_orientation(pad_orientation);
 		dest.set_callsign(callsign);
-		if (npyro > 0)
+		if (npyro != AltosLib.MISSING)
 			dest.set_pyros(pyros);
 		else
 			dest.set_pyros(null);
@@ -616,17 +616,17 @@ public class AltosConfigData {
 	public void save(AltosLink link, boolean remote) throws InterruptedException, TimeoutException {
 
 		/* HAS_FLIGHT */
-		if (main_deploy >= 0)
+		if (main_deploy != AltosLib.MISSING)
 			link.printf("c m %d\n", main_deploy);
-		if (apogee_delay >= 0)
+		if (apogee_delay != AltosLib.MISSING)
 			link.printf("c d %d\n", apogee_delay);
-		if (apogee_lockout >= 0)
+		if (apogee_lockout != AltosLib.MISSING)
 			link.printf("c L %d\n", apogee_lockout);
 
 		/* HAS_RADIO */
 		if (has_frequency()) {
-			boolean has_frequency = radio_frequency >= 0;
-			boolean has_setting = radio_setting > 0;
+			boolean has_frequency = radio_frequency != AltosLib.MISSING;
+			boolean has_setting = radio_setting != AltosLib.MISSING;
 			double frequency = frequency();
 			link.set_radio_frequency(frequency,
 							has_frequency,
@@ -642,7 +642,7 @@ public class AltosConfigData {
 			}
 		}
 
-		if (telemetry_rate >= 0) {
+		if (telemetry_rate != AltosLib.MISSING) {
 			link.printf("c T %d\n", telemetry_rate);
 			if (remote) {
 				link.flush_output();
@@ -664,12 +664,12 @@ public class AltosConfigData {
 			}
 		}
 
-		if (radio_enable >= 0)
+		if (radio_enable != AltosLib.MISSING)
 			link.printf("c e %d\n", radio_enable);
 
 		/* HAS_ACCEL */
 		/* UI doesn't support accel cal */
-		if (pad_orientation >= 0)
+		if (pad_orientation != AltosLib.MISSING)
 			link.printf("c o %d\n", pad_orientation);
 
 		/* HAS_LOG */
@@ -677,36 +677,36 @@ public class AltosConfigData {
 			link.printf("c l %d\n", flight_log_max);
 
 		/* HAS_IGNITE */
-		if (ignite_mode >= 0)
+		if (ignite_mode != AltosLib.MISSING)
 			link.printf("c i %d\n", ignite_mode);
 
 		/* HAS_AES */
 		/* UI doesn't support AES key config */
 
 		/* AO_PYRO_NUM */
-		if (npyro > 0) {
+		if (npyro != AltosLib.MISSING) {
 			for (int p = 0; p < pyros.length; p++) {
 				link.printf("c P %s\n",
 						   pyros[p].toString());
 			}
 		}
-		if (pyro_firing_time >= 0)
+		if (pyro_firing_time != AltosLib.MISSING)
 			link.printf("c I %d\n", (int) (pyro_firing_time * 100.0 + 0.5));
 
 		/* HAS_APRS */
-		if (aprs_interval >= 0)
+		if (aprs_interval != AltosLib.MISSING)
 			link.printf("c A %d\n", aprs_interval);
-		if (aprs_ssid >= 0)
+		if (aprs_ssid != AltosLib.MISSING)
 			link.printf("c S %d\n", aprs_ssid);
-		if (aprs_format >= 0)
+		if (aprs_format != AltosLib.MISSING)
 			link.printf("c C %d\n", aprs_format);
 
 		/* HAS_BEEP */
-		if (beep >= 0)
+		if (beep != AltosLib.MISSING)
 			link.printf("c b %d\n", beep);
 
 		/* HAS_TRACKER */
-		if (tracker_motion >= 0 && tracker_interval >= 0)
+		if (tracker_motion != AltosLib.MISSING && tracker_interval != AltosLib.MISSING)
 			link.printf("c t %d %d\n", tracker_motion, tracker_interval);
 
 		/* HAS_GYRO */

@@ -213,6 +213,8 @@ public class AltosIgniteUI
 			fired();
 		} else if (reply.startsWith("npyro")) {
 			npyro = Integer.parseInt(reply.substring(6));
+			if (npyro == AltosLib.MISSING)
+				npyro = 0;
 			make_ui();
 		}
 	}
@@ -255,15 +257,11 @@ public class AltosIgniteUI
 
 	boolean	getting_status = false;
 
-	boolean	visible = false;
-
 	void set_ignite_status() {
 		getting_status = false;
 		poll_remaining = 2;
-		if (!visible) {
-			visible = true;
+		if (!isVisible())
 			setVisible(true);
-		}
 	}
 
 	void poll_ignite_status() {

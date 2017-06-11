@@ -27,10 +27,9 @@ public class AltosUIRateList extends JComboBox<String> {
 	int	serial;
 
 	public void set_rate(int new_rate) {
-		int i;
-
-		setVisible(new_rate >= 0);
-		setSelectedIndex(new_rate);
+		if (new_rate != AltosLib.MISSING)
+			setSelectedIndex(new_rate);
+		setVisible(new_rate != AltosLib.MISSING);
 	}
 
 	public void set_product(String new_product) {
