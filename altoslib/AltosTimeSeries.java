@@ -16,10 +16,14 @@ package org.altusmetrum.altoslib_11;
 
 import java.util.*;
 
-public class AltosTimeSeries implements Iterable<AltosTimeValue> {
+public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<AltosTimeSeries> {
 	public String			label;
 	public AltosUnits		units;
 	ArrayList<AltosTimeValue>	values;
+
+	public int compareTo(AltosTimeSeries other) {
+		return label.compareTo(other.label);
+	}
 
 	public void add(AltosTimeValue tv) {
 		values.add(tv);

@@ -118,6 +118,12 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	public void add_series(AltosTimeSeries s) {
+		for (int e = 0; e < series.size(); e++) {
+			if (s.compareTo(series.get(e)) < 0){
+				series.add(e, s);
+				return;
+			}
+		}
 		series.add(s);
 	}
 
