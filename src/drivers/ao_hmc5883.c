@@ -143,10 +143,8 @@ static struct ao_task ao_hmc5883_task;
 static void
 ao_hmc5883_show(void)
 {
-	struct ao_data	sample;
-	ao_data_get(&sample);
-	printf ("X: %d Y: %d Z: %d missed irq: %lu\n",
-		sample.hmc5883.x, sample.hmc5883.y, sample.hmc5883.z, ao_hmc5883_missed_irq);
+	printf ("X: %d Z: %d Y: %d missed irq: %lu\n",
+		ao_hmc5883_current.x, ao_hmc5883_current.z, ao_hmc5883_current.y, ao_hmc5883_missed_irq);
 }
 
 static const struct ao_cmds ao_hmc5883_cmds[] = {

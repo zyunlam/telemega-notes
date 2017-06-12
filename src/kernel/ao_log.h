@@ -252,8 +252,8 @@ struct ao_log_mega {
 			int16_t		gyro_y;		/* 20 */
 			int16_t		gyro_z;		/* 22 */
 			int16_t		mag_x;		/* 24 */
-			int16_t		mag_y;		/* 26 */
-			int16_t		mag_z;		/* 28 */
+			int16_t		mag_z;		/* 26 */
+			int16_t		mag_y;		/* 28 */
 			int16_t		accel;		/* 30 */
 		} sensor;	/* 32 */
 		/* AO_LOG_TEMP_VOLT */

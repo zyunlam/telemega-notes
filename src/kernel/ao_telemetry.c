@@ -160,8 +160,8 @@ ao_send_mega_sensor(void)
 
 #if HAS_HMC5883
 	telemetry.mega_sensor.mag_x = packet->hmc5883.x;
-	telemetry.mega_sensor.mag_y = packet->hmc5883.y;
 	telemetry.mega_sensor.mag_z = packet->hmc5883.z;
+	telemetry.mega_sensor.mag_y = packet->hmc5883.y;
 #endif
 
 	ao_telemetry_send();
