@@ -22,9 +22,9 @@ import java.util.concurrent.*;
 import java.io.*;
 
 public class AltosMag implements Cloneable {
-	public int		along;
-	public int		across;
-	public int		through;
+	public int		x;
+	public int		z;
+	public int		y;
 
 	public static final double counts_per_gauss = 1090;
 
@@ -33,10 +33,6 @@ public class AltosMag implements Cloneable {
 	}
 
 	public boolean parse_string(String line) {
-//		if (line.startsWith("Syntax error")) {
-//			along = across = through = 0;
-//			return true;
-//		}
 
 		if (!line.startsWith("X:"))
 			return false;
@@ -44,9 +40,9 @@ public class AltosMag implements Cloneable {
 		String[] items = line.split("\\s+");
 
 		if (items.length >= 6) {
-			along = Integer.parseInt(items[1]);
-			across = Integer.parseInt(items[3]);
-			through = Integer.parseInt(items[5]);
+			x = Integer.parseInt(items[1]);
+			z = Integer.parseInt(items[3]);
+			y = Integer.parseInt(items[5]);
 		}
 		return true;
 	}
@@ -54,22 +50,16 @@ public class AltosMag implements Cloneable {
 	public AltosMag clone() {
 		AltosMag n = new AltosMag();
 
-		n.along = along;
-		n.across = across;
-		n.through = through;
+		n.x = x;
+		n.z = z;
+		n.y = y;
 		return n;
 	}
 
 	public AltosMag() {
-		along = AltosLib.MISSING;
-		across = AltosLib.MISSING;
-		through = AltosLib.MISSING;
-	}
-
-	public AltosMag(int along, int across, int through) {
-		this.along = along;
-		this.across = across;
-		this.through = through;
+		x = AltosLib.MISSING;
+		z = AltosLib.MISSING;
+		y = AltosLib.MISSING;
 	}
 
 	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
@@ -77,9 +67,9 @@ public class AltosMag implements Cloneable {
 			AltosMag	mag = new AltosMag(link);
 
 			if (mag != null)
-				listener.set_mag(cal_data.mag_along(mag.along),
-						 cal_data.mag_across(mag.across),
-						 cal_data.mag_through(mag.through));
+				listener.set_mag(cal_data.mag_along(mag.y),
+						 cal_data.mag_across(mag.x),
+						 cal_data.mag_through(mag.z));
 		} catch (TimeoutException te) {
 		}
 	}

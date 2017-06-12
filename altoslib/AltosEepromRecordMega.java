@@ -73,8 +73,8 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int gyro_y() { return data16(16); }
 	private int gyro_z() { return data16(18); }
 	private int mag_x() { return data16(20); }
-	private int mag_y() { return data16(22); }
-	private int mag_z() { return data16(24); }
+	private int mag_z() { return data16(22); }
+	private int mag_y() { return data16(24); }
 	private int accel() { return data16(26); }
 
 	/* AO_LOG_TEMP_VOLT elements */
@@ -142,8 +142,8 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			int	gyro_pitch = gyro_x();
 			int	gyro_yaw = gyro_z();
 
-			int	mag_along = mag_x();
-			int	mag_across = mag_y();
+			int	mag_along = mag_y();
+			int	mag_across = mag_x();
 			int	mag_through = mag_z();
 
 			if (log_format == AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD)

@@ -34,8 +34,8 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 	int	gyro_z() { return int16(24); }
 
 	int	mag_x() { return int16(26); }
-	int	mag_y() { return int16(28); }
-	int	mag_z() { return int16(30); }
+	int	mag_z() { return int16(28); }
+	int	mag_y() { return int16(30); }
 
 	public AltosTelemetryMegaSensor(int[] bytes) throws AltosCRCException {
 		super(bytes);
@@ -64,8 +64,8 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		int	gyro_pitch = gyro_x();
 		int	gyro_yaw = gyro_z();
 
-		int	mag_along = mag_x();
-		int	mag_across = mag_y();
+		int	mag_along = mag_y();
+		int	mag_across = mag_x();
 		int	mag_through = mag_z();
 
 		listener.set_accel(cal_data.accel_along(accel_along),
