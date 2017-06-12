@@ -243,12 +243,12 @@ public class AltosVoice {
 		if (last_flight_tell == TELL_FLIGHT_HEIGHT) {
 			last_flight_tell = TELL_FLIGHT_TRACK;
 			if (from_receiver != null) {
-				speak("bearing %s %d, elevation %d, range %s.",
+				speak("bearing %s %d, elevation %d, distance %s.",
 				      from_receiver.bearing_words(
 					      AltosGreatCircle.BEARING_VOICE),
 				      (int) (from_receiver.bearing + 0.5),
 				      (int) (from_receiver.elevation + 0.5),
-				      AltosConvert.distance.say(from_receiver.range));
+				      AltosConvert.distance.say(from_receiver.distance));
 				return true;
 			}
 		}
@@ -273,7 +273,7 @@ public class AltosVoice {
 		if (direction == null)
 			direction = String.format("Bearing %d", (int) (from_receiver.bearing + 0.5));
 
-		speak("%s, range %s.", direction,
+		speak("%s, distance %s.", direction,
 		      AltosConvert.distance.say_units(from_receiver.distance));
 
 		return true;

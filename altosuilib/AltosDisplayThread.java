@@ -95,13 +95,13 @@ public class AltosDisplayThread extends Thread {
 			    state.from_pad != null &&
 			    state.range >= 0)
 			{
-				voice.speak("Height %s, bearing %s %d, elevation %d, range %s.\n",
+				voice.speak("Height %s, bearing %s %d, elevation %d, distance %s.\n",
 					    AltosConvert.height.say(state.height()),
 					    state.from_pad.bearing_words(
 						    AltosGreatCircle.BEARING_VOICE),
 					    (int) (state.from_pad.bearing + 0.5),
 					    (int) (state.elevation + 0.5),
-					    AltosConvert.distance.say(state.range));
+					    AltosConvert.distance.say(state.distance));
 			} else if (state.state() > AltosLib.ao_flight_pad && state.height() != AltosLib.MISSING) {
 				voice.speak(AltosConvert.height.say_units(state.height()));
 			} else {
@@ -123,7 +123,7 @@ public class AltosDisplayThread extends Thread {
 				else
 					voice.speak("rocket may have crashed");
 				if (state.from_pad != null)
-					voice.speak("Bearing %d degrees, range %s.",
+					voice.speak("Bearing %d degrees, distance %s.",
 						    (int) (state.from_pad.bearing + 0.5),
 						    AltosConvert.distance.say_units(state.from_pad.distance));
 				++reported_landing;
