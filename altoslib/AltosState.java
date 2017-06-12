@@ -677,9 +677,6 @@ public class AltosState extends AltosDataListener {
 	public AltosGPS	gps;
 	public boolean	gps_pending;
 
-	public AltosIMU	imu;
-	public AltosMag	mag;
-
 	public static final int MIN_PAD_SAMPLES = 10;
 
 	public int	npad;
@@ -690,6 +687,7 @@ public class AltosState extends AltosDataListener {
 
 	public AltosGreatCircle from_pad;
 	public double	elevation;	/* from pad */
+	public double	distance;	/* distance along ground */
 	public double	range;		/* total distance */
 
 	public double	gps_height;
@@ -746,21 +744,31 @@ public class AltosState extends AltosDataListener {
 		gps = null;
 		gps_pending = false;
 
-		imu = null;
 		last_imu_time = AltosLib.MISSING;
 		rotation = null;
-
-		mag = null;
 
 		accel_ground_along = AltosLib.MISSING;
 		accel_ground_across = AltosLib.MISSING;
 		accel_ground_through = AltosLib.MISSING;
+
+		accel_along = AltosLib.MISSING;
+		accel_across = AltosLib.MISSING;
+		accel_through = AltosLib.MISSING;
+
+		gyro_roll = AltosLib.MISSING;
+		gyro_pitch = AltosLib.MISSING;
+		gyro_yaw = AltosLib.MISSING;
+
+		mag_along = AltosLib.MISSING;
+		mag_across = AltosLib.MISSING;
+		mag_through = AltosLib.MISSING;
 
 		set_npad(0);
 		ngps = 0;
 
 		from_pad = null;
 		elevation = AltosLib.MISSING;
+		distance = AltosLib.MISSING;
 		range = AltosLib.MISSING;
 		gps_height = AltosLib.MISSING;
 
@@ -803,6 +811,7 @@ public class AltosState extends AltosDataListener {
 
 	void update_gps() {
 		elevation = AltosLib.MISSING;
+		distance = AltosLib.MISSING;
 		range = AltosLib.MISSING;
 
 		if (gps == null)
@@ -844,6 +853,7 @@ public class AltosState extends AltosDataListener {
 				h = 0;
 			from_pad = new AltosGreatCircle(pad_lat, pad_lon, 0, gps.lat, gps.lon, h);
 			elevation = from_pad.elevation;
+			distance = from_pad.distance;
 			range = from_pad.range;
 		}
 	}
@@ -894,7 +904,6 @@ public class AltosState extends AltosDataListener {
 		}
 	}
 
-
 	public AltosRotation	rotation;
 
 	public double	accel_ground_along, accel_ground_across, accel_ground_through;
@@ -922,9 +931,9 @@ public class AltosState extends AltosDataListener {
 		if (last_imu_time != AltosLib.MISSING) {
 			double	t = time - last_imu_time;
 
-			double	pitch = AltosConvert.degrees_to_radians(gyro_pitch());
-			double	yaw = AltosConvert.degrees_to_radians(gyro_yaw());
-			double	roll = AltosConvert.degrees_to_radians(gyro_roll());
+			double	pitch = AltosConvert.degrees_to_radians(gyro_pitch);
+			double	yaw = AltosConvert.degrees_to_radians(gyro_yaw);
+			double	roll = AltosConvert.degrees_to_radians(gyro_roll);
 
 			if (t > 0 && pitch != AltosLib.MISSING && rotation != null) {
 				rotation.rotate(t, pitch, yaw, roll);
@@ -939,7 +948,7 @@ public class AltosState extends AltosDataListener {
 	public void set_gyro(double roll, double pitch, double yaw) {
 		gyro_roll = roll;
 		gyro_pitch = pitch;
-		gyro_roll = yaw;
+		gyro_yaw = yaw;
 		update_orient();
 	}
 
@@ -989,15 +998,11 @@ public class AltosState extends AltosDataListener {
 	}
 
 	public double mag_across() {
-		if (mag != null)
-			return AltosMag.convert_gauss(mag.across);
-		return AltosLib.MISSING;
+		return mag_across;
 	}
 
 	public double mag_through() {
-		if (mag != null)
-			return AltosMag.convert_gauss(mag.through);
-		return AltosLib.MISSING;
+		return mag_through;
 	}
 
 	public void set_companion(AltosCompanion companion) {
