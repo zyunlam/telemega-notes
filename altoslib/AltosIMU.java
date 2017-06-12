@@ -22,13 +22,13 @@ import java.util.concurrent.*;
 import java.io.*;
 
 public class AltosIMU implements Cloneable {
-	public int		accel_along;
-	public int		accel_across;
-	public int		accel_through;
+	public int		accel_x;
+	public int		accel_y;
+	public int		accel_z;
 
-	public int		gyro_roll;
-	public int		gyro_pitch;
-	public int		gyro_yaw;
+	public int		gyro_x;
+	public int		gyro_y;
+	public int		gyro_z;
 
 	public static final double	counts_per_g = 2048.0;
 
@@ -51,12 +51,12 @@ public class AltosIMU implements Cloneable {
 		String[] items = line.split("\\s+");
 
 		if (items.length >= 8) {
-			accel_along = Integer.parseInt(items[1]);
-			accel_across = Integer.parseInt(items[2]);
-			accel_through = Integer.parseInt(items[3]);
-			gyro_roll = Integer.parseInt(items[5]);
-			gyro_pitch = Integer.parseInt(items[6]);
-			gyro_yaw = Integer.parseInt(items[7]);
+			accel_x = Integer.parseInt(items[1]);
+			accel_y = Integer.parseInt(items[2]);
+			accel_z = Integer.parseInt(items[3]);
+			gyro_x = Integer.parseInt(items[5]);
+			gyro_y = Integer.parseInt(items[6]);
+			gyro_z = Integer.parseInt(items[7]);
 		}
 		return true;
 	}
@@ -64,13 +64,13 @@ public class AltosIMU implements Cloneable {
 	public AltosIMU clone() {
 		AltosIMU	n = new AltosIMU();
 
-		n.accel_along = accel_along;
-		n.accel_across = accel_across;
-		n.accel_through = accel_through;
+		n.accel_x = accel_x;
+		n.accel_y = accel_y;
+		n.accel_z = accel_z;
 
-		n.gyro_roll = gyro_roll;
-		n.gyro_pitch = gyro_pitch;
-		n.gyro_yaw = gyro_yaw;
+		n.gyro_x = gyro_x;
+		n.gyro_y = gyro_y;
+		n.gyro_z = gyro_z;
 		return n;
 	}
 
@@ -79,37 +79,25 @@ public class AltosIMU implements Cloneable {
 			AltosIMU	imu = new AltosIMU(link);
 
 			if (imu != null) {
-				listener.set_accel(cal_data.accel_along(imu.accel_along),
-						   cal_data.accel_across(imu.accel_across),
-						   cal_data.accel_through(imu.accel_through));
-				listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll),
-						  cal_data.gyro_pitch(imu.gyro_pitch),
-						  cal_data.gyro_yaw(imu.gyro_yaw));
+				listener.set_gyro(cal_data.gyro_roll(imu.gyro_y),
+						  cal_data.gyro_pitch(imu.gyro_x),
+						  cal_data.gyro_yaw(imu.gyro_z));
+				listener.set_accel_ground(cal_data.accel_along(imu.accel_y),
+							  cal_data.accel_across(imu.accel_x),
+							  cal_data.accel_through(imu.accel_z));
 			}
 		} catch (TimeoutException te) {
 		}
 	}
 
 	public AltosIMU() {
-		accel_along = AltosLib.MISSING;
-		accel_across = AltosLib.MISSING;
-		accel_through = AltosLib.MISSING;
+		accel_x = AltosLib.MISSING;
+		accel_y = AltosLib.MISSING;
+		accel_z = AltosLib.MISSING;
 
-		gyro_roll = AltosLib.MISSING;
-		gyro_pitch = AltosLib.MISSING;
-		gyro_yaw = AltosLib.MISSING;
-	}
-
-	public AltosIMU(int accel_along, int accel_across, int accel_through,
-			int gyro_roll, int gyro_pitch, int gyro_yaw) {
-
-		this.accel_along = accel_along;
-		this.accel_across = accel_across;
-		this.accel_through = accel_through;
-
-		this.gyro_roll = gyro_roll;
-		this.gyro_pitch = gyro_pitch;
-		this.gyro_yaw = gyro_yaw;
+		gyro_x = AltosLib.MISSING;
+		gyro_y = AltosLib.MISSING;
+		gyro_z = AltosLib.MISSING;
 	}
 
 	public AltosIMU(AltosLink link) throws InterruptedException, TimeoutException {
