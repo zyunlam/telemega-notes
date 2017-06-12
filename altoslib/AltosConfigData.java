@@ -451,8 +451,7 @@ public class AltosConfigData {
 			radio_frequency = (int) Math.floor (freq * 1000 + 0.5);
 			radio_channel = AltosLib.MISSING;
 		} else if (setting != AltosLib.MISSING) {
-			radio_setting =AltosConvert.radio_frequency_to_setting(freq,
-										    radio_calibration);
+			radio_setting =AltosConvert.radio_frequency_to_setting(freq, radio_calibration);
 			radio_channel = AltosLib.MISSING;
 		} else {
 			radio_channel = AltosConvert.radio_frequency_to_channel(freq);
@@ -463,12 +462,12 @@ public class AltosConfigData {
 		int	channel = radio_channel;
 		int	setting = radio_setting;
 
-		if (radio_frequency < 0 && channel < 0 && setting < 0)
+		if (radio_frequency == AltosLib.MISSING && channel == AltosLib.MISSING && setting == AltosLib.MISSING)
 			return AltosLib.MISSING;
 
-		if (channel < 0)
+		if (channel == AltosLib.MISSING)
 			channel = 0;
-		if (setting < 0)
+		if (setting == AltosLib.MISSING)
 			setting = 0;
 
 		return AltosConvert.radio_to_frequency(radio_frequency,
