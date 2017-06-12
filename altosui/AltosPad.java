@@ -128,10 +128,8 @@ public class AltosPad extends AltosUIFlightTab {
 	}
 
 	boolean report_pad(AltosState state) {
-		if ((state.state() == AltosLib.ao_flight_stateless ||
-		     state.state() < AltosLib.ao_flight_pad) &&
-		    state.gps != null &&
-		    state.gps.lat != AltosLib.MISSING)
+		if (state.state() == AltosLib.ao_flight_stateless ||
+		    state.state() < AltosLib.ao_flight_pad)
 		{
 			return false;
 		}
@@ -150,7 +148,7 @@ public class AltosPad extends AltosUIFlightTab {
 				if (report_pad(state)) {
 					lat = state.pad_lat;
 					label = "Pad Latitude";
-				} else {
+				} else if (state.gps != null) {
 					lat = state.gps.lat;
 					label = "Latitude";
 				}
@@ -187,7 +185,7 @@ public class AltosPad extends AltosUIFlightTab {
 				if (report_pad(state)) {
 					lon = state.pad_lon;
 					label = "Pad Longitude";
-				} else {
+				} else if (state.gps != null) {
 					lon = state.gps.lon;
 					label = "Longitude";
 				}
@@ -217,8 +215,10 @@ public class AltosPad extends AltosUIFlightTab {
 		public double value(AltosState state, int i) {
 			if (report_pad(state))
 				return state.pad_alt;
-			else
+			else if (state.gps != null)
 				return state.gps.alt;
+			else
+				return state.altitude();
 		}
 
 		public void show (AltosState state, AltosListenerState listener_state) {
