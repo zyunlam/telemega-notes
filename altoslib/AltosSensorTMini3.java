@@ -26,15 +26,15 @@ public class AltosSensorTMini3 {
 	public int	main;
 	public int	batt;
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
 		try {
 			AltosSensorTMini3	sensor_tmini = new AltosSensorTMini3(link);
 
 			if (sensor_tmini == null)
 				return;
-			state.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(sensor_tmini.batt));
-			state.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sensor_tmini.apogee));
-			state.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sensor_tmini.main));
+			listener.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(sensor_tmini.batt));
+			listener.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sensor_tmini.apogee));
+			listener.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sensor_tmini.main));
 
 		} catch (TimeoutException te) {
 		}

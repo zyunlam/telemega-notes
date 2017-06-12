@@ -89,18 +89,18 @@ class AltosSensorMega {
 		}
 	}
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
 		try {
 			AltosSensorMega	sensor_mega = new AltosSensorMega(link);
 
-			state.set_battery_voltage(AltosConvert.mega_battery_voltage(sensor_mega.v_batt));
-			state.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sensor_mega.sense[4]));
-			state.set_main_voltage(AltosConvert.mega_pyro_voltage(sensor_mega.sense[5]));
+			listener.set_battery_voltage(AltosConvert.mega_battery_voltage(sensor_mega.v_batt));
+			listener.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sensor_mega.sense[4]));
+			listener.set_main_voltage(AltosConvert.mega_pyro_voltage(sensor_mega.sense[5]));
 
 			double[]	igniter_voltage = new double[4];
 			for (int i = 0; i < 4; i++)
 				igniter_voltage[i] = AltosConvert.mega_pyro_voltage(sensor_mega.sense[i]);
-			state.set_igniter_voltage(igniter_voltage);
+			listener.set_igniter_voltage(igniter_voltage);
 
 		} catch (TimeoutException te) {
 		}

@@ -53,12 +53,12 @@ class AltosSensorMetrum {
 		}
 	}
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
 		try {
 			AltosSensorMetrum	sensor_metrum = new AltosSensorMetrum(link);
-			state.set_battery_voltage(AltosConvert.mega_battery_voltage(sensor_metrum.v_batt));
-			state.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sensor_metrum.sense_a));
-			state.set_main_voltage(AltosConvert.mega_pyro_voltage(sensor_metrum.sense_m));
+			listener.set_battery_voltage(AltosConvert.mega_battery_voltage(sensor_metrum.v_batt));
+			listener.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sensor_metrum.sense_a));
+			listener.set_main_voltage(AltosConvert.mega_pyro_voltage(sensor_metrum.sense_m));
 		} catch (TimeoutException te) {
 		}
 	}

@@ -31,15 +31,17 @@ class AltosIdler {
 	static final int	idle_imu = 1;
 	static final int	idle_mag = 2;
 	static final int	idle_mma655x = 4;
+	static final int	idle_ms5607 = 5;
 
 
 	static final int	idle_sensor_tm = 10;
 	static final int	idle_sensor_metrum = 11;
 	static final int	idle_sensor_mega = 12;
-	static final int	idle_sensor_emini = 13;
-	static final int	idle_sensor_tmini2 = 14;
-	static final int	idle_sensor_tgps = 15;
-	static final int	idle_sensor_tmini3 = 16;
+	static final int	idle_sensor_emini1 = 13;
+	static final int	idle_sensor_emini2 = 14;
+	static final int	idle_sensor_tmini2 = 15;
+	static final int	idle_sensor_tgps = 16;
+	static final int	idle_sensor_tmini3 = 17;
 
 	public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
@@ -56,7 +58,10 @@ class AltosIdler {
 			case idle_mma655x:
 				AltosMma655x.provide_data(listener, link, cal_data);
 				break;
-/*			case idle_sensor_tm:
+			case idle_ms5607:
+				AltosMs5607.provide_data(listener, link, cal_data);
+				break;
+			case idle_sensor_tm:
 				AltosSensorTM.provide_data(listener, link, cal_data);
 				break;
 			case idle_sensor_metrum:
@@ -65,8 +70,11 @@ class AltosIdler {
 			case idle_sensor_mega:
 				AltosSensorMega.provide_data(listener, link, cal_data);
 				break;
-			case idle_sensor_emini:
-				AltosSensorEMini.provide_data(listener, link, cal_data);
+			case idle_sensor_emini1:
+				AltosSensorEMini.provide_data(listener, link, cal_data, 1);
+				break;
+			case idle_sensor_emini2:
+				AltosSensorEMini.provide_data(listener, link, cal_data, 2);
 				break;
 			case idle_sensor_tmini2:
 				AltosSensorTMini2.provide_data(listener, link, cal_data);
@@ -77,7 +85,6 @@ class AltosIdler {
 			case idle_sensor_tmini3:
 				AltosSensorTMini3.provide_data(listener, link, cal_data);
 				break;
-*/
 			}
 		}
 	}
@@ -97,16 +104,23 @@ public class AltosIdleFetch implements AltosDataProvider {
 
 	static final AltosIdler[] idlers = {
 
-		new AltosIdler("EasyMini",
-			       AltosIdler.idle_sensor_emini),
+		new AltosIdler("EasyMini-v1",
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_sensor_emini1),
+
+		new AltosIdler("EasyMini-v2",
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_sensor_emini2),
 
 		new AltosIdler("TeleMini-v1",
 			       AltosIdler.idle_sensor_tm),
 
 		new AltosIdler("TeleMini-v2",
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_sensor_tmini2),
 
 		new AltosIdler("TeleMini-v3",
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_sensor_tmini3),
 
 		new AltosIdler("TeleMetrum-v1",
@@ -116,15 +130,18 @@ public class AltosIdleFetch implements AltosDataProvider {
 		new AltosIdler("TeleMetrum-v2",
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_mma655x,
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_sensor_metrum),
 
 		new AltosIdler("TeleMega",
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_mma655x,
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("EasyMega",
 			       AltosIdler.idle_mma655x,
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("TeleGPS",

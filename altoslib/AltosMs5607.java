@@ -133,6 +133,19 @@ public class AltosMs5607 {
 		crc = old.crc;
 	}
 
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+		try {
+			AltosMs5607	ms5607 = cal_data.ms5607;
+
+			if (ms5607 != null) {
+				AltosPresTemp	pt = ms5607.pres_temp(link);
+				listener.set_temperature(pt.temp);
+				listener.set_pressure(pt.pres);
+			}
+		} catch (TimeoutException te) {
+		}
+	}
+
 	public AltosMs5607(AltosConfigData config_data) {
 		this(config_data.ms5607());
 	}

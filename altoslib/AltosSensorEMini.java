@@ -26,15 +26,24 @@ public class AltosSensorEMini {
 	public int	main;
 	public int	batt;
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data, int version) throws InterruptedException {
 		try {
 			AltosSensorEMini	sensor_emini = new AltosSensorEMini(link);
 
 			if (sensor_emini == null)
 				return;
-			state.set_battery_voltage(AltosConvert.easy_mini_voltage(sensor_emini.batt, config_data.serial));
-			state.set_apogee_voltage(AltosConvert.easy_mini_voltage(sensor_emini.apogee, config_data.serial));
-			state.set_main_voltage(AltosConvert.easy_mini_voltage(sensor_emini.main, config_data.serial));
+			switch (version) {
+			case 1:
+				listener.set_battery_voltage(AltosConvert.easy_mini_1_voltage(sensor_emini.batt, cal_data.serial));
+				listener.set_apogee_voltage(AltosConvert.easy_mini_1_voltage(sensor_emini.apogee, cal_data.serial));
+				listener.set_main_voltage(AltosConvert.easy_mini_1_voltage(sensor_emini.main, cal_data.serial));
+				break;
+			case 2:
+				listener.set_battery_voltage(AltosConvert.easy_mini_2_voltage(sensor_emini.batt));
+				listener.set_apogee_voltage(AltosConvert.easy_mini_2_voltage(sensor_emini.apogee));
+				listener.set_main_voltage(AltosConvert.easy_mini_2_voltage(sensor_emini.main));
+				break;
+			}
 
 		} catch (TimeoutException te) {
 		}

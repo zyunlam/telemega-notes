@@ -24,13 +24,13 @@ public class AltosSensorTGPS {
 	public int	tick;
 	public int	batt;
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
 		try {
 			AltosSensorTGPS	sensor_tgps = new AltosSensorTGPS(link);
 
 			if (sensor_tgps == null)
 				return;
-			state.set_battery_voltage(AltosConvert.tele_gps_voltage(sensor_tgps.batt));
+			listener.set_battery_voltage(AltosConvert.tele_gps_voltage(sensor_tgps.batt));
 
 		} catch (TimeoutException te) {
 		}
