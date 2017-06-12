@@ -42,8 +42,10 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 
 	private double battery_voltage(int sensor) {
 		int log_format = log_format();
-		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI)
-			return AltosConvert.easy_mini_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI1)
+			return AltosConvert.easy_mini_1_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI2)
+			return AltosConvert.easy_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI2)
 			return AltosConvert.tele_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI3)
@@ -53,8 +55,10 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 
 	private double pyro_voltage(int sensor) {
 		int log_format = log_format();
-		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI)
-			return AltosConvert.easy_mini_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI1)
+			return AltosConvert.easy_mini_1_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI2)
+			return AltosConvert.easy_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI2)
 			return AltosConvert.tele_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI3)

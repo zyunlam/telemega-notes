@@ -270,7 +270,15 @@ public class AltosConvert {
 		return 3.3 * mega_adc(raw) * (5.1 + 10.0) / 10.0;
 	}
 
-	static double easy_mini_voltage(int sensor, int serial) {
+	static double easy_mini_2_adc(int raw) {
+		return raw / 4095.0;
+	}
+
+	static double easy_mini_1_adc(int raw) {
+		return raw / 32767.0;
+	}
+
+	static double easy_mini_1_voltage(int sensor, int serial) {
 		double	supply = 3.3;
 		double	diode_offset = 0.0;
 
@@ -284,7 +292,13 @@ public class AltosConvert {
 		if (serial < 1665)
 			diode_offset = 0.150;
 
-		return sensor / 32767.0 * supply * 127/27 + diode_offset;
+		return easy_mini_1_adc(sensor) * supply * 127/27 + diode_offset;
+	}
+
+	static double easy_mini_2_voltage(int sensor) {
+		double	supply = 3.3;
+
+		return easy_mini_2_adc(sensor) * supply * 127/27;
 	}
 
 	public static double radio_to_frequency(int freq, int setting, int cal, int channel) {

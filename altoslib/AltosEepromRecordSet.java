@@ -75,7 +75,8 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMINI2:
 		case AltosLib.AO_LOG_FORMAT_TELEMINI3:
-		case AltosLib.AO_LOG_FORMAT_EASYMINI:
+		case AltosLib.AO_LOG_FORMAT_EASYMINI1:
+		case AltosLib.AO_LOG_FORMAT_EASYMINI2:
 			record = new AltosEepromRecordMini(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEGPS:
