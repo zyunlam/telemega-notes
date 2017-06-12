@@ -201,11 +201,13 @@ __xdata struct ao_ms5607_sample	ao_ms5607_current;
 static void
 ao_ms5607(void)
 {
+	struct ao_ms5607_sample	sample;
 	ao_ms5607_setup();
 	for (;;)
 	{
-		ao_ms5607_sample(&ao_ms5607_current);
+		ao_ms5607_sample(&sample);
 		ao_arch_block_interrupts();
+		ao_ms5607_current = sample;
 		AO_DATA_PRESENT(AO_DATA_MS5607);
 		AO_DATA_WAIT();
 		ao_arch_release_interrupts();
