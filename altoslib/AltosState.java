@@ -749,7 +749,6 @@ public class AltosState extends AltosDataListener {
 		imu = null;
 		last_imu_time = AltosLib.MISSING;
 		rotation = null;
-		ground_rotation = null;
 
 		mag = null;
 
@@ -897,7 +896,6 @@ public class AltosState extends AltosDataListener {
 
 
 	public AltosRotation	rotation;
-	public AltosRotation	ground_rotation;
 
 	public double	accel_ground_along, accel_ground_across, accel_ground_through;
 
@@ -907,7 +905,6 @@ public class AltosState extends AltosDataListener {
 						     AltosIMU.convert_accel(accel_ground_through - cal_data.accel_zero_through),
 						     AltosIMU.convert_accel(accel_ground_along - cal_data.accel_zero_along),
 						     cal_data.pad_orientation);
-			ground_rotation = rotation;
 			orient.set_computed(rotation.tilt(), time);
 		}
 	}
