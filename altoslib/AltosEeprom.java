@@ -17,7 +17,7 @@ package org.altusmetrum.altoslib_11;
 import java.util.*;
 import java.io.*;
 
-public class AltosEepromNew {
+public class AltosEeprom {
 
 	private AltosJson	config;
 	ArrayList<Byte>		data;
@@ -268,24 +268,24 @@ public class AltosEepromNew {
 	/*
 	 * Constructors
 	 */
-	public AltosEepromNew(InputStream stream) throws IOException {
+	public AltosEeprom(InputStream stream) throws IOException {
 		read(stream);
 	}
 
-	public AltosEepromNew(String s) throws IOException {
+	public AltosEeprom(String s) throws IOException {
 		read(new AltosStringInputStream(s));
 	}
 
-	public AltosEepromNew(AltosJson config, ArrayList<Byte> data) {
+	public AltosEeprom(AltosJson config, ArrayList<Byte> data) {
 		this.config = config;
 		this.data = data;
 	}
 
-	public AltosEepromNew(AltosConfigData config_data, ArrayList<Byte> data) {
+	public AltosEeprom(AltosConfigData config_data, ArrayList<Byte> data) {
 		this.config = new AltosJson(config_data);
 		this.data = data;
 	}
 
-	public AltosEepromNew() {
+	public AltosEeprom() {
 	}
 }

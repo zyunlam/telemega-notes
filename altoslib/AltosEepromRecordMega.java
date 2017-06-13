@@ -249,12 +249,12 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		return new AltosEepromRecordMega(eeprom, s);
 	}
 
-	public AltosEepromRecordMega(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordMega(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 		log_format = eeprom.config_data().log_format;
 	}
 
-	public AltosEepromRecordMega(AltosEepromNew eeprom) {
+	public AltosEepromRecordMega(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

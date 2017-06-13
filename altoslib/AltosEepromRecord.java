@@ -16,7 +16,7 @@ package org.altusmetrum.altoslib_11;
 
 public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord> {
 
-	AltosEepromNew		eeprom;
+	AltosEeprom		eeprom;
 
 	int			wide_tick;
 
@@ -115,7 +115,7 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 
 	public abstract AltosEepromRecord next();
 
-	public AltosEepromRecord(AltosEepromNew eeprom, int start, int length) {
+	public AltosEepromRecord(AltosEeprom eeprom, int start, int length) {
 		this.eeprom = eeprom;
 		this.start = start;
 		this.length = length;

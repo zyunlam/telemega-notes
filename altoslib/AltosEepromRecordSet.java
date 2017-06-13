@@ -18,7 +18,7 @@ import java.io.*;
 import java.util.*;
 
 public class AltosEepromRecordSet implements AltosRecordSet {
-	AltosEepromNew			eeprom;
+	AltosEeprom			eeprom;
 	TreeSet<AltosEepromRecord>	ordered;
 	AltosCalData			cal_data;
 
@@ -50,7 +50,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		listener.finish();
 	}
 
-	public AltosEepromRecordSet(AltosEepromNew eeprom) {
+	public AltosEepromRecordSet(AltosEeprom eeprom) {
 		this.eeprom = eeprom;
 
 		AltosConfigData 	config_data = eeprom.config_data();
@@ -115,6 +115,6 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 	}
 
 	public AltosEepromRecordSet(InputStream input) throws IOException {
-		this(new AltosEepromNew(input));
+		this(new AltosEeprom(input));
 	}
 }

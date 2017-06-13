@@ -104,11 +104,11 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 		return new AltosEepromRecordFull(eeprom, s);
 	}
 
-	public AltosEepromRecordFull(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordFull(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordFull(AltosEepromNew eeprom) {
+	public AltosEepromRecordFull(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

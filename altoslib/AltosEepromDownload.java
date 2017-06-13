@@ -181,7 +181,7 @@ public class AltosEepromDownload implements Runnable {
 		}
 
 		/* Construct our internal representation of the eeprom data */
-		AltosEepromNew	eeprom = new AltosEepromNew(flights.config_data, data);
+		AltosEeprom	eeprom = new AltosEeprom(flights.config_data, data);
 
 		/* Now see if we can't actually parse the resulting
 		 * file to generate a better filename. Note that this

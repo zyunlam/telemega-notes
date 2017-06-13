@@ -135,11 +135,11 @@ public class AltosEepromRecordMetrum extends AltosEepromRecord {
 		return new AltosEepromRecordMetrum(eeprom, s);
 	}
 
-	public AltosEepromRecordMetrum(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordMetrum(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordMetrum(AltosEepromNew eeprom) {
+	public AltosEepromRecordMetrum(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

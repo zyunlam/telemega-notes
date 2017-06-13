@@ -77,11 +77,11 @@ public class AltosEepromRecordTiny extends AltosEepromRecord implements AltosDat
 		return new AltosEepromRecordTiny(eeprom, s);
 	}
 
-	public AltosEepromRecordTiny(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordTiny(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordTiny(AltosEepromNew eeprom) {
+	public AltosEepromRecordTiny(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

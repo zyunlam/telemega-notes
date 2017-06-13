@@ -92,11 +92,11 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 		return new AltosEepromRecordFireTwo(eeprom, s);
 	}
 
-	public AltosEepromRecordFireTwo(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordFireTwo(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordFireTwo(AltosEepromNew eeprom) {
+	public AltosEepromRecordFireTwo(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

@@ -95,11 +95,11 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 		return new AltosEepromRecordMini(eeprom, s);
 	}
 
-	public AltosEepromRecordMini(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordMini(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordMini(AltosEepromNew eeprom) {
+	public AltosEepromRecordMini(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

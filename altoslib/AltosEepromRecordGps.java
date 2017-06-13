@@ -135,11 +135,11 @@ public class AltosEepromRecordGps extends AltosEepromRecord {
 		return new AltosEepromRecordGps(eeprom, s);
 	}
 
-	public AltosEepromRecordGps(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordGps(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordGps(AltosEepromNew eeprom) {
+	public AltosEepromRecordGps(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }
