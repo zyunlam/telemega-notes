@@ -46,7 +46,6 @@ altoslib_JAVA = \
 	AltosEepromRecordGps.java \
 	AltosEepromRecordFireTwo.java \
 	AltosEepromRecordSet.java \
-	AltosEeprom.java \
 	AltosEepromChunk.java \
 	AltosEepromDownload.java \
 	AltosEepromMonitor.java \
