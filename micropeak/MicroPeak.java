@@ -30,7 +30,7 @@ import org.altusmetrum.altosuilib_11.*;
 public class MicroPeak extends MicroFrame implements ActionListener, ItemListener {
 
 	File		filename;
-	AltosGraphNew	graph;
+	AltosGraph	graph;
 	AltosUIEnable	enable;
 	AltosFlightStatsTable	statsTable;
 	MicroRaw	raw;
@@ -268,7 +268,7 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 
 		enable = new AltosUIEnable();
 
-		graph = new AltosGraphNew(enable);
+		graph = new AltosGraph(enable);
 		statsTable = new AltosFlightStatsTable();
 		raw = new MicroRaw();
 		pane.add(graph.panel, "Graph");

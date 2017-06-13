@@ -35,7 +35,7 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
-public class AltosGraphNew extends AltosUIGraph {
+public class AltosGraph extends AltosUIGraph {
 
 	static final private Color height_color = new Color(194,31,31);
 	static final private Color kalman_height_color = new Color(255,0,0);
@@ -324,11 +324,11 @@ public class AltosGraphNew extends AltosUIGraph {
 		set_series(setup(stats, flight_series));
 	}
 
-	public AltosGraphNew(AltosUIEnable enable) {
+	public AltosGraph(AltosUIEnable enable) {
 		super(enable, "Flight");
 	}
 
-	public AltosGraphNew(AltosUIEnable enable, AltosFlightStats stats, AltosUIFlightSeries flight_series) {
+	public AltosGraph(AltosUIEnable enable, AltosFlightStats stats, AltosUIFlightSeries flight_series) {
 		this(enable);
 		set_series(setup(stats, flight_series));
 	}

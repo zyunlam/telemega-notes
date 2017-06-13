@@ -34,7 +34,7 @@ import org.jfree.ui.RefineryUtilities;
 public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, AltosUnitsListener
 {
 	JTabbedPane		pane;
-	AltosGraphNew		graph;
+	AltosGraph		graph;
 	AltosUIEnable		enable;
 	AltosUIMap		map;
 	AltosFlightStats	stats;
@@ -99,7 +99,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 
 		stats = new AltosFlightStats(flight_series);
 
-		graph = new AltosGraphNew(enable, stats, flight_series);
+		graph = new AltosGraph(enable, stats, flight_series);
 
 		statsTable = new AltosFlightStatsTable(stats);
 

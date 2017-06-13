@@ -29,7 +29,7 @@ altosuilib_JAVA = \
 	AltosUIPreferences.java \
 	AltosUIFlightSeries.java \
 	AltosUIGraph.java \
-	AltosGraphNew.java \
+	AltosGraph.java \
 	AltosUSBDevice.java \
 	AltosVoice.java \
 	AltosDisplayThread.java \
