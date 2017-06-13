@@ -35,7 +35,7 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
-public class AltosGraphNew extends AltosUIGraphNew {
+public class AltosGraphNew extends AltosUIGraph {
 
 	static final private Color height_color = new Color(194,31,31);
 	static final private Color kalman_height_color = new Color(255,0,0);

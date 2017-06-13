@@ -28,7 +28,7 @@ altosuilib_JAVA = \
 	AltosUIPreferencesBackend.java \
 	AltosUIPreferences.java \
 	AltosUIFlightSeries.java \
-	AltosUIGraphNew.java \
+	AltosUIGraph.java \
 	AltosGraphNew.java \
 	AltosUSBDevice.java \
 	AltosVoice.java \

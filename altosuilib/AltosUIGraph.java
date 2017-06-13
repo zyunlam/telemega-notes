@@ -36,7 +36,7 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
-public class AltosUIGraphNew implements AltosUnitsListener {
+public class AltosUIGraph implements AltosUnitsListener {
 
 	XYPlot				plot;
 	JFreeChart			chart;
@@ -117,7 +117,7 @@ public class AltosUIGraphNew implements AltosUnitsListener {
 		units_changed(false);
 	}
 
-	public AltosUIGraphNew(AltosUIEnable enable, String title) {
+	public AltosUIGraph(AltosUIEnable enable, String title) {
 
 		this.enable = enable;
 		this.series = null;
