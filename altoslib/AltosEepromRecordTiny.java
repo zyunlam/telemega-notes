@@ -54,6 +54,7 @@ public class AltosEepromRecordTiny extends AltosEepromRecord implements AltosDat
 		int value = data16(-header_length);
 
 		cal_data.set_tick(tick());
+		listener.set_time(cal_data.time());
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
 			listener.set_state(AltosLib.ao_flight_pad);
