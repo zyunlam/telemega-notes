@@ -56,7 +56,7 @@
 
 */
 
-#define AO_RN_REBOOT_MSG	"%REBOOT%"
+#define AO_RN_REBOOT_MSG	"REBOOT"
 
 #define AO_RN_CMD_TIMEOUT	AO_MS_TO_TICKS(200)
 
@@ -67,10 +67,13 @@
 #define AO_RN_SET_NAME_CMD		"SN,"
 #define AO_RN_GET_NAME_CMD		"GN"
 
-#define AO_RN_SET_STATUS_STRING	"SO,"
+#define AO_RN_SET_STATUS_STRING	"so,"
 #define AO_RN_STATUS_STRING_DISABLE	" "
+#define AO_RN_STATUS_STRING_ENABLE	"%,%"
 
 #define AO_RN_REBOOT_CMD		"R,1"
+
+#define AO_RN_VERSION_CMD		"V"
 
 #define AO_RN_TIMEOUT	-1
 #define AO_RN_ERROR	0
