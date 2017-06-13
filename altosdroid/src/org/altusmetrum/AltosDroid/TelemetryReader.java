@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import android.os.Handler;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 
 public class TelemetryReader extends Thread {

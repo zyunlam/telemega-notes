@@ -19,7 +19,7 @@
 /*
  * Sensor data conversion functions
  */
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.util.*;
 

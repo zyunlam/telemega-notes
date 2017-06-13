@@ -22,8 +22,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.io.*;
 import java.text.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class TeleGPSDisplayThread extends Thread {
 

@@ -52,7 +52,7 @@ import android.hardware.usb.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 class SavedState {
 	long	received_time;

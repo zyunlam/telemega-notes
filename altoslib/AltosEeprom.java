@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.util.*;
 import java.io.*;

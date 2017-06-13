@@ -19,7 +19,7 @@
 package org.altusmetrum.AltosDroid;
 
 import java.util.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 import android.location.Location;
 
 public class TelemetryState {

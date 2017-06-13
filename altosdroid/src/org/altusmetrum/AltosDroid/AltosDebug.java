@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.io.*;
 import java.lang.*;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 import android.app.Activity;
 import android.graphics.*;

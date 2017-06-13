@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 	int	orient() { return int8(5); }

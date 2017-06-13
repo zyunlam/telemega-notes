@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public class AltosTime extends AltosUnits {
 	public double value(double v, boolean imperial_units) { return v; }

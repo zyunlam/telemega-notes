@@ -19,7 +19,7 @@
 package org.altusmetrum.telegps;
 
 import java.awt.event.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class TeleGPSStatusUpdate implements ActionListener {
 
