@@ -24,7 +24,7 @@ public class AltosSensorTGPS {
 	public int	tick;
 	public int	batt;
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosSensorTGPS	sensor_tgps = new AltosSensorTGPS(link);
 

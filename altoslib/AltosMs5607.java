@@ -133,8 +133,9 @@ public class AltosMs5607 {
 		crc = old.crc;
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
+			AltosCalData	cal_data = listener.cal_data();
 			AltosMs5607	ms5607 = cal_data.ms5607;
 
 			if (ms5607 != null) {

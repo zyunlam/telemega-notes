@@ -39,11 +39,10 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		super.provide_data(listener, cal_data);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 
 		listener.set_state(state());
-		cal_data.set_state(state());
 
 		listener.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt()));
 		listener.set_pyro_voltage(AltosConvert.mega_pyro_voltage(v_pyro()));
@@ -56,6 +55,8 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 			voltages[i] = AltosConvert.mega_pyro_voltage(sense(i));
 
 		listener.set_igniter_voltage(voltages);
+
+		AltosCalData cal_data = listener.cal_data();
 
 		cal_data.set_ground_accel(ground_accel());
 		cal_data.set_ground_pressure(ground_pres());

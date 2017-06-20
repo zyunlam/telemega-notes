@@ -43,47 +43,47 @@ class AltosIdler {
 	static final int	idle_sensor_tgps = 16;
 	static final int	idle_sensor_tmini3 = 17;
 
-	public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException, TimeoutException, AltosUnknownProduct {
+	public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
 			switch (idler) {
 			case idle_gps:
-				AltosGPS.provide_data(listener, link, cal_data);
+				AltosGPS.provide_data(listener, link);
 				break;
 			case idle_imu:
-				AltosIMU.provide_data(listener, link, cal_data);
+				AltosIMU.provide_data(listener, link);
 				break;
 			case idle_mag:
-				AltosMag.provide_data(listener, link, cal_data);
+				AltosMag.provide_data(listener, link);
 				break;
 			case idle_mma655x:
-				AltosMma655x.provide_data(listener, link, cal_data);
+				AltosMma655x.provide_data(listener, link);
 				break;
 			case idle_ms5607:
-				AltosMs5607.provide_data(listener, link, cal_data);
+				AltosMs5607.provide_data(listener, link);
 				break;
 			case idle_sensor_tm:
-				AltosSensorTM.provide_data(listener, link, cal_data);
+				AltosSensorTM.provide_data(listener, link);
 				break;
 			case idle_sensor_metrum:
-				AltosSensorMetrum.provide_data(listener, link, cal_data);
+				AltosSensorMetrum.provide_data(listener, link);
 				break;
 			case idle_sensor_mega:
-				AltosSensorMega.provide_data(listener, link, cal_data);
+				AltosSensorMega.provide_data(listener, link);
 				break;
 			case idle_sensor_emini1:
-				AltosSensorEMini.provide_data(listener, link, cal_data, 1);
+				AltosSensorEMini.provide_data(listener, link, 1);
 				break;
 			case idle_sensor_emini2:
-				AltosSensorEMini.provide_data(listener, link, cal_data, 2);
+				AltosSensorEMini.provide_data(listener, link, 2);
 				break;
 			case idle_sensor_tmini2:
-				AltosSensorTMini2.provide_data(listener, link, cal_data);
+				AltosSensorTMini2.provide_data(listener, link);
 				break;
 			case idle_sensor_tgps:
-				AltosSensorTGPS.provide_data(listener, link, cal_data);
+				AltosSensorTGPS.provide_data(listener, link);
 				break;
 			case idle_sensor_tmini3:
-				AltosSensorTMini3.provide_data(listener, link, cal_data);
+				AltosSensorTMini3.provide_data(listener, link);
 				break;
 			}
 		}
@@ -151,7 +151,7 @@ public class AltosIdleFetch implements AltosDataProvider {
 
 	AltosLink		link;
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) throws InterruptedException, AltosUnknownProduct {
+	public void provide_data(AltosDataListener listener) throws InterruptedException, AltosUnknownProduct {
 		try {
 			boolean	matched = false;
 			/* Fetch config data from remote */
@@ -159,7 +159,7 @@ public class AltosIdleFetch implements AltosDataProvider {
 			listener.set_state(AltosLib.ao_flight_stateless);
 			for (AltosIdler idler : idlers) {
 				if (idler.matches(config_data)) {
-					idler.provide_data(listener, link, cal_data);
+					idler.provide_data(listener, link);
 					matched = true;
 					break;
 				}

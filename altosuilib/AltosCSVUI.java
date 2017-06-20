@@ -56,9 +56,9 @@ public class AltosCSVUI
 			set_default_file();
 	}
 
-	public AltosCSVUI(JFrame frame, AltosFlightSeries series, AltosCalData cal_data, File source_file) {
+	public AltosCSVUI(JFrame frame, AltosFlightSeries series, File source_file) {
 		this.series = series;
-		this.cal_data = cal_data;
+		this.cal_data = series.cal_data();
 		csv_chooser = new JFileChooser(source_file);
 
 		accessory = new JPanel();

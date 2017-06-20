@@ -45,7 +45,7 @@ public class AltosTelemetryReader extends AltosFlightReader {
 			System.out.printf("Make state\n");
 			state = new AltosState(cal_data());
 		}
-		telem.provide_data(state, state.cal_data);
+		telem.provide_data(state);
 		return state;
 	}
 

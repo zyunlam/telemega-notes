@@ -16,13 +16,29 @@ package org.altusmetrum.altoslib_12;
 
 public abstract class AltosDataListener {
 
-	public AltosCalData	cal_data = null;
+	private AltosCalData	cal_data = null;
+
 	public double		time = AltosLib.MISSING;
 	public int		state = AltosLib.MISSING;
+
+	public void set_tick(int tick) {
+		cal_data.set_tick(tick);
+		set_time(cal_data.time());
+	}
+
+	public AltosCalData cal_data() {
+		if (cal_data == null)
+			cal_data = new AltosCalData();
+		return cal_data;
+	}
 
 	public void set_time(double time) {
 		if (time != AltosLib.MISSING)
 			this.time = time;
+	}
+
+	public void set_serial(int serial) {
+		cal_data().set_serial(serial);
 	}
 
 	public double time() {
@@ -30,8 +46,13 @@ public abstract class AltosDataListener {
 	}
 
 	public void set_state(int state) {
+		cal_data().set_state(state);
 		if (state != AltosLib.MISSING)
 			this.state = state;
+	}
+
+	public void set_flight(int flight) {
+		cal_data().set_flight(flight);
 	}
 
 	/* Called after all records are captured */

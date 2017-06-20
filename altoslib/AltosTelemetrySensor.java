@@ -41,11 +41,12 @@ public class AltosTelemetrySensor extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		super.provide_data(listener, cal_data);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 
 		listener.set_state(state());
-		cal_data.set_state(state());
+
+		AltosCalData	cal_data = listener.cal_data();
 
 		if (type() == packet_type_TM_sensor) {
 			cal_data.set_ground_accel(ground_accel());

@@ -19,5 +19,5 @@
 package org.altusmetrum.altoslib_12;
 
 public interface AltosDataProvider {
-	public void	provide_data(AltosDataListener listener, AltosCalData cal_data) throws InterruptedException, AltosUnknownProduct;
+	public void	provide_data(AltosDataListener listener) throws InterruptedException, AltosUnknownProduct;
 }

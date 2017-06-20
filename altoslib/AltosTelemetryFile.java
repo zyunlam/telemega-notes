@@ -52,6 +52,8 @@ class AltosTelemetryNullListener extends AltosDataListener {
 
 	public boolean cal_data_complete() {
 		/* All telemetry packets */
+		AltosCalData cal_data = cal_data();
+
 		if (cal_data.serial == AltosLib.MISSING)
 			return false;
 
@@ -107,7 +109,7 @@ public class AltosTelemetryFile implements AltosRecordSet {
 			AltosTelemetryNullListener l = new AltosTelemetryNullListener(cal_data);
 
 			for (AltosTelemetry telem : telems) {
-				telem.provide_data(l, cal_data);
+				telem.provide_data(l);
 				if (l.cal_data_complete())
 					break;
 			}
@@ -125,7 +127,7 @@ public class AltosTelemetryFile implements AltosRecordSet {
 
 			/* Try to pick up at least one pre-boost value */
 			if (cal_data.time() >= -2)
-				telem.provide_data(listener, cal_data);
+				telem.provide_data(listener);
 			if (listener.state == AltosLib.ao_flight_landed)
 				break;
 		}

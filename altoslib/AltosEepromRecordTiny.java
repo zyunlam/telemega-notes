@@ -50,16 +50,15 @@ public class AltosEepromRecordTiny extends AltosEepromRecord implements AltosDat
 		return tick;
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+	public void provide_data(AltosDataListener listener) {
 		int value = data16(-header_length);
 
-		cal_data.set_tick(tick());
-		listener.set_time(cal_data.time());
+		listener.set_tick(tick());
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
 			listener.set_state(AltosLib.ao_flight_pad);
-			cal_data.set_flight(value);
-			cal_data.set_boost_tick();
+			listener.cal_data().set_flight(value);
+			listener.cal_data().set_boost_tick();
 			break;
 		case AltosLib.AO_LOG_STATE:
 			listener.set_state(value & 0x7fff);

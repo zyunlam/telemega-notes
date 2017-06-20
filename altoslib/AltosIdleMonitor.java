@@ -55,11 +55,10 @@ public class AltosIdleMonitor extends Thread {
 	boolean provide_data(AltosDataListener listener) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		boolean		worked = false;
 		boolean		aborted = false;
-		AltosCalData	cal_data = new AltosCalData(link.config_data());
 
 		try {
 			start_link();
-			fetch.provide_data(listener, cal_data);
+			fetch.provide_data(listener);
 			if (!link.has_error && !link.reply_abort)
 				worked = true;
 		} finally {

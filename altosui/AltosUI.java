@@ -342,7 +342,7 @@ public class AltosUI extends AltosUIFrame {
 		if (set == null)
 			return;
 		AltosFlightSeries series = make_series(set);
-		new AltosCSVUI(AltosUI.this, series, series.cal_data, chooser.file());
+		new AltosCSVUI(AltosUI.this, series, chooser.file());
 	}
 
 	/* Load a flight log CSV file and display a pretty graph.

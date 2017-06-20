@@ -301,7 +301,7 @@ public class TeleGPS
 		if (set == null)
 			return;
 		AltosFlightSeries series = make_series(set);
-		new AltosCSVUI(this, series, series.cal_data, chooser.file());
+		new AltosCSVUI(this, series, chooser.file());
 	}
 
 	void graph() {

@@ -26,9 +26,10 @@ public class AltosSensorEMini {
 	public int	main;
 	public int	batt;
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data, int version) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, int version) throws InterruptedException {
 		try {
 			AltosSensorEMini	sensor_emini = new AltosSensorEMini(link);
+			AltosCalData		cal_data = listener.cal_data();
 
 			if (sensor_emini == null)
 				return;

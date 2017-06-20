@@ -26,7 +26,7 @@ public class AltosSensorTMini2 {
 	public int	main;
 	public int	batt;
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosSensorTMini2	sensor_tmini = new AltosSensorTMini2(link);
 

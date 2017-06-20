@@ -72,7 +72,7 @@ public class AltosIdleReader extends AltosFlightReader {
 				start_link();
 				if (state == null)
 					state = new AltosState(cal_data());
-				fetch.provide_data(state, state.cal_data);
+				fetch.provide_data(state);
 				if (!link.has_error && !link.reply_abort)
 					worked = true;
 			} catch (TimeoutException te) {

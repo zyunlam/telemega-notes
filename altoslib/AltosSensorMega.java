@@ -89,7 +89,7 @@ class AltosSensorMega {
 		}
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosSensorMega	sensor_mega = new AltosSensorMega(link);
 

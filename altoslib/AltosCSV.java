@@ -133,8 +133,8 @@ public class AltosCSV implements AltosWriter {
 	void write_general() {
 		double time = time();
 		out.printf("%s, %d, %d, %s, %8.2f, %8.2f, %4d, %3d",
-			   ALTOS_CSV_VERSION, series.cal_data.serial,
-			   series.cal_data.flight, series.cal_data.callsign,
+			   ALTOS_CSV_VERSION, series.cal_data().serial,
+			   series.cal_data().flight, series.cal_data().callsign,
 			   time, time,
 			   rssi(), status() & 0x7f);
 	}
@@ -220,8 +220,8 @@ public class AltosCSV implements AltosWriter {
 
 		AltosGreatCircle from_pad;
 
-		if (series.cal_data.gps_pad != null && gps != null)
-			from_pad = new AltosGreatCircle(series.cal_data.gps_pad, gps);
+		if (series.cal_data().gps_pad != null && gps != null)
+			from_pad = new AltosGreatCircle(series.cal_data().gps_pad, gps);
 		else
 			from_pad = new AltosGreatCircle();
 

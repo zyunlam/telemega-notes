@@ -909,11 +909,11 @@ public class AltosState extends AltosDataListener {
 	public double	accel_ground_along, accel_ground_across, accel_ground_through;
 
 	void update_pad_rotation() {
-		if (cal_data.pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
-			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data.accel_zero_across),
-						     AltosIMU.convert_accel(accel_ground_through - cal_data.accel_zero_through),
-						     AltosIMU.convert_accel(accel_ground_along - cal_data.accel_zero_along),
-						     cal_data.pad_orientation);
+		if (cal_data().pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
+			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data().accel_zero_across),
+						     AltosIMU.convert_accel(accel_ground_through - cal_data().accel_zero_through),
+						     AltosIMU.convert_accel(accel_ground_along - cal_data().accel_zero_along),
+						     cal_data().pad_orientation);
 			orient.set_computed(rotation.tilt(), time);
 		}
 	}
@@ -1066,8 +1066,6 @@ public class AltosState extends AltosDataListener {
 
 	public AltosState (AltosCalData cal_data) {
 		super(cal_data);
-		if (cal_data == null)
-			Thread.dumpStack();
 		init();
 	}
 }

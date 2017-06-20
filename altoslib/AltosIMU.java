@@ -74,9 +74,10 @@ public class AltosIMU implements Cloneable {
 		return n;
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosIMU	imu = new AltosIMU(link);
+			AltosCalData	cal_data = listener.cal_data();
 
 			if (imu != null) {
 				listener.set_gyro(cal_data.gyro_roll(imu.gyro_y),

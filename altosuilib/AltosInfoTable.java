@@ -128,7 +128,7 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 
 	public void show(AltosState state, AltosListenerState listener_state) {
 
-		AltosCalData	cal_data = state.cal_data;
+		AltosCalData	cal_data = state.cal_data();
 
 		if (!isShowing()) {
 			last_state = state;

@@ -232,23 +232,23 @@ public class AltosFlightSeries extends AltosDataListener {
 		if (altitude_series == null)
 			altitude_series = add_series(altitude_name, AltosConvert.height);
 
-		if (cal_data.ground_pressure == AltosLib.MISSING)
-			cal_data.set_ground_pressure(pa);
+		if (cal_data().ground_pressure == AltosLib.MISSING)
+			cal_data().set_ground_pressure(pa);
 
 		double altitude = AltosConvert.pressure_to_altitude(pa);
 		altitude_series.add(time(), altitude);
 	}
 
 	private void compute_height() {
-		double ground_altitude = cal_data.ground_altitude;
+		double ground_altitude = cal_data().ground_altitude;
 		if (height_series == null && ground_altitude != AltosLib.MISSING && altitude_series != null) {
 			height_series = add_series(height_name, AltosConvert.height);
 			for (AltosTimeValue alt : altitude_series)
 				height_series.add(alt.time, alt.value - ground_altitude);
 		}
 
-		if (gps_height == null && cal_data.gps_pad != null && cal_data.gps_pad.alt != AltosLib.MISSING && gps_altitude != null) {
-			double gps_ground_altitude = cal_data.gps_pad.alt;
+		if (gps_height == null && cal_data().gps_pad != null && cal_data().gps_pad.alt != AltosLib.MISSING && gps_altitude != null) {
+			double gps_ground_altitude = cal_data().gps_pad.alt;
 			gps_height = add_series(gps_height_name, AltosConvert.height);
 			for (AltosTimeValue gps_alt : gps_altitude)
 				gps_height.add(gps_alt.time, gps_alt.value - gps_ground_altitude);
@@ -343,16 +343,16 @@ public class AltosFlightSeries extends AltosDataListener {
 		if (accel_ground_across == AltosLib.MISSING)
 			return;
 
-		if (cal_data.pad_orientation == AltosLib.MISSING)
+		if (cal_data().pad_orientation == AltosLib.MISSING)
 			return;
 
-		if (cal_data.accel_zero_across == AltosLib.MISSING)
+		if (cal_data().accel_zero_across == AltosLib.MISSING)
 			return;
 
-		AltosRotation rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data.accel_zero_across),
-							   AltosIMU.convert_accel(accel_ground_through - cal_data.accel_zero_through),
-							   AltosIMU.convert_accel(accel_ground_along - cal_data.accel_zero_along),
-							   cal_data.pad_orientation);
+		AltosRotation rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data().accel_zero_across),
+							   AltosIMU.convert_accel(accel_ground_through - cal_data().accel_zero_through),
+							   AltosIMU.convert_accel(accel_ground_along - cal_data().accel_zero_along),
+							   cal_data().pad_orientation);
 		double prev_time = ground_time;
 
 		orient_series = add_series(orient_name, AltosConvert.orient);

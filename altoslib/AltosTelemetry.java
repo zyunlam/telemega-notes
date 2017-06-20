@@ -46,12 +46,11 @@ public abstract class AltosTelemetry implements AltosDataProvider {
 		return sum == bytes[bytes.length - 1];
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		cal_data.set_serial(serial());
+	public void provide_data(AltosDataListener listener) {
+		listener.set_serial(serial());
 		if (listener.state == AltosLib.ao_flight_invalid)
 			listener.set_state(AltosLib.ao_flight_startup);
-		cal_data.set_tick(tick());
-		listener.set_time(cal_data.time());
+		listener.set_tick(tick());
 		listener.set_rssi(rssi(), status());
 		listener.set_received_time(received_time);
 	}

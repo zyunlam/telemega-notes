@@ -40,18 +40,17 @@ public class AltosTelemetryMini3 extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		super.provide_data(listener, cal_data);
-
-		cal_data.set_ground_pressure(ground_pres());
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 
 		listener.set_state(state());
-		cal_data.set_state(state());
 
 		listener.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(v_batt()));
 
 		listener.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_a()));
 		listener.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_m()));
+
+		listener.cal_data().set_ground_pressure(ground_pres());
 
 		listener.set_pressure(pres());
 		listener.set_temperature(temp()/100.0);

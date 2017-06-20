@@ -29,9 +29,10 @@ public class AltosSensorTM {
 	public int	drogue;
 	public int	main;
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosSensorTM	sensor_tm = new AltosSensorTM(link);
+			AltosCalData	cal_data = listener.cal_data();
 
 			if (sensor_tm == null)
 				return;

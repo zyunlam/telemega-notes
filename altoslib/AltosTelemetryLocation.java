@@ -49,8 +49,10 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		super.provide_data(listener, cal_data);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
+
+		AltosCalData	cal_data = listener.cal_data();
 
 		AltosGPS	gps = cal_data.make_temp_gps(tick(), false);
 

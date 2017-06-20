@@ -128,7 +128,7 @@ public class AltosFlightStats {
 
 
 	public AltosFlightStats(AltosFlightSeries series) {
-		AltosCalData	cal_data = series.cal_data;
+		AltosCalData	cal_data = series.cal_data();
 
 		series.finish();
 
@@ -204,7 +204,7 @@ public class AltosFlightStats {
 		has_rssi = series.rssi_series != null;
 		has_flight_data = series.pressure_series != null;
 
-		AltosGPS gps = series.cal_data.gps_pad;
+		AltosGPS gps = series.cal_data().gps_pad;
 
 		if (gps != null) {
 			year = gps.year;

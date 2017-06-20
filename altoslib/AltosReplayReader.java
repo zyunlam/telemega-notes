@@ -108,7 +108,7 @@ public class AltosReplayReader extends AltosFlightReader {
 	int		reads;
 
 	public AltosCalData cal_data() {
-		return replay.state.cal_data;
+		return replay.state.cal_data();
 	}
 
 	public AltosState read() {

@@ -548,16 +548,17 @@ public class AltosTelemetryLegacy extends AltosTelemetry {
 		}
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		cal_data.set_tick(tick);
-		listener.set_time(cal_data.time());
+	public void provide_data(AltosDataListener listener) {
+		listener.set_serial(serial);
+		listener.set_tick(tick);
 		listener.set_state(this.state);
-		cal_data.set_state(this.state);
-		cal_data.set_flight(flight);
-		cal_data.set_serial(serial);
+		listener.set_flight(flight);
 		listener.set_rssi(rssi, status);
 
 		listener.set_pressure(AltosConvert.barometer_to_pressure(pres));
+
+		AltosCalData cal_data = listener.cal_data();
+
 		cal_data.set_accel_plus_minus(accel_plus_g, accel_minus_g);
 		listener.set_acceleration(cal_data.acceleration(accel));
 		if (kalman_height != AltosLib.MISSING)

@@ -53,7 +53,7 @@ class AltosSensorMetrum {
 		}
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosSensorMetrum	sensor_metrum = new AltosSensorMetrum(link);
 			listener.set_battery_voltage(AltosConvert.mega_battery_voltage(sensor_metrum.v_batt));

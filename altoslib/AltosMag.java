@@ -62,9 +62,10 @@ public class AltosMag implements Cloneable {
 		y = AltosLib.MISSING;
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosMag	mag = new AltosMag(link);
+			AltosCalData	cal_data = listener.cal_data();
 
 			if (mag != null)
 				listener.set_mag(cal_data.mag_along(mag.y),

@@ -92,7 +92,7 @@ public class AltosLog implements Runnable {
 					AltosTelemetry	telem = AltosTelemetry.parse(line.line);
 					if (state == null)
 						state = new AltosState(cal_data);
-					telem.provide_data(state, cal_data);
+					telem.provide_data(state);
 
 					if (cal_data.serial != serial ||
 					    cal_data.flight != flight ||

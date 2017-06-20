@@ -46,9 +46,10 @@ public class AltosMma655x implements Cloneable {
 		return n;
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException, AltosUnknownProduct {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException, AltosUnknownProduct {
 		try {
 			AltosMma655x	mma655x = new AltosMma655x(link);
+			AltosCalData	cal_data = listener.cal_data();
 
 			if (mma655x != null) {
 				int accel = mma655x.accel;

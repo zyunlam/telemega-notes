@@ -383,7 +383,7 @@ public class AltosGPS implements Cloneable {
 		}
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, AltosCalData cal_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosGPS gps = new AltosGPS(link, link.config_data());
 			if (gps != null)

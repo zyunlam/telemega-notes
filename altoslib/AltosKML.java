@@ -189,9 +189,9 @@ public class AltosKML implements AltosWriter {
 
 	public void write(AltosFlightSeries series) {
 		stats = new AltosFlightStats(series);
-		start(series.cal_data);
+		start(series.cal_data());
 		for (AltosGPSTimeValue gtv : series.gps_series)
-			write(gtv, series.cal_data, state(series, gtv.time), height(series, gtv.time));
+			write(gtv, series.cal_data(), state(series, gtv.time), height(series, gtv.time));
 	}
 
 	public AltosKML(File in_name) throws FileNotFoundException {

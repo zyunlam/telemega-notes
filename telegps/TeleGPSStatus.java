@@ -75,13 +75,14 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 		String	call;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.cal_data == null)
+			AltosCalData cal_data = state.cal_data();
+			if (cal_data == null)
 				System.out.printf("null cal data?\n");
-			if (state.cal_data.callsign != call) {
-				value.setText(state.cal_data.callsign);
-				call = state.cal_data.callsign;
+			if (cal_data.callsign != call) {
+				value.setText(cal_data.callsign);
+				call = cal_data.callsign;
 			}
-			if (state.cal_data.callsign == null)
+			if (cal_data.callsign == null)
 				setVisible(false);
 			else
 				setVisible(true);
@@ -102,12 +103,13 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 	class Serial extends Value {
 		int	serial = -1;
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.cal_data.serial != serial) {
-				if (state.cal_data.serial == AltosLib.MISSING)
+			AltosCalData cal_data = state.cal_data();
+			if (cal_data.serial != serial) {
+				if (cal_data.serial == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.cal_data.serial));
-				serial = state.cal_data.serial;
+					value.setText(String.format("%d", cal_data.serial));
+				serial = cal_data.serial;
 			}
 		}
 
@@ -128,12 +130,13 @@ public class TeleGPSStatus extends JComponent implements AltosFlightDisplay {
 		int	last_flight = -1;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.cal_data.flight != last_flight) {
-				if (state.cal_data.flight == AltosLib.MISSING)
+			AltosCalData cal_data = state.cal_data();
+			if (cal_data.flight != last_flight) {
+				if (cal_data.flight == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.cal_data.flight));
-				last_flight = state.cal_data.flight;
+					value.setText(String.format("%d", cal_data.flight));
+				last_flight = cal_data.flight;
 			}
 		}
 

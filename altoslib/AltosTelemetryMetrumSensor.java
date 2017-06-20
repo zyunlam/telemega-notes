@@ -38,13 +38,12 @@ public class AltosTelemetryMetrumSensor extends AltosTelemetryStandard {
 		super(bytes);
 	}
 
-	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		super.provide_data(listener, cal_data);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 
 		listener.set_state(state());
-		cal_data.set_state(state());
 
-		listener.set_acceleration(cal_data.acceleration(accel()));
+		listener.set_acceleration(listener.cal_data().acceleration(accel()));
 		listener.set_pressure(pres());
 		listener.set_temperature(temp()/100.0);
 
