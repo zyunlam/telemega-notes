@@ -100,6 +100,7 @@ static const char *status_strings[] = {
 	"RFCOMM_CLOSE",
 	"RFCOMM_OPEN",
 	"CONNECT",
+	"LCONNECT",
 	"DISCONN",
 	"BONDED",
 };
@@ -560,8 +561,22 @@ ao_rn_factory(void)
 	ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 1);
 }
 
+#if AO_RN_DEBUG
+static void
+ao_rn_send(void)
+{
+	int	c;
+
+	while ((c = getchar()) != '~')
+		ao_rn_putchar(c);
+}
+#endif
+
 static const struct ao_cmds rn_cmds[] = {
 	{ ao_rn_factory, "F\0Factory reset rn4678" },
+#if AO_RN_DEBUG
+	{ ao_rn_send, "B\0Send data to rn4678. End with ~" },
+#endif
 	{ 0 },
 };
 
