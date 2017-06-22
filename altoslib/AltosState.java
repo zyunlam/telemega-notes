@@ -931,12 +931,12 @@ public class AltosState extends AltosDataListener {
 		if (last_imu_time != AltosLib.MISSING) {
 			double	t = time - last_imu_time;
 
-			double	pitch = AltosConvert.degrees_to_radians(gyro_pitch);
-			double	yaw = AltosConvert.degrees_to_radians(gyro_yaw);
-			double	roll = AltosConvert.degrees_to_radians(gyro_roll);
+			if (t > 0 && gyro_pitch != AltosLib.MISSING && rotation != null) {
+				double	pitch = AltosConvert.degrees_to_radians(gyro_pitch) * t;
+				double	yaw = AltosConvert.degrees_to_radians(gyro_yaw) * t;
+				double	roll = AltosConvert.degrees_to_radians(gyro_roll) * t;
 
-			if (t > 0 && pitch != AltosLib.MISSING && rotation != null) {
-				rotation.rotate(t, pitch, yaw, roll);
+				rotation.rotate(pitch, yaw, roll);
 				orient.set_computed(rotation.tilt(), time);
 			}
 		}

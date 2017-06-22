@@ -363,11 +363,11 @@ public class AltosFlightSeries extends AltosDataListener {
 			double	dt = time - prev_time;
 
 			if (dt > 0) {
-				double	roll = AltosConvert.degrees_to_radians(roll_v.value);
-				double	pitch = AltosConvert.degrees_to_radians(gyro_pitch.value(time));
-				double	yaw = AltosConvert.degrees_to_radians(gyro_yaw.value(time));
+				double	roll = AltosConvert.degrees_to_radians(roll_v.value) * dt;
+				double	pitch = AltosConvert.degrees_to_radians(gyro_pitch.value(time)) * dt;
+				double	yaw = AltosConvert.degrees_to_radians(gyro_yaw.value(time)) * dt;
 
-				rotation.rotate(dt, pitch, yaw, roll);
+				rotation.rotate(pitch, yaw, roll);
 				orient_series.add(time, rotation.tilt());
 			}
 			prev_time = time;
