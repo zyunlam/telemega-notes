@@ -153,6 +153,7 @@ public class AltosQuaternion {
 
 	static public AltosQuaternion euler(double x, double y, double z) {
 
+		/* Halve the euler angles */
 		x = x / 2.0;
 		y = y / 2.0;
 		z = z / 2.0;

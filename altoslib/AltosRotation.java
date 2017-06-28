@@ -40,7 +40,7 @@ public class AltosRotation extends AltosQuaternion {
 	 *     = (a.z * -a.z) + (-a.y * -a.y) - (a.x * -a.x) + (-a.r * a.r)
 	 *     = -a.z² + a.y² + a.x² - a.r²
 	 *
-	 * tilt = acos(rot); /* in radians */
+	 * tilt = acos(rot)  (in radians)
 	 */
 
 	public double tilt() {
