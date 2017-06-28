@@ -180,7 +180,7 @@ ao_usart_set_speed(struct ao_stm_usart *usart, uint8_t speed)
 }
 
 static void
-ao_usart_init(struct ao_stm_usart *usart)
+ao_usart_init(struct ao_stm_usart *usart, int hw_flow)
 {
 	usart->reg->cr1 = ((0 << STM_USART_CR1_M1) |
 			   (0 << STM_USART_CR1_EOBIE) |
@@ -223,43 +223,38 @@ ao_usart_init(struct ao_stm_usart *usart)
 			   (0 << STM_USART_CR2_LBDL) |
 			   (0 << STM_USART_CR2_ADDM7));
 
-	usart->reg->cr3 = ((0 << STM_USART_CR3_WUFIE) |
-			   (0 << STM_USART_CR3_WUS) |
-			   (0 << STM_USART_CR3_SCARCNT) |
-			   (0 << STM_USART_CR3_DEP) |
-			   (0 << STM_USART_CR3_DEM) |
-			   (0 << STM_USART_CR3_DDRE) |
-			   (0 << STM_USART_CR3_OVRDIS) |
-			   (0 << STM_USART_CR3_ONEBIT) |
-			   (0 << STM_USART_CR3_CTIIE) |
-			   (0 << STM_USART_CR3_CTSE) |
-			   (0 << STM_USART_CR3_RTSE) |
-			   (0 << STM_USART_CR3_DMAT) |
-			   (0 << STM_USART_CR3_DMAR) |
-			   (0 << STM_USART_CR3_SCEN) |
-			   (0 << STM_USART_CR3_NACK) |
-			   (0 << STM_USART_CR3_HDSEL) |
-			   (0 << STM_USART_CR3_IRLP) |
-			   (0 << STM_USART_CR3_IREN) |
-			   (0 << STM_USART_CR3_EIE));
+	uint32_t cr3 = ((0 << STM_USART_CR3_WUFIE) |
+			(0 << STM_USART_CR3_WUS) |
+			(0 << STM_USART_CR3_SCARCNT) |
+			(0 << STM_USART_CR3_DEP) |
+			(0 << STM_USART_CR3_DEM) |
+			(0 << STM_USART_CR3_DDRE) |
+			(0 << STM_USART_CR3_OVRDIS) |
+			(0 << STM_USART_CR3_ONEBIT) |
+			(0 << STM_USART_CR3_CTIIE) |
+			(0 << STM_USART_CR3_CTSE) |
+			(0 << STM_USART_CR3_RTSE) |
+			(0 << STM_USART_CR3_DMAT) |
+			(0 << STM_USART_CR3_DMAR) |
+			(0 << STM_USART_CR3_SCEN) |
+			(0 << STM_USART_CR3_NACK) |
+			(0 << STM_USART_CR3_HDSEL) |
+			(0 << STM_USART_CR3_IRLP) |
+			(0 << STM_USART_CR3_IREN) |
+			(0 << STM_USART_CR3_EIE));
 
+	if (hw_flow)
+		cr3 |= ((1 << STM_USART_CR3_CTSE) |
+			(1 << STM_USART_CR3_RTSE));
+
+	usart->reg->cr3 = cr3;
 
 	/* Pick a 9600 baud rate */
 	ao_usart_set_speed(usart, AO_SERIAL_SPEED_9600);
 
 	/* Enable the usart */
 	usart->reg->cr1 |= (1 << STM_USART_CR1_UE);
-
 }
-
-#if HAS_SERIAL_HW_FLOW
-static void
-ao_usart_set_flow(struct ao_stm_usart *usart)
-{
-	usart->reg->cr3 |= ((1 << STM_USART_CR3_CTSE) |
-			    (1 << STM_USART_CR3_RTSE));
-}
-#endif
 
 #if HAS_SERIAL_1
 
@@ -391,13 +386,13 @@ ao_serial_init(void)
 	 */
 
 #if SERIAL_1_PA9_PA10
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN);
+	ao_enable_port(&stm_gpioa);
 
 	stm_afr_set(&stm_gpioa, 9, STM_AFR_AF1);
 	stm_afr_set(&stm_gpioa, 10, STM_AFR_AF1);
 #else
 #if SERIAL_1_PB6_PB7
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPBEN);
+	ao_enable_port(&stm_gpiob);
 
 	stm_afr_set(&stm_gpiob, 6, STM_AFR_AF0);
 	stm_afr_set(&stm_gpiob, 7, STM_AFR_AF0);
@@ -409,7 +404,7 @@ ao_serial_init(void)
 	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_USART1EN);
 
 	ao_stm_usart1.reg = &stm_usart1;
-	ao_usart_init(&ao_stm_usart1);
+	ao_usart_init(&ao_stm_usart1, 0);
 
 	stm_nvic_set_enable(STM_ISR_USART1_POS);
 	stm_nvic_set_priority(STM_ISR_USART1_POS, 4);
@@ -428,8 +423,7 @@ ao_serial_init(void)
 	 */
 
 # if SERIAL_2_PA2_PA3
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN);
-
+	ao_enable_port(&stm_gpioa);
 	stm_afr_set(&stm_gpioa, 2, STM_AFR_AF1);
 	stm_afr_set(&stm_gpioa, 3, STM_AFR_AF1);
 #  if USE_SERIAL_2_FLOW
@@ -447,8 +441,7 @@ ao_serial_init(void)
 #  endif
 # else
 #  if SERIAL_2_PA14_PA15
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_IOPAEN);
-
+	ao_enable_port(&stm_gpioa);
 	stm_afr_set(&stm_gpioa, 14, STM_AFR_AF1);
 	stm_afr_set(&stm_gpioa, 15, STM_AFR_AF1);
 #   if USE_SERIAL_2_FLOW
@@ -472,10 +465,7 @@ ao_serial_init(void)
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_USART2EN);
 
 	ao_stm_usart2.reg = &stm_usart2;
-	ao_usart_init(&ao_stm_usart2);
-# if USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW
-	ao_usart_set_flow(&ao_stm_usart2);
-# endif
+	ao_usart_init(&ao_stm_usart2, USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW);
 
 	stm_nvic_set_enable(STM_ISR_USART2_POS);
 	stm_nvic_set_priority(STM_ISR_USART2_POS, 4);
