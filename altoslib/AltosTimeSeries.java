@@ -150,30 +150,47 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<Alt
 		return min;
 	}
 
+	public AltosTimeValue first() {
+		return values.get(0);
+	}
+
+	public AltosTimeValue last() {
+		return values.get(values.size() - 1);
+	}
+
 	public double average() {
-		double total = 0;
-		int count = 0;
+		double total_value = 0;
+		double total_time = 0;
+		AltosTimeValue prev = null;
 		for (AltosTimeValue tv : values) {
-			total += tv.value;
-			count++;
+			if (prev != null) {
+				total_value += (tv.value + prev.value) / 2 * (tv.time - prev.time);
+				total_time += (tv.time - prev.time);
+			}
+			prev = tv;
 		}
-		if (count == 0)
+		if (total_time == 0)
 			return AltosLib.MISSING;
-		return total / count;
+		return total_value / total_time;
 	}
 
 	public double average(double start_time, double end_time) {
-		double total = 0;
-		int count = 0;
+		double total_value = 0;
+		double total_time = 0;
+		AltosTimeValue prev = null;
 		for (AltosTimeValue tv : values) {
 			if (start_time <= tv.time && tv.time <= end_time) {
-				total += tv.value;
-				count++;
+				if (prev != null) {
+					total_value += (tv.value + prev.value) / 2 * (tv.time - start_time);
+					total_time += (tv.time - start_time);
+				}
+				start_time = tv.time;
 			}
+			prev = tv;
 		}
-		if (count == 0)
+		if (total_time == 0)
 			return AltosLib.MISSING;
-		return total / count;
+		return total_value / total_time;
 	}
 
 	public AltosTimeSeries integrate(AltosTimeSeries integral) {

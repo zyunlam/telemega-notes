@@ -138,11 +138,11 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 				       String.format("%6.1f m/s²", stats.state_accel[AltosLib.ao_flight_boost]),
 				       String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.state_accel[AltosLib.ao_flight_boost])),
 				       String.format("%6.2f G", AltosConvert.meters_to_g(stats.state_accel[AltosLib.ao_flight_boost])));
-		if (stats.state_start[AltosLib.ao_flight_boost] < stats.state_end[AltosLib.ao_flight_coast]) {
+		if (stats.state_time[AltosLib.ao_flight_boost] != 0 || stats.state_time[AltosLib.ao_flight_fast] != 0 || stats.state_time[AltosLib.ao_flight_coast] != 0) {
 
-			double	boost_time = stats.state_end[AltosLib.ao_flight_boost] - stats.state_start[AltosLib.ao_flight_boost];
-			double	fast_time = stats.state_end[AltosLib.ao_flight_fast] - stats.state_start[AltosLib.ao_flight_fast];
-			double	coast_time = stats.state_end[AltosLib.ao_flight_coast] - stats.state_start[AltosLib.ao_flight_coast];
+			double	boost_time = stats.state_time[AltosLib.ao_flight_boost];
+			double	fast_time = stats.state_time[AltosLib.ao_flight_fast];
+			double	coast_time = stats.state_time[AltosLib.ao_flight_coast];
 
 			if (fast_time > 0) {
 				new FlightStat(layout, y++, "Ascent time",
@@ -175,10 +175,10 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 			new FlightStat(layout, y++, "Main descent rate",
 				       String.format("%6.1f m/s", -stats.state_speed[AltosLib.ao_flight_main]),
 				       String.format("%5.0f ft/s", -AltosConvert.meters_to_feet(stats.state_speed[AltosLib.ao_flight_main])));
-		if (stats.state_start[AltosLib.ao_flight_drogue] < stats.state_end[AltosLib.ao_flight_main]) {
-			double	drogue_duration = stats.state_end[AltosLib.ao_flight_drogue] - stats.state_start[AltosLib.ao_flight_drogue];
-			double	main_duration = stats.landed_time - stats.state_start[AltosLib.ao_flight_main];
-			double	duration = stats.landed_time - stats.state_start[AltosLib.ao_flight_drogue];
+		if (stats.state_time[AltosLib.ao_flight_drogue] != 0 || stats.state_time[AltosLib.ao_flight_main] != 0) {
+			double	drogue_duration = stats.state_time[AltosLib.ao_flight_drogue];
+			double	main_duration = stats.state_time[AltosLib.ao_flight_main];
+			double	duration = drogue_duration + main_duration;
 
 			if (drogue_duration > 0 && main_duration > 0) {
 				new FlightStat(layout, y++, "Descent time",
@@ -191,7 +191,7 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 					       String.format("%6.1f s", duration));
 			}
 		}
-		if (stats.state_start[AltosLib.ao_flight_boost] < stats.state_start[AltosLib.ao_flight_landed])
+		if (stats.landed_time > stats.boost_time)
 			new FlightStat(layout, y++, "Flight time",
 				       String.format("%6.1f s", stats.landed_time - stats.boost_time));
 		if (stats.has_gps && stats.pad_lat != AltosLib.MISSING) {
