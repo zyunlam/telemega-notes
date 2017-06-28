@@ -54,7 +54,7 @@
 #define USE_SERIAL_2_STDIN	1
 #define DELAY_SERIAL_2_STDIN	1
 #define USE_SERIAL_2_FLOW	1
-#define USE_SERIAL_2_SW_FLOW	1
+#define USE_SERIAL_2_SW_FLOW	0
 #define SERIAL_2_PA2_PA3	1
 #define SERIAL_2_PD5_PD6	0
 #define SERIAL_2_PORT_RTS	(&stm_gpioa)
