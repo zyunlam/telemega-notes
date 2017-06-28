@@ -70,9 +70,9 @@ class SavedState {
 			locked = state.gps.locked;
 		else
 			locked = false;
-		callsign = state.cal_data.callsign;
-		serial = state.cal_data.serial;
-		flight = state.cal_data.flight;
+		callsign = state.cal_data().callsign;
+		serial = state.cal_data().serial;
+		flight = state.cal_data().flight;
 		rssi = state.rssi;
 	}
 }
@@ -484,20 +484,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 								     state.gps.alt);
 			}
 
-			if (saved_state == null || !same_string(saved_state.callsign, state.cal_data.callsign)) {
-				mCallsignView.setText(state.cal_data.callsign);
+			if (saved_state == null || !same_string(saved_state.callsign, state.cal_data().callsign)) {
+				mCallsignView.setText(state.cal_data().callsign);
 			}
-			if (saved_state == null || state.cal_data.serial != saved_state.serial) {
-				if (state.cal_data.serial == AltosLib.MISSING)
+			if (saved_state == null || state.cal_data().serial != saved_state.serial) {
+				if (state.cal_data().serial == AltosLib.MISSING)
 					mSerialView.setText("");
 				else
-					mSerialView.setText(String.format("%d", state.cal_data.serial));
+					mSerialView.setText(String.format("%d", state.cal_data().serial));
 			}
-			if (saved_state == null || state.cal_data.flight != saved_state.flight) {
-				if (state.cal_data.flight == AltosLib.MISSING)
+			if (saved_state == null || state.cal_data().flight != saved_state.flight) {
+				if (state.cal_data().flight == AltosLib.MISSING)
 					mFlightView.setText("");
 				else
-					mFlightView.setText(String.format("%d", state.cal_data.flight));
+					mFlightView.setText(String.format("%d", state.cal_data().flight));
 			}
 			if (saved_state == null || state.state() != saved_state.state) {
 				if (state.state() == AltosLib.ao_flight_stateless) {

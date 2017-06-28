@@ -191,7 +191,7 @@ public class TabPad extends AltosDroidTab {
 				ignite_lights[i].set(voltage >= AltosLib.ao_igniter_good, voltage == AltosLib.MISSING);
 			}
 
-			if (state.cal_data.flight != 0) {
+			if (state.cal_data().flight != 0) {
 				if (state.state() <= AltosLib.ao_flight_pad)
 					data_logging_view.setText("Ready to record");
 				else if (state.state() < AltosLib.ao_flight_landed)
@@ -201,7 +201,7 @@ public class TabPad extends AltosDroidTab {
 			} else {
 				data_logging_view.setText("Storage full");
 			}
-			data_logging_lights.set(state.cal_data.flight != 0, state.cal_data.flight == AltosLib.MISSING);
+			data_logging_lights.set(state.cal_data().flight != 0, state.cal_data().flight == AltosLib.MISSING);
 
 			if (state.gps != null) {
 				int soln = state.gps.nsat;

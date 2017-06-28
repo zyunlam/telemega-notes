@@ -477,11 +477,11 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 				if (t_state.gps != null) {
 					AltosLatLon	latlon = new AltosLatLon(t_state.gps.lat, t_state.gps.lon);
 					rocket.set_position(latlon, t_state.received_time);
-					if (state.cal_data.serial == serial)
+					if (state.cal_data().serial == serial)
 						there = latlon;
 				}
 				if (state != null)
-					rocket.set_active(state.cal_data.serial == serial);
+					rocket.set_active(state.cal_data().serial == serial);
 			}
 		}
 		if (receiver != null) {

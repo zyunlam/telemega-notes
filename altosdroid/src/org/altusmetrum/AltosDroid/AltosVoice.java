@@ -294,7 +294,7 @@ public class AltosVoice {
 		int	tell_serial = last_tell_serial;
 
 		if (state != null)
-			tell_serial = state.cal_data.serial;
+			tell_serial = state.cal_data().serial;
 
 		if (tell_serial != last_tell_serial)
 			reset_last();
