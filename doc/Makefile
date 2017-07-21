@@ -167,7 +167,8 @@ OUTLINE_TXT_FILES=\
 	telemega-outline.txt \
 	telemetrum-outline.txt \
 	telemini-v1-outline.txt \
-	telemini-v3-outline.txt
+	telemini-v3-outline.txt \
+	telegps-outline.txt
 
 OUTLINE_RAW_FILES=$(OUTLINE_TXT_FILES:.txt=.raw)
 

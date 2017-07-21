@@ -16,10 +16,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import javax.swing.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosUIRateList extends JComboBox<String> {
 
@@ -27,10 +27,9 @@ public class AltosUIRateList extends JComboBox<String> {
 	int	serial;
 
 	public void set_rate(int new_rate) {
-		int i;
-
-		setVisible(new_rate >= 0);
-		setSelectedIndex(new_rate);
+		if (new_rate != AltosLib.MISSING)
+			setSelectedIndex(new_rate);
+		setVisible(new_rate != AltosLib.MISSING);
 	}
 
 	public void set_product(String new_product) {

@@ -16,15 +16,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.util.concurrent.*;
 import java.io.*;
 
 public class AltosMag implements Cloneable {
-	public int		along;
-	public int		across;
-	public int		through;
+	public int		x;
+	public int		z;
+	public int		y;
 
 	public static final double counts_per_gauss = 1090;
 
@@ -33,10 +33,6 @@ public class AltosMag implements Cloneable {
 	}
 
 	public boolean parse_string(String line) {
-//		if (line.startsWith("Syntax error")) {
-//			along = across = through = 0;
-//			return true;
-//		}
 
 		if (!line.startsWith("X:"))
 			return false;
@@ -44,9 +40,9 @@ public class AltosMag implements Cloneable {
 		String[] items = line.split("\\s+");
 
 		if (items.length >= 6) {
-			along = Integer.parseInt(items[1]);
-			across = Integer.parseInt(items[3]);
-			through = Integer.parseInt(items[5]);
+			x = Integer.parseInt(items[1]);
+			z = Integer.parseInt(items[3]);
+			y = Integer.parseInt(items[5]);
 		}
 		return true;
 	}
@@ -54,30 +50,27 @@ public class AltosMag implements Cloneable {
 	public AltosMag clone() {
 		AltosMag n = new AltosMag();
 
-		n.along = along;
-		n.across = across;
-		n.through = through;
+		n.x = x;
+		n.z = z;
+		n.y = y;
 		return n;
 	}
 
 	public AltosMag() {
-		along = AltosLib.MISSING;
-		across = AltosLib.MISSING;
-		through = AltosLib.MISSING;
+		x = AltosLib.MISSING;
+		z = AltosLib.MISSING;
+		y = AltosLib.MISSING;
 	}
 
-	public AltosMag(int along, int across, int through) {
-		this.along = along;
-		this.across = across;
-		this.through = through;
-	}
-
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosMag	mag = new AltosMag(link);
+			AltosCalData	cal_data = listener.cal_data();
 
 			if (mag != null)
-				state.set_mag(mag);
+				listener.set_mag(cal_data.mag_along(mag.y),
+						 cal_data.mag_across(mag.x),
+						 cal_data.mag_through(mag.z));
 		} catch (TimeoutException te) {
 		}
 	}

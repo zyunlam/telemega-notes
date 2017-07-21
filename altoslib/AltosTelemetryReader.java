@@ -16,19 +16,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.text.*;
 import java.io.*;
 import java.util.concurrent.*;
 
 public class AltosTelemetryReader extends AltosFlightReader {
-	AltosLink	link;
-	AltosLog	log;
-	double		frequency;
-	int		telemetry;
-	int		telemetry_rate;
-	AltosState	state = null;
+	AltosLink		link;
+	AltosLog		log;
+	double			frequency;
+	int			telemetry;
+	int			telemetry_rate;
+	private AltosState	state = null;
+	private AltosCalData	cal_data = null;
 
 	LinkedBlockingQueue<AltosLine> telem;
 
@@ -40,12 +41,20 @@ public class AltosTelemetryReader extends AltosFlightReader {
 				throw new IOException("IO error");
 		} while (!link.get_monitor());
 		AltosTelemetry	telem = AltosTelemetry.parse(l.line);
-		if (state == null)
-			state = new AltosState();
-		else
-			state = state.clone();
-		telem.update_state(state);
+		if (state == null) {
+			System.out.printf("Make state\n");
+			state = new AltosState(cal_data());
+		}
+		telem.provide_data(state);
 		return state;
+	}
+
+	public AltosCalData cal_data() {
+		if (cal_data == null) {
+			System.out.printf("Make cal data\n");
+			cal_data = new AltosCalData();
+		}
+		return cal_data;
 	}
 
 	public void flush() {
@@ -55,6 +64,7 @@ public class AltosTelemetryReader extends AltosFlightReader {
 	public void reset() {
 		flush();
 		state = null;
+		cal_data = null;
 	}
 
 	public void close(boolean interrupted) {

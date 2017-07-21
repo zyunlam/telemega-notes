@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
@@ -68,21 +68,19 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 		return AltosConvert.lb_to_n(v * 298 * 9.807);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			state.set_flight(flight());
-			state.set_ground_pressure(0.0);
-			state.set_accel_g(0, -1);
+			cal_data.set_flight(flight());
 			break;
 		case AltosLib.AO_LOG_STATE:
-			state.set_state(state());
+			listener.set_state(state());
 			break;
 		case AltosLib.AO_LOG_SENSOR:
-			state.set_pressure(adc_to_pa(pres()));
-			state.set_accel(adc_to_n(thrust()));
+			listener.set_pressure(adc_to_pa(pres()));
+			listener.set_thrust(adc_to_n(thrust()));
 			break;
 		}
 	}
@@ -94,11 +92,11 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 		return new AltosEepromRecordFireTwo(eeprom, s);
 	}
 
-	public AltosEepromRecordFireTwo(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordFireTwo(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordFireTwo(AltosEepromNew eeprom) {
+	public AltosEepromRecordFireTwo(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

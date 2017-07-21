@@ -1,132 +1,291 @@
 /*
- * Copyright © 2013 Keith Packard <keithp@keithp.com>
+ * Copyright © 2017 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
-import java.io.*;
 import java.util.*;
-import java.text.*;
+import java.io.*;
 
-public abstract class AltosEeprom implements AltosStateUpdate {
-	public int	cmd;
-	public int	tick;
-	public int	data8[];
-	public boolean	valid;
+public class AltosEeprom {
 
-	public int data8(int i) {
-		return data8[i];
+	private AltosJson	config;
+	ArrayList<Byte>		data;
+	private AltosConfigData	config_data;
+
+	/*
+	 * Public accessor APIs
+	 */
+	public int data8(int offset) {
+		return ((int) data.get(offset)) & 0xff;
 	}
 
-	public int data16(int i) {
-		return ((data8[i] | (data8[i+1] << 8)) << 16) >> 16;
+	public int data16(int offset) {
+		return data8(offset) | (data8(offset+1) << 8);
 	}
 
-	public int data24(int i) {
-		return data8[i] | (data8[i+1] << 8) | (data8[i+2] << 16);
+	public int data24(int offset) {
+		return (data8(offset) |
+			(data8(offset+1) << 8) |
+			(data8(offset+2) << 16));
 	}
 
-	public int data32(int i) {
-		return data8[i] | (data8[i+1] << 8) | (data8[i+2] << 16) | (data8[i+3] << 24);
+	public int data32(int offset) {
+		return (data8(offset) |
+			(data8(offset+1) << 8) |
+			(data8(offset+2) << 16) |
+			(data8(offset+3) << 24));
 	}
 
-	public boolean has_seconds() { return false; }
-
-	public int seconds() { return 0; }
-
-	public final static int header_length = 4;
-
-	public abstract int record_length();
-
-	public void update_state(AltosState state) {
-		if (cmd == AltosLib.AO_LOG_FLIGHT)
-			state.set_boost_tick(tick);
-		else
-			state.set_tick(tick);
+	public int size() {
+		return data.size();
 	}
 
-	public void write(PrintStream out) {
-		out.printf("%c %04x", cmd, tick);
-		if (data8 != null) {
-			for (int i = 0; i < data8.length; i++)
-				out.printf (" %02x", data8[i]);
-		}
-		out.printf ("\n");
-	}
+	public AltosConfigData config_data() {
+		if (config_data == null) {
+			config_data = (AltosConfigData) config.make(AltosConfigData.class);
+			if (config_data == null)
+				config_data = new AltosConfigData();
 
-	public String string() {
-		String	s;
-
-		s = String.format("%c %04x", cmd, tick);
-		if (data8 != null) {
-			for (int i = 0; i < data8.length; i++) {
-				String	d = String.format(" %02x", data8[i]);
-				s = s.concat(d);
-			}
-		}
-		s = s.concat("\n");
-		return s;
-	}
-
-	void parse_chunk(AltosEepromChunk chunk, int start) throws ParseException {
-		cmd = chunk.data(start);
-
-		int data_length = record_length() - header_length;
-
-		valid = !chunk.erased(start, record_length());
-		if (valid) {
-			if (AltosConvert.checksum(chunk.data, start, record_length()) != 0)
-				throw new ParseException(String.format("invalid checksum at 0x%x",
-								       chunk.address + start), 0);
-		} else {
-			cmd = AltosLib.AO_LOG_INVALID;
-		}
-
-		tick = chunk.data16(start+2);
-
-		data8 = new int[data_length];
-		for (int i = 0; i < data_length; i++)
-			data8[i] = chunk.data(start + header_length + i);
-	}
-
-	void parse_string(String line) {
-		valid = false;
-		tick = 0;
-		cmd = AltosLib.AO_LOG_INVALID;
-
-		int data_length = record_length() - header_length;
-
-		if (line == null)
-			return;
-		try {
-			String[] tokens = line.split("\\s+");
-
-			if (tokens[0].length() == 1) {
-				if (tokens.length == 2 + data_length) {
-					cmd = tokens[0].codePointAt(0);
-					tick = Integer.parseInt(tokens[1],16);
-					valid = true;
-					data8 = new int[data_length];
-
-					for (int i = 0; i < data_length; i++)
-						data8[i] = Integer.parseInt(tokens[2 + i],16);
+			if (config_data.log_format == AltosLib.AO_LOG_FORMAT_UNKNOWN) {
+				config_data.log_format = AltosLib.AO_LOG_FORMAT_FULL;
+				if (config_data.product != null) {
+					if (config_data.product.startsWith("TeleMetrum"))
+						config_data.log_format = AltosLib.AO_LOG_FORMAT_FULL;
+					else if (config_data.product.startsWith("TeleMini"))
+						config_data.log_format = AltosLib.AO_LOG_FORMAT_TINY;
 				}
 			}
-		} catch (NumberFormatException ne) {
 		}
+		return config_data;
+	}
+
+	private void write_config(Writer w) throws IOException {
+		config.write(w, 0, true);
+		w.append('\n');
+	}
+
+	/*
+	 * Private I/O APIs
+	 */
+	private void write_data(Writer w) throws IOException {
+		PrintWriter pw = new PrintWriter(w);
+
+		for (int i = 0; i < data.size(); i++) {
+			if (i > 0) {
+				if ((i & 0x1f) == 0)
+					pw.printf("\n");
+				else
+					pw.printf(" ");
+			}
+			pw.printf("%02x", data.get(i));
+		}
+		w.append('\n');
+	}
+
+	private boolean read_config(InputStream stream) throws IOException {
+		config = AltosJson.fromInputStream(stream);
+		if (config == null)
+			return false;
+		return true;
+	}
+
+	private String read_line(InputStream stream) throws IOException {
+		StringBuffer	buffer = null;
+		int		c;
+
+		for (;;) {
+			c = stream.read();
+			if (c == -1 && buffer == null)
+				return null;
+			if (buffer == null)
+				buffer = new StringBuffer();
+			if (c == -1 || c == '\n')
+				return buffer.toString();
+			buffer.append((char) c);
+		}
+	}
+
+	private boolean read_data(InputStream stream) throws IOException {
+		String			s;
+
+		data = new ArrayList<Byte>();
+		while ((s = read_line(stream)) != null) {
+
+			String[] tokens = s.split("\\s+");
+
+			for (int i = 0; i < tokens.length; i++) {
+				if (tokens[i].length() > 0) {
+					try {
+						data.add((byte) AltosLib.fromhex(tokens[i]));
+					} catch (NumberFormatException e) {
+						throw new IOException(e.toString());
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean read_old_config(InputStream stream) throws IOException {
+		AltosConfigData	cfg = new AltosConfigData();
+		for (;;) {
+			boolean	done = false;
+
+			/* The data starts with an upper case F character followed by a space */
+			stream.mark(2);
+			int	first = stream.read();
+			if (first == 'F') {
+				int second =  stream.read();
+				if (second == ' ')
+					done = true;
+			}
+			stream.reset();
+			if (done)
+				break;
+
+			String line = read_line(stream);
+			if (line == null)
+				return false;
+			cfg.parse_line(line);
+		}
+		config = new AltosJson(cfg);
+		return true;
+	}
+
+	private boolean read_old_data(InputStream stream) throws IOException {
+		String line;
+
+		data = new ArrayList<Byte>();
+		while ((line = read_line(stream)) != null) {
+			String[] tokens = line.split("\\s+");
+
+			/* Make sure there's at least a type and time */
+			if (tokens.length < 2)
+				break;
+
+			/* packet type */
+			if (tokens[0].length() != 1)
+				break;
+			int start = data.size();
+
+			if (config_data().log_format != AltosLib.AO_LOG_FORMAT_TINY) {
+				byte cmd = (byte) tokens[0].codePointAt(0);
+				data.add(cmd);
+
+				int time = AltosLib.fromhex(tokens[1]);
+
+				data.add((byte) 0);
+				data.add((byte) (time & 0xff));
+				data.add((byte) (time >> 8));
+			}
+			if (tokens.length == 4) {
+				/* Handle ancient log files */
+				if (config_data().log_format == AltosLib.AO_LOG_FORMAT_TINY) {
+					/*
+					 * Ancient TeleMini log files stored "extra" data to pretend
+					 * that it was a TeleMetrum device. Throw that away and
+					 * just save the actual log data.
+					 */
+					int a = AltosLib.fromhex(tokens[2]);
+					int b = AltosLib.fromhex(tokens[3]);
+					if (a != 0)
+						b = 0x8000 | a;
+					data.add((byte) (b & 0xff));
+					data.add((byte) ((b >> 8)));
+				} else {
+					for (int i = 2; i < tokens.length; i++) {
+						int v = AltosLib.fromhex(tokens[i]);
+						data.add((byte) (v & 0xff));
+						data.add((byte) ((v >> 8)));
+					}
+					/* Re-compute the checksum byte */
+					data.set(start + 1, (byte) (256 - AltosConvert.checksum(data, start, data.size() - start)));
+				}
+			} else {
+				for (int i = 2; i < tokens.length; i++)
+					data.add((byte) AltosLib.fromhex(tokens[i]));
+				/* Re-compute the checksum byte */
+				data.set(start + 1, (byte) (256 - AltosConvert.checksum(data, start, data.size() - start)));
+			}
+		}
+		return true;
+	}
+
+	private void read(InputStream stream) throws IOException {
+		BufferedInputStream	bis = new BufferedInputStream(stream);
+
+		bis.mark(1);
+		int c = bis.read();
+		bis.reset();
+
+		if (c == '{') {
+			if (!read_config(bis))
+				throw new IOException("failed to read config");
+			if (!read_data(bis))
+				throw new IOException("failed to read data");
+		} else {
+			if (!read_old_config(bis))
+				throw new IOException("failed to read old config");
+			if (!read_old_data(bis))
+				throw new IOException("failed to read old data");
+		}
+	}
+
+	/*
+	 * Public APIs for I/O
+	 */
+	public void write(Writer w) throws IOException {
+		write_config(w);
+		write_data(w);
+	}
+
+	public String toString() {
+		try {
+			Writer	w = new StringWriter();
+
+			write(w);
+			return w.toString();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public void print() throws IOException {
+		System.out.printf("%s", toString());
+	}
+
+	/*
+	 * Constructors
+	 */
+	public AltosEeprom(InputStream stream) throws IOException {
+		read(stream);
+	}
+
+	public AltosEeprom(String s) throws IOException {
+		read(new AltosStringInputStream(s));
+	}
+
+	public AltosEeprom(AltosJson config, ArrayList<Byte> data) {
+		this.config = config;
+		this.data = data;
+	}
+
+	public AltosEeprom(AltosConfigData config_data, ArrayList<Byte> data) {
+		this.config = new AltosJson(config_data);
+		this.data = data;
+	}
+
+	public AltosEeprom() {
 	}
 }

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.net.*;
@@ -91,6 +91,7 @@ public class AltosMapStore {
 	static Object	forbidden_lock = new Object();
 	static long	forbidden_time;
 	static boolean	forbidden_set;
+	public static int forbidden_response;
 
 	private int fetch_url() {
 		URL u;
@@ -116,6 +117,7 @@ public class AltosMapStore {
 					synchronized (forbidden_lock) {
 						forbidden_time = System.nanoTime();
 						forbidden_set = true;
+						forbidden_response = response;
 						return AltosMapTile.forbidden;
 					}
 				}

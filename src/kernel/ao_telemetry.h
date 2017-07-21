@@ -198,8 +198,8 @@ struct ao_telemetry_mega_sensor {
 	int16_t		gyro_z;		/* 24 */
 
 	int16_t		mag_x;		/* 26 */
-	int16_t		mag_y;		/* 28 */
-	int16_t		mag_z;		/* 30 */
+	int16_t		mag_z;		/* 28 */
+	int16_t		mag_y;		/* 30 */
 	/* 32 */
 };
 

@@ -16,61 +16,45 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 
 public class AltosTelemetryMini3 extends AltosTelemetryStandard {
 
-	int	state;
+	int	state() { return uint8(5); }
 
-	int	v_batt;
-	int	sense_a;
-	int	sense_m;
+	int	v_batt() { return int16(6); }
+	int	sense_a() { return int16(8); }
+	int	sense_m() { return int16(10); }
 
-	int	pres;
-	int	temp;
+	int	pres() { return int32(12); }
+	int	temp() { return int16(16); }
 
-	int	acceleration;
-	int	speed;
-	int	height_16;
+	int	acceleration() { return int16(18); }
+	int	speed() { return int16(20); }
+	int	height_16() { return int16(22); }
 
-	int	ground_pres;
+	int	ground_pres() { return int32(24); }
 
-	public AltosTelemetryMini3(int[] bytes) {
+	public AltosTelemetryMini3(int[] bytes) throws AltosCRCException {
 		super(bytes);
-
-		state         = int8(5);
-
-		v_batt        = int16(6);
-		sense_a       = int16(8);
-		sense_m       = int16(10);
-
-		pres          = int32(12);
-		temp          = int16(16);
-
-		acceleration  = int16(18);
-		speed         = int16(20);
-		height_16     = int16(22);
-
-		ground_pres   = int32(24);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 
-		state.set_state(this.state);
+		listener.set_state(state());
 
-		state.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(v_batt));
+		listener.set_battery_voltage(AltosConvert.tele_mini_3_battery_voltage(v_batt()));
 
-		state.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_a));
-		state.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_m));
+		listener.set_apogee_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_a()));
+		listener.set_main_voltage(AltosConvert.tele_mini_3_pyro_voltage(sense_m()));
 
-		state.set_pressure(pres);
-		state.set_temperature(temp/100.0);
+		listener.cal_data().set_ground_pressure(ground_pres());
 
-		state.set_kalman(extend_height(state, height_16),
-				 speed/16.0, acceleration/16.0);
+		listener.set_pressure(pres());
+		listener.set_temperature(temp()/100.0);
 
-		state.set_ground_pressure(ground_pres);
+		listener.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);
 	}
 }

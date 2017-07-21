@@ -18,7 +18,6 @@ altosuilib_JAVA = \
 	AltosUIDataMissing.java \
 	AltosUIDataPoint.java \
 	AltosUIDataSet.java \
-	AltosUIGraph.java \
 	AltosUIGrapher.java \
 	AltosUIDialog.java \
 	AltosUIEnable.java \
@@ -28,7 +27,9 @@ altosuilib_JAVA = \
 	AltosUIMarker.java \
 	AltosUIPreferencesBackend.java \
 	AltosUIPreferences.java \
-	AltosUISeries.java \
+	AltosUIFlightSeries.java \
+	AltosUIGraph.java \
+	AltosGraph.java \
 	AltosUSBDevice.java \
 	AltosVoice.java \
 	AltosDisplayThread.java \
@@ -50,9 +51,6 @@ altosuilib_JAVA = \
 	AltosInfoTable.java \
 	AltosFlightInfoTableModel.java \
 	AltosFlightStatsTable.java \
-	AltosGraph.java \
-	AltosGraphDataPoint.java \
-	AltosGraphDataSet.java \
 	AltosBTDevice.java \
 	AltosBTDeviceIterator.java \
 	AltosBTManage.java \
@@ -67,6 +65,7 @@ altosuilib_JAVA = \
 	AltosUITelemetryList.java \
 	AltosUIRateList.java \
 	AltosUIImage.java \
+	AltosUITimeSeries.java \
 	OSXAdapter.java
 
 JAR=altosuilib_$(ALTOSUILIB_VERSION).jar

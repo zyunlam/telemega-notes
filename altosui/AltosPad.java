@@ -19,8 +19,8 @@
 package altosui;
 
 import java.util.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class AltosPad extends AltosUIFlightTab {
 
@@ -46,10 +46,11 @@ public class AltosPad extends AltosUIFlightTab {
 
 	class LoggingReady extends AltosUIIndicator {
 		public void show (AltosState state, AltosListenerState listener_state) {
-			if (state == null || state.flight == AltosLib.MISSING) {
+			AltosCalData	cal_data = state.cal_data();
+			if (state == null || cal_data.flight == AltosLib.MISSING) {
 				hide();
 			} else {
-				if (state.flight != 0) {
+				if (cal_data.flight != 0) {
 					if (state.state() <= Altos.ao_flight_pad)
 						show("Ready to record");
 					else if (state.state() < Altos.ao_flight_landed ||
@@ -59,7 +60,7 @@ public class AltosPad extends AltosUIFlightTab {
 						show("Recorded data");
 				} else
 					show("Storage full");
-				set_lights(state.flight != 0);
+				set_lights(cal_data.flight != 0);
 			}
 		}
 		public LoggingReady (AltosUIFlightTab container, int y) {
@@ -128,10 +129,8 @@ public class AltosPad extends AltosUIFlightTab {
 	}
 
 	boolean report_pad(AltosState state) {
-		if ((state.state() == AltosLib.ao_flight_stateless ||
-		     state.state() < AltosLib.ao_flight_pad) &&
-		    state.gps != null &&
-		    state.gps.lat != AltosLib.MISSING)
+		if (state.state() == AltosLib.ao_flight_stateless ||
+		    state.state() < AltosLib.ao_flight_pad)
 		{
 			return false;
 		}
@@ -150,7 +149,7 @@ public class AltosPad extends AltosUIFlightTab {
 				if (report_pad(state)) {
 					lat = state.pad_lat;
 					label = "Pad Latitude";
-				} else {
+				} else if (state.gps != null) {
 					lat = state.gps.lat;
 					label = "Latitude";
 				}
@@ -187,7 +186,7 @@ public class AltosPad extends AltosUIFlightTab {
 				if (report_pad(state)) {
 					lon = state.pad_lon;
 					label = "Pad Longitude";
-				} else {
+				} else if (state.gps != null) {
 					lon = state.gps.lon;
 					label = "Longitude";
 				}
@@ -217,8 +216,10 @@ public class AltosPad extends AltosUIFlightTab {
 		public double value(AltosState state, int i) {
 			if (report_pad(state))
 				return state.pad_alt;
-			else
+			else if (state.gps != null)
 				return state.gps.alt;
+			else
+				return state.altitude();
 		}
 
 		public void show (AltosState state, AltosListenerState listener_state) {

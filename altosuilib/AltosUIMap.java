@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,7 +28,7 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.imageio.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosMapInterface {
 
@@ -413,6 +413,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		map.show(state, listener_state);
 	}
 
+	public void show(AltosGPS gps, int state) {
+		map.show(gps, state);
+	}
+
 	public String getName() {
 		return "Map";
 	}
@@ -420,6 +424,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	/* AltosGraphUI interface */
 	public void centre(AltosState state) {
 		map.centre(state);
+	}
+
+	public void centre(AltosGPS gps) {
+		map.centre(gps);
 	}
 
 	/* internal layout bits */

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
@@ -30,61 +30,62 @@ class AltosIdler {
 	static final int	idle_gps = 0;
 	static final int	idle_imu = 1;
 	static final int	idle_mag = 2;
-	static final int	idle_ms5607 = 3;
 	static final int	idle_mma655x = 4;
+	static final int	idle_ms5607 = 5;
 
 
 	static final int	idle_sensor_tm = 10;
 	static final int	idle_sensor_metrum = 11;
 	static final int	idle_sensor_mega = 12;
-	static final int	idle_sensor_emini = 13;
-	static final int	idle_sensor_tmini2 = 14;
-	static final int	idle_sensor_tgps = 15;
-	static final int	idle_sensor_tmini3 = 16;
+	static final int	idle_sensor_emini1 = 13;
+	static final int	idle_sensor_emini2 = 14;
+	static final int	idle_sensor_tmini2 = 15;
+	static final int	idle_sensor_tgps = 16;
+	static final int	idle_sensor_tmini3 = 17;
 
-	public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException, TimeoutException, AltosUnknownProduct {
+	public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
-			AltosIdle idle = null;
 			switch (idler) {
 			case idle_gps:
-				AltosGPS.update_state(state, link, config_data);
+				AltosGPS.provide_data(listener, link);
 				break;
 			case idle_imu:
-				AltosIMU.update_state(state, link, config_data);
+				AltosIMU.provide_data(listener, link);
 				break;
 			case idle_mag:
-				AltosMag.update_state(state, link, config_data);
-				break;
-			case idle_ms5607:
-				AltosMs5607.update_state(state, link, config_data);
+				AltosMag.provide_data(listener, link);
 				break;
 			case idle_mma655x:
-				AltosMma655x.update_state(state, link, config_data);
+				AltosMma655x.provide_data(listener, link);
+				break;
+			case idle_ms5607:
+				AltosMs5607.provide_data(listener, link);
 				break;
 			case idle_sensor_tm:
-				AltosSensorTM.update_state(state, link, config_data);
+				AltosSensorTM.provide_data(listener, link);
 				break;
 			case idle_sensor_metrum:
-				AltosSensorMetrum.update_state(state, link, config_data);
+				AltosSensorMetrum.provide_data(listener, link);
 				break;
 			case idle_sensor_mega:
-				AltosSensorMega.update_state(state, link, config_data);
+				AltosSensorMega.provide_data(listener, link);
 				break;
-			case idle_sensor_emini:
-				AltosSensorEMini.update_state(state, link, config_data);
+			case idle_sensor_emini1:
+				AltosSensorEMini.provide_data(listener, link, 1);
+				break;
+			case idle_sensor_emini2:
+				AltosSensorEMini.provide_data(listener, link, 2);
 				break;
 			case idle_sensor_tmini2:
-				AltosSensorTMini2.update_state(state, link, config_data);
+				AltosSensorTMini2.provide_data(listener, link);
 				break;
 			case idle_sensor_tgps:
-				AltosSensorTGPS.update_state(state, link, config_data);
+				AltosSensorTGPS.provide_data(listener, link);
 				break;
 			case idle_sensor_tmini3:
-				AltosSensorTMini3.update_state(state, link, config_data);
+				AltosSensorTMini3.provide_data(listener, link);
 				break;
 			}
-			if (idle != null)
-				idle.update_state(state);
 		}
 	}
 
@@ -99,13 +100,17 @@ class AltosIdler {
 }
 
 
-public class AltosIdleFetch implements AltosStateUpdate {
+public class AltosIdleFetch implements AltosDataProvider {
 
 	static final AltosIdler[] idlers = {
 
-		new AltosIdler("EasyMini",
+		new AltosIdler("EasyMini-v1",
 			       AltosIdler.idle_ms5607,
-			       AltosIdler.idle_sensor_emini),
+			       AltosIdler.idle_sensor_emini1),
+
+		new AltosIdler("EasyMini-v2",
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_sensor_emini2),
 
 		new AltosIdler("TeleMini-v1",
 			       AltosIdler.idle_sensor_tm),
@@ -124,16 +129,19 @@ public class AltosIdleFetch implements AltosStateUpdate {
 
 		new AltosIdler("TeleMetrum-v2",
 			       AltosIdler.idle_gps,
-			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
+			       AltosIdler.idle_mma655x,
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_sensor_metrum),
 
 		new AltosIdler("TeleMega",
 			       AltosIdler.idle_gps,
-			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
+			       AltosIdler.idle_mma655x,
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("EasyMega",
-			       AltosIdler.idle_ms5607, AltosIdler.idle_mma655x,
+			       AltosIdler.idle_mma655x,
+			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("TeleGPS",
@@ -143,29 +151,22 @@ public class AltosIdleFetch implements AltosStateUpdate {
 
 	AltosLink		link;
 
-	public void update_state(AltosState state) throws InterruptedException, AltosUnknownProduct {
+	public void provide_data(AltosDataListener listener) throws InterruptedException, AltosUnknownProduct {
 		try {
 			boolean	matched = false;
 			/* Fetch config data from remote */
 			AltosConfigData config_data = new AltosConfigData(link);
-			state.set_state(AltosLib.ao_flight_stateless);
-			state.set_serial(config_data.serial);
-			state.set_callsign(config_data.callsign);
-			state.set_ground_accel(config_data.accel_cal_plus);
-			state.set_accel_g(config_data.accel_cal_plus, config_data.accel_cal_minus);
-			state.set_product(config_data.product);
-			state.set_firmware_version(config_data.version);
-			state.set_log_space(config_data.log_space);
+			listener.set_state(AltosLib.ao_flight_stateless);
 			for (AltosIdler idler : idlers) {
 				if (idler.matches(config_data)) {
-					idler.update_state(state, link, config_data);
+					idler.provide_data(listener, link);
 					matched = true;
 					break;
 				}
 			}
 			if (!matched)
 				throw new AltosUnknownProduct(config_data.product);
-			state.set_received_time(System.currentTimeMillis());
+			listener.set_received_time(System.currentTimeMillis());
 		} catch (TimeoutException te) {
 		}
 

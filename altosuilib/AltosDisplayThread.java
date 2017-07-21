@@ -16,13 +16,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import java.awt.*;
 import javax.swing.*;
 import java.io.*;
 import java.text.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosDisplayThread extends Thread {
 
@@ -30,7 +30,9 @@ public class AltosDisplayThread extends Thread {
 	IdleThread		idle_thread;
 	AltosVoice		voice;
 	AltosFlightReader	reader;
-	AltosState		old_state, state;
+	AltosState		state;
+	int			old_state = AltosLib.ao_flight_invalid;
+	boolean			old_gps_ready = false;
 	AltosListenerState	listener_state;
 	AltosFlightDisplay	display;
 
@@ -93,13 +95,13 @@ public class AltosDisplayThread extends Thread {
 			    state.from_pad != null &&
 			    state.range >= 0)
 			{
-				voice.speak("Height %s, bearing %s %d, elevation %d, range %s.\n",
+				voice.speak("Height %s, bearing %s %d, elevation %d, distance %s.\n",
 					    AltosConvert.height.say(state.height()),
 					    state.from_pad.bearing_words(
 						    AltosGreatCircle.BEARING_VOICE),
 					    (int) (state.from_pad.bearing + 0.5),
 					    (int) (state.elevation + 0.5),
-					    AltosConvert.distance.say(state.range));
+					    AltosConvert.distance.say(state.distance));
 			} else if (state.state() > AltosLib.ao_flight_pad && state.height() != AltosLib.MISSING) {
 				voice.speak(AltosConvert.height.say_units(state.height()));
 			} else {
@@ -121,7 +123,7 @@ public class AltosDisplayThread extends Thread {
 				else
 					voice.speak("rocket may have crashed");
 				if (state.from_pad != null)
-					voice.speak("Bearing %d degrees, range %s.",
+					voice.speak("Bearing %d degrees, distance %s.",
 						    (int) (state.from_pad.bearing + 0.5),
 						    AltosConvert.distance.say_units(state.from_pad.distance));
 				++reported_landing;
@@ -164,7 +166,7 @@ public class AltosDisplayThread extends Thread {
 		}
 
 		public synchronized void notice(boolean spoken) {
-			if (old_state != null && old_state.state() != state.state()) {
+			if (old_state != state.state()) {
 				report_time = now();
 				this.notify();
 			} else if (spoken)
@@ -179,16 +181,16 @@ public class AltosDisplayThread extends Thread {
 
 	synchronized boolean tell() {
 		boolean	ret = false;
-		if (old_state == null || old_state.state() != state.state()) {
+		if (old_state != state.state()) {
 			if (state.state() != AltosLib.ao_flight_stateless)
 				voice.speak(state.state_name());
-			if ((old_state == null || old_state.state() <= AltosLib.ao_flight_boost) &&
+			if ((old_state == AltosLib.ao_flight_invalid || old_state <= AltosLib.ao_flight_boost) &&
 			    state.state() > AltosLib.ao_flight_boost) {
 				if (state.max_speed() != AltosLib.MISSING)
 					voice.speak("max speed: %s.",
 						    AltosConvert.speed.say_units(state.max_speed() + 0.5));
 				ret = true;
-			} else if ((old_state == null || old_state.state() < AltosLib.ao_flight_drogue) &&
+			} else if ((old_state == AltosLib.ao_flight_invalid || old_state < AltosLib.ao_flight_drogue) &&
 				   state.state() >= AltosLib.ao_flight_drogue) {
 				if (state.max_height() != AltosLib.MISSING)
 					voice.speak("max height: %s.",
@@ -196,17 +198,18 @@ public class AltosDisplayThread extends Thread {
 				ret = true;
 			}
 		}
-		if (old_state == null || old_state.gps_ready != state.gps_ready) {
+		if (old_gps_ready != state.gps_ready) {
 			if (state.gps_ready) {
 				voice.speak("GPS ready");
 				ret = true;
 			}
-			else if (old_state != null) {
+			else if (old_gps_ready) {
 				voice.speak("GPS lost");
 				ret = true;
 			}
 		}
-		old_state = state;
+		old_state = state.state();
+		old_gps_ready = state.gps_ready;
 		return ret;
 	}
 
@@ -220,14 +223,11 @@ public class AltosDisplayThread extends Thread {
 		try {
 			for (;;) {
 				try {
-					AltosState new_state = reader.read();
-					if (new_state == null) {
-						state = null;
+					state = reader.read();
+					if (state == null) {
 						listener_state.running = false;
 						break;
 					}
-					reader.update(new_state);
-					state = new_state;
 					show_safely();
 					told = tell();
 					idle_thread.notice(told);

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
@@ -363,11 +363,11 @@ public class AltosPreferences {
 		}
 	}
 
-	public static void set_state(AltosState state) {
+	public static void set_state(AltosState state, int serial) {
 
 		synchronized(backend) {
-			backend.putJson(String.format(statePreferenceFormat, state.serial), new AltosJson(state));
-			backend.putInt(statePreferenceLatest, state.serial);
+			backend.putJson(String.format(statePreferenceFormat, serial), new AltosJson(state));
+			backend.putInt(statePreferenceLatest, serial);
 			flush_preferences();
 		}
 	}

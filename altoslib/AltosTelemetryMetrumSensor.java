@@ -16,56 +16,42 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 
 public class AltosTelemetryMetrumSensor extends AltosTelemetryStandard {
-	int	state;
+	int	state() { return uint8(5); }
 
-	int	accel;
-	int	pres;
-	int	temp;
+	int	accel() { return int16(6); }
+	int	pres() { return int32(8); }
+	int	temp() { return int16(12); }
 
-	int	acceleration;
-	int	speed;
-	int	height_16;
+	int	acceleration() { return int16(14); }
+	int	speed() { return int16(16); }
+	int	height_16() { return int16(18); }
 
-	int	v_batt;
-	int	sense_a;
-	int	sense_m;
+	int	v_batt() { return int16(20); }
+	int	sense_a() { return int16(22); }
+	int	sense_m() { return int16(24); }
 
-	public AltosTelemetryMetrumSensor(int[] bytes) {
+	public AltosTelemetryMetrumSensor(int[] bytes) throws AltosCRCException {
 		super(bytes);
-
-		state	      = int8(5);
-		accel         = int16(6);
-		pres          = int32(8);
-		temp          = int16(12);
-
-		acceleration  = int16(14);
-		speed         = int16(16);
-		height_16     = int16(18);
-
-		v_batt        = int16(20);
-		sense_a       = int16(22);
-		sense_m       = int16(24);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 
-		state.set_state(this.state);
+		listener.set_state(state());
 
-		state.set_accel(accel);
-		state.set_pressure(pres);
-		state.set_temperature(temp/100.0);
+		listener.set_acceleration(listener.cal_data().acceleration(accel()));
+		listener.set_pressure(pres());
+		listener.set_temperature(temp()/100.0);
 
-		state.set_kalman(extend_height(state, height_16),
-				 speed/16.0, acceleration/16.0);
+		listener.set_kalman(height_16(), speed()/16.0, acceleration()/16.0);
 
-		state.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt));
+		listener.set_battery_voltage(AltosConvert.mega_battery_voltage(v_batt()));
 
-		state.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sense_a));
-		state.set_main_voltage(AltosConvert.mega_pyro_voltage(sense_m));
+		listener.set_apogee_voltage(AltosConvert.mega_pyro_voltage(sense_a()));
+		listener.set_main_voltage(AltosConvert.mega_pyro_voltage(sense_m()));
 	}
 }

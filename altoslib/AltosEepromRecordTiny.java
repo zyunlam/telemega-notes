@@ -12,9 +12,9 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
-public class AltosEepromRecordTiny extends AltosEepromRecord {
+public class AltosEepromRecordTiny extends AltosEepromRecord implements AltosDataProvider {
 	public static final int	record_length = 2;
 
 	private int value() {
@@ -50,21 +50,21 @@ public class AltosEepromRecordTiny extends AltosEepromRecord {
 		return tick;
 	}
 
-	public void update_state(AltosState state) {
+	public void provide_data(AltosDataListener listener) {
 		int value = data16(-header_length);
 
-		state.set_tick(tick());
+		listener.set_tick(tick());
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			state.set_state(AltosLib.ao_flight_pad);
-			state.set_flight(value);
-			state.set_boost_tick(0);
+			listener.set_state(AltosLib.ao_flight_pad);
+			listener.cal_data().set_flight(value);
+			listener.cal_data().set_boost_tick();
 			break;
 		case AltosLib.AO_LOG_STATE:
-			state.set_state(value & 0x7fff);
+			listener.set_state(value & 0x7fff);
 			break;
 		case AltosLib.AO_LOG_SENSOR:
-			state.set_pressure(AltosConvert.barometer_to_pressure(value));
+			listener.set_pressure(AltosConvert.barometer_to_pressure(value));
 			break;
 		}
 	}
@@ -76,11 +76,11 @@ public class AltosEepromRecordTiny extends AltosEepromRecord {
 		return new AltosEepromRecordTiny(eeprom, s);
 	}
 
-	public AltosEepromRecordTiny(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordTiny(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordTiny(AltosEepromNew eeprom) {
+	public AltosEepromRecordTiny(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

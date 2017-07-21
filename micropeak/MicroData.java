@@ -21,86 +21,21 @@ package org.altusmetrum.micropeak;
 import java.lang.*;
 import java.io.*;
 import java.util.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
-class MicroIterator implements Iterator<MicroDataPoint> {
-	int		i;
-	MicroData	data;
-
-	public boolean hasNext() {
-		return i < data.pressures.length;
-	}
-
-	public MicroDataPoint next() {
-		return new MicroDataPoint(data, i++);
-	}
-
-	public MicroIterator (MicroData data) {
-		this.data = data;
-		i = 0;
-	}
-
-	public void remove() {
-	}
-}
-
-class MicroIterable implements Iterable<MicroDataPoint> {
-
-	MicroData	data;
-
-	public Iterator<MicroDataPoint> iterator() {
-		return new MicroIterator(data);
-	}
-
-	public MicroIterable(MicroData data) {
-		this.data = data;
-	}
-}
-
-class MicroUIIterator implements Iterator<AltosUIDataPoint> {
-	int		i;
-	MicroData	data;
-
-	public boolean hasNext() {
-		return i < data.pressures.length;
-	}
-
-	public AltosUIDataPoint next() {
-		return new MicroDataPoint(data, i++);
-	}
-
-	public MicroUIIterator (MicroData data) {
-		this.data = data;
-		i = 0;
-	}
-
-	public void remove() {
-	}
-}
-
-class MicroUIIterable implements Iterable<AltosUIDataPoint> {
-	MicroData	data;
-
-	public Iterator<AltosUIDataPoint> iterator() {
-		return new MicroUIIterator(data);
-	}
-
-	public MicroUIIterable(MicroData data) {
-		this.data = data;
-	}
-}
-
-public class MicroData implements AltosUIDataSet {
+public class MicroData {
 	public int		ground_pressure;
 	public int		min_pressure;
-	public int[]		pressures;
+
+	AltosUIFlightSeries	flight_series;
+	AltosFlightStats	flight_stats;
+	AltosCalData		cal_data;
+
 	private double		time_step;
-	private double		ground_altitude;
 	private ArrayList<Integer>	bytes;
 	public int		log_id;
 	String			name;
-	MicroStats		stats;
 
 	public static final int LOG_ID_MICROPEAK = 0;
 	public static final int LOG_ID_MICROKITE = 1;
@@ -213,69 +148,45 @@ public class MicroData implements AltosUIDataSet {
 		return Math.abs (target - a) < Math.abs(target - b);
 	}
 
+	public double altitude(double time) {
+		if (flight_series.altitude_series == null)
+			return 0.0;
+		return flight_series.altitude_series.value(time);
+	}
+
 	public double altitude(int i) {
-		return AltosConvert.pressure_to_altitude(pressures[i]);
+		return altitude(time(i));
 	}
 
 	public String name() {
 		return name;
 	}
 
-	public Iterable<AltosUIDataPoint> dataPoints() {
-		return new MicroUIIterable(this);
-	}
-
-	public Iterable<MicroDataPoint> points() {
-		return new MicroIterable(this);
-	}
-
-	int fact(int n) {
-		if (n == 0)
-			return 1;
-		return n * fact(n-1);
-	}
-
-	int choose(int n, int k) {
-		return fact(n) / (fact(k) * fact(n-k));
-	}
-
-
-	public double avg_altitude(int center, int dist) {
-		int	start = center - dist;
-		int	stop = center + dist;
-
-		if (start < 0)
-			start = 0;
-		if (stop >= pressures.length)
-			stop = pressures.length - 1;
-
-		double	sum = 0;
-		double	div = 0;
-
-		int	n = dist * 2;
-
-		for (int i = start; i <= stop; i++) {
-			int	k = i - (center - dist);
-			int	c = choose (n, k);
-
-			sum += c * pressures[i];
-			div += c;
-		}
-
-		double pres = sum / div;
-
-		double alt = AltosConvert.pressure_to_altitude(pres);
-		return alt;
-	}
-
 	public double pressure(int i) {
-		return pressures[i];
+		if (flight_series.pressure_series == null)
+			return 0.0;
+
+		return flight_series.pressure_series.value(time(i));
+	}
+
+	public double height(double time) {
+		if (flight_series.height_series == null)
+			return 0.0;
+
+		return flight_series.height_series.value(time);
 	}
 
 	public double height(int i) {
-		return altitude(i) - ground_altitude;
+		return height(time(i));
 	}
 
+	public int length() {
+		if (flight_series.pressure_series == null)
+			return 0;
+		return flight_series.pressure_series.size();
+	}
+
+	/* Use the recorded apogee pressure for stats so that it agrees with the device */
 	public double apogee_pressure() {
 		return min_pressure;
 	}
@@ -285,31 +196,27 @@ public class MicroData implements AltosUIDataSet {
 	}
 
 	public double apogee_height() {
-		return apogee_altitude() - ground_altitude;
+		return apogee_altitude() - cal_data.ground_altitude;
 	}
 
-	static final int speed_avg = 3;
-	static final int accel_avg = 5;
-
-	private double avg_speed(int center, int dist) {
-		if (center == 0)
-			return 0;
-
-		double ai = avg_altitude(center, dist);
-		double aj = avg_altitude(center - 1, dist);
-		double s = (ai - aj) / time_step;
-
-		return s;
+	public double speed(double time) {
+		if (flight_series.speed_series == null)
+			return 0.0;
+		return flight_series.speed_series.value(time);
 	}
 
 	public double speed(int i) {
-		return avg_speed(i, speed_avg);
+		return speed(time(i));
+	}
+
+	public double acceleration(double time) {
+		if (flight_series.accel_series == null)
+			return 0.0;
+		return flight_series.accel_series.value(time);
 	}
 
 	public double acceleration(int i) {
-		if (i == 0)
-			return 0;
-		return (avg_speed(i, accel_avg) - avg_speed(i-1, accel_avg)) / time_step;
+		return acceleration(time(i));
 	}
 
 	public double time(int i) {
@@ -325,18 +232,24 @@ public class MicroData implements AltosUIDataSet {
 	public void export (Writer f) throws IOException {
 		PrintWriter	pw = new PrintWriter(f);
 		pw.printf("  Time, Press(Pa), Height(m), Height(f), Speed(m/s), Speed(mph), Speed(mach), Accel(m/s²), Accel(ft/s²),  Accel(g)\n");
-		for (MicroDataPoint point : points()) {
+
+		for (AltosTimeValue ptv : flight_series.pressure_series) {
+
+			double height = height(ptv.time);
+			double speed = speed(ptv.time);
+			double accel = acceleration(ptv.time);
+
 			pw.printf("%6.3f,%10.0f,%10.1f,%10.1f,%11.2f,%11.2f,%12.4f,%12.2f,%13.2f,%10.4f\n",
-				  point.time,
-				  point.pressure,
-				  point.height,
-				  AltosConvert.meters_to_feet(point.height),
-				  point.speed,
-				  AltosConvert.meters_to_mph(point.speed),
-				  AltosConvert.meters_to_mach(point.speed),
-				  point.accel,
-				  AltosConvert.meters_to_feet(point.accel),
-				  AltosConvert.meters_to_g(point.accel));
+				  ptv.time,
+				  ptv.value,
+				  height,
+				  AltosConvert.meters_to_feet(height),
+				  speed,
+				  AltosConvert.meters_to_mph(speed),
+				  AltosConvert.meters_to_mach(speed),
+				  accel,
+				  AltosConvert.meters_to_feet(accel),
+				  AltosConvert.meters_to_g(accel));
 		}
 	}
 
@@ -344,9 +257,20 @@ public class MicroData implements AltosUIDataSet {
 		this.name = name;
 	}
 
+	public MicroData() {
+		ground_pressure = 101000;
+		min_pressure = 101000;
+		cal_data = new AltosCalData();
+		flight_series = new AltosUIFlightSeries(cal_data);
+	}
+
 	public MicroData (InputStream f, String name) throws IOException, InterruptedException, NonHexcharException, FileEndedException {
 		this.name = name;
 		bytes = new ArrayList<Integer>();
+
+		cal_data = new AltosCalData();
+		flight_series = new AltosUIFlightSeries(cal_data);
+
 		if (!find_header(f))
 			throw new IOException("No MicroPeak data header found");
 		try {
@@ -357,11 +281,30 @@ public class MicroData implements AltosUIDataSet {
 
 			log_id = nsamples >> 12;
 			nsamples &= 0xfff;
-			pressures = new int[nsamples + 1];
 
-			ground_altitude = AltosConvert.pressure_to_altitude(ground_pressure);
+			cal_data.set_ground_pressure(ground_pressure);
+
+			switch (log_id) {
+			case LOG_ID_MICROPEAK:
+				time_step = 2 * CLOCK_MP1;
+				break;
+			case LOG_ID_MICROKITE:
+				time_step = 200 * CLOCK_MP1;
+				break;
+			case LOG_ID_MICROPEAK2:
+				time_step = CLOCK_MP2;
+				break;
+			default:
+				throw new IOException(String.format("Unknown device type: %d", log_id));
+			}
+			cal_data.set_ticks_per_sec(1/time_step);
+			cal_data.set_tick(0);
+			cal_data.set_boost_tick();
+
 			int cur = ground_pressure;
-			pressures[0] = cur;
+			cal_data.set_tick(0);
+			flight_series.set_time(cal_data.time());
+			flight_series.set_pressure(cur);
 			for (int i = 0; i < nsamples; i++) {
 				int	k = get_16(f);
 				int	same = mix_in(cur, k);
@@ -380,38 +323,40 @@ public class MicroData implements AltosUIDataSet {
 						cur = down;
 				}
 
-				pressures[i+1] = cur;
+				cal_data.set_tick(i+1);
+				flight_series.set_time(cal_data.time());
+				flight_series.set_pressure(cur);
 			}
+
+			flight_series.finish();
+
+			/* Build states */
+
+			flight_series.set_time(0);
+			flight_series.set_state(AltosLib.ao_flight_boost);
+
+			flight_series.set_time(flight_series.speed_series.max().time);
+			flight_series.set_state(AltosLib.ao_flight_coast);
+
+			flight_series.set_time(flight_series.height_series.max().time);
+			flight_series.set_state(AltosLib.ao_flight_drogue);
+
+			cal_data.set_tick(nsamples);
+			flight_series.set_time(cal_data.time());
+			flight_series.set_state(AltosLib.ao_flight_landed);
+
+			flight_series.finish();
+
+			flight_stats = new AltosFlightStats(flight_series);
 
 			int current_crc = swap16(~file_crc & 0xffff);
 			int crc = get_16(f);
 
 			crc_valid = crc == current_crc;
 
-			switch (log_id) {
-			case LOG_ID_MICROPEAK:
-				time_step = 2 * CLOCK_MP1;
-				break;
-			case LOG_ID_MICROKITE:
-				time_step = 200 * CLOCK_MP1;
-				break;
-			case LOG_ID_MICROPEAK2:
-				time_step = CLOCK_MP2;
-				break;
-			default:
-				throw new IOException(String.format("Unknown device type: %d", log_id));
-			}
-			stats = new MicroStats(this);
 		} catch (FileEndedException fe) {
 			throw new IOException("File Ended Unexpectedly");
 		}
-	}
-
-	public MicroData() {
-		ground_pressure = 101000;
-		min_pressure = 101000;
-		pressures = new int[1];
-		pressures[0] = 101000;
 	}
 
 }

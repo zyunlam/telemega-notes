@@ -16,26 +16,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
-import java.io.*;
-import java.util.*;
-
-public abstract class AltosStateIterable implements Iterable<AltosState> {
-
-	public void write_comments (PrintStream out) {
-	}
-
-	public abstract void write(PrintStream out);
-
-	public static AltosStateIterable iterable(File file) {
-		try {
-			if (file.getName().endsWith("telem"))
-				return new AltosTelemetryFile(new FileInputStream(file));
-			else
-				return new AltosEepromFile(new FileReader(file));
-		} catch (Exception e) {
-			return null;
-		}
-	}
+public interface AltosDataProvider {
+	public void	provide_data(AltosDataListener listener) throws InterruptedException, AltosUnknownProduct;
 }

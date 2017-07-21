@@ -39,7 +39,7 @@ static void
 ao_rn_log_char(char c, char dir)
 {
 	if (dir != ao_rn_dir) {
-		putchar(dir);
+		putchar(dir); putchar('\n');
 		ao_rn_dir = dir;
 	}
 	switch (c) {
@@ -100,83 +100,80 @@ static const char *status_strings[] = {
 	"RFCOMM_CLOSE",
 	"RFCOMM_OPEN",
 	"CONNECT",
+	"LCONNECT",
 	"DISCONN",
 	"BONDED",
 };
 
 #define NUM_STATUS_STRING	(sizeof status_strings/sizeof status_strings[0])
 
+static char		ao_rn_buffer[64];
+static int		ao_rn_buf_cnt, ao_rn_buf_ptr;
+static int		ao_rn_draining;
+static AO_TICK_TYPE	ao_rn_buf_time;
+
+/* Well, this is annoying. The status strings from the RN4678 can't be
+ * disabled due to a firmware bug. So, this code finds those in the
+ * input and strips them out.
+ */
 int
 _ao_wrap_rn_pollchar(void)
 {
-	static char	buffer[64];
-	static int	buf_cnt, buf_ptr;
-	static int	draining;
 	int		c = AO_READ_AGAIN;
 	unsigned	i;
 	int		done = 0;
 
-	while (!done && !draining) {
+	while (!done && !ao_rn_draining) {
 		c = _ao_serial_rn_pollchar();
 
-		if (c == AO_READ_AGAIN)
+		if (c == AO_READ_AGAIN) {
+			if (ao_rn_buf_cnt && (ao_time() - ao_rn_buf_time) > AO_MS_TO_TICKS(1000)) {
+				ao_rn_draining = 1;
+				continue;
+			}
 			return AO_READ_AGAIN;
+		}
 
-		if (buf_cnt) {
+		if (ao_rn_buf_cnt) {
 			/* buffering chars */
 
 			if (c == STATUS_CHAR) {
 				/* End of status string, drop it and carry on */
-				buffer[buf_cnt] = '\0';
-				ao_rn_dbg("discard %s\n", buffer);
-				buf_cnt = 0;
-			} else if (buf_cnt == sizeof(buffer)) {
+				ao_rn_buffer[ao_rn_buf_cnt] = '\0';
+//				ao_rn_dbg("discard %s\n", ao_rn_buffer);
+				ao_rn_buf_cnt = 0;
+			} else if (ao_rn_buf_cnt == sizeof(ao_rn_buffer)) {
 				/* If we filled the buffer, just give up */
-				draining = 1;
+				ao_rn_draining = 1;
 			} else {
-				buffer[buf_cnt++] = c;
+				ao_rn_buffer[ao_rn_buf_cnt++] = c;
 				for (i = 0; i < NUM_STATUS_STRING; i++) {
 					int cmp = strlen(status_strings[i]);
-					if (cmp >= buf_cnt)
-						cmp = buf_cnt-1;
-					if (memcmp(buffer+1, status_strings[i], cmp) == 0)
+					if (cmp >= ao_rn_buf_cnt)
+						cmp = ao_rn_buf_cnt-1;
+					if (memcmp(ao_rn_buffer+1, status_strings[i], cmp) == 0)
 						break;
 				}
 				if (i == NUM_STATUS_STRING)
-					draining = 1;
+					ao_rn_draining = 1;
 			}
 		} else if (c == STATUS_CHAR) {
-			buffer[0] = c;
-			buf_cnt = 1;
-			buf_ptr = 0;
+			ao_rn_buffer[0] = c;
+			ao_rn_buf_cnt = 1;
+			ao_rn_buf_ptr = 0;
+			ao_rn_buf_time = ao_time();
 		} else
 			done = 1;
 	}
-	if (draining) {
-		c = buffer[buf_ptr++] & 0xff;
-		if (buf_ptr == buf_cnt) {
-			buf_ptr = buf_cnt = 0;
-			draining = 0;
+	if (ao_rn_draining) {
+		c = ao_rn_buffer[ao_rn_buf_ptr++] & 0xff;
+		if (ao_rn_buf_ptr == ao_rn_buf_cnt) {
+			ao_rn_buf_ptr = ao_rn_buf_cnt = 0;
+			ao_rn_draining = 0;
 		}
 	}
-#if AO_RN_DEBUG
-	ao_arch_release_interrupts();
-	ao_usb_putchar(c); ao_usb_flush();
-	ao_arch_block_interrupts();
-#endif
 	return c;
 }
-
-#if AO_RN_DEBUG
-static void
-ao_wrap_rn_putchar(char c)
-{
-	ao_usb_putchar(c); ao_usb_flush();
-	ao_serial_rn_putchar(c);
-}
-#else
-#define ao_wrap_rn_putchar ao_serial_rn_putchar
-#endif
 
 static void
 ao_rn_puts(char *s)
@@ -192,7 +189,7 @@ ao_rn_drain(void)
 {
 	int	timeout = 0;
 
-	ao_rn_dbg("drain...\n");
+//	ao_rn_dbg("drain...\n");
 	ao_serial_rn_drain();
 	while (!timeout) {
 		ao_arch_block_interrupts();
@@ -204,13 +201,13 @@ ao_rn_drain(void)
 		}
 		ao_arch_release_interrupts();
 	}
-	ao_rn_dbg("drain done\n");
+//	ao_rn_dbg("drain done\n");
 }
 
 static void
 ao_rn_send_cmd(char *cmd, char *param)
 {
-	ao_rn_dbg("send_cmd %s%s\n", cmd, param ? param : "");
+//	ao_rn_dbg("send_cmd %s%s\n", cmd, param ? param : "");
 	ao_rn_drain();
 	ao_rn_puts(cmd);
 	if (param)
@@ -244,20 +241,20 @@ ao_rn_wait_for(int timeout, char *match)
 	AO_TICK_TYPE	giveup_time = ao_time() + timeout;
 	int		c;
 
-	ao_rn_dbg("wait for %d, \"%s\"\n", timeout, match);
+//	ao_rn_dbg("wait for %d, \"%s\"\n", timeout, match);
 	memset(reply, ' ', sizeof(reply));
 	while (memcmp(reply, match, match_len) != 0) {
 		c = ao_rn_wait_char(giveup_time);
 		if (c == AO_READ_AGAIN) {
-			ao_rn_dbg("\twait for timeout\n");
+//			ao_rn_dbg("\twait for timeout\n");
 			return AO_RN_TIMEOUT;
 		}
 		reply[match_len] = (char) c;
 		memmove(reply, reply+1, match_len);
 		reply[match_len] = '\0';
-		ao_rn_dbg("\tmatch now \"%s\"\n", reply);
+//		ao_rn_dbg("\tmatch now \"%s\"\n", reply);
 	}
-	ao_rn_dbg("\twait for ok\n");
+//	ao_rn_dbg("\twait for ok\n");
 	return AO_RN_OK;
 }
 
@@ -266,20 +263,20 @@ ao_rn_wait_line(AO_TICK_TYPE giveup_time, char *line, int len)
 {
 	char *l = line;
 
-	ao_rn_dbg("wait line\n");
+//	ao_rn_dbg("wait line\n");
 	for (;;) {
 		int c = ao_rn_wait_char(giveup_time);
 
 		/* timeout */
 		if (c == AO_READ_AGAIN) {
-			ao_rn_dbg("\twait line timeout\n");
+//			ao_rn_dbg("\twait line timeout\n");
 			return AO_RN_TIMEOUT;
 		}
 
 		/* done */
 		if (c == '\r') {
 			*l = '\0';
-			ao_rn_dbg("\twait line \"%s\"\n", line);
+//			ao_rn_dbg("\twait line \"%s\"\n", line);
 			return AO_RN_OK;
 		}
 
@@ -302,7 +299,7 @@ ao_rn_wait_status(void)
 	AO_TICK_TYPE	giveup_time = ao_time() + AO_RN_CMD_TIMEOUT;
 	int		status;
 
-	ao_rn_dbg("wait status\n");
+//	ao_rn_dbg("wait status\n");
 	status = ao_rn_wait_line(giveup_time, message, sizeof (message));
 	if (status == AO_RN_OK)
 		if (strncmp(message, "AOK", 3) != 0)
@@ -317,7 +314,7 @@ ao_rn_set_name(void)
 	char	*s = sn + 8;
 	int	n;
 
-	ao_rn_dbg("set name...\n");
+//	ao_rn_dbg("set name...\n");
 	*--s = '\0';
 	n = ao_serial_number;
 	do {
@@ -330,7 +327,7 @@ ao_rn_set_name(void)
 static int
 ao_rn_get_name(char *name, int len)
 {
-	ao_rn_dbg("get name...\n");
+//	ao_rn_dbg("get name...\n");
 	ao_rn_send_cmd(AO_RN_GET_NAME_CMD, NULL);
 	return ao_rn_wait_line(ao_time() + AO_RN_CMD_TIMEOUT, name, len);
 }
@@ -404,12 +401,18 @@ ao_rn(void)
 			continue;
 		}
 
-		ao_rn_puts("$$$");
-
 		/* After it reboots, it can take a moment before it responds
 		 * to commands
 		 */
-		(void) ao_rn_wait_for(AO_RN_REBOOT_TIMEOUT, "CMD> ");
+		status = ao_rn_wait_for(AO_RN_REBOOT_TIMEOUT, "CMD> ");
+
+		if (status == AO_RN_TIMEOUT) {
+			ao_rn_puts("$$$");
+			(void) ao_rn_wait_for(AO_RN_REBOOT_TIMEOUT, "CMD> ");
+		}
+
+		ao_rn_send_cmd(AO_RN_VERSION_CMD, NULL);
+		(void) ao_rn_wait_status();
 
 		/* Check to see if the name is already set and assume
 		 * that the device is ready to go
@@ -417,7 +420,9 @@ ao_rn(void)
 		status = ao_rn_get_name(name, sizeof (name));
 		if (status != AO_RN_OK) {
 			ao_rn_dbg("get name failed\n");
-			continue;
+			status = ao_rn_get_name(name, sizeof (name));
+			if (status != AO_RN_OK)
+				continue;
 		}
 
 		if (strncmp(name, "TeleBT-", 7) == 0) {
@@ -430,6 +435,12 @@ ao_rn(void)
 		ao_rn_send_cmd(AO_RN_SET_COMMAND_PIN, NULL);
 		if (ao_rn_wait_status() != AO_RN_OK) {
 			ao_rn_dbg("set command pin failed\n");
+			continue;
+		}
+
+		ao_rn_send_cmd(AO_RN_SET_STATUS_STRING, AO_RN_STATUS_STRING_ENABLE);
+		if (ao_rn_wait_status() != AO_RN_OK) {
+			ao_rn_dbg("set status string\n");
 			continue;
 		}
 
@@ -465,17 +476,27 @@ ao_rn(void)
 
 	ao_exti_enable(AO_RN_CONNECTED_PORT, AO_RN_CONNECTED_PIN);
 
-#if 1
+#if AO_RN_DEBUG
+
+	/*
+	 * Separate debug code when things aren't working. Just dump
+	 * inbound bluetooth characters to stdout
+	 */
+	for (;;) {
+		int	c;
+
+		ao_arch_block_interrupts();
+		while ((c = _ao_rn_pollchar()) == AO_READ_AGAIN)
+			ao_sleep(&ao_serial_rn_rx_fifo);
+		ao_arch_release_interrupts();
+	}
+#else
 	ao_rn_stdio = ao_add_stdio(_ao_wrap_rn_pollchar,
-				   ao_wrap_rn_putchar,
+				   ao_serial_rn_putchar,
 				   NULL);
 
 	ao_rn_echo(0);
-
 	ao_rn_check_link();
-
-	ao_rn_dbg("RN running\n");
-
 	/*
 	 * Now just hang around and flash the blue LED when we've got
 	 * a connection
@@ -487,26 +508,10 @@ ao_rn(void)
 		ao_arch_release_interrupts();
 		while (ao_rn_connected) {
 			ao_led_for(AO_BT_LED, AO_MS_TO_TICKS(20));
+			if (ao_rn_buf_cnt != 0)
+				ao_wakeup(&ao_stdin_ready);
 			ao_delay(AO_SEC_TO_TICKS(3));
 		}
-	}
-#else
-
-	/*
-	 * Separate debug code when things aren't working. Just dump
-	 * inbound bluetooth characters to stdout
-	 */
-	for (;;) {
-		int	c;
-
-		while (rn_cmd_running)
-			ao_delay(AO_MS_TO_TICKS(1000));
-
-		ao_arch_block_interrupts();
-		while ((c = _ao_wrap_rn_pollchar()) == AO_READ_AGAIN)
-			ao_sleep(&ao_serial_rn_rx_fifo);
-		ao_arch_release_interrupts();
-		putchar(c); flush();
 	}
 #endif
 }
@@ -539,19 +544,39 @@ ao_rn_factory(void)
 	/* Right after power on, poke P3_1 five times to force a
 	 * factory reset
 	 */
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 20; i++) {
 		v = 1-v;
-		ao_delay(AO_MS_TO_TICKS(100));
+		ao_delay(AO_MS_TO_TICKS(50));
 		ao_gpio_set(AO_RN_P3_1_PORT, AO_RN_P3_1_PIN, foo, v);
 		ao_led_toggle(AO_BT_LED);
 	}
 
 	/* And let P3_1 float again */
 	ao_enable_input(AO_RN_P3_1_PORT, AO_RN_P3_1_PIN, AO_EXTI_MODE_PULL_NONE);
+
+	printf("Reboot BT\n"); flush();
+	ao_delay(AO_MS_TO_TICKS(100));
+	ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 0);
+	ao_delay(AO_MS_TO_TICKS(100));
+	ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 1);
 }
+
+#if AO_RN_DEBUG
+static void
+ao_rn_send(void)
+{
+	int	c;
+
+	while ((c = getchar()) != '~')
+		ao_rn_putchar(c);
+}
+#endif
 
 static const struct ao_cmds rn_cmds[] = {
 	{ ao_rn_factory, "F\0Factory reset rn4678" },
+#if AO_RN_DEBUG
+	{ ao_rn_send, "B\0Send data to rn4678. End with ~" },
+#endif
 	{ 0 },
 };
 

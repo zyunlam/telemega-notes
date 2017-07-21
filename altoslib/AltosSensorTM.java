@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.util.concurrent.TimeoutException;
 
@@ -29,18 +29,19 @@ public class AltosSensorTM {
 	public int	drogue;
 	public int	main;
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosSensorTM	sensor_tm = new AltosSensorTM(link);
+			AltosCalData	cal_data = listener.cal_data();
 
 			if (sensor_tm == null)
 				return;
-			state.set_accel(sensor_tm.accel);
-			state.set_pressure(AltosConvert.barometer_to_pressure(sensor_tm.pres));
-			state.set_temperature(AltosConvert.thermometer_to_temperature(sensor_tm.temp));
-			state.set_battery_voltage(AltosConvert.cc_battery_to_voltage(sensor_tm.batt));
-			state.set_apogee_voltage(AltosConvert.cc_ignitor_to_voltage(sensor_tm.drogue));
-			state.set_main_voltage(AltosConvert.cc_ignitor_to_voltage(sensor_tm.main));
+			listener.set_acceleration(cal_data.acceleration((sensor_tm.accel)));
+			listener.set_pressure(AltosConvert.barometer_to_pressure(sensor_tm.pres));
+			listener.set_temperature(AltosConvert.thermometer_to_temperature(sensor_tm.temp));
+			listener.set_battery_voltage(AltosConvert.cc_battery_to_voltage(sensor_tm.batt));
+			listener.set_apogee_voltage(AltosConvert.cc_igniter_to_voltage(sensor_tm.drogue));
+			listener.set_main_voltage(AltosConvert.cc_igniter_to_voltage(sensor_tm.main));
 
 		} catch (TimeoutException te) {
 		}

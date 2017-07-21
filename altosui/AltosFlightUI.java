@@ -23,8 +23,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosVoice		voice;
@@ -36,7 +36,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	JTabbedPane	pane;
 
 	AltosPad	pad;
-	AltosIgnitor	ignitor;
+	AltosIgnitor	igniter;
 	AltosAscent	ascent;
 	AltosDescent	descent;
 	AltosLanded	landed;
@@ -45,7 +45,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	boolean		has_map;
 	boolean		has_companion;
 	boolean		has_state;
-	boolean		has_ignitor;
+	boolean		has_igniter;
 
 	private AltosFlightStatus flightStatus;
 	private AltosInfoTable flightInfo;
@@ -101,7 +101,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		status_update.saved_listener_state = listener_state;
 
 		if (state == null)
-			state = new AltosState();
+			state = new AltosState(new AltosCalData());
 
 		if (state.state() != Altos.ao_flight_startup) {
 			if (!has_state) {
@@ -115,21 +115,20 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 
 		JComponent tab = which_tab(state);
 		if (tab != cur_tab) {
-			if (cur_tab == pane.getSelectedComponent()) {
+			if (cur_tab == pane.getSelectedComponent())
 				pane.setSelectedComponent(tab);
-			}
 			cur_tab = tab;
 		}
 
-		if (ignitor.should_show(state)) {
-			if (!has_ignitor) {
-				pane.add("Ignitor", ignitor);
-				has_ignitor = true;
+		if (igniter.should_show(state)) {
+			if (!has_igniter) {
+				pane.add("Ignitor", igniter);
+				has_igniter = true;
 			}
 		} else {
-			if (has_ignitor) {
-				pane.remove(ignitor);
-				has_ignitor = false;
+			if (has_igniter) {
+				pane.remove(igniter);
+				has_igniter = false;
 			}
 		}
 
@@ -145,7 +144,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 			}
 		}
 
-		if (state.gps != null && state.gps.connected) {
+		if (state.gps != null) {
 			if (!has_map) {
 				pane.add("Site Map", sitemap);
 				has_map = true;
@@ -272,8 +271,8 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		displays.add(pad);
 		pane.add("Status", pad);
 
-		ignitor = new AltosIgnitor();
-		displays.add(ignitor);
+		igniter = new AltosIgnitor();
+		displays.add(igniter);
 		ascent = new AltosAscent();
 		displays.add(ascent);
 		descent = new AltosDescent();

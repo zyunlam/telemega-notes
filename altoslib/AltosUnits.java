@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.text.*;
 
@@ -40,6 +40,10 @@ public abstract class AltosUnits {
 	public abstract double value(double v, boolean imperial_units);
 
 	public abstract double inverse(double v, boolean imperial_units);
+
+	public String string_value(double v, boolean imperial_units) {
+		return new Double(value(v, imperial_units)).toString();
+	}
 
 	public abstract String show_units(boolean imperial_units);
 
@@ -111,6 +115,10 @@ public abstract class AltosUnits {
 
 	public String say_units(double v) {
 		return say_units(v, AltosConvert.imperial_units);
+	}
+
+	public String string_value(double v) {
+		return string_value(v, AltosConvert.imperial_units);
 	}
 
 	/* Parsing functions. Use the first range of the type */

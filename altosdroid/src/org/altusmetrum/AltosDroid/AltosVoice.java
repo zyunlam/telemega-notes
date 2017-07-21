@@ -23,7 +23,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.location.Location;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosVoice {
 
@@ -49,6 +49,7 @@ public class AltosVoice {
 	private Location	last_receiver;
 	private long		last_speak_time;
 	private int		last_flight_tell = TELL_FLIGHT_NONE;
+	private boolean		quiet = false;
 
 	private long now() {
 		return System.currentTimeMillis();
@@ -80,7 +81,8 @@ public class AltosVoice {
 	public synchronized void speak(String s) {
 		if (!tts_enabled) return;
 		last_speak_time = now();
-		tts.speak(s, TextToSpeech.QUEUE_ADD, null);
+		if (!quiet)
+			tts.speak(s, TextToSpeech.QUEUE_ADD, null);
 	}
 
 	public synchronized long time_since_speak() {
@@ -120,6 +122,8 @@ public class AltosVoice {
 
 		if (state == null)
 			return false;
+
+		AltosDebug.debug("tell_pad lag %b ltm %d\n", last_apogee_good, last_tell_mode);
 
 		if (state.apogee_voltage != AltosLib.MISSING)
 			last_apogee_good = tell_gonogo("apogee",
@@ -239,12 +243,12 @@ public class AltosVoice {
 		if (last_flight_tell == TELL_FLIGHT_HEIGHT) {
 			last_flight_tell = TELL_FLIGHT_TRACK;
 			if (from_receiver != null) {
-				speak("bearing %s %d, elevation %d, range %s.",
+				speak("bearing %s %d, elevation %d, distance %s.",
 				      from_receiver.bearing_words(
 					      AltosGreatCircle.BEARING_VOICE),
 				      (int) (from_receiver.bearing + 0.5),
 				      (int) (from_receiver.elevation + 0.5),
-				      AltosConvert.distance.say(from_receiver.range));
+				      AltosConvert.distance.say(from_receiver.distance));
 				return true;
 			}
 		}
@@ -269,7 +273,7 @@ public class AltosVoice {
 		if (direction == null)
 			direction = String.format("Bearing %d", (int) (from_receiver.bearing + 0.5));
 
-		speak("%s, range %s.", direction,
+		speak("%s, distance %s.", direction,
 		      AltosConvert.distance.say_units(from_receiver.distance));
 
 		return true;
@@ -277,7 +281,9 @@ public class AltosVoice {
 
 	public void tell(TelemetryState telem_state, AltosState state,
 			 AltosGreatCircle from_receiver, Location receiver,
-			 AltosDroidTab tab) {
+			 AltosDroidTab tab, boolean quiet) {
+
+		this.quiet = quiet;
 
 		boolean	spoken = false;
 
@@ -288,7 +294,7 @@ public class AltosVoice {
 		int	tell_serial = last_tell_serial;
 
 		if (state != null)
-			tell_serial = state.serial;
+			tell_serial = state.cal_data().serial;
 
 		if (tell_serial != last_tell_serial)
 			reset_last();

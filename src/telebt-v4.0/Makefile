@@ -14,6 +14,7 @@ INC = \
 	ao_product.h \
 	ao_cc1200_CC1200.h \
 	ao_task.h \
+	ao_rn4678.h \
 	stm32f0.h \
 	Makefile
 

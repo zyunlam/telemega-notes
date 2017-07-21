@@ -26,6 +26,7 @@ record_files = \
 
 altoslib_JAVA = \
 	AltosLib.java \
+	AltosCalData.java \
 	AltosCompanion.java \
 	AltosConfigData.java \
 	AltosConfigDataException.java \
@@ -34,7 +35,8 @@ altoslib_JAVA = \
 	AltosCRCException.java \
 	AltosCSV.java \
 	AltosDebug.java \
-	AltosEepromNew.java \
+	AltosEeprom.java \
+	AltosRecordSet.java \
 	AltosEepromRecord.java \
 	AltosEepromRecordFull.java \
 	AltosEepromRecordTiny.java \
@@ -44,7 +46,6 @@ altoslib_JAVA = \
 	AltosEepromRecordGps.java \
 	AltosEepromRecordFireTwo.java \
 	AltosEepromRecordSet.java \
-	AltosEeprom.java \
 	AltosEepromChunk.java \
 	AltosEepromDownload.java \
 	AltosEepromMonitor.java \
@@ -54,11 +55,15 @@ altoslib_JAVA = \
 	AltosFile.java \
 	AltosFlash.java \
 	AltosFlashListener.java \
+	AltosDataListener.java \
+	AltosDataProvider.java \
+	AltosFlightSeries.java \
 	AltosFlightReader.java \
 	AltosFlightStats.java \
 	AltosForce.java \
 	AltosFrequency.java \
 	AltosGPS.java \
+	AltosGPSTimeValue.java \
 	AltosGPSSat.java \
 	AltosGreatCircle.java \
 	AltosHexfile.java \
@@ -82,9 +87,11 @@ altoslib_JAVA = \
 	AltosOrient.java \
 	AltosParse.java \
 	AltosPressure.java \
+	AltosPresTemp.java \
 	AltosPreferences.java \
 	AltosPreferencesBackend.java \
 	AltosProgrammer.java \
+	AltosPyroName.java \
 	AltosReplayReader.java \
 	AltosRomconfig.java \
 	AltosSavedState.java \
@@ -98,8 +105,8 @@ altoslib_JAVA = \
 	AltosSensorMetrum.java \
 	AltosSensorTGPS.java \
 	AltosState.java \
-	AltosStateIterable.java \
-	AltosStateUpdate.java \
+	AltosStateName.java \
+	AltosStringInputStream.java \
 	AltosTelemetry.java \
 	AltosTelemetryConfiguration.java \
 	AltosTelemetryCompanion.java \
@@ -119,6 +126,9 @@ altoslib_JAVA = \
 	AltosTelemetrySensor.java \
 	AltosTelemetrySatellite.java \
 	AltosTelemetryStandard.java \
+	AltosTime.java \
+	AltosTimeSeries.java \
+	AltosTimeValue.java \
 	AltosUnitsListener.java \
 	AltosUnknownProduct.java \
 	AltosMs5607.java \
@@ -135,6 +145,7 @@ altoslib_JAVA = \
 	AltosLocation.java \
 	AltosLatitude.java \
 	AltosLongitude.java \
+	AltosRotationRate.java \
 	AltosPyro.java \
 	AltosWriter.java \
 	AltosQuaternion.java \

@@ -45,7 +45,7 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELEMETRY		3	/* 32 byte ao_telemetry records */
 #define AO_LOG_FORMAT_TELESCIENCE	4	/* 32 byte typed telescience records */
 #define AO_LOG_FORMAT_TELEMEGA_OLD	5	/* 32 byte typed telemega records */
-#define AO_LOG_FORMAT_EASYMINI		6	/* 16-byte MS5607 baro only, 3.0V supply */
+#define AO_LOG_FORMAT_EASYMINI1		6	/* 16-byte MS5607 baro only, 3.0V supply */
 #define AO_LOG_FORMAT_TELEMETRUM	7	/* 16-byte typed telemetrum records */
 #define AO_LOG_FORMAT_TELEMINI2		8	/* 16-byte MS5607 baro only, 3.3V supply, cc1111 SoC */
 #define AO_LOG_FORMAT_TELEGPS		9	/* 32 byte telegps records */
@@ -53,6 +53,7 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_DETHERM		11	/* 16-byte MS5607 baro only, no ADC */
 #define AO_LOG_FORMAT_TELEMINI3		12	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
 #define AO_LOG_FORMAT_TELEFIRETWO	13	/* 32-byte test stand data */
+#define AO_LOG_FORMAT_EASYMINI2		14	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 extern __code uint8_t ao_log_format;
@@ -252,8 +253,8 @@ struct ao_log_mega {
 			int16_t		gyro_y;		/* 20 */
 			int16_t		gyro_z;		/* 22 */
 			int16_t		mag_x;		/* 24 */
-			int16_t		mag_y;		/* 26 */
-			int16_t		mag_z;		/* 28 */
+			int16_t		mag_z;		/* 26 */
+			int16_t		mag_y;		/* 28 */
 			int16_t		accel;		/* 30 */
 		} sensor;	/* 32 */
 		/* AO_LOG_TEMP_VOLT */

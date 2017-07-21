@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.File;
 import java.util.*;
@@ -66,7 +66,7 @@ public class AltosFile extends File {
 		     extension);
 	}
 
-	public AltosFile(AltosState state) {
-		this(state.serial, state.flight, state.receiver_serial, "telem");
+	public AltosFile(AltosCalData cal_data) {
+		this(cal_data.serial, cal_data.flight, cal_data.receiver_serial, "telem");
 	}
 }

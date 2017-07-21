@@ -14,18 +14,14 @@ micropeakdir=$(datadir)/java
 micropeak_JAVA= \
 	MicroPeak.java \
 	MicroData.java \
-	MicroDataPoint.java \
 	MicroDownload.java \
 	MicroExport.java \
 	MicroFile.java \
 	MicroFrame.java \
-	MicroGraph.java \
 	MicroRaw.java \
 	MicroSave.java \
 	MicroSerial.java \
 	MicroSerialLog.java \
-	MicroStats.java \
-	MicroStatsTable.java \
 	MicroFileChooser.java \
 	MicroDeviceDialog.java \
 	MicroUSB.java

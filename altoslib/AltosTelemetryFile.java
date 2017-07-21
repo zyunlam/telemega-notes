@@ -16,82 +16,125 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
-class AltosTelemetryIterator implements Iterator<AltosState> {
-	AltosState			state;
-	Iterator<AltosTelemetry>	telems;
-	AltosTelemetry			next;
-	boolean				seen;
+class AltosTelemetryNullListener extends AltosDataListener {
+	public void set_rssi(int rssi, int status) { }
+	public void set_received_time(long received_time) { }
 
-	public boolean hasNext() {
-		return !seen || telems.hasNext();
+	public void set_acceleration(double accel) { }
+	public void set_pressure(double pa) { }
+	public void set_thrust(double N) { }
+
+	public void set_kalman(double height, double speed, double accel) { }
+
+	public void set_temperature(double deg_c) { }
+	public void set_battery_voltage(double volts) { }
+
+	public void set_apogee_voltage(double volts) { }
+	public void set_main_voltage(double volts) { }
+
+	public void set_gps(AltosGPS gps) { }
+
+	public void set_orient(double orient) { }
+	public void set_gyro(double roll, double pitch, double yaw) { }
+	public void set_accel_ground(double along, double across, double through) { }
+	public void set_accel(double along, double across, double through) { }
+	public void set_mag(double along, double across, double through) { }
+	public void set_pyro_voltage(double volts) { }
+	public void set_igniter_voltage(double[] voltage) { }
+	public void set_pyro_fired(int pyro_mask) { }
+	public void set_companion(AltosCompanion companion) { }
+
+	public boolean cal_data_complete() {
+		/* All telemetry packets */
+		AltosCalData cal_data = cal_data();
+
+		if (cal_data.serial == AltosLib.MISSING)
+			return false;
+
+		if (cal_data.boost_tick == AltosLib.MISSING)
+			return false;
+
+		/*
+		 * TelemetryConfiguration:
+		 *
+		 * device_type, flight, config version, log max,
+		 * flight params, callsign and version
+		 */
+		if (cal_data.device_type == AltosLib.MISSING)
+			return false;
+
+		/*
+		 * TelemetrySensor or TelemetryMegaData:
+		 *
+		 * ground_accel, accel+/-, ground pressure
+		 */
+		if (cal_data.ground_pressure == AltosLib.MISSING)
+			return false;
+
+		/*
+		 * TelemetryLocation
+		 */
+		if (AltosLib.has_gps(cal_data.device_type) && cal_data.gps_pad == null)
+			return false;
+
+		return true;
 	}
 
-	public AltosState next() {
-		if (seen) {
-			AltosState	n = state.clone();
-			AltosTelemetry	t = telems.next();
-
-			t.update_state(n);
-			state = n;
-		}
-		seen = true;
-		return state;
-	}
-
-	public void remove () {
-	}
-
-	public AltosTelemetryIterator(AltosState start, Iterator<AltosTelemetry> telems) {
-		this.state = start;
-		this.telems = telems;
-		this.seen = false;
+	public AltosTelemetryNullListener(AltosCalData cal_data) {
+		super(cal_data);
 	}
 }
 
-public class AltosTelemetryFile extends AltosStateIterable {
+public class AltosTelemetryFile implements AltosRecordSet {
 
 	AltosTelemetryIterable	telems;
-	AltosState		start;
+	AltosCalData		cal_data;
 
 	public void write_comments(PrintStream out) {
 	}
 
 	public void write(PrintStream out) {
-
 	}
 
-	public AltosTelemetryFile(FileInputStream input) {
-		telems = new AltosTelemetryIterable(input);
-		start = new AltosState();
+	/* Construct cal data by walking through the telemetry data until we've found everything available */
+	public AltosCalData cal_data() {
+		if (cal_data == null) {
+			cal_data = new AltosCalData();
+			AltosTelemetryNullListener l = new AltosTelemetryNullListener(cal_data);
 
-		/* Find boost tick */
-		AltosState	state = start.clone();
-
-		for (AltosTelemetry telem : telems) {
-			telem.update_state(state);
-			state.finish_update();
-			if (state.state() != AltosLib.ao_flight_invalid && state.state() >= AltosLib.ao_flight_boost) {
-				start.set_boost_tick(state.tick);
-				break;
+			for (AltosTelemetry telem : telems) {
+				telem.provide_data(l);
+				if (l.cal_data_complete())
+					break;
 			}
 		}
+		return cal_data;
 	}
 
-	public Iterator<AltosState> iterator() {
-		AltosState			state = start.clone();
-		Iterator<AltosTelemetry>  	i = telems.iterator();
+	public void capture_series(AltosDataListener listener) {
+		AltosCalData	cal_data = cal_data();
 
-		while (i.hasNext() && !state.valid()) {
-			AltosTelemetry	t = i.next();
-			t.update_state(state);
-			state.finish_update();
+		cal_data.reset();
+		for (AltosTelemetry telem : telems) {
+			int tick = telem.tick();
+			cal_data.set_tick(tick);
+
+			/* Try to pick up at least one pre-boost value */
+			if (cal_data.time() >= -2)
+				telem.provide_data(listener);
+			if (listener.state == AltosLib.ao_flight_landed)
+				break;
 		}
-		return new AltosTelemetryIterator(state, i);
+		listener.finish();
+	}
+
+	public AltosTelemetryFile(FileInputStream input) throws IOException {
+		telems = new AltosTelemetryIterable(input);
 	}
 }

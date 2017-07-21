@@ -23,8 +23,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.text.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class AltosConfigUI
 	extends AltosUIDialog
@@ -193,46 +193,46 @@ public class AltosConfigUI
 	}
 
 	void set_radio_enable_tool_tip() {
-		if (radio_enable_value.isEnabled())
+		if (radio_enable_value.isVisible())
 			radio_enable_value.setToolTipText("Enable/Disable telemetry and RDF transmissions");
 		else
 			radio_enable_value.setToolTipText("Firmware version does not support disabling radio");
 	}
 
 	void set_rate_tool_tip() {
-		if (rate_value.isEnabled())
+		if (rate_value.isVisible())
 			rate_value.setToolTipText("Select telemetry baud rate");
 		else
 			rate_value.setToolTipText("Firmware version does not support variable telemetry rates");
 	}
 
 	void set_aprs_interval_tool_tip() {
-		if (aprs_interval_value.isEnabled())
+		if (aprs_interval_value.isVisible())
 			aprs_interval_value.setToolTipText("Enable APRS and set the interval between APRS reports");
 		else
 			aprs_interval_value.setToolTipText("Hardware doesn't support APRS");
 	}
 
 	void set_aprs_ssid_tool_tip() {
-		if (aprs_ssid_value.isEnabled())
+		if (aprs_ssid_value.isVisible())
 			aprs_ssid_value.setToolTipText("Set the APRS SSID (secondary station identifier)");
-		else if (aprs_ssid_value.isEnabled())
+		else if (aprs_ssid_value.isVisible())
 			aprs_ssid_value.setToolTipText("Software version doesn't support setting the APRS SSID");
 		else
 			aprs_ssid_value.setToolTipText("Hardware doesn't support APRS");
 	}
 
 	void set_aprs_format_tool_tip() {
-		if (aprs_format_value.isEnabled())
+		if (aprs_format_value.isVisible())
 			aprs_format_value.setToolTipText("Set the APRS format (compressed/uncompressed)");
-		else if (aprs_format_value.isEnabled())
+		else if (aprs_format_value.isVisible())
 			aprs_format_value.setToolTipText("Software version doesn't support setting the APRS format");
 		else
 			aprs_format_value.setToolTipText("Hardware doesn't support APRS");
 	}
 
 	void set_flight_log_max_tool_tip() {
-		if (flight_log_max_value.isEnabled())
+		if (flight_log_max_value.isVisible())
 			flight_log_max_value.setToolTipText("Size reserved for each flight log (in kB)");
 		else {
 			if (is_telemini_v1())
@@ -243,14 +243,14 @@ public class AltosConfigUI
 	}
 
 	void set_ignite_mode_tool_tip() {
-		if (ignite_mode_value.isEnabled())
+		if (ignite_mode_value.isVisible())
 			ignite_mode_value.setToolTipText("Select when igniters will be fired");
 		else
 			ignite_mode_value.setToolTipText("Older firmware could not select ignite mode");
 	}
 
 	void set_pad_orientation_tool_tip() {
-		if (pad_orientation_value.isEnabled())
+		if (pad_orientation_value.isVisible())
 			pad_orientation_value.setToolTipText("How will the computer be mounted in the airframe");
 		else {
 			if (is_telemetrum())
@@ -263,7 +263,7 @@ public class AltosConfigUI
 	}
 
 	void set_beep_tool_tip() {
-		if (beep_value.isEnabled())
+		if (beep_value.isVisible())
 			beep_value.setToolTipText("What frequency the beeper will sound at");
 		else
 			beep_value.setToolTipText("Older firmware could not select beeper frequency");
@@ -959,12 +959,10 @@ public class AltosConfigUI
 	}
 
 	public void set_main_deploy(int new_main_deploy) {
-		main_deploy_value.setSelectedItem(AltosConvert.height.say(new_main_deploy));
-		main_deploy_value.setEnabled(new_main_deploy >= 0);
-
-		main_deploy_value.setVisible(new_main_deploy >= 0);
-		main_deploy_label.setVisible(new_main_deploy >= 0);
-
+		if (new_main_deploy != AltosLib.MISSING)
+			main_deploy_value.setSelectedItem(AltosConvert.height.say(new_main_deploy));
+		main_deploy_value.setVisible(new_main_deploy != AltosLib.MISSING);
+		main_deploy_label.setVisible(new_main_deploy != AltosLib.MISSING);
 	}
 
 	public int main_deploy() throws AltosConfigDataException {
@@ -1008,7 +1006,7 @@ public class AltosConfigUI
 		} catch (ParseException pe) {
 		}
 
-		if (tracker_motion_value.isEnabled()) {
+		if (tracker_motion_value.isVisible()) {
 			String motion = tracker_motion_value.getSelectedItem().toString();
 			tracker_motion_label.setText(get_tracker_motion_label());
 			set_tracker_motion_values();
@@ -1024,11 +1022,10 @@ public class AltosConfigUI
 	}
 
 	public void set_apogee_delay(int new_apogee_delay) {
-		apogee_delay_value.setVisible(new_apogee_delay >= 0);
-		apogee_delay_label.setVisible(new_apogee_delay >= 0);
-
-		apogee_delay_value.setSelectedItem(Integer.toString(new_apogee_delay));
-		apogee_delay_value.setEnabled(new_apogee_delay >= 0);
+		if (new_apogee_delay != AltosLib.MISSING)
+			apogee_delay_value.setSelectedItem(Integer.toString(new_apogee_delay));
+		apogee_delay_value.setVisible(new_apogee_delay != AltosLib.MISSING);
+		apogee_delay_label.setVisible(new_apogee_delay != AltosLib.MISSING);
 	}
 
 	private int parse_int(String name, String s, boolean split) throws AltosConfigDataException {
@@ -1047,11 +1044,11 @@ public class AltosConfigUI
 	}
 
 	public void set_apogee_lockout(int new_apogee_lockout) {
-		apogee_lockout_value.setSelectedItem(Integer.toString(new_apogee_lockout));
-		apogee_lockout_value.setEnabled(new_apogee_lockout >= 0);
+		if (new_apogee_lockout != AltosLib.MISSING)
+			apogee_lockout_value.setSelectedItem(Integer.toString(new_apogee_lockout));
 
-		apogee_lockout_value.setVisible(new_apogee_lockout >= 0);
-		apogee_lockout_label.setVisible(new_apogee_lockout >= 0);
+		apogee_lockout_value.setVisible(new_apogee_lockout != AltosLib.MISSING);
+		apogee_lockout_label.setVisible(new_apogee_lockout != AltosLib.MISSING);
 	}
 
 	public int apogee_lockout() throws AltosConfigDataException {
@@ -1059,8 +1056,10 @@ public class AltosConfigUI
 	}
 
 	public void set_radio_frequency(double new_radio_frequency) {
-		radio_frequency_label.setVisible(new_radio_frequency >= 0);
-		radio_frequency_value.set_frequency(new_radio_frequency);
+		if (new_radio_frequency != AltosLib.MISSING)
+			radio_frequency_value.set_frequency(new_radio_frequency);
+		radio_frequency_label.setVisible(new_radio_frequency != AltosLib.MISSING);
+		radio_frequency_value.setVisible(new_radio_frequency != AltosLib.MISSING);
 	}
 
 	public double radio_frequency() {
@@ -1068,40 +1067,33 @@ public class AltosConfigUI
 	}
 
 	public void set_radio_calibration(int new_radio_calibration) {
-		radio_calibration_value.setVisible(new_radio_calibration >= 0);
-		radio_calibration_label.setVisible(new_radio_calibration >= 0);
-
-		if (new_radio_calibration < 0)
-			radio_calibration_value.setText("Disabled");
-		else
+		if (new_radio_calibration != AltosLib.MISSING)
 			radio_calibration_value.setText(String.format("%d", new_radio_calibration));
+		radio_calibration_value.setVisible(new_radio_calibration != AltosLib.MISSING);
+		radio_calibration_label.setVisible(new_radio_calibration != AltosLib.MISSING);
 	}
 
 	public void set_radio_enable(int new_radio_enable) {
-		radio_enable_label.setVisible(new_radio_enable >= 0);
-		radio_enable_value.setVisible(new_radio_enable >= 0);
-
-		if (new_radio_enable >= 0) {
-			radio_enable_value.setSelected(new_radio_enable > 0);
-			radio_enable_value.setEnabled(true);
-		} else {
-			radio_enable_value.setSelected(true);
-			radio_enable_value.setEnabled(false);
-		}
+		if (new_radio_enable != AltosLib.MISSING)
+			radio_enable_value.setSelected(new_radio_enable != 0);
+		radio_enable_label.setVisible(new_radio_enable != AltosLib.MISSING);
+		radio_enable_value.setVisible(new_radio_enable != AltosLib.MISSING);
 		set_radio_enable_tool_tip();
 	}
 
 	public int radio_enable() {
-		if (radio_enable_value.isEnabled())
+		if (radio_enable_value.isVisible())
 			return radio_enable_value.isSelected() ? 1 : 0;
 		else
-			return -1;
+			return AltosLib.MISSING;
 	}
 
 	public void set_telemetry_rate(int new_rate) {
-		rate_label.setVisible(new_rate >= 0);
-
-		rate_value.set_rate(new_rate);
+		if (new_rate != AltosLib.MISSING)
+			rate_value.set_rate(new_rate);
+		rate_label.setVisible(new_rate != AltosLib.MISSING);
+		rate_value.setVisible(new_rate != AltosLib.MISSING);
+		set_rate_tool_tip();
 	}
 
 	public int telemetry_rate() {
@@ -1109,14 +1101,16 @@ public class AltosConfigUI
 	}
 
 	public void set_callsign(String new_callsign) {
+		if (new_callsign != null)
+			callsign_value.setText(new_callsign);
 		callsign_value.setVisible(new_callsign != null);
 		callsign_label.setVisible(new_callsign != null);
-
-		callsign_value.setText(new_callsign);
 	}
 
 	public String callsign() {
-		return callsign_value.getText();
+		if (callsign_value.isVisible())
+			return callsign_value.getText();
+		return null;
 	}
 
 	int	flight_log_max_limit;
@@ -1133,11 +1127,12 @@ public class AltosConfigUI
 	}
 
 	public void set_flight_log_max(int new_flight_log_max) {
-		flight_log_max_value.setVisible(new_flight_log_max >= 0);
-		flight_log_max_label.setVisible(new_flight_log_max >= 0);
-
-		flight_log_max_value.setSelectedItem(flight_log_max_label(new_flight_log_max));
-		flight_log_max = new_flight_log_max;
+		if (new_flight_log_max != AltosLib.MISSING) {
+			flight_log_max_value.setSelectedItem(flight_log_max_label(new_flight_log_max));
+			flight_log_max = new_flight_log_max;
+		}
+		flight_log_max_value.setVisible(new_flight_log_max != AltosLib.MISSING);
+		flight_log_max_label.setVisible(new_flight_log_max != AltosLib.MISSING);
 		set_flight_log_max_tool_tip();
 	}
 
@@ -1147,84 +1142,92 @@ public class AltosConfigUI
 	}
 
 	public int flight_log_max() throws AltosConfigDataException {
-		return parse_int("flight log max", flight_log_max_value.getSelectedItem().toString(), true);
+		if (flight_log_max_value.isVisible())
+			return parse_int("flight log max", flight_log_max_value.getSelectedItem().toString(), true);
+		return AltosLib.MISSING;
 	}
 
 	public void set_flight_log_max_limit(int new_flight_log_max_limit) {
 		flight_log_max_limit = new_flight_log_max_limit;
-		flight_log_max_value.removeAllItems();
-		for (int i = 8; i >= 1; i--) {
-			int	size = flight_log_max_limit / i;
-			flight_log_max_value.addItem(String.format("%d (%d flights)", size, i));
+		if (new_flight_log_max_limit != AltosLib.MISSING) {
+			flight_log_max_value.removeAllItems();
+			for (int i = 8; i >= 1; i--) {
+				int	size = flight_log_max_limit / i;
+				flight_log_max_value.addItem(String.format("%d (%d flights)", size, i));
+			}
 		}
 		if (flight_log_max != 0)
 			set_flight_log_max(flight_log_max);
 	}
 
 	public void set_ignite_mode(int new_ignite_mode) {
-		ignite_mode_value.setVisible(new_ignite_mode >= 0);
-		ignite_mode_label.setVisible(new_ignite_mode >= 0);
-
-		if (new_ignite_mode >= ignite_mode_values.length)
-			new_ignite_mode = 0;
-		if (new_ignite_mode < 0) {
-			ignite_mode_value.setEnabled(false);
-			new_ignite_mode = 0;
-		} else {
-			ignite_mode_value.setEnabled(true);
+		if (new_ignite_mode != AltosLib.MISSING) {
+			if (new_ignite_mode >= ignite_mode_values.length)
+				new_ignite_mode = 0;
+			if (new_ignite_mode < 0) {
+				ignite_mode_value.setEnabled(false);
+				new_ignite_mode = 0;
+			} else {
+				ignite_mode_value.setEnabled(true);
+			}
+			ignite_mode_value.setSelectedIndex(new_ignite_mode);
 		}
-		ignite_mode_value.setSelectedIndex(new_ignite_mode);
+		ignite_mode_value.setVisible(new_ignite_mode != AltosLib.MISSING);
+		ignite_mode_label.setVisible(new_ignite_mode != AltosLib.MISSING);
+
 		set_ignite_mode_tool_tip();
 	}
 
 	public int ignite_mode() {
-		if (ignite_mode_value.isEnabled())
+		if (ignite_mode_value.isVisible())
 			return ignite_mode_value.getSelectedIndex();
 		else
-			return -1;
+			return AltosLib.MISSING;
 	}
 
 
 	public void set_pad_orientation(int new_pad_orientation) {
-		pad_orientation_value.setVisible(new_pad_orientation >= 0);
-		pad_orientation_label.setVisible(new_pad_orientation >= 0);
+		if (new_pad_orientation != AltosLib.MISSING) {
+			if (new_pad_orientation >= pad_orientation_values.length)
+				new_pad_orientation = 0;
+			if (new_pad_orientation < 0)
+				new_pad_orientation = 0;
+			pad_orientation_value.setSelectedIndex(new_pad_orientation);
+		}
+		pad_orientation_value.setVisible(new_pad_orientation != AltosLib.MISSING);
+		pad_orientation_label.setVisible(new_pad_orientation != AltosLib.MISSING);
 
-		if (new_pad_orientation >= pad_orientation_values.length)
-			new_pad_orientation = 0;
-		if (new_pad_orientation < 0)
-			new_pad_orientation = 0;
-		pad_orientation_value.setSelectedIndex(new_pad_orientation);
 		set_pad_orientation_tool_tip();
 	}
 
 	public int pad_orientation() {
-		if (pad_orientation_value.isEnabled())
+		if (pad_orientation_value.isVisible())
 			return pad_orientation_value.getSelectedIndex();
 		else
-			return -1;
+			return AltosLib.MISSING;
 	}
 
 	public void set_beep(int new_beep) {
-		beep_value.setVisible(new_beep >= 0);
-		beep_label.setVisible(new_beep >= 0);
-
-		int new_freq = (int) Math.floor (AltosConvert.beep_value_to_freq(new_beep) + 0.5);
-		for (int i = 0; i < beep_values.length; i++)
-			if (new_beep == AltosConvert.beep_freq_to_value(Integer.parseInt(beep_values[i]))) {
-				beep_value.setSelectedIndex(i);
-				set_beep_tool_tip();
-				return;
-			}
-		beep_value.setSelectedItem(String.format("%d", new_freq));
-		beep_value.setEnabled(new_beep >= 0);
+		if (new_beep != AltosLib.MISSING) {
+			int new_freq = (int) Math.floor (AltosConvert.beep_value_to_freq(new_beep) + 0.5);
+			for (int i = 0; i < beep_values.length; i++)
+				if (new_beep == AltosConvert.beep_freq_to_value(Integer.parseInt(beep_values[i]))) {
+					beep_value.setSelectedIndex(i);
+					set_beep_tool_tip();
+					return;
+				}
+			beep_value.setSelectedItem(String.format("%d", new_freq));
+		}
+		beep_value.setVisible(new_beep != AltosLib.MISSING);
+		beep_label.setVisible(new_beep != AltosLib.MISSING);
 		set_beep_tool_tip();
 	}
 
 	public int beep() {
-		if (beep_value.isEnabled())
+		if (beep_value.isVisible())
 			return AltosConvert.beep_freq_to_value(Integer.parseInt(beep_value.getSelectedItem().toString()));
 		else
-			return -1;
+			return AltosLib.MISSING;
 	}
 
 	String[] tracker_motion_values() {
@@ -1248,58 +1251,53 @@ public class AltosConfigUI
 	}
 
 	void set_tracker_tool_tip() {
-		if (tracker_motion_value.isEnabled())
+		if (tracker_motion_value.isVisible())
 			tracker_motion_value.setToolTipText("How far the device must move before logging");
 		else
 			tracker_motion_value.setToolTipText("This device doesn't disable logging when stationary");
-		if (tracker_interval_value.isEnabled())
+		if (tracker_interval_value.isVisible())
 			tracker_interval_value.setToolTipText("How often to report GPS position");
 		else
 			tracker_interval_value.setToolTipText("This device can't configure interval");
 	}
 
 	public void set_tracker_motion(int tracker_motion) {
-		tracker_motion_label.setVisible(tracker_motion >= 0);
-		tracker_motion_value.setVisible(tracker_motion >= 0);
-
-		if (tracker_motion < 0) {
-			tracker_motion_value.setEnabled(false);
-		} else {
-			tracker_motion_value.setEnabled(true);
+		if (tracker_motion != AltosLib.MISSING)
 			tracker_motion_value.setSelectedItem(AltosConvert.height.say(tracker_motion));
-		}
+		tracker_motion_label.setVisible(tracker_motion != AltosLib.MISSING);
+		tracker_motion_value.setVisible(tracker_motion != AltosLib.MISSING);
 	}
 
 	public int tracker_motion() throws AltosConfigDataException {
-		String str = tracker_motion_value.getSelectedItem().toString();
-		try {
-			return (int) (AltosConvert.height.parse_locale(str) + 0.5);
-		} catch (ParseException pe) {
-			throw new AltosConfigDataException("invalid tracker motion %s", str);
+		if (tracker_motion_value.isVisible()) {
+			String str = tracker_motion_value.getSelectedItem().toString();
+			try {
+				return (int) (AltosConvert.height.parse_locale(str) + 0.5);
+			} catch (ParseException pe) {
+				throw new AltosConfigDataException("invalid tracker motion %s", str);
+			}
 		}
+		return AltosLib.MISSING;
 	}
 
 	public void set_tracker_interval(int tracker_interval) {
-		tracker_interval_label.setVisible(tracker_interval >= 0);
-		tracker_interval_value.setVisible(tracker_interval >= 0);
-
-		if (tracker_interval< 0) {
-			tracker_interval_value.setEnabled(false);
-		} else {
-			tracker_interval_value.setEnabled(true);
+		if (tracker_interval != AltosLib.MISSING)
 			tracker_interval_value.setSelectedItem(String.format("%d", tracker_interval));
-		}
+		tracker_interval_label.setVisible(tracker_interval != AltosLib.MISSING);
+		tracker_interval_value.setVisible(tracker_interval != AltosLib.MISSING);
 	}
 
 	public int tracker_interval() throws AltosConfigDataException {
-		return parse_int ("tracker interval", tracker_interval_value.getSelectedItem().toString(), false);
+		if (tracker_interval_value.isVisible())
+			return parse_int ("tracker interval", tracker_interval_value.getSelectedItem().toString(), false);
+		return AltosLib.MISSING;
 	}
 
 	public void set_pyros(AltosPyro[] new_pyros) {
 		pyros = new_pyros;
-		pyro.setVisible(pyros != null);
 		if (pyros != null && pyro_ui != null)
 			pyro_ui.set_pyros(pyros);
+		pyro.setVisible(pyros != null);
 	}
 
 	public AltosPyro[] pyros() throws AltosConfigDataException {
@@ -1310,9 +1308,9 @@ public class AltosConfigUI
 
 	public void set_pyro_firing_time(double new_pyro_firing_time) {
 		pyro_firing_time = new_pyro_firing_time;
-		pyro.setVisible(pyro_firing_time >= 0);
-		if (pyro_firing_time >= 0 && pyro_ui != null)
+		if (pyro_firing_time != AltosLib.MISSING && pyro_ui != null)
 			pyro_ui.set_pyro_firing_time(pyro_firing_time);
+		pyro.setVisible(pyro_firing_time != AltosLib.MISSING);
 	}
 
 	public double pyro_firing_time() throws AltosConfigDataException {
@@ -1322,49 +1320,49 @@ public class AltosConfigUI
 	}
 
 	public void set_aprs_interval(int new_aprs_interval) {
-		aprs_interval_value.setVisible(new_aprs_interval >= 0);
-		aprs_interval_label.setVisible(new_aprs_interval >= 0);
-
-		String	s;
-
-		if (new_aprs_interval <= 0)
-			s = "Disabled";
-		else
-			s = Integer.toString(new_aprs_interval);
-		aprs_interval_value.setSelectedItem(s);
+		if (new_aprs_interval != AltosLib.MISSING)
+			aprs_interval_value.setSelectedItem(Integer.toString(new_aprs_interval));
+		aprs_interval_value.setVisible(new_aprs_interval != AltosLib.MISSING);
+		aprs_interval_label.setVisible(new_aprs_interval != AltosLib.MISSING);
 		set_aprs_interval_tool_tip();
 	}
 
 	public int aprs_interval() throws AltosConfigDataException {
-		String	s = aprs_interval_value.getSelectedItem().toString();
+		if (aprs_interval_value.isVisible()) {
+			String	s = aprs_interval_value.getSelectedItem().toString();
 
-		if (s.equals("Disabled"))
-			return 0;
-		return parse_int("aprs interval", s, false);
+			return parse_int("aprs interval", s, false);
+		}
+		return AltosLib.MISSING;
 	}
 
 	public void set_aprs_ssid(int new_aprs_ssid) {
-		aprs_ssid_value.setVisible(new_aprs_ssid >= 0);
-		aprs_ssid_label.setVisible(new_aprs_ssid >= 0);
-
-		aprs_ssid_value.setSelectedItem(Math.max(0,new_aprs_ssid));
+		if (new_aprs_ssid != AltosLib.MISSING)
+			aprs_ssid_value.setSelectedItem(new_aprs_ssid);
+		aprs_ssid_value.setVisible(new_aprs_ssid != AltosLib.MISSING);
+		aprs_ssid_label.setVisible(new_aprs_ssid != AltosLib.MISSING);
 		set_aprs_ssid_tool_tip();
 	}
 
 	public int aprs_ssid() throws AltosConfigDataException {
-		Integer i = (Integer) aprs_ssid_value.getSelectedItem();
-		return i;
+		if (aprs_ssid_value.isVisible()) {
+			Integer i = (Integer) aprs_ssid_value.getSelectedItem();
+			return i;
+		}
+		return AltosLib.MISSING;
 	}
 
 	public void set_aprs_format(int new_aprs_format) {
-		aprs_format_value.setVisible(new_aprs_format >= 0);
-		aprs_format_label.setVisible(new_aprs_format >= 0);
-
-		aprs_format_value.setSelectedIndex(Math.max(0,new_aprs_format));
+		if (new_aprs_format != AltosLib.MISSING)
+			aprs_format_value.setSelectedIndex(new_aprs_format);
+		aprs_format_value.setVisible(new_aprs_format != AltosLib.MISSING);
+		aprs_format_label.setVisible(new_aprs_format != AltosLib.MISSING);
 		set_aprs_format_tool_tip();
 	}
 
 	public int aprs_format() throws AltosConfigDataException {
-		return aprs_format_value.getSelectedIndex();
+		if (aprs_format_value.isVisible())
+			return aprs_format_value.getSelectedIndex();
+		return AltosLib.MISSING;
 	}
 }

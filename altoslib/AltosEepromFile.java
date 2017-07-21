@@ -16,19 +16,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class AltosEepromFile extends AltosStateIterable {
+public class AltosEepromFile implements AltosRecordSet {
 
 	AltosEepromRecordSet	set;
-
-	public AltosConfigData config_data() {
-		return set.eeprom.config_data();
-	}
 
 	public void write_comments(PrintStream out) {
 	}
@@ -37,11 +33,19 @@ public class AltosEepromFile extends AltosStateIterable {
 		out.printf("%s\n", set.eeprom.toString());
 	}
 
-	public AltosEepromFile(Reader input) throws IOException {
+	public AltosEepromFile(InputStream input) throws IOException {
 		set = new AltosEepromRecordSet(input);
 	}
 
-	public Iterator<AltosState> iterator() {
-		return set.iterator();
+	public AltosConfigData config_data() {
+		return set.config_data();
+	}
+
+	public AltosCalData cal_data() {
+		return set.cal_data();
+	}
+
+	public void capture_series(AltosDataListener series) {
+		set.capture_series(series);
 	}
 }

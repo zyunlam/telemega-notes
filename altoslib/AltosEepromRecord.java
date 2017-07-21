@@ -12,12 +12,11 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_11;
-
+package org.altusmetrum.altoslib_12;
 
 public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord> {
 
-	AltosEepromNew		eeprom;
+	AltosEeprom		eeprom;
 
 	int			wide_tick;
 
@@ -65,30 +64,44 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		return 1;
 	}
 
+	public AltosConfigData config_data() {
+		return eeprom.config_data();
+	}
+
 	public int compareTo(AltosEepromRecord o) {
 		int	cmd_diff = cmdi() - o.cmdi();
 
 		if (cmd_diff != 0)
 			return cmd_diff;
 
-		int	tick_diff = tick() - o.tick();
+		int	tick_diff = wide_tick - o.wide_tick;
 
 		if (tick_diff != 0)
 			return tick_diff;
 		return start - o.start;
 	}
 
-	public void update_state(AltosState state) {
+	/* AltosDataProvider */
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		cal_data.set_tick(tick());
 		if (cmd() == AltosLib.AO_LOG_FLIGHT)
-			state.set_boost_tick(tick());
-		else
-			state.set_tick(tick());
+			cal_data.set_boost_tick();
+		listener.set_time(cal_data.time());
+
+		/* Flush any pending GPS changes */
+		if (!AltosLib.is_gps_cmd(cmd())) {
+			AltosGPS gps = cal_data.temp_gps();
+			if (gps != null) {
+				listener.set_gps(gps);
+				cal_data.reset_temp_gps();
+			}
+		}
 	}
 
 	public int next_start() {
 		int	s = start + length;
 
-		while (s + length < eeprom.data.size()) {
+		while (s + length <= eeprom.data.size()) {
 			if (valid(s))
 				return s;
 			s += length;
@@ -102,7 +115,7 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 
 	public abstract AltosEepromRecord next();
 
-	public AltosEepromRecord(AltosEepromNew eeprom, int start, int length) {
+	public AltosEepromRecord(AltosEeprom eeprom, int start, int length) {
 		this.eeprom = eeprom;
 		this.start = start;
 		this.length = length;

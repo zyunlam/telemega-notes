@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public class AltosEepromRecordMini extends AltosEepromRecord {
 	public static final int	record_length = 16;
@@ -42,8 +42,10 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 
 	private double battery_voltage(int sensor) {
 		int log_format = log_format();
-		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI)
-			return AltosConvert.easy_mini_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI1)
+			return AltosConvert.easy_mini_1_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI2)
+			return AltosConvert.easy_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI2)
 			return AltosConvert.tele_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI3)
@@ -53,8 +55,10 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 
 	private double pyro_voltage(int sensor) {
 		int log_format = log_format();
-		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI)
-			return AltosConvert.easy_mini_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI1)
+			return AltosConvert.easy_mini_1_voltage(sensor, eeprom.config_data().serial);
+		if (log_format == AltosLib.AO_LOG_FORMAT_EASYMINI2)
+			return AltosConvert.easy_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI2)
 			return AltosConvert.tele_mini_2_voltage(sensor);
 		if (log_format == AltosLib.AO_LOG_FORMAT_TELEMINI3)
@@ -62,22 +66,24 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 		return -1;
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		super.provide_data(listener, cal_data);
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:
-			state.set_flight(flight());
-			state.set_ground_pressure(ground_pres());
+			cal_data.set_flight(flight());
+			cal_data.set_ground_pressure(ground_pres());
 			break;
 		case AltosLib.AO_LOG_STATE:
-			state.set_state(state());
+			listener.set_state(state());
 			break;
 		case AltosLib.AO_LOG_SENSOR:
-			state.set_ms5607(pres(), temp());
-			state.set_apogee_voltage(pyro_voltage(sense_a()));
-			state.set_main_voltage(pyro_voltage(sense_m()));
-			state.set_battery_voltage(battery_voltage(v_batt()));
+			AltosPresTemp pt = eeprom.config_data().ms5607().pres_temp(pres(), temp());
+			listener.set_pressure(pt.pres);
+			listener.set_temperature(pt.temp);
+			listener.set_apogee_voltage(pyro_voltage(sense_a()));
+			listener.set_main_voltage(pyro_voltage(sense_m()));
+			listener.set_battery_voltage(battery_voltage(v_batt()));
 			break;
 		}
 	}
@@ -89,11 +95,11 @@ public class AltosEepromRecordMini extends AltosEepromRecord {
 		return new AltosEepromRecordMini(eeprom, s);
 	}
 
-	public AltosEepromRecordMini(AltosEepromNew eeprom, int start) {
+	public AltosEepromRecordMini(AltosEeprom eeprom, int start) {
 		super(eeprom, start, record_length);
 	}
 
-	public AltosEepromRecordMini(AltosEepromNew eeprom) {
+	public AltosEepromRecordMini(AltosEeprom eeprom) {
 		this(eeprom, 0);
 	}
 }

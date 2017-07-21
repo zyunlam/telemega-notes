@@ -16,40 +16,139 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /*
  * Open an existing telemetry file and replay it in realtime
  */
 
+class AltosReplay extends AltosDataListener implements Runnable {
+
+	AltosState	state;
+	AltosRecordSet	record_set;
+	double		last_time = AltosLib.MISSING;
+	Semaphore	semaphore = new Semaphore(1);;
+	boolean		done = false;
+
+	public void set_time(double time) {
+		if (last_time != AltosLib.MISSING) {
+			semaphore.release();
+			double	delay = Math.min(time - last_time,10);
+			if (delay > 0) {
+				try {
+					Thread.sleep((int) (delay * 1000));
+				} catch (InterruptedException ie) {
+				}
+			}
+		}
+		last_time = time;
+		super.set_time(time);
+		state.set_time(time);
+	}
+
+	public void set_state(int state) {
+		super.set_state(state);
+		this.state.set_state(state);
+	}
+
+	public void set_rssi(int rssi, int status) { state.set_rssi(rssi, status); }
+	public void set_received_time(long received_time) { }
+
+	public void set_acceleration(double accel) { state.set_acceleration(accel); }
+	public void set_pressure(double pa) { state.set_pressure(pa); }
+	public void set_thrust(double N) { state.set_thrust(N); }
+
+	public void set_kalman(double height, double speed, double accel) { state.set_kalman(height, speed, accel); }
+
+	public void set_temperature(double deg_c) { state.set_temperature(deg_c); }
+	public void set_battery_voltage(double volts) { state.set_battery_voltage(volts); }
+
+	public void set_apogee_voltage(double volts) { state.set_apogee_voltage(volts); }
+	public void set_main_voltage(double volts) { state.set_main_voltage(volts); }
+
+	public void set_gps(AltosGPS gps) { state.set_gps(gps); }
+
+	public void set_orient(double orient) { state.set_orient(orient); }
+	public void set_gyro(double roll, double pitch, double yaw) { state.set_gyro(roll, pitch, yaw); }
+	public void set_accel_ground(double along, double across, double through) { state.set_accel_ground(along, across, through); }
+	public void set_accel(double along, double across, double through) { state.set_accel(along, across, through); }
+	public void set_mag(double along, double across, double through) { state.set_mag(along, across, through); }
+	public void set_pyro_voltage(double volts) { state.set_pyro_voltage(volts); }
+	public void set_igniter_voltage(double[] voltage) { state.set_igniter_voltage(voltage); }
+	public void set_pyro_fired(int pyro_mask) { state.set_pyro_fired(pyro_mask); }
+	public void set_companion(AltosCompanion companion) { state.set_companion(companion); }
+
+	public void run () {
+		/* Run the flight */
+		record_set.capture_series(this);
+		/* All done, signal that it's over */
+		done = true;
+		semaphore.release();
+	}
+
+	public AltosReplay(AltosRecordSet record_set) {
+		super(record_set.cal_data());
+		state = new AltosState(record_set.cal_data());
+		this.record_set = record_set;
+		try {
+			semaphore.acquire();
+		} catch (InterruptedException ie) {
+		}
+	}
+}
+
 public class AltosReplayReader extends AltosFlightReader {
-	Iterator<AltosState>	iterator;
-	File	file;
+	File		file;
+	AltosReplay	replay;
+	Thread		t;
+	int		reads;
+
+	public AltosCalData cal_data() {
+		return replay.state.cal_data();
+	}
 
 	public AltosState read() {
-		if (iterator.hasNext())
-			return iterator.next();
-		return null;
+		switch (reads) {
+		case 0:
+			/* Tell the display that we're in pad mode */
+			replay.state.set_state(AltosLib.ao_flight_pad);
+			break;
+		case 1:
+			t = new Thread(replay);
+			t.start();
+			/* fall through */
+		default:
+			/* Wait for something to change */
+			try {
+				replay.semaphore.acquire();
+			} catch (InterruptedException ie) {
+			}
+			break;
+		}
+		reads++;
+
+		/* When done, let the display know */
+		if (replay.done)
+			return null;
+
+		/* Fake out the received time */
+		replay.state.set_received_time(System.currentTimeMillis());
+		return replay.state;
 	}
 
 	public void close (boolean interrupted) {
 	}
 
-	public void update(AltosState state) throws InterruptedException {
-		/* Make it run in realtime after the rocket leaves the pad */
-		if (state.state() > AltosLib.ao_flight_pad && state.time_change > 0)
-			Thread.sleep((int) (Math.min(state.time_change,10) * 1000));
-		state.set_received_time(System.currentTimeMillis());
-	}
-
 	public File backing_file() { return file; }
 
-	public AltosReplayReader(Iterator<AltosState> in_iterator, File in_file) {
-		iterator = in_iterator;
+	public AltosReplayReader(AltosRecordSet record_set, File in_file) {
+		reads = 0;
 		file = in_file;
 		name = file.getName();
+		replay = new AltosReplay(record_set);
 	}
 }

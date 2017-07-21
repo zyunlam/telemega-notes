@@ -12,47 +12,45 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
 
-public class AltosEepromRecordSet implements Iterable<AltosState> {
-	AltosEepromNew			eeprom;
+public class AltosEepromRecordSet implements AltosRecordSet {
+	AltosEeprom			eeprom;
 	TreeSet<AltosEepromRecord>	ordered;
-	AltosState			start_state;
+	AltosCalData			cal_data;
 
-	class RecordIterator implements Iterator<AltosState> {
-		Iterator<AltosEepromRecord> riterator;
-		AltosState state;
-		boolean started;
+	public AltosConfigData config_data() {
+		return eeprom.config_data();
+	}
 
-		public boolean hasNext() {
-			return state == null || riterator.hasNext();
-		}
-
-		public AltosState next() {
-			if (state == null)
-				state = start_state.clone();
-			else {
-				state = state.clone();
-				AltosEepromRecord	r = riterator.next();
-				r.update_state(state);
+	public AltosCalData cal_data() {
+		if (cal_data == null) {
+			cal_data = new AltosCalData(config_data());
+			for (AltosEepromRecord record : ordered) {
+				if (record.cmd() == AltosLib.AO_LOG_FLIGHT) {
+					cal_data.set_tick(record.tick());
+					cal_data.set_boost_tick();
+					break;
+				}
 			}
-			return state;
 		}
-
-		public RecordIterator() {
-			riterator = ordered.iterator();
-			state = null;
-		}
+		return cal_data;
 	}
 
-	public Iterator<AltosState> iterator() {
-		return new RecordIterator();
+	public void capture_series(AltosDataListener listener) {
+		AltosCalData	cal_data = cal_data();
+
+		cal_data.reset();
+		for (AltosEepromRecord record : ordered) {
+			record.provide_data(listener, cal_data);
+		}
+		listener.finish();
 	}
 
-	public AltosEepromRecordSet(AltosEepromNew eeprom) {
+	public AltosEepromRecordSet(AltosEeprom eeprom) {
 		this.eeprom = eeprom;
 
 		AltosConfigData 	config_data = eeprom.config_data();
@@ -77,7 +75,8 @@ public class AltosEepromRecordSet implements Iterable<AltosState> {
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMINI2:
 		case AltosLib.AO_LOG_FORMAT_TELEMINI3:
-		case AltosLib.AO_LOG_FORMAT_EASYMINI:
+		case AltosLib.AO_LOG_FORMAT_EASYMINI1:
+		case AltosLib.AO_LOG_FORMAT_EASYMINI2:
 			record = new AltosEepromRecordMini(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEGPS:
@@ -95,9 +94,6 @@ public class AltosEepromRecordSet implements Iterable<AltosState> {
 		ordered = new TreeSet<AltosEepromRecord>();
 		int	tick = 0;
 		boolean first = true;
-
-		start_state = new AltosState();
-		start_state.set_config_data(record.eeprom.config_data());
 
 		for (;;) {
 			int	t = record.tick();
@@ -118,7 +114,7 @@ public class AltosEepromRecordSet implements Iterable<AltosState> {
 		}
 	}
 
-	public AltosEepromRecordSet(Reader input) throws IOException {
-		this(new AltosEepromNew(input));
+	public AltosEepromRecordSet(InputStream input) throws IOException {
+		this(new AltosEeprom(input));
 	}
 }

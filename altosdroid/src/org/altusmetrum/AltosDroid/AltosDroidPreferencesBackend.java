@@ -25,7 +25,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.*;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	public final static String        NAME    = "org.altusmetrum.AltosDroid";
@@ -77,7 +77,17 @@ public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	}
 
 	public String getString(String key, String def) {
-		return prefs.getString(key, def);
+		String	ret;
+		ret = prefs.getString(key, def);
+//		AltosDebug.debug("AltosDroidPreferencesBackend get string %s:\n", key);
+//		if (ret == null)
+//			AltosDebug.debug("      (null)\n");
+//		else {
+//			String[] lines = ret.split("\n");
+//			for (String l : lines)
+//				AltosDebug.debug("        %s\n", l);
+//		}
+		return ret;
 	}
 
 	public byte[] getBytes(String key, byte[] def) {
@@ -103,6 +113,10 @@ public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	}
 
 	public void putString(String key, String value) {
+//		AltosDebug.debug("AltosDroidPreferencesBackend put string %s:\n", key);
+//		String[] lines = value.split("\n");
+//		for (String l : lines)
+//			AltosDebug.debug("        %s\n", l);
 		editor.putString(key, value);
 	}
 

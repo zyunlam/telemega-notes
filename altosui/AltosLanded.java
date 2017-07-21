@@ -22,8 +22,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 
@@ -123,18 +123,17 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 			if (file != null) {
 				String	filename = file.getName();
 				try {
-					AltosStateIterable states = null;
+					AltosRecordSet record_set = null;
+					FileInputStream in = new FileInputStream(file);
 					if (filename.endsWith("eeprom")) {
-						FileReader in = new FileReader(file);
-						states = new AltosEepromFile(in);
+						record_set = new AltosEepromRecordSet(in);
 					} else if (filename.endsWith("telem")) {
-						FileInputStream in = new FileInputStream(file);
-						states = new AltosTelemetryFile(in);
+						record_set = new AltosTelemetryFile(in);
 					} else {
 						throw new FileNotFoundException(filename);
 					}
 					try {
-						new AltosGraphUI(states, file);
+						new AltosGraphUI(record_set, file);
 					} catch (InterruptedException ie) {
 					} catch (IOException ie) {
 					}

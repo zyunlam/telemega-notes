@@ -195,7 +195,7 @@ ao_usart_set_speed(struct ao_stm_usart *usart, uint8_t speed)
 }
 
 static void
-ao_usart_init(struct ao_stm_usart *usart)
+ao_usart_init(struct ao_stm_usart *usart, int hw_flow)
 {
 	usart->reg->cr1 = ((0 << STM_USART_CR1_OVER8) |
 			  (1 << STM_USART_CR1_UE) |
@@ -236,6 +236,10 @@ ao_usart_init(struct ao_stm_usart *usart)
 			  (0 << STM_USART_CR3_IREN) |
 			  (0 << STM_USART_CR3_EIE));
 
+	if (hw_flow)
+		usart->reg->cr3 |= ((1 << STM_USART_CR3_CTSE) |
+				    (1 << STM_USART_CR3_RTSE));
+
 	/* Pick a 9600 baud rate */
 	ao_usart_set_speed(usart, AO_SERIAL_SPEED_9600);
 }
@@ -244,8 +248,6 @@ ao_usart_init(struct ao_stm_usart *usart)
 static void
 ao_usart_set_flow(struct ao_stm_usart *usart)
 {
-	usart->reg->cr3 |= ((1 << STM_USART_CR3_CTSE) |
-			    (1 << STM_USART_CR3_RTSE));
 }
 #endif
 
@@ -441,7 +443,7 @@ ao_serial_init(void)
 	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_USART1EN);
 
 	ao_stm_usart1.reg = &stm_usart1;
-	ao_usart_init(&ao_stm_usart1);
+	ao_usart_init(&ao_stm_usart1, 0);
 
 	stm_nvic_set_enable(STM_ISR_USART1_POS);
 	stm_nvic_set_priority(STM_ISR_USART1_POS, AO_STM_NVIC_MED_PRIORITY);
@@ -494,10 +496,7 @@ ao_serial_init(void)
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_USART2EN);
 
 	ao_stm_usart2.reg = &stm_usart2;
-	ao_usart_init(&ao_stm_usart2);
-#if USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW
-	ao_usart_set_flow(&ao_stm_usart2);
-#endif
+	ao_usart_init(&ao_stm_usart2, USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW);
 
 	stm_nvic_set_enable(STM_ISR_USART2_POS);
 	stm_nvic_set_priority(STM_ISR_USART2_POS, AO_STM_NVIC_MED_PRIORITY);
@@ -541,7 +540,7 @@ ao_serial_init(void)
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_USART3EN);
 
 	ao_stm_usart3.reg = &stm_usart3;
-	ao_usart_init(&ao_stm_usart3);
+	ao_usart_init(&ao_stm_usart3, 0);
 
 	stm_nvic_set_enable(STM_ISR_USART3_POS);
 	stm_nvic_set_priority(STM_ISR_USART3_POS, AO_STM_NVIC_MED_PRIORITY);

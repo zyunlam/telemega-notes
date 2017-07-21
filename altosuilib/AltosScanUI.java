@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,7 +26,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 class AltosScanResult {
 	String		callsign;
@@ -213,10 +213,11 @@ public class AltosScanUI
 						if (state == null)
 							continue;
 						packet_count++;
-						if (state.flight != AltosLib.MISSING) {
-							final AltosScanResult	result = new AltosScanResult(state.callsign,
-													     state.serial,
-													     state.flight,
+						AltosCalData	cal_data = state.cal_data();
+						if (cal_data.flight != AltosLib.MISSING) {
+							final AltosScanResult	result = new AltosScanResult(cal_data.callsign,
+													     cal_data.serial,
+													     cal_data.flight,
 													     frequencies[frequency_index],
 													     telemetry,
 													     rate);

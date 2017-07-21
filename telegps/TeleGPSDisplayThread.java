@@ -22,8 +22,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.io.*;
 import java.text.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class TeleGPSDisplayThread extends Thread {
 
@@ -31,7 +31,9 @@ public class TeleGPSDisplayThread extends Thread {
 	IdleThread		idle_thread;
 	AltosVoice		voice;
 	AltosFlightReader	reader;
-	AltosState		old_state, state;
+	AltosState		state;
+	int			old_state = AltosLib.ao_flight_invalid;
+	boolean			old_gps_ready = false;
 	AltosListenerState	listener_state;
 	AltosFlightDisplay	display;
 
@@ -130,11 +132,12 @@ public class TeleGPSDisplayThread extends Thread {
 		}
 
 		public synchronized void notice(boolean spoken) {
-			if (old_state != null && old_state.state() != state.state()) {
+			if (old_state != state.state()) {
 				report_time = now();
 				this.notify();
 			} else if (spoken)
 				set_report_time();
+			old_state = state.state();
 		}
 
 		public IdleThread() {
@@ -144,17 +147,17 @@ public class TeleGPSDisplayThread extends Thread {
 
 	synchronized boolean tell() {
 		boolean	ret = false;
-		if (old_state == null || old_state.gps_ready != state.gps_ready) {
+		if (old_gps_ready != state.gps_ready) {
 			if (state.gps_ready) {
 				voice.speak("GPS ready");
 				ret = true;
 			}
-			else if (old_state != null) {
+			else if (old_gps_ready) {
 				voice.speak("GPS lost");
 				ret = true;
 			}
+			old_gps_ready = state.gps_ready;
 		}
-		old_state = state;
 		return ret;
 	}
 
@@ -173,7 +176,6 @@ public class TeleGPSDisplayThread extends Thread {
 						listener_state.running = false;
 						break;
 					}
-					reader.update(state);
 					show_safely();
 					told = tell();
 					idle_thread.notice(told);

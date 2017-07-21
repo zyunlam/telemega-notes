@@ -53,7 +53,8 @@ extern uint8_t ao_on_battery;
 #define HAS_SERIAL_1		0
 #define HAS_SERIAL_2		1
 #define USE_SERIAL_2_STDIN	0
-#define HAS_SERIAL_SW_FLOW	0
+#define USE_SERIAL_2_FLOW	0
+#define USE_SERIAL_2_SW_FLOW	0
 #define SERIAL_2_PA2_PA3	1
 #define SERIAL_2_PA14_PA15	0
 #define USE_SERIAL2_FLOW	0

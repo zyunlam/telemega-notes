@@ -20,7 +20,7 @@ package org.altusmetrum.AltosDroid;
 
 import java.util.*;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;

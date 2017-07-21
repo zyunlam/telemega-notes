@@ -22,7 +22,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class MicroFrame extends AltosUIFrame {
 	static String[] micro_icon_names = {
