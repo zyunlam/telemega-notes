@@ -1,10 +1,10 @@
 #!/bin/sh
 
-if [ -x /usr/bin/ao-flash-stm ]; then
-	FLASH_STM=/usr/bin/ao-flash-stm
+if [ -x /usr/bin/dfu-util ]; then
+    DFU_UTIL=/usr/bin/dfu-util
 else
-	echo "Can't find ao-flash-stm!  Aborting."
-	exit 1
+    echo "Can't find dfu-util! Aborting."
+    exit 1
 fi
 
 if [ -x /usr/bin/ao-usbload ]; then
@@ -14,38 +14,52 @@ else
 	exit 1
 fi
 
-VERSION=3.0
+VERSION=4.0
 REPO=~/altusmetrumllc/Binaries
+PRODUCT=TeleBT
 
-echo "TeleBT v$VERSION Turn-On and Calibration Program"
-echo "Copyright 2015 by Bdale Garbee.  Released under GPL v2"
+echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+echo "Copyright 2017 by Bdale Garbee.  Released under GPL v3+"
 echo
 echo "Expectations:"
-echo "\tTeleBT v$VERSION powered from USB"
-echo "\t\twith ST-Link-V2 cabled to debug header"
+echo "\t$PRODUCT v$VERSION attached by USB"
 echo "\t\twith coax from UHF to frequency counter"
 echo
-echo -n "TeleBT-$VERSION serial number: "
-read SERIAL
 
-echo $FLASH_STM
+case $# in
+    1)
+        SERIAL="$1"
+        echo "$PRODUCT-$VERSION serial number: $SERIAL" 
+        ;;
+    0)
+        echo -n "$PRODUCT-$VERSION serial number: "
+        read SERIAL
+        ;;
+    *)
+        echo "Usage: $0 <serial-number>" 1>&2
+        exit 1;
+        ;;
+esac
 
-$FLASH_STM $REPO/loaders/telebt-v$VERSION*.elf || exit 1
+FLASH_FILE=$REPO/loaders/telebt-v$VERSION-altos-flash-*.bin
+ALTOS_FILE=$REPO/telebt-v$VERSION-*.elf
 
-sleep 5
+$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
 
-$USBLOAD --serial=$SERIAL $REPO/telebt-v$VERSION*.elf || exit 1
+sleep 2
 
-sleep 5
+$USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 
-dev=`ao-list | awk '/TeleBT-v'"$VERSION"'/ { print $3; exit(0); }'`
+sleep 3
+
+dev=`ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
 
 case "$dev" in
 /dev/tty*)
-	echo "TeleBT found on $dev"
+	echo "$PRODUCT found on $dev"
 	;;
 *)
-	echo 'No TeleBT-v'"$VERSION"' found'
+	echo 'No '"$PRODUCT"'-v'"$VERSION"' found'
 	exit 1
 	;;
 esac
@@ -65,6 +79,15 @@ else
 	exit 1
 fi
 
-echo "TeleBT-v$VERSION $SERIAL is ready to ship"
+echo -n "checking BTLE functionality... "
+btdev=`sudo timeout -s SIGINT 5s hcitool lescan | awk -F \- '/TeleBT/ { print $2 }'`
+if [ "$btdev" = "$SERIAL" ]; then
+	echo "working!"
+else
+	echo "device not found"
+	exit 1
+fi
+
+echo "$PRODUCT-v$VERSION $SERIAL is ready to ship"
 
 exit $?
