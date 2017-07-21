@@ -24,10 +24,14 @@ WINDOWS_SRC=\
 WINDOWS_H=\
 	libaltos.h
 
-noinst_PROGRAMS=cjnitest
+noinst_PROGRAMS=cjnitest btletest
 
 cjnitest_SOURCES=cjnitest.c
 cjnitest_LDADD=libaltos.la
+
+btletest_SOURCES=btletest.c
+
+btletest_LDADD=-lbluetooth
 
 if MULTI_ARCH
 altoslib_LTLIBRARIES+=libaltos32.la libaltos64.la
