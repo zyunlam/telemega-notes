@@ -55,18 +55,18 @@ ALTOS_SRC = \
 	ao_pad.c \
 	ao_radio_cmac_cmd.c \
 	ao_log.c \
-	ao_log_firetwo.c
+	ao_log_fireone.c
 
 PRODUCT_SRC = \
-	ao_telefiretwo.c
+	ao_telefireone.c
 
-PRODUCT=TeleFireTwo-v1.0
-PRODUCT_DEF=-DTELEFIRETWO_V_1_0
+PRODUCT=TeleFireOne-v1.0
+PRODUCT_DEF=-DTELEFIREONE_V_1_0
 IDPRODUCT=0x000f
 
 CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) -Os -g
 
-PROGNAME = telefiretwo-v1.0
+PROGNAME = telefireone-v1.0
 PROG = $(PROGNAME)-$(VERSION).elf
 HEX = $(PROGNAME)-$(VERSION).ihx
 
