@@ -53,11 +53,14 @@ public class AltosFlightStats {
 	double landed_time(AltosFlightSeries series) {
 		double	landed_state_time = AltosLib.MISSING;
 
+		double	prev_state_time = AltosLib.MISSING;
 		if (series.state_series != null) {
 			for (AltosTimeValue state : series.state_series) {
 				if (state.value == AltosLib.ao_flight_landed) {
 					landed_state_time = state.time;
 					break;
+				} else {
+					prev_state_time = state.time;
 				}
 			}
 		}
@@ -95,7 +98,7 @@ public class AltosFlightStats {
 			}
 		}
 
-		if (landed_time == AltosLib.MISSING)
+		if (landed_time == AltosLib.MISSING || (prev_state_time != AltosLib.MISSING && landed_time < prev_state_time))
 			landed_time = landed_state_time;
 		return landed_time;
 	}
