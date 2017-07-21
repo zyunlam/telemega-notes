@@ -46,7 +46,7 @@
 
 int ao_gps_new;
 
-#if !defined(TELEMEGA) && !defined(TELEMETRUM_V2)
+#if !defined(TELEMEGA) && !defined(TELEMETRUM_V2) && !defined(EASYMINI)
 #define TELEMETRUM_V1 1
 #endif
 
@@ -84,6 +84,18 @@ struct ao_adc {
 };
 #endif
 
+#if EASYMINI
+#define AO_ADC_NUM_SENSE	2
+#define HAS_MS5607		1
+#define HAS_BEEP		1
+#define AO_CONFIG_MAX_SIZE	1024
+
+struct ao_adc {
+	int16_t			sense_a;
+	int16_t			sense_m;
+	int16_t			v_batt;
+};
+#endif
 
 #if TELEMETRUM_V1
 /*
@@ -323,7 +335,7 @@ struct ao_cmds {
 #define ao_xmemcmp(d,s,c) memcmp(d,s,c)
 
 #define AO_NEED_ALTITUDE_TO_PRES 1
-#if TELEMEGA || TELEMETRUM_V2
+#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
 #include "ao_convert_pa.c"
 #include <ao_ms5607.h>
 struct ao_ms5607_prom	ao_ms5607_prom;
@@ -475,7 +487,7 @@ ao_insert(void)
 #else
 		double	accel = 0.0;
 #endif
-#if TELEMEGA || TELEMETRUM_V2
+#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
 		double	height;
 
 		ao_ms5607_convert(&ao_data_static.ms5607_raw, &ao_data_static.ms5607_cooked);
@@ -670,6 +682,19 @@ int32(uint8_t *bytes, int off)
 	return (int32_t) uint32(bytes, off);
 }
 
+uint32_t
+uint24(uint8_t *bytes, int off)
+{
+	return (uint32_t) bytes[off] | (((uint32_t) bytes[off+1]) << 8) |
+		(((uint32_t) bytes[off+2]) << 16);
+}
+
+int32_t
+int24(uint8_t *bytes, int off)
+{
+	return (int32_t) uint24(bytes, off);
+}
+
 static int log_format;
 
 void
@@ -694,12 +719,14 @@ ao_sleep(void *wchan)
 		for (;;) {
 			if (ao_records_read > 2 && ao_flight_state == ao_flight_startup)
 			{
+
 #if TELEMEGA
 				ao_data_static.mpu6000 = ao_ground_mpu6000;
 #endif
 #if TELEMETRUM_V1
 				ao_data_static.adc.accel = ao_flight_ground_accel;
 #endif
+
 				ao_insert();
 				return;
 			}
@@ -827,6 +854,72 @@ ao_sleep(void *wchan)
 						*((int16_t *) ((char *) pyro + ao_pyro_values[j].offset)) = val;
 					}
 				}
+			}
+#endif
+#if EASYMINI
+			if ((log_format == AO_LOG_FORMAT_EASYMINI1 || log_format == AO_LOG_FORMAT_EASYMINI2) && nword == 14 && strlen(words[0]) == 1) {
+				int	i;
+				struct ao_ms5607_value	value;
+
+				type = words[0][0];
+				tick = strtoul(words[1], NULL, 16);
+//				printf ("%c %04x", type, tick);
+				for (i = 2; i < nword; i++) {
+					bytes[i - 2] = strtoul(words[i], NULL, 16);
+//					printf(" %02x", bytes[i-2]);
+				}
+//				printf ("\n");
+				switch (type) {
+				case 'F':
+					ao_flight_started = 1;
+					ao_ground_pres = uint32(bytes, 4);
+					ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
+#if 0
+					printf("ground pres %d height %d\n", ao_ground_pres, ao_ground_height);
+					printf("sens %d off %d tcs %d tco %d tref %d tempsens %d crc %d\n",
+					       ao_ms5607_prom.sens,
+					       ao_ms5607_prom.off,
+					       ao_ms5607_prom.tcs,
+					       ao_ms5607_prom.tco,
+					       ao_ms5607_prom.tref,
+					       ao_ms5607_prom.tempsens,
+					       ao_ms5607_prom.crc);
+#endif
+					break;
+				case 'A':
+					ao_data_static.tick = tick;
+					ao_data_static.ms5607_raw.pres = int24(bytes, 0);
+					ao_data_static.ms5607_raw.temp = int24(bytes, 3);
+#if 0
+					printf("raw pres %d temp %d\n",
+					       ao_data_static.ms5607_raw.pres,
+					       ao_data_static.ms5607_raw.temp);
+#endif
+					ao_ms5607_convert(&ao_data_static.ms5607_raw, &value);
+//					printf("pres %d height %d\n", value.pres, ao_pa_to_altitude(value.pres));
+					ao_records_read++;
+					ao_insert();
+					return;
+				}
+				continue;
+			} else if (nword == 3 && strcmp(words[0], "ms5607") == 0) {
+				if (strcmp(words[1], "reserved:") == 0)
+					ao_ms5607_prom.reserved = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "sens:") == 0)
+					ao_ms5607_prom.sens = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "off:") == 0)
+					ao_ms5607_prom.off = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tcs:") == 0)
+					ao_ms5607_prom.tcs = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tco:") == 0)
+					ao_ms5607_prom.tco = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tref:") == 0)
+					ao_ms5607_prom.tref = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "tempsens:") == 0)
+					ao_ms5607_prom.tempsens = strtoul(words[2], NULL, 10);
+				else if (strcmp(words[1], "crc:") == 0)
+					ao_ms5607_prom.crc = strtoul(words[2], NULL, 10);
+				continue;
 			}
 #endif
 #if TELEMETRUM_V2
@@ -1007,7 +1100,7 @@ ao_sleep(void *wchan)
 			if (type != 'F' && !ao_flight_started)
 				continue;
 
-#if TELEMEGA || TELEMETRUM_V2
+#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
 			(void) a;
 			(void) b;
 #else
