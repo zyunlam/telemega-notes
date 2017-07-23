@@ -30,7 +30,7 @@
 #include "../aes/ao_aes_tables.c"
 #include "../aes/ao_aes.c"
 
-static uint8_t key[16];
+static uint8_t my_key[64];
 static uint8_t text[16];
 static uint8_t cbc[16];
 
@@ -41,7 +41,7 @@ main (int argc, char **argv)
 
 	ao_aes_init();
 	ao_aes_set_mode(ao_aes_mode_cbc_mac);
-	ao_aes_set_key(key);
+	ao_aes_set_key(my_key);
 	ao_aes_zero_iv();
 	ao_aes_run(text, cbc);
 
