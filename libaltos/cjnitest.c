@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include "libaltos.h"
+#include <string.h>
+
+#define HAS_BLUETOOTH 	1
+#define HAS_USB		1
 
 static void
 altos_puts(struct altos_file *file, char *string)
@@ -19,6 +23,7 @@ main (int argc, char **argv)
 	struct altos_bt_list	*bt_list;
 
 	altos_init();
+#if HAS_USB
 	list = altos_list_start();
 	while (altos_list_next(list, &device)) {
 		struct altos_file	*file;
@@ -42,6 +47,7 @@ main (int argc, char **argv)
 		altos_close(file);
 	}
 	altos_list_finish(list);
+#endif
 #if HAS_BLUETOOTH
 	bt_list = altos_bt_list_start(8);
 	while (altos_bt_list_next(bt_list, &bt_device)) {
