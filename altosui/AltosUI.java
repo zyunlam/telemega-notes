@@ -520,11 +520,12 @@ public class AltosUI extends AltosUIFrame {
 			System.out.printf("Main rate:   %6.0f m/s  %6.0f ft/s\n",
 					  stats.state_speed[Altos.ao_flight_main],
 					  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_main]));
-		if (stats.state_end[Altos.ao_flight_main] != AltosLib.MISSING &&
-		    stats.state_start[Altos.ao_flight_boost] != AltosLib.MISSING)
+		if (stats.landed_time != AltosLib.MISSING &&
+		    stats.boost_time != AltosLib.MISSING &&
+		    stats.landed_time > stats.boost_time)
 			System.out.printf("Flight time: %6.0f s\n",
-					  stats.state_end[Altos.ao_flight_main] -
-					  stats.state_start[Altos.ao_flight_boost]);
+					  stats.landed_time -
+					  stats.boost_time);
 		System.out.printf("\n");
 		return true;
 	}
