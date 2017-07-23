@@ -30,7 +30,7 @@ public class AltosConfigPyroUI
 	extends AltosUIDialog
 	implements ItemListener, DocumentListener, AltosUnitsListener, ActionListener
 {
-	AltosConfigUI	owner;
+	AltosConfigFCUI	owner;
 	Container	pane;
 
 	static Insets il = new Insets(4,4,4,4);
@@ -347,9 +347,9 @@ public class AltosConfigPyroUI
 	/* A window listener to catch closing events and tell the config code */
 	class ConfigListener extends WindowAdapter {
 		AltosConfigPyroUI	ui;
-		AltosConfigUI		owner;
+		AltosConfigFCUI		owner;
 
-		public ConfigListener(AltosConfigPyroUI this_ui, AltosConfigUI this_owner) {
+		public ConfigListener(AltosConfigPyroUI this_ui, AltosConfigFCUI this_owner) {
 			ui = this_ui;
 			owner = this_owner;
 		}
@@ -367,7 +367,7 @@ public class AltosConfigPyroUI
 			setVisible(false);
 	}
 
-	public AltosConfigPyroUI(AltosConfigUI in_owner, AltosPyro[] pyros, double pyro_firing_time) {
+	public AltosConfigPyroUI(AltosConfigFCUI in_owner, AltosPyro[] pyros, double pyro_firing_time) {
 
 		super(in_owner, "Configure Pyro Channels", false);
 

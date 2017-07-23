@@ -14,8 +14,8 @@ altosui_JAVA = \
 	AltosAscent.java \
 	AltosChannelMenu.java \
 	AltosCompanionInfo.java \
-	AltosConfig.java \
-	AltosConfigUI.java \
+	AltosConfigFC.java \
+	AltosConfigFCUI.java \
 	AltosConfigPyroUI.java \
 	AltosConfigureUI.java \
 	AltosConfigTD.java \

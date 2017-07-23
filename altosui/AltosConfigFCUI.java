@@ -26,7 +26,7 @@ import java.text.*;
 import org.altusmetrum.altoslib_12.*;
 import org.altusmetrum.altosuilib_12.*;
 
-public class AltosConfigUI
+public class AltosConfigFCUI
 	extends AltosUIDialog
 	implements ActionListener, ItemListener, DocumentListener, AltosConfigValues, AltosUnitsListener
 {
@@ -159,9 +159,9 @@ public class AltosConfigUI
 
 	/* A window listener to catch closing events and tell the config code */
 	class ConfigListener extends WindowAdapter {
-		AltosConfigUI	ui;
+		AltosConfigFCUI	ui;
 
-		public ConfigListener(AltosConfigUI this_ui) {
+		public ConfigListener(AltosConfigFCUI this_ui) {
 			ui = this_ui;
 		}
 
@@ -270,7 +270,7 @@ public class AltosConfigUI
 	}
 
 	/* Build the UI using a grid bag */
-	public AltosConfigUI(JFrame in_owner, boolean remote) {
+	public AltosConfigFCUI(JFrame in_owner, boolean remote) {
 		super (in_owner, "Configure Flight Computer", false);
 
 		owner = in_owner;

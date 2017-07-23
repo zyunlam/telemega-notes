@@ -276,7 +276,7 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	void ConfigureTeleMetrum() {
-		new AltosConfig(AltosUI.this);
+		new AltosConfigFC(AltosUI.this);
 	}
 
 	void ConfigureTeleDongle() {

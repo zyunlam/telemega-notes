@@ -4,8 +4,8 @@ CLASSPATH=classes:./*:/usr/share/java/*
 CLASSFILES=\
 	Altos.class \
 	AltosChannelMenu.class \
-	AltosConfig.class \
-	AltosConfigUI.class \
+	AltosConfigFC.class \
+	AltosConfigFCUI.class \
 	AltosConvert.class \
 	AltosCRCException.class \
 	AltosCSV.class \

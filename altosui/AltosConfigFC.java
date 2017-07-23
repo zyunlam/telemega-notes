@@ -26,7 +26,7 @@ import java.text.*;
 import org.altusmetrum.altoslib_12.*;
 import org.altusmetrum.altosuilib_12.*;
 
-public class AltosConfig implements ActionListener {
+public class AltosConfigFC implements ActionListener {
 
 	class int_ref {
 		int	value;
@@ -62,7 +62,7 @@ public class AltosConfig implements ActionListener {
 	boolean		remote;
 
 	AltosConfigData	data;
-	AltosConfigUI	config_ui;
+	AltosConfigFCUI	config_ui;
 	boolean		serial_started;
 	boolean		made_visible;
 
@@ -96,7 +96,7 @@ public class AltosConfig implements ActionListener {
 	final static int	serial_mode_reboot = 2;
 
 	class SerialData implements Runnable {
-		AltosConfig	config;
+		AltosConfigFC	config;
 		int		serial_mode;
 
 		void callback(String in_cmd) {
@@ -182,7 +182,7 @@ public class AltosConfig implements ActionListener {
 			}
 		}
 
-		public SerialData(AltosConfig in_config, int in_serial_mode) {
+		public SerialData(AltosConfigFC in_config, int in_serial_mode) {
 			config = in_config;
 			serial_mode = in_serial_mode;
 		}
@@ -195,7 +195,7 @@ public class AltosConfig implements ActionListener {
 	}
 
 	void init_ui () throws InterruptedException, TimeoutException {
-		config_ui = new AltosConfigUI(owner, remote);
+		config_ui = new AltosConfigFCUI(owner, remote);
 		config_ui.addActionListener(this);
 		serial_line.set_frame(owner);
 		set_ui();
@@ -275,7 +275,7 @@ public class AltosConfig implements ActionListener {
 		}
 	}
 
-	public AltosConfig(JFrame given_owner) {
+	public AltosConfigFC(JFrame given_owner) {
 		owner = given_owner;
 
 		device = AltosDeviceUIDialog.show(owner, Altos.product_any);
