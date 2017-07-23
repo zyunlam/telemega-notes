@@ -34,7 +34,7 @@ int	errors;
 		c = ao_cast64(&ao_r);					\
 		if (c != r) {						\
 			printf ("trial %4d: %lld " #func mod " %lld = %lld (should be %lld)\n", \
-				trial, (int64_t) (a), (int64_t) b, c, r); \
+				trial, (long long) (a), (long long) b, (long long) c, (long long) r); \
 			++errors;					\
 		}							\
 	} while (0)
