@@ -1,3 +1,209 @@
+altos (1.8-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * two more places where telemini-outline.pdf filename needs to be updated
+  * add telemini-v3.0 to list of binaries we stach in LLC repo for production use
+  * telebt-v4.0: initial creation of firmware for new product, no BT yet
+  * telebt-v4.0: add ao_send_packet
+  * telebt-v4.0: don't need the USB pin remapping flag
+  * telebt-v4.0: turn off pin remapping in the flash loader, too
+  * telebt-v4.0: slow down SPI speed to radio chip
+  * telegps-v2.0: slow down radio chip spi speed
+  * telebt-v4.0: make git ignore products of build
+  * ao-tools/ao-makebin: have git ignore built object
+  * telemini-v3.0: make git ignore build products
+  * altos/telebt-v4.0 Set CPU clock to 48Mhz instead of 96Mhz
+  * telegps: use new eeprom reading code
+  * have git ignore ao-bringup/cal_values
+  * telefiretwo: don't try to record pre-burn sensor values in FLIGHT record
+  * initial tests made using Terry's stand with a 2500psi sensor
+  * have AltosGraph use new AltosPressure to get imperial_units working
+  * re-brand current telefiretwo product as telefireone
+  * altoslib: include TimeSeries code in build
+  * add thrust as a graphable time series type
+  * rename existing turnon_telebt script, create a new one for v4.0
+  * clean up telefireone name references
+  * ignore more build products in telebt-v4.0 tree
+  * add TeleBT v4.0 to the list of stuff we build
+  * remove libssl-dev build dependency, only used by test code we don't build
+  * update docinfo file for 1.8 release
+  * releasing 1.8
+
+  [ Keith Packard ]
+  * altos/stmf0: Not all timer configurations use AF2
+  * altos/telemini-v3.0: Fix license
+  * altos/easymini-v2.0: Add EasyMini v2.0
+  * altos: Add telemini-v3.0 and easymini-v2.0 to default altos build
+  * altosui: Ship telemini v3.0 firmware
+  * altos/ao-bringup: Switch turnon_easymini to v2.0
+  * altosui: Add TeleMini v3.0 and EasyMini v2.0 firmware to windows package
+  * Update releasing to add more firmware bits
+  * Ignore ao_lisp_test
+  * altos/telegps-v2.0: git ignore make results
+  * altos/nucleo-32: Add lisp save/restore
+  * ao-bringup: make turnon_telemini search for ao_usbload on $PATH
+  * Fake thrust data as accel for now
+  * micropeak: Add MicroPeak V2 to the download code
+  * altos/ms5607: Allow applications to not use the normal data ring and thread
+  * altos: Adapt micro log to MicroPeak V3
+  * altos: Add 100ms constants for baro Kalman filter
+  * altos: Add header file for ao_report_micro.c
+  * altos/micropeak: Use existing ao_ms5607_current variable
+  * altos/micropeak: Update ao_micropeak.h for MicroPeak v2
+  * altos/stmf0: Compute serial baud rate registers at runtime
+  * altos/stmf0: Make sure systick is off before programming
+  * altos/stmf0: Fix HSI clock rate.
+  * altos/stmf0: Add support for HSI clocked applications
+  * altos/micropeak-v2.0: Add initial MicroPeak v2 support
+  * altos: Build MicroPeak-v2.0 by default
+  * src/kernel: Add GPS lock blink LED to tracker code
+  * altos/kernel: Allow TeleGPS v2 to scale battery in telem
+  * altos/telegps-v2.0: Adjust LED config
+  * altos/telegps-v2.0: Set CPU clock to 48MHz instread of 96MHz
+  * altos/telegps-v2.0: Battery ADC input is on PB1, not PA0
+  * altos/telegps-v2.0: Remove some unneeded defines
+  * altos/telegps-v2.0: GPS chip is connected to serial 2, not serial 1
+  * altos/telegps-v2.0: CC1200 CS is PA1, not PA5.
+  * altos/telegps-v2.0: Reorder initialization sequence
+  * altos/stmf0: Add code to use SoC flash as storage
+  * altos/telegps-v2.0: Disable external serial port to save ROM
+  * altos: Make CDC ACM 'line coding' public
+  * altos: Move 'ao_force_freq' to ao_config.c
+  * altos/telemini-v3.0: Add 'recovery mode' on PA14 (pin 6 on dbg header)
+  * altos/telemini-v3.0: Use dbg connector pin 5 for force bootloader
+  * altoslib: Hide members from json by prefixing with __
+  * altoslib: Add AltosForce and AltosPressure units
+  * altoslib: Add Ms5607 constructor that just takes config_data
+  * altoslib: Add empty constructor for AltosPyro for JSON
+  * altoslib: Add set_config_data to AltosState
+  * altoslib: Add new eeprom management code
+  * altoslib: Compile AltosForce and AltosPressure
+  * altoslib: Hack up AltosEepromFile to support new eeprom code
+  * altosui: Use new eeprom reading code
+  * altoslib: Save eeprom data in new .eeprom format
+  * altoslib: Remove older eeprom handling code
+  * altoslib: Another bit of altoslib for the old eeprom stuff
+  * Use SDP to locate the service channel on Linux
+  * altos: Add RN4678 Bluetooth module driver
+  * altos/telebt-v4.0: Hook up RN4678 module
+  * altoslib: Handle TeleBT v4.0 battery voltage
+  * libaltos: Add support for TeleBT-v4.0 bluetooth channel change
+  * altos/stmf: Fix up serial port flow control configuration bits
+  * altos/ao_rn4678: Send '$$$' for new devices. Fix name setting code.
+  * altoslib: Mark AltosConfigData fields as MISSING until set
+  * altoslib: Set default log format to FULL until we learn different
+  * altoslib: Set default accel cal for old TeleMetrum v1 files
+  * altos/telefireone-v1.0: Fix confusing defines about config storage
+  * ao-bringup: turnon_chaoskey: search for ao-usbload in PATH
+  * altos/telebt-v4.0: Remove HAS_POLLCHAR
+  * altos/telebt-v3.0: Add send_packet command
+  * altoslib: Add initial time series functions
+  * altosuilib: Add time series subclass with data for generating a plot
+  * altoslib: Create new abstraction underneath AltosState for recording values
+  * altosuilib: Start creating new graph interface that takes time series data
+  * altosui: Hacks to plug into the new graph stuff
+  * doc: Add telegps outline
+  * altoslib: Don't store computed telemetry fields
+  * altoslib: Do data analysis on raw values rather than AltosState
+  * altosuilib: Adapt to AltosFlightSeries data processing plan
+  * altosui: Adapt to AltosFlightSeries for data analysis
+  * altoslib/altosuilib/altosui: More work towards using AltosFlightSeries for analysis
+  * altoslib,altosuilib,altosui: Get stats and replay working again.
+  * altoslib: Make AltosReplayReader start synchronously enough to track states
+  * altosui: Remove --cat mode
+  * altoslib: Make sure AltosFlightSeries is filled in before use
+  * altoslib: Get KML export working again
+  * altoslib: Preserve old GPS data during operation
+  * altoslib: Trim stale bits of AltosState
+  * altosui: Remove debug printf.
+  * altoslib: Use cal data temp gps for telemetry data too
+  * altosdroid: Deal with AltosState changes
+  * telegps: Get telegps application working again
+  * altoslib: Change how speed/accel are computed from pressure
+  * altoslib: Allow for other tick sizes
+  * altoslib: Publish boost_time and landed_time from AltosFlightStats
+  * altoslib: Return AltosTimeValue from min/max funcs
+  * altoslib: Provide consistent cal_data from idle and replay readers
+  * altosuilib: Make AltosFlightStatsTable neater
+  * altosuilib: Remove 'cal_data' param from AltosGraphNew constructor
+  * micropeak: Use altoslib/altosuilib flight analysis bits
+  * altoslib: Recover from a couple of API changes
+  * altoslib: Extract a few more values from config to cal_data
+  * altoslib: Create data file open helper in AltosLib
+  * altoslib: Add constants for speed/accel filtering
+  * altoslib: Adjust boost/landed time in flight series for display
+  * altosuilib: Display product/firmware version in stats table
+  * altoslib: Handle eeprom tick wrapping
+  * altoslib: Use first pressure value if no ground pressure available
+  * altoslib: Check for empty gps height series
+  * altoslib: Ignore invalid accel cal values
+  * altoslib: Remove debug printfs
+  * altoslib: AltosFlightSeries ignore missing accel/pressure
+  * altoslib: Clean up gps series logging
+  * altoslib: Only compute state stats for recorded states
+  * altosuilib: Set graph title to include product/serial/flight info
+  * altoslib: Don't record 'pad' state in FlightSeries
+  * altoslib: Reset transient AltosCalData values before processing data
+  * altoslib: When no boost tick is found, just use first tick in file
+  * altoslib: Don't record radio status values in flight series
+  * altoslib: Add status back to AltosFlightSeries for CSV export
+  * altoslib: Check for valid pad alt before computing GPS height series
+  * altoslib,altosuilib: Remove stale source files
+  * altoslib: Compute orientation from eeprom data files
+  * altoslib: Compute 'vertical acceleration' for eeprom files
+  * altoslib, altosuilib, altosui, telegps: Missing config values now MISSING
+  * altos: Update sensor data atomically
+  * altos: HMC5883 output order is X Z Y
+  * altoslib: Adapt to Mag sensor value ordering changes
+  * altoslib: Missing config values now AltosLib.MISSING, not zero or negative
+  * altos: Create separate log format for EasyMini v2.0
+  * altoslib: Handle EasyMini v2.0 ADC values
+  * altoslib: Keep time series in AltosFlightSeries array sorted
+  * altoslib: Fix labels in AltosIMU to match source data
+  * altoslib: Hook up idle monitoring data again
+  * altoslib: Flush igniter fire command
+  * altoslib: Remove unused 'ground_rotation' from AltosState
+  * altosui: Display current altitude in monitor idle Pad tab
+  * altoslib: Initialize new imu/mag values. Remove stale imu/mag objects.
+  * altosui, telegps, altosdroid: say ground distance, not total range
+  * altoslib: Set time for TeleMini v1.0 eeprom analysing
+  * altosuilib: Don't display pad, last location in flight stats without gps
+  * altos: Add timeout to RN4678 status message code
+  * altos/telebt-4.0: Add dependency on RN4678 header
+  * altoslib: Remove old AltosEeprom.java code
+  * altoslib: Rename AltosEepromNew to AltosEeprom
+  * altosuilib: Rename AltosUIGraphNew to AltosUIGraph
+  * altosuilib: Rename AltosGraphNew to AltosGraph
+  * altoslib,altosuilib: Bump library version numbers
+  * altoslib: Make cal_data private in AltosDataListener
+  * altos/rn4678: Add BLE support
+  * altoslib: Clean up quaternion and rotation interfaces
+  * altosdroid: cal_data is no longer public from AltosState
+  * altoslib: Fix comments in AltosQuaternion and AltosRotation
+  * altoslib: Deal with multiple motors in flight stats
+  * altos/stmf0: Initialize UART RTS/CTS before turning it on
+  * altos/telebt-v4.0: Use HW flow control to BT module
+  * Set version to 1.7.1 for TeleBT firmware build
+  * altoslib: fix adjustment of landed time
+  * altos/test: Add EasyMini test mode
+  * libaltos: Add btle test program
+  * altosui: Adapt to flight stats time value changes
+  * altosui: Rename AltosConfig -> AltosConfigFC
+  * altos/test: Fix printf format for int64 arithmetic test
+  * altos/test: Fix AES key format in test code
+  * libaltos: Test both bluetooth and USB APIs with cjnitest
+  * altoslib: Set time in state for KML output correctly
+  * ao-bringup: Allow dfu_util to "fail" while flashing chaoskey
+  * altosui, telegps: Add TeleBT v4.0 firmware to app packages
+  * doc: Add 1.8 release notes
+  * Bump version to 1.8
+  * Note that telebt 4.0 files need to go to altusmetrumllc dir
+
+  [ Miguel Benavidez ]
+  * altoslib: Fix MS5607 raw data to pressure conversion function
+
+ -- Bdale Garbee <bdale@gag.com>  Sat, 12 Aug 2017 01:00:11 -0400
+
 altos (1.7-1) unstable; urgency=medium
 
   [ Keith Packard ]
