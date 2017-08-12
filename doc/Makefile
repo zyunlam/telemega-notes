@@ -3,6 +3,7 @@
 #
 
 RELNOTES_INC=\
+	release-notes-1.8.inc \
 	release-notes-1.7.inc \
 	release-notes-1.6.8.inc \
 	release-notes-1.6.5.inc \
@@ -167,7 +168,8 @@ OUTLINE_TXT_FILES=\
 	telemega-outline.txt \
 	telemetrum-outline.txt \
 	telemini-v1-outline.txt \
-	telemini-v3-outline.txt
+	telemini-v3-outline.txt \
+	telegps-outline.txt
 
 OUTLINE_RAW_FILES=$(OUTLINE_TXT_FILES:.txt=.raw)
 

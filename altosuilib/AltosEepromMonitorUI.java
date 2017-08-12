@@ -16,12 +16,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMonitor {
 	JFrame		owner;
@@ -35,7 +35,6 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 	JLabel		file_value;
 	JButton		cancel;
 	JProgressBar	pbar;
-	int		min_state, max_state;
 	ActionListener	listener;
 
 	static final int	progress_max = 10000;
@@ -138,11 +137,6 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		listener = l;
 	}
 
-	public void set_states(int min_state, int max_state) {
-		this.min_state = min_state;
-		this.max_state = max_state;
-	}
-
 	public void set_thread(Thread in_eeprom_thread) {
 		final Thread eeprom_thread = in_eeprom_thread;
 		cancel.addActionListener(new ActionListener() {
@@ -157,52 +151,30 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		setVisible(true);
 	}
 
-	private void set_value_internal(String state_name, int state, int state_block, int block) {
+	int max_block = 1;
+
+	public void set_block_internal(int block) {
 		double	pos;
 		String	s;
 
-		if (min_state == AltosLib.ao_flight_invalid) {
-			int	lblock = block;
-			if (lblock > 1000)
-				lblock = 1000;
-			pos = lblock / 1000.0;
-			s = String.format("block %d", block);
-		} else {
-			if (state == AltosLib.ao_flight_invalid)
-				state = 0;
-			if (state_block > 100)
-				state_block = 100;
-			if (state < min_state) state = min_state;
-			if (state > max_state) state = max_state;
+		pos = (double) block / (double) max_block;
 
-			if (state == max_state)
-				state_block = 0;
-
-			state -= min_state;
-
-			int	nstate = max_state - min_state;
-
-			double	spos = (double) state / (double) nstate;
-			double	bpos = state_block / 100.0;
-
-			pos = spos + bpos / nstate;
-
-			s = String.format("block %d state %s", block, state_name);
-		}
+		s = String.format("block %d of %d", block, max_block);
 
 		pbar.setString(s);
 		pbar.setValue((int) (pos * progress_max));
 	}
 
-	public void set_value(String in_state_name, int in_state, int in_state_block, int in_block) {
-		final String state_name = in_state_name;
-		final int state = in_state;
-		final int state_block = in_state_block;
+	public void set_max(int max_block) {
+		this.max_block = max_block;
+	}
+
+	public void set_block(int in_block) {
 		final int block = in_block;
 		Runnable r = new Runnable() {
 				public void run() {
 					try {
-						set_value_internal(state_name, state, state_block, block);
+						set_block_internal(block);
 					} catch (Exception ex) {
 					}
 				}
@@ -283,7 +255,8 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 	}
 
 	private void reset_internal() {
-		set_value_internal("startup",min_state,0, 0);
+		set_max(1);
+		set_block_internal(0);
 		set_flight_internal(0);
 		set_filename_internal("");
 	}

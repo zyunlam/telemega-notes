@@ -16,127 +16,36 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
-class AltosEepromIterator implements Iterator<AltosState> {
-	AltosState		state;
-	Iterator<AltosEeprom>	body;
-	AltosEeprom		next;
-	boolean			seen;
+public class AltosEepromFile implements AltosRecordSet {
 
-	public boolean hasNext() {
-		return !seen || body.hasNext();
-	}
-
-	public AltosState next() {
-		if (seen) {
-			AltosState	n = state.clone();
-			AltosEeprom	e = body.next();
-
-			e.update_state(n);
-			state = n;
-		}
-		seen = true;
-		return state;
-	}
-
-	public void remove () {
-	}
-
-	public AltosEepromIterator(AltosState start, Iterator<AltosEeprom> body) {
-		this.state = start;
-		this.body = body;
-		this.seen = false;
-	}
-}
-
-public class AltosEepromFile extends AltosStateIterable {
-
-	AltosEepromIterable	headers;
-	AltosEepromIterable	body;
-	AltosState		start;
+	AltosEepromRecordSet	set;
 
 	public void write_comments(PrintStream out) {
-		headers.write(out);
 	}
 
 	public void write(PrintStream out) {
-		headers.write(out);
-		body.write(out);
+		out.printf("%s\n", set.eeprom.toString());
 	}
 
-	public AltosEepromFile(FileInputStream input) {
-		headers = new AltosEepromIterable(AltosEepromHeader.read(input));
-
-		start = headers.state();
-		if (start.state() != AltosLib.ao_flight_stateless)
-			start.set_state(AltosLib.ao_flight_pad);
-
-		if (start.log_format == AltosLib.MISSING) {
-			if (start.product != null) {
-				if (start.product.startsWith("TeleMetrum"))
-					start.log_format = AltosLib.AO_LOG_FORMAT_FULL;
-				else if (start.product.startsWith("TeleMini"))
-					start.log_format = AltosLib.AO_LOG_FORMAT_TINY;
-			}
-		}
-
-		switch (start.log_format) {
-		case AltosLib.AO_LOG_FORMAT_FULL:
-			body = new AltosEepromIterable(AltosEepromTM.read(input));
-			break;
-		case AltosLib.AO_LOG_FORMAT_TINY:
-			body = new AltosEepromIterable(AltosEepromTMini.read(input));
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
-		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:
-		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
-		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
-			body = new AltosEepromIterable(AltosEepromMega.read(input, start.log_format));
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
-			body = new AltosEepromIterable(AltosEepromMetrum2.read(input));
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMINI2:
-		case AltosLib.AO_LOG_FORMAT_TELEMINI3:
-		case AltosLib.AO_LOG_FORMAT_EASYMINI:
-			body = new AltosEepromIterable(AltosEepromMini.read(input));
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEGPS:
-			body = new AltosEepromIterable(AltosEepromGPS.read(input));
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEFIRETWO:
-			body = new AltosEepromIterable(AltosEepromFireTwo.read(input));
-			break;
-		default:
-			body = new AltosEepromIterable(new LinkedList<AltosEeprom>());
-			break;
-		}
-
-		/* Find boost tick */
-		AltosState	state = start.clone();
-		for (AltosEeprom eeprom : body) {
-			eeprom.update_state(state);
-			state.finish_update();
-			if (state.state() >= AltosLib.ao_flight_boost) {
-				start.set_boost_tick(state.tick);
-				break;
-			}
-		}
+	public AltosEepromFile(InputStream input) throws IOException {
+		set = new AltosEepromRecordSet(input);
 	}
 
-	public Iterator<AltosState> iterator() {
-		AltosState		state = start.clone();
-		Iterator<AltosEeprom>	i = body.iterator();
+	public AltosConfigData config_data() {
+		return set.config_data();
+	}
 
-		while (i.hasNext() && !state.valid()) {
-			i.next().update_state(state);
-			state.finish_update();
-		}
-		return new AltosEepromIterator(state, i);
+	public AltosCalData cal_data() {
+		return set.cal_data();
+	}
+
+	public void capture_series(AltosDataListener series) {
+		set.capture_series(series);
 	}
 }

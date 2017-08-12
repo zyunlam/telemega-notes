@@ -16,16 +16,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public class AltosTelemetrySatellite extends AltosTelemetryStandard {
-	int		channels;
-	AltosGPSSat[]	sats;
+	int		channels() { return uint8(5); }
 
-	public AltosTelemetrySatellite(int[] bytes) {
-		super(bytes);
+	AltosGPSSat[]	sats() {
+		int 		channels = channels();
+		AltosGPSSat[]	sats = null;
 
-		channels = uint8(5);
 		if (channels > 12)
 			channels = 12;
 		if (channels == 0)
@@ -38,14 +37,22 @@ public class AltosTelemetrySatellite extends AltosTelemetryStandard {
 				sats[i] = new AltosGPSSat(svid, c_n_1);
 			}
 		}
+		return sats;
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public AltosTelemetrySatellite(int[] bytes) throws AltosCRCException {
+		super(bytes);
+	}
 
-		AltosGPS	gps = state.make_temp_gps(true);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 
-		gps.cc_gps_sat = sats;
-		state.set_temp_gps();
+		AltosCalData	cal_data = listener.cal_data();
+
+		AltosGPS	gps = cal_data.make_temp_gps(tick(), true);
+
+		gps.cc_gps_sat = sats();
+		listener.set_gps(gps);
+		cal_data.reset_temp_gps();
 	}
 }

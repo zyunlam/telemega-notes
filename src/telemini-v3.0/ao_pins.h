@@ -1,9 +1,10 @@
 /*
- * Copyright © 2013 Keith Packard <keithp@keithp.com>
+ * Copyright © 2017 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -65,6 +66,13 @@
 #define HAS_IGNITE		1
 #define HAS_IGNITE_REPORT	1
 #define AO_SMALL_ALTITUDE_TABLE	1
+
+/* Use debug connector clock for recovery mode */
+#define HAS_FORCE_FREQ		1
+#define AO_RECOVERY_PORT	(&stm_gpioa)
+#define AO_RECOVERY_PIN		14
+#define AO_RECOVERY_VALUE	0
+#define AO_RECOVERY_MODE	AO_EXTI_MODE_PULL_UP
 
 /* Beeper is on Tim1 CH3 */
 #define BEEPER_CHANNEL		4

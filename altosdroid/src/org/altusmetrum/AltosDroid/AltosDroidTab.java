@@ -18,7 +18,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 import android.location.Location;
 import android.app.Activity;
 import android.graphics.Color;

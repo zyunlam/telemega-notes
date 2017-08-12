@@ -16,28 +16,23 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 
 public class AltosTelemetryMetrumData extends AltosTelemetryStandard {
 
-	int	ground_pres;
-	int	ground_accel;
-	int	accel_plus_g;
-	int	accel_minus_g;
+	int	ground_pres() { return int32(8); }
+	int	ground_accel() { return int16(12); }
+	int	accel_plus_g() { return int16(14); }
+	int	accel_minus_g() { return int16(16); }
 
-	public AltosTelemetryMetrumData(int[] bytes) {
+	public AltosTelemetryMetrumData(int[] bytes) throws AltosCRCException {
 		super(bytes);
-
-		ground_pres = int32(8);
-		ground_accel = int16(12);
-		accel_plus_g = int16(14);
-		accel_minus_g = int16(16);
 	}
 
-	public void update_state(AltosState state) {
-		state.set_ground_accel(ground_accel);
-		state.set_accel_g(accel_plus_g, accel_minus_g);
-		state.set_ground_pressure(ground_pres);
+	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
+		cal_data.set_ground_accel(ground_accel());
+		cal_data.set_accel_plus_minus(accel_plus_g(), accel_minus_g());
+		cal_data.set_ground_pressure(ground_pres());
 	}
 }

@@ -22,7 +22,7 @@ import java.util.*;
 import java.text.*;
 
 import android.content.Context;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosDroidPreferences extends AltosPreferences {
 

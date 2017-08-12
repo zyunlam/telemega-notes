@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.util.*;
 import java.io.*;
@@ -37,6 +37,20 @@ public class AltosLib {
 	public static final int AO_LOG_GPS_SAT = 'V';
 	public static final int AO_LOG_GPS_DATE = 'Y';
 	public static final int AO_LOG_PRESSURE = 'P';
+
+	public static boolean is_gps_cmd(int cmd) {
+		switch (cmd) {
+		case AltosLib.AO_LOG_GPS_POS:
+		case AltosLib.AO_LOG_GPS_TIME:
+		case AltosLib.AO_LOG_GPS_LAT:
+		case AltosLib.AO_LOG_GPS_LON:
+		case AltosLib.AO_LOG_GPS_ALT:
+		case AltosLib.AO_LOG_GPS_SAT:
+		case AltosLib.AO_LOG_GPS_DATE:
+			return true;
+		}
+		return false;
+	}
 
 	/* Added for header fields in eeprom files */
 	public static final int AO_LOG_CONFIG_VERSION = 1000;
@@ -160,6 +174,16 @@ public class AltosLib {
 			if (low.startsWith(products[i].name))
 				return products[i].product;
 		return product_any;
+	}
+
+	public static boolean has_9dof(int device_type) {
+		return device_type == product_telemega || device_type == product_easymega;
+	}
+
+	public static boolean has_gps(int device_type) {
+		return device_type == product_telemetrum ||
+			device_type == product_telemega ||
+			device_type == product_telegps;
 	}
 
 	/* Bluetooth "identifier" (bluetooth sucks) */
@@ -330,7 +354,7 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_TELEMETRY = 3;
 	public static final int AO_LOG_FORMAT_TELESCIENCE = 4;
 	public static final int AO_LOG_FORMAT_TELEMEGA_OLD = 5;
-	public static final int AO_LOG_FORMAT_EASYMINI = 6;
+	public static final int AO_LOG_FORMAT_EASYMINI1 = 6;
 	public static final int AO_LOG_FORMAT_TELEMETRUM = 7;
 	public static final int AO_LOG_FORMAT_TELEMINI2 = 8;
 	public static final int AO_LOG_FORMAT_TELEGPS = 9;
@@ -338,6 +362,7 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_DETHERM = 11;
 	public static final int AO_LOG_FORMAT_TELEMINI3 = 12;
 	public static final int AO_LOG_FORMAT_TELEFIRETWO = 13;
+	public static final int AO_LOG_FORMAT_EASYMINI2 = 14;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {
@@ -561,7 +586,31 @@ public class AltosLib {
 		}
 	}
 
-	public static String ignitor_name(int i) {
+	public static String igniter_name(int i) {
 		return String.format("Ignitor %c", 'A' + i);
 	}
+
+	public static AltosRecordSet record_set(File file) throws FileNotFoundException, IOException {
+		FileInputStream in;
+		in = new FileInputStream(file);
+		if (file.getName().endsWith("telem")) {
+			return new AltosTelemetryFile(in);
+		} else if (file.getName().endsWith("eeprom")) {
+			return new AltosEepromFile(in);
+		} else {
+			String	name = file.getName();
+			int	dot = name.lastIndexOf('.');
+			String	extension;
+
+			if (dot == -1)
+				throw new IOException(String.format("%s (Missing extension)", file.toString()));
+			else {
+				extension = name.substring(dot);
+				throw new IOException(String.format("%s (Invalid extension '%s')",
+								    file.toString(),
+								    extension));
+			}
+		}
+	}
+
 }

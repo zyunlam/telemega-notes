@@ -20,11 +20,9 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
-import java.io.*;
-
-public class AltosState implements Cloneable {
+public class AltosState extends AltosDataListener {
 
 	public static final int set_position = 1;
 	public static final int set_gps = 2;
@@ -40,12 +38,8 @@ public class AltosState implements Cloneable {
 
 	public long	received_time;
 
-	public double	time;
-	public double	prev_time;
-	public double	time_change;
-	public int	tick;
-	private int	prev_tick;
-	public int	boost_tick;
+	public int	rssi;
+	public int	status;
 
 	class AltosValue {
 		double	value;
@@ -290,22 +284,9 @@ public class AltosState implements Cloneable {
 		}
 	}
 
-	private int	state;
-	public int	flight;
-	public int	serial;
-	public int	altitude_32;
-	public int	receiver_serial;
 	public boolean	landed;
 	public boolean	ascent;	/* going up? */
 	public boolean	boost;	/* under power */
-	public int	rssi;
-	public int	status;
-	public int	device_type;
-	public int	config_major;
-	public int	config_minor;
-	public int	apogee_delay;
-	public int	main_deploy;
-	public int	flight_log_max;
 
 	private double pressure_to_altitude(double p) {
 		if (p == AltosLib.MISSING)
@@ -448,6 +429,11 @@ public class AltosState implements Cloneable {
 	}
 
 	public void set_altitude(double new_altitude) {
+		double old_altitude = altitude.value();
+		if (old_altitude != AltosLib.MISSING) {
+			while (old_altitude - new_altitude > 32000)
+				new_altitude += 65536.0;
+		}
 		altitude.set_measured(new_altitude, time);
 	}
 
@@ -513,6 +499,9 @@ public class AltosState implements Cloneable {
 
 	public void set_pressure(double p) {
 		pressure.set(p, time);
+	}
+
+	public void set_thrust(double N) {
 	}
 
 	public double baro_height() {
@@ -667,6 +656,11 @@ public class AltosState implements Cloneable {
 	public AltosValue	kalman_height, kalman_speed, kalman_acceleration;
 
 	public void set_kalman(double height, double speed, double acceleration) {
+		double old_height = kalman_height.value();
+		if (old_height != AltosLib.MISSING) {
+			while (old_height - height > 32000)
+				height += 65536;
+		}
 		kalman_height.set(height, time);
 		kalman_speed.set(speed, time);
 		kalman_acceleration.set(acceleration, time);
@@ -678,16 +672,10 @@ public class AltosState implements Cloneable {
 	public double	apogee_voltage;
 	public double	main_voltage;
 
-	public double	ignitor_voltage[];
+	public double	igniter_voltage[];
 
 	public AltosGPS	gps;
-	public AltosGPS	temp_gps;
-	public int temp_gps_sat_tick;
 	public boolean	gps_pending;
-	public int gps_sequence;
-
-	public AltosIMU	imu;
-	public AltosMag	mag;
 
 	public static final int MIN_PAD_SAMPLES = 10;
 
@@ -699,6 +687,7 @@ public class AltosState implements Cloneable {
 
 	public AltosGreatCircle from_pad;
 	public double	elevation;	/* from pad */
+	public double	distance;	/* distance along ground */
 	public double	range;		/* total distance */
 
 	public double	gps_height;
@@ -708,20 +697,7 @@ public class AltosState implements Cloneable {
 	public int	speak_tick;
 	public double	speak_altitude;
 
-	public String	callsign;
-	public String	firmware_version;
-
-	public double	accel_plus_g;
-	public double	accel_minus_g;
-	public double	accel;
 	public double	ground_accel;
-	public double	ground_accel_avg;
-
-	public int	log_format;
-	public int	log_space;
-	public String	product;
-
-	public AltosMs5607	baro;
 
 	public AltosCompanion	companion;
 
@@ -740,23 +716,11 @@ public class AltosState implements Cloneable {
 
 		received_time = System.currentTimeMillis();
 		time = AltosLib.MISSING;
-		time_change = AltosLib.MISSING;
-		prev_time = AltosLib.MISSING;
-		tick = AltosLib.MISSING;
-		prev_tick = AltosLib.MISSING;
-		boost_tick = AltosLib.MISSING;
 		state = AltosLib.ao_flight_invalid;
-		flight = AltosLib.MISSING;
 		landed = false;
 		boost = false;
 		rssi = AltosLib.MISSING;
 		status = 0;
-		device_type = AltosLib.MISSING;
-		config_major = AltosLib.MISSING;
-		config_minor = AltosLib.MISSING;
-		apogee_delay = AltosLib.MISSING;
-		main_deploy = AltosLib.MISSING;
-		flight_log_max = AltosLib.MISSING;
 
 		ground_altitude = new AltosCValue();
 		ground_pressure = new AltosGroundPressure();
@@ -771,43 +735,40 @@ public class AltosState implements Cloneable {
 		pyro_voltage = AltosLib.MISSING;
 		apogee_voltage = AltosLib.MISSING;
 		main_voltage = AltosLib.MISSING;
-		ignitor_voltage = null;
+		igniter_voltage = null;
 
 		kalman_height = new AltosValue();
 		kalman_speed = new AltosValue();
 		kalman_acceleration = new AltosValue();
 
 		gps = null;
-		temp_gps = null;
-		temp_gps_sat_tick = 0;
-		gps_sequence = 0;
 		gps_pending = false;
 
-		imu = null;
 		last_imu_time = AltosLib.MISSING;
 		rotation = null;
-		ground_rotation = null;
-
-		mag = null;
-		accel_zero_along = AltosLib.MISSING;
-		accel_zero_across = AltosLib.MISSING;
-		accel_zero_through = AltosLib.MISSING;
 
 		accel_ground_along = AltosLib.MISSING;
 		accel_ground_across = AltosLib.MISSING;
 		accel_ground_through = AltosLib.MISSING;
 
-		pad_orientation = AltosLib.MISSING;
+		accel_along = AltosLib.MISSING;
+		accel_across = AltosLib.MISSING;
+		accel_through = AltosLib.MISSING;
 
-		gyro_zero_roll = AltosLib.MISSING;
-		gyro_zero_pitch = AltosLib.MISSING;
-		gyro_zero_yaw = AltosLib.MISSING;
+		gyro_roll = AltosLib.MISSING;
+		gyro_pitch = AltosLib.MISSING;
+		gyro_yaw = AltosLib.MISSING;
+
+		mag_along = AltosLib.MISSING;
+		mag_across = AltosLib.MISSING;
+		mag_through = AltosLib.MISSING;
 
 		set_npad(0);
 		ngps = 0;
 
 		from_pad = null;
 		elevation = AltosLib.MISSING;
+		distance = AltosLib.MISSING;
 		range = AltosLib.MISSING;
 		gps_height = AltosLib.MISSING;
 
@@ -825,32 +786,14 @@ public class AltosState implements Cloneable {
 		speak_tick = AltosLib.MISSING;
 		speak_altitude = AltosLib.MISSING;
 
-		callsign = null;
-		firmware_version = null;
-
-		accel_plus_g = AltosLib.MISSING;
-		accel_minus_g = AltosLib.MISSING;
-		accel = AltosLib.MISSING;
-
 		ground_accel = AltosLib.MISSING;
-		ground_accel_avg = AltosLib.MISSING;
 
-		log_format = AltosLib.MISSING;
-		log_space = AltosLib.MISSING;
-		product = null;
-		serial = AltosLib.MISSING;
-		receiver_serial = AltosLib.MISSING;
-		altitude_32 = AltosLib.MISSING;
-
-		baro = null;
 		companion = null;
 
 		pyro_fired = 0;
 	}
 
 	void finish_update() {
-		prev_tick = tick;
-
 		ground_altitude.finish_update();
 		altitude.finish_update();
 		pressure.finish_update();
@@ -863,156 +806,12 @@ public class AltosState implements Cloneable {
 		kalman_acceleration.finish_update();
 	}
 
-	void copy(AltosState old) {
-
-		if (old == null) {
-			init();
-			return;
-		}
-
-		received_time = old.received_time;
-		time = old.time;
-		time_change = old.time_change;
-		prev_time = old.time;
-
-		tick = old.tick;
-		prev_tick = old.tick;
-		boost_tick = old.boost_tick;
-
-		state = old.state;
-		flight = old.flight;
-		landed = old.landed;
-		ascent = old.ascent;
-		boost = old.boost;
-		rssi = old.rssi;
-		status = old.status;
-		device_type = old.device_type;
-		config_major = old.config_major;
-		config_minor = old.config_minor;
-		apogee_delay = old.apogee_delay;
-		main_deploy = old.main_deploy;
-		flight_log_max = old.flight_log_max;
-
-		set = 0;
-
-		ground_pressure.copy(old.ground_pressure);
-		ground_altitude.copy(old.ground_altitude);
-		altitude.copy(old.altitude);
-		pressure.copy(old.pressure);
-		speed.copy(old.speed);
-		acceleration.copy(old.acceleration);
-		orient.copy(old.orient);
-
-		battery_voltage = old.battery_voltage;
-		pyro_voltage = old.pyro_voltage;
-		temperature = old.temperature;
-		apogee_voltage = old.apogee_voltage;
-		main_voltage = old.main_voltage;
-		ignitor_voltage = old.ignitor_voltage;
-
-		kalman_height.copy(old.kalman_height);
-		kalman_speed.copy(old.kalman_speed);
-		kalman_acceleration.copy(old.kalman_acceleration);
-
-		if (old.gps != null)
-			gps = old.gps.clone();
-		else
-			gps = null;
-		if (old.temp_gps != null)
-			temp_gps = old.temp_gps.clone();
-		else
-			temp_gps = null;
-		temp_gps_sat_tick = old.temp_gps_sat_tick;
-		gps_sequence = old.gps_sequence;
-		gps_pending = old.gps_pending;
-
-		if (old.imu != null)
-			imu = old.imu.clone();
-		else
-			imu = null;
-		last_imu_time = old.last_imu_time;
-
-		if (old.rotation != null)
-			rotation = new AltosRotation (old.rotation);
-
-		if (old.ground_rotation != null) {
-			ground_rotation = new AltosRotation(old.ground_rotation);
-		}
-
-		accel_zero_along = old.accel_zero_along;
-		accel_zero_across = old.accel_zero_across;
-		accel_zero_through = old.accel_zero_through;
-
-		accel_ground_along = old.accel_ground_along;
-		accel_ground_across = old.accel_ground_across;
-		accel_ground_through = old.accel_ground_through;
-		pad_orientation = old.pad_orientation;
-
-		gyro_zero_roll = old.gyro_zero_roll;
-		gyro_zero_pitch = old.gyro_zero_pitch;
-		gyro_zero_yaw = old.gyro_zero_yaw;
-
-		if (old.mag != null)
-			mag = old.mag.clone();
-		else
-			mag = null;
-
-		npad = old.npad;
-		gps_waiting = old.gps_waiting;
-		gps_ready = old.gps_ready;
-		ngps = old.ngps;
-
-		if (old.from_pad != null)
-			from_pad = old.from_pad.clone();
-		else
-			from_pad = null;
-
-		elevation = old.elevation;
-		range = old.range;
-
-		gps_height = old.gps_height;
-
-		gps_altitude.copy(old.gps_altitude);
-		gps_ground_altitude.copy(old.gps_ground_altitude);
-		gps_ground_speed.copy(old.gps_ground_speed);
-		gps_ascent_rate.copy(old.gps_ascent_rate);
-		gps_course.copy(old.gps_course);
-		gps_speed.copy(old.gps_speed);
-
-		pad_lat = old.pad_lat;
-		pad_lon = old.pad_lon;
-		pad_alt = old.pad_alt;
-
-		speak_tick = old.speak_tick;
-		speak_altitude = old.speak_altitude;
-
-		callsign = old.callsign;
-		firmware_version = old.firmware_version;
-
-		accel_plus_g = old.accel_plus_g;
-		accel_minus_g = old.accel_minus_g;
-		accel = old.accel;
-		ground_accel = old.ground_accel;
-		ground_accel_avg = old.ground_accel_avg;
-
-		log_format = old.log_format;
-		log_space = old.log_space;
-		product = old.product;
-		serial = old.serial;
-		receiver_serial = old.receiver_serial;
-		altitude_32 = old.altitude_32;
-
-		baro = old.baro;
-		companion = old.companion;
-
-		pyro_fired = old.pyro_fired;
-	}
-
 	void update_time() {
 	}
 
 	void update_gps() {
 		elevation = AltosLib.MISSING;
+		distance = AltosLib.MISSING;
 		range = AltosLib.MISSING;
 
 		if (gps == null)
@@ -1054,34 +853,13 @@ public class AltosState implements Cloneable {
 				h = 0;
 			from_pad = new AltosGreatCircle(pad_lat, pad_lon, 0, gps.lat, gps.lon, h);
 			elevation = from_pad.elevation;
+			distance = from_pad.distance;
 			range = from_pad.range;
 		}
 	}
 
-	public void set_tick(int new_tick) {
-		if (new_tick != AltosLib.MISSING) {
-			if (prev_tick != AltosLib.MISSING) {
-				while (new_tick < prev_tick - 1000) {
-					new_tick += 65536;
-				}
-			}
-			tick = new_tick;
-			time = tick / 100.0;
-			time_change = time - prev_time;
-		}
-	}
-
-	public void set_boost_tick(int boost_tick) {
-		if (boost_tick != AltosLib.MISSING)
-			this.boost_tick = boost_tick;
-	}
-
 	public String state_name() {
 		return AltosLib.state_name(state);
-	}
-
-	public void set_product(String product) {
-		this.product = product;
 	}
 
 	public void set_state(int state) {
@@ -1097,96 +875,8 @@ public class AltosState implements Cloneable {
 		return state;
 	}
 
-	public void set_device_type(int device_type) {
-		this.device_type = device_type;
-		switch (device_type) {
-		case AltosLib.product_telegps:
-			this.state = AltosLib.ao_flight_stateless;
-			break;
-		}
-	}
-
-	public void set_log_format(int log_format) {
-		this.log_format = log_format;
-		switch (log_format) {
-		case AltosLib.AO_LOG_FORMAT_TELEGPS:
-			this.state = AltosLib.ao_flight_stateless;
-			break;
-		}
-	}
-
-	public void set_log_space(int log_space) {
-		this.log_space = log_space;
-	}
-
-	public void set_flight_params(int apogee_delay, int main_deploy) {
-		this.apogee_delay = apogee_delay;
-		this.main_deploy = main_deploy;
-	}
-
-	public void set_config(int major, int minor, int flight_log_max) {
-		config_major = major;
-		config_minor = minor;
-		this.flight_log_max = flight_log_max;
-	}
-
-	public void set_callsign(String callsign) {
-		this.callsign = callsign;
-	}
-
-	public void set_firmware_version(String version) {
-		firmware_version = version;
-	}
-
-	public int compare_version(String other_version) {
-		if (firmware_version == null)
-			return AltosLib.MISSING;
-		return AltosLib.compare_version(firmware_version, other_version);
-	}
-
 	private void re_init() {
-		int bt = boost_tick;
-		int rs = receiver_serial;
 		init();
-		boost_tick = bt;
-		receiver_serial = rs;
-	}
-
-	public void set_flight(int flight) {
-
-		/* When the flight changes, reset the state */
-		if (flight != AltosLib.MISSING) {
-			if (this.flight != AltosLib.MISSING &&
-			    this.flight != flight) {
-				re_init();
-			}
-			this.flight = flight;
-		}
-	}
-
-	public void set_serial(int serial) {
-		/* When the serial changes, reset the state */
-		if (serial != AltosLib.MISSING) {
-			if (this.serial != AltosLib.MISSING &&
-			    this.serial != serial) {
-				re_init();
-			}
-			this.serial = serial;
-		}
-	}
-
-	public void set_receiver_serial(int serial) {
-		if (serial != AltosLib.MISSING)
-			receiver_serial = serial;
-	}
-
-	public boolean altitude_32() {
-		return altitude_32 == 1;
-	}
-
-	public void set_altitude_32(int altitude_32) {
-		if (altitude_32 != AltosLib.MISSING)
-			this.altitude_32 = altitude_32;
 	}
 
 	public int rssi() {
@@ -1206,42 +896,24 @@ public class AltosState implements Cloneable {
 		received_time = ms;
 	}
 
-	public void set_gps(AltosGPS gps, int sequence) {
+	public void set_gps(AltosGPS gps) {
 		if (gps != null) {
-			this.gps = gps.clone();
-			gps_sequence = sequence;
+			this.gps = gps;
 			update_gps();
 			set |= set_gps;
 		}
 	}
 
-
-	public double	accel_zero_along;
-	public double	accel_zero_across;
-	public double	accel_zero_through;
-
 	public AltosRotation	rotation;
-	public AltosRotation	ground_rotation;
-
-	public void set_accel_zero(double zero_along, double zero_across, double zero_through) {
-		if (zero_along != AltosLib.MISSING) {
-			accel_zero_along = zero_along;
-			accel_zero_across = zero_across;
-			accel_zero_through = zero_through;
-		}
-	}
-
-	public int pad_orientation;
 
 	public double	accel_ground_along, accel_ground_across, accel_ground_through;
 
 	void update_pad_rotation() {
-		if (pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
-			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - accel_zero_across),
-						     AltosIMU.convert_accel(accel_ground_through - accel_zero_through),
-						     AltosIMU.convert_accel(accel_ground_along - accel_zero_along),
-						     pad_orientation);
-			ground_rotation = rotation;
+		if (cal_data().pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
+			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data().accel_zero_across),
+						     AltosIMU.convert_accel(accel_ground_through - cal_data().accel_zero_through),
+						     AltosIMU.convert_accel(accel_ground_along - cal_data().accel_zero_along),
+						     cal_data().pad_orientation);
 			orient.set_computed(rotation.tilt(), time);
 		}
 	}
@@ -1253,197 +925,95 @@ public class AltosState implements Cloneable {
 		update_pad_rotation();
 	}
 
-	public void set_pad_orientation(int pad_orientation) {
-		this.pad_orientation = pad_orientation;
-		update_pad_rotation();
-	}
-
-	public double	gyro_zero_roll;
-	public double	gyro_zero_pitch;
-	public double	gyro_zero_yaw;
-
-	public void set_gyro_zero(double roll, double pitch, double yaw) {
-		if (roll != AltosLib.MISSING) {
-			gyro_zero_roll = roll;
-			gyro_zero_pitch = pitch;
-			gyro_zero_yaw = yaw;
-		}
-	}
-
 	public double	last_imu_time;
-
-	private double radians(double degrees) {
-		if (degrees == AltosLib.MISSING)
-			return AltosLib.MISSING;
-		return degrees * Math.PI / 180.0;
-	}
 
 	private void update_orient() {
 		if (last_imu_time != AltosLib.MISSING) {
 			double	t = time - last_imu_time;
 
-			double	pitch = radians(gyro_pitch());
-			double	yaw = radians(gyro_yaw());
-			double	roll = radians(gyro_roll());
+			if (t > 0 && gyro_pitch != AltosLib.MISSING && rotation != null) {
+				double	pitch = AltosConvert.degrees_to_radians(gyro_pitch) * t;
+				double	yaw = AltosConvert.degrees_to_radians(gyro_yaw) * t;
+				double	roll = AltosConvert.degrees_to_radians(gyro_roll) * t;
 
-			if (t > 0 & pitch != AltosLib.MISSING && rotation != null) {
-				rotation.rotate(t, pitch, yaw, roll);
+				rotation.rotate(pitch, yaw, roll);
 				orient.set_computed(rotation.tilt(), time);
 			}
 		}
 		last_imu_time = time;
 	}
 
-	public void set_imu(AltosIMU imu) {
-		if (imu != null)
-			imu = imu.clone();
-		this.imu = imu;
+	private double	gyro_roll, gyro_pitch, gyro_yaw;
+
+	public void set_gyro(double roll, double pitch, double yaw) {
+		gyro_roll = roll;
+		gyro_pitch = pitch;
+		gyro_yaw = yaw;
 		update_orient();
 	}
 
-	private double gyro_zero_overflow(double first) {
-		double v = first / 128.0;
-		if (v < 0)
-			v = Math.ceil(v);
-		else
-			v = Math.floor(v);
-		return v * 128.0;
-	}
+	private double accel_along, accel_across, accel_through;
 
-	public void check_imu_wrap(AltosIMU imu) {
-		if (this.imu == null) {
-			gyro_zero_roll += gyro_zero_overflow(imu.gyro_roll);
-			gyro_zero_pitch += gyro_zero_overflow(imu.gyro_pitch);
-			gyro_zero_yaw += gyro_zero_overflow(imu.gyro_yaw);
-		}
+	public void set_accel(double along, double across, double through) {
+		accel_along = along;
+		accel_across = across;
+		accel_through = through;
+		update_orient();
 	}
 
 	public double accel_along() {
-		if (imu != null && accel_zero_along != AltosLib.MISSING)
-			return AltosIMU.convert_accel(imu.accel_along - accel_zero_along);
-		return AltosLib.MISSING;
+		return accel_along;
 	}
 
 	public double accel_across() {
-		if (imu != null && accel_zero_across != AltosLib.MISSING)
-			return AltosIMU.convert_accel(imu.accel_across - accel_zero_across);
-		return AltosLib.MISSING;
+		return accel_across;
 	}
 
 	public double accel_through() {
-		if (imu != null && accel_zero_through != AltosLib.MISSING)
-			return AltosIMU.convert_accel(imu.accel_through - accel_zero_through);
-		return AltosLib.MISSING;
+		return accel_through;
 	}
 
 	public double gyro_roll() {
-		if (imu != null && gyro_zero_roll != AltosLib.MISSING) {
-			return AltosIMU.convert_gyro(imu.gyro_roll - gyro_zero_roll);
-		}
-		return AltosLib.MISSING;
+		return gyro_roll;
 	}
 
 	public double gyro_pitch() {
-		if (imu != null && gyro_zero_pitch != AltosLib.MISSING) {
-			return AltosIMU.convert_gyro(imu.gyro_pitch - gyro_zero_pitch);
-		}
-		return AltosLib.MISSING;
+		return gyro_pitch;
 	}
 
 	public double gyro_yaw() {
-		if (imu != null && gyro_zero_yaw != AltosLib.MISSING) {
-			return AltosIMU.convert_gyro(imu.gyro_yaw - gyro_zero_yaw);
-		}
-		return AltosLib.MISSING;
+		return gyro_yaw;
 	}
 
-	public void set_mag(AltosMag mag) {
-		this.mag = mag.clone();
+	private double mag_along, mag_across, mag_through;
+
+	public void set_mag(double along, double across, double through) {
+		mag_along = along;
+		mag_across = across;
+		mag_through = through;
 	}
 
 	public double mag_along() {
-		if (mag != null)
-			return AltosMag.convert_gauss(mag.along);
-		return AltosLib.MISSING;
+		return mag_along;
 	}
 
 	public double mag_across() {
-		if (mag != null)
-			return AltosMag.convert_gauss(mag.across);
-		return AltosLib.MISSING;
+		return mag_across;
 	}
 
 	public double mag_through() {
-		if (mag != null)
-			return AltosMag.convert_gauss(mag.through);
-		return AltosLib.MISSING;
-	}
-
-	public AltosMs5607 make_baro() {
-		if (baro == null)
-			baro = new AltosMs5607();
-		return baro;
-	}
-
-	public void set_ms5607(AltosMs5607 ms5607) {
-		baro = ms5607;
-
-		if (baro != null) {
-			set_pressure(baro.pa);
-			set_temperature(baro.cc / 100.0);
-		}
-	}
-
-	public void set_ms5607(int pres, int temp) {
-		if (baro != null) {
-			baro.set(pres, temp);
-
-			set_pressure(baro.pa);
-			set_temperature(baro.cc / 100.0);
-		}
+		return mag_through;
 	}
 
 	public void set_companion(AltosCompanion companion) {
 		this.companion = companion;
 	}
 
-	void update_accel() {
-		if (accel == AltosLib.MISSING)
-			return;
-		if (accel_plus_g == AltosLib.MISSING)
-			return;
-		if (accel_minus_g == AltosLib.MISSING)
-			return;
-
-		double counts_per_g = (accel_minus_g - accel_plus_g) / 2.0;
-		double counts_per_mss = counts_per_g / 9.80665;
-		acceleration.set_measured((accel_plus_g - accel) / counts_per_mss, time);
-	}
-
-	public void set_accel_g(double accel_plus_g, double accel_minus_g) {
-		if (accel_plus_g != AltosLib.MISSING) {
-			this.accel_plus_g = accel_plus_g;
-			this.accel_minus_g = accel_minus_g;
-			update_accel();
+	public void set_acceleration(double acceleration) {
+		if (acceleration != AltosLib.MISSING) {
+			this.acceleration.set_measured(acceleration, time);
+			set |= set_data;
 		}
-	}
-
-	public void set_ground_accel(double ground_accel) {
-		if (ground_accel != AltosLib.MISSING)
-			this.ground_accel = ground_accel;
-	}
-
-	public void set_accel(double accel) {
-		if (accel != AltosLib.MISSING) {
-			this.accel = accel;
-			if (state == AltosLib.ao_flight_pad) {
-				if (ground_accel_avg == AltosLib.MISSING)
-					ground_accel_avg = accel;
-				else
-					ground_accel_avg = (ground_accel_avg * 7 + accel) / 8;
-			}
-		}
-		update_accel();
 	}
 
 	public void set_temperature(double temperature) {
@@ -1481,78 +1051,21 @@ public class AltosState implements Cloneable {
 		}
 	}
 
-	public void set_ignitor_voltage(double[] voltage) {
-		this.ignitor_voltage = voltage;
+	public void set_igniter_voltage(double[] voltage) {
+		this.igniter_voltage = voltage;
 	}
 
 	public void set_pyro_fired(int fired) {
 		this.pyro_fired = fired;
 	}
 
-	public double time_since_boost() {
-		if (tick == AltosLib.MISSING)
-			return 0.0;
-
-		if (boost_tick == AltosLib.MISSING)
-			return tick / 100.0;
-		return (tick - boost_tick) / 100.0;
+	public AltosState() {
+		Thread.dumpStack();
+		init();
 	}
 
-	public boolean valid() {
-		return tick != AltosLib.MISSING && serial != AltosLib.MISSING;
-	}
-
-	public AltosGPS make_temp_gps(boolean sats) {
-		if (temp_gps == null) {
-			temp_gps = new AltosGPS(gps);
-		}
-		gps_pending = true;
-		if (sats) {
-			if (tick != temp_gps_sat_tick)
-				temp_gps.cc_gps_sat = null;
-			temp_gps_sat_tick = tick;
-		}
-		return temp_gps;
-	}
-
-	public void set_temp_gps() {
-		set_gps(temp_gps, gps_sequence + 1);
-		gps_pending = false;
-		temp_gps = null;
-	}
-
-	public AltosState clone() {
-		AltosState s = new AltosState();
-		s.copy(this);
-
-		/* Code to test state save/restore. Enable only for that purpose
-		 */
-		if (false) {
-			AltosJson	json = new AltosJson(this);
-			String		onetrip = json.toPrettyString();
-			AltosJson	back = AltosJson.fromString(onetrip);
-			AltosState	tripstate = (AltosState) back.make(this.getClass());
-			AltosJson	tripjson = new AltosJson(tripstate);
-			String		twotrip = tripjson.toPrettyString();
-
-			if (!onetrip.equals(twotrip)) {
-				try {
-					FileWriter one_file = new FileWriter("one.json", true);
-					one_file.write(onetrip);
-					one_file.flush();
-					FileWriter two_file = new FileWriter("two.json", true);
-					two_file.write(twotrip);
-					two_file.flush();
-				} catch (Exception e) {
-				}
-				System.out.printf("json error\n");
-				System.exit(1);
-			}
-		}
-		return s;
-	}
-
-	public AltosState () {
+	public AltosState (AltosCalData cal_data) {
+		super(cal_data);
 		init();
 	}
 }

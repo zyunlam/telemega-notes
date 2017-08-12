@@ -25,8 +25,8 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.Arrays;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDisplay, AltosIdleMonitorListener, DocumentListener {
 	AltosDevice		device;
@@ -34,12 +34,12 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 	AltosPad		pad;
 	AltosInfoTable		flightInfo;
 	AltosFlightStatus	flightStatus;
-	AltosIgnitor		ignitor;
+	AltosIgnitor		igniter;
 	AltosIdleMonitor	thread;
 	AltosUIMap      	sitemap;
 	int			serial;
 	boolean			remote;
-	boolean			has_ignitor;
+	boolean			has_igniter;
 	boolean			has_map;
 
 	void stop_display() {
@@ -75,15 +75,15 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 	public void show(AltosState state, AltosListenerState listener_state) {
 		status_update.saved_state = state;
-		if (ignitor.should_show(state)) {
-			if (!has_ignitor) {
-				pane.add("Ignitor", ignitor);
-				has_ignitor = true;
+		if (igniter.should_show(state)) {
+			if (!has_igniter) {
+				pane.add("Ignitor", igniter);
+				has_igniter = true;
 			}
 		} else {
-			if (has_ignitor) {
-				pane.remove(ignitor);
-				has_ignitor = false;
+			if (has_igniter) {
+				pane.remove(igniter);
+				has_igniter = false;
 			}
 		}
 		if (state.gps != null && state.gps.connected) {
@@ -102,8 +102,8 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 			pad.show(state, listener_state);
 			flightStatus.show(state, listener_state);
 			flightInfo.show(state, listener_state);
-			if (has_ignitor)
-				ignitor.show(state, listener_state);
+			if (has_igniter)
+				igniter.show(state, listener_state);
 			if (has_map)
 				sitemap.show(state, listener_state);
 //		} catch (Exception e) {
@@ -274,7 +274,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		flightInfo = new AltosInfoTable();
 		pane.add("Table", new JScrollPane(flightInfo));
 
-		ignitor = new AltosIgnitor();
+		igniter = new AltosIgnitor();
 
 		sitemap = new AltosUIMap();
 

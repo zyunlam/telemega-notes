@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.text.*;
 import java.util.concurrent.*;
@@ -63,40 +63,8 @@ public class AltosEepromChunk {
 		return true;
 	}
 
-	public AltosEeprom eeprom(int offset, int log_format, AltosState state) throws ParseException {
-		AltosEeprom	eeprom = null;
-		switch (log_format) {
-		case AltosLib.AO_LOG_FORMAT_FULL:
-			eeprom = new AltosEepromTM(this, offset);
-			break;
-		case AltosLib.AO_LOG_FORMAT_TINY:
-			eeprom = new AltosEepromTMini(this, offset, state);
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
-		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
-		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
-			eeprom = new AltosEepromMega(this, offset, log_format);
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
-			eeprom = new AltosEepromMetrum2(this, offset);
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEMINI2:
-		case AltosLib.AO_LOG_FORMAT_TELEMINI3:
-		case AltosLib.AO_LOG_FORMAT_EASYMINI:
-			eeprom = new AltosEepromMini(this, offset);
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEGPS:
-			eeprom = new AltosEepromGPS(this, offset);
-			break;
-		case AltosLib.AO_LOG_FORMAT_TELEFIRETWO:
-			eeprom = new AltosEepromFireTwo(this, offset);
-			break;
-		default:
-			throw new ParseException("unknown eeprom format " + log_format, 0);
-		}
-		return eeprom;
+	public boolean erased() {
+		return erased(0, chunk_size);
 	}
 
 	public AltosEepromChunk(AltosLink link, int block, boolean flush)

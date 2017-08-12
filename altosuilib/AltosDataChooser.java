@@ -16,12 +16,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosDataChooser extends JFileChooser {
 	JFrame	frame;
@@ -36,7 +36,7 @@ public class AltosDataChooser extends JFileChooser {
 		return file;
 	}
 
-	public AltosStateIterable runDialog() {
+	public AltosRecordSet runDialog() {
 		int	ret;
 
 		ret = showOpenDialog(frame);
@@ -44,21 +44,12 @@ public class AltosDataChooser extends JFileChooser {
 			file = getSelectedFile();
 			if (file == null)
 				return null;
-			filename = file.getName();
 			try {
-				if (filename.endsWith("eeprom")) {
-					FileInputStream in = new FileInputStream(file);
-					return new AltosEepromFile(in);
-				} else if (filename.endsWith("telem")) {
-					FileInputStream in = new FileInputStream(file);
-					return new AltosTelemetryFile(in);
-				} else {
-					throw new FileNotFoundException();
-				}
-			} catch (FileNotFoundException fe) {
+				return AltosLib.record_set(file);
+			} catch (IOException ie) {
 				JOptionPane.showMessageDialog(frame,
-							      fe.getMessage(),
-							      "Cannot open file",
+							      ie.getMessage(),
+							      "Error reading file",
 							      JOptionPane.ERROR_MESSAGE);
 			}
 		}

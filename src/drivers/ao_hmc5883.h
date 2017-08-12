@@ -77,7 +77,7 @@
 #define HMC5883_ID_C		12
 
 struct ao_hmc5883_sample {
-	int16_t		x, y, z;
+	int16_t		x, z, y;
 };
 
 extern struct ao_hmc5883_sample	ao_hmc5883_current;

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.text.*;
 import java.io.*;
@@ -25,6 +25,7 @@ import java.util.concurrent.*;
 public class AltosIdleReader extends AltosFlightReader {
 	AltosLink	link;
 	boolean		remote;
+	AltosCalData	cal_data = null;
 	AltosState	state = null;
 	AltosIdleFetch	fetch;
 	long		next_millis;
@@ -44,14 +45,22 @@ public class AltosIdleReader extends AltosFlightReader {
 		return link.reply_abort;
 	}
 
+	public AltosCalData cal_data() {
+		if (cal_data == null) {
+			try {
+				cal_data = new AltosCalData(link.config_data());
+			} catch (InterruptedException ie) {
+			} catch (TimeoutException te) {
+			}
+			if (cal_data == null)
+				cal_data = new AltosCalData();
+		}
+		return cal_data;
+	}
+
 	public AltosState read() throws InterruptedException, ParseException, AltosCRCException, IOException {
 		boolean worked = false;
 		boolean aborted = false;
-
-		if (state == null)
-			state = new AltosState();
-		else
-			state = state.clone();
 
 		long	delay = next_millis - System.currentTimeMillis();
 
@@ -61,7 +70,9 @@ public class AltosIdleReader extends AltosFlightReader {
 		try {
 			try {
 				start_link();
-				fetch.update_state(state);
+				if (state == null)
+					state = new AltosState(cal_data());
+				fetch.provide_data(state);
 				if (!link.has_error && !link.reply_abort)
 					worked = true;
 			} catch (TimeoutException te) {

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -556,7 +556,7 @@ public abstract class AltosLink implements Runnable {
 			return AltosLib.MISSING;
 
 		double	volts = AltosLib.MISSING;
-		if (config_data.product.startsWith("TeleBT-v3")) {
+		if (config_data.product.startsWith("TeleBT-v3") || config_data.product.startsWith("TeleBT-v4")) {
 			volts = AltosConvert.tele_bt_3_battery(monitor_batt);
 		} else {
 			volts = AltosConvert.cc_battery_to_voltage(monitor_batt);

@@ -35,6 +35,10 @@ __pdata uint8_t ao_config_loaded;
 __pdata uint8_t ao_config_dirty;
 __xdata uint8_t ao_config_mutex;
 
+#if HAS_FORCE_FREQ
+__xdata uint8_t ao_force_freq;
+#endif
+
 #ifndef AO_CONFIG_DEFAULT_APRS_INTERVAL
 #define AO_CONFIG_DEFAULT_APRS_INTERVAL	0
 #endif

@@ -16,12 +16,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public class AltosQuaternion {
 	double	r;		/* real bit */
 	double	x, y, z;	/* imaginary bits */
 
+	/* Multiply by b */
 	public AltosQuaternion multiply(AltosQuaternion b) {
 		return new AltosQuaternion(
 			this.r * b.r - this.x * b.x - this.y * b.y - this.z * b.z,
@@ -31,35 +32,36 @@ public class AltosQuaternion {
 	}
 
 	public AltosQuaternion conjugate() {
-		return new AltosQuaternion(
-			this.r,
-			-this.x,
-			-this.y,
-			-this.z);
+		return new AltosQuaternion(this.r,
+					   -this.x,
+					   -this.y,
+					   -this.z);
 	}
 
 	public double normal() {
-		return (this.r * this.r +
-			this.x * this.x +
-			this.y * this.y +
-			this.z * this.z);
+		return Math.sqrt(this.r * this.r +
+				 this.x * this.x +
+				 this.y * this.y +
+				 this.z * this.z);
 	}
 
+	/* Scale by a real value */
 	public AltosQuaternion scale(double b) {
-		return new AltosQuaternion(
-			this.r * b,
-			this.x * b,
-			this.y * b,
-			this.z * b);
+		return new AltosQuaternion(this.r * b,
+					   this.x * b,
+					   this.y * b,
+					   this.z * b);
 	}
 
+	/* Divide by the length to end up with a quaternion of length 1 */
 	public AltosQuaternion normalize() {
 		double	n = normal();
 		if (n <= 0)
 			return this;
-		return scale(1/Math.sqrt(n));
+		return scale(1/n);
 	}
 
+	/* dot product */
 	public double dot(AltosQuaternion b) {
 		return (this.r * b.r +
 			this.x * b.x +
@@ -67,10 +69,14 @@ public class AltosQuaternion {
 			this.z * b.z);
 	}
 
+	/* Rotate 'this' by 'b' */
 	public AltosQuaternion rotate(AltosQuaternion b) {
 		return (b.multiply(this)).multiply(b.conjugate());
 	}
 
+	/* Given two vectors (this and b), compute a quaternion
+	 * representing the rotation between them
+	 */
 	public AltosQuaternion vectors_to_rotation(AltosQuaternion b) {
 		/*
 		 * The cross product will point orthogonally to the two
@@ -145,7 +151,13 @@ public class AltosQuaternion {
 		return new AltosQuaternion(1, 0, 0, 0);
 	}
 
-	static public AltosQuaternion half_euler(double x, double y, double z) {
+	static public AltosQuaternion euler(double x, double y, double z) {
+
+		/* Halve the euler angles */
+		x = x / 2.0;
+		y = y / 2.0;
+		z = z / 2.0;
+
 		double	s_x = Math.sin(x), c_x = Math.cos(x);
 		double	s_y = Math.sin(y), c_y = Math.cos(y);
 		double	s_z = Math.sin(z), c_z = Math.cos(z);;

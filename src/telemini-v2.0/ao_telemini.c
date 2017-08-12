@@ -20,8 +20,6 @@
 #include "ao_pins.h"
 #include <ao_exti.h>
 
-__xdata uint8_t ao_force_freq;
-
 void
 main(void)
 {

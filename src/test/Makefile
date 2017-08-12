@@ -1,7 +1,7 @@
 vpath % ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
 
 PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noisy_accel ao_flight_test_mm \
-	ao_flight_test_metrum \
+	ao_flight_test_metrum ao_flight_test_mini \
 	ao_gps_test ao_gps_test_skytraq ao_gps_test_ublox ao_convert_test ao_convert_pa_test ao_fec_test \
 	ao_aprs_test ao_micropeak_test ao_fat_test ao_aes_test ao_int64_test \
 	ao_ms5607_convert_test ao_quaternion_test ao_lisp_test
@@ -36,6 +36,9 @@ ao_flight_test_mm: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.
 
 ao_flight_test_metrum: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
 	cc -DTELEMETRUM_V2=1 $(CFLAGS) -o $@ $< -lm
+
+ao_flight_test_mini: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
+	cc -DEASYMINI=1 -DHAS_ACCEL=0 $(CFLAGS) -o $@ $< -lm
 
 ao_gps_test: ao_gps_test.c ao_gps_sirf.c ao_gps_print.c ao_host.h
 	cc $(CFLAGS) -o $@ $<

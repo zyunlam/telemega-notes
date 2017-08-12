@@ -41,3 +41,4 @@ nickle kalman.5c -p AO_BARO -c baro -t 0.1 $SIGMA_BARO
 nickle kalman.5c -p AO_BARO -c baro -t 1 $SIGMA_BARO
 
 nickle kalman_micro.5c -p AO_MK_BARO -c baro -t 0.096 $SIGMA_MICRO
+nickle kalman_micro.5c -p AO_MK2_BARO -c baro -t 0.1 $SIGMA_MICRO

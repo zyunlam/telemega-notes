@@ -192,7 +192,7 @@ _ao_mpu6000_setup(void)
 	_ao_mpu6000_wait_alive();
 
 	/* Reset the whole chip */
-	
+
 	_ao_mpu6000_reg_write(MPU6000_PWR_MGMT_1,
 			      (1 << MPU6000_PWR_MGMT_1_DEVICE_RESET));
 
@@ -292,7 +292,7 @@ _ao_mpu6000_setup(void)
 
 		ao_delay(AO_MS_TO_TICKS(200));
 		_ao_mpu6000_sample(&normal_mode);
-	
+
 		errors += ao_mpu6000_accel_check(normal_mode.accel_x, test_mode.accel_x);
 		errors += ao_mpu6000_accel_check(normal_mode.accel_y, test_mode.accel_y);
 		errors += ao_mpu6000_accel_check(normal_mode.accel_z, test_mode.accel_z);
@@ -315,7 +315,7 @@ _ao_mpu6000_setup(void)
 	/* Set sample rate divider to sample at 200Hz (v = gyro/rate - 1) */
 	_ao_mpu6000_reg_write(MPU6000_SMPRT_DIV,
 			      1000 / 200 - 1);
-	
+
 	ao_delay(AO_MS_TO_TICKS(100));
 	ao_mpu6000_configured = 1;
 }
@@ -325,6 +325,7 @@ struct ao_mpu6000_sample	ao_mpu6000_current;
 static void
 ao_mpu6000(void)
 {
+	struct ao_mpu6000_sample	sample;
 	/* ao_mpu6000_init already grabbed the SPI bus and mutex */
 	_ao_mpu6000_setup();
 #if AO_MPU6000_SPI
@@ -335,14 +336,15 @@ ao_mpu6000(void)
 #if AO_MPU6000_SPI
 		ao_mpu6000_spi_get();
 #endif
-		_ao_mpu6000_sample(&ao_mpu6000_current);
+		_ao_mpu6000_sample(&sample);
 #if AO_MPU6000_SPI
 		ao_mpu6000_spi_put();
-#endif	
-		ao_arch_critical(
-			AO_DATA_PRESENT(AO_DATA_MPU6000);
-			AO_DATA_WAIT();
-			);
+#endif
+		ao_arch_block_interrupts();
+		ao_mpu6000_current = sample;
+		AO_DATA_PRESENT(AO_DATA_MPU6000);
+		AO_DATA_WAIT();
+		ao_arch_release_interrupts();
 	}
 }
 
@@ -351,16 +353,13 @@ static struct ao_task ao_mpu6000_task;
 static void
 ao_mpu6000_show(void)
 {
-	struct ao_data	sample;
-
-	ao_data_get(&sample);
 	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d\n",
-		sample.mpu6000.accel_x,
-		sample.mpu6000.accel_y,
-		sample.mpu6000.accel_z,
-		sample.mpu6000.gyro_x,
-		sample.mpu6000.gyro_y,
-		sample.mpu6000.gyro_z);
+		ao_mpu6000_current.accel_x,
+		ao_mpu6000_current.accel_y,
+		ao_mpu6000_current.accel_z,
+		ao_mpu6000_current.gyro_x,
+		ao_mpu6000_current.gyro_y,
+		ao_mpu6000_current.gyro_z);
 }
 
 static const struct ao_cmds ao_mpu6000_cmds[] = {
@@ -374,7 +373,7 @@ ao_mpu6000_init(void)
 	ao_mpu6000_configured = 0;
 
 	ao_add_task(&ao_mpu6000_task, ao_mpu6000, "mpu6000");
-	
+
 #if AO_MPU6000_SPI
 	ao_spi_init_cs(AO_MPU6000_SPI_CS_PORT, (1 << AO_MPU6000_SPI_CS_PIN));
 
@@ -386,7 +385,7 @@ ao_mpu6000_init(void)
 	ao_cur_task = &ao_mpu6000_task;
 	ao_spi_get(AO_MPU6000_SPI_BUS, AO_SPI_SPEED_1MHz);
 	ao_cur_task = NULL;
-#endif	
+#endif
 
 	ao_cmd_register(&ao_mpu6000_cmds[0]);
 }

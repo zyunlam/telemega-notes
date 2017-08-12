@@ -16,13 +16,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 public class AltosCSVUI
 	extends AltosUIDialog
@@ -31,7 +31,8 @@ public class AltosCSVUI
 	JFileChooser		csv_chooser;
 	JPanel			accessory;
 	JComboBox<String>	combo_box;
-	Iterable<AltosState>	states;
+	AltosFlightSeries	series;
+	AltosCalData		cal_data;
 	AltosWriter		writer;
 
 	static String[]		combo_box_items = { "Comma Separated Values (.CSV)", "Googleearth Data (.KML)" };
@@ -55,8 +56,9 @@ public class AltosCSVUI
 			set_default_file();
 	}
 
-	public AltosCSVUI(JFrame frame, AltosStateIterable states, File source_file) {
-		this.states = states;
+	public AltosCSVUI(JFrame frame, AltosFlightSeries series, File source_file) {
+		this.series = series;
+		this.cal_data = series.cal_data();
 		csv_chooser = new JFileChooser(source_file);
 
 		accessory = new JPanel();
@@ -91,7 +93,7 @@ public class AltosCSVUI
 					writer = new AltosCSV(file);
 				else
 					writer = new AltosKML(file);
-				writer.write(states);
+				writer.write(series);
 				writer.close();
 			} catch (FileNotFoundException ee) {
 				JOptionPane.showMessageDialog(frame,

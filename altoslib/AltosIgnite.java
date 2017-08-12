@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.util.*;
 import java.io.*;
@@ -102,7 +102,7 @@ public class AltosIgnite {
 	private void get_npyro() throws InterruptedException, TimeoutException {
 		if (config_data == null)
 			config_data = new AltosConfigData(link);
-		if (config_data != null)
+		if (config_data != null && config_data.npyro != AltosLib.MISSING)
 			npyro = config_data.npyro;
 		else
 			npyro = 0;
@@ -174,6 +174,7 @@ public class AltosIgnite {
 		try {
 			start_link();
 			link.printf("i DoIt %s\n", igniter);
+			link.flush_output();
 		} catch (TimeoutException te) {
 		} finally {
 			stop_link();

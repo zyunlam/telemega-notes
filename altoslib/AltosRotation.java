@@ -16,10 +16,32 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public class AltosRotation extends AltosQuaternion {
 	private AltosQuaternion		rotation;
+
+	/* Compute pitch angle from vertical by taking the pad
+	 * orientation vector and rotating it by the current total
+	 * rotation value. That will be a unit vector pointing along
+	 * the airframe axis. The Z value will be the cosine of the
+	 * angle from vertical.
+	 *
+	 * rot = ao_rotation * vertical * ao_rotation°
+	 * rot = ao_rotation * (0,0,0,1) * ao_rotation°
+	 *     = ((a.z, a.y, -a.x, a.r) * (a.r, -a.x, -a.y, -a.z)) .z
+	 *
+	 *     = (-a.z * -a.z) + (a.y * -a.y) - (-a.x * -a.x) + (a.r * a.r)
+	 *     = a.z² - a.y² - a.x² + a.r²
+	 *
+	 * rot = ao_rotation * (0, 0, 0, -1) * ao_rotation°
+	 *     = ((-a.z, -a.y, a.x, -a.r) * (a.r, -a.x, -a.y, -a.z)) .z
+	 *
+	 *     = (a.z * -a.z) + (-a.y * -a.y) - (a.x * -a.x) + (-a.r * a.r)
+	 *     = -a.z² + a.y² + a.x² - a.r²
+	 *
+	 * tilt = acos(rot)  (in radians)
+	 */
 
 	public double tilt() {
 		double	rotz = rotation.z * rotation.z - rotation.y * rotation.y - rotation.x * rotation.x + rotation.r * rotation.r;
@@ -28,8 +50,11 @@ public class AltosRotation extends AltosQuaternion {
 		return tilt;
 	}
 
-	public void rotate(double dt, double x, double y, double z) {
-		AltosQuaternion	rot = AltosQuaternion.half_euler(x * dt / 2.0, y * dt / 2.0, z * dt / 2.0);
+	/* Given euler rotations in three axes, perform a combined rotation using
+	 * quaternions
+	 */
+	public void rotate(double x, double y, double z) {
+		AltosQuaternion	rot = AltosQuaternion.euler(x, y, z);
 		rotation = rot.multiply(rotation).normalize();
 	}
 

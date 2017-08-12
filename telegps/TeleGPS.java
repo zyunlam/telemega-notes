@@ -25,8 +25,8 @@ import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
 import java.text.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class TeleGPS
 	extends AltosUIFrame
@@ -152,7 +152,7 @@ public class TeleGPS
 			status_update.saved_listener_state = listener_state;
 
 			if (state == null)
-				state = new AltosState();
+				state = new AltosState(new AltosCalData());
 
 			int i = 0;
 			for (AltosFlightDisplay display : displays) {
@@ -287,23 +287,30 @@ public class TeleGPS
 		new TeleGPSConfig(this);
 	}
 
+	private static AltosFlightSeries make_series(AltosRecordSet set) {
+		AltosFlightSeries series = new AltosFlightSeries(set.cal_data());
+		set.capture_series(series);
+		series.finish();
+		return series;
+	}
+
 	void export() {
-		AltosDataChooser chooser;
-		chooser = new AltosDataChooser(this);
-		AltosStateIterable states = chooser.runDialog();
-		if (states == null)
+		AltosDataChooser chooser = new AltosDataChooser(this);
+
+		AltosRecordSet set = chooser.runDialog();
+		if (set == null)
 			return;
-		new AltosCSVUI(this, states, chooser.file());
+		AltosFlightSeries series = make_series(set);
+		new AltosCSVUI(this, series, chooser.file());
 	}
 
 	void graph() {
-		AltosDataChooser chooser;
-		chooser = new AltosDataChooser(this);
-		AltosStateIterable states = chooser.runDialog();
-		if (states == null)
+		AltosDataChooser chooser = new AltosDataChooser(this);
+		AltosRecordSet set = chooser.runDialog();
+		if (set == null)
 			return;
 		try {
-			new TeleGPSGraphUI(states, chooser.file());
+			new TeleGPSGraphUI(set, chooser.file());
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
 		}
@@ -612,33 +619,28 @@ public class TeleGPS
 		connect(device);
 	}
 
-	static AltosStateIterable record_iterable(File file) {
-		FileInputStream in;
+	static AltosRecordSet record_set(File file) {
 		try {
-			in = new FileInputStream(file);
-		} catch (Exception e) {
-			System.out.printf("Failed to open file '%s'\n", file);
-			return null;
-		}
-		if (file.getName().endsWith("telem"))
-			return new AltosTelemetryFile(in);
-		else
-			return new AltosEepromFile(in);
+			return AltosLib.record_set(file);
+		} catch (IOException ie) {
+			System.out.printf("%s\n", ie.getMessage());
+                }
+                return null;
 	}
 
 	static AltosReplayReader replay_file(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return null;
-		return new AltosReplayReader(states.iterator(), file);
+		return new AltosReplayReader(set, file);
 	}
 
 	static boolean process_graph(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return false;
 		try {
-			new TeleGPSGraphUI(states, file);
+			new TeleGPSGraphUI(set, file);
 		} catch (Exception e) {
 			return false;
 		}

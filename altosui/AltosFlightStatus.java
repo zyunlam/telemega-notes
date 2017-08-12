@@ -20,8 +20,8 @@ package altosui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class AltosFlightStatus extends JComponent implements AltosFlightDisplay {
 	GridBagLayout	layout;
@@ -93,14 +93,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		}
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (!same_call(state.callsign)) {
+			if (!same_call(state.cal_data().callsign)) {
 				show();
-				value.setText(state.callsign);
-				if (state.callsign == null)
+				value.setText(state.cal_data().callsign);
+				if (state.cal_data().callsign == null)
 					setVisible(false);
 				else
 					setVisible(true);
-				last_call = state.callsign;
+				last_call = state.cal_data().callsign;
 			}
 		}
 
@@ -120,13 +120,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 
 		int	last_serial = -1;
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.serial != last_serial) {
+			AltosCalData	cal_data = state.cal_data();
+			if (cal_data.serial != last_serial) {
 				show();
-				if (state.serial == AltosLib.MISSING)
+				if (cal_data.serial == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.serial));
-				last_serial = state.serial;
+					value.setText(String.format("%d", cal_data.serial));
+				last_serial = cal_data.serial;
 			}
 		}
 
@@ -147,13 +148,14 @@ public class AltosFlightStatus extends JComponent implements AltosFlightDisplay 
 		int	last_flight = -1;
 
 		void show(AltosState state, AltosListenerState listener_state) {
-			if (state.flight != last_flight) {
+			AltosCalData cal_data = state.cal_data();
+			if (cal_data.flight != last_flight) {
 				show();
-				if (state.flight == AltosLib.MISSING)
+				if (cal_data.flight == AltosLib.MISSING)
 					value.setText("none");
 				else
-					value.setText(String.format("%d", state.flight));
-				last_flight = state.flight;
+					value.setText(String.format("%d", cal_data.flight));
+				last_flight = cal_data.flight;
 			}
 		}
 

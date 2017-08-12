@@ -25,43 +25,35 @@ int
 main(void)
 {
 	ao_clock_init();
-
-#if HAS_STACK_GUARD
-	ao_mpu_init();
-#endif
-
 	ao_task_init();
-	ao_timer_init();
+	ao_cmd_init();
+	ao_config_init();
 
-	ao_spi_init();
+	ao_led_init(LEDS_AVAILABLE);
+	ao_led_on(AO_LED_GREEN);
+
+	/* internal systems */
+	ao_timer_init();
+	ao_dma_init();
 	ao_exti_init();
 
-	ao_storage_init();
-
-	ao_serial_init();
-
-	ao_cmd_init();
-
-	ao_usb_init();
-	ao_radio_init();
-
-#if HAS_ADC
+	/* SoC hardware */
 	ao_adc_init();
-#endif
+	ao_serial_init();
+	ao_spi_init();
+	ao_usb_init();
 
+	/* External hardware */
+	ao_storage_init();
+	ao_radio_init();
 	ao_gps_init();
-#if HAS_LOG
-	ao_log_init();
-#endif
 
+	/* Services */
+	ao_log_init();
+	ao_telemetry_init();
 	ao_tracker_init();
 
-	ao_telemetry_init();
-
-#if HAS_SAMPLE_PROFILE
-	ao_sample_profile_init();
-#endif
-	ao_config_init();
+	ao_led_off(AO_LED_GREEN);
 
 	ao_start_scheduler();
 	return 0;

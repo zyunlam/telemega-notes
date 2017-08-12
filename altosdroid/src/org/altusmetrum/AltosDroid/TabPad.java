@@ -18,7 +18,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -178,10 +178,10 @@ public class TabPad extends AltosDroidTab {
 			}
 			main_lights.set(state.main_voltage >= AltosLib.ao_igniter_good, state.main_voltage == AltosLib.MISSING);
 
-			int num_igniter = state.ignitor_voltage == null ? 0 : state.ignitor_voltage.length;
+			int num_igniter = state.igniter_voltage == null ? 0 : state.igniter_voltage.length;
 
 			for (int i = 0; i < 4; i++) {
-				double voltage = i >= num_igniter ? AltosLib.MISSING : state.ignitor_voltage[i];
+				double voltage = i >= num_igniter ? AltosLib.MISSING : state.igniter_voltage[i];
 				if (voltage == AltosLib.MISSING) {
 					ignite_row[i].setVisibility(View.GONE);
 				} else {
@@ -191,7 +191,7 @@ public class TabPad extends AltosDroidTab {
 				ignite_lights[i].set(voltage >= AltosLib.ao_igniter_good, voltage == AltosLib.MISSING);
 			}
 
-			if (state.flight != 0) {
+			if (state.cal_data().flight != 0) {
 				if (state.state() <= AltosLib.ao_flight_pad)
 					data_logging_view.setText("Ready to record");
 				else if (state.state() < AltosLib.ao_flight_landed)
@@ -201,7 +201,7 @@ public class TabPad extends AltosDroidTab {
 			} else {
 				data_logging_view.setText("Storage full");
 			}
-			data_logging_lights.set(state.flight != 0, state.flight == AltosLib.MISSING);
+			data_logging_lights.set(state.cal_data().flight != 0, state.cal_data().flight == AltosLib.MISSING);
 
 			if (state.gps != null) {
 				int soln = state.gps.nsat;

@@ -16,14 +16,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import java.io.*;
+import java.util.*;
 import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -42,10 +43,10 @@ public class AltosUIGraph implements AltosUnitsListener {
 	public ChartPanel		panel;
 	NumberAxis			xAxis;
 	AltosUIEnable			enable;
-	ArrayList<AltosUIGrapher>	graphers;
-	AltosUIDataSet			dataSet;
+	AltosUITimeSeries[]		series;
 	int				axis_index;
 	int				series_index;
+	Hashtable<Integer,Boolean>	axes_added;
 
 	static final private Color gridline_color = new Color(0, 0, 0);
 	static final private Color border_color = new Color(255, 255, 255);
@@ -65,69 +66,64 @@ public class AltosUIGraph implements AltosUnitsListener {
 		return newAxis(label, units, color, AltosUIAxis.axis_default);
 	}
 
-	public void addSeries(String label, int fetch, AltosUnits units, Color color,
-			      boolean enabled, AltosUIAxis axis) {
-		AltosUISeries		series = new AltosUISeries(label, fetch, units, color, enabled, axis);
-		XYSeriesCollection	dataset = new XYSeriesCollection(series);
+	void addAxis(AltosUIAxis axis) {
+		if (!axes_added.containsKey(axis.index)) {
+			axes_added.put(axis.index, true);
+			plot.setRangeAxis(axis.index, axis);
+		}
+	}
+
+	public void addSeries(AltosUITimeSeries series) {
+		XYSeriesCollection	dataset = new XYSeriesCollection(series.xy_series());
+
+		addAxis(series.axis);
 
 		series.renderer.setPlot(plot);
 		plot.setDataset(series_index, dataset);
 		plot.setRenderer(series_index, series.renderer);
-		plot.mapDatasetToRangeAxis(series_index, axis.index);
+		plot.mapDatasetToRangeAxis(series_index, series.axis.index);
 		if (enable != null)
-			enable.add(label, series, enabled);
-		this.graphers.add(series);
+			enable.add(series.label, series, series.enable);
 		series_index++;
 	}
 
-	public void addSeries(String label, int fetch, AltosUnits units, Color color) {
-		addSeries(label, fetch, units, color, true, newAxis(label, units, color));
-	}
-
-	public void addMarker(String label, int fetch, Color color) {
-		AltosUIMarker		marker = new AltosUIMarker(fetch, color, plot);
-		this.graphers.add(marker);
-	}
-
-	public void resetData() {
-		for (AltosUIGrapher g : graphers) {
-			g.clear();
-			g.setNotify(false);
-		}
-		if (dataSet != null) {
-			for (AltosUIDataPoint dataPoint : dataSet.dataPoints())
-				for (AltosUIGrapher g : graphers)
-					g.add(dataPoint);
-		}
-		for (AltosUIGrapher g : graphers) {
-			g.setNotify(true);
-			g.fireSeriesChanged();
-		}
+	public void addMarker(AltosUITimeSeries series) {
 	}
 
 	public void units_changed(boolean imperial_units) {
-		for (AltosUIGrapher g : graphers)
-			g.set_units();
-		resetData();
+		for (AltosUITimeSeries s : series)
+			s.set_units();
 	}
 
 	public void setName (String name) {
 		chart.setTitle(name);
 	}
 
-	public void setDataSet (AltosUIDataSet dataSet) {
-		this.dataSet = dataSet;
-		resetData();
-		if (dataSet != null)
-			setName(dataSet.name());
+	public void set_series(AltosUITimeSeries[] series) {
+		this.series = series;
+		boolean any_enabled = false;
+
+		for (AltosUITimeSeries s : series)
+			if (s.enable)
+				any_enabled = true;
+
+		if (!any_enabled)
+			for (AltosUITimeSeries s : series)
+				s.set_enable(true);
+
+		for (AltosUITimeSeries s : series)
+			addSeries(s);
+
+		units_changed(false);
 	}
 
-	public AltosUIGraph(AltosUIEnable enable) {
+	public AltosUIGraph(AltosUIEnable enable, String title) {
 
 		this.enable = enable;
-		this.graphers = new ArrayList<AltosUIGrapher>();
-		this.series_index = 0;
+		this.series = null;
 		this.axis_index = 0;
+
+		axes_added = new Hashtable<Integer,Boolean>();
 
 		xAxis = new NumberAxis("Time (s)");
 
@@ -139,7 +135,7 @@ public class AltosUIGraph implements AltosUnitsListener {
 		plot.setDomainPannable(true);
 		plot.setRangePannable(true);
 
-		chart = new JFreeChart("Flight", JFreeChart.DEFAULT_TITLE_FONT,
+		chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT,
 				       plot, true);
 
 		ChartUtilities.applyCurrentTheme(chart);
@@ -156,5 +152,6 @@ public class AltosUIGraph implements AltosUnitsListener {
 		panel.setPreferredSize(new java.awt.Dimension(800, 500));
 
 		AltosPreferences.register_units_listener(this);
+
 	}
 }

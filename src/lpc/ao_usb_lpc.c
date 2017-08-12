@@ -477,7 +477,7 @@ ao_usb_ep0_in_start(uint16_t max)
 	ao_usb_ep0_flush();
 }
 
-static struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
+struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 
 /* Walk through the list of descriptors and find a match
  */

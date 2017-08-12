@@ -23,6 +23,7 @@
 #include <ao_profile.h>
 #include <ao_btm.h>
 #include <ao_lco_cmd.h>
+#include <ao_send_packet.h>
 #if HAS_SAMPLE_PROFILE
 #include <ao_sample_profile.h>
 #endif
@@ -53,6 +54,7 @@ main(void)
 	ao_radio_init();
 	ao_packet_master_init();
 	ao_monitor_init();
+	ao_send_packet_init();
 
 	ao_config_init();
 

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -37,21 +37,34 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	AltosGraph		graph;
 	AltosUIEnable		enable;
 	AltosUIMap		map;
-	AltosState		state;
-	AltosGraphDataSet	graphDataSet;
 	AltosFlightStats	stats;
 	AltosFlightStatsTable	statsTable;
+	AltosGPS		gps;
 	boolean			has_gps;
 
-	void fill_map(AltosStateIterable states) {
-		boolean		any_gps = false;
-		for (AltosState state : states) {
-			if (state.gps != null && state.gps.locked && state.gps.nsat >= 4) {
-				if (map == null)
-					map = new AltosUIMap();
-				map.show(state, null);
-				has_gps = true;
+	void fill_map(AltosFlightSeries flight_series) {
+		boolean			any_gps = false;
+		AltosGPSTimeValue	gtv_last = null;
+
+		if (flight_series.gps_series != null) {
+			for (AltosGPSTimeValue gtv : flight_series.gps_series) {
+				gtv_last = gtv;
+				AltosGPS gps = gtv.gps;
+				if (gps != null &&
+				    gps.locked &&
+				    gps.nsat >= 4) {
+					if (map == null)
+						map = new AltosUIMap();
+					map.show(gps, (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time));
+					this.gps = gps;
+					has_gps = true;
+				}
 			}
+		}
+		if (gtv_last != null) {
+			int state = (int) flight_series.value_after(AltosFlightSeries.state_name, gtv_last.time);
+			if (state == AltosLib.ao_flight_landed)
+				map.show(gtv_last.gps, state);
 		}
 	}
 
@@ -69,18 +82,24 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 			enable.units_changed(imperial_units);
 	}
 
-	AltosGraphUI(AltosStateIterable states, File file) throws InterruptedException, IOException {
+	AltosGraphUI(AltosRecordSet set, File file) throws InterruptedException, IOException {
 		super(file.getName());
-		state = null;
+		AltosCalData	cal_data = set.cal_data();
+
 
 		pane = new JTabbedPane();
 
 		enable = new AltosUIEnable();
 
-		stats = new AltosFlightStats(states);
-		graphDataSet = new AltosGraphDataSet(states);
+		AltosUIFlightSeries flight_series = new AltosUIFlightSeries(cal_data);
 
-		graph = new AltosGraph(enable, stats, graphDataSet);
+		set.capture_series(flight_series);
+
+		flight_series.finish();
+
+		stats = new AltosFlightStats(flight_series);
+
+		graph = new AltosGraph(enable, stats, flight_series);
 
 		statsTable = new AltosFlightStatsTable(stats);
 
@@ -89,7 +108,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pane.add("Flight Statistics", statsTable);
 
 		has_gps = false;
-		fill_map(states);
+		fill_map(flight_series);
 		if (has_gps)
 			pane.add("Map", map);
 
@@ -108,7 +127,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pack();
 
 		setVisible(true);
-		if (state != null && has_gps)
-			map.centre(state);
+		if (gps != null)
+			map.centre(gps);
 	}
 }

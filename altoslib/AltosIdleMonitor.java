@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -52,20 +52,20 @@ public class AltosIdleMonitor extends Thread {
 		return link.reply_abort;
 	}
 
-	boolean update_state(AltosState state) throws InterruptedException, TimeoutException, AltosUnknownProduct {
+	boolean provide_data(AltosDataListener listener) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		boolean		worked = false;
 		boolean		aborted = false;
 
 		try {
 			start_link();
-			fetch.update_state(state);
+			fetch.provide_data(listener);
 			if (!link.has_error && !link.reply_abort)
 				worked = true;
 		} finally {
 			aborted = stop_link();
 			if (worked) {
 				if (remote)
-					state.set_rssi(link.rssi(), 0);
+					listener.set_rssi(link.rssi(), 0);
 				listener_state.battery = link.monitor_battery();
 			}
 		}
@@ -92,12 +92,14 @@ public class AltosIdleMonitor extends Thread {
 	}
 
 	public void run() {
-		AltosState state = new AltosState();
+		AltosState state = null;
 		try {
 			for (;;) {
 				try {
 					link.config_data();
-					update_state(state);
+					if (state == null)
+						state = new AltosState(new AltosCalData(link.config_data()));
+					provide_data(state);
 					listener.update(state, listener_state);
 				} catch (TimeoutException te) {
 				} catch (AltosUnknownProduct ae) {

@@ -16,11 +16,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public interface AltosWriter {
 
-	public void write(AltosStateIterable states);
+	public void write(AltosFlightSeries series);
 
 	public void close();
 }

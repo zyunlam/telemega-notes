@@ -32,10 +32,32 @@
 
 #include <ao_kalman.h>
 
+#ifndef AO_MK_STEP_96MS
+#define AO_MK_STEP_96MS	1
+
+#endif
+
+#if AO_MK_STEP_100MS
+#define AO_MK_TIME_STEP	0.1
+
+#define AO_K0_10	AO_MK2_BARO_K0_10
+#define AO_K1_10	AO_MK2_BARO_K1_10
+#define AO_K2_10	AO_MK2_BARO_K2_10
+#endif
+
+#if AO_MK_STEP_96MS
+#define AO_MK_TIME_STEP	0.096
+
+#define AO_K0_10	AO_MK_BARO_K0_10
+#define AO_K1_10	AO_MK_BARO_K1_10
+#define AO_K2_10	AO_MK_BARO_K2_10
+#endif
+
 /* Basic time step (96ms) */
-#define AO_MK_STEP	to_fix_v(0.096)
+#define AO_MK_STEP	to_fix_v(AO_MK_TIME_STEP)
+
 /* step ** 2 / 2 */
-#define AO_MK_STEP_2_2	to_fix_v(0.004608)
+#define AO_MK_STEP_2_2	to_fix_v(AO_MK_TIME_STEP * AO_MK_TIME_STEP / 2.0)
 
 uint32_t	ao_k_pa;		/* 24.8 fixed point */
 int32_t		ao_k_pa_speed;		/* 16.16 fixed point */
@@ -66,9 +88,9 @@ ao_microkalman_correct(void)
 
 	e = pa - from_fix8(ao_k_pa);
 
-	ao_k_pa       += fix16_to_fix8((int32_t) e * AO_MK_BARO_K0_10);
-	ao_k_pa_speed += (int32_t) e * AO_MK_BARO_K1_10;
-	ao_k_pa_accel += (int32_t) e * AO_MK_BARO_K2_10;
+	ao_k_pa       += fix16_to_fix8((int32_t) e * AO_K0_10);
+	ao_k_pa_speed += (int32_t) e * AO_K1_10;
+	ao_k_pa_accel += (int32_t) e * AO_K2_10;
 	ao_pa = from_fix8(ao_k_pa);
 	ao_pa_speed = from_fix(ao_k_pa_speed);
 	ao_pa_accel = from_fix(ao_k_pa_accel);

@@ -135,8 +135,8 @@ ao_log(void)
 #endif
 #if HAS_HMC5883
 				log.u.sensor.mag_x = ao_data_ring[ao_log_data_pos].hmc5883.x;
-				log.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].hmc5883.y;
 				log.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].hmc5883.z;
+				log.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].hmc5883.y;
 #endif
 				log.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
 				ao_log_mega(&log);

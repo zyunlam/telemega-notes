@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.util.concurrent.TimeoutException;
 
@@ -24,13 +24,13 @@ public class AltosSensorTGPS {
 	public int	tick;
 	public int	batt;
 
-	static public void update_state(AltosState state, AltosLink link, AltosConfigData config_data) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
 			AltosSensorTGPS	sensor_tgps = new AltosSensorTGPS(link);
 
 			if (sensor_tgps == null)
 				return;
-			state.set_battery_voltage(AltosConvert.tele_gps_voltage(sensor_tgps.batt));
+			listener.set_battery_voltage(AltosConvert.tele_gps_voltage(sensor_tgps.batt));
 
 		} catch (TimeoutException te) {
 		}

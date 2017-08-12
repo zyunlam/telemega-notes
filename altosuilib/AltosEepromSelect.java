@@ -16,13 +16,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_11;
+package org.altusmetrum.altosuilib_12;
 
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import org.altusmetrum.altoslib_11.*;
+import org.altusmetrum.altoslib_12.*;
 
 class AltosEepromItem implements ActionListener {
 	AltosEepromLog	log;
@@ -38,11 +38,7 @@ class AltosEepromItem implements ActionListener {
 		log = in_log;
 
 		String	text;
-		if (log.year != 0)
-			text = String.format("Flight #%02d - %04d-%02d-%02d",
-					     log.flight, log.year, log.month, log.day);
-		else
-			text = String.format("Flight #%02d", log.flight);
+		text = String.format("Flight #%02d", log.flight);
 
 		label = new JLabel(text);
 

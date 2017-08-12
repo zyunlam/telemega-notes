@@ -86,6 +86,7 @@ ao_timer_set_adc_interval(uint8_t interval)
 void
 ao_timer_init(void)
 {
+	stm_systick.csr = 0;
 	stm_systick.rvr = SYSTICK_RELOAD;
 	stm_systick.cvr = 0;
 	stm_systick.csr = ((1 << STM_SYSTICK_CSR_ENABLE) |

@@ -47,6 +47,13 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.8</revnumber>
+    <date>12 Aug 2017</date>
+    <revremark>
+      Add support for TeleBT v4.0, updates in data analysis code
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.7</revnumber>
     <date>21 Apr 2017</date>
     <revremark>

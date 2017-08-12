@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 import java.io.*;
 import java.util.*;
@@ -67,7 +67,7 @@ public class AltosTelemetryIterable implements Iterable<AltosTelemetry> {
 	int index;
 
 	public void add (AltosTelemetry telem) {
-		int	t = telem.tick;
+		int	t = telem.tick();
 		if (!telems.isEmpty()) {
 			while (t < tick - 1000)
 				t += 65536;
@@ -80,29 +80,25 @@ public class AltosTelemetryIterable implements Iterable<AltosTelemetry> {
 		return new AltosTelemetryOrderedIterator(telems);
 	}
 
-	public AltosTelemetryIterable (FileInputStream input) {
+	public AltosTelemetryIterable (FileInputStream input) throws IOException {
 		telems = new TreeSet<AltosTelemetryOrdered> ();
 		tick = 0;
 		index = 0;
 
-		try {
-			for (;;) {
-				String line = AltosLib.gets(input);
-				if (line == null) {
-					break;
-				}
-				try {
-					AltosTelemetry telem = AltosTelemetry.parse(line);
-					if (telem == null)
-						break;
-					add(telem);
-				} catch (ParseException pe) {
-					System.out.printf("parse exception %s\n", pe.getMessage());
-				} catch (AltosCRCException ce) {
-				}
+		for (;;) {
+			String line = AltosLib.gets(input);
+			if (line == null) {
+				break;
 			}
-		} catch (IOException io) {
-			System.out.printf("io exception\n");
+			try {
+				AltosTelemetry telem = AltosTelemetry.parse(line);
+				if (telem == null)
+					break;
+				add(telem);
+			} catch (ParseException pe) {
+				System.out.printf("parse exception %s\n", pe.getMessage());
+			} catch (AltosCRCException ce) {
+			}
 		}
 	}
 }

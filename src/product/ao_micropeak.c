@@ -22,7 +22,6 @@
 #include <ao_log_micro.h>
 #include <ao_async.h>
 
-static struct ao_ms5607_sample	sample;
 static struct ao_ms5607_value	value;
 
 alt_t		ground_alt, max_alt;
@@ -31,8 +30,8 @@ alt_t		ao_max_height;
 void
 ao_pa_get(void)
 {
-	ao_ms5607_sample(&sample);
-	ao_ms5607_convert(&sample, &value);
+	ao_ms5607_sample(&ao_ms5607_current);
+	ao_ms5607_convert(&ao_ms5607_current, &value);
 	pa = value.pres;
 }
 

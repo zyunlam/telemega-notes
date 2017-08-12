@@ -22,8 +22,8 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class TeleGPSState extends AltosUIFlightTab {
 
@@ -124,10 +124,11 @@ public class TeleGPSState extends AltosUIFlightTab {
 
 	class FirmwareVersion extends AltosUIIndicator {
 		public void show(AltosState state, AltosListenerState listener_state) {
-			if (state.firmware_version == null)
+			AltosCalData cal_data = state.cal_data();
+			if (cal_data.firmware_version == null)
 				show("Missing");
 			else
-				show(state.firmware_version);
+				show(cal_data.firmware_version);
 		}
 
 		public FirmwareVersion(Container container, int y) {
@@ -137,9 +138,8 @@ public class TeleGPSState extends AltosUIFlightTab {
 
 	class FlightLogMax extends AltosUIIndicator {
 		public void show(AltosState state, AltosListenerState listener_state) {
-			int storage = state.flight_log_max;
-			if (storage == AltosLib.MISSING)
-				storage = state.log_space >> 10;
+			AltosCalData cal_data = state.cal_data();
+			int storage = cal_data.flight_log_max;
 			if (storage == AltosLib.MISSING)
 				show("Missing");
 			else

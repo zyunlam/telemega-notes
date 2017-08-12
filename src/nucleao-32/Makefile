@@ -60,7 +60,7 @@ IDPRODUCT=0x000a
 
 CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -Os -g
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tload.ld
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tload.ld -n
 
 PROGNAME=nucleo-32
 PROG=$(PROGNAME)-$(VERSION).elf

@@ -61,4 +61,7 @@ altos_flush(struct altos_file *file);
 int
 altos_fill(struct altos_file *file, int timeout);
 
+int
+altos_bt_port(struct altos_bt_device *device);
+
 #endif /* _LIBALTOS_PRIVATE_H_ */

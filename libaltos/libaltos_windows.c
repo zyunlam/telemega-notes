@@ -747,7 +747,7 @@ altos_bt_open(struct altos_bt_device *device)
 	memset(&sockaddr_bth, '\0', sizeof (sockaddr_bth));
 	sockaddr_bth.addressFamily = AF_BTH;
 	sockaddr_bth.btAddr = str2ba(device->addr);
-	sockaddr_bth.port = 1;
+	sockaddr_bth.port = altos_bt_port(device);
 
 	ret = connect(file->socket, (SOCKADDR *) &sockaddr_bth, sizeof (sockaddr_bth));
 

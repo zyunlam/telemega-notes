@@ -23,8 +23,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_11.*;
-import org.altusmetrum.altosuilib_11.*;
+import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altosuilib_12.*;
 
 public class AltosUI extends AltosUIFrame {
 	public AltosVoice voice = new AltosVoice();
@@ -276,7 +276,7 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	void ConfigureTeleMetrum() {
-		new AltosConfig(AltosUI.this);
+		new AltosConfigFC(AltosUI.this);
 	}
 
 	void ConfigureTeleDongle() {
@@ -310,10 +310,9 @@ public class AltosUI extends AltosUIFrame {
 		AltosDataChooser chooser = new AltosDataChooser(
 			AltosUI.this);
 
-		Iterable<AltosState> states = chooser.runDialog();
-		if (states != null) {
-			AltosFlightReader reader = new AltosReplayReader(states.iterator(),
-									 chooser.file());
+		AltosRecordSet set = chooser.runDialog();
+		if (set != null) {
+			AltosReplayReader reader = new AltosReplayReader(set, chooser.file());
 			new AltosFlightUI(voice, reader);
 		}
 	}
@@ -325,6 +324,13 @@ public class AltosUI extends AltosUIFrame {
 		new AltosEepromManage(AltosUI.this, AltosLib.product_any);
 	}
 
+	private static AltosFlightSeries make_series(AltosRecordSet set) {
+		AltosFlightSeries series = new AltosFlightSeries(set.cal_data());
+		set.capture_series(series);
+		series.finish();
+		return series;
+	}
+
 	/* Load a flight log file and write out a CSV file containing
 	 * all of the data in standard units
 	 */
@@ -332,10 +338,11 @@ public class AltosUI extends AltosUIFrame {
 	private void ExportData() {
 		AltosDataChooser chooser;
 		chooser = new AltosDataChooser(this);
-		AltosStateIterable states = chooser.runDialog();
-		if (states == null)
+		AltosRecordSet set = chooser.runDialog();
+		if (set == null)
 			return;
-		new AltosCSVUI(AltosUI.this, states, chooser.file());
+		AltosFlightSeries series = make_series(set);
+		new AltosCSVUI(AltosUI.this, series, chooser.file());
 	}
 
 	/* Load a flight log CSV file and display a pretty graph.
@@ -344,11 +351,11 @@ public class AltosUI extends AltosUIFrame {
 	private void GraphData() {
 		AltosDataChooser chooser;
 		chooser = new AltosDataChooser(this);
-		AltosStateIterable states = chooser.runDialog();
-		if (states == null)
+		AltosRecordSet set = chooser.runDialog();
+		if (set == null)
 			return;
 		try {
-			new AltosGraphUI(states, chooser.file());
+			new AltosGraphUI(set, chooser.file());
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
 		}
@@ -362,21 +369,6 @@ public class AltosUI extends AltosUIFrame {
 		try {
 			new AltosIdleMonitorUI(this);
 		} catch (Exception e) {
-		}
-	}
-
-	static AltosStateIterable open_logfile(File file) {
-		try {
-			FileInputStream in;
-
-			in = new FileInputStream(file);
-			if (file.getName().endsWith("telem"))
-				return new AltosTelemetryFile(in);
-			else
-				return new AltosEepromFile(in);
-		} catch (FileNotFoundException fe) {
-			System.out.printf("%s\n", fe.getMessage());
-			return null;
 		}
 	}
 
@@ -398,17 +390,28 @@ public class AltosUI extends AltosUIFrame {
 		}
 	}
 
+	static AltosRecordSet record_set(File input) {
+		try {
+			return AltosLib.record_set(input);
+		} catch (IOException ie) {
+			String message = ie.getMessage();
+			if (message == null)
+				message = String.format("%s (I/O error)", input.toString());
+			System.err.printf("%s\n", message);
+		}
+		return null;
+	}
+
 	static final int process_none = 0;
 	static final int process_csv = 1;
 	static final int process_kml = 2;
 	static final int process_graph = 3;
 	static final int process_replay = 4;
 	static final int process_summary = 5;
-	static final int process_cat = 6;
 
 	static boolean process_csv(File input) {
-		AltosStateIterable states = open_logfile(input);
-		if (states == null)
+		AltosRecordSet set = record_set(input);
+		if (set == null)
 			return false;
 
 		File output = Altos.replace_extension(input,".csv");
@@ -420,15 +423,16 @@ public class AltosUI extends AltosUIFrame {
 			AltosWriter writer = open_csv(output);
 			if (writer == null)
 				return false;
-			writer.write(states);
+			AltosFlightSeries series = make_series(set);
+			writer.write(series);
 			writer.close();
 		}
 		return true;
 	}
 
 	static boolean process_kml(File input) {
-		AltosStateIterable states = open_logfile(input);
-		if (states == null)
+		AltosRecordSet set = record_set(input);
+		if (set == null)
 			return false;
 
 		File output = Altos.replace_extension(input,".kml");
@@ -440,31 +444,19 @@ public class AltosUI extends AltosUIFrame {
 			AltosWriter writer = open_kml(output);
 			if (writer == null)
 				return false;
-			writer.write(states);
+			AltosFlightSeries series = make_series(set);
+			series.finish();
+			writer.write(series);
 			writer.close();
 			return true;
 		}
 	}
 
-	static AltosStateIterable record_iterable(File file) {
-		FileInputStream in;
-		try {
-			in = new FileInputStream(file);
-		} catch (Exception e) {
-			System.out.printf("Failed to open file '%s'\n", file);
-			return null;
-		}
-		if (file.getName().endsWith("telem"))
-			return new AltosTelemetryFile(in);
-		else
-			return new AltosEepromFile(in);
-	}
-
 	static AltosReplayReader replay_file(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return null;
-		return new AltosReplayReader(states.iterator(), file);
+		return new AltosReplayReader(set, file);
 	}
 
 	static boolean process_replay(File file) {
@@ -476,11 +468,11 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	static boolean process_graph(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return false;
 		try {
-			new AltosGraphUI(states, file);
+			new AltosGraphUI(set, file);
 			return true;
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
@@ -489,85 +481,52 @@ public class AltosUI extends AltosUIFrame {
 	}
 
 	static boolean process_summary(File file) {
-		AltosStateIterable states = record_iterable(file);
-		if (states == null)
+		AltosRecordSet set = record_set(file);
+		if (set == null)
 			return false;
-		try {
-			System.out.printf("%s:\n", file.toString());
-			AltosFlightStats stats = new AltosFlightStats(states);
-			if (stats.serial != AltosLib.MISSING)
-				System.out.printf("Serial:       %5d\n", stats.serial);
-			if (stats.flight != AltosLib.MISSING)
-				System.out.printf("Flight:       %5d\n", stats.flight);
-			if (stats.year != AltosLib.MISSING)
-				System.out.printf("Date:    %04d-%02d-%02d\n",
-						  stats.year, stats.month, stats.day);
-			if (stats.hour != AltosLib.MISSING)
-				System.out.printf("Time:      %02d:%02d:%02d UTC\n",
-						  stats.hour, stats.minute, stats.second);
-			if (stats.max_height != AltosLib.MISSING)
-				System.out.printf("Max height:  %6.0f m    %6.0f ft\n",
-						  stats.max_height,
-						  AltosConvert.meters_to_feet(stats.max_height));
-			if (stats.max_speed != AltosLib.MISSING)
-				System.out.printf("Max speed:   %6.0f m/s  %6.0f ft/s  %6.4f Mach\n",
-						  stats.max_speed,
-						  AltosConvert.meters_to_feet(stats.max_speed),
-						  AltosConvert.meters_to_mach(stats.max_speed));
-			if (stats.max_acceleration != AltosLib.MISSING) {
-				System.out.printf("Max accel:   %6.0f m/s² %6.0f ft/s² %6.2f g\n",
-						  stats.max_acceleration,
-						  AltosConvert.meters_to_feet(stats.max_acceleration),
-						  AltosConvert.meters_to_g(stats.max_acceleration));
-			}
-			if (stats.state_speed[Altos.ao_flight_drogue] != AltosLib.MISSING)
-				System.out.printf("Drogue rate: %6.0f m/s  %6.0f ft/s\n",
-						  stats.state_speed[Altos.ao_flight_drogue],
-						  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_drogue]));
-			if (stats.state_speed[Altos.ao_flight_main] != AltosLib.MISSING)
-				System.out.printf("Main rate:   %6.0f m/s  %6.0f ft/s\n",
-						  stats.state_speed[Altos.ao_flight_main],
-						  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_main]));
-			if (stats.state_end[Altos.ao_flight_main] != AltosLib.MISSING &&
-			    stats.state_start[Altos.ao_flight_boost] != AltosLib.MISSING)
-				System.out.printf("Flight time: %6.0f s\n",
-						  stats.state_end[Altos.ao_flight_main] -
-						  stats.state_start[Altos.ao_flight_boost]);
-			System.out.printf("\n");
-			return true;
-		} catch (InterruptedException ie) {
-		} catch (IOException ie) {
+		System.out.printf("%s:\n", file.toString());
+		AltosFlightSeries series = make_series(set);
+		AltosFlightStats stats = new AltosFlightStats(series);
+		if (stats.serial != AltosLib.MISSING)
+			System.out.printf("Serial:       %5d\n", stats.serial);
+		if (stats.flight != AltosLib.MISSING)
+			System.out.printf("Flight:       %5d\n", stats.flight);
+		if (stats.year != AltosLib.MISSING)
+			System.out.printf("Date:    %04d-%02d-%02d\n",
+					  stats.year, stats.month, stats.day);
+		if (stats.hour != AltosLib.MISSING)
+			System.out.printf("Time:      %02d:%02d:%02d UTC\n",
+					  stats.hour, stats.minute, stats.second);
+		if (stats.max_height != AltosLib.MISSING)
+			System.out.printf("Max height:  %6.0f m    %6.0f ft\n",
+					  stats.max_height,
+					  AltosConvert.meters_to_feet(stats.max_height));
+		if (stats.max_speed != AltosLib.MISSING)
+			System.out.printf("Max speed:   %6.0f m/s  %6.0f ft/s  %6.4f Mach\n",
+					  stats.max_speed,
+					  AltosConvert.meters_to_feet(stats.max_speed),
+					  AltosConvert.meters_to_mach(stats.max_speed));
+		if (stats.max_acceleration != AltosLib.MISSING) {
+			System.out.printf("Max accel:   %6.0f m/s² %6.0f ft/s² %6.2f g\n",
+					  stats.max_acceleration,
+					  AltosConvert.meters_to_feet(stats.max_acceleration),
+					  AltosConvert.meters_to_g(stats.max_acceleration));
 		}
-		return false;
-	}
-
-	static boolean process_cat(File file) {
-		try {
-			AltosStateIterable eef = record_iterable(file);
-
-			for (AltosState state : eef) {
-				if ((state.set & AltosState.set_gps) != 0) {
-					System.out.printf ("time %d %d-%d-%d %d:%d:%d lat %g lon %g alt %g\n",
-							   state.gps.seconds(),
-							   state.gps.year,
-							   state.gps.month,
-							   state.gps.day,
-							   state.gps.hour,
-							   state.gps.minute,
-							   state.gps.second,
-							   state.gps.lat,
-							   state.gps.lon,
-							   state.gps.alt);
-				} else {
-					System.out.printf ("tick %d state %d height %g\n",
-							   state.tick, state.state(), state.height());
-				}
-			}
-
-		} catch (Exception e) {
-			System.out.printf("Failed to open file '%s'\n", file);
-			return false;
-		}
+		if (stats.state_speed[Altos.ao_flight_drogue] != AltosLib.MISSING)
+			System.out.printf("Drogue rate: %6.0f m/s  %6.0f ft/s\n",
+					  stats.state_speed[Altos.ao_flight_drogue],
+					  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_drogue]));
+		if (stats.state_speed[Altos.ao_flight_main] != AltosLib.MISSING)
+			System.out.printf("Main rate:   %6.0f m/s  %6.0f ft/s\n",
+					  stats.state_speed[Altos.ao_flight_main],
+					  AltosConvert.meters_to_feet(stats.state_speed[Altos.ao_flight_main]));
+		if (stats.landed_time != AltosLib.MISSING &&
+		    stats.boost_time != AltosLib.MISSING &&
+		    stats.landed_time > stats.boost_time)
+			System.out.printf("Flight time: %6.0f s\n",
+					  stats.landed_time -
+					  stats.boost_time);
+		System.out.printf("\n");
 		return true;
 	}
 
@@ -613,8 +572,6 @@ public class AltosUI extends AltosUIFrame {
 					process = process_graph;
 				else if (args[i].equals("--summary"))
 					process = process_summary;
-				else if (args[i].equals("--cat"))
-					process = process_cat;
 				else if (args[i].startsWith("--"))
 					help(1);
 				else {
@@ -643,9 +600,6 @@ public class AltosUI extends AltosUIFrame {
 						if (!process_summary(file))
 							++errors;
 						break;
-					case process_cat:
-						if (!process_cat(file))
-							++errors;
 					}
 				}
 			}

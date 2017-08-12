@@ -16,14 +16,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_11;
+package org.altusmetrum.altoslib_12;
 
 public class AltosTelemetryRaw extends AltosTelemetryStandard {
-	public AltosTelemetryRaw(int[] bytes) {
+	public AltosTelemetryRaw(int[] bytes) throws AltosCRCException {
 		super(bytes);
 	}
 
-	public void update_state(AltosState state) {
-		super.update_state(state);
+	public void provide_data(AltosDataListener listener) {
+		super.provide_data(listener);
 	}
 }

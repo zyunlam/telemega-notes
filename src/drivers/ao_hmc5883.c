@@ -126,13 +126,15 @@ struct ao_hmc5883_sample ao_hmc5883_current;
 static void
 ao_hmc5883(void)
 {
+	struct ao_hmc5883_sample	sample;
 	ao_hmc5883_setup();
 	for (;;) {
-		ao_hmc5883_sample(&ao_hmc5883_current);
-		ao_arch_critical(
-			AO_DATA_PRESENT(AO_DATA_HMC5883);
-			AO_DATA_WAIT();
-			);
+		ao_hmc5883_sample(&sample);
+		ao_arch_block_interrupts();
+		ao_hmc5883_current = sample;
+		AO_DATA_PRESENT(AO_DATA_HMC5883);
+		AO_DATA_WAIT();
+		ao_arch_release_interrupts();
 	}
 }
 
@@ -141,10 +143,8 @@ static struct ao_task ao_hmc5883_task;
 static void
 ao_hmc5883_show(void)
 {
-	struct ao_data	sample;
-	ao_data_get(&sample);
-	printf ("X: %d Y: %d Z: %d missed irq: %lu\n",
-		sample.hmc5883.x, sample.hmc5883.y, sample.hmc5883.z, ao_hmc5883_missed_irq);
+	printf ("X: %d Z: %d Y: %d missed irq: %lu\n",
+		ao_hmc5883_current.x, ao_hmc5883_current.z, ao_hmc5883_current.y, ao_hmc5883_missed_irq);
 }
 
 static const struct ao_cmds ao_hmc5883_cmds[] = {
