@@ -66,10 +66,7 @@
 #define SPI_1_ALT_1		0
 #define SPI_1_ALT_2		1
 
-#define HAS_74HC165		1
-#define AO_74HC165_CS_PORT	P1
-#define AO_74HC165_CS_PIN	4
-#define AO_74HC165_CS		P1_4
+#define HAS_FIXED_PAD_BOX	1
 
 #define AO_PCA9922_CS_PORT	P2
 #define AO_PCA9922_CS_PIN	0

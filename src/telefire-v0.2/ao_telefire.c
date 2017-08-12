@@ -18,7 +18,6 @@
 
 #include <ao.h>
 #include <ao_pad.h>
-#include <ao_74hc165.h>
 #include <ao_radio_cmac_cmd.h>
 
 void
@@ -34,7 +33,6 @@ main(void)
 	ao_adc_init();
 	ao_cmd_init();
 	ao_spi_init();
-	ao_74hc165_init();
 	ao_storage_init();
 	ao_usb_init();
 	ao_radio_init();

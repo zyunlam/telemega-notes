@@ -50,7 +50,6 @@ CC1111_SRC = \
 
 DRIVER_SRC = \
 	ao_pca9922.c \
-	ao_74hc165.c \
 	ao_pad.c \
 	ao_radio_cmac_cmd.c
 
