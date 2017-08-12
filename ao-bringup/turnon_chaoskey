@@ -27,7 +27,7 @@ echo
 FLASH_FILE=~/altusmetrumllc/Binaries/loaders/chaoskey-v1.0-altos-flash-*.bin
 ALTOS_FILE=~/altusmetrumllc/Binaries/chaoskey-v1.0-*.elf
 
-$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
+$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || true
 
 sleep 2
 
