@@ -41,6 +41,7 @@ ARMM3DIRS=\
 	teledongle-v3.0 teledongle-v3.0/flash-loader \
 	teleballoon-v2.0 \
 	telebt-v3.0 telebt-v3.0/flash-loader \
+	telebt-v4.0 telebt-v4.0/flash-loader \
 	telelcotwo-v0.1 telelcotwo-v0.1/flash-loader \
 	telefiretwo-v0.1 telefiretwo-v0.1/flash-loader \
 
