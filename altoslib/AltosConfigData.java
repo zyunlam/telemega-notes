@@ -523,6 +523,12 @@ public class AltosConfigData {
 		if (pad_orientation != AltosLib.MISSING)
 			pad_orientation = source.pad_orientation();
 
+		if (accel_cal_plus != AltosLib.MISSING)
+			accel_cal_plus = source.accel_cal_plus();
+
+		if (accel_cal_minus != AltosLib.MISSING)
+			accel_cal_minus = source.accel_cal_minus();
+
 		/* HAS_LOG */
 		if (flight_log_max != AltosLib.MISSING)
 			flight_log_max = source.flight_log_max();
@@ -590,6 +596,7 @@ public class AltosConfigData {
 		dest.set_flight_log_max(flight_log_max);
 		dest.set_ignite_mode(ignite_mode);
 		dest.set_pad_orientation(pad_orientation);
+		dest.set_accel_cal(accel_cal_plus, accel_cal_minus);
 		dest.set_callsign(callsign);
 		if (npyro != AltosLib.MISSING)
 			dest.set_pyros(pyros);
@@ -667,9 +674,10 @@ public class AltosConfigData {
 			link.printf("c e %d\n", radio_enable);
 
 		/* HAS_ACCEL */
-		/* UI doesn't support accel cal */
 		if (pad_orientation != AltosLib.MISSING)
 			link.printf("c o %d\n", pad_orientation);
+		if (accel_cal_plus != AltosLib.MISSING && accel_cal_minus != AltosLib.MISSING)
+			link.printf("c a %d %d\n", accel_cal_plus, accel_cal_minus);
 
 		/* HAS_LOG */
 		if (flight_log_max != 0)

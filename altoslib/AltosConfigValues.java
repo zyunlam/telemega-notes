@@ -74,6 +74,12 @@ public interface AltosConfigValues {
 
 	public abstract int pad_orientation();
 
+	public abstract void set_accel_cal(int accel_cal_plus, int accel_cal_minus);
+
+	public abstract int accel_cal_plus();
+
+	public abstract int accel_cal_minus();
+
 	public abstract void set_pyros(AltosPyro[] new_pyros);
 
 	public abstract AltosPyro[] pyros() throws AltosConfigDataException;

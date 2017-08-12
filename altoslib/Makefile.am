@@ -26,6 +26,8 @@ record_files = \
 
 altoslib_JAVA = \
 	AltosLib.java \
+	AltosAccelCal.java \
+	AltosAccelCalListener.java \
 	AltosCalData.java \
 	AltosCompanion.java \
 	AltosConfigData.java \
