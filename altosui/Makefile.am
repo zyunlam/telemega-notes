@@ -171,6 +171,8 @@ LINUX_DIST=Altos-Linux-$(VERSION).tar.bz2
 LINUX_SH=Altos-Linux-$(VERSION).sh
 MACOSX_DIST=Altos-Mac-$(VERSION).dmg
 WINDOWS_DIST=Altos-Windows-$(VERSION_DASH).exe
+MDWN=$(VERSION).mdwn
+MDWNTMPL=mdwn.tmpl
 
 FAT_FILES=$(FATJAR) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS)
 
@@ -185,14 +187,14 @@ MACOSX_EXTRA=$(FIRMWARE)
 
 WINDOWS_FILES=$(FAT_FILES) $(FIRMWARE) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(WINDOWS_ICONS)
 
-all-local: classes/altosui $(JAR) altosui altosui-test altosui-jdb
+all-local: classes/altosui $(JAR) altosui altosui-test altosui-jdb $(MDWN)
 
 clean-local:
 	-rm -rf classes $(JAR) $(FATJAR) \
 		Altos-Linux-*.tar.bz2 Altos-Linux-*.sh Altos-Mac-*.dmg Altos-Windows-*.exe \
 		windows altoslib_*.jar altosuilib_*.jar $(FREETTS_CLASS) \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt altos-windows.log altos-windows.nsi \
-		altosui altosui-test altosui-jdb macosx linux *.desktop
+		altosui altosui-test altosui-jdb macosx linux *.desktop $(MDWN)
 
 EXTRA_DIST = $(desktop_file).in
 
@@ -202,18 +204,17 @@ $(desktop_file): $(desktop_file).in
 
 if FATINSTALL
 
-FATTARGET=$(FATDIR)/$(VERSION)
+FATTARGET=$(FATDIR)/AltOS/releases/$(VERSION)
 
-LINUX_DIST_TARGET=$(FATTARGET)/$(LINUX_DIST)
 LINUX_SH_TARGET=$(FATTARGET)/$(LINUX_SH)
 MACOSX_DIST_TARGET=$(FATTARGET)/$(MACOSX_DIST)
 WINDOWS_DIST_TARGET=$(FATTARGET)/$(WINDOWS_DIST)
+MDWN_TARGET=$(FATDIR)/AltOS/releases/$(MDWN)
+RELNOTES=release-notes-$(VERSION).html
+RELNOTES_SRC=$(top_builddir)/doc/$(RELNOTES)
+RELNOTES_TARGET=$(FATTARGET)/$(RELNOTES)
 
-fat: $(LINUX_DIST_TARGET) $(LINUX_SH_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET)
-
-$(LINUX_DIST_TARGET): $(LINUX_DIST)
-	mkdir -p $(FATTARGET)
-	cp -p $< $@
+fat-install: fat $(LINUX_SH_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET) $(MDWN_TARGET) $(RELNOTES_TARGET)
 
 $(LINUX_SH_TARGET): $(LINUX_SH)
 	mkdir -p $(FATTARGET)
@@ -227,9 +228,20 @@ $(WINDOWS_DIST_TARGET): $(WINDOWS_DIST)
 	mkdir -p $(FATTARGET)
 	cp -p $< $@
 
-else
-fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
+$(MDWN_TARGET): $(MDWN)
+	mkdir -p $(FATTARGET)
+	cp -p $< $@
+
+$(RELNOTES_TARGET): $(RELNOTES_SRC)
+	mkdir -p $(FATTARGET)
+	sh $(top_srcdir)/doc/install-html -d $(FATTARGET) $(RELNOTES_SRC)
+
 endif
+
+$(MDWN): $(MDWNTMPL)
+	sed -e 's/%version%/$(VERSION)/g' -e 's/%version_dash%/$(VERSION_DASH)/g' $(MDWNTMPL) > $@
+
+fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
 
 altosuidir=$(datadir)/java
 

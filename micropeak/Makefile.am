@@ -95,7 +95,7 @@ desktopdir = $(datadir)/applications
 desktop_file = altusmetrum-micropeak.desktop
 desktop_SCRIPTS = $(desktop_file)
 
-all-local: micropeak-test micropeak-jdb $(JAR)
+all-local: micropeak-test micropeak-jdb $(JAR) $(MDWN)
 
 clean-local:
 	-rm -rf classes $(JAR) $(FATJAR) \
@@ -103,7 +103,7 @@ clean-local:
 		altoslib_*.jar altosuilib_*.jar \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		micropeak micropeak-test micropeak-jdb macosx linux windows micropeak-windows.log \
-		micropeak-windows.nsi *.desktop
+		micropeak-windows.nsi *.desktop $(MDWN)
 
 EXTRA_DIST = $(desktop_file).in
 
@@ -115,6 +115,8 @@ LINUX_DIST=MicroPeak-Linux-$(VERSION).tar.bz2
 LINUX_SH=MicroPeak-Linux-$(VERSION).sh
 MACOSX_DIST=MicroPeak-Mac-$(VERSION).dmg
 WINDOWS_DIST=MicroPeak-Windows-$(VERSION_DASH).exe
+MDWN=$(VERSION).mdwn
+MDWNTMPL=mdwn.tmpl
 
 MICROPEAK_DOC=$(top_srcdir)/doc/micropeak.pdf
 
@@ -153,18 +155,17 @@ WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(DOC) $(WINDOWS_ICONS) $(WINDO
 
 if FATINSTALL
 
-FATTARGET=$(FATDIR)/$(VERSION)
+FATTARGET=$(FATDIR)/MicroPeak/releases/$(VERSION)
 
-LINUX_DIST_TARGET=$(FATTARGET)/$(LINUX_DIST)
 LINUX_SH_TARGET=$(FATTARGET)/$(LINUX_SH)
 MACOSX_DIST_TARGET=$(FATTARGET)/$(MACOSX_DIST)
 WINDOWS_DIST_TARGET=$(FATTARGET)/$(WINDOWS_DIST)
+MDWN_TARGET=$(FATDIR)/MicroPeak/releases/$(MDWN)
+RELNOTES=release-notes-$(VERSION).html
+RELNOTES_SRC=$(top_builddir)/doc/$(RELNOTES)
+RELNOTES_TARGET=$(FATTARGET)/$(RELNOTES)
 
-fat: $(LINUX_DIST_TARGET) $(LINUX_SH_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET)
-
-$(LINUX_DIST_TARGET): $(LINUX_DIST)
-	mkdir -p $(FATTARGET)
-	cp -p $< $@
+fat-install: $(LINUX_SH_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET) $(MDWN_TARGET) $(RELNOTES_TARGET)
 
 $(LINUX_SH_TARGET): $(LINUX_SH)
 	mkdir -p $(FATTARGET)
@@ -178,9 +179,21 @@ $(WINDOWS_DIST_TARGET): $(WINDOWS_DIST)
 	mkdir -p $(FATTARGET)
 	cp -p $< $@
 
-else
-fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
+$(MDWN_TARGET): $(MDWN)
+	mkdir -p $(FATTARGET)
+	cp -p $< $@
+
+$(RELNOTES_TARGET): $(RELNOTES_SRC)
+	mkdir -p $(FATTARGET)
+	sh $(top_srcdir)/doc/install-html -d $(FATTARGET) $(RELNOTES_SRC)
+
 endif
+
+$(MDWN): $(MDWNTMPL)
+	sed -e 's/%version%/$(VERSION)/g' -e 's/%version_dash%/$(VERSION_DASH)/g' $(MDWNTMPL) > $@
+
+fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
+
 
 micropeak: Makefile
 	echo "#!/bin/sh" > $@

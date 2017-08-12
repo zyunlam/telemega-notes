@@ -120,7 +120,7 @@ desktopdir = $(datadir)/applications
 desktop_file = altusmetrum-telegps.desktop
 desktop_SCRIPTS = $(desktop_file)
 
-all-local: telegps-test telegps-jdb $(JAR)
+all-local: telegps-test telegps-jdb $(JAR) $(MDWN)
 
 clean-local:
 	-rm -rf classes $(JAR) $(FATJAR) \
@@ -128,7 +128,7 @@ clean-local:
 		altoslib_*.jar altosuilib_*.jar \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(FREETTS_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		telegps telegps-test telegps-jdb macosx linux windows telegps-windows.log \
-		telegps-windows.nsi *.desktop
+		telegps-windows.nsi *.desktop $(MDWN)
 
 EXTRA_DIST = $(desktop_file).in
 
@@ -140,6 +140,8 @@ LINUX_DIST=TeleGPS-Linux-$(VERSION).tar.bz2
 LINUX_SH=TeleGPS-Linux-$(VERSION).sh
 MACOSX_DIST=TeleGPS-Mac-$(VERSION).dmg
 WINDOWS_DIST=TeleGPS-Windows-$(VERSION_DASH).exe
+MDWN=$(VERSION).mdwn
+MDWNTMPL=mdwn.tmpl
 
 TELEGPS_DOC=$(top_srcdir)/doc/telegps.pdf
 
@@ -159,18 +161,17 @@ WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $
 
 if FATINSTALL
 
-FATTARGET=$(FATDIR)/$(VERSION)
+FATTARGET=$(FATDIR)/TeleGPS/releases/$(VERSION)
 
-LINUX_DIST_TARGET=$(FATTARGET)/$(LINUX_DIST)
 LINUX_SH_TARGET=$(FATTARGET)/$(LINUX_SH)
 MACOSX_DIST_TARGET=$(FATTARGET)/$(MACOSX_DIST)
 WINDOWS_DIST_TARGET=$(FATTARGET)/$(WINDOWS_DIST)
+MDWN_TARGET=$(FATDIR)/TeleGPS/releases/$(MDWN)
+RELNOTES=release-notes-$(VERSION).html
+RELNOTES_SRC=$(top_builddir)/doc/$(RELNOTES)
+RELNOTES_TARGET=$(FATTARGET)/$(RELNOTES)
 
-fat: $(LINUX_DIST_TARGET) $(LINUX_SH_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET)
-
-$(LINUX_DIST_TARGET): $(LINUX_DIST)
-	mkdir -p $(FATTARGET)
-	cp -p $< $@
+fat-install: $(LINUX_SH_TARGET) $(MACOSX_DIST_TARGET) $(WINDOWS_DIST_TARGET) $(MDWN_TARGET) $(RELNOTES_TARGET)
 
 $(LINUX_SH_TARGET): $(LINUX_SH)
 	mkdir -p $(FATTARGET)
@@ -184,9 +185,21 @@ $(WINDOWS_DIST_TARGET): $(WINDOWS_DIST)
 	mkdir -p $(FATTARGET)
 	cp -p $< $@
 
-else
-fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
+$(MDWN_TARGET): $(MDWN)
+	mkdir -p $(FATTARGET)
+	cp -p $< $@
+
+$(RELNOTES_TARGET): $(RELNOTES_SRC)
+	mkdir -p $(FATTARGET)
+	sh $(top_srcdir)/doc/install-html -d $(FATTARGET) $(RELNOTES_SRC)
+
 endif
+
+$(MDWN): $(MDWNTMPL)
+	sed -e 's/%version%/$(VERSION)/g' -e 's/%version_dash%/$(VERSION_DASH)/g' $(MDWNTMPL) > $@
+
+fat: $(LINUX_DIST) $(LINUX_SH) $(MACOSX_DIST) $(WINDOWS_DIST)
+
 
 telegps: Makefile
 	echo "#!/bin/sh" > $@

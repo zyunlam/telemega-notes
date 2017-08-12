@@ -165,7 +165,7 @@ AM_CONDITIONAL([ANDROID_RELEASE], [test x$ANDROID_RELEASE = xyes])
 AC_SUBST(ANDROID_SDK)
 
 AC_ARG_WITH(fat-dir, AS_HELP_STRING([--with-fat-dir=PATH],
-	    [Set the directory to install the 'fat' distribution files to (defaults to not installing)]),
+	    [Set the directory to install the 'fat-install' distribution files to (defaults to no such target)]),
 	    [FATDIR=$withval], [FATDIR=none])
 
 AM_CONDITIONAL(FATINSTALL, [test "x$FATDIR" != "xnone"])

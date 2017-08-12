@@ -18,6 +18,13 @@ ChangeLog:
 
 dist-hook: ChangeLog
 
+if FATINSTALL
+fat-install: fat
+	cd altosui && $(MAKE) fat-install
+	cd telegps && $(MAKE) fat-install
+	cd micropeak && $(MAKE) fat-install
+endif
+
 fat:
 	cd src && $(MAKE) all
 	cd doc && $(MAKE) all
