@@ -83,6 +83,7 @@ These are Bdale's notes on how to do a release.
 	   src/easymini-v1.0/{*.elf,*.ihx} \
 	   src/easymini-v2.0/{*.elf,*.ihx} \
 	   src/telebt-v3.0/{*.elf,*.ihx} \
+	   src/telebt-v4.0/{*.elf,*.ihx} \
 	   src/teledongle-v3.0/{*.elf,*.ihx} \
 	   src/telegps-v1.0/{*.elf,*.ihx} \
 	   src/telemega-v1.0/{*.elf,*.ihx} \
@@ -95,6 +96,7 @@ These are Bdale's notes on how to do a release.
 	   src/easymini-v1.0/flash-loader/*.elf \
 	   src/easymini-v2.0/flash-loader/{*.elf,*.bin} \
 	   src/telebt-v3.0/flash-loader/*.elf \
+	   src/telebt-v4.0/flash-loader/*.elf \
 	   src/teledongle-v3.0/flash-loader/*.elf \
 	   src/telegps-v1.0/flash-loader/*.elf \
 	   src/telemega-v1.0/flash-loader/*.elf \
