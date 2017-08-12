@@ -121,7 +121,7 @@ public class AltosKML implements AltosWriter {
 		String	state_color = state_color(state);
 		out.printf(kml_style_start, state_name, state_color);
 		out.printf("State: %s\n", state_name);
-		out.printf("Time: %6.2f s\n", stats.state_end[state] - stats.state_start[state]);
+		out.printf("Time: %6.2f s\n", stats.state_time[state]);
 		out.printf("Average speed: %s\n", AltosConvert.speed.show(6, stats.state_speed[state]));
 		out.printf("Average accel: %s\n", AltosConvert.accel.show(6, stats.state_accel[state]));
 		out.printf("%s", kml_style_end);
