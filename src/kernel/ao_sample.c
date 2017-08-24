@@ -180,7 +180,7 @@ static void
 ao_sample_rotate(void)
 {
 #ifdef AO_FLIGHT_TEST
-	float	dt = (ao_sample_tick - ao_sample_prev_tick) / TIME_DIV;
+	float	dt = (int16_t) (ao_sample_tick - ao_sample_prev_tick) / TIME_DIV;
 #else
 	static const float dt = 1/TIME_DIV;
 #endif

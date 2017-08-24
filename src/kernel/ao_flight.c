@@ -269,7 +269,7 @@ ao_flight(void)
 			 * number of seconds.
 			 */
 			if (ao_config.apogee_lockout) {
-				if ((ao_sample_tick - ao_boost_tick) <
+				if ((int16_t) (ao_sample_tick - ao_boost_tick) <
 				    AO_SEC_TO_TICKS(ao_config.apogee_lockout))
 					break;
 			}
