@@ -75,7 +75,7 @@ public class AltosUIConfigure
 
 	public int		row;
 
-	final static String[] font_size_names = { "Small", "Medium", "Large" };
+	final static String[] font_size_names = { "Small", "Medium", "Large", "Huge" };
 
 	public GridBagConstraints constraints (int x, int width, int fill) {
 		GridBagConstraints c = new GridBagConstraints();
