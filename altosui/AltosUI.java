@@ -408,6 +408,7 @@ public class AltosUI extends AltosUIFrame {
 	static final int process_graph = 3;
 	static final int process_replay = 4;
 	static final int process_summary = 5;
+	static final int process_oneline = 6;
 
 	static boolean process_csv(File input) {
 		AltosRecordSet set = record_set(input);
@@ -530,12 +531,40 @@ public class AltosUI extends AltosUIFrame {
 		return true;
 	}
 
+	static boolean process_oneline(File file) {
+		AltosRecordSet set = record_set(file);
+		if (set == null)
+			return false;
+		System.out.printf("%s:", file.toString());
+		AltosFlightSeries series = make_series(set);
+		AltosFlightStats stats = new AltosFlightStats(series);
+//		if (stats.serial != AltosLib.MISSING)
+//			System.out.printf("Serial:       %5d\n", stats.serial);
+//		if (stats.flight != AltosLib.MISSING)
+//			System.out.printf("Flight:       %5d\n", stats.flight);
+//		if (stats.year != AltosLib.MISSING)
+//			System.out.printf("Date:    %04d-%02d-%02d\n",
+//					  stats.year, stats.month, stats.day);
+//		if (stats.hour != AltosLib.MISSING)
+//			System.out.printf("Time:      %02d:%02d:%02d UTC\n",
+//					  stats.hour, stats.minute, stats.second);
+		if (stats.max_height != AltosLib.MISSING)
+			System.out.printf(" height:  %6.0f m", stats.max_height);
+		if (stats.max_speed != AltosLib.MISSING)
+			System.out.printf(" speed:   %6.0f m/s", stats.max_speed);
+		if (stats.max_acceleration != AltosLib.MISSING)
+			System.out.printf(" accel:   %6.0f m/s²", stats.max_acceleration);
+		System.out.printf("\n");
+		return true;
+	}
+
 	public static void help(int code) {
 		System.out.printf("Usage: altosui [OPTION]... [FILE]...\n");
 		System.out.printf("  Options:\n");
 		System.out.printf("    --replay <filename>\t\trelive the glory of past flights \n");
 		System.out.printf("    --graph <filename>\t\tgraph a flight\n");
 		System.out.printf("    --summary <filename>\t\tText summary of a flight\n");
+		System.out.printf("    --oneline <filename>\t\tOne line summary of a flight\n");
 		System.out.printf("    --csv\tgenerate comma separated output for spreadsheets, etc\n");
 		System.out.printf("    --kml\tgenerate KML output for use with Google Earth\n");
 		System.exit(code);
@@ -572,6 +601,8 @@ public class AltosUI extends AltosUIFrame {
 					process = process_graph;
 				else if (args[i].equals("--summary"))
 					process = process_summary;
+				else if (args[i].equals("--oneline"))
+					process = process_oneline;
 				else if (args[i].startsWith("--"))
 					help(1);
 				else {
@@ -598,6 +629,10 @@ public class AltosUI extends AltosUIFrame {
 						break;
 					case process_summary:
 						if (!process_summary(file))
+							++errors;
+						break;
+					case process_oneline:
+						if (!process_oneline(file))
 							++errors;
 						break;
 					}
