@@ -103,13 +103,13 @@ ao_kalman_err_height(void)
 		return;
 	height_distrust = ao_sample_alt - AO_MAX_BARO_HEIGHT;
 #if HAS_ACCEL
-	/* speed is stored * 16, but we need to ramp between 200 and 328, so
+	/* speed is stored * 16, but we need to ramp between 248 and 328, so
 	 * we want to multiply by 2. The result is a shift by 3.
 	 */
 	speed_distrust = (ao_speed - AO_MS_TO_SPEED(AO_MAX_BARO_SPEED)) >> (4 - 1);
-	if (speed_distrust <= 0)
-		speed_distrust = 0;
-	else if (speed_distrust > height_distrust)
+	if (speed_distrust > AO_MAX_SPEED_DISTRUST)
+		speed_distrust = AO_MAX_SPEED_DISTRUST;
+	if (speed_distrust > height_distrust)
 		height_distrust = speed_distrust;
 #endif
 	if (height_distrust > 0) {

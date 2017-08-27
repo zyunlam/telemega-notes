@@ -95,7 +95,12 @@ typedef int16_t			ao_v_t;
 /*
  * Above this speed, baro measurements are unreliable
  */
-#define AO_MAX_BARO_SPEED	200
+#define AO_MAX_BARO_SPEED	248
+
+/* The maximum amount (in a range of 0-256) to de-rate the
+ * baro sensor data based on speed.
+ */
+#define AO_MAX_SPEED_DISTRUST	160
 
 #define ACCEL_NOSE_UP	(ao_accel_2g >> 2)
 
