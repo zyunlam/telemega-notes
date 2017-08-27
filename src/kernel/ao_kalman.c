@@ -96,13 +96,8 @@ ao_kalman_err_height(void)
 		e = -e;
 	if (e > 127)
 		e = 127;
-#if HAS_ACCEL
-	ao_error_h_sq_avg -= ao_error_h_sq_avg >> 2;
-	ao_error_h_sq_avg += (e * e) >> 2;
-#else
 	ao_error_h_sq_avg -= ao_error_h_sq_avg >> 4;
 	ao_error_h_sq_avg += (e * e) >> 4;
-#endif
 
 	if (ao_flight_state >= ao_flight_drogue)
 		return;
