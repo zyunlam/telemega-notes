@@ -397,7 +397,7 @@ public class AltosUI extends AltosUIFrame {
 			String message = ie.getMessage();
 			if (message == null)
 				message = String.format("%s (I/O error)", input.toString());
-			System.err.printf("%s\n", message);
+			System.err.printf("%s: %s\n", input.toString(), message);
 		}
 		return null;
 	}
@@ -535,25 +535,17 @@ public class AltosUI extends AltosUIFrame {
 		AltosRecordSet set = record_set(file);
 		if (set == null)
 			return false;
-		System.out.printf("%s:", file.toString());
+		System.out.printf("%s", file.toString());
 		AltosFlightSeries series = make_series(set);
 		AltosFlightStats stats = new AltosFlightStats(series);
-//		if (stats.serial != AltosLib.MISSING)
-//			System.out.printf("Serial:       %5d\n", stats.serial);
-//		if (stats.flight != AltosLib.MISSING)
-//			System.out.printf("Flight:       %5d\n", stats.flight);
-//		if (stats.year != AltosLib.MISSING)
-//			System.out.printf("Date:    %04d-%02d-%02d\n",
-//					  stats.year, stats.month, stats.day);
-//		if (stats.hour != AltosLib.MISSING)
-//			System.out.printf("Time:      %02d:%02d:%02d UTC\n",
-//					  stats.hour, stats.minute, stats.second);
 		if (stats.max_height != AltosLib.MISSING)
-			System.out.printf(" height:  %6.0f m", stats.max_height);
+			System.out.printf(" height  %6.0f m", stats.max_height);
 		if (stats.max_speed != AltosLib.MISSING)
-			System.out.printf(" speed:   %6.0f m/s", stats.max_speed);
+			System.out.printf(" speed   %6.0f m/s", stats.max_speed);
+		if (stats.state_enter_speed[AltosLib.ao_flight_drogue] != AltosLib.MISSING)
+			System.out.printf(" drogue-deploy   %6.0f m/s", stats.state_enter_speed[AltosLib.ao_flight_drogue]);
 		if (stats.max_acceleration != AltosLib.MISSING)
-			System.out.printf(" accel:   %6.0f m/s²", stats.max_acceleration);
+			System.out.printf(" accel   %6.0f m/s²", stats.max_acceleration);
 		System.out.printf("\n");
 		return true;
 	}
