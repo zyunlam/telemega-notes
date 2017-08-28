@@ -264,6 +264,7 @@ double	main_time;
 int	tick_offset;
 
 static ao_k_t	ao_k_height;
+static double	simple_speed;
 
 int16_t
 ao_time(void)
@@ -501,6 +502,7 @@ ao_insert(void)
 			tick_offset = -ao_data_static.tick;
 		if ((prev_tick - ao_data_static.tick) > 0x400)
 			tick_offset += 65536;
+		simple_speed += accel * (ao_data_static.tick - prev_tick) / 100.0;
 		prev_tick = ao_data_static.tick;
 		time = (double) (ao_data_static.tick + tick_offset) / 100;
 
@@ -616,17 +618,27 @@ ao_insert(void)
 #endif
 
 #if 1
-			printf("%7.2f height %8.2f accel %8.3f "
-#if TELEMEGA && 1
-			       "angle %5d "
+			printf("%7.2f height %8.2f accel %8.3f accel_speed %8.3f "
+			       "state %-8.8s k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d"
+#if TELEMEGA
+			       " angle %5d "
 			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
 #endif
-			       "state %-8.8s k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d\n",
+			       "\n",
 			       time,
 			       height,
 			       accel,
-#if TELEMEGA && 1
-			       ao_sample_orient,
+			       simple_speed > -100.0 ? simple_speed : -100.0,
+			       ao_state_names[ao_flight_state],
+			       ao_k_height / 65536.0,
+			       ao_k_speed / 65536.0 / 16.0,
+			       ao_k_accel / 65536.0 / 16.0,
+			       ao_avg_height,
+			       drogue_height,
+			       main_height,
+			       ao_error_h_sq_avg
+#if TELEMEGA
+			       , ao_sample_orient,
 
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_x),
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_y),
@@ -637,18 +649,11 @@ ao_insert(void)
 			       ao_data_static.hmc5883.x,
 			       ao_data_static.hmc5883.y,
 			       ao_data_static.hmc5883.z,
-			       ao_mag_angle,
+			       ao_mag_angle
 #endif
-			       ao_state_names[ao_flight_state],
-			       ao_k_height / 65536.0,
-			       ao_k_speed / 65536.0 / 16.0,
-			       ao_k_accel / 65536.0 / 16.0,
-			       ao_avg_height,
-			       drogue_height,
-			       main_height,
-			       ao_error_h_sq_avg);
+				);
 #endif
-			
+
 //			if (ao_flight_state == ao_flight_landed)
 //				ao_test_exit();
 		}
