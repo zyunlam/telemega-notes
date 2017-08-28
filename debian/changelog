@@ -1,3 +1,9 @@
+altos (1.8.1-2) unstable; urgency=medium
+
+  * updating packaging to resolve outstanding lintian issues
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 28 Aug 2017 13:08:00 -0600
+
 altos (1.8.1-1) unstable; urgency=medium
 
   [ Keith Packard ]
