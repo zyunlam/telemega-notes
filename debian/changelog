@@ -1,3 +1,31 @@
+altos (1.8.1-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * install: Add 'fat-install' target
+  * altos: Perform time comparisons using 16-bit arithmetic to handle wrap
+  * micropeak: Track font changes in raw data display
+  * altosuilib: Add "Huge" font size
+  * altosui: Add --oneline mode to briefly summarize flights
+  * altos: Eliminate separate height error filter for accelerometer devices
+  * altos: Don't eliminate baro above mach speed, just trust it less
+  * altos/test: telemetrum baro data is inverted before being written to eeprom
+  * altos/test: Integrate raw accel to provide speed for comparison
+  * altos/test: Fake baro data for flight 12 serial 2093
+  * altoslib: Remove debug printf for gyro adjust
+  * altoslib: Allow for missing product when checking for mma655x inverted
+  * altoslib: Fix parsing of old TM log GPS sat data
+  * altoslib: Compute speed at entry to each state
+  * altosui: Make --oneline show drogue deploy speed
+  * altoslib: Fix freq preference loading
+  * altos: Don't compute filtered average of height error when HAS_ACCEL
+  * doc: Update for 1.8.1
+  * Version 1.8.1
+
+  [ Bdale Garbee ]
+  * releasing 1.8.1
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 28 Aug 2017 12:06:54 -0600
+
 altos (1.8-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
