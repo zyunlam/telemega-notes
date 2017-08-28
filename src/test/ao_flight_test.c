@@ -72,7 +72,7 @@ struct ao_adc {
 #define AO_ADC_NUM_SENSE	2
 #define HAS_MS5607		1
 #define HAS_MMA655X		1
-#define AO_MMA655X_INVERT	1
+#define AO_MMA655X_INVERT	0
 #define HAS_BEEP		1
 #define AO_CONFIG_MAX_SIZE	1024
 
