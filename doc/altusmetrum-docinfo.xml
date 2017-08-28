@@ -47,6 +47,14 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.8.1</revnumber>
+    <date>27 Aug 2017</date>
+    <revremark>
+      Fix Apogee Lockout time value wrapping bug. Change high-speed
+      Kalman filter function.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.8</revnumber>
     <date>12 Aug 2017</date>
     <revremark>
