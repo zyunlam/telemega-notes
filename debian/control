@@ -33,7 +33,7 @@ Build-Depends: asciidoc,
                swig,
                xmlto,
                xsltproc
-Standards-Version: 3.9.8
+Standards-Version: 4.0.0
 Homepage: http://altusmetrum.org/AltOS
 Vcs-Git: git://git.gag.com/fw/altos -b debian
 Vcs-Browser: http://git.gag.com/?p=fw/altos
