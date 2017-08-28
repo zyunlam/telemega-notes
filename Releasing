@@ -95,11 +95,8 @@ These are Bdale's notes on how to do a release.
 		--with-fat-dir=/home/bdale/web/altusmetrum/
 	make && make fat
 
-		this pushes packages for each platform and application
-		to web site, including auto-generated mdwn files and
-		release notes in html format.
+	- store a stable copy of ARM binaries for production use
 
-	# store a stable copy of ARM binaries for production use
 	cp src/chaoskey-v1.0/{*.elf,*.ihx} \
 	   src/easymega-v1.0/{*.elf,*.ihx} \
 	   src/easymini-v1.0/{*.elf,*.ihx} \
@@ -129,25 +126,22 @@ These are Bdale's notes on how to do a release.
 	(cd ~/altusmetrumllc ; git add Binaries ; git commit -a) 
 	(cd ~/altusmetrumllc ; git push) 
 
-	- copy the relevant release notes .html file from doc/ to 
-	    /home/bdale/web/altusmetrum/AltOS/releases/<rev>
-
 	- Push new release to web site
 
 	make fat-install
 	(cd doc ; make publish)
 
-	(cd ~/web/altusmetrum/ && git add AltOS/releases
-	TeleGPS/releases MicroPeak/releases && git commit -m'Release
-	<rev>' && git push origin master)
+	(cd ~/web/altusmetrum/ && \
+		git add */releases && git commit -m'Release <rev>' && \
+		git push origin master)
 
-		this pushes fresh documents to the web site
+	- upload the Debian package 
+
+	- clean up
 
 	sudo debian/rules clean
 	git push origin master branch-<version> debian pristine-tar
 	git push --tags
-
-		push commits and leave the build tree in an uncluttered state
 
 Testing before a release
 
