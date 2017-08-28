@@ -85,7 +85,7 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 		case AltosLib.AO_LOG_GPS_SAT:
 			gps = cal_data.make_temp_gps(tick(),true);
 			int svid = data16(0);
-			int c_n0 = data16(3);
+			int c_n0 = data16(2);
 			gps.add_sat(svid, c_n0);
 			break;
 		case AltosLib.AO_LOG_GPS_DATE:
