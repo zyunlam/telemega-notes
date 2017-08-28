@@ -139,7 +139,7 @@ public class AltosPreferences {
 		try {
 			AltosJson json = AltosJson.fromString(backend.getString(frequenciesPreference,
 										null));
-			frequencies = (AltosFrequency[]) json.make(frequencies.getClass());
+			frequencies = (AltosFrequency[]) json.make((new AltosFrequency[1]).getClass());
 		} catch (Exception e) {
 		}
 

@@ -62,4 +62,7 @@ public class AltosFrequency {
 		frequency = f;
 		description = d;
 	}
+	public AltosFrequency() {
+		this(0, null);
+	}
 }

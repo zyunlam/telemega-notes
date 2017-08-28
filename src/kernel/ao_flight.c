@@ -269,7 +269,7 @@ ao_flight(void)
 			 * number of seconds.
 			 */
 			if (ao_config.apogee_lockout) {
-				if ((ao_sample_tick - ao_boost_tick) <
+				if ((int16_t) (ao_sample_tick - ao_boost_tick) <
 				    AO_SEC_TO_TICKS(ao_config.apogee_lockout))
 					break;
 			}
@@ -282,9 +282,11 @@ ao_flight(void)
 			 * the measured altitude reasonably closely; otherwise
 			 * we're probably transsonic.
 			 */
+#define AO_ERROR_BOUND	100
+
 			if (ao_speed < 0
 #if !HAS_ACCEL
-			    && (ao_sample_alt >= AO_MAX_BARO_HEIGHT || ao_error_h_sq_avg < 100)
+			    && (ao_sample_alt >= AO_MAX_BARO_HEIGHT || ao_error_h_sq_avg < AO_ERROR_BOUND)
 #endif
 				)
 			{

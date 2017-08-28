@@ -26,6 +26,7 @@ public class AltosFlightStats {
 	public double		max_speed;
 	public double		max_acceleration;
 	public double[]		state_speed = new double[AltosLib.ao_flight_invalid + 1];
+	public double[]		state_enter_speed = new double[AltosLib.ao_flight_invalid + 1];
 	public double[]		state_accel = new double[AltosLib.ao_flight_invalid + 1];
 	public double[]		state_time = new double[AltosLib.ao_flight_invalid + 1];
 	public String		product;
@@ -131,6 +132,8 @@ public class AltosFlightStats {
 	private void add_times(AltosFlightSeries series, int state, double start_time, double end_time) {
 		double delta_time = end_time - start_time;
 		if (0 <= state && state <= AltosLib.ao_flight_invalid && delta_time > 0) {
+			if (state_enter_speed[state] == AltosLib.MISSING)
+				state_enter_speed[state] = series.speed_series.value(start_time);
 			speeds[state].value += series.speed_series.average(start_time, end_time) * delta_time;
 			speeds[state].time += delta_time;
 			accels[state].value += series.accel_series.average(start_time, end_time) * delta_time;
@@ -192,6 +195,7 @@ public class AltosFlightStats {
 
 		for (int s = 0; s < AltosLib.ao_flight_invalid + 1; s++) {
 			state_speed[s] = AltosLib.MISSING;
+			state_enter_speed[s] = AltosLib.MISSING;
 			state_accel[s] = AltosLib.MISSING;
 			state_time[s] = 0;
 			speeds[s] = new AltosTimeValue(0, 0);

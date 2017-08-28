@@ -342,8 +342,8 @@ public class AltosCalData {
 			v = Math.ceil(v);
 		else
 			v = Math.floor(v);
-		if (v != 0)
-			System.out.printf("Adjusting gyro axis by %g steps\n", v);
+//		if (v != 0)
+//			System.out.printf("Adjusting gyro axis by %g steps\n", v);
 		return v * 128.0;
 	}
 

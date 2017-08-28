@@ -72,7 +72,7 @@ struct ao_adc {
 #define AO_ADC_NUM_SENSE	2
 #define HAS_MS5607		1
 #define HAS_MMA655X		1
-#define AO_MMA655X_INVERT	1
+#define AO_MMA655X_INVERT	0
 #define HAS_BEEP		1
 #define AO_CONFIG_MAX_SIZE	1024
 
@@ -264,6 +264,7 @@ double	main_time;
 int	tick_offset;
 
 static ao_k_t	ao_k_height;
+static double	simple_speed;
 
 int16_t
 ao_time(void)
@@ -320,7 +321,7 @@ ao_dump_state(void);
 void
 ao_sleep(void *wchan);
 
-const char const * const ao_state_names[] = {
+const char * const ao_state_names[] = {
 	"startup", "idle", "pad", "boost", "fast",
 	"coast", "drogue", "main", "landed", "invalid"
 };
@@ -360,6 +361,9 @@ extern int16_t ao_ground_accel, ao_flight_accel;
 extern int16_t ao_accel_2g;
 
 typedef int16_t	accel_t;
+
+uint16_t	ao_serial_number;
+uint16_t	ao_flight_number;
 
 extern uint16_t	ao_sample_tick;
 
@@ -479,7 +483,6 @@ ao_insert(void)
 	double	time;
 
 	ao_data_ring[ao_data_head] = ao_data_static;
-	ao_data_head = ao_data_ring_next(ao_data_head);
 	if (ao_flight_state != ao_flight_startup) {
 #if HAS_ACCEL
 		double  accel = ((ao_flight_ground_accel - ao_data_accel_cook(&ao_data_static)) * GRAVITY * 2.0) /
@@ -487,22 +490,36 @@ ao_insert(void)
 #else
 		double	accel = 0.0;
 #endif
-#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
-		double	height;
-
-		ao_ms5607_convert(&ao_data_static.ms5607_raw, &ao_data_static.ms5607_cooked);
-		height = ao_pa_to_altitude(ao_data_static.ms5607_cooked.pres) - ao_ground_height;
-#else
-		double	height = ao_pres_to_altitude(ao_data_static.adc.pres_real) - ao_ground_height;
-#endif
 
 		(void) accel;
 		if (!tick_offset)
 			tick_offset = -ao_data_static.tick;
 		if ((prev_tick - ao_data_static.tick) > 0x400)
 			tick_offset += 65536;
+		simple_speed += accel * (ao_data_static.tick - prev_tick) / 100.0;
 		prev_tick = ao_data_static.tick;
 		time = (double) (ao_data_static.tick + tick_offset) / 100;
+
+#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
+		ao_ms5607_convert(&ao_data_static.ms5607_raw, &ao_data_static.ms5607_cooked);
+		double height = ao_pa_to_altitude(ao_data_static.ms5607_cooked.pres) - ao_ground_height;
+
+		/* Hack to skip baro spike at accidental drogue charge
+		 * firing in 2015-09-26-serial-2093-flight-0012.eeprom
+		 * so we can test the kalman filter with this data. Just
+		 * keep reporting the same baro value across the pressure spike
+		 */
+		{
+			static struct ao_ms5607_sample save;
+			if (ao_serial_number == 2093 && ao_flight_number == 12 && 32.5 < time && time < 33.7) {
+				ao_data_ring[ao_data_head].ms5607_raw = save;
+			} else {
+				save = ao_data_static.ms5607_raw;
+			}
+		}
+#else
+		double	height = ao_pres_to_altitude(ao_data_static.adc.pres_real) - ao_ground_height;
+#endif
 
 		if (ao_test_max_height < height) {
 			ao_test_max_height = height;
@@ -616,17 +633,27 @@ ao_insert(void)
 #endif
 
 #if 1
-			printf("%7.2f height %8.2f accel %8.3f "
-#if TELEMEGA && 1
-			       "angle %5d "
+			printf("%7.2f height %8.2f accel %8.3f accel_speed %8.3f "
+			       "state %-8.8s k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d"
+#if TELEMEGA
+			       " angle %5d "
 			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
 #endif
-			       "state %-8.8s k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d\n",
+			       "\n",
 			       time,
 			       height,
 			       accel,
-#if TELEMEGA && 1
-			       ao_sample_orient,
+			       simple_speed > -100.0 ? simple_speed : -100.0,
+			       ao_state_names[ao_flight_state],
+			       ao_k_height / 65536.0,
+			       ao_k_speed / 65536.0 / 16.0,
+			       ao_k_accel / 65536.0 / 16.0,
+			       ao_avg_height,
+			       drogue_height,
+			       main_height,
+			       ao_error_h_sq_avg
+#if TELEMEGA
+			       , ao_sample_orient,
 
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_x),
 			       ao_mpu6000_accel(ao_data_static.mpu6000.accel_y),
@@ -637,22 +664,16 @@ ao_insert(void)
 			       ao_data_static.hmc5883.x,
 			       ao_data_static.hmc5883.y,
 			       ao_data_static.hmc5883.z,
-			       ao_mag_angle,
+			       ao_mag_angle
 #endif
-			       ao_state_names[ao_flight_state],
-			       ao_k_height / 65536.0,
-			       ao_k_speed / 65536.0 / 16.0,
-			       ao_k_accel / 65536.0 / 16.0,
-			       ao_avg_height,
-			       drogue_height,
-			       main_height,
-			       ao_error_h_sq_avg);
+				);
 #endif
-			
+
 //			if (ao_flight_state == ao_flight_landed)
 //				ao_test_exit();
 		}
 	}
+	ao_data_head = ao_data_ring_next(ao_data_head);
 }
 
 
@@ -763,6 +784,7 @@ ao_sleep(void *wchan)
 //				printf ("\n");
 				switch (type) {
 				case 'F':
+					ao_flight_number = uint16(bytes, 0);
 					ao_flight_ground_accel = int16(bytes, 2);
 					ao_flight_started = 1;
 					ao_ground_pres = int32(bytes, 4);
@@ -872,6 +894,7 @@ ao_sleep(void *wchan)
 				switch (type) {
 				case 'F':
 					ao_flight_started = 1;
+					ao_flight_number = uint16(bytes, 0);
 					ao_ground_pres = uint32(bytes, 4);
 					ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
 #if 0
@@ -937,6 +960,7 @@ ao_sleep(void *wchan)
 //				printf ("\n");
 				switch (type) {
 				case 'F':
+					ao_flight_number = uint16(bytes, 0);
 					ao_flight_ground_accel = int16(bytes, 2);
 					ao_flight_started = 1;
 					ao_ground_pres = int32(bytes, 4);
@@ -985,6 +1009,8 @@ ao_sleep(void *wchan)
 #endif
 			else if (nword == 2 && strcmp(words[0], "log-format") == 0) {
 				log_format = strtoul(words[1], NULL, 10);
+			} else if (nword == 2 && strcmp(words[0], "serial-number") == 0) {
+				ao_serial_number = strtoul(words[1], NULL, 10);
 			} else if (nword >= 6 && strcmp(words[0], "Accel") == 0) {
 				ao_config.accel_plus_g = atoi(words[3]);
 				ao_config.accel_minus_g = atoi(words[5]);
@@ -1107,6 +1133,7 @@ ao_sleep(void *wchan)
 			switch (type) {
 			case 'F':
 				ao_flight_ground_accel = a;
+				ao_flight_number = b;
 				if (ao_config.accel_plus_g == 0) {
 					ao_config.accel_plus_g = a;
 					ao_config.accel_minus_g = a + 530;

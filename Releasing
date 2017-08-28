@@ -7,6 +7,26 @@ Adding a product to the release
 
 	Add the firmware to altosui/altos-windows.nsi.in
 
+	Add the firmware to telegps/Makefile.am
+
+	Add the firmware to telegps/telegps-windows.nsi.in
+
+	Add the firmware to Releasing
+
+These are Keith's notes on how to do a release
+
+	- update the version and date in configure.ac if Bdale hasn't already
+
+	- make sure there is a doc/release-notes-<version>.inc
+
+	- make sure doc/release-notes.inc points at that
+
+	- make sure doc/Makefile points at that too
+
+	- make sure that doc/altusmetrum-docinfo.xml has the right copyright 
+	  year, and add release to the revision history at the front (release 
+	  notes will be pulled in by release-notes.inc)
+
 These are Bdale's notes on how to do a release.
 
 	- make sure build environment is up to date
@@ -72,10 +92,12 @@ These are Bdale's notes on how to do a release.
 	make distclean
 
 	./autogen.sh --enable-multi-arch \
-		--with-fat-dir=/home/bdale/web/altusmetrum/AltOS/releases
+		--with-fat-dir=/home/bdale/web/altusmetrum/
 	make && make fat
 
-		this pushes packages for each platform to web site
+		this pushes packages for each platform and application
+		to web site, including auto-generated mdwn files and
+		release notes in html format.
 
 	# store a stable copy of ARM binaries for production use
 	cp src/chaoskey-v1.0/{*.elf,*.ihx} \
@@ -110,21 +132,14 @@ These are Bdale's notes on how to do a release.
 	- copy the relevant release notes .html file from doc/ to 
 	    /home/bdale/web/altusmetrum/AltOS/releases/<rev>
 
-	(cd ~/web/altusmetrum/AltOS/releases/<rev> ; rm *.tar.bz2)
+	- Push new release to web site
 
-	- create /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>,
-	  and move the MicroPeak installers from AltOS/releases to there
-		
-	- create /home/bdale/web/altusmetrum/TeleGPS/releases/<rev>,
-	  and move the TeleGPS installers from AltOS/releases to there
-		
-	- go edit ~/web/altusmetrum/AltOS/releases/<rev>.mdwn, 
-	  /home/bdale/web/altusmetrum/MicroPeak/releases/<rev>.mdwn, and
-	  /home/bdale/web/altusmetrum/TeleGPS/releases/<rev>.mdwn
-
-		- make sure the Windows stuff is like 1-4-1, not 1.4.1!
-
+	make fat-install
 	(cd doc ; make publish)
+
+	(cd ~/web/altusmetrum/ && git add AltOS/releases
+	TeleGPS/releases MicroPeak/releases && git commit -m'Release
+	<rev>' && git push origin master)
 
 		this pushes fresh documents to the web site
 

@@ -1,3 +1,224 @@
+commit b68c0482d4fae8eb54cde1df0e4bcf4c5d272bad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 22:49:09 2017 -0700
+
+    Version 1.8.1
+    
+    Android version 15
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit abe100385cedf2b0734191611d97e794805d0ef4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 22:48:46 2017 -0700
+
+    doc: Update for 1.8.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4775b1d9b50a8732d66a0ad3b73ff74901a8cb7f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 28 00:15:43 2017 -0700
+
+    altos: Don't compute filtered average of height error when HAS_ACCEL
+    
+    We only use this for baro-only devices to avoid firing drogue charges
+    at mach transitions; we trust the combination of accel+baro to do the
+    right thing when available.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dacd4c70700041a018b1f8ba47f22071b9600eaf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 28 00:10:04 2017 -0700
+
+    altoslib: Fix freq preference loading
+    
+    Allocate throw-away freq array to get the class pointer.
+    Add null-ary AltosFrequency constructor for JSON code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7f5f37ac7fb71d3059f639b39315712f90e9bfd6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:37:10 2017 -0700
+
+    altosui: Make --oneline show drogue deploy speed
+    
+    Also remove some commented out values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dd72c9144b207b12150eb6a7ffb012f217f37374
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:35:49 2017 -0700
+
+    altoslib: Compute speed at entry to each state
+    
+    Useful to have drogue/main deployment speeds
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9537a21b6ddb73b9f086858dad9a7b9d05279741
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:34:49 2017 -0700
+
+    altoslib: Fix parsing of old TM log GPS sat data
+    
+    Attempting to fetch sat data from wrong byte led to array bounds
+    exception.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 92b689bfd78a96ba56f0e1022ba68b7384a9b9b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:34:07 2017 -0700
+
+    altoslib: Allow for missing product when checking for mma655x inverted
+    
+    If there's no product, assume we've got some ancient log file.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e244a73d8c2a475416480f83328b7d363693402
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:33:38 2017 -0700
+
+    altoslib: Remove debug printf for gyro adjust
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f5642db4e03856b1f2ffeae6570fcf35fb7d93fb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:32:27 2017 -0700
+
+    altos/test: Fake baro data for flight 12 serial 2093
+    
+    This flight had a baro spike due to an accidental drogue charge firing
+    but is otherwise quite useful when testing for various mach delay
+    effects, so fake out the data during that spike.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bef7c37d1c986cd477367c0c015be61368a788d2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:30:15 2017 -0700
+
+    altos/test: Integrate raw accel to provide speed for comparison
+    
+    This can provide a useful visualization of the 'true' vs 'kalman'
+    speed value, as the kalman is necessarily delayed due to the model
+    assuming constant acceleration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2dce02efd54ad4051f1ddb94048696e8677dd225
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 17:04:27 2017 -0700
+
+    altos/test: telemetrum baro data is inverted before being written to eeprom
+    
+    No need for the test code to invert it during replay
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ea6fe21d78744d7e6225a56c369d54f7cd956767
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 26 19:16:47 2017 -0700
+
+    altos: Don't eliminate baro above mach speed, just trust it less
+    
+    Instead of completely eliminating the baro sensor above mach speed,
+    just derate it a bit so that the accel will dominate for speed
+    computation and keep the device from false-triggering across mach
+    transitions.
+    
+    When we completely ignored the baro sensor above mach, and the flight
+    spent considerable time in that speed range, then the estimated height
+    could be far from the real value. When the estimated speed dropped
+    back down and the baro values were brought back into the computation,
+    then the resulting rapid shift in estimated speed could trigger
+    accidental apogee detection.
+    
+    By mixing in a bit of baro data even above mach, we keep the estimated
+    height closer to the baro value and prevent this error, at least in
+    flights measured so far.
+    
+    The flight known to have this problem is:
+    
+            2015-09-26-serial-2093-flight-0012.eeprom
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 12ef994a24eb996458092dc35c671d6b824b1576
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 27 16:57:13 2017 -0700
+
+    altos: Eliminate separate height error filter for accelerometer devices
+    
+    We don't use the error value in flight for those models anyways; it's
+    only useful on baro-only hardware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f972000642f9c9835a0b7d14155d4c5695455d94
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 26 19:15:59 2017 -0700
+
+    altosui: Add --oneline mode to briefly summarize flights
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 465bb7242f39f6f8489e5fd52ce88031106c1c76
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 26 19:15:07 2017 -0700
+
+    altosuilib: Add "Huge" font size
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3dde7f4d05414ac4907c91c68c88cc1d06233605
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 26 19:14:10 2017 -0700
+
+    micropeak: Track font changes in raw data display
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cf20e213f39fb24f15e0ac94307c2d138fcadecb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 24 16:45:54 2017 -0700
+
+    altos: Perform time comparisons using 16-bit arithmetic to handle wrap
+    
+    Subtracting two 16-bit unsigned values to perform time comparisons
+    yields mystic results unless we carefully cast that to int16_t.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 43e2275250d9c91560a770942f3c06a8f74ed501
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 12 01:37:07 2017 -0400
+
+    install: Add 'fat-install' target
+    
+    This uses the existing --with-fat-dir option and instead of installing
+    everything to that directory, creates a normal ikiwiki hierarchy of
+    files including .mdwn files, whacked release notes html files and all
+    of the appropriate packages.
+    
+    One stop shopping for adding the release to the web site.
+    
+    Attempted to update Releasing file to match.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fccfa54bb3b746cecfcdc1fd497cf736bbfe3ef3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Aug 12 00:23:27 2017 -0400
+
+    releasing 1.8
+
 commit dbcb68f684a96d13efeb9993685f61b27b45e7dc
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Aug 12 00:21:43 2017 -0400

@@ -45,7 +45,9 @@ static __pdata ao_k_t		ao_avg_height_scaled;
 __xdata ao_v_t			ao_avg_height;
 
 __pdata ao_v_t			ao_error_h;
+#if !HAS_ACCEL
 __pdata ao_v_t			ao_error_h_sq_avg;
+#endif
 
 #if HAS_ACCEL
 __pdata ao_v_t			ao_error_a;
@@ -55,14 +57,14 @@ static void
 ao_kalman_predict(void)
 {
 #ifdef AO_FLIGHT_TEST
-	if (ao_sample_tick - ao_sample_prev_tick > 50) {
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50) {
 		ao_k_height += ((ao_k_t) ao_speed * AO_K_STEP_1 +
 				(ao_k_t) ao_accel * AO_K_STEP_2_2_1) >> 4;
 		ao_k_speed += (ao_k_t) ao_accel * AO_K_STEP_1;
 
 		return;
 	}
-	if (ao_sample_tick - ao_sample_prev_tick > 5) {
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		ao_k_height += ((ao_k_t) ao_speed * AO_K_STEP_10 +
 				(ao_k_t) ao_accel * AO_K_STEP_2_2_10) >> 4;
 		ao_k_speed += (ao_k_t) ao_accel * AO_K_STEP_10;
@@ -83,7 +85,9 @@ ao_kalman_predict(void)
 static void
 ao_kalman_err_height(void)
 {
+#if !HAS_ACCEL
 	ao_v_t	e;
+#endif
 	ao_v_t height_distrust;
 #if HAS_ACCEL
 	ao_v_t	speed_distrust;
@@ -91,15 +95,12 @@ ao_kalman_err_height(void)
 
 	ao_error_h = ao_sample_height - (ao_v_t) (ao_k_height >> 16);
 
+#if !HAS_ACCEL
 	e = ao_error_h;
 	if (e < 0)
 		e = -e;
 	if (e > 127)
 		e = 127;
-#if HAS_ACCEL
-	ao_error_h_sq_avg -= ao_error_h_sq_avg >> 2;
-	ao_error_h_sq_avg += (e * e) >> 2;
-#else
 	ao_error_h_sq_avg -= ao_error_h_sq_avg >> 4;
 	ao_error_h_sq_avg += (e * e) >> 4;
 #endif
@@ -108,13 +109,13 @@ ao_kalman_err_height(void)
 		return;
 	height_distrust = ao_sample_alt - AO_MAX_BARO_HEIGHT;
 #if HAS_ACCEL
-	/* speed is stored * 16, but we need to ramp between 200 and 328, so
+	/* speed is stored * 16, but we need to ramp between 248 and 328, so
 	 * we want to multiply by 2. The result is a shift by 3.
 	 */
 	speed_distrust = (ao_speed - AO_MS_TO_SPEED(AO_MAX_BARO_SPEED)) >> (4 - 1);
-	if (speed_distrust <= 0)
-		speed_distrust = 0;
-	else if (speed_distrust > height_distrust)
+	if (speed_distrust > AO_MAX_SPEED_DISTRUST)
+		speed_distrust = AO_MAX_SPEED_DISTRUST;
+	if (speed_distrust > height_distrust)
 		height_distrust = speed_distrust;
 #endif
 	if (height_distrust > 0) {
@@ -141,13 +142,13 @@ ao_kalman_correct_baro(void)
 {
 	ao_kalman_err_height();
 #ifdef AO_FLIGHT_TEST
-	if (ao_sample_tick - ao_sample_prev_tick > 50) {
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50) {
 		ao_k_height += (ao_k_t) AO_BARO_K0_1 * ao_error_h;
 		ao_k_speed  += (ao_k_t) AO_BARO_K1_1 * ao_error_h;
 		ao_k_accel  += (ao_k_t) AO_BARO_K2_1 * ao_error_h;
 		return;
 	}
-	if (ao_sample_tick - ao_sample_prev_tick > 5) {
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		ao_k_height += (ao_k_t) AO_BARO_K0_10 * ao_error_h;
 		ao_k_speed  += (ao_k_t) AO_BARO_K1_10 * ao_error_h;
 		ao_k_accel  += (ao_k_t) AO_BARO_K2_10 * ao_error_h;
@@ -180,7 +181,7 @@ ao_kalman_correct_both(void)
 	ao_kalman_err_accel();
 
 #ifdef AO_FLIGHT_TEST
-	if (ao_sample_tick - ao_sample_prev_tick > 50) {
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50) {
 		if (ao_flight_debug) {
 			printf ("correct speed %g + (%g * %g) + (%g * %g) = %g\n",
 				ao_k_speed / (65536.0 * 16.0),
@@ -201,7 +202,7 @@ ao_kalman_correct_both(void)
 			(ao_k_t) AO_BOTH_K21_1 * ao_error_a;
 		return;
 	}
-	if (ao_sample_tick - ao_sample_prev_tick > 5) {
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		if (ao_flight_debug) {
 			printf ("correct speed %g + (%g * %g) + (%g * %g) = %g\n",
 				ao_k_speed / (65536.0 * 16.0),
@@ -250,7 +251,7 @@ ao_kalman_correct_accel(void)
 {
 	ao_kalman_err_accel();
 
-	if (ao_sample_tick - ao_sample_prev_tick > 5) {
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		ao_k_height +=(ao_k_t) AO_ACCEL_K0_10 * ao_error_a;
 		ao_k_speed  += (ao_k_t) AO_ACCEL_K1_10 * ao_error_a;
 		ao_k_accel  += (ao_k_t) AO_ACCEL_K2_10 * ao_error_a;
@@ -285,9 +286,9 @@ ao_kalman(void)
 		ao_max_height = ao_height;
 	ao_avg_height_scaled = ao_avg_height_scaled - ao_avg_height + ao_sample_height;
 #ifdef AO_FLIGHT_TEST
-	if (ao_sample_tick - ao_sample_prev_tick > 50)
+	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50)
 		ao_avg_height = (ao_avg_height_scaled + 1) >> 1;
-	else if (ao_sample_tick - ao_sample_prev_tick > 5)
+	else if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5)
 		ao_avg_height = (ao_avg_height_scaled + 7) >> 4;
 	else 
 #endif

@@ -36,6 +36,7 @@ public class AltosUILib extends AltosLib {
 	final public static int font_size_small = 1;
 	final public static int font_size_medium = 2;
 	final public static int font_size_large = 3;
+	final public static int font_size_huge = 4;
 
 	final public static int position_top_left = 0;
 	final public static int position_top = 1;
@@ -68,6 +69,11 @@ public class AltosUILib extends AltosLib {
 			brief_size = 26;
 			status_size = 30;
 			table_size = 17;
+			break;
+		case font_size_huge:
+			brief_size = 30;
+			status_size = 36;
+			table_size = 24;
 			break;
 		}
 		label_font = new Font("Dialog", Font.PLAIN, brief_size);

@@ -488,14 +488,16 @@ public class AltosConfigData {
 
 
 	public boolean mma655x_inverted() throws AltosUnknownProduct {
-		if (product.startsWith("EasyMega-v1"))
-			return false;
-		if (product.startsWith("TeleMetrum-v2"))
-			return true;
-		if (product.startsWith("TeleMega-v2"))
-			return false;
-		if (product.startsWith("TeleMega-v1"))
-			return false;
+		if (product != null) {
+			if (product.startsWith("EasyMega-v1"))
+				return false;
+			if (product.startsWith("TeleMetrum-v2"))
+				return true;
+			if (product.startsWith("TeleMega-v2"))
+				return false;
+			if (product.startsWith("TeleMega-v1"))
+				return false;
+		}
 		throw new AltosUnknownProduct(product);
 	}
 

@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.8)
-ANDROID_VERSION=14
+AC_INIT([altos], 1.8.1)
+ANDROID_VERSION=15
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2017-08-11
+RELEASE_DATE=2017-08-27
 AC_SUBST(RELEASE_DATE)
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
@@ -165,7 +165,7 @@ AM_CONDITIONAL([ANDROID_RELEASE], [test x$ANDROID_RELEASE = xyes])
 AC_SUBST(ANDROID_SDK)
 
 AC_ARG_WITH(fat-dir, AS_HELP_STRING([--with-fat-dir=PATH],
-	    [Set the directory to install the 'fat' distribution files to (defaults to not installing)]),
+	    [Set the directory to install the 'fat-install' distribution files to (defaults to no such target)]),
 	    [FATDIR=$withval], [FATDIR=none])
 
 AM_CONDITIONAL(FATINSTALL, [test "x$FATDIR" != "xnone"])

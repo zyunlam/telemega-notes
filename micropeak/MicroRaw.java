@@ -24,7 +24,11 @@ import javax.swing.*;
 import org.altusmetrum.altoslib_12.*;
 import org.altusmetrum.altosuilib_12.*;
 
-public class MicroRaw extends JTextArea {
+public class MicroRaw extends JTextArea implements AltosFontListener {
+
+	public void font_size_changed(int font_size) {
+		setFont(AltosUILib.table_value_font);
+	}
 
 	public void setData(MicroData data) {
 		StringWriter	sw = new StringWriter();
@@ -38,9 +42,14 @@ public class MicroRaw extends JTextArea {
 		setCaretPosition(0);
 	}
 
+	public void tell_closing() {
+		AltosUIPreferences.unregister_font_listener(this);
+	}
+
 	public MicroRaw() {
 		super(1, 30);
 		setFont(AltosUILib.table_value_font);
 		setEditable(false);
+		AltosUIPreferences.register_font_listener(this);
 	}
 }

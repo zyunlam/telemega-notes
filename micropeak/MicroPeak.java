@@ -262,6 +262,7 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 			@Override
 			public void windowClosing(WindowEvent e) {
 				statsTable.tell_closing();
+				raw.tell_closing();
 				Close();
 			}
 		});
