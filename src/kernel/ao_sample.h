@@ -180,7 +180,9 @@ extern __xdata ao_v_t			ao_max_height;	/* max of ao_height */
 extern __xdata ao_v_t			ao_avg_height;	/* running average of height */
 
 extern __pdata ao_v_t			ao_error_h;
+#if !HAS_ACCEL
 extern __pdata ao_v_t			ao_error_h_sq_avg;
+#endif
 
 #if HAS_ACCEL
 extern __pdata ao_v_t			ao_error_a;

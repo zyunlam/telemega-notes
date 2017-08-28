@@ -45,7 +45,9 @@ static __pdata ao_k_t		ao_avg_height_scaled;
 __xdata ao_v_t			ao_avg_height;
 
 __pdata ao_v_t			ao_error_h;
+#if !HAS_ACCEL
 __pdata ao_v_t			ao_error_h_sq_avg;
+#endif
 
 #if HAS_ACCEL
 __pdata ao_v_t			ao_error_a;
@@ -83,7 +85,9 @@ ao_kalman_predict(void)
 static void
 ao_kalman_err_height(void)
 {
+#if !HAS_ACCEL
 	ao_v_t	e;
+#endif
 	ao_v_t height_distrust;
 #if HAS_ACCEL
 	ao_v_t	speed_distrust;
@@ -91,6 +95,7 @@ ao_kalman_err_height(void)
 
 	ao_error_h = ao_sample_height - (ao_v_t) (ao_k_height >> 16);
 
+#if !HAS_ACCEL
 	e = ao_error_h;
 	if (e < 0)
 		e = -e;
@@ -98,6 +103,7 @@ ao_kalman_err_height(void)
 		e = 127;
 	ao_error_h_sq_avg -= ao_error_h_sq_avg >> 4;
 	ao_error_h_sq_avg += (e * e) >> 4;
+#endif
 
 	if (ao_flight_state >= ao_flight_drogue)
 		return;
