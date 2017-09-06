@@ -74,7 +74,7 @@ chaoskey_match(libusb_device *dev, char *match_serial)
 		goto out;
 	}
 
-	ret = libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, device_serial, match_len + 1);
+	ret = libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, (unsigned char *) device_serial, match_len + 1);
 
 	if (ret < 0) {
 		fprintf(stderr, "failed to get serial number: %s\n", libusb_strerror(ret));
@@ -103,7 +103,6 @@ chaoskey_open(char *serial)
 	int		ret;
 	ssize_t		num;
 	libusb_device	**list;
-	libusb_device	*device = NULL;
 	int		d;
 
 	ck = calloc(sizeof (struct chaoskey), 1);
@@ -173,12 +172,6 @@ chaoskey_close(struct chaoskey *ck)
 	free(ck);
 }
 
-void
-chaoskey_transfer_callback(struct libusb_transfer *transfer)
-{
-	struct chaoskey *ck = transfer->user_data;
-}
-
 #define ENDPOINT	0x86
 
 int
@@ -202,7 +195,9 @@ chaoskey_read(struct chaoskey *ck, void *buffer, int len)
 		}
 		len -= transferred;
 		buf += transferred;
+		total += transferred;
 	}
+	return total;
 }
 
 static const struct option options[] = {
@@ -283,8 +278,17 @@ main (int argc, char **argv)
 			int i;
 			for (i = 0; i < got / 2; i++)
 				putchar((buf[i] >> 1 & 0xff));
-		} else
-			write(1, buf, got);
+		} else {
+			int i;
+			int ret;
+			for (i = 0; i < got; i += ret) {
+				ret = write(1, ((char *) buf) + i, got - i);
+				if (ret <= 0) {
+					perror("write");
+					exit(1);
+				}
+			}
+		}
 		length -= got;
 	}
 	exit(0);
