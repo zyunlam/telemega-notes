@@ -405,7 +405,7 @@ public class AltosConfigData {
 
 		/* HAS_GYRO */
 		try {
-			if (line.startsWith("IMU call along")) {
+			if (line.startsWith("IMU cal along")) {
 				String[] bits = line.split("\\s+");
 				if (bits.length >= 8) {
 					accel_zero_along = Integer.parseInt(bits[3]);
