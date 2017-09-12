@@ -44,7 +44,6 @@ public class AltosUIAccelCal
 	int accel_plus, accel_minus;
 
 	private void make_visible() {
-		System.out.printf("Make calibration dialog visible\n");
 		pack();
 		cal.start();
 		setVisible(true);
@@ -68,6 +67,10 @@ public class AltosUIAccelCal
 		return AltosLib.MISSING;
 	}
 
+	private void setDefaultButton(JButton button) {
+		this.getRootPane().setDefaultButton(button);
+	}
+
 	/* AltosAccelCalListener interface */
 	public void set_thread(AltosAccelCal cal, Thread thread) {
 		this.thread = thread;
@@ -80,6 +83,7 @@ public class AltosUIAccelCal
 					case AltosAccelCal.phase_antenna_up:
 						message.setText("Orient antenna upwards and click on Antenna Up");
 						antenna_up.setEnabled(true);
+						setDefaultButton(antenna_up);
 						antenna_down.setEnabled(false);
 						ok.setEnabled(false);
 						break;
@@ -87,6 +91,7 @@ public class AltosUIAccelCal
 						message.setText("Orient antenna downwards and click on Antenna Down");
 						antenna_up.setEnabled(false);
 						antenna_down.setEnabled(true);
+						setDefaultButton(antenna_down);
 						ok.setEnabled(false);
 						break;
 					}
@@ -104,6 +109,7 @@ public class AltosUIAccelCal
 					antenna_up.setEnabled(false);
 					antenna_down.setEnabled(false);
 					ok.setEnabled(true);
+					setDefaultButton(ok);
 				}
 			});
 	}
@@ -130,11 +136,11 @@ public class AltosUIAccelCal
 		} else if ("down".equals(cmd)) {
 			cal.signal(true);
 			antenna_down.setEnabled(false);
+			this.setDefaultButton(antenna_down);
 		} else if ("ok".equals(cmd)) {
 			cal.signal(true);
 			this.setVisible(false);
 			if (success) {
-				System.out.printf("set accel cal to %d/%d\n", accel_plus, accel_minus);
 				config_values.set_accel_cal(accel_plus, accel_minus);
 				config_values.set_dirty();
 			}
