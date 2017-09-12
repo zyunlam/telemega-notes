@@ -6,7 +6,10 @@ PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noi
 	ao_aprs_test ao_micropeak_test ao_fat_test ao_aes_test ao_int64_test \
 	ao_ms5607_convert_test ao_quaternion_test ao_lisp_test
 
-INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quaternion.h
+INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quaternion.h ao_eeprom_read.h
+TEST_SRC=ao_flight_test.c
+TEST_SRC_ALL=ao_flight_test.c ao_eeprom_read.c ao_eeprom_read_old.c
+TEST_LIB=-ljson-c
 
 KALMAN=make-kalman 
 
@@ -19,26 +22,26 @@ clean:
 
 install:
 
-ao_flight_test: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c altitude.h $(INCS)
-	cc $(CFLAGS) -o $@ $<
+ao_flight_test: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c altitude.h $(INCS)
+	cc $(CFLAGS) -o $@ $(TEST_SRC) $(TEST_LIB)
 
-ao_flight_test_noisy_accel: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c $(INCS)
-	cc -DNOISY_ACCEL=1 $(CFLAGS) -o $@ $<
+ao_flight_test_noisy_accel: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c $(INCS)
+	cc -DNOISY_ACCEL=1 $(CFLAGS) -o $@ $(TEST_SRC) $(TEST_LIB)
 
-ao_flight_test_baro: ao_flight_test.c ao_host.h ao_flight.c  ao_sample.c ao_kalman.c $(INCS)
-	cc $(CFLAGS) -o $@ -DHAS_ACCEL=0 ao_flight_test.c
+ao_flight_test_baro: $(TEST_SRC_ALL) ao_host.h ao_flight.c  ao_sample.c ao_kalman.c $(INCS)
+	cc $(CFLAGS) -o $@ -DHAS_ACCEL=0 $(TEST_SRC) $(TEST_LIB)
 
-ao_flight_test_accel: ao_flight_test.c ao_host.h ao_flight.c  ao_sample.c ao_kalman.c $(INCS)
-	cc $(CFLAGS) -o $@ -DFORCE_ACCEL=1 ao_flight_test.c
+ao_flight_test_accel: $(TEST_SRC_ALL) ao_host.h ao_flight.c  ao_sample.c ao_kalman.c $(INCS)
+	cc $(CFLAGS) -o $@ -DFORCE_ACCEL=1 $(TEST_SRC) $(TEST_LIB)
 
-ao_flight_test_mm: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
-	cc -DTELEMEGA=1 $(CFLAGS) -o $@ $< -lm
+ao_flight_test_mm: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
+	cc -DTELEMEGA=1 $(CFLAGS) -o $@ $(TEST_SRC)  $(TEST_LIB) -lm
 
-ao_flight_test_metrum: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
-	cc -DTELEMETRUM_V2=1 $(CFLAGS) -o $@ $< -lm
+ao_flight_test_metrum: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
+	cc -DTELEMETRUM_V2=1 $(CFLAGS) -o $@ $(TEST_SRC)  $(TEST_LIB) -lm
 
-ao_flight_test_mini: ao_flight_test.c ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
-	cc -DEASYMINI=1 -DHAS_ACCEL=0 $(CFLAGS) -o $@ $< -lm
+ao_flight_test_mini: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
+	cc -DEASYMINI=1 -DHAS_ACCEL=0 $(CFLAGS) -o $@ $(TEST_SRC)  $(TEST_LIB) -lm
 
 ao_gps_test: ao_gps_test.c ao_gps_sirf.c ao_gps_print.c ao_host.h
 	cc $(CFLAGS) -o $@ $<
