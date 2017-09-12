@@ -344,8 +344,10 @@ struct ao_cmds {
 #include <ao_ms5607.h>
 struct ao_ms5607_prom	ao_ms5607_prom;
 #include "ao_ms5607_convert.c"
+#if TELEMEGA
 #define AO_PYRO_NUM	4
 #include <ao_pyro.h>
+#endif
 #else
 #include "ao_convert.c"
 #endif
@@ -427,6 +429,9 @@ static double	ao_test_landed_time;
 static int	landed_set;
 static double	landed_time;
 static double	landed_height;
+#if AO_PYRO_NUM
+static uint16_t	pyros_fired;
+#endif
 
 #if HAS_MPU6000
 static struct ao_mpu6000_sample	ao_ground_mpu6000;
@@ -825,6 +830,10 @@ ao_sleep(void *wchan)
 						ao_insert();
 						return;
 					case AO_LOG_TEMP_VOLT:
+						if (pyros_fired != log_mega->u.volt.pyro) {
+							printf("pyro changed %x -> %x\n", pyros_fired, log_mega->u.volt.pyro);
+							pyros_fired = log_mega->u.volt.pyro;
+						}
 						break;
 					case AO_LOG_GPS_TIME:
 						ao_gps_prev = ao_gps_static;
