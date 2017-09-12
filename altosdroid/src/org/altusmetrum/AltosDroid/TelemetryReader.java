@@ -60,6 +60,7 @@ public class TelemetryReader extends Thread {
 			while (telemQueue != null) {
 				try {
 					AltosTelemetry	telem = read();
+					telem.set_frequency(link.frequency);
 					handler.obtainMessage(TelemetryService.MSG_TELEMETRY, telem).sendToTarget();
 				} catch (ParseException pp) {
 					AltosDebug.error("Parse error: %d \"%s\"", pp.getErrorOffset(), pp.getMessage());
