@@ -954,13 +954,11 @@ public class AltosConfigFCUI
 	}
 
 	public void set_dirty() {
-		System.out.printf("set dirty\n");
 		dirty = true;
 		save.setEnabled(true);
 	}
 
 	public void set_clean() {
-		System.out.printf("set clean\n");
 		dirty = false;
 		save.setEnabled(false);
 	}
