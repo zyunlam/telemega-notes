@@ -181,7 +181,7 @@ ao_pyro_ready(struct ao_pyro *pyro)
 		case ao_pyro_state_greater_or_equal:
 			if (ao_flight_state >= pyro->state_greater_or_equal)
 				continue;
-			DBG("state %d >= %d\n", ao_flight_state, pyro->state_less);
+			DBG("state %d < %d\n", ao_flight_state, pyro->state_greater_or_equal);
 			break;
 
 		default:
