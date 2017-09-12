@@ -1060,7 +1060,6 @@ public class AltosState extends AltosDataListener {
 	}
 
 	public AltosState() {
-		Thread.dumpStack();
 		init();
 	}
 
