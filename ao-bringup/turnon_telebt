@@ -80,7 +80,7 @@ else
 fi
 
 echo -n "checking BTLE functionality... "
-btdev=`sudo timeout -s SIGINT 5s hcitool lescan | awk -F \- '/TeleBT/ { print $2 }'`
+btdev=`sudo timeout -s SIGINT 5s hcitool lescan | awk -F \- '/TeleBT/ { print $2 }' | head -n 1`
 if [ "$btdev" = "$SERIAL" ]; then
 	echo "working!"
 else
