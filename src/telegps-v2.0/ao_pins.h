@@ -110,6 +110,8 @@ struct ao_adc {
 #define HAS_SERIAL_2	       	1
 #define SERIAL_2_PA2_PA3	1
 #define USE_SERIAL_2_STDIN	0
+#define USE_SERIAL_2_FLOW       0
+#define USE_SERIAL_2_SW_FLOW    0
 
 #define ao_gps_getchar		ao_serial2_getchar
 #define ao_gps_putchar		ao_serial2_putchar
