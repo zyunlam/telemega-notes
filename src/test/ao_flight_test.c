@@ -774,10 +774,11 @@ ao_sleep(void *wchan)
 #endif
 
 				if (eeprom_offset >= eeprom->len) {
-					if (++ao_eof_read >= 1000)
+					if (++ao_eof_read >= 1000) {
 						if (!ao_summary)
 							printf ("no more data, exiting simulation\n");
-					ao_test_exit();
+						ao_test_exit();
+					}
 					ao_data_static.tick += 10;
 					ao_insert();
 					return;

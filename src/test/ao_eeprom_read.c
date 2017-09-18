@@ -217,13 +217,11 @@ ao_eeprom_get_config(struct ao_eeprom *ao_eeprom, struct json_object *obj)
 	if (!ao_eeprom_get_pyro(config, obj))
 		return 0;
 #endif
-	config->ignite_mode = 		ao_json_get_int(obj, "ignite_mode", 0);
-	config->ignite_mode = 		ao_json_get_int(obj, "ignite_mode", 0);
-	config->ignite_mode = 		ao_json_get_int(obj, "ignite_mode", 0);
-	config->ignite_mode = 		ao_json_get_int(obj, "ignite_mode", 0);
-	config->ignite_mode = 		ao_json_get_int(obj, "ignite_mode", 0);
-	config->ignite_mode = 		ao_json_get_int(obj, "ignite_mode", 0);
-
+#if HAS_GYRO
+	config->accel_zero_along = 	ao_json_get_int(obj, "accel_zero_along", 0);
+	config->accel_zero_across = 	ao_json_get_int(obj, "accel_zero_across", 0);
+	config->accel_zero_through = 	ao_json_get_int(obj, "accel_zero_through", 0);
+#endif
 	if (!ao_eeprom_get_ms5607(&ao_eeprom->ms5607_prom, obj))
 		return 0;
 
