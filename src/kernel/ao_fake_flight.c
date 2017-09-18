@@ -180,8 +180,10 @@ ao_fake_flight(void)
 
 			for (pyro = 0; pyro < AO_PYRO_NUM; pyro++) {
 				uint16_t	bit = (1 << pyro);
-				if (!(my_pyro_fired & bit) && (ao_pyro_fired & bit))
+				if (!(my_pyro_fired & bit) && (ao_pyro_fired & bit)) {
 					printf ("fire %d\n", pyro);
+					flush();
+				}
 			}
 			my_pyro_fired = ao_pyro_fired;
 		}
