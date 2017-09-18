@@ -116,8 +116,10 @@ main (int argc, char **argv)
 	/* And dump the resulting bits to the device
 	 */
 
-	while ((c = fread(buf, 1, sizeof(buf), file)) > 0)
+	while ((c = fread(buf, 1, sizeof(buf), file)) > 0) {
 		cc_usb_write(cc, buf, c);
+		printf("."); fflush(stdout);
+	}
 
 	done(cc, 0);
 }
