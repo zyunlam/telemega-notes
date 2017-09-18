@@ -33,11 +33,11 @@
 #define IS_FLASH_LOADER		0
 #define HAS_BEEP 	       0
 
-#define AO_HSE                  32000000
+#define AO_HSE                  16000000
 #define AO_RCC_CFGR_PLLMUL      STM_RCC_CFGR_PLLMUL_3
-#define AO_RCC_CFGR2_PLLDIV	STM_RCC_CFGR2_PREDIV_2
+#define AO_RCC_CFGR2_PLLDIV	STM_RCC_CFGR2_PREDIV_1
 #define AO_PLLMUL               3
-#define AO_PLLDIV               2
+#define AO_PLLDIV               1
 
 /* HCLK = 48MHz */
 #define AO_AHB_PRESCALER        1
