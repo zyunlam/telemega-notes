@@ -212,8 +212,11 @@ public class AltosFlightStats {
 					add_times(series, (int) prev.value, prev.time, state.time);
 				prev = state;
 			}
-			if (prev != null)
-				add_times(series, (int) prev.value, prev.time, series.accel_series.last().time);
+			if (prev != null) {
+				AltosTimeValue last_accel = series.accel_series.last();
+				if (last_accel != null)
+					add_times(series, (int) prev.value, prev.time, last_accel.time);
+			}
 		}
 
 		for (int s = 0; s <= AltosLib.ao_flight_invalid; s++) {
@@ -245,14 +248,15 @@ public class AltosFlightStats {
 			has_gps = true;
 			lat = pad_lat = gps.lat;
 			lon = pad_lon = gps.lon;
-			for (AltosGPSTimeValue gtv : series.gps_series) {
-				gps = gtv.gps;
-				if (gps.locked && gps.nsat >= 4) {
-					lat = gps.lat;
-					lon = gps.lon;
+			if (series.gps_series != null) {
+				for (AltosGPSTimeValue gtv : series.gps_series) {
+					gps = gtv.gps;
+					if (gps.locked && gps.nsat >= 4) {
+						lat = gps.lat;
+						lon = gps.lon;
+					}
 				}
 			}
-
 		}
 
 		max_height = AltosLib.MISSING;
