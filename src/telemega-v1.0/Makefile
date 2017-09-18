@@ -115,6 +115,7 @@ ALTOS_SRC = \
 	ao_companion.c \
 	ao_pyro.c \
 	ao_aprs.c \
+	ao_fake_flight.c \
 	$(MATH_SRC) \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \

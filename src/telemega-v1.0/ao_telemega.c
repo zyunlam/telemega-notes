@@ -33,6 +33,9 @@
 #if HAS_STACK_GUARD
 #include <ao_mpu.h>
 #endif
+#if HAS_FAKE_FLIGHT
+#include <ao_fake_flight.h>
+#endif
 
 int
 main(void)
@@ -89,6 +92,9 @@ main(void)
 	ao_igniter_init();
 	ao_companion_init();
 	ao_pyro_init();
+#if HAS_FAKE_FLIGHT
+	ao_fake_flight_init();
+#endif
 
 	ao_config_init();
 #if AO_PROFILE
