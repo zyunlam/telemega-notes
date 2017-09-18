@@ -619,7 +619,7 @@ public class TeleGPSConfigUI
 		return true;
 	}
 
-	void set_dirty() {
+	public void set_dirty() {
 		dirty = true;
 		save.setEnabled(true);
 	}
@@ -632,6 +632,17 @@ public class TeleGPSConfigUI
 	public void dispose() {
 		AltosPreferences.unregister_units_listener(this);
 		super.dispose();
+	}
+
+	public int accel_cal_plus() {
+		return AltosLib.MISSING;
+	}
+
+	public int accel_cal_minus() {
+		return AltosLib.MISSING;
+	}
+
+	public void set_accel_cal(int accel_plus, int accel_minus) {
 	}
 
 	/* Listen for events from our buttons */
