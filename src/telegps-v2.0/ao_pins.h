@@ -50,6 +50,9 @@
 #define HAS_USB                         1
 #define AO_USB_DIRECTIO                 0
 #define AO_PA11_PA12_RMP                1
+#define HAS_USB_CONNECT			1
+#define AO_USB_CONNECT_PORT		(&stm_gpiob)
+#define AO_USB_CONNECT_PIN		3
 
 #define IS_FLASH_LOADER 0
 
