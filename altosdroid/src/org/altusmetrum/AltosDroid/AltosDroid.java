@@ -77,6 +77,75 @@ class SavedState {
 	}
 }
 
+class Tracker implements CharSequence, Comparable {
+	int	serial;
+	String	call;
+	double	frequency;
+
+	String	display;
+
+	public Tracker(int serial, String call, double frequency) {
+		if (call == null)
+			call = "none";
+
+		this.serial = serial;
+		this.call = call;
+		this.frequency = frequency;
+		if (frequency == 0.0)
+			display = "Auto";
+		else if (frequency == AltosLib.MISSING) {
+			display = String.format("%-8.8s  %6d", call, serial);
+		} else {
+			display = String.format("%-8.8s %7.3f %6d", call, frequency, serial);
+		}
+	}
+
+	public Tracker(AltosState s) {
+		this(s == null ? 0 : s.cal_data().serial,
+		     s == null ? null : s.cal_data().callsign,
+		     s == null ? 0.0 : s.frequency);
+	}
+
+	/* CharSequence */
+	public char charAt(int index) {
+		return display.charAt(index);
+	}
+
+	public int length() {
+		return display.length();
+	}
+
+	public CharSequence subSequence(int start, int end) throws IndexOutOfBoundsException {
+		return display.subSequence(start, end);
+	}
+
+	public String toString() {
+		return display.toString();
+	}
+
+	/* Comparable */
+	public int compareTo (Object other) {
+		Tracker	o = (Tracker) other;
+		if (frequency == 0.0) {
+			if (o.frequency == 0.0)
+				return 0;
+			return -1;
+		}
+		if (o.frequency == 0.0)
+			return 1;
+
+		int	a = serial - o.serial;
+		int	b = call.compareTo(o.call);
+		int	c = (int) Math.signum(frequency - o.frequency);
+
+		if (b != 0)
+			return b;
+		if (c != 0)
+			return c;
+		return a;
+	}
+}
+
 public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener {
 
 	// Actions sent to the telemetry server at startup time
@@ -151,7 +220,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	private Timer timer;
 
 	TelemetryState	telemetry_state;
-	Integer[] 	serials;
+	Tracker[]	trackers;
+
 
 	UsbDevice	pending_usb_device;
 	boolean		start_with_usb;
@@ -323,8 +393,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			AltosPreferences.register_units_listener(this);
 		}
 
-		serials = telemetry_state.states.keySet().toArray(new Integer[0]);
-		Arrays.sort(serials);
+		int	num_trackers = 0;
+		for (AltosState s : telemetry_state.states.values()) {
+			num_trackers++;
+		}
+
+		trackers = new Tracker[num_trackers + 1];
+
+		int n = 0;
+		trackers[n++] = new Tracker(0, "auto", 0.0);
+
+		for (AltosState s : telemetry_state.states.values())
+			trackers[n++] = new Tracker(s);
+
+		Arrays.sort(trackers);
 
 		update_title(telemetry_state);
 
@@ -955,11 +1037,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 
 		if (serial != 0) {
-			for (i = 0; i < serials.length; i++)
-				if (serials[i] == serial)
+			for (i = 0; i < trackers.length; i++)
+				if (trackers[i].serial == serial)
 					break;
 
-			if (i == serials.length) {
+			if (i == trackers.length) {
 				AltosDebug.debug("attempt to select unknown tracker %d\n", serial);
 				return;
 			}
@@ -972,17 +1054,22 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	void touch_trackers(Integer[] serials) {
 		AlertDialog.Builder builder_tracker = new AlertDialog.Builder(this);
 		builder_tracker.setTitle("Select Tracker");
-		final String[] trackers = new String[serials.length + 1];
-		trackers[0] = "Auto";
-		for (int i = 0; i < serials.length; i++)
-			trackers[i+1] = String.format("%d", serials[i]);
-		builder_tracker.setItems(trackers,
+
+		final Tracker[] my_trackers = new Tracker[serials.length + 1];
+
+		my_trackers[0] = new Tracker(null);
+
+		for (int i = 0; i < serials.length; i++) {
+			AltosState	s = telemetry_state.states.get(serials[i]);
+			my_trackers[i+1] = new Tracker(s);
+		}
+		builder_tracker.setItems(my_trackers,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
 							 if (item == 0)
 								 select_tracker(0);
 							 else
-								 select_tracker(Integer.parseInt(trackers[item]));
+								 select_tracker(my_trackers[item].serial);
 						 }
 					 });
 		AlertDialog alert_tracker = builder_tracker.create();
@@ -1040,20 +1127,17 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			alert_freq.show();
 			return true;
 		case R.id.select_tracker:
-			if (serials != null) {
-				String[] trackers = new String[serials.length+1];
-				trackers[0] = "Auto";
-				for (int i = 0; i < serials.length; i++)
-					trackers[i+1] = String.format("%d", serials[i]);
+			if (trackers != null) {
 				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
 				builder_serial.setTitle("Select a tracker");
 				builder_serial.setItems(trackers,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int item) {
+									System.out.printf("select item %d %s\n", item, trackers[item].display);
 									if (item == 0)
 										select_tracker(0);
 									else
-										select_tracker(serials[item-1]);
+										select_tracker(trackers[item].serial);
 								}
 							});
 				AlertDialog alert_serial = builder_serial.create();
@@ -1062,16 +1146,16 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			}
 			return true;
 		case R.id.delete_track:
-			if (serials != null) {
-				String[] trackers = new String[serials.length];
-				for (int i = 0; i < serials.length; i++)
-					trackers[i] = String.format("%d", serials[i]);
+			if (trackers != null) {
 				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
 				builder_serial.setTitle("Delete a track");
-				builder_serial.setItems(trackers,
+				final Tracker[] my_trackers = new Tracker[trackers.length - 1];
+				for (int i = 0; i < trackers.length - 1; i++)
+					my_trackers[i] = trackers[i+1];
+				builder_serial.setItems(my_trackers,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int item) {
-									delete_track(serials[item]);
+									delete_track(my_trackers[item].serial);
 								}
 							});
 				AlertDialog alert_serial = builder_serial.create();

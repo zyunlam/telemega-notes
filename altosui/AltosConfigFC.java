@@ -268,6 +268,13 @@ public class AltosConfigFC implements ActionListener {
 				if (serial_line != null)
 					serial_line.close();
 			}
+			else if (cmd.equals("Accel")) {
+				if (data.pad_orientation != AltosLib.MISSING) {
+					AltosUIAccelCal accel_ui = new AltosUIAccelCal(owner, serial_line, config_ui);
+					if (accel_ui != null)
+						accel_ui.doit();
+				}
+			}
 		} catch (InterruptedException ie) {
 			abort();
 		} catch (TimeoutException te) {

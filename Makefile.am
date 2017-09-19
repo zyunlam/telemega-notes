@@ -64,6 +64,7 @@ fat_altos = \
 	src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx \
 	src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx \
 	src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx \
+	src/telegps-v2.0/telegps-v2.0-$(VERSION).ihx \
 	src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx \
 	src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx \
 	src/telemetrum-v1.0/telemetrum-v1.0-$(VERSION).ihx \

@@ -43,6 +43,8 @@ public abstract class AltosLink implements Runnable {
 	public LinkedBlockingQueue<AltosLine> reply_queue = new LinkedBlockingQueue<AltosLine>();
 	public LinkedBlockingQueue<byte[]> binary_queue = new LinkedBlockingQueue<byte[]>();
 
+	private String match_string = null;
+
 	public synchronized void add_monitor(LinkedBlockingQueue<AltosLine> q) {
 		set_monitor(true);
 		monitors.add(q);
@@ -112,6 +114,15 @@ public abstract class AltosLink implements Runnable {
 
 	private int	len_read = 0;
 
+	private boolean match_bytes(byte[] bytes, int byte_count, String match) {
+		if (byte_count < match.length())
+			return false;
+		String	line = new String(bytes, 0, byte_count, AltosLib.unicode_set);
+		if (line == null)
+			return false;
+		return line.indexOf(match) >= 0;
+	}
+
 	public void run () {
 		int c;
 		byte[] line_bytes = null;
@@ -159,6 +170,11 @@ public abstract class AltosLink implements Runnable {
 							line_count = 0;
 							len_read = 0;
 						}
+						if (match_string != null && match_bytes(line_bytes, line_count, match_string)) {
+							match_string = null;
+							add_bytes(line_bytes, line_count);
+							line_count = 0;
+						}
 					}
 				}
 			}
@@ -166,6 +182,9 @@ public abstract class AltosLink implements Runnable {
 		}
 	}
 
+	public void set_match(String match) {
+		match_string = match;
+	}
 
 	public String get_reply(int timeout) throws InterruptedException {
 		boolean	can_cancel = can_cancel_reply();

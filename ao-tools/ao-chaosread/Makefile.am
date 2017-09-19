@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-chaosread
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(LIBUSB_CFLAGS) -Wall -Wextra
 
 ao_chaosread_LDADD=$(LIBUSB_LIBS)
 

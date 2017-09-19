@@ -38,6 +38,9 @@ public abstract class AltosTelemetry implements AltosDataProvider {
 	/* Mark when we received the packet */
 	long		received_time;
 
+	/* Mark frequency packet was received on */
+	public double		frequency = AltosLib.MISSING;
+
 	static boolean cksum(int[] bytes) {
 		int	sum = 0x5a;
 		for (int i = 1; i < bytes.length - 1; i++)
@@ -50,6 +53,8 @@ public abstract class AltosTelemetry implements AltosDataProvider {
 		listener.set_serial(serial());
 		if (listener.state == AltosLib.ao_flight_invalid)
 			listener.set_state(AltosLib.ao_flight_startup);
+		if (frequency != AltosLib.MISSING)
+			listener.set_frequency(frequency);
 		listener.set_tick(tick());
 		listener.set_rssi(rssi(), status());
 		listener.set_received_time(received_time);
@@ -106,6 +111,10 @@ public abstract class AltosTelemetry implements AltosDataProvider {
 			throw new ParseException(String.format("Invalid packet length %d", bytes.length), 0);
 		}
 		return telem;
+	}
+
+	public void set_frequency(double frequency) {
+		this.frequency = frequency;
 	}
 
 	public AltosTelemetry() {

@@ -151,11 +151,15 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<Alt
 	}
 
 	public AltosTimeValue first() {
-		return values.get(0);
+		if (values.size() > 0)
+			return values.get(0);
+		return null;
 	}
 
 	public AltosTimeValue last() {
-		return values.get(values.size() - 1);
+		if (values.size() > 0)
+			return values.get(values.size() - 1);
+		return null;
 	}
 
 	public double average() {

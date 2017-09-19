@@ -238,14 +238,16 @@
 		ifdef::radio[disabled, and the radio goes into transmit-only mode.]
 		ifndef::radio[disabled.]
 		The only way to get out of this
-		mode is to power the flight computer down.
+		mode is to power the flight computer down. See below for how to get the flight
+		computer to come up in Flight/Pad mode at power on.
 
 		Idle::
 		The flight computer is ready to communicate over USB
 		ifdef::radio[and in packet mode over the radio.]
 		You can configure
 		the flight computer, download data or display
-		the current state.
+		the current state. See below for how to get the flight
+		computer to come up in Idle mode at power on.
 
 		ifdef::telemetrum,easymega,telemega[]
 		For flight computers with accelerometers (TeleMetrum,

@@ -48,7 +48,6 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 
 		if (flight_series.gps_series != null) {
 			for (AltosGPSTimeValue gtv : flight_series.gps_series) {
-				gtv_last = gtv;
 				AltosGPS gps = gtv.gps;
 				if (gps != null &&
 				    gps.locked &&
@@ -57,6 +56,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 						map = new AltosUIMap();
 					map.show(gps, (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time));
 					this.gps = gps;
+					gtv_last = gtv;
 					has_gps = true;
 				}
 			}
