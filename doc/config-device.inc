@@ -206,6 +206,22 @@ ifdef::telegps[]
 		in the log.
 endif::telegps[]
 
+ifdef::telemega,easymega,telemetrum[]
+
+	==== Calibrate Accelerometer
+
+		This opens a separate window to recalibrate the
+		accelerometers. Follow the instructions, orienting the
+		flight computer with the antenna end, or end opposite
+		the screw terminals, in the case of EasyMega, first up
+		and then down.
+
+		When the calibration is complete, return to the
+		Configure Altimeter window and save the new
+		calibration values.
+
+endif::telemega,easymega,telemetrum[]
+
 ifdef::telemega,easymega[]
 
 	==== Configure Pyro Channels
