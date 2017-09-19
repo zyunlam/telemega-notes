@@ -20,6 +20,7 @@ public abstract class AltosDataListener {
 
 	public double		time = AltosLib.MISSING;
 	public int		state = AltosLib.MISSING;
+	public double		frequency = AltosLib.MISSING;
 
 	public void set_tick(int tick) {
 		cal_data.set_tick(tick);
@@ -53,6 +54,10 @@ public abstract class AltosDataListener {
 
 	public void set_flight(int flight) {
 		cal_data().set_flight(flight);
+	}
+
+	public void set_frequency(double frequency) {
+		this.frequency = frequency;
 	}
 
 	/* Called after all records are captured */

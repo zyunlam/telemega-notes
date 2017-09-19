@@ -13,6 +13,7 @@ altosuilib_JAVA = \
 	AltosDevice.java \
 	AltosDeviceDialog.java \
 	AltosPositionListener.java \
+	AltosUIAccelCal.java \
 	AltosUIConfigure.java \
 	AltosUIAxis.java \
 	AltosUIDataMissing.java \

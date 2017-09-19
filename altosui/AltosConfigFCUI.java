@@ -49,6 +49,8 @@ public class AltosConfigFCUI
 	JLabel			flight_log_max_label;
 	JLabel			ignite_mode_label;
 	JLabel			pad_orientation_label;
+	JLabel			accel_plus_label;
+	JLabel			accel_minus_label;
 	JLabel			callsign_label;
 	JLabel			beep_label;
 	JLabel			tracker_motion_label;
@@ -73,12 +75,15 @@ public class AltosConfigFCUI
 	JComboBox<String>	flight_log_max_value;
 	JComboBox<String>	ignite_mode_value;
 	JComboBox<String>	pad_orientation_value;
+	JTextField		accel_plus_value;
+	JTextField		accel_minus_value;
 	JTextField		callsign_value;
 	JComboBox<String>	beep_value;
 	JComboBox<String>	tracker_motion_value;
 	JComboBox<String>	tracker_interval_value;
 
 	JButton			pyro;
+	JButton			accel_cal;
 
 	JButton			save;
 	JButton			reset;
@@ -250,15 +255,25 @@ public class AltosConfigFCUI
 	}
 
 	void set_pad_orientation_tool_tip() {
-		if (pad_orientation_value.isVisible())
+		if (pad_orientation_value.isVisible()) {
 			pad_orientation_value.setToolTipText("How will the computer be mounted in the airframe");
-		else {
+		} else {
 			if (is_telemetrum())
 				pad_orientation_value.setToolTipText("Older TeleMetrum firmware must fly antenna forward");
 			else if (is_telemini() || is_easymini())
 				pad_orientation_value.setToolTipText("TeleMini and EasyMini don't care how they are mounted");
 			else
 				pad_orientation_value.setToolTipText("Can't select orientation");
+		}
+	}
+
+	void set_accel_tool_tips() {
+		if (accel_plus_value.isVisible()) {
+			accel_plus_value.setToolTipText("Pad acceleration value in flight orientation");
+			accel_minus_value.setToolTipText("Upside-down acceleration value");
+		} else {
+			accel_plus_value.setToolTipText("No accelerometer");
+			accel_minus_value.setToolTipText("No accelerometer");
 		}
 	}
 
@@ -709,6 +724,57 @@ public class AltosConfigFCUI
 		set_pad_orientation_tool_tip();
 		row++;
 
+		/* Accel plus */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		accel_plus_label = new JLabel("Accel Plus:");
+		pane.add(accel_plus_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		accel_plus_value = new JTextField(10);
+		accel_plus_value.setEditable(true);
+		accel_plus_value.getDocument().addDocumentListener(this);
+		pane.add(accel_plus_value, c);
+		row++;
+
+		/* Accel minus */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		accel_minus_label = new JLabel("Accel Minus:");
+		pane.add(accel_minus_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		accel_minus_value = new JTextField(10);
+		accel_minus_value.setEditable(true);
+		accel_minus_value.getDocument().addDocumentListener(this);
+		pane.add(accel_minus_value, c);
+		row++;
+		set_accel_tool_tips();
+
 		/* Beeper */
 		c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = row;
@@ -800,6 +866,20 @@ public class AltosConfigFCUI
 		pyro.setActionCommand("Pyro");
 		row++;
 
+		/* Accel cal */
+		c = new GridBagConstraints();
+		c.gridx = 5; c.gridy = row;
+		c.gridwidth = 5;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		accel_cal = new JButton("Calibrate Accelerometer");
+		pane.add(accel_cal, c);
+		accel_cal.addActionListener(this);
+		accel_cal.setActionCommand("Accel");
+		row++;
+
 		/* Buttons */
 		c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = row;
@@ -873,7 +953,7 @@ public class AltosConfigFCUI
 		return true;
 	}
 
-	void set_dirty() {
+	public void set_dirty() {
 		dirty = true;
 		save.setEnabled(true);
 	}
@@ -912,7 +992,8 @@ public class AltosConfigFCUI
 			setVisible(false);
 			dispose();
 		}
-		set_clean();
+		if (cmd.equals("Save") || cmd.equals("Reset"))
+			set_clean();
 	}
 
 	/* ItemListener interface method */
@@ -943,6 +1024,7 @@ public class AltosConfigFCUI
 		radio_frequency_value.set_product(product);
 		product_value.setText(product);
 		set_pad_orientation_tool_tip();
+		set_accel_tool_tips();
 		set_flight_log_max_tool_tip();
 	}
 
@@ -1196,6 +1278,7 @@ public class AltosConfigFCUI
 		}
 		pad_orientation_value.setVisible(new_pad_orientation != AltosLib.MISSING);
 		pad_orientation_label.setVisible(new_pad_orientation != AltosLib.MISSING);
+		accel_cal.setVisible(new_pad_orientation != AltosLib.MISSING);
 
 		set_pad_orientation_tool_tip();
 	}
@@ -1205,6 +1288,31 @@ public class AltosConfigFCUI
 			return pad_orientation_value.getSelectedIndex();
 		else
 			return AltosLib.MISSING;
+	}
+
+	public void set_accel_cal(int accel_plus, int accel_minus) {
+		if (accel_plus != AltosLib.MISSING) {
+			accel_plus_value.setText(String.format("%d", accel_plus));
+			accel_minus_value.setText(String.format("%d", accel_minus));
+		}
+		accel_plus_value.setVisible(accel_plus != AltosLib.MISSING);
+		accel_plus_label.setVisible(accel_plus != AltosLib.MISSING);
+		accel_minus_value.setVisible(accel_minus != AltosLib.MISSING);
+		accel_minus_label.setVisible(accel_minus != AltosLib.MISSING);
+
+		set_accel_tool_tips();
+	}
+
+	public int accel_cal_plus() {
+		if (accel_plus_value.isVisible())
+			return Integer.parseInt(accel_plus_value.getText());
+		return AltosLib.MISSING;
+	}
+
+	public int accel_cal_minus() {
+		if (accel_minus_value.isVisible())
+			return Integer.parseInt(accel_minus_value.getText());
+		return AltosLib.MISSING;
 	}
 
 	public void set_beep(int new_beep) {

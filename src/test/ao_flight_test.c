@@ -191,7 +191,7 @@ ao_distance_from_pad(void)
 	double	dist, bearing;
 	if (!ao_gps_count)
 		return 0;
-	
+
 	cc_great_circle(ao_gps_first.latitude / 1e7,
 			ao_gps_first.longitude / 1e7,
 			ao_gps_static.latitude / 1e7,
@@ -308,6 +308,9 @@ struct ao_task {
 
 int	ao_flight_debug;
 
+struct ao_eeprom	*eeprom;
+uint32_t		eeprom_offset;
+
 FILE *emulator_in;
 char *emulator_app;
 char *emulator_name;
@@ -341,14 +344,18 @@ struct ao_cmds {
 #include <ao_ms5607.h>
 struct ao_ms5607_prom	ao_ms5607_prom;
 #include "ao_ms5607_convert.c"
+#if TELEMEGA
 #define AO_PYRO_NUM	4
 #include <ao_pyro.h>
+#endif
 #else
 #include "ao_convert.c"
 #endif
 
 #include <ao_config.h>
 #include <ao_fake_flight.h>
+#include <ao_eeprom_read.h>
+#include <ao_log.h>
 
 #define ao_config_get()
 
@@ -401,12 +408,16 @@ ao_pyro_pin_set(uint8_t pin, uint8_t value)
 
 #include "ao_pyro.c"
 #endif
+#include "ao_eeprom_read.c"
+#include "ao_eeprom_read_old.c"
 
 #define to_double(f)	((f) / 65536.0)
 
 static int	ao_records_read = 0;
 static int	ao_eof_read = 0;
+#if !EASYMINI
 static int	ao_flight_ground_accel;
+#endif
 static int	ao_flight_started = 0;
 static int	ao_test_max_height;
 static double	ao_test_max_height_time;
@@ -418,9 +429,16 @@ static double	ao_test_landed_time;
 static int	landed_set;
 static double	landed_time;
 static double	landed_height;
+#if AO_PYRO_NUM
+static uint16_t	pyros_fired;
+#endif
 
 #if HAS_MPU6000
 static struct ao_mpu6000_sample	ao_ground_mpu6000;
+#endif
+
+#if HAS_ACCEL
+int ao_error_h_sq_avg;
 #endif
 
 void
@@ -567,7 +585,7 @@ ao_insert(void)
 
 			ao_quaternion_normalize(&ao_mag, &ao_mag);
 			ao_quaternion_rotate(&ao_mag_rot, &ao_mag, &ao_rotation);
-			
+
 			float				ao_dot;
 			int				ao_mag_angle;
 
@@ -722,17 +740,6 @@ void
 ao_sleep(void *wchan)
 {
 	if (wchan == &ao_data_head) {
-		char		type = 0;
-		uint16_t	tick = 0;
-		uint16_t	a = 0, b = 0;
-		uint8_t		bytes[1024];
-		union ao_telemetry_all	telem;
-		char		line[1024];
-		char		*saveptr;
-		char		*l;
-		char		*words[64];
-		int		nword;
-
 #if TELEMEGA
 		if (ao_flight_state >= ao_flight_boost && ao_flight_state < ao_flight_landed)
 			ao_pyro_check();
@@ -752,419 +759,183 @@ ao_sleep(void *wchan)
 				return;
 			}
 
-			if (!fgets(line, sizeof (line), emulator_in)) {
-				if (++ao_eof_read >= 1000) {
-					if (!ao_summary)
-						printf ("no more data, exiting simulation\n");
-					ao_test_exit();
-				}
-				ao_data_static.tick += 10;
-				ao_insert();
-				return;
-			}
-			l = line;
-			for (nword = 0; nword < 64; nword++) {
-				words[nword] = strtok_r(l, " \t\n", &saveptr);
-				l = NULL;
-				if (words[nword] == NULL)
-					break;
-			}
+			if (eeprom) {
 #if TELEMEGA
-			if ((log_format == AO_LOG_FORMAT_TELEMEGA_OLD || log_format == AO_LOG_FORMAT_TELEMEGA) && nword == 30 && strlen(words[0]) == 1) {
-				int	i;
-				struct ao_ms5607_value	value;
-
-				type = words[0][0];
-				tick = strtoul(words[1], NULL, 16);
-//				printf ("%c %04x", type, tick);
-				for (i = 2; i < nword; i++) {
-					bytes[i - 2] = strtoul(words[i], NULL, 16);
-//					printf(" %02x", bytes[i-2]);
-				}
-//				printf ("\n");
-				switch (type) {
-				case 'F':
-					ao_flight_number = uint16(bytes, 0);
-					ao_flight_ground_accel = int16(bytes, 2);
-					ao_flight_started = 1;
-					ao_ground_pres = int32(bytes, 4);
-					ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
-					ao_ground_accel_along = int16(bytes, 8);
-					ao_ground_accel_across = int16(bytes, 10);
-					ao_ground_accel_through = int16(bytes, 12);
-					ao_ground_roll = int16(bytes, 14);
-					ao_ground_pitch = int16(bytes, 16);
-					ao_ground_yaw = int16(bytes, 18);
-					ao_ground_mpu6000.accel_x = ao_ground_accel_across;
-					ao_ground_mpu6000.accel_y = ao_ground_accel_along;
-					ao_ground_mpu6000.accel_z = ao_ground_accel_through;
-					ao_ground_mpu6000.gyro_x = ao_ground_pitch >> 9;
-					ao_ground_mpu6000.gyro_y = ao_ground_roll >> 9;
-					ao_ground_mpu6000.gyro_z = ao_ground_yaw >> 9;
-					break;
-				case 'A':
-					ao_data_static.tick = tick;
-					ao_data_static.ms5607_raw.pres = int32(bytes, 0);
-					ao_data_static.ms5607_raw.temp = int32(bytes, 4);
-					ao_ms5607_convert(&ao_data_static.ms5607_raw, &value);
-					ao_data_static.mpu6000.accel_x = int16(bytes, 8);
-					ao_data_static.mpu6000.accel_y = int16(bytes, 10);
-					ao_data_static.mpu6000.accel_z = int16(bytes, 12);
-					ao_data_static.mpu6000.gyro_x = int16(bytes, 14);
-					ao_data_static.mpu6000.gyro_y = int16(bytes, 16);
-					ao_data_static.mpu6000.gyro_z = int16(bytes, 18);
-					ao_data_static.hmc5883.x = int16(bytes, 20);
-					ao_data_static.hmc5883.y = int16(bytes, 22);
-					ao_data_static.hmc5883.z = int16(bytes, 24);
-#if HAS_MMA655X
-					ao_data_static.mma655x = int16(bytes, 26);
-					if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
-						ao_data_static.mma655x = ao_data_accel_invert(ao_data_static.mma655x);
-#endif
-					ao_records_read++;
-					ao_insert();
-					return;
-				case 'G':
-					ao_gps_prev = ao_gps_static;
-					ao_gps_static.tick = tick;
-					ao_gps_static.latitude = int32(bytes, 0);
-					ao_gps_static.longitude = int32(bytes, 4);
-					{
-						int32_t	altitude = int32(bytes, 8);
-						AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_static, altitude);
-					}
-					ao_gps_static.flags = bytes[13];
-					if (!ao_gps_count)
-						ao_gps_first = ao_gps_static;
-					ao_gps_count++;
-					break;
-				}
-				continue;
-			} else if (nword == 3 && strcmp(words[0], "ms5607") == 0) {
-				if (strcmp(words[1], "reserved:") == 0)
-					ao_ms5607_prom.reserved = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "sens:") == 0)
-					ao_ms5607_prom.sens = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "off:") == 0)
-					ao_ms5607_prom.off = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tcs:") == 0)
-					ao_ms5607_prom.tcs = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tco:") == 0)
-					ao_ms5607_prom.tco = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tref:") == 0)
-					ao_ms5607_prom.tref = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tempsens:") == 0)
-					ao_ms5607_prom.tempsens = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "crc:") == 0)
-					ao_ms5607_prom.crc = strtoul(words[2], NULL, 10);
-				continue;
-			} else if (nword >= 3 && strcmp(words[0], "Pyro") == 0) {
-				int	p = strtoul(words[1], NULL, 10);
-				int	i, j;
-				struct ao_pyro	*pyro = &ao_config.pyro[p];
-
-				for (i = 2; i < nword; i++) {
-					for (j = 0; j < NUM_PYRO_VALUES; j++)
-						if (!strcmp (words[i], ao_pyro_values[j].name))
-							break;
-					if (j == NUM_PYRO_VALUES)
-						continue;
-					pyro->flags |= ao_pyro_values[j].flag;
-					if (ao_pyro_values[j].offset != NO_VALUE && i + 1 < nword) {
-						int16_t	val = strtoul(words[++i], NULL, 10);
-						printf("pyro %d condition %s value %d\n", p, words[i-1], val);
-						*((int16_t *) ((char *) pyro + ao_pyro_values[j].offset)) = val;
-					}
-				}
-			}
-#endif
-#if EASYMINI
-			if ((log_format == AO_LOG_FORMAT_EASYMINI1 || log_format == AO_LOG_FORMAT_EASYMINI2) && nword == 14 && strlen(words[0]) == 1) {
-				int	i;
-				struct ao_ms5607_value	value;
-
-				type = words[0][0];
-				tick = strtoul(words[1], NULL, 16);
-//				printf ("%c %04x", type, tick);
-				for (i = 2; i < nword; i++) {
-					bytes[i - 2] = strtoul(words[i], NULL, 16);
-//					printf(" %02x", bytes[i-2]);
-				}
-//				printf ("\n");
-				switch (type) {
-				case 'F':
-					ao_flight_started = 1;
-					ao_flight_number = uint16(bytes, 0);
-					ao_ground_pres = uint32(bytes, 4);
-					ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
-#if 0
-					printf("ground pres %d height %d\n", ao_ground_pres, ao_ground_height);
-					printf("sens %d off %d tcs %d tco %d tref %d tempsens %d crc %d\n",
-					       ao_ms5607_prom.sens,
-					       ao_ms5607_prom.off,
-					       ao_ms5607_prom.tcs,
-					       ao_ms5607_prom.tco,
-					       ao_ms5607_prom.tref,
-					       ao_ms5607_prom.tempsens,
-					       ao_ms5607_prom.crc);
-#endif
-					break;
-				case 'A':
-					ao_data_static.tick = tick;
-					ao_data_static.ms5607_raw.pres = int24(bytes, 0);
-					ao_data_static.ms5607_raw.temp = int24(bytes, 3);
-#if 0
-					printf("raw pres %d temp %d\n",
-					       ao_data_static.ms5607_raw.pres,
-					       ao_data_static.ms5607_raw.temp);
-#endif
-					ao_ms5607_convert(&ao_data_static.ms5607_raw, &value);
-//					printf("pres %d height %d\n", value.pres, ao_pa_to_altitude(value.pres));
-					ao_records_read++;
-					ao_insert();
-					return;
-				}
-				continue;
-			} else if (nword == 3 && strcmp(words[0], "ms5607") == 0) {
-				if (strcmp(words[1], "reserved:") == 0)
-					ao_ms5607_prom.reserved = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "sens:") == 0)
-					ao_ms5607_prom.sens = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "off:") == 0)
-					ao_ms5607_prom.off = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tcs:") == 0)
-					ao_ms5607_prom.tcs = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tco:") == 0)
-					ao_ms5607_prom.tco = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tref:") == 0)
-					ao_ms5607_prom.tref = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tempsens:") == 0)
-					ao_ms5607_prom.tempsens = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "crc:") == 0)
-					ao_ms5607_prom.crc = strtoul(words[2], NULL, 10);
-				continue;
-			}
+				struct ao_log_mega	*log_mega;
 #endif
 #if TELEMETRUM_V2
-			if (log_format == AO_LOG_FORMAT_TELEMETRUM && nword == 14 && strlen(words[0]) == 1) {
-				int	i;
-				struct ao_ms5607_value	value;
+				struct ao_log_metrum	*log_metrum;
+#endif
+#if EASYMINI
+				struct ao_log_mini	*log_mini;
+#endif
+#if TELEMETRUM_V1
+				struct ao_log_record	*log_record;
+#endif
 
-				type = words[0][0];
-				tick = strtoul(words[1], NULL, 16);
-//				printf ("%c %04x", type, tick);
-				for (i = 2; i < nword; i++) {
-					bytes[i - 2] = strtoul(words[i], NULL, 16);
-//					printf(" %02x", bytes[i-2]);
-				}
-//				printf ("\n");
-				switch (type) {
-				case 'F':
-					ao_flight_number = uint16(bytes, 0);
-					ao_flight_ground_accel = int16(bytes, 2);
-					ao_flight_started = 1;
-					ao_ground_pres = int32(bytes, 4);
-					ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
-					break;
-				case 'A':
-					ao_data_static.tick = tick;
-					ao_data_static.ms5607_raw.pres = int32(bytes, 0);
-					ao_data_static.ms5607_raw.temp = int32(bytes, 4);
-					ao_ms5607_convert(&ao_data_static.ms5607_raw, &value);
-					ao_data_static.mma655x = int16(bytes, 8);
-					ao_records_read++;
+				if (eeprom_offset >= eeprom->len) {
+					if (++ao_eof_read >= 1000)
+						if (!ao_summary)
+							printf ("no more data, exiting simulation\n");
+					ao_test_exit();
+					ao_data_static.tick += 10;
 					ao_insert();
 					return;
 				}
-				continue;
-			} else if (nword == 3 && strcmp(words[0], "ms5607") == 0) {
-				if (strcmp(words[1], "reserved:") == 0)
-					ao_ms5607_prom.reserved = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "sens:") == 0)
-					ao_ms5607_prom.sens = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "off:") == 0)
-					ao_ms5607_prom.off = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tcs:") == 0)
-					ao_ms5607_prom.tcs = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tco:") == 0)
-					ao_ms5607_prom.tco = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tref:") == 0)
-					ao_ms5607_prom.tref = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "tempsens:") == 0)
-					ao_ms5607_prom.tempsens = strtoul(words[2], NULL, 10);
-				else if (strcmp(words[1], "crc:") == 0)
-					ao_ms5607_prom.crc = strtoul(words[2], NULL, 10);
-				continue;
-			}
-#endif
-#if TELEMETRUM_V1
-			if (nword == 4 && log_format != AO_LOG_FORMAT_TELEMEGA) {
-				type = words[0][0];
-				tick = strtoul(words[1], NULL, 16);
-				a = strtoul(words[2], NULL, 16);
-				b = strtoul(words[3], NULL, 16);
-				if (type == 'P')
-					type = 'A';
-			}
-#endif
-			else if (nword == 2 && strcmp(words[0], "log-format") == 0) {
-				log_format = strtoul(words[1], NULL, 10);
-			} else if (nword == 2 && strcmp(words[0], "serial-number") == 0) {
-				ao_serial_number = strtoul(words[1], NULL, 10);
-			} else if (nword >= 6 && strcmp(words[0], "Accel") == 0) {
-				ao_config.accel_plus_g = atoi(words[3]);
-				ao_config.accel_minus_g = atoi(words[5]);
-#ifdef TELEMEGA
-			} else if (nword >= 8 && strcmp(words[0], "IMU") == 0) {
-				ao_config.accel_zero_along = atoi(words[3]);
-				ao_config.accel_zero_across = atoi(words[5]);
-				ao_config.accel_zero_through = atoi(words[7]);
-#endif
-			} else if (nword >= 4 && strcmp(words[0], "Main") == 0) {
-				ao_config.main_deploy = atoi(words[2]);
-			} else if (nword >= 3 && strcmp(words[0], "Apogee") == 0 &&
-				   strcmp(words[1], "lockout:") == 0) {
-				ao_config.apogee_lockout = atoi(words[2]);
-			} else if (nword >= 3 && strcmp(words[0], "Pad") == 0 &&
-				   strcmp(words[1], "orientation:") == 0) {
-				ao_config.pad_orientation = atoi(words[2]);
-			} else if (nword >= 36 && strcmp(words[0], "CALL") == 0) {
-				tick = atoi(words[10]);
-				if (!ao_flight_started) {
-					type = 'F';
-					a = atoi(words[26]);
-					ao_flight_started = 1;
-				} else {
-					type = 'A';
-					a = atoi(words[12]);
-					b = atoi(words[14]);
-				}
-			} else if (nword == 3 && strcmp(words[0], "BARO") == 0) {
-				tick = strtol(words[1], NULL, 16);
-				a = 16384 - 328;
-				b = strtol(words[2], NULL, 10);
-				type = 'A';
-				if (!ao_flight_started) {
-					ao_flight_ground_accel = 16384 - 328;
-					ao_config.accel_plus_g = 16384 - 328;
-					ao_config.accel_minus_g = 16384 + 328;
-					ao_flight_started = 1;
-				}
-			} else if (nword == 2 && strcmp(words[0], "TELEM") == 0) {
-				__xdata char	*hex = words[1];
-				char	elt[3];
-				int	i, len;
-				uint8_t	sum;
-
-				len = strlen(hex);
-				if (len > sizeof (bytes) * 2) {
-					len = sizeof (bytes)*2;
-					hex[len] = '\0';
-				}
-				for (i = 0; i < len; i += 2) {
-					elt[0] = hex[i];
-					elt[1] = hex[i+1];
-					elt[2] = '\0';
-					bytes[i/2] = (uint8_t) strtol(elt, NULL, 16);
-				}
-				len = i/2;
-				if (bytes[0] != len - 2) {
-					printf ("bad length %d != %d\n", bytes[0], len - 2);
-					continue;
-				}
-				sum = 0x5a;
-				for (i = 1; i < len-1; i++)
-					sum += bytes[i];
-				if (sum != bytes[len-1]) {
-					printf ("bad checksum\n");
-					continue;
-				}
-				if ((bytes[len-2] & 0x80) == 0) {
-					continue;
-				}
-				if (len == 36) {
-					ao_xmemcpy(&telem, bytes + 1, 32);
-					tick = telem.generic.tick;
-					switch (telem.generic.type) {
-					case AO_TELEMETRY_SENSOR_TELEMETRUM:
-					case AO_TELEMETRY_SENSOR_TELEMINI:
-					case AO_TELEMETRY_SENSOR_TELENANO:
-						if (!ao_flight_started) {
-							ao_flight_ground_accel = telem.sensor.ground_accel;
-							ao_config.accel_plus_g = telem.sensor.accel_plus_g;
-							ao_config.accel_minus_g = telem.sensor.accel_minus_g;
-							ao_flight_started = 1;
+				switch (eeprom->log_format) {
+#if TELEMEGA
+				case AO_LOG_FORMAT_TELEMEGA_OLD:
+				case AO_LOG_FORMAT_TELEMEGA:
+					log_mega = (struct ao_log_mega *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_mega);
+					switch (log_mega->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_number = log_mega->u.flight.flight;
+						ao_flight_ground_accel = log_mega->u.flight.ground_accel;
+						ao_flight_started = 1;
+						ao_ground_pres = log_mega->u.flight.ground_pres;
+						ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
+						ao_ground_accel_along = log_mega->u.flight.ground_accel_along;
+						ao_ground_accel_across = log_mega->u.flight.ground_accel_across;
+						ao_ground_accel_through = log_mega->u.flight.ground_accel_through;
+						ao_ground_roll = log_mega->u.flight.ground_roll;
+						ao_ground_pitch = log_mega->u.flight.ground_pitch;
+						ao_ground_yaw = log_mega->u.flight.ground_yaw;
+						ao_ground_mpu6000.accel_x = ao_ground_accel_across;
+						ao_ground_mpu6000.accel_y = ao_ground_accel_along;
+						ao_ground_mpu6000.accel_z = ao_ground_accel_through;
+						ao_ground_mpu6000.gyro_x = ao_ground_pitch >> 9;
+						ao_ground_mpu6000.gyro_y = ao_ground_roll >> 9;
+						ao_ground_mpu6000.gyro_z = ao_ground_yaw >> 9;
+						break;
+					case AO_LOG_STATE:
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_mega->tick;
+						ao_data_static.ms5607_raw.pres = log_mega->u.sensor.pres;
+						ao_data_static.ms5607_raw.temp = log_mega->u.sensor.temp;
+						ao_data_static.mpu6000.accel_x = log_mega->u.sensor.accel_x;
+						ao_data_static.mpu6000.accel_y = log_mega->u.sensor.accel_y;
+						ao_data_static.mpu6000.accel_z = log_mega->u.sensor.accel_z;
+						ao_data_static.mpu6000.gyro_x = log_mega->u.sensor.gyro_x;
+						ao_data_static.mpu6000.gyro_y = log_mega->u.sensor.gyro_y;
+						ao_data_static.mpu6000.gyro_z = log_mega->u.sensor.gyro_z;
+						ao_data_static.hmc5883.x = log_mega->u.sensor.mag_x;
+						ao_data_static.hmc5883.y = log_mega->u.sensor.mag_y;
+						ao_data_static.hmc5883.z = log_mega->u.sensor.mag_z;
+						ao_data_static.mma655x = log_mega->u.sensor.accel;
+						if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
+							ao_data_static.mma655x = ao_data_accel_invert(ao_data_static.mma655x);
+						ao_records_read++;
+						ao_insert();
+						return;
+					case AO_LOG_TEMP_VOLT:
+						if (pyros_fired != log_mega->u.volt.pyro) {
+							printf("pyro changed %x -> %x\n", pyros_fired, log_mega->u.volt.pyro);
+							pyros_fired = log_mega->u.volt.pyro;
 						}
-						type = 'A';
-						a = telem.sensor.accel;
-						b = telem.sensor.pres;
+						break;
+					case AO_LOG_GPS_TIME:
+						ao_gps_prev = ao_gps_static;
+						ao_gps_static.tick = log_mega->tick;
+						ao_gps_static.latitude = log_mega->u.gps.latitude;
+						ao_gps_static.longitude = log_mega->u.gps.longitude;
+						{
+							int16_t	altitude_low = log_mega->u.gps.altitude_low;
+							int16_t altitude_high = log_mega->u.gps.altitude_high;
+							int32_t altitude = altitude_low | ((int32_t) altitude_high << 16);
+
+							AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_static, altitude);
+						}
+						ao_gps_static.flags = log_mega->u.gps.flags;
+						if (!ao_gps_count)
+							ao_gps_first = ao_gps_static;
+						ao_gps_count++;
+						break;
+					case AO_LOG_GPS_SAT:
 						break;
 					}
-				} else if (len == 99) {
-					ao_flight_started = 1;
-					tick = uint16(bytes+1, 21);
-					ao_flight_ground_accel = int16(bytes+1, 7);
-					ao_config.accel_plus_g = int16(bytes+1, 17);
-					ao_config.accel_minus_g = int16(bytes+1, 19);
-					type = 'A';
-					a = int16(bytes+1, 23);
-					b = int16(bytes+1, 25);
-				} else if (len == 98) {
-					ao_flight_started = 1;
-					tick = uint16(bytes+1, 20);
-					ao_flight_ground_accel = int16(bytes+1, 6);
-					ao_config.accel_plus_g = int16(bytes+1, 16);
-					ao_config.accel_minus_g = int16(bytes+1, 18);
-					type = 'A';
-					a = int16(bytes+1, 22);
-					b = int16(bytes+1, 24);
-				} else {
-					printf("unknown len %d\n", len);
-					continue;
-				}
-			}
-			if (type != 'F' && !ao_flight_started)
-				continue;
-
-#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
-			(void) a;
-			(void) b;
-#else
-			switch (type) {
-			case 'F':
-				ao_flight_ground_accel = a;
-				ao_flight_number = b;
-				if (ao_config.accel_plus_g == 0) {
-					ao_config.accel_plus_g = a;
-					ao_config.accel_minus_g = a + 530;
-				}
-				if (ao_config.main_deploy == 0)
-					ao_config.main_deploy = 250;
-				ao_flight_started = 1;
-				break;
-			case 'S':
-				break;
-			case 'A':
-				ao_data_static.tick = tick;
-				ao_data_static.adc.accel = a;
-				ao_data_static.adc.pres_real = b;
-				ao_data_static.adc.pres = b;
-				ao_records_read++;
-				ao_insert();
-				return;
-			case 'T':
-				ao_data_static.tick = tick;
-				ao_data_static.adc.temp = a;
-				ao_data_static.adc.v_batt = b;
-				break;
-			case 'D':
-			case 'G':
-			case 'N':
-			case 'W':
-			case 'H':
-				break;
-			}
+					break;
 #endif
+#if TELEMETRUM_V2
+				case AO_LOG_FORMAT_TELEMETRUM:
+					log_metrum = (struct ao_log_metrum *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_metrum);
+					switch (log_metrum->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_started = 1;
+						ao_flight_number = log_metrum->u.flight.flight;
+						ao_flight_ground_accel = log_metrum->u.flight.ground_accel;
+						ao_ground_pres = log_metrum->u.flight.ground_pres;
+						ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_metrum->tick;
+						ao_data_static.ms5607_raw.pres = log_metrum->u.sensor.pres;
+						ao_data_static.ms5607_raw.temp = log_metrum->u.sensor.temp;
+						ao_data_static.mma655x = log_metrum->u.sensor.accel;
+						ao_records_read++;
+						ao_insert();
+						return;
+					}
+					break;
+#endif
+#if EASYMINI
+				case AO_LOG_FORMAT_EASYMINI1:
+				case AO_LOG_FORMAT_EASYMINI2:
+				case AO_LOG_FORMAT_TELEMINI3:
+					log_mini = (struct ao_log_mini *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_mini);
+					switch (log_mini->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_started = 1;
+						ao_flight_number = log_mini->u.flight.flight;
+						ao_ground_pres = log_mini->u.flight.ground_pres;
+						ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_mini->tick;
+						ao_data_static.ms5607_raw.pres = int24(log_mini->u.sensor.pres, 0);
+						ao_data_static.ms5607_raw.temp = int24(log_mini->u.sensor.temp, 0);
+						ao_records_read++;
+						ao_insert();
+						return;
+					}
+					break;
+#endif
+#if TELEMETRUM_V1
+				case AO_LOG_FORMAT_FULL:
+				case AO_LOG_FORMAT_TINY:
+					log_record = (struct ao_log_record *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_record);
+					switch (log_record->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_started = 1;
+						ao_flight_ground_accel = log_record->u.flight.ground_accel;
+						ao_flight_number = log_record->u.flight.flight;
+						break;
+					case AO_LOG_SENSOR:
+					case 'P':	/* ancient telemini */
+						ao_data_static.tick = log_record->tick;
+						ao_data_static.adc.accel = log_record->u.sensor.accel;
+						ao_data_static.adc.pres_real = log_record->u.sensor.pres;
+						ao_data_static.adc.pres = log_record->u.sensor.pres;
+						ao_records_read++;
+						ao_insert();
+						return;
+					case AO_LOG_TEMP_VOLT:
+						ao_data_static.tick = log_record->tick;;
+						ao_data_static.adc.temp = log_record->u.temp_volt.temp;
+						ao_data_static.adc.v_batt = log_record->u.temp_volt.v_batt;
+						break;
+					}
+					break;
+#endif
+				default:
+					printf ("invalid log format %d\n", log_format);
+					ao_test_exit();
+				}
+			}
 		}
 
 	}
@@ -1189,6 +960,26 @@ void run_flight_fixed(char *name, FILE *f, int summary, char *info)
 	emulator_in = f;
 	emulator_info = info;
 	ao_summary = summary;
+
+	if (strstr(name, ".eeprom") != NULL) {
+		char	c;
+
+		c = getc(f);
+		ungetc(c, f);
+		if (c == '{')
+			eeprom = ao_eeprom_read(f);
+		else
+			eeprom = ao_eeprom_read_old(f);
+
+		if (eeprom) {
+#if HAS_MS5607
+			ao_ms5607_prom = eeprom->ms5607_prom;
+#endif
+			ao_config = eeprom->config;
+			ao_serial_number = eeprom->serial_number;
+			log_format = eeprom->log_format;
+		}
+	}
 
 	ao_flight_init();
 	ao_flight();

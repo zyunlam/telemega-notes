@@ -153,10 +153,20 @@ ao_trng_send(void)
 
 	ao_crc_reset();
 
-	ao_delay(TRNG_ENABLE_DELAY);
-
 	for (s = 0; s < AO_TRNG_START_WAIT; s++) {
-		if (ao_trng_get_cooked(buffer[0]))
+		int i;
+		uint16_t	min, max;
+		uint16_t	buf[AO_USB_IN_SIZE>>1];
+
+		ao_trng_get_raw(buf);
+		min = max = buf[0];
+		for (i = 1; i < (AO_USB_IN_SIZE>>1); i++) {
+			uint16_t v = buf[i];
+			if (v < min) min = v;
+			if (v > max) max = v;
+		}
+		/* Wait for at least 10 bits of range */
+		if ((uint16_t) (max - min) >= 1024)
 			break;
 		ao_delay(AO_MS_TO_TICKS(10));
 	}

@@ -103,7 +103,7 @@ clean-local:
 		altoslib_*.jar altosuilib_*.jar \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		micropeak micropeak-test micropeak-jdb macosx linux windows micropeak-windows.log \
-		micropeak-windows.nsi *.desktop $(MDWN)
+		micropeak-windows.nsi *.desktop *.mdwn
 
 EXTRA_DIST = $(desktop_file).in
 
