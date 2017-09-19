@@ -194,7 +194,7 @@ clean-local:
 		Altos-Linux-*.tar.bz2 Altos-Linux-*.sh Altos-Mac-*.dmg Altos-Windows-*.exe \
 		windows altoslib_*.jar altosuilib_*.jar $(FREETTS_CLASS) \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt altos-windows.log altos-windows.nsi \
-		altosui altosui-test altosui-jdb macosx linux *.desktop $(MDWN)
+		altosui altosui-test altosui-jdb macosx linux *.desktop *.mdwn
 
 EXTRA_DIST = $(desktop_file).in
 
