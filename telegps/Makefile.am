@@ -128,7 +128,7 @@ clean-local:
 		altoslib_*.jar altosuilib_*.jar \
 		$(JFREECHART_CLASS) $(JCOMMON_CLASS) $(FREETTS_CLASS) $(LIBALTOS) Manifest.txt Manifest-fat.txt \
 		telegps telegps-test telegps-jdb macosx linux windows telegps-windows.log \
-		telegps-windows.nsi *.desktop $(MDWN)
+		telegps-windows.nsi *.desktop *.mdwn
 
 EXTRA_DIST = $(desktop_file).in
 
