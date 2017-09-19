@@ -1,3 +1,258 @@
+commit 1ece6e6fd3faaae3f6c6d434497eb04235939dc3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 18 20:43:14 2017 -0600
+
+    be more aggressive about removing and ignoring .mdwn files
+
+commit b12e982259817328e348f1aaa91c5c824891e7b9
+Merge: b1cf0dab e87d56b6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 18 20:35:00 2017 -0600
+
+    Merge branch 'master' into branch-1.8
+
+commit e87d56b665ca30a3e5920c23cd60c99b84341aa2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 18 18:51:51 2017 -0700
+
+    Update release version and date
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a54b3330574dd130540e482a06a3f8d7ca652b6c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 18 18:43:00 2017 -0700
+
+    Update docs for 1.8.2 release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d0c1ebc43a9c5bb0a3503d33978a5e7bc87057fe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 18 18:51:18 2017 -0700
+
+    Add short section on accelerometer calibration
+
+commit 60cadbc85949adf464be16a5cf8ce2c24d67bedf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 18 14:40:37 2017 -0700
+
+    altos/telegps-v2.0: Enable USB connect monitoring
+    
+    Disable radios when plugged in to USB to save power and avoid being
+    noisy.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e4c104c28952f2010c7b1cbc9ce59e148ab2d8f
+Merge: 63eeaada 4f2cbe0c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 18 16:01:43 2017 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 63eeaada85cb9ddccb0fa9b2d751cc8f46399d9c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 18 16:01:21 2017 -0600
+
+    production TeleGPS v2.0 use a 16Mhz crystal for the SOC
+
+commit 4f2cbe0c537c9f417aae310cc3b89f84e0915103
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 18 09:57:41 2017 -0700
+
+    altoslib: Avoid crashing when computing stats for empty flight logs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b9a00856aa4cf55ae4a143288058094ef8061134
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 18 09:57:06 2017 -0700
+
+    telegps: Fix up TeleGPS UI bits after accel cal changes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 95952059bbb50b5f22460418df003a87c8bd3271
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 15:47:43 2017 -0700
+
+    test/ao_flight_test: Show recorded pyro firing
+    
+    Can compare with computed values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 28a2db68e4806383cfaa7075d454c35cade9633a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Sep 17 12:41:50 2017 -0600
+
+    publish support for TeleGPS v2.0
+
+commit ad61e277069217d98400e884d3c173357d2343ed
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Sep 14 10:51:18 2017 -0600
+
+    deal with cheap BT dongle that shows multiple copies of unit in lescan output
+
+commit 5666a3c9427324ad8f92e21c5f9017436b36a82a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 14:02:11 2017 -0700
+
+    altosuilib: Make steps in accel cal default button
+    
+    This way you can just hit return through the process.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 441056b01abcf9287f61f425cf29fc4b1603c619
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:43:06 2017 -0700
+
+    altos/test: Handle new eeprom file format. Give up on telem files.
+    
+    Parse eeprom config using libjson-c, then read the hex values into a
+    giant blob.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit be44d33f5e94b8c4180adb275ec83cc70852db48
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:41:11 2017 -0700
+
+    altos: Fix debug printf in ao_pyro for state >=
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 10d14146ef84fbe4670454bc0996854a4066cfea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:40:06 2017 -0700
+
+    chaoskey: Wait for input data to stabilize before using it
+    
+    The ADC data takes a while to start working after power on; wait for
+    the range of input values to look reasonable before using the data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8284ba8bf78aade8f9d8f711cfefe2010ce81066
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:38:36 2017 -0700
+
+    doc: Add forward reference from 'idle' description to idle entry steps.
+    
+    This provides a reminder that entering idle mode takes specific steps
+    which differ between models.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8960cb525ef43c2262c7854b9a6f08237b3ea05b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:37:24 2017 -0700
+
+    altosui: Handle missing GPS when graphing mega/metrum data
+    
+    These have GPS, but if we never get a valid packet, then there won't
+    be any final position to display.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4dfaf25954134dbdc7229e2de39d4a4c049f285
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:37:06 2017 -0700
+
+    altosui: Remove debug printfs in FC config UI
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bc1cc0db1251e351d862dffbf618d0ce926c389d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:36:24 2017 -0700
+
+    altosdroid: Display serial, call, freq in tracker list
+    
+    This makes the list a lot easier to find entries in when it gets long.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4151c30e1294c0dda3aa02e7ac23b9616f25a4d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:35:25 2017 -0700
+
+    altoslib: Make receive frequency available in telem data
+    
+    This lets AltosDroid record which frequency each station was heard on.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d84f5e576e83a2b965d0e9752a9bbef100954815
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:34:23 2017 -0700
+
+    altoslib: Remove debug stack dump from AltosState
+    
+    An empty AltosState is allocated when parsing JSON data; it's not a
+    mistake.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b48966c3121e1b5d4a659bebcad595d6f1ec5ee5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 12 13:33:13 2017 -0700
+
+    altoslib: Correctly parse IMU cal data
+    
+    Was trying to match 'IMU call along' instead of 'IMU cal along',
+    causing the line to not match and losing the IMU accel cal values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f607a882a50aa6cd9e8e3e74cbaa5bcc1b5fa4a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 6 08:37:12 2017 -0600
+
+    ao-tools/ao-chaosread: Add -Wall -Wextra, clean up results
+
+commit 558a143315f0345b79cc4f22aa4b643fedcded9c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 11 23:42:53 2017 -0400
+
+    altosui: Accel calibration UI
+    
+    Provides a GUI for re-calibrating accelerometers
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c9a742db2497d07079f3d4bf383c6246cf80507c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 31 20:32:05 2017 -0700
+
+    Bump to version 1.8.1.1/android 16 for altosdroid
+    
+    AltosDroid 1.8.1 got released before the latest fix for not storing
+    frequency preferences was made. Make a 1.8.1.1 with a new android
+    release number for that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e85a8244389bffab0744be8dfa90b706f829083
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Aug 28 15:09:14 2017 -0600
+
+    need to capture .bin file for telebt-v4.0 loader
+
+commit ccf7ad5a31604e98b34bf16e3da6afb264ad1291
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Aug 28 14:01:54 2017 -0600
+
+    a few tweaks to the Releasing document based on experience with 1.8.1
+
+commit b1cf0dab1e28433e06ab02cec033951ea0149ea3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Aug 28 12:05:17 2017 -0600
+
+    releasing 1.8.1
+
 commit b68c0482d4fae8eb54cde1df0e4bcf4c5d272bad
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Aug 27 22:49:09 2017 -0700
