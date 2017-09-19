@@ -1,3 +1,39 @@
+altos (1.8.2-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * a few tweaks to the Releasing document based on experience with 1.8.1
+  * need to capture .bin file for telebt-v4.0 loader
+  * deal with cheap BT dongle that shows multiple copies of unit in lescan output
+  * publish support for TeleGPS v2.0
+  * production TeleGPS v2.0 use a 16Mhz crystal for the SOC
+  * be more aggressive about removing and ignoring .mdwn files
+  * releasing 1.8.2
+
+  [ Keith Packard ]
+  * Bump to version 1.8.1.1/android 16 for altosdroid
+  * altosui: Accel calibration UI
+  * ao-tools/ao-chaosread: Add -Wall -Wextra, clean up results
+  * altoslib: Correctly parse IMU cal data
+  * altoslib: Remove debug stack dump from AltosState
+  * altoslib: Make receive frequency available in telem data
+  * altosdroid: Display serial, call, freq in tracker list
+  * altosui: Remove debug printfs in FC config UI
+  * altosui: Handle missing GPS when graphing mega/metrum data
+  * doc: Add forward reference from 'idle' description to idle entry steps.
+  * chaoskey: Wait for input data to stabilize before using it
+  * altos: Fix debug printf in ao_pyro for state >=
+  * altos/test: Handle new eeprom file format. Give up on telem files.
+  * altosuilib: Make steps in accel cal default button
+  * test/ao_flight_test: Show recorded pyro firing
+  * telegps: Fix up TeleGPS UI bits after accel cal changes
+  * altoslib: Avoid crashing when computing stats for empty flight logs
+  * altos/telegps-v2.0: Enable USB connect monitoring
+  * Add short section on accelerometer calibration
+  * Update docs for 1.8.2 release
+  * Update release version and date
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 18 Sep 2017 20:48:07 -0600
+
 altos (1.8.1-2) unstable; urgency=medium
 
   * updating packaging to resolve outstanding lintian issues
