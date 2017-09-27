@@ -643,7 +643,7 @@ public class AltosFlightSeries extends AltosDataListener {
 	public  void set_igniter_voltage(double[] voltage) {
 		int channels = voltage.length;
 		if (igniter_voltage == null || igniter_voltage.length <= channels) {
-			AltosTimeSeries[]	new_igniter_voltage = new AltosTimeSeries[channels + 1];
+			AltosTimeSeries[]	new_igniter_voltage = new AltosTimeSeries[channels];
 			int			i = 0;
 
 			if (igniter_voltage != null) {

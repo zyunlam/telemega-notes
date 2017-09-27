@@ -587,7 +587,11 @@ public class AltosLib {
 	}
 
 	public static String igniter_name(int i) {
-		return String.format("Ignitor %c", 'A' + i);
+		return String.format("Igniter %c", 'A' + i);
+	}
+
+	public static String igniter_short_name(int i) {
+		return String.format("igniter_%c", 'a' + i);
 	}
 
 	public static AltosRecordSet record_set(File file) throws FileNotFoundException, IOException {
