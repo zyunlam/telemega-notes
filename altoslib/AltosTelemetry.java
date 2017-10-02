@@ -28,8 +28,11 @@ public abstract class AltosTelemetry implements AltosDataProvider {
 	int[]	bytes;
 
 	/* All telemetry packets have these fields */
-	public int rssi() { return AltosConvert.telem_to_rssi(AltosLib.int8(bytes, bytes.length - 3)); }
-	public int status() { return AltosLib.uint8(bytes, bytes.length - 2); }
+	static public int rssi(int[] bytes) { return AltosConvert.telem_to_rssi(AltosLib.int8(bytes, bytes.length - 3)); }
+	static public int status(int[] bytes) { return AltosLib.uint8(bytes, bytes.length - 2); }
+
+	public int rssi() { return rssi(bytes); }
+	public int status() { return status(bytes); }
 
 	/* All telemetry packets report these fields in some form */
 	public abstract int serial();
@@ -95,6 +98,9 @@ public abstract class AltosTelemetry implements AltosDataProvider {
 							       bytes.length - 2), 0);
 		if (!cksum(bytes))
 			throw new ParseException(String.format("invalid line \"%s\"", hex), 0);
+
+		if ((status(bytes) & PKT_APPEND_STATUS_1_CRC_OK) == 0)
+			throw new AltosCRCException(rssi(bytes));
 
 		/* length, data ..., rssi, status, checksum -- 4 bytes extra */
 		switch (bytes.length) {
