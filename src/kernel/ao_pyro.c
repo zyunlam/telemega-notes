@@ -482,7 +482,7 @@ ao_pyro_set(void)
 			break;
 
 		for (c = 0; c < AO_PYRO_NAME_LEN - 1; c++) {
-			if (ao_cmd_is_white())
+			if (ao_cmd_is_white() || ao_cmd_lex_c == '\n')
 				break;
 			name[c] = ao_cmd_lex_c;
 			ao_cmd_lex();
