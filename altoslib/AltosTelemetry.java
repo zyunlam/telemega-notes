@@ -51,7 +51,7 @@ public abstract class AltosTelemetry implements AltosDataProvider {
 
 	public void provide_data(AltosDataListener listener) {
 		listener.set_serial(serial());
-		if (listener.state == AltosLib.ao_flight_invalid)
+		if (listener.state() == AltosLib.ao_flight_invalid)
 			listener.set_state(AltosLib.ao_flight_startup);
 		if (frequency != AltosLib.MISSING)
 			listener.set_frequency(frequency);

@@ -83,7 +83,7 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 
 	/* AltosDataProvider */
 	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		cal_data.set_tick(tick());
+		listener.set_tick(tick());
 		if (cmd() == AltosLib.AO_LOG_FLIGHT)
 			cal_data.set_boost_tick();
 		listener.set_time(cal_data.time());

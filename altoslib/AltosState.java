@@ -480,7 +480,7 @@ public class AltosState extends AltosDataListener {
 	class AltosPressure extends AltosValue {
 		void set(double p, double time) {
 			super.set(p, time);
-			if (state == AltosLib.ao_flight_pad)
+			if (state() == AltosLib.ao_flight_pad)
 				ground_pressure.set_filtered(p, time);
 			double a = pressure_to_altitude(p);
 			altitude.set_computed(a, time);
@@ -557,7 +557,7 @@ public class AltosState extends AltosDataListener {
 	class AltosSpeed extends AltosCValue {
 
 		boolean can_max() {
-			return state < AltosLib.ao_flight_fast || state == AltosLib.ao_flight_stateless;
+			return state() < AltosLib.ao_flight_fast || state() == AltosLib.ao_flight_stateless;
 		}
 
 		void set_accel() {
@@ -615,7 +615,7 @@ public class AltosState extends AltosDataListener {
 	class AltosAccel extends AltosCValue {
 
 		boolean can_max() {
-			return state < AltosLib.ao_flight_fast || state == AltosLib.ao_flight_stateless;
+			return state() < AltosLib.ao_flight_fast || state() == AltosLib.ao_flight_stateless;
 		}
 
 		void set_measured(double a, double time) {
@@ -712,11 +712,11 @@ public class AltosState extends AltosDataListener {
 	}
 
 	public void init() {
+		super.init();
+
 		set = 0;
 
 		received_time = System.currentTimeMillis();
-		time = AltosLib.MISSING;
-		state = AltosLib.ao_flight_invalid;
 		landed = false;
 		boost = false;
 		rssi = AltosLib.MISSING;
@@ -819,9 +819,9 @@ public class AltosState extends AltosDataListener {
 
 		if (gps.locked && gps.nsat >= 4) {
 			/* Track consecutive 'good' gps reports, waiting for 10 of them */
-			if (state == AltosLib.ao_flight_pad || state == AltosLib.ao_flight_stateless) {
+			if (state() == AltosLib.ao_flight_pad || state() == AltosLib.ao_flight_stateless) {
 				set_npad(npad+1);
-				if (pad_lat != AltosLib.MISSING && (npad < 10 || state == AltosLib.ao_flight_pad)) {
+				if (pad_lat != AltosLib.MISSING && (npad < 10 || state() == AltosLib.ao_flight_pad)) {
 					pad_lat = (pad_lat * 31 + gps.lat) / 32;
 					pad_lon = (pad_lon * 31 + gps.lon) / 32;
 					gps_ground_altitude.set_filtered(gps.alt, time);
@@ -859,24 +859,14 @@ public class AltosState extends AltosDataListener {
 	}
 
 	public String state_name() {
-		return AltosLib.state_name(state);
+		return AltosLib.state_name(state());
 	}
 
 	public void set_state(int state) {
-		if (state != AltosLib.ao_flight_invalid) {
-			this.state = state;
-			ascent = (AltosLib.ao_flight_boost <= state &&
-				  state <= AltosLib.ao_flight_coast);
-			boost = (AltosLib.ao_flight_boost == state);
-		}
-	}
-
-	public int state() {
-		return state;
-	}
-
-	private void re_init() {
-		init();
+		super.set_state(state);
+		ascent = (AltosLib.ao_flight_boost <= state() &&
+			  state() <= AltosLib.ao_flight_coast);
+		boost = (AltosLib.ao_flight_boost == state());
 	}
 
 	public int rssi() {

@@ -72,6 +72,13 @@ public class AltosCalData {
 		}
 	}
 
+	public int		log_format = AltosLib.MISSING;
+
+	public void set_log_format(int log_format) {
+		if (log_format != AltosLib.MISSING)
+			this.log_format = log_format;
+	}
+
 	public int		config_major = AltosLib.MISSING;
 	public int		config_minor = AltosLib.MISSING;
 	public int		flight_log_max = AltosLib.MISSING;

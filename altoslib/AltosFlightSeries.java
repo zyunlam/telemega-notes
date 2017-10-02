@@ -150,15 +150,13 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public void set_state(int state) {
 
-		if (state == AltosLib.ao_flight_pad)
-			return;
-
-		if (state_series == null)
-			state_series = add_series(state_name, AltosConvert.state_name);
-		else if (this.state == state)
-			return;
-		this.state = state;
-		state_series.add(time(), state);
+		if (state != AltosLib.ao_flight_pad && state != AltosLib.MISSING && state != AltosLib.ao_flight_stateless) {
+			if (state_series == null)
+				state_series = add_series(state_name, AltosConvert.state_name);
+			if (this.state() != state)
+				state_series.add(time(), state);
+		}
+		super.set_state(state);
 	}
 
 	public AltosTimeSeries	accel_series;
