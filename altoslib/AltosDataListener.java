@@ -21,7 +21,14 @@ public abstract class AltosDataListener {
 	public double		time = AltosLib.MISSING;
 	public double		frequency = AltosLib.MISSING;
 
+	public int		raw_tick = AltosLib.MISSING;
+
+	public int tick() {
+		return raw_tick;
+	}
+
 	public void set_tick(int tick) {
+		raw_tick = tick;
 		cal_data.set_tick(tick);
 		set_time(cal_data.time());
 	}

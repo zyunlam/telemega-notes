@@ -80,6 +80,7 @@ public class AltosGraph extends AltosUIGraph {
 	static final private Color orient_color = new Color(31, 31, 31);
 
 	static AltosUnits dop_units = null;
+	static AltosUnits tick_units = null;
 
 	AltosUIFlightSeries flight_series;
 
@@ -89,7 +90,7 @@ public class AltosGraph extends AltosUIGraph {
 		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
 		AltosUIAxis	distance_axis, pressure_axis, thrust_axis;
 		AltosUIAxis	gyro_axis, orient_axis, mag_axis;
-		AltosUIAxis	course_axis, dop_axis;
+		AltosUIAxis	course_axis, dop_axis, tick_axis;
 
 		if (stats.serial != AltosLib.MISSING && stats.product != null && stats.flight != AltosLib.MISSING)
 			setName(String.format("%s %d flight %d\n", stats.product, stats.serial, stats.flight));
@@ -98,6 +99,7 @@ public class AltosGraph extends AltosUIGraph {
 		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
 		thrust_axis = newAxis("Thrust", AltosConvert.force, thrust_color);
+		tick_axis = newAxis("Tick", tick_units, accel_color, 0);
 		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
 		voltage_axis = newAxis("Voltage", AltosConvert.voltage, voltage_color);
 		temperature_axis = newAxis("Temperature", AltosConvert.temperature, temperature_color, 0);
@@ -128,6 +130,11 @@ public class AltosGraph extends AltosUIGraph {
 					      true,
 					      plot,
 					      false);
+
+		flight_series.register_axis(AltosUIFlightSeries.tick_name,
+					    accel_color,
+					    false,
+					    tick_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.accel_name,
 					    accel_color,
@@ -320,6 +327,12 @@ public class AltosGraph extends AltosUIGraph {
 		return flight_series.series(cal_data);
 	}
 
+	public void set_filter(double filter) {
+		System.out.printf("filter set to %f\n", filter);
+		flight_series.set_filter(filter, filter);
+		units_changed(false);
+	}
+
 	public void set_data(AltosFlightStats stats, AltosUIFlightSeries flight_series) {
 		set_series(setup(stats, flight_series));
 	}
@@ -330,6 +343,7 @@ public class AltosGraph extends AltosUIGraph {
 
 	public AltosGraph(AltosUIEnable enable, AltosFlightStats stats, AltosUIFlightSeries flight_series) {
 		this(enable);
+		this.flight_series = flight_series;
 		set_series(setup(stats, flight_series));
 	}
 }

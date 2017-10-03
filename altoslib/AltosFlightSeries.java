@@ -191,6 +191,17 @@ public class AltosFlightSeries extends AltosDataListener {
 	public void set_received_time(long received_time) {
 	}
 
+	public AltosTimeSeries tick_series;
+
+	public static final String tick_name = "Tick";
+
+	public void set_tick(int tick) {
+		super.set_tick(tick);
+		if (tick_series == null)
+			tick_series = add_series(tick_name, null);
+		tick_series.add(time(), tick);
+	}
+
 	public AltosTimeSeries rssi_series;
 
 	public static final String rssi_name = "RSSI";
