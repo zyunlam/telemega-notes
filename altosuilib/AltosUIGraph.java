@@ -95,6 +95,10 @@ public class AltosUIGraph implements AltosUnitsListener {
 			s.set_units();
 	}
 
+	public void filter_changed() {
+		units_changed(false);
+	}
+
 	public void setName (String name) {
 		chart.setTitle(name);
 	}

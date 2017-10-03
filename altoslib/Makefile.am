@@ -55,6 +55,7 @@ altoslib_JAVA = \
 	AltosEepromList.java \
 	AltosEepromLog.java \
 	AltosFile.java \
+	AltosFilterListener.java \
 	AltosFlash.java \
 	AltosFlashListener.java \
 	AltosDataListener.java \

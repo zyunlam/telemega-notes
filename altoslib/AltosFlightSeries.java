@@ -21,7 +21,7 @@ public class AltosFlightSeries extends AltosDataListener {
 	public ArrayList<AltosTimeSeries> series = new ArrayList<AltosTimeSeries>();
 
 	public double	speed_filter_width = 4.0;
-	public double	accel_filter_width = 4.0;
+	public double	accel_filter_width = 1.0;
 
 	public int[] indices() {
 		int[] indices = new int[series.size()];
@@ -160,6 +160,7 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	public AltosTimeSeries	accel_series;
+	public boolean		accel_computed;
 
 	public static final String accel_name = "Accel";
 
@@ -174,17 +175,44 @@ public class AltosFlightSeries extends AltosDataListener {
 			accel_series = add_series(accel_name, AltosConvert.accel);
 
 		accel_series.add(time(), acceleration);
+		accel_computed = false;
 	}
 
-	private void compute_accel() {
-		if (accel_series != null)
-			return;
+	private AltosTimeSeries compute_accel() {
+		AltosTimeSeries	new_accel_series = null;
 
 		if (speed_series != null) {
-			AltosTimeSeries temp_series = make_series(speed_name, AltosConvert.speed);
-			speed_series.filter(temp_series, accel_filter_width);
-			accel_series = add_series(accel_name, AltosConvert.accel);
-			temp_series.differentiate(accel_series);
+			AltosTimeSeries temp_series;
+			if (accel_filter_width > 0) {
+				temp_series = make_series(speed_name, AltosConvert.speed);
+				speed_series.filter(temp_series, accel_filter_width);
+			} else
+				temp_series = speed_series;
+
+			new_accel_series = make_series(accel_name, AltosConvert.accel);
+			temp_series.differentiate(new_accel_series);
+		}
+		return new_accel_series;
+	}
+
+	public void set_filter(double speed_filter, double accel_filter) {
+		this.speed_filter_width = speed_filter;
+		this.accel_filter_width = accel_filter;
+
+		AltosTimeSeries new_speed_series = compute_speed();
+
+		if (new_speed_series != null) {
+			speed_series.erase_values();
+			for (AltosTimeValue tv : new_speed_series)
+				speed_series.add(tv);
+		}
+		if (accel_computed) {
+			AltosTimeSeries new_accel_series = compute_accel();
+			if (new_accel_series != null) {
+				accel_series.erase_values();
+				for (AltosTimeValue tv : new_accel_series)
+					accel_series.add(tv);
+			}
 		}
 	}
 
@@ -268,21 +296,24 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public static final String speed_name = "Speed";
 
-	private void compute_speed() {
-		if (speed_series != null)
-			return;
-
+	private AltosTimeSeries compute_speed() {
+		AltosTimeSeries new_speed_series = null;
 		AltosTimeSeries	alt_speed_series = null;
 		AltosTimeSeries accel_speed_series = null;
 
 		if (altitude_series != null) {
-			AltosTimeSeries temp_series = make_series(altitude_name, AltosConvert.height);
-			altitude_series.filter(temp_series, speed_filter_width);
+			AltosTimeSeries temp_series;
+
+			if (speed_filter_width > 0) {
+				temp_series = make_series(speed_name, AltosConvert.height);
+				altitude_series.filter(temp_series, speed_filter_width);
+			} else
+				temp_series = altitude_series;
 
 			alt_speed_series = make_series(speed_name, AltosConvert.speed);
 			temp_series.differentiate(alt_speed_series);
 		}
-		if (accel_series != null) {
+		if (accel_series != null && !accel_computed) {
 
 			if (orient_series != null) {
 				vert_accel_series = add_series(vert_accel_name, AltosConvert.accel);
@@ -318,26 +349,25 @@ public class AltosFlightSeries extends AltosDataListener {
 				}
 			}
 			if (apogee_time == AltosLib.MISSING) {
-				speed_series = alt_speed_series;
+				new_speed_series = alt_speed_series;
 			} else {
-				speed_series = make_series(speed_name, AltosConvert.speed);
+				new_speed_series = make_series(speed_name, AltosConvert.speed);
 				for (AltosTimeValue d : accel_speed_series) {
 					if (d.time <= apogee_time)
-						speed_series.add(d);
+						new_speed_series.add(d);
 				}
 				for (AltosTimeValue d : alt_speed_series) {
 					if (d.time > apogee_time)
-						speed_series.add(d);
+						new_speed_series.add(d);
 				}
 
 			}
 		} else if (alt_speed_series != null) {
-			speed_series = alt_speed_series;
+			new_speed_series = alt_speed_series;
 		} else if (accel_speed_series != null) {
-			speed_series = accel_speed_series;
+			new_speed_series = accel_speed_series;
 		}
-		if (speed_series != null)
-			add_series(speed_series);
+		return new_speed_series;
 	}
 
 	public AltosTimeSeries orient_series;
@@ -690,8 +720,18 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public void finish() {
 		compute_orient();
-		compute_speed();
-		compute_accel();
+		if (speed_series == null) {
+			speed_series = compute_speed();
+			if (speed_series != null)
+				add_series(speed_series);
+		}
+		if (accel_series == null) {
+			accel_series = compute_accel();
+			if (accel_series != null) {
+				add_series(accel_series);
+				accel_computed = true;
+			}
+		}
 		compute_height();
 	}
 

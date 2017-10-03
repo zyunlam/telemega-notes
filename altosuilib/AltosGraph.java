@@ -92,7 +92,7 @@ public class AltosGraph extends AltosUIGraph {
 		AltosUIAxis	gyro_axis, orient_axis, mag_axis;
 		AltosUIAxis	course_axis, dop_axis, tick_axis;
 
-		if (stats.serial != AltosLib.MISSING && stats.product != null && stats.flight != AltosLib.MISSING)
+		if (stats != null && stats.serial != AltosLib.MISSING && stats.product != null && stats.flight != AltosLib.MISSING)
 			setName(String.format("%s %d flight %d\n", stats.product, stats.serial, stats.flight));
 
 		height_axis = newAxis("Height", AltosConvert.height, height_color);
@@ -325,12 +325,6 @@ public class AltosGraph extends AltosUIGraph {
 					    thrust_axis);
 
 		return flight_series.series(cal_data);
-	}
-
-	public void set_filter(double filter) {
-		System.out.printf("filter set to %f\n", filter);
-		flight_series.set_filter(filter, filter);
-		units_changed(false);
 	}
 
 	public void set_data(AltosFlightStats stats, AltosUIFlightSeries flight_series) {

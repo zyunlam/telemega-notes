@@ -89,7 +89,7 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 	public void fireSeriesChanged() {
 	}
 
-	void set_data() {
+	public void set_data() {
 		if (marker) {
 			if (markers != null) {
 				for (ValueMarker marker : markers)
@@ -124,6 +124,7 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 			}
 			xy_series.setNotify(true);
 		}
+		clear_changed();
 	}
 
 	public void set_units() {

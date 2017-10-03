@@ -31,7 +31,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.ui.RefineryUtilities;
 
-public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, AltosUnitsListener
+public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, AltosUnitsListener, AltosFilterListener
 {
 	JTabbedPane		pane;
 	AltosGraph		graph;
@@ -82,6 +82,23 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 			enable.units_changed(imperial_units);
 	}
 
+	AltosUIFlightSeries flight_series;
+
+	public void filter_changed(double speed_filter, double accel_filter) {
+		flight_series.set_filter(speed_filter, accel_filter);
+		graph.filter_changed();
+		stats = new AltosFlightStats(flight_series);
+		statsTable.filter_changed(stats);
+	}
+
+	public double speed_filter() {
+		return flight_series.speed_filter_width;
+	}
+
+	public double accel_filter() {
+		return flight_series.accel_filter_width;
+	}
+
 	AltosGraphUI(AltosRecordSet set, File file) throws InterruptedException, IOException {
 		super(file.getName());
 		AltosCalData	cal_data = set.cal_data();
@@ -89,9 +106,9 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 
 		pane = new JTabbedPane();
 
-		enable = new AltosUIEnable();
+		flight_series = new AltosUIFlightSeries(cal_data);
 
-		AltosUIFlightSeries flight_series = new AltosUIFlightSeries(cal_data);
+		enable = new AltosUIEnable(this);
 
 		set.capture_series(flight_series);
 

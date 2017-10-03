@@ -21,6 +21,7 @@ package org.altusmetrum.altosuilib_12;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
@@ -36,12 +37,17 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
-public class AltosUIEnable extends Container {
+public class AltosUIEnable extends Container implements ChangeListener {
 
 	Insets		il, ir;
 	int		y;
 	int		x;
 	JCheckBox	imperial_units;
+	JLabel		speed_filter_label;
+	JSlider		speed_filter;
+	JLabel		accel_filter_label;
+	JSlider		accel_filter;
+	AltosFilterListener	filter_listener;
 
 	static final int max_rows = 14;
 
@@ -69,10 +75,14 @@ public class AltosUIEnable extends Container {
 		}
 	}
 
+	LinkedList<GraphElement> elements = new LinkedList<GraphElement>();
+
 	public void add(String name, AltosUIGrapher grapher, boolean enabled) {
 
 		GraphElement	e = new GraphElement(name, grapher, enabled);
 		GridBagConstraints c = new GridBagConstraints();
+
+		elements.add(e);
 
 		/* Add element */
 		c = new GridBagConstraints();
@@ -87,6 +97,17 @@ public class AltosUIEnable extends Container {
 		if (y == max_rows) {
 			x++;
 			y = 0;
+		}
+	}
+
+	public void stateChanged(ChangeEvent e) {
+		JSlider filter = (JSlider) e.getSource();
+		if (!filter.getValueIsAdjusting()) {
+			double	speed_value = (int) speed_filter.getValue() / 1000.0;
+			double	accel_value = (int) accel_filter.getValue() / 1000.0;
+			if (filter_listener != null) {
+				filter_listener.filter_changed(speed_value, accel_value);
+			}
 		}
 	}
 
@@ -109,9 +130,66 @@ public class AltosUIEnable extends Container {
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = il;
 		add(imperial_units, c);
+
+		speed_filter_label = new JLabel("Speed Filter(ms)");
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = 1001;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		add(speed_filter_label, c);
+
+		speed_filter = new JSlider(JSlider.HORIZONTAL, 0, 10000, (int) (filter_listener.speed_filter() * 1000.0));
+		Hashtable<Integer,JLabel> label_table = new Hashtable<Integer,JLabel>();
+		for (int i = 0; i <= 10000; i += 5000) {
+			label_table.put(new Integer(i), new JLabel(String.format("%d", i)));
+		}
+		speed_filter.setPaintTicks(true);
+		speed_filter.setMajorTickSpacing(1000);
+		speed_filter.setMinorTickSpacing(250);
+		speed_filter.setLabelTable(label_table);
+		speed_filter.setPaintTrack(false);
+		speed_filter.setSnapToTicks(true);
+		speed_filter.setPaintLabels(true);
+		speed_filter.addChangeListener(this);
+
+		c = new GridBagConstraints();
+		c.gridx = 1; c.gridy = 1001;
+		c.gridwidth = 1000; c.gridheight = 1;
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		add(speed_filter, c);
+
+		accel_filter_label = new JLabel("Acceleration Filter(ms)");
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = 1002;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		add(accel_filter_label, c);
+
+		accel_filter = new JSlider(JSlider.HORIZONTAL, 0, 10000, (int) (filter_listener.accel_filter() * 1000.0));
+		accel_filter.setPaintTicks(true);
+		accel_filter.setMajorTickSpacing(1000);
+		accel_filter.setMinorTickSpacing(250);
+		accel_filter.setLabelTable(label_table);
+		accel_filter.setPaintTrack(false);
+		accel_filter.setSnapToTicks(true);
+		accel_filter.setPaintLabels(true);
+		accel_filter.addChangeListener(this);
+
+		c = new GridBagConstraints();
+		c.gridx = 1; c.gridy = 1002;
+		c.gridwidth = 1000; c.gridheight = 1;
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		add(accel_filter, c);
 	}
 
-	public AltosUIEnable() {
+	public AltosUIEnable(AltosFilterListener filter_listener) {
+		this.filter_listener = filter_listener;
 		il = new Insets(4,4,4,4);
 		ir = new Insets(4,4,4,4);
 		x = 0;
