@@ -31,6 +31,7 @@ altosuilib_JAVA = \
 	AltosUIFlightSeries.java \
 	AltosUIGraph.java \
 	AltosGraph.java \
+	AltosShapeListener.java \
 	AltosUSBDevice.java \
 	AltosVoice.java \
 	AltosDisplayThread.java \

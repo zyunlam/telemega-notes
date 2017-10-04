@@ -43,11 +43,13 @@ public class AltosUIEnable extends Container implements ChangeListener {
 	int		y;
 	int		x;
 	JCheckBox	imperial_units;
+	JCheckBox	show_shapes;
 	JLabel		speed_filter_label;
 	JSlider		speed_filter;
 	JLabel		accel_filter_label;
 	JSlider		accel_filter;
 	AltosFilterListener	filter_listener;
+	AltosShapeListener	shape_listener;
 
 	static final int max_rows = 14;
 
@@ -111,6 +113,16 @@ public class AltosUIEnable extends Container implements ChangeListener {
 		}
 	}
 
+	public void set_shapes_visible(boolean visible) {
+		System.out.printf("set shapes %b\n", visible);
+		if (shape_listener != null)
+			shape_listener.set_shapes_visible(visible);
+	}
+
+	public void register_shape_listener(AltosShapeListener shape_listener) {
+		this.shape_listener = shape_listener;
+	}
+
 	public void add_units() {
 		/* Imperial units setting */
 
@@ -131,9 +143,26 @@ public class AltosUIEnable extends Container implements ChangeListener {
 		c.insets = il;
 		add(imperial_units, c);
 
-		speed_filter_label = new JLabel("Speed Filter(ms)");
+		show_shapes = new JCheckBox("Show Markers", false);
+		show_shapes.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JCheckBox item = (JCheckBox) e.getSource();
+					boolean enabled = item.isSelected();
+					set_shapes_visible(enabled);
+				}
+			});
+		show_shapes.setToolTipText("Show marker Use Imperial units instead of metric");
 		c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = 1001;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		add(show_shapes, c);
+
+
+		speed_filter_label = new JLabel("Speed Filter(ms)");
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = 1002;
 		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = il;
@@ -154,7 +183,7 @@ public class AltosUIEnable extends Container implements ChangeListener {
 		speed_filter.addChangeListener(this);
 
 		c = new GridBagConstraints();
-		c.gridx = 1; c.gridy = 1001;
+		c.gridx = 1; c.gridy = 1002;
 		c.gridwidth = 1000; c.gridheight = 1;
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.LINE_START;
@@ -163,7 +192,7 @@ public class AltosUIEnable extends Container implements ChangeListener {
 
 		accel_filter_label = new JLabel("Acceleration Filter(ms)");
 		c = new GridBagConstraints();
-		c.gridx = 0; c.gridy = 1002;
+		c.gridx = 0; c.gridy = 1003;
 		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = il;
@@ -180,7 +209,7 @@ public class AltosUIEnable extends Container implements ChangeListener {
 		accel_filter.addChangeListener(this);
 
 		c = new GridBagConstraints();
-		c.gridx = 1; c.gridy = 1002;
+		c.gridx = 1; c.gridy = 1003;
 		c.gridwidth = 1000; c.gridheight = 1;
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.LINE_START;

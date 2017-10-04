@@ -36,7 +36,7 @@ import org.jfree.chart.labels.*;
 import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
-public class AltosUIGraph implements AltosUnitsListener {
+public class AltosUIGraph implements AltosUnitsListener, AltosShapeListener {
 
 	XYPlot				plot;
 	JFreeChart			chart;
@@ -99,6 +99,11 @@ public class AltosUIGraph implements AltosUnitsListener {
 		units_changed(false);
 	}
 
+	public void set_shapes_visible(boolean visible) {
+		for (AltosUITimeSeries s : series)
+			s.set_shapes_visible(visible);
+	}
+
 	public void setName (String name) {
 		chart.setTitle(name);
 	}
@@ -126,6 +131,8 @@ public class AltosUIGraph implements AltosUnitsListener {
 		this.enable = enable;
 		this.series = null;
 		this.axis_index = 0;
+
+		enable.register_shape_listener(this);
 
 		axes_added = new Hashtable<Integer,Boolean>();
 

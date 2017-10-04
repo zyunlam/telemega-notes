@@ -66,7 +66,7 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 	AltosUIAxis	axis;
 	boolean		marker;
 	boolean		marker_top;
-	XYItemRenderer	renderer;
+	XYLineAndShapeRenderer	renderer;
 	XYPlot		plot;
 	AltosXYSeries	xy_series;
 	ArrayList<ValueMarker>	markers;
@@ -186,6 +186,10 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 		this.marker = true;
 		this.plot = plot;
 		this.marker_top = marker_top;
+	}
+
+	public void set_shapes_visible(boolean shapes_visible) {
+		renderer.setSeriesShapesVisible(0, shapes_visible);
 	}
 
 	public AltosUITimeSeries(String label, AltosUnits units) {
