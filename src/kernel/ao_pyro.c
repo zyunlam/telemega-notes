@@ -76,7 +76,7 @@ uint16_t	ao_pyro_fired;
 
 #if PYRO_DBG
 int pyro_dbg;
-#define DBG(...)	do { if (pyro_dbg) printf("\t%d: ", (int) (pyro - ao_config.pyro)); printf(__VA_ARGS__); } while (0)
+#define DBG(...)	do { if (pyro_dbg) { printf("\t%d: ", (int) (pyro - ao_config.pyro)); printf(__VA_ARGS__); } } while (0)
 #else
 #define DBG(...)
 #endif
@@ -239,11 +239,8 @@ ao_pyro_pins_fire(uint16_t fire)
 	}
 	ao_delay(ao_config.pyro_time);
 	for (p = 0; p < AO_PYRO_NUM; p++) {
-		if (fire & (1 << p)) {
+		if (fire & (1 << p))
 			ao_pyro_pin_set(p, 0);
-			ao_config.pyro[p].fired = 1;
-			ao_pyro_fired |= (1 << p);
-		}
 	}
 	ao_delay(AO_MS_TO_TICKS(50));
 }
@@ -261,7 +258,7 @@ ao_pyro_check(void)
 
 		/* Ignore igniters which have already fired
 		 */
-		if (pyro->fired)
+		if (ao_pyro_fired & (1 << p))
 			continue;
 
 		/* Ignore disabled igniters
@@ -296,7 +293,7 @@ ao_pyro_check(void)
 			 * by setting the fired bit
 			 */
 			if (!ao_pyro_ready(pyro)) {
-				pyro->fired = 1;
+				ao_pyro_fired |= (1 << p);
 				continue;
 			}
 
@@ -307,8 +304,10 @@ ao_pyro_check(void)
 		fire |= (1 << p);
 	}
 
-	if (fire)
+	if (fire) {
+		ao_pyro_fired |= fire;
 		ao_pyro_pins_fire(fire);
+	}
 
 	return any_waiting;
 }
