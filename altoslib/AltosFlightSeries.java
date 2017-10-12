@@ -489,13 +489,24 @@ public class AltosFlightSeries extends AltosDataListener {
 	public ArrayList<AltosGPSTimeValue> gps_series;
 
 	public AltosGPS gps_before(double time) {
-		AltosGPS gps = null;
-		for (AltosGPSTimeValue gtv : gps_series)
-			if (gtv.time <= time)
-				gps = gtv.gps;
-			else
-				break;
-		return gps;
+		AltosGPSTimeValue nearest = null;
+		for (AltosGPSTimeValue gtv : gps_series) {
+			if (nearest == null)
+				nearest = gtv;
+			else {
+				if (gtv.time <= time) {
+					if (nearest.time <= time && gtv.time > nearest.time)
+						nearest = gtv;
+				} else {
+					if (nearest.time > time && gtv.time < nearest.time)
+						nearest = gtv;
+				}
+			}
+		}
+		if (nearest != null)
+			return nearest.gps;
+		else
+			return null;
 	}
 
 	public AltosTimeSeries	sats_in_view;
