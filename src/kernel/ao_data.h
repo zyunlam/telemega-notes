@@ -41,6 +41,13 @@
 #define AO_DATA_MPU6000	0
 #endif
 
+#if HAS_MPU9250
+#include <ao_mpu9250.h>
+#define AO_DATA_MPU9250	(1 << 2)
+#else
+#define AO_DATA_MPU9250	0
+#endif
+
 #if HAS_HMC5883
 #include <ao_hmc5883.h>
 #define AO_DATA_HMC5883	(1 << 3)
@@ -57,7 +64,7 @@
 
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250)
 
 struct ao_data {
 	uint16_t			tick;
@@ -73,6 +80,9 @@ struct ao_data {
 #if !HAS_MMA655X
 	int16_t				z_accel;
 #endif
+#endif
+#if HAS_MPU9250
+	struct ao_mpu9250_sample	mpu9250;
 #endif
 #if HAS_HMC5883
 	struct ao_hmc5883_sample	hmc5883;
