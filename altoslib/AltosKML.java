@@ -244,6 +244,8 @@ public class AltosKML implements AltosWriter {
 
 	public void write(AltosGPS gps, double alt)
 	{
+		if (gps == null)
+			return;
 		if (gps.lat == AltosLib.MISSING)
 			return;
 		if (gps.lon == AltosLib.MISSING)
