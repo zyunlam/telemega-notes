@@ -294,7 +294,7 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<Alt
 		double alpha = m / 2;
 		double t = (n - alpha) / alpha;
 
-		if (t > 1)
+		if (t > 1 || t < -1)
 			t = 1;
 		double k = i0 (beta * Math.sqrt (1 - t*t)) / i0(beta);
 		return k;
