@@ -355,7 +355,8 @@ public abstract class AltosLink implements Runnable {
 	public int telemetry_rate = -1;
 	public double frequency;
 	public String callsign;
-	AltosConfigData	config_data;
+	private AltosConfigData	config_data_local;
+	private AltosConfigData config_data_remote;
 
 	private Object config_data_lock = new Object();
 
@@ -390,7 +391,7 @@ public abstract class AltosLink implements Runnable {
 
 	public void set_radio_frequency(double in_frequency) throws InterruptedException, TimeoutException {
 		frequency = in_frequency;
-		config_data();
+		AltosConfigData config_data = config_data();
 		set_radio_frequency(frequency,
 				    config_data.radio_frequency > 0,
 				    config_data.radio_setting > 0,
@@ -446,11 +447,24 @@ public abstract class AltosLink implements Runnable {
 
  	public AltosConfigData config_data() throws InterruptedException, TimeoutException {
 		synchronized(config_data_lock) {
-			if (config_data == null) {
-				printf("m 0\n");
-				config_data = new AltosConfigData(this);
-				if (monitor_mode)
-					set_monitor(true);
+			AltosConfigData	config_data;
+
+			if (remote) {
+				if (config_data_remote == null) {
+					printf("m 0\n");
+					config_data_remote = new AltosConfigData(this);
+					if (monitor_mode)
+						set_monitor(true);
+				}
+				config_data = config_data_remote;
+			} else {
+				if (config_data_local == null) {
+					printf("m 0\n");
+					config_data_local = new AltosConfigData(this);
+					if (monitor_mode)
+						set_monitor(true);
+				}
+				config_data = config_data_local;
 			}
 			return config_data;
 		}
@@ -551,14 +565,23 @@ public abstract class AltosLink implements Runnable {
 	}
 
 	public boolean has_monitor_battery() {
-		return config_data.has_monitor_battery();
+		try {
+			return config_data().has_monitor_battery();
+		} catch (InterruptedException ie) {
+			return false;
+		} catch (TimeoutException te) {
+			return false;
+		}
 	}
 
 	public double monitor_battery() throws InterruptedException {
-		int monitor_batt = AltosLib.MISSING;
+		double	volts = AltosLib.MISSING;
 
-		if (config_data.has_monitor_battery()) {
-			try {
+		try {
+			AltosConfigData config_data = config_data();
+			int monitor_batt = AltosLib.MISSING;
+
+			if (config_data.has_monitor_battery()) {
 				String[] items = adc();
 				for (int i = 0; i < items.length;) {
 					if (items[i].equals("batt")) {
@@ -568,19 +591,17 @@ public abstract class AltosLink implements Runnable {
 					}
 					i++;
 				}
-			} catch (TimeoutException te) {
 			}
-		}
-		if (monitor_batt == AltosLib.MISSING)
-			return AltosLib.MISSING;
+			if (monitor_batt != AltosLib.MISSING) {
+				if (config_data.product.startsWith("TeleBT-v3") || config_data.product.startsWith("TeleBT-v4")) {
+					volts = AltosConvert.tele_bt_3_battery(monitor_batt);
+				} else {
+					volts = AltosConvert.cc_battery_to_voltage(monitor_batt);
+				}
+			}
 
-		double	volts = AltosLib.MISSING;
-		if (config_data.product.startsWith("TeleBT-v3") || config_data.product.startsWith("TeleBT-v4")) {
-			volts = AltosConvert.tele_bt_3_battery(monitor_batt);
-		} else {
-			volts = AltosConvert.cc_battery_to_voltage(monitor_batt);
+		} catch (TimeoutException te) {
 		}
-
 		return volts;
 	}
 
