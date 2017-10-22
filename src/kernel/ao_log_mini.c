@@ -21,50 +21,6 @@
 #include <ao_data.h>
 #include <ao_flight.h>
 
-static __xdata struct ao_log_mini log;
-
-__code uint8_t ao_log_format = AO_LOG_FORMAT;
-
-static uint8_t
-ao_log_csum(__xdata uint8_t *b) __reentrant
-{
-	uint8_t	sum = 0x5a;
-	uint8_t	i;
-
-	for (i = 0; i < sizeof (struct ao_log_mini); i++)
-		sum += *b++;
-	return -sum;
-}
-
-uint8_t
-ao_log_mini(__xdata struct ao_log_mini *log) __reentrant
-{
-	uint8_t wrote = 0;
-	/* set checksum */
-	log->csum = 0;
-	log->csum = ao_log_csum((__xdata uint8_t *) log);
-	ao_mutex_get(&ao_log_mutex); {
-		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
-			ao_log_stop();
-		if (ao_log_running) {
-			wrote = 1;
-			ao_storage_write(ao_log_current_pos,
-					 log,
-					 sizeof (struct ao_log_mini));
-			ao_log_current_pos += sizeof (struct ao_log_mini);
-		}
-	} ao_mutex_put(&ao_log_mutex);
-	return wrote;
-}
-
-static uint8_t
-ao_log_dump_check_data(void)
-{
-	if (ao_log_csum((uint8_t *) &log) != 0)
-		return 0;
-	return 1;
-}
-
 static __data uint8_t	ao_log_data_pos;
 
 /* a hack to make sure that ao_log_minis fill the eeprom block in even units */
@@ -92,7 +48,7 @@ ao_log(void)
 	log.tick = ao_sample_tick;
 	log.u.flight.flight = ao_flight_number;
 	log.u.flight.ground_pres = ao_ground_pres;
-	ao_log_mini(&log);
+	ao_log_write(&log);
 #endif
 
 	/* Write the whole contents of the ring to the log
@@ -116,7 +72,7 @@ ao_log(void)
 				log.u.sensor.sense_m = ao_data_ring[ao_log_data_pos].adc.sense_m;
 				log.u.sensor.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
 #endif
-				ao_log_mini(&log);
+				ao_log_write(&log);
 				if (ao_log_state <= ao_flight_coast)
 					next_sensor = log.tick + AO_SENSOR_INTERVAL_ASCENT;
 				else
@@ -132,7 +88,7 @@ ao_log(void)
 			log.tick = ao_time();
 			log.u.state.state = ao_log_state;
 			log.u.state.reason = 0;
-			ao_log_mini(&log);
+			ao_log_write(&log);
 
 			if (ao_log_state == ao_flight_landed)
 				ao_log_stop();
@@ -148,17 +104,4 @@ ao_log(void)
 		while (!ao_log_running)
 			ao_sleep(&ao_log_running);
 	}
-}
-
-uint16_t
-ao_log_flight(uint8_t slot)
-{
-	if (!ao_storage_read(ao_log_pos(slot),
-			     &log,
-			     sizeof (struct ao_log_mini)))
-		return 0;
-
-	if (ao_log_dump_check_data() && log.type == AO_LOG_FLIGHT)
-		return log.u.flight.flight;
-	return 0;
 }

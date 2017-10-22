@@ -47,7 +47,7 @@ ao_gps_report_metrum(void)
 			gps_log.u.gps.longitude = gps_data.longitude;
 			gps_log.u.gps.altitude_low = gps_data.altitude_low;
 			gps_log.u.gps.altitude_high = gps_data.altitude_high;
-			ao_log_metrum(&gps_log);
+			ao_log_write(&gps_log);
 
 			gps_log.type = AO_LOG_GPS_TIME;
 			gps_log.u.gps_time.hour = gps_data.hour;
@@ -58,7 +58,7 @@ ao_gps_report_metrum(void)
 			gps_log.u.gps_time.month = gps_data.month;
 			gps_log.u.gps_time.day = gps_data.day;
 			gps_log.u.gps_time.pdop = gps_data.pdop;
-			ao_log_metrum(&gps_log);
+			ao_log_write(&gps_log);
 		}
 
 		if ((new & AO_GPS_NEW_TRACKING) && (n = gps_tracking_data.channels)) {
@@ -71,7 +71,7 @@ ao_gps_report_metrum(void)
 					if (i == 4) {
 						gps_log.u.gps_sat.channels = i;
 						gps_log.u.gps_sat.more = 1;
-						ao_log_metrum(&gps_log);
+						ao_log_write(&gps_log);
 						i = 0;
 					}
 					gps_log.u.gps_sat.sats[i].svid = svid;
@@ -82,7 +82,7 @@ ao_gps_report_metrum(void)
 			if (i) {
 				gps_log.u.gps_sat.channels = i;
 				gps_log.u.gps_sat.more = 0;
-				ao_log_metrum(&gps_log);
+				ao_log_write(&gps_log);
 			}
 		}
 	}
