@@ -304,7 +304,7 @@ version(void)
 	       , ao_flight_number
 #endif
 #if HAS_LOG
-	       , ao_log_format
+	       , AO_LOG_FORMAT
 #if !DISABLE_LOG_SPACE
 	       , (unsigned long) ao_storage_log_max
 #endif

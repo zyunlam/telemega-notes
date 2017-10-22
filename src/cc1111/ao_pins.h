@@ -63,6 +63,7 @@
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
 	#define HAS_MUTEX_TRY		0
 	#define HAS_TASK_INFO		0	/* not enough space for this either */
+	#define AO_LOG_FORMAT		AO_LOG_FORMAT_FULL
 #endif
 
 #if defined(TELEMETRUM_V_1_1)
@@ -106,6 +107,7 @@
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
 	#define HAS_MUTEX_TRY		0
+	#define AO_LOG_FORMAT		AO_LOG_FORMAT_FULL
 #endif
 
 #if defined(TELEMETRUM_V_1_2)
@@ -149,6 +151,7 @@
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
 	#define HAS_MUTEX_TRY		0
+	#define AO_LOG_FORMAT		AO_LOG_FORMAT_FULL
 #endif
 
 #if defined(TELEDONGLE_V_0_2)
@@ -210,6 +213,7 @@
 	#define HAS_MONITOR		0
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
+	#define AO_LOG_FORMAT 		AO_LOG_FORMAT_TINY
 #endif
 
 #if defined(TELENANO_V_0_1)
@@ -274,6 +278,7 @@
 	#define HAS_TELEMETRY		1
 	#define HAS_RADIO_RATE		0	/* not enough space for this */
 	#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	((uint32_t) 127 * (uint32_t) 1024)
+	#define AO_LOG_FORMAT		AO_LOG_FORMAT_FULL
 #endif
 
 #if defined(TELEDONGLE_V_0_1)

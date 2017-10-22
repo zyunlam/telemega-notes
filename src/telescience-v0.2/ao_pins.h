@@ -111,6 +111,7 @@
 #define HAS_ADC			1
 #define HAS_ADC_TEMP		1
 #define HAS_LOG			1
+#define AO_LOG_FORMAT		AO_LOG_FORMAT_TELESCIENCE
 
 /*
  * SPI Flash memory
