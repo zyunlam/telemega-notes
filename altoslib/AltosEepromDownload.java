@@ -40,6 +40,7 @@ class AltosEepromNameData extends AltosDataListener {
 	public void set_main_voltage(double volts) { }
 
 	public void set_gps(AltosGPS gps) {
+		super.set_gps(gps);
 		if (gps != null &&
 		    gps.year != AltosLib.MISSING &&
 		    gps.month != AltosLib.MISSING &&

@@ -90,11 +90,9 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 
 		/* Flush any pending GPS changes */
 		if (!AltosLib.is_gps_cmd(cmd())) {
-			AltosGPS gps = cal_data.temp_gps();
-			if (gps != null) {
+			AltosGPS gps = listener.temp_gps();
+			if (gps != null)
 				listener.set_gps(gps);
-				cal_data.reset_temp_gps();
-			}
 		}
 	}
 

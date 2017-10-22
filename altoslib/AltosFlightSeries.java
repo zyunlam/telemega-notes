@@ -532,6 +532,7 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String gps_hdop_name = "GPS Horizontal Dilution of Precision";
 
 	public void set_gps(AltosGPS gps) {
+		super.set_gps(gps);
 		if (gps_series == null)
 			gps_series = new ArrayList<AltosGPSTimeValue>();
 		gps_series.add(new AltosGPSTimeValue(time(), gps));

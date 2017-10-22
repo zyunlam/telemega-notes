@@ -91,7 +91,7 @@ public class AltosEepromRecordMetrum extends AltosEepromRecord {
 			listener.set_main_voltage(AltosConvert.mega_pyro_voltage(sense_m()));
 			break;
 		case AltosLib.AO_LOG_GPS_POS:
-			gps = cal_data.make_temp_gps(tick(), false);
+			gps = listener.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
 			if (config_data().altitude_32())
@@ -100,7 +100,7 @@ public class AltosEepromRecordMetrum extends AltosEepromRecord {
 				gps.alt = altitude_low();
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
-			gps = cal_data.make_temp_gps(tick(), false);
+			gps = listener.make_temp_gps(false);
 
 			gps.hour = hour();
 			gps.minute = minute();
@@ -119,7 +119,7 @@ public class AltosEepromRecordMetrum extends AltosEepromRecord {
 			gps.pdop = pdop() / 10.0;
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
-			gps = cal_data.make_temp_gps(tick(), true);
+			gps = listener.make_temp_gps(true);
 
 			int n = nsat();
 			for (int i = 0; i < n; i++)

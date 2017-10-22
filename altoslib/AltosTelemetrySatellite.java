@@ -49,10 +49,9 @@ public class AltosTelemetrySatellite extends AltosTelemetryStandard {
 
 		AltosCalData	cal_data = listener.cal_data();
 
-		AltosGPS	gps = cal_data.make_temp_gps(tick(), true);
+		AltosGPS	gps = listener.make_temp_gps(true);
 
 		gps.cc_gps_sat = sats();
 		listener.set_gps(gps);
-		cal_data.reset_temp_gps();
 	}
 }

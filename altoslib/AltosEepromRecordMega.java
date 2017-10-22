@@ -188,7 +188,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			listener.set_pyro_fired(pyro());
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
-			gps = cal_data.make_temp_gps(tick(), false);
+			gps = listener.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
 
@@ -231,7 +231,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			}
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
-			gps = cal_data.make_temp_gps(tick(), true);
+			gps = listener.make_temp_gps(true);
 
 			int n = nsat();
 			if (n > max_sat)
