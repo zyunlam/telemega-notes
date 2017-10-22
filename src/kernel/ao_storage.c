@@ -22,6 +22,9 @@
 uint8_t
 ao_storage_read(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
 {
+#ifdef CC1111
+	return ao_storage_device_read(pos, buf, len);
+#else
 	uint16_t this_len;
 	uint16_t this_off;
 
@@ -47,11 +50,15 @@ ao_storage_read(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
 		pos += this_len;
 	}
 	return 1;
+#endif
 }
 
 uint8_t
 ao_storage_write(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
 {
+#ifdef CC1111
+	return ao_storage_device_write(pos, buf, len);
+#else
 	uint16_t this_len;
 	uint16_t this_off;
 
@@ -77,9 +84,10 @@ ao_storage_write(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
 		pos += this_len;
 	}
 	return 1;
+#endif
 }
 
-static __xdata uint8_t storage_data[8];
+static __xdata uint8_t storage_data[128];
 
 static void
 ao_storage_dump(void) __reentrant
@@ -159,6 +167,154 @@ ao_storage_zapall(void) __reentrant
 		ao_storage_erase(pos);
 }
 
+#if AO_STORAGE_TEST
+
+static void
+ao_storage_failure(uint32_t pos, char *format, ...)
+{
+	va_list a;
+	printf("TEST FAILURE AT %08x: ", pos);
+	va_start(a, format);
+	vprintf(format, a);
+	va_end(a);
+}
+
+static uint8_t
+ao_storage_check_block(uint32_t pos, uint8_t value)
+{
+	uint32_t	offset;
+	uint32_t	byte;
+
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
+		if (!ao_storage_read(pos + offset, storage_data, sizeof (storage_data))) {
+			ao_storage_failure(pos + offset, "read failed\n");
+			return 0;
+		}
+		for (byte = 0; byte < sizeof (storage_data); byte++)
+			if (storage_data[byte] != value) {
+				ao_storage_failure(pos + offset + byte,
+						   "want %02x got %02x\n",
+						   value, storage_data[byte]);
+				return 0;
+			}
+	}
+	return 1;
+}
+
+static uint8_t
+ao_storage_fill_block(uint32_t pos, uint8_t value)
+{
+	uint32_t	offset;
+	uint32_t	byte;
+
+	for (byte = 0; byte < sizeof (storage_data); byte++)
+		storage_data[byte] = value;
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
+		if (!ao_storage_write(pos + offset, storage_data, sizeof (storage_data))) {
+			ao_storage_failure(pos + offset, "write failed\n");
+			return 0;
+		}
+	}
+	return 1;
+}
+
+static uint8_t
+ao_storage_check_incr_block(uint32_t pos)
+{
+	uint32_t	offset;
+	uint32_t	byte;
+
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
+		if (!ao_storage_read(pos + offset, storage_data, sizeof (storage_data))) {
+			ao_storage_failure(pos + offset, "read failed\n");
+			return 0;
+		}
+		for (byte = 0; byte < sizeof (storage_data); byte++) {
+			uint8_t value = offset + byte;
+			if (storage_data[byte] != value) {
+				ao_storage_failure(pos + offset + byte,
+						   "want %02x got %02x\n",
+						   value, storage_data[byte]);
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
+static uint8_t
+ao_storage_fill_incr_block(uint32_t pos)
+{
+	uint32_t	offset;
+	uint32_t	byte;
+
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
+		for (byte = 0; byte < sizeof (storage_data); byte++)
+			storage_data[byte] = offset + byte;
+		if (!ao_storage_write(pos + offset, storage_data, sizeof (storage_data))) {
+			ao_storage_failure(pos + offset, "write failed\n");
+			return 0;
+		}
+	}
+	return 1;
+}
+
+static uint8_t
+ao_storage_fill_check_block(uint32_t pos, uint8_t value)
+{
+	return ao_storage_fill_block(pos, value) && ao_storage_check_block(pos, value);
+}
+
+static uint8_t
+ao_storage_incr_check_block(uint32_t pos)
+{
+	return ao_storage_fill_incr_block(pos) && ao_storage_check_incr_block(pos);
+}
+
+static uint8_t
+ao_storage_test_block(uint32_t pos) __reentrant
+{
+	ao_storage_erase(pos);
+	printf(" erase"); flush();
+	if (!ao_storage_check_block(pos, 0xff))
+		return 0;
+	printf(" zero"); flush();
+	if (!ao_storage_fill_check_block(pos, 0x00))
+		return 0;
+	ao_storage_erase(pos);
+	printf(" 0xaa"); flush();
+	if (!ao_storage_fill_check_block(pos, 0xaa))
+		return 0;
+	ao_storage_erase(pos);
+	printf(" 0x55"); flush();
+	if (!ao_storage_fill_check_block(pos, 0x55))
+		return 0;
+	ao_storage_erase(pos);
+	printf(" increment"); flush();
+	if (!ao_storage_incr_check_block(pos))
+		return 0;
+	ao_storage_erase(pos);
+	printf(" pass\n"); flush();
+	return 1;
+}
+
+static void
+ao_storage_test(void) __reentrant
+{
+	uint32_t	pos;
+
+	ao_cmd_white();
+	if (!ao_match_word("DoIt"))
+		return;
+	for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block) {
+		printf("Testing block 0x%08x:", pos); flush();
+		if (!ao_storage_test_block(pos))
+			break;
+	}
+	printf("Test complete\n");
+}
+#endif /* AO_STORAGE_TEST */
+
 void
 ao_storage_info(void) __reentrant
 {
@@ -176,6 +332,9 @@ __code struct ao_cmds ao_storage_cmds[] = {
 #endif
 	{ ao_storage_zap, "z <block>\0Erase <block>" },
 	{ ao_storage_zapall,"Z <key>\0Erase all. <key> is doit with D&I" },
+#if AO_STORAGE_TEST
+	{ ao_storage_test, "V <key>\0Validate flash (destructive). <key> is doit with D&I" },
+#endif
 	{ 0, NULL },
 };
 
