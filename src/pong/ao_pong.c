@@ -26,8 +26,6 @@
 
 // uint8_t ao_sensor_errors;
 
-#define BALL_SPEED	3
-
 #define WIN_SCORE	11
 
 #define BALL_WIDTH	5
@@ -47,6 +45,7 @@ struct rect {
 
 static struct ao_data	ao_data;
 
+static const int	player_led[2] = { AO_LED_GREEN, AO_LED_BLUE };
 static int		player_value[2];
 static int		player_score[2];
 
@@ -56,9 +55,12 @@ static struct rect	player[2];
 
 static struct rect	ball;
 
+static int	ball_speed;
 static int	ball_e;
 static int	ball_dx, ball_dy;
 static int	ball_step_x, ball_step_y;
+
+static int	volley_count;
 
 static int
 intersect(struct rect *a, struct rect *b)
@@ -73,11 +75,17 @@ ao_ball_step(void)
 	int	p;
 
 	/* Move the ball */
-	ball_e += ball_dy;
-	ball.x += ball_step_x;
+	ball_e += ball_dy * ball_speed;
+	ball.x += ball_step_x * ball_speed;
 	while (ball_e >= ball_dx) {
 		ball_e -= ball_dx;
 		ball.y += ball_step_y;
+
+		/* bounce off walls */
+		if (ball.y < 0 || ball.y + ball.h > AO_VGA_HEIGHT) {
+			ball_step_y = -ball_step_y;
+			ball.y += ball_step_y;
+		}
 	}
 
 	/* player missed */
@@ -87,21 +95,20 @@ ao_ball_step(void)
 	if (ball.x >= AO_VGA_WIDTH - BALL_WIDTH)
 		return -1;
 
-	/* bounce off walls */
-	if (ball.y < 0 || ball.y + ball.h > AO_VGA_HEIGHT) {
-		ball_step_y = -ball_step_y;
-		ball.y += ball_step_y;
-	}
-
 	/* bounce off paddles */
 
 	for (p = 0; p < 2; p++) {
 		if (intersect(&ball, &player[p])) {
-			int	dy = 2 * (ball.y - player[p].y) + ball.h - player[p].h;
+
+			volley_count++;
+
+			ball_speed = 3 + volley_count / 4;
+
+			int	dy = (2 * (ball.y - player[p].y) + ball.h - player[p].h);
 			int	dx = 20;
 
 			ball_step_x = -ball_step_x;
-			ball.x += ball_step_x;
+			ball.x += ball_step_x * ball_speed;
 			ball_step_y = 1;
 			if (dy < 0) {
 				ball_step_y = -1;
@@ -148,8 +155,10 @@ ao_pong_start(void)
 
 	pong_server = ao_time() & 1;
 
-	for (p = 0; p < 2; p++)
+	for (p = 0; p < 2; p++) {
+		ao_led_off(player_led[p]);
 		player_score[p] = 0;
+	}
 
 	return pong_serve;
 }
@@ -165,27 +174,30 @@ ao_pong_serve(void)
 
 	ball.y = (AO_VGA_HEIGHT - BALL_HEIGHT) / 2;
 
+	ball_speed = 3;
+	volley_count = 0;
+
 	if (pong_server) {
 		ball.x = player[1].x - BALL_WIDTH;
-		ball_step_x = -BALL_SPEED;
+		ball_step_x = -1;
 	} else {
 		ball.x = player[0].x + PADDLE_WIDTH;
-		ball_step_x = BALL_SPEED;
+		ball_step_x = 1;
 	}
 
 	ball.w = BALL_WIDTH;
 	ball.h = BALL_HEIGHT;
 
-	ball_dx = 100;
-	ball_dy = (seed & 7) * 10;
+	ball_dx = 20;
+	ball_dy = (seed & 7) * 2;
 	ball_e = 0;
 
 	seed >>= 3;
 
 	if (seed & 1) {
-		ball_step_y = BALL_SPEED;
+		ball_step_y = 1;
 	} else {
-		ball_step_y = -BALL_SPEED;
+		ball_step_y = -1;
 	}
 
 	return pong_volley;
@@ -202,8 +214,10 @@ ao_pong_volley(void)
 
 	point = (miss + 1) >> 1;
 	player_score[point]++;
-	if (player_score[point] == WIN_SCORE)
+	if (player_score[point] == WIN_SCORE) {
+		ao_led_on(player_led[point]);
 		return pong_endgame;
+	}
 
 	pong_server = point;
 	pong_timer = PONG_SERVE_WAIT;
