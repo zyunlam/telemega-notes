@@ -36,4 +36,6 @@ extern uint32_t	ao_vga_fb[AO_VGA_STRIDE * AO_VGA_HEIGHT];
 
 extern const struct ao_bitmap ao_vga_bitmap;
 
+extern uint8_t	ao_vga_vblank;
+
 #endif /* _AO_VGA_H_ */

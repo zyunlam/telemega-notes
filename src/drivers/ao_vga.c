@@ -91,6 +91,8 @@ static uint32_t	*scanline;
 			 (en << STM_DMA_CCR_EN))
 
 
+uint8_t	ao_vga_vblank;
+
 void stm_tim2_isr(void)
 {
 	int16_t	line = stm_tim3.cnt;
@@ -111,6 +113,10 @@ void stm_tim2_isr(void)
 		if (((line - VBLANK_END) & 1))
 			scanline += AO_VGA_STRIDE;
 	} else {
+		if (line == VBLANK_START) {
+			ao_vga_vblank = 1;
+			ao_wakeup(&ao_vga_vblank);
+		}
 		scanline = ao_vga_fb;
 	}
 	stm_tim2.sr = 0;
