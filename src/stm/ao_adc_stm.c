@@ -377,7 +377,7 @@ ao_adc_init(void)
 #if AO_NUM_ADC > 18
 #error "need to finish stm_adc.sqr settings"
 #endif
-	
+
 	/* Turn ADC on */
 	stm_adc.cr2 = AO_ADC_CR2_VAL;
 
