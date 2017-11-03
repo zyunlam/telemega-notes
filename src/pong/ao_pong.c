@@ -49,7 +49,7 @@ static const int	player_led[2] = { AO_LED_GREEN, AO_LED_BLUE };
 static int		player_value[2];
 static int		player_score[2];
 
-#define player_filter(old, new)	(((old) * 7 + (new)) >> 3)
+#define player_filter(old, new)	(((old) + (new)) >> 1)
 
 static struct rect	player[2];
 
@@ -73,50 +73,53 @@ static int
 ao_ball_step(void)
 {
 	int	p;
+	int	s;
 
 	/* Move the ball */
-	ball_e += ball_dy * ball_speed;
-	ball.x += ball_step_x * ball_speed;
-	while (ball_e >= ball_dx) {
-		ball_e -= ball_dx;
-		ball.y += ball_step_y;
-
-		/* bounce off walls */
-		if (ball.y < 0 || ball.y + ball.h > AO_VGA_HEIGHT) {
-			ball_step_y = -ball_step_y;
+	for (s = 0; s < ball_speed; s++) {
+		ball_e += ball_dy;
+		ball.x += ball_step_x;
+		while (ball_e >= ball_dx) {
+			ball_e -= ball_dx;
 			ball.y += ball_step_y;
-		}
-	}
 
-	/* player missed */
-	if (ball.x <= 0)
-		return 1;
-
-	if (ball.x >= AO_VGA_WIDTH - BALL_WIDTH)
-		return -1;
-
-	/* bounce off paddles */
-
-	for (p = 0; p < 2; p++) {
-		if (intersect(&ball, &player[p])) {
-
-			volley_count++;
-
-			ball_speed = 3 + volley_count / 4;
-
-			int	dy = (2 * (ball.y - player[p].y) + ball.h - player[p].h);
-			int	dx = 20;
-
-			ball_step_x = -ball_step_x;
-			ball.x += ball_step_x * ball_speed;
-			ball_step_y = 1;
-			if (dy < 0) {
-				ball_step_y = -1;
-				dy = -dy;
+			/* bounce off walls */
+			if (ball.y < 0 || ball.y + ball.h > AO_VGA_HEIGHT) {
+				ball_step_y = -ball_step_y;
+				ball.y += ball_step_y;
 			}
-			ball_e = 0;
-			ball_dx = dx;
-			ball_dy = dy;
+		}
+
+		/* player missed */
+		if (ball.x <= 0)
+			return 1;
+
+		if (ball.x >= AO_VGA_WIDTH - BALL_WIDTH)
+			return -1;
+
+		/* bounce off paddles */
+
+		for (p = 0; p < 2; p++) {
+			if (intersect(&ball, &player[p])) {
+
+				volley_count++;
+
+				ball_speed = 3 + volley_count / 4;
+
+				int	dy = (2 * (ball.y - player[p].y) + ball.h - player[p].h);
+				int	dx = 20;
+
+				ball_step_x = -ball_step_x;
+				ball.x += ball_step_x;
+				ball_step_y = 1;
+				if (dy < 0) {
+					ball_step_y = -1;
+					dy = -dy;
+				}
+				ball_e = 0;
+				ball_dx = dx;
+				ball_dy = dy;
+			}
 		}
 	}
 
