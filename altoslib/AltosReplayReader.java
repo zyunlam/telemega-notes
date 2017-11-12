@@ -31,7 +31,7 @@ class AltosReplay extends AltosDataListener implements Runnable {
 	AltosState	state;
 	AltosRecordSet	record_set;
 	double		last_time = AltosLib.MISSING;
-	Semaphore	semaphore = new Semaphore(1);;
+	Semaphore	semaphore = new Semaphore(1);
 	boolean		done = false;
 
 	public void set_time(double time) {
