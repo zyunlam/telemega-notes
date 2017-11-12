@@ -25,6 +25,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <math.h>
+#define log ao_log_data
 
 #define GRAVITY 9.80665
 
@@ -370,7 +371,7 @@ extern int16_t ao_accel_2g;
 typedef int16_t	accel_t;
 
 uint16_t	ao_serial_number;
-uint16_t	ao_flight_number;
+int16_t		ao_flight_number;
 
 extern uint16_t	ao_sample_tick;
 
@@ -998,13 +999,18 @@ main (int argc, char **argv)
 #else
 	emulator_app="baro";
 #endif
-	while ((c = getopt_long(argc, argv, "sdi:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "sdpi:", options, NULL)) != -1) {
 		switch (c) {
 		case 's':
 			summary = 1;
 			break;
 		case 'd':
 			ao_flight_debug = 1;
+			break;
+		case 'p':
+#if PYRO_DBG
+			pyro_dbg = 1;
+#endif
 			break;
 		case 'i':
 			info = optarg;
