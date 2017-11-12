@@ -183,7 +183,7 @@ ao_log_flight(uint8_t slot)
 	if (ao_log_check_clear())
 		return 0;
 
-	if (ao_log_check_data() || log.type != AO_LOG_FLIGHT)
+	if (!ao_log_check_data() || log.type != AO_LOG_FLIGHT)
 		return -(int16_t) (slot + 1);
 
 	return log.u.flight.flight;
