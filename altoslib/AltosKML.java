@@ -308,19 +308,23 @@ public class AltosKML implements AltosWriter {
 		stats = new AltosFlightStats(series);
 		cal_data = series.cal_data();
 		start();
-		folder_start("Barometric Altitude");
-		path_style_start("baro", style_color(0));
-		out.printf("Barometric Altitude\n");
-		out.printf("Max height: %s\n", AltosConvert.height.show(6, stats.max_height));
-		path_style_end();
-		path_start("Barometric Altitude", "baro");
-		for (AltosGPSTimeValue gtv : series.gps_series)
-			write(gtv.gps, baro_altitude(series, gtv.time));
-		path_end();
-		for (AltosTimeValue tv : series.state_series) {
-			write_point(tv, false);
+		if (series.height_series != null) {
+			folder_start("Barometric Altitude");
+			path_style_start("baro", style_color(0));
+			out.printf("Barometric Altitude\n");
+			out.printf("Max height: %s\n", AltosConvert.height.show(6, stats.max_height));
+			path_style_end();
+			path_start("Barometric Altitude", "baro");
+			for (AltosGPSTimeValue gtv : series.gps_series)
+				write(gtv.gps, baro_altitude(series, gtv.time));
+			path_end();
+			if (series.state_series != null) {
+				for (AltosTimeValue tv : series.state_series) {
+					write_point(tv, false);
+				}
+			}
+			folder_end();
 		}
-		folder_end();
 		folder_start("GPS Altitude");
 		path_style_start("gps", style_color(1));
 		out.printf("GPS Altitude");
@@ -330,8 +334,10 @@ public class AltosKML implements AltosWriter {
 		for (AltosGPSTimeValue gtv : series.gps_series)
 			write(gtv.gps, gtv.gps.alt);
 		path_end();
-		for (AltosTimeValue tv : series.state_series) {
-			write_point(tv, true);
+		if (series.state_series != null) {
+			for (AltosTimeValue tv : series.state_series) {
+				write_point(tv, true);
+			}
 		}
 		folder_end();
 		end();
