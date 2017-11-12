@@ -200,25 +200,47 @@ public class AltosEepromDownload implements Runnable {
 
 		AltosFile f = MakeFile(flights.config_data.serial, log.flight, name_data);
 
-		monitor.set_filename(f.toString());
+		log.set_file(f);
 
-		FileWriter w = new FileWriter(f);
+		boolean do_write = true;
 
-		eeprom.write(w);
-		w.close();
+		if (f.exists())
+			do_write = monitor.check_overwrite(f);
+
+		if (do_write) {
+			FileWriter w = new FileWriter(f);
+
+			eeprom.write(w);
+			w.close();
+		}
+
+		if (eeprom.errors != 0)
+			throw new ParseException(String.format("%d CRC Errors", eeprom.errors), 0);
+	}
+
+	static String label(int flight) {
+		if (flight < 0)
+			return "Corrupt";
+		else
+			return "Flight";
+	}
+
+	static int flight(int flight) {
+		if (flight < 0)
+			return -flight;
+		return flight;
 	}
 
 	public void run () {
 		boolean success = false;
 
 		try {
-			boolean	failed = false;
 			if (remote)
 				link.start_remote();
 
 			for (AltosEepromLog log : flights) {
 				parse_errors = null;
-				if (log.selected) {
+				if (log.download_selected) {
 					monitor.reset();
 					try {
 						CaptureLog(log);
@@ -226,16 +248,16 @@ public class AltosEepromDownload implements Runnable {
 						LogError(e.getMessage());
 					}
 				}
+				success = true;
 				if (parse_errors != null) {
-					failed = true;
-					monitor.show_message(String.format("Flight %d download error. Valid log data saved\n%s",
-									   log.flight,
+					monitor.show_message(String.format("%s %d download error. Valid log data saved\n%s",
+									   label(log.flight),
+									   flight(log.flight),
 									   parse_errors),
 							     link.name,
 							     AltosEepromMonitor.WARNING_MESSAGE);
 				}
 			}
-			success = !failed;
 		} catch (IOException ee) {
 			monitor.show_message(ee.getLocalizedMessage(),
 					     link.name,

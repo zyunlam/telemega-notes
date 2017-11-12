@@ -26,7 +26,7 @@ import java.util.concurrent.*;
 import org.altusmetrum.altoslib_12.*;
 import org.altusmetrum.altosuilib_12.*;
 
-public class AltosUI extends AltosUIFrame {
+public class AltosUI extends AltosUIFrame implements AltosEepromGrapher {
 	public AltosVoice voice = new AltosVoice();
 
 	public static boolean load_library(Frame frame) {
@@ -320,8 +320,17 @@ public class AltosUI extends AltosUIFrame {
 	/* Connect to TeleMetrum, either directly or through
 	 * a TeleDongle over the packet link
 	 */
+
+	public void graph_flights(AltosEepromList flights) {
+		for (AltosEepromLog flight : flights) {
+			if (flight.graph_selected && flight.file != null) {
+				process_graph(flight.file);
+			}
+		}
+	}
+
 	private void SaveFlightData() {
-		new AltosEepromManage(AltosUI.this, AltosLib.product_any);
+		new AltosEepromManage(this, this, AltosLib.product_any);
 	}
 
 	private static AltosFlightSeries make_series(AltosRecordSet set) {

@@ -87,7 +87,7 @@ public class AltosEepromList extends ArrayList<AltosEepromLog> {
 							start = AltosParse.parse_hex(tokens[3]);
 						if (tokens[4].equals("end"))
 							end = AltosParse.parse_hex(tokens[5]);
-						if (flight > 0 && start >= 0 && end > 0)
+						if (flight != 0 && start >= 0 && end > 0)
 							flights.add(new AltosEepromFlight(flight, start, end));
 					} catch (ParseException pe) { System.out.printf("Parse error %s\n", pe.toString()); }
 				}

@@ -30,7 +30,7 @@ import org.altusmetrum.altosuilib_12.*;
 
 public class TeleGPS
 	extends AltosUIFrame
-	implements AltosFlightDisplay, AltosFontListener, AltosUnitsListener, ActionListener
+	implements AltosFlightDisplay, AltosFontListener, AltosUnitsListener, ActionListener, AltosEepromGrapher
 {
 
 	static String[] telegps_icon_names = {
@@ -280,7 +280,7 @@ public class TeleGPS
 	}
 
 	void download(){
-		new AltosEepromManage(this, AltosLib.product_telegps);
+		new AltosEepromManage(this, this, AltosLib.product_telegps);
 	}
 
 	void configure() {
@@ -313,6 +313,21 @@ public class TeleGPS
 			new TeleGPSGraphUI(set, chooser.file());
 		} catch (InterruptedException ie) {
 		} catch (IOException ie) {
+		}
+	}
+
+	public void graph_flights(AltosEepromList list) {
+		for (AltosEepromLog log : list) {
+			if (log.file != null) {
+				AltosRecordSet set = record_set(log.file);
+				if (set != null) {
+					try {
+						new TeleGPSGraphUI(set, log.file);
+					} catch (InterruptedException ie) {
+					} catch (IOException ie) {
+					}
+				}
+			}
 		}
 	}
 

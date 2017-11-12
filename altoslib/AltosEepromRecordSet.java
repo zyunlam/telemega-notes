@@ -97,7 +97,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		int	tick = 0;
 		boolean first = true;
 
-		for (;;) {
+		do {
 			int	t = record.tick();
 
 			if (first) {
@@ -110,10 +110,8 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 			}
 			record.wide_tick = tick;
 			ordered.add(record);
-			if (!record.hasNext())
-				break;
 			record = record.next();
-		}
+		} while (record != null);
 	}
 
 	public AltosEepromRecordSet(InputStream input) throws IOException {
