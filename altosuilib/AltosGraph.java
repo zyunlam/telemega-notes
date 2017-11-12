@@ -37,47 +37,53 @@ import org.jfree.data.*;
 
 public class AltosGraph extends AltosUIGraph {
 
-	static final private Color height_color = new Color(194,31,31);
-	static final private Color kalman_height_color = new Color(255,0,0);
-	static final private Color gps_height_color = new Color(150,31,31);
-	static final private Color pressure_color = new Color (225,31,31);
-	static final private Color range_color = new Color(100, 31, 31);
-	static final private Color distance_color = new Color(100, 31, 194);
-	static final private Color speed_color = new Color(31,194,31);
-	static final private Color kalman_speed_color = new Color(0,255,0);
-	static final private Color thrust_color = new Color(31,194,31);
-	static final private Color accel_color = new Color(31,31,194);
-	static final private Color vert_accel_color = new Color(64,164,164);
-	static final private Color kalman_accel_color = new Color(0,0,255);
-	static final private Color voltage_color = new Color(194, 194, 31);
-	static final private Color battery_voltage_color = new Color(194, 194, 31);
-	static final private Color drogue_voltage_color = new Color(150, 150, 31);
-	static final private Color main_voltage_color = new Color(100, 100, 31);
-	static final private Color igniter_voltage_color = new Color(80, 80, 31);
-	static final private Color igniter_marker_color = new Color(255, 0, 0);
-	static final private Color gps_nsat_color = new Color (194, 31, 194);
-	static final private Color gps_nsat_solution_color = new Color (194, 31, 194);
-	static final private Color gps_nsat_view_color = new Color (150, 31, 150);
-	static final private Color gps_course_color = new Color (100, 31, 112);
-	static final private Color gps_ground_speed_color = new Color (31, 112, 100);
-	static final private Color gps_speed_color = new Color (31, 112, 100);
-	static final private Color gps_climb_rate_color = new Color (31, 31, 112);
-	static final private Color gps_pdop_color = new Color(50, 194, 0);
-	static final private Color gps_hdop_color = new Color(50, 0, 194);
-	static final private Color gps_vdop_color = new Color(194, 0, 50);
-	static final private Color temperature_color = new Color (31, 194, 194);
-	static final private Color dbm_color = new Color(31, 100, 100);
-	static final private Color state_color = new Color(0,0,0);
-	static final private Color accel_along_color = new Color(255, 0, 0);
-	static final private Color accel_across_color = new Color(0, 255, 0);
-	static final private Color accel_through_color = new Color(0, 0, 255);
-	static final private Color gyro_roll_color = new Color(192, 0, 0);
-	static final private Color gyro_pitch_color = new Color(0, 192, 0);
-	static final private Color gyro_yaw_color = new Color(0, 0, 192);
-	static final private Color mag_along_color = new Color(128, 0, 0);
-	static final private Color mag_across_color = new Color(0, 128, 0);
-	static final private Color mag_through_color = new Color(0, 0, 128);
-	static final private Color orient_color = new Color(31, 31, 31);
+	/* These are in 'priority' order so that earlier ones get simpler line styles,
+	 * then they are grouped so that adjacent ones get sequential colors
+	 */
+	static final private AltosUILineStyle height_color = new AltosUILineStyle();
+	static final private AltosUILineStyle speed_color = new AltosUILineStyle();
+	static final private AltosUILineStyle accel_color = new AltosUILineStyle();
+	static final private AltosUILineStyle vert_accel_color = new AltosUILineStyle();
+	static final private AltosUILineStyle orient_color = new AltosUILineStyle();
+
+	static final private AltosUILineStyle gps_height_color = new AltosUILineStyle();
+	static final private AltosUILineStyle altitude_color = new AltosUILineStyle();
+
+	static final private AltosUILineStyle battery_voltage_color = new AltosUILineStyle();
+	static final private AltosUILineStyle pyro_voltage_color = new AltosUILineStyle();
+	static final private AltosUILineStyle drogue_voltage_color = new AltosUILineStyle();
+	static final private AltosUILineStyle main_voltage_color = new AltosUILineStyle();
+	static final private AltosUILineStyle igniter_marker_color = new AltosUILineStyle(1);
+
+	static final private AltosUILineStyle kalman_height_color = new AltosUILineStyle();
+	static final private AltosUILineStyle kalman_speed_color = new AltosUILineStyle();
+	static final private AltosUILineStyle kalman_accel_color = new AltosUILineStyle();
+
+	static final private AltosUILineStyle gps_nsat_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle gps_nsat_solution_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle gps_nsat_view_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle gps_course_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle gps_ground_speed_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle gps_speed_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle gps_climb_rate_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle gps_pdop_color = new AltosUILineStyle();
+	static final private AltosUILineStyle gps_hdop_color = new AltosUILineStyle();
+	static final private AltosUILineStyle gps_vdop_color = new AltosUILineStyle();
+
+	static final private AltosUILineStyle temperature_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle dbm_color = new AltosUILineStyle();
+	static final private AltosUILineStyle pressure_color = new AltosUILineStyle ();
+
+	static final private AltosUILineStyle state_color = new AltosUILineStyle(0);
+	static final private AltosUILineStyle accel_along_color = new AltosUILineStyle();
+	static final private AltosUILineStyle accel_across_color = new AltosUILineStyle();
+	static final private AltosUILineStyle accel_through_color = new AltosUILineStyle();
+	static final private AltosUILineStyle gyro_roll_color = new AltosUILineStyle();
+	static final private AltosUILineStyle gyro_pitch_color = new AltosUILineStyle();
+	static final private AltosUILineStyle gyro_yaw_color = new AltosUILineStyle();
+	static final private AltosUILineStyle mag_along_color = new AltosUILineStyle();
+	static final private AltosUILineStyle mag_across_color = new AltosUILineStyle();
+	static final private AltosUILineStyle mag_through_color = new AltosUILineStyle();
 
 	static AltosUnits dop_units = null;
 	static AltosUnits tick_units = null;
@@ -88,7 +94,7 @@ public class AltosGraph extends AltosUIGraph {
 		AltosCalData	cal_data = flight_series.cal_data();
 
 		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
-		AltosUIAxis	distance_axis, pressure_axis, thrust_axis;
+		AltosUIAxis	pressure_axis, thrust_axis;
 		AltosUIAxis	gyro_axis, orient_axis, mag_axis;
 		AltosUIAxis	course_axis, dop_axis, tick_axis;
 
@@ -98,15 +104,14 @@ public class AltosGraph extends AltosUIGraph {
 		height_axis = newAxis("Height", AltosConvert.height, height_color);
 		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
-		thrust_axis = newAxis("Thrust", AltosConvert.force, thrust_color);
+		thrust_axis = newAxis("Thrust", AltosConvert.force, accel_color);
 		tick_axis = newAxis("Tick", tick_units, accel_color, 0);
 		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
-		voltage_axis = newAxis("Voltage", AltosConvert.voltage, voltage_color);
+		voltage_axis = newAxis("Voltage", AltosConvert.voltage, battery_voltage_color);
 		temperature_axis = newAxis("Temperature", AltosConvert.temperature, temperature_color, 0);
 		nsat_axis = newAxis("Satellites", null, gps_nsat_color,
 				    AltosUIAxis.axis_include_zero | AltosUIAxis.axis_integer);
 		dbm_axis = newAxis("Signal Strength", null, dbm_color, 0);
-		distance_axis = newAxis("Distance", AltosConvert.distance, range_color);
 
 		gyro_axis = newAxis("Rotation Rate", AltosConvert.rotation_rate, gyro_roll_color, 0);
 		orient_axis = newAxis("Tilt Angle", AltosConvert.orient, orient_color, 0);
@@ -177,7 +182,7 @@ public class AltosGraph extends AltosUIGraph {
 					    height_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.altitude_name,
-					    height_color,
+					    altitude_color,
 					    false,
 					    height_axis);
 
@@ -194,6 +199,11 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.battery_voltage_name,
 					    battery_voltage_color,
+					    false,
+					    voltage_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.pyro_voltage_name,
+					    pyro_voltage_color,
 					    false,
 					    voltage_axis);
 
@@ -312,17 +322,19 @@ public class AltosGraph extends AltosUIGraph {
 					    false,
 					    orient_axis);
 
-		for (int channel = 0; channel < 26; channel++) {
+		flight_series.register_axis(AltosUIFlightSeries.thrust_name,
+					    accel_color,
+					    true,
+					    thrust_axis);
+
+		for (int channel = 0; channel < 8; channel++) {
 			flight_series.register_axis(flight_series.igniter_voltage_name(channel),
-						    igniter_voltage_color,
+						    new AltosUILineStyle(),
 						    false,
 						    voltage_axis);
 		}
 
-		flight_series.register_axis(AltosUIFlightSeries.thrust_name,
-					    thrust_color,
-					    true,
-					    thrust_axis);
+		flight_series.check_axes();
 
 		return flight_series.series(cal_data);
 	}

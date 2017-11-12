@@ -41,6 +41,7 @@ altosuilib_JAVA = \
 	AltosConfigFreqUI.java \
 	AltosScanUI.java \
 	AltosEepromDelete.java \
+	AltosEepromGrapher.java \
 	AltosEepromManage.java \
 	AltosEepromMonitorUI.java \
 	AltosEepromSelect.java \
@@ -57,6 +58,7 @@ altosuilib_JAVA = \
 	AltosBTDeviceIterator.java \
 	AltosBTManage.java \
 	AltosBTKnown.java \
+	AltosUILineStyle.java \
 	AltosUIMap.java \
 	AltosUIMapPreload.java \
 	AltosUIFlightTab.java \

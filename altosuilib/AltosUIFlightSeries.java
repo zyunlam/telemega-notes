@@ -30,15 +30,16 @@ import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
 class AltosUITimeSeriesAxis {
-	Color		color;
-	boolean		enabled;
-	boolean		marker;
-	boolean		marker_top;
-	AltosUIAxis	axis;
-	XYPlot		plot;
+	AltosUILineStyle	line_style;
+	boolean			enabled;
+	boolean			marker;
+	boolean			marker_top;
+	AltosUIAxis		axis;
+	XYPlot			plot;
 
-	public AltosUITimeSeriesAxis(Color color, boolean enabled, AltosUIAxis axis, XYPlot plot, boolean marker, boolean marker_top) {
-		this.color = color;
+	public AltosUITimeSeriesAxis(AltosUILineStyle line_style, boolean enabled,
+				     AltosUIAxis axis, XYPlot plot, boolean marker, boolean marker_top) {
+		this.line_style = line_style;
 		this.enabled = enabled;
 		this.axis = axis;
 		this.plot = plot;
@@ -51,26 +52,34 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 
 	Hashtable<String,AltosUITimeSeriesAxis> axes;
 
-	AltosUIFlightSeries flight_series;
-
 	void fill_axes(String label, AltosUITimeSeriesAxis axis) {
 		for (AltosTimeSeries ts : series) {
 			AltosUITimeSeries uts = (AltosUITimeSeries) ts;
 
-			if (label.equals(ts.label) || (label.equals("default") && uts.color == null)) {
+			if (label.equals(ts.label) || (label.equals("default") && uts.line_style == null)) {
+				uts.custom_axis_set = true;
 				if (axis.marker)
-					uts.set_marker(axis.color, axis.enabled, axis.plot, axis.marker_top);
+					uts.set_marker(axis.line_style, axis.enabled, axis.plot, axis.marker_top);
 				else
-					uts.set_axis(axis.color, axis.enabled, axis.axis);
+					uts.set_axis(axis.line_style, axis.enabled, axis.axis);
 			}
 		}
 	}
 
+	void check_axes() {
+		for (AltosTimeSeries ts : series) {
+			AltosUITimeSeries uts = (AltosUITimeSeries) ts;
+
+			if (!uts.custom_axis_set)
+				System.out.printf("%s using default axis\n", ts.label);
+		}
+	}
+
 	public void register_axis(String label,
-				  Color color,
+				  AltosUILineStyle line_style,
 				  boolean enabled,
 				  AltosUIAxis axis) {
-		AltosUITimeSeriesAxis tsa = new AltosUITimeSeriesAxis(color,
+		AltosUITimeSeriesAxis tsa = new AltosUITimeSeriesAxis(line_style,
 								      enabled,
 								      axis,
 								      null,
@@ -81,11 +90,11 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 	}
 
 	public void register_marker(String label,
-				    Color color,
+				    AltosUILineStyle line_style,
 				    boolean enabled,
 				    XYPlot plot,
 				    boolean marker_top) {
-		AltosUITimeSeriesAxis tsa = new AltosUITimeSeriesAxis(color,
+		AltosUITimeSeriesAxis tsa = new AltosUITimeSeriesAxis(line_style,
 								      enabled,
 								      null,
 								      plot,
@@ -97,17 +106,18 @@ public class AltosUIFlightSeries extends AltosFlightSeries {
 
 	public AltosTimeSeries make_series(String label, AltosUnits units) {
 
-
 		AltosUITimeSeries time_series = new AltosUITimeSeries(label, units);
 
 		AltosUITimeSeriesAxis tsa = axes.get(label);
 		if (tsa == null)
 			tsa = axes.get("default");
+		else
+			time_series.custom_axis_set = true;
 		if (tsa != null) {
 			if (tsa.marker)
-				time_series.set_marker(tsa.color, tsa.enabled, tsa.plot, tsa.marker_top);
+				time_series.set_marker(tsa.line_style, tsa.enabled, tsa.plot, tsa.marker_top);
 			else
-				time_series.set_axis(tsa.color, tsa.enabled, tsa.axis);
+				time_series.set_axis(tsa.line_style, tsa.enabled, tsa.axis);
 		}
 		return time_series;
 	}

@@ -61,16 +61,17 @@ class AltosXYSeries extends XYSeries {
 }
 
 public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher {
-	Color		color;
-	boolean		enable;
-	AltosUIAxis	axis;
-	boolean		marker;
-	boolean		marker_top;
+	AltosUILineStyle	line_style;
+	boolean			enable;
+	boolean			custom_axis_set;
+	AltosUIAxis		axis;
+	boolean			marker;
+	boolean			marker_top;
 	XYLineAndShapeRenderer	renderer;
-	XYPlot		plot;
-	AltosXYSeries	xy_series;
+	XYPlot			plot;
+	AltosXYSeries		xy_series;
 	ArrayList<ValueMarker>	markers;
-
+	float			width;
 
 	/* AltosUIGrapher interface */
 	public boolean need_reset() {
@@ -107,7 +108,8 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 					marker.setLabelAnchor(RectangleAnchor.BOTTOM_RIGHT);
 					marker.setLabelTextAnchor(TextAnchor.BOTTOM_LEFT);
 				}
-				marker.setPaint(color);
+				marker.setPaint(line_style.color);
+				marker.setStroke(new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 				if (enable)
 					plot.addDomainMarker(marker);
 				markers.add(marker);
@@ -165,23 +167,41 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 		}
 	}
 
-	public void set_axis(Color color, boolean enable, AltosUIAxis axis) {
-		this.color = color;
+	// public BasicStroke(float width, int cap, int join, float miterlimit,
+	// float dash[], float dash_phase)
+
+	public void set_line_width(float width) {
+		this.width = width;
+		if (markers != null) {
+			for (ValueMarker marker : markers) {
+				marker.setStroke(new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+			}
+		} else {
+			if (line_style.dash[0] == 0.0)
+				renderer.setSeriesStroke(0, new BasicStroke(width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			else
+				renderer.setSeriesStroke(0, new BasicStroke(width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, line_style.dash, 0.0f));
+		}
+	}
+
+	public void set_axis(AltosUILineStyle line_style, boolean enable, AltosUIAxis axis) {
+		this.line_style = line_style;
 		this.enable = enable;
 		this.axis = axis;
 		this.marker = false;
+		this.width = 1.0f;
 
 		axis.ref(this.enable);
 
 		renderer = new XYLineAndShapeRenderer(true, false);
-		renderer.setSeriesPaint(0, color);
-		renderer.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		renderer.setSeriesPaint(0, line_style.color);
+		set_line_width(this.width);
 		renderer.setSeriesVisible(0, enable);
 		xy_series = new AltosXYSeries(label);
 	}
 
-	public void set_marker(Color color, boolean enable, XYPlot plot, boolean marker_top) {
-		this.color = color;
+	public void set_marker(AltosUILineStyle line_style, boolean enable, XYPlot plot, boolean marker_top) {
+		this.line_style = line_style;
 		this.enable = enable;
 		this.marker = true;
 		this.plot = plot;
@@ -197,9 +217,9 @@ public class AltosUITimeSeries extends AltosTimeSeries implements AltosUIGrapher
 	}
 
 	public AltosUITimeSeries(String label, AltosUnits units,
-				 Color color, boolean enable,
+				 AltosUILineStyle line_style, boolean enable,
 				 AltosUIAxis axis) {
 		this(label, units);
-		set_axis(color, enable, axis);
+		set_axis(line_style, enable, axis);
 	}
 }

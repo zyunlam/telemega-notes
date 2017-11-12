@@ -14,7 +14,9 @@
 
 package org.altusmetrum.altosuilib_12;
 
-public interface AltosShapeListener {
-	void set_shapes_visible(boolean visible);
-	void set_line_width(float width);
+import org.altusmetrum.altoslib_12.*;
+
+public interface AltosEepromGrapher {
+
+	public void graph_flights(AltosEepromList list);
 }

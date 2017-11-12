@@ -36,12 +36,12 @@ import org.jfree.data.xy.*;
 import org.jfree.data.*;
 
 public class AltosUIAxis extends NumberAxis {
-	String		label;
-	AltosUnits	units;
-	Color		color;
-	int		ref;
-	int		visible;
-	int		index;
+	String			label;
+	AltosUnits		units;
+	AltosUILineStyle	line_style;
+	int			ref;
+	int			visible;
+	int			index;
 
 	public final static int	axis_integer = 1;
 	public final static int axis_include_zero = 2;
@@ -82,21 +82,22 @@ public class AltosUIAxis extends NumberAxis {
 		}
 	}
 
-	public AltosUIAxis(String label, AltosUnits units, Color color, int index, int flags) {
+	public AltosUIAxis(String label, AltosUnits units, AltosUILineStyle line_style, int index, int flags) {
 		this.label = label;
 		this.units = units;
+		this.line_style = line_style;
 		this.index = index;
 		this.visible = 0;
 		this.ref = 0;
-		setLabelPaint(color);
-		setTickLabelPaint(color);
+		setLabelPaint(line_style.color);
+		setTickLabelPaint(line_style.color);
 		setVisible(false);
 		if ((flags & axis_integer) != 0)
 			setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 		setAutoRangeIncludesZero((flags & axis_include_zero) != 0);
 	}
 
-	public AltosUIAxis(String label, AltosUnits units, Color color, int index) {
-		this(label, units, color, index, axis_default);
+	public AltosUIAxis(String label, AltosUnits units, AltosUILineStyle line_style, int index) {
+		this(label, units, line_style, index, axis_default);
 	}
 }

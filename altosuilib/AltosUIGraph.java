@@ -56,14 +56,14 @@ public class AltosUIGraph implements AltosUnitsListener, AltosShapeListener {
 		return panel;
 	}
 
-	public AltosUIAxis newAxis(String label, AltosUnits units, Color color, int flags) {
-		AltosUIAxis axis = new AltosUIAxis(label, units, color, axis_index++, flags);
+	public AltosUIAxis newAxis(String label, AltosUnits units, AltosUILineStyle line_style, int flags) {
+		AltosUIAxis axis = new AltosUIAxis(label, units, line_style, axis_index++, flags);
 		plot.setRangeAxis(axis.index, axis);
 		return axis;
 	}
 
-	public AltosUIAxis newAxis(String label, AltosUnits units, Color color) {
-		return newAxis(label, units, color, AltosUIAxis.axis_default);
+	public AltosUIAxis newAxis(String label, AltosUnits units, AltosUILineStyle line_style) {
+		return newAxis(label, units, line_style, AltosUIAxis.axis_default);
 	}
 
 	void addAxis(AltosUIAxis axis) {
@@ -102,6 +102,11 @@ public class AltosUIGraph implements AltosUnitsListener, AltosShapeListener {
 	public void set_shapes_visible(boolean visible) {
 		for (AltosUITimeSeries s : series)
 			s.set_shapes_visible(visible);
+	}
+
+	public void set_line_width(float width) {
+		for (AltosUITimeSeries s : series)
+			s.set_line_width(width);
 	}
 
 	public void setName (String name) {

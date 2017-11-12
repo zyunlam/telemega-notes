@@ -44,6 +44,8 @@ public class AltosUIEnable extends Container implements ChangeListener {
 	int		x;
 	JCheckBox	imperial_units;
 	JCheckBox	show_shapes;
+	JLabel		line_width_label;
+	JSpinner	line_width;
 	JLabel		speed_filter_label;
 	JSlider		speed_filter;
 	JLabel		accel_filter_label;
@@ -114,9 +116,13 @@ public class AltosUIEnable extends Container implements ChangeListener {
 	}
 
 	public void set_shapes_visible(boolean visible) {
-		System.out.printf("set shapes %b\n", visible);
 		if (shape_listener != null)
 			shape_listener.set_shapes_visible(visible);
+	}
+
+	public void set_line_width(float width) {
+		if (shape_listener != null)
+			shape_listener.set_line_width(width);
 	}
 
 	public void register_shape_listener(AltosShapeListener shape_listener) {
@@ -159,6 +165,34 @@ public class AltosUIEnable extends Container implements ChangeListener {
 		c.insets = il;
 		add(show_shapes, c);
 
+
+		line_width_label = new JLabel("Line Width");
+		c = new GridBagConstraints();
+		c.gridx = 1; c.gridy = 1001;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		add(line_width_label, c);
+
+		line_width = new JSpinner();
+		line_width.setValue(new Integer(1));
+		line_width.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					int w = (Integer) line_width.getValue();
+					if (w < 1) {
+						w = 1;
+						line_width.setValue(new Integer(w));
+					}
+					System.out.printf("line width set to %d\n", w);
+					set_line_width(w);
+				}
+			});
+		c = new GridBagConstraints();
+		c.gridx = 2; c.gridy = 1001;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		add(line_width, c);
 
 		speed_filter_label = new JLabel("Speed Filter(ms)");
 		c = new GridBagConstraints();
