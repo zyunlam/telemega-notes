@@ -47,6 +47,14 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.8.3</revnumber>
+    <date>12 Nove 2017</date>
+    <revremark>
+      Support TeleGPS v2.0 hardware. Add accelerometer recalibration
+      UI.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.8.2</revnumber>
     <date>18 Sep 2017</date>
     <revremark>

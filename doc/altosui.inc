@@ -395,8 +395,27 @@
 			image::graph-configure.png[width="5.5in"]
 
 			This selects which graph elements to show, and, at the
-			very bottom, lets you switch between metric and
-			imperial units
+			very bottom. It also lets you configure how
+			the graph is drawn:
+
+			* Whether to use metric or imperial units
+
+			* Whether to show a marker at each data
+                          point. When displaying a small section of
+                          the graph, these can be useful to know what
+                          data values were recorded.
+
+			* How wide to draw the lines in the graph
+
+			* How to filter speed and acceleration data
+                          computed from barometric data. Flight
+                          computers with accelerometers never display
+                          computed acceleration data, and only use
+                          barometric data to compute speed during
+                          descent. Flight computers without
+                          accelerometers always compute both speed and
+                          acceleration from barometric data. A larger
+                          value smooths the data more.
 
 		==== Flight Statistics
 
