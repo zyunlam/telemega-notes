@@ -210,7 +210,7 @@ ao_lisp_eval_formal(void)
 	}
 
 	/* Append formal to list of values */
-	formal = ao_lisp_cons_poly(ao_lisp_cons_cons(ao_lisp_v, NULL));
+	formal = ao_lisp__cons(ao_lisp_v, AO_LISP_NIL);
 	if (!formal)
 		return 0;
 

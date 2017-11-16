@@ -72,7 +72,7 @@ const struct ao_lisp_type ao_lisp_cons_type = {
 struct ao_lisp_cons *ao_lisp_cons_free_list;
 
 struct ao_lisp_cons *
-ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr)
+ao_lisp_cons_cons(ao_poly car, ao_poly cdr)
 {
 	struct ao_lisp_cons	*cons;
 
@@ -81,16 +81,22 @@ ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr)
 		ao_lisp_cons_free_list = ao_lisp_poly_cons(cons->cdr);
 	} else {
 		ao_lisp_poly_stash(0, car);
-		ao_lisp_cons_stash(0, cdr);
+		ao_lisp_poly_stash(1, cdr);
 		cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
 		car = ao_lisp_poly_fetch(0);
-		cdr = ao_lisp_cons_fetch(0);
+		cdr = ao_lisp_poly_fetch(1);
 		if (!cons)
 			return NULL;
 	}
 	cons->car = car;
-	cons->cdr = ao_lisp_cons_poly(cdr);
+	cons->cdr = cdr;
 	return cons;
+}
+
+ao_poly
+ao_lisp__cons(ao_poly car, ao_poly cdr)
+{
+	return ao_lisp_cons_poly(ao_lisp_cons_cons(car, cdr));
 }
 
 void
@@ -114,8 +120,15 @@ ao_lisp_cons_print(ao_poly c)
 		if (!first)
 			printf(" ");
 		ao_lisp_poly_print(cons->car);
-		cons = ao_lisp_poly_cons(cons->cdr);
-		first = 0;
+		c = cons->cdr;
+		if (ao_lisp_poly_type(c) == AO_LISP_CONS) {
+			cons = ao_lisp_poly_cons(c);
+			first = 0;
+		} else {
+			printf(" . ");
+			ao_lisp_poly_print(c);
+			cons = NULL;
+		}
 	}
 	printf(")");
 }

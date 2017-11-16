@@ -62,7 +62,7 @@ static const uint16_t	lex_classes[128] = {
  	PRINTABLE|SIGN,		/* + */
  	PRINTABLE,		/* , */
  	PRINTABLE|SIGN,		/* - */
- 	PRINTABLE,		/* . */
+ 	PRINTABLE|DOTC,		/* . */
  	PRINTABLE,		/* / */
  	PRINTABLE|DIGIT,	/* 0 */
  	PRINTABLE|DIGIT,	/* 1 */
@@ -262,7 +262,7 @@ static inline void end_token(void) {
 }
 
 static int
-lex(void)
+_lex(void)
 {
 	int	c;
 
@@ -294,6 +294,11 @@ lex(void)
 			case '\'':
 				return QUOTE;
 			}
+		}
+		if (lex_class & (DOTC)) {
+			add_token(c);
+			end_token();
+			return DOT;
 		}
 		if (lex_class & TWIDDLE) {
 			token_int = lexc();
@@ -355,21 +360,32 @@ lex(void)
 	}
 }
 
+static inline int lex(void)
+{
+	int	parse_token = _lex();
+	DBGI("token %d (%s)\n", parse_token, token_string);
+	return parse_token;
+}
+
 static int parse_token;
 
 struct ao_lisp_cons	*ao_lisp_read_cons;
 struct ao_lisp_cons	*ao_lisp_read_cons_tail;
 struct ao_lisp_cons	*ao_lisp_read_stack;
 
+#define READ_IN_QUOTE	0x01
+#define READ_SAW_DOT	0x02
+#define READ_DONE_DOT	0x04
+
 static int
-push_read_stack(int cons, int in_quote)
+push_read_stack(int cons, int read_state)
 {
-	DBGI("push read stack %p %d\n", ao_lisp_read_cons, in_quote);
+	DBGI("push read stack %p 0x%x\n", ao_lisp_read_cons, read_state);
 	DBG_IN();
 	if (cons) {
 		ao_lisp_read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_read_cons),
-					       ao_lisp_cons_cons(ao_lisp_int_poly(in_quote),
-								 ao_lisp_read_stack));
+						       ao_lisp__cons(ao_lisp_int_poly(read_state),
+								     ao_lisp_cons_poly(ao_lisp_read_stack)));
 		if (!ao_lisp_read_stack)
 			return 0;
 	}
@@ -381,11 +397,11 @@ push_read_stack(int cons, int in_quote)
 static int
 pop_read_stack(int cons)
 {
-	int	in_quote = 0;
+	int	read_state = 0;
 	if (cons) {
 		ao_lisp_read_cons = ao_lisp_poly_cons(ao_lisp_read_stack->car);
 		ao_lisp_read_stack = ao_lisp_poly_cons(ao_lisp_read_stack->cdr);
-		in_quote = ao_lisp_poly_int(ao_lisp_read_stack->car);
+		read_state = ao_lisp_poly_int(ao_lisp_read_stack->car);
 		ao_lisp_read_stack = ao_lisp_poly_cons(ao_lisp_read_stack->cdr);
 		for (ao_lisp_read_cons_tail = ao_lisp_read_cons;
 		     ao_lisp_read_cons_tail && ao_lisp_read_cons_tail->cdr;
@@ -397,8 +413,8 @@ pop_read_stack(int cons)
 		ao_lisp_read_stack = 0;
 	}
 	DBG_OUT();
-	DBGI("pop read stack %p %d\n", ao_lisp_read_cons, in_quote);
-	return in_quote;
+	DBGI("pop read stack %p %d\n", ao_lisp_read_cons, read_state);
+	return read_state;
 }
 
 ao_poly
@@ -407,23 +423,21 @@ ao_lisp_read(void)
 	struct ao_lisp_atom	*atom;
 	char			*string;
 	int			cons;
-	int			in_quote;
+	int			read_state;
 	ao_poly			v;
 
-	parse_token = lex();
-	DBGI("token %d (%s)\n", parse_token, token_string);
 
 	cons = 0;
-	in_quote = 0;
+	read_state = 0;
 	ao_lisp_read_cons = ao_lisp_read_cons_tail = ao_lisp_read_stack = 0;
 	for (;;) {
+		parse_token = lex();
 		while (parse_token == OPEN) {
-			if (!push_read_stack(cons, in_quote))
+			if (!push_read_stack(cons, read_state))
 				return AO_LISP_NIL;
 			cons++;
-			in_quote = 0;
+			read_state = 0;
 			parse_token = lex();
-			DBGI("token %d (%s)\n", parse_token, token_string);
 		}
 
 		switch (parse_token) {
@@ -451,10 +465,10 @@ ao_lisp_read(void)
 				v = AO_LISP_NIL;
 			break;
 		case QUOTE:
-			if (!push_read_stack(cons, in_quote))
+			if (!push_read_stack(cons, read_state))
 				return AO_LISP_NIL;
 			cons++;
-			in_quote = 1;
+			read_state |= READ_IN_QUOTE;
 			v = _ao_lisp_atom_quote;
 			break;
 		case CLOSE:
@@ -464,8 +478,19 @@ ao_lisp_read(void)
 			}
 			v = ao_lisp_cons_poly(ao_lisp_read_cons);
 			--cons;
-			in_quote = pop_read_stack(cons);
+			read_state = pop_read_stack(cons);
 			break;
+		case DOT:
+			if (!cons) {
+				ao_lisp_error(AO_LISP_INVALID, ". outside of cons");
+				return AO_LISP_NIL;
+			}
+			if (!ao_lisp_read_cons) {
+				ao_lisp_error(AO_LISP_INVALID, ". first in cons");
+				return AO_LISP_NIL;
+			}
+			read_state |= READ_SAW_DOT;
+			continue;
 		}
 
 		/* loop over QUOTE ends */
@@ -473,26 +498,33 @@ ao_lisp_read(void)
 			if (!cons)
 				return v;
 
-			struct ao_lisp_cons	*read = ao_lisp_cons_cons(v, NULL);
-			if (!read)
+			if (read_state & READ_DONE_DOT) {
+				ao_lisp_error(AO_LISP_INVALID, ". not last in cons");
 				return AO_LISP_NIL;
+			}
 
-			if (ao_lisp_read_cons_tail)
-				ao_lisp_read_cons_tail->cdr = ao_lisp_cons_poly(read);
-			else
-				ao_lisp_read_cons = read;
-			ao_lisp_read_cons_tail = read;
+			if (read_state & READ_SAW_DOT) {
+				read_state |= READ_DONE_DOT;
+				ao_lisp_read_cons_tail->cdr = v;
+			} else {
+				struct ao_lisp_cons	*read = ao_lisp_cons_cons(v, AO_LISP_NIL);
+				if (!read)
+					return AO_LISP_NIL;
 
-			if (!in_quote || !ao_lisp_read_cons->cdr)
+				if (ao_lisp_read_cons_tail)
+					ao_lisp_read_cons_tail->cdr = ao_lisp_cons_poly(read);
+				else
+					ao_lisp_read_cons = read;
+				ao_lisp_read_cons_tail = read;
+			}
+
+			if (!(read_state & READ_IN_QUOTE) || !ao_lisp_read_cons->cdr)
 				break;
 
 			v = ao_lisp_cons_poly(ao_lisp_read_cons);
 			--cons;
-			in_quote = pop_read_stack(cons);
+			read_state = pop_read_stack(cons);
 		}
-
-		parse_token = lex();
-		DBGI("token %d (%s)\n", parse_token, token_string);
 	}
 	return v;
 }

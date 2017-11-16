@@ -22,6 +22,7 @@
 # define QUOTE	4
 # define STRING	5
 # define NUM	6
+# define DOT	7
 
 /*
  * character classes
@@ -42,8 +43,9 @@
 # define VBAR		0x00001000	/* | */
 # define TWIDDLE	0x00002000	/* ~ */
 # define STRINGC	0x00004000	/* " */
+# define DOTC		0x00008000	/* . */
 
-# define NOTNAME	(STRINGC|TWIDDLE|VBAR|QUOTEC|COMMENT|ENDOFFILE|WHITE|KET|BRA)
+# define NOTNAME	(STRINGC|TWIDDLE|VBAR|QUOTEC|COMMENT|ENDOFFILE|WHITE|KET|BRA|DOTC)
 # define NUMBER		(DIGIT|SIGN)
 
 #endif /* _AO_LISP_READ_H_ */

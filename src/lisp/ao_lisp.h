@@ -499,7 +499,10 @@ ao_lisp_stack_fetch(int id) {
 extern const struct ao_lisp_type ao_lisp_cons_type;
 
 struct ao_lisp_cons *
-ao_lisp_cons_cons(ao_poly car, struct ao_lisp_cons *cdr);
+ao_lisp_cons_cons(ao_poly car, ao_poly cdr);
+
+ao_poly
+ao_lisp__cons(ao_poly car, ao_poly cdr);
 
 extern struct ao_lisp_cons *ao_lisp_cons_free_list;
 

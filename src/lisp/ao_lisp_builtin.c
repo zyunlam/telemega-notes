@@ -190,11 +190,9 @@ ao_lisp_cons(struct ao_lisp_cons *cons)
 	ao_poly	car, cdr;
 	if(!ao_lisp_check_argc(_ao_lisp_atom_cons, cons, 2, 2))
 		return AO_LISP_NIL;
-	if (!ao_lisp_check_argt(_ao_lisp_atom_cons, cons, 1, AO_LISP_CONS, 1))
-		return AO_LISP_NIL;
 	car = ao_lisp_arg(cons, 0);
 	cdr = ao_lisp_arg(cons, 1);
-	return ao_lisp_cons_poly(ao_lisp_cons_cons(car, ao_lisp_poly_cons(cdr)));
+	return ao_lisp__cons(car, cdr);
 }
 
 ao_poly
@@ -247,14 +245,12 @@ ao_lisp_set(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_setq(struct ao_lisp_cons *cons)
 {
-	struct ao_lisp_cons	*expand = 0;
 	if (!ao_lisp_check_argc(_ao_lisp_atom_setq, cons, 2, 2))
 		return AO_LISP_NIL;
-	expand = ao_lisp_cons_cons(_ao_lisp_atom_set,
-				   ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_cons_cons(_ao_lisp_atom_quote,
-								       ao_lisp_cons_cons(cons->car, NULL))),
-						     ao_lisp_poly_cons(cons->cdr)));
-	return ao_lisp_cons_poly(expand);
+	return ao_lisp__cons(_ao_lisp_atom_set,
+			     ao_lisp__cons(ao_lisp__cons(_ao_lisp_atom_quote,
+							 ao_lisp__cons(cons->car, AO_LISP_NIL)),
+					   cons->cdr));
 }
 
 ao_poly

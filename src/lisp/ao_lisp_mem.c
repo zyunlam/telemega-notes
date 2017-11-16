@@ -437,7 +437,7 @@ dump_busy(void)
 #define DUMP_BUSY()
 #endif
 
-static const struct ao_lisp_type const *ao_lisp_types[AO_LISP_NUM_TYPE] = {
+static const struct ao_lisp_type *ao_lisp_types[AO_LISP_NUM_TYPE] = {
 	[AO_LISP_CONS] = &ao_lisp_cons_type,
 	[AO_LISP_INT] = NULL,
 	[AO_LISP_STRING] = &ao_lisp_string_type,
