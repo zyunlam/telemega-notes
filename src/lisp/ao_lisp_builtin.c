@@ -210,11 +210,17 @@ ao_lisp_do_set(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_do_setq(struct ao_lisp_cons *cons)
 {
+	ao_poly	name;
 	if (!ao_lisp_check_argc(_ao_lisp_atom_setq, cons, 2, 2))
 		return AO_LISP_NIL;
+	name = cons->car;
+	if (ao_lisp_poly_type(name) != AO_LISP_ATOM)
+		return ao_lisp_error(AO_LISP_INVALID, "set! of non-atom");
+	if (!ao_lisp_atom_ref(ao_lisp_frame_current, name))
+		return ao_lisp_error(AO_LISP_INVALID, "atom not defined");
 	return ao_lisp__cons(_ao_lisp_atom_set,
 			     ao_lisp__cons(ao_lisp__cons(_ao_lisp_atom_quote,
-							 ao_lisp__cons(cons->car, AO_LISP_NIL)),
+							 ao_lisp__cons(name, AO_LISP_NIL)),
 					   cons->cdr));
 }
 
@@ -557,6 +563,34 @@ ao_lisp_do_not(struct ao_lisp_cons *cons)
 		return _ao_lisp_bool_true;
 	else
 		return _ao_lisp_bool_false;
+}
+
+ao_poly
+ao_lisp_do_listp(struct ao_lisp_cons *cons)
+{
+	ao_poly	v;
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	v = ao_lisp_arg(cons, 0);
+	for (;;) {
+		if (v == AO_LISP_NIL)
+			return _ao_lisp_bool_true;
+		if (ao_lisp_poly_type(v) != AO_LISP_CONS)
+			return _ao_lisp_bool_false;
+		v = ao_lisp_poly_cons(v)->cdr;
+	}
+}
+
+ao_poly
+ao_lisp_do_pairp(struct ao_lisp_cons *cons)
+{
+	ao_poly	v;
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	v = ao_lisp_arg(cons, 0);
+	if (ao_lisp_poly_type(v) == AO_LISP_CONS)
+		return _ao_lisp_bool_true;
+	return _ao_lisp_bool_false;
 }
 
 #define AO_LISP_BUILTIN_FUNCS

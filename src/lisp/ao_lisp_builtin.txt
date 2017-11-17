@@ -11,7 +11,7 @@ lambda	last
 lambda	length
 nlambda	quote
 lambda	set
-macro	setq
+macro	setq		set!
 nlambda	cond
 nlambda	progn
 nlambda	while
@@ -22,7 +22,7 @@ lexpr	minus		-
 lexpr	times		*
 lexpr	divide		/
 lexpr	mod		%
-lexpr	equal		=
+lexpr	equal		=	eq?	eqv?
 lexpr	less		<
 lexpr	greater		>
 lexpr	less_equal	<=
@@ -38,3 +38,5 @@ lambda	call_cc		call/cc
 lambda	collect
 lambda	nullp		null?
 lambda	not
+lambda	listp		list?
+lambda	pairp		pair?
