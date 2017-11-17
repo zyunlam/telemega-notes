@@ -136,7 +136,7 @@ ao_lisp_is_const(ao_poly poly) {
 
 #define AO_LISP_IS_CONST(a)	(ao_lisp_const <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_lisp_const + AO_LISP_POOL_CONST)
 #define AO_LISP_IS_POOL(a)	(ao_lisp_pool <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_lisp_pool + AO_LISP_POOL)
-#define AO_LISP_IS_INT(p)	(ao_lisp_base_type(p) == AO_LISP_INT);
+#define AO_LISP_IS_INT(p)	(ao_lisp_poly_base_type(p) == AO_LISP_INT)
 
 void *
 ao_lisp_ref(ao_poly poly);

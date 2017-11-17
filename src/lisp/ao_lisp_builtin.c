@@ -277,6 +277,7 @@ ao_lisp_do_patom(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 {
+	struct ao_lisp_cons *orig_cons = cons;
 	ao_poly	ret = AO_LISP_NIL;
 
 	while (cons) {
@@ -284,12 +285,29 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 		uint8_t		rt = ao_lisp_poly_type(ret);
 		uint8_t		ct = ao_lisp_poly_type(car);
 
-		cons = ao_lisp_poly_cons(cons->cdr);
-
-		if (rt == AO_LISP_NIL)
+		if (cons == orig_cons) {
 			ret = car;
-
-		else if (rt == AO_LISP_INT && ct == AO_LISP_INT) {
+			if (cons->cdr == AO_LISP_NIL && ct == AO_LISP_INT) {
+				switch (op) {
+				case builtin_minus:
+					ret = ao_lisp_int_poly(-ao_lisp_poly_int(ret));
+					break;
+				case builtin_divide:
+					switch (ao_lisp_poly_int(ret)) {
+					case 0:
+						return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "divide by zero");
+					case 1:
+						break;
+					default:
+						ret = ao_lisp_int_poly(0);
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		} else if (rt == AO_LISP_INT && ct == AO_LISP_INT) {
 			int	r = ao_lisp_poly_int(ret);
 			int	c = ao_lisp_poly_int(car);
 
@@ -308,10 +326,25 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "divide by zero");
 				r /= c;
 				break;
-			case builtin_mod:
+			case builtin_quotient:
 				if (c == 0)
-					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "mod by zero");
+					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "quotient by zero");
+				if (r % c != 0 && (c < 0) != (r < 0))
+					r = r / c - 1;
+				else
+					r = r / c;
+				break;
+			case builtin_remainder:
+				if (c == 0)
+					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "remainder by zero");
 				r %= c;
+				break;
+			case builtin_modulo:
+				if (c == 0)
+					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "modulo by zero");
+				r %= c;
+				if ((r < 0) != (c < 0))
+					r += c;
 				break;
 			default:
 				break;
@@ -324,6 +357,8 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 								     ao_lisp_poly_string(car)));
 		else
 			return ao_lisp_error(AO_LISP_INVALID, "invalid args");
+
+		cons = ao_lisp_poly_cons(cons->cdr);
 	}
 	return ret;
 }
@@ -353,9 +388,21 @@ ao_lisp_do_divide(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_do_mod(struct ao_lisp_cons *cons)
+ao_lisp_do_quotient(struct ao_lisp_cons *cons)
 {
-	return ao_lisp_math(cons, builtin_mod);
+	return ao_lisp_math(cons, builtin_quotient);
+}
+
+ao_poly
+ao_lisp_do_modulo(struct ao_lisp_cons *cons)
+{
+	return ao_lisp_math(cons, builtin_modulo);
+}
+
+ao_poly
+ao_lisp_do_remainder(struct ao_lisp_cons *cons)
+{
+	return ao_lisp_math(cons, builtin_remainder);
 }
 
 ao_poly
@@ -591,6 +638,46 @@ ao_lisp_do_pairp(struct ao_lisp_cons *cons)
 	if (ao_lisp_poly_type(v) == AO_LISP_CONS)
 		return _ao_lisp_bool_true;
 	return _ao_lisp_bool_false;
+}
+
+ao_poly
+ao_lisp_do_numberp(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (AO_LISP_IS_INT(ao_lisp_arg(cons, 0)))
+		return _ao_lisp_bool_true;
+	return _ao_lisp_bool_false;
+}
+
+ao_poly
+ao_lisp_do_booleanp(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (ao_lisp_poly_type(ao_lisp_arg(cons, 0)) == AO_LISP_BOOL)
+		return _ao_lisp_bool_true;
+	return _ao_lisp_bool_false;
+}
+
+ao_poly
+ao_lisp_do_set_car(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 2, 2))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_CONS, 0))
+		return AO_LISP_NIL;
+	return ao_lisp_poly_cons(ao_lisp_arg(cons, 0))->car = ao_lisp_arg(cons, 1);
+}
+
+ao_poly
+ao_lisp_do_set_cdr(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 2, 2))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_CONS, 0))
+		return AO_LISP_NIL;
+	return ao_lisp_poly_cons(ao_lisp_arg(cons, 0))->cdr = ao_lisp_arg(cons, 1);
 }
 
 #define AO_LISP_BUILTIN_FUNCS

@@ -21,7 +21,9 @@ lexpr	plus		+
 lexpr	minus		-
 lexpr	times		*
 lexpr	divide		/
-lexpr	mod		%
+lexpr	modulo		modulo	%
+lexpr	remainder
+lexpr	quotient
 lexpr	equal		=	eq?	eqv?
 lexpr	less		<
 lexpr	greater		>
@@ -40,3 +42,7 @@ lambda	nullp		null?
 lambda	not
 lambda	listp		list?
 lambda	pairp		pair?
+lambda	numberp		number?	integer?
+lambda	booleanp	boolean?
+lambda	set_car		set-car!
+lambda	set_cdr		set-cdr!

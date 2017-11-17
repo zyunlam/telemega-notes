@@ -69,6 +69,93 @@
 (defun 1+ (x) (+ x 1))
 (defun 1- (x) (- x 1))
 
+(define zero? (macro (value rest)
+		     (list
+		      eq?
+		      value
+		      0)
+		     )
+  )
+
+(zero? 1)
+(zero? 0)
+(zero? "hello")
+
+(define positive? (macro (value rest)
+			 (list
+			  >
+			  value
+			  0)
+			 )
+  )
+
+(positive? 12)
+(positive? -12)
+
+(define negative? (macro (value rest)
+			 (list
+			  <
+			  value
+			  0)
+			 )
+  )
+
+(negative? 12)
+(negative? -12)
+
+(defun abs (x) (cond ((>= x 0) x)
+		     (else (- x)))
+       )
+
+(abs 12)
+(abs -12)
+
+(define max (lexpr (first rest)
+		   (while (not (null? rest))
+		     (cond ((< first (car rest))
+			    (set! first (car rest)))
+			   )
+		     (set! rest (cdr rest))
+		     )
+		   first)
+  )
+
+(max 1 2 3)
+(max 3 2 1)
+
+(define min (lexpr (first rest)
+		   (while (not (null? rest))
+		     (cond ((> first (car rest))
+			    (set! first (car rest)))
+			   )
+		     (set! rest (cdr rest))
+		     )
+		   first)
+  )
+
+(min 1 2 3)
+(min 3 2 1)
+
+(defun even? (x) (zero? (% x 2)))
+
+(even? 2)
+(even? -2)
+(even? 3)
+(even? -1)
+
+(defun odd? (x) (not (even? x)))
+
+(odd? 2)
+(odd? -2)
+(odd? 3)
+(odd? -1)
+
+(define exact? number?)
+(defun inexact? (x) #f)
+
+					; (if <condition> <if-true>)
+					; (if <condition> <if-true> <if-false)
+
 (define if (macro (test args)
 	       (cond ((null? (cdr args))
 		      (list
@@ -208,6 +295,49 @@
 
 (and #t #f)
 
+
+(define append (lexpr (args)
+		      (let ((append-list (lambda (a b)
+					   (cond ((null? a) b)
+						 (else (cons (car a) (append-list (cdr a) b)))
+						 )
+					   )
+					 )
+			    (append-lists (lambda (lists)
+					    (cond ((null? lists) lists)
+						  ((null? (cdr lists)) (car lists))
+						  (else (append-list (car lists) (append-lists (cdr lists))))
+						  )
+					    )
+					  )
+			    )
+			(append-lists args)
+			)
+		      )
+  )
+
+(append '(a b c) '(d e f) '(g h i))
+
+(defun reverse (list)
+  (let ((result ()))
+    (while (not (null? list))
+      (set! result (cons (car list) result))
+      (set! list (cdr list))
+      )
+    result)
+  )
+
+(reverse '(1 2 3))
+
+(define list-tail
+  (lambda (x k)
+    (if (zero? k)
+	x
+      (list-tail (cdr x) (- k 1)))))
+
+(list-tail '(1 2 3) 2)
+					; recursive equality
+
 (defun equal? (a b)
   (cond ((eq? a b) #t)
 	((and (pair? a) (pair? b))
@@ -220,3 +350,9 @@
 
 (equal? '(a b c) '(a b c))
 (equal? '(a b c) '(a b b))
+
+;(define number->string (lexpr (arg opt)
+;			      (let ((base (if (null? opt) 10 (car opt)))
+					;
+;
+				
