@@ -59,33 +59,13 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
 
 #define _ao_lisp_bool_true	_bool(1)
 #define _ao_lisp_bool_false	_bool(0)
-#define _ao_lisp_atom_quote	_atom(quote)
-#define _ao_lisp_atom_set 	_atom(set)
-#define _ao_lisp_atom_setq 	_atom(setq)
-#define _ao_lisp_atom_car 	_atom(car)
-#define _ao_lisp_atom_cdr	_atom(cdr)
-#define _ao_lisp_atom_cons	_atom(cons)
-#define _ao_lisp_atom_last	_atom(last)
-#define _ao_lisp_atom_length	_atom(length)
-#define _ao_lisp_atom_cond	_atom(cond)
-#define _ao_lisp_atom_else	_atom(else)
-#define _ao_lisp_atom_lambda	_atom(lambda)
-#define _ao_lisp_atom_led	_atom(led)
-#define _ao_lisp_atom_delay	_atom(delay)
-#define _ao_lisp_atom_pack	_atom(pack)
-#define _ao_lisp_atom_unpack	_atom(unpack)
-#define _ao_lisp_atom_flush	_atom(flush)
-#define _ao_lisp_atom_eval	_atom(eval)
-#define _ao_lisp_atom_read	_atom(read)
+
 #define _ao_lisp_atom_eof	_atom(eof)
-#define _ao_lisp_atom_save	_atom(save)
-#define _ao_lisp_atom_restore	_atom(restore)
-#define _ao_lisp_atom_call2fcc	_atom(call/cc)
-#define _ao_lisp_atom_collect	_atom(collect)
-#define _ao_lisp_atom_symbolp   _atom(symbol?)
-#define _ao_lisp_atom_builtin   _atom(builtin?)
-#define _ao_lisp_atom_symbolp   _atom(symbol?)
-#define _ao_lisp_atom_symbolp   _atom(symbol?)
+#define _ao_lisp_atom_else	_atom(else)
+
+#define AO_LISP_BUILTIN_ATOMS
+#include "ao_lisp_builtin.h"
+
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
