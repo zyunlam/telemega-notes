@@ -68,6 +68,7 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
 #define _ao_lisp_atom_last	_atom(last)
 #define _ao_lisp_atom_length	_atom(length)
 #define _ao_lisp_atom_cond	_atom(cond)
+#define _ao_lisp_atom_else	_atom(else)
 #define _ao_lisp_atom_lambda	_atom(lambda)
 #define _ao_lisp_atom_led	_atom(led)
 #define _ao_lisp_atom_delay	_atom(delay)

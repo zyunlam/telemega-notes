@@ -304,6 +304,9 @@ main(int argc, char **argv)
 	ao_lisp_atom_set(ao_lisp_atom_poly(a),
 			 ao_lisp_atom_poly(a));
 
+	/* 'else' */
+	a = ao_lisp_atom_intern("else");
+
 	if (argv[optind]){
 		in = fopen(argv[optind], "r");
 		if (!in) {

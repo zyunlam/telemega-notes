@@ -324,6 +324,8 @@ ao_lisp_eval_cond(void)
 			return 0;
 		}
 		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_v)->car;
+		if (ao_lisp_v == _ao_lisp_atom_else)
+			ao_lisp_v = _ao_lisp_bool_true;
 		ao_lisp_stack->state = eval_cond_test;
 		if (!ao_lisp_stack_push())
 			return 0;
@@ -492,6 +494,9 @@ const char *ao_lisp_state_names[] = {
 	"cond",
 	"cond_test",
 	"progn",
+	"while",
+	"while_test",
+	"macro",
 };
 
 /*
