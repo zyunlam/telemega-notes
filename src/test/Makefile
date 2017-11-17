@@ -1,4 +1,7 @@
-vpath % ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
+vpath %.o .
+vpath %.c ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
+vpath %.h ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
+vpath make-kalman ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
 
 PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noisy_accel ao_flight_test_mm \
 	ao_flight_test_metrum ao_flight_test_mini \
@@ -17,7 +20,7 @@ CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -I../lisp -
 
 all: $(PROGS) ao_aprs_data.wav
 
-clean:
+clean::
 	rm -f $(PROGS) ao_aprs_data.wav run-out.baro run-out.full
 
 install:
@@ -94,12 +97,16 @@ ao_ms5607_convert_test: ao_ms5607_convert_test.c ao_ms5607_convert_8051.c ao_int
 ao_quaternion_test: ao_quaternion_test.c ao_quaternion.h
 	cc $(CFLAGS) -o $@ ao_quaternion_test.c -lm
 
-AO_LISP_OBJS = ao_lisp_test.o ao_lisp_mem.o  ao_lisp_cons.o ao_lisp_string.o \
-	ao_lisp_atom.o ao_lisp_int.o ao_lisp_eval.o ao_lisp_poly.o \
-	ao_lisp_builtin.o ao_lisp_read.o ao_lisp_rep.o ao_lisp_frame.o \
-	ao_lisp_lambda.o ao_lisp_error.o ao_lisp_save.o ao_lisp_stack.o
+include ../lisp/Makefile-inc
+
+AO_LISP_SRCS=$(LISP_SRCS) ao_lisp_test.c
+
+AO_LISP_OBJS=$(AO_LISP_SRCS:.c=.o)
 
 ao_lisp_test: $(AO_LISP_OBJS)
 	cc $(CFLAGS) -o $@ $(AO_LISP_OBJS)
 
-$(AO_LISP_OBJS): ao_lisp.h ao_lisp_const.h ao_lisp_os.h
+$(AO_LISP_OBJS): $(LISP_HDRS)
+
+clean::
+	rm -f $(AO_LISP_OBJS)
