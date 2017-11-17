@@ -15,7 +15,7 @@
 #include <ao_lisp.h>
 
 ao_poly
-ao_lisp_save(struct ao_lisp_cons *cons)
+ao_lisp_do_save(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_save, cons, 0, 0))
 		return AO_LISP_NIL;
@@ -30,13 +30,13 @@ ao_lisp_save(struct ao_lisp_cons *cons)
 	os->const_checksum_inv = (uint16_t) ~ao_lisp_const_checksum;
 
 	if (ao_lisp_os_save())
-		return _ao_lisp_atom_t;
+		return _ao_lisp_bool_true;
 #endif
-	return AO_LISP_NIL;
+	return _ao_lisp_bool_false;
 }
 
 ao_poly
-ao_lisp_restore(struct ao_lisp_cons *cons)
+ao_lisp_do_restore(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_save, cons, 0, 0))
 		return AO_LISP_NIL;
@@ -68,9 +68,9 @@ ao_lisp_restore(struct ao_lisp_cons *cons)
 
 		/* Re-create the evaluator stack */
 		if (!ao_lisp_eval_restart())
-			return AO_LISP_NIL;
-		return _ao_lisp_atom_t;
+			return _ao_lisp_bool_false;
+		return _ao_lisp_bool_true;
 	}
 #endif
-	return AO_LISP_NIL;
+	return _ao_lisp_bool_false;
 }

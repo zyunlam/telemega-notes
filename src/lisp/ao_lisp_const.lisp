@@ -95,7 +95,7 @@
 					;
 
 		   (setq make-names (lambda (vars)
-				      (cond (vars
+				      (cond ((not (null? vars))
 					     (cons (car (car vars))
 						   (make-names (cdr vars))))
 					    )
@@ -108,7 +108,7 @@
 					; expressions to evaluate
 
 		   (setq make-exprs (lambda (vars exprs)
-				      (cond (vars (cons
+				      (cond ((not (null? vars)) (cons
 						   (list set
 							 (list quote
 							       (car (car vars))
@@ -127,7 +127,7 @@
 					; of nils of the right length
 
 		   (setq make-nils (lambda (vars)
-				     (cond (vars (cons nil (make-nils (cdr vars))))
+				     (cond ((not (null? vars)) (cons () (make-nils (cdr vars))))
 					   )
 				     )
 			 )
@@ -149,13 +149,14 @@
 		)
      )
 
+(let ((x 1)) x)
+
 					; boolean operators
 
 (def or (lexpr (l)
-	       (let ((ret nil))
-		 (while l
-		   (cond ((setq ret (car l))
-			  (setq l nil))
+	       (let ((ret #f))
+		 (while (not (null? l))
+		   (cond ((car l) (setq ret #t) (setq l ()))
 			 ((setq l (cdr l)))))
 		 ret
 		 )
@@ -164,14 +165,16 @@
 
 					; execute to resolve macros
 
-(or nil t)
+(or #f #t)
 
 (def and (lexpr (l)
-	       (let ((ret t))
-		 (while l
-		   (cond ((setq ret (car l))
+	       (let ((ret #t))
+		 (while (not (null? l))
+		   (cond ((car l)
 			  (setq l (cdr l)))
-			 ((setq ret (setq l nil)))
+			 (#t
+			  (setq ret #f)
+			  (setq l ()))
 			 )
 		   )
 		 ret
@@ -181,4 +184,4 @@
 
 					; execute to resolve macros
 
-(and t nil)
+(and #t #f)

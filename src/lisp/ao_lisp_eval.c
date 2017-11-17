@@ -107,6 +107,7 @@ ao_lisp_eval_sexpr(void)
 		DBGI("..frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 		ao_lisp_v = ao_lisp_atom_get(ao_lisp_v);
 		/* fall through */
+	case AO_LISP_BOOL:
 	case AO_LISP_INT:
 	case AO_LISP_STRING:
 	case AO_LISP_BUILTIN:
@@ -345,7 +346,7 @@ ao_lisp_eval_cond_test(void)
 	DBGI("cond_test: "); DBG_POLY(ao_lisp_v); DBG(" sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
 	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
-	if (ao_lisp_v) {
+	if (ao_lisp_v != _ao_lisp_bool_false) {
 		struct ao_lisp_cons *car = ao_lisp_poly_cons(ao_lisp_poly_cons(ao_lisp_stack->sexprs)->car);
 		ao_poly c = car->cdr;
 
@@ -432,7 +433,7 @@ ao_lisp_eval_while_test(void)
 	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
 
-	if (ao_lisp_v) {
+	if (ao_lisp_v != _ao_lisp_bool_false) {
 		ao_lisp_stack->values = ao_lisp_v;
 		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->cdr;
 		ao_lisp_stack->state = eval_while;

@@ -15,6 +15,10 @@
 #ifndef _AO_LISP_READ_H_
 #define _AO_LISP_READ_H_
 
+/*
+ * token classes
+ */
+
 # define END	0
 # define NAME	1
 # define OPEN  	2
@@ -23,29 +27,28 @@
 # define STRING	5
 # define NUM	6
 # define DOT	7
+# define BOOL	8
 
 /*
  * character classes
  */
 
-# define PRINTABLE	0x00000001	/* \t \n ' ' - '~' */
-# define QUOTED		0x00000002	/* \ anything */
-# define BRA		0x00000004	/* ( [ { */
-# define KET		0x00000008	/* ) ] } */
-# define WHITE		0x00000010	/* ' ' \t \n */
-# define DIGIT		0x00000020	/* [0-9] */
-# define SIGN		0x00000040	/* +- */
-# define ENDOFFILE	0x00000080	/* end of file */
-# define COMMENT	0x00000100	/* ; # */
-# define IGNORE		0x00000200	/* \0 - ' ' */
-# define QUOTEC		0x00000400	/* ' */
-# define BACKSLASH	0x00000800	/* \ */
-# define VBAR		0x00001000	/* | */
-# define TWIDDLE	0x00002000	/* ~ */
-# define STRINGC	0x00004000	/* " */
-# define DOTC		0x00008000	/* . */
+# define PRINTABLE	0x0001	/* \t \n ' ' - '~' */
+# define QUOTED		0x0002	/* \ anything */
+# define SPECIAL	0x0004	/* ( [ { ) ] } ' . */
+# define WHITE		0x0008	/* ' ' \t \n */
+# define DIGIT		0x0010	/* [0-9] */
+# define SIGN		0x0020	/* +- */
+# define ENDOFFILE	0x0040	/* end of file */
+# define COMMENT	0x0080	/* ; */
+# define IGNORE		0x0100	/* \0 - ' ' */
+# define BACKSLASH	0x0200	/* \ */
+# define VBAR		0x0400	/* | */
+# define TWIDDLE	0x0800	/* ~ */
+# define STRINGC	0x1000	/* " */
+# define POUND		0x2000	/* # */
 
-# define NOTNAME	(STRINGC|TWIDDLE|VBAR|QUOTEC|COMMENT|ENDOFFILE|WHITE|KET|BRA|DOTC)
+# define NOTNAME	(STRINGC|TWIDDLE|VBAR|COMMENT|ENDOFFILE|WHITE|SPECIAL)
 # define NUMBER		(DIGIT|SIGN)
 
 #endif /* _AO_LISP_READ_H_ */

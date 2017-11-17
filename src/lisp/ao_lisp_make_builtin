@@ -1,0 +1,149 @@
+#!/usr/bin/nickle
+
+typedef struct {
+	string	type;
+	string	c_name;
+	string	lisp_name;
+} builtin_t;
+
+string[string] type_map = {
+	"lambda" => "F_LAMBDA",
+	"nlambda" => "NLAMBDA",
+	"lexpr" => "F_LEXPR",
+	"macro" => "MACRO",
+};
+
+builtin_t
+read_builtin(file f) {
+	string	line = File::fgets(f);
+	string[*]	tokens = String::wordsplit(line, " \t");
+
+	return (builtin_t) {
+		.type = dim(tokens) > 0 ? type_map[tokens[0]] : "#",
+		.c_name = dim(tokens) > 1 ? tokens[1] : "#",
+		.lisp_name = dim(tokens) > 2 ? tokens[2] : tokens[1]
+	};
+}
+
+builtin_t[*]
+read_builtins(file f) {
+	builtin_t[...] builtins = {};
+
+	while (!File::end(f)) {
+		builtin_t	b = read_builtin(f);
+
+		if (b.type[0] != '#')
+			builtins[dim(builtins)] = b;
+	}
+	return builtins;
+}
+
+void
+dump_ids(builtin_t[*] builtins) {
+	printf("#ifdef AO_LISP_BUILTIN_ID\n");
+	printf("#undef AO_LISP_BUILTIN_ID\n");
+	printf("enum ao_lisp_builtin_id {\n");
+	for (int i = 0; i < dim(builtins); i++)
+		printf("\tbuiltin_%s,\n", builtins[i].c_name);
+	printf("\t_builtin_last\n");
+	printf("};\n");
+	printf("#endif /* AO_LISP_BUILTIN_ID */\n");
+}
+
+void
+dump_casename(builtin_t[*] builtins) {
+	printf("#ifdef AO_LISP_BUILTIN_CASENAME\n");
+	printf("#undef AO_LISP_BUILTIN_CASENAME\n");
+	printf("static char *ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {\n");
+	printf("\tswitch(b) {\n");
+	for (int i = 0; i < dim(builtins); i++)
+		printf("\tcase builtin_%s: return ao_lisp_poly_atom(_atom(%s))->name;\n",
+		       builtins[i].c_name, builtins[i].c_name);
+	printf("\tdefault: return \"???\";\n");
+	printf("\t}\n");
+	printf("}\n");
+	printf("#endif /* AO_LISP_BUILTIN_CASENAME */\n");
+}
+
+void
+cify_lisp(string l) {
+	for (int j = 0; j < String::length(l); j++) {
+		int c= l[j];
+		if (Ctype::isalnum(c) || c == '_')
+			printf("%c", c);
+		else
+			printf("%02x", c);
+	}
+}
+
+void
+dump_arrayname(builtin_t[*] builtins) {
+	printf("#ifdef AO_LISP_BUILTIN_ARRAYNAME\n");
+	printf("#undef AO_LISP_BUILTIN_ARRAYNAME\n");
+	printf("static const ao_poly builtin_names[] = {\n");
+	for (int i = 0; i < dim(builtins); i++) {
+		printf("\t[builtin_%s] = _ao_lisp_atom_",
+		       builtins[i].c_name);
+		cify_lisp(builtins[i].lisp_name);
+		printf(",\n");
+	}
+	printf("};\n");
+	printf("#endif /* AO_LISP_BUILTIN_ARRAYNAME */\n");
+}
+
+void
+dump_funcs(builtin_t[*] builtins) {
+	printf("#ifdef AO_LISP_BUILTIN_FUNCS\n");
+	printf("#undef AO_LISP_BUILTIN_FUNCS\n");
+	printf("const ao_lisp_func_t ao_lisp_builtins[] = {\n");
+	for (int i = 0; i < dim(builtins); i++) {
+		printf("\t[builtin_%s] = ao_lisp_do_%s,\n",
+		       builtins[i].c_name,
+		       builtins[i].c_name);
+	}
+	printf("};\n");
+	printf("#endif /* AO_LISP_BUILTIN_FUNCS */\n");
+}
+
+void
+dump_decls(builtin_t[*] builtins) {
+	printf("#ifdef AO_LISP_BUILTIN_DECLS\n");
+	printf("#undef AO_LISP_BUILTIN_DECLS\n");
+	for (int i = 0; i < dim(builtins); i++) {
+		printf("ao_poly\n");
+		printf("ao_lisp_do_%s(struct ao_lisp_cons *cons);\n",
+		       builtins[i].c_name);
+	}
+	printf("#endif /* AO_LISP_BUILTIN_DECLS */\n");
+}
+
+void
+dump_consts(builtin_t[*] builtins) {
+	printf("#ifdef AO_LISP_BUILTIN_CONSTS\n");
+	printf("#undef AO_LISP_BUILTIN_CONSTS\n");
+	printf("struct builtin_func funcs[] = {\n");
+	for (int i = 0; i < dim(builtins); i++) {
+		printf ("\t{ .name = \"%s\", .args = AO_LISP_FUNC_%s, .func = builtin_%s },\n",
+			builtins[i].lisp_name, builtins[i].type, builtins[i].c_name);
+	}
+	printf("};\n");
+	printf("#endif /* AO_LISP_BUILTIN_CONSTS */\n");
+}
+
+void main() {
+	if (dim(argv) < 2) {
+		File::fprintf(stderr, "usage: %s <file>\n", argv[0]);
+		exit(1);
+	}
+	twixt(file f = File::open(argv[1], "r"); File::close(f)) {
+		builtin_t[*]	builtins = read_builtins(f);
+		dump_ids(builtins);
+		dump_casename(builtins);
+		dump_arrayname(builtins);
+		dump_funcs(builtins);
+		dump_decls(builtins);
+		dump_consts(builtins);
+	}
+}
+
+main();

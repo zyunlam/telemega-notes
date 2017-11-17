@@ -54,35 +54,37 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
 #define ao_lisp_pool ao_lisp_const
 #define AO_LISP_POOL AO_LISP_POOL_CONST
 
-#define _atom(n) ao_lisp_atom_poly(ao_lisp_atom_intern(n))
+#define _atom(n) ao_lisp_atom_poly(ao_lisp_atom_intern(#n))
+#define _bool(v) ao_lisp_bool_poly(ao_lisp_bool_get(v))
 
-#define _ao_lisp_atom_quote	_atom("quote")
-#define _ao_lisp_atom_set 	_atom("set")
-#define _ao_lisp_atom_setq 	_atom("setq")
-#define _ao_lisp_atom_t 	_atom("t")
-#define _ao_lisp_atom_car 	_atom("car")
-#define _ao_lisp_atom_cdr	_atom("cdr")
-#define _ao_lisp_atom_cons	_atom("cons")
-#define _ao_lisp_atom_last	_atom("last")
-#define _ao_lisp_atom_length	_atom("length")
-#define _ao_lisp_atom_cond	_atom("cond")
-#define _ao_lisp_atom_lambda	_atom("lambda")
-#define _ao_lisp_atom_led	_atom("led")
-#define _ao_lisp_atom_delay	_atom("delay")
-#define _ao_lisp_atom_pack	_atom("pack")
-#define _ao_lisp_atom_unpack	_atom("unpack")
-#define _ao_lisp_atom_flush	_atom("flush")
-#define _ao_lisp_atom_eval	_atom("eval")
-#define _ao_lisp_atom_read	_atom("read")
-#define _ao_lisp_atom_eof	_atom("eof")
-#define _ao_lisp_atom_save	_atom("save")
-#define _ao_lisp_atom_restore	_atom("restore")
-#define _ao_lisp_atom_call2fcc	_atom("call/cc")
-#define _ao_lisp_atom_collect	_atom("collect")
-#define _ao_lisp_atom_symbolp   _atom("symbol?")
-#define _ao_lisp_atom_builtin   _atom("builtin?")
-#define _ao_lisp_atom_symbolp   _atom("symbol?")
-#define _ao_lisp_atom_symbolp   _atom("symbol?")
+#define _ao_lisp_bool_true	_bool(1)
+#define _ao_lisp_bool_false	_bool(0)
+#define _ao_lisp_atom_quote	_atom(quote)
+#define _ao_lisp_atom_set 	_atom(set)
+#define _ao_lisp_atom_setq 	_atom(setq)
+#define _ao_lisp_atom_car 	_atom(car)
+#define _ao_lisp_atom_cdr	_atom(cdr)
+#define _ao_lisp_atom_cons	_atom(cons)
+#define _ao_lisp_atom_last	_atom(last)
+#define _ao_lisp_atom_length	_atom(length)
+#define _ao_lisp_atom_cond	_atom(cond)
+#define _ao_lisp_atom_lambda	_atom(lambda)
+#define _ao_lisp_atom_led	_atom(led)
+#define _ao_lisp_atom_delay	_atom(delay)
+#define _ao_lisp_atom_pack	_atom(pack)
+#define _ao_lisp_atom_unpack	_atom(unpack)
+#define _ao_lisp_atom_flush	_atom(flush)
+#define _ao_lisp_atom_eval	_atom(eval)
+#define _ao_lisp_atom_read	_atom(read)
+#define _ao_lisp_atom_eof	_atom(eof)
+#define _ao_lisp_atom_save	_atom(save)
+#define _ao_lisp_atom_restore	_atom(restore)
+#define _ao_lisp_atom_call2fcc	_atom(call/cc)
+#define _ao_lisp_atom_collect	_atom(collect)
+#define _ao_lisp_atom_symbolp   _atom(symbol?)
+#define _ao_lisp_atom_builtin   _atom(builtin?)
+#define _ao_lisp_atom_symbolp   _atom(symbol?)
+#define _ao_lisp_atom_symbolp   _atom(symbol?)
 #else
 #include "ao_lisp_const.h"
 #ifndef AO_LISP_POOL
@@ -108,7 +110,8 @@ extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((a
 #define AO_LISP_FRAME		6
 #define AO_LISP_LAMBDA		7
 #define AO_LISP_STACK		8
-#define AO_LISP_NUM_TYPE	9
+#define AO_LISP_BOOL		9
+#define AO_LISP_NUM_TYPE	10
 
 /* Leave two bits for types to use as they please */
 #define AO_LISP_OTHER_TYPE_MASK	0x3f
@@ -169,6 +172,12 @@ struct ao_lisp_frame {
 	uint8_t			num;
 	ao_poly			prev;
 	struct ao_lisp_val	vals[];
+};
+
+struct ao_lisp_bool {
+	uint8_t			type;
+	uint8_t			value;
+	uint16_t		pad;
 };
 
 /* Set on type when the frame escapes the lambda */
@@ -257,47 +266,8 @@ struct ao_lisp_builtin {
 	uint16_t	func;
 };
 
-enum ao_lisp_builtin_id {
-	builtin_eval,
-	builtin_read,
-	builtin_lambda,
-	builtin_lexpr,
-	builtin_nlambda,
-	builtin_macro,
-	builtin_car,
-	builtin_cdr,
-	builtin_cons,
-	builtin_last,
-	builtin_length,
-	builtin_quote,
-	builtin_set,
-	builtin_setq,
-	builtin_cond,
-	builtin_progn,
-	builtin_while,
-	builtin_print,
-	builtin_patom,
-	builtin_plus,
-	builtin_minus,
-	builtin_times,
-	builtin_divide,
-	builtin_mod,
-	builtin_equal,
-	builtin_less,
-	builtin_greater,
-	builtin_less_equal,
-	builtin_greater_equal,
-	builtin_pack,
-	builtin_unpack,
-	builtin_flush,
-	builtin_delay,
-	builtin_led,
-	builtin_save,
-	builtin_restore,
-	builtin_call_cc,
-	builtin_collect,
-	_builtin_last
-};
+#define AO_LISP_BUILTIN_ID
+#include "ao_lisp_builtin.h"
 
 typedef ao_poly (*ao_lisp_func_t)(struct ao_lisp_cons *cons);
 
@@ -433,6 +403,17 @@ ao_lisp_builtin_poly(struct ao_lisp_builtin *b)
 	return ao_lisp_poly(b, AO_LISP_OTHER);
 }
 
+static inline ao_poly
+ao_lisp_bool_poly(struct ao_lisp_bool *b)
+{
+	return ao_lisp_poly(b, AO_LISP_OTHER);
+}
+
+static inline struct ao_lisp_bool *
+ao_lisp_poly_bool(ao_poly poly)
+{
+	return ao_lisp_ref(poly);
+}
 /* memory functions */
 
 extern int ao_lisp_collects[2];
@@ -494,6 +475,20 @@ static inline struct ao_lisp_stack *
 ao_lisp_stack_fetch(int id) {
 	return ao_lisp_poly_stack(ao_lisp_poly_fetch(id));
 }
+
+/* bool */
+
+extern const struct ao_lisp_type ao_lisp_bool_type;
+
+void
+ao_lisp_bool_print(ao_poly v);
+
+#ifdef AO_LISP_MAKE_CONST
+struct ao_lisp_bool	*ao_lisp_true, *ao_lisp_false;
+
+struct ao_lisp_bool *
+ao_lisp_bool_get(uint8_t value);
+#endif
 
 /* cons */
 extern const struct ao_lisp_type ao_lisp_cons_type;
@@ -666,27 +661,7 @@ void
 ao_lisp_lambda_print(ao_poly lambda);
 
 ao_poly
-ao_lisp_lambda(struct ao_lisp_cons *cons);
-
-ao_poly
-ao_lisp_lexpr(struct ao_lisp_cons *cons);
-
-ao_poly
-ao_lisp_nlambda(struct ao_lisp_cons *cons);
-
-ao_poly
-ao_lisp_macro(struct ao_lisp_cons *cons);
-
-ao_poly
 ao_lisp_lambda_eval(void);
-
-/* save */
-
-ao_poly
-ao_lisp_save(struct ao_lisp_cons *cons);
-
-ao_poly
-ao_lisp_restore(struct ao_lisp_cons *cons);
 
 /* stack */
 
@@ -712,9 +687,6 @@ ao_lisp_stack_print(ao_poly stack);
 ao_poly
 ao_lisp_stack_eval(void);
 
-ao_poly
-ao_lisp_call_cc(struct ao_lisp_cons *cons);
-
 /* error */
 
 void
@@ -725,6 +697,11 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame);
 
 ao_poly
 ao_lisp_error(int error, char *format, ...);
+
+/* builtins */
+
+#define AO_LISP_BUILTIN_DECLS
+#include "ao_lisp_builtin.h"
 
 /* debugging macros */
 

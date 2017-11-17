@@ -1,11 +1,11 @@
 LISP_SRCS=\
-	ao_lisp_make_const.c\
 	ao_lisp_mem.c \
 	ao_lisp_cons.c \
 	ao_lisp_string.c \
 	ao_lisp_atom.c \
 	ao_lisp_int.c \
 	ao_lisp_poly.c \
+	ao_lisp_bool.c \
 	ao_lisp_builtin.c \
 	ao_lisp_read.c \
 	ao_lisp_frame.c \
@@ -19,4 +19,5 @@ LISP_SRCS=\
 LISP_HDRS=\
 	ao_lisp.h \
 	ao_lisp_os.h \
-	ao_lisp_read.h
+	ao_lisp_read.h \
+	ao_lisp_builtin.h

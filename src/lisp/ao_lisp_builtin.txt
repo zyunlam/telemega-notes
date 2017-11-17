@@ -1,0 +1,40 @@
+lambda	eval
+lambda	read
+nlambda	lambda
+nlambda	lexpr
+nlambda	nlambda
+nlambda	macro
+lambda	car
+lambda	cdr
+lambda	cons
+lambda	last
+lambda	length
+nlambda	quote
+lambda	set
+macro	setq
+nlambda	cond
+nlambda	progn
+nlambda	while
+lexpr	print
+lexpr	patom
+lexpr	plus		+
+lexpr	minus		-
+lexpr	times		*
+lexpr	divide		/
+lexpr	mod		%
+lexpr	equal		=
+lexpr	less		<
+lexpr	greater		>
+lexpr	less_equal	<=
+lexpr	greater_equal	>=
+lambda	pack
+lambda	unpack
+lambda	flush
+lambda	delay
+lexpr	led
+lambda	save
+lambda	restore
+lambda	call_cc		call/cc
+lambda	collect
+lambda	nullp		null?
+lambda	not

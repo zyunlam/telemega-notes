@@ -241,7 +241,7 @@ ao_lisp_stack_eval(void)
  * it a single argument which is the current continuation
  */
 ao_poly
-ao_lisp_call_cc(struct ao_lisp_cons *cons)
+ao_lisp_do_call_cc(struct ao_lisp_cons *cons)
 {
 	struct ao_lisp_stack	*new;
 	ao_poly			v;

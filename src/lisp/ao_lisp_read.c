@@ -51,18 +51,18 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE|WHITE,	/*    */
  	PRINTABLE,		/* ! */
  	PRINTABLE|STRINGC,	/* " */
- 	PRINTABLE|COMMENT,	/* # */
+ 	PRINTABLE|POUND,	/* # */
  	PRINTABLE,		/* $ */
  	PRINTABLE,		/* % */
  	PRINTABLE,		/* & */
- 	PRINTABLE|QUOTEC,	/* ' */
- 	PRINTABLE|BRA,		/* ( */
- 	PRINTABLE|KET,		/* ) */
+ 	PRINTABLE|SPECIAL,	/* ' */
+ 	PRINTABLE|SPECIAL,	/* ( */
+ 	PRINTABLE|SPECIAL,	/* ) */
  	PRINTABLE,		/* * */
  	PRINTABLE|SIGN,		/* + */
  	PRINTABLE,		/* , */
  	PRINTABLE|SIGN,		/* - */
- 	PRINTABLE|DOTC,		/* . */
+ 	PRINTABLE|SPECIAL,	/* . */
  	PRINTABLE,		/* / */
  	PRINTABLE|DIGIT,	/* 0 */
  	PRINTABLE|DIGIT,	/* 1 */
@@ -283,26 +283,37 @@ _lex(void)
 			continue;
 		}
 
-		if (lex_class & (BRA|KET|QUOTEC)) {
+		if (lex_class & SPECIAL) {
 			add_token(c);
 			end_token();
 			switch (c) {
 			case '(':
+			case '[':
 				return OPEN;
 			case ')':
+			case ']':
 				return CLOSE;
 			case '\'':
 				return QUOTE;
+			case '.':
+				return DOT;
 			}
-		}
-		if (lex_class & (DOTC)) {
-			add_token(c);
-			end_token();
-			return DOT;
 		}
 		if (lex_class & TWIDDLE) {
 			token_int = lexc();
 			return NUM;
+		}
+		if (lex_class & POUND) {
+			for (;;) {
+				c = lexc();
+				add_token(c);
+				switch (c) {
+				case 't':
+					return BOOL;
+				case 'f':
+					return BOOL;
+				}
+			}
 		}
 		if (lex_class & STRINGC) {
 			for (;;) {
@@ -456,6 +467,12 @@ ao_lisp_read(void)
 			break;
 		case NUM:
 			v = ao_lisp_int_poly(token_int);
+			break;
+		case BOOL:
+			if (token_string[0] == 't')
+				v = _ao_lisp_bool_true;
+			else
+				v = _ao_lisp_bool_false;
 			break;
 		case STRING:
 			string = ao_lisp_string_copy(token_string);

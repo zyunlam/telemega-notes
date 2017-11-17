@@ -98,25 +98,25 @@ ao_lisp_lambda_alloc(struct ao_lisp_cons *code, int args)
 }
 
 ao_poly
-ao_lisp_lambda(struct ao_lisp_cons *cons)
+ao_lisp_do_lambda(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_lambda_alloc(cons, AO_LISP_FUNC_LAMBDA);
 }
 
 ao_poly
-ao_lisp_lexpr(struct ao_lisp_cons *cons)
+ao_lisp_do_lexpr(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_lambda_alloc(cons, AO_LISP_FUNC_LEXPR);
 }
 
 ao_poly
-ao_lisp_nlambda(struct ao_lisp_cons *cons)
+ao_lisp_do_nlambda(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_lambda_alloc(cons, AO_LISP_FUNC_NLAMBDA);
 }
 
 ao_poly
-ao_lisp_macro(struct ao_lisp_cons *cons)
+ao_lisp_do_macro(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_lambda_alloc(cons, AO_LISP_FUNC_MACRO);
 }

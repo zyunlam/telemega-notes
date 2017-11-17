@@ -34,46 +34,8 @@ struct builtin_func {
 	int	func;
 };
 
-struct builtin_func funcs[] = {
-	{ .name = "eval",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_eval },
-	{ .name = "read",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_read },
-	{ .name = "lambda",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_lambda },
-	{ .name = "lexpr",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_lexpr },
-	{ .name = "nlambda",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_nlambda },
-	{ .name = "macro",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_macro },
-	{ .name = "car",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_car },
-	{ .name = "cdr",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_cdr },
-	{ .name = "cons",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_cons },
-	{ .name = "last",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_last },
-	{ .name = "length",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_length },
-	{ .name = "quote",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_quote },
-	{ .name = "set",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_set },
-	{ .name = "setq",	.args = AO_LISP_FUNC_MACRO,	.func = builtin_setq },
-	{ .name = "cond",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_cond },
-	{ .name = "progn",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_progn },
-	{ .name = "while",	.args = AO_LISP_FUNC_NLAMBDA,	.func = builtin_while },
-	{ .name = "print",	.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_print },
-	{ .name = "patom",	.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_patom },
-	{ .name = "+",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_plus },
-	{ .name = "-",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_minus },
-	{ .name = "*",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_times },
-	{ .name = "/",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_divide },
-	{ .name = "%",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_mod },
-	{ .name = "=",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_equal },
-	{ .name = "<",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_less },
-	{ .name = ">",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_greater },
-	{ .name = "<=",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_less_equal },
-	{ .name = ">=",		.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_greater_equal },
-	{ .name = "pack",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_pack },
-	{ .name = "unpack",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_unpack },
-	{ .name = "flush",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_flush },
-	{ .name = "delay",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_delay },
-	{ .name = "led",	.args = AO_LISP_FUNC_F_LEXPR,	.func = builtin_led },
-	{ .name = "save",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_save },
-	{ .name = "restore",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_restore },
-	{ .name = "call/cc",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_call_cc },
-	{ .name = "collect",	.args = AO_LISP_FUNC_F_LAMBDA,	.func = builtin_collect },
-};
+#define AO_LISP_BUILTIN_CONSTS
+#include "ao_lisp_builtin.h"
 
 #define N_FUNC (sizeof funcs / sizeof funcs[0])
 
@@ -326,19 +288,16 @@ main(int argc, char **argv)
 		}
 	}
 
+	/* Boolean values #f and #t */
+	ao_lisp_bool_get(0);
+	ao_lisp_bool_get(1);
+
 	for (f = 0; f < (int) N_FUNC; f++) {
 		b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
 		a = ao_lisp_atom_intern(funcs[f].name);
 		ao_lisp_atom_set(ao_lisp_atom_poly(a),
 				 ao_lisp_builtin_poly(b));
 	}
-
-	/* boolean constants */
-	ao_lisp_atom_set(ao_lisp_atom_poly(ao_lisp_atom_intern("nil")),
-			 AO_LISP_NIL);
-	a = ao_lisp_atom_intern("t");
-	ao_lisp_atom_set(ao_lisp_atom_poly(a),
-			 ao_lisp_atom_poly(a));
 
 	/* end of file value */
 	a = ao_lisp_atom_intern("eof");
@@ -387,6 +346,8 @@ main(int argc, char **argv)
 	fprintf(out, "#define ao_builtin_frame 0x%04x\n", ao_lisp_frame_poly(ao_lisp_frame_global));
 	fprintf(out, "#define ao_lisp_const_checksum ((uint16_t) 0x%04x)\n", ao_fec_crc(ao_lisp_const, ao_lisp_top));
 
+	fprintf(out, "#define _ao_lisp_bool_false 0x%04x\n", ao_lisp_bool_poly(ao_lisp_false));
+	fprintf(out, "#define _ao_lisp_bool_true 0x%04x\n", ao_lisp_bool_poly(ao_lisp_true));
 
 	for (a = ao_lisp_atoms; a; a = ao_lisp_poly_atom(a->next)) {
 		char	*n = a->name, c;

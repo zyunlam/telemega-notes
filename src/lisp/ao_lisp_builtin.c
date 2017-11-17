@@ -40,61 +40,26 @@ const struct ao_lisp_type ao_lisp_builtin_type = {
 };
 
 #ifdef AO_LISP_MAKE_CONST
-char *ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {
-	(void) b;
-	return "???";
-}
+
+#define AO_LISP_BUILTIN_CASENAME
+#include "ao_lisp_builtin.h"
+
+#define _atomn(n)	ao_lisp_poly_atom(_atom(n))
+
 char *ao_lisp_args_name(uint8_t args) {
-	(void) args;
-	return "???";
+	args &= AO_LISP_FUNC_MASK;
+	switch (args) {
+	case AO_LISP_FUNC_LAMBDA: return _atomn(lambda)->name;
+	case AO_LISP_FUNC_LEXPR: return _atomn(lexpr)->name;
+	case AO_LISP_FUNC_NLAMBDA: return _atomn(nlambda)->name;
+	case AO_LISP_FUNC_MACRO: return _atomn(macro)->name;
+	default: return "???";
+	}
 }
 #else
-static const ao_poly builtin_names[] = {
-	[builtin_eval] = _ao_lisp_atom_eval,
-	[builtin_read] = _ao_lisp_atom_read,
-	[builtin_lambda] = _ao_lisp_atom_lambda,
-	[builtin_lexpr] = _ao_lisp_atom_lexpr,
-	[builtin_nlambda] = _ao_lisp_atom_nlambda,
-	[builtin_macro] = _ao_lisp_atom_macro,
-	[builtin_car] = _ao_lisp_atom_car,
-	[builtin_cdr] = _ao_lisp_atom_cdr,
-	[builtin_cons] = _ao_lisp_atom_cons,
-	[builtin_last] = _ao_lisp_atom_last,
-	[builtin_length] = _ao_lisp_atom_length,
-	[builtin_quote] = _ao_lisp_atom_quote,
-	[builtin_set] = _ao_lisp_atom_set,
-	[builtin_setq] = _ao_lisp_atom_setq,
-	[builtin_cond] = _ao_lisp_atom_cond,
-	[builtin_progn] = _ao_lisp_atom_progn,
-	[builtin_while] = _ao_lisp_atom_while,
-	[builtin_print] = _ao_lisp_atom_print,
-	[builtin_patom] = _ao_lisp_atom_patom,
-	[builtin_plus] = _ao_lisp_atom_2b,
-	[builtin_minus] = _ao_lisp_atom_2d,
-	[builtin_times] = _ao_lisp_atom_2a,
-	[builtin_divide] = _ao_lisp_atom_2f,
-	[builtin_mod] = _ao_lisp_atom_25,
-	[builtin_equal] = _ao_lisp_atom_3d,
-	[builtin_less] = _ao_lisp_atom_3c,
-	[builtin_greater] = _ao_lisp_atom_3e,
-	[builtin_less_equal] = _ao_lisp_atom_3c3d,
-	[builtin_greater_equal] = _ao_lisp_atom_3e3d,
-	[builtin_pack] = _ao_lisp_atom_pack,
-	[builtin_unpack] = _ao_lisp_atom_unpack,
-	[builtin_flush] = _ao_lisp_atom_flush,
-	[builtin_delay] = _ao_lisp_atom_delay,
-	[builtin_led] = _ao_lisp_atom_led,
-	[builtin_save] = _ao_lisp_atom_save,
-	[builtin_restore] = _ao_lisp_atom_restore,
-	[builtin_call_cc] = _ao_lisp_atom_call2fcc,
-	[builtin_collect] = _ao_lisp_atom_collect,
-#if 0
-	[builtin_symbolp] = _ao_lisp_atom_symbolp,
-	[builtin_listp] = _ao_lisp_atom_listp,
-	[builtin_stringp] = _ao_lisp_atom_stringp,
-	[builtin_numberp] = _ao_lisp_atom_numberp,
-#endif
-};
+
+#define AO_LISP_BUILTIN_ARRAYNAME
+#include "ao_lisp_builtin.h"
 
 static char *
 ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {
@@ -138,7 +103,7 @@ ao_lisp_check_argc(ao_poly name, struct ao_lisp_cons *cons, int min, int max)
 	}
 	if (argc < min || argc > max)
 		return ao_lisp_error(AO_LISP_INVALID, "%s: invalid arg count", ao_lisp_poly_atom(name)->name);
-	return _ao_lisp_atom_t;
+	return _ao_lisp_bool_true;
 }
 
 ao_poly
@@ -161,11 +126,11 @@ ao_lisp_check_argt(ao_poly name, struct ao_lisp_cons *cons, int argc, int type, 
 
 	if ((!car && !nil_ok) || ao_lisp_poly_type(car) != type)
 		return ao_lisp_error(AO_LISP_INVALID, "%s: invalid type for arg %d", ao_lisp_poly_atom(name)->name, argc);
-	return _ao_lisp_atom_t;
+	return _ao_lisp_bool_true;
 }
 
 ao_poly
-ao_lisp_car(struct ao_lisp_cons *cons)
+ao_lisp_do_car(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_car, cons, 1, 1))
 		return AO_LISP_NIL;
@@ -175,7 +140,7 @@ ao_lisp_car(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_cdr(struct ao_lisp_cons *cons)
+ao_lisp_do_cdr(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_cdr, cons, 1, 1))
 		return AO_LISP_NIL;
@@ -185,7 +150,7 @@ ao_lisp_cdr(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_cons(struct ao_lisp_cons *cons)
+ao_lisp_do_cons(struct ao_lisp_cons *cons)
 {
 	ao_poly	car, cdr;
 	if(!ao_lisp_check_argc(_ao_lisp_atom_cons, cons, 2, 2))
@@ -196,7 +161,7 @@ ao_lisp_cons(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_last(struct ao_lisp_cons *cons)
+ao_lisp_do_last(struct ao_lisp_cons *cons)
 {
 	ao_poly	l;
 	if (!ao_lisp_check_argc(_ao_lisp_atom_last, cons, 1, 1))
@@ -214,7 +179,7 @@ ao_lisp_last(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_length(struct ao_lisp_cons *cons)
+ao_lisp_do_length(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_length, cons, 1, 1))
 		return AO_LISP_NIL;
@@ -224,7 +189,7 @@ ao_lisp_length(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_quote(struct ao_lisp_cons *cons)
+ao_lisp_do_quote(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_quote, cons, 1, 1))
 		return AO_LISP_NIL;
@@ -232,7 +197,7 @@ ao_lisp_quote(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_set(struct ao_lisp_cons *cons)
+ao_lisp_do_set(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_set, cons, 2, 2))
 		return AO_LISP_NIL;
@@ -243,7 +208,7 @@ ao_lisp_set(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_setq(struct ao_lisp_cons *cons)
+ao_lisp_do_setq(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_setq, cons, 2, 2))
 		return AO_LISP_NIL;
@@ -254,14 +219,14 @@ ao_lisp_setq(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_cond(struct ao_lisp_cons *cons)
+ao_lisp_do_cond(struct ao_lisp_cons *cons)
 {
 	ao_lisp_set_cond(cons);
 	return AO_LISP_NIL;
 }
 
 ao_poly
-ao_lisp_progn(struct ao_lisp_cons *cons)
+ao_lisp_do_progn(struct ao_lisp_cons *cons)
 {
 	ao_lisp_stack->state = eval_progn;
 	ao_lisp_stack->sexprs = ao_lisp_cons_poly(cons);
@@ -269,7 +234,7 @@ ao_lisp_progn(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_while(struct ao_lisp_cons *cons)
+ao_lisp_do_while(struct ao_lisp_cons *cons)
 {
 	ao_lisp_stack->state = eval_while;
 	ao_lisp_stack->sexprs = ao_lisp_cons_poly(cons);
@@ -277,7 +242,7 @@ ao_lisp_while(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_print(struct ao_lisp_cons *cons)
+ao_lisp_do_print(struct ao_lisp_cons *cons)
 {
 	ao_poly	val = AO_LISP_NIL;
 	while (cons) {
@@ -292,7 +257,7 @@ ao_lisp_print(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_patom(struct ao_lisp_cons *cons)
+ao_lisp_do_patom(struct ao_lisp_cons *cons)
 {
 	ao_poly	val = AO_LISP_NIL;
 	while (cons) {
@@ -358,31 +323,31 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 }
 
 ao_poly
-ao_lisp_plus(struct ao_lisp_cons *cons)
+ao_lisp_do_plus(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_math(cons, builtin_plus);
 }
 
 ao_poly
-ao_lisp_minus(struct ao_lisp_cons *cons)
+ao_lisp_do_minus(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_math(cons, builtin_minus);
 }
 
 ao_poly
-ao_lisp_times(struct ao_lisp_cons *cons)
+ao_lisp_do_times(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_math(cons, builtin_times);
 }
 
 ao_poly
-ao_lisp_divide(struct ao_lisp_cons *cons)
+ao_lisp_do_divide(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_math(cons, builtin_divide);
 }
 
 ao_poly
-ao_lisp_mod(struct ao_lisp_cons *cons)
+ao_lisp_do_mod(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_math(cons, builtin_mod);
 }
@@ -393,7 +358,7 @@ ao_lisp_compare(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 	ao_poly	left;
 
 	if (!cons)
-		return _ao_lisp_atom_t;
+		return _ao_lisp_bool_true;
 
 	left = cons->car;
 	cons = ao_lisp_poly_cons(cons->cdr);
@@ -402,7 +367,7 @@ ao_lisp_compare(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 
 		if (op == builtin_equal) {
 			if (left != right)
-				return AO_LISP_NIL;
+				return _ao_lisp_bool_false;
 		} else {
 			uint8_t	lt = ao_lisp_poly_type(left);
 			uint8_t	rt = ao_lisp_poly_type(right);
@@ -413,19 +378,19 @@ ao_lisp_compare(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 				switch (op) {
 				case builtin_less:
 					if (!(l < r))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				case builtin_greater:
 					if (!(l > r))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				case builtin_less_equal:
 					if (!(l <= r))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				case builtin_greater_equal:
 					if (!(l >= r))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				default:
 					break;
@@ -436,19 +401,19 @@ ao_lisp_compare(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 				switch (op) {
 				case builtin_less:
 					if (!(c < 0))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				case builtin_greater:
 					if (!(c > 0))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				case builtin_less_equal:
 					if (!(c <= 0))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				case builtin_greater_equal:
 					if (!(c >= 0))
-						return AO_LISP_NIL;
+						return _ao_lisp_bool_false;
 					break;
 				default:
 					break;
@@ -458,41 +423,41 @@ ao_lisp_compare(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 		left = right;
 		cons = ao_lisp_poly_cons(cons->cdr);
 	}
-	return _ao_lisp_atom_t;
+	return _ao_lisp_bool_true;
 }
 
 ao_poly
-ao_lisp_equal(struct ao_lisp_cons *cons)
+ao_lisp_do_equal(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_compare(cons, builtin_equal);
 }
 
 ao_poly
-ao_lisp_less(struct ao_lisp_cons *cons)
+ao_lisp_do_less(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_compare(cons, builtin_less);
 }
 
 ao_poly
-ao_lisp_greater(struct ao_lisp_cons *cons)
+ao_lisp_do_greater(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_compare(cons, builtin_greater);
 }
 
 ao_poly
-ao_lisp_less_equal(struct ao_lisp_cons *cons)
+ao_lisp_do_less_equal(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_compare(cons, builtin_less_equal);
 }
 
 ao_poly
-ao_lisp_greater_equal(struct ao_lisp_cons *cons)
+ao_lisp_do_greater_equal(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_compare(cons, builtin_greater_equal);
 }
 
 ao_poly
-ao_lisp_pack(struct ao_lisp_cons *cons)
+ao_lisp_do_pack(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_pack, cons, 1, 1))
 		return AO_LISP_NIL;
@@ -502,7 +467,7 @@ ao_lisp_pack(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_unpack(struct ao_lisp_cons *cons)
+ao_lisp_do_unpack(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_unpack, cons, 1, 1))
 		return AO_LISP_NIL;
@@ -512,16 +477,16 @@ ao_lisp_unpack(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_flush(struct ao_lisp_cons *cons)
+ao_lisp_do_flush(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_flush, cons, 0, 0))
 		return AO_LISP_NIL;
 	ao_lisp_os_flush();
-	return _ao_lisp_atom_t;
+	return _ao_lisp_bool_true;
 }
 
 ao_poly
-ao_lisp_led(struct ao_lisp_cons *cons)
+ao_lisp_do_led(struct ao_lisp_cons *cons)
 {
 	ao_poly led;
 	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
@@ -534,7 +499,7 @@ ao_lisp_led(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_delay(struct ao_lisp_cons *cons)
+ao_lisp_do_delay(struct ao_lisp_cons *cons)
 {
 	ao_poly delay;
 	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
@@ -572,44 +537,27 @@ ao_lisp_do_collect(struct ao_lisp_cons *cons)
 	return ao_lisp_int_poly(free);
 }
 
-const ao_lisp_func_t ao_lisp_builtins[] = {
-	[builtin_eval] = ao_lisp_do_eval,
-	[builtin_read] = ao_lisp_do_read,
-	[builtin_lambda] = ao_lisp_lambda,
-	[builtin_lexpr] = ao_lisp_lexpr,
-	[builtin_nlambda] = ao_lisp_nlambda,
-	[builtin_macro] = ao_lisp_macro,
-	[builtin_car] = ao_lisp_car,
-	[builtin_cdr] = ao_lisp_cdr,
-	[builtin_cons] = ao_lisp_cons,
-	[builtin_last] = ao_lisp_last,
-	[builtin_length] = ao_lisp_length,
-	[builtin_quote] = ao_lisp_quote,
-	[builtin_set] = ao_lisp_set,
-	[builtin_setq] = ao_lisp_setq,
-	[builtin_cond] = ao_lisp_cond,
-	[builtin_progn] = ao_lisp_progn,
-	[builtin_while] = ao_lisp_while,
-	[builtin_print] = ao_lisp_print,
-	[builtin_patom] = ao_lisp_patom,
-	[builtin_plus] = ao_lisp_plus,
-	[builtin_minus] = ao_lisp_minus,
-	[builtin_times] = ao_lisp_times,
-	[builtin_divide] = ao_lisp_divide,
-	[builtin_mod] = ao_lisp_mod,
-	[builtin_equal] = ao_lisp_equal,
-	[builtin_less] = ao_lisp_less,
-	[builtin_greater] = ao_lisp_greater,
-	[builtin_less_equal] = ao_lisp_less_equal,
-	[builtin_greater_equal] = ao_lisp_greater_equal,
-	[builtin_pack] = ao_lisp_pack,
-	[builtin_unpack] = ao_lisp_unpack,
-	[builtin_flush] = ao_lisp_flush,
-	[builtin_led] = ao_lisp_led,
-	[builtin_delay] = ao_lisp_delay,
-	[builtin_save] = ao_lisp_save,
-	[builtin_restore] = ao_lisp_restore,
-	[builtin_call_cc] = ao_lisp_call_cc,
-	[builtin_collect] = ao_lisp_do_collect,
-};
+ao_poly
+ao_lisp_do_nullp(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (ao_lisp_arg(cons, 0) == AO_LISP_NIL)
+		return _ao_lisp_bool_true;
+	else
+		return _ao_lisp_bool_false;
+}
 
+ao_poly
+ao_lisp_do_not(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (ao_lisp_arg(cons, 0) == _ao_lisp_bool_false)
+		return _ao_lisp_bool_true;
+	else
+		return _ao_lisp_bool_false;
+}
+
+#define AO_LISP_BUILTIN_FUNCS
+#include "ao_lisp_builtin.h"
