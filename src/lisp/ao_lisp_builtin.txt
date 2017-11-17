@@ -29,8 +29,8 @@ lexpr	less		<
 lexpr	greater		>
 lexpr	less_equal	<=
 lexpr	greater_equal	>=
-lambda	pack
-lambda	unpack
+lambda	list_to_string		list->string
+lambda	string_to_list		string->list
 lambda	flush
 lambda	delay
 lexpr	led
@@ -46,3 +46,7 @@ lambda	numberp		number?	integer?
 lambda	booleanp	boolean?
 lambda	set_car		set-car!
 lambda	set_cdr		set-cdr!
+lambda	symbolp		symbol?
+lambda	symbol_to_string	symbol->string
+lambda	string_to_symbol	string->symbol
+lambda	stringp		string?

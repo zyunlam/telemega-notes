@@ -211,7 +211,7 @@ ao_poly
 ao_lisp_do_setq(struct ao_lisp_cons *cons)
 {
 	ao_poly	name;
-	if (!ao_lisp_check_argc(_ao_lisp_atom_setq, cons, 2, 2))
+	if (!ao_lisp_check_argc(_ao_lisp_atom_set21, cons, 2, 2))
 		return AO_LISP_NIL;
 	name = cons->car;
 	if (ao_lisp_poly_type(name) != AO_LISP_ATOM)
@@ -510,21 +510,21 @@ ao_lisp_do_greater_equal(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_do_pack(struct ao_lisp_cons *cons)
+ao_lisp_do_list_to_string(struct ao_lisp_cons *cons)
 {
-	if (!ao_lisp_check_argc(_ao_lisp_atom_pack, cons, 1, 1))
+	if (!ao_lisp_check_argc(_ao_lisp_atom_list2d3estring, cons, 1, 1))
 		return AO_LISP_NIL;
-	if (!ao_lisp_check_argt(_ao_lisp_atom_pack, cons, 0, AO_LISP_CONS, 1))
+	if (!ao_lisp_check_argt(_ao_lisp_atom_list2d3estring, cons, 0, AO_LISP_CONS, 1))
 		return AO_LISP_NIL;
 	return ao_lisp_string_pack(ao_lisp_poly_cons(ao_lisp_arg(cons, 0)));
 }
 
 ao_poly
-ao_lisp_do_unpack(struct ao_lisp_cons *cons)
+ao_lisp_do_string_to_list(struct ao_lisp_cons *cons)
 {
-	if (!ao_lisp_check_argc(_ao_lisp_atom_unpack, cons, 1, 1))
+	if (!ao_lisp_check_argc(_ao_lisp_atom_string2d3elist, cons, 1, 1))
 		return AO_LISP_NIL;
-	if (!ao_lisp_check_argt(_ao_lisp_atom_unpack, cons, 0, AO_LISP_STRING, 0))
+	if (!ao_lisp_check_argt(_ao_lisp_atom_string2d3elist, cons, 0, AO_LISP_STRING, 0))
 		return AO_LISP_NIL;
 	return ao_lisp_string_unpack(ao_lisp_poly_string(ao_lisp_arg(cons, 0)));
 }
@@ -612,6 +612,49 @@ ao_lisp_do_not(struct ao_lisp_cons *cons)
 		return _ao_lisp_bool_false;
 }
 
+static ao_poly
+ao_lisp_do_typep(int type, struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (ao_lisp_poly_type(ao_lisp_arg(cons, 0)) == type)
+		return _ao_lisp_bool_true;
+	return _ao_lisp_bool_false;
+}
+
+ao_poly
+ao_lisp_do_pairp(struct ao_lisp_cons *cons)
+{
+	return ao_lisp_do_typep(AO_LISP_CONS, cons);
+}
+
+ao_poly
+ao_lisp_do_numberp(struct ao_lisp_cons *cons)
+{
+	return ao_lisp_do_typep(AO_LISP_INT, cons);
+}
+
+ao_poly
+ao_lisp_do_stringp(struct ao_lisp_cons *cons)
+{
+	return ao_lisp_do_typep(AO_LISP_STRING, cons);
+}
+
+ao_poly
+ao_lisp_do_symbolp(struct ao_lisp_cons *cons)
+{
+	return ao_lisp_do_typep(AO_LISP_ATOM, cons);
+}
+
+ao_poly
+ao_lisp_do_booleanp(struct ao_lisp_cons *cons)
+{
+	return ao_lisp_do_typep(AO_LISP_BOOL, cons);
+}
+
+/* This one is special -- a list is either nil or
+ * a 'proper' list with only cons cells
+ */
 ao_poly
 ao_lisp_do_listp(struct ao_lisp_cons *cons)
 {
@@ -626,38 +669,6 @@ ao_lisp_do_listp(struct ao_lisp_cons *cons)
 			return _ao_lisp_bool_false;
 		v = ao_lisp_poly_cons(v)->cdr;
 	}
-}
-
-ao_poly
-ao_lisp_do_pairp(struct ao_lisp_cons *cons)
-{
-	ao_poly	v;
-	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
-		return AO_LISP_NIL;
-	v = ao_lisp_arg(cons, 0);
-	if (ao_lisp_poly_type(v) == AO_LISP_CONS)
-		return _ao_lisp_bool_true;
-	return _ao_lisp_bool_false;
-}
-
-ao_poly
-ao_lisp_do_numberp(struct ao_lisp_cons *cons)
-{
-	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
-		return AO_LISP_NIL;
-	if (AO_LISP_IS_INT(ao_lisp_arg(cons, 0)))
-		return _ao_lisp_bool_true;
-	return _ao_lisp_bool_false;
-}
-
-ao_poly
-ao_lisp_do_booleanp(struct ao_lisp_cons *cons)
-{
-	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
-		return AO_LISP_NIL;
-	if (ao_lisp_poly_type(ao_lisp_arg(cons, 0)) == AO_LISP_BOOL)
-		return _ao_lisp_bool_true;
-	return _ao_lisp_bool_false;
 }
 
 ao_poly
@@ -678,6 +689,27 @@ ao_lisp_do_set_cdr(struct ao_lisp_cons *cons)
 	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_CONS, 0))
 		return AO_LISP_NIL;
 	return ao_lisp_poly_cons(ao_lisp_arg(cons, 0))->cdr = ao_lisp_arg(cons, 1);
+}
+
+ao_poly
+ao_lisp_do_symbol_to_string(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_ATOM, 0))
+		return AO_LISP_NIL;
+	return ao_lisp_string_poly(ao_lisp_string_copy(ao_lisp_poly_atom(ao_lisp_arg(cons, 0))->name));
+}
+
+ao_poly
+ao_lisp_do_string_to_symbol(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_STRING, 0))
+		return AO_LISP_NIL;
+
+	return ao_lisp_atom_poly(ao_lisp_atom_intern(ao_lisp_poly_string(ao_lisp_arg(cons, 0))));
 }
 
 #define AO_LISP_BUILTIN_FUNCS

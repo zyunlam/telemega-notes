@@ -44,11 +44,10 @@
 # define IGNORE		0x0100	/* \0 - ' ' */
 # define BACKSLASH	0x0200	/* \ */
 # define VBAR		0x0400	/* | */
-# define TWIDDLE	0x0800	/* ~ */
-# define STRINGC	0x1000	/* " */
-# define POUND		0x2000	/* # */
+# define STRINGC	0x0800	/* " */
+# define POUND		0x1000	/* # */
 
-# define NOTNAME	(STRINGC|TWIDDLE|VBAR|COMMENT|ENDOFFILE|WHITE|SPECIAL)
+# define NOTNAME	(STRINGC|VBAR|COMMENT|ENDOFFILE|WHITE|SPECIAL)
 # define NUMBER		(DIGIT|SIGN)
 
 #endif /* _AO_LISP_READ_H_ */

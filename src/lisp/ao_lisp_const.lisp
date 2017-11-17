@@ -54,6 +54,8 @@
 					; basic list accessors
 
 
+(defun caar (l) (car (car l)))
+
 (defun cadr (l) (car (cdr l)))
 
 (defun caddr (l) (car (cdr (cdr l))))
@@ -336,6 +338,12 @@
       (list-tail (cdr x) (- k 1)))))
 
 (list-tail '(1 2 3) 2)
+
+(defun list-ref (x k) (car (list-tail x k)))
+
+(list-ref '(1 2 3) 2)
+
+    
 					; recursive equality
 
 (defun equal? (a b)
@@ -350,6 +358,108 @@
 
 (equal? '(a b c) '(a b c))
 (equal? '(a b c) '(a b b))
+
+(defun _member (obj list test?)
+  (if (null? list)
+      #f
+    (if (test? obj (car list))
+	list
+      (memq obj (cdr list)))))
+
+(defun memq (obj list) (_member obj list eq?))
+
+(memq 2 '(1 2 3))
+
+(memq 4 '(1 2 3))
+
+(defun memv (obj list) (_member obj list eqv?))
+
+(memv 2 '(1 2 3))
+
+(memv 4 '(1 2 3))
+
+(defun member (obj list) (_member obj list equal?))
+
+(member '(2) '((1) (2) (3)))
+
+(member '(4) '((1) (2) (3)))
+
+(defun _assoc (obj list test?)
+  (if (null? list)
+      #f
+    (if (test? obj (caar list))
+	(car list)
+      (_assoc obj (cdr list) test?)
+      )
+    )
+  )
+
+(defun assq (obj list) (_assoc obj list eq?))
+(defun assv (obj list) (_assoc obj list eqv?))
+(defun assoc (obj list) (_assoc obj list equal?))
+
+(assq 'a '((a 1) (b 2) (c 3)))
+(assv 'b '((a 1) (b 2) (c 3)))
+(assoc '(c) '((a 1) (b 2) ((c) 3)))
+
+(define char? integer?)
+
+(char? #\q)
+(char? "h")
+
+(defun char-upper-case? (c) (<= #\A c #\Z))
+
+(char-upper-case? #\a)
+(char-upper-case? #\B)
+(char-upper-case? #\0)
+(char-upper-case? #\space)
+
+(defun char-lower-case? (c) (<= #\a c #\a))
+
+(char-lower-case? #\a)
+(char-lower-case? #\B)
+(char-lower-case? #\0)
+(char-lower-case? #\space)
+
+(defun char-alphabetic? (c) (or (char-upper-case? c) (char-lower-case? c)))
+
+(char-alphabetic? #\a)
+(char-alphabetic? #\B)
+(char-alphabetic? #\0)
+(char-alphabetic? #\space)
+
+(defun char-numeric? (c) (<= #\0 c #\9))
+
+(char-numeric? #\a)
+(char-numeric? #\B)
+(char-numeric? #\0)
+(char-numeric? #\space)
+
+(defun char-whitespace? (c) (or (<= #\tab c #\return) (= #\space c)))
+
+(char-whitespace? #\a)
+(char-whitespace? #\B)
+(char-whitespace? #\0)
+(char-whitespace? #\space)
+
+(defun char->integer (c) c)
+(defun integer->char (c) char-integer)
+
+(defun char-upcase (c) (if (char-lower-case? c) (+ c (- #\A #\a)) c))
+
+(char-upcase #\a)
+(char-upcase #\B)
+(char-upcase #\0)
+(char-upcase #\space)
+
+(defun char-downcase (c) (if (char-upper-case? c) (+ c (- #\a #\A)) c))
+
+(char-downcase #\a)
+(char-downcase #\B)
+(char-downcase #\0)
+(char-downcase #\space)
+
+(define string (lexpr (chars) (list->string chars)))
 
 ;(define number->string (lexpr (arg opt)
 ;			      (let ((base (if (null? opt) 10 (car opt)))

@@ -142,7 +142,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  { */
 	PRINTABLE|VBAR,		/*  | */
 	PRINTABLE,		/*  } */
-	PRINTABLE|TWIDDLE,	/*  ~ */
+	PRINTABLE,		/*  ~ */
 	IGNORE,			/*  ^? */
 };
 
@@ -168,16 +168,38 @@ lex_unget(int c)
 		lex_unget_c = c;
 }
 
+static uint16_t	lex_class;
+
 static int
-lex_quoted (void)
+lexc(void)
+{
+	int	c;
+	do {
+		c = lex_get();
+		if (c == EOF) {
+			c = 0;
+			lex_class = ENDOFFILE;
+		} else {
+			c &= 0x7f;
+			lex_class = lex_classes[c];
+		}
+	} while (lex_class & IGNORE);
+	return c;
+}
+
+static int
+lex_quoted(void)
 {
 	int	c;
 	int	v;
 	int	count;
 
 	c = lex_get();
-	if (c == EOF)
-		return EOF;
+	if (c == EOF) {
+		lex_class = ENDOFFILE;
+		return 0;
+	}
+	lex_class = 0;
 	c &= 0x7f;
  	switch (c) {
 	case 'n':
@@ -218,32 +240,6 @@ lex_quoted (void)
 	default:
 		return c;
 	}
-}
-
-static uint16_t	lex_class;
-
-static int
-lexc(void)
-{
-	int	c;
-	do {
-		c = lex_get();
-		if (c == EOF) {
-			lex_class = ENDOFFILE;
-			c = 0;
-		} else {
-			c &= 0x7f;
-			lex_class = lex_classes[c];
-			if (lex_class & BACKSLASH) {
-				c = lex_quoted();
-				if (c == EOF)
-					lex_class = ENDOFFILE;
-				else
-					lex_class = PRINTABLE;
-			}
-		}
-	} while (lex_class & IGNORE);
-	return c;
 }
 
 #define AO_LISP_TOKEN_MAX	32
@@ -299,25 +295,60 @@ _lex(void)
 				return DOT;
 			}
 		}
-		if (lex_class & TWIDDLE) {
-			token_int = lexc();
-			return NUM;
-		}
 		if (lex_class & POUND) {
-			for (;;) {
-				c = lexc();
+			c = lexc();
+			switch (c) {
+			case 't':
 				add_token(c);
-				switch (c) {
-				case 't':
-					return BOOL;
-				case 'f':
-					return BOOL;
+				end_token();
+				return BOOL;
+			case 'f':
+				add_token(c);
+				end_token();
+				return BOOL;
+			case '\\':
+				for (;;) {
+					int alphabetic;
+					c = lexc();
+					alphabetic = (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'));
+					if (token_len == 0) {
+						add_token(c);
+						if (!alphabetic)
+							break;
+					} else {
+						if (alphabetic)
+							add_token(c);
+						else {
+							lex_unget(c);
+							break;
+						}
+					}
 				}
+				end_token();
+				if (token_len == 1)
+					token_int = token_string[0];
+				else if (!strcmp(token_string, "space"))
+					token_int = ' ';
+				else if (!strcmp(token_string, "newline"))
+					token_int = '\n';
+				else if (!strcmp(token_string, "tab"))
+					token_int = '\t';
+				else if (!strcmp(token_string, "return"))
+					token_int = '\r';
+				else if (!strcmp(token_string, "formfeed"))
+					token_int = '\f';
+				else {
+					ao_lisp_error(AO_LISP_INVALID, "invalid character token #\\%s", token_string);
+					continue;
+				}
+				return NUM;
 			}
 		}
 		if (lex_class & STRINGC) {
 			for (;;) {
 				c = lexc();
+				if (lex_class & BACKSLASH)
+					c = lex_quoted();
 				if (lex_class & (STRINGC|ENDOFFILE)) {
 					end_token();
 					return STRING;
