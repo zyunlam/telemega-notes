@@ -13,6 +13,7 @@
  */
 
 #include "ao_lisp.h"
+#include <limits.h>
 
 static int
 builtin_size(void *addr)
@@ -44,15 +45,13 @@ const struct ao_lisp_type ao_lisp_builtin_type = {
 #define AO_LISP_BUILTIN_CASENAME
 #include "ao_lisp_builtin.h"
 
-#define _atomn(n)	ao_lisp_poly_atom(_atom(n))
-
 char *ao_lisp_args_name(uint8_t args) {
 	args &= AO_LISP_FUNC_MASK;
 	switch (args) {
-	case AO_LISP_FUNC_LAMBDA: return _atomn(lambda)->name;
-	case AO_LISP_FUNC_LEXPR: return _atomn(lexpr)->name;
-	case AO_LISP_FUNC_NLAMBDA: return _atomn(nlambda)->name;
-	case AO_LISP_FUNC_MACRO: return _atomn(macro)->name;
+	case AO_LISP_FUNC_LAMBDA: return ao_lisp_poly_atom(_ao_lisp_atom_lambda)->name;
+	case AO_LISP_FUNC_LEXPR: return ao_lisp_poly_atom(_ao_lisp_atom_lexpr)->name;
+	case AO_LISP_FUNC_NLAMBDA: return ao_lisp_poly_atom(_ao_lisp_atom_nlambda)->name;
+	case AO_LISP_FUNC_MACRO: return ao_lisp_poly_atom(_ao_lisp_atom_macro)->name;
 	default: return "???";
 	}
 }
@@ -282,6 +281,7 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 
 	while (cons) {
 		ao_poly		car = cons->car;
+		ao_poly		cdr;
 		uint8_t		rt = ao_lisp_poly_type(ret);
 		uint8_t		ct = ao_lisp_poly_type(car);
 
@@ -358,7 +358,10 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 		else
 			return ao_lisp_error(AO_LISP_INVALID, "invalid args");
 
-		cons = ao_lisp_poly_cons(cons->cdr);
+		cdr = cons->cdr;
+		if (cdr != AO_LISP_NIL && ao_lisp_poly_type(cdr) != AO_LISP_CONS)
+			return ao_lisp_error(AO_LISP_INVALID, "improper list");
+		cons = ao_lisp_poly_cons(cdr);
 	}
 	return ret;
 }
@@ -574,6 +577,15 @@ ao_lisp_do_eval(struct ao_lisp_cons *cons)
 }
 
 ao_poly
+ao_lisp_do_apply(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_apply, cons, 2, INT_MAX))
+		return AO_LISP_NIL;
+	ao_lisp_stack->state = eval_apply;
+	return ao_lisp_cons_poly(cons);
+}
+
+ao_poly
 ao_lisp_do_read(struct ao_lisp_cons *cons)
 {
 	if (!ao_lisp_check_argc(_ao_lisp_atom_read, cons, 0, 0))
@@ -650,6 +662,20 @@ ao_poly
 ao_lisp_do_booleanp(struct ao_lisp_cons *cons)
 {
 	return ao_lisp_do_typep(AO_LISP_BOOL, cons);
+}
+
+ao_poly
+ao_lisp_do_procedurep(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	switch (ao_lisp_poly_type(ao_lisp_arg(cons, 0))) {
+	case AO_LISP_BUILTIN:
+	case AO_LISP_LAMBDA:
+		return _ao_lisp_bool_true;
+	default:
+	return _ao_lisp_bool_false;
+	}
 }
 
 /* This one is special -- a list is either nil or

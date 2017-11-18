@@ -19,10 +19,16 @@ static void cons_mark(void *addr)
 	struct ao_lisp_cons	*cons = addr;
 
 	for (;;) {
+		ao_poly cdr = cons->cdr;
+
 		ao_lisp_poly_mark(cons->car, 1);
-		cons = ao_lisp_poly_cons(cons->cdr);
-		if (!cons)
+		if (!cdr)
 			break;
+		if (ao_lisp_poly_type(cdr) != AO_LISP_CONS) {
+			ao_lisp_poly_mark(cdr, 1);
+			break;
+		}
+		cons = ao_lisp_poly_cons(cdr);
 		if (ao_lisp_mark_memory(&ao_lisp_cons_type, cons))
 			break;
 	}
@@ -42,23 +48,29 @@ static void cons_move(void *addr)
 		return;
 
 	for (;;) {
-		struct ao_lisp_cons	*cdr;
-		int			ret;
+		ao_poly			cdr;
+		struct ao_lisp_cons	*c;
+		int	ret;
 
 		MDBG_MOVE("cons_move start %d (%d, %d)\n",
 			  MDBG_OFFSET(cons), MDBG_OFFSET(ao_lisp_ref(cons->car)), MDBG_OFFSET(ao_lisp_ref(cons->cdr)));
 		(void) ao_lisp_poly_move(&cons->car, 1);
-		cdr = ao_lisp_poly_cons(cons->cdr);
+		cdr = cons->cdr;
 		if (!cdr)
 			break;
-		ret = ao_lisp_move_memory(&ao_lisp_cons_type, (void **) &cdr);
-		if (cdr != ao_lisp_poly_cons(cons->cdr))
-			cons->cdr = ao_lisp_cons_poly(cdr);
+		if (ao_lisp_poly_type(cdr) != AO_LISP_CONS) {
+			(void) ao_lisp_poly_move(&cons->cdr, 1);
+			break;
+		}
+		c = ao_lisp_poly_cons(cdr);
+		ret = ao_lisp_move_memory(&ao_lisp_cons_type, (void **) &c);
+		if (c != ao_lisp_poly_cons(cons->cdr))
+			cons->cdr = ao_lisp_cons_poly(c);
 		MDBG_MOVE("cons_move end %d (%d, %d)\n",
 			  MDBG_OFFSET(cons), MDBG_OFFSET(ao_lisp_ref(cons->car)), MDBG_OFFSET(ao_lisp_ref(cons->cdr)));
 		if (ret)
 			break;
-		cons = cdr;
+		cons = c;
 	}
 }
 

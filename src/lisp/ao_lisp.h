@@ -54,14 +54,14 @@ extern uint8_t ao_lisp_const[AO_LISP_POOL_CONST] __attribute__((aligned(4)));
 #define ao_lisp_pool ao_lisp_const
 #define AO_LISP_POOL AO_LISP_POOL_CONST
 
-#define _atom(n) ao_lisp_atom_poly(ao_lisp_atom_intern(#n))
+#define _atom(n) ao_lisp_atom_poly(ao_lisp_atom_intern(n))
 #define _bool(v) ao_lisp_bool_poly(ao_lisp_bool_get(v))
 
 #define _ao_lisp_bool_true	_bool(1)
 #define _ao_lisp_bool_false	_bool(0)
 
-#define _ao_lisp_atom_eof	_atom(eof)
-#define _ao_lisp_atom_else	_atom(else)
+#define _ao_lisp_atom_eof	_atom("eof")
+#define _ao_lisp_atom_else	_atom("else")
 
 #define AO_LISP_BUILTIN_ATOMS
 #include "ao_lisp_builtin.h"
@@ -184,6 +184,7 @@ enum eval_state {
 	eval_val,		/* Value computed */
 	eval_formal,		/* Formal computed */
 	eval_exec,		/* Start a lambda evaluation */
+	eval_apply,		/* Execute apply */
 	eval_cond,		/* Start next cond clause */
 	eval_cond_test,		/* Check cond condition */
 	eval_progn,		/* Start next progn entry */

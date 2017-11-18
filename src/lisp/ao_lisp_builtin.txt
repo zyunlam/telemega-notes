@@ -1,52 +1,54 @@
-lambda	eval
-lambda	read
-nlambda	lambda
-nlambda	lexpr
-nlambda	nlambda
-nlambda	macro
-lambda	car
-lambda	cdr
-lambda	cons
-lambda	last
-lambda	length
-nlambda	quote
-lambda	set
-macro	setq		set!
-nlambda	cond
-nlambda	progn
-nlambda	while
-lexpr	print
-lexpr	patom
-lexpr	plus		+
-lexpr	minus		-
-lexpr	times		*
-lexpr	divide		/
-lexpr	modulo		modulo	%
-lexpr	remainder
-lexpr	quotient
-lexpr	equal		=	eq?	eqv?
-lexpr	less		<
-lexpr	greater		>
-lexpr	less_equal	<=
-lexpr	greater_equal	>=
-lambda	list_to_string		list->string
-lambda	string_to_list		string->list
-lambda	flush
-lambda	delay
-lexpr	led
-lambda	save
-lambda	restore
-lambda	call_cc		call/cc
-lambda	collect
-lambda	nullp		null?
-lambda	not
-lambda	listp		list?
-lambda	pairp		pair?
-lambda	numberp		number?	integer?
-lambda	booleanp	boolean?
-lambda	set_car		set-car!
-lambda	set_cdr		set-cdr!
-lambda	symbolp		symbol?
-lambda	symbol_to_string	symbol->string
-lambda	string_to_symbol	string->symbol
-lambda	stringp		string?
+f_lambda	eval
+f_lambda	read
+nlambda		lambda
+nlambda		lexpr
+nlambda		nlambda
+nlambda		macro
+f_lambda	car
+f_lambda	cdr
+f_lambda	cons
+f_lambda	last
+f_lambda	length
+nlambda		quote
+f_lambda	set
+macro		setq		set!
+nlambda		cond
+nlambda		progn
+nlambda		while
+f_lexpr		print
+f_lexpr		patom
+f_lexpr		plus		+
+f_lexpr		minus		-
+f_lexpr		times		*
+f_lexpr		divide		/
+f_lexpr		modulo		modulo	%
+f_lexpr		remainder
+f_lexpr		quotient
+f_lexpr		equal		=	eq?	eqv?
+f_lexpr		less		<
+f_lexpr		greater		>
+f_lexpr		less_equal	<=
+f_lexpr		greater_equal	>=
+f_lambda	list_to_string		list->string
+f_lambda	string_to_list		string->list
+f_lambda	flush
+f_lambda	delay
+f_lexpr		led
+f_lambda	save
+f_lambda	restore
+f_lambda	call_cc		call-with-current-continuation	call/cc
+f_lambda	collect
+f_lambda	nullp		null?
+f_lambda	not
+f_lambda	listp		list?
+f_lambda	pairp		pair?
+f_lambda	numberp		number?	integer?
+f_lambda	booleanp	boolean?
+f_lambda	set_car		set-car!
+f_lambda	set_cdr		set-cdr!
+f_lambda	symbolp		symbol?
+f_lambda	symbol_to_string	symbol->string
+f_lambda	string_to_symbol	string->symbol
+f_lambda	stringp		string?
+f_lambda	procedurep	procedure?
+lexpr		apply

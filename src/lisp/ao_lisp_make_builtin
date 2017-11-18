@@ -7,10 +7,12 @@ typedef struct {
 } builtin_t;
 
 string[string] type_map = {
-	"lambda" => "F_LAMBDA",
+	"lambda" => "LAMBDA",
 	"nlambda" => "NLAMBDA",
-	"lexpr" => "F_LEXPR",
+	"lexpr" => "LEXPR",
 	"macro" => "MACRO",
+	"f_lambda" => "F_LAMBDA",
+	"f_lexpr" => "F_LEXPR",
 };
 
 string[*]
@@ -67,8 +69,8 @@ dump_casename(builtin_t[*] builtins) {
 	printf("static char *ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {\n");
 	printf("\tswitch(b) {\n");
 	for (int i = 0; i < dim(builtins); i++)
-		printf("\tcase builtin_%s: return ao_lisp_poly_atom(_atom(%s))->name;\n",
-		       builtins[i].c_name, builtins[i].c_name);
+		printf("\tcase builtin_%s: return ao_lisp_poly_atom(_atom(\"%s\"))->name;\n",
+		       builtins[i].c_name, builtins[i].lisp_names[0]);
 	printf("\tdefault: return \"???\";\n");
 	printf("\t}\n");
 	printf("}\n");
@@ -150,9 +152,7 @@ dump_atoms(builtin_t[*] builtins) {
 		for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
 			printf("#define _ao_lisp_atom_");
 			cify_lisp(builtins[i].lisp_names[j]);
-			printf(" _atom(");
-			cify_lisp(builtins[i].lisp_names[j]);
-			printf(")\n");
+			printf(" _atom(\"%s\")\n", builtins[i].lisp_names[j]);
 		}
 	}
 	printf("#endif /* AO_LISP_BUILTIN_ATOMS */\n");

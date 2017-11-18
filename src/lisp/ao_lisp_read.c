@@ -516,7 +516,7 @@ ao_lisp_read(void)
 			if (!push_read_stack(cons, read_state))
 				return AO_LISP_NIL;
 			cons++;
-			read_state |= READ_IN_QUOTE;
+			read_state = READ_IN_QUOTE;
 			v = _ao_lisp_atom_quote;
 			break;
 		case CLOSE:

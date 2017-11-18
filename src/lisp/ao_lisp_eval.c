@@ -17,6 +17,7 @@
 
 struct ao_lisp_stack		*ao_lisp_stack;
 ao_poly				ao_lisp_v;
+uint8_t				ao_lisp_skip_cons_free;
 
 ao_poly
 ao_lisp_set_cond(struct ao_lisp_cons *c)
@@ -269,7 +270,7 @@ ao_lisp_eval_exec(void)
 				DBGI("set "); DBG_POLY(atom); DBG(" = "); DBG_POLY(val); DBG("\n");
 			});
 		builtin = ao_lisp_poly_builtin(ao_lisp_v);
-		if (builtin->args & AO_LISP_FUNC_FREE_ARGS && !ao_lisp_stack_marked(ao_lisp_stack))
+		if (builtin->args & AO_LISP_FUNC_FREE_ARGS && !ao_lisp_stack_marked(ao_lisp_stack) && !ao_lisp_skip_cons_free)
 			ao_lisp_cons_free(ao_lisp_poly_cons(ao_lisp_stack->values));
 
 		ao_lisp_v = v;
@@ -295,6 +296,38 @@ ao_lisp_eval_exec(void)
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 		break;
 	}
+	ao_lisp_skip_cons_free = 0;
+	return 1;
+}
+
+/*
+ * Finish setting up the apply evaluation
+ *
+ * The value is the list to execute
+ */
+static int
+ao_lisp_eval_apply(void)
+{
+	struct ao_lisp_cons	*cons = ao_lisp_poly_cons(ao_lisp_v);
+	struct ao_lisp_cons	*cdr, *prev;
+
+	/* Glue the arguments into the right shape. That's all but the last
+	 * concatenated onto the last
+	 */
+	cdr = cons;
+	for (;;) {
+		prev = cdr;
+		cdr = ao_lisp_poly_cons(prev->cdr);
+		if (cdr->cdr == AO_LISP_NIL)
+			break;
+	}
+	DBGI("before mangling: "); DBG_POLY(ao_lisp_v); DBG("\n");
+	prev->cdr = cdr->car;
+	ao_lisp_stack->values = ao_lisp_v;
+	ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->values)->car;
+	DBGI("apply: "); DBG_POLY(ao_lisp_stack->values); DBG ("\n");
+	ao_lisp_stack->state = eval_exec;
+	ao_lisp_skip_cons_free = 1;
 	return 1;
 }
 
@@ -478,6 +511,7 @@ static int (*const evals[])(void) = {
 	[eval_val] = ao_lisp_eval_val,
 	[eval_formal] = ao_lisp_eval_formal,
 	[eval_exec] = ao_lisp_eval_exec,
+	[eval_apply] = ao_lisp_eval_apply,
 	[eval_cond] = ao_lisp_eval_cond,
 	[eval_cond_test] = ao_lisp_eval_cond_test,
 	[eval_progn] = ao_lisp_eval_progn,
@@ -487,16 +521,17 @@ static int (*const evals[])(void) = {
 };
 
 const char *ao_lisp_state_names[] = {
-	"sexpr",
-	"val",
-	"formal",
-	"exec",
-	"cond",
-	"cond_test",
-	"progn",
-	"while",
-	"while_test",
-	"macro",
+	[eval_sexpr] = "sexpr",
+	[eval_val] = "val",
+	[eval_formal] = "formal",
+	[eval_exec] = "exec",
+	[eval_apply] = "apply",
+	[eval_cond] = "cond",
+	[eval_cond_test] = "cond_test",
+	[eval_progn] = "progn",
+	[eval_while] = "while",
+	[eval_while_test] = "while_test",
+	[eval_macro] = "macro",
 };
 
 /*

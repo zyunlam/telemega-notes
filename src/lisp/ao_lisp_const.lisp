@@ -219,16 +219,18 @@
 					; expressions to evaluate
 
 		   (set! make-exprs (lambda (vars exprs)
-				      (cond ((not (null? vars)) (cons
-						   (list set
-							 (list quote
-							       (car (car vars))
-							       )
-							 (cadr (car vars))
-							 )
-						   (make-exprs (cdr vars) exprs)
-						   )
-						  )
+				      (cond ((not (null? vars))
+					     (cons
+					      (list set
+						    (list quote
+							  (car (car vars))
+							  )
+						    (cond ((null? (cdr (car vars))) ())
+							  (else (cadr (car vars))))
+						    )
+					      (make-exprs (cdr vars) exprs)
+					      )
+					     )
 					    (exprs)
 					    )
 				      )
@@ -460,6 +462,58 @@
 (char-downcase #\space)
 
 (define string (lexpr (chars) (list->string chars)))
+
+(patom "apply\n")
+(apply cons '(a b))
+
+(define save ())
+
+(define map (lexpr (proc lists)
+		   (let ((args (lambda (lists)
+				 (if (null? lists) ()
+				   (cons (caar lists) (args (cdr lists))))))
+			 (next (lambda (lists)
+				 (if (null? lists) ()
+				   (cons (cdr (car lists)) (next (cdr lists))))))
+			 (domap (lambda (lists)
+				  (if (null? (car lists)) ()
+				    (cons (apply proc (args lists)) (domap (next lists)))
+					)))
+			 )
+		     (domap lists))))
+
+(map cadr '((a b) (d e) (g h)))
+
+(define for-each (lexpr (proc lists)
+			(apply map proc lists)
+			#t))
+
+(for-each patom '("hello" " " "world" "\n"))
+
+(define string-map (lexpr (proc strings)
+			  (let ((make-lists (lambda (strings)
+					      (if (null? strings) ()
+						(cons (string->list (car strings)) (make-lists (cdr strings))))))
+				)
+			    (list->string (apply map proc (make-lists strings))))))
+
+(string-map 1+ "HAL")
+
+(define string-for-each (lexpr (proc strings)
+			       (apply string-map proc strings)
+			       #t))
+
+(string-for-each patom "IBM")
+
+
+(call-with-current-continuation
+ (lambda (exit)
+   (for-each (lambda (x)
+	       (print "test" x)
+	       (if (negative? x)
+		   (exit x)))
+	     '(54 0 37 -3 245 19))
+   #t))
 
 ;(define number->string (lexpr (arg opt)
 ;			      (let ((base (if (null? opt) 10 (car opt)))
