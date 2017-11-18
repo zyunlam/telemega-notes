@@ -102,7 +102,7 @@ const struct ao_lisp_type ao_lisp_frame_type = {
 };
 
 void
-ao_lisp_frame_print(ao_poly p)
+ao_lisp_frame_write(ao_poly p)
 {
 	struct ao_lisp_frame	*frame = ao_lisp_poly_frame(p);
 	int			f;
@@ -116,12 +116,12 @@ ao_lisp_frame_print(ao_poly p)
 			for (f = 0; f < frame->num; f++) {
 				if (f != 0)
 					printf(", ");
-				ao_lisp_poly_print(frame->vals[f].atom);
+				ao_lisp_poly_write(frame->vals[f].atom);
 				printf(" = ");
-				ao_lisp_poly_print(frame->vals[f].val);
+				ao_lisp_poly_write(frame->vals[f].val);
 			}
 			if (frame->prev)
-				ao_lisp_poly_print(frame->prev);
+				ao_lisp_poly_write(frame->prev);
 			frame->type &= ~AO_LISP_FRAME_PRINT;
 		}
 	}

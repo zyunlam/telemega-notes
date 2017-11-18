@@ -41,13 +41,23 @@ ao_lisp_os_led(int led)
 	printf("leds set to 0x%x\n", led);
 }
 
+#define AO_LISP_JIFFIES_PER_SECOND	100
+
 static inline void
-ao_lisp_os_delay(int delay)
+ao_lisp_os_delay(int jiffies)
 {
 	struct timespec ts = {
-		.tv_sec = delay / 1000,
-		.tv_nsec = (delay % 1000) * 1000000,
+		.tv_sec = jiffies / AO_LISP_JIFFIES_PER_SECOND,
+		.tv_nsec = (jiffies % AO_LISP_JIFFIES_PER_SECOND) * (1000000000L / AO_LISP_JIFFIES_PER_SECOND)
 	};
 	nanosleep(&ts, NULL);
+}
+
+static inline int
+ao_lisp_os_jiffy(void)
+{
+	struct timespec tp;
+	clock_gettime(CLOCK_MONOTONIC, &tp);
+	return tp.tv_sec * AO_LISP_JIFFIES_PER_SECOND + (tp.tv_nsec / (1000000000L / AO_LISP_JIFFIES_PER_SECOND));
 }
 #endif

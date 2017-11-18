@@ -50,7 +50,7 @@ const struct ao_lisp_type ao_lisp_lambda_type = {
 };
 
 void
-ao_lisp_lambda_print(ao_poly poly)
+ao_lisp_lambda_write(ao_poly poly)
 {
 	struct ao_lisp_lambda	*lambda = ao_lisp_poly_lambda(poly);
 	struct ao_lisp_cons	*cons = ao_lisp_poly_cons(lambda->code);
@@ -59,7 +59,7 @@ ao_lisp_lambda_print(ao_poly poly)
 	printf("%s", ao_lisp_args_name(lambda->args));
 	while (cons) {
 		printf(" ");
-		ao_lisp_poly_print(cons->car);
+		ao_lisp_poly_write(cons->car);
 		cons = ao_lisp_poly_cons(cons->cdr);
 	}
 	printf(")");

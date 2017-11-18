@@ -137,7 +137,9 @@ dump_consts(builtin_t[*] builtins) {
 	for (int i = 0; i < dim(builtins); i++) {
 		for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
 			printf ("\t{ .name = \"%s\", .args = AO_LISP_FUNC_%s, .func = builtin_%s },\n",
-				builtins[i].lisp_names[j], builtins[i].type, builtins[i].c_name);
+				builtins[i].lisp_names[j],
+				builtins[i].type,
+				builtins[i].c_name);
 		}
 	}
 	printf("};\n");

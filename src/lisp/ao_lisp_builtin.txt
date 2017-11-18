@@ -15,8 +15,8 @@ macro		setq		set!
 nlambda		cond
 nlambda		progn
 nlambda		while
-f_lexpr		print
-f_lexpr		patom
+f_lexpr		write
+f_lexpr		display
 f_lexpr		plus		+
 f_lexpr		minus		-
 f_lexpr		times		*
@@ -52,3 +52,9 @@ f_lambda	string_to_symbol	string->symbol
 f_lambda	stringp		string?
 f_lambda	procedurep	procedure?
 lexpr		apply
+f_lambda	read_char	read-char
+f_lambda	write_char	write-char
+f_lambda	exit
+f_lambda	current_jiffy	current-jiffy
+f_lambda	current_second	current-second
+f_lambda	jiffies_per_second	jiffies-per-second

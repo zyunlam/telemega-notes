@@ -270,7 +270,7 @@ ao_lisp_eval_exec(void)
 				DBGI("set "); DBG_POLY(atom); DBG(" = "); DBG_POLY(val); DBG("\n");
 			});
 		builtin = ao_lisp_poly_builtin(ao_lisp_v);
-		if (builtin->args & AO_LISP_FUNC_FREE_ARGS && !ao_lisp_stack_marked(ao_lisp_stack) && !ao_lisp_skip_cons_free)
+		if (builtin && builtin->args & AO_LISP_FUNC_FREE_ARGS && !ao_lisp_stack_marked(ao_lisp_stack) && !ao_lisp_skip_cons_free)
 			ao_lisp_cons_free(ao_lisp_poly_cons(ao_lisp_stack->values));
 
 		ao_lisp_v = v;

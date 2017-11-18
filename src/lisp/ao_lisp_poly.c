@@ -15,46 +15,46 @@
 #include "ao_lisp.h"
 
 struct ao_lisp_funcs {
-	void (*print)(ao_poly);
-	void (*patom)(ao_poly);
+	void (*write)(ao_poly);
+	void (*display)(ao_poly);
 };
 
 static const struct ao_lisp_funcs ao_lisp_funcs[AO_LISP_NUM_TYPE] = {
 	[AO_LISP_CONS] = {
-		.print = ao_lisp_cons_print,
-		.patom = ao_lisp_cons_patom,
+		.write = ao_lisp_cons_write,
+		.display = ao_lisp_cons_display,
 	},
 	[AO_LISP_STRING] = {
-		.print = ao_lisp_string_print,
-		.patom = ao_lisp_string_patom,
+		.write = ao_lisp_string_write,
+		.display = ao_lisp_string_display,
 	},
 	[AO_LISP_INT] = {
-		.print = ao_lisp_int_print,
-		.patom = ao_lisp_int_print,
+		.write = ao_lisp_int_write,
+		.display = ao_lisp_int_write,
 	},
 	[AO_LISP_ATOM] = {
-		.print = ao_lisp_atom_print,
-		.patom = ao_lisp_atom_print,
+		.write = ao_lisp_atom_write,
+		.display = ao_lisp_atom_write,
 	},
 	[AO_LISP_BUILTIN] = {
-		.print = ao_lisp_builtin_print,
-		.patom = ao_lisp_builtin_print,
+		.write = ao_lisp_builtin_write,
+		.display = ao_lisp_builtin_write,
 	},
 	[AO_LISP_FRAME] = {
-		.print = ao_lisp_frame_print,
-		.patom = ao_lisp_frame_print,
+		.write = ao_lisp_frame_write,
+		.display = ao_lisp_frame_write,
 	},
 	[AO_LISP_LAMBDA] = {
-		.print = ao_lisp_lambda_print,
-		.patom = ao_lisp_lambda_print,
+		.write = ao_lisp_lambda_write,
+		.display = ao_lisp_lambda_write,
 	},
 	[AO_LISP_STACK] = {
-		.print = ao_lisp_stack_print,
-		.patom = ao_lisp_stack_print,
+		.write = ao_lisp_stack_write,
+		.display = ao_lisp_stack_write,
 	},
 	[AO_LISP_BOOL] = {
-		.print = ao_lisp_bool_print,
-		.patom = ao_lisp_bool_print,
+		.write = ao_lisp_bool_write,
+		.display = ao_lisp_bool_write,
 	},
 };
 
@@ -69,21 +69,21 @@ funcs(ao_poly p)
 }
 
 void
-ao_lisp_poly_print(ao_poly p)
+ao_lisp_poly_write(ao_poly p)
 {
 	const struct ao_lisp_funcs *f = funcs(p);
 
-	if (f && f->print)
-		f->print(p);
+	if (f && f->write)
+		f->write(p);
 }
 
 void
-ao_lisp_poly_patom(ao_poly p)
+ao_lisp_poly_display(ao_poly p)
 {
 	const struct ao_lisp_funcs *f = funcs(p);
 
-	if (f && f->patom)
-		f->patom(p);
+	if (f && f->display)
+		f->display(p);
 }
 
 void *

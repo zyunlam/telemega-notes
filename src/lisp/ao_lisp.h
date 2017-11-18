@@ -106,6 +106,7 @@ extern uint16_t		ao_lisp_top;
 #define AO_LISP_INVALID		0x04
 #define AO_LISP_UNDEFINED	0x08
 #define AO_LISP_EOF		0x10
+#define AO_LISP_EXIT		0x20
 
 extern uint8_t		ao_lisp_exception;
 
@@ -463,7 +464,7 @@ ao_lisp_stack_fetch(int id) {
 extern const struct ao_lisp_type ao_lisp_bool_type;
 
 void
-ao_lisp_bool_print(ao_poly v);
+ao_lisp_bool_write(ao_poly v);
 
 #ifdef AO_LISP_MAKE_CONST
 struct ao_lisp_bool	*ao_lisp_true, *ao_lisp_false;
@@ -487,10 +488,10 @@ void
 ao_lisp_cons_free(struct ao_lisp_cons *cons);
 
 void
-ao_lisp_cons_print(ao_poly);
+ao_lisp_cons_write(ao_poly);
 
 void
-ao_lisp_cons_patom(ao_poly);
+ao_lisp_cons_display(ao_poly);
 
 int
 ao_lisp_cons_length(struct ao_lisp_cons *cons);
@@ -511,10 +512,10 @@ ao_poly
 ao_lisp_string_unpack(char *a);
 
 void
-ao_lisp_string_print(ao_poly s);
+ao_lisp_string_write(ao_poly s);
 
 void
-ao_lisp_string_patom(ao_poly s);
+ao_lisp_string_display(ao_poly s);
 
 /* atom */
 extern const struct ao_lisp_type ao_lisp_atom_type;
@@ -524,7 +525,7 @@ extern struct ao_lisp_frame	*ao_lisp_frame_global;
 extern struct ao_lisp_frame	*ao_lisp_frame_current;
 
 void
-ao_lisp_atom_print(ao_poly a);
+ao_lisp_atom_write(ao_poly a);
 
 struct ao_lisp_atom *
 ao_lisp_atom_intern(char *name);
@@ -540,14 +541,14 @@ ao_lisp_atom_set(ao_poly atom, ao_poly val);
 
 /* int */
 void
-ao_lisp_int_print(ao_poly i);
+ao_lisp_int_write(ao_poly i);
 
 /* prim */
 void
-ao_lisp_poly_print(ao_poly p);
+ao_lisp_poly_write(ao_poly p);
 
 void
-ao_lisp_poly_patom(ao_poly p);
+ao_lisp_poly_display(ao_poly p);
 
 int
 ao_lisp_poly_mark(ao_poly p, uint8_t note_cons);
@@ -572,7 +573,7 @@ ao_lisp_set_cond(struct ao_lisp_cons *cons);
 
 /* builtin */
 void
-ao_lisp_builtin_print(ao_poly b);
+ao_lisp_builtin_write(ao_poly b);
 
 extern const struct ao_lisp_type ao_lisp_builtin_type;
 
@@ -629,7 +630,7 @@ int
 ao_lisp_frame_add(struct ao_lisp_frame **frame, ao_poly atom, ao_poly val);
 
 void
-ao_lisp_frame_print(ao_poly p);
+ao_lisp_frame_write(ao_poly p);
 
 /* lambda */
 extern const struct ao_lisp_type ao_lisp_lambda_type;
@@ -640,7 +641,7 @@ struct ao_lisp_lambda *
 ao_lisp_lambda_new(ao_poly cons);
 
 void
-ao_lisp_lambda_print(ao_poly lambda);
+ao_lisp_lambda_write(ao_poly lambda);
 
 ao_poly
 ao_lisp_lambda_eval(void);
@@ -664,7 +665,7 @@ void
 ao_lisp_stack_clear(void);
 
 void
-ao_lisp_stack_print(ao_poly stack);
+ao_lisp_stack_write(ao_poly stack);
 
 ao_poly
 ao_lisp_stack_eval(void);
@@ -697,10 +698,10 @@ int ao_lisp_stack_depth;
 #define DBG_RESET()	(ao_lisp_stack_depth = 0)
 #define DBG(...) 	printf(__VA_ARGS__)
 #define DBGI(...)	do { DBG("%4d: ", __LINE__); DBG_INDENT(); DBG(__VA_ARGS__); } while (0)
-#define DBG_CONS(a)	ao_lisp_cons_print(ao_lisp_cons_poly(a))
-#define DBG_POLY(a)	ao_lisp_poly_print(a)
+#define DBG_CONS(a)	ao_lisp_cons_write(ao_lisp_cons_poly(a))
+#define DBG_POLY(a)	ao_lisp_poly_write(a)
 #define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_lisp_pool) : -1)
-#define DBG_STACK()	ao_lisp_stack_print(ao_lisp_stack_poly(ao_lisp_stack))
+#define DBG_STACK()	ao_lisp_stack_write(ao_lisp_stack_poly(ao_lisp_stack))
 static inline void
 ao_lisp_frames_dump(void)
 {

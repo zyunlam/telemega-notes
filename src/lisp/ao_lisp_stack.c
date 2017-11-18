@@ -156,7 +156,7 @@ ao_lisp_stack_clear(void)
 }
 
 void
-ao_lisp_stack_print(ao_poly poly)
+ao_lisp_stack_write(ao_poly poly)
 {
 	struct ao_lisp_stack *s = ao_lisp_poly_stack(poly);
 
@@ -167,7 +167,7 @@ ao_lisp_stack_print(ao_poly poly)
 		}
 		s->type |= AO_LISP_STACK_PRINT;
 		printf("\t[\n");
-		printf("\t\texpr:   "); ao_lisp_poly_print(s->list); printf("\n");
+		printf("\t\texpr:   "); ao_lisp_poly_write(s->list); printf("\n");
 		printf("\t\tstate:  %s\n", ao_lisp_state_names[s->state]);
 		ao_lisp_error_poly ("values: ", s->values, s->values_tail);
 		ao_lisp_error_poly ("sexprs: ", s->sexprs, AO_LISP_NIL);

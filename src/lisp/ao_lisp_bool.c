@@ -38,7 +38,7 @@ const struct ao_lisp_type ao_lisp_bool_type = {
 };
 
 void
-ao_lisp_bool_print(ao_poly v)
+ao_lisp_bool_write(ao_poly v)
 {
 	struct ao_lisp_bool	*b = ao_lisp_poly_bool(v);
 

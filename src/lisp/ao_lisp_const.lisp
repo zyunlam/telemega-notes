@@ -463,10 +463,8 @@
 
 (define string (lexpr (chars) (list->string chars)))
 
-(patom "apply\n")
+(display "apply\n")
 (apply cons '(a b))
-
-(define save ())
 
 (define map (lexpr (proc lists)
 		   (let ((args (lambda (lists)
@@ -488,28 +486,30 @@
 			(apply map proc lists)
 			#t))
 
-(for-each patom '("hello" " " "world" "\n"))
+(for-each display '("hello" " " "world" "\n"))
+
+(define -string-ml (lambda (strings)
+			     (if (null? strings) ()
+			       (cons (string->list (car strings)) (-string-ml (cdr strings))))))
 
 (define string-map (lexpr (proc strings)
-			  (let ((make-lists (lambda (strings)
-					      (if (null? strings) ()
-						(cons (string->list (car strings)) (make-lists (cdr strings))))))
-				)
-			    (list->string (apply map proc (make-lists strings))))))
+			  (list->string (apply map proc (-string-ml strings))))))
 
 (string-map 1+ "HAL")
 
 (define string-for-each (lexpr (proc strings)
-			       (apply string-map proc strings)
-			       #t))
+			       (apply for-each proc (-string-ml strings))))
 
-(string-for-each patom "IBM")
+(string-for-each write-char "IBM\n")
 
+(define newline (lambda () (write-char #\newline)))
+
+(newline)
 
 (call-with-current-continuation
  (lambda (exit)
    (for-each (lambda (x)
-	       (print "test" x)
+	       (write "test" x)
 	       (if (negative? x)
 		   (exit x)))
 	     '(54 0 37 -3 245 19))

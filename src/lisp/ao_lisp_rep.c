@@ -24,9 +24,11 @@ ao_lisp_read_eval_print(void)
 			break;
 		out = ao_lisp_eval(in);
 		if (ao_lisp_exception) {
+			if (ao_lisp_exception & AO_LISP_EXIT)
+				break;
 			ao_lisp_exception = 0;
 		} else {
-			ao_lisp_poly_print(out);
+			ao_lisp_poly_write(out);
 			putchar ('\n');
 		}
 	}

@@ -15,7 +15,7 @@
 #include "ao_lisp.h"
 
 void
-ao_lisp_int_print(ao_poly p)
+ao_lisp_int_write(ao_poly p)
 {
 	int i = ao_lisp_poly_int(p);
 	printf("%d", i);

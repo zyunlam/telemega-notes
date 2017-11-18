@@ -158,7 +158,7 @@ ao_lisp_atom_set(ao_poly atom, ao_poly val)
 }
 
 void
-ao_lisp_atom_print(ao_poly a)
+ao_lisp_atom_write(ao_poly a)
 {
 	struct ao_lisp_atom *atom = ao_lisp_poly_atom(a);
 	printf("%s", atom->name);

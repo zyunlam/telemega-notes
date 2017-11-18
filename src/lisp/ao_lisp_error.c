@@ -28,7 +28,7 @@ ao_lisp_error_poly(char *name, ao_poly poly, ao_poly last)
 					printf("\t\t         ");
 				else
 					first = 0;
-				ao_lisp_poly_print(cons->car);
+				ao_lisp_poly_write(cons->car);
 				printf("\n");
 				if (poly == last)
 					break;
@@ -38,7 +38,7 @@ ao_lisp_error_poly(char *name, ao_poly poly, ao_poly last)
 		} else
 			printf(")\n");
 	} else {
-		ao_lisp_poly_print(poly);
+		ao_lisp_poly_write(poly);
 		printf("\n");
 	}
 }
@@ -66,9 +66,9 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 					tabs(indent);
 					printf("         ");
 				}
-				ao_lisp_poly_print(frame->vals[f].atom);
+				ao_lisp_poly_write(frame->vals[f].atom);
 				printf(" = ");
-				ao_lisp_poly_print(frame->vals[f].val);
+				ao_lisp_poly_write(frame->vals[f].val);
 				printf("\n");
 			}
 			if (frame->prev)
@@ -92,11 +92,11 @@ ao_lisp_error(int error, char *format, ...)
 	vprintf(format, args);
 	va_end(args);
 	printf("\n");
-	printf("Value: "); ao_lisp_poly_print(ao_lisp_v); printf("\n");
+	printf("Value: "); ao_lisp_poly_write(ao_lisp_v); printf("\n");
 	printf("Stack:\n");
-	ao_lisp_stack_print(ao_lisp_stack_poly(ao_lisp_stack));
+	ao_lisp_stack_write(ao_lisp_stack_poly(ao_lisp_stack));
 	printf("Globals:\n\t");
-	ao_lisp_frame_print(ao_lisp_frame_poly(ao_lisp_frame_global));
+	ao_lisp_frame_write(ao_lisp_frame_poly(ao_lisp_frame_global));
 	printf("\n");
 	return AO_LISP_NIL;
 }

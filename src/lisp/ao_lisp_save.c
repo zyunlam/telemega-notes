@@ -69,6 +69,7 @@ ao_lisp_do_restore(struct ao_lisp_cons *cons)
 		/* Re-create the evaluator stack */
 		if (!ao_lisp_eval_restart())
 			return _ao_lisp_bool_false;
+
 		return _ao_lisp_bool_true;
 	}
 #endif

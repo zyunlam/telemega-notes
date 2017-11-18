@@ -123,7 +123,7 @@ ao_lisp_cons_free(struct ao_lisp_cons *cons)
 }
 
 void
-ao_lisp_cons_print(ao_poly c)
+ao_lisp_cons_write(ao_poly c)
 {
 	struct ao_lisp_cons *cons = ao_lisp_poly_cons(c);
 	int	first = 1;
@@ -131,14 +131,14 @@ ao_lisp_cons_print(ao_poly c)
 	while (cons) {
 		if (!first)
 			printf(" ");
-		ao_lisp_poly_print(cons->car);
+		ao_lisp_poly_write(cons->car);
 		c = cons->cdr;
 		if (ao_lisp_poly_type(c) == AO_LISP_CONS) {
 			cons = ao_lisp_poly_cons(c);
 			first = 0;
 		} else {
 			printf(" . ");
-			ao_lisp_poly_print(c);
+			ao_lisp_poly_write(c);
 			cons = NULL;
 		}
 	}
@@ -146,12 +146,12 @@ ao_lisp_cons_print(ao_poly c)
 }
 
 void
-ao_lisp_cons_patom(ao_poly c)
+ao_lisp_cons_display(ao_poly c)
 {
 	struct ao_lisp_cons *cons = ao_lisp_poly_cons(c);
 
 	while (cons) {
-		ao_lisp_poly_patom(cons->car);
+		ao_lisp_poly_display(cons->car);
 		cons = ao_lisp_poly_cons(cons->cdr);
 	}
 }

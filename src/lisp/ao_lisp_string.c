@@ -122,7 +122,7 @@ ao_lisp_string_unpack(char *a)
 }
 
 void
-ao_lisp_string_print(ao_poly p)
+ao_lisp_string_write(ao_poly p)
 {
 	char	*s = ao_lisp_poly_string(p);
 	char	c;
@@ -148,7 +148,7 @@ ao_lisp_string_print(ao_poly p)
 }
 
 void
-ao_lisp_string_patom(ao_poly p)
+ao_lisp_string_display(ao_poly p)
 {
 	char	*s = ao_lisp_poly_string(p);
 	char	c;

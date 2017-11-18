@@ -85,7 +85,7 @@ ao_lisp_args_name(uint8_t args)
 #endif
 
 void
-ao_lisp_builtin_print(ao_poly b)
+ao_lisp_builtin_write(ao_poly b)
 {
 	struct ao_lisp_builtin *builtin = ao_lisp_poly_builtin(b);
 	printf("%s", ao_lisp_builtin_name(builtin->func));
@@ -247,30 +247,30 @@ ao_lisp_do_while(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_do_print(struct ao_lisp_cons *cons)
+ao_lisp_do_write(struct ao_lisp_cons *cons)
 {
 	ao_poly	val = AO_LISP_NIL;
 	while (cons) {
 		val = cons->car;
-		ao_lisp_poly_print(val);
+		ao_lisp_poly_write(val);
 		cons = ao_lisp_poly_cons(cons->cdr);
 		if (cons)
 			printf(" ");
 	}
 	printf("\n");
-	return val;
+	return _ao_lisp_bool_true;
 }
 
 ao_poly
-ao_lisp_do_patom(struct ao_lisp_cons *cons)
+ao_lisp_do_display(struct ao_lisp_cons *cons)
 {
 	ao_poly	val = AO_LISP_NIL;
 	while (cons) {
 		val = cons->car;
-		ao_lisp_poly_patom(val);
+		ao_lisp_poly_display(val);
 		cons = ao_lisp_poly_cons(cons->cdr);
 	}
-	return val;
+	return _ao_lisp_bool_true;
 }
 
 ao_poly
@@ -736,6 +736,66 @@ ao_lisp_do_string_to_symbol(struct ao_lisp_cons *cons)
 		return AO_LISP_NIL;
 
 	return ao_lisp_atom_poly(ao_lisp_atom_intern(ao_lisp_poly_string(ao_lisp_arg(cons, 0))));
+}
+
+ao_poly
+ao_lisp_do_read_char(struct ao_lisp_cons *cons)
+{
+	int	c;
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 0, 0))
+		return AO_LISP_NIL;
+	c = getchar();
+	return ao_lisp_int_poly(c);
+}
+
+ao_poly
+ao_lisp_do_write_char(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_INT, 0))
+		return AO_LISP_NIL;
+	putchar(ao_lisp_poly_int(ao_lisp_arg(cons, 0)));
+	return _ao_lisp_bool_true;
+}
+
+ao_poly
+ao_lisp_do_exit(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 0, 0))
+		return AO_LISP_NIL;
+	ao_lisp_exception |= AO_LISP_EXIT;
+	return _ao_lisp_bool_true;
+}
+
+ao_poly
+ao_lisp_do_current_jiffy(struct ao_lisp_cons *cons)
+{
+	int	jiffy;
+
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 0, 0))
+		return AO_LISP_NIL;
+	jiffy = ao_lisp_os_jiffy();
+	return (ao_lisp_int_poly(jiffy));
+}
+
+ao_poly
+ao_lisp_do_current_second(struct ao_lisp_cons *cons)
+{
+	int	second;
+
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 0, 0))
+		return AO_LISP_NIL;
+	second = ao_lisp_os_jiffy() / AO_LISP_JIFFIES_PER_SECOND;
+	return (ao_lisp_int_poly(second));
+}
+
+ao_poly
+ao_lisp_do_jiffies_per_second(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 0, 0))
+		return AO_LISP_NIL;
+	return (ao_lisp_int_poly(AO_LISP_JIFFIES_PER_SECOND));
 }
 
 #define AO_LISP_BUILTIN_FUNCS

@@ -31,7 +31,7 @@ ao_lisp_make_builtin(enum ao_lisp_builtin_id func, int args) {
 struct builtin_func {
 	char	*name;
 	int	args;
-	int	func;
+	enum ao_lisp_builtin_id	func;
 };
 
 #define AO_LISP_BUILTIN_CONSTS
@@ -146,7 +146,7 @@ ao_is_macro(ao_poly p)
 	struct ao_lisp_lambda	*lambda;
 	ao_poly ret;
 
-	MACRO_DEBUG(indent(); printf ("is macro "); ao_lisp_poly_print(p); printf("\n"); ++macro_scan_depth);
+	MACRO_DEBUG(indent(); printf ("is macro "); ao_lisp_poly_write(p); printf("\n"); ++macro_scan_depth);
 	switch (ao_lisp_poly_type(p)) {
 	case AO_LISP_ATOM:
 		if (ao_lisp_macro_push(p))
@@ -181,7 +181,7 @@ ao_is_macro(ao_poly p)
 		ret = AO_LISP_NIL;
 		break;
 	}
-	MACRO_DEBUG(--macro_scan_depth;	indent(); printf ("... "); ao_lisp_poly_print(ret); printf("\n"));
+	MACRO_DEBUG(--macro_scan_depth;	indent(); printf ("... "); ao_lisp_poly_write(ret); printf("\n"));
 	return ret;
 }
 
@@ -195,7 +195,7 @@ ao_has_macro(ao_poly p)
 	if (p == AO_LISP_NIL)
 		return AO_LISP_NIL;
 
-	MACRO_DEBUG(indent(); printf("has macro "); ao_lisp_poly_print(p); printf("\n"); ++macro_scan_depth);
+	MACRO_DEBUG(indent(); printf("has macro "); ao_lisp_poly_write(p); printf("\n"); ++macro_scan_depth);
 	switch (ao_lisp_poly_type(p)) {
 	case AO_LISP_LAMBDA:
 		lambda = ao_lisp_poly_lambda(p);
@@ -222,7 +222,7 @@ ao_has_macro(ao_poly p)
 		p = AO_LISP_NIL;
 		break;
 	}
-	MACRO_DEBUG(--macro_scan_depth;	indent(); printf("... "); ao_lisp_poly_print(p); printf("\n"));
+	MACRO_DEBUG(--macro_scan_depth;	indent(); printf("... "); ao_lisp_poly_write(p); printf("\n"));
 	return p;
 }
 
@@ -237,7 +237,7 @@ ao_lisp_read_eval_abort(void)
 		out = ao_lisp_eval(in);
 		if (ao_lisp_exception)
 			return 0;
-		ao_lisp_poly_print(out);
+		ao_lisp_poly_write(out);
 		putchar ('\n');
 	}
 	return 1;
@@ -273,6 +273,7 @@ main(int argc, char **argv)
 	int	in_atom = 0;
 	char	*out_name = NULL;
 	int	c;
+	enum ao_lisp_builtin_id	prev_func;
 
 	in = stdin;
 	out = stdout;
@@ -292,8 +293,10 @@ main(int argc, char **argv)
 	ao_lisp_bool_get(0);
 	ao_lisp_bool_get(1);
 
+	prev_func = _builtin_last;
 	for (f = 0; f < (int) N_FUNC; f++) {
-		b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
+		if (funcs[f].func != prev_func)
+			b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
 		a = ao_lisp_atom_intern(funcs[f].name);
 		ao_lisp_atom_set(ao_lisp_atom_poly(a),
 				 ao_lisp_builtin_poly(b));
@@ -327,7 +330,7 @@ main(int argc, char **argv)
 		if (val != AO_LISP_NIL) {
 			printf("error: function %s contains unresolved macro: ",
 			       ao_lisp_poly_atom(ao_lisp_frame_global->vals[f].atom)->name);
-			ao_lisp_poly_print(val);
+			ao_lisp_poly_write(val);
 			printf("\n");
 			exit(1);
 		}
