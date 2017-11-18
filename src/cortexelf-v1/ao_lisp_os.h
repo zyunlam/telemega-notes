@@ -56,10 +56,18 @@ ao_lisp_os_led(int led)
 	(void) led;
 }
 
+#define AO_LISP_JIFFIES_PER_SECOND	AO_HERTZ
+
 static inline void
 ao_lisp_os_delay(int delay)
 {
-	ao_delay(AO_MS_TO_TICKS(delay));
+	ao_delay(delay);
+}
+
+static inline int
+ao_lisp_os_jiffy(void)
+{
+	return ao_tick_count;
 }
 
 #endif

@@ -82,6 +82,7 @@ ALTOS_SRC = \
 	ao_lisp_atom.c \
 	ao_lisp_int.c \
 	ao_lisp_poly.c \
+	ao_lisp_bool.c \
 	ao_lisp_builtin.c \
 	ao_lisp_read.c \
 	ao_lisp_rep.c \
