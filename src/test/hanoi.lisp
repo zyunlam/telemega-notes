@@ -16,129 +16,133 @@
 
 					; ANSI control sequences
 
-(defun move-to (col row)
-  (patom "\033[" row ";" col "H")
+(define move-to (lambda (col row)
+		  (for-each display (list "\033[" row ";" col "H"))
+		  )
   )
 
-(defun clear ()
-  (patom "\033[2J")
+(define clear (lambda ()
+		(display "\033[2J")
+		)
   )
 
-(defun display-string (x y str)
-  (move-to x y)
-  (patom str)
+(define display-string (lambda (x y str)
+			 (move-to x y)
+			 (display str)
+			 )
   )
 
 					; Here's the pieces to display
 
-(setq stack '("     *     " "    ***    " "   *****   " "  *******  " " ********* " "***********"))
+(define tower '("     *     " "    ***    " "   *****   " "  *******  " " ********* " "***********"))
 
-					; Here's all of the stacks of pieces
+					; Here's all of the towers of pieces
 					; This is generated when the program is run
 
-(setq stacks nil)
+(define towers ())
 
-					; Display one stack, clearing any
+(define 1- (lambda (x) (- x 1)))
+					; Display one tower, clearing any
 					; space above it
 
-(defun display-stack (x y clear stack)
-  (cond ((= 0 clear)
-	 (cond (stack 
-		(display-string x y (car stack))
-		(display-stack x (1+ y) 0 (cdr stack))
-		)
-	       )
-	 )
-	(t 
-	 (display-string x y "                   ")
-	 (display-stack x (1+ y) (1- clear) stack)
-	 )
-	)
+(define display-tower (lambda (x y clear tower)
+			(cond ((= 0 clear)
+			       (cond ((not (null? tower))
+				      (display-string x y (car tower))
+				      (display-tower x (1+ y) 0 (cdr tower))
+				      )
+				     )
+			       )
+			      (else 
+			       (display-string x y "                   ")
+			       (display-tower x (1+ y) (1- clear) tower)
+			       )
+			      )
+			)
   )
 
-					; Position of the top of the stack on the screen
-					; Shorter stacks start further down the screen
+					; Position of the top of the tower on the screen
+					; Shorter towers start further down the screen
 
-(defun stack-pos (y stack)
-  (- y (length stack))
+(define tower-pos (lambda (y tower)
+		    (- y (length tower))
+		    )
   )
 
-					; Display all of the stacks, spaced 20 columns apart
+					; Display all of the towers, spaced 20 columns apart
 
-(defun display-stacks (x y stacks)
-  (cond (stacks
-	 (display-stack x 0 (stack-pos y (car stacks)) (car stacks))
-	 (display-stacks (+ x 20) y (cdr stacks)))
-	)
+(define display-towers (lambda (x y towers)
+			 (cond ((not (null? towers))
+				(display-tower x 0 (tower-pos y (car towers)) (car towers))
+				(display-towers (+ x 20) y (cdr towers)))
+			       )
+			 )
   )
 
-					; Display all of the stacks, then move the cursor
+(define top 0)
+					; Display all of the towers, then move the cursor
 					; out of the way and flush the output
 
-(defun display ()
-  (display-stacks 0 top stacks)
-  (move-to 1 21)
-  (flush)
+(define display-hanoi (lambda ()
+			(display-towers 0 top towers)
+			(move-to 1 21)
+			(flush-output)
+			)
   )
 
-					; Reset stacks to the starting state, with
-					; all of the pieces in the first stack and the
+					; Reset towers to the starting state, with
+					; all of the pieces in the first tower and the
 					; other two empty
 
-(defun reset-stacks ()
-  (setq stacks (list stack nil nil))
-  (setq top (+ (length stack) 3))
-  (length stack)
+(define reset-towers (lambda ()
+		       (set! towers (list tower () ()))
+		       (set! top (+ (length tower) 3))
+		       (length tower)
+		       )
   )
 
-					; more functions which could usefully
-					; be in the rom image
-
-(defun min (a b)
-  (cond ((< a b) a)
-	(b)
-	)
-  )
-
-					; Replace a stack in the list of stacks
+					; Replace a tower in the list of towers
 					; with a new value
 
-(defun replace (list pos member)
-  (cond ((= pos 0) (cons member (cdr list)))
-	((cons (car list) (replace (cdr list) (1- pos) member)))
-	)
+(define replace (lambda (list pos member)
+		  (cond ((= pos 0) (cons member (cdr list)))
+			((cons (car list) (replace (cdr list) (1- pos) member)))
+			)
+		  )
   )
 
-					; Move a piece from the top of one stack
+					; Move a piece from the top of one tower
 					; to the top of another
 
-(setq move-delay 100)
+(define move-delay 10)
 
-(defun move-piece (from to)
-  (let ((from-stack (nth stacks from))
-	(to-stack (nth stacks to))
-	(piece (car from-stack)))
-    (setq from-stack (cdr from-stack))
-    (setq to-stack (cons piece to-stack))
-    (setq stacks (replace stacks from from-stack))
-    (setq stacks (replace stacks to to-stack))
-    (display)
-    (delay move-delay)
-    )
+(define move-piece (lambda (from to)
+		     (let* ((from-tower (list-ref towers from))
+			   (to-tower (list-ref towers to))
+			   (piece (car from-tower)))
+		       (set! from-tower (cdr from-tower))
+		       (set! to-tower (cons piece to-tower))
+		       (set! towers (replace towers from from-tower))
+		       (set! towers (replace towers to to-tower))
+		       (display-hanoi)
+;		       (delay move-delay)
+		       )
+		     )
   )
 
 ; The implementation of the game
 
-(defun _hanoi (n from to use)
-  (cond ((= 1 n)
-	 (move-piece from to)
-	 )
-	(t
-	 (_hanoi (1- n) from use to)
-	 (_hanoi 1 from to use)
-	 (_hanoi (1- n) use to from)
-	 )
-	)
+(define _hanoi (lambda (n from to use)
+		 (cond ((= 1 n)
+			(move-piece from to)
+			)
+		       (else
+			(_hanoi (1- n) from use to)
+			(_hanoi 1 from to use)
+			(_hanoi (1- n) use to from)
+			)
+		       )
+		 )
   )
 
 					; A pretty interface which
@@ -146,10 +150,13 @@
 					; clears the screen and runs
 					; the program
 
-(defun hanoi ()
-  (setq len (reset-stacks))
-  (clear)
-  (_hanoi len 0 1 2)
-  (move-to 0 23)
-  t
+(define hanoi (lambda ()
+		(let ((len))
+		  (set! len (reset-towers))
+		  (clear)
+		  (_hanoi len 0 1 2)
+		  (move-to 0 23)
+		  #t
+		  )
+		)
   )

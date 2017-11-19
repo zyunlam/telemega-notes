@@ -533,9 +533,9 @@ ao_lisp_do_string_to_list(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_do_flush(struct ao_lisp_cons *cons)
+ao_lisp_do_flush_output(struct ao_lisp_cons *cons)
 {
-	if (!ao_lisp_check_argc(_ao_lisp_atom_flush, cons, 0, 0))
+	if (!ao_lisp_check_argc(_ao_lisp_atom_flush2doutput, cons, 0, 0))
 		return AO_LISP_NIL;
 	ao_lisp_os_flush();
 	return _ao_lisp_bool_true;

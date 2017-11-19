@@ -60,10 +60,17 @@
 
 (defun caddr (l) (car (cdr (cdr l))))
 
-(defun nth (list n)
-  (cond ((= n 0) (car list))
-	((nth (cdr list) (1- n)))
-	)
+(define list-tail (lambda (x k)
+		    (if (zero? k)
+			x
+		      (list-tail (cdr x (- k 1)))
+		      )
+		    )
+  )
+
+(define list-ref (lambda (x k)
+		   (car (list-tail x k))
+		   )
   )
 
 					; simple math operators
@@ -264,6 +271,7 @@
 
 (let ((x 1)) x)
 
+(define let* let)
 					; boolean operators
 
 (define or (lexpr (l)

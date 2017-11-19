@@ -140,7 +140,10 @@ ao_lisp_string_write(ao_poly p)
 			printf ("\\t");
 			break;
 		default:
-			putchar(c);
+			if (c < ' ')
+				printf("\\%03o", c);
+			else
+				putchar(c);
 			break;
 		}
 	}

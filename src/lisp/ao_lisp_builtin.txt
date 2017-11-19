@@ -31,7 +31,7 @@ f_lexpr		less_equal	<=
 f_lexpr		greater_equal	>=
 f_lambda	list_to_string		list->string
 f_lambda	string_to_list		string->list
-f_lambda	flush
+f_lambda	flush_output		flush-output
 f_lambda	delay
 f_lexpr		led
 f_lambda	save
