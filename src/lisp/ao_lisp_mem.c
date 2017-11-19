@@ -458,6 +458,7 @@ static const struct ao_lisp_type *ao_lisp_types[AO_LISP_NUM_TYPE] = {
 	[AO_LISP_LAMBDA] = &ao_lisp_lambda_type,
 	[AO_LISP_STACK] = &ao_lisp_stack_type,
 	[AO_LISP_BOOL] = &ao_lisp_bool_type,
+	[AO_LISP_BIGINT] = &ao_lisp_bigint_type,
 };
 
 static int

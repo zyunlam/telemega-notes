@@ -23,6 +23,12 @@
 #define AO_LISP_POOL_TOTAL		16384
 #define AO_LISP_SAVE			1
 
+#ifndef __BYTE_ORDER
+#define	__LITTLE_ENDIAN	1234
+#define	__BIG_ENDIAN	4321
+#define __BYTE_ORDER	__LITTLE_ENDIAN
+#endif
+
 static inline int
 ao_lisp_getc() {
 	static uint8_t	at_eol;

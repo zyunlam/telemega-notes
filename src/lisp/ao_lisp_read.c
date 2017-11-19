@@ -245,7 +245,7 @@ lex_quoted(void)
 #define AO_LISP_TOKEN_MAX	32
 
 static char	token_string[AO_LISP_TOKEN_MAX];
-static int	token_int;
+static int32_t	token_int;
 static int	token_len;
 
 static inline void add_token(int c) {
@@ -497,7 +497,7 @@ ao_lisp_read(void)
 				v = AO_LISP_NIL;
 			break;
 		case NUM:
-			v = ao_lisp_int_poly(token_int);
+			v = ao_lisp_integer_poly(token_int);
 			break;
 		case BOOL:
 			if (token_string[0] == 't')

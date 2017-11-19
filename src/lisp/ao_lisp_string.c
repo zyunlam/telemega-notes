@@ -83,9 +83,9 @@ ao_lisp_string_pack(struct ao_lisp_cons *cons)
 	char	*s = r;
 
 	while (cons) {
-		if (ao_lisp_poly_type(cons->car) != AO_LISP_INT)
+		if (!ao_lisp_integer_typep(ao_lisp_poly_type(cons->car)))
 			return ao_lisp_error(AO_LISP_INVALID, "non-int passed to pack");
-		*s++ = ao_lisp_poly_int(cons->car);
+		*s++ = ao_lisp_poly_integer(cons->car);
 		cons = ao_lisp_poly_cons(cons->cdr);
 	}
 	*s++ = 0;

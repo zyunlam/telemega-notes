@@ -110,6 +110,7 @@ ao_lisp_eval_sexpr(void)
 		/* fall through */
 	case AO_LISP_BOOL:
 	case AO_LISP_INT:
+	case AO_LISP_BIGINT:
 	case AO_LISP_STRING:
 	case AO_LISP_BUILTIN:
 	case AO_LISP_LAMBDA:

@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <ao_lisp_os.h>
+#ifndef __BYTE_ORDER
+#include <endian.h>
+#endif
 
 typedef uint16_t	ao_poly;
 typedef int16_t		ao_signed_poly;
@@ -92,7 +95,8 @@ extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((a
 #define AO_LISP_LAMBDA		7
 #define AO_LISP_STACK		8
 #define AO_LISP_BOOL		9
-#define AO_LISP_NUM_TYPE	10
+#define AO_LISP_BIGINT		10
+#define AO_LISP_NUM_TYPE	11
 
 /* Leave two bits for types to use as they please */
 #define AO_LISP_OTHER_TYPE_MASK	0x3f
@@ -161,6 +165,35 @@ struct ao_lisp_bool {
 	uint8_t			value;
 	uint16_t		pad;
 };
+
+struct ao_lisp_bigint {
+	uint32_t		value;
+};
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+static inline uint32_t
+ao_lisp_int_bigint(int32_t i) {
+	return AO_LISP_BIGINT | (i << 8);
+}
+static inline int32_t
+ao_lisp_bigint_int(uint32_t bi) {
+	return (int32_t) bi >> 8;
+}
+#else
+static inline uint32_t
+ao_lisp_int_bigint(int32_t i) {
+	return (uint32_t) (i & 0xffffff) | (AO_LISP_BIGINT << 24);
+}
+static inlint int32_t
+ao_lisp_bigint_int(uint32_t bi) {
+	return (int32_t) (bi << 8) >> 8;
+}
+#endif
+
+#define AO_LISP_MIN_INT		(-(1 << (15 - AO_LISP_TYPE_SHIFT)))
+#define AO_LISP_MAX_INT		((1 << (15 - AO_LISP_TYPE_SHIFT)) - 1)
+
+#define AO_LISP_NOT_INTEGER	0x7fffffff
 
 /* Set on type when the frame escapes the lambda */
 #define AO_LISP_FRAME_MARK	0x80
@@ -338,16 +371,28 @@ ao_lisp_cons_poly(struct ao_lisp_cons *cons)
 	return ao_lisp_poly(cons, AO_LISP_CONS);
 }
 
-static inline int
+static inline int32_t
 ao_lisp_poly_int(ao_poly poly)
 {
-	return (int) ((ao_signed_poly) poly >> AO_LISP_TYPE_SHIFT);
+	return (int32_t) ((ao_signed_poly) poly >> AO_LISP_TYPE_SHIFT);
 }
 
 static inline ao_poly
-ao_lisp_int_poly(int i)
+ao_lisp_int_poly(int32_t i)
 {
 	return ((ao_poly) i << 2) | AO_LISP_INT;
+}
+
+static inline struct ao_lisp_bigint *
+ao_lisp_poly_bigint(ao_poly poly)
+{
+	return ao_lisp_ref(poly);
+}
+
+static inline ao_poly
+ao_lisp_bigint_poly(struct ao_lisp_bigint *bi)
+{
+	return ao_lisp_poly(bi, AO_LISP_OTHER);
 }
 
 static inline char *
@@ -543,6 +588,22 @@ ao_lisp_atom_set(ao_poly atom, ao_poly val);
 void
 ao_lisp_int_write(ao_poly i);
 
+int32_t
+ao_lisp_poly_integer(ao_poly p);
+
+ao_poly
+ao_lisp_integer_poly(int32_t i);
+
+static inline int
+ao_lisp_integer_typep(uint8_t t)
+{
+	return (t == AO_LISP_INT) || (t == AO_LISP_BIGINT);
+}
+
+void
+ao_lisp_bigint_write(ao_poly i);
+
+extern const struct ao_lisp_type	ao_lisp_bigint_type;
 /* prim */
 void
 ao_lisp_poly_write(ao_poly p);

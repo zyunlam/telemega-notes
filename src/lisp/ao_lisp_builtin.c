@@ -290,10 +290,10 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 			if (cons->cdr == AO_LISP_NIL && ct == AO_LISP_INT) {
 				switch (op) {
 				case builtin_minus:
-					ret = ao_lisp_int_poly(-ao_lisp_poly_int(ret));
+					ret = ao_lisp_integer_poly(-ao_lisp_poly_integer(ret));
 					break;
 				case builtin_divide:
-					switch (ao_lisp_poly_int(ret)) {
+					switch (ao_lisp_poly_integer(ret)) {
 					case 0:
 						return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "divide by zero");
 					case 1:
@@ -307,9 +307,9 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 					break;
 				}
 			}
-		} else if (rt == AO_LISP_INT && ct == AO_LISP_INT) {
-			int	r = ao_lisp_poly_int(ret);
-			int	c = ao_lisp_poly_int(car);
+		} else if (ao_lisp_integer_typep(rt) && ao_lisp_integer_typep(ct)) {
+			int32_t	r = ao_lisp_poly_integer(ret);
+			int32_t	c = ao_lisp_poly_integer(car);
 
 			switch(op) {
 			case builtin_plus:
@@ -349,7 +349,7 @@ ao_lisp_math(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 			default:
 				break;
 			}
-			ret = ao_lisp_int_poly(r);
+			ret = ao_lisp_integer_poly(r);
 		}
 
 		else if (rt == AO_LISP_STRING && ct == AO_LISP_STRING && op == builtin_plus)
@@ -427,9 +427,9 @@ ao_lisp_compare(struct ao_lisp_cons *cons, enum ao_lisp_builtin_id op)
 		} else {
 			uint8_t	lt = ao_lisp_poly_type(left);
 			uint8_t	rt = ao_lisp_poly_type(right);
-			if (lt == AO_LISP_INT && rt == AO_LISP_INT) {
-				int l = ao_lisp_poly_int(left);
-				int r = ao_lisp_poly_int(right);
+			if (ao_lisp_integer_typep(lt) && ao_lisp_integer_typep(rt)) {
+				int32_t l = ao_lisp_poly_integer(left);
+				int32_t r = ao_lisp_poly_integer(right);
 
 				switch (op) {
 				case builtin_less:
@@ -643,7 +643,15 @@ ao_lisp_do_pairp(struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_do_numberp(struct ao_lisp_cons *cons)
 {
-	return ao_lisp_do_typep(AO_LISP_INT, cons);
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	switch (ao_lisp_poly_type(ao_lisp_arg(cons, 0))) {
+	case AO_LISP_INT:
+	case AO_LISP_BIGINT:
+		return _ao_lisp_bool_true;
+	default:
+		return _ao_lisp_bool_false;
+	}
 }
 
 ao_poly
@@ -755,7 +763,7 @@ ao_lisp_do_write_char(struct ao_lisp_cons *cons)
 		return AO_LISP_NIL;
 	if (!ao_lisp_check_argt(_ao_lisp_atom_led, cons, 0, AO_LISP_INT, 0))
 		return AO_LISP_NIL;
-	putchar(ao_lisp_poly_int(ao_lisp_arg(cons, 0)));
+	putchar(ao_lisp_poly_integer(ao_lisp_arg(cons, 0)));
 	return _ao_lisp_bool_true;
 }
 
