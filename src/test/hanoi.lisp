@@ -41,7 +41,8 @@
 
 (define towers ())
 
-(define 1- (lambda (x) (- x 1)))
+(define one- (lambda (x) (- x 1)))
+(define one+ (lambda (x) (+ x 1)))
 					; Display one tower, clearing any
 					; space above it
 
@@ -49,13 +50,13 @@
 			(cond ((= 0 clear)
 			       (cond ((not (null? tower))
 				      (display-string x y (car tower))
-				      (display-tower x (1+ y) 0 (cdr tower))
+				      (display-tower x (one+ y) 0 (cdr tower))
 				      )
 				     )
 			       )
 			      (else 
 			       (display-string x y "                   ")
-			       (display-tower x (1+ y) (1- clear) tower)
+			       (display-tower x (one+ y) (one- clear) tower)
 			       )
 			      )
 			)
@@ -106,7 +107,7 @@
 
 (define replace (lambda (list pos member)
 		  (cond ((= pos 0) (cons member (cdr list)))
-			((cons (car list) (replace (cdr list) (1- pos) member)))
+			((cons (car list) (replace (cdr list) (one- pos) member)))
 			)
 		  )
   )
@@ -125,7 +126,7 @@
 		       (set! towers (replace towers from from-tower))
 		       (set! towers (replace towers to to-tower))
 		       (display-hanoi)
-;		       (delay move-delay)
+		       (delay move-delay)
 		       )
 		     )
   )
@@ -137,9 +138,9 @@
 			(move-piece from to)
 			)
 		       (else
-			(_hanoi (1- n) from use to)
+			(_hanoi (one- n) from use to)
 			(_hanoi 1 from to use)
-			(_hanoi (1- n) use to from)
+			(_hanoi (one- n) use to from)
 			)
 		       )
 		 )

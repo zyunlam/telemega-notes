@@ -104,7 +104,7 @@ AO_LISP_SRCS=$(LISP_SRCS) ao_lisp_test.c
 AO_LISP_OBJS=$(AO_LISP_SRCS:.c=.o)
 
 ao_lisp_test: $(AO_LISP_OBJS)
-	cc $(CFLAGS) -o $@ $(AO_LISP_OBJS)
+	cc $(CFLAGS) -o $@ $(AO_LISP_OBJS) -lm
 
 $(AO_LISP_OBJS): $(LISP_HDRS) ao_lisp_const.h
 
