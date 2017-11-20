@@ -105,6 +105,19 @@ ao_lisp_cons_cons(ao_poly car, ao_poly cdr)
 	return cons;
 }
 
+struct ao_lisp_cons *
+ao_lisp_cons_cdr(struct ao_lisp_cons *cons)
+{
+	ao_poly	cdr = cons->cdr;
+	if (cdr == AO_LISP_NIL)
+		return NULL;
+	if (ao_lisp_poly_type(cdr) != AO_LISP_CONS) {
+		(void) ao_lisp_error(AO_LISP_INVALID, "improper list");
+		return NULL;
+	}
+	return ao_lisp_poly_cons(cdr);
+}
+
 ao_poly
 ao_lisp__cons(ao_poly car, ao_poly cdr)
 {

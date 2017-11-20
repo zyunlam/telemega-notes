@@ -96,7 +96,8 @@ extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((a
 #define AO_LISP_STACK		8
 #define AO_LISP_BOOL		9
 #define AO_LISP_BIGINT		10
-#define AO_LISP_NUM_TYPE	11
+#define AO_LISP_FLOAT		11
+#define AO_LISP_NUM_TYPE	12
 
 /* Leave two bits for types to use as they please */
 #define AO_LISP_OTHER_TYPE_MASK	0x3f
@@ -168,6 +169,13 @@ struct ao_lisp_bool {
 
 struct ao_lisp_bigint {
 	uint32_t		value;
+};
+
+struct ao_lisp_float {
+	uint8_t			type;
+	uint8_t			pad1;
+	uint16_t		pad2;
+	float			value;
 };
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -442,6 +450,22 @@ ao_lisp_poly_bool(ao_poly poly)
 {
 	return ao_lisp_ref(poly);
 }
+
+static inline ao_poly
+ao_lisp_float_poly(struct ao_lisp_float *f)
+{
+	return ao_lisp_poly(f, AO_LISP_OTHER);
+}
+
+static inline struct ao_lisp_float *
+ao_lisp_poly_float(ao_poly poly)
+{
+	return ao_lisp_ref(poly);
+}
+
+float
+ao_lisp_poly_number(ao_poly p);
+
 /* memory functions */
 
 extern int ao_lisp_collects[2];
@@ -523,6 +547,10 @@ extern const struct ao_lisp_type ao_lisp_cons_type;
 
 struct ao_lisp_cons *
 ao_lisp_cons_cons(ao_poly car, ao_poly cdr);
+
+/* Return a cons or NULL for a proper list, else error */
+struct ao_lisp_cons *
+ao_lisp_cons_cdr(struct ao_lisp_cons *cons);
 
 ao_poly
 ao_lisp__cons(ao_poly car, ao_poly cdr);
@@ -631,6 +659,24 @@ ao_lisp_eval(ao_poly p);
 
 ao_poly
 ao_lisp_set_cond(struct ao_lisp_cons *cons);
+
+/* float */
+extern const struct ao_lisp_type ao_lisp_float_type;
+
+void
+ao_lisp_float_write(ao_poly p);
+
+ao_poly
+ao_lisp_float_get(float value);
+
+static inline uint8_t
+ao_lisp_number_typep(uint8_t t)
+{
+	return ao_lisp_integer_typep(t) || (t == AO_LISP_FLOAT);
+}
+
+float
+ao_lisp_poly_number(ao_poly p);
 
 /* builtin */
 void

@@ -42,7 +42,8 @@ f_lambda	nullp		null?
 f_lambda	not
 f_lambda	listp		list?
 f_lambda	pairp		pair?
-f_lambda	numberp		number?	integer?
+f_lambda	integerp	integer? exact? exact-integer?
+f_lambda	numberp		number? real?
 f_lambda	booleanp	boolean?
 f_lambda	set_car		set-car!
 f_lambda	set_cdr		set-cdr!
@@ -58,3 +59,7 @@ f_lambda	exit
 f_lambda	current_jiffy	current-jiffy
 f_lambda	current_second	current-second
 f_lambda	jiffies_per_second	jiffies-per-second
+f_lambda	finitep		finite?
+f_lambda	infinitep	infinite?
+f_lambda	inexactp	inexact?
+f_lambda	sqrt

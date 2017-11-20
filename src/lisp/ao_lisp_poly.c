@@ -60,6 +60,10 @@ static const struct ao_lisp_funcs ao_lisp_funcs[AO_LISP_NUM_TYPE] = {
 		.write = ao_lisp_bigint_write,
 		.display = ao_lisp_bigint_write,
 	},
+	[AO_LISP_FLOAT] = {
+		.write = ao_lisp_float_write,
+		.display = ao_lisp_float_write,
+	},
 };
 
 static const struct ao_lisp_funcs *

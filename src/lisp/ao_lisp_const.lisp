@@ -159,9 +159,6 @@
 (odd? 3)
 (odd? -1)
 
-(define exact? number?)
-(defun inexact? (x) #f)
-
 					; (if <condition> <if-true>)
 					; (if <condition> <if-true> <if-false)
 

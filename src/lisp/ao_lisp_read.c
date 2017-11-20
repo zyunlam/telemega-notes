@@ -14,6 +14,7 @@
 
 #include "ao_lisp.h"
 #include "ao_lisp_read.h"
+#include <math.h>
 
 static const uint16_t	lex_classes[128] = {
 	IGNORE,		/* ^@ */
@@ -62,7 +63,7 @@ static const uint16_t	lex_classes[128] = {
  	PRINTABLE|SIGN,		/* + */
  	PRINTABLE,		/* , */
  	PRINTABLE|SIGN,		/* - */
- 	PRINTABLE|SPECIAL,	/* . */
+ 	PRINTABLE|DOTC|FLOATC,	/* . */
  	PRINTABLE,		/* / */
  	PRINTABLE|DIGIT,	/* 0 */
  	PRINTABLE|DIGIT,	/* 1 */
@@ -85,7 +86,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  B */
 	PRINTABLE,		/*  C */
 	PRINTABLE,		/*  D */
-	PRINTABLE,		/*  E */
+	PRINTABLE|FLOATC,	/*  E */
 	PRINTABLE,		/*  F */
 	PRINTABLE,		/*  G */
 	PRINTABLE,		/*  H */
@@ -117,7 +118,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  b */
 	PRINTABLE,		/*  c */
 	PRINTABLE,		/*  d */
-	PRINTABLE,		/*  e */
+	PRINTABLE|FLOATC,	/*  e */
 	PRINTABLE,		/*  f */
 	PRINTABLE,		/*  g */
 	PRINTABLE,		/*  h */
@@ -140,7 +141,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  y */
 	PRINTABLE,		/*  z */
 	PRINTABLE,		/*  { */
-	PRINTABLE|VBAR,		/*  | */
+	PRINTABLE,		/*  | */
 	PRINTABLE,		/*  } */
 	PRINTABLE,		/*  ~ */
 	IGNORE,			/*  ^? */
@@ -247,15 +248,35 @@ lex_quoted(void)
 static char	token_string[AO_LISP_TOKEN_MAX];
 static int32_t	token_int;
 static int	token_len;
+static float	token_float;
 
 static inline void add_token(int c) {
 	if (c && token_len < AO_LISP_TOKEN_MAX - 1)
 		token_string[token_len++] = c;
 }
 
+static inline void del_token(void) {
+	if (token_len > 0)
+		token_len--;
+}
+
 static inline void end_token(void) {
 	token_string[token_len] = '\0';
 }
+
+struct namedfloat {
+	const char	*name;
+	float		value;
+};
+
+static const struct namedfloat namedfloats[] = {
+	{ .name = "+inf.0", .value = INFINITY },
+	{ .name = "-inf.0", .value = -INFINITY },
+	{ .name = "+nan.0", .value = NAN },
+	{ .name = "-nan.0", .value = NAN },
+};
+
+#define NUM_NAMED_FLOATS	(sizeof namedfloats / sizeof namedfloats[0])
 
 static int
 _lex(void)
@@ -279,7 +300,7 @@ _lex(void)
 			continue;
 		}
 
-		if (lex_class & SPECIAL) {
+		if (lex_class & (SPECIAL|DOTC)) {
 			add_token(c);
 			end_token();
 			switch (c) {
@@ -357,47 +378,72 @@ _lex(void)
 			}
 		}
 		if (lex_class & PRINTABLE) {
-			int	isnum;
+			int	isfloat;
 			int	hasdigit;
 			int	isneg;
+			int	isint;
+			int	epos;
 
-			isnum = 1;
+			isfloat = 1;
+			isint = 1;
 			hasdigit = 0;
 			token_int = 0;
 			isneg = 0;
+			epos = 0;
 			for (;;) {
 				if (!(lex_class & NUMBER)) {
-					isnum = 0;
+					isint = 0;
+					isfloat = 0;
 				} else {
- 					if (token_len != 0 &&
+					if (!(lex_class & INTEGER))
+						isint = 0;
+ 					if (token_len != epos &&
 					    (lex_class & SIGN))
 					{
-						isnum = 0;
+						isint = 0;
+						isfloat = 0;
 					}
 					if (c == '-')
 						isneg = 1;
+					if (c == '.' && epos != 0)
+						isfloat = 0;
+					if (c == 'e' || c == 'E') {
+						if (token_len == 0)
+							isfloat = 0;
+						else
+							epos = token_len + 1;
+					}
 					if (lex_class & DIGIT) {
 						hasdigit = 1;
-						if (isnum)
+						if (isint)
 							token_int = token_int * 10 + c - '0';
 					}
 				}
 				add_token (c);
 				c = lexc ();
-				if (lex_class & (NOTNAME)) {
+				if ((lex_class & (NOTNAME)) && (c != '.' || !isfloat)) {
+					unsigned int u;
 //					if (lex_class & ENDOFFILE)
 //						clearerr (f);
 					lex_unget(c);
 					end_token ();
-					if (isnum && hasdigit) {
+					if (isint && hasdigit) {
 						if (isneg)
 							token_int = -token_int;
 						return NUM;
 					}
+					if (isfloat && hasdigit) {
+						token_float = atof(token_string);
+						return FLOAT;
+					}
+					for (u = 0; u < NUM_NAMED_FLOATS; u++)
+						if (!strcmp(namedfloats[u].name, token_string)) {
+							token_float = namedfloats[u].value;
+							return FLOAT;
+						}
 					return NAME;
 				}
 			}
-
 		}
 	}
 }
@@ -498,6 +544,9 @@ ao_lisp_read(void)
 			break;
 		case NUM:
 			v = ao_lisp_integer_poly(token_int);
+			break;
+		case FLOAT:
+			v = ao_lisp_float_get(token_float);
 			break;
 		case BOOL:
 			if (token_string[0] == 't')

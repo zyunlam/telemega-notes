@@ -19,6 +19,6 @@ OBJS=$(SRCS:.c=.o)
 CFLAGS=-DAO_LISP_MAKE_CONST -O0 -g -I. -Wall -Wextra -no-pie
 
 ao_lisp_make_const:  $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) -lm
 
 $(OBJS): $(HDRS)
