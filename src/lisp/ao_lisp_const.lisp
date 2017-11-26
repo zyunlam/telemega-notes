@@ -25,7 +25,7 @@
 
 (set (quote define) (macro (name val rest)
 			(list
-			 'progn
+			 'begin
 			 (list
 			  'set
 			  (list 'quote name)
@@ -519,6 +519,26 @@
 		   (exit x)))
 	     '(54 0 37 -3 245 19))
    #t))
+
+(define repeat (macro (count rest)
+			(list
+			 let
+			 (list
+			  (list '__count__ count))
+			 (append
+			  (list
+			   while
+			   (list
+			    <=
+			    0
+			    (list
+			     set!
+			     '__count__
+			     (list
+			      -
+			      '__count__
+			      1))))
+			  rest))))
 
 ;(define number->string (lexpr (arg opt)
 ;			      (let ((base (if (null? opt) 10 (car opt)))

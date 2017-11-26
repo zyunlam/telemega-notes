@@ -232,9 +232,9 @@ ao_lisp_do_cond(struct ao_lisp_cons *cons)
 }
 
 ao_poly
-ao_lisp_do_progn(struct ao_lisp_cons *cons)
+ao_lisp_do_begin(struct ao_lisp_cons *cons)
 {
-	ao_lisp_stack->state = eval_progn;
+	ao_lisp_stack->state = eval_begin;
 	ao_lisp_stack->sexprs = ao_lisp_cons_poly(cons);
 	return AO_LISP_NIL;
 }

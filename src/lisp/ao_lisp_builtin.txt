@@ -13,7 +13,7 @@ nlambda		quote
 f_lambda	set
 macro		setq		set!
 nlambda		cond
-nlambda		progn
+nlambda		begin
 nlambda		while
 f_lexpr		write
 f_lexpr		display

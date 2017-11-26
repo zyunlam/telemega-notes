@@ -273,6 +273,6 @@ ao_lisp_do_call_cc(struct ao_lisp_cons *cons)
 	cons->cdr = AO_LISP_NIL;
 	v = ao_lisp_lambda_eval();
 	ao_lisp_stack->sexprs = v;
-	ao_lisp_stack->state = eval_progn;
+	ao_lisp_stack->state = eval_begin;
 	return AO_LISP_NIL;
 }

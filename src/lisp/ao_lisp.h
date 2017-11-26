@@ -229,7 +229,7 @@ enum eval_state {
 	eval_apply,		/* Execute apply */
 	eval_cond,		/* Start next cond clause */
 	eval_cond_test,		/* Check cond condition */
-	eval_progn,		/* Start next progn entry */
+	eval_begin,		/* Start next begin entry */
 	eval_while,		/* Start while condition */
 	eval_while_test,	/* Check while condition */
 	eval_macro,		/* Finished with macro generation */

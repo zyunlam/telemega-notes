@@ -283,7 +283,7 @@ ao_lisp_eval_exec(void)
 		break;
 	case AO_LISP_LAMBDA:
 		DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
-		ao_lisp_stack->state = eval_progn;
+		ao_lisp_stack->state = eval_begin;
 		v = ao_lisp_lambda_eval();
 		ao_lisp_stack->sexprs = v;
 		ao_lisp_stack->values = AO_LISP_NIL;
@@ -388,7 +388,7 @@ ao_lisp_eval_cond_test(void)
 		ao_poly c = car->cdr;
 
 		if (c) {
-			ao_lisp_stack->state = eval_progn;
+			ao_lisp_stack->state = eval_begin;
 			ao_lisp_stack->sexprs = c;
 		} else
 			ao_lisp_stack->state = eval_val;
@@ -403,17 +403,17 @@ ao_lisp_eval_cond_test(void)
 /*
  * Evaluate a list of sexprs, returning the value from the last one.
  *
- * ao_lisp_progn records the list in stack->sexprs, so we just need to
+ * ao_lisp_begin records the list in stack->sexprs, so we just need to
  * walk that list. Set ao_lisp_v to the car of the list and jump to
  * eval_sexpr. When that's done, it will land in eval_val. For all but
- * the last, leave a stack frame with eval_progn set so that we come
+ * the last, leave a stack frame with eval_begin set so that we come
  * back here. For the last, don't add a stack frame so that we can
  * just continue on.
  */
 static int
-ao_lisp_eval_progn(void)
+ao_lisp_eval_begin(void)
 {
-	DBGI("progn: "); DBG_POLY(ao_lisp_v); DBG(" sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+	DBGI("begin: "); DBG_POLY(ao_lisp_v); DBG(" sexprs "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
 	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
 
@@ -428,7 +428,7 @@ ao_lisp_eval_progn(void)
 		 * return the value of the last one by just landing in eval_sexpr
 		 */
 		if (ao_lisp_stack->sexprs) {
-			ao_lisp_stack->state = eval_progn;
+			ao_lisp_stack->state = eval_begin;
 			if (!ao_lisp_stack_push())
 				return 0;
 		}
@@ -476,7 +476,7 @@ ao_lisp_eval_while_test(void)
 		ao_lisp_stack->state = eval_while;
 		if (!ao_lisp_stack_push())
 			return 0;
-		ao_lisp_stack->state = eval_progn;
+		ao_lisp_stack->state = eval_begin;
 		ao_lisp_stack->sexprs = ao_lisp_v;
 	}
 	else
@@ -516,7 +516,7 @@ static int (*const evals[])(void) = {
 	[eval_apply] = ao_lisp_eval_apply,
 	[eval_cond] = ao_lisp_eval_cond,
 	[eval_cond_test] = ao_lisp_eval_cond_test,
-	[eval_progn] = ao_lisp_eval_progn,
+	[eval_begin] = ao_lisp_eval_begin,
 	[eval_while] = ao_lisp_eval_while,
 	[eval_while_test] = ao_lisp_eval_while_test,
 	[eval_macro] = ao_lisp_eval_macro,
@@ -530,7 +530,7 @@ const char *ao_lisp_state_names[] = {
 	[eval_apply] = "apply",
 	[eval_cond] = "cond",
 	[eval_cond_test] = "cond_test",
-	[eval_progn] = "progn",
+	[eval_begin] = "begin",
 	[eval_while] = "while",
 	[eval_while_test] = "while_test",
 	[eval_macro] = "macro",
