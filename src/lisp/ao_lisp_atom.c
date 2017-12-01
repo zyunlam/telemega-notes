@@ -98,42 +98,25 @@ ao_lisp_atom_intern(char *name)
 	return atom;
 }
 
-struct ao_lisp_frame	*ao_lisp_frame_global;
-struct ao_lisp_frame	*ao_lisp_frame_current;
-
-static void
-ao_lisp_atom_init(void)
-{
-	if (!ao_lisp_frame_global)
-		ao_lisp_frame_global = ao_lisp_frame_new(0);
-}
-
 ao_poly *
-ao_lisp_atom_ref(struct ao_lisp_frame *frame, ao_poly atom)
+ao_lisp_atom_ref(ao_poly atom)
 {
 	ao_poly	*ref;
-	ao_lisp_atom_init();
-	while (frame) {
+	struct ao_lisp_frame *frame;
+
+	for (frame = ao_lisp_frame_current; frame; frame = ao_lisp_poly_frame(frame->prev)) {
 		ref = ao_lisp_frame_ref(frame, atom);
 		if (ref)
 			return ref;
-		frame = ao_lisp_poly_frame(frame->prev);
 	}
-	if (ao_lisp_frame_global) {
-		ref = ao_lisp_frame_ref(ao_lisp_frame_global, atom);
-		if (ref)
-			return ref;
-	}
-	return NULL;
+	return ao_lisp_frame_ref(ao_lisp_frame_global, atom);
 }
 
 ao_poly
 ao_lisp_atom_get(ao_poly atom)
 {
-	ao_poly *ref = ao_lisp_atom_ref(ao_lisp_frame_current, atom);
+	ao_poly *ref = ao_lisp_atom_ref(atom);
 
-	if (!ref && ao_lisp_frame_global)
-		ref = ao_lisp_frame_ref(ao_lisp_frame_global, atom);
 #ifdef ao_builtin_frame
 	if (!ref)
 		ref = ao_lisp_frame_ref(ao_lisp_poly_frame(ao_builtin_frame), atom);
@@ -146,15 +129,26 @@ ao_lisp_atom_get(ao_poly atom)
 ao_poly
 ao_lisp_atom_set(ao_poly atom, ao_poly val)
 {
-	ao_poly *ref = ao_lisp_atom_ref(ao_lisp_frame_current, atom);
+	ao_poly *ref = ao_lisp_atom_ref(atom);
 
-	if (!ref && ao_lisp_frame_global)
-		ref = ao_lisp_frame_ref(ao_lisp_frame_global, atom);
-	if (ref)
-		*ref = val;
-	else
-		ao_lisp_frame_add(&ao_lisp_frame_global, atom, val);
+	if (!ref)
+		return ao_lisp_error(AO_LISP_UNDEFINED, "undefined atom %s", ao_lisp_poly_atom(atom)->name);
+	*ref = val;
 	return val;
+}
+
+ao_poly
+ao_lisp_atom_def(ao_poly atom, ao_poly val)
+{
+	ao_poly *ref = ao_lisp_atom_ref(atom);
+
+	if (ref) {
+		if (ao_lisp_frame_current)
+			return ao_lisp_error(AO_LISP_REDEFINED, "attempt to redefine atom %s", ao_lisp_poly_atom(atom)->name);
+		*ref = val;
+		return val;
+	}
+	return ao_lisp_frame_add(ao_lisp_frame_current ? ao_lisp_frame_current : ao_lisp_frame_global, atom, val);
 }
 
 void

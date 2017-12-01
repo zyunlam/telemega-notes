@@ -15,6 +15,7 @@ atom		unquote
 atom		unquote_splicing	unquote-splicing
 f_lambda	set
 macro		setq		set!
+f_lambda	def
 nlambda		cond
 nlambda		begin
 nlambda		while

@@ -501,6 +501,7 @@ ao_lisp_collect(uint8_t style)
 
 	MDBG_MOVE("collect %d\n", ao_lisp_collects[style]);
 #endif
+	MDBG_DO(ao_lisp_frame_write(ao_lisp_frame_poly(ao_lisp_frame_global)));
 
 	/* The first time through, we're doing a full collect */
 	if (ao_lisp_last_top == 0)
@@ -875,6 +876,7 @@ ao_lisp_alloc(int size)
 	}
 	addr = ao_lisp_pool + ao_lisp_top;
 	ao_lisp_top += size;
+	MDBG_MOVE("alloc %d size %d\n", MDBG_OFFSET(addr), size);
 	return addr;
 }
 

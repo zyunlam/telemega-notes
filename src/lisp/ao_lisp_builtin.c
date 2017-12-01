@@ -208,6 +208,17 @@ ao_lisp_do_set(struct ao_lisp_cons *cons)
 }
 
 ao_poly
+ao_lisp_do_def(struct ao_lisp_cons *cons)
+{
+	if (!ao_lisp_check_argc(_ao_lisp_atom_def, cons, 2, 2))
+		return AO_LISP_NIL;
+	if (!ao_lisp_check_argt(_ao_lisp_atom_def, cons, 0, AO_LISP_ATOM, 0))
+		return AO_LISP_NIL;
+
+	return ao_lisp_atom_def(ao_lisp_arg(cons, 0), ao_lisp_arg(cons, 1));
+}
+
+ao_poly
 ao_lisp_do_setq(struct ao_lisp_cons *cons)
 {
 	ao_poly	name;
@@ -216,7 +227,7 @@ ao_lisp_do_setq(struct ao_lisp_cons *cons)
 	name = cons->car;
 	if (ao_lisp_poly_type(name) != AO_LISP_ATOM)
 		return ao_lisp_error(AO_LISP_INVALID, "set! of non-atom");
-	if (!ao_lisp_atom_ref(ao_lisp_frame_current, name))
+	if (!ao_lisp_atom_ref(name))
 		return ao_lisp_error(AO_LISP_INVALID, "atom not defined");
 	return ao_lisp__cons(_ao_lisp_atom_set,
 			     ao_lisp__cons(ao_lisp__cons(_ao_lisp_atom_quote,

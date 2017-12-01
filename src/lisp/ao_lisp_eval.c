@@ -559,6 +559,8 @@ ao_lisp_eval(ao_poly _v)
 {
 	ao_lisp_v = _v;
 
+	ao_lisp_frame_init();
+
 	if (!ao_lisp_stack_push())
 		return AO_LISP_NIL;
 

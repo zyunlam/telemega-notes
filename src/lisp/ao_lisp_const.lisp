@@ -14,187 +14,185 @@
 ; Lisp code placed in ROM
 
 					; return a list containing all of the arguments
-(set (quote list) (lexpr (l) l))
+(def (quote list) (lexpr (l) l))
 
-(set (quote set!)
+(def (quote def!)
      (macro (name value rest)
 	    (list
-	     set
-	     (list
-	      quote
-	      name)
+	     def
+	     (list quote name)
 	     value)
 	    )
      )
 
-(set! append
-     (lexpr (args)
-	    ((lambda (append-list append-lists)
-	       (set! append-list
-		    (lambda (a b)
-		      (cond ((null? a) b)
-			    (else (cons (car a) (append-list (cdr a) b)))
-			    )
-		      )
-		    )
-	       (set! append-lists
-		    (lambda (lists)
-		      (cond ((null? lists) lists)
-			    ((null? (cdr lists)) (car lists))
-			    (else (append-list (car lists) (append-lists (cdr lists))))
-			    )
-		      )
-		    )
-	       (append-lists args)
-	       ) () ())
-	    )
-     )
+(begin
+ (def! append
+   (lexpr (args)
+	  ((lambda (append-list append-lists)
+	     (set! append-list
+		   (lambda (a b)
+		     (cond ((null? a) b)
+			   (else (cons (car a) (append-list (cdr a) b)))
+			   )
+		     )
+		   )
+	     (set! append-lists
+		   (lambda (lists)
+		     (cond ((null? lists) lists)
+			   ((null? (cdr lists)) (car lists))
+			   (else (append-list (car lists) (append-lists (cdr lists))))
+			   )
+		     )
+		   )
+	     (append-lists args)
+	     ) () ())
+	  )
+   )
+ 'append)
 
 (append '(a b c) '(d e f) '(g h i))
 
 					; boolean operators
 
-(set! or
-     (macro (l)
-	    ((lambda (_or)
-	       (set! _or
-		    (lambda (l)
-		      (cond ((null? l) #f)
-			    ((null? (cdr l))
-			     (car l))
-			    (else
-			     (list
-			      cond
-			      (list
-			       (car l))
-			      (list
-			       'else
-			       (_or (cdr l))
-			       )
-			      )
-			     )
-			    )
+(begin
+ (def! or
+   (macro (l)
+	  (def! _or
+	    (lambda (l)
+	      (cond ((null? l) #f)
+		    ((null? (cdr l))
+		     (car l))
+		    (else
+		     (list
+		      cond
+		      (list
+		       (car l))
+		      (list
+		       'else
+		       (_or (cdr l))
+		       )
 		      )
+		     )
 		    )
-	       (_or l)) ())))
+	      )
+	    )
+	  (_or l)))
+ 'or)
 
 					; execute to resolve macros
 
 (or #f #t)
 
-
-(set! and
-     (macro (l)
-	    ((lambda (_and)
-	       (set! _and
-		    (lambda (l)
-		      (cond ((null? l) #t)
-			    ((null? (cdr l))
-			     (car l))
-			    (else
-			     (list
-			      cond
-			      (list
-			       (car l)
-			       (_and (cdr l))
-			       )
-			      )
-			     )
-			    )
+(begin
+ (def! and
+   (macro (l)
+	  (def! _and
+	    (lambda (l)
+	      (cond ((null? l) #t)
+		    ((null? (cdr l))
+		     (car l))
+		    (else
+		     (list
+		      cond
+		      (list
+		       (car l)
+		       (_and (cdr l))
+		       )
 		      )
+		     )
 		    )
-	       (_and l)) ())
+	      )
 	    )
-     )
-
+	  (_and l)))
+ 'and)
 
 					; execute to resolve macros
 
 (and #t #f)
 
-(set! quasiquote
-  (macro (x rest)
-	 ((lambda (constant? combine-skeletons expand-quasiquote)
-	    (set! constant?
+(begin
+ (def! quasiquote
+   (macro (x rest)
+	  (def! constant?
 					; A constant value is either a pair starting with quote,
 					; or anything which is neither a pair nor a symbol
 
-		 (lambda (exp)
-		   (cond ((pair? exp)
-			  (eq? (car exp) 'quote)
-			  )
-			 (else
-			  (not (symbol? exp))
-			  )
-			 )
-		   )
-		 )
-	    (set! combine-skeletons
-		 (lambda (left right exp)
-		   (cond
-		    ((and (constant? left) (constant? right)) 
-		     (cond ((and (eqv? (eval left) (car exp))
-				 (eqv? (eval right) (cdr exp)))
-			    (list 'quote exp)
-			    )
-			   (else
-			    (list 'quote (cons (eval left) (eval right)))
-			    )
-			   )
-		     )
-		    ((null? right)
-		     (list 'list left)
-		     )
-		    ((and (pair? right) (eq? (car right) 'list))
-		     (cons 'list (cons left (cdr right)))
+	    (lambda (exp)
+	      (cond ((pair? exp)
+		     (eq? (car exp) 'quote)
 		     )
 		    (else
-		     (list 'cons left right)
+		     (not (symbol? exp))
 		     )
 		    )
-		   )
-		 )
+	      )
+	    )
+	  (def! combine-skeletons
+	    (lambda (left right exp)
+	      (cond
+	       ((and (constant? left) (constant? right)) 
+		(cond ((and (eqv? (eval left) (car exp))
+			    (eqv? (eval right) (cdr exp)))
+		       (list 'quote exp)
+		       )
+		      (else
+		       (list 'quote (cons (eval left) (eval right)))
+		       )
+		      )
+		)
+	       ((null? right)
+		(list 'list left)
+		)
+	       ((and (pair? right) (eq? (car right) 'list))
+		(cons 'list (cons left (cdr right)))
+		)
+	       (else
+		(list 'cons left right)
+		)
+	       )
+	      )
+	    )
 
-	    (set! expand-quasiquote
-		 (lambda (exp nesting)
-		   (cond
+	  (def! expand-quasiquote
+	    (lambda (exp nesting)
+	      (cond
 
 					; non cons -- constants
 					; themselves, others are
 					; quoted
 
-		    ((not (pair? exp)) 
-		     (cond ((constant? exp)
-			    exp
-			    )
-			   (else
-			    (list 'quote exp)
-			    )
-			   )
-		     )
+	       ((not (pair? exp)) 
+		(cond ((constant? exp)
+		       exp
+		       )
+		      (else
+		       (list 'quote exp)
+		       )
+		      )
+		)
 
 					; check for an unquote exp and
 					; add the param unquoted
 
-		    ((and (eq? (car exp) 'unquote) (= (length exp) 2))
-		     (cond ((= nesting 0)
-			    (car (cdr exp))
-			    )
-			   (else
-			    (combine-skeletons ''unquote 
-					       (expand-quasiquote (cdr exp) (- nesting 1))
-					       exp))
-			   )
-		     )
+	       ((and (eq? (car exp) 'unquote) (= (length exp) 2))
+		(cond ((= nesting 0)
+		       (car (cdr exp))
+		       )
+		      (else
+		       (combine-skeletons ''unquote 
+					  (expand-quasiquote (cdr exp) (- nesting 1))
+					  exp))
+		      )
+		)
 
 					; nested quasi-quote --
 					; construct the right
 					; expression
 
-		    ((and (eq? (car exp) 'quasiquote) (= (length exp) 2))
-		     (combine-skeletons ''quasiquote 
-					(expand-quasiquote (cdr exp) (+ nesting 1))
-					exp))
+	       ((and (eq? (car exp) 'quasiquote) (= (length exp) 2))
+		(combine-skeletons ''quasiquote 
+				   (expand-quasiquote (cdr exp) (+ nesting 1))
+				   exp))
 
 					; check for an
 					; unquote-splicing member,
@@ -202,36 +200,36 @@
 					; value and append the rest of
 					; the quasiquote result to it
 
-		    ((and (pair? (car exp))
-			  (eq? (car (car exp)) 'unquote-splicing)
-			  (= (length (car exp)) 2))
-		     (cond ((= nesting 0)
-			    (list 'append (car (cdr (car exp)))
-				  (expand-quasiquote (cdr exp) nesting))
-			    )
-			   (else
-			    (combine-skeletons (expand-quasiquote (car exp) (- nesting 1))
-					       (expand-quasiquote (cdr exp) nesting)
-					       exp))
-			   )
-		     )
+	       ((and (pair? (car exp))
+		     (eq? (car (car exp)) 'unquote-splicing)
+		     (= (length (car exp)) 2))
+		(cond ((= nesting 0)
+		       (list 'append (car (cdr (car exp)))
+			     (expand-quasiquote (cdr exp) nesting))
+		       )
+		      (else
+		       (combine-skeletons (expand-quasiquote (car exp) (- nesting 1))
+					  (expand-quasiquote (cdr exp) nesting)
+					  exp))
+		      )
+		)
 
 					; for other lists, just glue
 					; the expansion of the first
 					; element to the expansion of
 					; the rest of the list
 
-		    (else (combine-skeletons (expand-quasiquote (car exp) nesting)
-					     (expand-quasiquote (cdr exp) nesting)
-					     exp)
-			  )
-		    )
-		   )
-		 )
-	    (expand-quasiquote x 0)
-	    ) () () ())
-	 )
-  )
+	       (else (combine-skeletons (expand-quasiquote (car exp) nesting)
+					(expand-quasiquote (cdr exp) nesting)
+					exp)
+		     )
+	       )
+	      )
+	    )
+	  (expand-quasiquote x 0)
+	  )
+   )
+ 'quasiquote)
 					;
 					; Define a variable without returning the value
 					; Useful when defining functions to avoid
@@ -242,9 +240,8 @@
 					; (define (name x y z) sexprs ...) 
 					;
 
-(set! define
+(def! define
       (macro (first rest)
-
 					; check for alternate lambda definition form
 
 	     (cond ((list? first)
@@ -261,13 +258,12 @@
 		    )
 		   )
 	     `(begin
-	       (set! ,first ,rest)
+	       (def (quote ,first) ,rest)
 	       (quote ,first))
 	     )
       )
 
 					; basic list accessors
-
 
 (define (caar l) (car (car l)))
 
@@ -392,47 +388,36 @@
 					;
 					; (let ((x 1) (y)) (set! y (+ x 1)) y)
 
-(define let (macro (vars exprs)
-		((lambda (make-names make-vals)
-
-					;
-					; make the list of names in the let
-					;
-
-		   (set! make-names (lambda (vars)
-				      (cond ((not (null? vars))
-					     (cons (car (car vars))
-						   (make-names (cdr vars))))
-					    (else ())
-					    )
-				      )
-			 )
+(define let
+  (macro (vars exprs)
+	 (define (make-names vars)
+	   (cond ((not (null? vars))
+		  (cons (car (car vars))
+			(make-names (cdr vars))))
+		 (else ())
+		 )
+	   )
 
 					; the parameters to the lambda is a list
 					; of nils of the right length
 
-		   (set! make-vals (lambda (vars)
-				     (cond ((not (null? vars))
-					    (cons (cond ((null? (cdr (car vars))) ())
-							(else
-							 (car (cdr (car vars))))
-							)
-						  (make-vals (cdr vars))))
-					   (else ())
-					   )
-				     )
-			 )
+	 (define (make-vals vars)
+	   (cond ((not (null? vars))
+		  (cons (cond ((null? (cdr (car vars))) ())
+			      (else
+			       (car (cdr (car vars))))
+			      )
+			(make-vals (cdr vars))))
+		 (else ())
+		 )
+	   )
 					; prepend the set operations
 					; to the expressions
 
 					; build the lambda.
 
-		   `((lambda ,(make-names vars) ,@exprs) ,@(make-vals vars))
-		   )
-		 ()
-		 ()
-		 )
-		)
+	 `((lambda ,(make-names vars) ,@exprs) ,@(make-vals vars))
+	 )
      )
 		   
 
@@ -457,71 +442,58 @@
 					;
 					; (let* ((x 1) (y)) (set! y (+ x 1)) y)
 
-(define let* (macro (vars exprs)
-		((lambda (make-names make-exprs make-nils)
+(define let*
+  (macro (vars exprs)
 
 					;
 					; make the list of names in the let
 					;
 
-		   (set! make-names (lambda (vars)
-				      (cond ((not (null? vars))
-					     (cons (car (car vars))
-						   (make-names (cdr vars))))
-					    (else ())
-					    )
-				      )
-			 )
+	 (define (make-names vars)
+	   (cond ((not (null? vars))
+		  (cons (car (car vars))
+			(make-names (cdr vars))))
+		 (else ())
+		 )
+	   )
 
 					; the set of expressions is
 					; the list of set expressions
 					; pre-pended to the
 					; expressions to evaluate
 
-		   (set! make-exprs (lambda (vars exprs)
-				      (cond ((not (null? vars))
-					     (cons
-					      (list set
-						    (list quote
-							  (car (car vars))
-							  )
-						    (cond ((null? (cdr (car vars))) ())
-							  (else (cadr (car vars))))
-						    )
-					      (make-exprs (cdr vars) exprs)
-					      )
-					     )
-					    (else exprs)
-					    )
-				      )
+	 (define (make-exprs vars exprs)
+	   (cond ((null? vars) exprs)
+		 (else
+		  (cons
+		   (list set
+			 (list quote
+			       (car (car vars))
+			       )
+			 (cond ((null? (cdr (car vars))) ())
+			       (else (cadr (car vars))))
 			 )
+		   (make-exprs (cdr vars) exprs)
+		   )
+		  )
+		 )
+	   )
 
 					; the parameters to the lambda is a list
 					; of nils of the right length
 
-		   (set! make-nils (lambda (vars)
-				     (cond ((not (null? vars)) (cons () (make-nils (cdr vars))))
-					   (else ())
-					   )
-				     )
-			 )
-					; prepend the set operations
-					; to the expressions
-
-		   (set! exprs (make-exprs vars exprs))
-
+	 (define (make-nils vars)
+	   (cond ((null? vars) ())
+		 (else (cons () (make-nils (cdr vars))))
+		 )
+	   )
 					; build the lambda.
 
-		   `((lambda ,(make-names vars) ,@exprs) ,@(make-nils vars))
-		   )
-		 ()
-		 ()
-		 ()
-		 )
-		)
+	 `((lambda ,(make-names vars) ,@(make-exprs vars exprs)) ,@(make-nils vars))
+	 )
      )
 
-(let* ((x 1)) x)
+(let* ((x 1) (y x)) (+ x y))
 
 (define when (macro (test l) `(cond (,test ,@l))))
 
@@ -545,7 +517,7 @@
 (define (list-tail x k)
   (if (zero? k)
       x
-    (list-tail (cdr x) (- k 1)))))
+    (list-tail (cdr x) (- k 1))))
 
 (list-tail '(1 2 3) 2)
 
@@ -682,19 +654,32 @@
 (display "apply\n")
 (apply cons '(a b))
 
-(define map (lexpr (proc lists)
-		   (let* ((args (lambda (lists)
-				  (if (null? lists) ()
-				    (cons (caar lists) (args (cdr lists))))))
-			  (next (lambda (lists)
-				  (if (null? lists) ()
-				    (cons (cdr (car lists)) (next (cdr lists))))))
-			  (domap (lambda (lists)
-				   (if (null? (car lists)) ()
-				     (cons (apply proc (args lists)) (domap (next lists)))
-				     )))
-			  )
-		     (domap lists))))
+(define map
+  (lexpr (proc lists)
+	 (define (args lists)
+	   (cond ((null? lists) ())
+		 (else
+		  (cons (caar lists) (args (cdr lists)))
+		  )
+		 )
+	   )
+	 (define (next lists)
+	   (cond ((null? lists) ())
+		 (else
+		  (cons (cdr (car lists)) (next (cdr lists)))
+		  )
+		 )
+	   )
+	 (define (domap lists)
+	   (cond ((null? (car lists)) ())
+		 (else
+		  (cons (apply proc (args lists)) (domap (next lists)))
+		  )
+		 )
+	   )
+	 (domap lists)
+	 )
+  )
 
 (map cadr '((a b) (d e) (g h)))
 

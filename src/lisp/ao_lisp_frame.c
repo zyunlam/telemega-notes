@@ -37,10 +37,12 @@ frame_vals_mark(void *addr)
 		struct ao_lisp_val	*v = &vals->vals[f];
 
 		ao_lisp_poly_mark(v->val, 0);
-		MDBG_MOVE("frame mark atom %s %d val %d at %d\n",
+		MDBG_MOVE("frame mark atom %s %d val %d at %d    ",
 			  ao_lisp_poly_atom(v->atom)->name,
 			  MDBG_OFFSET(ao_lisp_ref(v->atom)),
 			  MDBG_OFFSET(ao_lisp_ref(v->val)), f);
+		MDBG_DO(ao_lisp_poly_write(v->val));
+		MDBG_DO(printf("\n"));
 	}
 }
 
@@ -202,6 +204,7 @@ ao_lisp_frame_vals_new(int num)
 		return NULL;
 	vals->type = AO_LISP_FRAME_VALS;
 	vals->size = num;
+	memset(vals->vals, '\0', num * sizeof (struct ao_lisp_val));
 	return vals;
 }
 
@@ -226,10 +229,9 @@ ao_lisp_frame_new(int num)
 		vals = ao_lisp_frame_vals_new(num);
 		frame = ao_lisp_poly_frame(ao_lisp_poly_fetch(0));
 		frame->vals = ao_lisp_frame_vals_poly(vals);
+		frame->num = num;
 	}
-	frame->num = num;
 	frame->prev = AO_LISP_NIL;
-	memset(vals, '\0', vals->size * sizeof (struct ao_lisp_val));
 	return frame;
 }
 
@@ -245,9 +247,13 @@ ao_lisp_frame_mark(struct ao_lisp_frame *frame)
 void
 ao_lisp_frame_free(struct ao_lisp_frame *frame)
 {
-	if (!ao_lisp_frame_marked(frame)) {
+	if (frame && !ao_lisp_frame_marked(frame)) {
 		int	num = frame->num;
 		if (num < AO_LISP_FRAME_FREE) {
+			struct ao_lisp_frame_vals	*vals;
+
+			vals = ao_lisp_poly_frame_vals(frame->vals);
+			memset(vals->vals, '\0', vals->size * sizeof (struct ao_lisp_val));
 			frame->prev = ao_lisp_frame_poly(ao_lisp_frame_free_list[num]);
 			ao_lisp_frame_free_list[num] = frame;
 		}
@@ -291,30 +297,33 @@ ao_lisp_frame_bind(struct ao_lisp_frame *frame, int num, ao_poly atom, ao_poly v
 	vals->vals[l].val = val;
 }
 
-int
-ao_lisp_frame_add(struct ao_lisp_frame **frame_ref, ao_poly atom, ao_poly val)
+ao_poly
+ao_lisp_frame_add(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val)
 {
-	struct ao_lisp_frame	*frame = *frame_ref;
 	ao_poly *ref = frame ? ao_lisp_frame_ref(frame, atom) : NULL;
 
 	if (!ref) {
 		int f;
 		ao_lisp_poly_stash(0, atom);
 		ao_lisp_poly_stash(1, val);
-		if (frame) {
-			f = frame->num;
-			frame = ao_lisp_frame_realloc(frame, f + 1);
-		} else {
-			f = 0;
-			frame = ao_lisp_frame_new(1);
-			*frame_ref = frame;
-		}
+		f = frame->num;
+		frame = ao_lisp_frame_realloc(frame, f + 1);
 		if (!frame)
-			return 0;
+			return AO_LISP_NIL;
 		atom = ao_lisp_poly_fetch(0);
 		val = ao_lisp_poly_fetch(1);
 		ao_lisp_frame_bind(frame, frame->num - 1, atom, val);
 	} else
 		*ref = val;
-	return 1;
+	return val;
+}
+
+struct ao_lisp_frame	*ao_lisp_frame_global;
+struct ao_lisp_frame	*ao_lisp_frame_current;
+
+void
+ao_lisp_frame_init(void)
+{
+	if (!ao_lisp_frame_global)
+		ao_lisp_frame_global = ao_lisp_frame_new(0);
 }

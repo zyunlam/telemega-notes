@@ -111,8 +111,9 @@ extern uint16_t		ao_lisp_top;
 #define AO_LISP_DIVIDE_BY_ZERO	0x02
 #define AO_LISP_INVALID		0x04
 #define AO_LISP_UNDEFINED	0x08
-#define AO_LISP_EOF		0x10
-#define AO_LISP_EXIT		0x20
+#define AO_LISP_REDEFINED	0x10
+#define AO_LISP_EOF		0x20
+#define AO_LISP_EXIT		0x40
 
 extern uint8_t		ao_lisp_exception;
 
@@ -627,13 +628,16 @@ struct ao_lisp_atom *
 ao_lisp_atom_intern(char *name);
 
 ao_poly *
-ao_lisp_atom_ref(struct ao_lisp_frame *frame, ao_poly atom);
+ao_lisp_atom_ref(ao_poly atom);
 
 ao_poly
 ao_lisp_atom_get(ao_poly atom);
 
 ao_poly
 ao_lisp_atom_set(ao_poly atom, ao_poly val);
+
+ao_poly
+ao_lisp_atom_def(ao_poly atom, ao_poly val);
 
 /* int */
 void
@@ -757,11 +761,14 @@ ao_lisp_frame_free(struct ao_lisp_frame *frame);
 void
 ao_lisp_frame_bind(struct ao_lisp_frame *frame, int num, ao_poly atom, ao_poly val);
 
-int
-ao_lisp_frame_add(struct ao_lisp_frame **frame, ao_poly atom, ao_poly val);
+ao_poly
+ao_lisp_frame_add(struct ao_lisp_frame *frame, ao_poly atom, ao_poly val);
 
 void
 ao_lisp_frame_write(ao_poly p);
+
+void
+ao_lisp_frame_init(void);
 
 /* lambda */
 extern const struct ao_lisp_type ao_lisp_lambda_type;
@@ -864,7 +871,7 @@ ao_lisp_frames_dump(void)
 #include <assert.h>
 extern int dbg_move_depth;
 #define MDBG_DUMP 1
-#define MDBG_OFFSET(a)	((int) ((uint8_t *) (a) - ao_lisp_pool))
+#define MDBG_OFFSET(a)	((a) ? (int) ((uint8_t *) (a) - ao_lisp_pool) : -1)
 
 extern int dbg_mem;
 

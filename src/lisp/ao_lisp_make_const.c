@@ -133,7 +133,7 @@ ao_has_macro(ao_poly p);
 ao_poly
 ao_macro_test_get(ao_poly atom)
 {
-	ao_poly	*ref = ao_lisp_atom_ref(ao_lisp_frame_global, atom);
+	ao_poly	*ref = ao_lisp_atom_ref(atom);
 	if (ref)
 		return *ref;
 	return AO_LISP_NIL;
@@ -289,6 +289,8 @@ main(int argc, char **argv)
 		}
 	}
 
+	ao_lisp_frame_init();
+
 	/* Boolean values #f and #t */
 	ao_lisp_bool_get(0);
 	ao_lisp_bool_get(1);
@@ -298,13 +300,13 @@ main(int argc, char **argv)
 		if (funcs[f].func != prev_func)
 			b = ao_lisp_make_builtin(funcs[f].func, funcs[f].args);
 		a = ao_lisp_atom_intern(funcs[f].name);
-		ao_lisp_atom_set(ao_lisp_atom_poly(a),
+		ao_lisp_atom_def(ao_lisp_atom_poly(a),
 				 ao_lisp_builtin_poly(b));
 	}
 
 	/* end of file value */
 	a = ao_lisp_atom_intern("eof");
-	ao_lisp_atom_set(ao_lisp_atom_poly(a),
+	ao_lisp_atom_def(ao_lisp_atom_poly(a),
 			 ao_lisp_atom_poly(a));
 
 	/* 'else' */

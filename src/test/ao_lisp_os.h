@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define AO_LISP_POOL_TOTAL	3072
+#define AO_LISP_POOL_TOTAL	16384
 #define AO_LISP_SAVE		1
 #define DBG_MEM_STATS		1
 

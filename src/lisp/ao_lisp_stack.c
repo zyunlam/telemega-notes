@@ -103,7 +103,9 @@ ao_lisp_stack_new(void)
 int
 ao_lisp_stack_push(void)
 {
-	struct ao_lisp_stack	*stack = ao_lisp_stack_new();
+	struct ao_lisp_stack	*stack;
+
+	stack = ao_lisp_stack_new();
 
 	if (!stack)
 		return 0;
