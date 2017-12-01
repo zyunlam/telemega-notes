@@ -350,7 +350,7 @@ ao_lisp_eval_cond(void)
 	DBGI(".. frame "); DBG_POLY(ao_lisp_frame_poly(ao_lisp_frame_current)); DBG("\n");
 	DBGI(".. saved frame "); DBG_POLY(ao_lisp_stack->frame); DBG("\n");
 	if (!ao_lisp_stack->sexprs) {
-		ao_lisp_v = AO_LISP_NIL;
+		ao_lisp_v = _ao_lisp_bool_false;
 		ao_lisp_stack->state = eval_val;
 	} else {
 		ao_lisp_v = ao_lisp_poly_cons(ao_lisp_stack->sexprs)->car;
