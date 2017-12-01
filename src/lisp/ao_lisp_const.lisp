@@ -374,8 +374,9 @@
 
 
 					; define a set of local
-					; variables and then evaluate
-					; a list of sexprs
+					; variables all at once and
+					; then evaluate a list of
+					; sexprs
 					;
 					; (let (var-defines) sexprs)
 					;
@@ -392,6 +393,71 @@
 					; (let ((x 1) (y)) (set! y (+ x 1)) y)
 
 (define let (macro (vars exprs)
+		((lambda (make-names make-vals)
+
+					;
+					; make the list of names in the let
+					;
+
+		   (set! make-names (lambda (vars)
+				      (cond ((not (null? vars))
+					     (cons (car (car vars))
+						   (make-names (cdr vars))))
+					    (else ())
+					    )
+				      )
+			 )
+
+					; the parameters to the lambda is a list
+					; of nils of the right length
+
+		   (set! make-vals (lambda (vars)
+				     (cond ((not (null? vars))
+					    (cons (cond ((null? (cdr (car vars))) ())
+							(else
+							 (car (cdr (car vars))))
+							)
+						  (make-vals (cdr vars))))
+					   (else ())
+					   )
+				     )
+			 )
+					; prepend the set operations
+					; to the expressions
+
+					; build the lambda.
+
+		   `((lambda ,(make-names vars) ,@exprs) ,@(make-vals vars))
+		   )
+		 ()
+		 ()
+		 )
+		)
+     )
+		   
+
+(let ((x 1) (y)) (set! y 2) (+ x y))
+
+					; define a set of local
+					; variables one at a time and
+					; then evaluate a list of
+					; sexprs
+					;
+					; (let* (var-defines) sexprs)
+					;
+					; where var-defines are either
+					;
+					; (name value)
+					;
+					; or
+					;
+					; (name)
+					;
+					; e.g.
+					;
+					; (let* ((x 1) (y)) (set! y (+ x 1)) y)
+
+(define let* (macro (vars exprs)
 		((lambda (make-names make-exprs make-nils)
 
 					;
@@ -446,9 +512,7 @@
 
 					; build the lambda.
 
-		   (cons (cons 'lambda (cons (make-names vars) exprs))
-			 (make-nils vars)
-			 )
+		   `((lambda ,(make-names vars) ,@exprs) ,@(make-nils vars))
 		   )
 		 ()
 		 ()
@@ -457,23 +521,15 @@
 		)
      )
 
-(let ((x 1)) x)
+(let* ((x 1)) x)
 
-(define let* let)
+(define when (macro (test l) `(cond (,test ,@l))))
 
-(define when (macro (test l)
-		    (list
-		     cond
-		     (cons test l))))
+(when #t (write 'when))
 
-(when #t (display 'when))
+(define unless (macro (test l) `(cond ((not ,test) ,@l))))
 
-(define unless (macro (test l)
-		      (list
-		       cond
-		       (cons (list not test) l))))
-
-(unless #f (display 'unless))
+(unless #f (write 'unless))
 
 (define (reverse list)
   (let ((result ()))
@@ -512,30 +568,39 @@
 (equal? '(a b c) '(a b c))
 (equal? '(a b c) '(a b b))
 
-(define (_member obj list test?)
-  (if (null? list)
-      #f
-    (if (test? obj (car list))
-	list
-      (memq obj (cdr list)))))
+(define member (lexpr (obj list test?)
+		      (cond ((null? list)
+			     #f
+			     )
+			    (else
+			     (if (null? test?) (set! test? equal?) (set! test? (car test?)))
+			     (if (test? obj (car list))
+				 list
+			       (member obj (cdr list) test?))
+			     )
+			    )
+		      )
+  )
 
-(define (memq obj list) (_member obj list eq?))
+(member '(2) '((1) (2) (3)))
+
+(member '(4) '((1) (2) (3)))
+
+(define (memq obj list) (member obj list eq?))
 
 (memq 2 '(1 2 3))
 
 (memq 4 '(1 2 3))
 
-(define (memv obj list) (_member obj list eqv?))
+(memq '(2) '((1) (2) (3)))
+
+(define (memv obj list) (member obj list eqv?))
 
 (memv 2 '(1 2 3))
 
 (memv 4 '(1 2 3))
 
-(define (member obj list) (_member obj list equal?))
-
-(member '(2) '((1) (2) (3)))
-
-(member '(4) '((1) (2) (3)))
+(memv '(2) '((1) (2) (3)))
 
 (define (_assoc obj list test?)
   (if (null? list)
@@ -618,17 +683,17 @@
 (apply cons '(a b))
 
 (define map (lexpr (proc lists)
-		   (let ((args (lambda (lists)
-				 (if (null? lists) ()
-				   (cons (caar lists) (args (cdr lists))))))
-			 (next (lambda (lists)
-				 (if (null? lists) ()
-				   (cons (cdr (car lists)) (next (cdr lists))))))
-			 (domap (lambda (lists)
-				  (if (null? (car lists)) ()
-				    (cons (apply proc (args lists)) (domap (next lists)))
-					)))
-			 )
+		   (let* ((args (lambda (lists)
+				  (if (null? lists) ()
+				    (cons (caar lists) (args (cdr lists))))))
+			  (next (lambda (lists)
+				  (if (null? lists) ()
+				    (cons (cdr (car lists)) (next (cdr lists))))))
+			  (domap (lambda (lists)
+				   (if (null? (car lists)) ()
+				     (cons (apply proc (args lists)) (domap (next lists)))
+				     )))
+			  )
 		     (domap lists))))
 
 (map cadr '((a b) (d e) (g h)))
@@ -684,36 +749,36 @@
 (repeat 3 (write 'goodbye))
 
 (define case (macro (test l)
-		    (let ((_unarrow
+		    (let* ((_unarrow
 					; construct the body of the
 					; case, dealing with the
 					; lambda version ( => lambda)
-			   
-			   (lambda (l)
-			     (cond ((null? l) l)
-				   ((eq? (car l) '=>) `(( ,(cadr l) __key__)))
-				   (else l))))
-			  (_case (lambda (l)
+			    
+			    (lambda (l)
+			      (cond ((null? l) l)
+				    ((eq? (car l) '=>) `(( ,(cadr l) __key__)))
+				    (else l))))
+			   (_case (lambda (l)
 
 					; Build the case elements, which is
 					; simply a list of cond clauses
 
-				   (cond ((null? l) ())
+				    (cond ((null? l) ())
 
 					; else case
 
-					 ((eq? (caar l) 'else)
-					  `((else ,@(_unarrow (cdr (car l))))))
+					  ((eq? (caar l) 'else)
+					   `((else ,@(_unarrow (cdr (car l))))))
 
 					; regular case
 					  
-					 (else
-					  (cons
-					   `((eqv? ,(caar l) __key__)
-					     ,@(_unarrow (cdr (car l))))
-					   (_case (cdr l)))
-					  )
-					 ))))
+					  (else
+					   (cons
+					    `((eqv? ,(caar l) __key__)
+					      ,@(_unarrow (cdr (car l))))
+					    (_case (cdr l)))
+					   )
+					  ))))
 
 					; now construct the overall
 					; expression, using a lambda
