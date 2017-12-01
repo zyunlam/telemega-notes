@@ -44,6 +44,10 @@ static const struct ao_lisp_funcs ao_lisp_funcs[AO_LISP_NUM_TYPE] = {
 		.write = ao_lisp_frame_write,
 		.display = ao_lisp_frame_write,
 	},
+	[AO_LISP_FRAME_VALS] = {
+		.write = NULL,
+		.display = NULL,
+	},
 	[AO_LISP_LAMBDA] = {
 		.write = ao_lisp_lambda_write,
 		.display = ao_lisp_lambda_write,

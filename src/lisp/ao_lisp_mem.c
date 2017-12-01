@@ -148,6 +148,7 @@ struct ao_lisp_root {
 
 static struct ao_lisp_cons 	*save_cons[2];
 static char			*save_string[2];
+static struct ao_lisp_frame	*save_frame[1];
 static ao_poly			save_poly[3];
 
 static const struct ao_lisp_root	ao_lisp_root[] = {
@@ -166,6 +167,10 @@ static const struct ao_lisp_root	ao_lisp_root[] = {
 	{
 		.type = &ao_lisp_string_type,
 		.addr = (void **) &save_string[1],
+	},
+	{
+		.type = &ao_lisp_frame_type,
+		.addr = (void **) &save_frame[0],
 	},
 	{
 		.type = NULL,
@@ -455,6 +460,7 @@ static const struct ao_lisp_type *ao_lisp_types[AO_LISP_NUM_TYPE] = {
 	[AO_LISP_ATOM] = &ao_lisp_atom_type,
 	[AO_LISP_BUILTIN] = &ao_lisp_builtin_type,
 	[AO_LISP_FRAME] = &ao_lisp_frame_type,
+	[AO_LISP_FRAME_VALS] = &ao_lisp_frame_vals_type,
 	[AO_LISP_LAMBDA] = &ao_lisp_lambda_type,
 	[AO_LISP_STACK] = &ao_lisp_stack_type,
 	[AO_LISP_BOOL] = &ao_lisp_bool_type,
@@ -619,6 +625,29 @@ ao_lisp_collect(uint8_t style)
 /*
  * Mark interfaces for objects
  */
+
+
+/*
+ * Mark a block of memory with an explicit size
+ */
+
+int
+ao_lisp_mark_block(void *addr, int size)
+{
+	int offset;
+	if (!AO_LISP_IS_POOL(addr))
+		return 1;
+
+	offset = pool_offset(addr);
+	MDBG_MOVE("mark memory %d\n", MDBG_OFFSET(addr));
+	if (busy(ao_lisp_busy, offset)) {
+		MDBG_MOVE("already marked\n");
+		return 1;
+	}
+	mark(ao_lisp_busy, offset);
+	note_chunk(offset, size);
+	return 0;
+}
 
 /*
  * Note a reference to memory and collect information about a few
@@ -891,3 +920,16 @@ ao_lisp_string_fetch(int id)
 	return string;
 }
 
+void
+ao_lisp_frame_stash(int id, struct ao_lisp_frame *frame)
+{
+	save_frame[id] = frame;
+}
+
+struct ao_lisp_frame *
+ao_lisp_frame_fetch(int id)
+{
+	struct ao_lisp_frame *frame = save_frame[id];
+	save_frame[id] = NULL;
+	return frame;
+}

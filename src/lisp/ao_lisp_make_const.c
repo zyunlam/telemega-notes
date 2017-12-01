@@ -326,10 +326,11 @@ main(int argc, char **argv)
 	ao_lisp_collect(AO_LISP_COLLECT_FULL);
 
 	for (f = 0; f < ao_lisp_frame_global->num; f++) {
-		val = ao_has_macro(ao_lisp_frame_global->vals[f].val);
+		struct ao_lisp_frame_vals	*vals = ao_lisp_poly_frame_vals(ao_lisp_frame_global->vals);
+		val = ao_has_macro(vals->vals[f].val);
 		if (val != AO_LISP_NIL) {
 			printf("error: function %s contains unresolved macro: ",
-			       ao_lisp_poly_atom(ao_lisp_frame_global->vals[f].atom)->name);
+			       ao_lisp_poly_atom(vals->vals[f].atom)->name);
 			ao_lisp_poly_write(val);
 			printf("\n");
 			exit(1);

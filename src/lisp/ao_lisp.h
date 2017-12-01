@@ -92,12 +92,13 @@ extern uint8_t		ao_lisp_pool[AO_LISP_POOL + AO_LISP_POOL_EXTRA] __attribute__((a
 #define AO_LISP_ATOM		4
 #define AO_LISP_BUILTIN		5
 #define AO_LISP_FRAME		6
-#define AO_LISP_LAMBDA		7
-#define AO_LISP_STACK		8
-#define AO_LISP_BOOL		9
-#define AO_LISP_BIGINT		10
-#define AO_LISP_FLOAT		11
-#define AO_LISP_NUM_TYPE	12
+#define AO_LISP_FRAME_VALS	7
+#define AO_LISP_LAMBDA		8
+#define AO_LISP_STACK		9
+#define AO_LISP_BOOL		10
+#define AO_LISP_BIGINT		11
+#define AO_LISP_FLOAT		12
+#define AO_LISP_NUM_TYPE	13
 
 /* Leave two bits for types to use as they please */
 #define AO_LISP_OTHER_TYPE_MASK	0x3f
@@ -154,11 +155,17 @@ struct ao_lisp_val {
 	ao_poly		val;
 };
 
+struct ao_lisp_frame_vals {
+	uint8_t			type;
+	uint8_t			size;
+	struct ao_lisp_val	vals[];
+};
+
 struct ao_lisp_frame {
 	uint8_t			type;
 	uint8_t			num;
 	ao_poly			prev;
-	struct ao_lisp_val	vals[];
+	ao_poly			vals;
 };
 
 struct ao_lisp_bool {
@@ -219,6 +226,16 @@ ao_lisp_poly_frame(ao_poly poly) {
 static inline ao_poly
 ao_lisp_frame_poly(struct ao_lisp_frame *frame) {
 	return ao_lisp_poly(frame, AO_LISP_OTHER);
+}
+
+static inline struct ao_lisp_frame_vals *
+ao_lisp_poly_frame_vals(ao_poly poly) {
+	return ao_lisp_ref(poly);
+}
+
+static inline ao_poly
+ao_lisp_frame_vals_poly(struct ao_lisp_frame_vals *vals) {
+	return ao_lisp_poly(vals, AO_LISP_OTHER);
 }
 
 enum eval_state {
@@ -528,6 +545,12 @@ ao_lisp_stack_fetch(int id) {
 	return ao_lisp_poly_stack(ao_lisp_poly_fetch(id));
 }
 
+void
+ao_lisp_frame_stash(int id, struct ao_lisp_frame *frame);
+
+struct ao_lisp_frame *
+ao_lisp_frame_fetch(int id);
+
 /* bool */
 
 extern const struct ao_lisp_type ao_lisp_bool_type;
@@ -713,6 +736,7 @@ ao_lisp_read_eval_print(void);
 
 /* frame */
 extern const struct ao_lisp_type ao_lisp_frame_type;
+extern const struct ao_lisp_type ao_lisp_frame_vals_type;
 
 #define AO_LISP_FRAME_FREE	6
 

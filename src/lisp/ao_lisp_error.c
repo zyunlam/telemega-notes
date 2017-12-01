@@ -57,6 +57,7 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 	tabs(indent);
 	printf ("%s{", name);
 	if (frame) {
+		struct ao_lisp_frame_vals	*vals = ao_lisp_poly_frame_vals(frame->vals);
 		if (frame->type & AO_LISP_FRAME_PRINT)
 			printf("recurse...");
 		else {
@@ -66,9 +67,9 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 					tabs(indent);
 					printf("         ");
 				}
-				ao_lisp_poly_write(frame->vals[f].atom);
+				ao_lisp_poly_write(vals->vals[f].atom);
 				printf(" = ");
-				ao_lisp_poly_write(frame->vals[f].val);
+				ao_lisp_poly_write(vals->vals[f].val);
 				printf("\n");
 			}
 			if (frame->prev)
