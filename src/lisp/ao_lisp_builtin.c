@@ -675,7 +675,13 @@ ao_lisp_do_typep(int type, struct ao_lisp_cons *cons)
 ao_poly
 ao_lisp_do_pairp(struct ao_lisp_cons *cons)
 {
-	return ao_lisp_do_typep(AO_LISP_CONS, cons);
+	ao_poly	v;
+	if (!ao_lisp_check_argc(_ao_lisp_atom_led, cons, 1, 1))
+		return AO_LISP_NIL;
+	v = ao_lisp_arg(cons, 0);
+	if (v != AO_LISP_NIL && ao_lisp_poly_type(v) == AO_LISP_CONS)
+		return _ao_lisp_bool_true;
+	return _ao_lisp_bool_false;
 }
 
 ao_poly
