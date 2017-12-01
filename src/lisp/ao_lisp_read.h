@@ -19,23 +19,26 @@
  * token classes
  */
 
-# define END	0
-# define NAME	1
-# define OPEN  	2
-# define CLOSE	3
-# define QUOTE	4
-# define STRING	5
-# define NUM	6
-# define FLOAT	7
-# define DOT	8
-# define BOOL	9
+# define END			0
+# define NAME			1
+# define OPEN  			2
+# define CLOSE			3
+# define QUOTE			4
+# define QUASIQUOTE		5
+# define UNQUOTE		6
+# define UNQUOTE_SPLICING	7
+# define STRING			8
+# define NUM			9
+# define FLOAT			10
+# define DOT			11
+# define BOOL			12
 
 /*
  * character classes
  */
 
-# define PRINTABLE	0x0001	/* \t \n ' ' - '~' */
-# define SPECIAL	0x0002	/* ( [ { ) ] } ' */
+# define PRINTABLE	0x0001	/* \t \n ' ' - ~ */
+# define SPECIAL	0x0002	/* ( [ { ) ] } ' ` , */
 # define DOTC		0x0004	/* . */
 # define WHITE		0x0008	/* ' ' \t \n */
 # define DIGIT		0x0010	/* [0-9] */

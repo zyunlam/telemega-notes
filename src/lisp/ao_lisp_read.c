@@ -61,7 +61,7 @@ static const uint16_t	lex_classes[128] = {
  	PRINTABLE|SPECIAL,	/* ) */
  	PRINTABLE,		/* * */
  	PRINTABLE|SIGN,		/* + */
- 	PRINTABLE,		/* , */
+ 	PRINTABLE|SPECIAL,	/* , */
  	PRINTABLE|SIGN,		/* - */
  	PRINTABLE|DOTC|FLOATC,	/* . */
  	PRINTABLE,		/* / */
@@ -113,7 +113,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  ] */
 	PRINTABLE,		/*  ^ */
 	PRINTABLE,		/*  _ */
-  	PRINTABLE,		/*  ` */
+  	PRINTABLE|SPECIAL,	/*  ` */
 	PRINTABLE,		/*  a */
 	PRINTABLE,		/*  b */
 	PRINTABLE,		/*  c */
@@ -314,6 +314,18 @@ _lex(void)
 				return QUOTE;
 			case '.':
 				return DOT;
+			case '`':
+				return QUASIQUOTE;
+			case ',':
+				c = lexc();
+				if (c == '@') {
+					add_token(c);
+					end_token();
+					return UNQUOTE_SPLICING;
+				} else {
+					lex_unget(c);
+					return UNQUOTE;
+				}
 			}
 		}
 		if (lex_class & POUND) {
@@ -562,11 +574,27 @@ ao_lisp_read(void)
 				v = AO_LISP_NIL;
 			break;
 		case QUOTE:
+		case QUASIQUOTE:
+		case UNQUOTE:
+		case UNQUOTE_SPLICING:
 			if (!push_read_stack(cons, read_state))
 				return AO_LISP_NIL;
 			cons++;
 			read_state = READ_IN_QUOTE;
-			v = _ao_lisp_atom_quote;
+			switch (parse_token) {
+			case QUOTE:
+				v = _ao_lisp_atom_quote;
+				break;
+			case QUASIQUOTE:
+				v = _ao_lisp_atom_quasiquote;
+				break;
+			case UNQUOTE:
+				v = _ao_lisp_atom_unquote;
+				break;
+			case UNQUOTE_SPLICING:
+				v = _ao_lisp_atom_unquote2dsplicing;
+				break;
+			}
 			break;
 		case CLOSE:
 			if (!cons) {

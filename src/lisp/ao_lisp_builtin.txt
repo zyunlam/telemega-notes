@@ -10,6 +10,9 @@ f_lambda	cons
 f_lambda	last
 f_lambda	length
 nlambda		quote
+atom		quasiquote
+atom		unquote
+atom		unquote_splicing	unquote-splicing
 f_lambda	set
 macro		setq		set!
 nlambda		cond
