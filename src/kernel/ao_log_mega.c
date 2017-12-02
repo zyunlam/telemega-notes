@@ -94,6 +94,17 @@ ao_log(void)
 				log.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].hmc5883.z;
 				log.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].hmc5883.y;
 #endif
+#if HAS_MPU9250
+				log.u.sensor.accel_x = ao_data_ring[ao_log_data_pos].mpu9250.accel_x;
+				log.u.sensor.accel_y = ao_data_ring[ao_log_data_pos].mpu9250.accel_y;
+				log.u.sensor.accel_z = ao_data_ring[ao_log_data_pos].mpu9250.accel_z;
+				log.u.sensor.gyro_x = ao_data_ring[ao_log_data_pos].mpu9250.gyro_x;
+				log.u.sensor.gyro_y = ao_data_ring[ao_log_data_pos].mpu9250.gyro_y;
+				log.u.sensor.gyro_z = ao_data_ring[ao_log_data_pos].mpu9250.gyro_z;
+				log.u.sensor.mag_x = ao_data_ring[ao_log_data_pos].mpu9250.mag_x;
+				log.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].mpu9250.mag_z;
+				log.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].mpu9250.mag_y;
+#endif
 				log.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
 				ao_log_write(&log);
 				if (ao_log_state <= ao_flight_coast)

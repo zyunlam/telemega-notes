@@ -54,6 +54,7 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELEMINI3		12	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
 #define AO_LOG_FORMAT_TELEFIRETWO	13	/* 32-byte test stand data */
 #define AO_LOG_FORMAT_EASYMINI2		14	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
+#define AO_LOG_FORMAT_TELEMEGA_3	15	/* 32 byte typed telemega records with 32 bit gyro cal and mpu9250 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -473,7 +474,7 @@ struct ao_log_gps {
 	} u;
 };
 
-#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA
+#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3
 typedef struct ao_log_mega ao_log_type;
 #endif
 
