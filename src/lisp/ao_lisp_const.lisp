@@ -28,24 +28,23 @@
 (begin
  (def! append
    (lexpr (args)
-	  ((lambda (append-list append-lists)
-	     (set! append-list
-		   (lambda (a b)
-		     (cond ((null? a) b)
-			   (else (cons (car a) (append-list (cdr a) b)))
-			   )
-		     )
-		   )
-	     (set! append-lists
-		   (lambda (lists)
-		     (cond ((null? lists) lists)
-			   ((null? (cdr lists)) (car lists))
-			   (else (append-list (car lists) (append-lists (cdr lists))))
-			   )
-		     )
-		   )
-	     (append-lists args)
-	     ) () ())
+	  (def! append-list
+	    (lambda (a b)
+	      (cond ((null? a) b)
+		    (else (cons (car a) (append-list (cdr a) b)))
+		    )
+	      )
+	    )
+	    
+	  (def! append-lists
+	    (lambda (lists)
+	      (cond ((null? lists) lists)
+		    ((null? (cdr lists)) (car lists))
+		    (else (append-list (car lists) (append-lists (cdr lists))))
+		    )
+	      )
+	    )
+	  (append-lists args)
 	  )
    )
  'append)
@@ -240,28 +239,31 @@
 					; (define (name x y z) sexprs ...) 
 					;
 
-(def! define
-      (macro (first rest)
+(begin
+ (def! define
+   (macro (first rest)
 					; check for alternate lambda definition form
 
-	     (cond ((list? first)
-		    (set! rest
-			  (append
-			   (list
-			    'lambda
-			    (cdr first))
-			   rest))
-		    (set! first (car first))
-		    )
-		   (else
-		    (set! rest (car rest))
-		    )
-		   )
-	     `(begin
-	       (def (quote ,first) ,rest)
-	       (quote ,first))
-	     )
-      )
+	  (cond ((list? first)
+		 (set! rest
+		       (append
+			(list
+			 'lambda
+			 (cdr first))
+			rest))
+		 (set! first (car first))
+		 )
+		(else
+		 (set! rest (car rest))
+		 )
+		)
+	  `(begin
+	    (def (quote ,first) ,rest)
+	    (quote ,first))
+	  )
+   )
+ 'define
+ )
 
 					; basic list accessors
 
@@ -689,9 +691,11 @@
 
 (for-each display '("hello" " " "world" "\n"))
 
-(define _string-ml (lambda (strings)
-			     (if (null? strings) ()
-			       (cons (string->list (car strings)) (_string-ml (cdr strings))))))
+(define (_string-ml strings)
+  (if (null? strings) ()
+    (cons (string->list (car strings)) (_string-ml (cdr strings)))
+    )
+  )
 
 (define string-map (lexpr (proc strings)
 			  (list->string (apply map proc (_string-ml strings))))))
@@ -703,7 +707,7 @@
 
 (string-for-each write-char "IBM\n")
 
-(define newline (lambda () (write-char #\newline)))
+(define (newline) (write-char #\newline))
 
 (newline)
 
@@ -726,52 +730,73 @@
 
 `(hello ,(+ 1 2) ,@(list 1 2 3) `foo)
 
-(define repeat (macro (count rest)
-		       `(let ((__count__ ,count))
-			  (while (<= 0 (set! __count__ (- __count__ 1))) ,@rest))))
+
+(define repeat
+  (macro (count rest)
+	 (define counter '__count__)
+	 (cond ((pair? count)
+		(set! counter (car count))
+		(set! count (cadr count))
+		)
+	       )
+	 `(let ((,counter 0)
+		(__max__ ,count)
+		)
+	    (while (< ,counter __max__)
+	      ,@rest
+	      (set! ,counter (+ ,counter 1))
+	      )
+	    )
+	 )
+  )
 
 (repeat 2 (write 'hello))
-(repeat 3 (write 'goodbye))
+(repeat (x 3) (write 'goodbye x))
 
-(define case (macro (test l)
-		    (let* ((_unarrow
+(define case
+  (macro (test l)
 					; construct the body of the
 					; case, dealing with the
 					; lambda version ( => lambda)
-			    
-			    (lambda (l)
-			      (cond ((null? l) l)
-				    ((eq? (car l) '=>) `(( ,(cadr l) __key__)))
-				    (else l))))
-			   (_case (lambda (l)
+
+	 (define (_unarrow l)
+	   (cond ((null? l) l)
+		 ((eq? (car l) '=>) `(( ,(cadr l) __key__)))
+		 (else l))
+	   )
 
 					; Build the case elements, which is
 					; simply a list of cond clauses
 
-				    (cond ((null? l) ())
+	 (define (_case l)
+
+	   (cond ((null? l) ())
 
 					; else case
 
-					  ((eq? (caar l) 'else)
-					   `((else ,@(_unarrow (cdr (car l))))))
+		 ((eq? (caar l) 'else)
+		  `((else ,@(_unarrow (cdr (car l))))))
 
 					; regular case
-					  
-					  (else
-					   (cons
-					    `((eqv? ,(caar l) __key__)
-					      ,@(_unarrow (cdr (car l))))
-					    (_case (cdr l)))
-					   )
-					  ))))
+		 
+		 (else
+		  (cons
+		   `((eqv? ,(caar l) __key__)
+		     ,@(_unarrow (cdr (car l))))
+		   (_case (cdr l)))
+		  )
+		 )
+	   )
 
 					; now construct the overall
 					; expression, using a lambda
 					; to hold the computed value
 					; of the test expression
 
-		      `((lambda (__key__)
-			  (cond ,@(_case l))) ,test))))
+	 `((lambda (__key__)
+	     (cond ,@(_case l))) ,test)
+	 )
+  )
 
 (case 12 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else"))
 
