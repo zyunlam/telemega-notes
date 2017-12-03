@@ -15,6 +15,7 @@
 #include "ao_lisp.h"
 #include "ao_lisp_read.h"
 #include <math.h>
+#include <stdlib.h>
 
 static const uint16_t	lex_classes[128] = {
 	IGNORE,		/* ^@ */
@@ -445,7 +446,7 @@ _lex(void)
 						return NUM;
 					}
 					if (isfloat && hasdigit) {
-						token_float = atof(token_string);
+						token_float = strtof(token_string, NULL);
 						return FLOAT;
 					}
 					for (u = 0; u < NUM_NAMED_FLOATS; u++)
@@ -524,8 +525,7 @@ ao_lisp_read(void)
 	char			*string;
 	int			cons;
 	int			read_state;
-	ao_poly			v;
-
+	ao_poly			v = AO_LISP_NIL;
 
 	cons = 0;
 	read_state = 0;
