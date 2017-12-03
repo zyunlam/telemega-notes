@@ -208,6 +208,8 @@ ao_lisp_bigint_int(uint32_t bi) {
 
 #define AO_LISP_MIN_INT		(-(1 << (15 - AO_LISP_TYPE_SHIFT)))
 #define AO_LISP_MAX_INT		((1 << (15 - AO_LISP_TYPE_SHIFT)) - 1)
+#define AO_LISP_MIN_BIGINT	(-(1 << 24))
+#define AO_LISP_MAX_BIGINT	((1 << 24) - 1)
 
 #define AO_LISP_NOT_INTEGER	0x7fffffff
 

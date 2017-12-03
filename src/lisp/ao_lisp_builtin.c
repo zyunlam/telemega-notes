@@ -321,24 +321,30 @@ ao_lisp_math(struct ao_lisp_cons *orig_cons, enum ao_lisp_builtin_id op)
 		} else if (ao_lisp_integer_typep(rt) && ao_lisp_integer_typep(ct)) {
 			int32_t	r = ao_lisp_poly_integer(ret);
 			int32_t	c = ao_lisp_poly_integer(car);
+			int64_t t;
 
 			switch(op) {
 			case builtin_plus:
 				r += c;
+			check_overflow:
+				if (r < AO_LISP_MIN_BIGINT || AO_LISP_MAX_BIGINT < r)
+					goto inexact;
 				break;
 			case builtin_minus:
 				r -= c;
+				goto check_overflow;
 				break;
 			case builtin_times:
-				r *= c;
+				t = (int64_t) r * (int64_t) c;
+				if (t < AO_LISP_MIN_BIGINT || AO_LISP_MAX_BIGINT < t)
+					goto inexact;
+				r = (int32_t) t;
 				break;
 			case builtin_divide:
 				if (c != 0 && (r % c) == 0)
 					r /= c;
-				else {
-					ret = ao_lisp_float_get((float) r / (float) c);
-					continue;
-				}
+				else
+					goto inexact;
 				break;
 			case builtin_quotient:
 				if (c == 0)
@@ -365,8 +371,10 @@ ao_lisp_math(struct ao_lisp_cons *orig_cons, enum ao_lisp_builtin_id op)
 			}
 			ret = ao_lisp_integer_poly(r);
 		} else if (ao_lisp_number_typep(rt) && ao_lisp_number_typep(ct)) {
-			float r = ao_lisp_poly_number(ret);
-			float c = ao_lisp_poly_number(car);
+			float r, c;
+		inexact:
+			r = ao_lisp_poly_number(ret);
+			c = ao_lisp_poly_number(car);
 			switch(op) {
 			case builtin_plus:
 				r += c;
@@ -380,28 +388,10 @@ ao_lisp_math(struct ao_lisp_cons *orig_cons, enum ao_lisp_builtin_id op)
 			case builtin_divide:
 				r /= c;
 				break;
-#if 0
 			case builtin_quotient:
-				if (c == 0)
-					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "quotient by zero");
-				if (r % c != 0 && (c < 0) != (r < 0))
-					r = r / c - 1;
-				else
-					r = r / c;
-				break;
 			case builtin_remainder:
-				if (c == 0)
-					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "remainder by zero");
-				r %= c;
-				break;
 			case builtin_modulo:
-				if (c == 0)
-					return ao_lisp_error(AO_LISP_DIVIDE_BY_ZERO, "modulo by zero");
-				r %= c;
-				if ((r < 0) != (c < 0))
-					r += c;
-				break;
-#endif
+				return ao_lisp_error(AO_LISP_INVALID, "non-integer value in integer divide");
 			default:
 				break;
 			}
