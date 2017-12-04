@@ -58,8 +58,8 @@ static void cons_move(void *addr)
 		cdr = cons->cdr;
 		if (!cdr)
 			break;
-		if (ao_lisp_poly_type(cdr) != AO_LISP_CONS) {
-			(void) ao_lisp_poly_move(&cons->cdr, 1);
+		if (ao_lisp_poly_base_type(cdr) != AO_LISP_CONS) {
+			(void) ao_lisp_poly_move(&cons->cdr, 0);
 			break;
 		}
 		c = ao_lisp_poly_cons(cdr);
@@ -95,8 +95,8 @@ ao_lisp_cons_cons(ao_poly car, ao_poly cdr)
 		ao_lisp_poly_stash(0, car);
 		ao_lisp_poly_stash(1, cdr);
 		cons = ao_lisp_alloc(sizeof (struct ao_lisp_cons));
-		car = ao_lisp_poly_fetch(0);
 		cdr = ao_lisp_poly_fetch(1);
+		car = ao_lisp_poly_fetch(0);
 		if (!cons)
 			return NULL;
 	}
