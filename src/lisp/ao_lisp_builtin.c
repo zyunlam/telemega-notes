@@ -125,7 +125,7 @@ ao_lisp_check_argt(ao_poly name, struct ao_lisp_cons *cons, int argc, int type, 
 	ao_poly car = ao_lisp_arg(cons, argc);
 
 	if ((!car && !nil_ok) || ao_lisp_poly_type(car) != type)
-		return ao_lisp_error(AO_LISP_INVALID, "%s: invalid type for arg %d", ao_lisp_poly_atom(name)->name, argc);
+		return ao_lisp_error(AO_LISP_INVALID, "%s: arg %d invalid type %v", ao_lisp_poly_atom(name)->name, argc, car);
 	return _ao_lisp_bool_true;
 }
 
@@ -226,9 +226,9 @@ ao_lisp_do_setq(struct ao_lisp_cons *cons)
 		return AO_LISP_NIL;
 	name = cons->car;
 	if (ao_lisp_poly_type(name) != AO_LISP_ATOM)
-		return ao_lisp_error(AO_LISP_INVALID, "set! of non-atom");
+		return ao_lisp_error(AO_LISP_INVALID, "set! of non-atom %v", name);
 	if (!ao_lisp_atom_ref(name))
-		return ao_lisp_error(AO_LISP_INVALID, "atom not defined");
+		return ao_lisp_error(AO_LISP_INVALID, "atom %v not defined", name);
 	return ao_lisp__cons(_ao_lisp_atom_set,
 			     ao_lisp__cons(ao_lisp__cons(_ao_lisp_atom_quote,
 							 ao_lisp__cons(name, AO_LISP_NIL)),

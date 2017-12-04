@@ -17,6 +17,9 @@
 
 #define DBG_MEM		0
 #define DBG_EVAL	0
+#define DBG_READ	0
+#define DBG_FREE_CONS	0
+#define NDEBUG		1
 
 #include <stdint.h>
 #include <string.h>
@@ -387,6 +390,16 @@ static inline int ao_lisp_poly_type(ao_poly poly) {
 	return type;
 }
 
+static inline int
+ao_lisp_is_cons(ao_poly poly) {
+	return (ao_lisp_poly_base_type(poly) == AO_LISP_CONS);
+}
+
+static inline int
+ao_lisp_is_pair(ao_poly poly) {
+	return poly != AO_LISP_NIL && (ao_lisp_poly_base_type(poly) == AO_LISP_CONS);
+}
+
 static inline struct ao_lisp_cons *
 ao_lisp_poly_cons(ao_poly poly)
 {
@@ -519,6 +532,11 @@ ao_lisp_alloc(int size);
 
 int
 ao_lisp_collect(uint8_t style);
+
+#if DBG_FREE_CONS
+void
+ao_lisp_cons_check(struct ao_lisp_cons *cons);
+#endif
 
 void
 ao_lisp_cons_stash(int id, struct ao_lisp_cons *cons);
@@ -813,6 +831,12 @@ ao_lisp_stack_eval(void);
 /* error */
 
 void
+ao_lisp_vprintf(char *format, va_list args);
+
+void
+ao_lisp_printf(char *format, ...);
+
+void
 ao_lisp_error_poly(char *name, ao_poly poly, ao_poly last);
 
 void
@@ -828,7 +852,7 @@ ao_lisp_error(int error, char *format, ...);
 
 /* debugging macros */
 
-#if DBG_EVAL
+#if DBG_EVAL || DBG_READ || DBG_MEM
 #define DBG_CODE	1
 int ao_lisp_stack_depth;
 #define DBG_DO(a)	a
@@ -836,8 +860,8 @@ int ao_lisp_stack_depth;
 #define DBG_IN()	(++ao_lisp_stack_depth)
 #define DBG_OUT()	(--ao_lisp_stack_depth)
 #define DBG_RESET()	(ao_lisp_stack_depth = 0)
-#define DBG(...) 	printf(__VA_ARGS__)
-#define DBGI(...)	do { DBG("%4d: ", __LINE__); DBG_INDENT(); DBG(__VA_ARGS__); } while (0)
+#define DBG(...) 	ao_lisp_printf(__VA_ARGS__)
+#define DBGI(...)	do { printf("%4d: ", __LINE__); DBG_INDENT(); DBG(__VA_ARGS__); } while (0)
 #define DBG_CONS(a)	ao_lisp_cons_write(ao_lisp_cons_poly(a))
 #define DBG_POLY(a)	ao_lisp_poly_write(a)
 #define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_lisp_pool) : -1)
@@ -866,6 +890,16 @@ ao_lisp_frames_dump(void)
 #define DBG_FRAMES()
 #endif
 
+#if DBG_READ
+#define RDBGI(...)	DBGI(__VA_ARGS__)
+#define RDBG_IN()	DBG_IN()
+#define RDBG_OUT()	DBG_OUT()
+#else
+#define RDBGI(...)
+#define RDBG_IN()
+#define RDBG_OUT()
+#endif
+
 #define DBG_MEM_START	1
 
 #if DBG_MEM
@@ -877,7 +911,7 @@ extern int dbg_move_depth;
 
 extern int dbg_mem;
 
-#define MDBG_DO(a)	a
+#define MDBG_DO(a)	DBG_DO(a)
 #define MDBG_MOVE(...) do { if (dbg_mem) { int d; for (d = 0; d < dbg_move_depth; d++) printf ("  "); printf(__VA_ARGS__); } } while (0)
 #define MDBG_MORE(...) do { if (dbg_mem) printf(__VA_ARGS__); } while (0)
 #define MDBG_MOVE_IN()	(dbg_move_depth++)

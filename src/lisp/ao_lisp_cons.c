@@ -127,6 +127,9 @@ ao_lisp__cons(ao_poly car, ao_poly cdr)
 void
 ao_lisp_cons_free(struct ao_lisp_cons *cons)
 {
+#if DBG_FREE_CONS
+	ao_lisp_cons_check(cons);
+#endif
 	while (cons) {
 		ao_poly cdr = cons->cdr;
 		cons->cdr = ao_lisp_cons_poly(ao_lisp_cons_free_list);

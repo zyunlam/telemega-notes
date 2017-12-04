@@ -82,6 +82,43 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 		printf ("}\n");
 }
 
+void
+ao_lisp_vprintf(char *format, va_list args)
+{
+	char c;
+
+	while ((c = *format++) != '\0') {
+		if (c == '%') {
+			switch (c = *format++) {
+			case 'v':
+				ao_lisp_poly_write((ao_poly) va_arg(args, unsigned int));
+				break;
+			case 'p':
+				printf("%p", va_arg(args, void *));
+				break;
+			case 'd':
+				printf("%d", va_arg(args, int));
+				break;
+			case 's':
+				printf("%s", va_arg(args, char *));
+				break;
+			default:
+				putchar(c);
+				break;
+			}
+		} else
+			putchar(c);
+	}
+}
+
+void
+ao_lisp_printf(char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	ao_lisp_vprintf(format, args);
+	va_end(args);
+}
 
 ao_poly
 ao_lisp_error(int error, char *format, ...)
@@ -90,14 +127,13 @@ ao_lisp_error(int error, char *format, ...)
 
 	ao_lisp_exception |= error;
 	va_start(args, format);
-	vprintf(format, args);
+	ao_lisp_vprintf(format, args);
+	putchar('\n');
 	va_end(args);
-	printf("\n");
-	printf("Value: "); ao_lisp_poly_write(ao_lisp_v); printf("\n");
+	ao_lisp_printf("Value:  %v\n", ao_lisp_v);
+	ao_lisp_printf("Frame:  %v\n", ao_lisp_frame_poly(ao_lisp_frame_current));
 	printf("Stack:\n");
 	ao_lisp_stack_write(ao_lisp_stack_poly(ao_lisp_stack));
-	printf("Globals:\n\t");
-	ao_lisp_frame_write(ao_lisp_frame_poly(ao_lisp_frame_global));
-	printf("\n");
+	ao_lisp_printf("Globals: %v\n", ao_lisp_frame_poly(ao_lisp_frame_global));
 	return AO_LISP_NIL;
 }

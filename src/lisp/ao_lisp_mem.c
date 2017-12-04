@@ -16,6 +16,7 @@
 
 #include "ao_lisp.h"
 #include <stdio.h>
+#include <assert.h>
 
 #ifdef AO_LISP_MAKE_CONST
 
@@ -623,6 +624,32 @@ ao_lisp_collect(uint8_t style)
 	return AO_LISP_POOL - ao_lisp_top;
 }
 
+#if DBG_FREE_CONS
+void
+ao_lisp_cons_check(struct ao_lisp_cons *cons)
+{
+	ao_poly	cdr;
+	int offset;
+
+	chunk_low = 0;
+	reset_chunks();
+	walk(ao_lisp_mark_ref, ao_lisp_poly_mark_ref);
+	while (cons) {
+		if (!AO_LISP_IS_POOL(cons))
+			break;
+		offset = pool_offset(cons);
+		if (busy(ao_lisp_busy, offset)) {
+			ao_lisp_printf("cons at %p offset %d poly %d is busy\n\t%v\n", cons, offset, ao_lisp_cons_poly(cons), ao_lisp_cons_poly(cons));
+			abort();
+		}
+		cdr = cons->cdr;
+		if (!ao_lisp_is_pair(cdr))
+			break;
+		cons = ao_lisp_poly_cons(cdr);
+	}
+}
+#endif
+
 /*
  * Mark interfaces for objects
  */
@@ -883,6 +910,7 @@ ao_lisp_alloc(int size)
 void
 ao_lisp_cons_stash(int id, struct ao_lisp_cons *cons)
 {
+	assert(save_cons[id] == 0);
 	save_cons[id] = cons;
 }
 
@@ -897,6 +925,7 @@ ao_lisp_cons_fetch(int id)
 void
 ao_lisp_poly_stash(int id, ao_poly poly)
 {
+	assert(save_poly[id] == AO_LISP_NIL);
 	save_poly[id] = poly;
 }
 
@@ -911,6 +940,7 @@ ao_lisp_poly_fetch(int id)
 void
 ao_lisp_string_stash(int id, char *string)
 {
+	assert(save_string[id] == NULL);
 	save_string[id] = string;
 }
 
@@ -925,6 +955,7 @@ ao_lisp_string_fetch(int id)
 void
 ao_lisp_frame_stash(int id, struct ao_lisp_frame *frame)
 {
+	assert(save_frame[id] == NULL);
 	save_frame[id] = frame;
 }
 

@@ -68,7 +68,7 @@ func_type(ao_poly func)
 static int
 ao_lisp_eval_sexpr(void)
 {
-	DBGI("sexpr: "); DBG_POLY(ao_lisp_v); DBG("\n");
+	DBGI("sexpr: %v\n", ao_lisp_v);
 	switch (ao_lisp_poly_type(ao_lisp_v)) {
 	case AO_LISP_CONS:
 		if (ao_lisp_v == AO_LISP_NIL) {
@@ -193,8 +193,8 @@ ao_lisp_eval_formal(void)
 			ao_lisp_stack->sexprs = prev->sexprs;
 
 			DBGI(".. start macro\n");
-			DBGI(".. sexprs       "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
-			DBGI(".. values       "); DBG_POLY(ao_lisp_stack->values); DBG("\n");
+			DBGI("\t.. sexprs       "); DBG_POLY(ao_lisp_stack->sexprs); DBG("\n");
+			DBGI("\t.. values       "); DBG_POLY(ao_lisp_stack->values); DBG("\n");
 			DBG_FRAMES();
 
 			/* fall through ... */

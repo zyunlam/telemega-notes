@@ -464,7 +464,7 @@ _lex(void)
 static inline int lex(void)
 {
 	int	parse_token = _lex();
-	DBGI("token %d (%s)\n", parse_token, token_string);
+	RDBGI("token %d (%s)\n", parse_token, token_string);
 	return parse_token;
 }
 
@@ -481,8 +481,8 @@ struct ao_lisp_cons	*ao_lisp_read_stack;
 static int
 push_read_stack(int cons, int read_state)
 {
-	DBGI("push read stack %p 0x%x\n", ao_lisp_read_cons, read_state);
-	DBG_IN();
+	RDBGI("push read stack %p 0x%x\n", ao_lisp_read_cons, read_state);
+	RDBG_IN();
 	if (cons) {
 		ao_lisp_read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_read_cons),
 						       ao_lisp__cons(ao_lisp_int_poly(read_state),
@@ -513,8 +513,8 @@ pop_read_stack(int cons)
 		ao_lisp_read_cons_tail = 0;
 		ao_lisp_read_stack = 0;
 	}
-	DBG_OUT();
-	DBGI("pop read stack %p %d\n", ao_lisp_read_cons, read_state);
+	RDBG_OUT();
+	RDBGI("pop read stack %p %d\n", ao_lisp_read_cons, read_state);
 	return read_state;
 }
 
