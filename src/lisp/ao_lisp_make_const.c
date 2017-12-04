@@ -191,6 +191,7 @@ ao_has_macro(ao_poly p)
 	struct ao_lisp_cons	*cons;
 	struct ao_lisp_lambda	*lambda;
 	ao_poly			m;
+	ao_poly			list;
 
 	if (p == AO_LISP_NIL)
 		return AO_LISP_NIL;
@@ -206,15 +207,16 @@ ao_has_macro(ao_poly p)
 		if ((p = ao_is_macro(cons->car)))
 			break;
 
-		cons = ao_lisp_poly_cons(cons->cdr);
+		list = cons->cdr;
 		p = AO_LISP_NIL;
-		while (cons) {
+		while (list != AO_LISP_NIL && ao_lisp_poly_type(list) == AO_LISP_CONS) {
+			cons = ao_lisp_poly_cons(list);
 			m = ao_has_macro(cons->car);
 			if (m) {
 				p = m;
 				break;
 			}
-			cons = ao_lisp_poly_cons(cons->cdr);
+			list = cons->cdr;
 		}
 		break;
 

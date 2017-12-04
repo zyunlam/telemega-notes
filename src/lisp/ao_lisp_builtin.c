@@ -50,7 +50,6 @@ char *ao_lisp_args_name(uint8_t args) {
 	args &= AO_LISP_FUNC_MASK;
 	switch (args) {
 	case AO_LISP_FUNC_LAMBDA: return ao_lisp_poly_atom(_ao_lisp_atom_lambda)->name;
-	case AO_LISP_FUNC_LEXPR: return ao_lisp_poly_atom(_ao_lisp_atom_lexpr)->name;
 	case AO_LISP_FUNC_NLAMBDA: return ao_lisp_poly_atom(_ao_lisp_atom_nlambda)->name;
 	case AO_LISP_FUNC_MACRO: return ao_lisp_poly_atom(_ao_lisp_atom_macro)->name;
 	default: return "???";
@@ -70,7 +69,6 @@ ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {
 
 static const ao_poly ao_lisp_args_atoms[] = {
 	[AO_LISP_FUNC_LAMBDA] = _ao_lisp_atom_lambda,
-	[AO_LISP_FUNC_LEXPR] = _ao_lisp_atom_lexpr,
 	[AO_LISP_FUNC_NLAMBDA] = _ao_lisp_atom_nlambda,
 	[AO_LISP_FUNC_MACRO] = _ao_lisp_atom_macro,
 };

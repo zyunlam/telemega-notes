@@ -14,10 +14,10 @@
 ; Lisp code placed in ROM
 
 					; return a list containing all of the arguments
-(def (quote list) (lexpr (l) l))
+(def (quote list) (lambda l l))
 
 (def (quote def!)
-     (macro (name value rest)
+     (macro (name value)
 	    (list
 	     def
 	     (list quote name)
@@ -27,7 +27,7 @@
 
 (begin
  (def! append
-   (lexpr (args)
+   (lambda args
 	  (def! append-list
 	    (lambda (a b)
 	      (cond ((null? a) b)
@@ -55,7 +55,7 @@
 
 (begin
  (def! or
-   (macro (l)
+   (macro l
 	  (def! _or
 	    (lambda (l)
 	      (cond ((null? l) #f)
@@ -84,7 +84,7 @@
 
 (begin
  (def! and
-   (macro (l)
+   (macro l
 	  (def! _and
 	    (lambda (l)
 	      (cond ((null? l) #t)
@@ -102,7 +102,9 @@
 		    )
 	      )
 	    )
-	  (_and l)))
+	  (_and l)
+	  )
+   )
  'and)
 
 					; execute to resolve macros
@@ -111,7 +113,7 @@
 
 (begin
  (def! quasiquote
-   (macro (x rest)
+   (macro (x)
 	  (def! constant?
 					; A constant value is either a pair starting with quote,
 					; or anything which is neither a pair nor a symbol
@@ -225,10 +227,12 @@
 	       )
 	      )
 	    )
-	  (expand-quasiquote x 0)
+	  (def! result (expand-quasiquote x 0))
+	  result
 	  )
    )
  'quasiquote)
+
 					;
 					; Define a variable without returning the value
 					; Useful when defining functions to avoid
@@ -241,7 +245,7 @@
 
 (begin
  (def! define
-   (macro (first rest)
+   (macro (first . rest)
 					; check for alternate lambda definition form
 
 	  (cond ((list? first)
@@ -257,9 +261,11 @@
 		 (set! rest (car rest))
 		 )
 		)
-	  `(begin
-	    (def (quote ,first) ,rest)
-	    (quote ,first))
+	  (def! result `(,begin
+			 (,def (,quote ,first) ,rest)
+			 (,quote ,first))
+	    )
+	  result
 	  )
    )
  'define
@@ -275,22 +281,11 @@
 
 (define (caddr l) (car (cdr (cdr l))))
 
-(define (list-tail x k)
-  (if (zero? k)
-      x
-    (list-tail (cdr x (- k 1)))
-    )
-  )
-
-(define (list-ref x k)
-  (car (list-tail x k))
-  )
-
 					; (if <condition> <if-true>)
 					; (if <condition> <if-true> <if-false)
 
 (define if
-  (macro (test args)
+  (macro (test . args)
 	 (cond ((null? (cdr args))
 		`(cond (,test ,(car args)))
 		)
@@ -309,18 +304,18 @@
 
 					; simple math operators
 
-(define zero? (macro (value rest) `(eq? ,value 0)))
+(define zero? (macro (value) `(eq? ,value 0)))
 
 (zero? 1)
 (zero? 0)
 (zero? "hello")
 
-(define positive? (macro (value rest) `(> ,value 0)))
+(define positive? (macro (value) `(> ,value 0)))
 
 (positive? 12)
 (positive? -12)
 
-(define negative? (macro (value rest) `(< ,value 0)))
+(define negative? (macro (value) `(< ,value 0)))
 
 (negative? 12)
 (negative? -12)
@@ -330,7 +325,7 @@
 (abs 12)
 (abs -12)
 
-(define max (lexpr (first rest)
+(define max (lambda (first . rest)
 		   (while (not (null? rest))
 		     (cond ((< first (car rest))
 			    (set! first (car rest)))
@@ -343,7 +338,7 @@
 (max 1 2 3)
 (max 3 2 1)
 
-(define min (lexpr (first rest)
+(define min (lambda (first . rest)
 		   (while (not (null? rest))
 		     (cond ((> first (car rest))
 			    (set! first (car rest)))
@@ -371,6 +366,17 @@
 (odd? -1)
 
 
+(define (list-tail x k)
+  (if (zero? k)
+      x
+    (list-tail (cdr x (- k 1)))
+    )
+  )
+
+(define (list-ref x k)
+  (car (list-tail x k))
+  )
+
 					; define a set of local
 					; variables all at once and
 					; then evaluate a list of
@@ -391,7 +397,7 @@
 					; (let ((x 1) (y)) (set! y (+ x 1)) y)
 
 (define let
-  (macro (vars exprs)
+  (macro (vars . exprs)
 	 (define (make-names vars)
 	   (cond ((not (null? vars))
 		  (cons (car (car vars))
@@ -445,7 +451,7 @@
 					; (let* ((x 1) (y)) (set! y (+ x 1)) y)
 
 (define let*
-  (macro (vars exprs)
+  (macro (vars . exprs)
 
 					;
 					; make the list of names in the let
@@ -497,11 +503,11 @@
 
 (let* ((x 1) (y x)) (+ x y))
 
-(define when (macro (test l) `(cond (,test ,@l))))
+(define when (macro (test . l) `(cond (,test ,@l))))
 
 (when #t (write 'when))
 
-(define unless (macro (test l) `(cond ((not ,test) ,@l))))
+(define unless (macro (test . l) `(cond ((not ,test) ,@l))))
 
 (unless #f (write 'unless))
 
@@ -542,7 +548,7 @@
 (equal? '(a b c) '(a b c))
 (equal? '(a b c) '(a b b))
 
-(define member (lexpr (obj list test?)
+(define member (lambda (obj list . test?)
 		      (cond ((null? list)
 			     #f
 			     )
@@ -651,13 +657,13 @@
 (char-downcase #\0)
 (char-downcase #\space)
 
-(define string (lexpr (chars) (list->string chars)))
+(define string (lambda chars (list->string chars)))
 
 (display "apply\n")
 (apply cons '(a b))
 
 (define map
-  (lexpr (proc lists)
+  (lambda (proc . lists)
 	 (define (args lists)
 	   (cond ((null? lists) ())
 		 (else
@@ -685,7 +691,7 @@
 
 (map cadr '((a b) (d e) (g h)))
 
-(define for-each (lexpr (proc lists)
+(define for-each (lambda (proc . lists)
 			(apply map proc lists)
 			#t))
 
@@ -697,12 +703,12 @@
     )
   )
 
-(define string-map (lexpr (proc strings)
+(define string-map (lambda (proc . strings)
 			  (list->string (apply map proc (_string-ml strings))))))
 
 (string-map (lambda (x) (+ 1 x)) "HAL")
 
-(define string-for-each (lexpr (proc strings)
+(define string-for-each (lambda (proc . strings)
 			       (apply for-each proc (_string-ml strings))))
 
 (string-for-each write-char "IBM\n")
@@ -732,7 +738,7 @@
 
 
 (define repeat
-  (macro (count rest)
+  (macro (count . rest)
 	 (define counter '__count__)
 	 (cond ((pair? count)
 		(set! counter (car count))
@@ -754,7 +760,7 @@
 (repeat (x 3) (write 'goodbye x))
 
 (define case
-  (macro (test l)
+  (macro (test . l)
 					; construct the body of the
 					; case, dealing with the
 					; lambda version ( => lambda)
@@ -800,7 +806,7 @@
 
 (case 12 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else"))
 
-;(define number->string (lexpr (arg opt)
+;(define number->string (lambda (arg . opt)
 ;			      (let ((base (if (null? opt) 10 (car opt)))
 					;
 ;

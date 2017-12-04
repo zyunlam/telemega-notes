@@ -9,10 +9,8 @@ typedef struct {
 string[string] type_map = {
 	"lambda" => "LAMBDA",
 	"nlambda" => "NLAMBDA",
-	"lexpr" => "LEXPR",
 	"macro" => "MACRO",
 	"f_lambda" => "F_LAMBDA",
-	"f_lexpr" => "F_LEXPR",
 	"atom" => "atom",
 };
 

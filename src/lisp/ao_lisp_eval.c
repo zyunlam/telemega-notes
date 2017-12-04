@@ -152,9 +152,9 @@ ao_lisp_eval_val(void)
  * A formal has been computed.
  *
  * If this is the first formal, then check to see if we've got a
- * lamda/lexpr or macro/nlambda.
+ * lamda, macro or nlambda.
  *
- * For lambda/lexpr, go compute another formal.  This will terminate
+ * For lambda, go compute another formal.  This will terminate
  * when the sexpr state sees nil.
  *
  * For macro/nlambda, we're done, so move the sexprs into the values
@@ -177,8 +177,7 @@ ao_lisp_eval_formal(void)
 	if (!ao_lisp_stack->values) {
 		switch (func_type(ao_lisp_v)) {
 		case AO_LISP_FUNC_LAMBDA:
-		case AO_LISP_FUNC_LEXPR:
-			DBGI(".. lambda or lexpr\n");
+			DBGI(".. lambda\n");
 			break;
 		case AO_LISP_FUNC_MACRO:
 			/* Evaluate the result once more */
@@ -272,8 +271,11 @@ ao_lisp_eval_exec(void)
 				DBGI("set "); DBG_POLY(atom); DBG(" = "); DBG_POLY(val); DBG("\n");
 			});
 		builtin = ao_lisp_poly_builtin(ao_lisp_v);
-		if (builtin && builtin->args & AO_LISP_FUNC_FREE_ARGS && !ao_lisp_stack_marked(ao_lisp_stack) && !ao_lisp_skip_cons_free)
-			ao_lisp_cons_free(ao_lisp_poly_cons(ao_lisp_stack->values));
+		if (builtin && (builtin->args & AO_LISP_FUNC_FREE_ARGS) && !ao_lisp_stack_marked(ao_lisp_stack) && !ao_lisp_skip_cons_free) {
+			struct ao_lisp_cons *cons = ao_lisp_poly_cons(ao_lisp_stack->values);
+			ao_lisp_stack->values = AO_LISP_NIL;
+			ao_lisp_cons_free(cons);
+		}
 
 		ao_lisp_v = v;
 		ao_lisp_stack->values = AO_LISP_NIL;

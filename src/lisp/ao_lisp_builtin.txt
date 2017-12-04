@@ -1,7 +1,6 @@
 f_lambda	eval
 f_lambda	read
 nlambda		lambda
-nlambda		lexpr
 nlambda		nlambda
 nlambda		macro
 f_lambda	car
@@ -19,25 +18,25 @@ f_lambda	def
 nlambda		cond
 nlambda		begin
 nlambda		while
-f_lexpr		write
-f_lexpr		display
-f_lexpr		plus		+
-f_lexpr		minus		-
-f_lexpr		times		*
-f_lexpr		divide		/
-f_lexpr		modulo		modulo	%
-f_lexpr		remainder
-f_lexpr		quotient
-f_lexpr		equal		=	eq?	eqv?
-f_lexpr		less		<
-f_lexpr		greater		>
-f_lexpr		less_equal	<=
-f_lexpr		greater_equal	>=
+f_lambda	write
+f_lambda	display
+f_lambda	plus		+
+f_lambda	minus		-
+f_lambda	times		*
+f_lambda	divide		/
+f_lambda	modulo		modulo	%
+f_lambda	remainder
+f_lambda	quotient
+f_lambda	equal		=	eq?	eqv?
+f_lambda	less		<
+f_lambda	greater		>
+f_lambda	less_equal	<=
+f_lambda	greater_equal	>=
 f_lambda	list_to_string		list->string
 f_lambda	string_to_list		string->list
 f_lambda	flush_output		flush-output
 f_lambda	delay
-f_lexpr		led
+f_lambda	led
 f_lambda	save
 f_lambda	restore
 f_lambda	call_cc		call-with-current-continuation	call/cc
@@ -56,7 +55,7 @@ f_lambda	symbol_to_string	symbol->string
 f_lambda	string_to_symbol	string->symbol
 f_lambda	stringp		string?
 f_lambda	procedurep	procedure?
-lexpr		apply
+lambda		apply
 f_lambda	read_char	read-char
 f_lambda	write_char	write-char
 f_lambda	exit
