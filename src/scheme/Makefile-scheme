@@ -1,4 +1,4 @@
-include ../lisp/Makefile-inc
+include ../scheme/Makefile-inc
 
-ao_scheme_const.h: $(LISP_SRCS) $(LISP_HDRS)
-	+cd ../lisp && make $@
+ao_scheme_const.h: $(SCHEME_SRCS) $(SCHEME_HDRS)
+	+cd ../scheme && make $@

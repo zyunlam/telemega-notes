@@ -13,25 +13,25 @@
  */
 
 #include <ao.h>
-#include <ao_lisp.h>
+#include <ao_scheme.h>
 #include <ao_flash.h>
 
 extern uint8_t	__flash__[];
 
 /* saved variables to rebuild the heap
 
-   ao_lisp_atoms
-   ao_lisp_frame_global
+   ao_scheme_atoms
+   ao_scheme_frame_global
  */
 
 int
-ao_lisp_os_save(void)
+ao_scheme_os_save(void)
 {
 	int i;
 
-	for (i = 0; i < AO_LISP_POOL_TOTAL; i += 256) {
+	for (i = 0; i < AO_SCHEME_POOL_TOTAL; i += 256) {
 		uint32_t	*dst = (uint32_t *) (void *) &__flash__[i];
-		uint32_t	*src = (uint32_t *) (void *) &ao_lisp_pool[i];
+		uint32_t	*src = (uint32_t *) (void *) &ao_scheme_pool[i];
 
 		ao_flash_page(dst, src);
 	}
@@ -39,15 +39,15 @@ ao_lisp_os_save(void)
 }
 
 int
-ao_lisp_os_restore_save(struct ao_lisp_os_save *save, int offset)
+ao_scheme_os_restore_save(struct ao_scheme_os_save *save, int offset)
 {
-	memcpy(save, &__flash__[offset], sizeof (struct ao_lisp_os_save));
+	memcpy(save, &__flash__[offset], sizeof (struct ao_scheme_os_save));
 	return 1;
 }
 
 int
-ao_lisp_os_restore(void)
+ao_scheme_os_restore(void)
 {
-	memcpy(ao_lisp_pool, __flash__, AO_LISP_POOL_TOTAL);
+	memcpy(ao_scheme_pool, __flash__, AO_SCHEME_POOL_TOTAL);
 	return 1;
 }

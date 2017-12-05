@@ -15,13 +15,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#ifndef _AO_LISP_OS_H_
-#define _AO_LISP_OS_H_
+#ifndef _AO_SCHEME_OS_H_
+#define _AO_SCHEME_OS_H_
 
 #include "ao.h"
 
-#define AO_LISP_POOL_TOTAL		16384
-#define AO_LISP_SAVE			1
+#define AO_SCHEME_POOL_TOTAL		16384
+#define AO_SCHEME_SAVE			1
 
 #ifndef __BYTE_ORDER
 #define	__LITTLE_ENDIAN	1234
@@ -30,7 +30,7 @@
 #endif
 
 static inline int
-ao_lisp_getc() {
+ao_scheme_getc() {
 	static uint8_t	at_eol;
 	int c;
 
@@ -45,33 +45,33 @@ ao_lisp_getc() {
 }
 
 static inline void
-ao_lisp_os_flush(void)
+ao_scheme_os_flush(void)
 {
 	flush();
 }
 
 static inline void
-ao_lisp_abort(void)
+ao_scheme_abort(void)
 {
 	ao_panic(1);
 }
 
 static inline void
-ao_lisp_os_led(int led)
+ao_scheme_os_led(int led)
 {
 	(void) led;
 }
 
-#define AO_LISP_JIFFIES_PER_SECOND	AO_HERTZ
+#define AO_SCHEME_JIFFIES_PER_SECOND	AO_HERTZ
 
 static inline void
-ao_lisp_os_delay(int delay)
+ao_scheme_os_delay(int delay)
 {
 	ao_delay(delay);
 }
 
 static inline int
-ao_lisp_os_jiffy(void)
+ao_scheme_os_jiffy(void)
 {
 	return ao_tick_count;
 }
