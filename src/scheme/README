@@ -1,0 +1,10 @@
+This follows the R7RS with the following known exceptions:
+
+* No vectors or bytevectors
+* Characters are just numbers
+* No dynamic-wind or exceptions
+* No environments
+* No ports
+* No syntax-rules; (have classic macros)
+* No record types
+* No libraries

@@ -27,7 +27,7 @@
 #include <ao_console.h>
 #include <ao_sdcard.h>
 #include <ao_fat.h>
-#include <ao_lisp.h>
+#include <ao_scheme.h>
 #include <ao_button.h>
 #include <ao_event.h>
 #include <ao_as1107.h>
@@ -188,8 +188,8 @@ ao_console_send(void)
 	}
 }
 
-static void lisp_cmd() {
-	ao_lisp_read_eval_print();
+static void scheme_cmd() {
+	ao_scheme_read_eval_print();
 }
 
 static void
@@ -224,7 +224,7 @@ __code struct ao_cmds ao_demo_cmds[] = {
 	{ ao_ps2_read_keys, "K\0Read keys from keyboard" },
 	{ ao_console_send, "C\0Send data to console, end with ~" },
 	{ ao_serial_blather, "S\0Blather on serial ports briefly" },
-	{ lisp_cmd, "l\0Run lisp interpreter" },
+	{ scheme_cmd, "l\0Run scheme interpreter" },
 	{ led_cmd, "L start value\0Show value (byte) at digit start" },
 	{ 0, NULL }
 };

@@ -1,4 +1,0 @@
-include ../lisp/Makefile-inc
-
-ao_lisp_const.h: $(LISP_SRCS) $(LISP_HDRS)
-	+cd ../lisp && make $@
