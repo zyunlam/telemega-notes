@@ -22,6 +22,8 @@
 
 #if HAS_MPU9250
 
+#define MPU9250_TEST	0
+
 static uint8_t	ao_mpu9250_configured;
 
 extern uint8_t ao_sensor_errors;
@@ -43,8 +45,12 @@ extern uint8_t ao_sensor_errors;
 #define ao_mpu9250_spi_end() 	ao_spi_clr_cs(AO_MPU9250_SPI_CS_PORT,	\
 					      (1 << AO_MPU9250_SPI_CS_PIN))
 
-#endif
+#else
 
+#define ao_mpu9250_spi_get()
+#define ao_mpu9250_spi_put()
+
+#endif
 
 static void
 _ao_mpu9250_reg_write(uint8_t addr, uint8_t value)
@@ -100,6 +106,61 @@ _ao_mpu9250_reg_read(uint8_t addr)
 	ao_i2c_put(AO_MPU9250_I2C_INDEX);
 #endif
 	return value;
+}
+
+static void
+_ao_mpu9250_slv4_setup(uint8_t addr, uint8_t reg)
+{
+	/* Set i2c slave address */
+	_ao_mpu9250_reg_write(MPU9250_I2C_SLV4_ADDR,
+			      addr);
+
+	/* Set i2c register address */
+	_ao_mpu9250_reg_write(MPU9250_I2C_SLV4_REG,
+			      reg);
+}
+
+static void
+_ao_mpu9250_slv4_run(void)
+{
+	uint8_t	ctrl;
+
+	/* Start the transfer */
+	_ao_mpu9250_reg_write(MPU9250_I2C_SLV4_CTRL,
+			      (1 << MPU9250_I2C_SLV4_CTRL_I2C_SLV4_EN) |
+			      (0 << MPU9250_I2C_SLV4_CTRL_SLV4_DONE_INT_EN) |
+			      (0 << MPU9250_I2C_SLV4_CTRL_I2C_SLV4_REG_DIS) |
+			      (0 << MPU9250_I2C_SLV4_CTRL_I2C_MST_DLY));
+
+	/* Poll for completion */
+	for (;;) {
+		ctrl = _ao_mpu9250_reg_read(MPU9250_I2C_SLV4_CTRL);
+		if ((ctrl & (1 << MPU9250_I2C_SLV4_CTRL_I2C_SLV4_EN)) == 0)
+			break;
+		ao_delay(0);
+	}
+}
+
+static uint8_t
+_ao_mpu9250_mag_reg_read(uint8_t reg)
+{
+	_ao_mpu9250_slv4_setup((1 << 7) | MPU9250_MAG_ADDR, reg);
+
+	_ao_mpu9250_slv4_run();
+
+	return _ao_mpu9250_reg_read(MPU9250_I2C_SLV4_DI);
+}
+
+static void
+_ao_mpu9250_mag_reg_write(uint8_t reg, uint8_t value)
+{
+	_ao_mpu9250_slv4_setup((0 << 7) | MPU9250_MAG_ADDR, reg);
+
+	/* Set the data */
+	_ao_mpu9250_reg_write(MPU9250_I2C_SLV4_DO,
+			      value);
+
+	_ao_mpu9250_slv4_run();
 }
 
 static void
@@ -180,6 +241,7 @@ _ao_mpu9250_wait_alive(void)
 }
 
 #define ST_TRIES	10
+#define MAG_TRIES	10
 
 static void
 _ao_mpu9250_setup(void)
@@ -187,6 +249,7 @@ _ao_mpu9250_setup(void)
 	struct ao_mpu9250_sample	normal_mode, test_mode;
 	int				errors;
 	int				st_tries;
+	int				mag_tries;
 
 	if (ao_mpu9250_configured)
 		return;
@@ -205,7 +268,7 @@ _ao_mpu9250_setup(void)
 	/* Reset signal conditioning, disabling I2C on SPI systems */
 	_ao_mpu9250_reg_write(MPU9250_USER_CTRL,
 			      (0 << MPU9250_USER_CTRL_FIFO_EN) |
-			      (0 << MPU9250_USER_CTRL_I2C_MST_EN) |
+			      (1 << MPU9250_USER_CTRL_I2C_MST_EN) |
 			      (AO_MPU9250_SPI << MPU9250_USER_CTRL_I2C_IF_DIS) |
 			      (0 << MPU9250_USER_CTRL_FIFO_RESET) |
 			      (0 << MPU9250_USER_CTRL_I2C_MST_RESET) |
@@ -232,6 +295,14 @@ _ao_mpu9250_setup(void)
 			      (0 << MPU9250_PWR_MGMT_1_CYCLE) |
 			      (0 << MPU9250_PWR_MGMT_1_TEMP_DIS) |
 			      (MPU9250_PWR_MGMT_1_CLKSEL_PLL_X_AXIS << MPU9250_PWR_MGMT_1_CLKSEL));
+
+	/* Set I2C clock and options */
+	_ao_mpu9250_reg_write(MPU9250_MST_CTRL,
+			      (0 << MPU9250_MST_CTRL_MULT_MST_EN) |
+			      (0 << MPU9250_MST_CTRL_WAIT_FOR_ES) |
+			      (0 << MPU9250_MST_CTRL_SLV_3_FIFO_EN) |
+			      (0 << MPU9250_MST_CTRL_I2C_MST_P_NSR) |
+			      (MPU9250_MST_CTRL_I2C_MST_CLK_400 << MPU9250_MST_CTRL_I2C_MST_CLK));
 
 	/* Set sample rate divider to sample at full speed */
 	_ao_mpu9250_reg_write(MPU9250_SMPRT_DIV, 0);
@@ -292,6 +363,53 @@ _ao_mpu9250_setup(void)
 	if (st_tries == ST_TRIES)
 		ao_sensor_errors = 1;
 
+	/* Set up the mag sensor */
+
+	/* make sure it's alive */
+	for (mag_tries = 0; mag_tries < MAG_TRIES; mag_tries++) {
+		if (_ao_mpu9250_mag_reg_read(MPU9250_MAG_WIA) == MPU9250_MAG_WIA_VALUE)
+			break;
+	}
+
+	if (mag_tries == MAG_TRIES)
+		ao_sensor_errors = 1;
+
+	/* Select continuous mode 2 (100Hz), 16 bit samples */
+
+	_ao_mpu9250_mag_reg_write(MPU9250_MAG_CNTL1,
+				  (MPU9250_MAG_CNTL1_BIT_16 << MPU9250_MAG_CNTL1_BIT) |
+				  (MPU9250_MAG_CNTL1_MODE_CONT_2 << MPU9250_MAG_CNTL1_MODE));
+
+	/* Set i2c master to delay shadowing data until read is
+	 * complete (avoids tearing the data) */
+
+	_ao_mpu9250_reg_write(MPU9250_I2C_MST_DELAY_CTRL,
+			      (1 << MPU9250_I2C_MST_DELAY_CTRL_DELAY_ES_SHADOW) |
+			      (0 << MPU9250_I2C_MST_DELAY_CTRL_I2C_SLV4_DLY_EN) |
+			      (0 << MPU9250_I2C_MST_DELAY_CTRL_I2C_SLV3_DLY_EN) |
+			      (0 << MPU9250_I2C_MST_DELAY_CTRL_I2C_SLV2_DLY_EN) |
+			      (0 << MPU9250_I2C_MST_DELAY_CTRL_I2C_SLV1_DLY_EN) |
+			      (0 << MPU9250_I2C_MST_DELAY_CTRL_I2C_SLV0_DLY_EN));
+
+	/* Set up i2c slave 0 to read the mag registers starting at HXL (3) */
+
+	_ao_mpu9250_reg_write(MPU9250_I2C_SLV0_ADDR,
+			      (1 << 7) | MPU9250_MAG_ADDR);
+
+	_ao_mpu9250_reg_write(MPU9250_I2C_SLV0_REG,
+			      MPU9250_MAG_HXL);
+
+	/* Byte swap so the mag values match the gyro/accel. Read 7 bytes
+	 * to include the status register
+	 */
+
+	_ao_mpu9250_reg_write(MPU9250_I2C_SLV0_CTRL,
+			      (1 << MPU9250_I2C_SLV0_CTRL_I2C_SLV0_EN) |
+			      (1 << MPU9250_I2C_SLV0_CTRL_I2C_SLV0_BYTE_SW) |
+			      (0 << MPU9250_I2C_SLV0_CTRL_I2C_SLV0_REG_DIS) |
+			      (1 << MPU9250_I2C_SLV0_CTRL_I2C_SLV0_GRP) |
+			      (MPU9250_MAG_ST2 - MPU9250_MAG_HXL + 1) << MPU9250_I2C_SLV0_CTRL_I2C_SLV0_LENG);
+
 	/* Filter to about 100Hz, which also sets the gyro rate to 1000Hz */
 	_ao_mpu9250_reg_write(MPU9250_CONFIG,
 			      (MPU9250_CONFIG_FIFO_MODE_REPLACE << MPU9250_CONFIG_FIFO_MODE) |
@@ -312,20 +430,15 @@ static void
 ao_mpu9250(void)
 {
 	struct ao_mpu9250_sample	sample;
+
 	/* ao_mpu9250_init already grabbed the SPI bus and mutex */
 	_ao_mpu9250_setup();
-#if AO_MPU9250_SPI
 	ao_mpu9250_spi_put();
-#endif
 	for (;;)
 	{
-#if AO_MPU9250_SPI
 		ao_mpu9250_spi_get();
-#endif
 		_ao_mpu9250_sample(&sample);
-#if AO_MPU9250_SPI
 		ao_mpu9250_spi_put();
-#endif
 		ao_arch_block_interrupts();
 		ao_mpu9250_current = sample;
 		AO_DATA_PRESENT(AO_DATA_MPU9250);
@@ -339,14 +452,19 @@ static struct ao_task ao_mpu9250_task;
 static void
 ao_mpu9250_show(void)
 {
-	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d\n",
+	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d Mag: %7d %7d %7d\n",
 		ao_mpu9250_current.accel_x,
 		ao_mpu9250_current.accel_y,
 		ao_mpu9250_current.accel_z,
 		ao_mpu9250_current.gyro_x,
 		ao_mpu9250_current.gyro_y,
-		ao_mpu9250_current.gyro_z);
+		ao_mpu9250_current.gyro_z,
+		ao_mpu9250_current.mag_x,
+		ao_mpu9250_current.mag_y,
+		ao_mpu9250_current.mag_z);
 }
+
+#if MPU9250_TEST
 
 static void
 ao_mpu9250_read(void)
@@ -384,10 +502,52 @@ ao_mpu9250_write(void)
 	ao_mpu9250_spi_put();
 }
 
+static void
+ao_mpu9250_mag_read(void)
+{
+	uint8_t	addr;
+	uint8_t val;
+
+	ao_cmd_hex();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	addr = ao_cmd_lex_i;
+	ao_mpu9250_spi_get();
+	val = _ao_mpu9250_mag_reg_read(addr);
+	ao_mpu9250_spi_put();
+	printf("Addr %02x val %02x\n", addr, val);
+}
+
+static void
+ao_mpu9250_mag_write(void)
+{
+	uint8_t	addr;
+	uint8_t val;
+
+	ao_cmd_hex();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	addr = ao_cmd_lex_i;
+	ao_cmd_hex();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	val = ao_cmd_lex_i;
+	printf("Addr %02x val %02x\n", addr, val);
+	ao_mpu9250_spi_get();
+	_ao_mpu9250_mag_reg_write(addr, val);
+	ao_mpu9250_spi_put();
+}
+
+#endif /* MPU9250_TEST */
+
 static const struct ao_cmds ao_mpu9250_cmds[] = {
 	{ ao_mpu9250_show,	"I\0Show MPU9250 status" },
+#if MPU9250_TEST
 	{ ao_mpu9250_read,	"R <addr>\0Read MPU9250 register" },
 	{ ao_mpu9250_write,	"W <addr> <val>\0Write MPU9250 register" },
+	{ ao_mpu9250_mag_read,	"G <addr>\0Read MPU9250 Mag register" },
+	{ ao_mpu9250_mag_write,	"P <addr> <val>\0Write MPU9250 Mag register" },
+#endif
 	{ 0, NULL }
 };
 
