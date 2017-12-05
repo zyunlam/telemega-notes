@@ -11,7 +11,7 @@ ao_scheme_const.h: ao_scheme_const.lisp make-const/ao_scheme_make_const
 ao_scheme_builtin.h: ao_scheme_make_builtin ao_scheme_builtin.txt
 	nickle ao_scheme_make_builtin ao_scheme_builtin.txt > $@
 
-make-const/ao_scheme_make_const: FRC
+make-const/ao_scheme_make_const: FRC ao_scheme_builtin.h
 	+cd make-const && make ao_scheme_make_const
 
 test/ao_scheme_test: FRC ao_scheme_const.h ao_scheme_builtin.h
