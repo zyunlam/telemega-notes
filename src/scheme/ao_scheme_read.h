@@ -12,8 +12,8 @@
  * General Public License for more details.
  */
 
-#ifndef _AO_LISP_READ_H_
-#define _AO_LISP_READ_H_
+#ifndef _AO_SCHEME_READ_H_
+#define _AO_SCHEME_READ_H_
 
 /*
  * token classes
@@ -55,4 +55,4 @@
 # define INTEGER	(DIGIT|SIGN)
 # define NUMBER		(INTEGER|FLOATC)
 
-#endif /* _AO_LISP_READ_H_ */
+#endif /* _AO_SCHEME_READ_H_ */

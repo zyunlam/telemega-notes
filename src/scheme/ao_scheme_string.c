@@ -15,7 +15,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include "ao_lisp.h"
+#include "ao_scheme.h"
 
 static void string_mark(void *addr)
 {
@@ -34,7 +34,7 @@ static void string_move(void *addr)
 	(void) addr;
 }
 
-const struct ao_lisp_type ao_lisp_string_type = {
+const struct ao_scheme_type ao_scheme_string_type = {
 	.mark = string_mark,
 	.size = string_size,
 	.move = string_move,
@@ -42,13 +42,13 @@ const struct ao_lisp_type ao_lisp_string_type = {
 };
 
 char *
-ao_lisp_string_copy(char *a)
+ao_scheme_string_copy(char *a)
 {
 	int	alen = strlen(a);
 
-	ao_lisp_string_stash(0, a);
-	char	*r = ao_lisp_alloc(alen + 1);
-	a = ao_lisp_string_fetch(0);
+	ao_scheme_string_stash(0, a);
+	char	*r = ao_scheme_alloc(alen + 1);
+	a = ao_scheme_string_fetch(0);
 	if (!r)
 		return NULL;
 	strcpy(r, a);
@@ -56,16 +56,16 @@ ao_lisp_string_copy(char *a)
 }
 
 char *
-ao_lisp_string_cat(char *a, char *b)
+ao_scheme_string_cat(char *a, char *b)
 {
 	int	alen = strlen(a);
 	int	blen = strlen(b);
 
-	ao_lisp_string_stash(0, a);
-	ao_lisp_string_stash(1, b);
-	char	*r = ao_lisp_alloc(alen + blen + 1);
-	a = ao_lisp_string_fetch(0);
-	b = ao_lisp_string_fetch(1);
+	ao_scheme_string_stash(0, a);
+	ao_scheme_string_stash(1, b);
+	char	*r = ao_scheme_alloc(alen + blen + 1);
+	a = ao_scheme_string_fetch(0);
+	b = ao_scheme_string_fetch(1);
 	if (!r)
 		return NULL;
 	strcpy(r, a);
@@ -74,57 +74,57 @@ ao_lisp_string_cat(char *a, char *b)
 }
 
 ao_poly
-ao_lisp_string_pack(struct ao_lisp_cons *cons)
+ao_scheme_string_pack(struct ao_scheme_cons *cons)
 {
-	int	len = ao_lisp_cons_length(cons);
-	ao_lisp_cons_stash(0, cons);
-	char	*r = ao_lisp_alloc(len + 1);
-	cons = ao_lisp_cons_fetch(0);
+	int	len = ao_scheme_cons_length(cons);
+	ao_scheme_cons_stash(0, cons);
+	char	*r = ao_scheme_alloc(len + 1);
+	cons = ao_scheme_cons_fetch(0);
 	char	*s = r;
 
 	while (cons) {
-		if (!ao_lisp_integer_typep(ao_lisp_poly_type(cons->car)))
-			return ao_lisp_error(AO_LISP_INVALID, "non-int passed to pack");
-		*s++ = ao_lisp_poly_integer(cons->car);
-		cons = ao_lisp_poly_cons(cons->cdr);
+		if (!ao_scheme_integer_typep(ao_scheme_poly_type(cons->car)))
+			return ao_scheme_error(AO_SCHEME_INVALID, "non-int passed to pack");
+		*s++ = ao_scheme_poly_integer(cons->car);
+		cons = ao_scheme_poly_cons(cons->cdr);
 	}
 	*s++ = 0;
-	return ao_lisp_string_poly(r);
+	return ao_scheme_string_poly(r);
 }
 
 ao_poly
-ao_lisp_string_unpack(char *a)
+ao_scheme_string_unpack(char *a)
 {
-	struct ao_lisp_cons	*cons = NULL, *tail = NULL;
+	struct ao_scheme_cons	*cons = NULL, *tail = NULL;
 	int			c;
 	int			i;
 
 	for (i = 0; (c = a[i]); i++) {
-		ao_lisp_cons_stash(0, cons);
-		ao_lisp_cons_stash(1, tail);
-		ao_lisp_string_stash(0, a);
-		struct ao_lisp_cons	*n = ao_lisp_cons_cons(ao_lisp_int_poly(c), AO_LISP_NIL);
-		a = ao_lisp_string_fetch(0);
-		cons = ao_lisp_cons_fetch(0);
-		tail = ao_lisp_cons_fetch(1);
+		ao_scheme_cons_stash(0, cons);
+		ao_scheme_cons_stash(1, tail);
+		ao_scheme_string_stash(0, a);
+		struct ao_scheme_cons	*n = ao_scheme_cons_cons(ao_scheme_int_poly(c), AO_SCHEME_NIL);
+		a = ao_scheme_string_fetch(0);
+		cons = ao_scheme_cons_fetch(0);
+		tail = ao_scheme_cons_fetch(1);
 
 		if (!n) {
 			cons = NULL;
 			break;
 		}
 		if (tail)
-			tail->cdr = ao_lisp_cons_poly(n);
+			tail->cdr = ao_scheme_cons_poly(n);
 		else
 			cons = n;
 		tail = n;
 	}
-	return ao_lisp_cons_poly(cons);
+	return ao_scheme_cons_poly(cons);
 }
 
 void
-ao_lisp_string_write(ao_poly p)
+ao_scheme_string_write(ao_poly p)
 {
-	char	*s = ao_lisp_poly_string(p);
+	char	*s = ao_scheme_poly_string(p);
 	char	c;
 
 	putchar('"');
@@ -151,9 +151,9 @@ ao_lisp_string_write(ao_poly p)
 }
 
 void
-ao_lisp_string_display(ao_poly p)
+ao_scheme_string_display(ao_poly p)
 {
-	char	*s = ao_lisp_poly_string(p);
+	char	*s = ao_scheme_poly_string(p);
 	char	c;
 
 	while ((c = *s++))

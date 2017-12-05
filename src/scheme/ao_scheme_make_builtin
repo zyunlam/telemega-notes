@@ -53,31 +53,31 @@ bool is_atom(builtin_t b) = b.type == "atom";
 
 void
 dump_ids(builtin_t[*] builtins) {
-	printf("#ifdef AO_LISP_BUILTIN_ID\n");
-	printf("#undef AO_LISP_BUILTIN_ID\n");
-	printf("enum ao_lisp_builtin_id {\n");
+	printf("#ifdef AO_SCHEME_BUILTIN_ID\n");
+	printf("#undef AO_SCHEME_BUILTIN_ID\n");
+	printf("enum ao_scheme_builtin_id {\n");
 	for (int i = 0; i < dim(builtins); i++)
 		if (!is_atom(builtins[i]))
 			printf("\tbuiltin_%s,\n", builtins[i].c_name);
 	printf("\t_builtin_last\n");
 	printf("};\n");
-	printf("#endif /* AO_LISP_BUILTIN_ID */\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_ID */\n");
 }
 
 void
 dump_casename(builtin_t[*] builtins) {
-	printf("#ifdef AO_LISP_BUILTIN_CASENAME\n");
-	printf("#undef AO_LISP_BUILTIN_CASENAME\n");
-	printf("static char *ao_lisp_builtin_name(enum ao_lisp_builtin_id b) {\n");
+	printf("#ifdef AO_SCHEME_BUILTIN_CASENAME\n");
+	printf("#undef AO_SCHEME_BUILTIN_CASENAME\n");
+	printf("static char *ao_scheme_builtin_name(enum ao_scheme_builtin_id b) {\n");
 	printf("\tswitch(b) {\n");
 	for (int i = 0; i < dim(builtins); i++)
 		if (!is_atom(builtins[i]))
-			printf("\tcase builtin_%s: return ao_lisp_poly_atom(_atom(\"%s\"))->name;\n",
+			printf("\tcase builtin_%s: return ao_scheme_poly_atom(_atom(\"%s\"))->name;\n",
 			       builtins[i].c_name, builtins[i].lisp_names[0]);
 	printf("\tdefault: return \"???\";\n");
 	printf("\t}\n");
 	printf("}\n");
-	printf("#endif /* AO_LISP_BUILTIN_CASENAME */\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_CASENAME */\n");
 }
 
 void
@@ -93,59 +93,59 @@ cify_lisp(string l) {
 
 void
 dump_arrayname(builtin_t[*] builtins) {
-	printf("#ifdef AO_LISP_BUILTIN_ARRAYNAME\n");
-	printf("#undef AO_LISP_BUILTIN_ARRAYNAME\n");
+	printf("#ifdef AO_SCHEME_BUILTIN_ARRAYNAME\n");
+	printf("#undef AO_SCHEME_BUILTIN_ARRAYNAME\n");
 	printf("static const ao_poly builtin_names[] = {\n");
 	for (int i = 0; i < dim(builtins); i++) {
 		if (!is_atom(builtins[i])) {
-			printf("\t[builtin_%s] = _ao_lisp_atom_",
+			printf("\t[builtin_%s] = _ao_scheme_atom_",
 			       builtins[i].c_name);
 			cify_lisp(builtins[i].lisp_names[0]);
 			printf(",\n");
 		}
 	}
 	printf("};\n");
-	printf("#endif /* AO_LISP_BUILTIN_ARRAYNAME */\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_ARRAYNAME */\n");
 }
 
 void
 dump_funcs(builtin_t[*] builtins) {
-	printf("#ifdef AO_LISP_BUILTIN_FUNCS\n");
-	printf("#undef AO_LISP_BUILTIN_FUNCS\n");
-	printf("const ao_lisp_func_t ao_lisp_builtins[] = {\n");
+	printf("#ifdef AO_SCHEME_BUILTIN_FUNCS\n");
+	printf("#undef AO_SCHEME_BUILTIN_FUNCS\n");
+	printf("const ao_scheme_func_t ao_scheme_builtins[] = {\n");
 	for (int i = 0; i < dim(builtins); i++) {
 		if (!is_atom(builtins[i]))
-			printf("\t[builtin_%s] = ao_lisp_do_%s,\n",
+			printf("\t[builtin_%s] = ao_scheme_do_%s,\n",
 			       builtins[i].c_name,
 			       builtins[i].c_name);
 	}
 	printf("};\n");
-	printf("#endif /* AO_LISP_BUILTIN_FUNCS */\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_FUNCS */\n");
 }
 
 void
 dump_decls(builtin_t[*] builtins) {
-	printf("#ifdef AO_LISP_BUILTIN_DECLS\n");
-	printf("#undef AO_LISP_BUILTIN_DECLS\n");
+	printf("#ifdef AO_SCHEME_BUILTIN_DECLS\n");
+	printf("#undef AO_SCHEME_BUILTIN_DECLS\n");
 	for (int i = 0; i < dim(builtins); i++) {
 		if (!is_atom(builtins[i])) {
 			printf("ao_poly\n");
-			printf("ao_lisp_do_%s(struct ao_lisp_cons *cons);\n",
+			printf("ao_scheme_do_%s(struct ao_scheme_cons *cons);\n",
 			       builtins[i].c_name);
 		}
 	}
-	printf("#endif /* AO_LISP_BUILTIN_DECLS */\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_DECLS */\n");
 }
 
 void
 dump_consts(builtin_t[*] builtins) {
-	printf("#ifdef AO_LISP_BUILTIN_CONSTS\n");
-	printf("#undef AO_LISP_BUILTIN_CONSTS\n");
+	printf("#ifdef AO_SCHEME_BUILTIN_CONSTS\n");
+	printf("#undef AO_SCHEME_BUILTIN_CONSTS\n");
 	printf("struct builtin_func funcs[] = {\n");
 	for (int i = 0; i < dim(builtins); i++) {
 		if (!is_atom(builtins[i])) {
 			for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
-				printf ("\t{ .name = \"%s\", .args = AO_LISP_FUNC_%s, .func = builtin_%s },\n",
+				printf ("\t{ .name = \"%s\", .args = AO_SCHEME_FUNC_%s, .func = builtin_%s },\n",
 					builtins[i].lisp_names[j],
 					builtins[i].type,
 					builtins[i].c_name);
@@ -153,21 +153,21 @@ dump_consts(builtin_t[*] builtins) {
 		}
 	}
 	printf("};\n");
-	printf("#endif /* AO_LISP_BUILTIN_CONSTS */\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_CONSTS */\n");
 }
 
 void
 dump_atoms(builtin_t[*] builtins) {
-	printf("#ifdef AO_LISP_BUILTIN_ATOMS\n");
-	printf("#undef AO_LISP_BUILTIN_ATOMS\n");
+	printf("#ifdef AO_SCHEME_BUILTIN_ATOMS\n");
+	printf("#undef AO_SCHEME_BUILTIN_ATOMS\n");
 	for (int i = 0; i < dim(builtins); i++) {
 		for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
-			printf("#define _ao_lisp_atom_");
+			printf("#define _ao_scheme_atom_");
 			cify_lisp(builtins[i].lisp_names[j]);
 			printf(" _atom(\"%s\")\n", builtins[i].lisp_names[j]);
 		}
 	}
-	printf("#endif /* AO_LISP_BUILTIN_ATOMS */\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_ATOMS */\n");
 }
 
 void main() {

@@ -12,5 +12,25 @@
  * General Public License for more details.
  */
 
-#include "ao_lisp.h"
+#include "ao_scheme.h"
 
+ao_poly
+ao_scheme_read_eval_print(void)
+{
+	ao_poly	in, out = AO_SCHEME_NIL;
+	for(;;) {
+		in = ao_scheme_read();
+		if (in == _ao_scheme_atom_eof)
+			break;
+		out = ao_scheme_eval(in);
+		if (ao_scheme_exception) {
+			if (ao_scheme_exception & AO_SCHEME_EXIT)
+				break;
+			ao_scheme_exception = 0;
+		} else {
+			ao_scheme_poly_write(out);
+			putchar ('\n');
+		}
+	}
+	return out;
+}

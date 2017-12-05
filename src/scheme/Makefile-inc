@@ -1,0 +1,24 @@
+SCHEME_SRCS=\
+	ao_scheme_mem.c \
+	ao_scheme_cons.c \
+	ao_scheme_string.c \
+	ao_scheme_atom.c \
+	ao_scheme_int.c \
+	ao_scheme_poly.c \
+	ao_scheme_bool.c \
+	ao_scheme_float.c \
+	ao_scheme_builtin.c \
+	ao_scheme_read.c \
+	ao_scheme_frame.c \
+	ao_scheme_lambda.c \
+	ao_scheme_eval.c \
+	ao_scheme_rep.c \
+	ao_scheme_save.c \
+	ao_scheme_stack.c \
+	ao_scheme_error.c 
+
+SCHEME_HDRS=\
+	ao_scheme.h \
+	ao_scheme_os.h \
+	ao_scheme_read.h \
+	ao_scheme_builtin.h

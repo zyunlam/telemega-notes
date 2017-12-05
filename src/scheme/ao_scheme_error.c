@@ -12,23 +12,23 @@
  * General Public License for more details.
  */
 
-#include "ao_lisp.h"
+#include "ao_scheme.h"
 #include <stdarg.h>
 
 void
-ao_lisp_error_poly(char *name, ao_poly poly, ao_poly last)
+ao_scheme_error_poly(char *name, ao_poly poly, ao_poly last)
 {
 	int first = 1;
 	printf("\t\t%s(", name);
-	if (ao_lisp_poly_type(poly) == AO_LISP_CONS) {
+	if (ao_scheme_poly_type(poly) == AO_SCHEME_CONS) {
 		if (poly) {
 			while (poly) {
-				struct ao_lisp_cons *cons = ao_lisp_poly_cons(poly);
+				struct ao_scheme_cons *cons = ao_scheme_poly_cons(poly);
 				if (!first)
 					printf("\t\t         ");
 				else
 					first = 0;
-				ao_lisp_poly_write(cons->car);
+				ao_scheme_poly_write(cons->car);
 				printf("\n");
 				if (poly == last)
 					break;
@@ -38,7 +38,7 @@ ao_lisp_error_poly(char *name, ao_poly poly, ao_poly last)
 		} else
 			printf(")\n");
 	} else {
-		ao_lisp_poly_write(poly);
+		ao_scheme_poly_write(poly);
 		printf("\n");
 	}
 }
@@ -50,31 +50,31 @@ static void tabs(int indent)
 }
 
 void
-ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
+ao_scheme_error_frame(int indent, char *name, struct ao_scheme_frame *frame)
 {
 	int			f;
 
 	tabs(indent);
 	printf ("%s{", name);
 	if (frame) {
-		struct ao_lisp_frame_vals	*vals = ao_lisp_poly_frame_vals(frame->vals);
-		if (frame->type & AO_LISP_FRAME_PRINT)
+		struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
+		if (frame->type & AO_SCHEME_FRAME_PRINT)
 			printf("recurse...");
 		else {
-			frame->type |= AO_LISP_FRAME_PRINT;
+			frame->type |= AO_SCHEME_FRAME_PRINT;
 			for (f = 0; f < frame->num; f++) {
 				if (f != 0) {
 					tabs(indent);
 					printf("         ");
 				}
-				ao_lisp_poly_write(vals->vals[f].atom);
+				ao_scheme_poly_write(vals->vals[f].atom);
 				printf(" = ");
-				ao_lisp_poly_write(vals->vals[f].val);
+				ao_scheme_poly_write(vals->vals[f].val);
 				printf("\n");
 			}
 			if (frame->prev)
-				ao_lisp_error_frame(indent + 1, "prev:   ", ao_lisp_poly_frame(frame->prev));
-			frame->type &= ~AO_LISP_FRAME_PRINT;
+				ao_scheme_error_frame(indent + 1, "prev:   ", ao_scheme_poly_frame(frame->prev));
+			frame->type &= ~AO_SCHEME_FRAME_PRINT;
 		}
 		tabs(indent);
 		printf("        }\n");
@@ -83,7 +83,7 @@ ao_lisp_error_frame(int indent, char *name, struct ao_lisp_frame *frame)
 }
 
 void
-ao_lisp_vprintf(char *format, va_list args)
+ao_scheme_vprintf(char *format, va_list args)
 {
 	char c;
 
@@ -91,7 +91,7 @@ ao_lisp_vprintf(char *format, va_list args)
 		if (c == '%') {
 			switch (c = *format++) {
 			case 'v':
-				ao_lisp_poly_write((ao_poly) va_arg(args, unsigned int));
+				ao_scheme_poly_write((ao_poly) va_arg(args, unsigned int));
 				break;
 			case 'p':
 				printf("%p", va_arg(args, void *));
@@ -112,28 +112,28 @@ ao_lisp_vprintf(char *format, va_list args)
 }
 
 void
-ao_lisp_printf(char *format, ...)
+ao_scheme_printf(char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	ao_lisp_vprintf(format, args);
+	ao_scheme_vprintf(format, args);
 	va_end(args);
 }
 
 ao_poly
-ao_lisp_error(int error, char *format, ...)
+ao_scheme_error(int error, char *format, ...)
 {
 	va_list	args;
 
-	ao_lisp_exception |= error;
+	ao_scheme_exception |= error;
 	va_start(args, format);
-	ao_lisp_vprintf(format, args);
+	ao_scheme_vprintf(format, args);
 	putchar('\n');
 	va_end(args);
-	ao_lisp_printf("Value:  %v\n", ao_lisp_v);
-	ao_lisp_printf("Frame:  %v\n", ao_lisp_frame_poly(ao_lisp_frame_current));
+	ao_scheme_printf("Value:  %v\n", ao_scheme_v);
+	ao_scheme_printf("Frame:  %v\n", ao_scheme_frame_poly(ao_scheme_frame_current));
 	printf("Stack:\n");
-	ao_lisp_stack_write(ao_lisp_stack_poly(ao_lisp_stack));
-	ao_lisp_printf("Globals: %v\n", ao_lisp_frame_poly(ao_lisp_frame_global));
-	return AO_LISP_NIL;
+	ao_scheme_stack_write(ao_scheme_stack_poly(ao_scheme_stack));
+	ao_scheme_printf("Globals: %v\n", ao_scheme_frame_poly(ao_scheme_frame_global));
+	return AO_SCHEME_NIL;
 }

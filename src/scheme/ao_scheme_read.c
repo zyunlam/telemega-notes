@@ -12,8 +12,8 @@
  * General Public License for more details.
  */
 
-#include "ao_lisp.h"
-#include "ao_lisp_read.h"
+#include "ao_scheme.h"
+#include "ao_scheme_read.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -158,7 +158,7 @@ lex_get()
 		c = lex_unget_c;
 		lex_unget_c = 0;
 	} else {
-		c = ao_lisp_getc();
+		c = ao_scheme_getc();
 	}
 	return c;
 }
@@ -244,15 +244,15 @@ lex_quoted(void)
 	}
 }
 
-#define AO_LISP_TOKEN_MAX	32
+#define AO_SCHEME_TOKEN_MAX	32
 
-static char	token_string[AO_LISP_TOKEN_MAX];
+static char	token_string[AO_SCHEME_TOKEN_MAX];
 static int32_t	token_int;
 static int	token_len;
 static float	token_float;
 
 static inline void add_token(int c) {
-	if (c && token_len < AO_LISP_TOKEN_MAX - 1)
+	if (c && token_len < AO_SCHEME_TOKEN_MAX - 1)
 		token_string[token_len++] = c;
 }
 
@@ -372,7 +372,7 @@ _lex(void)
 				else if (!strcmp(token_string, "formfeed"))
 					token_int = '\f';
 				else {
-					ao_lisp_error(AO_LISP_INVALID, "invalid character token #\\%s", token_string);
+					ao_scheme_error(AO_SCHEME_INVALID, "invalid character token #\\%s", token_string);
 					continue;
 				}
 				return NUM;
@@ -470,9 +470,9 @@ static inline int lex(void)
 
 static int parse_token;
 
-struct ao_lisp_cons	*ao_lisp_read_cons;
-struct ao_lisp_cons	*ao_lisp_read_cons_tail;
-struct ao_lisp_cons	*ao_lisp_read_stack;
+struct ao_scheme_cons	*ao_scheme_read_cons;
+struct ao_scheme_cons	*ao_scheme_read_cons_tail;
+struct ao_scheme_cons	*ao_scheme_read_stack;
 
 #define READ_IN_QUOTE	0x01
 #define READ_SAW_DOT	0x02
@@ -481,17 +481,17 @@ struct ao_lisp_cons	*ao_lisp_read_stack;
 static int
 push_read_stack(int cons, int read_state)
 {
-	RDBGI("push read stack %p 0x%x\n", ao_lisp_read_cons, read_state);
+	RDBGI("push read stack %p 0x%x\n", ao_scheme_read_cons, read_state);
 	RDBG_IN();
 	if (cons) {
-		ao_lisp_read_stack = ao_lisp_cons_cons(ao_lisp_cons_poly(ao_lisp_read_cons),
-						       ao_lisp__cons(ao_lisp_int_poly(read_state),
-								     ao_lisp_cons_poly(ao_lisp_read_stack)));
-		if (!ao_lisp_read_stack)
+		ao_scheme_read_stack = ao_scheme_cons_cons(ao_scheme_cons_poly(ao_scheme_read_cons),
+						       ao_scheme__cons(ao_scheme_int_poly(read_state),
+								     ao_scheme_cons_poly(ao_scheme_read_stack)));
+		if (!ao_scheme_read_stack)
 			return 0;
 	}
-	ao_lisp_read_cons = NULL;
-	ao_lisp_read_cons_tail = NULL;
+	ao_scheme_read_cons = NULL;
+	ao_scheme_read_cons_tail = NULL;
 	return 1;
 }
 
@@ -500,41 +500,41 @@ pop_read_stack(int cons)
 {
 	int	read_state = 0;
 	if (cons) {
-		ao_lisp_read_cons = ao_lisp_poly_cons(ao_lisp_read_stack->car);
-		ao_lisp_read_stack = ao_lisp_poly_cons(ao_lisp_read_stack->cdr);
-		read_state = ao_lisp_poly_int(ao_lisp_read_stack->car);
-		ao_lisp_read_stack = ao_lisp_poly_cons(ao_lisp_read_stack->cdr);
-		for (ao_lisp_read_cons_tail = ao_lisp_read_cons;
-		     ao_lisp_read_cons_tail && ao_lisp_read_cons_tail->cdr;
-		     ao_lisp_read_cons_tail = ao_lisp_poly_cons(ao_lisp_read_cons_tail->cdr))
+		ao_scheme_read_cons = ao_scheme_poly_cons(ao_scheme_read_stack->car);
+		ao_scheme_read_stack = ao_scheme_poly_cons(ao_scheme_read_stack->cdr);
+		read_state = ao_scheme_poly_int(ao_scheme_read_stack->car);
+		ao_scheme_read_stack = ao_scheme_poly_cons(ao_scheme_read_stack->cdr);
+		for (ao_scheme_read_cons_tail = ao_scheme_read_cons;
+		     ao_scheme_read_cons_tail && ao_scheme_read_cons_tail->cdr;
+		     ao_scheme_read_cons_tail = ao_scheme_poly_cons(ao_scheme_read_cons_tail->cdr))
 			;
 	} else {
-		ao_lisp_read_cons = 0;
-		ao_lisp_read_cons_tail = 0;
-		ao_lisp_read_stack = 0;
+		ao_scheme_read_cons = 0;
+		ao_scheme_read_cons_tail = 0;
+		ao_scheme_read_stack = 0;
 	}
 	RDBG_OUT();
-	RDBGI("pop read stack %p %d\n", ao_lisp_read_cons, read_state);
+	RDBGI("pop read stack %p %d\n", ao_scheme_read_cons, read_state);
 	return read_state;
 }
 
 ao_poly
-ao_lisp_read(void)
+ao_scheme_read(void)
 {
-	struct ao_lisp_atom	*atom;
+	struct ao_scheme_atom	*atom;
 	char			*string;
 	int			cons;
 	int			read_state;
-	ao_poly			v = AO_LISP_NIL;
+	ao_poly			v = AO_SCHEME_NIL;
 
 	cons = 0;
 	read_state = 0;
-	ao_lisp_read_cons = ao_lisp_read_cons_tail = ao_lisp_read_stack = 0;
+	ao_scheme_read_cons = ao_scheme_read_cons_tail = ao_scheme_read_stack = 0;
 	for (;;) {
 		parse_token = lex();
 		while (parse_token == OPEN) {
 			if (!push_read_stack(cons, read_state))
-				return AO_LISP_NIL;
+				return AO_SCHEME_NIL;
 			cons++;
 			read_state = 0;
 			parse_token = lex();
@@ -544,75 +544,75 @@ ao_lisp_read(void)
 		case END:
 		default:
 			if (cons)
-				ao_lisp_error(AO_LISP_EOF, "unexpected end of file");
-			return _ao_lisp_atom_eof;
+				ao_scheme_error(AO_SCHEME_EOF, "unexpected end of file");
+			return _ao_scheme_atom_eof;
 			break;
 		case NAME:
-			atom = ao_lisp_atom_intern(token_string);
+			atom = ao_scheme_atom_intern(token_string);
 			if (atom)
-				v = ao_lisp_atom_poly(atom);
+				v = ao_scheme_atom_poly(atom);
 			else
-				v = AO_LISP_NIL;
+				v = AO_SCHEME_NIL;
 			break;
 		case NUM:
-			v = ao_lisp_integer_poly(token_int);
+			v = ao_scheme_integer_poly(token_int);
 			break;
 		case FLOAT:
-			v = ao_lisp_float_get(token_float);
+			v = ao_scheme_float_get(token_float);
 			break;
 		case BOOL:
 			if (token_string[0] == 't')
-				v = _ao_lisp_bool_true;
+				v = _ao_scheme_bool_true;
 			else
-				v = _ao_lisp_bool_false;
+				v = _ao_scheme_bool_false;
 			break;
 		case STRING:
-			string = ao_lisp_string_copy(token_string);
+			string = ao_scheme_string_copy(token_string);
 			if (string)
-				v = ao_lisp_string_poly(string);
+				v = ao_scheme_string_poly(string);
 			else
-				v = AO_LISP_NIL;
+				v = AO_SCHEME_NIL;
 			break;
 		case QUOTE:
 		case QUASIQUOTE:
 		case UNQUOTE:
 		case UNQUOTE_SPLICING:
 			if (!push_read_stack(cons, read_state))
-				return AO_LISP_NIL;
+				return AO_SCHEME_NIL;
 			cons++;
 			read_state = READ_IN_QUOTE;
 			switch (parse_token) {
 			case QUOTE:
-				v = _ao_lisp_atom_quote;
+				v = _ao_scheme_atom_quote;
 				break;
 			case QUASIQUOTE:
-				v = _ao_lisp_atom_quasiquote;
+				v = _ao_scheme_atom_quasiquote;
 				break;
 			case UNQUOTE:
-				v = _ao_lisp_atom_unquote;
+				v = _ao_scheme_atom_unquote;
 				break;
 			case UNQUOTE_SPLICING:
-				v = _ao_lisp_atom_unquote2dsplicing;
+				v = _ao_scheme_atom_unquote2dsplicing;
 				break;
 			}
 			break;
 		case CLOSE:
 			if (!cons) {
-				v = AO_LISP_NIL;
+				v = AO_SCHEME_NIL;
 				break;
 			}
-			v = ao_lisp_cons_poly(ao_lisp_read_cons);
+			v = ao_scheme_cons_poly(ao_scheme_read_cons);
 			--cons;
 			read_state = pop_read_stack(cons);
 			break;
 		case DOT:
 			if (!cons) {
-				ao_lisp_error(AO_LISP_INVALID, ". outside of cons");
-				return AO_LISP_NIL;
+				ao_scheme_error(AO_SCHEME_INVALID, ". outside of cons");
+				return AO_SCHEME_NIL;
 			}
-			if (!ao_lisp_read_cons) {
-				ao_lisp_error(AO_LISP_INVALID, ". first in cons");
-				return AO_LISP_NIL;
+			if (!ao_scheme_read_cons) {
+				ao_scheme_error(AO_SCHEME_INVALID, ". first in cons");
+				return AO_SCHEME_NIL;
 			}
 			read_state |= READ_SAW_DOT;
 			continue;
@@ -624,29 +624,29 @@ ao_lisp_read(void)
 				return v;
 
 			if (read_state & READ_DONE_DOT) {
-				ao_lisp_error(AO_LISP_INVALID, ". not last in cons");
-				return AO_LISP_NIL;
+				ao_scheme_error(AO_SCHEME_INVALID, ". not last in cons");
+				return AO_SCHEME_NIL;
 			}
 
 			if (read_state & READ_SAW_DOT) {
 				read_state |= READ_DONE_DOT;
-				ao_lisp_read_cons_tail->cdr = v;
+				ao_scheme_read_cons_tail->cdr = v;
 			} else {
-				struct ao_lisp_cons	*read = ao_lisp_cons_cons(v, AO_LISP_NIL);
+				struct ao_scheme_cons	*read = ao_scheme_cons_cons(v, AO_SCHEME_NIL);
 				if (!read)
-					return AO_LISP_NIL;
+					return AO_SCHEME_NIL;
 
-				if (ao_lisp_read_cons_tail)
-					ao_lisp_read_cons_tail->cdr = ao_lisp_cons_poly(read);
+				if (ao_scheme_read_cons_tail)
+					ao_scheme_read_cons_tail->cdr = ao_scheme_cons_poly(read);
 				else
-					ao_lisp_read_cons = read;
-				ao_lisp_read_cons_tail = read;
+					ao_scheme_read_cons = read;
+				ao_scheme_read_cons_tail = read;
 			}
 
-			if (!(read_state & READ_IN_QUOTE) || !ao_lisp_read_cons->cdr)
+			if (!(read_state & READ_IN_QUOTE) || !ao_scheme_read_cons->cdr)
 				break;
 
-			v = ao_lisp_cons_poly(ao_lisp_read_cons);
+			v = ao_scheme_cons_poly(ao_scheme_read_cons);
 			--cons;
 			read_state = pop_read_stack(cons);
 		}

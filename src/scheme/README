@@ -5,7 +5,6 @@ This follows the R7RS with the following known exceptions:
 * No dynamic-wind or exceptions
 * No environments
 * No ports
-* No syntax-rules; we have macros instead
-* define inside of lambda does not add name to lambda scope
+* No syntax-rules; (have classic macros)
 * No record types
 * No libraries

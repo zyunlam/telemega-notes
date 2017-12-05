@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-#include "ao_lisp.h"
+#include "ao_scheme.h"
 
 static void bool_mark(void *addr)
 {
@@ -22,7 +22,7 @@ static void bool_mark(void *addr)
 static int bool_size(void *addr)
 {
 	(void) addr;
-	return sizeof (struct ao_lisp_bool);
+	return sizeof (struct ao_scheme_bool);
 }
 
 static void bool_move(void *addr)
@@ -30,7 +30,7 @@ static void bool_move(void *addr)
 	(void) addr;
 }
 
-const struct ao_lisp_type ao_lisp_bool_type = {
+const struct ao_scheme_type ao_scheme_bool_type = {
 	.mark = bool_mark,
 	.size = bool_size,
 	.move = bool_move,
@@ -38,9 +38,9 @@ const struct ao_lisp_type ao_lisp_bool_type = {
 };
 
 void
-ao_lisp_bool_write(ao_poly v)
+ao_scheme_bool_write(ao_poly v)
 {
-	struct ao_lisp_bool	*b = ao_lisp_poly_bool(v);
+	struct ao_scheme_bool	*b = ao_scheme_poly_bool(v);
 
 	if (b->value)
 		printf("#t");
@@ -48,23 +48,23 @@ ao_lisp_bool_write(ao_poly v)
 		printf("#f");
 }
 
-#ifdef AO_LISP_MAKE_CONST
+#ifdef AO_SCHEME_MAKE_CONST
 
-struct ao_lisp_bool	*ao_lisp_true, *ao_lisp_false;
+struct ao_scheme_bool	*ao_scheme_true, *ao_scheme_false;
 
-struct ao_lisp_bool *
-ao_lisp_bool_get(uint8_t value)
+struct ao_scheme_bool *
+ao_scheme_bool_get(uint8_t value)
 {
-	struct ao_lisp_bool	**b;
+	struct ao_scheme_bool	**b;
 
 	if (value)
-		b = &ao_lisp_true;
+		b = &ao_scheme_true;
 	else
-		b = &ao_lisp_false;
+		b = &ao_scheme_false;
 
 	if (!*b) {
-		*b = ao_lisp_alloc(sizeof (struct ao_lisp_bool));
-		(*b)->type = AO_LISP_BOOL;
+		*b = ao_scheme_alloc(sizeof (struct ao_scheme_bool));
+		(*b)->type = AO_SCHEME_BOOL;
 		(*b)->value = value;
 	}
 	return *b;
