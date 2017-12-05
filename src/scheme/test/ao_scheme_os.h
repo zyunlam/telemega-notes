@@ -15,54 +15,54 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#ifndef _AO_LISP_OS_H_
-#define _AO_LISP_OS_H_
+#ifndef _AO_SCHEME_OS_H_
+#define _AO_SCHEME_OS_H_
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define AO_LISP_POOL_TOTAL	16384
-#define AO_LISP_SAVE		1
+#define AO_SCHEME_POOL_TOTAL	16384
+#define AO_SCHEME_SAVE		1
 #define DBG_MEM_STATS		1
 
-extern int ao_lisp_getc(void);
+extern int ao_scheme_getc(void);
 
 static inline void
-ao_lisp_os_flush() {
+ao_scheme_os_flush() {
 	fflush(stdout);
 }
 
 static inline void
-ao_lisp_abort(void)
+ao_scheme_abort(void)
 {
 	abort();
 }
 
 static inline void
-ao_lisp_os_led(int led)
+ao_scheme_os_led(int led)
 {
 	printf("leds set to 0x%x\n", led);
 }
 
-#define AO_LISP_JIFFIES_PER_SECOND	100
+#define AO_SCHEME_JIFFIES_PER_SECOND	100
 
 static inline void
-ao_lisp_os_delay(int jiffies)
+ao_scheme_os_delay(int jiffies)
 {
 	struct timespec ts = {
-		.tv_sec = jiffies / AO_LISP_JIFFIES_PER_SECOND,
-		.tv_nsec = (jiffies % AO_LISP_JIFFIES_PER_SECOND) * (1000000000L / AO_LISP_JIFFIES_PER_SECOND)
+		.tv_sec = jiffies / AO_SCHEME_JIFFIES_PER_SECOND,
+		.tv_nsec = (jiffies % AO_SCHEME_JIFFIES_PER_SECOND) * (1000000000L / AO_SCHEME_JIFFIES_PER_SECOND)
 	};
 	nanosleep(&ts, NULL);
 }
 
 static inline int
-ao_lisp_os_jiffy(void)
+ao_scheme_os_jiffy(void)
 {
 	struct timespec tp;
 	clock_gettime(CLOCK_MONOTONIC, &tp);
-	return tp.tv_sec * AO_LISP_JIFFIES_PER_SECOND + (tp.tv_nsec / (1000000000L / AO_LISP_JIFFIES_PER_SECOND));
+	return tp.tv_sec * AO_SCHEME_JIFFIES_PER_SECOND + (tp.tv_nsec / (1000000000L / AO_SCHEME_JIFFIES_PER_SECOND));
 }
 
 #endif

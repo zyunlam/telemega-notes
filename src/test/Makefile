@@ -1,13 +1,13 @@
 vpath %.o .
-vpath %.c ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
-vpath %.h ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
-vpath make-kalman ..:../kernel:../drivers:../util:../micropeak:../aes:../product:../lisp
+vpath %.c ..:../kernel:../drivers:../util:../micropeak:../aes:../product
+vpath %.h ..:../kernel:../drivers:../util:../micropeak:../aes:../product
+vpath make-kalman ..:../kernel:../drivers:../util:../micropeak:../aes:../product
 
 PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noisy_accel ao_flight_test_mm \
 	ao_flight_test_metrum ao_flight_test_mini \
 	ao_gps_test ao_gps_test_skytraq ao_gps_test_ublox ao_convert_test ao_convert_pa_test ao_fec_test \
 	ao_aprs_test ao_micropeak_test ao_fat_test ao_aes_test ao_int64_test \
-	ao_ms5607_convert_test ao_quaternion_test ao_lisp_test
+	ao_ms5607_convert_test ao_quaternion_test
 
 INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quaternion.h ao_eeprom_read.h
 TEST_SRC=ao_flight_test.c
@@ -97,16 +97,3 @@ ao_ms5607_convert_test: ao_ms5607_convert_test.c ao_ms5607_convert_8051.c ao_int
 ao_quaternion_test: ao_quaternion_test.c ao_quaternion.h
 	cc $(CFLAGS) -o $@ ao_quaternion_test.c -lm
 
-include ../lisp/Makefile-inc
-
-AO_LISP_SRCS=$(LISP_SRCS) ao_lisp_test.c
-
-AO_LISP_OBJS=$(AO_LISP_SRCS:.c=.o)
-
-ao_lisp_test: $(AO_LISP_OBJS)
-	cc $(CFLAGS) -o $@ $(AO_LISP_OBJS) -lm
-
-$(AO_LISP_OBJS): $(LISP_HDRS) ao_lisp_const.h
-
-clean::
-	rm -f $(AO_LISP_OBJS)

@@ -29,17 +29,50 @@
   (display str)
   )
 
-					; Here's the pieces to display
+(define (make-piece num max)
+					; A piece for position 'num'
+					; is num + 1 + num stars
+					; centered in a field of max *
+					; 2 + 1 characters with spaces
+					; on either side. This way,
+					; every piece is the same
+					; number of characters
 
-(define tower '("     *     " "    ***    " "   *****   " "  *******  " " ********* " "***********"))
+  (define (chars n c)
+    (if (zero? n) ""
+      (+ c (chars (- n 1) c))
+      )
+    )
+  (+ (chars (- max num 1) " ")
+     (chars (+ (* num 2) 1) "*")
+     (chars (- max num 1) " ")
+     )
+  )
+
+(define (make-pieces max)
+					; Make a list of numbers from 0 to max-1
+  (define (nums cur max)
+    (if (= cur max) ()
+      (cons cur (nums (+ cur 1) max))
+      )
+    )
+					; Create a list of pieces
+
+  (map (lambda (x) (make-piece x max)) (nums 0 max))
+  )
 
 					; Here's all of the towers of pieces
 					; This is generated when the program is run
 
 (define towers ())
 
-(define (one- x) (- x 1))
-(define (one+ x) (+ x 1))
+					; position of the bottom of
+					; the stacks set at runtime
+(define bottom-y 0)
+(define left-x 0)
+
+(define move-delay 25)
+
 					; Display one tower, clearing any
 					; space above it
 
@@ -47,13 +80,13 @@
   (cond ((= 0 clear)
 	 (cond ((not (null? tower))
 		(display-string x y (car tower))
-		(display-tower x (one+ y) 0 (cdr tower))
+		(display-tower x (+ y 1) 0 (cdr tower))
 		)
 	       )
 	 )
 	(else 
-	 (display-string x y "                   ")
-	 (display-tower x (one+ y) (one- clear) tower)
+	 (display-string x y "                    ")
+	 (display-tower x (+ y 1) (- clear 1) tower)
 	 )
 	)
   )
@@ -61,76 +94,68 @@
 					; Position of the top of the tower on the screen
 					; Shorter towers start further down the screen
 
-(define (tower-pos y tower)
-  (- y (length tower))
+(define (tower-pos tower)
+  (- bottom-y (length tower))
   )
 
 					; Display all of the towers, spaced 20 columns apart
 
-(define (display-towers x y towers)
+(define (display-towers x towers)
   (cond ((not (null? towers))
-	 (display-tower x 0 (tower-pos y (car towers)) (car towers))
-	 (display-towers (+ x 20) y (cdr towers)))
+	 (display-tower x 0 (tower-pos (car towers)) (car towers))
+	 (display-towers (+ x 20) (cdr towers)))
 	)
   )
 
-(define top 0)
 					; Display all of the towers, then move the cursor
 					; out of the way and flush the output
 
 (define (display-hanoi)
-  (display-towers 0 top towers)
-  (move-to 1 21)
+  (display-towers left-x towers)
+  (move-to 1 23)
   (flush-output)
+  (delay move-delay)
   )
 
 					; Reset towers to the starting state, with
 					; all of the pieces in the first tower and the
 					; other two empty
 
-(define (reset-towers)
-  (set! towers (list tower () ()))
-  (set! top (+ (length tower) 3))
-  (length tower)
-  )
-
-					; Replace a tower in the list of towers
-					; with a new value
-
-(define (replace list pos member)
-  (cond ((= pos 0) (cons member (cdr list)))
-	(else (cons (car list) (replace (cdr list) (one- pos) member)))
-	)
+(define (reset-towers len)
+  (set! towers (list (make-pieces len) () ()))
+  (set! bottom-y (+ len 3))
   )
 
 					; Move a piece from the top of one tower
 					; to the top of another
 
-(define move-delay 10)
-
 (define (move-piece from to)
-  (let* ((from-tower (list-ref towers from))
-	 (to-tower (list-ref towers to))
-	 (piece (car from-tower)))
-    (set! from-tower (cdr from-tower))
-    (set! to-tower (cons piece to-tower))
-    (set! towers (replace towers from from-tower))
-    (set! towers (replace towers to to-tower))
-    (display-hanoi)
-    (delay move-delay)
-    )
+
+					; references to the cons holding the two towers
+
+  (define from-tower (list-tail towers from))
+  (define to-tower (list-tail towers to))
+
+					; stick the car of from-tower onto to-tower
+
+  (set-car! to-tower (cons (caar from-tower) (car to-tower)))
+
+					; remove the car of from-tower
+
+  (set-car! from-tower (cdar from-tower))
   )
 
-; The implementation of the game
+					; The implementation of the game
 
 (define (_hanoi n from to use)
   (cond ((= 1 n)
 	 (move-piece from to)
+	 (display-hanoi)
 	 )
 	(else
-	 (_hanoi (one- n) from use to)
+	 (_hanoi (- n 1) from use to)
 	 (_hanoi 1 from to use)
-	 (_hanoi (one- n) use to from)
+	 (_hanoi (- n 1) use to from)
 	 )
 	)
   )
@@ -140,12 +165,10 @@
 					; clears the screen and runs
 					; the program
 
-(define (hanoi)
-  (let ((len (reset-towers)))
-    (clear)
-    (_hanoi len 0 1 2)
-    (move-to 0 23)
-    #t
-    )
-  )
+(define (hanoi len)
+  (reset-towers len)
+  (clear)
+  (display-hanoi)
+  (_hanoi len 0 1 2)
+  #t
   )
