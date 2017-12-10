@@ -108,13 +108,7 @@ ao_scheme_eval_sexpr(void)
 		DBGI("..frame "); DBG_POLY(ao_scheme_frame_poly(ao_scheme_frame_current)); DBG("\n");
 		ao_scheme_v = ao_scheme_atom_get(ao_scheme_v);
 		/* fall through */
-	case AO_SCHEME_BOOL:
-	case AO_SCHEME_INT:
-	case AO_SCHEME_BIGINT:
-	case AO_SCHEME_FLOAT:
-	case AO_SCHEME_STRING:
-	case AO_SCHEME_BUILTIN:
-	case AO_SCHEME_LAMBDA:
+	default:
 		ao_scheme_stack->state = eval_val;
 		break;
 	}

@@ -340,6 +340,8 @@ _lex(void)
 				add_token(c);
 				end_token();
 				return BOOL;
+			case '(':
+				return OPEN_VECTOR;
 			case '\\':
 				for (;;) {
 					int alphabetic;
@@ -474,10 +476,12 @@ int			ao_scheme_read_list;
 struct ao_scheme_cons	*ao_scheme_read_cons;
 struct ao_scheme_cons	*ao_scheme_read_cons_tail;
 struct ao_scheme_cons	*ao_scheme_read_stack;
+static int		ao_scheme_read_state;
 
 #define READ_IN_QUOTE	0x01
 #define READ_SAW_DOT	0x02
 #define READ_DONE_DOT	0x04
+#define READ_SAW_VECTOR	0x08
 
 static int
 push_read_stack(int read_state)
@@ -490,7 +494,8 @@ push_read_stack(int read_state)
 								     ao_scheme_cons_poly(ao_scheme_read_stack)));
 		if (!ao_scheme_read_stack)
 			return 0;
-	}
+	} else
+		ao_scheme_read_state = read_state;
 	ao_scheme_read_cons = NULL;
 	ao_scheme_read_cons_tail = NULL;
 	return 1;
@@ -513,6 +518,7 @@ pop_read_stack(void)
 		ao_scheme_read_cons = 0;
 		ao_scheme_read_cons_tail = 0;
 		ao_scheme_read_stack = 0;
+		read_state = ao_scheme_read_state;
 	}
 	RDBG_OUT();
 	RDBGI("pop read stack %p %d\n", ao_scheme_read_cons, read_state);
@@ -532,7 +538,9 @@ ao_scheme_read(void)
 	ao_scheme_read_cons = ao_scheme_read_cons_tail = ao_scheme_read_stack = 0;
 	for (;;) {
 		parse_token = lex();
-		while (parse_token == OPEN) {
+		while (parse_token == OPEN || parse_token == OPEN_VECTOR) {
+			if (parse_token == OPEN_VECTOR)
+				read_state |= READ_SAW_VECTOR;
 			if (!push_read_stack(read_state))
 				return AO_SCHEME_NIL;
 			ao_scheme_read_list++;
@@ -604,6 +612,8 @@ ao_scheme_read(void)
 			v = ao_scheme_cons_poly(ao_scheme_read_cons);
 			--ao_scheme_read_list;
 			read_state = pop_read_stack();
+			if (read_state & READ_SAW_VECTOR)
+				v = ao_scheme_vector_poly(ao_scheme_list_to_vector(ao_scheme_poly_cons(v)));
 			break;
 		case DOT:
 			if (!ao_scheme_read_list) {

@@ -5,6 +5,6 @@ This follows the R7RS with the following known exceptions:
 * No dynamic-wind or exceptions
 * No environments
 * No ports
-* No syntax-rules; (have classic macros)
+* No syntax-rules
 * No record types
 * No libraries
