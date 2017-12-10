@@ -78,7 +78,7 @@ ao_scheme_getc(void)
 		return getc(ao_scheme_file);
 
 	if (newline) {
-		if (ao_scheme_read_stack)
+		if (ao_scheme_read_list)
 			printf("+ ");
 		else
 			printf("> ");

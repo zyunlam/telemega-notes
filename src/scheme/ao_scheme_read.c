@@ -151,7 +151,7 @@ static const uint16_t	lex_classes[128] = {
 static int lex_unget_c;
 
 static inline int
-lex_get()
+lex_get(void)
 {
 	int	c;
 	if (lex_unget_c) {
@@ -244,7 +244,7 @@ lex_quoted(void)
 	}
 }
 
-#define AO_SCHEME_TOKEN_MAX	32
+#define AO_SCHEME_TOKEN_MAX	128
 
 static char	token_string[AO_SCHEME_TOKEN_MAX];
 static int32_t	token_int;
@@ -470,6 +470,7 @@ static inline int lex(void)
 
 static int parse_token;
 
+int			ao_scheme_read_list;
 struct ao_scheme_cons	*ao_scheme_read_cons;
 struct ao_scheme_cons	*ao_scheme_read_cons_tail;
 struct ao_scheme_cons	*ao_scheme_read_stack;
@@ -479,11 +480,11 @@ struct ao_scheme_cons	*ao_scheme_read_stack;
 #define READ_DONE_DOT	0x04
 
 static int
-push_read_stack(int cons, int read_state)
+push_read_stack(int read_state)
 {
 	RDBGI("push read stack %p 0x%x\n", ao_scheme_read_cons, read_state);
 	RDBG_IN();
-	if (cons) {
+	if (ao_scheme_read_list) {
 		ao_scheme_read_stack = ao_scheme_cons_cons(ao_scheme_cons_poly(ao_scheme_read_cons),
 						       ao_scheme__cons(ao_scheme_int_poly(read_state),
 								     ao_scheme_cons_poly(ao_scheme_read_stack)));
@@ -496,10 +497,10 @@ push_read_stack(int cons, int read_state)
 }
 
 static int
-pop_read_stack(int cons)
+pop_read_stack(void)
 {
 	int	read_state = 0;
-	if (cons) {
+	if (ao_scheme_read_list) {
 		ao_scheme_read_cons = ao_scheme_poly_cons(ao_scheme_read_stack->car);
 		ao_scheme_read_stack = ao_scheme_poly_cons(ao_scheme_read_stack->cdr);
 		read_state = ao_scheme_poly_int(ao_scheme_read_stack->car);
@@ -523,19 +524,18 @@ ao_scheme_read(void)
 {
 	struct ao_scheme_atom	*atom;
 	char			*string;
-	int			cons;
 	int			read_state;
 	ao_poly			v = AO_SCHEME_NIL;
 
-	cons = 0;
+	ao_scheme_read_list = 0;
 	read_state = 0;
 	ao_scheme_read_cons = ao_scheme_read_cons_tail = ao_scheme_read_stack = 0;
 	for (;;) {
 		parse_token = lex();
 		while (parse_token == OPEN) {
-			if (!push_read_stack(cons, read_state))
+			if (!push_read_stack(read_state))
 				return AO_SCHEME_NIL;
-			cons++;
+			ao_scheme_read_list++;
 			read_state = 0;
 			parse_token = lex();
 		}
@@ -543,7 +543,7 @@ ao_scheme_read(void)
 		switch (parse_token) {
 		case END:
 		default:
-			if (cons)
+			if (ao_scheme_read_list)
 				ao_scheme_error(AO_SCHEME_EOF, "unexpected end of file");
 			return _ao_scheme_atom_eof;
 			break;
@@ -577,9 +577,9 @@ ao_scheme_read(void)
 		case QUASIQUOTE:
 		case UNQUOTE:
 		case UNQUOTE_SPLICING:
-			if (!push_read_stack(cons, read_state))
+			if (!push_read_stack(read_state))
 				return AO_SCHEME_NIL;
-			cons++;
+			ao_scheme_read_list++;
 			read_state = READ_IN_QUOTE;
 			switch (parse_token) {
 			case QUOTE:
@@ -597,16 +597,16 @@ ao_scheme_read(void)
 			}
 			break;
 		case CLOSE:
-			if (!cons) {
+			if (!ao_scheme_read_list) {
 				v = AO_SCHEME_NIL;
 				break;
 			}
 			v = ao_scheme_cons_poly(ao_scheme_read_cons);
-			--cons;
-			read_state = pop_read_stack(cons);
+			--ao_scheme_read_list;
+			read_state = pop_read_stack();
 			break;
 		case DOT:
-			if (!cons) {
+			if (!ao_scheme_read_list) {
 				ao_scheme_error(AO_SCHEME_INVALID, ". outside of cons");
 				return AO_SCHEME_NIL;
 			}
@@ -620,7 +620,7 @@ ao_scheme_read(void)
 
 		/* loop over QUOTE ends */
 		for (;;) {
-			if (!cons)
+			if (!ao_scheme_read_list)
 				return v;
 
 			if (read_state & READ_DONE_DOT) {
@@ -647,8 +647,8 @@ ao_scheme_read(void)
 				break;
 
 			v = ao_scheme_cons_poly(ao_scheme_read_cons);
-			--cons;
-			read_state = pop_read_stack(cons);
+			--ao_scheme_read_list;
+			read_state = pop_read_stack();
 		}
 	}
 	return v;

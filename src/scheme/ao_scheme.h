@@ -31,7 +31,7 @@
 typedef uint16_t	ao_poly;
 typedef int16_t		ao_signed_poly;
 
-#ifdef AO_SCHEME_SAVE
+#if AO_SCHEME_SAVE
 
 struct ao_scheme_os_save {
 	ao_poly		atoms;
@@ -76,6 +76,9 @@ extern uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute__((aligned(4)))
 #include "ao_scheme_const.h"
 #ifndef AO_SCHEME_POOL
 #define AO_SCHEME_POOL	3072
+#endif
+#ifndef AO_SCHEME_POOL_EXTRA
+#define AO_SCHEME_POOL_EXTRA 0
 #endif
 extern uint8_t		ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribute__((aligned(4)));
 #endif
@@ -745,6 +748,7 @@ char *
 ao_scheme_args_name(uint8_t args);
 
 /* read */
+extern int			ao_scheme_read_list;
 extern struct ao_scheme_cons	*ao_scheme_read_cons;
 extern struct ao_scheme_cons	*ao_scheme_read_cons_tail;
 extern struct ao_scheme_cons	*ao_scheme_read_stack;

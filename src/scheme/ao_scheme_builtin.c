@@ -636,7 +636,7 @@ ao_scheme_do_collect(struct ao_scheme_cons *cons)
 	int	free;
 	(void) cons;
 	free = ao_scheme_collect(AO_SCHEME_COLLECT_FULL);
-	return ao_scheme_int_poly(free);
+	return ao_scheme_integer_poly(free);
 }
 
 ao_poly
