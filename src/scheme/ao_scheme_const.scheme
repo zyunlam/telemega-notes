@@ -641,7 +641,7 @@
 (char-whitespace? #\space)
 
 (define (char->integer c) c)
-(define (integer->char c) char-integer)
+(define integer->char char->integer)
 
 (define (char-upcase c) (if (char-lower-case? c) (+ c (- #\A #\a)) c))
 
