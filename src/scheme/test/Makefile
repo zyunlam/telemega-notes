@@ -17,3 +17,6 @@ $(OBJS): $(SCHEME_HDRS)
 
 clean::
 	rm -f $(OBJS) ao_scheme_test
+
+install: ao_scheme_test
+	cp ao_scheme_test $$HOME/bin/ao-scheme

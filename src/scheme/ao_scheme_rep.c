@@ -18,6 +18,8 @@ ao_poly
 ao_scheme_read_eval_print(void)
 {
 	ao_poly	in, out = AO_SCHEME_NIL;
+
+	ao_scheme_exception = 0;
 	for(;;) {
 		in = ao_scheme_read();
 		if (in == _ao_scheme_atom_eof)
