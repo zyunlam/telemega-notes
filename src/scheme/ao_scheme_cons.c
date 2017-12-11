@@ -112,7 +112,7 @@ ao_scheme_cons_cdr(struct ao_scheme_cons *cons)
 	if (cdr == AO_SCHEME_NIL)
 		return NULL;
 	if (ao_scheme_poly_type(cdr) != AO_SCHEME_CONS) {
-		(void) ao_scheme_error(AO_SCHEME_INVALID, "improper list");
+		(void) ao_scheme_error(AO_SCHEME_INVALID, "improper cdr %v", cdr);
 		return NULL;
 	}
 	return ao_scheme_poly_cons(cdr);
@@ -122,6 +122,42 @@ ao_poly
 ao_scheme__cons(ao_poly car, ao_poly cdr)
 {
 	return ao_scheme_cons_poly(ao_scheme_cons_cons(car, cdr));
+}
+
+struct ao_scheme_cons *
+ao_scheme_cons_copy(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons	*head = NULL;
+	struct ao_scheme_cons	*tail = NULL;
+
+	while (cons) {
+		struct ao_scheme_cons	*new;
+		ao_poly cdr;
+
+		ao_scheme_cons_stash(0, cons);
+		ao_scheme_cons_stash(1, head);
+		ao_scheme_poly_stash(0, ao_scheme_cons_poly(tail));
+		new = ao_scheme_alloc(sizeof (struct ao_scheme_cons));
+		cons = ao_scheme_cons_fetch(0);
+		head = ao_scheme_cons_fetch(1);
+		tail = ao_scheme_poly_cons(ao_scheme_poly_fetch(0));
+		if (!new)
+			return AO_SCHEME_NIL;
+		new->car = cons->car;
+		new->cdr = AO_SCHEME_NIL;
+		if (!head)
+			head = new;
+		else
+			tail->cdr = ao_scheme_cons_poly(new);
+		tail = new;
+		cdr = cons->cdr;
+		if (ao_scheme_poly_type(cdr) != AO_SCHEME_CONS) {
+			tail->cdr = cdr;
+			break;
+		}
+		cons = ao_scheme_poly_cons(cdr);
+	}
+	return head;
 }
 
 void

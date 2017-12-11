@@ -198,6 +198,19 @@ ao_scheme_do_length(struct ao_scheme_cons *cons)
 }
 
 ao_poly
+ao_scheme_do_list_copy(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons *new;
+
+	if (!ao_scheme_check_argc(_ao_scheme_atom_length, cons, 1, 1))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_argt(_ao_scheme_atom_length, cons, 0, AO_SCHEME_CONS, 1))
+		return AO_SCHEME_NIL;
+	new = ao_scheme_cons_copy(ao_scheme_poly_cons(ao_scheme_arg(cons, 0)));
+	return ao_scheme_cons_poly(new);
+}
+
+ao_poly
 ao_scheme_do_quote(struct ao_scheme_cons *cons)
 {
 	if (!ao_scheme_check_argc(_ao_scheme_atom_quote, cons, 1, 1))

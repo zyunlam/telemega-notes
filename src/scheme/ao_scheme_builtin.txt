@@ -8,6 +8,7 @@ f_lambda	cdr
 f_lambda	cons
 f_lambda	last
 f_lambda	length
+f_lambda	list_copy	list-copy
 nlambda		quote
 atom		quasiquote
 atom		unquote

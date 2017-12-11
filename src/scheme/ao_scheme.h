@@ -634,6 +634,9 @@ ao_scheme_cons_display(ao_poly);
 int
 ao_scheme_cons_length(struct ao_scheme_cons *cons);
 
+struct ao_scheme_cons *
+ao_scheme_cons_copy(struct ao_scheme_cons *cons);
+
 /* string */
 extern const struct ao_scheme_type ao_scheme_string_type;
 
