@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define AO_SCHEME_POOL_TOTAL	16384
+#define AO_SCHEME_POOL_TOTAL	32768
 #define AO_SCHEME_SAVE		1
 #define DBG_MEM_STATS		1
 
