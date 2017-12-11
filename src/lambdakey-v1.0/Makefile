@@ -54,7 +54,7 @@ MAP=$(PROG).map
 NEWLIB=/local/newlib-mini
 MAPFILE=-Wl,-M=$(MAP)
 LDFLAGS=-L../stmf0 -L$(NEWLIB)/arm-none-eabi/lib/thumb/v6-m/ -Wl,-Tlambda.ld $(MAPFILE) -nostartfiles
-AO_CFLAGS=-I. -I../stmf0 -I../kernel -I../drivers -I.. -I../scheme -isystem $(NEWLIB)/arm-none-eabi/include
+AO_CFLAGS=-I. -I../stmf0 -I../kernel -I../drivers -I.. -I../scheme -isystem $(NEWLIB)/arm-none-eabi/include -DNEWLIB
 
 PROGNAME=lambdakey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf

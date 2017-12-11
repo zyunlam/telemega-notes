@@ -44,6 +44,9 @@ struct ao_task {
 	ao_arch_task_members		/* any architecture-specific fields */
 	uint8_t task_id;		/* unique id */
 	__code char *name;		/* task name */
+#ifdef NEWLIB
+	int __errno;			/* storage for errno in newlib libc */
+#endif
 #if HAS_TASK_QUEUE
 	struct ao_list	queue;
 	struct ao_list	alarm_queue;

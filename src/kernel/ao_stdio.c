@@ -84,7 +84,7 @@ __pdata int8_t ao_cur_stdio;
 #endif
 
 void
-putchar(char c)
+ao_putchar(char c)
 {
 #if LOW_LEVEL_DEBUG
 	if (!ao_cur_task) {
@@ -110,7 +110,7 @@ flush(void)
 __xdata uint8_t ao_stdin_ready;
 
 char
-getchar(void) __reentrant
+ao_getchar(void) __reentrant
 {
 	int c;
 	int8_t stdio;
