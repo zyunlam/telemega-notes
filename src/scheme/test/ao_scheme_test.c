@@ -107,15 +107,15 @@ main (int argc, char **argv)
 	}
 	ao_scheme_read_eval_print();
 
-	printf ("collects: full: %d incremental %d\n",
+	printf ("collects: full: %lu incremental %lu\n",
 		ao_scheme_collects[AO_SCHEME_COLLECT_FULL],
 		ao_scheme_collects[AO_SCHEME_COLLECT_INCREMENTAL]);
 
-	printf ("freed: full %d incremental %d\n",
+	printf ("freed: full %lu incremental %lu\n",
 		ao_scheme_freed[AO_SCHEME_COLLECT_FULL],
 		ao_scheme_freed[AO_SCHEME_COLLECT_INCREMENTAL]);
 
-	printf("loops: full %d incremental %d\n",
+	printf("loops: full %lu incremental %lu\n",
 		ao_scheme_loops[AO_SCHEME_COLLECT_FULL],
 		ao_scheme_loops[AO_SCHEME_COLLECT_INCREMENTAL]);
 

@@ -522,9 +522,9 @@ ao_scheme_poly_vector(ao_poly poly)
 
 /* memory functions */
 
-extern int ao_scheme_collects[2];
-extern int ao_scheme_freed[2];
-extern int ao_scheme_loops[2];
+extern uint64_t ao_scheme_collects[2];
+extern uint64_t ao_scheme_freed[2];
+extern uint64_t ao_scheme_loops[2];
 
 /* returns 1 if the object was already marked */
 int

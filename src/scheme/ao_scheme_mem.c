@@ -483,9 +483,9 @@ ao_scheme_poly_mark_ref(ao_poly *p, uint8_t do_note_cons)
 }
 
 #if DBG_MEM_STATS
-int ao_scheme_collects[2];
-int ao_scheme_freed[2];
-int ao_scheme_loops[2];
+uint64_t ao_scheme_collects[2];
+uint64_t ao_scheme_freed[2];
+uint64_t ao_scheme_loops[2];
 #endif
 
 int ao_scheme_last_top;
