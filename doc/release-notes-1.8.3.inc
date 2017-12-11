@@ -2,13 +2,19 @@
 :toc!:
 :doctype: article
 
-	Version 1.8.3 includes two important flight computer fixes,
-	changed KML export data for Tripoli Record reporting and some
-	updates to graph presentation and data downloading.
+	Version 1.8.3 includes support for TeleMega version 3.0 along
+	with two important flight computer fixes. This version also
+	changes KML export data to make Tripoli Record reporting
+	better and some updates to graph presentation and data
+	downloading.
 
 	== AltOS
 
-	AltOS Bug Fixes
+	AltOS New Features
+
+	* Support for TeleMega version 3.0 hardware.
+
+	== AltOS Bug Fixes
 
 	* Ground testing EasyMega and TeleMega additional pyro
           channels could result in a sticky 'fired' status which would
@@ -18,6 +24,10 @@
           from capturing log data.
 
 	== AltosUI and TeleGPS Applications
+
+	AltosUI New Features
+
+	* Support for TeleMega version 3.0.
 
 	AltosUI and TeleGPS Changes
 
