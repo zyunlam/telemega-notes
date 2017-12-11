@@ -492,9 +492,8 @@ ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 	for (cons = ao_scheme_cons_cdr(cons); cons; cons = ao_scheme_cons_cdr(cons)) {
 		ao_poly	right = cons->car;
 
-		if (op == builtin_equal) {
-			if (left != right)
-				return _ao_scheme_bool_false;
+		if (op == builtin_equal && left == right) {
+			;
 		} else {
 			uint8_t	lt = ao_scheme_poly_type(left);
 			uint8_t	rt = ao_scheme_poly_type(right);
@@ -519,6 +518,38 @@ ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 					if (!(l >= r))
 						return _ao_scheme_bool_false;
 					break;
+				case builtin_equal:
+					if (!(l == r))
+						return _ao_scheme_bool_false;
+				default:
+					break;
+				}
+			} else if (ao_scheme_number_typep(lt) && ao_scheme_number_typep(rt)) {
+				float l, r;
+
+				l = ao_scheme_poly_number(left);
+				r = ao_scheme_poly_number(right);
+
+				switch (op) {
+				case builtin_less:
+					if (!(l < r))
+						return _ao_scheme_bool_false;
+					break;
+				case builtin_greater:
+					if (!(l > r))
+						return _ao_scheme_bool_false;
+					break;
+				case builtin_less_equal:
+					if (!(l <= r))
+						return _ao_scheme_bool_false;
+					break;
+				case builtin_greater_equal:
+					if (!(l >= r))
+						return _ao_scheme_bool_false;
+					break;
+				case builtin_equal:
+					if (!(l == r))
+						return _ao_scheme_bool_false;
 				default:
 					break;
 				}
@@ -542,10 +573,15 @@ ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 					if (!(c >= 0))
 						return _ao_scheme_bool_false;
 					break;
+				case builtin_equal:
+					if (!(c == 0))
+						return _ao_scheme_bool_false;
+					break;
 				default:
 					break;
 				}
-			}
+			} else
+				return _ao_scheme_bool_false;
 		}
 		left = right;
 	}
