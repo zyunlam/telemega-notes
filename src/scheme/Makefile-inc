@@ -15,7 +15,8 @@ SCHEME_SRCS=\
 	ao_scheme_rep.c \
 	ao_scheme_save.c \
 	ao_scheme_stack.c \
-	ao_scheme_error.c 
+	ao_scheme_error.c \
+	ao_scheme_vector.c
 
 SCHEME_HDRS=\
 	ao_scheme.h \

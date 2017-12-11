@@ -31,7 +31,7 @@
 typedef uint16_t	ao_poly;
 typedef int16_t		ao_signed_poly;
 
-#ifdef AO_SCHEME_SAVE
+#if AO_SCHEME_SAVE
 
 struct ao_scheme_os_save {
 	ao_poly		atoms;
@@ -77,6 +77,9 @@ extern uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute__((aligned(4)))
 #ifndef AO_SCHEME_POOL
 #define AO_SCHEME_POOL	3072
 #endif
+#ifndef AO_SCHEME_POOL_EXTRA
+#define AO_SCHEME_POOL_EXTRA 0
+#endif
 extern uint8_t		ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribute__((aligned(4)));
 #endif
 
@@ -101,7 +104,8 @@ extern uint8_t		ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribut
 #define AO_SCHEME_BOOL		10
 #define AO_SCHEME_BIGINT	11
 #define AO_SCHEME_FLOAT		12
-#define AO_SCHEME_NUM_TYPE	13
+#define AO_SCHEME_VECTOR	13
+#define AO_SCHEME_NUM_TYPE	14
 
 /* Leave two bits for types to use as they please */
 #define AO_SCHEME_OTHER_TYPE_MASK	0x3f
@@ -187,6 +191,13 @@ struct ao_scheme_float {
 	uint8_t			pad1;
 	uint16_t		pad2;
 	float			value;
+};
+
+struct ao_scheme_vector {
+	uint8_t			type;
+	uint8_t			pad1;
+	uint16_t		length;
+	ao_poly			vals[];
 };
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -497,6 +508,18 @@ ao_scheme_poly_float(ao_poly poly)
 float
 ao_scheme_poly_number(ao_poly p);
 
+static inline ao_poly
+ao_scheme_vector_poly(struct ao_scheme_vector *v)
+{
+	return ao_scheme_poly(v, AO_SCHEME_OTHER);
+}
+
+static inline struct ao_scheme_vector *
+ao_scheme_poly_vector(ao_poly poly)
+{
+	return ao_scheme_ref(poly);
+}
+
 /* memory functions */
 
 extern int ao_scheme_collects[2];
@@ -677,6 +700,32 @@ void
 ao_scheme_bigint_write(ao_poly i);
 
 extern const struct ao_scheme_type	ao_scheme_bigint_type;
+
+/* vector */
+
+void
+ao_scheme_vector_write(ao_poly v);
+
+void
+ao_scheme_vector_display(ao_poly v);
+
+struct ao_scheme_vector *
+ao_scheme_vector_alloc(uint16_t length, ao_poly fill);
+
+ao_poly
+ao_scheme_vector_get(ao_poly v, ao_poly i);
+
+ao_poly
+ao_scheme_vector_set(ao_poly v, ao_poly i, ao_poly p);
+
+struct ao_scheme_vector *
+ao_scheme_list_to_vector(struct ao_scheme_cons *cons);
+
+struct ao_scheme_cons *
+ao_scheme_vector_to_list(struct ao_scheme_vector *vector);
+
+extern const struct ao_scheme_type	ao_scheme_vector_type;
+
 /* prim */
 void
 ao_scheme_poly_write(ao_poly p);
@@ -745,6 +794,7 @@ char *
 ao_scheme_args_name(uint8_t args);
 
 /* read */
+extern int			ao_scheme_read_list;
 extern struct ao_scheme_cons	*ao_scheme_read_cons;
 extern struct ao_scheme_cons	*ao_scheme_read_cons_tail;
 extern struct ao_scheme_cons	*ao_scheme_read_stack;

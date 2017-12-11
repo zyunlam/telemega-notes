@@ -467,6 +467,7 @@ static const struct ao_scheme_type * const ao_scheme_types[AO_SCHEME_NUM_TYPE] =
 	[AO_SCHEME_BOOL] = &ao_scheme_bool_type,
 	[AO_SCHEME_BIGINT] = &ao_scheme_bigint_type,
 	[AO_SCHEME_FLOAT] = &ao_scheme_float_type,
+	[AO_SCHEME_VECTOR] = &ao_scheme_vector_type,
 };
 
 static int

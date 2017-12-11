@@ -68,6 +68,10 @@ static const struct ao_scheme_funcs ao_scheme_funcs[AO_SCHEME_NUM_TYPE] = {
 		.write = ao_scheme_float_write,
 		.display = ao_scheme_float_write,
 	},
+	[AO_SCHEME_VECTOR] = {
+		.write = ao_scheme_vector_write,
+		.display = ao_scheme_vector_display
+	},
 };
 
 static const struct ao_scheme_funcs *

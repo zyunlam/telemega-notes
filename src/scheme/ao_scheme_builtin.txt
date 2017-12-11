@@ -66,3 +66,10 @@ f_lambda	finitep		finite?
 f_lambda	infinitep	infinite?
 f_lambda	inexactp	inexact?
 f_lambda	sqrt
+f_lambda	vector_ref	vector-ref
+f_lambda	vector_set	vector-set!
+f_lambda	vector
+f_lambda	list_to_vector	list->vector
+f_lambda	vector_to_list	vector->list
+f_lambda	vector_length	vector-length
+f_lambda	vectorp		vector?

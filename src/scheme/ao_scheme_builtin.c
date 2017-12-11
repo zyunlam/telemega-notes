@@ -267,7 +267,6 @@ ao_scheme_do_write(struct ao_scheme_cons *cons)
 		if (cons)
 			printf(" ");
 	}
-	printf("\n");
 	return _ao_scheme_bool_true;
 }
 
@@ -636,7 +635,7 @@ ao_scheme_do_collect(struct ao_scheme_cons *cons)
 	int	free;
 	(void) cons;
 	free = ao_scheme_collect(AO_SCHEME_COLLECT_FULL);
-	return ao_scheme_int_poly(free);
+	return ao_scheme_integer_poly(free);
 }
 
 ao_poly
@@ -751,7 +750,7 @@ ao_poly
 ao_scheme_do_listp(struct ao_scheme_cons *cons)
 {
 	ao_poly	v;
-	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
+	if (!ao_scheme_check_argc(_ao_scheme_atom_list3f, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	v = ao_scheme_arg(cons, 0);
 	for (;;) {
@@ -862,6 +861,68 @@ ao_scheme_do_jiffies_per_second(struct ao_scheme_cons *cons)
 	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 0, 0))
 		return AO_SCHEME_NIL;
 	return (ao_scheme_int_poly(AO_SCHEME_JIFFIES_PER_SECOND));
+}
+
+ao_poly
+ao_scheme_do_vector(struct ao_scheme_cons *cons)
+{
+	return ao_scheme_vector_poly(ao_scheme_list_to_vector(cons));
+}
+
+ao_poly
+ao_scheme_do_vector_ref(struct ao_scheme_cons *cons)
+{
+	if (!ao_scheme_check_argc(_ao_scheme_atom_vector2dref, cons, 2, 2))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_argt(_ao_scheme_atom_vector2dref, cons, 0, AO_SCHEME_VECTOR, 0))
+		return AO_SCHEME_NIL;
+	return ao_scheme_vector_get(ao_scheme_arg(cons, 0), ao_scheme_arg(cons, 1));
+}
+
+ao_poly
+ao_scheme_do_vector_set(struct ao_scheme_cons *cons)
+{
+	if (!ao_scheme_check_argc(_ao_scheme_atom_vector2dset21, cons, 3, 3))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_argt(_ao_scheme_atom_vector2dset21, cons, 0, AO_SCHEME_VECTOR, 0))
+		return AO_SCHEME_NIL;
+	return ao_scheme_vector_set(ao_scheme_arg(cons, 0), ao_scheme_arg(cons, 1), ao_scheme_arg(cons, 2));
+}
+
+ao_poly
+ao_scheme_do_list_to_vector(struct ao_scheme_cons *cons)
+{
+	if (!ao_scheme_check_argc(_ao_scheme_atom_list2d3evector, cons, 1, 1))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_argt(_ao_scheme_atom_list2d3evector, cons, 0, AO_SCHEME_CONS, 0))
+		return AO_SCHEME_NIL;
+	return ao_scheme_vector_poly(ao_scheme_list_to_vector(ao_scheme_poly_cons(ao_scheme_arg(cons, 0))));
+}
+
+ao_poly
+ao_scheme_do_vector_to_list(struct ao_scheme_cons *cons)
+{
+	if (!ao_scheme_check_argc(_ao_scheme_atom_vector2d3elist, cons, 1, 1))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_argt(_ao_scheme_atom_vector2d3elist, cons, 0, AO_SCHEME_VECTOR, 0))
+		return AO_SCHEME_NIL;
+	return ao_scheme_cons_poly(ao_scheme_vector_to_list(ao_scheme_poly_vector(ao_scheme_arg(cons, 0))));
+}
+
+ao_poly
+ao_scheme_do_vector_length(struct ao_scheme_cons *cons)
+{
+	if (!ao_scheme_check_argc(_ao_scheme_atom_vector2d3elist, cons, 1, 1))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_argt(_ao_scheme_atom_vector2d3elist, cons, 0, AO_SCHEME_VECTOR, 0))
+		return AO_SCHEME_NIL;
+	return ao_scheme_integer_poly(ao_scheme_poly_vector(ao_scheme_arg(cons, 0))->length);
+}
+
+ao_poly
+ao_scheme_do_vectorp(struct ao_scheme_cons *cons)
+{
+	return ao_scheme_do_typep(AO_SCHEME_VECTOR, cons);
 }
 
 #define AO_SCHEME_BUILTIN_FUNCS

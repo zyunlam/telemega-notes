@@ -39,6 +39,10 @@ const struct ao_scheme_type ao_scheme_float_type = {
 	.name = "float",
 };
 
+#ifndef FLOAT_FORMAT
+#define FLOAT_FORMAT "%g"
+#endif
+
 void
 ao_scheme_float_write(ao_poly p)
 {
@@ -54,7 +58,7 @@ ao_scheme_float_write(ao_poly p)
 			printf("+");
 		printf("inf.0");
 	} else
-		printf ("%g", f->value);
+		printf (FLOAT_FORMAT, v);
 }
 
 float

@@ -195,7 +195,7 @@ ao_scheme_cons_length(struct ao_scheme_cons *cons)
 	int	len = 0;
 	while (cons) {
 		len++;
-		cons = ao_scheme_poly_cons(cons->cdr);
+		cons = ao_scheme_cons_cdr(cons);
 	}
 	return len;
 }

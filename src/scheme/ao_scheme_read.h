@@ -32,6 +32,7 @@
 # define FLOAT			10
 # define DOT			11
 # define BOOL			12
+# define OPEN_VECTOR		13
 
 /*
  * character classes
