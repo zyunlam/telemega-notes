@@ -241,6 +241,8 @@ public class AltosCalData {
 
 	public AltosGPS		gps_pad = null;
 
+	public AltosGPS		prev_gps = null;
+
 	public double		gps_pad_altitude = AltosLib.MISSING;
 
 	public void set_cal_gps(AltosGPS gps) {
@@ -251,6 +253,7 @@ public class AltosCalData {
 				gps_pad_altitude = gps.alt;
 		}
 		temp_gps = null;
+		prev_gps = gps;
 	}
 
 	/*
@@ -275,7 +278,7 @@ public class AltosCalData {
 
 	public AltosGPS make_temp_cal_gps(int tick, boolean sats) {
 		if (temp_gps == null)
-			temp_gps = new AltosGPS();
+			temp_gps = new AltosGPS(prev_gps);
 		if (sats) {
 			if (tick != temp_gps_sat_tick)
 				temp_gps.cc_gps_sat = null;
