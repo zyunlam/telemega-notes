@@ -1,0 +1,81 @@
+f_lambda	eval
+f_lambda	read
+nlambda		lambda
+nlambda		nlambda
+nlambda		macro
+f_lambda	car
+f_lambda	cdr
+f_lambda	cons
+f_lambda	last
+f_lambda	length
+f_lambda	list_copy	list-copy
+nlambda		quote
+atom		quasiquote
+atom		unquote
+atom		unquote_splicing	unquote-splicing
+f_lambda	set
+macro		setq		set!
+f_lambda	def
+nlambda		cond
+nlambda		begin
+nlambda		while
+f_lambda	write
+f_lambda	display
+f_lambda	plus		+	string-append
+f_lambda	minus		-
+f_lambda	times		*
+f_lambda	divide		/
+f_lambda	modulo		modulo	%
+f_lambda	remainder
+f_lambda	quotient
+f_lambda	equal		=	eq?	eqv?
+f_lambda	less		<	string<?
+f_lambda	greater		>	string>?
+f_lambda	less_equal	<=	string<=?
+f_lambda	greater_equal	>=	string>=?
+f_lambda	flush_output		flush-output
+f_lambda	delay
+f_lambda	led
+f_lambda	save
+f_lambda	restore
+f_lambda	call_cc		call-with-current-continuation	call/cc
+f_lambda	collect
+f_lambda	nullp		null?
+f_lambda	not
+f_lambda	listp		list?
+f_lambda	pairp		pair?
+f_lambda	integerp	integer? exact? exact-integer?
+f_lambda	numberp		number? real?
+f_lambda	booleanp	boolean?
+f_lambda	set_car		set-car!
+f_lambda	set_cdr		set-cdr!
+f_lambda	symbolp		symbol?
+f_lambda	list_to_string		list->string
+f_lambda	string_to_list		string->list
+f_lambda	symbol_to_string	symbol->string
+f_lambda	string_to_symbol	string->symbol
+f_lambda	stringp		string?
+f_lambda	string_ref	string-ref
+f_lambda	string_set	string-set!
+f_lambda	string_copy	string-copy
+f_lambda	string_length	string-length
+f_lambda	procedurep	procedure?
+lambda		apply
+f_lambda	read_char	read-char
+f_lambda	write_char	write-char
+f_lambda	exit
+f_lambda	current_jiffy	current-jiffy
+f_lambda	current_second	current-second
+f_lambda	jiffies_per_second	jiffies-per-second
+f_lambda	finitep		finite?
+f_lambda	infinitep	infinite?
+f_lambda	inexactp	inexact?
+f_lambda	sqrt
+f_lambda	vector_ref	vector-ref
+f_lambda	vector_set	vector-set!
+f_lambda	vector
+f_lambda	make_vector	make-vector
+f_lambda	list_to_vector	list->vector
+f_lambda	vector_to_list	vector->list
+f_lambda	vector_length	vector-length
+f_lambda	vectorp		vector?

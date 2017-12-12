@@ -75,6 +75,8 @@
 	#define HAS_TELEMETRY		0
 
 	#define AO_VALUE_32		0
+
+	#define AO_LOG_FORMAT		AO_LOG_FORMAT_TELEMETRY
 #endif
 
 #if DBG_ON_P1

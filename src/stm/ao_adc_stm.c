@@ -58,6 +58,9 @@ static void ao_adc_done(int index)
 #if HAS_MPU6000
 		ao_data_ring[ao_data_head].mpu6000 = ao_mpu6000_current;
 #endif
+#if HAS_MPU9250
+		ao_data_ring[ao_data_head].mpu9250 = ao_mpu9250_current;
+#endif
 		ao_data_ring[ao_data_head].tick = ao_tick_count;
 		ao_data_head = ao_data_ring_next(ao_data_head);
 		ao_wakeup((void *) &ao_data_head);
@@ -377,7 +380,7 @@ ao_adc_init(void)
 #if AO_NUM_ADC > 18
 #error "need to finish stm_adc.sqr settings"
 #endif
-	
+
 	/* Turn ADC on */
 	stm_adc.cr2 = AO_ADC_CR2_VAL;
 

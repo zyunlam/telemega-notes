@@ -18,10 +18,17 @@
 
 package org.altusmetrum.altosuilib_12;
 
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.altusmetrum.altoslib_12.*;
+
+	class result_holder {
+		static int result;
+	}
 
 public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMonitor {
 	JFrame		owner;
@@ -32,7 +39,6 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 	JLabel		file_label;
 	JLabel		serial_value;
 	JLabel		flight_value;
-	JLabel		file_value;
 	JButton		cancel;
 	JProgressBar	pbar;
 	ActionListener	listener;
@@ -41,6 +47,8 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 
 	public AltosEepromMonitorUI(JFrame owner) {
 		super (owner, "Download Flight Data", false);
+
+		setMinimumSize(new Dimension(600, 100));
 
 		this.owner = owner;
 
@@ -85,30 +93,11 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		flight_value = new JLabel("");
 		pane.add(flight_value, c);
 
-		c = new GridBagConstraints();
-		c.fill = GridBagConstraints.NONE;
-		c.gridx = 0; c.gridy = 2;
-		c.anchor = GridBagConstraints.LINE_START;
-		c.insets = il;
-		file_label = new JLabel("File:");
-		pane.add(file_label, c);
-
-		c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		c.gridx = 1; c.gridy = 2;
-		c.anchor = GridBagConstraints.LINE_START;
-		c.insets = ir;
-		file_value = new JLabel("");
-		pane.add(file_value, c);
-
 		pbar = new JProgressBar();
 		pbar.setMinimum(0);
 		pbar.setMaximum(progress_max);
-		pbar.setValue(0);
-		pbar.setString("startup");
 		pbar.setStringPainted(true);
-		pbar.setPreferredSize(new Dimension(600, 20));
+		set_block_internal(0);
 		c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.CENTER;
@@ -117,7 +106,6 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		Insets ib = new Insets(4,4,4,4);
 		c.insets = ib;
 		pane.add(pbar, c);
-
 
 		cancel = new JButton("Cancel");
 		c = new GridBagConstraints();
@@ -141,8 +129,9 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		final Thread eeprom_thread = in_eeprom_thread;
 		cancel.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if (eeprom_thread != null)
+					if (eeprom_thread != null) {
 						eeprom_thread.interrupt();
+					}
 				}
 			});
 	}
@@ -162,6 +151,7 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		s = String.format("block %d of %d", block, max_block);
 
 		pbar.setString(s);
+		pbar.setStringPainted(true);
 		pbar.setValue((int) (pos * progress_max));
 	}
 
@@ -216,23 +206,6 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		SwingUtilities.invokeLater(r);
 	}
 
-	private void set_filename_internal(String filename) {
-		file_value.setText(String.format("%s", filename));
-	}
-
-	public void set_filename(String in_filename) {
-		final String filename = in_filename;
-		Runnable r = new Runnable() {
-				public void run() {
-					try {
-						set_filename_internal(filename);
-					} catch (Exception ex) {
-					}
-				}
-			};
-		SwingUtilities.invokeLater(r);
-	}
-
 	private void done_internal(boolean success) {
 		listener.actionPerformed(new ActionEvent(this,
 							 success ? 1 : 0,
@@ -258,7 +231,6 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		set_max(1);
 		set_block_internal(0);
 		set_flight_internal(0);
-		set_filename_internal("");
 	}
 
 	public void reset() {
@@ -291,6 +263,29 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 					      message,
 					      title,
 					      joption_message_type);
+	}
+
+	public Boolean check_overwrite(File in_file) {
+		final Semaphore check_overwrite_done = new Semaphore(0);
+		final File file = in_file;
+		final result_holder result = new result_holder();
+
+		Runnable r = new Runnable() {
+				public void run() {
+					result_holder.result = JOptionPane.showConfirmDialog(owner,
+											     String.format("\"%s\" already exists, overwrite?",
+													   file.toString()),
+											     "Overwrite Existing File?",
+											     JOptionPane.YES_NO_OPTION);
+					check_overwrite_done.release();
+				}
+			};
+
+		SwingUtilities.invokeLater(r);
+		try {
+			check_overwrite_done.acquire();
+		} catch (Exception e) {}
+		return result_holder.result == JOptionPane.YES_OPTION;
 	}
 
 	public void show_message(String in_message, String in_title, int in_message_type) {

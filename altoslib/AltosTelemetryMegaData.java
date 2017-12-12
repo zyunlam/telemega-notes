@@ -24,7 +24,9 @@ public class AltosTelemetryMegaData extends AltosTelemetryStandard {
 
 	int	v_batt() { return int16(6); }
 	int	v_pyro() { return int16(8); }
-	int	sense(int i) { int v = uint8(10+i); return v << 4 | v >> 8; }
+
+	/* pyro sense values are sent in 8 bits, expand to 12 bits */
+	int	sense(int i) { int v = uint8(10+i); return (v << 4) | (v >> 4); }
 
 	int	ground_pres() { return int32(16); }
 	int	ground_accel() { return int16(20); }

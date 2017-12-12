@@ -105,7 +105,7 @@ ao_gps_report_mega(void)
 			gps_log.u.gps.hdop = gps_data.hdop;
 			gps_log.u.gps.vdop = gps_data.vdop;
 			gps_log.u.gps.mode = gps_data.mode;
-			ao_log_mega(&gps_log);
+			ao_log_write(&gps_log);
 		}
 		if ((new & AO_GPS_NEW_TRACKING) && (n = gps_tracking_data.channels) != 0) {
 			gps_log.tick = ao_gps_tick;
@@ -120,7 +120,7 @@ ao_gps_report_mega(void)
 						break;
 				}
 			gps_log.u.gps_sat.channels = i;
-			ao_log_mega(&gps_log);
+			ao_log_write(&gps_log);
 		}
 	}
 }

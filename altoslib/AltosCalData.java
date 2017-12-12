@@ -72,6 +72,13 @@ public class AltosCalData {
 		}
 	}
 
+	public int		log_format = AltosLib.MISSING;
+
+	public void set_log_format(int log_format) {
+		if (log_format != AltosLib.MISSING)
+			this.log_format = log_format;
+	}
+
 	public int		config_major = AltosLib.MISSING;
 	public int		config_minor = AltosLib.MISSING;
 	public int		flight_log_max = AltosLib.MISSING;
@@ -192,7 +199,6 @@ public class AltosCalData {
 		tick = AltosLib.MISSING;
 		prev_tick = AltosLib.MISSING;
 		temp_gps = null;
-		prev_gps = null;
 		temp_gps_sat_tick = AltosLib.MISSING;
 		accel = AltosLib.MISSING;
 	}
@@ -235,13 +241,19 @@ public class AltosCalData {
 
 	public AltosGPS		gps_pad = null;
 
+	public AltosGPS		prev_gps = null;
+
 	public double		gps_pad_altitude = AltosLib.MISSING;
 
-	public void set_gps(AltosGPS gps) {
-		if ((state != AltosLib.MISSING && state < AltosLib.ao_flight_boost) || gps_pad == null)
-			gps_pad = gps;
-		if (gps_pad_altitude == AltosLib.MISSING && gps.alt != AltosLib.MISSING)
-			gps_pad_altitude = gps.alt;
+	public void set_cal_gps(AltosGPS gps) {
+		if (gps.locked && gps.nsat >= 4) {
+			if ((state != AltosLib.MISSING && state < AltosLib.ao_flight_boost) || gps_pad == null)
+				gps_pad = gps;
+			if (gps_pad_altitude == AltosLib.MISSING && gps.alt != AltosLib.MISSING)
+				gps_pad_altitude = gps.alt;
+		}
+		temp_gps = null;
+		prev_gps = gps;
 	}
 
 	/*
@@ -249,33 +261,24 @@ public class AltosCalData {
 	 * object and then deliver the result atomically to the listener
 	 */
 	AltosGPS		temp_gps = null;
-	AltosGPS		prev_gps = null;
 	int			temp_gps_sat_tick = AltosLib.MISSING;
 
-	public AltosGPS temp_gps() {
+	public AltosGPS temp_cal_gps() {
 		return temp_gps;
 	}
 
-	public void reset_temp_gps() {
-		if (temp_gps != null) {
-			if (temp_gps.locked && temp_gps.nsat >= 4)
-				set_gps(temp_gps);
-			prev_gps = temp_gps;
-			temp_gps = null;
-		}
+	public void reset_temp_cal_gps() {
+		if (temp_gps != null)
+			set_cal_gps(temp_gps);
 	}
 
-	public boolean gps_pending() {
+	public boolean cal_gps_pending() {
 		return temp_gps != null;
 	}
 
-	public AltosGPS make_temp_gps(int tick, boolean sats) {
-		if (temp_gps == null) {
-			if (prev_gps != null)
-				temp_gps = prev_gps.clone();
-			else
-				temp_gps = new AltosGPS();
-		}
+	public AltosGPS make_temp_cal_gps(int tick, boolean sats) {
+		if (temp_gps == null)
+			temp_gps = new AltosGPS(prev_gps);
 		if (sats) {
 			if (tick != temp_gps_sat_tick)
 				temp_gps.cc_gps_sat = null;

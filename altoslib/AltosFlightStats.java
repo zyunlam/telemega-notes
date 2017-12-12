@@ -27,6 +27,8 @@ public class AltosFlightStats {
 	public double		max_acceleration;
 	public double[]		state_speed = new double[AltosLib.ao_flight_invalid + 1];
 	public double[]		state_enter_speed = new double[AltosLib.ao_flight_invalid + 1];
+	public double[]		state_enter_height = new double[AltosLib.ao_flight_invalid + 1];
+	public double[]		state_enter_gps_height = new double[AltosLib.ao_flight_invalid + 1];
 	public double[]		state_accel = new double[AltosLib.ao_flight_invalid + 1];
 	public double[]		state_time = new double[AltosLib.ao_flight_invalid + 1];
 	public String		product;
@@ -134,6 +136,11 @@ public class AltosFlightStats {
 		if (0 <= state && state <= AltosLib.ao_flight_invalid && delta_time > 0) {
 			if (state_enter_speed[state] == AltosLib.MISSING)
 				state_enter_speed[state] = series.speed_series.value(start_time);
+			if (state_enter_height[state] == AltosLib.MISSING)
+				state_enter_height[state] = series.height_series.value(start_time);
+			if (state_enter_gps_height[state] == AltosLib.MISSING)
+				if (series.gps_height != null)
+					state_enter_gps_height[state] = series.gps_height.value(start_time);
 			speeds[state].value += series.speed_series.average(start_time, end_time) * delta_time;
 			speeds[state].time += delta_time;
 			accels[state].value += series.accel_series.average(start_time, end_time) * delta_time;

@@ -22,6 +22,7 @@ public class AltosEeprom {
 	private AltosJson	config;
 	ArrayList<Byte>		data;
 	private AltosConfigData	config_data;
+	int			errors = 0;
 
 	/*
 	 * Public accessor APIs

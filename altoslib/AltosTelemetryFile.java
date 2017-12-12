@@ -128,7 +128,7 @@ public class AltosTelemetryFile implements AltosRecordSet {
 			/* Try to pick up at least one pre-boost value */
 			if (cal_data.time() >= -2)
 				telem.provide_data(listener);
-			if (listener.state == AltosLib.ao_flight_landed)
+			if (listener.state() == AltosLib.ao_flight_landed)
 				break;
 		}
 		listener.finish();

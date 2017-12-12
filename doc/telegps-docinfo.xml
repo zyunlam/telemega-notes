@@ -38,6 +38,15 @@
 <revhistory>
   <?dbhtml filename="telegps-revhistory.html"?>
   <revision>
+    <revnumber>1.8.3</revnumber>
+    <date>11 Dec 2017</date>
+    <revremark>
+      New graphing features. Improve reliability of data
+      download. Update KML export to satisfy Tripoli Records board
+      requirements.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.6.4</revnumber>
     <date>10 May 2016</date>
     <revremark>

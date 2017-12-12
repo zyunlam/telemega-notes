@@ -33,6 +33,7 @@ public class AltosIdleMonitor extends Thread {
 	double			frequency;
 	String			callsign;
 
+	AltosState		state;
 	AltosListenerState	listener_state;
 	AltosConfigData		config_data;
 	AltosGPS		gps;
@@ -52,20 +53,23 @@ public class AltosIdleMonitor extends Thread {
 		return link.reply_abort;
 	}
 
-	boolean provide_data(AltosDataListener listener) throws InterruptedException, TimeoutException, AltosUnknownProduct {
+	boolean provide_data() throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		boolean		worked = false;
 		boolean		aborted = false;
 
 		try {
 			start_link();
-			fetch.provide_data(listener);
+			link.config_data();
+			if (state == null)
+				state = new AltosState(new AltosCalData(link.config_data()));
+			fetch.provide_data(state);
 			if (!link.has_error && !link.reply_abort)
 				worked = true;
 		} finally {
 			aborted = stop_link();
 			if (worked) {
 				if (remote)
-					listener.set_rssi(link.rssi(), 0);
+					state.set_rssi(link.rssi(), 0);
 				listener_state.battery = link.monitor_battery();
 			}
 		}
@@ -92,14 +96,11 @@ public class AltosIdleMonitor extends Thread {
 	}
 
 	public void run() {
-		AltosState state = null;
+		state = null;
 		try {
 			for (;;) {
 				try {
-					link.config_data();
-					if (state == null)
-						state = new AltosState(new AltosCalData(link.config_data()));
-					provide_data(state);
+					provide_data();
 					listener.update(state, listener_state);
 				} catch (TimeoutException te) {
 				} catch (AltosUnknownProduct ae) {

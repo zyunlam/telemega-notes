@@ -27,7 +27,7 @@ import java.util.*;
 import org.altusmetrum.altoslib_12.*;
 import org.altusmetrum.altosuilib_12.*;
 
-public class MicroPeak extends MicroFrame implements ActionListener, ItemListener {
+public class MicroPeak extends MicroFrame implements ActionListener, ItemListener, AltosFilterListener {
 
 	File		filename;
 	AltosGraph	graph;
@@ -206,6 +206,25 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		Preferences();
 	}
 
+	public void filter_changed(double speed_filter, double accel_filter) {
+		data.flight_series.set_filter(speed_filter, accel_filter);
+		graph.filter_changed();
+		data.flight_stats = new AltosFlightStats(data.flight_series);
+		statsTable.filter_changed(data.flight_stats);
+	}
+
+	public double speed_filter() {
+		if (data != null && data.flight_series != null)
+			return data.flight_series.speed_filter_width;
+		return 4.0;
+	}
+
+	public double accel_filter() {
+		if (data != null && data.flight_series != null)
+			return data.flight_series.accel_filter_width;
+		return 1.0;
+	}
+
 	public MicroPeak() {
 
 		++number_of_windows;
@@ -267,7 +286,7 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 			}
 		});
 
-		enable = new AltosUIEnable();
+		enable = new AltosUIEnable(this);
 
 		graph = new AltosGraph(enable);
 		statsTable = new AltosFlightStatsTable();

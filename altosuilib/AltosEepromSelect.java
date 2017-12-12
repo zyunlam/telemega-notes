@@ -27,23 +27,35 @@ import org.altusmetrum.altoslib_12.*;
 class AltosEepromItem implements ActionListener {
 	AltosEepromLog	log;
 	JLabel		label;
-	JCheckBox	action;
+	JCheckBox	download;
 	JCheckBox	delete;
+	JCheckBox	graph;
 
 	public void actionPerformed(ActionEvent e) {
-		log.selected = action.isSelected();
+		log.download_selected = download.isSelected();
+		log.delete_selected = delete.isSelected();
+		log.graph_selected = graph.isSelected();
 	}
 
 	public AltosEepromItem(AltosEepromLog in_log) {
 		log = in_log;
 
 		String	text;
-		text = String.format("Flight #%02d", log.flight);
+		if (log.flight >= 0)
+			text = String.format("Flight #%02d", log.flight);
+		else
+			text = String.format("Corrupt #%02d", -log.flight);
 
 		label = new JLabel(text);
 
-		action = new JCheckBox("", log.selected);
-		action.addActionListener(this);
+		download = new JCheckBox("", log.download_selected);
+		download.addActionListener(this);
+
+		delete = new JCheckBox("", log.delete_selected);
+		delete.addActionListener(this);
+
+		graph = new JCheckBox("", log.graph_selected);
+		graph.addActionListener(this);
 	}
 }
 
@@ -72,7 +84,7 @@ public class AltosEepromSelect extends AltosUIDialog implements ActionListener {
 
 	public AltosEepromSelect (JFrame in_frame,
 				  AltosEepromList flights,
-				  String action) {
+				  boolean has_graph) {
 
 		super(in_frame, String.format("Flight list for serial %d", flights.config_data.serial), true);
 		frame = in_frame;
@@ -81,7 +93,7 @@ public class AltosEepromSelect extends AltosUIDialog implements ActionListener {
 		Container contentPane = getContentPane();
 
 		/* First, we create a pane containing the dialog's header/title */
-		JLabel	selectLabel = new JLabel(String.format ("Select flights to %s", action), SwingConstants.CENTER);
+		JLabel	selectLabel = new JLabel(String.format ("Select flights"), SwingConstants.CENTER);
 
 		JPanel	labelPane = new JPanel();
 		labelPane.setLayout(new BoxLayout(labelPane, BoxLayout.X_AXIS));
@@ -118,8 +130,30 @@ public class AltosEepromSelect extends AltosUIDialog implements ActionListener {
 		c.weightx = 0.5;
 		c.anchor = GridBagConstraints.CENTER;
 		c.insets = i;
-		JLabel downloadHeaderLabel = new JLabel(action);
+		JLabel downloadHeaderLabel = new JLabel("Download");
 		flightPane.add(downloadHeaderLabel, c);
+
+		/* Delete Header */
+		c = new GridBagConstraints();
+		c.gridx = 2; c.gridy = 0;
+		c.fill = GridBagConstraints.NONE;
+		c.weightx = 0.5;
+		c.anchor = GridBagConstraints.CENTER;
+		c.insets = i;
+		JLabel deleteHeaderLabel = new JLabel("Delete");
+		flightPane.add(deleteHeaderLabel, c);
+
+		if (has_graph) {
+			/* Graph Header */
+			c = new GridBagConstraints();
+			c.gridx = 3; c.gridy = 0;
+			c.fill = GridBagConstraints.NONE;
+			c.weightx = 0.5;
+			c.anchor = GridBagConstraints.CENTER;
+			c.insets = i;
+			JLabel graphHeaderLabel = new JLabel("Graph");
+			flightPane.add(graphHeaderLabel, c);
+		}
 
 		/* Add the flights to the GridBag */
 		AltosEepromItem item;
@@ -139,14 +173,34 @@ public class AltosEepromSelect extends AltosUIDialog implements ActionListener {
 			c.insets = i;
 			flightPane.add(item.label, c);
 
-			/* Add action checkbox for the flight */
+			/* Add download checkbox for the flight */
 			c = new GridBagConstraints();
 			c.gridx = 1; c.gridy = itemNumber;
 			c.fill = GridBagConstraints.NONE;
 			c.weightx = 0.5;
 			c.anchor = GridBagConstraints.CENTER;
 			c.insets = i;
-			flightPane.add(item.action, c);
+			flightPane.add(item.download, c);
+
+			/* Add delete checkbox for the flight */
+			c = new GridBagConstraints();
+			c.gridx = 2; c.gridy = itemNumber;
+			c.fill = GridBagConstraints.NONE;
+			c.weightx = 0.5;
+			c.anchor = GridBagConstraints.CENTER;
+			c.insets = i;
+			flightPane.add(item.delete, c);
+
+			if (has_graph) {
+				/* Add graph checkbox for the flight */
+				c = new GridBagConstraints();
+				c.gridx = 3; c.gridy = itemNumber;
+				c.fill = GridBagConstraints.NONE;
+				c.weightx = 0.5;
+				c.anchor = GridBagConstraints.CENTER;
+				c.insets = i;
+				flightPane.add(item.graph, c);
+			}
 
 			itemNumber++;
 		}

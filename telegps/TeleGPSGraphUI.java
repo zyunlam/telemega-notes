@@ -34,7 +34,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.ui.RefineryUtilities;
 
-public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, AltosUnitsListener
+public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, AltosUnitsListener, AltosFilterListener
 {
 	JTabbedPane		pane;
 	AltosGraph		graph;
@@ -92,20 +92,38 @@ public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, A
 			enable.units_changed(imperial_units);
 	}
 
+	AltosUIFlightSeries flight_series;
+
+	public void filter_changed(double speed_filter, double accel_filter) {
+		flight_series.set_filter(speed_filter, accel_filter);
+		graph.filter_changed();
+		stats = new AltosFlightStats(flight_series);
+		statsTable.filter_changed(stats);
+	}
+
+	public double speed_filter() {
+		return flight_series.speed_filter_width;
+	}
+
+	public double accel_filter() {
+		return flight_series.accel_filter_width;
+	}
+
 	TeleGPSGraphUI(AltosRecordSet set, File file) throws InterruptedException, IOException {
 		super(file.getName());
 		AltosCalData cal_data = set.cal_data();
 
-		AltosUIFlightSeries flight_series = new AltosUIFlightSeries(cal_data);
+		flight_series = new AltosUIFlightSeries(cal_data);
 		set.capture_series(flight_series);
 		flight_series.finish();
 
 		pane = new JTabbedPane();
 
-		enable = new AltosUIEnable();
+		graph = new AltosGraph(enable, stats, flight_series);
+
 		stats = new AltosFlightStats(flight_series);
 
-		graph = new AltosGraph(enable, stats, flight_series);
+		enable = new AltosUIEnable(this);
 
 		statsTable = new AltosFlightStatsTable(stats);
 

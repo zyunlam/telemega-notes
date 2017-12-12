@@ -41,19 +41,15 @@ public class AltosTelemetryReader extends AltosFlightReader {
 				throw new IOException("IO error");
 		} while (!link.get_monitor());
 		AltosTelemetry	telem = AltosTelemetry.parse(l.line);
-		if (state == null) {
-			System.out.printf("Make state\n");
+		if (state == null)
 			state = new AltosState(cal_data());
-		}
 		telem.provide_data(state);
 		return state;
 	}
 
 	public AltosCalData cal_data() {
-		if (cal_data == null) {
-			System.out.printf("Make cal data\n");
+		if (cal_data == null)
 			cal_data = new AltosCalData();
-		}
 		return cal_data;
 	}
 

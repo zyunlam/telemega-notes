@@ -41,6 +41,13 @@
 #define AO_DATA_MPU6000	0
 #endif
 
+#if HAS_MPU9250
+#include <ao_mpu9250.h>
+#define AO_DATA_MPU9250	(1 << 2)
+#else
+#define AO_DATA_MPU9250	0
+#endif
+
 #if HAS_HMC5883
 #include <ao_hmc5883.h>
 #define AO_DATA_HMC5883	(1 << 3)
@@ -57,7 +64,7 @@
 
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250)
 
 struct ao_data {
 	uint16_t			tick;
@@ -73,6 +80,9 @@ struct ao_data {
 #if !HAS_MMA655X
 	int16_t				z_accel;
 #endif
+#endif
+#if HAS_MPU9250
+	struct ao_mpu9250_sample	mpu9250;
 #endif
 #if HAS_HMC5883
 	struct ao_hmc5883_sample	hmc5883;
@@ -320,6 +330,47 @@ typedef int16_t angle_t;	/* in degrees */
 #define ao_data_pitch(packet)	((packet)->mpu6000.gyro_x)
 #define ao_data_yaw(packet)	((packet)->mpu6000.gyro_z)
 
+static inline float ao_convert_gyro(float sensor)
+{
+	return ao_mpu6000_gyro(sensor);
+}
+
+static inline float ao_convert_accel(int16_t sensor)
+{
+	return ao_mpu6000_accel(sensor);
+}
+
+#endif
+
+#if !HAS_GYRO && HAS_MPU9250
+
+#define HAS_GYRO	1
+
+typedef int16_t	gyro_t;		/* in raw sample units */
+typedef int16_t angle_t;	/* in degrees */
+
+/* Y axis is aligned with the direction of motion (along) */
+/* X axis is aligned in the other board axis (across) */
+/* Z axis is aligned perpendicular to the board (through) */
+
+#define ao_data_along(packet)	((packet)->mpu9250.accel_y)
+#define ao_data_across(packet)	((packet)->mpu9250.accel_x)
+#define ao_data_through(packet)	((packet)->mpu9250.accel_z)
+
+#define ao_data_roll(packet)	((packet)->mpu9250.gyro_y)
+#define ao_data_pitch(packet)	((packet)->mpu9250.gyro_x)
+#define ao_data_yaw(packet)	((packet)->mpu9250.gyro_z)
+
+static inline float ao_convert_gyro(float sensor)
+{
+	return ao_mpu9250_gyro(sensor);
+}
+
+static inline float ao_convert_accel(int16_t sensor)
+{
+	return ao_mpu9250_accel(sensor);
+}
+
 #endif
 
 #if !HAS_MAG && HAS_HMC5883
@@ -331,6 +382,23 @@ typedef int16_t ao_mag_t;		/* in raw sample units */
 #define ao_data_mag_along(packet)	((packet)->hmc5883.x)
 #define ao_data_mag_across(packet)	((packet)->hmc5883.y)
 #define ao_data_mag_through(packet)	((packet)->hmc5883.z)
+
+#endif
+
+#if !HAS_MAG && HAS_MPU9250
+
+#define HAS_MAG		1
+
+typedef int16_t ao_mag_t;		/* in raw sample units */
+
+/* Note that this order is different from the accel and gyro. For some
+ * reason, the mag sensor axes aren't the same as the other two
+ * sensors. Also, the Z axis is flipped in sign.
+ */
+
+#define ao_data_mag_along(packet)	((packet)->mpu9250.mag_x)
+#define ao_data_mag_across(packet)	((packet)->mpu9250.mag_y)
+#define ao_data_mag_through(packet)	((packet)->mpu9250.mag_z)
 
 #endif
 

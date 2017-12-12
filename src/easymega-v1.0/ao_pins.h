@@ -69,6 +69,8 @@
 #define AO_CONFIG_MAX_SIZE                     1024
 #define LOG_ERASE_MARK                         0x55
 #define LOG_MAX_ERASE                          128
+#define AO_LOG_FORMAT				AO_LOG_FORMAT_TELEMEGA
+
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
 #define USE_EEPROM_CONFIG	1
@@ -84,7 +86,7 @@
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* Barometer */
 #define SPI_1_PB3_PB4_PB5	1	/* Accelerometer, Gyro */
-#define SPI_1_PE13_PE14_PE15	0	
+#define SPI_1_PE13_PE14_PE15	0
 #define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
 
 #define HAS_SPI_2		1

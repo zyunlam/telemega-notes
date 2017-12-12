@@ -38,6 +38,11 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 				value[i].setFont(AltosUILib.value_font);
 		}
 
+		public void set(String ... values) {
+			for (int j = 0; j < values.length; j++)
+				value[j].setText(values[j]);
+		}
+
 		public FlightStat(GridBagLayout layout, int y, String label_text, String ... values) {
 			GridBagConstraints	c = new GridBagConstraints();
 			c.insets = new Insets(AltosUILib.tab_elt_pad, AltosUILib.tab_elt_pad, AltosUILib.tab_elt_pad, AltosUILib.tab_elt_pad);
@@ -87,6 +92,43 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 		return String.format("%s %4d° %9.6f'", h, deg, min);
 	}
 
+	private FlightStat	max_height_stat;
+	private FlightStat	max_speed_stat;
+	private FlightStat	max_accel_stat;
+	private FlightStat	boost_accel_stat;
+	private FlightStat	drogue_descent_stat;
+	private FlightStat	main_descent_stat;
+
+	public void set_values(AltosFlightStats stats) {
+		if (max_height_stat != null && stats.max_height != AltosLib.MISSING) {
+			max_height_stat.set(String.format("%6.1f m", stats.max_height),
+					    String.format("%5.0f ft", AltosConvert.meters_to_feet(stats.max_height)));
+		}
+		if (max_speed_stat != null && stats.max_speed != AltosLib.MISSING) {
+			max_speed_stat.set(String.format("%6.1f m/s", stats.max_speed),
+					   String.format("%5.0f fps", AltosConvert.mps_to_fps(stats.max_speed)),
+					   String.format("Mach %4.1f", AltosConvert.meters_to_mach(stats.max_speed)));
+		}
+		if (max_accel_stat != null && stats.max_acceleration != AltosLib.MISSING) {
+			max_accel_stat.set(String.format("%6.1f m/s²", stats.max_acceleration),
+					   String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.max_acceleration)),
+					   String.format("%6.2f G", AltosConvert.meters_to_g(stats.max_acceleration)));
+		}
+		if (boost_accel_stat != null && stats.state_accel[AltosLib.ao_flight_boost] != AltosLib.MISSING) {
+			boost_accel_stat.set(String.format("%6.1f m/s²", stats.state_accel[AltosLib.ao_flight_boost]),
+					     String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.state_accel[AltosLib.ao_flight_boost])),
+					     String.format("%6.2f G", AltosConvert.meters_to_g(stats.state_accel[AltosLib.ao_flight_boost])));
+		}
+		if (drogue_descent_stat != null && stats.state_speed[AltosLib.ao_flight_drogue] != AltosLib.MISSING) {
+			drogue_descent_stat.set(String.format("%6.1f m/s", -stats.state_speed[AltosLib.ao_flight_drogue]),
+						String.format("%5.0f ft/s", -AltosConvert.meters_to_feet(stats.state_speed[AltosLib.ao_flight_drogue])));
+		}
+		if (main_descent_stat != null && stats.state_speed[AltosLib.ao_flight_main] != AltosLib.MISSING) {
+				main_descent_stat.set(String.format("%6.1f m/s", -stats.state_speed[AltosLib.ao_flight_main]),
+						      String.format("%5.0f ft/s", -AltosConvert.meters_to_feet(stats.state_speed[AltosLib.ao_flight_main])));
+		}
+	}
+
 	public void set_stats(AltosFlightStats stats) {
 		int y = 0;
 		if (stats.serial != AltosLib.MISSING) {
@@ -113,9 +155,9 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 					       String.format("%02d:%02d:%02d UTC", stats.hour, stats.minute, stats.second));
 		}
 		if (stats.max_height != AltosLib.MISSING) {
-			new FlightStat(layout, y++, "Maximum height",
-				       String.format("%6.1f m", stats.max_height),
-				       String.format("%5.0f ft", AltosConvert.meters_to_feet(stats.max_height)));
+			max_height_stat = new FlightStat(layout, y++, "Maximum height",
+							 String.format("%6.1f m", stats.max_height),
+							 String.format("%5.0f ft", AltosConvert.meters_to_feet(stats.max_height)));
 		}
 		if (stats.max_gps_height != AltosLib.MISSING) {
 			new FlightStat(layout, y++, "Maximum GPS height",
@@ -123,21 +165,21 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 				       String.format("%5.0f ft", AltosConvert.meters_to_feet(stats.max_gps_height)));
 		}
 		if (stats.max_speed != AltosLib.MISSING) {
-			new FlightStat(layout, y++, "Maximum speed",
-				       String.format("%6.1f m/s", stats.max_speed),
-				       String.format("%5.0f fps", AltosConvert.mps_to_fps(stats.max_speed)),
-				       String.format("Mach %4.1f", AltosConvert.meters_to_mach(stats.max_speed)));
+			max_speed_stat = new FlightStat(layout, y++, "Maximum speed",
+							String.format("%6.1f m/s", stats.max_speed),
+							String.format("%5.0f fps", AltosConvert.mps_to_fps(stats.max_speed)),
+							String.format("Mach %4.1f", AltosConvert.meters_to_mach(stats.max_speed)));
 		}
 		if (stats.max_acceleration != AltosLib.MISSING)
-			new FlightStat(layout, y++, "Maximum boost acceleration",
-				       String.format("%6.1f m/s²", stats.max_acceleration),
-				       String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.max_acceleration)),
-				       String.format("%6.2f G", AltosConvert.meters_to_g(stats.max_acceleration)));
+			max_accel_stat = new FlightStat(layout, y++, "Maximum boost acceleration",
+							String.format("%6.1f m/s²", stats.max_acceleration),
+							String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.max_acceleration)),
+							String.format("%6.2f G", AltosConvert.meters_to_g(stats.max_acceleration)));
 		if (stats.state_accel[AltosLib.ao_flight_boost] != AltosLib.MISSING)
-			new FlightStat(layout, y++, "Average boost acceleration",
-				       String.format("%6.1f m/s²", stats.state_accel[AltosLib.ao_flight_boost]),
-				       String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.state_accel[AltosLib.ao_flight_boost])),
-				       String.format("%6.2f G", AltosConvert.meters_to_g(stats.state_accel[AltosLib.ao_flight_boost])));
+			boost_accel_stat = new FlightStat(layout, y++, "Average boost acceleration",
+							  String.format("%6.1f m/s²", stats.state_accel[AltosLib.ao_flight_boost]),
+							  String.format("%5.0f ft/s²", AltosConvert.meters_to_feet(stats.state_accel[AltosLib.ao_flight_boost])),
+							  String.format("%6.2f G", AltosConvert.meters_to_g(stats.state_accel[AltosLib.ao_flight_boost])));
 		if (stats.state_time[AltosLib.ao_flight_boost] != 0 || stats.state_time[AltosLib.ao_flight_fast] != 0 || stats.state_time[AltosLib.ao_flight_coast] != 0) {
 
 			double	boost_time = stats.state_time[AltosLib.ao_flight_boost];
@@ -167,14 +209,14 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 				label = "Descent rate";
 			else
 				label = "Drogue descent rate";
-			new FlightStat(layout, y++, label,
+			drogue_descent_stat = new FlightStat(layout, y++, label,
 				       String.format("%6.1f m/s", -stats.state_speed[AltosLib.ao_flight_drogue]),
 				       String.format("%5.0f ft/s", -AltosConvert.meters_to_feet(stats.state_speed[AltosLib.ao_flight_drogue])));
 		}
 		if (stats.state_speed[AltosLib.ao_flight_main] != AltosLib.MISSING)
-			new FlightStat(layout, y++, "Main descent rate",
-				       String.format("%6.1f m/s", -stats.state_speed[AltosLib.ao_flight_main]),
-				       String.format("%5.0f ft/s", -AltosConvert.meters_to_feet(stats.state_speed[AltosLib.ao_flight_main])));
+			main_descent_stat = new FlightStat(layout, y++, "Main descent rate",
+							   String.format("%6.1f m/s", -stats.state_speed[AltosLib.ao_flight_main]),
+							   String.format("%5.0f ft/s", -AltosConvert.meters_to_feet(stats.state_speed[AltosLib.ao_flight_main])));
 		if (stats.state_time[AltosLib.ao_flight_drogue] != 0 || stats.state_time[AltosLib.ao_flight_main] != 0) {
 			double	drogue_duration = stats.state_time[AltosLib.ao_flight_drogue];
 			double	main_duration = stats.state_time[AltosLib.ao_flight_main];
@@ -208,6 +250,10 @@ public class AltosFlightStatsTable extends JComponent implements AltosFontListen
 
 	public void tell_closing() {
 		AltosUIPreferences.unregister_font_listener(this);
+	}
+
+	public void filter_changed(AltosFlightStats stats) {
+		set_values(stats);
 	}
 
 	public AltosFlightStatsTable() {

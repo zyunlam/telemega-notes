@@ -234,6 +234,10 @@ ao_button_get(uint16_t timeout) __critical;
 void
 ao_button_clear(void) __critical;
 
+/* console I/O funcs */
+#define ao_getchar getchar
+#define ao_putchar putchar
+
 /* ao_string.c */
 
 void

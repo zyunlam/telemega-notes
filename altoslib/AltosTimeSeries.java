@@ -20,14 +20,29 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<Alt
 	public String			label;
 	public AltosUnits		units;
 	ArrayList<AltosTimeValue>	values;
+	boolean				data_changed;
 
 	public int compareTo(AltosTimeSeries other) {
 		return label.compareTo(other.label);
 	}
 
 	public void add(AltosTimeValue tv) {
+		data_changed = true;
 		values.add(tv);
 	}
+
+	public void erase_values() {
+		data_changed = true;
+		this.values = new ArrayList<AltosTimeValue>();
+	}
+
+	public void clear_changed() {
+		data_changed = false;
+	}
+
+//	public boolean changed() {
+//		return data_changed;
+//	}
 
 	public void add(double time, double value) {
 		add(new AltosTimeValue(time, value));
@@ -264,14 +279,35 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<Alt
 
 	}
 
-	private double filter_coeff(double dist, double width) {
-		double ratio = dist / (width / 2);
+	private static double i0(double x) {
+		double	ds = 1, d = 0, s = 0;
 
-		return Math.cos(ratio * Math.PI / 2);
+		do {
+			d += 2;
+			ds = ds * (x * x) / (d * d);
+			s += ds;
+		} while (ds - 0.2e-8 * s > 0);
+		return s;
+	}
+
+	private static double kaiser(double n, double m, double beta) {
+		double alpha = m / 2;
+		double t = (n - alpha) / alpha;
+
+		if (t > 1 || t < -1)
+			t = 1;
+		double k = i0 (beta * Math.sqrt (1 - t*t)) / i0(beta);
+		return k;
+	}
+
+	private double filter_coeff(double dist, double width) {
+		return kaiser(dist + width/2.0, width, 2 * Math.PI);
 	}
 
 	public AltosTimeSeries filter(AltosTimeSeries f, double width) {
+
 		double	half_width = width/2;
+		int half_point = values.size() / 2;
 		for (int i = 0; i < values.size(); i++) {
 			double	center_time = values.get(i).time;
 			double	left_time = center_time - half_width;

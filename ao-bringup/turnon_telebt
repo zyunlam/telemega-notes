@@ -44,7 +44,7 @@ esac
 FLASH_FILE=$REPO/loaders/telebt-v$VERSION-altos-flash-*.bin
 ALTOS_FILE=$REPO/telebt-v$VERSION-*.elf
 
-$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
+$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE
 
 sleep 2
 

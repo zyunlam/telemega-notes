@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=2.0
+VERSION=3.0
 PRODUCT=TeleMega
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 

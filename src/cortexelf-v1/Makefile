@@ -4,7 +4,8 @@
 #
 
 include ../stm/Makefile.defs
-LDFLAGS=-L../stm -Wl,-Tcortexelf.ld
+include ../scheme/Makefile-inc
+
 
 INC = \
 	ao.h \
@@ -19,15 +20,12 @@ INC = \
 	math.h \
 	ao_mpu.h \
 	stm32l.h \
-	math.h \
 	ao_vga.h \
 	ao_draw.h \
 	ao_draw_int.h \
 	ao_font.h \
 	ao_ps2.h \
-	ao_lisp.h \
-	ao_lisp_const.h \
-	ao_lisp_os.h \
+	$(SCHEME_HDRS) \
 	ao_flip_bits.h \
 	Makefile
 
@@ -46,6 +44,7 @@ ALTOS_SRC = \
 	ao_cmd.c \
 	ao_config.c \
 	ao_task.c \
+	ao_errno.c \
 	ao_stdio.c \
 	ao_panic.c \
 	ao_timer.c \
@@ -74,23 +73,8 @@ ALTOS_SRC = \
 	ao_event.c \
 	ao_1802.c \
 	ao_hex.c \
-	ao_lisp_lex.c \
-	ao_lisp_mem.c \
-	ao_lisp_cons.c \
-	ao_lisp_eval.c \
-	ao_lisp_string.c \
-	ao_lisp_atom.c \
-	ao_lisp_int.c \
-	ao_lisp_poly.c \
-	ao_lisp_builtin.c \
-	ao_lisp_read.c \
-	ao_lisp_rep.c \
-	ao_lisp_frame.c \
-	ao_lisp_error.c \
-	ao_lisp_lambda.c \
-	ao_lisp_save.c \
-	ao_lisp_stack.c \
-	ao_lisp_os_save.c \
+	$(SCHEME_SRCS) \
+	ao_scheme_os_save.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)
@@ -99,11 +83,20 @@ PRODUCT=CortexELF-v1
 PRODUCT_DEF=-DCORTEXELF
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF) -Os -g
-
 PROGNAME=cortexelf-v1
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
+
+MAP=$(PROG).map
+
+MAPFILE=-Wl,-M=$(MAP)
+
+LDFLAGS=-L../stm -L/local/newlib-mini/arm-none-eabi/lib/thumb/v7-m/ -Wl,-Tcortexelf.ld $(MAPFILE) -nostartfiles
+AO_CFLAGS=-I. -I../stm -I../kernel -I../drivers -I../draw -I../scheme -I.. -I/local/newlib-mini/arm-none-eabi/include
+LIBS=-lc -lm -lgcc
+
+CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF) -Os -g
+
 
 SRC=$(ALTOS_SRC) ao_cortexelf.c
 OBJ=$(SRC:.c=.o)
@@ -130,7 +123,7 @@ clean::
 ao_flip_bits.h: ao_flip_bits.5c
 	nickle ao_flip_bits.5c > $@
 
-include ../lisp/Makefile-lisp
+include ../scheme/Makefile-scheme
 
 install:
 
