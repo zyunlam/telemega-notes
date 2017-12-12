@@ -218,6 +218,9 @@ ao_cmd_register(const __code struct ao_cmds *cmds);
 void
 ao_cmd_init(void);
 
+void
+ao_cmd(void);
+
 #if HAS_CMD_FILTER
 /*
  * Provided by an external module to filter raw command lines
