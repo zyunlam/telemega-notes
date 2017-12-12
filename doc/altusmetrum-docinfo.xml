@@ -48,10 +48,11 @@
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
     <revnumber>1.8.3</revnumber>
-    <date>12 Nove 2017</date>
+    <date>11 Dec 2017</date>
     <revremark>
-      Support TeleGPS v2.0 hardware. Add accelerometer recalibration
-      UI.
+      Support TeleMega v3.0 hardware. Fix one firmware bug affecting
+      all flight computers and another two affecting TeleMega and
+      EasyMega. Several new AltosUI graphing features.
     </revremark>
   </revision>
   <revision>
