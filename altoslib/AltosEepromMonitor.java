@@ -18,6 +18,8 @@
 
 package org.altusmetrum.altoslib_12;
 
+import java.io.*;
+
 public interface AltosEepromMonitor {
 
 	public void set_block(int in_block);
@@ -28,8 +30,6 @@ public interface AltosEepromMonitor {
 
 	public void set_flight(int in_flight);
 
-	public void set_filename(String in_file);
-
 	public void set_thread(Thread eeprom_thread);
 
 	final static int INFO_MESSAGE = 0;
@@ -37,6 +37,8 @@ public interface AltosEepromMonitor {
 	final static int ERROR_MESSAGE = 2;
 
 	public void show_message(String message, String title, int message_type);
+
+	public Boolean check_overwrite(File file);
 
 	public void start();
 

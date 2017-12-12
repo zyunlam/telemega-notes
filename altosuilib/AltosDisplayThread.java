@@ -159,9 +159,6 @@ public class AltosDisplayThread extends Thread {
 					report(false);
 				}
 			} catch (InterruptedException ie) {
-				try {
-					voice.drain();
-				} catch (InterruptedException iie) { }
 			}
 		}
 

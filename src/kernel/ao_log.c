@@ -29,7 +29,7 @@ __pdata uint32_t ao_log_end_pos;
 __pdata uint32_t ao_log_start_pos;
 __xdata uint8_t	ao_log_running;
 __pdata enum ao_flight_state ao_log_state;
-__xdata uint16_t ao_flight_number;
+__xdata int16_t ao_flight_number;
 
 void
 ao_log_flush(void)
@@ -111,6 +111,85 @@ ao_log_erase_mark(void)
 	ao_config_put();
 }
 
+#ifndef AO_LOG_UNCOMMON
+/*
+ * Common logging functions which depend on the type of the log data
+ * structure.
+ */
+
+__xdata ao_log_type log;
+
+static uint8_t
+ao_log_csum(__xdata uint8_t *b) __reentrant
+{
+	uint8_t	sum = 0x5a;
+	uint8_t	i;
+
+	for (i = 0; i < sizeof (ao_log_type); i++)
+		sum += *b++;
+	return -sum;
+}
+
+uint8_t
+ao_log_write(__xdata ao_log_type *log) __reentrant
+{
+	uint8_t wrote = 0;
+	/* set checksum */
+	log->csum = 0;
+	log->csum = ao_log_csum((__xdata uint8_t *) log);
+	ao_mutex_get(&ao_log_mutex); {
+		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
+			ao_log_stop();
+		if (ao_log_running) {
+			wrote = 1;
+			ao_storage_write(ao_log_current_pos,
+					 log,
+					 sizeof (ao_log_type));
+			ao_log_current_pos += sizeof (ao_log_type);
+		}
+	} ao_mutex_put(&ao_log_mutex);
+	return wrote;
+}
+
+uint8_t
+ao_log_check_data(void)
+{
+	if (ao_log_csum((uint8_t *) &log) != 0)
+		return 0;
+	return 1;
+}
+
+uint8_t
+ao_log_check_clear(void)
+{
+	uint8_t *b = (uint8_t *) &log;
+	uint8_t i;
+
+	for (i = 0; i < sizeof (ao_log_type); i++) {
+		if (*b++ != 0xff)
+			return 0;
+	}
+	return 1;
+}
+
+int16_t
+ao_log_flight(uint8_t slot)
+{
+	if (!ao_storage_read(ao_log_pos(slot),
+			     &log,
+			     sizeof (ao_log_type)))
+		return -(int16_t) (slot + 1);
+
+	if (ao_log_check_clear())
+		return 0;
+
+	if (!ao_log_check_data() || log.type != AO_LOG_FLIGHT)
+		return -(int16_t) (slot + 1);
+
+	return log.u.flight.flight;
+}
+#endif
+
 static uint8_t
 ao_log_slots()
 {
@@ -123,21 +202,21 @@ ao_log_pos(uint8_t slot)
 	return ((slot) * ao_config.flight_log_max);
 }
 
-static uint16_t
+static int16_t
 ao_log_max_flight(void)
 {
 	uint8_t		log_slot;
 	uint8_t		log_slots;
-	uint16_t	log_flight;
-	uint16_t	max_flight = 0;
+	int16_t		log_flight;
+	int16_t		max_flight = 0;
 
 	/* Scan the log space looking for the biggest flight number */
 	log_slots = ao_log_slots();
 	for (log_slot = 0; log_slot < log_slots; log_slot++) {
 		log_flight = ao_log_flight(log_slot);
-		if (!log_flight)
+		if (log_flight <= 0)
 			continue;
-		if (max_flight == 0 || (int16_t) (log_flight - max_flight) > 0)
+		if (max_flight == 0 || log_flight > max_flight)
 			max_flight = log_flight;
 	}
 	return max_flight;
@@ -228,24 +307,24 @@ ao_log_scan(void) __reentrant
 
 	if (ao_flight_number) {
 		uint32_t	full = ao_log_current_pos;
-		uint32_t	empty = ao_log_end_pos - ao_log_size;
+		uint32_t	empty = ao_log_end_pos - AO_LOG_SIZE;
 
 		/* If there's already a flight started, then find the
 		 * end of it
 		 */
 		for (;;) {
 			ao_log_current_pos = (full + empty) >> 1;
-			ao_log_current_pos -= ao_log_current_pos % ao_log_size;
+			ao_log_current_pos -= ao_log_current_pos % AO_LOG_SIZE;
 
 			if (ao_log_current_pos == full) {
-				if (ao_log_check(ao_log_current_pos))
-					ao_log_current_pos += ao_log_size;
+				if (ao_log_check(ao_log_current_pos) != AO_LOG_EMPTY)
+					ao_log_current_pos += AO_LOG_SIZE;
 				break;
 			}
 			if (ao_log_current_pos == empty)
 				break;
 
-			if (ao_log_check(ao_log_current_pos)) {
+			if (ao_log_check(ao_log_current_pos) != AO_LOG_EMPTY) {
 				full = ao_log_current_pos;
 			} else {
 				empty = ao_log_current_pos;
@@ -259,10 +338,11 @@ ao_log_scan(void) __reentrant
 	ao_wakeup(&ao_flight_number);
 	return ret;
 #else
-
-	if (ao_flight_number)
-		if (++ao_flight_number == 0)
+	if (ao_flight_number) {
+		++ao_flight_number;
+		if (ao_flight_number <= 0)
 			ao_flight_number = 1;
+	}
 
 	ao_log_find_max_erase_flight();
 
@@ -330,7 +410,7 @@ ao_log_list(void) __reentrant
 {
 	uint8_t	slot;
 	uint8_t slots;
-	uint16_t flight;
+	int16_t flight;
 
 	slots = ao_log_slots();
 	for (slot = 0; slot < slots; slot++)
@@ -350,18 +430,25 @@ ao_log_delete(void) __reentrant
 {
 	uint8_t slot;
 	uint8_t slots;
+	int16_t cmd_flight = 1;
 
+	ao_cmd_white();
+	if (ao_cmd_lex_c == '-') {
+		cmd_flight = -1;
+		ao_cmd_lex();
+	}
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
+	cmd_flight *= (int16_t) ao_cmd_lex_i;
 
 	slots = ao_log_slots();
 	/* Look for the flight log matching the requested flight */
-	if (ao_cmd_lex_i) {
+	if (cmd_flight) {
 		for (slot = 0; slot < slots; slot++) {
-			if (ao_log_flight(slot) == ao_cmd_lex_i) {
+			if (ao_log_flight(slot) == cmd_flight) {
 #if HAS_TRACKER
-				ao_tracker_erase_start(ao_cmd_lex_i);
+				ao_tracker_erase_start(cmd_flight);
 #endif
 				ao_log_erase(slot);
 #if HAS_TRACKER
@@ -372,7 +459,7 @@ ao_log_delete(void) __reentrant
 			}
 		}
 	}
-	printf("No such flight: %d\n", ao_cmd_lex_i);
+	printf("No such flight: %d\n", cmd_flight);
 }
 
 __code struct ao_cmds ao_log_cmds[] = {

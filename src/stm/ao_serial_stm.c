@@ -60,13 +60,13 @@ _ao_usart_cts(struct ao_stm_usart *usart)
 #endif
 
 static void
-_ao_usart_rx(struct ao_stm_usart *usart, int stdin)
+_ao_usart_rx(struct ao_stm_usart *usart, int is_stdin)
 {
 	if (usart->reg->sr & (1 << STM_USART_SR_RXNE)) {
 		if (!ao_fifo_full(usart->rx_fifo)) {
 			ao_fifo_insert(usart->rx_fifo, usart->reg->dr);
 			ao_wakeup(&usart->rx_fifo);
-			if (stdin)
+			if (is_stdin)
 				ao_wakeup(&ao_stdin_ready);
 #if HAS_SERIAL_SW_FLOW
 			/* If the fifo is nearly full, turn off RTS and wait
@@ -84,9 +84,9 @@ _ao_usart_rx(struct ao_stm_usart *usart, int stdin)
 }
 
 static void
-ao_usart_isr(struct ao_stm_usart *usart, int stdin)
+ao_usart_isr(struct ao_stm_usart *usart, int is_stdin)
 {
-	_ao_usart_rx(usart, stdin);
+	_ao_usart_rx(usart, is_stdin);
 
 	if (!_ao_usart_tx_start(usart))
 		usart->reg->cr1 &= ~(1<< STM_USART_CR1_TXEIE);

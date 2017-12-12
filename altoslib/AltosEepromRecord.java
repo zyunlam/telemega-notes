@@ -50,8 +50,22 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		return data8(i) | (data8(i+1) << 8) | (data8(i+2) << 16) | (data8(i+3) << 24);
 	}
 
+	public boolean empty(int s) {
+		for (int i = 0; i < length; i++)
+			if (eeprom.data8(s + i) != 0xff)
+				return false;
+		return true;
+	}
+
 	public boolean valid(int s) {
-		return AltosConvert.checksum(eeprom.data, s, length) == 0;
+		int	ck = AltosConvert.checksum(eeprom.data, s, length);
+
+		if (ck != 0) {
+			++eeprom.errors;
+			System.out.printf("invalid checksum 0x%x at 0x%x\n", ck, s);
+			return false;
+		}
+		return true;
 	}
 
 	public boolean valid() {
@@ -83,18 +97,16 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 
 	/* AltosDataProvider */
 	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {
-		cal_data.set_tick(tick());
+		listener.set_tick(tick());
 		if (cmd() == AltosLib.AO_LOG_FLIGHT)
 			cal_data.set_boost_tick();
 		listener.set_time(cal_data.time());
 
 		/* Flush any pending GPS changes */
 		if (!AltosLib.is_gps_cmd(cmd())) {
-			AltosGPS gps = cal_data.temp_gps();
-			if (gps != null) {
+			AltosGPS gps = listener.temp_gps();
+			if (gps != null)
 				listener.set_gps(gps);
-				cal_data.reset_temp_gps();
-			}
 		}
 	}
 
@@ -102,15 +114,11 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		int	s = start + length;
 
 		while (s + length <= eeprom.data.size()) {
-			if (valid(s))
+			if (!empty(s) && valid(s))
 				return s;
 			s += length;
 		}
 		return -1;
-	}
-
-	public boolean hasNext() {
-		return next_start() >= 0;
 	}
 
 	public abstract AltosEepromRecord next();
@@ -119,8 +127,5 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		this.eeprom = eeprom;
 		this.start = start;
 		this.length = length;
-
-		while (start + length < eeprom.data.size() && !valid())
-			start += length;
 	}
 }

@@ -295,7 +295,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		pack();
 		setVisible(true);
 
-		thread = new AltosIdleMonitor((AltosIdleMonitorListener) this, link, (boolean) remote);
+		thread = new AltosIdleMonitor(this, link, (boolean) remote);
 
 		status_update = new AltosFlightStatusUpdate(flightStatus);
 

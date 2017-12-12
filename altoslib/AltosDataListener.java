@@ -19,10 +19,16 @@ public abstract class AltosDataListener {
 	private AltosCalData	cal_data = null;
 
 	public double		time = AltosLib.MISSING;
-	public int		state = AltosLib.MISSING;
 	public double		frequency = AltosLib.MISSING;
 
+	public int		raw_tick = AltosLib.MISSING;
+
+	public int tick() {
+		return raw_tick;
+	}
+
 	public void set_tick(int tick) {
+		raw_tick = tick;
 		cal_data.set_tick(tick);
 		set_time(cal_data.time());
 	}
@@ -42,14 +48,34 @@ public abstract class AltosDataListener {
 		cal_data().set_serial(serial);
 	}
 
+	public void set_device_type(int device_type) {
+		cal_data().set_device_type(device_type);
+		switch (device_type) {
+		case AltosLib.product_telegps:
+			set_state(AltosLib.ao_flight_stateless);
+			break;
+		}
+	}
+
+	public void set_log_format(int log_format) {
+		cal_data().set_log_format(log_format);
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEGPS:
+			set_state(AltosLib.ao_flight_stateless);
+			break;
+		}
+	}
+
 	public double time() {
 		return time;
 	}
 
 	public void set_state(int state) {
 		cal_data().set_state(state);
-		if (state != AltosLib.MISSING)
-			this.state = state;
+	}
+
+	public int state() {
+		return cal_data().state;
 	}
 
 	public void set_flight(int flight) {
@@ -62,6 +88,12 @@ public abstract class AltosDataListener {
 
 	/* Called after all records are captured */
 	public void finish() {
+	}
+
+	public void init() {
+		set_state(AltosLib.ao_flight_invalid);
+		time = AltosLib.MISSING;
+		frequency = AltosLib.MISSING;
 	}
 
 	public abstract void set_rssi(int rssi, int status);
@@ -79,7 +111,18 @@ public abstract class AltosDataListener {
 	public abstract void set_apogee_voltage(double volts);
 	public abstract void set_main_voltage(double volts);
 
-	public abstract void set_gps(AltosGPS gps);
+	public void set_gps(AltosGPS gps) {
+		AltosCalData cal_data = cal_data();
+		cal_data.set_cal_gps(gps);
+	}
+
+	public AltosGPS make_temp_gps(boolean sats) {
+		return cal_data().make_temp_cal_gps(tick(), sats);
+	}
+
+	public AltosGPS temp_gps() {
+		return cal_data().temp_cal_gps();
+	}
 
 	public abstract void set_orient(double orient);
 	public abstract void set_gyro(double roll, double pitch, double yaw);

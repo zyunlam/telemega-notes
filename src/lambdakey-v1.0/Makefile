@@ -5,6 +5,12 @@
 
 include ../stmf0/Makefile.defs
 
+include ../scheme/Makefile-inc
+
+NEWLIB_FULL=-lm -lc -lgcc
+
+LIBS=$(NEWLIB_FULL)
+
 INC = \
 	ao.h \
 	ao_arch.h \
@@ -13,9 +19,7 @@ INC = \
 	ao_pins.h \
 	ao_product.h \
 	ao_task.h \
-	ao_lisp.h \
-	ao_lisp_const.h \
-	ao_lisp_os.h \
+	$(SCHEME_HDRS) \
 	stm32f0.h \
 	Makefile
 
@@ -35,23 +39,8 @@ ALTOS_SRC = \
 	ao_timer.c \
 	ao_usb_stm.c \
 	ao_flash_stm.c \
-	ao_lisp_lex.c \
-	ao_lisp_mem.c \
-	ao_lisp_cons.c \
-	ao_lisp_eval.c \
-	ao_lisp_string.c \
-	ao_lisp_atom.c \
-	ao_lisp_int.c \
-	ao_lisp_poly.c \
-	ao_lisp_builtin.c \
-	ao_lisp_read.c \
-	ao_lisp_rep.c \
-	ao_lisp_frame.c \
-	ao_lisp_error.c \
-	ao_lisp_lambda.c \
-	ao_lisp_save.c \
-	ao_lisp_stack.c \
-	ao_lisp_os_save.c
+	$(SCHEME_SRCS) \
+	ao_scheme_os_save.c
 
 PRODUCT=LambdaKey-v1.0
 PRODUCT_DEF=-DLAMBDAKEY
@@ -60,6 +49,12 @@ IDPRODUCT=0x000a
 CFLAGS = $(PRODUCT_DEF) -I. $(STMF0_CFLAGS) -Os -g
 
 LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tlambda.ld
+
+MAP=$(PROG).map
+NEWLIB=/local/newlib-mini
+MAPFILE=-Wl,-M=$(MAP)
+LDFLAGS=-L../stmf0 -L$(NEWLIB)/arm-none-eabi/lib/thumb/v6-m/ -Wl,-Tlambda.ld $(MAPFILE) -nostartfiles
+AO_CFLAGS=-I. -I../stmf0 -I../kernel -I../drivers -I.. -I../scheme -isystem $(NEWLIB)/arm-none-eabi/include -DNEWLIB
 
 PROGNAME=lambdakey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf

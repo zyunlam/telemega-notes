@@ -21,50 +21,6 @@
 #include <ao_data.h>
 #include <ao_flight.h>
 
-static __xdata struct ao_log_mega log;
-
-__code uint8_t ao_log_format = AO_LOG_FORMAT_TELEMEGA;
-
-static uint8_t
-ao_log_csum(__xdata uint8_t *b) __reentrant
-{
-	uint8_t	sum = 0x5a;
-	uint8_t	i;
-
-	for (i = 0; i < sizeof (struct ao_log_mega); i++)
-		sum += *b++;
-	return -sum;
-}
-
-uint8_t
-ao_log_mega(__xdata struct ao_log_mega *log) __reentrant
-{
-	uint8_t wrote = 0;
-	/* set checksum */
-	log->csum = 0;
-	log->csum = ao_log_csum((__xdata uint8_t *) log);
-	ao_mutex_get(&ao_log_mutex); {
-		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
-			ao_log_stop();
-		if (ao_log_running) {
-			wrote = 1;
-			ao_storage_write(ao_log_current_pos,
-					 log,
-					 sizeof (struct ao_log_mega));
-			ao_log_current_pos += sizeof (struct ao_log_mega);
-		}
-	} ao_mutex_put(&ao_log_mutex);
-	return wrote;
-}
-
-static uint8_t
-ao_log_dump_check_data(void)
-{
-	if (ao_log_csum((uint8_t *) &log) != 0)
-		return 0;
-	return 1;
-}
-
 #if HAS_FLIGHT
 static __data uint8_t	ao_log_data_pos;
 
@@ -106,7 +62,7 @@ ao_log(void)
 #endif
 	log.u.flight.ground_pres = ao_ground_pres;
 	log.u.flight.flight = ao_flight_number;
-	ao_log_mega(&log);
+	ao_log_write(&log);
 #endif
 
 	/* Write the whole contents of the ring to the log
@@ -138,8 +94,19 @@ ao_log(void)
 				log.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].hmc5883.z;
 				log.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].hmc5883.y;
 #endif
+#if HAS_MPU9250
+				log.u.sensor.accel_x = ao_data_ring[ao_log_data_pos].mpu9250.accel_x;
+				log.u.sensor.accel_y = ao_data_ring[ao_log_data_pos].mpu9250.accel_y;
+				log.u.sensor.accel_z = ao_data_ring[ao_log_data_pos].mpu9250.accel_z;
+				log.u.sensor.gyro_x = ao_data_ring[ao_log_data_pos].mpu9250.gyro_x;
+				log.u.sensor.gyro_y = ao_data_ring[ao_log_data_pos].mpu9250.gyro_y;
+				log.u.sensor.gyro_z = ao_data_ring[ao_log_data_pos].mpu9250.gyro_z;
+				log.u.sensor.mag_x = ao_data_ring[ao_log_data_pos].mpu9250.mag_x;
+				log.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].mpu9250.mag_z;
+				log.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].mpu9250.mag_y;
+#endif
 				log.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
-				ao_log_mega(&log);
+				ao_log_write(&log);
 				if (ao_log_state <= ao_flight_coast)
 					next_sensor = log.tick + AO_SENSOR_INTERVAL_ASCENT;
 				else
@@ -153,7 +120,7 @@ ao_log(void)
 				for (i = 0; i < AO_ADC_NUM_SENSE; i++)
 					log.u.volt.sense[i] = ao_data_ring[ao_log_data_pos].adc.sense[i];
 				log.u.volt.pyro = ao_pyro_fired;
-				ao_log_mega(&log);
+				ao_log_write(&log);
 				next_other = log.tick + AO_OTHER_INTERVAL;
 			}
 			ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
@@ -166,7 +133,7 @@ ao_log(void)
 			log.tick = ao_time();
 			log.u.state.state = ao_log_state;
 			log.u.state.reason = 0;
-			ao_log_mega(&log);
+			ao_log_write(&log);
 
 			if (ao_log_state == ao_flight_landed)
 				ao_log_stop();
@@ -185,15 +152,3 @@ ao_log(void)
 }
 #endif /* HAS_FLIGHT */
 
-uint16_t
-ao_log_flight(uint8_t slot)
-{
-	if (!ao_storage_read(ao_log_pos(slot),
-			     &log,
-			     sizeof (struct ao_log_mega)))
-		return 0;
-
-	if (ao_log_dump_check_data() && log.type == AO_LOG_FLIGHT)
-		return log.u.flight.flight;
-	return 0;
-}

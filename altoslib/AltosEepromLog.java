@@ -18,6 +18,7 @@
 
 package org.altusmetrum.altoslib_12;
 
+import java.io.*;
 import java.text.*;
 import java.util.concurrent.*;
 
@@ -32,7 +33,15 @@ public class AltosEepromLog {
 	public int		start_block;
 	public int		end_block;
 
-	public boolean		selected;
+	public boolean		download_selected;
+	public boolean		delete_selected;
+	public boolean		graph_selected;
+
+	public File		file;
+
+	public void set_file(File file) {
+		this.file = file;
+	}
 
 	public AltosEepromLog(AltosConfigData config_data,
 			      AltosLink link,
@@ -50,8 +59,11 @@ public class AltosEepromLog {
 		serial = config_data.serial;
 
 		/*
-		 * Select all flights for download
+		 * Select all flights for download and graph, but not
+		 * for delete
 		 */
-		selected = true;
+		download_selected = true;
+		delete_selected = false;
+		graph_selected = true;
 	}
 }

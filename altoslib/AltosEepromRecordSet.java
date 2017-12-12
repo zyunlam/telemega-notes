@@ -44,6 +44,8 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		AltosCalData	cal_data = cal_data();
 
 		cal_data.reset();
+		listener.set_log_format(config_data().log_format);
+
 		for (AltosEepromRecord record : ordered) {
 			record.provide_data(listener, cal_data);
 		}
@@ -67,6 +69,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
 		case AltosLib.AO_LOG_FORMAT_TELESCIENCE:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			record = new AltosEepromRecordMega(eeprom);
 			break;
@@ -95,7 +98,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		int	tick = 0;
 		boolean first = true;
 
-		for (;;) {
+		do {
 			int	t = record.tick();
 
 			if (first) {
@@ -108,10 +111,8 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 			}
 			record.wide_tick = tick;
 			ordered.add(record);
-			if (!record.hasNext())
-				break;
 			record = record.next();
-		}
+		} while (record != null);
 	}
 
 	public AltosEepromRecordSet(InputStream input) throws IOException {

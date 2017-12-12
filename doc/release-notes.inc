@@ -2,6 +2,10 @@
 == Release Notes
 
 	:leveloffset: 2
+	include::release-notes-1.8.3.raw[]
+
+	<<<<
+	:leveloffset: 2
 	include::release-notes-1.8.2.raw[]
 
 	<<<<
@@ -13,7 +17,6 @@
 	include::release-notes-1.8.raw[]
 
 	<<<<
-
 	:leveloffset: 2
 	include::release-notes-1.7.raw[]
 

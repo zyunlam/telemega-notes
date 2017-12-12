@@ -1,7 +1,7 @@
 include ../Makedefs
 CC=$(SDCC)
 
-CFLAGS=--model-small --debug --opt-code-speed -DCODESIZE=$(CODESIZE)
+CFLAGS=--model-small --debug --opt-code-speed -DCODESIZE=$(CODESIZE) -DCC1111
 
 CFLAGS += $(PRODUCT_DEF) -I. -I.. -I../kernel -I../cc1111 -I../drivers -I../product
 

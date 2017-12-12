@@ -29,9 +29,11 @@ public class AltosCSV implements AltosWriter {
 	int			boost_tick;
 
 	boolean			has_basic;
+	boolean			has_radio;
 	boolean			has_battery;
 	boolean			has_flight_state;
 	boolean			has_advanced;
+	boolean			has_igniter;
 	boolean			has_gps;
 	boolean			has_gps_sat;
 	boolean			has_companion;
@@ -39,7 +41,7 @@ public class AltosCSV implements AltosWriter {
 	AltosFlightSeries	series;
 	int[]			indices;
 
-	static final int ALTOS_CSV_VERSION = 5;
+	static final int ALTOS_CSV_VERSION = 6;
 
 	/* Version 4 format:
 	 *
@@ -49,7 +51,8 @@ public class AltosCSV implements AltosWriter {
 	 *	flight number
 	 *	callsign
 	 *	time (seconds since boost)
-	 *	clock (tick count / 100)
+	 *
+	 * Radio info (if available)
 	 *	rssi
 	 *	link quality
 	 *
@@ -81,6 +84,14 @@ public class AltosCSV implements AltosWriter {
 	 *	mag_x (g)
 	 *	mag_y (g)
 	 *	mag_z (g)
+	 *	tilt (d)
+	 *
+	 * Extra igniter voltages (if available)
+	 *	pyro (V)
+	 *	igniter_a (V)
+	 *	igniter_b (V)
+	 *	igniter_c (V)
+	 *	igniter_d (V)
 	 *
 	 * GPS data (if available)
 	 *	connected (1/0)
@@ -115,11 +126,24 @@ public class AltosCSV implements AltosWriter {
 	 */
 
 	void write_general_header() {
-		out.printf("version,serial,flight,call,time,clock,rssi,lqi");
+		out.printf("version,serial,flight,call,time");
 	}
 
 	double time() {
 		return series.time(indices);
+	}
+
+	void write_general() {
+		out.printf("%s, %d, %d, %s, %8.2f",
+			   ALTOS_CSV_VERSION,
+			   series.cal_data().serial,
+			   series.cal_data().flight,
+			   series.cal_data().callsign,
+			   time());
+	}
+
+	void write_radio_header() {
+		out.printf("rssi,lqi");
 	}
 
 	int rssi() {
@@ -130,12 +154,8 @@ public class AltosCSV implements AltosWriter {
 		return (int) series.value(AltosFlightSeries.status_name, indices);
 	}
 
-	void write_general() {
-		double time = time();
-		out.printf("%s, %d, %d, %s, %8.2f, %8.2f, %4d, %3d",
-			   ALTOS_CSV_VERSION, series.cal_data().serial,
-			   series.cal_data().flight, series.cal_data().callsign,
-			   time, time,
+	void write_radio() {
+		out.printf("%4d, %3d",
 			   rssi(), status() & 0x7f);
 	}
 
@@ -149,7 +169,7 @@ public class AltosCSV implements AltosWriter {
 
 	void write_flight() {
 		int state = state();
-		out.printf("%d,%8s", state, AltosLib.state_name(state));
+		out.printf("%2d,%8s", state, AltosLib.state_name(state));
 	}
 
 	void write_basic_header() {
@@ -189,7 +209,7 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_advanced_header() {
-		out.printf("accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,mag_x,mag_y,mag_z");
+		out.printf("accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,mag_x,mag_y,mag_z,tilt");
 	}
 
 	double accel_along() { return series.value(AltosFlightSeries.accel_along_name, indices); }
@@ -204,11 +224,30 @@ public class AltosCSV implements AltosWriter {
 	double mag_across() { return series.value(AltosFlightSeries.mag_across_name, indices); }
 	double mag_through() { return series.value(AltosFlightSeries.mag_through_name, indices); }
 
+	double tilt() { return series.value(AltosFlightSeries.orient_name, indices); }
+
 	void write_advanced() {
-		out.printf("%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
+		out.printf("%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
 			   accel_along(), accel_across(), accel_through(),
 			   gyro_roll(), gyro_pitch(), gyro_yaw(),
-			   mag_along(), mag_across(), mag_through());
+			   mag_along(), mag_across(), mag_through(),
+			   tilt());
+	}
+
+	void write_igniter_header() {
+		out.printf("pyro");
+		for (int i = 0; i < series.igniter_voltage.length; i++)
+			out.printf(",%s", AltosLib.igniter_short_name(i));
+	}
+
+	double pyro() { return series.value(AltosFlightSeries.pyro_voltage_name, indices); }
+
+	double igniter_value(int channel) { return series.value(series.igniter_voltage_name(channel), indices);	}
+
+	void write_igniter() {
+		out.printf("%5.2f", pyro());
+		for (int i = 0; i < series.igniter_voltage.length; i++)
+			out.printf(",%5.2f", igniter_value(i));
 	}
 
 	void write_gps_header() {
@@ -306,6 +345,10 @@ public class AltosCSV implements AltosWriter {
 
 	void write_header() {
 		out.printf("#"); write_general_header();
+		if (has_radio) {
+			out.printf(",");
+			write_radio_header();
+		}
 		if (has_flight_state) {
 			out.printf(",");
 			write_flight_header();
@@ -321,6 +364,10 @@ public class AltosCSV implements AltosWriter {
 		if (has_advanced) {
 			out.printf(",");
 			write_advanced_header();
+		}
+		if (has_igniter) {
+			out.printf(",");
+			write_igniter_header();
 		}
 		if (has_gps) {
 			out.printf(",");
@@ -339,6 +386,10 @@ public class AltosCSV implements AltosWriter {
 
 	void write_one() {
 		write_general();
+		if (has_radio) {
+			out.printf(",");
+			write_radio();
+		}
 		if (has_flight_state) {
 			out.printf(",");
 			write_flight();
@@ -354,6 +405,10 @@ public class AltosCSV implements AltosWriter {
 		if (has_advanced) {
 			out.printf(",");
 			write_advanced();
+		}
+		if (has_igniter) {
+			out.printf(",");
+			write_igniter();
 		}
 		if (has_gps) {
 			out.printf(",");
@@ -395,14 +450,18 @@ public class AltosCSV implements AltosWriter {
 
 		series.finish();
 
+		has_radio = false;
 		has_flight_state = false;
 		has_basic = false;
 		has_battery = false;
 		has_advanced = false;
+		has_igniter = false;
 		has_gps = false;
 		has_gps_sat = false;
 		has_companion = false;
 
+		if (series.has_series(AltosFlightSeries.rssi_name))
+			has_radio = true;
 		if (series.has_series(AltosFlightSeries.state_name))
 			has_flight_state = true;
 		if (series.has_series(AltosFlightSeries.accel_name) || series.has_series(AltosFlightSeries.pressure_name))
@@ -411,6 +470,8 @@ public class AltosCSV implements AltosWriter {
 			has_battery = true;
 		if (series.has_series(AltosFlightSeries.accel_across_name))
 			has_advanced = true;
+		if (series.has_series(AltosFlightSeries.pyro_voltage_name))
+			has_igniter = true;
 
 		if (series.gps_series != null)
 			has_gps = true;

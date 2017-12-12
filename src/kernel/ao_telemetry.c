@@ -141,7 +141,7 @@ ao_send_mega_sensor(void)
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_MEGA_SENSOR;
 
-#if HAS_MPU6000
+#if HAS_MPU6000 || HAS_MPU9250
 	telemetry.mega_sensor.orient = ao_sample_orient;
 #endif
 	telemetry.mega_sensor.accel = ao_data_accel(packet);
@@ -162,6 +162,20 @@ ao_send_mega_sensor(void)
 	telemetry.mega_sensor.mag_x = packet->hmc5883.x;
 	telemetry.mega_sensor.mag_z = packet->hmc5883.z;
 	telemetry.mega_sensor.mag_y = packet->hmc5883.y;
+#endif
+
+#if HAS_MPU9250
+	telemetry.mega_sensor.accel_x = packet->mpu9250.accel_x;
+	telemetry.mega_sensor.accel_y = packet->mpu9250.accel_y;
+	telemetry.mega_sensor.accel_z = packet->mpu9250.accel_z;
+
+	telemetry.mega_sensor.gyro_x = packet->mpu9250.gyro_x;
+	telemetry.mega_sensor.gyro_y = packet->mpu9250.gyro_y;
+	telemetry.mega_sensor.gyro_z = packet->mpu9250.gyro_z;
+
+	telemetry.mega_sensor.mag_x = packet->mpu9250.mag_x;
+	telemetry.mega_sensor.mag_z = packet->mpu9250.mag_z;
+	telemetry.mega_sensor.mag_y = packet->mpu9250.mag_y;
 #endif
 
 	ao_telemetry_send();

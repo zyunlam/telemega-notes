@@ -83,9 +83,9 @@ public class AltosIMU implements Cloneable {
 				listener.set_gyro(cal_data.gyro_roll(imu.gyro_y),
 						  cal_data.gyro_pitch(imu.gyro_x),
 						  cal_data.gyro_yaw(imu.gyro_z));
-				listener.set_accel_ground(cal_data.accel_along(imu.accel_y),
-							  cal_data.accel_across(imu.accel_x),
-							  cal_data.accel_through(imu.accel_z));
+				listener.set_accel_ground(imu.accel_y,
+							  imu.accel_x,
+							  imu.accel_z);
 			}
 		} catch (TimeoutException te) {
 		}

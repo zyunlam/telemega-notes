@@ -21,7 +21,6 @@ SDCCDIRS=\
 	teledongle-v0.2 \
 	telemini-v1.0 \
 	telebt-v1.0 \
-	teleterra-v0.2 teleshield-v0.1 \
 	telefire-v0.1 telefire-v0.2 \
 	telerepeat-v1.0
 
@@ -30,15 +29,14 @@ ARMM3DIRS=\
 	telemega-v0.1 telemega-v0.1/flash-loader \
 	telemega-v1.0 telemega-v1.0/flash-loader \
 	telemega-v2.0 telemega-v2.0/flash-loader \
+	telemega-v3.0 telemega-v3.0/flash-loader \
 	telemetrum-v2.0 telemetrum-v2.0/flash-loader \
 	telemetrum-v3.0 telemetrum-v3.0/flash-loader \
-	megadongle-v0.1 megadongle-v0.1/flash-loader \
 	telegps-v0.3 telegps-v0.3/flash-loader \
 	telegps-v1.0 telegps-v1.0/flash-loader \
 	telegps-v2.0 telegps-v2.0/flash-loader \
 	telelco-v0.2 telelco-v0.2/flash-loader \
 	telelco-v0.3 telelco-v0.3/flash-loader \
-	telescience-v0.2 telescience-v0.2/flash-loader \
 	teledongle-v3.0 teledongle-v3.0/flash-loader \
 	teleballoon-v2.0 \
 	telebt-v3.0 telebt-v3.0/flash-loader \
@@ -48,14 +46,13 @@ ARMM3DIRS=\
 
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader \
-	chaoskey-v0.1 chaoskey-v0.1/flash-loader \
 	chaoskey-v1.0 chaoskey-v1.0/flash-loader \
 	telemini-v3.0 telemini-v3.0/flash-loader \
 	easymini-v2.0 easymini-v2.0/flash-loader \
 	micropeak-v2.0 micropeak-v2.0/flash-loader
 
 AVRDIRS=\
-	telescience-v0.1 telescience-pwm micropeak nanopeak-v0.1 microkite
+	micropeak microkite
 
 SUBDIRS=
 

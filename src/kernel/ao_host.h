@@ -111,7 +111,7 @@ ao_dump_state(void *wchan);
 void
 ao_sleep(void *wchan);
 
-const char const * const ao_state_names[] = {
+const char * const ao_state_names[] = {
 	"startup", "idle", "pad", "boost", "fast",
 	"coast", "drogue", "main", "landed", "invalid"
 };

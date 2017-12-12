@@ -14,12 +14,12 @@ else
 	exit 1
 fi
 
-VERSION=2.0
+VERSION=3.0
 REPO=~/altusmetrumllc/Binaries
 PRODUCT=TeleMega
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
-echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
+echo "Copyright 2017 by Bdale Garbee.  Released under GPL v3"
 echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"
@@ -44,11 +44,11 @@ esac
 
 echo $FLASH_STM
 
-$FLASH_STM $REPO/loaders/telemega-v$VERSION*.elf || exit 1
+$FLASH_STM $REPO/loaders/telemega-v$VERSION*.elf 
 
 sleep 5
 
-$USBLOAD --serial=$SERIAL $REPO/telemega-v$VERSION*.elf || exit 1
+$USBLOAD --serial=$SERIAL --force $REPO/telemega-v$VERSION*.elf || exit 1
 
 sleep 5
 

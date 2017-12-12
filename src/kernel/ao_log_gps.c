@@ -24,50 +24,13 @@
 #include <ao_distance.h>
 #include <ao_tracker.h>
 
-static __xdata struct ao_log_gps log;
-
-__code uint8_t ao_log_format = AO_LOG_FORMAT_TELEGPS;
-__code uint8_t ao_log_size = sizeof (struct ao_log_gps);
-
-static uint8_t
-ao_log_csum(__xdata uint8_t *b) __reentrant
-{
-	uint8_t	sum = 0x5a;
-	uint8_t	i;
-
-	for (i = 0; i < sizeof (struct ao_log_gps); i++)
-		sum += *b++;
-	return -sum;
-}
-
-uint8_t
-ao_log_gps(__xdata struct ao_log_gps *log) __reentrant
-{
-	uint8_t wrote = 0;
-	/* set checksum */
-	log->csum = 0;
-	log->csum = ao_log_csum((__xdata uint8_t *) log);
-	ao_mutex_get(&ao_log_mutex); {
-		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
-			ao_log_stop();
-		if (ao_log_running) {
-			wrote = 1;
-			ao_storage_write(ao_log_current_pos,
-					 log,
-					 sizeof (struct ao_log_gps));
-			ao_log_current_pos += sizeof (struct ao_log_gps);
-		}
-	} ao_mutex_put(&ao_log_mutex);
-	return wrote;
-}
-
 void
 ao_log_gps_flight(void)
 {
 	log.type = AO_LOG_FLIGHT;
 	log.tick = ao_time();
 	log.u.flight.flight = ao_flight_number;
-	ao_log_gps(&log);
+	ao_log_write(&log);
 }
 
 void
@@ -94,7 +57,7 @@ ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data)
 	log.u.gps.hdop = gps_data->hdop;
 	log.u.gps.vdop = gps_data->vdop;
 	log.u.gps.mode = gps_data->mode;
-	ao_log_gps(&log);
+	ao_log_write(&log);
 }
 
 void
@@ -115,39 +78,21 @@ ao_log_gps_tracking(uint16_t tick, struct ao_telemetry_satellite *gps_tracking_d
 				break;
 		}
 	log.u.gps_sat.channels = i;
-	ao_log_gps(&log);
+	ao_log_write(&log);
 }
 
-static uint8_t
-ao_log_dump_check_data(void)
-{
-	if (ao_log_csum((uint8_t *) &log) != 0)
-		return 0;
-	return 1;
-}
-
-uint16_t
-ao_log_flight(uint8_t slot)
-{
-	if (!ao_storage_read(ao_log_pos(slot),
-			     &log,
-			     sizeof (struct ao_log_gps)))
-		return 0;
-
-	if (ao_log_dump_check_data() && log.type == AO_LOG_FLIGHT)
-		return log.u.flight.flight;
-	return 0;
-}
-
-uint8_t
+int8_t
 ao_log_check(uint32_t pos)
 {
 	if (!ao_storage_read(pos,
 			     &log,
 			     sizeof (struct ao_log_gps)))
-		return 0;
+		return AO_LOG_INVALID;
 
-	if (ao_log_dump_check_data())
-		return 1;
-	return 0;
+	if (ao_log_check_clear())
+		return AO_LOG_EMPTY;
+
+	if (!ao_log_check_data())
+		return AO_LOG_INVALID;
+	return AO_LOG_VALID;
 }

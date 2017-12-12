@@ -13,14 +13,14 @@
  */
 
 #include <ao.h>
-#include <ao_lisp.h>
+#include <ao_scheme.h>
 
-static void lisp_cmd() {
-	ao_lisp_read_eval_print();
+static void scheme_cmd() {
+	ao_scheme_read_eval_print();
 }
 
 static const struct ao_cmds blink_cmds[] = {
-	{ lisp_cmd,	"l\0Run lisp interpreter" },
+	{ scheme_cmd,	"l\0Run scheme interpreter" },
 	{ 0, 0 }
 };
 

@@ -31,6 +31,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int ground_roll() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 			return data32(16);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(14);
@@ -41,6 +42,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int ground_pitch() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 			return data32(20);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(16);
@@ -51,6 +53,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int ground_yaw() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 			return data32(24);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(18);
@@ -188,7 +191,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			listener.set_pyro_fired(pyro());
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
-			gps = cal_data.make_temp_gps(tick(), false);
+			gps = listener.make_temp_gps(false);
 			gps.lat = latitude() / 1e7;
 			gps.lon = longitude() / 1e7;
 
@@ -231,7 +234,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			}
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
-			gps = cal_data.make_temp_gps(tick(), true);
+			gps = listener.make_temp_gps(true);
 
 			int n = nsat();
 			if (n > max_sat)

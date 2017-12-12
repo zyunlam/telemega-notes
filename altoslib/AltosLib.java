@@ -363,6 +363,7 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_TELEMINI3 = 12;
 	public static final int AO_LOG_FORMAT_TELEFIRETWO = 13;
 	public static final int AO_LOG_FORMAT_EASYMINI2 = 14;
+	public static final int AO_LOG_FORMAT_TELEMEGA_3 = 15;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {
@@ -587,7 +588,11 @@ public class AltosLib {
 	}
 
 	public static String igniter_name(int i) {
-		return String.format("Ignitor %c", 'A' + i);
+		return String.format("Igniter %c", 'A' + i);
+	}
+
+	public static String igniter_short_name(int i) {
+		return String.format("igniter_%c", 'a' + i);
 	}
 
 	public static AltosRecordSet record_set(File file) throws FileNotFoundException, IOException {

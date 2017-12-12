@@ -53,7 +53,7 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 			listener.set_state(data16(0));
 			break;
 		case AltosLib.AO_LOG_GPS_TIME:
-			gps = cal_data.make_temp_gps(tick(),false);
+			gps = listener.make_temp_gps(false);
 
 			gps.hour = data8(0);
 			gps.minute = data8(1);
@@ -67,29 +67,29 @@ public class AltosEepromRecordFull extends AltosEepromRecord {
 				AltosLib.AO_GPS_NUM_SAT_SHIFT;
 			break;
 		case AltosLib.AO_LOG_GPS_LAT:
-			gps = cal_data.make_temp_gps(tick(),false);
+			gps = listener.make_temp_gps(false);
 
 			int lat32 = data32(0);
 			gps.lat = (double) lat32 / 1e7;
 			break;
 		case AltosLib.AO_LOG_GPS_LON:
-			gps = cal_data.make_temp_gps(tick(),false);
+			gps = listener.make_temp_gps(false);
 
 			int lon32 = data32(0);
 			gps.lon = (double) lon32 / 1e7;
 			break;
 		case AltosLib.AO_LOG_GPS_ALT:
-			gps = cal_data.make_temp_gps(tick(),false);
+			gps = listener.make_temp_gps(false);
 			gps.alt = data16(0);
 			break;
 		case AltosLib.AO_LOG_GPS_SAT:
-			gps = cal_data.make_temp_gps(tick(),true);
+			gps = listener.make_temp_gps(true);
 			int svid = data16(0);
 			int c_n0 = data16(2);
 			gps.add_sat(svid, c_n0);
 			break;
 		case AltosLib.AO_LOG_GPS_DATE:
-			gps = cal_data.make_temp_gps(tick(),false);
+			gps = listener.make_temp_gps(false);
 			gps.year = data8(0) + 2000;
 			gps.month = data8(1);
 			gps.day = data8(2);

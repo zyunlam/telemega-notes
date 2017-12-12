@@ -31,7 +31,7 @@ class AltosReplay extends AltosDataListener implements Runnable {
 	AltosState	state;
 	AltosRecordSet	record_set;
 	double		last_time = AltosLib.MISSING;
-	Semaphore	semaphore = new Semaphore(1);;
+	Semaphore	semaphore = new Semaphore(1);
 	boolean		done = false;
 
 	public void set_time(double time) {
@@ -70,7 +70,7 @@ class AltosReplay extends AltosDataListener implements Runnable {
 	public void set_apogee_voltage(double volts) { state.set_apogee_voltage(volts); }
 	public void set_main_voltage(double volts) { state.set_main_voltage(volts); }
 
-	public void set_gps(AltosGPS gps) { state.set_gps(gps); }
+	public void set_gps(AltosGPS gps) { super.set_gps(gps); state.set_gps(gps); }
 
 	public void set_orient(double orient) { state.set_orient(orient); }
 	public void set_gyro(double roll, double pitch, double yaw) { state.set_gyro(roll, pitch, yaw); }

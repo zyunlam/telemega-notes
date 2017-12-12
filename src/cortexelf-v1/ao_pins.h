@@ -62,6 +62,8 @@
 #define USE_SERIAL_2_STDIN	1
 #define SERIAL_2_PA2_PA3	0
 #define SERIAL_2_PD5_PD6	1
+#define USE_SERIAL_2_FLOW	0
+#define USE_SERIAL_2_SW_FLOW	0
 
 #define HAS_SERIAL_3		0
 #define USE_SERIAL_3_STDIN	0

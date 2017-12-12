@@ -54,7 +54,7 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 
 		AltosCalData	cal_data = listener.cal_data();
 
-		AltosGPS	gps = cal_data.make_temp_gps(tick(), false);
+		AltosGPS	gps = listener.make_temp_gps(false);
 
 		int flags = flags();
 		gps.nsat = flags & 0xf;
@@ -77,12 +77,7 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 			gps.ground_speed = ground_speed() * 1.0e-2;
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
-
-			if (gps.nsat >= 4)
-				cal_data.set_gps(gps);
 		}
 		listener.set_gps(gps);
-		cal_data.set_gps(gps);
-		cal_data.reset_temp_gps();
 	}
 }

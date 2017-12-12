@@ -36,10 +36,23 @@ public class AltosFile extends File {
 		return String.format("-via-%04d", receiver);
 	}
 
+	static private String label(int flight) {
+		if (flight < 0)
+			return "corrupt";
+		else
+			return "flight";
+	}
+
+	static private int flight(int flight) {
+		if (flight < 0)
+			return -flight;
+		return flight;
+	}
+
 	public AltosFile(int year, int month, int day, int serial, int flight, int receiver, String extension) {
 		super (AltosPreferences.logdir(),
-		       String.format("%04d-%02d-%02d-serial-%s-flight-%s%s.%s",
-				     year, month, day, number(serial), number(flight), receiver(receiver), extension));
+		       String.format("%04d-%02d-%02d-serial-%s-%s-%s%s.%s",
+				     year, month, day, number(serial), label(flight), number(flight(flight)), receiver(receiver), extension));
 	}
 
 	public AltosFile(int year, int month, int day, int serial, int flight, String extension) {

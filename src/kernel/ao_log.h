@@ -29,7 +29,7 @@
  * the log. Tasks may wait for this to be initialized
  * by sleeping on this variable.
  */
-extern __xdata uint16_t ao_flight_number;
+extern __xdata int16_t ao_flight_number;
 extern __xdata uint8_t	ao_log_mutex;
 extern __pdata uint32_t ao_log_current_pos;
 extern __pdata uint32_t ao_log_end_pos;
@@ -54,17 +54,28 @@ extern __pdata enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELEMINI3		12	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
 #define AO_LOG_FORMAT_TELEFIRETWO	13	/* 32-byte test stand data */
 #define AO_LOG_FORMAT_EASYMINI2		14	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
+#define AO_LOG_FORMAT_TELEMEGA_3	15	/* 32 byte typed telemega records with 32 bit gyro cal and mpu9250 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
-extern __code uint8_t ao_log_format;
-extern __code uint8_t ao_log_size;
+/* Return the flight number from the given log slot, 0 if none, -slot on failure */
 
-/* Return the flight number from the given log slot, 0 if none */
-uint16_t
+int16_t
 ao_log_flight(uint8_t slot);
 
-/* Check if there is valid log data at the specified location */
+/* Checksum the loaded log record */
 uint8_t
+ao_log_check_data(void);
+
+/* Check to see if the loaded log record is empty */
+uint8_t
+ao_log_check_clear(void);
+
+/* Check if there is valid log data at the specified location */
+#define AO_LOG_VALID	1
+#define AO_LOG_EMPTY	0
+#define AO_LOG_INVALID 	-1
+
+int8_t
 ao_log_check(uint32_t pos);
 
 /* Flush the log */
@@ -463,21 +474,48 @@ struct ao_log_gps {
 	} u;
 };
 
+#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3
+typedef struct ao_log_mega ao_log_type;
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMETRUM
+typedef struct ao_log_metrum ao_log_type;
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI1 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI3
+typedef struct ao_log_mini ao_log_type;
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEGPS
+typedef struct ao_log_gps ao_log_type;
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_FULL
+typedef struct ao_log_record ao_log_type;
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TINY
+#define AO_LOG_UNCOMMON	1
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMETRY
+#define AO_LOG_UNCOMMON	1
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TELESCIENCE
+#define AO_LOG_UNCOMMON	1
+#endif
+
+#ifndef AO_LOG_UNCOMMON
+extern __xdata ao_log_type log;
+
+#define AO_LOG_SIZE sizeof(ao_log_type)
+
 /* Write a record to the eeprom log */
-uint8_t
-ao_log_data(__xdata struct ao_log_record *log) __reentrant;
 
 uint8_t
-ao_log_mega(__xdata struct ao_log_mega *log) __reentrant;
-
-uint8_t
-ao_log_metrum(__xdata struct ao_log_metrum *log) __reentrant;
-
-uint8_t
-ao_log_mini(__xdata struct ao_log_mini *log) __reentrant;
-
-uint8_t
-ao_log_gps(__xdata struct ao_log_gps *log) __reentrant;
+ao_log_write(__xdata ao_log_type *log) __reentrant;
+#endif
 
 void
 ao_log_flush(void);

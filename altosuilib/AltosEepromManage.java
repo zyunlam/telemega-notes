@@ -33,6 +33,7 @@ public class AltosEepromManage implements ActionListener {
 	AltosEepromList		flights;
 	AltosEepromDownload	download;
 	AltosEepromDelete	delete;
+	AltosEepromGrapher	grapher;
 
 	public void finish() {
 		if (serial_line != null) {
@@ -48,7 +49,7 @@ public class AltosEepromManage implements ActionListener {
 	private int countDeletedFlights() {
 		int count = 0;
 		for (AltosEepromLog flight : flights) {
-			if (flight.selected)
+			if (flight.delete_selected)
 				count++;
 		}
 		return count;
@@ -58,7 +59,7 @@ public class AltosEepromManage implements ActionListener {
 		String	result = "";
 
 		for (AltosEepromLog flight : flights) {
-			if (flight.selected) {
+			if (flight.delete_selected) {
 				if (result.equals(""))
 					result = String.format("%d", flight.flight);
 				else
@@ -68,28 +69,36 @@ public class AltosEepromManage implements ActionListener {
 		return result;
 	}
 
-	public boolean download_done() {
-		AltosEepromSelect	select = new AltosEepromSelect(frame, flights, "Delete");
+	public boolean delete_start() {
 
-		if (select.run()) {
-			boolean any_selected = false;
-			for (AltosEepromLog flight : flights)
-				any_selected = any_selected || flight.selected;
-			if (any_selected) {
-				delete = new AltosEepromDelete(frame,
-							       serial_line,
-							       remote,
-							       flights);
-				delete.addActionListener(this);
-				/*
-				 * Start flight log delete
-				 */
+		boolean any_selected = false;
+		for (AltosEepromLog flight : flights)
+			any_selected = any_selected || flight.delete_selected;
+		if (any_selected) {
+			delete = new AltosEepromDelete(frame,
+						       serial_line,
+						       remote,
+						       flights);
+			delete.addActionListener(this);
+			/*
+			 * Start flight log delete
+			 */
 
-				delete.start();
-				return true;
-			}
+			delete.start();
+			return true;
 		}
 		return false;
+	}
+
+	public void graph_start() {
+		boolean any_selected = false;
+		for (AltosEepromLog flight : flights) {
+			if (!flight.download_selected)
+				flight.graph_selected = false;
+			any_selected = any_selected || flight.graph_selected;
+		}
+		if (any_selected && grapher != null)
+			grapher.graph_flights(flights);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -98,8 +107,11 @@ public class AltosEepromManage implements ActionListener {
 		boolean running = false;
 
 		if (cmd.equals("download")) {
-			if (success)
-				running = download_done();
+			if (success) {
+				running = delete_start();
+				if (!running)
+					graph_start();
+			}
 		} else if (cmd.equals("delete")) {
 			if (success) {
 				JOptionPane.showMessageDialog(frame,
@@ -108,6 +120,7 @@ public class AltosEepromManage implements ActionListener {
 									    showDeletedFlights()),
 							      serial_line.device.toShortString(),
 							      JOptionPane.INFORMATION_MESSAGE);
+				graph_start();
 			}
 		}
 		if (!running)
@@ -126,12 +139,12 @@ public class AltosEepromManage implements ActionListener {
 							      serial_line.device.toShortString(),
 							      JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				AltosEepromSelect	select = new AltosEepromSelect(frame, flights, "Download");
+				AltosEepromSelect	select = new AltosEepromSelect(frame, flights, grapher != null);
 
 				if (select.run()) {
 					boolean any_selected = false;
 					for (AltosEepromLog flight : flights)
-						any_selected = any_selected || flight.selected;
+						any_selected = any_selected || flight.download_selected;
 					if (any_selected) {
 						AltosEepromMonitorUI monitor = new AltosEepromMonitorUI(frame);
 						monitor.addActionListener(this);
@@ -147,7 +160,9 @@ public class AltosEepromManage implements ActionListener {
 						download.start();
 						running = true;
 					} else {
-						running = download_done();
+						running = delete_start();
+						if (!running)
+							graph_start();
 					}
 				}
 			}
@@ -205,11 +220,12 @@ public class AltosEepromManage implements ActionListener {
 		}
 	}
 
-	public AltosEepromManage(JFrame given_frame, int product) {
+	public AltosEepromManage(JFrame given_frame, AltosEepromGrapher grapher, int product) {
 
 		//boolean	running = false;
 
 		frame = given_frame;
+		this.grapher = grapher;
 		device = AltosDeviceUIDialog.show(frame, product);
 
 		remote = false;

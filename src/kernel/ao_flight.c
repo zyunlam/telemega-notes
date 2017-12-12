@@ -21,7 +21,7 @@
 #include <ao_log.h>
 #endif
 
-#if HAS_MPU6000
+#if HAS_MPU6000 || HAS_MPU9250
 #include <ao_quaternion.h>
 #endif
 

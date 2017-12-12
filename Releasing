@@ -126,6 +126,7 @@ These are Bdale's notes on how to do a release.
 	   src/telemini-v3.0/flash-loader/{*.elf,*.bin} \
 	   ~/altusmetrumllc/Binaries/loaders/
 	(cd ~/altusmetrumllc ; git add Binaries ; git commit -a) 
+	- remove previous versions (only keep latest release)
 	(cd ~/altusmetrumllc ; git push) 
 
 	- Push new release to web site

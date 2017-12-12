@@ -184,9 +184,9 @@ ao_sample_rotate(void)
 #else
 	static const float dt = 1/TIME_DIV;
 #endif
-	float	x = ao_mpu6000_gyro((float) ((ao_sample_pitch << 9) - ao_ground_pitch) / 512.0f) * dt;
-	float	y = ao_mpu6000_gyro((float) ((ao_sample_yaw << 9) - ao_ground_yaw) / 512.0f) * dt;
-	float	z = ao_mpu6000_gyro((float) ((ao_sample_roll << 9) - ao_ground_roll) / 512.0f) * dt;
+	float	x = ao_convert_gyro((float) ((ao_sample_pitch << 9) - ao_ground_pitch) / 512.0f) * dt;
+	float	y = ao_convert_gyro((float) ((ao_sample_yaw << 9) - ao_ground_yaw) / 512.0f) * dt;
+	float	z = ao_convert_gyro((float) ((ao_sample_roll << 9) - ao_ground_roll) / 512.0f) * dt;
 	struct ao_quaternion	rot;
 
 	ao_quaternion_init_half_euler(&rot, x, y, z);

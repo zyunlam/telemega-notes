@@ -47,6 +47,15 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.8.3</revnumber>
+    <date>11 Dec 2017</date>
+    <revremark>
+      Support TeleMega v3.0 hardware. Fix one firmware bug affecting
+      all flight computers and another two affecting TeleMega and
+      EasyMega. Several new AltosUI graphing features.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.8.2</revnumber>
     <date>18 Sep 2017</date>
     <revremark>
