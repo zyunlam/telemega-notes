@@ -325,15 +325,22 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 				case builtin_minus:
 					if (ao_scheme_integer_typep(ct))
 						ret = ao_scheme_integer_poly(-ao_scheme_poly_integer(ret));
+#ifdef AO_SCHEME_FEATURE_FLOAT
 					else if (ct == AO_SCHEME_FLOAT)
 						ret = ao_scheme_float_get(-ao_scheme_poly_number(ret));
+#endif
 					break;
 				case builtin_divide:
-					if (ao_scheme_integer_typep(ct) && ao_scheme_poly_integer(ret) == 1)
-						;
-					else if (ao_scheme_number_typep(ct)) {
-						float	v = ao_scheme_poly_number(ret);
-						ret = ao_scheme_float_get(1/v);
+					if (ao_scheme_integer_typep(ct) && ao_scheme_poly_integer(ret) == 1) {
+					} else {
+#ifdef AO_SCHEME_FEATURE_FLOAT
+						if (ao_scheme_number_typep(ct)) {
+							float	v = ao_scheme_poly_number(ret);
+							ret = ao_scheme_float_get(1/v);
+						}
+#else
+						ret = ao_scheme_integer_poly(0);
+#endif
 					}
 					break;
 				default:
@@ -344,30 +351,42 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 		} else if (ao_scheme_integer_typep(rt) && ao_scheme_integer_typep(ct)) {
 			int32_t	r = ao_scheme_poly_integer(ret);
 			int32_t	c = ao_scheme_poly_integer(car);
+#ifdef AO_SCHEME_FEATURE_FLOAT
 			int64_t t;
+#endif
 
 			switch(op) {
 			case builtin_plus:
 				r += c;
 			check_overflow:
+#ifdef AO_SCHEME_FEATURE_FLOAT
 				if (r < AO_SCHEME_MIN_BIGINT || AO_SCHEME_MAX_BIGINT < r)
 					goto inexact;
+#endif
 				break;
 			case builtin_minus:
 				r -= c;
 				goto check_overflow;
 				break;
 			case builtin_times:
+#ifdef AO_SCHEME_FEATURE_FLOAT
 				t = (int64_t) r * (int64_t) c;
 				if (t < AO_SCHEME_MIN_BIGINT || AO_SCHEME_MAX_BIGINT < t)
 					goto inexact;
 				r = (int32_t) t;
+#else
+				r = r * c;
+#endif
 				break;
 			case builtin_divide:
+#ifdef AO_SCHEME_FEATURE_FLOAT
 				if (c != 0 && (r % c) == 0)
 					r /= c;
 				else
 					goto inexact;
+#else
+				r /= c;
+#endif
 				break;
 			case builtin_quotient:
 				if (c == 0)
@@ -395,6 +414,7 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 			ao_scheme_cons_stash(0, cons);
 			ret = ao_scheme_integer_poly(r);
 			cons = ao_scheme_cons_fetch(0);
+#ifdef AO_SCHEME_FEATURE_FLOAT
 		} else if (ao_scheme_number_typep(rt) && ao_scheme_number_typep(ct)) {
 			float r, c;
 		inexact:
@@ -423,6 +443,7 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 			ao_scheme_cons_stash(0, cons);
 			ret = ao_scheme_float_get(r);
 			cons = ao_scheme_cons_fetch(0);
+#endif
 		}
 		else if (rt == AO_SCHEME_STRING && ct == AO_SCHEME_STRING && op == builtin_plus) {
 			ao_scheme_cons_stash(0, cons);
@@ -839,6 +860,7 @@ ao_scheme_do_pairp(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_integerp(struct ao_scheme_cons *cons)
 {
+#ifdef AO_SCHEME_FEATURE_BIGINT
 	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	switch (ao_scheme_poly_type(ao_scheme_arg(cons, 0))) {
@@ -848,21 +870,32 @@ ao_scheme_do_integerp(struct ao_scheme_cons *cons)
 	default:
 		return _ao_scheme_bool_false;
 	}
+#else
+	return ao_scheme_do_typep(AO_SCHEME_INT, cons);
+#endif
 }
 
 ao_poly
 ao_scheme_do_numberp(struct ao_scheme_cons *cons)
 {
+#if defined(AO_SCHEME_FEATURE_BIGINT) || defined(AO_SCHEME_FEATURE_FLOAT)
 	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	switch (ao_scheme_poly_type(ao_scheme_arg(cons, 0))) {
 	case AO_SCHEME_INT:
+#ifdef AO_SCHEME_FEATURE_BIGINT
 	case AO_SCHEME_BIGINT:
+#endif
+#ifdef AO_SCHEME_FEATURE_FLOAT
 	case AO_SCHEME_FLOAT:
+#endif
 		return _ao_scheme_bool_true;
 	default:
 		return _ao_scheme_bool_false;
 	}
+#else
+	return ao_scheme_do_integerp(cons);
+#endif
 }
 
 ao_poly
@@ -1017,6 +1050,8 @@ ao_scheme_do_jiffies_per_second(struct ao_scheme_cons *cons)
 	return (ao_scheme_int_poly(AO_SCHEME_JIFFIES_PER_SECOND));
 }
 
+#ifdef AO_SCHEME_FEATURE_VECTOR
+
 ao_poly
 ao_scheme_do_vector(struct ao_scheme_cons *cons)
 {
@@ -1091,6 +1126,8 @@ ao_scheme_do_vectorp(struct ao_scheme_cons *cons)
 {
 	return ao_scheme_do_typep(AO_SCHEME_VECTOR, cons);
 }
+
+#endif /* AO_SCHEME_FEATURE_VECTOR */
 
 #define AO_SCHEME_BUILTIN_FUNCS
 #include "ao_scheme_builtin.h"

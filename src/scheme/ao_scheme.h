@@ -23,6 +23,9 @@
 
 #include <stdint.h>
 #include <string.h>
+#define AO_SCHEME_BUILTIN_FEATURES
+#include "ao_scheme_builtin.h"
+#undef AO_SCHEME_BUILTIN_FEATURES
 #include <ao_scheme_os.h>
 #ifndef __BYTE_ORDER
 #include <endian.h>
@@ -102,10 +105,25 @@ extern uint8_t		ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribut
 #define AO_SCHEME_LAMBDA	8
 #define AO_SCHEME_STACK		9
 #define AO_SCHEME_BOOL		10
+#ifdef AO_SCHEME_FEATURE_BIGINT
 #define AO_SCHEME_BIGINT	11
-#define AO_SCHEME_FLOAT		12
+#define _AO_SCHEME_BIGINT	AO_SCHEME_BIGINT
+#else
+#define _AO_SCHEME_BIGINT	AO_SCHEME_BOOL
+#endif
+#ifdef AO_SCHEME_FEATURE_FLOAT
+#define AO_SCHEME_FLOAT		(_AO_SCHEME_BIGINT + 1)
+#define _AO_SCHEME_FLOAT	AO_SCHEME_FLOAT
+#else
+#define _AO_SCHEME_FLOAT	_AO_SCHEME_BIGINT
+#endif
+#ifdef AO_SCHEME_FEATURE_VECTOR
 #define AO_SCHEME_VECTOR	13
-#define AO_SCHEME_NUM_TYPE	14
+#define _AO_SCHEME_VECTOR	AO_SCHEME_VECTOR
+#else
+#define _AO_SCHEME_VECTOR	_AO_SCHEME_FLOAT
+#endif
+#define AO_SCHEME_NUM_TYPE	(_AO_SCHEME_VECTOR+1)
 
 /* Leave two bits for types to use as they please */
 #define AO_SCHEME_OTHER_TYPE_MASK	0x3f
@@ -182,25 +200,38 @@ struct ao_scheme_bool {
 	uint16_t		pad;
 };
 
-struct ao_scheme_bigint {
-	uint32_t		value;
-};
 
+#ifdef AO_SCHEME_FEATURE_FLOAT
 struct ao_scheme_float {
 	uint8_t			type;
 	uint8_t			pad1;
 	uint16_t		pad2;
 	float			value;
 };
+#endif
 
+#ifdef AO_SCHEME_FEATURE_VECTOR
 struct ao_scheme_vector {
 	uint8_t			type;
 	uint8_t			pad1;
 	uint16_t		length;
 	ao_poly			vals[];
 };
+#endif
+
+#define AO_SCHEME_MIN_INT	(-(1 << (15 - AO_SCHEME_TYPE_SHIFT)))
+#define AO_SCHEME_MAX_INT	((1 << (15 - AO_SCHEME_TYPE_SHIFT)) - 1)
+
+#ifdef AO_SCHEME_FEATURE_BIGINT
+struct ao_scheme_bigint {
+	uint32_t		value;
+};
+
+#define AO_SCHEME_MIN_BIGINT	(-(1 << 24))
+#define AO_SCHEME_MAX_BIGINT	((1 << 24) - 1)
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
+
 static inline uint32_t
 ao_scheme_int_bigint(int32_t i) {
 	return AO_SCHEME_BIGINT | (i << 8);
@@ -218,12 +249,9 @@ static inlint int32_t
 ao_scheme_bigint_int(uint32_t bi) {
 	return (int32_t) (bi << 8) >> 8;
 }
-#endif
 
-#define AO_SCHEME_MIN_INT	(-(1 << (15 - AO_SCHEME_TYPE_SHIFT)))
-#define AO_SCHEME_MAX_INT	((1 << (15 - AO_SCHEME_TYPE_SHIFT)) - 1)
-#define AO_SCHEME_MIN_BIGINT	(-(1 << 24))
-#define AO_SCHEME_MAX_BIGINT	((1 << 24) - 1)
+#endif	/* __BYTE_ORDER */
+#endif	/* AO_SCHEME_FEATURE_BIGINT */
 
 #define AO_SCHEME_NOT_INTEGER	0x7fffffff
 
@@ -433,6 +461,7 @@ ao_scheme_int_poly(int32_t i)
 	return ((ao_poly) i << 2) | AO_SCHEME_INT;
 }
 
+#ifdef AO_SCHEME_FEATURE_BIGINT
 static inline struct ao_scheme_bigint *
 ao_scheme_poly_bigint(ao_poly poly)
 {
@@ -444,6 +473,7 @@ ao_scheme_bigint_poly(struct ao_scheme_bigint *bi)
 {
 	return ao_scheme_poly(bi, AO_SCHEME_OTHER);
 }
+#endif /* AO_SCHEME_FEATURE_BIGINT */
 
 static inline char *
 ao_scheme_poly_string(ao_poly poly)
@@ -493,6 +523,7 @@ ao_scheme_poly_bool(ao_poly poly)
 	return ao_scheme_ref(poly);
 }
 
+#ifdef AO_SCHEME_FEATURE_FLOAT
 static inline ao_poly
 ao_scheme_float_poly(struct ao_scheme_float *f)
 {
@@ -507,7 +538,9 @@ ao_scheme_poly_float(ao_poly poly)
 
 float
 ao_scheme_poly_number(ao_poly p);
+#endif
 
+#ifdef AO_SCHEME_FEATURE_VECTOR
 static inline ao_poly
 ao_scheme_vector_poly(struct ao_scheme_vector *v)
 {
@@ -519,6 +552,7 @@ ao_scheme_poly_vector(ao_poly poly)
 {
 	return ao_scheme_ref(poly);
 }
+#endif
 
 /* memory functions */
 
@@ -687,6 +721,7 @@ ao_scheme_atom_def(ao_poly atom, ao_poly val);
 void
 ao_scheme_int_write(ao_poly i);
 
+#ifdef AO_SCHEME_FEATURE_BIGINT
 int32_t
 ao_scheme_poly_integer(ao_poly p);
 
@@ -703,6 +738,19 @@ void
 ao_scheme_bigint_write(ao_poly i);
 
 extern const struct ao_scheme_type	ao_scheme_bigint_type;
+
+#else
+
+#define ao_scheme_poly_integer ao_scheme_poly_int
+#define ao_scheme_integer_poly ao_scheme_int_poly
+
+static inline int
+ao_scheme_integer_typep(uint8_t t)
+{
+	return (t == AO_SCHEME_INT);
+}
+
+#endif /* AO_SCHEME_FEATURE_BIGINT */
 
 /* vector */
 
@@ -730,11 +778,14 @@ ao_scheme_vector_to_list(struct ao_scheme_vector *vector);
 extern const struct ao_scheme_type	ao_scheme_vector_type;
 
 /* prim */
-void
-ao_scheme_poly_write(ao_poly p);
+void (*ao_scheme_poly_write_func(ao_poly p))(ao_poly p);
+void (*ao_scheme_poly_display_func(ao_poly p))(ao_poly p);
 
-void
-ao_scheme_poly_display(ao_poly p);
+static inline void
+ao_scheme_poly_write(ao_poly p) { (*ao_scheme_poly_write_func(p))(p); }
+
+static inline void
+ao_scheme_poly_display(ao_poly p) { (*ao_scheme_poly_display_func(p))(p); }
 
 int
 ao_scheme_poly_mark(ao_poly p, uint8_t note_cons);
@@ -758,6 +809,7 @@ ao_poly
 ao_scheme_set_cond(struct ao_scheme_cons *cons);
 
 /* float */
+#ifdef AO_SCHEME_FEATURE_FLOAT
 extern const struct ao_scheme_type ao_scheme_float_type;
 
 void
@@ -765,7 +817,9 @@ ao_scheme_float_write(ao_poly p);
 
 ao_poly
 ao_scheme_float_get(float value);
+#endif
 
+#ifdef AO_SCHEME_FEATURE_FLOAT
 static inline uint8_t
 ao_scheme_number_typep(uint8_t t)
 {
@@ -774,6 +828,10 @@ ao_scheme_number_typep(uint8_t t)
 
 float
 ao_scheme_poly_number(ao_poly p);
+#else
+#define ao_scheme_number_typep ao_scheme_integer_typep
+#define ao_scheme_poly_number ao_scheme_poly_integer
+#endif
 
 /* builtin */
 void

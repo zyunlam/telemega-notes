@@ -15,6 +15,8 @@
 #include "ao_scheme.h"
 #include <math.h>
 
+#ifdef AO_SCHEME_FEATURE_FLOAT
+
 static void float_mark(void *addr)
 {
 	(void) addr;
@@ -150,3 +152,4 @@ ao_scheme_do_sqrt(struct ao_scheme_cons *cons)
 		return ao_scheme_error(AO_SCHEME_INVALID, "%s: non-numeric", ao_scheme_poly_atom(_ao_scheme_atom_sqrt)->name);
 	return ao_scheme_float_get(sqrtf(ao_scheme_poly_number(value)));
 }
+#endif

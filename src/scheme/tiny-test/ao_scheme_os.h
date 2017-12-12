@@ -22,7 +22,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define AO_SCHEME_POOL_TOTAL	32768
+#undef AO_SCHEME_FEATURE_FLOAT
+#undef AO_SCHEME_FEATURE_VECTOR
+#undef AO_SCHEME_FEATURE_QUASI
+#undef AO_SCHEME_FEATURE_BIGINT
+
+#define AO_SCHEME_POOL_TOTAL	4096
 #define AO_SCHEME_SAVE		1
 
 extern int ao_scheme_getc(void);

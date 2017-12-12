@@ -21,6 +21,8 @@ ao_scheme_int_write(ao_poly p)
 	printf("%d", i);
 }
 
+#ifdef AO_SCHEME_FEATURE_BIGINT
+
 int32_t
 ao_scheme_poly_integer(ao_poly p)
 {
@@ -77,3 +79,4 @@ ao_scheme_bigint_write(ao_poly p)
 
 	printf("%d", ao_scheme_bigint_int(bi->value));
 }
+#endif /* AO_SCHEME_FEATURE_BIGINT */

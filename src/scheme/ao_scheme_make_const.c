@@ -17,6 +17,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <stdbool.h>
 
 static struct ao_scheme_builtin *
 ao_scheme_make_builtin(enum ao_scheme_builtin_id func, int args) {
@@ -29,15 +30,25 @@ ao_scheme_make_builtin(enum ao_scheme_builtin_id func, int args) {
 }
 
 struct builtin_func {
+	char	*feature;
 	char	*name;
 	int	args;
 	enum ao_scheme_builtin_id	func;
 };
 
+struct builtin_atom {
+	char	*feature;
+	char	*name;
+};
+
 #define AO_SCHEME_BUILTIN_CONSTS
+#define AO_SCHEME_BUILTIN_ATOM_NAMES
+
 #include "ao_scheme_builtin.h"
 
-#define N_FUNC (sizeof funcs / sizeof funcs[0])
+#define N_FUNC		(sizeof funcs / sizeof funcs[0])
+
+#define N_ATOM		(sizeof atoms / sizeof atoms[0])
 
 struct ao_scheme_frame	*globals;
 
@@ -228,6 +239,36 @@ ao_has_macro(ao_poly p)
 	return p;
 }
 
+static struct ao_scheme_builtin *
+ao_scheme_get_builtin(ao_poly p)
+{
+	if (ao_scheme_poly_type(p) == AO_SCHEME_BUILTIN)
+		return ao_scheme_poly_builtin(p);
+	return NULL;
+}
+
+struct seen_builtin {
+	struct seen_builtin 		*next;
+	struct ao_scheme_builtin	*builtin;
+};
+
+static struct seen_builtin *seen_builtins;
+
+static int
+ao_scheme_seen_builtin(struct ao_scheme_builtin *b)
+{
+	struct seen_builtin	*s;
+
+	for (s = seen_builtins; s; s = s->next)
+		if (s->builtin == b)
+			return 1;
+	s = malloc (sizeof (struct seen_builtin));
+	s->builtin = b;
+	s->next = seen_builtins;
+	seen_builtins = s;
+	return 0;
+}
+
 int
 ao_scheme_read_eval_abort(void)
 {
@@ -248,6 +289,47 @@ ao_scheme_read_eval_abort(void)
 static FILE	*in;
 static FILE	*out;
 
+struct feature {
+	struct feature	*next;
+	char		name[];
+};
+
+static struct feature *enable;
+static struct feature *disable;
+
+void
+ao_scheme_add_feature(struct feature **list, char *name)
+{
+	struct feature *feature = malloc (sizeof (struct feature) + strlen(name) + 1);
+	strcpy(feature->name, name);
+	feature->next = *list;
+	*list = feature;
+}
+
+bool
+ao_scheme_has_feature(struct feature *list, char *name)
+{
+	while (list) {
+		if (!strcmp(list->name, name))
+			return true;
+		list = list->next;
+	}
+	return false;
+}
+
+void
+ao_scheme_add_features(struct feature **list, char *names)
+{
+	char	*saveptr = NULL;
+	char	*name;
+
+	while ((name = strtok_r(names, ",", &saveptr)) != NULL) {
+		names = NULL;
+		if (!ao_scheme_has_feature(*list, name))
+			ao_scheme_add_feature(list, name);
+	}
+}
+
 int
 ao_scheme_getc(void)
 {
@@ -256,19 +338,21 @@ ao_scheme_getc(void)
 
 static const struct option options[] = {
 	{ .name = "out", .has_arg = 1, .val = 'o' },
+	{ .name = "disable", .has_arg = 1, .val = 'd' },
+	{ .name = "enable", .has_arg = 1, .val = 'e' },
 	{ 0, 0, 0, 0 }
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--out=<output>] [input]\n", program);
+	fprintf(stderr, "usage: %s [--out=<output>] [--disable={feature,...}] [--enable={feature,...} [input]\n", program);
 	exit(1);
 }
 
 int
 main(int argc, char **argv)
 {
-	int	f, o;
+	int	f, o, an;
 	ao_poly	val;
 	struct ao_scheme_atom	*a;
 	struct ao_scheme_builtin	*b;
@@ -276,14 +360,22 @@ main(int argc, char **argv)
 	char	*out_name = NULL;
 	int	c;
 	enum ao_scheme_builtin_id	prev_func;
+	enum ao_scheme_builtin_id	target_func;
+	enum ao_scheme_builtin_id	func_map[_builtin_last];
 
 	in = stdin;
 	out = stdout;
 
-	while ((c = getopt_long(argc, argv, "o:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "o:d:e:", options, NULL)) != -1) {
 		switch (c) {
 		case 'o':
 			out_name = optarg;
+			break;
+		case 'd':
+			ao_scheme_add_features(&disable, optarg);
+			break;
+		case 'e':
+			ao_scheme_add_features(&enable, optarg);
 			break;
 		default:
 			usage(argv[0]);
@@ -298,21 +390,34 @@ main(int argc, char **argv)
 	ao_scheme_bool_get(1);
 
 	prev_func = _builtin_last;
+	target_func = 0;
 	for (f = 0; f < (int) N_FUNC; f++) {
-		if (funcs[f].func != prev_func)
-			b = ao_scheme_make_builtin(funcs[f].func, funcs[f].args);
-		a = ao_scheme_atom_intern(funcs[f].name);
-		ao_scheme_atom_def(ao_scheme_atom_poly(a),
-				 ao_scheme_builtin_poly(b));
+		if (ao_scheme_has_feature(enable, funcs[f].feature) || !ao_scheme_has_feature(disable, funcs[f].feature)) {
+			if (funcs[f].func != prev_func) {
+				prev_func = funcs[f].func;
+				b = ao_scheme_make_builtin(prev_func, funcs[f].args);
+
+				/* Target may have only a subset of
+				 * the enum values; record what those
+				 * values will be here. This obviously
+				 * depends on the functions in the
+				 * array being in the same order as
+				 * the enumeration; which
+				 * ao_scheme_make_builtin ensures.
+				 */
+				func_map[prev_func] = target_func++;
+			}
+			a = ao_scheme_atom_intern(funcs[f].name);
+			ao_scheme_atom_def(ao_scheme_atom_poly(a),
+					   ao_scheme_builtin_poly(b));
+		}
 	}
 
-	/* end of file value */
-	a = ao_scheme_atom_intern("eof");
-	ao_scheme_atom_def(ao_scheme_atom_poly(a),
-			 ao_scheme_atom_poly(a));
-
-	/* 'else' */
-	a = ao_scheme_atom_intern("else");
+	/* atoms */
+	for (an = 0; an < (int) N_ATOM; an++) {
+		if (ao_scheme_has_feature(enable, atoms[an].feature) || !ao_scheme_has_feature(disable, atoms[an].feature))
+			a = ao_scheme_atom_intern((char *) atoms[an].name);
+	}
 
 	if (argv[optind]){
 		in = fopen(argv[optind], "r");
@@ -331,6 +436,7 @@ main(int argc, char **argv)
 
 	for (f = 0; f < ao_scheme_frame_global->num; f++) {
 		struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(ao_scheme_frame_global->vals);
+
 		val = ao_has_macro(vals->vals[f].val);
 		if (val != AO_SCHEME_NIL) {
 			printf("error: function %s contains unresolved macro: ",
@@ -338,6 +444,13 @@ main(int argc, char **argv)
 			ao_scheme_poly_write(val);
 			printf("\n");
 			exit(1);
+		}
+
+		/* Remap builtin enum values to match target set */
+		b = ao_scheme_get_builtin(vals->vals[f].val);
+		if (b != NULL) {
+			if (!ao_scheme_seen_builtin(b))
+				b->func = func_map[b->func];
 		}
 	}
 

@@ -805,9 +805,3 @@
   )
 
 (case 12 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else"))
-
-;(define number->string (lambda (arg . opt)
-;			      (let ((base (if (null? opt) 10 (car opt)))
-					;
-;
-				

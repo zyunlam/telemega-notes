@@ -62,7 +62,7 @@ static const uint16_t	lex_classes[128] = {
  	PRINTABLE|SPECIAL,	/* ) */
  	PRINTABLE,		/* * */
  	PRINTABLE|SIGN,		/* + */
- 	PRINTABLE|SPECIAL,	/* , */
+ 	PRINTABLE|SPECIAL_QUASI,	/* , */
  	PRINTABLE|SIGN,		/* - */
  	PRINTABLE|DOTC|FLOATC,	/* . */
  	PRINTABLE,		/* / */
@@ -114,7 +114,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  ] */
 	PRINTABLE,		/*  ^ */
 	PRINTABLE,		/*  _ */
-  	PRINTABLE|SPECIAL,	/*  ` */
+  	PRINTABLE|SPECIAL_QUASI,	/*  ` */
 	PRINTABLE,		/*  a */
 	PRINTABLE,		/*  b */
 	PRINTABLE,		/*  c */
@@ -244,12 +244,13 @@ lex_quoted(void)
 	}
 }
 
+#ifndef AO_SCHEME_TOKEN_MAX
 #define AO_SCHEME_TOKEN_MAX	128
+#endif
 
 static char	token_string[AO_SCHEME_TOKEN_MAX];
 static int32_t	token_int;
 static int	token_len;
-static float	token_float;
 
 static inline void add_token(int c) {
 	if (c && token_len < AO_SCHEME_TOKEN_MAX - 1)
@@ -265,6 +266,9 @@ static inline void end_token(void) {
 	token_string[token_len] = '\0';
 }
 
+#ifdef AO_SCHEME_FEATURE_FLOAT
+static float	token_float;
+
 struct namedfloat {
 	const char	*name;
 	float		value;
@@ -278,6 +282,7 @@ static const struct namedfloat namedfloats[] = {
 };
 
 #define NUM_NAMED_FLOATS	(sizeof namedfloats / sizeof namedfloats[0])
+#endif
 
 static int
 _lex(void)
@@ -315,6 +320,7 @@ _lex(void)
 				return QUOTE;
 			case '.':
 				return DOT;
+#ifdef AO_SCHEME_FEATURE_QUASI
 			case '`':
 				return QUASIQUOTE;
 			case ',':
@@ -327,6 +333,7 @@ _lex(void)
 					lex_unget(c);
 					return UNQUOTE;
 				}
+#endif
 			}
 		}
 		if (lex_class & POUND) {
@@ -340,8 +347,10 @@ _lex(void)
 				add_token(c);
 				end_token();
 				return BOOL;
+#ifdef AO_SCHEME_FEATURE_VECTOR
 			case '(':
 				return OPEN_VECTOR;
+#endif
 			case '\\':
 				for (;;) {
 					int alphabetic;
@@ -393,23 +402,23 @@ _lex(void)
 			}
 		}
 		if (lex_class & PRINTABLE) {
-			int	isfloat;
-			int	hasdigit;
-			int	isneg;
-			int	isint;
-			int	epos;
+#ifdef AO_SCHEME_FEATURE_FLOAT
+			int	isfloat = 1;
+			int	epos = 0;
+#endif
+			int	hasdigit = 0;
+			int	isneg = 0;
+			int	isint = 1;
 
-			isfloat = 1;
-			isint = 1;
-			hasdigit = 0;
 			token_int = 0;
-			isneg = 0;
-			epos = 0;
 			for (;;) {
 				if (!(lex_class & NUMBER)) {
 					isint = 0;
+#ifdef AO_SCHEME_FEATURE_FLOAT
 					isfloat = 0;
+#endif
 				} else {
+#ifdef AO_SCHEME_FEATURE_FLOAT
 					if (!(lex_class & INTEGER))
 						isint = 0;
  					if (token_len != epos &&
@@ -418,8 +427,10 @@ _lex(void)
 						isint = 0;
 						isfloat = 0;
 					}
+#endif
 					if (c == '-')
 						isneg = 1;
+#ifdef AO_SCHEME_FEATURE_FLOAT
 					if (c == '.' && epos != 0)
 						isfloat = 0;
 					if (c == 'e' || c == 'E') {
@@ -428,6 +439,7 @@ _lex(void)
 						else
 							epos = token_len + 1;
 					}
+#endif
 					if (lex_class & DIGIT) {
 						hasdigit = 1;
 						if (isint)
@@ -436,8 +448,14 @@ _lex(void)
 				}
 				add_token (c);
 				c = lexc ();
-				if ((lex_class & (NOTNAME)) && (c != '.' || !isfloat)) {
+				if ((lex_class & (NOTNAME))
+#ifdef AO_SCHEME_FEATURE_FLOAT
+				    && (c != '.' || !isfloat)
+#endif
+					) {
+#ifdef AO_SCHEME_FEATURE_FLOAT
 					unsigned int u;
+#endif
 //					if (lex_class & ENDOFFILE)
 //						clearerr (f);
 					lex_unget(c);
@@ -447,6 +465,7 @@ _lex(void)
 							token_int = -token_int;
 						return NUM;
 					}
+#ifdef AO_SCHEME_FEATURE_FLOAT
 					if (isfloat && hasdigit) {
 						token_float = strtof(token_string, NULL);
 						return FLOAT;
@@ -456,6 +475,7 @@ _lex(void)
 							token_float = namedfloats[u].value;
 							return FLOAT;
 						}
+#endif
 					return NAME;
 				}
 			}
@@ -525,6 +545,12 @@ pop_read_stack(void)
 	return read_state;
 }
 
+#ifdef AO_SCHEME_FEATURE_VECTOR
+#define is_open(t) ((t) == OPEN || (t) == OPEN_VECTOR)
+#else
+#define is_open(t) ((t) == OPEN)
+#endif
+
 ao_poly
 ao_scheme_read(void)
 {
@@ -538,9 +564,11 @@ ao_scheme_read(void)
 	ao_scheme_read_cons = ao_scheme_read_cons_tail = ao_scheme_read_stack = 0;
 	for (;;) {
 		parse_token = lex();
-		while (parse_token == OPEN || parse_token == OPEN_VECTOR) {
+		while (is_open(parse_token)) {
+#ifdef AO_SCHEME_FEATURE_VECTOR
 			if (parse_token == OPEN_VECTOR)
 				read_state |= READ_SAW_VECTOR;
+#endif
 			if (!push_read_stack(read_state))
 				return AO_SCHEME_NIL;
 			ao_scheme_read_list++;
@@ -565,9 +593,11 @@ ao_scheme_read(void)
 		case NUM:
 			v = ao_scheme_integer_poly(token_int);
 			break;
+#ifdef AO_SCHEME_FEATURE_FLOAT
 		case FLOAT:
 			v = ao_scheme_float_get(token_float);
 			break;
+#endif
 		case BOOL:
 			if (token_string[0] == 't')
 				v = _ao_scheme_bool_true;
@@ -582,9 +612,11 @@ ao_scheme_read(void)
 				v = AO_SCHEME_NIL;
 			break;
 		case QUOTE:
+#ifdef AO_SCHEME_FEATURE_QUASI
 		case QUASIQUOTE:
 		case UNQUOTE:
 		case UNQUOTE_SPLICING:
+#endif
 			if (!push_read_stack(read_state))
 				return AO_SCHEME_NIL;
 			ao_scheme_read_list++;
@@ -593,6 +625,7 @@ ao_scheme_read(void)
 			case QUOTE:
 				v = _ao_scheme_atom_quote;
 				break;
+#ifdef AO_SCHEME_FEATURE_QUASI
 			case QUASIQUOTE:
 				v = _ao_scheme_atom_quasiquote;
 				break;
@@ -602,6 +635,7 @@ ao_scheme_read(void)
 			case UNQUOTE_SPLICING:
 				v = _ao_scheme_atom_unquote2dsplicing;
 				break;
+#endif
 			}
 			break;
 		case CLOSE:
@@ -612,8 +646,10 @@ ao_scheme_read(void)
 			v = ao_scheme_cons_poly(ao_scheme_read_cons);
 			--ao_scheme_read_list;
 			read_state = pop_read_stack();
+#ifdef AO_SCHEME_FEATURE_VECTOR
 			if (read_state & READ_SAW_VECTOR)
 				v = ao_scheme_vector_poly(ao_scheme_list_to_vector(ao_scheme_poly_cons(v)));
+#endif
 			break;
 		case DOT:
 			if (!ao_scheme_read_list) {
