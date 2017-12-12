@@ -1,3 +1,116 @@
+altos (1.8.3-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * be more aggressive about removing and ignoring .mdwn files
+  * tweak Releasing based on 1.8.2 release experience
+  * don't exit on dfu-util errors, it's not reliable about reporting success
+  * handle repeated invocations without failing as often
+  * moving to TeleMega v3.0 by default
+  * TeleMega v3.0 turnon scripts
+  * take telescience out of the routine builds
+  * TeleMega default is now v3.0
+  * releasing 1.8.3
+
+  [ Keith Packard ]
+  * altoslib: Add tilt and pyro data to CSV export
+  * altosuilib: Don't drain voice when terminating display
+  * altoslib,altosuilib,altosui: log_format/device_type TeleGPS selects stateless
+  * altos: Allow pyro config name to end with newline, not just space/tab
+  * altoslib: Allow early bail-out on bad telemetry CRC
+  * altosuilib: Show raw tick values in graph and info table
+  * altoslib: Add user-selectable filter width for data smoothing
+  * altoslib: Adapt KML output to make TRA record people happier
+  * altosuilib: Add 'show marker' button to graphs
+  * altoslib: Missing file for filter additions.
+  * Set version to 1.8.2.1
+  * altos: Stop storing pyro fired status in config block
+  * altos: Add MPU9250 driver (accel/gyro only for now)
+  * altoslib: Allow gps time later than requested if it's first
+  * altoslib: Don't crash if there's no GPS coord to write KML
+  * altoslib: Fix time series filter window computation
+  * altos: Add MPU9250 support to self test and data
+  * altoslib: Report un-adjusted ground accel in idle IMU monitor
+  * altoslib: Save separate config for local and remote. Use in idle
+  * altoslib: Move temp GPS API from cal_data to data_listener
+  * altos: Remove cross-block storage I/O on cc1111
+  * altos: Define AO_LOG_FORMAT in */ao_pins.h. Use in ao_cmd.c
+  * altos: Share common logging code. Deal with corrupt initial flight records
+  * altos: whitespace cleanup in ao_adc_stm.c
+  * altos/stm: Add AO_EXTI_MODE_PULL_NONE
+  * altosuilib: New line styles and colors for graphs. Selectable line width
+  * altos/test: Adapt flight test to int16_t flight number type
+  * altoslib: Don't write KML record when height data is missing
+  * altoslib: Remove spurious semicolon in AltosReplayReader.java
+  * altoslib: Improve EEprom download
+  * altos: Fix inverted test for corrupt flight log
+  * altos: Fix new GCC warnings
+  * doc: Update for 1.8.3
+  * altos/lisp: Add non-cons cdr support
+  * altos/lisp: Add scheme-style bools (#t and #f)
+  * altos/lisp: Add 'else' sematics to cond
+  * altos/lisp: More schemisms
+  * altos/test: Get lisp test building using Makefile-inc
+  * altos/lisp: Lots more scheme bits
+  * altos/test: More lisp test Makefile fixes
+  * altos/lisp: Generate built-in lambda atoms for const creation
+  * altos/lisp: Character consts. String and assoc builtins.
+  * altos/lisp: Add apply
+  * altos/lisp: Finish first pass through r7rs
+  * altos/test: Add jiffy funcs to lisp test
+  * altos/cortexelf-v1: Make lisp compile again
+  * altos/lisp: Add 'big' ints -- 24 bits wide
+  * altos/lisp: Fix some scheme compat issues
+  * altos/lisp: Add floats
+  * altos/test: Update to build altos lisp test app
+  * altos/lisp: Rename progn to begin
+  * altos/lisp: Add quasiquote
+  * altos/lisp: Fix pairp builtin
+  * altos/lisp: return from unmatched cond is #f, not nil
+  * altos/lisp: Make let distinct from let*
+  * altos/lisp: Split out frame vals from frame struct
+  * altos/lisp: split set/def. Add def support to lambdas
+  * altos/kernel: MPU9250 support
+  * altos: Add TeleMega v3.0
+  * altos: Build TeleMega v3.0 by default
+  * altoslib: Add support for TeleMega v3.0 log files
+  * altos/lisp: Overflow int computations to float
+  * altos/lisp: Convert more builtin lisp code to scheme format
+  * altos/lisp: use strtof instead of atof
+  * altos/lisp: Split out read debug, add memory validation
+  * altos/lisp: Check only cdr base type when moving cons cells
+  * altos/lisp: Fix stash usage across frame allocation
+  * altos/lisp: Switch to scheme formal syntax for varargs
+  * altos/scheme: Rename to 'scheme', clean up build
+  * altos/scheme: Move scheme test program to scheme sub-directory
+  * altos/scheme: Add explicit dependency on ao_scheme_builtin.h for ao_scheme_make_const
+  * altos/cortexelf-v1: Adapt to lisp->scheme name change
+  * altos/drivers: Start adding defines to get mag data out of MPU9250
+  * altos/scheme: Let readline know if there's a list in progress
+  * altoslib: Fix 8 to 12 bit conversion for Mega pyro voltage data
+  * altos/scheme: Fix name of constant scheme file
+  * altos/scheme: Add vectors
+  * altos/scheme: Avoid crashing with non-list in length
+  * altos/scheme: Add a bunch of string and vector builtins
+  * altos/scheme: Use 64-bit ints to track memory allocation stats
+  * altos/scheme: add list-copy
+  * altos/scheme: Stash cons across value allocation in compare
+  * altos/scheme: Make eqv? work for numbers and strings
+  * altos/scheme: Make test scheme app heap maximum size
+  * altos/scheme: Add Makefile for scheme test app
+  * altos/lambdakey-v1.0: Switch to newlib, get things compiling again
+  * altos: Add scheme for stm discovery board demo
+  * altos: Allow building with newlib + avr stdio on ARM
+  * altos/scheme: Allow ao_scheme_read_eval_print to be restarted
+  * altos/drivers: Hook up mag sensor for MPU9250
+  * doc: Note TeleMega v3.0 support in 1.8.3 relnotes
+  * Bump to version 1.8.3
+  * altos: Remove more software for hardware prototypes
+  * altos: Actually store current MPU9250 data in data ring
+  * altoslib: Keep old GPS values when updating data
+  * doc: Update release notes and docinfo for 1.8.3
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 11 Dec 2017 21:40:10 -0700
+
 altos (1.8.2-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
