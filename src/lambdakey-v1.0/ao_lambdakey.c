@@ -29,13 +29,11 @@ void main(void)
 {
 	ao_led_init(LEDS_AVAILABLE);
 	ao_clock_init();
-	ao_task_init();
 	ao_timer_init();
-	ao_dma_init();
 	ao_usb_init();
 	ao_cmd_init();
 	ao_cmd_register(blink_cmds);
-	ao_start_scheduler();
+	ao_cmd();
 }
 
 

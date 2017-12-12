@@ -1,0 +1,389 @@
+;
+; Copyright © 2016 Keith Packard <keithp@keithp.com>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation, either version 2 of the License, or
+; (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General Public License for more details.
+;
+; Lisp code placed in ROM
+
+					; return a list containing all of the arguments
+(def (quote list) (lambda l l))
+
+(def (quote def!)
+     (macro (a b)
+	    (list
+	     def
+	     (list quote a)
+	     b)
+	    )
+     )
+
+(begin
+ (def! append
+   (lambda args
+	  (def! a-l
+	    (lambda (a b)
+	      (cond ((null? a) b)
+		    (else (cons (car a) (a-l (cdr a) b)))
+		    )
+	      )
+	    )
+	    
+	  (def! a-ls
+	    (lambda (l)
+	      (cond ((null? l) l)
+		    ((null? (cdr l)) (car l))
+		    (else (a-l (car l) (a-ls (cdr l))))
+		    )
+	      )
+	    )
+	  (a-ls args)
+	  )
+   )
+ 'append)
+
+(append '(a b c) '(d e f) '(g h i))
+
+					;
+					; Define a variable without returning the value
+					; Useful when defining functions to avoid
+					; having lots of output generated.
+					;
+					; Also accepts the alternate
+					; form for defining lambdas of
+					; (define (name a y z) sexprs ...) 
+					;
+
+(begin
+ (def (quote define)
+   (macro (a . b)
+					; check for alternate lambda definition form
+
+	  (cond ((list? a)
+		 (set! b
+		       (cons lambda (cons (cdr a) b)))
+		 (set! a (car a))
+		 )
+		(else
+		 (set! b (car b))
+		 )
+		)
+	  (cons begin
+		(cons
+		 (cons def
+		       (cons (cons quote (cons a '()))
+			     (cons b '())
+			     )
+		       )
+		 (cons
+		  (cons quote (cons a '()))
+		  '())
+		 )
+		)
+	  )
+   )
+ 'define
+ )
+
+					; basic list accessors
+
+(define (caar l) (car (car l)))
+
+(define (cadr l) (car (cdr l)))
+
+(define (cdar l) (cdr (car l)))
+
+(define (caddr l) (car (cdr (cdr l))))
+
+					; (if <condition> <if-true>)
+					; (if <condition> <if-true> <if-false)
+
+(define if
+  (macro (test . args)
+    (cond ((null? (cdr args))
+	   (list cond (list test (car args)))
+		)
+	  (else
+	   (list cond
+		 (list test (car args))
+		 (list 'else (cadr args))
+		 )
+	   )
+	  )
+    )
+  )
+
+(if (> 3 2) 'yes)
+(if (> 3 2) 'yes 'no)
+(if (> 2 3) 'no 'yes)
+(if (> 2 3) 'no)
+
+					; simple math operators
+
+(define zero? (macro (value) (list eqv? value 0)))
+
+(zero? 1)
+(zero? 0)
+(zero? "hello")
+
+(define positive? (macro (value) (list > value 0)))
+
+(positive? 12)
+(positive? -12)
+
+(define negative? (macro (value) (list < value 0)))
+
+(negative? 12)
+(negative? -12)
+
+(define (abs a) (if (>= a 0) a (- a)))
+
+(abs 12)
+(abs -12)
+
+(define max (lambda (a . b)
+		   (while (not (null? b))
+		     (cond ((< a (car b))
+			    (set! a (car b)))
+			   )
+		     (set! b (cdr b))
+		     )
+		   a)
+  )
+
+(max 1 2 3)
+(max 3 2 1)
+
+(define min (lambda (a . b)
+		   (while (not (null? b))
+		     (cond ((> a (car b))
+			    (set! a (car b)))
+			   )
+		     (set! b (cdr b))
+		     )
+		   a)
+  )
+
+(min 1 2 3)
+(min 3 2 1)
+
+(define (even? a) (zero? (% a 2)))
+
+(even? 2)
+(even? -2)
+(even? 3)
+(even? -1)
+
+(define (odd? a) (not (even? a)))
+
+(odd? 2)
+(odd? -2)
+(odd? 3)
+(odd? -1)
+
+
+(define (list-tail a b)
+  (if (zero? b)
+      a
+    (list-tail (cdr a (- b 1)))
+    )
+  )
+
+(define (list-ref a b)
+  (car (list-tail a b))
+  )
+
+(define (list-tail a b)
+  (if (zero? b)
+      a
+    (list-tail (cdr a) (- b 1))))
+
+(list-tail '(1 2 3) 2)
+
+(define (list-ref a b) (car (list-tail a b)))
+
+(list-ref '(1 2 3) 2)
+    
+
+					; define a set of local
+					; variables one at a time and
+					; then evaluate a list of
+					; sexprs
+					;
+					; (let* (var-defines) sexprs)
+					;
+					; where var-defines are either
+					;
+					; (name value)
+					;
+					; or
+					;
+					; (name)
+					;
+					; e.g.
+					;
+					; (let* ((x 1) (y)) (set! y (+ x 1)) y)
+
+(define let*
+  (macro (a . b)
+
+					;
+					; make the list of names in the let
+					;
+
+	 (define (_n a)
+	   (cond ((not (null? a))
+		  (cons (car (car a))
+			(_n (cdr a))))
+		 (else ())
+		 )
+	   )
+
+					; the set of expressions is
+					; the list of set expressions
+					; pre-pended to the
+					; expressions to evaluate
+
+	 (define (_v a b)
+	   (cond ((null? a) b)		 (else
+		  (cons
+		   (list set
+			 (list quote
+			       (car (car a))
+			       )
+			 (cond ((null? (cdr (car a))) ())
+			       (else (cadr (car a))))
+			 )
+		   (_v (cdr a) b)
+		   )
+		  )
+		 )
+	   )
+
+					; the parameters to the lambda is a list
+					; of nils of the right length
+
+	 (define (_z a)
+	   (cond ((null? a) ())
+		 (else (cons () (_z (cdr a))))
+		 )
+	   )
+					; build the lambda.
+
+	 (cons (cons lambda (cons (_n a) (_v a b))) (_z a))
+	 )
+     )
+
+(let* ((a 1) (y a)) (+ a y))
+
+(define let let*)
+					; recursive equality
+
+(define (equal? a b)
+  (cond ((eq? a b) #t)
+	((pair? a)
+	 (cond ((pair? b)
+		(cond ((equal? (car a) (car b))
+		       (equal? (cdr a) (cdr b)))
+		      )
+		)
+	       )
+	 )
+	)
+  )
+
+(equal? '(a b c) '(a b c))
+(equal? '(a b c) '(a b b))
+
+(define member (lambda (obj a . test?)
+		      (cond ((null? a)
+			     #f
+			     )
+			    (else
+			     (if (null? test?) (set! test? equal?) (set! test? (car test?)))
+			     (if (test? obj (car a))
+				 a
+			       (member obj (cdr a) test?))
+			     )
+			    )
+		      )
+  )
+
+(member '(2) '((1) (2) (3)))
+
+(member '(4) '((1) (2) (3)))
+
+(define (memq obj a) (member obj a eq?))
+
+(memq 2 '(1 2 3))
+
+(memq 4 '(1 2 3))
+
+(memq '(2) '((1) (2) (3)))
+
+(define (_assoc a b t?)
+  (if (null? b)
+      #f
+    (if (t? a (caar b))
+	(car b)
+      (_assoc a (cdr b) t?)
+      )
+    )
+  )
+
+(define (assq a b) (_assoc a b eq?))
+(define (assoc a b) (_assoc a b equal?))
+
+(assq 'a '((a 1) (b 2) (c 3)))
+(assoc '(c) '((a 1) (b 2) ((c) 3)))
+
+(define string (lambda a (list->string a)))
+
+(display "apply\n")
+(apply cons '(a b))
+
+(define map
+  (lambda (a . b)
+	 (define (args b)
+	   (cond ((null? b) ())
+		 (else
+		  (cons (caar b) (args (cdr b)))
+		  )
+		 )
+	   )
+	 (define (next b)
+	   (cond ((null? b) ())
+		 (else
+		  (cons (cdr (car b)) (next (cdr b)))
+		  )
+		 )
+	   )
+	 (define (domap b)
+	   (cond ((null? (car b)) ())
+		 (else
+		  (cons (apply a (args b)) (domap (next b)))
+		  )
+		 )
+	   )
+	 (domap b)
+	 )
+  )
+
+(map cadr '((a b) (d e) (g h)))
+
+(define for-each (lambda (a . b)
+			(apply map a b)
+			#t))
+
+(for-each display '("hello" " " "world" "\n"))
+
+(define (newline) (write-char #\newline))
+
+(newline)
