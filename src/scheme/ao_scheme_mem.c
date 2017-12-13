@@ -41,6 +41,36 @@ uint8_t	ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribute__((ali
 #define DBG_MEM_STATS	DBG_MEM
 #endif
 
+#define DBG_MEM_STACK	0
+#if DBG_MEM_STACK
+char	*mem_collect_stack;
+int64_t	mem_collect_max_depth;
+
+static void
+ao_scheme_check_stack(void)
+{
+	char	x;
+	int64_t	depth;
+
+	depth = mem_collect_stack - &x;
+	if (depth > mem_collect_max_depth)
+		mem_collect_max_depth = depth;
+}
+
+static void
+_ao_scheme_reset_stack(char *x)
+{
+	mem_collect_stack = x;
+//	mem_collect_max_depth = 0;
+}
+#define ao_scheme_declare_stack	char x;
+#define ao_scheme_reset_stack() _ao_scheme_reset_stack(&x)
+#else
+#define ao_scheme_check_stack()
+#define ao_scheme_declare_stack
+#define ao_scheme_reset_stack()
+#endif
+
 #if DBG_MEM
 int dbg_move_depth;
 int dbg_mem = DBG_MEM_START;
@@ -281,6 +311,7 @@ static inline uint16_t pool_offset(void *addr) {
 static inline void mark(uint8_t *tag, int offset) {
 	int	byte = offset >> 5;
 	int	bit = (offset >> 2) & 7;
+	ao_scheme_check_stack();
 	tag[byte] |= (1 << bit);
 }
 
@@ -303,7 +334,7 @@ static inline int limit(int offset) {
 	return min(AO_SCHEME_POOL, max(offset, 0));
 }
 
-static void
+static inline void
 note_cons(uint16_t offset)
 {
 	MDBG_MOVE("note cons %d\n", offset);
@@ -335,6 +366,7 @@ static void
 note_chunk(uint16_t offset, uint16_t size)
 {
 	int l;
+	int end;
 
 	if (offset < chunk_low || chunk_high <= offset)
 		return;
@@ -357,7 +389,7 @@ note_chunk(uint16_t offset, uint16_t size)
 #endif
 
 	/* Shuffle existing entries right */
-	int end = min(AO_SCHEME_NCHUNK, chunk_last + 1);
+	end = min(AO_SCHEME_NCHUNK, chunk_last + 1);
 
 	memmove(&ao_scheme_chunk[l+1],
 		&ao_scheme_chunk[l],
@@ -477,6 +509,12 @@ static const struct ao_scheme_type * const ao_scheme_types[AO_SCHEME_NUM_TYPE] =
 };
 
 static int
+ao_scheme_mark(const struct ao_scheme_type *type, void *addr);
+
+static int
+ao_scheme_move(const struct ao_scheme_type *type, void **ref);
+
+static int
 ao_scheme_mark_ref(const struct ao_scheme_type *type, void **ref)
 {
 	return ao_scheme_mark(type, *ref);
@@ -499,6 +537,7 @@ int ao_scheme_last_top;
 int
 ao_scheme_collect(uint8_t style)
 {
+	ao_scheme_declare_stack
 	int	i;
 	int	top;
 #if DBG_MEM_STATS
@@ -510,6 +549,8 @@ ao_scheme_collect(uint8_t style)
 	MDBG_MOVE("collect %d\n", ao_scheme_collects[style]);
 #endif
 	MDBG_DO(ao_scheme_frame_write(ao_scheme_frame_poly(ao_scheme_frame_global)));
+
+	ao_scheme_reset_stack();
 
 	/* The first time through, we're doing a full collect */
 	if (ao_scheme_last_top == 0)
@@ -628,6 +669,9 @@ ao_scheme_collect(uint8_t style)
 	MDBG_DO(memset(ao_scheme_chunk, '\0', sizeof (ao_scheme_chunk));
 		walk(ao_scheme_mark_ref, ao_scheme_poly_mark_ref));
 
+#if DBG_MEM_STACK
+	fprintf(stderr, "max collect stack depth %lu\n", mem_collect_max_depth);
+#endif
 	return AO_SCHEME_POOL - ao_scheme_top;
 }
 
@@ -663,28 +707,6 @@ ao_scheme_cons_check(struct ao_scheme_cons *cons)
 
 
 /*
- * Mark a block of memory with an explicit size
- */
-
-int
-ao_scheme_mark_block(void *addr, int size)
-{
-	int offset;
-	if (!AO_SCHEME_IS_POOL(addr))
-		return 1;
-
-	offset = pool_offset(addr);
-	MDBG_MOVE("mark memory %d\n", MDBG_OFFSET(addr));
-	if (busy(ao_scheme_busy, offset)) {
-		MDBG_MOVE("already marked\n");
-		return 1;
-	}
-	mark(ao_scheme_busy, offset);
-	note_chunk(offset, size);
-	return 0;
-}
-
-/*
  * Note a reference to memory and collect information about a few
  * object sizes at a time
  */
@@ -710,7 +732,7 @@ ao_scheme_mark_memory(const struct ao_scheme_type *type, void *addr)
 /*
  * Mark an object and all that it refereces
  */
-int
+static int
 ao_scheme_mark(const struct ao_scheme_type *type, void *addr)
 {
 	int ret;
@@ -737,6 +759,7 @@ ao_scheme_poly_mark(ao_poly p, uint8_t do_note_cons)
 {
 	uint8_t type;
 	void	*addr;
+	int	ret;
 
 	type = ao_scheme_poly_base_type(p);
 
@@ -751,16 +774,26 @@ ao_scheme_poly_mark(ao_poly p, uint8_t do_note_cons)
 		note_cons(pool_offset(addr));
 		return 1;
 	} else {
+		const struct ao_scheme_type *lisp_type;
+
 		if (type == AO_SCHEME_OTHER)
 			type = ao_scheme_other_type(addr);
 
-		const struct ao_scheme_type *lisp_type = ao_scheme_types[type];
+		lisp_type = ao_scheme_types[type];
 #if DBG_MEM
 		if (!lisp_type)
 			ao_scheme_abort();
 #endif
 
-		return ao_scheme_mark(lisp_type, addr);
+		MDBG_MOVE("mark %d\n", MDBG_OFFSET(addr));
+		MDBG_MOVE_IN();
+		ret = ao_scheme_mark_memory(lisp_type, addr);
+		if (!ret) {
+			MDBG_MOVE("mark recurse\n");
+			lisp_type->mark(addr);
+		}
+		MDBG_MOVE_OUT();
+		return ret;
 	}
 }
 
@@ -817,7 +850,7 @@ ao_scheme_move_memory(const struct ao_scheme_type *type, void **ref)
 	return 0;
 }
 
-int
+static int
 ao_scheme_move(const struct ao_scheme_type *type, void **ref)
 {
 	int ret;
@@ -835,16 +868,12 @@ ao_scheme_move(const struct ao_scheme_type *type, void **ref)
 int
 ao_scheme_poly_move(ao_poly *ref, uint8_t do_note_cons)
 {
-	uint8_t		type;
 	ao_poly		p = *ref;
 	int		ret;
 	void		*addr;
 	uint16_t	offset, orig_offset;
-	uint8_t		base_type;
 
-	base_type = type = ao_scheme_poly_base_type(p);
-
-	if (type == AO_SCHEME_INT)
+	if (ao_scheme_poly_base_type(p) == AO_SCHEME_INT)
 		return 1;
 
 	addr = ao_scheme_ref(p);
@@ -854,25 +883,35 @@ ao_scheme_poly_move(ao_poly *ref, uint8_t do_note_cons)
 	orig_offset = pool_offset(addr);
 	offset = move_map(orig_offset);
 
-	if (type == AO_SCHEME_CONS && do_note_cons) {
+	if (ao_scheme_poly_base_type(p) == AO_SCHEME_CONS && do_note_cons) {
 		note_cons(orig_offset);
 		ret = 1;
 	} else {
+		uint8_t type = ao_scheme_poly_base_type(p);
+		const struct ao_scheme_type *lisp_type;
+
 		if (type == AO_SCHEME_OTHER)
 			type = ao_scheme_other_type(ao_scheme_pool + offset);
 
-		const struct ao_scheme_type *lisp_type = ao_scheme_types[type];
+		lisp_type = ao_scheme_types[type];
 #if DBG_MEM
 		if (!lisp_type)
 			ao_scheme_abort();
 #endif
-
-		ret = ao_scheme_move(lisp_type, &addr);
+		/* inline ao_scheme_move to save stack space */
+		MDBG_MOVE("move object %d\n", MDBG_OFFSET(addr));
+		MDBG_MOVE_IN();
+		ret = ao_scheme_move_memory(lisp_type, &addr);
+		if (!ret) {
+			MDBG_MOVE("move recurse\n");
+			lisp_type->move(addr);
+		}
+		MDBG_MOVE_OUT();
 	}
 
 	/* Re-write the poly value */
 	if (offset != orig_offset) {
-		ao_poly np = ao_scheme_poly(ao_scheme_pool + offset, base_type);
+		ao_poly np = ao_scheme_poly(ao_scheme_pool + offset, ao_scheme_poly_base_type(p));
 		MDBG_MOVE("poly %d moved %d -> %d\n",
 			  type, orig_offset, offset);
 		*ref = np;
