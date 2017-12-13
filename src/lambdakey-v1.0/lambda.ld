@@ -18,8 +18,8 @@
 
 MEMORY {
 	rom (rx) :   ORIGIN = 0x08001000, LENGTH = 28K
-	ram (!w) :   ORIGIN = 0x20000000, LENGTH = 6k - 480
-	stack (!w) : ORIGIN = 0x20000000 + 6k - 480, LENGTH = 480
+	ram (!w) :   ORIGIN = 0x20000000, LENGTH = 6k - 1k
+	stack (!w) : ORIGIN = 0x20000000 + 6k - 1k, LENGTH = 1k
 }
 
 INCLUDE registers.ld
