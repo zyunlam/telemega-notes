@@ -28,7 +28,7 @@
 extern int ao_scheme_getc(void);
 
 static inline void
-ao_scheme_os_flush() {
+ao_scheme_os_flush(void) {
 	fflush(stdout);
 }
 

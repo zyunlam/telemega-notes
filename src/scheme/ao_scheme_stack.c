@@ -221,11 +221,12 @@ ao_scheme_stack_copy(struct ao_scheme_stack *old)
 ao_poly
 ao_scheme_stack_eval(void)
 {
+	struct ao_scheme_cons	*cons;
 	struct ao_scheme_stack	*new = ao_scheme_stack_copy(ao_scheme_poly_stack(ao_scheme_v));
 	if (!new)
 		return AO_SCHEME_NIL;
 
-	struct ao_scheme_cons	*cons = ao_scheme_poly_cons(ao_scheme_stack->values);
+	cons = ao_scheme_poly_cons(ao_scheme_stack->values);
 
 	if (!cons || !cons->cdr)
 		return ao_scheme_error(AO_SCHEME_INVALID, "continuation requires a value");

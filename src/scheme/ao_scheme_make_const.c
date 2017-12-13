@@ -80,7 +80,7 @@ ao_fec_crc_byte(uint8_t byte, uint16_t crc)
 	return crc;
 }
 
-uint16_t
+static uint16_t
 ao_fec_crc(const uint8_t *bytes, uint8_t len)
 {
 	uint16_t	crc = AO_FEC_CRC_INIT;
@@ -97,7 +97,7 @@ struct ao_scheme_macro_stack {
 
 struct ao_scheme_macro_stack *macro_stack;
 
-int
+static int
 ao_scheme_macro_push(ao_poly p)
 {
 	struct ao_scheme_macro_stack *m = macro_stack;
@@ -114,7 +114,7 @@ ao_scheme_macro_push(ao_poly p)
 	return 0;
 }
 
-void
+static void
 ao_scheme_macro_pop(void)
 {
 	struct ao_scheme_macro_stack *m = macro_stack;
@@ -141,7 +141,7 @@ void indent(void)
 ao_poly
 ao_has_macro(ao_poly p);
 
-ao_poly
+static ao_poly
 ao_macro_test_get(ao_poly atom)
 {
 	ao_poly	*ref = ao_scheme_atom_ref(atom, NULL);
@@ -150,7 +150,7 @@ ao_macro_test_get(ao_poly atom)
 	return AO_SCHEME_NIL;
 }
 
-ao_poly
+static ao_poly
 ao_is_macro(ao_poly p)
 {
 	struct ao_scheme_builtin	*builtin;
@@ -269,7 +269,7 @@ ao_scheme_seen_builtin(struct ao_scheme_builtin *b)
 	return 0;
 }
 
-int
+static int
 ao_scheme_read_eval_abort(void)
 {
 	ao_poly	in, out = AO_SCHEME_NIL;
@@ -297,7 +297,7 @@ struct feature {
 static struct feature *enable;
 static struct feature *disable;
 
-void
+static void
 ao_scheme_add_feature(struct feature **list, char *name)
 {
 	struct feature *feature = malloc (sizeof (struct feature) + strlen(name) + 1);
@@ -359,6 +359,7 @@ main(int argc, char **argv)
 	ao_poly	val;
 	struct ao_scheme_atom	*a;
 	struct ao_scheme_builtin	*b;
+	struct feature			*d;
 	int	in_atom = 0;
 	char	*out_name = NULL;
 	int	c;
@@ -394,6 +395,7 @@ main(int argc, char **argv)
 
 	prev_func = _builtin_last;
 	target_func = 0;
+	b = NULL;
 	for (f = 0; f < (int) N_FUNC; f++) {
 		if (ao_scheme_has_feature(enable, funcs[f].feature) || !ao_scheme_has_feature(disable, funcs[f].feature)) {
 			if (funcs[f].func != prev_func) {
@@ -466,6 +468,9 @@ main(int argc, char **argv)
 	}
 
 	fprintf(out, "/* Generated file, do not edit */\n\n");
+
+	for (d = disable; d; d = d->next)
+		fprintf(out, "#undef AO_SCHEME_FEATURE_%s\n", d->name);
 
 	fprintf(out, "#define AO_SCHEME_POOL_CONST %d\n", ao_scheme_top);
 	fprintf(out, "extern const uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute__((aligned(4)));\n");

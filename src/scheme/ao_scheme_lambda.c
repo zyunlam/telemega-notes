@@ -17,14 +17,14 @@
 
 #include "ao_scheme.h"
 
-int
+static int
 lambda_size(void *addr)
 {
 	(void) addr;
 	return sizeof (struct ao_scheme_lambda);
 }
 
-void
+static void
 lambda_mark(void *addr)
 {
 	struct ao_scheme_lambda	*lambda = addr;
@@ -33,7 +33,7 @@ lambda_mark(void *addr)
 	ao_scheme_poly_mark(lambda->frame, 0);
 }
 
-void
+static void
 lambda_move(void *addr)
 {
 	struct ao_scheme_lambda	*lambda = addr;
@@ -65,7 +65,7 @@ ao_scheme_lambda_write(ao_poly poly)
 	printf(")");
 }
 
-ao_poly
+static ao_poly
 ao_scheme_lambda_alloc(struct ao_scheme_cons *code, int args)
 {
 	struct ao_scheme_lambda	*lambda;

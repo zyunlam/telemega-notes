@@ -127,7 +127,7 @@ ao_scheme_check_argt(ao_poly name, struct ao_scheme_cons *cons, int argc, int ty
 	return _ao_scheme_bool_true;
 }
 
-int32_t
+static int32_t
 ao_scheme_arg_int(ao_poly name, struct ao_scheme_cons *cons, int argc)
 {
 	ao_poly p = ao_scheme_arg(cons, argc);
@@ -306,10 +306,10 @@ ao_scheme_do_display(struct ao_scheme_cons *cons)
 	return _ao_scheme_bool_true;
 }
 
-ao_poly
+static ao_poly
 ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 {
-	struct ao_scheme_cons *cons = cons;
+	struct ao_scheme_cons *cons;
 	ao_poly	ret = AO_SCHEME_NIL;
 
 	for (cons = orig_cons; cons; cons = ao_scheme_cons_cdr(cons)) {
@@ -501,7 +501,7 @@ ao_scheme_do_remainder(struct ao_scheme_cons *cons)
 	return ao_scheme_math(cons, builtin_remainder);
 }
 
-ao_poly
+static ao_poly
 ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 {
 	ao_poly	left;
@@ -545,6 +545,7 @@ ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 				default:
 					break;
 				}
+#ifdef AO_SCHEME_FEATURE_FLOAT
 			} else if (ao_scheme_number_typep(lt) && ao_scheme_number_typep(rt)) {
 				float l, r;
 
@@ -574,6 +575,7 @@ ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 				default:
 					break;
 				}
+#endif /* AO_SCHEME_FEATURE_FLOAT */
 			} else if (lt == AO_SCHEME_STRING && rt == AO_SCHEME_STRING) {
 				int c = strcmp(ao_scheme_poly_string(left),
 					       ao_scheme_poly_string(right));

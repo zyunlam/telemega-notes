@@ -45,9 +45,10 @@ char *
 ao_scheme_string_copy(char *a)
 {
 	int	alen = strlen(a);
+	char	*r;
 
 	ao_scheme_string_stash(0, a);
-	char	*r = ao_scheme_alloc(alen + 1);
+	r = ao_scheme_alloc(alen + 1);
 	a = ao_scheme_string_fetch(0);
 	if (!r)
 		return NULL;
@@ -60,10 +61,11 @@ ao_scheme_string_cat(char *a, char *b)
 {
 	int	alen = strlen(a);
 	int	blen = strlen(b);
+	char 	*r;
 
 	ao_scheme_string_stash(0, a);
 	ao_scheme_string_stash(1, b);
-	char	*r = ao_scheme_alloc(alen + blen + 1);
+	r = ao_scheme_alloc(alen + blen + 1);
 	a = ao_scheme_string_fetch(0);
 	b = ao_scheme_string_fetch(1);
 	if (!r)
@@ -76,11 +78,15 @@ ao_scheme_string_cat(char *a, char *b)
 ao_poly
 ao_scheme_string_pack(struct ao_scheme_cons *cons)
 {
-	int	len = ao_scheme_cons_length(cons);
+	char	*r;
+	char	*s;
+	int	len;
+
+	len = ao_scheme_cons_length(cons);
 	ao_scheme_cons_stash(0, cons);
-	char	*r = ao_scheme_alloc(len + 1);
+	r = ao_scheme_alloc(len + 1);
 	cons = ao_scheme_cons_fetch(0);
-	char	*s = r;
+	s = r;
 
 	while (cons) {
 		if (!ao_scheme_integer_typep(ao_scheme_poly_type(cons->car)))
@@ -100,10 +106,11 @@ ao_scheme_string_unpack(char *a)
 	int			i;
 
 	for (i = 0; (c = a[i]); i++) {
+		struct ao_scheme_cons	*n;
 		ao_scheme_cons_stash(0, cons);
 		ao_scheme_cons_stash(1, tail);
 		ao_scheme_string_stash(0, a);
-		struct ao_scheme_cons	*n = ao_scheme_cons_cons(ao_scheme_int_poly(c), AO_SCHEME_NIL);
+		n = ao_scheme_cons_cons(ao_scheme_int_poly(c), AO_SCHEME_NIL);
 		a = ao_scheme_string_fetch(0);
 		cons = ao_scheme_cons_fetch(0);
 		tail = ao_scheme_cons_fetch(1);

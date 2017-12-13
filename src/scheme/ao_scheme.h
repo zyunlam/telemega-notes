@@ -43,6 +43,10 @@ struct ao_scheme_os_save {
 	uint16_t	const_checksum_inv;
 };
 
+#ifndef AO_SCHEME_POOL_TOTAL
+#error Must define AO_SCHEME_POOL_TOTAL for AO_SCHEME_SAVE
+#endif
+
 #define AO_SCHEME_POOL_EXTRA	(sizeof(struct ao_scheme_os_save))
 #define AO_SCHEME_POOL	((int) (AO_SCHEME_POOL_TOTAL - AO_SCHEME_POOL_EXTRA))
 
@@ -78,7 +82,7 @@ extern uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute__((aligned(4)))
 #else
 #include "ao_scheme_const.h"
 #ifndef AO_SCHEME_POOL
-#define AO_SCHEME_POOL	3072
+#error Must define AO_SCHEME_POOL
 #endif
 #ifndef AO_SCHEME_POOL_EXTRA
 #define AO_SCHEME_POOL_EXTRA 0
@@ -562,18 +566,7 @@ extern uint64_t ao_scheme_loops[2];
 
 /* returns 1 if the object was already marked */
 int
-ao_scheme_mark(const struct ao_scheme_type *type, void *addr);
-
-/* returns 1 if the object was already marked */
-int
 ao_scheme_mark_memory(const struct ao_scheme_type *type, void *addr);
-
-void *
-ao_scheme_move_map(void *addr);
-
-/* returns 1 if the object was already moved */
-int
-ao_scheme_move(const struct ao_scheme_type *type, void **ref);
 
 /* returns 1 if the object was already moved */
 int
@@ -635,7 +628,7 @@ void
 ao_scheme_bool_write(ao_poly v);
 
 #ifdef AO_SCHEME_MAKE_CONST
-struct ao_scheme_bool	*ao_scheme_true, *ao_scheme_false;
+extern struct ao_scheme_bool	*ao_scheme_true, *ao_scheme_false;
 
 struct ao_scheme_bool *
 ao_scheme_bool_get(uint8_t value);
@@ -825,12 +818,8 @@ ao_scheme_number_typep(uint8_t t)
 {
 	return ao_scheme_integer_typep(t) || (t == AO_SCHEME_FLOAT);
 }
-
-float
-ao_scheme_poly_number(ao_poly p);
 #else
 #define ao_scheme_number_typep ao_scheme_integer_typep
-#define ao_scheme_poly_number ao_scheme_poly_integer
 #endif
 
 /* builtin */

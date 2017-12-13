@@ -22,18 +22,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-#undef AO_SCHEME_FEATURE_FLOAT
-#undef AO_SCHEME_FEATURE_VECTOR
-#undef AO_SCHEME_FEATURE_QUASI
-#undef AO_SCHEME_FEATURE_BIGINT
-
 #define AO_SCHEME_POOL_TOTAL	4096
 #define AO_SCHEME_SAVE		1
 
 extern int ao_scheme_getc(void);
 
 static inline void
-ao_scheme_os_flush() {
+ao_scheme_os_flush(void) {
 	fflush(stdout);
 }
 
