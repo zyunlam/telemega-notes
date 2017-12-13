@@ -16,7 +16,7 @@
 #include <stdarg.h>
 
 void
-ao_scheme_error_poly(char *name, ao_poly poly, ao_poly last)
+ao_scheme_error_poly(const char *name, ao_poly poly, ao_poly last)
 {
 	int first = 1;
 	printf("\t\t%s(", name);
@@ -50,7 +50,7 @@ static void tabs(int indent)
 }
 
 void
-ao_scheme_error_frame(int indent, char *name, struct ao_scheme_frame *frame)
+ao_scheme_error_frame(int indent, const char *name, struct ao_scheme_frame *frame)
 {
 	int			f;
 
@@ -83,7 +83,7 @@ ao_scheme_error_frame(int indent, char *name, struct ao_scheme_frame *frame)
 }
 
 void
-ao_scheme_vprintf(char *format, va_list args)
+ao_scheme_vprintf(const char *format, va_list args)
 {
 	char c;
 
@@ -112,7 +112,7 @@ ao_scheme_vprintf(char *format, va_list args)
 }
 
 void
-ao_scheme_printf(char *format, ...)
+ao_scheme_printf(const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -121,7 +121,7 @@ ao_scheme_printf(char *format, ...)
 }
 
 ao_poly
-ao_scheme_error(int error, char *format, ...)
+ao_scheme_error(int error, const char *format, ...)
 {
 	va_list	args;
 

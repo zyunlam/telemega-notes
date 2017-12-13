@@ -30,15 +30,15 @@ ao_scheme_make_builtin(enum ao_scheme_builtin_id func, int args) {
 }
 
 struct builtin_func {
-	char	*feature;
-	char	*name;
-	int	args;
+	const char	*feature;
+	const char	*name;
+	int		args;
 	enum ao_scheme_builtin_id	func;
 };
 
 struct builtin_atom {
-	char	*feature;
-	char	*name;
+	const char	*feature;
+	const char	*name;
 };
 
 #define AO_SCHEME_BUILTIN_CONSTS
@@ -306,8 +306,8 @@ ao_scheme_add_feature(struct feature **list, char *name)
 	*list = feature;
 }
 
-bool
-ao_scheme_has_feature(struct feature *list, char *name)
+static bool
+ao_scheme_has_feature(struct feature *list, const char *name)
 {
 	while (list) {
 		if (!strcmp(list->name, name))
@@ -317,17 +317,20 @@ ao_scheme_has_feature(struct feature *list, char *name)
 	return false;
 }
 
-void
-ao_scheme_add_features(struct feature **list, char *names)
+static void
+ao_scheme_add_features(struct feature **list, const char *names)
 {
 	char	*saveptr = NULL;
 	char	*name;
+	char	*copy = strdup(names);
+	char	*save = copy;
 
-	while ((name = strtok_r(names, ",", &saveptr)) != NULL) {
-		names = NULL;
+	while ((name = strtok_r(copy, ",", &saveptr)) != NULL) {
+		copy = NULL;
 		if (!ao_scheme_has_feature(*list, name))
 			ao_scheme_add_feature(list, name);
 	}
+	free(save);
 }
 
 int
@@ -407,7 +410,7 @@ main(int argc, char **argv)
 				 */
 				func_map[prev_func] = target_func++;
 			}
-			a = ao_scheme_atom_intern(funcs[f].name);
+			a = ao_scheme_atom_intern((char *) funcs[f].name);
 			ao_scheme_atom_def(ao_scheme_atom_poly(a),
 					   ao_scheme_builtin_poly(b));
 		}
@@ -474,32 +477,33 @@ main(int argc, char **argv)
 	fprintf(out, "#define _ao_scheme_bool_true 0x%04x\n", ao_scheme_bool_poly(ao_scheme_true));
 
 	for (a = ao_scheme_atoms; a; a = ao_scheme_poly_atom(a->next)) {
-		char	*n = a->name, c;
+		const char	*n = a->name;
+		char		ch;
 		fprintf(out, "#define _ao_scheme_atom_");
-		while ((c = *n++)) {
-			if (isalnum(c))
-				fprintf(out, "%c", c);
+		while ((ch = *n++)) {
+			if (isalnum(ch))
+				fprintf(out, "%c", ch);
 			else
-				fprintf(out, "%02x", c);
+				fprintf(out, "%02x", ch);
 		}
 		fprintf(out, "  0x%04x\n", ao_scheme_atom_poly(a));
 	}
 	fprintf(out, "#ifdef AO_SCHEME_CONST_BITS\n");
 	fprintf(out, "const uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute((aligned(4))) = {");
 	for (o = 0; o < ao_scheme_top; o++) {
-		uint8_t	c;
+		uint8_t	ch;
 		if ((o & 0xf) == 0)
 			fprintf(out, "\n\t");
 		else
 			fprintf(out, " ");
-		c = ao_scheme_const[o];
+		ch = ao_scheme_const[o];
 		if (!in_atom)
 			in_atom = is_atom(o);
 		if (in_atom) {
-			fprintf(out, " '%c',", c);
+			fprintf(out, " '%c',", ch);
 			in_atom--;
 		} else {
-			fprintf(out, "0x%02x,", c);
+			fprintf(out, "0x%02x,", ch);
 		}
 	}
 	fprintf(out, "\n};\n");

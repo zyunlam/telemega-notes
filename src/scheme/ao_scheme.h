@@ -63,7 +63,7 @@ extern uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute__((aligned(4)))
 #define ao_scheme_pool ao_scheme_const
 #define AO_SCHEME_POOL AO_SCHEME_POOL_CONST
 
-#define _atom(n) ao_scheme_atom_poly(ao_scheme_atom_intern(n))
+#define _atom(n) ao_scheme_atom_poly(ao_scheme_atom_intern((char *) n))
 #define _bool(v) ao_scheme_bool_poly(ao_scheme_bool_get(v))
 
 #define _ao_scheme_bool_true	_bool(1)
@@ -940,19 +940,19 @@ ao_scheme_stack_eval(void);
 /* error */
 
 void
-ao_scheme_vprintf(char *format, va_list args);
+ao_scheme_vprintf(const char *format, va_list args);
 
 void
-ao_scheme_printf(char *format, ...);
+ao_scheme_printf(const char *format, ...);
 
 void
-ao_scheme_error_poly(char *name, ao_poly poly, ao_poly last);
+ao_scheme_error_poly(const char *name, ao_poly poly, ao_poly last);
 
 void
-ao_scheme_error_frame(int indent, char *name, struct ao_scheme_frame *frame);
+ao_scheme_error_frame(int indent, const char *name, struct ao_scheme_frame *frame);
 
 ao_poly
-ao_scheme_error(int error, char *format, ...);
+ao_scheme_error(int error, const char *format, ...);
 
 /* builtins */
 

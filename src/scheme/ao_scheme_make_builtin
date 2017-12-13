@@ -101,7 +101,7 @@ dump_casename(builtin_t[*] builtins) {
 			       builtins[i].c_name, builtins[i].lisp_names[0]);
 			dump_endif(builtins[i]);
 		}
-	printf("\tdefault: return \"???\";\n");
+	printf("\tdefault: return (char *) \"???\";\n");
 	printf("\t}\n");
 	printf("}\n");
 	printf("#endif /* AO_SCHEME_BUILTIN_CASENAME */\n");

@@ -52,7 +52,7 @@ char *ao_scheme_args_name(uint8_t args) {
 	case AO_SCHEME_FUNC_LAMBDA: return ao_scheme_poly_atom(_ao_scheme_atom_lambda)->name;
 	case AO_SCHEME_FUNC_NLAMBDA: return ao_scheme_poly_atom(_ao_scheme_atom_nlambda)->name;
 	case AO_SCHEME_FUNC_MACRO: return ao_scheme_poly_atom(_ao_scheme_atom_macro)->name;
-	default: return "???";
+	default: return (char *) "???";
 	}
 }
 #else
@@ -64,7 +64,7 @@ static char *
 ao_scheme_builtin_name(enum ao_scheme_builtin_id b) {
 	if (b < _builtin_last)
 		return ao_scheme_poly_atom(builtin_names[b])->name;
-	return "???";
+	return (char *) "???";
 }
 
 static const ao_poly ao_scheme_args_atoms[] = {
@@ -79,7 +79,7 @@ ao_scheme_args_name(uint8_t args)
 	args &= AO_SCHEME_FUNC_MASK;
 	if (args < sizeof ao_scheme_args_atoms / sizeof ao_scheme_args_atoms[0])
 		return ao_scheme_poly_atom(ao_scheme_args_atoms[args])->name;
-	return "(unknown)";
+	return (char *) "(unknown)";
 }
 #endif
 
