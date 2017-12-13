@@ -84,10 +84,13 @@ frame_mark(void *addr)
 	struct ao_scheme_frame	*frame = addr;
 
 	for (;;) {
+		struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
+
 		MDBG_MOVE("frame mark %d\n", MDBG_OFFSET(frame));
 		if (!AO_SCHEME_IS_POOL(frame))
 			break;
-		ao_scheme_poly_mark(frame->vals, 0);
+		if (!ao_scheme_mark_memory(&ao_scheme_frame_vals_type, vals))
+			frame_vals_mark(vals);
 		frame = ao_scheme_poly_frame(frame->prev);
 		MDBG_MOVE("frame next %d\n", MDBG_OFFSET(frame));
 		if (!frame)
@@ -103,13 +106,20 @@ frame_move(void *addr)
 	struct ao_scheme_frame	*frame = addr;
 
 	for (;;) {
-		struct ao_scheme_frame	*prev;
-		int			ret;
+		struct ao_scheme_frame		*prev;
+		struct ao_scheme_frame_vals	*vals;
+		int				ret;
 
 		MDBG_MOVE("frame move %d\n", MDBG_OFFSET(frame));
 		if (!AO_SCHEME_IS_POOL(frame))
 			break;
-		ao_scheme_poly_move(&frame->vals, 0);
+
+		vals = ao_scheme_poly_frame_vals(frame->vals);
+		if (!ao_scheme_move_memory(&ao_scheme_frame_vals_type, (void **) &vals))
+			frame_vals_move(vals);
+		if (vals != ao_scheme_poly_frame_vals(frame->vals))
+			frame->vals = ao_scheme_frame_vals_poly(vals);
+
 		prev = ao_scheme_poly_frame(frame->prev);
 		if (!prev)
 			break;
