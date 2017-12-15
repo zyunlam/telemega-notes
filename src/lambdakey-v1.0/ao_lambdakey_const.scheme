@@ -100,8 +100,6 @@
 
 (define (cdar l) (cdr (car l)))
 
-(define (caddr l) (car (cdr (cdr l))))
-
 					; (if <condition> <if-true>)
 					; (if <condition> <if-true> <if-false)
 
@@ -192,22 +190,13 @@
 (define (list-tail a b)
   (if (zero? b)
       a
-    (list-tail (cdr a (- b 1)))
-    )
+      (list-tail (cdr a) (- b 1))
+      )
   )
 
 (define (list-ref a b)
   (car (list-tail a b))
   )
-
-(define (list-tail a b)
-  (if (zero? b)
-      a
-    (list-tail (cdr a) (- b 1))))
-
-(list-tail '(1 2 3) 2)
-
-(define (list-ref a b) (car (list-tail a b)))
 
 (list-ref '(1 2 3) 2)
     
@@ -346,9 +335,6 @@
 
 (define string (lambda a (list->string a)))
 
-(display "apply\n")
-(apply cons '(a b))
-
 (define map
   (lambda (a . b)
 	 (define (args b)
@@ -377,12 +363,6 @@
   )
 
 (map cadr '((a b) (d e) (g h)))
-
-(define for-each (lambda (a . b)
-			(apply map a b)
-			#t))
-
-(for-each display '("hello" " " "world" "\n"))
 
 (define (newline) (write-char #\newline))
 
