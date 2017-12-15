@@ -71,8 +71,8 @@ const struct ao_scheme_type ao_scheme_atom_type = {
 
 struct ao_scheme_atom	*ao_scheme_atoms;
 
-struct ao_scheme_atom *
-ao_scheme_atom_intern(char *name)
+static struct ao_scheme_atom *
+ao_scheme_atom_find(char *name)
 {
 	struct ao_scheme_atom	*atom;
 
@@ -86,15 +86,43 @@ ao_scheme_atom_intern(char *name)
 			return atom;
 	}
 #endif
-	ao_scheme_string_stash(0, name);
-	atom = ao_scheme_alloc(name_size(name));
-	name = ao_scheme_string_fetch(0);
+	return NULL;
+}
+
+static void
+ao_scheme_atom_init(struct ao_scheme_atom *atom, char *name)
+{
 	if (atom) {
 		atom->type = AO_SCHEME_ATOM;
+		strcpy(atom->name, name);
 		atom->next = ao_scheme_atom_poly(ao_scheme_atoms);
 		ao_scheme_atoms = atom;
-		strcpy(atom->name, name);
 	}
+}
+
+struct ao_scheme_atom *
+ao_scheme_string_to_atom(struct ao_scheme_string *string)
+{
+	struct ao_scheme_atom	*atom = ao_scheme_atom_find(string->val);
+
+	if (atom)
+		return atom;
+	ao_scheme_string_stash(0, string);
+	atom = ao_scheme_alloc(name_size(string->val));
+	string = ao_scheme_string_fetch(0);
+	ao_scheme_atom_init(atom, string->val);
+	return atom;
+}
+
+struct ao_scheme_atom *
+ao_scheme_atom_intern(char *name)
+{
+	struct ao_scheme_atom	*atom = ao_scheme_atom_find(name);
+	if (atom)
+		return atom;
+
+	atom = ao_scheme_alloc(name_size(name));
+	ao_scheme_atom_init(atom, name);
 	return atom;
 }
 

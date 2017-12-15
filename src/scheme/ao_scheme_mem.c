@@ -178,7 +178,7 @@ struct ao_scheme_root {
 };
 
 static struct ao_scheme_cons 	*save_cons[2];
-static char			*save_string[2];
+static struct ao_scheme_string	*save_string[2];
 static struct ao_scheme_frame	*save_frame[1];
 static ao_poly			save_poly[3];
 
@@ -488,7 +488,9 @@ dump_busy(void)
 static const struct ao_scheme_type * const ao_scheme_types[AO_SCHEME_NUM_TYPE] = {
 	[AO_SCHEME_CONS] = &ao_scheme_cons_type,
 	[AO_SCHEME_INT] = NULL,
-	[AO_SCHEME_STRING] = &ao_scheme_string_type,
+#ifdef AO_SCHEME_FEATURE_BIGINT
+	[AO_SCHEME_BIGINT] = &ao_scheme_bigint_type,
+#endif
 	[AO_SCHEME_OTHER] = (void *) 0x1,
 	[AO_SCHEME_ATOM] = &ao_scheme_atom_type,
 	[AO_SCHEME_BUILTIN] = &ao_scheme_builtin_type,
@@ -497,9 +499,7 @@ static const struct ao_scheme_type * const ao_scheme_types[AO_SCHEME_NUM_TYPE] =
 	[AO_SCHEME_LAMBDA] = &ao_scheme_lambda_type,
 	[AO_SCHEME_STACK] = &ao_scheme_stack_type,
 	[AO_SCHEME_BOOL] = &ao_scheme_bool_type,
-#ifdef AO_SCHEME_FEATURE_BIGINT
-	[AO_SCHEME_BIGINT] = &ao_scheme_bigint_type,
-#endif
+	[AO_SCHEME_STRING] = &ao_scheme_string_type,
 #ifdef AO_SCHEME_FEATURE_FLOAT
 	[AO_SCHEME_FLOAT] = &ao_scheme_float_type,
 #endif
@@ -533,6 +533,7 @@ uint64_t ao_scheme_loops[2];
 #endif
 
 int ao_scheme_last_top;
+int ao_scheme_collect_counts;
 
 int
 ao_scheme_collect(uint8_t style)
@@ -555,6 +556,14 @@ ao_scheme_collect(uint8_t style)
 	/* The first time through, we're doing a full collect */
 	if (ao_scheme_last_top == 0)
 		style = AO_SCHEME_COLLECT_FULL;
+
+	/* One in a while, just do a full collect */
+
+	if (ao_scheme_collect_counts >= 128)
+		style = AO_SCHEME_COLLECT_FULL;
+
+	if (style == AO_SCHEME_COLLECT_FULL)
+		ao_scheme_collect_counts = 0;
 
 	/* Clear references to all caches */
 	for (i = 0; i < (int) AO_SCHEME_CACHE; i++)
@@ -984,16 +993,16 @@ ao_scheme_poly_fetch(int id)
 }
 
 void
-ao_scheme_string_stash(int id, char *string)
+ao_scheme_string_stash(int id, struct ao_scheme_string *string)
 {
 	assert(save_string[id] == NULL);
 	save_string[id] = string;
 }
 
-char *
+struct ao_scheme_string *
 ao_scheme_string_fetch(int id)
 {
-	char *string = save_string[id];
+	struct ao_scheme_string *string = save_string[id];
 	save_string[id] = NULL;
 	return string;
 }

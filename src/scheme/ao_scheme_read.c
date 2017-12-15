@@ -555,7 +555,7 @@ ao_poly
 ao_scheme_read(void)
 {
 	struct ao_scheme_atom	*atom;
-	char			*string;
+	struct ao_scheme_string	*string;
 	int			read_state;
 	ao_poly			v = AO_SCHEME_NIL;
 
@@ -605,7 +605,7 @@ ao_scheme_read(void)
 				v = _ao_scheme_bool_false;
 			break;
 		case STRING:
-			string = ao_scheme_string_copy(token_string);
+			string = ao_scheme_string_make(token_string);
 			if (string)
 				v = ao_scheme_string_poly(string);
 			else

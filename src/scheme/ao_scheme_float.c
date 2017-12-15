@@ -69,10 +69,10 @@ ao_scheme_poly_number(ao_poly p)
 	switch (ao_scheme_poly_base_type(p)) {
 	case AO_SCHEME_INT:
 		return ao_scheme_poly_int(p);
+	case AO_SCHEME_BIGINT:
+		return ao_scheme_poly_bigint(p)->value;
 	case AO_SCHEME_OTHER:
 		switch (ao_scheme_other_type(ao_scheme_poly_other(p))) {
-		case AO_SCHEME_BIGINT:
-			return ao_scheme_bigint_int(ao_scheme_poly_bigint(p)->value);
 		case AO_SCHEME_FLOAT:
 			return ao_scheme_poly_float(p)->value;
 		}

@@ -130,10 +130,11 @@ ao_scheme_check_argt(ao_poly name, struct ao_scheme_cons *cons, int argc, int ty
 static int32_t
 ao_scheme_arg_int(ao_poly name, struct ao_scheme_cons *cons, int argc)
 {
-	ao_poly p = ao_scheme_arg(cons, argc);
-	int32_t	i = ao_scheme_poly_integer(p);
+	ao_poly 	p = ao_scheme_arg(cons, argc);
+	bool		fail = false;
+	int32_t		i = ao_scheme_poly_integer(p, &fail);
 
-	if (i == AO_SCHEME_NOT_INTEGER)
+	if (fail)
 		(void) ao_scheme_error(AO_SCHEME_INVALID, "%v: arg %d invalid type %v", name, argc, p);
 	return i;
 }
@@ -324,14 +325,14 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 				switch (op) {
 				case builtin_minus:
 					if (ao_scheme_integer_typep(ct))
-						ret = ao_scheme_integer_poly(-ao_scheme_poly_integer(ret));
+						ret = ao_scheme_integer_poly(-ao_scheme_poly_integer(ret, NULL));
 #ifdef AO_SCHEME_FEATURE_FLOAT
 					else if (ct == AO_SCHEME_FLOAT)
 						ret = ao_scheme_float_get(-ao_scheme_poly_number(ret));
 #endif
 					break;
 				case builtin_divide:
-					if (ao_scheme_integer_typep(ct) && ao_scheme_poly_integer(ret) == 1) {
+					if (ao_scheme_poly_integer(ret, NULL) == 1) {
 					} else {
 #ifdef AO_SCHEME_FEATURE_FLOAT
 						if (ao_scheme_number_typep(ct)) {
@@ -349,8 +350,8 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 			}
 			cons = ao_scheme_cons_fetch(0);
 		} else if (ao_scheme_integer_typep(rt) && ao_scheme_integer_typep(ct)) {
-			int32_t	r = ao_scheme_poly_integer(ret);
-			int32_t	c = ao_scheme_poly_integer(car);
+			int32_t	r = ao_scheme_poly_integer(ret, NULL);
+			int32_t	c = ao_scheme_poly_integer(car, NULL);
 #ifdef AO_SCHEME_FEATURE_FLOAT
 			int64_t t;
 #endif
@@ -519,8 +520,8 @@ ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 			uint8_t	lt = ao_scheme_poly_type(left);
 			uint8_t	rt = ao_scheme_poly_type(right);
 			if (ao_scheme_integer_typep(lt) && ao_scheme_integer_typep(rt)) {
-				int32_t l = ao_scheme_poly_integer(left);
-				int32_t r = ao_scheme_poly_integer(right);
+				int32_t l = ao_scheme_poly_integer(left, NULL);
+				int32_t r = ao_scheme_poly_integer(right, NULL);
 
 				switch (op) {
 				case builtin_less:
@@ -577,8 +578,8 @@ ao_scheme_compare(struct ao_scheme_cons *cons, enum ao_scheme_builtin_id op)
 				}
 #endif /* AO_SCHEME_FEATURE_FLOAT */
 			} else if (lt == AO_SCHEME_STRING && rt == AO_SCHEME_STRING) {
-				int c = strcmp(ao_scheme_poly_string(left),
-					       ao_scheme_poly_string(right));
+				int c = strcmp(ao_scheme_poly_string(left)->val,
+					       ao_scheme_poly_string(right)->val);
 				switch (op) {
 				case builtin_less:
 					if (!(c < 0))
@@ -664,16 +665,16 @@ ao_scheme_do_string_to_list(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_string_ref(struct ao_scheme_cons *cons)
 {
-	char *string;
+	char	*string;
 	int32_t ref;
 	if (!ao_scheme_check_argc(_ao_scheme_atom_string2dref, cons, 2, 2))
 		return AO_SCHEME_NIL;
 	if (!ao_scheme_check_argt(_ao_scheme_atom_string2dref, cons, 0, AO_SCHEME_STRING, 0))
 		return AO_SCHEME_NIL;
 	ref = ao_scheme_arg_int(_ao_scheme_atom_string2dref, cons, 1);
-	if (ref == AO_SCHEME_NOT_INTEGER)
+	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
-	string = ao_scheme_poly_string(ao_scheme_arg(cons, 0));
+	string = ao_scheme_poly_string(ao_scheme_arg(cons, 0))->val;
 	while (*string && ref) {
 		++string;
 		--ref;
@@ -689,20 +690,20 @@ ao_scheme_do_string_ref(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_string_length(struct ao_scheme_cons *cons)
 {
-	char *string;
+	struct ao_scheme_string *string;
 
 	if (!ao_scheme_check_argc(_ao_scheme_atom_string2dlength, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	if (!ao_scheme_check_argt(_ao_scheme_atom_string2dlength, cons, 0, AO_SCHEME_STRING, 0))
 		return AO_SCHEME_NIL;
 	string = ao_scheme_poly_string(ao_scheme_arg(cons, 0));
-	return ao_scheme_integer_poly(strlen(string));
+	return ao_scheme_integer_poly(strlen(string->val));
 }
 
 ao_poly
 ao_scheme_do_string_copy(struct ao_scheme_cons *cons)
 {
-	char *string;
+	struct ao_scheme_string	*string;
 
 	if (!ao_scheme_check_argc(_ao_scheme_atom_string2dcopy, cons, 1, 1))
 		return AO_SCHEME_NIL;
@@ -715,7 +716,7 @@ ao_scheme_do_string_copy(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_string_set(struct ao_scheme_cons *cons)
 {
-	char *string;
+	char	*string;
 	int32_t ref;
 	int32_t val;
 
@@ -723,12 +724,12 @@ ao_scheme_do_string_set(struct ao_scheme_cons *cons)
 		return AO_SCHEME_NIL;
 	if (!ao_scheme_check_argt(_ao_scheme_atom_string2dset21, cons, 0, AO_SCHEME_STRING, 0))
 		return AO_SCHEME_NIL;
-	string = ao_scheme_poly_string(ao_scheme_arg(cons, 0));
+	string = ao_scheme_poly_string(ao_scheme_arg(cons, 0))->val;
 	ref = ao_scheme_arg_int(_ao_scheme_atom_string2dset21, cons, 1);
-	if (ref == AO_SCHEME_NOT_INTEGER)
+	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
 	val = ao_scheme_arg_int(_ao_scheme_atom_string2dset21, cons, 2);
-	if (val == AO_SCHEME_NOT_INTEGER)
+	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
 	while (*string && ref) {
 		++string;
@@ -759,7 +760,7 @@ ao_scheme_do_led(struct ao_scheme_cons *cons)
 	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	led = ao_scheme_arg_int(_ao_scheme_atom_led, cons, 0);
-	if (led == AO_SCHEME_NOT_INTEGER)
+	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
 	led = ao_scheme_arg(cons, 0);
 	ao_scheme_os_led(ao_scheme_poly_int(led));
@@ -774,7 +775,7 @@ ao_scheme_do_delay(struct ao_scheme_cons *cons)
 	if (!ao_scheme_check_argc(_ao_scheme_atom_delay, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	delay = ao_scheme_arg_int(_ao_scheme_atom_delay, cons, 0);
-	if (delay == AO_SCHEME_NOT_INTEGER)
+	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
 	ao_scheme_os_delay(delay);
 	return delay;
@@ -978,7 +979,7 @@ ao_scheme_do_symbol_to_string(struct ao_scheme_cons *cons)
 		return AO_SCHEME_NIL;
 	if (!ao_scheme_check_argt(_ao_scheme_atom_led, cons, 0, AO_SCHEME_ATOM, 0))
 		return AO_SCHEME_NIL;
-	return ao_scheme_string_poly(ao_scheme_string_copy(ao_scheme_poly_atom(ao_scheme_arg(cons, 0))->name));
+	return ao_scheme_string_poly(ao_scheme_atom_to_string(ao_scheme_poly_atom(ao_scheme_arg(cons, 0))));
 }
 
 ao_poly
@@ -989,7 +990,7 @@ ao_scheme_do_string_to_symbol(struct ao_scheme_cons *cons)
 	if (!ao_scheme_check_argt(_ao_scheme_atom_led, cons, 0, AO_SCHEME_STRING, 0))
 		return AO_SCHEME_NIL;
 
-	return ao_scheme_atom_poly(ao_scheme_atom_intern(ao_scheme_poly_string(ao_scheme_arg(cons, 0))));
+	return ao_scheme_atom_poly(ao_scheme_string_to_atom(ao_scheme_poly_string(ao_scheme_arg(cons, 0))));;
 }
 
 ao_poly
@@ -1009,7 +1010,7 @@ ao_scheme_do_write_char(struct ao_scheme_cons *cons)
 		return AO_SCHEME_NIL;
 	if (!ao_scheme_check_argt(_ao_scheme_atom_led, cons, 0, AO_SCHEME_INT, 0))
 		return AO_SCHEME_NIL;
-	putchar(ao_scheme_poly_integer(ao_scheme_arg(cons, 0)));
+	putchar(ao_scheme_poly_integer(ao_scheme_arg(cons, 0), NULL));
 	return _ao_scheme_bool_true;
 }
 
@@ -1068,7 +1069,7 @@ ao_scheme_do_make_vector(struct ao_scheme_cons *cons)
 	if (!ao_scheme_check_argc(_ao_scheme_atom_make2dvector, cons, 2, 2))
 		return AO_SCHEME_NIL;
 	k = ao_scheme_arg_int(_ao_scheme_atom_make2dvector, cons, 0);
-	if (k == AO_SCHEME_NOT_INTEGER)
+	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
 	return ao_scheme_vector_poly(ao_scheme_vector_alloc(k, ao_scheme_arg(cons, 1)));
 }

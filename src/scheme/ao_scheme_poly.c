@@ -24,10 +24,12 @@ static const struct ao_scheme_funcs ao_scheme_funcs[AO_SCHEME_NUM_TYPE] = {
 		.write = ao_scheme_cons_write,
 		.display = ao_scheme_cons_display,
 	},
-	[AO_SCHEME_STRING] = {
-		.write = ao_scheme_string_write,
-		.display = ao_scheme_string_display,
+#ifdef AO_SCHEME_FEATURE_BIGINT
+	[AO_SCHEME_BIGINT] = {
+		.write = ao_scheme_bigint_write,
+		.display = ao_scheme_bigint_write,
 	},
+#endif
 	[AO_SCHEME_INT] = {
 		.write = ao_scheme_int_write,
 		.display = ao_scheme_int_write,
@@ -60,12 +62,10 @@ static const struct ao_scheme_funcs ao_scheme_funcs[AO_SCHEME_NUM_TYPE] = {
 		.write = ao_scheme_bool_write,
 		.display = ao_scheme_bool_write,
 	},
-#ifdef AO_SCHEME_FEATURE_BIGINT
-	[AO_SCHEME_BIGINT] = {
-		.write = ao_scheme_bigint_write,
-		.display = ao_scheme_bigint_write,
+	[AO_SCHEME_STRING] = {
+		.write = ao_scheme_string_write,
+		.display = ao_scheme_string_display,
 	},
-#endif
 #ifdef AO_SCHEME_FEATURE_FLOAT
 	[AO_SCHEME_FLOAT] = {
 		.write = ao_scheme_float_write,

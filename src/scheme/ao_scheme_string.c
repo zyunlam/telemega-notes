@@ -24,9 +24,10 @@ static void string_mark(void *addr)
 
 static int string_size(void *addr)
 {
+	struct ao_scheme_string	*string = addr;
 	if (!addr)
 		return 0;
-	return strlen(addr) + 1;
+	return strlen(string->val) + 2;
 }
 
 static void string_move(void *addr)
@@ -41,71 +42,114 @@ const struct ao_scheme_type ao_scheme_string_type = {
 	.name = "string",
 };
 
-char *
-ao_scheme_string_copy(char *a)
+static struct ao_scheme_string *
+ao_scheme_string_alloc(int len)
 {
-	int	alen = strlen(a);
-	char	*r;
+	struct ao_scheme_string	*s;
+
+	s = ao_scheme_alloc(len + 2);
+	if (!s)
+		return NULL;
+	s->type = AO_SCHEME_STRING;
+	return s;
+}
+
+struct ao_scheme_string *
+ao_scheme_string_copy(struct ao_scheme_string *a)
+{
+	int			alen = strlen(a->val);
+	struct ao_scheme_string	*r;
 
 	ao_scheme_string_stash(0, a);
-	r = ao_scheme_alloc(alen + 1);
+	r = ao_scheme_string_alloc(alen);
 	a = ao_scheme_string_fetch(0);
 	if (!r)
 		return NULL;
-	strcpy(r, a);
+	strcpy(r->val, a->val);
 	return r;
 }
 
-char *
-ao_scheme_string_cat(char *a, char *b)
+struct ao_scheme_string *
+ao_scheme_string_make(char *a)
 {
-	int	alen = strlen(a);
-	int	blen = strlen(b);
-	char 	*r;
+	struct ao_scheme_string	*r;
+
+	r = ao_scheme_string_alloc(strlen(a));
+	if (!r)
+		return NULL;
+	strcpy(r->val, a);
+	return r;
+}
+
+struct ao_scheme_string *
+ao_scheme_atom_to_string(struct ao_scheme_atom *a)
+{
+	int			alen = strlen(a->name);
+	struct ao_scheme_string	*r;
+
+	ao_scheme_poly_stash(0, ao_scheme_atom_poly(a));
+	r = ao_scheme_string_alloc(alen);
+	a = ao_scheme_poly_atom(ao_scheme_poly_fetch(0));
+	if (!r)
+		return NULL;
+	strcpy(r->val, a->name);
+	return r;
+}
+
+struct ao_scheme_string *
+ao_scheme_string_cat(struct ao_scheme_string *a, struct ao_scheme_string *b)
+{
+	int				alen = strlen(a->val);
+	int				blen = strlen(b->val);
+	struct ao_scheme_string 	*r;
 
 	ao_scheme_string_stash(0, a);
 	ao_scheme_string_stash(1, b);
-	r = ao_scheme_alloc(alen + blen + 1);
+	r = ao_scheme_string_alloc(alen + blen);
 	a = ao_scheme_string_fetch(0);
 	b = ao_scheme_string_fetch(1);
 	if (!r)
 		return NULL;
-	strcpy(r, a);
-	strcpy(r+alen, b);
+	strcpy(r->val, a->val);
+	strcpy(r->val+alen, b->val);
 	return r;
 }
 
 ao_poly
 ao_scheme_string_pack(struct ao_scheme_cons *cons)
 {
-	char	*r;
-	char	*s;
-	int	len;
+	struct ao_scheme_string	*r;
+	char			*rval;
+	int			len;
 
 	len = ao_scheme_cons_length(cons);
 	ao_scheme_cons_stash(0, cons);
-	r = ao_scheme_alloc(len + 1);
+	r = ao_scheme_string_alloc(len);
 	cons = ao_scheme_cons_fetch(0);
-	s = r;
+	if (!r)
+		return AO_SCHEME_NIL;
+	rval = r->val;
 
 	while (cons) {
-		if (!ao_scheme_integer_typep(ao_scheme_poly_type(cons->car)))
+		bool fail = false;
+		ao_poly	car = cons->car;
+		*rval++ = ao_scheme_poly_integer(car, &fail);
+		if (fail)
 			return ao_scheme_error(AO_SCHEME_INVALID, "non-int passed to pack");
-		*s++ = ao_scheme_poly_integer(cons->car);
-		cons = ao_scheme_poly_cons(cons->cdr);
+		cons = ao_scheme_cons_cdr(cons);
 	}
-	*s++ = 0;
+	*rval++ = 0;
 	return ao_scheme_string_poly(r);
 }
 
 ao_poly
-ao_scheme_string_unpack(char *a)
+ao_scheme_string_unpack(struct ao_scheme_string *a)
 {
 	struct ao_scheme_cons	*cons = NULL, *tail = NULL;
 	int			c;
 	int			i;
 
-	for (i = 0; (c = a[i]); i++) {
+	for (i = 0; (c = a->val[i]); i++) {
 		struct ao_scheme_cons	*n;
 		ao_scheme_cons_stash(0, cons);
 		ao_scheme_cons_stash(1, tail);
@@ -131,11 +175,12 @@ ao_scheme_string_unpack(char *a)
 void
 ao_scheme_string_write(ao_poly p)
 {
-	char	*s = ao_scheme_poly_string(p);
-	char	c;
+	struct ao_scheme_string	*s = ao_scheme_poly_string(p);
+	char			*sval = s->val;
+	char			c;
 
 	putchar('"');
-	while ((c = *s++)) {
+	while ((c = *sval++)) {
 		switch (c) {
 		case '\n':
 			printf ("\\n");
@@ -160,9 +205,10 @@ ao_scheme_string_write(ao_poly p)
 void
 ao_scheme_string_display(ao_poly p)
 {
-	char	*s = ao_scheme_poly_string(p);
-	char	c;
+	struct ao_scheme_string	*s = ao_scheme_poly_string(p);
+	char			*sval = s->val;
+	char			c;
 
-	while ((c = *s++))
+	while ((c = *sval++))
 		putchar(c);
 }

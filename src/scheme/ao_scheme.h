@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 #define AO_SCHEME_BUILTIN_FEATURES
 #include "ao_scheme_builtin.h"
 #undef AO_SCHEME_BUILTIN_FEATURES
@@ -93,7 +94,7 @@ extern uint8_t		ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribut
 /* Primitive types */
 #define AO_SCHEME_CONS		0
 #define AO_SCHEME_INT		1
-#define AO_SCHEME_STRING	2
+#define AO_SCHEME_BIGINT	2
 #define AO_SCHEME_OTHER		3
 
 #define AO_SCHEME_TYPE_MASK	0x0003
@@ -109,17 +110,12 @@ extern uint8_t		ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribut
 #define AO_SCHEME_LAMBDA	8
 #define AO_SCHEME_STACK		9
 #define AO_SCHEME_BOOL		10
-#ifdef AO_SCHEME_FEATURE_BIGINT
-#define AO_SCHEME_BIGINT	11
-#define _AO_SCHEME_BIGINT	AO_SCHEME_BIGINT
-#else
-#define _AO_SCHEME_BIGINT	AO_SCHEME_BOOL
-#endif
+#define AO_SCHEME_STRING	11
 #ifdef AO_SCHEME_FEATURE_FLOAT
-#define AO_SCHEME_FLOAT		(_AO_SCHEME_BIGINT + 1)
+#define AO_SCHEME_FLOAT		12
 #define _AO_SCHEME_FLOAT	AO_SCHEME_FLOAT
 #else
-#define _AO_SCHEME_FLOAT	_AO_SCHEME_BIGINT
+#define _AO_SCHEME_FLOAT	12
 #endif
 #ifdef AO_SCHEME_FEATURE_VECTOR
 #define AO_SCHEME_VECTOR	13
@@ -180,6 +176,11 @@ struct ao_scheme_atom {
 	char		name[];
 };
 
+struct ao_scheme_string {
+	uint8_t		type;
+	char		val[];
+};
+
 struct ao_scheme_val {
 	ao_poly		atom;
 	ao_poly		val;
@@ -227,37 +228,15 @@ struct ao_scheme_vector {
 #define AO_SCHEME_MAX_INT	((1 << (15 - AO_SCHEME_TYPE_SHIFT)) - 1)
 
 #ifdef AO_SCHEME_FEATURE_BIGINT
+
 struct ao_scheme_bigint {
 	uint32_t		value;
 };
 
-#define AO_SCHEME_MIN_BIGINT	(-(1 << 24))
-#define AO_SCHEME_MAX_BIGINT	((1 << 24) - 1)
+#define AO_SCHEME_MIN_BIGINT	INT32_MIN
+#define AO_SCHEME_MAX_BIGINT	INT32_MAX
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-
-static inline uint32_t
-ao_scheme_int_bigint(int32_t i) {
-	return AO_SCHEME_BIGINT | (i << 8);
-}
-static inline int32_t
-ao_scheme_bigint_int(uint32_t bi) {
-	return (int32_t) bi >> 8;
-}
-#else
-static inline uint32_t
-ao_scheme_int_bigint(int32_t i) {
-	return (uint32_t) (i & 0xffffff) | (AO_SCHEME_BIGINT << 24);
-}
-static inlint int32_t
-ao_scheme_bigint_int(uint32_t bi) {
-	return (int32_t) (bi << 8) >> 8;
-}
-
-#endif	/* __BYTE_ORDER */
 #endif	/* AO_SCHEME_FEATURE_BIGINT */
-
-#define AO_SCHEME_NOT_INTEGER	0x7fffffff
 
 /* Set on type when the frame escapes the lambda */
 #define AO_SCHEME_FRAME_MARK	0x80
@@ -475,20 +454,20 @@ ao_scheme_poly_bigint(ao_poly poly)
 static inline ao_poly
 ao_scheme_bigint_poly(struct ao_scheme_bigint *bi)
 {
-	return ao_scheme_poly(bi, AO_SCHEME_OTHER);
+	return ao_scheme_poly(bi, AO_SCHEME_BIGINT);
 }
 #endif /* AO_SCHEME_FEATURE_BIGINT */
 
-static inline char *
+static inline struct ao_scheme_string *
 ao_scheme_poly_string(ao_poly poly)
 {
 	return ao_scheme_ref(poly);
 }
 
 static inline ao_poly
-ao_scheme_string_poly(char *s)
+ao_scheme_string_poly(struct ao_scheme_string *s)
 {
-	return ao_scheme_poly(s, AO_SCHEME_STRING);
+	return ao_scheme_poly(s, AO_SCHEME_OTHER);
 }
 
 static inline struct ao_scheme_atom *
@@ -599,9 +578,9 @@ ao_poly
 ao_scheme_poly_fetch(int id);
 
 void
-ao_scheme_string_stash(int id, char *string);
+ao_scheme_string_stash(int id, struct ao_scheme_string *string);
 
-char *
+struct ao_scheme_string *
 ao_scheme_string_fetch(int id);
 
 static inline void
@@ -667,17 +646,23 @@ ao_scheme_cons_copy(struct ao_scheme_cons *cons);
 /* string */
 extern const struct ao_scheme_type ao_scheme_string_type;
 
-char *
-ao_scheme_string_copy(char *a);
+struct ao_scheme_string *
+ao_scheme_string_copy(struct ao_scheme_string *a);
 
-char *
-ao_scheme_string_cat(char *a, char *b);
+struct ao_scheme_string *
+ao_scheme_string_make(char *a);
+
+struct ao_scheme_string *
+ao_scheme_atom_to_string(struct ao_scheme_atom *a);
+
+struct ao_scheme_string *
+ao_scheme_string_cat(struct ao_scheme_string *a, struct ao_scheme_string *b);
 
 ao_poly
 ao_scheme_string_pack(struct ao_scheme_cons *cons);
 
 ao_poly
-ao_scheme_string_unpack(char *a);
+ao_scheme_string_unpack(struct ao_scheme_string *a);
 
 void
 ao_scheme_string_write(ao_poly s);
@@ -694,6 +679,9 @@ extern struct ao_scheme_frame	*ao_scheme_frame_current;
 
 void
 ao_scheme_atom_write(ao_poly a);
+
+struct ao_scheme_atom *
+ao_scheme_string_to_atom(struct ao_scheme_string *string);
 
 struct ao_scheme_atom *
 ao_scheme_atom_intern(char *name);
@@ -716,7 +704,7 @@ ao_scheme_int_write(ao_poly i);
 
 #ifdef AO_SCHEME_FEATURE_BIGINT
 int32_t
-ao_scheme_poly_integer(ao_poly p);
+ao_scheme_poly_integer(ao_poly p, bool *fail);
 
 ao_poly
 ao_scheme_integer_poly(int32_t i);
@@ -734,7 +722,7 @@ extern const struct ao_scheme_type	ao_scheme_bigint_type;
 
 #else
 
-#define ao_scheme_poly_integer ao_scheme_poly_int
+#define ao_scheme_poly_integer(a,b) ao_scheme_poly_int(a)
 #define ao_scheme_integer_poly ao_scheme_int_poly
 
 static inline int

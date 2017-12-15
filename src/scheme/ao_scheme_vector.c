@@ -107,14 +107,15 @@ ao_scheme_vector_display(ao_poly v)
 static int32_t
 ao_scheme_vector_offset(struct ao_scheme_vector *vector, ao_poly i)
 {
-	int32_t	offset = ao_scheme_poly_integer(i);
+	bool	fail;
+	int32_t	offset = ao_scheme_poly_integer(i, &fail);
 
-	if (offset == AO_SCHEME_NOT_INTEGER)
+	if (fail)
 		ao_scheme_error(AO_SCHEME_INVALID, "vector index %v not integer", i);
 	if (offset < 0 || vector->length <= offset) {
 		ao_scheme_error(AO_SCHEME_INVALID, "vector index %v out of range (max %d)",
 				i, vector->length);
-		offset = AO_SCHEME_NOT_INTEGER;
+		offset = -1;
 	}
 	return offset;
 }
@@ -125,7 +126,7 @@ ao_scheme_vector_get(ao_poly v, ao_poly i)
 	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
 	int32_t			offset = ao_scheme_vector_offset(vector, i);
 
-	if (offset == AO_SCHEME_NOT_INTEGER)
+	if (offset < 0)
 		return AO_SCHEME_NIL;
 	return vector->vals[offset];
 }
@@ -136,7 +137,7 @@ ao_scheme_vector_set(ao_poly v, ao_poly i, ao_poly p)
 	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
 	int32_t			offset = ao_scheme_vector_offset(vector, i);
 
-	if (offset == AO_SCHEME_NOT_INTEGER)
+	if (offset < 0)
 		return AO_SCHEME_NIL;
 	return vector->vals[offset] = p;
 }
