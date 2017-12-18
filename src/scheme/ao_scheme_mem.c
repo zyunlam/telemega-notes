@@ -280,6 +280,10 @@ static const void ** const ao_scheme_cache[] = {
 
 #define AO_SCHEME_BUSY_SIZE	((AO_SCHEME_POOL + 31) / 32)
 
+static int	ao_scheme_printing, ao_scheme_print_cleared;
+#if DBG_MEM
+static int	ao_scheme_collecting;
+#endif
 static uint8_t	ao_scheme_busy[AO_SCHEME_BUSY_SIZE];
 static uint8_t	ao_scheme_cons_note[AO_SCHEME_BUSY_SIZE];
 static uint8_t	ao_scheme_cons_last[AO_SCHEME_BUSY_SIZE];
@@ -550,6 +554,7 @@ ao_scheme_collect(uint8_t style)
 	MDBG_MOVE("collect %d\n", ao_scheme_collects[style]);
 #endif
 	MDBG_DO(ao_scheme_frame_write(ao_scheme_frame_poly(ao_scheme_frame_global)));
+	MDBG_DO(++ao_scheme_collecting);
 
 	ao_scheme_reset_stack();
 
@@ -681,6 +686,7 @@ ao_scheme_collect(uint8_t style)
 #if DBG_MEM_STACK
 	fprintf(stderr, "max collect stack depth %lu\n", mem_collect_max_depth);
 #endif
+	MDBG_DO(--ao_scheme_collecting);
 	return AO_SCHEME_POOL - ao_scheme_top;
 }
 
@@ -1020,4 +1026,54 @@ ao_scheme_frame_fetch(int id)
 	struct ao_scheme_frame *frame = save_frame[id];
 	save_frame[id] = NULL;
 	return frame;
+}
+
+int
+ao_scheme_print_mark_addr(void *addr)
+{
+	int	offset;
+
+#if DBG_MEM
+	if (ao_scheme_collecting)
+		ao_scheme_abort();
+#endif
+
+	if (!AO_SCHEME_IS_POOL(addr))
+		return 1;
+
+	if (!ao_scheme_print_cleared) {
+		ao_scheme_print_cleared = 1;
+		memset(ao_scheme_busy, '\0', sizeof (ao_scheme_busy));
+	}
+	offset = pool_offset(addr);
+	if (busy(ao_scheme_busy, offset))
+		return 1;
+	mark(ao_scheme_busy, offset);
+	return 0;
+}
+
+int
+ao_scheme_print_mark_poly(ao_poly p)
+{
+	uint8_t type = ao_scheme_poly_base_type(p);
+
+	if (type == AO_SCHEME_INT)
+		return 1;
+	return ao_scheme_print_mark_addr(ao_scheme_ref(p));
+}
+
+/* Notes that printing has started */
+void
+ao_scheme_print_start(void)
+{
+	ao_scheme_printing++;
+}
+
+/* Notes that printing has ended */
+void
+ao_scheme_print_stop(void)
+{
+	ao_scheme_printing--;
+	if (ao_scheme_printing == 0)
+		ao_scheme_print_cleared = 0;
 }

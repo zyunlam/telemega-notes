@@ -555,6 +555,21 @@ ao_scheme_move_memory(const struct ao_scheme_type *type, void **ref);
 void *
 ao_scheme_alloc(int size);
 
+/* Marks an object as being printed, returns 1 if it was already marked */
+int
+ao_scheme_print_mark_addr(void *addr);
+
+int
+ao_scheme_print_mark_poly(ao_poly poly);
+
+/* Notes that printing has started */
+void
+ao_scheme_print_start(void);
+
+/* Notes that printing has ended */
+void
+ao_scheme_print_stop(void);
+
 #define AO_SCHEME_COLLECT_FULL		1
 #define AO_SCHEME_COLLECT_INCREMENTAL	0
 

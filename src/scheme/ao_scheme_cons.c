@@ -181,16 +181,17 @@ ao_scheme_cons_write(ao_poly c)
 	ao_poly			cdr;
 	int			first = 1;
 
+	ao_scheme_print_start();
 	printf("(");
 	while (cons) {
 		if (!first)
 			printf(" ");
-		ao_scheme_poly_write(cons->car);
-		cdr = cons->cdr;
-		if (cdr == c) {
-			printf(" ...");
+		if (ao_scheme_print_mark_addr(cons)) {
+			printf("...");
 			break;
 		}
+		ao_scheme_poly_write(cons->car);
+		cdr = cons->cdr;
 		if (ao_scheme_poly_type(cdr) == AO_SCHEME_CONS) {
 			cons = ao_scheme_poly_cons(cdr);
 			first = 0;
@@ -201,6 +202,7 @@ ao_scheme_cons_write(ao_poly c)
 		}
 	}
 	printf(")");
+	ao_scheme_print_stop();
 }
 
 void
@@ -209,13 +211,15 @@ ao_scheme_cons_display(ao_poly c)
 	struct ao_scheme_cons	*cons = ao_scheme_poly_cons(c);
 	ao_poly			cdr;
 
+	ao_scheme_print_start();
 	while (cons) {
-		ao_scheme_poly_display(cons->car);
-		cdr = cons->cdr;
-		if (cdr == c) {
+		if (ao_scheme_print_mark_addr(cons)) {
 			printf("...");
 			break;
 		}
+		ao_scheme_poly_display(cons->car);
+
+		cdr = cons->cdr;
 		if (ao_scheme_poly_type(cdr) == AO_SCHEME_CONS)
 			cons = ao_scheme_poly_cons(cdr);
 		else {
@@ -223,6 +227,7 @@ ao_scheme_cons_display(ao_poly c)
 			cons = NULL;
 		}
 	}
+	ao_scheme_print_stop();
 }
 
 int

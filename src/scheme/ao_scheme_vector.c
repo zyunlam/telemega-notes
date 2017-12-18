@@ -78,16 +78,19 @@ ao_scheme_vector_write(ao_poly v)
 	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
 	unsigned int i;
 
-	printf("#(");
-	for (i = 0; i < vector->length; i++) {
-		if (i != 0)
-			printf(" ");
-		if (vector->vals[i] == v)
-			printf ("...");
-		else
+	ao_scheme_print_start();
+	if (ao_scheme_print_mark_addr(vector))
+		printf ("...");
+	else {
+		printf("#(");
+		for (i = 0; i < vector->length; i++) {
+			if (i != 0)
+				printf(" ");
 			ao_scheme_poly_write(vector->vals[i]);
+		}
+		printf(")");
 	}
-	printf(")");
+	ao_scheme_print_stop();
 }
 
 void
@@ -96,10 +99,11 @@ ao_scheme_vector_display(ao_poly v)
 	struct ao_scheme_vector *vector = ao_scheme_poly_vector(v);
 	unsigned int i;
 
-	for (i = 0; i < vector->length; i++) {
-		if (vector->vals[i] == v)
-			printf("...");
-		else
+	ao_scheme_print_start();
+	if (ao_scheme_print_mark_addr(vector))
+		printf ("...");
+	else {
+		for (i = 0; i < vector->length; i++)
 			ao_scheme_poly_display(vector->vals[i]);
 	}
 }

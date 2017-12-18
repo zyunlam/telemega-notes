@@ -41,7 +41,6 @@ frame_vals_mark(void *addr)
 			  ao_scheme_poly_atom(v->atom)->name,
 			  MDBG_OFFSET(ao_scheme_ref(v->atom)),
 			  MDBG_OFFSET(ao_scheme_ref(v->val)), f);
-		MDBG_DO(ao_scheme_poly_write(v->val));
 		MDBG_DO(printf("\n"));
 	}
 }
