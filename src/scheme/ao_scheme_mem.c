@@ -623,6 +623,20 @@ ao_scheme_collect(uint8_t style)
 			top += size;
 		}
 
+		/* Short-circuit the rest of the loop when all of the
+		 * found objects aren't moving. This isn't strictly
+		 * necessary as the rest of the loop is structured to
+		 * work in this case, but GCC 7.2.0 with optimization
+		 * greater than 2 generates incorrect code for this...
+		 */
+		if (i == AO_SCHEME_NCHUNK) {
+			chunk_low = chunk_high;
+#if DBG_MEM_STATS
+			loops++;
+#endif
+			continue;
+		}
+
 		/*
 		 * Limit amount of chunk array used in mapping moves
 		 * to the active region
