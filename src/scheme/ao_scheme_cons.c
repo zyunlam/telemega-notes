@@ -24,8 +24,8 @@ static void cons_mark(void *addr)
 		ao_scheme_poly_mark(cons->car, 1);
 		if (!cdr)
 			break;
-		if (ao_scheme_poly_type(cdr) != AO_SCHEME_CONS) {
-			ao_scheme_poly_mark(cdr, 1);
+		if (!AO_SCHEME_IS_CONS(cdr)) {
+			ao_scheme_poly_mark(cdr, 0);
 			break;
 		}
 		cons = ao_scheme_poly_cons(cdr);
@@ -58,7 +58,7 @@ static void cons_move(void *addr)
 		cdr = cons->cdr;
 		if (!cdr)
 			break;
-		if (ao_scheme_poly_base_type(cdr) != AO_SCHEME_CONS) {
+		if (!AO_SCHEME_IS_CONS(cdr)) {
 			(void) ao_scheme_poly_move(&cons->cdr, 0);
 			break;
 		}

@@ -150,6 +150,7 @@ ao_scheme_is_const(ao_poly poly) {
 #define AO_SCHEME_IS_CONST(a)	(ao_scheme_const <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_scheme_const + AO_SCHEME_POOL_CONST)
 #define AO_SCHEME_IS_POOL(a)	(ao_scheme_pool <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_scheme_pool + AO_SCHEME_POOL)
 #define AO_SCHEME_IS_INT(p)	(ao_scheme_poly_base_type(p) == AO_SCHEME_INT)
+#define AO_SCHEME_IS_CONS(p)	(ao_scheme_poly_base_type(p) == AO_SCHEME_CONS)
 
 void *
 ao_scheme_ref(ao_poly poly);
