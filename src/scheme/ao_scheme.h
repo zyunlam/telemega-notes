@@ -15,10 +15,18 @@
 #ifndef _AO_SCHEME_H_
 #define _AO_SCHEME_H_
 
+#ifndef DBG_MEM
 #define DBG_MEM		0
+#endif
+#ifndef DBG_EVAL
 #define DBG_EVAL	0
+#endif
+#ifndef DBG_READ
 #define DBG_READ	0
+#endif
+#ifndef DBG_FREE_CONS
 #define DBG_FREE_CONS	0
+#endif
 #define NDEBUG		1
 
 #include <stdint.h>
@@ -954,9 +962,11 @@ ao_scheme_error(int error, const char *format, ...);
 
 /* debugging macros */
 
-#if DBG_EVAL || DBG_READ || DBG_MEM
-#define DBG_CODE	1
+#if DBG_EVAL || DBG_READ
 int ao_scheme_stack_depth;
+#endif
+
+#if DBG_EVAL
 #define DBG_DO(a)	a
 #define DBG_INDENT()	do { int _s; for(_s = 0; _s < ao_scheme_stack_depth; _s++) printf("  "); } while(0)
 #define DBG_IN()	(++ao_scheme_stack_depth)
@@ -993,27 +1003,46 @@ ao_scheme_frames_dump(void)
 #endif
 
 #if DBG_READ
-#define RDBGI(...)	DBGI(__VA_ARGS__)
-#define RDBG_IN()	DBG_IN()
-#define RDBG_OUT()	DBG_OUT()
+#define RDBGI(...)	do { printf("%4d: ", __LINE__); DBG_INDENT(); ao_scheme_printf(__VA_ARGS__); } while (0)
+#define RDBG_IN()	(++ao_scheme_stack_depth)
+#define RDBG_OUT()	(--ao_scheme_stack_depth)
 #else
 #define RDBGI(...)
 #define RDBG_IN()
 #define RDBG_OUT()
 #endif
 
-#define DBG_MEM_START	1
+static inline int
+ao_scheme_mdbg_offset(void *a)
+{
+	uint8_t		*u = a;
+
+	if (u == 0)
+		return -1;
+
+	if (ao_scheme_pool <= u && u < ao_scheme_pool + AO_SCHEME_POOL)
+		return u - ao_scheme_pool;
+
+#ifndef AO_SCHEME_MAKE_CONST
+	if (ao_scheme_const <= u && u < ao_scheme_const + AO_SCHEME_POOL_CONST)
+		return - (int) (u - ao_scheme_const);
+#endif
+	return -2;
+}
+
+#define MDBG_OFFSET(a)	ao_scheme_mdbg_offset(a)
 
 #if DBG_MEM
+
+#define DBG_MEM_START	1
 
 #include <assert.h>
 extern int dbg_move_depth;
 #define MDBG_DUMP 1
-#define MDBG_OFFSET(a)	((a) ? (int) ((uint8_t *) (a) - ao_scheme_pool) : -1)
 
 extern int dbg_mem;
 
-#define MDBG_DO(a)	DBG_DO(a)
+#define MDBG_DO(a)	a
 #define MDBG_MOVE(...) do { if (dbg_mem) { int d; for (d = 0; d < dbg_move_depth; d++) printf ("  "); printf(__VA_ARGS__); } } while (0)
 #define MDBG_MORE(...) do { if (dbg_mem) printf(__VA_ARGS__); } while (0)
 #define MDBG_MOVE_IN()	(dbg_move_depth++)

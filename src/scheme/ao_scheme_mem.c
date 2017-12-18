@@ -72,10 +72,16 @@ _ao_scheme_reset_stack(char *x)
 #endif
 
 #if DBG_MEM
+#define DBG_MEM_RECORD	1
+#endif
+
+#if DBG_MEM
 int dbg_move_depth;
 int dbg_mem = DBG_MEM_START;
 int dbg_validate = 0;
+#endif
 
+#if DBG_MEM_RECORD
 struct ao_scheme_record {
 	struct ao_scheme_record		*next;
 	const struct ao_scheme_type	*type;
@@ -129,9 +135,9 @@ ao_scheme_record_save(void)
 }
 
 static void
-ao_scheme_record_compare(char *where,
-		       struct ao_scheme_record *a,
-		       struct ao_scheme_record *b)
+ao_scheme_record_compare(const char *where,
+			 struct ao_scheme_record *a,
+			 struct ao_scheme_record *b)
 {
 	while (a && b) {
 		if (a->type != b->type || a->size != b->size) {
@@ -168,6 +174,7 @@ ao_scheme_record_compare(char *where,
 
 #else
 #define ao_scheme_record_reset()
+#define ao_scheme_record(t,a,s)
 #endif
 
 uint8_t	ao_scheme_exception;
@@ -390,6 +397,9 @@ note_chunk(uint16_t offset, uint16_t size)
 	/* Off the left side */
 	if (l == 0 && chunk_last && offset > ao_scheme_chunk[0].old_offset)
 		ao_scheme_abort();
+
+	if (l < chunk_last && ao_scheme_chunk[l].old_offset == offset)
+		ao_scheme_abort();
 #endif
 
 	/* Shuffle existing entries right */
@@ -469,20 +479,19 @@ static void
 dump_busy(void)
 {
 	int	i;
-	MDBG_MOVE("busy:");
+	printf("busy:");
 	for (i = 0; i < ao_scheme_top; i += 4) {
 		if ((i & 0xff) == 0) {
-			MDBG_MORE("\n");
-			MDBG_MOVE("%s", "");
+			printf("\n\t");
 		}
 		else if ((i & 0x1f) == 0)
-			MDBG_MORE(" ");
+			printf(" ");
 		if (busy(ao_scheme_busy, i))
-			MDBG_MORE("*");
+			printf("*");
 		else
-			MDBG_MORE("-");
+			printf("-");
 	}
-	MDBG_MORE ("\n");
+	printf ("\n");
 }
 #define DUMP_BUSY()	dump_busy()
 #else
@@ -548,11 +557,11 @@ ao_scheme_collect(uint8_t style)
 #if DBG_MEM_STATS
 	int	loops = 0;
 #endif
-#if DBG_MEM
+#if DBG_MEM_RECORD
 	struct ao_scheme_record	*mark_record = NULL, *move_record = NULL;
-
-	MDBG_MOVE("collect %d\n", ao_scheme_collects[style]);
 #endif
+	MDBG_MOVE("collect %lu\n", ao_scheme_collects[style]);
+
 	MDBG_DO(ao_scheme_frame_write(ao_scheme_frame_poly(ao_scheme_frame_global)));
 	MDBG_DO(++ao_scheme_collecting);
 
@@ -579,15 +588,12 @@ ao_scheme_collect(uint8_t style)
 		chunk_low = top = ao_scheme_last_top;
 	}
 	for (;;) {
-#if DBG_MEM_STATS
-		loops++;
-#endif
 		MDBG_MOVE("move chunks from %d to %d\n", chunk_low, top);
 		/* Find the sizes of the first chunk of objects to move */
 		reset_chunks();
 		walk(ao_scheme_mark_ref, ao_scheme_poly_mark_ref);
-#if DBG_MEM
 
+#if DBG_MEM_RECORD
 		ao_scheme_record_free(mark_record);
 		mark_record = ao_scheme_record_save();
 		if (mark_record && move_record)
@@ -599,7 +605,6 @@ ao_scheme_collect(uint8_t style)
 		/* Find the first moving object */
 		for (i = 0; i < chunk_last; i++) {
 			uint16_t	size = ao_scheme_chunk[i].size;
-
 #if DBG_MEM
 			if (!size)
 				ao_scheme_abort();
@@ -651,7 +656,7 @@ ao_scheme_collect(uint8_t style)
 			/* Relocate all references to the objects */
 			walk(ao_scheme_move, ao_scheme_poly_move);
 
-#if DBG_MEM
+#if DBG_MEM_RECORD
 			ao_scheme_record_free(move_record);
 			move_record = ao_scheme_record_save();
 			if (mark_record && move_record)
@@ -659,6 +664,9 @@ ao_scheme_collect(uint8_t style)
 #endif
 		}
 
+#if DBG_MEM_STATS
+		loops++;
+#endif
 		/* If we ran into the end of the heap, then
 		 * there's no need to keep walking
 		 */
@@ -861,7 +869,7 @@ ao_scheme_move_memory(const struct ao_scheme_type *type, void **ref)
 		return 1;
 	}
 	mark(ao_scheme_busy, offset);
-	MDBG_DO(ao_scheme_record(type, addr, ao_scheme_size(type, addr)));
+	ao_scheme_record(type, addr, ao_scheme_size(type, addr));
 	return 0;
 }
 
@@ -928,14 +936,14 @@ ao_scheme_poly_move(ao_poly *ref, uint8_t do_note_cons)
 	if (offset != orig_offset) {
 		ao_poly np = ao_scheme_poly(ao_scheme_pool + offset, ao_scheme_poly_base_type(p));
 		MDBG_MOVE("poly %d moved %d -> %d\n",
-			  type, orig_offset, offset);
+			  ao_scheme_poly_type(np), orig_offset, offset);
 		*ref = np;
 	}
 	return ret;
 }
 
 #if DBG_MEM
-void
+static void
 ao_scheme_validate(void)
 {
 	chunk_low = 0;
