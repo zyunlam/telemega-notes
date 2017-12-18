@@ -82,6 +82,7 @@ static const struct ao_scheme_funcs ao_scheme_funcs[AO_SCHEME_NUM_TYPE] = {
 
 static void ao_scheme_invalid_write(ao_poly p) {
 	printf("??? 0x%04x ???", p);
+	ao_scheme_abort();
 }
 
 static const struct ao_scheme_funcs ao_scheme_invalid_funcs = {
