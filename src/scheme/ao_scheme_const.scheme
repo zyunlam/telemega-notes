@@ -248,7 +248,7 @@
    (macro (first . rest)
 					; check for alternate lambda definition form
 
-	  (cond ((list? first)
+	  (cond ((pair? first)
 		 (set! rest
 		       (append
 			(list
@@ -640,7 +640,7 @@
 (char-whitespace? #\0)
 (char-whitespace? #\space)
 
-(define (char->integer c) c)
+(define char->integer (macro (v) v))
 (define integer->char char->integer)
 
 (define (char-upcase c) (if (char-lower-case? c) (+ c (- #\A #\a)) c))
