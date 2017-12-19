@@ -220,7 +220,7 @@ ao_has_macro(ao_poly p)
 
 		list = cons->cdr;
 		p = AO_SCHEME_NIL;
-		while (list != AO_SCHEME_NIL && ao_scheme_poly_type(list) == AO_SCHEME_CONS) {
+		while (list != AO_SCHEME_NIL && AO_SCHEME_IS_CONS(list)) {
 			cons = ao_scheme_poly_cons(list);
 			m = ao_has_macro(cons->car);
 			if (m) {
@@ -280,7 +280,7 @@ ao_scheme_read_eval_abort(void)
 		out = ao_scheme_eval(in);
 		if (ao_scheme_exception)
 			return 0;
-		ao_scheme_poly_write(out);
+		ao_scheme_poly_write(out, true);
 		putchar ('\n');
 	}
 	return 1;
@@ -446,7 +446,7 @@ main(int argc, char **argv)
 		if (val != AO_SCHEME_NIL) {
 			printf("error: function %s contains unresolved macro: ",
 			       ao_scheme_poly_atom(vals->vals[f].atom)->name);
-			ao_scheme_poly_write(val);
+			ao_scheme_poly_write(val, true);
 			printf("\n");
 			exit(1);
 		}

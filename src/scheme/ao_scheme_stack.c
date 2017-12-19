@@ -158,25 +158,34 @@ ao_scheme_stack_clear(void)
 }
 
 void
-ao_scheme_stack_write(ao_poly poly)
+ao_scheme_stack_write(ao_poly poly, bool write)
 {
-	struct ao_scheme_stack *s = ao_scheme_poly_stack(poly);
+	struct ao_scheme_stack 	*s = ao_scheme_poly_stack(poly);
+	struct ao_scheme_stack	*clear = s;
+	int			written = 0;
 
+	(void) write;
+	ao_scheme_print_start();
+	ao_scheme_frame_print_indent += 2;
 	while (s) {
-		if (s->type & AO_SCHEME_STACK_PRINT) {
+		if (ao_scheme_print_mark_addr(s)) {
 			printf("[recurse...]");
-			return;
+			break;
 		}
-		s->type |= AO_SCHEME_STACK_PRINT;
+		written++;
 		printf("\t[\n");
-		printf("\t\texpr:   "); ao_scheme_poly_write(s->list); printf("\n");
-		printf("\t\tstate:  %s\n", ao_scheme_state_names[s->state]);
-		ao_scheme_error_poly ("values: ", s->values, s->values_tail);
-		ao_scheme_error_poly ("sexprs: ", s->sexprs, AO_SCHEME_NIL);
-		ao_scheme_error_frame(2, "frame:  ", ao_scheme_poly_frame(s->frame));
+		ao_scheme_printf("\t\texpr:     %v\n", s->list);
+		ao_scheme_printf("\t\tvalues:   %v\n", s->values);
+		ao_scheme_printf("\t\tframe:    %v\n", s->frame);
 		printf("\t]\n");
-		s->type &= ~AO_SCHEME_STACK_PRINT;
 		s = ao_scheme_poly_stack(s->prev);
+	}
+	ao_scheme_frame_print_indent -= 2;
+	if (ao_scheme_print_stop()) {
+		while (written--) {
+			ao_scheme_print_clear_addr(clear);
+			clear = ao_scheme_poly_stack(clear->prev);
+		}
 	}
 }
 

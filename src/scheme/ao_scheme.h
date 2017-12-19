@@ -249,7 +249,6 @@ struct ao_scheme_bigint {
 
 /* Set on type when the frame escapes the lambda */
 #define AO_SCHEME_FRAME_MARK	0x80
-#define AO_SCHEME_FRAME_PRINT	0x40
 
 static inline int ao_scheme_frame_marked(struct ao_scheme_frame *f) {
 	return f->type & AO_SCHEME_FRAME_MARK;
@@ -301,7 +300,6 @@ struct ao_scheme_stack {
 };
 
 #define AO_SCHEME_STACK_MARK	0x80	/* set on type when a reference has been taken */
-#define AO_SCHEME_STACK_PRINT	0x40	/* stack is being printed */
 
 static inline int ao_scheme_stack_marked(struct ao_scheme_stack *s) {
 	return s->type & AO_SCHEME_STACK_MARK;
@@ -567,15 +565,15 @@ ao_scheme_alloc(int size);
 int
 ao_scheme_print_mark_addr(void *addr);
 
-int
-ao_scheme_print_mark_poly(ao_poly poly);
+void
+ao_scheme_print_clear_addr(void *addr);
 
 /* Notes that printing has started */
 void
 ao_scheme_print_start(void);
 
-/* Notes that printing has ended */
-void
+/* Notes that printing has ended, returns 1 if printing is still happening */
+int
 ao_scheme_print_stop(void);
 
 #define AO_SCHEME_COLLECT_FULL		1
@@ -628,7 +626,7 @@ ao_scheme_frame_fetch(int id);
 extern const struct ao_scheme_type ao_scheme_bool_type;
 
 void
-ao_scheme_bool_write(ao_poly v);
+ao_scheme_bool_write(ao_poly v, bool write);
 
 #ifdef AO_SCHEME_MAKE_CONST
 extern struct ao_scheme_bool	*ao_scheme_true, *ao_scheme_false;
@@ -656,10 +654,7 @@ void
 ao_scheme_cons_free(struct ao_scheme_cons *cons);
 
 void
-ao_scheme_cons_write(ao_poly);
-
-void
-ao_scheme_cons_display(ao_poly);
+ao_scheme_cons_write(ao_poly, bool write);
 
 int
 ao_scheme_cons_length(struct ao_scheme_cons *cons);
@@ -689,10 +684,7 @@ ao_poly
 ao_scheme_string_unpack(struct ao_scheme_string *a);
 
 void
-ao_scheme_string_write(ao_poly s);
-
-void
-ao_scheme_string_display(ao_poly s);
+ao_scheme_string_write(ao_poly s, bool write);
 
 /* atom */
 extern const struct ao_scheme_type ao_scheme_atom_type;
@@ -702,7 +694,7 @@ extern struct ao_scheme_frame	*ao_scheme_frame_global;
 extern struct ao_scheme_frame	*ao_scheme_frame_current;
 
 void
-ao_scheme_atom_write(ao_poly a);
+ao_scheme_atom_write(ao_poly a, bool write);
 
 struct ao_scheme_atom *
 ao_scheme_string_to_atom(struct ao_scheme_string *string);
@@ -724,7 +716,7 @@ ao_scheme_atom_def(ao_poly atom, ao_poly val);
 
 /* int */
 void
-ao_scheme_int_write(ao_poly i);
+ao_scheme_int_write(ao_poly i, bool write);
 
 #ifdef AO_SCHEME_FEATURE_BIGINT
 int32_t
@@ -740,7 +732,7 @@ ao_scheme_integer_typep(uint8_t t)
 }
 
 void
-ao_scheme_bigint_write(ao_poly i);
+ao_scheme_bigint_write(ao_poly i, bool write);
 
 extern const struct ao_scheme_type	ao_scheme_bigint_type;
 
@@ -760,10 +752,7 @@ ao_scheme_integer_typep(uint8_t t)
 /* vector */
 
 void
-ao_scheme_vector_write(ao_poly v);
-
-void
-ao_scheme_vector_display(ao_poly v);
+ao_scheme_vector_write(ao_poly v, bool write);
 
 struct ao_scheme_vector *
 ao_scheme_vector_alloc(uint16_t length, ao_poly fill);
@@ -783,14 +772,10 @@ ao_scheme_vector_to_list(struct ao_scheme_vector *vector);
 extern const struct ao_scheme_type	ao_scheme_vector_type;
 
 /* prim */
-void (*ao_scheme_poly_write_func(ao_poly p))(ao_poly p);
-void (*ao_scheme_poly_display_func(ao_poly p))(ao_poly p);
+void (*ao_scheme_poly_write_func(ao_poly p))(ao_poly p, bool write);
 
 static inline void
-ao_scheme_poly_write(ao_poly p) { (*ao_scheme_poly_write_func(p))(p); }
-
-static inline void
-ao_scheme_poly_display(ao_poly p) { (*ao_scheme_poly_display_func(p))(p); }
+ao_scheme_poly_write(ao_poly p, bool write) { (*ao_scheme_poly_write_func(p))(p, write); }
 
 int
 ao_scheme_poly_mark(ao_poly p, uint8_t note_cons);
@@ -818,7 +803,7 @@ ao_scheme_set_cond(struct ao_scheme_cons *cons);
 extern const struct ao_scheme_type ao_scheme_float_type;
 
 void
-ao_scheme_float_write(ao_poly p);
+ao_scheme_float_write(ao_poly p, bool write);
 
 ao_poly
 ao_scheme_float_get(float value);
@@ -836,7 +821,7 @@ ao_scheme_number_typep(uint8_t t)
 
 /* builtin */
 void
-ao_scheme_builtin_write(ao_poly b);
+ao_scheme_builtin_write(ao_poly b, bool write);
 
 extern const struct ao_scheme_type ao_scheme_builtin_type;
 
@@ -895,7 +880,7 @@ ao_poly
 ao_scheme_frame_add(struct ao_scheme_frame *frame, ao_poly atom, ao_poly val);
 
 void
-ao_scheme_frame_write(ao_poly p);
+ao_scheme_frame_write(ao_poly p, bool write);
 
 void
 ao_scheme_frame_init(void);
@@ -909,7 +894,7 @@ struct ao_scheme_lambda *
 ao_scheme_lambda_new(ao_poly cons);
 
 void
-ao_scheme_lambda_write(ao_poly lambda);
+ao_scheme_lambda_write(ao_poly lambda, bool write);
 
 ao_poly
 ao_scheme_lambda_eval(void);
@@ -919,6 +904,8 @@ ao_scheme_lambda_eval(void);
 extern const struct ao_scheme_type ao_scheme_stack_type;
 extern struct ao_scheme_stack	*ao_scheme_stack;
 extern struct ao_scheme_stack	*ao_scheme_stack_free_list;
+
+extern int			ao_scheme_frame_print_indent;
 
 void
 ao_scheme_stack_reset(struct ao_scheme_stack *stack);
@@ -933,7 +920,7 @@ void
 ao_scheme_stack_clear(void);
 
 void
-ao_scheme_stack_write(ao_poly stack);
+ao_scheme_stack_write(ao_poly stack, bool write);
 
 ao_poly
 ao_scheme_stack_eval(void);
@@ -945,12 +932,6 @@ ao_scheme_vprintf(const char *format, va_list args);
 
 void
 ao_scheme_printf(const char *format, ...);
-
-void
-ao_scheme_error_poly(const char *name, ao_poly poly, ao_poly last);
-
-void
-ao_scheme_error_frame(int indent, const char *name, struct ao_scheme_frame *frame);
 
 ao_poly
 ao_scheme_error(int error, const char *format, ...);
@@ -974,10 +955,10 @@ int ao_scheme_stack_depth;
 #define DBG_RESET()	(ao_scheme_stack_depth = 0)
 #define DBG(...) 	ao_scheme_printf(__VA_ARGS__)
 #define DBGI(...)	do { printf("%4d: ", __LINE__); DBG_INDENT(); DBG(__VA_ARGS__); } while (0)
-#define DBG_CONS(a)	ao_scheme_cons_write(ao_scheme_cons_poly(a))
-#define DBG_POLY(a)	ao_scheme_poly_write(a)
+#define DBG_CONS(a)	ao_scheme_cons_write(ao_scheme_cons_poly(a), true)
+#define DBG_POLY(a)	ao_scheme_poly_write(a, true)
 #define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_scheme_pool) : -1)
-#define DBG_STACK()	ao_scheme_stack_write(ao_scheme_stack_poly(ao_scheme_stack))
+#define DBG_STACK()	ao_scheme_stack_write(ao_scheme_stack_poly(ao_scheme_stack), true)
 static inline void
 ao_scheme_frames_dump(void)
 {

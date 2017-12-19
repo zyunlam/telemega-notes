@@ -111,7 +111,7 @@ ao_scheme_cons_cdr(struct ao_scheme_cons *cons)
 	ao_poly	cdr = cons->cdr;
 	if (cdr == AO_SCHEME_NIL)
 		return NULL;
-	if (ao_scheme_poly_type(cdr) != AO_SCHEME_CONS) {
+	if (!AO_SCHEME_IS_CONS(cdr)) {
 		(void) ao_scheme_error(AO_SCHEME_INVALID, "improper cdr %v", cdr);
 		return NULL;
 	}
@@ -151,7 +151,7 @@ ao_scheme_cons_copy(struct ao_scheme_cons *cons)
 			tail->cdr = ao_scheme_cons_poly(new);
 		tail = new;
 		cdr = cons->cdr;
-		if (ao_scheme_poly_type(cdr) != AO_SCHEME_CONS) {
+		if (!AO_SCHEME_IS_CONS(cdr)) {
 			tail->cdr = cdr;
 			break;
 		}
@@ -175,59 +175,53 @@ ao_scheme_cons_free(struct ao_scheme_cons *cons)
 }
 
 void
-ao_scheme_cons_write(ao_poly c)
+ao_scheme_cons_write(ao_poly c, bool write)
 {
 	struct ao_scheme_cons	*cons = ao_scheme_poly_cons(c);
+	struct ao_scheme_cons	*clear = cons;
 	ao_poly			cdr;
-	int			first = 1;
+	int			written = 0;
 
 	ao_scheme_print_start();
 	printf("(");
 	while (cons) {
-		if (!first)
+		if (written != 0)
 			printf(" ");
+
+		/* Note if there's recursion in printing. Not
+		 * as good as actual references, but at least
+		 * we don't infinite loop...
+		 */
 		if (ao_scheme_print_mark_addr(cons)) {
 			printf("...");
 			break;
 		}
-		ao_scheme_poly_write(cons->car);
+
+		ao_scheme_poly_write(cons->car, write);
+
+		/* keep track of how many pairs have been printed */
+		written++;
+
 		cdr = cons->cdr;
-		if (ao_scheme_poly_type(cdr) == AO_SCHEME_CONS) {
-			cons = ao_scheme_poly_cons(cdr);
-			first = 0;
-		} else {
+		if (!AO_SCHEME_IS_CONS(cdr)) {
 			printf(" . ");
-			ao_scheme_poly_write(cdr);
-			cons = NULL;
+			ao_scheme_poly_write(cdr, write);
+			break;
 		}
+		cons = ao_scheme_poly_cons(cdr);
 	}
 	printf(")");
-	ao_scheme_print_stop();
-}
 
-void
-ao_scheme_cons_display(ao_poly c)
-{
-	struct ao_scheme_cons	*cons = ao_scheme_poly_cons(c);
-	ao_poly			cdr;
+	if (ao_scheme_print_stop()) {
 
-	ao_scheme_print_start();
-	while (cons) {
-		if (ao_scheme_print_mark_addr(cons)) {
-			printf("...");
-			break;
-		}
-		ao_scheme_poly_display(cons->car);
-
-		cdr = cons->cdr;
-		if (ao_scheme_poly_type(cdr) == AO_SCHEME_CONS)
-			cons = ao_scheme_poly_cons(cdr);
-		else {
-			ao_scheme_poly_display(cdr);
-			cons = NULL;
+		/* If we're still printing, clear the print marks on
+		 * all printed pairs
+		 */
+		while (written--) {
+			ao_scheme_print_clear_addr(clear);
+			clear = ao_scheme_poly_cons(clear->cdr);
 		}
 	}
-	ao_scheme_print_stop();
 }
 
 int

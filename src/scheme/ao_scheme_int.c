@@ -15,9 +15,10 @@
 #include "ao_scheme.h"
 
 void
-ao_scheme_int_write(ao_poly p)
+ao_scheme_int_write(ao_poly p, bool write)
 {
 	int i = ao_scheme_poly_int(p);
+	(void) write;
 	printf("%d", i);
 }
 
@@ -76,10 +77,11 @@ const struct ao_scheme_type ao_scheme_bigint_type = {
 };
 
 void
-ao_scheme_bigint_write(ao_poly p)
+ao_scheme_bigint_write(ao_poly p, bool write)
 {
 	struct ao_scheme_bigint	*bi = ao_scheme_poly_bigint(p);
 
+	(void) write;
 	printf("%d", bi->value);
 }
 #endif /* AO_SCHEME_FEATURE_BIGINT */

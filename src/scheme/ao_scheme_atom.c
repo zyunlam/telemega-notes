@@ -188,8 +188,9 @@ ao_scheme_atom_def(ao_poly atom, ao_poly val)
 }
 
 void
-ao_scheme_atom_write(ao_poly a)
+ao_scheme_atom_write(ao_poly a, bool write)
 {
 	struct ao_scheme_atom *atom = ao_scheme_poly_atom(a);
+	(void) write;
 	printf("%s", atom->name);
 }

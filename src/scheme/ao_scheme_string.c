@@ -173,42 +173,36 @@ ao_scheme_string_unpack(struct ao_scheme_string *a)
 }
 
 void
-ao_scheme_string_write(ao_poly p)
+ao_scheme_string_write(ao_poly p, bool write)
 {
 	struct ao_scheme_string	*s = ao_scheme_poly_string(p);
 	char			*sval = s->val;
 	char			c;
 
-	putchar('"');
-	while ((c = *sval++)) {
-		switch (c) {
-		case '\n':
-			printf ("\\n");
-			break;
-		case '\r':
-			printf ("\\r");
-			break;
-		case '\t':
-			printf ("\\t");
-			break;
-		default:
-			if (c < ' ')
-				printf("\\%03o", c);
-			else
-				putchar(c);
-			break;
+	if (write) {
+		putchar('"');
+		while ((c = *sval++)) {
+			switch (c) {
+			case '\n':
+				printf ("\\n");
+				break;
+			case '\r':
+				printf ("\\r");
+				break;
+			case '\t':
+				printf ("\\t");
+				break;
+			default:
+				if (c < ' ')
+					printf("\\%03o", c);
+				else
+					putchar(c);
+				break;
+			}
 		}
+		putchar('"');
+	} else {
+		while ((c = *sval++))
+			putchar(c);
 	}
-	putchar('"');
-}
-
-void
-ao_scheme_string_display(ao_poly p)
-{
-	struct ao_scheme_string	*s = ao_scheme_poly_string(p);
-	char			*sval = s->val;
-	char			c;
-
-	while ((c = *sval++))
-		putchar(c);
 }

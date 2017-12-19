@@ -142,32 +142,53 @@ const struct ao_scheme_type ao_scheme_frame_type = {
 	.name = "frame",
 };
 
+int ao_scheme_frame_print_indent;
+
+static void
+ao_scheme_frame_indent(int extra)
+{
+	int				i;
+	putchar('\n');
+	for (i = 0; i < ao_scheme_frame_print_indent+extra; i++)
+		putchar('\t');
+}
+
 void
-ao_scheme_frame_write(ao_poly p)
+ao_scheme_frame_write(ao_poly p, bool write)
 {
 	struct ao_scheme_frame		*frame = ao_scheme_poly_frame(p);
+	struct ao_scheme_frame		*clear = frame;
 	struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
 	int				f;
+	int				written = 0;
 
-	printf ("{");
-	if (frame) {
-		if (frame->type & AO_SCHEME_FRAME_PRINT)
+	ao_scheme_print_start();
+	while (frame) {
+		if (written != 0)
+			printf(", ");
+		if (ao_scheme_print_mark_addr(frame)) {
 			printf("recurse...");
-		else {
-			frame->type |= AO_SCHEME_FRAME_PRINT;
-			for (f = 0; f < frame->num; f++) {
-				if (f != 0)
-					printf(", ");
-				ao_scheme_poly_write(vals->vals[f].atom);
-				printf(" = ");
-				ao_scheme_poly_write(vals->vals[f].val);
-			}
-			if (frame->prev)
-				ao_scheme_poly_write(frame->prev);
-			frame->type &= ~AO_SCHEME_FRAME_PRINT;
+			break;
+		}
+
+		putchar('{');
+		written++;
+		for (f = 0; f < frame->num; f++) {
+			ao_scheme_frame_indent(1);
+			ao_scheme_poly_write(vals->vals[f].atom, write);
+			printf(" = ");
+			ao_scheme_poly_write(vals->vals[f].val, write);
+		}
+		frame = ao_scheme_poly_frame(frame->prev);
+		ao_scheme_frame_indent(0);
+		putchar('}');
+	}
+	if (ao_scheme_print_stop()) {
+		while (written--) {
+			ao_scheme_print_clear_addr(clear);
+			clear = ao_scheme_poly_frame(clear->prev);
 		}
 	}
-	printf("}");
 }
 
 static int

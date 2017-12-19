@@ -73,39 +73,27 @@ ao_scheme_vector_alloc(uint16_t length, ao_poly fill)
 }
 
 void
-ao_scheme_vector_write(ao_poly v)
+ao_scheme_vector_write(ao_poly v, bool write)
 {
 	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
 	unsigned int i;
+	int was_marked = 0;
 
 	ao_scheme_print_start();
-	if (ao_scheme_print_mark_addr(vector))
+	was_marked = ao_scheme_print_mark_addr(vector);
+	if (was_marked) {
 		printf ("...");
-	else {
+	} else {
 		printf("#(");
 		for (i = 0; i < vector->length; i++) {
 			if (i != 0)
 				printf(" ");
-			ao_scheme_poly_write(vector->vals[i]);
+			ao_scheme_poly_write(vector->vals[i], write);
 		}
 		printf(")");
 	}
-	ao_scheme_print_stop();
-}
-
-void
-ao_scheme_vector_display(ao_poly v)
-{
-	struct ao_scheme_vector *vector = ao_scheme_poly_vector(v);
-	unsigned int i;
-
-	ao_scheme_print_start();
-	if (ao_scheme_print_mark_addr(vector))
-		printf ("...");
-	else {
-		for (i = 0; i < vector->length; i++)
-			ao_scheme_poly_display(vector->vals[i]);
-	}
+	if (ao_scheme_print_stop() && !was_marked)
+		ao_scheme_print_clear_addr(vector);
 }
 
 static int32_t

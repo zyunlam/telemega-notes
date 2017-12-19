@@ -84,9 +84,10 @@ ao_scheme_args_name(uint8_t args)
 #endif
 
 void
-ao_scheme_builtin_write(ao_poly b)
+ao_scheme_builtin_write(ao_poly b, bool write)
 {
 	struct ao_scheme_builtin *builtin = ao_scheme_poly_builtin(b);
+	(void) write;
 	printf("%s", ao_scheme_builtin_name(builtin->func));
 }
 
@@ -287,7 +288,7 @@ ao_scheme_do_write(struct ao_scheme_cons *cons)
 	ao_poly	val = AO_SCHEME_NIL;
 	while (cons) {
 		val = cons->car;
-		ao_scheme_poly_write(val);
+		ao_scheme_poly_write(val, true);
 		cons = ao_scheme_cons_cdr(cons);
 		if (cons)
 			printf(" ");
@@ -301,7 +302,7 @@ ao_scheme_do_display(struct ao_scheme_cons *cons)
 	ao_poly	val = AO_SCHEME_NIL;
 	while (cons) {
 		val = cons->car;
-		ao_scheme_poly_display(val);
+		ao_scheme_poly_write(val, false);
 		cons = ao_scheme_cons_cdr(cons);
 	}
 	return _ao_scheme_bool_true;
@@ -855,7 +856,7 @@ ao_scheme_do_pairp(struct ao_scheme_cons *cons)
 	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	v = ao_scheme_arg(cons, 0);
-	if (v != AO_SCHEME_NIL && ao_scheme_poly_type(v) == AO_SCHEME_CONS)
+	if (v != AO_SCHEME_NIL && AO_SCHEME_IS_CONS(v))
 		return _ao_scheme_bool_true;
 	return _ao_scheme_bool_false;
 }
@@ -946,7 +947,7 @@ ao_scheme_do_listp(struct ao_scheme_cons *cons)
 	for (;;) {
 		if (v == AO_SCHEME_NIL)
 			return _ao_scheme_bool_true;
-		if (ao_scheme_poly_type(v) != AO_SCHEME_CONS)
+		if (!AO_SCHEME_IS_CONS(v))
 			return _ao_scheme_bool_false;
 		v = ao_scheme_poly_cons(v)->cdr;
 	}

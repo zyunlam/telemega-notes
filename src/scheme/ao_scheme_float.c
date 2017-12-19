@@ -46,11 +46,12 @@ const struct ao_scheme_type ao_scheme_float_type = {
 #endif
 
 void
-ao_scheme_float_write(ao_poly p)
+ao_scheme_float_write(ao_poly p, bool write)
 {
 	struct ao_scheme_float *f = ao_scheme_poly_float(p);
 	float	v = f->value;
 
+	(void) write;
 	if (isnanf(v))
 		printf("+nan.0");
 	else if (isinff(v)) {

@@ -1061,7 +1061,7 @@ ao_scheme_print_mark_addr(void *addr)
 #endif
 
 	if (!AO_SCHEME_IS_POOL(addr))
-		return 1;
+		return 0;
 
 	if (!ao_scheme_print_cleared) {
 		ao_scheme_print_cleared = 1;
@@ -1074,14 +1074,23 @@ ao_scheme_print_mark_addr(void *addr)
 	return 0;
 }
 
-int
-ao_scheme_print_mark_poly(ao_poly p)
+void
+ao_scheme_print_clear_addr(void *addr)
 {
-	uint8_t type = ao_scheme_poly_base_type(p);
+	int	offset;
 
-	if (type == AO_SCHEME_INT)
-		return 1;
-	return ao_scheme_print_mark_addr(ao_scheme_ref(p));
+#if DBG_MEM
+	if (ao_scheme_collecting)
+		ao_scheme_abort();
+#endif
+
+	if (!AO_SCHEME_IS_POOL(addr))
+		return;
+
+	if (!ao_scheme_print_cleared)
+		return;
+	offset = pool_offset(addr);
+	clear(ao_scheme_busy, offset);
 }
 
 /* Notes that printing has started */
@@ -1091,11 +1100,13 @@ ao_scheme_print_start(void)
 	ao_scheme_printing++;
 }
 
-/* Notes that printing has ended */
-void
+/* Notes that printing has ended. Returns 1 if printing is still going on */
+int
 ao_scheme_print_stop(void)
 {
 	ao_scheme_printing--;
-	if (ao_scheme_printing == 0)
-		ao_scheme_print_cleared = 0;
+	if (ao_scheme_printing != 0)
+		return 1;
+	ao_scheme_print_cleared = 0;
+	return 0;
 }

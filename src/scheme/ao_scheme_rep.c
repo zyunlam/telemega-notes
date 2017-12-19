@@ -30,7 +30,7 @@ ao_scheme_read_eval_print(void)
 				break;
 			ao_scheme_exception = 0;
 		} else {
-			ao_scheme_poly_write(out);
+			ao_scheme_poly_write(out, true);
 			putchar ('\n');
 		}
 	}

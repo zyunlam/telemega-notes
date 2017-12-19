@@ -14,100 +14,41 @@
 
 #include "ao_scheme.h"
 
-struct ao_scheme_funcs {
-	void (*write)(ao_poly);
-	void (*display)(ao_poly);
-};
-
-static const struct ao_scheme_funcs ao_scheme_funcs[AO_SCHEME_NUM_TYPE] = {
-	[AO_SCHEME_CONS] = {
-		.write = ao_scheme_cons_write,
-		.display = ao_scheme_cons_display,
-	},
-#ifdef AO_SCHEME_FEATURE_BIGINT
-	[AO_SCHEME_BIGINT] = {
-		.write = ao_scheme_bigint_write,
-		.display = ao_scheme_bigint_write,
-	},
-#endif
-	[AO_SCHEME_INT] = {
-		.write = ao_scheme_int_write,
-		.display = ao_scheme_int_write,
-	},
-	[AO_SCHEME_ATOM] = {
-		.write = ao_scheme_atom_write,
-		.display = ao_scheme_atom_write,
-	},
-	[AO_SCHEME_BUILTIN] = {
-		.write = ao_scheme_builtin_write,
-		.display = ao_scheme_builtin_write,
-	},
-	[AO_SCHEME_FRAME] = {
-		.write = ao_scheme_frame_write,
-		.display = ao_scheme_frame_write,
-	},
-	[AO_SCHEME_FRAME_VALS] = {
-		.write = NULL,
-		.display = NULL,
-	},
-	[AO_SCHEME_LAMBDA] = {
-		.write = ao_scheme_lambda_write,
-		.display = ao_scheme_lambda_write,
-	},
-	[AO_SCHEME_STACK] = {
-		.write = ao_scheme_stack_write,
-		.display = ao_scheme_stack_write,
-	},
-	[AO_SCHEME_BOOL] = {
-		.write = ao_scheme_bool_write,
-		.display = ao_scheme_bool_write,
-	},
-	[AO_SCHEME_STRING] = {
-		.write = ao_scheme_string_write,
-		.display = ao_scheme_string_display,
-	},
-#ifdef AO_SCHEME_FEATURE_FLOAT
-	[AO_SCHEME_FLOAT] = {
-		.write = ao_scheme_float_write,
-		.display = ao_scheme_float_write,
-	},
-#endif
-#ifdef AO_SCHEME_FEATURE_VECTOR
-	[AO_SCHEME_VECTOR] = {
-		.write = ao_scheme_vector_write,
-		.display = ao_scheme_vector_display
-	},
-#endif
-};
-
-static void ao_scheme_invalid_write(ao_poly p) {
-	printf("??? 0x%04x ???", p);
+static void ao_scheme_invalid_write(ao_poly p, bool write) {
+	printf("??? type %d poly 0x%04x ???", ao_scheme_poly_type (p), p);
+	(void) write;
 	ao_scheme_abort();
 }
 
-static const struct ao_scheme_funcs ao_scheme_invalid_funcs = {
-	.write = ao_scheme_invalid_write,
-	.display = ao_scheme_invalid_write,
+static void (*const ao_scheme_write_funcs[AO_SCHEME_NUM_TYPE]) (ao_poly p, bool write) = {
+	[AO_SCHEME_CONS] = ao_scheme_cons_write,
+#ifdef AO_SCHEME_FEATURE_BIGINT
+	[AO_SCHEME_BIGINT] = ao_scheme_bigint_write,
+#endif
+	[AO_SCHEME_INT] = ao_scheme_int_write,
+	[AO_SCHEME_ATOM] = ao_scheme_atom_write,
+	[AO_SCHEME_BUILTIN] = ao_scheme_builtin_write,
+	[AO_SCHEME_FRAME] = ao_scheme_frame_write,
+	[AO_SCHEME_FRAME_VALS] = ao_scheme_invalid_write,
+	[AO_SCHEME_LAMBDA] = ao_scheme_lambda_write,
+	[AO_SCHEME_STACK] = ao_scheme_stack_write,
+	[AO_SCHEME_BOOL] = ao_scheme_bool_write,
+	[AO_SCHEME_STRING] = ao_scheme_string_write,
+#ifdef AO_SCHEME_FEATURE_FLOAT
+	[AO_SCHEME_FLOAT] = ao_scheme_float_write,
+#endif
+#ifdef AO_SCHEME_FEATURE_VECTOR
+	[AO_SCHEME_VECTOR] = ao_scheme_vector_write,
+#endif
 };
 
-static const struct ao_scheme_funcs *
-funcs(ao_poly p)
+void (*ao_scheme_poly_write_func(ao_poly p))(ao_poly p, bool write)
 {
 	uint8_t	type = ao_scheme_poly_type(p);
 
 	if (type < AO_SCHEME_NUM_TYPE)
-		return &ao_scheme_funcs[type];
-	return &ao_scheme_invalid_funcs;
-}
-
-void (*ao_scheme_poly_write_func(ao_poly p))(ao_poly p)
-{
-	return funcs(p)->write;
-}
-
-void (*ao_scheme_poly_display_func(ao_poly p))(ao_poly p)
-{
-	return funcs(p)->display;
+		return ao_scheme_write_funcs[type];
+	return ao_scheme_invalid_write;
 }
 
 void *
