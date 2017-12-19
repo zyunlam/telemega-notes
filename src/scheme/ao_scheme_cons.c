@@ -24,7 +24,7 @@ static void cons_mark(void *addr)
 		ao_scheme_poly_mark(cons->car, 1);
 		if (!cdr)
 			break;
-		if (!AO_SCHEME_IS_CONS(cdr)) {
+		if (!ao_scheme_is_cons(cdr)) {
 			ao_scheme_poly_mark(cdr, 0);
 			break;
 		}
@@ -58,7 +58,7 @@ static void cons_move(void *addr)
 		cdr = cons->cdr;
 		if (!cdr)
 			break;
-		if (!AO_SCHEME_IS_CONS(cdr)) {
+		if (!ao_scheme_is_cons(cdr)) {
 			(void) ao_scheme_poly_move(&cons->cdr, 0);
 			break;
 		}
@@ -111,7 +111,7 @@ ao_scheme_cons_cdr(struct ao_scheme_cons *cons)
 	ao_poly	cdr = cons->cdr;
 	if (cdr == AO_SCHEME_NIL)
 		return NULL;
-	if (!AO_SCHEME_IS_CONS(cdr)) {
+	if (!ao_scheme_is_cons(cdr)) {
 		(void) ao_scheme_error(AO_SCHEME_INVALID, "improper cdr %v", cdr);
 		return NULL;
 	}
@@ -151,7 +151,7 @@ ao_scheme_cons_copy(struct ao_scheme_cons *cons)
 			tail->cdr = ao_scheme_cons_poly(new);
 		tail = new;
 		cdr = cons->cdr;
-		if (!AO_SCHEME_IS_CONS(cdr)) {
+		if (!ao_scheme_is_cons(cdr)) {
 			tail->cdr = cdr;
 			break;
 		}
@@ -203,7 +203,7 @@ ao_scheme_cons_write(ao_poly c, bool write)
 		written++;
 
 		cdr = cons->cdr;
-		if (!AO_SCHEME_IS_CONS(cdr)) {
+		if (!ao_scheme_is_cons(cdr)) {
 			printf(" . ");
 			ao_scheme_poly_write(cdr, write);
 			break;

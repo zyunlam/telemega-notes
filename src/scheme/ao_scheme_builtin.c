@@ -856,7 +856,7 @@ ao_scheme_do_pairp(struct ao_scheme_cons *cons)
 	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
 		return AO_SCHEME_NIL;
 	v = ao_scheme_arg(cons, 0);
-	if (v != AO_SCHEME_NIL && AO_SCHEME_IS_CONS(v))
+	if (ao_scheme_is_pair(v))
 		return _ao_scheme_bool_true;
 	return _ao_scheme_bool_false;
 }
@@ -947,7 +947,7 @@ ao_scheme_do_listp(struct ao_scheme_cons *cons)
 	for (;;) {
 		if (v == AO_SCHEME_NIL)
 			return _ao_scheme_bool_true;
-		if (!AO_SCHEME_IS_CONS(v))
+		if (!ao_scheme_is_cons(v))
 			return _ao_scheme_bool_false;
 		v = ao_scheme_poly_cons(v)->cdr;
 	}

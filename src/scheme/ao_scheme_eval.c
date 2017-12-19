@@ -348,7 +348,7 @@ ao_scheme_eval_cond(void)
 		ao_scheme_stack->state = eval_val;
 	} else {
 		ao_scheme_v = ao_scheme_poly_cons(ao_scheme_stack->sexprs)->car;
-		if (!ao_scheme_v || !AO_SCHEME_IS_CONS(ao_scheme_v)) {
+		if (!ao_scheme_is_pair(ao_scheme_v)) {
 			ao_scheme_error(AO_SCHEME_INVALID, "invalid cond clause");
 			return 0;
 		}
@@ -492,7 +492,7 @@ ao_scheme_eval_macro(void)
 
 	if (ao_scheme_v == AO_SCHEME_NIL)
 		ao_scheme_abort();
-	if (AO_SCHEME_IS_CONS(ao_scheme_v)) {
+	if (ao_scheme_is_cons(ao_scheme_v)) {
 		*ao_scheme_poly_cons(ao_scheme_stack->sexprs) = *ao_scheme_poly_cons(ao_scheme_v);
 		ao_scheme_v = ao_scheme_stack->sexprs;
 		DBGI("sexprs rewritten to: "); DBG_POLY(ao_scheme_v); DBG("\n");

@@ -220,7 +220,7 @@ ao_has_macro(ao_poly p)
 
 		list = cons->cdr;
 		p = AO_SCHEME_NIL;
-		while (list != AO_SCHEME_NIL && AO_SCHEME_IS_CONS(list)) {
+		while (ao_scheme_is_pair(list)) {
 			cons = ao_scheme_poly_cons(list);
 			m = ao_has_macro(cons->car);
 			if (m) {
