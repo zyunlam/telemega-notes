@@ -49,7 +49,7 @@
    )
  'append)
 
-(append '(a b c) '(d e f) '(g h i))
+(append '(a) '(b))
 
 					;
 					; Define a variable without returning the value
@@ -66,7 +66,7 @@
    (macro (a . b)
 					; check for alternate lambda definition form
 
-	  (cond ((list? a)
+	  (cond ((pair? a)
 		 (set! b
 		       (cons lambda (cons (cdr a) b)))
 		 (set! a (car a))
@@ -92,26 +92,86 @@
  'define
  )
 
+					; boolean operators
+
+(begin
+ (def! or
+   (macro a
+	  (def! _or
+	    (lambda (a)
+	      (cond ((null? a) #f)
+		    ((null? (cdr a))
+		     (car a))
+		    (else
+		     (list
+		      cond
+		      (list
+		       (car a))
+		      (list
+		       'else
+		       (_or (cdr a))
+		       )
+		      )
+		     )
+		    )
+	      )
+	    )
+	  (_or a)))
+ 'or)
+
+					; execute to resolve macros
+
+(or #f #t)
+
+(begin
+ (def! and
+   (macro a
+	  (def! _and
+	    (lambda (a)
+	      (cond ((null? a) #t)
+		    ((null? (cdr a))
+		     (car a))
+		    (else
+		     (list
+		      cond
+		      (list
+		       (car a)
+		       (_and (cdr a))
+		       )
+		      )
+		     )
+		    )
+	      )
+	    )
+	  (_and a)
+	  )
+   )
+ 'and)
+
+					; execute to resolve macros
+
+(and #t #f)
+
 					; basic list accessors
 
-(define (caar l) (car (car l)))
+(define (caar a) (car (car a)))
 
-(define (cadr l) (car (cdr l)))
+(define (cadr a) (car (cdr a)))
 
-(define (cdar l) (cdr (car l)))
+; (define (cdar a) (cdr (car a)))
 
 					; (if <condition> <if-true>)
 					; (if <condition> <if-true> <if-false)
 
 (define if
-  (macro (test . args)
-    (cond ((null? (cdr args))
-	   (list cond (list test (car args)))
+  (macro (test . b)
+    (cond ((null? (cdr b))
+	   (list cond (list test (car b)))
 		)
 	  (else
 	   (list cond
-		 (list test (car args))
-		 (list 'else (cadr args))
+		 (list test (car b))
+		 (list 'else (cadr b))
 		 )
 	   )
 	  )
@@ -291,25 +351,24 @@
 (equal? '(a b c) '(a b c))
 (equal? '(a b c) '(a b b))
 
-(define member (lambda (obj a . test?)
-		      (cond ((null? a)
-			     #f
-			     )
-			    (else
-			     (if (null? test?) (set! test? equal?) (set! test? (car test?)))
-			     (if (test? obj (car a))
-				 a
-			       (member obj (cdr a) test?))
-			     )
-			    )
-		      )
+(define (member a b . t?)
+  (cond ((null? b)
+	 #f
+	 )
+	(else
+	 (if (null? t?) (set! t? equal?) (set! t? (car t?)))
+	 (if (t? a (car b))
+	     b
+	     (member a (cdr b) t?))
+	 )
+	)
   )
 
 (member '(2) '((1) (2) (3)))
 
 (member '(4) '((1) (2) (3)))
 
-(define (memq obj a) (member obj a eq?))
+(define (memq a b) (member a b eq?))
 
 (memq 2 '(1 2 3))
 
@@ -317,18 +376,18 @@
 
 (memq '(2) '((1) (2) (3)))
 
-(define (_assoc a b t?)
+(define (_as a b t?)
   (if (null? b)
       #f
     (if (t? a (caar b))
 	(car b)
-      (_assoc a (cdr b) t?)
+      (_as a (cdr b) t?)
       )
     )
   )
 
-(define (assq a b) (_assoc a b eq?))
-(define (assoc a b) (_assoc a b equal?))
+(define (assq a b) (_as a b eq?))
+(define (assoc a b) (_as a b equal?))
 
 (assq 'a '((a 1) (b 2) (c 3)))
 (assoc '(c) '((a 1) (b 2) ((c) 3)))
@@ -337,28 +396,28 @@
 
 (define map
   (lambda (a . b)
-	 (define (args b)
+	 (define (_a b)
 	   (cond ((null? b) ())
 		 (else
-		  (cons (caar b) (args (cdr b)))
+		  (cons (caar b) (_a (cdr b)))
 		  )
 		 )
 	   )
-	 (define (next b)
+	 (define (_n b)
 	   (cond ((null? b) ())
 		 (else
-		  (cons (cdr (car b)) (next (cdr b)))
+		  (cons (cdr (car b)) (_n (cdr b)))
 		  )
 		 )
 	   )
-	 (define (domap b)
+	 (define (_d b)
 	   (cond ((null? (car b)) ())
 		 (else
-		  (cons (apply a (args b)) (domap (next b)))
+		  (cons (apply a (_a b)) (_d (_n b)))
 		  )
 		 )
 	   )
-	 (domap b)
+	 (_d b)
 	 )
   )
 
