@@ -313,7 +313,7 @@ static struct ao_scheme_chunk ao_scheme_chunk[AO_SCHEME_NCHUNK];
 /* Offset of an address within the pool. */
 static inline uint16_t pool_offset(void *addr) {
 #if DBG_MEM
-	if (!AO_SCHEME_IS_POOL(addr))
+	if (!ao_scheme_is_pool_addr(addr))
 		ao_scheme_abort();
 #endif
 	return ((uint8_t *) addr) - ao_scheme_pool;
@@ -723,7 +723,7 @@ ao_scheme_cons_check(struct ao_scheme_cons *cons)
 	reset_chunks();
 	walk(ao_scheme_mark_ref, ao_scheme_poly_mark_ref);
 	while (cons) {
-		if (!AO_SCHEME_IS_POOL(cons))
+		if (!ao_scheme_is_pool_addr(cons))
 			break;
 		offset = pool_offset(cons);
 		if (busy(ao_scheme_busy, offset)) {
@@ -752,7 +752,7 @@ int
 ao_scheme_mark_memory(const struct ao_scheme_type *type, void *addr)
 {
 	int offset;
-	if (!AO_SCHEME_IS_POOL(addr))
+	if (!ao_scheme_is_pool_addr(addr))
 		return 1;
 
 	offset = pool_offset(addr);
@@ -804,7 +804,7 @@ ao_scheme_poly_mark(ao_poly p, uint8_t do_note_cons)
 		return 1;
 
 	addr = ao_scheme_ref(p);
-	if (!AO_SCHEME_IS_POOL(addr))
+	if (!ao_scheme_is_pool_addr(addr))
 		return 1;
 
 	if (type == AO_SCHEME_CONS && do_note_cons) {
@@ -864,7 +864,7 @@ ao_scheme_move_memory(const struct ao_scheme_type *type, void **ref)
 	void		*addr = *ref;
 	uint16_t	offset, orig_offset;
 
-	if (!AO_SCHEME_IS_POOL(addr))
+	if (!ao_scheme_is_pool_addr(addr))
 		return 1;
 
 	(void) type;
@@ -874,7 +874,7 @@ ao_scheme_move_memory(const struct ao_scheme_type *type, void **ref)
 	offset = move_map(orig_offset);
 	if (offset != orig_offset) {
 		MDBG_MOVE("update ref %d %d -> %d\n",
-			  AO_SCHEME_IS_POOL(ref) ? MDBG_OFFSET(ref) : -1,
+			  ao_scheme_is_pool_addr(ref) ? MDBG_OFFSET(ref) : -1,
 			  orig_offset, offset);
 		*ref = ao_scheme_pool + offset;
 	}
@@ -914,7 +914,7 @@ ao_scheme_poly_move(ao_poly *ref, uint8_t do_note_cons)
 		return 1;
 
 	addr = ao_scheme_ref(p);
-	if (!AO_SCHEME_IS_POOL(addr))
+	if (!ao_scheme_is_pool_addr(addr))
 		return 1;
 
 	orig_offset = pool_offset(addr);
@@ -1060,7 +1060,7 @@ ao_scheme_print_mark_addr(void *addr)
 		ao_scheme_abort();
 #endif
 
-	if (!AO_SCHEME_IS_POOL(addr))
+	if (!ao_scheme_is_pool_addr(addr))
 		return 0;
 
 	if (!ao_scheme_print_cleared) {
@@ -1084,7 +1084,7 @@ ao_scheme_print_clear_addr(void *addr)
 		ao_scheme_abort();
 #endif
 
-	if (!AO_SCHEME_IS_POOL(addr))
+	if (!ao_scheme_is_pool_addr(addr))
 		return;
 
 	if (!ao_scheme_print_cleared)

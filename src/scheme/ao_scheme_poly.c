@@ -65,7 +65,7 @@ ao_scheme_poly(const void *addr, ao_poly type) {
 	const uint8_t	*a = addr;
 	if (a == NULL)
 		return AO_SCHEME_NIL;
-	if (AO_SCHEME_IS_CONST(a))
+	if (ao_scheme_is_const_addr(a))
 		return AO_SCHEME_CONST | (a - ao_scheme_const + 4) | type;
 	return (a - ao_scheme_pool + 4) | type;
 }

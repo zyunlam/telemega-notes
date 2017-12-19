@@ -155,8 +155,17 @@ ao_scheme_is_const(ao_poly poly) {
 	return poly & AO_SCHEME_CONST;
 }
 
-#define AO_SCHEME_IS_CONST(a)	(ao_scheme_const <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_scheme_const + AO_SCHEME_POOL_CONST)
-#define AO_SCHEME_IS_POOL(a)	(ao_scheme_pool <= ((uint8_t *) (a)) && ((uint8_t *) (a)) < ao_scheme_pool + AO_SCHEME_POOL)
+static inline int
+ao_scheme_is_const_addr(const void *addr) {
+	const uint8_t *a = addr;
+	return (ao_scheme_const <= a) && (a < ao_scheme_const + AO_SCHEME_POOL_CONST);
+}
+
+static inline int
+ao_scheme_is_pool_addr(const void *addr) {
+	const uint8_t *a = addr;
+	return (ao_scheme_pool <= a) && (a < ao_scheme_pool + AO_SCHEME_POOL);
+}
 
 void *
 ao_scheme_ref(ao_poly poly);
