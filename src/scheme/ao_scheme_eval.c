@@ -206,7 +206,7 @@ ao_scheme_eval_formal(void)
 	}
 
 	/* Append formal to list of values */
-	formal = ao_scheme__cons(ao_scheme_v, AO_SCHEME_NIL);
+	formal = ao_scheme_cons(ao_scheme_v, AO_SCHEME_NIL);
 	if (!formal)
 		return 0;
 

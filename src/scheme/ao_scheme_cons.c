@@ -119,7 +119,7 @@ ao_scheme_cons_cdr(struct ao_scheme_cons *cons)
 }
 
 ao_poly
-ao_scheme__cons(ao_poly car, ao_poly cdr)
+ao_scheme_cons(ao_poly car, ao_poly cdr)
 {
 	return ao_scheme_cons_poly(ao_scheme_cons_cons(car, cdr));
 }

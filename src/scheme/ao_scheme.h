@@ -646,7 +646,7 @@ struct ao_scheme_cons *
 ao_scheme_cons_cdr(struct ao_scheme_cons *cons);
 
 ao_poly
-ao_scheme__cons(ao_poly car, ao_poly cdr);
+ao_scheme_cons(ao_poly car, ao_poly cdr);
 
 extern struct ao_scheme_cons *ao_scheme_cons_free_list;
 

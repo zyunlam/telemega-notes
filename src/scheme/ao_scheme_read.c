@@ -510,7 +510,7 @@ push_read_stack(int read_state)
 	RDBG_IN();
 	if (ao_scheme_read_list) {
 		ao_scheme_read_stack = ao_scheme_cons_cons(ao_scheme_cons_poly(ao_scheme_read_cons),
-						       ao_scheme__cons(ao_scheme_int_poly(read_state),
+						       ao_scheme_cons(ao_scheme_int_poly(read_state),
 								     ao_scheme_cons_poly(ao_scheme_read_stack)));
 		if (!ao_scheme_read_stack)
 			return 0;

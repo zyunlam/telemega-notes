@@ -168,7 +168,7 @@ ao_scheme_do_cons(struct ao_scheme_cons *cons)
 		return AO_SCHEME_NIL;
 	car = ao_scheme_arg(cons, 0);
 	cdr = ao_scheme_arg(cons, 1);
-	return ao_scheme__cons(car, cdr);
+	return ao_scheme_cons(car, cdr);
 }
 
 ao_poly
@@ -253,10 +253,10 @@ ao_scheme_do_setq(struct ao_scheme_cons *cons)
 		return ao_scheme_error(AO_SCHEME_INVALID, "set! of non-atom %v", name);
 	if (!ao_scheme_atom_ref(name, NULL))
 		return ao_scheme_error(AO_SCHEME_INVALID, "atom %v not defined", name);
-	return ao_scheme__cons(_ao_scheme_atom_set,
-			     ao_scheme__cons(ao_scheme__cons(_ao_scheme_atom_quote,
-							 ao_scheme__cons(name, AO_SCHEME_NIL)),
-					   cons->cdr));
+	return ao_scheme_cons(_ao_scheme_atom_set,
+			      ao_scheme_cons(ao_scheme_cons(_ao_scheme_atom_quote,
+							    ao_scheme_cons(name, AO_SCHEME_NIL)),
+					     cons->cdr));
 }
 
 ao_poly
