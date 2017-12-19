@@ -250,9 +250,9 @@ ao_scheme_frame_new(int num)
 		frame->num = 0;
 		frame->prev = AO_SCHEME_NIL;
 		frame->vals = AO_SCHEME_NIL;
-		ao_scheme_frame_stash(0, frame);
+		ao_scheme_frame_stash(frame);
 		vals = ao_scheme_frame_vals_new(num);
-		frame = ao_scheme_frame_fetch(0);
+		frame = ao_scheme_frame_fetch();
 		if (!vals)
 			return NULL;
 		frame->vals = ao_scheme_frame_vals_poly(vals);
@@ -296,9 +296,9 @@ ao_scheme_frame_realloc(struct ao_scheme_frame *frame, int new_num)
 
 	if (new_num == frame->num)
 		return frame;
-	ao_scheme_frame_stash(0, frame);
+	ao_scheme_frame_stash(frame);
 	new_vals = ao_scheme_frame_vals_new(new_num);
-	frame = ao_scheme_frame_fetch(0);
+	frame = ao_scheme_frame_fetch();
 	if (!new_vals)
 		return NULL;
 	vals = ao_scheme_poly_frame_vals(frame->vals);
@@ -331,11 +331,11 @@ ao_scheme_frame_add(struct ao_scheme_frame *frame, ao_poly atom, ao_poly val)
 
 	if (!ref) {
 		int f = frame->num;
-		ao_scheme_poly_stash(0, atom);
-		ao_scheme_poly_stash(1, val);
+		ao_scheme_poly_stash(atom);
+		ao_scheme_poly_stash(val);
 		frame = ao_scheme_frame_realloc(frame, f + 1);
-		val = ao_scheme_poly_fetch(1);
-		atom = ao_scheme_poly_fetch(0);
+		val = ao_scheme_poly_fetch();
+		atom = ao_scheme_poly_fetch();
 		if (!frame)
 			return AO_SCHEME_NIL;
 		ao_scheme_frame_bind(frame, frame->num - 1, atom, val);

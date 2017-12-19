@@ -145,9 +145,9 @@ ao_scheme_list_to_vector(struct ao_scheme_cons *cons)
 	if (ao_scheme_exception)
 		return NULL;
 
-	ao_scheme_cons_stash(0, cons);
+	ao_scheme_cons_stash(cons);
 	vector = ao_scheme_vector_alloc(length, AO_SCHEME_NIL);
-	cons = ao_scheme_cons_fetch(0);
+	cons = ao_scheme_cons_fetch();
 	if (!vector)
 		return NULL;
 	i = 0;
@@ -166,9 +166,9 @@ ao_scheme_vector_to_list(struct ao_scheme_vector *vector)
 	struct ao_scheme_cons	*cons = NULL;
 
 	for (i = length; i-- > 0;) {
-		ao_scheme_poly_stash(2, ao_scheme_vector_poly(vector));
+		ao_scheme_vector_stash(vector);
 		cons = ao_scheme_cons_cons(vector->vals[i], ao_scheme_cons_poly(cons));
-		vector = ao_scheme_poly_vector(ao_scheme_poly_fetch(2));
+		vector = ao_scheme_vector_fetch();
 		if (!cons)
 			return NULL;
 	}

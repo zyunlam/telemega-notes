@@ -321,7 +321,7 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 
 		if (cons == orig_cons) {
 			ret = car;
-			ao_scheme_cons_stash(0, cons);
+			ao_scheme_cons_stash(cons);
 			if (cons->cdr == AO_SCHEME_NIL) {
 				switch (op) {
 				case builtin_minus:
@@ -349,7 +349,7 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 					break;
 				}
 			}
-			cons = ao_scheme_cons_fetch(0);
+			cons = ao_scheme_cons_fetch();
 		} else if (ao_scheme_integer_typep(rt) && ao_scheme_integer_typep(ct)) {
 			int32_t	r = ao_scheme_poly_integer(ret, NULL);
 			int32_t	c = ao_scheme_poly_integer(car, NULL);
@@ -413,9 +413,9 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 			default:
 				break;
 			}
-			ao_scheme_cons_stash(0, cons);
+			ao_scheme_cons_stash(cons);
 			ret = ao_scheme_integer_poly(r);
-			cons = ao_scheme_cons_fetch(0);
+			cons = ao_scheme_cons_fetch();
 #ifdef AO_SCHEME_FEATURE_FLOAT
 		} else if (ao_scheme_number_typep(rt) && ao_scheme_number_typep(ct)) {
 			float r, c;
@@ -442,16 +442,16 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 			default:
 				break;
 			}
-			ao_scheme_cons_stash(0, cons);
+			ao_scheme_cons_stash(cons);
 			ret = ao_scheme_float_get(r);
-			cons = ao_scheme_cons_fetch(0);
+			cons = ao_scheme_cons_fetch();
 #endif
 		}
 		else if (rt == AO_SCHEME_STRING && ct == AO_SCHEME_STRING && op == builtin_plus) {
-			ao_scheme_cons_stash(0, cons);
+			ao_scheme_cons_stash(cons);
 			ret = ao_scheme_string_poly(ao_scheme_string_cat(ao_scheme_poly_string(ret),
 									 ao_scheme_poly_string(car)));
-			cons = ao_scheme_cons_fetch(0);
+			cons = ao_scheme_cons_fetch();
 			if (!ret)
 				return ret;
 		}

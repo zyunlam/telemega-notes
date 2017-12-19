@@ -89,9 +89,9 @@ ao_scheme_lambda_alloc(struct ao_scheme_cons *code, int args)
 		}
 	}
 
-	ao_scheme_cons_stash(0, code);
+	ao_scheme_cons_stash(code);
 	lambda = ao_scheme_alloc(sizeof (struct ao_scheme_lambda));
-	code = ao_scheme_cons_fetch(0);
+	code = ao_scheme_cons_fetch();
 	if (!lambda)
 		return AO_SCHEME_NIL;
 
@@ -160,9 +160,9 @@ ao_scheme_lambda_eval(void)
 			return ao_scheme_error(AO_SCHEME_INVALID, "need at least %d args, got %d", args_wanted, args_provided);
 	}
 
-	ao_scheme_poly_stash(1, varargs);
+	ao_scheme_poly_stash(varargs);
 	next_frame = ao_scheme_frame_new(args_wanted + (varargs != AO_SCHEME_NIL));
-	varargs = ao_scheme_poly_fetch(1);
+	varargs = ao_scheme_poly_fetch();
 	if (!next_frame)
 		return AO_SCHEME_NIL;
 

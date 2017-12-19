@@ -595,38 +595,72 @@ ao_scheme_cons_check(struct ao_scheme_cons *cons);
 #endif
 
 void
-ao_scheme_cons_stash(int id, struct ao_scheme_cons *cons);
-
-struct ao_scheme_cons *
-ao_scheme_cons_fetch(int id);
-
-void
-ao_scheme_poly_stash(int id, ao_poly poly);
+ao_scheme_poly_stash(ao_poly poly);
 
 ao_poly
-ao_scheme_poly_fetch(int id);
-
-void
-ao_scheme_string_stash(int id, struct ao_scheme_string *string);
-
-struct ao_scheme_string *
-ao_scheme_string_fetch(int id);
+ao_scheme_poly_fetch(void);
 
 static inline void
-ao_scheme_stack_stash(int id, struct ao_scheme_stack *stack) {
-	ao_scheme_poly_stash(id, ao_scheme_stack_poly(stack));
+ao_scheme_cons_stash(struct ao_scheme_cons *cons) {
+	ao_scheme_poly_stash(ao_scheme_cons_poly(cons));
+}
+
+static inline struct ao_scheme_cons *
+ao_scheme_cons_fetch(void) {
+	return ao_scheme_poly_cons(ao_scheme_poly_fetch());
+}
+
+static inline void
+ao_scheme_atom_stash(struct ao_scheme_atom *atom) {
+	ao_scheme_poly_stash(ao_scheme_atom_poly(atom));
+}
+
+static inline struct ao_scheme_atom *
+ao_scheme_atom_fetch(void) {
+	return ao_scheme_poly_atom(ao_scheme_poly_fetch());
+}
+
+static inline void
+ao_scheme_string_stash(struct ao_scheme_string *string) {
+	ao_scheme_poly_stash(ao_scheme_string_poly(string));
+}
+
+static inline struct ao_scheme_string *
+ao_scheme_string_fetch(void) {
+	return ao_scheme_poly_string(ao_scheme_poly_fetch());
+}
+
+#ifdef AO_SCHEME_FEATURE_VECTOR
+static inline void
+ao_scheme_vector_stash(struct ao_scheme_vector *vector) {
+	ao_scheme_poly_stash(ao_scheme_vector_poly(vector));
+}
+
+static inline struct ao_scheme_vector *
+ao_scheme_vector_fetch(void) {
+	return ao_scheme_poly_vector(ao_scheme_poly_fetch());
+}
+#endif
+
+static inline void
+ao_scheme_stack_stash(struct ao_scheme_stack *stack) {
+	ao_scheme_poly_stash(ao_scheme_stack_poly(stack));
 }
 
 static inline struct ao_scheme_stack *
-ao_scheme_stack_fetch(int id) {
-	return ao_scheme_poly_stack(ao_scheme_poly_fetch(id));
+ao_scheme_stack_fetch(void) {
+	return ao_scheme_poly_stack(ao_scheme_poly_fetch());
 }
 
-void
-ao_scheme_frame_stash(int id, struct ao_scheme_frame *frame);
+static inline void
+ao_scheme_frame_stash(struct ao_scheme_frame *frame) {
+	ao_scheme_poly_stash(ao_scheme_frame_poly(frame));
+}
 
-struct ao_scheme_frame *
-ao_scheme_frame_fetch(int id);
+static inline struct ao_scheme_frame *
+ao_scheme_frame_fetch(void) {
+	return ao_scheme_poly_frame(ao_scheme_poly_fetch());
+}
 
 /* bool */
 

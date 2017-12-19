@@ -199,13 +199,13 @@ ao_scheme_stack_copy(struct ao_scheme_stack *old)
 	struct ao_scheme_stack *n, *prev = NULL;
 
 	while (old) {
-		ao_scheme_stack_stash(0, old);
-		ao_scheme_stack_stash(1, new);
-		ao_scheme_stack_stash(2, prev);
+		ao_scheme_stack_stash(old);
+		ao_scheme_stack_stash(new);
+		ao_scheme_stack_stash(prev);
 		n = ao_scheme_stack_new();
-		prev = ao_scheme_stack_fetch(2);
-		new = ao_scheme_stack_fetch(1);
-		old = ao_scheme_stack_fetch(0);
+		prev = ao_scheme_stack_fetch();
+		new = ao_scheme_stack_fetch();
+		old = ao_scheme_stack_fetch();
 		if (!n)
 			return NULL;
 

@@ -60,9 +60,9 @@ ao_scheme_string_copy(struct ao_scheme_string *a)
 	int			alen = strlen(a->val);
 	struct ao_scheme_string	*r;
 
-	ao_scheme_string_stash(0, a);
+	ao_scheme_string_stash(a);
 	r = ao_scheme_string_alloc(alen);
-	a = ao_scheme_string_fetch(0);
+	a = ao_scheme_string_fetch();
 	if (!r)
 		return NULL;
 	strcpy(r->val, a->val);
@@ -87,9 +87,9 @@ ao_scheme_atom_to_string(struct ao_scheme_atom *a)
 	int			alen = strlen(a->name);
 	struct ao_scheme_string	*r;
 
-	ao_scheme_poly_stash(0, ao_scheme_atom_poly(a));
+	ao_scheme_atom_stash(a);
 	r = ao_scheme_string_alloc(alen);
-	a = ao_scheme_poly_atom(ao_scheme_poly_fetch(0));
+	a = ao_scheme_atom_fetch();
 	if (!r)
 		return NULL;
 	strcpy(r->val, a->name);
@@ -103,11 +103,11 @@ ao_scheme_string_cat(struct ao_scheme_string *a, struct ao_scheme_string *b)
 	int				blen = strlen(b->val);
 	struct ao_scheme_string 	*r;
 
-	ao_scheme_string_stash(0, a);
-	ao_scheme_string_stash(1, b);
+	ao_scheme_string_stash(a);
+	ao_scheme_string_stash(b);
 	r = ao_scheme_string_alloc(alen + blen);
-	a = ao_scheme_string_fetch(0);
-	b = ao_scheme_string_fetch(1);
+	b = ao_scheme_string_fetch();
+	a = ao_scheme_string_fetch();
 	if (!r)
 		return NULL;
 	strcpy(r->val, a->val);
@@ -123,9 +123,9 @@ ao_scheme_string_pack(struct ao_scheme_cons *cons)
 	int			len;
 
 	len = ao_scheme_cons_length(cons);
-	ao_scheme_cons_stash(0, cons);
+	ao_scheme_cons_stash(cons);
 	r = ao_scheme_string_alloc(len);
-	cons = ao_scheme_cons_fetch(0);
+	cons = ao_scheme_cons_fetch();
 	if (!r)
 		return AO_SCHEME_NIL;
 	rval = r->val;
@@ -151,13 +151,13 @@ ao_scheme_string_unpack(struct ao_scheme_string *a)
 
 	for (i = 0; (c = a->val[i]); i++) {
 		struct ao_scheme_cons	*n;
-		ao_scheme_cons_stash(0, cons);
-		ao_scheme_cons_stash(1, tail);
-		ao_scheme_string_stash(0, a);
+		ao_scheme_cons_stash(cons);
+		ao_scheme_cons_stash(tail);
+		ao_scheme_string_stash(a);
 		n = ao_scheme_cons_cons(ao_scheme_int_poly(c), AO_SCHEME_NIL);
-		a = ao_scheme_string_fetch(0);
-		cons = ao_scheme_cons_fetch(0);
-		tail = ao_scheme_cons_fetch(1);
+		a = ao_scheme_string_fetch();
+		tail = ao_scheme_cons_fetch();
+		cons = ao_scheme_cons_fetch();
 
 		if (!n) {
 			cons = NULL;

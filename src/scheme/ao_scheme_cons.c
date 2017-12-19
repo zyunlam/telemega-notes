@@ -92,11 +92,11 @@ ao_scheme_cons_cons(ao_poly car, ao_poly cdr)
 		cons = ao_scheme_cons_free_list;
 		ao_scheme_cons_free_list = ao_scheme_poly_cons(cons->cdr);
 	} else {
-		ao_scheme_poly_stash(0, car);
-		ao_scheme_poly_stash(1, cdr);
+		ao_scheme_poly_stash(car);
+		ao_scheme_poly_stash(cdr);
 		cons = ao_scheme_alloc(sizeof (struct ao_scheme_cons));
-		cdr = ao_scheme_poly_fetch(1);
-		car = ao_scheme_poly_fetch(0);
+		cdr = ao_scheme_poly_fetch();
+		car = ao_scheme_poly_fetch();
 		if (!cons)
 			return NULL;
 	}
@@ -134,13 +134,13 @@ ao_scheme_cons_copy(struct ao_scheme_cons *cons)
 		struct ao_scheme_cons	*new;
 		ao_poly cdr;
 
-		ao_scheme_cons_stash(0, cons);
-		ao_scheme_cons_stash(1, head);
-		ao_scheme_poly_stash(0, ao_scheme_cons_poly(tail));
+		ao_scheme_cons_stash(cons);
+		ao_scheme_cons_stash(head);
+		ao_scheme_cons_stash(tail);
 		new = ao_scheme_alloc(sizeof (struct ao_scheme_cons));
-		cons = ao_scheme_cons_fetch(0);
-		head = ao_scheme_cons_fetch(1);
-		tail = ao_scheme_poly_cons(ao_scheme_poly_fetch(0));
+		tail = ao_scheme_cons_fetch();
+		head = ao_scheme_cons_fetch();
+		cons = ao_scheme_cons_fetch();
 		if (!new)
 			return AO_SCHEME_NIL;
 		new->car = cons->car;

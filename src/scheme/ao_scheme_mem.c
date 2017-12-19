@@ -184,43 +184,34 @@ struct ao_scheme_root {
 	void				**addr;
 };
 
-static struct ao_scheme_cons 	*save_cons[2];
-static struct ao_scheme_string	*save_string[2];
-static struct ao_scheme_frame	*save_frame[1];
-static ao_poly			save_poly[3];
+#define AO_SCHEME_NUM_STASH	6
+static ao_poly			stash_poly[AO_SCHEME_NUM_STASH];
+static int			stash_poly_ptr;
 
 static const struct ao_scheme_root	ao_scheme_root[] = {
 	{
-		.type = &ao_scheme_cons_type,
-		.addr = (void **) &save_cons[0],
-	},
-	{
-		.type = &ao_scheme_cons_type,
-		.addr = (void **) &save_cons[1],
-	},
-	{
-		.type = &ao_scheme_string_type,
-		.addr = (void **) &save_string[0],
-	},
-	{
-		.type = &ao_scheme_string_type,
-		.addr = (void **) &save_string[1],
-	},
-	{
-		.type = &ao_scheme_frame_type,
-		.addr = (void **) &save_frame[0],
+		.type = NULL,
+		.addr = (void **) (void *) &stash_poly[0]
 	},
 	{
 		.type = NULL,
-		.addr = (void **) (void *) &save_poly[0]
+		.addr = (void **) (void *) &stash_poly[1]
 	},
 	{
 		.type = NULL,
-		.addr = (void **) (void *) &save_poly[1]
+		.addr = (void **) (void *) &stash_poly[2]
 	},
 	{
 		.type = NULL,
-		.addr = (void **) (void *) &save_poly[2]
+		.addr = (void **) (void *) &stash_poly[3]
+	},
+	{
+		.type = NULL,
+		.addr = (void **) (void *) &stash_poly[4]
+	},
+	{
+		.type = NULL,
+		.addr = (void **) (void *) &stash_poly[5]
 	},
 	{
 		.type = &ao_scheme_atom_type,
@@ -991,63 +982,21 @@ ao_scheme_alloc(int size)
 }
 
 void
-ao_scheme_cons_stash(int id, struct ao_scheme_cons *cons)
+ao_scheme_poly_stash(ao_poly p)
 {
-	assert(save_cons[id] == 0);
-	save_cons[id] = cons;
-}
-
-struct ao_scheme_cons *
-ao_scheme_cons_fetch(int id)
-{
-	struct ao_scheme_cons *cons = save_cons[id];
-	save_cons[id] = NULL;
-	return cons;
-}
-
-void
-ao_scheme_poly_stash(int id, ao_poly poly)
-{
-	assert(save_poly[id] == AO_SCHEME_NIL);
-	save_poly[id] = poly;
+	assert(stash_poly_ptr < AO_SCHEME_NUM_STASH);
+	stash_poly[stash_poly_ptr++] = p;
 }
 
 ao_poly
-ao_scheme_poly_fetch(int id)
+ao_scheme_poly_fetch(void)
 {
-	ao_poly poly = save_poly[id];
-	save_poly[id] = AO_SCHEME_NIL;
-	return poly;
-}
+	ao_poly	p;
 
-void
-ao_scheme_string_stash(int id, struct ao_scheme_string *string)
-{
-	assert(save_string[id] == NULL);
-	save_string[id] = string;
-}
-
-struct ao_scheme_string *
-ao_scheme_string_fetch(int id)
-{
-	struct ao_scheme_string *string = save_string[id];
-	save_string[id] = NULL;
-	return string;
-}
-
-void
-ao_scheme_frame_stash(int id, struct ao_scheme_frame *frame)
-{
-	assert(save_frame[id] == NULL);
-	save_frame[id] = frame;
-}
-
-struct ao_scheme_frame *
-ao_scheme_frame_fetch(int id)
-{
-	struct ao_scheme_frame *frame = save_frame[id];
-	save_frame[id] = NULL;
-	return frame;
+	assert (stash_poly_ptr > 0);
+	p = stash_poly[--stash_poly_ptr];
+	stash_poly[stash_poly_ptr] = AO_SCHEME_NIL;
+	return p;
 }
 
 int

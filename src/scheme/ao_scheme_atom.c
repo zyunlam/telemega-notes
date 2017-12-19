@@ -107,9 +107,9 @@ ao_scheme_string_to_atom(struct ao_scheme_string *string)
 
 	if (atom)
 		return atom;
-	ao_scheme_string_stash(0, string);
+	ao_scheme_string_stash(string);
 	atom = ao_scheme_alloc(name_size(string->val));
-	string = ao_scheme_string_fetch(0);
+	string = ao_scheme_string_fetch();
 	ao_scheme_atom_init(atom, string->val);
 	return atom;
 }
