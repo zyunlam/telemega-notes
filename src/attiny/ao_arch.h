@@ -85,4 +85,7 @@ ao_eeprom_read(uint16_t addr, void *buf, uint16_t len);
 void
 ao_eeprom_write(uint16_t addr, void *buf, uint16_t len);
 
+uint16_t
+ao_adc_read(uint8_t mux);
+
 #endif /* _AO_ARCH_H_ */
