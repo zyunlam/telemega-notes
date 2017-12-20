@@ -54,7 +54,7 @@ ALTOS_FILE=~/altusmetrumllc/Binaries/easymini-v2.0-*.elf
 
 echo $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE
 
-#$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
+$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
 
 sleep 2
 
