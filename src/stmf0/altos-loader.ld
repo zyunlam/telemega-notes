@@ -72,9 +72,10 @@ SECTIONS {
 		__text_ram_end = .;
 	} >ram AT>rom
 
-	/* Data -- relocated to RAM, but written to ROM
+	/* Data -- relocated to RAM, but written to ROM.
+	 * also aligned to 8 bytes in case textram is empty
 	 */
-	.data : {
+	.data BLOCK(8): {
 		*(.data)	/* initialized data */
 		__data_end__ = .;
 	} >ram AT>rom

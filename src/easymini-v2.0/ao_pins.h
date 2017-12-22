@@ -60,11 +60,11 @@
 #define HAS_IGNITE		1
 #define HAS_IGNITE_REPORT	1
 
-/* Beeper is on Tim3 CH3 */
+/* Beeper is on Tim3 CH4 */
 #define BEEPER_TIMER		3
-#define BEEPER_CHANNEL		3
+#define BEEPER_CHANNEL		4
 #define BEEPER_PORT		(&stm_gpiob)
-#define BEEPER_PIN		0
+#define BEEPER_PIN		1
 #define BEEPER_AFR		STM_AFR_AF1
 
 /* SPI */
@@ -130,8 +130,8 @@ struct ao_adc {
 #define AO_IGNITER_CLOSED	400
 #define AO_IGNITER_OPEN		60
 
-#define AO_IGNITER_DROGUE_PORT	(&stm_gpiob)
-#define AO_IGNITER_DROGUE_PIN	6
+#define AO_IGNITER_DROGUE_PORT	(&stm_gpioa)
+#define AO_IGNITER_DROGUE_PIN	3
 #define AO_IGNITER_SET_DROGUE(v)	ao_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, AO_IGNITER_DROGUE, v)
 
 #define AO_IGNITER_MAIN_PORT	(&stm_gpiob)

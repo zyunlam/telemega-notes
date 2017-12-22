@@ -41,7 +41,6 @@ frame_vals_mark(void *addr)
 			  ao_scheme_poly_atom(v->atom)->name,
 			  MDBG_OFFSET(ao_scheme_ref(v->atom)),
 			  MDBG_OFFSET(ao_scheme_ref(v->val)), f);
-		MDBG_DO(ao_scheme_poly_write(v->val));
 		MDBG_DO(printf("\n"));
 	}
 }
@@ -84,10 +83,11 @@ frame_mark(void *addr)
 	struct ao_scheme_frame	*frame = addr;
 
 	for (;;) {
+		struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
+
 		MDBG_MOVE("frame mark %d\n", MDBG_OFFSET(frame));
-		if (!AO_SCHEME_IS_POOL(frame))
-			break;
-		ao_scheme_poly_mark(frame->vals, 0);
+		if (!ao_scheme_mark_memory(&ao_scheme_frame_vals_type, vals))
+			frame_vals_mark(vals);
 		frame = ao_scheme_poly_frame(frame->prev);
 		MDBG_MOVE("frame next %d\n", MDBG_OFFSET(frame));
 		if (!frame)
@@ -103,13 +103,17 @@ frame_move(void *addr)
 	struct ao_scheme_frame	*frame = addr;
 
 	for (;;) {
-		struct ao_scheme_frame	*prev;
-		int			ret;
+		struct ao_scheme_frame		*prev;
+		struct ao_scheme_frame_vals	*vals;
+		int				ret;
 
 		MDBG_MOVE("frame move %d\n", MDBG_OFFSET(frame));
-		if (!AO_SCHEME_IS_POOL(frame))
-			break;
-		ao_scheme_poly_move(&frame->vals, 0);
+		vals = ao_scheme_poly_frame_vals(frame->vals);
+		if (!ao_scheme_move_memory(&ao_scheme_frame_vals_type, (void **) &vals))
+			frame_vals_move(vals);
+		if (vals != ao_scheme_poly_frame_vals(frame->vals))
+			frame->vals = ao_scheme_frame_vals_poly(vals);
+
 		prev = ao_scheme_poly_frame(frame->prev);
 		if (!prev)
 			break;
@@ -133,32 +137,53 @@ const struct ao_scheme_type ao_scheme_frame_type = {
 	.name = "frame",
 };
 
+int ao_scheme_frame_print_indent;
+
+static void
+ao_scheme_frame_indent(int extra)
+{
+	int				i;
+	putchar('\n');
+	for (i = 0; i < ao_scheme_frame_print_indent+extra; i++)
+		putchar('\t');
+}
+
 void
-ao_scheme_frame_write(ao_poly p)
+ao_scheme_frame_write(ao_poly p, bool write)
 {
 	struct ao_scheme_frame		*frame = ao_scheme_poly_frame(p);
+	struct ao_scheme_frame		*clear = frame;
 	struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
 	int				f;
+	int				written = 0;
 
-	printf ("{");
-	if (frame) {
-		if (frame->type & AO_SCHEME_FRAME_PRINT)
+	ao_scheme_print_start();
+	while (frame) {
+		if (written != 0)
+			printf(", ");
+		if (ao_scheme_print_mark_addr(frame)) {
 			printf("recurse...");
-		else {
-			frame->type |= AO_SCHEME_FRAME_PRINT;
-			for (f = 0; f < frame->num; f++) {
-				if (f != 0)
-					printf(", ");
-				ao_scheme_poly_write(vals->vals[f].atom);
-				printf(" = ");
-				ao_scheme_poly_write(vals->vals[f].val);
-			}
-			if (frame->prev)
-				ao_scheme_poly_write(frame->prev);
-			frame->type &= ~AO_SCHEME_FRAME_PRINT;
+			break;
+		}
+
+		putchar('{');
+		written++;
+		for (f = 0; f < frame->num; f++) {
+			ao_scheme_frame_indent(1);
+			ao_scheme_poly_write(vals->vals[f].atom, write);
+			printf(" = ");
+			ao_scheme_poly_write(vals->vals[f].val, write);
+		}
+		frame = ao_scheme_poly_frame(frame->prev);
+		ao_scheme_frame_indent(0);
+		putchar('}');
+	}
+	if (ao_scheme_print_stop()) {
+		while (written--) {
+			ao_scheme_print_clear_addr(clear);
+			clear = ao_scheme_poly_frame(clear->prev);
 		}
 	}
-	printf("}");
 }
 
 static int
@@ -225,9 +250,9 @@ ao_scheme_frame_new(int num)
 		frame->num = 0;
 		frame->prev = AO_SCHEME_NIL;
 		frame->vals = AO_SCHEME_NIL;
-		ao_scheme_frame_stash(0, frame);
+		ao_scheme_frame_stash(frame);
 		vals = ao_scheme_frame_vals_new(num);
-		frame = ao_scheme_frame_fetch(0);
+		frame = ao_scheme_frame_fetch();
 		if (!vals)
 			return NULL;
 		frame->vals = ao_scheme_frame_vals_poly(vals);
@@ -271,9 +296,9 @@ ao_scheme_frame_realloc(struct ao_scheme_frame *frame, int new_num)
 
 	if (new_num == frame->num)
 		return frame;
-	ao_scheme_frame_stash(0, frame);
+	ao_scheme_frame_stash(frame);
 	new_vals = ao_scheme_frame_vals_new(new_num);
-	frame = ao_scheme_frame_fetch(0);
+	frame = ao_scheme_frame_fetch();
 	if (!new_vals)
 		return NULL;
 	vals = ao_scheme_poly_frame_vals(frame->vals);
@@ -306,11 +331,11 @@ ao_scheme_frame_add(struct ao_scheme_frame *frame, ao_poly atom, ao_poly val)
 
 	if (!ref) {
 		int f = frame->num;
-		ao_scheme_poly_stash(0, atom);
-		ao_scheme_poly_stash(1, val);
+		ao_scheme_poly_stash(atom);
+		ao_scheme_poly_stash(val);
 		frame = ao_scheme_frame_realloc(frame, f + 1);
-		val = ao_scheme_poly_fetch(1);
-		atom = ao_scheme_poly_fetch(0);
+		val = ao_scheme_poly_fetch();
+		atom = ao_scheme_poly_fetch();
 		if (!frame)
 			return AO_SCHEME_NIL;
 		ao_scheme_frame_bind(frame, frame->num - 1, atom, val);

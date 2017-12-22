@@ -39,6 +39,21 @@ ao_sleep(__xdata void *wchan)
 	return 0;
 }
 
+#if HAS_AO_DELAY
+void
+ao_delay(uint16_t ticks)
+{
+	AO_TICK_TYPE	target;
+
+	if (!ticks)
+		ticks = 1;
+	target = ao_tick_count + ticks;
+	do {
+		ao_sleep(&ao_time);
+	} while ((int16_t) (target - ao_tick_count) > 0);
+}
+#endif
+
 void
 ao_wakeup(__xdata void *wchan)
 {

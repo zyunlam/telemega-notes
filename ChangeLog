@@ -1,3 +1,435 @@
+commit dbb78c8222c45f4430601deee0194b0c9dc2e79a
+Merge: fe38c225 87aab995
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 21 19:05:46 2017 -0700
+
+    Merge branch 'master' into branch-1.8
+
+commit 87aab99521dc44d1d29fbb0b7f227f868f074836
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 21 17:37:10 2017 -0800
+
+    Bump for version 1.8.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4bcdc106df2c5e8572570e57b4d97121df94799a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 21 17:36:24 2017 -0800
+
+    Doc updates for version 1.8.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 46304aa257635d14afc4d8567eedba0f93a5742f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 16:57:33 2017 -0800
+
+    altos/micropeak: Remove all compiler results
+    
+    Not just the current version.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 99299986e194337b05ee81cfb7c4aa1cb9e9a74e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 16:56:33 2017 -0800
+
+    altos/attiny: Add ADC implementation
+    
+    It's primitive, but might serve to read ADC values. Untested.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 342132a8869d530b6893bb84becf03cb30490600
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 16:21:23 2017 -0800
+
+    ao-bringup: turnon_easymini was left with dfu_util disabled
+    
+    This was presumably changed for some test and left in the wrong
+    state.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6d05747941b8e31afb1f8522ac0b8c1ad12aa90f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 16:19:40 2017 -0800
+
+    altos/easymini-v2.0: Adapt to final hardware pin assignment changes
+    
+    Beeper moved from PB0 to PB1 (Tim3 CH4)
+    Drogue fire moved from PB6 to PB3
+    Bootloader moved from PB1 to PB6
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9826845f952abe898f029e31cc0f7080708e2eae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 13:09:24 2017 -0800
+
+    altos/lambdakey-v1.0: Add back and/or macros
+    
+    With scheme shrinking a bit, there's now space for these useful macros.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ed1f7b79abc7400a54b35fbf62c9db6855f9129a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 12:39:20 2017 -0800
+
+    altos/scheme: Replace per-type indexed stash with poly stash heap
+    
+    Instead of having a random set of stash arrays with explicit indices
+    used by callers, just have a general heap. Less error prone, and less code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71fb79492cb955af4bd52e79f1fa69d17e084dbc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 12:16:24 2017 -0800
+
+    altos/scheme: Replace memory pool macros with inlines
+    
+    AO_SCHEME_IS_CONST -> ao_scheme_is_const_addr
+    AO_SCHEME_IS_POOL -> ao_scheme_is_pool_addr
+    
+    Provides better typechecking and avoids confusion with
+    ao_scheme_is_const inline (which takes an ao_poly instead of a void *)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 34f998d147d08e966daad1ab76c40906018d3d8d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 11:51:33 2017 -0800
+
+    altos/scheme: AO_SCHEME_IS_CONS -> ao_scheme_is_cons
+    
+    This inline was already defined; just use it. Also, switch some places
+    to use ao_scheme_is_pair instead as appropriate.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fa6f4b331db9d37da6767005fd375b696485b46b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 11:43:23 2017 -0800
+
+    altos/scheme: ao_scheme__cons -> ao_scheme_cons
+    
+    Fix the double underscore in this name. Ick.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 00390fb09f47654905824af671b966ffca0a38b3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 11:40:08 2017 -0800
+
+    altos/scheme: Don't optimize ao_scheme_make_const
+    
+    Performance isn't interesting, and it's nice to have a bare system
+    ready for debugging.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ba472dda57e134fe0f0e4a571a6d0c1e5a1ea6eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 11:39:39 2017 -0800
+
+    altos/scheme: Clean up test CFLAGS
+    
+    make it easy to switch between debug and optimized builds.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 53b99e0419cb44c7983e41026bf0430deae58940
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 11:37:33 2017 -0800
+
+    altos/scheme: (define (foo . bar)) has a pair, not list as card
+    
+    When defining a lambda with varargs, the args are not a list as the
+    final element is not a pair or nil. Use pair? instead of list? to
+    detect this form correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fbe5dc9f215e7014aa8f9d325c1fba939816be03
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 11:35:09 2017 -0800
+
+    altos/scheme: apply also needs to not free value list on lambdas
+    
+    When apply is invoked on any function, the cons in the argument list
+    cannot be immediately freed as they have been passed to the
+    function. That applies to both built-ins as well as lambdas; this
+    patch removes the special ao_scheme_skip_cons_free global and just
+    marks the stack in both cases.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 431165e5fa72ba6dffd477de32960745cdec332c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 19 11:33:36 2017 -0800
+
+    altos/scheme: Rework display/write code
+    
+    Unify output functions and add bool to switch between write and
+    display mode. Make that only affect strings (as per r⁷rs).
+    
+    Use print recursion detection in frame and stack code, eliminating
+    PRINT flags in type field.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5628b983497d9d03e10cccee157419210a49cfa9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 18 02:14:57 2017 -0800
+
+    altos/scheme: Compile scheme test with -O3
+    
+    This level of optimization caused trouble, so use it all of the time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6593570418e087b9f83ed7f90303d4e1e7d20e83
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 18 02:12:04 2017 -0800
+
+    altos/scheme: Work around gcc 7.2.0 optimization bug in memory manager
+    
+    After marking a set of memory chunks, it's possible that all of them
+    will be packed tight against 'top', in which case none of them will be
+    moving. In that case, gcc 7.2.0 appears to generate incorrect code
+    causing the loop to be abandoned, meaning that we don't actually
+    collect anything at all.
+    
+    Add a quick short-circuit test just after the mark phase that skips
+    the code which wouldn't do anything in this case.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9f1849e548e35498f88a0b8adbbc4a57c7a39222
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 18 02:11:07 2017 -0800
+
+    altos/scheme: rearrange debugging defines
+    
+    Allow applications to redefine these as desired, add more flexibility
+    in what the various memory debugging flags can do.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2def6abebb3d14a29fe0e03bac09b9d74d2d1578
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 18 02:08:23 2017 -0800
+
+    altos/scheme: abort when we try to print an invalid value
+    
+    This can catch a host of interpreter bugs; best to abandon the program
+    when it happens.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e1a6b3bf458f311d832aea7eec34935d42f8efed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 17 22:22:50 2017 -0800
+
+    altos/scheme: Use memory manager mark code to note recursive print
+    
+    This flags any object being printed and checks before recursing to
+    avoid infinite loops.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9d1131da911f7220ac8b6cb7ba5a0afd3deef657
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 17 22:19:38 2017 -0800
+
+    altos/scheme: Use AO_SCHEME_IS_CONS in cons memory funcs
+    
+    More efficient than ao_scheme_poly_type as it doesn't care about
+    non-prim types.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b866b3ca249dce61f8ff16c8d28514d1b80386d7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 14 23:10:43 2017 -0800
+
+    ao-bringup/test-chaoskey: Make finding most recent device more reliable
+    
+    Use dmesg -t to strip off the timestamp, which avoids having a
+    variable number of fields for awk to look at.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4c9233aa8a2f1b1dca6580d6d6275b48c40f01f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 14 23:09:02 2017 -0800
+
+    altos/lambdakey-v1.0: shrink scheme code to fit the ROM
+    
+    scheme has grown a bit; adapt
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 32f6877288ea6b7eb1cae9a42fbe8e2c5dbb2f08
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 14 23:04:39 2017 -0800
+
+    altos/scheme: swap BIGINT and STRING types
+    
+    This lets BIGINT be a primitive type, allowing it to use all 32 bits
+    for storage. This does make strings another byte longer, and also
+    slightly harder to deal with. It's a trade off.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2e11cae044cd2c053049effd76df9c5adecb84d7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 18:07:06 2017 -0800
+
+    altos/scheme: integer? is builtin on all versions
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0614c653a8ca8c4ccbf59d34296ca4b3e7d9f3a0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 18:02:17 2017 -0800
+
+    altos/lambdakey-v1.0: Make stack larger
+    
+    scheme doesn't like to run with less than a 1kB stack.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 839a7454686415a52f532d0e4f379061a68d5f1b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 18:01:21 2017 -0800
+
+    altos/scheme: inline some mem calls to reduce stack usage.
+    
+    Also includes some code to display stack usage during collect calls.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c490efdf90befdf048ff7d9cbbe26bcc6f942820
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 18:00:12 2017 -0800
+
+    altos/scheme: Use direct calls from frame to frame_vals mem functions
+    
+    Avoids the extra stack depth of the poly versions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca27d467198c556be483961a6ca3b8f97bbe96a6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 17:59:26 2017 -0800
+
+    altos/scheme: More compiler warning cleanups
+    
+    Make local funcs static. Don't mix decls and code.x
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4bfce37e7567d9c2a09ea4da8113e7639516ed6e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 17:54:03 2017 -0800
+
+    altos/scheme: apply const to places taking const strings.
+    
+    Mostly printf and friends.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 28dbe9a04b16f79db255baecbf0cd486c510ef58
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 15:31:27 2017 -0800
+
+    altos/stm: Align 'data' to 8 bytes, just like textram
+    
+    The textram section must be aligned to 8 bytes to keep the linker
+    happy. However, if that section contains no data, the declaration will
+    set the __data_start__ value to that alignment, but the data section
+    itself would start on a 4-byte alignment, potentially 4 bytes lower
+    than the value indicated by __data_start__. This completely scrambles
+    initialized memory as the startup code will copy the data segment to
+    __data_start__, 4 bytes off of the actual data segment start.
+    
+    Fix this by forcing the data segment to also be aligned to 8 bytes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db352bd0723e8d640bb034bc14e5ad193f0afe1d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 15:30:45 2017 -0800
+
+    altos/kernel: Allow ao_cmd to be built without tasking
+    
+    Useful for single-threaded applications, like lambdakey
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 09ea349f5b37e257e8ca23ead493ba1694395530
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 15:27:26 2017 -0800
+
+    altos/lambdakey-v1.0: Get this building again
+    
+    The lambdakey can't hold a full implementation of the scheme
+    interpreter, so use only a subset, removing floats, bigints and
+    vectors. Also reduce the pre-loaded lisp code as well.
+    
+    It's pretty spare at this point; but it does fill the ROM.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d8c9024f3829dc3f241b16869f165f3ee01764f3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 15:25:51 2017 -0800
+
+    altos/scheme: Support scheme subsetting via feature settings
+    
+    This provides for the creation of smaller versions of the interpreter,
+    leaving out options like floating point numbers and vectors.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a15166c435f65cb36f487ec8e5a4ff558a7e0502
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 12 15:15:41 2017 -0800
+
+    altos/scheme: Add ao_scheme_vector.c
+    
+    Useful to include the code for implementing vectors
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5cf77306257517a3d1ec8cea85fca34f576a8f22
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 11 22:36:00 2017 -0800
+
+    doc: Don't 'publish' release notes, don't build pdf release notes
+    
+    All we use the release notes for is to include into the main AltOS
+    page. Also remove the docinfo for these files so that information
+    isn't duplicated for each set of release notes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 40236913922e0395780cd7d90354546ecaf279f9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Dec 11 22:15:46 2017 -0700
+
+    update Releasing with changes discovered in 1.8.3 release process
+
+commit fe38c22595b050435dbacd35f1baae064fb7de75
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Dec 11 21:38:59 2017 -0700
+
+    releasing 1.8.3
+
 commit ea0aa97fb93e669868a6f2c49c5d4b46e7615b1f
 Merge: 216ea638 9adf8b23
 Author: Bdale Garbee <bdale@gag.com>

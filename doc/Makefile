@@ -3,6 +3,7 @@
 #
 
 RELNOTES_INC=\
+	release-notes-1.8.4.inc \
 	release-notes-1.8.3.inc \
 	release-notes-1.8.2.inc \
 	release-notes-1.8.1.inc \
@@ -186,7 +187,6 @@ SVG=\
 	telemini-v3.svg \
 	easymega.svg
 
-RELNOTES_PDF=$(RELNOTES_INC:.inc=.pdf)
 RELNOTES_HTML=$(RELNOTES_INC:.inc=.html)
 
 ONEFILE_TXT_FILES=\
@@ -196,10 +196,13 @@ ONEFILE_TXT_FILES=\
 
 ONEFILE_RAW_FILES=$(ONEFILE_TXT_FILES:.txt=.raw)
 ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
+ONEFILE_HTML_FILES=$(ONEFILE_TXT_FILES:.txt=.html)
 
 AM_HTML=am.html
 
-HTML=altusmetrum.html micropeak.html telegps.html easymini.html $(RELNOTES_HTML) $(ONEFILE_HTML_FILES)
+PUBLISH_HTML=altusmetrum.html micropeak.html telegps.html easymini.html $(ONEFILE_HTML_FILES)
+
+HTML=$(PUBLISH_HTML) $(RELNOTES_HTML)
 
 HTML_REVHISTORY=\
 	altusmetrum-revhistory.html \
@@ -207,7 +210,7 @@ HTML_REVHISTORY=\
 	telegps-revhistory.html \
 	easymini-revhistory.html
 
-PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(RELNOTES_PDF) $(ONEFILE_PDF_FILES) \
+PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 
 FOP_STYLE=am-fo.xsl
@@ -235,6 +238,8 @@ TEMPLATES_XSL=$(TEMPLATES_TMPL:.tmpl=.xsl)
 PDF_CONFIG_FILES=$(FOP_STYLE) $(COMMON_STYLE) $(FOP_XCONF) $(TEMPLATES_XSL)
 HTML_CONFIG_FILES=$(HTML_STYLE) $(COMMON_STYLE) $(TEMPLATES_XSL)
 
+PUBLISH_DOC=$(PUBLISH_HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
+
 DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
 .SUFFIXES: .tmpl .xsl .inc .txt .raw .pdf .html
@@ -245,12 +250,12 @@ DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 .inc.raw:
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
-.raw.pdf:
+.raw.html:
 	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
 	case $* in release-notes*) ./fix-html $*.html ;; esac
 
-.pdf.html:
+.html.pdf:
 	@touch $@
 
 .tmpl.xsl:
@@ -278,19 +283,21 @@ telemini-v3-outline.pdf: telemini-v3-outline.txt telemini-v3.svg
 
 install:	all
 
-publish:	$(DOC) $(FONTS)
-	cp $(DOC) /home/bdale/web/altusmetrum/AltOS/doc/
-	mkdir -p /home/bdale/web/altusmetrum/AltOS/doc/fonts/
-	cp $(FONTS) /home/bdale/web/altusmetrum/AltOS/doc/fonts/
-	(cd /home/bdale/web/altusmetrum ; \
-	 git add /home/bdale/web/altusmetrum/AltOS/doc/* ; \
-	 git add /home/bdale/web/altusmetrum/AltOS/doc/fonts/* ; \
+WEB_ROOT=/home/bdale/web/
+
+publish:	$(PUBLISH_DOC) $(FONTS)
+	cp $(PUBLISH_DOC) $(WEB_ROOT)/altusmetrum/AltOS/doc/
+	mkdir -p $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/
+	cp $(FONTS) $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/
+	(cd $(WEB_ROOT)/altusmetrum ; \
+	 git add $(WEB_ROOT)/altusmetrum/AltOS/doc/* ; \
+	 git add $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/* ; \
 	 echo "update docs" | \
-	 git commit -F - /home/bdale/web/altusmetrum/AltOS/doc/* /home/bdale/web/altusmetrum/AltOS/doc/fonts/* ; \
+	 git commit -F - $(WEB_ROOT)/altusmetrum/AltOS/doc/* $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/* ; \
 	 git push)
 
-publish-keithp:	am.html $(DOC) $(FONTS)
-	scp -p am.html $(DOC) keithp.com:~keithp/public_html/altos
+publish-keithp:	am.html $(PUBLISH_DOC) $(FONTS)
+	scp -p am.html $(PUBLISH_DOC) keithp.com:~keithp/public_html/altos
 	scp -p $(FONTS) keithp.com:~keithp/public_html/altos/fonts
 
 clean:

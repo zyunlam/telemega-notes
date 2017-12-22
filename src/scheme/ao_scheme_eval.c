@@ -17,7 +17,6 @@
 
 struct ao_scheme_stack		*ao_scheme_stack;
 ao_poly				ao_scheme_v;
-uint8_t				ao_scheme_skip_cons_free;
 
 ao_poly
 ao_scheme_set_cond(struct ao_scheme_cons *c)
@@ -207,7 +206,7 @@ ao_scheme_eval_formal(void)
 	}
 
 	/* Append formal to list of values */
-	formal = ao_scheme__cons(ao_scheme_v, AO_SCHEME_NIL);
+	formal = ao_scheme_cons(ao_scheme_v, AO_SCHEME_NIL);
 	if (!formal)
 		return 0;
 
@@ -265,7 +264,7 @@ ao_scheme_eval_exec(void)
 				DBGI("set "); DBG_POLY(atom); DBG(" = "); DBG_POLY(val); DBG("\n");
 			});
 		builtin = ao_scheme_poly_builtin(ao_scheme_v);
-		if (builtin && (builtin->args & AO_SCHEME_FUNC_FREE_ARGS) && !ao_scheme_stack_marked(ao_scheme_stack) && !ao_scheme_skip_cons_free) {
+		if (builtin && (builtin->args & AO_SCHEME_FUNC_FREE_ARGS) && !ao_scheme_stack_marked(ao_scheme_stack)) {
 			struct ao_scheme_cons *cons = ao_scheme_poly_cons(ao_scheme_stack->values);
 			ao_scheme_stack->values = AO_SCHEME_NIL;
 			ao_scheme_cons_free(cons);
@@ -294,7 +293,6 @@ ao_scheme_eval_exec(void)
 		DBGI(".. frame "); DBG_POLY(ao_scheme_frame_poly(ao_scheme_frame_current)); DBG("\n");
 		break;
 	}
-	ao_scheme_skip_cons_free = 0;
 	return 1;
 }
 
@@ -325,7 +323,7 @@ ao_scheme_eval_apply(void)
 	ao_scheme_v = ao_scheme_poly_cons(ao_scheme_stack->values)->car;
 	DBGI("apply: "); DBG_POLY(ao_scheme_stack->values); DBG ("\n");
 	ao_scheme_stack->state = eval_exec;
-	ao_scheme_skip_cons_free = 1;
+	ao_scheme_stack_mark(ao_scheme_stack);
 	return 1;
 }
 
@@ -350,7 +348,7 @@ ao_scheme_eval_cond(void)
 		ao_scheme_stack->state = eval_val;
 	} else {
 		ao_scheme_v = ao_scheme_poly_cons(ao_scheme_stack->sexprs)->car;
-		if (!ao_scheme_v || ao_scheme_poly_type(ao_scheme_v) != AO_SCHEME_CONS) {
+		if (!ao_scheme_is_pair(ao_scheme_v)) {
 			ao_scheme_error(AO_SCHEME_INVALID, "invalid cond clause");
 			return 0;
 		}
@@ -494,7 +492,7 @@ ao_scheme_eval_macro(void)
 
 	if (ao_scheme_v == AO_SCHEME_NIL)
 		ao_scheme_abort();
-	if (ao_scheme_poly_type(ao_scheme_v) == AO_SCHEME_CONS) {
+	if (ao_scheme_is_cons(ao_scheme_v)) {
 		*ao_scheme_poly_cons(ao_scheme_stack->sexprs) = *ao_scheme_poly_cons(ao_scheme_v);
 		ao_scheme_v = ao_scheme_stack->sexprs;
 		DBGI("sexprs rewritten to: "); DBG_POLY(ao_scheme_v); DBG("\n");

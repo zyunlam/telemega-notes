@@ -108,6 +108,7 @@ These are Bdale's notes on how to do a release.
 	   src/telegps-v2.0/{*.elf,*.ihx} \
 	   src/telemega-v1.0/{*.elf,*.ihx} \
 	   src/telemega-v2.0/{*.elf,*.ihx} \
+	   src/telemega-v3.0/{*.elf,*.ihx} \
 	   src/telemetrum-v2.0/{*.elf,*.ihx} \
 	   src/telemini-v3.0/{*.elf,*.ihx} \
 	   ~/altusmetrumllc/Binaries/
@@ -122,6 +123,7 @@ These are Bdale's notes on how to do a release.
 	   src/telegps-v2.0/flash-loader/*.elf \
 	   src/telemega-v1.0/flash-loader/*.elf \
 	   src/telemega-v2.0/flash-loader/*.elf \
+	   src/telemega-v3.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
 	   src/telemini-v3.0/flash-loader/{*.elf,*.bin} \
 	   ~/altusmetrumllc/Binaries/loaders/

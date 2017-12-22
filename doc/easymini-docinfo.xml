@@ -39,6 +39,13 @@
 <revhistory>
   <?dbhtml filename="easymini-revhistory.html"?>
   <revision>
+    <revnumber>1.8.4</revnumber>
+    <date>20 Dec 2017</date>
+    <revremark>
+      Support EasyMini v2.0 hardware.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.6.3</revnumber>
     <date>21 April 2016</date>
     <revremark>

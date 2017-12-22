@@ -19,6 +19,9 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
+#define HAS_TASK	0
+#define HAS_AO_DELAY	1
+
 #define LED_PORT_ENABLE	STM_RCC_AHBENR_IOPBEN
 #define LED_PORT	(&stm_gpiob)
 #define LED_PIN_RED	4

@@ -248,7 +248,7 @@
    (macro (first . rest)
 					; check for alternate lambda definition form
 
-	  (cond ((list? first)
+	  (cond ((pair? first)
 		 (set! rest
 		       (append
 			(list
@@ -640,7 +640,7 @@
 (char-whitespace? #\0)
 (char-whitespace? #\space)
 
-(define (char->integer c) c)
+(define char->integer (macro (v) v))
 (define integer->char char->integer)
 
 (define (char-upcase c) (if (char-lower-case? c) (+ c (- #\A #\a)) c))
@@ -805,9 +805,3 @@
   )
 
 (case 12 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else"))
-
-;(define number->string (lambda (arg . opt)
-;			      (let ((base (if (null? opt) 10 (car opt)))
-					;
-;
-				

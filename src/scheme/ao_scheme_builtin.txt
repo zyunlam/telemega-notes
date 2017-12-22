@@ -1,81 +1,84 @@
-f_lambda	eval
-f_lambda	read
-nlambda		lambda
-nlambda		nlambda
-nlambda		macro
-f_lambda	car
-f_lambda	cdr
-f_lambda	cons
-f_lambda	last
-f_lambda	length
-f_lambda	list_copy	list-copy
-nlambda		quote
-atom		quasiquote
-atom		unquote
-atom		unquote_splicing	unquote-splicing
-f_lambda	set
-macro		setq		set!
-f_lambda	def
-nlambda		cond
-nlambda		begin
-nlambda		while
-f_lambda	write
-f_lambda	display
-f_lambda	plus		+	string-append
-f_lambda	minus		-
-f_lambda	times		*
-f_lambda	divide		/
-f_lambda	modulo		modulo	%
-f_lambda	remainder
-f_lambda	quotient
-f_lambda	equal		=	eq?	eqv?
-f_lambda	less		<	string<?
-f_lambda	greater		>	string>?
-f_lambda	less_equal	<=	string<=?
-f_lambda	greater_equal	>=	string>=?
-f_lambda	flush_output		flush-output
-f_lambda	delay
-f_lambda	led
-f_lambda	save
-f_lambda	restore
-f_lambda	call_cc		call-with-current-continuation	call/cc
-f_lambda	collect
-f_lambda	nullp		null?
-f_lambda	not
-f_lambda	listp		list?
-f_lambda	pairp		pair?
-f_lambda	integerp	integer? exact? exact-integer?
-f_lambda	numberp		number? real?
-f_lambda	booleanp	boolean?
-f_lambda	set_car		set-car!
-f_lambda	set_cdr		set-cdr!
-f_lambda	symbolp		symbol?
-f_lambda	list_to_string		list->string
-f_lambda	string_to_list		string->list
-f_lambda	symbol_to_string	symbol->string
-f_lambda	string_to_symbol	string->symbol
-f_lambda	stringp		string?
-f_lambda	string_ref	string-ref
-f_lambda	string_set	string-set!
-f_lambda	string_copy	string-copy
-f_lambda	string_length	string-length
-f_lambda	procedurep	procedure?
-lambda		apply
-f_lambda	read_char	read-char
-f_lambda	write_char	write-char
-f_lambda	exit
-f_lambda	current_jiffy	current-jiffy
-f_lambda	current_second	current-second
-f_lambda	jiffies_per_second	jiffies-per-second
-f_lambda	finitep		finite?
-f_lambda	infinitep	infinite?
-f_lambda	inexactp	inexact?
-f_lambda	sqrt
-f_lambda	vector_ref	vector-ref
-f_lambda	vector_set	vector-set!
-f_lambda	vector
-f_lambda	make_vector	make-vector
-f_lambda	list_to_vector	list->vector
-f_lambda	vector_to_list	vector->list
-f_lambda	vector_length	vector-length
-f_lambda	vectorp		vector?
+BIGINT	feature		bigint
+all	atom		eof
+all	atom		else
+all	f_lambda	eval
+all	f_lambda	read
+all	nlambda		lambda
+all	nlambda		nlambda
+all	nlambda		macro
+all	f_lambda	car
+all	f_lambda	cdr
+all	f_lambda	cons
+all	f_lambda	last
+all	f_lambda	length
+all	f_lambda	list_copy	list-copy
+all	nlambda		quote
+QUASI	atom		quasiquote
+QUASI	atom		unquote
+QUASI	atom		unquote_splicing	unquote-splicing
+all	f_lambda	set
+all	macro		setq		set!
+all	f_lambda	def
+all	nlambda		cond
+all	nlambda		begin
+all	nlambda		while
+all	f_lambda	write
+all	f_lambda	display
+all	f_lambda	plus		+	string-append
+all	f_lambda	minus		-
+all	f_lambda	times		*
+all	f_lambda	divide		/
+all	f_lambda	modulo		modulo	%
+all	f_lambda	remainder
+all	f_lambda	quotient
+all	f_lambda	equal		=	eq?	eqv?
+all	f_lambda	less		<	string<?
+all	f_lambda	greater		>	string>?
+all	f_lambda	less_equal	<=	string<=?
+all	f_lambda	greater_equal	>=	string>=?
+all	f_lambda	flush_output		flush-output
+TIME	f_lambda	delay
+GPIO	f_lambda	led
+all	f_lambda	save
+all	f_lambda	restore
+all	f_lambda	call_cc		call-with-current-continuation	call/cc
+all	f_lambda	collect
+all	f_lambda	nullp		null?
+all	f_lambda	not
+all	f_lambda	listp		list?
+all	f_lambda	pairp		pair?
+all	f_lambda	integerp	integer? exact? exact-integer?
+all	f_lambda	numberp		number? real?
+all	f_lambda	booleanp	boolean?
+all	f_lambda	set_car		set-car!
+all	f_lambda	set_cdr		set-cdr!
+all	f_lambda	symbolp		symbol?
+all	f_lambda	list_to_string		list->string
+all	f_lambda	string_to_list		string->list
+all	f_lambda	symbol_to_string	symbol->string
+all	f_lambda	string_to_symbol	string->symbol
+all	f_lambda	stringp		string?
+all	f_lambda	string_ref	string-ref
+all	f_lambda	string_set	string-set!
+all	f_lambda	string_copy	string-copy
+all	f_lambda	string_length	string-length
+all	f_lambda	procedurep	procedure?
+all	lambda		apply
+all	f_lambda	read_char	read-char
+all	f_lambda	write_char	write-char
+all	f_lambda	exit
+TIME	f_lambda	current_jiffy	current-jiffy
+TIME	f_lambda	current_second	current-second
+TIME	f_lambda	jiffies_per_second	jiffies-per-second
+FLOAT	f_lambda	finitep		finite?
+FLOAT	f_lambda	infinitep	infinite?
+FLOAT	f_lambda	inexactp	inexact?
+FLOAT	f_lambda	sqrt
+VECTOR	f_lambda	vector_ref	vector-ref
+VECTOR	f_lambda	vector_set	vector-set!
+VECTOR	f_lambda	vector
+VECTOR	f_lambda	make_vector	make-vector
+VECTOR	f_lambda	list_to_vector	list->vector
+VECTOR	f_lambda	vector_to_list	vector->list
+VECTOR	f_lambda	vector_length	vector-length
+VECTOR	f_lambda	vectorp		vector?

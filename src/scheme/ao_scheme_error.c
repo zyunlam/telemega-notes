@@ -16,74 +16,7 @@
 #include <stdarg.h>
 
 void
-ao_scheme_error_poly(char *name, ao_poly poly, ao_poly last)
-{
-	int first = 1;
-	printf("\t\t%s(", name);
-	if (ao_scheme_poly_type(poly) == AO_SCHEME_CONS) {
-		if (poly) {
-			while (poly) {
-				struct ao_scheme_cons *cons = ao_scheme_poly_cons(poly);
-				if (!first)
-					printf("\t\t         ");
-				else
-					first = 0;
-				ao_scheme_poly_write(cons->car);
-				printf("\n");
-				if (poly == last)
-					break;
-				poly = cons->cdr;
-			}
-			printf("\t\t         )\n");
-		} else
-			printf(")\n");
-	} else {
-		ao_scheme_poly_write(poly);
-		printf("\n");
-	}
-}
-
-static void tabs(int indent)
-{
-	while (indent--)
-		printf("\t");
-}
-
-void
-ao_scheme_error_frame(int indent, char *name, struct ao_scheme_frame *frame)
-{
-	int			f;
-
-	tabs(indent);
-	printf ("%s{", name);
-	if (frame) {
-		struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
-		if (frame->type & AO_SCHEME_FRAME_PRINT)
-			printf("recurse...");
-		else {
-			frame->type |= AO_SCHEME_FRAME_PRINT;
-			for (f = 0; f < frame->num; f++) {
-				if (f != 0) {
-					tabs(indent);
-					printf("         ");
-				}
-				ao_scheme_poly_write(vals->vals[f].atom);
-				printf(" = ");
-				ao_scheme_poly_write(vals->vals[f].val);
-				printf("\n");
-			}
-			if (frame->prev)
-				ao_scheme_error_frame(indent + 1, "prev:   ", ao_scheme_poly_frame(frame->prev));
-			frame->type &= ~AO_SCHEME_FRAME_PRINT;
-		}
-		tabs(indent);
-		printf("        }\n");
-	} else
-		printf ("}\n");
-}
-
-void
-ao_scheme_vprintf(char *format, va_list args)
+ao_scheme_vprintf(const char *format, va_list args)
 {
 	char c;
 
@@ -91,7 +24,10 @@ ao_scheme_vprintf(char *format, va_list args)
 		if (c == '%') {
 			switch (c = *format++) {
 			case 'v':
-				ao_scheme_poly_write((ao_poly) va_arg(args, unsigned int));
+				ao_scheme_poly_write((ao_poly) va_arg(args, unsigned int), true);
+				break;
+			case 'V':
+				ao_scheme_poly_write((ao_poly) va_arg(args, unsigned int), false);
 				break;
 			case 'p':
 				printf("%p", va_arg(args, void *));
@@ -112,7 +48,7 @@ ao_scheme_vprintf(char *format, va_list args)
 }
 
 void
-ao_scheme_printf(char *format, ...)
+ao_scheme_printf(const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -121,7 +57,7 @@ ao_scheme_printf(char *format, ...)
 }
 
 ao_poly
-ao_scheme_error(int error, char *format, ...)
+ao_scheme_error(int error, const char *format, ...)
 {
 	va_list	args;
 
@@ -133,7 +69,7 @@ ao_scheme_error(int error, char *format, ...)
 	ao_scheme_printf("Value:  %v\n", ao_scheme_v);
 	ao_scheme_printf("Frame:  %v\n", ao_scheme_frame_poly(ao_scheme_frame_current));
 	printf("Stack:\n");
-	ao_scheme_stack_write(ao_scheme_stack_poly(ao_scheme_stack));
+	ao_scheme_stack_write(ao_scheme_stack_poly(ao_scheme_stack), true);
 	ao_scheme_printf("Globals: %v\n", ao_scheme_frame_poly(ao_scheme_frame_global));
 	return AO_SCHEME_NIL;
 }

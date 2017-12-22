@@ -15,6 +15,8 @@
 #include "ao_scheme.h"
 #include <math.h>
 
+#ifdef AO_SCHEME_FEATURE_FLOAT
+
 static void float_mark(void *addr)
 {
 	(void) addr;
@@ -44,11 +46,12 @@ const struct ao_scheme_type ao_scheme_float_type = {
 #endif
 
 void
-ao_scheme_float_write(ao_poly p)
+ao_scheme_float_write(ao_poly p, bool write)
 {
 	struct ao_scheme_float *f = ao_scheme_poly_float(p);
 	float	v = f->value;
 
+	(void) write;
 	if (isnanf(v))
 		printf("+nan.0");
 	else if (isinff(v)) {
@@ -67,10 +70,10 @@ ao_scheme_poly_number(ao_poly p)
 	switch (ao_scheme_poly_base_type(p)) {
 	case AO_SCHEME_INT:
 		return ao_scheme_poly_int(p);
+	case AO_SCHEME_BIGINT:
+		return ao_scheme_poly_bigint(p)->value;
 	case AO_SCHEME_OTHER:
 		switch (ao_scheme_other_type(ao_scheme_poly_other(p))) {
-		case AO_SCHEME_BIGINT:
-			return ao_scheme_bigint_int(ao_scheme_poly_bigint(p)->value);
 		case AO_SCHEME_FLOAT:
 			return ao_scheme_poly_float(p)->value;
 		}
@@ -150,3 +153,4 @@ ao_scheme_do_sqrt(struct ao_scheme_cons *cons)
 		return ao_scheme_error(AO_SCHEME_INVALID, "%s: non-numeric", ao_scheme_poly_atom(_ao_scheme_atom_sqrt)->name);
 	return ao_scheme_float_get(sqrtf(ao_scheme_poly_number(value)));
 }
+#endif

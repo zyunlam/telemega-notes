@@ -12,8 +12,8 @@ case "$#" in
 	serial="--serial $1"
 	;;
     0)
-	snum=`sudo dmesg | awk '/usb.*Product:/ { ck = index($0, "ChaosKey"); }
-		     /usb.*SerialNumber:/ { if (ck) print $5; }' | tail -1`
+	snum=`sudo dmesg -t | awk '/usb.*Product:/ { ck = index($0, "ChaosKey"); }
+		     /usb.*SerialNumber:/ { if (ck) print $4; }' | tail -1`
 
 	case "$snum" in
 	    "")

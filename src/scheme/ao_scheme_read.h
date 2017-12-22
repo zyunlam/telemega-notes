@@ -24,15 +24,21 @@
 # define OPEN  			2
 # define CLOSE			3
 # define QUOTE			4
+#ifdef AO_SCHEME_FEATURE_QUASI
 # define QUASIQUOTE		5
 # define UNQUOTE		6
 # define UNQUOTE_SPLICING	7
+#endif
 # define STRING			8
 # define NUM			9
+#ifdef AO_SCHEME_FEATURE_FLOAT
 # define FLOAT			10
+#endif
 # define DOT			11
 # define BOOL			12
+#ifdef AO_SCHEME_FEATURE_VECTOR
 # define OPEN_VECTOR		13
+#endif
 
 /*
  * character classes
@@ -40,11 +46,20 @@
 
 # define PRINTABLE	0x0001	/* \t \n ' ' - ~ */
 # define SPECIAL	0x0002	/* ( [ { ) ] } ' ` , */
+#ifdef AO_SCHEME_FEATURE_QUASI
+# define SPECIAL_QUASI	SPECIAL
+#else
+# define SPECIAL_QUASI	0
+#endif
 # define DOTC		0x0004	/* . */
 # define WHITE		0x0008	/* ' ' \t \n */
 # define DIGIT		0x0010	/* [0-9] */
 # define SIGN		0x0020	/* +- */
+#ifdef AO_SCHEME_FEATURE_FLOAT
 # define FLOATC		0x0040	/* . e E */
+#else
+# define FLOATC		0
+#endif
 # define ENDOFFILE	0x0080	/* end of file */
 # define COMMENT	0x0100	/* ; */
 # define IGNORE		0x0200	/* \0 - ' ' */

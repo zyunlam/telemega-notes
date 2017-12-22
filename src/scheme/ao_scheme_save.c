@@ -17,11 +17,15 @@
 ao_poly
 ao_scheme_do_save(struct ao_scheme_cons *cons)
 {
+#ifdef AO_SCHEME_SAVE
+	struct ao_scheme_os_save *os;
+#endif
+
 	if (!ao_scheme_check_argc(_ao_scheme_atom_save, cons, 0, 0))
 		return AO_SCHEME_NIL;
 
 #ifdef AO_SCHEME_SAVE
-	struct ao_scheme_os_save *os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
+	os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
 
 	ao_scheme_collect(AO_SCHEME_COLLECT_FULL);
 	os->atoms = ao_scheme_atom_poly(ao_scheme_atoms);
@@ -38,12 +42,15 @@ ao_scheme_do_save(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_restore(struct ao_scheme_cons *cons)
 {
+#ifdef AO_SCHEME_SAVE
+	struct ao_scheme_os_save save;
+	struct ao_scheme_os_save *os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
+#endif
 	if (!ao_scheme_check_argc(_ao_scheme_atom_save, cons, 0, 0))
 		return AO_SCHEME_NIL;
 
 #ifdef AO_SCHEME_SAVE
-	struct ao_scheme_os_save save;
-	struct ao_scheme_os_save *os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
+	os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
 
 	if (!ao_scheme_os_restore_save(&save, AO_SCHEME_POOL))
 		return ao_scheme_error(AO_SCHEME_INVALID, "header restore failed");

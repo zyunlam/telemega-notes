@@ -21,11 +21,11 @@
 
 #include <ao_flash_stm_pins.h>
 
-/* pin 5 (PB1) on debug header to gnd for boot mode */
+/* pin 27 (PB6) on debug header to gnd for boot mode */
 
 #define AO_BOOT_PIN			1
 #define AO_BOOT_APPLICATION_GPIO	stm_gpiob
-#define AO_BOOT_APPLICATION_PIN		1
+#define AO_BOOT_APPLICATION_PIN		6
 #define AO_BOOT_APPLICATION_VALUE	1
 #define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_UP
 

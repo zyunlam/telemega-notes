@@ -423,11 +423,13 @@ ao_loader(void)
 }
 #endif
 
+#if HAS_TASK
 __xdata struct ao_task ao_cmd_task;
+#endif
 
 __code struct ao_cmds	ao_base_cmds[] = {
 	{ help,		"?\0Help" },
-#if HAS_TASK_INFO
+#if HAS_TASK_INFO && HAS_TASK
 	{ ao_task_info,	"T\0Tasks" },
 #endif
 	{ echo,		"E <0 off, 1 on>\0Echo" },
@@ -445,5 +447,7 @@ void
 ao_cmd_init(void)
 {
 	ao_cmd_register(&ao_base_cmds[0]);
+#if HAS_TASK
 	ao_add_task(&ao_cmd_task, ao_cmd, "cmd");
+#endif
 }

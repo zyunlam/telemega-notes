@@ -20,9 +20,8 @@
 
 #include "ao.h"
 
-#define AO_SCHEME_SAVE	1
-
-#define AO_SCHEME_POOL_TOTAL	2048
+#define AO_SCHEME_POOL		3584
+#define AO_SCHEME_TOKEN_MAX	64
 
 #ifndef __BYTE_ORDER
 #define	__LITTLE_ENDIAN	1234

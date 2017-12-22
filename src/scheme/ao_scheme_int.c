@@ -15,23 +15,29 @@
 #include "ao_scheme.h"
 
 void
-ao_scheme_int_write(ao_poly p)
+ao_scheme_int_write(ao_poly p, bool write)
 {
 	int i = ao_scheme_poly_int(p);
+	(void) write;
 	printf("%d", i);
 }
 
+#ifdef AO_SCHEME_FEATURE_BIGINT
+
 int32_t
-ao_scheme_poly_integer(ao_poly p)
+ao_scheme_poly_integer(ao_poly p, bool *fail)
 {
+	if (fail)
+		*fail = false;
 	switch (ao_scheme_poly_base_type(p)) {
 	case AO_SCHEME_INT:
 		return ao_scheme_poly_int(p);
-	case AO_SCHEME_OTHER:
-		if (ao_scheme_other_type(ao_scheme_poly_other(p)) == AO_SCHEME_BIGINT)
-			return ao_scheme_bigint_int(ao_scheme_poly_bigint(p)->value);
+	case AO_SCHEME_BIGINT:
+		return ao_scheme_poly_bigint(p)->value;
 	}
-	return AO_SCHEME_NOT_INTEGER;
+	if (fail)
+		*fail = true;
+	return 0;
 }
 
 ao_poly
@@ -42,7 +48,7 @@ ao_scheme_integer_poly(int32_t p)
 	if (AO_SCHEME_MIN_INT <= p && p <= AO_SCHEME_MAX_INT)
 		return ao_scheme_int_poly(p);
 	bi = ao_scheme_alloc(sizeof (struct ao_scheme_bigint));
-	bi->value = ao_scheme_int_bigint(p);
+	bi->value = p;
 	return ao_scheme_bigint_poly(bi);
 }
 
@@ -71,9 +77,11 @@ const struct ao_scheme_type ao_scheme_bigint_type = {
 };
 
 void
-ao_scheme_bigint_write(ao_poly p)
+ao_scheme_bigint_write(ao_poly p, bool write)
 {
 	struct ao_scheme_bigint	*bi = ao_scheme_poly_bigint(p);
 
-	printf("%d", ao_scheme_bigint_int(bi->value));
+	(void) write;
+	printf("%d", bi->value);
 }
+#endif /* AO_SCHEME_FEATURE_BIGINT */

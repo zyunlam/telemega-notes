@@ -17,14 +17,14 @@
 
 #include "ao_scheme.h"
 
-int
+static int
 lambda_size(void *addr)
 {
 	(void) addr;
 	return sizeof (struct ao_scheme_lambda);
 }
 
-void
+static void
 lambda_mark(void *addr)
 {
 	struct ao_scheme_lambda	*lambda = addr;
@@ -33,7 +33,7 @@ lambda_mark(void *addr)
 	ao_scheme_poly_mark(lambda->frame, 0);
 }
 
-void
+static void
 lambda_move(void *addr)
 {
 	struct ao_scheme_lambda	*lambda = addr;
@@ -50,7 +50,7 @@ const struct ao_scheme_type ao_scheme_lambda_type = {
 };
 
 void
-ao_scheme_lambda_write(ao_poly poly)
+ao_scheme_lambda_write(ao_poly poly, bool write)
 {
 	struct ao_scheme_lambda	*lambda = ao_scheme_poly_lambda(poly);
 	struct ao_scheme_cons	*cons = ao_scheme_poly_cons(lambda->code);
@@ -59,13 +59,13 @@ ao_scheme_lambda_write(ao_poly poly)
 	printf("%s", ao_scheme_args_name(lambda->args));
 	while (cons) {
 		printf(" ");
-		ao_scheme_poly_write(cons->car);
+		ao_scheme_poly_write(cons->car, write);
 		cons = ao_scheme_poly_cons(cons->cdr);
 	}
 	printf(")");
 }
 
-ao_poly
+static ao_poly
 ao_scheme_lambda_alloc(struct ao_scheme_cons *code, int args)
 {
 	struct ao_scheme_lambda	*lambda;
@@ -89,9 +89,9 @@ ao_scheme_lambda_alloc(struct ao_scheme_cons *code, int args)
 		}
 	}
 
-	ao_scheme_cons_stash(0, code);
+	ao_scheme_cons_stash(code);
 	lambda = ao_scheme_alloc(sizeof (struct ao_scheme_lambda));
-	code = ao_scheme_cons_fetch(0);
+	code = ao_scheme_cons_fetch();
 	if (!lambda)
 		return AO_SCHEME_NIL;
 
@@ -160,9 +160,9 @@ ao_scheme_lambda_eval(void)
 			return ao_scheme_error(AO_SCHEME_INVALID, "need at least %d args, got %d", args_wanted, args_provided);
 	}
 
-	ao_scheme_poly_stash(1, varargs);
+	ao_scheme_poly_stash(varargs);
 	next_frame = ao_scheme_frame_new(args_wanted + (varargs != AO_SCHEME_NIL));
-	varargs = ao_scheme_poly_fetch(1);
+	varargs = ao_scheme_poly_fetch();
 	if (!next_frame)
 		return AO_SCHEME_NIL;
 
