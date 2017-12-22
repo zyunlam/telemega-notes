@@ -17,10 +17,9 @@
  */
 
 MEMORY {
-	rom (rx) :   ORIGIN = 0x08001000, LENGTH = 25K
-	flash (r):   ORIGIN = 0x08007400, LENGTH = 3k
-	ram (!w) :   ORIGIN = 0x20000000, LENGTH = 6k - 128
-	stack (!w) : ORIGIN = 0x20000000 + 6k - 128, LENGTH = 128
+	rom (rx) :   ORIGIN = 0x08001000, LENGTH = 28K
+	ram (!w) :   ORIGIN = 0x20000000, LENGTH = 6k - 1k
+	stack (!w) : ORIGIN = 0x20000000 + 6k - 1k, LENGTH = 1k
 }
 
 INCLUDE registers.ld
@@ -93,9 +92,9 @@ SECTIONS {
 
 	/* Data -- relocated to RAM, but written to ROM
 	 */
-	.data : {
+	.data BLOCK(8): {
 		*(.data)	/* initialized data */
-		. = ALIGN(4);
+		. = ALIGN(8);
 		__data_end__ = .;
 	} >ram AT>rom
 
@@ -110,8 +109,6 @@ SECTIONS {
 	PROVIDE(end = .);
 
 	PROVIDE(__stack__ = ORIGIN(stack) + LENGTH(stack));
-
-	__flash__ = ORIGIN(flash);
 }
 
 ENTRY(start);

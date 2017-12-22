@@ -19,8 +19,8 @@
 MEMORY {
 	rom (rx) :   ORIGIN = 0x08001000, LENGTH = 20K
 	flash(rx) :  ORIGIN = 0x08006000, LENGTH = 8K
-	ram (!w) :   ORIGIN = 0x20000000, LENGTH = 6k - 128
-	stack (!w) : ORIGIN = 0x20000000 + 6k - 128, LENGTH = 128
+	ram (!w) :   ORIGIN = 0x20000000, LENGTH = 6k - 512
+	stack (!w) : ORIGIN = 0x20000000 + 6k - 512, LENGTH = 512
 }
 
 INCLUDE registers.ld
@@ -94,11 +94,11 @@ SECTIONS {
 		*(.ramtext)
 	} >ram AT>rom
 
-	/* Data -- relocated to RAM, but written to ROM
+	/* Data -- relocated to RAM, but written to ROM,
+	 * also aligned to 8 bytes to agree with textram
 	 */
-	.data : {
+	.data BLOCK(8): {
 		*(.data)	/* initialized data */
-		. = ALIGN(4);
 		__data_end__ = .;
 	} >ram AT>rom
 

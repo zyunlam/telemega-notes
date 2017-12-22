@@ -72,8 +72,9 @@ SECTIONS {
 	} >ram AT>rom
 
 	/* Data -- relocated to RAM, but written to ROM
+	 * Also aligned to 8 bytes to agree with textram
 	 */
-	.data : {
+	.data BLOCK(8): {
 		*(.data)	/* initialized data */
 		__data_end__ = .;
 	} >ram AT>rom

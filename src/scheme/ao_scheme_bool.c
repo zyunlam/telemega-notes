@@ -38,10 +38,11 @@ const struct ao_scheme_type ao_scheme_bool_type = {
 };
 
 void
-ao_scheme_bool_write(ao_poly v)
+ao_scheme_bool_write(ao_poly v, bool write)
 {
 	struct ao_scheme_bool	*b = ao_scheme_poly_bool(v);
 
+	(void) write;
 	if (b->value)
 		printf("#t");
 	else

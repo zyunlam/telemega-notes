@@ -103,7 +103,7 @@ ao_product.o: ao_product.c ao_product.h
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROG) $(HEX) $(SCRIPT)
+	rm -f *.o *.elf *.ihx $(SCRIPT)
 	rm -f ao_product.h
 
 publish: $(PUBLISH_HEX) $(PUBLISH_SCRIPT)

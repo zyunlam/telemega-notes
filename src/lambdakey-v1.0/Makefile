@@ -20,6 +20,7 @@ INC = \
 	ao_product.h \
 	ao_task.h \
 	$(SCHEME_HDRS) \
+	ao_scheme_const.h \
 	stm32f0.h \
 	Makefile
 
@@ -27,20 +28,16 @@ ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_interrupt.c \
 	ao_product.c \
-	ao_romconfig.c \
 	ao_cmd.c \
-	ao_config.c \
-	ao_task.c \
+	ao_notask.c \
 	ao_led.c \
-	ao_dma_stm.c \
 	ao_stdio.c \
-	ao_mutex.c \
+	ao_stdio_newlib.c \
 	ao_panic.c \
 	ao_timer.c \
 	ao_usb_stm.c \
-	ao_flash_stm.c \
-	$(SCHEME_SRCS) \
-	ao_scheme_os_save.c
+	ao_romconfig.c \
+	$(SCHEME_SRCS)
 
 PRODUCT=LambdaKey-v1.0
 PRODUCT_DEF=-DLAMBDAKEY
@@ -65,7 +62,7 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-$(PROG): Makefile $(OBJ) lambda.ld altos.ld
+$(PROG): Makefile $(OBJ) lambda.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
@@ -73,13 +70,16 @@ $(OBJ): $(INC)
 ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
+ao_scheme_const.h: ../scheme/make-const/ao_scheme_make_const ao_lambdakey_const.scheme
+	../scheme/make-const/ao_scheme_make_const -d FLOAT,VECTOR,QUASI,BIGINT -o $@ ao_lambdakey_const.scheme
+
 load: $(PROG)
 	stm-load $(PROG)
 
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx ao_scheme_const.h
 	rm -f ao_product.h
 
 install:

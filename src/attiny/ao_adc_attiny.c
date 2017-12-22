@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Keith Packard <keithp@keithp.com>
+ * Copyright © 2017 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,27 +13,36 @@
  */
 
 #include <ao.h>
-#include <ao_scheme.h>
 
-static void scheme_cmd() {
-	ao_scheme_read_eval_print();
-}
+/*
+ * ATtiny ADC interface
+ */
 
-static const struct ao_cmds blink_cmds[] = {
-	{ scheme_cmd,	"l\0Run scheme interpreter" },
-	{ 0, 0 }
-};
-
-
-void main(void)
+uint16_t
+ao_adc_read(uint8_t mux)
 {
-	ao_led_init(LEDS_AVAILABLE);
-	ao_clock_init();
-	ao_timer_init();
-	ao_usb_init();
-	ao_cmd_init();
-	ao_cmd_register(blink_cmds);
-	ao_cmd();
+	uint8_t	low, high;
+
+	/* Set the mux */
+	ADMUX = mux;
+
+	/* Start conversion */
+	ADCSRA = ((1 << ADEN) |
+		  (1 << ADSC) |
+		  (0 << ADATE) |
+		  (0 << ADIF) |
+		  (0 << ADIE) |
+		  (0 << ADPS2) |
+		  (0 << ADPS1) |
+		  (0 << ADPS0));
+
+	/* Await conversion complete */
+	while ((ADCSRA & (1 << ADSC)) != 0)
+		;
+
+	/* Read low first */
+	low = ADCL;
+	high = ADCH;
+
+	return (((uint16_t) high) << 8) | low;
 }
-
-

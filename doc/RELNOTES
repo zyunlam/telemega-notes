@@ -1,7 +1,6 @@
 Creating documentation for a new release of AltOS
 
-* Write release notes in release-notes-${version}.inc. Write docinfo
-  for release notes in release-notes-${version}-docinfo.xml. Add to
+* Write release notes in release-notes-${version}.inc. Add to
   Makefile
 
 * Add references to that as appropriate from each of the
@@ -30,5 +29,4 @@ Creating documentation for a new release of AltOS
 	telegps-docinfo.xml
 	telemetry-docinfo.xml
 
-* Add release-notes-${version}.inc and
-  release-notes-${version}-docinfo.xml to git
+* Add release-notes-${version}.inc to git
