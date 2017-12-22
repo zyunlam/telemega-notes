@@ -32,6 +32,8 @@ These are Bdale's notes on how to do a release.
 	- make sure build environment is up to date
 		sudo cowbuilder --update
 
+	- make sure ~/web/altusmetrum has no pending pullable commits
+
 	git checkout master
 
 	- update the version in configure.ac if Keith hasn't already
