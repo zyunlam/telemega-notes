@@ -1,3 +1,50 @@
+altos (1.8.4-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * update Releasing with changes discovered in 1.8.3 release process
+  * releasing 1.8.4
+
+  [ Keith Packard ]
+  * doc: Don't 'publish' release notes, don't build pdf release notes
+  * altos/scheme: Add ao_scheme_vector.c
+  * altos/scheme: Support scheme subsetting via feature settings
+  * altos/lambdakey-v1.0: Get this building again
+  * altos/kernel: Allow ao_cmd to be built without tasking
+  * altos/stm: Align 'data' to 8 bytes, just like textram
+  * altos/scheme: apply const to places taking const strings.
+  * altos/scheme: More compiler warning cleanups
+  * altos/scheme: Use direct calls from frame to frame_vals mem functions
+  * altos/scheme: inline some mem calls to reduce stack usage.
+  * altos/lambdakey-v1.0: Make stack larger
+  * altos/scheme: integer? is builtin on all versions
+  * altos/scheme: swap BIGINT and STRING types
+  * altos/lambdakey-v1.0: shrink scheme code to fit the ROM
+  * ao-bringup/test-chaoskey: Make finding most recent device more reliable
+  * altos/scheme: Use AO_SCHEME_IS_CONS in cons memory funcs
+  * altos/scheme: Use memory manager mark code to note recursive print
+  * altos/scheme: abort when we try to print an invalid value
+  * altos/scheme: rearrange debugging defines
+  * altos/scheme: Work around gcc 7.2.0 optimization bug in memory manager
+  * altos/scheme: Compile scheme test with -O3
+  * altos/scheme: Rework display/write code
+  * altos/scheme: apply also needs to not free value list on lambdas
+  * altos/scheme: (define (foo . bar)) has a pair, not list as card
+  * altos/scheme: Clean up test CFLAGS
+  * altos/scheme: Don't optimize ao_scheme_make_const
+  * altos/scheme: ao_scheme__cons -> ao_scheme_cons
+  * altos/scheme: AO_SCHEME_IS_CONS -> ao_scheme_is_cons
+  * altos/scheme: Replace memory pool macros with inlines
+  * altos/scheme: Replace per-type indexed stash with poly stash heap
+  * altos/lambdakey-v1.0: Add back and/or macros
+  * altos/easymini-v2.0: Adapt to final hardware pin assignment changes
+  * ao-bringup: turnon_easymini was left with dfu_util disabled
+  * altos/attiny: Add ADC implementation
+  * altos/micropeak: Remove all compiler results
+  * Doc updates for version 1.8.4
+  * Bump for version 1.8.4
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 21 Dec 2017 19:07:43 -0700
+
 altos (1.8.3-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
