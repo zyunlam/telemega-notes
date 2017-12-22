@@ -3,6 +3,7 @@
 #
 
 RELNOTES_INC=\
+	release-notes-1.8.4.inc \
 	release-notes-1.8.3.inc \
 	release-notes-1.8.2.inc \
 	release-notes-1.8.1.inc \
