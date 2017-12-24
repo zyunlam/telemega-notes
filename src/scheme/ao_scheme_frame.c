@@ -153,12 +153,13 @@ ao_scheme_frame_write(ao_poly p, bool write)
 {
 	struct ao_scheme_frame		*frame = ao_scheme_poly_frame(p);
 	struct ao_scheme_frame		*clear = frame;
-	struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
 	int				f;
 	int				written = 0;
 
 	ao_scheme_print_start();
 	while (frame) {
+		struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
+
 		if (written != 0)
 			printf(", ");
 		if (ao_scheme_print_mark_addr(frame)) {
