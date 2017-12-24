@@ -393,6 +393,11 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 			case builtin_quotient:
 				if (c == 0)
 					return ao_scheme_error(AO_SCHEME_DIVIDE_BY_ZERO, "quotient by zero");
+				r = r / c;
+				break;
+			case builtin_floor_quotient:
+				if (c == 0)
+					return ao_scheme_error(AO_SCHEME_DIVIDE_BY_ZERO, "floor-quotient by zero");
 				if (r % c != 0 && (c < 0) != (r < 0))
 					r = r / c - 1;
 				else
@@ -436,6 +441,7 @@ ao_scheme_math(struct ao_scheme_cons *orig_cons, enum ao_scheme_builtin_id op)
 				r /= c;
 				break;
 			case builtin_quotient:
+			case builtin_floor_quotient:
 			case builtin_remainder:
 			case builtin_modulo:
 				return ao_scheme_error(AO_SCHEME_INVALID, "non-integer value in integer divide");
@@ -489,6 +495,12 @@ ao_poly
 ao_scheme_do_quotient(struct ao_scheme_cons *cons)
 {
 	return ao_scheme_math(cons, builtin_quotient);
+}
+
+ao_poly
+ao_scheme_do_floor_quotient(struct ao_scheme_cons *cons)
+{
+	return ao_scheme_math(cons, builtin_floor_quotient);
 }
 
 ao_poly

@@ -31,6 +31,7 @@ all	f_lambda	divide		/
 all	f_lambda	modulo		modulo	%
 all	f_lambda	remainder
 all	f_lambda	quotient
+all	f_lambda	floor_quotient	floor-quotient
 all	f_lambda	equal		=	eq?	eqv?
 all	f_lambda	less		<	string<?
 all	f_lambda	greater		>	string>?
