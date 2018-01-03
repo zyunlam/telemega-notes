@@ -105,17 +105,23 @@ ao_scheme_check_argc(ao_poly name, struct ao_scheme_cons *cons, int min, int max
 	return _ao_scheme_bool_true;
 }
 
+static ao_poly
+ao_scheme_opt_arg(struct ao_scheme_cons *cons, int argc, ao_poly def)
+{
+	for (;;) {
+		if (!cons)
+			return def;
+		if (argc == 0)
+			return cons->car;
+		cons = ao_scheme_cons_cdr(cons);
+		argc--;
+	}
+}
+
 ao_poly
 ao_scheme_arg(struct ao_scheme_cons *cons, int argc)
 {
-	if (!cons)
-		return AO_SCHEME_NIL;
-	while (argc--) {
-		if (!cons)
-			return AO_SCHEME_NIL;
-		cons = ao_scheme_cons_cdr(cons);
-	}
-	return cons->car;
+	return ao_scheme_opt_arg(cons, argc, AO_SCHEME_NIL);
 }
 
 ao_poly
@@ -132,6 +138,18 @@ static int32_t
 ao_scheme_arg_int(ao_poly name, struct ao_scheme_cons *cons, int argc)
 {
 	ao_poly 	p = ao_scheme_arg(cons, argc);
+	bool		fail = false;
+	int32_t		i = ao_scheme_poly_integer(p, &fail);
+
+	if (fail)
+		(void) ao_scheme_error(AO_SCHEME_INVALID, "%v: arg %d invalid type %v", name, argc, p);
+	return i;
+}
+
+static int32_t
+ao_scheme_opt_arg_int(ao_poly name, struct ao_scheme_cons *cons, int argc, int def)
+{
+	ao_poly 	p = ao_scheme_opt_arg(cons, argc, ao_scheme_int_poly(def));
 	bool		fail = false;
 	int32_t		i = ao_scheme_poly_integer(p, &fail);
 
@@ -1120,11 +1138,21 @@ ao_scheme_do_list_to_vector(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_vector_to_list(struct ao_scheme_cons *cons)
 {
-	if (!ao_scheme_check_argc(_ao_scheme_atom_vector2d3elist, cons, 1, 1))
+	int	start, end;
+
+	if (!ao_scheme_check_argc(_ao_scheme_atom_vector2d3elist, cons, 1, 3))
 		return AO_SCHEME_NIL;
 	if (!ao_scheme_check_argt(_ao_scheme_atom_vector2d3elist, cons, 0, AO_SCHEME_VECTOR, 0))
 		return AO_SCHEME_NIL;
-	return ao_scheme_cons_poly(ao_scheme_vector_to_list(ao_scheme_poly_vector(ao_scheme_arg(cons, 0))));
+	start = ao_scheme_opt_arg_int(_ao_scheme_atom_vector2d3elist, cons, 1, ao_scheme_int_poly(0));
+	if (ao_scheme_exception)
+		return AO_SCHEME_NIL;
+	end = ao_scheme_opt_arg_int(_ao_scheme_atom_vector2d3elist, cons, 2, ao_scheme_int_poly(-1));
+	if (ao_scheme_exception)
+		return AO_SCHEME_NIL;
+	return ao_scheme_cons_poly(ao_scheme_vector_to_list(ao_scheme_poly_vector(ao_scheme_arg(cons, 0)),
+							    start,
+							    end));
 }
 
 ao_poly

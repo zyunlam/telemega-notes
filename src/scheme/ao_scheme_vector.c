@@ -159,13 +159,19 @@ ao_scheme_list_to_vector(struct ao_scheme_cons *cons)
 }
 
 struct ao_scheme_cons *
-ao_scheme_vector_to_list(struct ao_scheme_vector *vector)
+ao_scheme_vector_to_list(struct ao_scheme_vector *vector, int start, int end)
 {
-	unsigned int		i;
+	int			i;
 	uint16_t		length = vector->length;
 	struct ao_scheme_cons	*cons = NULL;
 
-	for (i = length; i-- > 0;) {
+	if (end == -1)
+		end = length;
+	if (start < 0)
+		start = 0;
+	if (end > length)
+		end = length;
+	for (i = end; i-- > start;) {
 		ao_scheme_vector_stash(vector);
 		cons = ao_scheme_cons_cons(vector->vals[i], ao_scheme_cons_poly(cons));
 		vector = ao_scheme_vector_fetch();

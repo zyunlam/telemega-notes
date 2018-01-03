@@ -808,7 +808,7 @@ struct ao_scheme_vector *
 ao_scheme_list_to_vector(struct ao_scheme_cons *cons);
 
 struct ao_scheme_cons *
-ao_scheme_vector_to_list(struct ao_scheme_vector *vector);
+ao_scheme_vector_to_list(struct ao_scheme_vector *vector, int start, int end);
 
 extern const struct ao_scheme_type	ao_scheme_vector_type;
 
