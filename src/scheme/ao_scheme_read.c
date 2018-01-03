@@ -83,12 +83,12 @@ static const uint16_t	lex_classes[128] = {
  	PRINTABLE,		/* > */
  	PRINTABLE,		/* ? */
   	PRINTABLE,		/*  @ */
-	PRINTABLE,		/*  A */
-	PRINTABLE,		/*  B */
-	PRINTABLE,		/*  C */
-	PRINTABLE,		/*  D */
-	PRINTABLE|FLOATC,	/*  E */
-	PRINTABLE,		/*  F */
+	PRINTABLE|HEX_LETTER,	/*  A */
+	PRINTABLE|HEX_LETTER,	/*  B */
+	PRINTABLE|HEX_LETTER,	/*  C */
+	PRINTABLE|HEX_LETTER,	/*  D */
+	PRINTABLE|FLOATC|HEX_LETTER,/*  E */
+	PRINTABLE|HEX_LETTER,	/*  F */
 	PRINTABLE,		/*  G */
 	PRINTABLE,		/*  H */
 	PRINTABLE,		/*  I */
@@ -115,12 +115,12 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  ^ */
 	PRINTABLE,		/*  _ */
   	PRINTABLE|SPECIAL_QUASI,	/*  ` */
-	PRINTABLE,		/*  a */
-	PRINTABLE,		/*  b */
-	PRINTABLE,		/*  c */
-	PRINTABLE,		/*  d */
-	PRINTABLE|FLOATC,	/*  e */
-	PRINTABLE,		/*  f */
+	PRINTABLE|HEX_LETTER,	/*  a */
+	PRINTABLE|HEX_LETTER,	/*  b */
+	PRINTABLE|HEX_LETTER,	/*  c */
+	PRINTABLE|HEX_LETTER,	/*  d */
+	PRINTABLE|FLOATC|HEX_LETTER,/*  e */
+	PRINTABLE|HEX_LETTER,	/*  f */
 	PRINTABLE,		/*  g */
 	PRINTABLE,		/*  h */
 	PRINTABLE,		/*  i */
@@ -285,6 +285,30 @@ static const struct namedfloat namedfloats[] = {
 #endif
 
 static int
+parse_int(int base)
+{
+	int	cval;
+	int	c;
+
+	token_int = 0;
+	for (;;) {
+		c = lexc();
+		if ((lex_class & HEX_DIGIT) == 0) {
+			lex_unget(c);
+			end_token();
+			return NUM;
+		}
+		add_token(c);
+		if ('0' <= c && c <= '9')
+			cval = c - '0';
+		else
+			cval = (c | ('a' - 'A')) - 'a' + 10;
+		token_int = token_int * base + cval;
+	}
+	return NUM;
+}
+
+static int
 _lex(void)
 {
 	int	c;
@@ -387,6 +411,12 @@ _lex(void)
 					continue;
 				}
 				return NUM;
+			case 'x':
+				return parse_int(16);
+			case 'o':
+				return parse_int(8);
+			case 'b':
+				return parse_int(2);
 			}
 		}
 		if (lex_class & STRINGC) {

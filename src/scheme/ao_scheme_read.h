@@ -65,10 +65,11 @@
 # define IGNORE		0x0200	/* \0 - ' ' */
 # define BACKSLASH	0x0400	/* \ */
 # define STRINGC	0x0800	/* " */
-# define POUND		0x1000	/* # */
+# define HEX_LETTER	0x1000	/* a-f A-F */
 
 # define NOTNAME	(STRINGC|COMMENT|ENDOFFILE|WHITE|SPECIAL)
 # define INTEGER	(DIGIT|SIGN)
 # define NUMBER		(INTEGER|FLOATC)
+# define HEX_DIGIT	(DIGIT|HEX_LETTER)
 
 #endif /* _AO_SCHEME_READ_H_ */
