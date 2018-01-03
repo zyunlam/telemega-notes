@@ -35,6 +35,9 @@ ao_scheme_vprintf(const char *format, va_list args)
 			case 'd':
 				printf("%d", va_arg(args, int));
 				break;
+			case 'x':
+				printf("%x", va_arg(args, int));
+				break;
 			case 's':
 				printf("%s", va_arg(args, char *));
 				break;
