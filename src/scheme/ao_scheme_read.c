@@ -53,7 +53,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE|WHITE,	/*    */
  	PRINTABLE,		/* ! */
  	PRINTABLE|STRINGC,	/* " */
- 	PRINTABLE|POUND,	/* # */
+ 	PRINTABLE,		/* # */
  	PRINTABLE,		/* $ */
  	PRINTABLE,		/* % */
  	PRINTABLE,		/* & */
@@ -360,7 +360,7 @@ _lex(void)
 #endif
 			}
 		}
-		if (lex_class & POUND) {
+		if (c == '#') {
 			c = lexc();
 			switch (c) {
 			case 't':
@@ -516,7 +516,7 @@ _lex(void)
 static inline int lex(void)
 {
 	int	parse_token = _lex();
-	RDBGI("token %d (%s)\n", parse_token, token_string);
+	RDBGI("token %d \"%s\"\n", parse_token, token_string);
 	return parse_token;
 }
 
@@ -565,10 +565,11 @@ pop_read_stack(void)
 		     ao_scheme_read_cons_tail = ao_scheme_poly_cons(ao_scheme_read_cons_tail->cdr))
 			;
 	} else {
-		ao_scheme_read_cons = 0;
-		ao_scheme_read_cons_tail = 0;
-		ao_scheme_read_stack = 0;
 		read_state = ao_scheme_read_state;
+		ao_scheme_read_cons = NULL;
+		ao_scheme_read_cons_tail = NULL;
+		ao_scheme_read_stack = NULL;
+		ao_scheme_read_state = 0;
 	}
 	RDBG_OUT();
 	RDBGI("pop read stack %p %d\n", ao_scheme_read_cons, read_state);
@@ -591,7 +592,7 @@ ao_scheme_read(void)
 
 	ao_scheme_read_list = 0;
 	read_state = 0;
-	ao_scheme_read_cons = ao_scheme_read_cons_tail = ao_scheme_read_stack = 0;
+	ao_scheme_read_cons = ao_scheme_read_cons_tail = ao_scheme_read_stack = NULL;
 	for (;;) {
 		parse_token = lex();
 		while (is_open(parse_token)) {
@@ -677,8 +678,10 @@ ao_scheme_read(void)
 			--ao_scheme_read_list;
 			read_state = pop_read_stack();
 #ifdef AO_SCHEME_FEATURE_VECTOR
-			if (read_state & READ_SAW_VECTOR)
+			if (read_state & READ_SAW_VECTOR) {
 				v = ao_scheme_vector_poly(ao_scheme_list_to_vector(ao_scheme_poly_cons(v)));
+				read_state &= ~READ_SAW_VECTOR;
+			}
 #endif
 			break;
 		case DOT:
