@@ -512,12 +512,13 @@
 (unless #f (write 'unless))
 
 (define (reverse list)
-  (let ((result ()))
-    (while (not (null? list))
-      (set! result (cons (car list) result))
-      (set! list (cdr list))
-      )
-    result)
+  (define (_r old new)
+    (if (null? old)
+	new
+	(_r (cdr old) (cons (car old) new))
+	)
+    )
+  (_r list ())
   )
 
 (reverse '(1 2 3))
@@ -664,36 +665,46 @@
 
 (define map
   (lambda (proc . lists)
-	 (define (args lists)
+	 (define (_a lists)
 	   (cond ((null? lists) ())
 		 (else
-		  (cons (caar lists) (args (cdr lists)))
+		  (cons (caar lists) (_a (cdr lists)))
 		  )
 		 )
 	   )
-	 (define (next lists)
+	 (define (_n lists)
 	   (cond ((null? lists) ())
 		 (else
-		  (cons (cdr (car lists)) (next (cdr lists)))
+		  (cons (cdr (car lists)) (_n (cdr lists)))
 		  )
 		 )
 	   )
-	 (define (domap lists)
+	 (define (_m lists)
 	   (cond ((null? (car lists)) ())
 		 (else
-		  (cons (apply proc (args lists)) (domap (next lists)))
+		  (cons (apply proc (_a lists)) (_m (_n lists)))
 		  )
 		 )
 	   )
-	 (domap lists)
+	 (_m lists)
 	 )
   )
 
 (map cadr '((a b) (d e) (g h)))
 
-(define for-each (lambda (proc . lists)
-			(apply map proc lists)
-			#t))
+(define for-each
+  (lambda (proc . lists)
+    (define (_f lists)
+      (cond ((null? (car lists)) #t)
+	    (else
+	     (apply proc (map car lists))
+	     (_f (map cdr lists))
+	     )
+	    )
+      )
+    (_f lists)
+    )
+  )
 
 (for-each display '("hello" " " "world" "\n"))
 
@@ -708,8 +719,9 @@
 
 (string-map (lambda (x) (+ 1 x)) "HAL")
 
-(define string-for-each (lambda (proc . strings)
-			       (apply for-each proc (_string-ml strings))))
+(define string-for-each
+  (lambda (proc . strings)
+    (apply for-each proc (_string-ml strings))))
 
 (string-for-each write-char "IBM\n")
 
