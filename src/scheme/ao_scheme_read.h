@@ -63,9 +63,8 @@
 # define ENDOFFILE	0x0080	/* end of file */
 # define COMMENT	0x0100	/* ; */
 # define IGNORE		0x0200	/* \0 - ' ' */
-# define BACKSLASH	0x0400	/* \ */
-# define STRINGC	0x0800	/* " */
-# define HEX_LETTER	0x1000	/* a-f A-F */
+# define STRINGC	0x0400	/* " */
+# define HEX_LETTER	0x0800	/* a-f A-F */
 
 # define NOTNAME	(STRINGC|COMMENT|ENDOFFILE|WHITE|SPECIAL)
 # define INTEGER	(DIGIT|SIGN)

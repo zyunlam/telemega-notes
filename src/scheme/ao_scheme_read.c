@@ -110,7 +110,7 @@ static const uint16_t	lex_classes[128] = {
 	PRINTABLE,		/*  Y */
 	PRINTABLE,		/*  Z */
 	PRINTABLE,		/*  [ */
-	PRINTABLE|BACKSLASH,	/*  \ */
+	PRINTABLE,		/*  \ */
 	PRINTABLE,		/*  ] */
 	PRINTABLE,		/*  ^ */
 	PRINTABLE,		/*  _ */
@@ -204,18 +204,20 @@ lex_quoted(void)
 	lex_class = 0;
 	c &= 0x7f;
  	switch (c) {
-	case 'n':
-		return '\n';
-	case 'f':
-		return '\f';
+	case 'a':
+		return '\a';
 	case 'b':
 		return '\b';
-	case 'r':
-		return '\r';
-	case 'v':
-		return '\v';
 	case 't':
 		return '\t';
+	case 'n':
+		return '\n';
+	case 'r':
+		return '\r';
+	case 'f':
+		return '\f';
+	case 'v':
+		return '\v';
 	case '0':
 	case '1':
 	case '2':
@@ -422,7 +424,7 @@ _lex(void)
 		if (lex_class & STRINGC) {
 			for (;;) {
 				c = lexc();
-				if (lex_class & BACKSLASH)
+				if (c == '\\')
 					c = lex_quoted();
 				if (lex_class & (STRINGC|ENDOFFILE)) {
 					end_token();
@@ -636,7 +638,7 @@ ao_scheme_read(void)
 				v = _ao_scheme_bool_false;
 			break;
 		case STRING:
-			string = ao_scheme_string_make(token_string);
+			string = ao_scheme_string_new(token_string);
 			if (string)
 				v = ao_scheme_string_poly(string);
 			else
