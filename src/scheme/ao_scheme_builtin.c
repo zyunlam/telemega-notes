@@ -762,17 +762,39 @@ ao_scheme_do_string_set(struct ao_scheme_cons *cons)
 	val = ao_scheme_arg_int(_ao_scheme_atom_string2dset21, cons, 2);
 	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
+	if (!val)
+		goto fail;
 	while (*string && ref) {
 		++string;
 		--ref;
 	}
 	if (!*string)
-		return ao_scheme_error(AO_SCHEME_INVALID, "%v: string %v ref %v invalid",
-				       _ao_scheme_atom_string2dset21,
-				       ao_scheme_arg(cons, 0),
-				       ao_scheme_arg(cons, 1));
+		goto fail;
 	*string = val;
 	return ao_scheme_int_poly(*string);
+fail:
+	return ao_scheme_error(AO_SCHEME_INVALID, "%v: %v[%v] = %v invalid",
+			       _ao_scheme_atom_string2dset21,
+			       ao_scheme_arg(cons, 0),
+			       ao_scheme_arg(cons, 1),
+			       ao_scheme_arg(cons, 2));
+}
+
+ao_poly
+ao_scheme_do_make_string(struct ao_scheme_cons *cons)
+{
+	int32_t	len;
+	char	fill;
+
+	if (!ao_scheme_check_argc(_ao_scheme_atom_make2dstring, cons, 1, 2))
+		return AO_SCHEME_NIL;
+	len = ao_scheme_arg_int(_ao_scheme_atom_make2dstring, cons, 0);
+	if (ao_scheme_exception)
+		return AO_SCHEME_NIL;
+	fill = ao_scheme_opt_arg_int(_ao_scheme_atom_make2dstring, cons, 1, ' ');
+	if (ao_scheme_exception)
+		return AO_SCHEME_NIL;
+	return ao_scheme_string_poly(ao_scheme_make_string(len, fill));
 }
 
 ao_poly

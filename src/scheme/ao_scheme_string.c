@@ -51,6 +51,7 @@ ao_scheme_string_alloc(int len)
 	if (!s)
 		return NULL;
 	s->type = AO_SCHEME_STRING;
+	s->val[len] = '\0';
 	return s;
 }
 
@@ -70,7 +71,19 @@ ao_scheme_string_copy(struct ao_scheme_string *a)
 }
 
 struct ao_scheme_string *
-ao_scheme_string_make(char *a)
+ao_scheme_make_string(int32_t len, char fill)
+{
+	struct ao_scheme_string	*r;
+
+	r = ao_scheme_string_alloc(len);
+	if (!r)
+		return NULL;
+	memset(r->val, fill, len);
+	return r;
+}
+
+struct ao_scheme_string *
+ao_scheme_string_new(char *a)
 {
 	struct ao_scheme_string	*r;
 
@@ -138,7 +151,6 @@ ao_scheme_string_pack(struct ao_scheme_cons *cons)
 			return ao_scheme_error(AO_SCHEME_INVALID, "non-int passed to pack");
 		cons = ao_scheme_cons_cdr(cons);
 	}
-	*rval++ = 0;
 	return ao_scheme_string_poly(r);
 }
 
@@ -183,14 +195,32 @@ ao_scheme_string_write(ao_poly p, bool write)
 		putchar('"');
 		while ((c = *sval++)) {
 			switch (c) {
+			case '\a':
+				printf("\\a");
+				break;
+			case '\b':
+				printf("\\b");
+				break;
+			case '\t':
+				printf ("\\t");
+				break;
 			case '\n':
 				printf ("\\n");
 				break;
 			case '\r':
 				printf ("\\r");
 				break;
-			case '\t':
-				printf ("\\t");
+			case '\f':
+				printf("\\f");
+				break;
+			case '\v':
+				printf("\\v");
+				break;
+			case '\"':
+				printf("\\\"");
+				break;
+			case '\\':
+				printf("\\\\");
 				break;
 			default:
 				if (c < ' ')

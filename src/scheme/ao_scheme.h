@@ -710,7 +710,10 @@ struct ao_scheme_string *
 ao_scheme_string_copy(struct ao_scheme_string *a);
 
 struct ao_scheme_string *
-ao_scheme_string_make(char *a);
+ao_scheme_string_new(char *a);
+
+struct ao_scheme_string *
+ao_scheme_make_string(int32_t len, char fill);
 
 struct ao_scheme_string *
 ao_scheme_atom_to_string(struct ao_scheme_atom *a);

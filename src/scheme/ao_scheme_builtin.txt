@@ -63,6 +63,7 @@ all	f_lambda	string_ref	string-ref
 all	f_lambda	string_set	string-set!
 all	f_lambda	string_copy	string-copy
 all	f_lambda	string_length	string-length
+all	f_lambda	make_string	make-string
 all	f_lambda	procedurep	procedure?
 all	lambda		apply
 all	f_lambda	read_char	read-char
