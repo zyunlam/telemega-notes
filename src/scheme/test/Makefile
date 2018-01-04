@@ -3,6 +3,8 @@ include ../Makefile-inc
 vpath %.o .
 vpath %.c ..
 vpath %.h ..
+vpath %.scheme ..
+vpath ao_scheme_make_const ../make-const
 
 SRCS=$(SCHEME_SRCS) ao_scheme_test.c
 HDRS=$(SCHEME_HDRS) ao_scheme_const.h
@@ -20,8 +22,8 @@ ao-scheme: $(OBJS)
 
 $(OBJS): $(HDRS)
 
-ao_scheme_const.h: ../make-const/ao_scheme_make_const ../ao_scheme_const.scheme
-	../make-const/ao_scheme_make_const -o $@ ../ao_scheme_const.scheme
+ao_scheme_const.h: ao_scheme_make_const $(SCHEME_SCHEME)
+	$^ -o $@
 
 clean::
 	rm -f $(OBJS) ao-scheme ao_scheme_const.h

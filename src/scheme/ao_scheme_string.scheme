@@ -1,0 +1,152 @@
+;
+; Copyright © 2018 Keith Packard <keithp@keithp.com>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation, either version 2 of the License, or
+; (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General Public License for more details.
+;
+; string functions placed in ROM
+
+(define string-map
+  (lambda (proc . strings)
+					; result length is min of arg lengths
+    (let* ((l (apply min (map string-length strings)))
+					; create the result
+	   (s (make-string l)))
+					; walk the strings, doing evaluation
+      (define (_m p)
+	(if (equal? p l)
+	    s
+	    (begin
+	      (string-set! s p (apply proc (map (lambda (s) (string-ref s p)) strings)))
+	      (_m (+ p 1))
+	      )
+	    )
+	)
+      (_m 0)
+      )
+    )
+  )
+
+(_??_ (string-map (lambda (x) (+ 1 x)) "HAL") "IBM")
+
+(define string-copy!
+  (lambda (t a f . args)
+    (let ((l 0)
+	  (h (string-length f))
+	  (o a)
+	  (d 1))
+					; handle optional start/end args
+      
+      (if (not (null? args))
+	  (begin
+	    (set! l (car args))
+	    (if (not (null? (cdr args)))
+		(set! h (cadr args)))
+	    (set! o (- a l))
+	    )
+	  )
+					; flip copy order if dst is
+					; after src
+      (if (< l a)
+	  (begin
+	    (set! d h)
+	    (set! h (- l 1))
+	    (set! l (- d 1))
+	    (set! d -1)
+	    )
+	  )
+					; loop copying one at a time
+      (do ((p l (+ p d))
+	   )
+	  ((= p h) t)
+	(string-set! t (+ p o) (string-ref f p))
+	)
+      )
+    )
+  )
+
+(_??_ (string-copy! (make-string 10) 0 "hello" 0 5) "hello     ")
+(_??_ (string-copy! (make-string 10) 1 "hello" 0 5) " hello    ")
+(_??_ (string-copy! (make-string 10) 0 "hello" 0 5) "hello     ")
+
+(define (string-upcase s) (string-map char-upcase s))
+(define (string-downcase s) (string-map char-downcase s))
+(define string-foldcase string-downcase)
+
+(define string-copy
+  (lambda (s . args)
+    (let ((l 0)
+	  (h (string-length s)))
+      (if (not (null? args))
+	  (begin
+	    (set! l (car args))
+	    (if (not (null? (cdr args)))
+		(set! h (cadr args)))
+	    )
+	  )
+      (string-copy! (make-string (- h l)) 0 s l h)
+      )
+    )
+  )
+
+(_??_ (string-copy "hello" 0 1) "h")
+(_??_ (string-copy "hello" 1) "ello")
+(_??_ (string-copy "hello") "hello")
+
+(define substring string-copy)
+
+(define string-fill!
+  (lambda (s a . args)
+    (let ((l 0)
+	  (h (string-length s)))
+      (cond ((not (null? args))
+	     (set! l (car args))
+	     (cond ((not (null? (cdr args)))
+		    (set! h (cadr args)))
+		   )
+	     )
+	    )
+      (define (_f b)
+	(cond ((< b h)
+	       (string-set! s b a)
+	       (_f (+ b 1))
+	       )
+	      (else s)
+	      )
+	)
+      (_f l)
+      )
+    )
+  )
+
+(_??_ (string-fill! (make-string 10) #\a) "aaaaaaaaaa")
+(_??_ (string-fill! (make-string 10) #\a 1 2) " a        ")
+
+(define string-for-each
+  (lambda (proc . strings)
+					; result length is min of arg lengths
+    (let* ((l (apply min (map string-length strings)))
+	   )
+					; walk the strings, doing evaluation
+      (define (_m p)
+	(if (equal? p l)
+	    #t
+	    (begin
+	      (apply proc (map (lambda (s) (string-ref s p)) strings))
+	      (_m (+ p 1))
+	      )
+	    )
+	)
+      (_m 0)
+      )
+    )
+  )
+
+(_??_ (string-for-each write-char "IBM\n") #t)

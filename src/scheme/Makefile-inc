@@ -23,3 +23,8 @@ SCHEME_HDRS=\
 	ao_scheme_os.h \
 	ao_scheme_read.h \
 	ao_scheme_builtin.h
+
+SCHEME_SCHEME=\
+	ao_scheme_const.scheme \
+	ao_scheme_vector.scheme \
+	ao_scheme_string.scheme

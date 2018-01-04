@@ -1,0 +1,192 @@
+;
+; Copyright © 2018 Keith Packard <keithp@keithp.com>
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation, either version 2 of the License, or
+; (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General Public License for more details.
+;
+; vector functions placed in ROM
+
+
+(define vector->string
+  (lambda (v . args)
+    (let ((l 0)
+	  (h (vector-length v)))
+      (if (not (null? args))
+	  (begin
+	    (set! l (car args))
+	    (if (not (null? (cdr args)))
+		(set! h (cadr args)))
+	    )
+	  )
+      (do ((s (make-string (- h l)))
+	   (p l (+ p 1))
+	   )
+	  ((= p h) s)
+	(string-set! s (- p l) (vector-ref v p))
+	)
+      )
+    )
+  )
+
+(_??_ (vector->string #(#\a #\b #\c) 0 2) "ab")
+
+(define string->vector
+  (lambda (s . args)
+    (let ((l 0)
+	  (h (string-length s)))
+      (if (not (null? args))
+	  (begin
+	    (set! l (car args))
+	    (if (not (null? (cdr args)))
+		(set! h (cadr args)))
+	    )
+	  )
+      (do ((v (make-vector (- h l)))
+	   (p l (+ p 1))
+	   )
+	  ((= p h) v)
+	(vector-set! v (- p l) (string-ref s p))
+	)
+      )
+    )
+  )
+
+(_??_ (string->vector "hello" 0 2) #(#\h #\e))
+    
+(define vector-copy!
+  (lambda (t a f . args)
+    (let ((l 0)
+	  (h (vector-length f))
+	  (o a)
+	  (d 1))
+					; handle optional start/end args
+      
+      (if (not (null? args))
+	  (begin
+	    (set! l (car args))
+	    (if (not (null? (cdr args)))
+		(set! h (cadr args)))
+	    (set! o (- a l))
+	    )
+	  )
+					; flip copy order if dst is
+					; after src
+      (if (< l a)
+	  (begin
+	    (set! d h)
+	    (set! h (- l 1))
+	    (set! l (- d 1))
+	    (set! d -1)
+	    )
+	  )
+					; loop copying one at a time
+      (do ((p l (+ p d))
+	   )
+	  ((= p h) t)
+	(vector-set! t (+ p o) (vector-ref f p))
+	)
+      )
+    )
+  )
+
+					; simple vector-copy test
+
+(_??_ (vector-copy! (make-vector 10 "t") 0 (make-vector 5 "f") 0 5) #("f" "f" "f" "f" "f" "t" "t" "t" "t" "t"))
+
+(let ((v (vector 1 2 3 4 5 6 7 8 9 0)))
+  (vector-copy! v 1 v 0 2)
+  (display "v ") (write v) (newline)
+  )
+
+(define vector-copy
+  (lambda (v . args)
+    (let ((l 0)
+	  (h (vector-length v)))
+      (if (not (null? args))
+	  (begin
+	    (set! l (car args))
+	    (if (not (null? (cdr args)))
+		(set! h (cadr args)))
+	    )
+	  )
+      (vector-copy! (make-vector (- h l)) 0 v)
+      )
+    )
+  )
+
+(_??_ (vector-copy #(1 2 3) 0 3) #(1 2 3))
+
+(define vector-append
+  (lambda a
+    (define (_f v a p)
+      (if (null? a)
+	  v
+	  (begin
+	    (vector-copy! v p (car a))
+	    (_f v (cdr a) (+ p (vector-length (car a))))
+	    )
+	  )
+      )
+    (_f (make-vector (apply + (map vector-length a))) a 0)
+    )
+  )
+
+(_??_ (vector-append #(1 2 3) #(4 5 6) #(7 8 9)) #(1 2 3 4 5 6 7 8 9))
+
+(define vector-fill!
+  (lambda (v a . args)
+    (let ((l 0)
+	  (h (vector-length v)))
+      (cond ((not (null? args))
+	     (set! l (car args))
+	     (cond ((not (null? (cdr args)))
+		    (set! h (cadr args)))
+		   )
+	     )
+	    )
+      (define (_f b)
+	(cond ((< b h)
+	       (vector-set! v b a)
+	       (_f (+ b 1))
+	       )
+	      (else v)
+	      )
+	)
+      (_f l)
+      )
+    )
+  )
+
+(_??_ (vector-fill! (make-vector 3) #t 1 2) #(#f #t #f))
+
+					; like 'map', but for vectors
+
+(define vector-map
+  (lambda (proc . vectors)
+					; result length is min of arg lengths
+    (let* ((l (apply min (map vector-length vectors)))
+					; create the result
+	   (v (make-vector l)))
+					; walk the vectors, doing evaluation
+      (define (_m p)
+	(if (equal? p l)
+	    v
+	    (begin
+	      (vector-set! v p (apply proc (map (lambda (v) (vector-ref v p)) vectors)))
+	      (_m (+ p 1))
+	      )
+	    )
+	)
+      (_m 0)
+      )
+    )
+  )
+    
+(_??_ (vector-map + #(1 2 3) #(4 5 6)) #(5 7 9))
