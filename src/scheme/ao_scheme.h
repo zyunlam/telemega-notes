@@ -71,7 +71,7 @@ ao_scheme_os_restore(void);
 #endif
 
 #ifdef AO_SCHEME_MAKE_CONST
-#define AO_SCHEME_POOL_CONST	16384
+#define AO_SCHEME_POOL_CONST	32764
 extern uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute__((aligned(4)));
 #define ao_scheme_pool ao_scheme_const
 #define AO_SCHEME_POOL AO_SCHEME_POOL_CONST
