@@ -12,6 +12,7 @@ all	f_lambda	cons
 all	f_lambda	last
 all	f_lambda	length
 all	f_lambda	list_copy	list-copy
+all	f_lambda	list_tail	list-tail
 all	nlambda		quote
 QUASI	atom		quasiquote
 QUASI	atom		unquote

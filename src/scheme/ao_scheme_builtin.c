@@ -231,6 +231,31 @@ ao_scheme_do_list_copy(struct ao_scheme_cons *cons)
 }
 
 ao_poly
+ao_scheme_do_list_tail(struct ao_scheme_cons *cons)
+{
+	ao_poly	list;
+	int32_t	v;
+
+	if (!ao_scheme_check_argc(_ao_scheme_atom_list2dtail, cons, 2, 2))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_argt(_ao_scheme_atom_list2dtail, cons, 0, AO_SCHEME_CONS, 1))
+		return AO_SCHEME_NIL;
+	list = ao_scheme_arg(cons, 0);
+	v = ao_scheme_arg_int(_ao_scheme_atom_list2dtail, cons, 1);
+	if (ao_scheme_exception)
+		return AO_SCHEME_NIL;
+	while (v > 0) {
+		if (!list)
+			return ao_scheme_error(AO_SCHEME_INVALID, "%v: ran off end", _ao_scheme_atom_list2dtail);
+		if (!ao_scheme_is_cons(list))
+			return ao_scheme_error(AO_SCHEME_INVALID, "%v: invalid list", _ao_scheme_atom_list2dtail);
+		list = ao_scheme_poly_cons(list)->cdr;
+		v--;
+	}
+	return list;
+}
+
+ao_poly
 ao_scheme_do_quote(struct ao_scheme_cons *cons)
 {
 	if (!ao_scheme_check_argc(_ao_scheme_atom_quote, cons, 1, 1))
