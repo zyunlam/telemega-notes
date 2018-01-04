@@ -125,9 +125,9 @@ ao_scheme_macro_pop(void)
 
 #define DBG_MACRO 0
 #if DBG_MACRO
-int macro_scan_depth;
+static int macro_scan_depth;
 
-void indent(void)
+static void indent(void)
 {
 	int i;
 	for (i = 0; i < macro_scan_depth; i++)
@@ -157,7 +157,7 @@ ao_is_macro(ao_poly p)
 	struct ao_scheme_lambda	*lambda;
 	ao_poly ret;
 
-	MACRO_DEBUG(indent(); printf ("is macro "); ao_scheme_poly_write(p); printf("\n"); ++macro_scan_depth);
+	MACRO_DEBUG(indent(); ao_scheme_printf ("is macro %v\n", p); ++macro_scan_depth);
 	switch (ao_scheme_poly_type(p)) {
 	case AO_SCHEME_ATOM:
 		if (ao_scheme_macro_push(p))
@@ -192,7 +192,7 @@ ao_is_macro(ao_poly p)
 		ret = AO_SCHEME_NIL;
 		break;
 	}
-	MACRO_DEBUG(--macro_scan_depth;	indent(); printf ("... "); ao_scheme_poly_write(ret); printf("\n"));
+	MACRO_DEBUG(--macro_scan_depth;	indent(); ao_scheme_printf ("... %v\n", ret););
 	return ret;
 }
 
@@ -207,11 +207,11 @@ ao_has_macro(ao_poly p)
 	if (p == AO_SCHEME_NIL)
 		return AO_SCHEME_NIL;
 
-	MACRO_DEBUG(indent(); printf("has macro "); ao_scheme_poly_write(p); printf("\n"); ++macro_scan_depth);
+	MACRO_DEBUG(indent(); ao_scheme_printf("has macro %v\n", p); ++macro_scan_depth);
 	switch (ao_scheme_poly_type(p)) {
 	case AO_SCHEME_LAMBDA:
 		lambda = ao_scheme_poly_lambda(p);
-		p = ao_has_macro(lambda->code);
+		p = ao_has_macro(ao_scheme_poly_cons(lambda->code)->cdr);
 		break;
 	case AO_SCHEME_CONS:
 		cons = ao_scheme_poly_cons(p);
@@ -235,7 +235,7 @@ ao_has_macro(ao_poly p)
 		p = AO_SCHEME_NIL;
 		break;
 	}
-	MACRO_DEBUG(--macro_scan_depth;	indent(); printf("... "); ao_scheme_poly_write(p); printf("\n"));
+	MACRO_DEBUG(--macro_scan_depth;	indent(); ao_scheme_printf("... %v\n", p));
 	return p;
 }
 
@@ -424,16 +424,18 @@ main(int argc, char **argv)
 			a = ao_scheme_atom_intern((char *) atoms[an].name);
 	}
 
-	if (argv[optind]){
+	while (argv[optind]) {
 		in = fopen(argv[optind], "r");
 		if (!in) {
 			perror(argv[optind]);
 			exit(1);
 		}
-	}
-	if (!ao_scheme_read_eval_abort()) {
-		fprintf(stderr, "eval failed\n");
-		exit(1);
+		if (!ao_scheme_read_eval_abort()) {
+			fprintf(stderr, "eval failed\n");
+			exit(1);
+		}
+		fclose(in);
+		optind++;
 	}
 
 	/* Reduce to referenced values */
