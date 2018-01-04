@@ -1144,12 +1144,12 @@ ao_scheme_do_make_vector(struct ao_scheme_cons *cons)
 {
 	int32_t	k;
 
-	if (!ao_scheme_check_argc(_ao_scheme_atom_make2dvector, cons, 2, 2))
+	if (!ao_scheme_check_argc(_ao_scheme_atom_make2dvector, cons, 1, 2))
 		return AO_SCHEME_NIL;
 	k = ao_scheme_arg_int(_ao_scheme_atom_make2dvector, cons, 0);
 	if (ao_scheme_exception)
 		return AO_SCHEME_NIL;
-	return ao_scheme_vector_poly(ao_scheme_vector_alloc(k, ao_scheme_arg(cons, 1)));
+	return ao_scheme_vector_poly(ao_scheme_vector_alloc(k, ao_scheme_opt_arg(cons, 1, _ao_scheme_bool_false)));
 }
 
 ao_poly
