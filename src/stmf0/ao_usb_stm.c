@@ -531,11 +531,13 @@ ao_usb_set_configuration(void)
 #endif
 }
 
+#if USB_STATUS
 static uint16_t	control_count;
 static uint16_t int_count;
 static uint16_t	in_count;
 static uint16_t	out_count;
 static uint16_t	reset_count;
+#endif
 
 /* The USB memory must be accessed in 16-bit units
  */
@@ -895,7 +897,9 @@ stm_usb_isr(void)
 
 		switch (ep) {
 		case 0:
+#if USB_STATUS
 			++control_count;
+#endif
 			if (ao_usb_epr_ctr_rx(epr)) {
 				if (ao_usb_epr_setup(epr))
 					ao_usb_ep0_receive |= AO_USB_EP0_GOT_SETUP;
@@ -907,7 +911,9 @@ stm_usb_isr(void)
 			ao_usb_ep0_handle(ao_usb_ep0_receive);
 			break;
 		case AO_USB_OUT_EPR:
+#if USB_STATUS
 			++out_count;
+#endif
 			if (ao_usb_epr_ctr_rx(epr)) {
 				_rx_dbg1("RX ISR", epr);
 				ao_usb_out_avail = 1;
@@ -917,7 +923,9 @@ stm_usb_isr(void)
 			}
 			break;
 		case AO_USB_IN_EPR:
+#if USB_STATUS
 			++in_count;
+#endif
 			_tx_dbg1("TX ISR", epr);
 			if (ao_usb_epr_ctr_tx(epr)) {
 				ao_usb_in_pending = 0;
@@ -935,7 +943,9 @@ stm_usb_isr(void)
 			break;
 #endif
 		case AO_USB_INT_EPR:
+#if USB_STATUS
 			++int_count;
+#endif
 			if (ao_usb_epr_ctr_tx(epr))
 				_ao_usb_set_stat_tx(AO_USB_INT_EPR, STM_USB_EPR_STAT_TX_NAK);
 			break;
@@ -944,7 +954,9 @@ stm_usb_isr(void)
 	}
 
 	if (istr & (1 << STM_USB_ISTR_RESET)) {
+#if USB_STATUS
 		++reset_count;
+#endif
 		debug ("\treset\n");
 		ao_usb_set_ep0();
 	}
