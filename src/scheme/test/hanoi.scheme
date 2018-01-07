@@ -1,3 +1,4 @@
+#!/home/keithp/bin/ao-scheme
 ;
 ; Towers of Hanoi
 ;
@@ -172,3 +173,5 @@
   (_hanoi len 0 1 2)
   #t
   )
+
+(unless (null? (command-line)) (hanoi 6))

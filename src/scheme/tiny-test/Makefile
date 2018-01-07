@@ -3,6 +3,8 @@ include ../Makefile-inc
 vpath %.o .
 vpath %.c ..
 vpath %.h ..
+vpath %.scheme ..
+vpath ao_scheme_make_const ../make-const
 
 DEFS=
 
@@ -18,8 +20,8 @@ ao-scheme-tiny: $(OBJS)
 
 $(OBJS): $(HDRS)
 
-ao_scheme_const.h: ../make-const/ao_scheme_make_const ao_scheme_tiny_const.scheme
-	../make-const/ao_scheme_make_const -o $@ -d FLOAT,VECTOR,QUASI,BIGINT ao_scheme_tiny_const.scheme
+ao_scheme_const.h: ao_scheme_make_const ao_scheme_basic_syntax.scheme ao_scheme_finish.scheme
+	$^ -o $@ -d FLOAT,VECTOR,QUASI,BIGINT,PORT,POSIX,GPIO,UNDEF
 
 clean::
 	rm -f $(OBJS) ao-scheme-tiny ao_scheme_const.h

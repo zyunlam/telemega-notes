@@ -13,6 +13,10 @@
 ;
 ; string functions placed in ROM
 
+(define string (lambda chars (list->string chars)))
+
+(_??_ (string #\a #\b #\c) "abc")
+
 (define string-map
   (lambda (proc . strings)
 					; result length is min of arg lengths

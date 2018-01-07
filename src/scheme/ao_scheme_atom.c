@@ -32,34 +32,13 @@ static int atom_size(void *addr)
 
 static void atom_mark(void *addr)
 {
-	struct ao_scheme_atom	*atom = addr;
-
-	for (;;) {
-		atom = ao_scheme_poly_atom(atom->next);
-		if (!atom)
-			break;
-		if (ao_scheme_mark_memory(&ao_scheme_atom_type, atom))
-			break;
-	}
+	MDBG_MOVE("mark atom %s\n", ((struct ao_scheme_atom *) addr)->name);
+	(void) addr;
 }
 
 static void atom_move(void *addr)
 {
-	struct ao_scheme_atom	*atom = addr;
-	int			ret;
-
-	for (;;) {
-		struct ao_scheme_atom *next = ao_scheme_poly_atom(atom->next);
-
-		if (!next)
-			break;
-		ret = ao_scheme_move_memory(&ao_scheme_atom_type, (void **) &next);
-		if (next != ao_scheme_poly_atom(atom->next))
-			atom->next = ao_scheme_atom_poly(next);
-		if (ret)
-			break;
-		atom = next;
-	}
+	(void) addr;
 }
 
 const struct ao_scheme_type ao_scheme_atom_type = {
@@ -72,21 +51,74 @@ const struct ao_scheme_type ao_scheme_atom_type = {
 struct ao_scheme_atom	*ao_scheme_atoms;
 
 static struct ao_scheme_atom *
-ao_scheme_atom_find(char *name)
+ao_scheme_atom_find(const char *name)
 {
 	struct ao_scheme_atom	*atom;
 
+#ifdef ao_builtin_atoms
+	if (!ao_scheme_atoms)
+		ao_scheme_atoms = ao_scheme_poly_atom(ao_builtin_atoms);
+#endif
 	for (atom = ao_scheme_atoms; atom; atom = ao_scheme_poly_atom(atom->next)) {
 		if (!strcmp(atom->name, name))
 			return atom;
 	}
-#ifdef ao_builtin_atoms
-	for (atom = ao_scheme_poly_atom(ao_builtin_atoms); atom; atom = ao_scheme_poly_atom(atom->next)) {
-		if (!strcmp(atom->name, name))
-			return atom;
-	}
-#endif
 	return NULL;
+}
+
+#ifdef AO_SCHEME_MAKE_CONST
+
+#define AO_SCHEME_BUILTIN_SYNTAX_ATOMS
+#include "ao_scheme_builtin.h"
+#undef AO_SCHEME_BUILTIN_SYNTAX_ATOMS
+
+static void
+ao_scheme_atom_mark_syntax(void)
+{
+	unsigned	a;
+	for (a = 0; a < sizeof(syntax_atoms)/sizeof(syntax_atoms[0]); a++) {
+		struct ao_scheme_atom *atom = ao_scheme_atom_find(syntax_atoms[a]);
+		if (atom)
+			ao_scheme_mark_memory(&ao_scheme_atom_type, atom);
+	}
+}
+
+#else
+#define ao_scheme_atom_mark_syntax()
+#endif
+
+void
+ao_scheme_atom_move(void)
+{
+	struct ao_scheme_atom	*atom;
+	ao_scheme_move_memory(&ao_scheme_atom_type, (void **) (void *) &ao_scheme_atoms);
+	for (atom = ao_scheme_atoms; atom; atom = ao_scheme_poly_atom(atom->next)) {
+		if (!ao_scheme_is_pool_addr(atom)) {
+			MDBG_DO(printf("atom out of pool %s\n", atom->name));
+			break;
+		}
+		MDBG_DO(printf("move atom %s\n", atom->name));
+		ao_scheme_poly_move(&atom->next, 0);
+	}
+}
+
+void
+ao_scheme_atom_check_references(void)
+{
+	struct ao_scheme_atom	*atom;
+	ao_poly			*prev = NULL;
+
+	ao_scheme_atom_mark_syntax();
+	for (atom = ao_scheme_atoms; atom; atom = ao_scheme_poly_atom(atom->next)) {
+		if (!ao_scheme_marked(atom)) {
+			MDBG_DO(printf("unreferenced atom %s\n", atom->name));
+			if (prev)
+				*prev = atom->next;
+			else
+				ao_scheme_atoms = ao_scheme_poly_atom(atom->next);
+		} else
+			prev = &atom->next;
+	}
 }
 
 static void
@@ -162,17 +194,6 @@ ao_scheme_atom_get(ao_poly atom)
 }
 
 ao_poly
-ao_scheme_atom_set(ao_poly atom, ao_poly val)
-{
-	ao_poly *ref = ao_scheme_atom_ref(atom, NULL);
-
-	if (!ref)
-		return ao_scheme_error(AO_SCHEME_UNDEFINED, "undefined atom %s", ao_scheme_poly_atom(atom)->name);
-	*ref = val;
-	return val;
-}
-
-ao_poly
 ao_scheme_atom_def(ao_poly atom, ao_poly val)
 {
 	struct ao_scheme_frame	*frame;
@@ -188,9 +209,90 @@ ao_scheme_atom_def(ao_poly atom, ao_poly val)
 }
 
 void
-ao_scheme_atom_write(ao_poly a, bool write)
+ao_scheme_atom_write(FILE *out, ao_poly a, bool write)
 {
 	struct ao_scheme_atom *atom = ao_scheme_poly_atom(a);
 	(void) write;
-	printf("%s", atom->name);
+	fprintf(out, "%s", atom->name);
 }
+
+ao_poly
+ao_scheme_do_symbolp(struct ao_scheme_cons *cons)
+{
+	return ao_scheme_do_typep(_ao_scheme_atom_symbol3f, AO_SCHEME_ATOM, cons);
+}
+
+ao_poly
+ao_scheme_do_set(struct ao_scheme_cons *cons)
+{
+	ao_poly	atom;
+	ao_poly val;
+	ao_poly *ref;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_set, cons,
+				  AO_SCHEME_ATOM|AO_SCHEME_ARG_RET_POLY, &atom,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+
+	ref = ao_scheme_atom_ref(atom, NULL);
+
+	if (!ref)
+		return ao_scheme_error(AO_SCHEME_UNDEFINED, "%v: undefined atom %v",
+				       _ao_scheme_atom_set, atom);
+	*ref = val;
+	return val;
+}
+
+ao_poly
+ao_scheme_do_def(struct ao_scheme_cons *cons)
+{
+	ao_poly	atom;
+	ao_poly	val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_set, cons,
+				  AO_SCHEME_ATOM|AO_SCHEME_ARG_RET_POLY, &atom,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_atom_def(atom, val);
+}
+
+ao_poly
+ao_scheme_do_setq(struct ao_scheme_cons *cons)
+{
+	ao_poly	atom;
+	ao_poly	val;
+	ao_poly	p;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_set21, cons,
+				  AO_SCHEME_ATOM|AO_SCHEME_ARG_RET_POLY, &atom,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_atom_ref(atom, NULL))
+		return ao_scheme_error(AO_SCHEME_INVALID, "%v: symbol %v not defined",
+				       _ao_scheme_atom_set21, atom);
+	/*
+	 * Build the macro return -- `(set (quote ,atom) ,val)
+	 */
+	ao_scheme_poly_stash(cons->cdr);
+	p = ao_scheme_cons(atom, AO_SCHEME_NIL);
+	p = ao_scheme_cons(_ao_scheme_atom_quote, p);
+	p = ao_scheme_cons(p, ao_scheme_poly_fetch());
+	return ao_scheme_cons(_ao_scheme_atom_set, p);
+}
+
+#ifdef AO_SCHEME_FEATURE_UNDEF
+ao_poly
+ao_scheme_do_undef(struct ao_scheme_cons *cons)
+{
+	ao_poly	atom;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_set, cons,
+				  AO_SCHEME_ATOM|AO_SCHEME_ARG_RET_POLY, &atom,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_frame_del(ao_scheme_frame_global, atom);
+}
+#endif

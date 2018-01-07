@@ -23,25 +23,11 @@
 #include <time.h>
 
 #define AO_SCHEME_POOL_TOTAL	32768
-#define AO_SCHEME_SAVE		1
-
-extern int ao_scheme_getc(void);
-
-static inline void
-ao_scheme_os_flush(void) {
-	fflush(stdout);
-}
 
 static inline void
 ao_scheme_abort(void)
 {
 	abort();
-}
-
-static inline void
-ao_scheme_os_led(int led)
-{
-	printf("leds set to 0x%x\n", led);
 }
 
 #define AO_SCHEME_JIFFIES_PER_SECOND	100

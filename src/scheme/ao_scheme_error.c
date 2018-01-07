@@ -16,7 +16,7 @@
 #include <stdarg.h>
 
 void
-ao_scheme_vprintf(const char *format, va_list args)
+ao_scheme_vfprintf(FILE *out, const char *format, va_list args)
 {
 	char c;
 
@@ -24,38 +24,38 @@ ao_scheme_vprintf(const char *format, va_list args)
 		if (c == '%') {
 			switch (c = *format++) {
 			case 'v':
-				ao_scheme_poly_write((ao_poly) va_arg(args, unsigned int), true);
+				ao_scheme_poly_write(out, (ao_poly) va_arg(args, unsigned int), true);
 				break;
 			case 'V':
-				ao_scheme_poly_write((ao_poly) va_arg(args, unsigned int), false);
+				ao_scheme_poly_write(out, (ao_poly) va_arg(args, unsigned int), false);
 				break;
 			case 'p':
-				printf("%p", va_arg(args, void *));
+				fprintf(out, "%p", va_arg(args, void *));
 				break;
 			case 'd':
-				printf("%d", va_arg(args, int));
+				fprintf(out, "%d", va_arg(args, int));
 				break;
 			case 'x':
-				printf("%x", va_arg(args, int));
+				fprintf(out, "%x", va_arg(args, int));
 				break;
 			case 's':
-				printf("%s", va_arg(args, char *));
+				fprintf(out, "%s", va_arg(args, char *));
 				break;
 			default:
-				putchar(c);
+				putc(c, out);
 				break;
 			}
 		} else
-			putchar(c);
+			putc(c, out);
 	}
 }
 
 void
-ao_scheme_printf(const char *format, ...)
+ao_scheme_fprintf(FILE *out, const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	ao_scheme_vprintf(format, args);
+	ao_scheme_vfprintf(out, format, args);
 	va_end(args);
 }
 
@@ -66,13 +66,13 @@ ao_scheme_error(int error, const char *format, ...)
 
 	ao_scheme_exception |= error;
 	va_start(args, format);
-	ao_scheme_vprintf(format, args);
+	ao_scheme_vfprintf(stdout, format, args);
 	putchar('\n');
 	va_end(args);
-	ao_scheme_printf("Value:  %v\n", ao_scheme_v);
-	ao_scheme_printf("Frame:  %v\n", ao_scheme_frame_poly(ao_scheme_frame_current));
+	ao_scheme_fprintf(stdout, "Value:  %v\n", ao_scheme_v);
+	ao_scheme_fprintf(stdout, "Frame:  %v\n", ao_scheme_frame_poly(ao_scheme_frame_current));
 	printf("Stack:\n");
-	ao_scheme_stack_write(ao_scheme_stack_poly(ao_scheme_stack), true);
-	ao_scheme_printf("Globals: %v\n", ao_scheme_frame_poly(ao_scheme_frame_global));
+	ao_scheme_stack_write(stdout, ao_scheme_stack_poly(ao_scheme_stack), true);
+	ao_scheme_fprintf(stdout, "Globals: %v\n", ao_scheme_frame_poly(ao_scheme_frame_global));
 	return AO_SCHEME_NIL;
 }

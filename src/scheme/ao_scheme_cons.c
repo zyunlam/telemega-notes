@@ -124,7 +124,7 @@ ao_scheme_cons(ao_poly car, ao_poly cdr)
 	return ao_scheme_cons_poly(ao_scheme_cons_cons(car, cdr));
 }
 
-struct ao_scheme_cons *
+static struct ao_scheme_cons *
 ao_scheme_cons_copy(struct ao_scheme_cons *cons)
 {
 	struct ao_scheme_cons	*head = NULL;
@@ -175,7 +175,7 @@ ao_scheme_cons_free(struct ao_scheme_cons *cons)
 }
 
 void
-ao_scheme_cons_write(ao_poly c, bool write)
+ao_scheme_cons_write(FILE *out, ao_poly c, bool write)
 {
 	struct ao_scheme_cons	*cons = ao_scheme_poly_cons(c);
 	struct ao_scheme_cons	*clear = cons;
@@ -183,34 +183,34 @@ ao_scheme_cons_write(ao_poly c, bool write)
 	int			written = 0;
 
 	ao_scheme_print_start();
-	printf("(");
+	fprintf(out, "(");
 	while (cons) {
 		if (written != 0)
-			printf(" ");
+			fprintf(out, " ");
 
 		/* Note if there's recursion in printing. Not
 		 * as good as actual references, but at least
 		 * we don't infinite loop...
 		 */
 		if (ao_scheme_print_mark_addr(cons)) {
-			printf("...");
+			fprintf(out, "...");
 			break;
 		}
 
-		ao_scheme_poly_write(cons->car, write);
+		ao_scheme_poly_write(out, cons->car, write);
 
 		/* keep track of how many pairs have been printed */
 		written++;
 
 		cdr = cons->cdr;
 		if (!ao_scheme_is_cons(cdr)) {
-			printf(" . ");
-			ao_scheme_poly_write(cdr, write);
+			fprintf(out, " . ");
+			ao_scheme_poly_write(out, cdr, write);
 			break;
 		}
 		cons = ao_scheme_poly_cons(cdr);
 	}
-	printf(")");
+	fprintf(out, ")");
 
 	if (ao_scheme_print_stop()) {
 
@@ -234,3 +234,169 @@ ao_scheme_cons_length(struct ao_scheme_cons *cons)
 	}
 	return len;
 }
+
+ao_poly
+ao_scheme_do_car(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons *pair;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_car, cons,
+				  AO_SCHEME_CONS, &pair,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return pair->car;
+}
+
+ao_poly
+ao_scheme_do_cdr(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons *pair;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_cdr, cons,
+				  AO_SCHEME_CONS, &pair,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return pair->cdr;
+}
+
+ao_poly
+ao_scheme_do_cons(struct ao_scheme_cons *cons)
+{
+	ao_poly	car, cdr;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_cons, cons,
+				  AO_SCHEME_POLY, &car,
+				  AO_SCHEME_POLY, &cdr,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_cons(car, cdr);
+}
+
+ao_poly
+ao_scheme_do_last(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons	*pair;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_last, cons,
+				  AO_SCHEME_CONS | AO_SCHEME_ARG_NIL_OK, &pair,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	while (pair) {
+		if (!pair->cdr)
+			return pair->car;
+		pair = ao_scheme_cons_cdr(pair);
+	}
+	return AO_SCHEME_NIL;
+}
+
+ao_poly
+ao_scheme_do_length(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons	*pair;
+	if (!ao_scheme_parse_args(_ao_scheme_atom_length, cons,
+				  AO_SCHEME_CONS | AO_SCHEME_ARG_NIL_OK, &pair,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_integer_poly(ao_scheme_cons_length(pair));
+}
+
+ao_poly
+ao_scheme_do_list_copy(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons	*pair;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_list2dcopy, cons,
+				  AO_SCHEME_CONS | AO_SCHEME_ARG_NIL_OK, &pair,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_cons_poly(ao_scheme_cons_copy(pair));
+}
+
+ao_poly
+ao_scheme_do_list_tail(struct ao_scheme_cons *cons)
+{
+	ao_poly			list;
+	int32_t			v;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_list2dtail, cons,
+				  AO_SCHEME_CONS | AO_SCHEME_ARG_NIL_OK | AO_SCHEME_ARG_RET_POLY, &list,
+				  AO_SCHEME_INT, &v,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+
+	while (v > 0) {
+		if (!list)
+			return ao_scheme_error(AO_SCHEME_INVALID, "%v: ran off end", _ao_scheme_atom_list2dtail);
+		if (!ao_scheme_is_cons(list))
+			return ao_scheme_error(AO_SCHEME_INVALID, "%v: invalid list", _ao_scheme_atom_list2dtail);
+		list = ao_scheme_poly_cons(list)->cdr;
+		v--;
+	}
+	return list;
+}
+
+ao_poly
+ao_scheme_do_pairp(struct ao_scheme_cons *cons)
+{
+	ao_poly val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_pair3f, cons,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	if (ao_scheme_is_pair(val))
+		return _ao_scheme_bool_true;
+	return _ao_scheme_bool_false;
+}
+
+/* This one is special -- a list is either nil or
+ * a 'proper' list with only cons cells
+ */
+ao_poly
+ao_scheme_do_listp(struct ao_scheme_cons *cons)
+{
+	ao_poly val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_pair3f, cons,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	for (;;) {
+		if (val == AO_SCHEME_NIL)
+			return _ao_scheme_bool_true;
+		if (!ao_scheme_is_cons(val))
+			return _ao_scheme_bool_false;
+		val = ao_scheme_poly_cons(val)->cdr;
+	}
+}
+
+ao_poly
+ao_scheme_do_set_car(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons	*pair;
+	ao_poly			val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_set2dcar21, cons,
+				  AO_SCHEME_CONS, &pair,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	pair->car = val;
+	return val;
+}
+
+ao_poly
+ao_scheme_do_set_cdr(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons	*pair;
+	ao_poly			val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_set2dcar21, cons,
+				  AO_SCHEME_CONS, &pair,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	pair->cdr = val;
+	return val;
+}
+

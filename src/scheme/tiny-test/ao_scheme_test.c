@@ -15,9 +15,6 @@
 #include "ao_scheme.h"
 #include <stdio.h>
 
-static FILE *ao_scheme_file;
-static int newline = 1;
-
 static char save_file[] = "scheme.image";
 
 int
@@ -70,42 +67,20 @@ ao_scheme_os_restore(void)
 }
 
 int
-ao_scheme_getc(void)
-{
-	int c;
-
-	if (ao_scheme_file)
-		return getc(ao_scheme_file);
-
-	if (newline) {
-		if (ao_scheme_read_list)
-			printf("+ ");
-		else
-			printf("> ");
-		newline = 0;
-	}
-	c = getchar();
-	if (c == '\n')
-		newline = 1;
-	return c;
-}
-
-int
 main (int argc, char **argv)
 {
 	(void) argc;
 
 	while (*++argv) {
-		ao_scheme_file = fopen(*argv, "r");
-		if (!ao_scheme_file) {
+		FILE *in = fopen(*argv, "r");
+		if (!in) {
 			perror(*argv);
 			exit(1);
 		}
-		ao_scheme_read_eval_print();
-		fclose(ao_scheme_file);
-		ao_scheme_file = NULL;
+		ao_scheme_read_eval_print(in, stdout, false);
+		fclose(in);
 	}
-	ao_scheme_read_eval_print();
+	ao_scheme_read_eval_print(stdin, stdout, true);
 
 #ifdef DBG_MEM_STATS
 	printf ("collects: full: %lu incremental %lu\n",

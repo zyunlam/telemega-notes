@@ -214,10 +214,6 @@ static const struct ao_scheme_root	ao_scheme_root[] = {
 		.addr = (void **) (void *) &stash_poly[5]
 	},
 	{
-		.type = &ao_scheme_atom_type,
-		.addr = (void **) &ao_scheme_atoms
-	},
-	{
 		.type = &ao_scheme_frame_type,
 		.addr = (void **) &ao_scheme_frame_global,
 	},
@@ -245,6 +241,20 @@ static const struct ao_scheme_root	ao_scheme_root[] = {
 		.type = &ao_scheme_cons_type,
 		.addr = (void **) &ao_scheme_read_stack,
 	},
+#ifdef AO_SCHEME_FEATURE_PORT
+	{
+		.type = NULL,
+		.addr = (void **) (void *) &ao_scheme_stdin,
+	},
+	{
+		.type = NULL,
+		.addr = (void **) (void *) &ao_scheme_stdout,
+	},
+	{
+		.type = NULL,
+		.addr = (void **) (void *) &ao_scheme_stderr,
+	},
+#endif
 #ifdef AO_SCHEME_MAKE_CONST
 	{
 		.type = &ao_scheme_bool_type,
@@ -297,7 +307,7 @@ struct ao_scheme_chunk {
 	};
 };
 
-#define AO_SCHEME_NCHUNK	64
+#define AO_SCHEME_NCHUNK	(AO_SCHEME_POOL / 64)
 
 static struct ao_scheme_chunk ao_scheme_chunk[AO_SCHEME_NCHUNK];
 
@@ -489,6 +499,27 @@ dump_busy(void)
 #define DUMP_BUSY()
 #endif
 
+#if MDBG_DUMP
+static void
+dump_atoms(int show_marked)
+{
+	struct ao_scheme_atom	*atom;
+
+	printf("atoms {\n");
+	for (atom = ao_scheme_atoms; atom; atom = ao_scheme_poly_atom(atom->next)) {
+		printf("\t%d: %s", MDBG_OFFSET(atom), atom->name);
+		if (show_marked)
+			printf(" %s", ao_scheme_marked(atom) ? "referenced" : "unreferenced");
+		printf("\n");
+	}
+	printf("}\n");
+
+}
+#define DUMP_ATOMS(a)	dump_atoms(a)
+#else
+#define DUMP_ATOMS(a)
+#endif
+
 static const struct ao_scheme_type * const ao_scheme_types[AO_SCHEME_NUM_TYPE] = {
 	[AO_SCHEME_CONS] = &ao_scheme_cons_type,
 	[AO_SCHEME_INT] = NULL,
@@ -509,6 +540,9 @@ static const struct ao_scheme_type * const ao_scheme_types[AO_SCHEME_NUM_TYPE] =
 #endif
 #ifdef AO_SCHEME_FEATURE_VECTOR
 	[AO_SCHEME_VECTOR] = &ao_scheme_vector_type,
+#endif
+#ifdef AO_SCHEME_FEATURE_PORT
+	[AO_SCHEME_PORT] = &ao_scheme_port_type,
 #endif
 };
 
@@ -553,7 +587,7 @@ ao_scheme_collect(uint8_t style)
 #endif
 	MDBG_MOVE("collect %lu\n", ao_scheme_collects[style]);
 
-	MDBG_DO(ao_scheme_frame_write(ao_scheme_frame_poly(ao_scheme_frame_global)));
+	MDBG_DO(ao_scheme_frame_write(stdout, ao_scheme_frame_poly(ao_scheme_frame_global), true));
 	MDBG_DO(++ao_scheme_collecting);
 
 	ao_scheme_reset_stack();
@@ -584,6 +618,11 @@ ao_scheme_collect(uint8_t style)
 		reset_chunks();
 		walk(ao_scheme_mark_ref, ao_scheme_poly_mark_ref);
 
+#ifdef AO_SCHEME_FEATURE_PORT
+		ao_scheme_port_check_references();
+#endif
+		ao_scheme_atom_check_references();
+
 #if DBG_MEM_RECORD
 		ao_scheme_record_free(mark_record);
 		mark_record = ao_scheme_record_save();
@@ -591,6 +630,7 @@ ao_scheme_collect(uint8_t style)
 			ao_scheme_record_compare("mark", move_record, mark_record);
 #endif
 
+		DUMP_ATOMS(1);
 		DUMP_BUSY();
 
 		/* Find the first moving object */
@@ -660,6 +700,13 @@ ao_scheme_collect(uint8_t style)
 		if (chunk_first < chunk_last) {
 			/* Relocate all references to the objects */
 			walk(ao_scheme_move, ao_scheme_poly_move);
+			ao_scheme_atom_move();
+#ifdef AO_SCHEME_FEATURE_PORT
+			/* the set of open ports gets relocated but not marked, so
+			 * just deal with it separately
+			 */
+			ao_scheme_poly_move(&ao_scheme_open_ports, 0);
+#endif
 
 #if DBG_MEM_RECORD
 			ao_scheme_record_free(move_record);
@@ -667,6 +714,7 @@ ao_scheme_collect(uint8_t style)
 			if (mark_record && move_record)
 				ao_scheme_record_compare("move", mark_record, move_record);
 #endif
+			DUMP_ATOMS(0);
 		}
 
 #if DBG_MEM_STATS
@@ -764,7 +812,7 @@ static int
 ao_scheme_mark(const struct ao_scheme_type *type, void *addr)
 {
 	int ret;
-	MDBG_MOVE("mark %d\n", MDBG_OFFSET(addr));
+	MDBG_MOVE("mark offset %d\n", MDBG_OFFSET(addr));
 	MDBG_MOVE_IN();
 	ret = ao_scheme_mark_memory(type, addr);
 	if (!ret) {
@@ -813,7 +861,7 @@ ao_scheme_poly_mark(ao_poly p, uint8_t do_note_cons)
 			ao_scheme_abort();
 #endif
 
-		MDBG_MOVE("mark %d\n", MDBG_OFFSET(addr));
+		MDBG_MOVE("poly_mark offset %d\n", MDBG_OFFSET(addr));
 		MDBG_MOVE_IN();
 		ret = ao_scheme_mark_memory(lisp_type, addr);
 		if (!ret) {
@@ -945,6 +993,14 @@ ao_scheme_poly_move(ao_poly *ref, uint8_t do_note_cons)
 		*ref = np;
 	}
 	return ret;
+}
+
+int
+ao_scheme_marked(void *addr)
+{
+	if (!ao_scheme_is_pool_addr(addr))
+		return 1;
+	return busy(ao_scheme_busy, pool_offset(addr));
 }
 
 #if DBG_MEM

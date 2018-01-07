@@ -41,8 +41,8 @@ all	f_lambda	greater_equal	>=	string>=?
 all	f_lambda	flush_output		flush-output
 TIME	f_lambda	delay
 GPIO	f_lambda	led
-all	f_lambda	save
-all	f_lambda	restore
+SAVE	f_lambda	save
+SAVE	f_lambda	restore
 all	f_lambda	call_cc		call-with-current-continuation	call/cc
 all	f_lambda	collect
 all	f_lambda	nullp		null?
@@ -62,7 +62,6 @@ all	f_lambda	string_to_symbol	string->symbol
 all	f_lambda	stringp		string?
 all	f_lambda	string_ref	string-ref
 all	f_lambda	string_set	string-set!
-all	f_lambda	string_copy	string-copy
 all	f_lambda	string_length	string-length
 all	f_lambda	make_string	make-string
 all	f_lambda	procedurep	procedure?
@@ -71,7 +70,6 @@ all	f_lambda	read_char	read-char
 all	f_lambda	write_char	write-char
 all	f_lambda	exit
 TIME	f_lambda	current_jiffy	current-jiffy
-TIME	f_lambda	current_second	current-second
 TIME	f_lambda	jiffies_per_second	jiffies-per-second
 FLOAT	f_lambda	finitep		finite?
 FLOAT	f_lambda	infinitep	infinite?
@@ -85,3 +83,18 @@ VECTOR	f_lambda	list_to_vector	list->vector
 VECTOR	f_lambda	vector_to_list	vector->list
 VECTOR	f_lambda	vector_length	vector-length
 VECTOR	f_lambda	vectorp		vector?
+PORT	f_lambda	portp		port?
+PORT	f_lambda	port_openp	port-open?
+PORT	f_lambda	open_input_file	open-input-file
+PORT	f_lambda	open_output_file	open-output-file
+PORT	f_lambda	close_port	close-port
+PORT	f_lambda	current_input_port	current-input-port
+PORT	f_lambda	current_output_port	current-output-port
+PORT	f_lambda	current_error_port	current-error-port
+POSIX	f_lambda	command_line	command-line
+POSIX	f_lambda	get_environment_variables	get-environment-variables
+POSIX	f_lambda	get_environment_variable	get-environment-variable
+POSIX	f_lambda	file_existsp			file-exists?
+POSIX	f_lambda	delete_file	delete-file
+POSIX	f_lambda	current_second	current-second
+UNDEF	f_lambda	undef

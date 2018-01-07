@@ -28,11 +28,11 @@ stack_mark(void *addr)
 {
 	struct ao_scheme_stack	*stack = addr;
 	for (;;) {
-		ao_scheme_poly_mark(stack->sexprs, 0);
-		ao_scheme_poly_mark(stack->values, 0);
+		ao_scheme_poly_mark(stack->sexprs, 1);
+		ao_scheme_poly_mark(stack->values, 1);
 		/* no need to mark values_tail */
 		ao_scheme_poly_mark(stack->frame, 0);
-		ao_scheme_poly_mark(stack->list, 0);
+		ao_scheme_poly_mark(stack->list, 1);
 		stack = ao_scheme_poly_stack(stack->prev);
 		if (ao_scheme_mark_memory(&ao_scheme_stack_type, stack))
 			break;
@@ -47,11 +47,11 @@ stack_move(void *addr)
 	while (stack) {
 		struct ao_scheme_stack	*prev;
 		int			ret;
-		(void) ao_scheme_poly_move(&stack->sexprs, 0);
-		(void) ao_scheme_poly_move(&stack->values, 0);
+		(void) ao_scheme_poly_move(&stack->sexprs, 1);
+		(void) ao_scheme_poly_move(&stack->values, 1);
 		(void) ao_scheme_poly_move(&stack->values_tail, 0);
 		(void) ao_scheme_poly_move(&stack->frame, 0);
-		(void) ao_scheme_poly_move(&stack->list, 0);
+		(void) ao_scheme_poly_move(&stack->list, 1);
 		prev = ao_scheme_poly_stack(stack->prev);
 		if (!prev)
 			break;
@@ -150,15 +150,7 @@ ao_scheme_stack_pop(void)
 }
 
 void
-ao_scheme_stack_clear(void)
-{
-	ao_scheme_stack = NULL;
-	ao_scheme_frame_current = NULL;
-	ao_scheme_v = AO_SCHEME_NIL;
-}
-
-void
-ao_scheme_stack_write(ao_poly poly, bool write)
+ao_scheme_stack_write(FILE *out, ao_poly poly, bool write)
 {
 	struct ao_scheme_stack 	*s = ao_scheme_poly_stack(poly);
 	struct ao_scheme_stack	*clear = s;
@@ -169,15 +161,15 @@ ao_scheme_stack_write(ao_poly poly, bool write)
 	ao_scheme_frame_print_indent += 2;
 	while (s) {
 		if (ao_scheme_print_mark_addr(s)) {
-			printf("[recurse...]");
+			fputs("[recurse...]", out);
 			break;
 		}
 		written++;
-		printf("\t[\n");
-		ao_scheme_printf("\t\texpr:     %v\n", s->list);
-		ao_scheme_printf("\t\tvalues:   %v\n", s->values);
-		ao_scheme_printf("\t\tframe:    %v\n", s->frame);
-		printf("\t]\n");
+		fputs("\t[\n", out);
+		ao_scheme_fprintf(out, "\t\texpr:     %v\n", s->list);
+		ao_scheme_fprintf(out, "\t\tvalues:   %v\n", s->values);
+		ao_scheme_fprintf(out, "\t\tframe:    %v\n", s->frame);
+		fputs("\t]\n", out);
 		s = ao_scheme_poly_stack(s->prev);
 	}
 	ao_scheme_frame_print_indent -= 2;
@@ -258,21 +250,19 @@ ao_scheme_do_call_cc(struct ao_scheme_cons *cons)
 	struct ao_scheme_stack	*new;
 	ao_poly			v;
 
-	/* Make sure the single parameter is a lambda */
-	if (!ao_scheme_check_argc(_ao_scheme_atom_call2fcc, cons, 1, 1))
-		return AO_SCHEME_NIL;
-	if (!ao_scheme_check_argt(_ao_scheme_atom_call2fcc, cons, 0, AO_SCHEME_LAMBDA, 0))
+	if (!ao_scheme_parse_args(_ao_scheme_atom_call2fcc, cons,
+				  AO_SCHEME_LAMBDA|AO_SCHEME_ARG_RET_POLY, &v,
+				  AO_SCHEME_ARG_END))
 		return AO_SCHEME_NIL;
 
-	/* go get the lambda */
-	ao_scheme_v = ao_scheme_arg(cons, 0);
-
+	ao_scheme_poly_stash(v);
 	/* Note that the whole call chain now has
 	 * a reference to it which may escape
 	 */
 	new = ao_scheme_stack_copy(ao_scheme_stack);
 	if (!new)
 		return AO_SCHEME_NIL;
+	v = ao_scheme_poly_fetch();
 
 	/* re-fetch cons after the allocation */
 	cons = ao_scheme_poly_cons(ao_scheme_poly_cons(ao_scheme_stack->values)->cdr);
@@ -283,8 +273,7 @@ ao_scheme_do_call_cc(struct ao_scheme_cons *cons)
 
 	cons->car = ao_scheme_stack_poly(new);
 	cons->cdr = AO_SCHEME_NIL;
-	v = ao_scheme_lambda_eval();
-	ao_scheme_stack->sexprs = v;
-	ao_scheme_stack->state = eval_begin;
-	return AO_SCHEME_NIL;
+
+	ao_scheme_stack->state = eval_exec;
+	return v;
 }

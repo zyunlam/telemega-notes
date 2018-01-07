@@ -50,19 +50,19 @@ const struct ao_scheme_type ao_scheme_lambda_type = {
 };
 
 void
-ao_scheme_lambda_write(ao_poly poly, bool write)
+ao_scheme_lambda_write(FILE *out, ao_poly poly, bool write)
 {
 	struct ao_scheme_lambda	*lambda = ao_scheme_poly_lambda(poly);
 	struct ao_scheme_cons	*cons = ao_scheme_poly_cons(lambda->code);
 
-	printf("(");
-	printf("%s", ao_scheme_args_name(lambda->args));
+	putc('(', out);
+	fputs(ao_scheme_args_name(lambda->args), out);
 	while (cons) {
-		printf(" ");
-		ao_scheme_poly_write(cons->car, write);
+		putc(' ', out);
+		ao_scheme_poly_write(out, cons->car, write);
 		cons = ao_scheme_poly_cons(cons->cdr);
 	}
-	printf(")");
+	putc(')', out);
 }
 
 static ao_poly

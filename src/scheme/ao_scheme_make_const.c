@@ -270,18 +270,19 @@ ao_scheme_seen_builtin(struct ao_scheme_builtin *b)
 }
 
 static int
-ao_scheme_read_eval_abort(void)
+ao_scheme_read_eval_abort(FILE *read_file)
 {
-	ao_poly	in, out = AO_SCHEME_NIL;
+	ao_poly	in;
+
 	for(;;) {
-		in = ao_scheme_read();
+		in = ao_scheme_read(read_file);
 		if (in == _ao_scheme_atom_eof)
 			break;
-		out = ao_scheme_eval(in);
-		if (ao_scheme_exception)
+		(void) ao_scheme_eval(in);
+		if (ao_scheme_exception) {
+			ao_scheme_fprintf(stderr, "make_const failed on %v\n", in);
 			return 0;
-		ao_scheme_poly_write(out, true);
-		putchar ('\n');
+		}
 	}
 	return 1;
 }
@@ -307,14 +308,29 @@ ao_scheme_add_feature(struct feature **list, char *name)
 }
 
 static bool
-ao_scheme_has_feature(struct feature *list, const char *name)
+_ao_scheme_has_feature(struct feature *list, const char *name, bool skip_undef)
 {
+	if (skip_undef && !strcmp(name, "UNDEF"))
+		return false;
+
 	while (list) {
 		if (!strcmp(list->name, name))
 			return true;
 		list = list->next;
 	}
 	return false;
+}
+
+static bool
+ao_scheme_has_undef(struct feature *list)
+{
+	return _ao_scheme_has_feature(list, "UNDEF", false);
+}
+
+static bool
+ao_scheme_has_feature(struct feature *list, const char *name)
+{
+	return _ao_scheme_has_feature(list, name, true);
 }
 
 static void
@@ -430,12 +446,20 @@ main(int argc, char **argv)
 			perror(argv[optind]);
 			exit(1);
 		}
-		if (!ao_scheme_read_eval_abort()) {
+		if (!ao_scheme_read_eval_abort(in)) {
 			fprintf(stderr, "eval failed\n");
 			exit(1);
 		}
 		fclose(in);
 		optind++;
+	}
+
+	if (!ao_scheme_has_undef(enable) && ao_scheme_has_undef(disable)) {
+		struct ao_scheme_cons cons;
+
+		cons.car = _ao_scheme_atom_undef;
+		cons.cdr = AO_SCHEME_NIL;
+		ao_scheme_do_undef(&cons);
 	}
 
 	/* Reduce to referenced values */
@@ -446,10 +470,10 @@ main(int argc, char **argv)
 
 		val = ao_has_macro(vals->vals[f].val);
 		if (val != AO_SCHEME_NIL) {
-			printf("error: function %s contains unresolved macro: ",
-			       ao_scheme_poly_atom(vals->vals[f].atom)->name);
-			ao_scheme_poly_write(val, true);
-			printf("\n");
+			fprintf(stderr, "error: function %s contains unresolved macro: ",
+				ao_scheme_poly_atom(vals->vals[f].atom)->name);
+			ao_scheme_poly_write(stderr, val, true);
+			fprintf(stderr, "\n");
 			exit(1);
 		}
 

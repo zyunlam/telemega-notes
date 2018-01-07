@@ -32,43 +32,16 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ao_scheme_os.h>
 #define AO_SCHEME_BUILTIN_FEATURES
 #include "ao_scheme_builtin.h"
 #undef AO_SCHEME_BUILTIN_FEATURES
-#include <ao_scheme_os.h>
 #ifndef __BYTE_ORDER
 #include <endian.h>
 #endif
 
 typedef uint16_t	ao_poly;
 typedef int16_t		ao_signed_poly;
-
-#if AO_SCHEME_SAVE
-
-struct ao_scheme_os_save {
-	ao_poly		atoms;
-	ao_poly		globals;
-	uint16_t	const_checksum;
-	uint16_t	const_checksum_inv;
-};
-
-#ifndef AO_SCHEME_POOL_TOTAL
-#error Must define AO_SCHEME_POOL_TOTAL for AO_SCHEME_SAVE
-#endif
-
-#define AO_SCHEME_POOL_EXTRA	(sizeof(struct ao_scheme_os_save))
-#define AO_SCHEME_POOL	((int) (AO_SCHEME_POOL_TOTAL - AO_SCHEME_POOL_EXTRA))
-
-int
-ao_scheme_os_save(void);
-
-int
-ao_scheme_os_restore_save(struct ao_scheme_os_save *save, int offset);
-
-int
-ao_scheme_os_restore(void);
-
-#endif
 
 #ifdef AO_SCHEME_MAKE_CONST
 #define AO_SCHEME_POOL_CONST	32764
@@ -89,7 +62,35 @@ extern uint8_t ao_scheme_const[AO_SCHEME_POOL_CONST] __attribute__((aligned(4)))
 #include "ao_scheme_builtin.h"
 
 #else
+
 #include "ao_scheme_const.h"
+
+#ifdef AO_SCHEME_FEATURE_SAVE
+
+struct ao_scheme_os_save {
+	ao_poly		atoms;
+	ao_poly		globals;
+	uint16_t	const_checksum;
+	uint16_t	const_checksum_inv;
+};
+
+#ifndef AO_SCHEME_POOL_TOTAL
+#error Must define AO_SCHEME_POOL_TOTAL for AO_SCHEME_FEATURE_SAVE
+#endif
+
+#define AO_SCHEME_POOL_EXTRA	(sizeof(struct ao_scheme_os_save))
+#define AO_SCHEME_POOL	((int) (AO_SCHEME_POOL_TOTAL - AO_SCHEME_POOL_EXTRA))
+
+int
+ao_scheme_os_save(void);
+
+int
+ao_scheme_os_restore_save(struct ao_scheme_os_save *save, int offset);
+
+int
+ao_scheme_os_restore(void);
+#endif /* AO_SCHEME_FEATURE_SAVE */
+
 #ifndef AO_SCHEME_POOL
 #error Must define AO_SCHEME_POOL
 #endif
@@ -131,7 +132,13 @@ extern uint8_t		ao_scheme_pool[AO_SCHEME_POOL + AO_SCHEME_POOL_EXTRA] __attribut
 #else
 #define _AO_SCHEME_VECTOR	_AO_SCHEME_FLOAT
 #endif
-#define AO_SCHEME_NUM_TYPE	(_AO_SCHEME_VECTOR+1)
+#ifdef AO_SCHEME_FEATURE_PORT
+#define AO_SCHEME_PORT		14
+#define _AO_SCHEME_PORT		AO_SCHEME_PORT
+#else
+#define _AO_SCHEME_PORT		_AO_SCHEME_VECTOR
+#endif
+#define AO_SCHEME_NUM_TYPE	(_AO_SCHEME_PORT+1)
 
 /* Leave two bits for types to use as they please */
 #define AO_SCHEME_OTHER_TYPE_MASK	0x3f
@@ -146,7 +153,8 @@ extern uint16_t		ao_scheme_top;
 #define AO_SCHEME_UNDEFINED		0x08
 #define AO_SCHEME_REDEFINED		0x10
 #define AO_SCHEME_EOF			0x20
-#define AO_SCHEME_EXIT			0x40
+#define AO_SCHEME_FILEERROR		0x40
+#define AO_SCHEME_EXIT			0x80
 
 extern uint8_t		ao_scheme_exception;
 
@@ -237,6 +245,15 @@ struct ao_scheme_vector {
 	uint8_t			pad1;
 	uint16_t		length;
 	ao_poly			vals[];
+};
+#endif
+
+#ifdef AO_SCHEME_FEATURE_PORT
+struct ao_scheme_port {
+	uint8_t			type;
+	uint8_t			stayopen;
+	ao_poly			next;
+	FILE			*file;
 };
 #endif
 
@@ -551,6 +568,23 @@ ao_scheme_poly_vector(ao_poly poly)
 }
 #endif
 
+#ifdef AO_SCHEME_FEATURE_PORT
+static inline ao_poly
+ao_scheme_port_poly(struct ao_scheme_port *v)
+{
+	return ao_scheme_poly(v, AO_SCHEME_OTHER);
+}
+
+static inline struct ao_scheme_port *
+ao_scheme_poly_port(ao_poly poly)
+{
+	return ao_scheme_ref(poly);
+}
+
+extern ao_poly	ao_scheme_stdin, ao_scheme_stdout, ao_scheme_stderr;
+
+#endif
+
 /* memory functions */
 
 extern uint64_t ao_scheme_collects[2];
@@ -560,6 +594,10 @@ extern uint64_t ao_scheme_loops[2];
 /* returns 1 if the object was already marked */
 int
 ao_scheme_mark_memory(const struct ao_scheme_type *type, void *addr);
+
+/* returns 1 if the object is marked */
+int
+ao_scheme_marked(void *addr);
 
 /* returns 1 if the object was already moved */
 int
@@ -642,6 +680,18 @@ ao_scheme_vector_fetch(void) {
 }
 #endif
 
+#ifdef AO_SCHEME_FEATURE_PORT
+static inline void
+ao_scheme_port_stash(struct ao_scheme_port *port) {
+	ao_scheme_poly_stash(ao_scheme_port_poly(port));
+}
+
+static inline struct ao_scheme_port *
+ao_scheme_port_fetch(void) {
+	return ao_scheme_poly_port(ao_scheme_poly_fetch());
+}
+#endif
+
 static inline void
 ao_scheme_stack_stash(struct ao_scheme_stack *stack) {
 	ao_scheme_poly_stash(ao_scheme_stack_poly(stack));
@@ -667,7 +717,7 @@ ao_scheme_frame_fetch(void) {
 extern const struct ao_scheme_type ao_scheme_bool_type;
 
 void
-ao_scheme_bool_write(ao_poly v, bool write);
+ao_scheme_bool_write(FILE *out, ao_poly v, bool write);
 
 #ifdef AO_SCHEME_MAKE_CONST
 extern struct ao_scheme_bool	*ao_scheme_true, *ao_scheme_false;
@@ -695,25 +745,16 @@ void
 ao_scheme_cons_free(struct ao_scheme_cons *cons);
 
 void
-ao_scheme_cons_write(ao_poly, bool write);
+ao_scheme_cons_write(FILE *out, ao_poly, bool write);
 
 int
 ao_scheme_cons_length(struct ao_scheme_cons *cons);
-
-struct ao_scheme_cons *
-ao_scheme_cons_copy(struct ao_scheme_cons *cons);
 
 /* string */
 extern const struct ao_scheme_type ao_scheme_string_type;
 
 struct ao_scheme_string *
-ao_scheme_string_copy(struct ao_scheme_string *a);
-
-struct ao_scheme_string *
 ao_scheme_string_new(char *a);
-
-struct ao_scheme_string *
-ao_scheme_make_string(int32_t len, char fill);
 
 struct ao_scheme_string *
 ao_scheme_atom_to_string(struct ao_scheme_atom *a);
@@ -721,14 +762,8 @@ ao_scheme_atom_to_string(struct ao_scheme_atom *a);
 struct ao_scheme_string *
 ao_scheme_string_cat(struct ao_scheme_string *a, struct ao_scheme_string *b);
 
-ao_poly
-ao_scheme_string_pack(struct ao_scheme_cons *cons);
-
-ao_poly
-ao_scheme_string_unpack(struct ao_scheme_string *a);
-
 void
-ao_scheme_string_write(ao_poly s, bool write);
+ao_scheme_string_write(FILE *out, ao_poly s, bool write);
 
 /* atom */
 extern const struct ao_scheme_type ao_scheme_atom_type;
@@ -738,13 +773,19 @@ extern struct ao_scheme_frame	*ao_scheme_frame_global;
 extern struct ao_scheme_frame	*ao_scheme_frame_current;
 
 void
-ao_scheme_atom_write(ao_poly a, bool write);
+ao_scheme_atom_write(FILE *out, ao_poly a, bool write);
 
 struct ao_scheme_atom *
 ao_scheme_string_to_atom(struct ao_scheme_string *string);
 
 struct ao_scheme_atom *
 ao_scheme_atom_intern(char *name);
+
+void
+ao_scheme_atom_check_references(void);
+
+void
+ao_scheme_atom_move(void);
 
 ao_poly *
 ao_scheme_atom_ref(ao_poly atom, struct ao_scheme_frame **frame_ref);
@@ -753,18 +794,15 @@ ao_poly
 ao_scheme_atom_get(ao_poly atom);
 
 ao_poly
-ao_scheme_atom_set(ao_poly atom, ao_poly val);
-
-ao_poly
 ao_scheme_atom_def(ao_poly atom, ao_poly val);
 
 /* int */
 void
-ao_scheme_int_write(ao_poly i, bool write);
+ao_scheme_int_write(FILE *out, ao_poly i, bool write);
 
 #ifdef AO_SCHEME_FEATURE_BIGINT
 int32_t
-ao_scheme_poly_integer(ao_poly p, bool *fail);
+ao_scheme_poly_integer(ao_poly p);
 
 ao_poly
 ao_scheme_integer_poly(int32_t i);
@@ -776,14 +814,19 @@ ao_scheme_integer_typep(uint8_t t)
 }
 
 void
-ao_scheme_bigint_write(ao_poly i, bool write);
+ao_scheme_bigint_write(FILE *out, ao_poly i, bool write);
 
 extern const struct ao_scheme_type	ao_scheme_bigint_type;
 
 #else
 
-#define ao_scheme_poly_integer(a,b) ao_scheme_poly_int(a)
-#define ao_scheme_integer_poly ao_scheme_int_poly
+static inline int32_t ao_scheme_poly_integer(ao_poly poly) {
+	return ao_scheme_poly_int(poly);
+}
+
+static inline ao_poly ao_scheme_integer_poly(int32_t i) {
+	return ao_scheme_int_poly(i);
+}
 
 static inline int
 ao_scheme_integer_typep(uint8_t t)
@@ -795,17 +838,13 @@ ao_scheme_integer_typep(uint8_t t)
 
 /* vector */
 
+#ifdef AO_SCHEME_FEATURE_VECTOR
+
 void
-ao_scheme_vector_write(ao_poly v, bool write);
+ao_scheme_vector_write(FILE *OUT, ao_poly v, bool write);
 
 struct ao_scheme_vector *
 ao_scheme_vector_alloc(uint16_t length, ao_poly fill);
-
-ao_poly
-ao_scheme_vector_get(ao_poly v, ao_poly i);
-
-ao_poly
-ao_scheme_vector_set(ao_poly v, ao_poly i, ao_poly p);
 
 struct ao_scheme_vector *
 ao_scheme_list_to_vector(struct ao_scheme_cons *cons);
@@ -815,11 +854,66 @@ ao_scheme_vector_to_list(struct ao_scheme_vector *vector, int start, int end);
 
 extern const struct ao_scheme_type	ao_scheme_vector_type;
 
+#endif /* AO_SCHEME_FEATURE_VECTOR */
+
+/* port */
+
+#ifdef AO_SCHEME_FEATURE_PORT
+
+void
+ao_scheme_port_write(FILE *out, ao_poly v, bool write);
+
+struct ao_scheme_port *
+ao_scheme_port_alloc(FILE *file, bool stayopen);
+
+void
+ao_scheme_port_close(struct ao_scheme_port *port);
+
+void
+ao_scheme_port_check_references(void);
+
+extern ao_poly ao_scheme_open_ports;
+
+static inline int
+ao_scheme_port_getc(struct ao_scheme_port *port)
+{
+	if (port->file)
+		return getc(port->file);
+	return EOF;
+}
+
+static inline int
+ao_scheme_port_putc(struct ao_scheme_port *port, char c)
+{
+	if (port->file)
+		return putc(c, port->file);
+	return EOF;
+}
+
+static inline int
+ao_scheme_port_ungetc(struct ao_scheme_port *port, char c)
+{
+	if (port->file)
+		return ungetc(c, port->file);
+	return EOF;
+}
+
+extern const struct ao_scheme_type	ao_scheme_port_type;
+
+#endif /* AO_SCHEME_FEATURE_PORT */
+
+#ifdef AO_SCHEME_FEATURE_POSIX
+
+void
+ao_scheme_set_argv(char **argv);
+
+#endif
+
 /* prim */
-void (*ao_scheme_poly_write_func(ao_poly p))(ao_poly p, bool write);
+void (*ao_scheme_poly_write_func(ao_poly p))(FILE *out, ao_poly p, bool write);
 
 static inline void
-ao_scheme_poly_write(ao_poly p, bool write) { (*ao_scheme_poly_write_func(p))(p, write); }
+ao_scheme_poly_write(FILE *out, ao_poly p, bool write) { (*ao_scheme_poly_write_func(p))(out, p, write); }
 
 int
 ao_scheme_poly_mark(ao_poly p, uint8_t note_cons);
@@ -830,11 +924,13 @@ ao_scheme_poly_move(ao_poly *p, uint8_t note_cons);
 
 /* eval */
 
+#ifdef AO_SCHEME_FEATURE_SAVE
 void
 ao_scheme_eval_clear_globals(void);
 
 int
 ao_scheme_eval_restart(void);
+#endif
 
 ao_poly
 ao_scheme_eval(ao_poly p);
@@ -847,14 +943,14 @@ ao_scheme_set_cond(struct ao_scheme_cons *cons);
 extern const struct ao_scheme_type ao_scheme_float_type;
 
 void
-ao_scheme_float_write(ao_poly p, bool write);
+ao_scheme_float_write(FILE *out, ao_poly p, bool write);
 
 ao_poly
 ao_scheme_float_get(float value);
 #endif
 
 #ifdef AO_SCHEME_FEATURE_FLOAT
-static inline uint8_t
+static inline bool
 ao_scheme_number_typep(uint8_t t)
 {
 	return ao_scheme_integer_typep(t) || (t == AO_SCHEME_FLOAT);
@@ -863,11 +959,34 @@ ao_scheme_number_typep(uint8_t t)
 #define ao_scheme_number_typep ao_scheme_integer_typep
 #endif
 
+static inline bool
+ao_scheme_is_integer(ao_poly poly) {
+	return ao_scheme_integer_typep(ao_scheme_poly_base_type(poly));
+}
+
+static inline bool
+ao_scheme_is_number(ao_poly poly) {
+	return ao_scheme_number_typep(ao_scheme_poly_type(poly));
+}
+
 /* builtin */
 void
-ao_scheme_builtin_write(ao_poly b, bool write);
+ao_scheme_builtin_write(FILE *out, ao_poly b, bool write);
+
+ao_poly
+ao_scheme_do_typep(ao_poly proc, int type, struct ao_scheme_cons *cons);
 
 extern const struct ao_scheme_type ao_scheme_builtin_type;
+
+#define AO_SCHEME_ARG_OPTIONAL	0x100
+#define AO_SCHEME_ARG_NIL_OK	0x200
+#define AO_SCHEME_ARG_RET_POLY	0x400
+#define AO_SCHEME_ARG_END	-1
+#define AO_SCHEME_POLY		0xff
+#define AO_SCHEME_ARG_MASK	0xff
+
+int
+ao_scheme_parse_args(ao_poly name, struct ao_scheme_cons *cons, ...);
 
 /* Check argument count */
 ao_poly
@@ -891,11 +1010,11 @@ extern struct ao_scheme_cons	*ao_scheme_read_cons_tail;
 extern struct ao_scheme_cons	*ao_scheme_read_stack;
 
 ao_poly
-ao_scheme_read(void);
+ao_scheme_read(FILE *in);
 
 /* rep */
 ao_poly
-ao_scheme_read_eval_print(void);
+ao_scheme_read_eval_print(FILE *read_file, FILE *write_file, bool interactive);
 
 /* frame */
 extern const struct ao_scheme_type ao_scheme_frame_type;
@@ -923,8 +1042,13 @@ ao_scheme_frame_bind(struct ao_scheme_frame *frame, int num, ao_poly atom, ao_po
 ao_poly
 ao_scheme_frame_add(struct ao_scheme_frame *frame, ao_poly atom, ao_poly val);
 
+#ifdef AO_SCHEME_FEATURE_UNDEF
+ao_poly
+ao_scheme_frame_del(struct ao_scheme_frame *frame, ao_poly atom);
+#endif
+
 void
-ao_scheme_frame_write(ao_poly p, bool write);
+ao_scheme_frame_write(FILE *out, ao_poly p, bool write);
 
 void
 ao_scheme_frame_init(void);
@@ -938,7 +1062,7 @@ struct ao_scheme_lambda *
 ao_scheme_lambda_new(ao_poly cons);
 
 void
-ao_scheme_lambda_write(ao_poly lambda, bool write);
+ao_scheme_lambda_write(FILE *out, ao_poly lambda, bool write);
 
 ao_poly
 ao_scheme_lambda_eval(void);
@@ -961,10 +1085,7 @@ void
 ao_scheme_stack_pop(void);
 
 void
-ao_scheme_stack_clear(void);
-
-void
-ao_scheme_stack_write(ao_poly stack, bool write);
+ao_scheme_stack_write(FILE *out, ao_poly stack, bool write);
 
 ao_poly
 ao_scheme_stack_eval(void);
@@ -972,10 +1093,10 @@ ao_scheme_stack_eval(void);
 /* error */
 
 void
-ao_scheme_vprintf(const char *format, va_list args);
+ao_scheme_vfprintf(FILE *out, const char *format, va_list args);
 
 void
-ao_scheme_printf(const char *format, ...);
+ao_scheme_fprintf(FILE *out, const char *format, ...);
 
 ao_poly
 ao_scheme_error(int error, const char *format, ...);
@@ -997,12 +1118,12 @@ int ao_scheme_stack_depth;
 #define DBG_IN()	(++ao_scheme_stack_depth)
 #define DBG_OUT()	(--ao_scheme_stack_depth)
 #define DBG_RESET()	(ao_scheme_stack_depth = 0)
-#define DBG(...) 	ao_scheme_printf(__VA_ARGS__)
+#define DBG(...) 	ao_scheme_fprintf(stdout, __VA_ARGS__)
 #define DBGI(...)	do { printf("%4d: ", __LINE__); DBG_INDENT(); DBG(__VA_ARGS__); } while (0)
-#define DBG_CONS(a)	ao_scheme_cons_write(ao_scheme_cons_poly(a), true)
-#define DBG_POLY(a)	ao_scheme_poly_write(a, true)
+#define DBG_CONS(a)	ao_scheme_cons_write(stdout, ao_scheme_cons_poly(a), true)
+#define DBG_POLY(a)	ao_scheme_poly_write(stdout, a, true)
 #define OFFSET(a)	((a) ? (int) ((uint8_t *) a - ao_scheme_pool) : -1)
-#define DBG_STACK()	ao_scheme_stack_write(ao_scheme_stack_poly(ao_scheme_stack), true)
+#define DBG_STACK()	ao_scheme_stack_write(stdout, ao_scheme_stack_poly(ao_scheme_stack), true)
 static inline void
 ao_scheme_frames_dump(void)
 {
@@ -1071,7 +1192,7 @@ extern int dbg_mem;
 #define MDBG_MOVE(...) do { if (dbg_mem) { int d; for (d = 0; d < dbg_move_depth; d++) printf ("  "); printf(__VA_ARGS__); } } while (0)
 #define MDBG_MORE(...) do { if (dbg_mem) printf(__VA_ARGS__); } while (0)
 #define MDBG_MOVE_IN()	(dbg_move_depth++)
-#define MDBG_MOVE_OUT()	(assert(--dbg_move_depth >= 0))
+#define MDBG_MOVE_OUT()	(--dbg_move_depth)
 
 #else
 

@@ -15,13 +15,15 @@
 #include "ao_scheme.h"
 
 ao_poly
-ao_scheme_read_eval_print(void)
+ao_scheme_read_eval_print(FILE *read_file, FILE *write_file, bool interactive)
 {
 	ao_poly	in, out = AO_SCHEME_NIL;
 
 	ao_scheme_exception = 0;
 	for(;;) {
-		in = ao_scheme_read();
+		if (interactive)
+			fputs("> ", write_file);
+		in = ao_scheme_read(read_file);
 		if (in == _ao_scheme_atom_eof)
 			break;
 		out = ao_scheme_eval(in);
@@ -30,8 +32,10 @@ ao_scheme_read_eval_print(void)
 				break;
 			ao_scheme_exception = 0;
 		} else {
-			ao_scheme_poly_write(out, true);
-			putchar ('\n');
+			if (write_file) {
+				ao_scheme_poly_write(write_file, out, true);
+				putc('\n', write_file);
+			}
 		}
 	}
 	return out;

@@ -38,15 +38,21 @@ const struct ao_scheme_type ao_scheme_bool_type = {
 };
 
 void
-ao_scheme_bool_write(ao_poly v, bool write)
+ao_scheme_bool_write(FILE *out, ao_poly v, bool write)
 {
 	struct ao_scheme_bool	*b = ao_scheme_poly_bool(v);
 
 	(void) write;
 	if (b->value)
-		printf("#t");
+		fprintf(out, "#t");
 	else
-		printf("#f");
+		fprintf(out, "#f");
+}
+
+ao_poly
+ao_scheme_do_booleanp(struct ao_scheme_cons *cons)
+{
+	return ao_scheme_do_typep(_ao_scheme_atom_boolean3f, AO_SCHEME_BOOL, cons);
 }
 
 #ifdef AO_SCHEME_MAKE_CONST

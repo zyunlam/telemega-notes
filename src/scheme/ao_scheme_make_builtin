@@ -227,6 +227,22 @@ dump_atom_names(builtin_t[*] builtins) {
 	printf("#endif /* AO_SCHEME_BUILTIN_ATOM_NAMES */\n");
 }
 
+void
+dump_syntax_atoms(builtin_t[*] builtins) {
+	printf("#ifdef AO_SCHEME_BUILTIN_SYNTAX_ATOMS\n");
+	printf("#undef AO_SCHEME_BUILTIN_SYNTAX_ATOMS\n");
+	printf("static const char *syntax_atoms[] = {\n");
+	for (int i = 0; i < dim(builtins); i++) {
+		if (is_atom(builtins[i])) {
+			for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
+				printf("\t\"%s\",\n", builtins[i].lisp_names[j]);
+			}
+		}
+	}
+	printf("};\n");
+	printf("#endif /* AO_SCHEME_BUILTIN_SYNTAX_ATOMS */\n");
+}
+
 bool
 has_feature(string[*] features, string feature)
 {
@@ -245,7 +261,9 @@ dump_features(builtin_t[*] builtins) {
 			string feature = builtins[i].feature;
 			if (!has_feature(features, feature)) {
 				features[dim(features)] = feature;
+				printf("#ifndef AO_SCHEME_NO_FEATURE_%s\n", feature);
 				printf("#define AO_SCHEME_FEATURE_%s\n", feature);
+				printf("#endif /* AO_SCHEME_NO_FEATURE_%s */\n", feature);
 			}
 		}
 	}
@@ -269,6 +287,7 @@ void main() {
 		dump_consts(builtins);
 		dump_atoms(builtins);
 		dump_atom_names(builtins);
+		dump_syntax_atoms(builtins);
 		dump_features(builtins);
 	}
 }

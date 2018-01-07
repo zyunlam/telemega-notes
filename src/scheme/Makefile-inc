@@ -16,7 +16,8 @@ SCHEME_SRCS=\
 	ao_scheme_save.c \
 	ao_scheme_stack.c \
 	ao_scheme_error.c \
-	ao_scheme_vector.c
+	ao_scheme_vector.c \
+	ao_scheme_port.c
 
 SCHEME_HDRS=\
 	ao_scheme.h \
@@ -25,6 +26,10 @@ SCHEME_HDRS=\
 	ao_scheme_builtin.h
 
 SCHEME_SCHEME=\
-	ao_scheme_const.scheme \
+	ao_scheme_basic_syntax.scheme \
+	ao_scheme_advanced_syntax.scheme \
 	ao_scheme_vector.scheme \
-	ao_scheme_string.scheme
+	ao_scheme_string.scheme \
+	ao_scheme_char.scheme \
+	ao_scheme_port.scheme \
+	ao_scheme_finish.scheme

@@ -23,7 +23,7 @@ ao-scheme: $(OBJS)
 $(OBJS): $(HDRS)
 
 ao_scheme_const.h: ao_scheme_make_const $(SCHEME_SCHEME)
-	$^ -o $@
+	$^ -o $@ -d GPIO
 
 clean::
 	rm -f $(OBJS) ao-scheme ao_scheme_const.h

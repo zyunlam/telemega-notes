@@ -271,8 +271,10 @@ ao_scheme_eval_exec(void)
 		}
 
 		ao_scheme_v = v;
-		ao_scheme_stack->values = AO_SCHEME_NIL;
-		ao_scheme_stack->values_tail = AO_SCHEME_NIL;
+		if (ao_scheme_stack->state != eval_exec) {
+			ao_scheme_stack->values = AO_SCHEME_NIL;
+			ao_scheme_stack->values_tail = AO_SCHEME_NIL;
+		}
 		DBGI(".. result "); DBG_POLY(ao_scheme_v); DBG ("\n");
 		DBGI(".. frame "); DBG_POLY(ao_scheme_frame_poly(ao_scheme_frame_current)); DBG("\n");
 		break;
@@ -530,6 +532,7 @@ const char * const ao_scheme_state_names[] = {
 	[eval_macro] = "macro",
 };
 
+#ifdef AO_SCHEME_FEATURE_SAVE
 /*
  * Called at restore time to reset all execution state
  */
@@ -547,6 +550,7 @@ ao_scheme_eval_restart(void)
 {
 	return ao_scheme_stack_push();
 }
+#endif /* AO_SCHEME_FEATURE_SAVE */
 
 ao_poly
 ao_scheme_eval(ao_poly _v)
@@ -559,12 +563,11 @@ ao_scheme_eval(ao_poly _v)
 		return AO_SCHEME_NIL;
 
 	while (ao_scheme_stack) {
-		if (!(*evals[ao_scheme_stack->state])() || ao_scheme_exception) {
-			ao_scheme_stack_clear();
-			return AO_SCHEME_NIL;
-		}
+		if (!(*evals[ao_scheme_stack->state])() || ao_scheme_exception)
+			break;
 	}
 	DBG_DO(if (ao_scheme_frame_current) {DBGI("frame left as "); DBG_POLY(ao_scheme_frame_poly(ao_scheme_frame_current)); DBG("\n");});
+	ao_scheme_stack = NULL;
 	ao_scheme_frame_current = NULL;
 	return ao_scheme_v;
 }

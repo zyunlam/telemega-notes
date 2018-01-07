@@ -72,66 +72,57 @@ ao_scheme_vector_alloc(uint16_t length, ao_poly fill)
 	return vector;
 }
 
+struct vl {
+	struct ao_scheme_vector	*vector;
+	struct vl *prev;
+};
+
+static struct vl *vl;
+static unsigned int vd;
+
 void
-ao_scheme_vector_write(ao_poly v, bool write)
+ao_scheme_vector_write(FILE *out, ao_poly v, bool write)
 {
 	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
-	unsigned int i;
+	unsigned int i, j;
 	int was_marked = 0;
+	struct vl *ve;
+
+	++vd;
+	for (ve = vl; ve; ve = ve->prev)
+		if (ve->vector == vector)
+			abort();
+
+	ve = malloc(sizeof (struct vl));
+	ve->prev = vl;
+	ve->vector = vector;
+	vl = ve;
 
 	ao_scheme_print_start();
 	was_marked = ao_scheme_print_mark_addr(vector);
 	if (was_marked) {
-		printf ("...");
+		fputs("...", out);
 	} else {
-		printf("#(");
+		fputs("#(\n", out);
 		for (i = 0; i < vector->length; i++) {
-			if (i != 0)
-				printf(" ");
-			ao_scheme_poly_write(vector->vals[i], write);
+			printf("%3d: ", i);
+			for (j = 0; j < vd; j++)
+				printf(".");
+			ao_scheme_poly_write(out, vector->vals[i], write);
+			printf("\n");
 		}
+		printf("     ");
+		for (j = 0; j < vd; j++)
+			printf(".");
 		printf(")");
 	}
 	if (ao_scheme_print_stop() && !was_marked)
 		ao_scheme_print_clear_addr(vector);
-}
-
-static int32_t
-ao_scheme_vector_offset(struct ao_scheme_vector *vector, ao_poly i)
-{
-	bool	fail;
-	int32_t	offset = ao_scheme_poly_integer(i, &fail);
-
-	if (fail)
-		ao_scheme_error(AO_SCHEME_INVALID, "vector index %v not integer", i);
-	if (offset < 0 || vector->length <= offset) {
-		ao_scheme_error(AO_SCHEME_INVALID, "vector index %v out of range (max %d)",
-				i, vector->length);
-		offset = -1;
-	}
-	return offset;
-}
-
-ao_poly
-ao_scheme_vector_get(ao_poly v, ao_poly i)
-{
-	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
-	int32_t			offset = ao_scheme_vector_offset(vector, i);
-
-	if (offset < 0)
-		return AO_SCHEME_NIL;
-	return vector->vals[offset];
-}
-
-ao_poly
-ao_scheme_vector_set(ao_poly v, ao_poly i, ao_poly p)
-{
-	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
-	int32_t			offset = ao_scheme_vector_offset(vector, i);
-
-	if (offset < 0)
-		return AO_SCHEME_NIL;
-	return vector->vals[offset] = p;
+	if (vl != ve)
+		abort();
+	vl = ve->prev;
+	free(ve);
+	--vd;
 }
 
 struct ao_scheme_vector *
@@ -179,6 +170,120 @@ ao_scheme_vector_to_list(struct ao_scheme_vector *vector, int start, int end)
 			return NULL;
 	}
 	return cons;
+}
+
+ao_poly
+ao_scheme_do_vector(struct ao_scheme_cons *cons)
+{
+	return ao_scheme_vector_poly(ao_scheme_list_to_vector(cons));
+}
+
+ao_poly
+ao_scheme_do_make_vector(struct ao_scheme_cons *cons)
+{
+	int32_t	len;
+	ao_poly	val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_make2dvector, cons,
+				  AO_SCHEME_INT, &len,
+				  AO_SCHEME_POLY|AO_SCHEME_ARG_OPTIONAL, _ao_scheme_bool_false, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_vector_poly(ao_scheme_vector_alloc(len, val));
+}
+
+static bool
+ao_scheme_check_vector(ao_poly proc, struct ao_scheme_vector *vector, int32_t offset)
+{
+	if (offset < 0 || vector->length <= offset) {
+		(void) ao_scheme_error(AO_SCHEME_INVALID, "%v: vector index %d out of range (max %d)",
+				       proc,
+				       offset, vector->length);
+		return false;
+	}
+	return true;
+}
+
+ao_poly
+ao_scheme_do_vector_ref(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_vector	*vector;
+	int32_t			offset;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_vector2dref, cons,
+				  AO_SCHEME_VECTOR, &vector,
+				  AO_SCHEME_INT, &offset,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_vector(_ao_scheme_atom_vector2dref, vector, offset))
+		return AO_SCHEME_NIL;
+	return vector->vals[offset];
+}
+
+ao_poly
+ao_scheme_do_vector_set(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_vector	*vector;
+	int32_t			offset;
+	ao_poly			val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_vector2dset21, cons,
+				  AO_SCHEME_VECTOR, &vector,
+				  AO_SCHEME_INT, &offset,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	if (!ao_scheme_check_vector(_ao_scheme_atom_vector2dset21, vector, offset))
+		return AO_SCHEME_NIL;
+	vector->vals[offset] = val;
+	return val;
+}
+
+ao_poly
+ao_scheme_do_list_to_vector(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_cons	*pair;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_list2d3evector, cons,
+				  AO_SCHEME_CONS|AO_SCHEME_ARG_NIL_OK, &pair,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_vector_poly(ao_scheme_list_to_vector(pair));
+}
+
+ao_poly
+ao_scheme_do_vector_to_list(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_vector	*vector;
+	int32_t			start, end;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_vector2d3elist, cons,
+				  AO_SCHEME_VECTOR, &vector,
+				  AO_SCHEME_INT|AO_SCHEME_ARG_OPTIONAL, ao_scheme_int_poly(0), &start,
+				  AO_SCHEME_INT|AO_SCHEME_ARG_OPTIONAL, ao_scheme_int_poly(-1), &end,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	if (end == -1)
+		end = vector->length;
+	return ao_scheme_cons_poly(ao_scheme_vector_to_list(vector, start, end));
+}
+
+ao_poly
+ao_scheme_do_vector_length(struct ao_scheme_cons *cons)
+{
+	struct ao_scheme_vector	*vector;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_vector2d3elist, cons,
+				  AO_SCHEME_VECTOR, &vector,
+				  AO_SCHEME_ARG_END))
+		return AO_SCHEME_NIL;
+	return ao_scheme_integer_poly(vector->length);
+}
+
+ao_poly
+ao_scheme_do_vectorp(struct ao_scheme_cons *cons)
+{
+	return ao_scheme_do_typep(_ao_scheme_atom_vector3f, AO_SCHEME_VECTOR, cons);
 }
 
 #endif /* AO_SCHEME_FEATURE_VECTOR */

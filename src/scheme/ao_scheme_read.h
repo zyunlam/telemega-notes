@@ -35,9 +35,10 @@
 # define FLOAT			10
 #endif
 # define DOT			11
-# define BOOL			12
+# define TRUE_TOKEN		12
+# define FALSE_TOKEN		13
 #ifdef AO_SCHEME_FEATURE_VECTOR
-# define OPEN_VECTOR		13
+# define OPEN_VECTOR		14
 #endif
 
 /*
@@ -51,7 +52,8 @@
 #else
 # define SPECIAL_QUASI	0
 #endif
-# define DOTC		0x0004	/* . */
+#
+# define ALPHA		0x0004	/* A-Z a-z */
 # define WHITE		0x0008	/* ' ' \t \n */
 # define DIGIT		0x0010	/* [0-9] */
 # define SIGN		0x0020	/* +- */

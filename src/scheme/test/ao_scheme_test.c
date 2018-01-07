@@ -14,9 +14,8 @@
 
 #include "ao_scheme.h"
 #include <stdio.h>
-
-static FILE *ao_scheme_file;
-static int newline = 1;
+#include <unistd.h>
+#include <getopt.h>
 
 static char save_file[] = "scheme.image";
 
@@ -69,43 +68,86 @@ ao_scheme_os_restore(void)
 	return 1;
 }
 
-int
-ao_scheme_getc(void)
+static const struct option options[] = {
+	{ .name = "load", .has_arg = 1, .val = 'l' },
+	{ 0, 0, 0, 0 },
+};
+
+static void usage(char *program)
 {
-	int c;
+	fprintf(stderr, "usage: %s [--load=<library> ...] <program ...>\n", program);
+}
 
-	if (ao_scheme_file)
-		return getc(ao_scheme_file);
+static void
+check_exit(ao_poly v)
+{
+	if (ao_scheme_exception & AO_SCHEME_EXIT) {
+		int	ret;
 
-	if (newline) {
-		if (ao_scheme_read_list)
-			printf("+ ");
-		else
-			printf("> ");
-		newline = 0;
+		if (v == _ao_scheme_bool_true)
+			ret = 0;
+		else {
+			ret = 1;
+			if (ao_scheme_is_integer(v))
+				ret = ao_scheme_poly_integer(v);
+		}
+		exit(ret);
 	}
-	c = getchar();
-	if (c == '\n')
-		newline = 1;
-	return c;
+}
+
+static void
+run_file(char *name)
+{
+	FILE	*in;
+	int 	c;
+	ao_poly	v;
+
+	in = fopen(name, "r");
+	if (!in) {
+		perror(name);
+		exit(1);
+	}
+	c = getc(in);
+	if (c == '#') {
+		do {
+			c = getc(in);
+		} while (c != EOF && c != '\n');
+	} else {
+		ungetc(c, in);
+	}
+	v = ao_scheme_read_eval_print(in, NULL, false);
+	fclose(in);
+	check_exit(v);
 }
 
 int
 main (int argc, char **argv)
 {
-	(void) argc;
+	int	o;
 
-	while (*++argv) {
-		ao_scheme_file = fopen(*argv, "r");
-		if (!ao_scheme_file) {
-			perror(*argv);
+	while ((o = getopt_long(argc, argv, "?l:", options, NULL)) != -1) {
+		switch (o) {
+		case '?':
+			usage(argv[0]);
+			exit(0);
+		case 'l':
+			ao_scheme_set_argv(&argv[argc]);
+			run_file(optarg);
+			break;
+		default:
+			usage(argv[0]);
 			exit(1);
 		}
-		ao_scheme_read_eval_print();
-		fclose(ao_scheme_file);
-		ao_scheme_file = NULL;
 	}
-	ao_scheme_read_eval_print();
+	ao_scheme_set_argv(argv + optind);
+	if (argv[optind]) {
+		run_file(argv[optind]);
+	} else {
+		ao_poly v;
+		v = ao_scheme_read_eval_print(stdin, stdout, true);
+		check_exit(v);
+		putchar('\n');
+	}
 
 #ifdef DBG_MEM_STATS
 	printf ("collects: full: %lu incremental %lu\n",
@@ -138,4 +180,5 @@ main (int argc, char **argv)
 	       (double) ao_scheme_freed[AO_SCHEME_COLLECT_INCREMENTAL] /
 	       (double) ao_scheme_loops[AO_SCHEME_COLLECT_INCREMENTAL]);
 #endif
+	return 0;
 }

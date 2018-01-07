@@ -36,12 +36,12 @@ frame_vals_mark(void *addr)
 	for (f = 0; f < vals->size; f++) {
 		struct ao_scheme_val	*v = &vals->vals[f];
 
+		ao_scheme_poly_mark(v->atom, 0);
 		ao_scheme_poly_mark(v->val, 0);
-		MDBG_MOVE("frame mark atom %s %d val %d at %d    ",
+		MDBG_MOVE("frame mark atom %s %d val %d at %d\n",
 			  ao_scheme_poly_atom(v->atom)->name,
 			  MDBG_OFFSET(ao_scheme_ref(v->atom)),
 			  MDBG_OFFSET(ao_scheme_ref(v->val)), f);
-		MDBG_DO(printf("\n"));
 	}
 }
 
@@ -140,16 +140,16 @@ const struct ao_scheme_type ao_scheme_frame_type = {
 int ao_scheme_frame_print_indent;
 
 static void
-ao_scheme_frame_indent(int extra)
+ao_scheme_frame_indent(FILE *out, int extra)
 {
 	int				i;
-	putchar('\n');
+	putc('\n', out);
 	for (i = 0; i < ao_scheme_frame_print_indent+extra; i++)
-		putchar('\t');
+		putc('\t', out);
 }
 
 void
-ao_scheme_frame_write(ao_poly p, bool write)
+ao_scheme_frame_write(FILE *out, ao_poly p, bool write)
 {
 	struct ao_scheme_frame		*frame = ao_scheme_poly_frame(p);
 	struct ao_scheme_frame		*clear = frame;
@@ -161,23 +161,23 @@ ao_scheme_frame_write(ao_poly p, bool write)
 		struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
 
 		if (written != 0)
-			printf(", ");
+			fputs(", ", out);
 		if (ao_scheme_print_mark_addr(frame)) {
-			printf("recurse...");
+			fputs("recurse...", out);
 			break;
 		}
 
-		putchar('{');
+		putc('{', out);
 		written++;
 		for (f = 0; f < frame->num; f++) {
-			ao_scheme_frame_indent(1);
-			ao_scheme_poly_write(vals->vals[f].atom, write);
-			printf(" = ");
-			ao_scheme_poly_write(vals->vals[f].val, write);
+			ao_scheme_frame_indent(out, 1);
+			ao_scheme_poly_write(out, vals->vals[f].atom, write);
+			fputs(" = ", out);
+			ao_scheme_poly_write(out, vals->vals[f].val, write);
 		}
 		frame = ao_scheme_poly_frame(frame->prev);
-		ao_scheme_frame_indent(0);
-		putchar('}');
+		ao_scheme_frame_indent(out, 0);
+		putc('}', out);
 	}
 	if (ao_scheme_print_stop()) {
 		while (written--) {
@@ -344,6 +344,41 @@ ao_scheme_frame_add(struct ao_scheme_frame *frame, ao_poly atom, ao_poly val)
 		*ref = val;
 	return val;
 }
+
+#ifdef AO_SCHEME_FEATURE_UNDEF
+ao_poly
+ao_scheme_frame_del(struct ao_scheme_frame *frame, ao_poly atom)
+{
+	struct ao_scheme_frame_vals	*vals = ao_scheme_poly_frame_vals(frame->vals);
+	int				l = ao_scheme_frame_find(frame, frame->num, atom);
+	int				f = frame->num;
+	struct ao_scheme_frame		*moved_frame;
+
+	if (l >= frame->num)
+		return _ao_scheme_bool_false;
+
+	if (vals->vals[l].atom != atom)
+		return _ao_scheme_bool_false;
+
+	/* squash the deleted entry */
+	memmove(&vals->vals[l],
+		&vals->vals[l+1],
+		(f - l) * sizeof (struct ao_scheme_val));
+
+	/* allocate a smaller vals array */
+	ao_scheme_frame_stash(frame);
+	moved_frame = ao_scheme_frame_realloc(frame, f - 1);
+	frame = ao_scheme_frame_fetch();
+
+	/*
+	 * We couldn't allocate a smaller frame, so just
+	 * ignore the last value in the array
+	 */
+	if (!moved_frame)
+		frame->num = f - 1;
+	return _ao_scheme_bool_true;
+}
+#endif
 
 struct ao_scheme_frame	*ao_scheme_frame_global;
 struct ao_scheme_frame	*ao_scheme_frame_current;

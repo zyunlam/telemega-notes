@@ -14,17 +14,17 @@
 
 #include "ao_scheme.h"
 
+#ifdef AO_SCHEME_FEATURE_SAVE
 ao_poly
 ao_scheme_do_save(struct ao_scheme_cons *cons)
 {
-#ifdef AO_SCHEME_SAVE
+#ifndef AO_SCHEME_MAKE_CONST
 	struct ao_scheme_os_save *os;
-#endif
 
-	if (!ao_scheme_check_argc(_ao_scheme_atom_save, cons, 0, 0))
+	if (!ao_scheme_parse_args(_ao_scheme_atom_save, cons,
+				  AO_SCHEME_ARG_END))
 		return AO_SCHEME_NIL;
 
-#ifdef AO_SCHEME_SAVE
 	os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
 
 	ao_scheme_collect(AO_SCHEME_COLLECT_FULL);
@@ -35,6 +35,8 @@ ao_scheme_do_save(struct ao_scheme_cons *cons)
 
 	if (ao_scheme_os_save())
 		return _ao_scheme_bool_true;
+#else
+	(void) cons;
 #endif
 	return _ao_scheme_bool_false;
 }
@@ -42,14 +44,13 @@ ao_scheme_do_save(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_restore(struct ao_scheme_cons *cons)
 {
-#ifdef AO_SCHEME_SAVE
+#ifndef AO_SCHEME_MAKE_CONST
 	struct ao_scheme_os_save save;
 	struct ao_scheme_os_save *os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
-#endif
-	if (!ao_scheme_check_argc(_ao_scheme_atom_save, cons, 0, 0))
+	if (!ao_scheme_parse_args(_ao_scheme_atom_restore, cons,
+				  AO_SCHEME_ARG_END))
 		return AO_SCHEME_NIL;
 
-#ifdef AO_SCHEME_SAVE
 	os = (struct ao_scheme_os_save *) (void *) &ao_scheme_pool[AO_SCHEME_POOL];
 
 	if (!ao_scheme_os_restore_save(&save, AO_SCHEME_POOL))
@@ -79,6 +80,10 @@ ao_scheme_do_restore(struct ao_scheme_cons *cons)
 
 		return _ao_scheme_bool_true;
 	}
+#else
+	(void) cons;
 #endif
 	return _ao_scheme_bool_false;
 }
+
+#endif /* AO_SCHEME_FEATURE_SAVE */

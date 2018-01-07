@@ -13,7 +13,7 @@
 ;
 ; Lisp code placed in ROM
 
-(def (quote _?_) (lambda (a b) (cond ((eq? a b) a) (else (exit)))))
+(def (quote _?_) (lambda (a b) (cond ((eq? a b) a) (else (exit 1)))))
 
 					; return a list containing all of the arguments
 (def (quote list) (lambda l l))
@@ -502,7 +502,7 @@
 					;
 					; (let* ((x 1) (y)) (set! y (+ x 1)) y)
 
-(define let*
+(define letrec
   (macro (vars . exprs)
 
 					;
@@ -553,7 +553,11 @@
 	 )
      )
 
-(_??_ (let* ((x 1) (y x)) (+ x y)) 2)
+(_??_ (letrec ((x 1) (y x)) (+ x y)) 2)
+
+					; letrec is sufficient for let*
+
+(define let* letrec)
 
 (define when (macro (test . l) `(cond (,test ,@l))))
 
@@ -767,20 +771,25 @@
     )
   )
 
-(for-each display '("hello" " " "world" "\n"))
+(_??_ (let ((a 0))
+	(for-each (lambda (b) (set! a (+ a b))) '(1 2 3))
+	a
+	)
+      6)
+      
 
 (define (newline) (write-char #\newline))
 
 (newline)
 
-(call-with-current-continuation
- (lambda (exit)
-   (for-each (lambda (x)
-	       (write "test" x)
-	       (if (negative? x)
-		   (exit x)))
-	     '(54 0 37 -3 245 19))
-   #t))
+(_??_ (call-with-current-continuation
+       (lambda (exit)
+	 (for-each (lambda (x)
+		     (if (negative? x)
+			 (exit x)))
+		   '(54 0 37 -3 245 19))
+	 #t))
+      -3)
 
 
 					; `q -> (quote q)
@@ -813,7 +822,7 @@
   )
 
 (repeat 2 (write 'hello))
-(repeat (x 3) (write 'goodbye x))
+(repeat (x 3) (write (list 'goodbye x)))
 
 (define case
   (macro (test . l)
@@ -860,11 +869,11 @@
 	 )
   )
 
-(_??_ (case 1 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else")) "one")
-(_??_ (case 2 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else")) "two")
-(_??_ (case 3 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x) "three")) (12 "twelve") (else "else")) "three")
-(_??_ (case 4 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else")) "else")
-(_??_ (case 12 (1 "one") (2 "two") (3 => (lambda (x) (write "the value is" x))) (12 "twelve") (else "else")) "twelve")
+(_??_ (case 1 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "one")
+(_??_ (case 2 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "two")
+(_??_ (case 3 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)) "three")) (12 "twelve") (else "else")) "three")
+(_??_ (case 4 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "else")
+(_??_ (case 12 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "twelve")
 
 (define do
   (macro (vars test . cmds)
@@ -889,12 +898,17 @@
     )
   )
 
-(do ((x 1 (+ x 1)))
-    ((= x 10) "done")
-  (display "x: ")
-  (write x)
-  (newline)
+(define (eof-object? a)
+  (equal? a 'eof)
   )
+
+(_??_ (do ((x 1 (+ x 1))
+	   (y 0)
+	   )
+	  ((= x 10) y)
+	(set! y (+ y x))
+	)
+      45)
 
 (_??_ (do ((vec (make-vector 5))
 	   (i 0 (+ i 1)))

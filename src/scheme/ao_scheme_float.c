@@ -46,22 +46,22 @@ const struct ao_scheme_type ao_scheme_float_type = {
 #endif
 
 void
-ao_scheme_float_write(ao_poly p, bool write)
+ao_scheme_float_write(FILE *out, ao_poly p, bool write)
 {
 	struct ao_scheme_float *f = ao_scheme_poly_float(p);
 	float	v = f->value;
 
 	(void) write;
 	if (isnanf(v))
-		printf("+nan.0");
+		fputs("+nan.0", out);
 	else if (isinff(v)) {
 		if (v < 0)
-			printf("-");
+			putc('-', out);
 		else
-			printf("+");
-		printf("inf.0");
+			putc('+', out);
+		fputs("inf.0", out);
 	} else
-		printf (FLOAT_FORMAT, v);
+		fprintf(out, FLOAT_FORMAT, v);
 }
 
 float
@@ -95,9 +95,13 @@ ao_scheme_float_get(float value)
 ao_poly
 ao_scheme_do_inexactp(struct ao_scheme_cons *cons)
 {
-	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
+	ao_poly	val;
+
+	if (!ao_scheme_parse_args(_ao_scheme_atom_inexact3f, cons,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
 		return AO_SCHEME_NIL;
-	if (ao_scheme_poly_type(ao_scheme_arg(cons, 0)) == AO_SCHEME_FLOAT)
+	if (ao_scheme_poly_type(val) == AO_SCHEME_FLOAT)
 		return _ao_scheme_bool_true;
 	return _ao_scheme_bool_false;
 }
@@ -105,18 +109,19 @@ ao_scheme_do_inexactp(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_finitep(struct ao_scheme_cons *cons)
 {
-	ao_poly	value;
+	ao_poly	val;
 	float	f;
 
-	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
+	if (!ao_scheme_parse_args(_ao_scheme_atom_inexact3f, cons,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
 		return AO_SCHEME_NIL;
-	value = ao_scheme_arg(cons, 0);
-	switch (ao_scheme_poly_type(value)) {
+	switch (ao_scheme_poly_type(val)) {
 	case AO_SCHEME_INT:
 	case AO_SCHEME_BIGINT:
 		return _ao_scheme_bool_true;
 	case AO_SCHEME_FLOAT:
-		f = ao_scheme_poly_float(value)->value;
+		f = ao_scheme_poly_float(val)->value;
 		if (!isnan(f) && !isinf(f))
 			return _ao_scheme_bool_true;
 	}
@@ -126,15 +131,16 @@ ao_scheme_do_finitep(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_infinitep(struct ao_scheme_cons *cons)
 {
-	ao_poly	value;
+	ao_poly	val;
 	float	f;
 
-	if (!ao_scheme_check_argc(_ao_scheme_atom_led, cons, 1, 1))
+	if (!ao_scheme_parse_args(_ao_scheme_atom_inexact3f, cons,
+				  AO_SCHEME_POLY, &val,
+				  AO_SCHEME_ARG_END))
 		return AO_SCHEME_NIL;
-	value = ao_scheme_arg(cons, 0);
-	switch (ao_scheme_poly_type(value)) {
+	switch (ao_scheme_poly_type(val)) {
 	case AO_SCHEME_FLOAT:
-		f = ao_scheme_poly_float(value)->value;
+		f = ao_scheme_poly_float(val)->value;
 		if (isinf(f))
 			return _ao_scheme_bool_true;
 	}
@@ -144,13 +150,12 @@ ao_scheme_do_infinitep(struct ao_scheme_cons *cons)
 ao_poly
 ao_scheme_do_sqrt(struct ao_scheme_cons *cons)
 {
-	ao_poly	value;
+	float	f;
 
-	if (!ao_scheme_check_argc(_ao_scheme_atom_sqrt, cons, 1, 1))
+	if (!ao_scheme_parse_args(_ao_scheme_atom_sqrt, cons,
+				  AO_SCHEME_FLOAT, &f,
+				  AO_SCHEME_ARG_END))
 		return AO_SCHEME_NIL;
-	value = ao_scheme_arg(cons, 0);
-	if (!ao_scheme_number_typep(ao_scheme_poly_type(value)))
-		return ao_scheme_error(AO_SCHEME_INVALID, "%s: non-numeric", ao_scheme_poly_atom(_ao_scheme_atom_sqrt)->name);
-	return ao_scheme_float_get(sqrtf(ao_scheme_poly_number(value)));
+	return ao_scheme_float_get(sqrtf(f));
 }
 #endif

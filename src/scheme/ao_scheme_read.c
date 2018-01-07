@@ -18,147 +18,147 @@
 #include <stdlib.h>
 
 static const uint16_t	lex_classes[128] = {
-	IGNORE,		/* ^@ */
-	IGNORE,		/* ^A */
-	IGNORE,		/* ^B */
-	IGNORE,		/* ^C */
-	IGNORE,		/* ^D */
-	IGNORE,		/* ^E */
-	IGNORE,		/* ^F */
-	IGNORE,		/* ^G */
-	IGNORE,		/* ^H */
-	WHITE,		/* ^I */
-	WHITE,		/* ^J */
-	WHITE,		/* ^K */
-	WHITE,		/* ^L */
-	WHITE,		/* ^M */
-	IGNORE,		/* ^N */
-	IGNORE,		/* ^O */
-	IGNORE,		/* ^P */
-	IGNORE,		/* ^Q */
-	IGNORE,		/* ^R */
-	IGNORE,		/* ^S */
-	IGNORE,		/* ^T */
-	IGNORE,		/* ^U */
-	IGNORE,		/* ^V */
-	IGNORE,		/* ^W */
-	IGNORE,		/* ^X */
-	IGNORE,		/* ^Y */
-	IGNORE,		/* ^Z */
-	IGNORE,		/* ^[ */
-	IGNORE,		/* ^\ */
-	IGNORE,		/* ^] */
-	IGNORE,		/* ^^ */
-	IGNORE,		/* ^_ */
-	PRINTABLE|WHITE,	/*    */
- 	PRINTABLE,		/* ! */
- 	PRINTABLE|STRINGC,	/* " */
- 	PRINTABLE,		/* # */
- 	PRINTABLE,		/* $ */
- 	PRINTABLE,		/* % */
- 	PRINTABLE,		/* & */
- 	PRINTABLE|SPECIAL,	/* ' */
- 	PRINTABLE|SPECIAL,	/* ( */
- 	PRINTABLE|SPECIAL,	/* ) */
- 	PRINTABLE,		/* * */
- 	PRINTABLE|SIGN,		/* + */
+	IGNORE,				/* ^@ */
+	IGNORE,				/* ^A */
+	IGNORE,				/* ^B */
+	IGNORE,				/* ^C */
+	IGNORE,				/* ^D */
+	IGNORE,				/* ^E */
+	IGNORE,				/* ^F */
+	IGNORE,				/* ^G */
+	IGNORE,				/* ^H */
+	WHITE,				/* ^I */
+	WHITE,				/* ^J */
+	WHITE,				/* ^K */
+	WHITE,				/* ^L */
+	WHITE,				/* ^M */
+	IGNORE,				/* ^N */
+	IGNORE,				/* ^O */
+	IGNORE,				/* ^P */
+	IGNORE,				/* ^Q */
+	IGNORE,				/* ^R */
+	IGNORE,				/* ^S */
+	IGNORE,				/* ^T */
+	IGNORE,				/* ^U */
+	IGNORE,				/* ^V */
+	IGNORE,				/* ^W */
+	IGNORE,				/* ^X */
+	IGNORE,				/* ^Y */
+	IGNORE,				/* ^Z */
+	IGNORE,				/* ^[ */
+	IGNORE,				/* ^\ */
+	IGNORE,				/* ^] */
+	IGNORE,				/* ^^ */
+	IGNORE,				/* ^_ */
+	PRINTABLE|WHITE,		/*    */
+ 	PRINTABLE,			/* ! */
+ 	PRINTABLE|STRINGC,		/* " */
+ 	PRINTABLE,			/* # */
+ 	PRINTABLE,			/* $ */
+ 	PRINTABLE,			/* % */
+ 	PRINTABLE,			/* & */
+ 	PRINTABLE|SPECIAL,		/* ' */
+ 	PRINTABLE|SPECIAL,		/* ( */
+ 	PRINTABLE|SPECIAL,		/* ) */
+ 	PRINTABLE,			/* * */
+ 	PRINTABLE|SIGN,			/* + */
  	PRINTABLE|SPECIAL_QUASI,	/* , */
- 	PRINTABLE|SIGN,		/* - */
- 	PRINTABLE|DOTC|FLOATC,	/* . */
- 	PRINTABLE,		/* / */
- 	PRINTABLE|DIGIT,	/* 0 */
- 	PRINTABLE|DIGIT,	/* 1 */
- 	PRINTABLE|DIGIT,	/* 2 */
- 	PRINTABLE|DIGIT,	/* 3 */
- 	PRINTABLE|DIGIT,	/* 4 */
- 	PRINTABLE|DIGIT,	/* 5 */
- 	PRINTABLE|DIGIT,	/* 6 */
- 	PRINTABLE|DIGIT,	/* 7 */
- 	PRINTABLE|DIGIT,	/* 8 */
- 	PRINTABLE|DIGIT,	/* 9 */
- 	PRINTABLE,		/* : */
- 	PRINTABLE|COMMENT,	/* ; */
- 	PRINTABLE,		/* < */
- 	PRINTABLE,		/* = */
- 	PRINTABLE,		/* > */
- 	PRINTABLE,		/* ? */
-  	PRINTABLE,		/*  @ */
-	PRINTABLE|HEX_LETTER,	/*  A */
-	PRINTABLE|HEX_LETTER,	/*  B */
-	PRINTABLE|HEX_LETTER,	/*  C */
-	PRINTABLE|HEX_LETTER,	/*  D */
-	PRINTABLE|FLOATC|HEX_LETTER,/*  E */
-	PRINTABLE|HEX_LETTER,	/*  F */
-	PRINTABLE,		/*  G */
-	PRINTABLE,		/*  H */
-	PRINTABLE,		/*  I */
-	PRINTABLE,		/*  J */
-	PRINTABLE,		/*  K */
-	PRINTABLE,		/*  L */
-	PRINTABLE,		/*  M */
-	PRINTABLE,		/*  N */
-	PRINTABLE,		/*  O */
-	PRINTABLE,		/*  P */
-	PRINTABLE,		/*  Q */
-	PRINTABLE,		/*  R */
-	PRINTABLE,		/*  S */
-	PRINTABLE,		/*  T */
-	PRINTABLE,		/*  U */
-	PRINTABLE,		/*  V */
-	PRINTABLE,		/*  W */
-	PRINTABLE,		/*  X */
-	PRINTABLE,		/*  Y */
-	PRINTABLE,		/*  Z */
-	PRINTABLE,		/*  [ */
-	PRINTABLE,		/*  \ */
-	PRINTABLE,		/*  ] */
-	PRINTABLE,		/*  ^ */
-	PRINTABLE,		/*  _ */
+ 	PRINTABLE|SIGN,			/* - */
+ 	PRINTABLE|SPECIAL|FLOATC,	/* . */
+ 	PRINTABLE,			/* / */
+ 	PRINTABLE|DIGIT,		/* 0 */
+ 	PRINTABLE|DIGIT,		/* 1 */
+ 	PRINTABLE|DIGIT,		/* 2 */
+ 	PRINTABLE|DIGIT,		/* 3 */
+ 	PRINTABLE|DIGIT,		/* 4 */
+ 	PRINTABLE|DIGIT,		/* 5 */
+ 	PRINTABLE|DIGIT,		/* 6 */
+ 	PRINTABLE|DIGIT,		/* 7 */
+ 	PRINTABLE|DIGIT,		/* 8 */
+ 	PRINTABLE|DIGIT,		/* 9 */
+ 	PRINTABLE,			/* : */
+ 	PRINTABLE|COMMENT,		/* ; */
+ 	PRINTABLE,			/* < */
+ 	PRINTABLE,			/* = */
+ 	PRINTABLE,			/* > */
+ 	PRINTABLE,			/* ? */
+  	PRINTABLE,			/*  @ */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  A */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  B */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  C */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  D */
+	PRINTABLE|ALPHA|FLOATC|HEX_LETTER,/*  E */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  F */
+	PRINTABLE|ALPHA,		/*  G */
+	PRINTABLE|ALPHA,		/*  H */
+	PRINTABLE|ALPHA,		/*  I */
+	PRINTABLE|ALPHA,		/*  J */
+	PRINTABLE|ALPHA,		/*  K */
+	PRINTABLE|ALPHA,		/*  L */
+	PRINTABLE|ALPHA,		/*  M */
+	PRINTABLE|ALPHA,		/*  N */
+	PRINTABLE|ALPHA,		/*  O */
+	PRINTABLE|ALPHA,		/*  P */
+	PRINTABLE|ALPHA,		/*  Q */
+	PRINTABLE|ALPHA,		/*  R */
+	PRINTABLE|ALPHA,		/*  S */
+	PRINTABLE|ALPHA,		/*  T */
+	PRINTABLE|ALPHA,		/*  U */
+	PRINTABLE|ALPHA,		/*  V */
+	PRINTABLE|ALPHA,		/*  W */
+	PRINTABLE|ALPHA,		/*  X */
+	PRINTABLE|ALPHA,		/*  Y */
+	PRINTABLE|ALPHA,		/*  Z */
+	PRINTABLE,			/*  [ */
+	PRINTABLE,			/*  \ */
+	PRINTABLE,			/*  ] */
+	PRINTABLE,			/*  ^ */
+	PRINTABLE,			/*  _ */
   	PRINTABLE|SPECIAL_QUASI,	/*  ` */
-	PRINTABLE|HEX_LETTER,	/*  a */
-	PRINTABLE|HEX_LETTER,	/*  b */
-	PRINTABLE|HEX_LETTER,	/*  c */
-	PRINTABLE|HEX_LETTER,	/*  d */
-	PRINTABLE|FLOATC|HEX_LETTER,/*  e */
-	PRINTABLE|HEX_LETTER,	/*  f */
-	PRINTABLE,		/*  g */
-	PRINTABLE,		/*  h */
-	PRINTABLE,		/*  i */
-	PRINTABLE,		/*  j */
-	PRINTABLE,		/*  k */
-	PRINTABLE,		/*  l */
-	PRINTABLE,		/*  m */
-	PRINTABLE,		/*  n */
-	PRINTABLE,		/*  o */
-	PRINTABLE,		/*  p */
-	PRINTABLE,		/*  q */
-	PRINTABLE,		/*  r */
-	PRINTABLE,		/*  s */
-	PRINTABLE,		/*  t */
-	PRINTABLE,		/*  u */
-	PRINTABLE,		/*  v */
-	PRINTABLE,		/*  w */
-	PRINTABLE,		/*  x */
-	PRINTABLE,		/*  y */
-	PRINTABLE,		/*  z */
-	PRINTABLE,		/*  { */
-	PRINTABLE,		/*  | */
-	PRINTABLE,		/*  } */
-	PRINTABLE,		/*  ~ */
-	IGNORE,			/*  ^? */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  a */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  b */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  c */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  d */
+	PRINTABLE|ALPHA|FLOATC|HEX_LETTER,/*  e */
+	PRINTABLE|ALPHA|HEX_LETTER,	/*  f */
+	PRINTABLE|ALPHA,		/*  g */
+	PRINTABLE|ALPHA,		/*  h */
+	PRINTABLE|ALPHA,		/*  i */
+	PRINTABLE|ALPHA,		/*  j */
+	PRINTABLE|ALPHA,		/*  k */
+	PRINTABLE|ALPHA,		/*  l */
+	PRINTABLE|ALPHA,		/*  m */
+	PRINTABLE|ALPHA,		/*  n */
+	PRINTABLE|ALPHA,		/*  o */
+	PRINTABLE|ALPHA,		/*  p */
+	PRINTABLE|ALPHA,		/*  q */
+	PRINTABLE|ALPHA,		/*  r */
+	PRINTABLE|ALPHA,		/*  s */
+	PRINTABLE|ALPHA,		/*  t */
+	PRINTABLE|ALPHA,		/*  u */
+	PRINTABLE|ALPHA,		/*  v */
+	PRINTABLE|ALPHA,		/*  w */
+	PRINTABLE|ALPHA,		/*  x */
+	PRINTABLE|ALPHA,		/*  y */
+	PRINTABLE|ALPHA,		/*  z */
+	PRINTABLE,			/*  { */
+	PRINTABLE,			/*  | */
+	PRINTABLE,			/*  } */
+	PRINTABLE,			/*  ~ */
+	IGNORE,				/*  ^? */
 };
 
 static int lex_unget_c;
 
 static inline int
-lex_get(void)
+lex_get(FILE *in)
 {
 	int	c;
 	if (lex_unget_c) {
 		c = lex_unget_c;
 		lex_unget_c = 0;
 	} else {
-		c = ao_scheme_getc();
+		c = getc(in);
 	}
 	return c;
 }
@@ -173,11 +173,11 @@ lex_unget(int c)
 static uint16_t	lex_class;
 
 static int
-lexc(void)
+lexc(FILE *in)
 {
 	int	c;
 	do {
-		c = lex_get();
+		c = lex_get(in);
 		if (c == EOF) {
 			c = 0;
 			lex_class = ENDOFFILE;
@@ -190,14 +190,15 @@ lexc(void)
 }
 
 static int
-lex_quoted(void)
+lex_quoted(FILE *in)
 {
 	int	c;
 	int	v;
 	int	count;
 
-	c = lex_get();
+	c = lex_get(in);
 	if (c == EOF) {
+	eof:
 		lex_class = ENDOFFILE;
 		return 0;
 	}
@@ -229,9 +230,9 @@ lex_quoted(void)
 		v = c - '0';
 		count = 1;
 		while (count <= 3) {
-			c = lex_get();
+			c = lex_get(in);
 			if (c == EOF)
-				return EOF;
+				goto eof;
 			c &= 0x7f;
 			if (c < '0' || '7' < c) {
 				lex_unget(c);
@@ -254,17 +255,16 @@ static char	token_string[AO_SCHEME_TOKEN_MAX];
 static int32_t	token_int;
 static int	token_len;
 
-static inline void add_token(int c) {
+static void start_token(void) {
+	token_len = 0;
+}
+
+static void add_token(int c) {
 	if (c && token_len < AO_SCHEME_TOKEN_MAX - 1)
 		token_string[token_len++] = c;
 }
 
-static inline void del_token(void) {
-	if (token_len > 0)
-		token_len--;
-}
-
-static inline void end_token(void) {
+static void end_token(void) {
 	token_string[token_len] = '\0';
 }
 
@@ -287,20 +287,18 @@ static const struct namedfloat namedfloats[] = {
 #endif
 
 static int
-parse_int(int base)
+parse_int(FILE *in, int base)
 {
 	int	cval;
 	int	c;
 
 	token_int = 0;
 	for (;;) {
-		c = lexc();
+		c = lexc(in);
 		if ((lex_class & HEX_DIGIT) == 0) {
 			lex_unget(c);
-			end_token();
 			return NUM;
 		}
-		add_token(c);
 		if ('0' <= c && c <= '9')
 			cval = c - '0';
 		else
@@ -311,13 +309,13 @@ parse_int(int base)
 }
 
 static int
-_lex(void)
+_lex(FILE *in)
 {
 	int	c;
 
-	token_len = 0;
+	start_token();
 	for (;;) {
-		c = lexc();
+		c = lexc(in);
 		if (lex_class & ENDOFFILE)
 			return END;
 
@@ -325,16 +323,14 @@ _lex(void)
 			continue;
 
 		if (lex_class & COMMENT) {
-			while ((c = lexc()) != '\n') {
+			while ((c = lexc(in)) != '\n') {
 				if (lex_class & ENDOFFILE)
 					return END;
 			}
 			continue;
 		}
 
-		if (lex_class & (SPECIAL|DOTC)) {
-			add_token(c);
-			end_token();
+		if (lex_class & SPECIAL) {
 			switch (c) {
 			case '(':
 			case '[':
@@ -350,10 +346,8 @@ _lex(void)
 			case '`':
 				return QUASIQUOTE;
 			case ',':
-				c = lexc();
+				c = lexc(in);
 				if (c == '@') {
-					add_token(c);
-					end_token();
 					return UNQUOTE_SPLICING;
 				} else {
 					lex_unget(c);
@@ -363,31 +357,25 @@ _lex(void)
 			}
 		}
 		if (c == '#') {
-			c = lexc();
+			c = lexc(in);
 			switch (c) {
 			case 't':
-				add_token(c);
-				end_token();
-				return BOOL;
+				return TRUE_TOKEN;
 			case 'f':
-				add_token(c);
-				end_token();
-				return BOOL;
+				return FALSE_TOKEN;
 #ifdef AO_SCHEME_FEATURE_VECTOR
 			case '(':
 				return OPEN_VECTOR;
 #endif
 			case '\\':
 				for (;;) {
-					int alphabetic;
-					c = lexc();
-					alphabetic = (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'));
+					c = lexc(in);
 					if (token_len == 0) {
 						add_token(c);
-						if (!alphabetic)
+						if (!(lex_class & ALPHA))
 							break;
 					} else {
-						if (alphabetic)
+						if (lex_class & ALPHA)
 							add_token(c);
 						else {
 							lex_unget(c);
@@ -414,18 +402,18 @@ _lex(void)
 				}
 				return NUM;
 			case 'x':
-				return parse_int(16);
+				return parse_int(in, 16);
 			case 'o':
-				return parse_int(8);
+				return parse_int(in, 8);
 			case 'b':
-				return parse_int(2);
+				return parse_int(in, 2);
 			}
 		}
 		if (lex_class & STRINGC) {
 			for (;;) {
-				c = lexc();
+				c = lexc(in);
 				if (c == '\\')
-					c = lex_quoted();
+					c = lex_quoted(in);
 				if (lex_class & (STRINGC|ENDOFFILE)) {
 					end_token();
 					return STRING;
@@ -479,7 +467,7 @@ _lex(void)
 					}
 				}
 				add_token (c);
-				c = lexc ();
+				c = lexc (in);
 				if ((lex_class & (NOTNAME))
 #ifdef AO_SCHEME_FEATURE_FLOAT
 				    && (c != '.' || !isfloat)
@@ -488,8 +476,6 @@ _lex(void)
 #ifdef AO_SCHEME_FEATURE_FLOAT
 					unsigned int u;
 #endif
-//					if (lex_class & ENDOFFILE)
-//						clearerr (f);
 					lex_unget(c);
 					end_token ();
 					if (isint && hasdigit) {
@@ -515,9 +501,9 @@ _lex(void)
 	}
 }
 
-static inline int lex(void)
+static inline int lex(FILE *in)
 {
-	int	parse_token = _lex();
+	int	parse_token = _lex(in);
 	RDBGI("token %d \"%s\"\n", parse_token, token_string);
 	return parse_token;
 }
@@ -585,7 +571,7 @@ pop_read_stack(void)
 #endif
 
 ao_poly
-ao_scheme_read(void)
+ao_scheme_read(FILE *in)
 {
 	struct ao_scheme_atom	*atom;
 	struct ao_scheme_string	*string;
@@ -596,7 +582,7 @@ ao_scheme_read(void)
 	read_state = 0;
 	ao_scheme_read_cons = ao_scheme_read_cons_tail = ao_scheme_read_stack = NULL;
 	for (;;) {
-		parse_token = lex();
+		parse_token = lex(in);
 		while (is_open(parse_token)) {
 #ifdef AO_SCHEME_FEATURE_VECTOR
 			if (parse_token == OPEN_VECTOR)
@@ -606,7 +592,7 @@ ao_scheme_read(void)
 				return AO_SCHEME_NIL;
 			ao_scheme_read_list++;
 			read_state = 0;
-			parse_token = lex();
+			parse_token = lex(in);
 		}
 
 		switch (parse_token) {
@@ -631,11 +617,11 @@ ao_scheme_read(void)
 			v = ao_scheme_float_get(token_float);
 			break;
 #endif
-		case BOOL:
-			if (token_string[0] == 't')
-				v = _ao_scheme_bool_true;
-			else
-				v = _ao_scheme_bool_false;
+		case TRUE_TOKEN:
+			v = _ao_scheme_bool_true;
+			break;
+		case FALSE_TOKEN:
+			v = _ao_scheme_bool_false;
 			break;
 		case STRING:
 			string = ao_scheme_string_new(token_string);

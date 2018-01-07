@@ -14,13 +14,13 @@
 
 #include "ao_scheme.h"
 
-static void ao_scheme_invalid_write(ao_poly p, bool write) {
-	printf("??? type %d poly 0x%04x ???", ao_scheme_poly_type (p), p);
+static void ao_scheme_invalid_write(FILE *out, ao_poly p, bool write) {
+	fprintf(out, "??? type %d poly 0x%04x ???", ao_scheme_poly_type (p), p);
 	(void) write;
 	ao_scheme_abort();
 }
 
-static void (*const ao_scheme_write_funcs[AO_SCHEME_NUM_TYPE]) (ao_poly p, bool write) = {
+static void (*const ao_scheme_write_funcs[AO_SCHEME_NUM_TYPE]) (FILE *out, ao_poly p, bool write) = {
 	[AO_SCHEME_CONS] = ao_scheme_cons_write,
 #ifdef AO_SCHEME_FEATURE_BIGINT
 	[AO_SCHEME_BIGINT] = ao_scheme_bigint_write,
@@ -40,9 +40,12 @@ static void (*const ao_scheme_write_funcs[AO_SCHEME_NUM_TYPE]) (ao_poly p, bool 
 #ifdef AO_SCHEME_FEATURE_VECTOR
 	[AO_SCHEME_VECTOR] = ao_scheme_vector_write,
 #endif
+#ifdef AO_SCHEME_FEATURE_PORT
+	[AO_SCHEME_PORT] = ao_scheme_port_write,
+#endif
 };
 
-void (*ao_scheme_poly_write_func(ao_poly p))(ao_poly p, bool write)
+void (*ao_scheme_poly_write_func(ao_poly p))(FILE *out, ao_poly p, bool write)
 {
 	uint8_t	type = ao_scheme_poly_type(p);
 

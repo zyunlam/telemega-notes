@@ -56,11 +56,13 @@ ao_scheme_abort(void)
 	ao_panic(1);
 }
 
+#ifdef LEDS_AVAILABLE
 static inline void
 ao_scheme_os_led(int led)
 {
 	ao_led_set(led);
 }
+#endif
 
 #define AO_SCHEME_JIFFIES_PER_SECOND	AO_HERTZ
 
