@@ -150,6 +150,10 @@ static const uint16_t	lex_classes[128] = {
 
 static int lex_unget_c;
 
+#ifndef ao_scheme_getc
+#define ao_scheme_getc(f) getc(f)
+#endif
+
 static inline int
 lex_get(FILE *in)
 {
@@ -158,7 +162,7 @@ lex_get(FILE *in)
 		c = lex_unget_c;
 		lex_unget_c = 0;
 	} else {
-		c = getc(in);
+		c = ao_scheme_getc(in);
 	}
 	return c;
 }

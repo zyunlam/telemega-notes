@@ -30,7 +30,7 @@
 #endif
 
 static inline int
-ao_scheme_getc() {
+_ao_scheme_getc() {
 	static uint8_t	at_eol;
 	int c;
 
@@ -44,11 +44,7 @@ ao_scheme_getc() {
 	return c;
 }
 
-static inline void
-ao_scheme_os_flush(void)
-{
-	flush();
-}
+#define ao_scheme_getc(f) ({ (void) (f); _ao_scheme_getc(); })
 
 static inline void
 ao_scheme_abort(void)

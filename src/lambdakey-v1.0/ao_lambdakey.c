@@ -16,7 +16,7 @@
 #include <ao_scheme.h>
 
 static void scheme_cmd() {
-	ao_scheme_read_eval_print(stdin, stdout, true);
+	ao_scheme_read_eval_print(stdin, stdout, false);
 }
 
 static const struct ao_cmds blink_cmds[] = {
