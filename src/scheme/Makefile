@@ -18,4 +18,8 @@ test/ao-scheme: FRC ao_scheme_builtin.h make-const/ao_scheme_make_const
 tiny-test/ao-scheme-tiny: FRC ao_scheme_builtin.h make-const/ao_scheme_make_const
 	+cd tiny-test && make
 
+install: all
+	+cd test && make install
+	+cd tiny-test && make install
+
 FRC:
