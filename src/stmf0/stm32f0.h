@@ -1906,7 +1906,9 @@ extern struct stm_usb stm_usb;
 #define  STM_USB_EPR_EP_TYPE_INTERRUPT			3
 #define  STM_USB_EPR_EP_TYPE_MASK			3
 #define STM_USB_EPR_EP_KIND	8
+#define  STM_USB_EPR_EP_KIND_SNGL_BUF			0	/* Bulk */
 #define  STM_USB_EPR_EP_KIND_DBL_BUF			1	/* Bulk */
+#define  STM_USB_EPR_EP_KIND_NO_STATUS_OUT		0	/* Control */
 #define  STM_USB_EPR_EP_KIND_STATUS_OUT			1	/* Control */
 #define STM_USB_EPR_CTR_TX	7
 #define  STM_USB_CTR_TX_WRITE_INVARIANT			1
