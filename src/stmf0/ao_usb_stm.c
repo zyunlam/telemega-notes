@@ -99,12 +99,9 @@ static uint16_t ao_usb_int_tx_offset;
 
 /* Pointer to bulk data tx/rx buffers in USB memory */
 #if AO_USB_HAS_IN
-static uint16_t ao_usb_in_tx_offset;
-static uint16_t	*ao_usb_in_tx_buffer;
-
-/* System ram shadow of USB buffer; writing individual bytes is
- * too much of a pain (sigh) */
-static uint8_t	ao_usb_tx_buffer[AO_USB_IN_SIZE];
+static uint16_t ao_usb_in_tx_offset[2];
+static uint16_t	*ao_usb_in_tx_buffer[2];
+static uint8_t	ao_usb_in_tx_which;
 static uint8_t	ao_usb_tx_count;
 
 #endif
@@ -119,12 +116,9 @@ static uint8_t	ao_usb_rx_count, ao_usb_rx_pos;
 
 #endif
 #if AO_USB_HAS_IN2
-static uint16_t ao_usb_in2_tx_offset;
-static uint16_t *ao_usb_in2_tx_buffer;
-
-/* System ram shadow of USB buffer; writing individual bytes is
- * too much of a pain (sigh) */
-static uint8_t	ao_usb_tx2_buffer[AO_USB_IN_SIZE];
+static uint16_t ao_usb_in2_tx_offset[2];
+static uint16_t *ao_usb_in2_tx_buffer[2];
+static uint8_t	ao_usb_in_tx2_which;
 static uint8_t	ao_usb_tx2_count;
 #endif
 
@@ -378,29 +372,44 @@ ao_usb_alloc_buffers(void)
 
 
 #if AO_USB_HAS_INT
+	sram_addr += (sram_addr & 1);
 	ao_usb_int_tx_offset = sram_addr;
 	sram_addr += AO_USB_INT_SIZE;
 #endif
 
 #if AO_USB_HAS_OUT
+	sram_addr += (sram_addr & 1);
 	ao_usb_out_rx_buffer = ao_usb_packet_buffer_addr(sram_addr);
 	ao_usb_out_rx_offset = sram_addr;
 	sram_addr += AO_USB_OUT_SIZE;
 #endif
 
 #if AO_USB_HAS_IN
-	ao_usb_in_tx_buffer = ao_usb_packet_buffer_addr(sram_addr);
-	ao_usb_in_tx_offset = sram_addr;
+	sram_addr += (sram_addr & 1);
+	ao_usb_in_tx_buffer[0] = ao_usb_packet_buffer_addr(sram_addr);
+	ao_usb_in_tx_offset[0] = sram_addr;
 	sram_addr += AO_USB_IN_SIZE;
+	ao_usb_in_tx_buffer[1] = ao_usb_packet_buffer_addr(sram_addr);
+	ao_usb_in_tx_offset[1] = sram_addr;
+	sram_addr += AO_USB_IN_SIZE;
+	ao_usb_in_tx_which = 0;
 #endif
 
 #if AO_USB_HAS_IN2
-	ao_usb_in2_tx_buffer = ao_usb_packet_buffer_addr(sram_addr);
-	ao_usb_in2_tx_offset = sram_addr;
+	sram_addr += (sram_addr & 1);
+	ao_usb_in2_tx_buffer[0] = ao_usb_packet_buffer_addr(sram_addr);
+	ao_usb_in2_tx_offset[0] = sram_addr;
 	sram_addr += AO_USB_IN_SIZE;
+
+	sram_addr += (sram_addr & 1);
+	ao_usb_in2_tx_buffer[1] = ao_usb_packet_buffer_addr(sram_addr);
+	ao_usb_in2_tx_offset[1] = sram_addr;
+	sram_addr += AO_USB_IN_SIZE;
+	ao_usb_in2_tx_which = 0;
 #endif
 
 #if AO_USB_DIRECTIO
+	sram_addr += (sram_addr & 1);
 	ao_usb_sram_addr = sram_addr;
 #endif
 }
@@ -489,7 +498,7 @@ ao_usb_set_configuration(void)
 
 #if AO_USB_HAS_IN
 	/* Set up the IN end point */
-	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_in_tx_offset;
+	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = 0;
 	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = 0;
 
 	ao_usb_init_ep(AO_USB_IN_EPR,
@@ -501,7 +510,7 @@ ao_usb_set_configuration(void)
 
 #if AO_USB_HAS_IN2
 	/* Set up the IN2 end point */
-	ao_usb_bdt[AO_USB_IN2_EPR].single.addr_tx = ao_usb_in2_tx_offset;
+	ao_usb_bdt[AO_USB_IN2_EPR].single.addr_tx = 0;
 	ao_usb_bdt[AO_USB_IN2_EPR].single.count_tx = 0;
 
 	ao_usb_init_ep(AO_USB_IN2_EPR,
@@ -566,6 +575,16 @@ ao_usb_copy_rx(uint8_t *dst, uint16_t *base, uint16_t bytes)
 	}
 	if (bytes)
 		*dst = *base;
+}
+
+static uint8_t
+ao_usb_tx_byte(uint16_t *base, uint8_t tx_count, char byte)
+{
+	if (tx_count & 1)
+		base[tx_count >> 1] |= ((uint16_t) byte) << 8;
+	else
+		base[tx_count >> 1] = (uint16_t) (uint8_t) byte;
+	return tx_count + 1;
 }
 
 /* Send an IN data packet */
@@ -984,10 +1003,10 @@ _ao_usb_in_send(void)
 	ao_usb_in_pending = 1;
 	if (ao_usb_tx_count != AO_USB_IN_SIZE)
 		ao_usb_in_flushed = 1;
-	ao_usb_copy_tx(ao_usb_tx_buffer, ao_usb_in_tx_buffer, ao_usb_tx_count);
-	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_in_tx_offset;
+	ao_usb_bdt[AO_USB_IN_EPR].single.addr_tx = ao_usb_in_tx_offset[ao_usb_in_tx_which];
 	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = ao_usb_tx_count;
 	ao_usb_tx_count = 0;
+	ao_usb_in_tx_which = 1 - ao_usb_in_tx_which;
 	_ao_usb_set_stat_tx(AO_USB_IN_EPR, STM_USB_EPR_STAT_TX_VALID);
 	_tx_dbg0("in_send end");
 }
@@ -1041,7 +1060,7 @@ ao_usb_putchar(char c)
 	_ao_usb_in_wait();
 
 	ao_usb_in_flushed = 0;
-	ao_usb_tx_buffer[ao_usb_tx_count++] = (uint8_t) c;
+	ao_usb_tx_count = ao_usb_tx_byte(ao_usb_in_tx_buffer[ao_usb_in_tx_which], ao_usb_tx_count, c);
 
 	/* Send the packet when full */
 	if (ao_usb_tx_count == AO_USB_IN_SIZE) {
@@ -1065,10 +1084,10 @@ _ao_usb_in2_send(void)
 	ao_usb_in2_pending = 1;
 	if (ao_usb_tx2_count != AO_USB_IN_SIZE)
 		ao_usb_in2_flushed = 1;
-	ao_usb_copy_tx(ao_usb_tx2_buffer, ao_usb_in2_tx_buffer, ao_usb_tx2_count);
-	ao_usb_bdt[AO_USB_IN2_EPR].single.addr_tx = ao_usb_in_tx_offset;
-	ao_usb_bdt[AO_USB_IN2_EPR].single.count_tx = ao_usb_tx_count;
+	ao_usb_bdt[AO_USB_IN2_EPR].single.addr_tx = ao_usb_in2_tx_offset[ao_usb_in2_tx_which];
+	ao_usb_bdt[AO_USB_IN2_EPR].single.count_tx = ao_usb_tx2_count;
 	ao_usb_tx2_count = 0;
+	ao_usb_in2_tx_which = 1 - ao_usb_in2_tx_which;
 	_ao_usb_set_stat_tx(AO_USB_IN2_EPR, STM_USB_EPR_STAT_TX_VALID);
 	_tx_dbg0("in2_send end");
 }
@@ -1122,7 +1141,7 @@ ao_usb_putchar2(char c)
 	_ao_usb_in2_wait();
 
 	ao_usb_in2_flushed = 0;
-	ao_usb_tx2_buffer[ao_usb_tx2_count++] = (uint8_t) c;
+	ao_usb_tx2_count = ao_usb_tx_byte(ao_usb_in2_tx_buffer[ao_usb_in2_tx_which], ao_usb_tx2_count, c);
 
 	/* Send the packet when full */
 	if (ao_usb_tx2_count == AO_USB_IN_SIZE) {
