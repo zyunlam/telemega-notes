@@ -2000,7 +2000,12 @@ union stm_usb_bdt {
 
 #define STM_USB_BDT_SIZE	8
 
+/* We'll use the first block of usb SRAM for the BDT */
 extern uint8_t stm_usb_sram[] __attribute__((aligned(4)));
+extern union stm_usb_bdt stm_usb_bdt[STM_USB_BDT_SIZE] __attribute__((aligned(4)));
+
+#define stm_usb_sram	((uint8_t *) 0x40006000)
+#define stm_usb_bdt	((union stm_usb_bdt *) 0x40006000)
 
 struct stm_exti {
 	vuint32_t	imr;
