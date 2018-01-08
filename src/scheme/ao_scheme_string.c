@@ -47,6 +47,8 @@ ao_scheme_string_alloc(int len)
 {
 	struct ao_scheme_string	*s;
 
+	if (len < 0)
+		return NULL;
 	s = ao_scheme_alloc(len + 2);
 	if (!s)
 		return NULL;
@@ -182,8 +184,8 @@ ao_scheme_string_write(FILE *out, ao_poly p, bool write)
 				fputs("\\\\", out);
 				break;
 			default:
-				if (c < ' ')
-					fprintf(out, "\\%03o", c);
+				if ((uint8_t) c < ' ')
+					fprintf(out, "\\%03o", (uint8_t) c);
 				else
 					putc(c, out);
 				break;

@@ -186,8 +186,9 @@ lexc(FILE *in)
 			c = 0;
 			lex_class = ENDOFFILE;
 		} else {
-			c &= 0x7f;
-			lex_class = lex_classes[c];
+			lex_class = PRINTABLE;
+			if (c <= 0x7f)
+				lex_class = lex_classes[c];
 		}
 	} while (lex_class & IGNORE);
 	return c;
