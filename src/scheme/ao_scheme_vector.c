@@ -84,7 +84,7 @@ void
 ao_scheme_vector_write(FILE *out, ao_poly v, bool write)
 {
 	struct ao_scheme_vector	*vector = ao_scheme_poly_vector(v);
-	unsigned int i, j;
+	unsigned int i;
 	int was_marked = 0;
 	struct vl *ve;
 
@@ -103,17 +103,12 @@ ao_scheme_vector_write(FILE *out, ao_poly v, bool write)
 	if (was_marked) {
 		fputs("...", out);
 	} else {
-		fputs("#(\n", out);
+		fputs("#(", out);
 		for (i = 0; i < vector->length; i++) {
-			printf("%3d: ", i);
-			for (j = 0; j < vd; j++)
-				printf(".");
+			if (i != 0)
+				putc(' ', out);
 			ao_scheme_poly_write(out, vector->vals[i], write);
-			printf("\n");
 		}
-		printf("     ");
-		for (j = 0; j < vd; j++)
-			printf(".");
 		printf(")");
 	}
 	if (ao_scheme_print_stop() && !was_marked)
