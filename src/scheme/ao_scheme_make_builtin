@@ -1,10 +1,15 @@
 #!/usr/bin/nickle
 
 typedef struct {
+	string	name;
+	string	feature;
+} lisp_name_t;
+
+typedef struct {
 	string	feature;
 	string	type;
 	string	c_name;
-	string[*]	lisp_names;
+	lisp_name_t[*]	lisp_names;
 } builtin_t;
 
 string[string] type_map = {
@@ -16,14 +21,26 @@ string[string] type_map = {
 	"feature" => "feature",
 };
 
-string[*]
+lisp_name_t
+make_one_lisp(string token)
+{
+	string[*] bits = String::split(token, "@");
+	string	name = bits[0];
+	string	feature = "all";
+
+	if (dim(bits) > 1)
+		feature = bits[1];
+	return (lisp_name_t) {.name = name, .feature = feature };
+}
+
+lisp_name_t[*]
 make_lisp(string[*] tokens)
 {
-	string[...] lisp = {};
+	lisp_name_t[...] lisp = {};
 
 	if (dim(tokens) < 4)
-		return (string[1]) { tokens[dim(tokens) - 1] };
-	return (string[dim(tokens)-3]) { [i] = tokens[i+3] };
+		return (lisp_name_t[1]) { make_one_lisp(tokens[dim(tokens) - 1]) };
+	return (lisp_name_t[dim(tokens)-3]) { [i] = make_one_lisp(tokens[i+3]) };
 }
 
 builtin_t
@@ -98,7 +115,7 @@ dump_casename(builtin_t[*] builtins) {
 		if (is_func(builtins[i])) {
 			dump_ifdef(builtins[i]);
 			printf("\tcase builtin_%s: return ao_scheme_poly_atom(_atom(\"%s\"))->name;\n",
-			       builtins[i].c_name, builtins[i].lisp_names[0]);
+			       builtins[i].c_name, builtins[i].lisp_names[0].name);
 			dump_endif(builtins[i]);
 		}
 	printf("\tdefault: return (char *) \"???\";\n");
@@ -128,7 +145,7 @@ dump_arrayname(builtin_t[*] builtins) {
 			dump_ifdef(builtins[i]);
 			printf("\t[builtin_%s] = _ao_scheme_atom_",
 			       builtins[i].c_name);
-			cify_lisp(builtins[i].lisp_names[0]);
+			cify_lisp(builtins[i].lisp_names[0].name);
 			printf(",\n");
 			dump_endif(builtins[i]);
 		}
@@ -180,9 +197,12 @@ dump_consts(builtin_t[*] builtins) {
 		if (is_func(builtins[i])) {
 			dump_ifdef(builtins[i]);
 			for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
+				string feature = builtins[i].feature;
+				if (builtins[i].lisp_names[j].feature != "all")
+					feature = builtins[i].lisp_names[j].feature;
 				printf ("\t{ .feature = \"%s\", .name = \"%s\", .args = AO_SCHEME_FUNC_%s, .func = builtin_%s },\n",
-					builtins[i].feature,
-					builtins[i].lisp_names[j],
+					feature,
+					builtins[i].lisp_names[j].name,
 					builtins[i].type,
 					builtins[i].c_name);
 			}
@@ -201,8 +221,8 @@ dump_atoms(builtin_t[*] builtins) {
 		if (!is_feature(builtins[i])) {
 			for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
 				printf("#define _ao_scheme_atom_");
-				cify_lisp(builtins[i].lisp_names[j]);
-				printf(" _atom(\"%s\")\n", builtins[i].lisp_names[j]);
+				cify_lisp(builtins[i].lisp_names[j].name);
+				printf(" _atom(\"%s\")\n", builtins[i].lisp_names[j].name);
 			}
 		}
 	}
@@ -217,9 +237,12 @@ dump_atom_names(builtin_t[*] builtins) {
 	for (int i = 0; i < dim(builtins); i++) {
 		if (is_atom(builtins[i])) {
 			for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
+				string feature = builtins[i].feature;
+				if (builtins[i].lisp_names[j].feature != "all")
+					feature = builtins[i].lisp_names[j].feature;
 				printf("\t{ .feature = \"%s\", .name = \"%s\" },\n",
-				       builtins[i].feature,
-				       builtins[i].lisp_names[j]);
+				       feature,
+				       builtins[i].lisp_names[j].name);
 			}
 		}
 	}
@@ -235,7 +258,7 @@ dump_syntax_atoms(builtin_t[*] builtins) {
 	for (int i = 0; i < dim(builtins); i++) {
 		if (is_atom(builtins[i])) {
 			for (int j = 0; j < dim(builtins[i].lisp_names); j++) {
-				printf("\t\"%s\",\n", builtins[i].lisp_names[j]);
+				printf("\t\"%s\",\n", builtins[i].lisp_names[j].name);
 			}
 		}
 	}

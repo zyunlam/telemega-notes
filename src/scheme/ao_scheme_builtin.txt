@@ -49,8 +49,8 @@ all	f_lambda	nullp		null?
 all	f_lambda	not
 all	f_lambda	listp		list?
 all	f_lambda	pairp		pair?
-all	f_lambda	integerp	integer? exact? exact-integer?
-all	f_lambda	numberp		number? real?
+all	f_lambda	integerp	integer? exact?@BIGINT exact-integer?@BIGINT
+all	f_lambda	numberp		number? real?@FLOAT
 all	f_lambda	booleanp	boolean?
 all	f_lambda	set_car		set-car!
 all	f_lambda	set_cdr		set-cdr!
