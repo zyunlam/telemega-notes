@@ -1890,6 +1890,7 @@ extern struct stm_usb stm_usb;
 #define STM_USB_EPR_CTR_RX	15
 #define  STM_USB_EPR_CTR_RX_WRITE_INVARIANT		1
 #define STM_USB_EPR_DTOG_RX	14
+#define STM_USB_EPR_SW_BUF_TX	14
 #define STM_USB_EPR_DTOG_RX_WRITE_INVARIANT		0
 #define STM_USB_EPR_STAT_RX	12
 #define  STM_USB_EPR_STAT_RX_DISABLED			0
@@ -1913,6 +1914,7 @@ extern struct stm_usb stm_usb;
 #define STM_USB_EPR_CTR_TX	7
 #define  STM_USB_CTR_TX_WRITE_INVARIANT			1
 #define STM_USB_EPR_DTOG_TX	6
+#define STM_USB_EPR_SW_BUF_RX	6
 #define  STM_USB_EPR_DTOG_TX_WRITE_INVARIANT		0
 #define STM_USB_EPR_STAT_TX	4
 #define  STM_USB_EPR_STAT_TX_DISABLED			0
