@@ -2,6 +2,7 @@ include ../Makefile-inc
 
 vpath %.o .
 vpath %.c ..
+vpath ao_scheme_test.c ../test
 vpath %.h ..
 vpath %.scheme ..
 vpath ao_scheme_make_const ../make-const
@@ -17,6 +18,7 @@ CFLAGS=-O0 -g -Wall -Wextra -I. -I.. -Wpointer-arith -Wmissing-declarations -Wfo
 
 ao-scheme-tiny: $(OBJS)
 	cc $(CFLAGS) -o $@ $(OBJS) -lm
+	./ao-scheme-tiny ao_scheme_tiny_test.scheme
 
 $(OBJS): $(HDRS)
 

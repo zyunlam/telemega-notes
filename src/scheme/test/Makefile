@@ -19,6 +19,7 @@ CFLAGS=$(DFLAGS) $(OFLAGS) $(PGFLAGS) -g -Wall -Wextra -I. -I.. -Wpointer-arith 
 
 ao-scheme: $(OBJS)
 	cc $(CFLAGS) -o $@ $(OBJS) -lm
+	./ao-scheme ao_scheme_test.scheme
 
 $(OBJS): $(HDRS)
 

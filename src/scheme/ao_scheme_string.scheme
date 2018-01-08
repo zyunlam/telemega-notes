@@ -15,7 +15,7 @@
 
 (define string (lambda chars (list->string chars)))
 
-(_??_ (string #\a #\b #\c) "abc")
+(string #\a #\b #\c)
 
 (define string-map
   (lambda (proc . strings)
@@ -38,7 +38,7 @@
     )
   )
 
-(_??_ (string-map (lambda (x) (+ 1 x)) "HAL") "IBM")
+(string-map (lambda (x) (+ 1 x)) "HAL")
 
 (define string-copy!
   (lambda (t a f . args)
@@ -76,9 +76,9 @@
     )
   )
 
-(_??_ (string-copy! (make-string 10) 0 "hello" 0 5) "hello     ")
-(_??_ (string-copy! (make-string 10) 1 "hello" 0 5) " hello    ")
-(_??_ (string-copy! (make-string 10) 0 "hello" 0 5) "hello     ")
+(string-copy! (make-string 10) 0 "hello" 0 5)
+(string-copy! (make-string 10) 1 "hello" 0 5)
+(string-copy! (make-string 10) 0 "hello" 0 5)
 
 (define (string-upcase s) (string-map char-upcase s))
 (define (string-downcase s) (string-map char-downcase s))
@@ -100,9 +100,9 @@
     )
   )
 
-(_??_ (string-copy "hello" 0 1) "h")
-(_??_ (string-copy "hello" 1) "ello")
-(_??_ (string-copy "hello") "hello")
+(string-copy "hello" 0 1)
+(string-copy "hello" 1)
+(string-copy "hello")
 
 (define substring string-copy)
 
@@ -130,8 +130,8 @@
     )
   )
 
-(_??_ (string-fill! (make-string 10) #\a) "aaaaaaaaaa")
-(_??_ (string-fill! (make-string 10) #\a 1 2) " a        ")
+(string-fill! (make-string 10) #\a)
+(string-fill! (make-string 10) #\a 1 2)
 
 (define string-for-each
   (lambda (proc . strings)
@@ -153,4 +153,4 @@
     )
   )
 
-(_??_ (string-for-each write-char "IBM\n") #t)
+(string-for-each write-char "IBM\n")

@@ -13,8 +13,6 @@
 ;
 ; Basic syntax placed in ROM
 
-(def (quote _?_) (lambda (a b) (cond ((eq? a b) a) (else (exit 1)))))
-
 (def (quote list) (lambda l l))
 
 (def (quote def!)
@@ -28,7 +26,7 @@
 
 (begin
  (def! append
-   (lambda args
+   (lambda a
 	  (def! _a
 	    (lambda (a b)
 	      (cond ((null? a) b)
@@ -45,7 +43,7 @@
 		    )
 	      )
 	    )
-	  (_b args)
+	  (_b a)
 	  )
    )
  'append)
@@ -122,7 +120,7 @@
 
 					; execute to resolve macros
 
-(_?_ (or #f #t) #t)
+(or #f #t)
 
 (define and
   (macro a
@@ -149,7 +147,7 @@
 
 					; execute to resolve macros
 
-(_?_ (and #t #f) #f)
+(and #t #f)
 
 					; (if <condition> <if-true>)
 					; (if <condition> <if-true> <if-false)
@@ -169,10 +167,10 @@
     )
   )
 
-(_?_ (if (> 3 2) 'yes) 'yes)
-(_?_ (if (> 3 2) 'yes 'no) 'yes)
-(_?_ (if (> 2 3) 'no 'yes) 'yes)
-(_?_ (if (> 2 3) 'no) #f)
+(if (> 3 2) 'yes)
+(if (> 3 2) 'yes 'no)
+(if (> 2 3) 'no 'yes)
+(if (> 2 3) 'no)
 
 (define letrec
   (macro (a . b)
@@ -230,7 +228,7 @@
 	 )
      )
 
-(_?_ (letrec ((a 1) (b a)) (+ a b)) 2)
+(letrec ((a 1) (b a)) (+ a b))
 
 					; letrec is sufficient for let*
 
@@ -259,28 +257,13 @@
 	)
   )
 
-(_?_ (equal? '(a b c) '(a b c)) #t)
-(_?_ (equal? '(a b c) '(a b b)) #f)
-
-(def (quote _??_) (lambda (a b) (cond ((equal? a b) a) (else (exit 1)))))
+(equal? '(a b c) '(a b c))
 
 					; basic list accessors
 
 (define (caar a) (car (car a)))
 
 (define (cadr a) (car (cdr a)))
-
-(define (cdar l) (cdr (car l)))
-
-(_??_ (cdar '((1 2) (3 4))) '(2))
-
-(define (cddr l) (cdr (cdr l)))
-
-(_??_ (cddr '(1 2 3)) '(3))
-
-(define (caddr l) (car (cdr (cdr l))))
-
-(_??_ (caddr '(1 2 3 4)) 3)
 
 (define (list-ref a b)
   (car (list-tail a b))
@@ -301,14 +284,14 @@
 	)
   )
 
-(_??_ (member '(2) '((1) (2) (3)))  '((2) (3)))
-(_??_ (member '(4) '((1) (2) (3))) #f)
+(member '(2) '((1) (2) (3)))
+(member '(4) '((1) (2) (3)))
 
 (define (memq a b) (member a b eq?))
 
-(_??_ (memq 2 '(1 2 3)) '(2 3))
-(_??_ (memq 4 '(1 2 3)) #f)
-(_??_ (memq '(2) '((1) (2) (3))) #f)
+(memq 2 '(1 2 3))
+(memq 4 '(1 2 3))
+(memq '(2) '((1) (2) (3)))
 
 (define (assoc a b . t?)
   (if (null? t?)
@@ -324,12 +307,11 @@
     )
   )
 
-(define (assq a b) (assoc a b eq?))
-(define assv assq)
+(assoc '(c) '((a 1) (b 2) ((c) 3)))
 
-(_??_ (assq 'a '((a 1) (b 2) (c 3))) '(a 1))
-(_??_ (assv 'b '((a 1) (b 2) (c 3))) '(b 2))
-(_??_ (assoc '(c) '((a 1) (b 2) ((c) 3))) '((c) 3))
+(define (assq a b) (assoc a b eq?))
+
+(assq 'a '((a 1) (b 2) (c 3)))
 
 (define map
   (lambda (proc . lists)
@@ -358,7 +340,7 @@
 	 )
   )
 
-(_??_ (map cadr '((a b) (d e) (g h))) '(b e h))
+(map cadr '((a b) (d e) (g h)))
 
 					; use map as for-each in basic
 					; mode
@@ -430,8 +412,3 @@
 (define (newline) (write-char #\newline))
 
 (newline)
-
-(define (eof-object? a)
-  (equal? a 'eof)
-  )
-

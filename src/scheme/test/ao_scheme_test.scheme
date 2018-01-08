@@ -1,0 +1,175 @@
+					; Basic syntax tests
+
+(define _assert-eq_
+  (macro (a b)
+	   (list cond
+		 (list (list eq? a b)
+		       )
+		 (list 'else
+		       (list display "failed: ")
+		       (list write (list quote a))
+		       (list newline)
+		       (list exit 1)
+		       )
+		 )
+	   )
+  )
+
+(define _assert-equal_
+  (macro (a b)
+    (list cond
+	  (list (list equal? a b)
+		)
+	  (list 'else
+		(list display "failed: ")
+		(list write (list quote a))
+		(list newline)
+		(list exit 1)
+		)
+	  )
+    )
+  )
+
+(_assert-eq_ (or #f #t) #t)
+(_assert-eq_ (and #t #f) #f)
+(_assert-eq_ (if (> 3 2) 'yes) 'yes)
+(_assert-eq_ (if (> 3 2) 'yes 'no) 'yes)
+(_assert-eq_ (if (> 2 3) 'no 'yes) 'yes)
+(_assert-eq_ (if (> 2 3) 'no) #f)
+
+(_assert-eq_ (letrec ((a 1) (b a)) (+ a b)) 2)
+
+(_assert-eq_ (equal? '(a b c) '(a b c)) #t)
+(_assert-eq_ (equal? '(a b c) '(a b b)) #f)
+
+(_assert-equal_ (cdar '((1 2) (3 4))) '(2))
+
+(_assert-equal_ (cddr '(1 2 3)) '(3))
+
+(_assert-equal_ (caddr '(1 2 3 4)) 3)
+
+(_assert-equal_ (member '(2) '((1) (2) (3)))  '((2) (3)))
+(_assert-equal_ (member '(4) '((1) (2) (3))) #f)
+
+(_assert-equal_ (memq 2 '(1 2 3)) '(2 3))
+(_assert-equal_ (memq 4 '(1 2 3)) #f)
+(_assert-equal_ (memq '(2) '((1) (2) (3))) #f)
+
+(_assert-equal_ (assq 'a '((a 1) (b 2) (c 3))) '(a 1))
+(_assert-equal_ (assv 'b '((a 1) (b 2) (c 3))) '(b 2))
+(_assert-equal_ (assoc '(c) '((a 1) (b 2) ((c) 3))) '((c) 3))
+
+(_assert-equal_ (map cadr '((a b) (d e) (g h))) '(b e h))
+
+(_assert-equal_ `(hello ,(+ 1 2) ,@(list 1 2 3) `foo) '(hello 3 1 2 3 (quasiquote foo)))
+
+					; Advanced syntax tests
+
+(_assert-eq_ (equal? '(a b c) '(a b c)) #t)
+(_assert-eq_ (equal? '(a b c) '(a b b)) #f)
+(_assert-eq_ (equal? #(1 2 3) #(1 2 3)) #t)
+(_assert-eq_ (equal? #(1 2 3) #(4 5 6)) #f)
+(_assert-equal_ `(hello ,(+ 1 2) ,@(list 1 2 3) `foo) '(hello 3 1 2 3 (quasiquote foo)))
+(_assert-equal_ (let ((x 1) (y)) (set! y 2) (+ x y)) 3)
+(_assert-equal_ (when #t (+ 1 2)) 3)
+(_assert-equal_ (when #f (+ 1 2)) #f)
+(_assert-equal_ (unless #f (+ 2 3)) 5)
+(_assert-equal_ (unless #t (+ 2 3)) #f)
+(_assert-equal_ (cdar '((1 2) (3 4))) '(2))
+(_assert-equal_ (cddr '(1 2 3)) '(3))
+(_assert-equal_ (caddr '(1 2 3 4)) 3)
+(_assert-equal_ (reverse '(1 2 3)) '(3 2 1))
+(_assert-equal_ (make-list 10 'a) '(a a a a a a a a a a))
+(_assert-equal_ (make-list 10) '(#f #f #f #f #f #f #f #f #f #f))
+(_assert-equal_ (let ((a 0))
+		  (for-each (lambda (b) (set! a (+ a b))) '(1 2 3))
+		  a
+		  )
+		6)
+(_assert-equal_ (call-with-current-continuation
+		 (lambda (exit)
+		   (for-each (lambda (x)
+			       (if (negative? x)
+				   (exit x)))
+			     '(54 0 37 -3 245 19))
+		   )
+		 )
+		-3)
+(_assert-equal_ (case 1 (1 "one") (2 "two") (3 => (lambda (x) "three")) (12 "twelve") (else "else")) "one")
+(_assert-equal_ (case 2 (1 "one") (2 "two") (3 => (lambda (x) "three")) (12 "twelve") (else "else")) "two")
+(_assert-equal_ (case 3 (1 "one") (2 "two") (3 => (lambda (x) "three")) (12 "twelve") (else "else")) "three")
+(_assert-equal_ (case 4 (1 "one") (2 "two") (3 => (lambda (x) "three")) (12 "twelve") (else "else")) "else")
+(_assert-equal_ (case 12 (1 "one") (2 "two") (3 => (lambda (x) "three")) (12 "twelve") (else "else")) "twelve")
+(_assert-equal_ (do ((x 1 (+ x 1))
+	   (y 0)
+	   )
+	  ((= x 10) y)
+	(set! y (+ y x))
+	)
+      45)
+
+(_assert-equal_ (do ((vec (make-vector 5))
+		     (i 0 (+ i 1)))
+		    ((= i 5) vec)
+		  (vector-set! vec i i))
+		#(0 1 2 3 4))
+
+					; vector tests
+
+(_assert-equal_ (vector->string #(#\a #\b #\c) 0 2) "ab")
+(_assert-equal_ (string->vector "hello" 0 2) #(#\h #\e))
+(_assert-equal_ (vector-copy! (make-vector 10 "t") 0 (make-vector 5 "f") 0 5) #("f" "f" "f" "f" "f" "t" "t" "t" "t" "t"))
+(_assert-equal_ (vector-copy #(1 2 3) 0 3) #(1 2 3))
+(_assert-equal_ (vector-append #(1 2 3) #(4 5 6) #(7 8 9)) #(1 2 3 4 5 6 7 8 9))
+(_assert-equal_ (vector-fill! (make-vector 3) #t 1 2) #(#f #t #f))
+(_assert-equal_ (vector-map + #(1 2 3) #(4 5 6)) #(5 7 9))
+
+					; string tests
+
+(_assert-equal_ (string #\a #\b #\c) "abc")
+(_assert-equal_ (string-map (lambda (x) (+ 1 x)) "HAL") "IBM")
+(_assert-equal_ (string-copy! (make-string 10) 0 "hello" 0 5) "hello     ")
+(_assert-equal_ (string-copy! (make-string 10) 1 "hello" 0 5) " hello    ")
+(_assert-equal_ (string-copy! (make-string 10) 0 "hello" 0 5) "hello     ")
+(_assert-equal_ (string-copy "hello" 0 1) "h")
+(_assert-equal_ (string-copy "hello" 1) "ello")
+(_assert-equal_ (string-copy "hello") "hello")
+(_assert-equal_ (string-fill! (make-string 10) #\a) "aaaaaaaaaa")
+(_assert-equal_ (string-fill! (make-string 10) #\a 1 2) " a        ")
+;(_assert-equal_ (string-for-each write-char "IBM\n") #t)
+
+					; char tests
+
+(_assert-equal_ (char? #\q) #t)
+(_assert-equal_ (char? "h") #f)
+(_assert-equal_ (char-upper-case? #\a) #f)
+(_assert-equal_ (char-upper-case? #\B) #t)
+(_assert-equal_ (char-upper-case? #\0) #f)
+(_assert-equal_ (char-upper-case? #\space) #f)
+(_assert-equal_ (char-lower-case? #\a) #t)
+(_assert-equal_ (char-lower-case? #\B) #f)
+(_assert-equal_ (char-lower-case? #\0) #f)
+(_assert-equal_ (char-lower-case? #\space) #f)
+(_assert-equal_ (char-alphabetic? #\a) #t)
+(_assert-equal_ (char-alphabetic? #\B) #t)
+(_assert-equal_ (char-alphabetic? #\0) #f)
+(_assert-equal_ (char-alphabetic? #\space) #f)
+(_assert-equal_ (char-numeric? #\a) #f)
+(_assert-equal_ (char-numeric? #\B) #f)
+(_assert-equal_ (char-numeric? #\0) #t)
+(_assert-equal_ (char-numeric? #\space) #f)
+(_assert-equal_ (char-whitespace? #\a) #f)
+(_assert-equal_ (char-whitespace? #\B) #f)
+(_assert-equal_ (char-whitespace? #\0) #f)
+(_assert-equal_ (char-whitespace? #\space) #t)
+(_assert-equal_ (char-upcase #\a) #\A)
+(_assert-equal_ (char-upcase #\B) #\B)
+(_assert-equal_ (char-upcase #\0) #\0)
+(_assert-equal_ (char-upcase #\space) #\space)
+(_assert-equal_ (char-downcase #\a) #\a)
+(_assert-equal_ (char-downcase #\B) #\b)
+(_assert-equal_ (char-downcase #\0) #\0)
+(_assert-equal_ (char-downcase #\space) #\space)
+(_assert-equal_ (digit-value #\1) 1)
+(_assert-equal_ (digit-value #\a) #f)
+

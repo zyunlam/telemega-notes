@@ -131,7 +131,9 @@ main (int argc, char **argv)
 			usage(argv[0]);
 			exit(0);
 		case 'l':
+#ifdef AO_SCHEME_FEATURE_POSIX
 			ao_scheme_set_argv(&argv[argc]);
+#endif
 			run_file(optarg);
 			break;
 		default:
@@ -139,7 +141,9 @@ main (int argc, char **argv)
 			exit(1);
 		}
 	}
+#ifdef AO_SCHEME_FEATURE_POSIX
 	ao_scheme_set_argv(argv + optind);
+#endif
 	if (argv[optind]) {
 		run_file(argv[optind]);
 	} else {

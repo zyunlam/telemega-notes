@@ -40,20 +40,10 @@
   'equal?
   )
 
-(_?_ (equal? '(a b c) '(a b c)) #t)
-(_?_ (equal? '(a b c) '(a b b)) #f)
-(_?_ (equal? #(1 2 3) #(1 2 3)) #t)
-(_?_ (equal? #(1 2 3) #(4 5 6)) #f)
-
-(define (_??_ a b)
-  (cond ((equal? a b)
-	 a
-	 )
-	(else
-	 (exit 1)
-	 )
-	)
-  )
+(equal? '(a b c) '(a b c))
+(equal? '(a b c) '(a b b))
+(equal? #(1 2 3) #(1 2 3))
+(equal? #(1 2 3) #(4 5 6))
 
 (define quasiquote
   (macro (x)
@@ -175,7 +165,7 @@
 					; `(a ,@(list 1 2 3) -> (append (quote (a)) (list 1 2 3))
 
 
-(_??_ `(hello ,(+ 1 2) ,@(list 1 2 3) `foo) '(hello 3 1 2 3 (quasiquote foo)))
+`(hello ,(+ 1 2) ,@(list 1 2 3) `foo)
 
 					; define a set of local
 					; variables all at once and
@@ -229,29 +219,33 @@
      )
 		   
 
-(_??_ (let ((x 1) (y)) (set! y 2) (+ x y)) 3)
+(let ((x 1) (y)) (set! y 2) (+ x y))
+
+(define assv assq)
+
+(assv 'b '((a 1) (b 2) (c 3)))
 
 (define when (macro (test . l) `(cond (,test ,@l))))
 
-(_??_ (when #t (+ 1 2)) 3)
-(_??_ (when #f (+ 1 2)) #f)
+(when #t (+ 1 2))
+(when #f (+ 1 2))
 
 (define unless (macro (test . l) `(cond ((not ,test) ,@l))))
 
-(_??_ (unless #f (+ 2 3)) 5)
-(_??_ (unless #t (+ 2 3)) #f)
+(unless #f (+ 2 3))
+(unless #t (+ 2 3))
 
 (define (cdar l) (cdr (car l)))
 
-(_??_ (cdar '((1 2) (3 4))) '(2))
+(cdar '((1 2) (3 4)))
 
 (define (cddr l) (cdr (cdr l)))
 
-(_??_ (cddr '(1 2 3)) '(3))
+(cddr '(1 2 3))
 
 (define (caddr l) (car (cdr (cdr l))))
 
-(_??_ (caddr '(1 2 3 4)) 3)
+(caddr '(1 2 3 4))
 
 (define (reverse list)
   (define (_r old new)
@@ -263,7 +257,7 @@
   (_r list ())
   )
 
-(_??_ (reverse '(1 2 3)) '(3 2 1))
+(reverse '(1 2 3))
 
 (define make-list
   (lambda (a . b)
@@ -281,9 +275,9 @@
     )
   )
     
-(_??_ (make-list 10 'a) '(a a a a a a a a a a))
+(make-list 10 'a)
 
-(_??_ (make-list 10) '(#f #f #f #f #f #f #f #f #f #f))
+(make-list 10)
 
 (define for-each
   (lambda (proc . lists)
@@ -299,20 +293,18 @@
     )
   )
 
-(_??_ (let ((a 0))
-	(for-each (lambda (b) (set! a (+ a b))) '(1 2 3))
-	a
-	)
-      6)
+(let ((a 0))
+  (for-each (lambda (b) (set! a (+ a b))) '(1 2 3))
+  a
+  )
       
-(_??_ (call-with-current-continuation
+(call-with-current-continuation
        (lambda (exit)
 	 (for-each (lambda (x)
 		     (if (negative? x)
 			 (exit x)))
 		   '(54 0 37 -3 245 19))
 	 #t))
-      -3)
 
 (define case
   (macro (test . l)
@@ -359,11 +351,11 @@
 	 )
   )
 
-(_??_ (case 1 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "one")
-(_??_ (case 2 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "two")
-(_??_ (case 3 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)) "three")) (12 "twelve") (else "else")) "three")
-(_??_ (case 4 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "else")
-(_??_ (case 12 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else")) "twelve")
+(case 1 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else"))
+(case 2 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else"))
+(case 3 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)) "three")) (12 "twelve") (else "else"))
+(case 4 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else"))
+(case 12 (1 "one") (2 "two") (3 => (lambda (x) (write (list "the value is" x)))) (12 "twelve") (else "else"))
 
 (define do
   (macro (vars test . cmds)
@@ -388,15 +380,9 @@
     )
   )
 
-(_??_ (do ((x 1 (+ x 1))
-	   (y 0)
-	   )
-	  ((= x 10) y)
-	(set! y (+ y x))
-	)
-      45)
-
-(_??_ (do ((vec (make-vector 5))
-	   (i 0 (+ i 1)))
-	  ((= i 5) vec)
-	(vector-set! vec i i)) #(0 1 2 3 4))
+(do ((x 1 (+ x 1))
+     (y 0)
+     )
+    ((= x 10) y)
+  (set! y (+ y x))
+  )

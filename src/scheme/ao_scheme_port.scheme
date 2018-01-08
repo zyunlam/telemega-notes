@@ -26,6 +26,10 @@
 (newline)
 (newline (open-output-file "/dev/null"))
 
+(define (eof-object? a)
+  (equal? a 'eof)
+  )
+
 (define (load name)
   (let ((p (open-input-file name))
 	(e))

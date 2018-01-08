@@ -35,7 +35,7 @@
     )
   )
 
-(_??_ (vector->string #(#\a #\b #\c) 0 2) "ab")
+(vector->string #(#\a #\b #\c) 0 2)
 
 (define string->vector
   (lambda (s . args)
@@ -58,7 +58,7 @@
     )
   )
 
-(_??_ (string->vector "hello" 0 2) #(#\h #\e))
+(string->vector "hello" 0 2)
     
 (define vector-copy!
   (lambda (t a f . args)
@@ -98,7 +98,7 @@
 
 					; simple vector-copy test
 
-(_??_ (vector-copy! (make-vector 10 "t") 0 (make-vector 5 "f") 0 5) #("f" "f" "f" "f" "f" "t" "t" "t" "t" "t"))
+(vector-copy! (make-vector 10 "t") 0 (make-vector 5 "f") 0 5)
 
 (let ((v (vector 1 2 3 4 5 6 7 8 9 0)))
   (vector-copy! v 1 v 0 2)
@@ -121,7 +121,7 @@
     )
   )
 
-(_??_ (vector-copy #(1 2 3) 0 3) #(1 2 3))
+(vector-copy #(1 2 3) 0 3)
 
 (define vector-append
   (lambda a
@@ -138,7 +138,7 @@
     )
   )
 
-(_??_ (vector-append #(1 2 3) #(4 5 6) #(7 8 9)) #(1 2 3 4 5 6 7 8 9))
+(vector-append #(1 2 3) #(4 5 6) #(7 8 9))
 
 (define vector-fill!
   (lambda (v a . args)
@@ -164,7 +164,7 @@
     )
   )
 
-(_??_ (vector-fill! (make-vector 3) #t 1 2) #(#f #t #f))
+(vector-fill! (make-vector 3) #t 1 2)
 
 					; like 'map', but for vectors
 
@@ -189,4 +189,4 @@
     )
   )
     
-(_??_ (vector-map + #(1 2 3) #(4 5 6)) #(5 7 9))
+(vector-map + #(1 2 3) #(4 5 6))
