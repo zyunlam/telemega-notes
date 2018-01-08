@@ -22,15 +22,15 @@
 #define fprintf(file, ...) 	({ (void) (file); printf(__VA_ARGS__); })
 #undef putc
 #define putc(c,file) 		({ (void) (file); putchar(c); })
-#define fputs(s,file) 		({ (void) (file); printf("%s", s); })
-#define puts(s) 		({ printf("%s\n", s); })
+#define fputs(s,file) 		({ (void) (file); ao_put_string(s); })
 #undef getc
 #define getc(file) 		({ (void) (file); getchar(); })
+#define fflush(file)		({ (void) (file); flush(); })
 
 #define HAS_TASK	0
 #define HAS_AO_DELAY	1
 
-#if 0
+#if 1
 #define LED_PORT_ENABLE	STM_RCC_AHBENR_IOPBEN
 #define LED_PORT	(&stm_gpiob)
 #define LED_PIN_RED	4

@@ -32,6 +32,7 @@ ALTOS_SRC = \
 	ao_interrupt.c \
 	ao_product.c \
 	ao_cmd.c \
+	ao_led.c \
 	ao_notask.c \
 	ao_stdio.c \
 	ao_stdio_newlib.c \
@@ -72,8 +73,8 @@ $(OBJ): $(INC)
 ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
-ao_scheme_const.h: ao_scheme_make_const ao_scheme_basic_syntax.scheme ao_scheme_finish.scheme
-	$^ -o $@ -d GPIO,FLOAT,VECTOR,QUASI,BIGINT,POSIX,PORT,SAVE,UNDEF
+ao_scheme_const.h: ao_scheme_make_const ao_scheme_basic_syntax.scheme
+	$^ -o $@ -d FLOAT,VECTOR,QUASI,BIGINT,POSIX,PORT,SAVE,UNDEF
 
 load: $(PROG)
 	stm-load $(PROG)

@@ -20,7 +20,7 @@
 
 #include "ao.h"
 
-#define AO_SCHEME_POOL		3584
+#define AO_SCHEME_POOL		3792
 #define AO_SCHEME_TOKEN_MAX	64
 
 #ifndef __BYTE_ORDER
