@@ -1,4 +1,0 @@
-include ../scheme/Makefile-inc
-
-ao_scheme_const.h: $(SCHEME_SRCS) $(SCHEME_HDRS)
-	+cd ../scheme && make $@
