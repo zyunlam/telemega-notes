@@ -213,13 +213,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 				}
 			});
 		b.setToolTipText("Download satellite images for off-line flight monitoring");
-		b = addButton(2, 2, "Monitor Idle");
-		b.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					IdleMonitor();
-				}
-			});
-		b.setToolTipText("Check flight readiness of altimeter in idle mode");
 
 //		b = addButton(3, 2, "Launch Controller");
 //		b.addActionListener(new ActionListener() {
@@ -372,13 +365,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 
 	private void ConfigureTestStand() {
 		new AltosConfigureUI(TestStand.this, voice);
-	}
-
-	private void IdleMonitor() {
-		try {
-			new AltosIdleMonitorUI(this);
-		} catch (Exception e) {
-		}
 	}
 
 	static AltosWriter open_csv(File file) {
