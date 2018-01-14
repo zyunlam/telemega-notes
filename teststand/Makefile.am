@@ -23,7 +23,6 @@ teststand_JAVA = \
 	AltosFlightUI.java \
 	Altos.java \
 	AltosIgnitor.java \
-	AltosLaunch.java \
 	AltosLanded.java \
 	AltosPad.java \
 	TestStand.java \
