@@ -25,7 +25,6 @@ teststand_JAVA = \
 	Altos.java \
 	AltosIgnitor.java \
 	AltosLaunch.java \
-	AltosLaunchUI.java \
 	AltosLanded.java \
 	AltosPad.java \
 	TestStand.java \

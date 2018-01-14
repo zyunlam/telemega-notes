@@ -256,10 +256,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 		new AltosScanUI(TestStand.this, true);
 	}
 
-	void LaunchController() {
-		new AltosLaunchUI(TestStand.this);
-	}
-
 	/* Connect to TeleMetrum, either directly or through
 	 * a TeleDongle over the packet link
 	 */
