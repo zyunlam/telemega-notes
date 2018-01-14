@@ -38,8 +38,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosPad	pad;
 	AltosIgnitor	igniter;
 	AltosLanded	landed;
-	AltosCompanionInfo	companion;
-	boolean		has_companion;
 	boolean		has_state;
 	boolean		has_igniter;
 
@@ -117,18 +115,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 			if (has_igniter) {
 				pane.remove(igniter);
 				has_igniter = false;
-			}
-		}
-
-		if (state.companion != null) {
-			if (!has_companion) {
-				pane.add("Companion", companion);
-				has_companion= true;
-			}
-		} else {
-			if (has_companion) {
-				pane.remove(companion);
-				has_companion = false;
 			}
 		}
 
@@ -256,9 +242,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		displays.add(flightInfo);
 		pane.add("Table", new JScrollPane(flightInfo));
 
-		companion = new AltosCompanionInfo();
-		displays.add(companion);
-		has_companion = false;
 		has_state = false;
 
 		/* Make the tabbed pane use the rest of the window space */

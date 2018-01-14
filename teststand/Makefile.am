@@ -12,7 +12,6 @@ bin_SCRIPTS=teststand
 
 teststand_JAVA = \
 	AltosChannelMenu.java \
-	AltosCompanionInfo.java \
 	AltosConfigFC.java \
 	AltosConfigFCUI.java \
 	AltosConfigPyroUI.java \
