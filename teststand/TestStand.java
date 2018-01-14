@@ -199,20 +199,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 				}
 			});
 		b.setToolTipText("Find what channel an altimeter is sending telemetry on");
-		b = addButton(1, 2, "Load Maps");
-		b.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					LoadMaps();
-				}
-			});
-		b.setToolTipText("Download satellite images for off-line flight monitoring");
-
-//		b = addButton(3, 2, "Launch Controller");
-//		b.addActionListener(new ActionListener() {
-//				public void actionPerformed(ActionEvent e) {
-//					LaunchController();
-//				}
-//			});
 
 		b = addButton(4, 2, "Quit");
 		b.addActionListener(new ActionListener() {
@@ -279,10 +265,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 
 	void ScanChannels() {
 		new AltosScanUI(TestStand.this, true);
-	}
-
-	void LoadMaps() {
-		new AltosUIMapPreload(TestStand.this);
 	}
 
 	void LaunchController() {

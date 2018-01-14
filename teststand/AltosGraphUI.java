@@ -36,48 +36,17 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	JTabbedPane		pane;
 	AltosGraph		graph;
 	AltosUIEnable		enable;
-	AltosUIMap		map;
 	AltosFlightStats	stats;
 	AltosFlightStatsTable	statsTable;
 	AltosGPS		gps;
 	boolean			has_gps;
 
-	void fill_map(AltosFlightSeries flight_series) {
-		boolean			any_gps = false;
-		AltosGPSTimeValue	gtv_last = null;
-
-		if (flight_series.gps_series != null) {
-			for (AltosGPSTimeValue gtv : flight_series.gps_series) {
-				AltosGPS gps = gtv.gps;
-				if (gps != null &&
-				    gps.locked &&
-				    gps.nsat >= 4) {
-					if (map == null)
-						map = new AltosUIMap();
-					map.show(gps, (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time));
-					this.gps = gps;
-					gtv_last = gtv;
-					has_gps = true;
-				}
-			}
-		}
-		if (gtv_last != null) {
-			int state = (int) flight_series.value_after(AltosFlightSeries.state_name, gtv_last.time);
-			if (state == AltosLib.ao_flight_landed)
-				map.show(gtv_last.gps, state);
-		}
-	}
-
 	public void font_size_changed(int font_size) {
-		if (map != null)
-			map.font_size_changed(font_size);
 		if (statsTable != null)
 			statsTable.font_size_changed(font_size);
 	}
 
 	public void units_changed(boolean imperial_units) {
-		if (map != null)
-			map.units_changed(imperial_units);
 		if (enable != null)
 			enable.units_changed(imperial_units);
 	}
@@ -125,9 +94,6 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pane.add("Flight Statistics", statsTable);
 
 		has_gps = false;
-		fill_map(flight_series);
-		if (has_gps)
-			pane.add("Map", map);
 
 		setContentPane (pane);
 
@@ -144,7 +110,5 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pack();
 
 		setVisible(true);
-		if (gps != null)
-			map.centre(gps);
 	}
 }

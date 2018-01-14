@@ -39,8 +39,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	AltosIgnitor	igniter;
 	AltosLanded	landed;
 	AltosCompanionInfo	companion;
-	AltosUIMap      sitemap;
-	boolean		has_map;
 	boolean		has_companion;
 	boolean		has_state;
 	boolean		has_igniter;
@@ -131,18 +129,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 			if (has_companion) {
 				pane.remove(companion);
 				has_companion = false;
-			}
-		}
-
-		if (state.gps != null) {
-			if (!has_map) {
-				pane.add("Site Map", sitemap);
-				has_map = true;
-			}
-		} else {
-			if (has_map) {
-				pane.remove(sitemap);
-				has_map = false;
 			}
 		}
 
@@ -274,10 +260,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		displays.add(companion);
 		has_companion = false;
 		has_state = false;
-
-		sitemap = new AltosUIMap();
-		displays.add(sitemap);
-		has_map = false;
 
 		/* Make the tabbed pane use the rest of the window space */
 		bag.add(pane, constraints(0, 4, GridBagConstraints.BOTH));
