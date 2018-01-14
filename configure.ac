@@ -548,6 +548,9 @@ altosuilib/Makefile
 altosui/Makefile
 altosui/Info.plist
 altosui/altos-windows.nsi
+teststand/Makefile
+teststand/Info.plist
+teststand/teststand-windows.nsi
 libaltos/Makefile
 micropeak/Makefile
 micropeak/Info.plist

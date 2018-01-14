@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Test Stand UI
+GenericName=Altus Metrum Test Stand
+Comment=Operate and analayze data from Altus Metrum wireless test stand 
+Icon=%icondir%/altusmetrum-teststand.svg
+Exec=%bindir%/teststand %F
+Terminal=false
+MimeType=application/vnd.altusmetrum.telemetry;application/vnd.altusmetrum.eeprom
+Categories=Education;Electronics;Science;
