@@ -141,13 +141,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 					}
 				});
 		b.setToolTipText("Download and/or delete flight data from an altimeter");
-		b = addButton(2, 0, "Replay Flight");
-		b.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						Replay();
-					}
-				});
-		b.setToolTipText("Watch an old flight in real-time");
 		b = addButton(3, 0, "Graph Data");
 		b.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -296,20 +289,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 		new AltosLaunchUI(TestStand.this);
 	}
 
-	/*
-	 * Replay a flight from telemetry data
-	 */
-	private void Replay() {
-		AltosDataChooser chooser = new AltosDataChooser(
-			TestStand.this);
-
-		AltosRecordSet set = chooser.runDialog();
-		if (set != null) {
-			AltosReplayReader reader = new AltosReplayReader(set, chooser.file());
-			new AltosFlightUI(voice, reader);
-		}
-	}
-
 	/* Connect to TeleMetrum, either directly or through
 	 * a TeleDongle over the packet link
 	 */
@@ -401,9 +380,8 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 	static final int process_csv = 1;
 	static final int process_kml = 2;
 	static final int process_graph = 3;
-	static final int process_replay = 4;
-	static final int process_summary = 5;
-	static final int process_oneline = 6;
+	static final int process_summary = 4;
+	static final int process_oneline = 5;
 
 	static boolean process_csv(File input) {
 		AltosRecordSet set = record_set(input);
@@ -446,21 +424,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			writer.close();
 			return true;
 		}
-	}
-
-	static AltosReplayReader replay_file(File file) {
-		AltosRecordSet set = record_set(file);
-		if (set == null)
-			return null;
-		return new AltosReplayReader(set, file);
-	}
-
-	static boolean process_replay(File file) {
-		AltosReplayReader reader = replay_file(file);
-		if (reader == null)
-			return false;
-		AltosFlightUI flight_ui = new AltosFlightUI(new AltosVoice(), reader);
-		return true;
 	}
 
 	static boolean process_graph(File file) {
@@ -548,7 +511,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 	public static void help(int code) {
 		System.out.printf("Usage: teststand [OPTION]... [FILE]...\n");
 		System.out.printf("  Options:\n");
-		System.out.printf("    --replay <filename>\t\trelive the glory of past flights \n");
 		System.out.printf("    --graph <filename>\t\tgraph a flight\n");
 		System.out.printf("    --summary <filename>\t\tText summary of a flight\n");
 		System.out.printf("    --oneline <filename>\t\tOne line summary of a flight\n");
@@ -578,8 +540,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("--help"))
 					help(0);
-				else if (args[i].equals("--replay"))
-					process = process_replay;
 				else if (args[i].equals("--kml"))
 					process = process_kml;
 				else if (args[i].equals("--csv"))
@@ -600,10 +560,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 							teststand = new TestStand();
 					case process_graph:
 						if (!process_graph(file))
-							++errors;
-						break;
-					case process_replay:
-						if (!process_replay(file))
 							++errors;
 						break;
 					case process_kml:
