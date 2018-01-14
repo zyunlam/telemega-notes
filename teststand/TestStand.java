@@ -185,13 +185,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			});
 		b.setToolTipText("Replace the firmware in any AltusMetrum product");
 
-		b = addButton(4, 1, "Fire Igniter");
-		b.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					FireIgniter();
-				}
-			});
-		b.setToolTipText("Remote control of igniters for deployment testing");
 		b = addButton(0, 2, "Scan Channels");
 		b.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -257,10 +250,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 
 	void FlashImage() {
 		AltosFlashUI.show(TestStand.this);
-	}
-
-	void FireIgniter() {
-		new AltosIgniteUI(TestStand.this);
 	}
 
 	void ScanChannels() {
