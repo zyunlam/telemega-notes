@@ -37,8 +37,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 
 	AltosPad	pad;
 	AltosIgnitor	igniter;
-	AltosAscent	ascent;
-	AltosDescent	descent;
 	AltosLanded	landed;
 	AltosCompanionInfo	companion;
 	AltosUIMap      sitemap;
@@ -56,12 +54,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 	JComponent which_tab(AltosState state) {
 		if (state.state() < Altos.ao_flight_boost)
 			return pad;
-		if (state.state() <= Altos.ao_flight_coast)
-			return ascent;
-		if (state.state() <= Altos.ao_flight_main)
-			return descent;
-		if (state.state() == AltosLib.ao_flight_stateless)
-			return descent;
 		return landed;
 	}
 
@@ -106,9 +98,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		if (state.state() != Altos.ao_flight_startup) {
 			if (!has_state) {
 				pane.setTitleAt(0, "Launch Pad");
-				pane.add(ascent, 1);
-				pane.add(descent, 2);
-				pane.add(landed, 3);
+				pane.add(landed, 1);
 				has_state = true;
 			}
 		}
@@ -273,10 +263,6 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 
 		igniter = new AltosIgnitor();
 		displays.add(igniter);
-		ascent = new AltosAscent();
-		displays.add(ascent);
-		descent = new AltosDescent();
-		displays.add(descent);
 		landed = new AltosLanded(reader);
 		displays.add(landed);
 

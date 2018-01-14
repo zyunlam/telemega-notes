@@ -61,8 +61,6 @@ public class AltosFlightStatusTableModel extends AbstractTableModel {
 		setValueAt(state.data.state(), 1);
 		setValueAt(state.data.rssi, 2);
 		double speed = state.baro_speed;
-		if (state.ascent)
-			speed = state.speed;
 		setValueAt(String.format("%1.0f", AltosConvert.speed(speed)), 3);
 	}
 }

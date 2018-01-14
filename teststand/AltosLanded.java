@@ -165,7 +165,7 @@ public class AltosLanded extends AltosUIFlightTab implements ActionListener {
 	public AltosLanded(AltosFlightReader in_reader) {
 		reader = in_reader;
 
-		/* Elements in descent display */
+		/* Elements in display */
 		add(new Bearing(this, 0));
 		add(new Distance(this, 1));
 		add(new Lat(this, 2));

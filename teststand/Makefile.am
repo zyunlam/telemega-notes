@@ -11,7 +11,6 @@ CLASSPATH_ENV=mkdir -p $(JAVAROOT); CLASSPATH="$(JAVAROOT):../altoslib/*:../alto
 bin_SCRIPTS=teststand
 
 teststand_JAVA = \
-	AltosAscent.java \
 	AltosChannelMenu.java \
 	AltosCompanionInfo.java \
 	AltosConfigFC.java \
@@ -20,7 +19,6 @@ teststand_JAVA = \
 	AltosConfigureUI.java \
 	AltosConfigTD.java \
 	AltosConfigTDUI.java \
-	AltosDescent.java \
 	AltosFlightStatus.java \
 	AltosFlightStatusUpdate.java \
 	AltosFlightUI.java \
