@@ -155,7 +155,7 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 					}
 				});
 		b.setToolTipText("Convert flight data for a spreadsheet or GoogleEarth");
-		b = addButton(0, 1, "Configure Altimeter");
+		b = addButton(0, 1, "Configure TeleFire");
 		b.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						ConfigureTeleMetrum();
