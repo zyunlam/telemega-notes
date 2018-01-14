@@ -76,24 +76,39 @@ altos_putchar(struct altos_file *file, char c)
 }
 
 struct bt_vendor_map {
-	char	vendor[10];
-	int	port;
+	const char	vendor[10];
+	int		port;
 };
 
 static const struct bt_vendor_map altos_bt_vendor_map[] = {
 	{ .vendor = "00:12:6f:", 1 },	/* Rayson */
-	{ .vendor = "8C:DE:52:", 6 },	/* ISSC */
-	{ .vendor = "D8:80:39:", 6 },	/* Microchip */
+	{ .vendor = "8c:de:52:", 6 },	/* ISSC */
+	{ .vendor = "d8:80:39:", 6 },	/* Microchip */
 };
 
 #define NUM_BT_VENDOR_MAP	(sizeof altos_bt_vendor_map / sizeof altos_bt_vendor_map[0])
 #define BT_PORT_DEFAULT		1
 
+static inline int
+ao_tolower(int c) {
+	if ('A' <= c && c <= 'Z')
+		return c + 'a' - 'A';
+	return c;
+}
+
 int altos_bt_port(struct altos_bt_device *device) {
-	unsigned i;
-	for (i = 0; i < NUM_BT_VENDOR_MAP; i++)
-		if (strncmp (device->addr, altos_bt_vendor_map[i].vendor, strlen(altos_bt_vendor_map[i].vendor)) == 0)
-			return altos_bt_vendor_map[i].port;
+	unsigned i, j;
+	for (i = 0; i < NUM_BT_VENDOR_MAP; i++) {
+		const char *vendor = altos_bt_vendor_map[i].vendor;
+		for (j = 0; ; j++) {
+			if (vendor[j] == '\0')
+				return altos_bt_vendor_map[i].port;
+			if (device->addr[j] == '\0')
+				break;
+			if (ao_tolower(device->addr[j]) != vendor[j])
+				break;
+		}
+	}
 	return BT_PORT_DEFAULT;
 }
 
