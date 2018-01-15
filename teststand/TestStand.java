@@ -134,7 +134,7 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 					}
 				});
 		b.setToolTipText("Connect to TeleDongle and monitor telemetry");
-		b = addButton(1, 0, "Save Flight Data");
+		b = addButton(1, 0, "Save Data");
 		b.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						SaveFlightData();
@@ -201,7 +201,7 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			});
 		b.setToolTipText("Close all active windows and terminate TestStand");
 
-		setTitle("AltOS");
+		setTitle("Altus Metrum Test Stand");
 
 		pane.doLayout();
 		pane.validate();
@@ -322,15 +322,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 		}
 	}
 
-	static AltosWriter open_kml(File file) {
-		try {
-			return new AltosKML(file);
-		} catch (FileNotFoundException fe) {
-			System.out.printf("%s\n", fe.getMessage());
-			return null;
-		}
-	}
-
 	static AltosRecordSet record_set(File input) {
 		try {
 			return AltosLib.record_set(input);
@@ -345,7 +336,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 
 	static final int process_none = 0;
 	static final int process_csv = 1;
-	static final int process_kml = 2;
 	static final int process_graph = 3;
 	static final int process_summary = 4;
 	static final int process_oneline = 5;
@@ -369,28 +359,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			writer.close();
 		}
 		return true;
-	}
-
-	static boolean process_kml(File input) {
-		AltosRecordSet set = record_set(input);
-		if (set == null)
-			return false;
-
-		File output = Altos.replace_extension(input,".kml");
-		System.out.printf("Processing \"%s\" to \"%s\"\n", input, output);
-		if (input.equals(output)) {
-			System.out.printf("Not processing '%s'\n", input);
-			return false;
-		} else {
-			AltosWriter writer = open_kml(output);
-			if (writer == null)
-				return false;
-			AltosFlightSeries series = make_series(set);
-			series.finish();
-			writer.write(series);
-			writer.close();
-			return true;
-		}
 	}
 
 	static boolean process_graph(File file) {
@@ -482,7 +450,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 		System.out.printf("    --summary <filename>\t\tText summary of a flight\n");
 		System.out.printf("    --oneline <filename>\t\tOne line summary of a flight\n");
 		System.out.printf("    --csv\tgenerate comma separated output for spreadsheets, etc\n");
-		System.out.printf("    --kml\tgenerate KML output for use with Google Earth\n");
 		System.exit(code);
 	}
 
@@ -507,8 +474,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("--help"))
 					help(0);
-				else if (args[i].equals("--kml"))
-					process = process_kml;
 				else if (args[i].equals("--csv"))
 					process = process_csv;
 				else if (args[i].equals("--graph"))
@@ -527,10 +492,6 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 							teststand = new TestStand();
 					case process_graph:
 						if (!process_graph(file))
-							++errors;
-						break;
-					case process_kml:
-						if (!process_kml(file))
 							++errors;
 						break;
 					case process_csv:
