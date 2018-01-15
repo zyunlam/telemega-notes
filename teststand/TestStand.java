@@ -446,10 +446,10 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 	public static void help(int code) {
 		System.out.printf("Usage: teststand [OPTION]... [FILE]...\n");
 		System.out.printf("  Options:\n");
-		System.out.printf("    --graph <filename>\t\tgraph a flight\n");
-		System.out.printf("    --summary <filename>\t\tText summary of a flight\n");
-		System.out.printf("    --oneline <filename>\t\tOne line summary of a flight\n");
-		System.out.printf("    --csv\tgenerate comma separated output for spreadsheets, etc\n");
+		System.out.printf("    --graph <filename>\t\tGraph a test\n");
+		System.out.printf("    --summary <filename>\tText summary of a test\n");
+		System.out.printf("    --oneline <filename>\tOne line summary of a test\n");
+		System.out.printf("    --csv\t\t\tGenerate comma separated output for spreadsheets, etc\n");
 		System.exit(code);
 	}
 
