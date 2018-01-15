@@ -38,8 +38,6 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	AltosUIEnable		enable;
 	TestStats	stats;
 	TestStatsTable		statsTable;
-	AltosGPS		gps;
-	boolean			has_gps;
 
 	public void font_size_changed(int font_size) {
 		if (statsTable != null)
@@ -92,8 +90,6 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pane.add("Test Graph", graph.panel);
 		pane.add("Configure Graph", enable);
 		pane.add("Test Statistics", statsTable);
-
-		has_gps = false;
 
 		setContentPane (pane);
 
