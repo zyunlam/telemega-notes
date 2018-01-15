@@ -270,7 +270,7 @@ Manifest-fat.txt:
 
 teststand: Makefile
 	echo "#!/bin/sh" > $@
-	echo 'exec java -Djava.library.path="$(altoslibdir)" -jar "$(altosuidir)/teststand.jar" "$$@"' >> $@
+	echo 'exec java -Djava.library.path="$(altoslibdir)" -jar "$(teststanddir)/teststand.jar" "$$@"' >> $@
 	chmod +x $@
 
 teststand-test: Makefile

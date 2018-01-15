@@ -41,10 +41,12 @@ public class TestStandGraph extends AltosUIGraph {
 	/* These are in 'priority' order so that earlier ones get simpler line styles,
 	 * then they are grouped so that adjacent ones get sequential colors
 	 */
+	static final private AltosUILineStyle pressure_color = new AltosUILineStyle ();
+	static final private AltosUILineStyle thrust_color = new AltosUILineStyle();
+
 	static final private AltosUILineStyle height_color = new AltosUILineStyle();
 	static final private AltosUILineStyle speed_color = new AltosUILineStyle();
-	static final private AltosUILineStyle accel_color = new AltosUILineStyle();
-	static final private AltosUILineStyle vert_accel_color = new AltosUILineStyle();
+	static final private AltosUILineStyle vert_thrust_color = new AltosUILineStyle();
 	static final private AltosUILineStyle orient_color = new AltosUILineStyle();
 
 	static final private AltosUILineStyle gps_height_color = new AltosUILineStyle();
@@ -58,7 +60,7 @@ public class TestStandGraph extends AltosUIGraph {
 
 	static final private AltosUILineStyle kalman_height_color = new AltosUILineStyle();
 	static final private AltosUILineStyle kalman_speed_color = new AltosUILineStyle();
-	static final private AltosUILineStyle kalman_accel_color = new AltosUILineStyle();
+	static final private AltosUILineStyle kalman_thrust_color = new AltosUILineStyle();
 
 	static final private AltosUILineStyle gps_nsat_color = new AltosUILineStyle ();
 	static final private AltosUILineStyle gps_nsat_solution_color = new AltosUILineStyle ();
@@ -73,7 +75,6 @@ public class TestStandGraph extends AltosUIGraph {
 
 	static final private AltosUILineStyle temperature_color = new AltosUILineStyle ();
 	static final private AltosUILineStyle dbm_color = new AltosUILineStyle();
-	static final private AltosUILineStyle pressure_color = new AltosUILineStyle ();
 
 	static final private AltosUILineStyle state_color = new AltosUILineStyle(0);
 	static final private AltosUILineStyle accel_along_color = new AltosUILineStyle();
@@ -102,12 +103,13 @@ public class TestStandGraph extends AltosUIGraph {
 		if (stats != null && stats.serial != AltosLib.MISSING && stats.product != null && stats.flight != AltosLib.MISSING)
 			setName(String.format("%s %d flight %d\n", stats.product, stats.serial, stats.flight));
 
-		height_axis = newAxis("Height", AltosConvert.height, height_color);
 		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
+		thrust_axis = newAxis("Thrust", AltosConvert.force, thrust_color, 0);
+
+		height_axis = newAxis("Height", AltosConvert.height, height_color);
 		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
-		thrust_axis = newAxis("Thrust", AltosConvert.force, accel_color);
-		tick_axis = newAxis("Tick", tick_units, accel_color, 0);
-		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
+		tick_axis = newAxis("Tick", tick_units, thrust_color, 0);
+		accel_axis = newAxis("Acceleration", AltosConvert.accel, thrust_color);
 		voltage_axis = newAxis("Voltage", AltosConvert.voltage, battery_voltage_color);
 		temperature_axis = newAxis("Temperature", AltosConvert.temperature, temperature_color, 0);
 		nsat_axis = newAxis("Satellites", null, gps_nsat_color,
@@ -138,22 +140,22 @@ public class TestStandGraph extends AltosUIGraph {
 //					      false);
 
 		flight_series.register_axis(AltosUIFlightSeries.tick_name,
-					    accel_color,
+					    thrust_color,
 					    false,
 					    tick_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.accel_name,
-					    accel_color,
+					    thrust_color,
 					    false,
 					    accel_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.vert_accel_name,
-					    vert_accel_color,
+					    vert_thrust_color,
 					    false,
 					    accel_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.kalman_accel_name,
-					    kalman_accel_color,
+					    kalman_thrust_color,
 					    false,
 					    accel_axis);
 
@@ -324,7 +326,7 @@ public class TestStandGraph extends AltosUIGraph {
 					    orient_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.thrust_name,
-					    accel_color,
+					    thrust_color,
 					    true,
 					    thrust_axis);
 

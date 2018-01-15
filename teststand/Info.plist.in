@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.altusmetrum.altosui</string>
+	<string>org.altusmetrum.teststand</string>
 	<key>CFBundleSignature</key>
 	<string>Altu</string>
 	<key>CFBundleGetInfoString</key>
@@ -23,7 +23,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleIconFile</key>
-	<string>altusmetrum-altosui.icns</string>
+	<string>altusmetrum-teststand.icns</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 	  <dict>
@@ -54,12 +54,12 @@
 	<key>Java</key>
 	<dict>
 		<key>MainClass</key>
-		<string>altosui.AltosUI</string>
+		<string>teststand.TestStand</string>
 		<key>JVMVersion</key>
 		<string>1.5+</string>
 		<key>ClassPath</key>
 		<array>
-			<string>$JAVAROOT/altosui.jar</string>
+			<string>$JAVAROOT/teststand.jar</string>
 			<string>$JAVAROOT/freetts.jar</string>
 		</array>
 		<key>VMOptions</key>
