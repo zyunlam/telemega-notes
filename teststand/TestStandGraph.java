@@ -92,7 +92,7 @@ public class TestStandGraph extends AltosUIGraph {
 
 	AltosUIFlightSeries flight_series;
 
-	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosUIFlightSeries flight_series) {
+	AltosUITimeSeries[] setup(TestStats stats, AltosUIFlightSeries flight_series) {
 		AltosCalData	cal_data = flight_series.cal_data();
 
 		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
@@ -342,7 +342,7 @@ public class TestStandGraph extends AltosUIGraph {
 		return flight_series.series(cal_data);
 	}
 
-	public void set_data(AltosFlightStats stats, AltosUIFlightSeries flight_series) {
+	public void set_data(TestStats stats, AltosUIFlightSeries flight_series) {
 		set_series(setup(stats, flight_series));
 	}
 
@@ -350,7 +350,7 @@ public class TestStandGraph extends AltosUIGraph {
 		super(enable, "Flight");
 	}
 
-	public TestStandGraph(AltosUIEnable enable, AltosFlightStats stats, AltosUIFlightSeries flight_series) {
+	public TestStandGraph(AltosUIEnable enable, TestStats stats, AltosUIFlightSeries flight_series) {
 		this(enable);
 		this.flight_series = flight_series;
 		set_series(setup(stats, flight_series));

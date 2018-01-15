@@ -36,8 +36,8 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	JTabbedPane		pane;
 	TestStandGraph		graph;
 	AltosUIEnable		enable;
-	AltosFlightStats	stats;
-	AltosFlightStatsTable	statsTable;
+	TestStats	stats;
+	TestStatsTable		statsTable;
 	AltosGPS		gps;
 	boolean			has_gps;
 
@@ -56,7 +56,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	public void filter_changed(double speed_filter, double accel_filter) {
 		flight_series.set_filter(speed_filter, accel_filter);
 		graph.filter_changed();
-		stats = new AltosFlightStats(flight_series);
+		stats = new TestStats(flight_series);
 		statsTable.filter_changed(stats);
 	}
 
@@ -83,11 +83,11 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 
 		flight_series.finish();
 
-		stats = new AltosFlightStats(flight_series);
+		stats = new TestStats(flight_series);
 
 		graph = new TestStandGraph(enable, stats, flight_series);
 
-		statsTable = new AltosFlightStatsTable(stats);
+		statsTable = new TestStatsTable(stats);
 
 		pane.add("Test Graph", graph.panel);
 		pane.add("Configure Graph", enable);

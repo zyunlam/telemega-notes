@@ -412,7 +412,7 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			return false;
 		System.out.printf("%s:\n", file.toString());
 		AltosFlightSeries series = make_series(set);
-		AltosFlightStats stats = new AltosFlightStats(series);
+		TestStats stats = new TestStats(series);
 		if (stats.serial != AltosLib.MISSING)
 			System.out.printf("Serial:       %5d\n", stats.serial);
 		if (stats.flight != AltosLib.MISSING)
@@ -462,7 +462,7 @@ public class TestStand extends AltosUIFrame implements AltosEepromGrapher {
 			return false;
 		System.out.printf("%s", file.toString());
 		AltosFlightSeries series = make_series(set);
-		AltosFlightStats stats = new AltosFlightStats(series);
+		TestStats stats = new TestStats(series);
 		if (stats.max_height != AltosLib.MISSING)
 			System.out.printf(" height  %6.0f m", stats.max_height);
 		if (stats.max_speed != AltosLib.MISSING)

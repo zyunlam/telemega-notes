@@ -27,6 +27,8 @@ teststand_JAVA = \
 	AltosPad.java \
 	TestStand.java \
 	TestStandGraph.java \
+	TestStats.java \
+	TestStatsTable.java \
 	AltosGraphUI.java
 
 JFREECHART_CLASS= \
