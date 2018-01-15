@@ -89,9 +89,9 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 
 		statsTable = new AltosFlightStatsTable(stats);
 
-		pane.add("Flight Graph", graph.panel);
+		pane.add("Test Graph", graph.panel);
 		pane.add("Configure Graph", enable);
-		pane.add("Flight Statistics", statsTable);
+		pane.add("Test Statistics", statsTable);
 
 		has_gps = false;
 
