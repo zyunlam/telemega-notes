@@ -19,23 +19,34 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
+#define fprintf(file, ...) 	({ (void) (file); printf(__VA_ARGS__); })
+#undef putc
+#define putc(c,file) 		({ (void) (file); putchar(c); })
+#define fputs(s,file) 		({ (void) (file); ao_put_string(s); })
+#undef getc
+#define getc(file) 		({ (void) (file); getchar(); })
+#define fflush(file)		({ (void) (file); flush(); })
+
 #define HAS_TASK	0
 #define HAS_AO_DELAY	1
 
+#if 1
 #define LED_PORT_ENABLE	STM_RCC_AHBENR_IOPBEN
 #define LED_PORT	(&stm_gpiob)
 #define LED_PIN_RED	4
 #define AO_LED_RED	(1 << LED_PIN_RED)
 #define AO_LED_PANIC	AO_LED_RED
+#define LEDS_AVAILABLE	(AO_LED_RED)
+#endif
+
 #define AO_CMD_LEN	128
-#define AO_LISP_POOL_TOTAL	3072
-#define AO_LISP_SAVE	1
+#define AO_LISP_POOL	5120
 #define AO_STACK_SIZE	1024
 
+#if 0
 /* need HSI active to write to flash */
 #define AO_NEED_HSI	1
-
-#define LEDS_AVAILABLE	(AO_LED_RED)
+#endif
 
 #define AO_POWER_MANAGEMENT	0
 

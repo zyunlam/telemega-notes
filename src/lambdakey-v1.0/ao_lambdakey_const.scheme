@@ -185,7 +185,7 @@
 
 					; simple math operators
 
-(define zero? (macro (value) (list eqv? value 0)))
+(define zero? (macro (value) (list eq? value 0)))
 
 (zero? 1)
 (zero? 0)
@@ -247,13 +247,6 @@
 (odd? -1)
 
 
-(define (list-tail a b)
-  (if (zero? b)
-      a
-      (list-tail (cdr a) (- b 1))
-      )
-  )
-
 (define (list-ref a b)
   (car (list-tail a b))
   )
@@ -280,7 +273,7 @@
 					;
 					; (let* ((x 1) (y)) (set! y (+ x 1)) y)
 
-(define let*
+(define letrec
   (macro (a . b)
 
 					;
@@ -301,7 +294,8 @@
 					; expressions to evaluate
 
 	 (define (_v a b)
-	   (cond ((null? a) b)		 (else
+	   (cond ((null? a) b)
+		 (else
 		  (cons
 		   (list set
 			 (list quote
@@ -330,9 +324,10 @@
 	 )
      )
 
-(let* ((a 1) (y a)) (+ a y))
+(letrec ((a 1) (y a)) (+ a y))
 
-(define let let*)
+(define let letrec)
+(define let* letrec)
 					; recursive equality
 
 (define (equal? a b)
@@ -376,18 +371,21 @@
 
 (memq '(2) '((1) (2) (3)))
 
-(define (_as a b t?)
+(define (assoc a b . t?)
+  (if (null? t?)
+      (set! t? equal?)
+      (set! t? (car t?))
+      )
   (if (null? b)
       #f
     (if (t? a (caar b))
 	(car b)
-      (_as a (cdr b) t?)
+      (assoc a (cdr b) t?)
       )
     )
   )
 
-(define (assq a b) (_as a b eq?))
-(define (assoc a b) (_as a b equal?))
+(define (assq a b) (assoc a b eq?))
 
 (assq 'a '((a 1) (b 2) (c 3)))
 (assoc '(c) '((a 1) (b 2) ((c) 3)))

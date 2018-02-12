@@ -639,7 +639,7 @@ static void
 ba2str(BTH_ADDR ba, char *str)
 {
 
-	sprintf(str, "%02x:%02x:%02x:%02x:%02x:%02x",
+	sprintf(str, "%02X:%02X:%02X:%02X:%02X:%02X",
 		get_byte(ba, 0),
 		get_byte(ba, 1),
 		get_byte(ba, 2),
@@ -755,8 +755,8 @@ altos_bt_open(struct altos_bt_device *device)
 		altos_set_last_winsock_error();
 		closesocket(file->socket);
 		free(file);
+		log_message("Connection attempted to address %s port %d\n", device->addr, sockaddr_bth.port);
 		return NULL;
 	}
 	return &file->file;
 }
-

@@ -1890,6 +1890,7 @@ extern struct stm_usb stm_usb;
 #define STM_USB_EPR_CTR_RX	15
 #define  STM_USB_EPR_CTR_RX_WRITE_INVARIANT		1
 #define STM_USB_EPR_DTOG_RX	14
+#define STM_USB_EPR_SW_BUF_TX	14
 #define STM_USB_EPR_DTOG_RX_WRITE_INVARIANT		0
 #define STM_USB_EPR_STAT_RX	12
 #define  STM_USB_EPR_STAT_RX_DISABLED			0
@@ -1906,11 +1907,14 @@ extern struct stm_usb stm_usb;
 #define  STM_USB_EPR_EP_TYPE_INTERRUPT			3
 #define  STM_USB_EPR_EP_TYPE_MASK			3
 #define STM_USB_EPR_EP_KIND	8
+#define  STM_USB_EPR_EP_KIND_SNGL_BUF			0	/* Bulk */
 #define  STM_USB_EPR_EP_KIND_DBL_BUF			1	/* Bulk */
+#define  STM_USB_EPR_EP_KIND_NO_STATUS_OUT		0	/* Control */
 #define  STM_USB_EPR_EP_KIND_STATUS_OUT			1	/* Control */
 #define STM_USB_EPR_CTR_TX	7
 #define  STM_USB_CTR_TX_WRITE_INVARIANT			1
 #define STM_USB_EPR_DTOG_TX	6
+#define STM_USB_EPR_SW_BUF_RX	6
 #define  STM_USB_EPR_DTOG_TX_WRITE_INVARIANT		0
 #define STM_USB_EPR_STAT_TX	4
 #define  STM_USB_EPR_STAT_TX_DISABLED			0
@@ -1996,7 +2000,12 @@ union stm_usb_bdt {
 
 #define STM_USB_BDT_SIZE	8
 
+/* We'll use the first block of usb SRAM for the BDT */
 extern uint8_t stm_usb_sram[] __attribute__((aligned(4)));
+extern union stm_usb_bdt stm_usb_bdt[STM_USB_BDT_SIZE] __attribute__((aligned(4)));
+
+#define stm_usb_sram	((uint8_t *) 0x40006000)
+#define stm_usb_bdt	((union stm_usb_bdt *) 0x40006000)
 
 struct stm_exti {
 	vuint32_t	imr;

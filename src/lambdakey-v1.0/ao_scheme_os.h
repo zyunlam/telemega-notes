@@ -20,7 +20,7 @@
 
 #include "ao.h"
 
-#define AO_SCHEME_POOL		3584
+#define AO_SCHEME_POOL		3792
 #define AO_SCHEME_TOKEN_MAX	64
 
 #ifndef __BYTE_ORDER
@@ -30,7 +30,7 @@
 #endif
 
 static inline int
-ao_scheme_getc() {
+_ao_scheme_getc() {
 	static uint8_t	at_eol;
 	int c;
 
@@ -44,11 +44,7 @@ ao_scheme_getc() {
 	return c;
 }
 
-static inline void
-ao_scheme_os_flush(void)
-{
-	flush();
-}
+#define ao_scheme_getc(f) ({ (void) (f); _ao_scheme_getc(); })
 
 static inline void
 ao_scheme_abort(void)
@@ -56,11 +52,13 @@ ao_scheme_abort(void)
 	ao_panic(1);
 }
 
+#ifdef LEDS_AVAILABLE
 static inline void
 ao_scheme_os_led(int led)
 {
 	ao_led_set(led);
 }
+#endif
 
 #define AO_SCHEME_JIFFIES_PER_SECOND	AO_HERTZ
 

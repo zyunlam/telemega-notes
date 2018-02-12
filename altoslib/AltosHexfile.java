@@ -46,7 +46,7 @@ class HexFileInputStream extends PushbackInputStream {
 }
 
 class HexRecord implements Comparable<Object> {
-	public int	address;
+	public long	address;
 	public int	type;
 	public byte	checksum;
 	public byte[]	data;
@@ -110,7 +110,14 @@ class HexRecord implements Comparable<Object> {
 
 	public int compareTo(Object other) {
 		HexRecord	o = (HexRecord) other;
-		return address - o.address;
+
+		long diff = address - o.address;
+
+		if (diff > 0)
+			return 1;
+		if (diff < 0)
+			return -1;
+		return 0;
 	}
 
 	public String toString() {
@@ -119,8 +126,8 @@ class HexRecord implements Comparable<Object> {
 
 	public HexRecord(HexFileInputStream input) throws IOException, EOFException {
 		read_state	state = read_state.marker;
-		int		nhexbytes = 0;
-		int		hex = 0;
+		long		nhexbytes = 0;
+		long		hex = 0;
 		int		ndata = 0;
 		byte		got_checksum;
 
@@ -154,7 +161,7 @@ class HexRecord implements Comparable<Object> {
 
 				switch (state) {
 				case length:
-					data = new byte[hex];
+					data = new byte[(int) hex];
 					state = read_state.address;
 					nhexbytes = 4;
 					break;
@@ -164,7 +171,7 @@ class HexRecord implements Comparable<Object> {
 					nhexbytes = 2;
 					break;
 				case type:
-					type = hex;
+					type = (int) hex;
 					if (data.length > 0)
 						state = read_state.data;
 					else
@@ -211,12 +218,21 @@ class HexRecord implements Comparable<Object> {
 }
 
 public class AltosHexfile {
-	public int		address;
+	public long		address;
+	public long		max_address;
 	public byte[]		data;
 	LinkedList<AltosHexsym>	symlist = new LinkedList<AltosHexsym>();
 
-	public byte get_byte(int a) {
-		return data[a - address];
+	public byte get_byte(long a) {
+		return data[(int) (a - address)];
+	}
+
+	public int get_u8(long a) {
+		return ((int) get_byte(a)) & 0xff;
+	}
+
+	public int get_u16(long a) {
+		return get_u8(a) | (get_u8(a+1) << 8);
 	}
 
 	/* CC1111-based products have the romconfig stuff located
@@ -236,6 +252,15 @@ public class AltosHexfile {
 		new AltosHexsym("ao_radio_cal", ao_radio_cal_addr),
 		new AltosHexsym("ao_usb_descriptors", ao_usb_descriptors_addr)
 	};
+
+	static final int AO_USB_DESC_DEVICE		= 1;
+	static final int AO_USB_DESC_STRING		= 3;
+
+	static final int AO_ROMCONFIG_VERSION_INDEX	= 0;
+	static final int AO_ROMCONFIG_CHECK_INDEX	= 1;
+	static final int AO_SERIAL_NUMBER_INDEX		= 2;
+	static final int AO_RADIO_CAL_INDEX		= 3;
+	static final int AO_USB_DESCRIPTORS_INDEX	= 4;
 
 	private void add_cc_symbols() {
 		for (int i = 0; i < cc_symbols.length; i++)
@@ -262,6 +287,92 @@ public class AltosHexfile {
 		return null;
 	}
 
+	private long find_usb_descriptors() {
+		AltosHexsym	usb_descriptors = lookup_symbol("ao_usb_descriptors");
+		long		a;
+
+		if (usb_descriptors == null)
+			return -1;
+
+		/* Walk the descriptors looking for the device */
+		a = usb_descriptors.address;
+		while (get_u8(a+1) != AO_USB_DESC_DEVICE) {
+			int delta = get_u8(a);
+			a += delta;
+			if (delta == 0 || a >= max_address)
+				return -1;
+		}
+		return a;
+	}
+
+	public AltosUsbId find_usb_id() {
+		long a = find_usb_descriptors();
+
+		if (a == -1)
+			return null;
+
+		/* Walk the descriptors looking for the device */
+		while (get_u8(a+1) != AO_USB_DESC_DEVICE) {
+			int delta = get_u8(a);
+			a += delta;
+			if (delta == 0 || a >= max_address)
+				return null;
+		}
+
+		return new AltosUsbId(get_u16(a + 8),
+				      get_u16(a + 10));
+	}
+
+	public String find_usb_product() {
+		long		a = find_usb_descriptors();
+		int		num_strings;
+		int		product_string;
+
+		if (a == -1)
+			return null;
+
+		product_string = get_u8(a+15);
+
+		/* Walk the descriptors looking for the device */
+		num_strings = 0;
+		for (;;) {
+			if (get_u8(a+1) == AO_USB_DESC_STRING) {
+				++num_strings;
+				if (num_strings == product_string + 1)
+					break;
+			}
+
+			int delta = get_u8(a);
+			a += delta;
+			if (delta == 0 || a >= max_address)
+				return null;
+		}
+
+		int product_len = get_u8(a);
+
+		System.out.printf("Product is at %x length %d\n", a, product_len);
+
+		for (int i = 0; i < product_len; i++)
+			System.out.printf(" %2d: %02x\n", i, get_u8(a+i));
+
+		if (product_len <= 0)
+			return null;
+
+		String product = "";
+
+		for (int i = 0; i < product_len - 2; i += 2) {
+			int	c = get_u16(a + 2 + i);
+
+			System.out.printf("character %x\n", c);
+
+			product += Character.toString((char) c);
+		}
+
+		System.out.printf("product %s\n", product);
+
+		return product;
+	}
+
 	private String make_string(byte[] data, int start, int length) {
 		String s = "";
 		for (int i = 0; i < length; i++)
@@ -269,9 +380,10 @@ public class AltosHexfile {
 		return s;
 	}
 
-	public AltosHexfile(byte[] bytes, int offset) {
+	public AltosHexfile(byte[] bytes, long offset) {
 		data = bytes;
 		address = offset;
+		max_address = address + bytes.length;
 	}
 
 	public AltosHexfile(FileInputStream file) throws IOException {
@@ -335,7 +447,8 @@ public class AltosHexfile {
 			throw new IOException("hex file too large");
 
 		data = new byte[(int) (bound - base)];
-		address = (int) base;
+		address = base;
+		max_address = bound;
 		Arrays.fill(data, (byte) 0xff);
 
 		/* Paint the records into the new array */

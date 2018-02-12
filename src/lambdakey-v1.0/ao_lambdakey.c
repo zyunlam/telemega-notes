@@ -16,7 +16,7 @@
 #include <ao_scheme.h>
 
 static void scheme_cmd() {
-	ao_scheme_read_eval_print();
+	ao_scheme_read_eval_print(stdin, stdout, false);
 }
 
 static const struct ao_cmds blink_cmds[] = {
@@ -27,7 +27,9 @@ static const struct ao_cmds blink_cmds[] = {
 
 void main(void)
 {
+#ifdef LEDS_AVAILABLE
 	ao_led_init(LEDS_AVAILABLE);
+#endif
 	ao_clock_init();
 	ao_timer_init();
 	ao_usb_init();

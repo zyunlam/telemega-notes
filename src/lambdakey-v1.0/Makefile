@@ -5,7 +5,9 @@
 
 include ../stmf0/Makefile.defs
 
-include ../scheme/Makefile-inc
+aoschemelib=$(shell pkg-config --variable=aoschemelib ao-scheme)
+
+include $(aoschemelib)/Makefile-scheme
 
 NEWLIB_FULL=-lm -lc -lgcc
 
@@ -29,8 +31,8 @@ ALTOS_SRC = \
 	ao_interrupt.c \
 	ao_product.c \
 	ao_cmd.c \
-	ao_notask.c \
 	ao_led.c \
+	ao_notask.c \
 	ao_stdio.c \
 	ao_stdio_newlib.c \
 	ao_panic.c \
@@ -49,9 +51,9 @@ LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tlambda.ld
 
 MAP=$(PROG).map
 NEWLIB=/local/newlib-mini
-MAPFILE=-Wl,-M=$(MAP)
+MAPFILE=-Wl,-Map=$(MAP)
 LDFLAGS=-L../stmf0 -L$(NEWLIB)/arm-none-eabi/lib/thumb/v6-m/ -Wl,-Tlambda.ld $(MAPFILE) -nostartfiles
-AO_CFLAGS=-I. -I../stmf0 -I../kernel -I../drivers -I.. -I../scheme -isystem $(NEWLIB)/arm-none-eabi/include -DNEWLIB
+AO_CFLAGS=-I. -I../stmf0 -I../kernel -I../drivers -I.. -I$(aoschemelib) -isystem $(NEWLIB)/arm-none-eabi/include -DNEWLIB
 
 PROGNAME=lambdakey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -59,6 +61,9 @@ HEX=$(PROGNAME)-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_lambdakey.c
 OBJ=$(SRC:.c=.o)
+
+bletch:
+	echo lib is $(aoschemelib)
 
 all: $(PROG) $(HEX)
 
@@ -70,8 +75,8 @@ $(OBJ): $(INC)
 ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
-ao_scheme_const.h: ../scheme/make-const/ao_scheme_make_const ao_lambdakey_const.scheme
-	../scheme/make-const/ao_scheme_make_const -d FLOAT,VECTOR,QUASI,BIGINT -o $@ ao_lambdakey_const.scheme
+ao_scheme_const.h: ao-scheme-make-const ao_scheme_basic_syntax.scheme
+	$^ -o $@ -d FLOAT,VECTOR,QUASI,BIGINT,POSIX,PORT,SAVE,UNDEF
 
 load: $(PROG)
 	stm-load $(PROG)
