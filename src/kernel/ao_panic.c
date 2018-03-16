@@ -64,9 +64,9 @@ ao_panic(uint8_t reason)
 		ao_panic_delay(20);
 #if HAS_BEEP
 		for (n = 0; n < 5; n++) {
-			ao_beep(AO_BEEP_HIGH);
+			ao_beep(AO_BEEP_HIGH_PANIC);
 			ao_panic_delay(1);
-			ao_beep(AO_BEEP_LOW);
+			ao_beep(AO_BEEP_LOW_PANIC);
 			ao_panic_delay(1);
 		}
 		ao_beep(AO_BEEP_OFF);
@@ -78,7 +78,7 @@ ao_panic(uint8_t reason)
 #endif
 		if (reason & 0x40) {
 			ao_led_on(AO_LED_PANIC);
-			ao_beep(AO_BEEP_HIGH);
+			ao_beep(AO_BEEP_HIGH_PANIC);
 			ao_panic_delay(40);
 			ao_led_off(AO_LED_PANIC);
 			ao_beep(AO_BEEP_OFF);
@@ -86,7 +86,7 @@ ao_panic(uint8_t reason)
 		}
 		for (n = 0; n < (reason & 0x3f); n++) {
 			ao_led_on(AO_LED_PANIC);
-			ao_beep(AO_BEEP_MID);
+			ao_beep(AO_BEEP_MID_PANIC);
 			ao_panic_delay(10);
 			ao_led_off(AO_LED_PANIC);
 			ao_beep(AO_BEEP_OFF);
