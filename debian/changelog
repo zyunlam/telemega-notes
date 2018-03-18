@@ -1,3 +1,56 @@
+altos (1.8.5-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * update Releasing with wisdom from 1.8.4 release process
+  * need to push telegps-v2.0 loader .bin file to corporate repo, too
+  * doc: update copyright year in doc/altusmetrum-docinfo.xml
+  * preparing to release 1.8.5
+
+  [ Keith Packard ]
+  * altos/scheme: Add separate floor-quotient builtin
+  * altos/scheme: Pull out per-frame vals while printing list of frames
+  * altos/scheme: Add support for hex, octal and binary constants
+  * altos/scheme: support %x format for scheme printf
+  * altos/scheme: fix parsing of vector followed by list
+  * altos/scheme: Add start/end args to vector->list
+  * altos/scheme: Make for-each tail recursive
+  * altos/scheme: Make constant built pool as large as possible
+  * altos/scheme: add make-string builtin
+  * altos/scheme: Fix macro-detection debugging
+  * altos/scheme: Add builtin list-tail
+  * altos/scheme: Allow make-vector value param to be optional
+  * altos/scheme: Accept more escaped character constants
+  * altos/scheme: Add vector and string funcs. Test everybody.
+  * altos/scheme: add 'install' target to install both test and tiny test
+  * altos/scheme: Add ports. Split scheme code up.
+  * altos/lambdakey-v1.0: Switch back to command buffered input
+  * altos/kernel: Use ao_put_string for syntax error message
+  * altos/stmf0: Remove packet counters from non-debug build
+  * altos/stmf0: Stop shadowing USB tx buffers in system RAM
+  * altos/stmf0: Use double buffering for USB tx data
+  * altos/stmf0: use double buffering for USB rx data
+  * ao-chaosread: add --raw and --cooked flags
+  * altos/stmf0: Use double buffering for ChaosKey
+  * altos/scheme: Split tests out from build sources
+  * altos/scheme: Allow individual lisp keywords to be feature-conditional
+  * altos/scheme: remove debug code from vector write
+  * altos/lambdakey-v1.0: Add LED function back in
+  * altos/scheme: Allow unicode in lexer
+  * altos/scheme: Move ao-scheme to a separate repository
+  * altoslib/altosuilib: Validate rom image is for target device
+  * libaltos: Use case-insensitive compare when matching BT MACs
+  * Add TeleGPS v2.0 binaries to distribution
+  * ao-bringup: Don't wait for user when testing EasyMini igniters
+  * chaoskey: Create unified ROM image with both loader and app
+  * ao-bringup: Check for Loader USB id before attempting dfu-util
+  * ao-usbload: Flip product names in loader error message
+  * altos: Make panic beeps use fixed frequencies
+  * altos/stmf0: Add some common definitions for flash loaders
+  * doc: Add release notes for 1.8.5
+  * Bump version to 1.8.5
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 18 Mar 2018 15:50:54 -0600
+
 altos (1.8.4-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
