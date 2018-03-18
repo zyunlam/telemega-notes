@@ -26,20 +26,31 @@ public class AltosRomconfig {
 	public int	check;
 	public int	serial_number;
 	public int	radio_calibration;
+	public AltosUsbId	usb_id;
+	public String		usb_product;
+
+	static private long find_address(AltosHexfile hexfile, String name, int len) throws AltosNoSymbol {
+		AltosHexsym symbol = hexfile.lookup_symbol(name);
+		if (symbol == null) {
+			System.out.printf("no symbol %s\n", name);
+			throw new AltosNoSymbol(name);
+		}
+		if (hexfile.address <= symbol.address && symbol.address + len < hexfile.max_address) {
+			System.out.printf("%s: %x\n", name, symbol.address);
+			return symbol.address;
+		}
+		System.out.printf("invalid symbol addr %x range is %x - %x\n",
+				  symbol.address, hexfile.address, hexfile.max_address);
+		throw new AltosNoSymbol(name);
+	}
 
 	static private int find_offset(AltosHexfile hexfile, String name, int len) throws AltosNoSymbol {
-		AltosHexsym symbol = hexfile.lookup_symbol(name);
-		if (symbol == null)
-			throw new AltosNoSymbol(name);
-		int offset = (int) symbol.address - hexfile.address;
-		if (offset < 0 || hexfile.data.length < offset + len)
-			throw new AltosNoSymbol(name);
-		return offset;
+		return (int) (find_address(hexfile, name, len) - hexfile.address);
 	}
 
 	static int get_int(AltosHexfile hexfile, String name, int len) throws AltosNoSymbol {
 		byte[] bytes = hexfile.data;
-		int start = find_offset(hexfile, name, len);
+		int start = (int) find_offset(hexfile, name, len);
 
 		int	v = 0;
 		int	o = 0;
@@ -112,13 +123,17 @@ public class AltosRomconfig {
 
 	public AltosRomconfig(AltosHexfile hexfile) {
 		try {
+			System.out.printf("Attempting symbols\n");
 			version = get_int(hexfile, ao_romconfig_version, 2);
+			System.out.printf("version %d\n", version);
 			check = get_int(hexfile, ao_romconfig_check, 2);
+			System.out.printf("check %d\n", check);
 			if (check == (~version & 0xffff)) {
 				switch (version) {
 				case 2:
 				case 1:
 					serial_number = get_int(hexfile, ao_serial_number, 2);
+					System.out.printf("serial %d\n", serial_number);
 					try {
 						radio_calibration = get_int(hexfile, ao_radio_cal, 4);
 					} catch (AltosNoSymbol missing) {
@@ -128,6 +143,19 @@ public class AltosRomconfig {
 					break;
 				}
 			}
+			System.out.printf("attempting usbid\n");
+			usb_id = hexfile.find_usb_id();
+			if (usb_id == null)
+				System.out.printf("No usb id\n");
+			else
+				System.out.printf("usb id: %04x:%04x\n",
+						  usb_id.vid, usb_id.pid);
+			usb_product = hexfile.find_usb_product();
+			if (usb_product == null)
+				System.out.printf("No usb product\n");
+			else
+				System.out.printf("usb product: %s\n", usb_product);
+
 		} catch (AltosNoSymbol missing) {
 			valid = false;
 		}
@@ -137,8 +165,15 @@ public class AltosRomconfig {
 		ao_romconfig_version,
 		ao_romconfig_check,
 		ao_serial_number,
-		ao_radio_cal
+		ao_radio_cal,
+		ao_usb_descriptors,
 	};
+
+	private static int fetch_len(String name) {
+		if (name.equals(ao_usb_descriptors))
+			return 256;
+		return 2;
+	}
 
 	private final static String[] required_names = {
 		ao_romconfig_version,
@@ -153,13 +188,16 @@ public class AltosRomconfig {
 		return false;
 	}
 
-	public static int fetch_base(AltosHexfile hexfile) throws AltosNoSymbol {
-		int	base = 0x7fffffff;
+	public static long fetch_base(AltosHexfile hexfile) throws AltosNoSymbol {
+		long	base = 0xffffffffL;
 		for (String name : fetch_names) {
 			try {
-				int	addr = find_offset(hexfile, name, 2) + hexfile.address;
+				int	len = fetch_len(name);
+				long	addr = find_address(hexfile, name, len);
+
 				if (addr < base)
 					base = addr;
+				System.out.printf("symbol %s at %x base %x\n", name, addr, base);
 			} catch (AltosNoSymbol ns) {
 				if (name_required(name))
 					throw (ns);
@@ -168,19 +206,22 @@ public class AltosRomconfig {
 		return base;
 	}
 
-	public static int fetch_bounds(AltosHexfile hexfile) throws AltosNoSymbol {
-		int	bounds = 0;
+	public static long fetch_bounds(AltosHexfile hexfile) throws AltosNoSymbol {
+		long	bounds = 0;
 		for (String name : fetch_names) {
 			try {
-				int	addr = find_offset(hexfile, name, 2) + hexfile.address;
+				int	len = fetch_len(name);
+				long	addr = find_address(hexfile, name, len) + len;
 				if (addr > bounds)
 					bounds = addr;
+				System.out.printf("symbol %s at %x bounds %x\n", name, addr, bounds);
 			} catch (AltosNoSymbol ns) {
 				if (name_required(name))
 					throw (ns);
 			}
 		}
-		return bounds + 2;
+
+		return bounds;
 	}
 
 	public void write (AltosHexfile hexfile) throws IOException {

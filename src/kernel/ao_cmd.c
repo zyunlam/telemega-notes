@@ -355,7 +355,7 @@ report(void)
 	switch(ao_cmd_status) {
 	case ao_cmd_lex_error:
 	case ao_cmd_syntax_error:
-		puts("Syntax error");
+		ao_put_string("Syntax error\n");
 		ao_cmd_status = 0;
 	default:
 		break;

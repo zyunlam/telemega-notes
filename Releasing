@@ -32,6 +32,8 @@ These are Bdale's notes on how to do a release.
 	- make sure build environment is up to date
 		sudo cowbuilder --update
 
+	- make sure ~/web/altusmetrum has no pending pullable commits
+
 	git checkout master
 
 	- update the version in configure.ac if Keith hasn't already
@@ -120,7 +122,7 @@ These are Bdale's notes on how to do a release.
 	   src/telebt-v4.0/flash-loader/{*.elf,*.bin} \
 	   src/teledongle-v3.0/flash-loader/*.elf \
 	   src/telegps-v1.0/flash-loader/*.elf \
-	   src/telegps-v2.0/flash-loader/*.elf \
+	   src/telegps-v2.0/flash-loader/{*.elf,*.bin} \
 	   src/telemega-v1.0/flash-loader/*.elf \
 	   src/telemega-v2.0/flash-loader/*.elf \
 	   src/telemega-v3.0/flash-loader/*.elf \

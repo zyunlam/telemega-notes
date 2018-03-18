@@ -33,6 +33,20 @@ one found.
 \-l length | --length length
 Set the amount of data to read. Suffixes 'k', 'M' and 'G' are
 supported. The default is 1k.
+.TP
+\-i | --infinite
+Read an unlimited amount of data.
+.TP
+\-b | --bytes
+For each 16-bit value read, output bits 1-8 as a byte, don't output
+bit 0 or bits 9-15 at all.
+.TP
+\-c | --cooked
+Read whitened data from the device. The default is to read raw data
+from the noise source.
+.TP
+\-r | --raw
+Read raw data from the noise source. This is the default.
 .SH USAGE
 .I ao-chaosread
 reads noise data.

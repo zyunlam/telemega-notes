@@ -26,6 +26,7 @@ stm_crs    = 0x40006c00;
 
 stm_bxcan  = 0x40006400;
 stm_usb_sram = 0x40006000;
+stm_usb_bdt = 0x40006000;
 stm_usb    = 0x40005c00;
 
 stm_i2c1   = 0x40005400;

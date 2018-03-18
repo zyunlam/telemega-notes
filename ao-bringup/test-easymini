@@ -21,7 +21,7 @@ while [ $found -eq 0 ]; do
 		echo -e '\e[34m'Testing $product $serial $dev'\e[39m'
 		echo ""
 		
-		./test-igniters "$dev" drogue main
+		./test-igniters-nowait "$dev" drogue main
 		echo ""
 
 		echo "Testing baro sensor"
