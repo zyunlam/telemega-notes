@@ -1,3 +1,461 @@
+commit 7b614380f307cb5e27f2a05281bc76c4ace93334
+Merge: 16a9d861 39023ed6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Mar 18 15:47:31 2018 -0600
+
+    Merge branch 'master' into branch-1.8
+
+commit 39023ed6e29103a85bfad505506fa0dbf4dc1112
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Mar 18 15:42:48 2018 -0600
+
+    doc: update copyright year in doc/altusmetrum-docinfo.xml
+
+commit 84146083da782c335ba7f040b238c3f51ba2f484
+Merge: ee79a205 78e5ae58
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Mar 18 15:33:44 2018 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 78e5ae58c2ad5ba7246a649c0bd15ff68b5d0e74
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 17 11:26:29 2018 -0700
+
+    Bump version to 1.8.5
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 529c04026dec55d9d0922689e56f1d23b0ff6095
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 17 11:25:00 2018 -0700
+
+    doc: Add release notes for 1.8.5
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bd0021d431165a6c896a6022691a447e27fd555e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 16 14:54:04 2018 -0700
+
+    altos/stmf0: Add some common definitions for flash loaders
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4894d965d73231b5c74810d826c7c97fa1bd7803
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 16 14:53:14 2018 -0700
+
+    altos: Make panic beeps use fixed frequencies
+    
+    This ensures that the beeps will work even before the configuration
+    has been loaded.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1ea6188a9c78ab0642001110cac6c3b35e8ccc88
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 16 14:52:09 2018 -0700
+
+    ao-usbload: Flip product names in loader error message
+    
+    I was reversing the 'target' vs 'image' names in the error message,
+    leading to a bit of confusion.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 788d02a3caf0f14f3c84ff6ae7e2a2fff302e91b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 16 14:51:22 2018 -0700
+
+    ao-bringup: Check for Loader USB id before attempting dfu-util
+    
+    This lets me restart the turnon process after the boot loader has been
+    flashed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7068149704e6de67ece670227445e987421cd600
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 16 14:50:29 2018 -0700
+
+    chaoskey: Create unified ROM image with both loader and app
+    
+    Flash the whole thing all at once to reduce the number of steps during
+    turnon.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 46d8197bb80ce3fe4cdc7b36c3be211366093bd5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 16 14:49:04 2018 -0700
+
+    ao-bringup: Don't wait for user when testing EasyMini igniters
+    
+    I always have the LEDs ready to go before starting the turnon process.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee79a205e118ea8730a02cc327d8fb79cc5f74ff
+Merge: 365eee3e 78a90fc7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 12 16:38:57 2018 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 78a90fc760b88ab66c5c238289afc38356e29d8a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 12 15:36:12 2018 -0800
+
+    Add TeleGPS v2.0 binaries to distribution
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54e8e033ccf47526e5ff08f93c105ef75334924e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 13 21:29:08 2018 -0800
+
+    libaltos: Use case-insensitive compare when matching BT MACs
+    
+    We use the BT MAC vendor portion to figure out which port to connect
+    to as that is simpler and takes less network traffic than actually
+    doing discovery. However, on Windows, we were generating the address
+    in lower case and comparing against upper case vendors, which didn't
+    work out too well.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b95db5819885da89504d5e11decfda98cfac37aa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 12 22:27:41 2018 -0800
+
+    altoslib/altosuilib: Validate rom image is for target device
+    
+    This should avoid mis-programming devices with incorrect firmware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f26cc1a677f577da533425a15485fcaa24626b23
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 10 23:11:40 2018 -0800
+
+    altos/scheme: Move ao-scheme to a separate repository
+    
+    This way it can be incorporated into multiple operating systems more easily.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4b52fc6eea9a478cb3dd42dcd32c92838df39734
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 8 13:46:17 2018 -0800
+
+    altos/scheme: Allow unicode in lexer
+    
+    This just passes any bytes with the high bit set through the system so
+    programs can include UTF-8 in strings and symbols. What the heck.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f8a967959b2f5ca3486ab3422f30fe4ad4ba17a8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 23:06:51 2018 -0800
+
+    altos/lambdakey-v1.0: Add LED function back in
+    
+    We've made things smaller, so there's (barely) space for this now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6ae22601bbf018193ac093fb0f745ebe213bfb64
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 23:06:22 2018 -0800
+
+    altos/scheme: remove debug code from vector write
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf37c22c6cdd4a90117bdc809e5c063a079082ad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 23:05:02 2018 -0800
+
+    altos/scheme: Allow individual lisp keywords to be feature-conditional
+    
+    This lets us build a smaller lisp that is just missing some aliases
+    for existing functionality to save rom space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 283553f0f118cef1dbcfbf5e86a43575a610d27f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 23:04:22 2018 -0800
+
+    altos/scheme: Split tests out from build sources
+    
+    Run tests on both tiny and full scheme test programs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 48d164e3d4b2ef27fae20fae63b8014803a7b178
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 21:44:39 2018 -0800
+
+    altos/stmf0: Use double buffering for ChaosKey
+    
+    This improves the USB performance of ChaosKey so that it doesn't NAK
+    during data transfers at all.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db7f7c6c7f956058250b8057c6c27284f6f22e53
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 21:43:22 2018 -0800
+
+    ao-chaosread: add --raw and --cooked flags
+    
+    Allow reading from the cooked endpoint as well as the raw one.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8545ed42bd29152f4937fb6457aba5fbd57e7691
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 17:43:42 2018 -0800
+
+    altos/stmf0: use double buffering for USB rx data
+    
+    This also allows us to stop shadowing USB rx buffers in system ram
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 42072f591690b8258d957ab7a9b2f5d911676b39
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 12:43:13 2018 -0800
+
+    altos/stmf0: Use double buffering for USB tx data
+    
+    This shouldn't have much of an effect, but shows how double buffering
+    works.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eead259673c6594d41cfab796c8674c8bf1863cc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 11:51:07 2018 -0800
+
+    altos/stmf0: Stop shadowing USB tx buffers in system RAM
+    
+    Use the 16-bit USB memory directly, avoiding the buffer space and the copy
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee62272bec67b5784a4ee4e12d8a59677bf9d112
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 11:49:09 2018 -0800
+
+    altos/stmf0: Remove packet counters from non-debug build
+    
+    These counters are only useful for helping debug the USB driver.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 043c5b56ffc2d8171769f6e988eaad6e457bad89
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jan 7 11:47:57 2018 -0800
+
+    altos/kernel: Use ao_put_string for syntax error message
+    
+    Avoid using puts, which can be a large library function.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b446d9657cad0ff45f6f65c774d82cb9f2f65088
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 6 18:11:19 2018 -0800
+
+    altos/lambdakey-v1.0: Switch back to command buffered input
+    
+    Instead of just reading from stdin with no echo or editing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 16061947d4376b41e596d87f97ec53ec29d17644
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 6 17:29:10 2018 -0800
+
+    altos/scheme: Add ports. Split scheme code up.
+    
+    And lots of other changes, including freeing unreferenced atoms.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 39df849f0717d92a7d5bdf8aa5904bd4db1b467f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jan 6 17:21:45 2018 -0800
+
+    altos/scheme: add 'install' target to install both test and tiny test
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d9a3e0378f84ffc8447747150066eae33cd3229
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 4 02:28:13 2018 -0800
+
+    altos/scheme: Add vector and string funcs. Test everybody.
+    
+    Add a bunch of string and vector functions from r7rs. I think most
+    everything is here now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d34f01110d8770ac99556901143a54c3d492cde0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 4 02:27:11 2018 -0800
+
+    altos/scheme: Accept more escaped character constants
+    
+    Allow all those specified in r7rs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 243baa14a62e3efe5ae792c73db75f9c2cb86abb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 4 02:26:21 2018 -0800
+
+    altos/scheme: Allow make-vector value param to be optional
+    
+    It can default to #f
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a6e01e7aafb1d1fdb15d633ec23d8fe51afd15df
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 4 02:25:45 2018 -0800
+
+    altos/scheme: Add builtin list-tail
+    
+    This is used enough to warrant a builtin, rather than lisp implementation
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e030fba5ab556c88af918d08e1b62e63d6605638
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 4 02:24:15 2018 -0800
+
+    altos/scheme: Fix macro-detection debugging
+    
+    Just update to use ao_scheme_printf
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 036a5311cbc86dbc5a8f859778d52d588915e4e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 4 02:23:40 2018 -0800
+
+    altos/scheme: add make-string builtin
+    
+    Allocate a blank string.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0a0327330dcbf5531cd0f8ca8b912fa51ef44f13
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 4 02:22:02 2018 -0800
+
+    altos/scheme: Make constant built pool as large as possible
+    
+    This allows building with as much constant data as will fit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 637795fcf8ca52af431acec183cc961dae121e57
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 3 14:58:57 2018 -0800
+
+    altos/scheme: Make for-each tail recursive
+    
+    Provides a native version of for-each that is tail recursive, rather
+    than having it just use map and discard the return value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7bfc1eda398e8767e352cd6396ac61c7ea021079
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 3 14:57:39 2018 -0800
+
+    altos/scheme: Add start/end args to vector->list
+    
+    This is an r7rs extension which allows you to extract a subset of the
+    vector.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2bcc178f3cbfd346b134bb3fe700b0512f340fea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 3 14:56:15 2018 -0800
+
+    altos/scheme: fix parsing of vector followed by list
+    
+    The 'parsing a vector' state value wasn't getting cleared at the end
+    of the vector, so that (#(1 2) (3 4) returned (#(1 2) #(3 4)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b7c34a2e5ecff19d61d337b8c84976cc46005ec4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 3 14:55:24 2018 -0800
+
+    altos/scheme: support %x format for scheme printf
+    
+    read debugging uses this format.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fccb5105b79d5b9e2ed052ce5459028015c01741
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 3 14:53:48 2018 -0800
+
+    altos/scheme: Add support for hex, octal and binary constants
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 365eee3ebfe73204033089b363687228f97e5d98
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 3 14:43:29 2018 -0600
+
+    need to push telegps-v2.0 loader .bin file to corporate repo, too
+
+commit fc63968f90e3fab12e63d973a4ee7f16d80d765f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 24 14:29:09 2017 -0800
+
+    altos/scheme: Pull out per-frame vals while printing list of frames
+    
+    Was using the same vals for all frames, which just doesn't work well.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b5892f75a75363a656ede8befb419245aa218b5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 24 14:28:29 2017 -0800
+
+    altos/scheme: Add separate floor-quotient builtin
+    
+    Does what 'quotient' did before, now quotient rounds towards zero
+    while floor-quotient rounds down.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d95486be96fe989f6984b3452c5c5d92897c5606
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 21 20:40:28 2017 -0700
+
+    update Releasing with wisdom from 1.8.4 release process
+
+commit 16a9d8617b2d2092d166a85ada4349601afb0dce
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 21 19:06:22 2017 -0700
+
+    releasing 1.8.4
+
 commit dbb78c8222c45f4430601deee0194b0c9dc2e79a
 Merge: fe38c225 87aab995
 Author: Bdale Garbee <bdale@gag.com>
