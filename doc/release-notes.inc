@@ -1,6 +1,9 @@
 [appendix]
 == Release Notes
+	:leveloffset: 2
+	include::release-notes-1.8.5.raw[]
 
+	<<<<
 	:leveloffset: 2
 	include::release-notes-1.8.4.raw[]
 

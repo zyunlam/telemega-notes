@@ -402,9 +402,9 @@ main (int argc, char **argv)
 			old_len = ucs2len(old_product);
 			if (new_len != old_len || memcmp(new_product, old_product, new_len * 2) != 0) {
 				fprintf(stderr, "USB product mismatch (device is ");
-				putucs2str(new_product, stderr);
-				fprintf(stderr, ", image is ");
 				putucs2str(old_product, stderr);
+				fprintf(stderr, ", image is ");
+				putucs2str(new_product, stderr);
 				fprintf(stderr, ")\n");
 				done(cc, 1);
 			}

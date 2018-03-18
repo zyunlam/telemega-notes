@@ -42,8 +42,14 @@
 #else
 #define AO_BEEP_MID	AO_BEEP_MID_DEFAULT
 #endif
+
+#define AO_BEEP_MID_PANIC	AO_BEEP_MID_DEFAULT
+
 #define AO_BEEP_LOW	AO_BEEP_MID * 150 / 94	/* 2500Hz */
 #define AO_BEEP_HIGH	AO_BEEP_MID * 75 / 94	/* 5000Hz */
+
+#define AO_BEEP_LOW_PANIC	(AO_BEEP_MID_PANIC * 150 / 94)
+#define AO_BEEP_HIGH_PANIC	(AO_BEEP_MID_PANIC * 75 / 94)
 
 #define AO_BEEP_OFF	0	/* off */
 
