@@ -488,14 +488,17 @@ static inline void ao_arch_start_scheduler(void) {
 /* ao_usb_stm.c */
 
 #if AO_USB_DIRECTIO
-uint16_t *
-ao_usb_alloc(void);
+uint8_t
+ao_usb_alloc(uint16_t *buffers[2]);
 
-void
-ao_usb_write(uint16_t *buffer, uint16_t len);
+uint8_t
+ao_usb_alloc2(uint16_t *buffers[2]);
 
-void
-ao_usb_write2(uint16_t *buffer, uint16_t len);
+uint8_t
+ao_usb_write(uint16_t len);
+
+uint8_t
+ao_usb_write2(uint16_t len);
 #endif /* AO_USB_DIRECTIO */
 
 #endif /* _AO_ARCH_FUNCS_H_ */

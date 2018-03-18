@@ -52,11 +52,13 @@ ALTOS_FILE=~/altusmetrumllc/Binaries/easymini-v2.0-*.elf
 #FLASH_FILE=../src/$BASE-v$VERSION/flash-loader/$BASE-v$VERSION-altos-flash-*.elf
 #ALTOS_FILE=../src/$BASE-v$VERSION/*.ihx
 
-echo $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE
+if lsusb -d 0483:df11 | grep -q STM; then
+    echo $DFU_UTIL -v -v -R -a 0 -s 0x08000000:leave -D $FLASH_FILE
 
-$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
+    $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE
 
-sleep 2
+    sleep 2
+fi
 
 echo $USBLOAD $ALTOS_FILE
 

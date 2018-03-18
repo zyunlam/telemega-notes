@@ -254,7 +254,7 @@ public class AltosFlash extends AltosProgrammer {
 			clock_init();
 
 			int remain = image.data.length;
-			int flash_addr = image.address;
+			int flash_addr = (int) image.address;
 			int image_start = 0;
 
 			action("start", 0);
@@ -295,7 +295,7 @@ public class AltosFlash extends AltosProgrammer {
 			if (!aborted) {
 				action("done", 100);
 				if (debug != null) {
-					debug.set_pc(image.address);
+					debug.set_pc((int) image.address);
 					debug.resume();
 				}
 			}
@@ -331,10 +331,14 @@ public class AltosFlash extends AltosProgrammer {
 		rom_config = romconfig;
 	}
 
-	public AltosRomconfig romconfig() throws InterruptedException {
+	public AltosRomconfig target_romconfig() throws InterruptedException {
 		if (!check_rom_config())
 			return null;
 		return rom_config;
+	}
+
+	public AltosRomconfig image_romconfig() {
+		return new AltosRomconfig(image);
 	}
 
 	public AltosFlash(File file, AltosLink link, AltosFlashListener listener)

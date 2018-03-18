@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Keith Packard <keithp@keithp.com>
+ * Copyright © 2018 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,5 +12,15 @@
  * General Public License for more details.
  */
 
-#include "ao_scheme.h"
+package org.altusmetrum.altoslib_12;
 
+public class AltosUsbId {
+	public int	vid;
+	public int	pid;
+
+
+	public AltosUsbId(int vid, int pid) {
+		this.vid = vid;
+		this.pid = pid;
+	}
+}

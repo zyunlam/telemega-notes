@@ -99,6 +99,7 @@ altoslib_JAVA = \
 	AltosRomconfig.java \
 	AltosSavedState.java \
 	AltosSelfFlash.java \
+	AltosUsbId.java \
 	AltosSensorMM.java \
 	AltosSensorEMini.java \
 	AltosSensorTM.java \

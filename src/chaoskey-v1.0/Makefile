@@ -51,12 +51,13 @@ CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -g -Os
 PROGNAME=chaoskey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
+BIN=$(PROGNAME)-all-$(VERSION).bin
 METAINFO=org.altusmetrum.ChaosKey.metainfo.xml
 
 SRC=$(ALTOS_SRC) ao_chaoskey.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG) $(HEX)
+all: $(PROG) $(HEX) $(BIN)
 
 $(PROG): Makefile $(OBJ) altos.ld
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
@@ -65,6 +66,12 @@ ao_product.h: ao-make-product.5c ../Version
 	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -V $(IDVENDOR) -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) -o $@
 
 $(OBJ): $(INC)
+
+$(BIN): $(PROG) $(LOADER)
+	$(MAKEBIN) --output=$@ --base=$(FLASH_ADDR) $(LOADER) $(PROG)
+
+$(LOADER):
+	+cd flash-loader && make
 
 %.cab: $(PROG) $(HEX) $(METAINFO)
 	gcab --create --nopath $@ $(PROG) $(HEX) $(METAINFO)

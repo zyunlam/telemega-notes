@@ -276,8 +276,37 @@ public class AltosFlashUI
 		return true;
 	}
 
-	boolean update_rom_config_info(AltosRomconfig existing_config) {
+	boolean rom_config_matches (AltosRomconfig a, AltosRomconfig b) {
+		if (a.usb_id != null && b.usb_id != null &&
+		    (a.usb_id.vid != b.usb_id.vid ||
+		     a.usb_id.pid != b.usb_id.pid))
+			return false;
+
+		if (a.usb_product != null && b.usb_product != null &&
+		    !a.usb_product.equals(b.usb_product))
+			return false;
+
+		return true;
+	}
+
+	boolean update_rom_config_info(AltosRomconfig existing_config, AltosRomconfig image_config) {
 		AltosRomconfig	new_config;
+
+		if (!rom_config_matches(existing_config, image_config)) {
+			int ret = JOptionPane.showConfirmDialog(this,
+								String.format("Device is %04x:%04x %s\nImage is %04x:%04x %s\nFlash anyways?",
+									      existing_config.usb_id.vid,
+									      existing_config.usb_id.pid,
+									      existing_config.usb_product,
+									      image_config.usb_id.vid,
+									      image_config.usb_id.pid,
+									      image_config.usb_product),
+								"Image doesn't match Device",
+								JOptionPane.YES_NO_OPTION);
+			if (ret != JOptionPane.YES_OPTION)
+				return false;
+		}
+
 		new_config = AltosRomconfigUI.show(frame, existing_config);
 		if (new_config == null)
 			return false;
@@ -335,13 +364,15 @@ public class AltosFlashUI
 				else
 					programmer = new AltosSelfFlash(ui.file, link, this);
 
-				final AltosRomconfig	current_config = programmer.romconfig();
+				final AltosRomconfig	current_config = programmer.target_romconfig();
+
+				final AltosRomconfig	image_config = programmer.image_romconfig();
 
 				final Semaphore await_rom_config = new Semaphore(0);
 				SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
 							ui.programmer = programmer;
-							ui.update_rom_config_info(current_config);
+							ui.update_rom_config_info(current_config, image_config);
 							await_rom_config.release();
 						}
 					});

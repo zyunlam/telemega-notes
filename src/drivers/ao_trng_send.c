@@ -31,6 +31,29 @@ static AO_TICK_TYPE	trng_power_time;
 
 static uint8_t		random_mutex;
 
+static void
+ao_trng_start(void)
+{
+	if (!trng_running) {
+		ao_mutex_get(&random_mutex);
+		if (!trng_running) {
+			AO_TICK_TYPE	delay;
+
+			delay = trng_power_time + TRNG_ENABLE_DELAY - ao_time();
+			if (delay > TRNG_ENABLE_DELAY)
+				delay = TRNG_ENABLE_DELAY;
+
+			/* Delay long enough for the HV power supply
+			 * to stabilize so that the first bits we read
+			 * aren't of poor quality
+			 */
+			ao_delay(delay);
+			trng_running = TRUE;
+		}
+		ao_mutex_put(&random_mutex);
+	}
+}
+
 #if AO_USB_HAS_IN2
 
 static struct ao_task	ao_trng_send_raw_task;
@@ -54,34 +77,13 @@ ao_trng_get_raw(uint16_t *buf)
 static void
 ao_trng_send_raw(void)
 {
-	static uint16_t	*buffer[2];
+	uint16_t	*buffer[2];
 	int		usb_buf_id;
 
-	if (!buffer[0]) {
-		buffer[0] = ao_usb_alloc();
-		buffer[1] = ao_usb_alloc();
-		if (!buffer[0])
-			ao_exit();
-	}
-
-	usb_buf_id = 0;
+	usb_buf_id = ao_usb_alloc2(buffer);
 
 	for (;;) {
-		ao_mutex_get(&random_mutex);
-		if (!trng_running) {
-			AO_TICK_TYPE	delay;
-
-			delay = trng_power_time + TRNG_ENABLE_DELAY - ao_time();
-			if (delay > TRNG_ENABLE_DELAY)
-				delay = TRNG_ENABLE_DELAY;
-
-			/* Delay long enough for the HV power supply
-			 * to stabilize so that the first bits we read
-			 * aren't of poor quality
-			 */
-			ao_delay(delay);
-			trng_running = TRUE;
-		}
+		ao_trng_start();
 #ifdef AO_LED_TRNG_RAW
 		ao_led_on(AO_LED_TRNG_RAW);
 #endif
@@ -89,9 +91,7 @@ ao_trng_send_raw(void)
 #ifdef AO_LED_TRNG_RAW
 		ao_led_off(AO_LED_TRNG_RAW);
 #endif
-		ao_mutex_put(&random_mutex);
-		ao_usb_write2(buffer[usb_buf_id], AO_USB_IN_SIZE);
-		usb_buf_id = 1-usb_buf_id;
+		usb_buf_id = ao_usb_write2(AO_USB_IN_SIZE);
 	}
 }
 
@@ -105,7 +105,7 @@ ao_trng_get_cooked(uint16_t *buf)
 	uint16_t	i;
 	uint16_t	t;
 	uint32_t	*rnd = (uint32_t *) (void *) ao_adc_ring;
-	uint8_t		mismatch = 0;
+	uint8_t		mismatch = 1;
 
 	t = ao_adc_get(AO_USB_IN_SIZE) >> 1;		/* one 16-bit value per output byte */
 	for (i = 0; i < AO_USB_IN_SIZE / sizeof (uint16_t); i++) {
@@ -131,20 +131,13 @@ ao_trng_get_cooked(uint16_t *buf)
 static void
 ao_trng_send(void)
 {
-	static uint16_t	*buffer[2];
-	int	usb_buf_id;
-	int	good_bits;
-	int	failed;
-	int	s;
+	uint16_t	*buffer[2];
+	int		usb_buf_id;
+	int		good_bits;
+	int		failed;
+	int		s;
 
-	if (!buffer[0]) {
-		buffer[0] = ao_usb_alloc();
-		buffer[1] = ao_usb_alloc();
-		if (!buffer[0])
-			ao_exit();
-	}
-
-	usb_buf_id = 0;
+	usb_buf_id = ao_usb_alloc(buffer);
 
 #ifdef AO_TRNG_ENABLE_PORT
 	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
@@ -191,21 +184,7 @@ ao_trng_send(void)
 #endif
 
 	for (;;) {
-		ao_mutex_get(&random_mutex);
-		if (!trng_running) {
-			AO_TICK_TYPE	delay;
-
-			delay = trng_power_time + TRNG_ENABLE_DELAY - ao_time();
-			if (delay > TRNG_ENABLE_DELAY)
-				delay = TRNG_ENABLE_DELAY;
-
-			/* Delay long enough for the HV power supply
-			 * to stabilize so that the first bits we read
-			 * aren't of poor quality
-			 */
-			ao_delay(delay);
-			trng_running = TRUE;
-		}
+		ao_trng_start();
 #ifdef AO_LED_TRNG_COOKED
 		ao_led_on(AO_LED_TRNG_COOKED);
 #endif
@@ -213,14 +192,11 @@ ao_trng_send(void)
 #ifdef AO_LED_TRNG_COOKED
 		ao_led_off(AO_LED_TRNG_COOKED);
 #endif
-		ao_mutex_put(&random_mutex);
 		if (good_bits) {
-			ao_usb_write(buffer[usb_buf_id], AO_USB_IN_SIZE);
-			usb_buf_id = 1-usb_buf_id;
+			usb_buf_id = ao_usb_write(AO_USB_IN_SIZE);
 			failed = 0;
 		} else {
 			failed++;
-			ao_delay(AO_MS_TO_TICKS(10));
 			if (failed > 10) {
 				ao_usb_disable();
 				ao_panic(AO_PANIC_DMA);

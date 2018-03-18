@@ -28,7 +28,9 @@ public abstract class AltosProgrammer {
 
 	abstract public void abort();
 
-	abstract public AltosRomconfig romconfig() throws InterruptedException;
+	abstract public AltosRomconfig target_romconfig() throws InterruptedException;
+
+	abstract public AltosRomconfig image_romconfig();
 
 	abstract public void set_romconfig(AltosRomconfig config);
 }
