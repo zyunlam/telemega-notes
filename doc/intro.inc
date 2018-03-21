@@ -7,6 +7,16 @@
 	we also hope to empower you to take as active a role in our collective
 	future as you wish!
 
+	Our goal is to include in this document all of the information required
+	to successfully configure and use Altus Metrum products.  But 
+	documentation is a lot like software in that it can contain "bugs",
+	and can probably always be improved!  If you have questions that 
+	aren't answered in this manual, or just need a little help figuring
+	things out, we strongly suggest joining the Altus Metrum user email
+	list, which you can do by visiting 
+	https://lists.gag.com/mailman/listinfo/altusmetrum.  There's a lot
+	of useful information in the mailing list archives!
+
 	The first device created for our community was TeleMetrum, a dual
 	deploy altimeter with fully integrated GPS and radio telemetry
 	as standard features, and a “companion interface” that will
