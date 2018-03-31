@@ -51,7 +51,7 @@ ALTOS_FILE=$REPO/telegps-v2.0-*.elf
 
 $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE 
 
-sleep 2
+sleep 3
 
 $USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 
