@@ -345,6 +345,8 @@ public class MicroData {
 			flight_series.set_time(cal_data.time());
 			flight_series.set_state(AltosLib.ao_flight_landed);
 
+			flight_series.set_min_pressure(min_pressure);
+
 			flight_series.finish();
 
 			flight_stats = new AltosFlightStats(flight_series);

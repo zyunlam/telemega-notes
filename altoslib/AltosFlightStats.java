@@ -266,8 +266,8 @@ public class AltosFlightStats {
 			}
 		}
 
-		max_height = AltosLib.MISSING;
-		if (series.height_series != null)
+		max_height = series.max_height;
+		if (max_height == AltosLib.MISSING && series.height_series != null)
 			max_height = series.height_series.max().value;
 		max_gps_height = AltosLib.MISSING;
 		if (series.gps_height != null) {
