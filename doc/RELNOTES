@@ -1,5 +1,9 @@
 Creating documentation for a new release of AltOS
 
+* Make sure that doc/altusmetrum-docinfo.xml has the right copyright 
+  year, and add release to the revision history at the front (release 
+  notes will be pulled in by release-notes.inc)
+
 * Write release notes in release-notes-${version}.inc. Add to
   Makefile
 
