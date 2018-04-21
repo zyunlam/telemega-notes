@@ -446,15 +446,11 @@ ao_usb_write_short(uint16_t data, uint32_t *base, uint16_t offset)
 }
 
 static void
-ao_usb_write(const uint8_t *src, uint32_t *base, uint16_t offset, uint16_t bytes)
+ao_usb_write(const uint8_t *src, uint32_t *base, uint16_t bytes)
 {
+	uint16_t offset = 0;
 	if (!bytes)
 		return;
-	if (offset & 1) {
-		debug_data (" %02x", src[0]);
-		ao_usb_write_byte(*src++, base, offset++);
-		bytes--;
-	}
 	while (bytes >= 2) {
 		debug_data (" %02x %02x", src[0], src[1]);
 		ao_usb_write_short((src[1] << 8) | src[0], base, offset);
@@ -531,7 +527,7 @@ ao_usb_ep0_flush(void)
 	ao_usb_ep0_in_len -= this_len;
 
 	debug_data ("Flush EP0 len %d:", this_len);
-	ao_usb_write(ao_usb_ep0_in_data, ao_usb_ep0_tx_buffer, 0, this_len);
+	ao_usb_write(ao_usb_ep0_in_data, ao_usb_ep0_tx_buffer, this_len);
 	debug_data ("\n");
 	ao_usb_ep0_in_data += this_len;
 
@@ -850,7 +846,7 @@ _ao_usb_in_send(void)
 	ao_usb_in_pending = 1;
 	if (ao_usb_tx_count != AO_USB_IN_SIZE)
 		ao_usb_in_flushed = 1;
-	ao_usb_write(ao_usb_tx_buffer, ao_usb_in_tx_buffer, 0, ao_usb_tx_count);
+	ao_usb_write(ao_usb_tx_buffer, ao_usb_in_tx_buffer, ao_usb_tx_count);
 	ao_usb_bdt[AO_USB_IN_EPR].single.count_tx = ao_usb_tx_count;
 	ao_usb_tx_count = 0;
 	_ao_usb_set_stat_tx(AO_USB_IN_EPR, STM_USB_EPR_STAT_TX_VALID);
