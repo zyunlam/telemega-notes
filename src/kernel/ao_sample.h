@@ -146,7 +146,10 @@ extern __pdata accel_t	ao_sample_accel_through;
 extern __pdata gyro_t	ao_sample_roll;
 extern __pdata gyro_t	ao_sample_pitch;
 extern __pdata gyro_t	ao_sample_yaw;
+#define AO_NUM_ORIENT	64
 extern __pdata angle_t	ao_sample_orient;
+extern __pdata angle_t	ao_sample_orients[AO_NUM_ORIENT];
+extern __pdata uint8_t	ao_sample_orient_pos;
 #endif
 
 void ao_sample_init(void);

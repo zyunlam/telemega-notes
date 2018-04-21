@@ -81,6 +81,19 @@ int pyro_dbg;
 #define DBG(...)
 #endif
 
+static angle_t
+ao_sample_max_orient(void)
+{
+	uint8_t	i;
+	angle_t	max = ao_sample_orients[0];
+
+	for (i = 1; i < AO_NUM_ORIENT; i++) {
+		angle_t a = ao_sample_orients[i];
+		if (a > max)
+			max = a;
+	}
+	return max;
+}
 /*
  * Given a pyro structure, figure out
  * if the current flight state satisfies all
@@ -90,6 +103,9 @@ static uint8_t
 ao_pyro_ready(struct ao_pyro *pyro)
 {
 	enum ao_pyro_flag flag, flags;
+#if HAS_GYRO
+	angle_t max_orient;
+#endif
 
 	flags = pyro->flags;
 	while (flags != ao_pyro_none) {
@@ -130,14 +146,16 @@ ao_pyro_ready(struct ao_pyro *pyro)
 
 #if HAS_GYRO
 		case ao_pyro_orient_less:
-			if (ao_sample_orient <= pyro->orient_less)
+			max_orient = ao_sample_max_orient();
+			if (max_orient <= pyro->orient_less)
 				continue;
-			DBG("orient %d > %d\n", ao_sample_orient, pyro->orient_less);
+			DBG("orient %d > %d\n", max_orient, pyro->orient_less);
 			break;
 		case ao_pyro_orient_greater:
-			if (ao_sample_orient >= pyro->orient_greater)
+			max_orient = ao_sample_max_orient();
+			if (max_orient >= pyro->orient_greater)
 				continue;
-			DBG("orient %d < %d\n", ao_sample_orient, pyro->orient_greater);
+			DBG("orient %d < %d\n", max_orient, pyro->orient_greater);
 			break;
 #endif
 
