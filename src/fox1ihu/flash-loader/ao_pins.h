@@ -22,16 +22,27 @@
 #define AO_HSE		8000000
 
 #define AO_WATCHDOG_PORT	(&stm_gpiod)
+#define AO_WATCHDOG_PORT_BIT	(1 << STM_RCC_AHBENR_GPIODEN)
 #define AO_WATCHDOG_BIT		3
+#define AO_WATCHDOG_VALUE	0
 
-#define AO_FLASH_LOADER_INIT do {						\
-		ao_enable_output(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG, 0); \
+#define AO_RADIO_CONTROL_PORT		(&stm_gpioe)
+#define AO_RADIO_CONTROL_PORT_BIT	(1 << STM_RCC_AHBENR_GPIOEEN)
+#define AO_RADIO_CONTROL_BIT		12
+#define AO_RADIO_CONTROL_VALUE		1
+
+#define AO_FLASH_LOADER_INIT do {					\
+		stm_rcc.ahbenr |= AO_WATCHDOG_PORT_BIT | AO_RADIO_CONTROL_PORT_BIT; \
+									\
+		stm_gpio_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG_VALUE); \
+		stm_moder_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, STM_MODER_OUTPUT); \
+									\
+		stm_gpio_set(AO_RADIO_CONTROL_PORT, AO_RADIO_CONTROL_BIT, AO_RADIO_CONTROL_VALUE); \
+		stm_moder_set(AO_RADIO_CONTROL_PORT, AO_RADIO_CONTROL_BIT, STM_MODER_OUTPUT); \
 	} while (0)
-	
+
 #define AO_TIMER_HOOK	do {						\
-		static uint8_t	watchdog;				\
-		ao_gpio_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG_PIN, watchdog); \
-		watchdog ^= 1;						\
+		AO_WATCHDOG_PORT->odr ^= (1 << AO_WATCHDOG_BIT);	\
 	} while (0)
 
 #define HAS_TICK		1
