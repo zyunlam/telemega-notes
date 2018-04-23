@@ -1447,7 +1447,7 @@ ao_usb_enable(void)
 
 	ao_arch_release_interrupts();
 
-	for (t = 0; t < 1000; t++)
+	for (t = 0; t < 50000; t++)
 		ao_arch_nop();
 
 	/* Enable USB pull-up */
