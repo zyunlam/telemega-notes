@@ -29,24 +29,24 @@ public class AltosPyro {
 	public static final int pyro_accel_greater		= 0x00000002;
 	public static final String pyro_accel_less_string	= "a<";
 	public static final String pyro_accel_greater_string	= "a>";
-	public static final String pyro_accel_less_name		= "Acceleration less than";
-	public static final String pyro_accel_greater_name	= "Acceleration greater than";
+	public static final String pyro_accel_less_name		= "Vertical acceleration less than";
+	public static final String pyro_accel_greater_name	= "Vertical acceleration greater than";
 	public static final double pyro_accel_scale		= 16.0;
 
 	public static final int pyro_speed_less			= 0x00000004;
 	public static final int pyro_speed_greater		= 0x00000008;
 	public static final String pyro_speed_less_string	= "s<";
 	public static final String pyro_speed_greater_string	= "s>";
-	public static final String pyro_speed_less_name		= "Speed less than";
-	public static final String pyro_speed_greater_name	= "Speed greater than";
+	public static final String pyro_speed_less_name		= "Ascent rate less than";
+	public static final String pyro_speed_greater_name	= "Ascent rate greater than";
 	public static final double pyro_speed_scale		= 16.0;
 
 	public static final int pyro_height_less		= 0x00000010;
 	public static final int pyro_height_greater		= 0x00000020;
 	public static final String pyro_height_less_string	= "h<";
 	public static final String pyro_height_greater_string	= "h>";
-	public static final String pyro_height_less_name	= "Height less than";
-	public static final String pyro_height_greater_name	= "Height greater than";
+	public static final String pyro_height_less_name	= "Height above pad less than";
+	public static final String pyro_height_greater_name	= "Height above pad greater than";
 	public static final double pyro_height_scale		= 1.0;
 
 	public static final int pyro_orient_less		= 0x00000040;
@@ -90,7 +90,10 @@ public class AltosPyro {
 	public static final String pyro_state_greater_or_equal_name	= "Flight state after";
 	public static final double pyro_state_scale		= 1.0;
 
+	public static final int pyro_deprecate			= pyro_ascending | pyro_descending;
+
 	public static final int	pyro_all			= 0x0000ffff;
+	public static final int pyro_all_useful			= pyro_all ^ pyro_deprecate;
 
 	public static final int pyro_no_value			= (pyro_ascending |
 								   pyro_descending);
