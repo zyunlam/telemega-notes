@@ -174,23 +174,23 @@ public class AltosAccelCal implements Runnable {
 				if (worked)
 					new_config = new AltosConfigData(link);
 			} finally {
+				int plus = config_data.accel_cal_plus(config_data.pad_orientation);
+				int minus = config_data.accel_cal_minus(config_data.pad_orientation);
 				System.out.printf("Restore orientation %d +g %d -g %d\n",
 						  config_data.pad_orientation,
-						  config_data.accel_cal_plus,
-						  config_data.accel_cal_minus);
-				if (config_data.pad_orientation != AltosLib.MISSING && config_data.pad_orientation != 0)
+						  plus, minus);
+				if (config_data.pad_orientation != AltosLib.MISSING)
 					link.printf("c o %d\n", config_data.pad_orientation);
-				if (config_data.accel_cal_plus != AltosLib.MISSING && config_data.accel_cal_minus != AltosLib.MISSING)
-					link.printf("c a %d %d\n",
-						    config_data.accel_cal_plus, config_data.accel_cal_minus);
+				if (plus != AltosLib.MISSING && minus != AltosLib.MISSING)
+					link.printf("c a %d %d\n", plus, minus);
 				link.flush_output();
 				stop_link();
 			}
 			if (new_config != null) {
-				System.out.printf("*** +1g %d -1g %d\n",
-						  new_config.accel_cal_plus,
-						  new_config.accel_cal_minus);
-				listener.cal_done(this, new_config.accel_cal_plus, new_config.accel_cal_minus);
+				int plus = new_config.accel_cal_plus(AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP);
+				int minus = new_config.accel_cal_minus(AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP);
+				System.out.printf("*** +1g %d -1g %d\n", plus, minus);
+				listener.cal_done(this, plus, minus);
 				if (!wait_signal())
 					throw new InterruptedException("aborted");
 			} else
