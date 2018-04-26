@@ -183,6 +183,7 @@ public class AltosAccelCal implements Runnable {
 				if (config_data.accel_cal_plus != AltosLib.MISSING && config_data.accel_cal_minus != AltosLib.MISSING)
 					link.printf("c a %d %d\n",
 						    config_data.accel_cal_plus, config_data.accel_cal_minus);
+				link.flush_output();
 				stop_link();
 			}
 			if (new_config != null) {
