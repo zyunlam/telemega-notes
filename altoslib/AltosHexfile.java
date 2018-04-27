@@ -294,15 +294,19 @@ public class AltosHexfile {
 		if (usb_descriptors == null)
 			return -1;
 
-		/* Walk the descriptors looking for the device */
-		a = usb_descriptors.address;
-		while (get_u8(a+1) != AO_USB_DESC_DEVICE) {
-			int delta = get_u8(a);
-			a += delta;
-			if (delta == 0 || a >= max_address)
-				return -1;
+		try {
+			/* Walk the descriptors looking for the device */
+			a = usb_descriptors.address;
+			while (get_u8(a+1) != AO_USB_DESC_DEVICE) {
+				int delta = get_u8(a);
+				a += delta;
+				if (delta == 0 || a >= max_address)
+					return -1;
+			}
+			return a;
+		} catch (ArrayIndexOutOfBoundsException ae) {
+			return -1;
 		}
-		return a;
 	}
 
 	public AltosUsbId find_usb_id() {

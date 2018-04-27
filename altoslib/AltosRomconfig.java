@@ -35,12 +35,12 @@ public class AltosRomconfig {
 			System.out.printf("no symbol %s\n", name);
 			throw new AltosNoSymbol(name);
 		}
-		if (hexfile.address <= symbol.address && symbol.address + len < hexfile.max_address) {
+		if (hexfile.address <= symbol.address && symbol.address + len <= hexfile.max_address) {
 			System.out.printf("%s: %x\n", name, symbol.address);
 			return symbol.address;
 		}
-		System.out.printf("invalid symbol addr %x range is %x - %x\n",
-				  symbol.address, hexfile.address, hexfile.max_address);
+		System.out.printf("invalid symbol addr %x len %d range is %x - %x\n",
+				  symbol.address, len, hexfile.address, hexfile.max_address);
 		throw new AltosNoSymbol(name);
 	}
 
