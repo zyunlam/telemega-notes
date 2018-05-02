@@ -69,9 +69,9 @@ stm_flash_size(void) {
 
 void start(void)
 {
-#ifdef AO_BOOT_CHAIN
+#if AO_BOOT_CHAIN
 	if (ao_boot_check_chain()) {
-#ifdef AO_BOOT_PIN
+#if AO_BOOT_PIN
 		ao_boot_check_pin();
 #endif
 	}
