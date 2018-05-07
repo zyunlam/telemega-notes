@@ -31,6 +31,7 @@ ALTOS_SRC = \
 	ao_mutex.c \
 	ao_usb_stm.c \
 	ao_power.c \
+	ao_gpio.c \
 	ao_serial_stm.c
 
 PRODUCT=MicroPeakUSB-v3.0
