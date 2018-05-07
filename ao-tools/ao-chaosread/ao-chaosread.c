@@ -174,6 +174,7 @@ chaoskey_close(struct chaoskey *ck)
 
 #define COOKED_ENDPOINT	0x85
 #define RAW_ENDPOINT	0x86
+#define FLASH_ENDPOINT	0x87
 
 int
 chaoskey_read(struct chaoskey *ck, int endpoint, void *buffer, int len)
@@ -208,12 +209,13 @@ static const struct option options[] = {
 	{ .name = "bytes", .has_arg = 0, .val = 'b' },
 	{ .name = "cooked", .has_arg = 0, .val = 'c' },
 	{ .name = "raw", .has_arg = 0, .val = 'r' },
+	{ .name = "flash", .has_arg = 0, .val = 'f' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--serial=<serial>] [--length=<length>[kMG]] [--infinite] [--bytes] [--cooked] [--raw]\n", program);
+	fprintf(stderr, "usage: %s [--serial=<serial>] [--length=<length>[kMG]] [--infinite] [--bytes] [--cooked] [--raw] [--flash]\n", program);
 	exit(1);
 }
 
@@ -233,7 +235,7 @@ main (int argc, char **argv)
 	int	bytes = 0;
 	int	endpoint = RAW_ENDPOINT;
 
-	while ((c = getopt_long(argc, argv, "s:l:ibcr", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "s:l:ibcrf", options, NULL)) != -1) {
 		switch (c) {
 		case 's':
 			serial = optarg;
@@ -261,6 +263,9 @@ main (int argc, char **argv)
 			break;
 		case 'r':
 			endpoint = RAW_ENDPOINT;
+			break;
+		case 'f':
+			endpoint = FLASH_ENDPOINT;
 			break;
 		default:
 			usage(argv[0]);

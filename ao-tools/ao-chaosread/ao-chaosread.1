@@ -47,6 +47,12 @@ from the noise source.
 .TP
 \-r | --raw
 Read raw data from the noise source. This is the default.
+.TP
+\-f | --flash
+Read the contents of flash memory on the device. This loops through
+flash memory, so you can read the contents more than once, but there's
+no way to reset the pointer back to the start other than making sure
+you read the whole contents.
 .SH USAGE
 .I ao-chaosread
 reads noise data.
