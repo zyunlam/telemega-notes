@@ -1132,6 +1132,9 @@ _ao_usb_in2_send(void)
 	/* Toggle our usage */
 	ao_usb_in_tx2_which = 1 - ao_usb_in_tx2_which;
 
+	/* Toggle the SW_BUF flag */
+	_ao_usb_toggle_dtog(AO_USB_IN2_EPR, 1, 0);
+
 	/* Mark the outgoing buffer as valid */
 	_ao_usb_set_stat_tx(AO_USB_IN2_EPR, STM_USB_EPR_STAT_TX_VALID);
 
