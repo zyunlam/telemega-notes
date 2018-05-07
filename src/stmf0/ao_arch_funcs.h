@@ -171,10 +171,12 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 #define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
 #define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
+#if AO_POWER_MANAGEMENT
 extern struct ao_power	ao_power_gpioa;
 extern struct ao_power	ao_power_gpiob;
 extern struct ao_power	ao_power_gpioc;
 extern struct ao_power	ao_power_gpiof;
+#endif
 
 static inline void ao_enable_port(struct stm_gpio *port)
 {
