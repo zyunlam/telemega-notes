@@ -1689,9 +1689,9 @@ struct ao_usb_dbg {
 #endif
 };
 
-#define NUM_USB_DBG	128
+#define NUM_USB_DBG	16
 
-struct ao_usb_dbg dbg[128];
+struct ao_usb_dbg dbg[NUM_USB_DBG];
 int dbg_i;
 
 static void _dbg(int line, char *msg, uint32_t value)
@@ -1703,11 +1703,11 @@ static void _dbg(int line, char *msg, uint32_t value)
 	asm("mrs %0,primask" : "=&r" (primask));
 	dbg[dbg_i].primask = primask;
 #if TX_DBG
-	dbg[dbg_i].in_count = in_count;
-	dbg[dbg_i].in_epr = stm_usb.epr[AO_USB_IN_EPR];
-	dbg[dbg_i].in_pending = ao_usb_in_pending;
-	dbg[dbg_i].tx_count = ao_usb_tx_count;
-	dbg[dbg_i].in_flushed = ao_usb_in_flushed;
+	dbg[dbg_i].in_count = in3_count;
+	dbg[dbg_i].in_epr = stm_usb.epr[AO_USB_IN3_EPR].r;
+	dbg[dbg_i].in_pending = ao_usb_in3_pending;
+	dbg[dbg_i].tx_count = ao_usb_tx3_count;
+	dbg[dbg_i].in_flushed = ao_usb_in3_flushed;
 #endif
 #if RX_DBG
 	dbg[dbg_i].rx_count = ao_usb_rx_count;
