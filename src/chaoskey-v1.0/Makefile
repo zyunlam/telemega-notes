@@ -14,6 +14,7 @@ INC = \
 	ao_task.h \
 	ao_adc_fast.h \
 	ao_power.h \
+	ao_flash_readout.h \
 	ao_crc.h \
 	stm32f0.h
 
@@ -34,6 +35,7 @@ ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_usb_stm.c \
 	ao_trng_send.c \
+	ao_flash_readout.c \
 	ao_task.c \
 	ao_power.c \
 	ao_gpio.c \
@@ -84,7 +86,7 @@ check: $(METAINFO)
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx *.bin
 	rm -f ao_product.h
 	rm -f *.cab
 
