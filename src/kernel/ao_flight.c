@@ -233,7 +233,7 @@ ao_flight(void)
 			 * deceleration, or by waiting until the maximum burn duration
 			 * (15 seconds) has past.
 			 */
-			if ((ao_accel < AO_MSS_TO_ACCEL(-2.5) && ao_height > AO_M_TO_HEIGHT(100)) ||
+			if ((ao_accel < AO_MSS_TO_ACCEL(-2.5)) ||
 			    (int16_t) (ao_sample_tick - ao_boost_tick) > BOOST_TICKS_MAX)
 			{
 #if HAS_ACCEL
@@ -310,7 +310,7 @@ ao_flight(void)
 #if HAS_ACCEL
 			else {
 			check_re_boost:
-				ao_coast_avg_accel = ao_coast_avg_accel - (ao_coast_avg_accel >> 6) + (ao_accel >> 6);
+				ao_coast_avg_accel = ao_coast_avg_accel + ((ao_accel - ao_coast_avg_accel) >> 5);
 				if (ao_coast_avg_accel > AO_MSS_TO_ACCEL(20)) {
 					ao_boost_tick = ao_sample_tick;
 					ao_flight_state = ao_flight_boost;
