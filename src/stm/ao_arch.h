@@ -153,6 +153,10 @@ ao_adc_init();
 #define AO_BOOT_LOADER_BASE		((uint32_t *) 0x08000000)
 #define HAS_BOOT_LOADER			1
 
+#ifndef AO_LED_TYPE
+#define AO_LED_TYPE uint16_t
+#endif
+
 #endif /* _AO_ARCH_H_ */
 
 

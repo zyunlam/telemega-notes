@@ -18,11 +18,73 @@
 
 #include "ao.h"
 
-__pdata uint16_t ao_led_enable;
+#if LED_PER_LED
+static const struct {
+	struct stm_gpio	*port;
+	uint16_t	pin;
+} ao_leds[] = {
+#ifdef LED_0_PORT
+    [0] { LED_0_PORT, LED_0_PIN },
+#endif
+#ifdef LED_1_PORT
+    [1] { LED_1_PORT, LED_1_PIN },
+#endif
+#ifdef LED_2_PORT
+    [2] { LED_2_PORT, LED_2_PIN },
+#endif
+#ifdef LED_3_PORT
+    [3] { LED_3_PORT, LED_3_PIN },
+#endif
+#ifdef LED_4_PORT
+    [4] { LED_4_PORT, LED_4_PIN },
+#endif
+#ifdef LED_5_PORT
+    [5] { LED_5_PORT, LED_5_PIN },
+#endif
+#ifdef LED_6_PORT
+    [6] { LED_6_PORT, LED_6_PIN },
+#endif
+#ifdef LED_7_PORT
+    [7] { LED_7_PORT, LED_7_PIN },
+#endif
+#ifdef LED_8_PORT
+    [8] { LED_8_PORT, LED_8_PIN },
+#endif
+#ifdef LED_9_PORT
+    [9] { LED_9_PORT, LED_9_PIN },
+#endif
+#ifdef LED_10_PORT
+    [10] { LED_10_PORT, LED_10_PIN },
+#endif
+#ifdef LED_11_PORT
+    [11] { LED_11_PORT, LED_11_PIN },
+#endif
+#ifdef LED_12_PORT
+    [12] { LED_12_PORT, LED_12_PIN },
+#endif
+#ifdef LED_13_PORT
+    [13] { LED_13_PORT, LED_13_PIN },
+#endif
+#ifdef LED_14_PORT
+    [14] { LED_14_PORT, LED_14_PIN },
+#endif
+#ifdef LED_15_PORT
+    [15] { LED_15_PORT, LED_15_PIN },
+#endif
+};
+#define N_LED	(sizeof (ao_leds)/sizeof(ao_leds[0]))
+#endif
+static AO_LED_TYPE ao_led_enable;
 
 void
-ao_led_on(uint16_t colors)
+ao_led_on(AO_LED_TYPE colors)
 {
+#ifdef LED_PER_LED
+	AO_LED_TYPE i;
+	for (i = 0; i < N_LED; i++)
+		if (colors & (1 << i))
+			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, foo, 1);
+#else
 #ifdef LED_PORT
 	LED_PORT->bsrr = (colors & ao_led_enable);
 #else
@@ -33,11 +95,18 @@ ao_led_on(uint16_t colors)
 	LED_PORT_1->bsrr = ((colors & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
 #endif
 #endif
+#endif
 }
 
 void
-ao_led_off(uint16_t colors)
+ao_led_off(AO_LED_TYPE colors)
 {
+#ifdef LED_PER_LED
+	AO_LED_TYPE i;
+	for (i = 0; i < N_LED; i++)
+		if (colors & (1 << i))
+			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, foo, 0);
+#else
 #ifdef LED_PORT
 	LED_PORT->bsrr = (uint32_t) (colors & ao_led_enable) << 16;
 #else
@@ -48,21 +117,28 @@ ao_led_off(uint16_t colors)
 	LED_PORT_1->bsrr = ((uint32_t) (colors & ao_led_enable) & LED_PORT_1_MASK) << (LED_PORT_1_SHIFT + 16);
 #endif
 #endif
+#endif
 }
 
 void
-ao_led_set(uint16_t colors)
+ao_led_set(AO_LED_TYPE colors)
 {
-	uint16_t	on = colors & ao_led_enable;
-	uint16_t	off = ~colors & ao_led_enable;
+	AO_LED_TYPE	on = colors & ao_led_enable;
+	AO_LED_TYPE	off = ~colors & ao_led_enable;
 
 	ao_led_off(off);
 	ao_led_on(on);
 }
 
 void
-ao_led_toggle(uint16_t colors)
+ao_led_toggle(AO_LED_TYPE colors)
 {
+#ifdef LED_PER_LED
+	AO_LED_TYPE i;
+	for (i = 0; i < N_LED; i++)
+		if (colors & (1 << i))
+			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, foo, ~ao_gpio_get(ao_leds[i].port, ao_leds[i].pin, foo));
+#else
 #ifdef LED_PORT
 	LED_PORT->odr ^= (colors & ao_led_enable);
 #else
@@ -73,10 +149,11 @@ ao_led_toggle(uint16_t colors)
 	LED_PORT_1->odr ^= ((colors & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
 #endif
 #endif
+#endif
 }
 
 void
-ao_led_for(uint16_t colors, uint16_t ticks) __reentrant
+ao_led_for(AO_LED_TYPE colors, AO_LED_TYPE ticks) __reentrant
 {
 	ao_led_on(colors);
 	ao_delay(ticks);
@@ -89,11 +166,15 @@ ao_led_for(uint16_t colors, uint16_t ticks) __reentrant
 	} while (0)
 
 void
-ao_led_init(uint16_t enable)
+ao_led_init(AO_LED_TYPE enable)
 {
-	int	bit;
+	AO_LED_TYPE	bit;
 
 	ao_led_enable = enable;
+#if LED_PER_LED
+	for (bit = 0; bit < N_LED; bit++)
+		ao_enable_output(ao_leds[bit].port, ao_leds[bit].pin, foo, 0);
+#else
 #ifdef LED_PORT
 	stm_rcc.ahbenr |= (1 << LED_PORT_ENABLE);
 	LED_PORT->odr &= ~enable;
@@ -103,6 +184,10 @@ ao_led_init(uint16_t enable)
 	LED_PORT_0->odr &= ~((enable & ao_led_enable) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
 #endif
 #ifdef LED_PORT_1
+	stm_rcc.ahbenr |= (1 << LED_PORT_1_ENABLE);
+	LED_PORT_1->odr &= ~((enable & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
+#endif
+#ifdef LED_PORT_2
 	stm_rcc.ahbenr |= (1 << LED_PORT_1_ENABLE);
 	LED_PORT_1->odr &= ~((enable & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
 #endif
@@ -120,7 +205,12 @@ ao_led_init(uint16_t enable)
 			if (LED_PORT_1_MASK & (1 << bit))
 				init_led_pin(LED_PORT_1, bit + LED_PORT_1_SHIFT);
 #endif
+#ifdef LED_PORT_2
+			if (LED_PORT_2_MASK & (1 << bit))
+				init_led_pin(LED_PORT_2, bit + LED_PORT_2_SHIFT);
+#endif
 #endif
 		}
 	}
+#endif
 }
