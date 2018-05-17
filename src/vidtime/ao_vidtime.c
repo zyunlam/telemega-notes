@@ -24,33 +24,25 @@ static uint8_t	vidtime_monitor;
 static void
 vidtime(void)
 {
+	uint8_t	old = 0, got;
+
 	ao_exti_enable(AO_SENSOR_PORT, AO_SENSOR_PIN);
 	for (;;) {
 		while (!vidtime_monitor)
 			ao_sleep(&vidtime_monitor);
-		ao_sleep(&sensor_value);
-		printf("%d\n", sensor_value);
+		while ((got = sensor_value) == old)
+			ao_sleep(&sensor_value);
+		printf("%d\n", got);
 		flush();
+		old = got;
 	}
 }
 
 static void
 sensor_interrupt(void)
 {
-	uint8_t new = ao_gpio_get(AO_SENSOR_PORT, AO_SENSOR_PIN, foo);
-
-#if 0
-	if (new)
-		ao_exti_set_mode(AO_SENSOR_PORT, AO_SENSOR_PIN,
-				 AO_EXTI_MODE_FALLING);
-	else
-		ao_exti_set_mode(AO_SENSOR_PORT, AO_SENSOR_PIN,
-				 AO_EXTI_MODE_RISING);
-#endif
-	if (new != sensor_value) {
-		sensor_value = new;
-		ao_wakeup(&sensor_value);
-	}
+	sensor_value = ao_gpio_get(AO_SENSOR_PORT, AO_SENSOR_PIN, foo);
+	ao_wakeup(&sensor_value);
 }
 
 static struct ao_task	vidtime_task;
