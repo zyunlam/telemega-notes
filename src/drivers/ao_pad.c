@@ -17,6 +17,7 @@
  */
 
 #include <ao.h>
+#include <ao_exti.h>
 #include <ao_pad.h>
 #include <ao_74hc165.h>
 #include <ao_radio_cmac.h>
@@ -69,10 +70,20 @@ ao_strobe(uint8_t v)
 #endif
 }
 
+#ifdef AO_PAD_PORT_0
+#define pins_pad(pad)	(*((AO_PAD_ ## pad ## _PORT) == AO_PAD_PORT_0 ? (&pins0) : (&pins1)))
+#else
+#define pins_pad(pad)	pins0
+#define AO_PAD_PORT_0 AO_PAD_PORT
+#endif
+
 static void
 ao_pad_run(void)
 {
-	AO_PORT_TYPE	pins;
+	AO_PORT_TYPE	pins0;
+#ifdef AO_PAD_PORT_1
+	AO_PORT_TYPE	pins1;
+#endif
 
 	for (;;) {
 		while (!ao_pad_ignite)
@@ -80,32 +91,63 @@ ao_pad_run(void)
 		/*
 		 * Actually set the pad bits
 		 */
-		pins = 0;
+		pins0 = 0;
+#ifdef AO_PAD_PORT_1
+		pins1 = 0;
+#endif
 #if AO_PAD_NUM > 0
 		if (ao_pad_ignite & (1 << 0))
-			pins |= (1 << AO_PAD_PIN_0);
+			pins_pad(0) |= (1 << AO_PAD_PIN_0);
 #endif
 #if AO_PAD_NUM > 1
 		if (ao_pad_ignite & (1 << 1))
-			pins |= (1 << AO_PAD_PIN_1);
+			pins_pad(1) |= (1 << AO_PAD_PIN_1);
 #endif
 #if AO_PAD_NUM > 2
 		if (ao_pad_ignite & (1 << 2))
-			pins |= (1 << AO_PAD_PIN_2);
+			pins_pad(2) |= (1 << AO_PAD_PIN_2);
 #endif
 #if AO_PAD_NUM > 3
 		if (ao_pad_ignite & (1 << 3))
-			pins |= (1 << AO_PAD_PIN_3);
+			pins_pad(3) |= (1 << AO_PAD_PIN_3);
 #endif
-		PRINTD("ignite pins 0x%x\n", pins);
-		ao_gpio_set_bits(AO_PAD_PORT, pins);
+#if AO_PAD_NUM > 4
+		if (ao_pad_ignite & (1 << 4))
+			pins_pad(4) |= (1 << AO_PAD_PIN_4);
+#endif
+#if AO_PAD_NUM > 5
+		if (ao_pad_ignite & (1 << 5))
+			pins_pad(5) |= (1 << AO_PAD_PIN_5);
+#endif
+#if AO_PAD_NUM > 6
+		if (ao_pad_ignite & (1 << 6))
+			pins_pad(6) |= (1 << AO_PAD_PIN_6);
+#endif
+#if AO_PAD_NUM > 7
+		if (ao_pad_ignite & (1 << 7))
+			pins_pad(7) |= (1 << AO_PAD_PIN_7);
+#endif
+#ifdef AO_PAD_PORT_1
+		PRINTD("ignite pins 0x%x 0x%x\n", pins0, pins1);
+		ao_gpio_set_bits(AO_PAD_PORT_0, pins0);
+		ao_gpio_set_bits(AO_PAD_PORT_1, pins1);
+#else
+		PRINTD("ignite pins 0x%x\n", pins0);
+		ao_gpio_set_bits(AO_PAD_PORT_0, pins0);
+#endif
 		while (ao_pad_ignite) {
 			ao_pad_ignite = 0;
 
 			ao_delay(AO_PAD_FIRE_TIME);
 		}
-		ao_gpio_clr_bits(AO_PAD_PORT, pins);
-		PRINTD("turn off pins 0x%x\n", pins);
+#ifdef AO_PAD_PORT_1
+		ao_gpio_clr_bits(AO_PAD_PORT_0, pins0);
+		ao_gpio_clr_bits(AO_PAD_PORT_1, pins1);
+		PRINTD("turn off pins 0x%x 0x%x\n", pins0, pins1);
+#else
+		ao_gpio_set_bits(AO_PAD_PORT_0, pins0);
+		PRINTD("turn off pins 0x%x\n", pins0);
+#endif
 	}
 }
 
@@ -284,12 +326,31 @@ ao_pad_read_box(void)
 }
 #endif
 
+#ifdef AO_PAD_SELECTOR_PORT
+static int ao_pad_read_box(void) {
+	AO_PORT_TYPE	value = ao_gpio_get_all(AO_PAD_SELECTOR_PORT);
+	unsigned	pin;
+	int		select = 1;
+
+	for (pin = 0; pin < sizeof (AO_PORT_TYPE) * 8; pin++) {
+		if (AO_PAD_SELECTOR_PINS & (1 << pin)) {
+			if ((value & (1 << pin)) == 0)
+				return select;
+			select++;
+		}
+	}
+	return ao_config.pad_box;
+}
+#else
+
 #if HAS_FIXED_PAD_BOX
 #define ao_pad_read_box()	ao_config.pad_box
 #endif
 
 #ifdef PAD_BOX
 #define ao_pad_read_box()	PAD_BOX
+#endif
+
 #endif
 
 static void
@@ -497,20 +558,51 @@ __code struct ao_cmds ao_pad_cmds[] = {
 	{ 0, NULL }
 };
 
+#ifndef AO_PAD_PORT_1
+#define AO_PAD_0_PORT	AO_PAD_PORT
+#define AO_PAD_1_PORT	AO_PAD_PORT
+#define AO_PAD_2_PORT	AO_PAD_PORT
+#define AO_PAD_3_PORT	AO_PAD_PORT
+#define AO_PAD_4_PORT	AO_PAD_PORT
+#define AO_PAD_5_PORT	AO_PAD_PORT
+#define AO_PAD_6_PORT	AO_PAD_PORT
+#define AO_PAD_7_PORT	AO_PAD_PORT
+#endif
+
 void
 ao_pad_init(void)
 {
+#ifdef AO_PAD_SELECTOR_PORT
+	unsigned pin;
+
+	for (pin = 0; pin < sizeof (AO_PORT_TYPE) * 8; pin++) {
+		if (AO_PAD_SELECTOR_PINS & (1 << pin))
+			ao_enable_input(AO_PAD_SELECTOR_PORT, pin, AO_EXTI_MODE_PULL_UP);
+	}
+#endif
 #if AO_PAD_NUM > 0
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_0, AO_PAD_0, 0);
+	ao_enable_output(AO_PAD_0_PORT, AO_PAD_PIN_0, AO_PAD_0, 0);
 #endif
 #if AO_PAD_NUM > 1
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_1, AO_PAD_1, 0);
+	ao_enable_output(AO_PAD_1_PORT, AO_PAD_PIN_1, AO_PAD_1, 0);
 #endif
 #if AO_PAD_NUM > 2
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_2, AO_PAD_2, 0);
+	ao_enable_output(AO_PAD_2_PORT, AO_PAD_PIN_2, AO_PAD_2, 0);
 #endif
 #if AO_PAD_NUM > 3
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_3, AO_PAD_3, 0);
+	ao_enable_output(AO_PAD_3_PORT, AO_PAD_PIN_3, AO_PAD_3, 0);
+#endif
+#if AO_PAD_NUM > 4
+	ao_enable_output(AO_PAD_4_PORT, AO_PAD_PIN_4, AO_PAD_4, 0);
+#endif
+#if AO_PAD_NUM > 5
+	ao_enable_output(AO_PAD_5_PORT, AO_PAD_PIN_5, AO_PAD_5, 0);
+#endif
+#if AO_PAD_NUM > 5
+	ao_enable_output(AO_PAD_6_PORT, AO_PAD_PIN_6, AO_PAD_6, 0);
+#endif
+#if AO_PAD_NUM > 7
+	ao_enable_output(AO_PAD_7_PORT, AO_PAD_PIN_7, AO_PAD_7, 0);
 #endif
 #ifdef AO_STROBE
 	ao_enable_output(AO_STROBE_PORT, AO_STROBE_PIN, AO_STROBE, 0);
