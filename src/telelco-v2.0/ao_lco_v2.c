@@ -581,23 +581,32 @@ ao_lco_igniter_status(void)
 		for (c = 0; c < AO_LED_CONTINUITY_NUM; c++) {
 			uint8_t	status;
 
-			if (ao_lco_drag_race) {
-				if (ao_lco_selected[ao_lco_box] & (1 << c) && t)
+			if (ao_pad_query.channels & (1 << c))
+				status = ao_pad_query.igniter_status[c];
+			else
+				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
+
+			if (ao_lco_drag_race && (ao_lco_selected[ao_lco_box] & (1 << c))) {
+				uint8_t	on = 0;
+				if (status == AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN) {
+					if (t)
+						on = 1;
+				} else {
+					if (!t)
+						on = 1;
+				}
+				if (on)
 					ao_led_on(continuity_led[c]);
 				else
 					ao_led_off(continuity_led[c]);
 			} else {
-				if (ao_pad_query.channels & (1 << c))
-					status = ao_pad_query.igniter_status[c];
-				else
-					status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
 				if (status == AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN)
 					ao_led_on(continuity_led[c]);
 				else
 					ao_led_off(continuity_led[c]);
 			}
 		}
-		t = 1-t;
+		t = (t + 1) & 3;
 	}
 }
 
