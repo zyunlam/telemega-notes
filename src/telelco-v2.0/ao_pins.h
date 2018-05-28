@@ -305,6 +305,7 @@
  */
 
 #define AO_QUADRATURE_COUNT	1
+#define AO_QUADRATURE_DEBOUNCE	1
 
 #define AO_QUADRATURE_0_PORT	&stm_gpioe
 #define AO_QUADRATURE_0_A	15
