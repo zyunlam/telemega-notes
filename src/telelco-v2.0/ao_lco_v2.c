@@ -422,9 +422,11 @@ ao_lco_input(void)
 					ao_lco_drag_disable();
 				break;
 			case AO_BUTTON_SELECT:
-				if (!ao_lco_armed) {
-					ao_lco_select_mode = 1 - ao_lco_select_mode;
-					ao_lco_set_select();
+				if (event.value) {
+					if (!ao_lco_armed) {
+						ao_lco_select_mode = 1 - ao_lco_select_mode;
+						ao_lco_set_select();
+					}
 				}
 				break;
 			}
