@@ -321,13 +321,13 @@
 #define AO_BUTTON_COUNT		9
 #define AO_BUTTON_MODE		AO_EXTI_MODE_PULL_UP
 
-#define AO_BUTTON_MODE_SELECT	0
+#define AO_BUTTON_DRAG_MODE	0
 #define AO_BUTTON_0_PORT	&stm_gpioe
 #define AO_BUTTON_0		1
 
 #define AO_BUTTON_DRAG_SELECT	1
 #define AO_BUTTON_1_PORT	&stm_gpioe
-#define AO_BUTTON_1		1
+#define AO_BUTTON_1		0
 
 #define AO_BUTTON_SPARE1       	2
 #define AO_BUTTON_2_PORT	&stm_gpiob
@@ -353,8 +353,8 @@
 #define AO_BUTTON_7_PORT	&stm_gpiod
 #define AO_BUTTON_7		11
 
-#define AO_BUTTON_SELECT	8
+#define AO_BUTTON_ENCODER_SELECT	8
 #define AO_BUTTON_8_PORT	&stm_gpioe
-#define AO_BUTTON_8		0
+#define AO_BUTTON_8		13
 
 #endif /* _AO_PINS_H_ */

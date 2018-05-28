@@ -252,6 +252,7 @@ ao_lco_drag_enable(void)
 	PRINTD("Drag enable\n");
 	ao_lco_drag_race = 1;
 	memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
+	ao_led_on(AO_LED_DRAG);
 	ao_lco_drag_beep(5);
 	ao_lco_set_display();
 }
@@ -261,6 +262,7 @@ ao_lco_drag_disable(void)
 {
 	PRINTD("Drag disable\n");
 	ao_lco_drag_race = 0;
+	ao_led_off(AO_LED_DRAG);
 	memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 	ao_lco_drag_beep(2);
 	ao_lco_set_display();
@@ -415,13 +417,13 @@ ao_lco_input(void)
 					}
 				}
 				break;
-			case AO_BUTTON_MODE_SELECT:
+			case AO_BUTTON_DRAG_MODE:
 				if (event.value)
 					ao_lco_drag_enable();
 				else
 					ao_lco_drag_disable();
 				break;
-			case AO_BUTTON_SELECT:
+			case AO_BUTTON_ENCODER_SELECT:
 				if (event.value) {
 					if (!ao_lco_armed) {
 						ao_lco_select_mode = 1 - ao_lco_select_mode;
