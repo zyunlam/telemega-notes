@@ -55,6 +55,7 @@ ao_debounce(uint8_t cur, struct ao_debounce *debounce)
 	}
 	return debounce->state;
 #else
+	(void) debounce;
 	return cur;
 #endif
 }
@@ -83,16 +84,38 @@ _ao_quadrature_queue(uint8_t q, int8_t step)
 	ao_wakeup(&ao_quadrature_count[q]);
 }
 
+#if AO_QUADRATURE_SINGLE_CODE
+struct ao_quadrature_step {
+	uint8_t	inc;
+	uint8_t dec;
+};
+
+static struct ao_quadrature_step ao_quadrature_steps[4] = {
+	[0] = { .inc = 1, .dec = 2 },
+	[1] = { .inc = 3, .dec = 0 },
+	[3] = { .inc = 2, .dec = 1 },
+	[2] = { .inc = 0, .dec = 3 },
+};
+#endif
+
 static void
 _ao_quadrature_set(uint8_t q, uint8_t new) {
 	uint8_t	old = ao_quadrature_state[q];
 
+#ifdef AO_QUADRATURE_SINGLE_CODE
+	if (new == ao_quadrature_steps[old].inc) {
+		_ao_quadrature_queue(q, 1);
+	} else if (new == ao_quadrature_steps[old].dec) {
+		_ao_quadrature_queue(q, -1);
+	}
+#else
 	if (old != new && new == 0) {
 		if (old == 2)
 			_ao_quadrature_queue(q, 1);
 		else if (old == 1)
 			_ao_quadrature_queue(q, -1);
 	}
+#endif
 	ao_quadrature_state[q] = new;
 }
 
