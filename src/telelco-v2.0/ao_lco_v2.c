@@ -102,6 +102,7 @@ ao_lco_set_voltage(uint16_t decivolts)
 {
 	uint8_t	tens, ones, tenths;
 
+	PRINTD("voltage %d\n", decivolts);
 	tenths = decivolts % 10;
 	ones = (decivolts / 10) % 10;
 	tens = (decivolts / 100) % 10;
