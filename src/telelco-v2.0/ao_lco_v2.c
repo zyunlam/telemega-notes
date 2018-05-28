@@ -52,15 +52,12 @@ static uint16_t	ao_lco_tick_offset[AO_PAD_MAX_BOXES];
 /* UI values */
 static uint8_t	ao_lco_armed;
 static uint8_t	ao_lco_firing;
-static uint16_t	ao_lco_fire_tick;
-static uint8_t	ao_lco_fire_down;
 static uint8_t	ao_lco_drag_race;
 static uint8_t	ao_lco_pad;
 static int16_t	ao_lco_box;
 static uint8_t	ao_lco_select_mode;
 #define AO_LCO_SELECT_PAD	0
 #define AO_LCO_SELECT_BOX	1
-#define AO_LCO_SELECT_NONE	2
 
 static struct ao_pad_query	ao_pad_query;
 
@@ -167,19 +164,22 @@ ao_lco_pad_first(uint8_t box)
 static void
 ao_lco_set_select(void)
 {
-	switch (ao_lco_select_mode) {
-	case AO_LCO_SELECT_PAD:
-		ao_led_off(AO_LED_BOX);
-		ao_led_on(AO_LED_PAD);
-		break;
-	case AO_LCO_SELECT_BOX:
-		ao_led_off(AO_LED_PAD);
-		ao_led_on(AO_LED_BOX);
-		break;
-	default:
+	if (ao_lco_armed) {
 		ao_led_off(AO_LED_PAD);
 		ao_led_off(AO_LED_BOX);
-		break;
+	} else {
+		switch (ao_lco_select_mode) {
+		case AO_LCO_SELECT_PAD:
+			ao_led_off(AO_LED_BOX);
+			ao_led_on(AO_LED_PAD);
+			break;
+		case AO_LCO_SELECT_BOX:
+			ao_led_off(AO_LED_PAD);
+			ao_led_on(AO_LED_BOX);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -254,7 +254,6 @@ ao_lco_drag_enable(void)
 	memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 	ao_lco_drag_beep(5);
 	ao_lco_set_display();
-	ao_lco_fire_down = 0;
 }
 
 static void
@@ -265,34 +264,6 @@ ao_lco_drag_disable(void)
 	memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 	ao_lco_drag_beep(2);
 	ao_lco_set_display();
-	ao_lco_fire_down = 0;
-}
-
-static uint16_t
-ao_lco_drag_button_check(uint16_t now, uint16_t delay)
-{
-	uint16_t	button_delay = ~0;
-
-	/*
-	 * Check to see if the button has been held down long enough
-	 * to switch in/out of drag race mode
-	 */
-	if (ao_lco_fire_down) {
-		if (ao_lco_drag_race) {
-			if ((int16_t) (now - ao_lco_fire_tick) >= AO_LCO_DRAG_RACE_STOP_TIME)
-				ao_lco_drag_disable();
-			else
-				button_delay = ao_lco_fire_tick + AO_LCO_DRAG_RACE_STOP_TIME - now;
-		} else {
-			if ((int16_t) (now - ao_lco_fire_tick) >= AO_LCO_DRAG_RACE_START_TIME)
-				ao_lco_drag_enable();
-			else
-				button_delay = ao_lco_fire_tick + AO_LCO_DRAG_RACE_START_TIME - now;
-		}
-		if (delay > button_delay)
-			delay = button_delay;
-	}
-	return delay;
 }
 
 static uint16_t
@@ -330,12 +301,11 @@ ao_lco_drag_monitor(void)
 			continue;
 
 		now = ao_time();
-		delay = ao_lco_drag_button_check(now, delay);
 		delay = ao_lco_drag_warn_check(now, delay);
 		delay = ao_lco_drag_beep_check(now, delay);
 
 		/* check to see if there's anything left to do here */
-		if (!ao_lco_fire_down && !ao_lco_drag_race && !ao_lco_drag_beep_count) {
+		if (!ao_lco_drag_race && !ao_lco_drag_beep_count) {
 			delay = ~0;
 			ao_lco_drag_active = 0;
 		}
@@ -412,12 +382,11 @@ ao_lco_input(void)
 					if (ao_lco_drag_race) {
 						uint8_t	box;
 
-						for (box = ao_lco_min_box; box <= ao_lco_max_box; box++) {
-							if (ao_lco_selected[box]) {
-								ao_wakeup(&ao_lco_armed);
+						for (box = ao_lco_min_box; box <= ao_lco_max_box; box++)
+							if (ao_lco_selected[box])
 								break;
-							}
-						}
+						if (box > ao_lco_max_box)
+							ao_lco_armed = 0;
 					} else {
 						memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 						if (ao_lco_pad != 0)
@@ -426,11 +395,11 @@ ao_lco_input(void)
 							ao_lco_armed = 0;
 					}
 				}
+				ao_lco_set_select();
 				ao_wakeup(&ao_lco_armed);
 				break;
 			case AO_BUTTON_FIRE:
 				if (ao_lco_armed) {
-					ao_lco_fire_down = 0;
 					ao_lco_firing = event.value;
 					PRINTD("Firing %d\n", ao_lco_firing);
 					ao_wakeup(&ao_lco_armed);
@@ -453,10 +422,10 @@ ao_lco_input(void)
 					ao_lco_drag_disable();
 				break;
 			case AO_BUTTON_SELECT:
-				ao_lco_select_mode++;
-				if (ao_lco_select_mode > AO_LCO_SELECT_NONE)
-					ao_lco_select_mode = AO_LCO_SELECT_PAD;
-				ao_lco_set_select();
+				if (!ao_lco_armed) {
+					ao_lco_select_mode = 1 - ao_lco_select_mode;
+					ao_lco_set_select();
+				}
 				break;
 			}
 			break;
