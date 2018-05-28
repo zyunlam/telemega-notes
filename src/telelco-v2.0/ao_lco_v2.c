@@ -406,7 +406,7 @@ ao_lco_input(void)
 				}
 				break;
 			case AO_BUTTON_DRAG_SELECT:
-				if (ao_lco_drag_race) {
+				if (event.value && ao_lco_drag_race) {
 					if (ao_lco_pad != 0) {
 						ao_lco_selected[ao_lco_box] ^= (1 << (ao_lco_pad - 1));
 						PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
