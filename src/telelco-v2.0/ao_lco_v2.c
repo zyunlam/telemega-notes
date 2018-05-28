@@ -593,7 +593,7 @@ ao_lco_igniter_status(void)
 					if (t)
 						on = 1;
 				} else {
-					if (!t)
+					if (t == 1)
 						on = 1;
 				}
 				if (on)
