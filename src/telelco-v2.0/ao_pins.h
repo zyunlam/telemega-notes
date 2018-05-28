@@ -355,6 +355,6 @@
 
 #define AO_BUTTON_SELECT	8
 #define AO_BUTTON_8_PORT	&stm_gpioe
-#define AO_BUTTON_8		13
+#define AO_BUTTON_8		0
 
 #endif /* _AO_PINS_H_ */
