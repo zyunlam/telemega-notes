@@ -39,20 +39,24 @@ static struct ao_debounce ao_debounce_state[AO_QUADRATURE_COUNT][2];
 #define pinb(q) AO_QUADRATURE_ ## q ## _B ## _PIN
 #define isr(q)  ao_quadrature_isr_ ## q
 
-#define DEBOUNCE	10
+#ifndef AO_QUADRATURE_DEBOUNCE
+#define AO_QUADRATURE_DEBOUNCE	30
+#endif
 
 static uint8_t
 ao_debounce(uint8_t cur, struct ao_debounce *debounce)
 {
-	if (cur == debounce->state)
-		debounce->count = 0;
-	else {
-		if (++debounce->count == DEBOUNCE) {
-			debounce->state = cur;
-			debounce->count = 0;
-		}
+#if AO_QUADRATURE_DEBOUNCE > 0
+	if (debounce->count > 0) {
+		debounce->count--;
+	} else if (cur != debounce->state) {
+		debounce->state = cur;
+		debounce->count = AO_QUADRATURE_DEBOUNCE;
 	}
 	return debounce->state;
+#else
+	return cur;
+#endif
 }
 
 static uint16_t
@@ -84,9 +88,9 @@ _ao_quadrature_set(uint8_t q, uint8_t new) {
 	uint8_t	old = ao_quadrature_state[q];
 
 	if (old != new && new == 0) {
-		if (old & 2)
+		if (old == 2)
 			_ao_quadrature_queue(q, 1);
-		else if (old & 1)
+		else if (old == 1)
 			_ao_quadrature_queue(q, -1);
 	}
 	ao_quadrature_state[q] = new;
