@@ -357,4 +357,40 @@
 #define AO_BUTTON_8_PORT	&stm_gpioe
 #define AO_BUTTON_8		13
 
+/* ADC */
+
+struct ao_adc {
+	int16_t		v_batt;
+};
+
+#define AO_ADC_DUMP(p) \
+	printf("batt: %5d\n", p.v_batt)
+
+#define HAS_ADC_TEMP		0
+#define HAS_BATTERY_REPORT	1
+
+#define AO_ADC_V_BATT		0
+#define AO_ADC_V_BATT_PORT	(&stm_gpioa)
+#define AO_ADC_V_BATT_PIN	0
+
+#define AO_ADC_RCC_AHBENR	(1 << STM_RCC_AHBENR_GPIOAEN)
+
+#define AO_ADC_PIN0_PORT	AO_ADC_V_BATT_PORT
+#define AO_ADC_PIN0_PIN		AO_ADC_V_BATT_PIN
+
+#define AO_ADC_SQ1		AO_ADC_V_BATT
+
+#define AO_NUM_ADC		1
+
+/*
+ * Voltage divider on ADC battery sampler
+ */
+#define AO_BATTERY_DIV_PLUS	15	/* 15k */
+#define AO_BATTERY_DIV_MINUS	27	/* 27k */
+
+/*
+ * ADC reference in decivolts
+ */
+#define AO_ADC_REFERENCE_DV	33
+
 #endif /* _AO_PINS_H_ */

@@ -30,6 +30,7 @@
 #include <ao_lco_cmd.h>
 #include <ao_radio_cmac_cmd.h>
 #include <ao_eeprom.h>
+#include <ao_adc_single.h>
 
 int
 main(void)
@@ -45,6 +46,7 @@ main(void)
 	ao_spi_init();
 	ao_dma_init();
 	ao_exti_init();
+	ao_adc_single_init();
 
 	ao_beep_init();
 	ao_cmd_init();

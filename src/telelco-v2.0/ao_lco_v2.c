@@ -23,6 +23,7 @@
 #include <ao_quadrature.h>
 #include <ao_lco_func.h>
 #include <ao_radio_cmac.h>
+#include <ao_adc_single.h>
 
 #define DEBUG	1
 
@@ -625,6 +626,18 @@ ao_lco_arm_warn(void)
 	}
 }
 
+static void
+ao_lco_batt_voltage(void)
+{
+	struct ao_adc	packet;
+	int16_t		decivolt;
+
+	ao_adc_single_get(&packet);
+	decivolt = ao_battery_decivolt(packet.v_batt);
+	ao_lco_set_voltage(decivolt);
+	ao_delay(AO_MS_TO_TICKS(1000));
+}
+
 static struct ao_task ao_lco_input_task;
 static struct ao_task ao_lco_monitor_task;
 static struct ao_task ao_lco_arm_warn_task;
@@ -636,6 +649,7 @@ ao_lco_monitor(void)
 	uint16_t		delay;
 	uint8_t			box;
 
+	ao_lco_batt_voltage();
 	ao_lco_search();
 	ao_add_task(&ao_lco_input_task, ao_lco_input, "lco input");
 	ao_add_task(&ao_lco_arm_warn_task, ao_lco_arm_warn, "lco arm warn");
