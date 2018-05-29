@@ -366,6 +366,7 @@ struct ao_adc {
 #define AO_ADC_DUMP(p) \
 	printf("batt: %5d\n", p.v_batt)
 
+#define HAS_ADC_SINGLE		1
 #define HAS_ADC_TEMP		0
 #define HAS_BATTERY_REPORT	1
 
