@@ -149,7 +149,7 @@ ao_clock_init(void)
 #define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	(0 << STM_RCC_CFGR_PLLSRC)
 #endif
 
-#if !AO_HSE || HAS_ADC
+#if !AO_HSE || HAS_ADC || HAS_ADC_SINGLE
 	/* Enable HSI RC clock 16MHz */
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSION);
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSIRDY)))
