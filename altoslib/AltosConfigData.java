@@ -22,6 +22,7 @@ import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
 
+/* Don't change the field names in this structure; they're part of all .eeprom files */
 public class AltosConfigData {
 
 	/* Version information */
@@ -52,7 +53,7 @@ public class AltosConfigData {
 	public int	radio_setting;
 
 	/* HAS_ACCEL */
-	private int	accel_cal_plus_raw, accel_cal_minus_raw;
+	public int	accel_cal_plus, accel_cal_minus;
 	private int	accel_cal_plus_cooked, accel_cal_minus_cooked;
 	private boolean	accel_cal_adjusted;
 	public int	pad_orientation;
@@ -273,8 +274,8 @@ public class AltosConfigData {
 
 		accel_cal_plus_cooked = AltosLib.MISSING;
 		accel_cal_minus_cooked = AltosLib.MISSING;
-		accel_cal_plus_raw = AltosLib.MISSING;
-		accel_cal_minus_raw = AltosLib.MISSING;
+		accel_cal_plus = AltosLib.MISSING;
+		accel_cal_minus = AltosLib.MISSING;
 		pad_orientation = AltosLib.MISSING;
 		accel_cal_adjusted = false;
 
@@ -309,6 +310,7 @@ public class AltosConfigData {
 
 	/* Return + accel calibration relative to a specific pad orientation */
 	public int accel_cal_plus(int pad_orientation) {
+		adjust_accel_cal();
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
 			return accel_cal_plus_cooked;
@@ -321,6 +323,7 @@ public class AltosConfigData {
 
 	/* Return - accel calibration relative to a specific pad orientation */
 	public int accel_cal_minus(int pad_orientation) {
+		adjust_accel_cal();
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
 			return accel_cal_minus_cooked;
@@ -337,19 +340,19 @@ public class AltosConfigData {
 	private void adjust_accel_cal() {
 		if (!accel_cal_adjusted &&
 		    pad_orientation != AltosLib.MISSING &&
-		    accel_cal_plus_raw != AltosLib.MISSING &&
-		    accel_cal_minus_raw != AltosLib.MISSING &&
+		    accel_cal_plus != AltosLib.MISSING &&
+		    accel_cal_minus != AltosLib.MISSING &&
 		    log_format != AltosLib.AO_LOG_FORMAT_UNKNOWN)
 		{
 			switch (pad_orientation) {
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
-				accel_cal_plus_cooked = accel_cal_plus_raw;
-				accel_cal_minus_cooked = accel_cal_minus_raw;
+				accel_cal_plus_cooked = accel_cal_plus;
+				accel_cal_minus_cooked = accel_cal_minus;
 				accel_cal_adjusted = true;
 				break;
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
-				accel_cal_plus_cooked = invert_accel_value(accel_cal_minus_raw);
-				accel_cal_minus_cooked = invert_accel_value(accel_cal_plus_raw);
+				accel_cal_plus_cooked = invert_accel_value(accel_cal_minus);
+				accel_cal_minus_cooked = invert_accel_value(accel_cal_plus);
 				accel_cal_adjusted = true;
 				break;
 			default:
@@ -422,8 +425,8 @@ public class AltosConfigData {
 			if (line.startsWith("Accel cal")) {
 				String[] bits = line.split("\\s+");
 				if (bits.length >= 6) {
-					accel_cal_plus_raw = Integer.parseInt(bits[3]);
-					accel_cal_minus_raw = Integer.parseInt(bits[5]);
+					accel_cal_plus = Integer.parseInt(bits[3]);
+					accel_cal_minus = Integer.parseInt(bits[5]);
 					accel_cal_adjusted = false;
 				}
 			}
