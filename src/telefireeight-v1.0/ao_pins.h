@@ -189,35 +189,89 @@
 
 #define AO_PAD_PIN_0		9
 #define AO_PAD_0_PORT		(&stm_gpiod)
-#define AO_PAD_ADC_0		3
+#define AO_ADC_SENSE_PAD_0	3
+#define AO_ADC_SENSE_PAD_0_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_0_PIN	3
 
 #define AO_PAD_PIN_1		8
 #define AO_PAD_1_PORT		(&stm_gpiod)
-#define AO_PAD_ADC_1		2
+#define AO_ADC_SENSE_PAD_1	2
+#define AO_ADC_SENSE_PAD_1_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_1_PIN	2
 
 #define AO_PAD_PIN_2		15
 #define AO_PAD_2_PORT		(&stm_gpiob)
-#define AO_PAD_ADC_2		1
+#define AO_ADC_SENSE_PAD_2	1
+#define AO_ADC_SENSE_PAD_2_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_2_PIN	1
 
 #define AO_PAD_PIN_3		14
 #define AO_PAD_3_PORT		(&stm_gpiob)
-#define AO_PAD_ADC_3		0
+#define AO_ADC_SENSE_PAD_3	0
+#define AO_ADC_SENSE_PAD_3_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_3_PIN	0
 
 #define AO_PAD_PIN_4		12
 #define AO_PAD_4_PORT		(&stm_gpiod)
-#define AO_PAD_ADC_4		7
+#define AO_ADC_SENSE_PAD_4	7
+#define AO_ADC_SENSE_PAD_4_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_4_PIN	7
 
 #define AO_PAD_PIN_5		13
 #define AO_PAD_5_PORT		(&stm_gpiod)
-#define AO_PAD_ADC_5		6
+#define AO_ADC_SENSE_PAD_5	6
+#define AO_ADC_SENSE_PAD_5_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_5_PIN	6
 
 #define AO_PAD_PIN_6		14
 #define AO_PAD_6_PORT		(&stm_gpiod)
-#define AO_PAD_ADC_6		5
+#define AO_ADC_SENSE_PAD_6	5
+#define AO_ADC_SENSE_PAD_6_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_6_PIN	5
 
 #define AO_PAD_PIN_7		15
 #define AO_PAD_7_PORT		(&stm_gpiod)
-#define AO_PAD_ADC_7		4
+#define AO_ADC_SENSE_PAD_7	4
+#define AO_ADC_SENSE_PAD_7_PORT	(&stm_gpioa)
+#define AO_ADC_SENSE_PAD_7_PIN	4
+
+#define AO_ADC_PYRO		8
+#define AO_ADC_PYRO_PORT	(&stm_gpiob)
+#define AO_ADC_PYRO_PIN		0
+
+#define AO_ADC_BATT		15
+#define AO_ADC_BATT_PORT	(&stm_gpioc)
+#define AO_ADC_BATT_PIN		5
+
+#define AO_ADC_PIN0_PORT	AO_ADC_SENSE_PAD_0_PORT
+#define AO_ADC_PIN0_PIN		AO_ADC_SENSE_PAD_0_PIN
+
+#define AO_ADC_PIN1_PORT	AO_ADC_SENSE_PAD_1_PORT
+#define AO_ADC_PIN1_PIN		AO_ADC_SENSE_PAD_1_PIN
+
+#define AO_ADC_PIN2_PORT	AO_ADC_SENSE_PAD_2_PORT
+#define AO_ADC_PIN2_PIN		AO_ADC_SENSE_PAD_2_PIN
+
+#define AO_ADC_PIN3_PORT	AO_ADC_SENSE_PAD_3_PORT
+#define AO_ADC_PIN3_PIN		AO_ADC_SENSE_PAD_3_PIN
+
+#define AO_ADC_PIN4_PORT	AO_ADC_SENSE_PAD_4_PORT
+#define AO_ADC_PIN4_PIN		AO_ADC_SENSE_PAD_4_PIN
+
+#define AO_ADC_PIN5_PORT	AO_ADC_SENSE_PAD_5_PORT
+#define AO_ADC_PIN5_PIN		AO_ADC_SENSE_PAD_5_PIN
+
+#define AO_ADC_PIN6_PORT	AO_ADC_SENSE_PAD_6_PORT
+#define AO_ADC_PIN6_PIN		AO_ADC_SENSE_PAD_6_PIN
+
+#define AO_ADC_PIN7_PORT	AO_ADC_SENSE_PAD_7_PORT
+#define AO_ADC_PIN7_PIN		AO_ADC_SENSE_PAD_7_PIN
+
+#define AO_ADC_PIN8_PORT	AO_ADC_PYRO_PORT
+#define AO_ADC_PIN8_PIN		AO_ADC_PYRO_PIN
+
+#define AO_ADC_PIN9_PORT	AO_ADC_BATT_PORT
+#define AO_ADC_PIN9_PIN		AO_ADC_BATT_PIN
 
 #define AO_PAD_ALL_CHANNELS	(0xff)
 
@@ -226,23 +280,24 @@
 #define AO_PAD_NO_IGNITER	16904
 #define AO_PAD_GOOD_IGNITER	22514
 
-#define AO_PAD_ADC_PYRO		8
-#define AO_PAD_ADC_BATT		15
-
 #define AO_ADC_FIRST_PIN	0
 
 #define AO_NUM_ADC		10
 
-#define AO_ADC_SQ1		AO_PAD_ADC_0
-#define AO_ADC_SQ2		AO_PAD_ADC_1
-#define AO_ADC_SQ3		AO_PAD_ADC_2
-#define AO_ADC_SQ4		AO_PAD_ADC_3
-#define AO_ADC_SQ5		AO_PAD_ADC_4
-#define AO_ADC_SQ6		AO_PAD_ADC_5
-#define AO_ADC_SQ7		AO_PAD_ADC_6
-#define AO_ADC_SQ8		AO_PAD_ADC_7
-#define AO_ADC_SQ9		AO_PAD_ADC_PYRO
-#define AO_ADC_SQ10		AO_PAD_ADC_BATT
+#define AO_ADC_SQ1		AO_ADC_SENSE_PAD_0
+#define AO_ADC_SQ2		AO_ADC_SENSE_PAD_1
+#define AO_ADC_SQ3		AO_ADC_SENSE_PAD_2
+#define AO_ADC_SQ4		AO_ADC_SENSE_PAD_3
+#define AO_ADC_SQ5		AO_ADC_SENSE_PAD_4
+#define AO_ADC_SQ6		AO_ADC_SENSE_PAD_5
+#define AO_ADC_SQ7		AO_ADC_SENSE_PAD_6
+#define AO_ADC_SQ8		AO_ADC_SENSE_PAD_7
+#define AO_ADC_SQ9		AO_ADC_PYRO
+#define AO_ADC_SQ10		AO_ADC_BATT
+
+#define AO_ADC_RCC_AHBENR	((1 << STM_RCC_AHBENR_GPIOAEN) | \
+				 (1 << STM_RCC_AHBENR_GPIOBEN) | \
+				 (1 << STM_RCC_AHBENR_GPIOCEN))
 
 #define AO_PYRO_R_PYRO_SENSE	200
 #define AO_PYRO_R_SENSE_GND	22
@@ -275,16 +330,5 @@ struct ao_adc {
 		(p)->adc.sense[7],					\
 		(p)->adc.pyro,						\
 		(p)->adc.batt)
-
-#define AO_ADC_PINS	((1 << AO_PAD_ADC_0) |		\
-			 (1 << AO_PAD_ADC_1) |		\
-			 (1 << AO_PAD_ADC_2) |		\
-			 (1 << AO_PAD_ADC_3) |		\
-			 (1 << AO_PAD_ADC_4) |		\
-			 (1 << AO_PAD_ADC_5) |		\
-			 (1 << AO_PAD_ADC_6) |		\
-			 (1 << AO_PAD_ADC_7) |		\
-			 (1 << AO_PAD_ADC_PYRO) |	\
-			 (1 << AO_PAD_ADC_BATT))
 
 #endif /* _AO_PINS_H_ */
