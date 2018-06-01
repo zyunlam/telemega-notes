@@ -54,6 +54,8 @@
 #define HAS_RADIO_RATE		1
 #define HAS_TELEMETRY		0
 #define HAS_AES			1
+#define HAS_STATIC_TEST		0
+
 
 #define HAS_SPI_1		0
 #define SPI_1_PA5_PA6_PA7	0
