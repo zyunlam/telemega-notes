@@ -111,14 +111,23 @@
 #define AO_STROBE		P2_4
 
 /* test these values with real igniters */
-#define AO_PAD_RELAY_CLOSED	3524
-#define AO_PAD_NO_IGNITER	16904
-#define AO_PAD_GOOD_IGNITER	22514
-
 #define AO_PAD_ADC_PYRO		4
 #define AO_PAD_ADC_BATT		5
 
 #define AO_ADC_FIRST_PIN	0
+
+#define AO_ADC_REFERENCE_DV	33
+#define AO_PAD_R_V_BATT_BATT_SENSE	100
+#define AO_PAD_R_BATT_SENSE_GND		27
+
+#define AO_PAD_R_V_BATT_V_PYRO		100
+#define AO_PAD_R_V_PYRO_PYRO_SENSE	100
+#define AO_PAD_R_PYRO_SENSE_GND		27
+
+#define AO_PAD_R_V_PYRO_IGNITER		100
+#define AO_PAD_R_IGNITER_IGNITER_SENSE	100
+#define AO_PAD_R_IGNITER_SENSE_GND	27
+
 
 struct ao_adc {
 	int16_t		sense[AO_PAD_NUM];

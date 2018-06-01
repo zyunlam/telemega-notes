@@ -153,13 +153,36 @@ ao_pad_run(void)
 
 #define AO_PAD_ARM_SIREN_INTERVAL	200
 
-#ifndef AO_PYRO_R_PYRO_SENSE
-#define AO_PYRO_R_PYRO_SENSE	100
-#define AO_PYRO_R_SENSE_GND	27
-#define AO_FIRE_R_POWER_FET	100
-#define AO_FIRE_R_FET_SENSE	100
-#define AO_FIRE_R_SENSE_GND	27
-#endif
+/* Resistor values needed for various voltage test ratios:
+ *
+ *	Net names involved:
+ *
+ *	V_BATT		Battery power, after the initial power switch
+ *	V_PYRO		Pyro power, after the pyro power switch (and initial power switch)
+ *	PYRO_SENSE	ADC input to sense V_PYRO voltage
+ *	BATT_SENSE	ADC input to sense V_BATT voltage
+ *	IGNITER		FET output to pad (the other pad lead hooks to V_PYRO)
+ *	IGNITER_SENSE	ADC input to sense igniter voltage
+ *
+ *	AO_PAD_R_V_BATT_BATT_SENSE	Resistor from battery rail to battery sense input
+ *	AO_PAD_R_BATT_SENSE_GND		Resistor from battery sense input to ground
+ *
+ *	AO_PAD_R_V_BATT_V_PYRO		Resistor from battery rail to pyro rail
+ *	AO_PAD_R_V_PYRO_PYRO_SENSE	Resistor from pyro rail to pyro sense input
+ *	AO_PAD_R_PYRO_SENSE_GND		Resistor from pyro sense input to ground
+ *
+ *	AO_PAD_R_V_PYRO_IGNITER		Optional resistors from pyro rail to FET igniter output
+ *	AO_PAD_R_IGNITER_IGNITER_SENSE	Resistors from FET igniter output to igniter sense ADC inputs
+ *	AO_PAD_R_IGNITER_SENSE_GND	Resistors from igniter sense ADC inputs to ground
+ */
+
+int16_t
+ao_pad_decivolt(int16_t adc, int16_t r_plus, int16_t r_minus)
+{
+	int32_t	mul = (int32_t) AO_ADC_REFERENCE_DV * (r_plus + r_minus);
+	int32_t div = (int32_t) AO_ADC_MAX * r_minus;
+	return ((int32_t) adc * mul + mul/2) / div;
+}
 
 static void
 ao_pad_monitor(void)
@@ -174,6 +197,7 @@ ao_pad_monitor(void)
 	sample = ao_data_head;
 	for (;;) {
 		__pdata int16_t			pyro;
+
 		ao_arch_critical(
 			while (sample == ao_data_head)
 				ao_sleep((void *) DATA_TO_XDATA(&ao_data_head));
@@ -183,28 +207,18 @@ ao_pad_monitor(void)
 		packet = &ao_data_ring[sample];
 		sample = ao_data_ring_next(sample);
 
-		pyro = packet->adc.pyro;
+		/* Reply battery voltage */
+		query.battery = ao_pad_decivolt(packet->adc.batt, AO_PAD_R_V_BATT_BATT_SENSE, AO_PAD_R_BATT_SENSE_GND);
 
-#define VOLTS_TO_PYRO(x) ((int16_t) ((x) * ((1.0 * AO_PYRO_R_SENSE_GND) / \
-					    (1.0 * (AO_PYRO_R_SENSE_GND + AO_PYRO_R_PYRO_SENSE)) / 3.3 * AO_ADC_MAX)))
+		/* Current pyro voltage */
+		pyro = ao_pad_decivolt(packet->adc.pyro,
+				       AO_PAD_R_V_PYRO_PYRO_SENSE,
+				       AO_PAD_R_PYRO_SENSE_GND);
 
-
-#define VOLTS_TO_FIRE(x) ((int16_t) ((x) * ((1.0 * AO_FIRE_R_SENSE_GND) / \
-					    (1.0 * (AO_FIRE_R_SENSE_GND + AO_FIRE_R_FET_SENSE)) / 3.3 * AO_ADC_MAX)))
-
-		/* convert ADC value to voltage in tenths, then add .2 for the diode drop */
-		query.battery = (packet->adc.batt + 96) / 192 + 2;
 		cur = 0;
-		if (pyro > VOLTS_TO_PYRO(10)) {
+		if (pyro > query.battery * 7 / 8) {
 			query.arm_status = AO_PAD_ARM_STATUS_ARMED;
 			cur |= AO_LED_ARMED;
-#if AO_FIRE_R_POWER_FET
-		} else if (pyro > VOLTS_TO_PYRO(5)) {
-			if ((ao_time() % 100) < 50)
-				cur |= AO_LED_ARMED;
-			query.arm_status = AO_PAD_ARM_STATUS_UNKNOWN;
-			arm_beep_time = 0;
-#endif
 		} else {
 			query.arm_status = AO_PAD_ARM_STATUS_DISARMED;
 			arm_beep_time = 0;
@@ -217,54 +231,50 @@ ao_pad_monitor(void)
 			cur |= AO_LED_GREEN;
 
 		for (c = 0; c < AO_PAD_NUM; c++) {
-			int16_t		sense = packet->adc.sense[c];
+			int16_t		sense = ao_pad_decivolt(packet->adc.sense[c],
+								AO_PAD_R_IGNITER_IGNITER_SENSE,
+								AO_PAD_R_IGNITER_SENSE_GND);
 			uint8_t	status = AO_PAD_IGNITER_STATUS_UNKNOWN;
 
 			/*
-			 *	pyro is run through a divider, so pyro = v_pyro * 27 / 127 ~= v_pyro / 20
-			 *	v_pyro = pyro * 127 / 27
+			 *	Here's the resistor stack on each
+			 *	igniter channel. Note that
+			 *	AO_PAD_R_V_PYRO_IGNITER is optional
 			 *
-			 *		v_pyro \
-			 *	100k		igniter
-			 *		output /
-			 *	100k           \
-			 *		sense   relay
-			 *	27k            /
-			 *		gnd ---
+			 *					v_pyro \
+			 *	AO_PAD_R_V_PYRO_IGNITER			igniter
+			 *					output /
+			 *	AO_PAD_R_IGNITER_IGNITER_SENSE         \
+			 *					sense   relay
+			 *	AO_PAD_R_IGNITER_SENSE_GND	       /
+			 *					gnd ---
 			 *
-			 *		v_pyro \
-			 *	200k		igniter
-			 *		output /
-			 *	200k           \
-			 *		sense   relay
-			 *	22k            /
-			 *		gnd ---
-			 *
-			 *	If the relay is closed, then sense will be 0
-			 *	If no igniter is present, then sense will be v_pyro * 27k/227k = pyro * 127 / 227 ~= pyro/2
-			 *	If igniter is present, then sense will be v_pyro * 27k/127k ~= v_pyro / 20 = pyro
 			 */
 
-#if AO_FIRE_R_POWER_FET
+#ifdef AO_PAD_R_V_PYRO_IGNITER
 			if (sense <= pyro / 8) {
+				/* close to zero → relay is closed */
 				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_CLOSED;
 				if ((ao_time() % 100) < 50)
 					cur |= AO_LED_CONTINUITY(c);
-			} else
-			if (pyro / 8 * 3 <= sense && sense <= pyro / 8 * 5)
-				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
-			else if (pyro / 8 * 7 <= sense) {
-				status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
-				cur |= AO_LED_CONTINUITY(c);
 			}
-#else
-			if (sense >= pyro / 8 * 5) {
-				status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
-				cur |= AO_LED_CONTINUITY(c);
-			} else {
-				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
-			}
+			else
 #endif
+			{
+				if (sense >= (pyro * 7) / 8) {
+
+					/* sense close to pyro voltage; igniter is good
+					 */
+					status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
+					cur |= AO_LED_CONTINUITY(c);
+				} else {
+
+					/* relay not shorted (if we can tell),
+					 * and igniter not obviously present
+					 */
+					status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
+				}
+			}
 			query.igniter_status[c] = status;
 		}
 		if (cur != prev) {
