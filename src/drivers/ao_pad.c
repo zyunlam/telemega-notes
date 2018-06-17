@@ -370,6 +370,8 @@ ao_pad(void)
 	int8_t	ret;
 
 	ao_pad_box = 0;
+	ao_led_set(LEDS_AVAILABLE);
+	ao_delay(AO_MS_TO_TICKS(500));
 	ao_led_set(0);
 	for (;;) {
 		FLUSHD();
