@@ -26,9 +26,6 @@
 #if HAS_ADC_SINGLE
 #include <ao_adc_single.h>
 #endif
-#if HAS_ADC
-#include <ao_adc.h>
-#endif
 
 #define DEBUG	1
 
@@ -663,6 +660,7 @@ ao_lco_display_test()
 	ao_led_off(LEDS_AVAILABLE);
 }
 
+#if HAS_ADC_SINGLE
 static void
 ao_lco_batt_voltage(void)
 {
@@ -674,6 +672,7 @@ ao_lco_batt_voltage(void)
 	ao_lco_set_voltage(decivolt);
 	ao_delay(AO_MS_TO_TICKS(1000));
 }
+#endif
 
 static struct ao_task ao_lco_input_task;
 static struct ao_task ao_lco_monitor_task;
@@ -687,7 +686,9 @@ ao_lco_monitor(void)
 	uint8_t			box;
 
 	ao_lco_display_test();
+#if HAS_ADC_SINGLE
 	ao_lco_batt_voltage();
+#endif
 	ao_lco_search();
 	ao_add_task(&ao_lco_input_task, ao_lco_input, "lco input");
 	ao_add_task(&ao_lco_arm_warn_task, ao_lco_arm_warn, "lco arm warn");
