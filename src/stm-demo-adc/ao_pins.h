@@ -21,7 +21,7 @@
 
 /* Bridge SB17 on the board and use the MCO from the other chip */
 #define AO_HSE		8000000
-#define AO_HSE_BYPASS		1
+//#define AO_HSE_BYPASS		1
 
 /* PLLVCO = 96MHz (so that USB will work) */
 #define AO_PLLMUL		12
@@ -143,22 +143,27 @@
 #define HAS_ADC_SINGLE			1
 
 struct ao_adc {
+	int16_t			a0;
 	int16_t			idd;
 	int16_t			temp;
 	int16_t			vref;
 	int16_t			pot;
 };
 
-#define AO_ADC_DUMP(p)	printf("idd %5d temp %5d vref %5d pot %5d\n", \
-			       (p)->idd, (p)->temp, (p)->vref, (p)->pot)
+#define AO_ADC_DUMP(p)	printf("a0 %5d idd %5d temp %5d vref %5d pot %5d\n", \
+		(p)->a0, (p)->idd, (p)->temp, (p)->vref, (p)->pot)
+
+#define AO_ADC_A0		0
+#define AO_ADC_A0_PORT		(&stm_gpioa)
+#define AO_ADC_A0_PIN		0
 
 #define AO_ADC_IDD		4
-#define AO_ADC_PIN0_PORT	(&stm_gpioa)
-#define AO_ADC_PIN0_PIN		4
+#define AO_ADC_IDD_PORT		(&stm_gpioa)
+#define AO_ADC_IDD_PIN		4
 
 #define AO_ADC_POT		5
-#define AO_ADC_PIN1_PORT	(&stm_gpioa)
-#define AO_ADC_PIN1_PIN		5
+#define AO_ADC_POT_PORT		(&stm_gpioa)
+#define AO_ADC_POT_PIN		5
 
 #define AO_ADC_RCC_AHBENR	((1 << STM_RCC_AHBENR_GPIOAEN))
 #define AO_ADC_TEMP		16
@@ -166,13 +171,21 @@ struct ao_adc {
 
 #define HAS_ADC_TEMP		1
 
-#define AO_NUM_ADC		4
+#define AO_NUM_ADC		5
 
-#define AO_ADC_SQ1		AO_ADC_IDD
-#define AO_ADC_SQ2		AO_ADC_TEMP
-#define AO_ADC_SQ3		AO_ADC_VREF
-#define AO_ADC_SQ4		AO_ADC_POT
-	
+#define AO_ADC_PIN0_PORT	AO_ADC_A0_PORT
+#define AO_ADC_PIN0_PIN		AO_ADC_A0_PIN
+#define AO_ADC_PIN1_PORT	AO_ADC_IDD_PORT
+#define AO_ADC_PIN1_PIN		AO_ADC_IDD_PIN
+#define AO_ADC_PIN2_PORT	AO_ADC_POT_PORT
+#define AO_ADC_PIN2_PIN		AO_ADC_POT_PIN
+
+#define AO_ADC_SQ1		AO_ADC_A0
+#define AO_ADC_SQ2		AO_ADC_IDD
+#define AO_ADC_SQ3		AO_ADC_TEMP
+#define AO_ADC_SQ4		AO_ADC_VREF
+#define AO_ADC_SQ5		AO_ADC_POT
+
 #define HAS_I2C_1		1
 #define I2C_1_PB6_PB7		0
 #define I2C_1_PB8_PB9		1
