@@ -189,7 +189,7 @@ ao_pad_monitor(void)
 {
 	uint8_t			c;
 	uint8_t			sample;
-	__pdata uint8_t		prev = 0, cur = 0;
+	__pdata AO_LED_TYPE	prev = 0, cur = 0;
 	__pdata uint8_t		beeping = 0;
 	__xdata volatile struct ao_data	*packet;
 	__pdata uint16_t	arm_beep_time = 0;
