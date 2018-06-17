@@ -23,6 +23,9 @@
 #include <ao_quadrature.h>
 #include <ao_lco_func.h>
 #include <ao_radio_cmac.h>
+#if HAS_ADC_SINGLE
+#include <ao_adc_single.h>
+#endif
 
 #define DEBUG	1
 
@@ -640,6 +643,37 @@ ao_lco_arm_warn(void)
 	}
 }
 
+/*
+ * Light up everything for a second at power on to let the user
+ * visually inspect the system for correct operation
+ */
+static void
+ao_lco_display_test()
+{
+	ao_mutex_get(&ao_lco_display_mutex);
+	ao_seven_segment_set(AO_LCO_PAD_DIGIT, 8 | 0x10);
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, 8 | 0x10);
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, 8 | 0x10);
+	ao_mutex_put(&ao_lco_display_mutex);
+	ao_led_on(LEDS_AVAILABLE);
+	ao_delay(AO_MS_TO_TICKS(1000));
+	ao_led_off(LEDS_AVAILABLE);
+}
+
+#if HAS_ADC_SINGLE
+static void
+ao_lco_batt_voltage(void)
+{
+	struct ao_adc	packet;
+	int16_t		decivolt;
+
+	ao_adc_single_get(&packet);
+	decivolt = ao_battery_decivolt(packet.v_batt);
+	ao_lco_set_voltage(decivolt);
+	ao_delay(AO_MS_TO_TICKS(1000));
+}
+#endif
+
 static struct ao_task ao_lco_input_task;
 static struct ao_task ao_lco_monitor_task;
 static struct ao_task ao_lco_arm_warn_task;
@@ -651,6 +685,10 @@ ao_lco_monitor(void)
 	uint16_t		delay;
 	uint8_t			box;
 
+	ao_lco_display_test();
+#if HAS_ADC_SINGLE
+	ao_lco_batt_voltage();
+#endif
 	ao_lco_search();
 	ao_add_task(&ao_lco_input_task, ao_lco_input, "lco input");
 	ao_add_task(&ao_lco_arm_warn_task, ao_lco_arm_warn, "lco arm warn");
