@@ -22,6 +22,7 @@
 #include <ao_quadrature.h>
 #include <ao_button.h>
 #include <ao_boot.h>
+#include <ao_adc_single.h>
 
 struct ao_task demo_task;
 
@@ -138,19 +139,27 @@ ao_i2c_write(void) {
 	}
 }
 
+
 static void
 ao_temp (void)
 {
-	struct ao_data	packet;
+	struct ao_adc	adc;
 	int temp;
+#if HAS_ADC
+	struct ao_data	packet;
 
 	ao_data_get(&packet);
+	adc = packet.adc;
+#endif
+#if HAS_ADC_SINGLE
+	ao_adc_single_get(&adc);
+#endif
 
 	/*
 	 * r = (110 - 25) / (ts_cal_hot - ts_cal_cold)
 	 * 25 + (110 - 25) * (temp - ts_cal_cold) / (ts_cal_hot - ts_cal_cold)
 	 */
-	temp = 25 + (110 - 25) * (packet.adc.temp - stm_temp_cal.ts_cal_cold) / (stm_temp_cal.ts_cal_hot - stm_temp_cal.ts_cal_cold);
+	temp = 25 + (110 - 25) * (adc.temp - stm_temp_cal.ts_cal_cold) / (stm_temp_cal.ts_cal_hot - stm_temp_cal.ts_cal_cold);
 	printf ("temp: %d\n", temp);
 }
 
@@ -231,7 +240,7 @@ main(void)
 
 //	ao_timer_set_adc_interval(100);
 
-	ao_adc_init();
+	ao_adc_single_init();
 	ao_usb_init();
 
 	ao_add_task(&ao_blink_task, ao_blink, "blink");

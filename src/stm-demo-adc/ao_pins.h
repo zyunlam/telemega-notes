@@ -140,9 +140,7 @@
 
 #define AO_LCD_DUTY	STM_LCD_CR_DUTY_STATIC
 
-#define HAS_ADC			1
-
-#define AO_ADC_RING		32
+#define HAS_ADC_SINGLE			1
 
 struct ao_adc {
 	int16_t			idd;
@@ -150,8 +148,8 @@ struct ao_adc {
 	int16_t			vref;
 };
 
-#define AO_ADC_DUMP(p)	printf("tick: %5u idd %5d temp %5d vref %5d\n", \
-			       (p)->tick, (p)->adc.idd, (p)->adc.temp, (p)->adc.vref)
+#define AO_ADC_DUMP(p)	printf("idd %5d temp %5d vref %5d\n", \
+			       (p)->idd, (p)->temp, (p)->vref)
 
 #define AO_ADC_IDD		4
 #define AO_ADC_PIN0_PORT	(&stm_gpioa)
