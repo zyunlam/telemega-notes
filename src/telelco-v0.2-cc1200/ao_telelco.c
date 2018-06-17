@@ -45,33 +45,33 @@ main(void)
 	ao_timer_init();
 	ao_dma_init();
 
-//	ao_led_init(LEDS_AVAILABLE);
-//	ao_led_on(AO_LED_GREEN);
+	ao_led_init(LEDS_AVAILABLE);
+	ao_led_on(AO_LED_GREEN);
 
 
-//	ao_spi_init();
-//	ao_exti_init();
+	ao_spi_init();
+	ao_exti_init();
 
-//	ao_beep_init();
+	ao_beep_init();
 	ao_cmd_init();
 
-//	ao_lcd_stm_init();
-//	ao_seven_segment_init();
-//	ao_quadrature_init();
-//	ao_button_init();
+	ao_lcd_stm_init();
+	ao_seven_segment_init();
+	ao_quadrature_init();
+	ao_button_init();
 
 	ao_adc_single_init();
 
-//	ao_eeprom_init();
+	ao_eeprom_init();
 
-//	ao_radio_init();
+	ao_radio_init();
 
 	ao_usb_init();
 
-//	ao_config_init();
+	ao_config_init();
 
-//	ao_lco_init();
-//	ao_lco_cmd_init();
+	ao_lco_init();
+	ao_lco_cmd_init();
 //	ao_radio_cmac_cmd_init();
 
 	ao_start_scheduler();
