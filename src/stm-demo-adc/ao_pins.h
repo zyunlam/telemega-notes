@@ -146,14 +146,19 @@ struct ao_adc {
 	int16_t			idd;
 	int16_t			temp;
 	int16_t			vref;
+	int16_t			pot;
 };
 
-#define AO_ADC_DUMP(p)	printf("idd %5d temp %5d vref %5d\n", \
-			       (p)->idd, (p)->temp, (p)->vref)
+#define AO_ADC_DUMP(p)	printf("idd %5d temp %5d vref %5d pot %5d\n", \
+			       (p)->idd, (p)->temp, (p)->vref, (p)->pot)
 
 #define AO_ADC_IDD		4
 #define AO_ADC_PIN0_PORT	(&stm_gpioa)
 #define AO_ADC_PIN0_PIN		4
+
+#define AO_ADC_POT		5
+#define AO_ADC_PIN1_PORT	(&stm_gpioa)
+#define AO_ADC_PIN1_PIN		5
 
 #define AO_ADC_RCC_AHBENR	((1 << STM_RCC_AHBENR_GPIOAEN))
 #define AO_ADC_TEMP		16
@@ -161,12 +166,12 @@ struct ao_adc {
 
 #define HAS_ADC_TEMP		1
 
-#define AO_DATA_RING		32
-#define AO_NUM_ADC		3
+#define AO_NUM_ADC		4
 
 #define AO_ADC_SQ1		AO_ADC_IDD
 #define AO_ADC_SQ2		AO_ADC_TEMP
 #define AO_ADC_SQ3		AO_ADC_VREF
+#define AO_ADC_SQ4		AO_ADC_POT
 	
 #define HAS_I2C_1		1
 #define I2C_1_PB6_PB7		0

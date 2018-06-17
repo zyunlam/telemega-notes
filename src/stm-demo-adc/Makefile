@@ -33,7 +33,6 @@ ALTOS_SRC = \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
 	ao_adc_single_stm.c \
-	ao_data.c \
 	ao_i2c_stm.c \
 	ao_usb_stm.c \
 	ao_exti_stm.c

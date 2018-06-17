@@ -24,6 +24,7 @@
 #include <ao_boot.h>
 #include <ao_adc_single.h>
 
+#if 0
 struct ao_task demo_task;
 
 static inline int min(int a, int b) { return a < b ? a : b; }
@@ -49,14 +50,6 @@ ao_demo(void)
 			i = 0;
 	}
 }
-
-void _close() { }
-void _sbrk() { }
-void _isatty() { }
-void _lseek() { }
-void _exit () { }
-void _read () { }
-void _fstat() { }
 
 #define AO_DMA_TEST_INDEX	STM_DMA_INDEX(4)
 
@@ -138,7 +131,7 @@ ao_i2c_write(void) {
 		ao_delay(100);
 	}
 }
-
+#endif
 
 static void
 ao_temp (void)
@@ -181,6 +174,7 @@ ao_event(void)
 }
 #endif
 
+#if 0
 static uint8_t ao_blinking = 0;
 
 static void
@@ -204,16 +198,21 @@ ao_blink_toggle(void)
 	ao_blinking = !ao_blinking;
 	ao_wakeup(&ao_blinking);
 }
+#endif
 
 
 __code struct ao_cmds ao_demo_cmds[] = {
+#if 0
 	{ ao_dma_test,	"D\0DMA test" },
 	{ ao_spi_write, "W\0SPI write" },
 	{ ao_spi_read, "R\0SPI read" },
 	{ ao_i2c_write, "i\0I2C write" },
+#endif
 	{ ao_temp, "t\0Show temp" },
+#if 0
 	{ ao_blink_toggle, "b\0Toggle LED blinking" },
 /*	{ ao_event, "e\0Monitor event queue" }, */
+#endif
 	{ 0, NULL }
 };
 
@@ -221,14 +220,13 @@ int
 main(void)
 {
 	ao_clock_init();
-	
 	ao_task_init();
-
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_GREEN);
-	ao_led_off(AO_LED_BLUE);
 	ao_timer_init();
 	ao_dma_init();
+
+//	ao_led_init(LEDS_AVAILABLE);
+//	ao_led_on(AO_LED_GREEN);
+//	ao_led_off(AO_LED_BLUE);
 	ao_cmd_init();
 //	ao_lcd_stm_init();
 //	ao_lcd_font_init();
@@ -243,7 +241,7 @@ main(void)
 	ao_adc_single_init();
 	ao_usb_init();
 
-	ao_add_task(&ao_blink_task, ao_blink, "blink");
+//	ao_add_task(&ao_blink_task, ao_blink, "blink");
 	ao_cmd_register(&ao_demo_cmds[0]);
 	
 	ao_start_scheduler();
