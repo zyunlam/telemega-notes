@@ -195,6 +195,9 @@ ao_pad_monitor(void)
 	__pdata uint16_t	arm_beep_time = 0;
 
 	sample = ao_data_head;
+	ao_led_set(LEDS_AVAILABLE);
+	ao_delay(AO_MS_TO_TICKS(1000));
+	ao_led_set(0);
 	for (;;) {
 		__pdata int16_t			pyro;
 
@@ -370,9 +373,6 @@ ao_pad(void)
 	int8_t	ret;
 
 	ao_pad_box = 0;
-	ao_led_set(LEDS_AVAILABLE);
-	ao_delay(AO_MS_TO_TICKS(500));
-	ao_led_set(0);
 	for (;;) {
 		FLUSHD();
 		while (ao_pad_disabled)
