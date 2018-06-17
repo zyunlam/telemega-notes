@@ -30,8 +30,6 @@
 #define AO_STACK_SIZE	512
 #endif
 
-#define AO_LED_TYPE	uint16_t
-
 #ifndef AO_TICK_TYPE
 #define AO_TICK_TYPE	uint16_t
 #define AO_TICK_SIGNED	int16_t
