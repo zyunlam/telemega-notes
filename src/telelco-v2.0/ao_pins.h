@@ -362,13 +362,15 @@
 
 struct ao_adc {
 	int16_t		v_batt;
+	int16_t		temp;
+	int16_t		v_ref;
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("batt: %5d\n", p.v_batt)
+	printf("batt: %5d temp: %5d v_ref: %5d\n", (p)->v_batt, (p)->temp, (p)->v_ref)
 
 #define HAS_ADC_SINGLE		1
-#define HAS_ADC_TEMP		0
+#define HAS_ADC_TEMP		1
 #define HAS_BATTERY_REPORT	1
 
 #define AO_ADC_V_BATT		0
@@ -381,8 +383,10 @@ struct ao_adc {
 #define AO_ADC_PIN0_PIN		AO_ADC_V_BATT_PIN
 
 #define AO_ADC_SQ1		AO_ADC_V_BATT
+#define AO_ADC_SQ2		STM_ADC_SQ_TEMP
+#define AO_ADC_SQ3		STM_ADC_SQ_V_REF
 
-#define AO_NUM_ADC		1
+#define AO_NUM_ADC		3
 
 /*
  * Voltage divider on ADC battery sampler
