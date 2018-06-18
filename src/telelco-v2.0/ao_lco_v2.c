@@ -186,7 +186,6 @@ ao_lco_set_select(void)
 }
 
 static struct ao_task	ao_lco_drag_task;
-static uint8_t		ao_lco_drag_active;
 static uint8_t		ao_lco_drag_beep_count;
 static uint8_t		ao_lco_drag_beep_on;
 static uint16_t		ao_lco_drag_beep_time;
@@ -195,36 +194,20 @@ static uint16_t		ao_lco_drag_warn_time;
 #define AO_LCO_DRAG_BEEP_TIME	AO_MS_TO_TICKS(50)
 #define AO_LCO_DRAG_WARN_TIME	AO_SEC_TO_TICKS(5)
 
+/* Request 'beeps' additional drag race beeps */
 static void
-ao_lco_drag_beep_start(void)
-{
-	ao_beep(AO_BEEP_HIGH);
-	PRINTD("beep start\n");
-	ao_lco_drag_beep_on = 1;
-	ao_lco_drag_beep_time = ao_time() + AO_LCO_DRAG_BEEP_TIME;
-}
-
-static void
-ao_lco_drag_beep_stop(void)
-{
-	ao_beep(0);
-	PRINTD("beep stop\n");
-	ao_lco_drag_beep_on = 0;
-	if (ao_lco_drag_beep_count) {
-		--ao_lco_drag_beep_count;
-		if (ao_lco_drag_beep_count)
-			ao_lco_drag_beep_time = ao_time() + AO_LCO_DRAG_BEEP_TIME;
-	}
-}
-
-static void
-ao_lco_drag_beep(uint8_t beeps)
+ao_lco_drag_add_beeps(uint8_t beeps)
 {
 	PRINTD("beep %d\n", beeps);
-	if (!ao_lco_drag_beep_count)
-		ao_lco_drag_beep_start();
+	if (ao_lco_drag_beep_count == 0)
+		ao_lco_drag_beep_time = ao_time();
 	ao_lco_drag_beep_count += beeps;
+	ao_wakeup(&ao_lco_drag_beep_count);
 }
+
+/* Check whether it's time to change the beeper status, then either
+ * turn it on or off as necessary and bump the remaining beep counts
+ */
 
 static uint16_t
 ao_lco_drag_beep_check(uint16_t now, uint16_t delay)
@@ -234,16 +217,32 @@ ao_lco_drag_beep_check(uint16_t now, uint16_t delay)
 	       (int16_t) (now - ao_lco_drag_beep_time));
 	if (ao_lco_drag_beep_count) {
 		if ((int16_t) (now - ao_lco_drag_beep_time) >= 0) {
-			if (ao_lco_drag_beep_on)
-				ao_lco_drag_beep_stop();
-			else
-				ao_lco_drag_beep_start();
+			if (ao_lco_drag_beep_on) {
+				ao_beep(0);
+				PRINTD("beep stop\n");
+				ao_lco_drag_beep_on = 0;
+				if (ao_lco_drag_beep_count) {
+					--ao_lco_drag_beep_count;
+					if (ao_lco_drag_beep_count)
+						ao_lco_drag_beep_time = now + AO_LCO_DRAG_BEEP_TIME;
+				}
+			} else {
+				ao_beep(AO_BEEP_HIGH);
+				PRINTD("beep start\n");
+				ao_lco_drag_beep_on = 1;
+				ao_lco_drag_beep_time = now + AO_LCO_DRAG_BEEP_TIME;
+			}
 		}
 	}
 
 	if (ao_lco_drag_beep_count) {
-		if (delay > AO_LCO_DRAG_BEEP_TIME)
-			delay = AO_LCO_DRAG_BEEP_TIME;
+		uint16_t beep_delay = 0;
+
+		if (ao_lco_drag_beep_time > now)
+			beep_delay = ao_lco_drag_beep_time - now;
+
+		if (delay > beep_delay)
+			delay = beep_delay;
 	}
 	return delay;
 }
@@ -251,39 +250,47 @@ ao_lco_drag_beep_check(uint16_t now, uint16_t delay)
 static void
 ao_lco_drag_enable(void)
 {
-	PRINTD("Drag enable\n");
-	ao_lco_drag_race = 1;
-	memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
-	ao_led_on(AO_LED_DRAG);
-	ao_lco_drag_beep(5);
-	ao_lco_set_display();
+	if (!ao_lco_drag_race) {
+		PRINTD("Drag enable\n");
+		ao_lco_drag_race = 1;
+		memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
+		ao_led_on(AO_LED_DRAG);
+		ao_lco_drag_add_beeps(5);
+		ao_lco_set_display();
+	}
 }
 
 static void
 ao_lco_drag_disable(void)
 {
-	PRINTD("Drag disable\n");
-	ao_lco_drag_race = 0;
-	ao_led_off(AO_LED_DRAG);
-	memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
-	ao_lco_drag_beep(2);
-	ao_lco_set_display();
+	if (ao_lco_drag_race) {
+		PRINTD("Drag disable\n");
+		ao_lco_drag_race = 0;
+		ao_led_off(AO_LED_DRAG);
+		memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
+		ao_lco_drag_add_beeps(2);
+		ao_lco_set_display();
+	}
 }
+
+/* add a beep if it's time to warn the user that drag race mode is
+ * active
+ */
 
 static uint16_t
 ao_lco_drag_warn_check(uint16_t now, uint16_t delay)
 {
-	uint16_t	warn_delay = ~0;
-
 	if (ao_lco_drag_race) {
+		uint16_t	warn_delay;
+
 		if ((int16_t) (now - ao_lco_drag_warn_time) >= 0) {
-			ao_lco_drag_beep(1);
+			ao_lco_drag_add_beeps(1);
 			ao_lco_drag_warn_time = now + AO_LCO_DRAG_WARN_TIME;
 		}
 		warn_delay = ao_lco_drag_warn_time - now;
+		if (delay > warn_delay)
+			delay = warn_delay;
 	}
-	if (delay > warn_delay)
-		delay = warn_delay;
 	return delay;
 }
 
@@ -294,25 +301,16 @@ ao_lco_drag_monitor(void)
 	uint16_t	now;
 
 	for (;;) {
-		PRINTD("Drag monitor active %d delay %d\n", ao_lco_drag_active, delay);
+		PRINTD("Drag monitor count %d delay %d\n", ao_lco_drag_beep_count, delay);
 		if (delay == (uint16_t) ~0)
-			ao_sleep(&ao_lco_drag_active);
+			ao_sleep(&ao_lco_drag_beep_count);
 		else
-			ao_sleep_for(&ao_lco_drag_active, delay);
+			ao_sleep_for(&ao_lco_drag_beep_count, delay);
 
 		delay = ~0;
-		if (!ao_lco_drag_active)
-			continue;
-
 		now = ao_time();
 		delay = ao_lco_drag_warn_check(now, delay);
 		delay = ao_lco_drag_beep_check(now, delay);
-
-		/* check to see if there's anything left to do here */
-		if (!ao_lco_drag_race && !ao_lco_drag_beep_count) {
-			delay = ~0;
-			ao_lco_drag_active = 0;
-		}
 	}
 }
 
@@ -415,7 +413,7 @@ ao_lco_input(void)
 						ao_lco_selected[ao_lco_box] ^= (1 << (ao_lco_pad - 1));
 						PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
 						       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);
-						ao_lco_drag_beep(ao_lco_pad);
+						ao_lco_drag_add_beeps(ao_lco_pad);
 					}
 				}
 				break;
