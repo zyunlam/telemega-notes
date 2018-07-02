@@ -305,7 +305,7 @@ struct ao_task {
 #define AO_MS_TO_TICKS(ms)	((ms) / 10)
 #define AO_SEC_TO_TICKS(s)	((s) * 100)
 
-#define AO_FLIGHT_TEST
+#define AO_FLIGHT_TEST	1
 
 int	ao_flight_debug;
 
@@ -436,10 +436,6 @@ static uint16_t	pyros_fired;
 
 #if HAS_MPU6000
 static struct ao_mpu6000_sample	ao_ground_mpu6000;
-#endif
-
-#if HAS_ACCEL
-int ao_error_h_sq_avg;
 #endif
 
 void

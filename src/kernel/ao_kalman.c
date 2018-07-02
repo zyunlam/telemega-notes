@@ -45,7 +45,11 @@ static __pdata ao_k_t		ao_avg_height_scaled;
 __xdata ao_v_t			ao_avg_height;
 
 __pdata ao_v_t			ao_error_h;
-#if !HAS_ACCEL
+#if !HAS_ACCEL || AO_FLIGHT_TEST
+#define AO_ERROR_H_SQ_AVG	1
+#endif
+
+#if AO_ERROR_H_SQ_AVG
 __pdata ao_v_t			ao_error_h_sq_avg;
 #endif
 
@@ -85,7 +89,7 @@ ao_kalman_predict(void)
 static void
 ao_kalman_err_height(void)
 {
-#if !HAS_ACCEL
+#if AO_ERROR_H_SQ_AVG
 	ao_v_t	e;
 #endif
 	ao_v_t height_distrust;
@@ -95,7 +99,7 @@ ao_kalman_err_height(void)
 
 	ao_error_h = ao_sample_height - (ao_v_t) (ao_k_height >> 16);
 
-#if !HAS_ACCEL
+#if AO_ERROR_H_SQ_AVG
 	e = ao_error_h;
 	if (e < 0)
 		e = -e;
