@@ -66,6 +66,7 @@ ALTOS_SRC = \
 	ao_quadrature.c \
 	ao_button.c \
 	ao_event.c \
+	ao_lco_bits.c \
 	ao_lco_v2.c \
 	ao_lco_cmd.c \
 	ao_lco_func.c \

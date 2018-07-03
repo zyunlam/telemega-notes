@@ -67,6 +67,7 @@ ALTOS_SRC = \
 	ao_button.c \
 	ao_event.c \
 	ao_lco.c \
+	ao_lco_bits.c \
 	ao_lco_cmd.c \
 	ao_lco_func.c \
 	ao_radio_cmac_cmd.c
