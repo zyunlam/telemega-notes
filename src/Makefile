@@ -39,6 +39,7 @@ ARMM3DIRS=\
 	telelco-v0.2 telelco-v0.2/flash-loader \
 	telelco-v0.2-cc1200 telelco-v0.2-cc1200/flash-loader \
 	telelco-v0.3 telelco-v0.3/flash-loader \
+	telelco-v2.0 telelco-v2.0/flash-loader \
 	teledongle-v3.0 teledongle-v3.0/flash-loader \
 	teleballoon-v2.0 \
 	telebt-v3.0 telebt-v3.0/flash-loader \
