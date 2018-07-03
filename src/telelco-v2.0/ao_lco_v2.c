@@ -91,7 +91,7 @@ ao_lco_set_voltage(uint16_t decivolts)
 void
 ao_lco_set_display(void)
 {
-	if (ao_lco_pad == 0) {
+	if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
 		ao_lco_set_voltage(ao_pad_query.battery);
 	} else {
 		ao_lco_set_pad(ao_lco_pad);
@@ -213,14 +213,8 @@ ao_lco_input(void)
 					ao_lco_set_firing(event.value);
 				break;
 			case AO_BUTTON_DRAG_SELECT:
-				if (event.value && ao_lco_drag_race) {
-					if (ao_lco_pad != 0) {
-						ao_lco_selected[ao_lco_box] ^= (1 << (ao_lco_pad - 1));
-						PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
-						       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);
-						ao_lco_drag_add_beeps(ao_lco_pad);
-					}
-				}
+				if (event.value)
+					ao_lco_toggle_drag();
 				break;
 			case AO_BUTTON_DRAG_MODE:
 				if (event.value)

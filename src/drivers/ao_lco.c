@@ -102,7 +102,7 @@ ao_lco_set_voltage(uint16_t decivolts)
 void
 ao_lco_set_display(void)
 {
-	if (ao_lco_pad == 0 && ao_lco_box != AO_LCO_BOX_DRAG) {
+	if (ao_lco_pad == AO_LCO_PAD_VOLTAGE && ao_lco_box != AO_LCO_BOX_DRAG) {
 		ao_lco_set_voltage(ao_pad_query.battery);
 	} else {
 		if (ao_lco_box == AO_LCO_BOX_DRAG)
