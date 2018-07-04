@@ -111,7 +111,8 @@ static const struct {
 };
 
 static void
-_ao_quadrature_set(uint8_t q, uint8_t new) {
+_ao_quadrature_set(uint8_t q, uint8_t new)
+{
 	uint8_t	old;
 
 	ao_arch_block_interrupts();
@@ -134,6 +135,14 @@ ao_quadrature_isr(void)
 #if AO_QUADRATURE_COUNT > 1
 	_ao_quadrature_set(1, _ao_quadrature_get(1));
 #endif
+}
+
+static void
+_ao_quadrature_start_one(uint8_t q, uint8_t new)
+{
+	ao_arch_block_interrupts();
+	ao_quadrature_state[q] = new;
+	ao_arch_release_interrupts();
 }
 
 int32_t
@@ -204,9 +213,10 @@ static const struct ao_cmds ao_quadrature_cmds[] = {
 	{ 0, NULL }
 };
 
-#define init(q) do {					\
-		ao_enable_input(port(q), bita(q), 0);	\
-		ao_enable_input(port(q), bitb(q), 0);	\
+#define init(q) do {							\
+		ao_enable_input(port(q), bita(q), 0);			\
+		ao_enable_input(port(q), bitb(q), 0);			\
+		_ao_quadrature_start_one(q, _ao_quadrature_get(q));	\
 	} while (0)
 
 void
