@@ -170,11 +170,10 @@ ao_lco_update(void)
 	if (ao_lco_get_channels(ao_lco_box, &ao_pad_query) & AO_LCO_VALID_LAST) {
 		if (!(previous_valid & AO_LCO_VALID_EVER)) {
 			if (ao_lco_pad != AO_LCO_PAD_VOLTAGE)
-				ao_lco_pad = ao_lco_pad_first(ao_lco_box);
-			ao_lco_set_display();
+				ao_lco_set_pad(ao_lco_pad_first(ao_lco_box));
 		}
 		if (ao_lco_pad == AO_LCO_PAD_VOLTAGE)
-			ao_lco_set_display();
+			ao_lco_show_display();
 	}
 }
 
@@ -201,6 +200,28 @@ ao_lco_box_set_present(uint8_t box)
 }
 
 void
+ao_lco_set_pad(uint8_t new_pad)
+{
+	if (new_pad != ao_lco_pad) {
+		ao_lco_pad = new_pad;
+		ao_lco_show_display();
+	}
+}
+
+void
+ao_lco_set_box(uint16_t new_box)
+{
+	if (ao_lco_box != new_box) {
+		ao_lco_box = new_box;
+#if AO_LCO_DRAG
+		if (ao_lco_box != AO_LCO_BOX_DRAG)
+#endif
+			ao_lco_channels[ao_lco_box] = 0;
+		ao_lco_set_pad(1);
+	}
+}
+
+void
 ao_lco_step_pad(int8_t dir)
 {
 	int8_t	new_pad;
@@ -215,10 +236,7 @@ ao_lco_step_pad(int8_t dir)
 		if (new_pad == ao_lco_pad)
 			break;
 	} while (!ao_lco_pad_present(ao_lco_box, new_pad));
-	if (new_pad != ao_lco_pad) {
-		ao_lco_pad = new_pad;
-		ao_lco_set_display();
-	}
+	ao_lco_set_pad(new_pad);
 }
 
 void
@@ -255,17 +273,6 @@ ao_lco_set_firing(uint8_t firing)
 }
 
 void
-ao_lco_toggle_drag(void)
-{
-	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE) {
-		ao_lco_selected[ao_lco_box] ^= (1 << (ao_lco_pad - 1));
-		PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
-		       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);
-		ao_lco_drag_add_beeps(ao_lco_pad);
-	}
-}
-
-void
 ao_lco_search(void)
 {
 	int8_t		r;
@@ -297,8 +304,7 @@ ao_lco_search(void)
 		ao_lco_min_box = ao_lco_max_box = ao_lco_box = 0;
 	memset(ao_lco_valid, 0, sizeof (ao_lco_valid));
 	memset(ao_lco_channels, 0, sizeof (ao_lco_channels));
-	ao_lco_pad = 1;
-	ao_lco_set_display();
+	ao_lco_set_pad(1);
 }
 
 void
@@ -336,6 +342,8 @@ ao_lco_monitor(void)
 	}
 }
 
+#if AO_LCO_DRAG
+
 uint8_t			ao_lco_drag_beep_count;
 static uint8_t		ao_lco_drag_beep_on;
 static uint16_t		ao_lco_drag_beep_time;
@@ -353,6 +361,18 @@ ao_lco_drag_add_beeps(uint8_t beeps)
 		ao_lco_drag_beep_time = ao_time();
 	ao_lco_drag_beep_count += beeps;
 	ao_wakeup(&ao_lco_drag_beep_count);
+}
+
+/* Toggle current pad in drag set */
+void
+ao_lco_toggle_drag(void)
+{
+	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE) {
+		ao_lco_selected[ao_lco_box] ^= (1 << (ao_lco_pad - 1));
+		PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
+		       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);
+		ao_lco_drag_add_beeps(ao_lco_pad);
+	}
 }
 
 /* Check whether it's time to change the beeper status, then either
@@ -408,7 +428,7 @@ ao_lco_drag_enable(void)
 		ao_led_on(AO_LED_DRAG);
 #endif
 		ao_lco_drag_add_beeps(5);
-		ao_lco_set_display();
+		ao_lco_show_display();
 	}
 }
 
@@ -423,7 +443,7 @@ ao_lco_drag_disable(void)
 #endif
 		memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 		ao_lco_drag_add_beeps(2);
-		ao_lco_set_display();
+		ao_lco_show_display();
 	}
 }
 
@@ -447,6 +467,7 @@ ao_lco_drag_warn_check(uint16_t now, uint16_t delay)
 	}
 	return delay;
 }
+#endif /* AO_LCO_DRAG */
 
 /* task function for beeping while arm is active */
 void

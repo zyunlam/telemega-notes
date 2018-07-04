@@ -141,6 +141,8 @@
 				 AO_LED_CONTINUITY_0 |	\
 				 AO_LED_REMOTE_ARM)
 
+#define AO_LCO_DRAG		0
+
 /*
  * Use event queue for input devices
  */

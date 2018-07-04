@@ -21,6 +21,14 @@
 
 #include <ao_lco_func.h>
 
+#ifndef AO_LCO_DRAG
+#define AO_LCO_DRAG	1
+#endif
+
+#if AO_LCO_DRAG
+#define AO_LCO_BOX_DRAG		0x1000
+#endif
+
 #define DEBUG	1
 
 #if DEBUG
@@ -73,7 +81,13 @@ uint8_t
 ao_lco_pad_first(uint8_t box);
 
 void
+ao_lco_set_pad(uint8_t new_pad);
+
+void
 ao_lco_step_pad(int8_t dir);
+
+void
+ao_lco_set_box(uint16_t new_box);
 
 void
 ao_lco_set_armed(uint8_t armed);
@@ -121,16 +135,16 @@ ao_lco_arm_warn(void);
  */
 
 void
-ao_lco_set_pad(uint8_t pad);
+ao_lco_show_pad(uint8_t pad);
 
 void
-ao_lco_set_box(uint16_t box);
+ao_lco_show_box(uint16_t box);
 
 void
-ao_lco_set_voltage(uint16_t decivolts);
+ao_lco_show_voltage(uint16_t decivolts);
 
 void
-ao_lco_set_display(void);
+ao_lco_show_display(void);
 
 void
 ao_lco_init(void);

@@ -41,12 +41,10 @@
 static uint16_t	ao_lco_fire_tick;
 static uint8_t	ao_lco_fire_down;
 
-#define AO_LCO_BOX_DRAG		0x1000
-
 static uint8_t	ao_lco_display_mutex;
 
 void
-ao_lco_set_pad(uint8_t pad)
+ao_lco_show_pad(uint8_t pad)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_seven_segment_set(AO_LCO_PAD_DIGIT, pad | (ao_lco_drag_race << 4));
@@ -71,7 +69,7 @@ ao_lco_set_pad(uint8_t pad)
 				 (0 << 6))
 
 void
-ao_lco_set_box(uint16_t box)
+ao_lco_show_box(uint16_t box)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	if (box == AO_LCO_BOX_DRAG) {
@@ -85,7 +83,7 @@ ao_lco_set_box(uint16_t box)
 }
 
 void
-ao_lco_set_voltage(uint16_t decivolts)
+ao_lco_show_voltage(uint16_t decivolts)
 {
 	uint8_t	tens, ones, tenths;
 
@@ -100,16 +98,16 @@ ao_lco_set_voltage(uint16_t decivolts)
 }
 
 void
-ao_lco_set_display(void)
+ao_lco_show_display(void)
 {
 	if (ao_lco_pad == AO_LCO_PAD_VOLTAGE && ao_lco_box != AO_LCO_BOX_DRAG) {
-		ao_lco_set_voltage(ao_pad_query.battery);
+		ao_lco_show_voltage(ao_pad_query.battery);
 	} else {
 		if (ao_lco_box == AO_LCO_BOX_DRAG)
-			ao_lco_set_pad(ao_lco_drag_race);
+			ao_lco_show_pad(ao_lco_drag_race);
 		else
-			ao_lco_set_pad(ao_lco_pad);
-		ao_lco_set_box(ao_lco_box);
+			ao_lco_show_pad(ao_lco_pad);
+		ao_lco_show_box(ao_lco_box);
 	}
 }
 
@@ -210,13 +208,7 @@ ao_lco_step_box(int8_t dir)
 		if (new_box == ao_lco_box)
 			break;
 	} while (!ao_lco_box_present(new_box));
-	if (ao_lco_box != new_box) {
-		ao_lco_box = new_box;
-		ao_lco_pad = 1;
-		if (ao_lco_box != AO_LCO_BOX_DRAG)
-			ao_lco_channels[ao_lco_box] = 0;
-		ao_lco_set_display();
-	}
+	ao_lco_set_box(new_box);
 }
 
 static void
@@ -299,7 +291,7 @@ ao_lco_batt_voltage(void)
 
 	ao_adc_single_get(&packet);
 	decivolt = ao_battery_decivolt(packet.v_batt);
-	ao_lco_set_voltage(decivolt);
+	ao_lco_show_voltage(decivolt);
 	ao_delay(AO_MS_TO_TICKS(1000));
 }
 #endif
