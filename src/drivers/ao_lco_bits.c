@@ -20,20 +20,28 @@ uint8_t		ao_lco_debug;
 
 uint8_t		ao_lco_pad;
 int16_t		ao_lco_box;
-uint8_t		ao_lco_drag_race;
 
-uint8_t		ao_lco_armed;	/* arm active */
-uint8_t		ao_lco_firing;	/* fire active */
+uint8_t		ao_lco_armed;					/* arm active */
+uint8_t		ao_lco_firing;					/* fire active */
 
 uint8_t		ao_lco_min_box, ao_lco_max_box;
-uint8_t		ao_lco_selected[AO_PAD_MAX_BOXES];
-uint8_t		ao_lco_valid[AO_PAD_MAX_BOXES];
-uint8_t		ao_lco_channels[AO_PAD_MAX_BOXES];
-uint16_t	ao_lco_tick_offset[AO_PAD_MAX_BOXES];
 
-struct ao_pad_query	ao_pad_query;
+#if AO_LCO_DRAG
+uint8_t		ao_lco_drag_race;
+#endif
 
-static AO_LED_TYPE	continuity_led[AO_LED_CONTINUITY_NUM] = {
+struct ao_pad_query	ao_pad_query;				/* latest query response */
+
+static uint8_t		ao_lco_channels[AO_PAD_MAX_BOXES];	/* pad channels available on each box */
+static uint16_t		ao_lco_tick_offset[AO_PAD_MAX_BOXES];	/* offset from local to remote tick count */
+static uint8_t		ao_lco_selected[AO_PAD_MAX_BOXES];	/* pads selected to fire */
+
+#define AO_LCO_VALID_LAST	1
+#define AO_LCO_VALID_EVER	2
+
+static uint8_t		ao_lco_valid[AO_PAD_MAX_BOXES];		/* AO_LCO_VALID bits per box */
+
+static const AO_LED_TYPE	continuity_led[AO_LED_CONTINUITY_NUM] = {
 #ifdef AO_LED_CONTINUITY_0
 	AO_LED_CONTINUITY_0,
 #endif
@@ -68,9 +76,11 @@ ao_lco_igniter_status(void)
 	uint8_t		t = 0;
 
 	for (;;) {
+#if AO_LCO_DRAG
 		if (ao_lco_drag_race)
 			ao_sleep_for(&ao_pad_query, AO_MS_TO_TICKS(50));
 		else
+#endif
 			ao_sleep(&ao_pad_query);
 		PRINTD("RSSI %d VALID %d\n", ao_radio_cmac_rssi, ao_lco_valid[ao_lco_box]);
 		if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST)) {
@@ -98,6 +108,7 @@ ao_lco_igniter_status(void)
 			else
 				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
 
+#if AO_LCO_DRAG
 			if (ao_lco_drag_race && (ao_lco_selected[ao_lco_box] & (1 << c))) {
 				uint8_t	on = 0;
 				if (status == AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN) {
@@ -111,7 +122,9 @@ ao_lco_igniter_status(void)
 					ao_led_on(continuity_led[c]);
 				else
 					ao_led_off(continuity_led[c]);
-			} else {
+			} else
+#endif
+			{
 				if (status == AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN)
 					ao_led_on(continuity_led[c]);
 				else
@@ -210,9 +223,7 @@ void
 ao_lco_set_box(uint16_t new_box)
 {
 	ao_lco_box = new_box;
-#if AO_LCO_DRAG
-	if (ao_lco_box != AO_LCO_BOX_DRAG)
-#endif
+	if (ao_lco_box < AO_PAD_MAX_BOXES)
 		ao_lco_channels[ao_lco_box] = 0;
 	ao_lco_pad = 1;
 	ao_lco_show();
@@ -242,6 +253,7 @@ ao_lco_set_armed(uint8_t armed)
 	ao_lco_armed = armed;
 	PRINTD("Armed %d\n", ao_lco_armed);
 	if (ao_lco_armed) {
+#if AO_LCO_DRAG
 		if (ao_lco_drag_race) {
 			uint8_t	box;
 
@@ -250,7 +262,9 @@ ao_lco_set_armed(uint8_t armed)
 					break;
 			if (box > ao_lco_max_box)
 				ao_lco_armed = 0;
-		} else {
+		} else
+#endif
+		{
 			memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 			if (ao_lco_pad != 0)
 				ao_lco_selected[ao_lco_box] = (1 << (ao_lco_pad - 1));

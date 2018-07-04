@@ -34,8 +34,7 @@
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
 
-#define AO_LCO_VALID_LAST	1
-#define AO_LCO_VALID_EVER	2
+#define AO_LCO_BOX_DRAG		0x1000
 
 /* UI values */
 static uint16_t	ao_lco_fire_tick;

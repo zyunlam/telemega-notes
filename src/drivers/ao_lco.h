@@ -25,10 +25,6 @@
 #define AO_LCO_DRAG	1
 #endif
 
-#if AO_LCO_DRAG
-#define AO_LCO_BOX_DRAG		0x1000
-#endif
-
 #define DEBUG	1
 
 #if DEBUG
@@ -38,25 +34,21 @@ extern uint8_t	ao_lco_debug;
 #define PRINTD(...) 
 #endif
 
+#if AO_LCO_DRAG
 extern uint8_t	ao_lco_drag_race;	/* TRUE when drag race mode enabled */
+#endif
+
 extern uint8_t	ao_lco_pad;		/* Currently selected pad */
 extern int16_t	ao_lco_box;		/* Currently selected box */
 
-extern uint8_t	ao_lco_armed;
-extern uint8_t	ao_lco_firing;
+extern uint8_t	ao_lco_armed;		/* armed mode active */
+extern uint8_t	ao_lco_firing;		/* fire button pressed */
 
 extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
-
-#define AO_LCO_VALID_LAST	1
-#define AO_LCO_VALID_EVER	2
 
 #define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
 
 extern uint8_t	ao_lco_min_box, ao_lco_max_box;
-extern uint8_t	ao_lco_selected[AO_PAD_MAX_BOXES];
-extern uint8_t	ao_lco_valid[AO_PAD_MAX_BOXES];
-extern uint8_t	ao_lco_channels[AO_PAD_MAX_BOXES];
-extern uint16_t	ao_lco_tick_offset[AO_PAD_MAX_BOXES];
 
 #define AO_LCO_MASK_SIZE(n)	(((n) + 7) >> 3)
 #define AO_LCO_MASK_ID(n)	((n) >> 3)
