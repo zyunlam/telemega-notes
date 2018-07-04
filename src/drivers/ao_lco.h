@@ -141,10 +141,7 @@ void
 ao_lco_show_box(uint16_t box);
 
 void
-ao_lco_show_voltage(uint16_t decivolts);
-
-void
-ao_lco_show_display(void);
+ao_lco_show(void);
 
 void
 ao_lco_init(void);

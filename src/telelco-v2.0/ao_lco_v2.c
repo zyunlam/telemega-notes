@@ -72,7 +72,7 @@ ao_lco_show_box(uint16_t box)
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
-void
+static void
 ao_lco_show_voltage(uint16_t decivolts)
 {
 	uint8_t	tens, ones, tenths;
@@ -89,7 +89,7 @@ ao_lco_show_voltage(uint16_t decivolts)
 }
 
 void
-ao_lco_show_display(void)
+ao_lco_show(void)
 {
 	if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
 		ao_lco_show_voltage(ao_pad_query.battery);

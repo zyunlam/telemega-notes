@@ -46,7 +46,19 @@ ao_lco_wakeup(void)
 }
 
 void
-ao_lco_show_display(void)
+ao_lco_show_pad(uint8_t pad)
+{
+	(void) pad;
+}
+
+void
+ao_lco_show_box(uint16_t box)
+{
+	(void) box;
+}
+
+void
+ao_lco_show(void)
 {
 }
 

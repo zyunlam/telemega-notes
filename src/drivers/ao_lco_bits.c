@@ -173,7 +173,7 @@ ao_lco_update(void)
 				ao_lco_set_pad(ao_lco_pad_first(ao_lco_box));
 		}
 		if (ao_lco_pad == AO_LCO_PAD_VOLTAGE)
-			ao_lco_show_display();
+			ao_lco_show();
 	}
 }
 
@@ -203,7 +203,7 @@ void
 ao_lco_set_pad(uint8_t new_pad)
 {
 	ao_lco_pad = new_pad;
-	ao_lco_show_display();
+	ao_lco_show();
 }
 
 void
@@ -215,7 +215,7 @@ ao_lco_set_box(uint16_t new_box)
 #endif
 		ao_lco_channels[ao_lco_box] = 0;
 	ao_lco_pad = 1;
-	ao_lco_show_display();
+	ao_lco_show();
 }
 
 void
@@ -278,12 +278,11 @@ ao_lco_search(void)
 	uint8_t		boxes = 0;
 
 	ao_lco_box_reset_present();
-	ao_lco_set_pad(0);
+	ao_lco_show_box(0);
+	ao_lco_show_pad(0);
 	for (box = 0; box < AO_PAD_MAX_BOXES; box++) {
-		if ((box % 10) == 0) {
-			ao_lco_box = box;
-			ao_lco_show_display();
-		}
+		if ((box % 10) == 0)
+			ao_lco_show_box(box);
 		for (try = 0; try < 3; try++) {
 			ao_lco_tick_offset[box] = 0;
 			r = ao_lco_query(box, &ao_pad_query, &ao_lco_tick_offset[box]);
@@ -291,7 +290,7 @@ ao_lco_search(void)
 			if (r == AO_RADIO_CMAC_OK) {
 				++boxes;
 				ao_lco_box_set_present(box);
-				ao_lco_set_pad(boxes % 10);
+				ao_lco_show_pad(boxes % 10);
 				ao_delay(AO_MS_TO_TICKS(30));
 				break;
 			}
@@ -427,7 +426,7 @@ ao_lco_drag_enable(void)
 		ao_led_on(AO_LED_DRAG);
 #endif
 		ao_lco_drag_add_beeps(5);
-		ao_lco_show_display();
+		ao_lco_show();
 	}
 }
 
@@ -442,7 +441,7 @@ ao_lco_drag_disable(void)
 #endif
 		memset(ao_lco_selected, 0, sizeof (ao_lco_selected));
 		ao_lco_drag_add_beeps(2);
-		ao_lco_show_display();
+		ao_lco_show();
 	}
 }
 
