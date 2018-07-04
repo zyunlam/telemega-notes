@@ -202,23 +202,20 @@ ao_lco_box_set_present(uint8_t box)
 void
 ao_lco_set_pad(uint8_t new_pad)
 {
-	if (new_pad != ao_lco_pad) {
-		ao_lco_pad = new_pad;
-		ao_lco_show_display();
-	}
+	ao_lco_pad = new_pad;
+	ao_lco_show_display();
 }
 
 void
 ao_lco_set_box(uint16_t new_box)
 {
-	if (ao_lco_box != new_box) {
-		ao_lco_box = new_box;
+	ao_lco_box = new_box;
 #if AO_LCO_DRAG
-		if (ao_lco_box != AO_LCO_BOX_DRAG)
+	if (ao_lco_box != AO_LCO_BOX_DRAG)
 #endif
-			ao_lco_channels[ao_lco_box] = 0;
-		ao_lco_set_pad(1);
-	}
+		ao_lco_channels[ao_lco_box] = 0;
+	ao_lco_pad = 1;
+	ao_lco_show_display();
 }
 
 void
@@ -283,8 +280,10 @@ ao_lco_search(void)
 	ao_lco_box_reset_present();
 	ao_lco_set_pad(0);
 	for (box = 0; box < AO_PAD_MAX_BOXES; box++) {
-		if ((box % 10) == 0)
-			ao_lco_set_box(box);
+		if ((box % 10) == 0) {
+			ao_lco_box = box;
+			ao_lco_show_display();
+		}
 		for (try = 0; try < 3; try++) {
 			ao_lco_tick_offset[box] = 0;
 			r = ao_lco_query(box, &ao_pad_query, &ao_lco_tick_offset[box]);
@@ -304,7 +303,7 @@ ao_lco_search(void)
 		ao_lco_min_box = ao_lco_max_box = ao_lco_box = 0;
 	memset(ao_lco_valid, 0, sizeof (ao_lco_valid));
 	memset(ao_lco_channels, 0, sizeof (ao_lco_channels));
-	ao_lco_set_pad(1);
+	ao_lco_set_box(ao_lco_min_box);
 }
 
 void
