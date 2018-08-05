@@ -1,3 +1,1230 @@
+commit d8627bb7b46fc991786835afa38cd720e9e75812
+Merge: 59e23c27 8830fbc9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Aug 5 11:21:37 2018 +0800
+
+    Merge branch 'master' into branch-1.8
+
+commit 8830fbc99565f753c0ae1f3d9f4b079860c2634a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 11:13:23 2018 +0800
+
+    Update docs for 1.8.6
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d57c78dde3c6e61576a4769b0e0fae7e88c107d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 11:09:34 2018 +0800
+
+    altos: Add separate 'ao_launch_tick'. Use in pyro and lockout.
+    
+    Prior to this, there was only ao_boost_tick, which got reset at each
+    motor burn start. That meant there wasn't any way to measure total
+    flight time for pyro channels and 'apogee lockout' was based on time
+    since most recent motor start instead of total flight time.
+    
+    Now pyro channels and apogee lockout both use total flight time, while
+    motor burn length still uses time since most recent motor burn start
+    (as it should).
+    
+    Docs and UI updated to use 'launch' instead of 'boost' to try and make
+    the change clear.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9dfbf0103a649816e98d5511b1d6bbbfc93f6632
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 09:03:35 2018 +0800
+
+    altos/plottest: Make linewidth bigger
+    
+    1-pixel lines are harsh in 2018
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 50c6d796e0dbb69289f95c826e6b542e538fc5de
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 08:45:30 2018 +0800
+
+    altos/stm-demo: Set up for dumping eeprom
+    
+    This is used to dump an eeprom wired to the stm demo board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 327b765962d397efd4c45b6209c9225a4d23ba1d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 08:44:04 2018 +0800
+
+    altos: Change 'after motor' pyro check to be >= instead of ==
+    
+    This makes after motor stay valid even if further motors burn.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a90d205d41cb4f9f8e669473247786a23a678368
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 08:43:06 2018 +0800
+
+    ao-tools/ao-dumplog: Dump entire eeprom contents
+    
+    This gets the eeprom size from the device and uses that to dump the
+    whole thing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 08e7fdb9f2db4b54279c0c5b18735aa1d5abc19e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 4 20:25:58 2018 -0700
+
+    altoslib: Make stop_remote delay depend on the data rate
+    
+    It takes longer to flush commands at 2400 baud, so wait longer when
+    disabling remote mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 323a79e6ed3dfdd2afadfc2a464bb0610380b03b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 4 16:08:31 2018 -0700
+
+    altos: Fetch current quadrature status at startup time
+    
+    This avoids having the state appear to change the first time we look
+    at the device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ad9d6677231ccbfa09a528387f306f5364f9d608
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 4 12:34:38 2018 -0700
+
+    altos: Make fewer LCO variables public
+    
+    The lco common code doesn't need to share its internal values with the
+    world; make most of them static.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38fb80e5e6af87f8c734448e4aa69b2c39854903
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 4 11:58:40 2018 -0700
+
+    altos: Make LCO search directly drive pad/box displays
+    
+    Don't use ao_lco_show as that has other logic too.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2214ad7c0f268be76c0b027eef9d1dc406f23b28
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 4 11:27:31 2018 -0700
+
+    altos: Fix LCO display while searching
+    
+    Use lower level functions to control the display more directly
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b53a69e47816ee987a409b05a6b0b47891ca816
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 4 11:18:12 2018 -0700
+
+    altos: Fix telelcotwo build for new ao_lco_bits.c file
+    
+    Lots of code motion; shouldn't have any functional changes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71a51b4857f5bd49c0cba2578fb54b1d5b2c738b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jul 4 12:13:38 2018 -0600
+
+    add telefireeight-v1.0 to products built by default in src/Makefile
+
+commit 81355cd08a22502d47637f2505b6089d226d0889
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 3 01:06:09 2018 -0700
+
+    altos: A bit more LCO code sharing
+    
+    Missed drag race pad toggling in ao_lco_v2.c
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55f817d6ff1a524434fe41ba83e42b8008989cac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 3 01:01:05 2018 -0700
+
+    altos: Build telelco-v2.0 by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c48d4b60da8b23bf358e6c14d7332d3a360c2d2f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 3 01:00:15 2018 -0700
+
+    altos: Share common LCO functions in ao_lco_bits.c
+    
+    Move common code out of ao_lco.c and ao_lco_v2.c into a shared file,
+    ao_lco_bits.c. Update ao_lco.h to include shared functions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e56e1dc20b3bf18073766da4e26e97d9e1d419fc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 2 14:21:48 2018 -0700
+
+    altos/test: Compute and show height error tracker in ao_flight_test
+    
+    Enable the computation of ao_error_h_sq_avg in ao_flight_test even
+    when an accelerometer is present to allow review of that data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c263fde769da380d55d223cebe3c9b6e8f19cb29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 2 14:20:39 2018 -0700
+
+    altosuilib: Split cc1111 vs arm telefire/telemini for flashing
+    
+    Only older telefire and telemini boards had cc1111 processors and need
+    pair-programming.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8794920328c8311372f83e4e5656ce14c7f8336b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jul 1 14:50:26 2018 -0600
+
+    add a turnon script for TeleLCO v2.0
+
+commit 655fd8e1490b70061cd81edf1d019e0469843688
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 18 10:53:35 2018 -0700
+
+    altos/telelco-v2.0: Do all drag race beeping from the beeping thread
+    
+    Instead of starting the beep from the calling thread, just update some
+    state and poke the beeping thread.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9ece56e3ad76af6ae623ad7a6782c0c933839be8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 12:35:23 2018 -0700
+
+    altos/ao_pad: Move LED test to the monitor task
+    
+    It sets the LEDs, so it's best to not start doing that until we've
+    tested them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cef5a5725e3bf2c17965599bd76eb93cb05a0f80
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 12:30:09 2018 -0700
+
+    altos/ao_pad: Turn on all LEDs for a moment at power up
+    
+    Allow validation of all LED connections.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 731ba39a22719a8c431eb63895cd8ba553975114
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 12:29:36 2018 -0700
+
+    altos/ao_pad: Use AO_LED_TYPE for computing active LEDs.
+    
+    instead of uint8_t
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 42ee832368f6ff796444823d53935d824acd329a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 12:28:51 2018 -0700
+
+    altos/stm: Let products override AO_LED_TYPE for stm processors
+    
+    No need requiring it to be uint16_t
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c2d9f13a97d45b7dbe2cb47b563aea59ec725bb1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 01:36:00 2018 -0700
+
+    Bump version to 1.8.6
+    
+    Prepare for release.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 290506129fb6cb664da3a5e3ca450a0dcdff0398
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 01:20:01 2018 -0700
+
+    altos/telelco-v2.0: Fix AO_ADC_DUMP
+    
+    Was printing p.v_batt instead of (p)->v_batt. I don't know why the
+    former even worked.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 291bcd751991960ae3dad8c6523323fdcbafa16d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 16 23:50:11 2018 -0700
+
+    altos/telelco-v0.2-cc1200: Add build for NAR hacked TeleLCO v0.2 board
+    
+    This has the CC1120 replaced with a CC1200, but with 32MHz xtals
+    instead of 40MHz on the radio chip.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 16482bf5d63eafc5256f14a218d3a374f6584e0a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 16 23:51:26 2018 -0700
+
+    altos/driver: Improve quadrature debouncing for mechanical encoders
+    
+    Track state of encoder better and only bump values when the full
+    motion is detected (all four states).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit abac6c59d6b004d52a7b782865d2d987732cd61e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 00:17:29 2018 -0700
+
+    altos/telelco-v0: Test display, show batt voltage at boot
+    
+    Just like telelco v2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96835cc841ff7afad0b4d2fe4b63f26b951da122
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 17 00:19:37 2018 -0700
+
+    ao-bringup: Find dfu-util in $PATH for chaoskey
+    
+    In case it's not in /usr/bin
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7821e341a7cf55e32b926eb4474220dabb6eeb81
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 16 23:47:42 2018 -0700
+
+    altos/stm: Define ADC channels for TEMP and V_REF
+    
+    These are fixed at 16 and 17.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5c465b0049659246908b15be68806b1390e8ebe5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 16 23:47:15 2018 -0700
+
+    altos/stm: Remove unused ADC names from ao_adc_single_stm.c
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5d9881547706b49cc22b98cc5c94e01e8a7f5181
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 31 22:45:49 2018 -0700
+
+    altos/telelco: Remove STATIC_TEST code from stand-alone LCO boxes
+    
+    This command conflicts with the 'debug' command in these devices and
+    so wasn't usable anyways.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f755181fd3ec82d7644591e2ed4b99a244acfd6e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 31 22:42:13 2018 -0700
+
+    altos/telelco-v2.0: Test displays at power on
+    
+    At boot, light up all LEDS and LCD segments for a second to let the
+    user verify that things are working correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 99642f9c4f89aa5577376a9cd118e7cff26e2762
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 31 22:39:45 2018 -0700
+
+    altos/telefire*: Do voltage tests in decivolts instead of ADC units
+    
+    This requires that each pad device specify the ADC reference voltage
+    and all relevant voltage divider resistor values explicitly so that
+    the ADC values can be converted to decivolts and compared with one
+    another. This should be easier to understand in the future when
+    reading the code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ab22c56ca02db87a84b6950c024a90b086f5ce28
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 31 16:24:33 2018 -0700
+
+    altos/telefireeight-v1.0: Fix ADC definitions
+    
+    Was missing all of the GPIO configuration bits, which probably meant
+    the ADCs were returning garbage values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 82ed4f5c45b1a9f114577a59fac546c81d69f810
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 30 11:38:24 2018 -0700
+
+    altoslib: Revert field name changes for accel cal values
+    
+    These names get written in the JSON part of all .eeprom files, so we
+    can't change the names or the values won't be read and written correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 484ffebc54048bbe276e0e2c0e2ab52c6a1761c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 19:19:43 2018 -0700
+
+    altos/telelco-v2.0: Set HAS_ADC_SINGLE to enable HSI timer
+    
+    The ADC unit requires the HSI timer to run, so make sure it's enabled
+    for this device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 16971e550d1018fb6acf3fee3c56098f5ba9921e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 19:18:48 2018 -0700
+
+    altos/stm: Enable HSI timer when HAS_ADC_SINGLE is set
+    
+    The ADC unit always uses the HSI timer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 42a261a56606be69b5fb90fd6017c70a1e5d72dd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 16:10:51 2018 -0700
+
+    altos/telelco-v2.0: Display local batt voltage at startup
+    
+    Show the battery voltage for a second at startup.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3fb27f0ab7163c96945a60fd406e5423552206a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 16:09:19 2018 -0700
+
+    altos/stm: Add polling ADC sampler API
+    
+    This just fetches ADC values on demand instead of loading them
+    periodically into a ring buffer from the timer interrupt.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dbeb9b91a48418c5bc9f6edccaef20c3ef77d45d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 15:12:26 2018 -0700
+
+    altos/telelco-v2.0: Change drag race selected/no-continutity pattern
+    
+    Make it turn on at the same time as the pads with continuity, but turn
+    off sooner
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eb31a40b3499287e0a52324a9adc3728883ed957
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 15:07:06 2018 -0700
+
+    altos/telelco-v2.0: Add debug output for pad voltage display
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 29f9880f7b09bc135d34bf0dcb221bdede7726b3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 14:54:47 2018 -0700
+
+    altos/telelco-v2.0: A bit fancier with the drag-mode LED show
+    
+    Continutity leds now show whether the pad is included in the drag race
+    *and* the continutity using four different patterns:
+    
+    Drag select & igniter present:          long on, short off
+    Drag select & igniter missing:          short on, long off
+    Not select & igniter present:           solid on
+    Not select & igniter missing:           solid off
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 98ea690cc7514f43254f3a6c72668c11820f657c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 14:41:51 2018 -0700
+
+    altos/telelco-v2.0: Fix button names and pin mappings. Add drag LED.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b1f1a4513391aa595eb64552f2aa4cfedd0cc0ff
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 14:35:18 2018 -0700
+
+    altos/telelco-v2.0: Mixed up the select_button pin (is E0, was set to E13)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2c94ba66d5b4c99b43ab965331bf1faa270a9768
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 14:26:47 2018 -0700
+
+    altos/telelco-v2.0: Only look at drag select presses, not releases
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a26cf26e3416b1982abec249678a32a420bf8809
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 14:26:12 2018 -0700
+
+    altos/telelco-v2.0: Use single-step quadrature code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ccad6e970c5c7416561443f1e6e2fa8f80698957
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 14:15:34 2018 -0700
+
+    altos/driver: Add support for one-step-per-click quadrature encoder
+    
+    The mechanical encoders go through all four steps per click while the
+    optical ones have a single step per click. Support both kinds.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f172b139ddc3fcc17cf89b57e5126264c0faa45e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 13:08:33 2018 -0700
+
+    altos/telelco-v2.0: Reduce quadrature debounce time
+    
+    The optical encoders shouldn't bounce at all; let's try a minimal value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4dbc940cc6c8ff5565e8af21f2dcb4ae090380c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 13:07:06 2018 -0700
+
+    altos/drivers: Make quadrature debounce longer by default. Fix state tracking
+    
+    This increases the default debounce time for quadrature encoders to
+    30ms, which cleans up the mechanical encoders on TeleLCO v0.2. Also
+    change state tracking to explicitly check for expected state values to
+    avoid mis-triggering.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7e2a2849f58e98adc1114bb8f3a6319408d93691
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 12:06:41 2018 -0700
+
+    altos/telelco-v2.0: Only switch encoder mode on push, not release
+    
+    Was not checking event value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 863a9d523b26a8a5f8fbd5b516bd7dd914ee079e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 11:23:03 2018 -0700
+
+    altos/ao_button.c: Support up to 16 buttons
+    
+    TeleLCO v2.0 has more than 4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eb70e334ffc77e737bb21ab3fe777a982d80ee3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 28 11:12:36 2018 -0700
+
+    altos/telelco-v2: Change select button to alternate box/pad mode
+    
+    Instead of a three-way, just make the select button two-way and have
+    the arming switch disable it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14fa6cee857918966740d05c4ed13b1a79db3caa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 21 22:36:35 2018 -0700
+
+    altos: Add TeleFireEight v1.0 product
+    
+    Eight pyro channel version of the TeleFire boards.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e272f6a66881b6904037ee7b1afeb9a8a3ec5b2a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 21 22:32:38 2018 -0700
+
+    altos/drivers: Pads with multi-port firing and pad selector DIP switch
+    
+    TeleFire 8 scrambles GPIOs to make layout cleaner, placing the 8
+    firing outputs across two GPIO ports.
+    
+    We're also adding an 8-unit selector for box number so that boards can
+    be re-configured in the field. These override any ROM-configuration
+    value; you can select the rom value by setting all switches to 'off'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 85a8846a423ce2d15815466564fb589bb553c742
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 16 22:03:25 2018 -0700
+
+    altos/stm: Add per-LED port/pin mode in LED code
+    
+    If you've got a complicated LED pin arrangement, you can ask for each
+    one to be configured separately, instead of using groups in a couple
+    of GPIO registers. The code isn't as efficient this way, but at least
+    it's easy to read.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96ee5257068a988db10097af8df72b0008bce978
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 16 22:02:11 2018 -0700
+
+    altos: Add TeleLCO v2.0 product
+    
+    New LCO design with a single rotary knob and lots more buttons.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5a26df7db9453bf0596f729a23efb90e5e8a63c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 16 22:05:26 2018 -0700
+
+    altos/vidtime: Check for value change in normal code, not irq
+    
+    This makes sure each value change is reported to the user.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 06dac6551418ba817798c187f198b9b00c1dda74
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 11:26:42 2018 -0700
+
+    altos: add 'vidtime', a simple brightness monitor
+    
+    This is a testing tool for video refresh tracking. It uses the mpusb
+    v3.0 hardware and monitors the phototransistor value, sending 0 or 1
+    to the USB port when the value changes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1f56dc30a31e3d5c833f73ec9cd31f548a80e154
+Merge: feb881a2 71acc79f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 09:53:52 2018 -0700
+
+    Merge branch 'mpusb'
+
+commit 71acc79f8e828d56296db282c72cf4492a8aa4f4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 09:43:27 2018 -0700
+
+    altos/mpusb-v3.0: Make it compile again
+    
+    A few things have changed since this code was written.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bc70f92966221f941b96177b401744a7aca24814
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 09:42:28 2018 -0700
+
+    altos/stmf0: leave ao_power_gpio names undefined without power management
+    
+    Should make it more obvious at compile time that you've done something wrong.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5ddd4e10bd8ddb4a00a0ccd8982db3311ec5a9e7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 20 00:00:07 2016 -0800
+
+    altos: Add µPusb v3.0 project
+    
+    This replaces the ft230 with a stm32f04, saving a bit of BOM
+    and giving us control over the firmware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit feb881a24250bd7e71ec8ccef0099d4b4a0df519
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 08:58:21 2018 -0700
+
+    doc: Update pyro channel info to reflect UI changes
+    
+    Use the new naming in the UI. Add lots more comments about how things work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b11a34bb031035883bac97952e5ca6db0684e33
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 08:56:32 2018 -0700
+
+    altos/test: Replace state name with 10* state value in test log. Fix raw speed
+    
+    Using a state value means we can plot state changes along with the
+    rest of the graph. Raw speed (simple integrated acceleration) was
+    busted; mostly needing to skip the first accel sample.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cc83d57454ed07e4828b4413e5af6ae2ecfe2e5a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 08:51:36 2018 -0700
+
+    altos: Eliminate height requirement for coast detect
+    
+    We had required a minimum altitude of 100m to transition from boost to
+    coast. With small motors in a heavy multi-staged rocket, this can fail
+    to detect coast in time to light the second motor.
+    
+    Also, this would fail to deploy recovery systems if the flight failed
+    before reaching 100m.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 49aafcbb6c0f3ecda4b668776be74a04a5654377
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 7 08:50:33 2018 -0700
+
+    Update version to 1.8.5.2
+    
+    Shipped some bits to Fred Taverni to test eliminating the altitude
+    requirement for boost detect as he stages so low.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ab65e9f257493da5282d8933d8f0dcb716c1f41f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 6 21:16:25 2018 -0700
+
+    ao-chaosread: Add support for the new flash endpoint in chaoskey
+    
+    This adds support for endpoint 0x87, which streams the contents of the
+    onboard flash to the host for firmware verification.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bea42e45952df85d61428662caefbb100465a585
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 6 21:13:02 2018 -0700
+
+    altos/chaoskey-v1.0: Add endpoint for reading flash contents
+    
+    This creates another IN endpoint which provides the contents of flash
+    for validation of the firmware load on the host.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4451f7b6bade66775a197b93c6e70ba15f1826ce
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 6 21:11:48 2018 -0700
+
+    altos/stmf0: Fix up USB debug code
+    
+    At least make it compile. In this configuration, it's dumping out IN3
+    endpoint register values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a06c283c358455008cd1e5376ccc0b6f72c7ac87
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 6 21:11:02 2018 -0700
+
+    altos/stmf0: Add IN3 alternate endpoint support
+    
+    This adds the code necessary to drive another IN endpoint.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b15549d8c5277ba3aa425e232473a17dc136e5a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 6 21:09:22 2018 -0700
+
+    altos/stmf0: Toggle IN2 SW_BUF bit when sending data
+    
+    This tells the hardware we're done writing data to the second input
+    buffer and allows it to be switched from NAK to VALID.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8efe0d40deded973f08f63eb650a036f9e24d2fb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 6 21:17:32 2018 -0700
+
+    altos/kernel: Add USB descriptors for IN3
+    
+    This adds the necessary descriptor information to support another IN
+    endpoint for applications.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f282b802d2f5a0da56bb8245169c46a16b2eed71
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 6 21:06:31 2018 -0700
+
+    altos/kernel: Define usb IN2/IN3 functions
+    
+    These are putchar and flush functions that are used when sending data
+    to the additional IN2 and IN3 endpoints.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 257350e1a3e4ba2048e80d30a4a0454eb65d4a26
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 1 23:47:27 2018 -0700
+
+    ao-bringup/turnon_telemini: Skip DFU if no DFU device is present
+    
+    This skips running dfu-util to load the bootloader if there isn't a
+    suitable DFU device listed in the system, which allows an
+    already-flashed device to be run through the same script.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 08e543cd8b761e4cbbfa97404fcd5394f65a0e9e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 1 23:44:00 2018 -0700
+
+    altos/stmf0: Set 0x0 mapping to Main Flash for boot loader
+    
+    When DFU finishes loading firmware and jumps to the application, it
+    leaves the mapping of addresses starting at 0x0 set to System flash,
+    which prevents the boot loader from receiving interrupts and requires
+    a power cycle during flash & cal.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 980e3dc43ac4712680a370756e5112e9f330aa9a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 1 23:36:57 2018 -0700
+
+    altos/stmf0: whitespace fix
+    
+    Trailing whitespace.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 772b5f1cb625fba1396a57b47498ef805ae1a9a8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 1 23:36:16 2018 -0700
+
+    altos/stmf0: Change tests for AO_BOOT_CHAIN and AO_BOOT_PIN to #if
+    
+    Were #ifdef, which meant that #define AO_BOOT_PIN 0 didn't work right.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 312f303be7f2a641020903ed2daccb8a4d67ec42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 28 12:03:10 2018 -0700
+
+    altoslib: Fix Idle Monitor on TeleMega v3
+    
+    The new IMU includes a mag sensor, and there's no separate mag sensor.
+    
+    Add support for reading the mag sensor values from the IMU, separate
+    out v3 from previous TeleMega versions so that the code can stop
+    trying to read the mag sensor.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0dfaecc25a12da57248541a66dd5118161616cce
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 21 16:16:18 2018 -0700
+
+    altos/fox1ihu: Pull down radio control pin in flash loader
+    
+    Ensures that the radio is powered down while in the flash loader.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8025b98420f16730e5e6e45114cbdbbf88f7a748
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:16:41 2015 -0700
+
+    Remove ao_radio_cal from stm products without radios
+    
+    Products without a radio don't need this value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c408c773793b5a5685d95c11ba6f710200505c25
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue May 6 00:38:33 2014 -0600
+
+    had the sense backwards .. presence of 'attached' should put us in the loader
+
+commit 9003147a89074f8d991d1707f307fd4e41435aa3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon May 5 17:32:22 2014 -0600
+
+    move signal that forces flash-loader on to PB8, active high
+
+commit ddf70e806f894707613830fd64e21b5bb8f19972
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 27 00:36:36 2013 -0700
+
+    altos: Build fox1ihu by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6247e0c81084b59365ceca0ced33d2db92a72444
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 1 00:06:30 2014 -0800
+
+    altos/fox: Enable system timer in flash loader and prod watchdog with it
+    
+    This makes it possible to reflash the board without needing to disable
+    the watchdog.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 04aa1dfa7918dcf4eea9ec4cef5a31ac2a61a00d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 31 22:39:58 2014 -0800
+
+    altos/fox: Update ADC to fox-1 IHU Revision 2
+    
+    Change ADC pin definitions to match new hardware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54da028c492464802b048cb949d392cd83994e75
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 31 17:44:45 2014 -0800
+
+    altos/fox: Transition to current altos build environment
+    
+    Fix the library usage, use $(LIBS) instead of $(SAT_CLIB) -lgcc
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca58096665fc1a11ca5683f0e6aafaf3e153af37
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 28 00:42:31 2013 -0700
+
+    altos/fox: update product name to show v2, enable watchdog by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e79202f95f0e5b4a01da31d3742a775bea62cc92
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 28 00:05:39 2013 -0700
+
+    altos/fox: Run app when PD6 is low
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 36cf713ead58a52539c87de764b022ba0dcde27d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 27 16:06:48 2013 -0700
+
+    altos/fox: Add fox1ihu flash loader
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4c37ccc63d37ff0a4382f6812060d3c5fd4b6cfb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 25 21:25:12 2013 -0700
+
+    altos/fox: Add MRAM and SD card drivers
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f517aa5e042af8dd7fd36be47e4b196f212e79b0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 21 10:16:35 2013 -0700
+
+    altos/fox: Enable M25 driver for MRAM.
+    
+    The M25 driver can also talk to the MRAM chip, with a few adjustments
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e0c969910a516c018e64eaa73cdbe4bc2f979835
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 21 09:49:15 2013 -0700
+
+    altos/fox: Add watchdog timer
+    
+    Runs at 25Hz, can be enabled and disabled via the command line
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6adf9d2a17d701ed0ceb742f322fa72723149980
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 23 21:37:24 2013 -0800
+
+    altos/fox: Turn on all of the fox lights
+    
+    Fox has two red and two green LEDs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 524afb040aa34d93abae7d04afa1df7a626f9877
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 23 21:36:18 2013 -0800
+
+    altos/fox: Provide names for fox ADC channels
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8b783887d7f136d3a389316545b74f4755e43eb4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 23 21:05:26 2013 -0800
+
+    altos/fox: Fix up Fox ADC bits
+    
+    Update to current schematic
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff2330a7fedfa7f6be3502ad0d591ab9e5ddddc6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 23 20:48:04 2013 -0800
+
+    altos/fox: Initialize FOX adc
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fbf01178e560d8a36916e295d7bdb0b0e98d2b02
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 23 21:45:28 2013 -0700
+
+    altos/fox: rename fox product
+    
+    It's Fox1IHU-v1 now
+
+commit 23ba75c3c2ddde65dc543b52cd87b8a1433c5024
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 23 19:03:26 2013 -0800
+
+    altos/fox: Add fox1ihu bringup firmware
+    
+    Firmware capable of testing fox1ihu hardware
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8612c1287a1c458a17f33af1d679d30a13dea772
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 26 17:24:51 2018 -0700
+
+    altoslib: Fix data fetching during flashing of cc1111-based devices
+    
+    We want to get enough information about the target device to verify
+    that the new firmware matches, so fetch 512 bytes instead of just
+    barely enough to cover the romconfig data.
+    
+    Also catch out-of-bounds accesses and handle them, in case even this
+    large array isn't enough.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eee9f6128da146b0e9c711d49b2a3eb49a95aaf3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 26 16:30:54 2018 -0700
+
+    altoslib: Keep config data accel cal in antenna up form.
+    
+    Instead of letting the accel cal data live in whatever form it was
+    fetched in, keep it in antenna up form and provide it in whatever
+    orientation is necessary.
+    
+    This fixes bugs in changing pad configuration where the accel cal values
+    from the old orientation would get used in the new orientation and
+    wreck them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b3474fb33a58e78b3b8f36958dd44768e49f3edc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 25 23:07:46 2018 -0700
+
+    altoslib: Flush settings restoration commands after accel cal
+    
+    To avoid mangling settings when the user doesn't 'save' things,
+    restore the original accel cal values and orientation after finishing
+    accelerometer calibration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d691170a96545a9e57aad454de87541cea8c292
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 22 20:02:04 2018 -0700
+
+    altoslib: Remove ascending/descending from pyro config
+    
+    Ascending and descending don't add any functionality and can confuse
+    people. Clears pyro configuration value when ascending or descending were
+    selected in the configuration so that the user knows to reset the
+    channel from scratch.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 57218127ee39724e985fefcf203991401f01cc84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 22 20:01:01 2018 -0700
+
+    altoslib: Clarify terms in Mega pyro config
+    
+    Suggestions from Bob Brown et al
+    
+    Speed -> ascent rate
+    Height -> height above ground
+    Acceleration -> Vertical acceleration
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 06ca18ee67f80a9d1e25799930aca59e99e32d7f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 21 16:22:16 2018 -0700
+
+    Set version to 1.8.5.1
+    
+    Firmware has changed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b47796991cb6c2edb85f9201a53515b4dd28b946
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 15 22:52:35 2014 -0700
+
+    altos/flash-loader: On STM, don't include ao_usb_disable
+    
+    This saves a bit of space, keeping the flash loader under 4k on fox
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b478d3c3569d2f9df50b0030197468d14af67688
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 21 16:17:26 2018 -0700
+
+    altos: Use max of 64 previous orient values when checking pyro limits
+    
+    Instead of checking just a single measurement to see if the
+    orientation is outside of the desired limits, use the maximum of 64
+    previous values to that rapidly changing orientation won't
+    accidentally enable a pyro channel if sampled at the 'wrong time'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a414a32f86c9d8a2c5f576898c0f0dc75263ff85
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 21 16:14:39 2018 -0700
+
+    altos/stm: Simplify ao_usb_write a bit
+    
+    Remove unnecessary 'offset' param (was always passed zero). This also
+    makes some code conditional on that value no longer necessary.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1569b23b2f139e3840ec145f4eef45f36fc4939a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 16 09:46:22 2018 -0700
+
+    doc: add release check for altusmetrum-docinfo.xml copyright
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d5c038473d56ebbe61b8a71b5eb28d03385f8c48
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 16 09:45:35 2018 -0700
+
+    altosdroid: Attempt to avoid some reported altosdroid crashes
+    
+    Just looking at stack traces, maybe these changes will avoid some problems?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 110e4818b85781c33d683b7b7e7f2864a1223c5c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 5 16:41:20 2018 -0700
+
+    micropeak: Make reported 'max height' value show filtered max height
+    
+    MicroPeak tries to filter out bogus pressure data so that the value
+    reported on the LED is reasonable. We want to report that same value
+    in the UI, which means replacing the normal mechanism for computing
+    max height from the time series of height data with the value computed
+    from the saved minimum pressure value recorded in the device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 20dc0e6c8e365c1f4188189d506163d589c3bade
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 22 19:00:03 2018 -0600
+
+    add a warning about Google limiting per-day access until/unless we pay
+
+commit 0b58d3067d994319b73c2bd15817f6922257ece2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Mar 31 17:44:18 2018 -0600
+
+    another second seems to help on the very slow Acer laptop
+
+commit 865364d2738ae0b79a390eab62a5ddac1e890c71
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 23 17:35:47 2018 -0600
+
+    altos: Hack up code for TeleMetrum to make it just a tracker
+    
+    Support for a failed TeleMetrum device that uses just the GPS receiver
+    and radio to create a TeleGPS-compatible device called 'tmgps'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58eda1736d8cffa6e3b5afce6f5faabbb179045e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Mar 23 17:34:23 2018 -0600
+
+    altos/ao_cc1120: Only call ao_packet_slave_stop when HAS_SLAVE
+    
+    Don't try to disable packet slave mode when the product doesn't
+    support packet slave mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 49fd1fe435b116665b41722c7d14878a62bb3311
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Mar 20 18:25:43 2018 -0600
+
+    add a paragraph to the intro pointing to the altusmetrum email list
+
+commit 59e23c27c2a85d7d748223e444b24d19937afe47
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Mar 18 15:49:07 2018 -0600
+
+    preparing to release 1.8.5
+
 commit 7b614380f307cb5e27f2a05281bc76c4ace93334
 Merge: 16a9d861 39023ed6
 Author: Bdale Garbee <bdale@gag.com>
