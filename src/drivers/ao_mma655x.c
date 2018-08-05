@@ -30,8 +30,6 @@
 #define PRINTD(l,...) 
 #endif
 
-uint8_t	ao_mma655x_spi_index = AO_MMA655X_SPI_INDEX;
-
 static void
 ao_mma655x_start(void) {
 	ao_spi_get_bit(AO_MMA655X_CS_PORT,
