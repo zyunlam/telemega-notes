@@ -61,8 +61,8 @@ public class AltosPyro {
 	public static final int pyro_time_greater		= 0x00000200;
 	public static final String pyro_time_less_string	= "t<";
 	public static final String pyro_time_greater_string	= "t>";
-	public static final String pyro_time_less_name		= "Time since boost less than (s)";
-	public static final String pyro_time_greater_name	= "Time since boost greater than (s)";
+	public static final String pyro_time_less_name		= "Time since launch less than (s)";
+	public static final String pyro_time_greater_name	= "Time since launch greater than (s)";
 	public static final double pyro_time_scale		= 100.0;
 
 	public static final int pyro_ascending			= 0x00000400;

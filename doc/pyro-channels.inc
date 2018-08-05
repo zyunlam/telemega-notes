@@ -42,9 +42,13 @@ launch pad and initialize the system.
   of less than that value.
   ====
 
-Flight Time:: Time since boost was detected. Select a value and choose
-whether to activate the pyro channel before or after that amount of
-time.
+Flight Time:: Time since launch. Select a value and choose whether to
+activate the pyro channel before or after that amount of time.
+
+[WARNING]
+Firmware versions older than 1.8.6 have a bug which resets the time
+since launch to zero each time a motor starts burning. Update firmware
+to get the correct behavior.
 
 Ascending:: A deprecated configuration value which was the same as
 setting Ascent rate > 0. Existing configurations using this will be

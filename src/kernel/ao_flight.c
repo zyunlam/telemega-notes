@@ -48,7 +48,8 @@
 /* Main flight thread. */
 
 __pdata enum ao_flight_state	ao_flight_state;	/* current flight state */
-__pdata uint16_t		ao_boost_tick;		/* time of launch detect */
+__pdata uint16_t		ao_boost_tick;		/* time of most recent boost detect */
+__pdata uint16_t		ao_launch_tick;		/* time of first boost detect */
 __pdata uint16_t		ao_motor_number;	/* number of motors burned so far */
 
 #if HAS_SENSOR_ERRORS
@@ -199,7 +200,7 @@ ao_flight(void)
 				)
 			{
 				ao_flight_state = ao_flight_boost;
-				ao_boost_tick = ao_sample_tick;
+				ao_launch_tick = ao_boost_tick = ao_sample_tick;
 
 				/* start logging data */
 				ao_log_start();
@@ -269,7 +270,7 @@ ao_flight(void)
 			 * number of seconds.
 			 */
 			if (ao_config.apogee_lockout) {
-				if ((int16_t) (ao_sample_tick - ao_boost_tick) <
+				if ((int16_t) (ao_sample_tick - ao_launch_tick) <
 				    AO_SEC_TO_TICKS(ao_config.apogee_lockout))
 					break;
 			}
