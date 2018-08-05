@@ -57,7 +57,9 @@ cleared and must be reconfigured by the user.
 After Motor:: The flight software counts each time the rocket starts
 accelerating and then decelerating (presumably due to a motor or
 motors burning). Use this value for multi-staged or multi-airstart
-launches.
+launches. As of version 1.8.6 firmware, this checks to make sure at
+least this many motors have burned. Before version 1.8.6, this checked
+to make sure that exactly this many motors had burned.
 
 Delay:: Once the other parameters all become true, a timer is
 started for the specified amount of time. While the timer is running,

@@ -182,7 +182,7 @@ ao_pyro_ready(struct ao_pyro *pyro)
 			break;
 
 		case ao_pyro_after_motor:
-			if (ao_motor_number == pyro->motor)
+			if (ao_motor_number >= pyro->motor)
 				continue;
 			DBG("motor %d != %d\n", ao_motor_number, pyro->motor);
 			break;
