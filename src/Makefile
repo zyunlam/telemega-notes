@@ -16,14 +16,6 @@ include Version
 TOPDIR=.
 include Makedefs
 
-SDCCDIRS=\
-	telemetrum-v1.2 telemetrum-v1.1 telemetrum-v1.0 \
-	teledongle-v0.2 \
-	telemini-v1.0 \
-	telebt-v1.0 \
-	telefire-v0.1 telefire-v0.2 \
-	telerepeat-v1.0
-
 ARMM3DIRS=\
 	fox1ihu fox1ihu/flash-loader \
 	easymega-v1.0 easymega-v1.0/flash-loader \
@@ -60,15 +52,6 @@ AVRDIRS=\
 
 SUBDIRS=
 
-ifeq ($(strip $(HAVE_PDCLIB)),yes)
-PDCLIB=pdclib
-CLEAN_PDCLIB=clean-pdclib
-endif
-
-ifeq ($(strip $(HAVE_SDCC)),yes)
-SUBDIRS+=$(SDCCDIRS)
-endif
-
 ifeq ($(strip $(HAVE_ARM_M3_CC)),yes)
 SUBDIRS+=$(ARMM3DIRS)
 foo=bar
@@ -83,7 +66,7 @@ ifeq ($(strip $(HAVE_AVR_CC)),yes)
 SUBDIRS += $(AVRDIRS)
 endif
 
-ALLDIRS=$(SDCCDIRS) $(ARMM3DIRS) $(ARMM0DIRS) $(AVRDIRS)
+ALLDIRS=$(ARMM3DIRS) $(ARMM0DIRS) $(AVRDIRS)
 
 all: all-local all-recursive
 
