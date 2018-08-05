@@ -1,3 +1,128 @@
+altos (1.8.6-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * add a paragraph to the intro pointing to the altusmetrum email list
+  * another second seems to help on the very slow Acer laptop
+  * add a warning about Google limiting per-day access until/unless we pay
+  * altos/fox: rename fox product
+  * move signal that forces flash-loader on to PB8, active high
+  * had the sense backwards .. presence of 'attached' should put us in the loader
+  * add a turnon script for TeleLCO v2.0
+  * add telefireeight-v1.0 to products built by default in src/Makefile
+  * releasing 1.8.6
+
+  [ Keith Packard ]
+  * altos/ao_cc1120: Only call ao_packet_slave_stop when HAS_SLAVE
+  * altos: Hack up code for TeleMetrum to make it just a tracker
+  * micropeak: Make reported 'max height' value show filtered max height
+  * altosdroid: Attempt to avoid some reported altosdroid crashes
+  * doc: add release check for altusmetrum-docinfo.xml copyright
+  * altos/stm: Simplify ao_usb_write a bit
+  * altos: Use max of 64 previous orient values when checking pyro limits
+  * altos/flash-loader: On STM, don't include ao_usb_disable
+  * Set version to 1.8.5.1
+  * altoslib: Clarify terms in Mega pyro config
+  * altoslib: Remove ascending/descending from pyro config
+  * altoslib: Flush settings restoration commands after accel cal
+  * altoslib: Keep config data accel cal in antenna up form.
+  * altoslib: Fix data fetching during flashing of cc1111-based devices
+  * altos/fox: Add fox1ihu bringup firmware
+  * altos/fox: Initialize FOX adc
+  * altos/fox: Fix up Fox ADC bits
+  * altos/fox: Provide names for fox ADC channels
+  * altos/fox: Turn on all of the fox lights
+  * altos/fox: Add watchdog timer
+  * altos/fox: Enable M25 driver for MRAM.
+  * altos/fox: Add MRAM and SD card drivers
+  * altos/fox: Add fox1ihu flash loader
+  * altos/fox: Run app when PD6 is low
+  * altos/fox: update product name to show v2, enable watchdog by default
+  * altos/fox: Transition to current altos build environment
+  * altos/fox: Update ADC to fox-1 IHU Revision 2
+  * altos/fox: Enable system timer in flash loader and prod watchdog with it
+  * altos: Build fox1ihu by default
+  * Remove ao_radio_cal from stm products without radios
+  * altos/fox1ihu: Pull down radio control pin in flash loader
+  * altoslib: Fix Idle Monitor on TeleMega v3
+  * altos/stmf0: Change tests for AO_BOOT_CHAIN and AO_BOOT_PIN to #if
+  * altos/stmf0: whitespace fix
+  * altos/stmf0: Set 0x0 mapping to Main Flash for boot loader
+  * ao-bringup/turnon_telemini: Skip DFU if no DFU device is present
+  * altos/kernel: Define usb IN2/IN3 functions
+  * altos/kernel: Add USB descriptors for IN3
+  * altos/stmf0: Toggle IN2 SW_BUF bit when sending data
+  * altos/stmf0: Add IN3 alternate endpoint support
+  * altos/stmf0: Fix up USB debug code
+  * altos/chaoskey-v1.0: Add endpoint for reading flash contents
+  * ao-chaosread: Add support for the new flash endpoint in chaoskey
+  * Update version to 1.8.5.2
+  * altos: Eliminate height requirement for coast detect
+  * altos/test: Replace state name with 10* state value in test log. Fix raw speed
+  * doc: Update pyro channel info to reflect UI changes
+  * altos: Add µPusb v3.0 project
+  * altos/stmf0: leave ao_power_gpio names undefined without power management
+  * altos/mpusb-v3.0: Make it compile again
+  * altos: add 'vidtime', a simple brightness monitor
+  * altos/vidtime: Check for value change in normal code, not irq
+  * altos: Add TeleLCO v2.0 product
+  * altos/stm: Add per-LED port/pin mode in LED code
+  * altos/drivers: Pads with multi-port firing and pad selector DIP switch
+  * altos: Add TeleFireEight v1.0 product
+  * altos/telelco-v2: Change select button to alternate box/pad mode
+  * altos/ao_button.c: Support up to 16 buttons
+  * altos/telelco-v2.0: Only switch encoder mode on push, not release
+  * altos/drivers: Make quadrature debounce longer by default. Fix state tracking
+  * altos/telelco-v2.0: Reduce quadrature debounce time
+  * altos/driver: Add support for one-step-per-click quadrature encoder
+  * altos/telelco-v2.0: Use single-step quadrature code
+  * altos/telelco-v2.0: Only look at drag select presses, not releases
+  * altos/telelco-v2.0: Mixed up the select_button pin (is E0, was set to E13)
+  * altos/telelco-v2.0: Fix button names and pin mappings. Add drag LED.
+  * altos/telelco-v2.0: A bit fancier with the drag-mode LED show
+  * altos/telelco-v2.0: Add debug output for pad voltage display
+  * altos/telelco-v2.0: Change drag race selected/no-continutity pattern
+  * altos/stm: Add polling ADC sampler API
+  * altos/telelco-v2.0: Display local batt voltage at startup
+  * altos/stm: Enable HSI timer when HAS_ADC_SINGLE is set
+  * altos/telelco-v2.0: Set HAS_ADC_SINGLE to enable HSI timer
+  * altoslib: Revert field name changes for accel cal values
+  * altos/telefireeight-v1.0: Fix ADC definitions
+  * altos/telefire*: Do voltage tests in decivolts instead of ADC units
+  * altos/telelco-v2.0: Test displays at power on
+  * altos/telelco: Remove STATIC_TEST code from stand-alone LCO boxes
+  * altos/stm: Remove unused ADC names from ao_adc_single_stm.c
+  * altos/stm: Define ADC channels for TEMP and V_REF
+  * ao-bringup: Find dfu-util in $PATH for chaoskey
+  * altos/telelco-v0: Test display, show batt voltage at boot
+  * altos/driver: Improve quadrature debouncing for mechanical encoders
+  * altos/telelco-v0.2-cc1200: Add build for NAR hacked TeleLCO v0.2 board
+  * altos/telelco-v2.0: Fix AO_ADC_DUMP
+  * Bump version to 1.8.6
+  * altos/stm: Let products override AO_LED_TYPE for stm processors
+  * altos/ao_pad: Use AO_LED_TYPE for computing active LEDs.
+  * altos/ao_pad: Turn on all LEDs for a moment at power up
+  * altos/ao_pad: Move LED test to the monitor task
+  * altos/telelco-v2.0: Do all drag race beeping from the beeping thread
+  * altosuilib: Split cc1111 vs arm telefire/telemini for flashing
+  * altos/test: Compute and show height error tracker in ao_flight_test
+  * altos: Share common LCO functions in ao_lco_bits.c
+  * altos: Build telelco-v2.0 by default
+  * altos: A bit more LCO code sharing
+  * altos: Fix telelcotwo build for new ao_lco_bits.c file
+  * altos: Fix LCO display while searching
+  * altos: Make LCO search directly drive pad/box displays
+  * altos: Make fewer LCO variables public
+  * altos: Fetch current quadrature status at startup time
+  * altoslib: Make stop_remote delay depend on the data rate
+  * ao-tools/ao-dumplog: Dump entire eeprom contents
+  * altos: Change 'after motor' pyro check to be >= instead of ==
+  * altos/stm-demo: Set up for dumping eeprom
+  * altos/plottest: Make linewidth bigger
+  * altos: Add separate 'ao_launch_tick'. Use in pyro and lockout.
+  * Update docs for 1.8.6
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 05 Aug 2018 11:25:17 +0800
+
 altos (1.8.5-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
