@@ -83,7 +83,7 @@ __pdata int8_t ao_cur_stdio;
 #define ao_num_stdios	0
 #endif
 
-void
+int
 ao_putchar(char c)
 {
 #if LOW_LEVEL_DEBUG
@@ -92,12 +92,13 @@ ao_putchar(char c)
 		if (c == '\n')
 			ao_debug_out('\r');
 		ao_debug_out(c);
-		return;
+		return 0;
 	}
 #endif
 	if (c == '\n')
 		(*ao_stdios[ao_cur_stdio].putchar)('\r');
 	(*ao_stdios[ao_cur_stdio].putchar)(c);
+	return 0;
 }
 
 void
@@ -158,3 +159,33 @@ ao_add_stdio(int (*_pollchar)(void),
 	return 0;
 #endif
 }
+
+/*
+ * Basic I/O functions to support newlib tinystdio package
+ */
+
+static int
+ao_putc(char c, FILE *ignore)
+{
+	(void) ignore;
+	return ao_putchar(c);
+}
+
+static int
+ao_getc(FILE *ignore)
+{
+	(void) ignore;
+	return ao_getchar();
+}
+
+static int
+ao_flushc(FILE *ignore)
+{
+	(void) ignore;
+	flush();
+	return 0;
+}
+
+static FILE __stdio = FDEV_SETUP_STREAM(ao_putc, ao_getc, ao_flushc, _FDEV_SETUP_RW);
+
+FILE *const __iob[3] = { &__stdio, &__stdio, &__stdio };

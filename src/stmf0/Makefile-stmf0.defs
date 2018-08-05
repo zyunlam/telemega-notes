@@ -28,15 +28,16 @@ CC=$(ARM_CC)
 WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align
 
 AO_CFLAGS=-I. -I$(TOPDIR)/stmf0 -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers \
-	-I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math -I$(TOPDIR)/lisp \
-	$(PDCLIB_INCLUDES) 
+	-DNEWLIB_INTEGER_PRINTF_SCANF \
+	-I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math \
+	-isystem $(NEWLIB_NANO)/arm-none-eabi/include
 
 STMF0_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m0 -mthumb\
 	-ffreestanding -nostdlib $(AO_CFLAGS) $(WARN_FLAGS)
 
 NICKLE=nickle
 
-LIBS=$(PDCLIB_LIBS_M0) -lgcc
+LIBS=-L$(NEWLIB_NANO)/arm-none-eabi/lib/thumb/v6-m -lc -lm -lgcc
 
 V=0
 # The user has explicitly enabled quiet compilation.

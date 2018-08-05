@@ -22,15 +22,18 @@ endif
 include $(TOPDIR)/Makedefs
 
 CC=$(ARM_CC)
-LIBS=$(PDCLIB_LIBS_M3) -lgcc
+LIBS=-L$(NEWLIB_NANO)/arm-none-eabi/lib/thumb/v7-m -lm -lc -lgcc
 
 WARN_FLAGS=-Wall -Wextra -Werror
 
-AO_CFLAGS=-I. -I../stm -I../kernel -I../drivers -I../math -I../draw -I../lisp -I.. $(PDCLIB_INCLUDES)
+AO_CFLAGS=-I. -I../stm -I../kernel -I../drivers -I../math -I../draw \
+	-DNEWLIB_INTEGER_PRINTF_SCANF \
+	-I../lisp -I.. -isystem $(NEWLIB_NANO)/arm-none-eabi/include
+
 STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb -Wcast-align \
 	-ffreestanding -nostdlib $(AO_CFLAGS) $(WARN_FLAGS)
 
-LDFLAGS=-L../stm -Wl,-Taltos.ld
+LDFLAGS=-L../stm -Wl,-Taltos.ld -nostartfiles -Wl,-Map=$(PROGNAME).map
 
 NICKLE=nickle
 ELFTOHEX=$(TOPDIR)/../ao-tools/ao-elftohex/ao-elftohex

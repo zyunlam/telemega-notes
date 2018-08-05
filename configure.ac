@@ -238,27 +238,6 @@ fi
 AC_SUBST(HAVE_ARM_CC)
 AC_SUBST(ARM_CC)
 
-if test -d pdclib -a x"$HAVE_ARM_CC" = xyes; then
-	PDCLIB_ROOT='$(TOPDIR)/../pdclib-root'
-	PDCLIB_INCLUDES='-I$(TOPDIR)/../pdclib-root/include'
-	PDCLIB_LIBS_M0='-L$(TOPDIR)/../pdclib-root/lib -lpdclib-cortex-m0'
-	PDCLIB_LIBS_M3='-L$(TOPDIR)/../pdclib-root/lib -lpdclib-cortex-m3'
-	HAVE_PDCLIB=yes
-else
-	PDCLIB_INCLUDES=''
-	PDCLIB_LIBS_M0='-lpdclib-cortex-m0'
-	PDCLIB_LIBS_M3='-lpdclib-cortex-m3'
-	HAVE_PDCLIB=no
-fi
-
-AM_CONDITIONAL(PDCLIB, [test x$HAVE_PDCLIB = xyes])
-
-AC_SUBST(PDCLIB_INCLUDES)
-AC_SUBST(PDCLIB_LIBS_M0)
-AC_SUBST(PDCLIB_LIBS_M3)
-AC_SUBST(PDCLIB_ROOT)
-AC_SUBST(HAVE_PDCLIB)
-
 if test "x$HAVE_ARM_CC" = "xyes"; then
 	save_CC="$CC"
 	save_CFLAGS="$CFLAGS"
@@ -281,16 +260,6 @@ if test "x$HAVE_ARM_CC" = "xyes"; then
 			  [HAVE_ARM_M3_CC=no])
         AC_MSG_RESULT([$HAVE_ARM_M3_CC])
 
-	if test x$HAVE_PDCLIB != xyes; then
-		AC_CHECK_LIB(pdclib-cortex-m0,memcpy,
-			     [],
-			     [HAVE_ARM_M0_CC=no])
-
-		AC_CHECK_LIB(pdclib-cortex-m3,memcpy,
-			     [],
-			     [HAVE_ARM_M3_CC=no])
-        fi
-
 	AC_LANG_POP([C])
 	LIBS="$save_LIBS"
 	CFLAGS="$save_CFLAGS"
@@ -309,6 +278,37 @@ fi
 if test "x$HAVE_ARM_M0_CC" = "xno"; then
 	AC_MSG_WARN([No cortex-m0 arm compiler found, LPC11U14 binaries will not be built])
 fi
+
+AC_ARG_WITH([newlib-nano],
+	    [AS_HELP_STRING([--with-newlib-nano],
+	                    [Root of newlib nano install])],
+	    [],
+	    [with_newlib_nano=auto])
+
+HAVE_NEWLIB_NANO=no
+if test "x$with_newlib_nano" != "xno"; then
+	if test "x$with_newlib_nano" = "xauto"; then
+		for d in /usr/local/lib/newlib-nano /usr/lib/newlib-nano; do
+			if test "x$with_newlib_nano" = "xauto" -a -d "$d"; then
+				with_newlib_nano="$d"
+				HAVE_NEWLIB_NANO=yes
+			fi
+		done
+	else
+		HAVE_NEWLIB_NANO=yes
+	fi
+fi
+
+if test "x$HAVE_NEWLIB_NANO" = "xno"; then
+	AC_MSG_WARN([No newlib-nano library found, ARM binaries will not be built])
+	HAVE_ARM_M3_CC=no
+	HAVE_ARM_M0_CC=no
+else
+	NEWLIB_NANO="$with_newlib_nano"
+fi
+
+AC_SUBST(HAVE_NEWLIB_NANO)
+AC_SUBST(NEWLIB_NANO)
 
 #
 # Configure AVR compiler
@@ -562,7 +562,7 @@ echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
 echo "    Android release support.....: ${ANDROID_RELEASE}"
 echo "    STlink support..............: ${HAVE_STLINK}"
-echo "    Local pdclib................: ${HAVE_PDCLIB}"
+echo "    Newlib-nano support.........: ${NEWLIB_NANO}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
 echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
 echo ""

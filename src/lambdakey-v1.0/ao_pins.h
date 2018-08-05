@@ -19,14 +19,6 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define fprintf(file, ...) 	({ (void) (file); printf(__VA_ARGS__); })
-#undef putc
-#define putc(c,file) 		({ (void) (file); putchar(c); })
-#define fputs(s,file) 		({ (void) (file); ao_put_string(s); })
-#undef getc
-#define getc(file) 		({ (void) (file); getchar(); })
-#define fflush(file)		({ (void) (file); flush(); })
-
 #define HAS_TASK	0
 #define HAS_AO_DELAY	1
 

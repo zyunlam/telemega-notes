@@ -57,16 +57,6 @@
 
 #define ao_arch_interrupt(n)	/* nothing */
 
-#undef putchar
-#undef getchar
-#define putchar(c)	ao_putchar(c)
-#define getchar		ao_getchar
-
-extern void putchar(char c);
-extern char getchar(void);
-extern void ao_avr_stdio_init(void);
-
-
 /*
  * ao_romconfig.c
  */
