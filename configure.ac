@@ -210,36 +210,6 @@ fi
 AC_SUBST(WARN_CFLAGS)
 
 #
-# Configure SDCC
-#
-
-AC_ARG_WITH([sdcc],
-	    [AS_HELP_STRING([--with-sdcc],
-	                    [Name of SDCC])],
-	    [],
-	    [with_sdcc=auto])
-
-if test "x$with_sdcc" != "xno"; then	    
-	if test "x$with_sdcc" = "xauto"; then
-		with_sdcc="sdcc"
-		AC_CHECK_PROG([HAVE_SDCC],[$with_sdcc], yes, no)
-	else
-		HAVE_SDCC=yes
-	fi
-else
-	HAVE_SDCC=no
-fi
-
-if test "x$HAVE_SDCC" = "xno"; then
-	AC_MSG_WARN([SDCC not found, cc1111 binaries will not be built])
-else
-	SDCC=$with_sdcc
-fi
-
-AC_SUBST(SDCC)
-AC_SUBST(HAVE_SDCC)
-
-#
 # Configure ARM compiler for STM32L and LPC11U14
 #
 
@@ -587,8 +557,6 @@ echo "  Configuration"
 echo "    Arm compiler................: ${ARM_CC}"
 echo "    STM32L support..............: ${HAVE_ARM_M3_CC}"
 echo "    LPC11U14 support............: ${HAVE_ARM_M0_CC}"
-echo "    SDCC........................: ${SDCC}"
-echo "    CC1111 support..............: ${HAVE_SDCC}"
 echo "    AVR compiler................: ${AVR_CC} ${AVR_OBJCOPY}"
 echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"

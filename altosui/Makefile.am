@@ -118,26 +118,18 @@ LINUX_MIMETYPE	=\
 	$(ICONDIR)/org-altusmetrum-mimetypes.xml
 
 # Firmware
-FIRMWARE_TD_0_2=$(top_srcdir)/src/teledongle-v0.2/teledongle-v0.2-$(VERSION).ihx
 FIRMWARE_TD_3_0=$(top_srcdir)/src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx
-FIRMWARE_TD=$(FIRMWARE_TD_0_2) $(FIRMWARE_TD_3_0)
+FIRMWARE_TD=$(FIRMWARE_TD_3_0)
 
-FIRMWARE_TM_1_0=$(top_srcdir)/src/telemetrum-v1.0/telemetrum-v1.0-$(VERSION).ihx
-FIRMWARE_TM_1_1=$(top_srcdir)/src/telemetrum-v1.1/telemetrum-v1.1-$(VERSION).ihx
-FIRMWARE_TM_1_2=$(top_srcdir)/src/telemetrum-v1.2/telemetrum-v1.2-$(VERSION).ihx
 FIRMWARE_TM_2_0=$(top_srcdir)/src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx
-#FIRMWARE_TM_3_0=$(top_srcdir)/src/telemetrum-v3.0/telemetrum-v3.0-$(VERSION).ihx
-#FIRMWARE_TM=$(FIRMWARE_TM_1_0) $(FIRMWARE_TM_1_1) $(FIRMWARE_TM_1_2) $(FIRMWARE_TM_2_0) $(FIRMWARE_TM_3_0)
-FIRMWARE_TM=$(FIRMWARE_TM_1_0) $(FIRMWARE_TM_1_1) $(FIRMWARE_TM_1_2) $(FIRMWARE_TM_2_0)
+FIRMWARE_TM=$(FIRMWARE_TM_2_0)
 
-FIRMWARE_TELEMINI_1_0=$(top_srcdir)/src/telemini-v1.0/telemini-v1.0-$(VERSION).ihx
 FIRMWARE_TELEMINI_3_0=$(top_srcdir)/src/telemini-v3.0/telemini-v3.0-$(VERSION).ihx
-FIRMWARE_TELEMINI=$(FIRMWARE_TELEMINI_1_0) $(FIRMWARE_TELEMINI_3_0)
+FIRMWARE_TELEMINI=$(FIRMWARE_TELEMINI_3_0)
 
-FIRMWARE_TBT_1_0=$(top_srcdir)/src/telebt-v1.0/telebt-v1.0-$(VERSION).ihx
 FIRMWARE_TBT_3_0=$(top_srcdir)/src/telebt-v3.0/telebt-v3.0-$(VERSION).ihx
 FIRMWARE_TBT_4_0=$(top_srcdir)/src/telebt-v4.0/telebt-v4.0-$(VERSION).ihx
-FIRMWARE_TBT=$(FIRMWARE_TBT_1_0) $(FIRMWARE_TBT_3_0) $(FIRMWARE_TBT_4_0)
+FIRMWARE_TBT=$(FIRMWARE_TBT_3_0) $(FIRMWARE_TBT_4_0)
 
 FIRMWARE_TMEGA_1_0=$(top_srcdir)/src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx
 FIRMWARE_TMEGA_2_0=$(top_srcdir)/src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx
