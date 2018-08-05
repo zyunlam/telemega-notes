@@ -19,6 +19,7 @@
 #define _AO_SCHEME_OS_H_
 
 #include "ao.h"
+#include "ao_scheme.h"
 
 #define AO_SCHEME_POOL		3792
 #define AO_SCHEME_TOKEN_MAX	64
@@ -29,22 +30,13 @@
 #define __BYTE_ORDER	__LITTLE_ENDIAN
 #endif
 
-static inline int
-_ao_scheme_getc() {
-	static uint8_t	at_eol;
-	int c;
-
-	if (at_eol) {
-		ao_cmd_readline();
-		at_eol = 0;
-	}
-	c = ao_cmd_lex();
-	if (c == '\n')
-		at_eol = 1;
-	return c;
-}
+extern int _ao_scheme_getc(void);
 
 #define ao_scheme_getc(f) ({ (void) (f); _ao_scheme_getc(); })
+#undef putc
+#define putc(c, f) ({ (void) (f); ao_putchar(c); })
+#define fputs(s, f) ({ (void) (f); ao_put_string(s); })
+#define fiprintf(f, ...) ({ (void) (f); iprintf(__VA_ARGS__); })
 
 static inline void
 ao_scheme_abort(void)

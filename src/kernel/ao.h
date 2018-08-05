@@ -26,6 +26,15 @@
 #include <ao_pins.h>
 #include <ao_arch.h>
 
+/* replace stdio macros with direct calls to our functions */
+#undef putchar
+#undef getchar
+#define putchar(c)	ao_putchar(c)
+#define getchar		ao_getchar
+
+extern int ao_putchar(char c);
+extern char ao_getchar(void);
+
 #define TRUE 1
 #define FALSE 0
 
