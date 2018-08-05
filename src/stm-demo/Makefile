@@ -30,6 +30,8 @@ ALTOS_SRC = \
 	ao_lcd_stm.c \
 	ao_lcd_font.c \
 	ao_mutex.c \
+	ao_storage.c \
+	ao_m25.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
 	ao_adc_stm.c \
