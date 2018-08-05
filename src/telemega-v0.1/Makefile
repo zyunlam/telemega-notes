@@ -26,7 +26,6 @@ INC = \
 	ao_whiten.h \
 	ao_sample_profile.h \
 	ao_quaternion.h \
-	math.h \
 	ao_mpu.h \
 	stm32l.h \
 	Makefile
@@ -45,21 +44,6 @@ INC = \
 
 #STACK_GUARD=ao_mpu_stm.c
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
-
-MATH_SRC=\
-	ef_acos.c \
-	ef_sqrt.c \
-	ef_rem_pio2.c \
-	kf_cos.c \
-	kf_sin.c \
-	kf_rem_pio2.c \
-	sf_copysign.c \
-	sf_cos.c \
-	sf_sin.c \
-	sf_fabs.c \
-	sf_floor.c \
-	sf_scalbn.c \
-	ef_log.c
 
 ALTOS_SRC = \
 	ao_boot_chain.c \
@@ -112,7 +96,6 @@ ALTOS_SRC = \
 	ao_companion.c \
 	ao_pyro.c \
 	ao_aprs.c \
-	$(MATH_SRC) \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)

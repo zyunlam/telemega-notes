@@ -12,10 +12,14 @@ endif
 include $(TOPDIR)/Makedefs
 
 CC=$(ARM_CC)
-LIBS=$(PDCLIB_LIBS_M3) -lgcc
+LIBS=-L$(NEWLIB_NANO)/arm-none-eabi/lib/thumb/v7-m -lc -lm -lgcc
 
-AO_CFLAGS=-I. -I$(TOPDIR)/stm -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers -I$(TOPDIR)/product -I$(TOPDIR) $(PDCLIB_INCLUDES)
-STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb -ffreestanding -nostdlib $(AO_CFLAGS) $(SAT_CFLAGS)
+AO_CFLAGS=-I. -I$(TOPDIR)/stm -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers \
+	-DNEWLIB_INTEGER_PRINTF_SCANF \
+	-I$(TOPDIR)/product -I$(TOPDIR) -isystem $(NEWLIB_NANO)/arm-none-eabi/include
+
+STM_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m3 -mthumb \
+	-ffreestanding -nostdlib $(AO_CFLAGS) $(SAT_CFLAGS)
 
 LDFLAGS=-L$(TOPDIR)/stm -Wl,-Taltos-loader.ld
 

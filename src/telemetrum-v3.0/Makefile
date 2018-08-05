@@ -38,9 +38,6 @@ INC = \
 #STACK_GUARD=ao_mpu_stm.c
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
 
-MATH_SRC=\
-	ef_log.c
-
 ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_interrupt.c \
@@ -88,7 +85,6 @@ ALTOS_SRC = \
 	ao_packet.c \
 	ao_companion.c \
 	ao_aprs.c \
-	$(MATH_SRC) \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)
