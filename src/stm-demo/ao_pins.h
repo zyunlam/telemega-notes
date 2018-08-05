@@ -59,11 +59,14 @@
 #define SERIAL_3_PC10_PC11	0
 #define SERIAL_3_PD8_PD9	1
 
-#define HAS_SPI_1		1
+#define HAS_SPI_1		0
 #define SPI_1_PB3_PB4_PB5	1
 #define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
 
-#define HAS_SPI_2		0
+#define HAS_SPI_2		1
+#define SPI_2_PB13_PB14_PB15	1	/* Flash, Companion, Radio */
+#define SPI_2_PD1_PD3_PD4	0
+#define SPI_2_OSPEEDR		STM_OSPEEDR_10MHz
 
 #define HAS_USB			1
 #define HAS_BEEP		0
@@ -199,5 +202,12 @@ struct ao_adc {
 
 #define AO_TICK_TYPE		uint32_t
 #define AO_TICK_SIGNED		int32_t
+
+#define M25_MAX_CHIPS		1
+#define AO_M25_SPI_CS_PORT	(&stm_gpiob)
+#define AO_M25_SPI_CS_MASK	(1 << 12)
+#define AO_M25_SPI_BUS		AO_SPI_2_PB13_PB14_PB15
+
+#define AO_LOG_FORMAT				AO_LOG_FORMAT_TELEMEGA
 
 #endif /* _AO_PINS_H_ */

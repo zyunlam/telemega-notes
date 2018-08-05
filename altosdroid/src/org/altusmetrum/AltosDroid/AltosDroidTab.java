@@ -63,7 +63,10 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 			show(last_telem_state, last_state, last_from_receiver, last_receiver);
 		} else
 			ft.hide(this);
-		ft.commitAllowingStateLoss();
+		try {
+			ft.commitAllowingStateLoss();
+		} catch (IllegalStateException ie) {
+		}
 	}
 
 	@Override

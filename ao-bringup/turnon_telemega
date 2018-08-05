@@ -46,7 +46,7 @@ echo $FLASH_STM
 
 $FLASH_STM $REPO/loaders/telemega-v$VERSION*.elf 
 
-sleep 5
+sleep 3
 
 $USBLOAD --serial=$SERIAL --force $REPO/telemega-v$VERSION*.elf || exit 1
 

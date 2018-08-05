@@ -55,7 +55,7 @@ const char ao_product[] = AO_iProduct_STRING;
 
 #define HEADER_LEN	       	9
 #define CONTROL_CLASS_LEN	35
-#define DATA_LEN		(9 + 7 * AO_USB_HAS_OUT + 7 * AO_USB_HAS_IN + 7 * AO_USB_HAS_IN2)
+#define DATA_LEN		(9 + 7 * AO_USB_HAS_OUT + 7 * AO_USB_HAS_IN + 7 * AO_USB_HAS_IN2 + 7 * AO_USB_HAS_IN3)
 
 #define TOTAL_LENGTH		(HEADER_LEN + AO_USB_HAS_INT * CONTROL_CLASS_LEN + DATA_LEN)
 #define NUM_INTERFACES		(AO_USB_HAS_INT + 1)
@@ -141,7 +141,7 @@ AO_ROMCONFIG_SYMBOL(0x00aa) uint8_t ao_usb_descriptors [] =
 	AO_USB_DESC_INTERFACE,
 	AO_USB_HAS_INT,			/* bInterfaceNumber */
 	0x00,				/* bAlternateSetting */
-	AO_USB_HAS_OUT + AO_USB_HAS_IN + AO_USB_HAS_IN2,	/* bNumEndPoints */
+	AO_USB_HAS_OUT + AO_USB_HAS_IN + AO_USB_HAS_IN2 + AO_USB_HAS_IN3,	/* bNumEndPoints */
 	AO_USB_INTERFACE_CLASS_DATA,	/* bInterfaceClass = data */
 	0x00,				/* bInterfaceSubClass */
 	0x00,				/* bInterfaceProtocol */
@@ -172,6 +172,16 @@ AO_ROMCONFIG_SYMBOL(0x00aa) uint8_t ao_usb_descriptors [] =
 	0x07,
 	AO_USB_DESC_ENDPOINT,
 	AO_USB_IN2_EP|0x80,	/* bEndpointAddress */
+	0x02,			/* bmAttributes = bulk */
+	LE_WORD(AO_USB_IN_SIZE),/* wMaxPacketSize */
+	0x00,			/* bInterval */
+#endif
+
+#if AO_USB_HAS_IN3
+	/* Data EP in 3 */
+	0x07,
+	AO_USB_DESC_ENDPOINT,
+	AO_USB_IN3_EP|0x80,	/* bEndpointAddress */
 	0x02,			/* bmAttributes = bulk */
 	LE_WORD(AO_USB_IN_SIZE),/* wMaxPacketSize */
 	0x00,			/* bInterval */

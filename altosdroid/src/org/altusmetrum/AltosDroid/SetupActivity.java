@@ -256,6 +256,12 @@ public class SetupActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		AltosDebug.init(this);
+		AltosDebug.debug("+++ ON CREATE +++");
+
+		// Initialise preferences
+		AltosDroidPreferences.init(this);
+
 		// Setup the window
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.setup);

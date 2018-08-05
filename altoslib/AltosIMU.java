@@ -22,13 +22,17 @@ import java.util.concurrent.*;
 import java.io.*;
 
 public class AltosIMU implements Cloneable {
-	public int		accel_x;
-	public int		accel_y;
-	public int		accel_z;
+	public int		accel_x = AltosLib.MISSING;
+	public int		accel_y = AltosLib.MISSING;
+	public int		accel_z = AltosLib.MISSING;
 
-	public int		gyro_x;
-	public int		gyro_y;
-	public int		gyro_z;
+	public int		gyro_x = AltosLib.MISSING;
+	public int		gyro_y = AltosLib.MISSING;
+	public int		gyro_z = AltosLib.MISSING;
+
+	public int		mag_x = AltosLib.MISSING;
+	public int		mag_y = AltosLib.MISSING;
+	public int		mag_z = AltosLib.MISSING;
 
 	public static final double	counts_per_g = 2048.0;
 
@@ -58,6 +62,11 @@ public class AltosIMU implements Cloneable {
 			gyro_y = Integer.parseInt(items[6]);
 			gyro_z = Integer.parseInt(items[7]);
 		}
+		if (items.length >= 12) {
+			mag_x = Integer.parseInt(items[9]);
+			mag_y = Integer.parseInt(items[10]);
+			mag_z = Integer.parseInt(items[11]);
+		}
 		return true;
 	}
 
@@ -71,6 +80,11 @@ public class AltosIMU implements Cloneable {
 		n.gyro_x = gyro_x;
 		n.gyro_y = gyro_y;
 		n.gyro_z = gyro_z;
+
+		n.mag_x = mag_x;
+		n.mag_y = mag_y;
+		n.mag_z = mag_z;
+
 		return n;
 	}
 
@@ -86,6 +100,11 @@ public class AltosIMU implements Cloneable {
 				listener.set_accel_ground(imu.accel_y,
 							  imu.accel_x,
 							  imu.accel_z);
+				if (imu.mag_x != AltosLib.MISSING) {
+					listener.set_mag(cal_data.mag_along(imu.mag_y),
+							 cal_data.mag_across(imu.mag_x),
+							 cal_data.mag_through(imu.mag_z));
+				}
 			}
 		} catch (TimeoutException te) {
 		}
@@ -99,6 +118,10 @@ public class AltosIMU implements Cloneable {
 		gyro_x = AltosLib.MISSING;
 		gyro_y = AltosLib.MISSING;
 		gyro_z = AltosLib.MISSING;
+
+		mag_x = AltosLib.MISSING;
+		mag_y = AltosLib.MISSING;
+		mag_z = AltosLib.MISSING;
 	}
 
 	public AltosIMU(AltosLink link) throws InterruptedException, TimeoutException {

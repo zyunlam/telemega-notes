@@ -47,6 +47,20 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.8.6</revnumber>
+    <date>6 Aug 2018</date>
+    <revremark>
+      Various pyro channel configuration updates.
+    </revremark>
+  </revision>
+  <revision>
+    <revnumber>1.8.5</revnumber>
+    <date>18 Mar 2018</date>
+    <revremark>
+      Minor ground station software updates.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.8.4</revnumber>
     <date>20 Dec 2017</date>
     <revremark>

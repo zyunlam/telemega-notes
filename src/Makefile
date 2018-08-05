@@ -25,6 +25,7 @@ SDCCDIRS=\
 	telerepeat-v1.0
 
 ARMM3DIRS=\
+	fox1ihu fox1ihu/flash-loader \
 	easymega-v1.0 easymega-v1.0/flash-loader \
 	telemega-v0.1 telemega-v0.1/flash-loader \
 	telemega-v1.0 telemega-v1.0/flash-loader \
@@ -36,13 +37,16 @@ ARMM3DIRS=\
 	telegps-v1.0 telegps-v1.0/flash-loader \
 	telegps-v2.0 telegps-v2.0/flash-loader \
 	telelco-v0.2 telelco-v0.2/flash-loader \
+	telelco-v0.2-cc1200 telelco-v0.2-cc1200/flash-loader \
 	telelco-v0.3 telelco-v0.3/flash-loader \
+	telelco-v2.0 telelco-v2.0/flash-loader \
 	teledongle-v3.0 teledongle-v3.0/flash-loader \
 	teleballoon-v2.0 \
 	telebt-v3.0 telebt-v3.0/flash-loader \
 	telebt-v4.0 telebt-v4.0/flash-loader \
 	telelcotwo-v0.1 telelcotwo-v0.1/flash-loader \
 	telefiretwo-v0.1 telefiretwo-v0.1/flash-loader \
+	telefireeight-v1.0 telefireeight-v1.0/flash-loader 
 
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader \

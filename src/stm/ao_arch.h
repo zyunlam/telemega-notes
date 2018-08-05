@@ -30,8 +30,6 @@
 #define AO_STACK_SIZE	512
 #endif
 
-#define AO_LED_TYPE	uint16_t
-
 #ifndef AO_TICK_TYPE
 #define AO_TICK_TYPE	uint16_t
 #define AO_TICK_SIGNED	int16_t
@@ -152,6 +150,10 @@ ao_adc_init();
 #define AO_BOOT_APPLICATION_BOUND	((uint32_t *) (0x08000000 + stm_flash_size()))
 #define AO_BOOT_LOADER_BASE		((uint32_t *) 0x08000000)
 #define HAS_BOOT_LOADER			1
+
+#ifndef AO_LED_TYPE
+#define AO_LED_TYPE uint16_t
+#endif
 
 #endif /* _AO_ARCH_H_ */
 

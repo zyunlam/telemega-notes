@@ -339,9 +339,22 @@ public abstract class AltosLink implements Runnable {
 
 
 	public void flush_input() throws InterruptedException {
-		if (remote)
-			flush_input(500);
-		else
+		if (remote) {
+			int timeout = 500;
+			switch (telemetry_rate) {
+			case AltosLib.ao_telemetry_rate_38400:
+			default:
+				timeout = 500;
+				break;
+			case AltosLib.ao_telemetry_rate_9600:
+				timeout = 1000;
+				break;
+			case AltosLib.ao_telemetry_rate_2400:
+				timeout = 2000;
+				break;
+			}
+			flush_input(timeout);
+		} else
 			flush_input(100);
 	}
 

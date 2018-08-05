@@ -1447,7 +1447,9 @@ ao_radio_test_recv(void)
 static void
 ao_radio_aprs(void)
 {
+#if PACKET_HAS_SLAVE
 	ao_packet_slave_stop();
+#endif
 	ao_aprs_send();
 }
 #endif

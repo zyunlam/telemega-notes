@@ -45,9 +45,11 @@ ALTOS_FILE=~/altusmetrumllc/Binaries/telemini-v$VERSION-*.elf
 #FLASH_FILE=../src/telemini-v3.0/flash-loader/telemini-v$VERSION-altos-flash-*.bin
 #ALTOS_FILE=../src/telemini-v3.0/telemini-v$VERSION-*.elf
 
-$DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
+if lsusb -d 0483:df11 | grep -q STM; then
+    $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
 
-sleep 2
+    sleep 2
+fi
 
 $USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 

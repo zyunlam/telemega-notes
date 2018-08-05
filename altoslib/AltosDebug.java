@@ -264,8 +264,8 @@ public class AltosDebug {
 
 	public AltosRomconfig romconfig() throws InterruptedException {
 		try {
-			byte[] bytes = read_memory(0xa0, 10);
-			AltosHexfile hexfile = new AltosHexfile (bytes, 0xa0);
+			byte[] bytes = read_memory(0x00, 0x200);
+			AltosHexfile hexfile = new AltosHexfile (bytes, 0x00);
 			return new AltosRomconfig(hexfile);
 		} catch (IOException ie) {
 		}

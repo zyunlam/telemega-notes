@@ -41,7 +41,23 @@ ao_usb_pollchar(void);
 void
 ao_usb_flush(void);
 
+#if AO_USB_HAS_IN2
+void
+ao_usb_flush2(void);
+
+void
+ao_usb_putchar2(char c);
+#endif
+
+#if AO_USB_HAS_IN3
+void
+ao_usb_flush3(void);
+
+void
+ao_usb_putchar3(char c);
+#endif
 /* Enable the USB controller */
+
 void
 ao_usb_enable(void);
 
@@ -107,6 +123,7 @@ extern __code __at (0x00aa) uint8_t ao_usb_descriptors [];
 #define AO_USB_OUT_EP		4
 #define AO_USB_IN_EP		5
 #define AO_USB_IN2_EP		6
+#define AO_USB_IN3_EP		7
 #endif
 
 #ifndef AO_USB_HAS_OUT
@@ -123,6 +140,10 @@ extern __code __at (0x00aa) uint8_t ao_usb_descriptors [];
 
 #ifndef AO_USB_HAS_IN2
 #define AO_USB_HAS_IN2	0
+#endif
+
+#ifndef AO_USB_HAS_IN3
+#define AO_USB_HAS_IN3	0
 #endif
 
 /*

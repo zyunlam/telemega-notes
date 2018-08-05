@@ -23,64 +23,13 @@
 #include <ao_lco_func.h>
 #include <ao_radio_cmac.h>
 
-#define DEBUG	1
-
-#if DEBUG
-static uint8_t	ao_lco_debug;
-#define DEBUG_EVENT	1
-#define DEBUG_STATUS	2
-#define PRINTD(l, ...) do { if (!(ao_lco_debug & l)) break; printf ("\r%5u %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } while(0)
-#else
-#define PRINTD(l,...)
-#endif
-
-#define AO_LCO_VALID_LAST	1
-#define AO_LCO_VALID_EVER	2
-
 static uint8_t	ao_lco_suspended;
-static uint8_t	ao_lco_valid;
-static uint8_t	ao_lco_channels;
-static uint16_t	ao_lco_tick_offset;
-
-/* UI values */
-static uint8_t	ao_lco_armed;
-static uint8_t	ao_lco_firing;
-static uint8_t	ao_lco_box;
-
-static struct ao_pad_query	ao_pad_query;
-
-/* TeleFireTwo boxes have a single pad */
-#define ao_lco_pad	0
-
-static void
-ao_lco_set_box(int box)
-{
-	ao_lco_box = ao_config.pad_box + box;
-	ao_lco_valid = 0;
-	ao_lco_armed = 0;
-	ao_wakeup(&ao_lco_armed);
-}
-
-static void
-ao_lco_set_armed(int armed)
-{
-	uint8_t	bit = (1 << ao_lco_pad);
-
-	if (armed) {
-		ao_lco_armed = bit;
-	} else {
-		ao_lco_armed = 0;
-	}
-	PRINTD(DEBUG_EVENT, "pad %d bit 0x%x armed %d ao_lco_armed 0x%x\n",
-	       ao_lco_pad, bit, armed, ao_lco_armed);
-	ao_wakeup(&ao_lco_armed);
-}
 
 static void
 ao_lco_suspend(void)
 {
 	if (!ao_lco_suspended) {
-		PRINTD(DEBUG_EVENT, "suspend\n");
+		PRINTD("suspend\n");
 		ao_lco_suspended = 1;
 		ao_lco_armed = 0;
 		ao_wakeup(&ao_pad_query);
@@ -94,6 +43,23 @@ ao_lco_wakeup(void)
 		ao_lco_suspended = 0;
 		ao_wakeup(&ao_lco_suspended);
 	}
+}
+
+void
+ao_lco_show_pad(uint8_t pad)
+{
+	(void) pad;
+}
+
+void
+ao_lco_show_box(uint16_t box)
+{
+	(void) box;
+}
+
+void
+ao_lco_show(void)
+{
 }
 
 static void
@@ -113,151 +79,25 @@ ao_lco_input(void)
 			ao_event_get(&event);
 		}
 		ao_lco_wakeup();
-		PRINTD(DEBUG_EVENT, "event type %d unit %d value %d\n",
+		PRINTD("event type %d unit %d value %d\n",
 		       event.type, event.unit, event.value);
 		switch (event.type) {
 		case AO_EVENT_BUTTON:
 			switch (event.unit) {
 			case AO_BUTTON_BOX:
 				ao_lco_set_box(event.value);
+				ao_lco_set_armed(0);
 				break;
 			case AO_BUTTON_ARM:
 				ao_lco_set_armed(event.value);
 				break;
 			case AO_BUTTON_FIRE:
-				if (ao_lco_armed) {
-					ao_lco_firing = event.value;
-					PRINTD(DEBUG_EVENT, "Firing %d\n", ao_lco_firing);
-					ao_wakeup(&ao_lco_armed);
-				}
+				if (ao_lco_armed)
+					ao_lco_set_firing(event.value);
 				break;
 			}
 			break;
 		}
-	}
-}
-
-static AO_LED_TYPE	continuity_led[AO_LED_CONTINUITY_NUM] = {
-#ifdef AO_LED_CONTINUITY_0
-	AO_LED_CONTINUITY_0,
-#endif
-#ifdef AO_LED_CONTINUITY_1
-	AO_LED_CONTINUITY_1,
-#endif
-#ifdef AO_LED_CONTINUITY_2
-	AO_LED_CONTINUITY_2,
-#endif
-#ifdef AO_LED_CONTINUITY_3
-	AO_LED_CONTINUITY_3,
-#endif
-#ifdef AO_LED_CONTINUITY_4
-	AO_LED_CONTINUITY_4,
-#endif
-#ifdef AO_LED_CONTINUITY_5
-	AO_LED_CONTINUITY_5,
-#endif
-#ifdef AO_LED_CONTINUITY_6
-	AO_LED_CONTINUITY_6,
-#endif
-#ifdef AO_LED_CONTINUITY_7
-	AO_LED_CONTINUITY_7,
-#endif
-};
-
-static uint8_t
-ao_lco_get_channels(void)
-{
-	int8_t			r;
-
-	r = ao_lco_query(ao_lco_box, &ao_pad_query, &ao_lco_tick_offset);
-	if (r == AO_RADIO_CMAC_OK) {
-		ao_lco_channels = ao_pad_query.channels;
-		ao_lco_valid = AO_LCO_VALID_LAST | AO_LCO_VALID_EVER;
-	} else
-		ao_lco_valid &= ~AO_LCO_VALID_LAST;
-	PRINTD(DEBUG_STATUS, "ao_lco_get_channels() rssi %d valid %d ret %d offset %d\n", ao_radio_cmac_rssi, ao_lco_valid, r, ao_lco_tick_offset);
-	ao_wakeup(&ao_pad_query);
-	return ao_lco_valid;
-}
-
-static void
-ao_lco_igniter_status(void)
-{
-	uint8_t		c;
-	uint8_t		t = 0;
-
-	for (;;) {
-		uint8_t	all_status;
-		ao_sleep(&ao_pad_query);
-		while (ao_lco_suspended) {
-			ao_led_off(AO_LED_GREEN|AO_LED_AMBER|AO_LED_RED|AO_LED_REMOTE_ARM);
-			for (c = 0; c < AO_LED_CONTINUITY_NUM; c++)
-				ao_led_off(continuity_led[c]);
-			ao_sleep(&ao_lco_suspended);
-		}
-		PRINTD(DEBUG_STATUS, "RSSI %d VALID %d channels %d arm_status %d\n",
-		       ao_radio_cmac_rssi, ao_lco_valid,
-		       ao_lco_channels, ao_pad_query.arm_status);
-		if (!(ao_lco_valid & AO_LCO_VALID_LAST)) {
-			ao_led_on(AO_LED_RED);
-			ao_led_off(AO_LED_GREEN|AO_LED_AMBER);
-			memset(&ao_pad_query, '\0', sizeof (ao_pad_query));
-		} else if (ao_radio_cmac_rssi < -90) {
-			ao_led_on(AO_LED_AMBER);
-			ao_led_off(AO_LED_RED|AO_LED_GREEN);
-		} else {
-			ao_led_on(AO_LED_GREEN);
-			ao_led_off(AO_LED_RED|AO_LED_AMBER);
-		}
-		if (ao_pad_query.arm_status)
-			ao_led_on(AO_LED_REMOTE_ARM);
-		else
-			ao_led_off(AO_LED_REMOTE_ARM);
-
-		all_status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
-		for (c = 0; c < 8; c++) {
-			if (ao_pad_query.channels & (1 << c)) {
-				uint8_t status = ao_pad_query.igniter_status[c];
-				if (status > all_status)
-					all_status = status;
-				PRINTD(DEBUG_STATUS, "\tchannel %d status %d\n", c, status);
-			}
-		}
-		for (c = 0; c < AO_LED_CONTINUITY_NUM; c++) {
-			uint8_t	on = 0;
-			if (c == (ao_lco_box - ao_config.pad_box) % AO_LED_CONTINUITY_NUM) {
-				switch (all_status) {
-				case AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN:
-					on = 1;
-					break;
-				case AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_CLOSED:
-				case AO_PAD_IGNITER_STATUS_UNKNOWN:
-					on = t & 1;
-				}
-			}
-			if (on)
-				ao_led_on(continuity_led[c]);
-			else
-				ao_led_off(continuity_led[c]);
-		}
-		t = 1-t;
-	}
-}
-
-static void
-ao_lco_arm_warn(void)
-{
-	int	i;
-	for (;;) {
-		while (ao_lco_suspended)
-			ao_sleep(&ao_lco_suspended);
-		while (!ao_lco_armed)
-			ao_sleep(&ao_lco_armed);
-		for (i = 0; i < ao_lco_armed; i++) {
-			ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(100));
-			ao_delay(AO_MS_TO_TICKS(100));
-		}
-		ao_delay(AO_MS_TO_TICKS(300));
 	}
 }
 
@@ -267,10 +107,8 @@ static struct ao_task ao_lco_arm_warn_task;
 static struct ao_task ao_lco_igniter_status_task;
 
 static void
-ao_lco_monitor(void)
+ao_lco_main(void)
 {
-	uint16_t		delay;
-
 	ao_config_get();
 	ao_lco_set_box(ao_button_get(AO_BUTTON_BOX));
 	ao_add_task(&ao_lco_input_task, ao_lco_input, "lco input");
@@ -279,33 +117,7 @@ ao_lco_monitor(void)
 	ao_led_on(~0);
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
 	ao_led_off(~0);
-	for (;;) {
-		while (ao_lco_suspended)
-			ao_sleep(&ao_lco_suspended);
-
-		PRINTD(DEBUG_STATUS, "monitor armed %d firing %d\n",
-		       ao_lco_armed, ao_lco_firing);
-
-		if (ao_lco_armed && ao_lco_firing) {
-			ao_lco_ignite(AO_PAD_FIRE);
-		} else {
-			ao_lco_get_channels();
-			if (ao_lco_armed) {
-				PRINTD(DEBUG_STATUS, "Arming pads %x\n",
-				       ao_lco_armed);
-				if (ao_lco_valid & AO_LCO_VALID_EVER) {
-					ao_lco_arm(ao_lco_box, ao_lco_armed, ao_lco_tick_offset);
-					ao_delay(AO_MS_TO_TICKS(10));
-				}
-			}
-		}
-		if (ao_lco_armed && ao_lco_firing)
-			delay = AO_MS_TO_TICKS(100);
-		else {
-			delay = AO_SEC_TO_TICKS(1);
-		}
-		ao_sleep_for(&ao_lco_armed, delay);
-	}
+	ao_lco_monitor();
 }
 
 #if DEBUG
@@ -326,7 +138,7 @@ __code struct ao_cmds ao_lco_cmds[] = {
 void
 ao_lco_init(void)
 {
-	ao_add_task(&ao_lco_monitor_task, ao_lco_monitor, "lco monitor");
+	ao_add_task(&ao_lco_monitor_task, ao_lco_main, "lco monitor");
 #if DEBUG
 	ao_cmd_register(&ao_lco_cmds[0]);
 #endif

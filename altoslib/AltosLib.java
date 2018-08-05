@@ -348,6 +348,9 @@ public class AltosLib {
 	public static final int AO_GPS_NUM_SAT_SHIFT = 0;
 	public static final int AO_GPS_NUM_SAT_MASK = 0xf;
 
+	public static final int AO_PAD_ORIENTATION_ANTENNA_UP = 0;
+	public static final int AO_PAD_ORIENTATION_ANTENNA_DOWN = 1;
+
 	public static final int AO_LOG_FORMAT_UNKNOWN = 0;
 	public static final int AO_LOG_FORMAT_FULL = 1;
 	public static final int AO_LOG_FORMAT_TINY = 2;

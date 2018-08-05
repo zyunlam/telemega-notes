@@ -69,6 +69,39 @@ _ao_button_get(uint8_t b)
 #if AO_BUTTON_COUNT > 4
 	case 4: return ao_button_value(4);
 #endif
+#if AO_BUTTON_COUNT > 5
+	case 5: return ao_button_value(5);
+#endif
+#if AO_BUTTON_COUNT > 6
+	case 6: return ao_button_value(6);
+#endif
+#if AO_BUTTON_COUNT > 7
+	case 7: return ao_button_value(7);
+#endif
+#if AO_BUTTON_COUNT > 8
+	case 8: return ao_button_value(8);
+#endif
+#if AO_BUTTON_COUNT > 9
+	case 9: return ao_button_value(9);
+#endif
+#if AO_BUTTON_COUNT > 10
+	case 10: return ao_button_value(10);
+#endif
+#if AO_BUTTON_COUNT > 11
+	case 11: return ao_button_value(11);
+#endif
+#if AO_BUTTON_COUNT > 12
+	case 12: return ao_button_value(12);
+#endif
+#if AO_BUTTON_COUNT > 13
+	case 13: return ao_button_value(13);
+#endif
+#if AO_BUTTON_COUNT > 14
+	case 14: return ao_button_value(14);
+#endif
+#if AO_BUTTON_COUNT > 15
+	case 15: return ao_button_value(15);
+#endif
 	}
 	return 0;
 }
@@ -143,5 +176,41 @@ ao_button_init(void)
 #endif
 #if AO_BUTTON_COUNT > 4
 	init(4);
+#endif
+#if AO_BUTTON_COUNT > 5
+	init(5);
+#endif
+#if AO_BUTTON_COUNT > 6
+	init(6);
+#endif
+#if AO_BUTTON_COUNT > 7
+	init(7);
+#endif
+#if AO_BUTTON_COUNT > 8
+	init(8);
+#endif
+#if AO_BUTTON_COUNT > 9
+	init(9);
+#endif
+#if AO_BUTTON_COUNT > 10
+	init(10);
+#endif
+#if AO_BUTTON_COUNT > 11
+	init(11);
+#endif
+#if AO_BUTTON_COUNT > 12
+	init(12);
+#endif
+#if AO_BUTTON_COUNT > 13
+	init(13);
+#endif
+#if AO_BUTTON_COUNT > 14
+	init(14);
+#endif
+#if AO_BUTTON_COUNT > 15
+	init(15);
+#endif
+#if AO_BUTTON_COUNT > 16
+	#error too many buttons
 #endif
 }

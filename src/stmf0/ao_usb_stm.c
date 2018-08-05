@@ -113,6 +113,12 @@ static uint8_t	ao_usb_in_tx2_which;
 static uint8_t	ao_usb_tx2_count;
 #endif
 
+#if AO_USB_HAS_IN3
+static uint16_t ao_usb_in_tx3_offset;
+static uint8_t	ao_usb_in_tx3_which;
+static uint8_t	ao_usb_tx3_count;
+#endif
+
 /*
  * End point register indices
  */
@@ -122,6 +128,7 @@ static uint8_t	ao_usb_tx2_count;
 #define AO_USB_OUT_EPR		2
 #define AO_USB_IN_EPR		3
 #define AO_USB_IN2_EPR		4
+#define AO_USB_IN3_EPR		5
 
 /* Marks when we don't need to send an IN packet.
  * This happens only when the last IN packet is not full,
@@ -144,6 +151,16 @@ static uint8_t	ao_usb_in_pending;
 static uint8_t	ao_usb_in2_pending;
 static uint16_t	in2_count;
 static uint8_t	ao_usb_in2_flushed;
+#endif
+
+#if AO_USB_HAS_IN3
+/* Marks when we have delivered an IN packet to the hardware
+ * and it has not been received yet. ao_sleep on this address
+ * to wait for it to be delivered.
+ */
+static uint8_t	ao_usb_in3_pending;
+static uint16_t	in3_count;
+static uint8_t	ao_usb_in3_flushed;
 #endif
 
 /* Marks when an OUT packet has been received by the hardware
@@ -423,6 +440,11 @@ ao_usb_alloc_buffers(void)
 	ao_usb_in_tx2_offset = sram_addr;
 	sram_addr += AO_USB_IN_SIZE * 2;
 #endif
+#if AO_USB_HAS_IN3
+	sram_addr += (sram_addr & 1);
+	ao_usb_in_tx3_offset = sram_addr;
+	sram_addr += AO_USB_IN_SIZE * 2;
+#endif
 }
 
 static void
@@ -558,6 +580,25 @@ ao_usb_set_configuration(void)
 	ao_usb_in_tx2_which = 0;
 #endif
 
+#if AO_USB_HAS_IN3
+	/* Set up the IN3 end point */
+	stm_usb_bdt[AO_USB_IN3_EPR].double_tx[0].addr = ao_usb_in_tx3_offset;
+	stm_usb_bdt[AO_USB_IN3_EPR].double_tx[0].count = 0;
+	stm_usb_bdt[AO_USB_IN3_EPR].double_tx[1].addr = ao_usb_in_tx3_offset + AO_USB_IN_SIZE;
+	stm_usb_bdt[AO_USB_IN3_EPR].double_tx[1].count = 0;
+
+	ao_usb_init_ep(AO_USB_IN3_EPR,
+		       AO_USB_IN3_EP,
+		       STM_USB_EPR_EP_TYPE_BULK,
+		       STM_USB_EPR_STAT_RX_DISABLED,
+		       STM_USB_EPR_STAT_TX_NAK,
+		       STM_USB_EPR_EP_KIND_DBL_BUF,
+		       0, 1);
+
+	/* First transmit data goes to buffer 0 */
+	ao_usb_in_tx3_which = 0;
+#endif
+
 	ao_usb_in_flushed = 0;
 	ao_usb_in_pending = 0;
 	ao_wakeup(&ao_usb_in_pending);
@@ -565,6 +606,12 @@ ao_usb_set_configuration(void)
 	ao_usb_in2_flushed = 0;
 	ao_usb_in2_pending = 0;
 	ao_wakeup(&ao_usb_in2_pending);
+#endif
+
+#if AO_USB_HAS_IN3
+	ao_usb_in3_flushed = 0;
+	ao_usb_in3_pending = 0;
+	ao_wakeup(&ao_usb_in3_pending);
 #endif
 
 	ao_usb_out_avail = 0;
@@ -996,6 +1043,16 @@ stm_usb_isr(void)
 			}
 			break;
 #endif
+#if AO_USB_HAS_IN3
+		case AO_USB_IN3_EPR:
+			++in3_count;
+			_tx_dbg1("TX3 ISR", epr);
+			if (ao_usb_epr_ctr_tx(epr)) {
+				ao_usb_in3_pending = 0;
+				ao_wakeup(&ao_usb_in3_pending);
+			}
+			break;
+#endif
 		case AO_USB_INT_EPR:
 #if USB_STATUS
 			++int_count;
@@ -1132,6 +1189,9 @@ _ao_usb_in2_send(void)
 	/* Toggle our usage */
 	ao_usb_in_tx2_which = 1 - ao_usb_in_tx2_which;
 
+	/* Toggle the SW_BUF flag */
+	_ao_usb_toggle_dtog(AO_USB_IN2_EPR, 1, 0);
+
 	/* Mark the outgoing buffer as valid */
 	_ao_usb_set_stat_tx(AO_USB_IN2_EPR, STM_USB_EPR_STAT_TX_VALID);
 
@@ -1194,6 +1254,94 @@ ao_usb_putchar2(char c)
 		_tx_dbg0("putchar2 full");
 		_ao_usb_in2_send();
 		_tx_dbg0("putchar2 flushed");
+	}
+	ao_arch_release_interrupts();
+}
+#endif
+
+#if AO_USB_HAS_IN3
+/* Queue the current IN buffer for transmission */
+static void
+_ao_usb_in3_send(void)
+{
+	_tx_dbg0("in3_send start");
+	debug ("send3 %d\n", ao_usb_tx3_count);
+	while (ao_usb_in3_pending)
+		ao_sleep(&ao_usb_in3_pending);
+	ao_usb_in3_pending = 1;
+	if (ao_usb_tx3_count != AO_USB_IN_SIZE)
+		ao_usb_in3_flushed = 1;
+	stm_usb_bdt[AO_USB_IN3_EPR].double_tx[ao_usb_in_tx3_which].count = ao_usb_tx3_count;
+	ao_usb_tx3_count = 0;
+
+	/* Toggle our usage */
+	ao_usb_in_tx3_which = 1 - ao_usb_in_tx3_which;
+
+	/* Toggle the SW_BUF flag */
+	_ao_usb_toggle_dtog(AO_USB_IN3_EPR, 1, 0);
+
+	/* Mark the outgoing buffer as valid */
+	_ao_usb_set_stat_tx(AO_USB_IN3_EPR, STM_USB_EPR_STAT_TX_VALID);
+
+	_tx_dbg0("in3_send end");
+}
+
+/* Wait for a free IN buffer. Interrupts are blocked */
+static void
+_ao_usb_in3_wait(void)
+{
+	for (;;) {
+		/* Check if the current buffer is writable */
+		if (ao_usb_tx3_count < AO_USB_IN_SIZE)
+			break;
+
+		_tx_dbg0("in3_wait top");
+		/* Wait for an IN buffer to be ready */
+		while (ao_usb_in3_pending)
+			ao_sleep(&ao_usb_in3_pending);
+		_tx_dbg0("in_wait bottom");
+	}
+}
+
+void
+ao_usb_flush3(void)
+{
+	if (!ao_usb_running)
+		return;
+
+	/* Anytime we've sent a character since
+	 * the last time we flushed, we'll need
+	 * to send a packet -- the only other time
+	 * we would send a packet is when that
+	 * packet was full, in which case we now
+	 * want to send an empty packet
+	 */
+	ao_arch_block_interrupts();
+	while (!ao_usb_in3_flushed) {
+		_tx_dbg0("flush3 top");
+		_ao_usb_in3_send();
+		_tx_dbg0("flush3 end");
+	}
+	ao_arch_release_interrupts();
+}
+
+void
+ao_usb_putchar3(char c)
+{
+	if (!ao_usb_running)
+		return;
+
+	ao_arch_block_interrupts();
+	_ao_usb_in3_wait();
+
+	ao_usb_in3_flushed = 0;
+	ao_usb_tx_byte(ao_usb_in_tx3_offset + AO_USB_IN_SIZE * ao_usb_in_tx3_which + ao_usb_tx3_count++, c);
+
+	/* Send the packet when full */
+	if (ao_usb_tx3_count == AO_USB_IN_SIZE) {
+		_tx_dbg0("putchar3 full");
+		_ao_usb_in3_send();
+		_tx_dbg0("putchar3 flushed");
 	}
 	ao_arch_release_interrupts();
 }
@@ -1447,7 +1595,7 @@ ao_usb_enable(void)
 
 	ao_arch_release_interrupts();
 
-	for (t = 0; t < 1000; t++)
+	for (t = 0; t < 50000; t++)
 		ao_arch_nop();
 
 	/* Enable USB pull-up */
@@ -1541,9 +1689,9 @@ struct ao_usb_dbg {
 #endif
 };
 
-#define NUM_USB_DBG	128
+#define NUM_USB_DBG	16
 
-struct ao_usb_dbg dbg[128];
+struct ao_usb_dbg dbg[NUM_USB_DBG];
 int dbg_i;
 
 static void _dbg(int line, char *msg, uint32_t value)
@@ -1555,11 +1703,11 @@ static void _dbg(int line, char *msg, uint32_t value)
 	asm("mrs %0,primask" : "=&r" (primask));
 	dbg[dbg_i].primask = primask;
 #if TX_DBG
-	dbg[dbg_i].in_count = in_count;
-	dbg[dbg_i].in_epr = stm_usb.epr[AO_USB_IN_EPR];
-	dbg[dbg_i].in_pending = ao_usb_in_pending;
-	dbg[dbg_i].tx_count = ao_usb_tx_count;
-	dbg[dbg_i].in_flushed = ao_usb_in_flushed;
+	dbg[dbg_i].in_count = in3_count;
+	dbg[dbg_i].in_epr = stm_usb.epr[AO_USB_IN3_EPR].r;
+	dbg[dbg_i].in_pending = ao_usb_in3_pending;
+	dbg[dbg_i].tx_count = ao_usb_tx3_count;
+	dbg[dbg_i].in_flushed = ao_usb_in3_flushed;
 #endif
 #if RX_DBG
 	dbg[dbg_i].rx_count = ao_usb_rx_count;

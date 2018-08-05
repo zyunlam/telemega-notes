@@ -257,6 +257,15 @@ public class AltosFlightSeries extends AltosDataListener {
 
 	public AltosTimeSeries height_series;
 
+	public double max_height = AltosLib.MISSING;
+
+	public	void set_min_pressure(double pa) {
+		double ground_altitude = cal_data().ground_altitude;
+		if (ground_altitude != AltosLib.MISSING)
+			max_height = AltosConvert.pressure_to_altitude(pa) -
+				ground_altitude;
+	}
+
 	public static final String height_name = "Height";
 
 	public  void set_pressure(double pa) {

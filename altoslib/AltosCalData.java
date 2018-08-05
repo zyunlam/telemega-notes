@@ -397,7 +397,7 @@ public class AltosCalData {
 		set_flight_params(config_data.apogee_delay / ticks_per_sec, config_data.apogee_lockout / ticks_per_sec);
 		set_pad_orientation(config_data.pad_orientation);
 		set_product(config_data.product);
-		set_accel_plus_minus(config_data.accel_cal_plus, config_data.accel_cal_minus);
+		set_accel_plus_minus(config_data.accel_cal_plus(config_data.pad_orientation), config_data.accel_cal_minus(config_data.pad_orientation));
 		set_accel_zero(config_data.accel_zero_along, config_data.accel_zero_across, config_data.accel_zero_through);
 		set_ms5607(config_data.ms5607);
 		try {

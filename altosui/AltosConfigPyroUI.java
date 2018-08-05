@@ -186,8 +186,17 @@ public class AltosConfigPyroUI
 
 		public void set(AltosPyro pyro) {
 			int row = 0;
+			if ((pyro.flags & AltosPyro.pyro_deprecate) != 0) {
+				JOptionPane.showMessageDialog(owner,
+							      String.format("Pyro settings “Ascending” and “Descending” are deprecated.\n" +
+									    "Clearing %s configuration.", AltosLib.igniter_name(pyro.channel)),
+							      "Deprecated Pyro Settings",
+							      JOptionPane.ERROR_MESSAGE);
+				pyro.flags = 0;
+				owner.set_dirty();
+			}
 			for (int flag = 1; flag < AltosPyro.pyro_all; flag <<= 1) {
-				if ((AltosPyro.pyro_all & flag) != 0) {
+				if ((AltosPyro.pyro_all_useful & flag) != 0) {
 					items[row].set((pyro.flags & flag) != 0,
 						       pyro.get_value(flag));
 					row++;
@@ -200,7 +209,7 @@ public class AltosConfigPyroUI
 
 			int row = 0;
 			for (int flag = 1; flag < AltosPyro.pyro_all; flag <<= 1) {
-				if ((AltosPyro.pyro_all & flag) != 0) {
+				if ((AltosPyro.pyro_all_useful & flag) != 0) {
 					if (items[row].enabled()) {
 						try {
 						p.flags |= flag;
@@ -220,7 +229,7 @@ public class AltosConfigPyroUI
 		public void units_changed(boolean imperial_units) {
 			int row = 0;
 			for (int flag = 1; flag < AltosPyro.pyro_all; flag <<= 1) {
-				if ((AltosPyro.pyro_all & flag) != 0) {
+				if ((AltosPyro.pyro_all_useful & flag) != 0) {
 					items[row].units_changed(imperial_units);
 					row++;
 				}
@@ -233,7 +242,7 @@ public class AltosConfigPyroUI
 
 			int	nrow = 0;
 			for (int flag = 1; flag < AltosPyro.pyro_all; flag <<= 1)
-				if ((flag & AltosPyro.pyro_all) != 0)
+				if ((flag & AltosPyro.pyro_all_useful) != 0)
 					nrow++;
 
 			items = new PyroItem[nrow];
@@ -251,7 +260,7 @@ public class AltosConfigPyroUI
 			y++;
 
 			for (int flag = 1; flag < AltosPyro.pyro_all; flag <<= 1)
-				if ((flag & AltosPyro.pyro_all) != 0) {
+				if ((flag & AltosPyro.pyro_all_useful) != 0) {
 					items[row] = new PyroItem(ui, flag, x, y + row);
 					row++;
 				}
@@ -336,10 +345,12 @@ public class AltosConfigPyroUI
 			columns[c].units_changed(imperial_units);
 		int r = 0;
 		for (int flag = 1; flag <= AltosPyro.pyro_all; flag <<= 1) {
-			String n = AltosPyro.pyro_to_name(flag);
-			if (n != null) {
-				labels[r].setText(n);
-				r++;
+			if ((flag & AltosPyro.pyro_all_useful) != 0) {
+				String n = AltosPyro.pyro_to_name(flag);
+				if (n != null) {
+					labels[r].setText(n);
+					r++;
+				}
 			}
 		}
 	}
@@ -380,7 +391,7 @@ public class AltosConfigPyroUI
 
 		int	nrow = 0;
 		for (int flag = 1; flag < AltosPyro.pyro_all; flag <<= 1)
-			if ((flag & AltosPyro.pyro_all) != 0)
+			if ((flag & AltosPyro.pyro_all_useful) != 0)
 				nrow++;
 
 		labels = new JLabel[nrow];
@@ -390,18 +401,20 @@ public class AltosConfigPyroUI
 		for (int flag = 1; flag <= AltosPyro.pyro_all; flag <<= 1) {
 			String	n;
 
-			n = AltosPyro.pyro_to_name(flag);
-			if (n != null) {
-				c = new GridBagConstraints();
-				c.gridx = 0; c.gridy = row;
-				c.gridwidth = 1;
-				c.fill = GridBagConstraints.NONE;
-				c.anchor = GridBagConstraints.LINE_START;
-				c.insets = il;
-				JLabel label = new JLabel(n);
-				pane.add(label, c);
-				labels[row-1] = label;
-				row++;
+			if ((flag & AltosPyro.pyro_all_useful) != 0) {
+				n = AltosPyro.pyro_to_name(flag);
+				if (n != null) {
+					c = new GridBagConstraints();
+					c.gridx = 0; c.gridy = row;
+					c.gridwidth = 1;
+					c.fill = GridBagConstraints.NONE;
+					c.anchor = GridBagConstraints.LINE_START;
+					c.insets = il;
+					JLabel label = new JLabel(n);
+					pane.add(label, c);
+					labels[row-1] = label;
+					row++;
+				}
 			}
 		}
 
