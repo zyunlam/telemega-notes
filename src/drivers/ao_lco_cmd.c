@@ -22,6 +22,10 @@
 #include <ao_lco_func.h>
 #include <ao_radio_cmac.h>
 
+#ifndef HAS_STATIC_TEST
+#define HAS_STATIC_TEST	1
+#endif
+
 static __pdata uint16_t	lco_box;
 static __pdata uint8_t	lco_channels;
 static __pdata uint16_t	tick_offset;
@@ -150,6 +154,7 @@ lco_fire_cmd(void) __reentrant
 	}
 }
 
+#if HAS_STATIC_TEST
 static void
 lco_static_cmd(void) __reentrant
 {
@@ -182,6 +187,7 @@ lco_static_cmd(void) __reentrant
 		ao_delay(AO_MS_TO_TICKS(100));
 	}
 }
+#endif
 
 static void
 lco_arm_cmd(void) __reentrant
@@ -208,18 +214,21 @@ lco_ignite_cmd(void) __reentrant
 }
 
 
+#if HAS_STATIC_TEST
 static void
 lco_endstatic_cmd(void) __reentrant
 {
 	lco_ignite(AO_PAD_ENDSTATIC);
 }
+#endif
 
 static __code struct ao_cmds ao_lco_cmds[] = {
 	{ lco_report_cmd,	"l <box> <channel>\0Get remote status" },
 	{ lco_fire_cmd,		"F <box> <channel> <secs>\0Fire remote igniters" },
-	{ lco_fire_cmd,		"F <box> <channel> <secs>\0Fire remote igniters" },
+#if HAS_STATIC_TEST
 	{ lco_static_cmd,	"S <box> <channel> <secs>\0Initiate static test" },
 	{ lco_endstatic_cmd,	"D\0End static test (and download someday)" },
+#endif
 	{ lco_arm_cmd,		"a <box> <channel>\0Arm remote igniter" },
 	{ lco_ignite_cmd,	"i <box> <channel>\0Pulse remote igniter" },
 	{ 0, NULL },

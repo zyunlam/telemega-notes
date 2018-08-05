@@ -440,7 +440,7 @@ public class AltosConfigFCUI
 		apogee_lockout_value.setEditable(true);
 		apogee_lockout_value.addItemListener(this);
 		pane.add(apogee_lockout_value, c);
-		apogee_lockout_value.setToolTipText("Time after boost while apogee detection is locked out");
+		apogee_lockout_value.setToolTipText("Time after launch while apogee detection is locked out");
 		row++;
 
 		/* Frequency */

@@ -20,6 +20,7 @@
 #include <ao_adc_fast.h>
 #include <ao_crc.h>
 #include <ao_trng_send.h>
+#include <ao_flash_readout.h>
 
 void main(void)
 {
@@ -30,6 +31,7 @@ void main(void)
 	ao_dma_init();
 	ao_adc_init();
 	ao_crc_init();
+	ao_flash_readout_init();
 
 	ao_usb_init();
 

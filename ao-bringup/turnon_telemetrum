@@ -46,7 +46,7 @@ echo $FLASH_STM
 
 $FLASH_STM ~/altusmetrumllc/Binaries/loaders/telemetrum-v$VERSION-*.elf || exit 1
 
-sleep 2
+sleep 3
 
 $USBLOAD --serial=$SERIAL ~/altusmetrumllc/Binaries/telemetrum-v$VERSION-*.elf || exit 1
 

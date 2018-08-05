@@ -17,6 +17,7 @@
  */
 
 #include <ao.h>
+#include <ao_exti.h>
 #include <ao_pad.h>
 #include <ao_74hc165.h>
 #include <ao_radio_cmac.h>
@@ -69,10 +70,20 @@ ao_strobe(uint8_t v)
 #endif
 }
 
+#ifdef AO_PAD_PORT_0
+#define pins_pad(pad)	(*((AO_PAD_ ## pad ## _PORT) == AO_PAD_PORT_0 ? (&pins0) : (&pins1)))
+#else
+#define pins_pad(pad)	pins0
+#define AO_PAD_PORT_0 AO_PAD_PORT
+#endif
+
 static void
 ao_pad_run(void)
 {
-	AO_PORT_TYPE	pins;
+	AO_PORT_TYPE	pins0;
+#ifdef AO_PAD_PORT_1
+	AO_PORT_TYPE	pins1;
+#endif
 
 	for (;;) {
 		while (!ao_pad_ignite)
@@ -80,58 +91,116 @@ ao_pad_run(void)
 		/*
 		 * Actually set the pad bits
 		 */
-		pins = 0;
+		pins0 = 0;
+#ifdef AO_PAD_PORT_1
+		pins1 = 0;
+#endif
 #if AO_PAD_NUM > 0
 		if (ao_pad_ignite & (1 << 0))
-			pins |= (1 << AO_PAD_PIN_0);
+			pins_pad(0) |= (1 << AO_PAD_PIN_0);
 #endif
 #if AO_PAD_NUM > 1
 		if (ao_pad_ignite & (1 << 1))
-			pins |= (1 << AO_PAD_PIN_1);
+			pins_pad(1) |= (1 << AO_PAD_PIN_1);
 #endif
 #if AO_PAD_NUM > 2
 		if (ao_pad_ignite & (1 << 2))
-			pins |= (1 << AO_PAD_PIN_2);
+			pins_pad(2) |= (1 << AO_PAD_PIN_2);
 #endif
 #if AO_PAD_NUM > 3
 		if (ao_pad_ignite & (1 << 3))
-			pins |= (1 << AO_PAD_PIN_3);
+			pins_pad(3) |= (1 << AO_PAD_PIN_3);
 #endif
-		PRINTD("ignite pins 0x%x\n", pins);
-		ao_gpio_set_bits(AO_PAD_PORT, pins);
+#if AO_PAD_NUM > 4
+		if (ao_pad_ignite & (1 << 4))
+			pins_pad(4) |= (1 << AO_PAD_PIN_4);
+#endif
+#if AO_PAD_NUM > 5
+		if (ao_pad_ignite & (1 << 5))
+			pins_pad(5) |= (1 << AO_PAD_PIN_5);
+#endif
+#if AO_PAD_NUM > 6
+		if (ao_pad_ignite & (1 << 6))
+			pins_pad(6) |= (1 << AO_PAD_PIN_6);
+#endif
+#if AO_PAD_NUM > 7
+		if (ao_pad_ignite & (1 << 7))
+			pins_pad(7) |= (1 << AO_PAD_PIN_7);
+#endif
+#ifdef AO_PAD_PORT_1
+		PRINTD("ignite pins 0x%x 0x%x\n", pins0, pins1);
+		ao_gpio_set_bits(AO_PAD_PORT_0, pins0);
+		ao_gpio_set_bits(AO_PAD_PORT_1, pins1);
+#else
+		PRINTD("ignite pins 0x%x\n", pins0);
+		ao_gpio_set_bits(AO_PAD_PORT_0, pins0);
+#endif
 		while (ao_pad_ignite) {
 			ao_pad_ignite = 0;
 
 			ao_delay(AO_PAD_FIRE_TIME);
 		}
-		ao_gpio_clr_bits(AO_PAD_PORT, pins);
-		PRINTD("turn off pins 0x%x\n", pins);
+#ifdef AO_PAD_PORT_1
+		ao_gpio_clr_bits(AO_PAD_PORT_0, pins0);
+		ao_gpio_clr_bits(AO_PAD_PORT_1, pins1);
+		PRINTD("turn off pins 0x%x 0x%x\n", pins0, pins1);
+#else
+		ao_gpio_set_bits(AO_PAD_PORT_0, pins0);
+		PRINTD("turn off pins 0x%x\n", pins0);
+#endif
 	}
 }
 
 #define AO_PAD_ARM_SIREN_INTERVAL	200
 
-#ifndef AO_PYRO_R_PYRO_SENSE
-#define AO_PYRO_R_PYRO_SENSE	100
-#define AO_PYRO_R_SENSE_GND	27
-#define AO_FIRE_R_POWER_FET	100
-#define AO_FIRE_R_FET_SENSE	100
-#define AO_FIRE_R_SENSE_GND	27
-#endif
+/* Resistor values needed for various voltage test ratios:
+ *
+ *	Net names involved:
+ *
+ *	V_BATT		Battery power, after the initial power switch
+ *	V_PYRO		Pyro power, after the pyro power switch (and initial power switch)
+ *	PYRO_SENSE	ADC input to sense V_PYRO voltage
+ *	BATT_SENSE	ADC input to sense V_BATT voltage
+ *	IGNITER		FET output to pad (the other pad lead hooks to V_PYRO)
+ *	IGNITER_SENSE	ADC input to sense igniter voltage
+ *
+ *	AO_PAD_R_V_BATT_BATT_SENSE	Resistor from battery rail to battery sense input
+ *	AO_PAD_R_BATT_SENSE_GND		Resistor from battery sense input to ground
+ *
+ *	AO_PAD_R_V_BATT_V_PYRO		Resistor from battery rail to pyro rail
+ *	AO_PAD_R_V_PYRO_PYRO_SENSE	Resistor from pyro rail to pyro sense input
+ *	AO_PAD_R_PYRO_SENSE_GND		Resistor from pyro sense input to ground
+ *
+ *	AO_PAD_R_V_PYRO_IGNITER		Optional resistors from pyro rail to FET igniter output
+ *	AO_PAD_R_IGNITER_IGNITER_SENSE	Resistors from FET igniter output to igniter sense ADC inputs
+ *	AO_PAD_R_IGNITER_SENSE_GND	Resistors from igniter sense ADC inputs to ground
+ */
+
+int16_t
+ao_pad_decivolt(int16_t adc, int16_t r_plus, int16_t r_minus)
+{
+	int32_t	mul = (int32_t) AO_ADC_REFERENCE_DV * (r_plus + r_minus);
+	int32_t div = (int32_t) AO_ADC_MAX * r_minus;
+	return ((int32_t) adc * mul + mul/2) / div;
+}
 
 static void
 ao_pad_monitor(void)
 {
 	uint8_t			c;
 	uint8_t			sample;
-	__pdata uint8_t		prev = 0, cur = 0;
+	__pdata AO_LED_TYPE	prev = 0, cur = 0;
 	__pdata uint8_t		beeping = 0;
 	__xdata volatile struct ao_data	*packet;
 	__pdata uint16_t	arm_beep_time = 0;
 
 	sample = ao_data_head;
+	ao_led_set(LEDS_AVAILABLE);
+	ao_delay(AO_MS_TO_TICKS(1000));
+	ao_led_set(0);
 	for (;;) {
 		__pdata int16_t			pyro;
+
 		ao_arch_critical(
 			while (sample == ao_data_head)
 				ao_sleep((void *) DATA_TO_XDATA(&ao_data_head));
@@ -141,28 +210,18 @@ ao_pad_monitor(void)
 		packet = &ao_data_ring[sample];
 		sample = ao_data_ring_next(sample);
 
-		pyro = packet->adc.pyro;
+		/* Reply battery voltage */
+		query.battery = ao_pad_decivolt(packet->adc.batt, AO_PAD_R_V_BATT_BATT_SENSE, AO_PAD_R_BATT_SENSE_GND);
 
-#define VOLTS_TO_PYRO(x) ((int16_t) ((x) * ((1.0 * AO_PYRO_R_SENSE_GND) / \
-					    (1.0 * (AO_PYRO_R_SENSE_GND + AO_PYRO_R_PYRO_SENSE)) / 3.3 * AO_ADC_MAX)))
+		/* Current pyro voltage */
+		pyro = ao_pad_decivolt(packet->adc.pyro,
+				       AO_PAD_R_V_PYRO_PYRO_SENSE,
+				       AO_PAD_R_PYRO_SENSE_GND);
 
-
-#define VOLTS_TO_FIRE(x) ((int16_t) ((x) * ((1.0 * AO_FIRE_R_SENSE_GND) / \
-					    (1.0 * (AO_FIRE_R_SENSE_GND + AO_FIRE_R_FET_SENSE)) / 3.3 * AO_ADC_MAX)))
-
-		/* convert ADC value to voltage in tenths, then add .2 for the diode drop */
-		query.battery = (packet->adc.batt + 96) / 192 + 2;
 		cur = 0;
-		if (pyro > VOLTS_TO_PYRO(10)) {
+		if (pyro > query.battery * 7 / 8) {
 			query.arm_status = AO_PAD_ARM_STATUS_ARMED;
 			cur |= AO_LED_ARMED;
-#if AO_FIRE_R_POWER_FET
-		} else if (pyro > VOLTS_TO_PYRO(5)) {
-			if ((ao_time() % 100) < 50)
-				cur |= AO_LED_ARMED;
-			query.arm_status = AO_PAD_ARM_STATUS_UNKNOWN;
-			arm_beep_time = 0;
-#endif
 		} else {
 			query.arm_status = AO_PAD_ARM_STATUS_DISARMED;
 			arm_beep_time = 0;
@@ -175,54 +234,50 @@ ao_pad_monitor(void)
 			cur |= AO_LED_GREEN;
 
 		for (c = 0; c < AO_PAD_NUM; c++) {
-			int16_t		sense = packet->adc.sense[c];
+			int16_t		sense = ao_pad_decivolt(packet->adc.sense[c],
+								AO_PAD_R_IGNITER_IGNITER_SENSE,
+								AO_PAD_R_IGNITER_SENSE_GND);
 			uint8_t	status = AO_PAD_IGNITER_STATUS_UNKNOWN;
 
 			/*
-			 *	pyro is run through a divider, so pyro = v_pyro * 27 / 127 ~= v_pyro / 20
-			 *	v_pyro = pyro * 127 / 27
+			 *	Here's the resistor stack on each
+			 *	igniter channel. Note that
+			 *	AO_PAD_R_V_PYRO_IGNITER is optional
 			 *
-			 *		v_pyro \
-			 *	100k		igniter
-			 *		output /
-			 *	100k           \
-			 *		sense   relay
-			 *	27k            /
-			 *		gnd ---
+			 *					v_pyro \
+			 *	AO_PAD_R_V_PYRO_IGNITER			igniter
+			 *					output /
+			 *	AO_PAD_R_IGNITER_IGNITER_SENSE         \
+			 *					sense   relay
+			 *	AO_PAD_R_IGNITER_SENSE_GND	       /
+			 *					gnd ---
 			 *
-			 *		v_pyro \
-			 *	200k		igniter
-			 *		output /
-			 *	200k           \
-			 *		sense   relay
-			 *	22k            /
-			 *		gnd ---
-			 *
-			 *	If the relay is closed, then sense will be 0
-			 *	If no igniter is present, then sense will be v_pyro * 27k/227k = pyro * 127 / 227 ~= pyro/2
-			 *	If igniter is present, then sense will be v_pyro * 27k/127k ~= v_pyro / 20 = pyro
 			 */
 
-#if AO_FIRE_R_POWER_FET
+#ifdef AO_PAD_R_V_PYRO_IGNITER
 			if (sense <= pyro / 8) {
+				/* close to zero → relay is closed */
 				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_CLOSED;
 				if ((ao_time() % 100) < 50)
 					cur |= AO_LED_CONTINUITY(c);
-			} else
-			if (pyro / 8 * 3 <= sense && sense <= pyro / 8 * 5)
-				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
-			else if (pyro / 8 * 7 <= sense) {
-				status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
-				cur |= AO_LED_CONTINUITY(c);
 			}
-#else
-			if (sense >= pyro / 8 * 5) {
-				status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
-				cur |= AO_LED_CONTINUITY(c);
-			} else {
-				status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
-			}
+			else
 #endif
+			{
+				if (sense >= (pyro * 7) / 8) {
+
+					/* sense close to pyro voltage; igniter is good
+					 */
+					status = AO_PAD_IGNITER_STATUS_GOOD_IGNITER_RELAY_OPEN;
+					cur |= AO_LED_CONTINUITY(c);
+				} else {
+
+					/* relay not shorted (if we can tell),
+					 * and igniter not obviously present
+					 */
+					status = AO_PAD_IGNITER_STATUS_NO_IGNITER_RELAY_OPEN;
+				}
+			}
 			query.igniter_status[c] = status;
 		}
 		if (cur != prev) {
@@ -284,12 +339,31 @@ ao_pad_read_box(void)
 }
 #endif
 
+#ifdef AO_PAD_SELECTOR_PORT
+static int ao_pad_read_box(void) {
+	AO_PORT_TYPE	value = ao_gpio_get_all(AO_PAD_SELECTOR_PORT);
+	unsigned	pin;
+	int		select = 1;
+
+	for (pin = 0; pin < sizeof (AO_PORT_TYPE) * 8; pin++) {
+		if (AO_PAD_SELECTOR_PINS & (1 << pin)) {
+			if ((value & (1 << pin)) == 0)
+				return select;
+			select++;
+		}
+	}
+	return ao_config.pad_box;
+}
+#else
+
 #if HAS_FIXED_PAD_BOX
 #define ao_pad_read_box()	ao_config.pad_box
 #endif
 
 #ifdef PAD_BOX
 #define ao_pad_read_box()	PAD_BOX
+#endif
+
 #endif
 
 static void
@@ -299,7 +373,6 @@ ao_pad(void)
 	int8_t	ret;
 
 	ao_pad_box = 0;
-	ao_led_set(0);
 	for (;;) {
 		FLUSHD();
 		while (ao_pad_disabled)
@@ -497,20 +570,51 @@ __code struct ao_cmds ao_pad_cmds[] = {
 	{ 0, NULL }
 };
 
+#ifndef AO_PAD_PORT_1
+#define AO_PAD_0_PORT	AO_PAD_PORT
+#define AO_PAD_1_PORT	AO_PAD_PORT
+#define AO_PAD_2_PORT	AO_PAD_PORT
+#define AO_PAD_3_PORT	AO_PAD_PORT
+#define AO_PAD_4_PORT	AO_PAD_PORT
+#define AO_PAD_5_PORT	AO_PAD_PORT
+#define AO_PAD_6_PORT	AO_PAD_PORT
+#define AO_PAD_7_PORT	AO_PAD_PORT
+#endif
+
 void
 ao_pad_init(void)
 {
+#ifdef AO_PAD_SELECTOR_PORT
+	unsigned pin;
+
+	for (pin = 0; pin < sizeof (AO_PORT_TYPE) * 8; pin++) {
+		if (AO_PAD_SELECTOR_PINS & (1 << pin))
+			ao_enable_input(AO_PAD_SELECTOR_PORT, pin, AO_EXTI_MODE_PULL_UP);
+	}
+#endif
 #if AO_PAD_NUM > 0
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_0, AO_PAD_0, 0);
+	ao_enable_output(AO_PAD_0_PORT, AO_PAD_PIN_0, AO_PAD_0, 0);
 #endif
 #if AO_PAD_NUM > 1
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_1, AO_PAD_1, 0);
+	ao_enable_output(AO_PAD_1_PORT, AO_PAD_PIN_1, AO_PAD_1, 0);
 #endif
 #if AO_PAD_NUM > 2
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_2, AO_PAD_2, 0);
+	ao_enable_output(AO_PAD_2_PORT, AO_PAD_PIN_2, AO_PAD_2, 0);
 #endif
 #if AO_PAD_NUM > 3
-	ao_enable_output(AO_PAD_PORT, AO_PAD_PIN_3, AO_PAD_3, 0);
+	ao_enable_output(AO_PAD_3_PORT, AO_PAD_PIN_3, AO_PAD_3, 0);
+#endif
+#if AO_PAD_NUM > 4
+	ao_enable_output(AO_PAD_4_PORT, AO_PAD_PIN_4, AO_PAD_4, 0);
+#endif
+#if AO_PAD_NUM > 5
+	ao_enable_output(AO_PAD_5_PORT, AO_PAD_PIN_5, AO_PAD_5, 0);
+#endif
+#if AO_PAD_NUM > 5
+	ao_enable_output(AO_PAD_6_PORT, AO_PAD_PIN_6, AO_PAD_6, 0);
+#endif
+#if AO_PAD_NUM > 7
+	ao_enable_output(AO_PAD_7_PORT, AO_PAD_PIN_7, AO_PAD_7, 0);
 #endif
 #ifdef AO_STROBE
 	ao_enable_output(AO_STROBE_PORT, AO_STROBE_PIN, AO_STROBE, 0);

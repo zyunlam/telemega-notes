@@ -23,7 +23,7 @@ ifdef::altusmetrum[]
 
 	==== Apogee Lockout
 
-		Apogee lockout is the number of seconds after boost
+		Apogee lockout is the number of seconds after launch
 		where the flight computer will not fire the apogee
 		charge, even if the rocket appears to be at
 		apogee. This is often called 'Mach Delay', as it is
@@ -34,6 +34,12 @@ ifdef::altusmetrum[]
 		Kalman filter which is not fooled by this sharp
 		pressure increase, and so this setting should be left
 		at the default value of zero to disable it.
+
+		[WARNING]
+		Firmware versions older than 1.8.6 have a
+		bug which resets the time since launch to zero each
+		time a motor starts burning. Update firmware to get
+		the correct behavior.
 
 endif::altusmetrum[]
 

@@ -1454,6 +1454,9 @@ struct stm_adc {
 
 extern struct stm_adc stm_adc;
 
+#define STM_ADC_SQ_TEMP		16
+#define STM_ADC_SQ_V_REF	17
+
 #define STM_ADC_SR_JCNR		9
 #define STM_ADC_SR_RCNR		8
 #define STM_ADC_SR_ADONS	6

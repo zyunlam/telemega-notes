@@ -5,7 +5,11 @@
 
 	Before heading out to a new launch site, you can use
 	this to load satellite images in case you don't have
-	internet connectivity at the site.
+	internet connectivity at the site.  Try not to wait
+	until the last minute, though, particularly if you're
+	heading to a major launch.  If too many people are 
+	all trying to download map data at once, Google may
+	limit access until the next day.
 
 	There's a drop-down menu of launch sites we know
 	about; if your favorites aren't there, please let us

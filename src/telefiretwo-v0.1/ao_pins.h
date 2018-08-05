@@ -191,6 +191,19 @@
 
 #define HAS_ADC_TEMP		0
 
+#define AO_ADC_REFERENCE_DV	33
+
+#define AO_PAD_R_V_BATT_BATT_SENSE	200
+#define AO_PAD_R_BATT_SENSE_GND		22
+
+#define AO_PAD_R_V_BATT_V_PYRO		200
+#define AO_PAD_R_V_PYRO_PYRO_SENSE	200
+#define AO_PAD_R_PYRO_SENSE_GND		22
+
+#undef AO_PAD_R_V_PYRO_IGNITER
+#define AO_PAD_R_IGNITER_IGNITER_SENSE	200
+#define AO_PAD_R_IGNITER_SENSE_GND	22
+
 struct ao_adc {
 	int16_t		sense[AO_PAD_NUM];
 	int16_t		pyro;

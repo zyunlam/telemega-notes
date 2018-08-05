@@ -50,6 +50,8 @@ __pdata gyro_t		ao_sample_roll;
 __pdata gyro_t		ao_sample_pitch;
 __pdata gyro_t		ao_sample_yaw;
 __pdata angle_t		ao_sample_orient;
+__pdata angle_t		ao_sample_orients[AO_NUM_ORIENT];
+__pdata uint8_t		ao_sample_orient_pos;
 #endif
 
 __data uint8_t		ao_sample_data;
@@ -115,6 +117,53 @@ ao_sample_preflight_add(void)
 	++nsamples;
 }
 
+#if HAS_GYRO
+static void
+ao_sample_set_all_orients(void)
+{
+	int i;
+	for (i = 0; i < AO_NUM_ORIENT; i++)
+		ao_sample_orients[i] = ao_sample_orient;
+	ao_sample_orient_pos = 0;
+}
+
+static void
+ao_sample_set_one_orient(void)
+{
+	ao_sample_orients[ao_sample_orient_pos] = ao_sample_orient;
+	ao_sample_orient_pos = (ao_sample_orient_pos + 1) % AO_NUM_ORIENT;
+}
+
+static void
+ao_sample_compute_orient(void)
+{
+	/* Compute pitch angle from vertical by taking the pad
+	 * orientation vector and rotating it by the current total
+	 * rotation value. That will be a unit vector pointing along
+	 * the airframe axis. The Z value will be the cosine of the
+	 * change in the angle from vertical since boost.
+	 *
+	 * rot = ao_rotation * vertical * ao_rotation°
+	 * rot = ao_rotation * (0,0,0,1) * ao_rotation°
+	 *     = ((a.z, a.y, -a.x, a.r) * (a.r, -a.x, -a.y, -a.z)) .z
+	 *
+	 *     = (-a.z * -a.z) + (a.y * -a.y) - (-a.x * -a.x) + (a.r * a.r)
+	 *     = a.z² - a.y² - a.x² + a.r²
+	 *
+	 * rot = ao_rotation * (0, 0, 0, -1) * ao_rotation°
+	 *     = ((-a.z, -a.y, a.x, -a.r) * (a.r, -a.x, -a.y, -a.z)) .z
+	 *
+	 *     = (a.z * -a.z) + (-a.y * -a.y) - (a.x * -a.x) + (-a.r * a.r)
+	 *     = -a.z² + a.y² + a.x² - a.r²
+	 */
+
+	float rotz;
+	rotz = ao_rotation.z * ao_rotation.z - ao_rotation.y * ao_rotation.y - ao_rotation.x * ao_rotation.x + ao_rotation.r * ao_rotation.r;
+
+	ao_sample_orient = acosf(rotz) * (float) (180.0/M_PI);
+}
+#endif /* HAS_GYRO */
+
 static void
 ao_sample_preflight_set(void)
 {
@@ -138,7 +187,7 @@ ao_sample_preflight_set(void)
 	ao_sample_pitch_sum = 0;
 	ao_sample_yaw_sum = 0;
 	ao_sample_roll_sum = 0;
-	ao_sample_orient = 0;
+	ao_sample_set_all_orients();
 
 	struct ao_quaternion	orient;
 
@@ -168,6 +217,9 @@ ao_sample_preflight_set(void)
 	if (ao_orient_test)
 		printf("\n\treset\n");
 #endif	
+
+	ao_sample_compute_orient();
+	ao_sample_set_all_orients();
 #endif
 	nsamples = 0;
 }
@@ -195,31 +247,6 @@ ao_sample_rotate(void)
 	/* And normalize to make sure it remains a unit vector */
 	ao_quaternion_normalize(&ao_rotation, &ao_rotation);
 
-	/* Compute pitch angle from vertical by taking the pad
-	 * orientation vector and rotating it by the current total
-	 * rotation value. That will be a unit vector pointing along
-	 * the airframe axis. The Z value will be the cosine of the
-	 * change in the angle from vertical since boost.
-	 *
-	 * rot = ao_rotation * vertical * ao_rotation°
-	 * rot = ao_rotation * (0,0,0,1) * ao_rotation°
-	 *     = ((a.z, a.y, -a.x, a.r) * (a.r, -a.x, -a.y, -a.z)) .z
-	 *
-	 *     = (-a.z * -a.z) + (a.y * -a.y) - (-a.x * -a.x) + (a.r * a.r)
-	 *     = a.z² - a.y² - a.x² + a.r²
-	 *
-	 * rot = ao_rotation * (0, 0, 0, -1) * ao_rotation°
-	 *     = ((-a.z, -a.y, a.x, -a.r) * (a.r, -a.x, -a.y, -a.z)) .z
-	 *
-	 *     = (a.z * -a.z) + (-a.y * -a.y) - (a.x * -a.x) + (-a.r * a.r)
-	 *     = -a.z² + a.y² + a.x² - a.r²
-	 */
-
-	float rotz;
-	rotz = ao_rotation.z * ao_rotation.z - ao_rotation.y * ao_rotation.y - ao_rotation.x * ao_rotation.x + ao_rotation.r * ao_rotation.r;
-
-	ao_sample_orient = acosf(rotz) * (float) (180.0/M_PI);
-
 #if HAS_FLIGHT_DEBUG
 	if (ao_orient_test) {
 		printf ("rot %d %d %d orient %d     \r",
@@ -229,7 +256,8 @@ ao_sample_rotate(void)
 			ao_sample_orient);
 	}
 #endif
-
+	ao_sample_compute_orient();
+	ao_sample_set_one_orient();
 }
 #endif
 
@@ -367,6 +395,7 @@ ao_sample_init(void)
 	ao_sample_yaw = 0;
 	ao_sample_roll = 0;
 	ao_sample_orient = 0;
+	ao_sample_set_all_orients();
 #endif
 	ao_sample_data = ao_data_head;
 	ao_preflight = TRUE;

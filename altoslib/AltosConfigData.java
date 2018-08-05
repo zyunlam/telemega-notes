@@ -22,6 +22,7 @@ import java.util.*;
 import java.text.*;
 import java.util.concurrent.*;
 
+/* Don't change the field names in this structure; they're part of all .eeprom files */
 public class AltosConfigData {
 
 	/* Version information */
@@ -53,6 +54,8 @@ public class AltosConfigData {
 
 	/* HAS_ACCEL */
 	public int	accel_cal_plus, accel_cal_minus;
+	private int	accel_cal_plus_cooked, accel_cal_minus_cooked;
+	private boolean	accel_cal_adjusted;
 	public int	pad_orientation;
 
 	/* HAS_LOG */
@@ -186,6 +189,23 @@ public class AltosConfigData {
 		}
 	}
 
+	public int invert_accel_value(int value) {
+		if (value == AltosLib.MISSING)
+			return AltosLib.MISSING;
+
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_FULL:
+			return 0x7fff - value;
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+			return 4095 - value;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
 	public boolean has_monitor_battery() {
 		if (product.startsWith("TeleBT"))
 			return true;
@@ -252,9 +272,12 @@ public class AltosConfigData {
 		radio_setting = AltosLib.MISSING;
 		telemetry_rate = AltosLib.MISSING;
 
+		accel_cal_plus_cooked = AltosLib.MISSING;
+		accel_cal_minus_cooked = AltosLib.MISSING;
 		accel_cal_plus = AltosLib.MISSING;
 		accel_cal_minus = AltosLib.MISSING;
 		pad_orientation = AltosLib.MISSING;
+		accel_cal_adjusted = false;
 
 		flight_log_max = AltosLib.MISSING;
 		log_fixed = AltosLib.MISSING;
@@ -283,6 +306,59 @@ public class AltosConfigData {
 		accel_zero_along = AltosLib.MISSING;
 		accel_zero_across = AltosLib.MISSING;
 		accel_zero_through = AltosLib.MISSING;
+	}
+
+	/* Return + accel calibration relative to a specific pad orientation */
+	public int accel_cal_plus(int pad_orientation) {
+		adjust_accel_cal();
+		switch (pad_orientation) {
+		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+			return accel_cal_plus_cooked;
+		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+			return invert_accel_value(accel_cal_minus_cooked);
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	/* Return - accel calibration relative to a specific pad orientation */
+	public int accel_cal_minus(int pad_orientation) {
+		adjust_accel_cal();
+		switch (pad_orientation) {
+		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+			return accel_cal_minus_cooked;
+		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+			return invert_accel_value(accel_cal_plus_cooked);
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	/* Once we have all of the values from the config data, compute the
+	 * accel cal values relative to Antenna Up orientation.
+	 */
+	private void adjust_accel_cal() {
+		if (!accel_cal_adjusted &&
+		    pad_orientation != AltosLib.MISSING &&
+		    accel_cal_plus != AltosLib.MISSING &&
+		    accel_cal_minus != AltosLib.MISSING &&
+		    log_format != AltosLib.AO_LOG_FORMAT_UNKNOWN)
+		{
+			switch (pad_orientation) {
+			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+				accel_cal_plus_cooked = accel_cal_plus;
+				accel_cal_minus_cooked = accel_cal_minus;
+				accel_cal_adjusted = true;
+				break;
+			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+				accel_cal_plus_cooked = invert_accel_value(accel_cal_minus);
+				accel_cal_minus_cooked = invert_accel_value(accel_cal_plus);
+				accel_cal_adjusted = true;
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	public void parse_line(String line) {
@@ -351,6 +427,7 @@ public class AltosConfigData {
 				if (bits.length >= 6) {
 					accel_cal_plus = Integer.parseInt(bits[3]);
 					accel_cal_minus = Integer.parseInt(bits[5]);
+					accel_cal_adjusted = false;
 				}
 			}
 		} catch (Exception e) {}
@@ -414,6 +491,9 @@ public class AltosConfigData {
 				}
 			}
 		} catch (Exception e) {}
+
+		/* Fix accel cal as soon as all of the necessary values appear */
+		adjust_accel_cal();
 	}
 
 	public AltosConfigData() {
@@ -525,11 +605,11 @@ public class AltosConfigData {
 		if (pad_orientation != AltosLib.MISSING)
 			pad_orientation = source.pad_orientation();
 
-		if (accel_cal_plus != AltosLib.MISSING)
-			accel_cal_plus = source.accel_cal_plus();
+		if (accel_cal_plus_cooked != AltosLib.MISSING)
+			accel_cal_plus_cooked = source.accel_cal_plus();
 
-		if (accel_cal_minus != AltosLib.MISSING)
-			accel_cal_minus = source.accel_cal_minus();
+		if (accel_cal_minus_cooked != AltosLib.MISSING)
+			accel_cal_minus_cooked = source.accel_cal_minus();
 
 		/* HAS_LOG */
 		if (flight_log_max != AltosLib.MISSING)
@@ -598,7 +678,8 @@ public class AltosConfigData {
 		dest.set_flight_log_max(flight_log_max);
 		dest.set_ignite_mode(ignite_mode);
 		dest.set_pad_orientation(pad_orientation);
-		dest.set_accel_cal(accel_cal_plus, accel_cal_minus);
+		dest.set_accel_cal(accel_cal_plus(AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP),
+				   accel_cal_minus(AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP));
 		dest.set_callsign(callsign);
 		if (npyro != AltosLib.MISSING)
 			dest.set_pyros(pyros);
@@ -676,10 +757,13 @@ public class AltosConfigData {
 			link.printf("c e %d\n", radio_enable);
 
 		/* HAS_ACCEL */
+		/* set orientation first so that we know how to set the accel cal */
 		if (pad_orientation != AltosLib.MISSING)
 			link.printf("c o %d\n", pad_orientation);
-		if (accel_cal_plus != AltosLib.MISSING && accel_cal_minus != AltosLib.MISSING)
-			link.printf("c a %d %d\n", accel_cal_plus, accel_cal_minus);
+		int plus = accel_cal_plus(pad_orientation);
+		int minus = accel_cal_minus(pad_orientation);
+		if (plus != AltosLib.MISSING && minus != AltosLib.MISSING)
+			link.printf("c a %d %d\n", plus, minus);
 
 		/* HAS_LOG */
 		if (flight_log_max != 0)

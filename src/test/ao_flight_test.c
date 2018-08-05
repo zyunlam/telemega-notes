@@ -305,7 +305,7 @@ struct ao_task {
 #define AO_MS_TO_TICKS(ms)	((ms) / 10)
 #define AO_SEC_TO_TICKS(s)	((s) * 100)
 
-#define AO_FLIGHT_TEST
+#define AO_FLIGHT_TEST	1
 
 int	ao_flight_debug;
 
@@ -438,10 +438,6 @@ static uint16_t	pyros_fired;
 static struct ao_mpu6000_sample	ao_ground_mpu6000;
 #endif
 
-#if HAS_ACCEL
-int ao_error_h_sq_avg;
-#endif
-
 void
 ao_test_exit(void)
 {
@@ -504,7 +500,7 @@ ao_insert(void)
 	ao_data_ring[ao_data_head] = ao_data_static;
 	if (ao_flight_state != ao_flight_startup) {
 #if HAS_ACCEL
-		double  accel = ((ao_flight_ground_accel - ao_data_accel_cook(&ao_data_static)) * GRAVITY * 2.0) /
+		double  accel = ((ao_flight_ground_accel - ao_data_accel(&ao_data_static)) * GRAVITY * 2.0) /
 			(ao_config.accel_minus_g - ao_config.accel_plus_g);
 #else
 		double	accel = 0.0;
@@ -515,7 +511,12 @@ ao_insert(void)
 			tick_offset = -ao_data_static.tick;
 		if ((prev_tick - ao_data_static.tick) > 0x400)
 			tick_offset += 65536;
-		simple_speed += accel * (ao_data_static.tick - prev_tick) / 100.0;
+		if (prev_tick) {
+			int ticks = ao_data_static.tick - prev_tick;
+			if (ticks < 0)
+				ticks += 65536;
+			simple_speed += accel * ticks / 100.0;
+		}
 		prev_tick = ao_data_static.tick;
 		time = (double) (ao_data_static.tick + tick_offset) / 100;
 
@@ -653,7 +654,7 @@ ao_insert(void)
 
 #if 1
 			printf("%7.2f height %8.2f accel %8.3f accel_speed %8.3f "
-			       "state %-8.8s k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d"
+			       "state %d k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d"
 #if TELEMEGA
 			       " angle %5d "
 			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
@@ -663,7 +664,7 @@ ao_insert(void)
 			       height,
 			       accel,
 			       simple_speed > -100.0 ? simple_speed : -100.0,
-			       ao_state_names[ao_flight_state],
+			       ao_flight_state * 10,
 			       ao_k_height / 65536.0,
 			       ao_k_speed / 65536.0 / 16.0,
 			       ao_k_accel / 65536.0 / 16.0,

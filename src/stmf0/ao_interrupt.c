@@ -69,20 +69,24 @@ stm_flash_size(void) {
 
 void start(void)
 {
-#ifdef AO_BOOT_CHAIN
+#if AO_BOOT_CHAIN
 	if (ao_boot_check_chain()) {
-#ifdef AO_BOOT_PIN
+#if AO_BOOT_PIN
 		ao_boot_check_pin();
 #endif
 	}
 #endif
-#if RELOCATE_INTERRUPT
 	/* Turn on syscfg */
 	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGCOMPEN);
 
+#if RELOCATE_INTERRUPT
 	memcpy(&__interrupt_start__, &__interrupt_rom__, &__interrupt_end__ - &__interrupt_start__);
 	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
 		(STM_SYSCFG_CFGR1_MEM_MODE_SRAM << STM_SYSCFG_CFGR1_MEM_MODE);
+#else
+	/* Switch to Main Flash mode (DFU loader leaves us in System mode) */
+	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
+		(STM_SYSCFG_CFGR1_MEM_MODE_MAIN_FLASH << STM_SYSCFG_CFGR1_MEM_MODE);
 #endif
 	memcpy(&__data_start__, &__text_end__, &__data_end__ - &__data_start__);
 	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);

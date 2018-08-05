@@ -34,7 +34,7 @@ main(void)
 
 #ifdef AO_FLASH_LOADER_INIT
 	AO_FLASH_LOADER_INIT;
-#endif	
+#endif
 	ao_flash_task();
 	return 0;
 }

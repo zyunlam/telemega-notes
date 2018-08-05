@@ -253,6 +253,7 @@
 #define AO_QUADRATURE_1_B	0
 
 #define AO_QUADRATURE_BOX	1
+#define AO_QUADRATURE_DEBOUNCE	10
 
 /*
  * Buttons

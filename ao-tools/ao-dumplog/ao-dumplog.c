@@ -90,6 +90,8 @@ main (int argc, char **argv)
 	int		any_valid;
 	int		invalid;
 	char		serial_line[8192];
+	unsigned	storage_size;
+	int		blocks;
 
 	while ((c = getopt_long(argc, argv, "T:D:C:R", options, NULL)) != -1) {
 		switch (c) {
@@ -140,10 +142,21 @@ main (int argc, char **argv)
 		cc_usb_close(cc);
 		exit(1);
 	}
-	printf ("Serial number: %d\n", serial_number);
+	cc_usb_printf(cc, "f\n");
+	storage_size = 0;
+	for (;;) {
+		cc_usb_getline(cc, line, sizeof(line));
+		if (sscanf(line, "Storage size: %u", &storage_size) == 1)
+			break;
+	}
+	printf ("Serial number: %d Storage size: %u\n", serial_number, storage_size);
+	if (storage_size)
+		blocks = storage_size / 256;
+	else
+		blocks = 511;
 	done = 0;
 	column = 0;
-	for (block = 0; !done && block < 511; block++) {
+	for (block = 0; !done && block < blocks; block++) {
 		cc_usb_printf(cc, "e %x\n", block);
 		if (column == 64) {
 			putchar('\n');
