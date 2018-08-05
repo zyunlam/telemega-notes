@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 public interface AltosFilterListener {
 	void filter_changed(double speed_filter, double accel_filter);

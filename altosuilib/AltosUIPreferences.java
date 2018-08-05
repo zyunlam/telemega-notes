@@ -16,13 +16,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.io.*;
 import java.util.*;
 import java.awt.Component;
 import javax.swing.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class AltosUIPreferences extends AltosPreferences {
 

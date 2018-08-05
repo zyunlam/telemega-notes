@@ -21,7 +21,7 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 import java.io.*;
 
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 import android.app.Activity;
 import android.graphics.*;

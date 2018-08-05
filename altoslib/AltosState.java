@@ -20,7 +20,7 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 public class AltosState extends AltosDataListener {
 

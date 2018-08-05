@@ -16,14 +16,14 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class AltosUIAccelCal
 	extends AltosUIDialog

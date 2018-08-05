@@ -34,8 +34,8 @@ AC_SUBST(ANDROID_VERSION)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=12
-ALTOSLIB_VERSION=12
+ALTOSUILIB_VERSION=13
+ALTOSLIB_VERSION=13
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])

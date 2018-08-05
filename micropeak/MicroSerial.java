@@ -21,7 +21,7 @@ package org.altusmetrum.micropeak;
 import java.util.*;
 import java.io.*;
 import libaltosJNI.*;
-import org.altusmetrum.altosuilib_12.*;
+import org.altusmetrum.altosuilib_13.*;
 
 public class MicroSerial extends InputStream {
 	SWIGTYPE_p_altos_file	file;

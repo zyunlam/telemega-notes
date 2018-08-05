@@ -33,7 +33,7 @@ import android.view.inputmethod.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 class FrequencyItem {
 	public AltosFrequency frequency;
