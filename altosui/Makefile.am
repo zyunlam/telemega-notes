@@ -141,7 +141,8 @@ FIRMWARE_TBT=$(FIRMWARE_TBT_1_0) $(FIRMWARE_TBT_3_0) $(FIRMWARE_TBT_4_0)
 
 FIRMWARE_TMEGA_1_0=$(top_srcdir)/src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx
 FIRMWARE_TMEGA_2_0=$(top_srcdir)/src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx
-FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0)
+FIRMWARE_TMEGA_3_0=$(top_srcdir)/src/telemega-v3.0/telemega-v3.0-$(VERSION).ihx
+FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0)
 
 FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
 FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0)

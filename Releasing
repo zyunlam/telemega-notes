@@ -17,6 +17,8 @@ These are Keith's notes on how to do a release
 
 	- update the version and date in configure.ac if Bdale hasn't already
 
+	- follow instructions in doc/RELNOTES
+
 	- make sure there is a doc/release-notes-<version>.inc
 
 	- make sure doc/release-notes.inc points at that
