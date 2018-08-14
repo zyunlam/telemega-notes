@@ -45,7 +45,7 @@
 		AO_WATCHDOG_PORT->odr ^= (1 << AO_WATCHDOG_BIT);	\
 	} while (0)
 
-#define HAS_TICK		1
+#define HAS_TICK		0
 #include <ao_flash_stm_pins.h>
 
 /* Attached signal, PB8 */
