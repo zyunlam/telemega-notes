@@ -117,7 +117,7 @@ ao_log_erase_mark(void)
  * structure.
  */
 
-__xdata ao_log_type log;
+__xdata ao_log_type ao_log_data;
 
 static uint8_t
 ao_log_csum(__xdata uint8_t *b) __reentrant
@@ -154,7 +154,7 @@ ao_log_write(__xdata ao_log_type *log) __reentrant
 uint8_t
 ao_log_check_data(void)
 {
-	if (ao_log_csum((uint8_t *) &log) != 0)
+	if (ao_log_csum((uint8_t *) &ao_log_data) != 0)
 		return 0;
 	return 1;
 }
@@ -162,7 +162,7 @@ ao_log_check_data(void)
 uint8_t
 ao_log_check_clear(void)
 {
-	uint8_t *b = (uint8_t *) &log;
+	uint8_t *b = (uint8_t *) &ao_log_data;
 	uint8_t i;
 
 	for (i = 0; i < sizeof (ao_log_type); i++) {
@@ -176,17 +176,17 @@ int16_t
 ao_log_flight(uint8_t slot)
 {
 	if (!ao_storage_read(ao_log_pos(slot),
-			     &log,
+			     &ao_log_data,
 			     sizeof (ao_log_type)))
 		return -(int16_t) (slot + 1);
 
 	if (ao_log_check_clear())
 		return 0;
 
-	if (!ao_log_check_data() || log.type != AO_LOG_FLIGHT)
+	if (!ao_log_check_data() || ao_log_data.type != AO_LOG_FLIGHT)
 		return -(int16_t) (slot + 1);
 
-	return log.u.flight.flight;
+	return ao_log_data.u.flight.flight;
 }
 #endif
 

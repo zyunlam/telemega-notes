@@ -44,11 +44,11 @@ ao_log(void)
 		ao_sleep(&ao_log_running);
 
 #if HAS_FLIGHT
-	log.type = AO_LOG_FLIGHT;
-	log.tick = ao_sample_tick;
-	log.u.flight.flight = ao_flight_number;
-	log.u.flight.ground_pres = ao_ground_pres;
-	ao_log_write(&log);
+	ao_log_data.type = AO_LOG_FLIGHT;
+	ao_log_data.tick = ao_sample_tick;
+	ao_log_data.u.flight.flight = ao_flight_number;
+	ao_log_data.u.flight.ground_pres = ao_ground_pres;
+	ao_log_write(&ao_log_data);
 #endif
 
 	/* Write the whole contents of the ring to the log
@@ -60,23 +60,23 @@ ao_log(void)
 	for (;;) {
 		/* Write samples to EEPROM */
 		while (ao_log_data_pos != ao_data_head) {
-			log.tick = ao_data_ring[ao_log_data_pos].tick;
-			if ((int16_t) (log.tick - next_sensor) >= 0) {
-				log.type = AO_LOG_SENSOR;
-				ao_log_pack24(log.u.sensor.pres,
+			ao_log_data.tick = ao_data_ring[ao_log_data_pos].tick;
+			if ((int16_t) (ao_log_data.tick - next_sensor) >= 0) {
+				ao_log_data.type = AO_LOG_SENSOR;
+				ao_log_pack24(ao_log_data.u.sensor.pres,
 					      ao_data_ring[ao_log_data_pos].ms5607_raw.pres);
-				ao_log_pack24(log.u.sensor.temp,
+				ao_log_pack24(ao_log_data.u.sensor.temp,
 					      ao_data_ring[ao_log_data_pos].ms5607_raw.temp);
 #if AO_LOG_FORMAT != AO_LOG_FORMAT_DETHERM
-				log.u.sensor.sense_a = ao_data_ring[ao_log_data_pos].adc.sense_a;
-				log.u.sensor.sense_m = ao_data_ring[ao_log_data_pos].adc.sense_m;
-				log.u.sensor.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
+				ao_log_data.u.sensor.sense_a = ao_data_ring[ao_log_data_pos].adc.sense_a;
+				ao_log_data.u.sensor.sense_m = ao_data_ring[ao_log_data_pos].adc.sense_m;
+				ao_log_data.u.sensor.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
 #endif
-				ao_log_write(&log);
+				ao_log_write(&ao_log_data);
 				if (ao_log_state <= ao_flight_coast)
-					next_sensor = log.tick + AO_SENSOR_INTERVAL_ASCENT;
+					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_ASCENT;
 				else
-					next_sensor = log.tick + AO_SENSOR_INTERVAL_DESCENT;
+					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_DESCENT;
 			}
 			ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 		}
@@ -84,11 +84,11 @@ ao_log(void)
 		/* Write state change to EEPROM */
 		if (ao_flight_state != ao_log_state) {
 			ao_log_state = ao_flight_state;
-			log.type = AO_LOG_STATE;
-			log.tick = ao_time();
-			log.u.state.state = ao_log_state;
-			log.u.state.reason = 0;
-			ao_log_write(&log);
+			ao_log_data.type = AO_LOG_STATE;
+			ao_log_data.tick = ao_time();
+			ao_log_data.u.state.state = ao_log_state;
+			ao_log_data.u.state.reason = 0;
+			ao_log_write(&ao_log_data);
 
 			if (ao_log_state == ao_flight_landed)
 				ao_log_stop();
