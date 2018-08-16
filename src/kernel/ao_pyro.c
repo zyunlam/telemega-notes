@@ -484,10 +484,9 @@ ao_pyro_set(void)
 	}
 #endif
 
-	ao_cmd_decimal();
+	p = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	p = ao_cmd_lex_i;
 	if (AO_PYRO_NUM <= p) {
 		printf ("invalid pyro channel %d\n", p);
 		return;
@@ -516,25 +515,23 @@ ao_pyro_set(void)
 		}
 		pyro_tmp.flags |= ao_pyro_values[v].flag;
 		if (ao_pyro_values[v].offset != NO_VALUE) {
-			uint8_t negative = 0;
+			int16_t r = 1;
 			ao_cmd_white();
 			if (ao_cmd_lex_c == '-') {
-				negative = 1;
+				r = -1;
 				ao_cmd_lex();
 			}
-			ao_cmd_decimal();
+			r *= ao_cmd_decimal();
 			if (ao_cmd_status != ao_cmd_success)
 				return;
 			if (ao_pyro_values[v].flag & AO_PYRO_8_BIT_VALUE) {
-				if (negative) {
+				if (r < 0) {
 					ao_cmd_status = ao_cmd_syntax_error;
 					return;
 				}
-				*((uint8_t *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
+				*((uint8_t *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = r;
 			} else {
-				if (negative)
-					ao_cmd_lex_i = -ao_cmd_lex_i;
-				*((int16_t *) (void *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = ao_cmd_lex_i;
+				*((int16_t *) (void *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = r;
 			}
 		}
 	}

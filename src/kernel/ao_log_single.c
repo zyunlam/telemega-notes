@@ -118,10 +118,11 @@ ao_log_single_restart(void)
 void
 ao_log_single_set(void)
 {
+	uint16_t r;
 	printf("Logging currently %s\n", ao_log_running ? "on" : "off");
-	ao_cmd_hex();
+	r = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success) {
-		if (ao_cmd_lex_i) {
+		if (r) {
 			printf("Logging from %ld to %ld\n", ao_log_current_pos, ao_log_end_pos);
 			ao_log_single_start();
 		} else {
@@ -136,13 +137,12 @@ void
 ao_log_single_delete(void)
 {
 	uint32_t	pos;
-
-	ao_cmd_hex();
+	uint16_t	r = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	if (ao_cmd_lex_i != 1) {
+	if (r != 1) {
 		ao_cmd_status = ao_cmd_syntax_error;
-		printf("No such flight: %d\n", ao_cmd_lex_i);
+		printf("No such flight: %d\n", r);
 		return;
 	}
 	ao_log_single_stop();
@@ -153,7 +153,7 @@ ao_log_single_delete(void)
 	}
 	ao_log_current_pos = ao_log_start_pos = 0;
 	if (pos == 0)
-		printf("No such flight: %d\n", ao_cmd_lex_i);
+		printf("No such flight: %d\n", r);
 	else
 		printf ("Erased\n");
 }

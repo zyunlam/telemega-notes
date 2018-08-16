@@ -19,8 +19,6 @@
 #include "ao.h"
 #include "ao_task.h"
 
-uint16_t ao_cmd_lex_i;
-uint32_t ao_cmd_lex_u32;
 char	ao_cmd_lex_c;
 enum ao_cmd_status ao_cmd_status;
 
@@ -174,55 +172,49 @@ ao_cmd_hexchar(char c)
 	return -1;
 }
 
-void
-ao_cmd_hexbyte(void)
+static
+uint32_t
+_ao_cmd_hex(uint8_t lim)
 {
+	uint32_t result = 0;
 	uint8_t i;
-	int8_t	n;
 
-	ao_cmd_lex_i = 0;
 	ao_cmd_white();
-	for (i = 0; i < 2; i++) {
-		n = ao_cmd_hexchar(ao_cmd_lex_c);
+	for (i = 0; i < lim; i++) {
+		int8_t n = ao_cmd_hexchar(ao_cmd_lex_c);
 		if (n < 0) {
-			ao_cmd_status = ao_cmd_syntax_error;
+			if (i == 0 || lim != 0xff)
+				ao_cmd_status = ao_cmd_lex_error;
 			break;
 		}
-		ao_cmd_lex_i = (ao_cmd_lex_i << 4) | n;
+		result = (result << 4) | n;
 		ao_cmd_lex();
 	}
+	return result;
 }
 
-void
+uint8_t
+ao_cmd_hexbyte(void)
+{
+	return _ao_cmd_hex(2);
+}
+
+uint32_t
 ao_cmd_hex(void)
 {
-	uint8_t	r = ao_cmd_lex_error;
-	int8_t	n;
-
-	ao_cmd_lex_i = 0;
-	ao_cmd_white();
-	for(;;) {
-		n = ao_cmd_hexchar(ao_cmd_lex_c);
-		if (n < 0)
-			break;
-		ao_cmd_lex_i = (ao_cmd_lex_i << 4) | n;
-		r = ao_cmd_success;
-		ao_cmd_lex();
-	}
-	if (r != ao_cmd_success)
-		ao_cmd_status = r;
+	return _ao_cmd_hex(0xff);
 }
 
-void
+uint32_t
 ao_cmd_decimal(void) 
 {
+	uint32_t result = 0;
 	uint8_t	r = ao_cmd_lex_error;
 
-	ao_cmd_lex_u32 = 0;
 	ao_cmd_white();
 	for(;;) {
 		if ('0' <= ao_cmd_lex_c && ao_cmd_lex_c <= '9')
-			ao_cmd_lex_u32 = (ao_cmd_lex_u32 * 10) + (ao_cmd_lex_c - '0');
+			result = result * 10 + (ao_cmd_lex_c - '0');
 		else
 			break;
 		r = ao_cmd_success;
@@ -230,7 +222,7 @@ ao_cmd_decimal(void)
 	}
 	if (r != ao_cmd_success)
 		ao_cmd_status = r;
-	ao_cmd_lex_i = (uint16_t) ao_cmd_lex_u32;
+	return result;
 }
 
 uint8_t
@@ -250,9 +242,9 @@ ao_match_word(const char *word)
 static void
 echo(void)
 {
-	ao_cmd_hex();
+	uint32_t v = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_stdios[ao_cur_stdio].echo = ao_cmd_lex_i != 0;
+		ao_stdios[ao_cur_stdio].echo = v != 0;
 }
 
 static void

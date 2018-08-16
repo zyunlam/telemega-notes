@@ -805,8 +805,7 @@ ao_radio_test_cmd(void)
 	static uint8_t radio_on;
 	ao_cmd_white();
 	if (ao_cmd_lex_c != '\n') {
-		ao_cmd_decimal();
-		mode = (uint8_t) ao_cmd_lex_u32;
+		mode = ao_cmd_decimal();
 	}
 	mode++;
 	if ((mode & 2) && !radio_on) {

@@ -858,10 +858,8 @@ ao_radio_test_cmd(void)
 {
 	uint8_t	mode = 2;
 	ao_cmd_white();
-	if (ao_cmd_lex_c != '\n') {
-		ao_cmd_decimal();
-		mode = (uint8_t) ao_cmd_lex_u32;
-	}
+	if (ao_cmd_lex_c != '\n')
+		mode = ao_cmd_decimal();
 	mode++;
 	if ((mode & 2))
 		ao_radio_test_on();
@@ -1362,14 +1360,15 @@ ao_radio_aprs(void)
 static void
 ao_radio_strobe_test(void)
 {
+	uint8_t addr;
 	uint8_t	r;
 
-	ao_cmd_hex();
+	addr = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	r = ao_radio_strobe(ao_cmd_lex_i);
+	r = ao_radio_strobe(addr);
 	printf ("Strobe %02x -> %02x (rdy %d state %d)\n",
-		ao_cmd_lex_i,
+		addr,
 		r,
 		r >> 7,
 		(r >> 4) & 0x7);
@@ -1381,14 +1380,12 @@ ao_radio_write_test(void)
 	uint16_t	addr;
 	uint8_t		data;
 
-	ao_cmd_hex();
+	addr = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	addr = ao_cmd_lex_i;
-	ao_cmd_hex();
+	data = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	data = ao_cmd_lex_i;
 	printf ("Write %04x = %02x\n", addr, data);
 	ao_radio_reg_write(addr, data);
 }
@@ -1399,10 +1396,9 @@ ao_radio_read_test(void)
 	uint16_t	addr;
 	uint8_t		data;
 
-	ao_cmd_hex();
+	addr = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	addr = ao_cmd_lex_i;
 	data = ao_radio_reg_read(addr);
 	printf ("Read %04x = %02x\n", addr, data);
 }

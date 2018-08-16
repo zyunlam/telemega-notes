@@ -63,9 +63,9 @@ ao_init_vidtime(void)
 static void
 ao_set_vidtime(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success) {
-		vidtime_monitor = ao_cmd_lex_i != 0;
+		vidtime_monitor = r != 0;
 		ao_wakeup(&vidtime_monitor);
 	}
 }

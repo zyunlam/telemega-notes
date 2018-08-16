@@ -124,9 +124,9 @@ ao_lco_main(void)
 void
 ao_lco_set_debug(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_lco_debug = ao_cmd_lex_i;
+		ao_lco_debug = r;
 }
 
 const struct ao_cmds ao_lco_cmds[] = {

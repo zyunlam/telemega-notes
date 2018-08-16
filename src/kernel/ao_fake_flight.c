@@ -133,14 +133,12 @@ ao_fake_flight(void)
 	enum ao_flight_state	my_state = ao_flight_invalid;
 	int			i;
 
-	ao_cmd_hex();
+	calib_size = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	calib_size = ao_cmd_lex_i;
-	ao_cmd_hex();
+	data_size = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	data_size = ao_cmd_lex_i;
 	if ((unsigned) calib_size != sizeof (struct ao_fake_calib)) {
 		printf ("calib size %d larger than actual size %d\n",
 			calib_size, sizeof (struct ao_fake_calib));
