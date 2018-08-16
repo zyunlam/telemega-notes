@@ -68,7 +68,7 @@ main(void)
 	ao_report_init();
 	ao_telemetry_init();
 	ao_radio_init();
-	ao_packet_slave_init(TRUE);
+	ao_packet_slave_init(true);
 	ao_igniter_init();
 	ao_config_init();
 

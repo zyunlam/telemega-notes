@@ -35,7 +35,7 @@ ao_hmc5883_reg_write(uint8_t addr, uint8_t data)
 	d[1] = data;
 	ao_i2c_get(AO_HMC5883_I2C_INDEX);
 	ao_i2c_start(AO_HMC5883_I2C_INDEX, HMC5883_ADDR_WRITE);
-	ao_i2c_send(d, 2, AO_HMC5883_I2C_INDEX, TRUE);
+	ao_i2c_send(d, 2, AO_HMC5883_I2C_INDEX, true);
 	ao_i2c_put(AO_HMC5883_I2C_INDEX);
 	ao_hmc5883_addr = addr + 1;
 }
@@ -46,10 +46,10 @@ ao_hmc5883_read(uint8_t addr, uint8_t *data, uint8_t len)
 	ao_i2c_get(AO_HMC5883_I2C_INDEX);
 	if (addr != ao_hmc5883_addr) {
 		ao_i2c_start(AO_HMC5883_I2C_INDEX, HMC5883_ADDR_WRITE);
-		ao_i2c_send(&addr, 1, AO_HMC5883_I2C_INDEX, FALSE);
+		ao_i2c_send(&addr, 1, AO_HMC5883_I2C_INDEX, false);
 	}
 	ao_i2c_start(AO_HMC5883_I2C_INDEX, HMC5883_ADDR_READ);
-	ao_i2c_recv(data, len, AO_HMC5883_I2C_INDEX, TRUE);
+	ao_i2c_recv(data, len, AO_HMC5883_I2C_INDEX, true);
 	ao_i2c_put(AO_HMC5883_I2C_INDEX);
 	ao_hmc5883_addr = 0xff;
 }
@@ -103,7 +103,7 @@ ao_hmc5883_setup(void)
 
 	ao_i2c_get(AO_HMC5883_I2C_INDEX);
 	present = ao_i2c_start(AO_HMC5883_I2C_INDEX, HMC5883_ADDR_READ);
-	ao_i2c_recv(&d, 1, AO_HMC5883_I2C_INDEX, TRUE);
+	ao_i2c_recv(&d, 1, AO_HMC5883_I2C_INDEX, true);
 	ao_i2c_put(AO_HMC5883_I2C_INDEX);
 
 	if (!present)

@@ -28,7 +28,7 @@ ao_packet_slave(void)
 		if (ao_packet_recv(0)) {
 			ao_xmemcpy(&ao_tx_packet.callsign, &ao_rx_packet.packet.callsign, AO_MAX_CALLSIGN);
 #if HAS_FLIGHT
-			ao_flight_force_idle = TRUE;
+			ao_flight_force_idle = true;
 #endif
 			ao_packet_send();
 		}

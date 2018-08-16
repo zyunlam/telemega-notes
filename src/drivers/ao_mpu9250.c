@@ -63,7 +63,7 @@ _ao_mpu9250_reg_write(uint8_t addr, uint8_t value)
 #else
 	ao_i2c_get(AO_MPU9250_I2C_INDEX);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_WRITE);
-	ao_i2c_send(d, 2, AO_MPU9250_I2C_INDEX, TRUE);
+	ao_i2c_send(d, 2, AO_MPU9250_I2C_INDEX, true);
 	ao_i2c_put(AO_MPU9250_I2C_INDEX);
 #endif
 }
@@ -80,9 +80,9 @@ _ao_mpu9250_read(uint8_t addr, void *data, uint8_t len)
 #else
 	ao_i2c_get(AO_MPU9250_I2C_INDEX);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_WRITE);
-	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, FALSE);
+	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, false);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_READ);
-	ao_i2c_recv(data, len, AO_MPU9250_I2C_INDEX, TRUE);
+	ao_i2c_recv(data, len, AO_MPU9250_I2C_INDEX, true);
 	ao_i2c_put(AO_MPU9250_I2C_INDEX);
 #endif
 }
@@ -100,9 +100,9 @@ _ao_mpu9250_reg_read(uint8_t addr)
 #else
 	ao_i2c_get(AO_MPU9250_I2C_INDEX);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_WRITE);
-	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, FALSE);
+	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, false);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_READ);
-	ao_i2c_recv(&value, 1, AO_MPU9250_I2C_INDEX, TRUE);
+	ao_i2c_recv(&value, 1, AO_MPU9250_I2C_INDEX, true);
 	ao_i2c_put(AO_MPU9250_I2C_INDEX);
 #endif
 	return value;
