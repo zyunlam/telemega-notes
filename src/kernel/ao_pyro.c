@@ -38,8 +38,8 @@
 enum ao_igniter_status
 ao_pyro_status(uint8_t p)
 {
-	__xdata struct ao_data packet;
-	__pdata int16_t value;
+	struct ao_data packet;
+	int16_t value;
 
 	ao_arch_critical(
 		ao_data_get(&packet);
@@ -404,7 +404,7 @@ ao_pyro(void)
 	ao_exit();
 }
 
-__xdata struct ao_task ao_pyro_task;
+struct ao_task ao_pyro_task;
 
 
 static void

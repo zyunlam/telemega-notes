@@ -18,7 +18,7 @@
 
 #include "ao.h"
 
-volatile __data uint16_t ao_tick_count;
+volatile uint16_t ao_tick_count;
 
 uint16_t ao_time(void)
 {
@@ -33,8 +33,8 @@ uint16_t ao_time(void)
 #define T1_SAMPLE_TIME		30000	/* 3e6/30000 = 100 */
 
 #if HAS_ADC
-volatile __data uint8_t	ao_adc_interval = 1;
-volatile __data uint8_t	ao_adc_count;
+volatile uint8_t	ao_adc_interval = 1;
+volatile uint8_t	ao_adc_count;
 #endif
 
 void
@@ -53,7 +53,7 @@ ISR(TIMER1_COMPA_vect)
 
 #if HAS_ADC
 void
-ao_timer_set_adc_interval(uint8_t interval) __critical
+ao_timer_set_adc_interval(uint8_t interval) 
 {
 	ao_adc_interval = interval;
 	ao_adc_count = 0;

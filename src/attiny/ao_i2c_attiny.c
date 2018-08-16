@@ -173,7 +173,7 @@ ao_i2c_stop_bus(void)
  * so using interrupts would take way too long
  */
 uint8_t
-ao_i2c_send_bus(void __xdata *block, uint16_t len, uint8_t stop)
+ao_i2c_send_bus(void *block, uint16_t len, uint8_t stop)
 {
 	uint8_t	*d = block;
 
@@ -206,7 +206,7 @@ ao_i2c_send_fixed_bus(uint8_t d, uint16_t len, uint8_t stop)
  * Poll, sending zeros and reading data back
  */
 uint8_t
-ao_i2c_recv_bus(void __xdata *block, uint16_t len, uint8_t stop)
+ao_i2c_recv_bus(void *block, uint16_t len, uint8_t stop)
 {
 	uint8_t	*d = block;
 

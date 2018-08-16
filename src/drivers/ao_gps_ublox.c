@@ -26,11 +26,11 @@
 
 #include <stdarg.h>
 
-__xdata uint8_t ao_gps_new;
-__xdata uint8_t ao_gps_mutex;
-__pdata uint16_t ao_gps_tick;
-__xdata struct ao_telemetry_location	ao_gps_data;
-__xdata struct ao_telemetry_satellite	ao_gps_tracking_data;
+uint8_t ao_gps_new;
+uint8_t ao_gps_mutex;
+uint16_t ao_gps_tick;
+struct ao_telemetry_location	ao_gps_data;
+struct ao_telemetry_satellite	ao_gps_tracking_data;
 
 #undef AO_SERIAL_SPEED_UBLOX
 
@@ -58,8 +58,8 @@ struct ao_ublox_cksum {
 	uint8_t	a, b;
 };
 
-static __pdata struct ao_ublox_cksum ao_ublox_cksum;
-static __pdata uint16_t ao_ublox_len;
+static struct ao_ublox_cksum ao_ublox_cksum;
+static uint16_t ao_ublox_len;
 
 #if AO_UBLOX_DEBUG
 
@@ -152,11 +152,11 @@ static uint8_t data_byte(void)
 	return header_byte();
 }
 
-static char __xdata *ublox_target;
+static char *ublox_target;
 
 static void ublox_u16(uint8_t offset)
 {
-	uint16_t __xdata *ptr = (uint16_t __xdata *) (void __xdata *) (ublox_target + offset);
+	uint16_t *ptr = (uint16_t *) (void *) (ublox_target + offset);
 	uint16_t val;
 
 	val = data_byte();
@@ -166,16 +166,16 @@ static void ublox_u16(uint8_t offset)
 
 static void ublox_u8(uint8_t offset)
 {
-	uint8_t __xdata *ptr = (uint8_t __xdata *) (ublox_target + offset);
+	uint8_t *ptr = (uint8_t *) (ublox_target + offset);
 	uint8_t val;
 
 	val = data_byte ();
 	*ptr = val;
 }
 
-static void ublox_u32(uint8_t offset) __reentrant
+static void ublox_u32(uint8_t offset) 
 {
-	uint32_t __xdata *ptr = (uint32_t __xdata *) (void __xdata *) (ublox_target + offset);
+	uint32_t *ptr = (uint32_t *) (void *) (ublox_target + offset);
 	uint32_t val;
 
 	val = ((uint32_t) data_byte ());
@@ -203,7 +203,7 @@ struct ublox_packet_parse {
 };
 
 static void
-ao_ublox_parse(void __xdata *target, const struct ublox_packet_parse *parse) __reentrant
+ao_ublox_parse(void *target, const struct ublox_packet_parse *parse) 
 {
 	uint8_t	i, offset;
 
@@ -610,7 +610,7 @@ ao_gps_set_rate(uint8_t rate)
 }
 
 void
-ao_gps(void) __reentrant
+ao_gps(void) 
 {
 	uint8_t			class, id;
 	struct ao_ublox_cksum	cksum;
@@ -796,12 +796,12 @@ static void ao_gps_option(void)
 #define ao_gps_option ao_gps_show
 #endif
 
-__code struct ao_cmds ao_gps_cmds[] = {
+const struct ao_cmds ao_gps_cmds[] = {
 	{ ao_gps_option, 	"g\0Display GPS" },
 	{ 0, NULL },
 };
 
-__xdata struct ao_task ao_gps_task;
+struct ao_task ao_gps_task;
 
 void
 ao_gps_init(void)

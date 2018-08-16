@@ -988,7 +988,7 @@ ao_radio_dump_state(struct ao_radio_state *s)
 #endif
 
 uint8_t
-ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
+ao_radio_recv(void *d, uint8_t size, uint8_t timeout)
 {
 	uint8_t	success = 0;
 

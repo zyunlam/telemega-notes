@@ -83,8 +83,8 @@ struct ao_gps_tracking_orig {
 #define ao_telemetry_satellite ao_gps_tracking_orig
 #define ao_telemetry_satellite_info ao_gps_sat_orig
 
-extern __xdata struct ao_telemetry_location	ao_gps_data;
-extern __xdata struct ao_telemetry_satellite	ao_gps_tracking_data;
+extern struct ao_telemetry_location	ao_gps_data;
+extern struct ao_telemetry_satellite	ao_gps_tracking_data;
 
 uint8_t ao_gps_mutex;
 

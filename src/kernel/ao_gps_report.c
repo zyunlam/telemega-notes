@@ -21,9 +21,9 @@
 void
 ao_gps_report(void)
 {
-	static __xdata struct ao_log_record		gps_log;
-	static __xdata struct ao_telemetry_location	gps_data;
-	static __xdata struct ao_telemetry_satellite	gps_tracking_data;
+	static struct ao_log_record		gps_log;
+	static struct ao_telemetry_location	gps_data;
+	static struct ao_telemetry_satellite	gps_tracking_data;
 	uint8_t	date_reported = 0;
 	uint8_t new;
 
@@ -85,7 +85,7 @@ ao_gps_report(void)
 	}
 }
 
-__xdata struct ao_task ao_gps_report_task;
+struct ao_task ao_gps_report_task;
 
 void
 ao_gps_report_init(void)

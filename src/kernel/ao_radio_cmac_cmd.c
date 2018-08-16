@@ -20,7 +20,7 @@
 #include <ao_radio_cmac_cmd.h>
 #include <ao_radio_cmac.h>
 
-static __xdata uint8_t cmac_data[AO_CMAC_MAX_LEN];
+static uint8_t cmac_data[AO_CMAC_MAX_LEN];
 
 static uint8_t
 getnibble(void)
@@ -45,7 +45,7 @@ getbyte(void)
 }
 	
 static void
-radio_cmac_send_cmd(void) __reentrant
+radio_cmac_send_cmd(void) 
 {
 	uint8_t	i;
 	uint8_t	len;
@@ -69,7 +69,7 @@ radio_cmac_send_cmd(void) __reentrant
 }
 
 static void
-radio_cmac_recv_cmd(void) __reentrant
+radio_cmac_recv_cmd(void) 
 {
 	uint8_t		len, i;
 	uint16_t	timeout;
@@ -92,7 +92,7 @@ radio_cmac_recv_cmd(void) __reentrant
 		printf ("ERROR %d %d\n", i, ao_radio_cmac_rssi);
 }
 
-static __code struct ao_cmds ao_radio_cmac_cmds[] = {
+static const struct ao_cmds ao_radio_cmac_cmds[] = {
 	{ radio_cmac_send_cmd,	"s <length>\0Send AES-CMAC packet. Bytes to send follow on next line" },
 	{ radio_cmac_recv_cmd,	"S <length> <timeout>\0Receive AES-CMAC packet. Timeout in ms" },
 	{ 0, NULL },

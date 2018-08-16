@@ -115,41 +115,41 @@ typedef int16_t			ao_v_t;
 #define AO_MS_TO_SPEED(ms)	((ao_v_t) ((ms) * 16))
 #define AO_MSS_TO_ACCEL(mss)	((ao_v_t) ((mss) * 16))
 
-extern __pdata uint16_t	ao_sample_tick;		/* time of last data */
-extern __data uint8_t	ao_sample_adc;		/* Ring position of last processed sample */
-extern __data uint8_t	ao_sample_data;		/* Ring position of last processed sample */
+extern uint16_t	ao_sample_tick;		/* time of last data */
+extern uint8_t	ao_sample_adc;		/* Ring position of last processed sample */
+extern uint8_t	ao_sample_data;		/* Ring position of last processed sample */
 
 #if HAS_BARO
-extern __pdata pres_t	ao_sample_pres;		/* most recent pressure sensor reading */
-extern __pdata alt_t	ao_sample_alt;		/* MSL of ao_sample_pres */
-extern __pdata alt_t	ao_sample_height;	/* AGL of ao_sample_pres */
-extern __pdata pres_t	ao_ground_pres;		/* startup pressure */
-extern __pdata alt_t	ao_ground_height;	/* MSL of ao_ground_pres */
+extern pres_t	ao_sample_pres;		/* most recent pressure sensor reading */
+extern alt_t	ao_sample_alt;		/* MSL of ao_sample_pres */
+extern alt_t	ao_sample_height;	/* AGL of ao_sample_pres */
+extern pres_t	ao_ground_pres;		/* startup pressure */
+extern alt_t	ao_ground_height;	/* MSL of ao_ground_pres */
 #endif
 
 #if HAS_ACCEL
-extern __pdata accel_t	ao_sample_accel;	/* most recent accel sensor reading */
-extern __pdata accel_t	ao_ground_accel;	/* startup acceleration */
-extern __pdata accel_t 	ao_accel_2g;		/* factory accel calibration */
-extern __pdata int32_t	ao_accel_scale;		/* sensor to m/s² conversion */
+extern accel_t	ao_sample_accel;	/* most recent accel sensor reading */
+extern accel_t	ao_ground_accel;	/* startup acceleration */
+extern accel_t 	ao_accel_2g;		/* factory accel calibration */
+extern int32_t	ao_accel_scale;		/* sensor to m/s² conversion */
 #endif
 #if HAS_GYRO
-extern __pdata accel_t	ao_ground_accel_along;
-extern __pdata accel_t	ao_ground_accel_across;
-extern __pdata accel_t	ao_ground_accel_through;
-extern __pdata int32_t	ao_ground_pitch;	/* * 512 */
-extern __pdata int32_t	ao_ground_yaw;		/* * 512 */
-extern __pdata int32_t	ao_ground_roll;		/* * 512 */
-extern __pdata accel_t	ao_sample_accel_along;
-extern __pdata accel_t	ao_sample_accel_across;
-extern __pdata accel_t	ao_sample_accel_through;
-extern __pdata gyro_t	ao_sample_roll;
-extern __pdata gyro_t	ao_sample_pitch;
-extern __pdata gyro_t	ao_sample_yaw;
+extern accel_t	ao_ground_accel_along;
+extern accel_t	ao_ground_accel_across;
+extern accel_t	ao_ground_accel_through;
+extern int32_t	ao_ground_pitch;	/* * 512 */
+extern int32_t	ao_ground_yaw;		/* * 512 */
+extern int32_t	ao_ground_roll;		/* * 512 */
+extern accel_t	ao_sample_accel_along;
+extern accel_t	ao_sample_accel_across;
+extern accel_t	ao_sample_accel_through;
+extern gyro_t	ao_sample_roll;
+extern gyro_t	ao_sample_pitch;
+extern gyro_t	ao_sample_yaw;
 #define AO_NUM_ORIENT	64
-extern __pdata angle_t	ao_sample_orient;
-extern __pdata angle_t	ao_sample_orients[AO_NUM_ORIENT];
-extern __pdata uint8_t	ao_sample_orient_pos;
+extern angle_t	ao_sample_orient;
+extern angle_t	ao_sample_orients[AO_NUM_ORIENT];
+extern uint8_t	ao_sample_orient_pos;
 #endif
 
 void ao_sample_init(void);
@@ -176,19 +176,19 @@ uint8_t ao_sample(void);
 
 #define from_fix(x)	((x) >> 16)
 
-extern __pdata ao_v_t			ao_height;	/* meters */
-extern __pdata ao_v_t			ao_speed;	/* m/s * 16 */
-extern __pdata ao_v_t			ao_accel;	/* m/s² * 16 */
-extern __xdata ao_v_t			ao_max_height;	/* max of ao_height */
-extern __xdata ao_v_t			ao_avg_height;	/* running average of height */
+extern ao_v_t			ao_height;	/* meters */
+extern ao_v_t			ao_speed;	/* m/s * 16 */
+extern ao_v_t			ao_accel;	/* m/s² * 16 */
+extern ao_v_t			ao_max_height;	/* max of ao_height */
+extern ao_v_t			ao_avg_height;	/* running average of height */
 
-extern __pdata ao_v_t			ao_error_h;
+extern ao_v_t			ao_error_h;
 #if !HAS_ACCEL
-extern __pdata ao_v_t			ao_error_h_sq_avg;
+extern ao_v_t			ao_error_h_sq_avg;
 #endif
 
 #if HAS_ACCEL
-extern __pdata ao_v_t			ao_error_a;
+extern ao_v_t			ao_error_a;
 #endif
 #endif
 

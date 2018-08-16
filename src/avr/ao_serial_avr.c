@@ -18,8 +18,8 @@
 
 #include "ao.h"
 
-__xdata struct ao_fifo	ao_serial1_rx_fifo;
-__xdata struct ao_fifo	ao_serial1_tx_fifo;
+struct ao_fifo	ao_serial1_rx_fifo;
+struct ao_fifo	ao_serial1_tx_fifo;
 
 void
 ao_debug_out(char c)
@@ -40,7 +40,7 @@ ISR(USART1_RX_vect)
 #endif
 }
 
-static __xdata uint8_t ao_serial_tx1_started;
+static uint8_t ao_serial_tx1_started;
 
 static void
 ao_serial1_tx_start(void)
@@ -75,7 +75,7 @@ _ao_serial1_pollchar(void)
 #endif
 
 char
-ao_serial1_getchar(void) __critical
+ao_serial1_getchar(void) 
 {
 	char	c;
 
@@ -99,7 +99,7 @@ ao_serial1_putchar(char c)
 }
 
 void
-ao_serial1_drain(void) __critical
+ao_serial1_drain(void) 
 {
 	ao_arch_block_interrupts();
 	while (!ao_fifo_empty(ao_serial1_tx_fifo))

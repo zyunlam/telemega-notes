@@ -29,12 +29,12 @@
 
 #define AO_NO_TASK_INDEX	0xff
 
-__xdata struct ao_task * __xdata ao_tasks[AO_NUM_TASKS];
-__data uint8_t ao_num_tasks;
-__xdata struct ao_task *__data ao_cur_task;
+struct ao_task * ao_tasks[AO_NUM_TASKS];
+uint8_t ao_num_tasks;
+struct ao_task *ao_cur_task;
 
 #if !HAS_TASK_QUEUE
-static __data uint8_t ao_cur_task_index;
+static uint8_t ao_cur_task_index;
 #endif
 
 #ifdef ao_arch_task_globals
@@ -290,7 +290,7 @@ ao_task_validate(void)
 #endif /* HAS_TASK_QUEUE */
 
 void
-ao_add_task(__xdata struct ao_task * task, void (*start)(void), __code char *name) __reentrant
+ao_add_task(struct ao_task * task, void (*start)(void), const char *name) 
 {
 	uint8_t task_id;
 	uint8_t t;
@@ -321,7 +321,7 @@ ao_add_task(__xdata struct ao_task * task, void (*start)(void), __code char *nam
 		);
 }
 
-__data uint8_t	ao_task_minimize_latency;
+uint8_t	ao_task_minimize_latency;
 
 /* Task switching function. This must not use any stack variables */
 void
@@ -382,7 +382,7 @@ ao_yield(void) ao_arch_naked_define
 	ao_cur_task = ao_list_first_entry(&run_queue, struct ao_task, queue);
 #else
 	{
-		__pdata uint8_t	ao_last_task_index = ao_cur_task_index;
+		uint8_t	ao_last_task_index = ao_cur_task_index;
 		for (;;) {
 			++ao_cur_task_index;
 			if (ao_cur_task_index == ao_num_tasks)
@@ -418,7 +418,7 @@ ao_yield(void) ao_arch_naked_define
 }
 
 uint8_t
-ao_sleep(__xdata void *wchan)
+ao_sleep(void *wchan)
 {
 #if HAS_TASK_QUEUE
 	uint32_t flags;
@@ -439,7 +439,7 @@ ao_sleep(__xdata void *wchan)
 }
 
 void
-ao_wakeup(__xdata void *wchan) __reentrant
+ao_wakeup(void *wchan) 
 {
 	ao_validate_cur_stack();
 #if HAS_TASK_QUEUE
@@ -470,7 +470,7 @@ ao_wakeup(__xdata void *wchan) __reentrant
 }
 
 uint8_t
-ao_sleep_for(__xdata void *wchan, uint16_t timeout)
+ao_sleep_for(void *wchan, uint16_t timeout)
 {
 	uint8_t	ret;
 	if (timeout) {
@@ -504,7 +504,7 @@ ao_sleep_for(__xdata void *wchan, uint16_t timeout)
 	return ret;
 }
 
-static __xdata uint8_t ao_forever;
+static uint8_t ao_forever;
 
 void
 ao_delay(uint16_t ticks)
@@ -541,7 +541,7 @@ void
 ao_task_info(void)
 {
 	uint8_t		i;
-	__xdata struct ao_task *task;
+	struct ao_task *task;
 	uint16_t	now = ao_time();
 
 	for (i = 0; i < ao_num_tasks; i++) {

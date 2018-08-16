@@ -59,9 +59,9 @@ ao_gps_sparse_should_log(int32_t lat, int32_t lon, int16_t alt)
 void
 ao_gps_report_mega(void)
 {
-	static __xdata struct ao_log_mega		gps_log;
-	static __xdata struct ao_telemetry_location	gps_data;
-	static __xdata struct ao_telemetry_satellite	gps_tracking_data;
+	static struct ao_log_mega		gps_log;
+	static struct ao_telemetry_location	gps_data;
+	static struct ao_telemetry_satellite	gps_tracking_data;
 	uint8_t	new;
 	uint8_t	c, n, i;
 
@@ -125,7 +125,7 @@ ao_gps_report_mega(void)
 	}
 }
 
-__xdata struct ao_task ao_gps_report_mega_task;
+struct ao_task ao_gps_report_mega_task;
 
 void
 ao_gps_report_mega_init(void)

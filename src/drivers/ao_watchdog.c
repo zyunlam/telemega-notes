@@ -46,7 +46,7 @@ ao_watchdog_set(void)
 }
 	
 
-static __code struct ao_cmds ao_watchdog_cmds[] = {
+static const struct ao_cmds ao_watchdog_cmds[] = {
 	{ ao_watchdog_set,	"Q <0 off, 1 on>\0Enable or disable watchdog timer" },
 	{ 0,			NULL },
 };

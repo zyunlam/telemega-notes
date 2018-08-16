@@ -62,7 +62,7 @@
 
 #define AO_AES_LEN 16
 
-extern __xdata uint8_t ao_config_aes_seq;
+extern uint8_t ao_config_aes_seq;
 
 struct ao_config {
 	uint8_t		major;
@@ -130,7 +130,7 @@ struct ao_config {
 #define AO_CONFIG_DEFAULT_APRS_FORMAT	AO_APRS_FORMAT_COMPRESSED
 
 #if HAS_RADIO_FORWARD
-extern __xdata uint32_t	ao_send_radio_setting;
+extern uint32_t	ao_send_radio_setting;
 #endif
 
 #define AO_IGNITE_MODE_DUAL		0
@@ -151,8 +151,8 @@ extern __xdata uint32_t	ao_send_radio_setting;
 /* Make sure AO_CONFIG_MAX_SIZE is big enough */
 typedef uint8_t	config_check_space[(int) (AO_CONFIG_MAX_SIZE - sizeof (struct ao_config))];
 
-extern __xdata struct ao_config ao_config;
-extern __pdata uint8_t ao_config_loaded;
+extern struct ao_config ao_config;
+extern uint8_t ao_config_loaded;
 
 void
 _ao_config_edit_start(void);

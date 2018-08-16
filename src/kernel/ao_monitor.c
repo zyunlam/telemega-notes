@@ -36,15 +36,15 @@
 #error Must define AO_MONITOR_LED
 #endif
 
-__xdata uint8_t ao_monitoring_mutex;
-__data uint8_t ao_monitoring;
-static __data uint8_t ao_monitor_disabled;
-static __data uint8_t ao_internal_monitoring;
-static __data uint8_t ao_external_monitoring;
+uint8_t ao_monitoring_mutex;
+uint8_t ao_monitoring;
+static uint8_t ao_monitor_disabled;
+static uint8_t ao_internal_monitoring;
+static uint8_t ao_external_monitoring;
 
-__xdata union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
+union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
 
-__data uint8_t	ao_monitor_head;
+uint8_t	ao_monitor_head;
 
 static void
 _ao_monitor_adjust(void)
@@ -91,7 +91,7 @@ ao_monitor_get(void)
 }
 
 #if AO_MONITOR_LED
-__xdata struct ao_task ao_monitor_blink_task;
+struct ao_task ao_monitor_blink_task;
 
 void
 ao_monitor_blink(void)
@@ -125,7 +125,7 @@ void
 ao_monitor_put(void)
 {
 #if LEGACY_MONITOR
-	__xdata char callsign[AO_MAX_CALLSIGN+1];
+	char callsign[AO_MAX_CALLSIGN+1];
 #endif
 #if LEGACY_MONITOR || HAS_RSSI
 	int16_t rssi;
@@ -133,7 +133,7 @@ ao_monitor_put(void)
 	uint8_t ao_monitor_tail;
 	uint8_t state;
 	uint8_t sum, byte;
-	__xdata union ao_monitor	*m;
+	union ao_monitor	*m;
 
 #define recv_raw	((m->raw))
 #define recv_orig	((m->orig))
@@ -266,10 +266,10 @@ ao_monitor_put(void)
 	}
 }
 
-__xdata struct ao_task ao_monitor_put_task;
+struct ao_task ao_monitor_put_task;
 #endif
 
-__xdata struct ao_task ao_monitor_get_task;
+struct ao_task ao_monitor_get_task;
 
 void
 ao_monitor_set(uint8_t monitoring)
@@ -303,14 +303,14 @@ set_monitor(void)
 	_ao_monitor_adjust();
 }
 
-__code struct ao_cmds ao_monitor_cmds[] = {
+const struct ao_cmds ao_monitor_cmds[] = {
 	{ set_monitor,	"m <0 off, 1 old, 20 std>\0Set radio monitoring" },
 	{ 0,	NULL },
 };
 #endif
 
 void
-ao_monitor_init(void) __reentrant
+ao_monitor_init(void) 
 {
 #if HAS_MONITOR_PUT
 	ao_cmd_register(&ao_monitor_cmds[0]);

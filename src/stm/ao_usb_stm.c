@@ -1079,7 +1079,7 @@ ao_usb_irq(void)
 		control_count, out_count, in_count, int_count, reset_count);
 }
 
-__code struct ao_cmds ao_usb_cmds[] = {
+const struct ao_cmds ao_usb_cmds[] = {
 	{ ao_usb_irq, "I\0Show USB interrupt counts" },
 	{ 0, NULL }
 };

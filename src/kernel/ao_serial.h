@@ -26,8 +26,8 @@
 #define AO_SERIAL_SPEED_115200	4
 
 #if HAS_SERIAL_0
-extern volatile __xdata struct ao_fifo	ao_serial0_rx_fifo;
-extern volatile __xdata struct ao_fifo	ao_serial0_tx_fifo;
+extern volatile struct ao_fifo	ao_serial0_rx_fifo;
+extern volatile struct ao_fifo	ao_serial0_tx_fifo;
 
 char
 ao_serial0_getchar(void);
@@ -49,8 +49,8 @@ ao_serial0_set_speed(uint8_t speed);
 #endif
 
 #if HAS_SERIAL_1
-extern volatile __xdata struct ao_fifo	ao_serial1_rx_fifo;
-extern volatile __xdata struct ao_fifo	ao_serial1_tx_fifo;
+extern volatile struct ao_fifo	ao_serial1_rx_fifo;
+extern volatile struct ao_fifo	ao_serial1_tx_fifo;
 
 char
 ao_serial1_getchar(void);
@@ -72,8 +72,8 @@ ao_serial1_set_speed(uint8_t speed);
 #endif
 
 #if HAS_SERIAL_2
-extern volatile __xdata struct ao_fifo	ao_serial2_rx_fifo;
-extern volatile __xdata struct ao_fifo	ao_serial2_tx_fifo;
+extern volatile struct ao_fifo	ao_serial2_rx_fifo;
+extern volatile struct ao_fifo	ao_serial2_tx_fifo;
 
 char
 ao_serial2_getchar(void);
@@ -95,8 +95,8 @@ ao_serial2_set_speed(uint8_t speed);
 #endif
 
 #if HAS_SERIAL_3
-extern volatile __xdata struct ao_fifo	ao_serial3_rx_fifo;
-extern volatile __xdata struct ao_fifo	ao_serial3_tx_fifo;
+extern volatile struct ao_fifo	ao_serial3_rx_fifo;
+extern volatile struct ao_fifo	ao_serial3_tx_fifo;
 
 char
 ao_serial3_getchar(void);

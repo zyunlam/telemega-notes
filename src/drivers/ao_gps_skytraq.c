@@ -33,20 +33,20 @@
 #define ao_gps_set_speed	ao_serial1_set_speed
 #endif
 
-__xdata uint8_t ao_gps_new;
-__xdata uint8_t ao_gps_mutex;
-static __data char ao_gps_char;
-static __data uint8_t ao_gps_cksum;
-static __data uint8_t ao_gps_error;
+uint8_t ao_gps_new;
+uint8_t ao_gps_mutex;
+static char ao_gps_char;
+static uint8_t ao_gps_cksum;
+static uint8_t ao_gps_error;
 
-__pdata uint16_t ao_gps_tick;
-__xdata struct ao_telemetry_location	ao_gps_data;
-__xdata struct ao_telemetry_satellite	ao_gps_tracking_data;
+uint16_t ao_gps_tick;
+struct ao_telemetry_location	ao_gps_data;
+struct ao_telemetry_satellite	ao_gps_tracking_data;
 
-static __pdata uint16_t				ao_gps_next_tick;
-static __pdata struct ao_telemetry_location	ao_gps_next;
-static __pdata uint8_t				ao_gps_date_flags;
-static __pdata struct ao_telemetry_satellite	ao_gps_tracking_next;
+static uint16_t				ao_gps_next_tick;
+static struct ao_telemetry_location	ao_gps_next;
+static uint8_t				ao_gps_date_flags;
+static struct ao_telemetry_satellite	ao_gps_tracking_next;
 
 #define STQ_S 0xa0, 0xa1
 #define STQ_E 0x0d, 0x0a
@@ -60,7 +60,7 @@ static __pdata struct ao_telemetry_satellite	ao_gps_tracking_next;
     STQ_S, 0,15, id, a,b,c,d,e,f,g,h,i,j,k,l,m,n, \
     (id^a^b^c^d^e^f^g^h^i^j^k^l^m^n), STQ_E
 
-static __code uint8_t ao_gps_config[] = {
+static const uint8_t ao_gps_config[] = {
 	SKYTRAQ_MSG_8(0x08, 1, 0, 1, 0, 1, 0, 0, 0), /* configure nmea */
 	/* gga interval */
 	/* gsa interval */
@@ -107,7 +107,7 @@ ao_gps_skip_sep(void)
 		ao_gps_lexchar();
 }
 
-__data static uint8_t ao_gps_num_width;
+static uint8_t ao_gps_num_width;
 
 static int16_t
 ao_gps_decimal(uint8_t max_width)
@@ -162,11 +162,11 @@ ao_gps_hex(void)
 }
 
 static int32_t
-ao_gps_parse_pos(uint8_t deg_width) __reentrant
+ao_gps_parse_pos(uint8_t deg_width) 
 {
-	static __pdata uint16_t	d;
-	static __pdata uint8_t	m;
-	static __pdata uint16_t	f;
+	static uint16_t	d;
+	static uint8_t	m;
+	static uint16_t	f;
 	char c;
 
 	d = ao_gps_decimal(deg_width);
@@ -414,7 +414,7 @@ ao_nmea_rmc(void)
 #define ao_skytraq_sendstruct(s) ao_skytraq_sendbytes((s), sizeof(s))
 
 static void
-ao_skytraq_sendbytes(__code uint8_t *b, uint8_t l)
+ao_skytraq_sendbytes(const uint8_t *b, uint8_t l)
 {
 	while (l--) {
 		uint8_t	c = *b++;
@@ -462,7 +462,7 @@ ao_gps_nmea_parse(void)
 static uint8_t	ao_gps_updating;
 
 void
-ao_gps(void) __reentrant
+ao_gps(void) 
 {
 	ao_gps_set_speed(AO_SERIAL_SPEED_9600);
 
@@ -486,9 +486,9 @@ ao_gps(void) __reentrant
 	}
 }
 
-__xdata struct ao_task ao_gps_task;
+struct ao_task ao_gps_task;
 
-static __code uint8_t ao_gps_115200[] = {
+static const uint8_t ao_gps_115200[] = {
 	SKYTRAQ_MSG_3(5,0,5,0)	/* Set to 115200 baud */
 };
 
@@ -500,7 +500,7 @@ ao_gps_set_speed_delay(uint8_t speed) {
 }
 
 static void
-gps_update(void) __reentrant
+gps_update(void) 
 {
 	ao_gps_updating = 1;
 	ao_task_minimize_latency = 1;
@@ -517,7 +517,7 @@ gps_update(void) __reentrant
 		ao_gps_putchar(ao_usb_getchar());
 }
 
-__code struct ao_cmds ao_gps_cmds[] = {
+const struct ao_cmds ao_gps_cmds[] = {
 	{ ao_gps_show, 	"g\0Display GPS" },
 	{ gps_update,	"U\0Update GPS firmware" },
 	{ 0, NULL },

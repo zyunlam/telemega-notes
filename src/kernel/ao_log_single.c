@@ -26,16 +26,16 @@
 #include "ao.h"
 #include "ao_product.h"
 
-static __xdata struct ao_task ao_log_single_task;
+static struct ao_task ao_log_single_task;
 
-__xdata uint8_t 	ao_log_running;
-__xdata uint8_t		ao_log_mutex;
-__pdata uint32_t	ao_log_start_pos;
-__pdata uint32_t	ao_log_end_pos;
-__pdata uint32_t	ao_log_current_pos;
+uint8_t 	ao_log_running;
+uint8_t		ao_log_mutex;
+uint32_t	ao_log_start_pos;
+uint32_t	ao_log_end_pos;
+uint32_t	ao_log_current_pos;
 
-__xdata union ao_log_single ao_log_single_write_data;
-__xdata union ao_log_single ao_log_single_read_data;
+union ao_log_single ao_log_single_write_data;
+union ao_log_single ao_log_single_read_data;
 
 uint8_t
 ao_log_single_write(void)
@@ -59,7 +59,7 @@ ao_log_single_write(void)
 static uint8_t
 ao_log_single_valid(void)
 {
-	__xdata uint8_t	*d = ao_log_single_read_data.bytes;
+	uint8_t	*d = ao_log_single_read_data.bytes;
 	uint8_t	i;
 	for (i = 0; i < AO_LOG_SINGLE_SIZE; i++)
 		if (*d++ != 0xff)

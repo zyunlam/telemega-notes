@@ -43,12 +43,12 @@
 			       AO_COMPANION_SPI_BUS);	\
 	} while (0)
 
-__xdata struct ao_companion_command		ao_companion_command;
-__xdata struct ao_companion_setup		ao_companion_setup;
+struct ao_companion_command		ao_companion_command;
+struct ao_companion_setup		ao_companion_setup;
 
-__xdata uint16_t	ao_companion_data[AO_COMPANION_MAX_CHANNELS];
-__pdata uint8_t		ao_companion_running;
-__xdata uint8_t		ao_companion_mutex;
+uint16_t	ao_companion_data[AO_COMPANION_MAX_CHANNELS];
+uint8_t		ao_companion_running;
+uint8_t		ao_companion_mutex;
 
 static void
 ao_companion_send_command(uint8_t command)
@@ -116,7 +116,7 @@ ao_companion(void)
 }
 
 void
-ao_companion_status(void) __reentrant
+ao_companion_status(void) 
 {
 	uint8_t	i;
 	printf("Companion running: %d\n", ao_companion_running);
@@ -134,12 +134,12 @@ ao_companion_status(void) __reentrant
 	printf("\n");
 }
 
-__code struct ao_cmds ao_companion_cmds[] = {
+const struct ao_cmds ao_companion_cmds[] = {
 	{ ao_companion_status,	"L\0Companion link status" },
 	{ 0, NULL },
 };
 
-static __xdata struct ao_task ao_companion_task;
+static struct ao_task ao_companion_task;
 
 void
 ao_companion_init(void)

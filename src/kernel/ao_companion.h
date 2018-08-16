@@ -44,11 +44,11 @@ struct ao_companion_setup {
 	uint8_t		channels;
 };
 
-extern __pdata uint8_t				ao_companion_running;
-extern __xdata uint8_t				ao_companion_mutex;
-extern __xdata struct ao_companion_command	ao_companion_command;
-extern __xdata struct ao_companion_setup	ao_companion_setup;
-extern __xdata uint16_t				ao_companion_data[AO_COMPANION_MAX_CHANNELS];
+extern uint8_t				ao_companion_running;
+extern uint8_t				ao_companion_mutex;
+extern struct ao_companion_command	ao_companion_command;
+extern struct ao_companion_setup	ao_companion_setup;
+extern uint16_t				ao_companion_data[AO_COMPANION_MAX_CHANNELS];
 
 void
 ao_companion_init(void);

@@ -26,8 +26,8 @@
  * project payload developed at Challenger Middle School.  
  */
 
-volatile __data uint16_t ao_icp3_count = 0;
-volatile __data uint16_t ao_icp3_last = 0;
+volatile uint16_t ao_icp3_count = 0;
+volatile uint16_t ao_icp3_last = 0;
 
 uint16_t ao_icp3(void)
 {
@@ -39,7 +39,7 @@ uint16_t ao_icp3(void)
 }
 
 static void
-ao_pwmin_display(void) __reentrant
+ao_pwmin_display(void) 
 {
 	/* display the most recent value */
 	printf("icp 3: %5u\n", ao_icp3());
@@ -62,7 +62,7 @@ ISR(TIMER3_CAPT_vect)
 	ao_icp3_last = ao_icp3_this;
 }
 
-__code struct ao_cmds ao_pwmin_cmds[] = {
+const struct ao_cmds ao_pwmin_cmds[] = {
 	{ ao_pwmin_display,	"p\0PWM input" },
 	{ 0, NULL },
 };

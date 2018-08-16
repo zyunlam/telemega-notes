@@ -119,11 +119,7 @@ struct ao_adc {
 
 #endif
 
-#define __pdata
-#define __data
-#define __xdata
-#define __code
-#define __reentrant
+#define const
 
 #define HAS_FLIGHT 1
 #define HAS_IGNITE 1

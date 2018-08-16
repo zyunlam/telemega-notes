@@ -1066,7 +1066,7 @@ ao_radio_rx_wait(void)
 }
 
 uint8_t
-ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
+ao_radio_recv(void *d, uint8_t size, uint8_t timeout)
 {
 	uint8_t		len;
 	uint8_t		radio_rssi = 0;

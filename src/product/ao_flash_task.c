@@ -29,7 +29,7 @@ ao_panic(uint8_t reason)
 }
 
 void
-ao_put_string(__code char *s)
+ao_put_string(const char *s)
 {
 	char	c;
 	while ((c = *s++)) {

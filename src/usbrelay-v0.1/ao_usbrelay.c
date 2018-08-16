@@ -45,7 +45,7 @@ ao_relay_control(uint8_t output)
 }
 
 static void
-ao_relay_select(void) __reentrant
+ao_relay_select(void) 
 {
 	uint8_t output;
 
@@ -59,7 +59,7 @@ ao_relay_select(void) __reentrant
 		ao_relay_control(output);
 }
 
-static __code struct ao_cmds ao_relay_cmds[] = {
+static const struct ao_cmds ao_relay_cmds[] = {
 	{ ao_relay_select, "R <output>\0Select relay output" },
 	{ 0, NULL }
 };

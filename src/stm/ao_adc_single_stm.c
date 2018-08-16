@@ -95,7 +95,7 @@ ao_adc_dump(void)
 	AO_ADC_DUMP(&packet);
 }
 
-__code struct ao_cmds ao_adc_cmds[] = {
+const struct ao_cmds ao_adc_cmds[] = {
 	{ ao_adc_dump,	"a\0Display current ADC values" },
 	{ 0, NULL },
 };

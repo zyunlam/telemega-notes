@@ -30,13 +30,13 @@
 #include <ao_tracker.h>
 #endif
 
-__xdata struct ao_config ao_config;
-__pdata uint8_t ao_config_loaded;
-__pdata uint8_t ao_config_dirty;
-__xdata uint8_t ao_config_mutex;
+struct ao_config ao_config;
+uint8_t ao_config_loaded;
+uint8_t ao_config_dirty;
+uint8_t ao_config_mutex;
 
 #if HAS_FORCE_FREQ
-__xdata uint8_t ao_force_freq;
+uint8_t ao_force_freq;
 #endif
 
 #ifndef AO_CONFIG_DEFAULT_APRS_INTERVAL
@@ -100,7 +100,7 @@ ao_config_put(void)
 #if HAS_RADIO
 
 #if HAS_RADIO_FORWARD
-__xdata uint32_t	ao_send_radio_setting;
+uint32_t	ao_send_radio_setting;
 #endif
 
 void
@@ -283,10 +283,10 @@ ao_config_callsign_show(void)
 }
 
 void
-ao_config_callsign_set(void) __reentrant
+ao_config_callsign_set(void) 
 {
 	uint8_t	c;
-	static __xdata char callsign[AO_MAX_CALLSIGN + 1];
+	static char callsign[AO_MAX_CALLSIGN + 1];
 
 	ao_xmemset(callsign, '\0', sizeof callsign);
 	ao_cmd_white();
@@ -309,14 +309,14 @@ ao_config_callsign_set(void) __reentrant
 #if HAS_RADIO
 
 void
-ao_config_frequency_show(void) __reentrant
+ao_config_frequency_show(void) 
 {
 	printf("Frequency: %ld\n",
 	       ao_config.frequency);
 }
 
 void
-ao_config_frequency_set(void) __reentrant
+ao_config_frequency_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -334,14 +334,14 @@ ao_config_frequency_set(void) __reentrant
 
 #if HAS_RADIO_FORWARD
 void
-ao_config_send_frequency_show(void) __reentrant
+ao_config_send_frequency_show(void) 
 {
 	printf("Send frequency: %ld\n",
 	       ao_config.send_frequency);
 }
 
 void
-ao_config_send_frequency_set(void) __reentrant
+ao_config_send_frequency_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -360,14 +360,14 @@ ao_config_send_frequency_set(void) __reentrant
 #if HAS_FLIGHT
 
 void
-ao_config_main_deploy_show(void) __reentrant
+ao_config_main_deploy_show(void) 
 {
 	printf("Main deploy: %d meters\n",
 	       ao_config.main_deploy);
 }
 
 void
-ao_config_main_deploy_set(void) __reentrant
+ao_config_main_deploy_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -379,7 +379,7 @@ ao_config_main_deploy_set(void) __reentrant
 
 #if HAS_ACCEL
 void
-ao_config_accel_calibrate_show(void) __reentrant
+ao_config_accel_calibrate_show(void) 
 {
 	printf("Accel cal +1g: %d -1g: %d\n",
 	       ao_config.accel_plus_g, ao_config.accel_minus_g);
@@ -401,7 +401,7 @@ static int16_t accel_cal_through;
 #endif
 
 static int16_t
-ao_config_accel_calibrate_auto(char *orientation) __reentrant
+ao_config_accel_calibrate_auto(char *orientation) 
 {
 	uint16_t	i;
 	int32_t		accel_total;
@@ -442,7 +442,7 @@ ao_config_accel_calibrate_auto(char *orientation) __reentrant
 }
 
 void
-ao_config_accel_calibrate_set(void) __reentrant
+ao_config_accel_calibrate_set(void) 
 {
 	int16_t	up, down;
 #if HAS_GYRO
@@ -494,14 +494,14 @@ ao_config_accel_calibrate_set(void) __reentrant
 #endif /* HAS_ACCEL */
 
 void
-ao_config_apogee_delay_show(void) __reentrant
+ao_config_apogee_delay_show(void) 
 {
 	printf("Apogee delay: %d seconds\n",
 	       ao_config.apogee_delay);
 }
 
 void
-ao_config_apogee_delay_set(void) __reentrant
+ao_config_apogee_delay_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -512,14 +512,14 @@ ao_config_apogee_delay_set(void) __reentrant
 }
 
 void
-ao_config_apogee_lockout_show(void) __reentrant
+ao_config_apogee_lockout_show(void) 
 {
 	printf ("Apogee lockout: %d seconds\n",
 		ao_config.apogee_lockout);
 }
 
 void
-ao_config_apogee_lockout_set(void) __reentrant
+ao_config_apogee_lockout_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -533,13 +533,13 @@ ao_config_apogee_lockout_set(void) __reentrant
 
 #if HAS_RADIO
 void
-ao_config_radio_cal_show(void) __reentrant
+ao_config_radio_cal_show(void) 
 {
 	printf("Radio cal: %ld\n", ao_config.radio_cal);
 }
 
 void
-ao_config_radio_cal_set(void) __reentrant
+ao_config_radio_cal_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -558,13 +558,13 @@ ao_config_radio_cal_set(void) __reentrant
 #endif
 
 void
-ao_config_radio_rate_show(void) __reentrant
+ao_config_radio_rate_show(void) 
 {
 	printf("Telemetry rate: %d\n", ao_config.radio_rate);
 }
 
 void
-ao_config_radio_rate_set(void) __reentrant
+ao_config_radio_rate_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -588,7 +588,7 @@ ao_config_radio_rate_set(void) __reentrant
 #if HAS_LOG
 
 void
-ao_config_log_show(void) __reentrant
+ao_config_log_show(void) 
 {
 	printf("Max flight log: %d kB\n", (int16_t) (ao_config.flight_log_max >> 10));
 #if FLIGHT_LOG_APPEND
@@ -611,7 +611,7 @@ ao_config_log_fix_append(void)
 #endif
 
 void
-ao_config_log_set(void) __reentrant
+ao_config_log_set(void) 
 {
 #if FLIGHT_LOG_APPEND
 	printf("Flight log fixed size %d kB\n", ao_storage_log_max >> 10);
@@ -639,13 +639,13 @@ ao_config_log_set(void) __reentrant
 
 #if HAS_IGNITE
 void
-ao_config_ignite_mode_show(void) __reentrant
+ao_config_ignite_mode_show(void) 
 {
 	printf("Ignite mode: %d\n", ao_config.ignite_mode);
 }
 
 void
-ao_config_ignite_mode_set(void) __reentrant
+ao_config_ignite_mode_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -658,7 +658,7 @@ ao_config_ignite_mode_set(void) __reentrant
 
 #if HAS_ACCEL
 void
-ao_config_pad_orientation_show(void) __reentrant
+ao_config_pad_orientation_show(void) 
 {
 	printf("Pad orientation: %d\n", ao_config.pad_orientation);
 }
@@ -668,7 +668,7 @@ ao_config_pad_orientation_show(void) __reentrant
 #endif
 
 void
-ao_config_pad_orientation_set(void) __reentrant
+ao_config_pad_orientation_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -688,13 +688,13 @@ ao_config_pad_orientation_set(void) __reentrant
 
 #if HAS_RADIO
 void
-ao_config_radio_enable_show(void) __reentrant
+ao_config_radio_enable_show(void) 
 {
 	printf("Radio enable: %d\n", ao_config.radio_enable);
 }
 
 void
-ao_config_radio_enable_set(void) __reentrant
+ao_config_radio_enable_set(void) 
 {
 	ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -710,10 +710,10 @@ ao_config_radio_enable_set(void) __reentrant
 
 #if HAS_AES
 
-__xdata uint8_t	ao_config_aes_seq = 1;
+uint8_t	ao_config_aes_seq = 1;
 
 void
-ao_config_key_show(void) __reentrant
+ao_config_key_show(void) 
 {
 	uint8_t	i;
 	printf("AES key: ");
@@ -723,7 +723,7 @@ ao_config_key_show(void) __reentrant
 }
 
 void
-ao_config_key_set(void) __reentrant
+ao_config_key_set(void) 
 {
 	uint8_t i;
 
@@ -950,23 +950,23 @@ ao_config_pad_idle_set(void)
 #endif
 
 struct ao_config_var {
-	__code char	*str;
-	void		(*set)(void) __reentrant;
-	void		(*show)(void) __reentrant;
+	const char	*str;
+	void		(*set)(void);
+	void		(*show)(void);
 };
 
 static void
-ao_config_help(void) __reentrant;
+ao_config_help(void);
 
 static void
-ao_config_show(void) __reentrant;
+ao_config_show(void);
 
 #if HAS_EEPROM
 static void
-ao_config_save(void) __reentrant;
+ao_config_save(void);
 #endif
 
-__code struct ao_config_var ao_config_vars[] = {
+const struct ao_config_var ao_config_vars[] = {
 #if HAS_FLIGHT
 	{ "m <meters>\0Main deploy (m)",
 	  ao_config_main_deploy_set,	ao_config_main_deploy_show, },
@@ -1078,7 +1078,7 @@ ao_config_set(void)
 }
 
 static void
-ao_config_help(void) __reentrant
+ao_config_help(void) 
 {
 	uint8_t cmd;
 	for (cmd = 0; ao_config_vars[cmd].str != NULL; cmd++)
@@ -1089,7 +1089,7 @@ ao_config_help(void) __reentrant
 }
 
 static void
-ao_config_show(void) __reentrant
+ao_config_show(void) 
 {
 	uint8_t cmd;
 	ao_config_get();
@@ -1105,7 +1105,7 @@ ao_config_show(void) __reentrant
 
 #if HAS_EEPROM
 static void
-ao_config_save(void) __reentrant
+ao_config_save(void) 
 {
 	uint8_t saved = 0;
 	ao_mutex_get(&ao_config_mutex);
@@ -1122,7 +1122,7 @@ ao_config_save(void) __reentrant
 }
 #endif
 
-__code struct ao_cmds ao_config_cmds[] = {
+const struct ao_cmds ao_config_cmds[] = {
 	{ ao_config_set,	"c <var> <value>\0Set config (? for help, s to show)" },
 	{ 0, NULL },
 };
