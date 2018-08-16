@@ -48,7 +48,7 @@ ao_trng_start(void)
 			 * aren't of poor quality
 			 */
 			ao_delay(delay);
-			trng_running = TRUE;
+			trng_running = true;
 		}
 		ao_mutex_put(&random_mutex);
 	}
@@ -213,7 +213,7 @@ static void ao_trng_suspend(void *arg)
 #ifdef AO_TRNG_ENABLE_PORT
 	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 0);
 #endif
-	trng_running = FALSE;
+	trng_running = false;
 }
 
 static void ao_trng_resume(void *arg)

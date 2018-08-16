@@ -227,8 +227,8 @@ ao_gps_angle(void)
 
 extern enum ao_flight_state ao_flight_state;
 
-#define FALSE 0
-#define TRUE 1
+#define false 0
+#define true 1
 
 volatile struct ao_data ao_data_ring[AO_DATA_RING];
 volatile uint8_t ao_data_head;

@@ -26,7 +26,7 @@ ao_power_register(struct ao_power *power)
 {
 	if (power->registered)
 		return;
-	power->registered = TRUE;
+	power->registered = true;
 	if (tail) {
 		tail->next = power;
 		power->prev = tail;
@@ -44,7 +44,7 @@ ao_power_unregister(struct ao_power *power)
 {
 	if (!power->registered)
 		return;
-	power->registered = FALSE;
+	power->registered = false;
 	if (power->prev)
 		power->prev->next = power->next;
 	else

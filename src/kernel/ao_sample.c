@@ -277,7 +277,7 @@ ao_sample_preflight(void)
 		ao_accel_scale = to_fix_32(GRAVITY * 2 * 16) / ao_accel_2g;
 #endif
 		ao_sample_preflight_set();
-		ao_preflight = FALSE;
+		ao_preflight = false;
 	}
 }
 
@@ -398,5 +398,5 @@ ao_sample_init(void)
 	ao_sample_set_all_orients();
 #endif
 	ao_sample_data = ao_data_head;
-	ao_preflight = TRUE;
+	ao_preflight = true;
 }

@@ -275,7 +275,7 @@ ao_i2c_send(void *block, uint16_t len, uint8_t index, uint8_t stop)
 		stm_i2c->cr1 = AO_STM_I2C_CR1 | (1 << STM_I2C_CR1_STOP);
 		ao_i2c_wait_stop(index);
 	}
-	return TRUE;
+	return true;
 }
 
 void
@@ -300,10 +300,10 @@ uint8_t
 ao_i2c_recv(void *block, uint16_t len, uint8_t index, uint8_t stop)
 {
 	struct stm_i2c	*stm_i2c = ao_i2c_stm_info[index].stm_i2c;
-	uint8_t		ret = TRUE;
+	uint8_t		ret = true;
 
 	if (len == 0)
-		return TRUE;
+		return true;
 	if (len == 1) {
 		ao_i2c_recv_data[index] = block;
 		ao_i2c_recv_len[index] = 1;
