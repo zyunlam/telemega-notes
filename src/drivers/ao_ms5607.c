@@ -45,7 +45,7 @@ ao_ms5607_reset(void) {
 
 	cmd = AO_MS5607_RESET;
 	ao_ms5607_start();
-	ao_spi_send(DATA_TO_XDATA(&cmd), 1, AO_MS5607_SPI_INDEX);
+	ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
 	ao_delay(AO_MS_TO_TICKS(10));
 	ao_ms5607_stop();
 }
@@ -106,7 +106,7 @@ ao_ms5607_prom_read(__xdata struct ao_ms5607_prom *prom)
 	for (addr = 0; addr < 8; addr++) {
 		uint8_t	cmd = AO_MS5607_PROM_READ(addr);
 		ao_ms5607_start();
-		ao_spi_send(DATA_TO_XDATA(&cmd), 1, AO_MS5607_SPI_INDEX);
+		ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
 		ao_spi_recv(r, 2, AO_MS5607_SPI_INDEX);
 		ao_ms5607_stop();
 		r++;
@@ -156,7 +156,7 @@ ao_ms5607_get_sample(uint8_t cmd) {
 	ao_ms5607_done = 0;
 
 	ao_ms5607_start();
-	ao_spi_send(DATA_TO_XDATA(&cmd), 1, AO_MS5607_SPI_INDEX);
+	ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
 
 	ao_exti_enable(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN);
 

@@ -38,17 +38,6 @@ extern char ao_getchar(void);
 #define TRUE 1
 #define FALSE 0
 
-/* Convert a __data pointer into an __xdata pointer */
-#ifndef DATA_TO_XDATA
-#define DATA_TO_XDATA(a)	(a)
-#endif
-#ifndef PDATA_TO_XDATA
-#define PDATA_TO_XDATA(a)	(a)
-#endif
-#ifndef CODE_TO_XDATA
-#define CODE_TO_XDATA(a)	(a)
-#endif
-
 #ifndef HAS_TASK
 #define HAS_TASK	1
 #endif

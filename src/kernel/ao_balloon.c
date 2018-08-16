@@ -96,7 +96,7 @@ ao_flight(void)
 				ao_led_off(AO_LED_RED);
 			}
 			/* wakeup threads due to state change */
-			ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+			ao_wakeup(&ao_flight_state);
 
 			break;
 		case ao_flight_pad:
@@ -118,7 +118,7 @@ ao_flight(void)
 				ao_wakeup(&ao_gps_new);
 #endif
 
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 		default:
