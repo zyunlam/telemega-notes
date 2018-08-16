@@ -38,9 +38,9 @@ ao_watchdog(void)
 static void
 ao_watchdog_set(void)
 {
-	ao_cmd_hex();
+	uint32_t r = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success) {
-		ao_watchdog_enabled = ao_cmd_lex_i != 0;
+		ao_watchdog_enabled = r != 0;
 		ao_wakeup(&ao_watchdog_enabled);
 	}
 }

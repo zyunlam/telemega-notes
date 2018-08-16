@@ -315,11 +315,11 @@ ao_config_frequency_show(void)
 void
 ao_config_frequency_set(void) 
 {
-	ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.frequency = ao_cmd_lex_u32;
+	ao_config.frequency = r;
 	ao_config_set_radio();
 	_ao_config_edit_finish();
 #if HAS_RADIO_RECV
@@ -366,11 +366,11 @@ ao_config_main_deploy_show(void)
 void
 ao_config_main_deploy_set(void) 
 {
-	ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.main_deploy = ao_cmd_lex_i;
+	ao_config.main_deploy = r;
 	_ao_config_edit_finish();
 }
 
@@ -442,16 +442,17 @@ void
 ao_config_accel_calibrate_set(void) 
 {
 	int16_t	up, down;
+	uint16_t r;
 #if HAS_GYRO
 	int16_t	accel_along_up = 0, accel_along_down = 0;
 	int16_t	accel_across_up = 0, accel_across_down = 0;
 	int16_t	accel_through_up = 0, accel_through_down = 0;
 #endif
 
-	ao_cmd_decimal();
+	r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	if (ao_cmd_lex_i == 0) {
+	if (r == 0) {
 		up = ao_config_accel_calibrate_auto("up");
 #if HAS_GYRO
 		accel_along_up = accel_cal_along;
@@ -465,11 +466,11 @@ ao_config_accel_calibrate_set(void)
 		accel_through_down = accel_cal_through;
 #endif
 	} else {
-		up = ao_cmd_lex_i;
-		ao_cmd_decimal();
+		up = r;
+		r = ao_cmd_decimal();
 		if (ao_cmd_status != ao_cmd_success)
 			return;
-		down = ao_cmd_lex_i;
+		down = r;
 	}
 	if (up >= down) {
 		printf("Invalid accel: up (%d) down (%d)\n",
@@ -480,7 +481,7 @@ ao_config_accel_calibrate_set(void)
 	ao_config.accel_plus_g = up;
 	ao_config.accel_minus_g = down;
 #if HAS_GYRO
-	if (ao_cmd_lex_i == 0) {
+	if (r == 0) {
 		ao_config.accel_zero_along = (accel_along_up + accel_along_down) / 2;
 		ao_config.accel_zero_across = (accel_across_up + accel_across_down) / 2;
 		ao_config.accel_zero_through = (accel_through_up + accel_through_down) / 2;
@@ -500,11 +501,11 @@ ao_config_apogee_delay_show(void)
 void
 ao_config_apogee_delay_set(void) 
 {
-	ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.apogee_delay = ao_cmd_lex_i;
+	ao_config.apogee_delay = r;
 	_ao_config_edit_finish();
 }
 
@@ -518,11 +519,11 @@ ao_config_apogee_lockout_show(void)
 void
 ao_config_apogee_lockout_set(void) 
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.apogee_lockout = ao_cmd_lex_i;
+	ao_config.apogee_lockout = r;
 	_ao_config_edit_finish();
 }
 
@@ -538,11 +539,11 @@ ao_config_radio_cal_show(void)
 void
 ao_config_radio_cal_set(void) 
 {
-	ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.radio_cal = ao_cmd_lex_u32;
+	ao_config.radio_cal = r;
 	ao_config_set_radio();
 	_ao_config_edit_finish();
 }
@@ -563,15 +564,15 @@ ao_config_radio_rate_show(void)
 void
 ao_config_radio_rate_set(void) 
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	if (AO_RADIO_RATE_MAX < ao_cmd_lex_i) {
+	if (AO_RADIO_RATE_MAX < r) {
 		ao_cmd_status = ao_cmd_lex_error;
 		return;
 	}
 	_ao_config_edit_start();
-	ao_config.radio_rate = ao_cmd_lex_i;
+	ao_config.radio_rate = r;
 	_ao_config_edit_finish();
 #if HAS_TELEMETRY
 	ao_telemetry_reset_interval();
@@ -615,19 +616,20 @@ ao_config_log_set(void)
 #else
 	uint16_t	block = (uint16_t) (ao_storage_block >> 10);
 	uint16_t	log_max = (uint16_t) (ao_storage_log_max >> 10);
+	uint32_t	r;
 
-	ao_cmd_decimal();
+	r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	if (ao_log_present())
 		printf("Storage must be empty before changing log size\n");
-	else if (block > 1024 && (ao_cmd_lex_i & (block - 1)))
+	else if (block > 1024 && (r & (block - 1)))
 		printf("Flight log size must be multiple of %d kB\n", block);
-	else if (ao_cmd_lex_i > log_max)
+	else if (r > log_max)
 		printf("Flight log max %d kB\n", log_max);
 	else {
 		_ao_config_edit_start();
-		ao_config.flight_log_max = (uint32_t) ao_cmd_lex_i << 10;
+		ao_config.flight_log_max = r << 10;
 		_ao_config_edit_finish();
 	}
 #endif
@@ -644,11 +646,11 @@ ao_config_ignite_mode_show(void)
 void
 ao_config_ignite_mode_set(void) 
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.ignite_mode = ao_cmd_lex_i;
+	ao_config.ignite_mode = r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -667,18 +669,17 @@ ao_config_pad_orientation_show(void)
 void
 ao_config_pad_orientation_set(void) 
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal() & 1;
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_cmd_lex_i &= 1;
-	if (ao_config.pad_orientation != ao_cmd_lex_i) {
+	if (ao_config.pad_orientation != r) {
 		int16_t t;
 		t = ao_config.accel_plus_g;
 		ao_config.accel_plus_g = AO_ACCEL_INVERT - ao_config.accel_minus_g;
 		ao_config.accel_minus_g = AO_ACCEL_INVERT - t;
 	}
-	ao_config.pad_orientation = ao_cmd_lex_i;
+	ao_config.pad_orientation = r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -693,11 +694,11 @@ ao_config_radio_enable_show(void)
 void
 ao_config_radio_enable_set(void) 
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.radio_enable = ao_cmd_lex_i;
+	ao_config.radio_enable = r;
 	_ao_config_edit_finish();
 #if HAS_TELEMETRY && HAS_RADIO_RATE
 	ao_telemetry_reset_interval();
@@ -726,10 +727,10 @@ ao_config_key_set(void)
 
 	_ao_config_edit_start();
 	for (i = 0; i < AO_AES_LEN; i++) {
-		ao_cmd_hexbyte();
+		uint8_t b = ao_cmd_hexbyte();
 		if (ao_cmd_status != ao_cmd_success)
 			break;
-		ao_config.aes_key[i] = ao_cmd_lex_i;
+		ao_config.aes_key[i] = b;
 	}
 	++ao_config_aes_seq;
 	_ao_config_edit_finish();
@@ -747,11 +748,11 @@ ao_config_aprs_show(void)
 void
 ao_config_aprs_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.aprs_interval = ao_cmd_lex_i;
+	ao_config.aprs_interval = r;
 	_ao_config_edit_finish();
 	ao_telemetry_reset_interval();
 }
@@ -769,11 +770,11 @@ ao_config_radio_amp_show(void)
 void
 ao_config_radio_amp_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.radio_amp = ao_cmd_lex_i;
+	ao_config.radio_amp = r;
 	_ao_config_edit_finish();
 }
 
@@ -790,11 +791,11 @@ ao_config_radio_power_show(void)
 void
 ao_config_radio_power_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.radio_power = ao_cmd_lex_i;
+	ao_config.radio_power = r;
 	_ao_config_edit_finish();
 }
 
@@ -810,11 +811,11 @@ ao_config_beep_show(void)
 void
 ao_config_beep_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.mid_beep = ao_cmd_lex_i;
+	ao_config.mid_beep = r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -832,14 +833,12 @@ void
 ao_config_tracker_set(void)
 {
 	uint16_t	m, i;
-	ao_cmd_decimal();
+	m = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	m = ao_cmd_lex_i;
-	ao_cmd_decimal();
+	i = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	i = ao_cmd_lex_i;
 	_ao_config_edit_start();
 	ao_config.tracker_motion = m;
 	ao_config.tracker_interval = i;
@@ -860,11 +859,11 @@ ao_config_pyro_time_show(void)
 void
 ao_config_pyro_time_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.pyro_time = ao_cmd_lex_i;
+	ao_config.pyro_time = r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -880,26 +879,26 @@ ao_config_aprs_ssid_show(void)
 void
 ao_config_aprs_ssid_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	if (15 < ao_cmd_lex_i) {
+	if (15 < r) {
 		ao_cmd_status = ao_cmd_lex_error;
 		return;
 	}
 	_ao_config_edit_start();
-	ao_config.aprs_ssid = ao_cmd_lex_i;
+	ao_config.aprs_ssid = r;
 	_ao_config_edit_finish();
 }
 
 void
 ao_config_aprs_format_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.aprs_format = ao_cmd_lex_i != 0;
+	ao_config.aprs_format = r != 0;
 	_ao_config_edit_finish();
 }
 
@@ -920,11 +919,11 @@ ao_config_pad_box_show(void)
 void
 ao_config_pad_box_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.pad_box = ao_cmd_lex_i;
+	ao_config.pad_box = r;
 	_ao_config_edit_finish();
 }
 
@@ -937,11 +936,11 @@ ao_config_pad_idle_show(void)
 void
 ao_config_pad_idle_set(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.pad_idle = ao_cmd_lex_i;
+	ao_config.pad_idle = r;
 	_ao_config_edit_finish();
 }
 #endif

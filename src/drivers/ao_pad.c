@@ -509,16 +509,14 @@ ao_pad_manual(void)
 	ao_cmd_white();
 	if (!ao_match_word("DoIt"))
 		return;
-	ao_cmd_decimal();
+	ignite = 1 << ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ignite = 1 << ao_cmd_lex_i;
-	ao_cmd_decimal();
+	repeat = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success) {
 		repeat = 1;
 		ao_cmd_status = ao_cmd_success;
-	} else
-		repeat = ao_cmd_lex_i;
+	}
 	while (repeat-- > 0) {
 		ao_pad_ignite = ignite;
 		ao_wakeup(&ao_pad_ignite);
@@ -534,9 +532,9 @@ static struct ao_task ao_pad_monitor_task;
 void
 ao_pad_set_debug(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_pad_debug = ao_cmd_lex_i != 0;
+		ao_pad_debug = r != 0;
 }
 
 
@@ -544,14 +542,12 @@ static void
 ao_pad_alarm_debug(void)
 {
 	uint8_t	which, value;
-	ao_cmd_decimal();
+	which = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	which = ao_cmd_lex_i;
-	ao_cmd_decimal();
+	value = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	value = ao_cmd_lex_i;
 	printf ("Set %s to %d\n", which ? "siren" : "strobe", value);
 	if (which)
 		ao_siren(value);

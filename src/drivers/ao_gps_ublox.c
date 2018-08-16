@@ -783,12 +783,12 @@ ao_gps(void)
 #if AO_UBLOX_DEBUG
 static void ao_gps_option(void)
 {
-	ao_cmd_hex();
+	uint16_t r = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success) {
 		ao_cmd_status = ao_cmd_success;
 		ao_gps_show();
 	} else {
-		ao_gps_dbg_enable = ao_cmd_lex_i;
+		ao_gps_dbg_enable = r;
 		printf ("gps debug set to %d\n", ao_gps_dbg_enable);
 	}
 }

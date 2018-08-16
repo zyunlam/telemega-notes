@@ -437,10 +437,9 @@ ao_log_delete(void)
 		cmd_flight = -1;
 		ao_cmd_lex();
 	}
-	ao_cmd_decimal();
+	cmd_flight *= ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	cmd_flight *= (int16_t) ao_cmd_lex_i;
 
 	slots = ao_log_slots();
 	/* Look for the flight log matching the requested flight */

@@ -72,11 +72,11 @@ ao_led_set_mask(uint8_t colors, uint8_t mask)
 static void
 ao_led_test(void)
 {
-	ao_cmd_hexbyte();
+	AO_LED_TYPE r = ao_cmd_hexbyte();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ao_led_set(ao_cmd_lex_i);
-	printf("LEDs set to %02x\n", ao_cmd_lex_i);
+	ao_led_set(r);
+	printf("LEDs set to %x\n", r);
 }
 
 static const struct ao_cmds ao_led_cmds[] = {

@@ -29,8 +29,7 @@ ao_send_packet(void)
 	uint8_t b;
 	uint8_t	i;
 
-	ao_cmd_hex();
-	count = ao_cmd_lex_i;
+	count = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	if (count > AO_MAX_SEND - 2) {

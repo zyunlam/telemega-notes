@@ -33,10 +33,8 @@ static uint16_t	tick_offset;
 static void
 lco_args(void) 
 {
-	ao_cmd_decimal();
-	lco_box = ao_cmd_lex_i;
-	ao_cmd_hex();
-	lco_channels = ao_cmd_lex_i;
+	lco_box = ao_cmd_decimal();
+	lco_channels = ao_cmd_hex();
 }
 
 static struct ao_pad_query	ao_pad_query;
@@ -129,8 +127,7 @@ lco_fire_cmd(void)
 	int8_t		r;
 
 	lco_args();
-	ao_cmd_decimal();
-	secs = ao_cmd_lex_i;
+	secs = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	r = lco_query();
@@ -163,8 +160,7 @@ lco_static_cmd(void)
 	int8_t		r;
 
 	lco_args();
-	ao_cmd_decimal();
-	secs = ao_cmd_lex_i;
+	secs = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	r = lco_query();

@@ -92,15 +92,16 @@ static uint8_t storage_data[128];
 static void
 ao_storage_dump(void) 
 {
+	uint32_t block;
 	uint8_t i, j;
 
-	ao_cmd_hex();
+	block = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	for (i = 0; ; i += 8) {
-		if (ao_storage_read(((uint32_t) (ao_cmd_lex_i) << 8) + i,
-				  storage_data,
-				  8)) {
+		if (ao_storage_read((block << 8) + i,
+				    storage_data,
+				    8)) {
 			ao_cmd_put16((uint16_t) i);
 			for (j = 0; j < 8; j++) {
 				putchar(' ');
@@ -123,23 +124,19 @@ ao_storage_store(void)
 	uint16_t block;
 	uint8_t i;
 	uint16_t len;
-	static uint8_t b;
+	uint8_t b;
 	uint32_t addr;
 
-	ao_cmd_hex();
-	block = ao_cmd_lex_i;
-	ao_cmd_hex();
-	i = ao_cmd_lex_i;
+	block = ao_cmd_hex();
+	i = ao_cmd_hex();
 	addr = ((uint32_t) block << 8) | i;
-	ao_cmd_hex();
-	len = ao_cmd_lex_i;
+	len = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	while (len--) {
-		ao_cmd_hex();
+		b = ao_cmd_hexbyte();
 		if (ao_cmd_status != ao_cmd_success)
 			return;
-		b = ao_cmd_lex_i;
 		ao_storage_write(addr, &b, 1);
 		addr++;
 	}
@@ -149,10 +146,10 @@ ao_storage_store(void)
 void
 ao_storage_zap(void) 
 {
-	ao_cmd_hex();
+	uint32_t v = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ao_storage_erase((uint32_t) ao_cmd_lex_i << 8);
+	ao_storage_erase((uint32_t) v << 8);
 }
 
 void

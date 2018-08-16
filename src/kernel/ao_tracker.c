@@ -211,9 +211,9 @@ static struct ao_task ao_tracker_task;
 static void
 ao_tracker_set_telem(void)
 {
-	ao_cmd_hex();
+	uint16_t r = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_tracker_force_telem = ao_cmd_lex_i;
+		ao_tracker_force_telem = r;
 	ao_cmd_status = ao_cmd_success;
 	printf ("flight: %d\n", ao_flight_number);
 	printf ("force_telem: %d\n", ao_tracker_force_telem);
