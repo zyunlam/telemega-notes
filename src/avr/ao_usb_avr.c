@@ -27,7 +27,7 @@
 #define debug(format, args...)
 #endif
 
-struct ao_task __xdata ao_usb_task;
+struct ao_task ao_usb_task;
 
 struct ao_usb_setup {
 	uint8_t		dir_type_recip;
@@ -35,21 +35,21 @@ struct ao_usb_setup {
 	uint16_t	value;
 	uint16_t	index;
 	uint16_t	length;
-} __xdata ao_usb_setup;
+} ao_usb_setup;
 
-static __xdata uint8_t 	ao_usb_ep0_state;
-static const uint8_t * __xdata ao_usb_ep0_in_data;
-static __xdata uint8_t 	ao_usb_ep0_in_len;
-static __xdata uint8_t	ao_usb_ep0_in_pending;
-static __xdata uint8_t	ao_usb_addr_pending;
-static __xdata uint8_t	ao_usb_ep0_in_buf[2];
-static __xdata uint8_t 	ao_usb_ep0_out_len;
-static __xdata uint8_t *__xdata ao_usb_ep0_out_data;
+static uint8_t 	ao_usb_ep0_state;
+static const uint8_t * ao_usb_ep0_in_data;
+static uint8_t 	ao_usb_ep0_in_len;
+static uint8_t	ao_usb_ep0_in_pending;
+static uint8_t	ao_usb_addr_pending;
+static uint8_t	ao_usb_ep0_in_buf[2];
+static uint8_t 	ao_usb_ep0_out_len;
+static uint8_t *ao_usb_ep0_out_data;
 
-static __xdata uint8_t	ao_usb_in_flushed;
-__xdata uint8_t		ao_usb_running;
-static __xdata uint8_t	ao_usb_configuration;
-static __xdata uint8_t	ueienx_0;
+static uint8_t	ao_usb_in_flushed;
+uint8_t		ao_usb_running;
+static uint8_t	ao_usb_configuration;
+static uint8_t	ueienx_0;
 
 void
 ao_usb_set_address(uint8_t address)
@@ -143,9 +143,9 @@ struct ao_usb_line_coding ao_usb_line_coding = {115200, 0, 0, 8};
 static void
 ao_usb_get_descriptor(uint16_t value)
 {
-	const uint8_t		*__xdata descriptor;
-	__xdata uint8_t		type = value >> 8;
-	__xdata uint8_t		index = value;
+	const uint8_t		*descriptor;
+	uint8_t		type = value >> 8;
+	uint8_t		index = value;
 
 	descriptor = ao_usb_descriptors;
 	while (descriptor[0] != 0) {
@@ -174,7 +174,7 @@ ao_usb_ep0_set_in_pending(uint8_t in_pending)
 static void
 ao_usb_ep0_flush(void)
 {
-	__xdata uint8_t this_len;
+	uint8_t this_len;
 
 	cli();
 	UENUM = 0;
@@ -242,7 +242,7 @@ static void
 ao_usb_ep0_setup(void)
 {
 	/* Pull the setup packet out of the fifo */
-	ao_usb_ep0_out_data = (__xdata uint8_t *) &ao_usb_setup;
+	ao_usb_ep0_out_data = (uint8_t *) &ao_usb_setup;
 	ao_usb_ep0_out_len = 8;
 	ao_usb_ep0_fill(8, (1 << RXSTPI) | (1 << RXOUTI) | (1 << TXINI));
 	if (ao_usb_ep0_out_len != 0) {
@@ -334,7 +334,7 @@ ao_usb_ep0_setup(void)
 		case AO_USB_SET_LINE_CODING:
 			debug ("set line coding\n");
 			ao_usb_ep0_out_len = 7;
-			ao_usb_ep0_out_data = (__xdata uint8_t *) &ao_usb_line_coding;
+			ao_usb_ep0_out_data = (uint8_t *) &ao_usb_line_coding;
 			break;
 		case AO_USB_GET_LINE_CODING:
 			debug ("get line coding\n");
@@ -636,7 +636,7 @@ ao_usb_enable(void)
 }
 
 #if USB_DEBUG
-struct ao_task __xdata ao_usb_echo_task;
+struct ao_task ao_usb_echo_task;
 
 static void
 ao_usb_echo(void)

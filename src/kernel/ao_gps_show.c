@@ -23,7 +23,7 @@
 #include <ao_data.h>
 
 void
-ao_gps_show(void) __reentrant
+ao_gps_show(void) 
 {
 	uint8_t	i;
 	ao_mutex_get(&ao_gps_mutex);

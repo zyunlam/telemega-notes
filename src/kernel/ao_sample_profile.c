@@ -160,7 +160,7 @@ ao_sample_profile_cmd(void)
 	}
 }
 
-static __code struct ao_cmds ao_sample_profile_cmds[] = {
+static const struct ao_cmds ao_sample_profile_cmds[] = {
 	{ ao_sample_profile_cmd,	"S <1 start,0 stop, d dump,c clear>\0Sample profile" },
 	{ 0, NULL }
 };

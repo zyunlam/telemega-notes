@@ -27,7 +27,7 @@
 uint8_t
 ao_74hc497_read(void)
 {
-	static __xdata state;
+	static state;
 	ao_spi_get_bit(AO_74HC497_CS_PORT, AO_74HC497_CS_PIN, AO_74HC497_CS, AO_74HC497_SPI_BUS, AO_SPI_SPEED_FAST);
 	ao_spi_recv(&state, 1, AO_74HC497_SPI_BUS);
 	ao_spi_put_bit(AO_74HC497_CS_PORT, AO_74HC497_CS_PIN, AO_74HC497_CS, AO_74HC497_SPI_BUS);

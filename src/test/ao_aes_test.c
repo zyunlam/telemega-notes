@@ -16,11 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#define __pdata
-#define __data
-#define __xdata
-#define __code
-#define __reentrant
+#define const
 
 #include <string.h>
 #include <stdio.h>

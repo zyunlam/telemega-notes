@@ -180,7 +180,7 @@ ao_adc_one(void)
 }
 #endif
 
-__code struct ao_cmds ao_adc_cmds[] = {
+const struct ao_cmds ao_adc_cmds[] = {
 	{ ao_adc_dump,	"a\0Display current ADC values" },
 #if AO_ADC_DEBUG
 	{ ao_adc_one,	"A ch\0Display one ADC channel" },

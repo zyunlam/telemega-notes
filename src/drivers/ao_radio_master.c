@@ -21,15 +21,15 @@
 #include <ao_exti.h>
 #include <ao_radio_cmac.h>
 
-static __xdata struct ao_radio_spi_reply	ao_radio_spi_reply;
-static __xdata struct ao_radio_spi_request	ao_radio_spi_request;
-static volatile __xdata uint8_t			ao_radio_wait_mode;
-static volatile __xdata uint8_t			ao_radio_done = 0;
-static volatile __xdata uint8_t			ao_radio_ready = 1;
-static __xdata uint8_t				ao_radio_mutex;
-static __xdata uint8_t				ao_radio_aes_seq;
+static struct ao_radio_spi_reply	ao_radio_spi_reply;
+static struct ao_radio_spi_request	ao_radio_spi_request;
+static volatile uint8_t			ao_radio_wait_mode;
+static volatile uint8_t			ao_radio_done = 0;
+static volatile uint8_t			ao_radio_ready = 1;
+static uint8_t				ao_radio_mutex;
+static uint8_t				ao_radio_aes_seq;
 
-__xdata int8_t					ao_radio_cmac_rssi;
+int8_t					ao_radio_cmac_rssi;
 
 #if 0
 #define PRINTD(...) do { printf ("\r%5u %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } while(0)
@@ -126,7 +126,7 @@ ao_radio_put(void)
 }
 
 static void
-ao_radio_get_data(__xdata void *d, uint8_t size)
+ao_radio_get_data(void *d, uint8_t size)
 {
 	PRINTD ("fetch\n");
 	ao_radio_master_start();
@@ -157,7 +157,7 @@ ao_radio_send(const void *d, uint8_t size)
 
 
 uint8_t
-ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
+ao_radio_recv(void *d, uint8_t size, uint8_t timeout)
 {
 	int8_t	ret;
 	uint8_t	recv;
@@ -198,7 +198,7 @@ ao_radio_cmac_set_key(void)
 }
 
 int8_t
-ao_radio_cmac_send(__xdata void *packet, uint8_t len) __reentrant
+ao_radio_cmac_send(void *packet, uint8_t len) 
 {
 	if (len > AO_CMAC_MAX_LEN)
 		return AO_RADIO_CMAC_LEN_ERROR;
@@ -220,7 +220,7 @@ ao_radio_cmac_send(__xdata void *packet, uint8_t len) __reentrant
 }
 
 int8_t
-ao_radio_cmac_recv(__xdata void *packet, uint8_t len, uint16_t timeout) __reentrant
+ao_radio_cmac_recv(void *packet, uint8_t len, uint16_t timeout) 
 {
 	int8_t	ret;
 	int8_t	recv;
@@ -296,7 +296,7 @@ ao_radio_test_cmd(void)
 		ao_radio_test(0);
 }
 
-__code struct ao_cmds ao_radio_cmds[] = {
+const struct ao_cmds ao_radio_cmds[] = {
 	{ ao_radio_test_cmd,	"C <1 start, 0 stop, none both>\0Radio carrier test" },
 	{ 0,	NULL },
 };

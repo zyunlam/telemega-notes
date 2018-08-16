@@ -15,11 +15,7 @@
 #ifndef _AO_EEPROM_READ_H_
 #define _AO_EEPROM_READ_H_
 
-#define __pdata
-#define __data
-#define __xdata
-#define __code
-#define __reentrant
+#define const
 
 #include <stdint.h>
 #include <stdio.h>

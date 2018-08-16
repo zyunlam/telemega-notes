@@ -75,10 +75,10 @@ SECTIONS {
 	/* Data -- relocated to RAM, but written to ROM
 	 */
 	.data : {
-		__data_start__ = .;
+		_start__ = .;
 		*(.data)	/* initialized data */
 		. = ALIGN(4);
-		__data_end__ = .;
+		_end__ = .;
 	} >ram AT>rom
 
 	.bss : {

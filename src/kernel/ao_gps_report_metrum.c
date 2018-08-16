@@ -22,9 +22,9 @@
 void
 ao_gps_report_metrum(void)
 {
-	static __xdata struct ao_log_metrum		gps_log;
-	static __xdata struct ao_telemetry_location	gps_data;
-	static __xdata struct ao_telemetry_satellite	gps_tracking_data;
+	static struct ao_log_metrum		gps_log;
+	static struct ao_telemetry_location	gps_data;
+	static struct ao_telemetry_satellite	gps_tracking_data;
 	uint8_t	c, n, i;
 	uint8_t svid;
 	uint8_t new;
@@ -88,7 +88,7 @@ ao_gps_report_metrum(void)
 	}
 }
 
-__xdata struct ao_task ao_gps_report_metrum_task;
+struct ao_task ao_gps_report_metrum_task;
 
 void
 ao_gps_report_metrum_init(void)

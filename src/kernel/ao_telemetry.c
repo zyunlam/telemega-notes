@@ -20,10 +20,10 @@
 #include "ao_log.h"
 #include "ao_product.h"
 
-static __pdata uint16_t ao_telemetry_interval;
+static uint16_t ao_telemetry_interval;
 
 #if HAS_RADIO_RATE
-static __xdata uint16_t ao_telemetry_desired_interval;
+static uint16_t ao_telemetry_desired_interval;
 #endif
 
 /* TeleMetrum v1.0 just doesn't have enough space to
@@ -37,10 +37,10 @@ static __xdata uint16_t ao_telemetry_desired_interval;
 
 #ifdef SIMPLIFY
 #define ao_telemetry_time time
-#define RDF_SPACE	__pdata
+#define RDF_SPACE	
 #else
-#define RDF_SPACE	__xdata
-static __pdata uint16_t ao_telemetry_time;
+#define RDF_SPACE	
+static uint16_t ao_telemetry_time;
 #endif
 
 #if HAS_RDF
@@ -49,7 +49,7 @@ static RDF_SPACE uint16_t ao_rdf_time;
 #endif
 
 #if HAS_APRS
-static __pdata uint16_t ao_aprs_time;
+static uint16_t ao_aprs_time;
 
 #include <ao_aprs.h>
 #endif
@@ -74,7 +74,7 @@ static __pdata uint16_t ao_aprs_time;
 #define AO_TELEMETRY_SENSOR	AO_TELEMETRY_SENSOR_TELENANO
 #endif
 
-static __xdata union ao_telemetry_all	telemetry;
+static union ao_telemetry_all	telemetry;
 
 static void
 ao_telemetry_send(void)
@@ -88,7 +88,7 @@ ao_telemetry_send(void)
 static void
 ao_send_sensor(void)
 {
-	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_SENSOR;
@@ -136,7 +136,7 @@ ao_send_sensor(void)
 static void
 ao_send_mega_sensor(void)
 {
-	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_MEGA_SENSOR;
@@ -181,15 +181,15 @@ ao_send_mega_sensor(void)
 	ao_telemetry_send();
 }
 
-static __pdata int8_t ao_telemetry_mega_data_max;
-static __pdata int8_t ao_telemetry_mega_data_cur;
+static int8_t ao_telemetry_mega_data_max;
+static int8_t ao_telemetry_mega_data_cur;
 
 /* Send mega data packet */
 static void
 ao_send_mega_data(void)
 {
 	if (--ao_telemetry_mega_data_cur <= 0) {
-		__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+			struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 		uint8_t	i;
 
 		telemetry.generic.tick = packet->tick;
@@ -223,7 +223,7 @@ ao_send_mega_data(void)
 static void
 ao_send_metrum_sensor(void)
 {
-	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_METRUM_SENSOR;
@@ -246,15 +246,15 @@ ao_send_metrum_sensor(void)
 	ao_telemetry_send();
 }
 
-static __pdata int8_t ao_telemetry_metrum_data_max;
-static __pdata int8_t ao_telemetry_metrum_data_cur;
+static int8_t ao_telemetry_metrum_data_max;
+static int8_t ao_telemetry_metrum_data_cur;
 
 /* Send telemetrum data packet */
 static void
 ao_send_metrum_data(void)
 {
 	if (--ao_telemetry_metrum_data_cur <= 0) {
-		__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+			struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 		telemetry.generic.tick = packet->tick;
 		telemetry.generic.type = AO_TELEMETRY_METRUM_DATA;
@@ -281,7 +281,7 @@ ao_send_metrum_data(void)
 static void
 ao_send_mini(void)
 {
-	__xdata	struct ao_data *packet = (__xdata struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 	telemetry.generic.tick = packet->tick;
 	telemetry.generic.type = AO_SEND_MINI;
@@ -306,9 +306,9 @@ ao_send_mini(void)
 
 #endif /* AO_SEND_MINI */
 
-static __pdata int8_t ao_telemetry_config_max;
-static __pdata int8_t ao_telemetry_config_cur;
-static __pdata uint16_t ao_telemetry_flight_number;
+static int8_t ao_telemetry_config_max;
+static int8_t ao_telemetry_config_cur;
+static uint16_t ao_telemetry_flight_number;
 
 #ifndef ao_telemetry_battery_convert
 #define ao_telemetry_battery_convert(a) (a)
@@ -346,9 +346,9 @@ ao_send_configuration(void)
 
 #if HAS_GPS
 
-static __pdata int8_t ao_telemetry_gps_max;
-static __pdata int8_t ao_telemetry_loc_cur;
-static __pdata int8_t ao_telemetry_sat_cur;
+static int8_t ao_telemetry_gps_max;
+static int8_t ao_telemetry_loc_cur;
+static int8_t ao_telemetry_sat_cur;
 
 static void
 ao_send_location(void)
@@ -387,8 +387,8 @@ ao_send_satellite(void)
 
 #if HAS_COMPANION
 
-static __pdata int8_t ao_telemetry_companion_max;
-static __pdata int8_t ao_telemetry_companion_cur;
+static int8_t ao_telemetry_companion_max;
+static int8_t ao_telemetry_companion_cur;
 
 static void
 ao_send_companion(void)
@@ -536,7 +536,7 @@ ao_telemetry_set_interval(uint16_t interval)
 #if HAS_RADIO_RATE
 	/* Limit max telemetry rate based on available radio bandwidth.
 	 */
-	static __xdata const uint16_t min_interval[] = {
+	static const uint16_t min_interval[] = {
 		/* [AO_RADIO_RATE_38400] = */ AO_MS_TO_TICKS(100),
 		/* [AO_RADIO_RATE_9600] = */ AO_MS_TO_TICKS(500),
 		/* [AO_RADIO_RATE_2400] = */ AO_MS_TO_TICKS(1000)
@@ -613,7 +613,7 @@ ao_rdf_set(uint8_t rdf)
 }
 #endif
 
-__xdata struct ao_task	ao_telemetry_task;
+struct ao_task	ao_telemetry_task;
 
 void
 ao_telemetry_init()

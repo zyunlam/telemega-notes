@@ -31,10 +31,10 @@
 typedef ao_storage_pos_t ao_pos_t;
 
 /* Total bytes of available storage */
-extern __pdata ao_pos_t	ao_storage_total;
+extern ao_pos_t	ao_storage_total;
 
 /* Block size - device is erased in these units. At least 256 bytes */
-extern __pdata ao_pos_t	ao_storage_block;
+extern ao_pos_t	ao_storage_block;
 
 #ifndef USE_STORAGE_CONFIG
 #define USE_STORAGE_CONFIG 1
@@ -42,7 +42,7 @@ extern __pdata ao_pos_t	ao_storage_block;
 
 #if USE_STORAGE_CONFIG
 /* Byte offset of config block. Will be ao_storage_block bytes long */
-extern __pdata ao_pos_t	ao_storage_config;
+extern ao_pos_t	ao_storage_config;
 
 #define ao_storage_log_max	ao_storage_config
 #else
@@ -50,27 +50,27 @@ extern __pdata ao_pos_t	ao_storage_config;
 #endif
 
 /* Storage unit size - device reads and writes must be within blocks of this size. Usually 256 bytes. */
-extern __pdata uint16_t ao_storage_unit;
+extern uint16_t ao_storage_unit;
 
 /* Initialize above values. Can only be called once the OS is running */
 void
-ao_storage_setup(void) __reentrant;
+ao_storage_setup(void);
 
 /* Write data. Returns 0 on failure, 1 on success */
 uint8_t
-ao_storage_write(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant;
+ao_storage_write(ao_pos_t pos, void *buf, uint16_t len);
 
 /* Read data. Returns 0 on failure, 1 on success */
 uint8_t
-ao_storage_read(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant;
+ao_storage_read(ao_pos_t pos, void *buf, uint16_t len);
 
 /* Erase a block of storage. This always clears ao_storage_block bytes */
 uint8_t
-ao_storage_erase(ao_pos_t pos) __reentrant;
+ao_storage_erase(ao_pos_t pos);
 
 /* Flush any pending writes to stable storage */
 void
-ao_storage_flush(void) __reentrant;
+ao_storage_flush(void);
 
 /* Initialize the storage code */
 void
@@ -82,11 +82,11 @@ ao_storage_init(void);
 
 /* Read data within a storage unit */
 uint8_t
-ao_storage_device_read(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant;
+ao_storage_device_read(ao_pos_t pos, void *buf, uint16_t len);
 
 /* Write data within a storage unit */
 uint8_t
-ao_storage_device_write(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant;
+ao_storage_device_write(ao_pos_t pos, void *buf, uint16_t len);
 
 /* Initialize low-level device bits */
 void
@@ -94,6 +94,6 @@ ao_storage_device_init(void);
 
 /* Print out information about flash chips */
 void
-ao_storage_device_info(void) __reentrant;
+ao_storage_device_info(void);
 
 #endif /* _AO_STORAGE_H_ */

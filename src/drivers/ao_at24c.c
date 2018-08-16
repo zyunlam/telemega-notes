@@ -25,10 +25,10 @@
 #define AO_AT24C_PAGE_LEN	128
 
 /* Total bytes of available storage */
-__pdata ao_pos_t	ao_storage_total = 64l * 1024l;
+ao_pos_t	ao_storage_total = 64l * 1024l;
 
 /* Storage unit size - device reads and writes must be within blocks of this size. */
-__pdata uint16_t	ao_storage_unit = 128;
+uint16_t	ao_storage_unit = 128;
 
 static void
 ao_at24c_set_address(uint8_t addr, ao_pos_t pos)
@@ -45,7 +45,7 @@ ao_at24c_set_address(uint8_t addr, ao_pos_t pos)
  * Erase the specified sector
  */
 uint8_t
-ao_storage_erase(ao_pos_t pos) __reentrant
+ao_storage_erase(ao_pos_t pos) 
 {
 	if (pos >= ao_storage_total || pos + AO_AT24C_PAGE_LEN > ao_storage_total)
 		return 0;
@@ -61,7 +61,7 @@ ao_storage_erase(ao_pos_t pos) __reentrant
  * Write to flash
  */
 uint8_t
-ao_storage_device_write(ao_pos_t pos, __xdata void *d, uint16_t len) __reentrant
+ao_storage_device_write(ao_pos_t pos, void *d, uint16_t len) 
 {
 	if (pos >= ao_storage_total || pos + len > ao_storage_total)
 		return 0;
@@ -77,7 +77,7 @@ ao_storage_device_write(ao_pos_t pos, __xdata void *d, uint16_t len) __reentrant
  * Read from flash
  */
 uint8_t
-ao_storage_device_read(ao_pos_t pos, __xdata void *d, uint16_t len) __reentrant
+ao_storage_device_read(ao_pos_t pos, void *d, uint16_t len) 
 {
 	if (pos >= ao_storage_total || pos + len > ao_storage_total)
 		return 0;
@@ -89,7 +89,7 @@ ao_storage_device_read(ao_pos_t pos, __xdata void *d, uint16_t len) __reentrant
 }
 
 void
-ao_storage_flush(void) __reentrant
+ao_storage_flush(void) 
 {
 }
 

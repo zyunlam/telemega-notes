@@ -147,7 +147,7 @@ ao_adc_poll(void)
 }
 
 static void
-ao_adc_dump(void) __reentrant
+ao_adc_dump(void) 
 {
 	struct ao_data	packet;
 #ifndef AO_ADC_DUMP
@@ -167,7 +167,7 @@ ao_adc_dump(void) __reentrant
 #endif
 }
 
-__code struct ao_cmds ao_adc_cmds[] = {
+const struct ao_cmds ao_adc_cmds[] = {
 	{ ao_adc_dump,	"a\0Display current ADC values" },
 	{ 0, NULL },
 };

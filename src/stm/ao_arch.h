@@ -41,11 +41,6 @@
 
 #define ao_arch_naked_declare	__attribute__((naked))
 #define ao_arch_naked_define
-#define __pdata
-#define __data
-#define __xdata
-#define __code const
-#define __reentrant
 #define __interrupt(n)
 #define __at(n)
 

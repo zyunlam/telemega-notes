@@ -259,7 +259,7 @@ ao_mma655x_dump(void)
 	printf ("MMA655X value %d\n", ao_mma655x_current);
 }
 
-__code struct ao_cmds ao_mma655x_cmds[] = {
+const struct ao_cmds ao_mma655x_cmds[] = {
 	{ ao_mma655x_dump,	"A\0Display MMA655X data" },
 	{ 0, NULL },
 };
@@ -277,7 +277,7 @@ ao_mma655x(void)
 	}
 }
 
-static __xdata struct ao_task ao_mma655x_task;
+static struct ao_task ao_mma655x_task;
 
 void
 ao_mma655x_init(void)

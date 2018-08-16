@@ -35,63 +35,63 @@
 #define ACCEL_TYPE int16_t
 #endif
 
-__pdata uint16_t	ao_sample_tick;		/* time of last data */
-__pdata pres_t		ao_sample_pres;
-__pdata alt_t		ao_sample_alt;
-__pdata alt_t		ao_sample_height;
+uint16_t	ao_sample_tick;		/* time of last data */
+pres_t		ao_sample_pres;
+alt_t		ao_sample_alt;
+alt_t		ao_sample_height;
 #if HAS_ACCEL
-__pdata accel_t		ao_sample_accel;
+accel_t		ao_sample_accel;
 #endif
 #if HAS_GYRO
-__pdata accel_t		ao_sample_accel_along;
-__pdata accel_t		ao_sample_accel_across;
-__pdata accel_t		ao_sample_accel_through;
-__pdata gyro_t		ao_sample_roll;
-__pdata gyro_t		ao_sample_pitch;
-__pdata gyro_t		ao_sample_yaw;
-__pdata angle_t		ao_sample_orient;
-__pdata angle_t		ao_sample_orients[AO_NUM_ORIENT];
-__pdata uint8_t		ao_sample_orient_pos;
+accel_t		ao_sample_accel_along;
+accel_t		ao_sample_accel_across;
+accel_t		ao_sample_accel_through;
+gyro_t		ao_sample_roll;
+gyro_t		ao_sample_pitch;
+gyro_t		ao_sample_yaw;
+angle_t		ao_sample_orient;
+angle_t		ao_sample_orients[AO_NUM_ORIENT];
+uint8_t		ao_sample_orient_pos;
 #endif
 
-__data uint8_t		ao_sample_data;
+uint8_t		ao_sample_data;
 
 /*
  * Sensor calibration values
  */
 
-__pdata pres_t		ao_ground_pres;		/* startup pressure */
-__pdata alt_t		ao_ground_height;	/* MSL of ao_ground_pres */
+pres_t		ao_ground_pres;		/* startup pressure */
+alt_t		ao_ground_height;	/* MSL of ao_ground_pres */
 
 #if HAS_ACCEL
-__pdata accel_t		ao_ground_accel;	/* startup acceleration */
-__pdata accel_t		ao_accel_2g;		/* factory accel calibration */
-__pdata int32_t		ao_accel_scale;		/* sensor to m/s² conversion */
+accel_t		ao_ground_accel;	/* startup acceleration */
+accel_t		ao_accel_2g;		/* factory accel calibration */
+int32_t		ao_accel_scale;		/* sensor to m/s² conversion */
 #endif
 
 #if HAS_GYRO
-__pdata accel_t		ao_ground_accel_along;
-__pdata accel_t		ao_ground_accel_across;
-__pdata accel_t		ao_ground_accel_through;
-__pdata int32_t		ao_ground_pitch;
-__pdata int32_t		ao_ground_yaw;
-__pdata int32_t		ao_ground_roll;
+accel_t		ao_ground_accel_along;
+accel_t		ao_ground_accel_across;
+accel_t		ao_ground_accel_through;
+int32_t		ao_ground_pitch;
+int32_t		ao_ground_yaw;
+int32_t		ao_ground_roll;
 #endif
 
-static __pdata uint8_t	ao_preflight;		/* in preflight mode */
+static uint8_t	ao_preflight;		/* in preflight mode */
 
-static __pdata uint16_t	nsamples;
-__pdata int32_t ao_sample_pres_sum;
+static uint16_t	nsamples;
+int32_t ao_sample_pres_sum;
 #if HAS_ACCEL
-__pdata int32_t ao_sample_accel_sum;
+int32_t ao_sample_accel_sum;
 #endif
 #if HAS_GYRO
-__pdata int32_t ao_sample_accel_along_sum;
-__pdata int32_t ao_sample_accel_across_sum;
-__pdata int32_t	ao_sample_accel_through_sum;
-__pdata int32_t ao_sample_pitch_sum;
-__pdata int32_t ao_sample_yaw_sum;
-__pdata int32_t	ao_sample_roll_sum;
+int32_t ao_sample_accel_along_sum;
+int32_t ao_sample_accel_across_sum;
+int32_t	ao_sample_accel_through_sum;
+int32_t ao_sample_pitch_sum;
+int32_t ao_sample_yaw_sum;
+int32_t	ao_sample_roll_sum;
 static struct ao_quaternion ao_rotation;
 #endif
 
@@ -324,7 +324,7 @@ ao_sample(void)
 	ao_wakeup(&ao_sample_data);
 	ao_sleep((void *) &ao_data_head);
 	while (ao_sample_data != ao_data_head) {
-		__xdata struct ao_data *ao_data;
+		struct ao_data *ao_data;
 
 		/* Capture a sample */
 		ao_data = (struct ao_data *) &ao_data_ring[ao_sample_data];

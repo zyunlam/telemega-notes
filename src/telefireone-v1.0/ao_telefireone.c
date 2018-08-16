@@ -31,7 +31,7 @@ set_logging(void)
 	ao_wakeup(&ao_log_running);
 }
 
-__code struct ao_cmds ao_firetwo_cmds[] = {
+const struct ao_cmds ao_firetwo_cmds[] = {
         { set_logging,  "L <0 off, 1 on>\0Log sensors to flash" },
         { 0,    NULL },
 };

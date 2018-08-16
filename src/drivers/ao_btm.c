@@ -30,12 +30,12 @@
 #endif
 
 int8_t			ao_btm_stdio;
-__xdata uint8_t		ao_btm_connected;
+uint8_t		ao_btm_connected;
 
 #define BT_DEBUG 0
 
 #if BT_DEBUG
-__xdata char		ao_btm_buffer[256];
+char		ao_btm_buffer[256];
 uint16_t		ao_btm_ptr;
 char			ao_btm_dir;
 
@@ -137,7 +137,7 @@ ao_btm_send(void)
 	ao_wakeup((void *) &ao_serial_btm_rx_fifo);
 }
 
-__code struct ao_cmds ao_btm_cmds[] = {
+const struct ao_cmds ao_btm_cmds[] = {
 	{ ao_btm_dump,		"d\0Dump btm buffer." },
 	{ ao_btm_speed,		"s <19200,57600>\0Set btm serial speed." },
 	{ ao_btm_send,		"S\0BTM interactive mode. ~ to exit." },
@@ -153,7 +153,7 @@ __code struct ao_cmds ao_btm_cmds[] = {
 #endif
 
 #define AO_BTM_MAX_REPLY	16
-__xdata char		ao_btm_reply[AO_BTM_MAX_REPLY];
+char		ao_btm_reply[AO_BTM_MAX_REPLY];
 
 /*
  * Read one bluetooth character.
@@ -252,7 +252,7 @@ ao_btm_wait_reply(void)
 }
 
 void
-ao_btm_string(__code char *cmd)
+ao_btm_string(const char *cmd)
 {
 	char	c;
 
@@ -261,7 +261,7 @@ ao_btm_string(__code char *cmd)
 }
 
 uint8_t
-ao_btm_cmd(__code char *cmd)
+ao_btm_cmd(const char *cmd)
 {
 	ao_btm_drain();
 
@@ -351,7 +351,7 @@ ao_btm_check_link()
 #endif
 }
 
-__xdata struct ao_task ao_btm_task;
+struct ao_task ao_btm_task;
 
 /*
  * A thread to initialize the bluetooth device and

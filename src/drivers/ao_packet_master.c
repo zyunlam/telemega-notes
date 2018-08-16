@@ -39,7 +39,7 @@ ao_packet_getchar(void)
 }
 
 static void
-ao_packet_echo(void) __reentrant
+ao_packet_echo(void) 
 {
 	int	c;
 	while (ao_packet_enable) {
@@ -50,9 +50,9 @@ ao_packet_echo(void) __reentrant
 	ao_exit();
 }
 
-static __xdata struct ao_task	ao_packet_echo_task;
-static __xdata uint16_t		ao_packet_master_delay;
-static __xdata uint16_t		ao_packet_master_time;
+static struct ao_task	ao_packet_echo_task;
+static uint16_t		ao_packet_master_delay;
+static uint16_t		ao_packet_master_time;
 
 #define AO_PACKET_MASTER_DELAY_SHORT	AO_MS_TO_TICKS(100)
 #define AO_PACKET_MASTER_DELAY_LONG	AO_MS_TO_TICKS(1000)
@@ -114,7 +114,7 @@ ao_packet_master(void)
 }
 
 static void
-ao_packet_forward(void) __reentrant
+ao_packet_forward(void) 
 {
 	char c;
 	ao_packet_enable = 1;
@@ -152,7 +152,7 @@ ao_packet_signal(void)
 	printf ("RSSI: %d\n", ao_radio_rssi);
 }
 
-__code struct ao_cmds ao_packet_master_cmds[] = {
+const struct ao_cmds ao_packet_master_cmds[] = {
 	{ ao_packet_forward,	"p\0Remote packet link." },
 	{ ao_packet_signal,	"s\0Report signal strength." },
 	{ 0,	NULL },

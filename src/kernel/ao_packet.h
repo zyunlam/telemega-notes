@@ -43,13 +43,13 @@ struct ao_packet_recv {
 	uint8_t			status;
 };
 
-extern __xdata struct ao_packet_recv ao_rx_packet;
-extern __xdata struct ao_packet ao_tx_packet;
-extern __xdata struct ao_task	ao_packet_task;
-extern __xdata uint8_t ao_packet_enable;
-extern __xdata uint8_t ao_packet_master_sleeping;
-extern __pdata uint8_t ao_packet_rx_len, ao_packet_rx_used, ao_packet_tx_used;
-extern __xdata uint8_t ao_packet_restart;
+extern struct ao_packet_recv ao_rx_packet;
+extern struct ao_packet ao_tx_packet;
+extern struct ao_task	ao_packet_task;
+extern uint8_t ao_packet_enable;
+extern uint8_t ao_packet_master_sleeping;
+extern uint8_t ao_packet_rx_len, ao_packet_rx_used, ao_packet_tx_used;
+extern uint8_t ao_packet_restart;
 
 void
 ao_packet_send(void);
@@ -61,7 +61,7 @@ void
 ao_packet_flush(void);
 
 void
-ao_packet_putchar(char c) __reentrant;
+ao_packet_putchar(char c);
 
 int
 _ao_packet_pollchar(void);
@@ -69,7 +69,7 @@ _ao_packet_pollchar(void);
 #if PACKET_HAS_MASTER
 /* ao_packet_master.c */
 
-extern __xdata int8_t ao_packet_last_rssi;
+extern int8_t ao_packet_last_rssi;
 
 void
 ao_packet_master_init(void);

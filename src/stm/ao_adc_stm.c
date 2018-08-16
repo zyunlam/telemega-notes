@@ -100,7 +100,7 @@ ao_adc_poll(void)
  * Fetch a copy of the most recent ADC data
  */
 void
-ao_adc_get(__xdata struct ao_adc *packet)
+ao_adc_get(struct ao_adc *packet)
 {
 #if HAS_FLIGHT
 	uint8_t	i = ao_data_ring_prev(ao_sample_data);
@@ -177,7 +177,7 @@ static const char *ao_adc_name[AO_NUM_ADC] = {
 #endif
 
 static void
-ao_adc_dump(void) __reentrant
+ao_adc_dump(void) 
 {
 	struct ao_data	packet;
 #ifndef AO_ADC_DUMP
@@ -203,7 +203,7 @@ ao_adc_dump(void) __reentrant
 #endif
 }
 
-__code struct ao_cmds ao_adc_cmds[] = {
+const struct ao_cmds ao_adc_cmds[] = {
 	{ ao_adc_dump,	"a\0Display current ADC values" },
 	{ 0, NULL },
 };

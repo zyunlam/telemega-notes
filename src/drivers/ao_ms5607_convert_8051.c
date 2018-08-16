@@ -32,8 +32,8 @@
 #endif
 
 void
-ao_ms5607_convert(__xdata struct ao_ms5607_sample *sample,
-		  __xdata struct ao_ms5607_value *value)
+ao_ms5607_convert(struct ao_ms5607_sample *sample,
+		  struct ao_ms5607_value *value)
 {
 	__LOCAL int32_t	dT;
 	__LOCAL int32_t TEMP;

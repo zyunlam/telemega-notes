@@ -23,12 +23,12 @@
 
 static uint8_t	ao_log_data_pos;
 
-__code uint8_t ao_log_format = AO_LOG_FORMAT_TELESCIENCE;
+const uint8_t ao_log_format = AO_LOG_FORMAT_TELESCIENCE;
 
 static void
-ao_log_telescience_csum(void) __reentrant
+ao_log_telescience_csum(void) 
 {
-	__xdata uint8_t *b = ao_log_single_write_data.bytes;
+	uint8_t *b = ao_log_single_write_data.bytes;
 	uint8_t	sum = 0x5a;
 	uint8_t	i;
 

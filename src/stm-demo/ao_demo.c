@@ -197,7 +197,7 @@ ao_blink_toggle(void)
 }
 
 
-__code struct ao_cmds ao_demo_cmds[] = {
+const struct ao_cmds ao_demo_cmds[] = {
 	{ ao_dma_test,	"D\0DMA test" },
 	{ ao_spi_write, "W\0SPI write" },
 	{ ao_spi_read, "R\0SPI read" },

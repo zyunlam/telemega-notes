@@ -16,10 +16,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#define __xdata
-#define __data
-#define __pdata
-#define __reentrant
 
 #include <stdint.h>
 #include <ao_ms5607.h>

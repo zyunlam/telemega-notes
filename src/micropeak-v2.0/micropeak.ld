@@ -90,7 +90,7 @@ SECTIONS {
 	 */
 
 	.textram BLOCK(8): {
-		__data_start__ = .;
+		_start__ = .;
 		*(.ramtext)
 	} >ram AT>rom
 
@@ -99,7 +99,7 @@ SECTIONS {
 	 */
 	.data BLOCK(8): {
 		*(.data)	/* initialized data */
-		__data_end__ = .;
+		_end__ = .;
 	} >ram AT>rom
 
 	.bss : {

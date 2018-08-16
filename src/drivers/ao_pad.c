@@ -22,14 +22,14 @@
 #include <ao_74hc165.h>
 #include <ao_radio_cmac.h>
 
-static __xdata uint8_t ao_pad_ignite;
-static __xdata struct ao_pad_command	command;
-static __xdata struct ao_pad_query	query;
-static __pdata uint8_t	ao_pad_armed;
-static __pdata uint16_t	ao_pad_arm_time;
-static __pdata uint8_t	ao_pad_box;
-static __xdata uint8_t	ao_pad_disabled;
-static __pdata uint16_t	ao_pad_packet_time;
+static uint8_t ao_pad_ignite;
+static struct ao_pad_command	command;
+static struct ao_pad_query	query;
+static uint8_t	ao_pad_armed;
+static uint16_t	ao_pad_arm_time;
+static uint8_t	ao_pad_box;
+static uint8_t	ao_pad_disabled;
+static uint16_t	ao_pad_packet_time;
 
 #ifndef AO_PAD_RSSI_MINIMUM
 #define AO_PAD_RSSI_MINIMUM	-90
@@ -38,7 +38,7 @@ static __pdata uint16_t	ao_pad_packet_time;
 #define DEBUG	1
 
 #if DEBUG
-static __pdata uint8_t	ao_pad_debug;
+static uint8_t	ao_pad_debug;
 #define PRINTD(...) (ao_pad_debug ? (printf(__VA_ARGS__), 0) : 0)
 #define FLUSHD()    (ao_pad_debug ? (flush(), 0) : 0)
 #else
@@ -189,17 +189,17 @@ ao_pad_monitor(void)
 {
 	uint8_t			c;
 	uint8_t			sample;
-	__pdata AO_LED_TYPE	prev = 0, cur = 0;
-	__pdata uint8_t		beeping = 0;
-	__xdata volatile struct ao_data	*packet;
-	__pdata uint16_t	arm_beep_time = 0;
+	AO_LED_TYPE	prev = 0, cur = 0;
+	uint8_t		beeping = 0;
+	volatile struct ao_data	*packet;
+	uint16_t	arm_beep_time = 0;
 
 	sample = ao_data_head;
 	ao_led_set(LEDS_AVAILABLE);
 	ao_delay(AO_MS_TO_TICKS(1000));
 	ao_led_set(0);
 	for (;;) {
-		__pdata int16_t			pyro;
+		int16_t			pyro;
 
 		ao_arch_critical(
 			while (sample == ao_data_head)
@@ -526,9 +526,9 @@ ao_pad_manual(void)
 	}
 }
 
-static __xdata struct ao_task ao_pad_task;
-static __xdata struct ao_task ao_pad_ignite_task;
-static __xdata struct ao_task ao_pad_monitor_task;
+static struct ao_task ao_pad_task;
+static struct ao_task ao_pad_ignite_task;
+static struct ao_task ao_pad_monitor_task;
 
 #if DEBUG
 void
@@ -560,7 +560,7 @@ ao_pad_alarm_debug(void)
 }
 #endif
 
-__code struct ao_cmds ao_pad_cmds[] = {
+const struct ao_cmds ao_pad_cmds[] = {
 	{ ao_pad_test,	"t\0Test pad continuity" },
 	{ ao_pad_manual,	"i <key> <n>\0Fire igniter. <key> is doit with D&I" },
 #if DEBUG

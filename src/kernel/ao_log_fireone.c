@@ -21,12 +21,12 @@
 #include <ao_data.h>
 #include <ao_flight.h>
 
-static __xdata struct ao_log_firetwo log;
+static struct ao_log_firetwo log;
 
-__code uint8_t ao_log_format = AO_LOG_FORMAT_TELEFIRETWO;
+const uint8_t ao_log_format = AO_LOG_FORMAT_TELEFIRETWO;
 
 static uint8_t
-ao_log_csum(__xdata uint8_t *b) __reentrant
+ao_log_csum(uint8_t *b) 
 {
 	uint8_t	sum = 0x5a;
 	uint8_t	i;
@@ -37,12 +37,12 @@ ao_log_csum(__xdata uint8_t *b) __reentrant
 }
 
 uint8_t
-ao_log_firetwo(__xdata struct ao_log_firetwo *log) __reentrant
+ao_log_firetwo(struct ao_log_firetwo *log) 
 {
 	uint8_t wrote = 0;
 	/* set checksum */
 	log->csum = 0;
-	log->csum = ao_log_csum((__xdata uint8_t *) log);
+	log->csum = ao_log_csum((uint8_t *) log);
 	ao_mutex_get(&ao_log_mutex); {
 		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 			ao_log_stop();
@@ -66,7 +66,7 @@ ao_log_dump_check_data(void)
 }
 
 #if HAS_ADC
-static __data uint8_t	ao_log_data_pos;
+static uint8_t	ao_log_data_pos;
 
 /* a hack to make sure that ao_log_metrums fill the eeprom block in even units */
 typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;

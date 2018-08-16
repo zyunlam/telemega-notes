@@ -23,7 +23,7 @@ static void
 ao_monitor_forward(void)
 {
 	uint32_t					recv_radio_setting;
-	static __xdata struct ao_telemetry_all_recv	packet;
+	static struct ao_telemetry_all_recv	packet;
 
 	for (;;) {
 		while (ao_monitoring)
@@ -40,10 +40,10 @@ ao_monitor_forward(void)
 	}
 }
 
-static __xdata struct ao_task ao_monitor_forward_task;
+static struct ao_task ao_monitor_forward_task;
 
 void
-ao_monitor_forward_init(void) __reentrant
+ao_monitor_forward_init(void) 
 {
 	ao_add_task(&ao_monitor_forward_task, ao_monitor_forward, "monitor_forward");
 }
