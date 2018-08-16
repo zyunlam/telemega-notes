@@ -34,6 +34,8 @@ static char	cmd_line[AO_CMD_LEN];
 static uint8_t	cmd_len;
 static uint8_t	cmd_i;
 
+static const char backspace[] = "\010 \010";
+
 void
 ao_put_string(const char *s)
 {
@@ -42,18 +44,12 @@ ao_put_string(const char *s)
 		putchar(c);
 }
 
-static void
-backspace(void)
-{
-	ao_put_string ("\010 \010");
-}
-
 void
-ao_cmd_readline(void)
+ao_cmd_readline(const char *prompt)
 {
 	char c;
 	if (ao_echo())
-		ao_put_string("> ");
+		ao_put_string(prompt);
 	cmd_len = 0;
 	for (;;) {
 		flush();
@@ -62,7 +58,7 @@ ao_cmd_readline(void)
 		if (c == '\010' || c == '\177') {
 			if (cmd_len != 0) {
 				if (ao_echo())
-					backspace();
+					ao_put_string(backspace);
 				--cmd_len;
 			}
 			continue;
@@ -72,7 +68,7 @@ ao_cmd_readline(void)
 		if (c == '\025') {
 			while (cmd_len != 0) {
 				if (ao_echo())
-					backspace();
+					ao_put_string(backspace);
 				--cmd_len;
 			}
 			continue;
@@ -172,9 +168,8 @@ ao_cmd_hexchar(char c)
 	return -1;
 }
 
-static
-uint32_t
-_ao_cmd_hex(uint8_t lim)
+static uint32_t
+get_hex(uint8_t lim)
 {
 	uint32_t result = 0;
 	uint8_t i;
@@ -196,13 +191,13 @@ _ao_cmd_hex(uint8_t lim)
 uint8_t
 ao_cmd_hexbyte(void)
 {
-	return _ao_cmd_hex(2);
+	return get_hex(2);
 }
 
 uint32_t
 ao_cmd_hex(void)
 {
-	return _ao_cmd_hex(0xff);
+	return get_hex(0xff);
 }
 
 uint32_t
@@ -371,7 +366,7 @@ ao_cmd(void)
 	void (*func)(void);
 
 	for (;;) {
-		ao_cmd_readline();
+		ao_cmd_readline("> ");
 		ao_cmd_lex();
 		ao_cmd_white();
 		c = ao_cmd_lex_c;

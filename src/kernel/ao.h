@@ -165,7 +165,7 @@ void
 ao_put_string(const char *s);
 
 void
-ao_cmd_readline(void);
+ao_cmd_readline(const char *prompt);
 
 char
 ao_cmd_lex(void);
