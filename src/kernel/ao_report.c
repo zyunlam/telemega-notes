@@ -183,7 +183,7 @@ ao_report_battery(void)
 		ao_data_get(&packet);
 		if (packet.adc.v_batt != 0)
 			break;
-		ao_sleep(DATA_TO_XDATA(&ao_sample_data));
+		ao_sleep(&ao_sample_data);
 	}
 	ao_report_number(ao_battery_decivolt(packet.adc.v_batt));
 }
@@ -281,7 +281,7 @@ ao_report(void)
 		}
 #endif
 		while (ao_report_state == ao_flight_state)
-			ao_sleep(DATA_TO_XDATA(&ao_flight_state));
+			ao_sleep(&ao_flight_state);
 	}
 }
 

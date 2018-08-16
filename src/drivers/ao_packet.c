@@ -91,7 +91,7 @@ ao_packet_recv(uint16_t timeout)
 	if (ao_xmemcmp(ao_rx_packet.packet.callsign,
 		       ao_config.callsign,
 		       AO_MAX_CALLSIGN) != 0 &&
-	    ao_xmemcmp(ao_config.callsign, CODE_TO_XDATA("N0CALL"), 7) != 0)
+	    ao_xmemcmp(ao_config.callsign, "N0CALL", 7) != 0)
 		return 0;
 
 	/* SYN packets carry no data */

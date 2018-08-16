@@ -321,8 +321,8 @@ static gyro_t inline ao_gyro(void) {
 uint8_t
 ao_sample(void)
 {
-	ao_wakeup(DATA_TO_XDATA(&ao_sample_data));
-	ao_sleep((void *) DATA_TO_XDATA(&ao_data_head));
+	ao_wakeup(&ao_sample_data);
+	ao_sleep((void *) &ao_data_head);
 	while (ao_sample_data != ao_data_head) {
 		__xdata struct ao_data *ao_data;
 

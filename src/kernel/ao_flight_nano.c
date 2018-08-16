@@ -70,7 +70,7 @@ ao_flight_nano(void)
 			ao_led_off(AO_LED_RED);
 
 			/* wakeup threads due to state change */
-			ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+			ao_wakeup(&ao_flight_state);
 			break;
 		case ao_flight_pad:
 			if (ao_height> AO_M_TO_HEIGHT(20)) {
@@ -80,7 +80,7 @@ ao_flight_nano(void)
 				/* start logging data */
 				ao_log_start();
 
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 		case ao_flight_drogue:
@@ -101,7 +101,7 @@ ao_flight_nano(void)
 
 					/* turn off the ADC capture */
 					ao_timer_set_adc_interval(0);
-					ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+					ao_wakeup(&ao_flight_state);
 				}
 				ao_interval_min_height = ao_interval_max_height = ao_height;
 				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;

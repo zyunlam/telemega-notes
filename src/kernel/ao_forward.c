@@ -27,7 +27,7 @@ ao_monitor_forward(void)
 
 	for (;;) {
 		while (ao_monitoring)
-			ao_sleep(DATA_TO_XDATA(&ao_monitoring));
+			ao_sleep(&ao_monitoring);
 
 		if (!ao_radio_recv(&packet, sizeof(packet), 0))
 			continue;

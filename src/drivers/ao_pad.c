@@ -203,7 +203,7 @@ ao_pad_monitor(void)
 
 		ao_arch_critical(
 			while (sample == ao_data_head)
-				ao_sleep((void *) DATA_TO_XDATA(&ao_data_head));
+				ao_sleep((void *) &ao_data_head);
 			);
 
 

@@ -59,7 +59,7 @@ _ao_monitor_adjust(void)
 		else
 			ao_monitoring = ao_internal_monitoring;
 	}
-	ao_wakeup(DATA_TO_XDATA(&ao_monitoring));
+	ao_wakeup(&ao_monitoring);
 }
 
 void
@@ -70,7 +70,7 @@ ao_monitor_get(void)
 	for (;;) {
 		switch (ao_monitoring) {
 		case 0:
-			ao_sleep(DATA_TO_XDATA(&ao_monitoring));
+			ao_sleep(&ao_monitoring);
 			continue;
 #if LEGACY_MONITOR
 		case AO_MONITORING_ORIG:
@@ -86,7 +86,7 @@ ao_monitor_get(void)
 		if (!ao_radio_recv(&ao_monitor_ring[ao_monitor_head], size + 2, 0))
 			continue;
 		ao_monitor_head = ao_monitor_ring_next(ao_monitor_head);
-		ao_wakeup(DATA_TO_XDATA(&ao_monitor_head));
+		ao_wakeup(&ao_monitor_head);
 	}
 }
 
@@ -100,7 +100,7 @@ ao_monitor_blink(void)
 	uint8_t		*recv;
 #endif
 	for (;;) {
-		ao_sleep(DATA_TO_XDATA(&ao_monitor_head));
+		ao_sleep(&ao_monitor_head);
 #ifdef AO_MONITOR_BAD
 		recv = (uint8_t *) &ao_monitor_ring[ao_monitor_ring_prev(ao_monitor_head)];
 		if (ao_monitoring && !(recv[ao_monitoring + 1] & AO_RADIO_STATUS_CRC_OK))
@@ -142,9 +142,9 @@ ao_monitor_put(void)
 	ao_monitor_tail = ao_monitor_head;
 	for (;;) {
 		while (!ao_external_monitoring)
-			ao_sleep(DATA_TO_XDATA(&ao_external_monitoring));
+			ao_sleep(&ao_external_monitoring);
 		while (ao_monitor_tail == ao_monitor_head && ao_external_monitoring)
-			ao_sleep(DATA_TO_XDATA(&ao_monitor_head));
+			ao_sleep(&ao_monitor_head);
 		if (!ao_external_monitoring)
 			continue;
 		m = &ao_monitor_ring[ao_monitor_tail];
@@ -298,8 +298,8 @@ set_monitor(void)
 {
 	ao_cmd_hex();
 	ao_external_monitoring = ao_cmd_lex_i;
-	ao_wakeup(DATA_TO_XDATA(&ao_external_monitoring));
-	ao_wakeup(DATA_TO_XDATA(&ao_monitor_head));
+	ao_wakeup(&ao_external_monitoring);
+	ao_wakeup(&ao_monitor_head);
 	_ao_monitor_adjust();
 }
 

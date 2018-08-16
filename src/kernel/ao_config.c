@@ -135,7 +135,7 @@ _ao_config_get(void)
 		/* Version 0 stuff */
 		ao_config.main_deploy = AO_CONFIG_DEFAULT_MAIN_DEPLOY;
 		ao_xmemset(&ao_config.callsign, '\0', sizeof (ao_config.callsign));
-		ao_xmemcpy(&ao_config.callsign, CODE_TO_XDATA(AO_CONFIG_DEFAULT_CALLSIGN),
+		ao_xmemcpy(&ao_config.callsign, AO_CONFIG_DEFAULT_CALLSIGN,
 		       sizeof(AO_CONFIG_DEFAULT_CALLSIGN) - 1);
 		ao_config._legacy_radio_channel = 0;
 	}
@@ -246,7 +246,7 @@ _ao_config_get(void)
 #if HAS_RADIO_RATE
 		ao_config.radio_rate = AO_CONFIG_DEFAULT_RADIO_RATE;
 #endif
-		ao_xmemcpy(&ao_config.callsign, CODE_TO_XDATA(AO_CONFIG_DEFAULT_CALLSIGN),
+		ao_xmemcpy(&ao_config.callsign, AO_CONFIG_DEFAULT_CALLSIGN,
 		       sizeof(AO_CONFIG_DEFAULT_CALLSIGN) - 1);
 	}
 #endif
@@ -421,7 +421,7 @@ ao_config_accel_calibrate_auto(char *orientation) __reentrant
 	accel_total = 0;
 	cal_data_ring = ao_sample_data;
 	while (i) {
-		ao_sleep(DATA_TO_XDATA(&ao_sample_data));
+		ao_sleep(&ao_sample_data);
 		while (i && cal_data_ring != ao_sample_data) {
 			accel_total += (int32_t) ao_data_accel(&ao_data_ring[cal_data_ring]);
 #if HAS_GYRO
