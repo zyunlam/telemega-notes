@@ -47,9 +47,9 @@ struct ao_adc {
 #define __code
 #define __reentrant
 
-#define DATA_TO_XDATA(a)	(a)
-#define PDATA_TO_XDATA(a)	(a)
-#define CODE_TO_XDATA(a)	(a)
+#define a	(a)
+#define a	(a)
+#define a	(a)
 
 enum ao_flight_state {
 	ao_flight_startup = 0,

@@ -41,7 +41,7 @@ static void ao_log_tiny_data(uint16_t d)
 	if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 		ao_log_stop();
 	if (ao_log_running) {
-		ao_storage_write(ao_log_current_pos, DATA_TO_XDATA(&d), 2);
+		ao_storage_write(ao_log_current_pos, &d, 2);
 		ao_log_current_pos += 2;
 	}
 }
@@ -102,7 +102,7 @@ ao_log(void)
 		/*
 		 * Add in pending sample data
 		 */
-		ao_sleep(DATA_TO_XDATA(&ao_sample_data));
+		ao_sleep(&ao_sample_data);
 		while (ao_log_data != ao_sample_data) {
 			sum += ao_data_pres(&ao_data_ring[ao_log_data]);
 			count++;

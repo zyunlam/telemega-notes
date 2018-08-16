@@ -50,7 +50,7 @@ ao_log_telem_track() {
 				ao_flight_state = ao_log_single_write_data.telemetry.sensor.state;
 				if (ao_flight_state == ao_flight_pad)
 					ao_max_height = 0;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 		}
 	}
@@ -111,7 +111,7 @@ ao_log_single(void)
 				ao_log_telem_track();
 			}
 			/* Wait for more telemetry data to arrive */
-			ao_sleep(DATA_TO_XDATA(&ao_monitor_head));
+			ao_sleep(&ao_monitor_head);
 		}
 	}
 }

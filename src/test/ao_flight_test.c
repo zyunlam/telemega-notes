@@ -362,7 +362,7 @@ struct ao_ms5607_prom	ao_ms5607_prom;
 
 struct ao_config ao_config;
 
-#define DATA_TO_XDATA(x) (x)
+#define x (x)
 
 
 extern int16_t ao_ground_accel, ao_flight_accel;

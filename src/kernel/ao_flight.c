@@ -175,7 +175,7 @@ ao_flight(void)
 #endif
 			}
 			/* wakeup threads due to state change */
-			ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+			ao_wakeup(&ao_flight_state);
 
 			break;
 		case ao_flight_pad:
@@ -219,7 +219,7 @@ ao_flight(void)
 				ao_wakeup(&ao_gps_new);
 #endif
 
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 		case ao_flight_boost:
@@ -244,7 +244,7 @@ ao_flight(void)
 				ao_flight_state = ao_flight_coast;
 #endif
 				++ao_motor_number;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 #if HAS_ACCEL
@@ -257,7 +257,7 @@ ao_flight(void)
 			if (ao_speed < AO_MS_TO_SPEED(AO_MAX_BARO_SPEED))
 			{
 				ao_flight_state = ao_flight_coast;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			} else
 				goto check_re_boost;
 			break;
@@ -306,7 +306,7 @@ ao_flight(void)
 
 				/* and enter drogue state */
 				ao_flight_state = ao_flight_drogue;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 #if HAS_ACCEL
 			else {
@@ -315,7 +315,7 @@ ao_flight(void)
 				if (ao_coast_avg_accel > AO_MSS_TO_ACCEL(20)) {
 					ao_boost_tick = ao_sample_tick;
 					ao_flight_state = ao_flight_boost;
-					ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+					ao_wakeup(&ao_flight_state);
 				}
 			}
 #endif
@@ -352,7 +352,7 @@ ao_flight(void)
 				ao_interval_min_height = ao_interval_max_height = ao_avg_height;
 
 				ao_flight_state = ao_flight_main;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 
@@ -379,7 +379,7 @@ ao_flight(void)
 					ao_timer_set_adc_interval(0);
 #endif
 
-					ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+					ao_wakeup(&ao_flight_state);
 				}
 				ao_interval_min_height = ao_interval_max_height = ao_avg_height;
 				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;

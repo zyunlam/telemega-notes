@@ -113,9 +113,7 @@ extern volatile __data uint8_t		ao_data_count;
  * Wait until it is time to write a sensor sample; this is
  * signaled by the timer tick
  */
-#define AO_DATA_WAIT() do {				\
-		ao_sleep(DATA_TO_XDATA ((void *) &ao_data_count));	\
-	} while (0)
+#define AO_DATA_WAIT() 		ao_sleep((void *) &ao_data_count)
 
 #endif /* AO_DATA_RING */
 

@@ -588,7 +588,7 @@ ao_terramonitor(void)
 	     monitor = ao_monitor_ring_next(monitor))
 	{
 		while (monitor == ao_monitor_head)
-			ao_sleep(DATA_TO_XDATA(&ao_monitor_head));
+			ao_sleep(&ao_monitor_head);
 		if (ao_monitoring != sizeof (union ao_telemetry_all))
 			continue;
 		if (!(ao_monitor_ring[monitor].all.status & PKT_APPEND_STATUS_1_CRC_OK))

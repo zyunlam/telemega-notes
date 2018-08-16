@@ -337,7 +337,7 @@ ao_send_configuration(void)
 			    ao_config.callsign,
 			    AO_MAX_CALLSIGN);
 		ao_xmemcpy (telemetry.configuration.version,
-			    CODE_TO_XDATA(ao_version),
+			    ao_version,
 			    AO_MAX_VERSION);
 		ao_telemetry_config_cur = ao_telemetry_config_max;
 		ao_telemetry_send();
