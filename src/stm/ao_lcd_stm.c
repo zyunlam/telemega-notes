@@ -326,12 +326,9 @@ ao_lcd_stm_seg_set(void)
 {
 	int	com, seg, val;
 	int	n, bit;
-	ao_cmd_decimal();
-	com = ao_cmd_lex_i;
-	ao_cmd_decimal();
-	seg = ao_cmd_lex_u32;
-	ao_cmd_decimal();
-	val = ao_cmd_lex_i;
+	com = ao_cmd_decimal();
+	seg = ao_cmd_decimal();
+	val = ao_cmd_decimal();
 	printf ("com: %d seg: %d val: %d\n", com, seg, val);
 	ao_lcd_set(com, seg, val);
 	ao_lcd_flush();

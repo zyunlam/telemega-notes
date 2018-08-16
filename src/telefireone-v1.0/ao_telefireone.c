@@ -26,8 +26,7 @@
 static void
 set_logging(void)
 {
-	ao_cmd_hex();
-	ao_log_running = ao_cmd_lex_i;
+	ao_log_running = ao_cmd_hex();
 	ao_wakeup(&ao_log_running);
 }
 

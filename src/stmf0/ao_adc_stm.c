@@ -103,10 +103,9 @@ ao_adc_one(void)
 	int		ch;
 	uint16_t	value;
 
-	ao_cmd_decimal();
+	ch = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ch = ao_cmd_lex_i;
 	if (ch < 0 || AO_NUM_ADC <= ch) {
 		ao_cmd_status = ao_cmd_syntax_error;
 		return;

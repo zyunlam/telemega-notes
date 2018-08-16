@@ -160,8 +160,6 @@ enum ao_cmd_status {
 	ao_cmd_syntax_error = 2,
 };
 
-extern uint16_t ao_cmd_lex_i;
-extern uint32_t ao_cmd_lex_u32;
 extern char	ao_cmd_lex_c;
 extern enum ao_cmd_status ao_cmd_status;
 
@@ -189,13 +187,13 @@ ao_cmd_white(void);
 int8_t
 ao_cmd_hexchar(char c);
 
-void
+uint8_t
 ao_cmd_hexbyte(void);
 
-void
+uint32_t
 ao_cmd_hex(void);
 
-void
+uint32_t
 ao_cmd_decimal(void);
 
 /* Read a single hex nibble off stdin. */

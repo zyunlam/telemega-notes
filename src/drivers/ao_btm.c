@@ -32,7 +32,7 @@
 int8_t			ao_btm_stdio;
 uint8_t		ao_btm_connected;
 
-#define BT_DEBUG 0
+#define BT_DEBUG 1
 
 #if BT_DEBUG
 char		ao_btm_buffer[256];
@@ -76,6 +76,7 @@ ao_btm_dump(void)
 {
 	int i;
 	char c;
+	uint16_t r;
 
 	for (i = 0; i < ao_btm_ptr; i++) {
 		c = ao_btm_buffer[i];
@@ -85,8 +86,8 @@ ao_btm_dump(void)
 			putchar(ao_btm_buffer[i]);
 	}
 	putchar('\n');
-	ao_cmd_decimal();
-	if (ao_cmd_status == ao_cmd_success && ao_cmd_lex_i)
+	r = ao_cmd_decimal();
+	if (ao_cmd_status == ao_cmd_success && r)
 		ao_btm_ptr = 0;
 	ao_cmd_status = ao_cmd_success;
 }
@@ -94,13 +95,17 @@ ao_btm_dump(void)
 static void
 ao_btm_speed(void)
 {
-	ao_cmd_decimal();
-	if (ao_cmd_lex_u32 == 57600)
+	switch (ao_cmd_decimal()) {
+	case 57600:
 		ao_serial_btm_set_speed(AO_SERIAL_SPEED_57600);
-	else if (ao_cmd_lex_u32 == 19200)
+		break;
+	case 19200:
 		ao_serial_btm_set_speed(AO_SERIAL_SPEED_19200);
-	else
+		break;
+	default:
 		ao_cmd_status = ao_cmd_syntax_error;
+		break;
+	}
 }
 
 static uint8_t	ao_btm_enable;

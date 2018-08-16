@@ -159,17 +159,16 @@ ao_fb_init(void)
 static void
 ao_video_toggle(void)
 {
-	ao_cmd_decimal();
-	if (ao_cmd_lex_i)
+	uint16_t r = ao_cmd_decimal();
+	if (r)
 		ao_fb_init();
-	ao_vga_enable(ao_cmd_lex_i);
+	ao_vga_enable(r);
 }
 
 static void
 ao_ball_toggle(void)
 {
-	ao_cmd_decimal();
-	ball_enable = ao_cmd_lex_i;
+	ball_enable = ao_cmd_decimal();
 	ao_wakeup(&ball_enable);
 }
 
