@@ -20,15 +20,15 @@
 #include <ao_flight.h>
 #include <math.h>
 
-static __xdata struct ao_telemetry_sensor		ao_tel_sensor;
-static __xdata struct ao_telemetry_location		ao_tel_location;
-static __xdata struct ao_telemetry_configuration	ao_tel_config;
-static __xdata int16_t 					ao_tel_max_speed;
-static __xdata int16_t					ao_tel_max_height;
+static struct ao_telemetry_sensor		ao_tel_sensor;
+static struct ao_telemetry_location		ao_tel_location;
+static struct ao_telemetry_configuration	ao_tel_config;
+static int16_t 					ao_tel_max_speed;
+static int16_t					ao_tel_max_height;
 static int8_t ao_tel_rssi;
 
-static __xdata char ao_lcd_line[17];
-static __xdata char ao_state_name[] = "SIPBFCDMLI";
+static char ao_lcd_line[17];
+static char ao_state_name[] = "SIPBFCDMLI";
 
 static void
 ao_terraui_line(uint8_t addr)
@@ -85,7 +85,7 @@ ao_terraui_logging(void)
 	return '-';
 }
 
-static __code char ao_progress[4] = { '\011', '\012', '\014', '\013' };
+static const char ao_progress[4] = { '\011', '\012', '\014', '\013' };
 
 static uint8_t	ao_telem_progress;
 static uint8_t	ao_gps_progress;
@@ -165,7 +165,7 @@ static int16_t mag(int32_t d)
 static int32_t
 dist(int32_t d)
 {
-	__pdata uint32_t m;
+	uint32_t m;
 	uint8_t neg = 0;
 
 	if (d < 0) {
@@ -184,7 +184,7 @@ dist(int32_t d)
 	return d;
 }
 
-static __code uint8_t cos_table[] = {
+static const uint8_t cos_table[] = {
    0, /*  0 */
    0, /*  1 */
    0, /*  2 */
@@ -242,7 +242,7 @@ static __code uint8_t cos_table[] = {
    1, /* 54 */
 };
 
-static __code uint8_t tan_table[] = {
+static const uint8_t tan_table[] = {
     0, /*  0 */
     4, /*  1 */
     9, /*  2 */
@@ -290,7 +290,7 @@ static __code uint8_t tan_table[] = {
   247, /* 44 */
 };
 	
-int16_t ao_atan2(int32_t dy, int32_t dx) __reentrant
+int16_t ao_atan2(int32_t dy, int32_t dx) 
 {
 	int8_t	m = 1;
 	int16_t	a = 0;
@@ -334,10 +334,10 @@ int16_t ao_atan2(int32_t dy, int32_t dx) __reentrant
 	return t * m + a;
 }
 
-static __pdata int32_t	lon_dist, lat_dist;
-static __pdata uint32_t	ground_dist, range;
-static __pdata uint8_t dist_in_km;
-static __pdata int16_t bearing, elevation;
+static int32_t	lon_dist, lat_dist;
+static uint32_t	ground_dist, range;
+static uint8_t dist_in_km;
+static int16_t bearing, elevation;
 
 static void
 ao_terraui_lat_dist(void)
@@ -346,7 +346,7 @@ ao_terraui_lat_dist(void)
 }
 
 static void
-ao_terraui_lon_dist(void) __reentrant
+ao_terraui_lon_dist(void) 
 {
 	uint8_t	c = cos_table[ao_gps_data.latitude >> 24];
 	lon_dist = ao_tel_location.longitude;
@@ -418,7 +418,7 @@ ao_terraui_recover(void)
 }
 
 static void
-ao_terraui_coord(int32_t c, char plus, char minus, char extra) __reentrant
+ao_terraui_coord(int32_t c, char plus, char minus, char extra) 
 {
 	uint16_t	d;
 	uint8_t		m;
@@ -448,7 +448,7 @@ ao_terraui_remote(void)
 }
 
 static void
-ao_terraui_local(void) __reentrant
+ao_terraui_local(void) 
 {
 	ao_terraui_coord(ao_gps_data.latitude, 'n', 's',
 			 ao_terraui_local_gps());
@@ -457,11 +457,11 @@ ao_terraui_local(void) __reentrant
 	ao_terraui_line(AO_LCD_ADDR(1,0));
 }
 
-static __pdata uint8_t ao_set_freq;
-static __pdata uint32_t ao_set_freq_orig;
+static uint8_t ao_set_freq;
+static uint32_t ao_set_freq_orig;
 
 static void
-ao_terraui_freq(void) __reentrant
+ao_terraui_freq(void) 
 {
 	uint16_t	MHz;
 	uint16_t	frac;
@@ -508,7 +508,7 @@ ao_terraui_freq_button(char b) {
 	ao_radio_recv_abort();
 }
 
-static __code void (*__code ao_terraui_page[])(void) = {
+static const void (*const ao_terraui_page[])(void) = {
 	ao_terraui_startup,
 	ao_terraui_info,
 	ao_terraui_pad,
@@ -521,8 +521,8 @@ static __code void (*__code ao_terraui_page[])(void) = {
 
 #define NUM_PAGE	(sizeof (ao_terraui_page)/sizeof (ao_terraui_page[0]))
 
-static __pdata uint8_t ao_current_page = 0;
-static __pdata uint8_t ao_shown_about = 3;
+static uint8_t ao_current_page = 0;
+static uint8_t ao_shown_about = 3;
 
 static void
 ao_terraui(void)
@@ -575,7 +575,7 @@ ao_terraui(void)
 	}
 }
 
-__xdata static struct ao_task ao_terraui_task;
+static struct ao_task ao_terraui_task;
 
 static void
 ao_terramonitor(void)
@@ -619,7 +619,7 @@ ao_terramonitor(void)
 	}
 }
 
-__xdata static struct ao_task ao_terramonitor_task;
+static struct ao_task ao_terramonitor_task;
 
 static void
 ao_terragps(void)
@@ -634,7 +634,7 @@ ao_terragps(void)
 	}
 }
 
-__xdata static struct ao_task ao_terragps_task;
+static struct ao_task ao_terragps_task;
 
 void
 ao_terraui_init(void)

@@ -20,18 +20,18 @@
 
 /* Main flight thread. */
 
-__pdata enum ao_flight_state	ao_flight_state;	/* current flight state */
-__pdata uint16_t		ao_launch_tick;		/* time of launch detect */
+enum ao_flight_state	ao_flight_state;	/* current flight state */
+uint16_t		ao_launch_tick;		/* time of launch detect */
 
 /*
  * track min/max data over a long interval to detect
  * resting
  */
-__pdata uint16_t		ao_interval_end;
-__pdata alt_t			ao_interval_min_height;
-__pdata alt_t			ao_interval_max_height;
+uint16_t		ao_interval_end;
+alt_t			ao_interval_min_height;
+alt_t			ao_interval_max_height;
 
-__pdata uint8_t			ao_flight_force_idle;
+uint8_t			ao_flight_force_idle;
 
 /* Landing is detected by getting constant readings from both pressure and accelerometer
  * for a fairly long time (AO_INTERVAL_TICKS)
@@ -111,7 +111,7 @@ ao_flight_nano(void)
 	}
 }
 
-static __xdata struct ao_task	flight_task;
+static struct ao_task	flight_task;
 
 void
 ao_flight_nano_init(void)

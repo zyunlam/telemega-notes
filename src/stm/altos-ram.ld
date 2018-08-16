@@ -42,13 +42,13 @@ SECTIONS {
 		__text_end__ = .;
 	} > ram
 
-	__data_start__ = .;
+	_start__ = .;
 
 	/* Data -- relocated to RAM, but written to ROM
 	 */
 	.data : AT (ADDR(.ARM.exidx) + SIZEOF (.ARM.exidx)) {
 		*(.data)	/* initialized data */
-		__data_end__ = .;
+		_end__ = .;
 		__bss_start__ = .;
 	} >ram
 

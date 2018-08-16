@@ -22,7 +22,7 @@
 #include <ao_fast_timer.h>
 #include <ao_event.h>
 
-__xdata int32_t ao_quadrature_count[AO_QUADRATURE_COUNT];
+int32_t ao_quadrature_count[AO_QUADRATURE_COUNT];
 #ifndef AO_QUADRATURE_SINGLE_CODE
 static int8_t ao_quadrature_step[AO_QUADRATURE_COUNT];
 #endif

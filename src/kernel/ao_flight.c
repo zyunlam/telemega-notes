@@ -47,28 +47,28 @@
 
 /* Main flight thread. */
 
-__pdata enum ao_flight_state	ao_flight_state;	/* current flight state */
-__pdata uint16_t		ao_boost_tick;		/* time of most recent boost detect */
-__pdata uint16_t		ao_launch_tick;		/* time of first boost detect */
-__pdata uint16_t		ao_motor_number;	/* number of motors burned so far */
+enum ao_flight_state	ao_flight_state;	/* current flight state */
+uint16_t		ao_boost_tick;		/* time of most recent boost detect */
+uint16_t		ao_launch_tick;		/* time of first boost detect */
+uint16_t		ao_motor_number;	/* number of motors burned so far */
 
 #if HAS_SENSOR_ERRORS
 /* Any sensor can set this to mark the flight computer as 'broken' */
-__xdata uint8_t			ao_sensor_errors;
+uint8_t			ao_sensor_errors;
 #endif
 
 /*
  * track min/max data over a long interval to detect
  * resting
  */
-static __data uint16_t		ao_interval_end;
-static __data ao_v_t		ao_interval_min_height;
-static __data ao_v_t		ao_interval_max_height;
+static uint16_t		ao_interval_end;
+static ao_v_t		ao_interval_min_height;
+static ao_v_t		ao_interval_max_height;
 #if HAS_ACCEL
-static __data ao_v_t		ao_coast_avg_accel;
+static ao_v_t		ao_coast_avg_accel;
 #endif
 
-__pdata uint8_t			ao_flight_force_idle;
+uint8_t			ao_flight_force_idle;
 
 /* We also have a clock, which can be used to sanity check things in
  * case of other failures
@@ -463,7 +463,7 @@ ao_orient_test_select(void)
 	ao_orient_test = !ao_orient_test;
 }
 
-__code struct ao_cmds ao_flight_cmds[] = {
+const struct ao_cmds ao_flight_cmds[] = {
 	{ ao_flight_dump, 	"F\0Dump flight status" },
 	{ ao_gyro_test,		"G\0Test gyro code" },
 	{ ao_orient_test_select,"O\0Test orientation code" },
@@ -471,7 +471,7 @@ __code struct ao_cmds ao_flight_cmds[] = {
 };
 #endif
 
-static __xdata struct ao_task	flight_task;
+static struct ao_task	flight_task;
 
 void
 ao_flight_init(void)

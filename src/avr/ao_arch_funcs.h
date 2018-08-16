@@ -20,7 +20,7 @@
  * ao_spi.c
  */
 
-extern __xdata uint8_t	ao_spi_mutex;
+extern uint8_t	ao_spi_mutex;
 
 #define ao_spi_get_mask(reg,mask,bus,speed) do {	\
 		ao_mutex_get(&ao_spi_mutex);	\
@@ -66,10 +66,10 @@ extern __xdata uint8_t	ao_spi_mutex;
 
 
 void
-ao_spi_send_bus(void __xdata *block, uint16_t len) __reentrant;
+ao_spi_send_bus(void *block, uint16_t len);
 
 void
-ao_spi_recv_bus(void __xdata *block, uint16_t len) __reentrant;
+ao_spi_recv_bus(void *block, uint16_t len);
 
 #define ao_spi_send(block, len, bus) ao_spi_send_bus(block, len)
 #define ao_spi_recv(block, len, bus) ao_spi_recv_bus(block, len)

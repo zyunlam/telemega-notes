@@ -26,11 +26,11 @@
  * frequency, and updating the radio setting along the way
  */
 
-int32_t ao_freq_to_set(int32_t freq, int32_t cal) __reentrant
+int32_t ao_freq_to_set(int32_t freq, int32_t cal) 
 {
-	static __pdata int32_t	set;
-	static __pdata uint8_t	neg;
-	static __pdata int32_t	error;
+	static int32_t	set;
+	static uint8_t	neg;
+	static int32_t	error;
 
 	set = 0;
 	neg = 0;

@@ -22,7 +22,7 @@
  * Atmega32u4 TWI master mode (I2C)
  */
 
-__xdata uint8_t	ao_i2c_mutex;
+uint8_t	ao_i2c_mutex;
 
 /* Send bytes over I2C.
  *
@@ -30,7 +30,7 @@ __xdata uint8_t	ao_i2c_mutex;
  * so using interrupts would take way too long
  */
 void
-ao_i2c_send(void __xdata *block, uint16_t len) __reentrant
+ao_i2c_send(void *block, uint16_t len) 
 {
 	uint8_t	*d = block;
 
@@ -51,7 +51,7 @@ ao_i2c_send(void __xdata *block, uint16_t len) __reentrant
  * clocks the data coming in.
  */
 void
-ao_i2c_recv(void __xdata *block, uint16_t len) __reentrant
+ao_i2c_recv(void *block, uint16_t len) 
 {
 	uint8_t	*d = block;
 

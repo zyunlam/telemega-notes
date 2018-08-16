@@ -51,7 +51,7 @@ ao_led_toggle(AO_LED_TYPE colors);
 
 /* Turn on the specified LEDs for the indicated interval */
 void
-ao_led_for(AO_LED_TYPE colors, uint16_t ticks) __reentrant;
+ao_led_for(AO_LED_TYPE colors, uint16_t ticks);
 
 /* Initialize the LEDs */
 void

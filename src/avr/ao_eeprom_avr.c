@@ -21,16 +21,16 @@
 #include <ao_storage.h>
 
 /* Total bytes of available storage */
-__pdata ao_pos_t	ao_storage_total = 1024;
+ao_pos_t	ao_storage_total = 1024;
 
 /* Block size - device is erased in these units. */
-__pdata ao_pos_t	ao_storage_block = 1024;
+ao_pos_t	ao_storage_block = 1024;
 
 /* Byte offset of config block. Will be ao_storage_block bytes long */
-__pdata ao_pos_t	ao_storage_config = 0;
+ao_pos_t	ao_storage_config = 0;
 
 /* Storage unit size - device reads and writes must be within blocks of this size. */
-__pdata uint16_t	ao_storage_unit = 1024;
+uint16_t	ao_storage_unit = 1024;
 
 /*
  * The internal flash chip is arranged in 8 byte sectors; the
@@ -45,7 +45,7 @@ __pdata uint16_t	ao_storage_unit = 1024;
  * Erase the specified sector
  */
 uint8_t
-ao_storage_erase(ao_pos_t pos) __reentrant
+ao_storage_erase(ao_pos_t pos) 
 {
 	/* Not necessary */
 	return 1;
@@ -83,10 +83,10 @@ ao_intflash_read(uint16_t pos)
  */
 
 uint8_t
-ao_storage_device_write(ao_pos_t pos32, __xdata void *v, uint16_t len) __reentrant
+ao_storage_device_write(ao_pos_t pos32, void *v, uint16_t len) 
 {
 	uint16_t pos = pos32;
-	__xdata uint8_t *d = v;
+	uint8_t *d = v;
 
 	if (pos >= ao_storage_total || pos + len > ao_storage_total)
 		return 0;
@@ -101,7 +101,7 @@ ao_storage_device_write(ao_pos_t pos32, __xdata void *v, uint16_t len) __reentra
  * Read from flash
  */
 uint8_t
-ao_storage_device_read(ao_pos_t pos, __xdata void *v, uint16_t len) __reentrant
+ao_storage_device_read(ao_pos_t pos, void *v, uint16_t len) 
 {
 	uint8_t	*d = v;
 	
@@ -113,7 +113,7 @@ ao_storage_device_read(ao_pos_t pos, __xdata void *v, uint16_t len) __reentrant
 }
 
 void
-ao_storage_flush(void) __reentrant
+ao_storage_flush(void) 
 {
 }
 
@@ -123,7 +123,7 @@ ao_storage_setup(void)
 }
 
 void
-ao_storage_device_info(void) __reentrant
+ao_storage_device_info(void) 
 {
 	printf ("Using internal flash\n");
 }

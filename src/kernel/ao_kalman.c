@@ -24,9 +24,9 @@
 #include "ao_sample.h"
 #include "ao_kalman.h"
 
-static __pdata ao_k_t		ao_k_height;
-static __pdata ao_k_t		ao_k_speed;
-static __pdata ao_k_t		ao_k_accel;
+static ao_k_t		ao_k_height;
+static ao_k_t		ao_k_speed;
+static ao_k_t		ao_k_accel;
 
 #define AO_K_STEP_100		to_fix_v(0.01)
 #define AO_K_STEP_2_2_100	to_fix_v(0.00005)
@@ -37,24 +37,24 @@ static __pdata ao_k_t		ao_k_accel;
 #define AO_K_STEP_1		to_fix_v(1)
 #define AO_K_STEP_2_2_1		to_fix_v(0.5)
 
-__pdata ao_v_t			ao_height;
-__pdata ao_v_t			ao_speed;
-__pdata ao_v_t			ao_accel;
-__xdata ao_v_t			ao_max_height;
-static __pdata ao_k_t		ao_avg_height_scaled;
-__xdata ao_v_t			ao_avg_height;
+ao_v_t			ao_height;
+ao_v_t			ao_speed;
+ao_v_t			ao_accel;
+ao_v_t			ao_max_height;
+static ao_k_t		ao_avg_height_scaled;
+ao_v_t			ao_avg_height;
 
-__pdata ao_v_t			ao_error_h;
+ao_v_t			ao_error_h;
 #if !HAS_ACCEL || AO_FLIGHT_TEST
 #define AO_ERROR_H_SQ_AVG	1
 #endif
 
 #if AO_ERROR_H_SQ_AVG
-__pdata ao_v_t			ao_error_h_sq_avg;
+ao_v_t			ao_error_h_sq_avg;
 #endif
 
 #if HAS_ACCEL
-__pdata ao_v_t			ao_error_a;
+ao_v_t			ao_error_a;
 #endif
 
 static void

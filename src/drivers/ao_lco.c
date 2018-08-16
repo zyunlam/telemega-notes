@@ -324,7 +324,7 @@ ao_lco_set_debug(void)
 		ao_lco_debug = ao_cmd_lex_i != 0;
 }
 
-__code struct ao_cmds ao_lco_cmds[] = {
+const struct ao_cmds ao_lco_cmds[] = {
 	{ ao_lco_set_debug,	"D <0 off, 1 on>\0Debug" },
 	{ ao_lco_search,	"s\0Search for pad boxes" },
 	{ 0, NULL }

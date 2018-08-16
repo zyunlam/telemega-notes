@@ -19,9 +19,9 @@
 #include <ao.h>
 #include <ao_radio_cmac.h>
 
-static __xdata uint8_t ao_radio_cmac_mutex;
-__pdata int8_t ao_radio_cmac_rssi;
-static __xdata uint8_t cmac_data[AO_CMAC_MAX_LEN + AO_CMAC_KEY_LEN + 2 + AO_CMAC_KEY_LEN];
+static uint8_t ao_radio_cmac_mutex;
+int8_t ao_radio_cmac_rssi;
+static uint8_t cmac_data[AO_CMAC_MAX_LEN + AO_CMAC_KEY_LEN + 2 + AO_CMAC_KEY_LEN];
 
 static uint8_t
 round_len(uint8_t len)
@@ -45,7 +45,7 @@ round_len(uint8_t len)
  * Sign and deliver the data sitting in the cmac buffer
  */
 static void
-radio_cmac_send(uint8_t len) __reentrant
+radio_cmac_send(uint8_t len) 
 {
 	uint8_t	i;
 
@@ -77,7 +77,7 @@ radio_cmac_send(uint8_t len) __reentrant
  */
 
 static int8_t
-radio_cmac_recv(uint8_t len, uint16_t timeout) __reentrant
+radio_cmac_recv(uint8_t len, uint16_t timeout) 
 {
 	uint8_t	i;
 
@@ -127,7 +127,7 @@ radio_cmac_recv(uint8_t len, uint16_t timeout) __reentrant
 }
 
 int8_t
-ao_radio_cmac_send(__xdata void *packet, uint8_t len) __reentrant
+ao_radio_cmac_send(void *packet, uint8_t len) 
 {
 	if (len > AO_CMAC_MAX_LEN)
 		return AO_RADIO_CMAC_LEN_ERROR;
@@ -145,7 +145,7 @@ ao_radio_cmac_send(__xdata void *packet, uint8_t len) __reentrant
 }
 
 int8_t
-ao_radio_cmac_recv(__xdata void *packet, uint8_t len, uint16_t timeout) __reentrant
+ao_radio_cmac_recv(void *packet, uint8_t len, uint16_t timeout) 
 {
 	int8_t	i;
 	if (len > AO_CMAC_MAX_LEN)

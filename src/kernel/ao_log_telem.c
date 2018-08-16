@@ -20,13 +20,13 @@
 #include <ao_flight.h>
 #include <ao_sample.h>
 
-__code uint8_t ao_log_format = AO_LOG_FORMAT_TELEMETRY;
+const uint8_t ao_log_format = AO_LOG_FORMAT_TELEMETRY;
 
-static __data uint8_t			ao_log_monitor_pos;
-__pdata enum ao_flight_state		ao_flight_state;
-__xdata int16_t				ao_max_height;	/* max of ao_height */
-__pdata int16_t				sense_d, sense_m;
-__pdata uint8_t				ao_igniter_present;
+static uint8_t			ao_log_monitor_pos;
+enum ao_flight_state		ao_flight_state;
+int16_t				ao_max_height;	/* max of ao_height */
+int16_t				sense_d, sense_m;
+uint8_t				ao_igniter_present;
 
 static void
 ao_log_telem_track() {

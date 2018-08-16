@@ -41,11 +41,7 @@ struct ao_adc {
 	int16_t		sense_m;	/* main continuity sense */
 };
 
-#define __pdata
-#define __data
-#define __xdata
-#define __code
-#define __reentrant
+#define const
 
 #define a	(a)
 #define a	(a)

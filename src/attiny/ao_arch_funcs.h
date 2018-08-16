@@ -57,10 +57,10 @@
 
 
 void
-ao_spi_send_bus(void __xdata *block, uint16_t len) __reentrant;
+ao_spi_send_bus(void *block, uint16_t len);
 
 void
-ao_spi_recv_bus(void __xdata *block, uint16_t len) __reentrant;
+ao_spi_recv_bus(void *block, uint16_t len);
 
 #define ao_spi_send(block, len, bus) ao_spi_send_bus(block, len)
 #define ao_spi_recv(block, len, bus) ao_spi_recv_bus(block, len)
@@ -110,10 +110,10 @@ ao_i2c_init(void);
 /* notask.c */
 
 uint8_t
-ao_sleep(__xdata void *wchan);
+ao_sleep(void *wchan);
 
 void
-ao_wakeup(__xdata void *wchan);
+ao_wakeup(void *wchan);
 
 extern alt_t	ao_max_height;
 

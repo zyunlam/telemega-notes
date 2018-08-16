@@ -19,16 +19,16 @@
 #include "ao.h"
 
 /* Total bytes of available storage */
-__pdata uint32_t	ao_storage_total;
+uint32_t	ao_storage_total;
 
 /* Block size - device is erased in these units. At least 256 bytes */
-__pdata uint32_t	ao_storage_block;
+uint32_t	ao_storage_block;
 
 /* Byte offset of config block. Will be ao_storage_block bytes long */
-__pdata uint32_t	ao_storage_config;
+uint32_t	ao_storage_config;
 
 /* Storage unit size - device reads and writes must be within blocks of this size. Usually 256 bytes. */
-__pdata uint16_t	ao_storage_unit;
+uint16_t	ao_storage_unit;
 
 /*
  * MRAM is entirely random access; no erase operations are required,
@@ -51,7 +51,7 @@ __pdata uint16_t	ao_storage_unit;
 #define MR25_STATUS_BP_SHIFT	(2)
 #define MR25_STATUS_WEL		(1 << 1)	/* Write enable latch */
 
-static __xdata uint8_t ao_mr25_mutex;
+static uint8_t ao_mr25_mutex;
 
 /*
  * This little array is abused to send and receive data. A particular
@@ -61,7 +61,7 @@ static __xdata uint8_t ao_mr25_mutex;
  * those last three bytes.
  */
 
-static __xdata uint8_t	ao_mr25_instruction[4];
+static uint8_t	ao_mr25_instruction[4];
 
 #define MR25_SELECT()		ao_spi_get_mask(AO_MR25_SPI_CS_PORT,(1 << AO_MR25_SPI_CS_PIN),AO_MR25_SPI_BUS, AO_SPI_SPEED_FAST)
 #define MR25_DESELECT()		ao_spi_put_mask(AO_MR25_SPI_CS_PORT,(1 << AO_MR25_SPI_CS_PIN),AO_MR25_SPI_BUS)
@@ -93,7 +93,7 @@ ao_mr25_set_address(uint32_t pos)
  * Erase the specified sector (no-op for MRAM)
  */
 uint8_t
-ao_storage_erase(uint32_t pos) __reentrant
+ao_storage_erase(uint32_t pos) 
 {
 	if (pos >= ao_storage_total || pos + ao_storage_block > ao_storage_total)
 		return 0;
@@ -104,7 +104,7 @@ ao_storage_erase(uint32_t pos) __reentrant
  * Write to flash
  */
 uint8_t
-ao_storage_device_write(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
+ao_storage_device_write(uint32_t pos, void *d, uint16_t len) 
 {
 	if (pos >= ao_storage_total || pos + len > ao_storage_total)
 		return 0;
@@ -128,7 +128,7 @@ ao_storage_device_write(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
  * Read from flash
  */
 uint8_t
-ao_storage_device_read(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
+ao_storage_device_read(uint32_t pos, void *d, uint16_t len) 
 {
 	if (pos >= ao_storage_total || pos + len > ao_storage_total)
 		return 0;
@@ -147,7 +147,7 @@ ao_storage_device_read(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
 }
 
 void
-ao_storage_flush(void) __reentrant
+ao_storage_flush(void) 
 {
 }
 
@@ -157,7 +157,7 @@ ao_storage_setup(void)
 }
 
 void
-ao_storage_device_info(void) __reentrant
+ao_storage_device_info(void) 
 {
 	printf ("Detected chips 1 size %d\n", ao_storage_total >> 8);
 }

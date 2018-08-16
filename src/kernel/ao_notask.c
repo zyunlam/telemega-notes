@@ -21,7 +21,7 @@
 static volatile void *ao_wchan;
 
 uint8_t
-ao_sleep(__xdata void *wchan)
+ao_sleep(void *wchan)
 {
 #if 1
 	ao_wchan = wchan;
@@ -55,7 +55,7 @@ ao_delay(uint16_t ticks)
 #endif
 
 void
-ao_wakeup(__xdata void *wchan)
+ao_wakeup(void *wchan)
 {
 	(void) wchan;
 	ao_wchan = 0;

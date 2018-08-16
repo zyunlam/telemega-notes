@@ -18,13 +18,13 @@
 
 #include "ao.h"
 
-struct ao_task __xdata blink_0_task;
-struct ao_task __xdata blink_1_task;
-struct ao_task __xdata wakeup_task;
-struct ao_task __xdata beep_task;
-struct ao_task __xdata echo_task;
+struct ao_task blink_0_task;
+struct ao_task blink_1_task;
+struct ao_task wakeup_task;
+struct ao_task beep_task;
+struct ao_task echo_task;
 
-void delay(int n) __reentrant
+void delay(int n) 
 {
 	uint8_t	j = 0;
 	while (--n)
@@ -32,7 +32,7 @@ void delay(int n) __reentrant
 			ao_yield();
 }
 
-static __xdata uint8_t blink_chan;
+static uint8_t blink_chan;
 
 void
 blink_0(void)
@@ -51,7 +51,7 @@ blink_0(void)
 void
 blink_1(void)
 {
-	static __xdata struct ao_adc adc;
+	static struct ao_adc adc;
 
 	for (;;) {
 		ao_sleep(&ao_adc_head);
@@ -75,7 +75,7 @@ wakeup(void)
 void
 beep(void)
 {
-	static __xdata struct ao_adc adc;
+	static struct ao_adc adc;
 
 	for (;;) {
 		ao_delay(AO_SEC_TO_TICKS(1));

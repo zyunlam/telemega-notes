@@ -18,7 +18,7 @@
 
 #include <ao.h>
 
-__pdata AO_PORT_TYPE ao_led_enable;
+AO_PORT_TYPE ao_led_enable;
 
 void
 ao_led_on(AO_PORT_TYPE colors)
@@ -49,7 +49,7 @@ ao_led_toggle(AO_PORT_TYPE colors)
 }
 
 void
-ao_led_for(AO_PORT_TYPE colors, uint16_t ticks) __reentrant
+ao_led_for(AO_PORT_TYPE colors, uint16_t ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);

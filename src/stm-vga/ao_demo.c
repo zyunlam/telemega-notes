@@ -198,7 +198,7 @@ ao_console_send(void)
 	}
 }
 
-__code struct ao_cmds ao_demo_cmds[] = {
+const struct ao_cmds ao_demo_cmds[] = {
 	{ ao_video_toggle, "V\0Toggle video" },
 	{ ao_ball_toggle, "B\0Toggle ball" },
 	{ ao_ps2_read_keys, "K\0Read keys from keyboard" },

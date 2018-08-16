@@ -65,7 +65,7 @@ SECTIONS {
 	 */
 
 	.textram BLOCK(8): {
-		__data_start__ = .;
+		_start__ = .;
 		__text_ram_start__ = .;
 		*(.ramtext)
 		__text_ram_end = .;
@@ -76,7 +76,7 @@ SECTIONS {
 	 */
 	.data BLOCK(8): {
 		*(.data)	/* initialized data */
-		__data_end__ = .;
+		_end__ = .;
 	} >ram AT>rom
 
 

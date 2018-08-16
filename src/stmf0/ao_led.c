@@ -18,7 +18,7 @@
 
 #include "ao.h"
 
-__pdata uint16_t ao_led_enable;
+uint16_t ao_led_enable;
 
 void
 ao_led_on(uint16_t colors)
@@ -76,7 +76,7 @@ ao_led_toggle(uint16_t colors)
 }
 
 void
-ao_led_for(uint16_t colors, uint16_t ticks) __reentrant
+ao_led_for(uint16_t colors, uint16_t ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);

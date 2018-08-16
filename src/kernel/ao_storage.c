@@ -20,7 +20,7 @@
 #include <ao_storage.h>
 
 uint8_t
-ao_storage_read(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
+ao_storage_read(ao_pos_t pos, void *buf, uint16_t len) 
 {
 #ifdef CC1111
 	return ao_storage_device_read(pos, buf, len);
@@ -54,7 +54,7 @@ ao_storage_read(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
 }
 
 uint8_t
-ao_storage_write(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
+ao_storage_write(ao_pos_t pos, void *buf, uint16_t len) 
 {
 #ifdef CC1111
 	return ao_storage_device_write(pos, buf, len);
@@ -87,10 +87,10 @@ ao_storage_write(ao_pos_t pos, __xdata void *buf, uint16_t len) __reentrant
 #endif
 }
 
-static __xdata uint8_t storage_data[128];
+static uint8_t storage_data[128];
 
 static void
-ao_storage_dump(void) __reentrant
+ao_storage_dump(void) 
 {
 	uint8_t i, j;
 
@@ -118,12 +118,12 @@ ao_storage_dump(void) __reentrant
 /* not enough space for this today
  */
 static void
-ao_storage_store(void) __reentrant
+ao_storage_store(void) 
 {
 	uint16_t block;
 	uint8_t i;
 	uint16_t len;
-	static __xdata uint8_t b;
+	static uint8_t b;
 	uint32_t addr;
 
 	ao_cmd_hex();
@@ -147,7 +147,7 @@ ao_storage_store(void) __reentrant
 #endif
 
 void
-ao_storage_zap(void) __reentrant
+ao_storage_zap(void) 
 {
 	ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
@@ -156,7 +156,7 @@ ao_storage_zap(void) __reentrant
 }
 
 void
-ao_storage_zapall(void) __reentrant
+ao_storage_zapall(void) 
 {
 	uint32_t	pos;
 
@@ -272,7 +272,7 @@ ao_storage_incr_check_block(uint32_t pos)
 }
 
 static uint8_t
-ao_storage_test_block(uint32_t pos) __reentrant
+ao_storage_test_block(uint32_t pos) 
 {
 	ao_storage_erase(pos);
 	printf(" erase"); flush();
@@ -299,7 +299,7 @@ ao_storage_test_block(uint32_t pos) __reentrant
 }
 
 static void
-ao_storage_test(void) __reentrant
+ao_storage_test(void) 
 {
 	uint32_t	pos;
 
@@ -316,7 +316,7 @@ ao_storage_test(void) __reentrant
 #endif /* AO_STORAGE_TEST */
 
 void
-ao_storage_info(void) __reentrant
+ao_storage_info(void) 
 {
 	ao_storage_setup();
 	printf("Storage size: %ld\n", (long) ao_storage_total);
@@ -324,7 +324,7 @@ ao_storage_info(void) __reentrant
 	ao_storage_device_info();
 }
 
-__code struct ao_cmds ao_storage_cmds[] = {
+const struct ao_cmds ao_storage_cmds[] = {
 	{ ao_storage_info, "f\0Show storage" },
 	{ ao_storage_dump, "e <block>\0Dump flash" },
 #if HAS_STORAGE_DEBUG

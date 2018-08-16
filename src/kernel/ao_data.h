@@ -97,12 +97,12 @@ struct ao_data {
 
 /* Get a copy of the last complete sample set */
 void
-ao_data_get(__xdata struct ao_data *packet);
+ao_data_get(struct ao_data *packet);
 
-extern volatile __xdata struct ao_data	ao_data_ring[AO_DATA_RING];
-extern volatile __data uint8_t		ao_data_head;
-extern volatile __data uint8_t		ao_data_present;
-extern volatile __data uint8_t		ao_data_count;
+extern volatile struct ao_data	ao_data_ring[AO_DATA_RING];
+extern volatile uint8_t		ao_data_head;
+extern volatile uint8_t		ao_data_present;
+extern volatile uint8_t		ao_data_count;
 
 /*
  * Mark a section of data as ready, check for data complete

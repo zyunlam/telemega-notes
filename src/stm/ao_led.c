@@ -153,7 +153,7 @@ ao_led_toggle(AO_LED_TYPE colors)
 }
 
 void
-ao_led_for(AO_LED_TYPE colors, AO_LED_TYPE ticks) __reentrant
+ao_led_for(AO_LED_TYPE colors, AO_LED_TYPE ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);

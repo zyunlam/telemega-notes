@@ -19,10 +19,10 @@
 #include "ao.h"
 #include "ao_task.h"
 
-__pdata uint16_t ao_cmd_lex_i;
-__pdata uint32_t ao_cmd_lex_u32;
-__pdata char	ao_cmd_lex_c;
-__pdata enum ao_cmd_status ao_cmd_status;
+uint16_t ao_cmd_lex_i;
+uint32_t ao_cmd_lex_u32;
+char	ao_cmd_lex_c;
+enum ao_cmd_status ao_cmd_status;
 
 #ifndef AO_CMD_LEN
 #if AO_PYRO_NUM
@@ -32,12 +32,12 @@ __pdata enum ao_cmd_status ao_cmd_status;
 #endif
 #endif
 
-static __xdata char	cmd_line[AO_CMD_LEN];
-static __pdata uint8_t	cmd_len;
-static __pdata uint8_t	cmd_i;
+static char	cmd_line[AO_CMD_LEN];
+static uint8_t	cmd_len;
+static uint8_t	cmd_i;
 
 void
-ao_put_string(__code char *s)
+ao_put_string(const char *s)
 {
 	char	c;
 	while ((c = *s++))
@@ -196,7 +196,7 @@ ao_cmd_hexbyte(void)
 void
 ao_cmd_hex(void)
 {
-	__pdata uint8_t	r = ao_cmd_lex_error;
+	uint8_t	r = ao_cmd_lex_error;
 	int8_t	n;
 
 	ao_cmd_lex_i = 0;
@@ -214,7 +214,7 @@ ao_cmd_hex(void)
 }
 
 void
-ao_cmd_decimal(void) __reentrant
+ao_cmd_decimal(void) 
 {
 	uint8_t	r = ao_cmd_lex_error;
 
@@ -234,7 +234,7 @@ ao_cmd_decimal(void) __reentrant
 }
 
 uint8_t
-ao_match_word(__code char *word)
+ao_match_word(const char *word)
 {
 	while (*word) {
 		if (ao_cmd_lex_c != *word) {
@@ -321,16 +321,16 @@ version(void)
 #define NUM_CMDS	11
 #endif
 
-static __code struct ao_cmds	*__xdata (ao_cmds[NUM_CMDS]);
-static __pdata uint8_t		ao_ncmds;
+static const struct ao_cmds	*(ao_cmds[NUM_CMDS]);
+static uint8_t		ao_ncmds;
 
 static void
 help(void)
 {
-	__pdata uint8_t cmds;
-	__pdata uint8_t cmd;
-	__code struct ao_cmds * __pdata cs;
-	__code const char *h;
+	uint8_t cmds;
+	uint8_t cmd;
+	const struct ao_cmds * cs;
+	const char *h;
 	uint8_t e;
 
 	for (cmds = 0; cmds < ao_ncmds; cmds++) {
@@ -363,7 +363,7 @@ report(void)
 }
 
 void
-ao_cmd_register(__code struct ao_cmds *cmds)
+ao_cmd_register(const struct ao_cmds *cmds)
 {
 	if (ao_ncmds >= NUM_CMDS)
 		ao_panic(AO_PANIC_CMD);
@@ -373,10 +373,10 @@ ao_cmd_register(__code struct ao_cmds *cmds)
 void
 ao_cmd(void)
 {
-	__pdata char	c;
+	char	c;
 	uint8_t cmd, cmds;
-	__code struct ao_cmds * __xdata cs;
-	void (*__xdata func)(void);
+	const struct ao_cmds * cs;
+	void (*func)(void);
 
 	for (;;) {
 		ao_cmd_readline();
@@ -424,10 +424,10 @@ ao_loader(void)
 #endif
 
 #if HAS_TASK
-__xdata struct ao_task ao_cmd_task;
+struct ao_task ao_cmd_task;
 #endif
 
-__code struct ao_cmds	ao_base_cmds[] = {
+const struct ao_cmds	ao_base_cmds[] = {
 	{ help,		"?\0Help" },
 #if HAS_TASK_INFO && HAS_TASK
 	{ ao_task_info,	"T\0Tasks" },

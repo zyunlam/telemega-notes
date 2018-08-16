@@ -26,7 +26,7 @@ static void scheme_cmd() {
 }
 
 
-__code struct ao_cmds ao_demo_cmds[] = {
+const struct ao_cmds ao_demo_cmds[] = {
 	{ scheme_cmd, "l\0Run scheme interpreter" },
 	{ 0, NULL }
 };

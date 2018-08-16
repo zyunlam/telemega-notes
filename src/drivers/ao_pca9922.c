@@ -23,7 +23,7 @@
 
 #include <ao.h>
 
-static __xdata uint8_t	ao_led_state;
+static uint8_t	ao_led_state;
 
 static void
 ao_led_apply(void)
@@ -93,7 +93,7 @@ ao_led_toggle(uint8_t colors)
 }
 
 void
-ao_led_for(uint8_t colors, uint16_t ticks) __reentrant
+ao_led_for(uint8_t colors, uint16_t ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);

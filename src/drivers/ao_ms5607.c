@@ -22,8 +22,8 @@
 
 #if HAS_MS5607 || HAS_MS5611
 
-__xdata struct ao_ms5607_prom	ao_ms5607_prom;
-static __xdata uint8_t	  	ms5607_configured;
+struct ao_ms5607_prom	ao_ms5607_prom;
+static uint8_t	  	ms5607_configured;
 
 #ifndef AO_MS5607_SPI_SPEED
 #define AO_MS5607_SPI_SPEED	AO_SPI_SPEED_FAST
@@ -97,12 +97,12 @@ ao_ms5607_prom_valid(uint8_t *prom)
 }
 
 static void
-ao_ms5607_prom_read(__xdata struct ao_ms5607_prom *prom)
+ao_ms5607_prom_read(struct ao_ms5607_prom *prom)
 {
 	uint8_t		addr;
 	uint16_t	*r;
 
-	r = (__xdata uint16_t *) prom;
+	r = (uint16_t *) prom;
 	for (addr = 0; addr < 8; addr++) {
 		uint8_t	cmd = AO_MS5607_PROM_READ(addr);
 		ao_ms5607_start();
@@ -138,20 +138,20 @@ ao_ms5607_setup(void)
 	ao_ms5607_prom_read(&ao_ms5607_prom);
 }
 
-static __xdata volatile uint8_t	ao_ms5607_done;
+static volatile uint8_t	ao_ms5607_done;
 
 static void
 ao_ms5607_isr(void)
 {
 	ao_exti_disable(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN);
 	ao_ms5607_done = 1;
-	ao_wakeup((__xdata void *) &ao_ms5607_done);
+	ao_wakeup((void *) &ao_ms5607_done);
 }
 
 static uint32_t
 ao_ms5607_get_sample(uint8_t cmd) {
-	__xdata uint8_t	reply[3];
-	__xdata uint8_t read;
+	uint8_t	reply[3];
+	uint8_t read;
 
 	ao_ms5607_done = 0;
 
@@ -198,7 +198,7 @@ ao_ms5607_get_sample(uint8_t cmd) {
 #define AO_CONVERT_D2	token_evaluator(AO_MS5607_CONVERT_D2_, AO_MS5607_TEMP_OVERSAMPLE)
 
 void
-ao_ms5607_sample(__xdata struct ao_ms5607_sample *sample)
+ao_ms5607_sample(struct ao_ms5607_sample *sample)
 {
 	sample->pres = ao_ms5607_get_sample(AO_CONVERT_D1);
 	sample->temp = ao_ms5607_get_sample(AO_CONVERT_D2);
@@ -214,7 +214,7 @@ ao_ms5607_sample(__xdata struct ao_ms5607_sample *sample)
 #define HAS_MS5607_TASK HAS_TASK
 #endif
 
-__xdata struct ao_ms5607_sample	ao_ms5607_current;
+struct ao_ms5607_sample	ao_ms5607_current;
 
 #if HAS_MS5607_TASK
 static void
@@ -233,7 +233,7 @@ ao_ms5607(void)
 	}
 }
 
-__xdata struct ao_task ao_ms5607_task;
+struct ao_task ao_ms5607_task;
 #endif
 
 #if HAS_TASK
@@ -253,7 +253,7 @@ ao_ms5607_info(void)
 static void
 ao_ms5607_dump(void)
 {
-	__xdata struct ao_ms5607_value value;
+	struct ao_ms5607_value value;
 
 	ao_ms5607_convert(&ao_ms5607_current, &value);
 	printf ("Pressure:    %8lu %8ld\n", ao_ms5607_current.pres, value.pres);
@@ -261,7 +261,7 @@ ao_ms5607_dump(void)
 	printf ("Altitude: %ld\n", ao_pa_to_altitude(value.pres));
 }
 
-__code struct ao_cmds ao_ms5607_cmds[] = {
+const struct ao_cmds ao_ms5607_cmds[] = {
 	{ ao_ms5607_dump,	"B\0Display MS5607 data" },
 	{ 0, NULL },
 };

@@ -21,7 +21,7 @@
 
 /* ao_aes.c */
 
-extern __xdata uint8_t ao_aes_mutex;
+extern uint8_t ao_aes_mutex;
 
 /* AES keys and blocks are 128 bits */
 
@@ -40,14 +40,14 @@ void
 ao_aes_set_mode(enum ao_aes_mode mode);
 
 void
-ao_aes_set_key(__xdata uint8_t *in);
+ao_aes_set_key(uint8_t *in);
 
 void
 ao_aes_zero_iv(void);
 
 void
-ao_aes_run(__xdata uint8_t *in,
-	   __xdata uint8_t *out);
+ao_aes_run(uint8_t *in,
+	   uint8_t *out);
 
 void
 ao_aes_init(void);

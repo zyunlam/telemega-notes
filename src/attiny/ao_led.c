@@ -18,7 +18,7 @@
 
 #include "ao.h"
 
-__pdata uint8_t ao_led_enable;
+uint8_t ao_led_enable;
 
 #define LED_PORT	PORTB
 #define LED_DDR		DDRB
@@ -48,7 +48,7 @@ ao_led_toggle(uint8_t colors)
 }
 
 void
-ao_led_for(uint8_t colors, uint16_t ticks) __reentrant
+ao_led_for(uint8_t colors, uint16_t ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);

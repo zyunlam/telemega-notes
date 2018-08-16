@@ -20,11 +20,11 @@
 #include <ao_radio_spi.h>
 #include <ao_radio_cmac.h>
 
-static __xdata struct ao_radio_spi_reply ao_radio_spi_reply;
+static struct ao_radio_spi_reply ao_radio_spi_reply;
 
-static __xdata struct ao_radio_spi_request ao_radio_spi_request;
+static struct ao_radio_spi_request ao_radio_spi_request;
 
-static __xdata uint8_t	slave_state;
+static uint8_t	slave_state;
 
 static void
 ao_radio_slave_low(void)
@@ -123,7 +123,7 @@ ao_radio_slave_spi(void)
 	}
 }
 
-static __xdata struct ao_task ao_radio_slave_spi_task;
+static struct ao_task ao_radio_slave_spi_task;
 
 void
 ao_radio_slave_init(void)

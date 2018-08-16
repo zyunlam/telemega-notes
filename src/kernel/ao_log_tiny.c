@@ -18,7 +18,7 @@
 
 #include "ao.h"
 
-static __data uint16_t	ao_log_tiny_interval;
+static uint16_t	ao_log_tiny_interval;
 
 #define AO_LOG_TINY_INTERVAL_DEFAULT	AO_MS_TO_TICKS(1000)
 #if USE_FAST_ASCENT_LOG
@@ -46,8 +46,8 @@ static void ao_log_tiny_data(uint16_t d)
 	}
 }
 
-static __xdata uint16_t ao_log_pad_ring[AO_PAD_RING];
-static __pdata uint8_t ao_log_pad_ring_pos;
+static uint16_t ao_log_pad_ring[AO_PAD_RING];
+static uint8_t ao_log_pad_ring_pos;
 
 #define ao_pad_ring_next(n)	(((n) + 1) & (AO_PAD_RING - 1))
 
@@ -150,7 +150,7 @@ ao_log(void)
 int16_t
 ao_log_flight(uint8_t slot)
 {
-	static __xdata uint16_t flight;
+	static uint16_t flight;
 
 	(void) slot;
 	ao_storage_read(0, &flight, 2);
