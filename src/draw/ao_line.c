@@ -159,28 +159,28 @@ ao_clip_line(struct ao_cc *c, struct ao_cbox *b)
 	/* Clip major axis */
 	if (c->major < b->maj1) {
 		if (c->sign_major <= 0)
-			return FALSE;
+			return false;
 		adjust_major = b->maj1 - c->major;
 	} else if (c->major >= b->maj2) {
 		if (c->sign_major >= 0)
-			return FALSE;
+			return false;
 		adjust_major = c->major - (b->maj2-1);
 	}
 
 	/* Clip minor axis */
 	if (c->minor < b->min1) {
 		if (c->sign_minor <= 0)
-			return FALSE;
+			return false;
 		adjust_minor = b->min1 - c->minor;
 	} else if (c->minor >= b->min2) {
 		if (c->sign_minor >= 0)
-			return FALSE;
+			return false;
 		adjust_minor = c->minor - (b->min2-1);
 	}
 
 	/* If unclipped, we're done */
 	if (adjust_major == 0 && adjust_minor == 0)
-		return TRUE;
+		return true;
 
 	/* See how much minor adjustment would happen during
 	 * a major clip. This is a bit tricky because line drawing
@@ -208,7 +208,7 @@ ao_clip_line(struct ao_cc *c, struct ao_cbox *b)
 	c->major += c->sign_major * adjust_major;
 	c->minor += c->sign_minor * adjust_minor;
 
-	return TRUE;
+	return true;
 }
 
 void
@@ -276,8 +276,8 @@ ao_line(const struct ao_bitmap	*dst,
 	e3 = e2 - e1;
 	e = e - e1;
 
-	clip_1.first = TRUE;
-	clip_2.first = FALSE;
+	clip_1.first = true;
+	clip_2.first = false;
 	clip_2.e = clip_1.e = e;
 	clip_2.e1 = clip_1.e1 = e1;
 	clip_2.e3 = clip_1.e3 = e3;

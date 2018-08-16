@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <ao_pins.h>
 #include <ao_arch.h>
 
@@ -34,9 +35,6 @@
 
 extern int ao_putchar(char c);
 extern char ao_getchar(void);
-
-#define TRUE 1
-#define FALSE 0
 
 #ifndef HAS_TASK
 #define HAS_TASK	1

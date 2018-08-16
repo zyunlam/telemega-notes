@@ -18,7 +18,7 @@
 
 #include <ao.h>
 
-static int	ao_watchdog_enabled = TRUE;
+static int	ao_watchdog_enabled = true;
 
 static void
 ao_watchdog(void)

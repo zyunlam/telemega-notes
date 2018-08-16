@@ -205,9 +205,9 @@ ao_pyro_ready(struct ao_pyro *pyro)
 		default:
 			continue;
 		}
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 #ifndef AO_FLIGHT_TEST

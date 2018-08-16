@@ -154,7 +154,7 @@ extern uint8_t	ao_sample_orient_pos;
 
 void ao_sample_init(void);
 
-/* returns FALSE in preflight mode, TRUE in flight mode */
+/* returns false in preflight mode, true in flight mode */
 uint8_t ao_sample(void);
 
 /*

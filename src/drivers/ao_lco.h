@@ -35,7 +35,7 @@ extern uint8_t	ao_lco_debug;
 #endif
 
 #if AO_LCO_DRAG
-extern uint8_t	ao_lco_drag_race;	/* TRUE when drag race mode enabled */
+extern uint8_t	ao_lco_drag_race;	/* true when drag race mode enabled */
 #endif
 
 extern uint8_t	ao_lco_pad;		/* Currently selected pad */
