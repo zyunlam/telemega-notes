@@ -258,7 +258,7 @@ DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 	case $* in release-notes*) ./fix-html $*.html ;; esac
 
 .html.pdf:
-	@touch $@
+	@echo $@
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
