@@ -278,6 +278,12 @@ public class AltosFlashUI
 	}
 
 	boolean rom_config_matches (AltosRomconfig a, AltosRomconfig b) {
+		if (a == null || b == null)
+			return (a == null && b == null);
+
+		if (!a.valid || !b.valid)
+			return false;
+
 		if (a.usb_id != null && b.usb_id != null &&
 		    (a.usb_id.vid != b.usb_id.vid ||
 		     a.usb_id.pid != b.usb_id.pid))
@@ -294,16 +300,27 @@ public class AltosFlashUI
 		AltosRomconfig	new_config;
 
 		if (!rom_config_matches(existing_config, image_config)) {
-			int ret = JOptionPane.showConfirmDialog(this,
-								String.format("Device is %04x:%04x %s\nImage is %04x:%04x %s\nFlash anyways?",
-									      existing_config.usb_id.vid,
-									      existing_config.usb_id.pid,
-									      existing_config.usb_product,
-									      image_config.usb_id.vid,
-									      image_config.usb_id.pid,
-									      image_config.usb_product),
-								"Image doesn't match Device",
-								JOptionPane.YES_NO_OPTION);
+			int ret;
+			if (existing_config == null || !existing_config.valid) {
+				ret = JOptionPane.showConfirmDialog(this,
+								    String.format("Cannot determine target device type\nImage is %04x:%04x %s\nFlash anyways?",
+										  image_config.usb_id.vid,
+										  image_config.usb_id.pid,
+										  image_config.usb_product),
+								    "Unknown Target Device",
+								    JOptionPane.YES_NO_OPTION);
+			} else {
+				ret = JOptionPane.showConfirmDialog(this,
+								    String.format("Device is %04x:%04x %s\nImage is %04x:%04x %s\nFlash anyways?",
+										  existing_config.usb_id.vid,
+										  existing_config.usb_id.pid,
+										  existing_config.usb_product,
+										  image_config.usb_id.vid,
+										  image_config.usb_id.pid,
+										  image_config.usb_product),
+								    "Image doesn't match Device",
+								    JOptionPane.YES_NO_OPTION);
+			}
 			if (ret != JOptionPane.YES_OPTION)
 				return false;
 		}
