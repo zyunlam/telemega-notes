@@ -94,6 +94,23 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 		return false;
 	}
 
+	public int hashCode() {
+		return getVendor() ^ getProduct() ^ getSerial();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (!(o instanceof AltosUSBDevice))
+			return false;
+		AltosUSBDevice other = (AltosUSBDevice) o;
+
+		return getVendor() == other.getVendor() &&
+			getProduct() == other.getProduct() &&
+			getSerial() == other.getSerial();
+	}
+
 	static public java.util.List<AltosDevice> list(int product) {
 		if (!AltosUILib.load_library())
 			return null;

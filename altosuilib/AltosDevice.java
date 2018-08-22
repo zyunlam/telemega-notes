@@ -28,4 +28,5 @@ public interface AltosDevice {
 	public abstract boolean matchProduct(int product);
 	public abstract String getErrorString();
 	public SWIGTYPE_p_altos_file open();
+	public abstract boolean equals(Object obj);
 }
