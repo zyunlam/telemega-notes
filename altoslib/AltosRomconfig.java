@@ -32,15 +32,11 @@ public class AltosRomconfig {
 	static private long find_address(AltosHexfile hexfile, String name, int len) throws AltosNoSymbol {
 		AltosHexsym symbol = hexfile.lookup_symbol(name);
 		if (symbol == null) {
-			System.out.printf("no symbol %s\n", name);
 			throw new AltosNoSymbol(name);
 		}
 		if (hexfile.address <= symbol.address && symbol.address + len <= hexfile.max_address) {
-			System.out.printf("%s: %x\n", name, symbol.address);
 			return symbol.address;
 		}
-		System.out.printf("invalid symbol addr %x len %d range is %x - %x\n",
-				  symbol.address, len, hexfile.address, hexfile.max_address);
 		throw new AltosNoSymbol(name);
 	}
 
@@ -123,17 +119,13 @@ public class AltosRomconfig {
 
 	public AltosRomconfig(AltosHexfile hexfile) {
 		try {
-			System.out.printf("Attempting symbols\n");
 			version = get_int(hexfile, ao_romconfig_version, 2);
-			System.out.printf("version %d\n", version);
 			check = get_int(hexfile, ao_romconfig_check, 2);
-			System.out.printf("check %d\n", check);
 			if (check == (~version & 0xffff)) {
 				switch (version) {
 				case 2:
 				case 1:
 					serial_number = get_int(hexfile, ao_serial_number, 2);
-					System.out.printf("serial %d\n", serial_number);
 					try {
 						radio_calibration = get_int(hexfile, ao_radio_cal, 4);
 					} catch (AltosNoSymbol missing) {
@@ -143,18 +135,8 @@ public class AltosRomconfig {
 					break;
 				}
 			}
-			System.out.printf("attempting usbid\n");
 			usb_id = hexfile.find_usb_id();
-			if (usb_id == null)
-				System.out.printf("No usb id\n");
-			else
-				System.out.printf("usb id: %04x:%04x\n",
-						  usb_id.vid, usb_id.pid);
 			usb_product = hexfile.find_usb_product();
-			if (usb_product == null)
-				System.out.printf("No usb product\n");
-			else
-				System.out.printf("usb product: %s\n", usb_product);
 
 		} catch (AltosNoSymbol missing) {
 			valid = false;
@@ -197,7 +179,6 @@ public class AltosRomconfig {
 
 				if (addr < base)
 					base = addr;
-				System.out.printf("symbol %s at %x base %x\n", name, addr, base);
 			} catch (AltosNoSymbol ns) {
 				if (name_required(name))
 					throw (ns);
@@ -214,7 +195,6 @@ public class AltosRomconfig {
 				long	addr = find_address(hexfile, name, len) + len;
 				if (addr > bounds)
 					bounds = addr;
-				System.out.printf("symbol %s at %x bounds %x\n", name, addr, bounds);
 			} catch (AltosNoSymbol ns) {
 				if (name_required(name))
 					throw (ns);
