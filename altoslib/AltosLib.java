@@ -180,6 +180,10 @@ public class AltosLib {
 		return device_type == product_telemega || device_type == product_easymega;
 	}
 
+	public static boolean has_radio(int device_type) {
+		return device_type != product_easymini && device_type != product_easymega;
+	}
+
 	public static boolean has_gps(int device_type) {
 		return device_type == product_telemetrum ||
 			device_type == product_telemega ||
