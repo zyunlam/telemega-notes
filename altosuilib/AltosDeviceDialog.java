@@ -31,6 +31,8 @@ public abstract class AltosDeviceDialog extends AltosUIDialog implements ActionL
 	public Frame			frame;
 	public int			product;
 	public JPanel			buttonPane;
+	private Timer			timer;
+	AltosDevice[]			devices;
 
 	public AltosDevice getValue() {
 		return value;
@@ -39,8 +41,16 @@ public abstract class AltosDeviceDialog extends AltosUIDialog implements ActionL
 	public abstract AltosDevice[] devices();
 
 	public void update_devices() {
-		AltosDevice[] devices = devices();
+		AltosDevice selected = list.getSelectedValue();
+
+		devices = devices();
 		list.setListData(devices);
+		for (AltosDevice d : devices) {
+			if (d.equals(selected)) {
+				list.setSelectedValue(d, true);
+				break;
+			}
+		}
 		select_button.setEnabled(devices.length > 0);
 	}
 
@@ -53,8 +63,6 @@ public abstract class AltosDeviceDialog extends AltosUIDialog implements ActionL
 		frame = in_frame;
 		value = null;
 
-		AltosDevice[]	devices = devices();
-
 		cancel_button = new JButton("Cancel");
 		cancel_button.setActionCommand("cancel");
 		cancel_button.addActionListener(this);
@@ -62,8 +70,7 @@ public abstract class AltosDeviceDialog extends AltosUIDialog implements ActionL
 		select_button = new JButton("Select");
 		select_button.setActionCommand("select");
 		select_button.addActionListener(this);
-		if (devices.length == 0)
-			select_button.setEnabled(false);
+		select_button.setEnabled(false);
 		getRootPane().setDefaultButton(select_button);
 
 		list = new JList<AltosDevice>(devices) {
@@ -143,10 +150,31 @@ public abstract class AltosDeviceDialog extends AltosUIDialog implements ActionL
 		contentPane.add(buttonPane, BorderLayout.PAGE_END);
 
 		//Initialize values.
+		update_devices();
 		if (devices != null && devices.length != 0)
 			list.setSelectedValue(devices[0], true);
 		pack();
 		setLocationRelativeTo(location);
+
+		timer = new Timer(1000, new ActionListener () {
+				public void actionPerformed(ActionEvent evt) {
+					update_devices();
+				}
+			});
+
+		addComponentListener(new ComponentListener() {
+				public void componentShown(ComponentEvent e) {
+					timer.start();
+				}
+				public void componentMoved(ComponentEvent e) {
+				}
+				public void componentResized(ComponentEvent e) {
+				}
+				public void componentHidden(ComponentEvent e) {
+					timer.stop();
+				}
+			});
+
 	}
 
 	//Handle clicks on the Set and Cancel buttons.
