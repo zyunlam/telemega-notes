@@ -45,7 +45,6 @@ public class AltosSelfFlash extends AltosProgrammer {
 		int b;
 		byte[]	data = new byte[len];
 
-		System.out.printf("read_memory %x %d\n", addr, len);
 		for (int offset = 0; offset < len; offset += 0x100) {
 			link.printf("R %x\n", addr + offset);
 			byte[]	reply = link.get_binary_reply(5000, 0x100);
@@ -161,7 +160,8 @@ public class AltosSelfFlash extends AltosProgrammer {
 			long base = AltosRomconfig.fetch_base(image);
 			long bounds = AltosRomconfig.fetch_bounds(image);
 
-			System.out.printf("rom base %x bounds %x\n", base, bounds);
+			if (link.debug)
+				System.out.printf("rom base %x bounds %x\n", base, bounds);
 			return read_hexfile(base, (int) (bounds - base));
 		} catch (AltosNoSymbol ns) {
 			return null;
