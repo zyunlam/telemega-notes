@@ -257,7 +257,7 @@ public class AltosFlash extends AltosProgrammer {
 			int flash_addr = (int) image.address;
 			int image_start = 0;
 
-			action("start", 0);
+			action(AltosFlashListener.flash_start, 0);
 			action(0, image.data.length);
 			while (remain > 0 && !aborted) {
 				int this_time = remain;
@@ -293,7 +293,7 @@ public class AltosFlash extends AltosProgrammer {
 				action(image.data.length - remain, image.data.length);
 			}
 			if (!aborted) {
-				action("done", 100);
+				action(AltosFlashListener.flash_done, 100);
 				if (debug != null) {
 					debug.set_pc((int) image.address);
 					debug.resume();

@@ -101,7 +101,7 @@ public class AltosSelfFlash extends AltosProgrammer {
 			long flash_addr = image.address;
 			int image_start = 0;
 
-			action("start", 0);
+			action(AltosFlashListener.flash_start, 0);
 			action(0, image.data.length);
 			while (remain > 0 && !aborted) {
 				int this_time = remain;
@@ -129,7 +129,7 @@ public class AltosSelfFlash extends AltosProgrammer {
 				action(image.data.length - remain, image.data.length);
 			}
 			if (!aborted) {
-				action("done", 100);
+				action(AltosFlashListener.flash_done, 100);
 			}
 			close();
 		} catch (IOException ie) {

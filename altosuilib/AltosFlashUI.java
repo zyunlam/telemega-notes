@@ -116,10 +116,10 @@ public class AltosFlashUI
 							      JOptionPane.ERROR_MESSAGE);
 				setVisible(false);
 				dispose();
-			} else if (cmd.equals("done")) {
+			} else if (cmd.equals(AltosFlashListener.flash_done)) {
 				setVisible(false);
 				dispose();
-			} else if (cmd.equals("start")) {
+			} else if (cmd.equals(AltosFlashListener.flash_start)) {
 				setVisible(true);
 			} else {
 				pbar.setValue(e.getID());

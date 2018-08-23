@@ -19,5 +19,9 @@
 package org.altusmetrum.altoslib_13;
 
 public interface AltosFlashListener {
+
+	public final static String flash_start = "start";
+	public final static String flash_done = "done";
+
 	public void position(String label, int percent);
 }
