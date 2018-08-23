@@ -95,7 +95,7 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 	}
 
 	public int hashCode() {
-		return getVendor() ^ getProduct() ^ getSerial();
+		return getVendor() ^ getProduct() ^ getSerial() ^ getPath().hashCode();
 	}
 
 	public boolean equals(Object o) {
@@ -108,7 +108,8 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 
 		return getVendor() == other.getVendor() &&
 			getProduct() == other.getProduct() &&
-			getSerial() == other.getSerial();
+			getSerial() == other.getSerial() &&
+			getPath().equals(other.getPath());
 	}
 
 	static public java.util.List<AltosDevice> list(int product) {
