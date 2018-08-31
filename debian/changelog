@@ -1,3 +1,9 @@
+altos (1.8.6-2) unstable; urgency=medium
+
+  * quick patch to not include fox1ihu in build by default, closes: #907480
+  
+ -- Bdale Garbee <bdale@gag.com>  Thu, 30 Aug 2018 21:41:00 -0600
+
 altos (1.8.6-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
