@@ -209,7 +209,7 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_advanced_header() {
-		out.printf("accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,mag_x,mag_y,mag_z,tilt");
+		out.printf("accel_x,accel_y,accel_z,gyro_roll,gyro_pitch,gyro_yaw,mag_x,mag_y,mag_z,tilt");
 	}
 
 	double accel_along() { return series.value(AltosFlightSeries.accel_along_name, indices); }
