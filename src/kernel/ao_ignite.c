@@ -72,10 +72,8 @@ ao_igniter_status(enum ao_igniter igniter)
 		return ao_igniter_unknown;
 }
 
-#ifndef AO_IGNITER_SET_DROGUE
-#define AO_IGNITER_SET_DROGUE(v)	AO_IGNITER_DROGUE = (v)
-#define AO_IGNITER_SET_MAIN(v)		AO_IGNITER_MAIN = (v)
-#endif
+#define AO_IGNITER_SET_DROGUE(v)	ao_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, v)
+#define AO_IGNITER_SET_MAIN(v)		ao_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, v)
 
 #ifndef AO_IGNITER_FIRE_TIME
 #define AO_IGNITER_FIRE_TIME		AO_MS_TO_TICKS(50)
@@ -226,8 +224,8 @@ struct ao_task ao_igniter_task;
 void
 ao_ignite_set_pins(void)
 {
-	ao_enable_output(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, AO_IGNITER_DROGUE, 0);
-	ao_enable_output(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, AO_IGNITER_MAIN, 0);
+	ao_enable_output(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, 0);
+	ao_enable_output(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, 0);
 }
 #endif
 

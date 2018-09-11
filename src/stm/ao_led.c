@@ -83,7 +83,7 @@ ao_led_on(AO_LED_TYPE colors)
 	AO_LED_TYPE i;
 	for (i = 0; i < N_LED; i++)
 		if (colors & (1 << i))
-			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, foo, 1);
+			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, 1);
 #else
 #ifdef LED_PORT
 	LED_PORT->bsrr = (colors & ao_led_enable);
@@ -105,7 +105,7 @@ ao_led_off(AO_LED_TYPE colors)
 	AO_LED_TYPE i;
 	for (i = 0; i < N_LED; i++)
 		if (colors & (1 << i))
-			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, foo, 0);
+			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, 0);
 #else
 #ifdef LED_PORT
 	LED_PORT->bsrr = (uint32_t) (colors & ao_led_enable) << 16;
@@ -137,7 +137,7 @@ ao_led_toggle(AO_LED_TYPE colors)
 	AO_LED_TYPE i;
 	for (i = 0; i < N_LED; i++)
 		if (colors & (1 << i))
-			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, foo, ~ao_gpio_get(ao_leds[i].port, ao_leds[i].pin, foo));
+			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, ~ao_gpio_get(ao_leds[i].port, ao_leds[i].pin));
 #else
 #ifdef LED_PORT
 	LED_PORT->odr ^= (colors & ao_led_enable);
@@ -173,7 +173,7 @@ ao_led_init(AO_LED_TYPE enable)
 	ao_led_enable = enable;
 #if LED_PER_LED
 	for (bit = 0; bit < N_LED; bit++)
-		ao_enable_output(ao_leds[bit].port, ao_leds[bit].pin, foo, 0);
+		ao_enable_output(ao_leds[bit].port, ao_leds[bit].pin, 0);
 #else
 #ifdef LED_PORT
 	stm_rcc.ahbenr |= (1 << LED_PORT_ENABLE);

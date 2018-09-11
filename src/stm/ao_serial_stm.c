@@ -33,7 +33,7 @@ _ao_usart_tx_start(struct ao_stm_usart *usart)
 {
 	if (!ao_fifo_empty(usart->tx_fifo)) {
 #if HAS_SERIAL_SW_FLOW
-		if (usart->gpio_cts && ao_gpio_get(usart->gpio_cts, usart->pin_cts, foo) == 1) {
+		if (usart->gpio_cts && ao_gpio_get(usart->gpio_cts, usart->pin_cts) == 1) {
 			ao_exti_enable(usart->gpio_cts, usart->pin_cts);
 			return 0;
 		}
@@ -73,7 +73,7 @@ _ao_usart_rx(struct ao_stm_usart *usart, int is_stdin)
 			 * for it to drain a bunch
 			 */
 			if (usart->gpio_rts && ao_fifo_mostly(usart->rx_fifo)) {
-				ao_gpio_set(usart->gpio_rts, usart->pin_rts, usart->pin_rts, 1);
+				ao_gpio_set(usart->gpio_rts, usart->pin_rts, 1);
 				usart->rts = 0;
 			}
 #endif
@@ -118,7 +118,7 @@ _ao_usart_pollchar(struct ao_stm_usart *usart)
 #if HAS_SERIAL_SW_FLOW
 		/* If we've cleared RTS, check if there's space now and turn it back on */
 		if (usart->gpio_rts && usart->rts == 0 && ao_fifo_barely(usart->rx_fifo)) {
-			ao_gpio_set(usart->gpio_rts, usart->pin_rts, foo, 0);
+			ao_gpio_set(usart->gpio_rts, usart->pin_rts, 0);
 			usart->rts = 1;
 		}
 #endif
@@ -403,7 +403,7 @@ ao_serial_set_sw_rts_cts(struct ao_stm_usart *usart,
 {
 	/* Pull RTS low to note that there's space in the FIFO
 	 */
-	ao_enable_output(port_rts, pin_rts, foo, 0);
+	ao_enable_output(port_rts, pin_rts, 0);
 	usart->gpio_rts = port_rts;
 	usart->pin_rts = pin_rts;
 	usart->rts = 1;

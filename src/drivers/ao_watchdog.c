@@ -28,9 +28,9 @@ ao_watchdog(void)
 			ao_sleep(&ao_watchdog_enabled);
 		while (ao_watchdog_enabled) {
 			ao_delay(AO_WATCHDOG_INTERVAL);
-			ao_gpio_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG_PIN, 1);
+			ao_gpio_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, 1);
 			ao_delay(1);
-			ao_gpio_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG_PIN, 0);
+			ao_gpio_set(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, 0);
 		}
 	}
 }
@@ -56,7 +56,7 @@ static struct ao_task watchdog_task;
 void
 ao_watchdog_init(void)
 {
-	ao_enable_output(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, AO_WATCHDOG, 0);
+	ao_enable_output(AO_WATCHDOG_PORT, AO_WATCHDOG_BIT, 0);
 	ao_cmd_register(&ao_watchdog_cmds[0]);
 	ao_add_task(&watchdog_task, ao_watchdog, "watchdog");
 }

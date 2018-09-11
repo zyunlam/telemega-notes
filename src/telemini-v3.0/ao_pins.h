@@ -165,11 +165,9 @@ struct ao_adc {
 
 #define AO_IGNITER_DROGUE_PORT	(&stm_gpiob)
 #define AO_IGNITER_DROGUE_PIN	7
-#define AO_IGNITER_SET_DROGUE(v)	ao_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, AO_IGNITER_DROGUE, v)
 
 #define AO_IGNITER_MAIN_PORT	(&stm_gpiob)
 #define AO_IGNITER_MAIN_PIN	6
-#define AO_IGNITER_SET_MAIN(v)		ao_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, AO_IGNITER_MAIN, v)
 
 #define AO_SENSE_DROGUE(p)	((p)->adc.sense_a)
 #define AO_SENSE_MAIN(p)	((p)->adc.sense_m)

@@ -140,7 +140,7 @@ ao_trng_send(void)
 	usb_buf_id = ao_usb_alloc(buffer);
 
 #ifdef AO_TRNG_ENABLE_PORT
-	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
+	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, 1);
 #endif
 	trng_power_time = ao_time();
 
@@ -211,7 +211,7 @@ static void ao_trng_suspend(void *arg)
 {
 	(void) arg;
 #ifdef AO_TRNG_ENABLE_PORT
-	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 0);
+	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, 0);
 #endif
 	trng_running = false;
 }
@@ -220,7 +220,7 @@ static void ao_trng_resume(void *arg)
 {
 	(void) arg;
 #ifdef AO_TRNG_ENABLE_PORT
-	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 1);
+	ao_gpio_set(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, 1);
 #endif
 	trng_power_time = ao_time();
 }
@@ -236,7 +236,7 @@ void
 ao_trng_send_init(void)
 {
 #ifdef AO_TRNG_ENABLE_PORT
-	ao_enable_output(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, AO_TRNG_ENABLE_PIN, 0);
+	ao_enable_output(AO_TRNG_ENABLE_PORT, AO_TRNG_ENABLE_BIT, 0);
 	ao_power_register(&ao_trng_power);
 #endif
 	ao_enable_input(AO_RAW_PORT, AO_RAW_BIT, AO_EXTI_MODE_PULL_UP);

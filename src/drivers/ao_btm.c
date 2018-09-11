@@ -347,7 +347,7 @@ ao_btm_check_link()
 		);
 #else
 	ao_arch_block_interrupts();
-	if (ao_gpio_get(AO_BTM_INT_PORT, AO_BTM_INT_PIN, AO_BTM_INT) == 0) {
+	if (ao_gpio_get(AO_BTM_INT_PORT, AO_BTM_INT_PIN) == 0) {
 		ao_btm_connected = 1;
 	} else {
 		ao_btm_connected = 0;
@@ -455,7 +455,7 @@ ao_btm_init (void)
 	ao_serial_btm_set_speed(AO_SERIAL_SPEED_19200);
 
 #ifdef AO_BTM_RESET_PORT
-	ao_enable_output(AO_BTM_RESET_PORT,AO_BTM_RESET_PIN,AO_BTM_RESET,0);
+	ao_enable_output(AO_BTM_RESET_PORT,AO_BTM_RESET_PIN,0);
 #endif
 
 #ifdef AO_BTM_INT_PORT

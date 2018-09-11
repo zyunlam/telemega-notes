@@ -32,12 +32,12 @@ extern uint8_t	ao_spi_mutex;
 		ao_mutex_put(&ao_spi_mutex);	\
 	} while (0)
 
-#define ao_spi_get_bit(reg,bit,pin,bus,speed) do {	\
+#define ao_spi_get_bit(reg,bit,bus,speed) do {	\
 		ao_mutex_get(&ao_spi_mutex);	\
 		(pin) = 0;			\
 	} while (0)
 
-#define ao_spi_put_bit(reg,bit,pin,bus) do {	\
+#define ao_spi_put_bit(reg,bit,bus) do {	\
 		(pin) = 1;			\
 		ao_mutex_put(&ao_spi_mutex);	\
 	} while (0)
@@ -46,7 +46,7 @@ extern uint8_t	ao_spi_mutex;
 #define ao_gpio_token_paster(x,y)		x ## y
 #define ao_gpio_token_evaluator(x,y)	ao_gpio_token_paster(x,y)
 
-#define ao_gpio_set(port, bit, pin, v) do {				\
+#define ao_gpio_set(port, bit, v) do {				\
 		if (v)							\
 			(ao_gpio_token_evaluator(PORT,port)) |= (1 << bit); \
 		else							\
@@ -59,8 +59,8 @@ extern uint8_t	ao_spi_mutex;
  * from chip select low to chip select high
  */
 
-#define ao_enable_output(port, bit, pin, v) do {			\
-		ao_gpio_set(port, bit, pin, v);				\
+#define ao_enable_output(port, bit, v) do {			\
+		ao_gpio_set(port, bit, v);				\
 		ao_gpio_token_evaluator(DDR,port) |= (1 << bit);	\
 	} while (0)
 

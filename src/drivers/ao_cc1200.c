@@ -192,7 +192,7 @@ ao_radio_fifo_write_fixed(uint8_t data, uint8_t len)
 static uint8_t
 ao_radio_int_pin(void)
 {
-	return ao_gpio_get(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_CC1200_INT);
+	return ao_gpio_get(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
 }
 
 static uint8_t
