@@ -804,10 +804,10 @@ static int tncPositionPacket(void)
 	    /* Convert from meters to feet */
 	    alt = (alt * 328 + 50) / 100;
 
-	    buf += sprintf((char *) tncBuffer, "!%02u%02u.%02u%c/%03u%02u.%02u%c'/A=%06u ",
+	    buf += sprintf((char *) tncBuffer, "!%02u%02u.%02u%c/%03u%02u.%02u%c'/A=%06lu ",
 			   lat_deg, lat_min, lat_frac, lat_sign,
 			   lon_deg, lon_min, lon_frac, lon_sign,
-			   alt);
+			   (long) alt);
 	    break;
     }
     }
