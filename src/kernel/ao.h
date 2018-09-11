@@ -111,10 +111,6 @@ ao_delay(uint16_t ticks);
 void
 ao_timer_set_adc_interval(uint8_t interval);
 
-/* Timer interrupt */
-void
-ao_timer_isr(void) ao_arch_interrupt(9);
-
 /* Initialize the timer */
 void
 ao_timer_init(void);
@@ -581,9 +577,6 @@ extern int8_t	ao_radio_rssi;
 #define HAS_RADIO_RATE	HAS_RADIO
 #endif
 
-void
-ao_radio_general_isr(void) ao_arch_interrupt(16);
-
 #if HAS_RADIO_XMIT
 void
 ao_radio_send(const void *d, uint8_t size);
@@ -944,9 +937,6 @@ ao_terraui_init(void);
  */
 
 #ifdef BATTERY_PIN
-void
-ao_battery_isr(void) ao_arch_interrupt(1);
-
 uint16_t
 ao_battery_get(void);
 
