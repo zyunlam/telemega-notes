@@ -18,65 +18,63 @@
 
 #include "ao.h"
 
-uint16_t ao_led_enable;
-
 void
-ao_led_on(uint16_t colors)
+ao_led_on(AO_LED_TYPE colors)
 {
 #ifdef LED_PORT
-	LED_PORT->bsrr = (colors & ao_led_enable);
+	LED_PORT->bsrr = (colors & LEDS_AVAILABLE);
 #else
 #ifdef LED_PORT_0
-	LED_PORT_0->bsrr = ((colors & ao_led_enable) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
+	LED_PORT_0->bsrr = ((colors & LEDS_AVAILABLE) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
 #endif
 #ifdef LED_PORT_1
-	LED_PORT_1->bsrr = ((colors & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
+	LED_PORT_1->bsrr = ((colors & LEDS_AVAILABLE) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
 #endif
 #endif
 }
 
 void
-ao_led_off(uint16_t colors)
+ao_led_off(AO_LED_TYPE colors)
 {
 #ifdef LED_PORT
-	LED_PORT->bsrr = (uint32_t) (colors & ao_led_enable) << 16;
+	LED_PORT->bsrr = (uint32_t) (colors & LEDS_AVAILABLE) << 16;
 #else
 #ifdef LED_PORT_0
-	LED_PORT_0->bsrr = ((uint32_t) (colors & ao_led_enable) & LED_PORT_0_MASK) << (LED_PORT_0_SHIFT + 16);
+	LED_PORT_0->bsrr = ((uint32_t) (colors & LEDS_AVAILABLE) & LED_PORT_0_MASK) << (LED_PORT_0_SHIFT + 16);
 #endif
 #ifdef LED_PORT_1
-	LED_PORT_1->bsrr = ((uint32_t) (colors & ao_led_enable) & LED_PORT_1_MASK) << (LED_PORT_1_SHIFT + 16);
+	LED_PORT_1->bsrr = ((uint32_t) (colors & LEDS_AVAILABLE) & LED_PORT_1_MASK) << (LED_PORT_1_SHIFT + 16);
 #endif
 #endif
 }
 
 void
-ao_led_set(uint16_t colors)
+ao_led_set(AO_LED_TYPE colors)
 {
-	uint16_t	on = colors & ao_led_enable;
-	uint16_t	off = ~colors & ao_led_enable;
+	AO_LED_TYPE	on = colors & LEDS_AVAILABLE;
+	AO_LED_TYPE	off = ~colors & LEDS_AVAILABLE;
 
 	ao_led_off(off);
 	ao_led_on(on);
 }
 
 void
-ao_led_toggle(uint16_t colors)
+ao_led_toggle(AO_LED_TYPE colors)
 {
 #ifdef LED_PORT
-	LED_PORT->odr ^= (colors & ao_led_enable);
+	LED_PORT->odr ^= (colors & LEDS_AVAILABLE);
 #else
 #ifdef LED_PORT_0
-	LED_PORT_0->odr ^= ((colors & ao_led_enable) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
+	LED_PORT_0->odr ^= ((colors & LEDS_AVAILABLE) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
 #endif
 #ifdef LED_PORT_1
-	LED_PORT_1->odr ^= ((colors & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
+	LED_PORT_1->odr ^= ((colors & LEDS_AVAILABLE) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
 #endif
 #endif
 }
 
 void
-ao_led_for(uint16_t colors, uint16_t ticks) 
+ao_led_for(AO_LED_TYPE colors, AO_TICK_TYPE ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);
@@ -89,26 +87,25 @@ ao_led_for(uint16_t colors, uint16_t ticks)
 	} while (0)
 
 void
-ao_led_init(uint16_t enable)
+ao_led_init(void)
 {
 	int	bit;
 
-	ao_led_enable = enable;
 #ifdef LED_PORT
 	stm_rcc.ahbenr |= (1 << LED_PORT_ENABLE);
-	LED_PORT->odr &= ~enable;
+	LED_PORT->odr &= ~LEDS_AVAILABLE;
 #else
 #ifdef LED_PORT_0
 	stm_rcc.ahbenr |= (1 << LED_PORT_0_ENABLE);
-	LED_PORT_0->odr &= ~((enable & ao_led_enable) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
+	LED_PORT_0->odr &= (uint32_t) ~(LEDS_AVAILABLE & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
 #endif
 #ifdef LED_PORT_1
 	stm_rcc.ahbenr |= (1 << LED_PORT_1_ENABLE);
-	LED_PORT_1->odr &= ~((enable & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
+	LED_PORT_1->odr &= (uint32_t) ~(LEDS_AVAILABLE & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
 #endif
 #endif
 	for (bit = 0; bit < 16; bit++) {
-		if (enable & (1 << bit)) {
+		if (LEDS_AVAILABLE & (1 << bit)) {
 #ifdef LED_PORT
 			init_led_pin(LED_PORT, bit);
 #else

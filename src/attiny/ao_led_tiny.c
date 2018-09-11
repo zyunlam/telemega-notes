@@ -18,37 +18,35 @@
 
 #include "ao.h"
 
-uint8_t ao_led_enable;
-
 #define LED_PORT	PORTB
 #define LED_DDR		DDRB
 
 void
 ao_led_on(uint8_t colors)
 {
-	LED_PORT |= (colors & ao_led_enable);
+	LED_PORT |= colors;
 }
 
 void
 ao_led_off(uint8_t colors)
 {
-	LED_PORT &= ~(colors & ao_led_enable);
+	LED_PORT &= ~colors;
 }
 
 void
 ao_led_set(uint8_t colors)
 {
-	LED_PORT = (LED_PORT & ~(ao_led_enable)) | (colors & ao_led_enable);
+	LED_PORT = (LED_PORT & ~LEDS_AVAILABLE) | (colors & LEDS_AVAILABLE);
 }
 
 void
 ao_led_toggle(uint8_t colors)
 {
-	LED_PORT ^= (colors & ao_led_enable);
+	LED_PORT ^= (colors & LEDS_AVAILABLE);
 }
 
 void
-ao_led_for(uint8_t colors, uint16_t ticks) 
+ao_led_for(uint8_t colors, AO_TICK_TYPE ticks)
 {
 	ao_led_on(colors);
 	ao_delay(ticks);
@@ -56,9 +54,8 @@ ao_led_for(uint8_t colors, uint16_t ticks)
 }
 
 void
-ao_led_init(uint8_t enable)
+ao_led_init(void)
 {
-	ao_led_enable = enable;
-	LED_PORT &= ~enable;
-	LED_DDR |= enable;
+	LED_PORT &= ~LEDS_AVAILABLE;
+	LED_DDR |= LEDS_AVAILABLE;
 }

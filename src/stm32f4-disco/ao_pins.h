@@ -14,16 +14,7 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define HAS_BEEP	0
-
-#define B_USER_PORT	(&stm_gpioa)
-#define B_USER_PIN	0
-
-#define LED_GREEN_PORT	(&stm_gpioc)
-#define LED_GREEN_PIN	5
-#define LED_RED_PORT	(&stm_gpioe)
-#define LED_RED_PIN	3
-
+/* Clock tree configuration */
 #define AO_HSE		8000000	/* fed from st/link processor */
 #define AO_HSE_BYPASS	1	/* no xtal, directly fed */
 
@@ -42,5 +33,23 @@
 #define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_1
 
 #define DEBUG_THE_CLOCK	1
+
+#define HAS_USB		0
+#define HAS_BEEP	0
+
+#define B_USER_PORT	(&stm_gpioa)
+#define B_USER_PIN	0
+
+/* LEDs */
+
+#define HAS_LED		1
+
+#define LED_0_PORT	(&stm_gpioc)
+#define LED_0_PIN	5
+#define LED_GREEN	(1 << 0)
+
+#define LED_1_PORT	(&stm_gpioe)
+#define LED_1_PIN	3
+#define LED_RED		(1 << 1)
 
 #endif /* _AO_PINS_H_ */

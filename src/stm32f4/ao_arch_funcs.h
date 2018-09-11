@@ -15,6 +15,234 @@
 #ifndef _AO_ARCH_FUNCS_H_
 #define _AO_ARCH_FUNCS_H_
 
+/* task functions */
+
+#define ARM_PUSH32(stack, val)	(*(--(stack)) = (val))
+
+typedef uint32_t	ao_arch_irq_t;
+
+static inline void
+ao_arch_block_interrupts(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("msr basepri,%0" : : "r" (AO_STM_NVIC_BASEPRI_MASK));
+#else
+	asm("cpsid i");
+#endif
+}
+
+static inline void
+ao_arch_release_interrupts(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("msr basepri,%0" : : "r" (0x0));
+#else
+	asm("cpsie i");
+#endif
+}
+
+static inline uint32_t
+ao_arch_irqsave(void) {
+	uint32_t	val;
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("mrs %0,basepri" : "=r" (val));
+#else
+	asm("mrs %0,primask" : "=r" (val));
+#endif
+	ao_arch_block_interrupts();
+	return val;
+}
+
+static inline void
+ao_arch_irqrestore(uint32_t basepri) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm("msr basepri,%0" : : "r" (basepri));
+#else
+	asm("msr primask,%0" : : "r" (basepri));
+#endif
+}
+
+static inline void
+ao_arch_memory_barrier() {
+	asm volatile("" ::: "memory");
+}
+
+static inline void
+ao_arch_irq_check(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	uint32_t	basepri;
+	asm("mrs %0,basepri" : "=r" (basepri));
+	if (basepri == 0)
+		ao_panic(AO_PANIC_IRQ);
+#else
+	uint32_t	primask;
+	asm("mrs %0,primask" : "=r" (primask));
+	if ((primask & 1) == 0)
+		ao_panic(AO_PANIC_IRQ);
+#endif
+}
+
+#if HAS_TASK
+static inline void
+ao_arch_init_stack(struct ao_task *task, void *start)
+{
+	uint32_t	*sp = (uint32_t *) ((void*) task->stack + AO_STACK_SIZE);
+	uint32_t	a = (uint32_t) start;
+	int		i;
+
+	/* Return address (goes into LR) */
+	ARM_PUSH32(sp, a);
+
+	/* Clear register values r0-r12 */
+	i = 13;
+	while (i--)
+		ARM_PUSH32(sp, 0);
+
+	/* APSR */
+	ARM_PUSH32(sp, 0);
+
+	/* Clear register values s0-s31 */
+	i = 32;
+	while (i--)
+		ARM_PUSH32(sp, 0);
+
+	/* FPSCR */
+	ARM_PUSH32(sp, 0);
+
+	/* BASEPRI with interrupts enabled */
+	ARM_PUSH32(sp, 0);
+
+	task->sp = sp;
+}
+
+static inline void ao_arch_save_regs(void) {
+	/* Save general registers */
+	asm("push {r0-r12,lr}");
+
+	/* Save APSR */
+	asm("mrs r0,apsr");
+	asm("push {r0}");
+
+	/* Save FPU registers */
+	asm("vpush {s0-s15}");
+	asm("vpush {s16-s31}");
+
+	/* Save FPSCR */
+	asm("vmrs r0,fpscr");
+	asm("push {r0}");
+
+#ifdef AO_NONMASK_INTERRUPTS
+	/* Save BASEPRI */
+	asm("mrs r0,basepri");
+#else
+	/* Save PRIMASK */
+	asm("mrs r0,primask");
+#endif
+	asm("push {r0}");
+}
+
+static inline void ao_arch_save_stack(void) {
+	uint32_t	*sp;
+	asm("mov %0,sp" : "=&r" (sp) );
+	ao_cur_task->sp = (sp);
+}
+
+static inline void ao_arch_restore_stack(void) {
+	/* Switch stacks */
+	asm("mov sp, %0" : : "r" (ao_cur_task->sp) );
+
+#ifdef AO_NONMASK_INTERRUPTS
+	/* Restore BASEPRI */
+	asm("pop {r0}");
+	asm("msr basepri,r0");
+#else
+	/* Restore PRIMASK */
+	asm("pop {r0}");
+	asm("msr primask,r0");
+#endif
+
+	/* Restore FPSCR */
+	asm("pop {r0}");
+	asm("vmsr fpscr,r0");
+
+	/* Restore FPU registers */
+	asm("vpop {s16-s31}");
+	asm("vpop {s0-s15}");
+
+	/* Restore APSR */
+	asm("pop {r0}");
+	asm("msr apsr_nczvq,r0");
+
+	/* Restore general registers */
+	asm("pop {r0-r12,lr}\n");
+
+	/* Return to calling function */
+	asm("bx lr");
+}
+
+#ifndef HAS_SAMPLE_PROFILE
+#define HAS_SAMPLE_PROFILE 0
+#endif
+
+#if DEBUG
+#define HAS_ARCH_VALIDATE_CUR_STACK	1
+
+static inline void
+ao_validate_cur_stack(void)
+{
+	uint8_t		*psp;
+
+	asm("mrs %0,psp" : "=&r" (psp));
+	if (ao_cur_task &&
+	    psp <= ao_cur_task->stack &&
+	    psp >= ao_cur_task->stack - 256)
+		ao_panic(AO_PANIC_STACK);
+}
+#endif
+
+#if !HAS_SAMPLE_PROFILE
+#define HAS_ARCH_START_SCHEDULER	1
+
+static inline void ao_arch_start_scheduler(void) {
+	uint32_t	sp;
+	uint32_t	control;
+
+	asm("mrs %0,msp" : "=&r" (sp));
+	asm("msr psp,%0" : : "r" (sp));
+	asm("mrs %0,control" : "=r" (control));
+	control |= (1 << 1);
+	asm("msr control,%0" : : "r" (control));
+	asm("isb");
+}
+#endif
+
+#define ao_arch_isr_stack()
+
+#endif
+
+static inline void
+ao_arch_wait_interrupt(void) {
+#ifdef AO_NONMASK_INTERRUPTS
+	asm(
+	    "dsb\n"			/* Serialize data */
+	    "isb\n"			/* Serialize instructions */
+	    "cpsid i\n"			/* Block all interrupts */
+	    "msr basepri,%0\n"		/* Allow all interrupts through basepri */
+	    "wfi\n"			/* Wait for an interrupt */
+	    "cpsie i\n"			/* Allow all interrupts */
+	    "msr basepri,%1\n"		/* Block interrupts through basepri */
+	    : : "r" (0), "r" (AO_STM_NVIC_BASEPRI_MASK));
+#else
+	asm("\twfi\n");
+	ao_arch_release_interrupts();
+	ao_arch_block_interrupts();
+#endif
+}
+
+#define ao_arch_critical(b) do {			\
+		uint32_t __mask = ao_arch_irqsave();	\
+		do { b } while (0);			\
+		ao_arch_irqrestore(__mask);		\
+	} while (0)
+
 /* GPIO functions */
 
 #define ao_power_register(gpio)

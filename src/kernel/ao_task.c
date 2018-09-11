@@ -569,4 +569,5 @@ ao_start_scheduler(void)
 	ao_arch_start_scheduler();
 #endif
 	ao_yield();
+	__builtin_unreachable();
 }

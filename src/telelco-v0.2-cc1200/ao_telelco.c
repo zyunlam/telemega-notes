@@ -45,9 +45,8 @@ main(void)
 	ao_timer_init();
 	ao_dma_init();
 
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_GREEN);
-
+	ao_led_init();
+	ao_led_on(LEDS_AVAILABLE);
 
 	ao_spi_init();
 	ao_exti_init();
@@ -73,6 +72,8 @@ main(void)
 	ao_lco_init();
 	ao_lco_cmd_init();
 //	ao_radio_cmac_cmd_init();
+
+	ao_led_off(LEDS_AVAILABLE);
 
 	ao_start_scheduler();
 	return 0;

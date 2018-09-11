@@ -29,7 +29,7 @@ LOADARG=-p $(DUDECPUTYPE) -c $(PROGRAMMER) -e -U flash:w:
 ALTOS_SRC = \
 	ao_micropeak.c \
 	ao_spi_attiny.c \
-	ao_led.c \
+	ao_led_tiny.c \
 	ao_clock.c \
 	ao_ms5607.c \
 	ao_exti.c \

@@ -30,7 +30,7 @@ ALTOS_SRC = \
 	ao_adc_fast.c \
 	ao_crc_stm.c \
 	ao_stdio.c \
-	ao_led.c \
+	ao_led_stmf0.c \
 	ao_romconfig.c \
 	ao_boot_chain.c \
 	ao_usb_stm.c \

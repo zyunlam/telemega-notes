@@ -34,6 +34,8 @@
 
 #define AO_PORT_TYPE	uint8_t
 
+#define AO_LED_TYPE	uint8_t
+
 /* Various definitions to make GCC look more like SDCC */
 
 #define ao_arch_naked_declare	__attribute__((naked))

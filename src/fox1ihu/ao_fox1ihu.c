@@ -31,7 +31,7 @@ main(void)
 #endif
 
 	ao_task_init();
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 	ao_led_on(AO_LED_RED|AO_LED_GREEN|AO_LED_RED_2|AO_LED_GREEN_2);
 	ao_timer_init();
 

@@ -29,9 +29,6 @@
 #define ao_arch_task_members\
 	uint32_t *sp;			/* saved stack pointer */
 
-#define ao_arch_block_interrupts()	asm("cpsid i")
-#define ao_arch_release_interrupts()	asm("cpsie i")
-
 #define ao_arch_naked_declare	__attribute__((naked))
 #define ao_arch_naked_define
 

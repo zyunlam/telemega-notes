@@ -230,7 +230,7 @@ ao_cmd_filter(void);
 #include <ao_beep.h>
 #endif
 
-#if LEDS_AVAILABLE
+#if LEDS_AVAILABLE || HAS_LED
 #include <ao_led.h>
 #endif
 
