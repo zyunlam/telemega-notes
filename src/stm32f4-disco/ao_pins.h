@@ -27,9 +27,9 @@
 #define AO_HSE		8000000	/* fed from st/link processor */
 #define AO_HSE_BYPASS	1	/* no xtal, directly fed */
 
-#define AO_PLL_M	8	/* down to 1MHz */
+#define AO_PLL_M	4	/* down to 2MHz */
 
-#define AO_PLL1_N	192	/* up to 192MHz */
+#define AO_PLL1_N	96	/* up to 192MHz */
 #define AO_PLL1_P	2	/* down to 96MHz */
 #define AO_PLL1_Q	4	/* down to 48MHz for USB and SDIO */
 
@@ -40,5 +40,7 @@
 #define AO_RCC_CFGR_PPRE1_DIV	STM_RCC_CFGR_PPRE1_DIV_1
 #define AO_APB2_PRESCALER	1
 #define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_1
+
+#define DEBUG_THE_CLOCK	1
 
 #endif /* _AO_PINS_H_ */

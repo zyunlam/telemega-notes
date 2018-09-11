@@ -136,22 +136,6 @@ ao_clock_init(void)
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSERDY)))
 		asm("nop");
 
-#define STM_RCC_CFGR_SWS_TARGET_CLOCK		(STM_RCC_CFGR_SWS_HSE << STM_RCC_CFGR_SWS)
-#define STM_RCC_CFGR_SW_TARGET_CLOCK		(STM_RCC_CFGR_SW_HSE)
-#define STM_PLLSRC				AO_HSE
-#define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	(1 << STM_RCC_CFGR_PLLSRC)
-#else
-#define STM_RCC_CFGR_SWS_TARGET_CLOCK		(STM_RCC_CFGR_SWS_HSI << STM_RCC_CFGR_SWS)
-#define STM_RCC_CFGR_SW_TARGET_CLOCK		(STM_RCC_CFGR_SW_HSI)
-#define STM_PLLSRC				STM_HSI
-#define STM_RCC_CFGR_PLLSRC_TARGET_CLOCK	(0 << STM_RCC_CFGR_PLLSRC)
-#endif
-
-#if !AO_HSE || HAS_ADC || HAS_ADC_SINGLE
-	/* Enable HSI RC clock 16MHz */
-	stm_rcc.cr |= (1 << STM_RCC_CR_HSION);
-	while (!(stm_rcc.cr & (1 << STM_RCC_CR_HSIRDY)))
-		asm("nop");
 #endif
 
 	/* Set flash latency to tolerate SYSCLK */
@@ -213,18 +197,33 @@ ao_clock_init(void)
 	pllcfgr |= (AO_PLL_M << STM_RCC_PLLCFGR_PLLM);
 	pllcfgr |= (AO_PLL1_N << STM_RCC_PLLCFGR_PLLN);
 #if AO_PLL1_P
-	pllcfgr |= (AO_PLL1_P << STM_RCC_PLLCFGR_PLLP);
+#if AO_PLL1_P == 2
+#define AO_RCC_PLLCFGR_PLLP	STM_RCC_PLLCFGR_PLLP_DIV_2
+#endif
+#if AO_PLL1_P == 4
+#define AO_RCC_PLLCFGR_PLLP	STM_RCC_PLLCFGR_PLLP_DIV_4
+#endif
+#if AO_PLL1_P == 6
+#define AO_RCC_PLLCFGR_PLLP	STM_RCC_PLLCFGR_PLLP_DIV_6
+#endif
+#if AO_PLL1_P == 8
+#define AO_RCC_PLLCFGR_PLLP	STM_RCC_PLLCFGR_PLLP_DIV_8
+#endif
+	pllcfgr |= (AO_RCC_PLLCFGR_PLLP << STM_RCC_PLLCFGR_PLLP);
 #endif
 #if AO_PLL1_Q
 	pllcfgr |= (AO_PLL1_Q << STM_RCC_PLLCFGR_PLLQ);
 #endif
+#if AO_PLL1_R
+	pllcfgr |= (AO_PLL1_R << STM_RCC_PLLCFGR_PLLR);
+#endif
 	/* PLL source */
 	pllcfgr &= ~(1 << STM_RCC_PLLCFGR_PLLSRC);
 #if AO_HSI
-	pllcfgr |= STM_RCC_PLLCFGR_PLLSRC_HSI;
+	pllcfgr |= (STM_RCC_PLLCFGR_PLLSRC_HSI << STM_RCC_PLLCFGR_PLLSRC);
 #endif
 #if AO_HSE
-	pllcfgr |= STM_RCC_PLLCFGR_PLLSRC_HSE;
+	pllcfgr |= (STM_RCC_PLLCFGR_PLLSRC_HSE << STM_RCC_PLLCFGR_PLLSRC);
 #endif
 	stm_rcc.pllcfgr = pllcfgr;
 
@@ -250,31 +249,34 @@ ao_clock_init(void)
 			break;
 	}
 
-#if 0
-	stm_rcc.apb2rstr = 0xffff;
-	stm_rcc.apb1rstr = 0xffff;
-	stm_rcc.ahbrstr = 0x3f;
-	stm_rcc.ahbenr = (1 << STM_RCC_AHBENR_FLITFEN);
-	stm_rcc.apb2enr = 0;
-	stm_rcc.apb1enr = 0;
-	stm_rcc.ahbrstr = 0;
-	stm_rcc.apb1rstr = 0;
-	stm_rcc.apb2rstr = 0;
+#if AO_HSE
+	/* Disable HSI clock */
+	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
 #endif
 
 	/* Clear reset flags */
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
 #if DEBUG_THE_CLOCK
-	/* Output SYSCLK on PA8 for measurments */
+	/* Output PLL clock on PA8 and SYCLK on PC9 for measurments */
 
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOAEN);
-	
+	stm_rcc.ahb1enr |= ((1 << STM_RCC_AHB1ENR_IOPAEN) |
+			    (1 << STM_RCC_AHB1ENR_IOPCEN));
+
 	stm_afr_set(&stm_gpioa, 8, STM_AFR_AF0);
 	stm_moder_set(&stm_gpioa, 8, STM_MODER_ALTERNATE);
-	stm_ospeedr_set(&stm_gpioa, 8, STM_OSPEEDR_40MHz);
+	stm_ospeedr_set(&stm_gpioa, 8, STM_OSPEEDR_HIGH);
 
-	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOPRE_DIV_1 << STM_RCC_CFGR_MCOPRE);
-	stm_rcc.cfgr |= (STM_RCC_CFGR_MCOSEL_HSE << STM_RCC_CFGR_MCOSEL);
+	stm_afr_set(&stm_gpioc, 9, STM_AFR_AF0);
+	stm_moder_set(&stm_gpioc, 9, STM_MODER_ALTERNATE);
+	stm_ospeedr_set(&stm_gpioc, 9, STM_OSPEEDR_HIGH);
+
+	cfgr = stm_rcc.cfgr;
+	cfgr &= 0x001fffff;
+	cfgr |= ((0 << STM_RCC_CFGR_MCO2) |
+		 (6 << STM_RCC_CFGR_MCO2PRE) |
+		 (6 << STM_RCC_CFGR_MCO1PRE) |
+		 (2 << STM_RCC_CFGR_MCO1));
+	stm_rcc.cfgr = cfgr;
 #endif
 }
