@@ -21,7 +21,7 @@ INC = \
 
 ALTOS_SRC = \
 	ao_adc_stm.c \
-	ao_led.c \
+	ao_led_stmf0.c \
 	ao_interrupt.c \
 	ao_boot_chain.c \
 	ao_product.c \

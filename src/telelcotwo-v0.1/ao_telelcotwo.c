@@ -34,8 +34,8 @@ main(void)
 {
 	ao_clock_init();
 
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_GREEN);
+	ao_led_init();
+	ao_led_on(LEDS_AVAILABLE);
 	ao_beep_init();
 	ao_task_init();
 
@@ -60,6 +60,8 @@ main(void)
 	ao_lco_init();
 	ao_lco_cmd_init();
 //	ao_radio_cmac_cmd_init();
+
+	ao_led_off(LEDS_AVAILABLE);
 
 	ao_start_scheduler();
 	return 0;

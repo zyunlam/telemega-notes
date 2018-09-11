@@ -243,9 +243,9 @@ ao_lco_display_test()
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, 8 | 0x10);
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, 8 | 0x10);
 	ao_mutex_put(&ao_lco_display_mutex);
-	ao_led_on(LEDS_AVAILABLE);
+	ao_led_on(AO_LEDS_AVAILABLE);
 	ao_delay(AO_MS_TO_TICKS(1000));
-	ao_led_off(LEDS_AVAILABLE);
+	ao_led_off(AO_LEDS_AVAILABLE);
 }
 
 static void

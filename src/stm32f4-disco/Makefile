@@ -3,7 +3,10 @@ include ../stm32f4/Makefile-raw.defs
 ALTOS_SRC = \
 	ao_interrupt.c \
 	ao_panic.c \
-	ao_timer.c
+	ao_timer.c \
+	ao_led.c \
+	ao_task.c \
+	ao_stdio.c
 
 CFLAGS = $(STM32F4_CFLAGS)
 

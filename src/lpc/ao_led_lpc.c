@@ -35,8 +35,8 @@ ao_led_off(AO_PORT_TYPE colors)
 void
 ao_led_set(AO_PORT_TYPE colors)
 {
-	AO_PORT_TYPE	on = colors & ao_led_enable;
-	AO_PORT_TYPE	off = ~colors & ao_led_enable;
+	AO_PORT_TYPE	on = colors & LEDS_AVAILABLE;
+	AO_PORT_TYPE	off = ~colors & LEDS_AVAILABLE;
 
 	ao_led_off(off);
 	ao_led_on(on);
@@ -57,18 +57,17 @@ ao_led_for(AO_PORT_TYPE colors, uint16_t ticks)
 }
 
 void
-ao_led_init(AO_PORT_TYPE enable)
+ao_led_init(void)
 {
-	ao_led_enable = enable;
 	ao_enable_port(LED_PORT);
 	if (LED_PORT == 0) {
-		if (enable & (1 << 11))
+		if (LEDS_AVAILABLE & (1 << 11))
 			lpc_ioconf.pio0_11 = LPC_IOCONF_FUNC_PIO0_11 | (1 << LPC_IOCONF_ADMODE);
-		if (enable & (1 << 12))
+		if (LEDS_AVAILABLE & (1 << 12))
 			lpc_ioconf.pio0_12 = LPC_IOCONF_FUNC_PIO0_12 | (1 << LPC_IOCONF_ADMODE);
-		if (enable & (1 << 14))
+		if (LEDS_AVAILABLE & (1 << 14))
 			lpc_ioconf.pio0_14 = LPC_IOCONF_FUNC_PIO0_14 | (1 << LPC_IOCONF_ADMODE);
 	}
-	lpc_gpio.dir[LED_PORT] |= enable;
-	ao_led_off(enable);
+	lpc_gpio.dir[LED_PORT] |= LEDS_AVAILABLE;
+	ao_led_off(LEDS_AVAILABLE);
 }

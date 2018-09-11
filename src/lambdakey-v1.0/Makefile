@@ -27,7 +27,7 @@ ALTOS_SRC = \
 	ao_interrupt.c \
 	ao_product.c \
 	ao_cmd.c \
-	ao_led.c \
+	ao_led_stmf0.c \
 	ao_notask.c \
 	ao_stdio.c \
 	ao_panic.c \

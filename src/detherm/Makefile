@@ -27,7 +27,7 @@ ALTOS_SRC = \
 	ao_spi_stm.c \
 	ao_exti_stm.c \
 	ao_stdio.c \
-	ao_led.c \
+	ao_led_stmf0.c \
 	ao_log.c \
 	ao_log_mini.c \
 	ao_sample.c \

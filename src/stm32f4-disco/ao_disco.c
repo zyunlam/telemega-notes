@@ -14,24 +14,35 @@
 
 #include <ao.h>
 
+static struct ao_task red_task;
+static struct ao_task green_task;
+
+static void
+red(void)
+{
+	for (;;) {
+		ao_led_toggle(LED_RED);
+		ao_delay(AO_MS_TO_TICKS(500));
+	}
+}
+
+static void
+green(void)
+{
+	for (;;) {
+		ao_led_toggle(LED_GREEN);
+		ao_delay(AO_MS_TO_TICKS(450));
+	}
+}
+
 void main(void)
 {
-	float		x;
-	int		r = 1;
-	int		g = 0;
-
 	ao_clock_init();
-
 	ao_timer_init();
+	ao_led_init();
+	ao_task_init();
 
-	ao_enable_output(LED_GREEN_PORT, LED_GREEN_PIN, 0);
-	ao_enable_output(LED_RED_PORT, LED_RED_PIN, 1);
-	for (;;) {
-		ao_gpio_set(LED_GREEN_PORT, LED_GREEN_PIN, g);
-		ao_gpio_set(LED_RED_PORT, LED_RED_PIN, r);
-		g ^= 1;
-		r ^= 1;
-		for (x = 0.0f; x < 100000.0f; x = x + 0.1f)
-			ao_arch_nop();
-	}
+	ao_add_task(&red_task, red, "red");
+	ao_add_task(&green_task, green, "green");
+	ao_start_scheduler();
 }

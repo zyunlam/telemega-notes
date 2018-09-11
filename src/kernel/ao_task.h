@@ -134,7 +134,7 @@ ao_task_info(void);
 
 /* Start the scheduler. This will not return */
 void
-ao_start_scheduler(void);
+ao_start_scheduler(void) __attribute__((noreturn));
 
 #if HAS_TASK_QUEUE
 void

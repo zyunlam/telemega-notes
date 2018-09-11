@@ -30,7 +30,7 @@ ALTOS_SRC = \
 	ao_romconfig.c \
 	ao_cmd.c \
 	ao_task.c \
-	ao_led.c \
+	ao_led_stm.c \
 	ao_stdio_newlib.c \
 	ao_panic.c \
 	ao_timer.c \

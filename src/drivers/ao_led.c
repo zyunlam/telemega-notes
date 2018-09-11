@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ * Copyright © 2018 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 
 #include "ao.h"
 
-#if LED_PER_LED
 static const struct {
 	struct stm_gpio	*port;
 	uint16_t	pin;
@@ -71,146 +70,105 @@ static const struct {
 #ifdef LED_15_PORT
     [15] { LED_15_PORT, LED_15_PIN },
 #endif
+#ifdef LED_16_PORT
+    [16] { LED_16_PORT, LED_16_PIN },
+#endif
+#ifdef LED_17_PORT
+    [17] { LED_17_PORT, LED_17_PIN },
+#endif
+#ifdef LED_18_PORT
+    [18] { LED_18_PORT, LED_18_PIN },
+#endif
+#ifdef LED_19_PORT
+    [19] { LED_19_PORT, LED_19_PIN },
+#endif
+#ifdef LED_20_PORT
+    [20] { LED_20_PORT, LED_20_PIN },
+#endif
+#ifdef LED_21_PORT
+    [21] { LED_21_PORT, LED_21_PIN },
+#endif
+#ifdef LED_22_PORT
+    [22] { LED_22_PORT, LED_22_PIN },
+#endif
+#ifdef LED_23_PORT
+    [23] { LED_23_PORT, LED_23_PIN },
+#endif
+#ifdef LED_24_PORT
+    [24] { LED_24_PORT, LED_24_PIN },
+#endif
+#ifdef LED_25_PORT
+    [25] { LED_25_PORT, LED_25_PIN },
+#endif
+#ifdef LED_26_PORT
+    [26] { LED_26_PORT, LED_26_PIN },
+#endif
+#ifdef LED_27_PORT
+    [27] { LED_27_PORT, LED_27_PIN },
+#endif
+#ifdef LED_28_PORT
+    [28] { LED_28_PORT, LED_28_PIN },
+#endif
+#ifdef LED_29_PORT
+    [29] { LED_29_PORT, LED_29_PIN },
+#endif
+#ifdef LED_30_PORT
+    [30] { LED_30_PORT, LED_30_PIN },
+#endif
+#ifdef LED_31_PORT
+    [31] { LED_31_PORT, LED_31_PIN },
+#endif
 };
 #define N_LED	(sizeof (ao_leds)/sizeof(ao_leds[0]))
-#endif
-static AO_LED_TYPE ao_led_enable;
 
 void
 ao_led_on(AO_LED_TYPE colors)
 {
-#ifdef LED_PER_LED
 	AO_LED_TYPE i;
 	for (i = 0; i < N_LED; i++)
 		if (colors & (1 << i))
 			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, 1);
-#else
-#ifdef LED_PORT
-	LED_PORT->bsrr = (colors & ao_led_enable);
-#else
-#ifdef LED_PORT_0
-	LED_PORT_0->bsrr = ((colors & ao_led_enable) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
-#endif
-#ifdef LED_PORT_1
-	LED_PORT_1->bsrr = ((colors & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
-#endif
-#endif
-#endif
 }
 
 void
 ao_led_off(AO_LED_TYPE colors)
 {
-#ifdef LED_PER_LED
 	AO_LED_TYPE i;
 	for (i = 0; i < N_LED; i++)
 		if (colors & (1 << i))
 			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, 0);
-#else
-#ifdef LED_PORT
-	LED_PORT->bsrr = (uint32_t) (colors & ao_led_enable) << 16;
-#else
-#ifdef LED_PORT_0
-	LED_PORT_0->bsrr = ((uint32_t) (colors & ao_led_enable) & LED_PORT_0_MASK) << (LED_PORT_0_SHIFT + 16);
-#endif
-#ifdef LED_PORT_1
-	LED_PORT_1->bsrr = ((uint32_t) (colors & ao_led_enable) & LED_PORT_1_MASK) << (LED_PORT_1_SHIFT + 16);
-#endif
-#endif
-#endif
 }
 
 void
 ao_led_set(AO_LED_TYPE colors)
 {
-	AO_LED_TYPE	on = colors & ao_led_enable;
-	AO_LED_TYPE	off = ~colors & ao_led_enable;
-
-	ao_led_off(off);
-	ao_led_on(on);
+	AO_LED_TYPE i;
+	for (i = 0; i < N_LED; i++)
+		ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, (colors >> i) & 1);
 }
 
 void
 ao_led_toggle(AO_LED_TYPE colors)
 {
-#ifdef LED_PER_LED
 	AO_LED_TYPE i;
 	for (i = 0; i < N_LED; i++)
 		if (colors & (1 << i))
 			ao_gpio_set(ao_leds[i].port, ao_leds[i].pin, ~ao_gpio_get(ao_leds[i].port, ao_leds[i].pin));
-#else
-#ifdef LED_PORT
-	LED_PORT->odr ^= (colors & ao_led_enable);
-#else
-#ifdef LED_PORT_0
-	LED_PORT_0->odr ^= ((colors & ao_led_enable) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
-#endif
-#ifdef LED_PORT_1
-	LED_PORT_1->odr ^= ((colors & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
-#endif
-#endif
-#endif
 }
 
 void
-ao_led_for(AO_LED_TYPE colors, AO_LED_TYPE ticks) 
+ao_led_for(AO_LED_TYPE colors, AO_TICK_TYPE ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);
 	ao_led_off(colors);
 }
 
-#define init_led_pin(port, bit) do { \
-		stm_moder_set(port, bit, STM_MODER_OUTPUT);		\
-		stm_otyper_set(port, bit, STM_OTYPER_PUSH_PULL);	\
-	} while (0)
-
 void
-ao_led_init(AO_LED_TYPE enable)
+ao_led_init(void)
 {
 	AO_LED_TYPE	bit;
 
-	ao_led_enable = enable;
-#if LED_PER_LED
 	for (bit = 0; bit < N_LED; bit++)
 		ao_enable_output(ao_leds[bit].port, ao_leds[bit].pin, 0);
-#else
-#ifdef LED_PORT
-	stm_rcc.ahbenr |= (1 << LED_PORT_ENABLE);
-	LED_PORT->odr &= ~enable;
-#else
-#ifdef LED_PORT_0
-	stm_rcc.ahbenr |= (1 << LED_PORT_0_ENABLE);
-	LED_PORT_0->odr &= ~((enable & ao_led_enable) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
-#endif
-#ifdef LED_PORT_1
-	stm_rcc.ahbenr |= (1 << LED_PORT_1_ENABLE);
-	LED_PORT_1->odr &= ~((enable & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
-#endif
-#ifdef LED_PORT_2
-	stm_rcc.ahbenr |= (1 << LED_PORT_1_ENABLE);
-	LED_PORT_1->odr &= ~((enable & ao_led_enable) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
-#endif
-#endif
-	for (bit = 0; bit < 16; bit++) {
-		if (enable & (1 << bit)) {
-#ifdef LED_PORT
-			init_led_pin(LED_PORT, bit);
-#else
-#ifdef LED_PORT_0
-			if (LED_PORT_0_MASK & (1 << bit))
-				init_led_pin(LED_PORT_0, bit + LED_PORT_0_SHIFT);
-#endif
-#ifdef LED_PORT_1
-			if (LED_PORT_1_MASK & (1 << bit))
-				init_led_pin(LED_PORT_1, bit + LED_PORT_1_SHIFT);
-#endif
-#ifdef LED_PORT_2
-			if (LED_PORT_2_MASK & (1 << bit))
-				init_led_pin(LED_PORT_2, bit + LED_PORT_2_SHIFT);
-#endif
-#endif
-		}
-	}
-#endif
 }
