@@ -34,7 +34,6 @@ static void
 ao_mma655x_start(void) {
 	ao_spi_get_bit(AO_MMA655X_CS_PORT,
 		       AO_MMA655X_CS_PIN,
-		       AO_MMA655X_CS,
 		       AO_MMA655X_SPI_INDEX,
 		       AO_SPI_SPEED_FAST);
 }
@@ -43,19 +42,18 @@ static void
 ao_mma655x_stop(void) {
 	ao_spi_put_bit(AO_MMA655X_CS_PORT,
 		       AO_MMA655X_CS_PIN,
-		       AO_MMA655X_CS,
 		       AO_MMA655X_SPI_INDEX);
 }
 
 static void
 ao_mma655x_restart(void) {
 	uint8_t	i;
-	ao_gpio_set(AO_MMA655X_CS_PORT, AO_MMA655X_CS_PIN, AO_MMA655X_CS, 1);
+	ao_gpio_set(AO_MMA655X_CS_PORT, AO_MMA655X_CS_PIN, 1);
 
 	/* Emperical testing on STM32L151 at 32MHz for this delay amount */
 	for (i = 0; i < 10; i++)
 		ao_arch_nop();
-	ao_gpio_set(AO_MMA655X_CS_PORT, AO_MMA655X_CS_PIN, AO_MMA655X_CS, 0);
+	ao_gpio_set(AO_MMA655X_CS_PORT, AO_MMA655X_CS_PIN, 0);
 }
 
 static uint8_t

@@ -19,17 +19,17 @@
 #ifndef _AO_ARCH_FUNCS_H_
 #define _AO_ARCH_FUNCS_H_
 
-#define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
-#define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<bit),bus)
+#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
+#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
 #define ao_enable_port(port) (lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_GPIO))
 #define ao_disable_port(port) (lpc_scb.sysahbclkctrl &= ~(1 << LPC_SCB_SYSAHBCLKCTRL_GPIO))
 
 #define lpc_all_bit(port,bit)	(((port) << 5) | (bit))
 
-#define ao_gpio_set(port, bit, pin, v)	(lpc_gpio.byte[lpc_all_bit(port,bit)] = (v))
+#define ao_gpio_set(port, bit, v)	(lpc_gpio.byte[lpc_all_bit(port,bit)] = (v))
 
-#define ao_gpio_get(port, bit, pin) 	(lpc_gpio.byte[lpc_all_bit(port,bit)])
+#define ao_gpio_get(port, bit) 	(lpc_gpio.byte[lpc_all_bit(port,bit)])
 
 #define PORT0_JTAG_REGS	((1 << 11) | (1 << 12) | (1 << 14))
 
@@ -41,10 +41,10 @@ static inline void lpc_set_gpio(int port, int bit) {
 	}
 }
 
-#define ao_enable_output(port,bit,pin,v) do {			\
+#define ao_enable_output(port,bit,v) do {			\
 		ao_enable_port(port);				\
 		lpc_set_gpio(port,bit);				\
-		ao_gpio_set(port, bit, pin, v);			\
+		ao_gpio_set(port, bit, v);			\
 		lpc_gpio.dir[port] |= (1 << bit);		\
 	} while (0)
 
@@ -204,8 +204,8 @@ static inline void ao_arch_restore_stack(void) {
 		ao_spi_put(bus);		\
 	} while (0)
 
-#define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
-#define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<bit),bus)
+#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
+#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
 void
 ao_spi_get(uint8_t spi_index, uint32_t speed);
@@ -254,7 +254,7 @@ static inline void ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
 		uint8_t __bit__;					\
 		for (__bit__ = 0; __bit__ < 32; __bit__++) {		\
 			if (mask & (1 << __bit__))			\
-				ao_enable_output(port, __bit__, PIN, 1); \
+				ao_enable_output(port, __bit__, 1); \
 		}							\
 	} while (0)
 

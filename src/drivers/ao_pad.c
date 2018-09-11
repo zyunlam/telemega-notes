@@ -50,7 +50,7 @@ static void
 ao_siren(uint8_t v)
 {
 #ifdef AO_SIREN
-	ao_gpio_set(AO_SIREN_PORT, AO_SIREN_PIN, AO_SIREN, v);
+	ao_gpio_set(AO_SIREN_PORT, AO_SIREN_PIN, v);
 #else
 #if HAS_BEEP
 	ao_beep(v ? AO_BEEP_MID : 0);
@@ -64,7 +64,7 @@ static void
 ao_strobe(uint8_t v)
 {
 #ifdef AO_STROBE
-	ao_gpio_set(AO_STROBE_PORT, AO_STROBE_PIN, AO_STROBE, v);
+	ao_gpio_set(AO_STROBE_PORT, AO_STROBE_PIN, v);
 #else
 	(void) v;
 #endif
@@ -589,34 +589,34 @@ ao_pad_init(void)
 	}
 #endif
 #if AO_PAD_NUM > 0
-	ao_enable_output(AO_PAD_0_PORT, AO_PAD_PIN_0, AO_PAD_0, 0);
+	ao_enable_output(AO_PAD_0_PORT, AO_PAD_PIN_0, 0);
 #endif
 #if AO_PAD_NUM > 1
-	ao_enable_output(AO_PAD_1_PORT, AO_PAD_PIN_1, AO_PAD_1, 0);
+	ao_enable_output(AO_PAD_1_PORT, AO_PAD_PIN_1, 0);
 #endif
 #if AO_PAD_NUM > 2
-	ao_enable_output(AO_PAD_2_PORT, AO_PAD_PIN_2, AO_PAD_2, 0);
+	ao_enable_output(AO_PAD_2_PORT, AO_PAD_PIN_2, 0);
 #endif
 #if AO_PAD_NUM > 3
-	ao_enable_output(AO_PAD_3_PORT, AO_PAD_PIN_3, AO_PAD_3, 0);
+	ao_enable_output(AO_PAD_3_PORT, AO_PAD_PIN_3, 0);
 #endif
 #if AO_PAD_NUM > 4
-	ao_enable_output(AO_PAD_4_PORT, AO_PAD_PIN_4, AO_PAD_4, 0);
+	ao_enable_output(AO_PAD_4_PORT, AO_PAD_PIN_4, 0);
 #endif
 #if AO_PAD_NUM > 5
-	ao_enable_output(AO_PAD_5_PORT, AO_PAD_PIN_5, AO_PAD_5, 0);
+	ao_enable_output(AO_PAD_5_PORT, AO_PAD_PIN_5, 0);
 #endif
 #if AO_PAD_NUM > 5
-	ao_enable_output(AO_PAD_6_PORT, AO_PAD_PIN_6, AO_PAD_6, 0);
+	ao_enable_output(AO_PAD_6_PORT, AO_PAD_PIN_6, 0);
 #endif
 #if AO_PAD_NUM > 7
-	ao_enable_output(AO_PAD_7_PORT, AO_PAD_PIN_7, AO_PAD_7, 0);
+	ao_enable_output(AO_PAD_7_PORT, AO_PAD_PIN_7, 0);
 #endif
 #ifdef AO_STROBE
-	ao_enable_output(AO_STROBE_PORT, AO_STROBE_PIN, AO_STROBE, 0);
+	ao_enable_output(AO_STROBE_PORT, AO_STROBE_PIN, 0);
 #endif
 #ifdef AO_SIREN
-	ao_enable_output(AO_SIREN_PORT, AO_SIREN_PIN, AO_SIREN, 0);
+	ao_enable_output(AO_SIREN_PORT, AO_SIREN_PIN, 0);
 #endif
 	ao_cmd_register(&ao_pad_cmds[0]);
 	ao_add_task(&ao_pad_task, ao_pad, "pad listener");

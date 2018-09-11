@@ -857,7 +857,7 @@ ao_usb_disable(void)
 	ao_arch_block_interrupts();
 
 #if HAS_USB_PULLUP
-	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, AO_USB_PULLUP, 0);
+	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, 0);
 #endif
 	/* Disable interrupts */
 	lpc_usb.inten = 0;
@@ -975,7 +975,7 @@ ao_usb_enable(void)
 	ao_usb_set_ep0();
 
 #if HAS_USB_PULLUP
-	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, AO_USB_PULLUP, 1);
+	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, 1);
 #endif
 }
 
@@ -1013,7 +1013,7 @@ void
 ao_usb_init(void)
 {
 #if HAS_USB_PULLUP
-	ao_enable_output(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, AO_USB_PULLUP, 0);
+	ao_enable_output(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, 0);
 #endif
 	ao_usb_enable();
 

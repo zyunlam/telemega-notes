@@ -37,7 +37,6 @@ static struct ao_button_state	ao_button_state[AO_BUTTON_COUNT];
 
 #define port(q)	AO_BUTTON_ ## q ## _PORT
 #define bit(q) AO_BUTTON_ ## q
-#define pin(q) AO_BUTTON_ ## q ## _PIN
 
 #ifndef AO_BUTTON_INVERTED
 #define AO_BUTTON_INVERTED	1
@@ -45,9 +44,9 @@ static struct ao_button_state	ao_button_state[AO_BUTTON_COUNT];
 
 #if AO_BUTTON_INVERTED
 /* pins are inverted */
-#define ao_button_value(b)	!ao_gpio_get(port(b), bit(b), pin(b))
+#define ao_button_value(b)	!ao_gpio_get(port(b), bit(b))
 #else
-#define ao_button_value(b)	ao_gpio_get(port(b), bit(b), pin(b))
+#define ao_button_value(b)	ao_gpio_get(port(b), bit(b))
 #endif
 
 static uint8_t

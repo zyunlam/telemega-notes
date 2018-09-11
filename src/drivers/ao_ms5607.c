@@ -31,12 +31,12 @@ static uint8_t	  	ms5607_configured;
 
 static void
 ao_ms5607_start(void) {
-	ao_spi_get_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, AO_MS5607_SPI_INDEX, AO_MS5607_SPI_SPEED);
+	ao_spi_get_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_SPI_INDEX, AO_MS5607_SPI_SPEED);
 }
 
 static void
 ao_ms5607_stop(void) {
-	ao_spi_put_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_CS, AO_MS5607_SPI_INDEX);
+	ao_spi_put_bit(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, AO_MS5607_SPI_INDEX);
 }
 
 static void
@@ -164,7 +164,7 @@ ao_ms5607_get_sample(uint8_t cmd) {
 	ao_spi_put(AO_MS5607_SPI_INDEX);
 #endif
 	ao_arch_block_interrupts();
-	while (!ao_gpio_get(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN, AO_MS5607_MISO) &&
+	while (!ao_gpio_get(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN) &&
 	       !ao_ms5607_done)
 		ao_sleep((void *) &ao_ms5607_done);
 	ao_arch_release_interrupts();

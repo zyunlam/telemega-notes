@@ -141,9 +141,6 @@
 #define AO_IGNITER_MAIN_PORT	(&stm_gpioa)
 #define AO_IGNITER_MAIN_PIN	9
 
-#define AO_IGNITER_SET_DROGUE(v)	stm_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, v)
-#define AO_IGNITER_SET_MAIN(v)		stm_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, v)
-
 /*
  * ADC
  */

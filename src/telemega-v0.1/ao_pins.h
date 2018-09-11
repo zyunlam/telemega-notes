@@ -165,9 +165,6 @@
 /* Number of general purpose pyro channels available */
 #define AO_PYRO_NUM	4
 
-#define AO_IGNITER_SET_DROGUE(v)	stm_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, v)
-#define AO_IGNITER_SET_MAIN(v)		stm_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, v)
-
 /*
  * ADC
  */

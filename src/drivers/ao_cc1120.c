@@ -208,7 +208,7 @@ ao_radio_fifo_write_fixed(uint8_t data, uint8_t len)
 static uint8_t
 ao_radio_int_pin(void)
 {
-	return ao_gpio_get(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN, AO_CC1120_INT);
+	return ao_gpio_get(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
 }
 
 #if CC1120_DEBUG

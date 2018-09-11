@@ -30,7 +30,7 @@ static uint8_t		ao_tracker_force_telem;
 static inline uint8_t
 ao_usb_connected(void)
 {
-	return ao_gpio_get(AO_USB_CONNECT_PORT, AO_USB_CONNECT_PIN, AO_USB_CONNECT) != 0;
+	return ao_gpio_get(AO_USB_CONNECT_PORT, AO_USB_CONNECT_PIN) != 0;
 }
 #else
 #define ao_usb_connected()	1

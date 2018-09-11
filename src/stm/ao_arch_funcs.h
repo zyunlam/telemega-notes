@@ -166,8 +166,8 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		ao_spi_put(bus);		\
 	} while (0)
 
-#define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
-#define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<bit),bus)
+#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
+#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
 #define ao_enable_port(port) do {					\
 		if ((port) == &stm_gpioa)				\
@@ -196,9 +196,9 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 	} while (0)
 
 
-#define ao_gpio_set(port, bit, pin, v) stm_gpio_set(port, bit, v)
+#define ao_gpio_set(port, bit, v) stm_gpio_set(port, bit, v)
 
-#define ao_gpio_get(port, bit, pin) stm_gpio_get(port, bit)
+#define ao_gpio_get(port, bit) stm_gpio_get(port, bit)
 
 #define ao_gpio_set_bits(port, bits) stm_gpio_set_bits(port, bits)
 
@@ -208,9 +208,9 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 
 #define ao_gpio_get_all(port) stm_gpio_get_all(port)
 
-#define ao_enable_output(port,bit,pin,v) do {			\
+#define ao_enable_output(port,bit,v) do {			\
 		ao_enable_port(port);				\
-		ao_gpio_set(port, bit, pin, v);			\
+		ao_gpio_set(port, bit, v);			\
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);\
 	} while (0)
 
@@ -223,7 +223,7 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 #define AO_OUTPUT_PUSH_PULL	STM_OTYPER_PUSH_PULL
 #define AO_OUTPUT_OPEN_DRAIN	STM_OTYPER_OPEN_DRAIN
 
-#define ao_gpio_set_output_mode(port,bit,pin,mode) \
+#define ao_gpio_set_output_mode(port,bit,mode) \
 	stm_otyper_set(port, pin, mode)
 
 #define ao_gpio_set_mode(port,bit,mode) do {				\
@@ -248,8 +248,8 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		stm_moder_set(port, bit, STM_MODER_INPUT);	\
 	} while (0)
 
-#define ao_set_output(port, bit, pin, v) do {			\
-		ao_gpio_set(port, bit, pin, v);			\
+#define ao_set_output(port, bit, v) do {			\
+		ao_gpio_set(port, bit, v);			\
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);	\
 	} while (0)
 
