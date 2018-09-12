@@ -56,14 +56,7 @@
  * ao_romconfig.c
  */
 
-#define AO_ROMCONFIG_VERSION	2
-
-#define AO_ROMCONFIG_SYMBOL(a) __attribute__((section(".romconfig"))) const
-
-extern const uint16_t ao_romconfig_version;
-extern const uint16_t ao_romconfig_check;
-extern const uint16_t ao_serial_number;
-extern const uint32_t ao_radio_cal;
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
 
 #define ao_arch_task_members\
 	uint32_t *sp;			/* saved stack pointer */

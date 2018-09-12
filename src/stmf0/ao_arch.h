@@ -58,9 +58,7 @@
  * ao_romconfig.c
  */
 
-#define AO_ROMCONFIG_VERSION	2
-
-#define AO_ROMCONFIG_SYMBOL(a) __attribute__((section(".romconfig"))) const
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
 
 extern const uint16_t ao_romconfig_version;
 extern const uint16_t ao_romconfig_check;

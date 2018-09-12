@@ -26,7 +26,13 @@
 
 #define AO_PORT_TYPE	uint16_t
 
+#define ao_arch_reboot() \
+	(stm_scb.aircr = ((STM_SCB_AIRCR_VECTKEY_KEY << STM_SCB_AIRCR_VECTKEY) | \
+			  (1 << STM_SCB_AIRCR_SYSRESETREQ)))
+
 #define ao_arch_nop()		asm("nop")
+
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
 
 #define ao_arch_task_members\
 	uint32_t *sp;			/* saved stack pointer */
