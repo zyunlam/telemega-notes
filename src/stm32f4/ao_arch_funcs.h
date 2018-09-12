@@ -331,4 +331,10 @@ static inline void ao_disable_port(struct stm_gpio *port)
 		ao_gpio_set_mode(port, bit, mode);			\
 	} while (0)
 
+/* usart */
+
+void
+ao_usart_init(void);
+
+
 #endif /* _AO_ARCH_FUNCS_H_ */

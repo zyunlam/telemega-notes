@@ -19,6 +19,26 @@ stm_dac1   = 0x40007400;
 stm_uart7  = 0x40007800;
 stm_uart8  = 0x40007c00;
 
+stm_tim1   = 0x40010000;
+stm_tim8   = 0x40010400;
+stm_usart1 = 0x40011000;
+stm_usart6 = 0x40011400;
+stm_uart9  = 0x40011800;
+stm_uart10 = 0x40011c00;
+stm_adc    = 0x40012000;
+stm_sdio   = 0x40012c00;
+stm_spi1   = 0x40013000;
+stm_spi4   = 0x40013400;
+stm_syscfg = 0x40013800;
+stm_exti   = 0x40013c00;
+stm_tim9   = 0x40014000;
+stm_tim10  = 0x40014400;
+stm_tim11  = 0x40014800;
+stm_spi5   = 0x40015000;
+stm_sai1   = 0x40015800;
+stm_dfsdm1 = 0x40016000;
+stm_dfsdm2 = 0x40016400;
+
 stm_gpioa  = 0x40020000;
 stm_gpiob  = 0x40020400;
 stm_gpioc  = 0x40020800;

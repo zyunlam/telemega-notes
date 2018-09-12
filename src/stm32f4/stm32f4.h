@@ -223,6 +223,26 @@ extern struct stm_rcc stm_rcc;
 #define STM_RCC_APB1ENR_TIM3EN		1
 #define STM_RCC_APB1ENR_TIM2EN		0
 
+#define STM_RCC_APB2ENR_DFSDM2EN	25
+#define STM_RCC_APB2ENR_DFSDM1EN	24
+#define STM_RCC_APB2ENR_SAI1EN		22
+#define STM_RCC_APB2ENR_SPI5EN		20
+#define STM_RCC_APB2ENR_TIM11EN		18
+#define STM_RCC_APB2ENR_TIM10EN		17
+#define STM_RCC_APB2ENR_TIM9EN		16
+#define STM_RCC_APB2ENR_EXITEN		15
+#define STM_RCC_APB2ENR_SYSCFGEN	14
+#define STM_RCC_APB2ENR_SPI4EN		13
+#define STM_RCC_APB2ENR_SPI1EN		12
+#define STM_RCC_APB2ENR_SDIOEN		11
+#define STM_RCC_APB2ENR_ADC1EN		8
+#define STM_RCC_APB2ENR_UART10EN	7
+#define STM_RCC_APB2ENR_UART9EN		5
+#define STM_RCC_APB2ENR_USART6EN	5
+#define STM_RCC_APB2ENR_USART1EN	4
+#define STM_RCC_APB2ENR_TIM8EN		1
+#define STM_RCC_APB2ENR_TIM1EN		0
+
 #define STM_RCC_CSR_RMVF		24
 
 struct stm_ictr {
@@ -283,7 +303,7 @@ static inline int
 stm_nvic_enabled(int irq) {
 	return IRQ_BOOL(stm_nvic.iser[IRQ_REG(irq)], irq);
 }
-	
+
 static inline void
 stm_nvic_set_pending(int irq) {
 	stm_nvic.ispr[IRQ_REG(irq)] = IRQ_MASK(irq);
@@ -323,6 +343,152 @@ static inline uint8_t
 stm_nvic_get_priority(int irq) {
 	return (stm_nvic.ipr[IRQ_PRIO_REG(irq)] >> IRQ_PRIO_BIT(irq)) & IRQ_PRIO_MASK(0);
 }
+
+#define isr(name) void stm_ ## name ## _isr(void)
+
+isr(nmi);
+isr(hardfault);
+isr(memmanage);
+isr(busfault);
+isr(usagefault);
+isr(svc);
+isr(debugmon);
+isr(pendsv);
+isr(systick);
+isr(wwdg);
+isr(pvd);
+isr(tamper_stamp);
+isr(rtc_wkup);
+isr(flash);
+isr(rcc);
+isr(exti0);
+isr(exti1);
+isr(exti2);
+isr(exti3);
+isr(exti4);
+isr(dma1_stream0);
+isr(dma1_stream1);
+isr(dma1_stream2);
+isr(dma1_stream3);
+isr(dma1_stream4);
+isr(dma1_stream5);
+isr(dma1_stream6);
+isr(adc);
+isr(can1_tx);
+isr(can1_rx0);
+isr(can1_rx1);
+isr(can1_sce);
+isr(exti9_5);
+isr(tim1_brk_tim9);
+isr(tim1_up_tim10);
+isr(tim_trg_com_tim11);
+isr(tim1_cc);
+isr(tim2);
+isr(tim3);
+isr(tim4);
+isr(i2c1_evt);
+isr(i2c1_err);
+isr(i2c2_evt);
+isr(i2c2_err);
+isr(spi1);
+isr(spi2);
+isr(usart1);
+isr(usart2);
+isr(usart3);
+isr(exti15_10);
+isr(rtc_alarm);
+isr(otg_fs_wkup);
+isr(tim8_brk_tim12);
+isr(tim8_up_tim13);
+isr(tim8_trg_com_tim14);
+isr(tim8_cc);
+isr(dma1_stream7);
+isr(fsmc);
+isr(sdio);
+isr(tim5);
+isr(spi3);
+isr(uart4);
+isr(uart5);
+isr(tim6_glb_it);
+isr(tim7);
+isr(dma2_stream0);
+isr(dma2_stream1);
+isr(dma2_stream2);
+isr(dma2_stream3);
+isr(dma2_stream4);
+isr(dfsdm1_flt0);
+isr(dfsdm1_flt1);
+isr(can2_tx);
+isr(can2_rx0);
+isr(can2_rx1);
+isr(can2_sce);
+isr(otg_fs);
+isr(dma2_stream5);
+isr(dma2_stream6);
+isr(dma2_stream7);
+isr(usart6);
+isr(i2c3_ev);
+isr(i2c3_er);
+isr(can3_tx);
+isr(can3_rx0);
+isr(can3_rx1);
+isr(can3_sce);
+isr(crypto);
+isr(rng);
+isr(fpu);
+isr(uart7);
+isr(uart8);
+isr(spi4);
+isr(spi5);
+isr(sai1);
+isr(uart9);
+isr(uart10);
+isr(quad_spi);
+isr(i2cfmp1_ev);
+isr(i2cfmp1_er);
+isr(exti23);
+isr(dfsdm2_flt0);
+isr(dfsdm2_flt1);
+isr(dfsdm2_flt2);
+isr(dfsdm2_flt3);
+
+#undef isr
+
+#define STM_ISR_WWDG_POS		0
+#define STM_ISR_PVD_POS			1
+#define STM_ISR_TAMPER_STAMP_POS	2
+#define STM_ISR_RTC_WKUP_POS		3
+#define STM_ISR_FLASH_POS		4
+#define STM_ISR_RCC_POS			5
+#define STM_ISR_EXTI0_POS		6
+#define STM_ISR_EXTI1_POS		7
+#define STM_ISR_EXTI2_POS		8
+#define STM_ISR_EXTI3_POS		9
+#define STM_ISR_EXTI4_POS		10
+#define STM_ISR_DMA1_STREAM0_POS	11
+#define STM_ISR_DMA1_STREAM1_POS	12
+#define STM_ISR_DMA1_STREAM2_POS	13
+#define STM_ISR_DMA1_STREAM3_POS	14
+#define STM_ISR_DMA1_STREAM4_POS	15
+#define STM_ISR_DMA1_STREAM5_POS	16
+#define STM_ISR_DMA1_STREAM6_POS	17
+#define STM_ISR_ADC_POS			18
+#define STM_ISR_CAN1_TX_POS		19
+#define STM_ISR_CAN1_RX0_POS		20
+#define STM_ISR_CAN1_RX1_POS		21
+#define STM_ISR_CAN1_SCE_POS		22
+#define STM_ISR_EXTI9_5_POS		23
+#define STM_ISR_USART1_POS		37
+#define STM_ISR_USART2_POS		38
+#define STM_ISR_USART3_POS		39
+#define STM_ISR_UART4_POS		52
+#define STM_ISR_UART5_POS		53
+#define STM_ISR_USART6_POS		71
+#define STM_ISR_UART7_POS		82
+#define STM_ISR_UART9_POS		88
+#define STM_ISR_UART10_POS		89
+
+#define STM_ISR_EXTI15_10_POS		40
 
 struct stm_flash {
 	vuint32_t	acr;
@@ -595,6 +761,13 @@ extern struct stm_scb stm_scb;
 #define STM_SCB_CPACR_FP0	STM_SCB_CPACR_CP(10)
 #define STM_SCB_CPACR_FP1	STM_SCB_CPACR_CP(11)
 
+#define STM_SCB_AIRCR_VECTKEY		16
+#define  STM_SCB_AIRCR_VECTKEY_KEY		0x05fa
+#define STM_SCB_AIRCR_PRIGROUP		8
+#define STM_SCB_AIRCR_SYSRESETREQ	2
+#define STM_SCB_AIRCR_VECTCLRACTIVE	1
+#define STM_SCB_AIRCR_VECTRESET		0
+
 /* The SYSTICK starts at 0xe000e010 */
 
 struct stm_systick {
@@ -614,6 +787,148 @@ extern struct stm_systick stm_systick;
 #define  STM_SYSTICK_CSR_CLKSOURCE_AHB_8		0
 #define  STM_SYSTICK_CSR_CLKSOURCE_AHB			1
 #define STM_SYSTICK_CSR_COUNTFLAG	16
+
+#define STM_SYSCFG_EXTICR_PA		0
+#define STM_SYSCFG_EXTICR_PB		1
+#define STM_SYSCFG_EXTICR_PC		2
+#define STM_SYSCFG_EXTICR_PD		3
+#define STM_SYSCFG_EXTICR_PE		4
+#define STM_SYSCFG_EXTICR_PF		5
+#define STM_SYSCFG_EXTICR_PG		6
+#define STM_SYSCFG_EXTICR_PH		7
+
+struct stm_syscfg {
+	vuint32_t	memrmp;
+	vuint32_t	pmc;
+	vuint32_t	exticr[4];
+};
+
+extern struct stm_syscfg stm_syscfg;
+
+#define stm_syscfg (*((struct stm_syscfg *) 0x40013800))
+
+#define STM_SYSCFG_MEMRMP_MEM_MODE	0
+#define  STM_SYSCFG_MEMRMP_MEM_MODE_MAIN_FLASH		0
+#define  STM_SYSCFG_MEMRMP_MEM_MODE_SYSTEM_FLASH	1
+#define  STM_SYSCFG_MEMRMP_MEM_MODE_SRAM		3
+#define  STM_SYSCFG_MEMRMP_MEM_MODE_MASK		3
+
+#define STM_SYSCFG_PMC_ADC1DC2		0
+
+static inline void
+stm_exticr_set(struct stm_gpio *gpio, int pin) {
+	uint8_t	reg = pin >> 2;
+	uint8_t	shift = (pin & 3) << 2;
+	uint8_t	val = 0;
+
+	/* Enable SYSCFG */
+	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGEN);
+
+	if (gpio == &stm_gpioa)
+		val = STM_SYSCFG_EXTICR_PA;
+	else if (gpio == &stm_gpiob)
+		val = STM_SYSCFG_EXTICR_PB;
+	else if (gpio == &stm_gpioc)
+		val = STM_SYSCFG_EXTICR_PC;
+	else if (gpio == &stm_gpiod)
+		val = STM_SYSCFG_EXTICR_PD;
+	else if (gpio == &stm_gpioe)
+		val = STM_SYSCFG_EXTICR_PE;
+	else if (gpio == &stm_gpiof)
+		val = STM_SYSCFG_EXTICR_PF;
+	else if (gpio == &stm_gpiog)
+		val = STM_SYSCFG_EXTICR_PG;
+	else if (gpio == &stm_gpioh)
+		val = STM_SYSCFG_EXTICR_PH;
+
+	stm_syscfg.exticr[reg] = (stm_syscfg.exticr[reg] & ~(0xf << shift)) | val << shift;
+}
+
+struct stm_exti {
+	vuint32_t	imr;
+	vuint32_t	emr;
+	vuint32_t	rtsr;
+	vuint32_t	ftsr;
+
+	vuint32_t	swier;
+	vuint32_t	pr;
+};
+
+extern struct stm_exti stm_exti;
+
+#define stm_exti	(*((struct stm_exti *) 0x40013c00))
+
+struct stm_usart {
+	vuint32_t	sr;	/* status register */
+	vuint32_t	dr;	/* data register */
+	vuint32_t	brr;	/* baud rate register */
+	vuint32_t	cr1;	/* control register 1 */
+
+	vuint32_t	cr2;	/* control register 2 */
+	vuint32_t	cr3;	/* control register 3 */
+	vuint32_t	gtpr;	/* guard time and prescaler */
+};
+
+extern struct stm_usart	stm_usart6;
+
+#define stm_usart6	(*((struct stm_usart *) 0x40011400))
+
+#define STM_USART_SR_CTS	(9)	/* CTS flag */
+#define STM_USART_SR_LBD	(8)	/* LIN break detection flag */
+#define STM_USART_SR_TXE	(7)	/* Transmit data register empty */
+#define STM_USART_SR_TC		(6)	/* Transmission complete */
+#define STM_USART_SR_RXNE	(5)	/* Read data register not empty */
+#define STM_USART_SR_IDLE	(4)	/* IDLE line detected */
+#define STM_USART_SR_ORE	(3)	/* Overrun error */
+#define STM_USART_SR_NF		(2)	/* Noise detected flag */
+#define STM_USART_SR_FE		(1)	/* Framing error */
+#define STM_USART_SR_PE		(0)	/* Parity error */
+
+#define STM_USART_CR1_OVER8	(15)	/* Oversampling mode */
+#define STM_USART_CR1_UE	(13)	/* USART enable */
+#define STM_USART_CR1_M		(12)	/* Word length */
+#define STM_USART_CR1_WAKE	(11)	/* Wakeup method */
+#define STM_USART_CR1_PCE	(10)	/* Parity control enable */
+#define STM_USART_CR1_PS	(9)	/* Parity selection */
+#define STM_USART_CR1_PEIE	(8)	/* PE interrupt enable */
+#define STM_USART_CR1_TXEIE	(7)	/* TXE interrupt enable */
+#define STM_USART_CR1_TCIE	(6)	/* Transmission complete interrupt enable */
+#define STM_USART_CR1_RXNEIE	(5)	/* RXNE interrupt enable */
+#define STM_USART_CR1_IDLEIE	(4)	/* IDLE interrupt enable */
+#define STM_USART_CR1_TE	(3)	/* Transmitter enable */
+#define STM_USART_CR1_RE	(2)	/* Receiver enable */
+#define STM_USART_CR1_RWU	(1)	/* Receiver wakeup */
+#define STM_USART_CR1_SBK	(0)	/* Send break */
+
+#define STM_USART_CR2_LINEN	(14)	/* LIN mode enable */
+#define STM_USART_CR2_STOP	(12)	/* STOP bits */
+#define STM_USART_CR2_STOP_MASK	3
+#define STM_USART_CR2_STOP_1	0
+#define STM_USART_CR2_STOP_0_5	1
+#define STM_USART_CR2_STOP_2	2
+#define STM_USART_CR2_STOP_1_5	3
+
+#define STM_USART_CR2_CLKEN	(11)	/* Clock enable */
+#define STM_USART_CR2_CPOL	(10)	/* Clock polarity */
+#define STM_USART_CR2_CPHA	(9)	/* Clock phase */
+#define STM_USART_CR2_LBCL	(8)	/* Last bit clock pulse */
+#define STM_USART_CR2_LBDIE	(6)	/* LIN break detection interrupt enable */
+#define STM_USART_CR2_LBDL	(5)	/* lin break detection length */
+#define STM_USART_CR2_ADD	(0)
+#define STM_USART_CR2_ADD_MASK	0xf
+
+#define STM_USART_CR3_ONEBIT	(11)	/* One sample bit method enable */
+#define STM_USART_CR3_CTSIE	(10)	/* CTS interrupt enable */
+#define STM_USART_CR3_CTSE	(9)	/* CTS enable */
+#define STM_USART_CR3_RTSE	(8)	/* RTS enable */
+#define STM_USART_CR3_DMAT	(7)	/* DMA enable transmitter */
+#define STM_USART_CR3_DMAR	(6)	/* DMA enable receiver */
+#define STM_USART_CR3_SCEN	(5)	/* Smartcard mode enable */
+#define STM_USART_CR3_NACK	(4)	/* Smartcard NACK enable */
+#define STM_USART_CR3_HDSEL	(3)	/* Half-duplex selection */
+#define STM_USART_CR3_IRLP	(2)	/* IrDA low-power */
+#define STM_USART_CR3_IREN	(1)	/* IrDA mode enable */
+#define STM_USART_CR3_EIE	(0)	/* Error interrupt enable */
 
 /* Errata 2.1.5
 
