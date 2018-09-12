@@ -61,7 +61,7 @@ const char ao_product[] = AO_iProduct_STRING;
 #define NUM_INTERFACES		(AO_USB_HAS_INT + 1)
 
 /* USB descriptors in one giant block of bytes */
-AO_ROMCONFIG_SYMBOL(0x00aa) uint8_t ao_usb_descriptors [] =
+AO_ROMCONFIG_SYMBOL uint8_t ao_usb_descriptors [] =
 {
 	/* Device descriptor */
 	0x12,

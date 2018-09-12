@@ -49,6 +49,8 @@
 
 #define ao_arch_interrupt(n)	/* nothing */
 
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
+
 #undef putchar
 #undef getchar
 #define putchar(c)	ao_putchar(c)

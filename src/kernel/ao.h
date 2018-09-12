@@ -82,6 +82,19 @@ void
 ao_panic(uint8_t reason);
 
 /*
+ * ao_romconfig.c
+ */
+
+#define AO_ROMCONFIG_VERSION	2
+
+extern AO_ROMCONFIG_SYMBOL uint16_t ao_romconfig_version;
+extern AO_ROMCONFIG_SYMBOL uint16_t ao_romconfig_check;
+extern AO_ROMCONFIG_SYMBOL uint16_t ao_serial_number;
+#if HAS_RADIO
+extern AO_ROMCONFIG_SYMBOL uint32_t ao_radio_cal;
+#endif
+
+/*
  * ao_timer.c
  */
 
