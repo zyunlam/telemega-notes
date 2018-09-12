@@ -27,14 +27,12 @@
 #endif
 
 /* arm stacks must be 32-bit aligned */
+#ifndef AO_STACK_ALIGNMENT
 #ifdef __arm__
 #define AO_STACK_ALIGNMENT __attribute__ ((aligned(4)))
-#endif
-#ifdef SDCC
+#else
 #define AO_STACK_ALIGNMENT
 #endif
-#ifdef __AVR__
-#define AO_STACK_ALIGNMENT
 #endif
 
 /* An AltOS task */

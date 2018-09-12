@@ -19,8 +19,10 @@
 #include <stm32f4.h>
 
 #ifndef AO_STACK_SIZE
-#define AO_STACK_SIZE	512
+#define AO_STACK_SIZE	1024
 #endif
+
+#define AO_STACK_ALIGNMENT __attribute__ ((aligned(8)))
 
 #define AO_PORT_TYPE	uint16_t
 
