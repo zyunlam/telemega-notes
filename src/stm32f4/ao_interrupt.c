@@ -119,7 +119,7 @@ isr(spi2)
 isr(usart1)
 isr(usart2)
 isr(usart3)
-isr(exti5_10)
+isr(exti15_10)
 isr(rtc_alarm)
 isr(otg_fs_wkup)
 isr(tim8_brk_tim12)
@@ -231,9 +231,10 @@ const void *stm_interrupt_vector[] = {
 	i(0xd4, usart1),
 	i(0xd8, usart2),
 	i(0xdc, usart3),
-	i(0xe0, exti5_10),
+	i(0xe0, exti15_10),
 	i(0xe4, rtc_alarm),
 	i(0xe8, otg_fs_wkup),
 	i(0xec, tim8_brk_tim12),
 	i(0xf0, tim8_up_tim13),
+	i(0x15c, usart6),
 };

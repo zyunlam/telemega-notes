@@ -100,4 +100,32 @@
 #define AO_SYSTICK	(AO_HCLK)
 #define AO_PANIC_DELAY_SCALE  (AO_SYSCLK / 12000000)
 
+/* The stm32f413 implements only 4 bits of the priority fields? */
+
+#if AO_NONMASK_INTERRUPT
+#define AO_STM_NVIC_NONMASK_PRIORITY	0x00
+
+/* Set the basepri register to this value to mask all
+ * non-maskable priorities
+ */
+#define AO_STM_NVIC_BASEPRI_MASK	0x10
+#endif
+
+#define AO_STM_NVIC_HIGH_PRIORITY	0x40
+#define AO_STM_NVIC_MED_PRIORITY	0x80
+#define AO_STM_NVIC_LOW_PRIORITY	0xC0
+#define AO_STM_NVIC_CLOCK_PRIORITY	0xf0
+
+#define AO_GPIO_MODE_PULL_NONE	0
+#define AO_GPIO_MODE_PULL_UP	4
+#define AO_GPIO_MODE_PULL_DOWN	8
+
+/* usart stuff */
+
+#define AO_SERIAL_SPEED_4800	4800
+#define AO_SERIAL_SPEED_9600	9600
+#define AO_SERIAL_SPEED_19200	19200
+#define AO_SERIAL_SPEED_57600	57600
+#define AO_SERIAL_SPEED_115200	115200
+
 #endif /* _AO_ARCH_H_ */
