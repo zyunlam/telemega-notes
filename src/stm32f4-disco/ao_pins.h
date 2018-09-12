@@ -46,10 +46,26 @@
 
 #define LED_0_PORT	(&stm_gpioc)
 #define LED_0_PIN	5
-#define LED_GREEN	(1 << 0)
+#define LED_GREEN	AO_LED_0
 
 #define LED_1_PORT	(&stm_gpioe)
 #define LED_1_PIN	3
-#define LED_RED		(1 << 1)
+#define LED_RED		AO_LED_0
+
+#define AO_LED_PANIC	LED_RED
+
+/* USART */
+
+#define HAS_SERIAL_6		1
+#define SERIAL_6_RX_PORT	(&stm_gpiog)
+#define SERIAL_6_RX_PIN		9
+
+#define SERIAL_6_TX_PORT	(&stm_gpiog)
+#define SERIAL_6_TX_PIN		14
+
+#define USE_SERIAL_6_STDIN	1
+#define DELAY_SERIAL_6_STDIN	0
+#define USE_SERIAL_6_FLOW	0
+#define USE_SERIAL_6_SW_FLOW	0
 
 #endif /* _AO_PINS_H_ */

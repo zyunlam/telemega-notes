@@ -13,26 +13,31 @@
  */
 
 #include <ao.h>
+#include <ao_scheme.h>
 
-static struct ao_task red_task;
-static struct ao_task green_task;
-
-static void
-red(void)
-{
-	for (;;) {
-		ao_led_toggle(LED_RED);
-		ao_delay(AO_MS_TO_TICKS(500));
-	}
+static void scheme_cmd() {
+	ao_scheme_read_eval_print(stdin, stdout, false);
 }
 
-static void
-green(void)
+static const struct ao_cmds scheme_cmds[] = {
+	{ scheme_cmd,	"l\0Run scheme interpreter" },
+	{ 0, 0 }
+};
+
+int
+_ao_scheme_getc(void)
 {
-	for (;;) {
-		ao_led_toggle(LED_GREEN);
-		ao_delay(AO_MS_TO_TICKS(450));
+	static uint8_t	at_eol;
+	int c;
+
+	if (at_eol) {
+		ao_cmd_readline(ao_scheme_read_list ? "- " : "> ");
+		at_eol = 0;
 	}
+	c = (unsigned char) ao_cmd_lex();
+	if (c == '\n')
+		at_eol = 1;
+	return c;
 }
 
 void main(void)
@@ -40,9 +45,9 @@ void main(void)
 	ao_clock_init();
 	ao_timer_init();
 	ao_led_init();
+	ao_usart_init();
 	ao_task_init();
-
-	ao_add_task(&red_task, red, "red");
-	ao_add_task(&green_task, green, "green");
+	ao_cmd_init();
+	ao_cmd_register(scheme_cmds);
 	ao_start_scheduler();
 }
