@@ -38,9 +38,13 @@ SECTIONS {
 
 	.text : {
 		*(.text*)	/* Executable code */
-		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		*(.rodata*)	/* Constants */
 	} > rom
+
+	.exidx : {
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+	} > rom
+
 	__text_end__ = .;
 
 	/* Data -- relocated to RAM, but written to ROM
