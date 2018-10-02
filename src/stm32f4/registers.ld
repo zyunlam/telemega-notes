@@ -1,3 +1,4 @@
+
 stm_tim2   = 0x40000000;
 stm_tim3   = 0x40000400;
 stm_tim4   = 0x40000800;
@@ -39,6 +40,8 @@ stm_sai1   = 0x40015800;
 stm_dfsdm1 = 0x40016000;
 stm_dfsdm2 = 0x40016400;
 
+/* AHB1 */
+
 stm_gpioa  = 0x40020000;
 stm_gpiob  = 0x40020400;
 stm_gpioc  = 0x40020800;
@@ -53,6 +56,11 @@ stm_rcc    = 0x40023800;
 stm_flash  = 0x40023c00;
 stm_dma1   = 0x40026000;
 stm_dma2   = 0x40026400;
+
+/* AHB2 */
+
+stm_usb    = 0x50000000;
+stm_rng    = 0x50060800;
 
 stm_systick = 0xe000e010;
 

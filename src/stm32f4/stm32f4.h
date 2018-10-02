@@ -193,6 +193,10 @@ extern struct stm_rcc stm_rcc;
 #define STM_RCC_AHB1ENR_IOPGEN	6
 #define STM_RCC_AHB1ENR_IOPHEN	7
 
+#define STM_RCC_AHB2ENR_OTGFSEN		7
+#define STM_RCC_AHB2ENR_RNGEN		6
+#define STM_RCC_AHB2ENR_CRYPEN		4
+
 #define STM_RCC_APB1ENR_UART8EN		31
 #define STM_RCC_APB1ENR_UART7EN		30
 #define STM_RCC_APB1ENR_DACEN		29
@@ -244,6 +248,34 @@ extern struct stm_rcc stm_rcc;
 #define STM_RCC_APB2ENR_TIM1EN		0
 
 #define STM_RCC_CSR_RMVF		24
+
+#define STM_RCC_DCKCFGR_CKDFSDMSEL	31
+#define STM_RCC_DCKCFGR_I2S2SRC		27
+#define STM_RCC_DCKCFGR_I2S1SRC		25
+#define STM_RCC_DCKCFGR_TIMPRE		24
+#define STM_RCC_DCKCFGR_SAII1BSRC	22
+#define STM_RCC_DCKCFGR_SAII1ASRC	20
+#define STM_RCC_DCKCFGR_CKDFSDM1ASEL	15
+#define STM_RCC_DCKCFGR_CKDFSDM2ASEL	14
+#define STM_RCC_DCKCFGR_PLLDIVR		8
+#define STM_RCC_DCKCFGR_PLLI2SDIVR	0
+
+#define STM_RCC_DCKCFGR2_LPTIMER1SEL	30
+#define  STM_RCC_DCKCFGR2_LPTIMER1SEL_APB	0
+#define  STM_RCC_DCKCFGR2_LPTIMER1SEL_HSI	1
+#define  STM_RCC_DCKCFGR2_LPTIMER1SEL_LSI	2
+#define  STM_RCC_DCKCFGR2_LPTIMER1SEL_LSE	3
+#define STM_RCC_DCKCFGR2_SDIOSEL	28
+#define  STM_RCC_DCKCFGR2_SDIOSEL_CK_48MHZ	0
+#define  STM_RCC_DCKCFGR2_SDIOSEL_SYSTEM_CLOCK	1
+#define STM_RCC_DCKCFGR2_CK48MSEL	27
+#define  STM_RCC_DCKCFGR2_CK48MSEL_PLL_Q	1
+#define  STM_RCC_DCKCFGR2_CK48MSEL_PLLI2S_Q	1
+#define STM_RCC_DCKCFGR2_I2CFMP1SEL	22
+#define  STM_RCC_DCKCFGR2_I2CFMP1SEL_APB		0
+#define  STM_RCC_DCKCFGR2_I2CFMP1SEL_SYSTEM_CLOCK	1
+#define  STM_RCC_DCKCFGR2_I2CFMP1SEL_HSI		2
+#define  STM_RCC_DCKCFGR2_I2CFMP1SEL_APB_ALSO		3
 
 struct stm_ictr {
 	vuint32_t	ictr;
@@ -478,11 +510,53 @@ isr(dfsdm2_flt3);
 #define STM_ISR_CAN1_RX1_POS		21
 #define STM_ISR_CAN1_SCE_POS		22
 #define STM_ISR_EXTI9_5_POS		23
+#define STM_ISR_TIM1_BRK_TIM9_POS	24
+#define STM_ISR_TIM1_UP_TIM10_POS	25
+#define STM_ISR_TIM_TRG_COM_TIM11_POS	26
+#define STM_ISR_TIM1_CC_POS		27
+#define STM_ISR_TIM2_POS		28
+#define STM_ISR_TIM3_POS		29
+#define STM_ISR_TIM4_POS		30
+#define STM_ISR_I2C1_EVT_POS		31
+#define STM_ISR_I2C1_ERR_POS		32
+#define STM_ISR_I2C2_EVT_POS		33
+#define STM_ISR_I2C2_ERR_POS		34
+#define STM_ISR_SPI1_POS		35
+#define STM_ISR_SPI2_POS		36
 #define STM_ISR_USART1_POS		37
 #define STM_ISR_USART2_POS		38
 #define STM_ISR_USART3_POS		39
+#define STM_ISR_EXTI15_10_POS		40
+#define STM_ISR_EXTI17_RTC_ALARM_POS	41
+#define STM_ISR_EXTI18_OTG_FS_WKUP_POS	42
+#define STM_ISR_TIM2_BRK_TIM12_POS	43
+#define STM_ISR_TIM8_UP_TIM13_POS	44
+#define STM_ISR_TIM8_TRG_COM_TIM14_POS	45
+#define STM_ISR_TIM8_CC_POS		46
+#define STM_ISR_DMA1_STREAM7_POS	47
+#define STM_ISR_FSMC_POS		48
+#define STM_ISR_SDIO_POS		49
+#define STM_ISR_TIM5_POS		50
+#define STM_ISR_SPI3_POS		41
 #define STM_ISR_UART4_POS		52
 #define STM_ISR_UART5_POS		53
+#define STM_ISR_TIM6_GLB_IT_DAC1_DAC2_POS	54
+#define STM_ISR_TIM7_POS		55
+#define STM_ISR_DMA2_STREAM0_POS	56
+#define STM_ISR_DMA2_STREAM1_POS	57
+#define STM_ISR_DMA2_STREAM2_POS	58
+#define STM_ISR_DMA2_STREAM3_POS	59
+#define STM_ISR_DMA2_STREAM4_POS	60
+#define STM_ISR_DFSDM1_FLT0_POS		61
+#define STM_ISR_DFSDM1_FLT1_POS		62
+#define STM_ISR_CAN2_TX_POS		63
+#define STM_ISR_CAN2_RX0_POS		64
+#define STM_ISR_CAN2_RX1_POS		65
+#define STM_ISR_CAN2_SCE_POS		66
+#define STM_ISR_OTG_FS_POS		67
+#define STM_ISR_DMA2_STREAM5_POS	68
+#define STM_ISR_DMA2_STREAM6_POS	69
+#define STM_ISR_DMA2_STREAM7_POS	70
 #define STM_ISR_USART6_POS		71
 #define STM_ISR_UART7_POS		82
 #define STM_ISR_UART9_POS		88
@@ -929,6 +1003,441 @@ extern struct stm_usart	stm_usart6;
 #define STM_USART_CR3_IRLP	(2)	/* IrDA low-power */
 #define STM_USART_CR3_IREN	(1)	/* IrDA mode enable */
 #define STM_USART_CR3_EIE	(0)	/* Error interrupt enable */
+
+/* USB */
+struct stm_usb {
+	vuint32_t	gotgctl;
+	vuint32_t	gotgint;
+	vuint32_t	gahbcfg;
+	vuint32_t	gusbcfg;
+
+	vuint32_t	grstctl;
+	vuint32_t	gintsts;
+	vuint32_t	gintmsk;
+	vuint32_t	grxstsr;
+
+	vuint32_t	grxstsp;
+	vuint32_t	grxfsiz;
+	vuint32_t	dieptxf0;
+	vuint32_t	hnptxsts;
+
+	vuint32_t	pad_30;
+	vuint32_t	pad_34;
+	vuint32_t	gccfg;
+	vuint32_t	cid;
+
+	vuint32_t	pad_40;
+	vuint32_t	pad_44;
+	vuint32_t	pad_48;
+	vuint32_t	ghwcfg3;	/* not in docs? */
+
+	vuint32_t	pad_50;
+	vuint32_t	glpmcfg;
+	vuint32_t	pad_58;
+	vuint32_t	gdfifocfg;	/* not in docs? */
+
+	uint8_t		pad_60[0x100 - 0x60];
+
+	vuint32_t	hptxfsiz;	/* 0x100 */
+	vuint32_t	dieptxf[0xf];	/* 0x104 5 in docs? */
+
+	uint8_t		pad_140[0x400 - 0x140];
+
+	vuint32_t	hcfg;
+	vuint32_t	hfir;
+	vuint32_t	hfnum;
+	vuint32_t	pad_40c;
+
+	vuint32_t	hptxsts;
+	vuint32_t	haint;
+	vuint32_t	haintmsk;
+	vuint32_t	pad_41c;
+
+	uint8_t		pad_420[0x440-0x420];
+
+	vuint32_t	hprt;
+
+	uint8_t		pad_444[0x500 - 0x444];
+
+	vuint32_t	hcchar0;
+	vuint32_t	pad_504;
+	vuint32_t	hcint0;
+	vuint32_t	hcintmsk0;
+
+	vuint32_t	hctsiz0;
+	vuint32_t	pad_514;
+	vuint32_t	pad_518;
+	vuint32_t	pad_51c;
+
+	struct {
+		vuint32_t	hcchar;
+		vuint32_t	pad_4;
+		vuint32_t	hcint;
+		vuint32_t	hcintmsk;
+
+		vuint32_t	hctsiz;
+		vuint32_t	pad_14;
+		vuint32_t	pad_18;
+		vuint32_t	pad_1c;
+	} h[11];
+
+	uint8_t		pad_680[0x800 - 0x680];
+
+	vuint32_t	dcfg;
+	vuint32_t	dctl;
+	vuint32_t	dsts;
+	vuint32_t	pad_80c;
+
+	vuint32_t	diepmsk;
+	vuint32_t	doepmsk;
+	vuint32_t	daint;
+	vuint32_t	daintmsk;
+
+	vuint32_t	pad_820;
+	vuint32_t	pad_824;
+	vuint32_t	dvbusdis;
+	vuint32_t	dvbuspulse;
+
+	vuint32_t	pad_830;
+	vuint32_t	diepempmsk;
+
+	uint8_t		pad_838[0x900 - 0x838];
+
+	struct {
+		vuint32_t	diepctl;
+		vuint32_t	pad_04;
+		vuint32_t	diepint;
+		vuint32_t	pad_0c;
+
+		vuint32_t	dieptsiz;
+		vuint32_t	pad_14;
+		vuint32_t	dtxfsts;
+		vuint32_t	pad_1c;
+	} diep[6];
+
+	uint8_t		pad_9c0[0xb00 - 0x9c0];
+
+	struct {
+		vuint32_t	doepctl;
+		vuint32_t	pad_04;
+		vuint32_t	doepint;
+		vuint32_t	pad_0c;
+
+		vuint32_t	doeptsiz;
+		vuint32_t	pad_14;
+		vuint32_t	pad_18;
+		vuint32_t	pad_1c;
+	} doep[6];
+
+	uint8_t		pad_bc0[0xe00 - 0xbc0];
+
+	vuint32_t	pcgcctl;
+
+	uint8_t		pad_e04[0x1000 - 0xe04];
+
+	struct {
+		vuint32_t	fifo;
+		uint8_t		pad_004[0x1000 - 0x004];
+	} dfifo[6];
+};
+
+extern struct stm_usb stm_usb;
+
+#define stm_usb (*((struct stm_usb *) 0x50000000))
+
+#define STM_USB_GOTGCTL_CURMOD		21
+#define STM_USB_GOTGCTL_OTGVER		20
+#define STM_USB_GOTGCTL_BSVLD		19
+#define STM_USB_GOTGCTL_ASVLD		18
+#define STM_USB_GOTGCTL_DBCT		17
+#define STM_USB_GOTGCTL_CIDSTS		16
+#define STM_USB_GOTGCTL_EHEN		12
+#define STM_USB_GOTGCTL_DHNPEN		11
+#define STM_USB_GOTGCTL_HSHNPEN		10
+#define STM_USB_GOTGCTL_HNPRQ		9
+#define STM_USB_GOTGCTL_HNGSCS		8
+#define STM_USB_GOTGCTL_BVALOVAL	7
+#define STM_USB_GOTGCTL_BVALOEN		6
+#define STM_USB_GOTGCTL_AVALOVAL	5
+#define STM_USB_GOTGCTL_AVALOEN		4
+#define STM_USB_GOTGCTL_VBVALOVAL	3
+#define STM_USB_GOTGCTL_VBVALOEN	2
+#define STM_USB_GOTGCTL_SRQ		1
+#define STM_USB_GOTGCTL_SRQSCS		0
+
+#define STM_USB_GOTGINT_IDCHNG		20
+#define STM_USB_GOTGINT_DBCDNE		19
+#define STM_USB_GOTGINT_ADTOCHG		18
+#define STM_USB_GOTGINT_HNGDET		17
+#define STM_USB_GOTGINT_HNSSCHG		9
+#define STM_USB_GOTGINT_SRSSCHG		8
+#define STM_USB_GOTGINT_SEDET		2
+
+#define STM_USB_GAHBCFG_PTXFELVL	8
+#define STM_USB_GAHBCFG_TXFELVL		7
+#define STM_USB_GAHBCFG_GINTMSK		0
+
+#define STM_USB_GUSBCFG_FDMOD		30
+#define STM_USB_GUSBCFG_FHMOD		29
+#define STM_USB_GUSBCFG_TRDT		10
+#define  STM_USB_GUSBCFG_TRDT_MASK	0xf
+#define STM_USB_GUSBCFG_HNPCAP		9
+#define STM_USB_GUSBCFG_SRPCAP		8
+#define STM_USB_GUSBCFG_PHYSEL		6
+#define STM_USB_GUSBCFG_TOCAL		0
+#define  STM_USB_GUSBCFG_TOCAL_MASK		0x7
+
+#define STM_USB_GRSTCTL_AHBIDL		31
+#define STM_USB_GRSTCTL_TXFNUM		6
+#define  STM_USB_GRSTCTL_TXFNUM_ALL		0x10
+#define  STM_USB_GRSTCTL_TXFNUM_MASK		0x1f
+#define STM_USB_GRSTCTL_TXFFLSH		5
+#define STM_USB_GRSTCTL_RXFFLSH		4
+#define STM_USB_GRSTCTL_FCRST		2
+#define STM_USB_GRSTCTL_PSRST		1
+#define STM_USB_GRSTCTL_CSRST		0
+
+#define STM_USB_GINTSTS_WKUPINT		31
+#define STM_USB_GINTSTS_SRQINT		30
+#define STM_USB_GINTSTS_DISCINT		29
+#define STM_USB_GINTSTS_CIDSCHG		28
+#define STM_USB_GINTSTS_LPMINT		27
+#define STM_USB_GINTSTS_PTXFE		26
+#define STM_USB_GINTSTS_HCINT		25
+#define STM_USB_GINTSTS_HPRTINT		24
+#define STM_USB_GINTSTS_RSTDET		23
+#define STM_USB_GINTSTS_IPXFER		21
+#define STM_USB_GINTSTS_IISOIXFR	20
+#define STM_USB_GINTSTS_OEPINT		19
+#define STM_USB_GINTSTS_IEPINT		18
+#define STM_USB_GINTSTS_EOPF		15
+#define STM_USB_GINTSTS_ISOODRP		14
+#define STM_USB_GINTSTS_ENUMDNE		13
+#define STM_USB_GINTSTS_USBRST		12
+#define STM_USB_GINTSTS_USBSUSP		11
+#define STM_USB_GINTSTS_ESUSP		10
+#define STM_USB_GINTSTS_GONAKEFF	7
+#define STM_USB_GINTSTS_GINAKEFF	6
+#define STM_USB_GINTSTS_NPTXFE		5
+#define STM_USB_GINTSTS_RXFLVL		4
+#define STM_USB_GINTSTS_SOF		3
+#define STM_USB_GINTSTS_OTGINT		2
+#define STM_USB_GINTSTS_MMIS		1
+#define STM_USB_GINTSTS_CMOD		0
+
+#define STM_USB_GINTMSK_WUIM		31
+#define STM_USB_GINTMSK_SRQIM		30
+#define STM_USB_GINTMSK_DISCINT		29
+#define STM_USB_GINTMSK_CIDSCHGM	28
+#define STM_USB_GINTMSK_LPMINTM		27
+#define STM_USB_GINTMSK_PTXFEM		26
+#define STM_USB_GINTMSK_HCIM		25
+#define STM_USB_GINTMSK_PRTIM		24
+#define STM_USB_GINTMSK_RSTDETM		23
+#define STM_USB_GINTMSK_IPXFERM		21	/* host mode */
+#define STM_USB_GINTMSK_IISOOXFRM	21	/* device mode */
+#define STM_USB_GINTMSK_IISOIXFRM	20
+#define STM_USB_GINTMSK_OEPINT		19
+#define STM_USB_GINTMSK_IEPINT		18
+#define STM_USB_GINTMSK_EOPFM		15
+#define STM_USB_GINTMSK_ISOODRPM	14
+#define STM_USB_GINTMSK_ENUMDNEM	13
+#define STM_USB_GINTMSK_USBRST		12
+#define STM_USB_GINTMSK_USBSUSPM	11
+#define STM_USB_GINTMSK_ESUSPM		10
+#define STM_USB_GINTMSK_GONAKEFFM	7
+#define STM_USB_GINTMSK_GINAKEFFM	6
+#define STM_USB_GINTMSK_NPTXFEM		5
+#define STM_USB_GINTMSK_RXFLVLM		4
+#define STM_USB_GINTMSK_SOFM		3
+#define STM_USB_GINTMSK_OTGINT		2
+#define STM_USB_GINTMSK_MMISM		1
+
+#define STM_USB_GRXSTSP_STSPHST		27
+#define STM_USB_GRXSTSP_FRMNUM		21
+#define  STM_USB_GRXSTSP_FRMNUM_MASK		0xf
+#define STM_USB_GRXSTSP_PKTSTS		17
+#define  STM_USB_GRXSTSP_PKTSTS_NAK		1
+#define  STM_USB_GRXSTSP_PKTSTS_OUT_DATA	2
+#define  STM_USB_GRXSTSP_PKTSTS_OUT_COMPLETE	3
+#define  STM_USB_GRXSTSP_PKTSTS_SETUP_COMPLETE	4
+#define  STM_USB_GRXSTSP_PKTSTS_SETUP_DATA	5
+#define  STM_USB_GRXSTSP_PKTSTS_MASK		0xf
+#define STM_USB_GRXSTSP_DPID		15
+#define  STM_USB_GRXSTSP_DPID_MASK		3
+#define STM_USB_GRXSTSP_BCNT		4
+#define STM_USB_GRXSTSP_BCNT		4
+#define  STM_USB_GRXSTSP_BCNT_MASK		0x3ff
+#define STM_USB_GRXSTSP_EPNUM		0
+#define  STM_USB_GRXSTSP_EPNUM_MASK		0xf
+
+#define STM_USB_GRXFSIZ_RXFD		0
+#define  STM_USB_GRXFSIZ_RXFD_MASK		0xffff
+
+#define STM_USB_GCCFG_VBDEN		21
+#define STM_USB_GCCFG_SDEN		20
+#define STM_USB_GCCFG_PDEN		19
+#define STM_USB_GCCFG_DCDEN		18
+#define STM_USB_GCCFG_BCDEN		17
+#define STM_USB_GCCFG_PWRDWN		16
+#define STM_USB_GCCFG_PS2DET		3
+#define STM_USB_GCCFG_SDET		2
+#define STM_USB_GCCFG_PDET		1
+#define STM_USB_GCCFG_DCDET		0
+
+#define STM_USB_DIEPTXF0_TX0FD		16
+#define STM_USB_DIEPTXF0_TX0FSA		 0
+
+#define STM_USB_DCFG_ERRATIM		15
+#define STM_USB_DCFG_PFIVL		11
+#define  STM_USB_DCFG_PFIVL_80			0
+#define  STM_USB_DCFG_PFIVL_85			1
+#define  STM_USB_DCFG_PFIVL_90			2
+#define  STM_USB_DCFG_PFIVL_95			3
+#define  STM_USB_DCFG_PFIVL_MASK		3
+#define STM_USB_DCFG_DAD		4
+#define  STM_USB_DCFG_DAD_MASK			0x7f
+#define STM_USB_DCFG_NZLSOHSK		2
+#define STM_USB_DCFG_DSPD		0
+#define  STM_USB_DCFG_DSPD_FULL_SPEED		3
+#define  STM_USB_DCFG_DSPD_MASK			3
+#define STM_USB_DCFG_
+#define STM_USB_DCFG_
+#define STM_USB_DCFG_
+#define STM_USB_DCFG_
+#define STM_USB_DCFG_
+#define STM_USB_DCFG_
+#define STM_USB_DCFG_
+
+#define STM_USB_DCTL_DSBESLRJCT		18
+#define STM_USB_DCTL_POPRGDNE		11
+#define STM_USB_DCTL_CGONAK		10
+#define STM_USB_DCTL_SGONAK		9
+#define STM_USB_DCTL_CGINAK		8
+#define STM_USB_DCTL_SGINAK		7
+#define STM_USB_DCTL_TCTL		4
+#define STM_USB_DCTL_GONSTS		3
+#define STM_USB_DCTL_GINSTS		2
+#define STM_USB_DCTL_SDIS		1
+#define STM_USB_DCTL_RWUSIG		0
+
+#define STM_USB_DSTS_DEVLNSTS		22
+#define  STM_USB_DSTS_DEVLNSTS_MASK		0x3
+#define STM_USB_DSTS_FNSOF		8
+#define  STM_USB_DSTS_FNSOF_MASK		0x3fff
+#define STM_USB_DSTS_EERR		3
+#define STM_USB_DSTS_ENUMSPD		1
+#define  STM_USB_DSTS_ENUMSPD_MASK		3
+#define STM_USB_DSTS_SUSPSTS		0
+
+#define STM_USB_DIEPMSK_NAKM		13
+#define STM_USB_DIEPMSK_TXFURM		8
+#define STM_USB_DIEPMSK_INEPNEM		6
+#define STM_USB_DIEPMSK_INEPNMM		5
+#define STM_USB_DIEPMSK_ITTXFEMSK	4
+#define STM_USB_DIEPMSK_TOM		3
+#define STM_USB_DIEPMSK_EPDM		1
+#define STM_USB_DIEPMSK_XFRCM		0
+
+#define STM_USB_DOEPMSK_NYETMSK		14
+#define STM_USB_DOEPMSK_NAKMSK		13
+#define STM_USB_DOEPMSK_BERRM		12
+#define STM_USB_DOEPMSK_OUTPKTERRM	8
+#define STM_USB_DOEPMSK_STSPHSRXM	5
+#define STM_USB_DOEPMSK_OTEPDM		4
+#define STM_USB_DOEPMSK_STUPM		3
+#define STM_USB_DOEPMSK_EPDM		1
+#define STM_USB_DOEPMSK_XFRCM		0
+
+#define STM_USB_DAINT_OEPINT		16
+#define  STM_USB_DAINT_OEPINT_MASK		0xffff
+#define STM_USB_DAINT_IEPINT		16
+#define  STM_USB_DAINT_IEPINT_MASK		0xffff
+
+#define STM_USB_DAINTMSK_OEPM		16
+#define  STM_USB_DAINTMSK_OEPM_MASK		0xffff
+#define STM_USB_DAINTMSK_IEPM		0
+#define  STM_USB_DAINTMSK_IEPM_MASK		0xffff
+
+#define STM_USB_DIEPCTL_EPENA		31
+#define STM_USB_DIEPCTL_EPDIS		30
+#define STM_USB_DIEPCTL_SNAK		27
+#define STM_USB_DIEPCTL_CNAK		26
+#define STM_USB_DIEPCTL_TXFNUM		22
+#define  STM_USB_DIEPCTL_TXFNUM_MASK		0xf
+#define STM_USB_DIEPCTL_STALL		21
+#define STM_USB_DIEPCTL_EPTYP		18
+#define  STM_USB_DIEPCTL_EPTYP_CONTROL		0
+#define  STM_USB_DIEPCTL_EPTYP_ISOCHRONOUS	1
+#define  STM_USB_DIEPCTL_EPTYP_BULK		2
+#define  STM_USB_DIEPCTL_EPTYP_INTERRUPT	3
+#define  STM_USB_DIEPCTL_EPTYP_MASK		3
+#define STM_USB_DIEPCTL_NAKSTS		17
+#define STM_USB_DIEPCTL_EONUM		16
+#define STM_USB_DIEPCTL_USBAEP		15
+#define STM_USB_DIEPCTL_MPSIZ		0
+#define  STM_USB_DIEPCTL_MPSIZ0_64		0
+#define  STM_USB_DIEPCTL_MPSIZ0_32		1
+#define  STM_USB_DIEPCTL_MPSIZ0_16		2
+#define  STM_USB_DIEPCTL_MPSIZ0_8		3
+#define  STM_USB_DIEPCTL_MPSIZ0_MASK		3
+#define  STM_USB_DIEPCTL_MPSIZ_MASK		0x7f
+
+#define STM_USB_DIEPINT_NAK		13
+#define STM_USB_DIEPINT_PKTDRPSTS	11
+#define STM_USB_DIEPINT_TXFIFOUDRN	8
+#define STM_USB_DIEPINT_TXFE		7
+#define STM_USB_DIEPINT_INEPNE		6
+#define STM_USB_DIEPINT_INEPNM		5
+#define STM_USB_DIEPINT_ITTXFE		4
+#define STM_USB_DIEPINT_TOC		3
+#define STM_USB_DIEPINT_EPDISD		1
+#define STM_USB_DIEPINT_XFRC		0
+
+#define STM_USB_DIEPTSIZ_MCNT		29
+#define  STM_USB_DIEPTSIZ_MCNT_MASK		3
+#define STM_USB_DIEPTSIZ_PKTCNT		19
+#define  STM_USB_DIEPTSIZ_PKTCNT0_MASK		3
+#define  STM_USB_DIEPTSIZ_PKTCNT_MASK		0x3ff
+#define STM_USB_DIEPTSIZ_XFRSIZ		0
+#define  STM_USB_DIEPTSIZ_XFRSIZ0_MASK		0x7f
+#define  STM_USB_DIEPTSIZ_XFRSIZ_MASK		0x7ffff
+
+#define STM_USB_DOEPCTL_EPENA		31
+#define STM_USB_DOEPCTL_EPDIS		30
+#define STM_USB_DOEPCTL_SNAK		27
+#define STM_USB_DOEPCTL_CNAK		26
+#define STM_USB_DOEPCTL_STALL		21
+#define STM_USB_DOEPCTL_SNPM		20
+#define STM_USB_DOEPCTL_EPTYP		18
+#define  STM_USB_DOEPCTL_EPTYP_CONTROL		0
+#define  STM_USB_DOEPCTL_EPTYP_ISOCHRONOUS	1
+#define  STM_USB_DOEPCTL_EPTYP_BULK		2
+#define  STM_USB_DOEPCTL_EPTYP_INTERRUPT	3
+#define  STM_USB_DOEPCTL_EPTYP_MASK		3
+#define STM_USB_DOEPCTL_NAKSTS		17
+#define STM_USB_DOEPCTL_USBAEP		15
+#define STM_USB_DOEPCTL_MPSIZ		0
+#define  STM_USB_DOEPCTL_MPSIZ0_64		0
+#define  STM_USB_DOEPCTL_MPSIZ0_32		1
+#define  STM_USB_DOEPCTL_MPSIZ0_16		2
+#define  STM_USB_DOEPCTL_MPSIZ0_8		3
+#define  STM_USB_DOEPCTL_MPSIZ0_MASK		3
+
+#define STM_USB_DOEPINT_NAK		13
+#define STM_USB_DOEPINT_BERR		12
+#define STM_USB_DOEPINT_OUTPKTERR	8
+#define STM_USB_DOEPINT_STSPHSRX	5
+#define STM_USB_DOEPINT_OTEPDIS		4
+#define STM_USB_DOEPINT_STUP		3
+#define STM_USB_DOEPINT_EPDISD		1
+#define STM_USB_DOEPINT_XFRC		0
+
+#define STM_USB_DOEPTSIZ_STUPCNT	29
+#define  STM_USB_DOEPTSIZ_STUPCNT_MASK		3
+#define STM_USB_DOEPTSIZ_PKTCNT		19
+#define STM_USB_DOEPTSIZ_XFRSIZ		0
+#define  STM_USB_DOEPTSIZ_XFRSIZ_MASK		0x7f
 
 /* Errata 2.1.5
 

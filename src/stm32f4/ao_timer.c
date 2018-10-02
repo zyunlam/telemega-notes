@@ -181,6 +181,14 @@ ao_clock_init(void)
 	cfgr |= (AO_RCC_CFGR_PPRE2_DIV << STM_RCC_CFGR_PPRE2);
 	stm_rcc.cfgr = cfgr;
 
+	/* Clock configuration register DCKCFGR2; mostly make sure USB
+	 * gets clocked from PLL_Q
+	 */
+	stm_rcc.dckcfgr2 = ((STM_RCC_DCKCFGR2_LPTIMER1SEL_APB << STM_RCC_DCKCFGR2_LPTIMER1SEL) |
+			    (STM_RCC_DCKCFGR2_SDIOSEL_CK_48MHZ << STM_RCC_DCKCFGR2_SDIOSEL) |
+			    (STM_RCC_DCKCFGR2_CK48MSEL_PLL_Q << STM_RCC_DCKCFGR2_CK48MSEL) |
+			    (STM_RCC_DCKCFGR2_I2CFMP1SEL_APB << STM_RCC_DCKCFGR2_I2CFMP1SEL));
+
 	/* Disable the PLL */
 	stm_rcc.cr &= ~(1 << STM_RCC_CR_PLLON);
 	while (stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY))
@@ -196,7 +204,6 @@ ao_clock_init(void)
 
 	pllcfgr |= (AO_PLL_M << STM_RCC_PLLCFGR_PLLM);
 	pllcfgr |= (AO_PLL1_N << STM_RCC_PLLCFGR_PLLN);
-#if AO_PLL1_P
 #if AO_PLL1_P == 2
 #define AO_RCC_PLLCFGR_PLLP	STM_RCC_PLLCFGR_PLLP_DIV_2
 #endif
@@ -210,13 +217,8 @@ ao_clock_init(void)
 #define AO_RCC_PLLCFGR_PLLP	STM_RCC_PLLCFGR_PLLP_DIV_8
 #endif
 	pllcfgr |= (AO_RCC_PLLCFGR_PLLP << STM_RCC_PLLCFGR_PLLP);
-#endif
-#if AO_PLL1_Q
 	pllcfgr |= (AO_PLL1_Q << STM_RCC_PLLCFGR_PLLQ);
-#endif
-#if AO_PLL1_R
 	pllcfgr |= (AO_PLL1_R << STM_RCC_PLLCFGR_PLLR);
-#endif
 	/* PLL source */
 	pllcfgr &= ~(1 << STM_RCC_PLLCFGR_PLLSRC);
 #if AO_HSI
