@@ -87,13 +87,13 @@ ao_ms5607_prom_valid(uint8_t *prom)
 		if (*p++ + 1 > 1)
 			break;
 	if (i == 16)
-		return false;
+		return FALSE;
 
 	crc = ao_ms5607_crc(prom);
 	if (crc != (prom[15] & 0xf))
-		return false;
+		return FALSE;
 
-	return true;
+	return TRUE;
 }
 
 static void
