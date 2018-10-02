@@ -97,6 +97,25 @@ public class MicroUSB extends altos_device implements AltosDevice {
 		return isFTDI() || isMicro();
 	}
 
+	public int hashCode() {
+		return getVendor() ^ getProduct() ^ getSerial() ^ getPath().hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (!(o instanceof MicroUSB))
+			return false;
+
+		MicroUSB other = (MicroUSB) o;
+
+		return getVendor() == other.getVendor() &&
+			getProduct() == other.getProduct() &&
+			getSerial() == other.getSerial() &&
+			getPath().equals(other.getPath());
+	}
+
 	static java.util.List<MicroUSB> list() {
 		if (!load_library())
 			return null;
