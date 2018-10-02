@@ -69,7 +69,7 @@ ao_usb_disable(void);
 void
 ao_usb_init(void);
 
-extern const __at (0x00aa) uint8_t ao_usb_descriptors [];
+extern const uint8_t ao_usb_descriptors [];
 
 #define AO_USB_SETUP_DIR_MASK	(0x01 << 7)
 #define AO_USB_SETUP_TYPE_MASK	(0x03 << 5)
