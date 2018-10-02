@@ -18,23 +18,24 @@
 #define AO_HSE		8000000	/* fed from st/link processor */
 #define AO_HSE_BYPASS	1	/* no xtal, directly fed */
 
-#define AO_PLL_M	4	/* down to 2MHz */
+#define AO_PLL_M	8	/* down to 1MHz */
 
-#define AO_PLL1_N	96	/* up to 192MHz */
+#define AO_PLL1_R	2	/* down to 96MHz */
+#define AO_PLL1_N	192	/* up to 192MHz */
 #define AO_PLL1_P	2	/* down to 96MHz */
 #define AO_PLL1_Q	4	/* down to 48MHz for USB and SDIO */
 
 #define AO_AHB_PRESCALER	1
 #define AO_RCC_CFGR_HPRE_DIV	STM_RCC_CFGR_HPRE_DIV_1
 
-#define AO_APB1_PRESCALER	1
-#define AO_RCC_CFGR_PPRE1_DIV	STM_RCC_CFGR_PPRE1_DIV_1
+#define AO_APB1_PRESCALER	2
+#define AO_RCC_CFGR_PPRE1_DIV	STM_RCC_CFGR_PPRE1_DIV_2
+
 #define AO_APB2_PRESCALER	1
 #define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_1
 
 #define DEBUG_THE_CLOCK	1
 
-#define HAS_USB		0
 #define HAS_BEEP	0
 
 #define B_USER_PORT	(&stm_gpioa)
@@ -54,6 +55,8 @@
 
 #define AO_LED_PANIC	LED_RED
 
+#define AO_CMD_LEN	128
+
 /* USART */
 
 #define HAS_SERIAL_6		1
@@ -67,5 +70,10 @@
 #define DELAY_SERIAL_6_STDIN	0
 #define USE_SERIAL_6_FLOW	0
 #define USE_SERIAL_6_SW_FLOW	0
+
+/* USB */
+
+#define HAS_USB			1
+#define USE_USB_STDIO		0
 
 #endif /* _AO_PINS_H_ */

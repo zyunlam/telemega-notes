@@ -14,6 +14,7 @@
 
 #include <ao.h>
 #include <ao_scheme.h>
+#include <ao_usb.h>
 
 static void scheme_cmd() {
 	ao_scheme_read_eval_print(stdin, stdout, false);
@@ -44,9 +45,11 @@ void main(void)
 {
 	ao_clock_init();
 	ao_timer_init();
+	ao_task_init();
+
 	ao_led_init();
 	ao_usart_init();
-	ao_task_init();
+	ao_usb_init();
 	ao_cmd_init();
 	ao_cmd_register(scheme_cmds);
 	ao_start_scheduler();

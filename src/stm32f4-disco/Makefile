@@ -29,10 +29,12 @@ ALTOS_SRC = \
 	ao_timer.c \
 	ao_task.c \
 	ao_stdio.c \
-	ao_product.o \
+	ao_product.c \
 	ao_cmd.c \
 	ao_exti_stm32f4.c \
 	ao_usart_stm32f4.c \
+	ao_usb_gen.c \
+	ao_usb_stm32f4.c \
 	ao_led.c \
 	ao_impure.c \
 	$(SCHEME_SRCS)
@@ -72,7 +74,7 @@ ao_scheme_const.h: ao-scheme-make-const-big $(SCHEME_SCHEME)
 distclean:	clean
 
 clean:
-	rm -f *.o *.elf *.ihx
+	rm -f *.o *.elf *.ihx *.map
 
 install:
 
