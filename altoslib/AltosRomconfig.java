@@ -19,9 +19,11 @@
 package org.altusmetrum.altoslib_13;
 
 import java.io.*;
+import java.util.concurrent.*;
 
-public class AltosRomconfig {
+public class AltosRomconfig implements AltosUnitInfoListener {
 	public boolean	valid;
+	public boolean	radio_calibration_broken;
 	public int	version;
 	public int	check;
 	public int	serial_number;
@@ -117,6 +119,29 @@ public class AltosRomconfig {
 	final static String ao_radio_cal = "ao_radio_cal";
 	final static String ao_usb_descriptors = "ao_usb_descriptors";
 
+	Semaphore	unit_info_done;
+
+	public void notify_unit_info(AltosUnitInfo unit_info) {
+		unit_info_done.release();
+	}
+
+	private void fetch_radio_cal() {
+		unit_info_done = new Semaphore(0);
+		AltosUnitInfo	info = new AltosUnitInfo(serial_number, this);
+
+		/* Block waiting for the rf calibration data */
+		radio_calibration_broken = true;
+		try {
+			unit_info_done.acquire();
+			int new_cal = info.rfcal();
+			if (new_cal != AltosLib.MISSING) {
+				radio_calibration = new_cal;
+				radio_calibration_broken = false;
+			}
+		} catch (InterruptedException ie) {
+		}
+	}
+
 	public AltosRomconfig(AltosHexfile hexfile) {
 		try {
 			version = get_int(hexfile, ao_romconfig_version, 2);
@@ -131,7 +156,18 @@ public class AltosRomconfig {
 					} catch (AltosNoSymbol missing) {
 						radio_calibration = 0;
 					}
+
 					valid = true;
+
+					/* XXX TeleBT v4.0 units originally shipped without RF calibration programmed. Go fetch
+					 * the correct value from the web site
+					 */
+					if (serial_number == 2584 ||
+					    (3686 <= serial_number && serial_number <= 3938 && radio_calibration == 5695485))
+					{
+						fetch_radio_cal();
+					}
+
 					break;
 				}
 			}

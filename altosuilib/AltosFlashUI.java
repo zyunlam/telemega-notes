@@ -325,6 +325,17 @@ public class AltosFlashUI
 				return false;
 		}
 
+		if (existing_config.radio_calibration_broken) {
+			int ret = JOptionPane.showConfirmDialog(this,
+								String.format("Radio calibration value %d may be incorrect\nFlash anyways?",
+									      existing_config.radio_calibration),
+								"Radio Calibration Invalid",
+								JOptionPane.YES_NO_OPTION);
+			if (ret != JOptionPane.YES_OPTION)
+				return false;
+		}
+
+
 		new_config = AltosRomconfigUI.show(frame, existing_config);
 		if (new_config == null)
 			return false;
