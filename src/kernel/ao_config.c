@@ -243,6 +243,9 @@ _ao_config_get(void)
 	if (ao_force_freq) {
 		ao_config.frequency = 434550;
 		ao_config.radio_cal = ao_radio_cal;
+#if HAS_RADIO_RATE
+		ao_config.radio_rate = AO_CONFIG_DEFAULT_RADIO_RATE;
+#endif
 		ao_xmemcpy(&ao_config.callsign, CODE_TO_XDATA(AO_CONFIG_DEFAULT_CALLSIGN),
 		       sizeof(AO_CONFIG_DEFAULT_CALLSIGN) - 1);
 	}
