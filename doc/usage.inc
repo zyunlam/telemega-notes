@@ -323,3 +323,22 @@
 		different kind of battery to any of these will destroy
 		the board.
 		endif::telemega,easymega,telemetrum[]
+
+	=== Using Packet Link Mode
+
+		All AltusMetrum flight computers that have a radio can
+		communicate with the ground station software for
+		configuration and other operations using the Packet
+		Link mode. This uses radio communication instead of a
+		USB cable. To set this up, the ground station software
+		must be configured to the correct data rate, frequency
+		and callsign.
+
+		You can monitor Packet Link mode from TeleBT or
+		TeleDongle by watching the LEDs. Each time the device
+		transmits, the red LED will flash. When the link is
+		busy, or when the link is not working, the device will
+		transmit 10 times per second, so the LED will flash
+		rapidly. When the link is working and there is no data
+		to send, the link will flash once per second, and the
+		LED will flash more slowly.
