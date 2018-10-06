@@ -1,0 +1,6 @@
+altos-map
+altos-map-jdb
+altos-map-test
+*.jar
+*.stamp
+classes

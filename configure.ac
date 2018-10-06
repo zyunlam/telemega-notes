@@ -565,6 +565,9 @@ ao-tools/ao-usbtrng/Makefile
 ao-tools/ao-chaosread/Makefile
 ao-tools/ao-makebin/Makefile
 ao-utils/Makefile
+map-server/Makefile
+map-server/altos-mapd/Makefile
+map-server/altos-map/Makefile
 src/Version
 ])
 
