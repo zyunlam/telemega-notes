@@ -47,6 +47,14 @@
 <revhistory>
   <?dbhtml filename="altusmetrum-revhistory.html"?>
   <revision>
+    <revnumber>1.8.7</revnumber>
+    <date>6 Oct  2018</date>
+    <revremark>
+      Include TeleMega v3.0 firmware in release. Fix TeleBT v4.0 RF
+      calibration to factory value when reflashing.
+    </revremark>
+  </revision>
+  <revision>
     <revnumber>1.8.6</revnumber>
     <date>6 Aug 2018</date>
     <revremark>
