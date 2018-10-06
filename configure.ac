@@ -519,6 +519,7 @@ AC_OUTPUT([
 Makefile
 src/Makedefs
 src/chaoskey-v1.0/org.altusmetrum.ChaosKey.metainfo.xml
+doc/Makefile
 altoslib/Makefile
 altoslib/AltosVersion.java
 icon/Makefile

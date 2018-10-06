@@ -2,6 +2,8 @@
 #	http://docbook.sourceforge.net/release/xsl/current/README
 #
 
+FAKETIME=$(RELEASE_DATE) 00:00:00
+
 RELNOTES_INC=\
 	release-notes-1.8.7.inc \
 	release-notes-1.8.6.inc \
@@ -245,7 +247,7 @@ PUBLISH_DOC=$(PUBLISH_HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
 DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
-.SUFFIXES: .tmpl .xsl .inc .txt .raw .pdf .html
+SUFFIXES = .tmpl .xsl .inc .txt .raw .pdf .html
 
 .txt.raw:
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.txt > $@
@@ -254,12 +256,11 @@ DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
 .raw.html:
-	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
-	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
+	a2x -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
 	case $* in release-notes*) ./fix-html $*.html ;; esac
 
 .html.pdf:
-	@echo $@
+	TZ=UTC faketime -f '$(FAKETIME) i0' a2x -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
