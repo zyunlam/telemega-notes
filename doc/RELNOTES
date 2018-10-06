@@ -34,3 +34,5 @@ Creating documentation for a new release of AltOS
 	telemetry-docinfo.xml
 
 * Add release-notes-${version}.inc to git
+
+* Make sure new hardware specs are documented in specs.inc
