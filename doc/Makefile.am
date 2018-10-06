@@ -197,7 +197,8 @@ RELNOTES_HTML=$(RELNOTES_INC:.inc=.html)
 ONEFILE_TXT_FILES=\
 	altos.txt \
 	companion.txt \
-	telemetry.txt
+	telemetry.txt \
+	map-loading.txt
 
 ONEFILE_RAW_FILES=$(ONEFILE_TXT_FILES:.txt=.raw)
 ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
@@ -218,6 +219,8 @@ HTML_REVHISTORY=\
 PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 
+MAP_DOT_FILES=map-loading.dot
+MAP_SVG_FILES=$(MAP_DOT_FILES:.dot=.svg)
 FOP_STYLE=am-fo.xsl
 HTML_STYLE=am-html.xsl
 COMMON_STYLE=common.xsl
@@ -247,7 +250,10 @@ PUBLISH_DOC=$(PUBLISH_HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
 DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
-SUFFIXES = .tmpl .xsl .inc .txt .raw .pdf .html
+SUFFIXES = .dot .svg .tmpl .xsl .inc .txt .raw .pdf .html
+
+.dot.svg:
+	dot -Tsvg -o$@ $*.dot
 
 .txt.raw:
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.txt > $@
@@ -266,6 +272,8 @@ SUFFIXES = .tmpl .xsl .inc .txt .raw .pdf .html
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
 
 all:	$(HTML) $(PDF)
+
+map-loading.raw: $(MAP_SVG_FILES)
 
 altusmetrum-revhistory.html: altusmetrum.html
 
