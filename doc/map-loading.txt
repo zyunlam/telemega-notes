@@ -89,7 +89,7 @@ server. The elements of the  elements are:
 
 Encoding this in a URI is straightforward:
 
-\	altos-map?center=<lat>,<lon>&zoom=<zoom>
+\	altos-map?lat=<lat>&lon=<lon>&zoom=<zoom>
 
 Latitude and longitude are both encoded using decimal degrees with 6
 digits following the decimal point.

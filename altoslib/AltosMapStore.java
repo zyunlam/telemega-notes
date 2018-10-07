@@ -57,7 +57,7 @@ public class AltosMapStore {
 	}
 
 	private static String altos_map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale, String format_string) {
-		return String.format("https://maps.altusmetrum.org/altos-map?center=%.6f,%.6f&zoom=%d",
+		return String.format("https://maps.altusmetrum.org/cgi-bin/altos-map?lat=%.6f&lon=%.6f&zoom=%d",
 				     center.lat, center.lon, zoom);
 	}
 
