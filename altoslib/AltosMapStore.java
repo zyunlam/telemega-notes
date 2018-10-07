@@ -100,11 +100,6 @@ public class AltosMapStore {
 			listener.notify_store(this, status);
 	}
 
-	static Object	forbidden_lock = new Object();
-	static long	forbidden_time;
-	static boolean	forbidden_set;
-	public static int forbidden_response;
-
 	private int fetch_url() {
 		URL u;
 
@@ -114,48 +109,64 @@ public class AltosMapStore {
 			return AltosMapTile.bad_request;
 		}
 
-		byte[] data;
+		byte[] data = null;
 		URLConnection uc = null;
-		try {
-			uc = u.openConnection();
-			String type = uc.getContentType();
-			int contentLength = uc.getContentLength();
-			if (uc instanceof HttpURLConnection) {
-				int response = ((HttpURLConnection) uc).getResponseCode();
-				switch (response) {
-				case HttpURLConnection.HTTP_FORBIDDEN:
-				case HttpURLConnection.HTTP_PAYMENT_REQUIRED:
-				case HttpURLConnection.HTTP_UNAUTHORIZED:
-					synchronized (forbidden_lock) {
-						forbidden_time = System.nanoTime();
-						forbidden_set = true;
-						forbidden_response = response;
+
+		int status = AltosMapTile.failed;
+		int tries = 0;
+
+		while (tries < 10 && status != AltosMapTile.fetched) {
+			try {
+				uc = u.openConnection();
+				String type = uc.getContentType();
+				int contentLength = uc.getContentLength();
+				if (uc instanceof HttpURLConnection) {
+					int response = ((HttpURLConnection) uc).getResponseCode();
+					switch (response) {
+					case HttpURLConnection.HTTP_FORBIDDEN:
+					case HttpURLConnection.HTTP_PAYMENT_REQUIRED:
+					case HttpURLConnection.HTTP_UNAUTHORIZED:
 						return AltosMapTile.forbidden;
 					}
 				}
-			}
-			InputStream in = new BufferedInputStream(uc.getInputStream());
-			int bytesRead = 0;
-			int offset = 0;
-			data = new byte[contentLength];
-			while (offset < contentLength) {
-				bytesRead = in.read(data, offset, data.length - offset);
-				if (bytesRead == -1)
-					break;
-				offset += bytesRead;
-			}
-			in.close();
+				InputStream in = new BufferedInputStream(uc.getInputStream());
+				int bytesRead = 0;
+				int offset = 0;
+				data = new byte[contentLength];
+				while (offset < contentLength) {
+					bytesRead = in.read(data, offset, data.length - offset);
+					if (bytesRead == -1)
+						break;
+					offset += bytesRead;
+				}
+				in.close();
 
-			if (offset != contentLength)
-				return AltosMapTile.failed;
+				if (offset == contentLength)
+					status = AltosMapTile.fetched;
+				else
+					status = AltosMapTile.failed;
 
-		} catch (IOException e) {
-			return AltosMapTile.failed;
+			} catch (IOException e) {
+				status = AltosMapTile.failed;
+			}
+
+			if (status != AltosMapTile.fetched) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException ie) {
+				}
+				tries++;
+				System.out.printf("Fetch failed, retrying %d\n", tries);
+			}
 		}
+
+		if (status != AltosMapTile.fetched)
+			return status;
 
 		try {
 			FileOutputStream out = new FileOutputStream(file);
-			out.write(data);
+			if (data != null)
+				out.write(data);
 			out.flush();
 			out.close();
 		} catch (FileNotFoundException e) {
@@ -170,18 +181,19 @@ public class AltosMapStore {
 
 	static Object	fetch_lock = new Object();
 
-	static final long	forbidden_interval = 60l * 1000l * 1000l * 1000l;
-	static final long 	google_maps_ratelimit_ms = 1200;
-
 	static Object	fetcher_lock = new Object();
 
 	static LinkedList<AltosMapStore> waiting = new LinkedList<AltosMapStore>();
 	static LinkedList<AltosMapStore> running = new LinkedList<AltosMapStore>();
 
-	static final int concurrent_fetchers = 128;
+	static int concurrent_fetchers() {
+		if (google_maps_api_key == null)
+			return 16;
+		return 128;
+	}
 
 	static void start_fetchers() {
-		while (!waiting.isEmpty() && running.size() < concurrent_fetchers) {
+		while (!waiting.isEmpty() && running.size() < concurrent_fetchers()) {
 			AltosMapStore 	s = waiting.remove();
 			running.add(s);
 			Thread lt = s.make_fetcher_thread();
@@ -210,13 +222,6 @@ public class AltosMapStore {
 				if (file.exists()) {
 					notify_listeners(AltosMapTile.fetched);
 					return;
-				}
-
-				synchronized(forbidden_lock) {
-					if (forbidden_set && (System.nanoTime() - forbidden_time) < forbidden_interval) {
-						notify_listeners(AltosMapTile.forbidden);
-						return;
-					}
 				}
 
 				int new_status;
