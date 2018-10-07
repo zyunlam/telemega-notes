@@ -341,7 +341,9 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 					AltosLatLon	ul = transform.lat_lon(point);
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
 					AltosMapTile tile = map_interface.new_tile(cache, ul, center, zoom, maptype, px_size, scale);
-					debug("show state %s url %s\n", AltosMapTile.status_name(tile.store.status()), tile.store.url);
+					int status = tile.store.status();
+					if (status == AltosMapTile.fetching)
+						debug("Fetching %.6f %.6f %d\n", center.lat, center.lon, zoom);
 					tile.add_listener(this);
 					tiles.put(point, tile);
 				}
