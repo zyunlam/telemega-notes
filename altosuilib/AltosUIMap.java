@@ -106,7 +106,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		}
 
 		private boolean is_drag_event(MouseEvent e) {
-			return e.getModifiers() == InputEvent.BUTTON1_MASK;
+			return e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK;
 		}
 
 		/* MouseMotionListener methods */
