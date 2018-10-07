@@ -26,7 +26,10 @@ public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 	private AltosJson	request;
 	private AltosJson	reply;
 
+	private int		http_status;
+
 	private void set_status(int status) {
+		http_status = status;
 		reply.put("status", status);
 	}
 
@@ -83,8 +86,6 @@ public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 
 				store_ready = new Semaphore(0);
 
-				System.out.printf("Fetching tile for %g %g %d\n", lat, lon, zoom);
-
 				AltosMapStore	map_store = AltosMapStore.get(new AltosLatLon(lat, lon),
 									      zoom,
 									      AltosMapd.maptype,
@@ -93,12 +94,9 @@ public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 				int status;
 
 				if (map_store == null) {
-					System.out.printf("no store?\n");
 					status = AltosMapTile.failed;
 				} else {
 					map_store.add_listener(this);
-
-					System.out.printf("Waiting for tile\n");
 
 					try {
 						store_ready.acquire();
@@ -123,6 +121,9 @@ public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 					set_status(400);
 				}
 			}
+			System.out.printf("%s: %.6f %.6f %d status %d\n",
+					  addr, lat, lon, zoom, http_status);
+
 		} catch (Exception e) {
 			System.out.printf("client exception %s\n", e.toString());
 			e.printStackTrace(System.out);
@@ -140,7 +141,6 @@ public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 				socket.close();
 			} catch (IOException ie) {
 			}
-			System.out.printf("client done\n");
 		}
 	}
 
