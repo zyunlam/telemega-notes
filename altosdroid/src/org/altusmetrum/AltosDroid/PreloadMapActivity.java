@@ -54,10 +54,12 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 	private ArrayAdapter<AltosLaunchSite> known_sites_adapter;
 
+/*
 	private CheckBox	hybrid;
 	private CheckBox	satellite;
 	private CheckBox	roadmap;
 	private CheckBox	terrain;
+*/
 
 	private Spinner		known_sites_spinner;
 	private Spinner		min_zoom;
@@ -196,17 +198,22 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		return r;
 	}
 
+/*
 	private int bit(CheckBox box, int value) {
 		if (box.isChecked())
 			return 1 << value;
 		return 0;
 	}
+*/
 
 	private int types() {
+/*
 		return (bit(hybrid, AltosMap.maptype_hybrid) |
 			bit(satellite, AltosMap.maptype_satellite) |
 			bit(roadmap, AltosMap.maptype_roadmap) |
 			bit(terrain, AltosMap.maptype_terrain));
+*/
+		return 1 << AltosMap.maptype_hybrid;
 	}
 
 	private void load() {
@@ -318,12 +325,14 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		latitude = (EditText) findViewById(R.id.preload_latitude);
 		longitude = (EditText) findViewById(R.id.preload_longitude);
 
+/*
 		hybrid = (CheckBox) findViewById(R.id.preload_hybrid);
 		satellite = (CheckBox) findViewById(R.id.preload_satellite);
 		roadmap = (CheckBox) findViewById(R.id.preload_roadmap);
 		terrain = (CheckBox) findViewById(R.id.preload_terrain);
 
 		hybrid.setChecked(true);
+*/
 
 		min_zoom = (Spinner) findViewById(R.id.preload_min_zoom);
 		add_numbers(min_zoom,

@@ -214,7 +214,10 @@ public class AltosMapLoader extends Thread implements AltosMapStoreListener {
 		this.min_z = min_z;
 		this.max_z = max_z;
 		this.radius = radius;
+/*
 		this.all_types = all_types;
+*/
+		this.all_types = 1 << AltosMap.maptype_hybrid;
 		this.scale = scale;
 		this.abort = false;
 		start();

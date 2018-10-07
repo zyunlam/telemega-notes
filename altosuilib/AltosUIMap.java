@@ -386,8 +386,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	JLabel	zoom_label;
 
 	public void set_maptype(int type) {
+/*
 		map.set_maptype(type);
 		maptype_combo.setSelectedIndex(type);
+*/
 	}
 
 	/* AltosUIMapPreload functions */
@@ -433,7 +435,9 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	/* internal layout bits */
 	private GridBagLayout layout = new GridBagLayout();
 
+/*
 	JComboBox<String>	maptype_combo;
+*/
 
 	MapView	view;
 
@@ -522,6 +526,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		c.weighty = 0;
 		add(zoom_out, c);
 
+/*
 		maptype_combo = new JComboBox<String>(map.maptype_labels);
 
 		maptype_combo.setEditable(false);
@@ -540,7 +545,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		c.weightx = 0;
 		c.weighty = 0;
 		add(maptype_combo, c);
-
+*/
 		map = new AltosMap(this);
 	}
 }

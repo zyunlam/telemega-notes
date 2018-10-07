@@ -211,12 +211,14 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public boolean set_maptype(int maptype) {
+/*
 		if (maptype != this.maptype) {
 			this.maptype = maptype;
 			tiles.clear();
 			repaint();
 			return true;
 		}
+*/
 		return false;
 	}
 
@@ -350,7 +352,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	public void set_load_params(int new_zoom, int new_type, double lat, double lon, int radius, AltosMapTileListener listener) {
 		if (AltosMap.min_zoom <= new_zoom && new_zoom <= AltosMap.max_zoom)
 			zoom = new_zoom;
-		maptype = new_type;
+/*		maptype = new_type; */
 		load_centre = new AltosLatLon(lat, lon);
 		load_radius = radius;
 		load_listener = listener;
