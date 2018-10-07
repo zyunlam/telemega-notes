@@ -30,6 +30,8 @@ public class AltosLaunchSites extends Thread {
 	LinkedList<AltosLaunchSite>	sites;
 	AltosLaunchSiteListener		listener;
 
+	public static String		launch_sites_url;
+
 	void notify_complete() {
 		listener.notify_launch_sites(sites);
 	}
@@ -50,9 +52,13 @@ public class AltosLaunchSites extends Thread {
 		try {
 			String	path;
 
-			path = System.getenv(AltosLib.launch_sites_env);
-			if (path == null)
-				path = AltosLib.launch_sites_url;
+			if (launch_sites_url != null)
+				path = launch_sites_url;
+			else {
+				path = System.getenv(AltosLib.launch_sites_env);
+				if (path == null)
+					path = AltosLib.launch_sites_url;
+			}
 			url = new URL(path);
 			URLConnection uc = url.openConnection();
 
