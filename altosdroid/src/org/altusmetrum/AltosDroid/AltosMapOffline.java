@@ -163,7 +163,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 						message = "Network error";
 						break;
 					case AltosMapTile.forbidden:
-						message = "Outside of launch area";
+						message = "Outside of known launch areas";
 						break;
 					}
 					if (message != null) {
