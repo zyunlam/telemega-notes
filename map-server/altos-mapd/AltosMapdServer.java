@@ -19,6 +19,6 @@ import java.io.*;
 
 public class AltosMapdServer extends ServerSocket {
 	public AltosMapdServer(int port) throws IOException {
-		super(port, 5, InetAddress.getLoopbackAddress());
+		super(port, 256, InetAddress.getLoopbackAddress());
 	}
 }
