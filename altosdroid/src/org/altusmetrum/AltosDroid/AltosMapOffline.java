@@ -86,7 +86,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	AltosMap		map;
 	AltosDroid		altos_droid;
 
-	static int scale = 2;
+	static int scale = 1;
 
 	AltosLatLon	here;
 	AltosLatLon	there;
