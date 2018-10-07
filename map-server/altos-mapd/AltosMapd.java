@@ -16,12 +16,15 @@ package altosmapd;
 
 import java.net.*;
 import java.io.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.altusmetrum.altoslib_13.*;
 
-public class AltosMapd {
+public class AltosMapd implements AltosLaunchSiteListener {
 
-	public final static int port = 16717;
+	public static int port = 16717;
 
 	public final static int maptype = AltosMap.maptype_hybrid;
 
@@ -29,27 +32,149 @@ public class AltosMapd {
 
 	public final static int scale = 1;
 
-	public static void main(final String[] args) {
+	public static double valid_radius = 17000;	/* 17km */
 
-		AltosMapdServer server = new AltosMapdServer(port);
+	public String map_dir = null;
+	public String launch_sites_file = null;
+	public String key_file = null;
+
+	public void usage() {
+		System.out.printf("usage: altos-mapd [--mapdir <map-directory] [--launch-sites <launch-sites-file>]\n" +
+				  "                  [--radius <valid-radius-m> [--port <port>] [--key <key-file>]\n");
+		System.exit(1);
+	}
+
+	private static Semaphore launch_sites_ready;
+
+	private static List<AltosLaunchSite> launch_sites;
+
+	public void notify_launch_sites(List<AltosLaunchSite> sites) {
+		synchronized (launch_sites_ready) {
+			if (sites != null) {
+				launch_sites = sites;
+				launch_sites_ready.release();
+			}
+		}
+	}
+
+	public static boolean check_lat_lon(double lat, double lon) {
+		synchronized (launch_sites_ready) {
+			if (launch_sites == null) {
+				try {
+					launch_sites_ready.acquire();
+				} catch (InterruptedException ie) {
+					return false;
+				}
+			}
+		}
+		if (launch_sites == null) {
+			System.out.printf("No launch site data available, refusing all requests\n");
+			return false;
+		}
+
+		for (AltosLaunchSite site : launch_sites) {
+			AltosGreatCircle gc = new AltosGreatCircle(site.latitude, site.longitude,
+								   lat, lon);
+			if (gc.distance <= valid_radius)
+				return true;
+		}
+
+		return false;
+	}
+
+	AltosMapdServer	server;
+
+	public void process(String[] args) {
 
 		AltosPreferences.init(new AltosMapdPreferences());
 
-		if (args.length < 1) {
-			System.out.printf("usage: altos-mapd <map-directory>\n");
-			System.exit(1);
+		int skip = 1;
+		for (int i = 0; i < args.length; i += skip) {
+			skip = 1;
+			if (args[i].equals("--mapdir") && i < args.length-1) {
+				map_dir = args[i+1];
+				skip = 2;
+			} else if (args[i].equals("--launch-sites") && i < args.length-1) {
+				launch_sites_file = args[i+1];
+				skip = 2;
+			} else if (args[i].equals("--radius") && i < args.length-1) {
+				try {
+					valid_radius = AltosParse.parse_double_locale(args[i+1]);
+				} catch (ParseException pe) {
+					usage();
+				}
+				skip = 2;
+			} else if (args[i].equals("--port") && i < args.length-1) {
+				try {
+					port = AltosParse.parse_int(args[i+1]);
+				} catch (ParseException pe) {
+					usage();
+				}
+				skip = 2;
+			} else if (args[i].equals("--key") && i < args.length-1) {
+				key_file = args[i+1];
+				skip = 2;
+			} else {
+				usage();
+			}
 		}
 
-		AltosPreferences.mapdir = new File(args[0]);
+		if (map_dir == null)
+			usage();
+
+		if (key_file != null) {
+			try {
+				BufferedReader key_reader = new BufferedReader(new FileReader(key_file));
+
+				String line = key_reader.readLine();
+				if (line == null || line.length() != 39) {
+					System.out.printf("%s: invalid contents %d \"%s\"\n",
+							  key_file, line.length(), line);
+					usage();
+				}
+				key_reader.close();
+				AltosMapStore.google_maps_api_key = line;
+			} catch (Exception e) {
+				System.out.printf("%s: %s\n", key_file, e.toString());
+				usage();
+			}
+		}
+
+		AltosPreferences.mapdir = new File(map_dir);
+
+		if (launch_sites_file != null)
+			AltosLaunchSites.launch_sites_url = "file://" + launch_sites_file;
+
+		launch_sites_ready = new Semaphore(0);
+
+		new AltosLaunchSites(this);
+
+		try {
+			server = new AltosMapdServer(port);
+		} catch (IOException ie) {
+			System.out.printf("Cannot bind to port %d: %s\n", port, ie.toString());
+			usage();
+		}
 
 		for (;;) {
-			Socket client = server.accept();
-			if (client == null) {
-				System.out.printf("accept failed\n");
-				continue;
+			try {
+				Socket client = server.accept();
+				if (client == null) {
+					System.out.printf("accept failed\n");
+					continue;
+				}
+				System.out.printf("got client\n");
+				new AltosMapdClient(client);
+			} catch (Exception e) {
+				System.out.printf("Exception %s\n", e.toString());
 			}
-			System.out.printf("got client\n");
-			new AltosMapdClient(client);
 		}
+	}
+
+	public void AltosMapd() {
+	}
+
+	public static void main(final String[] args) {
+		new AltosMapd().process(args);
 	}
 }

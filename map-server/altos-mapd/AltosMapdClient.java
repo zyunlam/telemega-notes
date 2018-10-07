@@ -77,7 +77,10 @@ public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 			    addr == null)
 			{
 				set_status(400);
+			} else if (!AltosMapd.check_lat_lon(lat, lon)) {
+				set_status(403);	/* Forbidden */
 			} else {
+
 				store_ready = new Semaphore(0);
 
 				System.out.printf("Fetching tile for %g %g %d\n", lat, lon, zoom);

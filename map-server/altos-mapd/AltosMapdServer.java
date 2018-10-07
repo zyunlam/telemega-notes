@@ -15,23 +15,10 @@
 package altosmapd;
 
 import java.net.*;
+import java.io.*;
 
-public class AltosMapdServer {
-	ServerSocket	socket;
-
-	public Socket accept() {
-		try {
-			return socket.accept();
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	public AltosMapdServer(int port) {
-		try {
-			socket = new ServerSocket(port, 5, InetAddress.getLoopbackAddress());
-		} catch (Exception e) {
-			socket = null;
-		}
+public class AltosMapdServer extends ServerSocket {
+	public AltosMapdServer(int port) throws IOException {
+		super(port, 5, InetAddress.getLoopbackAddress());
 	}
 }
