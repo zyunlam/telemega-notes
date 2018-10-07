@@ -226,16 +226,23 @@ int main(int argc, char **argv)
 	if (s < 0)
 		fail(408, "Cannot connect AltOS map daemon");
 
+	FILE	*sf = fdopen(s, "r+");
+
+	if (sf == NULL)
+		fail(400, "allocation failure");
+
 	json_t *request = json_pack("{s:f s:f s:i s:s}", "lat", lat, "lon", lon, "zoom", zoom, "remote_addr", remote_addr);
 
 	if (request == NULL)
 		fail(400, "Cannot create JSON request");
 
-	if (json_dumpfd(request, s, 0) < 0)
+	if (json_dumpf(request, sf, 0) < 0)
 		fail(400, "Cannot write JSON request");
 
+	fflush(sf);
+
 	json_error_t	error;
-	json_t 		*reply = json_loadfd(s, 0, &error);
+	json_t 		*reply = json_loadf(sf, 0, &error);
 
 	if (!reply)
 		fail(400, "Cannot read JSON reply");
