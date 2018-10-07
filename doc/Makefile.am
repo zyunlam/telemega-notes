@@ -2,7 +2,9 @@
 #	http://docbook.sourceforge.net/release/xsl/current/README
 #
 
-FAKETIME=$(RELEASE_DATE) 00:00:00
+if FAKETIME
+FAKETIME=TZ=UTC faketime -f '$(RELEASE_DATE) 00:00:00 i0'
+endif
 
 RELNOTES_INC=\
 	release-notes-1.8.7.inc \
@@ -264,9 +266,10 @@ SUFFIXES = .dot .svg .tmpl .xsl .inc .txt .raw .pdf .html
 .raw.html:
 	a2x -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
 	case $* in release-notes*) ./fix-html $*.html ;; esac
+	$(FAKETIME) a2x -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 
 .html.pdf:
-	TZ=UTC faketime -f '$(FAKETIME) i0' a2x -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
+	echo $@
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
