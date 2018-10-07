@@ -56,7 +56,11 @@ public class AltosMap {
 	public void fail(int status, String reason) {
 		write_status(status);
 		write_type("text/html");
+		System.out.printf("\n");
+		System.out.printf("<html>\n");
+		System.out.printf("<head><title>Map Fetch Failure</title></head>\n");
 		System.out.printf("<body>%s</body>\n", reason);
+		System.out.printf("</html>\n");
 		System.exit(1);
 	}
 
@@ -133,6 +137,7 @@ public class AltosMap {
 				String content_type = reply.get_string("content_type", null);
 				System.out.printf("Content-Type: %s\n", content_type);
 				System.out.printf("Content-Length: %d\n", file.length());
+				System.out.printf("\n");
 				byte[] buf = new byte[4096];
 				int bytes_read;
 				while ((bytes_read = in.read(buf)) > 0)
