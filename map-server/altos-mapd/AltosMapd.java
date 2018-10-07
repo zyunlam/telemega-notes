@@ -163,7 +163,6 @@ public class AltosMapd implements AltosLaunchSiteListener {
 					System.out.printf("accept failed\n");
 					continue;
 				}
-				System.out.printf("got client\n");
 				new AltosMapdClient(client);
 			} catch (Exception e) {
 				System.out.printf("Exception %s\n", e.toString());
