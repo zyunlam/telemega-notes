@@ -51,7 +51,7 @@
     <date>6 Oct  2018</date>
     <revremark>
       Include TeleMega v3.0 firmware in release. Fix TeleBT v4.0 RF
-      calibration to factory value when reflashing.
+      calibration to factory value when reflashing. Fix map images.
     </revremark>
   </revision>
   <revision>

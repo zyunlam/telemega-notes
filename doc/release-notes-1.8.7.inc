@@ -25,6 +25,8 @@
 	* Add documentation about forcing TeleMini RF parameters to
           known values.
 
+	* Create a proxy server for Google Maps to re-enable map images
+
 	== MicroPeak
 
 	* Poll for new devices while Device dialog is displayed
