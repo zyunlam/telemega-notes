@@ -417,6 +417,8 @@ if test "x$HAVE_NICKLE" = "xno"; then
 	AC_MSG_ERROR([Please install nickle to build AltOs])
 fi
 
+PKG_CHECK_MODULES([JANSSON], [jansson])
+
 AC_ARG_WITH([readline],
 	    [AS_HELP_STRING([--with-readline],
 			      [enable readline functionality in ao-dbg @<:@default=auto@:>@])],
@@ -574,6 +576,7 @@ ao-utils/Makefile
 map-server/Makefile
 map-server/altos-mapd/Makefile
 map-server/altos-map/Makefile
+map-server/altos-mapj/Makefile
 src/Version
 ])
 
