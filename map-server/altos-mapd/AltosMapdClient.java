@@ -85,7 +85,7 @@ public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 				    addr == null)
 				{
 					set_status(400);
-				} else if (!AltosMapd.check_lat_lon(lat, lon)) {
+				} else if (!AltosMapd.check_lat_lon(lat, lon, zoom)) {
 					set_status(403);	/* Forbidden */
 				} else {
 

@@ -57,7 +57,23 @@ public class AltosMapd implements AltosLaunchSiteListener {
 		}
 	}
 
-	public static boolean check_lat_lon(double lat, double lon) {
+	private static boolean west_of(double a, double b) {
+		double	diff = b - a;
+
+		while (diff >= 360.0)
+			diff -= 360.0;
+		while (diff <= -360.0)
+			diff += 360.0;
+
+		return diff >= 0;
+	}
+
+	public static boolean check_lat_lon(double lat, double lon, int zoom) {
+		AltosMapTransform	transform = new AltosMapTransform(px_size, px_size, zoom, new AltosLatLon(lat, lon));
+
+		AltosLatLon		upper_left = transform.screen_lat_lon(new AltosPointInt(0, 0));
+		AltosLatLon		lower_right = transform.screen_lat_lon(new AltosPointInt(px_size, px_size));
+
 		synchronized (launch_sites_ready) {
 			if (launch_sites == null) {
 				try {
@@ -73,8 +89,34 @@ public class AltosMapd implements AltosLaunchSiteListener {
 		}
 
 		for (AltosLaunchSite site : launch_sites) {
+
+			/* Figure out which point in the tile to
+			 * measure to the site That's one of the edges
+			 * or the site location depend on where the
+			 * site is in relation to the tile
+			 */
+
+			double		check_lon;
+
+			if (west_of(site.longitude, upper_left.lon))
+				check_lon = upper_left.lon;
+			else if (west_of(lower_right.lon, site.longitude))
+				check_lon = lower_right.lon;
+			else
+				check_lon = site.longitude;
+
+			double		check_lat;
+
+			if (site.latitude < lower_right.lat)
+				check_lat = lower_right.lat;
+			else if (upper_left.lat < site.latitude)
+				check_lat = upper_left.lat;
+			else
+				check_lat = site.latitude;
+
 			AltosGreatCircle gc = new AltosGreatCircle(site.latitude, site.longitude,
-								   lat, lon);
+								   check_lat, check_lon);
+
 			if (gc.distance <= valid_radius)
 				return true;
 		}
