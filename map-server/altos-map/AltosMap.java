@@ -25,6 +25,8 @@ public class AltosMap {
 
 	public final static int port = 16717;
 
+	public final static String protocol_version = "1.0.0";
+
 	String	query_string;
 	String	remote_addr;
 
@@ -80,6 +82,7 @@ public class AltosMap {
 		double	lon = AltosLib.MISSING;
 		double	lat = AltosLib.MISSING;
 		int	zoom = AltosLib.MISSING;
+		String	version = null;
 
 		try {
 			for (String query : queries) {
@@ -93,6 +96,8 @@ public class AltosMap {
 						lat = AltosParse.parse_double_net(value);
 					else if (name.equals("zoom"))
 						zoom = AltosParse.parse_int(value);
+					else if (name.equals("version"))
+						version = value;
 					else
 						fail(400, String.format("Extra query param \"%s\"", query));
 				}
@@ -101,62 +106,68 @@ public class AltosMap {
 			fail(400, String.format("Invalid query: %s", pe.toString()));
 		}
 
-		if (lon == AltosLib.MISSING)
-			fail(400, "Missing longitude");
-		if (lat == AltosLib.MISSING)
-			fail(400, "Missing latitude");
-		if (zoom == AltosLib.MISSING)
-			fail(400, "Missing zoom");
+		if (version != null) {
+			System.out.printf("Content-Type: text/plain\n");
+			System.out.printf("\n");
+			System.out.printf("%s\n", protocol_version);
+		} else {
+			if (lon == AltosLib.MISSING)
+				fail(400, "Missing longitude");
+			if (lat == AltosLib.MISSING)
+				fail(400, "Missing latitude");
+			if (zoom == AltosLib.MISSING)
+				fail(400, "Missing zoom");
 
-		try {
-			Socket	socket = null;
-			int tries = 0;
-
-			while (tries < 10 && socket == null) {
-				try {
-					socket = new Socket(InetAddress.getLoopbackAddress(), port);
-				} catch (IOException ie) {
-					Thread.sleep(100);
-					tries++;
-				}
-			}
-
-			AltosJson	request = new AltosJson();
-
-			request.put("lat", lat);
-			request.put("lon", lon);
-			request.put("zoom", zoom);
-			request.put("remote_addr", remote_addr);
-
-			Writer writer = new PrintWriter(socket.getOutputStream());
-			request.write(writer);
-			writer.flush();
-
-			AltosJson	reply = AltosJson.fromInputStream(socket.getInputStream());
-
-			int status = reply.get_int("status", 400);
-
-			if (status != 200)
-				fail(status, "Bad cache status");
-
-			String filename = reply.get_string("filename", null);
 			try {
-				File file = new File(filename);
-				long length = file.length();
-				FileInputStream in = new FileInputStream(file);
-				String content_type = reply.get_string("content_type", null);
-				System.out.printf("Content-Type: %s\n", content_type);
-				System.out.printf("Content-Length: %d\n", file.length());
-				System.out.printf("\n");
-				byte[] buf = new byte[4096];
-				int bytes_read;
-				while ((bytes_read = in.read(buf)) > 0)
-					System.out.write(buf);
-			} catch (IOException ie) {
-				fail(404, String.format("IO Exception: %s", ie.toString()));
+				Socket	socket = null;
+				int tries = 0;
+
+				while (tries < 10 && socket == null) {
+					try {
+						socket = new Socket(InetAddress.getLoopbackAddress(), port);
+					} catch (IOException ie) {
+						Thread.sleep(100);
+						tries++;
+					}
+				}
+
+				AltosJson	request = new AltosJson();
+
+				request.put("lat", lat);
+				request.put("lon", lon);
+				request.put("zoom", zoom);
+				request.put("remote_addr", remote_addr);
+
+				Writer writer = new PrintWriter(socket.getOutputStream());
+				request.write(writer);
+				writer.flush();
+
+				AltosJson	reply = AltosJson.fromInputStream(socket.getInputStream());
+
+				int status = reply.get_int("status", 400);
+
+				if (status != 200)
+					fail(status, "Bad cache status");
+
+				String filename = reply.get_string("filename", null);
+				try {
+					File file = new File(filename);
+					long length = file.length();
+					FileInputStream in = new FileInputStream(file);
+					String content_type = reply.get_string("content_type", null);
+					System.out.printf("Content-Type: %s\n", content_type);
+					System.out.printf("Content-Length: %d\n", file.length());
+					System.out.printf("\n");
+					byte[] buf = new byte[4096];
+					int bytes_read;
+					while ((bytes_read = in.read(buf)) > 0)
+						System.out.write(buf);
+				} catch (IOException ie) {
+					fail(404, String.format("IO Exception: %s", ie.toString()));
+				}
+			} catch (Exception e) {
+				fail(404, String.format("Exception %s", e.toString()));
 			}
-		} catch (Exception e) {
-			fail(404, String.format("Exception %s", e.toString()));
 		}
 	}
 
