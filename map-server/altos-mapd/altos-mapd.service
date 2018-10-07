@@ -8,7 +8,7 @@ Type=simple
 User=altos-mapd
 Restart=always
 EnvironmentFile=/etc/default/altos-mapd-default
-ExecStart=/usr/bin/altos-mapd --key $MAPKEY --mapdir $MAPDIR --launch-sites $LAUNCHSITES
+ExecStart=/usr/bin/altos-mapd --key $MAPKEY --mapdir $MAPDIR --launch-sites $LAUNCHSITES --max-zoom $MAXZOOM
 
 [Install]
 WantedBy=multi-user.target

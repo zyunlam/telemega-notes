@@ -32,6 +32,8 @@ public class AltosMapd implements AltosLaunchSiteListener {
 
 	public final static int scale = 1;
 
+	public static int max_zoom = 17;
+
 	public static double valid_radius = 17000;	/* 17km */
 
 	public String map_dir = null;
@@ -40,7 +42,8 @@ public class AltosMapd implements AltosLaunchSiteListener {
 
 	public void usage() {
 		System.out.printf("usage: altos-mapd [--mapdir <map-directory] [--launch-sites <launch-sites-file>]\n" +
-				  "                  [--radius <valid-radius-m> [--port <port>] [--key <key-file>]\n");
+				  "                  [--radius <valid-radius-m> [--port <port>] [--key <key-file>]\n" +
+				  "                  [--max-zoom <max-zoom-level>\n");
 		System.exit(1);
 	}
 
@@ -69,6 +72,10 @@ public class AltosMapd implements AltosLaunchSiteListener {
 	}
 
 	public static boolean check_lat_lon(double lat, double lon, int zoom) {
+
+		if (zoom > max_zoom)
+			return false;
+
 		AltosMapTransform	transform = new AltosMapTransform(px_size, px_size, zoom, new AltosLatLon(lat, lon));
 
 		AltosLatLon		upper_left = transform.screen_lat_lon(new AltosPointInt(0, 0));
@@ -155,6 +162,13 @@ public class AltosMapd implements AltosLaunchSiteListener {
 				skip = 2;
 			} else if (args[i].equals("--key") && i < args.length-1) {
 				key_file = args[i+1];
+				skip = 2;
+			} else if (args[i].equals("--max-zoom") && i < args.length-1) {
+				try {
+					max_zoom = AltosParse.parse_int(args[i+1]);
+				} catch (ParseException pe) {
+					usage();
+				}
 				skip = 2;
 			} else {
 				usage();
