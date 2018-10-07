@@ -109,7 +109,17 @@ public class AltosMap {
 			fail(400, "Missing zoom");
 
 		try {
-			Socket	socket = new Socket(InetAddress.getLoopbackAddress(), port);
+			Socket	socket = null;
+			int tries = 0;
+
+			while (tries < 10 && socket == null) {
+				try {
+					socket = new Socket(InetAddress.getLoopbackAddress(), port);
+				} catch (IOException ie) {
+					Thread.sleep(100);
+					tries++;
+				}
+			}
 
 			AltosJson	request = new AltosJson();
 
