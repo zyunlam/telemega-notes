@@ -278,10 +278,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 						message = "Internal error";
 						break;
 					case AltosMapTile.failed:
-						message = "Network error, check connection";
+						message = "Network error";
 						break;
 					case AltosMapTile.forbidden:
-						message = "Too many requests, try later";
+						message = "Outside of launch area";
 						break;
 					}
 					if (message != null && tile_font != null) {
