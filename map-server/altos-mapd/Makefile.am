@@ -22,6 +22,14 @@ FATJAR=altosmapd-fat.jar
 
 all-local: classes/altosmapd $(JAR) altos-mapd altos-mapd-test altos-mapd-jdb
 
+defaultsdir=$(sysconfdir)/default
+
+defaults_DATA=altos-mapd-default
+
+systemddir=$(libdir)/systemd/system
+
+systemd_DATA=altos-mapd.service
+
 install-altosmapdJAVA: altosmapd.jar
 	@$(NORMAL_INSTALL)
 	test -z "$(altosmapddir)" || $(MKDIR_P) "$(DESTDIR)$(altosmapddir)"

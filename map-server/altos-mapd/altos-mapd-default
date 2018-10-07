@@ -1,0 +1,3 @@
+MAPKEY=/home/altos-mapd/google-maps-api-key
+MAPDIR=/home/altos-mapd/maps
+LAUNCHSITES=/var/www/html/launch-sites.txt
