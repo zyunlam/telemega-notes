@@ -22,6 +22,12 @@ FATJAR=altosmapd-fat.jar
 
 all-local: classes/altosmapd $(JAR) altos-mapd altos-mapd-test altos-mapd-jdb
 
+install-altosmapdJAVA: altosmapd.jar
+	@$(NORMAL_INSTALL)
+	test -z "$(altosmapddir)" || $(MKDIR_P) "$(DESTDIR)$(altosmapddir)"
+	echo " $(INSTALL_DATA)" "$<" "'$(DESTDIR)$(altosmapddir)/altosdmap.jar'"; \
+	$(INSTALL_DATA) "$<" "$(DESTDIR)$(altosmapddir)"
+
 classes/altosmapd:
 	mkdir -p classes/altosmapd
 
