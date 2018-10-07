@@ -264,6 +264,21 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 
 			if (image != null) {
 				g.drawImage(image, point.x, point.y, null);
+/*
+ * Useful when debugging map fetching problems
+ *
+				String message = String.format("%.6f %.6f", center.lat, center.lon);
+				g.setFont(tile_font);
+				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				Rectangle2D bounds = tile_font.getStringBounds(message, g.getFontRenderContext());
+
+				float x = px_size / 2.0f;
+				float y = px_size / 2.0f;
+				x = x - (float) bounds.getWidth() / 2.0f;
+				y = y + (float) bounds.getHeight() / 2.0f;
+				g.setColor(Color.RED);
+				g.drawString(message, (float) point_double.x + x, (float) point_double.y + y);
+*/
 			} else {
 				g.setColor(Color.GRAY);
 				g.fillRect(point.x, point.y, px_size, px_size);
