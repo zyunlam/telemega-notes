@@ -35,7 +35,12 @@ public class AltosMapd {
 
 		AltosPreferences.init(new AltosMapdPreferences());
 
-		AltosPreferences.mapdir = new File("/home/keithp/misc/rockets/flights/maps");
+		if (args.length < 1) {
+			System.out.printf("usage: altos-mapd <map-directory>\n");
+			System.exit(1);
+		}
+
+		AltosPreferences.mapdir = new File(args[0]);
 
 		for (;;) {
 			Socket client = server.accept();
