@@ -19,6 +19,12 @@ FATJAR=altosmap-fat.jar
 
 all-local: classes/altosmap $(JAR) altos-map altos-map-test altos-map-jdb
 
+install-altosmapJAVA: altosmap.jar
+	@$(NORMAL_INSTALL)
+	test -z "$(altosmapdir)" || $(MKDIR_P) "$(DESTDIR)$(altosmapdir)"
+	echo " $(INSTALL_DATA)" "$<" "'$(DESTDIR)$(altosmapdir)/altosmap.jar'"; \
+	$(INSTALL_DATA) "$<" "$(DESTDIR)$(altosmapdir)"
+
 classes/altosmap:
 	mkdir -p classes/altosmap
 
