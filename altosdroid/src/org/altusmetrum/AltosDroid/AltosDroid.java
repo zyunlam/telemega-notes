@@ -678,7 +678,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);
 		mVersion.setText("Version: " + BuildInfo.version +
-				 (AltosVersion.has_google_maps_api_key() ? " maps" : "") +
 		                 " Built: " + BuildInfo.builddate + " " + BuildInfo.buildtime + " " + BuildInfo.buildtz +
 		                 " (" + BuildInfo.branch + "-" + BuildInfo.commitnum + "-" + BuildInfo.commithash + ")");
 

@@ -172,25 +172,11 @@ AM_CONDITIONAL(FATINSTALL, [test "x$FATDIR" != "xnone"])
 
 AC_SUBST(FATDIR)
 
-AC_ARG_WITH(google-key, AS_HELP_STRING([--with-google-key=PATH],
-	    [Set the file to read the google maps API key from (defaults to ~/altusmetrumllc/google-maps-api-key)]),
-	    [GOOGLEKEYFILE=$withval], [GOOGLEKEYFILE=$HOME/altusmetrumllc/google-maps-api-key])
-
-if test -r "$GOOGLEKEYFILE" -a -s "$GOOGLEKEYFILE"; then
-	GOOGLEKEY=`cat "$GOOGLEKEYFILE"`
-	HAVE_GOOGLE_KEY="yes"
-else
-	GOOGLEKEY='null'
-	HAVE_GOOGLE_KEY="no"
-fi
-
 AC_ARG_ENABLE(faketime, AS_HELP_STRING([--enable-faketime],
               [Use faketime program to ensure pdf files are reproducible (default=no)]),
 	      [FAKETIME=$enableval], [FAKETIME=no])
 
 AM_CONDITIONAL(FAKETIME, [test x$FAKETIME = xyes])
-
-AC_SUBST(GOOGLEKEY)
 
 AC_PROG_CC
 AC_PROG_INSTALL

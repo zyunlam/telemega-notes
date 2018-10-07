@@ -48,9 +48,21 @@ public class AltosMapStore {
 					      chlat, lat, chlon, lon, maptype_string, zoom, scale == 1 ? "" : String.format("-%d", scale), format_string));
 	}
 
+	public static String google_maps_api_key = null;
+
+	private static String google_map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale, String format_string) {
+		return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s&key=%s",
+				     center.lat, center.lon, zoom, px_size, px_size, scale,
+				     AltosMap.maptype_names[maptype], format_string, google_maps_api_key);
+	}
+
+	private static String altos_map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale, String format_string) {
+		return String.format("https://maps.altusmetrum.org/altos-map?center=%.6f,%.6f&zoom=%d",
+				     center.lat, center.lon, zoom);
+	}
+
 	private static String map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
 		String format_string;
-		int z = zoom;
 
 		if (maptype == AltosMap.maptype_hybrid || maptype == AltosMap.maptype_satellite || maptype == AltosMap.maptype_terrain)
 			format_string = "jpg";
@@ -58,14 +70,14 @@ public class AltosMapStore {
 			format_string = "png32";
 
 		for (int s = 1; s < scale; s <<= 1)
-			z--;
+			zoom--;
 
-		if (AltosVersion.has_google_maps_api_key())
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s&key=%s",
-					     center.lat, center.lon, z, px_size/scale, px_size/scale, scale, AltosMap.maptype_names[maptype], format_string, AltosVersion.google_maps_api_key);
+		px_size /= scale;
+
+		if (google_maps_api_key != null)
+			return google_map_url(center, zoom, maptype, px_size, scale, format_string);
 		else
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s",
-					     center.lat, center.lon, z, px_size/scale, px_size/scale, AltosMap.maptype_names[maptype], format_string);
+			return altos_map_url(center, zoom, maptype, px_size, scale, format_string);
 	}
 
 	public synchronized int status() {
@@ -209,24 +221,8 @@ public class AltosMapStore {
 
 				int new_status;
 
-				if (!AltosVersion.has_google_maps_api_key()) {
-					synchronized (fetch_lock) {
-						long startTime = System.nanoTime();
-						new_status = fetch_url();
-						if (new_status == AltosMapTile.fetched) {
-							long duration_ms = (System.nanoTime() - startTime) / 1000000;
-							if (duration_ms < google_maps_ratelimit_ms) {
-								try {
-									Thread.sleep(google_maps_ratelimit_ms - duration_ms);
-								} catch (InterruptedException e) {
-									Thread.currentThread().interrupt();
-								}
-							}
-						}
-					}
-				} else {
-					new_status = fetch_url();
-				}
+				new_status = fetch_url();
+
 				notify_listeners(new_status);
 			} finally {
 				finish_fetcher();

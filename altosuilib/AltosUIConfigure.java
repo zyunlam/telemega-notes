@@ -270,9 +270,8 @@ public class AltosUIConfigure
 			 constraints(0, 3));
 		row++;
 
-		pane.add(new JLabel (String.format("AltOS version %s (%smaps key)",
-						   AltosVersion.version,
-						   AltosVersion.has_google_maps_api_key() ? "" : "no ")),
+		pane.add(new JLabel (String.format("AltOS version %s",
+						   AltosVersion.version)),
 			 constraints(0, 3));
 		row++;
 
