@@ -184,6 +184,12 @@ else
 	HAVE_GOOGLE_KEY="no"
 fi
 
+AC_ARG_ENABLE(faketime, AS_HELP_STRING([--enable-faketime],
+              [Use faketime program to ensure pdf files are reproducible (default=no)]),
+	      [FAKETIME=$enableval], [FAKETIME=no])
+
+AM_CONDITIONAL(FAKETIME, [test x$FAKETIME = xyes])
+
 AC_SUBST(GOOGLEKEY)
 
 AC_PROG_CC
@@ -565,6 +571,9 @@ ao-tools/ao-usbtrng/Makefile
 ao-tools/ao-chaosread/Makefile
 ao-tools/ao-makebin/Makefile
 ao-utils/Makefile
+map-server/Makefile
+map-server/altos-mapd/Makefile
+map-server/altos-map/Makefile
 src/Version
 ])
 

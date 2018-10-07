@@ -1,0 +1,2 @@
+Main-Class: altosmap.AltosMap
+Class-Path: altoslib_13.jar

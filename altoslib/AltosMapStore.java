@@ -68,7 +68,7 @@ public class AltosMapStore {
 					     center.lat, center.lon, z, px_size/scale, px_size/scale, AltosMap.maptype_names[maptype], format_string);
 	}
 
-	public int status() {
+	public synchronized int status() {
 		return status;
 	}
 
