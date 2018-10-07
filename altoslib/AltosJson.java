@@ -63,18 +63,22 @@ class JsonUtil {
 			result.append("\t");
 		return result;
 	}
-	static NumberFormat get_nf_json() {
-		DecimalFormat nf = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ROOT);
-		nf.setParseIntegerOnly(false);
-		nf.setGroupingUsed(false);
-		nf.setMaximumFractionDigits(17);
-		nf.setMinimumFractionDigits(0);
-		nf.setMinimumIntegerDigits(1);
-		nf.setDecimalSeparatorAlwaysShown(false);
-		return nf;
-	}
 
-	static NumberFormat nf_json = get_nf_json();
+	NumberFormat _nf_json;
+
+	NumberFormat nf_json() {
+		if (_nf_json == null) {
+			DecimalFormat nf = (DecimalFormat) NumberFormat.getNumberInstance(Locale.ROOT);
+			nf.setParseIntegerOnly(false);
+			nf.setGroupingUsed(false);
+			nf.setMaximumFractionDigits(17);
+			nf.setMinimumFractionDigits(0);
+			nf.setMinimumIntegerDigits(1);
+			nf.setDecimalSeparatorAlwaysShown(false);
+			_nf_json = nf;
+		}
+		return _nf_json;
+	}
 }
 
 class JsonHash extends JsonUtil {
@@ -372,7 +376,7 @@ class JsonLexer extends JsonUtil {
 					String dstr = dbuf.toString();
 					double dval;
 					try {
-						dval = nf_json.parse(dstr).doubleValue();
+						dval = nf_json().parse(dstr).doubleValue();
 					} catch (ParseException pe) {
 						return new JsonToken(JsonToken._error, dstr);
 					}
@@ -612,7 +616,7 @@ public class AltosJson extends JsonUtil {
 			} else if (Double.isNaN(d_number)) {
 				result.append("NaN");
 			} else {
-				String dval = nf_json.format(d_number);
+				String dval = nf_json().format(d_number);
 				if (dval.equals("-0"))
 					dval = "0";
 				result.append(dval);
