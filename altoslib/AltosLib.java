@@ -226,7 +226,7 @@ public class AltosLib {
 		"Compressed", "Uncompressed"
 	};
 
-	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
+	public static final String launch_sites_url = "http://maps.altusmetrum.org/launch-sites.txt";
 	public static final String launch_sites_env = "LAUNCH_SITES";
 //	public static final String launch_sites_url = "file:///home/keithp/misc/text/altusmetrum/AltOS/launch-sites.txt";
 
