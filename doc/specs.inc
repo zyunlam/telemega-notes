@@ -108,7 +108,7 @@
 
 	|TeleMega v3.0
 	|MS5607 30km (100k')
-	|ADXL375 200g
+	|MMA6555 102g
 	|uBlox Max-7Q
 	|MPU9250
 	|8MB
