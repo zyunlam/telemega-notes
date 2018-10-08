@@ -1,3 +1,92 @@
+altos (1.8.7-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * capture updates to Releasing from 1.8.6 release process
+  * altos: don't build fox1ihu by default
+  * altoslib: update launch-sites.txt location to new home at maps.altusmetrum.org
+  * add new script that uses openocd to reset an LPC target
+  * update debian/rules to reflect configuration changes needed for 1.8.7
+  * doc: correct specs for TeleMega v3.0, which still uses the MMA6555
+  * releasing 1.8.7
+
+  [ Keith Packard ]
+  * Bump version to 1.8.6.1
+  * Include TeleMega v3.0 firmware with releases
+  * Bump java lib versions to 13
+  * altos: Remove spurious ao_mma655x_spi_index variable
+  * altos: Remove spurious 'const' from ao_state_names
+  * altos: Allow timer interrupt without needing tick count
+  * altos/lpc: Fix stdio wakeup on serial IRQ
+  * altos/stmf0: Stop using 'stdin' name as local variable
+  * altos: Switch global 'log' to 'ao_log_data'
+  * altosuilib: Add 'equals' method to AltosDevice
+  * altosuilib: Poll for devices while Select Device dialog is displayed
+  * altosuilib: Show a more useful message when the flash target device is unknown
+  * altosuilib: Don't show radio parameter when reflashing radioless devices
+  * altoslib: Use common constants for flash action messages
+  * altosuilib: Include device path in equals test of AltosUSBDevice
+  * altosuilib: Provide dialog while waiting for flash target to re-appear
+  * altoslib: Reduce debug printf spamming during flashing operation
+  * altos/drivers: Shrink ao_ms5607.c code to fit on micropeak still
+  * doc: Don't accidentally create zero-length PDF files
+  * micropeak: Add MicroUSB 'equals' method
+  * ao-tools/ao-cal-freq: Add --nosave and --output options. Check save results.
+  * altos: sdcc doesn't have 'false' and 'true'.
+  * altosui: Fetch RF calibration value for TBT v4.0 units from web
+  * ao-bringup: Add 'fix-telebt' to reflash TeleBT v4.0 with correct rf cal
+  * altoslib: Fix gyro headings in CSV files
+  * altoslib: Add missing AltosUnitInfo files
+  * doc: Describe Packet Link usage and selecting RF param defaults for TeleMini
+  * doc: Describe Packet Link mode in the initial usage section
+  * altos: Force telemetry rate to 38400 when ao_force_freq is set
+  * doc: Update for 1.8.7
+  * doc: Add check for new hardware in specs.inc
+  * macosx: Ship install-macosx script with all apps.
+  * doc: Use RELEASE_DATE to set PDF timestamps using faketime
+  * debian: build depend on faketime
+  * Add map-loading documentation
+  * map-server: Add maps proxy server
+  * altos-map: Fix altos-map HTTP syntax
+  * altos-map: Install .jar file for altos-map
+  * altos-mapd: Use command line to pass map directory in
+  * doc: Make use of 'faketime' configurable with configure.ac. Default to 'no'
+  * altoslib: Allow launch site URL to be overridden at runtime
+  * altoslib: Switch to maps.altusmetrum.org when no google map key is available
+  * altos-mapd: Add geo-fencing for map requests. Add port and key arguments
+  * altos-map: Retry connection to cache service
+  * altos-mapd: remove debug printf
+  * altos-mapd: Clean up log messages
+  * altos-mapd: Make cache service listen queue longer
+  * altos-mapd: Install altosmapd.jar file
+  * altoslib: Use https for launch-sites.txt
+  * altoslib: Change map loading to lat=&lon= from center=
+  * altosdroid: Fix offline map messages to match new meanings
+  * altoslib: Retry map connections 10 times on network failure
+  * altosuilib: Fix offline map messages to match new meanings
+  * altos-map: Support version query from application
+  * altos-mapd: Install systemd service file and defaults file
+  * altosdroid: Set offline map scale to 1
+  * altosdroid: Restore google maps key setting
+  * map-server: Implement altos-map in C
+  * altosuilib: Remove GrabNDrag.java
+  * altosui/altosdroid: Disable offline map type selections
+  * altosuilib: InputEvent.getModifiers is deprecated, use getModifiersEx
+  * altos-mapd: Handle clients failing to send valid JSON
+  * debian: Add libjansson-dev build depend
+  * altos-map: Switch from json FD ops to json FILE ops
+  * altos-mapd: Check nearest portion of tile to launch site
+  * altosui/altosdroid: Change message in forbidden map tiles
+  * altoslib: NumberFormat can't be shared between parsers
+  * altoslib: Be less chatty about map loading
+  * altosuilib: Leave some map debug code around for the future
+  * doc: Note that 1.8.7 fixes map images
+  * altos-mapd: Add --max-zoom to limit tile loading. Set default to 15.
+  * Switch to universal JavaApplicationStub for Mac OS X
+  * doc: Note fixes for Mac OS X
+  * Set version to 1.8.7
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 08 Oct 2018 17:53:09 -0600
+
 altos (1.8.6-2) unstable; urgency=medium
 
   * quick patch to not include fox1ihu in build by default, closes: #907480
