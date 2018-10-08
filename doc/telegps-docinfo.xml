@@ -10,7 +10,7 @@
   <email>keithp@keithp.com</email>
 </author>
 <copyright>
-  <year>2015</year>
+  <year>2018</year>
   <holder>Bdale Garbee and Keith Packard</holder>
 </copyright>
 <mediaobject>
@@ -37,6 +37,14 @@
 </legalnotice>
 <revhistory>
   <?dbhtml filename="telegps-revhistory.html"?>
+  <revision>
+    <revnumber>1.8.7</revnumber>
+    <date>08 Oct 2018</date>
+    <revremark>
+      Fix TeleBT v4.0 RF calibration to factory value when
+      reflashing. Fix map images. Fix Mac OS X support.
+    </revremark>
+  </revision>
   <revision>
     <revnumber>1.8.3</revnumber>
     <date>11 Dec 2017</date>
