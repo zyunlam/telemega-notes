@@ -26,6 +26,8 @@
 #define HAS_TICK 1
 #endif
 
+#if HAS_TICK || defined(AO_TIMER_HOOK)
+
 #if HAS_TICK
 volatile AO_TICK_TYPE ao_tick_count;
 
@@ -34,6 +36,7 @@ ao_time(void)
 {
 	return ao_tick_count;
 }
+#endif
 
 #if AO_DATA_ALL
 volatile __data uint8_t	ao_data_interval = 1;
@@ -44,7 +47,9 @@ void stm_systick_isr(void)
 {
 	ao_validate_cur_stack();
 	if (stm_systick.csr & (1 << STM_SYSTICK_CSR_COUNTFLAG)) {
+#if HAS_TICK
 		++ao_tick_count;
+#endif
 #if HAS_TASK_QUEUE
 		if (ao_task_alarm_tick && (int16_t) (ao_tick_count - ao_task_alarm_tick) >= 0)
 			ao_task_check_alarm((uint16_t) ao_tick_count);

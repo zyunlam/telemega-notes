@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -27,7 +27,7 @@ import java.text.*;
 import java.lang.Math;
 import java.net.URL;
 import java.net.URLConnection;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 class AltosUIMapPos extends Box implements ActionListener {
 	AltosUIMapPreload	preload;
@@ -144,7 +144,9 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 	JToggleButton	load_button;
 	JButton		close_button;
 
+/*
 	JCheckBox[]	maptypes = new JCheckBox[AltosMap.maptype_terrain - AltosMap.maptype_hybrid + 1];
+*/
 
 	JComboBox<Integer>	min_zoom;
 	JComboBox<Integer>	max_zoom;
@@ -215,11 +217,14 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 
 
 	private int all_types() {
+/*
 		int all_types = 0;
 		for (int t = AltosMap.maptype_hybrid; t <= AltosMap.maptype_terrain; t++)
 			if (maptypes[t].isSelected())
 				all_types |= (1 << t);
 		return all_types;
+*/
+		return 1 << AltosMap.maptype_hybrid;
 	}
 
 	void center_map(double latitude, double longitude) {
@@ -485,6 +490,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 
 		pane.add(close_button, c);
 
+/*
 		JLabel	types_label = new JLabel("Map Types");
 		c.gridx = 2;
 		c.gridwidth = 2;
@@ -501,6 +507,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 			c.gridy = (type & 1) + 3;
 			pane.add(maptypes[type], c);
 		}
+*/
 
 		JLabel	min_zoom_label = new JLabel("Minimum Zoom");
 		c.gridx = 4;

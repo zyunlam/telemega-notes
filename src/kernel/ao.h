@@ -662,7 +662,7 @@ ao_radio_init(void);
 
 #if HAS_MONITOR
 
-extern const char const * const ao_state_names[];
+extern const char * const ao_state_names[];
 
 #define AO_MONITOR_RING	8
 

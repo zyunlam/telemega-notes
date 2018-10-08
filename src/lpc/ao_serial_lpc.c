@@ -66,8 +66,9 @@ lpc_usart_isr(void)
 	}
 	if (wake_input) {
 		ao_wakeup(&ao_usart_rx_fifo);
-		if (stdin)
-			ao_wakeup(&ao_stdin_ready);
+#if USE_SERIAL_0_STDIN
+		ao_wakeup(&ao_stdin_ready);
+#endif
 	}
 }
 

@@ -57,10 +57,11 @@ ao_ms5607_crc(uint8_t *prom)
 	uint8_t 	cnt;
 	uint16_t	n_rem = 0;
 	uint8_t		n_bit;
+	uint8_t		*p = prom;
 
 	prom[15] = 0;
 	for (cnt = 0; cnt < 16; cnt++) {
-		n_rem ^= prom[cnt];
+		n_rem ^= *p++;
 		for (n_bit = 8; n_bit > 0; n_bit--) {
 			if (n_rem & 0x8000)
 				n_rem = (n_rem << 1) ^ 0x3000;
@@ -73,12 +74,33 @@ ao_ms5607_crc(uint8_t *prom)
 	return n_rem;
 }
 
+static int
+ao_ms5607_prom_valid(uint8_t *prom)
+{
+	uint8_t	crc;
+	int	i;
+	uint8_t *p;
+
+	/* Look for a value other than 0x0000 or 0xffff */
+	p = prom;
+	for (i = 0; i < 16; i++)
+		if (*p++ + 1 > 1)
+			break;
+	if (i == 16)
+		return FALSE;
+
+	crc = ao_ms5607_crc(prom);
+	if (crc != (prom[15] & 0xf))
+		return FALSE;
+
+	return TRUE;
+}
+
 static void
 ao_ms5607_prom_read(__xdata struct ao_ms5607_prom *prom)
 {
-	uint8_t			addr;
-	uint8_t			crc;
-	__xdata uint16_t	*r;
+	uint8_t		addr;
+	uint16_t	*r;
 
 	r = (__xdata uint16_t *) prom;
 	for (addr = 0; addr < 8; addr++) {
@@ -89,22 +111,19 @@ ao_ms5607_prom_read(__xdata struct ao_ms5607_prom *prom)
 		ao_ms5607_stop();
 		r++;
 	}
-	crc = ao_ms5607_crc((uint8_t *) prom);
-	if (crc != (((uint8_t *) prom)[15] & 0xf)) {
-#if HAS_TASK
-		printf ("MS5607 PROM CRC error (computed %x actual %x)\n",
-			crc, (((uint8_t *) prom)[15] & 0xf));
-		flush();
-#endif
+
+	if (!ao_ms5607_prom_valid((uint8_t *) prom))
 		ao_panic(AO_PANIC_SELF_TEST_MS5607);
-	}
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 	/* Byte swap */
 	r = (uint16_t *) prom;
 	for (addr = 0; addr < 8; addr++) {
-		uint16_t	t = *r;
-		*r++ = (t << 8) | (t >> 8);
+		uint8_t		*t = (uint8_t *) r;
+		uint8_t	a = t[0];
+		t[0] = t[1];
+		t[1] = a;
+		r++;
 	}
 #endif
 }

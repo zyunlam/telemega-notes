@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import libaltosJNI.*;
 
@@ -28,4 +28,5 @@ public interface AltosDevice {
 	public abstract boolean matchProduct(int product);
 	public abstract String getErrorString();
 	public SWIGTYPE_p_altos_file open();
+	public abstract boolean equals(Object obj);
 }

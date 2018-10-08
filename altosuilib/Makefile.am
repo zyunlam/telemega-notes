@@ -9,7 +9,6 @@ SRC=.
 altosuilibdir = $(datadir)/java
 
 altosuilib_JAVA = \
-	GrabNDrag.java \
 	AltosDevice.java \
 	AltosDeviceDialog.java \
 	AltosPositionListener.java \

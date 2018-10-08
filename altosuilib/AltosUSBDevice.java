@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.util.*;
 import libaltosJNI.*;
@@ -92,6 +92,24 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 			return true;
 
 		return false;
+	}
+
+	public int hashCode() {
+		return getVendor() ^ getProduct() ^ getSerial() ^ getPath().hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (!(o instanceof AltosUSBDevice))
+			return false;
+		AltosUSBDevice other = (AltosUSBDevice) o;
+
+		return getVendor() == other.getVendor() &&
+			getProduct() == other.getProduct() &&
+			getSerial() == other.getSerial() &&
+			getPath().equals(other.getPath());
 	}
 
 	static public java.util.List<AltosDevice> list(int product) {

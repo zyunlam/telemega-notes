@@ -137,7 +137,8 @@ MACOSX_DRIVERS=$(MACOSX_DRIVER_1) $(MACOSX_DRIVER_0)
 
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVERS) $(MACOSX_README) $(DOC) $(MACOSX_ICONS)
+MACOSX_INSTALL=../altosui/install-macosx
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVERS) $(MACOSX_README) $(DOC) $(MACOSX_ICONS) $(MACOSX_INSTALL)
 
 $(MACOSX_DRIVER_0):
 	wget -O $@ $(MACOSX_DRIVER_0_URL)
@@ -306,7 +307,8 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	-rm -rf macosx
 	mkdir macosx
 	cp -a MicroPeak.app macosx/
-	cp -a $(MACOSX_README) macosx/ReadMe.rtf
+	cp -a $(MACOSX_README) macosx/ReadMe-MicroPeak.rtf
+	cp -a $(MACOSX_INSTALL) macosx
 	cp -a $(DOC) macosx
 	cp -p Info.plist macosx/MicroPeak.app/Contents
 	cp -p $(MACOSX_DRIVERS) macosx

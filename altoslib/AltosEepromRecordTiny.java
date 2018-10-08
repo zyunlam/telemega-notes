@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 public class AltosEepromRecordTiny extends AltosEepromRecord implements AltosDataProvider {
 	public static final int	record_length = 2;

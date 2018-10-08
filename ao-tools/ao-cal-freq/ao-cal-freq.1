@@ -25,6 +25,10 @@ ao-cal-freq \- Calibrate AltOS flight computer frequency
 [\--tty \fItty-device\fP]
 [\-D \fIaltos-device\fP]
 [\--device \fIaltos-device\fP]
+[\-v] [\--verbose]
+[\-n] [\--nosave]
+[\-o \fIcal-value-output-file\fP]
+[\--output \fIcal-value-output-file\fP]
 .SH DESCRIPTION
 .I ao-cal-freq
 drives the frequency calibration process and saves the result.
@@ -49,10 +53,22 @@ TeleMega
 Leaving out the product name will cause the tool to select a suitable
 product, leaving out the serial number will cause the tool to match
 one of the available devices.
+.TP
+\-o cal-value-output-file | --output cal-value-output-file
+Writes the resulting calibration value to the specified file.
+.TP
+\-n | --nosave
+Inhibits saving the calibration value on the device. Necessary for
+devices which don't have on-board configuration storage.
+.TP
+\-v | --verbose
+Makes
+.I ao-cal-freq
+chatty about communication with the target device.
 .SH USAGE
 .I ao-cal-freq
 opens the target device, interactively calibrates the frequency, then
-shows the resulting calibration values and saves them to configuration
-memory.
+shows the resulting calibration values and (optionally) saves them to
+configuration memory and/or a file.
 .SH AUTHOR
 Keith Packard

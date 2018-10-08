@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.8.6)
+AC_INIT([altos], 1.8.7)
 ANDROID_VERSION=17
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2018-06-17
+RELEASE_DATE=2018-10-08
 AC_SUBST(RELEASE_DATE)
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
@@ -34,8 +34,8 @@ AC_SUBST(ANDROID_VERSION)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=12
-ALTOSLIB_VERSION=12
+ALTOSUILIB_VERSION=13
+ALTOSLIB_VERSION=13
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -173,8 +173,8 @@ AM_CONDITIONAL(FATINSTALL, [test "x$FATDIR" != "xnone"])
 AC_SUBST(FATDIR)
 
 AC_ARG_WITH(google-key, AS_HELP_STRING([--with-google-key=PATH],
-	    [Set the file to read the google maps API key from (defaults to ~/altusmetrumllc/google-maps-api-key)]),
-	    [GOOGLEKEYFILE=$withval], [GOOGLEKEYFILE=$HOME/altusmetrumllc/google-maps-api-key])
+	    [Set the file to read the AltosDroid maps API key from (defaults to ~/altusmetrumllc/google-altosdroid-maps-api-key)]),
+	    [GOOGLEKEYFILE=$withval], [GOOGLEKEYFILE=$HOME/altusmetrumllc/google-altosdroid-maps-api-key])
 
 if test -r "$GOOGLEKEYFILE" -a -s "$GOOGLEKEYFILE"; then
 	GOOGLEKEY=`cat "$GOOGLEKEYFILE"`
@@ -183,6 +183,12 @@ else
 	GOOGLEKEY='null'
 	HAVE_GOOGLE_KEY="no"
 fi
+
+AC_ARG_ENABLE(faketime, AS_HELP_STRING([--enable-faketime],
+              [Use faketime program to ensure pdf files are reproducible (default=no)]),
+	      [FAKETIME=$enableval], [FAKETIME=no])
+
+AM_CONDITIONAL(FAKETIME, [test x$FAKETIME = xyes])
 
 AC_SUBST(GOOGLEKEY)
 
@@ -411,6 +417,8 @@ if test "x$HAVE_NICKLE" = "xno"; then
 	AC_MSG_ERROR([Please install nickle to build AltOs])
 fi
 
+PKG_CHECK_MODULES([JANSSON], [jansson])
+
 AC_ARG_WITH([readline],
 	    [AS_HELP_STRING([--with-readline],
 			      [enable readline functionality in ao-dbg @<:@default=auto@:>@])],
@@ -519,6 +527,7 @@ AC_OUTPUT([
 Makefile
 src/Makedefs
 src/chaoskey-v1.0/org.altusmetrum.ChaosKey.metainfo.xml
+doc/Makefile
 altoslib/Makefile
 altoslib/AltosVersion.java
 icon/Makefile
@@ -564,6 +573,10 @@ ao-tools/ao-usbtrng/Makefile
 ao-tools/ao-chaosread/Makefile
 ao-tools/ao-makebin/Makefile
 ao-utils/Makefile
+map-server/Makefile
+map-server/altos-mapd/Makefile
+map-server/altos-map/Makefile
+map-server/altos-mapj/Makefile
 src/Version
 ])
 
@@ -590,7 +603,7 @@ echo "    freetts.....................: ${FREETTS}"
 echo "    jfreechart..................: ${JFREECHART}"
 echo "    jcommon.....................: ${JCOMMON}"
 echo "    JVM include.................: ${JVM_INCLUDE}"
-echo "    Google maps API key.........: ${HAVE_GOOGLE_KEY}"
+echo "    AltosDroid maps API key.....: ${HAVE_GOOGLE_KEY}"
 if test x${ANDROID_SDK} != "xno"; then
 echo ""
 echo "  Android path"

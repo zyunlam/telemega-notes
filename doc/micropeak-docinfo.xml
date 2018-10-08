@@ -5,7 +5,7 @@
   <email>keithp@keithp.com</email>
 </author>
 <copyright>
-  <year>2014</year>
+  <year>2018</year>
   <holder>Keith Packard</holder>
 </copyright>
 <mediaobject>
@@ -31,6 +31,20 @@
 </legalnotice>
 <revhistory>
   <?dbhtml filename="micropeak-revhistory.html"?>
+  <revision>
+    <revnumber>1.8.7</revnumber>
+    <date>8 October 2018</date>
+    <revremark>
+      Poll for MicroPeak USB while the device dialog is open. Fix Mac OS X support.
+    </revremark>
+  </revision>
+  <revision>
+    <revnumber>1.8.6</revnumber>
+    <date>6 August 2018</date>
+    <revremark>
+      Report altimeter-recorded maximum height value
+    </revremark>
+  </revision>
   <revision>
     <revnumber>1.3.2</revnumber>
     <date>12 February 2014</date>

@@ -22,8 +22,8 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_12.*;
-import org.altusmetrum.altosuilib_12.*;
+import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altosuilib_13.*;
 
 public class AltosAscent extends AltosUIFlightTab {
 	JLabel	cur, max;

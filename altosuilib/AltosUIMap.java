@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,7 +28,7 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.imageio.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosMapInterface {
 
@@ -106,7 +106,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		}
 
 		private boolean is_drag_event(MouseEvent e) {
-			return e.getModifiers() == InputEvent.BUTTON1_MASK;
+			return e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK;
 		}
 
 		/* MouseMotionListener methods */
@@ -264,6 +264,21 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 
 			if (image != null) {
 				g.drawImage(image, point.x, point.y, null);
+/*
+ * Useful when debugging map fetching problems
+ *
+				String message = String.format("%.6f %.6f", center.lat, center.lon);
+				g.setFont(tile_font);
+				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				Rectangle2D bounds = tile_font.getStringBounds(message, g.getFontRenderContext());
+
+				float x = px_size / 2.0f;
+				float y = px_size / 2.0f;
+				x = x - (float) bounds.getWidth() / 2.0f;
+				y = y + (float) bounds.getHeight() / 2.0f;
+				g.setColor(Color.RED);
+				g.drawString(message, (float) point_double.x + x, (float) point_double.y + y);
+*/
 			} else {
 				g.setColor(Color.GRAY);
 				g.fillRect(point.x, point.y, px_size, px_size);
@@ -278,10 +293,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 						message = "Internal error";
 						break;
 					case AltosMapTile.failed:
-						message = "Network error, check connection";
+						message = "Network error";
 						break;
 					case AltosMapTile.forbidden:
-						message = "Too many requests, try later";
+						message = "Outside of known launch areas";
 						break;
 					}
 					if (message != null && tile_font != null) {
@@ -386,8 +401,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	JLabel	zoom_label;
 
 	public void set_maptype(int type) {
+/*
 		map.set_maptype(type);
 		maptype_combo.setSelectedIndex(type);
+*/
 	}
 
 	/* AltosUIMapPreload functions */
@@ -433,7 +450,9 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	/* internal layout bits */
 	private GridBagLayout layout = new GridBagLayout();
 
+/*
 	JComboBox<String>	maptype_combo;
+*/
 
 	MapView	view;
 
@@ -522,6 +541,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		c.weighty = 0;
 		add(zoom_out, c);
 
+/*
 		maptype_combo = new JComboBox<String>(map.maptype_labels);
 
 		maptype_combo.setEditable(false);
@@ -540,7 +560,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		c.weightx = 0;
 		c.weighty = 0;
 		add(maptype_combo, c);
-
+*/
 		map = new AltosMap(this);
 	}
 }

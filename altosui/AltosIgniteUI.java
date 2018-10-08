@@ -25,8 +25,8 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_12.*;
-import org.altusmetrum.altosuilib_12.*;
+import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altosuilib_13.*;
 
 public class AltosIgniteUI
 	extends AltosUIDialog

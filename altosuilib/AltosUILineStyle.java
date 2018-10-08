@@ -12,14 +12,14 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.io.*;
 import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;

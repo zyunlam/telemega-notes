@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 import java.util.*;
 import java.io.*;
@@ -180,6 +180,10 @@ public class AltosLib {
 		return device_type == product_telemega || device_type == product_easymega;
 	}
 
+	public static boolean has_radio(int device_type) {
+		return device_type != product_easymini && device_type != product_easymega;
+	}
+
 	public static boolean has_gps(int device_type) {
 		return device_type == product_telemetrum ||
 			device_type == product_telemega ||
@@ -222,9 +226,12 @@ public class AltosLib {
 		"Compressed", "Uncompressed"
 	};
 
-	public static final String launch_sites_url = "http://www.altusmetrum.org/AltOS/launch-sites.txt";
+	public static final String launch_sites_url = "https://maps.altusmetrum.org/launch-sites.txt";
 	public static final String launch_sites_env = "LAUNCH_SITES";
 //	public static final String launch_sites_url = "file:///home/keithp/misc/text/altusmetrum/AltOS/launch-sites.txt";
+
+	public static final String unit_info_url = "https://altusmetrum.org/cgi-bin/unitinfo.cgi?sn=%d";
+	public static final String unit_info_env = "UNIT_INFO";
 
 	public static final int ao_telemetry_standard_len = 32;
 	public static final int ao_telemetry_0_9_len = 95;

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 import java.io.*;
 import java.net.*;
@@ -48,9 +48,21 @@ public class AltosMapStore {
 					      chlat, lat, chlon, lon, maptype_string, zoom, scale == 1 ? "" : String.format("-%d", scale), format_string));
 	}
 
+	public static String google_maps_api_key = null;
+
+	private static String google_map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale, String format_string) {
+		return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s&key=%s",
+				     center.lat, center.lon, zoom, px_size, px_size, scale,
+				     AltosMap.maptype_names[maptype], format_string, google_maps_api_key);
+	}
+
+	private static String altos_map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale, String format_string) {
+		return String.format("https://maps.altusmetrum.org/cgi-bin/altos-map?lat=%.6f&lon=%.6f&zoom=%d",
+				     center.lat, center.lon, zoom);
+	}
+
 	private static String map_url(AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
 		String format_string;
-		int z = zoom;
 
 		if (maptype == AltosMap.maptype_hybrid || maptype == AltosMap.maptype_satellite || maptype == AltosMap.maptype_terrain)
 			format_string = "jpg";
@@ -58,17 +70,17 @@ public class AltosMapStore {
 			format_string = "png32";
 
 		for (int s = 1; s < scale; s <<= 1)
-			z--;
+			zoom--;
 
-		if (AltosVersion.has_google_maps_api_key())
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s&key=%s",
-					     center.lat, center.lon, z, px_size/scale, px_size/scale, scale, AltosMap.maptype_names[maptype], format_string, AltosVersion.google_maps_api_key);
+		px_size /= scale;
+
+		if (google_maps_api_key != null)
+			return google_map_url(center, zoom, maptype, px_size, scale, format_string);
 		else
-			return String.format("http://maps.google.com/maps/api/staticmap?center=%.6f,%.6f&zoom=%d&size=%dx%d&scale=%d&sensor=false&maptype=%s&format=%s",
-					     center.lat, center.lon, z, px_size/scale, px_size/scale, AltosMap.maptype_names[maptype], format_string);
+			return altos_map_url(center, zoom, maptype, px_size, scale, format_string);
 	}
 
-	public int status() {
+	public synchronized int status() {
 		return status;
 	}
 
@@ -88,11 +100,6 @@ public class AltosMapStore {
 			listener.notify_store(this, status);
 	}
 
-	static Object	forbidden_lock = new Object();
-	static long	forbidden_time;
-	static boolean	forbidden_set;
-	public static int forbidden_response;
-
 	private int fetch_url() {
 		URL u;
 
@@ -102,48 +109,64 @@ public class AltosMapStore {
 			return AltosMapTile.bad_request;
 		}
 
-		byte[] data;
+		byte[] data = null;
 		URLConnection uc = null;
-		try {
-			uc = u.openConnection();
-			String type = uc.getContentType();
-			int contentLength = uc.getContentLength();
-			if (uc instanceof HttpURLConnection) {
-				int response = ((HttpURLConnection) uc).getResponseCode();
-				switch (response) {
-				case HttpURLConnection.HTTP_FORBIDDEN:
-				case HttpURLConnection.HTTP_PAYMENT_REQUIRED:
-				case HttpURLConnection.HTTP_UNAUTHORIZED:
-					synchronized (forbidden_lock) {
-						forbidden_time = System.nanoTime();
-						forbidden_set = true;
-						forbidden_response = response;
+
+		int status = AltosMapTile.failed;
+		int tries = 0;
+
+		while (tries < 10 && status != AltosMapTile.fetched) {
+			try {
+				uc = u.openConnection();
+				String type = uc.getContentType();
+				int contentLength = uc.getContentLength();
+				if (uc instanceof HttpURLConnection) {
+					int response = ((HttpURLConnection) uc).getResponseCode();
+					switch (response) {
+					case HttpURLConnection.HTTP_FORBIDDEN:
+					case HttpURLConnection.HTTP_PAYMENT_REQUIRED:
+					case HttpURLConnection.HTTP_UNAUTHORIZED:
 						return AltosMapTile.forbidden;
 					}
 				}
-			}
-			InputStream in = new BufferedInputStream(uc.getInputStream());
-			int bytesRead = 0;
-			int offset = 0;
-			data = new byte[contentLength];
-			while (offset < contentLength) {
-				bytesRead = in.read(data, offset, data.length - offset);
-				if (bytesRead == -1)
-					break;
-				offset += bytesRead;
-			}
-			in.close();
+				InputStream in = new BufferedInputStream(uc.getInputStream());
+				int bytesRead = 0;
+				int offset = 0;
+				data = new byte[contentLength];
+				while (offset < contentLength) {
+					bytesRead = in.read(data, offset, data.length - offset);
+					if (bytesRead == -1)
+						break;
+					offset += bytesRead;
+				}
+				in.close();
 
-			if (offset != contentLength)
-				return AltosMapTile.failed;
+				if (offset == contentLength)
+					status = AltosMapTile.fetched;
+				else
+					status = AltosMapTile.failed;
 
-		} catch (IOException e) {
-			return AltosMapTile.failed;
+			} catch (IOException e) {
+				status = AltosMapTile.failed;
+			}
+
+			if (status != AltosMapTile.fetched) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException ie) {
+				}
+				tries++;
+				System.out.printf("Fetch failed, retrying %d\n", tries);
+			}
 		}
+
+		if (status != AltosMapTile.fetched)
+			return status;
 
 		try {
 			FileOutputStream out = new FileOutputStream(file);
-			out.write(data);
+			if (data != null)
+				out.write(data);
 			out.flush();
 			out.close();
 		} catch (FileNotFoundException e) {
@@ -158,18 +181,19 @@ public class AltosMapStore {
 
 	static Object	fetch_lock = new Object();
 
-	static final long	forbidden_interval = 60l * 1000l * 1000l * 1000l;
-	static final long 	google_maps_ratelimit_ms = 1200;
-
 	static Object	fetcher_lock = new Object();
 
 	static LinkedList<AltosMapStore> waiting = new LinkedList<AltosMapStore>();
 	static LinkedList<AltosMapStore> running = new LinkedList<AltosMapStore>();
 
-	static final int concurrent_fetchers = 128;
+	static int concurrent_fetchers() {
+		if (google_maps_api_key == null)
+			return 16;
+		return 128;
+	}
 
 	static void start_fetchers() {
-		while (!waiting.isEmpty() && running.size() < concurrent_fetchers) {
+		while (!waiting.isEmpty() && running.size() < concurrent_fetchers()) {
 			AltosMapStore 	s = waiting.remove();
 			running.add(s);
 			Thread lt = s.make_fetcher_thread();
@@ -200,33 +224,10 @@ public class AltosMapStore {
 					return;
 				}
 
-				synchronized(forbidden_lock) {
-					if (forbidden_set && (System.nanoTime() - forbidden_time) < forbidden_interval) {
-						notify_listeners(AltosMapTile.forbidden);
-						return;
-					}
-				}
-
 				int new_status;
 
-				if (!AltosVersion.has_google_maps_api_key()) {
-					synchronized (fetch_lock) {
-						long startTime = System.nanoTime();
-						new_status = fetch_url();
-						if (new_status == AltosMapTile.fetched) {
-							long duration_ms = (System.nanoTime() - startTime) / 1000000;
-							if (duration_ms < google_maps_ratelimit_ms) {
-								try {
-									Thread.sleep(google_maps_ratelimit_ms - duration_ms);
-								} catch (InterruptedException e) {
-									Thread.currentThread().interrupt();
-								}
-							}
-						}
-					}
-				} else {
-					new_status = fetch_url();
-				}
+				new_status = fetch_url();
+
 				notify_listeners(new_status);
 			} finally {
 				finish_fetcher();

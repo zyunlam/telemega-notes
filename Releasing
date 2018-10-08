@@ -17,6 +17,8 @@ These are Keith's notes on how to do a release
 
 	- update the version and date in configure.ac if Bdale hasn't already
 
+	- follow instructions in doc/RELNOTES
+
 	- make sure there is a doc/release-notes-<version>.inc
 
 	- make sure doc/release-notes.inc points at that
@@ -31,6 +33,14 @@ These are Bdale's notes on how to do a release.
 
 	- make sure build environment is up to date
 		sudo cowbuilder --update
+
+	- ensure i386 build support is available, and we have tools to build
+	  installers for Windows and Mac OS X
+
+		sudo dpkg --add-architecture i386
+		sudo apt update
+		sudo apt install gcc-multilib genisoimage nsis
+		(need some mingw packages too, but not sure which offhand)
 
 	- make sure ~/web/altusmetrum has no pending pullable commits
 
@@ -91,7 +101,7 @@ These are Bdale's notes on how to do a release.
 	- at this point we have packages in ~/debian/build-area/altos, now
 	  we move on to the non-Debian part of the release process
 
-	make distclean
+	make distclean	(just to be sure, this should do nothing)
 
 	./autogen.sh --enable-multi-arch \
 		--with-fat-dir=/home/bdale/web/altusmetrum/
@@ -99,7 +109,7 @@ These are Bdale's notes on how to do a release.
 
 	- store a stable copy of ARM binaries for production use
 
-	cp src/chaoskey-v1.0/{*.elf,*.ihx} \
+	cp src/chaoskey-v1.0/{*.elf,*.ihx,*.bin} \
 	   src/easymega-v1.0/{*.elf,*.ihx} \
 	   src/easymini-v1.0/{*.elf,*.ihx} \
 	   src/easymini-v2.0/{*.elf,*.ihx} \
@@ -113,6 +123,8 @@ These are Bdale's notes on how to do a release.
 	   src/telemega-v3.0/{*.elf,*.ihx} \
 	   src/telemetrum-v2.0/{*.elf,*.ihx} \
 	   src/telemini-v3.0/{*.elf,*.ihx} \
+	   src/telelco-v2.0/{*.elf,*.ihx} \
+	   src/telefireeight-v1.0/{*.elf,*.ihx} \
 	   ~/altusmetrumllc/Binaries/
 	cp src/chaoskey-v1.0/flash-loader/{*.elf,*.bin} \
 	   src/easymega-v1.0/flash-loader/*.elf \
@@ -128,6 +140,8 @@ These are Bdale's notes on how to do a release.
 	   src/telemega-v3.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
 	   src/telemini-v3.0/flash-loader/{*.elf,*.bin} \
+	   src/telelco-v2.0/flash-loader/*.elf \
+	   src/telefireeight-v1.0/flash-loader/*.elf \
 	   ~/altusmetrumllc/Binaries/loaders/
 	(cd ~/altusmetrumllc ; git add Binaries ; git commit -a) 
 	- remove previous versions (only keep latest release)

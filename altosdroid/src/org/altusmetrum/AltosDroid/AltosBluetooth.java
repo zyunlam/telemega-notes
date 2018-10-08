@@ -31,7 +31,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 //import android.os.Message;
 
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class AltosBluetooth extends AltosDroidLink {
 

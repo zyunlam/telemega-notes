@@ -1,3 +1,811 @@
+commit 34658a1236e34891b41a0a51a480717db98779e7
+Merge: 3a2a5a05 88ae4c5e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Oct 8 17:49:47 2018 -0600
+
+    Merge branch 'master' into branch-1.8
+
+commit 88ae4c5ebd64215f05f5efc18f9660560b409ace
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Oct 8 16:27:33 2018 -0600
+
+    doc: correct specs for TeleMega v3.0, which still uses the MMA6555
+
+commit 24db798925e26a4c411afe88f7e4844d6554fe0c
+Merge: 6f25d235 03680c55
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Oct 8 16:07:32 2018 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 6f25d2359151fb114e22bf8e3b15c007cfb464b5
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Oct 8 16:06:29 2018 -0600
+
+    add new script that uses openocd to reset an LPC target
+
+commit 03680c55ae8394056ed27839e64356d8df375537
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 23:31:53 2018 -0700
+
+    Set version to 1.8.7
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 625981b96e99a5dbec8180016d5e2c291378a21f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 23:31:04 2018 -0700
+
+    doc: Note fixes for Mac OS X
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cd75ca767b616900d7df4596907f4f5b00517ad4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 23:25:25 2018 -0700
+
+    Switch to universal JavaApplicationStub for Mac OS X
+    
+    The binary JavaApplicationStub only supports Mac JRE 6, even if you
+    install a later JRE from Oracle it will still run our apps with the
+    Mac version.
+    
+    This replacement JavaApplicationStub is a shell script which comes
+    from here:
+    
+            https://github.com/tofi86/universalJavaApplicationStub
+    
+    I've tested it with Oracle JRE 10 installed and AltosUI came up fine,
+    and has access to our devices and networking.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 746ad2c385046c77831b43291ef4335a11e5bfab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 16:28:32 2018 -0600
+
+    altos-mapd: Add --max-zoom to limit tile loading. Set default to 15.
+    
+    This ensures that we won't end up serving huge numbers of high
+    resolution images.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7f5cdd0aeb68104f474ad1736360df39dd174006
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 14:26:27 2018 -0700
+
+    doc: Note that 1.8.7 fixes map images
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2bcbd39a37cf1fa0002345d5c401869a387dc84f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 14:11:03 2018 -0700
+
+    altosuilib: Leave some map debug code around for the future
+    
+    Displays lat/lon on each map tile. Commented out for production use.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 444fdd96515cc7163c49942ac2435ace8e7bb5bf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 14:06:51 2018 -0700
+
+    altoslib: Be less chatty about map loading
+    
+    Only mention when a new tile is being fetched from the server.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 173e72429fb494ea3832e3e38ee90f165fbff4cf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 14:49:48 2018 -0600
+
+    altoslib: NumberFormat can't be shared between parsers
+    
+    AltosJson uses NumberFormat to ensure locale-independent parsing of
+    values. However, NumberFormat appears to have some internal state
+    which means that each thread needs to have an independent NumberFormat
+    object. Create one for each parser as needed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1b53a54b032c21b6e8ffb085aa56b9ffdff53d7e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 13:12:56 2018 -0700
+
+    altosui/altosdroid: Change message in forbidden map tiles
+    
+    These are outside of *known* launch areas.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e7e1e805f1358052b33103a2ffdd4e9c435c8650
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 14:08:30 2018 -0600
+
+    altos-mapd: Check nearest portion of tile to launch site
+    
+    We limit tile queries to those within 17km of a known launch
+    site. Change the check to look at the portion of the tile nearest each
+    launch site, instead of only checking the center location of the tile.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 581f700e08ec8a1c3bfc5a09e7186676c54a5460
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 10:32:48 2018 -0700
+
+    altos-map: Switch from json FD ops to json FILE ops
+    
+    Older versions (in Debian stable) do not have the fd-based operations.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6f911b92652de890ebff67b3b28f21a36f300ebf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 10:03:31 2018 -0700
+
+    altos-mapd: Handle clients failing to send valid JSON
+    
+    Just bail if the data we receive doesn't generate a json value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b631f88b0bf19c6740eb21b65bd4be7c25049773
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 10:02:26 2018 -0700
+
+    altosuilib: InputEvent.getModifiers is deprecated, use getModifiersEx
+    
+    Some java change; seems like it's a no-op for us.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5c957107ee5917d865eb866319f86cf8c109f212
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 10:01:30 2018 -0700
+
+    altosui/altosdroid: Disable offline map type selections
+    
+    Our server only supports hybrid maps for now. If that changes, we can
+    re-add this support easily enough.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e4f4183ce206d4cb7bbc89e1065eb34b05cf11c4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 09:39:27 2018 -0700
+
+    altosuilib: Remove GrabNDrag.java
+    
+    This isn't used anymore.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit af678be97e419a1167a0630f28bcaba82d67929b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 7 09:22:44 2018 -0700
+
+    map-server: Implement altos-map in C
+    
+    This app is all about startup time, and java starts
+    slowly. Re-implement in C to improve server performance.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b248524d4bd2c3ab64899b133230d131258396c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 23:32:24 2018 -0700
+
+    altosdroid: Restore google maps key setting
+    
+    Only for altosdroid, and use a key restricted to our app
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7eb475a9694327809b7ab5a9f419d00e0819a47d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 23:25:50 2018 -0700
+
+    altosdroid: Set offline map scale to 1
+    
+    Offline maps only supports scale 1 now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 417ec9c2a42bbe74f3aba4d00b42eb14dd6eb079
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 23:22:26 2018 -0600
+
+    altos-mapd: Install systemd service file and defaults file
+    
+    This lets the map service 'just work' if enabled.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 64d6689f97dfbed13533350dcb75a0a6a3d11c78
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 21:32:12 2018 -0700
+
+    altos-map: Support version query from application
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7c39a4509b0d4a428fcb83602a8dae1c158faf37
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 21:30:03 2018 -0700
+
+    altosuilib: Fix offline map messages to match new meanings
+    
+    forbidden means outside of launch area.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a8f4af38d7abbb1da922b5e4d84af218475f1752
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 21:30:58 2018 -0700
+
+    altoslib: Retry map connections 10 times on network failure
+    
+    This covers a host of problems between the application and google maps.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fab890328d4e1151932621a317226bc291b853da
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 21:30:03 2018 -0700
+
+    altosdroid: Fix offline map messages to match new meanings
+    
+    forbidden means outside of launch area.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff5faf1cc710b7e9299dcaec719bc2421f4ca5b4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 20:21:07 2018 -0700
+
+    altoslib: Change map loading to lat=&lon= from center=
+    
+    This is easier to parse.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 21c630af7181a03b44cfcfa1cc787212501785ec
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 20:20:33 2018 -0700
+
+    altoslib: Use https for launch-sites.txt
+    
+    http causes a redirect, which Java doesn't handle
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a203aa6e3ed67337b752f939da956856e208c28b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 22:28:36 2018 -0600
+
+    altos-mapd: Install altosmapd.jar file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1b841e14d11b3a9e7a754730b1d87b30d22f3dd4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 22:27:58 2018 -0600
+
+    altos-mapd: Make cache service listen queue longer
+    
+    Just in case the service gets busy, make the listen queue longer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 02adfb13297f7dffcd8edcdd3b8747cf52b2a70b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 22:27:20 2018 -0600
+
+    altos-mapd: Clean up log messages
+    
+    Generate a single log message per request with remote address,
+    parameters and result code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 839e3a413a60c6a61851a94cc299de701ab5c277
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 22:26:46 2018 -0600
+
+    altos-mapd: remove debug printf
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 026c735393f6029d09011dba1d5c780322921921
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 22:25:48 2018 -0600
+
+    altos-map: Retry connection to cache service
+    
+    Just in case the cache service gets busy, retry the connection instead
+    of immediately failing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e7c0bcd945f8365e86e99b9d450f3a3389fa0e66
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 19:33:51 2018 -0700
+
+    altos-mapd: Add geo-fencing for map requests. Add port and key arguments
+    
+    Map requests are now limited to a region within 17km of any registered
+    launch site.
+    
+    The --port argument allows the listen port to be changed.
+    
+    The --key argument provides the name of a file containing the Google
+    maps API key.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c7b1f3c6722ae59d09a888084075664446ff2768
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 19:29:01 2018 -0700
+
+    altoslib: Switch to maps.altusmetrum.org when no google map key is available
+    
+    The map key is only usable from maps.altusmetrum.org at this point,
+    and that service will be proxying for everyone in the near future.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fe761eb413430c061b12f6ca8003665e56e20262
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 19:27:43 2018 -0700
+
+    altoslib: Allow launch site URL to be overridden at runtime
+    
+    Expose a public variable, AltosLaunchSites.launch_sites_url, that will
+    be used in place of the environment variable or pre-defined value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 073ebc77bbd813eb97c515ecf3c2d104d6157843
+Merge: fb167d9f 9e29ac8e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 6 18:55:05 2018 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit fb167d9f589d3e42e0f99b9f454a51a31e09050a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 6 18:54:35 2018 -0600
+
+    altoslib: update launch-sites.txt location to new home at maps.altusmetrum.org
+
+commit 9e29ac8ed9a48fc4ac8e769eeb131dd7c58fedc4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 17:17:20 2018 -0700
+
+    doc: Make use of 'faketime' configurable with configure.ac. Default to 'no'
+    
+    This ensures that older a2x versions don't simply wedge while building
+    the docs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cabfcb078950238cdaee4e6ec4702195feaabc7b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 18:11:48 2018 -0600
+
+    altos-mapd: Use command line to pass map directory in
+    
+    Don't bother with a default value, just require a command line param.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e405ec771b812f0ff78abbe813c3a793ae129487
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 18:11:13 2018 -0600
+
+    altos-map: Install .jar file for altos-map
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a372152654613fd8479ed4687b987ae2a513adf6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 18:10:57 2018 -0600
+
+    altos-map: Fix altos-map HTTP syntax
+    
+    Add blank line between header and content.
+    Make error pages have actual HTML content.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b817a2b854065af23c9ec8e849150e6930f51e9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 16:04:39 2018 -0700
+
+    map-server: Add maps proxy server
+    
+    This creates a map proxy server to handle the new Google Maps API requirements
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5a95ed9c9419c15352b8dc1d895c9adce30f99f5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 6 12:00:45 2018 -0700
+
+    Add map-loading documentation
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cc70746e8efa6cadb23cbfcb11ddb51574c512a9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 5 21:40:13 2018 -0700
+
+    doc: Use RELEASE_DATE to set PDF timestamps using faketime
+    
+    This ensures that the generated PDF files do not depend on the time of
+    the build and only on the date of the release.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8e87b2626cdd81c128ac0cb5db03350aff67feac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 5 19:36:20 2018 -0700
+
+    macosx: Ship install-macosx script with all apps.
+    
+    This script copies all files to ~/Applications/AltOS, then it deletes
+    all xattrs on all files so that OS X will run the java programs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a477dcbafe942af8f53e57802e228d94b526e13e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 5 18:22:59 2018 -0700
+
+    doc: Add check for new hardware in specs.inc
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bb740c830b58273ee72255320bcedb3b849c0e2c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 5 18:22:11 2018 -0700
+
+    doc: Update for 1.8.7
+    
+    Release notes
+    Add HW specs for EasyMini v2.0 and TeleMega v3.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit aeb07f2b94b0121d4e5a6ce175ce4e013d6557cf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 4 23:10:59 2018 -0700
+
+    altos: Force telemetry rate to 38400 when ao_force_freq is set
+    
+    ao_force_freq is used by TeleMini to set the radio to known
+    values. As TeleMini v3.0 also has configurable telemetry rates, this
+    value also needs to be set back to a known value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 77c3878df78ae356c442999a99f1e1752e2cd06b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 4 23:03:12 2018 -0700
+
+    doc: Describe Packet Link mode in the initial usage section
+    
+    It's not described in any detail elsewhere...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0f05859d9fdef5867df888d9a8b41602e3bff7f7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 4 22:58:38 2018 -0700
+
+    doc: Describe Packet Link usage and selecting RF param defaults for TeleMini
+    
+    Packet Link mode is the only communication method available for
+    TeleMini and deserves some special mention in the docs.
+    
+    TeleMini allows forcing of RF parameters back to known defaults by
+    hooking SWCLK to ground at power on (hole 7 to hole 3 on the debug
+    connector). Describe this process so that users will be able to get
+    TeleMini back to known values and recover.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1b43a0d4a76910c4b512b2299e17ee0d3b661990
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 4 12:12:56 2018 -0700
+
+    altoslib: Add missing AltosUnitInfo files
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 06b1fc72c8a694b3295262f1e0b50e8c88c53585
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 00:06:05 2018 -0700
+
+    altoslib: Fix gyro headings in CSV files
+    
+    Use yaw/pitch/roll instead of x/y/z
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3094d1f0ebd734f62d35e5e989d9a2368b713d29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 17:27:31 2018 -0700
+
+    ao-bringup: Add 'fix-telebt' to reflash TeleBT v4.0 with correct rf cal
+    
+    Fetches RF calibration value from the net and applies that when reflashing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c2c7873695ee2dc1b6fd153b67accad9693937aa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 17:03:28 2018 -0700
+
+    altosui: Fetch RF calibration value for TBT v4.0 units from web
+    
+    We shipped a pile of TBT v4.0 units without programming the RF
+    calibration value into flash. This change checks to see if the target
+    is in the right serial number range and has the default RF calibration
+    value, in which case it fetches the RF calibration value from our web
+    site.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d5b9fd5b3dd8c8b3bfb478d366ba07501085c1b3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 13:57:58 2018 -0700
+
+    altos: sdcc doesn't have 'false' and 'true'.
+    
+    Use FALSE and TRUE in ms5607.c driver instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2ea6454ebdf8ac7c3a24a738672c57d3f3f885c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:57:06 2018 -0700
+
+    ao-tools/ao-cal-freq: Add --nosave and --output options. Check save results.
+    
+    --nosave means don't attempt to update the on-device configuration
+      data in eeprom.
+    
+    --output means write the calibration value to a file.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 523e51d2cd2dfc5c0c4ca5a893b005916c46d46a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:49:12 2018 -0700
+
+    micropeak: Add MicroUSB 'equals' method
+    
+    This lets the code which polls for devices work with MicroUSB devices
+    too.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8dd942b59edbe6909128b88bfbb8d1e15c3857c6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 00:59:59 2018 -0700
+
+    doc: Don't accidentally create zero-length PDF files
+    
+    The PDF files are generated at the same time the HTML files are, so
+    the PDF versions depend on the HTML ones. However, touching the PDF
+    files is a bad idea.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 56dcfd4acf830fcb69c8b994e4b989c9aa7ddef3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 00:59:12 2018 -0700
+
+    altos/drivers: Shrink ao_ms5607.c code to fit on micropeak still
+    
+    Use some code constructs that make the little AVR processor happier
+    and save about 16 bytes of memory.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3c48b0fd504ae97dfaca91d2064b5822ca6e1344
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 00:52:21 2018 -0700
+
+    altoslib: Reduce debug printf spamming during flashing operation
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac8a9bc2ef301f1f18772af7d871c257a56ae70c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Aug 30 21:36:18 2018 -0600
+
+    altos: don't build fox1ihu by default
+
+commit 87ae17f888b745de71790d071846b96ab96e1529
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 17:44:02 2018 -0700
+
+    altosuilib: Provide dialog while waiting for flash target to re-appear
+    
+    On windows, switching to the boot loader can take a long time. Instead
+    of timing out after a second, show a dialog and let the user cancel
+    the operation if they get bored of waiting.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ba285ecf51e317917858740504a7d691b9839588
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 17:43:17 2018 -0700
+
+    altosuilib: Include device path in equals test of AltosUSBDevice
+    
+    Ensure that multiple AltosFlash devices don't appear the same; they
+    all use serial number 1.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 378ebab2e70917b4182cbd840a3fa66e4e42fd92
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 17:42:13 2018 -0700
+
+    altoslib: Use common constants for flash action messages
+    
+    Place messages in AltosFlashListener instead of using the same strings
+    in three different places.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 22005da598921ef6fe1a7f1bb5e56e41f44fe12f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 00:58:14 2018 -0700
+
+    altosuilib: Don't show radio parameter when reflashing radioless devices
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 75420fecbc76ab718661718ada249673e139a29d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 00:56:25 2018 -0700
+
+    altosuilib: Show a more useful message when the flash target device is unknown
+    
+    The flashing code uses the new symbol table to find information in the
+    existing device; if they don't match at all, there won't be anything
+    about the target device known. Tell the user this, rather than
+    displaying mystic information (or crashing).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d8017f921649d2176d90239e02275dc5ef793815
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 00:54:55 2018 -0700
+
+    altosuilib: Poll for devices while Select Device dialog is displayed
+    
+    Lets the user plug/unplug devices and have the dialog box show the
+    current set of available devices. Particularly useful on Windows where
+    it takes a long time after connecting a device for the OS to actually
+    make it usable.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 91bb344a74a413f7dcee379c4d760c34599749bc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 22 00:53:46 2018 -0700
+
+    altosuilib: Add 'equals' method to AltosDevice
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2f61ef9a5046c39f4eeaaf741031bb6a9607b8a6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 15 15:31:57 2018 -0700
+
+    altos: Switch global 'log' to 'ao_log_data'
+    
+    Avoid conflicts with 'log' math function.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cbe9cfd5eb5d19b7b9bf4bb75424e7592d708929
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 12:20:56 2018 +0800
+
+    altos/stmf0: Stop using 'stdin' name as local variable
+    
+    stdio kinda wants to own this name
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1bbef0879ad86dfc21610a255e6cbca1b94b5d1a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 12:19:59 2018 +0800
+
+    altos/lpc: Fix stdio wakeup on serial IRQ
+    
+    Should just use USE_SERIAL_0_STDIN directly
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f16d1e3a2f074b96aae6b9053e8e9e03bd282741
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 13 17:43:13 2018 -0700
+
+    altos: Allow timer interrupt without needing tick count
+    
+    This saves a bit of space in the fox1ihu loader which uses the timer
+    interrupt to poke the watchdog.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bb9d071d328969fc3c544897f1fc96e55a842198
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 13 17:43:57 2018 -0700
+
+    altos: Remove spurious 'const' from ao_state_names
+    
+    Current gcc complains about this.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 171d12cb7bb0ea185e9b8b6d90e1c0fb94b19008
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 12:19:19 2018 +0800
+
+    altos: Remove spurious ao_mma655x_spi_index variable
+    
+    This isn't used; was probably included for debugging at some point.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 297eb795b24ec31f6599f48bc8c3769557a7ec6f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 12:32:42 2018 +0800
+
+    Bump java lib versions to 13
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54838e3d523953e3ce4cea2319b2820c21d2c576
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 6 13:15:21 2018 +0800
+
+    Include TeleMega v3.0 firmware with releases
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55302673a3bff29ac8cd4c7656a410ba3c182845
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 12:28:25 2018 +0800
+
+    Bump version to 1.8.6.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 029259feafd63f17fc34b95cc7b1fe55e3f611c3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Aug 5 14:11:01 2018 +0800
+
+    capture updates to Releasing from 1.8.6 release process
+
+commit 3a2a5a05bb6372d9003905cee7afdfcd6d38ae7e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Aug 5 11:23:31 2018 +0800
+
+    releasing 1.8.6
+
 commit d8627bb7b46fc991786835afa38cd720e9e75812
 Merge: 59e23c27 8830fbc9
 Author: Bdale Garbee <bdale@gag.com>
