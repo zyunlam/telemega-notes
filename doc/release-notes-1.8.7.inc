@@ -8,7 +8,7 @@
 
 	* Include TeleMega v3.0 firmware
 	
-	== AltosUI, TeleGPS
+	== AltosUI, TeleGPS, MicroPeak
 
 	* Poll for new devices while Device dialog is displayed
 
@@ -25,10 +25,13 @@
 	* Add documentation about forcing TeleMini RF parameters to
           known values.
 
-	* Create a proxy server for Google Maps to re-enable map images
+	* Create a proxy server for Google Maps to re-enable map
+          images
 
-	== MicroPeak
+	* Fix Java version info in all distributed jar files so that
+          applications will run with standard Mac OS X Java.
 
-	* Poll for new devices while Device dialog is displayed
+	* Replace JavaApplicationStub for Mac OS X so that
+          applications will run with Oracle Java.
 
 	

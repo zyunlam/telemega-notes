@@ -39,10 +39,10 @@
   <?dbhtml filename="telegps-revhistory.html"?>
   <revision>
     <revnumber>1.8.7</revnumber>
-    <date>07 Oct 2018</date>
+    <date>08 Oct 2018</date>
     <revremark>
       Fix TeleBT v4.0 RF calibration to factory value when
-      reflashing. Fix map images.
+      reflashing. Fix map images. Fix Mac OS X support.
     </revremark>
   </revision>
   <revision>

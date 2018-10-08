@@ -33,9 +33,9 @@
   <?dbhtml filename="micropeak-revhistory.html"?>
   <revision>
     <revnumber>1.8.7</revnumber>
-    <date>6 October 2018</date>
+    <date>8 October 2018</date>
     <revremark>
-      Poll for MicroPeak USB while the device dialog is open.
+      Poll for MicroPeak USB while the device dialog is open. Fix Mac OS X support.
     </revremark>
   </revision>
   <revision>
