@@ -76,6 +76,15 @@
 	|1MB
 	|-
 	|3.7-12V
+
+	|EasyMini v2.0
+	|MS5607 30km (100k')
+	|-
+	|-
+	|-
+	|1MB
+	|-
+	|3.7-12V
 	endif::easymini[]
 
 	ifdef::telemega[]
@@ -93,6 +102,15 @@
 	|MMA6555 102g
 	|uBlox Max-7Q
 	|MPU6000 HMC5883
+	|8MB
+	|40mW
+	|3.7V
+
+	|TeleMega v3.0
+	|MS5607 30km (100k')
+	|MMA6555 102g
+	|uBlox Max-7Q
+	|MPU9250
 	|8MB
 	|40mW
 	|3.7V

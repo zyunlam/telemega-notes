@@ -2,7 +2,12 @@
 #	http://docbook.sourceforge.net/release/xsl/current/README
 #
 
+if FAKETIME
+FAKETIME=TZ=UTC faketime -f '$(RELEASE_DATE) 00:00:00 i0'
+endif
+
 RELNOTES_INC=\
+	release-notes-1.8.7.inc \
 	release-notes-1.8.6.inc \
 	release-notes-1.8.5.inc \
 	release-notes-1.8.4.inc \
@@ -194,7 +199,8 @@ RELNOTES_HTML=$(RELNOTES_INC:.inc=.html)
 ONEFILE_TXT_FILES=\
 	altos.txt \
 	companion.txt \
-	telemetry.txt
+	telemetry.txt \
+	map-loading.txt
 
 ONEFILE_RAW_FILES=$(ONEFILE_TXT_FILES:.txt=.raw)
 ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
@@ -215,6 +221,8 @@ HTML_REVHISTORY=\
 PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 
+MAP_DOT_FILES=map-loading.dot
+MAP_SVG_FILES=$(MAP_DOT_FILES:.dot=.svg)
 FOP_STYLE=am-fo.xsl
 HTML_STYLE=am-html.xsl
 COMMON_STYLE=common.xsl
@@ -244,7 +252,10 @@ PUBLISH_DOC=$(PUBLISH_HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
 DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 
-.SUFFIXES: .tmpl .xsl .inc .txt .raw .pdf .html
+SUFFIXES = .dot .svg .tmpl .xsl .inc .txt .raw .pdf .html
+
+.dot.svg:
+	dot -Tsvg -o$@ $*.dot
 
 .txt.raw:
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.txt > $@
@@ -253,17 +264,19 @@ DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
 .raw.html:
-	a2x --verbose -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
-	a2x --verbose -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
+	a2x -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
 	case $* in release-notes*) ./fix-html $*.html ;; esac
+	$(FAKETIME) a2x -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
 
 .html.pdf:
-	@touch $@
+	echo $@
 
 .tmpl.xsl:
 	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
 
 all:	$(HTML) $(PDF)
+
+map-loading.raw: $(MAP_SVG_FILES)
 
 altusmetrum-revhistory.html: altusmetrum.html
 

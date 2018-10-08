@@ -141,7 +141,8 @@ FIRMWARE_TBT=$(FIRMWARE_TBT_1_0) $(FIRMWARE_TBT_3_0) $(FIRMWARE_TBT_4_0)
 
 FIRMWARE_TMEGA_1_0=$(top_srcdir)/src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx
 FIRMWARE_TMEGA_2_0=$(top_srcdir)/src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx
-FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0)
+FIRMWARE_TMEGA_3_0=$(top_srcdir)/src/telemega-v3.0/telemega-v3.0-$(VERSION).ihx
+FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0)
 
 FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
 FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0)
@@ -183,7 +184,8 @@ LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) $(desktop_file).in $(L
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICONS)
+MACOSX_INSTALL=install-macosx
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICONS) $(MACOSX_INSTALL)
 MACOSX_EXTRA=$(FIRMWARE)
 
 WINDOWS_FILES=$(FAT_FILES) $(FIRMWARE) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(WINDOWS_ICONS)
@@ -374,7 +376,8 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	-rm -rf macosx
 	mkdir macosx
 	cp -a AltosUI.app macosx/
-	cp -a ReadMe-Mac.rtf macosx/ReadMe.rtf
+	cp -a $(MACOSX_INSTALL) macosx
+	cp -a ReadMe-Mac.rtf macosx/ReadMe-AltosUI.rtf
 	mkdir -p macosx/Doc
 	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/AltosUI.app/Contents

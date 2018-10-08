@@ -16,12 +16,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 import java.io.*;
+import java.util.concurrent.*;
 
-public class AltosRomconfig {
+public class AltosRomconfig implements AltosUnitInfoListener {
 	public boolean	valid;
+	public boolean	radio_calibration_broken;
 	public int	version;
 	public int	check;
 	public int	serial_number;
@@ -32,15 +34,11 @@ public class AltosRomconfig {
 	static private long find_address(AltosHexfile hexfile, String name, int len) throws AltosNoSymbol {
 		AltosHexsym symbol = hexfile.lookup_symbol(name);
 		if (symbol == null) {
-			System.out.printf("no symbol %s\n", name);
 			throw new AltosNoSymbol(name);
 		}
 		if (hexfile.address <= symbol.address && symbol.address + len <= hexfile.max_address) {
-			System.out.printf("%s: %x\n", name, symbol.address);
 			return symbol.address;
 		}
-		System.out.printf("invalid symbol addr %x len %d range is %x - %x\n",
-				  symbol.address, len, hexfile.address, hexfile.max_address);
 		throw new AltosNoSymbol(name);
 	}
 
@@ -121,40 +119,60 @@ public class AltosRomconfig {
 	final static String ao_radio_cal = "ao_radio_cal";
 	final static String ao_usb_descriptors = "ao_usb_descriptors";
 
+	Semaphore	unit_info_done;
+
+	public void notify_unit_info(AltosUnitInfo unit_info) {
+		unit_info_done.release();
+	}
+
+	private void fetch_radio_cal() {
+		unit_info_done = new Semaphore(0);
+		AltosUnitInfo	info = new AltosUnitInfo(serial_number, this);
+
+		/* Block waiting for the rf calibration data */
+		radio_calibration_broken = true;
+		try {
+			unit_info_done.acquire();
+			int new_cal = info.rfcal();
+			if (new_cal != AltosLib.MISSING) {
+				radio_calibration = new_cal;
+				radio_calibration_broken = false;
+			}
+		} catch (InterruptedException ie) {
+		}
+	}
+
 	public AltosRomconfig(AltosHexfile hexfile) {
 		try {
-			System.out.printf("Attempting symbols\n");
 			version = get_int(hexfile, ao_romconfig_version, 2);
-			System.out.printf("version %d\n", version);
 			check = get_int(hexfile, ao_romconfig_check, 2);
-			System.out.printf("check %d\n", check);
 			if (check == (~version & 0xffff)) {
 				switch (version) {
 				case 2:
 				case 1:
 					serial_number = get_int(hexfile, ao_serial_number, 2);
-					System.out.printf("serial %d\n", serial_number);
 					try {
 						radio_calibration = get_int(hexfile, ao_radio_cal, 4);
 					} catch (AltosNoSymbol missing) {
 						radio_calibration = 0;
 					}
+
 					valid = true;
+
+					/* XXX TeleBT v4.0 units originally shipped without RF calibration programmed. Go fetch
+					 * the correct value from the web site
+					 */
+					if (serial_number == 2584 ||
+					    (3686 <= serial_number && serial_number <= 3938 && radio_calibration == 5695485))
+					{
+						fetch_radio_cal();
+					}
+
 					break;
 				}
 			}
-			System.out.printf("attempting usbid\n");
 			usb_id = hexfile.find_usb_id();
-			if (usb_id == null)
-				System.out.printf("No usb id\n");
-			else
-				System.out.printf("usb id: %04x:%04x\n",
-						  usb_id.vid, usb_id.pid);
 			usb_product = hexfile.find_usb_product();
-			if (usb_product == null)
-				System.out.printf("No usb product\n");
-			else
-				System.out.printf("usb product: %s\n", usb_product);
 
 		} catch (AltosNoSymbol missing) {
 			valid = false;
@@ -197,7 +215,6 @@ public class AltosRomconfig {
 
 				if (addr < base)
 					base = addr;
-				System.out.printf("symbol %s at %x base %x\n", name, addr, base);
 			} catch (AltosNoSymbol ns) {
 				if (name_required(name))
 					throw (ns);
@@ -214,7 +231,6 @@ public class AltosRomconfig {
 				long	addr = find_address(hexfile, name, len) + len;
 				if (addr > bounds)
 					bounds = addr;
-				System.out.printf("symbol %s at %x bounds %x\n", name, addr, bounds);
 			} catch (AltosNoSymbol ns) {
 				if (name_required(name))
 					throw (ns);

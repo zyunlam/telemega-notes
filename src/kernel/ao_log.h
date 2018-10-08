@@ -507,7 +507,7 @@ typedef struct ao_log_record ao_log_type;
 #endif
 
 #ifndef AO_LOG_UNCOMMON
-extern __xdata ao_log_type log;
+extern __xdata ao_log_type ao_log_data;
 
 #define AO_LOG_SIZE sizeof(ao_log_type)
 

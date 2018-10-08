@@ -41,13 +41,13 @@ ao_log(void)
 	while (!ao_log_running)
 		ao_sleep(&ao_log_running);
 
-	log.type = AO_LOG_FLIGHT;
-	log.tick = ao_sample_tick;
+	ao_log_data.type = AO_LOG_FLIGHT;
+	ao_log_data.tick = ao_sample_tick;
 #if HAS_ACCEL
-	log.u.flight.ground_accel = ao_ground_accel;
+	ao_log_data.u.flight.ground_accel = ao_ground_accel;
 #endif
-	log.u.flight.flight = ao_flight_number;
-	ao_log_write(&log);
+	ao_log_data.u.flight.flight = ao_flight_number;
+	ao_log_write(&ao_log_data);
 
 	/* Write the whole contents of the ring to the log
 	 * when starting up.
@@ -58,38 +58,38 @@ ao_log(void)
 	for (;;) {
 		/* Write samples to EEPROM */
 		while (ao_log_data_pos != ao_sample_data) {
-			log.tick = ao_data_ring[ao_log_data_pos].tick;
-			if ((int16_t) (log.tick - next_sensor) >= 0) {
-				log.type = AO_LOG_SENSOR;
-				log.u.sensor.accel = ao_data_ring[ao_log_data_pos].adc.accel;
-				log.u.sensor.pres = ao_data_ring[ao_log_data_pos].adc.pres;
-				ao_log_write(&log);
+			ao_log_data.tick = ao_data_ring[ao_log_data_pos].tick;
+			if ((int16_t) (ao_log_data.tick - next_sensor) >= 0) {
+				ao_log_data.type = AO_LOG_SENSOR;
+				ao_log_data.u.sensor.accel = ao_data_ring[ao_log_data_pos].adc.accel;
+				ao_log_data.u.sensor.pres = ao_data_ring[ao_log_data_pos].adc.pres;
+				ao_log_write(&ao_log_data);
 				if (ao_log_state <= ao_flight_coast)
-					next_sensor = log.tick + AO_SENSOR_INTERVAL_ASCENT;
+					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_ASCENT;
 				else
-					next_sensor = log.tick + AO_SENSOR_INTERVAL_DESCENT;
+					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_DESCENT;
 			}
-			if ((int16_t) (log.tick - next_other) >= 0) {
-				log.type = AO_LOG_TEMP_VOLT;
-				log.u.temp_volt.temp = ao_data_ring[ao_log_data_pos].adc.temp;
-				log.u.temp_volt.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
-				ao_log_write(&log);
-				log.type = AO_LOG_DEPLOY;
-				log.u.deploy.drogue = ao_data_ring[ao_log_data_pos].adc.sense_d;
-				log.u.deploy.main = ao_data_ring[ao_log_data_pos].adc.sense_m;
-				ao_log_write(&log);
-				next_other = log.tick + AO_OTHER_INTERVAL;
+			if ((int16_t) (ao_log_data.tick - next_other) >= 0) {
+				ao_log_data.type = AO_LOG_TEMP_VOLT;
+				ao_log_data.u.temp_volt.temp = ao_data_ring[ao_log_data_pos].adc.temp;
+				ao_log_data.u.temp_volt.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
+				ao_log_write(&ao_log_data);
+				ao_log_data.type = AO_LOG_DEPLOY;
+				ao_log_data.u.deploy.drogue = ao_data_ring[ao_log_data_pos].adc.sense_d;
+				ao_log_data.u.deploy.main = ao_data_ring[ao_log_data_pos].adc.sense_m;
+				ao_log_write(&ao_log_data);
+				next_other = ao_log_data.tick + AO_OTHER_INTERVAL;
 			}
 			ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 		}
 		/* Write state change to EEPROM */
 		if (ao_flight_state != ao_log_state) {
 			ao_log_state = ao_flight_state;
-			log.type = AO_LOG_STATE;
-			log.tick = ao_sample_tick;
-			log.u.state.state = ao_log_state;
-			log.u.state.reason = 0;
-			ao_log_write(&log);
+			ao_log_data.type = AO_LOG_STATE;
+			ao_log_data.tick = ao_sample_tick;
+			ao_log_data.u.state.state = ao_log_state;
+			ao_log_data.u.state.reason = 0;
+			ao_log_write(&ao_log_data);
 
 			if (ao_log_state == ao_flight_landed)
 				ao_log_stop();

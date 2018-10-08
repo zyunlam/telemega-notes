@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -354,11 +354,6 @@ public class AltosHexfile {
 
 		int product_len = get_u8(a);
 
-		System.out.printf("Product is at %x length %d\n", a, product_len);
-
-		for (int i = 0; i < product_len; i++)
-			System.out.printf(" %2d: %02x\n", i, get_u8(a+i));
-
 		if (product_len <= 0)
 			return null;
 
@@ -367,12 +362,11 @@ public class AltosHexfile {
 		for (int i = 0; i < product_len - 2; i += 2) {
 			int	c = get_u16(a + 2 + i);
 
-			System.out.printf("character %x\n", c);
-
 			product += Character.toString((char) c);
 		}
 
-		System.out.printf("product %s\n", product);
+		if (AltosLink.debug)
+			System.out.printf("product %s\n", product);
 
 		return product;
 	}

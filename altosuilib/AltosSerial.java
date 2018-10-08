@@ -20,13 +20,13 @@
  * Deal with TeleDongle on a serial port
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.io.*;
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 import libaltosJNI.*;
 
 /*

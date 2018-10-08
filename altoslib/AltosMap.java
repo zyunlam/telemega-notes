@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 import java.io.*;
 import java.lang.*;
@@ -211,12 +211,14 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public boolean set_maptype(int maptype) {
+/*
 		if (maptype != this.maptype) {
 			this.maptype = maptype;
 			tiles.clear();
 			repaint();
 			return true;
 		}
+*/
 		return false;
 	}
 
@@ -339,7 +341,9 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 					AltosLatLon	ul = transform.lat_lon(point);
 					AltosLatLon	center = transform.lat_lon(new AltosPointDouble(x + AltosMap.px_size/2, y + AltosMap.px_size/2));
 					AltosMapTile tile = map_interface.new_tile(cache, ul, center, zoom, maptype, px_size, scale);
-					debug("show state %s url %s\n", AltosMapTile.status_name(tile.store.status()), tile.store.url);
+					int status = tile.store.status();
+					if (status == AltosMapTile.fetching)
+						debug("Fetching %.6f %.6f %d\n", center.lat, center.lon, zoom);
 					tile.add_listener(this);
 					tiles.put(point, tile);
 				}
@@ -350,7 +354,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	public void set_load_params(int new_zoom, int new_type, double lat, double lon, int radius, AltosMapTileListener listener) {
 		if (AltosMap.min_zoom <= new_zoom && new_zoom <= AltosMap.max_zoom)
 			zoom = new_zoom;
-		maptype = new_type;
+/*		maptype = new_type; */
 		load_centre = new AltosLatLon(lat, lon);
 		load_radius = radius;
 		load_listener = listener;

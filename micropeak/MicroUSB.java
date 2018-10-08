@@ -20,8 +20,8 @@ package org.altusmetrum.micropeak;
 
 import java.util.*;
 import libaltosJNI.*;
-import org.altusmetrum.altoslib_12.*;
-import org.altusmetrum.altosuilib_12.*;
+import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altosuilib_13.*;
 
 public class MicroUSB extends altos_device implements AltosDevice {
 
@@ -95,6 +95,25 @@ public class MicroUSB extends altos_device implements AltosDevice {
 
 	public boolean matchProduct(int product) {
 		return isFTDI() || isMicro();
+	}
+
+	public int hashCode() {
+		return getVendor() ^ getProduct() ^ getSerial() ^ getPath().hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (!(o instanceof MicroUSB))
+			return false;
+
+		MicroUSB other = (MicroUSB) o;
+
+		return getVendor() == other.getVendor() &&
+			getProduct() == other.getProduct() &&
+			getSerial() == other.getSerial() &&
+			getPath().equals(other.getPath());
 	}
 
 	static java.util.List<MicroUSB> list() {

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 import java.io.*;
 
@@ -45,7 +45,6 @@ public class AltosSelfFlash extends AltosProgrammer {
 		int b;
 		byte[]	data = new byte[len];
 
-		System.out.printf("read_memory %x %d\n", addr, len);
 		for (int offset = 0; offset < len; offset += 0x100) {
 			link.printf("R %x\n", addr + offset);
 			byte[]	reply = link.get_binary_reply(5000, 0x100);
@@ -101,7 +100,7 @@ public class AltosSelfFlash extends AltosProgrammer {
 			long flash_addr = image.address;
 			int image_start = 0;
 
-			action("start", 0);
+			action(AltosFlashListener.flash_start, 0);
 			action(0, image.data.length);
 			while (remain > 0 && !aborted) {
 				int this_time = remain;
@@ -129,7 +128,7 @@ public class AltosSelfFlash extends AltosProgrammer {
 				action(image.data.length - remain, image.data.length);
 			}
 			if (!aborted) {
-				action("done", 100);
+				action(AltosFlashListener.flash_done, 100);
 			}
 			close();
 		} catch (IOException ie) {
@@ -161,7 +160,8 @@ public class AltosSelfFlash extends AltosProgrammer {
 			long base = AltosRomconfig.fetch_base(image);
 			long bounds = AltosRomconfig.fetch_bounds(image);
 
-			System.out.printf("rom base %x bounds %x\n", base, bounds);
+			if (link.debug)
+				System.out.printf("rom base %x bounds %x\n", base, bounds);
 			return read_hexfile(base, (int) (bounds - base));
 		} catch (AltosNoSymbol ns) {
 			return null;

@@ -155,7 +155,8 @@ LINUX_EXTRA=telegps-fat $(desktop_file).in
 
 MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
-MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_README) $(DOC) $(MACOSX_ICONS)
+MACOSX_INSTALL=../altosui/install-macosx
+MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_README) $(DOC) $(MACOSX_ICONS) $(MACOSX_INSTALL)
 MACOSX_EXTRA=$(FIRMWARE)
 
 WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(top_srcdir)/altusmetrum.inf $(top_srcdir)/altusmetrum.cat $(DOC) $(WINDOWS_ICONS)
@@ -315,7 +316,8 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	-rm -rf macosx
 	mkdir macosx
 	cp -a TeleGPS.app macosx/
-	cp -a $(MACOSX_README) macosx/ReadMe.rtf
+	cp -a $(MACOSX_README) macosx/ReadMe-TeleGPS.rtf
+	cp -a $(MACOSX_INSTALL) macosx
 	mkdir -p macosx/Doc
 	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/TeleGPS.app/Contents

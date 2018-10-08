@@ -183,7 +183,9 @@ altoslib_JAVA = \
 	AltosMapLoader.java \
 	AltosMapTypeListener.java \
 	AltosJson.java \
-	AltosVersion.java
+	AltosVersion.java \
+	AltosUnitInfo.java \
+	AltosUnitInfoListener.java
 
 JAR=altoslib_$(ALTOSLIB_VERSION).jar
 

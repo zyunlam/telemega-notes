@@ -21,7 +21,7 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 import java.io.*;
 
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 import android.app.Activity;
 import android.graphics.*;
@@ -86,7 +86,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 	AltosMap		map;
 	AltosDroid		altos_droid;
 
-	static int scale = 2;
+	static int scale = 1;
 
 	AltosLatLon	here;
 	AltosLatLon	there;
@@ -160,11 +160,10 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 						message = "Internal error";
 						break;
 					case AltosMapTile.failed:
-						message = "Network error, check connection";
+						message = "Network error";
 						break;
 					case AltosMapTile.forbidden:
-						message = "Too many requests, try later";
-						AltosDebug.debug("Forbidden map response %d\n", AltosMapStore.forbidden_response);
+						message = "Outside of known launch areas";
 						break;
 					}
 					if (message != null) {

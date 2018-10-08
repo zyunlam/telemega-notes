@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -24,7 +24,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.concurrent.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class AltosFlashUI
 	extends AltosUIDialog
@@ -116,10 +116,10 @@ public class AltosFlashUI
 							      JOptionPane.ERROR_MESSAGE);
 				setVisible(false);
 				dispose();
-			} else if (cmd.equals("done")) {
+			} else if (cmd.equals(AltosFlashListener.flash_done)) {
 				setVisible(false);
 				dispose();
-			} else if (cmd.equals("start")) {
+			} else if (cmd.equals(AltosFlashListener.flash_start)) {
 				setVisible(true);
 			} else {
 				pbar.setValue(e.getID());
@@ -278,6 +278,12 @@ public class AltosFlashUI
 	}
 
 	boolean rom_config_matches (AltosRomconfig a, AltosRomconfig b) {
+		if (a == null || b == null)
+			return (a == null && b == null);
+
+		if (!a.valid || !b.valid)
+			return false;
+
 		if (a.usb_id != null && b.usb_id != null &&
 		    (a.usb_id.vid != b.usb_id.vid ||
 		     a.usb_id.pid != b.usb_id.pid))
@@ -294,19 +300,41 @@ public class AltosFlashUI
 		AltosRomconfig	new_config;
 
 		if (!rom_config_matches(existing_config, image_config)) {
+			int ret;
+			if (existing_config == null || !existing_config.valid) {
+				ret = JOptionPane.showConfirmDialog(this,
+								    String.format("Cannot determine target device type\nImage is %04x:%04x %s\nFlash anyways?",
+										  image_config.usb_id.vid,
+										  image_config.usb_id.pid,
+										  image_config.usb_product),
+								    "Unknown Target Device",
+								    JOptionPane.YES_NO_OPTION);
+			} else {
+				ret = JOptionPane.showConfirmDialog(this,
+								    String.format("Device is %04x:%04x %s\nImage is %04x:%04x %s\nFlash anyways?",
+										  existing_config.usb_id.vid,
+										  existing_config.usb_id.pid,
+										  existing_config.usb_product,
+										  image_config.usb_id.vid,
+										  image_config.usb_id.pid,
+										  image_config.usb_product),
+								    "Image doesn't match Device",
+								    JOptionPane.YES_NO_OPTION);
+			}
+			if (ret != JOptionPane.YES_OPTION)
+				return false;
+		}
+
+		if (existing_config.radio_calibration_broken) {
 			int ret = JOptionPane.showConfirmDialog(this,
-								String.format("Device is %04x:%04x %s\nImage is %04x:%04x %s\nFlash anyways?",
-									      existing_config.usb_id.vid,
-									      existing_config.usb_id.pid,
-									      existing_config.usb_product,
-									      image_config.usb_id.vid,
-									      image_config.usb_id.pid,
-									      image_config.usb_product),
-								"Image doesn't match Device",
+								String.format("Radio calibration value %d may be incorrect\nFlash anyways?",
+									      existing_config.radio_calibration),
+								"Radio Calibration Invalid",
 								JOptionPane.YES_NO_OPTION);
 			if (ret != JOptionPane.YES_OPTION)
 				return false;
 		}
+
 
 		new_config = AltosRomconfigUI.show(frame, existing_config);
 		if (new_config == null)
@@ -329,7 +357,7 @@ public class AltosFlashUI
 								    device.toShortString()),
 						      "Device in use",
 						      JOptionPane.ERROR_MESSAGE);
-		} else if (e instanceof IOException) {
+		} else {
 			JOptionPane.showMessageDialog(frame,
 						      e.getMessage(),
 						      file.toString(),
@@ -412,45 +440,235 @@ public class AltosFlashUI
 
 	flash_task	flasher;
 
-	private boolean open_device() throws InterruptedException {
-		try {
-			link = new AltosSerial(device);
-			if (is_pair_programmed())
-				return true;
 
-			if (link == null)
-				throw new IOException(String.format("%s: open failed", device.toShortString()));
+	class open_task implements Runnable {
+		AltosDevice	device;
+		Thread		t;
+		open_dialog	dialog;
 
-			while (!link.is_loader()) {
-				link.to_loader();
-
-				java.util.List<AltosDevice> devices = null;
-
-				for (int tries = 0; tries < 10; tries++) {
-					Thread.sleep(100);
-					devices = AltosUSBDevice.list(AltosLib.product_altusmetrum);
-					if (devices.size() != 0)
-						break;
-				}
-
-				if (devices.size() == 1)
-					device = devices.get(0);
-				else {
-					device = AltosDeviceUIDialog.show(frame, AltosLib.product_altusmetrum);
-					if (device == null)
-						return false;
-				}
-				link = new AltosSerial(device);
-			}
-			return true;
-		} catch (AltosSerialInUseException ee) {
-			exception(ee);
-		} catch (FileNotFoundException fe) {
-			exception(fe);
-		} catch (IOException ie) {
-			exception (ie);
+		public void do_exception(final Exception e) {
+			SwingUtilities.invokeLater(
+				new Runnable() {
+					public void run() {
+						try { dialog.open_exception(e); } catch (Exception ex) { }
+					}
+				});
 		}
-		return false;
+
+		public void do_success(final AltosLink link) {
+			SwingUtilities.invokeLater(
+				new Runnable() {
+					public void run() {
+						try { dialog.open_success(link); } catch (Exception ex) { }
+					}
+				});
+		}
+
+		public void do_failure() {
+			SwingUtilities.invokeLater(
+				new Runnable() {
+					public void run() {
+						try { dialog.open_failure(); } catch (Exception ex) { }
+					}
+				});
+		}
+
+		public void do_cancel() {
+			SwingUtilities.invokeLater(
+				new Runnable() {
+					public void run() {
+						try { dialog.open_cancel(); } catch (Exception ex) { }
+					}
+				});
+		}
+
+		public void run () {
+			try {
+				AltosLink link = null;
+
+				for (;;) {
+					System.out.printf("Attempting to open %s\n", device.toShortString());
+
+					link = new AltosSerial(device);
+
+					if (link == null)
+						throw new IOException(String.format("%s: open failed",
+										    device.toShortString()));
+
+					/* See if the link is usable already */
+					if (is_pair_programmed() || link.is_loader()) {
+						System.out.printf("Device ready for use\n");
+						do_success(link);
+						return;
+					}
+
+					java.util.List<AltosDevice> prev_devices =
+						AltosUSBDevice.list(AltosLib.product_altusmetrum);
+
+					/* Nope, switch to loader and
+					 * wait for it to re-appear
+					 */
+
+					System.out.printf("Switch to loader\n");
+
+					link.to_loader();
+
+					/* This is a bit fragile, but
+					 * I'm not sure what else to
+					 * do other than ask the user.
+					 *
+					 * Search for a device which
+					 * wasn't there before we
+					 * asked the target to switch
+					 * to loader mode
+					 */
+
+					device = null;
+					for (;;) {
+						Thread.sleep(100);
+						java.util.List<AltosDevice> devices =
+							AltosUSBDevice.list(AltosLib.product_altusmetrum);
+
+						for (AltosDevice d : devices) {
+							boolean matched = false;
+							System.out.printf("\tfound device %s\n", d.toShortString());
+							for (AltosDevice p : prev_devices)
+								if (d.equals(p)) {
+									matched = true;
+									break;
+								}
+							if (!matched) {
+								System.out.printf("Identified new device %s\n", d.toShortString());
+								device = d;
+								break;
+							}
+						}
+						if (device != null)
+							break;
+					}
+				}
+			} catch (AltosSerialInUseException ee) {
+				do_exception(ee);
+			} catch (FileNotFoundException fe) {
+				do_exception(fe);
+			} catch (IOException ie) {
+				do_exception (ie);
+			} catch (InterruptedException ie) {
+			}
+		}
+
+		public void cancel() {
+			t.interrupt();
+		}
+
+		public open_task(AltosDevice device, open_dialog dialog) {
+			this.device = device;
+			this.dialog = dialog;
+			t = new Thread(this);
+			t.start();
+		}
+	}
+
+	class open_dialog
+		extends AltosUIDialog
+		implements ActionListener
+	{
+		AltosUIFrame owner;
+
+		private JLabel	opening_label;
+		private JButton	cancel_button;
+
+		boolean done = false;
+
+		AltosLink link = null;
+
+		open_task open = null;
+
+		public void open_exception(Exception e) {
+			System.out.printf("open_exception\n");
+			setVisible(false);
+			exception(e);
+			done = true;
+		}
+
+		public void open_success(AltosLink link) {
+			System.out.printf("open_success\n");
+			setVisible(false);
+			this.link = link;
+			done = true;
+		}
+
+		public void open_failure() {
+			System.out.printf("open_failure\n");
+			setVisible(false);
+			done = true;
+		}
+
+		public void open_cancel() {
+			System.out.printf("open_cancel\n");
+			setVisible(false);
+			done = true;
+		}
+
+		public AltosLink do_open(open_task open) throws InterruptedException {
+			this.open = open;
+			setVisible(true);
+			return link;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			String cmd = e.getActionCommand();
+
+			if (cmd.equals("cancel"))
+				if (open != null)
+					open.cancel();
+			done = true;
+			setVisible(false);
+		}
+
+		public open_dialog(AltosUIFrame in_owner) {
+			super(in_owner, "Open Flash Target Device", true);
+			owner = in_owner;
+
+			Container		pane = getContentPane();
+			GridBagConstraints	c = new GridBagConstraints();
+			Insets			i = new Insets(4,4,4,4);
+
+
+			pane.setLayout(new GridBagLayout());
+
+			opening_label = new JLabel("Opening Device");
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.anchor = GridBagConstraints.LINE_START;
+			c.insets = i;
+			c.weightx = 0;
+			c.weighty = 0;
+
+			c.gridx = 0;
+			c.gridy = 0;
+
+			pane.add(opening_label, c);
+
+			cancel_button = new JButton("Cancel");
+			cancel_button.addActionListener(this);
+			cancel_button.setActionCommand("cancel");
+
+			c.gridy = 1;
+			pane.add(cancel_button, c);
+			pack();
+			setLocationRelativeTo(owner);
+		}
+	}
+
+	private boolean open_device() throws InterruptedException {
+
+		open_dialog	dialog = new open_dialog(frame);
+
+		open_task	open = new open_task(device, dialog);
+
+		link = dialog.do_open(open);
+
+		return link != null;
 	}
 
 	/*

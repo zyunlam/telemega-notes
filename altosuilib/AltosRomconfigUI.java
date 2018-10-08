@@ -16,12 +16,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_12;
+package org.altusmetrum.altosuilib_13;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class AltosRomconfigUI
 	extends AltosUIDialog
@@ -40,10 +40,10 @@ public class AltosRomconfigUI
 	JButton		cancel;
 
 	/* Build the UI using a grid bag */
-	public AltosRomconfigUI(JFrame in_owner) {
-		super (in_owner, "Configure TeleMetrum Rom Values", true);
+	public AltosRomconfigUI(JFrame frame, AltosRomconfig config) {
+		super (frame, "Configure Rom Values", true);
 
-		owner = in_owner;
+		owner = frame;
 		GridBagConstraints c;
 
 		Insets il = new Insets(4,4,4,4);
@@ -52,9 +52,11 @@ public class AltosRomconfigUI
 		pane = getContentPane();
 		pane.setLayout(new GridBagLayout());
 
+		int y = 0;
+
 		/* Serial */
 		c = new GridBagConstraints();
-		c.gridx = 0; c.gridy = 0;
+		c.gridx = 0; c.gridy = y;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.LINE_START;
@@ -63,7 +65,7 @@ public class AltosRomconfigUI
 		pane.add(serial_label, c);
 
 		c = new GridBagConstraints();
-		c.gridx = 3; c.gridy = 0;
+		c.gridx = 3; c.gridy = y;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
@@ -72,31 +74,37 @@ public class AltosRomconfigUI
 		serial_value = new JTextField("00000000");
 		pane.add(serial_value, c);
 
-		/* Radio calibration value */
-		c = new GridBagConstraints();
-		c.gridx = 0; c.gridy = 1;
-		c.gridwidth = 3;
-		c.fill = GridBagConstraints.NONE;
-		c.anchor = GridBagConstraints.LINE_START;
-		c.insets = il;
-		c.ipady = 5;
-		radio_calibration_label = new JLabel("Radio Calibration:");
-		pane.add(radio_calibration_label, c);
+		y++;
 
-		c = new GridBagConstraints();
-		c.gridx = 3; c.gridy = 1;
-		c.gridwidth = 3;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1;
-		c.anchor = GridBagConstraints.LINE_START;
-		c.insets = ir;
-		c.ipady = 5;
-		radio_calibration_value = new JTextField("00000000");
-		pane.add(radio_calibration_value, c);
+		if (AltosLib.has_radio(config.usb_id.pid)) {
+			/* Radio calibration value */
+			c = new GridBagConstraints();
+			c.gridx = 0; c.gridy = y;
+			c.gridwidth = 3;
+			c.fill = GridBagConstraints.NONE;
+			c.anchor = GridBagConstraints.LINE_START;
+			c.insets = il;
+			c.ipady = 5;
+			radio_calibration_label = new JLabel("Radio Calibration:");
+			pane.add(radio_calibration_label, c);
+
+			c = new GridBagConstraints();
+			c.gridx = 3; c.gridy = y;
+			c.gridwidth = 3;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.weightx = 1;
+			c.anchor = GridBagConstraints.LINE_START;
+			c.insets = ir;
+			c.ipady = 5;
+			radio_calibration_value = new JTextField("00000000");
+			pane.add(radio_calibration_value, c);
+
+			y++;
+		}
 
 		/* Buttons */
 		c = new GridBagConstraints();
-		c.gridx = 0; c.gridy = 2;
+		c.gridx = 0; c.gridy = y;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.CENTER;
@@ -107,7 +115,7 @@ public class AltosRomconfigUI
 		ok.setActionCommand("ok");
 
 		c = new GridBagConstraints();
-		c.gridx = 3; c.gridy = 2;
+		c.gridx = 3; c.gridy = y;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.CENTER;
@@ -117,12 +125,10 @@ public class AltosRomconfigUI
 		cancel.addActionListener(this);
 		cancel.setActionCommand("cancel");
 
+		y++;
+
 		pack();
 		setLocationRelativeTo(owner);
-	}
-
-	public AltosRomconfigUI(JFrame frame, AltosRomconfig config) {
-		this(frame);
 		set(config);
 	}
 
@@ -155,10 +161,15 @@ public class AltosRomconfigUI
 	}
 
 	int radio_calibration() {
+		if (radio_calibration_value == null)
+			return 0;
+
 		return Integer.parseInt(radio_calibration_value.getText());
 	}
 
 	void set_radio_calibration(int calibration) {
+		if (radio_calibration_value == null)
+			return;
 		radio_calibration_value.setText(String.format("%d", calibration));
 	}
 

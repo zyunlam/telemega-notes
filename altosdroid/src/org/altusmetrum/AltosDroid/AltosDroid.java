@@ -52,7 +52,7 @@ import android.hardware.usb.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
 
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 class SavedState {
 	long	received_time;
@@ -678,7 +678,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);
 		mVersion.setText("Version: " + BuildInfo.version +
-				 (AltosVersion.has_google_maps_api_key() ? " maps" : "") +
 		                 " Built: " + BuildInfo.builddate + " " + BuildInfo.buildtime + " " + BuildInfo.buildtz +
 		                 " (" + BuildInfo.branch + "-" + BuildInfo.commitnum + "-" + BuildInfo.commithash + ")");
 

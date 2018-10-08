@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_12;
+package org.altusmetrum.altoslib_13;
 
 import java.io.*;
 import java.util.*;
@@ -214,7 +214,10 @@ public class AltosMapLoader extends Thread implements AltosMapStoreListener {
 		this.min_z = min_z;
 		this.max_z = max_z;
 		this.radius = radius;
+/*
 		this.all_types = all_types;
+*/
+		this.all_types = 1 << AltosMap.maptype_hybrid;
 		this.scale = scale;
 		this.abort = false;
 		start();
