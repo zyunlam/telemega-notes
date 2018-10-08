@@ -11,10 +11,10 @@ prebuild:
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	PKG_CONFIG_PATH=/opt/stlink/lib/pkgconfig ./autogen.sh \
+	./autogen.sh \
 		--prefix=/usr \
 		--disable-install-shared-mime-info \
-		--with-google-key=/opt/google/maps-api-key
+		--enable-faketime
 	touch configure-stamp
 
 build: build-arch build-indep
@@ -58,23 +58,13 @@ binary-arch: install
 	ln -s /usr/share/altos/themes/background.png \
 		debian/altos/usr/share/slim/themes/altusmetrum/background.png
 	dh_installmenu
-#	dh_installdebconf
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
 	cp icon/org-altusmetrum-mimetypes.xml debian/altos.sharedmimeinfo
 	dh_installmime
-#	dh_python
-#	dh_installinit
-#	dh_installcron
-#	dh_installinfo
 	dh_installman
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
-#	dh_perl
-#	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
