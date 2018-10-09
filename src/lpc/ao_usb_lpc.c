@@ -1013,7 +1013,11 @@ void
 ao_usb_init(void)
 {
 #if HAS_USB_PULLUP
+	int	i;
 	ao_enable_output(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, AO_USB_PULLUP, 0);
+
+	for (i = 0; i < 40000; i++)
+		ao_arch_nop();
 #endif
 	ao_usb_enable();
 

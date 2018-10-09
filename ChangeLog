@@ -1,3 +1,37 @@
+commit f3330f019216ee2632f47be1fb06e158fb09d758
+Merge: 5a86ff43 e7136c6b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Oct 8 20:58:43 2018 -0600
+
+    Merge branch 'master' into branch-1.8
+
+commit e7136c6b413c8464d32cdc4afc28c93ba1f17a3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 8 19:42:09 2018 -0700
+
+    altos/lpc: Make sure USB pull-up is held low at boot for 'a while'
+    
+    Add a delay loop to make sure the host sees the pull-up low for long
+    enough.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e785eea7b7a14ec8c1e69cad2c88836a9b1943e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 8 19:40:32 2018 -0700
+
+    ao-bringup: Use new ao-cal-freq options when flashing teledongle v3.0
+    
+    Use --nosave and --output to get the value needed to reflash the device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5a86ff43a2b4a90dbddc1bba48019626e1b83e10
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Oct 8 17:51:33 2018 -0600
+
+    releasing 1.8.7
+
 commit 34658a1236e34891b41a0a51a480717db98779e7
 Merge: 3a2a5a05 88ae4c5e
 Author: Bdale Garbee <bdale@gag.com>
