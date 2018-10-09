@@ -8,6 +8,10 @@ altos (1.8.7-1) unstable; urgency=medium
   * update debian/rules to reflect configuration changes needed for 1.8.7
   * doc: correct specs for TeleMega v3.0, which still uses the MMA6555
   * releasing 1.8.7
+  * update changelog for Debian build
+  * patches merged upstream in 1.8.7 release
+  * we need graphviz as a build-dep for 1.8.7
+  * releasing 1.8.7
 
   [ Keith Packard ]
   * Bump version to 1.8.6.1
@@ -84,8 +88,10 @@ altos (1.8.7-1) unstable; urgency=medium
   * Switch to universal JavaApplicationStub for Mac OS X
   * doc: Note fixes for Mac OS X
   * Set version to 1.8.7
+  * ao-bringup: Use new ao-cal-freq options when flashing teledongle v3.0
+  * altos/lpc: Make sure USB pull-up is held low at boot for 'a while'
 
- -- Bdale Garbee <bdale@gag.com>  Mon, 08 Oct 2018 17:53:09 -0600
+ -- Bdale Garbee <bdale@gag.com>  Mon, 08 Oct 2018 21:02:16 -0600
 
 altos (1.8.6-2) unstable; urgency=medium
 
