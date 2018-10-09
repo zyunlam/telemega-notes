@@ -71,7 +71,9 @@ esac
 
 echo 'E 0' > $dev
 
-SERIAL=$SERIAL ./cal-freq $dev
+CALFILE=cal-$SERIAL.txt
+
+../ao-tools/ao-cal-freq/ao-cal-freq --verbose --nosave --output=$CALFILE --tty=$dev
 
 case $? in
     0)
@@ -82,7 +84,7 @@ case $? in
 	;;
 esac
 
-CAL_VALUE=`grep "^$SERIAL," cal_values | tail -1 | sed 's/^[^,]*,//'`
+CAL_VALUE=`cat $CALFILE`
 
 case "$CAL_VALUE" in
     [1-9]*)
@@ -92,6 +94,8 @@ case "$CAL_VALUE" in
 	exit 1
 	;;
 esac
+
+echo $SERIAL","$CAL_VALUE >> cal_values
 
 echo "Reflashing with calibration: $CAL_VALUE"
 
