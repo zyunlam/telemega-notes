@@ -48,14 +48,6 @@ These are Bdale's notes on how to do a release.
 
 	- update the version in configure.ac if Keith hasn't already
 
-	- make sure the Google Maps API key is in the build chroot and root
-	    (cd ~/altusmetrumllc; git pull)
-	    sudo mkdir -p /var/cache/pbuilder/base.cow/opt/google /opt/google
-	    sudo cp ~/altusmetrumllc/google-maps-api-key \
-		/var/cache/pbuilder/base.cow/opt/google/maps-api-key
-	    sudo ln -sf /home/bdale/altusmetrumllc/google-maps-api-key \
-		/opt/google/maps-api-key
-
 	- if this is an x.y release, then:
 		git checkout -b branch-<version>
 
