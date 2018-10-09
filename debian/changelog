@@ -1,3 +1,11 @@
+altos (1.8.7-2) unstable; urgency=medium
+
+  * elide map-server from set of directories built and installed by 
+    default.  Eventually, we'll refactor to put that in a new binary
+    package...
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 09 Oct 2018 09:55:40 -0600
+
 altos (1.8.7-1) unstable; urgency=medium
 
   [ Bdale Garbee ]

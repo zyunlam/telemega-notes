@@ -1,0 +1,10 @@
+diff --git a/Makefile.am b/Makefile.am
+index 89fdd6c9..4f47417e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS=ao-tools src doc icon altoslib libaltos altosuilib altosui micropeak ao-utils altosdroid telegps map-server
++SUBDIRS=ao-tools src doc icon altoslib libaltos altosuilib altosui micropeak ao-utils altosdroid telegps
+ 
+ EXTRA_DIST = ChangeLog
+ 
