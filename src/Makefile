@@ -116,11 +116,3 @@ ao_whiten.h: make-whiten
 
 clean-local: $(CLEAN_PDCLIB)
 	rm -f altitude.h ao_kalman.h
-
-pdclib:
-	mkdir -p $(PDCLIB_ROOT)/include $(PDCLIB_ROOT)/lib 
-	cd ../pdclib && make && make prefix=`pwd`/../pdclib-root install
-
-clean-pdclib:
-	rm -rf $(PDCLIB_ROOT)
-	cd ../pdclib && make clean
