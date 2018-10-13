@@ -17,9 +17,9 @@
  */
 
 #include <ao.h>
-#include <ao_hmc5883.h>
-#include <ao_mpu6000.h>
-#include <ao_mma655x.h>
+#include <ao_ms5607.h>
+#include <ao_mpu9250.h>
+#include <ao_adxl375.h>
 #include <ao_log.h>
 #include <ao_exti.h>
 #include <ao_companion.h>
@@ -43,7 +43,7 @@ main(void)
 #endif
 
 	ao_task_init();
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 	ao_led_on(LEDS_AVAILABLE);
 	ao_timer_init();
 
@@ -53,23 +53,12 @@ main(void)
 	ao_exti_init();
 
 	ao_adc_init();
-#if HAS_BEEP
 	ao_beep_init();
-#endif
 	ao_cmd_init();
 
-#if HAS_MS5607
 	ao_ms5607_init();
-#endif
-#if HAS_HMC5883
-	ao_hmc5883_init();
-#endif
-#if HAS_MPU6000
-	ao_mpu6000_init();
-#endif
-#if HAS_MMA655X
-	ao_mma655x_init();
-#endif
+	ao_mpu9250_init();
+	ao_adxl375_init();
 
 	ao_eeprom_init();
 	ao_storage_init();

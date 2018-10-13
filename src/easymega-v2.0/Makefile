@@ -19,15 +19,14 @@ INC = \
 	ao_product.h \
 	ao_ms5607.h \
 	ao_mpu9250.h \
+	ao_adxl375.h \
 	ao_profile.h \
 	ao_task.h \
 	ao_whiten.h \
 	ao_sample_profile.h \
 	ao_quaternion.h \
-	math.h \
 	ao_mpu.h \
 	stm32l.h \
-	math.h \
 	Makefile
 
 #
@@ -44,21 +43,6 @@ INC = \
 #STACK_GUARD=ao_mpu_stm.c
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
 
-MATH_SRC=\
-	ef_acos.c \
-	ef_sqrt.c \
-	ef_rem_pio2.c \
-	kf_cos.c \
-	kf_sin.c \
-	kf_rem_pio2.c \
-	sf_copysign.c \
-	sf_cos.c \
-	sf_fabs.c \
-	sf_floor.c \
-	sf_scalbn.c \
-	sf_sin.c \
-	ef_log.c
-
 ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_interrupt.c \
@@ -67,7 +51,7 @@ ALTOS_SRC = \
 	ao_cmd.c \
 	ao_config.c \
 	ao_task.c \
-	ao_led.c \
+	ao_led_stm.c \
 	ao_stdio.c \
 	ao_panic.c \
 	ao_timer.c \
@@ -79,6 +63,7 @@ ALTOS_SRC = \
 	ao_data.c \
 	ao_ms5607.c \
 	ao_mpu9250.c \
+	ao_adxl375.c \
 	ao_adc_stm.c \
 	ao_beep_stm.c \
 	ao_eeprom_stm.c \
@@ -97,7 +82,6 @@ ALTOS_SRC = \
 	ao_flight.c \
 	ao_companion.c \
 	ao_pyro.c \
-	$(MATH_SRC) \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)

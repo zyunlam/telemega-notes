@@ -25,8 +25,8 @@
 #define AO_HSE			16000000
 
 /* PLLVCO = 96MHz (so that USB will work) */
-#define AO_PLLMUL		12
-#define AO_RCC_CFGR_PLLMUL	(STM_RCC_CFGR_PLLMUL_12)
+#define AO_PLLMUL		6
+#define AO_RCC_CFGR_PLLMUL	(STM_RCC_CFGR_PLLMUL_6)
 
 /* SYSCLK = 32MHz (no need to go faster than CPU) */
 #define AO_PLLDIV		3
@@ -89,19 +89,14 @@
 
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* Barometer */
-#define SPI_1_PB3_PB4_PB5	1	/* Accelerometer, Gyro */
+#define SPI_1_PB3_PB4_PB5	1	/* Accelerometer */
 #define SPI_1_PE13_PE14_PE15	0
 #define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
 
 #define HAS_SPI_2		1
-#define SPI_2_PB13_PB14_PB15	1	/* Flash, Companion */
+#define SPI_2_PB13_PB14_PB15	1	/* Flash, IMU, Companion */
 #define SPI_2_PD1_PD3_PD4	0
 #define SPI_2_OSPEEDR		STM_OSPEEDR_10MHz
-
-#define SPI_2_PORT		(&stm_gpiob)
-#define SPI_2_SCK_PIN		13
-#define SPI_2_MISO_PIN		14
-#define SPI_2_MOSI_PIN		15
 
 #define HAS_I2C_1		1
 #define I2C_1_PB8_PB9		1
@@ -168,9 +163,6 @@
 
 /* Number of general purpose pyro channels available */
 #define AO_PYRO_NUM	4
-
-#define AO_IGNITER_SET_DROGUE(v)	stm_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, v)
-#define AO_IGNITER_SET_MAIN(v)		stm_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, v)
 
 /*
  * ADC
@@ -307,22 +299,29 @@ struct ao_adc {
  */
 
 #define HAS_MPU9250		1
-#define AO_MPU9250_INT_PORT	(&stm_gpioe)
-#define AO_MPU9250_INT_PIN	0
-#define AO_MPU9250_SPI_BUS	AO_SPI_1_PE13_PE14_PE15
-#define AO_MPU9250_SPI_CS_PORT	(&stm_gpiod)
-#define AO_MPU9250_SPI_CS_PIN	2
+#define AO_MPU9250_INT_PORT	(&stm_gpioc)
+#define AO_MPU9250_INT_PIN	15
+#define AO_MPU9250_SPI_BUS	(AO_SPI_2_PB13_PB14_PB15 | AO_SPI_MODE_0)
+#define AO_MPU9250_SPI_CS_PORT	(&stm_gpioc)
+#define AO_MPU9250_SPI_CS_PIN	13
 #define HAS_IMU			1
 
-/*
- * mma655x
- */
+/* ADXL375 */
 
-#define HAS_MMA655X		0
-#define AO_MMA655X_INVERT	0
-#define AO_MMA655X_SPI_INDEX	AO_SPI_1_PB3_PB4_PB5
-#define AO_MMA655X_CS_PORT	(&stm_gpioc)
-#define AO_MMA655X_CS_PIN	12
+#define HAS_ADXL375		1
+#define AO_ADXL375_SPI_INDEX	(AO_SPI_1_PB3_PB4_PB5 | AO_SPI_MODE_3)
+#define AO_ADXL375_CS_PORT	(&stm_gpioc)
+#define AO_ADXL375_CS_PIN	12
+#define AO_ADXL375_SPI_SPEED	AO_SPI_SPEED_4MHz
+
+#define AO_ADXL375_INT1_PORT	(&stm_gpiob)
+#define AO_ADXL375_INT1_PIN	8
+
+#define AO_ADXL375_INT2_PORT	(&stm_gpiob)
+#define AO_ADXL375_INT2_PIN	9
+
+#define AO_ADXL375_AXIS		x
+#define AO_ADXL375_INVERT	1
 
 #define NUM_CMDS		16
 
