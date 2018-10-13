@@ -77,6 +77,10 @@
 #define USE_STORAGE_CONFIG	0
 #define HAS_USB			1
 #define HAS_BEEP		1
+#define BEEPER_TIMER		3
+#define BEEPER_CHANNEL		1
+#define BEEPER_PORT		(&stm_gpioc)
+#define BEEPER_PIN		6
 #define HAS_BATTERY_REPORT	1
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0

@@ -74,9 +74,9 @@
 #define AO_RECOVERY_VALUE	0
 #define AO_RECOVERY_MODE	AO_EXTI_MODE_PULL_UP
 
-/* Beeper is on Tim1 CH3 */
+/* Beeper is on Tim3 CH4 */
 #define BEEPER_CHANNEL		4
-#define BEEPER_TIMER		2
+#define BEEPER_TIMER		3
 #define BEEPER_PORT		(&stm_gpioa)
 #define BEEPER_PIN		3
 
