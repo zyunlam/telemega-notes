@@ -62,9 +62,16 @@
 #define AO_DATA_MMA655X 0
 #endif
 
+#if HAS_ADXL375
+#include <ao_adxl375.h>
+#define AO_DATA_ADXL375 (1 << 4)
+#else
+#define AO_DATA_ADXL375 0
+#endif
+
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375)
 
 struct ao_data {
 	uint16_t			tick;
@@ -89,6 +96,9 @@ struct ao_data {
 #endif
 #if HAS_MMA655X
 	uint16_t			mma655x;
+#endif
+#if HAS_ADXL375
+	struct ao_adxl375_sample	adxl375;
 #endif
 };
 
@@ -293,6 +303,27 @@ typedef int16_t accel_t;
 
 #endif
 
+#if !HAS_ACCEL && HAS_ADXL375
+
+#define HAS_ACCEL	1
+
+typedef int16_t	accel_t;
+
+#ifndef AO_ADXL375_INVERT
+#error AO_ADXL375_INVERT not defined
+#endif
+
+#define ao_data_accel(packet)			((packet)->adxl375.AO_ADXL375_AXIS)
+#if AO_ADXL375_INVERT
+#define ao_data_accel_cook(packet)		(-ao_data_accel(packet))
+#else
+#define ao_data_accel_cook(packet)		ao_data_accel(packet)
+#endif
+#define ao_data_set_accel(packet, accel)	(ao_data_accel(packet) = (accel))
+#define ao_data_accel_invert(accel)		(-(accel))
+
+#endif /* HAS_ADXL375 */
+
 #if !HAS_ACCEL && HAS_MPU6000
 
 #define HAS_ACCEL	1
@@ -419,6 +450,9 @@ ao_data_fill(int head) {
 #endif
 #if HAS_MPU9250
 		ao_data_ring[head].mpu9250 = ao_mpu9250_current;
+#endif
+#if HAS_ADXL375
+		ao_data_ring[head].adxl375 = ao_adxl375_current;
 #endif
 		ao_data_ring[head].tick = ao_tick_count;
 		ao_data_head = ao_data_ring_next(head);
