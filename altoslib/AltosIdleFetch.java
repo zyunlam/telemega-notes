@@ -32,7 +32,7 @@ class AltosIdler {
 	static final int	idle_mag = 2;
 	static final int	idle_mma655x = 4;
 	static final int	idle_ms5607 = 5;
-
+	static final int	idle_adxl375 = 6;
 
 	static final int	idle_sensor_tm = 10;
 	static final int	idle_sensor_metrum = 11;
@@ -57,6 +57,9 @@ class AltosIdler {
 				break;
 			case idle_mma655x:
 				AltosMma655x.provide_data(listener, link);
+				break;
+			case idle_adxl375:
+				AltosAdxl375.provide_data(listener, link);
 				break;
 			case idle_ms5607:
 				AltosMs5607.provide_data(listener, link);
@@ -157,10 +160,15 @@ public class AltosIdleFetch implements AltosDataProvider {
 			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu,
 			       AltosIdler.idle_sensor_mega),
-		new AltosIdler("EasyMega",
+		new AltosIdler("EasyMega-v1",
 			       AltosIdler.idle_mma655x,
 			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu, AltosIdler.idle_mag,
+			       AltosIdler.idle_sensor_mega),
+		new AltosIdler("EasyMega-v2",
+			       AltosIdler.idle_adxl375,
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_imu,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("TeleGPS",
 			       AltosIdler.idle_gps,
