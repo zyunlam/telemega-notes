@@ -140,7 +140,8 @@ FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
 FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0)
 
 FIRMWARE_EMEGA_1_0=$(top_srcdir)/src/easymega-v1.0/easymega-v1.0-$(VERSION).ihx
-FIRMWARE_EMEGA=$(FIRMWARE_EMEGA_1_0)
+FIRMWARE_EMEGA_2_0=$(top_srcdir)/src/easymega-v2.0/easymega-v2.0-$(VERSION).ihx
+FIRMWARE_EMEGA=$(FIRMWARE_EMEGA_1_0) $(FIRMWARE_EMEGA_2_0)
 
 FIRMWARE_TGPS_1_0=$(top_srcdir)/src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx
 FIRMWARE_TGPS_2_0=$(top_srcdir)/src/telegps-v2.0/telegps-v2.0-$(VERSION).ihx

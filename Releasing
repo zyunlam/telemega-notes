@@ -103,6 +103,7 @@ These are Bdale's notes on how to do a release.
 
 	cp src/chaoskey-v1.0/{*.elf,*.ihx,*.bin} \
 	   src/easymega-v1.0/{*.elf,*.ihx} \
+	   src/easymega-v2.0/{*.elf,*.ihx} \
 	   src/easymini-v1.0/{*.elf,*.ihx} \
 	   src/easymini-v2.0/{*.elf,*.ihx} \
 	   src/telebt-v3.0/{*.elf,*.ihx} \
@@ -120,6 +121,7 @@ These are Bdale's notes on how to do a release.
 	   ~/altusmetrumllc/Binaries/
 	cp src/chaoskey-v1.0/flash-loader/{*.elf,*.bin} \
 	   src/easymega-v1.0/flash-loader/*.elf \
+	   src/easymega-v2.0/flash-loader/*.elf \
 	   src/easymini-v1.0/flash-loader/*.elf \
 	   src/easymini-v2.0/flash-loader/{*.elf,*.bin} \
 	   src/telebt-v3.0/flash-loader/*.elf \
