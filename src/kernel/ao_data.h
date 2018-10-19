@@ -400,4 +400,32 @@ typedef int16_t ao_mag_t;		/* in raw sample units */
 
 #endif
 
+#ifdef AO_DATA_RING
+
+static inline void
+ao_data_fill(int head) {
+	if (ao_data_present == AO_DATA_ALL) {
+#if HAS_MS5607
+		ao_data_ring[head].ms5607_raw = ao_ms5607_current;
+#endif
+#if HAS_MMA655X
+		ao_data_ring[head].mma655x = ao_mma655x_current;
+#endif
+#if HAS_HMC5883
+		ao_data_ring[head].hmc5883 = ao_hmc5883_current;
+#endif
+#if HAS_MPU6000
+		ao_data_ring[head].mpu6000 = ao_mpu6000_current;
+#endif
+#if HAS_MPU9250
+		ao_data_ring[head].mpu9250 = ao_mpu9250_current;
+#endif
+		ao_data_ring[head].tick = ao_tick_count;
+		ao_data_head = ao_data_ring_next(head);
+		ao_wakeup((void *) &ao_data_head);
+	}
+}
+
+#endif
+
 #endif /* _AO_DATA_H_ */
