@@ -98,8 +98,8 @@ struct ao_adxl375_total {
 	int32_t	z;
 };
 
-#define AO_ADXL375_SELF_TEST_SAMPLES	16
-#define AO_ADXL375_SELF_TEST_SETTLE	6
+#define AO_ADXL375_SELF_TEST_SAMPLES	10
+#define AO_ADXL375_SELF_TEST_SETTLE	4
 
 #define MIN_LSB_G	18.4
 #define MAX_LSB_G	22.6
@@ -108,9 +108,6 @@ struct ao_adxl375_total {
 
 #define MIN_SELF_TEST	((int32_t) (MIN_LSB_G * SELF_TEST_MIN_G * AO_ADXL375_SELF_TEST_SAMPLES + 0.5))
 #define MAX_SELF_TEST	((int32_t) (MAX_LSB_G * SELF_TEST_MAX_G * AO_ADXL375_SELF_TEST_SAMPLES + 0.5))
-
-static const int32_t	min_self_test = MIN_SELF_TEST;
-static const int32_t	max_self_test = MAX_SELF_TEST;
 
 static void
 ao_adxl375_total_value(struct ao_adxl375_total *total, int samples)
@@ -178,9 +175,6 @@ ao_adxl375_setup(void)
 	(void) ao_adxl375_total_value;
 	/* Perform self-test */
 
-#define AO_ADXL375_SELF_TEST_SAMPLES	16
-#define AO_ADXL375_SELF_TEST_SETTLE	6
-
 	struct ao_adxl375_total	self_test_off, self_test_on;
 
 	/* Discard some samples to let it settle down */
@@ -210,14 +204,12 @@ ao_adxl375_setup(void)
 
 	self_test_value = z_change;
 
-	if (z_change < min_self_test || max_self_test < z_change)
+	if (z_change < MIN_SELF_TEST || MAX_SELF_TEST < z_change)
 		ao_sensor_errors = 1;
 
 	/* Discard some samples to let it settle down */
 	ao_adxl375_total_value(&self_test_off, AO_ADXL375_SELF_TEST_SETTLE);
 }
-
-static int	adxl375_count;
 
 static void
 ao_adxl375(void)
@@ -225,7 +217,6 @@ ao_adxl375(void)
 	ao_adxl375_setup();
 	for (;;) {
 		ao_adxl375_value(&ao_adxl375_current);
-		++adxl375_count;
 		ao_arch_critical(
 			AO_DATA_PRESENT(AO_DATA_ADXL375);
 			AO_DATA_WAIT();
@@ -238,11 +229,10 @@ static struct ao_task ao_adxl375_task;
 static void
 ao_adxl375_dump(void)
 {
-	printf ("ADXL375 value %d %d %d count %d self test %d min %d max %d\n",
+	printf ("ADXL375 value %d %d %d self test %d min %d max %d\n",
 		ao_adxl375_current.x,
 		ao_adxl375_current.y,
 		ao_adxl375_current.z,
-		adxl375_count,
 		self_test_value,
 		MIN_SELF_TEST,
 		MAX_SELF_TEST);
