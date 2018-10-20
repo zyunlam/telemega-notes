@@ -261,7 +261,7 @@ public class AltosConvert {
 	static double tele_gps_voltage(int sensor) {
 		double	supply = 3.3;
 
-		return sensor / 32767.0 * supply * (5.6 + 10.0) / 10.0;
+		return sensor / 4095.0 * supply * (5.6 + 10.0) / 10.0;
 	}
 
 	static double tele_bt_3_battery(int raw) {
