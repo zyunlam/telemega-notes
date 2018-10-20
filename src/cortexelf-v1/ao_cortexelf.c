@@ -149,17 +149,16 @@ ao_fb_init(void)
 static void
 ao_video_toggle(void)
 {
-	ao_cmd_decimal();
-	if (ao_cmd_lex_i)
+	uint16_t r = ao_cmd_decimal();
+	if (r)
 		ao_fb_init();
-	ao_vga_enable(ao_cmd_lex_i);
+	ao_vga_enable(r)
 }
 
 static void
 ao_ball_toggle(void)
 {
-	ao_cmd_decimal();
-	ball_enable = ao_cmd_lex_i;
+	ball_enable = ao_cmd_decimal();
 	ao_wakeup(&ball_enable);
 }
 
@@ -208,17 +207,15 @@ led_cmd(void)
 {
 	uint8_t	start;
 	uint8_t value;
-	ao_cmd_decimal();
 
-	start = ao_cmd_lex_i;
-	ao_cmd_hex();
-	value = ao_cmd_lex_i;
+	start = ao_cmd_decimal();
+	value = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	ao_as1107_write_8(start, value);
 }
 
-__code struct ao_cmds ao_demo_cmds[] = {
+const struct ao_cmds ao_demo_cmds[] = {
 	{ ao_video_toggle, "V\0Toggle video" },
 	{ ao_ball_toggle, "B\0Toggle ball" },
 	{ ao_ps2_read_keys, "K\0Read keys from keyboard" },

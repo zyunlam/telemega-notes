@@ -26,12 +26,11 @@
 static void
 set_logging(void)
 {
-	ao_cmd_hex();
-	ao_log_running = ao_cmd_lex_i;
+	ao_log_running = ao_cmd_hex();
 	ao_wakeup(&ao_log_running);
 }
 
-__code struct ao_cmds ao_firetwo_cmds[] = {
+const struct ao_cmds ao_firetwo_cmds[] = {
         { set_logging,  "L <0 off, 1 on>\0Log sensors to flash" },
         { 0,    NULL },
 };

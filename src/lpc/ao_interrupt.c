@@ -32,7 +32,7 @@
 extern void main(void);
 extern char __stack__;
 extern char __text_start__, __text_end__;
-extern char __data_start__, __data_end__;
+extern char _start__, _end__;
 extern char __bss_start__, __bss_end__;
 #if RELOCATE_INTERRUPT
 extern char __interrupt_rom__, __interrupt_start__, __interrupt_end__;
@@ -61,7 +61,7 @@ void start(void) {
 	memcpy(&__interrupt_start__, &__interrupt_rom__, &__interrupt_end__ - &__interrupt_start__);
 	lpc_scb.sysmemremap = LPC_SCB_SYSMEMREMAP_MAP_RAM << LPC_SCB_SYSMEMREMAP_MAP;
 #endif
-	memcpy(&__data_start__, &__text_end__, &__data_end__ - &__data_start__);
+	memcpy(&_start__, &__text_end__, &_end__ - &_start__);
 	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);
 	main();
 }

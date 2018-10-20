@@ -19,8 +19,8 @@
 #include "ao.h"
 #include "ao_pwmin.h"
 
-volatile __xdata struct ao_data	ao_data_ring[AO_DATA_RING];
-volatile __data uint8_t		ao_data_head;
+volatile struct ao_data	ao_data_ring[AO_DATA_RING];
+volatile uint8_t		ao_data_head;
 
 #ifdef TELESCIENCE
 const uint8_t	adc_channels[AO_LOG_TELESCIENCE_NUM_ADC] = {
@@ -119,16 +119,16 @@ ao_adc_poll(void)
 }
 
 void
-ao_data_get(__xdata struct ao_data *packet)
+ao_data_get(struct ao_data *packet)
 {
 	uint8_t	i = ao_data_ring_prev(ao_data_head);
 	memcpy(packet, (void *) &ao_data_ring[i], sizeof (struct ao_data));
 }
 
 static void
-ao_adc_dump(void) __reentrant
+ao_adc_dump(void) 
 {
-	static __xdata struct ao_data	packet;
+	static struct ao_data	packet;
 	uint8_t i;
 	ao_data_get(&packet);
 	printf("tick: %5u",  packet.tick);
@@ -137,7 +137,7 @@ ao_adc_dump(void) __reentrant
 	printf("\n");
 }
 
-__code struct ao_cmds ao_adc_cmds[] = {
+const struct ao_cmds ao_adc_cmds[] = {
 	{ ao_adc_dump,	"a\0ADC" },
 	{ 0, NULL },
 };

@@ -23,7 +23,7 @@
 #endif
 
 #if HAS_IGNITE
-__xdata struct ao_ignition ao_ignition[2];
+struct ao_ignition ao_ignition[2];
 
 void
 ao_ignite(enum ao_igniter igniter)
@@ -42,9 +42,9 @@ ao_ignite(enum ao_igniter igniter)
 enum ao_igniter_status
 ao_igniter_status(enum ao_igniter igniter)
 {
-	__xdata struct ao_data packet;
-	__pdata int16_t value;
-	__pdata uint8_t request, firing, fired;
+	struct ao_data packet;
+	int16_t value;
+	uint8_t request, firing, fired;
 
 	ao_arch_critical(
 		ao_data_get(&packet);
@@ -72,10 +72,8 @@ ao_igniter_status(enum ao_igniter igniter)
 		return ao_igniter_unknown;
 }
 
-#ifndef AO_IGNITER_SET_DROGUE
-#define AO_IGNITER_SET_DROGUE(v)	AO_IGNITER_DROGUE = (v)
-#define AO_IGNITER_SET_MAIN(v)		AO_IGNITER_MAIN = (v)
-#endif
+#define AO_IGNITER_SET_DROGUE(v)	ao_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, v)
+#define AO_IGNITER_SET_MAIN(v)		ao_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, v)
 
 #ifndef AO_IGNITER_FIRE_TIME
 #define AO_IGNITER_FIRE_TIME		AO_MS_TO_TICKS(50)
@@ -141,7 +139,7 @@ ao_igniter_fire(enum ao_igniter igniter)
 void
 ao_igniter(void)
 {
-	__xdata enum ao_igniter igniter;
+	enum ao_igniter igniter;
 
 	ao_config_get();
 	for (;;) {
@@ -187,13 +185,13 @@ ao_ignite_manual(void)
 	ao_cmd_status = ao_cmd_syntax_error;
 }
 
-__code char * __code ao_igniter_status_names[] = {
+const char * const ao_igniter_status_names[] = {
 	"unknown", "ready", "active", "open"
 };
 
 #if HAS_IGNITE
 void
-ao_ignite_print_status(enum ao_igniter igniter, __code char *name) __reentrant
+ao_ignite_print_status(enum ao_igniter igniter, const char *name) 
 {
 	enum ao_igniter_status status = ao_igniter_status(igniter);
 	printf("Igniter: %6s Status: %s\n",
@@ -214,20 +212,20 @@ ao_ignite_test(void)
 #endif
 }
 
-__code struct ao_cmds ao_ignite_cmds[] = {
+const struct ao_cmds ao_ignite_cmds[] = {
 	{ ao_ignite_manual,	"i <key> {main|drogue}\0Fire igniter. <key> is doit with D&I" },
 	{ ao_ignite_test,	"t\0Test igniter" },
 	{ 0,	NULL },
 };
 
 #if HAS_IGNITE
-__xdata struct ao_task ao_igniter_task;
+struct ao_task ao_igniter_task;
 
 void
 ao_ignite_set_pins(void)
 {
-	ao_enable_output(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, AO_IGNITER_DROGUE, 0);
-	ao_enable_output(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, AO_IGNITER_MAIN, 0);
+	ao_enable_output(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, 0);
+	ao_enable_output(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, 0);
 }
 #endif
 

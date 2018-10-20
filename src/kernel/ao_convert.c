@@ -30,7 +30,7 @@ static const ao_v_t altitude_table[] = {
 #define ALT_FRAC_MASK	(ALT_FRAC_SCALE - 1)
 
 ao_v_t
-ao_pres_to_altitude(int16_t pres) __reentrant
+ao_pres_to_altitude(int16_t pres) 
 {
 	uint8_t	o;
 	int16_t	part;
@@ -46,7 +46,7 @@ ao_pres_to_altitude(int16_t pres) __reentrant
 
 #if AO_NEED_ALTITUDE_TO_PRES
 int16_t
-ao_altitude_to_pres(ao_v_t alt) __reentrant
+ao_altitude_to_pres(ao_v_t alt) 
 {
 	ao_v_t span, sub_span;
 	uint8_t	l, h, m;
@@ -74,7 +74,7 @@ ao_altitude_to_pres(ao_v_t alt) __reentrant
 
 #if 0
 int16_t
-ao_temp_to_dC(int16_t temp) __reentrant
+ao_temp_to_dC(int16_t temp) 
 {
 	int16_t	ret;
 

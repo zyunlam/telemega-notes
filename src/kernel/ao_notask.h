@@ -20,9 +20,9 @@
 #define _AO_NOTASK_H_
 
 uint8_t
-ao_sleep(__xdata void *wchan);
+ao_sleep(void *wchan);
 
 void
-ao_wakeup(__xdata void *wchan);
+ao_wakeup(void *wchan);
 
 #endif /* _AO_NOTASK_H_ */

@@ -54,7 +54,7 @@ ao_fake_data_read(void)
 	uint8_t	*d = (void *) &ao_fake_next;
 
 	if (getchar() == 0)
-		return FALSE;
+		return false;
 	for (i = 0; i < sizeof (struct ao_data); i++)
 		*d++ = getchar();
 	if (!ao_fake_has_offset) {
@@ -64,7 +64,7 @@ ao_fake_data_read(void)
 	} else
 		ao_fake_next.tick += ao_fake_tick_offset;
 	ao_fake_has_next = 1;
-	return TRUE;
+	return true;
 }
 
 static void
@@ -118,10 +118,10 @@ ao_fake_calib_read(void)
 		) {
 		printf ("Calibration data major version mismatch %d.%d <= %d.%d\n",
 			ao_calib.major, ao_calib.minor, AO_FAKE_CALIB_MAJOR, AO_FAKE_CALIB_MINOR);
-		return FALSE;
+		return false;
 	}
 	ao_fake_calib_set(&ao_calib);
-	return TRUE;
+	return true;
 }
 
 static void
@@ -133,14 +133,12 @@ ao_fake_flight(void)
 	enum ao_flight_state	my_state = ao_flight_invalid;
 	int			i;
 
-	ao_cmd_hex();
+	calib_size = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	calib_size = ao_cmd_lex_i;
-	ao_cmd_hex();
+	data_size = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	data_size = ao_cmd_lex_i;
 	if ((unsigned) calib_size != sizeof (struct ao_fake_calib)) {
 		printf ("calib size %d larger than actual size %d\n",
 			calib_size, sizeof (struct ao_fake_calib));

@@ -20,7 +20,7 @@
 
 static uint16_t	ao_lcd_time = 3;
 
-static __xdata uint8_t	ao_lcd_mutex;
+static uint8_t	ao_lcd_mutex;
 
 static void
 ao_lcd_delay(void)

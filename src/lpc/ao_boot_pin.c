@@ -36,7 +36,7 @@ ao_boot_check_pin(void)
 		ao_arch_nop();
 
 	/* Read the value */
-	v = ao_gpio_get(AO_BOOT_APPLICATION_GPIO, AO_BOOT_APPLICATION_PIN, AO_BOOT_APPLICATION);
+	v = ao_gpio_get(AO_BOOT_APPLICATION_GPIO, AO_BOOT_APPLICATION_PIN);
 
 	/* Reset the chip to turn off the port and the power interface clock */
 	ao_gpio_set_mode(AO_BOOT_APPLICATION_GPIO, AO_BOOT_APPLICATION_PIN, 0);

@@ -335,7 +335,7 @@ ao_rn_get_name(char *name, int len)
 static void
 ao_rn_check_link(void)
 {
-	ao_rn_connected = 1 - ao_gpio_get(AO_RN_CONNECTED_PORT, AO_RN_CONNECTED_PIN, foo);
+	ao_rn_connected = 1 - ao_gpio_get(AO_RN_CONNECTED_PORT, AO_RN_CONNECTED_PIN);
 }
 
 static void
@@ -384,17 +384,17 @@ ao_rn(void)
 	ao_rn_dbg("ao_rn top\n");
 
 	/* Select CMD mode after the device gets out of reset */
-	ao_gpio_set(AO_RN_CMD_PORT, AO_RN_CMD_PIN, foo, AO_RN_CMD_CMD);
+	ao_gpio_set(AO_RN_CMD_PORT, AO_RN_CMD_PIN, AO_RN_CMD_CMD);
 
 	for (i = 0; i < 3; i++) {
 		ao_rn_dbg("reset device\n");
 
-		ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 0);
+		ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, 0);
 		ao_delay(AO_MS_TO_TICKS(100));
 
 		/* Reboot the RN4678 and wait for it to start talking */
 		ao_rn_drain();
-		ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 1);
+		ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, 1);
 		status = ao_rn_wait_for(AO_RN_REBOOT_TIMEOUT, AO_RN_REBOOT_MSG);
 		if (status != AO_RN_OK) {
 			ao_rn_dbg("reboot failed\n");
@@ -468,7 +468,7 @@ ao_rn(void)
 	if (status != AO_RN_OK)
 		ao_bt_panic(4);
 
-	ao_gpio_set(AO_RN_CMD_PORT, AO_RN_CMD_PIN, foo, AO_RN_CMD_DATA);
+	ao_gpio_set(AO_RN_CMD_PORT, AO_RN_CMD_PIN, AO_RN_CMD_DATA);
 
 	/* Wait for the hardware to finish sending messages, then clear the queue */
 	ao_delay(AO_MS_TO_TICKS(200));
@@ -530,16 +530,16 @@ ao_rn_factory(void)
 	 */
 
 	/* Select our target output pin */
-	ao_enable_output(AO_RN_P3_1_PORT, AO_RN_P3_1_PIN, foo, v);
+	ao_enable_output(AO_RN_P3_1_PORT, AO_RN_P3_1_PIN, v);
 
 	/* Turn off the BT device using the SW_BTN pin */
 	printf("Power down BT\n"); flush();
-	ao_gpio_set(AO_RN_SW_BTN_PORT, AO_RN_SW_BTN_PIN, foo, 0);
+	ao_gpio_set(AO_RN_SW_BTN_PORT, AO_RN_SW_BTN_PIN, 0);
 	ao_delay(AO_MS_TO_TICKS(1000));
 
 	/* And turn it back on */
 	printf("Power up BT\n"); flush();
-	ao_gpio_set(AO_RN_SW_BTN_PORT, AO_RN_SW_BTN_PIN, foo, 1);
+	ao_gpio_set(AO_RN_SW_BTN_PORT, AO_RN_SW_BTN_PIN, 1);
 
 	/* Right after power on, poke P3_1 five times to force a
 	 * factory reset
@@ -547,7 +547,7 @@ ao_rn_factory(void)
 	for (i = 0; i < 20; i++) {
 		v = 1-v;
 		ao_delay(AO_MS_TO_TICKS(50));
-		ao_gpio_set(AO_RN_P3_1_PORT, AO_RN_P3_1_PIN, foo, v);
+		ao_gpio_set(AO_RN_P3_1_PORT, AO_RN_P3_1_PIN, v);
 		ao_led_toggle(AO_BT_LED);
 	}
 
@@ -556,9 +556,9 @@ ao_rn_factory(void)
 
 	printf("Reboot BT\n"); flush();
 	ao_delay(AO_MS_TO_TICKS(100));
-	ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 0);
+	ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, 0);
 	ao_delay(AO_MS_TO_TICKS(100));
-	ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 1);
+	ao_gpio_set(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, 1);
 }
 
 #if AO_RN_DEBUG
@@ -588,13 +588,13 @@ ao_rn4678_init(void)
 	ao_serial_rn_set_speed(AO_SERIAL_SPEED_115200);
 
 	/* Reset line */
-	ao_enable_output(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, foo, 0);
+	ao_enable_output(AO_RN_RST_N_PORT, AO_RN_RST_N_PIN, 0);
 
 	/* SW_BTN */
-	ao_enable_output(AO_RN_SW_BTN_PORT, AO_RN_SW_BTN_PIN, foo, 1);
+	ao_enable_output(AO_RN_SW_BTN_PORT, AO_RN_SW_BTN_PIN, 1);
 
 	/* P3_7 command/data selector */
-	ao_enable_output(AO_RN_CMD_PORT, AO_RN_CMD_PIN, foo, AO_RN_CMD_CMD);
+	ao_enable_output(AO_RN_CMD_PORT, AO_RN_CMD_PIN, AO_RN_CMD_CMD);
 
 	ao_enable_input(AO_RN_CONNECTED_PORT, AO_RN_CONNECTED_PIN, AO_EXTI_MODE_PULL_NONE);
 	ao_exti_setup(AO_RN_CONNECTED_PORT, AO_RN_CONNECTED_PIN,

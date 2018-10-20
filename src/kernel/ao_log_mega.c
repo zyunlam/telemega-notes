@@ -22,7 +22,7 @@
 #include <ao_flight.h>
 
 #if HAS_FLIGHT
-static __data uint8_t	ao_log_data_pos;
+static uint8_t	ao_log_data_pos;
 
 /* a hack to make sure that ao_log_megas fill the eeprom block in even units */
 typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_mega))] ;
@@ -36,7 +36,7 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_mega))] ;
 void
 ao_log(void)
 {
-	__pdata uint16_t	next_sensor, next_other;
+	uint16_t	next_sensor, next_other;
 	uint8_t			i;
 
 	ao_storage_setup();

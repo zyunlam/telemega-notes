@@ -21,7 +21,7 @@
 #include <ao_data.h>
 #include <ao_flight.h>
 
-static __data uint8_t	ao_log_data_pos;
+static uint8_t	ao_log_data_pos;
 
 /* a hack to make sure that ao_log_minis fill the eeprom block in even units */
 typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_mini))] ;
@@ -34,7 +34,7 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_mini))] ;
 void
 ao_log(void)
 {
-	__pdata uint16_t	next_sensor;
+	uint16_t	next_sensor;
 
 	ao_storage_setup();
 

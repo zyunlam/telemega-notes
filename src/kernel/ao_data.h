@@ -62,9 +62,16 @@
 #define AO_DATA_MMA655X 0
 #endif
 
+#if HAS_ADXL375
+#include <ao_adxl375.h>
+#define AO_DATA_ADXL375 (1 << 4)
+#else
+#define AO_DATA_ADXL375 0
+#endif
+
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375)
 
 struct ao_data {
 	uint16_t			tick;
@@ -90,6 +97,9 @@ struct ao_data {
 #if HAS_MMA655X
 	uint16_t			mma655x;
 #endif
+#if HAS_ADXL375
+	struct ao_adxl375_sample	adxl375;
+#endif
 };
 
 #define ao_data_ring_next(n)	(((n) + 1) & (AO_DATA_RING - 1))
@@ -97,12 +107,12 @@ struct ao_data {
 
 /* Get a copy of the last complete sample set */
 void
-ao_data_get(__xdata struct ao_data *packet);
+ao_data_get(struct ao_data *packet);
 
-extern volatile __xdata struct ao_data	ao_data_ring[AO_DATA_RING];
-extern volatile __data uint8_t		ao_data_head;
-extern volatile __data uint8_t		ao_data_present;
-extern volatile __data uint8_t		ao_data_count;
+extern volatile struct ao_data	ao_data_ring[AO_DATA_RING];
+extern volatile uint8_t		ao_data_head;
+extern volatile uint8_t		ao_data_present;
+extern volatile uint8_t		ao_data_count;
 
 /*
  * Mark a section of data as ready, check for data complete
@@ -113,9 +123,7 @@ extern volatile __data uint8_t		ao_data_count;
  * Wait until it is time to write a sensor sample; this is
  * signaled by the timer tick
  */
-#define AO_DATA_WAIT() do {				\
-		ao_sleep(DATA_TO_XDATA ((void *) &ao_data_count));	\
-	} while (0)
+#define AO_DATA_WAIT() 		ao_sleep((void *) &ao_data_count)
 
 #endif /* AO_DATA_RING */
 
@@ -295,6 +303,27 @@ typedef int16_t accel_t;
 
 #endif
 
+#if !HAS_ACCEL && HAS_ADXL375
+
+#define HAS_ACCEL	1
+
+typedef int16_t	accel_t;
+
+#ifndef AO_ADXL375_INVERT
+#error AO_ADXL375_INVERT not defined
+#endif
+
+#define ao_data_accel(packet)			((packet)->adxl375.AO_ADXL375_AXIS)
+#if AO_ADXL375_INVERT
+#define ao_data_accel_cook(packet)		(-ao_data_accel(packet))
+#else
+#define ao_data_accel_cook(packet)		ao_data_accel(packet)
+#endif
+#define ao_data_set_accel(packet, accel)	(ao_data_accel(packet) = (accel))
+#define ao_data_accel_invert(accel)		(-(accel))
+
+#endif /* HAS_ADXL375 */
+
 #if !HAS_ACCEL && HAS_MPU6000
 
 #define HAS_ACCEL	1
@@ -399,6 +428,37 @@ typedef int16_t ao_mag_t;		/* in raw sample units */
 #define ao_data_mag_along(packet)	((packet)->mpu9250.mag_x)
 #define ao_data_mag_across(packet)	((packet)->mpu9250.mag_y)
 #define ao_data_mag_through(packet)	((packet)->mpu9250.mag_z)
+
+#endif
+
+#ifdef AO_DATA_RING
+
+static inline void
+ao_data_fill(int head) {
+	if (ao_data_present == AO_DATA_ALL) {
+#if HAS_MS5607
+		ao_data_ring[head].ms5607_raw = ao_ms5607_current;
+#endif
+#if HAS_MMA655X
+		ao_data_ring[head].mma655x = ao_mma655x_current;
+#endif
+#if HAS_HMC5883
+		ao_data_ring[head].hmc5883 = ao_hmc5883_current;
+#endif
+#if HAS_MPU6000
+		ao_data_ring[head].mpu6000 = ao_mpu6000_current;
+#endif
+#if HAS_MPU9250
+		ao_data_ring[head].mpu9250 = ao_mpu9250_current;
+#endif
+#if HAS_ADXL375
+		ao_data_ring[head].adxl375 = ao_adxl375_current;
+#endif
+		ao_data_ring[head].tick = ao_tick_count;
+		ao_data_head = ao_data_ring_next(head);
+		ao_wakeup((void *) &ao_data_head);
+	}
+}
 
 #endif
 

@@ -35,7 +35,7 @@
 extern void main(void);
 extern char __stack__;
 extern char __text_start__, __text_end__;
-extern char __data_start__, __data_end__;
+extern char _start__, _end__;
 extern char __bss_start__, __bss_end__;
 #if RELOCATE_INTERRUPT
 extern char __interrupt_rom__, __interrupt_start__, __interrupt_end__;
@@ -88,7 +88,7 @@ void start(void)
 	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
 		(STM_SYSCFG_CFGR1_MEM_MODE_MAIN_FLASH << STM_SYSCFG_CFGR1_MEM_MODE);
 #endif
-	memcpy(&__data_start__, &__text_end__, &__data_end__ - &__data_start__);
+	memcpy(&_start__, &__text_end__, &_end__ - &_start__);
 	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);
 	main();
 }

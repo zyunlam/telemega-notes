@@ -25,6 +25,10 @@
 #define HAS_FLIGHT		0
 #define HAS_USB			1
 #define HAS_BEEP		0
+#define BEEPER_TIMER		3
+#define BEEPER_CHANNEL		1
+#define BEEPER_PORT		(&stm_gpioc)
+#define BEEPER_PIN		6
 #define HAS_GPS			0
 #define HAS_SERIAL_1		0
 #define HAS_ADC			1
@@ -107,7 +111,7 @@
 #define AO_CC1200_INT_GPIO	2
 #define AO_CC1200_INT_GPIO_IOCFG	CC1200_IOCFG2
 
-#define LED_PER_LED		1
+#define HAS_LED			1
 #define LED_TYPE		uint16_t
 
 /* Continuity leds 1-8 */
@@ -128,14 +132,8 @@
 #define LED_7_PORT		(&stm_gpioa)
 #define LED_7_PIN		10
 
-#define LED_PIN_CONTINUITY_0	0
-#define LED_PIN_CONTINUITY_1	1
-#define LED_PIN_CONTINUITY_2	2
-#define LED_PIN_CONTINUITY_3	3
-#define LED_PIN_CONTINUITY_4	4
-#define LED_PIN_CONTINUITY_5	5
-#define LED_PIN_CONTINUITY_6	6
-#define LED_PIN_CONTINUITY_7	7
+#define AO_LED_CONTINUITY(c)	(1 << (c))
+#define AO_LED_CONTINUITY_MASK	(0xff)
 
 /* ARM */
 #define LED_8_PORT		(&stm_gpioe)
@@ -151,19 +149,10 @@
 #define LED_11_PORT		(&stm_gpioe)
 #define LED_11_PIN		6
 
-#define LED_PIN_GREEN		9
-#define LED_PIN_AMBER		10
-#define LED_PIN_RED		11
-
-#define AO_LED_CONTINUITY(c)	(1 << (c))
-#define AO_LED_CONTINUITY_MASK	(0xff)
-
-#define AO_LED_ARMED		(1 << LED_PIN_ARMED)
-#define AO_LED_GREEN		(1 << LED_PIN_GREEN)
-#define AO_LED_AMBER		(1 << LED_PIN_AMBER)
-#define AO_LED_RED		(1 << LED_PIN_RED)
-
-#define LEDS_AVAILABLE		(0xfff)
+#define AO_LED_ARMED		AO_LED_8
+#define AO_LED_GREEN		AO_LED_9
+#define AO_LED_AMBER		AO_LED_10
+#define AO_LED_RED		AO_LED_11
 
 /* Alarm A */
 #define AO_SIREN

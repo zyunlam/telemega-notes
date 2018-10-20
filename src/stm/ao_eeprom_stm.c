@@ -117,10 +117,10 @@ ao_intflash_read(uint16_t pos)
  */
 
 uint8_t
-ao_eeprom_write(ao_pos_t pos32, __xdata void *v, uint16_t len)
+ao_eeprom_write(ao_pos_t pos32, void *v, uint16_t len)
 {
 	uint16_t pos = pos32;
-	__xdata uint8_t *d = v;
+	uint8_t *d = v;
 
 	if (pos >= ao_eeprom_total || pos + len > ao_eeprom_total)
 		return 0;
@@ -151,7 +151,7 @@ ao_eeprom_write(ao_pos_t pos32, __xdata void *v, uint16_t len)
  * Read from eeprom
  */
 uint8_t
-ao_eeprom_read(ao_pos_t pos, __xdata void *v, uint16_t len)
+ao_eeprom_read(ao_pos_t pos, void *v, uint16_t len)
 {
 	uint8_t	*d = v;
 	

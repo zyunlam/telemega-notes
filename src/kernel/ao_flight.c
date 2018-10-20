@@ -47,28 +47,28 @@
 
 /* Main flight thread. */
 
-__pdata enum ao_flight_state	ao_flight_state;	/* current flight state */
-__pdata uint16_t		ao_boost_tick;		/* time of most recent boost detect */
-__pdata uint16_t		ao_launch_tick;		/* time of first boost detect */
-__pdata uint16_t		ao_motor_number;	/* number of motors burned so far */
+enum ao_flight_state	ao_flight_state;	/* current flight state */
+uint16_t		ao_boost_tick;		/* time of most recent boost detect */
+uint16_t		ao_launch_tick;		/* time of first boost detect */
+uint16_t		ao_motor_number;	/* number of motors burned so far */
 
 #if HAS_SENSOR_ERRORS
 /* Any sensor can set this to mark the flight computer as 'broken' */
-__xdata uint8_t			ao_sensor_errors;
+uint8_t			ao_sensor_errors;
 #endif
 
 /*
  * track min/max data over a long interval to detect
  * resting
  */
-static __data uint16_t		ao_interval_end;
-static __data ao_v_t		ao_interval_min_height;
-static __data ao_v_t		ao_interval_max_height;
+static uint16_t		ao_interval_end;
+static ao_v_t		ao_interval_min_height;
+static ao_v_t		ao_interval_max_height;
 #if HAS_ACCEL
-static __data ao_v_t		ao_coast_avg_accel;
+static ao_v_t		ao_coast_avg_accel;
 #endif
 
-__pdata uint8_t			ao_flight_force_idle;
+uint8_t			ao_flight_force_idle;
 
 /* We also have a clock, which can be used to sanity check things in
  * case of other failures
@@ -175,7 +175,7 @@ ao_flight(void)
 #endif
 			}
 			/* wakeup threads due to state change */
-			ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+			ao_wakeup(&ao_flight_state);
 
 			break;
 		case ao_flight_pad:
@@ -219,7 +219,7 @@ ao_flight(void)
 				ao_wakeup(&ao_gps_new);
 #endif
 
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 		case ao_flight_boost:
@@ -244,7 +244,7 @@ ao_flight(void)
 				ao_flight_state = ao_flight_coast;
 #endif
 				++ao_motor_number;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 #if HAS_ACCEL
@@ -257,7 +257,7 @@ ao_flight(void)
 			if (ao_speed < AO_MS_TO_SPEED(AO_MAX_BARO_SPEED))
 			{
 				ao_flight_state = ao_flight_coast;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			} else
 				goto check_re_boost;
 			break;
@@ -306,7 +306,7 @@ ao_flight(void)
 
 				/* and enter drogue state */
 				ao_flight_state = ao_flight_drogue;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 #if HAS_ACCEL
 			else {
@@ -315,7 +315,7 @@ ao_flight(void)
 				if (ao_coast_avg_accel > AO_MSS_TO_ACCEL(20)) {
 					ao_boost_tick = ao_sample_tick;
 					ao_flight_state = ao_flight_boost;
-					ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+					ao_wakeup(&ao_flight_state);
 				}
 			}
 #endif
@@ -352,7 +352,7 @@ ao_flight(void)
 				ao_interval_min_height = ao_interval_max_height = ao_avg_height;
 
 				ao_flight_state = ao_flight_main;
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 
@@ -379,7 +379,7 @@ ao_flight(void)
 					ao_timer_set_adc_interval(0);
 #endif
 
-					ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+					ao_wakeup(&ao_flight_state);
 				}
 				ao_interval_min_height = ao_interval_max_height = ao_avg_height;
 				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;
@@ -463,7 +463,7 @@ ao_orient_test_select(void)
 	ao_orient_test = !ao_orient_test;
 }
 
-__code struct ao_cmds ao_flight_cmds[] = {
+const struct ao_cmds ao_flight_cmds[] = {
 	{ ao_flight_dump, 	"F\0Dump flight status" },
 	{ ao_gyro_test,		"G\0Test gyro code" },
 	{ ao_orient_test_select,"O\0Test orientation code" },
@@ -471,7 +471,7 @@ __code struct ao_cmds ao_flight_cmds[] = {
 };
 #endif
 
-static __xdata struct ao_task	flight_task;
+static struct ao_task	flight_task;
 
 void
 ao_flight_init(void)

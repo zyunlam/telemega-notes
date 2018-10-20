@@ -20,6 +20,6 @@
 #define _AO_FORWARD_H_
 
 void
-ao_monitor_forward_init(void) __reentrant;
+ao_monitor_forward_init(void);
 
 #endif /* _AO_FORWARD_H_ */

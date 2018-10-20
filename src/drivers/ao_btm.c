@@ -30,12 +30,12 @@
 #endif
 
 int8_t			ao_btm_stdio;
-__xdata uint8_t		ao_btm_connected;
+uint8_t		ao_btm_connected;
 
-#define BT_DEBUG 0
+#define BT_DEBUG 1
 
 #if BT_DEBUG
-__xdata char		ao_btm_buffer[256];
+char		ao_btm_buffer[256];
 uint16_t		ao_btm_ptr;
 char			ao_btm_dir;
 
@@ -76,6 +76,7 @@ ao_btm_dump(void)
 {
 	int i;
 	char c;
+	uint16_t r;
 
 	for (i = 0; i < ao_btm_ptr; i++) {
 		c = ao_btm_buffer[i];
@@ -85,8 +86,8 @@ ao_btm_dump(void)
 			putchar(ao_btm_buffer[i]);
 	}
 	putchar('\n');
-	ao_cmd_decimal();
-	if (ao_cmd_status == ao_cmd_success && ao_cmd_lex_i)
+	r = ao_cmd_decimal();
+	if (ao_cmd_status == ao_cmd_success && r)
 		ao_btm_ptr = 0;
 	ao_cmd_status = ao_cmd_success;
 }
@@ -94,13 +95,17 @@ ao_btm_dump(void)
 static void
 ao_btm_speed(void)
 {
-	ao_cmd_decimal();
-	if (ao_cmd_lex_u32 == 57600)
+	switch (ao_cmd_decimal()) {
+	case 57600:
 		ao_serial_btm_set_speed(AO_SERIAL_SPEED_57600);
-	else if (ao_cmd_lex_u32 == 19200)
+		break;
+	case 19200:
 		ao_serial_btm_set_speed(AO_SERIAL_SPEED_19200);
-	else
+		break;
+	default:
 		ao_cmd_status = ao_cmd_syntax_error;
+		break;
+	}
 }
 
 static uint8_t	ao_btm_enable;
@@ -137,7 +142,7 @@ ao_btm_send(void)
 	ao_wakeup((void *) &ao_serial_btm_rx_fifo);
 }
 
-__code struct ao_cmds ao_btm_cmds[] = {
+const struct ao_cmds ao_btm_cmds[] = {
 	{ ao_btm_dump,		"d\0Dump btm buffer." },
 	{ ao_btm_speed,		"s <19200,57600>\0Set btm serial speed." },
 	{ ao_btm_send,		"S\0BTM interactive mode. ~ to exit." },
@@ -153,7 +158,7 @@ __code struct ao_cmds ao_btm_cmds[] = {
 #endif
 
 #define AO_BTM_MAX_REPLY	16
-__xdata char		ao_btm_reply[AO_BTM_MAX_REPLY];
+char		ao_btm_reply[AO_BTM_MAX_REPLY];
 
 /*
  * Read one bluetooth character.
@@ -252,7 +257,7 @@ ao_btm_wait_reply(void)
 }
 
 void
-ao_btm_string(__code char *cmd)
+ao_btm_string(const char *cmd)
 {
 	char	c;
 
@@ -261,7 +266,7 @@ ao_btm_string(__code char *cmd)
 }
 
 uint8_t
-ao_btm_cmd(__code char *cmd)
+ao_btm_cmd(const char *cmd)
 {
 	ao_btm_drain();
 
@@ -342,7 +347,7 @@ ao_btm_check_link()
 		);
 #else
 	ao_arch_block_interrupts();
-	if (ao_gpio_get(AO_BTM_INT_PORT, AO_BTM_INT_PIN, AO_BTM_INT) == 0) {
+	if (ao_gpio_get(AO_BTM_INT_PORT, AO_BTM_INT_PIN) == 0) {
 		ao_btm_connected = 1;
 	} else {
 		ao_btm_connected = 0;
@@ -351,7 +356,7 @@ ao_btm_check_link()
 #endif
 }
 
-__xdata struct ao_task ao_btm_task;
+struct ao_task ao_btm_task;
 
 /*
  * A thread to initialize the bluetooth device and
@@ -450,7 +455,7 @@ ao_btm_init (void)
 	ao_serial_btm_set_speed(AO_SERIAL_SPEED_19200);
 
 #ifdef AO_BTM_RESET_PORT
-	ao_enable_output(AO_BTM_RESET_PORT,AO_BTM_RESET_PIN,AO_BTM_RESET,0);
+	ao_enable_output(AO_BTM_RESET_PORT,AO_BTM_RESET_PIN,0);
 #endif
 
 #ifdef AO_BTM_INT_PORT

@@ -29,13 +29,13 @@
  * the log. Tasks may wait for this to be initialized
  * by sleeping on this variable.
  */
-extern __xdata int16_t ao_flight_number;
-extern __xdata uint8_t	ao_log_mutex;
-extern __pdata uint32_t ao_log_current_pos;
-extern __pdata uint32_t ao_log_end_pos;
-extern __pdata uint32_t ao_log_start_pos;
-extern __xdata uint8_t	ao_log_running;
-extern __pdata enum ao_flight_state ao_log_state;
+extern int16_t ao_flight_number;
+extern uint8_t	ao_log_mutex;
+extern uint32_t ao_log_current_pos;
+extern uint32_t ao_log_end_pos;
+extern uint32_t ao_log_start_pos;
+extern uint8_t	ao_log_running;
+extern enum ao_flight_state ao_log_state;
 
 /* required functions from the underlying log system */
 
@@ -90,7 +90,7 @@ ao_log(void);
 
 /* Figure out the current flight number */
 uint8_t
-ao_log_scan(void) __reentrant;
+ao_log_scan(void);
 
 /* Return the position of the start of the given log slot */
 uint32_t
@@ -507,14 +507,14 @@ typedef struct ao_log_record ao_log_type;
 #endif
 
 #ifndef AO_LOG_UNCOMMON
-extern __xdata ao_log_type ao_log_data;
+extern ao_log_type ao_log_data;
 
 #define AO_LOG_SIZE sizeof(ao_log_type)
 
 /* Write a record to the eeprom log */
 
 uint8_t
-ao_log_write(__xdata ao_log_type *log) __reentrant;
+ao_log_write(ao_log_type *log);
 #endif
 
 void

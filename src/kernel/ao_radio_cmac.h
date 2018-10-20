@@ -24,10 +24,10 @@
 #define AO_CMAC_KEY_LEN		AO_AES_LEN
 #define AO_CMAC_MAX_LEN		(128 - AO_CMAC_KEY_LEN)
 
-extern __pdata int8_t ao_radio_cmac_rssi;
+extern int8_t ao_radio_cmac_rssi;
 
 int8_t
-ao_radio_cmac_send(__xdata void *packet, uint8_t len) __reentrant;
+ao_radio_cmac_send(void *packet, uint8_t len);
 
 #define AO_RADIO_CMAC_OK	0
 #define AO_RADIO_CMAC_LEN_ERROR	-1
@@ -36,7 +36,7 @@ ao_radio_cmac_send(__xdata void *packet, uint8_t len) __reentrant;
 #define AO_RADIO_CMAC_TIMEOUT	-4
 
 int8_t
-ao_radio_cmac_recv(__xdata void *packet, uint8_t len, uint16_t timeout) __reentrant;
+ao_radio_cmac_recv(void *packet, uint8_t len, uint16_t timeout);
 
 void
 ao_radio_cmac_init(void);

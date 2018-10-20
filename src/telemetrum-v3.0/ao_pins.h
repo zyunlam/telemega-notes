@@ -74,6 +74,9 @@
 #define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
 #define BEEPER_CHANNEL		4
+#define BEEPER_TIMER		3
+#define BEEPER_PORT		(&stm_gpiob)
+#define BEEPER_PIN		1
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		1
 #define HAS_APRS		1
@@ -140,9 +143,6 @@
 /* Main */
 #define AO_IGNITER_MAIN_PORT	(&stm_gpioa)
 #define AO_IGNITER_MAIN_PIN	9
-
-#define AO_IGNITER_SET_DROGUE(v)	stm_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, v)
-#define AO_IGNITER_SET_MAIN(v)		stm_gpio_set(AO_IGNITER_MAIN_PORT, AO_IGNITER_MAIN_PIN, v)
 
 /*
  * ADC

@@ -376,7 +376,7 @@ ao_beep(uint8_t beep)
 }
 
 void
-ao_beep_for(uint8_t beep, uint16_t ticks) __reentrant
+ao_beep_for(uint8_t beep, uint16_t ticks) 
 {
 	ao_beep(beep);
 	ao_delay(ticks);
@@ -386,7 +386,7 @@ ao_beep_for(uint8_t beep, uint16_t ticks) __reentrant
 void
 ao_beep_init(void)
 {
-	ao_enable_output(BEEPER_PORT, BEEPER_PIN, BEEPER, 0);
+	ao_enable_output(BEEPER_PORT, BEEPER_PIN, 0);
 
 	/* Leave the timer off until requested */
 	stm_rcc_enr &= ~(1 << STM_RCC_TIMER);

@@ -133,6 +133,18 @@ public class AltosCalData {
 		mma655x_inverted = inverted;
 	}
 
+	public boolean adxl375_inverted = false;
+
+	public void set_adxl375_inverted(boolean inverted) {
+		adxl375_inverted = inverted;
+	}
+
+	public int adxl375_axis = AltosLib.MISSING;
+
+	public void set_adxl375_axis(int axis) {
+		adxl375_axis = axis;
+	}
+
 	public int pad_orientation = AltosLib.MISSING;
 
 	public void set_pad_orientation(int orientation) {
@@ -142,7 +154,11 @@ public class AltosCalData {
 
 	/* Compute acceleration */
 	public double acceleration(double sensor) {
-		return AltosConvert.acceleration_from_sensor(sensor, accel_plus_g, accel_minus_g, ground_accel);
+		double accel;
+		accel = AltosConvert.acceleration_from_sensor(sensor, accel_plus_g, accel_minus_g, ground_accel);
+		System.out.printf("acceleration %g (+ %g - %g g %g) -> %g\n",
+				  sensor, accel_plus_g, accel_minus_g, ground_accel, accel);
+		return accel;
 	}
 
 	public AltosMs5607	ms5607 = null;
@@ -402,6 +418,14 @@ public class AltosCalData {
 		set_ms5607(config_data.ms5607);
 		try {
 			set_mma655x_inverted(config_data.mma655x_inverted());
+		} catch (AltosUnknownProduct up) {
+		}
+		try {
+			set_adxl375_inverted(config_data.adxl375_inverted());
+		} catch (AltosUnknownProduct up) {
+		}
+		try {
+			set_adxl375_axis(config_data.adxl375_axis());
 		} catch (AltosUnknownProduct up) {
 		}
 		set_pad_orientation(config_data.pad_orientation);

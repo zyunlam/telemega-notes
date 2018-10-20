@@ -208,7 +208,7 @@ ao_radio_fifo_write_fixed(uint8_t data, uint8_t len)
 static uint8_t
 ao_radio_int_pin(void)
 {
-	return ao_gpio_get(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN, AO_CC1120_INT);
+	return ao_gpio_get(AO_CC1120_INT_PORT, AO_CC1120_INT_PIN);
 }
 
 #if CC1120_DEBUG
@@ -805,8 +805,7 @@ ao_radio_test_cmd(void)
 	static uint8_t radio_on;
 	ao_cmd_white();
 	if (ao_cmd_lex_c != '\n') {
-		ao_cmd_decimal();
-		mode = (uint8_t) ao_cmd_lex_u32;
+		mode = ao_cmd_decimal();
 	}
 	mode++;
 	if ((mode & 2) && !radio_on) {
@@ -1066,7 +1065,7 @@ ao_radio_rx_wait(void)
 }
 
 uint8_t
-ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout)
+ao_radio_recv(void *d, uint8_t size, uint8_t timeout)
 {
 	uint8_t		len;
 	uint8_t		radio_rssi = 0;

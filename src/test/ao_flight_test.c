@@ -119,11 +119,7 @@ struct ao_adc {
 
 #endif
 
-#define __pdata
-#define __data
-#define __xdata
-#define __code
-#define __reentrant
+#define const
 
 #define HAS_FLIGHT 1
 #define HAS_IGNITE 1
@@ -231,8 +227,8 @@ ao_gps_angle(void)
 
 extern enum ao_flight_state ao_flight_state;
 
-#define FALSE 0
-#define TRUE 1
+#define false 0
+#define true 1
 
 volatile struct ao_data ao_data_ring[AO_DATA_RING];
 volatile uint8_t ao_data_head;
@@ -362,7 +358,7 @@ struct ao_ms5607_prom	ao_ms5607_prom;
 
 struct ao_config ao_config;
 
-#define DATA_TO_XDATA(x) (x)
+#define x (x)
 
 
 extern int16_t ao_ground_accel, ao_flight_accel;

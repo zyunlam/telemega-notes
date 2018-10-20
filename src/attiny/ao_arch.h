@@ -34,16 +34,12 @@
 
 #define AO_PORT_TYPE	uint8_t
 
+#define AO_LED_TYPE	uint8_t
+
 /* Various definitions to make GCC look more like SDCC */
 
 #define ao_arch_naked_declare	__attribute__((naked))
 #define ao_arch_naked_define
-#define __pdata
-#define __data
-#define __xdata
-#define __code const
-#define __reentrant
-#define __critical
 #define __interrupt(n)
 #define __at(n)
 
@@ -52,6 +48,8 @@
 #define ao_arch_nop()		asm("nop")
 
 #define ao_arch_interrupt(n)	/* nothing */
+
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
 
 #undef putchar
 #undef getchar

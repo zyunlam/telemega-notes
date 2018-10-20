@@ -9,10 +9,6 @@ aoschemelib=$(shell pkg-config --variable=aoschemelib ao-scheme)
 
 include $(aoschemelib)/Makefile-scheme
 
-NEWLIB_FULL=-lm -lc -lgcc
-
-LIBS=$(NEWLIB_FULL)
-
 INC = \
 	ao.h \
 	ao_arch.h \
@@ -31,10 +27,9 @@ ALTOS_SRC = \
 	ao_interrupt.c \
 	ao_product.c \
 	ao_cmd.c \
-	ao_led.c \
+	ao_led_stmf0.c \
 	ao_notask.c \
 	ao_stdio.c \
-	ao_stdio_newlib.c \
 	ao_panic.c \
 	ao_timer.c \
 	ao_usb_stm.c \
@@ -45,15 +40,7 @@ PRODUCT=LambdaKey-v1.0
 PRODUCT_DEF=-DLAMBDAKEY
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) -I. $(STMF0_CFLAGS) -Os -g
-
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tlambda.ld
-
-MAP=$(PROG).map
-NEWLIB=/local/newlib-mini
-MAPFILE=-Wl,-Map=$(MAP)
-LDFLAGS=-L../stmf0 -L$(NEWLIB)/arm-none-eabi/lib/thumb/v6-m/ -Wl,-Tlambda.ld $(MAPFILE) -nostartfiles
-AO_CFLAGS=-I. -I../stmf0 -I../kernel -I../drivers -I.. -I$(aoschemelib) -isystem $(NEWLIB)/arm-none-eabi/include -DNEWLIB
+CFLAGS = $(PRODUCT_DEF) -I. -I$(aoschemelib) $(STMF0_CFLAGS) -Os -g
 
 PROGNAME=lambdakey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -67,7 +54,7 @@ bletch:
 
 all: $(PROG) $(HEX)
 
-$(PROG): Makefile $(OBJ) lambda.ld
+$(PROG): Makefile $(OBJ)
 	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)

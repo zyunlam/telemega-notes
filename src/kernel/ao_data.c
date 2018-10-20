@@ -19,13 +19,13 @@
 #include <ao.h>
 #include <ao_data.h>
 
-volatile __xdata struct ao_data	ao_data_ring[AO_DATA_RING];
-volatile __data uint8_t		ao_data_head;
-volatile __data uint8_t		ao_data_present;
+volatile struct ao_data	ao_data_ring[AO_DATA_RING];
+volatile uint8_t		ao_data_head;
+volatile uint8_t		ao_data_present;
 
 #ifndef ao_data_count
 void
-ao_data_get(__xdata struct ao_data *packet)
+ao_data_get(struct ao_data *packet)
 {
 #if HAS_FLIGHT
 	uint8_t	i = ao_data_ring_prev(ao_sample_data);

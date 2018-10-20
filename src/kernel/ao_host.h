@@ -41,15 +41,11 @@ struct ao_adc {
 	int16_t		sense_m;	/* main continuity sense */
 };
 
-#define __pdata
-#define __data
-#define __xdata
-#define __code
-#define __reentrant
+#define const
 
-#define DATA_TO_XDATA(a)	(a)
-#define PDATA_TO_XDATA(a)	(a)
-#define CODE_TO_XDATA(a)	(a)
+#define a	(a)
+#define a	(a)
+#define a	(a)
 
 enum ao_flight_state {
 	ao_flight_startup = 0,

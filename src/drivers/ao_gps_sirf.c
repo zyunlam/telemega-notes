@@ -20,11 +20,11 @@
 #include "ao.h"
 #endif
 
-__xdata uint8_t ao_gps_new;
-__xdata uint8_t ao_gps_mutex;
-__pdata uint16_t ao_gps_tick;
-__xdata struct ao_telemetry_location	ao_gps_data;
-__xdata struct ao_telemetry_satellite	ao_gps_tracking_data;
+uint8_t ao_gps_new;
+uint8_t ao_gps_mutex;
+uint16_t ao_gps_tick;
+struct ao_telemetry_location	ao_gps_data;
+struct ao_telemetry_satellite	ao_gps_tracking_data;
 
 static const char ao_gps_set_nmea[] = "\r\n$PSRF100,0,57600,8,1,0*37\r\n";
 
@@ -107,7 +107,7 @@ struct sirf_geodetic_nav_data {
 	uint8_t		hdop;
 };
 
-static __xdata struct sirf_geodetic_nav_data	ao_sirf_data;
+static struct sirf_geodetic_nav_data	ao_sirf_data;
 
 struct sirf_measured_sat_data {
 	uint8_t		svid;
@@ -121,10 +121,10 @@ struct sirf_measured_tracker_data {
 	struct sirf_measured_sat_data	sats[12];
 };
 
-static __xdata struct sirf_measured_tracker_data	ao_sirf_tracker_data;
+static struct sirf_measured_tracker_data	ao_sirf_tracker_data;
 
-static __pdata uint16_t ao_sirf_cksum;
-static __pdata uint16_t ao_sirf_len;
+static uint16_t ao_sirf_cksum;
+static uint16_t ao_sirf_len;
 
 #ifndef ao_sirf_getchar
 #define ao_sirf_getchar		ao_serial1_getchar
@@ -142,11 +142,11 @@ static uint8_t data_byte(void)
 	return c;
 }
 
-static char __xdata *sirf_target;
+static char *sirf_target;
 
 static void sirf_u16(uint8_t offset)
 {
-	uint16_t __xdata *ptr = (uint16_t __xdata *) (sirf_target + offset);
+	uint16_t *ptr = (uint16_t *) (sirf_target + offset);
 	uint16_t val;
 
 	val = data_byte() << 8;
@@ -156,16 +156,16 @@ static void sirf_u16(uint8_t offset)
 
 static void sirf_u8(uint8_t offset)
 {
-	uint8_t __xdata *ptr = (uint8_t __xdata *) (sirf_target + offset);
+	uint8_t *ptr = (uint8_t *) (sirf_target + offset);
 	uint8_t val;
 
 	val = data_byte ();
 	*ptr = val;
 }
 
-static void sirf_u32(uint8_t offset) __reentrant
+static void sirf_u32(uint8_t offset) 
 {
-	uint32_t __xdata *ptr = (uint32_t __xdata *) (sirf_target + offset);
+	uint32_t *ptr = (uint32_t *) (sirf_target + offset);
 	uint32_t val;
 
 	val = ((uint32_t) data_byte ()) << 24;
@@ -194,7 +194,7 @@ struct sirf_packet_parse {
 };
 
 static void
-ao_sirf_parse(void __xdata *target, const struct sirf_packet_parse *parse) __reentrant
+ao_sirf_parse(void *target, const struct sirf_packet_parse *parse) 
 {
 	uint8_t	i, offset, j;
 
@@ -258,7 +258,7 @@ static const struct sirf_packet_parse geodetic_nav_data_packet[] = {
 };
 
 static void
-ao_sirf_parse_41(void) __reentrant
+ao_sirf_parse_41(void) 
 {
 	ao_sirf_parse(&ao_sirf_data, geodetic_nav_data_packet);
 }
@@ -279,7 +279,7 @@ static const struct sirf_packet_parse measured_sat_data_packet[] = {
 };
 
 static void
-ao_sirf_parse_4(void) __reentrant
+ao_sirf_parse_4(void) 
 {
 	uint8_t	i;
 	ao_sirf_parse(&ao_sirf_tracker_data, measured_tracker_data_packet);
@@ -288,7 +288,7 @@ ao_sirf_parse_4(void) __reentrant
 }
 
 static void
-ao_gps_setup(void) __reentrant
+ao_gps_setup(void) 
 {
 	uint8_t	i, k;
 	ao_sirf_set_speed(AO_SERIAL_SPEED_4800);
@@ -309,7 +309,7 @@ static const char ao_gps_set_message_rate[] = {
 };
 
 void
-ao_sirf_set_message_rate(uint8_t msg, uint8_t rate) __reentrant
+ao_sirf_set_message_rate(uint8_t msg, uint8_t rate) 
 {
 	uint16_t	cksum = 0x00a6;
 	uint8_t		i;
@@ -337,7 +337,7 @@ static const uint8_t sirf_disable[] = {
 };
 
 void
-ao_gps(void) __reentrant
+ao_gps(void) 
 {
 	uint8_t	i, k;
 	uint16_t cksum;
@@ -443,7 +443,7 @@ ao_gps(void) __reentrant
 	}
 }
 
-__xdata struct ao_task ao_gps_task;
+struct ao_task ao_gps_task;
 
 void
 ao_gps_init(void)

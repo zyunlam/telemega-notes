@@ -72,18 +72,18 @@
 
 #define AO_NUM_STDIOS	(HAS_USB + PACKET_HAS_SLAVE + USE_SERIAL_STDIN + CONSOLE_STDIN)
 
-__xdata struct ao_stdio ao_stdios[AO_NUM_STDIOS];
+struct ao_stdio ao_stdios[AO_NUM_STDIOS];
 
 #if AO_NUM_STDIOS > 1
-__pdata int8_t ao_cur_stdio;
-__pdata int8_t ao_num_stdios;
+int8_t ao_cur_stdio;
+int8_t ao_num_stdios;
 #else
-__pdata int8_t ao_cur_stdio;
+int8_t ao_cur_stdio;
 #define ao_cur_stdio	0
 #define ao_num_stdios	0
 #endif
 
-void
+int
 ao_putchar(char c)
 {
 #if LOW_LEVEL_DEBUG
@@ -92,12 +92,13 @@ ao_putchar(char c)
 		if (c == '\n')
 			ao_debug_out('\r');
 		ao_debug_out(c);
-		return;
+		return 0;
 	}
 #endif
 	if (c == '\n')
 		(*ao_stdios[ao_cur_stdio].putchar)('\r');
 	(*ao_stdios[ao_cur_stdio].putchar)(c);
+	return 0;
 }
 
 void
@@ -107,10 +108,10 @@ flush(void)
 		ao_stdios[ao_cur_stdio].flush();
 }
 
-__xdata uint8_t ao_stdin_ready;
+uint8_t ao_stdin_ready;
 
 char
-ao_getchar(void) __reentrant
+ao_getchar(void) 
 {
 	int c;
 	int8_t stdio;
@@ -144,7 +145,7 @@ ao_echo(void)
 int8_t
 ao_add_stdio(int (*_pollchar)(void),
 	     void (*putchar)(char),
-	     void (*flush)(void)) __reentrant
+	     void (*flush)(void)) 
 {
 	if (ao_num_stdios == AO_NUM_STDIOS)
 		ao_panic(AO_PANIC_STDIO);
@@ -158,3 +159,33 @@ ao_add_stdio(int (*_pollchar)(void),
 	return 0;
 #endif
 }
+
+/*
+ * Basic I/O functions to support newlib tinystdio package
+ */
+
+static int
+ao_putc(char c, FILE *ignore)
+{
+	(void) ignore;
+	return ao_putchar(c);
+}
+
+static int
+ao_getc(FILE *ignore)
+{
+	(void) ignore;
+	return ao_getchar();
+}
+
+static int
+ao_flushc(FILE *ignore)
+{
+	(void) ignore;
+	flush();
+	return 0;
+}
+
+static FILE __stdio = FDEV_SETUP_STREAM(ao_putc, ao_getc, ao_flushc, _FDEV_SETUP_RW);
+
+FILE *const __iob[3] = { &__stdio, &__stdio, &__stdio };

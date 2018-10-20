@@ -22,7 +22,7 @@
 #include <ao_fast_timer.h>
 #include <ao_event.h>
 
-__xdata int32_t ao_quadrature_count[AO_QUADRATURE_COUNT];
+int32_t ao_quadrature_count[AO_QUADRATURE_COUNT];
 #ifndef AO_QUADRATURE_SINGLE_CODE
 static int8_t ao_quadrature_step[AO_QUADRATURE_COUNT];
 #endif
@@ -170,8 +170,7 @@ ao_quadrature_test(void)
 	int8_t t = 0;
 #endif
 
-	ao_cmd_decimal();
-	q = ao_cmd_lex_i;
+	q = ao_cmd_decimal();
 	if (q >= AO_QUADRATURE_COUNT)
 		ao_cmd_status = ao_cmd_syntax_error;
 	if (ao_cmd_status != ao_cmd_success)

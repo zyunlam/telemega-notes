@@ -23,22 +23,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <ao_pins.h>
 #include <ao_arch.h>
 
-#define TRUE 1
-#define FALSE 0
+/* replace stdio macros with direct calls to our functions */
+#undef putchar
+#undef getchar
+#define putchar(c)	ao_putchar(c)
+#define getchar		ao_getchar
 
-/* Convert a __data pointer into an __xdata pointer */
-#ifndef DATA_TO_XDATA
-#define DATA_TO_XDATA(a)	(a)
-#endif
-#ifndef PDATA_TO_XDATA
-#define PDATA_TO_XDATA(a)	(a)
-#endif
-#ifndef CODE_TO_XDATA
-#define CODE_TO_XDATA(a)	(a)
-#endif
+extern int ao_putchar(char c);
+extern char ao_getchar(void);
 
 #ifndef HAS_TASK
 #define HAS_TASK	1
@@ -86,6 +82,19 @@ void
 ao_panic(uint8_t reason);
 
 /*
+ * ao_romconfig.c
+ */
+
+#define AO_ROMCONFIG_VERSION	2
+
+extern AO_ROMCONFIG_SYMBOL uint16_t ao_romconfig_version;
+extern AO_ROMCONFIG_SYMBOL uint16_t ao_romconfig_check;
+extern AO_ROMCONFIG_SYMBOL uint16_t ao_serial_number;
+#if HAS_RADIO
+extern AO_ROMCONFIG_SYMBOL uint32_t ao_radio_cal;
+#endif
+
+/*
  * ao_timer.c
  */
 
@@ -94,7 +103,7 @@ ao_panic(uint8_t reason);
 #define AO_TICK_SIGNED	int16_t
 #endif
 
-extern volatile __data AO_TICK_TYPE ao_tick_count;
+extern volatile AO_TICK_TYPE ao_tick_count;
 
 /* Our timer runs at 100Hz */
 #ifndef AO_HERTZ
@@ -114,10 +123,6 @@ ao_delay(uint16_t ticks);
 /* Set the ADC interval */
 void
 ao_timer_set_adc_interval(uint8_t interval);
-
-/* Timer interrupt */
-void
-ao_timer_isr(void) ao_arch_interrupt(9);
 
 /* Initialize the timer */
 void
@@ -143,13 +148,13 @@ ao_clock_resume(void);
 
 #ifndef ao_mutex_get
 uint8_t
-ao_mutex_try(__xdata uint8_t *ao_mutex, uint8_t task_id) __reentrant;
+ao_mutex_try(uint8_t *ao_mutex, uint8_t task_id);
 
 void
-ao_mutex_get(__xdata uint8_t *ao_mutex) __reentrant;
+ao_mutex_get(uint8_t *ao_mutex);
 
 void
-ao_mutex_put(__xdata uint8_t *ao_mutex) __reentrant;
+ao_mutex_put(uint8_t *ao_mutex);
 #endif
 
 /*
@@ -162,16 +167,14 @@ enum ao_cmd_status {
 	ao_cmd_syntax_error = 2,
 };
 
-extern __pdata uint16_t ao_cmd_lex_i;
-extern __pdata uint32_t ao_cmd_lex_u32;
-extern __pdata char	ao_cmd_lex_c;
-extern __pdata enum ao_cmd_status ao_cmd_status;
+extern char	ao_cmd_lex_c;
+extern enum ao_cmd_status ao_cmd_status;
 
 void
-ao_put_string(__code char *s);
+ao_put_string(const char *s);
 
 void
-ao_cmd_readline(void);
+ao_cmd_readline(const char *prompt);
 
 char
 ao_cmd_lex(void);
@@ -191,29 +194,29 @@ ao_cmd_white(void);
 int8_t
 ao_cmd_hexchar(char c);
 
-void
+uint8_t
 ao_cmd_hexbyte(void);
 
-void
+uint32_t
 ao_cmd_hex(void);
 
-void
-ao_cmd_decimal(void) __reentrant;
+uint32_t
+ao_cmd_decimal(void);
 
 /* Read a single hex nibble off stdin. */
 uint8_t
 ao_getnibble(void);
 
 uint8_t
-ao_match_word(__code char *word);
+ao_match_word(const char *word);
 
 struct ao_cmds {
 	void		(*func)(void);
-	__code char	*help;
+	const char	*help;
 };
 
 void
-ao_cmd_register(const __code struct ao_cmds *cmds);
+ao_cmd_register(const struct ao_cmds *cmds);
 
 void
 ao_cmd_init(void);
@@ -240,7 +243,7 @@ ao_cmd_filter(void);
 #include <ao_beep.h>
 #endif
 
-#if LEDS_AVAILABLE
+#if LEDS_AVAILABLE || HAS_LED
 #include <ao_led.h>
 #endif
 
@@ -297,13 +300,13 @@ ao_report_init(void);
 #if HAS_BARO
 /* pressure from the sensor to altitude in meters */
 alt_t
-ao_pres_to_altitude(pres_t pres) __reentrant;
+ao_pres_to_altitude(pres_t pres);
 
 pres_t
-ao_altitude_to_pres(alt_t alt) __reentrant;
+ao_altitude_to_pres(alt_t alt);
 
 int16_t
-ao_temp_to_dC(int16_t temp) __reentrant;
+ao_temp_to_dC(int16_t temp);
 #endif
 
 /*
@@ -379,11 +382,11 @@ ao_spi_slave(void);
 #define AO_GPS_NEW_DATA		1
 #define AO_GPS_NEW_TRACKING	2
 
-extern __xdata uint8_t ao_gps_new;
-extern __pdata uint16_t ao_gps_tick;
-extern __xdata uint8_t ao_gps_mutex;
-extern __xdata struct ao_telemetry_location ao_gps_data;
-extern __xdata struct ao_telemetry_satellite ao_gps_tracking_data;
+extern uint8_t ao_gps_new;
+extern uint16_t ao_gps_tick;
+extern uint8_t ao_gps_mutex;
+extern struct ao_telemetry_location ao_gps_data;
+extern struct ao_telemetry_satellite ao_gps_tracking_data;
 
 struct ao_gps_orig {
 	uint8_t			year;
@@ -423,13 +426,13 @@ void
 ao_gps(void);
 
 void
-ao_gps_print(__xdata struct ao_gps_orig *gps_data);
+ao_gps_print(struct ao_gps_orig *gps_data);
 
 void
-ao_gps_tracking_print(__xdata struct ao_gps_tracking_orig *gps_tracking_data);
+ao_gps_tracking_print(struct ao_gps_tracking_orig *gps_tracking_data);
 
 void
-ao_gps_show(void) __reentrant;
+ao_gps_show(void);
 
 void
 ao_gps_init(void);
@@ -560,9 +563,9 @@ ao_telemetry_tiny_init(void);
  * ao_radio.c
  */
 
-extern __xdata uint8_t	ao_radio_dma;
+extern uint8_t	ao_radio_dma;
 
-extern __xdata int8_t	ao_radio_rssi;
+extern int8_t	ao_radio_rssi;
 
 #ifdef PKT_APPEND_STATUS_1_CRC_OK
 #define AO_RADIO_STATUS_CRC_OK	PKT_APPEND_STATUS_1_CRC_OK
@@ -587,17 +590,14 @@ extern __xdata int8_t	ao_radio_rssi;
 #define HAS_RADIO_RATE	HAS_RADIO
 #endif
 
-void
-ao_radio_general_isr(void) ao_arch_interrupt(16);
-
 #if HAS_RADIO_XMIT
 void
-ao_radio_send(const __xdata void *d, uint8_t size) __reentrant;
+ao_radio_send(const void *d, uint8_t size);
 #endif
 
 #if HAS_RADIO_RECV
 uint8_t
-ao_radio_recv(__xdata void *d, uint8_t size, uint8_t timeout) __reentrant;
+ao_radio_recv(void *d, uint8_t size, uint8_t timeout);
 
 void
 ao_radio_recv_abort(void);
@@ -675,14 +675,14 @@ union ao_monitor {
 #endif
 };
 
-extern __xdata union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
+extern union ao_monitor ao_monitor_ring[AO_MONITOR_RING];
 
 #define ao_monitor_ring_next(n)	(((n) + 1) & (AO_MONITOR_RING - 1))
 #define ao_monitor_ring_prev(n)	(((n) - 1) & (AO_MONITOR_RING - 1))
 
-extern __xdata uint8_t ao_monitoring_mutex;
-extern __data uint8_t ao_monitoring;
-extern __data uint8_t ao_monitor_head;
+extern uint8_t ao_monitoring_mutex;
+extern uint8_t ao_monitoring;
+extern uint8_t ao_monitor_head;
 
 void
 ao_monitor(void);
@@ -700,7 +700,7 @@ void
 ao_monitor_enable(void);
 
 void
-ao_monitor_init(void) __reentrant;
+ao_monitor_init(void);
 
 #endif
 
@@ -712,27 +712,27 @@ ao_monitor_init(void) __reentrant;
 
 struct ao_stdio {
 	int	(*_pollchar)(void);	/* Called with interrupts blocked */
-	void	(*putchar)(char c) __reentrant;
+	void	(*putchar)(char c);
 	void	(*flush)(void);
 	uint8_t	echo;
 };
 
-extern __xdata struct ao_stdio ao_stdios[];
-extern __pdata int8_t ao_cur_stdio;
-extern __pdata int8_t ao_num_stdios;
+extern struct ao_stdio ao_stdios[];
+extern int8_t ao_cur_stdio;
+extern int8_t ao_num_stdios;
 
 void
 flush(void);
 
-extern __xdata uint8_t ao_stdin_ready;
+extern uint8_t ao_stdin_ready;
 
 uint8_t
 ao_echo(void);
 
 int8_t
 ao_add_stdio(int (*pollchar)(void),
-	     void (*putchar)(char) __reentrant,
-	     void (*flush)(void)) __reentrant;
+	     void (*putchar)(char) ,
+	     void (*flush)(void));
 
 /*
  * ao_ignite.c
@@ -759,14 +759,14 @@ struct ao_ignition {
 	uint8_t firing;
 };
 
-extern __code char * __code ao_igniter_status_names[];
+extern const char * const ao_igniter_status_names[];
 
-extern __xdata struct ao_ignition ao_ignition[2];
+extern struct ao_ignition ao_ignition[2];
 
 enum ao_igniter_status
 ao_igniter_status(enum ao_igniter igniter);
 
-extern __pdata uint8_t ao_igniter_present;
+extern uint8_t ao_igniter_present;
 
 void
 ao_ignite_set_pins(void);
@@ -787,7 +787,7 @@ ao_igniter_init(void);
 /*
  * Set this to force the frequency to 434.550MHz
  */
-extern __xdata uint8_t ao_force_freq;
+extern uint8_t ao_force_freq;
 #endif
 
 /*
@@ -887,8 +887,8 @@ union ao_log_single {
 	uint8_t				bytes[AO_LOG_SINGLE_SIZE];
 };
 
-extern __xdata union ao_log_single	ao_log_single_write_data;
-extern __xdata union ao_log_single	ao_log_single_read_data;
+extern union ao_log_single	ao_log_single_write_data;
+extern union ao_log_single	ao_log_single_read_data;
 
 void
 ao_log_single_extra_query(void);
@@ -950,9 +950,6 @@ ao_terraui_init(void);
  */
 
 #ifdef BATTERY_PIN
-void
-ao_battery_isr(void) ao_arch_interrupt(1);
-
 uint16_t
 ao_battery_get(void);
 
@@ -971,7 +968,7 @@ ao_sqrt(uint32_t op);
  * ao_freq.c
  */
 
-int32_t ao_freq_to_set(int32_t freq, int32_t cal) __reentrant;
+int32_t ao_freq_to_set(int32_t freq, int32_t cal);
 
 /*
  * ao_ms5607.c

@@ -20,17 +20,16 @@
 
 #define AO_MAX_SEND	128
 
-static __xdata uint8_t ao_send[AO_MAX_SEND];
+static uint8_t ao_send[AO_MAX_SEND];
 
 static void
 ao_send_packet(void)
 {
-	__pdata uint16_t count;
+	uint16_t count;
 	uint8_t b;
-	__pdata uint8_t	i;
+	uint8_t	i;
 
-	ao_cmd_hex();
-	count = ao_cmd_lex_i;
+	count = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	if (count > AO_MAX_SEND - 2) {
@@ -47,7 +46,7 @@ ao_send_packet(void)
 	ao_radio_send(ao_send, count);
 }
 
-static __code struct ao_cmds ao_send_packet_cmds[] = {
+static const struct ao_cmds ao_send_packet_cmds[] = {
 	{ ao_send_packet, "S <len>\0Send packet. Data on next line" },
 	{ 0, NULL }
 };

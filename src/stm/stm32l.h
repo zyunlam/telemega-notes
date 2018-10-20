@@ -241,15 +241,14 @@ stm_gpio_get_all(struct stm_gpio *gpio) {
  * ao_enable_gpio macro will expand into a huge pile of code
  * as the compiler won't do correct constant folding and
  * dead-code elimination
+ */
 
- extern struct stm_gpio stm_gpioa;
- extern struct stm_gpio stm_gpiob;
- extern struct stm_gpio stm_gpioc;
- extern struct stm_gpio stm_gpiod;
- extern struct stm_gpio stm_gpioe;
- extern struct stm_gpio stm_gpioh;
-
-*/
+extern struct stm_gpio stm_gpioa;
+extern struct stm_gpio stm_gpiob;
+extern struct stm_gpio stm_gpioc;
+extern struct stm_gpio stm_gpiod;
+extern struct stm_gpio stm_gpioe;
+extern struct stm_gpio stm_gpioh;
 
 #define stm_gpioh  (*((struct stm_gpio *) 0x40021400))
 #define stm_gpioe  (*((struct stm_gpio *) 0x40021000))

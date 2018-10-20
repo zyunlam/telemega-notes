@@ -27,6 +27,7 @@
 #define HAS_USB			1
 #define HAS_BEEP		1
 #define BEEPER_CHANNEL		4
+#define BEEPER_TIMER		3
 #define HAS_GPS			0
 #define HAS_SERIAL_1		0
 #define HAS_ADC			1

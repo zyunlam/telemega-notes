@@ -29,8 +29,8 @@ main(void)
 	ao_cmd_init();
 	ao_config_init();
 
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_GREEN);
+	ao_led_init();
+	ao_led_on(LEDS_AVAILABLE);
 
 	/* internal systems */
 	ao_timer_init();
@@ -53,8 +53,7 @@ main(void)
 	ao_telemetry_init();
 	ao_tracker_init();
 
-	ao_led_off(AO_LED_GREEN);
+	ao_led_off(LEDS_AVAILABLE);
 
 	ao_start_scheduler();
-	return 0;
 }

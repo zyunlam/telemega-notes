@@ -28,6 +28,7 @@ altoslib_JAVA = \
 	AltosLib.java \
 	AltosAccelCal.java \
 	AltosAccelCalListener.java \
+	AltosAdxl375.java \
 	AltosCalData.java \
 	AltosCompanion.java \
 	AltosConfigData.java \

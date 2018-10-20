@@ -107,10 +107,8 @@ ao_pwm_cmd(void)
 	uint8_t	ch;
 	uint16_t val;
 
-	ao_cmd_decimal();
-	ch = ao_cmd_lex_u32;
-	ao_cmd_decimal();
-	val = ao_cmd_lex_u32;
+	ch = ao_cmd_decimal();
+	val = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 

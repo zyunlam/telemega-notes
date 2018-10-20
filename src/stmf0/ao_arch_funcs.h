@@ -168,8 +168,8 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		ao_spi_put(bus);		\
 	} while (0)
 
-#define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
-#define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<bit),bus)
+#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
+#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
 #if AO_POWER_MANAGEMENT
 extern struct ao_power	ao_power_gpioa;
@@ -212,13 +212,13 @@ static inline void ao_disable_port(struct stm_gpio *port)
 	}
 }
 
-#define ao_gpio_set(port, bit, pin, v) stm_gpio_set(port, bit, v)
+#define ao_gpio_set(port, bit, v) stm_gpio_set(port, bit, v)
 
-#define ao_gpio_get(port, bit, pin) stm_gpio_get(port, bit)
+#define ao_gpio_get(port, bit) stm_gpio_get(port, bit)
 
-#define ao_enable_output(port,bit,pin,v) do {			\
+#define ao_enable_output(port,bit,v) do {			\
 		ao_enable_port(port);				\
-		ao_gpio_set(port, bit, pin, v);			\
+		ao_gpio_set(port, bit, v);			\
 		stm_moder_set(port, bit, STM_MODER_OUTPUT);\
 	} while (0)
 
@@ -238,7 +238,7 @@ static inline void ao_disable_port(struct stm_gpio *port)
 	} while (0)
 
 #define ao_enable_cs(port,bit) do {				\
-		ao_enable_output(port, bit, pin, 1);		\
+		ao_enable_output(port, bit, 1);		\
 	} while (0)
 
 #define ao_spi_init_cs(port, mask) do {				\

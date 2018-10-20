@@ -23,7 +23,7 @@
 #define pause(time)	ao_delay(time)
 
 static void
-ao_report_digit(uint8_t digit) __reentrant
+ao_report_digit(uint8_t digit) 
 {
 	if (!digit) {
 		mid(AO_MS_TO_TICKS(1000));
@@ -40,9 +40,9 @@ ao_report_digit(uint8_t digit) __reentrant
 void
 ao_report_altitude(void)
 {
-	__pdata alt_t	agl = ao_max_height;
-	static __xdata uint8_t	digits[11];
-	__pdata uint8_t ndigits, i;
+	alt_t	agl = ao_max_height;
+	static uint8_t	digits[11];
+	uint8_t ndigits, i;
 
 	if (agl < 0)
 		agl = 0;

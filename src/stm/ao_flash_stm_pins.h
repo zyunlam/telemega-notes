@@ -21,6 +21,10 @@
 
 #include <ao_flash_pins.h>
 
+#ifndef AO_PLLMUL
+
+#if AO_HSE == 8000000
+
 /* PLLVCO = 96MHz (so that USB will work) */
 #define AO_PLLMUL		12
 #define AO_RCC_CFGR_PLLMUL	(STM_RCC_CFGR_PLLMUL_12)
@@ -28,6 +32,22 @@
 /* SYSCLK = 32MHz */
 #define AO_PLLDIV		3
 #define AO_RCC_CFGR_PLLDIV	(STM_RCC_CFGR_PLLDIV_3)
+
+#endif
+
+#if AO_HSE == 16000000
+
+/* PLLVCO = 96MHz (so that USB will work) */
+#define AO_PLLMUL		6
+#define AO_RCC_CFGR_PLLMUL	(STM_RCC_CFGR_PLLMUL_6)
+
+/* SYSCLK = 32MHz */
+#define AO_PLLDIV		3
+#define AO_RCC_CFGR_PLLDIV	(STM_RCC_CFGR_PLLDIV_3)
+
+#endif
+
+#endif
 
 /* HCLK = 32MHZ (CPU clock) */
 #define AO_AHB_PRESCALER	1

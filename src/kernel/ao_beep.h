@@ -85,7 +85,7 @@ ao_beep(uint8_t beep);
 
 /* Turn on the beeper for the specified time */
 void
-ao_beep_for(uint8_t beep, uint16_t ticks) __reentrant;
+ao_beep_for(uint8_t beep, uint16_t ticks);
 
 /* Initialize the beeper */
 void

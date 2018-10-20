@@ -24,6 +24,21 @@ static const struct ao_cmds blink_cmds[] = {
 	{ 0, 0 }
 };
 
+int
+_ao_scheme_getc(void)
+{
+	static uint8_t	at_eol;
+	int c;
+
+	if (at_eol) {
+		ao_cmd_readline(ao_scheme_read_list ? "Λ " : "λ ");
+		at_eol = 0;
+	}
+	c = (unsigned char) ao_cmd_lex();
+	if (c == '\n')
+		at_eol = 1;
+	return c;
+}
 
 void main(void)
 {

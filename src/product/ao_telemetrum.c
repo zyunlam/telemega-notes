@@ -60,7 +60,7 @@ main(void)
 	ao_gps_report_init();
 	ao_telemetry_init();
 	ao_radio_init();
-	ao_packet_slave_init(FALSE);
+	ao_packet_slave_init(false);
 	ao_igniter_init();
 #if HAS_DBG
 	ao_dbg_init();
