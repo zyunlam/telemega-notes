@@ -382,6 +382,7 @@ typedef int16_t angle_t;	/* in degrees */
 /* X axis is aligned in the other board axis (across) */
 /* Z axis is aligned perpendicular to the board (through) */
 
+#ifndef ao_data_along
 #define ao_data_along(packet)	((packet)->mpu9250.accel_y)
 #define ao_data_across(packet)	((packet)->mpu9250.accel_x)
 #define ao_data_through(packet)	((packet)->mpu9250.accel_z)
@@ -389,6 +390,7 @@ typedef int16_t angle_t;	/* in degrees */
 #define ao_data_roll(packet)	((packet)->mpu9250.gyro_y)
 #define ao_data_pitch(packet)	((packet)->mpu9250.gyro_x)
 #define ao_data_yaw(packet)	((packet)->mpu9250.gyro_z)
+#endif
 
 static inline float ao_convert_gyro(float sensor)
 {
@@ -425,9 +427,11 @@ typedef int16_t ao_mag_t;		/* in raw sample units */
  * sensors. Also, the Z axis is flipped in sign.
  */
 
+#ifndef ao_data_mag_along
 #define ao_data_mag_along(packet)	((packet)->mpu9250.mag_x)
 #define ao_data_mag_across(packet)	((packet)->mpu9250.mag_y)
 #define ao_data_mag_through(packet)	((packet)->mpu9250.mag_z)
+#endif
 
 #endif
 

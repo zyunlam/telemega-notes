@@ -69,7 +69,7 @@
 #define AO_CONFIG_MAX_SIZE                     1024
 #define LOG_ERASE_MARK                         0x55
 #define LOG_MAX_ERASE                          128
-#define AO_LOG_FORMAT				AO_LOG_FORMAT_TELEMEGA
+#define AO_LOG_FORMAT				AO_LOG_FORMAT_EASYMEGA_2
 
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
@@ -305,6 +305,18 @@ struct ao_adc {
 #define AO_MPU9250_SPI_CS_PORT	(&stm_gpioc)
 #define AO_MPU9250_SPI_CS_PIN	13
 #define HAS_IMU			1
+
+#define ao_data_along(packet)	((packet)->mpu9250.accel_x)
+#define ao_data_across(packet)	(-(packet)->mpu9250.accel_y)
+#define ao_data_through(packet)	((packet)->mpu9250.accel_z)
+
+#define ao_data_roll(packet)	((packet)->mpu9250.gyro_x)
+#define ao_data_pitch(packet)	(-(packet)->mpu9250.gyro_y)
+#define ao_data_yaw(packet)	((packet)->mpu9250.gyro_z)
+
+#define ao_data_mag_along(packet)	((packet)->mpu9250.mag_y)
+#define ao_data_mag_across(packet)	(-(packet)->mpu9250.mag_x)
+#define ao_data_mag_through(packet)	((packet)->mpu9250.mag_z)
 
 /* ADXL375 */
 
