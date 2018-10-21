@@ -28,7 +28,7 @@ public abstract class AltosProgrammer {
 
 	abstract public void abort();
 
-	abstract public AltosRomconfig target_romconfig() throws InterruptedException;
+	abstract public AltosRomconfig target_romconfig(AltosUsbId usb_id, String usb_product) throws InterruptedException;
 
 	abstract public AltosRomconfig image_romconfig();
 

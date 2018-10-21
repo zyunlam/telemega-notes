@@ -20,6 +20,7 @@ package org.altusmetrum.altosuilib_13;
 
 import java.util.*;
 import libaltosJNI.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class AltosUSBDevice  extends altos_device implements AltosDevice {
 
@@ -96,6 +97,14 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 
 	public int hashCode() {
 		return getVendor() ^ getProduct() ^ getSerial() ^ getPath().hashCode();
+	}
+
+	public AltosUsbId usb_id() {
+		return new AltosUsbId(getVendor(), getProduct());
+	}
+
+	public String usb_product() {
+		return getName();
 	}
 
 	public boolean equals(Object o) {

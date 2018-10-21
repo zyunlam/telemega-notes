@@ -24,27 +24,39 @@ import java.awt.event.*;
 
 public class AltosDeviceUIDialog extends AltosDeviceDialog {
 
+	boolean	include_bluetooth;
+
 	public AltosDevice[] devices() {
 		java.util.List<AltosDevice>	usb_devices = AltosUSBDevice.list(product);
 		int				num_devices = usb_devices.size();
-		java.util.List<AltosDevice>	bt_devices = AltosBTKnown.bt_known().list(product);
-		num_devices += bt_devices.size();
+
+		java.util.List<AltosDevice>	bt_devices = null;
+
+		if (include_bluetooth) {
+			bt_devices = AltosBTKnown.bt_known().list(product);
+			num_devices += bt_devices.size();
+		}
+
 		AltosDevice[]			devices = new AltosDevice[num_devices];
 
 		for (int i = 0; i < usb_devices.size(); i++)
 			devices[i] = usb_devices.get(i);
-		int off = usb_devices.size();
-		for (int j = 0; j < bt_devices.size(); j++)
-			devices[off + j] = bt_devices.get(j);
+		if (include_bluetooth) {
+			int off = usb_devices.size();
+			for (int j = 0; j < bt_devices.size(); j++)
+				devices[off + j] = bt_devices.get(j);
+		}
 		return devices;
 	}
 
 	public void add_bluetooth() {
-		JButton manage_bluetooth_button = new JButton("Manage Bluetooth");
-		manage_bluetooth_button.setActionCommand("manage");
-		manage_bluetooth_button.addActionListener(this);
-		buttonPane.add(manage_bluetooth_button);
-		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
+		if (include_bluetooth) {
+			JButton manage_bluetooth_button = new JButton("Manage Bluetooth");
+			manage_bluetooth_button.setActionCommand("manage");
+			manage_bluetooth_button.addActionListener(this);
+			buttonPane.add(manage_bluetooth_button);
+			buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -55,16 +67,29 @@ public class AltosDeviceUIDialog extends AltosDeviceDialog {
 		}
 	}
 
-	public AltosDeviceUIDialog (Frame in_frame, Component location, int in_product) {
+	public AltosDeviceUIDialog (Frame in_frame, Component location, int in_product, boolean include_bluetooth) {
 		super(in_frame, location, in_product);
+		this.include_bluetooth = include_bluetooth;
 	}
 
-	public static AltosDevice show (Component frameComp, int product) {
+	public AltosDeviceUIDialog (Frame in_frame, Component location, int in_product) {
+		this(in_frame, location, in_product, true);
+	}
+
+	public static AltosDevice show (Component frameComp, int product, boolean include_bluetooth) {
 		Frame			frame = JOptionPane.getFrameForComponent(frameComp);
 		AltosDeviceUIDialog	dialog;
 
-		dialog = new AltosDeviceUIDialog(frame, frameComp, product);
+		dialog = new AltosDeviceUIDialog(frame, frameComp, product, include_bluetooth);
 		dialog.setVisible(true);
 		return dialog.getValue();
+	}
+
+	public static AltosDevice show (Component frameComp, int product) {
+		return show(frameComp, product, true);
+	}
+
+	public static AltosUSBDevice show_usb (Component frameComp, int product) {
+		return (AltosUSBDevice) show(frameComp, product, false);
 	}
 }

@@ -45,7 +45,7 @@ public class AltosFlashUI
 	File		file;
 
 	// Debug connection
-	AltosDevice	device;
+	AltosUSBDevice	device;
 
 	AltosLink	link;
 
@@ -205,14 +205,20 @@ public class AltosFlashUI
 	}
 
 	static class AltosHexfileFilter extends javax.swing.filechooser.FileFilter {
-		int product;
 		String head;
 		String description;
 
-		public AltosHexfileFilter(int product, String head, String description) {
-			this.product = product;
-			this.head = head;
-			this.description = description;
+		public AltosHexfileFilter(String usb_product) {
+			int l;
+
+			/* Trim off any trailing variants (1.0a vs 1.0) */
+			for (l = usb_product.length(); l > 0; l--) {
+				char c = usb_product.charAt(l-1);
+				if (c < 'a' || 'z' < c)
+					break;
+			}
+			head = usb_product.substring(0, l).toLowerCase();
+			description = String.format("%s Image File", usb_product);
 		}
 
 		public boolean accept(File file) {
@@ -224,14 +230,6 @@ public class AltosFlashUI
 		}
 	}
 
-	static AltosHexfileFilter[] filters = {
-		new AltosHexfileFilter(AltosLib.product_telemetrum, "telemetrum", "TeleMetrum Image"),
-		new AltosHexfileFilter(AltosLib.product_teledongle, "teledongle", "TeleDongle Image"),
-		new AltosHexfileFilter(AltosLib.product_telemega, "telemega", "TeleMega Image"),
-		new AltosHexfileFilter(AltosLib.product_easymini, "easymini", "EasyMini Image"),
-		new AltosHexfileFilter(AltosLib.product_easymega, "easymega", "EasyMega Image"),
-	};
-
 	boolean select_source_file() {
 		JFileChooser	hexfile_chooser = new JFileChooser();
 
@@ -241,18 +239,14 @@ public class AltosFlashUI
 
 		hexfile_chooser.setDialogTitle("Select Flash Image");
 
-		for (int i = 0; i < filters.length; i++) {
-			hexfile_chooser.addChoosableFileFilter(filters[i]);
-		}
 		javax.swing.filechooser.FileFilter ihx_filter = new FileNameExtensionFilter("Flash Image", "ihx");
 		hexfile_chooser.addChoosableFileFilter(ihx_filter);
 		hexfile_chooser.setFileFilter(ihx_filter);
 
 		if (!is_pair_programmed() && !device.matchProduct(AltosLib.product_altusmetrum)) {
-			for (int i = 0; i < filters.length; i++) {
-				if (device != null && device.matchProduct(filters[i].product))
-					hexfile_chooser.setFileFilter(filters[i]);
-			}
+			AltosHexfileFilter filter = new AltosHexfileFilter(device.usb_product());
+			hexfile_chooser.addChoosableFileFilter(filter);
+			hexfile_chooser.setFileFilter(filter);
 		}
 
 		int returnVal = hexfile_chooser.showOpenDialog(frame);
@@ -270,7 +264,7 @@ public class AltosFlashUI
 	boolean select_device() {
 		int	product = AltosLib.product_any;
 
-		device = AltosDeviceUIDialog.show(frame, AltosLib.product_any);
+		device = AltosDeviceUIDialog.show_usb(frame, AltosLib.product_any);
 
 		if (device == null)
 			return false;
@@ -393,9 +387,11 @@ public class AltosFlashUI
 				else
 					programmer = new AltosSelfFlash(ui.file, link, this);
 
-				final AltosRomconfig	current_config = programmer.target_romconfig();
+				final AltosRomconfig	current_config = programmer.target_romconfig(device.usb_id(), device.usb_product());
 
 				final AltosRomconfig	image_config = programmer.image_romconfig();
+
+				System.out.printf("product %s current %s image %s\n", device.usb_product(), current_config, image_config);
 
 				final Semaphore await_rom_config = new Semaphore(0);
 				SwingUtilities.invokeLater(new Runnable() {
@@ -539,7 +535,7 @@ public class AltosFlashUI
 								}
 							if (!matched) {
 								System.out.printf("Identified new device %s\n", d.toShortString());
-								device = d;
+								device = (AltosUSBDevice) d;
 								break;
 							}
 						}

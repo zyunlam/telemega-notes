@@ -24,6 +24,10 @@ public class AltosHexsym {
 
 	final static long invalid_addr = 0xffffffff;
 
+	public String toString() {
+		return String.format("%s:0x%x", name, address);
+	}
+
 	public AltosHexsym(String name, long address) {
 		this.name = name;
 		this.address = address;

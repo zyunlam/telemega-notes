@@ -331,9 +331,13 @@ public class AltosFlash extends AltosProgrammer {
 		rom_config = romconfig;
 	}
 
-	public AltosRomconfig target_romconfig() throws InterruptedException {
+	public AltosRomconfig target_romconfig(AltosUsbId usb_id, String usb_product) throws InterruptedException {
 		if (!check_rom_config())
 			return null;
+		if (rom_config.usb_id == null)
+			rom_config.usb_id = usb_id;
+		if (rom_config.usb_product == null)
+			rom_config.usb_product = usb_product;
 		return rom_config;
 	}
 
