@@ -108,7 +108,8 @@ altoslib_JAVA = \
 	AltosSensorTMini3.java \
 	AltosSensorMega.java \
 	AltosSensorMetrum.java \
-	AltosSensorTGPS.java \
+	AltosSensorTGPS1.java \
+	AltosSensorTGPS2.java \
 	AltosState.java \
 	AltosStateName.java \
 	AltosStringInputStream.java \

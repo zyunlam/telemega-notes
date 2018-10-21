@@ -43,9 +43,15 @@ public class AltosTelemetryConfiguration extends AltosTelemetryStandard {
 		listener.set_device_type(device_type());
 		cal_data.set_flight(flight());
 		cal_data.set_config(config_major(), config_minor(), flight_log_max());
-		if (device_type() == AltosLib.product_telegps)
-			listener.set_battery_voltage(AltosConvert.tele_gps_voltage(v_batt()));
-		else
+		if (device_type() == AltosLib.product_telegps) {
+			int v_batt = v_batt();
+			double batt;
+			if (v_batt > 4095)
+				batt = AltosConvert.tele_gps_1_voltage(v_batt);
+			else
+				batt = AltosConvert.tele_gps_2_voltage(v_batt);
+			listener.set_battery_voltage(batt);
+		} else
 			cal_data.set_flight_params(apogee_delay() / 100.0, main_deploy());
 
 		cal_data.set_callsign(callsign());

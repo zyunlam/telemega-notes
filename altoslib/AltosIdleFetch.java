@@ -40,8 +40,9 @@ class AltosIdler {
 	static final int	idle_sensor_emini1 = 13;
 	static final int	idle_sensor_emini2 = 14;
 	static final int	idle_sensor_tmini2 = 15;
-	static final int	idle_sensor_tgps = 16;
-	static final int	idle_sensor_tmini3 = 17;
+	static final int	idle_sensor_tgps1 = 16;
+	static final int	idle_sensor_tgps2 = 17;
+	static final int	idle_sensor_tmini3 = 18;
 
 	public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
@@ -82,8 +83,11 @@ class AltosIdler {
 			case idle_sensor_tmini2:
 				AltosSensorTMini2.provide_data(listener, link);
 				break;
-			case idle_sensor_tgps:
-				AltosSensorTGPS.provide_data(listener, link);
+			case idle_sensor_tgps1:
+				AltosSensorTGPS1.provide_data(listener, link);
+				break;
+			case idle_sensor_tgps2:
+				AltosSensorTGPS2.provide_data(listener, link);
 				break;
 			case idle_sensor_tmini3:
 				AltosSensorTMini3.provide_data(listener, link);
@@ -170,9 +174,12 @@ public class AltosIdleFetch implements AltosDataProvider {
 			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu,
 			       AltosIdler.idle_sensor_mega),
-		new AltosIdler("TeleGPS",
+		new AltosIdler("TeleGPS-v1",
 			       AltosIdler.idle_gps,
-			       AltosIdler.idle_sensor_tgps),
+			       AltosIdler.idle_sensor_tgps1),
+		new AltosIdler("TeleGPS-v2",
+			       AltosIdler.idle_gps,
+			       AltosIdler.idle_sensor_tgps2),
 	};
 
 	AltosLink		link;

@@ -20,23 +20,23 @@ package org.altusmetrum.altoslib_13;
 
 import java.util.concurrent.TimeoutException;
 
-public class AltosSensorTGPS {
+public class AltosSensorTGPS1 {
 	public int	tick;
 	public int	batt;
 
 	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
 		try {
-			AltosSensorTGPS	sensor_tgps = new AltosSensorTGPS(link);
+			AltosSensorTGPS1	sensor_tgps = new AltosSensorTGPS1(link);
 
 			if (sensor_tgps == null)
 				return;
-			listener.set_battery_voltage(AltosConvert.tele_gps_voltage(sensor_tgps.batt));
+			listener.set_battery_voltage(AltosConvert.tele_gps_1_voltage(sensor_tgps.batt));
 
 		} catch (TimeoutException te) {
 		}
 	}
 
-	public AltosSensorTGPS(AltosLink link) throws InterruptedException, TimeoutException {
+	public AltosSensorTGPS1(AltosLink link) throws InterruptedException, TimeoutException {
 		String[] items = link.adc();
 		for (int i = 0; i < items.length - 1;) {
 			if (items[i].equals("tick:")) {
