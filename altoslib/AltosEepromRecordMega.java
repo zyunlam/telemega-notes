@@ -32,6 +32,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 			return data32(16);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(14);
@@ -43,6 +44,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 			return data32(20);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(16);
@@ -54,6 +56,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 			return data32(24);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(18);
@@ -78,6 +81,98 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int mag_x() { return data16(20); }
 	private int mag_z() { return data16(22); }
 	private int mag_y() { return data16(24); }
+
+	private int accel_across() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return accel_x();
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return -accel_y();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int accel_along(){
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return accel_y();
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return accel_x();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int accel_through() {
+		return accel_z();
+	}
+
+	private int gyro_pitch() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return gyro_x();
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return -gyro_y();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int gyro_roll() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return gyro_y();
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return gyro_x();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int gyro_yaw() {
+		return gyro_z();
+	}
+
+	private int mag_across() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return mag_x();
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return -mag_y();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_along() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return mag_y();
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return mag_y();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_through() {
+		return mag_z();
+	}
+
+
 	private int accel() { return data16(26); }
 
 	/* AO_LOG_TEMP_VOLT elements */
@@ -138,16 +233,16 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			listener.set_pressure(pt.pres);
 			listener.set_temperature(pt.temp);
 
-			int	accel_along = accel_y();
-			int	accel_across = accel_x();
-			int	accel_through = accel_z();
-			int	gyro_roll = gyro_y();
-			int	gyro_pitch = gyro_x();
-			int	gyro_yaw = gyro_z();
+			int	accel_along = accel_along();
+			int	accel_across = accel_across();
+			int	accel_through = accel_through();
+			int	gyro_roll = gyro_roll();
+			int	gyro_pitch = gyro_pitch();
+			int	gyro_yaw = gyro_yaw();
 
-			int	mag_along = mag_y();
-			int	mag_across = mag_x();
-			int	mag_through = mag_z();
+			int	mag_along = mag_along();
+			int	mag_across = mag_across();
+			int	mag_through = mag_through();
 
 			if (log_format == AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD)
 				cal_data.check_imu_wrap(gyro_roll, gyro_pitch, gyro_yaw);

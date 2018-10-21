@@ -201,6 +201,8 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 			return 4095 - value;
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return -value;
 		default:
 			return AltosLib.MISSING;
 		}
