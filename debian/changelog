@@ -1,6 +1,6 @@
 altos (1.8.7-2) unstable; urgency=medium
 
-  * elide map-server from set of directories built and installed by 
+  * elide map-server from set of directories built and installed by
     default.  Eventually, we'll refactor to put that in a new binary
     package...
 
@@ -104,7 +104,7 @@ altos (1.8.7-1) unstable; urgency=medium
 altos (1.8.6-2) unstable; urgency=medium
 
   * quick patch to not include fox1ihu in build by default, closes: #907480
-  
+
  -- Bdale Garbee <bdale@gag.com>  Thu, 30 Aug 2018 21:41:00 -0600
 
 altos (1.8.6-1) unstable; urgency=medium
@@ -3466,14 +3466,14 @@ altos (1.1-1) unstable; urgency=low
   * new upstream minor release, which provides a few new features in AltosUI
     and the AltOS firmware, and fixes bugs
     - Add apogee-lockout value. Overrides the apogee detection logic to
-      prevent incorrect apogee charge firing.  A configuration menu 
+      prevent incorrect apogee charge firing.  A configuration menu
       provides a list of reasonable values, or the value can be set by hand.
-    - Fix a bug where the data reported in telemetry packets was from 
+    - Fix a bug where the data reported in telemetry packets was from
       320ms ago.
     - Force the radio frequency to 434.550MHz when the debug clock
       pin is connected to ground at boot time. This provides a way
       to talk to a TeleMini which is configured to some unknown frequency.
-    - Provide RSSI values for Monitor Idle mode. This makes it easy to check 
+    - Provide RSSI values for Monitor Idle mode. This makes it easy to check
       radio range without needing to go to flight mode.
     - Fix a bug which caused the old received telemetry packets to
       be retransmitted over the USB link when the radio was turned
@@ -3549,7 +3549,7 @@ altos (1.0.1) unstable; urgency=low
   [ Bdale Garbee ]
   * use multimaint-merge to make Debian changelogs less ugly
   * update TeleMini turnon script now that we've made a stable firmware release
-  * moving git-buildpackage config into .git/ since it is fairly specific to 
+  * moving git-buildpackage config into .git/ since it is fairly specific to
     Bdale's build environment, and doesn't need to be in the source package
   * get ready for a 1.0.1 release
   * update changelogs for Debian build
@@ -3671,14 +3671,14 @@ altos (1.0) unstable; urgency=low
   * prepare to release
   * don't deliver sources.list fragment in official Debian packages
   * changes in preparation for upload to Debian
-  * ao-view is no longer included in the altos package, so have the 
+  * ao-view is no longer included in the altos package, so have the
     old-style Debian menu entry point to altosui instead
   * rewind packaging changelog to last tagged version
   * update desktop file for consistency with package section
   * we need a main category in the desktop file
   * really, I mean it, no longer deliver the sources.list fragment
-  * add a postinst to remove sources.list.d fragment delivered by old 
-    private versions of this package, no longer needed once we have 
+  * add a postinst to remove sources.list.d fragment delivered by old
+    private versions of this package, no longer needed once we have
     official packages
 
  -- Bdale Garbee <bdale@gag.com>  Thu, 25 Aug 2011 02:22:21 -0600
@@ -5270,4 +5270,3 @@ altos (0.5+77+gc57bd7f) unstable; urgency=low
   * build for Debian from git
 
  -- Bdale Garbee <bdale@gag.com>  Mon, 12 Oct 2009 15:57:19 -0600
-
