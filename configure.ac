@@ -198,7 +198,6 @@ AC_PROG_LN_S
 AC_PROG_LIBTOOL
 PKG_PROG_PKG_CONFIG
 
-CFLAGS="-g"
 WARN_CFLAGS=""
 if test "x$GCC" = "xyes"; then
 	WARN_CFLAGS="-Wall -Wpointer-arith -Wstrict-prototypes \
