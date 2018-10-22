@@ -9,3 +9,4 @@ Exec=%bindir%/altosui %F
 Terminal=false
 MimeType=application/vnd.altusmetrum.telemetry;application/vnd.altusmetrum.eeprom
 Categories=Education;Electronics;Science;
+Keywords=Rocket;Telemetry;GPS
