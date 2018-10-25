@@ -233,7 +233,7 @@ ifdef::telemega,easymega[]
 	==== Configure Pyro Channels
 
 		.Additional Pyro Channel Configuration
-		image::configure-pyro.png[width="5.5in"]
+		image::configure-pyro.png[width=400]
 
 		This opens a separate window to configure the
 		additional pyro channels available on TeleMega
@@ -262,6 +262,6 @@ ifdef::telemega,easymega[]
 		configuration by pressing the 'Save' button in
 		the main Configure Flight Computer window.
 
-		include::pyro-channels.raw[]
+		include::pyro-channels.adoc[]
 
 endif::telemega,easymega[]

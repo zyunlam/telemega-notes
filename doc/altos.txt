@@ -1,7 +1,15 @@
 = AltOS
+Keith Packard <keithp@keithp.com>
 :doctype: book
 :toc:
+:stylesheet: am.css
+:linkcss:
 :numbered:
+:pdf-stylesdir: .
+:pdf-style: altusmetrum
+:pdf-fontsdir: fonts
+
+	include::header.adoc[]
 
 == Overview
 

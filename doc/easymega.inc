@@ -1,7 +1,7 @@
 == EasyMega
 
 	.EasyMega Board
-	image::easymega-v1.0-top.jpg[width="4.5in"]
+	image::easymega-v1.0-top.jpg[width=430]
 
 	EasyMega is a 1¼ inch by 2¼ inch circuit board. It was
 	designed to easily fit in a 38mm coupler. Like TeleMetrum,

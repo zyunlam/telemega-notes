@@ -1,6 +1,5 @@
 = Release Notes for Version 1.8.3
-:toc!:
-:doctype: article
+include::release-head.adoc[]
 
 	Version 1.8.3 includes support for TeleMega version 3.0 along
 	with two important flight computer fixes. This version also

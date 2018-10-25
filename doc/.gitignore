@@ -2,6 +2,7 @@
 *.pdf
 *.fo
 *.raw
+*.adoc
 titlepage.templates.xsl
 fop-cfg.xml
 map-loading.svg

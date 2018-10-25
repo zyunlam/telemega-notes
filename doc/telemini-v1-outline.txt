@@ -1,5 +1,7 @@
-= TeleMini v1 Outline and Hole Pattern
+:notitle:
 :doctype: article
+
+== TeleMini v1 Outline and Hole Pattern
 
 	This image, when printed, provides a precise template for the
 	mounting holes in TeleMini. TeleMini v1 has overall dimensions of

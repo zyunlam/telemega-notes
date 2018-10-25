@@ -1,6 +1,7 @@
-= TeleMini v3 Outline and Hole Pattern
+:notitle:
 :doctype: article
 
+== TeleMini v3 Outline and Hole Pattern
 	This image, when printed, provides a precise template for the
 	mounting holes in TeleMini v3. TeleMini v3 has overall dimensions of
 	0.500 x 1.670 inches, and the mounting holes are sized for use

@@ -1,34 +1,47 @@
 = EasyMini Owner's Manual
+Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
+:title-logo-image: image:../themes/background.png[]
+:revnumber: v1.8.7
+:revdate: 8 Oct 2018
+:copyright: Bdale Garbee and Keith Packard 2018
 :doctype: book
 :numbered:
+:toc:
+:stylesheet: am.css
+:linkcss:
 :altusmetrum: 1
 :easymini: 1
 :application: AltosUI
+:pdf-stylesdir: .
+:pdf-style: altusmetrum
+:pdf-fontsdir: fonts
 
-	include::dedication.raw[]
+	include::header.adoc[]
 
-	include::intro.raw[]
+	include::dedication.adoc[]
 
-	include::getting-started.raw[]
+	include::intro.adoc[]
 
-	include::usage.raw[]
+	include::getting-started.adoc[]
 
-	include::easymini-device.raw[]
+	include::usage.adoc[]
 
-	include::installation.raw[]
+	include::easymini-device.adoc[]
 
-	include::using-am-products.raw[]
+	include::installation.adoc[]
 
-	include::altosui.raw[]
+	include::using-am-products.adoc[]
 
-	include::system-operation.raw[]
+	include::altosui.adoc[]
 
-	include::handling.raw[]
+	include::system-operation.adoc[]
 
-	include::updating-firmware.raw[]
+	include::handling.adoc[]
 
-	include::flight-data-recording.raw[]
+	include::updating-firmware.adoc[]
 
-	include::specs.raw[]
+	include::flight-data-recording.adoc[]
 
-	include::easymini-release-notes.raw[]
+	include::specs.adoc[]
+
+	include::easymini-release-notes.adoc[]

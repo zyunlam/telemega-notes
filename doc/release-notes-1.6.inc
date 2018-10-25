@@ -1,5 +1,5 @@
 = Release Notes for Version 1.6
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.6 includes support for our updated TeleDongle v3.0

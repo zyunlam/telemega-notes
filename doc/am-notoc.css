@@ -61,7 +61,7 @@
 body {
     font-family: "Open Sans",sans-serif;
     font-size: 12pt;
-    margin: 0;
+    margin: 2em 5em 2em 5em;
 }
 
 code, pre {
@@ -92,57 +92,10 @@ h1, h2, h3, h4, h5, h6
   font-family: "Open Sans",sans-serif;
 }
 
-div#content, div#header, div#footer {
-    margin-left: 440px;
-    margin-right: 2em;
-    margin-top: 2em;
-    margin-bottom: 2em;
-}
-
 div.toc {
-    position: fixed;
-    left: 0px;
-    top: 92px;
-    bottom: 0;
-    width: 390px;
-    margin-right: 0;
-    margin-left: 0;
-    padding-left: 10px;
-    padding-right: 10px;
-    float: left;
-    border-right: 2px solid #808080;
-    border-collapse: collapse;
-    overflow: auto;
+    display:none;
 }
-
-div#logo img {
-    position: fixed;
-    left: 0px;
-    top: 0px;
-    width: 410px;
-    height: 92px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    border-right: 2px solid #808080;
-    border-bottom: 2px solid #808080;
-}
-
-div.toc a:link {
-    text-decoration: none;
-}
-
-div.toc a:visited {
-    text-decoration: none;
-}
-
-div.toc a:hover {
-    text-decoration: underline;
-}
-
-div.toc a:active {
-    text-decoration: underline;
-}
-
+    
 div.details {
     padding-top: 1em;
     padding-left: 3em;

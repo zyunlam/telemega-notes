@@ -1,6 +1,15 @@
 = AltOS Companion Port
+Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 :doctype: article
+:copyright: Bdale Garbee and Keith Packard 2018
+:stylesheet: am.css
+:linkcss:
+:pdf-stylesdir: .
+:pdf-style: altusmetrum
+:pdf-fontsdir: fonts
 :toc:
+
+	include::header.adoc[]
 
 == Companion Port
 

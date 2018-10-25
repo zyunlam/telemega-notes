@@ -1,7 +1,7 @@
 === Load Maps
 
 	.Load Maps Window
-	image::load-maps.png[width="5.2in"]
+	image::load-maps.png[width=500]
 
 	Before heading out to a new launch site, you can use
 	this to load satellite images in case you don't have

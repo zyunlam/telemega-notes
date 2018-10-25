@@ -27,10 +27,14 @@
 	http://www.altusmetrum.org/AltOS/
 
 	ifdef::telemega[]
+
 	=== Updating TeleMega, TeleMetrum v2, EasyMega, EasyMini or TeleDongle v3 Firmware
+
 	endif::telemega[]
 	ifndef::telemega[]
+
 	=== Updating EasyMini Firmware
+
 	endif::telemega[]
 
 		Self-programmable devices are reprogrammed by

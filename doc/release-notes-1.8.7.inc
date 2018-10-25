@@ -1,5 +1,5 @@
 = Release Notes for Version 1.8.7
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.8.7

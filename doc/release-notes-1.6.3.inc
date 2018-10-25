@@ -1,5 +1,5 @@
 = Release Notes for Version 1.6.3
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.6.3 adds idle mode to AltosDroid and has bug fixes

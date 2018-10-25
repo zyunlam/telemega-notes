@@ -1,7 +1,18 @@
 = AltOS Telemetry
+Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
+:revnumber: v1.8.7
+:revdate: 8 Oct 2018
+:copyright: Bdale Garbee and Keith Packard 2018
+:stylesheet: am.css
+:linkcss:
 :doctype: article
 :toc:
 :numbered:
+:pdf-stylesdir: .
+:pdf-style: altusmetrum
+:pdf-fontsdir: fonts
+
+	include::header.adoc[]
 
 == Packet Format Design
 

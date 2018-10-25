@@ -1,5 +1,5 @@
 = Release Notes for Version 1.6.2
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.6.2 includes support for our updated TeleMega v2.0

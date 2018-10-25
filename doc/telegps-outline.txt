@@ -1,6 +1,7 @@
-= TeleGPS Outline and Hole Pattern
+:notitle:
 :doctype: article
 
+== TeleGPS Outline and Hole Pattern
 	This image, when printed, provides a precise template for the
 	mounting holes in TeleGPS.  TeleGPS has overall dimensions
 	of 1.000 x 1.500 inches, and the mounting holes are sized for

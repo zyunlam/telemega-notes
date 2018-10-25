@@ -1,10 +1,10 @@
 == TeleMetrum
 
 	.TeleMetrum v2 Board
-	image::telemetrum-v2.0-th.jpg[width="5.5in"]
+	image::telemetrum-v2.0-th.jpg[width=400]
 
 	.TeleMetrum v1 Board
-	image::telemetrum-v1.1-thside.jpg[width="5.5in"]
+	image::telemetrum-v1.1-thside.jpg[width=400]
 
 	TeleMetrum is a 1 inch by 2¾ inch circuit board.  It was designed to
 	fit inside coupler for 29mm air-frame tubing, but using it in a tube that
@@ -39,7 +39,7 @@
 
 		.TeleMetrum Screw Terminals
 		[options="header",grid="all",cols="2,3,10"]
-		|=========================
+		|===
 		|Terminal #|Terminal Name|Description
 		|1	|Switch Output	|Switch connection to flight computer
 		|2	|Switch Input	|Switch connection to positive battery terminal
@@ -47,7 +47,7 @@
 		|4	|Main -		|Main pyro channel connection to pyro circuit
 		|5	|Apogee +	|Apogee pyro channel common connection to battery +
 		|6	|Apogee -	|Apogee pyro channel connection to pyro circuit
-		|========================
+		|===
 
 	=== Using a Separate Pyro Battery with TeleMetrum
 

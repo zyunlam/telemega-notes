@@ -1,5 +1,15 @@
 #
-#	http://docbook.sourceforge.net/release/xsl/current/README
+# Copyright © 2018 Keith Packard <keithp@keithp.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
 
 if FAKETIME
@@ -115,9 +125,11 @@ COMMON_INC_FILES=\
 	config-ui.inc \
 	load-maps.inc \
 	aprs-operation.inc \
-	handling.inc
+	handling.inc \
+	release-head.inc
 
 INC_FILES=\
+	header.inc \
 	dedication.inc \
 	intro.inc \
 	getting-started.inc \
@@ -140,7 +152,7 @@ INC_FILES=\
 	release-notes.inc \
 	$(RELNOTES_INC)
 
-RAW_FILES=$(TXT_FILES:.txt=.raw) $(INC_FILES:.inc=.raw)
+ADOC_FILES=$(TXT_FILES:.txt=.adoc) $(INC_FILES:.inc=.adoc)
 
 TELEGPS_INC_FILES=\
 	telegps-dedication.inc \
@@ -156,14 +168,14 @@ TELEGPS_INC_FILES=\
 TELEGPS_TXT_FILES=\
 	telegps.txt
 
-TELEGPS_RAW_FILES=$(TELEGPS_TXT_FILES:.txt=.raw) $(TELEGPS_INC_FILES:.inc=.raw)
+TELEGPS_ADOC_FILES=$(TELEGPS_TXT_FILES:.txt=.adoc) $(TELEGPS_INC_FILES:.inc=.adoc)
 
 MICROPEAK_TXT_FILES=\
 	micropeak.txt
 
 MICROPEAK_INC_FILES=
 
-MICROPEAK_RAW_FILES=$(MICROPEAK_TXT_FILES:.txt=.raw) $(MICROPEAK_INC_FILES:.inc=.raw)
+MICROPEAK_ADOC_FILES=$(MICROPEAK_TXT_FILES:.txt=.adoc) $(MICROPEAK_INC_FILES:.inc=.adoc)
 
 EASYMINI_TXT_FILES=\
 	easymini.txt
@@ -171,7 +183,7 @@ EASYMINI_TXT_FILES=\
 EASYMINI_INC_FILES=$(INC_FILES) easymini-release-notes.inc
 
 
-EASYMINI_RAW_FILES=$(EASYMINI_TXT_FILES:.txt=.raw) $(EASYMINI_INC_FILES:.inc=.raw)
+EASYMINI_ADOC_FILES=$(EASYMINI_TXT_FILES:.txt=.adoc) $(EASYMINI_INC_FILES:.inc=.adoc)
 
 OUTLINE_TXT_FILES=\
 	easymega-outline.txt \
@@ -182,7 +194,7 @@ OUTLINE_TXT_FILES=\
 	telemini-v3-outline.txt \
 	telegps-outline.txt
 
-OUTLINE_RAW_FILES=$(OUTLINE_TXT_FILES:.txt=.raw)
+OUTLINE_ADOC_FILES=$(OUTLINE_TXT_FILES:.txt=.adoc)
 
 OUTLINE_PDF_FILES=$(OUTLINE_TXT_FILES:.txt=.pdf)
 
@@ -202,7 +214,7 @@ ONEFILE_TXT_FILES=\
 	telemetry.txt \
 	map-loading.txt
 
-ONEFILE_RAW_FILES=$(ONEFILE_TXT_FILES:.txt=.raw)
+ONEFILE_ADOC_FILES=$(ONEFILE_TXT_FILES:.txt=.adoc)
 ONEFILE_PDF_FILES=$(ONEFILE_TXT_FILES:.txt=.pdf)
 ONEFILE_HTML_FILES=$(ONEFILE_TXT_FILES:.txt=.html)
 
@@ -212,22 +224,12 @@ PUBLISH_HTML=altusmetrum.html micropeak.html telegps.html easymini.html $(ONEFIL
 
 HTML=$(PUBLISH_HTML) $(RELNOTES_HTML)
 
-HTML_REVHISTORY=\
-	altusmetrum-revhistory.html \
-	micropeak-revhistory.html \
-	telegps-revhistory.html \
-	easymini-revhistory.html
-
 PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 
 MAP_DOT_FILES=map-loading.dot
 MAP_SVG_FILES=$(MAP_DOT_FILES:.dot=.svg)
-FOP_STYLE=am-fo.xsl
-HTML_STYLE=am-html.xsl
-COMMON_STYLE=common.xsl
-FOP_XCONF=fop.xconf
-STYLESHEET=am.css
+STYLESHEET=am.css am-notoc.css
 
 FONTS=\
 	fonts/DejaVuSansMono-BoldOblique.ttf \
@@ -241,56 +243,41 @@ FONTS=\
 	fonts/OpenSans-Semibold.ttf \
 	fonts/OpenSans-SemiboldItalic.ttf
 
-TEMPLATES_TMPL=titlepage.templates.tmpl
+PDF_CONFIG_FILES=altusmetrum-theme.yml
+HTML_CONFIG_FILES=
 
-TEMPLATES_XSL=$(TEMPLATES_TMPL:.tmpl=.xsl)
+PUBLISH_DOC=$(PUBLISH_HTML) $(PDF) $(IMAGES) $(MAP_SVG_FILES) $(STYLESHEET)
 
-PDF_CONFIG_FILES=$(FOP_STYLE) $(COMMON_STYLE) $(FOP_XCONF) $(TEMPLATES_XSL)
-HTML_CONFIG_FILES=$(HTML_STYLE) $(COMMON_STYLE) $(TEMPLATES_XSL)
+DOC=$(HTML) $(PDF) $(IMAGES) $(MAP_SVG_FILES) $(STYLESHEET)
 
-PUBLISH_DOC=$(PUBLISH_HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
-
-DOC=$(HTML) $(HTML_REVHISTORY) $(PDF) $(IMAGES) $(STYLESHEET)
-
-SUFFIXES = .dot .svg .tmpl .xsl .inc .txt .raw .pdf .html
+SUFFIXES = .dot .svg .inc .txt .adoc .pdf .html
 
 .dot.svg:
 	dot -Tsvg -o$@ $*.dot
 
-.txt.raw:
+.txt.adoc:
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.txt > $@
 
-.inc.raw:
+.inc.adoc:
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
-.raw.html:
-	a2x -a docinfo -f xhtml --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(HTML_STYLE) --stylesheet=$(STYLESHEET) $*.raw
-	case $* in release-notes*) ./fix-html $*.html ;; esac
-	$(FAKETIME) a2x -a docinfo -f pdf --xsltproc-opts "--stringparam toc.section.depth 2" --xsl-file $(FOP_STYLE) --fop --fop-opts="-c $(FOP_XCONF)" $*.raw
+.adoc.html:
+	asciidoctor -b html5 $*.adoc
 
-.html.pdf:
-	echo $@
-
-.tmpl.xsl:
-	xsltproc --output $@ /usr/share/xml/docbook/stylesheet/docbook-xsl/template/titlepage.xsl $*.tmpl
+.adoc.pdf:
+	asciidoctor-pdf $*.adoc
 
 all:	$(HTML) $(PDF)
 
-map-loading.raw: $(MAP_SVG_FILES)
+map-loading.adoc: $(MAP_SVG_FILES)
 
-altusmetrum-revhistory.html: altusmetrum.html
+altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(ADOC_FILES) $(IMAGES)
 
-micropeak-revhistory.html: micropeak.html
+telegps.html telegps.pdf: telegps-docinfo.xml $(TELEGPS_ADOC_FILES) $(IMAGES)
 
-telegps-revhistory.html: telegps.html
+micropeak.pdf micropeak.html: micropeak-docinfo.xml $(MICROPEAK_ADOC_FILES) $(IMAGES)
 
-altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(RAW_FILES) $(IMAGES)
-
-telegps.html telegps.pdf: telegps-docinfo.xml $(TELEGPS_RAW_FILES) $(IMAGES)
-
-micropeak.pdf micropeak.html: micropeak-docinfo.xml $(MICROPEAK_RAW_FILES) $(IMAGES)
-
-easymini.pdf easymini.html: easymini-docinfo.xml $(EASYMINI_RAW_FILES) $(IMAGES)
+easymini.pdf easymini.html: easymini-docinfo.xml $(EASYMINI_ADOC_FILES) $(IMAGES)
 
 telemini-v1-outline.pdf: telemini-v1-outline.txt telemini-v1.svg
 
@@ -311,12 +298,12 @@ publish:	$(PUBLISH_DOC) $(FONTS)
 	 git commit -F - $(WEB_ROOT)/altusmetrum/AltOS/doc/* $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/* ; \
 	 git push)
 
-publish-keithp:	am.html $(PUBLISH_DOC) $(FONTS)
-	scp -p am.html $(PUBLISH_DOC) keithp.com:~keithp/public_html/altos
+publish-keithp:	am.html $(DOC) $(FONTS)
+	scp -p am.html $(DOC) keithp.com:~keithp/public_html/altos
 	scp -p $(FONTS) keithp.com:~keithp/public_html/altos/fonts
 
 clean:
-	rm -f am.html $(HTML) $(HTML_REVHISTORY) $(PDF) $(TEMPLATES_XSL) $(RAW_FILES) $(TELEGPS_RAW_FILES) $(MICROPEAK_RAW_FILES)
+	rm -f am.html $(HTML) $(PDF) $(ADOC_FILES) $(TELEGPS_ADOC_FILES) $(MICROPEAK_ADOC_FILES)
 
 distclean: clean
 	rm -f $(HTML) $(PDF)

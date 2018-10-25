@@ -1,5 +1,5 @@
 = Release Notes for Version 1.8.1
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.8.1 includes an important bug fix for Apogee Lockout

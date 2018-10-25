@@ -21,7 +21,7 @@
       
 	:aprsdevices: TeleGPS
 	:configure_section: _configure_device
-	include::aprs-operation.raw[]
+	include::aprs-operation.adoc[]
 
 	=== Configurable Parameters
 

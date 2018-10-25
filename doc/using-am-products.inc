@@ -1,12 +1,14 @@
 == Using Altus Metrum Products
 
 	ifdef::radio[]
+
 	=== Being Legal
 
 	        In the US, you need an
 	        link:http://www.altusmetrum.org/Radio/[amateur radio license]
 	        or other authorization to legally operate the radio
 	        transmitters that are part of our products.
+
 	endif::radio[]
 
 

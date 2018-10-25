@@ -1,8 +1,8 @@
 == TeleMini
 
 	.TeleMini v3 Board
-	image::telemini-v3.0-top.jpg[width="5.5in"]
-	image::telemini-v3.0-bottom.jpg[width="5.5in"]
+	image::telemini-v3.0-top.jpg[width=400]
+	image::telemini-v3.0-bottom.jpg[width=400]
 
 	TeleMini v3 is 0.5 inches by 1.67 inches.  It was
 	designed to fit inside an 18mm air-frame tube, but using it in
@@ -152,5 +152,5 @@
 		power switch.
 
 		.TeleMini v1 Board
-		image::telemini-v1-top.jpg[width="5.5in"]
+		image::telemini-v1-top.jpg[width=400]
 

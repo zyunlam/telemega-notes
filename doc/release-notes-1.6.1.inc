@@ -1,5 +1,5 @@
 = Release Notes for Version 1.6.1
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.6.1 includes support for our updated TeleBT v3.0

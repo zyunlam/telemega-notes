@@ -1,5 +1,5 @@
 = Release Notes for Version 0.7.1
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 0.7.1 is the first release containing our new

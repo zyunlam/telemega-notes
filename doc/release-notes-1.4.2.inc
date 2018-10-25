@@ -1,5 +1,5 @@
 = Release Notes for Version 1.4.2
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.4.2 is a minor release. It fixes Java-related install issues on

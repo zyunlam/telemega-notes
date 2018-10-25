@@ -1,5 +1,5 @@
 = Release Notes for Version 1.7
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.7 includes support for our new TeleMini v3.0
