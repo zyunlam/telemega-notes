@@ -3,7 +3,7 @@ Section: electronics
 Priority: optional
 Maintainer: Bdale Garbee <bdale@gag.com>
 Uploaders: Keith Packard <keithp@keithp.com>
-Build-Depends: asciidoc,
+Build-Depends: asciidoctor,
                autoconf,
                automake,
                cc1111,
