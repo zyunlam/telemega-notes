@@ -271,13 +271,13 @@ all:	$(HTML) $(PDF)
 
 map-loading.adoc: $(MAP_SVG_FILES)
 
-altusmetrum.pdf altusmetrum.html: altusmetrum-docinfo.xml $(ADOC_FILES) $(IMAGES)
+altusmetrum.pdf altusmetrum.html: $(ADOC_FILES) $(IMAGES)
 
-telegps.html telegps.pdf: telegps-docinfo.xml $(TELEGPS_ADOC_FILES) $(IMAGES)
+telegps.html telegps.pdf: $(TELEGPS_ADOC_FILES) $(IMAGES)
 
-micropeak.pdf micropeak.html: micropeak-docinfo.xml $(MICROPEAK_ADOC_FILES) $(IMAGES)
+micropeak.pdf micropeak.html: $(MICROPEAK_ADOC_FILES) $(IMAGES)
 
-easymini.pdf easymini.html: easymini-docinfo.xml $(EASYMINI_ADOC_FILES) $(IMAGES)
+easymini.pdf easymini.html: $(EASYMINI_ADOC_FILES) $(IMAGES)
 
 telemini-v1-outline.pdf: telemini-v1-outline.txt telemini-v1.svg
 
