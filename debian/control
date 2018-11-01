@@ -9,10 +9,7 @@ Build-Depends: asciidoctor,
                cc1111,
                debhelper (>= 10),
                default-jdk,
-               docbook-xml,
-               docbook-xsl,
 	       faketime,
-               fop,
                freetts,
                gawk,
                gcc-arm-none-eabi,
@@ -34,9 +31,7 @@ Build-Depends: asciidoctor,
 	       cairo-5c,
                pkg-config,
                shared-mime-info,
-               swig,
-               xmlto,
-               xsltproc
+               swig
 Standards-Version: 4.0.0
 Homepage: http://altusmetrum.org/AltOS
 Vcs-Git: git://git.gag.com/fw/altos -b debian
