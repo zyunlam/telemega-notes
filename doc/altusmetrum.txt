@@ -3,6 +3,8 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>; Bob Finch; Anth
 :title-logo-image: image:../themes/background.png[]
 :revnumber: v1.8.7
 :revdate: 8 Oct 2018
+:icons:
+:icontype: svg
 :revremark: Include TeleMega v3.0 firmware in release. Fix TeleBT v4.0 RF calibration to factory value when reflashing. Fix map images. Fix Mac OS X support.
 :copyright: Bdale Garbee and Keith Packard 2018
 :doctype: book
@@ -63,3 +65,4 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>; Bob Finch; Anth
 	include::specs.adoc[]
 
 	include::release-notes.adoc[]
+

@@ -243,6 +243,13 @@ FONTS=\
 	fonts/OpenSans-Semibold.ttf \
 	fonts/OpenSans-SemiboldItalic.ttf
 
+ICONS=\
+	images/icons/caution.svg \
+	images/icons/important.svg \
+	images/icons/note.svg \
+	images/icons/tip.svg \
+	images/icons/warning.svg
+
 PDF_CONFIG_FILES=altusmetrum-theme.yml
 HTML_CONFIG_FILES=
 
@@ -287,20 +294,25 @@ install:	all
 
 WEB_ROOT=/home/bdale/web/
 
-publish:	$(PUBLISH_DOC) $(FONTS)
-	cp $(PUBLISH_DOC) $(WEB_ROOT)/altusmetrum/AltOS/doc/
+publish:	$(PUBLISH_DOC) $(FONTS) $(ICONS)
+	cp -a $(PUBLISH_DOC) $(WEB_ROOT)/altusmetrum/AltOS/doc/
 	mkdir -p $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/
 	cp $(FONTS) $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/
+	mkdir -p $(WEB_ROOT)/altusmetrum/AltOS/doc/images/icons/
+	cp $(ICONS) $(WEB_ROOT)/altusmetrum/AltOS/doc/images/icons/
 	(cd $(WEB_ROOT)/altusmetrum ; \
 	 git add $(WEB_ROOT)/altusmetrum/AltOS/doc/* ; \
 	 git add $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/* ; \
+	 git add $(WEB_ROOT)/altusmetrum/AltOS/doc/images/icons/* ;\
 	 echo "update docs" | \
-	 git commit -F - $(WEB_ROOT)/altusmetrum/AltOS/doc/* $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/* ; \
+	 git commit -F - $(WEB_ROOT)/altusmetrum/AltOS/doc/* $(WEB_ROOT)/altusmetrum/AltOS/doc/fonts/* $(WEB_ROOT)/altusmetrum/AltOS/doc/images/icons ; \
 	 git push)
 
 publish-keithp:	am.html $(DOC) $(FONTS)
+	ssh keithp.com 'mkdir -p ~keithp/public_html/altos/fonts ~keithp/public_html/altos/images/icons'
 	scp -p am.html $(DOC) keithp.com:~keithp/public_html/altos
 	scp -p $(FONTS) keithp.com:~keithp/public_html/altos/fonts
+	scp -p $(ICONS) keithp.com:~keithp/public_html/altos/images/icons
 
 clean:
 	rm -f am.html $(HTML) $(PDF) $(ADOC_FILES) $(TELEGPS_ADOC_FILES) $(MICROPEAK_ADOC_FILES)

@@ -127,6 +127,16 @@ div#logo img {
     border-bottom: 2px solid #808080;
 }
 
+td.icon {
+    width: 4em;
+    height: 3em;
+}
+
+td.icon img {
+    height: 100%;
+    width: 100%
+}
+
 div.toc a:link {
     text-decoration: none;
 }
