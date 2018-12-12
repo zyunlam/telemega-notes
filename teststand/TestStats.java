@@ -19,7 +19,7 @@
 package teststand;
 
 import java.io.*;
-import org.altusmetrum.altoslib_12.*;
+import org.altusmetrum.altoslib_13.*;
 
 public class TestStats {
 	public double		max_pressure;
