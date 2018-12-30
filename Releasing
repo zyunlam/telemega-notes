@@ -3,6 +3,8 @@ Adding a product to the release
 	Make sure the firmware and loader get built by default in
 	src/Makefile
 
+	Add firmware targets to fat_altos target in Makefile.am
+	
 	Add the firmware to altosui/Makefile.am
 
 	Add the firmware to altosui/altos-windows.nsi.in

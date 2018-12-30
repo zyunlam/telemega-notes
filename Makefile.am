@@ -51,6 +51,7 @@ fat_android = \
 
 fat_altos = \
 	src/easymega-v1.0/easymega-v1.0-$(VERSION).ihx \
+	src/easymega-v2.0/easymega-v2.0-$(VERSION).ihx \
 	src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx \
 	src/telebt-v3.0/telebt-v3.0-$(VERSION).ihx \
 	src/telebt-v4.0/telebt-v4.0-$(VERSION).ihx \
@@ -59,6 +60,7 @@ fat_altos = \
 	src/telegps-v2.0/telegps-v2.0-$(VERSION).ihx \
 	src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx \
 	src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx \
+	src/telemega-v3.0/telemega-v3.0-$(VERSION).ihx \
 	src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx
 
 keithp-fat: fat
