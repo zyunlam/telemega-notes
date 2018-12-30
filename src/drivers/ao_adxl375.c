@@ -172,7 +172,6 @@ ao_adxl375_setup(void)
 			     (0 << AO_ADXL375_POWER_CTL_SLEEP) |
 			     (AO_ADXL375_POWER_CTL_WAKEUP_8 << AO_ADXL375_POWER_CTL_WAKEUP));
 
-	(void) ao_adxl375_total_value;
 	/* Perform self-test */
 
 	struct ao_adxl375_total	self_test_off, self_test_on;
@@ -204,8 +203,15 @@ ao_adxl375_setup(void)
 
 	self_test_value = z_change;
 
-	if (z_change < MIN_SELF_TEST || MAX_SELF_TEST < z_change)
+	if (z_change < MIN_SELF_TEST)
 		ao_sensor_errors = 1;
+
+	/* This check is commented out as maximum self test is unreliable
+
+	   if (z_change > MAX_SELF_TEST)
+	   	ao_sensor_errors = 1;
+
+	*/
 
 	/* Discard some samples to let it settle down */
 	ao_adxl375_total_value(&self_test_off, AO_ADXL375_SELF_TEST_SETTLE);
