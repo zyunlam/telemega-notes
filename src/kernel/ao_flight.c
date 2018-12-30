@@ -444,7 +444,9 @@ ao_flight_dump(void)
 	printf ("  max_height  %d\n", ao_max_height);
 	printf ("  avg_height  %d\n", ao_avg_height);
 	printf ("  error_h     %d\n", ao_error_h);
+#if !HAS_ACCEL
 	printf ("  error_avg   %d\n", ao_error_h_sq_avg);
+#endif
 }
 
 static void
