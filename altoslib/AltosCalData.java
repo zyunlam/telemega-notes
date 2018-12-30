@@ -156,8 +156,6 @@ public class AltosCalData {
 	public double acceleration(double sensor) {
 		double accel;
 		accel = AltosConvert.acceleration_from_sensor(sensor, accel_plus_g, accel_minus_g, ground_accel);
-		System.out.printf("acceleration %g (+ %g - %g g %g) -> %g\n",
-				  sensor, accel_plus_g, accel_minus_g, ground_accel, accel);
 		return accel;
 	}
 
