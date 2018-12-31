@@ -4,15 +4,15 @@ PRODUCT=EasyMega
 VERSION=2.0
 REPO=~/altusmetrumllc/Binaries
 
-if [ -x ../ao-tools/ao-flash/ao-flash-stm ]; then
-	STMLOAD=../ao-tools/ao-flash/ao-flash-stm
+if [ -x /usr/bin/ao-flash-stm ]; then
+	FLASH_STM=/usr/bin/ao-flash-stm
 else
 	echo "Can't find ao-flash-stm!  Aborting."
 	exit 1
 fi
 
-if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
-	USBLOAD=../ao-tools/ao-usbload/ao-usbload
+if [ -x /usr/bin/ao-usbload ]; then
+	USBLOAD=/usr/bin/ao-usbload
 else
 	echo "Can't find ao-usbload!  Aborting."
 	exit 1
@@ -42,17 +42,17 @@ case $# in
 	;;
 esac
 
-echo $STMLOAD
+echo $FLASH_STM
 
-$STMLOAD $REPO/loaders/easymega-v$VERSION*.elf || exit 1
+$FLASH_STM $REPO/loaders/easymega-v$VERSION*.elf
 
-sleep 2
+sleep 3
 
 $USBLOAD --serial=$SERIAL $REPO/easymega-v$VERSION*.elf || exit 1
 
-sleep 2
+sleep 5
 
-dev=`../ao-tools/ao-list/ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
+dev=`ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
 
 case "$dev" in
 /dev/tty*)
@@ -66,7 +66,11 @@ esac
 
 echo 'E 0' > $dev
 
-../ao-tools/ao-cal-accel/ao-cal-accel $dev || exit 1
+failed=1
+while [ $failed =  1 ]; do
+    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
+    failed=$?
+done
 
 echo 'E 1' > $dev
 
