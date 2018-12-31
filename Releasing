@@ -27,10 +27,6 @@ These are Keith's notes on how to do a release
 
 	- make sure doc/Makefile points at that too
 
-	- make sure that doc/altusmetrum-docinfo.xml has the right copyright 
-	  year, and add release to the revision history at the front (release 
-	  notes will be pulled in by release-notes.inc)
-
 These are Bdale's notes on how to do a release.
 
 	- make sure build environment is up to date
