@@ -3,9 +3,8 @@ Creating documentation for a new release of AltOS
 * Write release notes in release-notes-${version}.inc. Add to
   Makefile
 
-* Make sure that doc/altusmetrum-docinfo.xml has the right copyright 
-  year, and add release to the revision history at the front (release 
-  notes will be pulled in by release-notes.inc)
+* Make sure that doc/altusmetrum.txt has the right copyright 
+  year
 
 * Add references to that as appropriate from each of the
   documents:
@@ -13,25 +12,6 @@ Creating documentation for a new release of AltOS
 	release-notes.inc
 	easymini-release-notes.inc
 	telegps-release-notes.inc
-
-* Update date and add docinfo short release info for each document as
-  appropriate
-
-	altusmetrum-docinfo.xml
-	companion-docinfo.xml
-	easymini-docinfo.xml
-	micropeak-docinfo.xml
-	telegps-docinfo.xml
-	telemetry-docinfo.xml
-
-* Update copyright year as appropriate
-
-	altusmetrum-docinfo.xml
-	companion-docinfo.xml
-	easymini-docinfo.xml
-	micropeak-docinfo.xml
-	telegps-docinfo.xml
-	telemetry-docinfo.xml
 
 * Add release-notes-${version}.inc to git
 
