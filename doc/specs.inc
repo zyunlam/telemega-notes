@@ -125,6 +125,15 @@
 	|8MB
 	|-
 	|3.7V
+
+	|EasyMega v2.0
+	|MS5607 30km (100k')
+	|ADXL375 200g
+	|-
+	|MPU9250
+	|8MB
+	|-
+	|3.7V
 	endif::easymega[]
 
 	|===
