@@ -29,8 +29,11 @@ These are Keith's notes on how to do a release
 
 These are Bdale's notes on how to do a release.
 
-	- make sure build environment is up to date
+	- make sure Debian build environment is up to date
 		sudo cowbuilder --update
+
+	- make sure fat build environment is up to date
+		sudo apt update && sudo apt upgrade
 
 	- ensure i386 build support is available, and we have tools to build
 	  installers for Windows and Mac OS X
@@ -54,12 +57,9 @@ These are Bdale's notes on how to do a release.
 		- cherry-pick or merge appropriate content from master
 	
 	- make sure there is a doc/release-notes-<version>.inc
-	- make sure that doc/altusmetrum-docinfo.xml has the right copyright 
-	  year, and add release to the revision history at the front (release 
-	  notes will be pulled in automatically)
+	- make sure that doc/*.txt have the right copyright year and the
+	  new release is included
 	- make absolutely sure checked-out tree is "clean" 
-	- make absolutely sure the pdclib/ submodule is on the master branch,
-	  up to date, and "clean"
 
         git log > ChangeLog
 	git commit -a
@@ -77,14 +77,14 @@ These are Bdale's notes on how to do a release.
         git commit -n debian/changelog -m "update changelog for Debian build"
 
 	- if this is a -1 release, then
-		gbp buildpackage --git-no-pristine-tar --git-submodules \
+		gbp buildpackage --git-no-pristine-tar \
 			--git-upstream-branch=branch-<version> \ # eg 1.3
 			--git-upstream-tag=<version>	         # eg 1.3.1
 		pristine-tar commit \
 			../build-area/altos_<version>.orig.tar.gz \
 			branch-<version>
 	  else if this is not a -1 release
-		gbp buildpackage --git-submodules
+		gbp buildpackage
 
 	git tag debian/<version>
 
