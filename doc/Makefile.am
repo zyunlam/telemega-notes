@@ -225,8 +225,10 @@ PUBLISH_HTML=altusmetrum.html micropeak.html telegps.html easymini.html $(ONEFIL
 
 HTML=$(PUBLISH_HTML) $(RELNOTES_HTML)
 
+if ASCIIDOCTOR_PDF
 PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
+endif
 
 MAP_DOT_FILES=map-loading.dot
 MAP_SVG_FILES=$(MAP_DOT_FILES:.dot=.svg)
