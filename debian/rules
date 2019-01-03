@@ -60,6 +60,7 @@ binary-arch: install
 	cp icon/org-altusmetrum-mimetypes.xml debian/altos.sharedmimeinfo
 	dh_installmime
 	dh_installman
+	dh_lintian
 	dh_link
 	dh_strip
 	dh_compress
