@@ -44,7 +44,6 @@ main (int argc, char **argv)
 	char	line[80];
 	int c, i, ret = 0;
 	FILE *file;
-	int serial;
 	int ignore_crc = 0;
 	while ((c = getopt_long(argc, argv, "c", options, NULL)) != -1) {
 		switch (c) {
@@ -63,11 +62,6 @@ main (int argc, char **argv)
 			ret++;
 			continue;
 		}
-		s = strstr(argv[i], "-serial-");
-		if (s)
-			serial = atoi(s + 8);
-		else
-			serial = 0;
 		while (fgets(line, sizeof (line), file)) {
 			union ao_telemetry_all telem;
  			char call[AO_MAX_CALLSIGN+1];
@@ -104,7 +98,7 @@ main (int argc, char **argv)
 					memcpy(version, telem.configuration.version, AO_MAX_VERSION);
 					call[AO_MAX_CALLSIGN] = '\0';
 					version[AO_MAX_CALLSIGN] = '\0';
-					printf ("device %3d flight %5d config %3d.%03d delay %2d main %4d",
+					printf ("device %3d flight %5d config %3d.%03d delay %2d main %4d log_max %5d",
 						telem.configuration.device,
 						telem.configuration.flight,
 						telem.configuration.config_major,
