@@ -386,6 +386,12 @@ if test "x$HAVE_NICKLE" = "xno"; then
 	AC_MSG_ERROR([Please install nickle to build AltOs])
 fi
 
+AC_CHECK_PROG([HAVE_ASCIIDOCTOR_PDF], [asciidoctor-pdf], yes, no)
+if test "x$HAVE_ASCIIDOCTOR_PDF" = "xno"; then
+	AC_MSG_WARN([asciidoctor-pdf not found, PDF docs will not be built])
+fi
+AM_CONDITIONAL([ASCIIDOCTOR_PDF], [test x$HAVE_ASCIIDOCTOR_PDF != xno])
+
 PKG_CHECK_MODULES([JANSSON], [jansson])
 
 AC_ARG_WITH([readline],
