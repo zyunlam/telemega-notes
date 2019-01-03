@@ -1,0 +1,3 @@
+altos source: source-contains-prebuilt-windows-binary altosui/Instdrv/NSIS/Plugins/InstDrv.dll
+altos source: source-contains-prebuilt-windows-binary altosui/Instdrv/NSIS/Contrib/InstDrv/InstDrv-Test.exe
+altos source: source-contains-prebuilt-windows-binary altosui/Instdrv/NSIS/Contrib/InstDrv/ircomm2k.sys
