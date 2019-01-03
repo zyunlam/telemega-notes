@@ -1,0 +1,5 @@
+altos source: source-contains-prebuilt-windows-binary altosui/Instdrv/NSIS/Plugins/InstDrv.dll
+altos source: source-contains-prebuilt-windows-binary altosui/Instdrv/NSIS/Contrib/InstDrv/InstDrv-Test.exe
+altos source: source-contains-prebuilt-windows-binary altosui/Instdrv/NSIS/Contrib/InstDrv/ircomm2k.sys
+altos: bad-jar-name usr/share/java/altoslib_13.jar
+altos: bad-jar-name usr/share/java/altosuilib_13.jar
