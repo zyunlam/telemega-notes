@@ -17,6 +17,10 @@ altos (1.9-1) unstable; urgency=medium
   * update easymega turn-on script for v2.0
   * ao-bringup: get turnon_easymega working for v2.0
   * changelog for 1.9 release
+  * update changelog for Debian build
+  * use ChangeLog from branch-1.9 in unmolested form
+  * need to run autoreconf before calling dh_auto_configure
+  * elide pdf files from delivered docs until ruby-asciidoctor-pdf escapes NEW
 
   [ Keith Packard ]
   * altosdroid: Bump version to 18 for 1.8.7
@@ -89,8 +93,9 @@ altos (1.9-1) unstable; urgency=medium
   * doc: Add 1.9 release notes
   * Change Releasing to reflect asciidoctor switch
   * Update to version 1.9
+  * doc: Skip .pdf generation when asciidoctor-pdf is missing
 
- -- Bdale Garbee <bdale@gag.com>  Wed, 02 Jan 2019 22:24:05 -0700
+ -- Bdale Garbee <bdale@gag.com>  Wed, 02 Jan 2019 23:05:30 -0700
 
 altos (1.8.7-2) unstable; urgency=medium
 
