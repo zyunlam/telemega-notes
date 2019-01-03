@@ -13,6 +13,7 @@ configure_flags = --disable-install-shared-mime-info --enable-faketime
 
 configure: configure-stamp
 configure-stamp:
+	autoreconf --force -v --install
 	dh_auto_configure -- $(configure_flags) && touch $@
 
 build: build-arch build-indep
