@@ -13,6 +13,14 @@ Creating documentation for a new release of AltOS
 	easymini-release-notes.inc
 	telegps-release-notes.inc
 
+* Update version in main docs
+
+	altusmetrum.txt
+	easymini.txt
+	micropeak.txt
+	telegps.txt
+	telemetry.txt
+
 * Add release-notes-${version}.inc to git
 
 * Make sure new hardware specs are documented in specs.inc
