@@ -213,9 +213,6 @@ cc_pressure_to_altitude(double pressure)
  * 2.82V * 2047 / 3.3 counts/V = 1749 counts/115 kPa
  */
 
-static const double counts_per_kPa = 27 * 2047 / 3300;
-static const double counts_at_101_3kPa = 1674.0;
-
 double
 cc_barometer_to_pressure(double count)
 {

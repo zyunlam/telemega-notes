@@ -114,7 +114,6 @@ static const char *state_names[] = {
 static void
 send_telem(struct cc_usb *cc, union ao_telemetry_all *telem)
 {
-	int 	rssi = (int8_t) telem->generic.rssi / 2 - 74;
 	int	i;
 	uint8_t	*b;
 
@@ -170,9 +169,7 @@ main (int argc, char **argv)
 	char		line[80];
 	int 		c, i, ret = 0;
 	int		freq = 434550;
-	char 		*s;
 	FILE 		*file;
-	int 		serial;
 	uint16_t	last_tick;
 	int		started;
 	int		realtime = 0;
@@ -239,7 +236,6 @@ main (int argc, char **argv)
 
 	if (fake) {
 		union ao_telemetry_all	telem;
-		uint16_t		tick;
 		int			i;
 
 		memset(&telem, '\0', sizeof (telem));

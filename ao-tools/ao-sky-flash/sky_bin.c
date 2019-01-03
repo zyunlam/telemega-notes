@@ -48,7 +48,7 @@ skytraq_send_bin(int fd, const char *filename)
 	size = ftell(file);
 	rewind(file);
 
-	sprintf(message, "BINSIZE = %d Checksum = %d Loopnumber = %d ", size, cksum, 1);
+	sprintf(message, "BINSIZE = %ld Checksum = %d Loopnumber = %d ", size, cksum, 1);
 
 	ret = skytraq_cmd_wait(fd, message, strlen(message) + 1, "OK", 20000);
 	if (ret < 0)

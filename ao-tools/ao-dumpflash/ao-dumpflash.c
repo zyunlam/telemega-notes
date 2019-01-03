@@ -51,24 +51,17 @@ main (int argc, char **argv)
 	int		c;
 	char		line[8192];
 	FILE		*out;
-	char		*filename;
 	int		serial_number = 0;
 	int		freq = 434550;
 	char		*call = "N0CALL";
-	int		flight = 0;
-	char		cmd;
 	int		block;
 	int		addr;
 	int		received_addr;
 	int		data[8];
-	int		done;
 	int		i;
-	int		column;
 	int		remote = 0;
-	int		any_valid;
-	int		invalid;
 	int		storage_size = 0;
-	char		*out_name;
+	char		*out_name = NULL;
 
 	while ((c = getopt_long(argc, argv, "T:D:F:C:o:R", options, NULL)) != -1) {
 		switch (c) {

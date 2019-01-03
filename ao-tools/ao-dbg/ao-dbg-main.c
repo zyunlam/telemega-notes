@@ -50,7 +50,8 @@ usage(void)
 	exit(1);
 }
 
-void s51_sigint()
+static void
+s51_sigint(int signum)
 {
 	s51_interrupted = 1;
 }
@@ -64,7 +65,7 @@ static const struct option options[] = {
 int
 main(int argc, char **argv)
 {
-	int flags, opt;
+	int opt;
 	char *endptr;
 
 	while ((opt = getopt_long(argc, argv, "PVvHhmt:X:c:r:Z:s:S:p:T:", options, NULL)) != -1) {
@@ -242,7 +243,6 @@ s51_check_input(void)
 {
 	struct pollfd	input;
 	int r;
-	int c;
 
 	input.fd = fileno(s51_input);
 	input.events = POLLIN;

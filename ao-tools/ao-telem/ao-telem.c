@@ -42,8 +42,7 @@ int
 main (int argc, char **argv)
 {
 	char	line[80];
-	int c, i, ret;
-	char *s;
+	int c, i, ret = 0;
 	FILE *file;
 	int serial;
 	int ignore_crc = 0;

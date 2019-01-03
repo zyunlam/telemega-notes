@@ -46,8 +46,8 @@ struct cc_flightcooked *
 cc_flight_cook(struct cc_flightraw *raw)
 {
 	struct cc_flightcooked *cooked;
-	double			flight_start;
-	double			flight_stop;
+	double			flight_start = 0;
+	double			flight_stop = 0;
 	int			start_set = 0;
 	int			stop_set = 0;
 	int			i;

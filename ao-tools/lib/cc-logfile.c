@@ -306,8 +306,8 @@ cc_log_read(FILE *file)
 {
 	struct cc_flightraw	*f;
 	char			line[8192];
-	double			ground_pres;
-	int			ground_pres_count;
+	double			ground_pres = 0.0;
+	int			ground_pres_count = 0;
 
 	f = calloc(1, sizeof (struct cc_flightraw));
 	if (!f)

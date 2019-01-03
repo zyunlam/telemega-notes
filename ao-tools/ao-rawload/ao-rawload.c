@@ -38,8 +38,6 @@ int
 main (int argc, char **argv)
 {
 	struct ccdbg	*dbg;
-	uint8_t		status;
-	uint16_t	pc;
 	struct ao_hex_file	*hex;
 	struct ao_hex_image *image;
 	char		*filename;

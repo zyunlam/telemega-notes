@@ -36,7 +36,7 @@ struct chaoskey {
 	int			kernel_active;
 };
 
-libusb_device_handle *
+static libusb_device_handle *
 chaoskey_match(libusb_device *dev, char *match_serial)
 {
 	struct libusb_device_descriptor desc;
@@ -96,7 +96,7 @@ out:
 	return 0;
 }
 
-struct chaoskey *
+static struct chaoskey *
 chaoskey_open(char *serial)
 {
 	struct chaoskey	*ck;
@@ -161,22 +161,11 @@ out:
 	return NULL;
 }
 
-void
-chaoskey_close(struct chaoskey *ck)
-{
-	libusb_release_interface(ck->handle, 0);
-	if (ck->kernel_active)
-		libusb_attach_kernel_driver(ck->handle, 0);
-	libusb_close(ck->handle);
-	libusb_exit(ck->ctx);
-	free(ck);
-}
-
 #define COOKED_ENDPOINT	0x85
 #define RAW_ENDPOINT	0x86
 #define FLASH_ENDPOINT	0x87
 
-int
+static int
 chaoskey_read(struct chaoskey *ck, int endpoint, void *buffer, int len)
 {
 	uint8_t	*buf = buffer;
