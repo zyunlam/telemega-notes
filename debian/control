@@ -6,13 +6,13 @@ Uploaders: Keith Packard <keithp@keithp.com>
 Build-Depends: asciidoctor,
                autoconf,
                automake,
-               cc1111,
                debhelper (>= 10),
                default-jdk,
 	       faketime,
                freetts,
                gawk,
                gcc-arm-none-eabi,
+               libnewlib-nano-arm-none-eabi,
                graphicsmagick | imagemagick,
                graphviz,
                icnsutils,
@@ -32,7 +32,7 @@ Build-Depends: asciidoctor,
                pkg-config,
                shared-mime-info,
                swig
-Standards-Version: 4.0.0
+Standards-Version: 4.3.0
 Homepage: http://altusmetrum.org/AltOS
 Vcs-Git: git://git.gag.com/fw/altos -b debian
 Vcs-Browser: http://git.gag.com/?p=fw/altos
