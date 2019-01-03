@@ -26,7 +26,7 @@ ao_check_recovery(void)
 	ao_enable_input(AO_RECOVERY_PORT, AO_RECOVERY_PIN, AO_RECOVERY_MODE);
 	for (i = 0; i < 100; i++)
 		ao_arch_nop();
-	if (ao_gpio_get(AO_RECOVERY_PORT, AO_RECOVERY_PIN, AO_RECOVERY) == AO_RECOVERY_VALUE) {
+	if (ao_gpio_get(AO_RECOVERY_PORT, AO_RECOVERY_PIN) == AO_RECOVERY_VALUE) {
 		ao_flight_force_idle = 1;
 		ao_force_freq = 1;
 	}
@@ -68,7 +68,7 @@ main(void)
 	ao_report_init();
 	ao_telemetry_init();
 	ao_radio_init();
-	ao_packet_slave_init(TRUE);
+	ao_packet_slave_init(true);
 	ao_igniter_init();
 	ao_config_init();
 

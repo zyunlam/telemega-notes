@@ -45,26 +45,7 @@ static void ao_adc_done(int index)
 	(void) index;
 	AO_DATA_PRESENT(AO_DATA_ADC);
 	ao_dma_done_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
-	if (ao_data_present == AO_DATA_ALL) {
-#if HAS_MS5607
-		ao_data_ring[ao_data_head].ms5607_raw = ao_ms5607_current;
-#endif
-#if HAS_MMA655X
-		ao_data_ring[ao_data_head].mma655x = ao_mma655x_current;
-#endif
-#if HAS_HMC5883
-		ao_data_ring[ao_data_head].hmc5883 = ao_hmc5883_current;
-#endif
-#if HAS_MPU6000
-		ao_data_ring[ao_data_head].mpu6000 = ao_mpu6000_current;
-#endif
-#if HAS_MPU9250
-		ao_data_ring[ao_data_head].mpu9250 = ao_mpu9250_current;
-#endif
-		ao_data_ring[ao_data_head].tick = ao_tick_count;
-		ao_data_head = ao_data_ring_next(ao_data_head);
-		ao_wakeup((void *) &ao_data_head);
-	}
+	ao_data_fill(ao_data_head);
 	ao_adc_ready = 1;
 }
 
@@ -100,7 +81,7 @@ ao_adc_poll(void)
  * Fetch a copy of the most recent ADC data
  */
 void
-ao_adc_get(__xdata struct ao_adc *packet)
+ao_adc_get(struct ao_adc *packet)
 {
 #if HAS_FLIGHT
 	uint8_t	i = ao_data_ring_prev(ao_sample_data);
@@ -177,7 +158,7 @@ static const char *ao_adc_name[AO_NUM_ADC] = {
 #endif
 
 static void
-ao_adc_dump(void) __reentrant
+ao_adc_dump(void) 
 {
 	struct ao_data	packet;
 #ifndef AO_ADC_DUMP
@@ -203,7 +184,7 @@ ao_adc_dump(void) __reentrant
 #endif
 }
 
-__code struct ao_cmds ao_adc_cmds[] = {
+const struct ao_cmds ao_adc_cmds[] = {
 	{ ao_adc_dump,	"a\0Display current ADC values" },
 	{ 0, NULL },
 };

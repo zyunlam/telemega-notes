@@ -24,16 +24,16 @@
 #define EE_DEVICE_SIZE	((uint32_t) 128 * (uint32_t) 1024)
 
 /* Total bytes of available storage */
-__pdata uint32_t	ao_storage_total;
+uint32_t	ao_storage_total;
 
 /* Block size - device is erased in these units. At least 256 bytes */
-__pdata uint32_t	ao_storage_block;
+uint32_t	ao_storage_block;
 
 /* Byte offset of config block. Will be ao_storage_block bytes long */
-__pdata uint32_t	ao_storage_config;
+uint32_t	ao_storage_config;
 
 /* Storage unit size - device reads and writes must be within blocks of this size. Usually 256 bytes. */
-__pdata uint16_t	ao_storage_unit;
+uint16_t	ao_storage_unit;
 
 /*
  * Using SPI on USART 0, with P1_2 as the chip select
@@ -43,7 +43,7 @@ __pdata uint16_t	ao_storage_unit;
 #define EE_CS		P1_2
 #define EE_CS_PIN	2
 
-static __xdata uint8_t ao_ee_mutex;
+static uint8_t ao_ee_mutex;
 
 #define ao_ee_delay() do { \
 	_asm nop _endasm; \
@@ -58,7 +58,7 @@ static __xdata uint8_t ao_ee_mutex;
 struct ao_ee_instruction {
 	uint8_t	instruction;
 	uint8_t	address[3];
-} __xdata ao_ee_instruction;
+} ao_ee_instruction;
 
 static void
 ao_ee_write_enable(void)
@@ -92,9 +92,9 @@ ao_ee_wrsr(uint8_t status)
 
 #define EE_BLOCK_NONE	0xffff
 
-static __xdata uint8_t ao_ee_data[EE_BLOCK_SIZE];
-static __pdata uint16_t ao_ee_block = EE_BLOCK_NONE;
-static __pdata uint8_t	ao_ee_block_dirty;
+static uint8_t ao_ee_data[EE_BLOCK_SIZE];
+static uint16_t ao_ee_block = EE_BLOCK_NONE;
+static uint8_t	ao_ee_block_dirty;
 
 /* Write the current block to the EEPROM */
 static void
@@ -157,7 +157,7 @@ ao_ee_fill(uint16_t block)
 }
 
 uint8_t
-ao_storage_device_write(uint32_t pos, __xdata void *buf, uint16_t len) __reentrant
+ao_storage_device_write(uint32_t pos, void *buf, uint16_t len) 
 {
 	uint16_t block = (uint16_t) (pos >> EE_BLOCK_SHIFT);
 
@@ -176,7 +176,7 @@ ao_storage_device_write(uint32_t pos, __xdata void *buf, uint16_t len) __reentra
 }
 
 uint8_t
-ao_storage_device_read(uint32_t pos, __xdata void *buf, uint16_t len) __reentrant
+ao_storage_device_read(uint32_t pos, void *buf, uint16_t len) 
 {
 	uint16_t block = (uint16_t) (pos >> EE_BLOCK_SHIFT);
 
@@ -189,7 +189,7 @@ ao_storage_device_read(uint32_t pos, __xdata void *buf, uint16_t len) __reentran
 }
 
 void
-ao_storage_flush(void) __reentrant
+ao_storage_flush(void) 
 {
 	ao_mutex_get(&ao_ee_mutex); {
 		ao_ee_flush_internal();
@@ -197,7 +197,7 @@ ao_storage_flush(void) __reentrant
 }
 
 uint8_t
-ao_storage_erase(uint32_t pos) __reentrant
+ao_storage_erase(uint32_t pos) 
 {
 	ao_mutex_get(&ao_ee_mutex); {
 		ao_ee_flush_internal();
@@ -209,7 +209,7 @@ ao_storage_erase(uint32_t pos) __reentrant
 }
 
 static void
-ee_store(void) __reentrant
+ee_store(void) 
 {
 }
 
@@ -225,7 +225,7 @@ ao_storage_setup(void)
 }
 
 void
-ao_storage_device_info(void) __reentrant
+ao_storage_device_info(void) 
 {
 }
 

@@ -20,23 +20,23 @@
 #include "ao_at45db161d.h"
 
 /* Total bytes of available storage */
-__pdata uint32_t	ao_storage_total;
+uint32_t	ao_storage_total;
 
 /* Block size - device is erased in these units. At least 256 bytes */
-__pdata uint32_t	ao_storage_block;
+uint32_t	ao_storage_block;
 
 /* Byte offset of config block. Will be ao_storage_block bytes long */
-__pdata uint32_t	ao_storage_config;
+uint32_t	ao_storage_config;
 
 /* Storage unit size - device reads and writes must be within blocks of this size. Usually 256 bytes. */
-__pdata uint16_t	ao_storage_unit;
+uint16_t	ao_storage_unit;
 
 #define FLASH_CS		P1_1
 #define FLASH_CS_INDEX		1
 
 #define FLASH_BLOCK_SIZE_MAX	512
 
-__xdata uint8_t ao_flash_mutex;
+uint8_t ao_flash_mutex;
 
 #define ao_flash_delay() do { \
 	_asm nop _endasm; \
@@ -51,7 +51,7 @@ __xdata uint8_t ao_flash_mutex;
 struct ao_flash_instruction {
 	uint8_t	instruction;
 	uint8_t	address[3];
-} __xdata ao_flash_instruction;
+} ao_flash_instruction;
 
 static void
 ao_flash_set_pagesize_512(void)
@@ -79,17 +79,17 @@ ao_flash_read_status(void)
 
 #define FLASH_BLOCK_NONE	0xffff
 
-static __xdata uint8_t ao_flash_data[FLASH_BLOCK_SIZE_MAX];
-static __pdata uint16_t ao_flash_block = FLASH_BLOCK_NONE;
-static __pdata uint8_t	ao_flash_block_dirty;
-static __pdata uint8_t  ao_flash_write_pending;
-static __pdata uint8_t	ao_flash_setup_done;
-static __pdata uint8_t	ao_flash_block_shift;
-static __pdata uint16_t	ao_flash_block_size;
-static __pdata uint16_t	ao_flash_block_mask;
+static uint8_t ao_flash_data[FLASH_BLOCK_SIZE_MAX];
+static uint16_t ao_flash_block = FLASH_BLOCK_NONE;
+static uint8_t	ao_flash_block_dirty;
+static uint8_t  ao_flash_write_pending;
+static uint8_t	ao_flash_setup_done;
+static uint8_t	ao_flash_block_shift;
+static uint16_t	ao_flash_block_size;
+static uint16_t	ao_flash_block_mask;
 
 void
-ao_storage_setup(void) __reentrant
+ao_storage_setup(void) 
 {
 	uint8_t	status;
 
@@ -234,7 +234,7 @@ ao_flash_fill(uint16_t block)
 }
 
 uint8_t
-ao_storage_device_write(uint32_t pos, __xdata void *buf, uint16_t len) __reentrant
+ao_storage_device_write(uint32_t pos, void *buf, uint16_t len) 
 {
 	uint16_t block = (uint16_t) (pos >> ao_flash_block_shift);
 
@@ -255,7 +255,7 @@ ao_storage_device_write(uint32_t pos, __xdata void *buf, uint16_t len) __reentra
 }
 
 uint8_t
-ao_storage_device_read(uint32_t pos, __xdata void *buf, uint16_t len) __reentrant
+ao_storage_device_read(uint32_t pos, void *buf, uint16_t len) 
 {
 	uint16_t block = (uint16_t) (pos >> ao_flash_block_shift);
 
@@ -270,7 +270,7 @@ ao_storage_device_read(uint32_t pos, __xdata void *buf, uint16_t len) __reentran
 }
 
 void
-ao_storage_flush(void) __reentrant
+ao_storage_flush(void) 
 {
 	ao_mutex_get(&ao_flash_mutex); {
 		ao_flash_flush_internal();
@@ -278,7 +278,7 @@ ao_storage_flush(void) __reentrant
 }
 
 uint8_t
-ao_storage_erase(uint32_t pos) __reentrant
+ao_storage_erase(uint32_t pos) 
 {
 	ao_mutex_get(&ao_flash_mutex); {
 		ao_flash_flush_internal();
@@ -290,7 +290,7 @@ ao_storage_erase(uint32_t pos) __reentrant
 }
 
 void
-ao_storage_device_info(void) __reentrant
+ao_storage_device_info(void) 
 {
 	uint8_t	status;
 

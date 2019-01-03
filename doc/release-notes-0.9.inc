@@ -1,5 +1,5 @@
 = Release Notes for Version 0.9
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 0.9 adds a few new firmware features and accompanying

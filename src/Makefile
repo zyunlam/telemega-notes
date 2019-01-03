@@ -16,16 +16,9 @@ include Version
 TOPDIR=.
 include Makedefs
 
-SDCCDIRS=\
-	telemetrum-v1.2 telemetrum-v1.1 telemetrum-v1.0 \
-	teledongle-v0.2 \
-	telemini-v1.0 \
-	telebt-v1.0 \
-	telefire-v0.1 telefire-v0.2 \
-	telerepeat-v1.0
-
 ARMM3DIRS=\
 	easymega-v1.0 easymega-v1.0/flash-loader \
+	easymega-v2.0 easymega-v2.0/flash-loader \
 	telemega-v0.1 telemega-v0.1/flash-loader \
 	telemega-v1.0 telemega-v1.0/flash-loader \
 	telemega-v2.0 telemega-v2.0/flash-loader \
@@ -59,15 +52,6 @@ AVRDIRS=\
 
 SUBDIRS=
 
-ifeq ($(strip $(HAVE_PDCLIB)),yes)
-PDCLIB=pdclib
-CLEAN_PDCLIB=clean-pdclib
-endif
-
-ifeq ($(strip $(HAVE_SDCC)),yes)
-SUBDIRS+=$(SDCCDIRS)
-endif
-
 ifeq ($(strip $(HAVE_ARM_M3_CC)),yes)
 SUBDIRS+=$(ARMM3DIRS)
 foo=bar
@@ -82,7 +66,7 @@ ifeq ($(strip $(HAVE_AVR_CC)),yes)
 SUBDIRS += $(AVRDIRS)
 endif
 
-ALLDIRS=$(SDCCDIRS) $(ARMM3DIRS) $(ARMM0DIRS) $(AVRDIRS)
+ALLDIRS=$(ARMM3DIRS) $(ARMM0DIRS) $(AVRDIRS)
 
 all: all-local all-recursive
 
@@ -133,11 +117,3 @@ ao_whiten.h: make-whiten
 
 clean-local: $(CLEAN_PDCLIB)
 	rm -f altitude.h ao_kalman.h
-
-pdclib:
-	mkdir -p $(PDCLIB_ROOT)/include $(PDCLIB_ROOT)/lib 
-	cd ../pdclib && make && make prefix=`pwd`/../pdclib-root install
-
-clean-pdclib:
-	rm -rf $(PDCLIB_ROOT)
-	cd ../pdclib && make clean

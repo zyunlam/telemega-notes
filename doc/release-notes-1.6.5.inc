@@ -1,5 +1,5 @@
 = Release Notes for Version 1.6.5
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.6.5 fixes a TeleMega and TeleMetrum v2.0 bug where

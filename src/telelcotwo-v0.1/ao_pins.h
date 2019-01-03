@@ -51,6 +51,9 @@
 #define HAS_USB			1
 #define HAS_BEEP		1
 #define BEEPER_CHANNEL		4
+#define BEEPER_TIMER		3
+#define BEEPER_PORT		(&stm_gpiob)
+#define BEEPER_PIN		1
 #define HAS_RADIO		1
 #define HAS_RADIO_RATE		1
 #define HAS_TELEMETRY		0

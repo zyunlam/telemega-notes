@@ -1,5 +1,5 @@
 = Release Notes for Version 1.2
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.2 is a major release. It adds support for MicroPeak

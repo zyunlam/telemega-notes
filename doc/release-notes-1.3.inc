@@ -1,5 +1,5 @@
 = Release Notes for Version 1.3
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.3 is a major release. It adds support for TeleMega,

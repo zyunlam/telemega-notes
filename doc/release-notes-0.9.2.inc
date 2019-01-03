@@ -1,5 +1,5 @@
 = Release Notes for Version 0.9.2
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 0.9.2 is an AltosUI bug-fix release, with no firmware

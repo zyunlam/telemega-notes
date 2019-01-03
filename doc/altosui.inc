@@ -1,7 +1,7 @@
 == AltosUI
 
 	.AltosUI Main Window
-	image::altosui.png[width="4.6in"]
+	image::altosui.png[width=450]
 
 	The AltosUI program provides a graphical user interface for
 	interacting with the Altus Metrum product family. AltosUI can
@@ -12,10 +12,8 @@
 	the tasks provided from the top-level toolbar.
 
 	ifdef::radio[]
+
     	=== Monitor Flight
-	////
-	      <subtitle>Receive, Record and Display Telemetry Data</subtitle>
-	////
 
 		Selecting this item brings up a dialog box listing all
 		of the connected TeleDongle devices. When you choose
@@ -24,7 +22,7 @@
 		device.
 
 		.Device Selection Dialog
-		image::device-selection.png[width="3.1in"]
+		image::device-selection.png[width=300]
 
 		All telemetry data received are automatically recorded
 		in suitable log files. The name of the files includes
@@ -84,7 +82,7 @@
 		==== Launch Pad
 
 			.Monitor Flight Launch Pad View
-			image::launch-pad.png[width="5.5in"]
+			image::launch-pad.png[width=400]
 
 			The 'Launch Pad' tab shows information used to decide when the
 			rocket is ready for flight. The first elements include red/green
@@ -146,7 +144,7 @@
 		==== Ascent
 
 			.Monitor Flight Ascent View
-			image::ascent.png[width="5.5in"]
+			image::ascent.png[width=400]
 
 			This tab is shown during Boost, Fast and Coast
 			phases. The information displayed here helps monitor the
@@ -170,7 +168,7 @@
 		==== Descent
 
 			.Monitor Flight Descent View
-			image::descent.png[width="5.5in"]
+			image::descent.png[width=400]
 
 			Once the rocket has reached apogee and (we hope)
 			activated the apogee charge, attention switches to
@@ -209,7 +207,7 @@
 		==== Landed
 
 			.Monitor Flight Landed View
-			image::landed.png[width="5.5in"]
+			image::landed.png[width=400]
 
 			Once the rocket is on the ground, attention switches
 			to recovery. While the radio signal is often lost once
@@ -246,7 +244,7 @@
 		==== Table
 
 			.Monitor Flight Table View
-			image::table.png[width="5.5in"]
+			image::table.png[width=400]
 
 			The table view shows all of the data available from the
 			flight computer. Probably the most useful data on
@@ -257,7 +255,7 @@
 		==== Site Map
 
 			.Monitor Flight Site Map View
-			image::site-map.png[width="5.5in"]
+			image::site-map.png[width=400]
 
 			When the TeleMetrum has a GPS fix, the Site Map tab
 			will map the rocket's position to make it easier for
@@ -291,7 +289,7 @@
 		==== Igniter
 
 			.Monitor Flight Additional Igniter View
-			image::ignitor.png[width="5.5in"]
+			image::ignitor.png[width=400]
 
 			TeleMega includes four additional programmable pyro
 			channels. The Ignitor tab shows whether each of them has
@@ -299,6 +297,7 @@
 			voltage measured here will be close to the pyro battery
 			voltage. A value greater than 3.2V is required for a 'GO'
 			status.
+
 	endif::radio[]
 
 
@@ -375,7 +374,7 @@
 		==== Flight Graph
 
 			.Flight Data Graph
-			image::graph.png[width="5.5in"]
+			image::graph.png[width=400]
 
 			By default, the graph contains acceleration (blue),
 			velocity (green) and altitude (red).
@@ -392,7 +391,7 @@
 		==== Configure Graph
 
 			.Flight Graph Configuration
-			image::graph-configure.png[width="5.5in"]
+			image::graph-configure.png[width=400]
 
 			This selects which graph elements to show, and, at the
 			very bottom. It also lets you configure how
@@ -420,7 +419,7 @@
 		==== Flight Statistics
 
 			.Flight Statistics
-			image::graph-stats.png[width="5.5in"]
+			image::graph-stats.png[width=400]
 
 			Shows overall data computed from the flight.
 
@@ -428,7 +427,7 @@
 		==== Map
 
 			.Flight Map
-			image::graph-map.png[width="5.5in"]
+			image::graph-map.png[width=400]
 
 			Shows a satellite image of the flight area overlaid
 			with the path of the flight. The red concentric
@@ -481,7 +480,7 @@
 	=== Configure Altimeter
 
 		.Altimeter Configuration
-		image::configure-altimeter.png[width="3.6in"]
+		image::configure-altimeter.png[width=350]
 
 		ifdef::radio[]
 		Select this button and then select either an altimeter or
@@ -523,24 +522,25 @@
 
 	        The rest of the dialog contains the parameters to be configured.
 
-		include::config-device.raw[]
+		include::config-device.adoc[]
 
 
 	=== Configure AltosUI
 
 		.Configure AltosUI Dialog
-		image::configure-altosui.png[width="2.4in"]
+		image::configure-altosui.png[width=230]
 
 		This button presents a dialog so that you can
 		configure the AltosUI global settings.
 
-		include::config-ui.raw[]
+		include::config-ui.adoc[]
 
 	ifdef::radio[]
+
 	=== Configure Groundstation
 
 		.Configure Groundstation Dialog
-		image::configure-groundstation.png[width="3.1in"]
+		image::configure-groundstation.png[width=300]
 
 		Select this button and then select a TeleDongle or
 		TeleBT Device from the list provided.
@@ -631,7 +631,7 @@
 	=== Fire Igniter
 
 		.Fire Igniter Window
-		image::fire-igniter.png[width="1.2in"]
+		image::fire-igniter.png[width=120]
 
 		This activates the igniter circuits in the flight
 		computer to help test recovery systems
@@ -663,7 +663,7 @@
 	=== Scan Channels
 
 		.Scan Channels Window
-		image::scan-channels.png[width="3.2in"]
+		image::scan-channels.png[width=300]
 
 		This listens for telemetry packets on all of the
 		configured frequencies, displaying information about
@@ -675,14 +675,14 @@
 	endif::radio[]
 
 	ifdef::gps[]
-	include::load-maps.raw[]
+	include::load-maps.adoc[]
 	endif::gps[]
 
 	ifdef::radio[]
 	=== Monitor Idle
 
 		.Monitor Idle Window
-		image::monitor-idle.png[width="5.2in"]
+		image::monitor-idle.png[width=500]
 
 		This brings up a dialog similar to the Monitor Flight
 		UI, except it works with the altimeter in “idle” mode

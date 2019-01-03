@@ -58,7 +58,7 @@ static const uint8_t flight_reports[] = {
 #endif
 #define pause(time)	ao_delay(time)
 
-static __pdata enum ao_flight_state ao_report_state;
+static enum ao_flight_state ao_report_state;
 
 /*
  * Farnsworth spacing
@@ -115,7 +115,7 @@ static __pdata enum ao_flight_state ao_report_state;
  */
 
 static void
-ao_report_beep(void) __reentrant
+ao_report_beep(void) 
 {
 	uint8_t r = flight_reports[ao_flight_state];
 	uint8_t l = r & 7;
@@ -134,7 +134,7 @@ ao_report_beep(void) __reentrant
 }
 
 static void
-ao_report_digit(uint8_t digit) __reentrant
+ao_report_digit(uint8_t digit) 
 {
 	if (!digit) {
 		mid(AO_MS_TO_TICKS(500));
@@ -151,8 +151,8 @@ ao_report_digit(uint8_t digit) __reentrant
 static void
 ao_report_number(int16_t n)
 {
-	__xdata uint8_t	digits[10];
-	__pdata uint8_t ndigits, i;
+	uint8_t	digits[10];
+	uint8_t ndigits, i;
 
 	if (n < 0)
 		n = 0;
@@ -178,12 +178,12 @@ ao_report_altitude(void)
 static void
 ao_report_battery(void)
 {
-	__xdata struct ao_data packet;
+	struct ao_data packet;
 	for (;;) {
 		ao_data_get(&packet);
 		if (packet.adc.v_batt != 0)
 			break;
-		ao_sleep(DATA_TO_XDATA(&ao_sample_data));
+		ao_sleep(&ao_sample_data);
 	}
 	ao_report_number(ao_battery_decivolt(packet.adc.v_batt));
 }
@@ -204,7 +204,7 @@ ao_report_igniter(void)
 }
 
 static void
-ao_report_continuity(void) __reentrant
+ao_report_continuity(void) 
 {
 	uint8_t	c;
 
@@ -281,11 +281,11 @@ ao_report(void)
 		}
 #endif
 		while (ao_report_state == ao_flight_state)
-			ao_sleep(DATA_TO_XDATA(&ao_flight_state));
+			ao_sleep(&ao_flight_state);
 	}
 }
 
-static __xdata struct ao_task ao_report_task;
+static struct ao_task ao_report_task;
 
 void
 ao_report_init(void)

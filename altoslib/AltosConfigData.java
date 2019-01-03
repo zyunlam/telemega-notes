@@ -201,6 +201,8 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 			return 4095 - value;
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return -value;
 		default:
 			return AltosLib.MISSING;
 		}
@@ -577,6 +579,22 @@ public class AltosConfigData {
 				return false;
 			if (product.startsWith("TeleMega-v1"))
 				return false;
+		}
+		throw new AltosUnknownProduct(product);
+	}
+
+	public boolean adxl375_inverted() throws AltosUnknownProduct {
+		if (product != null) {
+			if (product.startsWith("EasyMega-v2"))
+				return true;
+		}
+		throw new AltosUnknownProduct(product);
+	}
+
+	public int adxl375_axis() throws AltosUnknownProduct {
+		if (product != null) {
+			if (product.startsWith("EasyMega-v2"))
+				return AltosAdxl375.X_AXIS;
 		}
 		throw new AltosUnknownProduct(product);
 	}

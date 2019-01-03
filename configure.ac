@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.8.7)
-ANDROID_VERSION=17
+AC_INIT([altos], 1.9)
+ANDROID_VERSION=18
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2018-10-08
+RELEASE_DATE=2018-12-31
 AC_SUBST(RELEASE_DATE)
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
@@ -198,7 +198,6 @@ AC_PROG_LN_S
 AC_PROG_LIBTOOL
 PKG_PROG_PKG_CONFIG
 
-CFLAGS="-g"
 WARN_CFLAGS=""
 if test "x$GCC" = "xyes"; then
 	WARN_CFLAGS="-Wall -Wpointer-arith -Wstrict-prototypes \
@@ -208,36 +207,6 @@ if test "x$GCC" = "xyes"; then
 	[Can use #warning in C files])
 fi
 AC_SUBST(WARN_CFLAGS)
-
-#
-# Configure SDCC
-#
-
-AC_ARG_WITH([sdcc],
-	    [AS_HELP_STRING([--with-sdcc],
-	                    [Name of SDCC])],
-	    [],
-	    [with_sdcc=auto])
-
-if test "x$with_sdcc" != "xno"; then	    
-	if test "x$with_sdcc" = "xauto"; then
-		with_sdcc="sdcc"
-		AC_CHECK_PROG([HAVE_SDCC],[$with_sdcc], yes, no)
-	else
-		HAVE_SDCC=yes
-	fi
-else
-	HAVE_SDCC=no
-fi
-
-if test "x$HAVE_SDCC" = "xno"; then
-	AC_MSG_WARN([SDCC not found, cc1111 binaries will not be built])
-else
-	SDCC=$with_sdcc
-fi
-
-AC_SUBST(SDCC)
-AC_SUBST(HAVE_SDCC)
 
 #
 # Configure ARM compiler for STM32L and LPC11U14
@@ -268,27 +237,6 @@ fi
 AC_SUBST(HAVE_ARM_CC)
 AC_SUBST(ARM_CC)
 
-if test -d pdclib -a x"$HAVE_ARM_CC" = xyes; then
-	PDCLIB_ROOT='$(TOPDIR)/../pdclib-root'
-	PDCLIB_INCLUDES='-I$(TOPDIR)/../pdclib-root/include'
-	PDCLIB_LIBS_M0='-L$(TOPDIR)/../pdclib-root/lib -lpdclib-cortex-m0'
-	PDCLIB_LIBS_M3='-L$(TOPDIR)/../pdclib-root/lib -lpdclib-cortex-m3'
-	HAVE_PDCLIB=yes
-else
-	PDCLIB_INCLUDES=''
-	PDCLIB_LIBS_M0='-lpdclib-cortex-m0'
-	PDCLIB_LIBS_M3='-lpdclib-cortex-m3'
-	HAVE_PDCLIB=no
-fi
-
-AM_CONDITIONAL(PDCLIB, [test x$HAVE_PDCLIB = xyes])
-
-AC_SUBST(PDCLIB_INCLUDES)
-AC_SUBST(PDCLIB_LIBS_M0)
-AC_SUBST(PDCLIB_LIBS_M3)
-AC_SUBST(PDCLIB_ROOT)
-AC_SUBST(HAVE_PDCLIB)
-
 if test "x$HAVE_ARM_CC" = "xyes"; then
 	save_CC="$CC"
 	save_CFLAGS="$CFLAGS"
@@ -311,16 +259,6 @@ if test "x$HAVE_ARM_CC" = "xyes"; then
 			  [HAVE_ARM_M3_CC=no])
         AC_MSG_RESULT([$HAVE_ARM_M3_CC])
 
-	if test x$HAVE_PDCLIB != xyes; then
-		AC_CHECK_LIB(pdclib-cortex-m0,memcpy,
-			     [],
-			     [HAVE_ARM_M0_CC=no])
-
-		AC_CHECK_LIB(pdclib-cortex-m3,memcpy,
-			     [],
-			     [HAVE_ARM_M3_CC=no])
-        fi
-
 	AC_LANG_POP([C])
 	LIBS="$save_LIBS"
 	CFLAGS="$save_CFLAGS"
@@ -339,6 +277,37 @@ fi
 if test "x$HAVE_ARM_M0_CC" = "xno"; then
 	AC_MSG_WARN([No cortex-m0 arm compiler found, LPC11U14 binaries will not be built])
 fi
+
+AC_ARG_WITH([newlib-nano],
+	    [AS_HELP_STRING([--with-newlib-nano],
+	                    [Root of newlib nano install])],
+	    [],
+	    [with_newlib_nano=auto])
+
+HAVE_NEWLIB_NANO=no
+if test "x$with_newlib_nano" != "xno"; then
+	if test "x$with_newlib_nano" = "xauto"; then
+		for d in /usr/local/lib/newlib-nano /usr/lib/newlib-nano; do
+			if test "x$with_newlib_nano" = "xauto" -a -d "$d"; then
+				with_newlib_nano="$d"
+				HAVE_NEWLIB_NANO=yes
+			fi
+		done
+	else
+		HAVE_NEWLIB_NANO=yes
+	fi
+fi
+
+if test "x$HAVE_NEWLIB_NANO" = "xno"; then
+	AC_MSG_WARN([No newlib-nano library found, ARM binaries will not be built])
+	HAVE_ARM_M3_CC=no
+	HAVE_ARM_M0_CC=no
+else
+	NEWLIB_NANO="$with_newlib_nano"
+fi
+
+AC_SUBST(HAVE_NEWLIB_NANO)
+AC_SUBST(NEWLIB_NANO)
 
 #
 # Configure AVR compiler
@@ -587,14 +556,12 @@ echo "  Configuration"
 echo "    Arm compiler................: ${ARM_CC}"
 echo "    STM32L support..............: ${HAVE_ARM_M3_CC}"
 echo "    LPC11U14 support............: ${HAVE_ARM_M0_CC}"
-echo "    SDCC........................: ${SDCC}"
-echo "    CC1111 support..............: ${HAVE_SDCC}"
 echo "    AVR compiler................: ${AVR_CC} ${AVR_OBJCOPY}"
 echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
 echo "    Android release support.....: ${ANDROID_RELEASE}"
 echo "    STlink support..............: ${HAVE_STLINK}"
-echo "    Local pdclib................: ${HAVE_PDCLIB}"
+echo "    Newlib-nano support.........: ${NEWLIB_NANO}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
 echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
 echo ""

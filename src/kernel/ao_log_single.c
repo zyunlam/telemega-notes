@@ -26,16 +26,16 @@
 #include "ao.h"
 #include "ao_product.h"
 
-static __xdata struct ao_task ao_log_single_task;
+static struct ao_task ao_log_single_task;
 
-__xdata uint8_t 	ao_log_running;
-__xdata uint8_t		ao_log_mutex;
-__pdata uint32_t	ao_log_start_pos;
-__pdata uint32_t	ao_log_end_pos;
-__pdata uint32_t	ao_log_current_pos;
+uint8_t 	ao_log_running;
+uint8_t		ao_log_mutex;
+uint32_t	ao_log_start_pos;
+uint32_t	ao_log_end_pos;
+uint32_t	ao_log_current_pos;
 
-__xdata union ao_log_single ao_log_single_write_data;
-__xdata union ao_log_single ao_log_single_read_data;
+union ao_log_single ao_log_single_write_data;
+union ao_log_single ao_log_single_read_data;
 
 uint8_t
 ao_log_single_write(void)
@@ -59,7 +59,7 @@ ao_log_single_write(void)
 static uint8_t
 ao_log_single_valid(void)
 {
-	__xdata uint8_t	*d = ao_log_single_read_data.bytes;
+	uint8_t	*d = ao_log_single_read_data.bytes;
 	uint8_t	i;
 	for (i = 0; i < AO_LOG_SINGLE_SIZE; i++)
 		if (*d++ != 0xff)
@@ -118,10 +118,11 @@ ao_log_single_restart(void)
 void
 ao_log_single_set(void)
 {
+	uint16_t r;
 	printf("Logging currently %s\n", ao_log_running ? "on" : "off");
-	ao_cmd_hex();
+	r = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success) {
-		if (ao_cmd_lex_i) {
+		if (r) {
 			printf("Logging from %ld to %ld\n", ao_log_current_pos, ao_log_end_pos);
 			ao_log_single_start();
 		} else {
@@ -136,13 +137,12 @@ void
 ao_log_single_delete(void)
 {
 	uint32_t	pos;
-
-	ao_cmd_hex();
+	uint16_t	r = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	if (ao_cmd_lex_i != 1) {
+	if (r != 1) {
 		ao_cmd_status = ao_cmd_syntax_error;
-		printf("No such flight: %d\n", ao_cmd_lex_i);
+		printf("No such flight: %d\n", r);
 		return;
 	}
 	ao_log_single_stop();
@@ -153,7 +153,7 @@ ao_log_single_delete(void)
 	}
 	ao_log_current_pos = ao_log_start_pos = 0;
 	if (pos == 0)
-		printf("No such flight: %d\n", ao_cmd_lex_i);
+		printf("No such flight: %d\n", r);
 	else
 		printf ("Erased\n");
 }

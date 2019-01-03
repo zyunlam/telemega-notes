@@ -18,7 +18,7 @@
 
 #include <ao.h>
 
-volatile __data AO_TICK_TYPE ao_tick_count;
+volatile AO_TICK_TYPE ao_tick_count;
 
 uint16_t
 ao_time(void)
@@ -27,8 +27,8 @@ ao_time(void)
 }
 
 #if AO_DATA_ALL
-volatile __data uint8_t	ao_data_interval = 1;
-volatile __data uint8_t	ao_data_count;
+volatile uint8_t	ao_data_interval = 1;
+volatile uint8_t	ao_data_count;
 #endif
 
 void lpc_systick_isr(void)

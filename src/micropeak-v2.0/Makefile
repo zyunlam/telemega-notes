@@ -18,7 +18,7 @@ ALTOS_SRC = \
 	ao_micropeak.c \
 	ao_spi_stm.c \
 	ao_dma_stm.c \
-	ao_led.c \
+	ao_led_stmf0.c \
 	ao_timer.c \
 	ao_ms5607.c \
 	ao_exti_stm.c \

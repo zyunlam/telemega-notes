@@ -18,7 +18,7 @@
 
 #include <ao_int64.h>
 
-void ao_plus64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, __pdata ao_int64_t *b) __FATTR {
+void ao_plus64(ao_int64_t *r, ao_int64_t *a, ao_int64_t *b) __FATTR {
 	__LOCAL uint32_t	t;
 
 	r->high = a->high + b->high;
@@ -28,7 +28,7 @@ void ao_plus64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, __pdata ao_int64_t 
 	r->low = t;
 }
 
-void ao_minus64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, __pdata ao_int64_t *b) __FATTR {
+void ao_minus64(ao_int64_t *r, ao_int64_t *a, ao_int64_t *b) __FATTR {
 	__LOCAL uint32_t	t;
 
 	r->high = a->high - b->high;
@@ -38,7 +38,7 @@ void ao_minus64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, __pdata ao_int64_t
 	r->low = t;
 }
 
-void ao_rshift64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, uint8_t d) __FATTR {
+void ao_rshift64(ao_int64_t *r, ao_int64_t *a, uint8_t d) __FATTR {
 	if (d < 32) {
 		r->low = a->low >> d;
 		if (d)
@@ -51,7 +51,7 @@ void ao_rshift64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, uint8_t d) __FATT
 	}
 }
 
-void ao_lshift64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, uint8_t d) __FATTR {
+void ao_lshift64(ao_int64_t *r, ao_int64_t *a, uint8_t d) __FATTR {
 	if (d < 32) {
 		r->high = a->high << d;
 		if (d)
@@ -64,7 +64,7 @@ void ao_lshift64(__pdata ao_int64_t *r, __pdata ao_int64_t *a, uint8_t d) __FATT
 	}
 }
 
-static void ao_umul64_32_32(__ARG ao_int64_t *r, uint32_t a, uint32_t b) __reentrant {
+static void ao_umul64_32_32(__ARG ao_int64_t *r, uint32_t a, uint32_t b) {
 	__LOCAL uint32_t	s;
 	__LOCAL ao_int64_t	t;
 	r->low = (uint32_t) (uint16_t) a * (uint16_t) b;
@@ -83,7 +83,7 @@ static void ao_umul64_32_32(__ARG ao_int64_t *r, uint32_t a, uint32_t b) __reent
 	ao_plus64(r, r, &t);
 }
 
-void ao_neg64(__pdata ao_int64_t *r, __pdata ao_int64_t *a) __FATTR {
+void ao_neg64(ao_int64_t *r, ao_int64_t *a) __FATTR {
 	r->high = ~a->high;
 	if (!(r->low = ~a->low + 1))
 		r->high++;
@@ -105,7 +105,7 @@ void ao_mul64_32_32(__ARG ao_int64_t *r, int32_t a, int32_t b) __FATTR {
 		ao_neg64(r, r);
 }
 
-static void ao_umul64(__ARG ao_int64_t *r, __ARG ao_int64_t *a, __ARG ao_int64_t *b) __reentrant {
+static void ao_umul64(__ARG ao_int64_t *r, __ARG ao_int64_t *a, __ARG ao_int64_t *b) {
 	__LOCAL ao_int64_t	r2, r3;
 
 	ao_umul64_32_32(&r2, a->high, b->low);
@@ -135,7 +135,7 @@ void ao_mul64(__ARG ao_int64_t *r, __ARG ao_int64_t *a, __ARG ao_int64_t *b) __F
 		ao_neg64(r, r);
 }
 
-static void ao_umul64_64_16(__ARG ao_int64_t *r, __ARG ao_int64_t *a, uint16_t b) __reentrant {
+static void ao_umul64_64_16(__ARG ao_int64_t *r, __ARG ao_int64_t *a, uint16_t b) {
 	__LOCAL uint32_t h;
 
 	h = a->high * b;

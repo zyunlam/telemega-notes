@@ -1,5 +1,5 @@
 = Release Notes for Version 1.1
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.1.1 is a bug-fix release. It fixes a couple of bugs

@@ -40,7 +40,7 @@ main(void)
 	ao_report_init();
 	ao_telemetry_init();
 	ao_radio_init();
-	ao_packet_slave_init(TRUE);
+	ao_packet_slave_init(true);
 	ao_config_init();
 	ao_start_scheduler();
 }

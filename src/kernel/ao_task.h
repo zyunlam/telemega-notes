@@ -27,23 +27,21 @@
 #endif
 
 /* arm stacks must be 32-bit aligned */
+#ifndef AO_STACK_ALIGNMENT
 #ifdef __arm__
 #define AO_STACK_ALIGNMENT __attribute__ ((aligned(4)))
-#endif
-#ifdef SDCC
+#else
 #define AO_STACK_ALIGNMENT
 #endif
-#ifdef __AVR__
-#define AO_STACK_ALIGNMENT
 #endif
 
 /* An AltOS task */
 struct ao_task {
-	__xdata void *wchan;		/* current wait channel (NULL if running) */
+	void *wchan;		/* current wait channel (NULL if running) */
 	uint16_t alarm;			/* abort ao_sleep time */
 	ao_arch_task_members		/* any architecture-specific fields */
 	uint8_t task_id;		/* unique id */
-	__code char *name;		/* task name */
+	const char *name;		/* task name */
 #ifdef NEWLIB
 	int __errno;			/* storage for errno in newlib libc */
 #endif
@@ -66,10 +64,10 @@ struct ao_task {
 
 #define AO_NO_TASK		0	/* no task id */
 
-extern __xdata struct ao_task * __xdata ao_tasks[AO_NUM_TASKS];
-extern __data uint8_t ao_num_tasks;
-extern __xdata struct ao_task *__data ao_cur_task;
-extern __data uint8_t ao_task_minimize_latency;	/* Reduce IRQ latency */
+extern struct ao_task * ao_tasks[AO_NUM_TASKS];
+extern uint8_t ao_num_tasks;
+extern struct ao_task *ao_cur_task;
+extern uint8_t ao_task_minimize_latency;	/* Reduce IRQ latency */
 
 #ifndef HAS_ARCH_VALIDATE_CUR_STACK
 #define ao_validate_cur_stack()
@@ -85,7 +83,7 @@ extern __data uint8_t ao_task_minimize_latency;	/* Reduce IRQ latency */
  *  1 on alarm
  */
 uint8_t
-ao_sleep(__xdata void *wchan);
+ao_sleep(void *wchan);
 
 /* Suspend the current task until wchan is awoken or the timeout
  * expires. returns:
@@ -93,11 +91,11 @@ ao_sleep(__xdata void *wchan);
  *  1 on alarm
  */
 uint8_t
-ao_sleep_for(__xdata void *wchan, uint16_t timeout);
+ao_sleep_for(void *wchan, uint16_t timeout);
 
 /* Wake all tasks sleeping on wchan */
 void
-ao_wakeup(__xdata void *wchan) __reentrant;
+ao_wakeup(void *wchan);
 
 #if 0
 /* set an alarm to go off in 'delay' ticks */
@@ -115,7 +113,7 @@ ao_yield(void) ao_arch_naked_declare;
 
 /* Add a task to the run queue */
 void
-ao_add_task(__xdata struct ao_task * task, void (*start)(void), __code char *name) __reentrant;
+ao_add_task(struct ao_task * task, void (*start)(void), const char *name);
 
 #if HAS_TASK_QUEUE
 /* Called on timer interrupt to check alarms */
@@ -134,7 +132,7 @@ ao_task_info(void);
 
 /* Start the scheduler. This will not return */
 void
-ao_start_scheduler(void);
+ao_start_scheduler(void) __attribute__((noreturn));
 
 #if HAS_TASK_QUEUE
 void

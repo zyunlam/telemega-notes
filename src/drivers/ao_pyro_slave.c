@@ -33,7 +33,7 @@ static const struct ao_companion_setup	ao_telepyro_setup = {
 
 struct ao_config ao_config;
 
-extern volatile __data uint16_t ao_tick_count;
+extern volatile uint16_t ao_tick_count;
 uint16_t ao_boost_tick;
 
 void ao_spi_slave(void)

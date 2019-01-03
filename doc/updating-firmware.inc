@@ -27,10 +27,14 @@
 	http://www.altusmetrum.org/AltOS/
 
 	ifdef::telemega[]
+
 	=== Updating TeleMega, TeleMetrum v2, EasyMega, EasyMini or TeleDongle v3 Firmware
+
 	endif::telemega[]
 	ifndef::telemega[]
+
 	=== Updating EasyMini Firmware
+
 	endif::telemega[]
 
 		Self-programmable devices are reprogrammed by
@@ -131,6 +135,12 @@
 			to the USB wires on the row of pins towards the center
 			of the board. Ground is available on the capacitor
 			next to it, on the end towards the USB wires.
+			
+			TeleBT v4::
+
+			Connect pin 30 on the CPU to ground. Pin 30 is the 6th
+			pin from the right on the top when the unit is oriented
+			such that the SMA is at the top.
 			endif::telemetrum[]
 
 			Once you've located the right pins:

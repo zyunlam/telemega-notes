@@ -990,7 +990,7 @@ ao_fat_sync(void)
 /*
  * ao_fat_full
  *
- * Returns TRUE if the filesystem cannot take
+ * Returns true if the filesystem cannot take
  * more data
  */
 

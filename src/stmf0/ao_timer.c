@@ -36,8 +36,8 @@ ao_time(void)
 }
 
 #if AO_DATA_ALL
-volatile __data uint8_t	ao_data_interval = 1;
-volatile __data uint8_t	ao_data_count;
+volatile uint8_t	ao_data_interval = 1;
+volatile uint8_t	ao_data_count;
 #endif
 
 void stm_systick_isr(void)

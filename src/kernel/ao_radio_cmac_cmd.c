@@ -20,7 +20,7 @@
 #include <ao_radio_cmac_cmd.h>
 #include <ao_radio_cmac.h>
 
-static __xdata uint8_t cmac_data[AO_CMAC_MAX_LEN];
+static uint8_t cmac_data[AO_CMAC_MAX_LEN];
 
 static uint8_t
 getnibble(void)
@@ -45,21 +45,19 @@ getbyte(void)
 }
 	
 static void
-radio_cmac_send_cmd(void) __reentrant
+radio_cmac_send_cmd(void) 
 {
 	uint8_t	i;
 	uint8_t	len;
 
-	ao_cmd_decimal();
+	len = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	len = ao_cmd_lex_i;
 	if (len > AO_CMAC_MAX_LEN) {
 		ao_cmd_status = ao_cmd_syntax_error;
 		return;
 	}
 	flush();
-	len = ao_cmd_lex_i;
 	for (i = 0; i < len; i++) {
 		cmac_data[i] = getbyte();
 		if (ao_cmd_status != ao_cmd_success)
@@ -69,19 +67,17 @@ radio_cmac_send_cmd(void) __reentrant
 }
 
 static void
-radio_cmac_recv_cmd(void) __reentrant
+radio_cmac_recv_cmd(void) 
 {
 	uint8_t		len, i;
 	uint16_t	timeout;
 
-	ao_cmd_decimal();
+	len = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	len = ao_cmd_lex_i;
-	ao_cmd_decimal();
+	timeout = AO_MS_TO_TICKS(ao_cmd_decimal());
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	timeout = AO_MS_TO_TICKS(ao_cmd_lex_i);
 	i = ao_radio_cmac_recv(cmac_data, len, timeout);
 	if (i == AO_RADIO_CMAC_OK) {
 		printf ("PACKET ");
@@ -92,7 +88,7 @@ radio_cmac_recv_cmd(void) __reentrant
 		printf ("ERROR %d %d\n", i, ao_radio_cmac_rssi);
 }
 
-static __code struct ao_cmds ao_radio_cmac_cmds[] = {
+static const struct ao_cmds ao_radio_cmac_cmds[] = {
 	{ radio_cmac_send_cmd,	"s <length>\0Send AES-CMAC packet. Bytes to send follow on next line" },
 	{ radio_cmac_recv_cmd,	"S <length> <timeout>\0Receive AES-CMAC packet. Timeout in ms" },
 	{ 0, NULL },

@@ -91,11 +91,11 @@ ao_ps2_put(uint8_t c)
 	ao_arch_release_interrupts();
 
 	/* pull the clock pin down */
-	ao_enable_output(AO_PS2_CLOCK_PORT, AO_PS2_CLOCK_BIT, AO_PS2_CLOCK_PIN, 0);
+	ao_enable_output(AO_PS2_CLOCK_PORT, AO_PS2_CLOCK_BIT, 0);
 	ao_delay(0);
 
 	/* pull the data pin down for the start bit */
-	ao_enable_output(AO_PS2_DATA_PORT, AO_PS2_DATA_BIT, AO_PS2_DATA_PIN, 0);
+	ao_enable_output(AO_PS2_DATA_PORT, AO_PS2_DATA_BIT, 0);
 	ao_delay(0);
 
 	/* switch back to input mode for the interrupt to work */
@@ -369,7 +369,7 @@ ao_ps2_isr(void)
 	uint8_t	bit;
 
 	if (ao_ps2_tx_count) {
-		ao_gpio_set(AO_PS2_DATA_PORT, AO_PS2_DATA_BIT, AO_PS2_DATA_PIN, ao_ps2_tx&1);
+		ao_gpio_set(AO_PS2_DATA_PORT, AO_PS2_DATA_BIT, ao_ps2_tx&1);
 		ao_ps2_tx >>= 1;
 		ao_ps2_tx_count--;
 		if (!ao_ps2_tx_count) {
@@ -383,7 +383,7 @@ ao_ps2_isr(void)
 		ao_ps2_count = 0;
 	ao_ps2_tick = ao_tick_count;
 
-	bit = ao_gpio_get(AO_PS2_DATA_PORT, AO_PS2_DATA_BIT, AO_PS2_DATA_PIN);
+	bit = ao_gpio_get(AO_PS2_DATA_PORT, AO_PS2_DATA_BIT);
 	if (ao_ps2_count == 0) {
 		/* check for start bit, ignore if not zero */
 		if (bit)

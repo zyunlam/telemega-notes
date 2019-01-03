@@ -31,7 +31,6 @@
 #define COMPANION_SELECT()	do {			\
 		ao_spi_get_bit(AO_COMPANION_CS_PORT,	\
 			       AO_COMPANION_CS_PIN,	\
-			       AO_COMPANION_CS,		\
 			       AO_COMPANION_SPI_BUS,	\
 			       AO_SPI_SPEED_200kHz);	\
 	} while (0)
@@ -39,16 +38,15 @@
 #define COMPANION_DESELECT()	do {			\
 		ao_spi_put_bit(AO_COMPANION_CS_PORT,	\
 			       AO_COMPANION_CS_PIN,	\
-			       AO_COMPANION_CS,		\
 			       AO_COMPANION_SPI_BUS);	\
 	} while (0)
 
-__xdata struct ao_companion_command		ao_companion_command;
-__xdata struct ao_companion_setup		ao_companion_setup;
+struct ao_companion_command		ao_companion_command;
+struct ao_companion_setup		ao_companion_setup;
 
-__xdata uint16_t	ao_companion_data[AO_COMPANION_MAX_CHANNELS];
-__pdata uint8_t		ao_companion_running;
-__xdata uint8_t		ao_companion_mutex;
+uint16_t	ao_companion_data[AO_COMPANION_MAX_CHANNELS];
+uint8_t		ao_companion_running;
+uint8_t		ao_companion_mutex;
 
 static void
 ao_companion_send_command(uint8_t command)
@@ -107,7 +105,7 @@ ao_companion(void)
 		    break;
 	}
 	while (ao_companion_running) {
-		if (ao_sleep_for(DATA_TO_XDATA(&ao_flight_state), ao_companion_setup.update_period))
+		if (ao_sleep_for(&ao_flight_state, ao_companion_setup.update_period))
 			ao_companion_get_data();
 		else
 			ao_companion_notify();
@@ -116,7 +114,7 @@ ao_companion(void)
 }
 
 void
-ao_companion_status(void) __reentrant
+ao_companion_status(void) 
 {
 	uint8_t	i;
 	printf("Companion running: %d\n", ao_companion_running);
@@ -134,17 +132,17 @@ ao_companion_status(void) __reentrant
 	printf("\n");
 }
 
-__code struct ao_cmds ao_companion_cmds[] = {
+const struct ao_cmds ao_companion_cmds[] = {
 	{ ao_companion_status,	"L\0Companion link status" },
 	{ 0, NULL },
 };
 
-static __xdata struct ao_task ao_companion_task;
+static struct ao_task ao_companion_task;
 
 void
 ao_companion_init(void)
 {
-	ao_enable_output(AO_COMPANION_CS_PORT, AO_COMPANION_CS_PIN, AO_COMPANION_CS, 1);
+	ao_enable_output(AO_COMPANION_CS_PORT, AO_COMPANION_CS_PIN, 1);
 	ao_cmd_register(&ao_companion_cmds[0]);
 	ao_add_task(&ao_companion_task, ao_companion, "companion");
 }

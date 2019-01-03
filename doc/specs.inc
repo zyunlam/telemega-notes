@@ -6,7 +6,7 @@
 
 	.Altus Metrum Flight Computer Electronics
 	[options="header"]
-	|================================
+	|===
 	|Device | Barometer | Z-axis accel | GPS | 3D sensors | Storage | RF Output | Battery
 
 	ifdef::telemetrum[]
@@ -45,8 +45,8 @@
 	|8MB
 	|40mW
 	|3.7V
-	endif::telemetrum[]
 
+	endif::telemetrum[]
 	ifdef::telemini[]
 	|TeleMini v1.0
 	|MP3H6115 10km (33k')
@@ -65,8 +65,8 @@
 	|512kB
 	|40mW
 	|3.7V
-	endif::telemini[]
 
+	endif::telemini[]
 	ifdef::easymini[]
 	|EasyMini v1.0
 	|MS5607 30km (100k')
@@ -85,8 +85,8 @@
 	|1MB
 	|-
 	|3.7-12V
-	endif::easymini[]
 
+	endif::easymini[]
 	ifdef::telemega[]
 	|TeleMega v1.0
 	|MS5607 30km (100k')
@@ -114,8 +114,8 @@
 	|8MB
 	|40mW
 	|3.7V
-	endif::telemega[]
 
+	endif::telemega[]
 	ifdef::easymega[]
 	|EasyMega v1.0
 	|MS5607 30km (100k')
@@ -125,14 +125,23 @@
 	|8MB
 	|-
 	|3.7V
+
+	|EasyMega v2.0
+	|MS5607 30km (100k')
+	|ADXL375 200g
+	|-
+	|MPU9250
+	|8MB
+	|-
+	|3.7V
 	endif::easymega[]
 
-	|==============================
+	|===
 
 	<<<<
 	.Altus Metrum Flight Computer Mechanical Components
 	[options="header",grid="all"]
-	|==============================
+	|===
 	|Device|Connectors|Screw Terminals|Width|Length|Tube Size
 
 	ifdef::telemetrum[]
@@ -187,4 +196,4 @@
 	|38mm coupler
 	endif::easymega[]
 
-	|====================================
+	|===

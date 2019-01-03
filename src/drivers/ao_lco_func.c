@@ -21,8 +21,8 @@
 #include <ao_radio_cmac.h>
 #include <ao_lco_func.h>
 
-static __xdata struct ao_pad_command	command;
-static __xdata uint8_t			ao_lco_mutex;
+static struct ao_pad_command	command;
+static uint8_t			ao_lco_mutex;
 
 int8_t
 ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)

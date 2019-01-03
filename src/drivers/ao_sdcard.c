@@ -34,8 +34,8 @@ extern uint8_t ao_radio_mutex;
 #define ao_sdcard_send_fixed(d,l)	ao_spi_send_fixed((d), (l), AO_SDCARD_SPI_BUS)
 #define ao_sdcard_send(d,l)		ao_spi_send((d), (l), AO_SDCARD_SPI_BUS)
 #define ao_sdcard_recv(d,l)		ao_spi_recv((d), (l), AO_SDCARD_SPI_BUS)
-#define ao_sdcard_select()		ao_gpio_set(AO_SDCARD_SPI_CS_PORT,AO_SDCARD_SPI_CS_PIN,AO_SDCARD_SPI_CS,0)
-#define ao_sdcard_deselect()		ao_gpio_set(AO_SDCARD_SPI_CS_PORT,AO_SDCARD_SPI_CS_PIN,AO_SDCARD_SPI_CS,1)
+#define ao_sdcard_select()		ao_gpio_set(AO_SDCARD_SPI_CS_PORT,AO_SDCARD_SPI_CS_PIN,0)
+#define ao_sdcard_deselect()		ao_gpio_set(AO_SDCARD_SPI_CS_PORT,AO_SDCARD_SPI_CS_PIN,1)
 
 /* Include SD card commands */
 #ifndef SDCARD_DEBUG

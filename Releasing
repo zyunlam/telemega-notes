@@ -3,6 +3,8 @@ Adding a product to the release
 	Make sure the firmware and loader get built by default in
 	src/Makefile
 
+	Add firmware targets to fat_altos target in Makefile.am
+	
 	Add the firmware to altosui/Makefile.am
 
 	Add the firmware to altosui/altos-windows.nsi.in
@@ -25,10 +27,6 @@ These are Keith's notes on how to do a release
 
 	- make sure doc/Makefile points at that too
 
-	- make sure that doc/altusmetrum-docinfo.xml has the right copyright 
-	  year, and add release to the revision history at the front (release 
-	  notes will be pulled in by release-notes.inc)
-
 These are Bdale's notes on how to do a release.
 
 	- make sure build environment is up to date
@@ -47,14 +45,6 @@ These are Bdale's notes on how to do a release.
 	git checkout master
 
 	- update the version in configure.ac if Keith hasn't already
-
-	- make sure the Google Maps API key is in the build chroot and root
-	    (cd ~/altusmetrumllc; git pull)
-	    sudo mkdir -p /var/cache/pbuilder/base.cow/opt/google /opt/google
-	    sudo cp ~/altusmetrumllc/google-maps-api-key \
-		/var/cache/pbuilder/base.cow/opt/google/maps-api-key
-	    sudo ln -sf /home/bdale/altusmetrumllc/google-maps-api-key \
-		/opt/google/maps-api-key
 
 	- if this is an x.y release, then:
 		git checkout -b branch-<version>
@@ -111,6 +101,7 @@ These are Bdale's notes on how to do a release.
 
 	cp src/chaoskey-v1.0/{*.elf,*.ihx,*.bin} \
 	   src/easymega-v1.0/{*.elf,*.ihx} \
+	   src/easymega-v2.0/{*.elf,*.ihx} \
 	   src/easymini-v1.0/{*.elf,*.ihx} \
 	   src/easymini-v2.0/{*.elf,*.ihx} \
 	   src/telebt-v3.0/{*.elf,*.ihx} \
@@ -128,6 +119,7 @@ These are Bdale's notes on how to do a release.
 	   ~/altusmetrumllc/Binaries/
 	cp src/chaoskey-v1.0/flash-loader/{*.elf,*.bin} \
 	   src/easymega-v1.0/flash-loader/*.elf \
+	   src/easymega-v2.0/flash-loader/*.elf \
 	   src/easymini-v1.0/flash-loader/*.elf \
 	   src/easymini-v2.0/flash-loader/{*.elf,*.bin} \
 	   src/telebt-v3.0/flash-loader/*.elf \

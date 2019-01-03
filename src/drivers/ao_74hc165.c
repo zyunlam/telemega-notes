@@ -27,7 +27,7 @@
 uint8_t
 ao_74hc165_read(void)
 {
-	static __xdata state;
+	static state;
 	ao_spi_get(AO_74HC165_SPI_BUS);
 	ao_spi_set_speed(AO_74HC165_SPI_BUS, AO_SPI_SPEED_FAST);
 	AO_74HC165_CS = 1;

@@ -63,7 +63,7 @@ _ao_mpu9250_reg_write(uint8_t addr, uint8_t value)
 #else
 	ao_i2c_get(AO_MPU9250_I2C_INDEX);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_WRITE);
-	ao_i2c_send(d, 2, AO_MPU9250_I2C_INDEX, TRUE);
+	ao_i2c_send(d, 2, AO_MPU9250_I2C_INDEX, true);
 	ao_i2c_put(AO_MPU9250_I2C_INDEX);
 #endif
 }
@@ -80,9 +80,9 @@ _ao_mpu9250_read(uint8_t addr, void *data, uint8_t len)
 #else
 	ao_i2c_get(AO_MPU9250_I2C_INDEX);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_WRITE);
-	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, FALSE);
+	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, false);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_READ);
-	ao_i2c_recv(data, len, AO_MPU9250_I2C_INDEX, TRUE);
+	ao_i2c_recv(data, len, AO_MPU9250_I2C_INDEX, true);
 	ao_i2c_put(AO_MPU9250_I2C_INDEX);
 #endif
 }
@@ -100,9 +100,9 @@ _ao_mpu9250_reg_read(uint8_t addr)
 #else
 	ao_i2c_get(AO_MPU9250_I2C_INDEX);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_WRITE);
-	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, FALSE);
+	ao_i2c_send(&addr, 1, AO_MPU9250_I2C_INDEX, false);
 	ao_i2c_start(AO_MPU9250_I2C_INDEX, MPU9250_ADDR_READ);
-	ao_i2c_recv(&value, 1, AO_MPU9250_I2C_INDEX, TRUE);
+	ao_i2c_recv(&value, 1, AO_MPU9250_I2C_INDEX, true);
 	ao_i2c_put(AO_MPU9250_I2C_INDEX);
 #endif
 	return value;
@@ -472,10 +472,9 @@ ao_mpu9250_read(void)
 	uint8_t	addr;
 	uint8_t val;
 
-	ao_cmd_hex();
+	addr = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	addr = ao_cmd_lex_i;
 	ao_mpu9250_spi_get();
 	val = _ao_mpu9250_reg_read(addr);
 	ao_mpu9250_spi_put();
@@ -488,14 +487,12 @@ ao_mpu9250_write(void)
 	uint8_t	addr;
 	uint8_t val;
 
-	ao_cmd_hex();
+	addr = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	addr = ao_cmd_lex_i;
-	ao_cmd_hex();
+	val = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	val = ao_cmd_lex_i;
 	printf("Addr %02x val %02x\n", addr, val);
 	ao_mpu9250_spi_get();
 	_ao_mpu9250_reg_write(addr, val);
@@ -508,10 +505,9 @@ ao_mpu9250_mag_read(void)
 	uint8_t	addr;
 	uint8_t val;
 
-	ao_cmd_hex();
+	addr = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	addr = ao_cmd_lex_i;
 	ao_mpu9250_spi_get();
 	val = _ao_mpu9250_mag_reg_read(addr);
 	ao_mpu9250_spi_put();
@@ -524,14 +520,12 @@ ao_mpu9250_mag_write(void)
 	uint8_t	addr;
 	uint8_t val;
 
-	ao_cmd_hex();
+	addr = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	addr = ao_cmd_lex_i;
-	ao_cmd_hex();
+	val = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	val = ao_cmd_lex_i;
 	printf("Addr %02x val %02x\n", addr, val);
 	ao_mpu9250_spi_get();
 	_ao_mpu9250_mag_reg_write(addr, val);

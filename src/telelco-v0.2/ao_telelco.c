@@ -35,9 +35,9 @@ int
 main(void)
 {
 	ao_clock_init();
-	
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_GREEN);
+
+	ao_led_init();
+	ao_led_on(LEDS_AVAILABLE);
 	ao_task_init();
 
 	ao_timer_init();
@@ -55,17 +55,19 @@ main(void)
 	ao_button_init();
 
 	ao_eeprom_init();
-	
+
 	ao_radio_init();
 
 	ao_usb_init();
 
 	ao_config_init();
-	
+
 	ao_lco_init();
 	ao_lco_cmd_init();
 //	ao_radio_cmac_cmd_init();
-	
+
+	ao_led_off(LEDS_AVAILABLE);
+
 	ao_start_scheduler();
 	return 0;
 }

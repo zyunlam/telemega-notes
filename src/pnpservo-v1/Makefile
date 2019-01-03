@@ -24,7 +24,7 @@ ALTOS_SRC = \
 	ao_cmd.c \
 	ao_config.c \
 	ao_task.c \
-	ao_led.c \
+	ao_led_stmf0.c \
 	ao_dma_stm.c \
 	ao_stdio.c \
 	ao_mutex.c \

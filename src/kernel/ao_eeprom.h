@@ -26,13 +26,13 @@ extern const ao_pos_t	ao_eeprom_total;
  */
 
 uint8_t
-ao_eeprom_write(ao_pos_t pos32, __xdata void *v, uint16_t len);
+ao_eeprom_write(ao_pos_t pos32, void *v, uint16_t len);
 
 /*
  * Read from eeprom
  */
 uint8_t
-ao_eeprom_read(ao_pos_t pos, __xdata void *v, uint16_t len);
+ao_eeprom_read(ao_pos_t pos, void *v, uint16_t len);
 
 /*
  * Initialize eeprom

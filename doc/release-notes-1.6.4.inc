@@ -1,5 +1,5 @@
 = Release Notes for Version 1.6.4
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.6.4 fixes a bluetooth communication problem with

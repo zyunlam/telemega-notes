@@ -23,13 +23,13 @@
 #include <ao_tracker.h>
 #endif
 
-__xdata uint8_t	ao_log_mutex;
-__pdata uint32_t ao_log_current_pos;
-__pdata uint32_t ao_log_end_pos;
-__pdata uint32_t ao_log_start_pos;
-__xdata uint8_t	ao_log_running;
-__pdata enum ao_flight_state ao_log_state;
-__xdata int16_t ao_flight_number;
+uint8_t	ao_log_mutex;
+uint32_t ao_log_current_pos;
+uint32_t ao_log_end_pos;
+uint32_t ao_log_start_pos;
+uint8_t	ao_log_running;
+enum ao_flight_state ao_log_state;
+int16_t ao_flight_number;
 
 void
 ao_log_flush(void)
@@ -47,7 +47,7 @@ struct ao_log_erase {
 	uint16_t flight;
 };
 
-static __xdata struct ao_log_erase erase;
+static struct ao_log_erase erase;
 
 #ifndef LOG_MAX_ERASE
 #define LOG_MAX_ERASE	16
@@ -117,10 +117,10 @@ ao_log_erase_mark(void)
  * structure.
  */
 
-__xdata ao_log_type ao_log_data;
+ao_log_type ao_log_data;
 
 static uint8_t
-ao_log_csum(__xdata uint8_t *b) __reentrant
+ao_log_csum(uint8_t *b) 
 {
 	uint8_t	sum = 0x5a;
 	uint8_t	i;
@@ -131,12 +131,12 @@ ao_log_csum(__xdata uint8_t *b) __reentrant
 }
 
 uint8_t
-ao_log_write(__xdata ao_log_type *log) __reentrant
+ao_log_write(ao_log_type *log) 
 {
 	uint8_t wrote = 0;
 	/* set checksum */
 	log->csum = 0;
-	log->csum = ao_log_csum((__xdata uint8_t *) log);
+	log->csum = ao_log_csum((uint8_t *) log);
 	ao_mutex_get(&ao_log_mutex); {
 		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 			ao_log_stop();
@@ -223,7 +223,7 @@ ao_log_max_flight(void)
 }
 
 static void
-ao_log_erase(uint8_t slot) __reentrant
+ao_log_erase(uint8_t slot) 
 {
 	uint32_t log_current_pos, log_end_pos;
 
@@ -232,7 +232,7 @@ ao_log_erase(uint8_t slot) __reentrant
 	log_end_pos = log_current_pos + ao_config.flight_log_max;
 	while (log_current_pos < log_end_pos) {
 		uint8_t	i;
-		static __xdata uint8_t b;
+		static uint8_t b;
 
 		/*
 		 * Check to see if we've reached the end of
@@ -252,7 +252,7 @@ ao_log_erase(uint8_t slot) __reentrant
 }
 
 static void
-ao_log_find_max_erase_flight(void) __reentrant
+ao_log_find_max_erase_flight(void) 
 {
 	uint8_t	log_slot;
 
@@ -273,7 +273,7 @@ ao_log_find_max_erase_flight(void) __reentrant
 }
 
 uint8_t
-ao_log_scan(void) __reentrant
+ao_log_scan(void) 
 {
 	uint8_t		log_slot;
 	uint8_t		log_slots;
@@ -402,11 +402,11 @@ ao_log_full(void)
 #endif
 
 #if LOG_ADC
-static __xdata struct ao_task ao_log_task;
+static struct ao_task ao_log_task;
 #endif
 
 void
-ao_log_list(void) __reentrant
+ao_log_list(void) 
 {
 	uint8_t	slot;
 	uint8_t slots;
@@ -426,7 +426,7 @@ ao_log_list(void) __reentrant
 }
 
 void
-ao_log_delete(void) __reentrant
+ao_log_delete(void) 
 {
 	uint8_t slot;
 	uint8_t slots;
@@ -437,10 +437,9 @@ ao_log_delete(void) __reentrant
 		cmd_flight = -1;
 		ao_cmd_lex();
 	}
-	ao_cmd_decimal();
+	cmd_flight *= ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	cmd_flight *= (int16_t) ao_cmd_lex_i;
 
 	slots = ao_log_slots();
 	/* Look for the flight log matching the requested flight */
@@ -462,7 +461,7 @@ ao_log_delete(void) __reentrant
 	printf("No such flight: %d\n", cmd_flight);
 }
 
-__code struct ao_cmds ao_log_cmds[] = {
+const struct ao_cmds ao_log_cmds[] = {
 	{ ao_log_list,	"l\0List logs" },
 	{ ao_log_delete,	"d <flight-number>\0Delete flight" },
 	{ 0,	NULL },

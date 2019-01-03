@@ -45,21 +45,20 @@ ao_relay_control(uint8_t output)
 }
 
 static void
-ao_relay_select(void) __reentrant
+ao_relay_select(void) 
 {
 	uint8_t output;
 
-	ao_cmd_decimal();
+	output = ao_cmd_decimal();
         if (ao_cmd_status != ao_cmd_success)
                 return;
-	output = ao_cmd_lex_i;
 	if (output > 1) 
 		printf ("Invalid relay position %u\n", output);
 	else
 		ao_relay_control(output);
 }
 
-static __code struct ao_cmds ao_relay_cmds[] = {
+static const struct ao_cmds ao_relay_cmds[] = {
 	{ ao_relay_select, "R <output>\0Select relay output" },
 	{ 0, NULL }
 };

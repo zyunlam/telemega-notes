@@ -1,5 +1,5 @@
 = Release Notes for Version 1.2.1
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.2.1 is a minor release. It adds support for TeleBT and

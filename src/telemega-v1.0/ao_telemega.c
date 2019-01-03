@@ -45,7 +45,7 @@ main(void)
 
 	ao_task_init();
 	ao_serial_init();
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 	ao_led_on(LEDS_AVAILABLE);
 	ao_timer_init();
 
@@ -85,7 +85,7 @@ main(void)
 	ao_gps_report_mega_init();
 	ao_telemetry_init();
 	ao_radio_init();
-	ao_packet_slave_init(FALSE);
+	ao_packet_slave_init(false);
 	ao_igniter_init();
 	ao_companion_init();
 	ao_pyro_init();

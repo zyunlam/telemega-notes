@@ -28,6 +28,7 @@ altoslib_JAVA = \
 	AltosLib.java \
 	AltosAccelCal.java \
 	AltosAccelCalListener.java \
+	AltosAdxl375.java \
 	AltosCalData.java \
 	AltosCompanion.java \
 	AltosConfigData.java \
@@ -107,7 +108,8 @@ altoslib_JAVA = \
 	AltosSensorTMini3.java \
 	AltosSensorMega.java \
 	AltosSensorMetrum.java \
-	AltosSensorTGPS.java \
+	AltosSensorTGPS1.java \
+	AltosSensorTGPS2.java \
 	AltosState.java \
 	AltosStateName.java \
 	AltosStringInputStream.java \

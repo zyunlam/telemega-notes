@@ -25,7 +25,7 @@
 #if HAS_MUTEX_TRY
 
 uint8_t
-ao_mutex_try(__xdata uint8_t *mutex, uint8_t task_id) __reentrant
+ao_mutex_try(uint8_t *mutex, uint8_t task_id) 
 {
 	uint8_t	ret;
 	if (*mutex == task_id)
@@ -42,7 +42,7 @@ ao_mutex_try(__xdata uint8_t *mutex, uint8_t task_id) __reentrant
 #endif
 
 void
-ao_mutex_get(__xdata uint8_t *mutex) __reentrant
+ao_mutex_get(uint8_t *mutex) 
 {
 	if (*mutex == ao_cur_task->task_id)
 		ao_panic(AO_PANIC_MUTEX);
@@ -54,7 +54,7 @@ ao_mutex_get(__xdata uint8_t *mutex) __reentrant
 }
 
 void
-ao_mutex_put(__xdata uint8_t *mutex) __reentrant
+ao_mutex_put(uint8_t *mutex) 
 {
 	if (*mutex != ao_cur_task->task_id)
 		ao_panic(AO_PANIC_MUTEX);

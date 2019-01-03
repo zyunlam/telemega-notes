@@ -125,7 +125,7 @@ ao_i2c_write(void) {
 	for (i = 0; i < 10; i++) {
 		ao_i2c_get(0);
 		if (ao_i2c_start(0, 0x55))
-			ao_i2c_send(data, 4, 0, TRUE);
+			ao_i2c_send(data, 4, 0, true);
 		else {
 			printf ("i2c start failed\n");
 			ao_i2c_put(0);
@@ -197,7 +197,7 @@ ao_blink_toggle(void)
 }
 
 
-__code struct ao_cmds ao_demo_cmds[] = {
+const struct ao_cmds ao_demo_cmds[] = {
 	{ ao_dma_test,	"D\0DMA test" },
 	{ ao_spi_write, "W\0SPI write" },
 	{ ao_spi_read, "R\0SPI read" },

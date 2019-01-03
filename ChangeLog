@@ -1,9 +1,735 @@
-commit f3330f019216ee2632f47be1fb06e158fb09d758
-Merge: 5a86ff43 e7136c6b
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Oct 8 20:58:43 2018 -0600
+commit 4e9e0bf99d6b71086110038fa1e3231d00bb2496
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 31 15:20:57 2018 -0800
 
-    Merge branch 'master' into branch-1.8
+    Update to version 1.9
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f62ac01979a403f6a05f119201a62a8ffc217c73
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 31 15:20:23 2018 -0800
+
+    Change Releasing to reflect asciidoctor switch
+    
+    Don't need to hack .xml files anymore (yay!)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bed019b64d9e37f276ad5aa2dabb7681aae122ec
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 31 15:17:01 2018 -0800
+
+    doc: Add 1.9 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f9fdbfade5e2d203d2ca5378e4f2a65beae4a19f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 31 15:17:42 2018 -0800
+
+    doc: Set doc version to 1.9
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ec8df548e3f6fd5d809238e2e60a0844775f551a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 31 15:17:20 2018 -0800
+
+    doc: Add EasyMega v2.0 specs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58fb7e53989f67fe8d793d7b3ddad8e41682cfbe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 31 15:18:08 2018 -0800
+
+    doc: Update doc/RELNOTES to adapt to asciidoctor change
+    
+    Moving to asciidoctor means changing our doc release process
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bb3f961022032390bfac6104ea4136354df67689
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 30 14:28:07 2018 -0800
+
+    Add shipping products to fat_altos target, note that in Releasing
+    
+    These bits are used to build alpha/beta releases, so they should
+    support all existing products.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 60b46436f9f642d43be4e00df08eccadb57214e8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Dec 31 12:37:45 2018 -0700
+
+    ao-bringup: get turnon_easymega working for v2.0
+
+commit 9791ebb256c2892663c072f7989e4b9bd34818a1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 30 14:15:51 2018 -0800
+
+    altoslib: Remove spurious debug printf in AltosCalData
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d472ab07224a21abfa83da8336439d7844f9aa8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 30 14:11:03 2018 -0800
+
+    altos: Don't validate ADXL375 self test for maximum value
+    
+    The data sheet says this is unreliable, and that we should be using an
+    FFT anyways.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4fb00afc9018c6179c4aff897fcbb330588d02a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 30 13:42:50 2018 -0800
+
+    altos: Make HAS_ACCEL_DEBUG build again
+    
+    Need to not use ao_error_h_sq_avg without HAS_ACCEL
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 84c04a114898d97a13f61e1006949dc3926eeba1
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Dec 30 15:16:29 2018 -0700
+
+    update easymega turn-on script for v2.0
+
+commit e9a3268285e97b7316c3321892e77814703ff71d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 1 19:40:31 2018 -0700
+
+    doc: Use icons for admonitions
+    
+    This replaces the text 'WARNING' or 'NOTE' with a suitable icon instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d859a7f65baf6c5c170f14fb2d9401b5c607a254
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 25 17:01:38 2018 -0700
+
+    doc: Remove asciidoc related files
+    
+    These all helped asciidoc generate documentation
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41fed74c4cf139de6bf8f1879d370977785ad1f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 25 16:56:24 2018 -0700
+
+    Remove cc1111 products from 'fat_altos' list, which is used for keithp-fat
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6d80b89c0bd82133dd5c93df8604f562ac49c19a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 25 16:50:17 2018 -0700
+
+    doc: Switch to asciidoctor to format docs
+    
+    asciidoc and a2x are no longer actively maintained and Debian policy
+    encourages people to move away from them to asciidoctor.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cf3e524e50a6fae2862efb404c9918b74438e9c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 23 16:07:09 2018 -0700
+
+    Generate LED icons on the fly. Include SVG versions.
+    
+    This builds the required LED images from source code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e9915aad4fe97cd253b88805646085c64181baef
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 22 16:48:56 2018 -0700
+
+    Don't force CFLAGS from top level
+    
+    Let the system defaults control this value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cf7b2e065d844d290ee43449ae37162839220158
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 22 16:48:04 2018 -0700
+
+    ao-tools: Spelling fixes in a couple of man pages
+    
+    ao-dbg.1 and ao-eeprom.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1812adbd61400af19293bf775e544baf661ec224
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 22 16:47:20 2018 -0700
+
+    Add keywords to .desktop files
+    
+    Makes applications easier to find with search
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 48e221cca00c9f925ff57588dd782842705f7a23
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 20 17:29:36 2018 -0700
+
+    altoslib: When flashing hardware, pull USB data from device if needed
+    
+    If we fail to extract USB vid/pid and product values from the device
+    ROM, use the data discovered over USB when the device was originally
+    discovered.
+    
+    Also, use the USB product to select appropriate .ihx files instead of
+    only using the USB vid/pid. This will help people avoid using the
+    wrong file when reflashing devices.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 345e3c37a1cf619392b54589bb91b4caf7844810
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 20 17:26:53 2018 -0700
+
+    altos/easymega-v2.0: Handle different mpu9250 orientation
+    
+    The mpu9250 on EasyMega v2.0 is rotated 90° compared with EasyMega v1
+    and TeleMega IMU devices.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8c92656576aff3ceab5bead3c835d96c36098fe7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 20 17:24:41 2018 -0700
+
+    altoslib: Add support for EasyMega-v2
+    
+    adxl375 instead of mma6555.
+    mpu9250 rotated 90° compared with other megas.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f13e294d4644096b0529383c1d60d5e4b7916d76
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 20 17:22:59 2018 -0700
+
+    altoslib: Add support for TeleGPS v2
+    
+    The battery voltage ADC values are different from TeleGPS v1 (max 4095
+    instead of 32767).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c01514fa1e0a2cea3955c71a833b4a21b3d33f24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 20 07:34:57 2018 -0700
+
+    altos/adxl375: Clean up initialization, shortening self test period
+    
+    Set the self test period to that suggested in the documentation.
+    Eliminate some debug variables.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0686a7b8aec524d81bda4c572549a3a068ce0eed
+Merge: 6aa451ce cc528f1f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 20 01:18:12 2018 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 6aa451ce81bfdfe679e3f9902043a5f0d235c745
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 20 01:17:39 2018 -0600
+
+    altoslib: fix computation of TeleGPS battery voltage
+
+commit cc528f1ff0271ec6488a1a7b91c731183502101e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 19 13:20:31 2018 -0700
+
+    altosui: Add EasyMega v2.0 firmware to release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1e4b8674d874a190eca1a98a397aaf0a9d15bda1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 19 13:19:03 2018 -0700
+
+    altoslib: Add ADXL375 support and EasyMega v2.0 support
+    
+    EasyMega v2.0 replaces the MMA655X with an ADXL375 part.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3fd320ea38f2945f5611a09a0e48d16db467d105
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 19 08:41:51 2018 -0700
+
+    altos: Add EasyMega v2.0 to default build
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f49763bf4a6cd8b2a47abfbec7ef3d8c8c029b8f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 09:43:25 2018 -0700
+
+    altos/easymega-v2.0: Add adxl375, replace mpu6000 with 9250 [v2]
+    
+    Should reflect current hardware design now.
+    
+    v2:
+            Use SPI mode 3 for ADXL375
+            Invert ADXL375 values
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6fdc392ef1b624c06e26e7a053c3579435c455d5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 09:46:01 2018 -0700
+
+    altos/easymega-v2.0: Change binary to easymega-v2.0 instead of easymega-v1.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 30e4e286eec31e69ad1e69a44cf00d4549a09f88
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 09:41:31 2018 -0700
+
+    altos: Add ADXL375 driver [v2]
+    
+    Includes self-test code and multi-byte mode operation for reading
+    sample registers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 33bb97b9637bdabe4360269889e20fcc50ef9886
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 15 11:15:31 2018 -0700
+
+    altos/stm: Support SPI modes other than 0
+    
+    ADXL375 requires SPI mode 3.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dbc52686c6d9808275c35e0c9c987cbbd9f7859d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 13:42:34 2018 -0700
+
+    altos/stm: Make beeper driver support all possible tim234 configs
+    
+    And update all users to be explicit about the desired config.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 80affca535c5c43a5d9963dfafc74f9675c9b155
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 19 08:12:22 2018 -0700
+
+    altos: Create ao_data_fill shared function
+    
+    This fills a data ring entry with all of the current sensor values
+    other than the ADC. It is used in all of the adc completion functions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit facf790f469df374257440ba9482321cbab7cecb
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 13 10:17:47 2018 -0600
+
+    altos: remove usbtrng support (chaoskey prototypes)
+
+commit 59f66e3264a48d8586dcbd12f6f0fa91e2e1ecdc
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 13 10:12:39 2018 -0600
+
+    altos: remove telescience support
+
+commit 758c8c27ba1819b5d90fda9e9ba6d15f5e8598e0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 13 10:02:13 2018 -0600
+
+    altos: remove teledongle-v1.8 support (what was that, anyway?!?)
+
+commit 3620f09329ccae817fe3ec2f9c2c588ebbfa149b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 13 09:59:22 2018 -0600
+
+    altos: remove megadongle-v0.1 support, never went beyond prototype
+
+commit 2da09b9f5649786f202aa0f295ead728939eddae
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 13 09:57:44 2018 -0600
+
+    altos: remove telepyro-v0.1 support, which was never completed anyway
+
+commit 41ebb27230de6385a01c111c299bb22b1cb0badf
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 13 09:55:03 2018 -0600
+
+    altos: remove teleterra-v0.1, also an ancient cc1111 project
+
+commit 983c36782527078ce667feb9eccd1ed0b97fbc29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 08:33:49 2018 -0700
+
+    altos/drivers: Use stdbool in ao_ms5607.c
+    
+    We don't have TRUE and FALSE anymore (they were pdclib specific).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 346fdfb469f7f3c1f87a39dee5bfb4568631c28b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 08:27:41 2018 -0700
+
+    altos: Remove pdclib bits from Makefile
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cf21c87f9f3e1a75dba39ab41dfffb629586935d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 08:27:17 2018 -0700
+
+    Remove .gitmodules
+    
+    We no longer use submodules (yay!)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 815d537e0fa6503b2a83d92d94c734eaee15987b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 08:26:02 2018 -0700
+
+    Bump version to 1.8.7.1
+    
+    Tag development versions
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 408badbef80d7a3412b5ad92b269be19d0faaa09
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:48:25 2018 -0700
+
+    altos/stm32f4-disco: Start hooking up stm32f413 USB for the disco board
+    
+    Non-working as yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 805d218ff50e6c38345c0d4e46f568009132633e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:46:19 2018 -0700
+
+    altos/stm32f4: Add start of stm32f413 USB support
+    
+    This code doesn't work yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a246b4cb5ee8e8894ea3492187a08e1e4f719bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:46:01 2018 -0700
+
+    altos/stm32f4: Add stm32f413 USART support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 600689b39d9bc604b0a8b586c8a93a465a42fc3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:45:39 2018 -0700
+
+    altos/stm32f4: Add external interrupt bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 015d3055a52532070e96469907683c3aa3eda44e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:44:58 2018 -0700
+
+    altos/stm32f4: Add more stm32f413 definitions and support code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 44ae8b9317fa4aaccabbe9d07b5972f7dfd3baa2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 18:53:15 2018 -0700
+
+    altos: Clean up AO_ROMCONFIG bits
+    
+    Remove address parameter (doesn't work with gcc), create shared
+    ao_romconfig in kernel.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 32463323d888d2b36d4b993d82e2522e1b236299
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 18:51:59 2018 -0700
+
+    altos/stm32f4-disco: Hook up serial console. Add scheme
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bb9d3d3bb1ae6223a7b910bc49ea8af5544a64d7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 18:50:45 2018 -0700
+
+    altos/stm32f4: Place ARM.exidx sections after .text
+    
+    This makes the linker happy about not attempting to merge unordered
+    and ordered stuff (whatever that means...)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cd151a622537e1436362bd71229c6ce22a3957d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 18:50:15 2018 -0700
+
+    altos/stm32f4: Use full printf/scanf (including floats)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0b5ac831d2e63a091833c702b07b0331fba32e72
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 18:49:22 2018 -0700
+
+    altos/stm32f4: Add usart driver for usart6
+    
+    This is what the disco board hooks up.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 23075d174d2bff8ff3f3deef3c3d90b83da6bd2e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 18:46:52 2018 -0700
+
+    altos/stm32f4: Align stack to 8 bytes
+    
+    This makes sure that doubles are aligned properly when passed on the stack.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71248c899676e0c2f3a478c63dec0d005b2458e6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 12:03:27 2018 -0700
+
+    altos/stm32f4-disco: Add .gitignore
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2cdb1f30c49ba460b0850d23ba9c85e0336af290
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 11:57:50 2018 -0700
+
+    altos: Add generic LED driver.
+    
+    This driver uses the generic GPIO functions and allows per-LED port
+    and pin configuration. It supports up to 32 LEDs.
+    
+    Rename SoC-specific LED drivers.
+    
+    Remove enabled parameter to ao_led_init
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cdaa0d7b272505c49017f409b7c0b8e3240608f0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 10:40:24 2018 -0700
+
+    altos: Eliminate 'pin' field from GPIO functions
+    
+    This was used with the 8051 bit-addressing mode to provide
+    single-instruction access to GPIO pins.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f7ca88282466c271bad5e25e804729580fe83c47
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 01:28:03 2018 -0700
+
+    altos/stm32f4: Fix clock configuration
+    
+    Was running the PLL input too slow (it wants 2MHz).
+    Was configuring the PLL_P factor wrong (needs magic values, not P
+    value)
+    
+    Set up clock debugging for PA8 and PC9 output. Enable on disco board
+    for debugging.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 621d1529d6bc07a3f4bd27fb2d02d5b3161a3a6a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 00:08:17 2018 -0700
+
+    altos/stm32f4: Add STM32F413 disco board support
+    
+    Discovery development board
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b7a21bf6a086748b4907c0577eaa114445995783
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 00:07:38 2018 -0700
+
+    altos/stm32f4: Start adding support for STM32F413
+    
+    Enough to get clocks lit up at least.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f037d0091a4b31c631d64e71441953eb9b3b21ce
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 2 12:47:00 2018 -0700
+
+    altos: Remove 8051-ism from ao_usb.h
+    
+    __at doesn't exist for non-8051
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b8e607960f2f399fd6ba92a8c97ab72e19812d3f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 00:05:38 2018 -0700
+
+    altos: Delete random 8051 ISR declarations
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a76829a4a840261e33869c40b3366fff3b691069
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 15 22:44:17 2018 -0700
+
+    altos: Allow application-specific prompts for ao_cmd_readline
+    
+    Lets other readline users specify alternate prompts.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 684741765117611b7d666efbdfafd87c6199752c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 15 19:17:19 2018 -0700
+
+    altos: Use stdbool true/false instead of TRUE/FALSE
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c417ab1de2a083b5fcff2e081e4feb2a65887903
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 15 19:13:45 2018 -0700
+
+    altos: Make cmd number parsing functions return value
+    
+    Don't use a global variable to hold the result.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c6e57291d91f1f6c4de5c54a5cfd3eef66d9f830
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 15 17:47:37 2018 -0700
+
+    altos: Remove 8051 address space specifiers
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6023ff81f1bbd240169b9548209133d3b02d475f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 15 17:34:20 2018 -0700
+
+    altos: Remove *_TO_DATA macros
+    
+    Now that we don't support 8051, we don't need these
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e2e2182a6ae6c8a7290fb5f7bbb7f8e0a863ba99
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 15 15:39:34 2018 -0700
+
+    Remove pdclib
+
+commit 7c04888cf9809e0c73f0813c74e8dd972facde3a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 12:23:22 2018 +0800
+
+    altos: Switch to newlib-nano for libc on arm
+    
+    Stop using pdclib
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 56629222711ba3ef7853405c9b07ad614fb29b95
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 5 12:17:19 2018 +0800
+
+    altos: Remove cc1111 products
+    
+    We're not testing these anyways; building new firmware for them is not helpful.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 382b3ef62a09e580834b07faf9ed2d00e5ce1621
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 11 00:06:44 2018 -0700
+
+    altos: use %lu for APRS altitude in sprintf
+    
+    It's a long.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 803c68d7933d03aaebda19786b63055d4a6d3d22
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 07:50:59 2018 -0700
+
+    altos/stm: Make flash loader work with either 8MHz or 16MHz xtal
+    
+    Provide PLL definitions for both values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e830d803d3e289f0f1a6d92ce208682af28d3f52
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 13 07:44:10 2018 -0700
+
+    altosdroid: Bump version to 18 for 1.8.7
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 393a5e929b530d9ee4f78cd01faa4dd90c95fe3a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 12 23:32:57 2018 -0600
+
+    altos: first cut at easymega v2.0 support .. nothing working yet
+
+commit fe3ff829d4c2fde8d4e80f721204b18e7831bb97
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Oct 10 20:41:40 2018 -0600
+
+    doc: add bootloader force instructions for TeleBT v4.0
+
+commit 34b5144dbfd565ee2b9fb1e0dff388a49253f93b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Oct 9 11:46:09 2018 -0600
+
+    update turnon_telebt to use new approach for saving cal value on TeleBT
+
+commit ba37db43741fde8a08080fa65f5bcf76b1f745ee
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Oct 8 21:41:30 2018 -0600
+
+    capture changes to Releasing discovered during 1.8.7 release
 
 commit e7136c6b413c8464d32cdc4afc28c93ba1f17a3b
 Author: Keith Packard <keithp@keithp.com>
@@ -26,6 +752,7 @@ Date:   Mon Oct 8 19:40:32 2018 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
+<<<<<<< HEAD
 commit 5a86ff43a2b4a90dbddc1bba48019626e1b83e10
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Oct 8 17:51:33 2018 -0600
@@ -39,6 +766,8 @@ Date:   Mon Oct 8 17:49:47 2018 -0600
 
     Merge branch 'master' into branch-1.8
 
+=======
+>>>>>>> branch-1.9
 commit 88ae4c5ebd64215f05f5efc18f9660560b409ace
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Oct 8 16:27:33 2018 -0600
@@ -834,6 +1563,7 @@ Date:   Sun Aug 5 14:11:01 2018 +0800
 
     capture updates to Releasing from 1.8.6 release process
 
+<<<<<<< HEAD
 commit 3a2a5a05bb6372d9003905cee7afdfcd6d38ae7e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Aug 5 11:23:31 2018 +0800
@@ -847,6 +1577,8 @@ Date:   Sun Aug 5 11:21:37 2018 +0800
 
     Merge branch 'master' into branch-1.8
 
+=======
+>>>>>>> branch-1.9
 commit 8830fbc99565f753c0ae1f3d9f4b079860c2634a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Aug 5 11:13:23 2018 +0800
@@ -2061,6 +2793,7 @@ Date:   Tue Mar 20 18:25:43 2018 -0600
 
     add a paragraph to the intro pointing to the altusmetrum email list
 
+<<<<<<< HEAD
 commit 59e23c27c2a85d7d748223e444b24d19937afe47
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Mar 18 15:49:07 2018 -0600
@@ -2074,6 +2807,8 @@ Date:   Sun Mar 18 15:47:31 2018 -0600
 
     Merge branch 'master' into branch-1.8
 
+=======
+>>>>>>> branch-1.9
 commit 39023ed6e29103a85bfad505506fa0dbf4dc1112
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Mar 18 15:42:48 2018 -0600
@@ -2519,6 +3254,7 @@ Date:   Thu Dec 21 20:40:28 2017 -0700
 
     update Releasing with wisdom from 1.8.4 release process
 
+<<<<<<< HEAD
 commit 16a9d8617b2d2092d166a85ada4349601afb0dce
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Dec 21 19:06:22 2017 -0700
@@ -2532,6 +3268,8 @@ Date:   Thu Dec 21 19:05:46 2017 -0700
 
     Merge branch 'master' into branch-1.8
 
+=======
+>>>>>>> branch-1.9
 commit 87aab99521dc44d1d29fbb0b7f227f868f074836
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Dec 21 17:37:10 2017 -0800
@@ -2951,6 +3689,7 @@ Date:   Mon Dec 11 22:15:46 2017 -0700
 
     update Releasing with changes discovered in 1.8.3 release process
 
+<<<<<<< HEAD
 commit fe38c22595b050435dbacd35f1baae064fb7de75
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Dec 11 21:38:59 2017 -0700
@@ -2964,6 +3703,8 @@ Date:   Mon Dec 11 21:37:48 2017 -0700
 
     Merge branch 'master' into branch-1.8
 
+=======
+>>>>>>> branch-1.9
 commit 9adf8b23aac8256f230b10adcab9dd323266caaa
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Dec 11 21:33:21 2017 -0700
@@ -4046,18 +4787,22 @@ Date:   Mon Sep 18 21:24:52 2017 -0600
 
     tweak Releasing based on 1.8.2 release experience
 
+<<<<<<< HEAD
 commit 216ea6388a75c46891dc4687a2eb0c97dc63b136
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 18 20:46:04 2017 -0600
 
     releasing 1.8.2
 
+=======
+>>>>>>> branch-1.9
 commit 60666630789b6925d7e16160ebdc88ccd23f51de
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 18 20:43:14 2017 -0600
 
     be more aggressive about removing and ignoring .mdwn files
 
+<<<<<<< HEAD
 commit 1ece6e6fd3faaae3f6c6d434497eb04235939dc3
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 18 20:43:14 2017 -0600
@@ -4071,6 +4816,8 @@ Date:   Mon Sep 18 20:35:00 2017 -0600
 
     Merge branch 'master' into branch-1.8
 
+=======
+>>>>>>> branch-1.9
 commit e87d56b665ca30a3e5920c23cd60c99b84341aa2
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Sep 18 18:51:51 2017 -0700
@@ -4307,12 +5054,15 @@ Date:   Mon Aug 28 14:01:54 2017 -0600
 
     a few tweaks to the Releasing document based on experience with 1.8.1
 
+<<<<<<< HEAD
 commit b1cf0dab1e28433e06ab02cec033951ea0149ea3
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Aug 28 12:05:17 2017 -0600
 
     releasing 1.8.1
 
+=======
+>>>>>>> branch-1.9
 commit b68c0482d4fae8eb54cde1df0e4bcf4c5d272bad
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Aug 27 22:49:09 2017 -0700

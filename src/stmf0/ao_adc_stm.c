@@ -38,23 +38,7 @@ static void ao_adc_done(int index)
 
 	AO_DATA_PRESENT(AO_DATA_ADC);
 	ao_dma_done_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
-	if (ao_data_present == AO_DATA_ALL) {
-#if HAS_MS5607
-		ao_data_ring[ao_data_head].ms5607_raw = ao_ms5607_current;
-#endif
-#if HAS_MMA655X
-		ao_data_ring[ao_data_head].mma655x = ao_mma655x_current;
-#endif
-#if HAS_HMC5883
-		ao_data_ring[ao_data_head].hmc5883 = ao_hmc5883_current;
-#endif
-#if HAS_MPU6000
-		ao_data_ring[ao_data_head].mpu6000 = ao_mpu6000_current;
-#endif
-		ao_data_ring[ao_data_head].tick = ao_tick_count;
-		ao_data_head = ao_data_ring_next(ao_data_head);
-		ao_wakeup((void *) &ao_data_head);
-	}
+	ao_data_fill(ao_data_head);
 	ao_adc_ready = 1;
 }
 
@@ -103,10 +87,9 @@ ao_adc_one(void)
 	int		ch;
 	uint16_t	value;
 
-	ao_cmd_decimal();
+	ch = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ch = ao_cmd_lex_i;
 	if (ch < 0 || AO_NUM_ADC <= ch) {
 		ao_cmd_status = ao_cmd_syntax_error;
 		return;
@@ -180,7 +163,7 @@ ao_adc_one(void)
 }
 #endif
 
-__code struct ao_cmds ao_adc_cmds[] = {
+const struct ao_cmds ao_adc_cmds[] = {
 	{ ao_adc_dump,	"a\0Display current ADC values" },
 #if AO_ADC_DEBUG
 	{ ao_adc_one,	"A ch\0Display one ADC channel" },

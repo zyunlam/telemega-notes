@@ -1,5 +1,5 @@
 = Release Notes for Version 1.8.2
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.8.2 includes support for TeleGPS version 2.0 along

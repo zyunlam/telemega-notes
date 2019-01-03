@@ -209,10 +209,8 @@ static void
 ao_seven_segment_show(void)
 {
 	uint8_t	digit, value;
-	ao_cmd_decimal();
-	digit = ao_cmd_lex_i;
-	ao_cmd_decimal();
-	value = ao_cmd_lex_i;
+	digit = ao_cmd_decimal();
+	value = ao_cmd_decimal();
 	ao_seven_segment_set(digit, value);
 }
 

@@ -65,7 +65,7 @@
 			the device.
         
 			.TeleGPS Map View
-			image::telegps-map.png[width="5.5in"]
+			image::telegps-map.png[width=400]
 
 			The map's default scale is approximately 3m
 			(10ft) per pixel. The map can be dragged using
@@ -99,7 +99,7 @@
 			received from TeleGPS.
 	
 			.TeleGPS Location View
-			image::telegps-location.png[width="5.5in"]
+			image::telegps-location.png[width=400]
 
 		==== Status
 
@@ -108,7 +108,7 @@
 			received telemetry from it.
 	
 			.TeleGPS Status View
-			image::telegps-status.png[width="5.5in"]
+			image::telegps-status.png[width=400]
 
 		==== Table
 
@@ -116,7 +116,7 @@
 			the GPS receiver
 	
 			.TeleGPS Information Table
-			image::telegps-table.png[width="5.5in"]
+			image::telegps-table.png[width=400]
 
 	=== TeleGPS Menus
 
@@ -164,12 +164,12 @@
 		==== Data Graph
 
 			.TeleGPS Graph
-			image::telegps-graph-graph.png[width="5.5in"]
+			image::telegps-graph-graph.png[width=400]
 
 		==== Graph Configuration
 
 			.TeleGPS Graph Configuration
-			image::telegps-graph-configure.png[width="5.5in"]
+			image::telegps-graph-configure.png[width=400]
 
 			This selects which graph elements to show, and, at the
 			bottom, lets you switch between metric and imperial
@@ -178,14 +178,14 @@
 		==== Statistics
 
 			.TeleGPS Statistics
-			image::telegps-graph-stats.png[width="5.5in"]
+			image::telegps-graph-stats.png[width=400]
 
 			Shows overall data computed from the flight.
 		
 		==== Map
 
 			.TeleGPS Map
-			image::telegps-graph-map.png[width="6in"]
+			image::telegps-graph-map.png[width=450]
 
 			Shows a map of the area overlaid with the GPS track. As with
 			the telemetry monitoring window, you can select the style
@@ -233,14 +233,14 @@
 			within that application. With this, you can use Google Earth to
 			see the whole path in 3D.
 
-	include::load-maps.raw[]
+	include::load-maps.adoc[]
 
 	=== Preferences
 
 		.TeleGPS Preferences Window
-		image::telegps-preferences.png[width="2.4in"]
+		image::telegps-preferences.png[width=230]
 
-		include::config-ui.raw[]
+		include::config-ui.adoc[]
 
 	=== Close
 
@@ -260,7 +260,7 @@
 		received by the selected TeleDongle device.
 	
 		.Device Selection Dialog
-		image::device-selection.png[width="3.1in"]
+		image::device-selection.png[width=300]
 
 	=== Disconnect
 
@@ -270,7 +270,7 @@
 	=== Scan Channels
 
 		.Radio Scanning Dialog
-		image::telegps-scan.png[width="3.1in"]
+		image::telegps-scan.png[width=300]
 
 		Scans the configured set of frequencies looking for
 		telemetry signals. A list of all of the discovered
@@ -306,7 +306,7 @@
 	=== Configure Device
 
 		.TeleGPS Configuration Dialog
-		image::telegps-configure.png[width="3.6in"]
+		image::telegps-configure.png[width=350]
 
 		Select this button and then select any connected TeleGPS
 		device from the list provided.
@@ -342,7 +342,7 @@
 
 	        The rest of the dialog contains the parameters to be configured.
 
-		include::config-device.raw[]
+		include::config-device.adoc[]
 
 	=== Flash Device
 

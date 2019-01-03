@@ -26,17 +26,15 @@
 #define HAS_STATIC_TEST	1
 #endif
 
-static __pdata uint16_t	lco_box;
-static __pdata uint8_t	lco_channels;
-static __pdata uint16_t	tick_offset;
+static uint16_t	lco_box;
+static uint8_t	lco_channels;
+static uint16_t	tick_offset;
 
 static void
-lco_args(void) __reentrant
+lco_args(void) 
 {
-	ao_cmd_decimal();
-	lco_box = ao_cmd_lex_i;
-	ao_cmd_hex();
-	lco_channels = ao_cmd_lex_i;
+	lco_box = ao_cmd_decimal();
+	lco_channels = ao_cmd_hex();
 }
 
 static struct ao_pad_query	ao_pad_query;
@@ -71,7 +69,7 @@ lco_ignite(uint8_t cmd)
 }
 
 static void
-lco_report_cmd(void) __reentrant
+lco_report_cmd(void) 
 {
 	int8_t		r;
 	uint8_t		c;
@@ -122,15 +120,14 @@ lco_report_cmd(void) __reentrant
 }
 
 static void
-lco_fire_cmd(void) __reentrant
+lco_fire_cmd(void) 
 {
 	uint8_t		secs;
 	uint8_t		i;
 	int8_t		r;
 
 	lco_args();
-	ao_cmd_decimal();
-	secs = ao_cmd_lex_i;
+	secs = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	r = lco_query();
@@ -156,15 +153,14 @@ lco_fire_cmd(void) __reentrant
 
 #if HAS_STATIC_TEST
 static void
-lco_static_cmd(void) __reentrant
+lco_static_cmd(void) 
 {
 	uint8_t		secs;
 	uint8_t		i;
 	int8_t		r;
 
 	lco_args();
-	ao_cmd_decimal();
-	secs = ao_cmd_lex_i;
+	secs = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	r = lco_query();
@@ -190,7 +186,7 @@ lco_static_cmd(void) __reentrant
 #endif
 
 static void
-lco_arm_cmd(void) __reentrant
+lco_arm_cmd(void) 
 {
 	uint8_t	i;
 	int8_t  r;
@@ -205,7 +201,7 @@ lco_arm_cmd(void) __reentrant
 }
 
 static void
-lco_ignite_cmd(void) __reentrant
+lco_ignite_cmd(void) 
 {
 	uint8_t i;
 	lco_args();
@@ -216,13 +212,13 @@ lco_ignite_cmd(void) __reentrant
 
 #if HAS_STATIC_TEST
 static void
-lco_endstatic_cmd(void) __reentrant
+lco_endstatic_cmd(void) 
 {
 	lco_ignite(AO_PAD_ENDSTATIC);
 }
 #endif
 
-static __code struct ao_cmds ao_lco_cmds[] = {
+static const struct ao_cmds ao_lco_cmds[] = {
 	{ lco_report_cmd,	"l <box> <channel>\0Get remote status" },
 	{ lco_fire_cmd,		"F <box> <channel> <secs>\0Fire remote igniters" },
 #if HAS_STATIC_TEST

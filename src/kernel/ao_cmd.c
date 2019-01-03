@@ -19,10 +19,8 @@
 #include "ao.h"
 #include "ao_task.h"
 
-__pdata uint16_t ao_cmd_lex_i;
-__pdata uint32_t ao_cmd_lex_u32;
-__pdata char	ao_cmd_lex_c;
-__pdata enum ao_cmd_status ao_cmd_status;
+char	ao_cmd_lex_c;
+enum ao_cmd_status ao_cmd_status;
 
 #ifndef AO_CMD_LEN
 #if AO_PYRO_NUM
@@ -32,30 +30,26 @@ __pdata enum ao_cmd_status ao_cmd_status;
 #endif
 #endif
 
-static __xdata char	cmd_line[AO_CMD_LEN];
-static __pdata uint8_t	cmd_len;
-static __pdata uint8_t	cmd_i;
+static char	cmd_line[AO_CMD_LEN];
+static uint8_t	cmd_len;
+static uint8_t	cmd_i;
+
+static const char backspace[] = "\010 \010";
 
 void
-ao_put_string(__code char *s)
+ao_put_string(const char *s)
 {
 	char	c;
 	while ((c = *s++))
 		putchar(c);
 }
 
-static void
-backspace(void)
-{
-	ao_put_string ("\010 \010");
-}
-
 void
-ao_cmd_readline(void)
+ao_cmd_readline(const char *prompt)
 {
 	char c;
 	if (ao_echo())
-		ao_put_string("> ");
+		ao_put_string(prompt);
 	cmd_len = 0;
 	for (;;) {
 		flush();
@@ -64,7 +58,7 @@ ao_cmd_readline(void)
 		if (c == '\010' || c == '\177') {
 			if (cmd_len != 0) {
 				if (ao_echo())
-					backspace();
+					ao_put_string(backspace);
 				--cmd_len;
 			}
 			continue;
@@ -74,7 +68,7 @@ ao_cmd_readline(void)
 		if (c == '\025') {
 			while (cmd_len != 0) {
 				if (ao_echo())
-					backspace();
+					ao_put_string(backspace);
 				--cmd_len;
 			}
 			continue;
@@ -174,55 +168,48 @@ ao_cmd_hexchar(char c)
 	return -1;
 }
 
-void
-ao_cmd_hexbyte(void)
+static uint32_t
+get_hex(uint8_t lim)
 {
+	uint32_t result = 0;
 	uint8_t i;
-	int8_t	n;
 
-	ao_cmd_lex_i = 0;
 	ao_cmd_white();
-	for (i = 0; i < 2; i++) {
-		n = ao_cmd_hexchar(ao_cmd_lex_c);
+	for (i = 0; i < lim; i++) {
+		int8_t n = ao_cmd_hexchar(ao_cmd_lex_c);
 		if (n < 0) {
-			ao_cmd_status = ao_cmd_syntax_error;
+			if (i == 0 || lim != 0xff)
+				ao_cmd_status = ao_cmd_lex_error;
 			break;
 		}
-		ao_cmd_lex_i = (ao_cmd_lex_i << 4) | n;
+		result = (result << 4) | n;
 		ao_cmd_lex();
 	}
+	return result;
 }
 
-void
+uint8_t
+ao_cmd_hexbyte(void)
+{
+	return get_hex(2);
+}
+
+uint32_t
 ao_cmd_hex(void)
 {
-	__pdata uint8_t	r = ao_cmd_lex_error;
-	int8_t	n;
-
-	ao_cmd_lex_i = 0;
-	ao_cmd_white();
-	for(;;) {
-		n = ao_cmd_hexchar(ao_cmd_lex_c);
-		if (n < 0)
-			break;
-		ao_cmd_lex_i = (ao_cmd_lex_i << 4) | n;
-		r = ao_cmd_success;
-		ao_cmd_lex();
-	}
-	if (r != ao_cmd_success)
-		ao_cmd_status = r;
+	return get_hex(0xff);
 }
 
-void
-ao_cmd_decimal(void) __reentrant
+uint32_t
+ao_cmd_decimal(void) 
 {
+	uint32_t result = 0;
 	uint8_t	r = ao_cmd_lex_error;
 
-	ao_cmd_lex_u32 = 0;
 	ao_cmd_white();
 	for(;;) {
 		if ('0' <= ao_cmd_lex_c && ao_cmd_lex_c <= '9')
-			ao_cmd_lex_u32 = (ao_cmd_lex_u32 * 10) + (ao_cmd_lex_c - '0');
+			result = result * 10 + (ao_cmd_lex_c - '0');
 		else
 			break;
 		r = ao_cmd_success;
@@ -230,11 +217,11 @@ ao_cmd_decimal(void) __reentrant
 	}
 	if (r != ao_cmd_success)
 		ao_cmd_status = r;
-	ao_cmd_lex_i = (uint16_t) ao_cmd_lex_u32;
+	return result;
 }
 
 uint8_t
-ao_match_word(__code char *word)
+ao_match_word(const char *word)
 {
 	while (*word) {
 		if (ao_cmd_lex_c != *word) {
@@ -250,9 +237,9 @@ ao_match_word(__code char *word)
 static void
 echo(void)
 {
-	ao_cmd_hex();
+	uint32_t v = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_stdios[ao_cur_stdio].echo = ao_cmd_lex_i != 0;
+		ao_stdios[ao_cur_stdio].echo = v != 0;
 }
 
 static void
@@ -321,16 +308,16 @@ version(void)
 #define NUM_CMDS	11
 #endif
 
-static __code struct ao_cmds	*__xdata (ao_cmds[NUM_CMDS]);
-static __pdata uint8_t		ao_ncmds;
+static const struct ao_cmds	*(ao_cmds[NUM_CMDS]);
+static uint8_t		ao_ncmds;
 
 static void
 help(void)
 {
-	__pdata uint8_t cmds;
-	__pdata uint8_t cmd;
-	__code struct ao_cmds * __pdata cs;
-	__code const char *h;
+	uint8_t cmds;
+	uint8_t cmd;
+	const struct ao_cmds * cs;
+	const char *h;
 	uint8_t e;
 
 	for (cmds = 0; cmds < ao_ncmds; cmds++) {
@@ -363,7 +350,7 @@ report(void)
 }
 
 void
-ao_cmd_register(__code struct ao_cmds *cmds)
+ao_cmd_register(const struct ao_cmds *cmds)
 {
 	if (ao_ncmds >= NUM_CMDS)
 		ao_panic(AO_PANIC_CMD);
@@ -373,13 +360,13 @@ ao_cmd_register(__code struct ao_cmds *cmds)
 void
 ao_cmd(void)
 {
-	__pdata char	c;
+	char	c;
 	uint8_t cmd, cmds;
-	__code struct ao_cmds * __xdata cs;
-	void (*__xdata func)(void);
+	const struct ao_cmds * cs;
+	void (*func)(void);
 
 	for (;;) {
-		ao_cmd_readline();
+		ao_cmd_readline("> ");
 		ao_cmd_lex();
 		ao_cmd_white();
 		c = ao_cmd_lex_c;
@@ -424,10 +411,10 @@ ao_loader(void)
 #endif
 
 #if HAS_TASK
-__xdata struct ao_task ao_cmd_task;
+struct ao_task ao_cmd_task;
 #endif
 
-__code struct ao_cmds	ao_base_cmds[] = {
+const struct ao_cmds	ao_base_cmds[] = {
 	{ help,		"?\0Help" },
 #if HAS_TASK_INFO && HAS_TASK
 	{ ao_task_info,	"T\0Tasks" },

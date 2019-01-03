@@ -105,7 +105,7 @@ product, leaving out the serial number will cause the tool to match
 one of the available devices.
 .SH COMMANDS
 Once started, ao-dbg connects to the cc1111 and then reads and
-executes commands, either from stdin, or the nework connection to
+executes commands, either from stdin, or the network connection to
 sdcdb.
 .PP
 Unlike the command line, ao-dbg contains built-in help for each of these
@@ -208,7 +208,7 @@ pins and then change the Port 1 data to set them high or low:
 > set sfr 0x90 0x00	# set P1_1 to low
 .IP "Reading the A/D converters"
 The six A/D converter inputs can each be connected to any of the P0 pins,
-ground, the A/D voltage refernece, an internal temperature sensor or VDD/3.
+ground, the A/D voltage reference, an internal temperature sensor or VDD/3.
 To read one of these values, select an A/D converter to use then start the
 conversion process. The cc1111 manual has the table for selecting the input
 on page 144.

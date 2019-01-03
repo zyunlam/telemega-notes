@@ -1,5 +1,13 @@
 = Loading Map Tiles from Google Maps
+Keith Packard <keithp@keithp.com>
+:title-logo-image: image:load-maps.png[]
+:copyright: Keith Packard 2018
 :doctype: article
+:stylesheet: am-notoc.css
+:linkcss:
+:pdf-stylesdir: .
+:pdf-style: altusmetrum
+:pdf-fontsdir: fonts
 
 == The Google Maps Problem
 

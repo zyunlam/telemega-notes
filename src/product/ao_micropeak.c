@@ -57,7 +57,7 @@ ao_pips(void)
 int
 main(void)
 {
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 	ao_timer_init();
 
 	/* Init external hardware */

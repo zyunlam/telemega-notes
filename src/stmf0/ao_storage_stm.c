@@ -157,7 +157,7 @@ ao_storage_device_write(uint32_t pos, void *v, uint16_t len)
 }
 
 uint8_t
-ao_storage_device_read(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
+ao_storage_device_read(uint32_t pos, void *d, uint16_t len) 
 {
 	if (pos >= ao_storage_total || pos + len > ao_storage_total)
 		return 0;
@@ -166,7 +166,7 @@ ao_storage_device_read(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
 }
 
 void
-ao_storage_flush(void) __reentrant
+ao_storage_flush(void) 
 {
 }
 
@@ -179,7 +179,7 @@ ao_storage_setup(void)
 }
 
 void
-ao_storage_device_info(void) __reentrant
+ao_storage_device_info(void) 
 {
 	printf ("Using internal flash, page %d bytes, total %d bytes\n",
 		ao_storage_block, ao_storage_total);

@@ -34,16 +34,16 @@
 
 #if HAS_SENSOR_ERRORS
 /* Any sensor can set this to mark the flight computer as 'broken' */
-__xdata uint8_t			ao_sensor_errors;
+uint8_t			ao_sensor_errors;
 #endif
 
-__pdata uint16_t		ao_motor_number;	/* number of motors burned so far */
+uint16_t		ao_motor_number;	/* number of motors burned so far */
 
 /* Main flight thread. */
 
-__pdata enum ao_flight_state	ao_flight_state;	/* current flight state */
+enum ao_flight_state	ao_flight_state;	/* current flight state */
 
-__pdata uint8_t			ao_flight_force_idle;
+uint8_t			ao_flight_force_idle;
 
 void
 ao_flight(void)
@@ -96,7 +96,7 @@ ao_flight(void)
 				ao_led_off(AO_LED_RED);
 			}
 			/* wakeup threads due to state change */
-			ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+			ao_wakeup(&ao_flight_state);
 
 			break;
 		case ao_flight_pad:
@@ -118,7 +118,7 @@ ao_flight(void)
 				ao_wakeup(&ao_gps_new);
 #endif
 
-				ao_wakeup(DATA_TO_XDATA(&ao_flight_state));
+				ao_wakeup(&ao_flight_state);
 			}
 			break;
 		default:
@@ -127,7 +127,7 @@ ao_flight(void)
 	}
 }
 
-static __xdata struct ao_task	flight_task;
+static struct ao_task	flight_task;
 
 void
 ao_flight_init(void)

@@ -273,6 +273,14 @@ public class AltosRomconfig implements AltosUnitInfoListener {
 			throw new IOException("writing new rom config failed\n");
 	}
 
+	public String toString() {
+		return String.format("valid %b version %d serial %d radio %d usb %04x:%04x %s",
+				     valid, version, serial_number, radio_calibration,
+				     usb_id == null ? 0 : usb_id.vid,
+				     usb_id == null ? 0 : usb_id.pid,
+				     usb_product == null ? "unknown" : usb_product);
+	}
+
 	public AltosRomconfig(int in_serial_number, int in_radio_calibration) {
 		valid = true;
 		version = 1;
@@ -282,7 +290,7 @@ public class AltosRomconfig implements AltosUnitInfoListener {
 	}
 
 	public boolean valid() {
-		return valid && serial_number != 0;
+		return valid;
 	}
 
 	public AltosRomconfig() {

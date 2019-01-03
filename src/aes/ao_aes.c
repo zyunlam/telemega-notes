@@ -372,7 +372,7 @@ ao_aes_set_mode(enum ao_aes_mode mode)
 }
 
 void
-ao_aes_set_key(__xdata uint8_t *in)
+ao_aes_set_key(uint8_t *in)
 {
 	memcpy(key, in, 16);
 	xrijndaelKeySched((word32 *) key, 128, 128, &rkk);
@@ -385,8 +385,8 @@ ao_aes_zero_iv(void)
 }
 
 void
-ao_aes_run(__xdata uint8_t *in,
-	   __xdata uint8_t *out)
+ao_aes_run(uint8_t *in,
+	   uint8_t *out)
 {
 	uint8_t	i;
 	uint8_t *_iv = (uint8_t *) iv;

@@ -19,16 +19,16 @@
 #include "ao.h"
 
 /* Total bytes of available storage */
-__pdata uint32_t	ao_storage_total;
+uint32_t	ao_storage_total;
 
 /* Block size - device is erased in these units. At least 256 bytes */
-__pdata uint32_t	ao_storage_block;
+uint32_t	ao_storage_block;
 
 /* Byte offset of config block. Will be ao_storage_block bytes long */
-__pdata uint32_t	ao_storage_config;
+uint32_t	ao_storage_config;
 
 /* Storage unit size - device reads and writes must be within blocks of this size. Usually 256 bytes. */
-__pdata uint16_t	ao_storage_unit;
+uint16_t	ao_storage_unit;
 
 #define M25_DEBUG	0
 /*
@@ -89,7 +89,7 @@ static uint8_t ao_m25_numchips;			/* number of chips detected */
 static uint8_t ao_m25_total;			/* total sectors available */
 static ao_port_t ao_m25_wip;			/* write in progress */
 
-static __xdata uint8_t ao_m25_mutex;
+static uint8_t ao_m25_mutex;
 
 /*
  * This little array is abused to send and receive data. A particular
@@ -99,7 +99,7 @@ static __xdata uint8_t ao_m25_mutex;
  * of which touch those last three bytes.
  */
 
-static __xdata uint8_t	ao_m25_instruction[4];
+static uint8_t	ao_m25_instruction[4];
 
 #define M25_SELECT(cs)		ao_spi_get_mask(AO_M25_SPI_CS_PORT,cs,AO_M25_SPI_BUS, AO_SPI_SPEED_FAST)
 #define M25_DESELECT(cs)	ao_spi_put_mask(AO_M25_SPI_CS_PORT,cs,AO_M25_SPI_BUS)
@@ -239,7 +239,7 @@ ao_m25_scan(void)
  * Erase the specified sector
  */
 uint8_t
-ao_storage_erase(uint32_t pos) __reentrant
+ao_storage_erase(uint32_t pos) 
 {
 	ao_port_t	cs;
 
@@ -267,7 +267,7 @@ ao_storage_erase(uint32_t pos) __reentrant
  * Write to flash
  */
 uint8_t
-ao_storage_device_write(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
+ao_storage_device_write(uint32_t pos, void *d, uint16_t len) 
 {
 	ao_port_t	cs;
 
@@ -294,7 +294,7 @@ ao_storage_device_write(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
  * Read from flash
  */
 uint8_t
-ao_storage_device_read(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
+ao_storage_device_read(uint32_t pos, void *d, uint16_t len) 
 {
 	ao_port_t	cs;
 
@@ -317,7 +317,7 @@ ao_storage_device_read(uint32_t pos, __xdata void *d, uint16_t len) __reentrant
 }
 
 void
-ao_storage_flush(void) __reentrant
+ao_storage_flush(void) 
 {
 }
 
@@ -330,7 +330,7 @@ ao_storage_setup(void)
 }
 
 void
-ao_storage_device_info(void) __reentrant
+ao_storage_device_info(void) 
 {
 #if M25_DEBUG
 	ao_port_t	cs;

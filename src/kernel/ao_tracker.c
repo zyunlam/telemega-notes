@@ -30,7 +30,7 @@ static uint8_t		ao_tracker_force_telem;
 static inline uint8_t
 ao_usb_connected(void)
 {
-	return ao_gpio_get(AO_USB_CONNECT_PORT, AO_USB_CONNECT_PIN, AO_USB_CONNECT) != 0;
+	return ao_gpio_get(AO_USB_CONNECT_PORT, AO_USB_CONNECT_PIN) != 0;
 }
 #else
 #define ao_usb_connected()	1
@@ -211,9 +211,9 @@ static struct ao_task ao_tracker_task;
 static void
 ao_tracker_set_telem(void)
 {
-	ao_cmd_hex();
+	uint16_t r = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_tracker_force_telem = ao_cmd_lex_i;
+		ao_tracker_force_telem = r;
 	ao_cmd_status = ao_cmd_success;
 	printf ("flight: %d\n", ao_flight_number);
 	printf ("force_telem: %d\n", ao_tracker_force_telem);

@@ -1,5 +1,5 @@
 = Release Notes for Version 1.4.1
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.4.1 is a minor release. It fixes install issues on

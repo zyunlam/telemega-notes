@@ -243,9 +243,9 @@ ao_lco_display_test()
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, 8 | 0x10);
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, 8 | 0x10);
 	ao_mutex_put(&ao_lco_display_mutex);
-	ao_led_on(LEDS_AVAILABLE);
+	ao_led_on(AO_LEDS_AVAILABLE);
 	ao_delay(AO_MS_TO_TICKS(1000));
-	ao_led_off(LEDS_AVAILABLE);
+	ao_led_off(AO_LEDS_AVAILABLE);
 }
 
 static void
@@ -282,12 +282,12 @@ ao_lco_main(void)
 void
 ao_lco_set_debug(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_lco_debug = ao_cmd_lex_i != 0;
+		ao_lco_debug = r != 0;
 }
 
-__code struct ao_cmds ao_lco_cmds[] = {
+const struct ao_cmds ao_lco_cmds[] = {
 	{ ao_lco_set_debug,	"D <0 off, 1 on>\0Debug" },
 	{ ao_lco_search,	"s\0Search for pad boxes" },
 	{ 0, NULL }

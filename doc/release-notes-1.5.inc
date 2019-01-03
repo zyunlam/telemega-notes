@@ -1,5 +1,5 @@
 = Release Notes for Version 1.5
-:toc!:
+include::release-head.adoc[]
 
 	Version 1.5 is a major release. It includes support for our new
 	EasyMega product, new features and bug fixes in in the flight

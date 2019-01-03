@@ -1,5 +1,5 @@
 = Release Notes for Version 1.4
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.4 is a major release. It includes support for our new

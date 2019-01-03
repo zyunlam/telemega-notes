@@ -22,14 +22,14 @@
 #include <ao_74hc165.h>
 #include <ao_radio_cmac.h>
 
-static __xdata uint8_t ao_pad_ignite;
-static __xdata struct ao_pad_command	command;
-static __xdata struct ao_pad_query	query;
-static __pdata uint8_t	ao_pad_armed;
-static __pdata uint16_t	ao_pad_arm_time;
-static __pdata uint8_t	ao_pad_box;
-static __xdata uint8_t	ao_pad_disabled;
-static __pdata uint16_t	ao_pad_packet_time;
+static uint8_t ao_pad_ignite;
+static struct ao_pad_command	command;
+static struct ao_pad_query	query;
+static uint8_t	ao_pad_armed;
+static uint16_t	ao_pad_arm_time;
+static uint8_t	ao_pad_box;
+static uint8_t	ao_pad_disabled;
+static uint16_t	ao_pad_packet_time;
 
 #ifndef AO_PAD_RSSI_MINIMUM
 #define AO_PAD_RSSI_MINIMUM	-90
@@ -38,7 +38,7 @@ static __pdata uint16_t	ao_pad_packet_time;
 #define DEBUG	1
 
 #if DEBUG
-static __pdata uint8_t	ao_pad_debug;
+static uint8_t	ao_pad_debug;
 #define PRINTD(...) (ao_pad_debug ? (printf(__VA_ARGS__), 0) : 0)
 #define FLUSHD()    (ao_pad_debug ? (flush(), 0) : 0)
 #else
@@ -50,7 +50,7 @@ static void
 ao_siren(uint8_t v)
 {
 #ifdef AO_SIREN
-	ao_gpio_set(AO_SIREN_PORT, AO_SIREN_PIN, AO_SIREN, v);
+	ao_gpio_set(AO_SIREN_PORT, AO_SIREN_PIN, v);
 #else
 #if HAS_BEEP
 	ao_beep(v ? AO_BEEP_MID : 0);
@@ -64,7 +64,7 @@ static void
 ao_strobe(uint8_t v)
 {
 #ifdef AO_STROBE
-	ao_gpio_set(AO_STROBE_PORT, AO_STROBE_PIN, AO_STROBE, v);
+	ao_gpio_set(AO_STROBE_PORT, AO_STROBE_PIN, v);
 #else
 	(void) v;
 #endif
@@ -189,21 +189,21 @@ ao_pad_monitor(void)
 {
 	uint8_t			c;
 	uint8_t			sample;
-	__pdata AO_LED_TYPE	prev = 0, cur = 0;
-	__pdata uint8_t		beeping = 0;
-	__xdata volatile struct ao_data	*packet;
-	__pdata uint16_t	arm_beep_time = 0;
+	AO_LED_TYPE	prev = 0, cur = 0;
+	uint8_t		beeping = 0;
+	volatile struct ao_data	*packet;
+	uint16_t	arm_beep_time = 0;
 
 	sample = ao_data_head;
 	ao_led_set(LEDS_AVAILABLE);
 	ao_delay(AO_MS_TO_TICKS(1000));
 	ao_led_set(0);
 	for (;;) {
-		__pdata int16_t			pyro;
+		int16_t			pyro;
 
 		ao_arch_critical(
 			while (sample == ao_data_head)
-				ao_sleep((void *) DATA_TO_XDATA(&ao_data_head));
+				ao_sleep((void *) &ao_data_head);
 			);
 
 
@@ -509,16 +509,14 @@ ao_pad_manual(void)
 	ao_cmd_white();
 	if (!ao_match_word("DoIt"))
 		return;
-	ao_cmd_decimal();
+	ignite = 1 << ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ignite = 1 << ao_cmd_lex_i;
-	ao_cmd_decimal();
+	repeat = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success) {
 		repeat = 1;
 		ao_cmd_status = ao_cmd_success;
-	} else
-		repeat = ao_cmd_lex_i;
+	}
 	while (repeat-- > 0) {
 		ao_pad_ignite = ignite;
 		ao_wakeup(&ao_pad_ignite);
@@ -526,17 +524,17 @@ ao_pad_manual(void)
 	}
 }
 
-static __xdata struct ao_task ao_pad_task;
-static __xdata struct ao_task ao_pad_ignite_task;
-static __xdata struct ao_task ao_pad_monitor_task;
+static struct ao_task ao_pad_task;
+static struct ao_task ao_pad_ignite_task;
+static struct ao_task ao_pad_monitor_task;
 
 #if DEBUG
 void
 ao_pad_set_debug(void)
 {
-	ao_cmd_decimal();
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_pad_debug = ao_cmd_lex_i != 0;
+		ao_pad_debug = r != 0;
 }
 
 
@@ -544,14 +542,12 @@ static void
 ao_pad_alarm_debug(void)
 {
 	uint8_t	which, value;
-	ao_cmd_decimal();
+	which = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	which = ao_cmd_lex_i;
-	ao_cmd_decimal();
+	value = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	value = ao_cmd_lex_i;
 	printf ("Set %s to %d\n", which ? "siren" : "strobe", value);
 	if (which)
 		ao_siren(value);
@@ -560,7 +556,7 @@ ao_pad_alarm_debug(void)
 }
 #endif
 
-__code struct ao_cmds ao_pad_cmds[] = {
+const struct ao_cmds ao_pad_cmds[] = {
 	{ ao_pad_test,	"t\0Test pad continuity" },
 	{ ao_pad_manual,	"i <key> <n>\0Fire igniter. <key> is doit with D&I" },
 #if DEBUG
@@ -593,34 +589,34 @@ ao_pad_init(void)
 	}
 #endif
 #if AO_PAD_NUM > 0
-	ao_enable_output(AO_PAD_0_PORT, AO_PAD_PIN_0, AO_PAD_0, 0);
+	ao_enable_output(AO_PAD_0_PORT, AO_PAD_PIN_0, 0);
 #endif
 #if AO_PAD_NUM > 1
-	ao_enable_output(AO_PAD_1_PORT, AO_PAD_PIN_1, AO_PAD_1, 0);
+	ao_enable_output(AO_PAD_1_PORT, AO_PAD_PIN_1, 0);
 #endif
 #if AO_PAD_NUM > 2
-	ao_enable_output(AO_PAD_2_PORT, AO_PAD_PIN_2, AO_PAD_2, 0);
+	ao_enable_output(AO_PAD_2_PORT, AO_PAD_PIN_2, 0);
 #endif
 #if AO_PAD_NUM > 3
-	ao_enable_output(AO_PAD_3_PORT, AO_PAD_PIN_3, AO_PAD_3, 0);
+	ao_enable_output(AO_PAD_3_PORT, AO_PAD_PIN_3, 0);
 #endif
 #if AO_PAD_NUM > 4
-	ao_enable_output(AO_PAD_4_PORT, AO_PAD_PIN_4, AO_PAD_4, 0);
+	ao_enable_output(AO_PAD_4_PORT, AO_PAD_PIN_4, 0);
 #endif
 #if AO_PAD_NUM > 5
-	ao_enable_output(AO_PAD_5_PORT, AO_PAD_PIN_5, AO_PAD_5, 0);
+	ao_enable_output(AO_PAD_5_PORT, AO_PAD_PIN_5, 0);
 #endif
 #if AO_PAD_NUM > 5
-	ao_enable_output(AO_PAD_6_PORT, AO_PAD_PIN_6, AO_PAD_6, 0);
+	ao_enable_output(AO_PAD_6_PORT, AO_PAD_PIN_6, 0);
 #endif
 #if AO_PAD_NUM > 7
-	ao_enable_output(AO_PAD_7_PORT, AO_PAD_PIN_7, AO_PAD_7, 0);
+	ao_enable_output(AO_PAD_7_PORT, AO_PAD_PIN_7, 0);
 #endif
 #ifdef AO_STROBE
-	ao_enable_output(AO_STROBE_PORT, AO_STROBE_PIN, AO_STROBE, 0);
+	ao_enable_output(AO_STROBE_PORT, AO_STROBE_PIN, 0);
 #endif
 #ifdef AO_SIREN
-	ao_enable_output(AO_SIREN_PORT, AO_SIREN_PIN, AO_SIREN, 0);
+	ao_enable_output(AO_SIREN_PORT, AO_SIREN_PIN, 0);
 #endif
 	ao_cmd_register(&ao_pad_cmds[0]);
 	ao_add_task(&ao_pad_task, ao_pad, "pad listener");

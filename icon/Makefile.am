@@ -27,6 +27,17 @@ EEPROM_ICON	= $(EEPROM_NAME).svg
 TELEM_ICON	= $(TELEM_NAME).svg
 MPD_ICON	= $(MPD_NAME).svg
 
+LED_SVG = \
+	redoff.svg \
+	greenoff.svg \
+	greenled.svg \
+	grayon.svg \
+	grayled.svg \
+	redled.svg
+LED_PNG = $(LED_SVG:.svg=.png)
+
+LED_ICONS = $(LED_SVG) $(LED_PNG)
+
 # Files needed for Mac OSX icons
 
 MAC_AM_FILES	= $(shell for i in $(MAC_RES); do echo $(AM_NAME)-$$i.png; done)
@@ -109,7 +120,7 @@ java-telegps:
 
 fat: all $(ICO_FILES) $(ICNS_FILES) $(EXE_FILES)
 
-all-local: $(JAVA_FILES) $(AM_XPM)
+all-local: $(JAVA_FILES) $(AM_XPM) $(LED_ICONS)
 
 clean-local:
 	$(RM) $(AM_NAME)-*.png $(TG_NAME)-*.png $(MP_NAME)-*.png
@@ -117,12 +128,16 @@ clean-local:
 	$(RM) $(EEPROM_NAME)-*.png $(TELEM_NAME)-*.png $(MPD_NAME)-*.png
 	$(RM) *.build *.ico *.rc *.icns *.o *.exe $(MPD_ICON)
 	$(RM) altusmetrum.xpm
+	$(RM) $(LED_ICONS)
 
 if INSTALL_SHARED_MIME_INFO
 install-data-hook:
 	update-mime-database $(DESTDIR)$(datadir)/mime
 	update-icon-caches $(DESTDIR)$(ICON_THEME)
 endif
+
+$(LED_ICONS): led.5c
+	nickle led.5c $@
 
 $(MPD_ICON): $(MP_ICON)
 	$(LN_S) $(MP_ICON) $@

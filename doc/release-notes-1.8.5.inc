@@ -1,5 +1,5 @@
 = Release Notes for Version 1.8.5
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 1.8.5 includes fixes to the ground software support

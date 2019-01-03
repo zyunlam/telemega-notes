@@ -69,9 +69,9 @@ SECTIONS {
 	/* Data -- relocated to RAM, but written to ROM
 	 */
 	.data : AT (ADDR(.ARM.exidx) + SIZEOF (.ARM.exidx)) {
-		__data_start__ = .;
+		_start__ = .;
 		*(.data)	/* initialized data */
-		__data_end__ = .;
+		_end__ = .;
 		__bss_start__ = .;
 	} >ram
 

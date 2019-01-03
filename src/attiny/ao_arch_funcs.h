@@ -28,21 +28,21 @@
 		(reg) |= (mask);		\
 	} while (0)
 
-#define ao_spi_get_bit(reg,bit,pin,bus,speed) ao_spi_get_mask(reg,(1<<(bit)),bus,speed)
+#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,(1<<(bit)),bus,speed)
 
-#define ao_spi_put_bit(reg,bit,pin,bus) ao_spi_put_mask(reg,(1<<(bit)),bus)
+#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,(1<<(bit)),bus)
 
 #define ao_gpio_token_paster(x,y)		x ## y
 #define ao_gpio_token_evaluator(x,y)	ao_gpio_token_paster(x,y)
 
-#define ao_gpio_set(port, bit, pin, v) do {	\
+#define ao_gpio_set(port, bit, v) do {	\
 		if (v)				\
 			PORTB |= (1 << bit);	\
 		else				\
 			PORTB &= ~(1 << bit);	\
 	} while (0)
 
-#define ao_gpio_get(port, bit, pin)	((PORTB >> (bit)) & 1)
+#define ao_gpio_get(port, bit)	((PORTB >> (bit)) & 1)
 
 /*
  * The SPI mutex must be held to call either of these
@@ -50,17 +50,17 @@
  * from chip select low to chip select high
  */
 
-#define ao_enable_output(port, bit, pin, v) do {			\
-		ao_gpio_set(port, bit, pin, v);				\
+#define ao_enable_output(port, bit, v) do {			\
+		ao_gpio_set(port, bit, v);				\
 		ao_gpio_token_evaluator(DDR,port) |= (1 << bit);	\
 	} while (0)
 
 
 void
-ao_spi_send_bus(void __xdata *block, uint16_t len) __reentrant;
+ao_spi_send_bus(void *block, uint16_t len);
 
 void
-ao_spi_recv_bus(void __xdata *block, uint16_t len) __reentrant;
+ao_spi_recv_bus(void *block, uint16_t len);
 
 #define ao_spi_send(block, len, bus) ao_spi_send_bus(block, len)
 #define ao_spi_recv(block, len, bus) ao_spi_recv_bus(block, len)
@@ -110,10 +110,10 @@ ao_i2c_init(void);
 /* notask.c */
 
 uint8_t
-ao_sleep(__xdata void *wchan);
+ao_sleep(void *wchan);
 
 void
-ao_wakeup(__xdata void *wchan);
+ao_wakeup(void *wchan);
 
 extern alt_t	ao_max_height;
 

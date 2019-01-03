@@ -18,20 +18,20 @@
 
 #include "ao.h"
 
-__xdata struct ao_packet_recv ao_rx_packet;
-__xdata struct ao_packet ao_tx_packet;
-__pdata uint8_t ao_packet_rx_len, ao_packet_rx_used, ao_packet_tx_used;
+struct ao_packet_recv ao_rx_packet;
+struct ao_packet ao_tx_packet;
+uint8_t ao_packet_rx_len, ao_packet_rx_used, ao_packet_tx_used;
 
-static __xdata uint8_t tx_data[AO_PACKET_MAX];
-static __xdata uint8_t rx_data[AO_PACKET_MAX];
-static __pdata uint8_t rx_seq;
+static uint8_t tx_data[AO_PACKET_MAX];
+static uint8_t rx_data[AO_PACKET_MAX];
+static uint8_t rx_seq;
 
-__xdata struct ao_task	ao_packet_task;
-__xdata uint8_t ao_packet_enable;
-__xdata uint8_t ao_packet_restart;
+struct ao_task	ao_packet_task;
+uint8_t ao_packet_enable;
+uint8_t ao_packet_restart;
 
 #if PACKET_HAS_MASTER
-__xdata uint8_t ao_packet_master_sleeping;
+uint8_t ao_packet_master_sleeping;
 #endif
 
 void
@@ -91,7 +91,7 @@ ao_packet_recv(uint16_t timeout)
 	if (ao_xmemcmp(ao_rx_packet.packet.callsign,
 		       ao_config.callsign,
 		       AO_MAX_CALLSIGN) != 0 &&
-	    ao_xmemcmp(ao_config.callsign, CODE_TO_XDATA("N0CALL"), 7) != 0)
+	    ao_xmemcmp(ao_config.callsign, "N0CALL", 7) != 0)
 		return 0;
 
 	/* SYN packets carry no data */
@@ -150,7 +150,7 @@ ao_packet_flush(void)
 #endif /* PACKET_HAS_MASTER */
 
 void
-ao_packet_putchar(char c) __reentrant
+ao_packet_putchar(char c) 
 {
 	/* No need to block interrupts, all variables here
 	 * are only manipulated in task context

@@ -1,5 +1,5 @@
 = Release Notes for Version 0.8
-:toc!:
+include::release-head.adoc[]
 :doctype: article
 
 	Version 0.8 offers a major upgrade in the AltosUI
