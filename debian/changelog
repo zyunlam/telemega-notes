@@ -1,3 +1,97 @@
+altos (1.9-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * capture changes to Releasing discovered during 1.8.7 release
+  * update turnon_telebt to use new approach for saving cal value on TeleBT
+  * doc: add bootloader force instructions for TeleBT v4.0
+  * altos: first cut at easymega v2.0 support .. nothing working yet
+  * altos: remove teleterra-v0.1, also an ancient cc1111 project
+  * altos: remove telepyro-v0.1 support, which was never completed anyway
+  * altos: remove megadongle-v0.1 support, never went beyond prototype
+  * altos: remove teledongle-v1.8 support (what was that, anyway?!?)
+  * altos: remove telescience support
+  * altos: remove usbtrng support (chaoskey prototypes)
+  * altoslib: fix computation of TeleGPS battery voltage
+  * update build depends to reflect move to asciidoctor
+  * eliminate spurious build dependencies now that we're using asciidoctor
+  * update easymega turn-on script for v2.0
+  * ao-bringup: get turnon_easymega working for v2.0
+  * changelog for 1.9 release
+
+  [ Keith Packard ]
+  * altosdroid: Bump version to 18 for 1.8.7
+  * altos/stm: Make flash loader work with either 8MHz or 16MHz xtal
+  * altos: use %lu for APRS altitude in sprintf
+  * altos: Remove cc1111 products
+  * altos: Switch to newlib-nano for libc on arm
+  * Remove pdclib
+  * altos: Remove *_TO_DATA macros
+  * altos: Remove 8051 address space specifiers
+  * altos: Make cmd number parsing functions return value
+  * altos: Use stdbool true/false instead of TRUE/FALSE
+  * altos: Allow application-specific prompts for ao_cmd_readline
+  * altos: Delete random 8051 ISR declarations
+  * altos: Remove 8051-ism from ao_usb.h
+  * altos/stm32f4: Start adding support for STM32F413
+  * altos/stm32f4: Add STM32F413 disco board support
+  * altos/stm32f4: Fix clock configuration
+  * altos: Eliminate 'pin' field from GPIO functions
+  * altos: Add generic LED driver.
+  * altos/stm32f4-disco: Add .gitignore
+  * altos/stm32f4: Align stack to 8 bytes
+  * altos/stm32f4: Add usart driver for usart6
+  * altos/stm32f4: Use full printf/scanf (including floats)
+  * altos/stm32f4: Place ARM.exidx sections after .text
+  * altos/stm32f4-disco: Hook up serial console. Add scheme
+  * altos: Clean up AO_ROMCONFIG bits
+  * altos/stm32f4: Add more stm32f413 definitions and support code
+  * altos/stm32f4: Add external interrupt bits
+  * altos/stm32f4: Add stm32f413 USART support
+  * altos/stm32f4: Add start of stm32f413 USB support
+  * altos/stm32f4-disco: Start hooking up stm32f413 USB for the disco board
+  * Bump version to 1.8.7.1
+  * Remove .gitmodules
+  * altos: Remove pdclib bits from Makefile
+  * altos/drivers: Use stdbool in ao_ms5607.c
+  * altos: Create ao_data_fill shared function
+  * altos/stm: Make beeper driver support all possible tim234 configs
+  * altos/stm: Support SPI modes other than 0
+  * altos: Add ADXL375 driver [v2]
+  * altos/easymega-v2.0: Change binary to easymega-v2.0 instead of easymega-v1.0
+  * altos/easymega-v2.0: Add adxl375, replace mpu6000 with 9250 [v2]
+  * altos: Add EasyMega v2.0 to default build
+  * altoslib: Add ADXL375 support and EasyMega v2.0 support
+  * altosui: Add EasyMega v2.0 firmware to release
+  * altos/adxl375: Clean up initialization, shortening self test period
+  * altoslib: Add support for TeleGPS v2
+  * altoslib: Add support for EasyMega-v2
+  * altos/easymega-v2.0: Handle different mpu9250 orientation
+  * altoslib: When flashing hardware, pull USB data from device if needed
+  * Add keywords to .desktop files
+  * ao-tools: Spelling fixes in a couple of man pages
+  * Don't force CFLAGS from top level
+  * Generate LED icons on the fly. Include SVG versions.
+  * debian: Add cairo-5c as build dependency
+  * debian: Clean trailing whitespace in changelog
+  * debian: Switch to machine-readable copyright format
+  * debian: use dh_auto_configure instead of open-coding configuration
+  * doc: Switch to asciidoctor to format docs
+  * Remove cc1111 products from 'fat_altos' list, which is used for keithp-fat
+  * doc: Remove asciidoc related files
+  * doc: Use icons for admonitions
+  * altos: Make HAS_ACCEL_DEBUG build again
+  * altos: Don't validate ADXL375 self test for maximum value
+  * altoslib: Remove spurious debug printf in AltosCalData
+  * Add shipping products to fat_altos target, note that in Releasing
+  * doc: Update doc/RELNOTES to adapt to asciidoctor change
+  * doc: Add EasyMega v2.0 specs
+  * doc: Set doc version to 1.9
+  * doc: Add 1.9 release notes
+  * Change Releasing to reflect asciidoctor switch
+  * Update to version 1.9
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 02 Jan 2019 22:24:05 -0700
+
 altos (1.8.7-2) unstable; urgency=medium
 
   * elide map-server from set of directories built and installed by
