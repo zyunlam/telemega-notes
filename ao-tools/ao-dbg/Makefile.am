@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-dbg
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 AO_DBG_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
 
 man_MANS = ao-dbg.1

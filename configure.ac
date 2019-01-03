@@ -184,6 +184,9 @@ else
 	HAVE_GOOGLE_KEY="no"
 fi
 
+WARN_CFLAGS="-Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wnested-externs"
+AC_SUBST(WARN_CFLAGS)
+
 AC_ARG_ENABLE(faketime, AS_HELP_STRING([--enable-faketime],
               [Use faketime program to ensure pdf files are reproducible (default=no)]),
 	      [FAKETIME=$enableval], [FAKETIME=no])

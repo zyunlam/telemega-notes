@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-makebin
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 AO_ELFTOHEX_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
 
 ao_makebin_DEPENDENCIES = $(AO_ELFTOHEX_LIBS)
