@@ -752,22 +752,6 @@ Date:   Mon Oct 8 19:40:32 2018 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
-<<<<<<< HEAD
-commit 5a86ff43a2b4a90dbddc1bba48019626e1b83e10
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Oct 8 17:51:33 2018 -0600
-
-    releasing 1.8.7
-
-commit 34658a1236e34891b41a0a51a480717db98779e7
-Merge: 3a2a5a05 88ae4c5e
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Oct 8 17:49:47 2018 -0600
-
-    Merge branch 'master' into branch-1.8
-
-=======
->>>>>>> branch-1.9
 commit 88ae4c5ebd64215f05f5efc18f9660560b409ace
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Oct 8 16:27:33 2018 -0600
@@ -1563,22 +1547,6 @@ Date:   Sun Aug 5 14:11:01 2018 +0800
 
     capture updates to Releasing from 1.8.6 release process
 
-<<<<<<< HEAD
-commit 3a2a5a05bb6372d9003905cee7afdfcd6d38ae7e
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Aug 5 11:23:31 2018 +0800
-
-    releasing 1.8.6
-
-commit d8627bb7b46fc991786835afa38cd720e9e75812
-Merge: 59e23c27 8830fbc9
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Aug 5 11:21:37 2018 +0800
-
-    Merge branch 'master' into branch-1.8
-
-=======
->>>>>>> branch-1.9
 commit 8830fbc99565f753c0ae1f3d9f4b079860c2634a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Aug 5 11:13:23 2018 +0800
@@ -2793,22 +2761,6 @@ Date:   Tue Mar 20 18:25:43 2018 -0600
 
     add a paragraph to the intro pointing to the altusmetrum email list
 
-<<<<<<< HEAD
-commit 59e23c27c2a85d7d748223e444b24d19937afe47
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Mar 18 15:49:07 2018 -0600
-
-    preparing to release 1.8.5
-
-commit 7b614380f307cb5e27f2a05281bc76c4ace93334
-Merge: 16a9d861 39023ed6
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Sun Mar 18 15:47:31 2018 -0600
-
-    Merge branch 'master' into branch-1.8
-
-=======
->>>>>>> branch-1.9
 commit 39023ed6e29103a85bfad505506fa0dbf4dc1112
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Mar 18 15:42:48 2018 -0600
@@ -3254,22 +3206,6 @@ Date:   Thu Dec 21 20:40:28 2017 -0700
 
     update Releasing with wisdom from 1.8.4 release process
 
-<<<<<<< HEAD
-commit 16a9d8617b2d2092d166a85ada4349601afb0dce
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Thu Dec 21 19:06:22 2017 -0700
-
-    releasing 1.8.4
-
-commit dbb78c8222c45f4430601deee0194b0c9dc2e79a
-Merge: fe38c225 87aab995
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Thu Dec 21 19:05:46 2017 -0700
-
-    Merge branch 'master' into branch-1.8
-
-=======
->>>>>>> branch-1.9
 commit 87aab99521dc44d1d29fbb0b7f227f868f074836
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Dec 21 17:37:10 2017 -0800
@@ -3689,22 +3625,6 @@ Date:   Mon Dec 11 22:15:46 2017 -0700
 
     update Releasing with changes discovered in 1.8.3 release process
 
-<<<<<<< HEAD
-commit fe38c22595b050435dbacd35f1baae064fb7de75
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Dec 11 21:38:59 2017 -0700
-
-    releasing 1.8.3
-
-commit ea0aa97fb93e669868a6f2c49c5d4b46e7615b1f
-Merge: 216ea638 9adf8b23
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Dec 11 21:37:48 2017 -0700
-
-    Merge branch 'master' into branch-1.8
-
-=======
->>>>>>> branch-1.9
 commit 9adf8b23aac8256f230b10adcab9dd323266caaa
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Dec 11 21:33:21 2017 -0700
@@ -4787,37 +4707,12 @@ Date:   Mon Sep 18 21:24:52 2017 -0600
 
     tweak Releasing based on 1.8.2 release experience
 
-<<<<<<< HEAD
-commit 216ea6388a75c46891dc4687a2eb0c97dc63b136
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Sep 18 20:46:04 2017 -0600
-
-    releasing 1.8.2
-
-=======
->>>>>>> branch-1.9
 commit 60666630789b6925d7e16160ebdc88ccd23f51de
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 18 20:43:14 2017 -0600
 
     be more aggressive about removing and ignoring .mdwn files
 
-<<<<<<< HEAD
-commit 1ece6e6fd3faaae3f6c6d434497eb04235939dc3
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Sep 18 20:43:14 2017 -0600
-
-    be more aggressive about removing and ignoring .mdwn files
-
-commit b12e982259817328e348f1aaa91c5c824891e7b9
-Merge: b1cf0dab e87d56b6
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Sep 18 20:35:00 2017 -0600
-
-    Merge branch 'master' into branch-1.8
-
-=======
->>>>>>> branch-1.9
 commit e87d56b665ca30a3e5920c23cd60c99b84341aa2
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Sep 18 18:51:51 2017 -0700
@@ -5054,15 +4949,6 @@ Date:   Mon Aug 28 14:01:54 2017 -0600
 
     a few tweaks to the Releasing document based on experience with 1.8.1
 
-<<<<<<< HEAD
-commit b1cf0dab1e28433e06ab02cec033951ea0149ea3
-Author: Bdale Garbee <bdale@gag.com>
-Date:   Mon Aug 28 12:05:17 2017 -0600
-
-    releasing 1.8.1
-
-=======
->>>>>>> branch-1.9
 commit b68c0482d4fae8eb54cde1df0e4bcf4c5d272bad
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Aug 27 22:49:09 2017 -0700
