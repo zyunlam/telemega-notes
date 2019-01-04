@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Bdale Garbee <bdale@gag.com>
 Uploaders: Keith Packard <keithp@keithp.com>
 Build-Depends: asciidoctor,
+               ruby-asciidoctor-pdf,
                autoconf,
                automake,
                debhelper (>= 10),
