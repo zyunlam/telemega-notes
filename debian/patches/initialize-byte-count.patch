@@ -1,0 +1,139 @@
+From 14900d539c9d379a39ec157bb7e1914aad8fde3c Mon Sep 17 00:00:00 2001
+From: Keith Packard <keithp@keithp.com>
+Date: Thu, 3 Jan 2019 11:57:42 -0800
+Subject: [PATCH] ao-tools/ao-cal-accel: Initialize byte count var 'l'
+
+When left uninitialized, the program would randomly segfault at startup.
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ ao-tools/ao-cal-accel/ao-cal-accel.c | 62 +++-------------------------
+ 1 file changed, 5 insertions(+), 57 deletions(-)
+
+diff --git a/ao-tools/ao-cal-accel/ao-cal-accel.c b/ao-tools/ao-cal-accel/ao-cal-accel.c
+index 8a9e6347..671e4ba5 100644
+--- a/ao-tools/ao-cal-accel/ao-cal-accel.c
++++ b/ao-tools/ao-cal-accel/ao-cal-accel.c
+@@ -48,35 +48,13 @@ static void usage(char *program)
+ 	exit(1);
+ }
+ 
+-void
++static void
+ done(struct cc_usb *cc, int code)
+ {
+ 	cc_usb_close(cc);
+ 	exit (code);
+ }
+ 
+-static int
+-ends_with(char *whole, char *suffix)
+-{
+-	int whole_len = strlen(whole);
+-	int suffix_len = strlen(suffix);
+-
+-	if (suffix_len > whole_len)
+-		return 0;
+-	return strcmp(whole + whole_len - suffix_len, suffix) == 0;
+-}
+-
+-static int
+-starts_with(char *whole, char *prefix)
+-{
+-	int whole_len = strlen(whole);
+-	int prefix_len = strlen(prefix);
+-
+-	if (prefix_len > whole_len)
+-		return 0;
+-	return strncmp(whole, prefix, prefix_len) == 0;
+-}
+-
+ static char **
+ tok(char *line) {
+ 	char	**strs = malloc (sizeof (char *)), *str;
+@@ -92,16 +70,6 @@ tok(char *line) {
+ 	return strs;
+ }
+ 
+-static void
+-free_strs(char **strs) {
+-	char	*str;
+-	int	i;
+-
+-	for (i = 0; (str = strs[i]) != NULL; i++)
+-		free(str);
+-	free(strs);
+-}
+-
+ struct flash {
+ 	struct flash	*next;
+ 	char		line[512];
+@@ -130,21 +98,8 @@ flash(struct cc_usb *usb)
+ 	return head;
+ }
+ 
+-static void
+-free_flash(struct flash *b) {
+-	struct flash *n;
+-
+-	while (b) {
+-		n = b->next;
+-		free_strs(b->strs);
+-		free(b);
+-		b = n;
+-	}
+-}
+-
+-char **
++static char **
+ find_flash(struct flash *b, char *word0) {
+-	int i;
+ 	for (;b; b = b->next) {
+ 		if (strstr(b->line, word0))
+ 			return b->strs;
+@@ -152,7 +107,7 @@ find_flash(struct flash *b, char *word0) {
+ 	return NULL;
+ }
+ 
+-void
++static void
+ await_key(void)
+ {
+ 	struct termios	termios, termios_save;
+@@ -166,12 +121,12 @@ await_key(void)
+ 	tcsetattr(0, TCSAFLUSH, &termios_save);
+ }
+ 
+-int
++static int
+ do_cal(struct cc_usb *usb) {
+ 	struct flash	*b;
+ 	char	**accel;
+ 	char	line[1024];
+-	int	l;
++	int	l = 0;
+ 	int	running = 0;
+ 	int	worked = 1;
+ 
+@@ -230,18 +185,11 @@ int
+ main (int argc, char **argv)
+ {
+ 	char			*device = NULL;
+-	char			*filename;
+-	Elf			*e;
+-	unsigned int		s;
+-	int			i;
+ 	int			c;
+-	int			tries;
+ 	struct cc_usb		*cc = NULL;
+ 	char			*tty = NULL;
+-	int			success;
+ 	int			verbose = 0;
+ 	int			ret = 0;
+-	int			expected_size;
+ 
+ 	while ((c = getopt_long(argc, argv, "rT:D:c:s:v:", options, NULL)) != -1) {
+ 		switch (c) {
+-- 
+2.20.1
+
