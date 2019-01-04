@@ -1,2 +1,3 @@
 elide-map-server.patch
 initialize-byte-count.patch
+fix-doc-versions.patch

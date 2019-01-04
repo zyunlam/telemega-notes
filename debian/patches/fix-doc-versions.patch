@@ -1,0 +1,88 @@
+From adf4bec88df1822031e1a8b00422de8b8b0c0cd4 Mon Sep 17 00:00:00 2001
+From: Keith Packard <keithp@keithp.com>
+Date: Wed, 2 Jan 2019 23:51:58 -0800
+Subject: [PATCH] doc: Update all docs to 1.9. Note this in doc/RELNOTES
+
+Missed a bunch of 1.8.7 numbers due to a missing step in the release process
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ doc/RELNOTES      | 8 ++++++++
+ doc/easymini.txt  | 2 +-
+ doc/micropeak.txt | 2 +-
+ doc/telegps.txt   | 2 +-
+ doc/telemetry.txt | 2 +-
+ 5 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/doc/RELNOTES b/doc/RELNOTES
+index db81297c..bd47f0b2 100644
+--- a/doc/RELNOTES
++++ b/doc/RELNOTES
+@@ -13,6 +13,14 @@ Creating documentation for a new release of AltOS
+ 	easymini-release-notes.inc
+ 	telegps-release-notes.inc
+ 
++* Update version in main docs
++
++	altusmetrum.txt
++	easymini.txt
++	micropeak.txt
++	telegps.txt
++	telemetry.txt
++
+ * Add release-notes-${version}.inc to git
+ 
+ * Make sure new hardware specs are documented in specs.inc
+diff --git a/doc/easymini.txt b/doc/easymini.txt
+index e3d3fae8..69902f91 100644
+--- a/doc/easymini.txt
++++ b/doc/easymini.txt
+@@ -1,7 +1,7 @@
+ = EasyMini Owner's Manual
+ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
+ :title-logo-image: image:../themes/background.png[]
+-:revnumber: v1.8.7
++:revnumber: v1.9
+ :revdate: 8 Oct 2018
+ :copyright: Bdale Garbee and Keith Packard 2018
+ :doctype: book
+diff --git a/doc/micropeak.txt b/doc/micropeak.txt
+index 9569194e..3621a2dc 100644
+--- a/doc/micropeak.txt
++++ b/doc/micropeak.txt
+@@ -1,6 +1,6 @@
+ = MicroPeak Owner's Manual
+ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
+-:revnumber: v1.8.7
++:revnumber: v1.9
+ :revdate: 8 Oct 2018
+ :copyright: Bdale Garbee and Keith Packard 2018
+ :stylesheet: am.css
+diff --git a/doc/telegps.txt b/doc/telegps.txt
+index 8b558dbd..b28573cb 100644
+--- a/doc/telegps.txt
++++ b/doc/telegps.txt
+@@ -1,7 +1,7 @@
+ = TeleGPS Owner's Manual
+ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
+ :title-logo-image: image:../themes/background.png[]
+-:revnumber: v1.8.7
++:revnumber: v1.9
+ :revdate: 8 Oct 2018
+ :revremark: Fix TeleBT v4.0 RF calibration to factory value when reflashing. Fix map images. Fix Mac OS X support.
+ :copyright: Bdale Garbee and Keith Packard 2018
+diff --git a/doc/telemetry.txt b/doc/telemetry.txt
+index ae9c7f9f..e1f25bf7 100644
+--- a/doc/telemetry.txt
++++ b/doc/telemetry.txt
+@@ -1,6 +1,6 @@
+ = AltOS Telemetry
+ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
+-:revnumber: v1.8.7
++:revnumber: v1.9
+ :revdate: 8 Oct 2018
+ :copyright: Bdale Garbee and Keith Packard 2018
+ :stylesheet: am.css
+-- 
+2.20.1
+
