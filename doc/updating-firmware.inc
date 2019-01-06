@@ -136,6 +136,13 @@
 			of the board. Ground is available on the capacitor
 			next to it, on the end towards the USB wires.
 			
+			TeleBT v3::
+
+			Connect pin 4 on the CPU to 3.3V, which can be done by
+			connecting pin 1 to pin 4.  Pin 1 is the left pin on
+			the lower edge of the chip when the unit is oriented
+			such taht the SMA is at the top.
+
 			TeleBT v4::
 
 			Connect pin 30 on the CPU to ground. Pin 30 is the 6th
