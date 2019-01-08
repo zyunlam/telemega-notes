@@ -548,7 +548,6 @@ ao-tools/ao-cal-accel/Makefile
 ao-tools/ao-cal-freq/Makefile
 ao-tools/ao-test-gps/Makefile
 ao-tools/ao-usbtrng/Makefile
-ao-tools/ao-chaosread/Makefile
 ao-tools/ao-makebin/Makefile
 ao-utils/Makefile
 map-server/Makefile
