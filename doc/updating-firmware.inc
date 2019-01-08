@@ -141,7 +141,7 @@
 			Connect pin 4 on the CPU to 3.3V, which can be done by
 			connecting pin 1 to pin 4.  Pin 1 is the left pin on
 			the lower edge of the chip when the unit is oriented
-			such taht the SMA is at the top.
+			such that the SMA is at the top.
 
 			TeleBT v4::
 
