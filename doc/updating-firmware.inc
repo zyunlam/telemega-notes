@@ -128,6 +128,18 @@
 			the one on the other end of the row.
 			endif::easymini[]
 
+			TeleGPS v1::
+
+			Connect pin 32 on the CPU to ground.  Pin 32 is the
+			right-most pin on the bottom edge of the CPU when the
+			board is oriented with the USB and battery connectors
+			to the right.
+
+			TeleGPS v2::
+
+			Connect together pins 1 and 5 of the Debug connector.
+			Pin 1 is the pin with the square pad around the hole.
+
 			ifdef::telemetrum[]
 			TeleDongle v3::
 
