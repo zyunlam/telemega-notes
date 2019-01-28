@@ -38,7 +38,8 @@ ARMM3DIRS=\
 	telebt-v4.0 telebt-v4.0/flash-loader \
 	telelcotwo-v0.1 telelcotwo-v0.1/flash-loader \
 	telefiretwo-v0.1 telefiretwo-v0.1/flash-loader \
-	telefireeight-v1.0 telefireeight-v1.0/flash-loader 
+	telefireeight-v1.0 telefireeight-v1.0/flash-loader \
+	telefireeight-v2.0 telefireeight-v2.0/flash-loader 
 
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader \
