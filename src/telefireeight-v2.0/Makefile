@@ -41,7 +41,6 @@ ALTOS_SRC = \
 	ao_freq.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
-	ao_beep_stm.c \
 	ao_eeprom_stm.c \
 	ao_usb_stm.c \
 	ao_exti_stm.c \

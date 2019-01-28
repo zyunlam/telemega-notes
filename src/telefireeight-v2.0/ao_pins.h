@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010 Keith Packard <keithp@keithp.com>
+ * Copyright © 2019 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,6 @@
 #define HAS_FLIGHT		0
 #define HAS_USB			1
 #define HAS_BEEP		0
-#define BEEPER_TIMER		3
-#define BEEPER_CHANNEL		1
-#define BEEPER_PORT		(&stm_gpioc)
-#define BEEPER_PIN		6
 #define HAS_GPS			0
 #define HAS_SERIAL_1		0
 #define HAS_ADC			1
@@ -37,9 +33,6 @@
 #define HAS_LOG			0
 #define HAS_PAD			1
 #define USE_INTERNAL_FLASH	1
-#define IGNITE_ON_P0		0
-#define PACKET_HAS_MASTER	0
-#define PACKET_HAS_SLAVE	0
 #define AO_DATA_RING		32
 #define USE_EEPROM_CONFIG	1
 #define USE_STORAGE_CONFIG	0
@@ -75,9 +68,6 @@
 #define SPI_1_PB3_PB4_PB5	0
 #define SPI_1_PE13_PE14_PE15	1
 #define SPI_1_GPIO		(&stm_gpioe)
-#define SPI_1_SCK		13
-#define SPI_1_MISO		14
-#define SPI_1_MOSI		15
 #define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
 
 #define HAS_SPI_2		0
@@ -87,11 +77,6 @@
 #define HAS_I2C_1		0
 
 #define HAS_I2C_2		0
-
-#define PACKET_HAS_SLAVE	0
-#define PACKET_HAS_MASTER	0
-
-#define FAST_TIMER_FREQ		10000	/* .1ms for debouncing */
 
 /*
  * Radio is a cc1200 connected via SPI
@@ -139,7 +124,7 @@
 #define LED_8_PORT		(&stm_gpioe)
 #define LED_8_PIN		3
 
-#define LED_PIN_ARMED		8
+#define AO_LED_ARMED		AO_LED_8
 
 /* RF good/marginal/poor */
 #define LED_9_PORT		(&stm_gpioe)
@@ -149,7 +134,6 @@
 #define LED_11_PORT		(&stm_gpioe)
 #define LED_11_PIN		6
 
-#define AO_LED_ARMED		AO_LED_8
 #define AO_LED_GREEN		AO_LED_9
 #define AO_LED_AMBER		AO_LED_10
 #define AO_LED_RED		AO_LED_11
