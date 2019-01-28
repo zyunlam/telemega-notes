@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 Keith Packard <keithp@keithp.com>
+ * Copyright © 2019 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
