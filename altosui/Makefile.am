@@ -255,12 +255,18 @@ $(JAR): classaltosui.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTOSU
 		$(ICONJAR) \
 		-C classes altosui \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 $(FATJAR): classaltosui.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) $(JAVA_ICONS)
 	jar cfm $@ Manifest-fat.txt \
 		$(ICONJAR) \
 		-C classes altosui \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 Manifest.txt: Makefile
 	echo 'Main-Class: altosui.AltosUI' > $@

@@ -101,3 +101,6 @@ $(JAVAROOT):
 
 $(JAR): classaltosuilib.stamp $(ICONS)
 	jar cf $@ $(ICONJAR) -C $(JAVAROOT) .
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif

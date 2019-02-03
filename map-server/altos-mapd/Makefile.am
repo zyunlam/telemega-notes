@@ -42,12 +42,18 @@ classes/altosmapd:
 $(JAR): classaltosmapd.stamp Manifest.txt $(ALTOSLIB_CLASS)
 	jar cfm $@ Manifest.txt \
 		-C classes altosmapd
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 altosmapddir=$(datadir)/java
 
 $(FATJAR): classaltosmapd.stamp Manifest-fat.txt $(ALTOSLIB_CLASS)
 	jar cfm $@ Manifest-fat.txt \
 		-C classes altosmapd
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 altos-mapd: Makefile
 	echo "#!/bin/sh" > $@

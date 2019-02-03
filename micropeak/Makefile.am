@@ -222,12 +222,18 @@ $(JAR): classmicropeak.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTO
 		$(ICONJAR) \
 		-C classes org \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 $(FATJAR): classmicropeak.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS) $(JAVA_ICONS)
 	jar cfm $@ Manifest-fat.txt \
 		$(ICONJAR) \
 		-C classes org \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 classaltosui.stamp: $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)
 

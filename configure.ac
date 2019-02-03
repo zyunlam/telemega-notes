@@ -395,6 +395,25 @@ if test "x$HAVE_ASCIIDOCTOR_PDF" = "xno"; then
 fi
 AM_CONDITIONAL([ASCIIDOCTOR_PDF], [test x$HAVE_ASCIIDOCTOR_PDF != xno])
 
+AC_ARG_WITH([strip-nondeterminism],
+	    [AS_HELP_STRING([--with-strip-nondeterminism],
+		            [Name of non-deterministic build data stripping tool])],
+	    [],
+	    [with_strip_nondeterminism=auto])
+
+if test "x$with_strip_nondeterminism" != "xno"; then
+	if test "x$with_strip_nondeterminism" = "xauto"; then
+		with_strip_nondeterminism="strip-nondeterminism"
+		AC_CHECK_PROG([HAVE_STRIP_NONDETERMINISM],[$with_strip_nondeterminism], yes, no)
+	else
+		HAVE_STRIP_NONDETERMINISM=yes
+	fi
+else
+	HAVE_STRIP_NONDETERMINISM=no
+fi
+AM_CONDITIONAL([STRIP_NONDETERMINISM], [test x$HAVE_STRIP_NONDETERMINISM != xno])
+AC_SUBST(STRIP_NONDETERMINISM, "$with_strip_nondeterminism")
+
 PKG_CHECK_MODULES([JANSSON], [jansson])
 
 AC_ARG_WITH([readline],
@@ -572,6 +591,7 @@ echo "    STlink support..............: ${HAVE_STLINK}"
 echo "    Newlib-nano support.........: ${NEWLIB_NANO}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
 echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
+echo "    Strip jar timestamps........: ${STRIP_NONDETERMINISM}"
 echo ""
 echo "  Java"
 echo "    freetts.....................: ${FREETTS}"

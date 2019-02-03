@@ -207,3 +207,6 @@ bin:
 
 $(JAR): classaltoslib.stamp
 	jar cf $@ -C bin org
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
