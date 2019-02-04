@@ -5,6 +5,7 @@ Maintainer: Bdale Garbee <bdale@gag.com>
 Uploaders: Keith Packard <keithp@keithp.com>
 Build-Depends: asciidoctor,
                ruby-asciidoctor-pdf,
+               strip-nondeterminism,
                autoconf,
                automake,
                debhelper (>= 10),
