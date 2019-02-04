@@ -1,3 +1,9 @@
+altos (1.9-3) unstable; urgency=medium
+
+  * cherry-pick commit that makes builds reproducible
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 03 Feb 2019 23:02:33 -0700
+
 altos (1.9-2) unstable; urgency=medium
 
   * Revert "elide pdf files from delivered docs until ruby-asciidoctor-pdf escapes NEW"

@@ -1,0 +1,199 @@
+From 630f457666b48321be0a5b6fbf391efef1fa3eb4 Mon Sep 17 00:00:00 2001
+From: Keith Packard <keithp@keithp.com>
+Date: Sun, 3 Feb 2019 12:48:45 -0800
+Subject: [PATCH] Use strip-nondeterminism to fix JAR timestamps
+
+.jar files are just zip files, and contain dates. These will cause the
+build to be non-reproducible. Use strip-nondeterminism to smash all of
+these back to a fixed value.
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ altoslib/Makefile.am              |  3 +++
+ altosui/Makefile.am               |  6 ++++++
+ altosuilib/Makefile.am            |  3 +++
+ configure.ac                      | 20 ++++++++++++++++++++
+ map-server/altos-mapd/Makefile.am |  6 ++++++
+ map-server/altos-mapj/Makefile.am |  6 ++++++
+ micropeak/Makefile.am             |  6 ++++++
+ telegps/Makefile.am               |  6 ++++++
+ 8 files changed, 56 insertions(+)
+
+diff --git a/altoslib/Makefile.am b/altoslib/Makefile.am
+index 447830e5..dfae0f69 100644
+--- a/altoslib/Makefile.am
++++ b/altoslib/Makefile.am
+@@ -207,3 +207,6 @@ bin:
+ 
+ $(JAR): classaltoslib.stamp
+ 	jar cf $@ -C bin org
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+diff --git a/altosui/Makefile.am b/altosui/Makefile.am
+index 7cc1f4ea..eec15786 100644
+--- a/altosui/Makefile.am
++++ b/altosui/Makefile.am
+@@ -255,12 +255,18 @@ $(JAR): classaltosui.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTOSU
+ 		$(ICONJAR) \
+ 		-C classes altosui \
+ 		-C ../libaltos libaltosJNI
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ $(FATJAR): classaltosui.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) $(JAVA_ICONS)
+ 	jar cfm $@ Manifest-fat.txt \
+ 		$(ICONJAR) \
+ 		-C classes altosui \
+ 		-C ../libaltos libaltosJNI
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ Manifest.txt: Makefile
+ 	echo 'Main-Class: altosui.AltosUI' > $@
+diff --git a/altosuilib/Makefile.am b/altosuilib/Makefile.am
+index c00144f8..3b2e49d4 100644
+--- a/altosuilib/Makefile.am
++++ b/altosuilib/Makefile.am
+@@ -101,3 +101,6 @@ $(JAVAROOT):
+ 
+ $(JAR): classaltosuilib.stamp $(ICONS)
+ 	jar cf $@ $(ICONJAR) -C $(JAVAROOT) .
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+diff --git a/configure.ac b/configure.ac
+index 466f5369..a2d84ce6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -395,6 +395,25 @@ if test "x$HAVE_ASCIIDOCTOR_PDF" = "xno"; then
+ fi
+ AM_CONDITIONAL([ASCIIDOCTOR_PDF], [test x$HAVE_ASCIIDOCTOR_PDF != xno])
+ 
++AC_ARG_WITH([strip-nondeterminism],
++	    [AS_HELP_STRING([--with-strip-nondeterminism],
++		            [Name of non-deterministic build data stripping tool])],
++	    [],
++	    [with_strip_nondeterminism=auto])
++
++if test "x$with_strip_nondeterminism" != "xno"; then
++	if test "x$with_strip_nondeterminism" = "xauto"; then
++		with_strip_nondeterminism="strip-nondeterminism"
++		AC_CHECK_PROG([HAVE_STRIP_NONDETERMINISM],[$with_strip_nondeterminism], yes, no)
++	else
++		HAVE_STRIP_NONDETERMINISM=yes
++	fi
++else
++	HAVE_STRIP_NONDETERMINISM=no
++fi
++AM_CONDITIONAL([STRIP_NONDETERMINISM], [test x$HAVE_STRIP_NONDETERMINISM != xno])
++AC_SUBST(STRIP_NONDETERMINISM, "$with_strip_nondeterminism")
++
+ PKG_CHECK_MODULES([JANSSON], [jansson])
+ 
+ AC_ARG_WITH([readline],
+@@ -572,6 +591,7 @@ echo "    STlink support..............: ${HAVE_STLINK}"
+ echo "    Newlib-nano support.........: ${NEWLIB_NANO}"
+ echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
+ echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
++echo "    Strip jar timestamps........: ${STRIP_NONDETERMINISM}"
+ echo ""
+ echo "  Java"
+ echo "    freetts.....................: ${FREETTS}"
+diff --git a/map-server/altos-mapd/Makefile.am b/map-server/altos-mapd/Makefile.am
+index 39f67536..315a33d5 100644
+--- a/map-server/altos-mapd/Makefile.am
++++ b/map-server/altos-mapd/Makefile.am
+@@ -42,12 +42,18 @@ classes/altosmapd:
+ $(JAR): classaltosmapd.stamp Manifest.txt $(ALTOSLIB_CLASS)
+ 	jar cfm $@ Manifest.txt \
+ 		-C classes altosmapd
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ altosmapddir=$(datadir)/java
+ 
+ $(FATJAR): classaltosmapd.stamp Manifest-fat.txt $(ALTOSLIB_CLASS)
+ 	jar cfm $@ Manifest-fat.txt \
+ 		-C classes altosmapd
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ altos-mapd: Makefile
+ 	echo "#!/bin/sh" > $@
+diff --git a/map-server/altos-mapj/Makefile.am b/map-server/altos-mapj/Makefile.am
+index f447adb6..98d4f170 100644
+--- a/map-server/altos-mapj/Makefile.am
++++ b/map-server/altos-mapj/Makefile.am
+@@ -31,12 +31,18 @@ classes/altosmap:
+ $(JAR): classaltosmap.stamp Manifest.txt $(ALTOSLIB_CLASS)
+ 	jar cfm $@ Manifest.txt \
+ 		-C classes altosmap
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ altosmapdir=$(datadir)/java
+ 
+ $(FATJAR): classaltosmap.stamp Manifest-fat.txt $(ALTOSLIB_CLASS)
+ 	jar cfm $@ Manifest-fat.txt \
+ 		-C classes altosmap
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ altos-mapj: Makefile
+ 	echo "#!/bin/sh" > $@
+diff --git a/micropeak/Makefile.am b/micropeak/Makefile.am
+index f01c5c9f..7e9b490d 100644
+--- a/micropeak/Makefile.am
++++ b/micropeak/Makefile.am
+@@ -222,12 +222,18 @@ $(JAR): classmicropeak.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTO
+ 		$(ICONJAR) \
+ 		-C classes org \
+ 		-C ../libaltos libaltosJNI
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ $(FATJAR): classmicropeak.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS) $(JAVA_ICONS)
+ 	jar cfm $@ Manifest-fat.txt \
+ 		$(ICONJAR) \
+ 		-C classes org \
+ 		-C ../libaltos libaltosJNI
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ classaltosui.stamp: $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)
+ 
+diff --git a/telegps/Makefile.am b/telegps/Makefile.am
+index 3443b288..ae1e83e9 100644
+--- a/telegps/Makefile.am
++++ b/telegps/Makefile.am
+@@ -227,12 +227,18 @@ $(JAR): classtelegps.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTOSU
+ 		$(ICONJAR) \
+ 		-C classes org \
+ 		-C ../libaltos libaltosJNI
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ $(FATJAR): classtelegps.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS) $(JAVA_ICONS)
+ 	jar cfm $@ Manifest-fat.txt \
+ 		$(ICONJAR) \
+ 		-C classes org \
+ 		-C ../libaltos libaltosJNI
++if STRIP_NONDETERMINISM
++	$(STRIP_NONDETERMINISM) $@
++endif
+ 
+ libaltos.so: build-libaltos
+ 	-rm -f "$@"
+-- 
+2.20.1
+

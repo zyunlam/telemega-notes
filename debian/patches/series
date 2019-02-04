@@ -1,3 +1,4 @@
 elide-map-server.patch
 initialize-byte-count.patch
 fix-doc-versions.patch
+0001-Use-strip-nondeterminism-to-fix-JAR-timestamps.patch
