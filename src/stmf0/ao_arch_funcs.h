@@ -381,7 +381,7 @@ ao_arch_irqrestore(uint32_t primask) {
 }
 
 static inline void
-ao_arch_memory_barrier() {
+ao_arch_memory_barrier(void) {
 	asm volatile("" ::: "memory");
 }
 

@@ -29,13 +29,13 @@
 #define AO_EXTI_PIN_NOCONFIGURE	64
 
 void
-ao_exti_setup(uint8_t gpio, uint8_t pin, uint8_t mode, void (*callback)());
+ao_exti_setup(uint8_t gpio, uint8_t pin, uint8_t mode, void (*callback)(void));
 
 void
 ao_exti_set_mode(uint8_t gpio, uint8_t pin, uint8_t mode);
 
 void
-ao_exti_set_callback(uint8_t gpio, uint8_t pin, void (*callback)());
+ao_exti_set_callback(uint8_t gpio, uint8_t pin, void (*callback)(void));
 
 void
 ao_exti_enable(uint8_t gpio, uint8_t pin);

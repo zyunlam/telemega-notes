@@ -127,7 +127,7 @@ void ao_lcd_font_string(char *s);
 extern const uint32_t	ao_radio_cal;
 
 void
-ao_adc_init();
+ao_adc_init(void);
 
 /* ADC maximum reported value */
 #define AO_ADC_MAX			4095

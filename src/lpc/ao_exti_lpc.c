@@ -140,7 +140,7 @@ ao_exti_set_mode(uint8_t port, uint8_t pin, uint8_t mode)
 }
 
 void
-ao_exti_set_callback(uint8_t port, uint8_t pin, void (*callback)()) {
+ao_exti_set_callback(uint8_t port, uint8_t pin, void (*callback)(void)) {
 	uint8_t		id = pin_id(port,pin);
 	uint8_t		pint = ao_pint_map[id];
 
