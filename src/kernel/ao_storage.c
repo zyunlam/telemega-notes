@@ -20,11 +20,9 @@
 #include <ao_storage.h>
 
 uint8_t
-ao_storage_read(ao_pos_t pos, void *buf, uint16_t len) 
+ao_storage_read(ao_pos_t pos, void *v_buf, uint16_t len) 
 {
-#ifdef CC1111
-	return ao_storage_device_read(pos, buf, len);
-#else
+	uint8_t *buf = v_buf;
 	uint16_t this_len;
 	uint16_t this_off;
 
@@ -50,15 +48,12 @@ ao_storage_read(ao_pos_t pos, void *buf, uint16_t len)
 		pos += this_len;
 	}
 	return 1;
-#endif
 }
 
 uint8_t
-ao_storage_write(ao_pos_t pos, void *buf, uint16_t len) 
+ao_storage_write(ao_pos_t pos, void *v_buf, uint16_t len) 
 {
-#ifdef CC1111
-	return ao_storage_device_write(pos, buf, len);
-#else
+	uint8_t *buf = v_buf;
 	uint16_t this_len;
 	uint16_t this_off;
 
@@ -84,7 +79,6 @@ ao_storage_write(ao_pos_t pos, void *buf, uint16_t len)
 		pos += this_len;
 	}
 	return 1;
-#endif
 }
 
 static uint8_t storage_data[128];
