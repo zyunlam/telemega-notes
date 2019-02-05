@@ -26,7 +26,12 @@ endif
 ELFTOHEX=$(TOPDIR)/../ao-tools/ao-elftohex/ao-elftohex
 CC=$(ARM_CC)
 
-WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align
+WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
+	-Wpointer-arith \
+	-Wstrict-prototypes \
+	-Wmissing-prototypes \
+	-Wmissing-declarations \
+	-Wnested-externs
 
 AO_CFLAGS=-I. -I$(TOPDIR)/lpc -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers \
 	-DNEWLIB_INTEGER_PRINTF_SCANF \

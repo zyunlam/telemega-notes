@@ -24,7 +24,12 @@ include $(TOPDIR)/Makedefs
 CC=$(ARM_CC)
 LIBS=-L$(NEWLIB_NANO)/arm-none-eabi/lib/thumb/v7-m -lm -lc -lgcc
 
-WARN_FLAGS=-Wall -Wextra -Werror
+WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
+	-Wpointer-arith \
+	-Wstrict-prototypes \
+	-Wmissing-prototypes \
+	-Wmissing-declarations \
+	-Wnested-externs
 
 AO_CFLAGS=-I. -I../stm -I../kernel -I../drivers -I../math -I../draw \
 	-DNEWLIB_INTEGER_PRINTF_SCANF \
