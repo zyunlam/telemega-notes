@@ -503,4 +503,9 @@ uint8_t
 ao_usb_write2(uint16_t len);
 #endif /* AO_USB_DIRECTIO */
 
+void start(void);
+
+void
+ao_debug_out(char c);
+
 #endif /* _AO_ARCH_FUNCS_H_ */

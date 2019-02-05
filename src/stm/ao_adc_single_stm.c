@@ -18,6 +18,7 @@
 
 #include <ao.h>
 #include <ao_data.h>
+#include <ao_adc_single.h>
 
 static uint8_t			ao_adc_ready;
 

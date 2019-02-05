@@ -393,6 +393,9 @@ struct ao_stm_usart {
 #endif
 };
 
+void
+ao_debug_out(char c);
+
 #if HAS_SERIAL_1
 extern struct ao_stm_usart	ao_stm_usart1;
 #endif
@@ -606,5 +609,7 @@ ao_arch_wait_interrupt(void) {
 		do { b } while (0);			\
 		ao_arch_irqrestore(__mask);		\
 	} while (0)
+
+void start(void);
 
 #endif /* _AO_ARCH_FUNCS_H_ */

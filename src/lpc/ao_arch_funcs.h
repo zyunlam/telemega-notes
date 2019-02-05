@@ -258,6 +258,9 @@ static inline void ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
 		}							\
 	} while (0)
 
+void
+ao_debug_out(char c);
+
 #define HAS_ARCH_START_SCHEDULER	1
 
 static inline void ao_arch_start_scheduler(void) {
@@ -271,5 +274,7 @@ static inline void ao_arch_start_scheduler(void) {
 	asm("msr control,%0" : : "r" (control));
 	asm("isb");
 }
+
+void start(void);
 
 #endif /* _AO_ARCH_FUNCS_H_ */
