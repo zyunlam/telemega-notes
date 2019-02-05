@@ -58,9 +58,6 @@
 
 #define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
 
-#define ao_arch_task_members\
-	uint32_t *sp;			/* saved stack pointer */
-
 /*
  * For now, we're running at a weird frequency
  */

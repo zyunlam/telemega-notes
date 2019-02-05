@@ -60,9 +60,6 @@
 
 #define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
 
-#define ao_arch_task_members\
-	uint32_t *sp;			/* saved stack pointer */
-
 #define ao_arch_block_interrupts()	asm("cpsid i")
 #define ao_arch_release_interrupts()	asm("cpsie i")
 

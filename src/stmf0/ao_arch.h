@@ -65,9 +65,6 @@ extern const uint16_t ao_romconfig_check;
 extern const uint16_t ao_serial_number;
 extern const uint32_t ao_radio_cal;
 
-#define ao_arch_task_members\
-	uint32_t *sp;			/* saved stack pointer */
-
 #define ao_arch_block_interrupts()	asm("cpsid i")
 #define ao_arch_release_interrupts()	asm("cpsie i")
 
