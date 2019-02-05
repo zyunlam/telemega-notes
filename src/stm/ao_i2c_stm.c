@@ -341,6 +341,17 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t index, uint8_t stop)
 				    (0 << STM_DMA_CCR_PINC) |
 				    (0 << STM_DMA_CCR_CIRC) |
 				    (STM_DMA_CCR_DIR_PER_TO_MEM << STM_DMA_CCR_DIR));
+
+		/* XXX ao_i2c_recv_dma_isr hasn't ever been used, so it
+		 * doesn't appear to be necessary. Testing with a device
+		 * that uses i2c would really be useful here to discover
+		 * whether this function is necessary or not.
+		 */
+#if 0
+		ao_dma_set_isr(rx_dma_index, ao_i2c_recv_dma_isr);
+#else
+		(void) ao_i2c_recv_dma_isr;
+#endif
 		stm_i2c->cr1 = AO_STM_I2C_CR1 | (1 << STM_I2C_CR1_ACK);
 		stm_i2c->cr2 = AO_STM_I2C_CR2 |
 			(1 << STM_I2C_CR2_DMAEN) | (1 << STM_I2C_CR2_LAST);
