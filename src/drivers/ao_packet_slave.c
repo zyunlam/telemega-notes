@@ -18,7 +18,7 @@
 
 #include "ao.h"
 
-void
+static void
 ao_packet_slave(void)
 {
 	ao_tx_packet.addr = ao_serial_number;

@@ -339,7 +339,7 @@ ao_serial2_set_speed(uint8_t speed)
 }
 
 #if HAS_SERIAL_SW_FLOW
-void
+static void
 ao_serial2_cts(void)
 {
 	_ao_usart_cts(&ao_stm_usart2);

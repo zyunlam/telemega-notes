@@ -245,7 +245,7 @@ static inline uint32_t ao_usb_epr_sw_buf_rx(uint32_t epr) {
  * Set current device address and mark the
  * interface as active
  */
-void
+static void
 ao_usb_set_address(uint8_t address)
 {
 	debug("ao_usb_set_address %02x\n", address);
@@ -957,7 +957,7 @@ ao_usb_ep0_handle(uint8_t receive)
 }
 
 #if AO_POWER_MANAGEMENT
-void
+static void
 ao_usb_suspend(void)
 {
 	stm_usb.cntr |= (1 << STM_USB_CNTR_FSUSP);
@@ -966,7 +966,7 @@ ao_usb_suspend(void)
 	ao_clock_suspend();
 }
 
-void
+static void
 ao_usb_wakeup(void)
 {
 	ao_clock_resume();
@@ -1371,7 +1371,7 @@ _ao_usb_out_recv(void)
 	_rx_dbg1("out_recv count", ao_usb_rx_count);
 }
 
-int
+static int
 _ao_usb_pollchar(void)
 {
 	uint8_t c;

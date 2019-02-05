@@ -251,7 +251,7 @@ ao_report_continuity(void)
 }
 #endif
 
-void
+static void
 ao_report(void)
 {
 	for(;;) {

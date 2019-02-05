@@ -40,12 +40,12 @@ extern char __interrupt_rom__, __interrupt_start__, __interrupt_end__;
 
 /* Interrupt functions */
 
-void lpc_halt_isr(void)
+static void lpc_halt_isr(void)
 {
 	ao_panic(AO_PANIC_CRASH);
 }
 
-void lpc_ignore_isr(void)
+static void lpc_ignore_isr(void)
 {
 }
 

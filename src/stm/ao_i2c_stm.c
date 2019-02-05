@@ -278,7 +278,7 @@ ao_i2c_send(void *block, uint16_t len, uint8_t index, uint8_t stop)
 	return true;
 }
 
-void
+static void
 ao_i2c_recv_dma_isr(int index)
 {
 	int		i;
@@ -374,7 +374,7 @@ ao_i2c_recv(void *block, uint16_t len, uint8_t index, uint8_t stop)
 	return ret;
 }
 
-void
+static void
 ao_i2c_channel_init(uint8_t index)
 {
 	struct stm_i2c	*stm_i2c = ao_i2c_stm_info[index].stm_i2c;

@@ -176,7 +176,7 @@ ao_pad_run(void)
  *	AO_PAD_R_IGNITER_SENSE_GND	Resistors from igniter sense ADC inputs to ground
  */
 
-int16_t
+static int16_t
 ao_pad_decivolt(int16_t adc, int16_t r_plus, int16_t r_minus)
 {
 	int32_t	mul = (int32_t) AO_ADC_REFERENCE_DV * (r_plus + r_minus);
@@ -472,7 +472,7 @@ ao_pad(void)
 	}
 }
 
-void
+static void
 ao_pad_test(void)
 {
 	uint8_t	c;
@@ -501,7 +501,7 @@ ao_pad_test(void)
 	}
 }
 
-void
+static void
 ao_pad_manual(void)
 {
 	uint8_t	ignite;
@@ -529,7 +529,7 @@ static struct ao_task ao_pad_ignite_task;
 static struct ao_task ao_pad_monitor_task;
 
 #if DEBUG
-void
+static void
 ao_pad_set_debug(void)
 {
 	uint16_t r = ao_cmd_decimal();

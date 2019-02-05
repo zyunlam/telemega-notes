@@ -88,7 +88,7 @@ ao_gps_lexchar(void)
 	ao_gps_char = c;
 }
 
-void
+static void
 ao_gps_skip_field(void)
 {
 	for (;;) {
@@ -99,7 +99,7 @@ ao_gps_skip_field(void)
 	}
 }
 
-void
+static void
 ao_gps_skip_sep(void)
 {
 	char c = ao_gps_char;

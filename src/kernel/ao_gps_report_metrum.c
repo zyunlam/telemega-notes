@@ -19,7 +19,7 @@
 #include "ao.h"
 #include "ao_log.h"
 
-void
+static void
 ao_gps_report_metrum(void)
 {
 	static struct ao_log_metrum		gps_log;

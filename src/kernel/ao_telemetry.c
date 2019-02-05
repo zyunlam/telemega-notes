@@ -409,7 +409,7 @@ ao_send_companion(void)
 }
 #endif
 
-void
+static void
 ao_telemetry(void)
 {
 	uint16_t	time;

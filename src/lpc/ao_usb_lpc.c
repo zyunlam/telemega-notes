@@ -131,7 +131,7 @@ static inline uint32_t set_toggle(uint32_t 	current_value,
  * Set current device address and mark the
  * interface as active
  */
-void
+static void
 ao_usb_set_address(uint8_t address)
 {
 	debug("ao_usb_set_address %02x\n", address);
@@ -813,7 +813,7 @@ _ao_usb_out_recv(void)
 	ao_usb_set_epn_out(AO_USB_OUT_EP, ao_usb_out_rx_buffer[1-ao_usb_out_rx_cur], AO_USB_OUT_SIZE);
 }
 
-int
+static int
 _ao_usb_pollchar(void)
 {
 	uint8_t c;

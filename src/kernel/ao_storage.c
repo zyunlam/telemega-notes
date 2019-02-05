@@ -143,7 +143,7 @@ ao_storage_store(void)
 }
 #endif
 
-void
+static void
 ao_storage_zap(void) 
 {
 	uint32_t v = ao_cmd_hex();
@@ -152,7 +152,7 @@ ao_storage_zap(void)
 	ao_storage_erase((uint32_t) v << 8);
 }
 
-void
+static void
 ao_storage_zapall(void) 
 {
 	uint32_t	pos;
@@ -312,7 +312,7 @@ ao_storage_test(void)
 }
 #endif /* AO_STORAGE_TEST */
 
-void
+static void
 ao_storage_info(void) 
 {
 	ao_storage_setup();

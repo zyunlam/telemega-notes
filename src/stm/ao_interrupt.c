@@ -29,12 +29,12 @@ extern char __bss_start__, __bss_end__;
 
 /* Interrupt functions */
 
-void stm_halt_isr(void)
+static void stm_halt_isr(void)
 {
 	ao_panic(AO_PANIC_CRASH);
 }
 
-void stm_ignore_isr(void)
+static void stm_ignore_isr(void)
 {
 }
 

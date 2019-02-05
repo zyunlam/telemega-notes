@@ -83,7 +83,7 @@ ao_packet_master_check_busy(void)
 		ao_packet_master_delay = AO_PACKET_MASTER_DELAY_LONG;
 }
 
-void
+static void
 ao_packet_master(void)
 {
 	ao_config_get();
