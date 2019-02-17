@@ -57,14 +57,6 @@ ao_log_firetwo(struct ao_log_firetwo *log)
 	return wrote;
 }
 
-static uint8_t
-ao_log_dump_check_data(void)
-{
-	if (ao_log_csum((uint8_t *) &log) != 0)
-		return 0;
-	return 1;
-}
-
 #if HAS_ADC
 static uint8_t	ao_log_data_pos;
 
@@ -131,15 +123,3 @@ ao_log(void)
 	} while (ao_log_running);
 }
 
-uint16_t
-ao_log_flight(uint8_t slot)
-{
-	if (!ao_storage_read(ao_log_pos(slot),
-			     &log,
-			     sizeof (struct ao_log_firetwo)))
-		return 0;
-
-	if (ao_log_dump_check_data() && log.type == AO_LOG_FLIGHT)
-		return log.u.flight.flight;
-	return 0;
-}

@@ -483,6 +483,10 @@ typedef struct ao_log_mega ao_log_type;
 typedef struct ao_log_metrum ao_log_type;
 #endif
 
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEFIRETWO
+typedef struct ao_log_firetwo ao_log_type;
+#endif
+
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI1 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI3
 typedef struct ao_log_mini ao_log_type;
 #endif
