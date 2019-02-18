@@ -27,35 +27,6 @@ struct ao_task demo_task;
 
 static inline int min(int a, int b) { return a < b ? a : b; }
 
-void
-ao_demo(void)
-{
-	char	message[] = "Hello, Mike & Bdale --- ";
-	char	part[7];
-	int	i = 0;
-	int	len = sizeof(message) - 1;
-	int	first, second;
-
-	part[6] = '\0';
-	for (;;) {
-		ao_delay(AO_MS_TO_TICKS(150));
-		first = min(6, len - i);
-		second = 6 - first;
-		memcpy(part, message + i, first);
-		memcpy(part + first, message, second);
-		ao_lcd_font_string(part);
-		if (++i >= len)
-			i = 0;
-	}
-}
-
-void _close() { }
-void _sbrk() { }
-void _isatty() { }
-void _lseek() { }
-void _exit () { }
-void _read () { }
-void _fstat() { }
 
 #define AO_DMA_TEST_INDEX	STM_DMA_INDEX(4)
 
@@ -215,7 +186,7 @@ main(void)
 	
 	ao_task_init();
 
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 	ao_led_on(AO_LED_GREEN);
 	ao_led_off(AO_LED_BLUE);
 	ao_timer_init();
