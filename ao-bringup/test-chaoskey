@@ -37,7 +37,7 @@ tests="0:100 1:100 2:100 3:100 12:10 13:100 15:10000 16:250 202:1000 203:100 204
 PASS=0
 FAIL=0
 WEAK=0
-../ao-tools/ao-chaosread/ao-chaosread $serial --infinite --bytes | for test in $tests done; do
+chaosread $serial --infinite --bytes | for test in $tests done; do
     case $test in
 	*:*:*)
 	    dnum=`echo $test | sed 's/:.*$//'`
