@@ -17,9 +17,10 @@
  */
 
 #include <ao.h>
+#include "ao_lcd_font.h"
 
 static const uint16_t ao_lcd_font[] = {
-#include "ao_lcd_font.h"
+#include "ao_lcd_font_bits.h"
 };
 
 /*
@@ -116,7 +117,7 @@ ao_lcd_font_text(void)
 	ao_lcd_font_string(string);
 }
 
-const struct ao_cmds ao_lcd_font_cmds[] = {
+static const struct ao_cmds ao_lcd_font_cmds[] = {
 	{ ao_lcd_font_text,	"t <string>\0Write <string> to LCD" },
 	{ 0, NULL }
 };
@@ -126,4 +127,3 @@ ao_lcd_font_init(void)
 {
 	ao_cmd_register(ao_lcd_font_cmds);
 }
-	
