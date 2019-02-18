@@ -145,13 +145,13 @@ ao_echo(void)
 int8_t
 ao_add_stdio(int (*_pollchar)(void),
 	     void (*putchar)(char),
-	     void (*flush)(void)) 
+	     void (*_flush)(void)) 
 {
 	if (ao_num_stdios == AO_NUM_STDIOS)
 		ao_panic(AO_PANIC_STDIO);
 	ao_stdios[ao_num_stdios]._pollchar = _pollchar;
 	ao_stdios[ao_num_stdios].putchar = putchar;
-	ao_stdios[ao_num_stdios].flush = flush;
+	ao_stdios[ao_num_stdios].flush = _flush;
 	ao_stdios[ao_num_stdios].echo = 1;
 #if AO_NUM_STDIOS > 1
 	return ao_num_stdios++;

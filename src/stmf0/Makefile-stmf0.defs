@@ -30,7 +30,8 @@ WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
 	-Wstrict-prototypes \
 	-Wmissing-prototypes \
 	-Wmissing-declarations \
-	-Wnested-externs
+	-Wnested-externs \
+	-Wshadow
 
 AO_CFLAGS=-I. -I$(TOPDIR)/stmf0 -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers \
 	-DNEWLIB_INTEGER_PRINTF_SCANF \
