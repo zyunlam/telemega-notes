@@ -40,7 +40,7 @@ PRODUCT=LambdaKey-v1.0
 PRODUCT_DEF=-DLAMBDAKEY
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) -I. -I$(aoschemelib) $(STMF0_CFLAGS) -Os -g
+CFLAGS = $(PRODUCT_DEF) -I. -I$(aoschemelib) $(STMF0_CFLAGS)
 
 PROGNAME=lambdakey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf

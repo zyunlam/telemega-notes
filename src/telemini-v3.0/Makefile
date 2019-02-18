@@ -60,7 +60,7 @@ PRODUCT=TeleMini-v3.0
 PRODUCT_DEF=-DTELEMINI_V_3_0
 IDPRODUCT=0x0027
 
-CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -g -Os
+CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS)
 
 PROGNAME=telemini-v3.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -72,10 +72,7 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 

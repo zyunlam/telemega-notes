@@ -12,8 +12,8 @@ vpath kalman_micro.5c kalman
 vpath load_csv.5c kalman
 vpath matrix.5c kalman
 
-include Version
 TOPDIR=.
+
 include Makedefs
 
 ARMM3DIRS=\
@@ -49,7 +49,7 @@ ARMM0DIRS=\
 	micropeak-v2.0 micropeak-v2.0/flash-loader
 
 AVRDIRS=\
-	micropeak microkite
+	micropeak microkite microsplash
 
 SUBDIRS=
 

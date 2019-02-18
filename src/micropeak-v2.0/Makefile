@@ -52,13 +52,14 @@ INC=\
 	ao_log_micro.h \
 	ao_micropeak.h \
 	altitude-pa.h \
+	ao_product.h \
 	stm32f0.h
 
 IDPRODUCT=0x14
 PRODUCT=MicroPeak-v2.0
 PRODUCT_DEF=-DMICROPEAK
 
-CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -g -Os
+CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS)
 
 PROGNAME=micropeak-v2.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -72,12 +73,7 @@ all: $(PROG) $(HEX)
 LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tmicropeak.ld -n
 
 $(PROG): Makefile $(OBJ) micropeak.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
-
-ao_product.o: ao_product.c ao_product.h
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 distclean:	clean
 
@@ -90,11 +86,8 @@ publish: $(PUBLISH_HEX)
 $(PUBLISH_HEX): $(HEX)
 	cp -a $(HEX) $@
 
-../altitude-pa.h: make-altitude-pa
-	nickle $< > $@
-
 install:
 
 uninstall:
 
-$(OBJ): ao_product.h $(INC)
+$(OBJ): $(INC)

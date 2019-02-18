@@ -2,11 +2,8 @@
 # Tiny AltOS build
 #
 #
-vpath % ../attiny:../drivers:../kernel:../product:..
-vpath ao-make-product.5c ../util
-vpath make-altitude-pa ../util
-
-include ../avr/Makefile.defs
+TOPDIR=..
+include $(TOPDIR)/attiny/Makefile.defs
 
 PROGNAME=microkite-v0.1
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -17,14 +14,6 @@ SCRIPT=microkite-load
 PUBLISH_DIR=$(HOME)/altusmetrumllc/Binaries
 PUBLISH_HEX=$(PUBLISH_DIR)/$(HEX)
 PUBLISH_SCRIPT=$(PUBLISH_DIR)/$(SCRIPT)
-
-MCU=attiny85
-DUDECPUTYPE=t85
-#PROGRAMMER=stk500v2 -P usb
-LOADSLOW=-i 32 -B 32
-LOADARG=-p $(DUDECPUTYPE) -c $(PROGRAMMER) -e -U flash:w:
-
-#LDFLAGS=-L$(LDSCRIPTS) -Tavr25.x
 
 ALTOS_SRC = \
 	ao_micropeak.c \
@@ -52,28 +41,18 @@ INC=\
 	ao_ms5607.h \
 	ao_log_micro.h \
 	ao_micropeak.h \
+	ao_product.h \
 	altitude-pa.h
 
 IDPRODUCT=0
 PRODUCT=MicroKite-v0.1
 PRODUCT_DEF=-DMICROPEAK
-CFLAGS = $(PRODUCT_DEF) -I. -I../attiny -I../kernel -I.. -I../drivers -I../product
-CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -O2 -mcall-prologues -DATTINY
-
-NICKLE=nickle
+CFLAGS = $(PRODUCT_DEF) $(ATTINY_CFLAGS)
 
 SRC=$(ALTOS_SRC)
 OBJ=$(SRC:.c=.o)
 
-V=0
-# The user has explicitly enabled quiet compilation.
-ifeq ($(V),0)
-quiet = @printf "  $1 $2 $@\n"; $($1)
-endif
-# Otherwise, print the full command line.
-quiet ?= $($1)
-
-all: $(PROG) $(HEX) microkite-load
+all: $(PROG) $(HEX) $(SCRIPT)
 
 CHECK=sh ../util/check-avr-mem
 
@@ -85,25 +64,16 @@ $(HEX): $(PROG)
 	avr-size $(PROG)
 	$(OBJCOPY) -R .eeprom -O ihex $(PROG) $@
 
-
 load: $(HEX)
 	$(LOADCMD) $(LOADARG)$(HEX)
 
 load-slow: $(HEX)
 	$(LOADCMD) $(LOADSLOW) $(LOADARG)$(HEX)
 
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
-
-ao_product.o: ao_product.c ao_product.h
-
-%.o : %.c $(INC)
-	$(call quiet,CC) -c $(CFLAGS) $<
-
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROG) $(HEX) $(SCRIPT)
+	rm -f *.o *.elf *.ihx $(SCRIPT)
 	rm -f ao_product.h
 
 publish: $(PUBLISH_HEX) $(PUBLISH_SCRIPT)
@@ -120,10 +90,7 @@ load-product:
 load-product-slow:
 	./$(SCRIPT) slow
 
-../altitude-pa.h: make-altitude-pa
-	nickle $< > $@
-
-$(SCRIPT): $(SCRIPT).tmpl Makefile ../Version
+$(SCRIPT): $(SCRIPT).tmpl Makefile $(TOPDIR)/Makedefs
 	sed -e 's/%HEX%/$(HEX)/' -e 's/%LOADCMD%/$(LOADCMD)/' -e 's/%LOADARG%/$(LOADARG)/' -e 's/%LOADSLOW%/$(LOADSLOW)/' $(SCRIPT).tmpl > $@ || (rm $@ && exit 1)
 	chmod +x $@
 
@@ -131,4 +98,4 @@ install:
 
 uninstall:
 
-$(OBJ): ao_product.h $(INC)
+$(OBJ): $(INC)

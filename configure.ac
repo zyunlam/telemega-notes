@@ -573,7 +573,6 @@ map-server/Makefile
 map-server/altos-mapd/Makefile
 map-server/altos-map/Makefile
 map-server/altos-mapj/Makefile
-src/Version
 ])
 
 echo ""
