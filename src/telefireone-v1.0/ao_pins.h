@@ -42,6 +42,8 @@
 #define AO_DATA_RING		32
 #define HAS_FIXED_PAD_BOX	1
 
+#define AO_LOG_FORMAT		AO_LOG_FORMAT_TELEFIRETWO
+
 #define LOG_ERASE_MARK		0x55
 
 /* 8MHz High speed external crystal */
