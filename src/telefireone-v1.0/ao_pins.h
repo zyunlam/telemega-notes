@@ -25,7 +25,7 @@
 
 #define HAS_FLIGHT		0
 #define HAS_USB			1
-#define HAS_BEEP		1
+#define HAS_BEEP		0
 #define BEEPER_CHANNEL		4
 #define BEEPER_TIMER		3
 #define HAS_GPS			0
