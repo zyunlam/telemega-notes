@@ -37,6 +37,7 @@ ARMM3DIRS=\
 	telebt-v3.0 telebt-v3.0/flash-loader \
 	telebt-v4.0 telebt-v4.0/flash-loader \
 	telelcotwo-v0.1 telelcotwo-v0.1/flash-loader \
+	telefireone-v1.0 telefireone-v1.0/flash-loader \
 	telefiretwo-v0.1 telefiretwo-v0.1/flash-loader \
 	telefireeight-v1.0 telefireeight-v1.0/flash-loader \
 	telefireeight-v2.0 telefireeight-v2.0/flash-loader 
