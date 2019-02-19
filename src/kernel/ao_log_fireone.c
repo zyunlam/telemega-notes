@@ -36,20 +36,20 @@ ao_log_csum(uint8_t *b)
 	return -sum;
 }
 
-uint8_t
-ao_log_firetwo(struct ao_log_firetwo *log) 
+static uint8_t
+ao_log_firetwo(void)
 {
 	uint8_t wrote = 0;
 	/* set checksum */
-	log->csum = 0;
-	log->csum = ao_log_csum((uint8_t *) log);
+	log.csum = 0;
+	log.csum = ao_log_csum((uint8_t *) &log);
 	ao_mutex_get(&ao_log_mutex); {
 		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 			ao_log_stop();
 		if (ao_log_running) {
 			wrote = 1;
 			ao_storage_write(ao_log_current_pos,
-					 log,
+					 &log,
 					 sizeof (struct ao_log_firetwo));
 			ao_log_current_pos += sizeof (struct ao_log_firetwo);
 		}
@@ -67,8 +67,6 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;
 void
 ao_log(void)
 {
-	uint16_t ao_flight_state = ao_flight_startup;
-
 	ao_storage_setup();
 
 	do {
@@ -80,13 +78,12 @@ ao_log(void)
 		log.type = AO_LOG_FLIGHT;
 		log.tick = ao_time();
 		log.u.flight.flight = ao_flight_number;
-		ao_log_firetwo(&log);
+		ao_log_firetwo();
 
 		/* Write the whole contents of the ring to the log
 	 	* when starting up.
 	 	*/
 		ao_log_data_pos = ao_data_ring_next(ao_data_head);
-		ao_log_state = ao_flight_startup;
 		for (;;) {
 			/* Write samples to EEPROM */
 			while (ao_log_data_pos != ao_data_head) {
@@ -97,22 +94,10 @@ ao_log(void)
 	//			for (i = 0; i < 4; i++) {
 	//				log.u.sensor.thermistor[i] = ao_data_ring[ao_log_data_pos].sensor.thermistor[i];
 	//			}
-				ao_log_firetwo(&log);
+				ao_log_firetwo();
 				ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 			}
-			/* Write state change to EEPROM */
-			if (ao_flight_state != ao_log_state) {
-				ao_log_state = ao_flight_state;
-				log.type = AO_LOG_STATE;
-				log.tick = ao_time();
-				log.u.state.state = ao_log_state;
-				log.u.state.reason = 0;
-				ao_log_firetwo(&log);
-	
-				if (ao_log_state == ao_flight_landed)
-					ao_log_stop();
-			}
-	
+
 			ao_log_flush();
 
 			if (!ao_log_running) break;
