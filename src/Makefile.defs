@@ -20,10 +20,12 @@ WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
 
 OPT=-Os
 
+NEWLIB_PRINTF_CFLAGS = 	-DNEWLIB_INTEGER_PRINTF_SCANF
+
 NEWLIB_CFLAGS= \
 	-ffreestanding -nostdlib \
-	-DNEWLIB_INTEGER_PRINTF_SCANF \
-	-isystem $(NEWLIB_NANO)/arm-none-eabi/include
+	-isystem $(NEWLIB_NANO)/arm-none-eabi/include \
+	$(NEWLIB_PRINTF_CFLAGS)
 
 AO_CFLAGS=\
 	-std=gnu99 \

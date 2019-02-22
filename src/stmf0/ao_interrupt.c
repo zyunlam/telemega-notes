@@ -43,12 +43,12 @@ extern char __interrupt_rom__, __interrupt_start__, __interrupt_end__;
 
 /* Interrupt functions */
 
-static void stm_halt_isr(void)
+void stm_halt_isr(void)
 {
 	ao_panic(AO_PANIC_CRASH);
 }
 
-static void stm_ignore_isr(void)
+void stm_ignore_isr(void)
 {
 }
 
@@ -144,6 +144,9 @@ isr(usart2)
 isr(usart3_4_5_6_7_8)
 isr(cec_can)
 isr(usb)
+
+#undef isr
+#undef isr_halt
 
 #define i(addr,name)	[(addr)/4] = stm_ ## name ## _isr
 

@@ -1103,64 +1103,67 @@ extern struct stm_mpu stm_mpu;
 #define  STM_MPU_RASR_SIZE_MASK		0x1f
 #define STM_MPU_RASR_ENABLE	0
 
-#define isr(name) void stm_ ## name ## _isr(void);
+#define isr_decl(name) void stm_ ## name ## _isr(void)
 
-isr(nmi)
-isr(hardfault)
-isr(memmanage)
-isr(busfault)
-isr(usagefault)
-isr(svc)
-isr(debugmon)
-isr(pendsv)
-isr(systick)
-isr(wwdg)
-isr(pvd)
-isr(tamper_stamp)
-isr(rtc_wkup)
-isr(flash)
-isr(rcc)
-isr(exti0)
-isr(exti1)
-isr(exti2)
-isr(exti3)
-isr(exti4)
-isr(dma1_channel1)
-isr(dma1_channel2)
-isr(dma1_channel3)
-isr(dma1_channel4)
-isr(dma1_channel5)
-isr(dma1_channel6)
-isr(dma1_channel7)
-isr(adc1)
-isr(usb_hp)
-isr(usb_lp)
-isr(dac)
-isr(comp)
-isr(exti9_5)
-isr(lcd)
-isr(tim9)
-isr(tim10)
-isr(tim11)
-isr(tim2)
-isr(tim3)
-isr(tim4)
-isr(i2c1_ev)
-isr(i2c1_er)
-isr(i2c2_ev)
-isr(i2c2_er)
-isr(spi1)
-isr(spi2)
-isr(usart1)
-isr(usart2)
-isr(usart3)
-isr(exti15_10)
-isr(rtc_alarm)
-isr(usb_fs_wkup)
-isr(tim6)
-isr(tim7)
+isr_decl(halt);
+isr_decl(ignore);
 
-#undef isr
+isr_decl(nmi);
+isr_decl(hardfault);
+isr_decl(memmanage);
+isr_decl(busfault);
+isr_decl(usagefault);
+isr_decl(svc);
+isr_decl(debugmon);
+isr_decl(pendsv);
+isr_decl(systick);
+isr_decl(wwdg);
+isr_decl(pvd);
+isr_decl(tamper_stamp);
+isr_decl(rtc_wkup);
+isr_decl(flash);
+isr_decl(rcc);
+isr_decl(exti0);
+isr_decl(exti1);
+isr_decl(exti2);
+isr_decl(exti3);
+isr_decl(exti4);
+isr_decl(dma1_channel1);
+isr_decl(dma1_channel2);
+isr_decl(dma1_channel3);
+isr_decl(dma1_channel4);
+isr_decl(dma1_channel5);
+isr_decl(dma1_channel6);
+isr_decl(dma1_channel7);
+isr_decl(adc1);
+isr_decl(usb_hp);
+isr_decl(usb_lp);
+isr_decl(dac);
+isr_decl(comp);
+isr_decl(exti9_5);
+isr_decl(lcd);
+isr_decl(tim9);
+isr_decl(tim10);
+isr_decl(tim11);
+isr_decl(tim2);
+isr_decl(tim3);
+isr_decl(tim4);
+isr_decl(i2c1_ev);
+isr_decl(i2c1_er);
+isr_decl(i2c2_ev);
+isr_decl(i2c2_er);
+isr_decl(spi1);
+isr_decl(spi2);
+isr_decl(usart1);
+isr_decl(usart2);
+isr_decl(usart3);
+isr_decl(exti15_10);
+isr_decl(rtc_alarm);
+isr_decl(usb_fs_wkup);
+isr_decl(tim6);
+isr_decl(tim7);
+
+#undef isr_decl
 
 #define STM_ISR_WWDG_POS		0
 #define STM_ISR_PVD_POS			1
@@ -2044,63 +2047,5 @@ struct stm_exti {
 };
 
 extern struct stm_exti stm_exti;
-
-#define isr_decl(name) \
-	void __attribute__ ((weak)) stm_ ## name ## _isr(void);
-
-isr_decl(nmi)
-isr_decl(hardfault)
-isr_decl(memmanage)
-isr_decl(busfault)
-isr_decl(usagefault)
-isr_decl(svc)
-isr_decl(debugmon)
-isr_decl(pendsv)
-isr_decl(systick)
-isr_decl(wwdg)
-isr_decl(pvd)
-isr_decl(tamper_stamp)
-isr_decl(rtc_wkup)
-isr_decl(flash)
-isr_decl(rcc)
-isr_decl(exti0)
-isr_decl(exti1)
-isr_decl(exti2)
-isr_decl(exti3)
-isr_decl(exti4)
-isr_decl(dma1_channel1)
-isr_decl(dma1_channel2)
-isr_decl(dma1_channel3)
-isr_decl(dma1_channel4)
-isr_decl(dma1_channel5)
-isr_decl(dma1_channel6)
-isr_decl(dma1_channel7)
-isr_decl(adc1)
-isr_decl(usb_hp)
-isr_decl(usb_lp)
-isr_decl(dac)
-isr_decl(comp)
-isr_decl(exti9_5)
-isr_decl(lcd)
-isr_decl(tim9)
-isr_decl(tim10)
-isr_decl(tim11)
-isr_decl(tim2)
-isr_decl(tim3)
-isr_decl(tim4)
-isr_decl(i2c1_ev)
-isr_decl(i2c1_er)
-isr_decl(i2c2_ev)
-isr_decl(i2c2_er)
-isr_decl(spi1)
-isr_decl(spi2)
-isr_decl(usart1)
-isr_decl(usart2)
-isr_decl(usart3)
-isr_decl(exti15_10)
-isr_decl(rtc_alarm)
-isr_decl(usb_fs_wkup)
-isr_decl(tim6)
-isr_decl(tim7)
 
 #endif /* _STM32L_H_ */

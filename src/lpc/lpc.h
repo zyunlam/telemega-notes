@@ -1348,47 +1348,49 @@ extern struct lpc_ct32b lpc_ct32b0, lpc_ct32b1;
 #define LPC_CT32B_EMR_EMC_TOGGLE	3
 
 #define isr_decl(name) \
-	void __attribute__ ((weak)) lpc_ ## name ## _isr(void);
+	void lpc_ ## name ## _isr(void)
 
-isr_decl(nmi)
-isr_decl(hardfault)
-isr_decl(memmanage)
-isr_decl(busfault)
-isr_decl(usagefault)
-isr_decl(svc)
-isr_decl(debugmon)
-isr_decl(pendsv)
-isr_decl(systick)
+isr_decl(halt);
+isr_decl(ignore);
 
-isr_decl(pin_int0)	/* IRQ0 */
-isr_decl(pin_int1)
-isr_decl(pin_int2)
-isr_decl(pin_int3)
-isr_decl(pin_int4)	/* IRQ4 */
-isr_decl(pin_int5)
-isr_decl(pin_int6)
-isr_decl(pin_int7)
+isr_decl(nmi);
+isr_decl(hardfault);
+isr_decl(memmanage);
+isr_decl(busfault);
+isr_decl(usagefault);
+isr_decl(svc);
+isr_decl(debugmon);
+isr_decl(pendsv);
+isr_decl(systick);
 
-isr_decl(gint0)	/* IRQ8 */
-isr_decl(gint1)
-isr_decl(ssp1)
-isr_decl(i2c)
+isr_decl(pin_int0);	/* IRQ0 */
+isr_decl(pin_int1);
+isr_decl(pin_int2);
+isr_decl(pin_int3);
+isr_decl(pin_int4);	/* IRQ4 */
+isr_decl(pin_int5);
+isr_decl(pin_int6);
+isr_decl(pin_int7);
 
-isr_decl(ct16b0)	/* IRQ16 */
-isr_decl(ct16b1)
-isr_decl(ct32b0)
-isr_decl(ct32b1)
-isr_decl(ssp0)	/* IRQ20 */
-isr_decl(usart)
-isr_decl(usb_irq)
-isr_decl(usb_fiq)
+isr_decl(gint0);	/* IRQ8 */
+isr_decl(gint1);
+isr_decl(ssp1);
+isr_decl(i2c);
 
-isr_decl(adc)	/* IRQ24 */
-isr_decl(wwdt)
-isr_decl(bod)
-isr_decl(flash)
+isr_decl(ct16b0);	/* IRQ16 */
+isr_decl(ct16b1);
+isr_decl(ct32b0);
+isr_decl(ct32b1);
+isr_decl(ssp0);	/* IRQ20 */
+isr_decl(usart);
+isr_decl(usb_irq);
+isr_decl(usb_fiq);
 
-isr_decl(usb_wakeup)
+isr_decl(adc);	/* IRQ24 */
+isr_decl(wwdt);
+isr_decl(bod);
+isr_decl(flash);
 
+isr_decl(usb_wakeup);
 
 #endif /* _LPC_H_ */
