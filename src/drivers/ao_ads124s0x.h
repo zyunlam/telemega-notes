@@ -58,10 +58,7 @@
 #define AO_ADS124S0X_GPIOCON		0x11
 
 struct ao_ads124s0x_sample {
-	int32_t	ain0;
-	int32_t	ain1;
-	int32_t	ain2;
-	int32_t	ain3;
+	int32_t	ain[AO_ADS124S0X_CHANNELS];
 };
 
 extern struct ao_ads124s0x_sample	ao_ads124s0x_current;
