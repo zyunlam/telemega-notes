@@ -13,6 +13,7 @@
  */
 
 #include <ao.h>
+#include <ao_exti.h>
 #include "ao_ads124s0x.h"
 
 #define DEBUG_LOW	1
@@ -27,6 +28,8 @@
 #endif
 
 struct ao_ads124s0x_sample	ao_ads124s0x_current;
+uint8_t		nextchan = 0;
+uint8_t		ao_ads124s0x_drdy;
 
 static void
 ao_ads124s0x_start(void) {
@@ -94,15 +97,16 @@ ao_ads124s0x_setup(void)
 {
 	uint8_t	d[20];
 
-/*	we have nowhere to report this error to since ao_sensor_errors is
-	normally part of ao_flight?
-
 	uint8_t	devid = ao_ads124s0x_reg_read(AO_ADS124S0X_ID);
 	if (devid != AO_ADS124S0X_ID_ADS124S06)
-		ao_sensor_errors = 1;
-*/
+		ao_panic(AO_PANIC_SELF_TEST_ADS124S0X);
 
-	/* 1ksps each across 4 inputs using full duplex ala 9.5.4.3 */
+	ao_exti_setup(AO_ADS124S0x_DRDY_PORT, AO_ADS124S0X_DRDY_PIN,
+		AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH,
+		ao_ads124s0x_isr);
+
+	/* run converter at 4ksps so we can scan 4 channels at 1ksps using
+	   full duplex ala datasheet section 9.5.4.3 */
 
 	d[0] = AO_ADS124S0X_INPMUX | AO_ADS124S0X_WREG;
 	d[1] = 8;	/* write 8 registers starting with INPMUX */
@@ -133,16 +137,38 @@ ao_ads124s0x_setup(void)
 static void
 ao_ads124s0x(void)
 {
+	uint8_t	d[3], curchan;
+
 	ao_ads124s0x_setup();
-/*
+
+	ao_exti_enable(AO_ADS124S0X_DRDY_PORT, AO_ADS124S0X_DRDY_PIN);
+
 	for (;;) {
-		ao_ads124s0x_value(&ao_ads124s0x_current);
-		ao_arch_critical(
-			AO_DATA_PRESENT(AO_DATA_ADS124S0X);
-			AO_DATA_WAIT();
-			);
+		ao_sleep(&ao_ads124s0x_drdy);
+
+		curchan = nextchan;
+		nextchan = (nextchan + 1) % AO_ADS124S0X_CHANNELS;
+
+		d[0] = AO_ADS124S0X_INPMUX | AO_ADS124S0X_WREG;
+		d[1] = 1;			
+		d[2] = nextchan << 4 | 0x0c; ;	/* relative to AINCOM */
+		ao_ads124s0x_start();
+		ao_spi_duplex(d, d, 3, AO_ADS124S0X_SPI_BUS);
+		ao_ads124s0x_stop();
+
+		ao_ads124s0x_current.ain[curchan] = 
+			d[0] << 16 | d[1] << 8 | d[2];
+
+		// FIXME
+		//	If nextchan == 0, we have a complete set of inputs
+		//	and we need to log them somewhere
+
 	}
-*/
+}
+
+void ao_ads124s0x_isr(void)
+{
+	ao_wakeup(&ao_ads124s0x_drdy);
 }
 
 static struct ao_task ao_ads124s0x_task;
@@ -151,10 +177,10 @@ static void
 ao_ads124s0x_dump(void)			// FIXME
 {
 	printf ("ADS124S0X value %d %d %d %d\n",
-		ao_ads124s0x_current.ain0,
-		ao_ads124s0x_current.ain1,
-		ao_ads124s0x_current.ain2,
-		ao_ads124s0x_current.ain3);
+		ao_ads124s0x_current.ain[0],
+		ao_ads124s0x_current.ain[1],
+		ao_ads124s0x_current.ain[2],
+		ao_ads124s0x_current.ain[3]);
 }
 
 const struct ao_cmds ao_ads124s0x_cmds[] = {
@@ -166,6 +192,7 @@ void
 ao_ads124s0x_init(void)
 {
 	ao_cmd_register(ao_ads124s0x_cmds);
+
 	ao_spi_init_cs(AO_ADS124S0X_SPI_CS_PORT, 
 		(1 << AO_ADS124S0X_SPI_CS_PIN));
 
