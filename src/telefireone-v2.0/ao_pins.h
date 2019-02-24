@@ -123,6 +123,8 @@
 #define AO_ADS124S0X_RESET_PORT		(&stm_gpioc)
 #define AO_ADS124S0X_RESET_PIN		15
 
+#define AO_ADS124S0X_CHANNELS		4	/* how many inputs in use */
+
 /*
  * SPI Flash memory
  */

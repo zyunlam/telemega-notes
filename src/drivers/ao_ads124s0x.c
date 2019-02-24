@@ -46,7 +46,6 @@ ao_ads124s0x_stop(void) {
 		       AO_ADS124S0X_SPI_BUS);
 }
 
-/*
 static uint8_t
 ao_ads124s0x_reg_read(uint8_t addr)
 {
@@ -55,14 +54,16 @@ ao_ads124s0x_reg_read(uint8_t addr)
 	d[0] = addr | AO_ADS124S0X_RREG;
 	d[1] = 0;			
 	ao_ads124s0x_start();
-	ao_spi_duplex(d, d, 2, AO_ADS124S0X_SPI_BUS);
+	ao_spi_send(d, 2, AO_ADS124S0X_SPI_BUS);
+	ao_spi_recv(d, 1, AO_ADS124S0X_SPI_BUS);
 	ao_ads124s0x_stop();
 
-	PRINTD(DEBUG_LOW, "read %x = %x\n", addr, d);
+	PRINTD(DEBUG_LOW, "read %x = %x\n", addr, d[0]);
 
-	return d[1];
+	return d[0];
 }
 
+/*
 static void
 ao_ads124s0x_reg_write(uint8_t addr, uint8_t value)
 {
@@ -76,21 +77,14 @@ ao_ads124s0x_reg_write(uint8_t addr, uint8_t value)
 	ao_spi_send(d, 3, AO_ADS124S0X_SPI_BUS);
 	ao_ads124s0x_stop();
 
-#if DEBUG & DEBUG_LOW
-	d[0] = addr | AO_ADS124S0X_RREG
-	d[1] = 0;
-	ao_ads124s0x_start();
-	ao_spi_duplex(d, d, 2, AO_ADS124S0X_SPI_BUS);
-	ao_ads124s0x_stop();
-	PRINTD(DEBUG_LOW, "readback %x %x\n", d[0], d[1]);
-#endif
 }
 */
 
-// FIXME 
-//	We need to be in continuous conversion mode, and use the WREG
-//	command to set the next conversion input while reading each 
-//	which I don't see an example for elsewhere?
+static void 
+ao_ads124s0x_isr(void)
+{
+	ao_wakeup(&ao_ads124s0x_drdy);
+}
 
 static void
 ao_ads124s0x_setup(void)
@@ -101,7 +95,7 @@ ao_ads124s0x_setup(void)
 	if (devid != AO_ADS124S0X_ID_ADS124S06)
 		ao_panic(AO_PANIC_SELF_TEST_ADS124S0X);
 
-	ao_exti_setup(AO_ADS124S0x_DRDY_PORT, AO_ADS124S0X_DRDY_PIN,
+	ao_exti_setup(AO_ADS124S0X_DRDY_PORT, AO_ADS124S0X_DRDY_PIN,
 		AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH,
 		ao_ads124s0x_isr);
 
@@ -164,11 +158,6 @@ ao_ads124s0x(void)
 		//	and we need to log them somewhere
 
 	}
-}
-
-void ao_ads124s0x_isr(void)
-{
-	ao_wakeup(&ao_ads124s0x_drdy);
 }
 
 static struct ao_task ao_ads124s0x_task;
