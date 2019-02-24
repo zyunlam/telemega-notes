@@ -49,18 +49,18 @@ ao_ads124s0x_stop(void) {
 static uint8_t
 ao_ads124s0x_reg_read(uint8_t addr)
 {
-	uint8_t	d[2];
+	uint8_t	d[3];
 
 	d[0] = addr | AO_ADS124S0X_RREG;
 	d[1] = 0;			
+	d[2] = 0;			
 	ao_ads124s0x_start();
-	ao_spi_send(d, 2, AO_ADS124S0X_SPI_BUS);
-	ao_spi_recv(d, 1, AO_ADS124S0X_SPI_BUS);
+	ao_spi_duplex(d, d, 3, AO_ADS124S0X_SPI_BUS);
 	ao_ads124s0x_stop();
 
 	PRINTD(DEBUG_LOW, "read %x = %x\n", addr, d[0]);
 
-	return d[0];
+	return d[2];
 }
 
 /*
@@ -83,6 +83,7 @@ ao_ads124s0x_reg_write(uint8_t addr, uint8_t value)
 static void 
 ao_ads124s0x_isr(void)
 {
+	ao_ads124s0x_drdy = 1;
 	ao_wakeup(&ao_ads124s0x_drdy);
 }
 
@@ -91,8 +92,14 @@ ao_ads124s0x_setup(void)
 {
 	uint8_t	d[20];
 
+	ao_delay(1);
+
+	ao_gpio_set(AO_ADS124S0X_RESET_PORT, AO_ADS124S0X_RESET_PIN, 1);
+
+	ao_delay(1);
+
 	uint8_t	devid = ao_ads124s0x_reg_read(AO_ADS124S0X_ID);
-	if (devid != AO_ADS124S0X_ID_ADS124S06)
+	if ((devid & 7) != AO_ADS124S0X_ID_ADS124S06)
 		ao_panic(AO_PANIC_SELF_TEST_ADS124S0X);
 
 	ao_exti_setup(AO_ADS124S0X_DRDY_PORT, AO_ADS124S0X_DRDY_PIN,
@@ -138,7 +145,11 @@ ao_ads124s0x(void)
 	ao_exti_enable(AO_ADS124S0X_DRDY_PORT, AO_ADS124S0X_DRDY_PIN);
 
 	for (;;) {
-		ao_sleep(&ao_ads124s0x_drdy);
+		ao_arch_block_interrupts();
+		ao_ads124s0x_drdy = 0;
+		while (ao_ads124s0x_drdy == 0)
+			ao_sleep(&ao_ads124s0x_drdy);
+		ao_arch_release_interrupts();
 
 		curchan = nextchan;
 		nextchan = (nextchan + 1) % AO_ADS124S0X_CHANNELS;
@@ -157,6 +168,7 @@ ao_ads124s0x(void)
 		//	If nextchan == 0, we have a complete set of inputs
 		//	and we need to log them somewhere
 
+		ao_ads124s0x_drdy = 0;
 	}
 }
 
@@ -165,8 +177,13 @@ static struct ao_task ao_ads124s0x_task;
 static void
 ao_ads124s0x_dump(void)	
 {
-	ao_add_task(&ao_ads124s0x_task, ao_ads124s0x, "ads124s0x");
+	static int done;
 
+	if (!done) {
+		done = 1;
+		ao_add_task(&ao_ads124s0x_task, ao_ads124s0x, "ads124s0x");
+	}
+		
 	printf ("ADS124S0X value %d %d %d %d\n",
 		ao_ads124s0x_current.ain[0],
 		ao_ads124s0x_current.ain[1],
@@ -183,6 +200,8 @@ void
 ao_ads124s0x_init(void)
 {
 	ao_cmd_register(ao_ads124s0x_cmds);
+
+	ao_enable_output(AO_ADS124S0X_RESET_PORT, AO_ADS124S0X_RESET_PIN, 0);
 
 	ao_spi_init_cs(AO_ADS124S0X_SPI_CS_PORT, 
 		(1 << AO_ADS124S0X_SPI_CS_PIN));
