@@ -22,6 +22,7 @@
 #include <ao_exti.h>
 #include <ao_radio_cmac_cmd.h>
 #include <ao_eeprom.h>
+#include <ao_ads124s0x.h>
 
 static void
 set_logging(void)
@@ -67,6 +68,8 @@ main(void)
 	ao_pad_init();
 
 //	ao_radio_cmac_cmd_init();
+
+	ao_ads124s0x_init();
 
 	ao_start_scheduler();
 }

@@ -163,8 +163,10 @@ ao_ads124s0x(void)
 static struct ao_task ao_ads124s0x_task;
 
 static void
-ao_ads124s0x_dump(void)			// FIXME
+ao_ads124s0x_dump(void)	
 {
+	ao_add_task(&ao_ads124s0x_task, ao_ads124s0x, "ads124s0x");
+
 	printf ("ADS124S0X value %d %d %d %d\n",
 		ao_ads124s0x_current.ain[0],
 		ao_ads124s0x_current.ain[1],
@@ -185,5 +187,5 @@ ao_ads124s0x_init(void)
 	ao_spi_init_cs(AO_ADS124S0X_SPI_CS_PORT, 
 		(1 << AO_ADS124S0X_SPI_CS_PIN));
 
-	ao_add_task(&ao_ads124s0x_task, ao_ads124s0x, "ads124s0x");
+//	ao_add_task(&ao_ads124s0x_task, ao_ads124s0x, "ads124s0x");
 }
