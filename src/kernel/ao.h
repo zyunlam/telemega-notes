@@ -117,6 +117,10 @@ extern volatile AO_TICK_TYPE ao_tick_count;
 AO_TICK_TYPE
 ao_time(void);
 
+/* Returns the current time in ns */
+uint64_t
+ao_time_ns(void);
+
 /* Suspend the current task until ticks time has passed */
 void
 ao_delay(uint16_t ticks);
