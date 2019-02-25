@@ -20,7 +20,7 @@
 
 volatile AO_TICK_TYPE ao_tick_count;
 
-uint16_t
+AO_TICK_TYPE
 ao_time(void)
 {
 	return ao_tick_count;

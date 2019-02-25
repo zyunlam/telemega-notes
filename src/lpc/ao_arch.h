@@ -33,11 +33,6 @@
 
 #define AO_LED_TYPE	AO_PORT_TYPE
 
-#ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint16_t
-#define AO_TICK_SIGNED	int16_t
-#endif
-
 /* Various definitions to make GCC look more like SDCC */
 
 #define ao_arch_naked_declare	__attribute__((naked))

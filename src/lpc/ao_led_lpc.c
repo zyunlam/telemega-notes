@@ -49,7 +49,7 @@ ao_led_toggle(AO_PORT_TYPE colors)
 }
 
 void
-ao_led_for(AO_PORT_TYPE colors, uint16_t ticks) 
+ao_led_for(AO_PORT_TYPE colors, AO_TICK_TYPE ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);

@@ -30,11 +30,6 @@
 #define AO_STACK_SIZE	512
 #endif
 
-#ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint16_t
-#define AO_TICK_SIGNED	int16_t
-#endif
-
 #define AO_PORT_TYPE	uint16_t
 
 /* Various definitions to make GCC look more like SDCC */

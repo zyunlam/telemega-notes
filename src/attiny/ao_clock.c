@@ -28,7 +28,7 @@ ISR(TIMER1_COMPA_vect)
 		ao_wakeup((void *) &ao_tick_count);
 }
 
-uint16_t
+AO_TICK_TYPE
 ao_time(void)
 {
 	uint16_t	r;
