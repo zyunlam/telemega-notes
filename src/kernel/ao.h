@@ -100,8 +100,8 @@ extern AO_ROMCONFIG_SYMBOL uint32_t ao_radio_cal;
  */
 
 #ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint16_t
-#define AO_TICK_SIGNED	int16_t
+#define AO_TICK_TYPE	uint32_t
+#define AO_TICK_SIGNED	int32_t
 #endif
 
 extern volatile AO_TICK_TYPE ao_tick_count;
@@ -116,6 +116,10 @@ extern volatile AO_TICK_TYPE ao_tick_count;
 /* Returns the current time in ticks */
 AO_TICK_TYPE
 ao_time(void);
+
+/* Returns the current time in ns */
+uint64_t
+ao_time_ns(void);
 
 /* Suspend the current task until ticks time has passed */
 void
