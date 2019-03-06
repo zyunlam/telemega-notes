@@ -55,7 +55,7 @@
 		The TeleLCO unit should be placed on a table at the Launch
 		Control position.  It can be helpful for the LCO (the human(s)
 		too, not just the electronics!) to be provided with some 
-		shade, but the use of transreflexive LCDs for the digit 
+		shade, but the use of reflective LCDs for the digit 
 		displays and ultri-bright LEDs make TeleLCO operation 
 		reasonable even in direct sunlight.
 

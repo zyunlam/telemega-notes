@@ -1,6 +1,6 @@
 == Configuration
 
-	There are 3 things you need to configure identically in each unit
+	There are three things you need to configure identically in each unit
 	that is part of a TeleLaunch system for wireless communications to
 	succeed.  Those are the operating frequency, the callsign, and a key
 	for the AES encryption algorithm.  Additionally, each TeleFire unit
@@ -115,7 +115,7 @@
 
 		Each TeleFire unit needs to be configured with a bank number,
 		and bank numbers should be unique within a given system.  For
-		most systems with 8 or less banks, just use the DIP switch
+		most systems with 8 or fewer banks, just use the DIP switch
 		on the circuit board inside the TeleFire unit to select the
 		desired bank.  Only one switch should be turned on.  Switch
 		one means bank one, etc.
