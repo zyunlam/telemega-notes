@@ -34,6 +34,7 @@
 
 /* register map */
 #define AO_ADS1256_STATUS	0x00
+#define AO_ADS1256_ID_ADS1256		0x03
 #define AO_ADS1256_MUX		0x01
 #define AO_ADS1256_ADCON	0x02
 #define AO_ADS1256_DRATE	0x03

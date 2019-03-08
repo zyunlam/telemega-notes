@@ -100,7 +100,7 @@ ao_ads124s0x_setup(void)
 
 	uint8_t	devid = ao_ads124s0x_reg_read(AO_ADS124S0X_ID);
 	if ((devid & 7) != AO_ADS124S0X_ID_ADS124S06)
-		ao_panic(AO_PANIC_SELF_TEST_ADS124S0X);
+		ao_panic(AO_PANIC_SELF_TEST_ADS);
 
 	ao_exti_setup(AO_ADS124S0X_DRDY_PORT, AO_ADS124S0X_DRDY_PIN,
 		AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH,

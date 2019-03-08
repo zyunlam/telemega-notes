@@ -46,7 +46,7 @@ ao_ads1256_stop(void) {
 		       AO_ADS1256_SPI_BUS);
 }
 
-/*
+
 static uint8_t
 ao_ads1256_reg_read(uint8_t addr)
 {
@@ -64,7 +64,7 @@ ao_ads1256_reg_read(uint8_t addr)
 
 	return d[0];
 }
-*/
+
 /*
 static void
 ao_ads1256_reg_write(uint8_t addr, uint8_t value)
@@ -102,24 +102,11 @@ ao_ads1256_setup(void)
 		AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH,
 		ao_ads1256_isr);
 
-	/* reset the chip */
+	/* read status register and confirm device id matches */
 
-//	d[0] = AO_ADS1256_RESET;
-//	ao_ads1256_start();
-//	ao_spi_send(d, 1, AO_ADS1256_SPI_BUS);
-//	ao_ads1256_stop();
-
-	/* read status register */
-
-	d[0] = AO_ADS1256_STATUS | AO_ADS1256_RREG;
-	ao_ads1256_start();
-	ao_spi_send(d, 1, AO_ADS1256_SPI_BUS);
-	d[0] = 0;
-	ao_spi_send(d, 1, AO_ADS1256_SPI_BUS);
-	ao_spi_recv(d, 1, AO_ADS1256_SPI_BUS);
-	ao_ads1256_stop();
-
-	printf ("ADS1256 status 0x%x\n", d[0]);
+        uint8_t devid = ao_ads1256_reg_read(AO_ADS1256_STATUS) >> 4;
+        if (devid != AO_ADS1256_ID_ADS1256)
+                ao_panic(AO_PANIC_SELF_TEST_ADS);
 
 	/* write configuration registers, tell converter to start working */
 
@@ -128,7 +115,7 @@ ao_ads1256_setup(void)
 	d[2] = 0x00;	/* msb first, auto-cal off, analog buffer disabled */
 	d[3] = 0x08;	/* mux AIN0 relative to AINCOM */
 	d[4] = 0x20;	/* clock out = fclkin, sensor detect off, pga gain 1 */
-	d[5] = 0xf0;	/* data rate 30,000 SPS */
+	d[5] = 0xf0;	/* data rate 7500 SPS */
 	d[6] = 0xf0;	/* all gpio pins are inputs */
 	d[7] = AO_ADS1256_SYNC;
 	d[8] = AO_ADS1256_WAKEUP;
@@ -164,7 +151,6 @@ ao_ads1256(void)
 		d[5] = AO_ADS1256_RDATA;
 		ao_ads1256_start();
 		ao_spi_send(d, 6, AO_ADS1256_SPI_BUS);
-//		ao_delay(1);
 		ao_spi_recv(d, 3, AO_ADS1256_SPI_BUS);
 		ao_ads1256_stop();
 
@@ -191,7 +177,7 @@ ao_ads1256_dump(void)
 		ao_add_task(&ao_ads1256_task, ao_ads1256, "ads1256");
 	}
 		
-	printf ("ADS1256 value %d %d %d %d\n",
+	printf ("ADS1256 value 0x%x 0x%x 0x%x 0x%x\n",
 		ao_ads1256_current.ain[0],
 		ao_ads1256_current.ain[1],
 		ao_ads1256_current.ain[2],
