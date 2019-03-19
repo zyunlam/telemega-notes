@@ -262,13 +262,12 @@ ao_clock_init(void)
 #if DEBUG_THE_CLOCK
 	/* Output PLL clock on PA8 and SYCLK on PC9 for measurments */
 
-	stm_rcc.ahb1enr |= ((1 << STM_RCC_AHB1ENR_IOPAEN) |
-			    (1 << STM_RCC_AHB1ENR_IOPCEN));
-
+	ao_enable_port(&stm_gpioa);
 	stm_afr_set(&stm_gpioa, 8, STM_AFR_AF0);
 	stm_moder_set(&stm_gpioa, 8, STM_MODER_ALTERNATE);
 	stm_ospeedr_set(&stm_gpioa, 8, STM_OSPEEDR_HIGH);
 
+	ao_enable_port(&stm_gpioc);
 	stm_afr_set(&stm_gpioc, 9, STM_AFR_AF0);
 	stm_moder_set(&stm_gpioc, 9, STM_MODER_ALTERNATE);
 	stm_ospeedr_set(&stm_gpioc, 9, STM_OSPEEDR_HIGH);
