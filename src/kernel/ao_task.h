@@ -26,10 +26,10 @@
 #define HAS_TASK_INFO 1
 #endif
 
-/* arm stacks must be 32-bit aligned */
+/* arm stacks must be 64-bit aligned */
 #ifndef AO_STACK_ALIGNMENT
 #ifdef __arm__
-#define AO_STACK_ALIGNMENT __attribute__ ((aligned(4)))
+#define AO_STACK_ALIGNMENT __attribute__ ((aligned(8)))
 #else
 #define AO_STACK_ALIGNMENT
 #endif
@@ -50,11 +50,11 @@ struct ao_task {
 	struct ao_list	queue;
 	struct ao_list	alarm_queue;
 #endif
-	/* Provide both 32-bit and 8-bit stacks, always 32-bit aligned */
+	/* Provide both 32-bit and 8-bit stacks */
 	union {
 		uint32_t stack32[AO_STACK_SIZE>>2];
 		uint8_t stack8[AO_STACK_SIZE];
-	};
+	} AO_STACK_ALIGNMENT;
 #if HAS_SAMPLE_PROFILE
 	uint32_t ticks;
 	uint32_t yields;
