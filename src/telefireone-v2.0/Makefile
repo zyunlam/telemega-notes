@@ -55,7 +55,8 @@ ALTOS_SRC = \
 	ao_radio_cmac_cmd.c \
 	ao_log.c \
 	ao_log_fireone.c \
-	ao_ads124s0x.c
+	ao_ads124s0x.c \
+	ao_max6691.c
 
 PRODUCT_SRC = \
 	ao_telefireone.c

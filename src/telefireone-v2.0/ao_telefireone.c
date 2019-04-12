@@ -23,6 +23,7 @@
 #include <ao_radio_cmac_cmd.h>
 #include <ao_eeprom.h>
 #include <ao_ads124s0x.h>
+#include <ao_max6691.h>
 
 static void
 set_logging(void)
@@ -54,6 +55,8 @@ main(void)
 	ao_cmd_init();
 
 	ao_adc_init();
+
+	ao_max6691_init();
 
 	ao_eeprom_init();
 	ao_storage_init();
