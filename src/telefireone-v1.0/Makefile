@@ -89,3 +89,5 @@ install:
 
 uninstall:
 
+echo:
+	echo $(PROG) $(VERSION)

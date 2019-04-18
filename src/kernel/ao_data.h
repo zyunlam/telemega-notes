@@ -328,8 +328,6 @@ typedef int16_t	accel_t;
 
 #define HAS_ACCEL	1
 
-#define AO_ACCEL_INVERT		0
-
 typedef int16_t accel_t;
 
 /* MPU6000 is hooked up so that positive y is positive acceleration */

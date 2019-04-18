@@ -665,10 +665,6 @@ ao_config_pad_orientation_show(void)
 	printf("Pad orientation: %d\n", ao_config.pad_orientation);
 }
 
-#ifndef AO_ACCEL_INVERT
-#define AO_ACCEL_INVERT	0x7fff
-#endif
-
 static void
 ao_config_pad_orientation_set(void) 
 {
@@ -677,10 +673,10 @@ ao_config_pad_orientation_set(void)
 		return;
 	_ao_config_edit_start();
 	if (ao_config.pad_orientation != r) {
-		int16_t t;
+		accel_t t;
 		t = ao_config.accel_plus_g;
-		ao_config.accel_plus_g = AO_ACCEL_INVERT - ao_config.accel_minus_g;
-		ao_config.accel_minus_g = AO_ACCEL_INVERT - t;
+		ao_config.accel_plus_g = ao_data_accel_invert(ao_config.accel_minus_g);
+		ao_config.accel_minus_g = ao_data_accel_invert(t);
 	}
 	ao_config.pad_orientation = r;
 	_ao_config_edit_finish();
