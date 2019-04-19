@@ -88,22 +88,103 @@ public class AltosIMU implements Cloneable {
 		return n;
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException {
+	public static final int orient_telemega = 0;
+	public static final int orient_easymega_v2 = 1;
+
+	private int accel_across(int orient) {
+		switch (orient) {
+		case orient_telemega:
+			return accel_x;
+		case orient_easymega_v2:
+			return -accel_y;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int accel_along(int orient) {
+		switch (orient) {
+		case orient_telemega:
+			return accel_y;
+		case orient_easymega_v2:
+			return accel_x;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int accel_through(int orient) {
+		return accel_z;
+	}
+
+	private int gyro_roll(int orient) {
+		switch (orient) {
+		case orient_telemega:
+			return gyro_y;
+		case orient_easymega_v2:
+			return gyro_x;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int gyro_pitch(int orient) {
+		switch (orient) {
+		case orient_telemega:
+			return gyro_x;
+		case orient_easymega_v2:
+			return -gyro_y;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int gyro_yaw(int orient) {
+		return gyro_z;
+	}
+
+	private int mag_across(int orient) {
+		switch (orient) {
+		case orient_telemega:
+			return mag_x;
+		case orient_easymega_v2:
+			return -mag_y;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_along(int orient) {
+		switch (orient) {
+		case orient_telemega:
+			return mag_y;
+		case orient_easymega_v2:
+			return mag_x;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_through(int orient) {
+		return mag_z;
+	}
+
+	static public void provide_data(AltosDataListener listener, AltosLink link, int orient) throws InterruptedException {
 		try {
 			AltosIMU	imu = new AltosIMU(link);
 			AltosCalData	cal_data = listener.cal_data();
 
 			if (imu != null) {
-				listener.set_gyro(cal_data.gyro_roll(imu.gyro_y),
-						  cal_data.gyro_pitch(imu.gyro_x),
-						  cal_data.gyro_yaw(imu.gyro_z));
-				listener.set_accel_ground(imu.accel_y,
-							  imu.accel_x,
-							  imu.accel_z);
+				listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll(orient)),
+						  cal_data.gyro_pitch(imu.gyro_pitch(orient)),
+						  cal_data.gyro_yaw(imu.gyro_yaw(orient)));
+				listener.set_accel_ground(imu.accel_along(orient),
+							  imu.accel_across(orient),
+							  imu.accel_through(orient));
 				if (imu.mag_x != AltosLib.MISSING) {
-					listener.set_mag(cal_data.mag_along(imu.mag_y),
-							 cal_data.mag_across(imu.mag_x),
-							 cal_data.mag_through(imu.mag_z));
+					listener.set_mag(cal_data.mag_along(imu.mag_along(orient)),
+							 cal_data.mag_across(imu.mag_across(orient)),
+							 cal_data.mag_through(imu.mag_through(orient)));
 				}
 			}
 		} catch (TimeoutException te) {
