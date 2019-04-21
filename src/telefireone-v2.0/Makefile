@@ -65,6 +65,10 @@ PRODUCT=TeleFireOne-v2.0
 PRODUCT_DEF=-DTELEFIREONE_V_2_0
 IDPRODUCT=0x000f
 
+# Include floating-point enabled printf
+
+NEWLIB_PRINTF_CFLAGS = 
+
 CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF)
 
 PROGNAME = telefireone-v2.0
