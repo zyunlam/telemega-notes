@@ -55,12 +55,9 @@ bletch:
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS) -Wl,-M=$(PROGNAME).map
 
 $(OBJ): $(INC)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
 ao_scheme_const.h: ao-scheme-make-const ao_scheme_basic_syntax.scheme
 	$^ -o $@ -d FLOAT,VECTOR,QUASI,BIGINT,POSIX,PORT,SAVE,UNDEF
