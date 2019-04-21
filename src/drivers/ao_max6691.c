@@ -14,22 +14,48 @@
 
 #include "ao.h"
 #include "ao_max6691.h"
+#include "ao_exti.h"
 
-#define cat(a,b)	a ## b
+#define cat2(a,b)	a ## b
+#define cat(a,b)	cat2(a,b)
+
+#if AO_MAX6691_CH != 2
+#error ao_max6691 driver currently only works for timer channel 2
+#endif
 
 #define AO_MAX6691_CCR		(AO_MAX6691_TIMER->cat(ccr, AO_MAX6691_CH))
 
-#if 0
-static uint16_t	ao_max6691_data[8];
+/* Two samples per channel, plus time start value and two for Tready pulse */
+
+#define AO_MAX6691_SAMPLES	(AO_MAX6691_CHANNELS * 2 + 3)
+
+static uint16_t	ao_max6691_raw[AO_MAX6691_SAMPLES];
+
+static inline uint16_t
+ao_max6691_t_high(int channel)
+{
+	return ao_max6691_raw[channel * 2 + 3] - ao_max6691_raw[channel * 2 + 2];
+}
+
+static inline uint16_t
+ao_max6691_t_low(int channel)
+{
+	return ao_max6691_raw[channel * 2 + 4] - ao_max6691_raw[channel * 2 + 3];
+}
 
 void
-ao_max6691_sample(void)
+ao_max6691_sample(struct ao_max6691 *ao_max6691)
 {
+	struct stm_tim234	*tim = AO_MAX6691_TIMER;
+
+	tim->sr = 0;
+
+	memset(&ao_max6691_raw, '\0', sizeof (ao_max6691_raw));
 	/* Get the DMA engine ready */
 	ao_dma_set_transfer(AO_MAX6691_DMA,
 			    &AO_MAX6691_CCR,
-			    &ao_max6691_data,
-			    8,
+			    &ao_max6691_raw,
+			    AO_MAX6691_SAMPLES,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
 			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
 			    (STM_DMA_CCR_MSIZE_16 << STM_DMA_CCR_MSIZE) |
@@ -41,66 +67,120 @@ ao_max6691_sample(void)
 	ao_dma_start(AO_MAX6691_DMA);
 
 	/* Prod the max6691 */
-	ao_gpio_set(AO_MAX6691_PORT, AO_MAX6691_PIN, 0);
-	ao_arch_nop();
-	ao_gpio_set(AO_MAX6691_PORT, AO_MAX6691_PIN, 1);
+	ao_set_output(AO_MAX6691_GPIO, AO_MAX6691_PIN, 0);
+	int i;
+	for (i = 0; i < 100; i++)
+		ao_arch_nop();
+	ao_set_input(AO_MAX6691_GPIO, AO_MAX6691_PIN);
+	for (i = 0; i < 100; i++)
+		ao_arch_nop();
+
+	/* Reset the timer count */
+	tim->cnt = 0;
 
 	/* Switch the pin to timer input mode */
 	stm_afr_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, STM_AFR_AF1);
 
+	tim->ccer = ((0 << STM_TIM234_CCER_CC1E) |
+		     (0 << STM_TIM234_CCER_CC1P) |
+		     (0 << STM_TIM234_CCER_CC1NP) |
+		     (1 << STM_TIM234_CCER_CC2E) |
+		     (1 << STM_TIM234_CCER_CC2P) |
+		     (1 << STM_TIM234_CCER_CC2NP) |
+		     (0 << STM_TIM234_CCER_CC3E) |
+		     (0 << STM_TIM234_CCER_CC3P) |
+		     (0 << STM_TIM234_CCER_CC3NP) |
+		     (0 << STM_TIM234_CCER_CC4E) |
+		     (0 << STM_TIM234_CCER_CC4P) |
+		     (0 << STM_TIM234_CCER_CC4NP));
+
+	/* Enable event generation on channel 2 */
+
+	tim->egr = ((0 << STM_TIM234_EGR_TG) |
+		    (0 << STM_TIM234_EGR_CC4G) |
+		    (0 << STM_TIM234_EGR_CC3G) |
+		    (1 << STM_TIM234_EGR_CC2G) |
+		    (0 << STM_TIM234_EGR_CC1G) |
+		    (0 << STM_TIM234_EGR_UG));
+	/* Start the timer */
+	tim->cr1 |= (1 << STM_TIM234_CR1_CEN);
+
 	ao_arch_block_interrupts();
-	while (!ao_dma_done(AO_MAX6691_DMA))
-		ao_sleep(&ao_dma_done(AO_MAX6691_DMA));
+	while (!ao_dma_done[AO_MAX6691_DMA])
+		ao_sleep(&ao_dma_done[AO_MAX6691_DMA]);
 	ao_arch_release_interrupts();
 
-	/* Switch pin back to output mode */
-	stm_moder_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, STM_MODER_OUTPUT);
+	/* Disable event generation */
+	tim->egr = 0;
+
+	/* Disable capture */
+	tim->ccer = 0;
+
+	/* Stop the timer */
+	tim->cr1 &= ~(1 << STM_TIM234_CR1_CEN);
+
+	/* Switch back to GPIO mode */
+	stm_moder_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, STM_MODER_INPUT);
 
 	/* Mark DMA done */
 	ao_dma_done_transfer(AO_MAX6691_DMA);
+
+	for (i = 0; i < AO_MAX6691_CHANNELS; i++) {
+		ao_max6691->sensor[i].t_high = ao_max6691_t_high(i);
+		ao_max6691->sensor[i].t_low = ao_max6691_t_low(i);
+	}
 }
-#endif
+
+#define R_EXT	1000.0f
 
 static void
 ao_max6691_test(void)
 {
+	struct ao_max6691 ao_max6691;
+
+	printf("Testing MAX6691\n"); flush();
+	ao_max6691_sample(&ao_max6691);
+
 	int i;
+	for (i = 0; i < AO_MAX6691_SAMPLES; i++)
+		printf("%d: %5u\n", i, ao_max6691_raw[i]);
 
-	printf("Testing MAX6691\n");
-	/* Prod the max6691 */
-	ao_set_output(AO_MAX6691_GPIO, AO_MAX6691_PIN, 0);
-	for (i = 0; i < 1000; i++) {
-		ao_led_on(AO_LED_ARMED);
-		ao_gpio_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, 0);
-		ao_delay(AO_MS_TO_TICKS(250));
-		ao_led_off(AO_LED_ARMED);
-		ao_gpio_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, 1);
-		ao_delay(AO_MS_TO_TICKS(250));
-	}
-#if 0
-	uint16_t	tick;
-	uint16_t	i, j;
-	uint8_t		p, v;
+	for (i = 0; i < AO_MAX6691_CHANNELS; i++) {
+		uint16_t	t_high = ao_max6691.sensor[i].t_high;
+		uint16_t	t_low = ao_max6691.sensor[i].t_low;
 
-	for (i = 0; i < 100; i++)
-		ao_arch_nop();
-	ao_gpio_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, 1);
-	ao_arch_nop();
-	ao_set_input(AO_MAX6691_GPIO, AO_MAX6691_PIN);
-	i = 0;
-	p = 1;
-	for (tick = 0; i < 8 && tick < 10000; tick++)
-	{
-		v = ao_gpio_get(AO_MAX6691_GPIO, AO_MAX6691_PIN);
-		if (v != p) {
-			ao_max6691_data[i++] = tick;
-			p = v;
-		}
+		/*
+		 * From the MAX6691 data sheet
+		 *
+		 *	Thigh   Vext               Rext
+		 *	----- = ---- - 0.0002 = ---------- - 0.0002
+		 *	Tlow    Vref            Rext - Rth
+		 *
+		 *	We want to find Rth given Rext and the timing values
+		 *
+		 *	Thigh              Rext
+		 *	----- + 0.0002 = ----------
+		 *	Tlow             Rext + Rth
+		 *
+		 *	V = (Thigh / Tlow + 0.0002)
+		 *
+		 *	(Rext + Rth) * V = Rext
+		 *
+		 *	Rext * V + Rth * V = Rext
+		 *
+		 *	Rth * V = Rext - Rext * V
+		 *
+		 *	Rth * V = Rext * (1 - V)
+		 *
+		 *	Rth = Rext * (1 - V) / V
+		 */
+
+		float V = (float) t_high / (float) t_low + 0.0002f;
+
+		float Rth = R_EXT * (1 - V) / V;
+
+		printf("%d: high %5u low %5u ohms: %7g\n", i, t_high, t_low, Rth);
 	}
-	for (j = 0; j < i; i++)
-		printf("%d: %5u\n", j, ao_max6691_data[j]);
-#endif
-	printf("Done\n");
 }
 
 static const struct ao_cmds ao_max6691_cmds[] = {
@@ -114,59 +194,28 @@ ao_max6691_init(void)
 {
 	ao_cmd_register(&ao_max6691_cmds[0]);
 
-#if 0
-	struct stm_tim234	*tim = &AO_MAX6691_TIMER;
+	struct stm_tim234	*tim = AO_MAX6691_TIMER;
 
 	stm_rcc.apb1enr |= (1 << AO_MAX6691_TIMER_ENABLE);
 
 	tim->cr1 = 0;
-	tim->psc = 0;
+	tim->psc = (AO_TIM23467_CLK / 4000000) - 1;	/* run the timer at 4MHz */
 	tim->cnt = 0;
 
-	tim->ccmr1 = ((0 << STM_TIM234_CCMR1_IC2F) |
-		      (
+	/*
+	 * XXX This assumes we're using CH2, which is true on TeleFireOne v2.0
+	 */
+	tim->ccmr1 = ((STM_TIM234_CCMR1_IC2F_NONE << STM_TIM234_CCMR1_IC2F) |
+		      (STM_TIM234_CCMR1_IC2PSC_NONE << STM_TIM234_CCMR1_IC2PSC) |
+		      (STM_TIM234_CCMR1_CC2S_INPUT_TI2 << STM_TIM234_CCMR1_CC2S));
 
-
-	tim->ccmr2 = ((0 << STM_TIM234_CCMR2_OC4CE) |
-		      (STM_TIM234_CCMR2_OC4M_PWM_MODE_1 << STM_TIM234_CCMR2_OC4M) |
-		      (0 << STM_TIM234_CCMR2_OC4PE) |
-		      (0 << STM_TIM234_CCMR2_OC4FE) |
-		      (STM_TIM234_CCMR2_CC4S_OUTPUT << STM_TIM234_CCMR2_CC4S) |
-
-		      (0 << STM_TIM234_CCMR2_OC3CE) |
-		      (STM_TIM234_CCMR2_OC3M_PWM_MODE_1 << STM_TIM234_CCMR2_OC3M) |
-		      (0 << STM_TIM234_CCMR2_OC3PE) |
-		      (0 << STM_TIM234_CCMR2_OC3FE) |
-		      (STM_TIM234_CCMR2_CC3S_OUTPUT << STM_TIM234_CCMR2_CC3S));
-	tim->ccer = ((1 << STM_TIM234_CCER_CC1E) |
-		     (0 << STM_TIM234_CCER_CC1P) |
-		     (1 << STM_TIM234_CCER_CC2E) |
-		     (0 << STM_TIM234_CCER_CC2P) |
-		     (1 << STM_TIM234_CCER_CC3E) |
-		     (0 << STM_TIM234_CCER_CC3P) |
-		     (1 << STM_TIM234_CCER_CC4E) |
-		     (0 << STM_TIM234_CCER_CC4P));
-
-	tim->egr = 0;
+	tim->ccer = 0;
 
 	tim->sr = 0;
 	tim->dier = 0;
 	tim->smcr = 0;
 	tim->cr2 = ((0 << STM_TIM234_CR2_TI1S) |
 		    (STM_TIM234_CR2_MMS_RESET<< STM_TIM234_CR2_MMS) |
-		    (0 << STM_TIM234_CR2_CCDS));
-
-	tim->cr1 = ((STM_TIM234_CR1_CKD_1 << STM_TIM234_CR1_CKD) |
-		    (0 << STM_TIM234_CR1_ARPE) |
-		    (STM_TIM234_CR1_CMS_EDGE << STM_TIM234_CR1_CMS) |
-		    (STM_TIM234_CR1_DIR_UP << STM_TIM234_CR1_DIR) |
-		    (0 << STM_TIM234_CR1_OPM) |
-		    (0 << STM_TIM234_CR1_URS) |
-		    (0 << STM_TIM234_CR1_UDIS) |
-		    (1 << STM_TIM234_CR1_CEN));
-
-	tim->cr2 = ((0 << STM_TIM234_CR2_TI1S) |
-		    (STM_TIM234_CR2_MMS_RESET << STM_TIM234_CR2_MMS) |
 		    (0 << STM_TIM234_CR2_CCDS));
 
 	tim->dier = ((0 << STM_TIM234_DIER_TDE) |
@@ -181,19 +230,17 @@ ao_max6691_init(void)
 		     (0 << STM_TIM234_DIER_CC1IE) |
 		     (0 << STM_TIM234_DIER_UIE));
 
-	tim->egr = ((0 << STM_TIM234_EGR_TG) |
-		    (0 << STM_TIM234_EGR_CC4G) |
-		    (0 << STM_TIM234_EGR_CC3G) |
-		    (1 << STM_TIM234_EGR_CC2G) |
-		    (0 << STM_TIM234_EGR_CC1G) |
-		    (0 << STM_TIM234_EGR_UG));
+	tim->egr = 0;
 
-	tim->ccmr1 = ((0 << STM_TIM234_CCMR_IC2F) |
-		      (0 << STM_TIM234_CCMR_IC2PSC) |
-		      (2 << STM_TIM234_CCMR_CC2S) |
-		      (
+	tim->cr1 = ((STM_TIM234_CR1_CKD_1 << STM_TIM234_CR1_CKD) |
+		    (0 << STM_TIM234_CR1_ARPE) |
+		    (STM_TIM234_CR1_CMS_EDGE << STM_TIM234_CR1_CMS) |
+		    (STM_TIM234_CR1_DIR_UP << STM_TIM234_CR1_DIR) |
+		    (0 << STM_TIM234_CR1_OPM) |
+		    (0 << STM_TIM234_CR1_URS) |
+		    (0 << STM_TIM234_CR1_UDIS) |
+		    (0 << STM_TIM234_CR1_CEN));
 
 	stm_ospeedr_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, STM_OSPEEDR_40MHz);
-#endif
-	ao_enable_output(AO_MAX6691_GPIO, AO_MAX6691_PIN, 1);
+	ao_enable_input(AO_MAX6691_GPIO, AO_MAX6691_PIN, AO_EXTI_MODE_PULL_UP);
 }
