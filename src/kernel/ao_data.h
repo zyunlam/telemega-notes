@@ -69,6 +69,13 @@
 #define AO_DATA_ADXL375 0
 #endif
 
+#if HAS_MAX6691
+#include <ao_max6691.h>
+#define AO_DATA_MAX6691 (1 << 4)
+#else
+#define AO_DATA_MAX6691 0
+#endif
+
 #ifdef AO_DATA_RING
 
 #define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375)
@@ -99,6 +106,12 @@ struct ao_data {
 #endif
 #if HAS_ADXL375
 	struct ao_adxl375_sample	adxl375;
+#endif
+#if HAS_MAX6691
+	struct ao_max6691_sample	max6691;
+#endif
+#if HAS_ADS131A0X
+	struct ao_ads131a0x_sample	ads131a0x;
 #endif
 };
 
@@ -455,6 +468,12 @@ ao_data_fill(int head) {
 #endif
 #if HAS_ADXL375
 		ao_data_ring[head].adxl375 = ao_adxl375_current;
+#endif
+#if HAS_MAX6691
+		ao_data_ring[head].max6691 = ao_max6691_current;
+#endif
+#if HAS_ADS131A0X
+		ao_data_ring[head].ads131a0x = ao_ads131a0x_current;
 #endif
 		ao_data_ring[head].tick = ao_tick_count;
 		ao_data_head = ao_data_ring_next(head);
