@@ -17,15 +17,14 @@
 
 #define AO_MAX6691_CHANNELS	4
 
-struct ao_max6691 {
+struct ao_max6691_sample {
 	struct {
 		uint16_t	t_high;
 		uint16_t	t_low;
 	} sensor[AO_MAX6691_CHANNELS];
 };
 
-void
-ao_max6691_sample(struct ao_max6691 *ao_max6691);
+extern struct ao_max6691_sample ao_max6691_current;
 
 void
 ao_max6691_init(void);

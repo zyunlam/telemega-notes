@@ -43,8 +43,10 @@ ao_max6691_t_low(int channel)
 	return ao_max6691_raw[channel * 2 + 4] - ao_max6691_raw[channel * 2 + 3];
 }
 
-void
-ao_max6691_sample(struct ao_max6691 *ao_max6691)
+struct ao_max6691_sample ao_max6691_current;
+
+static void
+ao_max6691_sample(void)
 {
 	struct stm_tim234	*tim = AO_MAX6691_TIMER;
 
@@ -126,25 +128,32 @@ ao_max6691_sample(struct ao_max6691 *ao_max6691)
 	ao_dma_done_transfer(AO_MAX6691_DMA);
 
 	for (i = 0; i < AO_MAX6691_CHANNELS; i++) {
-		ao_max6691->sensor[i].t_high = ao_max6691_t_high(i);
-		ao_max6691->sensor[i].t_low = ao_max6691_t_low(i);
+		ao_max6691_current.sensor[i].t_high = ao_max6691_t_high(i);
+		ao_max6691_current.sensor[i].t_low = ao_max6691_t_low(i);
 	}
 }
+
+static void
+ao_max6691(void)
+{
+	for (;;) {
+		ao_max6691_sample();
+		ao_arch_critical(AO_DATA_PRESENT(AO_DATA_MAX6691););
+	}
+}
+
+static struct ao_task ao_max6691_task;
 
 #define R_EXT	1000.0f
 
 static void
-ao_max6691_test(void)
+ao_max6691_dump(void)
 {
-	struct ao_max6691 ao_max6691;
+	struct ao_max6691_sample ao_max6691;
 
-	printf("Testing MAX6691\n"); flush();
-	ao_max6691_sample(&ao_max6691);
+	ao_max6691 = ao_max6691_current;
 
 	int i;
-	for (i = 0; i < AO_MAX6691_SAMPLES; i++)
-		printf("%d: %5u\n", i, ao_max6691_raw[i]);
-
 	for (i = 0; i < AO_MAX6691_CHANNELS; i++) {
 		uint16_t	t_high = ao_max6691.sensor[i].t_high;
 		uint16_t	t_low = ao_max6691.sensor[i].t_low;
@@ -179,12 +188,12 @@ ao_max6691_test(void)
 
 		float Rth = R_EXT * (1 - V) / V;
 
-		printf("%d: high %5u low %5u ohms: %7g\n", i, t_high, t_low, Rth);
+		printf("max6691 channel %d: high %5u low %5u ohms: %7g\n", i, t_high, t_low, Rth);
 	}
 }
 
 static const struct ao_cmds ao_max6691_cmds[] = {
-	{ ao_max6691_test, 	"q\0Thermistor test" },
+	{ ao_max6691_dump, 	"q\0Thermistor test" },
 	{ 0, NULL },
 };
 
@@ -243,4 +252,6 @@ ao_max6691_init(void)
 
 	stm_ospeedr_set(AO_MAX6691_GPIO, AO_MAX6691_PIN, STM_OSPEEDR_40MHz);
 	ao_enable_input(AO_MAX6691_GPIO, AO_MAX6691_PIN, AO_EXTI_MODE_PULL_UP);
+
+	ao_add_task(&ao_max6691_task, ao_max6691, "max6691");
 }
