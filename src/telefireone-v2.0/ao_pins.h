@@ -261,12 +261,12 @@ struct ao_adc {
 			 (1 << AO_PAD_ADC_BATT))
 
 /* MAX6691 thermistor chip */
+#define HAS_MAX6691		1
 #define AO_MAX6691_GPIO		(&stm_gpiob)
 #define AO_MAX6691_PIN		3
 #define AO_MAX6691_TIMER	(&stm_tim2)
 #define AO_MAX6691_TIMER_ENABLE	STM_RCC_APB1ENR_TIM2EN
 #define AO_MAX6691_CH		2
 #define AO_MAX6691_DMA		STM_DMA_INDEX(7)
-
 
 #endif /* _AO_PINS_H_ */
