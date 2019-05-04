@@ -21,36 +21,24 @@
 /*
  * The provided 'calibration' value is
  * that needed to tune the radio to precisely 434550kHz.
- * Use that to 'walk' to the target frequency by following
- * a 'bresenham' line from 434550kHz to the target
- * frequency, and updating the radio setting along the way
+ * The relation between value and freq is linear, so
+ * to get the value for an arbitrary frequency:
+ *
+ *	target_value   target_freq
+ *	------------ = ------------
+ *	 cal_value       cal_freq
+ *
+ *                     cal_value * target_freq
+ *	target_value = -----------------------
+ *                             cal_freq
  */
 
-int32_t ao_freq_to_set(int32_t freq, int32_t cal) 
+int32_t ao_freq_to_set(int32_t target_freq, int32_t cal_value)
 {
-	static int32_t	set;
-	static uint8_t	neg;
-	static int32_t	error;
+	int64_t	prod = (int64_t) target_freq * (int64_t) cal_value;
 
-	set = 0;
-	neg = 0;
-	error = -434550 / 2;
+	/* Round to nearest */
+	int32_t target_value = (prod + (434550 / 2)) / 434550;
 
-	if ((freq -= 434550) < 0) {
-		neg = 1;
-		freq = -freq;
-	}
-	for (;;) {
-		if (error > 0) {
-			error -= 434550;
-			set++;
-		} else {
-			error += cal;
-			if (--freq < 0)
-				break;
-		}
-	}
-	if (neg)
-		set = -set;
-	return cal + set;
+	return target_value;
 }
