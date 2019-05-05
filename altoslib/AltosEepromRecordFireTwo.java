@@ -47,25 +47,32 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 
 	public static double adc_to_pa(int adc) {
 
-		/* raw adc to processor voltage, then back through the
-		 * voltage divider to the sensor voltage
-		 */
+//		/* 1600psi sensor measured 2019.04.30, these values based on that */
+//		double ADC_MIN = 405;
+//		double ADC_SLOPE = 1.95;
 
-		double	v = firetwo_adc(adc) * v_adc * (r_above + r_below) / r_below;
+		/* 2500psi sensor measured 2019.04.30, these values based on that */
+		double ADC_MIN = 392;
+		double ADC_SLOPE = 0.46;	/* adc counts per psi */
 
-		/* Bound to ranges provided in sensor */
-		if (v < 0.5) v = 0.5;
-		if (v > 4.5) v = 4.5;
+		/* sensor is asserted to be linear 0 - max psi over ADC_MIN to ADC_MAX */
+		double raw = adc;
+		double psi = ((raw - ADC_MIN) / ADC_SLOPE);
 
-		double	psi = (v - 0.5) / 4.0 * 2500.0;
 		return AltosConvert.psi_to_pa(psi);
+
 	}
 
 	public static double adc_to_n(int adc) {
-		double v = firetwo_adc(adc);
 
-		/* this is a total guess */
-		return AltosConvert.lb_to_n(v * 298 * 9.807);
+		/* sensor looks linear once it "gets going" */
+		double ADC_MIN = 156;		/* first non-zero cal value */
+		double ADC_SLOPE = 3.343;	/* adc counts per lb */
+		double ADC_OFFSET = 26.5;	/* lbs at ADC_MIN */
+
+		double raw = adc;
+		double lb = ((raw - ADC_MIN) / ADC_SLOPE) + ADC_OFFSET;
+		return AltosConvert.lb_to_n(lb);
 	}
 
 	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {

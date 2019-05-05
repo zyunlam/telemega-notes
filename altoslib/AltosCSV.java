@@ -173,29 +173,16 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_basic_header() {
-		out.printf("acceleration,pressure,altitude,height,accel_speed,baro_speed,temperature,drogue_voltage,main_voltage");
+		out.printf("pressure,thrust");
 	}
 
-	double acceleration() { return series.value(AltosFlightSeries.accel_name, indices); }
 	double pressure() { return series.value(AltosFlightSeries.pressure_name, indices); }
-	double altitude() { return series.value(AltosFlightSeries.altitude_name, indices); }
-	double height() { return series.value(AltosFlightSeries.height_name, indices); }
-	double speed() { return series.value(AltosFlightSeries.speed_name, indices); }
-	double temperature() { return series.value(AltosFlightSeries.temperature_name, indices); }
-	double apogee_voltage() { return series.value(AltosFlightSeries.apogee_voltage_name, indices); }
-	double main_voltage() { return series.value(AltosFlightSeries.main_voltage_name, indices); }
+	double thrust() { return series.value(AltosFlightSeries.thrust_name, indices); }
 
 	void write_basic() {
-		out.printf("%8.2f,%10.2f,%8.2f,%8.2f,%8.2f,%8.2f,%5.1f,%5.2f,%5.2f",
-			   acceleration(),
+		out.printf("%10.2f,%10.2f",
 			   pressure(),
-			   altitude(),
-			   height(),
-			   speed(),
-			   speed(),
-			   temperature(),
-			   apogee_voltage(),
-			   main_voltage());
+			   thrust());
 	}
 
 	void write_battery_header() {
