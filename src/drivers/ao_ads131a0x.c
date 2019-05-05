@@ -129,11 +129,26 @@ ao_ads131a0x_setup(void)
 
 	ao_delay(1);
 
-	/* send unlock command?  why, if we've not locked it? */
-
+	/* confirm we're talking to the chip we're expecting */
 	uint8_t	devid = ao_ads131a0x_reg_read(AO_ADS131A0X_ID_MSB);
 	if (devid != AO_ADS131A0X_ID_ADS131A04)
 		ao_panic(AO_PANIC_SELF_TEST_ADS);
+
+	/* send unlock command so we can configure the chip */
+
+	d[0] = AO_ADS131A0X_UNLOCK >> 8;
+	d[1] = AO_ADS131A0X_UNLOCK & 0xff;
+	d[2] = 0;			
+	ao_ads131a0x_start();
+	ao_spi_send(d, 3, AO_ADS131A0X_SPI_BUS);
+	ao_ads131a0x_stop();
+
+	/* data isn't actually returned until the next frame */
+	d[0] = AO_ADS131A0X_NULL >> 8;
+	d[1] = AO_ADS131A0X_NULL & 0xff;
+	ao_ads131a0x_start();
+	ao_spi_duplex(d, d, 3, AO_ADS131A0X_SPI_BUS);
+	ao_ads131a0x_stop();
 
 	ao_exti_setup(AO_ADS131A0X_DRDY_PORT, AO_ADS131A0X_DRDY_PIN,
 		AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH,
@@ -257,7 +272,7 @@ ao_ads131a0x_dump(void)
 }
 
 const struct ao_cmds ao_ads131a0x_cmds[] = {
-	{ ao_ads131a0x_dump,	"I\0Display ADS131A0X data" },
+	{ ao_ads131a0x_dump,	"A\0Display ADS131A0X data" },
 	{ 0, NULL },
 };
 
