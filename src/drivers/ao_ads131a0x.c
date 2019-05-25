@@ -259,12 +259,13 @@ ao_ads131a0x_dump(void)
 {
 	static int done;
 
+	// add task here while debugging so we can get to command prompt!
 	if (!done) {
 		done = 1;
 		ao_add_task(&ao_ads131a0x_task, ao_ads131a0x, "ads131a0x");
 	}
 		
-	printf ("ADS131A0X value %d %d %d %d\n",
+	printf ("ADS131A0X value %8x %8x %8x %8x\n",
 		ao_ads131a0x_current.ain[0],
 		ao_ads131a0x_current.ain[1],
 		ao_ads131a0x_current.ain[2],
