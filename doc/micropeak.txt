@@ -327,10 +327,16 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 	sensor out of direct sunlight.
 
 	The barometric sensor sampling ports must be able to
-	"breathe", both by not being covered by foam or tape or other
-	materials that might directly block the hole on the top of the
-	sensor, and also by having a suitable static vent to outside
-	air.
+	"breathe", both by not being covered by solid foam or tape or 
+	other materials that might directly block the hole on the top 
+	of the sensor, and also by having a suitable static vent to 
+	outside air.
+
+	One good solution is to use a small rectangle of Poron 
+	50-30031-12X12P or equivalent to cover the sensor.  This is an
+	open cell foam in 1/32" thickness with an adhesive backing.  It
+	seems to do a good job of blocking sun while still allowing
+	airflow to and from the sensor internals.
 
 	As with all other rocketry electronics, Altus Metrum
 	altimeters must be protected from exposure to corrosive motor
