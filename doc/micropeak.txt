@@ -299,6 +299,43 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 			these applications, change in one application
 			will affect the other.
 
+== Protecting MicroPeak from Sunlight
+
+	The MS5607 barometric sensor is sensitive to direct light. When light
+	shines through the holes in the cover to the components inside, the
+	reported pressure can vary wildly from the actual pressure. This
+	causes the reported altitude to have errors of as much as 3000-4000
+	feet.
+
+	MicroPeak should be installed in an opaque compartment in the airframe
+	and not subjected to sunlight. Alternatively, a small piece of
+	adhesive-backed open-cell foam can be attached to the device so that
+	it covers the barometric sensor and protects it from direct light.
+
+	Here's what happens when MicroPeak is exposed to sunlight. At apogee,
+	I exposed MicroPeak to varying amounts of sunlight and you can see the
+	wild swings in altitude resulting from that:
+
+	.MicroPeak in Sunlight
+	image::micropeak-flight-nofoam.png[width=430]
+
+	You can carefully cutting a piece of adhesive-backed open-cell foam
+	and attach it to MicroPeak. It's important to press the adhesive to
+	the circuit board and not to the top of the barometric sensor or the
+	sensor may become blocked and not operate at all. Once you've attached
+	the foam, you should test MicroPeak on the ground to make sure it's
+	still working.
+
+	.MicroPeak with Foam
+	image::micropeak-foam.jpg[width=430]
+
+	That MicroPeak was in the same barometric chamber as the one which
+	generated the above results and the resulting flight data looks
+	correct:
+
+	.MicroPeak in Sunlight with Foam
+	image::micropeak-flight-foam.png[width=430]
+
 [appendix]
 == Handling Precautions
 
