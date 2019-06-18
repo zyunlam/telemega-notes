@@ -176,11 +176,12 @@ ao_micropeak(void)
 	/* Give the person a second to get their finger out of the way */
 	ao_delay(AO_MS_TO_TICKS(1000));
 
-	ao_pips();
-
 	ao_log_micro_restore();
 	ao_compute_height();
 	ao_report_altitude();
+
+	ao_pips();
+
 	ao_log_micro_dump();
 
 #if BOOST_DELAY
