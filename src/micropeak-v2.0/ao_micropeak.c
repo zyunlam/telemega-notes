@@ -257,22 +257,21 @@ main(void)
 	ao_timer_init();
 	ao_serial_init();
 	stm_moder_set(&stm_gpioa, 2, STM_MODER_OUTPUT);
-
 	ao_dma_init();
 	ao_spi_init();
 	ao_exti_init();
 
-	/* Leave USB disabled on battery */
-	if (!ao_on_battery) {
-		ao_usb_init();
-		ao_cmd_init();
-	}
-
 	ao_ms5607_init();
-
 	ao_storage_init();
 
-	ao_add_task(&mp_task, ao_micropeak, "micropeak");
-	ao_cmd_register(mp_cmd);
+	if (ao_on_battery) {
+		/* On battery power, run the flight code */
+		ao_add_task(&mp_task, ao_micropeak, "micropeak");
+	} else {
+		/* otherwise, turn on USB and run the command processor */
+		ao_usb_init();
+		ao_cmd_init();
+		ao_cmd_register(mp_cmd);
+	}
 	ao_start_scheduler();
 }
