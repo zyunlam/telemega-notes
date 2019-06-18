@@ -568,6 +568,8 @@ struct stm_pwr {
 
 extern struct stm_pwr stm_pwr;
 
+#define stm_pwr (*(struct stm_pwr *) 0x40007000)
+
 #define STM_PWR_CR_DBP		(8)
 
 #define STM_PWR_CR_PLS		(5)
@@ -585,7 +587,7 @@ extern struct stm_pwr stm_pwr;
 #define STM_PWR_CR_CSBF		(3)
 #define STM_PWR_CR_CWUF		(2)
 #define STM_PWR_CR_PDDS		(1)
-#define STM_PWR_CR_LPSDSR	(0)
+#define STM_PWR_CR_LPDS		(0)
 
 #define STM_PWR_CSR_EWUP3	(10)
 #define STM_PWR_CSR_EWUP2	(9)
@@ -746,12 +748,18 @@ struct stm_scb {
 
 extern struct stm_scb stm_scb;
 
+#define stm_scb (*(struct stm_scb *) 0xe000ed00)
+
 #define STM_SCB_AIRCR_VECTKEY		16
 #define  STM_SCB_AIRCR_VECTKEY_KEY		0x05fa
 #define STM_SCB_AIRCR_PRIGROUP		8
 #define STM_SCB_AIRCR_SYSRESETREQ	2
 #define STM_SCB_AIRCR_VECTCLRACTIVE	1
 #define STM_SCB_AIRCR_VECTRESET		0
+
+#define STM_SCB_SCR_SEVONPEND		4
+#define STM_SCB_SCR_SLEEPDEEP		2
+#define STM_SCB_SCR_SLEEPONEXIT		1
 
 #define STM_ISR_WWDG_POS		0
 #define STM_ISR_PVD_VDDIO2_POS		1

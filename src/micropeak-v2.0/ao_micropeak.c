@@ -194,6 +194,7 @@ ao_micropeak(void)
 	ao_compute_height();
 	ao_report_altitude();
 
+	ao_sleep_mode();
 	ao_sleep(&ao_on_battery);
 }
 

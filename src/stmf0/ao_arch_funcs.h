@@ -447,6 +447,31 @@ static inline void ao_arch_restore_stack(void) {
 	asm("pop {r0-r7,pc}\n");
 }
 
+static inline void ao_sleep_mode(void) {
+
+	/*
+	  WFI (Wait for Interrupt) or WFE (Wait for Event) while:
+	   – Set SLEEPDEEP in Cortex ® -M0 System Control register
+	   – Set PDDS bit in Power Control register (PWR_CR)
+	   – Clear WUF bit in Power Control/Status register (PWR_CSR)
+	*/
+
+	ao_arch_block_interrupts();
+
+	stm_scb.scr |= (1 << STM_SCB_SCR_SLEEPDEEP);
+	ao_arch_nop();
+	stm_pwr.cr |= (1 << STM_PWR_CR_PDDS) | (1 << STM_PWR_CR_LPDS);
+	ao_arch_nop();
+	stm_pwr.cr |= (1 << STM_PWR_CR_CWUF);
+	ao_arch_nop();
+	ao_arch_nop();
+	ao_arch_nop();
+	ao_arch_nop();
+	ao_arch_nop();
+	asm("wfi");
+	ao_arch_nop();
+}
+
 #ifndef HAS_SAMPLE_PROFILE
 #define HAS_SAMPLE_PROFILE 0
 #endif
