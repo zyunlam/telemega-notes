@@ -91,11 +91,12 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 			break;
 		}
 
+		ordered = new TreeSet<AltosEepromRecord>();
+
 		if (record == null) {
 			System.out.printf("failed to parse log format %d\n", config_data.log_format);
 			return;
 		}
-		ordered = new TreeSet<AltosEepromRecord>();
 		int	tick = 0;
 		boolean first = true;
 
