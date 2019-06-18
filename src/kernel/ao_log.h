@@ -57,6 +57,7 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELEMEGA_3	15	/* 32 byte typed telemega records with 32 bit gyro cal and mpu9250 */
 #define AO_LOG_FORMAT_EASYMEGA_2	16	/* 32 byte typed telemega records with 32 bit gyro cal, mpu9250 rotated 90° and adxl375 */
 #define AO_LOG_FORMAT_TELESTATIC	17	/* 32 byte typed telestatic records */
+#define AO_LOG_FORMAT_MICROPEAK2	18	/* 2-byte baro values with header */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -536,6 +537,10 @@ typedef struct ao_log_record ao_log_type;
 #endif
 
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_TELESCIENCE
+#define AO_LOG_UNCOMMON	1
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_MICROPEAK2
 #define AO_LOG_UNCOMMON	1
 #endif
 

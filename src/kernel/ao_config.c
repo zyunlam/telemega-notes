@@ -39,6 +39,10 @@ uint8_t ao_config_mutex;
 uint8_t ao_force_freq;
 #endif
 
+#ifndef HAS_CONFIG_SAVE
+#define HAS_CONFIG_SAVE	HAS_EEPROM
+#endif
+
 #ifndef AO_CONFIG_DEFAULT_APRS_INTERVAL
 #define AO_CONFIG_DEFAULT_APRS_INTERVAL	0
 #endif
@@ -50,7 +54,7 @@ uint8_t ao_force_freq;
 #define AO_CONFIG_DEFAULT_IGNITE_MODE	AO_IGNITE_MODE_DUAL
 #define AO_CONFIG_DEFAULT_PAD_ORIENTATION	AO_PAD_ORIENTATION_ANTENNA_UP
 #define AO_CONFIG_DEFAULT_PYRO_TIME	AO_MS_TO_TICKS(50)
-#if HAS_EEPROM
+#if HAS_CONFIG_SAVE
 #ifndef USE_INTERNAL_FLASH
 #error Please define USE_INTERNAL_FLASH
 #endif
@@ -75,7 +79,7 @@ uint8_t ao_force_freq;
 #define AO_CONFIG_DEFAULT_APRS_SSID		(ao_serial_number % 10)
 #define AO_CONFIG_DEFAULT_RADIO_RATE		AO_RADIO_RATE_38400
 
-#if HAS_EEPROM
+#if HAS_CONFIG_SAVE
 static void
 _ao_config_put(void)
 {
@@ -120,7 +124,7 @@ _ao_config_get(void)
 
 	if (ao_config_loaded)
 		return;
-#if HAS_EEPROM
+#if HAS_CONFIG_SAVE
 	/* Yes, I know ao_storage_read calls ao_storage_setup,
 	 * but ao_storage_setup *also* sets ao_storage_config, which we
 	 * need before calling ao_storage_read here
@@ -597,7 +601,7 @@ ao_config_log_show(void)
 #endif
 }
 
-#if FLIGHT_LOG_APPEND
+#if FLIGHT_LOG_APPEND && HAS_CONFIG_SAVE
 void
 ao_config_log_fix_append(void)
 {
@@ -956,7 +960,7 @@ ao_config_help(void);
 static void
 ao_config_show(void);
 
-#if HAS_EEPROM
+#if HAS_CONFIG_SAVE
 static void
 ao_config_save(void);
 #endif
@@ -1046,7 +1050,7 @@ const struct ao_config_var ao_config_vars[] = {
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },
-#if HAS_EEPROM
+#if HAS_CONFIG_SAVE
 	{ "w\0Write to eeprom",
 	  ao_config_save,		0 },
 #endif
@@ -1098,7 +1102,7 @@ ao_config_show(void)
 #endif
 }
 
-#if HAS_EEPROM
+#if HAS_CONFIG_SAVE
 static void
 ao_config_save(void) 
 {

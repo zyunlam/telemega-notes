@@ -171,7 +171,6 @@ static void
 ao_micropeak(void)
 {
 	ao_ms5607_setup();
-	ao_storage_setup();
 
 	/* Give the person a second to get their finger out of the way */
 	ao_delay(AO_MS_TO_TICKS(1000));
@@ -204,7 +203,54 @@ ao_show_bat(void)
 	printf("battery: %u\n", ao_battery_voltage());
 }
 
+uint8_t
+ao_log_present(void)
+{
+	uint16_t	n_samples;
+
+	ao_eeprom_read(N_SAMPLES_OFFSET, &n_samples, sizeof (n_samples));
+
+	return n_samples != 0xffff;
+}
+
+static void
+ao_log_list(void)
+{
+	if (ao_log_present())
+		printf ("flight %d start %x end %x\n",
+			1,
+			0, MAX_LOG_OFFSET >> 8);
+	printf ("done\n");
+}
+
+static void
+ao_log_delete(void)
+{
+	int16_t cmd_flight = 1;
+
+	ao_cmd_white();
+	if (ao_cmd_lex_c == '-') {
+		cmd_flight = -1;
+		ao_cmd_lex();
+	}
+	cmd_flight *= ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+
+	/* Look for the flight log matching the requested flight */
+	if (cmd_flight == 1 && ao_log_present()) {
+		uint32_t	pos;
+		for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block)
+			ao_storage_erase(pos);
+		puts("Erased");
+		return;
+	}
+	printf("No such flight: %d\n", cmd_flight);
+}
+
 static struct ao_cmds mp_cmd[] = {
+	{ ao_log_list,	"l\0List logs" },
+	{ ao_log_delete,	"d <flight-number>\0Delete flight" },
 	{ ao_show_bat, "b\0Show battery voltage" },
 	{ 0 }
 };
@@ -268,6 +314,8 @@ main(void)
 	ao_spi_init();
 	ao_exti_init();
 
+	ao_storage_setup();
+
 	ao_ms5607_init();
 	ao_storage_init();
 
@@ -279,6 +327,7 @@ main(void)
 		ao_usb_init();
 		ao_cmd_init();
 		ao_cmd_register(mp_cmd);
+		ao_config_init();
 	}
 	ao_start_scheduler();
 }

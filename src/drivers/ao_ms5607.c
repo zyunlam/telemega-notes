@@ -240,6 +240,9 @@ struct ao_task ao_ms5607_task;
 void
 ao_ms5607_info(void)
 {
+#if !HAS_MS5607_TASK
+	ao_ms5607_setup();
+#endif
 	printf ("ms5607 reserved: %u\n", ao_ms5607_prom.reserved);
 	printf ("ms5607 sens: %u\n", ao_ms5607_prom.sens);
 	printf ("ms5607 off: %u\n", ao_ms5607_prom.off);
@@ -256,7 +259,6 @@ ao_ms5607_dump(void)
 	struct ao_ms5607_value value;
 
 #if !HAS_MS5607_TASK
-	ao_ms5607_setup();
 	ao_ms5607_info();
 	ao_ms5607_sample(&ao_ms5607_current);
 #endif

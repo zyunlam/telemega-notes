@@ -32,6 +32,7 @@ ALTOS_SRC = \
 	ao_mutex.c \
 	ao_interrupt.c \
 	ao_cmd.c \
+	ao_config.c \
 	ao_task.c \
 	ao_data.c \
 	ao_boot_chain.c \

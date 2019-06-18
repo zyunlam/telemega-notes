@@ -65,7 +65,8 @@ extern uint8_t ao_on_battery;
 #define HAS_MS5607		1
 #define HAS_MS5611		0
 #define HAS_MS5607_TASK		0
-#define HAS_EEPROM		0
+#define HAS_EEPROM		1
+#define HAS_CONFIG_SAVE		0
 #define HAS_BEEP		0
 
 /* Logging */
@@ -73,6 +74,9 @@ extern uint8_t ao_on_battery;
 #define SAMPLE_SLEEP		AO_MS_TO_TICKS(100)
 #define BOOST_DELAY		AO_SEC_TO_TICKS(60)
 #define AO_LOG_ID		AO_LOG_ID_MICRO_PEAK2
+#define HAS_LOG			1
+#define AO_LOG_FORMAT		AO_LOG_FORMAT_MICROPEAK2
+#define FLIGHT_LOG_APPEND	1
 
 /* Kalman filter */
 
@@ -135,6 +139,7 @@ void ao_delay_until(uint16_t target);
 #define ao_eeprom_read(pos, ptr, size) ao_storage_read(pos, ptr, size)
 #define ao_eeprom_write(pos, ptr, size) ao_storage_write(pos, ptr, size)
 #define MAX_LOG_OFFSET	ao_storage_total
+#define ao_storage_log_max ao_storage_total
 
 extern uint32_t __flash__[];
 extern uint32_t __flash_end__[];
