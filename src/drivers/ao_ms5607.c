@@ -255,6 +255,11 @@ ao_ms5607_dump(void)
 {
 	struct ao_ms5607_value value;
 
+#if !HAS_MS5607_TASK
+	ao_ms5607_setup();
+	ao_ms5607_info();
+	ao_ms5607_sample(&ao_ms5607_current);
+#endif
 	ao_ms5607_convert(&ao_ms5607_current, &value);
 	printf ("Pressure:    %8lu %8ld\n", ao_ms5607_current.pres, value.pres);
 	printf ("Temperature: %8lu %8ld\n", ao_ms5607_current.temp, value.temp);
