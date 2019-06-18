@@ -304,7 +304,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 	The MS5607 barometric sensor is sensitive to direct light. When light
 	shines through the holes in the cover to the components inside, the
 	reported pressure can vary wildly from the actual pressure. This
-	causes the reported altitude to have errors of as much as 3000-4000
+	causes the reported altitude to have errors of thousands of
 	feet.
 
 	MicroPeak should be installed in an opaque compartment in the airframe
