@@ -19,4 +19,5 @@ import java.util.*;
 public interface AltosRecordSet {
 	public AltosCalData cal_data();
 	public void capture_series(AltosDataListener listener);
+	public boolean valid();
 }

@@ -21,6 +21,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 	AltosEeprom			eeprom;
 	TreeSet<AltosEepromRecord>	ordered;
 	AltosCalData			cal_data;
+	boolean				valid;
 
 	public AltosConfigData config_data() {
 		return eeprom.config_data();
@@ -50,6 +51,10 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 			record.provide_data(listener, cal_data);
 		}
 		listener.finish();
+	}
+
+	public boolean valid() {
+		return valid;
 	}
 
 	public AltosEepromRecordSet(AltosEeprom eeprom) {
@@ -95,8 +100,11 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 
 		if (record == null) {
 			System.out.printf("failed to parse log format %d\n", config_data.log_format);
+			valid = false;
 			return;
 		}
+		valid = true;
+
 		int	tick = 0;
 		boolean first = true;
 

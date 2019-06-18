@@ -307,26 +307,14 @@ public class TeleGPS
 	void graph() {
 		AltosDataChooser chooser = new AltosDataChooser(this);
 		AltosRecordSet set = chooser.runDialog();
-		if (set == null)
-			return;
-		try {
-			new TeleGPSGraphUI(set, chooser.file());
-		} catch (InterruptedException ie) {
-		} catch (IOException ie) {
-		}
+		graph_file(this, set, chooser.file());
 	}
 
 	public void graph_flights(AltosEepromList list) {
 		for (AltosEepromLog log : list) {
 			if (log.file != null) {
 				AltosRecordSet set = record_set(log.file);
-				if (set != null) {
-					try {
-						new TeleGPSGraphUI(set, log.file);
-					} catch (InterruptedException ie) {
-					} catch (IOException ie) {
-					}
-				}
+				graph_file(this, set, log.file);
 			}
 		}
 	}
@@ -650,16 +638,27 @@ public class TeleGPS
 		return new AltosReplayReader(set, file);
 	}
 
-	static boolean process_graph(File file) {
-		AltosRecordSet set = record_set(file);
+	private static boolean graph_file(TeleGPS telegps, AltosRecordSet set, File file) {
 		if (set == null)
 			return false;
+		if (!set.valid()) {
+			JOptionPane.showMessageDialog(telegps,
+						      String.format("Failed to parse file %s", file),
+						      "Graph Failed",
+						      JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
 		try {
 			new TeleGPSGraphUI(set, file);
 		} catch (Exception e) {
 			return false;
 		}
 		return true;
+	}
+
+	static boolean process_graph(File file) {
+		AltosRecordSet set = record_set(file);
+		return graph_file(null, set, file);
 	}
 
 	static boolean process_replay(File file) {
