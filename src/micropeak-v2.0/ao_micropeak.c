@@ -243,6 +243,11 @@ ao_hsi_init(void)
 void
 main(void)
 {
+	int i;
+
+	for (i = 0; i < 100000; i++)
+		ao_arch_nop();
+
 	if (ao_battery_voltage() < 320)
 		ao_on_battery = 1;
 
