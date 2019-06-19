@@ -164,6 +164,13 @@ ao_battery_voltage(void)
 	return 330 * stm_cal.vrefint_cal / vrefint;
 }
 
+static void
+ao_log_erase(void)
+{
+	uint32_t	pos;
+	for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block)
+		ao_storage_erase(pos);
+}
 
 uint8_t	ao_on_battery;
 
@@ -186,6 +193,7 @@ ao_micropeak(void)
 #if BOOST_DELAY
 	ao_delay(BOOST_DELAY);
 #endif
+	ao_log_erase();
 
 	ao_microflight();
 
@@ -239,9 +247,7 @@ ao_log_delete(void)
 
 	/* Look for the flight log matching the requested flight */
 	if (cmd_flight == 1 && ao_log_present()) {
-		uint32_t	pos;
-		for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block)
-			ao_storage_erase(pos);
+		ao_log_erase();
 		puts("Erased");
 		return;
 	}
