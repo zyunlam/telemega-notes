@@ -86,6 +86,9 @@ public abstract class AltosDataListener {
 		this.frequency = frequency;
 	}
 
+	public void set_avoid_duplicate_files() {
+	}
+
 	/* Called after all records are captured */
 	public void finish() {
 	}
