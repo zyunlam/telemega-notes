@@ -50,5 +50,9 @@ libao_tools_a_SOURCES = \
 	ao-dfu.h \
 	ao-selfload.c \
 	ao-selfload.h \
+	ao-eeprom-read.c \
+	ao-eeprom-read.h \
+	ao-ms5607-convert.c \
+	ao-ms5607.h \
 	ao-verbose.c \
 	ao-verbose.h
