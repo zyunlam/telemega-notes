@@ -112,8 +112,14 @@ ao_ms5607_prom_read(struct ao_ms5607_prom *prom)
 		r++;
 	}
 
-	if (!ao_ms5607_prom_valid((uint8_t *) prom))
+
+	if (!ao_ms5607_prom_valid((uint8_t *) prom)) {
+#if HAS_SENSOR_ERRORS
+		ao_sensor_errors = 1;
+#else
 		ao_panic(AO_PANIC_SELF_TEST_MS5607);
+#endif
+	}
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 	/* Byte swap */

@@ -63,6 +63,7 @@ extern uint8_t ao_on_battery;
 #define IS_FLASH_LOADER		0
 
 #define HAS_MS5607		1
+#define HAS_SENSOR_ERRORS	0
 #define HAS_MS5611		0
 #define HAS_MS5607_TASK		0
 #define HAS_EEPROM		1
