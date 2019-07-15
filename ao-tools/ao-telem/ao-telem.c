@@ -31,8 +31,7 @@ static const struct option options[] = {
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s\n"
-		"\t{flight-log} ...\n", program);
+	fprintf(stderr, "usage: %s [--crc] {flight.telem} ...\n",program);
 	exit(1);
 }
 
