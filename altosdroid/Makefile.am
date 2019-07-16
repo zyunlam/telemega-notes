@@ -34,7 +34,7 @@ SUPPORT_V4_JAR=android-support-v4.jar
 
 SUPPORT_V4=$(EXT_LIBDIR)/$(SUPPORT_V4_JAR)
 
-GOOGLE_PLAY_SERVICES_LIB_SRCDIR=$(SDK)/extras/google/google_play_services/libproject
+GOOGLE_PLAY_SERVICES_LIB_SRCDIR=$(SDK)/..
 GOOGLE_PLAY_SERVICES_LIB=google-play-services_lib
 
 JAVA_SRC=$(JAVA_SRC_DIR)/*.java $(JAVA_SRC_DIR)/BuildInfo.java
@@ -83,10 +83,10 @@ install-debug: bin/AltosDroid-debug.apk
 	$(ADB) install -r bin/AltosDroid-debug.apk
 
 bin/AltosDroid-debug.apk: $(SRC) $(ALTOSLIB) $(SUPPORT_V4) $(GOOGLE_PLAY_SERVICES_LIB)
-	ant debug
+	JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 ant debug
 
 bin/AltosDroid-release-unsigned.apk: $(SRC) $(ALTOSLIB) $(SUPPORT_V4) $(GOOGLE_PLAY_SERVICES_LIB)
-	ant release
+	JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 ant release
 
 bin/AltosDroid-release.apk: bin/AltosDroid-release-unsigned.apk
 	jarsigner -sigalg SHA1withDSA -digestalg SHA1 \

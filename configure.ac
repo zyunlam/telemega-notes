@@ -70,7 +70,7 @@ AC_ARG_WITH(jvm, AS_HELP_STRING([--with-jvm=PATH],
 
 if test "x$JVM" = "xauto"; then
 	AC_MSG_CHECKING([JVM])
-	for jvm in default-java java-6-openjdk java-7-openjdk java-8-openjdk java-9-openjdk java-10-openjdk java-11-openjdk java-12-openjdk java-13-openjdk java-6-sun; do
+	for jvm in default-java java-6-openjdk java-7-openjdk java-8-openjdk java-9-openjdk java-10-openjdk java-11-openjdk java-12-openjdk java-13-openjdk java-6-sun java-8-openjdk-amd64; do
 		if test "x$JVM" = "xauto"; then
 			INCLUDE="/usr/lib/jvm/$jvm/include"
 			if test -f "$INCLUDE"/jni.h; then

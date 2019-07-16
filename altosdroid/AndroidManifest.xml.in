@@ -22,7 +22,7 @@
           package="org.altusmetrum.AltosDroid"
           android:versionCode="@ANDROID_VERSION@"
           android:versionName="@VERSION@">
-    <uses-sdk android:targetSdkVersion="12" android:minSdkVersion="12"/>
+    <uses-sdk android:targetSdkVersion="21" android:minSdkVersion="21"/>
     <!-- Google Maps -->
     <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
 
