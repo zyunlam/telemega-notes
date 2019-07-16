@@ -458,6 +458,9 @@ static inline void ao_sleep_mode(void) {
 
 	ao_arch_block_interrupts();
 
+	/* Enable power interface clock */
+	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
+	ao_arch_nop();
 	stm_scb.scr |= (1 << STM_SCB_SCR_SLEEPDEEP);
 	ao_arch_nop();
 	stm_pwr.cr |= (1 << STM_PWR_CR_PDDS) | (1 << STM_PWR_CR_LPDS);

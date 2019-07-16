@@ -294,9 +294,6 @@ ao_clock_init(void)
 	/* Enable 1 wait state so the CPU can run at 48MHz */
 	stm_flash.acr |= (STM_FLASH_ACR_LATENCY_1 << STM_FLASH_ACR_LATENCY);
 
-	/* Enable power interface clock */
-	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
-
 	/* HCLK to 48MHz -> AHB prescaler = /1 */
 	cfgr = stm_rcc.cfgr;
 	cfgr &= ~(STM_RCC_CFGR_HPRE_MASK << STM_RCC_CFGR_HPRE);
