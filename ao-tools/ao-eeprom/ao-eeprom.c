@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <ao-eeprom-read.h>
+#include <ao-atmosphere.h>
 
 static const struct option options[] = {
 	{ .name = "raw", .has_arg = 0, .val = 'r' },
@@ -55,11 +56,12 @@ ao_ms5607(uint32_t pres, uint32_t temp, struct ao_eeprom *eeprom, bool is_ms5611
 
 	ao_ms5607_convert(&ms5607_sample, &ms5607_value,
 			  &eeprom->ms5607_prom, is_ms5611);
-	printf(" pres %9u temp %9u (%7.3f kPa %6.2f°C)",
+	printf(" pres %9u temp %9u (%7.3f kPa %6.2f°C %7.1f m)",
 	       pres,
 	       temp,
 	       ms5607_value.pres / 1000.0,
-	       ms5607_value.temp / 100.0);
+	       ms5607_value.temp / 100.0,
+	       ao_pressure_to_altitude(ms5607_value.pres));
 }
 
 #define GRAVITY 9.80665

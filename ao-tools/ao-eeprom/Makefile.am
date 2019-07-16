@@ -5,7 +5,7 @@ AO_EEPROM_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
 
 ao_eeprom_DEPENDENCIES = $(AO_EEPROM_LIBS)
 
-ao_eeprom_LDADD=$(AO_EEPROM_LIBS) -ljson-c
+ao_eeprom_LDADD=$(AO_EEPROM_LIBS) -ljson-c -lm
 
 ao_eeprom_SOURCES = ao-eeprom.c
 
