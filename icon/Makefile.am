@@ -183,3 +183,6 @@ $(EXE_FILES): windows-stub.o make-rc
 
 windows-stub.o: windows-stub.c
 	$(MINGCC32) -c $(MINGFLAGS) windows-stub.c
+
+altosdroid.png: altosdroid.svg
+	rsvg-convert -a -b white -h 480 altosdroid.svg | pngtopnm | pnmpad -white -width 512 -height 512 | pnmtopng > $@
