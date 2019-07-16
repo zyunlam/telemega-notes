@@ -56,12 +56,12 @@ ao_ms5607(uint32_t pres, uint32_t temp, struct ao_eeprom *eeprom, bool is_ms5611
 
 	ao_ms5607_convert(&ms5607_sample, &ms5607_value,
 			  &eeprom->ms5607_prom, is_ms5611);
-	printf(" pres %9u temp %9u (%7.3f kPa %6.2f°C %7.1f m)",
+	printf(" pres %9u %7.3f kPa  %7.1f m temp %9u %6.2f °C",
 	       pres,
-	       temp,
 	       ms5607_value.pres / 1000.0,
-	       ms5607_value.temp / 100.0,
-	       ao_pressure_to_altitude(ms5607_value.pres));
+	       ao_pressure_to_altitude(ms5607_value.pres),
+	       temp,
+	       ms5607_value.temp / 100.0);
 }
 
 #define GRAVITY 9.80665
@@ -71,7 +71,7 @@ ao_accel(int16_t accel, struct ao_eeprom *eeprom)
 {
 	double accel_2g = eeprom->config.accel_minus_g - eeprom->config.accel_plus_g;
 	double accel_scale = GRAVITY * 2.0 / accel_2g;
-	printf(" accel %6d (%7.2f m/s²)",
+	printf(" accel %6d %7.2f m/s²",
 	       accel, (eeprom->config.accel_plus_g - accel) * accel_scale);
 }
 
@@ -105,14 +105,61 @@ ao_state(uint16_t state, uint16_t reason)
 	       state, ao_state_name(state), reason);
 }
 
+static double
+ao_adc_to_volts(int16_t value, int16_t max_adc, double ref, double r1, double r2)
+{
+	return ref * ((double) value / max_adc) * (r1 + r2) / r2;
+}
+
 static void
 ao_volts(const char *name, int16_t value, int16_t max_adc, double ref, double r1, double r2)
 {
 	printf(" %s %5d",
 	       name, value);
 	if (r1 && r2 && ref)
-	       printf("(%6.3f V)",
-		      ref * ((double) value / max_adc) * (r1 + r2) / r2);
+		printf(" %6.3f V", ao_adc_to_volts(value, max_adc, ref, r1, r2));
+}
+
+static double lb_to_n(double lb)
+{
+	return lb / 0.22480894;
+}
+
+static double psi_to_pa(double psi)
+{
+	return psi * 6894.76;
+}
+
+static double
+ao_volts_to_newtons(double volts)
+{
+	/* this is a total guess */
+	return lb_to_n(volts * 57.88645 * GRAVITY);
+}
+
+static void
+ao_thrust(int16_t value, int16_t max_adc, double ref, double r1, double r2)
+{
+	printf(" thrust %5d", value);
+	if (r1 && r2 && ref) {
+		double volts = ao_adc_to_volts(value, max_adc, ref, r1, r2);
+		printf(" %6.3f V %8.1f N", volts, ao_volts_to_newtons(volts));
+	}
+}
+
+static void
+ao_pressure(int16_t value, int16_t max_adc, double ref, double r1, double r2)
+{
+	printf(" pressure %5d", value);
+	if (r1 && r2 && ref) {
+		double volts = ao_adc_to_volts(value, max_adc, ref, r1, r2);
+		if (volts < 0.5) volts = 0.5;
+		if (volts > 4.5) volts = 4.5;
+
+		double psi = (volts - 0.5) / 4.0 * 2500.0;
+		double pa = psi_to_pa(psi);
+		printf(" %9.3f kPa", pa / 1000.0);
+	}
 }
 
 #if 0
@@ -208,6 +255,9 @@ main (int argc, char **argv)
 		int 	len = 0;
 		bool	is_ms5611 = false;
 
+		int64_t	current_tick = 0;
+		int64_t	first_tick = 0x7fffffffffffffffLL;
+
 		double	sense_r1 = 0.0, sense_r2 = 0.0;
 		double	batt_r1 = 0.0, batt_r2 = 0.0;
 		double	adc_ref = 0.0;
@@ -265,6 +315,10 @@ main (int argc, char **argv)
 			break;
 		case AO_LOG_FORMAT_TELEFIRETWO:
 			len = 32;
+			max_adc = 4095;
+			adc_ref = 3.3;
+			sense_r1 = batt_r1 = 5600;
+			sense_r2 = batt_r2 = 10000;
 			break;
 		case AO_LOG_FORMAT_EASYMINI2:
 			len = 16;
@@ -300,12 +354,14 @@ main (int argc, char **argv)
 		}
 		if (arg_len)
 			len = arg_len;
-		printf("config major %d minor %d log format %d total %u len %d\n",
-		       eeprom->config.major,
-		       eeprom->config.minor,
-		       eeprom->log_format,
-		       eeprom->len,
-		       len);
+		if (verbose)
+			printf("config major %d minor %d log format %d total %u len %d\n",
+			       eeprom->config.major,
+			       eeprom->config.minor,
+			       eeprom->log_format,
+			       eeprom->len,
+			       len);
+
 		uint32_t	pos;
 		for (pos = 0; pos < eeprom->len; pos += len) {
 			int i;
@@ -318,6 +374,7 @@ main (int argc, char **argv)
 				struct ao_log_mini *log_mini;
 				struct ao_log_metrum *log_metrum;
 				struct ao_log_gps *log_gps;
+				struct ao_log_firetwo *log_firetwo;
 
 				if (!csum && !ao_csum_valid(&eeprom->data[pos], len)) {
 					if (verbose)
@@ -327,7 +384,14 @@ main (int argc, char **argv)
 
 				struct ao_log_header *log_header = (struct ao_log_header *) &eeprom->data[pos];
 
-				printf("type %c tick %5u", log_header->type, log_header->tick);
+				if (first_tick == 0x7fffffffffffffffLL) {
+					current_tick = first_tick = log_header->tick;
+				} else {
+					int16_t diff = (int16_t) (log_header->tick - (uint16_t) current_tick);
+
+					current_tick += diff;
+				}
+				printf("type %c tick %5u %6.2f S", log_header->type, log_header->tick, (current_tick - first_tick) / 100.0);
 
 				switch (eeprom->log_format) {
 				case AO_LOG_FORMAT_TELEMEGA_OLD:
@@ -398,16 +462,16 @@ main (int argc, char **argv)
 						printf(" pyro %04x", log_mega->u.volt.pyro);
 						break;
 					case AO_LOG_GPS_TIME:
-						printf(" lat %10.7f° lon %10.7f° alt %8d m",
+						printf(" lat %10.7f ° lon %10.7f ° alt %8d m",
 						       log_mega->u.gps.latitude / 10000000.0,
 						       log_mega->u.gps.longitude/ 10000000.0,
 						       (int32_t) (log_mega->u.gps.altitude_low |
 								  (log_mega->u.gps.altitude_high << 16)));
-						printf(" time %02d:%02d:%02d 20%02d-%02d-%02d flags %02x",
+						printf(" time %02d:%02d:%02d %04d-%02d-%02d flags %02x",
 						       log_mega->u.gps.hour,
 						       log_mega->u.gps.minute,
 						       log_mega->u.gps.second,
-						       log_mega->u.gps.year,
+						       log_mega->u.gps.year + 2000,
 						       log_mega->u.gps.month,
 						       log_mega->u.gps.day,
 						       log_mega->u.gps.flags);
@@ -527,6 +591,36 @@ main (int argc, char **argv)
 						break;
 					default:
 						printf(" unknown");
+					}
+					break;
+				case AO_LOG_FORMAT_TELEFIRETWO:
+					log_firetwo = (struct ao_log_firetwo *) &eeprom->data[pos];
+					switch (log_firetwo->type) {
+					case AO_LOG_FLIGHT:
+						printf(" serial %5u flight %5u",
+						       eeprom->serial_number,
+						       log_firetwo->u.flight.flight);
+						break;
+					case AO_LOG_STATE:
+						ao_state(log_firetwo->u.state.state,
+							 log_firetwo->u.state.reason);
+						break;
+					case AO_LOG_SENSOR:
+						ao_pressure(log_firetwo->u.sensor.pressure,
+							    max_adc, adc_ref,
+							    sense_r1, sense_r2);
+						ao_thrust(log_firetwo->u.sensor.thrust,
+							  max_adc, adc_ref,
+							  sense_r1, sense_r2);
+						for (i = 0; i < 4; i++) {
+							char name[20];
+							sprintf(name, "thermistor%d", i);
+							ao_volts(name,
+								 log_firetwo->u.sensor.thermistor[i],
+								 max_adc, adc_ref,
+								 sense_r1, sense_r2);
+						}
+						break;
 					}
 					break;
 				case AO_LOG_FORMAT_TELEGPS:
