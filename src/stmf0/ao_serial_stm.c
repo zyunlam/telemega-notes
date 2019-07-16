@@ -376,6 +376,17 @@ ao_serial_set_sw_rts_cts(struct ao_stm_usart *usart,
 #endif
 
 void
+ao_serial_shutdown(void)
+{
+#if HAS_SERIAL_1
+	stm_rcc.apb2enr &= ~(1 << STM_RCC_APB2ENR_USART1EN);
+#endif
+#if HAS_SERIAL_2
+	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_USART2EN);
+#endif
+}
+
+void
 ao_serial_init(void)
 {
 #if HAS_SERIAL_1
