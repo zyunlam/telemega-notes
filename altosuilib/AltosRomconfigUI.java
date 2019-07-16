@@ -76,7 +76,7 @@ public class AltosRomconfigUI
 
 		y++;
 
-		if (AltosLib.has_radio(config.usb_id.pid)) {
+		if (config == null || AltosLib.has_radio(config.usb_id.pid)) {
 			/* Radio calibration value */
 			c = new GridBagConstraints();
 			c.gridx = 0; c.gridy = y;
