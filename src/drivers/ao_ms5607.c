@@ -115,7 +115,7 @@ ao_ms5607_prom_read(struct ao_ms5607_prom *prom)
 
 	if (!ao_ms5607_prom_valid((uint8_t *) prom)) {
 #if HAS_SENSOR_ERRORS
-		ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_MS5607);
 #else
 		ao_panic(AO_PANIC_SELF_TEST_MS5607);
 #endif

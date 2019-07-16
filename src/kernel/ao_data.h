@@ -143,6 +143,12 @@ extern volatile uint8_t		ao_data_count;
 #define AO_DATA_PRESENT(bit)	(ao_data_present |= (bit))
 
 /*
+ * Mark sensor failed, and unblock the sample collection code by
+ * marking the data as present
+ */
+#define AO_SENSOR_ERROR(bit)	(ao_data_present |= (ao_sensor_errors |= (bit)))
+
+/*
  * Wait until it is time to write a sensor sample; this is
  * signaled by the timer tick
  */
