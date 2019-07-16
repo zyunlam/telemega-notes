@@ -40,6 +40,8 @@ libao_tools_a_SOURCES = \
 	chbevl.c \
 	mconf.h \
 	cephes.h \
+	ao-atmosphere.c \
+	ao-atmosphere.h \
 	ao-hex.c \
 	ao-hex.h \
 	ao-editaltos.c \
