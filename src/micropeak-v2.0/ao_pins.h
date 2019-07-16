@@ -43,8 +43,8 @@ extern uint8_t ao_on_battery;
 #define AO_RCC_CFGR_HPRE_DIV	(ao_on_battery ? STM_RCC_CFGR_HPRE_DIV_16 : STM_RCC_CFGR_HPRE_DIV_1)
 
 /* APB = 12MHz usb / 2MHz battery */
-#define AO_APB_PRESCALER	1
-#define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
+#define AO_APB_PRESCALER	(ao_on_battery ? 2 : 1)
+#define AO_RCC_CFGR_PPRE_DIV	(ao_on_battery ? STM_RCC_CFGR_PPRE_DIV_2 : STM_RCC_CFGR_PPRE_DIV_1)
 
 #define HAS_USB			1
 #define AO_PA11_PA12_RMP	1
@@ -86,6 +86,7 @@ extern uint8_t ao_on_battery;
 
 /* SPI */
 #define HAS_SPI_1		1
+#define SPI_1_POWER_MANAGE	1
 #define SPI_1_PA5_PA6_PA7	1
 #define SPI_1_PB3_PB4_PB5	0
 #define SPI_1_OSPEEDR		STM_OSPEEDR_MEDIUM
@@ -128,9 +129,11 @@ void ao_delay_until(uint16_t target);
 #define ao_async_stop() do {					\
 		ao_serial2_drain();				\
 		stm_moder_set(&stm_gpioa, 2, STM_MODER_OUTPUT); \
+		ao_serial_shutdown();				\
 	} while (0)
 
 #define ao_async_start() do {						\
+		ao_serial_init();					\
 		stm_moder_set(&stm_gpioa, 2, STM_MODER_ALTERNATE);	\
 		ao_delay(AO_MS_TO_TICKS(100));				\
 	} while (0)

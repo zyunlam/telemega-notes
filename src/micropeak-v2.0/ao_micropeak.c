@@ -272,9 +272,6 @@ ao_hsi_init(void)
 	/* Enable prefetch */
 	stm_flash.acr |= (1 << STM_FLASH_ACR_PRFTBE);
 
-	/* Enable power interface clock */
-	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
-
 	/* HCLK to 48MHz -> AHB prescaler = /1 */
 	cfgr = stm_rcc.cfgr;
 	cfgr &= ~(STM_RCC_CFGR_HPRE_MASK << STM_RCC_CFGR_HPRE);
@@ -314,7 +311,6 @@ main(void)
 	ao_led_init();
 	ao_task_init();
 	ao_timer_init();
-	ao_serial_init();
 	stm_moder_set(&stm_gpioa, 2, STM_MODER_OUTPUT);
 	ao_dma_init();
 	ao_spi_init();
@@ -324,6 +320,12 @@ main(void)
 
 	ao_ms5607_init();
 	ao_storage_init();
+
+	/* Let FLITF clock turn off in sleep mode */
+	stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_FLITFEN);
+
+	/* Le SRAM clock turn off in sleep mode */
+	stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_SRAMEN);
 
 	if (ao_on_battery) {
 		/* On battery power, run the flight code */
