@@ -64,27 +64,41 @@ AC_ARG_WITH(jcommon, AS_HELP_STRING([--with-jcommon=PATH],
 
 AC_SUBST(JCOMMON)
 
-AC_ARG_WITH(jvm, AS_HELP_STRING([--with-jvm-include=PATH],
-	[Set jvm include path for jni builds (default searches in /usr/lib/jvm)]),
-	[JVM_INCLUDE=$withval], [JVM_INCLUDE=auto])
+AC_ARG_WITH(jvm, AS_HELP_STRING([--with-jvm=PATH],
+	[Set jvm path for java builds (default searches in /usr/lib/jvm)]),
+	[JVM=$withval], [JVM=auto])
 
-if test "x$JVM_INCLUDE" = "xauto"; then
-	AC_MSG_CHECKING([JVM include files])
-	for jvm in default-java java-6-openjdk java-6-sun; do
-		if test "x$JVM_INCLUDE" = "xauto"; then
+if test "x$JVM" = "xauto"; then
+	AC_MSG_CHECKING([JVM])
+	for jvm in default-java java-6-openjdk java-7-openjdk java-8-openjdk java-9-openjdk java-10-openjdk java-11-openjdk java-12-openjdk java-13-openjdk java-6-sun; do
+		if test "x$JVM" = "xauto"; then
 			INCLUDE="/usr/lib/jvm/$jvm/include"
 			if test -f "$INCLUDE"/jni.h; then
-				JVM_INCLUDE="$INCLUDE"
+				JVM=/usr/lib/jvm/"$jvm"
 			fi
 		fi
 	done
-	if test "x$JVM_INCLUDE" = "xauto"; then
-		AC_MSG_ERROR([no JVM include files found])
+	if test "x$JVM" = "xauto"; then
+		AC_MSG_ERROR([no JVM files found])
 	fi
-	AC_MSG_RESULT([$JVM_INCLUDE])
+	AC_MSG_RESULT([$JVM])
 fi
 
+AC_ARG_WITH(java-version, AS_HELP_STRING([--with-java-version=7],
+					 [Set java language compatibility version (default is 7)]),
+	   [JAVA_VERSION=$withval], [JAVA_VERSION=7])
+
+JAVAC="$JVM"/bin/javac
+JAVA="$JVM"/bin/java
+JVM_INCLUDE="$JVM"/include
+JAVAC_VERSION_FLAGS="-target 1.$JAVA_VERSION -source 1.$JAVA_VERSION"
+
+AC_SUBST(JAVAC)
+AC_SUBST(JAVA)
+AC_SUBST(JVM)
 AC_SUBST(JVM_INCLUDE)
+AC_SUBST(JAVAC_VERSION_FLAGS)
+
 
 AC_ARG_WITH(android, AS_HELP_STRING([--with-android=PATH],
 	[Set android SDK path (default searches in a variety of places)]),
