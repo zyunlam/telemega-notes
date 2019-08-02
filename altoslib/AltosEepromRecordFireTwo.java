@@ -47,17 +47,18 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 
 	public static double adc_to_pa(int adc) {
 
-//		/* 1600psi sensor measured 2019.04.30, these values based on that */
-//		double ADC_MIN = 405;
-//		double ADC_SLOPE = 1.95;
+		/* 1600psi sensor measured 2019.07.10, these values based on that */
+		double ADC_MIN = 405;
+		double ADC_SLOPE = 2.020;	/* adc counts per psi */
+		double ADC_OFFSET = 14.79;	/* psi at ADC_MIN */
 
-		/* 2500psi sensor measured 2019.04.30, these values based on that */
-		double ADC_MIN = 392;
-		double ADC_SLOPE = 0.46;	/* adc counts per psi */
+//		/* 2500psi sensor measured 2019.04.30, these values based on that */
+//		double ADC_MIN = 392;
+//		double ADC_SLOPE = 0.46;	/* adc counts per psi */
 
 		/* sensor is asserted to be linear 0 - max psi over ADC_MIN to ADC_MAX */
 		double raw = adc;
-		double psi = ((raw - ADC_MIN) / ADC_SLOPE);
+		double psi = ((raw - ADC_MIN) / ADC_SLOPE) + ADC_OFFSET;
 
 		return AltosConvert.psi_to_pa(psi);
 

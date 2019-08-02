@@ -102,15 +102,15 @@ public class AltosGraph extends AltosUIGraph {
 		AltosUIAxis	course_axis, dop_axis, tick_axis;
 
 		if (stats != null && stats.serial != AltosLib.MISSING && stats.product != null && stats.flight != AltosLib.MISSING)
-			setName(String.format("%s %d flight %d\n", stats.product, stats.serial, stats.flight));
+			setName(String.format("%s %d test %d\n", stats.product, stats.serial, stats.flight));
 
-		height_axis = newAxis("Height", AltosConvert.height, height_color);
-		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color, 0);
-		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color);
+		height_axis = newAxis("Height", AltosConvert.height, height_color,0);
+		pressure_axis = newAxis("Pressure", AltosConvert.pressure, pressure_color);
+		speed_axis = newAxis("Speed", AltosConvert.speed, speed_color,0);
 		thrust_axis = newAxis("Thrust", AltosConvert.force, accel_color);
 		tick_axis = newAxis("Tick", tick_units, accel_color, 0);
-		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color);
-		voltage_axis = newAxis("Voltage", AltosConvert.voltage, battery_voltage_color);
+		accel_axis = newAxis("Acceleration", AltosConvert.accel, accel_color,0);
+		voltage_axis = newAxis("Voltage", AltosConvert.voltage, battery_voltage_color,0);
 		temperature_axis = newAxis("Temperature", AltosConvert.temperature, temperature_color, 0);
 		nsat_axis = newAxis("Satellites", null, gps_nsat_color,
 				    AltosUIAxis.axis_include_zero | AltosUIAxis.axis_integer);
@@ -146,7 +146,7 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.accel_name,
 					    accel_color,
-					    true,
+					    false,
 					    accel_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.vert_accel_name,
@@ -166,7 +166,7 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.speed_name,
 					    speed_color,
-					    true,
+					    false,
 					    speed_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.kalman_speed_name,
@@ -176,12 +176,12 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.pressure_name,
 					    pressure_color,
-					    false,
+					    true,
 					    pressure_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.height_name,
 					    height_color,
-					    true,
+					    false,
 					    height_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.altitude_name,
