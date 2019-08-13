@@ -41,8 +41,10 @@ ao_v_t			ao_height;
 ao_v_t			ao_speed;
 ao_v_t			ao_accel;
 ao_v_t			ao_max_height;
+#if HAS_BARO
 static ao_k_t		ao_avg_height_scaled;
 ao_v_t			ao_avg_height;
+#endif
 
 ao_v_t			ao_error_h;
 #if !HAS_ACCEL || AO_FLIGHT_TEST
@@ -86,6 +88,7 @@ ao_kalman_predict(void)
 	ao_k_speed += (ao_k_t) ao_accel * AO_K_STEP_100;
 }
 
+#if HAS_BARO
 static void
 ao_kalman_err_height(void)
 {
@@ -140,7 +143,9 @@ ao_kalman_err_height(void)
 #endif
 	}
 }
+#endif
 
+#if HAS_BARO
 static void
 ao_kalman_correct_baro(void)
 {
@@ -163,6 +168,7 @@ ao_kalman_correct_baro(void)
 	ao_k_speed  += (ao_k_t) AO_BARO_K1_100 * ao_error_h;
 	ao_k_accel  += (ao_k_t) AO_BARO_K2_100 * ao_error_h;
 }
+#endif
 
 #if HAS_ACCEL
 
@@ -177,7 +183,7 @@ ao_kalman_err_accel(void)
 	ao_error_a = (accel - ao_k_accel) >> 16;
 }
 
-#ifndef FORCE_ACCEL
+#if !defined(FORCE_ACCEL) && HAS_BARO
 static void
 ao_kalman_correct_both(void)
 {
@@ -255,12 +261,14 @@ ao_kalman_correct_accel(void)
 {
 	ao_kalman_err_accel();
 
+#ifdef AO_FLIGHT_TEST
 	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		ao_k_height +=(ao_k_t) AO_ACCEL_K0_10 * ao_error_a;
 		ao_k_speed  += (ao_k_t) AO_ACCEL_K1_10 * ao_error_a;
 		ao_k_accel  += (ao_k_t) AO_ACCEL_K2_10 * ao_error_a;
 		return;
 	}
+#endif
 	ao_k_height += (ao_k_t) AO_ACCEL_K0_100 * ao_error_a;
 	ao_k_speed  += (ao_k_t) AO_ACCEL_K1_100 * ao_error_a;
 	ao_k_accel  += (ao_k_t) AO_ACCEL_K2_100 * ao_error_a;
@@ -273,6 +281,7 @@ void
 ao_kalman(void)
 {
 	ao_kalman_predict();
+#if HAS_BARO
 #if HAS_ACCEL
 	if (ao_flight_state <= ao_flight_coast) {
 #ifdef FORCE_ACCEL
@@ -283,11 +292,15 @@ ao_kalman(void)
 	} else
 #endif
 		ao_kalman_correct_baro();
+#else
+	ao_kalman_correct_accel();
+#endif
 	ao_height = from_fix(ao_k_height);
 	ao_speed = from_fix(ao_k_speed);
 	ao_accel = from_fix(ao_k_accel);
 	if (ao_height > ao_max_height)
 		ao_max_height = ao_height;
+#if HAS_BARO
 	ao_avg_height_scaled = ao_avg_height_scaled - ao_avg_height + ao_sample_height;
 #ifdef AO_FLIGHT_TEST
 	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50)
@@ -297,4 +310,5 @@ ao_kalman(void)
 	else 
 #endif
 		ao_avg_height = (ao_avg_height_scaled + 63) >> 7;
+#endif
 }

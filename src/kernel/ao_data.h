@@ -114,6 +114,9 @@ struct ao_data {
 #endif
 #if HAS_MPU9250
 	struct ao_mpu9250_sample	mpu9250;
+#if !HAS_MMA655X
+	int16_t				z_accel;
+#endif
 #endif
 #if HAS_HMC5883
 	struct ao_hmc5883_sample	hmc5883;
@@ -185,20 +188,6 @@ typedef AO_ALT_TYPE	alt_t;
 #define ao_data_temp(packet)	((packet)->ms5607_cooked.temp)
 
 #define pres_to_altitude(p)	ao_pa_to_altitude(p)
-
-#endif
-
-#if !HAS_BARO && HAS_ADC
-
-#define HAS_BARO	1
-
-typedef int16_t pres_t;
-typedef int16_t alt_t;
-
-#define ao_data_pres(packet)	((packet)->adc.pres)
-#define ao_data_temp(packet)	((packet)->adc.temp)
-#define pres_to_altitude(p)	ao_pres_to_altitude(p)
-#define ao_data_pres_cook(p)
 
 #endif
 
@@ -405,6 +394,20 @@ static inline float ao_convert_accel(int16_t sensor)
 {
 	return ao_mpu6000_accel(sensor);
 }
+
+#endif
+
+#if !HAS_ACCEL && HAS_MPU9250
+
+#define HAS_ACCEL	1
+
+typedef int16_t accel_t;
+
+/* MPU9250 is hooked up so that positive y is positive acceleration */
+#define ao_data_accel(packet)			((packet)->z_accel)
+#define ao_data_accel_cook(packet)		(-(packet)->mpu9250.accel_y)
+#define ao_data_set_accel(packet, accel)	((packet)->z_accel = (accel))
+#define ao_data_accel_invert(a)			(-(a))
 
 #endif
 

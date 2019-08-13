@@ -108,10 +108,12 @@ ao_flight(void)
 #if HAS_ACCEL
 			if (ao_config.accel_plus_g == 0 ||
 			    ao_config.accel_minus_g == 0 ||
-			    ao_ground_accel < ao_config.accel_plus_g - ACCEL_NOSE_UP ||
-			    ao_ground_accel > ao_config.accel_minus_g + ACCEL_NOSE_UP ||
-			    ao_ground_height < -1000 ||
-			    ao_ground_height > 7000)
+			    ao_ground_accel < ao_config.accel_plus_g - ACCEL_NOSE_UP
+#if HAS_BARO
+			    || ao_ground_accel > ao_config.accel_minus_g + ACCEL_NOSE_UP
+			    || ao_ground_height < -1000 || ao_ground_height > 7000
+#endif
+				)
 			{
 				/* Detected an accel value outside -1.5g to 1.5g
 				 * (or uncalibrated values), so we go into invalid mode
@@ -203,7 +205,9 @@ ao_flight(void)
 				ao_launch_tick = ao_boost_tick = ao_sample_tick;
 
 				/* start logging data */
+#if HAS_LOG
 				ao_log_start();
+#endif
 
 #if HAS_TELEMETRY
 				/* Increase telemetry rate */
