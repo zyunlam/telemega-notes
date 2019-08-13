@@ -36,9 +36,11 @@
 #endif
 
 uint16_t	ao_sample_tick;		/* time of last data */
+#if HAS_BARO
 pres_t		ao_sample_pres;
 alt_t		ao_sample_alt;
 alt_t		ao_sample_height;
+#endif
 #if HAS_ACCEL
 accel_t		ao_sample_accel;
 #endif
@@ -60,8 +62,10 @@ uint8_t		ao_sample_data;
  * Sensor calibration values
  */
 
+#if HAS_BARO
 pres_t		ao_ground_pres;		/* startup pressure */
 alt_t		ao_ground_height;	/* MSL of ao_ground_pres */
+#endif
 
 #if HAS_ACCEL
 accel_t		ao_ground_accel;	/* startup acceleration */
@@ -81,7 +85,9 @@ int32_t		ao_ground_roll;
 static uint8_t	ao_preflight;		/* in preflight mode */
 
 static uint16_t	nsamples;
+#if HAS_BARO
 int32_t ao_sample_pres_sum;
+#endif
 #if HAS_ACCEL
 int32_t ao_sample_accel_sum;
 #endif
@@ -105,7 +111,9 @@ ao_sample_preflight_add(void)
 #if HAS_ACCEL
 	ao_sample_accel_sum += ao_sample_accel;
 #endif
+#if HAS_BARO
 	ao_sample_pres_sum += ao_sample_pres;
+#endif
 #if HAS_GYRO
 	ao_sample_accel_along_sum += ao_sample_accel_along;
 	ao_sample_accel_across_sum += ao_sample_accel_across;
@@ -171,9 +179,11 @@ ao_sample_preflight_set(void)
 	ao_ground_accel = ao_sample_accel_sum >> 9;
 	ao_sample_accel_sum = 0;
 #endif
+#if HAS_BARO
 	ao_ground_pres = ao_sample_pres_sum >> 9;
 	ao_ground_height = pres_to_altitude(ao_ground_pres);
 	ao_sample_pres_sum = 0;
+#endif
 #if HAS_GYRO
 	ao_ground_accel_along = ao_sample_accel_along_sum >> 9;
 	ao_ground_accel_across = ao_sample_accel_across_sum >> 9;
@@ -375,8 +385,10 @@ ao_sample_init(void)
 {
 	ao_config_get();
 	nsamples = 0;
+#if HAS_BARO
 	ao_sample_pres_sum = 0;
 	ao_sample_pres = 0;
+#endif
 #if HAS_ACCEL
 	ao_sample_accel_sum = 0;
 	ao_sample_accel = 0;
