@@ -7,3 +7,9 @@ application-vnd.altusmetrum.micropeak.svg
 *.icns
 *.build
 *.exe
+*led.png
+*on.png
+*off.png
+*led.svg
+*on.svg
+*off.svg
