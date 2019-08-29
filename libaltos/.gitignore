@@ -11,5 +11,6 @@ libaltosJNI
 cjnitest
 cjnitest32
 cjnitest64
+btletest
 libaltos.swig
 swig_bindings/
