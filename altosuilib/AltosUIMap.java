@@ -36,6 +36,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	Graphics2D	g;
 	Font		tile_font;
 	Font		line_font;
+	AltosMapMark	nearest_mark;
 
 	static Point2D.Double point2d(AltosPointDouble pt) {
 		return new Point2D.Double(pt.x, pt.y);
@@ -115,7 +116,40 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 			map.touch_continue(e.getPoint().x, e.getPoint().y, is_drag_event(e));
 		}
 
+		String pos(double p, String pos, String neg) {
+			String	h = pos;
+			if (p < 0) {
+				h = neg;
+				p = -p;
+			}
+			int deg = (int) Math.floor(p);
+			double min = (p - Math.floor(p)) * 60.0;
+			return String.format("%s %4d° %9.6f'", h, deg, min);
+		}
+
 		public void mouseMoved(MouseEvent e) {
+			AltosMapPathPoint point = map.nearest(e.getPoint().x, e.getPoint().y);
+
+			if (nearest_mark == null)
+				nearest_mark = map.add_mark(point.lat_lon.lat,
+							    point.lat_lon.lon,
+							    point.state);
+			else {
+				nearest_mark.lat_lon.lat = point.lat_lon.lat;
+				nearest_mark.lat_lon.lon = point.lat_lon.lon;
+				nearest_mark.state = point.state;
+			}
+			if (point != null) {
+				nearest_label.setText(String.format("Time: %9.2f Position:  %s  %s",
+								    point.time,
+								    pos(point.lat_lon.lat,
+									"N", "S"),
+								    pos(point.lat_lon.lon,
+									"E", "W")));
+			} else {
+				nearest_label.setText("");
+			}
+			repaint();
 		}
 
 		/* MouseListener methods */
@@ -387,6 +421,8 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	public void set_font() {
 		tile_font = AltosUILib.value_font;
 		line_font = AltosUILib.status_font;
+		if (nearest_label != null)
+			nearest_label.setFont(AltosUILib.value_font);
 	}
 
 	public void font_size_changed(int font_size) {
@@ -399,6 +435,8 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 	}
 
 	JLabel	zoom_label;
+
+	JLabel	nearest_label;
 
 	public void set_maptype(int type) {
 /*
@@ -430,8 +468,8 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		map.show(state, listener_state);
 	}
 
-	public void show(AltosGPS gps, int state) {
-		map.show(gps, state);
+	public void show(AltosGPS gps, double time, int state) {
+		map.show(gps, time, state);
 	}
 
 	public String getName() {
@@ -541,6 +579,20 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		c.weighty = 0;
 		add(zoom_out, c);
 
+
+		nearest_label = new JLabel("", JLabel.LEFT);
+		nearest_label.setFont(tile_font);
+
+		c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 11;
+		c.weightx = 0;
+		c.weighty = 0;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		add(nearest_label, c);
 /*
 		maptype_combo = new JComboBox<String>(map.maptype_labels);
 

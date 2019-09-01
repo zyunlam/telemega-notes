@@ -32,8 +32,8 @@ public abstract class AltosMapPath {
 
 	public abstract void paint(AltosMapTransform t);
 
-	public AltosMapRectangle add(double lat, double lon, int state) {
-		AltosMapPathPoint		point = new AltosMapPathPoint(new AltosLatLon (lat, lon), state);
+	public AltosMapRectangle add(double lat, double lon, double time, int state) {
+		AltosMapPathPoint		point = new AltosMapPathPoint(new AltosLatLon (lat, lon), time, state);
 		AltosMapRectangle	rect = null;
 
 		if (!point.equals(last_point)) {
@@ -43,6 +43,31 @@ public abstract class AltosMapPath {
 			last_point = point;
 		}
 		return rect;
+	}
+
+	private double dist(AltosLatLon lat_lon, AltosMapPathPoint point) {
+		return (new AltosGreatCircle(lat_lon.lat,
+					     lat_lon.lon,
+					     point.lat_lon.lat,
+					     point.lat_lon.lon)).distance;
+	}
+
+	public AltosMapPathPoint nearest(AltosLatLon lat_lon) {
+		AltosMapPathPoint nearest = null;
+		double nearest_dist = 0;
+		for (AltosMapPathPoint point : points) {
+			if (nearest == null) {
+				nearest = point;
+				nearest_dist = dist(lat_lon, point);
+			} else {
+				double d = dist(lat_lon, point);
+				if (d < nearest_dist) {
+					nearest = point;
+					nearest_dist = d;
+				}
+			}
+		}
+		return nearest;
 	}
 
 	public void clear () {

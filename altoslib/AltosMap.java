@@ -222,7 +222,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		return false;
 	}
 
-	public void show(AltosGPS gps, int state) {
+	public void show(AltosGPS gps, double time, int state) {
 
 		/*
 		 * If insufficient gps data, nothing to update
@@ -250,7 +250,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		}
 
 		if (path != null) {
-			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, state);
+			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, time, state);
 
 			if (damage != null)
 				repaint(damage, AltosMapPath.stroke_width);
@@ -262,7 +262,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public void show(AltosState state, AltosListenerState listener_state) {
-		show(state.gps, state.state());
+		show(state.gps, state.time, state.state());
 	}
 
 	public void centre(AltosLatLon lat_lon) {
@@ -290,13 +290,19 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			centre(lat_lon);
 	}
 
-	public void add_mark(double lat, double lon, int state) {
+	public AltosMapMark add_mark(double lat, double lon, int state) {
+		AltosMapMark mark;
 		synchronized(marks) {
-			AltosMapMark mark = map_interface.new_mark(lat, lon, state);
+			mark = map_interface.new_mark(lat, lon, state);
 			if (mark != null)
 				marks.add(mark);
 		}
 		repaint();
+		return mark;
+	}
+
+	public void del_mark(AltosMapMark mark) {
+		marks.remove(mark);
 	}
 
 	public void clear_marks() {
@@ -488,6 +494,14 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		notice_user_input();
 		if (is_drag)
 			drag_stop(x, y);
+	}
+
+	public AltosMapPathPoint nearest(int x, int y) {
+		notice_user_input();
+		if (path == null)
+			return null;
+		AltosLatLon	at = transform.screen_lat_lon(new  AltosPointInt(x, y));
+		return path.nearest(at);
 	}
 
 	public AltosMap(AltosMapInterface map_interface, int scale) {

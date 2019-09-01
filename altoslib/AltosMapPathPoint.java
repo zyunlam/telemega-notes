@@ -25,6 +25,7 @@ import java.util.concurrent.*;
 
 public class AltosMapPathPoint {
 	public AltosLatLon	lat_lon;
+	public double		time;
 	public int		state;
 
 	public int hashCode() {
@@ -43,8 +44,9 @@ public class AltosMapPathPoint {
 		return lat_lon.equals(other.lat_lon) && state == other.state;
 	}
 
-	public AltosMapPathPoint(AltosLatLon lat_lon, int state) {
+	public AltosMapPathPoint(AltosLatLon lat_lon, double time, int state) {
 		this.lat_lon = lat_lon;
+		this.time = time;
 		this.state = state;
 	}
 }
