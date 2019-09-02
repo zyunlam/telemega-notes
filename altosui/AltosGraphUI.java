@@ -45,6 +45,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	void fill_map(AltosFlightSeries flight_series) {
 		boolean			any_gps = false;
 		AltosGPSTimeValue	gtv_last = null;
+		double gps_pad_altitude = flight_series.cal_data().gps_pad_altitude;;
 
 		if (flight_series.gps_series != null) {
 			for (AltosGPSTimeValue gtv : flight_series.gps_series) {
@@ -54,7 +55,9 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 				    gps.nsat >= 4) {
 					if (map == null)
 						map = new AltosUIMap();
-					map.show(gps, gtv. time, (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time));
+					double gps_height = gps.alt - gps_pad_altitude;
+					int state = (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time);
+					map.show(gps, gtv.time, state, gps_height);
 					this.gps = gps;
 					gtv_last = gtv;
 					has_gps = true;
@@ -63,8 +66,9 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		}
 		if (gtv_last != null) {
 			int state = (int) flight_series.value_after(AltosFlightSeries.state_name, gtv_last.time);
+			double gps_height = gps.alt - gps_pad_altitude;
 			if (state == AltosLib.ao_flight_landed)
-				map.show(gtv_last.gps, gtv_last.time, state);
+				map.show(gtv_last.gps, gtv_last.time, state,gps_height);
 		}
 	}
 

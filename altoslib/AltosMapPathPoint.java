@@ -24,12 +24,13 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class AltosMapPathPoint {
-	public AltosLatLon	lat_lon;
+	public AltosGPS		gps;
 	public double		time;
 	public int		state;
+	public double		gps_height;
 
 	public int hashCode() {
-		return lat_lon.hashCode() ^ state;
+		return Double.valueOf(gps.lat).hashCode() ^ Double.valueOf(gps.lon).hashCode() ^ state;
 	}
 
 	public boolean equals(Object o) {
@@ -41,13 +42,14 @@ public class AltosMapPathPoint {
 
 		AltosMapPathPoint other = (AltosMapPathPoint) o;
 
-		return lat_lon.equals(other.lat_lon) && state == other.state;
+		return gps.lat == other.gps.lat && gps.lon == other.gps.lon && state == other.state;
 	}
 
-	public AltosMapPathPoint(AltosLatLon lat_lon, double time, int state) {
-		this.lat_lon = lat_lon;
+	public AltosMapPathPoint(AltosGPS gps, double time, int state, double gps_height) {
+		this.gps = gps;
 		this.time = time;
 		this.state = state;
+		this.gps_height = gps_height;
 	}
 }
 

@@ -222,8 +222,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		return false;
 	}
 
-	public void show(AltosGPS gps, double time, int state) {
-
+	public void show(AltosGPS gps, double time, int state, double gps_height) {
 		/*
 		 * If insufficient gps data, nothing to update
 		 */
@@ -250,7 +249,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		}
 
 		if (path != null) {
-			AltosMapRectangle	damage = path.add(gps.lat, gps.lon, time, state);
+			AltosMapRectangle	damage = path.add(gps, time, state, gps_height);
 
 			if (damage != null)
 				repaint(damage, AltosMapPath.stroke_width);
@@ -262,7 +261,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	}
 
 	public void show(AltosState state, AltosListenerState listener_state) {
-		show(state.gps, state.time, state.state());
+		show(state.gps, state.time, state.state(), state.gps_height());
 	}
 
 	public void centre(AltosLatLon lat_lon) {

@@ -117,6 +117,8 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		}
 
 		String pos(double p, String pos, String neg) {
+			if (p == AltosLib.MISSING)
+				return "";
 			String	h = pos;
 			if (p < 0) {
 				h = neg;
@@ -127,25 +129,44 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 			return String.format("%s %4d° %9.6f'", h, deg, min);
 		}
 
+		String height(double h, String label) {
+			if (h == AltosLib.MISSING)
+				return "";
+			return String.format(" %s%s",
+					     AltosConvert.height.show(6, h),
+					     label);
+		}
+
+		String speed(double s, String label) {
+			if (s == AltosLib.MISSING)
+				return "";
+			return String.format(" %s%s",
+					     AltosConvert.speed.show(6, s),
+					     label);
+		}
+
 		public void mouseMoved(MouseEvent e) {
 			AltosMapPathPoint point = map.nearest(e.getPoint().x, e.getPoint().y);
 
 			if (nearest_mark == null)
-				nearest_mark = map.add_mark(point.lat_lon.lat,
-							    point.lat_lon.lon,
+				nearest_mark = map.add_mark(point.gps.lat,
+							    point.gps.lon,
 							    point.state);
 			else {
-				nearest_mark.lat_lon.lat = point.lat_lon.lat;
-				nearest_mark.lat_lon.lon = point.lat_lon.lon;
+				nearest_mark.lat_lon.lat = point.gps.lat;
+				nearest_mark.lat_lon.lon = point.gps.lon;
 				nearest_mark.state = point.state;
 			}
 			if (point != null) {
-				nearest_label.setText(String.format("Time: %9.2f Position:  %s  %s",
+				nearest_label.setText(String.format("%9.2f sec %s%s%s%s",
 								    point.time,
-								    pos(point.lat_lon.lat,
+								    pos(point.gps.lat,
 									"N", "S"),
-								    pos(point.lat_lon.lon,
-									"E", "W")));
+								    pos(point.gps.lon,
+									"E", "W"),
+								    height(point.gps_height, ""),
+								    speed(point.gps.ground_speed, "(h)"),
+								    speed(point.gps.climb_rate, "(v)")));
 			} else {
 				nearest_label.setText("");
 			}
@@ -256,7 +277,7 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 			g.setStroke(new BasicStroke(stroke_width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
 			for (AltosMapPathPoint point : points) {
-				Point2D.Double	cur = point2d(t.screen(point.lat_lon));
+				Point2D.Double	cur = point2d(t.screen(point.gps.lat, point.gps.lon));
 				if (prev != null) {
 					Line2D.Double	line = new Line2D.Double (prev, cur);
 					Rectangle	bounds = line.getBounds();
@@ -468,8 +489,8 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		map.show(state, listener_state);
 	}
 
-	public void show(AltosGPS gps, double time, int state) {
-		map.show(gps, time, state);
+	public void show(AltosGPS gps, double time, int state, double gps_height) {
+		map.show(gps, time, state, gps_height);
 	}
 
 	public String getName() {
