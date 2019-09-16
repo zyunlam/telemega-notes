@@ -20,12 +20,11 @@ WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
 
 OPT=-Os -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
-NEWLIB_PRINTF_CFLAGS = 	-DNEWLIB_INTEGER_PRINTF_SCANF
+PICOLIBC_PRINTF_CFLAGS = -DPICOLIBC_INTEGER_PRINTF_SCANF
 
-NEWLIB_CFLAGS= \
-	-ffreestanding -nostdlib \
-	-isystem $(NEWLIB_NANO)/arm-none-eabi/include \
-	$(NEWLIB_PRINTF_CFLAGS)
+PICOLIBC_CFLAGS= \
+	-specs=picolibc.specs \
+	$(PICOLIBC_PRINTF_CFLAGS)
 
 AO_CFLAGS=\
 	-std=gnu99 \

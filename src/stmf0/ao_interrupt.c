@@ -32,15 +32,6 @@
 #endif
 #endif
 
-extern void main(void);
-extern char __stack__;
-extern char __text_start__, __text_end__;
-extern char _start__, _end__;
-extern char __bss_start__, __bss_end__;
-#if RELOCATE_INTERRUPT
-extern char __interrupt_rom__, __interrupt_start__, __interrupt_end__;
-#endif
-
 /* Interrupt functions */
 
 void stm_halt_isr(void)
@@ -51,8 +42,6 @@ void stm_halt_isr(void)
 void stm_ignore_isr(void)
 {
 }
-
-const void *stm_interrupt_vector[];
 
 uint32_t
 stm_flash_size(void) {
@@ -65,35 +54,6 @@ stm_flash_size(void) {
 		break;
 	}
 	return (uint32_t) kbytes * 1024;
-}
-
-void start(void)
-{
-#if AO_BOOT_CHAIN
-	if (ao_boot_check_chain()) {
-#if AO_BOOT_PIN
-		if (ao_boot_check_pin())
-#endif
-		{
-			ao_boot_chain(AO_BOOT_APPLICATION_BASE);
-		}
-	}
-#endif
-	/* Turn on syscfg */
-	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGCOMPEN);
-
-#if RELOCATE_INTERRUPT
-	memcpy(&__interrupt_start__, &__interrupt_rom__, &__interrupt_end__ - &__interrupt_start__);
-	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
-		(STM_SYSCFG_CFGR1_MEM_MODE_SRAM << STM_SYSCFG_CFGR1_MEM_MODE);
-#else
-	/* Switch to Main Flash mode (DFU loader leaves us in System mode) */
-	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
-		(STM_SYSCFG_CFGR1_MEM_MODE_MAIN_FLASH << STM_SYSCFG_CFGR1_MEM_MODE);
-#endif
-	memcpy(&_start__, &__text_end__, &_end__ - &_start__);
-	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);
-	main();
 }
 
 #define STRINGIFY(x) #x
@@ -153,10 +113,14 @@ isr(usb)
 
 #define i(addr,name)	[(addr)/4] = stm_ ## name ## _isr
 
-__attribute__ ((section(".interrupt")))
-const void *stm_interrupt_vector[] = {
-	[0] = &__stack__,
-	[1] = start,
+extern char __stack[];
+void _start(void) __attribute__((__noreturn__));
+void main(void) __attribute__((__noreturn__));
+
+__attribute__ ((section(".init")))
+const void * const __interrupt_vector[0x30] = {
+	[0] = __stack,
+	[1] = _start,
 	i(0x08, nmi),
 	i(0x0c, hardfault),
 	i(0x2c, svc),
@@ -196,3 +160,47 @@ const void *stm_interrupt_vector[] = {
 	i(0xb8, cec_can),
 	i(0xbc, usb),
 };
+
+/*
+ * Previous versions of this code had a 256 byte interupt vector. Add
+ * some padding to make sure the other low ROM variables land at the
+ * same address
+ */
+
+__attribute__ ((section(".init.0")))
+const void *const __interrupt_pad[0x10];
+
+void *__interrupt_ram[sizeof(__interrupt_vector)/sizeof(__interrupt_vector[0])] __attribute__((section(".preserve.1")));
+
+extern char __data_source[];
+extern char __data_start[];
+extern char __data_size[];
+extern char __bss_start[];
+extern char __bss_size[];
+
+void _start(void)
+{
+	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+
+#if AO_BOOT_CHAIN
+	if (ao_boot_check_chain()) {
+#if AO_BOOT_PIN
+		ao_boot_check_pin();
+#endif
+	}
+#endif
+	/* Turn on syscfg */
+	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGCOMPEN);
+
+#if RELOCATE_INTERRUPT
+	memcpy(__interrupt_ram, __interrupt_vector, sizeof(__interrupt_ram));
+	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
+		(STM_SYSCFG_CFGR1_MEM_MODE_SRAM << STM_SYSCFG_CFGR1_MEM_MODE);
+#else
+	/* Switch to Main Flash mode (DFU loader leaves us in System mode) */
+	stm_syscfg.cfgr1 = (stm_syscfg.cfgr1 & ~(STM_SYSCFG_CFGR1_MEM_MODE_MASK << STM_SYSCFG_CFGR1_MEM_MODE)) |
+		(STM_SYSCFG_CFGR1_MEM_MODE_MAIN_FLASH << STM_SYSCFG_CFGR1_MEM_MODE);
+#endif
+	main();
+}

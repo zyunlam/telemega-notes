@@ -70,7 +70,7 @@ ao_flash_wait_bsy(void)
 		;
 }
 
-static void __attribute__ ((section(".ramtext"),noinline))
+static void __attribute__ ((section(".sdata2.flash"), noinline))
 _ao_flash_erase_page(uint32_t *page)
 {
 	stm_flash.pecr |= (1 << STM_FLASH_PECR_ERASE) | (1 << STM_FLASH_PECR_PROG);
@@ -93,7 +93,7 @@ ao_flash_erase_page(uint32_t *page)
 	ao_arch_release_interrupts();
 }
 
-static void __attribute__ ((section(".ramtext"), noinline))
+static void __attribute__ ((section(".sdata2.flash"), noinline))
 _ao_flash_half_page(uint32_t *dst, uint32_t *src)
 {
 	uint8_t		i;
