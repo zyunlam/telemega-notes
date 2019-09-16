@@ -527,7 +527,7 @@ static int tncComment(uint8_t *buf)
 	int16_t apogee = ao_ignite_decivolt(AO_SENSE_DROGUE(&packet));
 #endif
 #ifdef AO_SENSE_MAIN
-	int16_t main = ao_ignite_decivolt(AO_SENSE_MAIN(&packet));
+	int16_t main_value = ao_ignite_decivolt(AO_SENSE_MAIN(&packet));
 #endif
 
 	return sprintf((char *) buf,
@@ -548,8 +548,8 @@ static int tncComment(uint8_t *buf)
 		       apogee%10
 #endif
 #ifdef AO_SENSE_MAIN
-		       , main/10,
-		       main%10
+		       , main_value/10,
+		       main_value%10
 #endif
 		       , ao_serial_number
 		);
