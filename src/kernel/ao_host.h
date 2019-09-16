@@ -127,6 +127,6 @@ struct ao_config {
 
 struct ao_config ao_config = { 250, 16000 };
 
-#define ao_xmemcpy(d,s,c) memcpy(d,s,c)
-#define ao_xmemset(d,v,c) memset(d,v,c)
-#define ao_xmemcmp(d,s,c) memcmp(d,s,c)
+#define memcpy(d,s,c) memcpy(d,s,c)
+#define memset(d,v,c) memset(d,v,c)
+#define memcmp(d,s,c) memcmp(d,s,c)

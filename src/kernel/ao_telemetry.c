@@ -333,12 +333,12 @@ ao_send_configuration(void)
 #endif
 
 		telemetry.configuration.flight_log_max = ao_config.flight_log_max >> 10;
-		ao_xmemcpy (telemetry.configuration.callsign,
-			    ao_config.callsign,
-			    AO_MAX_CALLSIGN);
-		ao_xmemcpy (telemetry.configuration.version,
-			    ao_version,
-			    AO_MAX_VERSION);
+		memcpy (telemetry.configuration.callsign,
+			ao_config.callsign,
+			AO_MAX_CALLSIGN);
+		memcpy (telemetry.configuration.version,
+			ao_version,
+			AO_MAX_VERSION);
 		ao_telemetry_config_cur = ao_telemetry_config_max;
 		ao_telemetry_send();
 	}
@@ -350,6 +350,18 @@ static int8_t ao_telemetry_gps_max;
 static int8_t ao_telemetry_loc_cur;
 static int8_t ao_telemetry_sat_cur;
 
+static inline void *
+telemetry_bits(struct ao_telemetry_location *l)
+{
+	return ((uint8_t *) l) + offsetof(struct ao_telemetry_location, flags);
+}
+
+static inline int
+telemetry_size(void)
+{
+	return sizeof(struct ao_telemetry_location) - offsetof(struct ao_telemetry_location, flags);
+}
+
 static void
 ao_send_location(void)
 {
@@ -357,9 +369,9 @@ ao_send_location(void)
 	{
 		telemetry.generic.type = AO_TELEMETRY_LOCATION;
 		ao_mutex_get(&ao_gps_mutex);
-		ao_xmemcpy(&telemetry.location.flags,
-		       &ao_gps_data.flags,
-		       27);
+		memcpy(telemetry_bits(&telemetry.location),
+		       telemetry_bits(&ao_gps_data),
+		       telemetry_size());
 		telemetry.location.tick = ao_gps_tick;
 		ao_mutex_put(&ao_gps_mutex);
 		ao_telemetry_loc_cur = ao_telemetry_gps_max;
@@ -375,7 +387,7 @@ ao_send_satellite(void)
 		telemetry.generic.type = AO_TELEMETRY_SATELLITE;
 		ao_mutex_get(&ao_gps_mutex);
 		telemetry.satellite.channels = ao_gps_tracking_data.channels;
-		ao_xmemcpy(&telemetry.satellite.sats,
+		memcpy(&telemetry.satellite.sats,
 		       &ao_gps_tracking_data.sats,
 		       AO_MAX_GPS_TRACKING * sizeof (struct ao_telemetry_satellite_info));
 		ao_mutex_put(&ao_gps_mutex);
@@ -399,7 +411,7 @@ ao_send_companion(void)
 		telemetry.companion.update_period = ao_companion_setup.update_period;
 		telemetry.companion.channels = ao_companion_setup.channels;
 		ao_mutex_get(&ao_companion_mutex);
-		ao_xmemcpy(&telemetry.companion.companion_data,
+		memcpy(&telemetry.companion.companion_data,
 		       ao_companion_data,
 		       ao_companion_setup.channels * 2);
 		ao_mutex_put(&ao_companion_mutex);

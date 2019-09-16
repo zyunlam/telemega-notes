@@ -138,8 +138,8 @@ _ao_config_get(void)
 
 		/* Version 0 stuff */
 		ao_config.main_deploy = AO_CONFIG_DEFAULT_MAIN_DEPLOY;
-		ao_xmemset(&ao_config.callsign, '\0', sizeof (ao_config.callsign));
-		ao_xmemcpy(&ao_config.callsign, AO_CONFIG_DEFAULT_CALLSIGN,
+		memset(&ao_config.callsign, '\0', sizeof (ao_config.callsign));
+		memcpy(&ao_config.callsign, AO_CONFIG_DEFAULT_CALLSIGN,
 		       sizeof(AO_CONFIG_DEFAULT_CALLSIGN) - 1);
 		ao_config._legacy_radio_channel = 0;
 	}
@@ -171,7 +171,7 @@ _ao_config_get(void)
 		if (minor < 8)
 			ao_config.radio_enable = AO_RADIO_ENABLE_CORE;
 		if (minor < 9)
-			ao_xmemset(&ao_config.aes_key, '\0', AO_AES_LEN);
+			memset(&ao_config.aes_key, '\0', AO_AES_LEN);
 		if (minor < 10)
 			ao_config.frequency = 434550 + ao_config._legacy_radio_channel * 100;
 		if (minor < 11)
@@ -250,7 +250,7 @@ _ao_config_get(void)
 #if HAS_RADIO_RATE
 		ao_config.radio_rate = AO_CONFIG_DEFAULT_RADIO_RATE;
 #endif
-		ao_xmemcpy(&ao_config.callsign, AO_CONFIG_DEFAULT_CALLSIGN,
+		memcpy(&ao_config.callsign, AO_CONFIG_DEFAULT_CALLSIGN,
 		       sizeof(AO_CONFIG_DEFAULT_CALLSIGN) - 1);
 	}
 #endif
@@ -294,7 +294,7 @@ ao_config_callsign_set(void)
 	uint8_t	c;
 	static char callsign[AO_MAX_CALLSIGN + 1];
 
-	ao_xmemset(callsign, '\0', sizeof callsign);
+	memset(callsign, '\0', sizeof callsign);
 	ao_cmd_white();
 	c = 0;
 	while (ao_cmd_lex_c != '\n') {
@@ -307,7 +307,7 @@ ao_config_callsign_set(void)
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_xmemcpy(&ao_config.callsign, &callsign,
+	memcpy(&ao_config.callsign, &callsign,
 	       AO_MAX_CALLSIGN + 1);
 	_ao_config_edit_finish();
 }

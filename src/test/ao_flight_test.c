@@ -331,10 +331,6 @@ struct ao_cmds {
 	const char	*help;
 };
 
-#define ao_xmemcpy(d,s,c) memcpy(d,s,c)
-#define ao_xmemset(d,v,c) memset(d,v,c)
-#define ao_xmemcmp(d,s,c) memcmp(d,s,c)
-
 #define AO_NEED_ALTITUDE_TO_PRES 1
 #if TELEMEGA || TELEMETRUM_V2 || EASYMINI
 #include "ao_convert_pa.c"
@@ -357,9 +353,6 @@ struct ao_ms5607_prom	ao_ms5607_prom;
 #define ao_config_get()
 
 struct ao_config ao_config;
-
-#define x (x)
-
 
 extern int16_t ao_ground_accel, ao_flight_accel;
 extern int16_t ao_accel_2g;

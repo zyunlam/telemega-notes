@@ -157,7 +157,7 @@ ao_monitor_put(void)
 			state = recv_orig.telemetry_orig.flight_state;
 
 			rssi = (int16_t) AO_RSSI_FROM_RADIO(recv_orig.rssi);
-			ao_xmemcpy(callsign, recv_orig.telemetry_orig.callsign, AO_MAX_CALLSIGN);
+			memcpy(callsign, recv_orig.telemetry_orig.callsign, AO_MAX_CALLSIGN);
 			if (state > ao_flight_invalid)
 				state = ao_flight_invalid;
 			if (recv_orig.status & PKT_APPEND_STATUS_1_CRC_OK) {

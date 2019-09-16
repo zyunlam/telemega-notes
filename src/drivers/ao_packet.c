@@ -42,7 +42,7 @@ ao_packet_send(void)
 #endif
 	/* If any tx data is pending then copy it into the tx packet */
 	if (ao_packet_tx_used && ao_tx_packet.len == 0) {
-		ao_xmemcpy(&ao_tx_packet.d, tx_data, ao_packet_tx_used);
+		memcpy(&ao_tx_packet.d, tx_data, ao_packet_tx_used);
 		ao_tx_packet.len = ao_packet_tx_used;
 		ao_tx_packet.seq++;
 		ao_packet_tx_used = 0;
@@ -88,10 +88,10 @@ ao_packet_recv(uint16_t timeout)
 	/* Accept packets with matching call signs, or any packet if
 	 * our callsign hasn't been configured
 	 */
-	if (ao_xmemcmp(ao_rx_packet.packet.callsign,
+	if (memcmp(ao_rx_packet.packet.callsign,
 		       ao_config.callsign,
 		       AO_MAX_CALLSIGN) != 0 &&
-	    ao_xmemcmp(ao_config.callsign, "N0CALL", 7) != 0)
+	    memcmp(ao_config.callsign, "N0CALL", 7) != 0)
 		return 0;
 
 	/* SYN packets carry no data */
@@ -111,7 +111,7 @@ ao_packet_recv(uint16_t timeout)
 			/* Copy data to the receive data buffer and set up the
 			 * offsets
 			 */
-			ao_xmemcpy(rx_data, ao_rx_packet.packet.d, ao_rx_packet.packet.len);
+			memcpy(rx_data, ao_rx_packet.packet.d, ao_rx_packet.packet.len);
 			ao_packet_rx_used = 0;
 			ao_packet_rx_len = ao_rx_packet.packet.len;
 
