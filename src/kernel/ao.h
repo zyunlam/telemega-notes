@@ -75,6 +75,7 @@ typedef AO_PORT_TYPE ao_port_t;
 #define AO_PANIC_SELF_TEST_HMC5883	0x40 | 2	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MPU6000	0x40 | 3	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MPU9250	0x40 | 3	/* Self test failure */
+#define AO_PANIC_SELF_TEST_BMX160	0x40 | 3	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MS5607	0x40 | 4	/* Self test failure */
 #define AO_PANIC_SELF_TEST_ADS124S0X	0x40 | 5	/* Self test failure */
 

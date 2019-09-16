@@ -76,6 +76,13 @@
 #define AO_DATA_MAX6691 0
 #endif
 
+#if HAS_BMX160
+#include <ao_bmx160.h>
+#define AO_DATA_BMX160	(1 << 2)
+#else
+#define AO_DATA_BMX160	0
+#endif
+
 #ifndef HAS_SENSOR_ERRORS
 #if HAS_IMU || HAS_MMA655X || HAS_MS5607 || HAS_MS5611
 #define HAS_SENSOR_ERRORS	1
@@ -88,7 +95,7 @@ extern uint8_t			ao_sensor_errors;
 
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375|AO_DATA_BMX160)
 
 struct ao_data {
 	uint16_t			tick;
@@ -122,6 +129,9 @@ struct ao_data {
 #endif
 #if HAS_ADS131A0X
 	struct ao_ads131a0x_sample	ads131a0x;
+#endif
+#if HAS_BMX160
+	struct ao_bmx160_sample		bmx160;
 #endif
 };
 
