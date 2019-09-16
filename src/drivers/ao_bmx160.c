@@ -90,6 +90,7 @@ _ao_bmm150_reg_write(uint8_t addr, uint8_t data)
 	_ao_bmm150_wait_manual();
 }
 
+#if BMX160_TEST
 static uint8_t
 _ao_bmm150_reg_read(uint8_t addr)
 {
@@ -97,6 +98,7 @@ _ao_bmm150_reg_read(uint8_t addr)
 	_ao_bmm150_wait_manual();
 	return _ao_bmx160_reg_read(BMX160_DATA_0);
 }
+#endif
 
 static void
 _ao_bmx160_sample(struct ao_bmx160_sample *sample)

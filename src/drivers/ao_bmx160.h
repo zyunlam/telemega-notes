@@ -19,6 +19,8 @@
 #ifndef _AO_BMX160_H_
 #define _AO_BMX160_H_
 
+#include <math.h>
+
 struct ao_bmx160_sample {
 	int16_t		mag_x;
 	int16_t		mag_y;
@@ -249,5 +251,19 @@ ao_bmx160_init(void);
 #define  BMM150_REPXY_VALUE(n)				(((n)-1) >> 1)
 #define BMM150_REPZ				0x52
 #define  BMM150_REPZ_VALUE(n)				((n) -1)
+
+#define BMX160_GYRO_FULLSCALE	((float) 2000 * M_PI/180.0)
+
+static inline float
+ao_bmx160_gyro(float sensor) {
+	return sensor * ((float) (BMX160_GYRO_FULLSCALE / 32767.0));
+}
+
+#define BMX160_ACCEL_FULLSCALE	16
+
+static inline float
+ao_bmx160_accel(int16_t sensor) {
+	return (float) sensor * ((float) (BMX160_ACCEL_FULLSCALE * GRAVITY / 32767.0));
+}
 
 #endif /* _BMX160_H_ */

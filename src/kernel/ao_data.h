@@ -441,6 +441,29 @@ static inline float ao_convert_accel(int16_t sensor)
 
 #endif
 
+#if !HAS_GYRO && HAS_BMX160
+
+#define HAS_GYRO	1
+
+typedef int16_t	gyro_t;		/* in raw sample units */
+typedef int16_t angle_t;	/* in degrees */
+
+/* Y axis is aligned with the direction of motion (along) */
+/* X axis is aligned in the other board axis (across) */
+/* Z axis is aligned perpendicular to the board (through) */
+
+static inline float ao_convert_gyro(float sensor)
+{
+	return ao_bmx160_gyro(sensor);
+}
+
+static inline float ao_convert_accel(int16_t sensor)
+{
+	return ao_bmx160_accel(sensor);
+}
+
+#endif
+
 #if !HAS_MAG && HAS_HMC5883
 
 #define HAS_MAG		1
