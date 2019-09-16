@@ -71,10 +71,10 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Wl,-Tmicropeak.ld -n
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stmf0 -Tmicropeak.ld -n
 
 $(PROG): Makefile $(OBJ) micropeak.ld
-	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS) -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
 distclean:	clean
 

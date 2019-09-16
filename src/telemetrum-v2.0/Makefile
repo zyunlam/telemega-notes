@@ -105,7 +105,7 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS) -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
 $(OBJ): $(INC)
 

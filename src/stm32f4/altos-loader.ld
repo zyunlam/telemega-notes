@@ -68,7 +68,7 @@ SECTIONS {
 	.textram BLOCK(8): {
 		_start__ = .;
 		__text_ram_start__ = .;
-		*(.ramtext)
+		*(.srodata)
 		__text_ram_end = .;
 	} >ram AT>rom
 

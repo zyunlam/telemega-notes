@@ -43,8 +43,8 @@ struct ao_boot {
 	uint32_t	check;
 };
 
-static struct ao_boot __attribute__ ((section(".boot"))) ao_boot;
-	
+extern struct ao_boot ao_boot;
+
 int
 ao_boot_check_chain(void)
 {

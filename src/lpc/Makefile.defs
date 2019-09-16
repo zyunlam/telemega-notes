@@ -4,7 +4,7 @@ endif
 
 include $(TOPDIR)/lpc/Makefile-lpc.defs
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/lpc -Wl,-Taltos.ld -n
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/lpc -Taltos.ld -n
 
 ao_serial_lpc.h: $(TOPDIR)/lpc/baud_rate ao_pins.h
 	nickle $(TOPDIR)/lpc/baud_rate `awk '/AO_LPC_CLKOUT/{print $$3}' ao_pins.h` > $@

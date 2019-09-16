@@ -4,4 +4,4 @@ endif
 
 include $(TOPDIR)/stm/Makefile-stm.defs
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm -Wl,-Taltos.ld -n
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm -Taltos.ld -n

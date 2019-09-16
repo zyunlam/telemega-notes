@@ -52,7 +52,7 @@ ao_flash_lock(void)
 
 #define ao_flash_wait_bsy() do { while (stm_flash.sr & (1 << STM_FLASH_SR_BSY)); } while (0)
 
-static void __attribute__ ((section(".ramtext"),noinline))
+static void __attribute__ ((section(".srodata"),noinline))
 _ao_flash_erase_page(uint32_t *page)
 {
 	stm_flash.cr |= (1 << STM_FLASH_CR_PER);
@@ -103,7 +103,7 @@ ao_flash_erase_page(uint32_t *page)
 	ao_arch_release_interrupts();
 }
 
-static void __attribute__ ((section(".ramtext"), noinline))
+static void __attribute__ ((section(".srodata"), noinline))
 _ao_flash_page(uint16_t *dst, uint16_t *src)
 {
 	uint8_t		i;

@@ -29,15 +29,6 @@
 #define RELOCATE_INTERRUPT	1
 #endif
 
-extern void main(void);
-extern char __stack__;
-extern char __text_start__, __text_end__;
-extern char _start__, _end__;
-extern char __bss_start__, __bss_end__;
-#if RELOCATE_INTERRUPT
-extern char __interrupt_rom__, __interrupt_start__, __interrupt_end__;
-#endif
-
 /* Interrupt functions */
 
 void lpc_halt_isr(void)
@@ -47,23 +38,6 @@ void lpc_halt_isr(void)
 
 void lpc_ignore_isr(void)
 {
-}
-
-void start(void) {
-#ifdef AO_BOOT_CHAIN
-	if (ao_boot_check_chain()) {
-#ifdef AO_BOOT_PIN
-		ao_boot_check_pin();
-#endif
-	}
-#endif
-#if RELOCATE_INTERRUPT
-	memcpy(&__interrupt_start__, &__interrupt_rom__, &__interrupt_end__ - &__interrupt_start__);
-	lpc_scb.sysmemremap = LPC_SCB_SYSMEMREMAP_MAP_RAM << LPC_SCB_SYSMEMREMAP_MAP;
-#endif
-	memcpy(&_start__, &__text_end__, &_end__ - &_start__);
-	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);
-	main();
 }
 
 #define STRINGIFY(x) #x
@@ -119,10 +93,13 @@ isr(usb_wakeup)
 #define i(addr,name)	[(addr)/4] = lpc_ ## name ## _isr
 #define c(addr,value)	[(addr)/4] = (value)
 
-__attribute__ ((section(".interrupt")))
-const void *lpc_interrupt_vector[] = {
-	[0] = &__stack__,
-	[1] = start,
+extern char __stack[];
+extern void _start(void);
+
+__attribute__ ((section(".init")))
+const void *const lpc_interrupt_vector[0x40] = {
+	[0] = __stack,
+	[1] = _start,
 	i(0x08, nmi),
 	i(0x0c, hardfault),
 	c(0x10, 0),
@@ -175,3 +152,24 @@ const void *lpc_interrupt_vector[] = {
 	i(0xb8, usb_wakeup),
 	i(0xbc, hardfault),
 };
+
+extern char __interrupt_start[];
+
+void _init(void);
+
+void _init(void)
+{
+#ifdef AO_BOOT_CHAIN
+	if (ao_boot_check_chain()) {
+#ifdef AO_BOOT_PIN
+		ao_boot_check_pin();
+#endif
+	}
+#endif
+#if RELOCATE_INTERRUPT
+	/* This will erase the boot chain data */
+	memcpy(__interrupt_start, lpc_interrupt_vector, sizeof (lpc_interrupt_vector));
+	lpc_scb.sysmemremap = LPC_SCB_SYSMEMREMAP_MAP_RAM << LPC_SCB_SYSMEMREMAP_MAP;
+#endif
+}
+

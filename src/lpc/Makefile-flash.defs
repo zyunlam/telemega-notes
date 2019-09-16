@@ -35,7 +35,7 @@ IDPRODUCT=0x000a
 
 CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS)
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/lpc -Wl,-Taltos-loader.ld
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/lpc -Taltos-loader.ld
 
 PROGNAME=altos-flash
 PROG=$(HARDWARE)-$(PROGNAME)-$(VERSION).elf

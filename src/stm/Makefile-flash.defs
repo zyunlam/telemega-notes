@@ -35,13 +35,13 @@ IDPRODUCT=0x000a
 
 CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS)
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm -Wl,-Taltos-loader.ld -n
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm -Taltos-loader.ld -n
 
 PROGNAME=altos-flash
 PROG=$(HARDWARE)-$(PROGNAME)-$(VERSION).elf
 
 $(PROG): Makefile $(OBJ) altos-loader.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 
