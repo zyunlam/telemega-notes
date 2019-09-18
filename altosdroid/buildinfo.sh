@@ -11,7 +11,7 @@ srcdir=app/src/main/java/org/altusmetrum/AltosDroid
 infile=${srcdir}/BuildInfo.java.in
 outfile=${srcdir}/BuildInfo.java
 
-. ../src/Version
+. ../src/Makedefs
 version=$VERSION
 branch=''
 commitnum=''
