@@ -23,6 +23,8 @@
     <!-- Google Maps -->
     <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <!-- Permissions needed to access bluetooth -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
