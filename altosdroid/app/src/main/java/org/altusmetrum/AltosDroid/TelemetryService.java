@@ -22,24 +22,15 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeoutException;
 import java.util.*;
 
-import android.app.Notification;
-//import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
+import android.app.*;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothAdapter;
+import android.graphics.Color;
 import android.hardware.usb.*;
 import android.content.Intent;
 import android.content.Context;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.os.Looper;
+import android.os.*;
 import android.widget.Toast;
-import android.location.Criteria;
 
 import org.altusmetrum.altoslib_13.*;
 
@@ -641,24 +632,40 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 		}
 	}
 
+
+	private String createNotificationChannel(String channelId, String channelName) {
+		NotificationChannel chan = new NotificationChannel(
+				channelId, channelName, NotificationManager.IMPORTANCE_NONE);
+		chan.setLightColor(Color.BLUE);
+		chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+		NotificationManager service = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		service.createNotificationChannel(chan);
+		return channelId;
+	}
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		AltosDebug.debug("Received start id %d: %s", startId, intent);
-
-		CharSequence text = getText(R.string.telemetry_service_started);
-
-		// Create notification to be displayed while the service runs
-		Notification notification = new Notification(R.drawable.am_status_c, text, 0);
 
 		// The PendingIntent to launch our activity if the user selects this notification
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
 				new Intent(this, AltosDroid.class), 0);
 
-		// Set the info for the views that show in the notification panel.
-		notification.setLatestEventInfo(this, getText(R.string.telemetry_service_label), text, contentIntent);
+		String channelId =
+				(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+						? createNotificationChannel("altosdroid_telemetry", "AltosDroid Telemetry Service")
+						: "";
 
-		// Set the notification to be in the "Ongoing" section.
-		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		// Create notification to be displayed while the service runs
+		Notification notification = new Notification.Builder(this, channelId)
+				.setContentTitle(getText(R.string.telemetry_service_label))
+				.setContentText(getText(R.string.telemetry_service_started))
+				.setContentIntent(contentIntent)
+				.setWhen(System.currentTimeMillis())
+				.setOngoing(true)
+				.setSmallIcon(R.drawable.am_status_c)
+//				.setLargeIcon(R.drawable.am_status_c)
+				.build();
 
 		// Move us into the foreground.
 		startForeground(NOTIFICATION, notification);
