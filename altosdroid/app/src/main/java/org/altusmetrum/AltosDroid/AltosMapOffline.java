@@ -23,13 +23,8 @@ import java.io.*;
 
 import org.altusmetrum.altoslib_13.*;
 
-import android.app.Activity;
 import android.graphics.*;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.*;
-import android.widget.*;
 import android.location.Location;
 import android.content.*;
 import android.util.*;

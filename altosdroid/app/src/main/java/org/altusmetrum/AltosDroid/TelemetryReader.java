@@ -22,7 +22,6 @@ package org.altusmetrum.AltosDroid;
 
 import java.text.*;
 import java.io.*;
-import java.util.*;
 import java.util.concurrent.*;
 import android.os.Handler;
 

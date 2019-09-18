@@ -27,11 +27,7 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-//import android.os.Bundle;
 import android.os.Handler;
-//import android.os.Message;
-
-import org.altusmetrum.altoslib_13.*;
 
 public class AltosBluetooth extends AltosDroidLink {
 

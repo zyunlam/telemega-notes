@@ -21,12 +21,8 @@ package org.altusmetrum.AltosDroid;
 import org.altusmetrum.altoslib_13.*;
 import android.location.Location;
 import android.app.Activity;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.FragmentManager;
-import android.location.Location;
 import android.widget.TextView;
 
 public abstract class AltosDroidTab extends Fragment implements AltosUnitsListener {

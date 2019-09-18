@@ -18,22 +18,12 @@
 
 package org.altusmetrum.AltosDroid;
 
-import java.util.*;
-import org.altusmetrum.AltosDroid.R;
-
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
-import android.view.View.OnClickListener;
 import android.widget.*;
-import android.widget.AdapterView.*;
 
 import org.altusmetrum.altoslib_13.*;
 

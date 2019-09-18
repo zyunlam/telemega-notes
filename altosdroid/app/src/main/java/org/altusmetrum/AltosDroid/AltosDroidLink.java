@@ -18,11 +18,6 @@
 
 package org.altusmetrum.AltosDroid;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.UUID;
-
 import android.os.Handler;
 
 import org.altusmetrum.altoslib_13.*;

@@ -18,10 +18,8 @@
 
 package org.altusmetrum.AltosDroid;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
 import java.util.HashMap;
 
 import android.content.Context;

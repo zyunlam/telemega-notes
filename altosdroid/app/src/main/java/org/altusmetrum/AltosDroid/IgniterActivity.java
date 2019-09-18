@@ -20,18 +20,14 @@ package org.altusmetrum.AltosDroid;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
-import org.altusmetrum.AltosDroid.R;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.*;
 import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
-import android.widget.AdapterView.*;
 
 import org.altusmetrum.altoslib_13.*;
 

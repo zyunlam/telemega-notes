@@ -18,8 +18,6 @@
 
 package org.altusmetrum.AltosDroid;
 
-import java.util.*;
-import java.io.*;
 import android.location.Location;
 import org.altusmetrum.altoslib_13.*;
 

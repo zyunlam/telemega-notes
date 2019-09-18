@@ -21,7 +21,6 @@ package org.altusmetrum.AltosDroid;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
-import android.view.View;
 
 public class GoNoGoLights {
 	private Boolean state;

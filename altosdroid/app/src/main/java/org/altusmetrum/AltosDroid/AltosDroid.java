@@ -19,14 +19,11 @@
 package org.altusmetrum.AltosDroid;
 
 import java.lang.ref.WeakReference;
-import java.text.*;
 import java.util.*;
-import java.io.*;
 
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.Context;
 import android.content.ComponentName;
@@ -38,10 +35,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.util.DisplayMetrics;
 import android.view.*;
 import android.widget.*;
 import android.app.AlertDialog;
@@ -49,8 +44,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 import android.hardware.usb.*;
-import android.graphics.*;
-import android.graphics.drawable.*;
 
 import org.altusmetrum.altoslib_13.*;
 

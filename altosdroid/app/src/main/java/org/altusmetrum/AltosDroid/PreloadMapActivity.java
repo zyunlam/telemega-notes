@@ -19,18 +19,10 @@
 package org.altusmetrum.AltosDroid;
 
 import java.util.*;
-import java.io.*;
 import java.text.*;
 
-import org.altusmetrum.AltosDroid.R;
-
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -40,7 +32,6 @@ import android.widget.AdapterView.*;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
-import android.location.Criteria;
 
 import org.altusmetrum.altoslib_13.*;
 

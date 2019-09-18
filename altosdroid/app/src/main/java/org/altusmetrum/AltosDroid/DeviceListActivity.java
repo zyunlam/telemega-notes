@@ -17,7 +17,6 @@
 package org.altusmetrum.AltosDroid;
 
 import java.util.Set;
-import org.altusmetrum.AltosDroid.R;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;

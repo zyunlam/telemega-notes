@@ -17,9 +17,7 @@
  */
 package org.altusmetrum.AltosDroid;
 
-import java.io.*;
 import java.util.*;
-import java.text.*;
 
 import android.content.Context;
 import org.altusmetrum.altoslib_13.*;
