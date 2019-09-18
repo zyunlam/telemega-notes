@@ -19,10 +19,7 @@
 
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.altusmetrum.AltosDroid"
-          android:versionCode="@ANDROID_VERSION@"
-          android:versionName="@VERSION@">
-    <uses-sdk android:targetSdkVersion="21" android:minSdkVersion="21"/>
+          package="org.altusmetrum.AltosDroid">
     <!-- Google Maps -->
     <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
 
