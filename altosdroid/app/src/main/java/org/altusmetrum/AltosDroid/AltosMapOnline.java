@@ -99,8 +99,8 @@ class RocketOnline implements Comparable {
 	}
 }
 
-public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, AltosMapTypeListener {
-	public SupportMapFragment mMapFragment;
+public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, OnMapReadyCallback, AltosMapTypeListener {
+	public AltosOnlineMapFragment mMapFragment;
 	private GoogleMap mMap;
 	private boolean mapLoaded = false;
 	Context context;
@@ -119,27 +119,34 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 
 	private AltosDroid altos_droid;
 
+	public static class AltosOnlineMapFragment extends SupportMapFragment {
+		AltosMapOnline c;
+
+		public AltosOnlineMapFragment(AltosMapOnline c) {
+			this.c = c;
+		}
+
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			getMapAsync(c);
+		}
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			c.map_view = super.onCreateView(inflater, container, savedInstanceState);
+			return c.map_view;
+		}
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			c.map_view = null;
+		}
+	}
+
 	public void onCreateView(AltosDroid altos_droid) {
 		this.altos_droid = altos_droid;
-		final int map_type = AltosPreferences.map_type();
 		AltosPreferences.register_map_type_listener(this);
-		mMapFragment = new SupportMapFragment() {
-			@Override
-			public void onActivityCreated(Bundle savedInstanceState) {
-				super.onActivityCreated(savedInstanceState);
-				setupMap(map_type);
-			}
-			@Override
-			public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-				map_view = super.onCreateView(inflater, container, savedInstanceState);
-				return map_view;
-			}
-			@Override
-			public void onDestroyView() {
-				super.onDestroyView();
-				map_view = null;
-			}
-		};
+		mMapFragment = new AltosOnlineMapFragment(this);
 	}
 
 	public void onDestroyView() {
@@ -185,8 +192,10 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 		return true;
 	}
 
-	public void setupMap(int map_type) {
-		mMap = mMapFragment.getMap();
+	@Override
+	public void onMapReady(GoogleMap googleMap) {
+		final int map_type = AltosPreferences.map_type();
+		mMap = googleMap;
 		if (mMap != null) {
 			map_type_changed(map_type);
 			mMap.setMyLocationEnabled(true);
