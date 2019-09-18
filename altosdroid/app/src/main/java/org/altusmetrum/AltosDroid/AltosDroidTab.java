@@ -21,8 +21,8 @@ package org.altusmetrum.AltosDroid;
 import org.altusmetrum.altoslib_13.*;
 import android.location.Location;
 import android.app.Activity;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.widget.TextView;
 
 public abstract class AltosDroidTab extends Fragment implements AltosUnitsListener {
