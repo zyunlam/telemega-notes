@@ -1,7 +1,10 @@
+DBG_APK=app/build/outputs/apk/debug/app-debug.apk
+REL_APK=app/build/outputs/apk/release/app-release.apk
+
 if ANDROID
-all_target=bin/AltosDroid-debug.apk
+all_target=$(DBG_APK)
 if ANDROID_RELEASE
-all_target+=bin/AltosDroid-release.apk
+all_target+=$(REL_APK)
 endif
 else
 all_target=
@@ -17,25 +20,18 @@ APKBUILDER=$(SDK)/tools/apkbuilder
 ZIPALIGN_A=$(SDK)/tools/zipalign
 ZIPALIGN_B=$(shell ls $(SDK)/build-tools/*/zipalign | tail -1)
 
-JAVA_SRC_DIR=src/org/altusmetrum/AltosDroid
-EXT_LIBDIR=libs
-DRAWABLE_DIR=res/drawable
-LAYOUT_DIR=res/layout
-MENU_DIR=res/menu
-VALUES_DIR=res/values
-XML_DIR=res/xml
+JAVA_SRC_DIR=app/src/main/java/org/altusmetrum/AltosDroid
+EXT_LIBDIR=app/libs
+RES_DIR=app/src/main/res
+DRAWABLE_DIR=$(RES_DIR)/drawable
+LAYOUT_DIR=$(RES_DIR)/layout
+MENU_DIR=$(RES_DIR)/menu
+VALUES_DIR=$(RES_DIR)/values
+XML_DIR=$(RES_DIR)/xml
 ALTOSLIB_SRCDIR=../altoslib
 ALTOSLIB_JAR=altoslib_$(ALTOSLIB_VERSION).jar
 
 ALTOSLIB=$(EXT_LIBDIR)/$(ALTOSLIB_JAR)
-
-SUPPORT_V4_SRCDIR=$(SDK)/extras/android/support/v4
-SUPPORT_V4_JAR=android-support-v4.jar
-
-SUPPORT_V4=$(EXT_LIBDIR)/$(SUPPORT_V4_JAR)
-
-GOOGLE_PLAY_SERVICES_LIB_SRCDIR=$(SDK)/..
-GOOGLE_PLAY_SERVICES_LIB=google-play-services_lib
 
 JAVA_SRC=$(JAVA_SRC_DIR)/*.java $(JAVA_SRC_DIR)/BuildInfo.java
 
@@ -44,10 +40,12 @@ DRAWABLES=\
     $(DRAWABLE_DIR)/greenled.png \
     $(DRAWABLE_DIR)/grayled.png
 
+GRADLEW=bash ./gradlew --no-daemon
+
 LAYOUTS=$(LAYOUT_DIR)/*.xml
 MENUS=$(MENU_DIR)/*.xml
 VALUES=$(VALUES_DIR)/*.xml
-XMLS=$(XML_DIR)/*.xml AndroidManifest.xml
+XMLS=$(XML_DIR)/*.xml app/src/main/AndroidManifest.xml
 
 RES=$(LAYOUTS) $(MENUS) $(VALUES) $(XMLS)
 
@@ -61,14 +59,6 @@ $(ALTOSLIB): $(ALTOSLIB_SRCDIR)/$(ALTOSLIB_JAR)
 	mkdir -p $(EXT_LIBDIR)
 	cd $(EXT_LIBDIR) && ln -sf $(shell echo $(EXT_LIBDIR) | sed 's|[^/]\+|..|g')/$(ALTOSLIB_SRCDIR)/$(ALTOSLIB_JAR) .
 
-$(SUPPORT_V4): $(SUPPORT_V4_SRCDIR)/$(SUPPORT_V4_JAR)
-	mkdir -p $(EXT_LIBDIR)
-	cd $(EXT_LIBDIR) && ln -sf $(SUPPORT_V4_SRCDIR)/$(SUPPORT_V4_JAR) .
-
-$(GOOGLE_PLAY_SERVICES_LIB): $(GOOGLE_PLAY_SERVICES_LIB_SRCDIR)/$(GOOGLE_PLAY_SERVICES_LIB)
-	cp -a $(GOOGLE_PLAY_SERVICES_LIB_SRCDIR)/$(GOOGLE_PLAY_SERVICES_LIB) .
-	cd $(GOOGLE_PLAY_SERVICES_LIB) && $(SDK)/tools/android update project --target $(SDK_TARGET) --path .
-
 $(JAVA_SRC_DIR)/BuildInfo.java: $(filter-out $(JAVA_SRC_DIR)/BuildInfo.java,$(shell echo $(JAVA_SRC)))
 	./buildinfo.sh
 
@@ -76,38 +66,22 @@ $(DRAWABLE_DIR)/%.png: ../icon/%.png
 	cd $(DRAWABLE_DIR) && ln -sf $(shell echo $(DRAWABLE_DIR) | sed 's|[^/]\+|..|g')/$< .
 
 if ANDROID
-install-release: bin/AltosDroid-release.apk
-	$(ADB) install -r bin/AltosDroid-release.apk
+install-release: $(REL_APK)
+	$(ADB) install -r $(REL_APK)
 
-install-debug: bin/AltosDroid-debug.apk
-	$(ADB) install -r bin/AltosDroid-debug.apk
+install-debug: $(DBG_APK)
+	$(ADB) install -r $(DBG_APK)
 
-bin/AltosDroid-debug.apk: $(SRC) $(ALTOSLIB) $(SUPPORT_V4) $(GOOGLE_PLAY_SERVICES_LIB)
-	JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 ant debug
+$(DBG_APK): $(SRC) $(ALTOSLIB)
+	$(GRADLEW) assembleDebug
 
-bin/AltosDroid-release-unsigned.apk: $(SRC) $(ALTOSLIB) $(SUPPORT_V4) $(GOOGLE_PLAY_SERVICES_LIB)
-	JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 ant release
+$(REL_APK): $(SRC) $(ALTOSLIB)
+	$(GRADLEW) build
 
-bin/AltosDroid-release.apk: bin/AltosDroid-release-unsigned.apk
-	jarsigner -sigalg SHA1withDSA -digestalg SHA1 \
-	   -keystore ~/altusmetrumllc/google-play-release.keystore \
-	   -storepass:file ~/altusmetrumllc/google-play-passphrase \
-	   -signedjar bin/AltosDroid-release-signed.apk \
-	   bin/AltosDroid-release-unsigned.apk AltosDroid
-	if [ -f $(ZIPALIGN_A) ]; then \
-		$(ZIPALIGN_A) -f 4 \
-		   bin/AltosDroid-release-signed.apk \
-		   bin/AltosDroid-release.apk; \
-	else \
-		$(ZIPALIGN_B) -f 4 \
-		   bin/AltosDroid-release-signed.apk \
-		   bin/AltosDroid-release.apk; \
-	fi
-
-release: bin/AltosDroid-release.apk
+release: $(REL_APK)
 
 clean-local: $(GOOGLE_PLAY_SERVICES_LIB)
-	ant clean
+	$(GRADLEW) clean
 	rm -f $(JAVA_SRC_DIR)/BuildInfo.java
 	rm -f $(DRAWABLES)
 	rm -rf $(EXT_LIBDIR)
