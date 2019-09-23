@@ -291,7 +291,7 @@ ao_hsi_init(void)
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 }
 
-void
+int
 main(void)
 {
 	int i;

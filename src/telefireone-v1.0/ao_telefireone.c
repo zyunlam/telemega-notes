@@ -35,7 +35,7 @@ const struct ao_cmds ao_firetwo_cmds[] = {
         { 0,    NULL },
 };
 
-void
+int
 main(void)
 {
 	ao_clock_init();

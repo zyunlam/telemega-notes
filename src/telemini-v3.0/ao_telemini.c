@@ -34,7 +34,7 @@ ao_check_recovery(void)
 	ao_disable_port(AO_RECOVERY_PORT);
 }
 
-void
+int
 main(void)
 {
 	ao_check_recovery();

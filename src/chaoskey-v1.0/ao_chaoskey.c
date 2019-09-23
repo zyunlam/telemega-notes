@@ -22,7 +22,8 @@
 #include <ao_trng_send.h>
 #include <ao_flash_readout.h>
 
-void main(void)
+int
+main(void)
 {
 	ao_led_init();
 	ao_clock_init();
