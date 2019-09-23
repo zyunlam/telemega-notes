@@ -21,7 +21,7 @@
 #include <ao_data.h>
 #include <ao_flight.h>
 
-static struct ao_log_firetwo log;
+static struct ao_log_firetwo ao_fireone_data;
 
 const uint8_t ao_log_format = AO_LOG_FORMAT_TELEFIRETWO;
 
@@ -41,15 +41,15 @@ ao_log_firetwo(void)
 {
 	uint8_t wrote = 0;
 	/* set checksum */
-	log.csum = 0;
-	log.csum = ao_log_csum((uint8_t *) &log);
+	ao_fireone_data.csum = 0;
+	ao_fireone_data.csum = ao_log_csum((uint8_t *) &ao_fireone_data);
 	ao_mutex_get(&ao_log_mutex); {
 		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 			ao_log_stop();
 		if (ao_log_running) {
 			wrote = 1;
 			ao_storage_write(ao_log_current_pos,
-					 &log,
+					 &ao_fireone_data,
 					 sizeof (struct ao_log_firetwo));
 			ao_log_current_pos += sizeof (struct ao_log_firetwo);
 		}
@@ -58,7 +58,7 @@ ao_log_firetwo(void)
 }
 
 #if HAS_ADC
-static uint8_t	ao_log_data_pos;
+static uint8_t	ao_fireone_data_pos;
 
 /* a hack to make sure that ao_log_metrums fill the eeprom block in even units */
 typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;
@@ -75,27 +75,27 @@ ao_log(void)
 		while (!ao_log_running)
 			ao_sleep(&ao_log_running);
 	
-		log.type = AO_LOG_FLIGHT;
-		log.tick = ao_time();
-		log.u.flight.flight = ao_flight_number;
+		ao_fireone_data.type = AO_LOG_FLIGHT;
+		ao_fireone_data.tick = ao_time();
+		ao_fireone_data.u.flight.flight = ao_flight_number;
 		ao_log_firetwo();
 
 		/* Write the whole contents of the ring to the log
 	 	* when starting up.
 	 	*/
-		ao_log_data_pos = ao_data_ring_next(ao_data_head);
+		ao_fireone_data_pos = ao_data_ring_next(ao_data_head);
 		for (;;) {
 			/* Write samples to EEPROM */
-			while (ao_log_data_pos != ao_data_head) {
-				log.tick = ao_data_ring[ao_log_data_pos].tick;
-				log.type = AO_LOG_SENSOR;
-				log.u.sensor.pressure = ao_data_ring[ao_log_data_pos].adc.pressure;
-				log.u.sensor.thrust = ao_data_ring[ao_log_data_pos].adc.thrust;
+			while (ao_fireone_data_pos != ao_data_head) {
+				ao_fireone_data.tick = ao_data_ring[ao_fireone_data_pos].tick;
+				ao_fireone_data.type = AO_LOG_SENSOR;
+				ao_fireone_data.u.sensor.pressure = ao_data_ring[ao_fireone_data_pos].adc.pressure;
+				ao_fireone_data.u.sensor.thrust = ao_data_ring[ao_fireone_data_pos].adc.thrust;
 	//			for (i = 0; i < 4; i++) {
-	//				log.u.sensor.thermistor[i] = ao_data_ring[ao_log_data_pos].sensor.thermistor[i];
+	//				ao_fireone_data.u.sensor.thermistor[i] = ao_data_ring[ao_fireone_data_pos].sensor.thermistor[i];
 	//			}
 				ao_log_firetwo();
-				ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
+				ao_fireone_data_pos = ao_data_ring_next(ao_fireone_data_pos);
 			}
 
 			ao_log_flush();
