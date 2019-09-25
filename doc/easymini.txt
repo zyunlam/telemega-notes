@@ -1,9 +1,9 @@
 = EasyMini Owner's Manual
 Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 :title-logo-image: image:../themes/background.png[]
-:revnumber: v1.9
-:revdate: 8 Oct 2018
-:copyright: Bdale Garbee and Keith Packard 2018
+:revnumber: v1.9.1
+:revdate: 25 Sep 2019
+:copyright: Bdale Garbee and Keith Packard 2019
 :doctype: book
 :numbered:
 :toc:

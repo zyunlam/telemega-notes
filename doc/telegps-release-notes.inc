@@ -2,6 +2,18 @@
 == Release Notes
 
 	:leveloffset: 2
+	include::release-notes-1.9.1.adoc[]
+
+	<<<<
+	:leveloffset: 2
+	include::release-notes-1.9.adoc[]
+
+	<<<<
+	:leveloffset: 2
+	include::release-notes-1.8.7.adoc[]
+
+	<<<<
+	:leveloffset: 2
 	include::release-notes-1.8.6.adoc[]
 
 	<<<<
