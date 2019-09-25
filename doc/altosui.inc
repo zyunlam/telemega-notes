@@ -429,10 +429,27 @@
 			.Flight Map
 			image::graph-map.png[width=400]
 
-			Shows a satellite image of the flight area overlaid
-			with the path of the flight. The red concentric
-			circles mark the launch pad, the black concentric
-			circles mark the landing location.
+			Shows a satellite image of the flight area
+			overlaid with the path of the flight. The
+			flight path will have different colored
+			sections for each state of the flight (just
+			like the Site Map in Monitor Flight mode):
+			white for pad, red for boost, pink for fast,
+			yellow for coast, light blue for drogue, dark
+			blue for main, and black for landed.
+
+			The red concentric circles mark the launch
+			pad, the black concentric circles mark the
+			landing location. Data for the point along the
+			along the flight path nearest the cursor will
+			be displayed at the bottom of the window. This
+			data includes flight time (so you can
+			correlate data in the graph window), latitude,
+			longitude, height above ground and vertical
+			speed. The selected point will be highlighted
+			with concentric circles in the same color as
+			the flight path at that point.
+
 		endif::gps[]
 
 	=== Export Data
