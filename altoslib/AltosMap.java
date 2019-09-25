@@ -499,6 +499,8 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 		notice_user_input();
 		if (path == null)
 			return null;
+		if (transform == null)
+			return null;
 		AltosLatLon	at = transform.screen_lat_lon(new  AltosPointInt(x, y));
 		return path.nearest(at);
 	}

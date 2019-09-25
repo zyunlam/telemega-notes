@@ -148,16 +148,16 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		public void mouseMoved(MouseEvent e) {
 			AltosMapPathPoint point = map.nearest(e.getPoint().x, e.getPoint().y);
 
-			if (nearest_mark == null)
-				nearest_mark = map.add_mark(point.gps.lat,
-							    point.gps.lon,
-							    point.state);
-			else {
-				nearest_mark.lat_lon.lat = point.gps.lat;
-				nearest_mark.lat_lon.lon = point.gps.lon;
-				nearest_mark.state = point.state;
-			}
 			if (point != null) {
+				if (nearest_mark == null)
+					nearest_mark = map.add_mark(point.gps.lat,
+								    point.gps.lon,
+								    point.state);
+				else {
+					nearest_mark.lat_lon.lat = point.gps.lat;
+					nearest_mark.lat_lon.lon = point.gps.lon;
+					nearest_mark.state = point.state;
+				}
 				nearest_label.setText(String.format("%9.2f sec %s%s%s%s",
 								    point.time,
 								    pos(point.gps.lat,
