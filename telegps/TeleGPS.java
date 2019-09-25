@@ -650,7 +650,10 @@ public class TeleGPS
 		}
 		try {
 			new TeleGPSGraphUI(set, file);
-		} catch (Exception e) {
+		} catch (IOException e) {
+			System.out.printf("Exception %s\n", e.toString());
+		} catch (InterruptedException e) {
+			System.out.printf("Exception %s\n", e.toString());
 			return false;
 		}
 		return true;
