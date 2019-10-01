@@ -92,7 +92,7 @@
 		Put a rocket on a launch rail / rod, and connect whip clips
 		from a pad output on a TeleFire unit to the motor igniter.
 		Verify igniter continuity using the LED associated with that
-		output.  Green is good, red is bad.
+		output.  Green is good.
 
 		Switch the TeleFire unit from 'Safe' to 'Arm', at which point
 		it will start "chirping" to indicate that it is "armed and 
