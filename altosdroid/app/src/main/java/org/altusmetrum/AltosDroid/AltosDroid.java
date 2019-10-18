@@ -595,7 +595,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			mTab.update_ui(telem_state, state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
 		AltosDebug.debug("quiet %b\n", quiet);
-		if (mAltosVoice != null)
+		if (mAltosVoice != null && mTabsAdapter.currentItem() != null)
 			mAltosVoice.tell(telem_state, state, from_receiver, location, (AltosDroidTab) mTabsAdapter.currentItem(), quiet);
 
 	}

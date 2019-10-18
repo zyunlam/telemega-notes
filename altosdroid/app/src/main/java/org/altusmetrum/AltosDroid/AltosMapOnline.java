@@ -110,8 +110,6 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 	private boolean pad_set;
 	private Polyline mPolyline;
 
-	private View map_view;
-
 	private double mapAccuracy = -1;
 
 	private AltosLatLon my_position = null;
@@ -121,25 +119,38 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 
 	public static class AltosOnlineMapFragment extends SupportMapFragment {
 		AltosMapOnline c;
+		View map_view;
 
 		public AltosOnlineMapFragment(AltosMapOnline c) {
 			this.c = c;
 		}
 
+		public AltosOnlineMapFragment() {
+		}
+
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
-			getMapAsync(c);
+			if (c != null)
+				getMapAsync(c);
 		}
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			c.map_view = super.onCreateView(inflater, container, savedInstanceState);
-			return c.map_view;
+			map_view = super.onCreateView(inflater, container, savedInstanceState);
+			return map_view;
 		}
 		@Override
 		public void onDestroyView() {
 			super.onDestroyView();
-			c.map_view = null;
+			map_view = null;
+		}
+		public void set_visible(boolean visible) {
+			if (map_view == null)
+				return;
+			if (visible)
+				map_view.setVisibility(View.VISIBLE);
+			else
+				map_view.setVisibility(View.GONE);
 		}
 	}
 
@@ -259,12 +270,8 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 	}
 
 	public void set_visible(boolean visible) {
-		if (map_view == null)
-			return;
-		if (visible)
-			map_view.setVisibility(View.VISIBLE);
-		else
-			map_view.setVisibility(View.GONE);
+		if (mMapFragment != null)
+			mMapFragment.set_visible(visible);
 	}
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
