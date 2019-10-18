@@ -406,6 +406,10 @@ ao_pad(void)
 				PRINTD ("time difference too large %d\n", time_difference);
 				break;
 			}
+			if (query.arm_status != AO_PAD_ARM_STATUS_ARMED) {
+				PRINTD ("box not armed locally\n");
+				break;
+			}
 			PRINTD ("armed\n");
 			ao_pad_armed = command.channels;
 			ao_pad_arm_time = ao_time();
