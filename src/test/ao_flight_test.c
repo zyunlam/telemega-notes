@@ -126,6 +126,15 @@ struct ao_adc {
 #define HAS_USB 1
 #define HAS_GPS 1
 
+int16_t
+ao_time(void);
+
+void
+ao_dump_state(void);
+
+#define ao_tick_count	(ao_time())
+#define ao_wakeup(wchan) ao_dump_state()
+
 #include <ao_data.h>
 #include <ao_log.h>
 #include <ao_telemetry.h>
@@ -237,7 +246,6 @@ int	ao_summary = 0;
 #define ao_led_on(l)
 #define ao_led_off(l)
 #define ao_timer_set_adc_interval(i)
-#define ao_wakeup(wchan) ao_dump_state()
 #define ao_cmd_register(c)
 #define ao_usb_disable()
 #define ao_telemetry_set_interval(x)
@@ -314,9 +322,6 @@ char *emulator_name;
 char *emulator_info;
 double emulator_error_max = 4;
 double emulator_height_error_max = 20;	/* noise in the baro sensor */
-
-void
-ao_dump_state(void);
 
 void
 ao_sleep(void *wchan);
@@ -647,6 +652,7 @@ ao_insert(void)
 #if TELEMEGA
 			       " angle %5d "
 			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
+			       "avg_accel %8.3f "
 #endif
 			       "\n",
 			       time,
@@ -673,7 +679,8 @@ ao_insert(void)
 			       ao_data_static.hmc5883.x,
 			       ao_data_static.hmc5883.y,
 			       ao_data_static.hmc5883.z,
-			       ao_mag_angle
+			       ao_mag_angle,
+			       ao_coast_avg_accel / 16.0
 #endif
 				);
 #endif

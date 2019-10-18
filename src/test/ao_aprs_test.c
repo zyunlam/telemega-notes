@@ -60,6 +60,7 @@ ao_aprs_bit(uint8_t bit)
 void
 ao_radio_send_aprs(ao_radio_fill_func fill);
 
+#if 0
 static void
 aprs_bit_debug(uint8_t tx_bit)
 {
@@ -71,8 +72,10 @@ aprs_byte_debug(uint8_t tx_byte)
 {
 	fprintf(stderr, "byte %02x\n", tx_byte);
 }
+
 #define APRS_BIT_DEBUG(x) aprs_bit_debug(x)
 #define APRS_BYTE_DEBUG(y) aprs_byte_debug(y)
+#endif
 
 #include <ao_aprs.c>
 
@@ -103,6 +106,7 @@ aprs_byte_debug(uint8_t tx_byte)
 
  */
 
+#if 0
 static void
 audio_gap(int secs)
 {
@@ -113,6 +117,7 @@ audio_gap(int secs)
 		ao_aprs_bit(0);
 #endif
 }
+#endif
 
 // This is where we go after reset.
 int main(int argc, char **argv)

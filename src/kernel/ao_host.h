@@ -41,12 +41,6 @@ struct ao_adc {
 	int16_t		sense_m;	/* main continuity sense */
 };
 
-#define const
-
-#define a	(a)
-#define a	(a)
-#define a	(a)
-
 enum ao_flight_state {
 	ao_flight_startup = 0,
 	ao_flight_idle = 1,
