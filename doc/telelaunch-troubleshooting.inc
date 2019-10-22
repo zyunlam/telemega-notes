@@ -21,8 +21,11 @@
 		mounting arrangements, and so forth with more granularity than
 		provided by the red/amber/green operational LED indicators.
 
-		The system is good down to about -100dBm, and it takes about 
-		6dB to double the range.  So a reading of -84dBm means that you
+		The system is good down to below -100dBm, and it takes about 
+		6dB to double the range.  So a reading of -80dBm means that you
 		could extend the distance between the units by a factor of
 		10 before losing the link.  Note, however, that real world
-		range is affected by terrain, vegetation, etc.
+		range is affected by terrain, vegetation, etc.  And you really
+		don't ever want to be operating close to the minimum signal
+		threshold!  Keep the RF signal indicators green with good
+		antenna choices and installations for maximum satisfaction.
