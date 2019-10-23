@@ -378,7 +378,7 @@ ao_pad(void)
 		while (ao_pad_disabled)
 			ao_sleep(&ao_pad_disabled);
 		ret = ao_radio_cmac_recv(&command, sizeof (command), 0);
-		PRINTD ("cmac_recv status %d rssi %d\n", ret, ao_radio_cmac_rssi);
+		PRINTD ("receive packet status %d rssi %d\n", ret, ao_radio_cmac_rssi);
 		if (ret != AO_RADIO_CMAC_OK)
 			continue;
 		ao_pad_packet_time = ao_time();
