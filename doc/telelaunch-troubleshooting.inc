@@ -11,6 +11,15 @@
 		of the safe/arm switch on the currently selected TeleFire box
 		and can be used to confirm this situation.
 
+		Note that in a cross-bank drag race configuration, any TeleFire
+		boxes involved in the drag race that are fully armed will
+		launch, while any TeleFire boxes involved in the drag race
+		that are not fully armed will not launch.  Pay attention to
+		make sure all involved TeleFire boxes are flashing their
+		strobe lights and sounding their sirens before launch to
+		ensure all desired rockets will actually participate in such
+		a drag race.
+
 	=== Radio Signal Strength
 
 		Each unit in the TeleLaunch system has a debugging feature
