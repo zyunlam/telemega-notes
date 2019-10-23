@@ -1,6 +1,16 @@
 [appendix]
 == Troubleshooting
 
+	=== TeleFire Fails to Arm
+
+		If turning the TeleLCO key switch from "SAFE" to "ARM" does
+		not cause the selected TeleFire box to start flashing and
+		sounding its siren, the most likely cause is that the 
+		TeleFire box was left with the local safe/arm switch in the
+		safe position.  The Remote Arm LED on TeleLCO shows the state
+		of the safe/arm switch on the currently selected TeleFire box
+		and can be used to confirm this situation.
+
 	=== Radio Signal Strength
 
 		Each unit in the TeleLaunch system has a debugging feature
