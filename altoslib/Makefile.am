@@ -4,7 +4,7 @@ JAVAROOT=bin
 
 VERSION=1
 
-CLASSPATH_ENV=mkdir -p $(JAVAROOT); "
+CLASSPATH_ENV=mkdir -p $(JAVAROOT); CLASSPATH=bin
 
 SRC=.
 
