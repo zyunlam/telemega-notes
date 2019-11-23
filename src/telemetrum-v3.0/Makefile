@@ -18,7 +18,7 @@ INC = \
 	ao_kalman.h \
 	ao_product.h \
 	ao_ms5607.h \
-	ao_mma655x.h \
+	ao_adxl375.h \
 	ao_cc1200_CC1200.h \
 	ao_profile.h \
 	ao_task.h \
@@ -64,7 +64,7 @@ ALTOS_SRC = \
 	ao_fec_rx.c \
 	ao_data.c \
 	ao_ms5607.c \
-	ao_mma655x.c \
+	ao_adxl375.c \
 	ao_adc_stm.c \
 	ao_beep_stm.c \
 	ao_storage.c \
