@@ -6,6 +6,8 @@ include::release-head.adoc[]
 
 	== AltOS
 
+	* Add support for TeleMetrum v3.0
+
 	* Fix accel cal value when changing EasyMega v2.0 pad orientation
 
 	* Correct EasyMega v2.0 magnetometer data axes
@@ -21,3 +23,5 @@ include::release-head.adoc[]
 	* Make it possible to disable APRS once enabled.
 
 	* Display some data for point near cursor in map tab.
+
+	* Support upgrading devices from pre-1.8 firmware
