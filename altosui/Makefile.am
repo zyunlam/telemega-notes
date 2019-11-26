@@ -122,7 +122,8 @@ FIRMWARE_TD_3_0=$(top_srcdir)/src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx
 FIRMWARE_TD=$(FIRMWARE_TD_3_0)
 
 FIRMWARE_TM_2_0=$(top_srcdir)/src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx
-FIRMWARE_TM=$(FIRMWARE_TM_2_0)
+FIRMWARE_TM_3_0=$(top_srcdir)/src/telemetrum-v3.0/telemetrum-v3.0-$(VERSION).ihx
+FIRMWARE_TM=$(FIRMWARE_TM_2_0) $(FIRMWARE_TM_3_0)
 
 FIRMWARE_TELEMINI_3_0=$(top_srcdir)/src/telemini-v3.0/telemini-v3.0-$(VERSION).ihx
 FIRMWARE_TELEMINI=$(FIRMWARE_TELEMINI_3_0)
