@@ -20,8 +20,8 @@
 	The first device created for our community was TeleMetrum, a dual
 	deploy altimeter with fully integrated GPS and radio telemetry
 	as standard features, and a “companion interface” that will
-	support optional capabilities in the future. The latest version
-	of TeleMetrum, v2.0, has all of the same features but with
+	support optional capabilities in the future. The later versions
+	of TeleMetrum, v2 and newer, have all of the same features but with
 	improved sensors and radio to offer increased performance.
 
 	Our second device was TeleMini, a dual deploy altimeter with

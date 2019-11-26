@@ -2,7 +2,7 @@
 == Updating Device Firmware
 
 	ifdef::telemega[]
-	TeleMega, TeleMetrum v2, EasyMega, EasyMini and TeleDongle v3
+	TeleMega, TeleMetrum v2 and newer, EasyMega, EasyMini and TeleDongle v3
 	are all
 	endif::telemega[]
 	ifndef::telemega[]
@@ -28,7 +28,7 @@
 
 	ifdef::telemega[]
 
-	=== Updating TeleMega, TeleMetrum v2, EasyMega, EasyMini or TeleDongle v3 Firmware
+	=== Updating TeleMega, TeleMetrum v2 or newer, EasyMega, EasyMini, TeleDongle v3 or TeleBT v3 Firmware
 
 	endif::telemega[]
 	ifndef::telemega[]
@@ -106,7 +106,7 @@
 			endif::easymega[]
 
 			ifdef::telemetrum[]
-			TeleMetrum v2::
+			TeleMetrum v2 and newer::
 
 			Connect pin 6 and pin 1 of the companion
 			connector. Pin 1 can be identified by the square pad

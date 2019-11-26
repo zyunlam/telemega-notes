@@ -295,7 +295,7 @@
 	endif::radio[]
 
 	ifdef::gps+radio[]
-	:aprsdevices: TeleMetrum v2.0 and TeleMega
+	:aprsdevices: TeleMetrum v2 and newer and TeleMega
 	:configure_section: _configure_altimeter
 	include::aprs-operation.adoc[]
 	endif::gps+radio[]

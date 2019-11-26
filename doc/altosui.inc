@@ -634,8 +634,9 @@
 			programming).
 		endif::telemetrum,telemini[]
 		ifdef::telemega,easymega,telemetrum[]
-			TeleMega, EasyMega, TeleMetrum v2,
-			EasyMini and TeleDongle v3 are all
+			TeleMega, EasyMega, TeleMetrum v2 or newer,
+			EasyMini, TeleBT v3 or newer and TeleDongle v3
+			or newer are all
 		endif::telemega,easymega,telemetrum[]
 		ifndef::telemega,easymega,telemetrum[]
 			EasyMini is
