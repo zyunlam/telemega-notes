@@ -14,7 +14,7 @@ else
 	exit 1
 fi
 
-VERSION=3.0
+VERSION=2.0
 PRODUCT=TeleMetrum
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
