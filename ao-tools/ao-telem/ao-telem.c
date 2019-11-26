@@ -115,7 +115,7 @@ main (int argc, char **argv)
 						(telem.location.flags & (1 << 6)) ? ",date" : "",
 						(telem.location.flags & (1 << 7)) ? ",course" : "");
 					printf (" alt %5d lat %12.7f lon %12.7f",
-						telem.location.altitude,
+						AO_TELEMETRY_LOCATION_ALTITUDE(&telem.location),
 						telem.location.latitude / 1e7,
 						telem.location.longitude / 1e7);
 					if ((telem.location.flags & (1 << 6)) != 0) {
