@@ -563,6 +563,8 @@ public class AltosConfigData {
 			return false;
 		if (product.startsWith("TeleMetrum-v2"))
 			return false;
+		if (product.startsWith("TeleMetrum-v3"))
+			return false;
 		if (product.startsWith("EasyMega"))
 			return false;
 		return true;
