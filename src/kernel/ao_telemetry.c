@@ -58,7 +58,7 @@ static uint16_t ao_aprs_time;
 #define AO_SEND_MEGA	1
 #endif
 
-#if defined (TELEMETRUM_V_2_0)
+#if defined (TELEMETRUM_V_2_0) || defined (TELEMETRUM_V_3_0)
 #define AO_SEND_METRUM	1
 #endif
 
