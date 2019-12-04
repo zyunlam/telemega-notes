@@ -29,9 +29,11 @@ public class AltosRomconfigUI
 {
 	Container	pane;
 	Box		box;
+	JLabel		product_label;
 	JLabel		serial_label;
 	JLabel		radio_calibration_label;
 
+	JLabel		product_value;
 	JFrame		owner;
 	JTextField	serial_value;
 	JTextField	radio_calibration_value;
@@ -53,6 +55,29 @@ public class AltosRomconfigUI
 		pane.setLayout(new GridBagLayout());
 
 		int y = 0;
+
+		/* Product name */
+		/* Serial */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = y;
+		c.gridwidth = 3;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		product_label = new JLabel("Product:");
+		pane.add(product_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 3; c.gridy = y;
+		c.gridwidth = 3;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		product_value = new JLabel(config.usb_product);
+		pane.add(product_value, c);
+
+		y++;
 
 		/* Serial */
 		c = new GridBagConstraints();
