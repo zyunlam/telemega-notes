@@ -295,15 +295,20 @@ public class AltosHexfile {
 			return -1;
 
 		try {
-			/* Walk the descriptors looking for the device */
+			/* The address of this has moved depending on
+			 * padding in the linker script. Look forward
+			 * and backwards two bytes to see if we can find it
+			 */
 			a = usb_descriptors.address;
-			while (get_u8(a+1) != AO_USB_DESC_DEVICE) {
-				int delta = get_u8(a);
-				a += delta;
-				if (delta == 0 || a >= max_address)
-					return -1;
-			}
-			return a;
+
+			if (get_u8(a) == 0x12 && get_u8(a+1) == AO_USB_DESC_DEVICE)
+				return a;
+			else if (get_u8(a+1) == 0x12 && get_u8(a+3) == AO_USB_DESC_DEVICE)
+				return a + 2;
+			else if (get_u8(a-2) == 0x12 && get_u8(a-1) == AO_USB_DESC_DEVICE)
+				return a - 2;
+
+			return -1;
 		} catch (ArrayIndexOutOfBoundsException ae) {
 			return -1;
 		}
