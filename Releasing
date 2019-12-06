@@ -60,6 +60,8 @@ These are Bdale's notes on how to do a release.
 	- make sure that doc/*.txt have the right copyright year and the
 	  new release is included
 	- make absolutely sure checked-out tree is "clean" 
+	- make absolutely sure any commits Keith might have pushed to branches
+	  like debian are already pulled
 
         git log > ChangeLog
 	git commit -a
