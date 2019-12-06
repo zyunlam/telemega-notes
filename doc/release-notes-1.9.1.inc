@@ -25,3 +25,6 @@ include::release-head.adoc[]
 	* Display some data for point near cursor in map tab.
 
 	* Support upgrading devices from pre-1.8 firmware
+
+	* Wait for Windows to prepare new devices during firmware
+	  upgrade. This should avoid the “COMxx: open failed” message.
