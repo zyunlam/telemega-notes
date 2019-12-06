@@ -481,12 +481,24 @@ public class AltosFlashUI
 		public void run () {
 			try {
 				AltosLink link = null;
+				boolean new_device = false;
 
 				for (;;) {
 					System.out.printf("Attempting to open %s\n", device.toShortString());
 
-					link = new AltosSerial(device);
+					for (int i = 0; i < 20; i++) {
+						link = new AltosSerial(device);
 
+						if (link != null)
+							break;
+
+						if (!new_device)
+							break;
+
+						System.out.printf("Waiting for device to become ready\n");
+
+						Thread.sleep(1000);
+					}
 					if (link == null)
 						throw new IOException(String.format("%s: open failed",
 										    device.toShortString()));
@@ -536,6 +548,7 @@ public class AltosFlashUI
 							if (!matched) {
 								System.out.printf("Identified new device %s\n", d.toShortString());
 								device = (AltosUSBDevice) d;
+								new_device = true;
 								break;
 							}
 						}
