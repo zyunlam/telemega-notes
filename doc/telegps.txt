@@ -2,7 +2,7 @@
 Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 :title-logo-image: image:../themes/background.png[]
 :revnumber: v1.9.1
-:revdate: 25 Sep 2019
+:revdate: 5 Dec 2019
 :copyright: Bdale Garbee and Keith Packard 2019
 :stylesheet: am.css
 :linkcss:
