@@ -118,6 +118,9 @@ ao_serial3_set_speed(uint8_t speed);
 #endif
 
 void
+ao_serial_shutdown(void);
+
+void
 ao_serial_init(void);
 
 #endif /* _AO_SERIAL_H_ */

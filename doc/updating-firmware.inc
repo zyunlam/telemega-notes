@@ -2,7 +2,7 @@
 == Updating Device Firmware
 
 	ifdef::telemega[]
-	TeleMega, TeleMetrum v2, EasyMega, EasyMini and TeleDongle v3
+	TeleMega, TeleMetrum v2 and newer, EasyMega, EasyMini and TeleDongle v3
 	are all
 	endif::telemega[]
 	ifndef::telemega[]
@@ -28,7 +28,7 @@
 
 	ifdef::telemega[]
 
-	=== Updating TeleMega, TeleMetrum v2, EasyMega, EasyMini or TeleDongle v3 Firmware
+	=== Updating TeleMega, TeleMetrum v2 or newer, EasyMega, EasyMini, TeleDongle v3 or TeleBT v3 Firmware
 
 	endif::telemega[]
 	ifndef::telemega[]
@@ -106,7 +106,7 @@
 			endif::easymega[]
 
 			ifdef::telemetrum[]
-			TeleMetrum v2::
+			TeleMetrum v2 and newer::
 
 			Connect pin 6 and pin 1 of the companion
 			connector. Pin 1 can be identified by the square pad
@@ -128,6 +128,18 @@
 			the one on the other end of the row.
 			endif::easymini[]
 
+			TeleGPS v1::
+
+			Connect pin 32 on the CPU to ground.  Pin 32 is the
+			right-most pin on the bottom edge of the CPU when the
+			board is oriented with the USB and battery connectors
+			to the right.
+
+			TeleGPS v2::
+
+			Connect together pins 1 and 5 of the Debug connector.
+			Pin 1 is the pin with the square pad around the hole.
+
 			ifdef::telemetrum[]
 			TeleDongle v3::
 
@@ -136,6 +148,13 @@
 			of the board. Ground is available on the capacitor
 			next to it, on the end towards the USB wires.
 			
+			TeleBT v3::
+
+			Connect pin 4 on the CPU to 3.3V, which can be done by
+			connecting pin 1 to pin 4.  Pin 1 is the left pin on
+			the lower edge of the chip when the unit is oriented
+			such that the SMA is at the top.
+
 			TeleBT v4::
 
 			Connect pin 30 on the CPU to ground. Pin 30 is the 6th

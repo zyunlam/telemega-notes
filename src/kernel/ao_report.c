@@ -251,7 +251,7 @@ ao_report_continuity(void)
 }
 #endif
 
-void
+static void
 ao_report(void)
 {
 	for(;;) {
@@ -262,6 +262,11 @@ ao_report(void)
 		else
 #endif
 			ao_report_beep();
+#if HAS_SENSOR_ERRORS
+		if (ao_report_state == ao_flight_invalid && ao_sensor_errors)
+			ao_report_number(ao_sensor_errors);
+#endif
+
 		if (ao_report_state == ao_flight_landed) {
 			ao_report_altitude();
 #if HAS_FLIGHT

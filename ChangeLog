@@ -1,3 +1,1810 @@
+commit fdf1dbd3d945f6f34f404ffbcb57781f4df23015
+Merge: 5b4da841 bfc4999c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 5 22:21:29 2019 -0700
+
+    Merge branch 'master' into branch-1.9
+
+commit bfc4999c99dc7ba29226a956f3991c2a45a1dd88
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 5 22:18:12 2019 -0700
+
+    update release date in all documents
+
+commit 55af5c3a0df734cedbac98bbe350846add45d5e3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 5 22:15:21 2019 -0700
+
+    start the process of releasing 1.9.1
+
+commit 2ff2b4962f3241ede9a7718e373a68296c4e308a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 5 21:05:28 2019 -0800
+
+    Release note about self-flashing on windows waiting for devices
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 695dba4e37ccca9a2dc06e1656699a13406002c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 5 16:59:40 2019 -0800
+
+    altosuilib: Wait for Windows to get ready with new device
+    
+    Windows appears to report the new device path long before
+    the path is actually usable. Stick some long delays trying to
+    open the device before giving up.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2b3c6806a3039ac8c4c1a1e2d6715b0cdc5b9632
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 3 19:34:06 2019 -0800
+
+    altosuilib: Show the recovered product name in the Configure Rom dialog
+    
+    This lets the user know that things are actually working as expected
+    as the correct device name should appear in the dialog.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5bdf8eeb1cdc1a50c9abd0f8962533f6970bd7f0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 3 19:31:34 2019 -0800
+
+    altoslib: Linker script changed -> the USB desc is two bytes off
+    
+    The USB descriptor used to be at 0x0800110c in previous releases and
+    is now at 0x0800110a, presumably because the linker script changed the
+    padding requirements of those sections.
+    
+    Search forward and backwards two bytes to see if we can't find the
+    descriptors by checking for the descriptor value and size at each
+    location.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 946faa1541f69c6cf2759c13760fa9bc16e2298e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 26 15:47:07 2019 -0800
+
+    doc: Update docs to reference TeleMetrum v3 where appropriate
+    
+    Mostly just add 'or newer' to various TeleMetrum v2 bits. Also add
+    specs for the v3 board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 68aa05881239264b95e37c648faa821fd0230402
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 26 15:33:25 2019 -0800
+
+    doc: Mention TeleMetrum v3.0 in release notes for 1.9.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 56767df42a2582c9663554f27b354c2b9c180119
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 25 18:38:14 2019 -0800
+
+    ao-telem: Show all 24 bits of GPS altitude data
+    
+    Need to mix in the upper 8 bits from devices which include them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a47071b7f23874ca3d889ba18cd218d6445df29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 25 18:36:16 2019 -0800
+
+    altos: Send "metrum" telemetry packets for TeleMetrum v3.0 boards
+    
+    This includes the ADC values, which report igniter continuity
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 66b6b2d5fb1313d5e16a3f802c2af8cc6585362b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 25 18:15:16 2019 -0800
+
+    altoslib: Set up adxl375 for TM v3.0 in idle mode
+    
+    Need to select axis and polarity for each adxl375 product.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9bb091f6d6aec6e5e887eebc93174106b25a7a98
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Nov 25 18:02:06 2019 -0700
+
+    ao-bringup: add production test support for TeleMetrum v3.0
+
+commit f95b359aa1a3ba3982a162bdf398d0b261806d47
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Nov 25 17:57:27 2019 -0700
+
+    altosuilib: TeleMetrum v3, like v2, doesn't use flash for config
+
+commit 8554da3b6c05c1094045f4fb21b43c183029408f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Nov 25 17:55:10 2019 -0700
+
+    altosui: add TeleMetrum v3 to delivered firmware list
+
+commit 0072e9741719367a1f6748d242cd6195a1a7c6a5
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Nov 25 17:50:41 2019 -0700
+
+    altosui: add monitor idle support for TeleMetrum v3
+
+commit 6d55d03587e9f71a7e8320a6b36fde25edc63b28
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Nov 22 17:18:58 2019 -0800
+
+    altos: TeleMetrum v3.0 has ADXL375 and Max-8Q
+    
+    Replacce the mma655x driver with the adxl375 driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b215bed45798ea30f8f13128204493e7afdc9af1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 27 10:24:52 2019 -0700
+
+    altoslib: Fix original telemetry sensor packet parsing
+    
+    ground_pres is at byte 24, ground_accel at byte 26. These were flipped
+    around.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cdbc29d6d86c69e70b0f105d273ee8ddd7ae290e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 27 10:24:10 2019 -0700
+
+    altoslib: Fix setting of CLASSPATH
+    
+    Need to include bin for local files.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3aeb1a310069811a2e043a5df28dc2df17436fc4
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Oct 23 10:43:54 2019 -0600
+
+    doc: add some text about cross-bank drag race safe/arm to TeleLaunch manual
+
+commit 1cb529e0532d0a7430487c856bb9b037ff6cea0f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Oct 23 10:41:30 2019 -0600
+
+    doc: add some text to TeleLaunch troubleshooting about SAFE/ARM on TeleFire
+
+commit 88e279b15b3d2357f142e58d20d73c24bf2561eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 23 09:24:18 2019 -0700
+
+    altos: Improve labeling of telefire receive packet information
+    
+    Avoid the use of 'cmac_recv', which is not exactly descriptive.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c31db066e5ba7a6708ebe4bf350963697c611816
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 23 09:20:53 2019 -0700
+
+    altos: Relabel packet receive status line for TeleFire boxes
+    
+    The status line included return value and RSSI, but neither was
+    labeled, which left the user unsure as to what it meant.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b6602d8c4053932a72c2bf4a63e24793634b2ad0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Oct 22 09:30:25 2019 -0600
+
+    doc: add more text to TeleLaunch manual, be less sloppy with dBm assertions
+
+commit c349eb9d1b90abd7c0492b5d0ba2116ae5ad6ec2
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Sun Oct 13 20:22:37 2019 +1300
+
+    Update app to use Material Design Light theme
+    
+    The Holo theme does weird things these days
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit b8560bd91d603e4697f0cddc095952f923366d30
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 18 01:06:55 2019 -0700
+
+    altoslib: Don't bother adding FREETTS to CLASSPATH
+    
+    altoslib doesn't use freetts at all
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4696687ef84181e363ac79f43016d347d7e14a23
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 18 01:05:15 2019 -0700
+
+    altosdroid: Make altosdroid code more resilient to weird androidisms
+    
+    Sometimes altosdroid was crashing when messing with configuration bits
+    like selecting different themes. These fixes seem to make that happen
+    less.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8be4e3b8faac362665641e98a1df1e1e8a681b7a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 18 01:02:51 2019 -0700
+
+    altos/test: Get test code working again after restructuring
+    
+    Something changed, the test code wasn't building. Now it does.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8d5792e32dc35441ec98339149fb4df3cc16f44b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 17 23:09:47 2019 -0700
+
+    altos/telefire: Don't arm the box if the local arm switch is off
+    
+    This skips arming the box when the local arming switch is off. This
+    keeps the siren and light from going off, and also avoids attempting
+    to fire the channels in case something else screwy is going on.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 75cd8196ee9ba4ed983abdc83f1fe60fb94f2866
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 30 21:15:56 2019 -0600
+
+    TeleFireEight has simple green LEDs for continuity
+
+commit ff68c8855bc6983638db5102ffbc6822b83edb5d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 25 13:10:36 2019 -0700
+
+    telegps: Get --graph mode working after recent changes
+    
+    Was just exiting due to a null pointer exception caused by mis-ordered
+    setup of the map data. Also using stale API.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 35351c7db337c4384ef642fbc8b8676f0944686a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 25 13:09:22 2019 -0700
+
+    altoslib: Don't crash when map flight data is missing
+    
+    Just a couple of null pointer checks to allow the map display to come
+    up even when no data are available.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4df77f2ac7f34986b8e7c0584c57d77dc74d9df9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 24 20:49:56 2019 -0700
+
+    doc: Update for 1.9.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 51cca3b3405da7408fd8af18f8d1ff7db97fe1bc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 24 20:50:08 2019 -0700
+
+    doc: Describe new 'show nearest values' in map view
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6032ca7f418924e5794a886c06ca752dee0ada83
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 23 12:40:19 2019 -0700
+
+    altos: Rename 'log' in ao_log_fireone to 'ao_fireone_data'
+    
+    Avoids conflict with global 'log' function
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 77e6bad5e66023e487430ef31244edaeaef7c606
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 23 12:39:42 2019 -0700
+
+    altos: Switch all main() to return 'int'
+    
+    Makes gcc happy
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3979c88417fd5512447f5d02cc660522dff5d9d6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 18 17:38:44 2019 -0700
+
+    altosdroid: Update Makefile.am to run gradle-based build
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d607cbee5c9b406ef0f4e522c12e56993632cf00
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 18 17:10:14 2019 -0700
+
+    altos: Add missing build files for avr/attiny devices
+    
+    These were sitting in my src directory but not in git
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 260dd06107c8f8f5c7e606a283d388cb3ba46465
+Merge: 28618a72 faa5abe0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 18 16:26:44 2019 -0700
+
+    Merge remote-tracking branch 'mjb/android-build-update'
+
+commit faa5abe0bc9aa071ffa55534a24638bc0972e3c2
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:26:40 2019 +1200
+
+    Update Google Maps API usage.
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 3af69b00a94b473dbc98fcf6d26fa90b66065e8b
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:25:47 2019 +1200
+
+    Update persistent notification in TelemetryService
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit be9ed3ffc9b00c97e8513bbfab23b8e16329bc4b
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:25:09 2019 +1200
+
+    Convert to AndroidX from support_v4
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit d7ef39ba104a1ac6024af875c730a645f282719f
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:24:13 2019 +1200
+
+    Import cleanup
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 5c1acdabd211346936423ec8bc147a47f62bb8ae
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:19:11 2019 +1200
+
+    Commented out duplicate strings
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit ffdac6b48b43dc5610ddb926191a7cff738c97de
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:18:48 2019 +1200
+
+    Indentation cleanup
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit b6cb79994a58f37f6c743c1f2fafe30337e89d79
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:17:52 2019 +1200
+
+    Add FOREGROUND_SERVICE permission which is now required
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit f2c652d5115eb64568d9ae8ed6426a16e6154999
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:17:09 2019 +1200
+
+    Remove versioning data from AndroidManifest.xml.in
+    
+    (now in build.gradle)
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 198c868a25b3cbcde9634bbbcce57d71f3659eee
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:16:18 2019 +1200
+
+    Clean up duplication in AndroidManifest.xml.in
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 1ba8ffe41defe411390197c56b03762fa51c20bf
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:12:59 2019 +1200
+
+    buildinfo data comes from Makedefs now, not Version
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 3c4d4d5cc1a8361a713aba075b29c3f6509f3f90
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:12:30 2019 +1200
+
+    Add gradle build files
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 70fb078cac4203e76e04211a0b8f1a6eceb6298b
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:09:26 2019 +1200
+
+    Update files that reference new paths
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 8b53f860eb3171cd43e4bd0e440f2889bd810662
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 10:04:58 2019 +1200
+
+    Move java source, and resources to new paths for gradle
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 4a257455b2dc57069c41e1845daf66239c5cbe1d
+Author: Mike Beattie <mike@ethernal.org>
+Date:   Thu Sep 19 09:58:06 2019 +1200
+
+    Remove ant build files
+    
+    Signed-off-by: Mike Beattie <mike@ethernal.org>
+
+commit 28618a728e85b70ecac73983531894a25e90d7f6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 16 13:12:08 2019 -0700
+
+    altos: Add EasyMega v3.0 bits (not setup correctly yet)
+    
+    This adds a new directory for EasyMega v3.0, replacing the mpu9250
+    with a bmx160.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 28add4f616dbaf06a1ca3234b81c68c4a299d056
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 16 13:10:09 2019 -0700
+
+    altos: Integrate BMX160 into data code
+    
+    Get conversion functions written and fix up a few warnings
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a87698663f8a5ced468755068a0468755d8f2746
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 16 12:39:09 2019 -0700
+
+    altos: Add bmx160 driver
+    
+    This just adds the driver, it doesn't hook it up yet
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 99525a748e00406424b98a0952f0156437b30b6c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 15 17:09:26 2019 -0700
+
+    altos: Replace ao_xmem functions with direct mem calls
+    
+    We no longer need to wrap these functions
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 46d3cbadce6808b4cd29ad1e034efac7b5e4fa42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 15 17:05:59 2019 -0700
+
+    drivers: Use 'main_value' instead of 'main'
+    
+    GCC can emit a warning when programs redefine 'main'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2524730217e6972f3d0f04a9954350ba1964a83a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 2 15:20:14 2019 -0500
+
+    altosui: Add speed and gps height to map display data
+    
+    And generalize the API so that any other GPS data could be added in
+    the future.
+    
+    This feature was proposed by Mike Beattie
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b13893245e8c66b48e23bb2005ef6ce46e69744f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 31 23:20:31 2019 -0500
+
+    altosui: Display data for point nearest cursor in map view
+    
+    Include time, lat and lon
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 936a5ff21d01db6f0084ee7e4712042c914942a5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 28 22:40:21 2019 -0500
+
+    libaltos: gitignore btletest
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 252009db6451f01c9707970d05e69f39e3a047dd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 28 22:39:25 2019 -0500
+
+    Add .gitignore files for new projects
+    
+    EasyMega v2.0
+    TeleFireEight v2.0
+    TeleFireOne v1.0
+    TeleLco v0.2 with cc1200 radio
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 415302a81f7bf0cdfd79999e1fcd5ea41dc39d13
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 28 22:34:53 2019 -0500
+
+    icon: Ignore generated LED images
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 025c53a14804385ad96afcc9bf29a8d5c202a93a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 28 22:33:35 2019 -0500
+
+    Add new altosdroid icon
+    
+    Remove drop shadow
+    Change size to make Google happier
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fcb5d55e94058810fc8b31ad5e8caa99fa61200c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 12 17:30:48 2019 -0700
+
+    altos: Use fast timer for buttons instead of edge-triggered ISR
+    
+    If the button bounces between the triggering interrupt and the button
+    state check, we could lose the final state change of the button and
+    send an incorrect event to the application. In the worst case, the button
+    would end up in exactly the wrong state, toggling in the wrong direction.
+    
+    Use the fast timer to poll all buttons instead so that there is only
+    one check of each button at each poll interval (instead of the
+    interrupt and the state check). This makes buttons reliably debounced.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5e738fd2e3602c6a92f205df99361dbe06c1719e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 4 21:12:29 2019 -0700
+
+    altosui: Make it possible to disable APRS
+    
+    The menu says "Disabled", but the device wants "0". Translate back and
+    forth to avoid an error.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1105cfe0c065483e8a97a800bc870fbdecaab9b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 4 20:33:21 2019 -0700
+
+    altosui: Fix path to easymini-v2.0 ihx file
+    
+    This gets the bits included in macosx and linux builds
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 489b429dbeb8b0fb69881161ff32fdc2fdfcf9f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 11:15:20 2019 -0700
+
+    altosdroid: Hack up build to 'work' for now
+    
+    Android apps are now build with gradle instead of ant; the ant bits
+    are stale and only work with old java. Use old java to run ant while
+    using the current java compiler to build things.
+    
+    This requires a custom version of the google play API library.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 93401542ab1bf53c5b7b2a2cad5da97e44d7244e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Aug 2 14:20:39 2019 -0600
+
+    ao-bringup: add a turnon_telefireeight script
+
+commit 318b81d59e6f34a92a7a78c0896aa331bc14d0a1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 17 11:40:06 2019 -0700
+
+    Use discovered java path for compiler and jni include files
+    
+    Instead of using the discovered java bits just for jni.h, also use
+    javac from that directory. Add JAVA_VERSION param to set language
+    version for newer compilers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 784ccd37d051e8b88ef1b150ccb4e89103675b3e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 17 11:38:43 2019 -0700
+
+    altoslib: Stop using deprecated Java functionality
+    
+    new Double(x) -> Double.valueOf(x)
+    c.newInstance() -> c.getDeclaredConstructor().newInstance()
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 25be2785cf34773bdcac5ec7b2a41769e352812a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 12:08:33 2019 -0700
+
+    ao-tools/ao-eeprom: Add support for TeleFireTwo
+    
+    Display converted pressure and thrust data along with raw thermistor
+    data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8b2e457db8c4536440ecd7dc35d06f827fc008dc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 11:12:49 2019 -0700
+
+    altos: Record all failed sensors and report status at power up
+    
+    Use DATA bits to mark which sensors have failed, then report that in
+    beeps at startup time to help diagnose hardware failures while still
+    allowing the board to be used over USB.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c37cd66b7c11f904b528c5ff7e80e18c5e0d26e5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 11:10:36 2019 -0700
+
+    altos/micropeak-v2.0: Reduce power usage
+    
+    This gets power consumption down under 1mA on the pad. Not really low
+    enough to sell, but I think this is about as low as the chip will go.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 40624256be70088d7608742b71e1241d95a7fcdf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 11:07:27 2019 -0700
+
+    altos/stmf0: Allow SPI to be powered down when idle if desired
+    
+    Set SPI_1_POWER_MANAGE and/or SPI_2_POWER_MANAGE to have the spi
+    blocks powered down when not in use.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bdcb3653bd9fb97f98773ac3bc1f87a6f52b1121
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 11:04:16 2019 -0700
+
+    altos/stmf0: Add 'ao_serial_shutdown'
+    
+    This powers down the UART logic on request.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 009d56b4f03c1ba3c9a36bdb54c772ad21844057
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 11:02:56 2019 -0700
+
+    altos/stmf0: Leave power interface disabled until needed
+    
+    We only need the power interface when placing the chip in the lowest
+    power state, so don't power up the power interface clock at startup,
+    instead wait until later.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e879d739c394602043e8ed512ad1a433fbf96c1c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 10:23:54 2019 -0700
+
+    icon: Add altosdroid-specific icon
+    
+    Google style guides have no drop shadows anymore, so create an icon
+    for the play store without one.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9abacdaacf5ad1211da4fc72f5320ba9c43ff509
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 10:22:02 2019 -0700
+
+    altosuilib: Don't crash when flashing an unknown device
+    
+    An unknown device will not have a config; check for that before
+    showing radio calibration dialogs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a0a109d8c82e7f362253a0f1e52d14843ddec996
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 09:57:24 2019 -0700
+
+    ao-tools/ao-eeprom: Add altitude data for baro values
+    
+    Displays altitude along with pressure and temp for baro sensor data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0a60b7addddc302c66556c0f25ba1e71d14cf53d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 16 09:56:39 2019 -0700
+
+    ao-tools/lib: Add atmosphere model
+    
+    Converts between pressure and altitude
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fa214ca689449af3a241750e6c759dd3f2d52327
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 15 13:28:11 2019 -0700
+
+    ao-tools/ao-telem: Fix man page and usage to match code
+    
+    ao-telem just parses .telem files.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 245a49a85dd7b6a7cb9ec36ad02f6bb66e42f4e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 15 13:26:30 2019 -0700
+
+    altos: Allow ms5607 driver to either set ao_sensor_errors or panic
+    
+    Products that want to remain usable (over USB) after a sensor failure
+    don't want to panic when the ms5607 fails, but products with limited
+    ROM space don't want to have extra code to check for the sensor
+    failure and panic. Change the MS5607 driver to allow either option,
+    and then make the micropeak based devices use it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 98f7c1c116aab672a29db1f81213cabe2d72ae16
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 15 13:22:15 2019 -0700
+
+    ao-tools: Change ao-eeprom into eeprom analysis tool
+    
+    ao-eeprom used to be a TeleMetrum v0.2 specific tool for fetching
+    eeprom contents from that device. ao-dumpflash handles that case now.
+    
+    ao-eeprom now parses .eeprom files and displays their contents.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e3eb285ff6be17afe592dca4a2fb5526c0626283
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 23:18:19 2019 -0700
+
+    altos/micropeak-v2: Update .gitignore
+    
+    Ignore built stuff
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 06be34ea0750743b85823b873041188dac7b06d9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 23:17:10 2019 -0700
+
+    altos/micropeak-v2: Correct AO_LOG_ID value
+    
+    Typo wasn't caught by the compiler (thanks!)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c4b8aff07d5366cef2c7209729f6cd22fa67de0c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 23:16:12 2019 -0700
+
+    altos/micropeak-v2: Erase log space at end of BOOST_DELAY
+    
+    We have to erase the log before the flight starts, so this seems like
+    the latest possible moment.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 835faccc2c1141f7cd8ff93629d583fcaf785e48
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 23:14:54 2019 -0700
+
+    altos: Don't dump MS5607 eeprom in 'B' command
+    
+    MicroPeak v2 now has config stuff where these values get shown
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bcf609837eefd431415c979942a31abda1227eb9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 23:14:05 2019 -0700
+
+    altoslib: Add support for MicroPeak v2 eeprom format
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee7a54b3215ffa1eb38f16a151c0740b14b60857
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 14:50:53 2019 -0700
+
+    altos/micropeak-v2.0: expose log and config commands over USB
+    
+    This lets AltosUI handle the eeprom data
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6529fd623f0e4b921aea1110c723d7dc03954def
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 14:50:18 2019 -0700
+
+    altosui/telegps: Display error message when attempting to graph unknown files
+    
+    Instead of presenting an empty graph window.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bd351b9e3b1ba21851b2c87f5202ac3bf5c479c0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 14:25:09 2019 -0700
+
+    altoslib: Always create an ordered record set for eeprom files
+    
+    If we can't parse the format, just leave it empty. This makes code
+    handling arbitrary records much easier as it doesn't have to check for
+    the ordered set existing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4d4f018f22a0a9814e675a232b1c4239572bdd9a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 13:02:51 2019 -0700
+
+    altos/micropeak-v2.0: Go into standby mode after landing
+    
+    This is the lowest power state we can reach, and consumes about 15µA
+    or less.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2ef794e60b4f6a6e9cb5e9a14ef732f7d6d36b3d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 13:02:12 2019 -0700
+
+    altos/micropeak-v2.0: Fix LED blinking sequence at power-on
+    
+    'pips' happens between altitude report and data dump.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8ec178bbc3babb072b8d53975632cf6294626e98
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 18 00:11:49 2019 -0700
+
+    altos/micropeak-v2.0: Wait for the power supply to stabilize before measuring
+    
+    If we don't wait before measuring the battery, it will often read
+    under 3.2V right at boot time, which puts MicroPeak in flight mode
+    instead of USB mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 77df3f636ef8bf461800f5e08c28c09bfb69c48b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 17 23:44:50 2019 -0700
+
+    altos/micropeak-v2.0: Don't run flight code when plugged in
+    
+    No sense running the flight code when there's a USB cable attached.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff7fa802f632700f73418246f1be5017ac0a09b4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 17 23:43:02 2019 -0700
+
+    altos: Support ao_ms5607_dump when no ms5607 task
+    
+    MicroPeak v2.0 has tasking support, but doesn't have a separate ms5607
+    task. That means the device isn't getting initialized when not running
+    the flight code, so in cmd mode we need to make sure it's initialized,
+    and we also need to actually fetch a value to display.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7c5ba25e61f98fd4537062dce52ab22d1445fa24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 17 23:41:51 2019 -0700
+
+    doc: Say 'thousands of feet' instead of '3000-4000 feet'
+    
+    No reason to try and be precise here.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4be194a350987cff5b459ebaa751347b216fde05
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 17 14:49:36 2019 -0700
+
+    altosui: Ship EasyMini v2.0 firwmare
+    
+    Left this out in the last release...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0a466e9869633c6ce7e43ff24ba2afff938461dd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 17 14:47:56 2019 -0700
+
+    doc: Describe what sunlight does to MicroPeak and how to protect it
+    
+    Show flight data from micropeak in sunlight, a picture of foam
+    installed on micropeak and the resulting data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fa8e0fb8b75a808e029b090747fb60b35debb44a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jun 5 10:46:57 2019 -0600
+
+    add an explicit reference to Poron open-cell foam in Appendix A
+
+commit a6e8b739c47c50fa472e3f2a41cf13abb8d82c07
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 3 21:51:28 2019 -0700
+
+    altos: Directly compute radio tuning values from frequency
+    
+    The 8051 compiler doesn't support 64-bit ints, so the old
+    code used an iterative method in 32-bit values. That could take
+    a long time when the frequency was mis-entered in Hz or MHz instead of
+    kHz.
+    
+    This direct-computation uses 64-bit ints, but takes a fixed amount of
+    time for any inputs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1d3a8443d8de832b8e76a005e56ac5ff09b71849
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 23 06:45:54 2019 -0700
+
+    Add TeleStatic-v3.0 makefiles
+
+commit 0800970a4c9c6ed38bb76bfed6374093ca16b459
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 21 18:30:43 2019 -0700
+
+    altos: Add preliminary TeleStatic v3.0 code
+    
+    This adds the pin definitions and all of the code except for the
+    ads131a04 driver.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a29b84cffcd31b2a74dd14a18aa4790eb4f14f9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 21 18:19:59 2019 -0700
+
+    altos/telefireone-v2.0: Include MAX6691 data in ring
+    
+    Define HAS_MAX6691 which tells the data code to pull the MAX6691 data
+    into the data ring for logging etc.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 83823e4ee901edb893db68e36deb2b92ffec3958
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 21 18:18:55 2019 -0700
+
+    altos: Change MAX6691 driver to run its own thread
+    
+    This just captures temp data continuously; it takes 100ms to get the
+    temp data from the sensor, so the maximum rate is around 10 samples/sec.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 188f9efadd480de872f86a8eb741e8738db84c6b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 21 18:14:05 2019 -0700
+
+    altos: Add MAX6691 and ADS131A0X data to ring if present
+    
+    Add these two devices as potential data sources to be added into the
+    ring if available.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2c19d410f9d6ff1075ea2de0c0ad7b6a84e1e378
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 21 16:53:51 2019 -0700
+
+    altos/telefireone-v2.0: Definitions needed for MAX6691 driver
+    
+    Fix the DMA channel definition (STM starts values at 1 for unknown reasons).
+    Add definition of the power enable bit for the timer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5d3436ed8551537287dc6cf418f93b0989e1aee8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 21 16:49:19 2019 -0700
+
+    altos: get ao_max6691 driver working
+    
+    The driver uses a timer connected to a DMA engine to measure pulse
+    widths from the chip. We get 11 pulses for 4 channels; the first pulse
+    is caused by the timer starting up, the next two are the marker pulse
+    and then 8 more indicating the end of the high and low periods for
+    each channel.
+    
+    The driver API returns the 8 pulse widths; the caller is expected to
+    know what to do with those values as using them requires knowing the
+    value of the configuration resistor and the characteristics of the
+    thermistors.
+    
+    The test code assumes a 1k configuration resistor, using that it computes
+    the resistance of the four thermistors.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 49ce3e9a2eb4e1918773b80c355d720a3dadc7e0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 11 23:54:37 2019 -0700
+
+    altos: Work on MAX6691 driver
+
+commit 0e8970c7f4eb7e8dd4ef325e4db4fe7412d0ed78
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 21 12:55:20 2019 -0700
+
+    altos/lambdakey-v1.0: Fix obvious build errors
+    
+    The code is too large to run on this device at this point, but at least
+    it doesn't fail to compile?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8d77d5032781c5ef0dbb19de07ea97389b809f08
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 18 19:48:00 2019 -0700
+
+    altoslib: Correct monitor idle IMU data for EasyMega v2
+    
+    The IMU on EasyMega v2 is rotated from the other devices using this sensor.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6dea82844075348049ce5ff9bb8670ba8efc6668
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 18 19:46:24 2019 -0700
+
+    altoslib: Fetch correct mag along data for EasyMega v2
+    
+    Was using the wrong axis (y) instead of the correct one (x)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit df08028ff5dd892dafa667fde1fbf9de43f82fea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 18 14:42:15 2019 -0700
+
+    altos: Use ao_data_accel_invert when changing orientation value
+    
+    Instead of using AO_ACCEL_INVERT, use the macro which flips the values
+    around. This fixes a bug with ADXL375 flight computers (EasyMega v2.0) where the
+    accel cal values would be scrambled when changing orientation.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 774001a9426493fd5c0d5a237da6cb903b1259a8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 18 14:32:48 2019 -0700
+
+    doc: Make sure all 'code' examples are in DejaVu Sans Mono
+    
+    We were inheriting the default value for this setting, which was Courier
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b4ee716c0026cf997cde36ef00720d63a4c62c0c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 28 22:29:21 2019 -0700
+
+    doc: Document LEDs on TeleGPS devices
+    
+    V1 has just the battery charger. V2 adds the GPS lock indicator.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 226f422b1fe5ccdf0bb3c07fa4983ec1615ce066
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 18 17:21:57 2019 -0700
+
+    altos/stm32f4-disco: Remove scheme
+    
+    This demo doesn't need a lisp interpreter
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96c446b4dba6814d61317efb4d2dc99a3ca29e0c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 18 17:20:52 2019 -0700
+
+    altos/stm32f4: Working on USB
+    
+    Reset now works, still no packets
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e38e1a2f735a1bb4aebf0817cdd99a05567c6340
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 18 17:20:14 2019 -0700
+
+    altos/stm32f4: Wrong value for CK48MSEL_PLL_Q
+    
+    This meant that the USB clock wasn't actually getting started...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 65be5d1e07ff4ae619233f3b541b9599c44490ab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 18 17:17:21 2019 -0700
+
+    altos/stm32f4: Need to read-back register after clock enable
+    
+    This was reported as necessary; I have no idea, but it's not
+    expensive, so why not...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit efc2c093819b3ec2e5743126efb76d3a9c0ad231
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 18 17:16:16 2019 -0700
+
+    altos/stm32f4: Add -mfloat-abi=hard compile option
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a2df970fca0e719e4b32e1642803590ff7bbd1ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 18 17:15:16 2019 -0700
+
+    altos: ARM ABI requires 8-byte aligned stack
+    
+    This makes doubles on the stack (as for var-args functions) work
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b7de266431ee7bf05ba68ccae3e43a0468045860
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 12 12:58:20 2019 +0100
+
+    altos/drivers/ao_led.c: Declare LED port as void * to allow any SoC to use this code
+    
+    The generic LED code needs a generic type for the GPIO port.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3a01a7e36dd475adf96468f42c95aa352b5fdf11
+Merge: 338372b9 6b0754ce
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Mar 5 18:31:37 2019 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 6b0754cee625c6e2c19dc70fb5be6cd2f0125d47
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 5 17:25:44 2019 -0800
+
+    doc: A few minor edits to telelaunch docs
+    
+    3 → three
+    less → fewer
+    transreflexive -> reflective
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 338372b97d441c30d2a23df540163a66a7f8d8c0
+Merge: 8d0df64b cd920a0e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 25 18:30:08 2019 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit cd920a0e5321166ef8b1d6afc3d63fc5de998a93
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 25 16:42:25 2019 -0700
+
+    altos: add ao_time_ns API
+    
+    This provides nano-second resolution times by reading the systick
+    value (which runs at 250ns ticks on stm).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0448b9b638f8599633227a639ef9d8572780bbd9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 25 16:41:45 2019 -0700
+
+    altos: Change default time type to 32-bits
+    
+    Offers additional range for internal use without increasing cost on
+    32-bit platforms.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6fec7b5affd223c18bad78377d7655af958dffc2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 25 16:40:16 2019 -0700
+
+    altos: Fix several mis-specified time types
+    
+    Make sure AO_TICK_TYPE is used "everywhere", instead of uint16_t or other.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8d0df64bbc5ed31188b4b4bea0be52a52dbece3b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 24 15:10:25 2019 -0700
+
+    altos: ads124s0x successfully reading data
+
+commit 14fe18559d2eb7e568f07fcbaec89b6ef55fae24
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 24 11:51:58 2019 -0700
+
+    altos: snapshot - working on ads124x0x driver
+
+commit 2f87e182d9f0b3c2856f62149371ad70b16148cf
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 24 10:49:47 2019 -0700
+
+    altos: ADS124S0X driver compiles now
+
+commit 69bdb309f46a28803e93b08921720805b28b18a2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 24 10:28:15 2019 -0700
+
+    altos: fix ads124s0x data structure
+
+commit 8cc418ed3b0df0e465f0af27c2255cb97294e6ce
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 24 10:25:31 2019 -0700
+
+    altos: first cut at ADS124S0X driver interrupt handling
+
+commit 654a23168f59d04d7e9cad657bebf8ecfdd8e41e
+Merge: d0f66918 655c5d2c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 21 21:57:26 2019 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit d0f6691804ee8de633601483354c93f1c2d75219
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 21 21:57:08 2019 -0700
+
+    doc: actually add the telelaunch files
+
+commit 655c5d2c1124182ba336db368474cf4de0b9ce9d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 21 19:28:14 2019 -0800
+
+    altos: Allow applications to override newlib printf selection
+    
+    Re-defining NEWLIB_PRINTF_CFLAGS will allow applications to select
+    printf with floating point support if desired.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3310b22e28d953a6569cd50e83f91c25577424a5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 21 19:26:41 2019 -0800
+
+    altos: Fix ISR declarations to make them non-weak
+    
+    In my zeal to eliminate warnings, I added declarations of all ISR
+    functions to a shared header file. However, I managed to include the
+    'weak' declaration, which meant that the intended ISR functions were
+    as weak as the 'default' ISR functions. This left all interrupts
+    non-functional, which doesn't make for a happy program.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eaf2ee0f498b519d64e1664a2b8c66c52ac1497c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:43:50 2019 -0800
+
+    altos/telefireone-v2.0: Remove build of ao_product.h from Makefile
+    
+    This is built in common code now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c411c7ec71be0263a958c0803772cd6068e6bdad
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 21 17:14:24 2019 -0700
+
+    doc: new TeleLaunch system manual
+
+commit 5c772d58ba83e147f0a404261a34c39183f2aac3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 18 17:39:34 2019 -0700
+
+    altos: first cut of code for telefireone-v2.0
+
+commit d31fda73fef37cf6a9e449c99f3197b713b93acb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:26:39 2019 -0800
+
+    altos: Build telefireone-v1.0 by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6aeb000899ad7f22e92b487b5891664554bc4d33
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:26:08 2019 -0800
+
+    altos/telefireone-v1.0: Track ao_led_init API change
+    
+    No longer takes a parameter.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2e468bfbf9f430b6a3970283d818ea4405ccfc5b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:25:38 2019 -0800
+
+    altos/telefireone-v1.0: Set various ADC values
+    
+    Reference voltage and divider resistor values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4b41b14ea46ff6954895824a60637c0eb4353b17
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:25:06 2019 -0800
+
+    altos/telefireone-v1.0: Set AO_LOG_FORMAT
+    
+    Use AO_LOG_FORMAT_TELFIRETWO for now; perhaps we'll have a new format
+    at some point.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58f77ec66f5e40095917905578e36566b7e3401e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:24:21 2019 -0800
+
+    altos/telefireone-v1.0: Turn off USE_INTERNAL_FLASH
+    
+    This is for TeleMini v1.0 which stored log data to the program flash.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9ea50f00039c812ea6a4a4235d78c140a0252662
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:23:13 2019 -0800
+
+    altos/telefireone-v1.0: Clean up Makefile
+    
+    Follow other projects and remove common bits which are now in
+    Makefile.defs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d19f1888d736943e8b51aeb56ec7097e11a505fc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:22:07 2019 -0800
+
+    altos/telefireone-v1.0: Doesn't have a beeper
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f9f1776f61cf365e3c8862f9f93cd2773391da16
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 16:20:14 2019 -0800
+
+    altos: Remove AO_LOG_STATE from ao_log_telefiretwo
+    
+    Telefiretwo never changes flight state, so these packets weren't going
+    to be written.
+    
+    Also stop passing &log to ao_log_firetwo -- it always got the global
+    anyways, just use it directly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7a89aa1ea7e1b02b5cd310986adf4239ec0ce91d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 12:59:05 2019 -0800
+
+    altos: Move common build definitions to src/Makefile.defs
+    
+    This cleans up the build process for all architectures, providing a
+    common place to specify vpath, cflags and build rules for various
+    common files.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 889518aeee080b0f8bb954db86d08105898d8161
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 11:25:21 2019 -0800
+
+    altos/attiny: Mark 'mode' param to ao_exti_setup_port as used
+    
+    Retain API.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a12dc56db6d5245ee8ac594337576dd85791a984
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 10:42:23 2019 -0800
+
+    altos: Add -Wshadow to CFLAGS
+    
+    And fix up the related messages.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fda36e57205138f6c180a18b54956ea1682a5293
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 10:41:31 2019 -0800
+
+    altos/stm-demo: Make this build again after various API and CFLAGS changes
+    
+    Deal with LED API change. Remove unused functions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 85104dbe9684af579c9255553b609fd28f8ee276
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 10:40:06 2019 -0800
+
+    ao-tools/ao-dump-up: Document --wait flag
+    
+    --wait means to poll for a µPusb device instead of bailing when none
+    exists at startup. Quite useful for testing a batch of new device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b6021e8dd866d6db54d28c79f0572aadd1861a5f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 10:39:11 2019 -0800
+
+    ao-bringup: chaosread is no longer part of altos
+    
+    this has been moved to a separate project.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a43bc96ad4a524480a2d47500fb0cfaeeba8ad3d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 18 10:38:21 2019 -0800
+
+    stm: Expose LCD font API in ao_lcd_font.h
+    
+    That required renaming the existing LCD font defintions from
+    ao_lcd_font.h to ao_lcd_font_bits.h.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ebb8ab6a2f5f1245098ad68d0cd007d3f115a24d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:39:34 2019 -0800
+
+    altos: Add a pile more compiler warnings
+    
+    Adds:
+            -Wpointer-arith
+            -Wstrict-prototypes
+            -Wmissing-prototypes
+            -Wmissing-declarations
+            -Wnested-externs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d6c3c3618a708d2a1a7948454710e6ae21c2a426
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:38:23 2019 -0800
+
+    altos: Declare task stack as union of uint8_t and uint32_t
+    
+    Support -Wcast-align and -Wpointer-arith while still allowing
+    architectures to pick whether they want an 8-bit or 32-bit stack.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 63a44b9c169d042fb1a3997620477e7f00bb0918
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:34:21 2019 -0800
+
+    altos: Remove unused ao_adc_get from ao_adc_stm.c
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f26197f0eec650330b476514c47978b4ba087719
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:33:32 2019 -0800
+
+    altos: Stop doing pointer arith on void *
+    
+    Switch to uint8_t * instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54dd2a6e3a05b940d9daebb3d73f6876c182b3e7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:32:24 2019 -0800
+
+    altos: Add 'void' to function declarations with no params.
+    
+    Support -Wstrict-prototypes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 873f511173c637016b5e173813bd03c1725797bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:28:02 2019 -0800
+
+    altos: Declare all public functions in header files
+    
+    Including interrupt vectors to catch mis-spellings.
+    Working toward supporting -Wmissing-prototypes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c11427819ca24bb77523496309b5b6f699d126c5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:24:37 2019 -0800
+
+    altos: Mark local functions 'static'
+    
+    Working towards supporting -Wmissing-prototypes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 119a829e58aff5dd7801fe7ef8cae886bf31fec1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:35:02 2019 -0800
+
+    altos/stm: Note that ao_i2c_recv_dma_isr isn't actually used
+    
+    This function resets the i2c transceiver after DMA completes, but it
+    hasn't ever been hooked up. Some testing would be a good idea. For
+    now, just add a comment and mark the function as referenced to avoid a
+    compiler warning.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit acf032eb39504657e9289ca54844967b9c3bed76
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 4 22:42:05 2019 -0800
+
+    altos: Fix spelling of stm_dma_ch4_5_6_isr
+    
+    This spellingn error would have caused all DMA to these channels to fail.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d7f8c9262f7979ddcc93cb64b913e392c18ef674
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 17 17:35:25 2019 -0700
+
+    altos: ADS124S0X driver compiles with initialization code maybe completed
+
+commit c29f65a5696df66efb7e84e3ae8a3ea4b1f1494c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 17 14:38:53 2019 -0700
+
+    altos: add initial support for TeleFireOne v2.0
+
+commit 630f457666b48321be0a5b6fbf391efef1fa3eb4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 3 12:48:45 2019 -0800
+
+    Use strip-nondeterminism to fix JAR timestamps
+    
+    .jar files are just zip files, and contain dates. These will cause the
+    build to be non-reproducible. Use strip-nondeterminism to smash all of
+    these back to a fixed value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 145e5a1ac557c4990e74fb64b005fc68d6941bdc
+Merge: e2c9ef80 db730875
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jan 28 13:46:59 2019 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit e2c9ef801abacd2533d9b4321c24a490d4556134
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jan 28 13:45:31 2019 -0700
+
+    Makefiles, too
+
+commit db7308750b3478ec3d2332e81db9957a9d4f2cfc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 28 11:35:32 2019 -0800
+
+    altos/telefireeight-v2.0: Add flash loader Makefile
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e40407467f28ab44b9f7c7d51a65a51f802410d5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 28 11:33:19 2019 -0800
+
+    altos: Delete unused config bits for telefireeight-v2.0. Add Makefile
+    
+    Clean up the config and set the copyright year.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38dc7545a98a851af447ad3d69fa5bc85583fed9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 27 19:20:02 2019 -0700
+
+    altos: add telefireeight-v2.0 to src/Makefile and to Releasing
+
+commit f29b55691c9f160898b49bf15f46a88ae00b115f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 27 19:16:41 2019 -0700
+
+    altos: add support for telefireeight-v2.0
+
+commit 37f4a66e47370e0e5ef42b0d70cda060fa2baa64
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 9 15:42:42 2019 -0700
+
+    doc: add force-bootloader instructions for TeleGPS v1 and v2
+
+commit 3703aef1b8b043697e8b99df24b987ba696909bc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 7 17:15:41 2019 -0800
+
+    doc: Fix typo in TeleBT v3 flash-force instructions
+    
+    taht → that
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38630c65460b5e873a0df0fef937d498a37ea329
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 7 17:12:56 2019 -0800
+
+    Remove ao-chaosread
+    
+    This program is now provided by the independent chaosread program.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 31f9ed231e63b214b405a141cabce3eb758e82e6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Jan 5 18:02:34 2019 -0700
+
+    doc: add flash-force instructions for TeleBT v3.0
+
+commit 72bcff4c1af10571314e5cbbe29f073de818088e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 3 11:59:02 2019 -0800
+
+    ao-tools/ao-telem: Print out 'log_max' value. Clean up compiler warnings.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14900d539c9d379a39ec157bb7e1914aad8fde3c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 3 11:57:42 2019 -0800
+
+    ao-tools/ao-cal-accel: Initialize byte count var 'l'
+    
+    When left uninitialized, the program would randomly segfault at startup.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96be286b3a9daa9bdb7872118be0118872d483f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 3 11:55:38 2019 -0800
+
+    ao-tools/ao-load: Return status from 'rewrite'
+    
+    Was just falling off the end of this function, returning a random value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6f729ff46b2f4531db68f0af85e7e9fe0f6d1969
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 3 11:41:49 2019 -0800
+
+    ao-tools: Fix warnings in ao-tools
+    
+    None of these appear likely to have caused actual problems.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f14c799ae7ff3be56c28f5694f04c03daff7708e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 3 11:40:32 2019 -0800
+
+    ao-tools: Add lots of compiler warning flags to ao-tools build
+    
+    This catches some uninitialized variable errors which cause
+    ao-cal-accel to crash (fixes coming next)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit adf4bec88df1822031e1a8b00422de8b8b0c0cd4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 2 23:51:58 2019 -0800
+
+    doc: Update all docs to 1.9. Note this in doc/RELNOTES
+    
+    Missed a bunch of 1.8.7 numbers due to a missing step in the release process
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a3177edd807b12a58d684ece60b0f3329e742af6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jan 3 00:49:22 2019 -0700
+
+    updates to Releasing based on 1.9 release process learnings
+
+commit 5b4da841459a650e641924aab132f566c6259c4d
+Merge: 95ffec07 ecf40a3a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 2 23:03:41 2019 -0700
+
+    Merge branch 'master' into branch-1.9
+
+commit ecf40a3a190fb2f7d7d2654c1e87daddf0362b0c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 2 22:02:42 2019 -0800
+
+    doc: Skip .pdf generation when asciidoctor-pdf is missing
+    
+    Not available in debian unstable yet
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 95ffec073b0758801df04a77eca0bd2bc6e57e35
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jan 2 22:19:36 2019 -0700
+
+    changelog for 1.9 release
+
 commit 4e9e0bf99d6b71086110038fa1e3231d00bb2496
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Dec 31 15:20:57 2018 -0800

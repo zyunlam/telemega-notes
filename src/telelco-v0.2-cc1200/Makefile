@@ -76,7 +76,7 @@ PRODUCT=TeleLCO-v0.2
 PRODUCT_DEF=-DTELELCO
 IDPRODUCT=0x0023
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) -Os -g
+CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF)
 
 PROGNAME=telelco-v0.2
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -88,15 +88,9 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-../altitude.h: make-altitude
-	nickle $< > $@
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
 distclean:	clean
 

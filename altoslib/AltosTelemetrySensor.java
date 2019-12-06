@@ -32,8 +32,8 @@ public class AltosTelemetrySensor extends AltosTelemetryStandard {
 	int	speed() { return int16(20); }
 	int	height_16() { return int16(22); }
 
-	int	ground_accel() { return int16(24); }
-	int	ground_pres() { return int16(26); }
+	int	ground_pres() { return int16(24); }
+	int	ground_accel() { return int16(26); }
 	int	accel_plus_g() { return int16(28); }
 	int	accel_minus_g() { return int16(30); }
 

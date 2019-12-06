@@ -30,11 +30,6 @@
 #define AO_STACK_SIZE	512
 #endif
 
-#ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint16_t
-#define AO_TICK_SIGNED	int16_t
-#endif
-
 #define AO_PORT_TYPE	uint16_t
 
 /* Various definitions to make GCC look more like SDCC */
@@ -57,9 +52,6 @@
  */
 
 #define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
-
-#define ao_arch_task_members\
-	uint32_t *sp;			/* saved stack pointer */
 
 /*
  * For now, we're running at a weird frequency
@@ -119,7 +111,7 @@ void ao_lcd_font_string(char *s);
 extern const uint32_t	ao_radio_cal;
 
 void
-ao_adc_init();
+ao_adc_init(void);
 
 /* ADC maximum reported value */
 #define AO_ADC_MAX			4095

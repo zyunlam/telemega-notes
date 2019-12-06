@@ -42,7 +42,6 @@ ALTOS_SRC = \
 	ao_freq.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
-	ao_beep_stm.c \
 	ao_eeprom_stm.c \
 	ao_storage.c \
 	ao_m25.c \
@@ -64,7 +63,7 @@ PRODUCT=TeleFireOne-v1.0
 PRODUCT_DEF=-DTELEFIREONE_V_1_0
 IDPRODUCT=0x000f
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) -Os -g
+CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF)
 
 PROGNAME = telefireone-v1.0
 PROG = $(PROGNAME)-$(VERSION).elf
@@ -76,12 +75,9 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
 distclean:	clean
 
@@ -93,3 +89,5 @@ install:
 
 uninstall:
 
+echo:
+	echo $(PROG) $(VERSION)

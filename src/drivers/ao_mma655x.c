@@ -232,7 +232,7 @@ ao_mma655x_setup(void)
 		ao_delay(AO_ST_DELAY);
 	}
 	if (tries == AO_ST_TRIES)
-		ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_MMA655X);
 
 	ao_mma655x_reg_write(AO_MMA655X_DEVCFG,
 			     DEVCFG_VALUE | (1 << AO_MMA655X_DEVCFG_ENDINIT));

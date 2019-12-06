@@ -33,6 +33,6 @@ ao_ee_write_config(uint8_t *buf, uint16_t len)
 uint8_t
 ao_ee_read_config(uint8_t *buf, uint16_t len) 
 {
-	ao_xmemset(buf, '\0', len);
+	memset(buf, '\0', len);
 	return 1;
 }

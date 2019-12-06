@@ -53,8 +53,6 @@ int ao_num_symbols = NUM_SYMBOLS;
 static bool
 rewrite(struct ao_hex_image *load, unsigned address, uint8_t *data, int length)
 {
-	int 		i;
-
 	if (address < load->address || load->address + load->length < address + length)
 		return false;
 

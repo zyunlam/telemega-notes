@@ -93,7 +93,7 @@ ao_companion_notify(void)
 	COMPANION_DESELECT();
 }
 
-void
+static void
 ao_companion(void)
 {
 	uint8_t	i;
@@ -113,7 +113,7 @@ ao_companion(void)
 	ao_exit();
 }
 
-void
+static void
 ao_companion_status(void) 
 {
 	uint8_t	i;

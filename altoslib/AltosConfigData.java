@@ -563,6 +563,8 @@ public class AltosConfigData {
 			return false;
 		if (product.startsWith("TeleMetrum-v2"))
 			return false;
+		if (product.startsWith("TeleMetrum-v3"))
+			return false;
 		if (product.startsWith("EasyMega"))
 			return false;
 		return true;
@@ -587,6 +589,8 @@ public class AltosConfigData {
 		if (product != null) {
 			if (product.startsWith("EasyMega-v2"))
 				return true;
+			if (product.startsWith("TeleMetrum-v3"))
+				return true;
 		}
 		throw new AltosUnknownProduct(product);
 	}
@@ -594,6 +598,8 @@ public class AltosConfigData {
 	public int adxl375_axis() throws AltosUnknownProduct {
 		if (product != null) {
 			if (product.startsWith("EasyMega-v2"))
+				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("TeleMetrum-v3"))
 				return AltosAdxl375.X_AXIS;
 		}
 		throw new AltosUnknownProduct(product);

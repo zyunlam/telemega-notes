@@ -26,6 +26,8 @@ import java.util.concurrent.*;
 class AltosEepromNameData extends AltosDataListener {
 	AltosGPS	gps = null;
 
+	boolean avoid_duplicate_files = false;
+
 	public void set_rssi(int rssi, int status) { }
 	public void set_received_time(long received_time) { }
 
@@ -38,6 +40,10 @@ class AltosEepromNameData extends AltosDataListener {
 
 	public void set_apogee_voltage(double volts) { }
 	public void set_main_voltage(double volts) { }
+
+	public void set_avoid_duplicate_files() {
+		avoid_duplicate_files = true;
+	}
 
 	public void set_gps(AltosGPS gps) {
 		super.set_gps(gps);
@@ -96,12 +102,19 @@ public class AltosEepromDownload implements Runnable {
 	private AltosFile MakeFile(int serial, int flight, AltosEepromNameData name_data) throws IOException {
 		AltosFile		eeprom_name;
 
-		if (name_data.gps != null) {
-			AltosGPS		gps = name_data.gps;
-			eeprom_name = new AltosFile(gps.year, gps.month, gps.day,
-						    serial, flight, "eeprom");
-		} else
-			eeprom_name = new AltosFile(serial, flight, "eeprom");
+		for (;;) {
+			if (name_data.gps != null) {
+				AltosGPS		gps = name_data.gps;
+				eeprom_name = new AltosFile(gps.year, gps.month, gps.day,
+							    serial, flight, "eeprom");
+			} else
+				eeprom_name = new AltosFile(serial, flight, "eeprom");
+			if (!name_data.avoid_duplicate_files)
+				break;
+			if (!eeprom_name.exists())
+				break;
+			flight++;
+		}
 
 		return eeprom_name;
 	}

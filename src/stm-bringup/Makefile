@@ -7,12 +7,12 @@ endif
 TOPDIR=..
 include $(TOPDIR)/Makedefs
 
-CC=arm-none-eabi-gcc
+CC=arm-none-eabicc
 OBJCOPY=arm-none-eabi-objcopy
 
 C_LIB=$(PDCLIB_LIBS_M3)
 
-DEF_CFLAGS=-g -std=gnu99 -Os -mlittle-endian -mthumb -ffreestanding -nostdlib -I. -I../stm $(PDCLIB_INCLUDES)
+DEF_CFLAGS= -std=gnu99 -mlittle-endian -mthumb -ffreestanding -nostdlib -I. -I../stm $(PDCLIB_INCLUDES)
 
 # to run from SRAM
 LD_FLAGS_RAM=-L../stm -Wl,-Taltos-ram.ld

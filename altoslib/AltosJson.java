@@ -623,7 +623,7 @@ public class AltosJson extends JsonUtil {
 			}
 			break;
 		case type_long:
-			result.append(new Long(l_number).toString());
+			result.append(Long.valueOf(l_number).toString());
 			break;
 		case type_string:
 			quote(result, string);
@@ -1036,6 +1036,7 @@ public class AltosJson extends JsonUtil {
 	 * all inner classes are only members of their immediate outer
 	 * class
 	 */
+	@SuppressWarnings("unchecked")
 	private Object make(Class c, Class enclosing_class, Object enclosing_object) {
 		Object	ret;
 		if (c == Boolean.TYPE) {
@@ -1105,7 +1106,7 @@ public class AltosJson extends JsonUtil {
 					Constructor<?> ctor = ((Class<?>)c).getDeclaredConstructor((Class<?>) enclosing_class);
 					object = ctor.newInstance(enclosing_object);
 				} else {
-					object = c.newInstance();
+					object = c.getDeclaredConstructor().newInstance();
 				}
 				for (; c != Object.class; c = c.getSuperclass()) {
 					for (Field field : c.getDeclaredFields()) {

@@ -47,7 +47,7 @@ MCU=atmega32u4
 PRODUCT_DEF=-DAVR_DEMO
 IDPRODUCT=0x000a
 CFLAGS = $(PRODUCT_DEF) -I. -I../avr -I../kernel -I..
-CFLAGS += -g -mmcu=$(MCU) -Wall -Wstrict-prototypes -Os -mcall-prologues
+CFLAGS += -mmcu=$(MCU) -Wall -Wstrict-prototypes -mcall-prologues
 
 NICKLE=nickle
 

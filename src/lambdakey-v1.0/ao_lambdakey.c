@@ -15,7 +15,7 @@
 #include <ao.h>
 #include <ao_scheme.h>
 
-static void scheme_cmd() {
+static void scheme_cmd(void) {
 	ao_scheme_read_eval_print(stdin, stdout, false);
 }
 
@@ -43,7 +43,7 @@ _ao_scheme_getc(void)
 void main(void)
 {
 #ifdef LEDS_AVAILABLE
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 #endif
 	ao_clock_init();
 	ao_timer_init();

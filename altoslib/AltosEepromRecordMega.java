@@ -162,7 +162,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return mag_y();
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
-			return mag_y();
+			return mag_x();
 		default:
 			return AltosLib.MISSING;
 		}

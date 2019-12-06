@@ -21,7 +21,7 @@
 #include <ao_data.h>
 #include <ao_flight.h>
 
-static struct ao_log_firetwo log;
+static struct ao_log_firetwo ao_fireone_data;
 
 const uint8_t ao_log_format = AO_LOG_FORMAT_TELEFIRETWO;
 
@@ -36,20 +36,20 @@ ao_log_csum(uint8_t *b)
 	return -sum;
 }
 
-uint8_t
-ao_log_firetwo(struct ao_log_firetwo *log) 
+static uint8_t
+ao_log_firetwo(void)
 {
 	uint8_t wrote = 0;
 	/* set checksum */
-	log->csum = 0;
-	log->csum = ao_log_csum((uint8_t *) log);
+	ao_fireone_data.csum = 0;
+	ao_fireone_data.csum = ao_log_csum((uint8_t *) &ao_fireone_data);
 	ao_mutex_get(&ao_log_mutex); {
 		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 			ao_log_stop();
 		if (ao_log_running) {
 			wrote = 1;
 			ao_storage_write(ao_log_current_pos,
-					 log,
+					 &ao_fireone_data,
 					 sizeof (struct ao_log_firetwo));
 			ao_log_current_pos += sizeof (struct ao_log_firetwo);
 		}
@@ -57,16 +57,8 @@ ao_log_firetwo(struct ao_log_firetwo *log)
 	return wrote;
 }
 
-static uint8_t
-ao_log_dump_check_data(void)
-{
-	if (ao_log_csum((uint8_t *) &log) != 0)
-		return 0;
-	return 1;
-}
-
 #if HAS_ADC
-static uint8_t	ao_log_data_pos;
+static uint8_t	ao_fireone_data_pos;
 
 /* a hack to make sure that ao_log_metrums fill the eeprom block in even units */
 typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;
@@ -75,8 +67,6 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_firetwo))] ;
 void
 ao_log(void)
 {
-	uint16_t ao_flight_state = ao_flight_startup;
-
 	ao_storage_setup();
 
 	do {
@@ -85,42 +75,29 @@ ao_log(void)
 		while (!ao_log_running)
 			ao_sleep(&ao_log_running);
 	
-		log.type = AO_LOG_FLIGHT;
-		log.tick = ao_time();
-		log.u.flight.flight = ao_flight_number;
-		ao_log_firetwo(&log);
+		ao_fireone_data.type = AO_LOG_FLIGHT;
+		ao_fireone_data.tick = ao_time();
+		ao_fireone_data.u.flight.flight = ao_flight_number;
+		ao_log_firetwo();
 
 		/* Write the whole contents of the ring to the log
 	 	* when starting up.
 	 	*/
-		ao_log_data_pos = ao_data_ring_next(ao_data_head);
-		ao_log_state = ao_flight_startup;
+		ao_fireone_data_pos = ao_data_ring_next(ao_data_head);
 		for (;;) {
 			/* Write samples to EEPROM */
-			while (ao_log_data_pos != ao_data_head) {
-				log.tick = ao_data_ring[ao_log_data_pos].tick;
-				log.type = AO_LOG_SENSOR;
-				log.u.sensor.pressure = ao_data_ring[ao_log_data_pos].adc.pressure;
-				log.u.sensor.thrust = ao_data_ring[ao_log_data_pos].adc.thrust;
+			while (ao_fireone_data_pos != ao_data_head) {
+				ao_fireone_data.tick = ao_data_ring[ao_fireone_data_pos].tick;
+				ao_fireone_data.type = AO_LOG_SENSOR;
+				ao_fireone_data.u.sensor.pressure = ao_data_ring[ao_fireone_data_pos].adc.pressure;
+				ao_fireone_data.u.sensor.thrust = ao_data_ring[ao_fireone_data_pos].adc.thrust;
 	//			for (i = 0; i < 4; i++) {
-	//				log.u.sensor.thermistor[i] = ao_data_ring[ao_log_data_pos].sensor.thermistor[i];
+	//				ao_fireone_data.u.sensor.thermistor[i] = ao_data_ring[ao_fireone_data_pos].sensor.thermistor[i];
 	//			}
-				ao_log_firetwo(&log);
-				ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
+				ao_log_firetwo();
+				ao_fireone_data_pos = ao_data_ring_next(ao_fireone_data_pos);
 			}
-			/* Write state change to EEPROM */
-			if (ao_flight_state != ao_log_state) {
-				ao_log_state = ao_flight_state;
-				log.type = AO_LOG_STATE;
-				log.tick = ao_time();
-				log.u.state.state = ao_log_state;
-				log.u.state.reason = 0;
-				ao_log_firetwo(&log);
-	
-				if (ao_log_state == ao_flight_landed)
-					ao_log_stop();
-			}
-	
+
 			ao_log_flush();
 
 			if (!ao_log_running) break;
@@ -131,15 +108,3 @@ ao_log(void)
 	} while (ao_log_running);
 }
 
-uint16_t
-ao_log_flight(uint8_t slot)
-{
-	if (!ao_storage_read(ao_log_pos(slot),
-			     &log,
-			     sizeof (struct ao_log_firetwo)))
-		return 0;
-
-	if (ao_log_dump_check_data() && log.type == AO_LOG_FLIGHT)
-		return log.u.flight.flight;
-	return 0;
-}

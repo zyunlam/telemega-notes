@@ -412,6 +412,18 @@ ao_spi_config(uint8_t spi_index, uint32_t speed)
 	uint8_t		id = AO_SPI_INDEX(spi_index);
 	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
 
+	switch (id) {
+#if SPI_1_POWER_MANAGE
+	case 0:
+		stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SPI1EN);
+		break;
+#endif
+#if SPI_2_POWER_MANAGE
+	case 1:
+		stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_SPI2EN);
+		break;
+#endif
+	}
 	if (spi_index != ao_spi_index[id]) {
 
 		/* Disable old config
@@ -469,6 +481,18 @@ ao_spi_put(uint8_t spi_index)
 	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
 
 	stm_spi->cr1 = 0;
+	switch (id) {
+#if SPI_1_POWER_MANAGE
+	case 0:
+		stm_rcc.apb2enr &= ~(1 << STM_RCC_APB2ENR_SPI1EN);
+		break;
+#endif
+#if SPI_2_POWER_MANAGE
+	case 1:
+		stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_SPI2EN);
+		break;
+#endif
+	}
 	ao_mutex_put(&ao_spi_mutex[id]);
 }
 

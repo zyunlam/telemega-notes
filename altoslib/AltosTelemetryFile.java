@@ -117,6 +117,10 @@ public class AltosTelemetryFile implements AltosRecordSet {
 		return cal_data;
 	}
 
+	public boolean valid() {
+		return true;
+	}
+
 	public void capture_series(AltosDataListener listener) {
 		AltosCalData	cal_data = cal_data();
 

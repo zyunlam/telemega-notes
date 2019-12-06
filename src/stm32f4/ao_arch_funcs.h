@@ -61,7 +61,7 @@ ao_arch_irqrestore(uint32_t basepri) {
 }
 
 static inline void
-ao_arch_memory_barrier() {
+ao_arch_memory_barrier(void) {
 	asm volatile("" ::: "memory");
 }
 
@@ -84,7 +84,7 @@ ao_arch_irq_check(void) {
 static inline void
 ao_arch_init_stack(struct ao_task *task, void *start)
 {
-	uint32_t	*sp = (uint32_t *) ((void*) task->stack + AO_STACK_SIZE);
+	uint32_t	*sp = &task->stack32[AO_STACK_SIZE>>2];
 	uint32_t	a = (uint32_t) start;
 	int		i;
 
@@ -110,7 +110,7 @@ ao_arch_init_stack(struct ao_task *task, void *start)
 	/* BASEPRI with interrupts enabled */
 	ARM_PUSH32(sp, 0);
 
-	task->sp = sp;
+	task->sp32 = sp;
 }
 
 static inline void ao_arch_save_regs(void) {
@@ -142,12 +142,12 @@ static inline void ao_arch_save_regs(void) {
 static inline void ao_arch_save_stack(void) {
 	uint32_t	*sp;
 	asm("mov %0,sp" : "=&r" (sp) );
-	ao_cur_task->sp = (sp);
+	ao_cur_task->sp32 = (sp);
 }
 
 static inline void ao_arch_restore_stack(void) {
 	/* Switch stacks */
-	asm("mov sp, %0" : : "r" (ao_cur_task->sp) );
+	asm("mov sp, %0" : : "r" (ao_cur_task->sp32) );
 
 #ifdef AO_NONMASK_INTERRUPTS
 	/* Restore BASEPRI */
@@ -251,28 +251,28 @@ ao_arch_wait_interrupt(void) {
 static inline void ao_enable_port(struct stm_gpio *port)
 {
 	if ((port) == &stm_gpioa) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPAEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPAEN);
 		ao_power_register(&ao_power_gpioa);
 	} else if ((port) == &stm_gpiob) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPBEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPBEN);
 		ao_power_register(&ao_power_gpiob);
 	} else if ((port) == &stm_gpioc) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPCEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPCEN);
 		ao_power_register(&ao_power_gpioc);
 	} else if ((port) == &stm_gpiod) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPDEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPDEN);
 		ao_power_register(&ao_power_gpiod);
 	} else if ((port) == &stm_gpioe) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPEEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPEEN);
 		ao_power_register(&ao_power_gpioe);
 	} else if ((port) == &stm_gpiof) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPFEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPFEN);
 		ao_power_register(&ao_power_gpiof);
 	} else if ((port) == &stm_gpiog) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPGEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPGEN);
 		ao_power_register(&ao_power_gpiog);
 	} else if ((port) == &stm_gpioh) {
-		stm_rcc.ahb1enr |= (1 << STM_RCC_AHB1ENR_IOPHEN);
+		stm_rcc_ahb1_clk_enable(1 << STM_RCC_AHB1ENR_IOPHEN);
 		ao_power_register(&ao_power_gpioh);
 	}
 }
@@ -280,28 +280,28 @@ static inline void ao_enable_port(struct stm_gpio *port)
 static inline void ao_disable_port(struct stm_gpio *port)
 {
 	if ((port) == &stm_gpioa) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPAEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPAEN);
 		ao_power_unregister(&ao_power_gpioa);
 	} else if ((port) == &stm_gpiob) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPBEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPBEN);
 		ao_power_unregister(&ao_power_gpiob);
 	} else if ((port) == &stm_gpioc) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPCEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPCEN);
 		ao_power_unregister(&ao_power_gpioc);
 	} else if ((port) == &stm_gpiod) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPDEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPDEN);
 		ao_power_unregister(&ao_power_gpiod);
 	} else if ((port) == &stm_gpioe) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPEEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPEEN);
 		ao_power_unregister(&ao_power_gpioe);
 	} else if ((port) == &stm_gpiof) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPFEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPFEN);
 		ao_power_unregister(&ao_power_gpiof);
 	} else if ((port) == &stm_gpiog) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPGEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPGEN);
 		ao_power_unregister(&ao_power_gpiog);
 	} else if ((port) == &stm_gpioh) {
-		stm_rcc.ahb1enr &= ~(1 << STM_RCC_AHB1ENR_IOPHEN);
+		stm_rcc_ahb1_clk_disable(1 << STM_RCC_AHB1ENR_IOPHEN);
 		ao_power_unregister(&ao_power_gpioh);
 	}
 }
@@ -336,5 +336,25 @@ static inline void ao_disable_port(struct stm_gpio *port)
 void
 ao_usart_init(void);
 
+void
+start(void);
+
+char
+ao_serial6_getchar(void);
+
+void
+ao_serial6_putchar(char c);
+
+int
+_ao_serial6_pollchar(void);
+
+uint8_t
+_ao_serial6_sleep_for(uint16_t timeout);
+
+void
+ao_serial6_set_speed(uint32_t speed);
+
+void
+ao_serial6_drain(void);
 
 #endif /* _AO_ARCH_FUNCS_H_ */

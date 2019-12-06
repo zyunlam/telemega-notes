@@ -143,7 +143,7 @@ ao_adxl375_setup(void)
 
 	uint8_t	devid = ao_adxl375_reg_read(AO_ADXL375_DEVID);
 	if (devid != AO_ADXL375_DEVID_ID)
-		ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_ADXL375);
 
 	/* Set the data rate */
 	ao_adxl375_reg_write(AO_ADXL375_BW_RATE,
@@ -204,12 +204,12 @@ ao_adxl375_setup(void)
 	self_test_value = z_change;
 
 	if (z_change < MIN_SELF_TEST)
-		ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_ADXL375);
 
 	/* This check is commented out as maximum self test is unreliable
 
 	   if (z_change > MAX_SELF_TEST)
-	   	ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_ADXL375);
 
 	*/
 

@@ -1,11 +1,11 @@
 #!/bin/sh
 
-VERSION=2.0
+VERSION=3.0
 PRODUCT=TeleMetrum
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 
 echo "$PRODUCT-v$VERSION Test Program"
-echo "Copyright 2014 by Keith Packard.  Released under GPL v2"
+echo "Copyright 2019 by Bdale Garbee.  Released under GPL v2"
 echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"

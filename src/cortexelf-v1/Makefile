@@ -95,7 +95,7 @@ LDFLAGS=-L../stm -L/local/newlib-mini/arm-none-eabi/lib/thumb/v7-m/ -Wl,-Tcortex
 AO_CFLAGS=-I. -I../stm -I../kernel -I../drivers -I../draw -I../scheme -I.. -I/local/newlib-mini/arm-none-eabi/include
 LIBS=-lc -lm -lgcc
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF) -Os -g
+CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF)
 
 
 SRC=$(ALTOS_SRC) ao_cortexelf.c

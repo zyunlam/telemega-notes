@@ -78,27 +78,25 @@ extern uint8_t	ao_cpu_sleep_disable;
 
 #define ao_arch_task_globals	uint8_t ao_cpu_sleep_disable;
 
-#define ao_arch_task_members\
-	uint8_t *sp;			/* saved stack pointer */
-
-#define ao_arch_init_stack(task, start) do {			\
-	uint8_t		*sp = task->stack + AO_STACK_SIZE - 1;	\
-	uint16_t	a = (uint16_t) start; 			\
-	int		i;					\
-								\
-	/* Return address */					\
-	AVR_PUSH8(sp, a);					\
-	AVR_PUSH8(sp, (a >> 8));				\
-								\
-	/* Clear register values */				\
-	i = 32;							\
-	while (i--)						\
-		AVR_PUSH8(sp, 0);				\
-								\
-	/* SREG with interrupts enabled */			\
-	AVR_PUSH8(sp, 0x80);					\
-	task->sp = sp;						\
-} while (0);
+#define ao_arch_init_stack(task, start) \
+	do {								\
+		uint8_t		*sp = task->stack8 + AO_STACK_SIZE - 1;	\
+		uint16_t	a = (uint16_t) start; 			\
+		int		i;					\
+									\
+		/* Return address */					\
+		AVR_PUSH8(sp, a);					\
+		AVR_PUSH8(sp, (a >> 8));				\
+									\
+		/* Clear register values */				\
+		i = 32;							\
+		while (i--)						\
+			AVR_PUSH8(sp, 0);				\
+									\
+		/* SREG with interrupts enabled */			\
+		AVR_PUSH8(sp, 0x80);					\
+		task->sp8 = sp;						\
+	} while (0);
 	
 #define ao_arch_save_regs() do {					\
 		asm("push r31" "\n\t" "push r30");			\
@@ -115,7 +113,7 @@ extern uint8_t	ao_cpu_sleep_disable;
 		uint8_t	sp_l, sp_h;					\
 		asm("in %0,__SP_L__" : "=&r" (sp_l) );			\
 		asm("in %0,__SP_H__" : "=&r" (sp_h) );			\
-		ao_cur_task->sp = (uint8_t *) ((uint16_t) sp_l | ((uint16_t) sp_h << 8)); \
+		ao_cur_task->sp8 = (uint8_t *) ((uint16_t) sp_l | ((uint16_t) sp_h << 8)); \
 	} while (0)
 
 #define ao_arch_isr_stack()	/* nothing */
@@ -140,8 +138,8 @@ extern uint8_t	ao_cpu_sleep_disable;
 
 #define ao_arch_restore_stack() do { \
 		uint8_t	sp_l, sp_h;					\
-		sp_l = (uint16_t) ao_cur_task->sp;			\
-		sp_h = ((uint16_t) ao_cur_task->sp) >> 8;		\
+		sp_l = (uint16_t) ao_cur_task->sp8;			\
+		sp_h = ((uint16_t) ao_cur_task->sp8) >> 8;		\
 		asm("out __SP_H__,%0" : : "r" (sp_h) );			\
 		asm("out __SP_L__,%0" : : "r" (sp_l) );			\
 		asm("pop r0"	"\n\t"					\

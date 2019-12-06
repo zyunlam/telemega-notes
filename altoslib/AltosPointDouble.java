@@ -22,7 +22,7 @@ public class AltosPointDouble {
 	public double	x, y;
 
 	public int hashCode() {
-		return new Double(x).hashCode() ^ new Double(y).hashCode();
+		return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode();
 	}
 
 	public boolean equals(Object o) {

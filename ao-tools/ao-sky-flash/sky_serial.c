@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE 1
 #include <termios.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -98,11 +98,10 @@ skytraq_open(const char *path)
 #define US_PER_CHAR	(1000000 / BPS)
 
 int
-skytraq_write(int fd, const char *data, int len)
+skytraq_write(int fd, const void *d, int len)
 {
-	const char *d = data;
+	const char *data = d;
 	int		r;
-	int		us;
 
 	skytraq_dbg_printf (0, "%4d: ", len);
 	if (len < 70)
@@ -116,7 +115,6 @@ skytraq_write(int fd, const char *data, int len)
 		r = write(fd, data, this_time);
 		if (r <= 0)
 			return r;
-		us = r * US_PER_CHAR;
 		usleep(r * US_PER_CHAR);
 		data += r;
 		len -= r;
@@ -132,7 +130,7 @@ skytraq_setcomm(int fd, int baudrate)
 	int	i;
 	uint8_t	cksum;
 
-	int target_baudrate;
+	int target_baudrate = 0;
 	switch(baudrate)
 	{
 	case 4800:

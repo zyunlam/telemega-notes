@@ -145,6 +145,9 @@ isr(usart3_4_5_6_7_8)
 isr(cec_can)
 isr(usb)
 
+#undef isr
+#undef isr_halt
+
 #define i(addr,name)	[(addr)/4] = stm_ ## name ## _isr
 
 __attribute__ ((section(".interrupt")))

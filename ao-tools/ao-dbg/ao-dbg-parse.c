@@ -68,41 +68,6 @@ static struct command_function functions[] = {
 #define TRUE 1
 #endif
 
-static int
-string_to_int(char *s, int *v)
-{
-	char *endptr;
-
-	if (isdigit(s[0]) || s[0] == '-' || s[0] == '+') {
-		*v = strtol(s, &endptr, 0);
-		if (endptr == s)
-			return FALSE;
-	} else if (*s == '\'') {
-		s++;
-		if (*s == '\\') {
-			s++;
-			switch (*s) {
-			case 'n':
-				*v = '\n';
-				break;
-			case 't':
-				*v = '\t';
-				break;
-			default:
-				*v = (int) *s;
-				break;
-			}
-		} else
-			*v = (int) *s;
-		s++;
-		if (*s != '\'')
-			return FALSE;
-	}
-	else
-		return FALSE;
-    return TRUE;
-}
-
 struct command_function *
 command_string_to_function(struct command_function *functions, char *name)
 {

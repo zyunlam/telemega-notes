@@ -33,7 +33,7 @@ PRODUCT=AltosFlash
 PRODUCT_DEF=-DALTOS_FLASH
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) $(STM32F4_CFLAGS) -g -Os
+CFLAGS = $(PRODUCT_DEF) $(STM32F4_CFLAGS)
 
 LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm32f4 -Wl,-Taltos-loader.ld
 
@@ -52,9 +52,6 @@ $(PROG): Makefile $(OBJ) altos-loader.ld
 $(BIN): $(PROG)
 	$(MAKEBIN) --output=$@ --base=$(FLASH_ADDR) $(PROG)
 	
-ao_product.h: ao-make-product.5c $(TOPDIR)/Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
-
 $(OBJ): $(INC)
 
 distclean:	clean

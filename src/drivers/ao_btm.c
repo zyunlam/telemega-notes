@@ -187,7 +187,7 @@ ao_btm_getchar(void)
  * it after a few characters.
  */
 
-uint8_t
+static uint8_t
 ao_btm_get_line(void)
 {
 	uint8_t ao_btm_reply_len = 0;
@@ -209,8 +209,8 @@ ao_btm_get_line(void)
 /*
  * Drain the serial port completely
  */
-void
-ao_btm_drain()
+static void
+ao_btm_drain(void)
 {
 	while (ao_btm_get_line())
 		;
@@ -219,7 +219,7 @@ ao_btm_drain()
 /*
  * Set the stdio echo for the bluetooth link
  */
-void
+static void
 ao_btm_echo(uint8_t echo)
 {
 	ao_stdios[ao_btm_stdio].echo = echo;
@@ -230,7 +230,7 @@ ao_btm_echo(uint8_t echo)
  * can't keep up with 57600 baud
  */
 
-void
+static void
 ao_btm_putchar(char c)
 {
 	ao_btm_log_out_char(c);
@@ -242,7 +242,7 @@ ao_btm_putchar(char c)
  * Wait for the bluetooth device to return
  * status from the previously executed command
  */
-uint8_t
+static uint8_t
 ao_btm_wait_reply(void)
 {
 	for (;;) {
@@ -256,7 +256,7 @@ ao_btm_wait_reply(void)
 	}
 }
 
-void
+static void
 ao_btm_string(const char *cmd)
 {
 	char	c;
@@ -265,7 +265,7 @@ ao_btm_string(const char *cmd)
 		ao_btm_putchar(c);
 }
 
-uint8_t
+static uint8_t
 ao_btm_cmd(const char *cmd)
 {
 	ao_btm_drain();
@@ -282,7 +282,7 @@ ao_btm_cmd(const char *cmd)
 	return ao_btm_wait_reply();
 }
 
-uint8_t
+static uint8_t
 ao_btm_set_name(void)
 {
 	char	sn[8];
@@ -301,7 +301,7 @@ ao_btm_set_name(void)
 	return ao_btm_wait_reply();
 }
 
-uint8_t
+static uint8_t
 ao_btm_try_speed(uint8_t speed)
 {
 	ao_serial_btm_set_speed(speed);
@@ -329,8 +329,8 @@ ao_btm_try_speed(uint8_t speed)
 #define BT_CC1111	1
 #endif
 
-void
-ao_btm_check_link()
+static void
+ao_btm_check_link(void)
 {
 #if BT_CC1111
 	ao_arch_critical(
@@ -362,7 +362,7 @@ struct ao_task ao_btm_task;
  * A thread to initialize the bluetooth device and
  * hang around to blink the LED when connected
  */
-void
+static void
 ao_btm(void)
 {
 #ifdef AO_BTM_INT_PORT

@@ -42,7 +42,7 @@ public abstract class AltosUnits {
 	public abstract double inverse(double v, boolean imperial_units);
 
 	public String string_value(double v, boolean imperial_units) {
-		return new Double(value(v, imperial_units)).toString();
+		return Double.valueOf(value(v, imperial_units)).toString();
 	}
 
 	public abstract String show_units(boolean imperial_units);

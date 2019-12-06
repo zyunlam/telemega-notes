@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-test-igniter
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 
 ao_test_igniter_DEPENDENCIES = $(top_builddir)/ao-tools/lib/libao-tools.a
 

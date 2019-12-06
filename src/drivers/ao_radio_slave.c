@@ -107,7 +107,7 @@ ao_radio_slave_spi(void)
 			break;
 			
 		case AO_RADIO_SPI_CMAC_KEY:
-			ao_xmemcpy(&ao_config.aes_key, ao_radio_spi_request.payload, AO_AES_LEN);
+			memcpy(&ao_config.aes_key, ao_radio_spi_request.payload, AO_AES_LEN);
 			break;
 
 		case AO_RADIO_SPI_TEST_ON:

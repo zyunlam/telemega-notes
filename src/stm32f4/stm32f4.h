@@ -66,8 +66,8 @@ struct stm_rcc {
 	vuint32_t	pad_28;
 	vuint32_t	pad_2c;
 
-	vuint32_t	ahb1enr;
-	vuint32_t	ahb2enr;
+	vuint32_t	_ahb1enr;
+	vuint32_t	_ahb2enr;
 	vuint32_t	ahbdnr;
 	vuint32_t	pad_3c;
 
@@ -269,13 +269,45 @@ extern struct stm_rcc stm_rcc;
 #define  STM_RCC_DCKCFGR2_SDIOSEL_CK_48MHZ	0
 #define  STM_RCC_DCKCFGR2_SDIOSEL_SYSTEM_CLOCK	1
 #define STM_RCC_DCKCFGR2_CK48MSEL	27
-#define  STM_RCC_DCKCFGR2_CK48MSEL_PLL_Q	1
+#define  STM_RCC_DCKCFGR2_CK48MSEL_PLL_Q	0
 #define  STM_RCC_DCKCFGR2_CK48MSEL_PLLI2S_Q	1
 #define STM_RCC_DCKCFGR2_I2CFMP1SEL	22
 #define  STM_RCC_DCKCFGR2_I2CFMP1SEL_APB		0
 #define  STM_RCC_DCKCFGR2_I2CFMP1SEL_SYSTEM_CLOCK	1
 #define  STM_RCC_DCKCFGR2_I2CFMP1SEL_HSI		2
 #define  STM_RCC_DCKCFGR2_I2CFMP1SEL_APB_ALSO		3
+
+static inline void
+stm_rcc_ahb1_clk_enable(uint32_t bit)
+{
+	stm_rcc._ahb1enr |= bit;
+	uint32_t value = stm_rcc._ahb1enr;
+	(void) value;
+}
+
+static inline void
+stm_rcc_ahb1_clk_disable(uint32_t bit)
+{
+	stm_rcc._ahb1enr &= ~bit;
+	uint32_t value = stm_rcc._ahb1enr;
+	(void) value;
+}
+
+static inline void
+stm_rcc_ahb2_clk_enable(uint32_t bit)
+{
+	stm_rcc._ahb2enr |= bit;
+	uint32_t value = stm_rcc._ahb2enr;
+	(void) value;
+}
+
+static inline void
+stm_rcc_ahb2_clk_disable(uint32_t bit)
+{
+	stm_rcc._ahb2enr &= ~bit;
+	uint32_t value = stm_rcc._ahb2enr;
+	(void) value;
+}
 
 struct stm_ictr {
 	vuint32_t	ictr;
@@ -378,6 +410,8 @@ stm_nvic_get_priority(int irq) {
 
 #define isr(name) void stm_ ## name ## _isr(void)
 
+isr(halt);
+isr(ignore);
 isr(nmi);
 isr(hardfault);
 isr(memmanage);

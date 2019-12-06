@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
+#include <ctype.h>
 #include "cc-usb.h"
 #include "cc.h"
 
@@ -37,17 +38,6 @@ static void usage(char *program)
 {
 	fprintf(stderr, "usage: %s [--tty <tty-name>] [--device <device-name>] [--wait]\n", program);
 	exit(1);
-}
-
-static uint8_t
-log_checksum(int d[8])
-{
-	uint8_t	sum = 0x5a;
-	int	i;
-
-	for (i = 0; i < 8; i++)
-		sum += (uint8_t) d[i];
-	return -sum;
 }
 
 static int get_nonwhite(struct cc_usb *cc, int timeout)
@@ -147,7 +137,6 @@ main (int argc, char **argv)
 	char		*tty = NULL;
 	char		*device = NULL;
 	int		c;
-	char		line[8192];
 	int		nsamples;
 	int		i;
 	int		crc;

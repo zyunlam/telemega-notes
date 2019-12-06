@@ -96,7 +96,7 @@ static void usage(char *program)
 	exit(1);
 }
 
-void
+static void
 done(struct cc_usb *cc, int code)
 {
 /*	cc_usb_printf(cc, "a\n"); */
@@ -124,7 +124,7 @@ ucs2len(uint16_t *ucs2)
 	return len;
 }
 
-int
+static int
 putucs4(uint32_t c, FILE *file)
 {
 	char d;
@@ -162,23 +162,14 @@ main (int argc, char **argv)
 {
 	char			*device = NULL;
 	char			*filename;
-	Elf			*e;
 	int			raw = 0;
 	char			*serial_end;
 	unsigned int		serial = 0;
-	char			*serial_ucs2;
-	int			serial_ucs2_len;
-	char			serial_int[2];
-	unsigned int		s;
-	int			i;
-	int			string_num;
 	uint32_t		cal = 0;
-	char			cal_int[4];
 	char			*cal_end;
 	int			c;
 	int			was_flashed = 0;
 	struct ao_hex_image	*load;
-	int			tries;
 	struct cc_usb		*cc = NULL;
 	char			*tty = NULL;
 	int			success;

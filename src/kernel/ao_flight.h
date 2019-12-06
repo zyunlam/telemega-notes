@@ -43,14 +43,6 @@ extern uint16_t			ao_boost_tick;
 extern uint16_t			ao_launch_tick;
 extern uint16_t			ao_motor_number;
 
-#if HAS_IMU || HAS_MMA655X
-#define HAS_SENSOR_ERRORS	1
-#endif
-
-#if HAS_SENSOR_ERRORS
-extern uint8_t			ao_sensor_errors;
-#endif
-
 extern uint16_t			ao_launch_time;
 extern uint8_t			ao_flight_force_idle;
 

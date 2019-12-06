@@ -93,6 +93,7 @@ rewrite(struct ao_hex_image *image, unsigned addr, char *data, int len)
 		printf (" %02x", data[i]);
 	printf("\n");
 	memcpy(image->data + addr - image->address, data, len);
+	return 1;
 }
 
 static const struct option options[] = {
@@ -112,8 +113,6 @@ int
 main (int argc, char **argv)
 {
 	struct ccdbg	*dbg;
-	uint8_t		status;
-	uint16_t	pc;
 	struct ao_hex_file	*hex;
 	struct ao_hex_image *image;
 	char		*filename;

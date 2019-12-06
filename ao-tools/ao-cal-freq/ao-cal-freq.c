@@ -50,35 +50,6 @@ static void usage(char *program)
 	exit(1);
 }
 
-void
-done(struct cc_usb *cc, int code)
-{
-	cc_usb_close(cc);
-	exit (code);
-}
-
-static int
-ends_with(char *whole, char *suffix)
-{
-	int whole_len = strlen(whole);
-	int suffix_len = strlen(suffix);
-
-	if (suffix_len > whole_len)
-		return 0;
-	return strcmp(whole + whole_len - suffix_len, suffix) == 0;
-}
-
-static int
-starts_with(char *whole, char *prefix)
-{
-	int whole_len = strlen(whole);
-	int prefix_len = strlen(prefix);
-
-	if (prefix_len > whole_len)
-		return 0;
-	return strncmp(whole, prefix, prefix_len) == 0;
-}
-
 static char **
 tok(char *line) {
 	char	**strs = malloc (sizeof (char *)), *str;
@@ -92,16 +63,6 @@ tok(char *line) {
 	}
 	strs[n] = '\0';
 	return strs;
-}
-
-static void
-free_strs(char **strs) {
-	char	*str;
-	int	i;
-
-	for (i = 0; (str = strs[i]) != NULL; i++)
-		free(str);
-	free(strs);
 }
 
 struct flash {
@@ -132,21 +93,8 @@ flash(struct cc_usb *usb)
 	return head;
 }
 
-static void
-free_flash(struct flash *b) {
-	struct flash *n;
-
-	while (b) {
-		n = b->next;
-		free_strs(b->strs);
-		free(b);
-		b = n;
-	}
-}
-
-char **
+static char **
 find_flash(struct flash *b, char *word0) {
-	int i;
 	for (;b; b = b->next) {
 		if (strstr(b->line, word0))
 			return b->strs;
@@ -154,21 +102,7 @@ find_flash(struct flash *b, char *word0) {
 	return NULL;
 }
 
-void
-await_key(void)
-{
-	struct termios	termios, termios_save;
-	char	buf[512];
-
-	tcgetattr(0, &termios);
-	termios_save = termios;
-	cfmakeraw(&termios);
-	tcsetattr(0, TCSAFLUSH, &termios);
-	read(0, buf, sizeof (buf));
-	tcsetattr(0, TCSAFLUSH, &termios_save);
-}
-
-int
+static int
 do_save(struct cc_usb *usb)
 {
 	int ret = 0;
@@ -192,7 +126,7 @@ do_save(struct cc_usb *usb)
 	return ret;
 }
 
-int
+static int
 do_output(char *output, int cur_cal)
 {
 	printf ("Saving calibration value to file \"%s\"\n", output);
@@ -220,7 +154,7 @@ do_output(char *output, int cur_cal)
 	return ret;
 }
 
-int
+static int
 do_cal(char *tty, int save, char *output)
 {
 	struct cc_usb *usb = NULL;
@@ -313,18 +247,11 @@ int
 main (int argc, char **argv)
 {
 	char			*device = NULL;
-	char			*filename;
-	Elf			*e;
-	unsigned int		s;
-	int			i;
 	int			c;
-	int			tries;
 	char			*tty = NULL;
-	int			success;
 	int			verbose = 0;
 	int			save = 1;
 	int			ret = 0;
-	int			expected_size;
 	char			*output = NULL;
 
 	while ((c = getopt_long(argc, argv, "vnT:D:o:", options, NULL)) != -1) {

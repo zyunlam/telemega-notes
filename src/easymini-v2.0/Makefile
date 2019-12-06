@@ -53,7 +53,7 @@ PRODUCT=EasyMini-v2.0
 PRODUCT_DEF=-DEASYMINI_V_2_0
 IDPRODUCT=0x0026
 
-CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -g -Os
+CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS)
 
 PROGNAME=easymini-v2.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -65,10 +65,7 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 

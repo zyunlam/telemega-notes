@@ -67,7 +67,7 @@ static inline void ao_check_stack(void) {
 
 static struct ao_list	run_queue;
 static struct ao_list	alarm_queue;
-static struct ao_list	sleep_queue[SLEEP_HASH_SIZE];
+static struct ao_list	ao_sleep_queue[SLEEP_HASH_SIZE];
 
 static void
 ao_task_to_run_queue(struct ao_task *task)
@@ -80,7 +80,7 @@ ao_task_to_run_queue(struct ao_task *task)
 static struct ao_list *
 ao_task_sleep_queue(void *wchan)
 {
-	return &sleep_queue[(uintptr_t) wchan % SLEEP_HASH_SIZE];
+	return &ao_sleep_queue[(uintptr_t) wchan % SLEEP_HASH_SIZE];
 }
 
 static void
@@ -195,7 +195,7 @@ ao_task_init(void)
 	ao_list_init(&alarm_queue);
 	ao_task_alarm_tick = 0;
 	for (i = 0; i < SLEEP_HASH_SIZE; i++)
-		ao_list_init(&sleep_queue[i]);
+		ao_list_init(&ao_sleep_queue[i]);
 }
 
 #if DEBUG
@@ -290,7 +290,7 @@ ao_task_validate(void)
 #endif /* HAS_TASK_QUEUE */
 
 void
-ao_add_task(struct ao_task * task, void (*start)(void), const char *name) 
+ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name) 
 {
 	uint8_t task_id;
 	uint8_t t;
@@ -310,7 +310,7 @@ ao_add_task(struct ao_task * task, void (*start)(void), const char *name)
 	 * Construct a stack frame so that it will 'return'
 	 * to the start of the task
 	 */
-	ao_arch_init_stack(task, start);
+	ao_arch_init_stack(task, task_func);
 	ao_arch_critical(
 #if HAS_TASK_QUEUE
 		ao_task_init_queue(task);

@@ -19,6 +19,7 @@
 #include <ao.h>
 #include <ao_button.h>
 #include <ao_exti.h>
+#include <ao_fast_timer.h>
 #if AO_EVENT
 #include <ao_event.h>
 #define ao_button_queue(b,v)	ao_event_put_isr(AO_EVENT_BUTTON, b, v)
@@ -149,12 +150,7 @@ ao_button_isr(void)
 }
 
 #define init(b) do {							\
-		ao_enable_port(port(b));				\
-									\
-		ao_exti_setup(port(b), bit(b),				\
-			      AO_BUTTON_MODE|AO_EXTI_MODE_FALLING|AO_EXTI_MODE_RISING|AO_EXTI_PRIORITY_MED, \
-			      ao_button_isr);				\
-		ao_exti_enable(port(b), bit(b));			\
+		ao_enable_input(port(b), bit(b), AO_BUTTON_MODE);	\
 		_ao_button_init(b);					\
 	} while (0)
 
@@ -212,4 +208,6 @@ ao_button_init(void)
 #if AO_BUTTON_COUNT > 16
 	#error too many buttons
 #endif
+	ao_fast_timer_init();
+	ao_fast_timer_on(ao_button_isr);
 }

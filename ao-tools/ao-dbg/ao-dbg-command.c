@@ -106,6 +106,7 @@ command_di (int argc, char **argv)
 		return command_error;
 	length = (int) end - (int) start + 1;
 	status = ccdbg_read_memory(s51_dbg, start + 0xff00, memory, length);
+	(void) status;
 	dump_bytes(memory, length, start, "0x%02x ");
 	return command_success;
 }
@@ -126,6 +127,7 @@ command_ds (int argc, char **argv)
 		return command_error;
 	length = (int) end - (int) start + 1;
 	status = ccdbg_read_sfr(s51_dbg, start, memory, length);
+	(void) status;
 	dump_bytes(memory, length, start, "0x%02x ");
 	return command_success;
 }
@@ -146,6 +148,7 @@ command_dx (int argc, char **argv)
 		return command_error;
 	length = (int) end - (int) start + 1;
 	status = ccdbg_read_memory(s51_dbg, start, memory, length);
+	(void) status;
 	dump_bytes(memory, length, start, "0x%04x ");
 	return command_success;
 }
@@ -282,11 +285,10 @@ enable_breakpoints(void)
 			enable_breakpoint(b);
 }
 
-enum command_result
+static enum command_result
 set_breakpoint(uint16_t address, int temporary)
 {
 	int b;
-	uint8_t status;
 	for (b = 0; b < CC_NUM_BREAKPOINTS; b++) {
 		if (breakpoints[b].enabled == 0)
 			break;
@@ -307,11 +309,10 @@ set_breakpoint(uint16_t address, int temporary)
 	return command_success;
 }
 
-enum command_result
+static enum command_result
 clear_breakpoint(uint16_t address, int temporary)
 {
 	int b;
-	uint8_t status;
 
 	for (b = 0; b < CC_NUM_BREAKPOINTS; b++) {
 		if (breakpoints[b].enabled != 0 &&
@@ -333,7 +334,7 @@ clear_breakpoint(uint16_t address, int temporary)
 }
 
 
-int
+static int
 find_breakpoint(uint16_t address)
 {
 	int b;
@@ -372,7 +373,6 @@ command_break (int argc, char **argv)
 enum command_result
 command_clear (int argc, char **argv)
 {
-	int b;
 	uint16_t address;
 	enum command_result result;
 
@@ -384,7 +384,7 @@ command_clear (int argc, char **argv)
 	return clear_breakpoint(address, 0);
 }
 
-void
+static void
 cc_stopped(uint8_t status)
 {
 	uint16_t pc;
@@ -411,7 +411,7 @@ cc_stopped(uint8_t status)
 	}
 }
 
-uint8_t
+static uint8_t
 cc_step(uint16_t pc)
 {
 	int b;
@@ -585,8 +585,6 @@ static enum command_result
 info_breakpoints(int argc, char **argv)
 {
 	int b;
-	uint16_t address;
-	enum command_result result;
 
 	if (argc == 1) {
 		s51_printf("Num Type       Disp Hit   Cnt   Address  What\n");
@@ -599,7 +597,7 @@ info_breakpoints(int argc, char **argv)
 			}
 		return command_success;
 	}
-
+	return command_syntax;
 }
 
 static enum command_result

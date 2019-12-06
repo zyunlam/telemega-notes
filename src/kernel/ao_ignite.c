@@ -83,7 +83,7 @@ ao_igniter_status(enum ao_igniter igniter)
 #define AO_IGNITER_CHARGE_TIME		AO_MS_TO_TICKS(2000)
 #endif
 
-void
+static void
 ao_igniter_fire(enum ao_igniter igniter)
 {
 	ao_ignition[igniter].firing = 1;
@@ -136,7 +136,7 @@ ao_igniter_fire(enum ao_igniter igniter)
 	ao_ignition[igniter].firing = 0;
 }
 
-void
+static void
 ao_igniter(void)
 {
 	enum ao_igniter igniter;
@@ -159,7 +159,7 @@ ao_igniter(void)
 
 #endif
 
-void
+static void
 ao_ignite_manual(void)
 {
 	ao_cmd_white();
@@ -190,7 +190,7 @@ const char * const ao_igniter_status_names[] = {
 };
 
 #if HAS_IGNITE
-void
+static void
 ao_ignite_print_status(enum ao_igniter igniter, const char *name) 
 {
 	enum ao_igniter_status status = ao_igniter_status(igniter);
@@ -200,7 +200,7 @@ ao_ignite_print_status(enum ao_igniter igniter, const char *name)
 }
 #endif
 
-void
+static void
 ao_ignite_test(void)
 {
 #if HAS_IGNITE

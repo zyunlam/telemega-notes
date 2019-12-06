@@ -18,7 +18,7 @@ INC = \
 	ao_kalman.h \
 	ao_product.h \
 	ao_ms5607.h \
-	ao_mma655x.h \
+	ao_adxl375.h \
 	ao_cc1200_CC1200.h \
 	ao_profile.h \
 	ao_task.h \
@@ -64,7 +64,7 @@ ALTOS_SRC = \
 	ao_fec_rx.c \
 	ao_data.c \
 	ao_ms5607.c \
-	ao_mma655x.c \
+	ao_adxl375.c \
 	ao_adc_stm.c \
 	ao_beep_stm.c \
 	ao_storage.c \
@@ -93,7 +93,7 @@ PRODUCT=TeleMetrum-v3.0
 PRODUCT_DEF=-DTELEMETRUM_V_3_0
 IDPRODUCT=0x000b
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF) -Os -g
+CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF)
 
 PROGNAME=telemetrum-v3.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -105,15 +105,9 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-../altitude-pa.h: make-altitude-pa
-	nickle $< > $@
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
 distclean:	clean
 

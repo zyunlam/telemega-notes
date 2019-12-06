@@ -135,7 +135,7 @@ ao_exti_set_mode(struct stm_gpio *gpio, uint8_t pin, uint8_t mode) {
 }
 
 void
-ao_exti_set_callback(struct stm_gpio *gpio, uint8_t pin, void (*callback)()) {
+ao_exti_set_callback(struct stm_gpio *gpio, uint8_t pin, void (*callback)(void)) {
 	(void) gpio;
 	ao_exti_callback[pin] = callback;
 }

@@ -46,7 +46,7 @@ static void usage(char *program)
 	exit(1);
 }
 
-void
+static void
 done(struct cc_usb *cc, int code)
 {
 	cc_usb_close(cc);
@@ -57,7 +57,6 @@ int
 main (int argc, char **argv)
 {
 	char			*device = NULL;
-	char			*filename;
 	int			i;
 	int			c;
 	struct cc_usb		*cc = NULL;

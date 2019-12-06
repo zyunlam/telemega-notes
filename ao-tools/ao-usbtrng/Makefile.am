@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-usbtrng
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 
 ao_usbtrng_DEPENDENCIES = $(top_builddir)/ao-tools/lib/libao-tools.a
 

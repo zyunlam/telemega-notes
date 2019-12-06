@@ -83,7 +83,7 @@ ao_packet_master_check_busy(void)
 		ao_packet_master_delay = AO_PACKET_MASTER_DELAY_LONG;
 }
 
-void
+static void
 ao_packet_master(void)
 {
 	ao_config_get();
@@ -93,7 +93,7 @@ ao_packet_master(void)
 	ao_packet_master_delay = AO_PACKET_MASTER_DELAY_SHORT;
 	while (ao_packet_enable) {
 		uint8_t	r;
-		ao_xmemcpy(ao_tx_packet.callsign, ao_config.callsign, AO_MAX_CALLSIGN);
+		memcpy(ao_tx_packet.callsign, ao_config.callsign, AO_MAX_CALLSIGN);
 		ao_packet_send();
 		if (ao_tx_packet.len)
 			ao_packet_master_busy();

@@ -48,7 +48,7 @@ PRODUCT_DEF=-DCHAOSKEY_V_1_0
 IDVENDOR=0x1d50
 IDPRODUCT=0x60c6
 
-CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) -g -Os
+CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS)
 
 PROGNAME=chaoskey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -62,10 +62,7 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX) $(BIN)
 
 $(PROG): Makefile $(OBJ) altos.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -V $(IDVENDOR) -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) -o $@
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 

@@ -2,51 +2,13 @@ ifndef TOPDIR
 TOPDIR=..
 endif
 
-include $(TOPDIR)/Makedefs
+include $(TOPDIR)/Makefile.defs
 
-vpath % $(TOPDIR)/lpc:$(TOPDIR)/product:$(TOPDIR)/drivers:$(TOPDIR)/kernel:$(TOPDIR)/util:$(TOPDIR)/kalman:$(TOPDIR)/aes:$(TOPDIR):$(TOPDIR)/math
-vpath make-altitude $(TOPDIR)/util
-vpath make-kalman $(TOPDIR)/util
-vpath kalman.5c $(TOPDIR)/kalman
-vpath kalman_filter.5c $(TOPDIR)/kalman
-vpath load_csv.5c $(TOPDIR)/kalman
-vpath matrix.5c $(TOPDIR)/kalman
-vpath ao-make-product.5c $(TOPDIR)/util
+vpath % $(TOPDIR)/lpc:$(AO_VPATH)
 
-.SUFFIXES: .elf .ihx
-
-.elf.ihx:
-	$(ELFTOHEX) --output=$@ $*.elf
-
-
-ifndef VERSION
-include $(TOPDIR)/Version
-endif
-
-ELFTOHEX=$(TOPDIR)/../ao-tools/ao-elftohex/ao-elftohex
 CC=$(ARM_CC)
-
-WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align
-
-AO_CFLAGS=-I. -I$(TOPDIR)/lpc -I$(TOPDIR)/kernel -I$(TOPDIR)/drivers \
-	-DNEWLIB_INTEGER_PRINTF_SCANF \
-	-I$(TOPDIR)/product -I$(TOPDIR) -I$(TOPDIR)/math -I$(TOPDIR) \
-	-isystem $(NEWLIB_NANO)/arm-none-eabi/include
-
-LPC_CFLAGS=-std=gnu99 -mlittle-endian -mcpu=cortex-m0 -mthumb\
-	-ffreestanding -nostdlib $(AO_CFLAGS) $(WARN_FLAGS)
-
-NICKLE=nickle
 
 LIBS=-L$(NEWLIB_NANO)/arm-none-eabi/lib/thumb/v6-m -lc -lm -lgcc
 
-V=0
-# The user has explicitly enabled quiet compilation.
-ifeq ($(V),0)
-quiet = @printf "  $1 $2 $@\n"; $($1)
-endif
-# Otherwise, print the full command line.
-quiet ?= $($1)
-
-.c.o:
-	$(call quiet,CC) -c $(CFLAGS) -o $@ $<
+LPC_CFLAGS=-mlittle-endian -mcpu=cortex-m0 -mthumb\
+	 -I$(TOPDIR)/lpc $(AO_CFLAGS) $(NEWLIB_CFLAGS)

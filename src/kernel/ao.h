@@ -75,7 +75,9 @@ typedef AO_PORT_TYPE ao_port_t;
 #define AO_PANIC_SELF_TEST_HMC5883	0x40 | 2	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MPU6000	0x40 | 3	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MPU9250	0x40 | 3	/* Self test failure */
+#define AO_PANIC_SELF_TEST_BMX160	0x40 | 3	/* Self test failure */
 #define AO_PANIC_SELF_TEST_MS5607	0x40 | 4	/* Self test failure */
+#define AO_PANIC_SELF_TEST_ADS124S0X	0x40 | 5	/* Self test failure */
 
 /* Stop the operating system, beeping and blinking the reason */
 void
@@ -99,8 +101,8 @@ extern AO_ROMCONFIG_SYMBOL uint32_t ao_radio_cal;
  */
 
 #ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint16_t
-#define AO_TICK_SIGNED	int16_t
+#define AO_TICK_TYPE	uint32_t
+#define AO_TICK_SIGNED	int32_t
 #endif
 
 extern volatile AO_TICK_TYPE ao_tick_count;
@@ -115,6 +117,10 @@ extern volatile AO_TICK_TYPE ao_tick_count;
 /* Returns the current time in ticks */
 AO_TICK_TYPE
 ao_time(void);
+
+/* Returns the current time in ns */
+uint64_t
+ao_time_ns(void);
 
 /* Suspend the current task until ticks time has passed */
 void
@@ -931,12 +937,6 @@ ao_log_single(void);
  */
 
 #define AO_TELEPYRO_NUM_ADC	9
-
-#ifndef ao_xmemcpy
-#define ao_xmemcpy(d,s,c) memcpy(d,s,c)
-#define ao_xmemset(d,v,c) memset(d,v,c)
-#define ao_xmemcmp(d,s,c) memcmp(d,s,c)
-#endif
 
 /*
  * ao_terraui.c

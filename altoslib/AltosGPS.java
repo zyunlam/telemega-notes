@@ -92,6 +92,10 @@ public class AltosGPS implements Cloneable {
 		return odt.toEpochSecond();
 	}
 
+	public  AltosLatLon lat_lon() {
+		return new AltosLatLon(lat, lon);
+	}
+
 	public AltosGPS(AltosTelemetryMap map) throws ParseException {
 		String	state = map.get_string(AltosTelemetryLegacy.AO_TELEM_GPS_STATE,
 					       AltosTelemetryLegacy.AO_TELEM_GPS_STATE_ERROR);

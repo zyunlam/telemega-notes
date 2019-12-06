@@ -381,7 +381,7 @@ ao_arch_irqrestore(uint32_t primask) {
 }
 
 static inline void
-ao_arch_memory_barrier() {
+ao_arch_memory_barrier(void) {
 	asm volatile("" ::: "memory");
 }
 
@@ -389,7 +389,7 @@ ao_arch_memory_barrier() {
 static inline void
 ao_arch_init_stack(struct ao_task *task, void *start)
 {
-	uint32_t	*sp = (uint32_t *) ((void *) task->stack + AO_STACK_SIZE);
+	uint32_t	*sp = &task->stack32[AO_STACK_SIZE >> 2];
 	uint32_t	a = (uint32_t) start;
 	int		i;
 
@@ -407,7 +407,7 @@ ao_arch_init_stack(struct ao_task *task, void *start)
 	/* PRIMASK with interrupts enabled */
 	ARM_PUSH32(sp, 0);
 
-	task->sp = sp;
+	task->sp32 = sp;
 }
 
 static inline void ao_arch_save_regs(void) {
@@ -426,17 +426,14 @@ static inline void ao_arch_save_regs(void) {
 static inline void ao_arch_save_stack(void) {
 	uint32_t	*sp;
 	asm("mov %0,sp" : "=&r" (sp) );
-	ao_cur_task->sp = (sp);
-	if ((uint8_t *) sp < &ao_cur_task->stack[0])
+	ao_cur_task->sp32 = (sp);
+	if (sp < &ao_cur_task->stack32[0])
 		ao_panic (AO_PANIC_STACK);
 }
 
 static inline void ao_arch_restore_stack(void) {
-	uint32_t	sp;
-	sp = (uint32_t) ao_cur_task->sp;
-
 	/* Switch stacks */
-	asm("mov sp, %0" : : "r" (sp) );
+	asm("mov sp, %0" : : "r" (ao_cur_task->sp32) );
 
 	/* Restore PRIMASK */
 	asm("pop {r0}");
@@ -448,6 +445,34 @@ static inline void ao_arch_restore_stack(void) {
 
 	/* Restore general registers */
 	asm("pop {r0-r7,pc}\n");
+}
+
+static inline void ao_sleep_mode(void) {
+
+	/*
+	  WFI (Wait for Interrupt) or WFE (Wait for Event) while:
+	   – Set SLEEPDEEP in Cortex ® -M0 System Control register
+	   – Set PDDS bit in Power Control register (PWR_CR)
+	   – Clear WUF bit in Power Control/Status register (PWR_CSR)
+	*/
+
+	ao_arch_block_interrupts();
+
+	/* Enable power interface clock */
+	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
+	ao_arch_nop();
+	stm_scb.scr |= (1 << STM_SCB_SCR_SLEEPDEEP);
+	ao_arch_nop();
+	stm_pwr.cr |= (1 << STM_PWR_CR_PDDS) | (1 << STM_PWR_CR_LPDS);
+	ao_arch_nop();
+	stm_pwr.cr |= (1 << STM_PWR_CR_CWUF);
+	ao_arch_nop();
+	ao_arch_nop();
+	ao_arch_nop();
+	ao_arch_nop();
+	ao_arch_nop();
+	asm("wfi");
+	ao_arch_nop();
 }
 
 #ifndef HAS_SAMPLE_PROFILE
@@ -502,5 +527,10 @@ ao_usb_write(uint16_t len);
 uint8_t
 ao_usb_write2(uint16_t len);
 #endif /* AO_USB_DIRECTIO */
+
+void start(void);
+
+void
+ao_debug_out(char c);
 
 #endif /* _AO_ARCH_FUNCS_H_ */

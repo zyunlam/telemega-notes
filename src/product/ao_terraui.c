@@ -598,7 +598,7 @@ ao_terramonitor(void)
 		case AO_TELEMETRY_SENSOR_TELEMETRUM:
 		case AO_TELEMETRY_SENSOR_TELEMINI:
 		case AO_TELEMETRY_SENSOR_TELENANO:
-			ao_xmemcpy(&ao_tel_sensor, &ao_monitor_ring[monitor], sizeof (ao_tel_sensor));
+			memcpy(&ao_tel_sensor, &ao_monitor_ring[monitor], sizeof (ao_tel_sensor));
 			if (ao_tel_sensor.state < ao_flight_boost) {
 				ao_tel_max_speed = 0;
 				ao_tel_max_height = 0;
@@ -611,10 +611,10 @@ ao_terramonitor(void)
 			ao_telem_progress = (ao_telem_progress + 1) & 0x3;
 			break;
 		case AO_TELEMETRY_LOCATION:
-			ao_xmemcpy(&ao_tel_location, &ao_monitor_ring[monitor], sizeof (ao_tel_location));
+			memcpy(&ao_tel_location, &ao_monitor_ring[monitor], sizeof (ao_tel_location));
 			break;
 		case AO_TELEMETRY_CONFIGURATION:
-			ao_xmemcpy(&ao_tel_config, &ao_monitor_ring[monitor], sizeof (ao_tel_config));
+			memcpy(&ao_tel_config, &ao_monitor_ring[monitor], sizeof (ao_tel_config));
 		}
 	}
 }

@@ -69,9 +69,33 @@
 #define AO_DATA_ADXL375 0
 #endif
 
+#if HAS_MAX6691
+#include <ao_max6691.h>
+#define AO_DATA_MAX6691 (1 << 4)
+#else
+#define AO_DATA_MAX6691 0
+#endif
+
+#if HAS_BMX160
+#include <ao_bmx160.h>
+#define AO_DATA_BMX160	(1 << 2)
+#else
+#define AO_DATA_BMX160	0
+#endif
+
+#ifndef HAS_SENSOR_ERRORS
+#if HAS_IMU || HAS_MMA655X || HAS_MS5607 || HAS_MS5611
+#define HAS_SENSOR_ERRORS	1
+#endif
+#endif
+
+#if HAS_SENSOR_ERRORS
+extern uint8_t			ao_sensor_errors;
+#endif
+
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375|AO_DATA_BMX160)
 
 struct ao_data {
 	uint16_t			tick;
@@ -100,6 +124,15 @@ struct ao_data {
 #if HAS_ADXL375
 	struct ao_adxl375_sample	adxl375;
 #endif
+#if HAS_MAX6691
+	struct ao_max6691_sample	max6691;
+#endif
+#if HAS_ADS131A0X
+	struct ao_ads131a0x_sample	ads131a0x;
+#endif
+#if HAS_BMX160
+	struct ao_bmx160_sample		bmx160;
+#endif
 };
 
 #define ao_data_ring_next(n)	(((n) + 1) & (AO_DATA_RING - 1))
@@ -118,6 +151,12 @@ extern volatile uint8_t		ao_data_count;
  * Mark a section of data as ready, check for data complete
  */
 #define AO_DATA_PRESENT(bit)	(ao_data_present |= (bit))
+
+/*
+ * Mark sensor failed, and unblock the sample collection code by
+ * marking the data as present
+ */
+#define AO_SENSOR_ERROR(bit)	(ao_data_present |= (ao_sensor_errors |= (bit)))
 
 /*
  * Wait until it is time to write a sensor sample; this is
@@ -328,8 +367,6 @@ typedef int16_t	accel_t;
 
 #define HAS_ACCEL	1
 
-#define AO_ACCEL_INVERT		0
-
 typedef int16_t accel_t;
 
 /* MPU6000 is hooked up so that positive y is positive acceleration */
@@ -404,6 +441,29 @@ static inline float ao_convert_accel(int16_t sensor)
 
 #endif
 
+#if !HAS_GYRO && HAS_BMX160
+
+#define HAS_GYRO	1
+
+typedef int16_t	gyro_t;		/* in raw sample units */
+typedef int16_t angle_t;	/* in degrees */
+
+/* Y axis is aligned with the direction of motion (along) */
+/* X axis is aligned in the other board axis (across) */
+/* Z axis is aligned perpendicular to the board (through) */
+
+static inline float ao_convert_gyro(float sensor)
+{
+	return ao_bmx160_gyro(sensor);
+}
+
+static inline float ao_convert_accel(int16_t sensor)
+{
+	return ao_bmx160_accel(sensor);
+}
+
+#endif
+
 #if !HAS_MAG && HAS_HMC5883
 
 #define HAS_MAG		1
@@ -457,6 +517,12 @@ ao_data_fill(int head) {
 #endif
 #if HAS_ADXL375
 		ao_data_ring[head].adxl375 = ao_adxl375_current;
+#endif
+#if HAS_MAX6691
+		ao_data_ring[head].max6691 = ao_max6691_current;
+#endif
+#if HAS_ADS131A0X
+		ao_data_ring[head].ads131a0x = ao_ads131a0x_current;
 #endif
 		ao_data_ring[head].tick = ao_tick_count;
 		ao_data_head = ao_data_ring_next(head);

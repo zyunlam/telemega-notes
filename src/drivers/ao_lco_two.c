@@ -121,7 +121,7 @@ ao_lco_main(void)
 }
 
 #if DEBUG
-void
+static void
 ao_lco_set_debug(void)
 {
 	uint16_t r = ao_cmd_decimal();

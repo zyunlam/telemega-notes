@@ -90,7 +90,7 @@ ifdef::radio[]
 		transmission is disabled.
 		ifdef::altusmetrum[]
 		This option is
-		available on TeleMetrum v2 and TeleMega
+		available on TeleMetrum v2 or newer and TeleMega
 		boards. TeleMetrum v1 boards cannot transmit
 		APRS packets.
 		endif::altusmetrum[]

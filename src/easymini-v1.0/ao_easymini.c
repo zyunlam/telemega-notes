@@ -19,7 +19,7 @@
 #include <ao.h>
 #include <ao_exti.h>
 
-void
+int
 main(void)
 {
 	ao_clock_init();

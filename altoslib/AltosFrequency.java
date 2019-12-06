@@ -27,7 +27,7 @@ public class AltosFrequency {
 	public String	description;
 
 	public int hashCode() {
-		return new Double(frequency).hashCode();
+		return Double.valueOf(frequency).hashCode();
 	}
 
 	public boolean equals(Object o) {

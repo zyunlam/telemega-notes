@@ -191,7 +191,7 @@ ao_log_flight(uint8_t slot)
 #endif
 
 static uint8_t
-ao_log_slots()
+ao_log_slots(void)
 {
 	return (uint8_t) (ao_storage_log_max / ao_config.flight_log_max);
 }
@@ -405,7 +405,7 @@ ao_log_full(void)
 static struct ao_task ao_log_task;
 #endif
 
-void
+static void
 ao_log_list(void) 
 {
 	uint8_t	slot;
@@ -425,7 +425,7 @@ ao_log_list(void)
 	printf ("done\n");
 }
 
-void
+static void
 ao_log_delete(void) 
 {
 	uint8_t slot;

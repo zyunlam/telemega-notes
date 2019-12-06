@@ -49,6 +49,7 @@ public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, A
 	void fill_map(AltosFlightSeries flight_series) {
 		boolean			any_gps = false;
 		AltosGPSTimeValue	gtv_last = null;
+		double gps_pad_altitude = flight_series.cal_data().gps_pad_altitude;;
 
 		if (flight_series.gps_series != null) {
 			for (AltosGPSTimeValue gtv : flight_series.gps_series) {
@@ -59,7 +60,9 @@ public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, A
 				    gps.nsat >= 4) {
 					if (map == null)
 						map = new AltosUIMap();
-					map.show(gps, (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time));
+					double gps_height = gps.alt - gps_pad_altitude;
+					int state = (int) flight_series.value_before(AltosFlightSeries.state_name, gtv.time);
+					map.show(gps, gtv.time, state, gps_height);
 					this.gps = gps;
 					has_gps = true;
 				}
@@ -67,8 +70,9 @@ public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, A
 		}
 		if (gtv_last != null) {
 			int state = (int) flight_series.value_after(AltosFlightSeries.state_name, gtv_last.time);
+			double gps_height = gps.alt - gps_pad_altitude;
 			if (state == AltosLib.ao_flight_landed)
-				map.show(gtv_last.gps, state);
+				map.show(gtv_last.gps, gtv_last.time, state, gps_height);
 		}
 	}
 
@@ -113,17 +117,19 @@ public class TeleGPSGraphUI extends AltosUIFrame implements AltosFontListener, A
 		super(file.getName());
 		AltosCalData cal_data = set.cal_data();
 
-		flight_series = new AltosUIFlightSeries(cal_data);
-		set.capture_series(flight_series);
-		flight_series.finish();
-
 		pane = new JTabbedPane();
 
-		graph = new AltosGraph(enable, stats, flight_series);
+		flight_series = new AltosUIFlightSeries(cal_data);
+
+		enable = new AltosUIEnable(this);
+
+		set.capture_series(flight_series);
+
+		flight_series.finish();
 
 		stats = new AltosFlightStats(flight_series);
 
-		enable = new AltosUIEnable(this);
+		graph = new AltosGraph(enable, stats, flight_series);
 
 		statsTable = new AltosFlightStatsTable(stats);
 

@@ -102,7 +102,7 @@ usb_tty(char *sys)
 	struct dirent **namelist;
 	int interface;
 	int num_interfaces;
-	char endpoint_base[20];
+	char endpoint_base[64];
 	char *endpoint_full;
 	char *tty_dir;
 	int ntty;

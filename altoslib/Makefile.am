@@ -1,10 +1,10 @@
-AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked -source 6
+AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
 
 JAVAROOT=bin
 
 VERSION=1
 
-CLASSPATH_ENV=mkdir -p $(JAVAROOT); CLASSPATH="bin:$(FREETTS)/*:/usr/share/java/*"
+CLASSPATH_ENV=mkdir -p $(JAVAROOT); CLASSPATH=bin
 
 SRC=.
 
@@ -48,6 +48,7 @@ altoslib_JAVA = \
 	AltosEepromRecordMini.java \
 	AltosEepromRecordGps.java \
 	AltosEepromRecordFireTwo.java \
+	AltosEepromRecordMicroPeak2.java \
 	AltosEepromRecordSet.java \
 	AltosEepromChunk.java \
 	AltosEepromDownload.java \
@@ -207,3 +208,6 @@ bin:
 
 $(JAR): classaltoslib.stamp
 	jar cf $@ -C bin org
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif

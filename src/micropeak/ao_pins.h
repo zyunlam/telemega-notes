@@ -32,6 +32,7 @@
 #define HAS_TASK		0
 #define HAS_MS5607		1
 #define HAS_MS5611		0
+#define HAS_SENSOR_ERRORS	0
 #define HAS_EEPROM		0
 #define HAS_BEEP		0
 #define AVR_CLOCK		250000UL

@@ -2,7 +2,7 @@ VERSION=$(shell git describe)
 
 AO_VIEW_CFLAGS=-I$(top_srcdir)/ao-tools/lib
 AO_VIEW_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
-AM_CFLAGS=$(AO_VIEW_CFLAGS) $(GNOME_CFLAGS) $(ALSA_CFLAGS) -I$(top_srcdir)/src -DAOVIEW_VERSION=\"$(VERSION)\" @FLITE_INCS@
+AM_CFLAGS=$(WARN_CFLAGS) $(AO_VIEW_CFLAGS) $(GNOME_CFLAGS) $(ALSA_CFLAGS) -I$(top_srcdir)/src -DAOVIEW_VERSION=\"$(VERSION)\" @FLITE_INCS@
 
 bin_PROGRAMS=ao-view
 

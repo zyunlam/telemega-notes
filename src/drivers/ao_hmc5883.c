@@ -66,7 +66,7 @@ ao_hmc5883_isr(void)
 
 static uint32_t	ao_hmc5883_missed_irq;
 
-void
+static void
 ao_hmc5883_sample(struct ao_hmc5883_sample *sample)
 {
 	uint16_t	*d = (uint16_t *) sample;

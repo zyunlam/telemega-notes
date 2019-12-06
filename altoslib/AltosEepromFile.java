@@ -45,6 +45,10 @@ public class AltosEepromFile implements AltosRecordSet {
 		return set.cal_data();
 	}
 
+	public boolean valid() {
+		return set.valid();
+	}
+
 	public void capture_series(AltosDataListener series) {
 		set.capture_series(series);
 	}

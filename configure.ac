@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9)
+AC_INIT([altos], 1.9.1)
 ANDROID_VERSION=18
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2018-12-31
+RELEASE_DATE=2019-12-05
 AC_SUBST(RELEASE_DATE)
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
@@ -64,27 +64,41 @@ AC_ARG_WITH(jcommon, AS_HELP_STRING([--with-jcommon=PATH],
 
 AC_SUBST(JCOMMON)
 
-AC_ARG_WITH(jvm, AS_HELP_STRING([--with-jvm-include=PATH],
-	[Set jvm include path for jni builds (default searches in /usr/lib/jvm)]),
-	[JVM_INCLUDE=$withval], [JVM_INCLUDE=auto])
+AC_ARG_WITH(jvm, AS_HELP_STRING([--with-jvm=PATH],
+	[Set jvm path for java builds (default searches in /usr/lib/jvm)]),
+	[JVM=$withval], [JVM=auto])
 
-if test "x$JVM_INCLUDE" = "xauto"; then
-	AC_MSG_CHECKING([JVM include files])
-	for jvm in default-java java-6-openjdk java-6-sun; do
-		if test "x$JVM_INCLUDE" = "xauto"; then
+if test "x$JVM" = "xauto"; then
+	AC_MSG_CHECKING([JVM])
+	for jvm in default-java java-6-openjdk java-7-openjdk java-8-openjdk java-9-openjdk java-10-openjdk java-11-openjdk java-12-openjdk java-13-openjdk java-6-sun java-8-openjdk-amd64; do
+		if test "x$JVM" = "xauto"; then
 			INCLUDE="/usr/lib/jvm/$jvm/include"
 			if test -f "$INCLUDE"/jni.h; then
-				JVM_INCLUDE="$INCLUDE"
+				JVM=/usr/lib/jvm/"$jvm"
 			fi
 		fi
 	done
-	if test "x$JVM_INCLUDE" = "xauto"; then
-		AC_MSG_ERROR([no JVM include files found])
+	if test "x$JVM" = "xauto"; then
+		AC_MSG_ERROR([no JVM files found])
 	fi
-	AC_MSG_RESULT([$JVM_INCLUDE])
+	AC_MSG_RESULT([$JVM])
 fi
 
+AC_ARG_WITH(java-version, AS_HELP_STRING([--with-java-version=7],
+					 [Set java language compatibility version (default is 7)]),
+	   [JAVA_VERSION=$withval], [JAVA_VERSION=7])
+
+JAVAC="$JVM"/bin/javac
+JAVA="$JVM"/bin/java
+JVM_INCLUDE="$JVM"/include
+JAVAC_VERSION_FLAGS="-target 1.$JAVA_VERSION -source 1.$JAVA_VERSION"
+
+AC_SUBST(JAVAC)
+AC_SUBST(JAVA)
+AC_SUBST(JVM)
 AC_SUBST(JVM_INCLUDE)
+AC_SUBST(JAVAC_VERSION_FLAGS)
+
 
 AC_ARG_WITH(android, AS_HELP_STRING([--with-android=PATH],
 	[Set android SDK path (default searches in a variety of places)]),
@@ -183,6 +197,9 @@ else
 	GOOGLEKEY='null'
 	HAVE_GOOGLE_KEY="no"
 fi
+
+WARN_CFLAGS="-Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wnested-externs"
+AC_SUBST(WARN_CFLAGS)
 
 AC_ARG_ENABLE(faketime, AS_HELP_STRING([--enable-faketime],
               [Use faketime program to ensure pdf files are reproducible (default=no)]),
@@ -392,6 +409,25 @@ if test "x$HAVE_ASCIIDOCTOR_PDF" = "xno"; then
 fi
 AM_CONDITIONAL([ASCIIDOCTOR_PDF], [test x$HAVE_ASCIIDOCTOR_PDF != xno])
 
+AC_ARG_WITH([strip-nondeterminism],
+	    [AS_HELP_STRING([--with-strip-nondeterminism],
+		            [Name of non-deterministic build data stripping tool])],
+	    [],
+	    [with_strip_nondeterminism=auto])
+
+if test "x$with_strip_nondeterminism" != "xno"; then
+	if test "x$with_strip_nondeterminism" = "xauto"; then
+		with_strip_nondeterminism="strip-nondeterminism"
+		AC_CHECK_PROG([HAVE_STRIP_NONDETERMINISM],[$with_strip_nondeterminism], yes, no)
+	else
+		HAVE_STRIP_NONDETERMINISM=yes
+	fi
+else
+	HAVE_STRIP_NONDETERMINISM=no
+fi
+AM_CONDITIONAL([STRIP_NONDETERMINISM], [test x$HAVE_STRIP_NONDETERMINISM != xno])
+AC_SUBST(STRIP_NONDETERMINISM, "$with_strip_nondeterminism")
+
 PKG_CHECK_MODULES([JANSSON], [jansson])
 
 AC_ARG_WITH([readline],
@@ -519,7 +555,7 @@ telegps/Info.plist
 telegps/telegps-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
-altosdroid/AndroidManifest.xml
+altosdroid/app/src/main/AndroidManifest.xml
 ao-tools/Makefile
 ao-tools/lib/Makefile
 ao-tools/ao-rawload/Makefile
@@ -545,14 +581,12 @@ ao-tools/ao-cal-accel/Makefile
 ao-tools/ao-cal-freq/Makefile
 ao-tools/ao-test-gps/Makefile
 ao-tools/ao-usbtrng/Makefile
-ao-tools/ao-chaosread/Makefile
 ao-tools/ao-makebin/Makefile
 ao-utils/Makefile
 map-server/Makefile
 map-server/altos-mapd/Makefile
 map-server/altos-map/Makefile
 map-server/altos-mapj/Makefile
-src/Version
 ])
 
 echo ""
@@ -570,6 +604,7 @@ echo "    STlink support..............: ${HAVE_STLINK}"
 echo "    Newlib-nano support.........: ${NEWLIB_NANO}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
 echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
+echo "    Strip jar timestamps........: ${STRIP_NONDETERMINISM}"
 echo ""
 echo "  Java"
 echo "    freetts.....................: ${FREETTS}"

@@ -77,20 +77,6 @@ ao_adc_poll(void)
 	stm_adc.cr2 = AO_ADC_CR2_VAL | (1 << STM_ADC_CR2_SWSTART);
 }
 
-/*
- * Fetch a copy of the most recent ADC data
- */
-void
-ao_adc_get(struct ao_adc *packet)
-{
-#if HAS_FLIGHT
-	uint8_t	i = ao_data_ring_prev(ao_sample_data);
-#else
-	uint8_t	i = ao_data_ring_prev(ao_data_head);
-#endif
-	memcpy(packet, (void *) &ao_data_ring[i].adc, sizeof (struct ao_adc));
-}
-
 #ifdef AO_ADC_SQ1_NAME
 static const char *ao_adc_name[AO_NUM_ADC] = {
 	AO_ADC_SQ1_NAME,

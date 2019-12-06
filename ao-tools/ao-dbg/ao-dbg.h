@@ -18,6 +18,7 @@
 
 #include <ccdbg.h>
 #include <cc.h>
+#include <ctype.h>
 
 extern char *s51_prompt;
 extern struct ccdbg *s51_dbg;

@@ -64,7 +64,7 @@ void stm_dma_ch2_3_isr(void) {
 		   ch_mask(STM_DMA_INDEX(3)));
 }
 
-void stm_dma1_ch4_5_6_isr(void) {
+void stm_dma_ch4_5_6_isr(void) {
 	ao_dma_isr(STM_DMA_INDEX(4), STM_DMA_INDEX(6),
 		   ch_mask(STM_DMA_INDEX(4)) |
 		   ch_mask(STM_DMA_INDEX(5)) |

@@ -26,8 +26,6 @@
 
 static uint8_t	ao_mpu9250_configured;
 
-extern uint8_t ao_sensor_errors;
-
 #ifndef AO_MPU9250_I2C_INDEX
 #define AO_MPU9250_SPI	1
 #else
@@ -361,7 +359,7 @@ _ao_mpu9250_setup(void)
 	}
 
 	if (st_tries == ST_TRIES)
-		ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_MPU9250);
 
 	/* Set up the mag sensor */
 
@@ -372,7 +370,7 @@ _ao_mpu9250_setup(void)
 	}
 
 	if (mag_tries == MAG_TRIES)
-		ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_MPU9250);
 
 	/* Select continuous mode 2 (100Hz), 16 bit samples */
 

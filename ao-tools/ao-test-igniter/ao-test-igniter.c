@@ -47,34 +47,12 @@ static void usage(char *program)
 	exit(1);
 }
 
-void
+static void
 done(struct cc_usb *cc, int code)
 {
 /*	cc_usb_printf(cc, "a\n"); */
 	cc_usb_close(cc);
 	exit (code);
-}
-
-static int
-ends_with(char *whole, char *suffix)
-{
-	int whole_len = strlen(whole);
-	int suffix_len = strlen(suffix);
-
-	if (suffix_len > whole_len)
-		return 0;
-	return strcmp(whole + whole_len - suffix_len, suffix) == 0;
-}
-
-static int
-starts_with(char *whole, char *prefix)
-{
-	int whole_len = strlen(whole);
-	int prefix_len = strlen(prefix);
-
-	if (prefix_len > whole_len)
-		return 0;
-	return strncmp(whole, prefix, prefix_len) == 0;
 }
 
 struct igniter {
@@ -96,7 +74,7 @@ igniters(struct cc_usb *usb)
 		cc_usb_getline(usb, line, sizeof (line));
 		if (strstr(line, "software-version"))
 			break;
-		if (sscanf(line, "Igniter: %s Status: %s", &name, &status) == 2) {
+		if (sscanf(line, "Igniter: %s Status: %s", name, status) == 2) {
 			struct igniter	*i = malloc (sizeof (struct igniter));
 			strcpy(i->name, name);
 			strcpy(i->status, status);
@@ -125,6 +103,7 @@ find_igniter(struct igniter *i, char *name)
 	for (; i; i = i->next)
 		if (strcmp(i->name, name) == 0)
 			return i;
+	return NULL;
 }
 
 static int
@@ -134,7 +113,7 @@ do_igniter(struct cc_usb *usb, char *name)
 	struct igniter	*this = find_igniter(all, name);
 	if (!this) {
 		struct igniter	*i;
-		printf("no igniter %s found in");
+		printf("no igniter %s found in", name);
 		for (i = all; i; i = i->next)
 			printf(" %s", i->name);
 		printf("\n");
@@ -157,15 +136,10 @@ int
 main (int argc, char **argv)
 {
 	char			*device = NULL;
-	char			*filename;
-	Elf			*e;
-	unsigned int		s;
 	int			i;
 	int			c;
-	int			tries;
 	struct cc_usb		*cc = NULL;
 	char			*tty = NULL;
-	int			success;
 	int			verbose = 0;
 	int			ret = 0;
 

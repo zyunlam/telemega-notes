@@ -113,9 +113,9 @@ ao_hex_read_record(struct ao_hex_input *input)
 	struct ao_hex_record *record = NULL;
 	enum ao_hex_read_state state = read_marker;
 	char c;
-	int nhexbytes;
-	uint32_t hex;
-	uint32_t ndata;
+	int nhexbytes = 0;
+	uint32_t hex = 0;
+	uint32_t ndata = 0;
 	uint8_t checksum;
 
 	while (state != read_done) {
@@ -451,8 +451,8 @@ ao_hex_image_free(struct ao_hex_image *image)
 	free(image);
 }
 
-uint32_t min(uint32_t a, uint32_t b) { return a < b ? a : b; }
-uint32_t max(uint32_t a, uint32_t b) { return a > b ? a : b; }
+static uint32_t min(uint32_t a, uint32_t b) { return a < b ? a : b; }
+static uint32_t max(uint32_t a, uint32_t b) { return a > b ? a : b; }
 
 struct ao_hex_image *
 ao_hex_image_cat(struct ao_hex_image *a, struct ao_hex_image *b)
