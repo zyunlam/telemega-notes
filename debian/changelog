@@ -1,3 +1,194 @@
+altos (1.9.1-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * updates to Releasing based on 1.9 release process learnings
+  * doc: add flash-force instructions for TeleBT v3.0
+  * doc: add force-bootloader instructions for TeleGPS v1 and v2
+  * altos: add support for telefireeight-v2.0
+  * altos: add telefireeight-v2.0 to src/Makefile and to Releasing
+  * Makefiles, too
+  * altos: add initial support for TeleFireOne v2.0
+  * altos: ADS124S0X driver compiles with initialization code maybe completed
+  * altos: first cut of code for telefireone-v2.0
+  * doc: new TeleLaunch system manual
+  * doc: actually add the telelaunch files
+  * altos: first cut at ADS124S0X driver interrupt handling
+  * altos: fix ads124s0x data structure
+  * altos: ADS124S0X driver compiles now
+  * altos: snapshot - working on ads124x0x driver
+  * altos: ads124s0x successfully reading data
+  * add an explicit reference to Poron open-cell foam in Appendix A
+  * ao-bringup: add a turnon_telefireeight script
+  * TeleFireEight has simple green LEDs for continuity
+  * doc: add more text to TeleLaunch manual, be less sloppy with dBm assertions
+  * doc: add some text to TeleLaunch troubleshooting about SAFE/ARM on TeleFire
+  * doc: add some text about cross-bank drag race safe/arm to TeleLaunch manual
+  * altosui: add monitor idle support for TeleMetrum v3
+  * altosui: add TeleMetrum v3 to delivered firmware list
+  * altosuilib: TeleMetrum v3, like v2, doesn't use flash for config
+  * ao-bringup: add production test support for TeleMetrum v3.0
+  * start the process of releasing 1.9.1
+  * update release date in all documents
+  * update ChangeLog for 1.9.1 release
+
+  [ Keith Packard ]
+  * doc: Update all docs to 1.9. Note this in doc/RELNOTES
+  * ao-tools: Add lots of compiler warning flags to ao-tools build
+  * ao-tools: Fix warnings in ao-tools
+  * ao-tools/ao-load: Return status from 'rewrite'
+  * ao-tools/ao-cal-accel: Initialize byte count var 'l'
+  * ao-tools/ao-telem: Print out 'log_max' value. Clean up compiler warnings.
+  * Remove ao-chaosread
+  * doc: Fix typo in TeleBT v3 flash-force instructions
+  * altos: Delete unused config bits for telefireeight-v2.0. Add Makefile
+  * altos/telefireeight-v2.0: Add flash loader Makefile
+  * Use strip-nondeterminism to fix JAR timestamps
+  * altos: Fix spelling of stm_dma_ch4_5_6_isr
+  * altos/stm: Note that ao_i2c_recv_dma_isr isn't actually used
+  * altos: Mark local functions 'static'
+  * altos: Declare all public functions in header files
+  * altos: Add 'void' to function declarations with no params.
+  * altos: Stop doing pointer arith on void *
+  * altos: Remove unused ao_adc_get from ao_adc_stm.c
+  * altos: Declare task stack as union of uint8_t and uint32_t
+  * altos: Add a pile more compiler warnings
+  * stm: Expose LCD font API in ao_lcd_font.h
+  * ao-bringup: chaosread is no longer part of altos
+  * ao-tools/ao-dump-up: Document --wait flag
+  * altos/stm-demo: Make this build again after various API and CFLAGS changes
+  * altos: Add -Wshadow to CFLAGS
+  * altos/attiny: Mark 'mode' param to ao_exti_setup_port as used
+  * altos: Move common build definitions to src/Makefile.defs
+  * altos: Remove AO_LOG_STATE from ao_log_telefiretwo
+  * altos/telefireone-v1.0: Doesn't have a beeper
+  * altos/telefireone-v1.0: Clean up Makefile
+  * altos/telefireone-v1.0: Turn off USE_INTERNAL_FLASH
+  * altos/telefireone-v1.0: Set AO_LOG_FORMAT
+  * altos/telefireone-v1.0: Set various ADC values
+  * altos/telefireone-v1.0: Track ao_led_init API change
+  * altos: Build telefireone-v1.0 by default
+  * altos/telefireone-v2.0: Remove build of ao_product.h from Makefile
+  * altos: Fix ISR declarations to make them non-weak
+  * altos: Allow applications to override newlib printf selection
+  * altos: Fix several mis-specified time types
+  * altos: Change default time type to 32-bits
+  * altos: add ao_time_ns API
+  * doc: A few minor edits to telelaunch docs
+  * altos/drivers/ao_led.c: Declare LED port as void * to allow any SoC to use this code
+  * altos: ARM ABI requires 8-byte aligned stack
+  * altos/stm32f4: Add -mfloat-abi=hard compile option
+  * altos/stm32f4: Need to read-back register after clock enable
+  * altos/stm32f4: Wrong value for CK48MSEL_PLL_Q
+  * altos/stm32f4: Working on USB
+  * altos/stm32f4-disco: Remove scheme
+  * doc: Document LEDs on TeleGPS devices
+  * doc: Make sure all 'code' examples are in DejaVu Sans Mono
+  * altos: Use ao_data_accel_invert when changing orientation value
+  * altoslib: Fetch correct mag along data for EasyMega v2
+  * altoslib: Correct monitor idle IMU data for EasyMega v2
+  * altos/lambdakey-v1.0: Fix obvious build errors
+  * altos: Work on MAX6691 driver
+  * altos: get ao_max6691 driver working
+  * altos/telefireone-v2.0: Definitions needed for MAX6691 driver
+  * altos: Add MAX6691 and ADS131A0X data to ring if present
+  * altos: Change MAX6691 driver to run its own thread
+  * altos/telefireone-v2.0: Include MAX6691 data in ring
+  * altos: Add preliminary TeleStatic v3.0 code
+  * Add TeleStatic-v3.0 makefiles
+  * altos: Directly compute radio tuning values from frequency
+  * doc: Describe what sunlight does to MicroPeak and how to protect it
+  * altosui: Ship EasyMini v2.0 firwmare
+  * doc: Say 'thousands of feet' instead of '3000-4000 feet'
+  * altos: Support ao_ms5607_dump when no ms5607 task
+  * altos/micropeak-v2.0: Don't run flight code when plugged in
+  * altos/micropeak-v2.0: Wait for the power supply to stabilize before measuring
+  * altos/micropeak-v2.0: Fix LED blinking sequence at power-on
+  * altos/micropeak-v2.0: Go into standby mode after landing
+  * altoslib: Always create an ordered record set for eeprom files
+  * altosui/telegps: Display error message when attempting to graph unknown files
+  * altos/micropeak-v2.0: expose log and config commands over USB
+  * altoslib: Add support for MicroPeak v2 eeprom format
+  * altos: Don't dump MS5607 eeprom in 'B' command
+  * altos/micropeak-v2: Erase log space at end of BOOST_DELAY
+  * altos/micropeak-v2: Correct AO_LOG_ID value
+  * altos/micropeak-v2: Update .gitignore
+  * ao-tools: Change ao-eeprom into eeprom analysis tool
+  * altos: Allow ms5607 driver to either set ao_sensor_errors or panic
+  * ao-tools/ao-telem: Fix man page and usage to match code
+  * ao-tools/lib: Add atmosphere model
+  * ao-tools/ao-eeprom: Add altitude data for baro values
+  * altosuilib: Don't crash when flashing an unknown device
+  * icon: Add altosdroid-specific icon
+  * altos/stmf0: Leave power interface disabled until needed
+  * altos/stmf0: Add 'ao_serial_shutdown'
+  * altos/stmf0: Allow SPI to be powered down when idle if desired
+  * altos/micropeak-v2.0: Reduce power usage
+  * altos: Record all failed sensors and report status at power up
+  * ao-tools/ao-eeprom: Add support for TeleFireTwo
+  * altoslib: Stop using deprecated Java functionality
+  * Use discovered java path for compiler and jni include files
+  * altosdroid: Hack up build to 'work' for now
+  * altosui: Fix path to easymini-v2.0 ihx file
+  * altosui: Make it possible to disable APRS
+  * altos: Use fast timer for buttons instead of edge-triggered ISR
+  * debian: Add libjson-c4 dependency
+  * Add new altosdroid icon
+  * icon: Ignore generated LED images
+  * Add .gitignore files for new projects
+  * libaltos: gitignore btletest
+  * altosui: Display data for point nearest cursor in map view
+  * altosui: Add speed and gps height to map display data
+  * drivers: Use 'main_value' instead of 'main'
+  * altos: Replace ao_xmem functions with direct mem calls
+  * altos: Add bmx160 driver
+  * altos: Integrate BMX160 into data code
+  * altos: Add EasyMega v3.0 bits (not setup correctly yet)
+  * altos: Add missing build files for avr/attiny devices
+  * altosdroid: Update Makefile.am to run gradle-based build
+  * altos: Switch all main() to return 'int'
+  * altos: Rename 'log' in ao_log_fireone to 'ao_fireone_data'
+  * doc: Describe new 'show nearest values' in map view
+  * doc: Update for 1.9.1
+  * altoslib: Don't crash when map flight data is missing
+  * telegps: Get --graph mode working after recent changes
+  * altos/telefire: Don't arm the box if the local arm switch is off
+  * altos/test: Get test code working again after restructuring
+  * altosdroid: Make altosdroid code more resilient to weird androidisms
+  * altoslib: Don't bother adding FREETTS to CLASSPATH
+  * altos: Relabel packet receive status line for TeleFire boxes
+  * altos: Improve labeling of telefire receive packet information
+  * altoslib: Fix setting of CLASSPATH
+  * altoslib: Fix original telemetry sensor packet parsing
+  * altos: TeleMetrum v3.0 has ADXL375 and Max-8Q
+  * altoslib: Set up adxl375 for TM v3.0 in idle mode
+  * altos: Send "metrum" telemetry packets for TeleMetrum v3.0 boards
+  * ao-telem: Show all 24 bits of GPS altitude data
+  * doc: Mention TeleMetrum v3.0 in release notes for 1.9.1
+  * doc: Update docs to reference TeleMetrum v3 where appropriate
+  * altoslib: Linker script changed -> the USB desc is two bytes off
+  * altosuilib: Show the recovered product name in the Configure Rom dialog
+  * altosuilib: Wait for Windows to get ready with new device
+  * Release note about self-flashing on windows waiting for devices
+
+  [ Mike Beattie ]
+  * Remove ant build files
+  * Move java source, and resources to new paths for gradle
+  * Update files that reference new paths
+  * Add gradle build files
+  * buildinfo data comes from Makedefs now, not Version
+  * Clean up duplication in AndroidManifest.xml.in
+  * Remove versioning data from AndroidManifest.xml.in
+  * Add FOREGROUND_SERVICE permission which is now required
+  * Indentation cleanup
+  * Commented out duplicate strings
+  * Import cleanup
+  * Convert to AndroidX from support_v4
+  * Update persistent notification in TelemetryService
+  * Update Google Maps API usage.
+  * Update app to use Material Design Light theme
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 05 Dec 2019 22:45:45 -0700
+
 altos (1.9-3) unstable; urgency=medium
 
   * cherry-pick commit that makes builds reproducible
