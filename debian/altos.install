@@ -1,6 +1,5 @@
 debian/altusmetrum.xpm	usr/share/pixmaps
 src/*/*.ihx		usr/share/altos
-src/*/*.map		usr/share/altos
 themes/background.png		usr/share/altos/themes
 themes/gdm/GdmGreeterTheme.desktop	/usr/share/gdm/themes/altusmetrum
 themes/gdm/altusmetrum.xml	/usr/share/gdm/themes/altusmetrum
