@@ -21,7 +21,7 @@
 #include <ao_exti.h>
 #include <ao_radio_cmac_cmd.h>
 
-void
+int
 main(void)
 {
 	ao_clock_init();

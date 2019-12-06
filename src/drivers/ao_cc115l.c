@@ -596,7 +596,7 @@ uint8_t ao_radio_tone_count;
 uint8_t ao_radio_tone_current;
 uint8_t ao_radio_tone_offset;
 
-int16_t
+static int16_t
 ao_radio_tone_fill(uint8_t *buf, int16_t len)
 {
 	int16_t	ret = 0;

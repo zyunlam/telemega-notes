@@ -18,7 +18,7 @@
 
 #include <ao.h>
 #include <ao_ms5607.h>
-#include <ao_mma655x.h>
+#include <ao_adxl375.h>
 #include <ao_log.h>
 #include <ao_exti.h>
 #include <ao_packet.h>
@@ -52,17 +52,11 @@ main(void)
 	ao_exti_init();
 
 	ao_adc_init();
-#if HAS_BEEP
 	ao_beep_init();
-#endif
 	ao_cmd_init();
 
-#if HAS_MS5607
 	ao_ms5607_init();
-#endif
-#if HAS_MMA655X
-	ao_mma655x_init();
-#endif
+	ao_adxl375_init();
 
 	ao_eeprom_init();
 

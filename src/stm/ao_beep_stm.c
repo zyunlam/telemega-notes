@@ -17,6 +17,7 @@
  */
 
 #include "ao.h"
+#include "ao_beep.h"
 
 #if BEEPER_TIMER == 2
 #define stm_beeper	stm_tim2

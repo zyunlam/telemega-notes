@@ -154,13 +154,13 @@ glyph[*] read_font(file f) {
 
 glyph[*] font;
 void init () {
-	twixt (file f = File::open("ao_lcd_font.h", "r"); File::close(f)) {
+	twixt (file f = File::open("ao_lcd_font_bits.h", "r"); File::close(f)) {
 		font = read_font(f);
 	}
 }
 
 void dump() {
-	twixt(file f = File::open("ao_lcd_font.h.new", "w"); File::close(f)) {
+	twixt(file f = File::open("ao_lcd_font_bits.h.new", "w"); File::close(f)) {
 		for (int i = 0; i < dim(font); i++) {
 			File::fprintf (f, "\t[%d] = 0x%04x,\n", i, glyph_value(font[i]));
 			File::fprintf (f, "/*\n");

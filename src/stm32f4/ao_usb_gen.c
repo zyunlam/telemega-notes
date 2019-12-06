@@ -449,7 +449,7 @@ ao_usb_int_interrupt(uint32_t mask)
 }
 
 void
-stm_usb_fs_wkup(void)
+stm_otg_fs_wkup_isr(void)
 {
 	/* USB wakeup, just clear the bit for now */
 //	stm_usb.istr &= ~(1 << STM_USB_ISTR_WKUP);
@@ -547,7 +547,7 @@ _ao_usb_out_recv(void)
 	ao_usb_rx_pos = 0;
 }
 
-int
+static int
 _ao_usb_pollchar(void)
 {
 	uint8_t c;
@@ -601,7 +601,6 @@ void
 ao_usb_enable(void)
 {
 	ao_usb_dev_enable();
-
 	ao_usb_configuration = 0;
 }
 

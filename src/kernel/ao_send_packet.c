@@ -17,6 +17,7 @@
  */
 
 #include "ao.h"
+#include "ao_send_packet.h"
 
 #define AO_MAX_SEND	128
 

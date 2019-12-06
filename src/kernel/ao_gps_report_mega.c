@@ -70,9 +70,9 @@ ao_gps_report_mega(void)
 			ao_sleep(&ao_gps_new);
 		ao_mutex_get(&ao_gps_mutex);
 		if (new & AO_GPS_NEW_DATA)
-			ao_xmemcpy(&gps_data, &ao_gps_data, sizeof (ao_gps_data));
+			memcpy(&gps_data, &ao_gps_data, sizeof (ao_gps_data));
 		if (new & AO_GPS_NEW_TRACKING)
-			ao_xmemcpy(&gps_tracking_data, &ao_gps_tracking_data, sizeof (ao_gps_tracking_data));
+			memcpy(&gps_tracking_data, &ao_gps_tracking_data, sizeof (ao_gps_tracking_data));
 		ao_gps_new = 0;
 		ao_mutex_put(&ao_gps_mutex);
 

@@ -1103,64 +1103,67 @@ extern struct stm_mpu stm_mpu;
 #define  STM_MPU_RASR_SIZE_MASK		0x1f
 #define STM_MPU_RASR_ENABLE	0
 
-#define isr(name) void stm_ ## name ## _isr(void);
+#define isr_decl(name) void stm_ ## name ## _isr(void)
 
-isr(nmi)
-isr(hardfault)
-isr(memmanage)
-isr(busfault)
-isr(usagefault)
-isr(svc)
-isr(debugmon)
-isr(pendsv)
-isr(systick)
-isr(wwdg)
-isr(pvd)
-isr(tamper_stamp)
-isr(rtc_wkup)
-isr(flash)
-isr(rcc)
-isr(exti0)
-isr(exti1)
-isr(exti2)
-isr(exti3)
-isr(exti4)
-isr(dma1_channel1)
-isr(dma1_channel2)
-isr(dma1_channel3)
-isr(dma1_channel4)
-isr(dma1_channel5)
-isr(dma1_channel6)
-isr(dma1_channel7)
-isr(adc1)
-isr(usb_hp)
-isr(usb_lp)
-isr(dac)
-isr(comp)
-isr(exti9_5)
-isr(lcd)
-isr(tim9)
-isr(tim10)
-isr(tim11)
-isr(tim2)
-isr(tim3)
-isr(tim4)
-isr(i2c1_ev)
-isr(i2c1_er)
-isr(i2c2_ev)
-isr(i2c2_er)
-isr(spi1)
-isr(spi2)
-isr(usart1)
-isr(usart2)
-isr(usart3)
-isr(exti15_10)
-isr(rtc_alarm)
-isr(usb_fs_wkup)
-isr(tim6)
-isr(tim7)
+isr_decl(halt);
+isr_decl(ignore);
 
-#undef isr
+isr_decl(nmi);
+isr_decl(hardfault);
+isr_decl(memmanage);
+isr_decl(busfault);
+isr_decl(usagefault);
+isr_decl(svc);
+isr_decl(debugmon);
+isr_decl(pendsv);
+isr_decl(systick);
+isr_decl(wwdg);
+isr_decl(pvd);
+isr_decl(tamper_stamp);
+isr_decl(rtc_wkup);
+isr_decl(flash);
+isr_decl(rcc);
+isr_decl(exti0);
+isr_decl(exti1);
+isr_decl(exti2);
+isr_decl(exti3);
+isr_decl(exti4);
+isr_decl(dma1_channel1);
+isr_decl(dma1_channel2);
+isr_decl(dma1_channel3);
+isr_decl(dma1_channel4);
+isr_decl(dma1_channel5);
+isr_decl(dma1_channel6);
+isr_decl(dma1_channel7);
+isr_decl(adc1);
+isr_decl(usb_hp);
+isr_decl(usb_lp);
+isr_decl(dac);
+isr_decl(comp);
+isr_decl(exti9_5);
+isr_decl(lcd);
+isr_decl(tim9);
+isr_decl(tim10);
+isr_decl(tim11);
+isr_decl(tim2);
+isr_decl(tim3);
+isr_decl(tim4);
+isr_decl(i2c1_ev);
+isr_decl(i2c1_er);
+isr_decl(i2c2_ev);
+isr_decl(i2c2_er);
+isr_decl(spi1);
+isr_decl(spi2);
+isr_decl(usart1);
+isr_decl(usart2);
+isr_decl(usart3);
+isr_decl(exti15_10);
+isr_decl(rtc_alarm);
+isr_decl(usb_fs_wkup);
+isr_decl(tim6);
+isr_decl(tim7);
+
+#undef isr_decl
 
 #define STM_ISR_WWDG_POS		0
 #define STM_ISR_PVD_POS			1
@@ -1796,6 +1799,14 @@ extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
 #define  STM_TIM234_SMCR_SMS_EXTERNAL_CLOCK	7
 #define  STM_TIM234_SMCR_SMS_MASK		7
 
+#define STM_TIM234_DIER_TDE		14
+#define STM_TIM234_DIER_CC4DE		12
+#define STM_TIM234_DIER_CC3DE		11
+#define STM_TIM234_DIER_CC2DE		10
+#define STM_TIM234_DIER_CC1DE		9
+#define STM_TIM234_DIER_UDE		8
+
+#define STM_TIM234_DIER_TIE		6
 #define STM_TIM234_DIER_CC4IE		4
 #define STM_TIM234_DIER_CC3IE		3
 #define STM_TIM234_DIER_CC2IE		2
@@ -1859,6 +1870,51 @@ extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
 #define  STM_TIM234_CCMR1_CC1S_INPUT_TI2		2
 #define  STM_TIM234_CCMR1_CC1S_INPUT_TRC		3
 #define  STM_TIM234_CCMR1_CC1S_MASK			3
+
+#define STM_TIM234_CCMR1_IC2F	12
+#define  STM_TIM234_CCMR1_IC2F_NONE			0
+#define  STM_TIM234_CCMR1_IC2F_CK_INT_N_2		1
+#define  STM_TIM234_CCMR1_IC2F_CK_INT_N_4		2
+#define  STM_TIM234_CCMR1_IC2F_CK_INT_N_8		3
+#define  STM_TIM234_CCMR1_IC2F_DTS_2_N_6		4
+#define  STM_TIM234_CCMR1_IC2F_DTS_2_N_8		5
+#define  STM_TIM234_CCMR1_IC2F_DTS_4_N_6		6
+#define  STM_TIM234_CCMR1_IC2F_DTS_4_N_8		7
+#define  STM_TIM234_CCMR1_IC2F_DTS_8_N_6		8
+#define  STM_TIM234_CCMR1_IC2F_DTS_8_N_8		9
+#define  STM_TIM234_CCMR1_IC2F_DTS_16_N_5		10
+#define  STM_TIM234_CCMR1_IC2F_DTS_16_N_6		11
+#define  STM_TIM234_CCMR1_IC2F_DTS_16_N_8		12
+#define  STM_TIM234_CCMR1_IC2F_DTS_32_N_5		13
+#define  STM_TIM234_CCMR1_IC2F_DTS_32_N_6		14
+#define  STM_TIM234_CCMR1_IC2F_DTS_32_N_8		15
+#define STM_TIM234_CCMR1_IC2PSC	10
+#define  STM_TIM234_CCMR1_IC2PSC_NONE			0
+#define  STM_TIM234_CCMR1_IC2PSC_2			1
+#define  STM_TIM234_CCMR1_IC2PSC_4			2
+#define  STM_TIM234_CCMR1_IC2PSC_8			3
+#define STM_TIM234_CCMR1_IC1F	4
+#define  STM_TIM234_CCMR1_IC1F_NONE			0
+#define  STM_TIM234_CCMR1_IC1F_CK_INT_N_2		1
+#define  STM_TIM234_CCMR1_IC1F_CK_INT_N_4		2
+#define  STM_TIM234_CCMR1_IC1F_CK_INT_N_8		3
+#define  STM_TIM234_CCMR1_IC1F_DTS_2_N_6		4
+#define  STM_TIM234_CCMR1_IC1F_DTS_2_N_8		5
+#define  STM_TIM234_CCMR1_IC1F_DTS_4_N_6		6
+#define  STM_TIM234_CCMR1_IC1F_DTS_4_N_8		7
+#define  STM_TIM234_CCMR1_IC1F_DTS_8_N_6		8
+#define  STM_TIM234_CCMR1_IC1F_DTS_8_N_8		9
+#define  STM_TIM234_CCMR1_IC1F_DTS_16_N_5		10
+#define  STM_TIM234_CCMR1_IC1F_DTS_16_N_6		11
+#define  STM_TIM234_CCMR1_IC1F_DTS_16_N_8		12
+#define  STM_TIM234_CCMR1_IC1F_DTS_32_N_5		13
+#define  STM_TIM234_CCMR1_IC1F_DTS_32_N_6		14
+#define  STM_TIM234_CCMR1_IC1F_DTS_32_N_8		15
+#define STM_TIM234_CCMR1_IC1PSC	2
+#define  STM_TIM234_CCMR1_IC1PSC_NONE			0
+#define  STM_TIM234_CCMR1_IC1PSC_2			1
+#define  STM_TIM234_CCMR1_IC1PSC_4			2
+#define  STM_TIM234_CCMR1_IC1PSC_8			3
 
 #define STM_TIM234_CCMR2_OC4CE	15
 #define STM_TIM234_CCMR2_OC4M	12

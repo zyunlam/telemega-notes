@@ -31,6 +31,7 @@ ISR(PCINT0_vect)
 void
 ao_exti_setup_port(uint8_t pin, uint8_t mode, void (*callback)(void))
 {
+	(void) mode;
 	pcint_callback = callback;
 	pcint_mask = (1 << pin);
 	ao_exti_disable(PORTB, pin);

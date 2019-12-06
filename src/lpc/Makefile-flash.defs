@@ -33,7 +33,7 @@ PRODUCT=AltosFlash
 PRODUCT_DEF=-DALTOS_FLASH
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS) -g -Os
+CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS)
 
 LDFLAGS=$(CFLAGS) -L$(TOPDIR)/lpc -Wl,-Taltos-loader.ld
 
@@ -41,10 +41,7 @@ PROGNAME=altos-flash
 PROG=$(HARDWARE)-$(PROGNAME)-$(VERSION).elf
 
 $(PROG): Makefile $(OBJ) altos-loader.ld
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-ao_product.h: ao-make-product.5c $(TOPDIR)/Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 

@@ -269,7 +269,7 @@ ao_lco_input(void)
  * visually inspect the system for correct operation
  */
 static void
-ao_lco_display_test()
+ao_lco_display_test(void)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_seven_segment_set(AO_LCO_PAD_DIGIT, 8 | 0x10);
@@ -316,7 +316,7 @@ ao_lco_main(void)
 }
 
 #if DEBUG
-void
+static void
 ao_lco_set_debug(void)
 {
 	uint16_t r  = ao_cmd_decimal();

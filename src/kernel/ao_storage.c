@@ -20,11 +20,9 @@
 #include <ao_storage.h>
 
 uint8_t
-ao_storage_read(ao_pos_t pos, void *buf, uint16_t len) 
+ao_storage_read(ao_pos_t pos, void *v_buf, uint16_t len) 
 {
-#ifdef CC1111
-	return ao_storage_device_read(pos, buf, len);
-#else
+	uint8_t *buf = v_buf;
 	uint16_t this_len;
 	uint16_t this_off;
 
@@ -50,15 +48,12 @@ ao_storage_read(ao_pos_t pos, void *buf, uint16_t len)
 		pos += this_len;
 	}
 	return 1;
-#endif
 }
 
 uint8_t
-ao_storage_write(ao_pos_t pos, void *buf, uint16_t len) 
+ao_storage_write(ao_pos_t pos, void *v_buf, uint16_t len) 
 {
-#ifdef CC1111
-	return ao_storage_device_write(pos, buf, len);
-#else
+	uint8_t *buf = v_buf;
 	uint16_t this_len;
 	uint16_t this_off;
 
@@ -84,7 +79,6 @@ ao_storage_write(ao_pos_t pos, void *buf, uint16_t len)
 		pos += this_len;
 	}
 	return 1;
-#endif
 }
 
 static uint8_t storage_data[128];
@@ -143,7 +137,7 @@ ao_storage_store(void)
 }
 #endif
 
-void
+static void
 ao_storage_zap(void) 
 {
 	uint32_t v = ao_cmd_hex();
@@ -152,7 +146,7 @@ ao_storage_zap(void)
 	ao_storage_erase((uint32_t) v << 8);
 }
 
-void
+static void
 ao_storage_zapall(void) 
 {
 	uint32_t	pos;
@@ -312,7 +306,7 @@ ao_storage_test(void)
 }
 #endif /* AO_STORAGE_TEST */
 
-void
+static void
 ao_storage_info(void) 
 {
 	ao_storage_setup();

@@ -2,7 +2,7 @@ if LIBSTLINK
 
 bin_PROGRAMS=ao-stmload
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(STLINK_CFLAGS) $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(STLINK_CFLAGS) $(LIBUSB_CFLAGS)
 AO_STMLOAD_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
 
 ao_stmload_DEPENDENCIES = $(AO_STMLOAD_LIBS)

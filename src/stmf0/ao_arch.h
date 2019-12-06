@@ -32,11 +32,6 @@
 
 #define AO_LED_TYPE	uint16_t
 
-#ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint16_t
-#define AO_TICK_SIGNED	int16_t
-#endif
-
 #define AO_PORT_TYPE	uint16_t
 
 /* Various definitions to make GCC look more like SDCC */
@@ -64,9 +59,6 @@ extern const uint16_t ao_romconfig_version;
 extern const uint16_t ao_romconfig_check;
 extern const uint16_t ao_serial_number;
 extern const uint32_t ao_radio_cal;
-
-#define ao_arch_task_members\
-	uint32_t *sp;			/* saved stack pointer */
 
 #define ao_arch_block_interrupts()	asm("cpsid i")
 #define ao_arch_release_interrupts()	asm("cpsie i")
@@ -127,7 +119,7 @@ void ao_lcd_font_string(char *s);
 extern const uint32_t	ao_radio_cal;
 
 void
-ao_adc_init();
+ao_adc_init(void);
 
 /* ADC maximum reported value */
 #define AO_ADC_MAX			4095

@@ -31,7 +31,7 @@ int
 skytraq_setcomm(int fd, int baudrate);
 
 int
-skytraq_write(int fd, const char *data, int len);
+skytraq_write(int fd, const void *data, int len);
 
 int
 skytraq_waitchar(int fd, int timeout);
@@ -41,6 +41,12 @@ skytraq_waitstatus(int fd, const char *status, int timeout);
 
 void
 skytraq_flush(int fd);
+
+int
+skytraq_millis(void);
+
+void
+skytraq_dbg_newline(void);
 
 int
 skytraq_cmd_wait(int fd, const char *message, int len, const char *status, int timeout);

@@ -277,15 +277,16 @@ struct ao_adc {
 
 #define HAS_HIGHG_ACCEL		1
 
-/*
- * mma655x
- */
+/* ADXL375 */
 
-#define HAS_MMA655X		1
-#define AO_MMA655X_SPI_INDEX	AO_SPI_1_PB3_PB4_PB5
-#define AO_MMA655X_CS_PORT	(&stm_gpiob)
-#define AO_MMA655X_CS_PIN	9
-#define AO_MMA655X_INVERT	1
+#define HAS_ADXL375		1
+#define AO_ADXL375_SPI_INDEX	(AO_SPI_1_PB3_PB4_PB5 | AO_SPI_MODE_3)
+#define AO_ADXL375_CS_PORT	(&stm_gpiob)
+#define AO_ADXL375_CS_PIN	9
+#define AO_ADXL375_SPI_SPEED	AO_SPI_SPEED_4MHz
+
+#define AO_ADXL375_AXIS		x
+#define AO_ADXL375_INVERT	1
 
 #define NUM_CMDS		16
 

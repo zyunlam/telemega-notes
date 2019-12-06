@@ -56,6 +56,8 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_EASYMINI2		14	/* 16-byte MS5607 baro only, 3.3V supply, stm32f042 SoC */
 #define AO_LOG_FORMAT_TELEMEGA_3	15	/* 32 byte typed telemega records with 32 bit gyro cal and mpu9250 */
 #define AO_LOG_FORMAT_EASYMEGA_2	16	/* 32 byte typed telemega records with 32 bit gyro cal, mpu9250 rotated 90° and adxl375 */
+#define AO_LOG_FORMAT_TELESTATIC	17	/* 32 byte typed telestatic records */
+#define AO_LOG_FORMAT_MICROPEAK2	18	/* 2-byte baro values with header */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -338,6 +340,33 @@ struct ao_log_firetwo {
 	} u;	/* 32 */
 };
 
+struct ao_log_telestatic {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;		/* 4 */
+		} flight;	/* 6 */
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;		/* 4 */
+			uint16_t	reason;		/* 6 */
+		} state;	/* 8 */
+		/* AO_LOG_SENSOR */
+		struct {
+			uint32_t	pressure;	/* 4 */
+			uint32_t	pressure2;	/* 8 */
+			uint32_t	thrust;		/* 12 */
+			uint32_t	mass;		/* 16 */
+			uint16_t	t_low;		/* 20 */
+			uint16_t	t_high[4];	/* 22 */
+		} sensor;	/* 30 */
+		uint8_t		align[28];		/* 4 */
+	} u;	/* 32 */
+};
+
 struct ao_log_metrum {
 	char			type;			/* 0 */
 	uint8_t			csum;			/* 1 */
@@ -483,6 +512,10 @@ typedef struct ao_log_mega ao_log_type;
 typedef struct ao_log_metrum ao_log_type;
 #endif
 
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEFIRETWO
+typedef struct ao_log_firetwo ao_log_type;
+#endif
+
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI1 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI3
 typedef struct ao_log_mini ao_log_type;
 #endif
@@ -504,6 +537,10 @@ typedef struct ao_log_record ao_log_type;
 #endif
 
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_TELESCIENCE
+#define AO_LOG_UNCOMMON	1
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_MICROPEAK2
 #define AO_LOG_UNCOMMON	1
 #endif
 

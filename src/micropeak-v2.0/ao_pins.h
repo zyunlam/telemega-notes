@@ -43,8 +43,8 @@ extern uint8_t ao_on_battery;
 #define AO_RCC_CFGR_HPRE_DIV	(ao_on_battery ? STM_RCC_CFGR_HPRE_DIV_16 : STM_RCC_CFGR_HPRE_DIV_1)
 
 /* APB = 12MHz usb / 2MHz battery */
-#define AO_APB_PRESCALER	1
-#define AO_RCC_CFGR_PPRE_DIV	STM_RCC_CFGR_PPRE_DIV_1
+#define AO_APB_PRESCALER	(ao_on_battery ? 2 : 1)
+#define AO_RCC_CFGR_PPRE_DIV	(ao_on_battery ? STM_RCC_CFGR_PPRE_DIV_2 : STM_RCC_CFGR_PPRE_DIV_1)
 
 #define HAS_USB			1
 #define AO_PA11_PA12_RMP	1
@@ -63,16 +63,21 @@ extern uint8_t ao_on_battery;
 #define IS_FLASH_LOADER		0
 
 #define HAS_MS5607		1
+#define HAS_SENSOR_ERRORS	0
 #define HAS_MS5611		0
 #define HAS_MS5607_TASK		0
-#define HAS_EEPROM		0
+#define HAS_EEPROM		1
+#define HAS_CONFIG_SAVE		0
 #define HAS_BEEP		0
 
 /* Logging */
 #define LOG_INTERVAL		1
 #define SAMPLE_SLEEP		AO_MS_TO_TICKS(100)
 #define BOOST_DELAY		AO_SEC_TO_TICKS(60)
-#define AO_LOG_ID		AO_LOG_ID_MICRO_PEAK2
+#define AO_LOG_ID		AO_LOG_ID_MICROPEAK2
+#define HAS_LOG			1
+#define AO_LOG_FORMAT		AO_LOG_FORMAT_MICROPEAK2
+#define FLIGHT_LOG_APPEND	1
 
 /* Kalman filter */
 
@@ -81,6 +86,7 @@ extern uint8_t ao_on_battery;
 
 /* SPI */
 #define HAS_SPI_1		1
+#define SPI_1_POWER_MANAGE	1
 #define SPI_1_PA5_PA6_PA7	1
 #define SPI_1_PB3_PB4_PB5	0
 #define SPI_1_OSPEEDR		STM_OSPEEDR_MEDIUM
@@ -123,9 +129,11 @@ void ao_delay_until(uint16_t target);
 #define ao_async_stop() do {					\
 		ao_serial2_drain();				\
 		stm_moder_set(&stm_gpioa, 2, STM_MODER_OUTPUT); \
+		ao_serial_shutdown();				\
 	} while (0)
 
 #define ao_async_start() do {						\
+		ao_serial_init();					\
 		stm_moder_set(&stm_gpioa, 2, STM_MODER_ALTERNATE);	\
 		ao_delay(AO_MS_TO_TICKS(100));				\
 	} while (0)
@@ -135,6 +143,7 @@ void ao_delay_until(uint16_t target);
 #define ao_eeprom_read(pos, ptr, size) ao_storage_read(pos, ptr, size)
 #define ao_eeprom_write(pos, ptr, size) ao_storage_write(pos, ptr, size)
 #define MAX_LOG_OFFSET	ao_storage_total
+#define ao_storage_log_max ao_storage_total
 
 extern uint32_t __flash__[];
 extern uint32_t __flash_end__[];

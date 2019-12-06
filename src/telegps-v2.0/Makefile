@@ -3,7 +3,9 @@
 #
 #
 
-include ../stmf0/Makefile.defs
+TOPDIR=..
+
+include $(TOPDIR)/stmf0/Makefile.defs
 
 INC = \
 	ao.h \
@@ -59,7 +61,7 @@ PRODUCT=TeleGPS-v2.0
 PRODUCT_DEF=-DTELEGPS
 IDPRODUCT=0x0025
 
-CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) $(PROFILE_DEF) -g -Os
+CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS) $(PROFILE_DEF)
 
 PROGNAME=telegps-v2.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -74,9 +76,6 @@ $(PROG): Makefile $(OBJ) altos.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
 distclean:	clean
 

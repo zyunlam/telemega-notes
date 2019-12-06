@@ -12,8 +12,8 @@ vpath kalman_micro.5c kalman
 vpath load_csv.5c kalman
 vpath matrix.5c kalman
 
-include Version
 TOPDIR=.
+
 include Makedefs
 
 ARMM3DIRS=\
@@ -37,8 +37,10 @@ ARMM3DIRS=\
 	telebt-v3.0 telebt-v3.0/flash-loader \
 	telebt-v4.0 telebt-v4.0/flash-loader \
 	telelcotwo-v0.1 telelcotwo-v0.1/flash-loader \
+	telefireone-v1.0 telefireone-v1.0/flash-loader \
 	telefiretwo-v0.1 telefiretwo-v0.1/flash-loader \
-	telefireeight-v1.0 telefireeight-v1.0/flash-loader 
+	telefireeight-v1.0 telefireeight-v1.0/flash-loader \
+	telefireeight-v2.0 telefireeight-v2.0/flash-loader 
 
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader \
@@ -48,7 +50,7 @@ ARMM0DIRS=\
 	micropeak-v2.0 micropeak-v2.0/flash-loader
 
 AVRDIRS=\
-	micropeak microkite
+	micropeak microkite microsplash
 
 SUBDIRS=
 

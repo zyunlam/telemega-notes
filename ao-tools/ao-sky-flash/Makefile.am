@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-sky-flash
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 AO_SKY_FLASH_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
 
 ao_sky_flash_DEPENDENCIES = $(AO_SKY_FLASH_LIBS)

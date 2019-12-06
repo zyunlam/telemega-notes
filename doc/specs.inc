@@ -46,6 +46,15 @@
 	|40mW
 	|3.7V
 
+	|TeleMetrum v3.0
+	|MS5607 30km (100k')
+	|ADXL375 200g
+	|uBlox Max-8Q
+	|-
+	|8MB
+	|40mW
+	|3.7V
+
 	endif::telemetrum[]
 	ifdef::telemini[]
 	|TeleMini v1.0

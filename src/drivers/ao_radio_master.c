@@ -134,7 +134,7 @@ ao_radio_get_data(void *d, uint8_t size)
 		    AO_RADIO_SPI_REPLY_HEADER_LEN + size,
 		    AO_RADIO_SPI_BUS);
 	ao_radio_master_stop();
-	ao_xmemcpy(d, ao_radio_spi_reply.payload, size);
+	memcpy(d, ao_radio_spi_reply.payload, size);
 	PRINTD ("fetched %d\n", size);
 }
 
@@ -150,7 +150,7 @@ void
 ao_radio_send(const void *d, uint8_t size)
 {
 	ao_radio_get(AO_RADIO_SPI_SEND, size);
-	ao_xmemcpy(&ao_radio_spi_request.payload, d, size);
+	memcpy(&ao_radio_spi_request.payload, d, size);
 	ao_radio_master_send();
 	ao_radio_put();
 }
@@ -190,7 +190,7 @@ ao_radio_cmac_set_key(void)
 	 */
 	PRINTD ("set key\n");
 	ao_radio_get(AO_RADIO_SPI_CMAC_KEY, AO_AES_LEN);
-	ao_xmemcpy(&ao_radio_spi_request.payload, &ao_config.aes_key, AO_AES_LEN);
+	memcpy(&ao_radio_spi_request.payload, &ao_config.aes_key, AO_AES_LEN);
 	ao_radio_master_send();
 	ao_radio_put();
 	PRINTD ("key set\n");
@@ -212,7 +212,7 @@ ao_radio_cmac_send(void *packet, uint8_t len)
 	
 	PRINTD ("sending packet\n");
 	ao_radio_get(AO_RADIO_SPI_CMAC_SEND, len);
-	ao_xmemcpy(&ao_radio_spi_request.payload, packet, len);
+	memcpy(&ao_radio_spi_request.payload, packet, len);
 	ao_radio_master_send();
 	ao_radio_put();
 	PRINTD ("packet sent\n");

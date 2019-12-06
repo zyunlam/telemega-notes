@@ -137,7 +137,8 @@ public class AltosUIGraph implements AltosUnitsListener, AltosShapeListener {
 		this.series = null;
 		this.axis_index = 0;
 
-		enable.register_shape_listener(this);
+		if (enable != null)
+			enable.register_shape_listener(this);
 
 		axes_added = new Hashtable<Integer,Boolean>();
 

@@ -1427,20 +1427,29 @@ public class AltosConfigFCUI
 		return pyro_firing_time;
 	}
 
+	private String aprs_interval_string(int interval) {
+		if (interval == 0)
+			return "Disabled";
+		return Integer.toString(interval);
+	}
+
+	private int aprs_interval_value(String interval) throws AltosConfigDataException {
+		if (interval.equalsIgnoreCase("Disabled"))
+			return 0;
+		return parse_int("aprs interval", interval, false);
+	}
+
 	public void set_aprs_interval(int new_aprs_interval) {
 		if (new_aprs_interval != AltosLib.MISSING)
-			aprs_interval_value.setSelectedItem(Integer.toString(new_aprs_interval));
+			aprs_interval_value.setSelectedItem(aprs_interval_string(new_aprs_interval));
 		aprs_interval_value.setVisible(new_aprs_interval != AltosLib.MISSING);
 		aprs_interval_label.setVisible(new_aprs_interval != AltosLib.MISSING);
 		set_aprs_interval_tool_tip();
 	}
 
 	public int aprs_interval() throws AltosConfigDataException {
-		if (aprs_interval_value.isVisible()) {
-			String	s = aprs_interval_value.getSelectedItem().toString();
-
-			return parse_int("aprs interval", s, false);
-		}
+		if (aprs_interval_value.isVisible())
+			return aprs_interval_value(aprs_interval_value.getSelectedItem().toString());
 		return AltosLib.MISSING;
 	}
 

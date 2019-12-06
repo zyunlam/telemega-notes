@@ -568,6 +568,8 @@ struct stm_pwr {
 
 extern struct stm_pwr stm_pwr;
 
+#define stm_pwr (*(struct stm_pwr *) 0x40007000)
+
 #define STM_PWR_CR_DBP		(8)
 
 #define STM_PWR_CR_PLS		(5)
@@ -585,7 +587,7 @@ extern struct stm_pwr stm_pwr;
 #define STM_PWR_CR_CSBF		(3)
 #define STM_PWR_CR_CWUF		(2)
 #define STM_PWR_CR_PDDS		(1)
-#define STM_PWR_CR_LPSDSR	(0)
+#define STM_PWR_CR_LPDS		(0)
 
 #define STM_PWR_CSR_EWUP3	(10)
 #define STM_PWR_CSR_EWUP2	(9)
@@ -746,6 +748,8 @@ struct stm_scb {
 
 extern struct stm_scb stm_scb;
 
+#define stm_scb (*(struct stm_scb *) 0xe000ed00)
+
 #define STM_SCB_AIRCR_VECTKEY		16
 #define  STM_SCB_AIRCR_VECTKEY_KEY		0x05fa
 #define STM_SCB_AIRCR_PRIGROUP		8
@@ -753,64 +757,9 @@ extern struct stm_scb stm_scb;
 #define STM_SCB_AIRCR_VECTCLRACTIVE	1
 #define STM_SCB_AIRCR_VECTRESET		0
 
-#define isr(name) void stm_ ## name ## _isr(void);
-
-isr(nmi)
-isr(hardfault)
-isr(memmanage)
-isr(busfault)
-isr(usagefault)
-isr(svc)
-isr(debugmon)
-isr(pendsv)
-isr(systick)
-isr(wwdg)
-isr(pvd)
-isr(tamper_stamp)
-isr(rtc_wkup)
-isr(flash)
-isr(rcc)
-isr(exti0)
-isr(exti1)
-isr(exti2)
-isr(exti3)
-isr(exti4)
-isr(dma1_channel1)
-isr(dma1_channel2)
-isr(dma1_channel3)
-isr(dma1_channel4)
-isr(dma1_channel5)
-isr(dma1_channel6)
-isr(dma1_channel7)
-isr(adc1)
-isr(usb_hp)
-isr(usb_lp)
-isr(dac)
-isr(comp)
-isr(exti9_5)
-isr(lcd)
-isr(tim9)
-isr(tim10)
-isr(tim11)
-isr(tim2)
-isr(tim3)
-isr(tim4)
-isr(i2c1_ev)
-isr(i2c1_er)
-isr(i2c2_ev)
-isr(i2c2_er)
-isr(spi1)
-isr(spi2)
-isr(usart1)
-isr(usart2)
-isr(usart3)
-isr(exti15_10)
-isr(rtc_alarm)
-isr(usb_fs_wkup)
-isr(tim6)
-isr(tim7)
-
-#undef isr
+#define STM_SCB_SCR_SEVONPEND		4
+#define STM_SCB_SCR_SLEEPDEEP		2
+#define STM_SCB_SCR_SLEEPONEXIT		1
 
 #define STM_ISR_WWDG_POS		0
 #define STM_ISR_PVD_VDDIO2_POS		1
@@ -2143,5 +2092,52 @@ struct stm_usart {
 
 extern struct stm_usart	stm_usart1;
 extern struct stm_usart stm_usart2;
+
+#define isr_decl(name) \
+	void stm_ ## name ## _isr(void)
+
+isr_decl(halt);
+isr_decl(ignore);
+isr_decl(nmi);
+isr_decl(hardfault);
+isr_decl(memmanage);
+isr_decl(busfault);
+isr_decl(usagefault);
+isr_decl(svc);
+isr_decl(debugmon);
+isr_decl(pendsv);
+isr_decl(systick);
+isr_decl(wwdg);
+isr_decl(pvd);
+isr_decl(rtc);
+isr_decl(flash);
+isr_decl(rcc_crs);
+isr_decl(exti0_1);
+isr_decl(exti2_3);
+isr_decl(exti4_15);
+isr_decl(tsc);
+isr_decl(dma_ch1);
+isr_decl(dma_ch2_3);
+isr_decl(dma_ch4_5_6);
+isr_decl(adc_comp);
+isr_decl(tim1_brk_up_trg_com);
+isr_decl(tim1_cc);
+isr_decl(tim2);
+isr_decl(tim3);
+isr_decl(tim6_dac);
+isr_decl(tim7);
+isr_decl(tim14);
+isr_decl(tim15);
+isr_decl(tim16);
+isr_decl(tim17);
+isr_decl(i2c1);
+isr_decl(i2c2);
+isr_decl(spi1);
+isr_decl(spi2);
+isr_decl(usart1);
+isr_decl(usart2);
+isr_decl(usart3_4_5_6_7_8);
+isr_decl(cec_can);
+isr_decl(usb);
 
 #endif /* _STM32F0_H_ */

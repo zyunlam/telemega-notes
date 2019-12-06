@@ -18,7 +18,7 @@
 	bay for TeleMetrum should have at least 10 inches of interior length.
 
 	There are two generations of the TeleMetrum design. The
-	major changes in the v2 generation are:
+	major changes after v1 generation are:
 
 	* uBlox GPS chip certified for altitude records
 

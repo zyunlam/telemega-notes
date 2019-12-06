@@ -40,7 +40,7 @@ PRODUCT=LambdaKey-v1.0
 PRODUCT_DEF=-DLAMBDAKEY
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) -I. -I$(aoschemelib) $(STMF0_CFLAGS) -Os -g
+CFLAGS = $(PRODUCT_DEF) -I. -I$(aoschemelib) $(STMF0_CFLAGS)
 
 PROGNAME=lambdakey-v1.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -55,12 +55,9 @@ bletch:
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS) -Wl,-M=$(PROGNAME).map
 
 $(OBJ): $(INC)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
 
 ao_scheme_const.h: ao-scheme-make-const ao_scheme_basic_syntax.scheme
 	$^ -o $@ -d FLOAT,VECTOR,QUASI,BIGINT,POSIX,PORT,SAVE,UNDEF

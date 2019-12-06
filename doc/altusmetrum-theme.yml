@@ -59,3 +59,5 @@ footer:
       content: '{page-number}'
 literal:
   font_family: DejaVu Sans Mono
+code:
+  font_family: DejaVu Sans Mono

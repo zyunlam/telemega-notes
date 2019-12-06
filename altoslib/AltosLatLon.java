@@ -23,7 +23,7 @@ public class AltosLatLon {
 	public double	lon;
 
 	public int hashCode() {
-		return new Double(lat).hashCode() ^ new Double(lon).hashCode();
+		return Double.valueOf(lat).hashCode() ^ Double.valueOf(lon).hashCode();
 	}
 
 	public boolean equals(Object o) {

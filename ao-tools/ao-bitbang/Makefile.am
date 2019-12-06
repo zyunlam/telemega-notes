@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-bitbang
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 AO_BITBANG_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
 
 ao_bitbang_DEPENDENCIES = $(AO_BITBANG_LIBS)

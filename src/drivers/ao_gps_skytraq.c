@@ -88,7 +88,7 @@ ao_gps_lexchar(void)
 	ao_gps_char = c;
 }
 
-void
+static void
 ao_gps_skip_field(void)
 {
 	for (;;) {
@@ -99,7 +99,7 @@ ao_gps_skip_field(void)
 	}
 }
 
-void
+static void
 ao_gps_skip_sep(void)
 {
 	char c = ao_gps_char;
@@ -298,7 +298,7 @@ ao_nmea_gga(void)
 		ao_mutex_get(&ao_gps_mutex);
 		ao_gps_new |= AO_GPS_NEW_DATA;
 		ao_gps_tick = ao_gps_next_tick;
-		ao_xmemcpy(&ao_gps_data, &ao_gps_next, sizeof (ao_gps_data));
+		memcpy(&ao_gps_data, &ao_gps_next, sizeof (ao_gps_data));
 		ao_mutex_put(&ao_gps_mutex);
 		ao_wakeup(&ao_gps_new);
 	}
@@ -357,7 +357,7 @@ ao_nmea_gsv(void)
 	else if (done) {
 		ao_mutex_get(&ao_gps_mutex);
 		ao_gps_new |= AO_GPS_NEW_TRACKING;
-		ao_xmemcpy(&ao_gps_tracking_data, &ao_gps_tracking_next, sizeof(ao_gps_tracking_data));
+		memcpy(&ao_gps_tracking_data, &ao_gps_tracking_next, sizeof(ao_gps_tracking_data));
 		ao_mutex_put(&ao_gps_mutex);
 		ao_wakeup(&ao_gps_new);
 	}

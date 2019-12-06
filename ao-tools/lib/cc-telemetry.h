@@ -91,13 +91,15 @@ struct ao_telemetry_configuration {
 #define AO_GPS_MODE_MANUAL		'M'
 #define AO_GPS_MODE_SIMULATED		'S'
 
+#define AO_GPS_MODE_ALTITUDE_24		(1 << 0)	/* reports 24-bits of altitude */
+
 struct ao_telemetry_location {
 	uint16_t	serial;		/*  0 */
 	uint16_t	tick;		/*  2 */
 	uint8_t		type;		/*  4 */
 
 	uint8_t         flags;		/*  5 Number of sats and other flags */
-	int16_t         altitude;	/*  6 GPS reported altitude (m) */
+	int16_t         altitude_low;	/*  6 GPS reported altitude (m) */
 	int32_t         latitude;	/*  8 latitude (degrees * 10⁷) */
 	int32_t         longitude;	/* 12 longitude (degrees * 10⁷) */
 	uint8_t         year;		/* 16 (- 2000) */
@@ -113,9 +115,14 @@ struct ao_telemetry_location {
 	uint16_t	ground_speed;	/* 26 cm/s */
 	int16_t		climb_rate;	/* 28 cm/s */
 	uint8_t		course;		/* 30 degrees / 2 */
-	uint8_t		unused[1];	/* 31 */
+	int8_t		altitude_high;	/* 31 */
 	/* 32 */
 };
+
+typedef int32_t gps_alt_t;
+#define AO_TELEMETRY_LOCATION_ALTITUDE(l) \
+	((l)->altitude_low | (((l)->mode & AO_GPS_MODE_ALTITUDE_24) ? \
+			      ((gps_alt_t) (l)->altitude_high << 16) : 0))
 
 #define AO_TELEMETRY_SATELLITE		0x06
 
@@ -124,13 +131,16 @@ struct ao_telemetry_satellite_info {
 	uint8_t		c_n_1;
 };
 
+#define AO_TELEMETRY_SATELLITE_MAX_SAT	12
+
+
 struct ao_telemetry_satellite {
 	uint16_t				serial;		/*  0 */
 	uint16_t				tick;		/*  2 */
 	uint8_t					type;		/*  4 */
 	uint8_t					channels;	/*  5 number of reported sats */
 
-	struct ao_telemetry_satellite_info	sats[12];	/* 6 */
+	struct ao_telemetry_satellite_info	sats[AO_TELEMETRY_SATELLITE_MAX_SAT];	/* 6 */
 	uint8_t					unused[2];	/* 30 */
 	/* 32 */
 };
@@ -173,8 +183,8 @@ struct ao_telemetry_mega_sensor {
 	int16_t		gyro_z;		/* 24 */
 
 	int16_t		mag_x;		/* 26 */
-	int16_t		mag_y;		/* 28 */
 	int16_t		mag_z;		/* 30 */
+	int16_t		mag_y;		/* 28 */
 	/* 32 */
 };
 	
@@ -233,17 +243,19 @@ struct ao_telemetry_metrum_data {
 	uint16_t	serial;		/*  0 */
 	uint16_t	tick;		/*  2 */
 	uint8_t		type;		/*  4 */
+	uint8_t		pad5[3];	/*  5 */
 
 	int32_t		ground_pres;	/* 8 average pres on pad */
 	int16_t		ground_accel;	/* 12 average accel on pad */
 	int16_t		accel_plus_g;	/* 14 accel calibration at +1g */
 	int16_t		accel_minus_g;	/* 16 accel calibration at -1g */
 
-	uint8_t		pad[14];	/* 18 */
+	uint8_t		pad18[14];	/* 18 */
 	/* 32 */
 };
 
 #define AO_TELEMETRY_MINI		0x10
+#define AO_TELEMETRY_MINI3		0x11
 
 struct ao_telemetry_mini {
 	uint16_t	serial;		/*  0 */

@@ -393,6 +393,9 @@ struct ao_stm_usart {
 #endif
 };
 
+void
+ao_debug_out(char c);
+
 #if HAS_SERIAL_1
 extern struct ao_stm_usart	ao_stm_usart1;
 #endif
@@ -449,7 +452,7 @@ ao_arch_irqrestore(uint32_t basepri) {
 }
 
 static inline void
-ao_arch_memory_barrier() {
+ao_arch_memory_barrier(void) {
 	asm volatile("" ::: "memory");
 }
 
@@ -472,7 +475,7 @@ ao_arch_irq_check(void) {
 static inline void
 ao_arch_init_stack(struct ao_task *task, void *start)
 {
-	uint32_t	*sp = (uint32_t *) ((void*) task->stack + AO_STACK_SIZE);
+	uint32_t	*sp = &task->stack32[AO_STACK_SIZE>>2];
 	uint32_t	a = (uint32_t) start;
 	int		i;
 
@@ -490,7 +493,7 @@ ao_arch_init_stack(struct ao_task *task, void *start)
 	/* BASEPRI with interrupts enabled */
 	ARM_PUSH32(sp, 0);
 
-	task->sp = sp;
+	task->sp32 = sp;
 }
 
 static inline void ao_arch_save_regs(void) {
@@ -514,12 +517,12 @@ static inline void ao_arch_save_regs(void) {
 static inline void ao_arch_save_stack(void) {
 	uint32_t	*sp;
 	asm("mov %0,sp" : "=&r" (sp) );
-	ao_cur_task->sp = (sp);
+	ao_cur_task->sp32 = (sp);
 }
 
 static inline void ao_arch_restore_stack(void) {
 	/* Switch stacks */
-	asm("mov sp, %0" : : "r" (ao_cur_task->sp) );
+	asm("mov sp, %0" : : "r" (ao_cur_task->sp32) );
 
 #ifdef AO_NONMASK_INTERRUPTS
 	/* Restore BASEPRI */
@@ -606,5 +609,7 @@ ao_arch_wait_interrupt(void) {
 		do { b } while (0);			\
 		ao_arch_irqrestore(__mask);		\
 	} while (0)
+
+void start(void);
 
 #endif /* _AO_ARCH_FUNCS_H_ */

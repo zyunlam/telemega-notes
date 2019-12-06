@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-cal-accel
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 
 ao_cal_accel_DEPENDENCIES = $(top_builddir)/ao-tools/lib/libao-tools.a
 

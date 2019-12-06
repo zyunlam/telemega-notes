@@ -19,7 +19,7 @@
 #ifndef _AO_PROFILE_H_
 #define _AO_PROFILE_H_
 
-void	ao_profile_init();
+void	ao_profile_init(void);
 
 static inline uint32_t ao_profile_tick(void) {
 	uint16_t	hi, lo, second_hi;

@@ -62,7 +62,7 @@ _ao_monitor_adjust(void)
 	ao_wakeup(&ao_monitoring);
 }
 
-void
+static void
 ao_monitor_get(void)
 {
 	uint8_t	size;
@@ -93,7 +93,7 @@ ao_monitor_get(void)
 #if AO_MONITOR_LED
 struct ao_task ao_monitor_blink_task;
 
-void
+static void
 ao_monitor_blink(void)
 {
 #ifdef AO_MONITOR_BAD
@@ -121,7 +121,7 @@ static const char xdigit[16] = {
 
 #define hex(c) do { putchar(xdigit[(c) >> 4]); putchar(xdigit[(c)&0xf]); } while (0)
 
-void
+static void
 ao_monitor_put(void)
 {
 #if LEGACY_MONITOR
@@ -157,7 +157,7 @@ ao_monitor_put(void)
 			state = recv_orig.telemetry_orig.flight_state;
 
 			rssi = (int16_t) AO_RSSI_FROM_RADIO(recv_orig.rssi);
-			ao_xmemcpy(callsign, recv_orig.telemetry_orig.callsign, AO_MAX_CALLSIGN);
+			memcpy(callsign, recv_orig.telemetry_orig.callsign, AO_MAX_CALLSIGN);
 			if (state > ao_flight_invalid)
 				state = ao_flight_invalid;
 			if (recv_orig.status & PKT_APPEND_STATUS_1_CRC_OK) {

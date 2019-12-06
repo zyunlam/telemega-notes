@@ -106,5 +106,8 @@ ao_usb_in_interrupt(uint32_t mask);
 void
 ao_usb_out_interrupt(uint32_t mask);
 
+void
+ao_usb_int_interrupt(uint32_t mask);
+
 #endif /* _AO_USB_GEN_H_ */
 

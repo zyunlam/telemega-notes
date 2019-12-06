@@ -246,7 +246,7 @@ ao_storage_device_write(uint32_t pos, void *buf, uint16_t len)
 			ao_flash_flush_internal();
 			ao_flash_block = block;
 		}
-		ao_xmemcpy(ao_flash_data + (uint16_t) (pos & ao_flash_block_mask),
+		memcpy(ao_flash_data + (uint16_t) (pos & ao_flash_block_mask),
 		       buf,
 		       len);
 		ao_flash_block_dirty = 1;
@@ -262,7 +262,7 @@ ao_storage_device_read(uint32_t pos, void *buf, uint16_t len)
 	/* Transfer the data */
 	ao_mutex_get(&ao_flash_mutex); {
 		ao_flash_fill(block);
-		ao_xmemcpy(buf,
+		memcpy(buf,
 		       ao_flash_data + (uint16_t) (pos & ao_flash_block_mask),
 		       len);
 	} ao_mutex_put(&ao_flash_mutex);
@@ -283,7 +283,7 @@ ao_storage_erase(uint32_t pos)
 	ao_mutex_get(&ao_flash_mutex); {
 		ao_flash_flush_internal();
 		ao_flash_block = (uint16_t) (pos >> ao_flash_block_shift);
-		ao_xmemset(ao_flash_data, 0xff, ao_flash_block_size);
+		memset(ao_flash_data, 0xff, ao_flash_block_size);
 		ao_flash_block_dirty = 1;
 	} ao_mutex_put(&ao_flash_mutex);
 	return 1;

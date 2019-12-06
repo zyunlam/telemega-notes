@@ -102,7 +102,7 @@ public class AltosUI extends AltosUIFrame implements AltosEepromGrapher {
 
 	/* OSXAdapter interfaces */
 	public void macosx_file_handler(String path) {
-		process_graph(new File(path));
+		process_graph(null, new File(path));
 	}
 
 	public void macosx_quit_handler() {
@@ -324,7 +324,7 @@ public class AltosUI extends AltosUIFrame implements AltosEepromGrapher {
 	public void graph_flights(AltosEepromList flights) {
 		for (AltosEepromLog flight : flights) {
 			if (flight.graph_selected && flight.file != null) {
-				process_graph(flight.file);
+				process_graph(this, flight.file);
 			}
 		}
 	}
@@ -354,6 +354,25 @@ public class AltosUI extends AltosUIFrame implements AltosEepromGrapher {
 		new AltosCSVUI(AltosUI.this, series, chooser.file());
 	}
 
+	private static boolean graph_file(AltosUI altosui, AltosRecordSet set, File file) {
+		if (set == null)
+			return false;
+		if (!set.valid()) {
+			JOptionPane.showMessageDialog(altosui,
+						      String.format("Failed to parse file %s", file),
+						      "Graph Failed",
+						      JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		try {
+			new AltosGraphUI(set, file);
+			return true;
+		} catch (InterruptedException ie) {
+		} catch (IOException ie) {
+		}
+		return false;
+	}
+
 	/* Load a flight log CSV file and display a pretty graph.
 	 */
 
@@ -361,13 +380,7 @@ public class AltosUI extends AltosUIFrame implements AltosEepromGrapher {
 		AltosDataChooser chooser;
 		chooser = new AltosDataChooser(this);
 		AltosRecordSet set = chooser.runDialog();
-		if (set == null)
-			return;
-		try {
-			new AltosGraphUI(set, chooser.file());
-		} catch (InterruptedException ie) {
-		} catch (IOException ie) {
-		}
+		graph_file(this, set, chooser.file());
 	}
 
 	private void ConfigureAltosUI() {
@@ -477,17 +490,9 @@ public class AltosUI extends AltosUIFrame implements AltosEepromGrapher {
 		return true;
 	}
 
-	static boolean process_graph(File file) {
+	static boolean process_graph(AltosUI altosui, File file) {
 		AltosRecordSet set = record_set(file);
-		if (set == null)
-			return false;
-		try {
-			new AltosGraphUI(set, file);
-			return true;
-		} catch (InterruptedException ie) {
-		} catch (IOException ie) {
-		}
-		return false;
+		return graph_file(altosui, set, file);
 	}
 
 	static boolean process_summary(File file) {
@@ -613,7 +618,7 @@ public class AltosUI extends AltosUIFrame implements AltosEepromGrapher {
 						if (altosui == null)
 							altosui = new AltosUI();
 					case process_graph:
-						if (!process_graph(file))
+						if (!process_graph(null, file))
 							++errors;
 						break;
 					case process_replay:

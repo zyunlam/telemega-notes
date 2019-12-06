@@ -829,7 +829,7 @@ stm_usb_lp_isr(void)
 }
 
 void
-stm_usb_fs_wkup(void)
+stm_usb_fs_wkup_isr(void)
 {
 	/* USB wakeup, just clear the bit for now */
 	stm_usb.istr &= ~(1 << STM_USB_ISTR_WKUP);
@@ -932,7 +932,7 @@ _ao_usb_out_recv(void)
 	_ao_usb_set_stat_rx(AO_USB_OUT_EPR, STM_USB_EPR_STAT_RX_VALID);
 }
 
-int
+static int
 _ao_usb_pollchar(void)
 {
 	uint8_t c;

@@ -73,7 +73,7 @@ int pending = 1;
 static void
 dump_saved(void);
 
-void
+static void
 doit(union ao_telemetry_all *telem)
 {
 	double lat, lon;
@@ -142,10 +142,9 @@ int
 main (int argc, char **argv)
 {
 	char	line[80];
-	int c, i, ret;
-	char *s;
+	int c, i, ret = 0;
 	FILE *file;
-	int serial;
+
 	while ((c = getopt_long(argc, argv, "l:L:", options, NULL)) != -1) {
 		switch (c) {
 		case 'L':
@@ -166,11 +165,6 @@ main (int argc, char **argv)
 			ret++;
 			continue;
 		}
-		s = strstr(argv[i], "-serial-");
-		if (s)
-			serial = atoi(s + 8);
-		else
-			serial = 0;
 		while (fgets(line, sizeof (line), file)) {
 			union ao_telemetry_all telem;
 

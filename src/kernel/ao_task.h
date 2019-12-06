@@ -26,10 +26,10 @@
 #define HAS_TASK_INFO 1
 #endif
 
-/* arm stacks must be 32-bit aligned */
+/* arm stacks must be 64-bit aligned */
 #ifndef AO_STACK_ALIGNMENT
 #ifdef __arm__
-#define AO_STACK_ALIGNMENT __attribute__ ((aligned(4)))
+#define AO_STACK_ALIGNMENT __attribute__ ((aligned(8)))
 #else
 #define AO_STACK_ALIGNMENT
 #endif
@@ -37,19 +37,24 @@
 
 /* An AltOS task */
 struct ao_task {
-	void *wchan;		/* current wait channel (NULL if running) */
+	void *wchan;			/* current wait channel (NULL if running) */
 	uint16_t alarm;			/* abort ao_sleep time */
-	ao_arch_task_members		/* any architecture-specific fields */
-	uint8_t task_id;		/* unique id */
+	uint16_t task_id;		/* unique id */
+	/* Saved stack pointer */
+	union {
+		uint32_t	*sp32;
+		uint8_t		*sp8;
+	};
 	const char *name;		/* task name */
-#ifdef NEWLIB
-	int __errno;			/* storage for errno in newlib libc */
-#endif
 #if HAS_TASK_QUEUE
 	struct ao_list	queue;
 	struct ao_list	alarm_queue;
 #endif
-	uint8_t stack[AO_STACK_SIZE] AO_STACK_ALIGNMENT;	/* saved stack */
+	/* Provide both 32-bit and 8-bit stacks */
+	union {
+		uint32_t stack32[AO_STACK_SIZE>>2];
+		uint8_t stack8[AO_STACK_SIZE];
+	} AO_STACK_ALIGNMENT;
 #if HAS_SAMPLE_PROFILE
 	uint32_t ticks;
 	uint32_t yields;

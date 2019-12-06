@@ -33,11 +33,6 @@
 
 #define AO_LED_TYPE	AO_PORT_TYPE
 
-#ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint16_t
-#define AO_TICK_SIGNED	int16_t
-#endif
-
 /* Various definitions to make GCC look more like SDCC */
 
 #define ao_arch_naked_declare	__attribute__((naked))
@@ -59,9 +54,6 @@
  */
 
 #define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
-
-#define ao_arch_task_members\
-	uint32_t *sp;			/* saved stack pointer */
 
 #define ao_arch_block_interrupts()	asm("cpsid i")
 #define ao_arch_release_interrupts()	asm("cpsie i")

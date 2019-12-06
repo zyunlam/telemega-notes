@@ -305,7 +305,7 @@ _ao_mpu6000_setup(void)
 	}
 
 	if (st_tries == ST_TRIES)
-		ao_sensor_errors = 1;
+		AO_SENSOR_ERROR(AO_DATA_MPU6000);
 
 	/* Filter to about 100Hz, which also sets the gyro rate to 1000Hz */
 	_ao_mpu6000_reg_write(MPU6000_CONFIG,

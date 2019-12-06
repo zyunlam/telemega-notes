@@ -43,7 +43,7 @@ ao_led_set(AO_LED_TYPE colors);
 
 /* Set all LEDs in 'mask' to the specified state */
 void
-ao_led_set_mask(uint8_t colors, uint8_t mask);
+ao_led_set_mask(AO_LED_TYPE colors, AO_LED_TYPE mask);
 
 /* Toggle the specified LEDs */
 void
@@ -51,7 +51,7 @@ ao_led_toggle(AO_LED_TYPE colors);
 
 /* Turn on the specified LEDs for the indicated interval */
 void
-ao_led_for(AO_LED_TYPE colors, uint16_t ticks);
+ao_led_for(AO_LED_TYPE colors, AO_TICK_TYPE ticks);
 
 /* Initialize the LEDs */
 void

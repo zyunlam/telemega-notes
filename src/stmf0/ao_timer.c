@@ -35,6 +35,22 @@ ao_time(void)
 	return ao_tick_count;
 }
 
+uint64_t
+ao_time_ns(void)
+{
+	AO_TICK_TYPE	before, after;
+	uint32_t	cvr;
+
+	do {
+		before = ao_tick_count;
+		cvr = stm_systick.cvr;
+		after = ao_tick_count;
+	} while (before != after);
+
+	return (uint64_t) after * (1000000000ULL / AO_HERTZ) +
+		(uint64_t) cvr * (1000000000ULL / AO_SYSTICK);
+}
+
 #if AO_DATA_ALL
 volatile uint8_t	ao_data_interval = 1;
 volatile uint8_t	ao_data_count;
@@ -277,9 +293,6 @@ ao_clock_init(void)
 
 	/* Enable 1 wait state so the CPU can run at 48MHz */
 	stm_flash.acr |= (STM_FLASH_ACR_LATENCY_1 << STM_FLASH_ACR_LATENCY);
-
-	/* Enable power interface clock */
-	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
 
 	/* HCLK to 48MHz -> AHB prescaler = /1 */
 	cfgr = stm_rcc.cfgr;

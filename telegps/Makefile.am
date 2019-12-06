@@ -1,5 +1,5 @@
 JAVAROOT=classes
-AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked -source 6
+AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
 
 man_MANS=telegps.1
 
@@ -227,12 +227,18 @@ $(JAR): classtelegps.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTOSU
 		$(ICONJAR) \
 		-C classes org \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 $(FATJAR): classtelegps.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS) $(JAVA_ICONS)
 	jar cfm $@ Manifest-fat.txt \
 		$(ICONJAR) \
 		-C classes org \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 libaltos.so: build-libaltos
 	-rm -f "$@"

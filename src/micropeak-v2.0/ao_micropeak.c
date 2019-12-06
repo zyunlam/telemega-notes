@@ -164,6 +164,13 @@ ao_battery_voltage(void)
 	return 330 * stm_cal.vrefint_cal / vrefint;
 }
 
+static void
+ao_log_erase(void)
+{
+	uint32_t	pos;
+	for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block)
+		ao_storage_erase(pos);
+}
 
 uint8_t	ao_on_battery;
 
@@ -171,21 +178,22 @@ static void
 ao_micropeak(void)
 {
 	ao_ms5607_setup();
-	ao_storage_setup();
 
 	/* Give the person a second to get their finger out of the way */
 	ao_delay(AO_MS_TO_TICKS(1000));
 
-	ao_pips();
-
 	ao_log_micro_restore();
 	ao_compute_height();
 	ao_report_altitude();
+
+	ao_pips();
+
 	ao_log_micro_dump();
 
 #if BOOST_DELAY
 	ao_delay(BOOST_DELAY);
 #endif
+	ao_log_erase();
 
 	ao_microflight();
 
@@ -193,6 +201,7 @@ ao_micropeak(void)
 	ao_compute_height();
 	ao_report_altitude();
 
+	ao_sleep_mode();
 	ao_sleep(&ao_on_battery);
 }
 
@@ -202,7 +211,52 @@ ao_show_bat(void)
 	printf("battery: %u\n", ao_battery_voltage());
 }
 
+uint8_t
+ao_log_present(void)
+{
+	uint16_t	n_samples;
+
+	ao_eeprom_read(N_SAMPLES_OFFSET, &n_samples, sizeof (n_samples));
+
+	return n_samples != 0xffff;
+}
+
+static void
+ao_log_list(void)
+{
+	if (ao_log_present())
+		printf ("flight %d start %x end %x\n",
+			1,
+			0, MAX_LOG_OFFSET >> 8);
+	printf ("done\n");
+}
+
+static void
+ao_log_delete(void)
+{
+	int16_t cmd_flight = 1;
+
+	ao_cmd_white();
+	if (ao_cmd_lex_c == '-') {
+		cmd_flight = -1;
+		ao_cmd_lex();
+	}
+	cmd_flight *= ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+
+	/* Look for the flight log matching the requested flight */
+	if (cmd_flight == 1 && ao_log_present()) {
+		ao_log_erase();
+		puts("Erased");
+		return;
+	}
+	printf("No such flight: %d\n", cmd_flight);
+}
+
 static struct ao_cmds mp_cmd[] = {
+	{ ao_log_list,	"l\0List logs" },
+	{ ao_log_delete,	"d <flight-number>\0Delete flight" },
 	{ ao_show_bat, "b\0Show battery voltage" },
 	{ 0 }
 };
@@ -217,9 +271,6 @@ ao_hsi_init(void)
 
 	/* Enable prefetch */
 	stm_flash.acr |= (1 << STM_FLASH_ACR_PRFTBE);
-
-	/* Enable power interface clock */
-	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
 
 	/* HCLK to 48MHz -> AHB prescaler = /1 */
 	cfgr = stm_rcc.cfgr;
@@ -240,9 +291,14 @@ ao_hsi_init(void)
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 }
 
-void
+int
 main(void)
 {
+	int i;
+
+	for (i = 0; i < 100000; i++)
+		ao_arch_nop();
+
 	if (ao_battery_voltage() < 320)
 		ao_on_battery = 1;
 
@@ -255,24 +311,31 @@ main(void)
 	ao_led_init();
 	ao_task_init();
 	ao_timer_init();
-	ao_serial_init();
 	stm_moder_set(&stm_gpioa, 2, STM_MODER_OUTPUT);
-
 	ao_dma_init();
 	ao_spi_init();
 	ao_exti_init();
 
-	/* Leave USB disabled on battery */
-	if (!ao_on_battery) {
-		ao_usb_init();
-		ao_cmd_init();
-	}
+	ao_storage_setup();
 
 	ao_ms5607_init();
-
 	ao_storage_init();
 
-	ao_add_task(&mp_task, ao_micropeak, "micropeak");
-	ao_cmd_register(mp_cmd);
+	/* Let FLITF clock turn off in sleep mode */
+	stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_FLITFEN);
+
+	/* Le SRAM clock turn off in sleep mode */
+	stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_SRAMEN);
+
+	if (ao_on_battery) {
+		/* On battery power, run the flight code */
+		ao_add_task(&mp_task, ao_micropeak, "micropeak");
+	} else {
+		/* otherwise, turn on USB and run the command processor */
+		ao_usb_init();
+		ao_cmd_init();
+		ao_cmd_register(mp_cmd);
+		ao_config_init();
+	}
 	ao_start_scheduler();
 }

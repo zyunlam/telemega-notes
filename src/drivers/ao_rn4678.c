@@ -116,7 +116,7 @@ static AO_TICK_TYPE	ao_rn_buf_time;
  * disabled due to a firmware bug. So, this code finds those in the
  * input and strips them out.
  */
-int
+static int
 _ao_wrap_rn_pollchar(void)
 {
 	int		c = AO_READ_AGAIN;
@@ -368,7 +368,7 @@ static uint8_t	ao_rn_stdio;
 /*
  * Set the stdio echo for the bluetooth link
  */
-void
+static void
 ao_rn_echo(uint8_t echo)
 {
 	ao_stdios[ao_rn_stdio].echo = echo;

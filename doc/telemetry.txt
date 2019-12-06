@@ -1,8 +1,8 @@
 = AltOS Telemetry
 Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
-:revnumber: v1.8.7
-:revdate: 8 Oct 2018
-:copyright: Bdale Garbee and Keith Packard 2018
+:revnumber: v1.9.1
+:revdate: 5 Dec 2019
+:copyright: Bdale Garbee and Keith Packard 2019
 :stylesheet: am.css
 :linkcss:
 :doctype: article
@@ -173,7 +173,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|32
 		|====
 
-	=== TeleMetrum v2 Sensor Data
+	=== TeleMetrum v2 and newer Sensor Data
 
 		.TeleMetrum v2 Packet Type
 		[options="border",cols="1,3"]
@@ -183,17 +183,17 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|0x0B	|TeleMetrum v2 Calibration Data
 		|====
 
-		TeleMetrum v2 has higher resolution barometric data than
+		TeleMetrum v2 and newer have higher resolution barometric data than
 		TeleMetrum v1, and so the constant calibration data is
 		split out into a separate packet.
 
-		TeleMetrum v2 Sensor Data packets are transmitted once per second on the
+		TeleMetrum v2 and newer Sensor Data packets are transmitted once per second on the
 		ground, 10 times per second during ascent and once per second
 		during descent and landing
 
-		TeleMetrum v2 Calibration Data packets are always transmitted once per second.
+		TeleMetrum v2 and newer Calibration Data packets are always transmitted once per second.
 
-		.TeleMetrum v2 Sensor Packet Contents
+		.TeleMetrum v2 and newer Sensor Packet Contents
 		[options="border",cols="2,3,3,9"]
 		|====
 		|Offset	|Data Type	|Name		|Description
@@ -211,7 +211,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|32
 		|====
 
-		.TeleMetrum v2 Calibration Data Packet Contents
+		.TeleMetrum v2 and newer Calibration Data Packet Contents
 		[options="border",cols="2,3,3,9"]
 		|====
 		|Offset	|Data Type	|Name		|Description
@@ -461,19 +461,19 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 
 	|CC1111
 	|10mW transceiver with integrated SoC
-	|TeleDongle v0.2, TeleBT v1.0, TeleMetrum v1.x, TeleMini
+	|TeleDongle v0.2, TeleBT v1.0, TeleMetrum v1.x, TeleMini v1
 
 	|CC1120
 	|35mW transceiver with SW FEC
-	|TeleMetrum v2, TeleMega
+	|TeleMetrum v2, TeleMega v1
 
 	|CC1200
 	|35mW transceiver with HW FEC
-	|TeleDongle v3.0, TeleBT v3.0
+	|TeleMetrum v3, TeleMega v2, TeleDongle v3.0, TeleMini v3, TeleBT v3.0, TeleGPS v2
 
 	|CC115L
 	|14mW transmitter with SW FEC
-	|TeleGPS
+	|TeleGPS v1
 
 	|====
 

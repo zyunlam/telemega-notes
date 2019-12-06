@@ -23,12 +23,12 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <getopt.h>
+#include <unistd.h>
 #include "cc.h"
 
 static const struct option options[] = {
 	{ .name = "tty", .has_arg = 1, .val = 'T' },
 	{ .name = "device", .has_arg = 1, .val = 'D' },
-	{ .name = "loader", .has_arg = 1, .val = 'l' },
 	{ .name = "firmware", .has_arg = 1, .val = 'f' },
 	{ .name = "query", .has_arg = 0, .val = 'q' },
 	{ .name = "raw", .has_arg = 0, .val = 'r' },
@@ -46,7 +46,6 @@ usage(char *program)
 	fprintf(stderr,
 		"usage: %s [--tty <tty-name>]\n"
 		"          [--device <device-name>]\n"
-		"          [--loader <srec bootloader file>]\n"
 		"          [--firmware <binary firmware file>]\n"
 		"          [--query]\n"
 		"          [--quiet]\n"
@@ -54,7 +53,7 @@ usage(char *program)
 	exit(1);
 }
 
-int
+static int
 skytraq_expect(int fd, uint8_t want, int timeout) {
 	int	c;
 
@@ -66,12 +65,12 @@ skytraq_expect(int fd, uint8_t want, int timeout) {
 	return 0;
 }
 
-int
+static int
 skytraq_wait_reply(int fd, uint8_t reply, uint8_t *buf, uint8_t reply_len) {
 
 	for(;;) {
 		uint8_t	a, b;
-		uint8_t	cksum_computed, cksum_read;
+		uint8_t	cksum_computed;
 		int	len;
 		switch (skytraq_expect(fd, 0xa0, 10000)) {
 		case -1:
@@ -135,16 +134,10 @@ int
 main(int argc, char **argv)
 {
 	int	fd;
-	char	buf[512];
 	int	ret;
-	FILE	*input;
-	long	size;
-	unsigned char	cksum;
 	int	c;
-	char	message[1024];
 	char	*tty = NULL;
 	char	*device = NULL;
-	char	*loader = "srec_115200.bin";
 	char	*file = NULL;
 	int	query = 0;
 	int	raw = 0;
@@ -156,9 +149,6 @@ main(int argc, char **argv)
 			break;
 		case 'D':
 			device = optarg;
-			break;
-		case 'l':
-			loader = optarg;
 			break;
 		case 'f':
 			file = optarg;

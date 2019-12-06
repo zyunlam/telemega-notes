@@ -22,6 +22,7 @@
 	|TeleMetrum v1.0	|8	|1MB	|20
 	|TeleMetrum v1.1 v1.2	|8	|2MB	|40
 	|TeleMetrum v2.0	|16	|8MB	|80
+	|TeleMetrum v3.0	|16	|8MB	|80
 	endif::telemetrum[]
 	ifdef::telemini[]
 	|TeleMini v1.0		|2	|5kB	|4
@@ -52,7 +53,7 @@
 	for storing flight log data.
 
 	ifdef::telemetrum,telemega,easymega[]
-	TeleMetrum v2.0, TeleMega and EasyMega
+	TeleMetrum v2 or newer, TeleMega and EasyMega
 	store configuration data in a bit of eeprom available within
 	the processor chip, leaving that space available in flash for
 	more flight data.
@@ -65,7 +66,7 @@
 	together. That will slightly under-estimate the storage (in
 	bytes) needed for the flight.
 	ifdef::telemetrum[]
-	For instance, a TeleMetrum v2.0 flight spending
+	For instance, a TeleMetrum v2 or newer flight spending
 	20 seconds in ascent and 150 seconds in descent will take
 	about (20 * 1600) + (150 * 160) = 56000 bytes of storage. You
 	could store dozens of these flights in the on-board flash.

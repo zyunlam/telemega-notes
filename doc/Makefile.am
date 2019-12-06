@@ -17,6 +17,7 @@ FAKETIME=TZ=UTC faketime -f '$(RELEASE_DATE) 00:00:00 i0'
 endif
 
 RELNOTES_INC=\
+	release-notes-1.9.1.inc \
 	release-notes-1.9.inc \
 	release-notes-1.8.7.inc \
 	release-notes-1.8.6.inc \
@@ -155,6 +156,21 @@ INC_FILES=\
 
 ADOC_FILES=$(TXT_FILES:.txt=.adoc) $(INC_FILES:.inc=.adoc)
 
+TELELAUNCH_TXT_FILES=altusmetrum.txt
+
+TELELAUNCH_INC_FILES=\
+	header.inc \
+	telelaunch-acknowledgements.inc \
+	telelaunch-intro.inc \
+	telelaunch-configuration.inc \
+	telelaunch-operation.inc \
+	telelaunch-specs.inc \
+	telelaunch-updating-firmware.inc \
+	telelaunch-cables.inc \
+	telelaunch-troubleshooting.inc 
+
+TELELAUNCH_ADOC_FILES=$(TELELAUNCH_TXT_FILES:.txt=.adoc) $(TELELAUNCH_INC_FILES:.inc=.adoc)
+
 TELEGPS_INC_FILES=\
 	telegps-dedication.inc \
 	telegps-quick-start.inc \
@@ -221,12 +237,12 @@ ONEFILE_HTML_FILES=$(ONEFILE_TXT_FILES:.txt=.html)
 
 AM_HTML=am.html
 
-PUBLISH_HTML=altusmetrum.html micropeak.html telegps.html easymini.html $(ONEFILE_HTML_FILES)
+PUBLISH_HTML=altusmetrum.html micropeak.html telegps.html easymini.html telelaunch.html $(ONEFILE_HTML_FILES)
 
 HTML=$(PUBLISH_HTML) $(RELNOTES_HTML)
 
 if ASCIIDOCTOR_PDF
-PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf $(ONEFILE_PDF_FILES) \
+PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf telelaunch.pdf $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 endif
 
@@ -283,6 +299,8 @@ map-loading.adoc: $(MAP_SVG_FILES)
 
 altusmetrum.pdf altusmetrum.html: $(ADOC_FILES) $(IMAGES)
 
+telelaunch.pdf telelaunch.html: $(TELELAUNCH_ADOC_FILES) $(IMAGES)
+
 telegps.html telegps.pdf: $(TELEGPS_ADOC_FILES) $(IMAGES)
 
 micropeak.pdf micropeak.html: $(MICROPEAK_ADOC_FILES) $(IMAGES)
@@ -318,7 +336,7 @@ publish-keithp:	am.html $(DOC) $(FONTS)
 	scp -p $(ICONS) keithp.com:~keithp/public_html/altos/images/icons
 
 clean:
-	rm -f am.html $(HTML) $(PDF) $(ADOC_FILES) $(TELEGPS_ADOC_FILES) $(MICROPEAK_ADOC_FILES)
+	rm -f am.html $(HTML) $(PDF) $(ADOC_FILES) $(TELEGPS_ADOC_FILES) $(MICROPEAK_ADOC_FILES) $(TELELAUNCH_ADOC_FILES)
 
 distclean: clean
 	rm -f $(HTML) $(PDF)

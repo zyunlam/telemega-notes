@@ -1,5 +1,5 @@
 JAVAROOT=classes
-AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked -source 6
+AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
 
 altoslibdir=$(libdir)/altos
 
@@ -31,12 +31,18 @@ classes/altosmap:
 $(JAR): classaltosmap.stamp Manifest.txt $(ALTOSLIB_CLASS)
 	jar cfm $@ Manifest.txt \
 		-C classes altosmap
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 altosmapdir=$(datadir)/java
 
 $(FATJAR): classaltosmap.stamp Manifest-fat.txt $(ALTOSLIB_CLASS)
 	jar cfm $@ Manifest-fat.txt \
 		-C classes altosmap
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 altos-mapj: Makefile
 	echo "#!/bin/sh" > $@

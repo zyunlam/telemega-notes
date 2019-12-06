@@ -1,6 +1,6 @@
 
 JAVAROOT=classes
-AM_JAVACFLAGS=-target 1.6 -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked -source 6
+AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
 
 man_MANS=altosui.1
 
@@ -122,7 +122,8 @@ FIRMWARE_TD_3_0=$(top_srcdir)/src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx
 FIRMWARE_TD=$(FIRMWARE_TD_3_0)
 
 FIRMWARE_TM_2_0=$(top_srcdir)/src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx
-FIRMWARE_TM=$(FIRMWARE_TM_2_0)
+FIRMWARE_TM_3_0=$(top_srcdir)/src/telemetrum-v3.0/telemetrum-v3.0-$(VERSION).ihx
+FIRMWARE_TM=$(FIRMWARE_TM_2_0) $(FIRMWARE_TM_3_0)
 
 FIRMWARE_TELEMINI_3_0=$(top_srcdir)/src/telemini-v3.0/telemini-v3.0-$(VERSION).ihx
 FIRMWARE_TELEMINI=$(FIRMWARE_TELEMINI_3_0)
@@ -137,7 +138,8 @@ FIRMWARE_TMEGA_3_0=$(top_srcdir)/src/telemega-v3.0/telemega-v3.0-$(VERSION).ihx
 FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0)
 
 FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
-FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0)
+FIRMWARE_EMINI_2_0=$(top_srcdir)/src/easymini-v2.0/easymini-v2.0-$(VERSION).ihx
+FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0) $(FIRMWARE_EMINI_2_0)
 
 FIRMWARE_EMEGA_1_0=$(top_srcdir)/src/easymega-v1.0/easymega-v1.0-$(VERSION).ihx
 FIRMWARE_EMEGA_2_0=$(top_srcdir)/src/easymega-v2.0/easymega-v2.0-$(VERSION).ihx
@@ -255,12 +257,18 @@ $(JAR): classaltosui.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTOSU
 		$(ICONJAR) \
 		-C classes altosui \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 $(FATJAR): classaltosui.stamp Manifest-fat.txt $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) $(FREETTS_CLASS) $(JFREECHART_CLASS) $(JCOMMON_CLASS) $(LIBALTOS) $(JAVA_ICONS)
 	jar cfm $@ Manifest-fat.txt \
 		$(ICONJAR) \
 		-C classes altosui \
 		-C ../libaltos libaltosJNI
+if STRIP_NONDETERMINISM
+	$(STRIP_NONDETERMINISM) $@
+endif
 
 Manifest.txt: Makefile
 	echo 'Main-Class: altosui.AltosUI' > $@

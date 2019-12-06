@@ -1,6 +1,6 @@
 bin_PROGRAMS=ao-usbload
 
-AM_CFLAGS=-I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
+AM_CFLAGS=$(WARN_CFLAGS) -I$(top_srcdir)/ao-tools/lib $(LIBUSB_CFLAGS)
 AO_STMLOAD_LIBS=$(top_builddir)/ao-tools/lib/libao-tools.a
 
 ao_usbload_DEPENDENCIES = $(AO_STMLOAD_LIBS)

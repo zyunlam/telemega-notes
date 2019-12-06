@@ -42,13 +42,14 @@
 		to trickle charge. It can take several hours to fully recharge a
 		deeply discharged battery.
 
-		TeleMetrum v2.0, TeleMega and EasyMega use a higher power battery charger,
-		allowing them to charge the battery while running the board at
-		maximum power. When the battery is charging, or when the board
-		is consuming a lot of power, the red LED will be lit. When the
-		battery is fully charged, the green LED will be lit. When the
-		battery is damaged or missing, both LEDs will be lit, which
-		appears yellow.
+		TeleMetrum v2 or newer, TeleMega and EasyMega use a
+		higher power battery charger, allowing them to charge
+		the battery while running the board at maximum
+		power. When the battery is charging, or when the board
+		is consuming a lot of power, the red LED will be
+		lit. When the battery is fully charged, the green LED
+		will be lit. When the battery is damaged or missing,
+		both LEDs will be lit, which appears yellow.
 		====
 		endif::telemetrum,telemega,easymega[]
 

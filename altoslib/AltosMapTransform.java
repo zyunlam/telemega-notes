@@ -67,19 +67,23 @@ public class AltosMapTransform {
 		return lat_lon(screen_point(screen));
 	}
 
-	public AltosPointDouble point(AltosLatLon lat_lon) {
+	public  AltosPointDouble point(double lat, double lon) {
 		double x, y;
 		double e;
 
-		x = lat_lon.lon * scale_x;
+		x = lon * scale_x;
 
-		e = Math.sin(Math.toRadians(lat_lon.lat));
+		e = Math.sin(Math.toRadians(lat));
 		e = Math.max(e,-(1-1.0E-15));
 		e = Math.min(e,  1-1.0E-15 );
 
 		y = 0.5*Math.log((1+e)/(1-e))*-scale_y;
 
 		return new AltosPointDouble(x, y);
+	}
+
+	public AltosPointDouble point(AltosLatLon lat_lon) {
+		return point(lat_lon.lat, lat_lon.lon);
 	}
 
 	public AltosPointDouble screen(AltosPointDouble point) {
@@ -100,6 +104,10 @@ public class AltosMapTransform {
 
 	public AltosPointDouble screen(AltosLatLon lat_lon) {
 		return screen(point(lat_lon));
+	}
+
+	public AltosPointDouble screen(double lat, double lon) {
+		return screen(point(lat, lon));
 	}
 
 	private boolean has_location;

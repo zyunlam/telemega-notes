@@ -52,7 +52,24 @@
 		onboard flash before it fills up. TeleGPS will still
 		report telemetry even if memory is full, so the only
 		thing you will lose is the on-board data log.
-      
+
+	=== LEDs
+
+		TeleGPS v1.0 has a dual greed/red LED along the edge
+		towards the USB connector end of the board. This
+		indicates battery charging status while connected to
+		power over USB. When the red LED is lit, the battery
+		is charging. Once the battery is fully charged, the
+		red LED goes out and the green LED turns on. If both
+		LEDs are lit, something is probably wrong with the battery.
+
+		TeleGPS v2.0 has the same green/red battery charging
+		status LED and adds another green LED along the same
+		edge, towards end of the board with the 70cm
+		antenna. This green LED indicates GPS lock status — it
+		blinks once every three seconds when the GPS receiver
+		is locked and tracking position.
+
 	=== Installation
 
 		The battery connectors are a standard 2-pin JST

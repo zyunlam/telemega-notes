@@ -47,33 +47,11 @@ static void usage(char *program)
 	exit(1);
 }
 
-void
+static void
 done(struct cc_usb *cc, int code)
 {
 	cc_usb_close(cc);
 	exit (code);
-}
-
-static int
-ends_with(char *whole, char *suffix)
-{
-	int whole_len = strlen(whole);
-	int suffix_len = strlen(suffix);
-
-	if (suffix_len > whole_len)
-		return 0;
-	return strcmp(whole + whole_len - suffix_len, suffix) == 0;
-}
-
-static int
-starts_with(char *whole, char *prefix)
-{
-	int whole_len = strlen(whole);
-	int prefix_len = strlen(prefix);
-
-	if (prefix_len > whole_len)
-		return 0;
-	return strncmp(whole, prefix, prefix_len) == 0;
 }
 
 static char **
@@ -141,9 +119,8 @@ free_flash(struct flash *b) {
 	}
 }
 
-char **
+static char **
 find_flash(struct flash *b, char *word0) {
-	int i;
 	for (;b; b = b->next) {
 		if (strstr(b->line, word0))
 			return b->strs;
@@ -151,7 +128,7 @@ find_flash(struct flash *b, char *word0) {
 	return NULL;
 }
 
-int
+static int
 do_flash(struct cc_usb *usb, int expected_size) {
 	struct flash *b = flash(usb);
 	char **size = find_flash(b, "Storage size:");
@@ -188,18 +165,11 @@ int
 main (int argc, char **argv)
 {
 	char			*device = NULL;
-	char			*filename;
-	Elf			*e;
-	unsigned int		s;
-	int			i;
 	int			c;
-	int			tries;
 	struct cc_usb		*cc = NULL;
 	char			*tty = NULL;
-	int			success;
 	int			verbose = 0;
 	int			ret = 0;
-	int			expected_size;
 
 	while ((c = getopt_long(argc, argv, "rT:D:c:s:v:", options, NULL)) != -1) {
 		switch (c) {

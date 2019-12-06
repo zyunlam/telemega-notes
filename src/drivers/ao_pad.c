@@ -176,7 +176,7 @@ ao_pad_run(void)
  *	AO_PAD_R_IGNITER_SENSE_GND	Resistors from igniter sense ADC inputs to ground
  */
 
-int16_t
+static int16_t
 ao_pad_decivolt(int16_t adc, int16_t r_plus, int16_t r_minus)
 {
 	int32_t	mul = (int32_t) AO_ADC_REFERENCE_DV * (r_plus + r_minus);
@@ -378,7 +378,7 @@ ao_pad(void)
 		while (ao_pad_disabled)
 			ao_sleep(&ao_pad_disabled);
 		ret = ao_radio_cmac_recv(&command, sizeof (command), 0);
-		PRINTD ("cmac_recv %d %d\n", ret, ao_radio_cmac_rssi);
+		PRINTD ("receive packet status %d rssi %d\n", ret, ao_radio_cmac_rssi);
 		if (ret != AO_RADIO_CMAC_OK)
 			continue;
 		ao_pad_packet_time = ao_time();
@@ -404,6 +404,10 @@ ao_pad(void)
 				time_difference = -time_difference;
 			if (time_difference > 10) {
 				PRINTD ("time difference too large %d\n", time_difference);
+				break;
+			}
+			if (query.arm_status != AO_PAD_ARM_STATUS_ARMED) {
+				PRINTD ("box not armed locally\n");
 				break;
 			}
 			PRINTD ("armed\n");
@@ -472,7 +476,7 @@ ao_pad(void)
 	}
 }
 
-void
+static void
 ao_pad_test(void)
 {
 	uint8_t	c;
@@ -501,7 +505,7 @@ ao_pad_test(void)
 	}
 }
 
-void
+static void
 ao_pad_manual(void)
 {
 	uint8_t	ignite;
@@ -529,7 +533,7 @@ static struct ao_task ao_pad_ignite_task;
 static struct ao_task ao_pad_monitor_task;
 
 #if DEBUG
-void
+static void
 ao_pad_set_debug(void)
 {
 	uint16_t r = ao_cmd_decimal();

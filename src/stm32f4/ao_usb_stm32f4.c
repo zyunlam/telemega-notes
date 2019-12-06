@@ -231,12 +231,15 @@ ao_usb_dev_ep0_out(void *data, uint16_t len)
 
 /* Queue IN bytes to EPn */
 void
-ao_usb_dev_ep_in(uint8_t ep, const void *data, uint16_t len)
+ao_usb_dev_ep_in(uint8_t ep, const void *_data, uint16_t len)
 {
+	const uint8_t *data = _data;
 	int	l = len;
 
 	while (l > 0) {
-		stm_usb.dfifo[ep].fifo = *((__packed uint32_t *) data);
+		uint32_t d;
+		memcpy(&d, data, 4);
+		stm_usb.dfifo[ep].fifo = d;
 		l -= 4;
 		data += 4;
 	}
@@ -261,8 +264,9 @@ ao_usb_dev_ep_in_busy(uint8_t ep)
 
 /* Receive OUT bytes from EPn */
 uint16_t
-ao_usb_dev_ep_out(uint8_t ep, void *data, uint16_t len)
+ao_usb_dev_ep_out(uint8_t ep, void *_data, uint16_t len)
 {
+	uint8_t		*data = _data;
 	uint16_t	received;
 	int		l = len;
 	uint32_t	t;
@@ -275,7 +279,9 @@ ao_usb_dev_ep_out(uint8_t ep, void *data, uint16_t len)
 		received = len;
 
 	while (l >= 4) {
-		*((__packed uint32_t *) data) = stm_usb.dfifo[0].fifo;
+		uint32_t d;
+		d = stm_usb.dfifo[0].fifo;
+		memcpy(data, &d, 4);
 		l -= 4;
 		data += 4;
 	}
@@ -358,6 +364,8 @@ static void
 ao_usb_device_init(void)
 {
 	/* deactivate vbus sensing */
+	stm_usb.gccfg |= (1 << STM_USB_GCCFG_VBDEN);
+
 	stm_usb.gccfg &= ~(1 << STM_USB_GCCFG_VBDEN);
 
 	/* Force device mode */
@@ -393,8 +401,10 @@ ao_usb_device_init(void)
 		else
 			stm_usb.diep[i].diepctl = 0;
 		stm_usb.diep[i].dieptsiz = 0;
-		stm_usb.diep[i].diepint = 0xfffffffful;
+		stm_usb.diep[i].diepint = 0xffu;
+	}
 
+	for (int i = 0; i < 6; i++) {
 		/* Reset OUT endpoint */
 		if (stm_usb.doep[i].doepctl & (1 << STM_USB_DOEPCTL_EPENA))
 			stm_usb.doep[i].doepctl = ((1 << STM_USB_DOEPCTL_EPDIS) |
@@ -403,8 +413,10 @@ ao_usb_device_init(void)
 			stm_usb.doep[i].doepctl = 0;
 
 		stm_usb.doep[i].doeptsiz = 0;
-		stm_usb.doep[i].doepint = 0xfffffffful;
+		stm_usb.doep[i].doepint = 0xffu;
 	}
+
+	stm_usb.diepmsk &= ~(1 << STM_USB_DIEPMSK_TXFURM);
 
 	/* Disable all interrupts */
 	stm_usb.gintmsk = 0;
@@ -449,7 +461,6 @@ ao_usb_device_connect(void)
 	ao_usb_delay(20);
 }
 
-#if 0
 static void
 ao_usb_device_disconnect(void)
 {
@@ -457,7 +468,13 @@ ao_usb_device_disconnect(void)
 	stm_usb.dctl |= (1 << STM_USB_DCTL_SDIS);
 	ao_usb_delay(20);
 }
-#endif
+
+static void
+ao_usb_dev_start(void)
+{
+	ao_usb_device_connect();
+	stm_usb.gahbcfg |= (1 << STM_USB_GAHBCFG_GINTMSK);
+}
 
 void
 ao_usb_dev_enable(void)
@@ -474,16 +491,19 @@ ao_usb_dev_enable(void)
 	stm_afr_set(&stm_gpioa, 11, STM_AFR_AF10);
 	stm_ospeedr_set(&stm_gpioa, 11, STM_OSPEEDR_HIGH);
 	stm_pupdr_set(&stm_gpioa, 11, STM_PUPDR_NONE);
+
 	stm_afr_set(&stm_gpioa, 12, STM_AFR_AF10);
 	stm_ospeedr_set(&stm_gpioa, 12, STM_OSPEEDR_HIGH);
 	stm_pupdr_set(&stm_gpioa, 12, STM_PUPDR_NONE);
 
 	/* Power on USB */
-	stm_rcc.ahb2enr |= (1 << STM_RCC_AHB2ENR_OTGFSEN);
+	stm_rcc_ahb2_clk_enable(1 << STM_RCC_AHB2ENR_OTGFSEN);
 
 	/* Route interrupts */
 	stm_nvic_set_priority(STM_ISR_OTG_FS_POS, AO_STM_NVIC_LOW_PRIORITY);
 	stm_nvic_set_enable(STM_ISR_OTG_FS_POS);
+
+	ao_arch_release_interrupts();
 
 	/* Core init */
 	ao_usb_core_init();
@@ -497,13 +517,18 @@ ao_usb_dev_enable(void)
 
 	ao_usb_device_init();
 
-	/* Connect */
-	ao_usb_device_connect();
+	/* Disconnect */
+	ao_usb_device_disconnect();
+
+	/* Start */
+	ao_usb_dev_start();
 }
 
 void
 ao_usb_dev_disable(void)
 {
+	ao_usb_device_disconnect();
+
 	stm_usb.gusbcfg = ((1 << STM_USB_GUSBCFG_FDMOD) |
 			   (0 << STM_USB_GUSBCFG_FHMOD) |
 			   (6 << STM_USB_GUSBCFG_TRDT) |
@@ -519,7 +544,7 @@ ao_usb_dev_disable(void)
 	stm_usb.dctl = ((0 << STM_USB_DCTL_POPRGDNE) |
 			(1 << STM_USB_DCTL_SDIS));
 
-	stm_rcc.ahb2enr &= ~(1 << STM_RCC_AHB2ENR_OTGFSEN);
+	stm_rcc_ahb2_clk_disable(1 << STM_RCC_AHB2ENR_OTGFSEN);
 }
 
 void
@@ -1138,7 +1163,129 @@ $5 = {
 	CK48MSEL = 1		PLLI2S_Q
 	I2CFMP1SEL = 0		APB
 }
-      
-
 
 */
+
+/*
+ *
+ * altos clock configuration
+ * (gdb) print/x stm_rcc
+ * $8 = {
+ *	  altos			demo firmware
+ * cr = 0x0307 7d80,		0x0f077d83, 
+ *
+ *   PLLI2SRDY 0		1
+ *   PLLI2SON  0		1
+ *   PLLRDY    1		1
+ *   PLLON     1		1
+ *   CSSON     0		0
+ *   HSEBYP    1		1
+ *   HSERDY    1		1
+ *   HSEON     1		1
+ *   HSICAL    0x7d		0x7d
+ *   HSITRIM   0x10		0x10
+ *   HSIRDY    0		1
+ *   HSION     0		1
+ *
+ * pllcfgr = 0x24403008,	0x27403208,
+ *   PLLR	2		2
+ *   PLLQ	4 		7
+ *   PLLSRC	1		1
+ *   PLLP	0 (/2)		0 (/2)
+ *   PLLN	192		200
+ *   PLLM	8		8
+ *
+ * cfgr = 0x3640100a,		0x0000100a,
+ *   upper bits are just MCO
+ *
+ *   cir = 0x0,			0x0
+ *   ahb1rstr = 0x0,		0x0
+ *   ahb2rstr = 0x0,		0x0
+ *   ahb3rstr = 0x0,
+ *   pad_1c = 0x0,
+ *   apb1rstr = 0x0,
+ *   apb2rstr = 0x0,
+ *   pad_28 = 0x0,
+ *   pad_2c = 0x0,
+ *   _ahb1enr = 0x55,		0x80
+ *   _ahb2enr = 0x80,		0xc800
+ *   ahbdnr = 0x0,
+ *   pad_3c = 0x0,
+ *   apb1enr = 0x10000400,
+ *   apb2enr = 0x8020,
+ *   pad_48 = 0x0,
+ *   pad_4c = 0x0,
+ *   ahb1lpenr = 0x6390ff,	0x6390ff
+ *   ahb2lpenr = 0xd0,		0xd0
+ *   ahb3lpenr = 0x3,		0x3
+ *   pad_5c = 0x0,
+ *   apb1lpenr = 0xfffecfff,	0xfffecfff,
+ *   apb2lpenr = 0x357f9f3,	0x357f9f3,
+ *   pad_68 = 0x0,
+ *   pad_6c = 0x0,
+ *   bdcr = 0x0,		0x8200,
+ *   csr = 0x0,			0x1e000003,
+ *   pad_78 = 0x0,
+ *   pad_7c = 0x0,
+ *   sscgr = 0x0,
+ *   plli2scfgr = 0x24003010,	0x44003008,
+ *   pad_88 = 0x0,
+ *   dckcfgr = 0x0,
+ *   ckgatenr = 0x0,
+ *   dckcfgr2 = 0x8000000	0x08000000
+ * }
+ *
+ *
+ */
+
+/*
+ *
+ * main
+ *  	HAL_Init
+ *  	SystemClock_Config
+ *   
+ * 	USBD_Init
+ *  		USBD_LL_Init
+ *    			HAL_PCD_Init
+ *     				HAL_PCD_MspInit
+ *					__HAL_RCC_GPIOA_CLK_ENABLE
+ *					HAL_GPIO_Init
+ *					__HAL_RCC_USB_OTG_FS_CLK_ENABLE
+ *					HAL_NVIC_SetPriority
+ *					HAL_NVIC_EnableIRQ
+ *     				USB_CoreInit
+ *					Select FS Embedded PHY
+ *					USB_CoreReset
+ *					Deactivate the power down
+ *     				USB_SetCurrentMode
+ *     				USB_DevInit
+ *					VBUS sensing stuff
+ *					Restart PHY clock
+ *					USB_SetDevSpeed
+ *					USB_FlushTxFifo
+ *					USB_FlushRxFifo
+ *					Clear pending interrupts
+ *					Disable all endpoints
+ *					Disable all interrupts
+ *					Clear pending interrupts
+ *					enable interrupts
+ *     				USB_DevDisconnect
+ *					Turn on SDIS bit
+ *					delay 3ms
+ *    			HAL_PCDEx_SeRxFifo
+ *    			HAL_PCDEx_SetTxFifo
+ *  	USBD_RegisterClass
+ *  	USBD_MSC_RegisterStorage
+ *  	USBD_Start
+ *		USBD_LL_Start
+ *			HAL_PCD_Start
+ *				__HAL_LOCK
+ *				USB_DevConnect
+ *					Turn off SDIS bit
+ *					delay 3ms
+ *				__HAL_PCD_ENABLE
+ *					USB_EnableGlobalInt
+ *  						USBx->GAHBCFG |= USB_OTG_GAHBCFG_GINT;
+ *				__HAL_UNLOCK
+ *
+ */
