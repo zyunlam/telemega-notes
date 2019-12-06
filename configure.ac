@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9)
+AC_INIT([altos], 1.9.1)
 ANDROID_VERSION=18
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2018-12-31
+RELEASE_DATE=2019-12-05
 AC_SUBST(RELEASE_DATE)
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
