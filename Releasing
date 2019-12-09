@@ -115,6 +115,7 @@ These are Bdale's notes on how to do a release.
 	   src/telemega-v2.0/{*.elf,*.ihx} \
 	   src/telemega-v3.0/{*.elf,*.ihx} \
 	   src/telemetrum-v2.0/{*.elf,*.ihx} \
+	   src/telemetrum-v3.0/{*.elf,*.ihx} \
 	   src/telemini-v3.0/{*.elf,*.ihx} \
 	   src/telelco-v2.0/{*.elf,*.ihx} \
 	   src/telefireeight-v1.0/{*.elf,*.ihx} \
@@ -134,6 +135,7 @@ These are Bdale's notes on how to do a release.
 	   src/telemega-v2.0/flash-loader/*.elf \
 	   src/telemega-v3.0/flash-loader/*.elf \
 	   src/telemetrum-v2.0/flash-loader/*.elf \
+	   src/telemetrum-v3.0/flash-loader/*.elf \
 	   src/telemini-v3.0/flash-loader/{*.elf,*.bin} \
 	   src/telelco-v2.0/flash-loader/*.elf \
 	   src/telefireeight-v1.0/flash-loader/*.elf \
