@@ -1,13 +1,12 @@
 Creating documentation for a new release of AltOS
 
-* Write release notes in release-notes-${version}.inc. Add to
-  Makefile
+* Write release notes in release-notes-${version}.inc. Add to Makefile
 
-* Make sure that doc/altusmetrum.txt has the right copyright 
-  year
+* Make sure that doc/altusmetrum.txt has the right copyright year
 
-* Add references to that as appropriate from each of the
-  documents:
+* Make sure doc/altusmetrum-theme.yml has the right copyright year
+
+* Add references to that as appropriate from each of the documents:
 
 	release-notes.inc
 	easymini-release-notes.inc
