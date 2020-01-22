@@ -33,7 +33,7 @@ uint8_t		ao_lco_drag_race;
 struct ao_pad_query	ao_pad_query;				/* latest query response */
 
 static uint8_t		ao_lco_channels[AO_PAD_MAX_BOXES];	/* pad channels available on each box */
-static uint16_t		ao_lco_tick_offset[AO_PAD_MAX_BOXES];	/* offset from local to remote tick count */
+static uint16_t		ao_lco_tick_offset[AO_PAD_MAX_BOXES];	/* 16 bit offset from local to remote tick count */
 static uint8_t		ao_lco_selected[AO_PAD_MAX_BOXES];	/* pads selected to fire */
 
 #define AO_LCO_VALID_LAST	1
@@ -322,7 +322,7 @@ ao_lco_search(void)
 void
 ao_lco_monitor(void)
 {
-	uint16_t		delay;
+	AO_TICK_TYPE		delay;
 	uint8_t			box;
 
 	for (;;) {
@@ -358,8 +358,8 @@ ao_lco_monitor(void)
 
 uint8_t			ao_lco_drag_beep_count;
 static uint8_t		ao_lco_drag_beep_on;
-static uint16_t		ao_lco_drag_beep_time;
-static uint16_t		ao_lco_drag_warn_time;
+static AO_TICK_TYPE	ao_lco_drag_beep_time;
+static AO_TICK_TYPE	ao_lco_drag_warn_time;
 
 #define AO_LCO_DRAG_BEEP_TIME	AO_MS_TO_TICKS(50)
 #define AO_LCO_DRAG_WARN_TIME	AO_SEC_TO_TICKS(5)
@@ -391,14 +391,14 @@ ao_lco_toggle_drag(void)
  * turn it on or off as necessary and bump the remaining beep counts
  */
 
-uint16_t
-ao_lco_drag_beep_check(uint16_t now, uint16_t delay)
+AO_TICK_TYPE
+ao_lco_drag_beep_check(AO_TICK_TYPE now, AO_TICK_TYPE delay)
 {
 	PRINTD("beep check count %d delta %d\n",
 	       ao_lco_drag_beep_count,
-	       (int16_t) (now - ao_lco_drag_beep_time));
+	       (AO_TICK_SIGNED) (now - ao_lco_drag_beep_time));
 	if (ao_lco_drag_beep_count) {
-		if ((int16_t) (now - ao_lco_drag_beep_time) >= 0) {
+		if ((AO_TICK_SIGNED) (now - ao_lco_drag_beep_time) >= 0) {
 			if (ao_lco_drag_beep_on) {
 				ao_beep(0);
 				PRINTD("beep stop\n");
@@ -418,7 +418,7 @@ ao_lco_drag_beep_check(uint16_t now, uint16_t delay)
 	}
 
 	if (ao_lco_drag_beep_count) {
-		uint16_t beep_delay = 0;
+		AO_TICK_TYPE beep_delay = 0;
 
 		if (ao_lco_drag_beep_time > now)
 			beep_delay = ao_lco_drag_beep_time - now;
@@ -463,13 +463,13 @@ ao_lco_drag_disable(void)
  * active
  */
 
-uint16_t
-ao_lco_drag_warn_check(uint16_t now, uint16_t delay)
+AO_TICK_TYPE
+ao_lco_drag_warn_check(AO_TICK_TYPE now, AO_TICK_TYPE delay)
 {
 	if (ao_lco_drag_race) {
-		uint16_t	warn_delay;
+		AO_TICK_TYPE	warn_delay;
 
-		if ((int16_t) (now - ao_lco_drag_warn_time) >= 0) {
+		if ((AO_TICK_SIGNED) (now - ao_lco_drag_warn_time) >= 0) {
 			ao_lco_drag_add_beeps(1);
 			ao_lco_drag_warn_time = now + AO_LCO_DRAG_WARN_TIME;
 		}

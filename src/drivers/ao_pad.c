@@ -26,10 +26,10 @@ static uint8_t ao_pad_ignite;
 static struct ao_pad_command	command;
 static struct ao_pad_query	query;
 static uint8_t	ao_pad_armed;
-static uint16_t	ao_pad_arm_time;
+static AO_TICK_TYPE	ao_pad_arm_time;
 static uint8_t	ao_pad_box;
 static uint8_t	ao_pad_disabled;
-static uint16_t	ao_pad_packet_time;
+static AO_TICK_TYPE	ao_pad_packet_time;
 
 #ifndef AO_PAD_RSSI_MINIMUM
 #define AO_PAD_RSSI_MINIMUM	-90
@@ -288,7 +288,7 @@ ao_pad_monitor(void)
 			prev = cur;
 		}
 
-		if (ao_pad_armed && (int16_t) (ao_time() - ao_pad_arm_time) > AO_PAD_ARM_TIME)
+		if (ao_pad_armed && (AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_PAD_ARM_TIME)
 			ao_pad_armed = 0;
 
 		if (ao_pad_armed) {
@@ -369,7 +369,7 @@ static int ao_pad_read_box(void) {
 static void
 ao_pad(void)
 {
-	int16_t	time_difference;
+	int16_t	tick_difference;
 	int8_t	ret;
 
 	ao_pad_box = 0;
@@ -398,12 +398,12 @@ ao_pad(void)
 			if (command.channels & ~(AO_PAD_ALL_CHANNELS))
 				break;
 
-			time_difference = command.tick - ao_time();
-			PRINTD ("arm tick %d local tick %d\n", command.tick, ao_time());
-			if (time_difference < 0)
-				time_difference = -time_difference;
-			if (time_difference > 10) {
-				PRINTD ("time difference too large %d\n", time_difference);
+			tick_difference = command.tick - (uint16_t) ao_time();
+			PRINTD ("arm tick %d local tick %d\n", command.tick, (uint16_t) ao_time());
+			if (tick_difference < 0)
+				tick_difference = -tick_difference;
+			if (tick_difference > 10) {
+				PRINTD ("tick difference too large %d\n", tick_difference);
 				break;
 			}
 			if (query.arm_status != AO_PAD_ARM_STATUS_ARMED) {
@@ -439,7 +439,7 @@ ao_pad(void)
 				PRINTD ("not armed\n");
 				break;
 			}
-			if ((uint16_t) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
+			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
 				PRINTD ("late pad arm_time %d time %d\n",
 					ao_pad_arm_time, ao_time());
 				break;
@@ -457,7 +457,7 @@ ao_pad(void)
 #if HAS_LOG
 			if (!ao_log_running) ao_log_start();
 #endif
-			if ((uint16_t) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
+			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
 				PRINTD ("late pad arm_time %d time %d\n",
 					ao_pad_arm_time, ao_time());
 				break;
