@@ -72,8 +72,11 @@ void start(void)
 #if AO_BOOT_CHAIN
 	if (ao_boot_check_chain()) {
 #if AO_BOOT_PIN
-		ao_boot_check_pin();
+		if (ao_boot_check_pin())
 #endif
+		{
+			ao_boot_chain(AO_BOOT_APPLICATION_BASE);
+		}
 	}
 #endif
 	/* Turn on syscfg */

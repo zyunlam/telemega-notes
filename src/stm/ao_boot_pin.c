@@ -20,7 +20,7 @@
 #include <ao_boot.h>
 #include <ao_exti.h>
 
-void
+int
 ao_boot_check_pin(void)
 {
 	uint16_t v;
@@ -42,6 +42,5 @@ ao_boot_check_pin(void)
 	ao_gpio_set_mode(&AO_BOOT_APPLICATION_GPIO, AO_BOOT_APPLICATION_PIN, 0);
 	ao_disable_port(&AO_BOOT_APPLICATION_GPIO);
 	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_PWREN);
-	if (v == AO_BOOT_APPLICATION_VALUE)
-		ao_boot_chain(AO_BOOT_APPLICATION_BASE);
+	return v == AO_BOOT_APPLICATION_VALUE;
 }
