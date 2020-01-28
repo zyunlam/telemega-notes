@@ -556,6 +556,7 @@ telegps/telegps-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
 altosdroid/app/src/main/AndroidManifest.xml
+altosdroid/app/build.gradle
 ao-tools/Makefile
 ao-tools/lib/Makefile
 ao-tools/ao-rawload/Makefile

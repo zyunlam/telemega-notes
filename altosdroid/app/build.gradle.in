@@ -17,10 +17,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "org.altusmetrum.AltosDroid"
-        minSdkVersion 26
+        minSdkVersion 21
         targetSdkVersion 28
-        versionCode 19
-        versionName "1.9.1rc1"
+        versionCode @ANDROID_VERSION@
+        versionName "@VERSION@"
     }
     buildTypes {
         release {
