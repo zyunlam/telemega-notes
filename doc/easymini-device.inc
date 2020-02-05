@@ -97,7 +97,7 @@
 		Connecting the switched positive battery terminal to the pyro
 		charges must be done separate from EasyMini, by soldering
 		them together or using some other connector.  Note that for
-		safety, you should put a switch between the pyro battery and
+		safety, you must put a switch between the pyro battery and
 		the rest of the circuit!
 
 		The other lead from each pyro charge is then inserted into
