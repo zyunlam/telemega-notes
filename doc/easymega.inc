@@ -97,9 +97,12 @@
 		EasyMega provides explicit support for an external pyro
 		battery. All that is required is to remove the jumper
 		between the lipo terminal (Bottom 3) and the pyro terminal
-		(Bottom 2). Then hook the negative pyro battery terminal to ground
-		(Bottom 1) and the positive pyro battery to the pyro battery
-		input (Bottom 2). You can then use the existing pyro screw
+		(Bottom 2). Then hook the negative pyro battery terminal to 
+		ground (Bottom 1) and the switched positive pyro battery to 
+		the pyro battery input (Bottom 2). Note that you must include
+		a switch between the pyro battery and the board for safety,
+		as the on-board power switch circuit only supports the primary
+		battery!  You can then use the existing pyro screw
 		terminals to hook up all of the pyro charges.
 
       	=== Using Only One Battery With EasyMega

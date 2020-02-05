@@ -62,11 +62,11 @@
 
 		As described above, using an external pyro battery involves
 		connecting the negative battery terminal to the flight
-		computer ground, connecting the positive battery terminal to
-		one of the igniter leads and connecting the other igniter
-		lead to the per-channel pyro circuit connection. Because
-		there is no solid ground connection to use on TeleMini, this
-		is not recommended.
+		computer ground, connecting the switched positive battery 
+		terminal to one of the igniter leads and connecting the other 
+		igniter lead to the per-channel pyro circuit connection. 
+		Because there is no solid ground connection to use on 
+		TeleMini, this is not recommended.
 
 		The only available ground connection on TeleMini v3 are
 		the two mounting holes next to the telemetry
@@ -75,7 +75,9 @@
 
 		Connecting the positive battery terminal to the pyro
 		charges must be done separate from TeleMini v3, by soldering
-		them together or using some other connector.
+		them together or using some other connector.  Note that you 
+		must include a switch in the pyro battery positive lead for
+		safety!
 
 		The other lead from each pyro charge is then inserted into
 		the appropriate per-pyro channel screw terminal (terminal 3 for the
