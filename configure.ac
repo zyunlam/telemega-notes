@@ -19,7 +19,7 @@ dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
 AC_INIT([altos], 1.9.1)
-ANDROID_VERSION=18
+ANDROID_VERSION=20
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
@@ -166,9 +166,7 @@ fi
 ANDROID_RELEASE=no
 if test "x$ANDROID_SDK" != "xno"; then
 	HAVE_ANDROID_SDK="yes"
-	if test -f "$HOME/altusmetrumllc/google-play-release.keystore" -a -f "$HOME/altusmetrumllc/google-play-passphrase"; then
-		ANDROID_RELEASE=yes
-	fi
+	ANDROID_RELEASE=yes
 else
 	HAVE_ANDROID_SDK="no"
 fi
@@ -556,6 +554,7 @@ telegps/telegps-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
 altosdroid/app/src/main/AndroidManifest.xml
+altosdroid/app/build.gradle
 ao-tools/Makefile
 ao-tools/lib/Makefile
 ao-tools/ao-rawload/Makefile
