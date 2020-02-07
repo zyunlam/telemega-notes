@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.os.*;
 import android.widget.Toast;
+import androidx.core.app.NotificationCompat;
 
 import org.altusmetrum.altoslib_13.*;
 
@@ -657,7 +658,7 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 						: "";
 
 		// Create notification to be displayed while the service runs
-		Notification notification = new Notification.Builder(this, channelId)
+		Notification notification = new NotificationCompat.Builder(this, channelId)
 				.setContentTitle(getText(R.string.telemetry_service_label))
 				.setContentText(getText(R.string.telemetry_service_started))
 				.setContentIntent(contentIntent)
