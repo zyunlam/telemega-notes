@@ -21,6 +21,7 @@ package org.altusmetrum.AltosDroid;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -44,7 +45,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 import android.hardware.usb.*;
-
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
 import org.altusmetrum.altoslib_13.*;
 
 class SavedState {
@@ -139,7 +141,7 @@ class Tracker implements CharSequence, Comparable {
 	}
 }
 
-public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener {
+public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
 	// Actions sent to the telemetry server at startup time
 
@@ -791,11 +793,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		noticeIntent(intent);
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		AltosDebug.debug("+ ON RESUME +");
-
+	private void enable_location_updates() {
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
@@ -810,12 +808,65 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		update_ui(telemetry_state, state, true);
 	}
 
+	static final int MY_PERMISSION_REQUEST_FINE_POSITION = 1001;
+
+	public boolean have_location_permission = false;
+	public boolean asked_location_permission = false;
+
+	AltosMapOnline map_online;
+
+	void
+	tell_map_permission(AltosMapOnline map_online) {
+		this.map_online = map_online;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions,
+					       int[] grantResults) {
+		switch (requestCode) {
+		case MY_PERMISSION_REQUEST_FINE_POSITION:
+			if (grantResults.length > 0 &&
+			    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+				have_location_permission = true;
+				enable_location_updates();
+				if (map_online != null)
+					map_online.position_permission();
+			}
+			break;
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		AltosDebug.debug("+ ON RESUME +");
+
+		if (!asked_location_permission) {
+			asked_location_permission = true;
+			if (ActivityCompat.checkSelfPermission(this,
+							      Manifest.permission.ACCESS_FINE_LOCATION)
+			    == PackageManager.PERMISSION_GRANTED)
+			{
+				have_location_permission = true;
+			}
+			else
+			{
+				ActivityCompat.requestPermissions(this,
+								  new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+								  MY_PERMISSION_REQUEST_FINE_POSITION);
+			}
+		}
+		if (have_location_permission)
+			enable_location_updates();
+	}
+
 	@Override
 	public void onPause() {
 		super.onPause();
 		AltosDebug.debug("- ON PAUSE -");
 		// Stop listening for location updates
-		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
+		if (have_location_permission)
+			((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
 	}
 
 	@Override

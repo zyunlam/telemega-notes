@@ -203,13 +203,22 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 		return true;
 	}
 
+	void
+	position_permission() {
+		if (mMap != null)
+			mMap.setMyLocationEnabled(true);
+	}
+
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
 		final int map_type = AltosPreferences.map_type();
 		mMap = googleMap;
 		if (mMap != null) {
 			map_type_changed(map_type);
-			mMap.setMyLocationEnabled(true);
+			if (altos_droid.have_location_permission)
+				mMap.setMyLocationEnabled(true);
+			else
+				altos_droid.tell_map_permission(this);
 			mMap.getUiSettings().setTiltGesturesEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 			mMap.setOnMarkerClickListener(this);
