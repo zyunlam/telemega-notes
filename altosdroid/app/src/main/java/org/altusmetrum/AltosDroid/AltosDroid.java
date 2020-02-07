@@ -959,10 +959,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	}
 
 	private void bluetoothEnabled(Intent data) {
-		try {
-			mService.send(Message.obtain(null, TelemetryService.MSG_BLUETOOTH_ENABLED, null));
-		} catch (RemoteException e) {
-			AltosDebug.debug("send BT enabled message failed");
+		if (mService != null) {
+			try {
+				mService.send(Message.obtain(null, TelemetryService.MSG_BLUETOOTH_ENABLED, null));
+			} catch (RemoteException e) {
+				AltosDebug.debug("send BT enabled message failed");
+			}
 		}
 	}
 
