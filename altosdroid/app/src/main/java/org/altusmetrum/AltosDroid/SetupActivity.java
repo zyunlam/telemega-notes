@@ -262,7 +262,7 @@ public class SetupActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setTheme(AltosDroid.themes[AltosDroidPreferences.font_size()]);
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		AltosDebug.init(this);

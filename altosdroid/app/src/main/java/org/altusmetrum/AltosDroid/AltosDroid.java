@@ -649,6 +649,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		R.style.Extra
 	};
 
+	static public int[] dialog_themes = {
+		R.style.Small_Dialog,
+		R.style.Medium_Dialog,
+		R.style.Large_Dialog,
+		R.style.Extra_Dialog
+	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// Initialise preferences

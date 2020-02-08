@@ -101,7 +101,7 @@ class IgniterAdapter extends ArrayAdapter<IgniterItem> {
 		if (position == selected_item)
 			item.igniter_view.setBackgroundColor(Color.RED);
 		else
-			item.igniter_view.setBackgroundColor(Color.BLACK);
+			item.igniter_view.setBackgroundColor(Color.WHITE);
 		return item.igniter_view;
 	}
 }
@@ -339,6 +339,7 @@ public class IgniterActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window

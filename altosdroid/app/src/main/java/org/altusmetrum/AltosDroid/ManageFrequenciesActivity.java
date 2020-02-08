@@ -236,6 +236,7 @@ public class ManageFrequenciesActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
