@@ -172,6 +172,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	public static final int SETUP_UNITS = 2;
 	public static final int SETUP_MAP_SOURCE = 4;
 	public static final int SETUP_MAP_TYPE = 8;
+	public static final int SETUP_FONT_SIZE = 16;
 
 	public static FragmentManager	fm;
 
@@ -596,7 +597,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		for (AltosDroidTab mTab : mTabs)
 			mTab.update_ui(telem_state, state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
-		AltosDebug.debug("quiet %b\n", quiet);
 		if (mAltosVoice != null && mTabsAdapter.currentItem() != null)
 			mAltosVoice.tell(telem_state, state, from_receiver, location, (AltosDroidTab) mTabsAdapter.currentItem(), quiet);
 
@@ -619,7 +619,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 		int deg = (int) Math.floor(p);
 		double min = (p - Math.floor(p)) * 60.0;
-		return String.format("%d°%9.4f\" %s", deg, min, h);
+		return String.format("%d° %7.4f\" %s", deg, min, h);
 	}
 
 	static String number(String format, double value) {
@@ -642,14 +642,22 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		return tab_view;
 	}
 
+	static public int[] themes = {
+		R.style.Small,
+		R.style.Medium,
+		R.style.Large,
+		R.style.Extra
+	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		// Initialise preferences
+		AltosDroidPreferences.init(this);
+		setTheme(themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 		AltosDebug.init(this);
 		AltosDebug.debug("+++ ON CREATE +++");
 
-		// Initialise preferences
-		AltosDroidPreferences.init(this);
 
 		fm = getSupportFragmentManager();
 
@@ -808,10 +816,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		update_ui(telemetry_state, state, true);
 	}
 
-	static final int MY_PERMISSION_REQUEST_FINE_POSITION = 1001;
+	static final int MY_PERMISSION_REQUEST = 1001;
 
 	public boolean have_location_permission = false;
-	public boolean asked_location_permission = false;
+	public boolean have_storage_permission = false;
+	public boolean asked_permission = false;
 
 	AltosMapOnline map_online;
 
@@ -823,16 +832,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions,
 					       int[] grantResults) {
-		switch (requestCode) {
-		case MY_PERMISSION_REQUEST_FINE_POSITION:
-			if (grantResults.length > 0 &&
-			    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				have_location_permission = true;
-				enable_location_updates();
-				if (map_online != null)
-					map_online.position_permission();
+		if (requestCode == MY_PERMISSION_REQUEST) {
+			for (int i = 0; i < grantResults.length; i++) {
+				if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+					if (permissions[i].equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+						have_location_permission = true;
+						enable_location_updates();
+						if (map_online != null)
+							map_online.position_permission();
+					}
+					if (permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+						have_storage_permission = true;
+					}
+				}
 			}
-			break;
 		}
 	}
 
@@ -841,19 +854,30 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		super.onResume();
 		AltosDebug.debug("+ ON RESUME +");
 
-		if (!asked_location_permission) {
-			asked_location_permission = true;
+		if (!asked_permission) {
+			asked_permission = true;
 			if (ActivityCompat.checkSelfPermission(this,
 							      Manifest.permission.ACCESS_FINE_LOCATION)
 			    == PackageManager.PERMISSION_GRANTED)
 			{
 				have_location_permission = true;
 			}
-			else
+			if (ActivityCompat.checkSelfPermission(this,
+							       Manifest.permission.WRITE_EXTERNAL_STORAGE)
+			    == PackageManager.PERMISSION_GRANTED)
 			{
-				ActivityCompat.requestPermissions(this,
-								  new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-								  MY_PERMISSION_REQUEST_FINE_POSITION);
+				have_storage_permission = true;
+			}
+			int count = (have_location_permission ? 0 : 1) + (have_storage_permission ? 0 : 1);
+			if (count > 0)
+			{
+				String[] permissions = new String[count];
+				int i = 0;
+				if (!have_location_permission)
+					permissions[i++] = Manifest.permission.ACCESS_FINE_LOCATION;
+				if (!have_location_permission)
+					permissions[i++] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+				ActivityCompat.requestPermissions(this, permissions, MY_PERMISSION_REQUEST);
 			}
 		}
 		if (have_location_permission)
@@ -889,7 +913,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		AltosDebug.debug("onActivityResult " + resultCode);
+		AltosDebug.debug("onActivityResult request %d result %d", requestCode, resultCode);
 		switch (requestCode) {
 		case REQUEST_CONNECT_DEVICE:
 			// When DeviceListActivity returns with a device to connect to
@@ -925,6 +949,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	private void note_setup_changes(Intent data) {
 		int changes = data.getIntExtra(SetupActivity.EXTRA_SETUP_CHANGES, 0);
 
+		AltosDebug.debug("note_setup_changes changes %d\n", changes);
+
 		if ((changes & SETUP_BAUD) != 0) {
 			try {
 				mService.send(Message.obtain(null, TelemetryService.MSG_SETBAUD,
@@ -942,6 +968,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			/* nothing to do here */
 		}
 		set_switch_time();
+		if ((changes & SETUP_FONT_SIZE) != 0) {
+			AltosDebug.debug(" ==== Recreate to switch font sizes ==== ");
+			finish();
+			startActivity(getIntent());
+		}
 	}
 
 	private void connectUsb(UsbDevice device) {

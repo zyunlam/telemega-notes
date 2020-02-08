@@ -159,19 +159,19 @@ public class TabPad extends AltosDroidTab {
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
-			battery_voltage_view.setText(AltosDroid.number(" %4.2f V", state.battery_voltage));
+			battery_voltage_view.setText(AltosDroid.number("%1.2f V", state.battery_voltage));
 			battery_lights.set(state.battery_voltage >= AltosLib.ao_battery_good, state.battery_voltage == AltosLib.MISSING);
 			if (state.apogee_voltage == AltosLib.MISSING) {
 				apogee_row.setVisibility(View.GONE);
 			} else {
-				apogee_voltage_view.setText(AltosDroid.number(" %4.2f V", state.apogee_voltage));
+				apogee_voltage_view.setText(AltosDroid.number("%1.2f V", state.apogee_voltage));
 				apogee_row.setVisibility(View.VISIBLE);
 			}
 			apogee_lights.set(state.apogee_voltage >= AltosLib.ao_igniter_good, state.apogee_voltage == AltosLib.MISSING);
 			if (state.main_voltage == AltosLib.MISSING) {
 				main_row.setVisibility(View.GONE);
 			} else {
-				main_voltage_view.setText(AltosDroid.number(" %4.2f V", state.main_voltage));
+				main_voltage_view.setText(AltosDroid.number("%1.2f V", state.main_voltage));
 				main_row.setVisibility(View.VISIBLE);
 			}
 			main_lights.set(state.main_voltage >= AltosLib.ao_igniter_good, state.main_voltage == AltosLib.MISSING);
@@ -183,7 +183,7 @@ public class TabPad extends AltosDroidTab {
 				if (voltage == AltosLib.MISSING) {
 					ignite_row[i].setVisibility(View.GONE);
 				} else {
-					ignite_voltage_view[i].setText(AltosDroid.number(" %4.2f V", voltage));
+					ignite_voltage_view[i].setText(AltosDroid.number("%1.2f V", voltage));
 					ignite_row[i].setVisibility(View.VISIBLE);
 				}
 				ignite_lights[i].set(voltage >= AltosLib.ao_igniter_good, voltage == AltosLib.MISSING);
@@ -219,7 +219,7 @@ public class TabPad extends AltosDroidTab {
 			if (telem_state.receiver_battery == AltosLib.MISSING) {
 				receiver_row.setVisibility(View.GONE);
 			} else {
-				receiver_voltage_view.setText(AltosDroid.number(" %4.2f V", telem_state.receiver_battery));
+				receiver_voltage_view.setText(AltosDroid.number("%1.2f V", telem_state.receiver_battery));
 				receiver_row.setVisibility(View.VISIBLE);
 			}
 			receiver_voltage_lights.set(telem_state.receiver_battery >= AltosLib.ao_battery_good, telem_state.receiver_battery == AltosLib.MISSING);

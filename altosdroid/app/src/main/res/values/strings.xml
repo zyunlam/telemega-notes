@@ -38,7 +38,7 @@
 	<string name="select_tracker">Select Tracker</string>
 	<string name="delete_track">Delete Track</string>
 	<string name="map_type">Map Type</string>
-	<string name="map_source">Toggle Online/Offline maps</string>
+	<string name="map_source">Map Source</string>
 
 	<!-- MapTypeActivity -->
 	<!-- <string name="map_type">Map Type</string> -->
@@ -59,7 +59,7 @@
 
 	<!-- UI fields -->
 	<!-- Header -->
-	<string name="callsign_label">Callsign</string>
+	<string name="callsign_label">Call</string>
 	<string name="serial_label">Serial</string>
 	<string name="flight_label">Flight</string>
 	<string name="state_label">State</string>
@@ -92,6 +92,8 @@
 	<string name="gps_ready_label">GPS Ready</string>
 	<string name="latitude_label">Latitude</string>
 	<string name="longitude_label">Longitude</string>
+	<string name="target_pos_label">Tar</string>
+	<string name="receiver_pos_label">Me</string>
 	<string name="target_latitude_label">Tar Lat</string>
 	<string name="target_longitude_label">Tar Lon</string>
 	<string name="receiver_latitude_label">My Lat</string>
@@ -134,6 +136,7 @@
 	<!-- <string name="map_type">Map Type</string> -->
 	<!-- <string name="map_source">Map Source</string> -->
 	<!-- <string name="preload_maps">Preload Maps</string> -->
+	<string name="font_size">Text Size</string>
 	<string name="manage_frequencies">Manage Frequencies</string>
 	<string name="done">OK</string>
 	

@@ -123,8 +123,6 @@ public class AltosVoice {
 		if (state == null)
 			return false;
 
-		AltosDebug.debug("tell_pad lag %b ltm %d\n", last_apogee_good, last_tell_mode);
-
 		if (state.apogee_voltage != AltosLib.MISSING)
 			last_apogee_good = tell_gonogo("apogee",
 						       state.apogee_voltage >= AltosLib.ao_igniter_good,

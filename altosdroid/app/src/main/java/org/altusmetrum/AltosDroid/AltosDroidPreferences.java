@@ -28,6 +28,15 @@ public class AltosDroidPreferences extends AltosPreferences {
 	final static String activeDeviceAddressPreference = "ACTIVE-DEVICE-ADDRESS";
 	final static String activeDeviceNamePreference = "ACTIVE-DEVICE-NAME";
 
+	public static final int font_size_small = 0;
+	public static final int font_size_medium = 1;
+	public static final int font_size_large = 2;
+	public static final int font_size_extra = 3;
+
+	final static String fontSizePreference = "FONT-SIZE";
+
+	static int font_size = font_size_medium;
+
 	static DeviceAddress	active_device_address;
 
 	/* Map source preference name */
@@ -43,6 +52,8 @@ public class AltosDroidPreferences extends AltosPreferences {
 			return;
 
 		AltosPreferences.init(new AltosDroidPreferencesBackend(context));
+
+		font_size = backend.getInt(fontSizePreference, font_size_medium);
 
 		String address = backend.getString(activeDeviceAddressPreference, null);
 		String name = backend.getString(activeDeviceNamePreference, null);
@@ -105,6 +116,22 @@ public class AltosDroidPreferences extends AltosPreferences {
 	public static void unregister_map_source_listener(AltosDroidMapSourceListener l) {
 		synchronized(backend) {
 			map_source_listeners.remove(l);
+		}
+	}
+
+	public static int font_size() {
+		synchronized (backend) {
+			return font_size;
+		}
+	}
+
+	public static void set_font_size(int new_font_size) {
+		synchronized (backend) {
+			if (font_size != new_font_size) {
+				font_size = new_font_size;
+				backend.putInt(fontSizePreference, font_size);
+				flush_preferences();
+			}
 		}
 	}
 }

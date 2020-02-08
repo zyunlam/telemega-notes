@@ -31,6 +31,7 @@ import org.altusmetrum.altoslib_13.*;
 public class SetupActivity extends Activity {
 	private Spinner select_rate;
 	private Spinner set_units;
+	private Spinner font_size;
 	private Spinner map_type;
 	private Spinner map_source;
 	private Button manage_frequencies;
@@ -72,6 +73,13 @@ public class SetupActivity extends Activity {
 		"2400",
 	};
 
+	static final String[] sizes = {
+		"Small",
+		"Medium",
+		"Large",
+		"Extra"
+	};
+
 	static final String[] map_types = {
 		"Hybrid",
 		"Satellite",
@@ -95,30 +103,39 @@ public class SetupActivity extends Activity {
 	private int	set_map_source;
 	private int	set_map_type;
 	private boolean	set_imperial_units;
-
-	private int	changes = 0;
-
-	private void add_change(int change) {
-		changes |= change;
-	}
+	private int	set_font_size;
 
 	private void done() {
+		int	changes = 0;
 		Intent intent = new Intent();
-		if ((changes & AltosDroid.SETUP_BAUD) != 0)
+
+		if (set_telemetry_rate != AltosPreferences.telemetry_rate(1)) {
+			changes |= AltosDroid.SETUP_BAUD;
 			AltosPreferences.set_telemetry_rate(1, set_telemetry_rate);
-		if ((changes & AltosDroid.SETUP_UNITS) != 0)
+		}
+		if (set_imperial_units != AltosPreferences.imperial_units()) {
+			changes |= AltosDroid.SETUP_UNITS;
 			AltosPreferences.set_imperial_units(set_imperial_units);
-		if ((changes & AltosDroid.SETUP_MAP_SOURCE) != 0)
+		}
+		if (set_map_source != AltosDroidPreferences.map_source()) {
+			changes |= AltosDroid.SETUP_MAP_SOURCE;
 			AltosDroidPreferences.set_map_source(set_map_source);
-		if ((changes & AltosDroid.SETUP_MAP_TYPE) != 0)
+		}
+		if (set_map_type != AltosPreferences.map_type()) {
+			changes |= AltosDroid.SETUP_MAP_TYPE;
 			AltosPreferences.set_map_type(set_map_type);
+		}
+		if (set_font_size != AltosDroidPreferences.font_size()) {
+			changes |= AltosDroid.SETUP_FONT_SIZE;
+			AltosDroidPreferences.set_font_size(set_font_size);
+		}
 		intent.putExtra(EXTRA_SETUP_CHANGES, changes);
 		setResult(Activity.RESULT_OK, intent);
 		finish();
 	}
 
 	private void add_strings(Spinner spinner, String[] strings, int def) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item);
 
 		for (int i = 0; i < strings.length; i++)
 			adapter.add(strings[i]);
@@ -139,12 +156,7 @@ public class SetupActivity extends Activity {
 	}
 
 	private void setBaud(int baud) {
-		try {
-			service.send(Message.obtain(null, TelemetryService.MSG_SETBAUD, baud));
-			set_telemetry_rate = baud;
-			add_change(AltosDroid.SETUP_BAUD);
-		} catch (RemoteException e) {
-		}
+		set_telemetry_rate = baud;
 	}
 
 	private int string_to_rate(String baud) {
@@ -197,7 +209,10 @@ public class SetupActivity extends Activity {
 			set_imperial_units = true;
 			break;
 		}
-		add_change(AltosDroid.SETUP_UNITS);
+	}
+
+	private void set_font_size(int pos) {
+		set_font_size = pos;
 	}
 
 	private int default_map_type_pos() {
@@ -211,7 +226,6 @@ public class SetupActivity extends Activity {
 
 	private void select_map_type(int pos) {
 		set_map_type = map_type_values[pos];
-		add_change(AltosDroid.SETUP_MAP_TYPE);
 	}
 
 	private int default_map_source_pos() {
@@ -234,7 +248,6 @@ public class SetupActivity extends Activity {
 			set_map_source = AltosDroidPreferences.MAP_SOURCE_OFFLINE;
 			break;
 		}
-		add_change(AltosDroid.SETUP_MAP_SOURCE);
 	}
 
 	private void manage_frequencies(){
@@ -249,6 +262,7 @@ public class SetupActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		AltosDebug.init(this);
@@ -265,6 +279,7 @@ public class SetupActivity extends Activity {
 		add_strings(select_rate, rates, default_rate_pos());
 		select_rate.setOnItemSelectedListener(new OnItemSelectedListener() {
 				public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+					AltosDebug.debug("rate selected pos %d id %d", pos, id);
 					select_rate(pos);
 				}
 				public void onNothingSelected(AdapterView<?> parent) {
@@ -276,6 +291,16 @@ public class SetupActivity extends Activity {
 		set_units.setOnItemSelectedListener(new OnItemSelectedListener() {
 				public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 					set_units(pos);
+				}
+				public void onNothingSelected(AdapterView<?> parent) {
+				}
+			});
+
+		font_size = (Spinner) findViewById(R.id.font_size);
+		add_strings(font_size, sizes, AltosDroidPreferences.font_size());
+		font_size.setOnItemSelectedListener(new OnItemSelectedListener() {
+				public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+					set_font_size(pos);
 				}
 				public void onNothingSelected(AdapterView<?> parent) {
 				}

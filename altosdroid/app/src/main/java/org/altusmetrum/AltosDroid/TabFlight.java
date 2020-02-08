@@ -83,16 +83,16 @@ public class TabFlight extends AltosDroidTab {
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (state != null) {
-			set_value(speed_view, AltosConvert.speed, 6, state.speed());
-			set_value(height_view, AltosConvert.height, 6, state.height());
-			set_value(max_speed_view, AltosConvert.speed, 6, state.max_speed());
-			set_value(max_height_view, AltosConvert.height, 6, state.max_height());
+			set_value(speed_view, AltosConvert.speed, 1, state.speed());
+			set_value(height_view, AltosConvert.height, 1, state.height());
+			set_value(max_speed_view, AltosConvert.speed, 1, state.max_speed());
+			set_value(max_height_view, AltosConvert.height, 1, state.max_height());
 			if (from_receiver != null) {
-				elevation_view.setText(AltosDroid.number("%3.0f°", from_receiver.elevation));
-				set_value(range_view, AltosConvert.distance, 6, from_receiver.range);
-				bearing_view.setText(AltosDroid.number("%3.0f°", from_receiver.bearing));
+				elevation_view.setText(AltosDroid.number("%1.0f°", from_receiver.elevation));
+				set_value(range_view, AltosConvert.distance, 1, from_receiver.range);
+				bearing_view.setText(AltosDroid.number("%1.0f°", from_receiver.bearing));
 				compass_view.setText(from_receiver.bearing_words(AltosGreatCircle.BEARING_LONG));
-				set_value(distance_view, AltosConvert.distance, 6, from_receiver.distance);
+				set_value(distance_view, AltosConvert.distance, 1, from_receiver.distance);
 			} else { 
 				elevation_view.setText("<unknown>");
 				range_view.setText("<unknown>");
@@ -108,7 +108,7 @@ public class TabFlight extends AltosDroidTab {
 			if (state.apogee_voltage == AltosLib.MISSING) {
 				apogee_view.setVisibility(View.GONE);
 			} else {
-				apogee_voltage_view.setText(AltosDroid.number("%4.2f V", state.apogee_voltage));
+				apogee_voltage_view.setText(AltosDroid.number("%1.2f V", state.apogee_voltage));
 				apogee_lights.set(state.apogee_voltage > 3.2, state.apogee_voltage == AltosLib.MISSING);
 				apogee_view.setVisibility(View.VISIBLE);
 			}
@@ -116,7 +116,7 @@ public class TabFlight extends AltosDroidTab {
 			if (state.main_voltage == AltosLib.MISSING) {
 				main_view.setVisibility(View.GONE);
 			} else {
-				main_voltage_view.setText(AltosDroid.number("%4.2f V", state.main_voltage));
+				main_voltage_view.setText(AltosDroid.number("%1.2f V", state.main_voltage));
 				main_lights.set(state.main_voltage > 3.2, state.main_voltage == AltosLib.MISSING);
 				main_view.setVisibility(View.VISIBLE);
 			}
