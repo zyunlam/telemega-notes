@@ -346,18 +346,6 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 		draw_bitmap(here, here_bitmap, here_off_x, here_off_y);
 	}
 
-	@Override public void invalidate() {
-		Rect r = new Rect();
-		getDrawingRect(r);
-		super.invalidate();
-	}
-
-	@Override public void invalidate(int l, int t, int r, int b) {
-		Rect rect = new Rect();
-		getDrawingRect(rect);
-		super.invalidate();
-	}
-
 	@Override
 	protected void onDraw(Canvas view_canvas) {
 		if (map == null) {

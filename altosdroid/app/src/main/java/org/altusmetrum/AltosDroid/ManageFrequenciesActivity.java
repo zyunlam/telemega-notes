@@ -99,7 +99,7 @@ class FrequencyAdapter extends ArrayAdapter<FrequencyItem> {
 		if (position == selected_item)
 			item.frequency_view.setBackgroundColor(Color.RED);
 		else
-			item.frequency_view.setBackgroundColor(Color.BLACK);
+			item.frequency_view.setBackgroundColor(0);
 		return item.frequency_view;
 	}
 }
@@ -240,7 +240,6 @@ public class ManageFrequenciesActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.manage_frequencies);
 
 		frequencies_view = (ListView) findViewById(R.id.frequencies);

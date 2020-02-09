@@ -82,7 +82,7 @@ public class AltosVoice {
 		if (!tts_enabled) return;
 		last_speak_time = now();
 		if (!quiet)
-			tts.speak(s, TextToSpeech.QUEUE_ADD, null);
+			tts.speak(s, TextToSpeech.QUEUE_ADD, null, null);
 	}
 
 	public synchronized long time_since_speak() {

@@ -78,7 +78,6 @@ public class IdleModeActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.idle_mode);
 
 		callsign = (EditText) findViewById(R.id.set_callsign);

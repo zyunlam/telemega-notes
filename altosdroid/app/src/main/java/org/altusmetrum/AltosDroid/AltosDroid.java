@@ -699,7 +699,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
 		mAgeNewColor   = mAgeView.getTextColors().getDefaultColor();
-		mAgeOldColor   = getResources().getColor(R.color.old_color);
+		mAgeOldColor   = getResources().getColor(R.color.old_color, getTheme());
 	}
 
 	private void ensureBluetooth() {

@@ -272,7 +272,6 @@ public class SetupActivity extends Activity {
 		AltosDroidPreferences.init(this);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.setup);
 
 		select_rate = (Spinner) findViewById(R.id.select_rate);

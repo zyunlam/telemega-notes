@@ -62,7 +62,6 @@ public class MapTypeActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.map_type);
 
 		hybrid = (Button) findViewById(R.id.map_type_hybrid);
