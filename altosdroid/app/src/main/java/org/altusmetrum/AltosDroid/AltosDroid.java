@@ -311,9 +311,23 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		if (new_telemetry_state != null)
 			telemetry_state = new_telemetry_state;
 
-		if (selected_serial == 0 || telemetry_state.get(selected_serial) == null) {
-			AltosDebug.debug("selected serial set to %d", selected_serial);
+		if (selected_frequency != AltosLib.MISSING) {
+			AltosState selected_state = telemetry_state.get(selected_serial);
+			AltosState latest_state = telemetry_state.get(telemetry_state.latest_serial);
+
+			if (selected_state != null && selected_state.frequency == selected_frequency) {
+				selected_frequency = AltosLib.MISSING;
+			} else if ((selected_state == null || selected_state.frequency != selected_frequency) &&
+				   (latest_state != null && latest_state.frequency == selected_frequency))
+			{
+				selected_frequency = AltosLib.MISSING;
+				selected_serial = telemetry_state.latest_serial;
+			}
+		}
+
+		if (!telemetry_state.containsKey(selected_serial)) {
 			selected_serial = telemetry_state.latest_serial;
+			AltosDebug.debug("selected serial set to %d", selected_serial);
 		}
 
 		int shown_serial = selected_serial;
@@ -989,9 +1003,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	}
 
 	double telem_frequency = 434.550;
+	double selected_frequency = AltosLib.MISSING;
 
 	void setFrequency(double freq) {
 		telem_frequency = freq;
+		selected_frequency = AltosLib.MISSING;
 		try {
 			mService.send(Message.obtain(null, TelemetryService.MSG_SETFREQUENCY, freq));
 			set_switch_time();
@@ -1134,6 +1150,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
 							 setFrequency(frequencies[item]);
+							 selected_frequency = frequencies[item].frequency;
 						 }
 					 });
 			AlertDialog alert_freq = builder_freq.create();
