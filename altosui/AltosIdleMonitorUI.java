@@ -297,6 +297,8 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 		thread = new AltosIdleMonitor(this, link, (boolean) remote);
 
+		thread.set_frequency(AltosUIPreferences.frequency(serial));
+
 		status_update = new AltosFlightStatusUpdate(flightStatus);
 
 		new javax.swing.Timer(100, status_update).start();
