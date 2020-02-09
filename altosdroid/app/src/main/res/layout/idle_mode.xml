@@ -32,6 +32,11 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:hint="@string/set_callsign_label"/>
+      <TextView android:id="@+id/frequency"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text=""
+		/>
       <Button android:id="@+id/connect_idle"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"

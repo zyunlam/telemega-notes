@@ -287,12 +287,12 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 
 		if (telem_state != null) {
 			for (int serial : rockets.keySet()) {
-				if (!telem_state.states.containsKey(serial))
+				if (!telem_state.containsKey(serial))
 					remove_rocket(serial);
 			}
 
-			for (int serial : telem_state.states.keySet()) {
-				set_rocket(serial, telem_state.states.get(serial));
+			for (int serial : telem_state.keySet()) {
+				set_rocket(serial, telem_state.get(serial));
 			}
 		}
 

@@ -52,6 +52,9 @@
 	<string name="title_other_devices">Other Available Devices</string>
 	<string name="button_scan">Scan for devices</string>
 
+	<!-- TrackerListActivity -->
+	<string name="freq_label">Freq</string>
+
 	<!-- Service -->
 	<string name="telemetry_service_label">AltosDroid Telemetry Service</string>
 	<string name="telemetry_service_started">Telemetry Service Started</string>

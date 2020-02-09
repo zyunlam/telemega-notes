@@ -35,11 +35,44 @@ public class TelemetryState {
 	double		frequency;
 	int		telemetry_rate;
 
+	boolean		idle_mode;
 	boolean		quiet;
 
-	HashMap<Integer,AltosState>	states;
+	private HashMap<Integer,AltosState>	states;
 
 	int		latest_serial;
+	long		latest_received_time;
+
+	public void put(int serial, AltosState state) {
+		long received_time = state.received_time;
+		if (received_time > latest_received_time || latest_serial == 0) {
+			latest_serial = serial;
+			latest_received_time = received_time;
+		}
+		states.put(serial, state);
+	}
+
+	public AltosState get(int serial) {
+		if (states.containsKey(serial))
+			return states.get(serial);
+		return null;
+	}
+
+	public void remove(int serial) {
+		states.remove((Integer) serial);
+	}
+
+	public Set<Integer> keySet() {
+		return states.keySet();
+	}
+
+	public Collection<AltosState> values() {
+		return states.values();
+	}
+
+	public boolean containsKey(int serial) {
+		return states.containsKey(serial);
+	}
 
 	public TelemetryState() {
 		connect = CONNECT_NONE;

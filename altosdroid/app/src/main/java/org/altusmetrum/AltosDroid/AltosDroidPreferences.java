@@ -47,6 +47,11 @@ public class AltosDroidPreferences extends AltosPreferences {
 
 	static int	map_source;
 
+	/* Tracker sort selection */
+	final static String trackerSortPreference = "TRACKER-SORT";
+
+	static int	tracker_sort;
+
 	public static void init(Context context) {
 		if (backend != null)
 			return;
@@ -62,6 +67,8 @@ public class AltosDroidPreferences extends AltosPreferences {
 			active_device_address = new DeviceAddress (address, name);
 
 		map_source = backend.getInt(mapSourcePreference, MAP_SOURCE_ONLINE);
+
+		tracker_sort = backend.getInt(trackerSortPreference, 0);
 	}
 
 	public static void set_active_device(DeviceAddress address) {
@@ -130,6 +137,23 @@ public class AltosDroidPreferences extends AltosPreferences {
 			if (font_size != new_font_size) {
 				font_size = new_font_size;
 				backend.putInt(fontSizePreference, font_size);
+				flush_preferences();
+			}
+		}
+	}
+
+
+	public static int tracker_sort() {
+		synchronized(backend) {
+			return tracker_sort;
+		}
+	}
+
+	public static void set_tracker_sort(int new_tracker_sort) {
+		synchronized(backend) {
+			if (tracker_sort != new_tracker_sort) {
+				tracker_sort = new_tracker_sort;
+				backend.putInt(trackerSortPreference, tracker_sort);
 				flush_preferences();
 			}
 		}
