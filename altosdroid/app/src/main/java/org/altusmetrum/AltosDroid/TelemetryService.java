@@ -133,7 +133,9 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 			case MSG_SETFREQUENCY:
 				AltosDebug.debug("MSG_SETFREQUENCY");
 				s.telemetry_state.frequency = (Double) msg.obj;
-				if (s.telemetry_state.connect == TelemetryState.CONNECT_CONNECTED) {
+				if (s.idle_monitor != null) {
+					s.idle_monitor.set_frequency(s.telemetry_state.frequency);
+				} else if (s.telemetry_state.connect == TelemetryState.CONNECT_CONNECTED) {
 					try {
 						s.altos_link.set_radio_frequency(s.telemetry_state.frequency);
 						s.altos_link.save_frequency();
