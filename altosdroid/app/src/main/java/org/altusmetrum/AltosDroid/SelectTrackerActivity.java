@@ -239,6 +239,9 @@ public class SelectTrackerActivity extends Activity implements OnTouchListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		int title_id = getIntent().getIntExtra(AltosDroid.EXTRA_TRACKERS_TITLE, R.id.select_tracker);
+		AltosDebug.debug("get title id 0x%x %s", title_id, getResources().getText(title_id));
+		setTitle(getResources().getText(title_id));
 		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 

@@ -95,12 +95,14 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	public static final int REQUEST_IGNITERS       = 6;
 	public static final int REQUEST_SETUP	       = 7;
 	public static final int REQUEST_SELECT_TRACKER = 8;
+	public static final int REQUEST_DELETE_TRACKER = 9;
 
 	public static final String EXTRA_IDLE_MODE = "idle_mode";
 	public static final String EXTRA_IDLE_RESULT = "idle_result";
 	public static final String EXTRA_FREQUENCY = "frequency";
 	public static final String EXTRA_TELEMETRY_SERVICE = "telemetry_service";
 	public static final String EXTRA_TRACKERS = "trackers";
+	public static final String EXTRA_TRACKERS_TITLE = "trackers_title";
 
 	// Setup result bits
 	public static final int SETUP_BAUD = 1;
@@ -883,6 +885,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			if (resultCode == Activity.RESULT_OK)
 				select_tracker(data);
 			break;
+		case REQUEST_DELETE_TRACKER:
+			if (resultCode == Activity.RESULT_OK)
+				delete_track(data);
+			break;
 		}
 	}
 
@@ -1080,36 +1086,44 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		select_tracker(serial, frequency);
 	}
 
-	void touch_trackers(Integer[] serials) {
-		AlertDialog.Builder builder_tracker = new AlertDialog.Builder(this);
-		builder_tracker.setTitle("Select Tracker");
-
-		final Tracker[] my_trackers = new Tracker[serials.length + 1];
-
-		my_trackers[0] = new Tracker(null);
-
-		for (int i = 0; i < serials.length; i++) {
-			AltosState	s = telemetry_state.get(serials[i]);
-			my_trackers[i+1] = new Tracker(s);
-		}
-		builder_tracker.setItems(my_trackers,
-					 new DialogInterface.OnClickListener() {
-						 public void onClick(DialogInterface dialog, int item) {
-							 if (item == 0)
-								 select_tracker(0, 0.0);
-							 else
-								 select_tracker(my_trackers[item].serial, my_trackers[item].frequency);
-						 }
-					 });
-		AlertDialog alert_tracker = builder_tracker.create();
-		alert_tracker.show();
-	}
-
 	void delete_track(int serial) {
 		try {
 			mService.send(Message.obtain(null, TelemetryService.MSG_DELETE_SERIAL, (Integer) serial));
 		} catch (Exception ex) {
 		}
+	}
+
+	void delete_track(Intent data) {
+		int serial = data.getIntExtra(SelectTrackerActivity.EXTRA_SERIAL_NUMBER, 0);
+		if (serial != 0)
+			delete_track(serial);
+	}
+
+	void start_select_tracker(Tracker[] select_trackers, int title_id, int request) {
+		Intent intent = new Intent(this, SelectTrackerActivity.class);
+		AltosDebug.debug("put title id 0x%x %s", title_id, getResources().getString(title_id));
+		intent.putExtra(EXTRA_TRACKERS_TITLE, title_id);
+		if (select_trackers != null) {
+			ArrayList<Tracker> tracker_array = new ArrayList<Tracker>(Arrays.asList(select_trackers));
+			intent.putParcelableArrayListExtra(EXTRA_TRACKERS, tracker_array);
+		} else {
+			intent.putExtra(EXTRA_TRACKERS, (Parcelable[]) null);
+		}
+		startActivityForResult(intent, request);
+	}
+
+	void start_select_tracker(Tracker[] select_trackers) {
+		start_select_tracker(select_trackers, R.string.select_tracker, REQUEST_SELECT_TRACKER);
+	}
+
+	void touch_trackers(Integer[] serials) {
+		Tracker[] my_trackers = new Tracker[serials.length];
+
+		for (int i = 0; i < serials.length; i++) {
+			AltosState	s = telemetry_state.get(serials[i]);
+			my_trackers[i] = new Tracker(s);
+		}
+		start_select_tracker(my_trackers);
 	}
 
 	@Override
@@ -1145,7 +1159,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				frequency_strings[i] = frequencies[i].toString();
 
 			AlertDialog.Builder builder_freq = new AlertDialog.Builder(this);
-			builder_freq.setTitle("Pick a frequency");
+			builder_freq.setTitle("Select Frequency");
 			builder_freq.setItems(frequency_strings,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
@@ -1157,32 +1171,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			alert_freq.show();
 			return true;
 		case R.id.select_tracker:
-			serverIntent = new Intent(this, SelectTrackerActivity.class);
-			if (trackers != null) {
-				ArrayList<Tracker> tracker_array = new ArrayList<Tracker>(Arrays.asList(trackers));
-				serverIntent.putParcelableArrayListExtra(EXTRA_TRACKERS, tracker_array);
-			} else {
-				serverIntent.putExtra(EXTRA_TRACKERS, (Parcelable[]) null);
-			}
-			startActivityForResult(serverIntent, REQUEST_SELECT_TRACKER);
+			start_select_tracker(trackers);
 			return true;
 		case R.id.delete_track:
-			if (trackers != null) {
-				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
-				builder_serial.setTitle("Delete a track");
-				final Tracker[] my_trackers = new Tracker[trackers.length - 1];
-				for (int i = 0; i < trackers.length - 1; i++)
-					my_trackers[i] = trackers[i+1];
-				builder_serial.setItems(my_trackers,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int item) {
-									delete_track(my_trackers[item].serial);
-								}
-							});
-				AlertDialog alert_serial = builder_serial.create();
-				alert_serial.show();
-
-			}
+			if (trackers != null && trackers.length > 0)
+				start_select_tracker(trackers, R.string.delete_track, REQUEST_DELETE_TRACKER);
 			return true;
 		case R.id.idle_mode:
 			serverIntent = new Intent(this, IdleModeActivity.class);
