@@ -78,7 +78,6 @@ ALTOS_SRC = \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
 	ao_report.c \
-	ao_i2c_stm.c \
 	ao_bmx160.c \
 	ao_convert_pa.c \
 	ao_convert_volt.c \

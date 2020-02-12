@@ -49,7 +49,6 @@ main(void)
 	ao_led_on(LEDS_AVAILABLE);
 	ao_timer_init();
 
-	ao_i2c_init();
 	ao_spi_init();
 	ao_dma_init();
 	ao_exti_init();
