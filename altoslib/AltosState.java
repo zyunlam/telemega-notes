@@ -842,6 +842,8 @@ public class AltosState extends AltosDataListener {
 							gps.climb_rate * gps.climb_rate), time);
 			if (gps.course != AltosLib.MISSING)
 				gps_course.set(gps.course, time);
+		} else if (state() == AltosLib.ao_flight_pad || state() == AltosLib.ao_flight_stateless) {
+			set_npad(0);
 		}
 		if (gps.lat != 0 && gps.lon != 0 &&
 		    pad_lat != AltosLib.MISSING &&
