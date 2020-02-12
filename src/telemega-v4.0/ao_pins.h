@@ -47,7 +47,7 @@
 #define HAS_SERIAL_1		0
 #define USE_SERIAL_1_STDIN	0
 #define SERIAL_1_PB6_PB7	0
-#define SERIAL_1_PA9_PA10	1
+#define SERIAL_1_PA9_PA10	0
 
 #define HAS_SERIAL_2		0
 #define USE_SERIAL_2_STDIN	0
@@ -89,8 +89,8 @@
 
 #define HAS_SPI_1		1
 #define SPI_1_PA5_PA6_PA7	1	/* Barometer */
-#define SPI_1_PB3_PB4_PB5	0
-#define SPI_1_PE13_PE14_PE15	1	/* Accelerometer, Gyro */
+#define SPI_1_PB3_PB4_PB5	1	/* Accelerometer */
+#define SPI_1_PE13_PE14_PE15	1	/* IMU */
 #define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
 
 #define HAS_SPI_2		1
@@ -98,13 +98,8 @@
 #define SPI_2_PD1_PD3_PD4	0
 #define SPI_2_OSPEEDR		STM_OSPEEDR_10MHz
 
-#define SPI_2_PORT		(&stm_gpiob)
-#define SPI_2_SCK_PIN		13
-#define SPI_2_MISO_PIN		14
-#define SPI_2_MOSI_PIN		15
-
-#define HAS_I2C_1		1
-#define I2C_1_PB8_PB9		1
+#define HAS_I2C_1		0
+#define I2C_1_PB8_PB9		0
 
 #define HAS_I2C_2		0
 #define I2C_2_PB10_PB11		0
@@ -151,7 +146,7 @@
 #define AO_PYRO_PIN_1	7
 
 /* Pyro C */
-#define AO_PYRO_PORT_2	(&stm_gpiob)
+#define AO_PYRO_PORT_2	(&stm_gpiod)
 #define AO_PYRO_PIN_2	5
 
 /* Pyro D */
