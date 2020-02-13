@@ -35,13 +35,15 @@ class AltosReplay extends AltosDataListener implements Runnable {
 	boolean		done = false;
 
 	public void set_time(double time) {
-		if (last_time != AltosLib.MISSING) {
-			semaphore.release();
-			double	delay = Math.min(time - last_time,10);
-			if (delay > 0) {
-				try {
-					Thread.sleep((int) (delay * 1000));
-				} catch (InterruptedException ie) {
+		if (time > -2) {
+			if (last_time != AltosLib.MISSING) {
+				semaphore.release();
+				double	delay = Math.min(time - last_time,10);
+				if (delay > 0) {
+					try {
+						Thread.sleep((int) (delay * 1000));
+					} catch (InterruptedException ie) {
+					}
 				}
 			}
 		}
@@ -108,31 +110,17 @@ public class AltosReplayReader extends AltosFlightReader {
 	File		file;
 	AltosReplay	replay;
 	Thread		t;
-	int		reads;
 
 	public AltosCalData cal_data() {
 		return replay.state.cal_data();
 	}
 
 	public AltosState read() {
-		switch (reads) {
-		case 0:
-			/* Tell the display that we're in pad mode */
-			replay.state.set_state(AltosLib.ao_flight_pad);
-			break;
-		case 1:
-			t = new Thread(replay);
-			t.start();
-			/* fall through */
-		default:
-			/* Wait for something to change */
-			try {
-				replay.semaphore.acquire();
-			} catch (InterruptedException ie) {
-			}
-			break;
+		/* Wait for something to change */
+		try {
+			replay.semaphore.acquire();
+		} catch (InterruptedException ie) {
 		}
-		reads++;
 
 		/* When done, let the display know */
 		if (replay.done)
@@ -149,9 +137,10 @@ public class AltosReplayReader extends AltosFlightReader {
 	public File backing_file() { return file; }
 
 	public AltosReplayReader(AltosRecordSet record_set, File in_file) {
-		reads = 0;
 		file = in_file;
 		name = file.getName();
 		replay = new AltosReplay(record_set);
+		t = new Thread(replay);
+		t.start();
 	}
 }
