@@ -201,9 +201,9 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 				if (state.gps.lon != AltosLib.MISSING)
 					info_add_deg(1, "Longitude", state.gps.lon, 'E', 'W');
 				if (state.gps.alt != AltosLib.MISSING)
-					info_add_row(1, "GPS altitude", "%8.1f", state.gps.alt);
+					info_add_row(1, "GPS altitude", "%8.1f m", state.gps.alt);
 				if (state.gps_height != AltosLib.MISSING)
-					info_add_row(1, "GPS height", "%8.1f", state.gps_height);
+					info_add_row(1, "GPS height", "%8.1f m", state.gps_height);
 
 				if (state.gps.ground_speed != AltosLib.MISSING && state.gps.course != AltosLib.MISSING)
 					info_add_row(1, "GPS ground speed", "%6.1f m/s %3d°",
