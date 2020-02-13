@@ -70,6 +70,10 @@ public abstract class AltosDataListener {
 		return time;
 	}
 
+	public String state_name() {
+		return cal_data().state_name();
+	}
+
 	public void set_state(int state) {
 		cal_data().set_state(state);
 	}

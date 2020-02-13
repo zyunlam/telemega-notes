@@ -860,10 +860,6 @@ public class AltosState extends AltosDataListener {
 		}
 	}
 
-	public String state_name() {
-		return AltosLib.state_name(state());
-	}
-
 	public void set_state(int state) {
 		super.set_state(state);
 		ascent = (AltosLib.ao_flight_boost <= state() &&

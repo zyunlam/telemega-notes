@@ -247,6 +247,10 @@ public class AltosCalData {
 
 	public int		state = AltosLib.MISSING;
 
+	public String state_name() {
+		return AltosLib.state_name(state);
+	}
+
 	public void set_state(int state) {
 		if (state >= AltosLib.ao_flight_boost && boost_tick == AltosLib.MISSING)
 			set_boost_tick();
