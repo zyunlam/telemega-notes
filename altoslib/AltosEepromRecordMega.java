@@ -217,9 +217,9 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 			cal_data.set_flight(flight());
 			cal_data.set_ground_accel(ground_accel());
 			cal_data.set_ground_pressure(ground_pres());
-			listener.set_accel_ground(ground_accel_along(),
-						  ground_accel_across(),
-						  ground_accel_through());
+			listener.set_accel_ground(cal_data.accel_along(ground_accel_along()),
+						  cal_data.accel_across(ground_accel_across()),
+						  cal_data.accel_through(ground_accel_through()));
 			cal_data.set_gyro_zero(ground_roll() / 512.0,
 					       ground_pitch() / 512.0,
 					       ground_yaw() / 512.0);

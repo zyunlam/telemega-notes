@@ -391,16 +391,18 @@ public class AltosFlightSeries extends AltosDataListener {
 		if (accel_ground_across == AltosLib.MISSING)
 			return;
 
-		if (cal_data().pad_orientation == AltosLib.MISSING)
+		AltosCalData cal_data = cal_data();
+
+		if (cal_data.pad_orientation == AltosLib.MISSING)
 			return;
 
-		if (cal_data().accel_zero_across == AltosLib.MISSING)
+		if (cal_data.accel_zero_across == AltosLib.MISSING)
 			return;
 
-		AltosRotation rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data().accel_zero_across),
-							   AltosIMU.convert_accel(accel_ground_through - cal_data().accel_zero_through),
-							   AltosIMU.convert_accel(accel_ground_along - cal_data().accel_zero_along),
-							   cal_data().pad_orientation);
+		AltosRotation rotation = new AltosRotation(accel_ground_across,
+							   accel_ground_through,
+							   accel_ground_along,
+							   cal_data.pad_orientation);
 		double prev_time = ground_time;
 
 		orient_series = add_series(orient_name, AltosConvert.orient);
