@@ -28,12 +28,15 @@ class AltosIdler {
 	int[]	idlers;
 
 	static final int	idle_gps = 0;
-	static final int	idle_imu = 1;
-	static final int	idle_imu_em_v2 = 2;
-	static final int	idle_mag = 3;
-	static final int	idle_mma655x = 4;
-	static final int	idle_ms5607 = 5;
-	static final int	idle_adxl375 = 6;
+	static final int	idle_imu_tm_v1_v2 = 1;
+	static final int	idle_imu_tm_v3 = 2;
+	static final int	idle_imu_tm_v4 = 3;
+	static final int	idle_imu_em_v1 = 4;
+	static final int	idle_imu_em_v2 = 5;
+	static final int	idle_mag = 6;
+	static final int	idle_mma655x = 7;
+	static final int	idle_ms5607 = 8;
+	static final int	idle_adxl375 = 9;
 
 	static final int	idle_sensor_tm = 10;
 	static final int	idle_sensor_metrum = 11;
@@ -51,11 +54,20 @@ class AltosIdler {
 			case idle_gps:
 				AltosGPS.provide_data(listener, link);
 				break;
-			case idle_imu:
-				AltosIMU.provide_data(listener, link, AltosIMU.orient_telemega);
+			case idle_imu_tm_v1_v2:
+				AltosIMU.provide_data(listener, link, AltosIMU.imu_type_telemega_v1_v2);
+				break;
+			case idle_imu_tm_v3:
+				AltosIMU.provide_data(listener, link, AltosIMU.imu_type_telemega_v3);
+				break;
+			case idle_imu_tm_v4:
+				AltosIMU.provide_data(listener, link, AltosIMU.imu_type_telemega_v4);
+				break;
+			case idle_imu_em_v1:
+				AltosIMU.provide_data(listener, link, AltosIMU.imu_type_easymega_v1);
 				break;
 			case idle_imu_em_v2:
-				AltosIMU.provide_data(listener, link, AltosIMU.orient_easymega_v2);
+				AltosIMU.provide_data(listener, link, AltosIMU.imu_type_easymega_v2);
 				break;
 			case idle_mag:
 				AltosMag.provide_data(listener, link);
@@ -154,30 +166,36 @@ public class AltosIdleFetch implements AltosDataProvider {
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_mma655x,
 			       AltosIdler.idle_ms5607,
-			       AltosIdler.idle_imu, AltosIdler.idle_mag,
+			       AltosIdler.idle_imu_tm_v1_v2, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("TeleMega-v1",
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_mma655x,
 			       AltosIdler.idle_ms5607,
-			       AltosIdler.idle_imu, AltosIdler.idle_mag,
+			       AltosIdler.idle_imu_tm_v1_v2, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("TeleMega-v2",
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_mma655x,
 			       AltosIdler.idle_ms5607,
-			       AltosIdler.idle_imu, AltosIdler.idle_mag,
+			       AltosIdler.idle_imu_tm_v1_v2, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("TeleMega-v3",
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_mma655x,
 			       AltosIdler.idle_ms5607,
-			       AltosIdler.idle_imu,
+			       AltosIdler.idle_imu_tm_v3,
+			       AltosIdler.idle_sensor_mega),
+		new AltosIdler("TeleMega-v4",
+			       AltosIdler.idle_gps,
+			       AltosIdler.idle_adxl375,
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_imu_tm_v4,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("EasyMega-v1",
 			       AltosIdler.idle_mma655x,
 			       AltosIdler.idle_ms5607,
-			       AltosIdler.idle_imu, AltosIdler.idle_mag,
+			       AltosIdler.idle_imu_em_v1, AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("EasyMega-v2",
 			       AltosIdler.idle_adxl375,

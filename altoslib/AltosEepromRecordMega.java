@@ -33,6 +33,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return data32(16);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(14);
@@ -45,6 +46,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return data32(20);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(16);
@@ -57,6 +59,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return data32(24);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(18);
@@ -82,11 +85,28 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int mag_z() { return data16(22); }
 	private int mag_y() { return data16(24); }
 
+	private int imu_type() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+			return AltosIMU.imu_type_telemega_v1_v2;
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+			return AltosIMU.imu_type_telemega_v3;
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+			return AltosIMU.imu_type_easymega_v2;
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
+			return AltosIMU.imu_type_telemega_v4;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
 	private int accel_across() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return accel_x();
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 			return -accel_y();
@@ -102,6 +122,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return accel_y();
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return accel_x();
 		default:
 			return AltosLib.MISSING;
@@ -132,6 +153,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return gyro_y();
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return gyro_x();
 		default:
 			return AltosLib.MISSING;
@@ -149,6 +171,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return mag_x();
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return -mag_y();
 		default:
 			return AltosLib.MISSING;
@@ -162,6 +185,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return mag_y();
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return mag_x();
 		default:
 			return AltosLib.MISSING;
@@ -211,6 +235,8 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		super.provide_data(listener, cal_data);
 
 		AltosGPS	gps;
+
+		cal_data.set_imu_type(imu_type());
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:

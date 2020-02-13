@@ -34,18 +34,90 @@ public class AltosIMU implements Cloneable {
 	public int		mag_y = AltosLib.MISSING;
 	public int		mag_z = AltosLib.MISSING;
 
-	public static final double	counts_per_g = 2048.0;
+	public static final double	counts_per_g_mpu = 2048.0;
+	public static final double	counts_per_g_bmx = 2048.0;
 
-	public static double convert_accel(double counts) {
-		return counts / counts_per_g * AltosConvert.gravity;
+	private static double counts_per_g(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
+		case imu_type_easymega_v2:
+			return counts_per_g_mpu;
+		case  imu_type_telemega_v4:
+			return counts_per_g_bmx;
+		default:
+			return AltosLib.MISSING;
+		}
 	}
 
-	/* In radians */
-	public static final double 	GYRO_FULLSCALE_DEGREES = 2000.0;
-	public static final double	GYRO_COUNTS = 32767.0;
+	public static double convert_accel(double counts, int imu_type) {
+		return counts / counts_per_g(imu_type) * AltosConvert.gravity;
+	}
 
-	public static double gyro_degrees_per_second(double counts, double cal) {
-		return (counts - cal) * GYRO_FULLSCALE_DEGREES / GYRO_COUNTS;
+	public static final double 	GYRO_FULLSCALE_DEGREES_MPU = 2000.0;
+	public static final double	GYRO_COUNTS_MPU = 32767.0;
+	public static final double	counts_per_degree_mpu = GYRO_COUNTS_MPU / GYRO_FULLSCALE_DEGREES_MPU;
+	public static final double 	GYRO_FULLSCALE_DEGREES_BMX = 2000.0;
+	public static final double	GYRO_COUNTS_BMX = 32767.0;
+	public static final double	counts_per_degree_bmx = GYRO_COUNTS_BMX / GYRO_FULLSCALE_DEGREES_BMX;
+
+	private static double counts_per_degree(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
+		case imu_type_easymega_v2:
+			return counts_per_degree_mpu;
+		case  imu_type_telemega_v4:
+			return counts_per_degree_bmx;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	public static double gyro_degrees_per_second(double counts, int imu_type) {
+		return counts / counts_per_degree(imu_type);
+	}
+
+	public static final int imu_axis_x = 0;
+	public static final int imu_axis_y = 1;
+	public static final int imu_axis_z = 2;
+
+	public static final double MAG_FULLSCALE_GAUSS_MPU = 48.00;	/* 4800µT */
+	public static final double MAG_COUNTS_MPU = 32767.0;
+	public static final double counts_per_gauss_mpu = MAG_COUNTS_MPU / MAG_FULLSCALE_GAUSS_MPU;
+
+	public static final double MAG_FULLSCALE_GAUSS_BMX_XY = 11.50;	/* 1150µT */
+	public static final double MAG_FULLSCALE_GAUSS_BMX_Z = 25.00;	/* 2500µT */
+	public static final double MAG_COUNTS_BMX = 32767.0;
+	public static final double counts_per_gauss_bmx_xy = MAG_COUNTS_BMX / MAG_FULLSCALE_GAUSS_BMX_XY;
+	public static final double counts_per_gauss_bmx_z = MAG_COUNTS_BMX / MAG_FULLSCALE_GAUSS_BMX_Z;
+
+	public static double counts_per_gauss(int imu_type, int axis) {
+		switch(imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_easymega_v1:
+			return AltosMag.counts_per_gauss;
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v2:
+			return counts_per_gauss_mpu;
+		case imu_type_telemega_v4:
+			switch (axis) {
+			case imu_axis_x:
+			case imu_axis_y:
+				return counts_per_gauss_bmx_xy;
+			case imu_axis_z:
+				return counts_per_gauss_bmx_z;
+			}
+			/* fall through */
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	public static double convert_gauss(double counts, int imu_type, int imu_axis) {
+		return counts / counts_per_gauss(imu_type, imu_axis);
 	}
 
 	public boolean parse_string(String line) {
@@ -53,6 +125,8 @@ public class AltosIMU implements Cloneable {
 			return false;
 
 		String[] items = line.split("\\s+");
+
+		System.out.printf("length %d\n", items.length);
 
 		if (items.length >= 8) {
 			accel_x = Integer.parseInt(items[1]);
@@ -88,103 +162,163 @@ public class AltosIMU implements Cloneable {
 		return n;
 	}
 
-	public static final int orient_telemega = 0;
-	public static final int orient_easymega_v2 = 1;
+	public static final int imu_type_telemega_v1_v2 = 0;	/* MPU6000 */
+	public static final int imu_type_telemega_v3 = 1;	/* MPU9250 */
+	public static final int imu_type_telemega_v4 = 2;	/* BMX160 */
 
-	private int accel_across(int orient) {
-		switch (orient) {
-		case orient_telemega:
+	public static final int imu_type_easymega_v1 = 3;	/* MPU6000 */
+	public static final int imu_type_easymega_v2 = 4;	/* MPU9250 */
+
+	private int accel_across(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
 			return accel_x;
-		case orient_easymega_v2:
+		case imu_type_easymega_v2:
+			return -accel_y;
+		case  imu_type_telemega_v4:
 			return -accel_y;
 		default:
 			return AltosLib.MISSING;
 		}
 	}
 
-	private int accel_along(int orient) {
-		switch (orient) {
-		case orient_telemega:
+	private int accel_along(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
 			return accel_y;
-		case orient_easymega_v2:
+		case imu_type_easymega_v2:
+		case imu_type_telemega_v4:
 			return accel_x;
 		default:
 			return AltosLib.MISSING;
 		}
 	}
 
-	private int accel_through(int orient) {
+	private int accel_through(int imu_type) {
 		return accel_z;
 	}
 
-	private int gyro_roll(int orient) {
-		switch (orient) {
-		case orient_telemega:
+	private int gyro_roll(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
 			return gyro_y;
-		case orient_easymega_v2:
+		case imu_type_easymega_v2:
+		case imu_type_telemega_v4:
 			return gyro_x;
 		default:
 			return AltosLib.MISSING;
 		}
 	}
 
-	private int gyro_pitch(int orient) {
-		switch (orient) {
-		case orient_telemega:
+	private int gyro_pitch(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
 			return gyro_x;
-		case orient_easymega_v2:
+		case imu_type_easymega_v2:
+		case imu_type_telemega_v4:
 			return -gyro_y;
 		default:
 			return AltosLib.MISSING;
 		}
 	}
 
-	private int gyro_yaw(int orient) {
+	private int gyro_yaw(int imu_type) {
 		return gyro_z;
 	}
 
-	private int mag_across(int orient) {
-		switch (orient) {
-		case orient_telemega:
+	public static int mag_across_axis(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
+			return imu_axis_x;
+		case imu_type_telemega_v4:
+		case imu_type_easymega_v2:
+			return imu_axis_y;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_across(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
 			return mag_x;
-		case orient_easymega_v2:
+		case imu_type_telemega_v4:
+		case imu_type_easymega_v2:
 			return -mag_y;
 		default:
 			return AltosLib.MISSING;
 		}
 	}
 
-	private int mag_along(int orient) {
-		switch (orient) {
-		case orient_telemega:
+	public static int mag_along_axis(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
+			return imu_axis_y;
+		case imu_type_easymega_v2:
+		case imu_type_telemega_v4:
+			return imu_axis_x;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_along(int imu_type) {
+		switch (imu_type) {
+		case imu_type_telemega_v1_v2:
+		case imu_type_telemega_v3:
+		case imu_type_easymega_v1:
 			return mag_y;
-		case orient_easymega_v2:
+		case imu_type_easymega_v2:
+		case imu_type_telemega_v4:
 			return mag_x;
 		default:
 			return AltosLib.MISSING;
 		}
 	}
 
-	private int mag_through(int orient) {
+	public static int mag_through_axis(int imu_type) {
+		return imu_axis_z;
+	}
+
+	private int mag_through(int imu_type) {
 		return mag_z;
 	}
 
-	static public void provide_data(AltosDataListener listener, AltosLink link, int orient) throws InterruptedException {
+	static public void provide_data(AltosDataListener listener, AltosLink link, int imu_type) throws InterruptedException {
 		try {
 			AltosIMU	imu = new AltosIMU(link);
 			AltosCalData	cal_data = listener.cal_data();
 
+			cal_data.set_imu_type(imu_type);
+
 			if (imu != null) {
-				listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll(orient)),
-						  cal_data.gyro_pitch(imu.gyro_pitch(orient)),
-						  cal_data.gyro_yaw(imu.gyro_yaw(orient)));
-				listener.set_accel_ground(imu.accel_along(orient),
-							  imu.accel_across(orient),
-							  imu.accel_through(orient));
+				listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll(imu_type)),
+						  cal_data.gyro_pitch(imu.gyro_pitch(imu_type)),
+						  cal_data.gyro_yaw(imu.gyro_yaw(imu_type)));
+				listener.set_accel_ground(cal_data.accel_along(imu.accel_along(imu_type)),
+							  cal_data.accel_across(imu.accel_across(imu_type)),
+							  cal_data.accel_through(imu.accel_through(imu_type)));
+				listener.set_accel(cal_data.accel_along(imu.accel_along(imu_type)),
+						   cal_data.accel_across(imu.accel_across(imu_type)),
+						   cal_data.accel_through(imu.accel_through(imu_type)));
 				if (imu.mag_x != AltosLib.MISSING) {
-					listener.set_mag(cal_data.mag_along(imu.mag_along(orient)),
-							 cal_data.mag_across(imu.mag_across(orient)),
-							 cal_data.mag_through(imu.mag_through(orient)));
+					listener.set_mag(cal_data.mag_along(imu.mag_along(imu_type)),
+							 cal_data.mag_across(imu.mag_across(imu_type)),
+							 cal_data.mag_through(imu.mag_through(imu_type)));
 				}
 			}
 		} catch (TimeoutException te) {

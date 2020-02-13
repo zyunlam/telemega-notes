@@ -301,6 +301,12 @@ public class AltosCalData {
 		return temp_gps;
 	}
 
+	public int	imu_type = AltosLib.MISSING;;
+
+	public void set_imu_type(int imu_type) {
+		this.imu_type = imu_type;
+	}
+
 	public double	accel_zero_along, accel_zero_across, accel_zero_through;
 
 	public void set_accel_zero(double zero_along, double zero_across, double zero_through) {
@@ -312,15 +318,15 @@ public class AltosCalData {
 	}
 
 	public double accel_along(double counts) {
-		return AltosIMU.convert_accel(counts - accel_zero_along);
+		return AltosIMU.convert_accel(counts - accel_zero_along, imu_type);
 	}
 
 	public double accel_across(double counts) {
-		return AltosIMU.convert_accel(counts - accel_zero_across);
+		return AltosIMU.convert_accel(counts - accel_zero_across, imu_type);
 	}
 
 	public double accel_through(double counts) {
-		return AltosIMU.convert_accel(counts - accel_zero_through);
+		return AltosIMU.convert_accel(counts - accel_zero_through, imu_type);
 	}
 
 	public double	gyro_zero_roll,	gyro_zero_pitch, gyro_zero_yaw;
@@ -338,19 +344,19 @@ public class AltosCalData {
 		if (gyro_zero_roll == AltosLib.MISSING || counts == AltosLib.MISSING)
 			return AltosLib.MISSING;
 
-		return AltosIMU.gyro_degrees_per_second(counts, gyro_zero_roll);
+		return AltosIMU.gyro_degrees_per_second(counts - gyro_zero_roll, imu_type);
 	}
 
 	public double gyro_pitch(double counts) {
 		if (gyro_zero_pitch == AltosLib.MISSING || counts == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosIMU.gyro_degrees_per_second(counts, gyro_zero_pitch);
+		return AltosIMU.gyro_degrees_per_second(counts - gyro_zero_pitch, imu_type);
 	}
 
 	public double gyro_yaw(double counts) {
 		if (gyro_zero_yaw == AltosLib.MISSING || counts == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosIMU.gyro_degrees_per_second(counts, gyro_zero_yaw);
+		return AltosIMU.gyro_degrees_per_second(counts - gyro_zero_yaw, imu_type);
 	}
 
 	private double gyro_zero_overflow(double first) {
@@ -383,19 +389,19 @@ public class AltosCalData {
 	public double mag_along(double along) {
 		if (along == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosMag.convert_gauss(along);
+		return AltosIMU.convert_gauss(along, imu_type, AltosIMU.mag_along_axis(imu_type));
 	}
 
 	public double mag_across(double across) {
 		if (across == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosMag.convert_gauss(across);
+		return AltosIMU.convert_gauss(across, imu_type, AltosIMU.mag_across_axis(imu_type));
 	}
 
 	public double mag_through(double through) {
 		if (through == AltosLib.MISSING)
 			return AltosLib.MISSING;
-		return AltosMag.convert_gauss(through);
+		return AltosIMU.convert_gauss(through, imu_type, AltosIMU.mag_through_axis(imu_type));
 	}
 
 	public AltosCalData() {

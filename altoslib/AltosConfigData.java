@@ -200,6 +200,7 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return 4095 - value;
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 			return -value;

@@ -37,8 +37,22 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 	int	mag_z() { return int16(28); }
 	int	mag_y() { return int16(30); }
 
-	public AltosTelemetryMegaSensor(int[] bytes) throws AltosCRCException {
+	int imu_type;
+
+	public AltosTelemetryMegaSensor(int[] bytes, int imu_type) throws AltosCRCException {
 		super(bytes);
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+			if (serial() < 3000)
+				imu_type = AltosIMU.imu_type_telemega_v1_v2;
+			else
+				imu_type = AltosIMU.imu_type_telemega_v3;
+			break;
+		default:
+			break;
+		}
+		this.imu_type = imu_type;
 	}
 
 	public void provide_data(AltosDataListener listener) {
@@ -51,6 +65,7 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		listener.set_temperature(temp() / 100.0);
 
 		listener.set_orient(orient());
+		cal_data.set_imu_type(imu_type);
 
 		/* XXX we have no calibration data for these values */
 
