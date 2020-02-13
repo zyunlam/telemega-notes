@@ -391,7 +391,7 @@ public class AltosGPS implements Cloneable {
 		try {
 			AltosGPS gps = new AltosGPS(link, link.config_data());
 			if (gps != null)
-				listener.set_gps(gps);
+				listener.set_gps(gps, true, true);
 		} catch (TimeoutException te) {
 		}
 	}

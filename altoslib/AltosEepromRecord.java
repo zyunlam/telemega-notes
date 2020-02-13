@@ -106,7 +106,7 @@ public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord>
 		if (!AltosLib.is_gps_cmd(cmd())) {
 			AltosGPS gps = listener.temp_gps();
 			if (gps != null)
-				listener.set_gps(gps);
+				listener.set_gps(gps, true, true);
 		}
 	}
 

@@ -884,8 +884,8 @@ public class AltosState extends AltosDataListener {
 		received_time = ms;
 	}
 
-	public void set_gps(AltosGPS gps) {
-		super.set_gps(gps);
+	public void set_gps(AltosGPS gps, boolean set_location, boolean set_sats) {
+		super.set_gps(gps, set_location, set_sats);
 		if (gps != null) {
 			this.gps = gps;
 			update_gps();

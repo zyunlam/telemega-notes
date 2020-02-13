@@ -123,7 +123,7 @@ public class AltosEepromRecordGps extends AltosEepromRecord {
 				if (gps.vdop < 0.8)
 					gps.vdop += 2.56;
 			}
-			listener.set_gps(gps);
+			listener.set_gps(gps, true, true);
 			break;
 		}
 	}

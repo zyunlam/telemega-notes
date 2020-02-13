@@ -118,7 +118,7 @@ public abstract class AltosDataListener {
 	public abstract void set_apogee_voltage(double volts);
 	public abstract void set_main_voltage(double volts);
 
-	public void set_gps(AltosGPS gps) {
+	public void set_gps(AltosGPS gps, boolean set_location, boolean set_sats) {
 		AltosCalData cal_data = cal_data();
 		cal_data.set_cal_gps(gps);
 	}

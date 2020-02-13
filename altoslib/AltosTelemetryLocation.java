@@ -78,6 +78,6 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
 		}
-		listener.set_gps(gps);
+		listener.set_gps(gps, true, false);
 	}
 }

@@ -52,6 +52,6 @@ public class AltosTelemetrySatellite extends AltosTelemetryStandard {
 		AltosGPS	gps = listener.make_temp_gps(true);
 
 		gps.cc_gps_sat = sats();
-		listener.set_gps(gps);
+		listener.set_gps(gps, false, true);
 	}
 }

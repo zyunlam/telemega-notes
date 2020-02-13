@@ -70,7 +70,10 @@ class AltosReplay extends AltosDataListener implements Runnable {
 	public void set_apogee_voltage(double volts) { state.set_apogee_voltage(volts); }
 	public void set_main_voltage(double volts) { state.set_main_voltage(volts); }
 
-	public void set_gps(AltosGPS gps) { super.set_gps(gps); state.set_gps(gps); }
+	public void set_gps(AltosGPS gps, boolean set_location, boolean set_sats) {
+		super.set_gps(gps, set_location, set_sats);
+		state.set_gps(gps, set_location, set_sats);
+	}
 
 	public void set_orient(double orient) { state.set_orient(orient); }
 	public void set_gyro(double roll, double pitch, double yaw) { state.set_gyro(roll, pitch, yaw); }

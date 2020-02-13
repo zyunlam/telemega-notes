@@ -542,63 +542,68 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String gps_vdop_name = "GPS Vertical Dilution of Precision";
 	public static final String gps_hdop_name = "GPS Horizontal Dilution of Precision";
 
-	public void set_gps(AltosGPS gps) {
-		super.set_gps(gps);
+	public void set_gps(AltosGPS gps, boolean new_location, boolean new_sats) {
+		super.set_gps(gps, new_location, new_sats);
+		AltosCalData cal_data = cal_data();
 		if (gps_series == null)
 			gps_series = new ArrayList<AltosGPSTimeValue>();
 		gps_series.add(new AltosGPSTimeValue(time(), gps));
 
-		if (sats_in_soln == null) {
-			sats_in_soln = add_series(sats_in_soln_name, null);
-		}
-		sats_in_soln.add(time(), gps.nsat);
-		if (gps.pdop != AltosLib.MISSING) {
-			if (gps_pdop == null)
-				gps_pdop = add_series(gps_pdop_name, null);
-			gps_pdop.add(time(), gps.pdop);
-		}
-		if (gps.hdop != AltosLib.MISSING) {
-			if (gps_hdop == null)
-				gps_hdop = add_series(gps_hdop_name, null);
-			gps_hdop.add(time(), gps.hdop);
-		}
-		if (gps.vdop != AltosLib.MISSING) {
-			if (gps_vdop == null)
-				gps_vdop = add_series(gps_vdop_name, null);
-			gps_vdop.add(time(), gps.vdop);
-		}
-		if (gps.locked) {
-			if (gps.alt != AltosLib.MISSING) {
-				if (gps_altitude == null)
-					gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
-				gps_altitude.add(time(), gps.alt);
+		if (new_location) {
+			if (sats_in_soln == null) {
+				sats_in_soln = add_series(sats_in_soln_name, null);
 			}
-			if (gps.ground_speed != AltosLib.MISSING) {
-				if (gps_ground_speed == null)
-					gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
-				gps_ground_speed.add(time(), gps.ground_speed);
+			sats_in_soln.add(time(), gps.nsat);
+			if (gps.pdop != AltosLib.MISSING) {
+				if (gps_pdop == null)
+					gps_pdop = add_series(gps_pdop_name, null);
+				gps_pdop.add(time(), gps.pdop);
 			}
-			if (gps.climb_rate != AltosLib.MISSING) {
-				if (gps_ascent_rate == null)
-					gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
-				gps_ascent_rate.add(time(), gps.climb_rate);
+			if (gps.hdop != AltosLib.MISSING) {
+				if (gps_hdop == null)
+					gps_hdop = add_series(gps_hdop_name, null);
+				gps_hdop.add(time(), gps.hdop);
 			}
-			if (gps.course != AltosLib.MISSING) {
-				if (gps_course == null)
-					gps_course = add_series(gps_course_name, null);
-				gps_course.add(time(), gps.course);
+			if (gps.vdop != AltosLib.MISSING) {
+				if (gps_vdop == null)
+					gps_vdop = add_series(gps_vdop_name, null);
+				gps_vdop.add(time(), gps.vdop);
 			}
-			if (gps.ground_speed != AltosLib.MISSING && gps.climb_rate != AltosLib.MISSING) {
-				if (gps_speed == null)
-					gps_speed = add_series(gps_speed_name, null);
-				gps_speed.add(time(), Math.sqrt(gps.ground_speed * gps.ground_speed +
-								gps.climb_rate * gps.climb_rate));
+			if (gps.locked) {
+				if (gps.alt != AltosLib.MISSING) {
+					if (gps_altitude == null)
+						gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
+					gps_altitude.add(time(), gps.alt);
+				}
+				if (gps.ground_speed != AltosLib.MISSING) {
+					if (gps_ground_speed == null)
+						gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
+					gps_ground_speed.add(time(), gps.ground_speed);
+				}
+				if (gps.climb_rate != AltosLib.MISSING) {
+					if (gps_ascent_rate == null)
+						gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
+					gps_ascent_rate.add(time(), gps.climb_rate);
+				}
+				if (gps.course != AltosLib.MISSING) {
+					if (gps_course == null)
+						gps_course = add_series(gps_course_name, null);
+					gps_course.add(time(), gps.course);
+				}
+				if (gps.ground_speed != AltosLib.MISSING && gps.climb_rate != AltosLib.MISSING) {
+					if (gps_speed == null)
+						gps_speed = add_series(gps_speed_name, null);
+					gps_speed.add(time(), Math.sqrt(gps.ground_speed * gps.ground_speed +
+									gps.climb_rate * gps.climb_rate));
+				}
 			}
 		}
-		if (gps.cc_gps_sat != null) {
-			if (sats_in_view == null)
-				sats_in_view = add_series(sats_in_view_name, null);
-			sats_in_view.add(time(), gps.cc_gps_sat.length);
+		if (new_sats) {
+			if (gps.cc_gps_sat != null) {
+				if (sats_in_view == null)
+					sats_in_view = add_series(sats_in_view_name, null);
+				sats_in_view.add(time(), gps.cc_gps_sat.length);
+			}
 		}
 	}
 
