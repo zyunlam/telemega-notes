@@ -513,26 +513,27 @@ public class AltosState extends AltosDataListener {
 	}
 
 	public double height() {
-		double k = kalman_height.value();
-		if (k != AltosLib.MISSING)
-			return k;
-
 		double b = baro_height();
 		if (b != AltosLib.MISSING)
 			return b;
+
+		double k = kalman_height.value();
+		if (k != AltosLib.MISSING)
+			return k;
 
 		return gps_height();
 	}
 
 	public double max_height() {
-		double	k = kalman_height.max();
-		if (k != AltosLib.MISSING)
-			return k;
-
 		double a = altitude.max();
 		double g = ground_altitude();
 		if (a != AltosLib.MISSING && g != AltosLib.MISSING)
 			return a - g;
+
+		double	k = kalman_height.max();
+		if (k != AltosLib.MISSING)
+			return k;
+
 		return max_gps_height();
 	}
 
