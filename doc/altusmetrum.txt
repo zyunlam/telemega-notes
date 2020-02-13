@@ -1,11 +1,11 @@
 = The Altus Metrum System: An Owner's Manual for Altus Metrum Rocketry Electronics
 Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>; Bob Finch; Anthony Towns
 :title-logo-image: image:../themes/background.png[]
-:revnumber: v1.9.1
-:revdate: 5 Dec 2019
+:revnumber: v1.9.2
+:revdate: 13 Feb 2020
 :icons:
 :icontype: svg
-:copyright: Bdale Garbee and Keith Packard 2019
+:copyright: Bdale Garbee and Keith Packard 2020
 :doctype: book
 :numbered:
 :stylesheet: am.css

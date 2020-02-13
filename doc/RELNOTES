@@ -20,6 +20,6 @@ Creating documentation for a new release of AltOS
 	telegps.txt
 	telemetry.txt
 
-* Add release-notes-${version}.inc to git
+* Add release-notes-${version}.inc to Makefile.am and git
 
 * Make sure new hardware specs are documented in specs.inc
