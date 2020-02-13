@@ -27,8 +27,8 @@ import org.altusmetrum.altoslib_13.*;
 public class AltosInfoTable extends JTable implements AltosFlightDisplay, HierarchyListener {
 	private AltosFlightInfoTableModel model;
 
-	static final int info_columns = 3;
-	static final int info_rows = 17;
+	static final int info_columns = 4;
+	static final int info_rows = 18;
 
 	private AltosState		last_state;
 	private AltosListenerState	last_listener_state;
@@ -270,6 +270,27 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 				}
 			}
 		}
+
+		if (state != null && state.accel_along() != AltosLib.MISSING) {
+			info_add_row(3, "Accel along", "%8.1f m/s²", state.accel_along());
+			info_add_row(3, "Accel across", "%8.1f m/s²", state.accel_across());
+			info_add_row(3, "Accel through", "%8.1f m/s²", state.accel_through());
+			info_add_row(3, "Gyro roll", "%8.1f °/s", state.gyro_roll());
+			info_add_row(3, "Gyro pitch", "%8.1f °/s", state.gyro_pitch());
+			info_add_row(3, "Gyro yaw", "%8.1f °/s", state.gyro_yaw());
+			if (state.mag_along() != AltosLib.MISSING) {
+				/* Report mag in nanoteslas (1 G = 100000 nT (or γ)) */
+				info_add_row(3, "Mag along", "%8.1f γ", state.mag_along() * 100000.0);
+				info_add_row(3, "Mag across", "%8.1f γ", state.mag_across() * 100000.0);
+				info_add_row(3, "Mag Through", "%8.1f γ", state.mag_through() * 100000.0);
+			}
+		}
+
+		if (state != null && state.igniter_voltage != null) {
+			for (int i = 0; i < state.igniter_voltage.length; i++)
+				info_add_row(3, AltosLib.igniter_name(i), "%9.2f V", state.igniter_voltage[i]);
+		}
+
 		info_finish();
 	}
 }
