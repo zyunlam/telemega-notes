@@ -240,12 +240,12 @@ public class AltosUIConfigure
 
 						AltosUIPreferences.set_map_cache(size);
 					} catch (ClassCastException ce) {
-						map_cache.setSelectedItem(new Integer(AltosUIPreferences.map_cache()));
+						map_cache.setSelectedItem(AltosUIPreferences.map_cache());
 					}
 				}
 			});
 
-		map_cache.setSelectedItem (new Integer(AltosUIPreferences.map_cache()));
+		map_cache.setSelectedItem (AltosUIPreferences.map_cache());
 		pane.add(map_cache, constraints(1, 2, GridBagConstraints.BOTH));
 		row++;
 	}
