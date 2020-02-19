@@ -18,8 +18,8 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9.1e)
-ANDROID_VERSION=25
+AC_INIT([altos], 1.9.1f)
+ANDROID_VERSION=26
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
