@@ -448,8 +448,8 @@ static inline float ao_convert_accel(int16_t sensor)
 typedef int16_t	gyro_t;		/* in raw sample units */
 typedef int16_t angle_t;	/* in degrees */
 
-/* Y axis is aligned with the direction of motion (along) */
-/* X axis is aligned in the other board axis (across) */
+/* X axis is aligned with the direction of motion (along) */
+/* Y axis is aligned in the other board axis (across) */
 /* Z axis is aligned perpendicular to the board (through) */
 
 static inline float ao_convert_gyro(float sensor)
