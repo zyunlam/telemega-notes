@@ -198,7 +198,36 @@ _ao_bmx160_setup(void)
 	 */
 
 	_ao_bmx160_cmd(BMX160_CMD_ACC_SET_PMU_MODE(BMX160_PMU_STATUS_ACC_PMU_STATUS_NORMAL));
+
+	for (r = 0; r < 20; r++) {
+		ao_delay(AO_MS_TO_TICKS(100));
+		if (((_ao_bmx160_reg_read(BMX160_PMU_STATUS)
+		      >> BMX160_PMU_STATUS_ACC_PMU_STATUS)
+		     & BMX160_PMU_STATUS_ACC_PMU_STATUS_MASK)
+		    == BMX160_PMU_STATUS_ACC_PMU_STATUS_NORMAL)
+		{
+			r = 0;
+			break;
+		}
+	}
+	if (r != 0)
+		AO_SENSOR_ERROR(AO_DATA_BMX160);
+
 	_ao_bmx160_cmd(BMX160_CMD_GYR_SET_PMU_MODE(BMX160_PMU_STATUS_GYR_PMU_STATUS_NORMAL));
+
+	for (r = 0; r < 20; r++) {
+		ao_delay(AO_MS_TO_TICKS(100));
+		if (((_ao_bmx160_reg_read(BMX160_PMU_STATUS)
+		      >> BMX160_PMU_STATUS_GYR_PMU_STATUS)
+		     & BMX160_PMU_STATUS_GYR_PMU_STATUS_MASK)
+		    == BMX160_PMU_STATUS_GYR_PMU_STATUS_NORMAL)
+		{
+			r = 0;
+			break;
+		}
+	}
+	if (r != 0)
+		AO_SENSOR_ERROR(AO_DATA_BMX160);
 
 	/* Configure accelerometer:
 	 *
@@ -215,8 +244,10 @@ _ao_bmx160_setup(void)
 			     (BMX160_ACC_CONF_ACC_ODR_200 << BMX160_ACC_CONF_ACC_ODR));
 	_ao_bmx160_reg_write(BMX160_ACC_RANGE,
 			     BMX160_ACC_RANGE_16G);
-	for (r = 0x4; r <= 0x17; r++)
+
+	for (r = 0x3; r <= 0x1b; r++)
 		(void) _ao_bmx160_reg_read(r);
+	if (_ao_bmx160_reg_read(
 
 	/* Configure gyro:
 	 *
