@@ -130,8 +130,6 @@ ao_bmx160_init(void);
 #define  BMX160_ACC_RANGE_4G			0x5
 #define  BMX160_ACC_RANGE_8G			0x8
 #define  BMX160_ACC_RANGE_16G			0xc
-#define  BMX160_ACC_RANGE_
-#define  BMX160_ACC_RANGE_
 #define BMX160_GYR_CONF			0x42
 #define  BMX160_GYR_CONF_GYR_ODR		0
 #define   BMX160_GYR_CONF_GYR_ODR_25			0x6

@@ -183,6 +183,8 @@ _ao_bmx160_wait_alive(void)
 static void
 _ao_bmx160_setup(void)
 {
+	int r;
+
 	if (ao_bmx160_configured)
 		return;
 
@@ -216,6 +218,9 @@ _ao_bmx160_setup(void)
 			     (BMX160_ACC_CONF_ACC_ODR_200 << BMX160_ACC_CONF_ACC_ODR));
 	_ao_bmx160_reg_write(BMX160_ACC_RANGE,
 			     BMX160_ACC_RANGE_16G);
+	for (r = 0x4; r <= 0x17; r++)
+		(void) _ao_bmx160_reg_read(r);
+
 
 	/* Configure gyro:
 	 *
@@ -319,10 +324,15 @@ ao_bmx160_show(void)
 	uint8_t gyr_conf = _ao_bmx160_reg_read(BMX160_GYR_CONF);
 	uint8_t gyr_range = _ao_bmx160_reg_read(BMX160_GYR_RANGE);
 	uint8_t mag_conf = _ao_bmx160_reg_read(BMX160_MAG_CONF);
+	uint8_t status = _ao_bmx160_reg_read(BMX160_MAG_CONF);
+	uint8_t acc_x_lo = _ao_bmx160_reg_read(BMX160_ACCEL_X_0_7);
+	uint8_t acc_x_hi = _ao_bmx160_reg_read(BMX160_ACCEL_X_8_15);
 	ao_bmx160_spi_put();
 
 	printf("ACC_CONF %02x ACC_RANGE %02x GYR_CONF %02x GYR_RANGE %02x MAG_CONF %02x\n",
 	       acc_conf, acc_range, gyr_conf, gyr_range, mag_conf);
+
+	printf("STATUS %02x ACCEL_X_0_7 %02x ACCEL_X_8_15 %02x\n", status, acc_x_lo, acc_x_hi);
 
 	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d Mag: %7d %7d %7d\n",
 		ao_bmx160_current.acc_x,

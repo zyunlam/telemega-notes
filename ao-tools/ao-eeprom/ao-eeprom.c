@@ -351,6 +351,16 @@ main (int argc, char **argv)
 		case AO_LOG_FORMAT_MICROPEAK2:
 			len = 2;
 			break;
+		case AO_LOG_FORMAT_TELEMEGA_4:
+			len = 32;
+			break;
+			max_adc= 4095;
+			adc_ref = 3.3;
+			batt_r1 = 5600;
+			batt_r2 = 10000;
+			sense_r1 = 100e3;
+			sense_r2 = 27e3;
+			break;
 		}
 		if (arg_len)
 			len = arg_len;
@@ -398,6 +408,7 @@ main (int argc, char **argv)
 				case AO_LOG_FORMAT_TELEMEGA:
 				case AO_LOG_FORMAT_TELEMEGA_3:
 				case AO_LOG_FORMAT_EASYMEGA_2:
+				case AO_LOG_FORMAT_TELEMEGA_4:
 					log_mega = (struct ao_log_mega *) &eeprom->data[pos];
 					switch (log_mega->type) {
 					case AO_LOG_FLIGHT:
