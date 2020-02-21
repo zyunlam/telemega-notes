@@ -192,7 +192,7 @@ _ao_bmx160_setup(void)
 	_ao_bmx160_wait_alive();
 
 	/* Reboot */
-	_ao_bmx160_cmd(BMX160_CMD_SOFTRESET);
+//	_ao_bmx160_cmd(BMX160_CMD_SOFTRESET);
 
 	/* Force SPI mode */
 	_ao_bmx160_reg_write(BMX160_NV_CONF, 1 << BMX160_NV_CONF_SPI_EN);
@@ -201,6 +201,7 @@ _ao_bmx160_setup(void)
 	 */
 
 	_ao_bmx160_cmd(BMX160_CMD_ACC_SET_PMU_MODE(BMX160_PMU_STATUS_ACC_PMU_STATUS_NORMAL));
+
 	_ao_bmx160_cmd(BMX160_CMD_GYR_SET_PMU_MODE(BMX160_PMU_STATUS_GYR_PMU_STATUS_NORMAL));
 
 	/* Configure accelerometer:
@@ -324,7 +325,8 @@ ao_bmx160_show(void)
 	uint8_t gyr_conf = _ao_bmx160_reg_read(BMX160_GYR_CONF);
 	uint8_t gyr_range = _ao_bmx160_reg_read(BMX160_GYR_RANGE);
 	uint8_t mag_conf = _ao_bmx160_reg_read(BMX160_MAG_CONF);
-	uint8_t status = _ao_bmx160_reg_read(BMX160_MAG_CONF);
+	uint8_t status = _ao_bmx160_reg_read(BMX160_STATUS);
+	uint8_t pmu_status = _ao_bmx160_reg_read(BMX160_PMU_STATUS);
 	uint8_t acc_x_lo = _ao_bmx160_reg_read(BMX160_ACCEL_X_0_7);
 	uint8_t acc_x_hi = _ao_bmx160_reg_read(BMX160_ACCEL_X_8_15);
 	ao_bmx160_spi_put();
@@ -332,7 +334,8 @@ ao_bmx160_show(void)
 	printf("ACC_CONF %02x ACC_RANGE %02x GYR_CONF %02x GYR_RANGE %02x MAG_CONF %02x\n",
 	       acc_conf, acc_range, gyr_conf, gyr_range, mag_conf);
 
-	printf("STATUS %02x ACCEL_X_0_7 %02x ACCEL_X_8_15 %02x\n", status, acc_x_lo, acc_x_hi);
+	printf("STATUS %02x PMU_STATUS %02x ACCEL_X_0_7 %02x ACCEL_X_8_15 %02x\n",
+	       status, pmu_status, acc_x_lo, acc_x_hi);
 
 	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d Mag: %7d %7d %7d\n",
 		ao_bmx160_current.acc_x,
