@@ -247,7 +247,6 @@ _ao_bmx160_setup(void)
 
 	for (r = 0x3; r <= 0x1b; r++)
 		(void) _ao_bmx160_reg_read(r);
-	if (_ao_bmx160_reg_read(
 
 	/* Configure gyro:
 	 *
