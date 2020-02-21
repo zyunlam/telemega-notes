@@ -183,17 +183,22 @@ _ao_bmx160_wait_alive(void)
 static void
 _ao_bmx160_setup(void)
 {
+	int r;
+
 	if (ao_bmx160_configured)
 		return;
 
 	/* Make sure the chip is responding */
 	_ao_bmx160_wait_alive();
 
-	/* Reboot */
-	_ao_bmx160_cmd(BMX160_CMD_SOFTRESET);
-
 	/* Force SPI mode */
 	_ao_bmx160_reg_write(BMX160_NV_CONF, 1 << BMX160_NV_CONF_SPI_EN);
+
+	/* Enable acc and gyr
+	 */
+
+	_ao_bmx160_cmd(BMX160_CMD_ACC_SET_PMU_MODE(BMX160_PMU_STATUS_ACC_PMU_STATUS_NORMAL));
+	_ao_bmx160_cmd(BMX160_CMD_GYR_SET_PMU_MODE(BMX160_PMU_STATUS_GYR_PMU_STATUS_NORMAL));
 
 	/* Configure accelerometer:
 	 *
@@ -210,6 +215,8 @@ _ao_bmx160_setup(void)
 			     (BMX160_ACC_CONF_ACC_ODR_200 << BMX160_ACC_CONF_ACC_ODR));
 	_ao_bmx160_reg_write(BMX160_ACC_RANGE,
 			     BMX160_ACC_RANGE_16G);
+	for (r = 0x4; r <= 0x17; r++)
+		(void) _ao_bmx160_reg_read(r);
 
 	/* Configure gyro:
 	 *
@@ -276,11 +283,6 @@ _ao_bmx160_setup(void)
 			     (0 << BMX160_MAG_IF_0_MAG_OFFSET) |
 			     (0 << BMX160_MAG_IF_0_MAG_RD_BURST));
 
-	/* Enable acc and gyr
-	 */
-
-	_ao_bmx160_cmd(BMX160_CMD_ACC_SET_PMU_MODE(BMX160_PMU_STATUS_ACC_PMU_STATUS_NORMAL));
-	_ao_bmx160_cmd(BMX160_CMD_GYR_SET_PMU_MODE(BMX160_PMU_STATUS_GYR_PMU_STATUS_NORMAL));
 	ao_bmx160_configured = 1;
 }
 
