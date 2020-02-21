@@ -524,6 +524,9 @@ ao_data_fill(int head) {
 #if HAS_ADS131A0X
 		ao_data_ring[head].ads131a0x = ao_ads131a0x_current;
 #endif
+#if HAS_BMX160
+		ao_data_ring[head].bmx160 = ao_bmx160_current;
+#endif
 		ao_data_ring[head].tick = ao_tick_count;
 		ao_data_head = ao_data_ring_next(head);
 		ao_wakeup((void *) &ao_data_head);
