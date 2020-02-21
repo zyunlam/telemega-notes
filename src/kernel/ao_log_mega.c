@@ -105,6 +105,17 @@ ao_log(void)
 				ao_log_data.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].mpu9250.mag_z;
 				ao_log_data.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].mpu9250.mag_y;
 #endif
+#if HAS_BMX160
+				ao_log_data.u.sensor.accel_x = ao_data_ring[ao_log_data_pos].bmx160.acc_x;
+				ao_log_data.u.sensor.accel_y = ao_data_ring[ao_log_data_pos].bmx160.acc_y;
+				ao_log_data.u.sensor.accel_z = ao_data_ring[ao_log_data_pos].bmx160.acc_z;
+				ao_log_data.u.sensor.gyro_x = ao_data_ring[ao_log_data_pos].bmx160.gyr_x;
+				ao_log_data.u.sensor.gyro_y = ao_data_ring[ao_log_data_pos].bmx160.gyr_y;
+				ao_log_data.u.sensor.gyro_z = ao_data_ring[ao_log_data_pos].bmx160.gyr_z;
+				ao_log_data.u.sensor.mag_x = ao_data_ring[ao_log_data_pos].bmx160.mag_x;
+				ao_log_data.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].bmx160.mag_z;
+				ao_log_data.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].bmx160.mag_y;
+#endif
 				ao_log_data.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
 				ao_log_write(&ao_log_data);
 				if (ao_log_state <= ao_flight_coast)
