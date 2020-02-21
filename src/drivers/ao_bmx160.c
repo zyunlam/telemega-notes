@@ -195,6 +195,12 @@ _ao_bmx160_setup(void)
 	/* Force SPI mode */
 	_ao_bmx160_reg_write(BMX160_NV_CONF, 1 << BMX160_NV_CONF_SPI_EN);
 
+	/* Enable acc and gyr
+	 */
+
+	_ao_bmx160_cmd(BMX160_CMD_ACC_SET_PMU_MODE(BMX160_PMU_STATUS_ACC_PMU_STATUS_NORMAL));
+	_ao_bmx160_cmd(BMX160_CMD_GYR_SET_PMU_MODE(BMX160_PMU_STATUS_GYR_PMU_STATUS_NORMAL));
+
 	/* Configure accelerometer:
 	 *
 	 * 	undersampling disabled
@@ -276,11 +282,6 @@ _ao_bmx160_setup(void)
 			     (0 << BMX160_MAG_IF_0_MAG_OFFSET) |
 			     (0 << BMX160_MAG_IF_0_MAG_RD_BURST));
 
-	/* Enable acc and gyr
-	 */
-
-	_ao_bmx160_cmd(BMX160_CMD_ACC_SET_PMU_MODE(BMX160_PMU_STATUS_ACC_PMU_STATUS_NORMAL));
-	_ao_bmx160_cmd(BMX160_CMD_GYR_SET_PMU_MODE(BMX160_PMU_STATUS_GYR_PMU_STATUS_NORMAL));
 	ao_bmx160_configured = 1;
 }
 
