@@ -93,8 +93,9 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		case AltosIMU.imu_type_easymega_v1:
 			return gyro_x();
 		case AltosIMU.imu_type_easymega_v2:
-		case AltosIMU.imu_type_telemega_v4:
 			return -gyro_y();
+		case AltosIMU.imu_type_telemega_v4:
+			return gyro_y();
 		default:
 			return AltosLib.MISSING;
 		}
