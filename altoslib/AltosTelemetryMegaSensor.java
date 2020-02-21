@@ -39,6 +39,135 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 
 	int imu_type;
 
+	private int accel_across(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return accel_x();
+		case AltosIMU.imu_type_easymega_v2:
+			return -accel_y();
+		case  AltosIMU.imu_type_telemega_v4:
+			return -accel_y();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int accel_along(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return accel_y();
+		case AltosIMU.imu_type_easymega_v2:
+		case AltosIMU.imu_type_telemega_v4:
+			return accel_x();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int accel_through(int imu_type) {
+		return accel_z();
+	}
+
+	private int gyro_roll(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return gyro_y();
+		case AltosIMU.imu_type_easymega_v2:
+		case AltosIMU.imu_type_telemega_v4:
+			return gyro_x();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int gyro_pitch(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return gyro_x();
+		case AltosIMU.imu_type_easymega_v2:
+		case AltosIMU.imu_type_telemega_v4:
+			return -gyro_y();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int gyro_yaw(int imu_type) {
+		return gyro_z();
+	}
+
+	public static int mag_across_axis(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return AltosIMU.imu_axis_x;
+		case AltosIMU.imu_type_telemega_v4:
+		case AltosIMU.imu_type_easymega_v2:
+			return AltosIMU.imu_axis_y;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_across(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return mag_x();
+		case AltosIMU.imu_type_telemega_v4:
+		case AltosIMU.imu_type_easymega_v2:
+			return -mag_y();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	public static int mag_along_axis(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return AltosIMU.imu_axis_y;
+		case AltosIMU.imu_type_easymega_v2:
+		case AltosIMU.imu_type_telemega_v4:
+			return AltosIMU.imu_axis_x;
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	private int mag_along(int imu_type) {
+		switch (imu_type) {
+		case AltosIMU.imu_type_telemega_v1_v2:
+		case AltosIMU.imu_type_telemega_v3:
+		case AltosIMU.imu_type_easymega_v1:
+			return mag_y();
+		case AltosIMU.imu_type_easymega_v2:
+		case AltosIMU.imu_type_telemega_v4:
+			return mag_x();
+		default:
+			return AltosLib.MISSING;
+		}
+	}
+
+	public static int mag_through_axis(int imu_type) {
+		return AltosIMU.imu_axis_z;
+	}
+
+	private int mag_through(int imu_type) {
+		return mag_z();
+	}
+
 	public AltosTelemetryMegaSensor(int[] bytes, int imu_type) throws AltosCRCException {
 		super(bytes);
 		switch (imu_type) {
@@ -74,16 +203,17 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		if (cal_data.gyro_zero_roll == AltosLib.MISSING)
 			cal_data.set_gyro_zero(0, 0, 0);
 
-		int	accel_along = accel_y();
-		int	accel_across = accel_x();
-		int	accel_through = accel_z();
-		int	gyro_roll = gyro_y();
-		int	gyro_pitch = gyro_x();
-		int	gyro_yaw = gyro_z();
+		int	accel_along = accel_along(imu_type);
+		int	accel_across = accel_across(imu_type);
+		int	accel_through = accel_through(imu_type);
 
-		int	mag_along = mag_y();
-		int	mag_across = mag_x();
-		int	mag_through = mag_z();
+		int	gyro_roll = gyro_roll(imu_type);
+		int	gyro_pitch = gyro_pitch(imu_type);
+		int	gyro_yaw = gyro_yaw(imu_type);
+
+		int	mag_along = mag_along(imu_type);
+		int	mag_across = mag_across(imu_type);
+		int	mag_through = mag_through(imu_type);
 
 		listener.set_accel(cal_data.accel_along(accel_along),
 				   cal_data.accel_across(accel_across),
