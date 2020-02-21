@@ -312,6 +312,17 @@ static struct ao_task ao_bmx160_task;
 static void
 ao_bmx160_show(void)
 {
+	ao_bmx160_spi_get();
+	uint8_t acc_conf = _ao_bmx160_reg_read(BMX160_ACC_CONF);
+	uint8_t acc_range = _ao_bmx160_reg_read(BMX160_ACC_RANGE);
+	uint8_t gyr_conf = _ao_bmx160_reg_read(BMX160_GYR_CONF);
+	uint8_t gyr_range = _ao_bmx160_reg_read(BMX160_GYR_RANGE);
+	uint8_t mag_conf = _ao_bmx160_reg_read(BMX160_MAG_CONF);
+	ao_bmx160_spi_put();
+
+	printf("ACC_CONF %02x ACC_RANGE %02x GYR_CONF %02x GYR_RANGE %02x MAG_CONF %02x\n",
+	       acc_conf, acc_range, gyr_conf, gyr_range, mag_conf);
+
 	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d Mag: %7d %7d %7d\n",
 		ao_bmx160_current.acc_x,
 		ao_bmx160_current.acc_y,
@@ -322,6 +333,7 @@ ao_bmx160_show(void)
 		ao_bmx160_current.mag_x,
 		ao_bmx160_current.mag_y,
 		ao_bmx160_current.mag_z);
+
 }
 
 #if BMX160_TEST
