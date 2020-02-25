@@ -88,11 +88,7 @@ public class AltosIMU implements Cloneable {
 	public static final double MAG_COUNTS_MPU = 32767.0;
 	public static final double counts_per_gauss_mpu = MAG_COUNTS_MPU / MAG_FULLSCALE_GAUSS_MPU;
 
-	public static final double MAG_FULLSCALE_GAUSS_BMX_XY = 11.50;	/* 1150µT */
-	public static final double MAG_FULLSCALE_GAUSS_BMX_Z = 25.00;	/* 2500µT */
-	public static final double MAG_COUNTS_BMX = 32767.0;
-	public static final double counts_per_gauss_bmx_xy = MAG_COUNTS_BMX / MAG_FULLSCALE_GAUSS_BMX_XY;
-	public static final double counts_per_gauss_bmx_z = MAG_COUNTS_BMX / MAG_FULLSCALE_GAUSS_BMX_Z;
+	public static final double counts_per_gauss_bmx = 100.0;	/* BMX driver converts to µT */
 
 	public static double counts_per_gauss(int imu_type, int axis) {
 		switch(imu_type) {
@@ -103,14 +99,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v2:
 			return counts_per_gauss_mpu;
 		case imu_type_telemega_v4:
-			switch (axis) {
-			case imu_axis_x:
-			case imu_axis_y:
-				return counts_per_gauss_bmx_xy;
-			case imu_axis_z:
-				return counts_per_gauss_bmx_z;
-			}
-			/* fall through */
+			return 100.0;
 		default:
 			return AltosLib.MISSING;
 		}
