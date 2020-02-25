@@ -25,7 +25,7 @@ struct ao_bmx160_sample {
 	int16_t		mag_x;
 	int16_t		mag_y;
 	int16_t		mag_z;
-	int16_t		rhall;
+	uint16_t	rhall;
 	int16_t		gyr_x;
 	int16_t		gyr_y;
 	int16_t		gyr_z;
@@ -44,6 +44,20 @@ struct ao_bmx160_offset {
 	int8_t		off_gyr_y;
 	int8_t		off_gyr_z;
 	uint8_t		offset_6;
+};
+
+struct ao_bmm150_trim {
+	int8_t		dig_x1;
+	int8_t		dig_y1;
+	int8_t		dig_x2;
+	int8_t		dig_y2;
+	uint16_t	dig_z1;
+	int16_t		dig_z2;
+	int16_t		dig_z3;
+	int16_t		dig_z4;
+	uint8_t		dig_xy1;
+	int8_t		dig_xy2;
+	uint16_t	dig_xyz1;
 };
 
 void
@@ -188,6 +202,8 @@ ao_bmx160_init(void);
 #define BMX160_FOC_CONF			0x69
 #define BMX160_CONF			0x6A
 #define BMX160_IF_CONF			0x6B
+#define  BMX160_IF_CONF_IF_MODE			4
+#define  BMX160_IF_CONF_IF_MODE_AUTO_MAG		0x02
 #define BMX160_PMU_TRIGGER		0x6C
 #define BMX160_SELF_TEST		0x6D
 #define BMX160_NV_CONF			0x70
@@ -251,6 +267,30 @@ ao_bmx160_init(void);
 #define  BMM150_REPXY_VALUE(n)				(((n)-1) >> 1)
 #define BMM150_REPZ				0x52
 #define  BMM150_REPZ_VALUE(n)				((n) -1)
+
+/* Trim Extended Registers */
+#define BMM150_DIG_X1                        0x5D
+#define BMM150_DIG_Y1                        0x5E
+#define BMM150_DIG_Z4_LSB                    0x62
+#define BMM150_DIG_Z4_MSB                    0x63
+#define BMM150_DIG_X2                        0x64
+#define BMM150_DIG_Y2                        0x65
+#define BMM150_DIG_Z2_LSB                    0x68
+#define BMM150_DIG_Z2_MSB                    0x69
+#define BMM150_DIG_Z1_LSB                    0x6A
+#define BMM150_DIG_Z1_MSB                    0x6B
+#define BMM150_DIG_XYZ1_LSB                  0x6C
+#define BMM150_DIG_XYZ1_MSB                  0x6D
+#define BMM150_DIG_Z3_LSB                    0x6E
+#define BMM150_DIG_Z3_MSB                    0x6F
+#define BMM150_DIG_XY2                       0x70
+#define BMM150_DIG_XY1                       0x71
+
+#define BMM150_XYAXES_FLIP_OVERFLOW_ADCVAL   -4096
+#define BMM150_ZAXIS_HALL_OVERFLOW_ADCVAL    -16384
+#define BMM150_OVERFLOW_OUTPUT               -32768
+#define BMM150_NEGATIVE_SATURATION_Z         -32767
+#define BMM150_POSITIVE_SATURATION_Z         32767
 
 #define BMX160_GYRO_FULLSCALE	((float) 2000 * M_PI/180.0)
 
