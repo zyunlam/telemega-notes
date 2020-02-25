@@ -338,11 +338,11 @@ struct ao_adc {
 #define ao_data_through(packet)	((packet)->bmx160.acc_z)
 
 #define ao_data_roll(packet)	((packet)->bmx160.gyr_x)
-#define ao_data_pitch(packet)	((packet)->bmx160.gyr_y)
+#define ao_data_pitch(packet)	(-(packet)->bmx160.gyr_y)
 #define ao_data_yaw(packet)	((packet)->bmx160.gyr_z)
 
 #define ao_data_mag_along(packet)	((packet)->bmx160.mag_x)
-#define ao_data_mag_across(packet)	(-(packet)->bmx160.mag_y)
+#define ao_data_mag_across(packet)	((packet)->bmx160.mag_y)
 #define ao_data_mag_through(packet)	((packet)->bmx160.mag_z)
 
 /* ADXL375 */
