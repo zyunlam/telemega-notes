@@ -380,8 +380,10 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	public AltosTimeSeries orient_series;
+	public AltosTimeSeries azimuth_series;
 
 	public static final String orient_name = "Tilt Angle";
+	public static final String azimuth_name = "Azimuth Angle";
 
 	private void compute_orient() {
 
@@ -408,6 +410,9 @@ public class AltosFlightSeries extends AltosDataListener {
 		orient_series = add_series(orient_name, AltosConvert.orient);
 		orient_series.add(ground_time, rotation.tilt());
 
+		azimuth_series = add_series(azimuth_name, AltosConvert.orient);
+		azimuth_series.add(ground_time, rotation.azimuth());
+
 		for (AltosTimeValue roll_v : gyro_roll) {
 			double	time = roll_v.time;
 			double	dt = time - prev_time;
@@ -419,6 +424,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 				rotation.rotate(pitch, yaw, roll);
 				orient_series.add(time, rotation.tilt());
+				azimuth_series.add(time, rotation.azimuth());
 			}
 			prev_time = time;
 		}
@@ -622,8 +628,10 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String mag_along_name = "Magnetic Field Along";
 	public static final String mag_across_name = "Magnetic Field Across";
 	public static final String mag_through_name = "Magnetic Field Through";
+	public static final String mag_total_name = "Magnetic Field Strength";
+	public static final String compass_name = "Compass";
 
-	public AltosTimeSeries mag_along, mag_across, mag_through;
+	public AltosTimeSeries mag_along, mag_across, mag_through, mag_total, compass;
 
 	public  void set_accel(double along, double across, double through) {
 		if (accel_along == null) {
@@ -665,10 +673,14 @@ public class AltosFlightSeries extends AltosDataListener {
 			mag_along = add_series(mag_along_name, AltosConvert.magnetic_field);
 			mag_across = add_series(mag_across_name, AltosConvert.magnetic_field);
 			mag_through = add_series(mag_through_name, AltosConvert.magnetic_field);
+			mag_total = add_series(mag_total_name, AltosConvert.magnetic_field);
+			compass = add_series(compass_name, AltosConvert.orient);
 		}
 		mag_along.add(time(), along);
 		mag_across.add(time(), across);
 		mag_through.add(time(), through);
+		mag_total.add(time(), Math.sqrt(along * along + across * across + through *through));
+		compass.add(time(), Math.atan2(across, through) * 180 / Math.PI);
 	}
 
 	public void set_orient(double orient) {

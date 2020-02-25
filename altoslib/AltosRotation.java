@@ -29,7 +29,7 @@ public class AltosRotation extends AltosQuaternion {
 	 *
 	 * rot = ao_rotation * vertical * ao_rotation°
 	 * rot = ao_rotation * (0,0,0,1) * ao_rotation°
-	 *     = ((a.z, a.y, -a.x, a.r) * (a.r, -a.x, -a.y, -a.z)) .z
+	 *     = ((-a.z, a.y, -a.x, a.r) * (a.r, -a.x, -a.y, -a.z)) .z
 	 *
 	 *     = (-a.z * -a.z) + (a.y * -a.y) - (-a.x * -a.x) + (a.r * a.r)
 	 *     = a.z² - a.y² - a.x² + a.r²
@@ -48,6 +48,34 @@ public class AltosRotation extends AltosQuaternion {
 
 		double tilt = Math.acos(rotz) * 180.0 / Math.PI;
 		return tilt;
+	}
+
+	/* Compute azimuth angle from a reference line pointing out the side
+	 * of the airframe
+	 *
+	 * rot = ao_rotation * x_axis * ao_rotation°
+	 * rot = ao_rotation * (0,1,0,0) * ao_rotation°
+	 *     = (-a.x, a.r, a.z, -a.y) * (a.r, -a.x, -a.y, -a.z) . x
+	 *     = (-a.x * -a.x) + (a.r * a.r) + (a.z * -a.z) - (-a.y * -a.y)
+	 *     = a.x² + a.r² - a.z² - a.y²
+	 *
+	 *     = (-a.x, a.r, a.z, -a.y) * (a.r, -a.x, -a.y, -a.z) . y
+	 *     = (-a.x * -a.y) - (a.r * -a.z) + (a.z * a.r) + (-a.y * -a.x)
+	 *     = a.x * a.y + a.r * a.z + a.z * a.r + a.y * a.x
+	 *
+	 * The X value will be the cosine of the rotation. The Y value will be the
+	 * sine of the rotation; use the sign of that to figure out which direction from
+	 * zero we've headed
+	 */
+
+	public double azimuth() {
+		double rotx = rotation.x * rotation.x + rotation.r * rotation.r - rotation.z * rotation.z - rotation.y * rotation.y;
+		double roty = rotation.x * rotation.y + rotation.r * rotation.z + rotation.z * rotation.r + rotation.y * rotation.x;
+
+		double az = Math.acos(rotx) * 180.0 / Math.PI;
+		if (roty < 0)
+			return -az;
+		return az;
 	}
 
 	/* Given euler rotations in three axes, perform a combined rotation using

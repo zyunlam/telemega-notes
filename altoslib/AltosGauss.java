@@ -45,9 +45,9 @@ public class AltosGauss extends AltosUnits {
 	public AltosGauss() {
 		range_metric = new AltosUnitsRange[1];
 
-		range_metric[0] = new AltosUnitsRange(0, "γ", "nano tesla") {
+		range_metric[0] = new AltosUnitsRange(0, "µT", "microtesla") {
 				double value(double v) {
-					return v * 100000;
+					return v * 100;
 				}
 				int show_fraction(int width) {
 					return width / 9;
