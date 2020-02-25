@@ -142,7 +142,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 			return -gyro_y();
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
-			return gyro_y();
+			return -gyro_y();
 		default:
 			return AltosLib.MISSING;
 		}
@@ -173,8 +173,9 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return mag_x();
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
-		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return -mag_y();
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
+			return mag_y();
 		default:
 			return AltosLib.MISSING;
 		}

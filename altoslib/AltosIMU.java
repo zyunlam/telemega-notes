@@ -225,7 +225,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v2:
 			return -gyro_y;
 		case imu_type_telemega_v4:
-			return gyro_y;
+			return -gyro_y;
 		default:
 			return AltosLib.MISSING;
 		}
@@ -255,9 +255,10 @@ public class AltosIMU implements Cloneable {
 		case imu_type_telemega_v3:
 		case imu_type_easymega_v1:
 			return mag_x;
-		case imu_type_telemega_v4:
 		case imu_type_easymega_v2:
 			return -mag_y;
+		case imu_type_telemega_v4:
+			return mag_y;
 		default:
 			return AltosLib.MISSING;
 		}
