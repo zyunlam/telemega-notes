@@ -20,7 +20,7 @@ package org.altusmetrum.AltosDroid;
 
 import android.os.Handler;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public abstract class AltosDroidLink extends AltosLink {
 

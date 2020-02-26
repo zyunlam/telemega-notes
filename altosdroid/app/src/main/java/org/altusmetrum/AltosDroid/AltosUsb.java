@@ -27,7 +27,7 @@ import android.hardware.usb.*;
 import android.app.*;
 import android.os.Handler;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class AltosUsb extends AltosDroidLink {
 

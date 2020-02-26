@@ -19,7 +19,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class AltosMap {
 

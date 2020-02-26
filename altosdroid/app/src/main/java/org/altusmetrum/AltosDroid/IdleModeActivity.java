@@ -26,7 +26,7 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class IdleModeActivity extends Activity {
 	private EditText callsignText;

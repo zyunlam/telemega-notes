@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.io.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class AltosMapdClient extends Thread implements AltosMapStoreListener {
 	private Socket		socket;

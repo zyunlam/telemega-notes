@@ -29,7 +29,7 @@ import android.view.*;
 import android.view.View.*;
 import android.widget.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 class IgniterItem {
 	public String name;
