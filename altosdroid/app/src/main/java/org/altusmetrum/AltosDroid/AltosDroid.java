@@ -48,7 +48,7 @@ import android.location.LocationListener;
 import android.hardware.usb.*;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 class SavedState {
 	long	received_time;

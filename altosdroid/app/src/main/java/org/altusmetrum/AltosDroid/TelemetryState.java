@@ -19,7 +19,7 @@
 package org.altusmetrum.AltosDroid;
 
 import java.util.*;
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class TelemetryState {
 	public static final int CONNECT_NONE         = 0;

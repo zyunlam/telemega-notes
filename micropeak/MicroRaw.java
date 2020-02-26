@@ -21,8 +21,8 @@ package org.altusmetrum.micropeak;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_13.*;
-import org.altusmetrum.altosuilib_13.*;
+import org.altusmetrum.altoslib_14.*;
+import org.altusmetrum.altosuilib_14.*;
 
 public class MicroRaw extends JTextArea implements AltosFontListener {
 

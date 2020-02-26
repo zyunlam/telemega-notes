@@ -30,7 +30,7 @@ import android.graphics.*;
 import android.graphics.drawable.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 class TrackerComparatorCall implements Comparator<Tracker> {
 	public int compare(Tracker a, Tracker b) {

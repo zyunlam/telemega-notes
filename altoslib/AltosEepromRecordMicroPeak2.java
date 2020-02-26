@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 public class AltosEepromRecordMicroPeak2 extends AltosEepromRecord {
 	public static final int	record_length = 2;
