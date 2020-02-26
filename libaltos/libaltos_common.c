@@ -117,16 +117,12 @@ int altos_bt_port(struct altos_bt_device *device) {
 	return BT_PORT_DEFAULT;
 }
 
-#include <time.h>
-
 PUBLIC void
 altos_free(struct altos_file *file)
 {
 	int i;
 	altos_close(file);
-	for (i = 0; i < 10 && file->busy; i++) {
-		struct timespec delay = { .tv_sec = 1, .tv_nsec = 0 };
-		nanosleep(&delay, NULL);
-	}
+	for (i = 0; i < 10 && file->busy; i++)
+		altos_pause_one_second();
 	free(file);
 }

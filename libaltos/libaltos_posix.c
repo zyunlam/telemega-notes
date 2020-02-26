@@ -200,3 +200,11 @@ altos_fill(struct altos_file *file_common, int timeout)
 	return 0;
 }
 
+#include <time.h>
+
+void
+altos_pause_one_second(void)
+{
+	struct timespec delay = { .tv_sec = 1, .tv_nsec = 0 };
+	nanosleep(&delay, NULL);
+}
