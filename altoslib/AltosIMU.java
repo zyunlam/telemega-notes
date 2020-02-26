@@ -115,8 +115,6 @@ public class AltosIMU implements Cloneable {
 
 		String[] items = line.split("\\s+");
 
-		System.out.printf("length %d\n", items.length);
-
 		if (items.length >= 8) {
 			accel_x = Integer.parseInt(items[1]);
 			accel_y = Integer.parseInt(items[2]);
