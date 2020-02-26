@@ -21,6 +21,7 @@ package org.altusmetrum.AltosDroid;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -35,6 +36,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.Parcelable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import android.view.*;
@@ -44,8 +46,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 import android.hardware.usb.*;
-
-import org.altusmetrum.altoslib_13.*;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import org.altusmetrum.altoslib_14.*;
 
 class SavedState {
 	long	received_time;
@@ -70,76 +73,7 @@ class SavedState {
 	}
 }
 
-class Tracker implements CharSequence, Comparable {
-	int	serial;
-	String	call;
-	double	frequency;
-
-	String	display;
-
-	public Tracker(int serial, String call, double frequency) {
-		if (call == null)
-			call = "none";
-
-		this.serial = serial;
-		this.call = call;
-		this.frequency = frequency;
-		if (frequency == 0.0)
-			display = "Auto";
-		else if (frequency == AltosLib.MISSING) {
-			display = String.format("%-8.8s  %6d", call, serial);
-		} else {
-			display = String.format("%-8.8s %7.3f %6d", call, frequency, serial);
-		}
-	}
-
-	public Tracker(AltosState s) {
-		this(s == null ? 0 : s.cal_data().serial,
-		     s == null ? null : s.cal_data().callsign,
-		     s == null ? 0.0 : s.frequency);
-	}
-
-	/* CharSequence */
-	public char charAt(int index) {
-		return display.charAt(index);
-	}
-
-	public int length() {
-		return display.length();
-	}
-
-	public CharSequence subSequence(int start, int end) throws IndexOutOfBoundsException {
-		return display.subSequence(start, end);
-	}
-
-	public String toString() {
-		return display.toString();
-	}
-
-	/* Comparable */
-	public int compareTo (Object other) {
-		Tracker	o = (Tracker) other;
-		if (frequency == 0.0) {
-			if (o.frequency == 0.0)
-				return 0;
-			return -1;
-		}
-		if (o.frequency == 0.0)
-			return 1;
-
-		int	a = serial - o.serial;
-		int	b = call.compareTo(o.call);
-		int	c = (int) Math.signum(frequency - o.frequency);
-
-		if (b != 0)
-			return b;
-		if (c != 0)
-			return c;
-		return a;
-	}
-}
-
-public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener {
+public class AltosDroid extends FragmentActivity implements AltosUnitsListener, LocationListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
 	// Actions sent to the telemetry server at startup time
 
@@ -160,16 +94,22 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	public static final int REQUEST_IDLE_MODE      = 5;
 	public static final int REQUEST_IGNITERS       = 6;
 	public static final int REQUEST_SETUP	       = 7;
+	public static final int REQUEST_SELECT_TRACKER = 8;
+	public static final int REQUEST_DELETE_TRACKER = 9;
 
 	public static final String EXTRA_IDLE_MODE = "idle_mode";
 	public static final String EXTRA_IDLE_RESULT = "idle_result";
+	public static final String EXTRA_FREQUENCY = "frequency";
 	public static final String EXTRA_TELEMETRY_SERVICE = "telemetry_service";
+	public static final String EXTRA_TRACKERS = "trackers";
+	public static final String EXTRA_TRACKERS_TITLE = "trackers_title";
 
 	// Setup result bits
 	public static final int SETUP_BAUD = 1;
 	public static final int SETUP_UNITS = 2;
 	public static final int SETUP_MAP_SOURCE = 4;
 	public static final int SETUP_MAP_TYPE = 8;
+	public static final int SETUP_FONT_SIZE = 16;
 
 	public static FragmentManager	fm;
 
@@ -214,7 +154,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	TelemetryState	telemetry_state;
 	Tracker[]	trackers;
-
 
 	UsbDevice	pending_usb_device;
 	boolean		start_with_usb;
@@ -322,7 +261,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		case TelemetryState.CONNECT_CONNECTED:
 			if (telemetry_state.config != null) {
 				String str = String.format("S/N %d %6.3f MHz%s", telemetry_state.config.serial,
-							   telemetry_state.frequency, idle_mode ? " (idle)" : "");
+							   telemetry_state.frequency, telemetry_state.idle_mode ? " (idle)" : "");
 				if (telemetry_state.telemetry_rate != AltosLib.ao_telemetry_rate_38400)
 					str = str.concat(String.format(" %d bps",
 								       AltosLib.ao_telemetry_rate_values[telemetry_state.telemetry_rate]));
@@ -360,7 +299,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	}
 
 	int	selected_serial = 0;
-	int	current_serial;
 	long	switch_time;
 
 	void set_switch_time() {
@@ -375,11 +313,29 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		if (new_telemetry_state != null)
 			telemetry_state = new_telemetry_state;
 
-		if (selected_serial != 0)
-			current_serial = selected_serial;
+		if (selected_frequency != AltosLib.MISSING) {
+			AltosState selected_state = telemetry_state.get(selected_serial);
+			AltosState latest_state = telemetry_state.get(telemetry_state.latest_serial);
 
-		if (current_serial == 0)
-			current_serial = telemetry_state.latest_serial;
+			if (selected_state != null && selected_state.frequency == selected_frequency) {
+				selected_frequency = AltosLib.MISSING;
+			} else if ((selected_state == null || selected_state.frequency != selected_frequency) &&
+				   (latest_state != null && latest_state.frequency == selected_frequency))
+			{
+				selected_frequency = AltosLib.MISSING;
+				selected_serial = telemetry_state.latest_serial;
+			}
+		}
+
+		if (!telemetry_state.containsKey(selected_serial)) {
+			selected_serial = telemetry_state.latest_serial;
+			AltosDebug.debug("selected serial set to %d", selected_serial);
+		}
+
+		int shown_serial = selected_serial;
+
+		if (telemetry_state.idle_mode)
+			shown_serial = telemetry_state.latest_serial;
 
 		if (!registered_units_listener) {
 			registered_units_listener = true;
@@ -387,7 +343,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 
 		int	num_trackers = 0;
-		for (AltosState s : telemetry_state.states.values()) {
+
+		for (AltosState s : telemetry_state.values()) {
 			num_trackers++;
 		}
 
@@ -396,44 +353,17 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		int n = 0;
 		trackers[n++] = new Tracker(0, "auto", 0.0);
 
-		for (AltosState s : telemetry_state.states.values())
+		for (AltosState s : telemetry_state.values())
 			trackers[n++] = new Tracker(s);
 
 		Arrays.sort(trackers);
 
+		if (telemetry_state.frequency != AltosLib.MISSING)
+			telem_frequency = telemetry_state.frequency;
+
 		update_title(telemetry_state);
 
-		AltosState	state = null;
-		boolean		aged = true;
-
-		if (telemetry_state.states.containsKey(current_serial)) {
-			state = telemetry_state.states.get(current_serial);
-			int age = state_age(state.received_time);
-			if (age < 20)
-				aged = false;
-			if (current_serial == selected_serial)
-				aged = false;
-			else if (switch_time != 0 && (switch_time - state.received_time) > 0)
-				aged = true;
-		}
-
-		if (aged) {
-			AltosState	newest_state = null;
-			int		newest_age = 0;
-
-			for (int serial : telemetry_state.states.keySet()) {
-				AltosState	existing = telemetry_state.states.get(serial);
-				int		existing_age = state_age(existing.received_time);
-
-				if (newest_state == null || existing_age < newest_age) {
-					newest_state = existing;
-					newest_age = existing_age;
-				}
-			}
-
-			if (newest_state != null)
-				state = newest_state;
-		}
+		AltosState	state = telemetry_state.get(shown_serial);
 
 		update_ui(telemetry_state, state, telemetry_state.quiet);
 
@@ -474,6 +404,19 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 
+	static String age_string(int age) {
+		String	text;
+		if (age < 60)
+			text = String.format("%ds", age);
+		else if (age < 60 * 60)
+			text = String.format("%dm", age / 60);
+		else if (age < 60 * 60 * 24)
+			text = String.format("%dh", age / (60 * 60));
+		else
+			text = String.format("%dd", age / (24 * 60 * 60));
+		return text;
+	}
+
 	void update_age() {
 		if (saved_state != null) {
 			int age = state_age(saved_state.received_time);
@@ -487,16 +430,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 			set_screen_on(age);
 
-			String	text;
-			if (age < 60)
-				text = String.format("%ds", age);
-			else if (age < 60 * 60)
-				text = String.format("%dm", age / 60);
-			else if (age < 60 * 60 * 24)
-				text = String.format("%dh", age / (60 * 60));
-			else
-				text = String.format("%dd", age / (24 * 60 * 60));
-			mAgeView.setText(text);
+			mAgeView.setText(age_string(age));
 		}
 	}
 
@@ -594,7 +528,6 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		for (AltosDroidTab mTab : mTabs)
 			mTab.update_ui(telem_state, state, from_receiver, location, mTab == mTabsAdapter.currentItem());
 
-		AltosDebug.debug("quiet %b\n", quiet);
 		if (mAltosVoice != null && mTabsAdapter.currentItem() != null)
 			mAltosVoice.tell(telem_state, state, from_receiver, location, (AltosDroidTab) mTabsAdapter.currentItem(), quiet);
 
@@ -617,7 +550,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 		int deg = (int) Math.floor(p);
 		double min = (p - Math.floor(p)) * 60.0;
-		return String.format("%d°%9.4f\" %s", deg, min, h);
+		return String.format("%d° %7.4f\" %s", deg, min, h);
 	}
 
 	static String number(String format, double value) {
@@ -640,14 +573,29 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		return tab_view;
 	}
 
+	static public int[] themes = {
+		R.style.Small,
+		R.style.Medium,
+		R.style.Large,
+		R.style.Extra
+	};
+
+	static public int[] dialog_themes = {
+		R.style.Small_Dialog,
+		R.style.Medium_Dialog,
+		R.style.Large_Dialog,
+		R.style.Extra_Dialog
+	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		// Initialise preferences
+		AltosDroidPreferences.init(this);
+		setTheme(themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 		AltosDebug.init(this);
 		AltosDebug.debug("+++ ON CREATE +++");
 
-		// Initialise preferences
-		AltosDroidPreferences.init(this);
 
 		fm = getSupportFragmentManager();
 
@@ -682,7 +630,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		mStateView     = (TextView) findViewById(R.id.state_value);
 		mAgeView       = (TextView) findViewById(R.id.age_value);
 		mAgeNewColor   = mAgeView.getTextColors().getDefaultColor();
-		mAgeOldColor   = getResources().getColor(R.color.old_color);
+		mAgeOldColor   = getResources().getColor(R.color.old_color, getTheme());
 	}
 
 	private void ensureBluetooth() {
@@ -791,11 +739,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		noticeIntent(intent);
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		AltosDebug.debug("+ ON RESUME +");
-
+	private void enable_location_updates() {
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
@@ -810,12 +754,81 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		update_ui(telemetry_state, state, true);
 	}
 
+	static final int MY_PERMISSION_REQUEST = 1001;
+
+	public boolean have_location_permission = false;
+	public boolean have_storage_permission = false;
+	public boolean asked_permission = false;
+
+	AltosMapOnline map_online;
+
+	void
+	tell_map_permission(AltosMapOnline map_online) {
+		this.map_online = map_online;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions,
+					       int[] grantResults) {
+		if (requestCode == MY_PERMISSION_REQUEST) {
+			for (int i = 0; i < grantResults.length; i++) {
+				if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+					if (permissions[i].equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+						have_location_permission = true;
+						enable_location_updates();
+						if (map_online != null)
+							map_online.position_permission();
+					}
+					if (permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+						have_storage_permission = true;
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		AltosDebug.debug("+ ON RESUME +");
+
+		if (!asked_permission) {
+			asked_permission = true;
+			if (ActivityCompat.checkSelfPermission(this,
+							      Manifest.permission.ACCESS_FINE_LOCATION)
+			    == PackageManager.PERMISSION_GRANTED)
+			{
+				have_location_permission = true;
+			}
+			if (ActivityCompat.checkSelfPermission(this,
+							       Manifest.permission.WRITE_EXTERNAL_STORAGE)
+			    == PackageManager.PERMISSION_GRANTED)
+			{
+				have_storage_permission = true;
+			}
+			int count = (have_location_permission ? 0 : 1) + (have_storage_permission ? 0 : 1);
+			if (count > 0)
+			{
+				String[] permissions = new String[count];
+				int i = 0;
+				if (!have_location_permission)
+					permissions[i++] = Manifest.permission.ACCESS_FINE_LOCATION;
+				if (!have_location_permission)
+					permissions[i++] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+				ActivityCompat.requestPermissions(this, permissions, MY_PERMISSION_REQUEST);
+			}
+		}
+		if (have_location_permission)
+			enable_location_updates();
+	}
+
 	@Override
 	public void onPause() {
 		super.onPause();
 		AltosDebug.debug("- ON PAUSE -");
 		// Stop listening for location updates
-		((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
+		if (have_location_permission)
+			((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
 	}
 
 	@Override
@@ -838,7 +851,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		AltosDebug.debug("onActivityResult " + resultCode);
+		AltosDebug.debug("onActivityResult request %d result %d", requestCode, resultCode);
 		switch (requestCode) {
 		case REQUEST_CONNECT_DEVICE:
 			// When DeviceListActivity returns with a device to connect to
@@ -868,11 +881,21 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			if (resultCode == Activity.RESULT_OK)
 				note_setup_changes(data);
 			break;
+		case REQUEST_SELECT_TRACKER:
+			if (resultCode == Activity.RESULT_OK)
+				select_tracker(data);
+			break;
+		case REQUEST_DELETE_TRACKER:
+			if (resultCode == Activity.RESULT_OK)
+				delete_track(data);
+			break;
 		}
 	}
 
 	private void note_setup_changes(Intent data) {
 		int changes = data.getIntExtra(SetupActivity.EXTRA_SETUP_CHANGES, 0);
+
+		AltosDebug.debug("note_setup_changes changes %d\n", changes);
 
 		if ((changes & SETUP_BAUD) != 0) {
 			try {
@@ -891,6 +914,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			/* nothing to do here */
 		}
 		set_switch_time();
+		if ((changes & SETUP_FONT_SIZE) != 0) {
+			AltosDebug.debug(" ==== Recreate to switch font sizes ==== ");
+			finish();
+			startActivity(getIntent());
+		}
 	}
 
 	private void connectUsb(UsbDevice device) {
@@ -908,10 +936,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	}
 
 	private void bluetoothEnabled(Intent data) {
-		try {
-			mService.send(Message.obtain(null, TelemetryService.MSG_BLUETOOTH_ENABLED, null));
-		} catch (RemoteException e) {
-			AltosDebug.debug("send BT enabled message failed");
+		if (mService != null) {
+			try {
+				mService.send(Message.obtain(null, TelemetryService.MSG_BLUETOOTH_ENABLED, null));
+			} catch (RemoteException e) {
+				AltosDebug.debug("send BT enabled message failed");
+			}
 		}
 	}
 
@@ -978,7 +1008,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		return true;
 	}
 
+	double telem_frequency = 434.550;
+	double selected_frequency = AltosLib.MISSING;
+
 	void setFrequency(double freq) {
+		telem_frequency = freq;
+		selected_frequency = AltosLib.MISSING;
 		try {
 			mService.send(Message.obtain(null, TelemetryService.MSG_SETFREQUENCY, freq));
 			set_switch_time();
@@ -1018,10 +1053,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 	}
 
-	void select_tracker(int serial) {
-		int i;
+	void select_tracker(int serial, double frequency) {
 
-		AltosDebug.debug("select tracker %d\n", serial);
+		AltosDebug.debug("select tracker %d %7.3f\n", serial, frequency);
 
 		if (serial == selected_serial) {
 			AltosDebug.debug("%d already selected\n", serial);
@@ -1029,6 +1063,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 
 		if (serial != 0) {
+			int i;
 			for (i = 0; i < trackers.length; i++)
 				if (trackers[i].serial == serial)
 					break;
@@ -1037,35 +1072,18 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				AltosDebug.debug("attempt to select unknown tracker %d\n", serial);
 				return;
 			}
+			if (frequency != 0.0 && frequency != AltosLib.MISSING)
+				setFrequency(frequency);
 		}
 
-		current_serial = selected_serial = serial;
+		selected_serial = serial;
 		update_state(null);
 	}
 
-	void touch_trackers(Integer[] serials) {
-		AlertDialog.Builder builder_tracker = new AlertDialog.Builder(this);
-		builder_tracker.setTitle("Select Tracker");
-
-		final Tracker[] my_trackers = new Tracker[serials.length + 1];
-
-		my_trackers[0] = new Tracker(null);
-
-		for (int i = 0; i < serials.length; i++) {
-			AltosState	s = telemetry_state.states.get(serials[i]);
-			my_trackers[i+1] = new Tracker(s);
-		}
-		builder_tracker.setItems(my_trackers,
-					 new DialogInterface.OnClickListener() {
-						 public void onClick(DialogInterface dialog, int item) {
-							 if (item == 0)
-								 select_tracker(0);
-							 else
-								 select_tracker(my_trackers[item].serial);
-						 }
-					 });
-		AlertDialog alert_tracker = builder_tracker.create();
-		alert_tracker.show();
+	void select_tracker(Intent data) {
+		int serial = data.getIntExtra(SelectTrackerActivity.EXTRA_SERIAL_NUMBER, 0);
+		double frequency = data.getDoubleExtra(SelectTrackerActivity.EXTRA_FREQUENCY, 0.0);
+		select_tracker(serial, frequency);
 	}
 
 	void delete_track(int serial) {
@@ -1073,6 +1091,39 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			mService.send(Message.obtain(null, TelemetryService.MSG_DELETE_SERIAL, (Integer) serial));
 		} catch (Exception ex) {
 		}
+	}
+
+	void delete_track(Intent data) {
+		int serial = data.getIntExtra(SelectTrackerActivity.EXTRA_SERIAL_NUMBER, 0);
+		if (serial != 0)
+			delete_track(serial);
+	}
+
+	void start_select_tracker(Tracker[] select_trackers, int title_id, int request) {
+		Intent intent = new Intent(this, SelectTrackerActivity.class);
+		AltosDebug.debug("put title id 0x%x %s", title_id, getResources().getString(title_id));
+		intent.putExtra(EXTRA_TRACKERS_TITLE, title_id);
+		if (select_trackers != null) {
+			ArrayList<Tracker> tracker_array = new ArrayList<Tracker>(Arrays.asList(select_trackers));
+			intent.putParcelableArrayListExtra(EXTRA_TRACKERS, tracker_array);
+		} else {
+			intent.putExtra(EXTRA_TRACKERS, (Parcelable[]) null);
+		}
+		startActivityForResult(intent, request);
+	}
+
+	void start_select_tracker(Tracker[] select_trackers) {
+		start_select_tracker(select_trackers, R.string.select_tracker, REQUEST_SELECT_TRACKER);
+	}
+
+	void touch_trackers(Integer[] serials) {
+		Tracker[] my_trackers = new Tracker[serials.length];
+
+		for (int i = 0; i < serials.length; i++) {
+			AltosState	s = telemetry_state.get(serials[i]);
+			my_trackers[i] = new Tracker(s);
+		}
+		start_select_tracker(my_trackers);
 	}
 
 	@Override
@@ -1108,56 +1159,28 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				frequency_strings[i] = frequencies[i].toString();
 
 			AlertDialog.Builder builder_freq = new AlertDialog.Builder(this);
-			builder_freq.setTitle("Pick a frequency");
+			builder_freq.setTitle("Select Frequency");
 			builder_freq.setItems(frequency_strings,
 					 new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int item) {
 							 setFrequency(frequencies[item]);
+							 selected_frequency = frequencies[item].frequency;
 						 }
 					 });
 			AlertDialog alert_freq = builder_freq.create();
 			alert_freq.show();
 			return true;
 		case R.id.select_tracker:
-			if (trackers != null) {
-				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
-				builder_serial.setTitle("Select a tracker");
-				builder_serial.setItems(trackers,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int item) {
-									System.out.printf("select item %d %s\n", item, trackers[item].display);
-									if (item == 0)
-										select_tracker(0);
-									else
-										select_tracker(trackers[item].serial);
-								}
-							});
-				AlertDialog alert_serial = builder_serial.create();
-				alert_serial.show();
-
-			}
+			start_select_tracker(trackers);
 			return true;
 		case R.id.delete_track:
-			if (trackers != null) {
-				AlertDialog.Builder builder_serial = new AlertDialog.Builder(this);
-				builder_serial.setTitle("Delete a track");
-				final Tracker[] my_trackers = new Tracker[trackers.length - 1];
-				for (int i = 0; i < trackers.length - 1; i++)
-					my_trackers[i] = trackers[i+1];
-				builder_serial.setItems(my_trackers,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int item) {
-									delete_track(my_trackers[item].serial);
-								}
-							});
-				AlertDialog alert_serial = builder_serial.create();
-				alert_serial.show();
-
-			}
+			if (trackers != null && trackers.length > 0)
+				start_select_tracker(trackers, R.string.delete_track, REQUEST_DELETE_TRACKER);
 			return true;
 		case R.id.idle_mode:
 			serverIntent = new Intent(this, IdleModeActivity.class);
 			serverIntent.putExtra(EXTRA_IDLE_MODE, idle_mode);
+			serverIntent.putExtra(EXTRA_FREQUENCY, telem_frequency);
 			startActivityForResult(serverIntent, REQUEST_IDLE_MODE);
 			return true;
 		}

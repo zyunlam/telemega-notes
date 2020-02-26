@@ -7,7 +7,6 @@
         android:id="@+id/tabLabel"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:textSize="13dp"
         android:textColor="#ffffff"
 	android:gravity="center_horizontal"
 	android:background="#808080"

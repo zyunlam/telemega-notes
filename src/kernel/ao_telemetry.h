@@ -176,7 +176,8 @@ struct ao_telemetry_companion {
 	/* 32 */
 };
 
-#define AO_TELEMETRY_MEGA_SENSOR	0x08
+#define AO_TELEMETRY_MEGA_SENSOR_MPU		0x08	/* Invensense IMU */
+#define AO_TELEMETRY_MEGA_SENSOR_BMX160		0x12	/* BMX160 IMU */
 
 struct ao_telemetry_mega_sensor {
 	uint16_t	serial;		/*  0 */

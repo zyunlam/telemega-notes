@@ -94,9 +94,11 @@
 		ground, connect it to the negative external battery
 		connection, top terminal 4.
 
-		Connecting the positive battery terminal to the pyro
+		Connecting the switched positive battery terminal to the pyro
 		charges must be done separate from EasyMini, by soldering
-		them together or using some other connector.
+		them together or using some other connector.  Note that for
+		safety, you must put a switch between the pyro battery and
+		the rest of the circuit!
 
 		The other lead from each pyro charge is then inserted into
 		the appropriate per-pyro channel screw terminal (top

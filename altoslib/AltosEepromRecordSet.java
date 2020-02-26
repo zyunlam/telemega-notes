@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.io.*;
 import java.util.*;
@@ -27,24 +27,32 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		return eeprom.config_data();
 	}
 
+	private void init_cal_data() {
+		for (AltosEepromRecord record : ordered) {
+			if (record.cmd() == AltosLib.AO_LOG_FLIGHT) {
+				cal_data.set_tick(record.tick());
+				cal_data.set_boost_tick();
+				cal_data.set_state(AltosLib.ao_flight_pad);
+				break;
+			}
+		}
+	}
+
 	public AltosCalData cal_data() {
 		if (cal_data == null) {
 			cal_data = new AltosCalData(config_data());
-			for (AltosEepromRecord record : ordered) {
-				if (record.cmd() == AltosLib.AO_LOG_FLIGHT) {
-					cal_data.set_tick(record.tick());
-					cal_data.set_boost_tick();
-					break;
-				}
-			}
+			init_cal_data();
 		}
 		return cal_data;
 	}
 
 	public void capture_series(AltosDataListener listener) {
-		AltosCalData	cal_data = cal_data();
-
-		cal_data.reset();
+		if (cal_data == null) {
+			cal_data();
+		} else {
+			cal_data.reset();
+			init_cal_data();
+		}
 		listener.set_log_format(config_data().log_format);
 
 		for (AltosEepromRecord record : ordered) {
@@ -77,6 +85,7 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			record = new AltosEepromRecordMega(eeprom);
 			break;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:

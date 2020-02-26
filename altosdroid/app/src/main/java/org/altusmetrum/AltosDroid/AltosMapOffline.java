@@ -21,7 +21,7 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 import java.io.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 import android.graphics.*;
 import android.view.*;
@@ -346,18 +346,6 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 		draw_bitmap(here, here_bitmap, here_off_x, here_off_y);
 	}
 
-	@Override public void invalidate() {
-		Rect r = new Rect();
-		getDrawingRect(r);
-		super.invalidate();
-	}
-
-	@Override public void invalidate(int l, int t, int r, int b) {
-		Rect rect = new Rect();
-		getDrawingRect(rect);
-		super.invalidate();
-	}
-
 	@Override
 	protected void onDraw(Canvas view_canvas) {
 		if (map == null) {
@@ -449,11 +437,11 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 
 		if (telem_state != null) {
 			Integer[] old_serial = rockets.keySet().toArray(new Integer[0]);
-			Integer[] new_serial = telem_state.states.keySet().toArray(new Integer[0]);
+			Integer[] new_serial = telem_state.keySet().toArray(new Integer[0]);
 
 			/* remove deleted keys */
 			for (int serial : old_serial) {
-				if (!telem_state.states.containsKey(serial))
+				if (!telem_state.containsKey(serial))
 					rockets.remove(serial);
 			}
 
@@ -461,7 +449,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 
 			for (int serial : new_serial) {
 				Rocket 		rocket;
-				AltosState	t_state = telem_state.states.get(serial);
+				AltosState	t_state = telem_state.get(serial);
 				if (rockets.containsKey(serial))
 					rocket = rockets.get(serial);
 				else {
@@ -471,7 +459,7 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 				if (t_state.gps != null) {
 					AltosLatLon	latlon = new AltosLatLon(t_state.gps.lat, t_state.gps.lon);
 					rocket.set_position(latlon, t_state.received_time);
-					if (state.cal_data().serial == serial)
+					if (state != null && state.cal_data().serial == serial)
 						there = latlon;
 				}
 				if (state != null)

@@ -25,7 +25,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class MapTypeActivity extends Activity {
 	private Button hybrid;
@@ -58,10 +58,10 @@ public class MapTypeActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.map_type);
 
 		hybrid = (Button) findViewById(R.id.map_type_hybrid);

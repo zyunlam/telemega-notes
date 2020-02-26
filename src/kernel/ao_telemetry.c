@@ -139,9 +139,17 @@ ao_send_mega_sensor(void)
 		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 	telemetry.generic.tick = packet->tick;
-	telemetry.generic.type = AO_TELEMETRY_MEGA_SENSOR;
-
+#if HAS_BMX160
+	telemetry.generic.type = AO_TELEMETRY_MEGA_SENSOR_BMX160;
+#else
 #if HAS_MPU6000 || HAS_MPU9250
+	telemetry.generic.type = AO_TELEMETRY_MEGA_SENSOR_MPU;
+#else
+#error unknown IMU
+#endif
+#endif
+
+#if HAS_GYRO
 	telemetry.mega_sensor.orient = ao_sample_orient;
 #endif
 	telemetry.mega_sensor.accel = ao_data_accel(packet);
@@ -176,6 +184,20 @@ ao_send_mega_sensor(void)
 	telemetry.mega_sensor.mag_x = packet->mpu9250.mag_x;
 	telemetry.mega_sensor.mag_z = packet->mpu9250.mag_z;
 	telemetry.mega_sensor.mag_y = packet->mpu9250.mag_y;
+#endif
+
+#if HAS_BMX160
+	telemetry.mega_sensor.accel_x = packet->bmx160.acc_x;
+	telemetry.mega_sensor.accel_y = packet->bmx160.acc_y;
+	telemetry.mega_sensor.accel_z = packet->bmx160.acc_z;
+
+	telemetry.mega_sensor.gyro_x = packet->bmx160.gyr_x;
+	telemetry.mega_sensor.gyro_y = packet->bmx160.gyr_y;
+	telemetry.mega_sensor.gyro_z = packet->bmx160.gyr_z;
+
+	telemetry.mega_sensor.mag_x = packet->bmx160.mag_x;
+	telemetry.mega_sensor.mag_z = packet->bmx160.mag_z;
+	telemetry.mega_sensor.mag_y = packet->bmx160.mag_y;
 #endif
 
 	ao_telemetry_send();

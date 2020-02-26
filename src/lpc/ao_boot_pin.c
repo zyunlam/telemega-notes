@@ -20,14 +20,11 @@
 #include <ao_boot.h>
 #include <ao_exti.h>
 
-void
+int
 ao_boot_check_pin(void)
 {
 	uint16_t v;
 
-	/* Enable power interface clock */
-//	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
-	
 	/* Enable the input pin */
 	ao_enable_input(AO_BOOT_APPLICATION_GPIO, AO_BOOT_APPLICATION_PIN,
 			AO_BOOT_APPLICATION_MODE);
@@ -41,7 +38,5 @@ ao_boot_check_pin(void)
 	/* Reset the chip to turn off the port and the power interface clock */
 	ao_gpio_set_mode(AO_BOOT_APPLICATION_GPIO, AO_BOOT_APPLICATION_PIN, 0);
 	ao_disable_port(AO_BOOT_APPLICATION_GPIO);
-//	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_PWREN);
-	if (v == AO_BOOT_APPLICATION_VALUE)
-		ao_boot_chain(AO_BOOT_APPLICATION_BASE);
+	return v == AO_BOOT_APPLICATION_VALUE;
 }

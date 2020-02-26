@@ -297,13 +297,20 @@
 
 		To use a separate pyro battery, connect the negative pyro
 		battery terminal to the flight computer ground terminal,
-		the positive battery terminal to the igniter and the other
+		the the switched positive battery terminal to the igniter 
+		and the other
 		igniter lead to the negative pyro terminal on the flight
 		computer. When the pyro channel fires, it will complete the
 		circuit between the negative pyro terminal and the ground
 		terminal, firing the igniter. Specific instructions on how
 		to hook this up for each flight computer will be found
 		in the section below for that flight computer.
+
+		Note that you must include a switch in the positive lead of 
+		the pyro battery for safety, as the on-board power switch 
+		circuit on our product only controls current flow from the 
+		the primary or system battery!
+
 
 	=== Using a Different Kind of Battery
 

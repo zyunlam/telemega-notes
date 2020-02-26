@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.util.*;
 import java.io.*;
@@ -377,6 +377,7 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_EASYMEGA_2 = 16;
 	public static final int AO_LOG_FORMAT_TELESTATIC = 17;
 	public static final int AO_LOG_FORMAT_MICROPEAK2 = 18;
+	public static final int AO_LOG_FORMAT_TELEMEGA_4 = 19;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static boolean isspace(int c) {

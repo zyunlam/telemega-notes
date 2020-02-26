@@ -51,7 +51,7 @@ footer:
     left:
       content: '{page-number}'
     right:
-      content: '© 2018 Bdale Garbee and Keith Packard. Creative Commons ShareAlike 3.0 License'
+      content: '© 2020 Bdale Garbee and Keith Packard. Creative Commons ShareAlike 3.0 License'
   verso:
     left:
       content: $footer_recto_right_content

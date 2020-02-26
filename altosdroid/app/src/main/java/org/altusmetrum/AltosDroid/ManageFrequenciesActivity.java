@@ -30,7 +30,7 @@ import android.view.View.*;
 import android.view.inputmethod.*;
 import android.widget.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 class FrequencyItem {
 	public AltosFrequency frequency;
@@ -99,7 +99,7 @@ class FrequencyAdapter extends ArrayAdapter<FrequencyItem> {
 		if (position == selected_item)
 			item.frequency_view.setBackgroundColor(Color.RED);
 		else
-			item.frequency_view.setBackgroundColor(Color.BLACK);
+			item.frequency_view.setBackgroundColor(0);
 		return item.frequency_view;
 	}
 }
@@ -236,10 +236,10 @@ public class ManageFrequenciesActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.manage_frequencies);
 
 		frequencies_view = (ListView) findViewById(R.id.frequencies);

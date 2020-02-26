@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altosuilib_13;
+package org.altusmetrum.altosuilib_14;
 
 public interface AltosShapeListener {
 	void set_shapes_visible(boolean visible);

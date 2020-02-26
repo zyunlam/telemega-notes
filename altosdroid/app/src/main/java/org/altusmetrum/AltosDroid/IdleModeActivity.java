@@ -26,14 +26,16 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class IdleModeActivity extends Activity {
-	private EditText callsign;
+	private EditText callsignText;
+	private TextView frequencyView;
 	private Button connect;
 	private Button disconnect;
 	private Button reboot;
 	private Button igniters;
+	private double frequency;
 
 	public static final String EXTRA_IDLE_MODE = "idle_mode";
 	public static final String EXTRA_IDLE_RESULT = "idle_result";
@@ -52,7 +54,7 @@ public class IdleModeActivity extends Activity {
 	}
 
 	private String callsign() {
-		return callsign.getEditableText().toString();
+		return callsignText.getEditableText().toString();
 	}
 
 	public void connect_idle() {
@@ -74,14 +76,18 @@ public class IdleModeActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.idle_mode);
 
-		callsign = (EditText) findViewById(R.id.set_callsign);
-		callsign.setText(new StringBuffer(AltosPreferences.callsign()));
+		callsignText = (EditText) findViewById(R.id.set_callsign);
+		callsignText.setText(new StringBuffer(AltosPreferences.callsign()));
+
+		frequency = getIntent().getDoubleExtra(AltosDroid.EXTRA_FREQUENCY, 0.0);
+		frequencyView = (TextView) findViewById(R.id.frequency);
+		frequencyView.setText(String.format("Frequency: %7.3f MHz", frequency));
 
 		connect = (Button) findViewById(R.id.connect_idle);
 		connect.setOnClickListener(new OnClickListener() {

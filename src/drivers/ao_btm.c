@@ -32,7 +32,7 @@
 int8_t			ao_btm_stdio;
 uint8_t		ao_btm_connected;
 
-#define BT_DEBUG 1
+#define BT_DEBUG 0
 
 #if BT_DEBUG
 char		ao_btm_buffer[256];

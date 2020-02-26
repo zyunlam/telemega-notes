@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -30,7 +30,7 @@ public class AltosIdleMonitor extends Thread {
 
 	boolean			remote;
 	boolean			close_on_exit;
-	double			frequency;
+	double			frequency = AltosLib.MISSING;
 	String			callsign;
 
 	AltosState		state;
@@ -63,6 +63,8 @@ public class AltosIdleMonitor extends Thread {
 			if (state == null)
 				state = new AltosState(new AltosCalData(link.config_data()));
 			fetch.provide_data(state);
+			if (frequency != AltosLib.MISSING)
+				state.set_frequency(frequency);
 			if (!link.has_error && !link.reply_abort)
 				worked = true;
 		} finally {

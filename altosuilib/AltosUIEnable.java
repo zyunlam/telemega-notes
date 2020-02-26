@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_13;
+package org.altusmetrum.altosuilib_14;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,7 +25,7 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -175,15 +175,14 @@ public class AltosUIEnable extends Container implements ChangeListener {
 		add(line_width_label, c);
 
 		line_width = new JSpinner();
-		line_width.setValue(new Integer(1));
+		line_width.setValue(1);
 		line_width.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent e) {
 					int w = (Integer) line_width.getValue();
 					if (w < 1) {
 						w = 1;
-						line_width.setValue(new Integer(w));
+						line_width.setValue(w);
 					}
-					System.out.printf("line width set to %d\n", w);
 					set_line_width(w);
 				}
 			});
@@ -205,7 +204,7 @@ public class AltosUIEnable extends Container implements ChangeListener {
 		speed_filter = new JSlider(JSlider.HORIZONTAL, 0, 10000, (int) (filter_listener.speed_filter() * 1000.0));
 		Hashtable<Integer,JLabel> label_table = new Hashtable<Integer,JLabel>();
 		for (int i = 0; i <= 10000; i += 5000) {
-			label_table.put(new Integer(i), new JLabel(String.format("%d", i)));
+			label_table.put(i, new JLabel(String.format("%d", i)));
 		}
 		speed_filter.setPaintTicks(true);
 		speed_filter.setMajorTickSpacing(1000);

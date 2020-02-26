@@ -33,7 +33,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and
@@ -296,10 +296,10 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.map_preload);
 
 		// Set result CANCELED incase the user backs out

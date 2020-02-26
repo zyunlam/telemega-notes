@@ -70,6 +70,7 @@ altoslib_JAVA = \
 	AltosGPS.java \
 	AltosGPSTimeValue.java \
 	AltosGPSSat.java \
+	AltosGauss.java \
 	AltosGreatCircle.java \
 	AltosHexfile.java \
 	AltosHexsym.java \

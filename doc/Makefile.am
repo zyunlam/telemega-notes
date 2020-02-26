@@ -17,6 +17,7 @@ FAKETIME=TZ=UTC faketime -f '$(RELEASE_DATE) 00:00:00 i0'
 endif
 
 RELNOTES_INC=\
+	release-notes-1.9.2.inc \
 	release-notes-1.9.1.inc \
 	release-notes-1.9.inc \
 	release-notes-1.8.7.inc \
@@ -278,6 +279,8 @@ DOC=$(HTML) $(PDF) $(IMAGES) $(MAP_SVG_FILES) $(STYLESHEET)
 
 SUFFIXES = .dot .svg .inc .txt .adoc .pdf .html
 
+ATTRIBUTES=--attribute="revdate=$(DOC_DATE)" --attribute="version=$(VERSION)"
+
 .dot.svg:
 	dot -Tsvg -o$@ $*.dot
 
@@ -288,10 +291,10 @@ SUFFIXES = .dot .svg .inc .txt .adoc .pdf .html
 	sed -e 's/^[ 	]*//' -e 's/^\\//' $*.inc > $@
 
 .adoc.html:
-	asciidoctor -b html5 $*.adoc
+	asciidoctor $(ATTRIBUTES) -b html5 $*.adoc
 
 .adoc.pdf:
-	asciidoctor-pdf $*.adoc
+	asciidoctor-pdf $(ATTRIBUTES) $*.adoc
 
 all:	$(HTML) $(PDF)
 

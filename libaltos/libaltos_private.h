@@ -35,6 +35,7 @@ struct altos_file {
 	unsigned char			in_data[USB_BUF_SIZE];
 	int				in_used;
 	int				in_read;
+	int				busy;
 };
 
 #ifdef LINUX

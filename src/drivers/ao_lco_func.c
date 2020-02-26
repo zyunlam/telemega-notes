@@ -28,8 +28,8 @@ int8_t
 ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 {
 	int8_t		r;
-	uint16_t	sent_time;
-	uint16_t	timeout = AO_MS_TO_TICKS(10);
+	AO_TICK_TYPE	sent_time;
+	AO_TICK_TYPE	timeout = AO_MS_TO_TICKS(10);
 
 #if HAS_RADIO_RATE
 	switch (ao_config.radio_rate) {
@@ -62,7 +62,7 @@ void
 ao_lco_arm(uint16_t box, uint8_t channels, uint16_t tick_offset)
 {
 	ao_mutex_get(&ao_lco_mutex);
-	command.tick = ao_time() - tick_offset;
+	command.tick = (uint16_t) ao_time() - tick_offset;
 	command.box = box;
 	command.cmd = AO_PAD_ARM;
 	command.channels = channels;

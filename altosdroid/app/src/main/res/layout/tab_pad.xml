@@ -38,17 +38,21 @@
       
       <ImageView
 	  android:id="@+id/battery_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/battery_voltage_label"
 	  android:src="@drawable/grayled"
 	  />
 
       <ImageView
 	  android:id="@+id/battery_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
 	  android:contentDescription="@string/battery_voltage_label"
+	  android:paddingRight="5dp"
 	  android:src="@drawable/grayled" />
 
       <TextView
@@ -77,15 +81,19 @@
 
       <ImageView
 	  android:id="@+id/receiver_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/receiver_voltage_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/receiver_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/receiver_voltage_label"
 	  android:src="@drawable/grayled" />
 
@@ -112,15 +120,19 @@
 
       <ImageView
 	  android:id="@+id/logging_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/logging_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/logging_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/logging_label"
 	  android:src="@drawable/grayled" />
 
@@ -148,15 +160,19 @@
 
       <ImageView
 	  android:id="@+id/gps_locked_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/gps_locked_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/gps_locked_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/gps_locked_label"
 	  android:src="@drawable/grayled" />
 
@@ -184,15 +200,19 @@
 
       <ImageView
 	  android:id="@+id/gps_ready_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/gps_ready_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/gps_ready_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/gps_ready_label"
 	  android:src="@drawable/grayled" />
 
@@ -222,15 +242,19 @@
 
       <ImageView
 	  android:id="@+id/apogee_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/apogee_voltage_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/apogee_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/apogee_voltage_label"
 	  android:src="@drawable/grayled" />
 
@@ -259,15 +283,19 @@
 
       <ImageView
 	  android:id="@+id/main_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/main_voltage_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/main_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/main_voltage_label"
 	  android:src="@drawable/grayled" />
 
@@ -296,15 +324,19 @@
 
       <ImageView
 	  android:id="@+id/ignite_a_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_a_voltage_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/ignite_a_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_a_voltage_label"
 	  android:src="@drawable/grayled" />
 
@@ -333,15 +365,19 @@
 
       <ImageView
 	  android:id="@+id/ignite_b_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_b_voltage_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/ignite_b_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_b_voltage_label"
 	  android:src="@drawable/grayled" />
 
@@ -370,15 +406,19 @@
 
       <ImageView
 	  android:id="@+id/ignite_c_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_c_voltage_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/ignite_c_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_c_voltage_label"
 	  android:src="@drawable/grayled" />
 
@@ -407,15 +447,19 @@
 
       <ImageView
 	  android:id="@+id/ignite_d_redled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_d_voltage_label"
 	  android:src="@drawable/grayled" />
 
       <ImageView
 	  android:id="@+id/ignite_d_greenled"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
+	  android:layout_width="match_parent"
+	  android:layout_height="match_parent"
+	  android:scaleType="centerInside"
+	  android:paddingRight="5dp"
 	  android:contentDescription="@string/ignite_d_voltage_label"
 	  android:src="@drawable/grayled" />
 

@@ -22,7 +22,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import org.altusmetrum.altosuilib_13.*;
+import org.altusmetrum.altosuilib_14.*;
 
 public class MicroDeviceDialog extends AltosDeviceDialog {
 

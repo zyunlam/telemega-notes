@@ -29,7 +29,7 @@ import android.view.*;
 import android.view.View.*;
 import android.widget.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 class IgniterItem {
 	public String name;
@@ -101,7 +101,7 @@ class IgniterAdapter extends ArrayAdapter<IgniterItem> {
 		if (position == selected_item)
 			item.igniter_view.setBackgroundColor(Color.RED);
 		else
-			item.igniter_view.setBackgroundColor(Color.BLACK);
+			item.igniter_view.setBackgroundColor(0);
 		return item.igniter_view;
 	}
 }
@@ -139,7 +139,8 @@ public class IgniterActivity extends Activity {
 
 			switch (msg.what) {
 			case AltosDroid.MSG_IGNITER_STATUS:
-				ia.igniter_status((HashMap <String,Integer>) msg.obj);
+				@SuppressWarnings("unchecked") HashMap<String,Integer> map = (HashMap <String,Integer>) msg.obj;
+				ia.igniter_status(map);
 				break;
 			}
 		}
@@ -339,10 +340,10 @@ public class IgniterActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.igniters);
 
 		igniters_view = (ListView) findViewById(R.id.igniters);

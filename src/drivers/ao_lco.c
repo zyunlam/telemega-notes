@@ -37,7 +37,7 @@
 #define AO_LCO_BOX_DRAG		0x1000
 
 /* UI values */
-static uint16_t	ao_lco_fire_tick;
+static AO_TICK_TYPE	ao_lco_fire_tick;
 static uint8_t	ao_lco_fire_down;
 
 static uint8_t	ao_lco_display_mutex;
@@ -124,10 +124,10 @@ ao_lco_box_present(uint16_t box)
 static struct ao_task	ao_lco_drag_task;
 static uint8_t		ao_lco_drag_active;
 
-static uint16_t
-ao_lco_drag_button_check(uint16_t now, uint16_t delay)
+static AO_TICK_TYPE
+ao_lco_drag_button_check(AO_TICK_TYPE now, AO_TICK_TYPE delay)
 {
-	uint16_t	button_delay = ~0;
+	AO_TICK_TYPE	button_delay = ~0;
 
 	/*
 	 * Check to see if the button has been held down long enough
@@ -135,14 +135,14 @@ ao_lco_drag_button_check(uint16_t now, uint16_t delay)
 	 */
 	if (ao_lco_fire_down) {
 		if (ao_lco_drag_race) {
-			if ((int16_t) (now - ao_lco_fire_tick) >= AO_LCO_DRAG_RACE_STOP_TIME) {
+			if ((AO_TICK_SIGNED) (now - ao_lco_fire_tick) >= AO_LCO_DRAG_RACE_STOP_TIME) {
 				ao_lco_drag_disable();
 				ao_lco_fire_down = 0;
 			}
 			else
 				button_delay = ao_lco_fire_tick + AO_LCO_DRAG_RACE_STOP_TIME - now;
 		} else {
-			if ((int16_t) (now - ao_lco_fire_tick) >= AO_LCO_DRAG_RACE_START_TIME) {
+			if ((AO_TICK_SIGNED) (now - ao_lco_fire_tick) >= AO_LCO_DRAG_RACE_START_TIME) {
 				ao_lco_drag_enable();
 				ao_lco_fire_down = 0;
 			}
@@ -158,14 +158,14 @@ ao_lco_drag_button_check(uint16_t now, uint16_t delay)
 static void
 ao_lco_drag_monitor(void)
 {
-	uint16_t	delay = ~0;
-	uint16_t	now;
+	AO_TICK_TYPE	delay = ~0;
+	AO_TICK_TYPE	now;
 
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
 	for (;;) {
 		PRINTD("Drag monitor count %d active %d delay %d\n",
 		       ao_lco_drag_beep_count, ao_lco_drag_active, delay);
-		if (delay == (uint16_t) ~0)
+		if (delay == (AO_TICK_TYPE) ~0)
 			ao_sleep(&ao_lco_drag_beep_count);
 		else
 			ao_sleep_for(&ao_lco_drag_beep_count, delay);

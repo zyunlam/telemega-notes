@@ -62,14 +62,15 @@
 		stranded, into the GND hole just above the screw terminal
 		strip and solder it in place.
 
-		Connecting the positive battery terminal to the pyro
+		Connecting the switched positive battery terminal to the pyro
 		charges must be done separate from TeleMetrum, by soldering
-		them together or using some other connector.
-
+		them together or using some other connector. Note that you 
+		must include a switch in the positive lead from the pyro 
+		battery for safety!
 
 		The other lead from each pyro charge is then inserted into
-		the appropriate per-pyro channel screw terminal (terminal 4 for the
-		Main charge, terminal 6 for the Apogee charge).
+		the appropriate per-pyro channel screw terminal (terminal 4 
+		for the Main charge, terminal 6 for the Apogee charge).
 
 	=== Using an Active Switch with TeleMetrum
 

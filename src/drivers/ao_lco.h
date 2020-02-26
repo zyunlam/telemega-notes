@@ -107,12 +107,12 @@ void
 ao_lco_drag_disable(void);
 
 /* Handle drag beeps, return new delay */
-uint16_t
-ao_lco_drag_beep_check(uint16_t now, uint16_t delay);
+AO_TICK_TYPE
+ao_lco_drag_beep_check(AO_TICK_TYPE now, AO_TICK_TYPE delay);
 
 /* Check if it's time to beep during drag race. Return new delay */
-uint16_t
-ao_lco_drag_warn_check(uint16_t now, uint16_t delay);
+AO_TICK_TYPE
+ao_lco_drag_warn_check(AO_TICK_TYPE now, AO_TICK_TYPE delay);
 
 /* Request 'beeps' additional drag race beeps */
 void

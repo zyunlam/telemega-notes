@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -392,7 +392,7 @@ public abstract class AltosLink implements Runnable {
 					int cal) {
 		if (debug)
 			System.out.printf("set_radio_frequency %7.3f (freq %b) (set %b) %d\n", frequency, has_frequency, has_setting, cal);
-		if (frequency == 0)
+		if (frequency == 0 || frequency == AltosLib.MISSING)
 			return;
 		if (has_frequency)
 			set_radio_freq((int) Math.floor (frequency * 1000 + 0.5));
@@ -519,7 +519,7 @@ public abstract class AltosLink implements Runnable {
 	public String name;
 
 	public void start_remote() throws TimeoutException, InterruptedException {
-		if (frequency == 0.0)
+		if (frequency == 0.0 || frequency == AltosLib.MISSING)
 			frequency = AltosPreferences.frequency(serial);
 		if (debug)
 			System.out.printf("start remote %7.3f\n", frequency);

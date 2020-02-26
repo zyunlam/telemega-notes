@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.util.concurrent.*;
 
@@ -31,13 +31,11 @@ public class AltosAdxl375 implements Cloneable {
 
 	public boolean parse_line(String line) throws NumberFormatException {
 		if (line.startsWith("ADXL375 value")) {
-			System.out.printf("adxl parse line %s\n", line);
 			String[] items = line.split("\\s+");
 			if (axis == AltosLib.MISSING)
 				throw new NumberFormatException("No ADXL375 axis specified");
 			if (items.length >= 3) {
 				accel = Integer.parseInt(items[2 + axis]);
-				System.out.printf("accel %d\n", accel);
 				return true;
 			}
 		}

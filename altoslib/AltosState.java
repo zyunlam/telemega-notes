@@ -20,7 +20,7 @@
  * Track flight state from telemetry or eeprom data stream
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 public class AltosState extends AltosDataListener {
 
@@ -513,26 +513,27 @@ public class AltosState extends AltosDataListener {
 	}
 
 	public double height() {
-		double k = kalman_height.value();
-		if (k != AltosLib.MISSING)
-			return k;
-
 		double b = baro_height();
 		if (b != AltosLib.MISSING)
 			return b;
+
+		double k = kalman_height.value();
+		if (k != AltosLib.MISSING)
+			return k;
 
 		return gps_height();
 	}
 
 	public double max_height() {
-		double	k = kalman_height.max();
-		if (k != AltosLib.MISSING)
-			return k;
-
 		double a = altitude.max();
 		double g = ground_altitude();
 		if (a != AltosLib.MISSING && g != AltosLib.MISSING)
 			return a - g;
+
+		double	k = kalman_height.max();
+		if (k != AltosLib.MISSING)
+			return k;
+
 		return max_gps_height();
 	}
 
@@ -842,6 +843,8 @@ public class AltosState extends AltosDataListener {
 							gps.climb_rate * gps.climb_rate), time);
 			if (gps.course != AltosLib.MISSING)
 				gps_course.set(gps.course, time);
+		} else if (state() == AltosLib.ao_flight_pad || state() == AltosLib.ao_flight_stateless) {
+			set_npad(0);
 		}
 		if (gps.lat != 0 && gps.lon != 0 &&
 		    pad_lat != AltosLib.MISSING &&
@@ -856,10 +859,6 @@ public class AltosState extends AltosDataListener {
 			distance = from_pad.distance;
 			range = from_pad.range;
 		}
-	}
-
-	public String state_name() {
-		return AltosLib.state_name(state());
 	}
 
 	public void set_state(int state) {
@@ -886,8 +885,8 @@ public class AltosState extends AltosDataListener {
 		received_time = ms;
 	}
 
-	public void set_gps(AltosGPS gps) {
-		super.set_gps(gps);
+	public void set_gps(AltosGPS gps, boolean set_location, boolean set_sats) {
+		super.set_gps(gps, set_location, set_sats);
 		if (gps != null) {
 			this.gps = gps;
 			update_gps();
@@ -901,9 +900,9 @@ public class AltosState extends AltosDataListener {
 
 	void update_pad_rotation() {
 		if (cal_data().pad_orientation != AltosLib.MISSING && accel_ground_along != AltosLib.MISSING) {
-			rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data().accel_zero_across),
-						     AltosIMU.convert_accel(accel_ground_through - cal_data().accel_zero_through),
-						     AltosIMU.convert_accel(accel_ground_along - cal_data().accel_zero_along),
+			rotation = new AltosRotation(accel_ground_across,
+						     accel_ground_through,
+						     accel_ground_along,
 						     cal_data().pad_orientation);
 			orient.set_computed(rotation.tilt(), time);
 		}

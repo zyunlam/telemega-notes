@@ -20,13 +20,22 @@ package org.altusmetrum.AltosDroid;
 import java.util.*;
 
 import android.content.Context;
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class AltosDroidPreferences extends AltosPreferences {
 
 	/* Active device preference name */
 	final static String activeDeviceAddressPreference = "ACTIVE-DEVICE-ADDRESS";
 	final static String activeDeviceNamePreference = "ACTIVE-DEVICE-NAME";
+
+	public static final int font_size_small = 0;
+	public static final int font_size_medium = 1;
+	public static final int font_size_large = 2;
+	public static final int font_size_extra = 3;
+
+	final static String fontSizePreference = "FONT-SIZE";
+
+	static int font_size = font_size_medium;
 
 	static DeviceAddress	active_device_address;
 
@@ -38,11 +47,18 @@ public class AltosDroidPreferences extends AltosPreferences {
 
 	static int	map_source;
 
+	/* Tracker sort selection */
+	final static String trackerSortPreference = "TRACKER-SORT";
+
+	static int	tracker_sort;
+
 	public static void init(Context context) {
 		if (backend != null)
 			return;
 
 		AltosPreferences.init(new AltosDroidPreferencesBackend(context));
+
+		font_size = backend.getInt(fontSizePreference, font_size_medium);
 
 		String address = backend.getString(activeDeviceAddressPreference, null);
 		String name = backend.getString(activeDeviceNamePreference, null);
@@ -51,6 +67,8 @@ public class AltosDroidPreferences extends AltosPreferences {
 			active_device_address = new DeviceAddress (address, name);
 
 		map_source = backend.getInt(mapSourcePreference, MAP_SOURCE_ONLINE);
+
+		tracker_sort = backend.getInt(trackerSortPreference, 0);
 	}
 
 	public static void set_active_device(DeviceAddress address) {
@@ -105,6 +123,39 @@ public class AltosDroidPreferences extends AltosPreferences {
 	public static void unregister_map_source_listener(AltosDroidMapSourceListener l) {
 		synchronized(backend) {
 			map_source_listeners.remove(l);
+		}
+	}
+
+	public static int font_size() {
+		synchronized (backend) {
+			return font_size;
+		}
+	}
+
+	public static void set_font_size(int new_font_size) {
+		synchronized (backend) {
+			if (font_size != new_font_size) {
+				font_size = new_font_size;
+				backend.putInt(fontSizePreference, font_size);
+				flush_preferences();
+			}
+		}
+	}
+
+
+	public static int tracker_sort() {
+		synchronized(backend) {
+			return tracker_sort;
+		}
+	}
+
+	public static void set_tracker_sort(int new_tracker_sort) {
+		synchronized(backend) {
+			if (tracker_sort != new_tracker_sort) {
+				tracker_sort = new_tracker_sort;
+				backend.putInt(trackerSortPreference, tracker_sort);
+				flush_preferences();
+			}
 		}
 	}
 }

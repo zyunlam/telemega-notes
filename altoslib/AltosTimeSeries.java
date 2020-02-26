@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.util.*;
 
@@ -21,14 +21,17 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<Alt
 	public AltosUnits		units;
 	ArrayList<AltosTimeValue>	values;
 	boolean				data_changed;
+	double				min_time = -2;
 
 	public int compareTo(AltosTimeSeries other) {
 		return label.compareTo(other.label);
 	}
 
 	public void add(AltosTimeValue tv) {
-		data_changed = true;
-		values.add(tv);
+		if (tv.time >= min_time) {
+			data_changed = true;
+			values.add(tv);
+		}
 	}
 
 	public void erase_values() {

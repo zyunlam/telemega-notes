@@ -22,7 +22,8 @@
 void
 ao_boot_chain(uint32_t *base);
 
-void
+/* Return true to switch to application */
+int
 ao_boot_check_pin(void);
 
 /* Return true to switch to application (if present) */
