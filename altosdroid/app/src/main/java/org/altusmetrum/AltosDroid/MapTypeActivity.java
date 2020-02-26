@@ -25,7 +25,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class MapTypeActivity extends Activity {
 	private Button hybrid;

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_13;
+package org.altusmetrum.altosuilib_14;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,7 +25,7 @@ import javax.swing.event.*;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.*;
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;

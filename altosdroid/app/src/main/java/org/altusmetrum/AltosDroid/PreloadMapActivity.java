@@ -33,7 +33,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and
