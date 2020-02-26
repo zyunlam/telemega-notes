@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 public class AltosEepromRecordMega extends AltosEepromRecord {
 	public static final int	record_length = 32;

@@ -12,9 +12,9 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altosuilib_13;
+package org.altusmetrum.altosuilib_14;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public interface AltosEepromGrapher {
 

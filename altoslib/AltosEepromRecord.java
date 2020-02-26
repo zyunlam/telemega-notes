@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 public abstract class AltosEepromRecord implements Comparable<AltosEepromRecord> {
 

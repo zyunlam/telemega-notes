@@ -33,7 +33,7 @@ import android.os.*;
 import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class TelemetryService extends Service implements AltosIdleMonitorListener {
 
