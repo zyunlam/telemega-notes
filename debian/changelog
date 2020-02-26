@@ -1,3 +1,96 @@
+altos (1.9.2-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * Releasing: capture notes from 1.9.1 release
+  * Releasing: add TeleMetrum v3.0 firmware to production list
+  * doc: update copyright year in footers, note need to check this doc/RELNOTEs
+  * update info on using separate pyro batteries to encourage including a switch
+  * update TeleMega production scripts for v4.0
+  * include TeleMega v4 in list of firmware included in fat build and LLC repo
+  * update copyright assertion in TeleLaunch manual
+  * update ChangeLog for release 1.9.2
+
+  [ Keith Packard ]
+  * altos: Initial bits for TeleMega v4.0
+  * altos: Build TeleMega v4.0 bits
+  * altos: Use AO_TICK_TYPE/AO_TICK_SIGNED for lco/pad code
+  * altos: Make debug telemini firmware a bit easier to build
+  * altos: TeleMini beeper is on Tim2 CH4, not Tim3 CH4
+  * altos: Disable ao_btm debug. Avoids breaking 's' command
+  * altos: Always start application if boot pin isn't in use
+  * Generate altosdroid/app/build.gradle at configure time
+  * Force using opensdk-8 to build altosdroid
+  * Bump altosdroid version to 20, always build release apk
+  * Use 'must' instead of 'should' in reference to switch for pyro battery
+  * altosdroid: Switch to NotificationCompat
+  * altosdroid: Request fine location permission if not already granted
+  * altosdroid: Check if the telem service is running when bluetooth gets enabled
+  * Bump version to build a new android app -- 1.9.1c
+  * altosdroid: Add text size selection
+  * Bump version to build a new android app (23)
+  * altosdroid: Use custom dialog themes for all dialogs
+  * altosdroid: Fix a pile of compile warnings
+  * altosdroid: Change tracker selection dialog
+  * altosdroid: Ignore 'build.gradle', which is built from a .in file
+  * altosdroid: Add helper 'makefile'
+  * altosui: Set idle mode frequency before starting link
+  * altosdroid: When the user switches frequency, look for something there
+  * Bump version to build a new android app (25)
+  * altosdroid: Use select tracker dialog when deleting a tracker
+  * altosdroid: Make frequency changes during idle mode work
+  * altosdroid: Change layout of idle mode dialog a bit
+  * altoslib: Reset consecutive GPS count when GPS bad
+  * altos: Fix wiring mistakes for TeleMega v4.0
+  * altos: Add new telemetry packet format for TeleMega v4
+  * altos: Create new log format for TeleMega v4
+  * altoslib: Add 'gauss' units for magnetic field strength
+  * altosuilib: Add fourth column to info table
+  * altoslib: Store IMU accel ground data in converted values
+  * altoslib: Add support for TeleMega v4
+  * altoslib: Move 'state_name' API to AltosCalData
+  * altoslib: Report whether GPS data contains new location/sat info
+  * altoslib: Re-initialize cal data for eeprom record set
+  * altoslib: Report raw baro height instead of kalman filtered value
+  * altosuilib: Put units on GPS altitude and height in info table
+  * altoslib: Pass all flight records while reading telem file
+  * doc: updates for 1.9.2
+  * altosui: Add TeleMega v4.0 firmware to altosui packaged bits
+  * altosuilib: Eliminate a couple java compiler warnings
+  * Bump version for new android upload
+  * altos: Log BMX160 data when present
+  * altos: Copy BMX160 data to data ring
+  * altos: Get BMX160 initialized correctly
+  * altoslib: Remove ADXL375 debug noise
+  * ao-tools: Add TeleMega v4.0 to ao-eeprom
+  * altos: Init BMX160 more carefully
+  * altoslib: Correct IMU axes for telemetry data
+  * ao-tools: Handle TeleMega v4.0 telemetry in ao-telem
+  * altos: Adjust comment about how the BMX160 is oriented
+  * altos/altoslib: BMX160 Y axis gyro direction is opposite from MPU
+  * altoslib: Fix Tmega v4 eeprom parsing
+  * libaltos: Delay freeing serial device until not busy
+  * altoslib: Correct sign of telemega v4 pitch
+  * altoslib: Remove hard-coded accel scale for mega eeprom
+  * altosuilib, altoslib: Add azimuth and compass to reports
+  * altos/telemega-4.0: Fix signs of IMU pitch and mag across
+  * altos/bmx160: Compute µT in bmx160 driver using trim data
+  * altoslib: BMX160 driver now returns µT values for mag sensor
+  * Bump java lib versions in preparation for 1.9.2
+  * Set doc version and date from package version and release date
+  * Bump version to 1.9.2, android 27
+  * Bump java lib versions in preparation for 1.9.2
+  * altoslib: Add TeleMega-v4 adxl375 config to AltosConfigData
+  * Bump version to 1.9.2, android 27
+  * Set doc version and date from package version and release date
+  * Bump java lib versions in preparation for 1.9.2
+  * Bump version to 1.9.2, android 27
+  * altoslib: Remove debug printf from AltosIMU.java
+  * libaltos: Create altos_pause_one_second API
+  * Bump java lib versions in preparation for 1.9.2
+  * Bump version to 1.9.2, android 27
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 25 Feb 2020 23:58:43 -0700
+
 altos (1.9.1-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
