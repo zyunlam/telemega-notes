@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.util.*;
 
@@ -380,8 +380,10 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	public AltosTimeSeries orient_series;
+	public AltosTimeSeries azimuth_series;
 
 	public static final String orient_name = "Tilt Angle";
+	public static final String azimuth_name = "Azimuth Angle";
 
 	private void compute_orient() {
 
@@ -391,20 +393,25 @@ public class AltosFlightSeries extends AltosDataListener {
 		if (accel_ground_across == AltosLib.MISSING)
 			return;
 
-		if (cal_data().pad_orientation == AltosLib.MISSING)
+		AltosCalData cal_data = cal_data();
+
+		if (cal_data.pad_orientation == AltosLib.MISSING)
 			return;
 
-		if (cal_data().accel_zero_across == AltosLib.MISSING)
+		if (cal_data.accel_zero_across == AltosLib.MISSING)
 			return;
 
-		AltosRotation rotation = new AltosRotation(AltosIMU.convert_accel(accel_ground_across - cal_data().accel_zero_across),
-							   AltosIMU.convert_accel(accel_ground_through - cal_data().accel_zero_through),
-							   AltosIMU.convert_accel(accel_ground_along - cal_data().accel_zero_along),
-							   cal_data().pad_orientation);
+		AltosRotation rotation = new AltosRotation(accel_ground_across,
+							   accel_ground_through,
+							   accel_ground_along,
+							   cal_data.pad_orientation);
 		double prev_time = ground_time;
 
 		orient_series = add_series(orient_name, AltosConvert.orient);
 		orient_series.add(ground_time, rotation.tilt());
+
+		azimuth_series = add_series(azimuth_name, AltosConvert.orient);
+		azimuth_series.add(ground_time, rotation.azimuth());
 
 		for (AltosTimeValue roll_v : gyro_roll) {
 			double	time = roll_v.time;
@@ -417,6 +424,7 @@ public class AltosFlightSeries extends AltosDataListener {
 
 				rotation.rotate(pitch, yaw, roll);
 				orient_series.add(time, rotation.tilt());
+				azimuth_series.add(time, rotation.azimuth());
 			}
 			prev_time = time;
 		}
@@ -540,63 +548,68 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String gps_vdop_name = "GPS Vertical Dilution of Precision";
 	public static final String gps_hdop_name = "GPS Horizontal Dilution of Precision";
 
-	public void set_gps(AltosGPS gps) {
-		super.set_gps(gps);
+	public void set_gps(AltosGPS gps, boolean new_location, boolean new_sats) {
+		super.set_gps(gps, new_location, new_sats);
+		AltosCalData cal_data = cal_data();
 		if (gps_series == null)
 			gps_series = new ArrayList<AltosGPSTimeValue>();
 		gps_series.add(new AltosGPSTimeValue(time(), gps));
 
-		if (sats_in_soln == null) {
-			sats_in_soln = add_series(sats_in_soln_name, null);
-		}
-		sats_in_soln.add(time(), gps.nsat);
-		if (gps.pdop != AltosLib.MISSING) {
-			if (gps_pdop == null)
-				gps_pdop = add_series(gps_pdop_name, null);
-			gps_pdop.add(time(), gps.pdop);
-		}
-		if (gps.hdop != AltosLib.MISSING) {
-			if (gps_hdop == null)
-				gps_hdop = add_series(gps_hdop_name, null);
-			gps_hdop.add(time(), gps.hdop);
-		}
-		if (gps.vdop != AltosLib.MISSING) {
-			if (gps_vdop == null)
-				gps_vdop = add_series(gps_vdop_name, null);
-			gps_vdop.add(time(), gps.vdop);
-		}
-		if (gps.locked) {
-			if (gps.alt != AltosLib.MISSING) {
-				if (gps_altitude == null)
-					gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
-				gps_altitude.add(time(), gps.alt);
+		if (new_location) {
+			if (sats_in_soln == null) {
+				sats_in_soln = add_series(sats_in_soln_name, null);
 			}
-			if (gps.ground_speed != AltosLib.MISSING) {
-				if (gps_ground_speed == null)
-					gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
-				gps_ground_speed.add(time(), gps.ground_speed);
+			sats_in_soln.add(time(), gps.nsat);
+			if (gps.pdop != AltosLib.MISSING) {
+				if (gps_pdop == null)
+					gps_pdop = add_series(gps_pdop_name, null);
+				gps_pdop.add(time(), gps.pdop);
 			}
-			if (gps.climb_rate != AltosLib.MISSING) {
-				if (gps_ascent_rate == null)
-					gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
-				gps_ascent_rate.add(time(), gps.climb_rate);
+			if (gps.hdop != AltosLib.MISSING) {
+				if (gps_hdop == null)
+					gps_hdop = add_series(gps_hdop_name, null);
+				gps_hdop.add(time(), gps.hdop);
 			}
-			if (gps.course != AltosLib.MISSING) {
-				if (gps_course == null)
-					gps_course = add_series(gps_course_name, null);
-				gps_course.add(time(), gps.course);
+			if (gps.vdop != AltosLib.MISSING) {
+				if (gps_vdop == null)
+					gps_vdop = add_series(gps_vdop_name, null);
+				gps_vdop.add(time(), gps.vdop);
 			}
-			if (gps.ground_speed != AltosLib.MISSING && gps.climb_rate != AltosLib.MISSING) {
-				if (gps_speed == null)
-					gps_speed = add_series(gps_speed_name, null);
-				gps_speed.add(time(), Math.sqrt(gps.ground_speed * gps.ground_speed +
-								gps.climb_rate * gps.climb_rate));
+			if (gps.locked) {
+				if (gps.alt != AltosLib.MISSING) {
+					if (gps_altitude == null)
+						gps_altitude = add_series(gps_altitude_name, AltosConvert.height);
+					gps_altitude.add(time(), gps.alt);
+				}
+				if (gps.ground_speed != AltosLib.MISSING) {
+					if (gps_ground_speed == null)
+						gps_ground_speed = add_series(gps_ground_speed_name, AltosConvert.speed);
+					gps_ground_speed.add(time(), gps.ground_speed);
+				}
+				if (gps.climb_rate != AltosLib.MISSING) {
+					if (gps_ascent_rate == null)
+						gps_ascent_rate = add_series(gps_ascent_rate_name, AltosConvert.speed);
+					gps_ascent_rate.add(time(), gps.climb_rate);
+				}
+				if (gps.course != AltosLib.MISSING) {
+					if (gps_course == null)
+						gps_course = add_series(gps_course_name, null);
+					gps_course.add(time(), gps.course);
+				}
+				if (gps.ground_speed != AltosLib.MISSING && gps.climb_rate != AltosLib.MISSING) {
+					if (gps_speed == null)
+						gps_speed = add_series(gps_speed_name, null);
+					gps_speed.add(time(), Math.sqrt(gps.ground_speed * gps.ground_speed +
+									gps.climb_rate * gps.climb_rate));
+				}
 			}
 		}
-		if (gps.cc_gps_sat != null) {
-			if (sats_in_view == null)
-				sats_in_view = add_series(sats_in_view_name, null);
-			sats_in_view.add(time(), gps.cc_gps_sat.length);
+		if (new_sats) {
+			if (gps.cc_gps_sat != null) {
+				if (sats_in_view == null)
+					sats_in_view = add_series(sats_in_view_name, null);
+				sats_in_view.add(time(), gps.cc_gps_sat.length);
+			}
 		}
 	}
 
@@ -615,8 +628,10 @@ public class AltosFlightSeries extends AltosDataListener {
 	public static final String mag_along_name = "Magnetic Field Along";
 	public static final String mag_across_name = "Magnetic Field Across";
 	public static final String mag_through_name = "Magnetic Field Through";
+	public static final String mag_total_name = "Magnetic Field Strength";
+	public static final String compass_name = "Compass";
 
-	public AltosTimeSeries mag_along, mag_across, mag_through;
+	public AltosTimeSeries mag_along, mag_across, mag_through, mag_total, compass;
 
 	public  void set_accel(double along, double across, double through) {
 		if (accel_along == null) {
@@ -658,10 +673,14 @@ public class AltosFlightSeries extends AltosDataListener {
 			mag_along = add_series(mag_along_name, AltosConvert.magnetic_field);
 			mag_across = add_series(mag_across_name, AltosConvert.magnetic_field);
 			mag_through = add_series(mag_through_name, AltosConvert.magnetic_field);
+			mag_total = add_series(mag_total_name, AltosConvert.magnetic_field);
+			compass = add_series(compass_name, AltosConvert.orient);
 		}
 		mag_along.add(time(), along);
 		mag_across.add(time(), across);
 		mag_through.add(time(), through);
+		mag_total.add(time(), Math.sqrt(along * along + across * across + through *through));
+		compass.add(time(), Math.atan2(across, through) * 180 / Math.PI);
 	}
 
 	public void set_orient(double orient) {

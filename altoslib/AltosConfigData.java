@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.util.*;
 import java.text.*;
@@ -200,6 +200,7 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return 4095 - value;
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 			return -value;
@@ -591,6 +592,8 @@ public class AltosConfigData {
 				return true;
 			if (product.startsWith("TeleMetrum-v3"))
 				return true;
+			if (product.startsWith("TeleMega-v4"))
+				return true;
 		}
 		throw new AltosUnknownProduct(product);
 	}
@@ -600,6 +603,8 @@ public class AltosConfigData {
 			if (product.startsWith("EasyMega-v2"))
 				return AltosAdxl375.X_AXIS;
 			if (product.startsWith("TeleMetrum-v3"))
+				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("TeleMega-v4"))
 				return AltosAdxl375.X_AXIS;
 		}
 		throw new AltosUnknownProduct(product);

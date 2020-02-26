@@ -18,7 +18,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -41,16 +41,6 @@ public class TabMap extends AltosDroidTab implements AltosDroidMapSourceListener
 	private AltosMapOnline map_online;
 	private View view;
 	private int map_source;
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

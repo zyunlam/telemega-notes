@@ -49,12 +49,17 @@ PUBLIC int
 altos_getchar(struct altos_file *file, int timeout)
 {
 	int	ret;
+
+	file->busy = 1;
 	while (file->in_read == file->in_used) {
 		ret = altos_fill(file, timeout);
 		if (ret)
-			return ret;
+			goto done;
 	}
-	return file->in_data[file->in_read++];
+	ret = file->in_data[file->in_read++];
+done:
+	file->busy = 0;
+	return ret;
 }
 
 PUBLIC int
@@ -115,6 +120,9 @@ int altos_bt_port(struct altos_bt_device *device) {
 PUBLIC void
 altos_free(struct altos_file *file)
 {
+	int i;
 	altos_close(file);
+	for (i = 0; i < 10 && file->busy; i++)
+		altos_pause_one_second();
 	free(file);
 }

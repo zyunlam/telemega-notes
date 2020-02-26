@@ -1,12 +1,12 @@
 = TeleLaunch: The Altus Metrum Wireless Launch Control System
 Bdale Garbee <bdale@gag.com>
 :title-logo-image: image:../themes/background.png[]
-:revnumber: v0.1
-:revdate: 16 Feb 2019
+:revnumber: v{version}
+:revdate: 01 Jan 1970
 :icons:
 :icontype: svg
 :revremark: initial draft
-:copyright: Bdale Garbee 2019
+:copyright: Bdale Garbee 2020
 :doctype: book
 :numbered:
 :stylesheet: am.css

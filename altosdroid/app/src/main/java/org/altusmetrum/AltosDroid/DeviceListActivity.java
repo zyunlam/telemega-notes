@@ -55,10 +55,10 @@ public class DeviceListActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(AltosDroid.dialog_themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
 
 		// Setup the window
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.device_list);
 
 		// Set result CANCELED incase the user backs out
@@ -135,7 +135,6 @@ public class DeviceListActivity extends Activity {
 		AltosDebug.debug("doDiscovery()");
 
 		// Indicate scanning in the title
-		setProgressBarIndeterminateVisibility(true);
 		setTitle(R.string.scanning);
 
 		// Turn on sub-title for new devices
@@ -207,7 +206,6 @@ public class DeviceListActivity extends Activity {
 			/* When discovery is finished, change the Activity title
 			 */
 			} else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-				setProgressBarIndeterminateVisibility(false);
 				setTitle(R.string.select_device);
 				if (mNewDevicesArrayAdapter.getCount() == 0) {
 					String noDevices = getResources().getText(R.string.none_found).toString();

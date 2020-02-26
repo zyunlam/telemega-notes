@@ -1,3 +1,900 @@
+commit 28e77f3520095a1e47ab25721b186e42110ffd3e
+Merge: c6ea2666 91ab3acc
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 25 23:57:31 2020 -0700
+
+    Merge branch 'master' into branch-1.9
+
+commit 91ab3acc113dc24e1ebce89875def646e590fb12
+Merge: 243a6b5e aae87fe9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 25 23:55:29 2020 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit aae87fe9fa8d596fea6cc19d4701a7583255150f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:08:58 2020 -0800
+
+    Bump version to 1.9.2, android 27
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ec46adee44ea08120b1940ca55a5fbdf56874bb1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:07:15 2020 -0800
+
+    Bump java lib versions in preparation for 1.9.2
+    
+    Quite a few changes; let's bump the version so we don't end up with
+    the wrong version on some machine.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 45f7b91ea126f8f9e607a8ee53df655d992590f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 22:51:54 2020 -0800
+
+    libaltos: Create altos_pause_one_second API
+    
+    This is to wait for the reading thread to stop using the file object
+    while cleaning up.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 243a6b5ee60989ec4c04b8a7638907d2517d4926
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 25 23:18:11 2020 -0700
+
+    update copyright assertion in TeleLaunch manual
+
+commit c6ea266630b9eef7a80e267a4430d22d50954908
+Merge: 12d6b4dc 7d2b2bae
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 25 23:17:22 2020 -0700
+
+    Merge branch 'master' into branch-1.9
+
+commit 7d2b2bae8a7ed2e15040c58819c8e96215e8292b
+Merge: af8f0b58 0993f791
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 25 22:56:07 2020 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit cec4dea23b7b3cfe0f0a43c19b3118cc98cb9414
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 21:50:10 2020 -0800
+
+    altoslib: Remove debug printf from AltosIMU.java
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0993f7913efb3bc217df6ed2b38b5f6ad018b95d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:08:58 2020 -0800
+
+    Bump version to 1.9.2, android 27
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 76b288f8d02e0a48f04de9455a2dd0b77e48bd63
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:07:15 2020 -0800
+
+    Bump java lib versions in preparation for 1.9.2
+    
+    Quite a few changes; let's bump the version so we don't end up with
+    the wrong version on some machine.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit af8f0b5892e01bdcf9fa4ca86a4752a8294992a1
+Merge: 25c1ef61 65df207e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 25 22:44:08 2020 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 8011baae420bb96ec487bfb343a761af70dd980d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:24:23 2020 -0800
+
+    Set doc version and date from package version and release date
+    
+    This is a bit less work than manually updating them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 65df207e00545ccd380ff7a80933b2d223c1544b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:08:58 2020 -0800
+
+    Bump version to 1.9.2, android 27
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a74e4816b669346fac1c72cfc629d11e2ca5e336
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 21:42:29 2020 -0800
+
+    altoslib: Add TeleMega-v4 adxl375 config to AltosConfigData
+    
+    Needed for idle monitor to work correctly
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 528fdc4e03466430c8d81fc78c90d3c9e8465ca7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:07:15 2020 -0800
+
+    Bump java lib versions in preparation for 1.9.2
+    
+    Quite a few changes; let's bump the version so we don't end up with
+    the wrong version on some machine.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 25c1ef61b9c791b8e55b7d0ebd948ece4ca954c7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:08:58 2020 -0800
+
+    Bump version to 1.9.2, android 27
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 61d3064e7c4958036e241381aa4ab791582820f8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:24:23 2020 -0800
+
+    Set doc version and date from package version and release date
+    
+    This is a bit less work than manually updating them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 52149fd81df45f37f5097850795f290f463c43ef
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 17:07:15 2020 -0800
+
+    Bump java lib versions in preparation for 1.9.2
+    
+    Quite a few changes; let's bump the version so we don't end up with
+    the wrong version on some machine.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9ad50b83eca7aea8c9e568a661fcdd98598d0c73
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 15:35:33 2020 -0800
+
+    altoslib: BMX160 driver now returns µT values for mag sensor
+    
+    These are converted on-board using calibration values provided with
+    the chip.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff2dc6ea0e62f6534b5fb1b0ec2edd4702cf4a41
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 14:57:35 2020 -0800
+
+    altos/bmx160: Compute µT in bmx160 driver using trim data
+    
+    Instead of attempting to ship all of the trim data, compute µT
+    on-board. This means losing the raw sensor values.
+    
+    The compensate functions were taken from the bmm150 sample driver
+    provided by Bosch under the BSD 3 clause license.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9aedcdcab2c24b804236a5b8f99da634cac7ba05
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 11:58:17 2020 -0800
+
+    altos/telemega-4.0: Fix signs of IMU pitch and mag across
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0ab2332358eb0990cb55074001b675d390eae2ca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 11:55:36 2020 -0800
+
+    altosuilib, altoslib: Add azimuth and compass to reports
+    
+    Here, azimuth means change in horizontal plane from launch.
+    Compass is reporting mag field strength in X/Y plane
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 97cb2a808ad8853cead2d9722b7258b1b62df7a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 11:54:11 2020 -0800
+
+    altoslib: Remove hard-coded accel scale for mega eeprom
+    
+    I don't know why this is using a hard-coded value which only matches
+    early TeleMega v1 boards.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4039a60bbe972fd022699d62ab06a8f1bc4af69
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 11:51:57 2020 -0800
+
+    altoslib: Correct sign of telemega v4 pitch
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 88cf92175a4524143349491a817c9037dd8c39ef
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Feb 25 11:57:21 2020 -0800
+
+    libaltos: Delay freeing serial device until not busy
+    
+    Just spins for a while waiting for reading thread to wake up and
+    return.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 017e7ed4d2eea2bbc01972a8dfe11babd42d5993
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 23 16:43:23 2020 -0800
+
+    altoslib: Fix Tmega v4 eeprom parsing
+    
+    Mangled the source while hacking things somehow; both accel and gyro
+    corrupted.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a5a8a4d8de49484a2edba62cc9b84377aa5415a6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 21 00:19:25 2020 -0800
+
+    altos/altoslib: BMX160 Y axis gyro direction is opposite from MPU
+    
+    Just need to flip the sign to make the values go the same direction.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3db6d4698d05c5017565a25b9b5c0f538014bebe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 23:43:01 2020 -0800
+
+    altos: Adjust comment about how the BMX160 is oriented
+    
+    Bdale promises to make them all the same.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 101d068b92031169e2b11350528be0833ff2f8ea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 23:42:24 2020 -0800
+
+    ao-tools: Handle TeleMega v4.0 telemetry in ao-telem
+    
+    Same packet format as older telemega, but axes differ
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6c68e96ef650b2a149064069e26a4dc3ac741d42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 23:41:27 2020 -0800
+
+    altoslib: Correct IMU axes for telemetry data
+    
+    The telem data was assuming original TeleMega sensor orientation.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 88cb0f4a791e0867ccd279e6d244d94f0b1765e9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 22:53:31 2020 -0800
+
+    altos: Init BMX160 more carefully
+    
+    Check accel and gyro power status after turning them on, waiting
+    for a while to see if they actually power up.
+    
+    Read more registers after configuring accel to try and get things
+    reset better.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    
+    Oops.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0ca9a7c6fc914c4b555c99863828861ec54fa01d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 22:44:54 2020 -0800
+
+    ao-tools: Add TeleMega v4.0 to ao-eeprom
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5e8de5a2cef200c1426674859967edc0fdd13663
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 22:35:54 2020 -0800
+
+    altoslib: Remove ADXL375 debug noise
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 67356ae163487e57e6d9c83cb2b7f71a69f8aa27
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 16:51:15 2020 -0800
+
+    altos: Get BMX160 initialized correctly
+    
+     1. Don't reboot at startup. This probably takes a lot longer
+        than 100ms.
+    
+     2. Power up acc and gyr before attempting to configure
+    
+     3. Clear data registers after setting acc range
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee38b3bea20f1e3a73e67aea151f9fc6abdc8483
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 16:23:33 2020 -0800
+
+    altos: Copy BMX160 data to data ring
+    
+    Otherwise you get a lot of zero
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58976653e5d4b8eff1781e69115c4b7e86db045a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 20 16:12:43 2020 -0800
+
+    altos: Log BMX160 data when present
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4b824da227f08e45f7a1a59661b8c0fe45068d60
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 19 14:30:50 2020 -0800
+
+    Bump version for new android upload
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 95fe82630797bae5a9a7ffacc871bbd00efe2d82
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 19 14:01:15 2020 -0800
+
+    altosuilib: Eliminate a couple java compiler warnings
+    
+    Were using new Integer(int), when just passing the int would
+    'auto-box' as necessary.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 76c5e6bf7ecc30ae77a9744a4af26dca3dc46254
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 16:00:43 2020 -0800
+
+    altosui: Add TeleMega v4.0 firmware to altosui packaged bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3055f698e0426d7785843ea1668478375fd02642
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 15:59:25 2020 -0800
+
+    doc: updates for 1.9.2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8ac11767a1b8d3e2faf6f020f5161ed05b801070
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 15:39:08 2020 -0800
+
+    altoslib: Pass all flight records while reading telem file
+    
+    This makes sure we get complete GPS and setup information before
+    the flight starts.
+    
+    To make this work, have data skipped when building time series
+    instead, and have realtime replay fast-forward through the initial
+    data
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit da499044c9d66e42915e3f6429b6b86999b06c2c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 15:38:34 2020 -0800
+
+    altosuilib: Put units on GPS altitude and height in info table
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 305e7852f764e6a06024a9d57b5766d2f8a056ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 15:36:57 2020 -0800
+
+    altoslib: Report raw baro height instead of kalman filtered value
+    
+    Report raw sensor values to the user during flight.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5ff0442702ee41179341240b1bbf290be89e1718
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 15:06:45 2020 -0800
+
+    altoslib: Re-initialize cal data for eeprom record set
+    
+    Instead of leaving it uninitialized, restore the initial data from
+    the flight log.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58e7fccc24f933fd64e272207f783ca79002b7ba
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 15:04:40 2020 -0800
+
+    altoslib: Report whether GPS data contains new location/sat info
+    
+    Use this to limit time series additions to fresh data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2e45e4b1351ce505b9294d5dc25429ab9721e62
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 13 15:00:55 2020 -0800
+
+    altoslib: Move 'state_name' API to AltosCalData
+    
+    That's where state lives.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f400b8dd98680e47645d43940bcff5c0c99bb9e9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 13 12:15:01 2020 -0700
+
+    include TeleMega v4 in list of firmware included in fat build and LLC repo
+
+commit 06cf43cea9149f8c04c80785a613408454eab4f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 20:07:02 2020 -0800
+
+    altoslib: Add support for TeleMega v4
+    
+    TeleMega v4 has a new IMU chip, which required adding support for
+    multiple IMU types, including different scale factors for each mag
+    sensor axis.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f51ad734dfccfa2d4b7515a94dc337eb2b2708a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 20:05:31 2020 -0800
+
+    altoslib: Store IMU accel ground data in converted values
+    
+    For some reason, this value was in sensor units.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b2deef36f135b52ba2eea3042e9d1a1198d4a9ae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 20:00:22 2020 -0800
+
+    altosuilib: Add fourth column to info table
+    
+    Holds IMU data and igniter voltages
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4435843fc8eb06751dbb1ba00fb2856563963e5e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 19:59:19 2020 -0800
+
+    altoslib: Add 'gauss' units for magnetic field strength
+    
+    Compute in gauss, but display in nT (G * 100000)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ea4140a81dc4ec6e541512ed70861691b57c4904
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 13:00:18 2020 -0800
+
+    altos: Create new log format for TeleMega v4
+    
+    Has BMX160 instead of MPU9250
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 440292f53125d7da29b3b4e8caa2c94c557b8325
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 13:01:08 2020 -0800
+
+    altos: Add new telemetry packet format for TeleMega v4
+    
+    Bmx160 instead of MPU9250 changes orientation of IMU data
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cff5506e97314bf9b34d80a01cbdfcad22f3ce08
+Merge: e220b00d 803e260d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Feb 12 12:55:04 2020 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit e220b00d5c3af42dd840dbd34fba264e11046fc6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Feb 12 12:54:38 2020 -0700
+
+    update TeleMega production scripts for v4.0
+
+commit 803e260dcf9beba5684c4dcdda14255d76b2e551
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 11:53:25 2020 -0800
+
+    altos: Fix wiring mistakes for TeleMega v4.0
+    
+    Enable SPI 1 on PB3 PB4 PB5 (just sets output pin config)
+    Disable I2C (we're not using)
+    Fix Pyro channel C port (port D, not port B)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e64b1bc108bd75bcd6271631e48abde84af4631f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 12 11:37:05 2020 -0800
+
+    altoslib: Reset consecutive GPS count when GPS bad
+    
+    This makes sure we get back to 'GPS not ready' when GPS goes unlocked.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ae38a6b5c6cb6c7d89b3237623a890e5101e282b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 10 14:25:55 2020 -0800
+
+    altosdroid: Change layout of idle mode dialog a bit
+    
+    Stick 'callsign:' label and callsign on same line. Save a bit of vertical space.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ddd0c7b57aca8fe7e68c0b8dae21ba79e163db15
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 10 14:25:26 2020 -0800
+
+    altosdroid: Make frequency changes during idle mode work
+    
+    Otherwise, we'd end up sending a freq change over the link, which
+    would do 'bad things'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9697da4767bceb07c4ec070e1537ff4f91a74a87
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 10 13:55:37 2020 -0800
+
+    altosdroid: Use select tracker dialog when deleting a tracker
+    
+    Remove custom delete tracker dialog code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0b7b31793dc91a25d215c216e8db481d549e66ad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 8 23:59:44 2020 -0800
+
+    Bump version to build a new android app (25)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1df1efc7a022597287722dc3a34d3a678fde6d3b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 8 23:55:58 2020 -0800
+
+    altosdroid: When the user switches frequency, look for something there
+    
+    Instead of sticking with the original tracker serial, when the user
+    selects a new frequency, check to see if some data appears there and
+    switch to that tracker.
+    
+    Only do this once, and stop looking if the user selects a tracker.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a88989faebdc3a4b5198c4150096e6f626d76a96
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 8 23:09:50 2020 -0800
+
+    altosui: Set idle mode frequency before starting link
+    
+    This makes sure the link doesn't try to start at the wrong frequency.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96bdc1585d89e09381bd164dfb2ea41e8257df26
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 8 20:46:19 2020 -0800
+
+    altosdroid: Add helper 'makefile'
+    
+    This builds the app from deep inside the source tree.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41ad298abe24cfef0a9db0259436b998a66e4208
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 8 20:45:50 2020 -0800
+
+    altosdroid: Ignore 'build.gradle', which is built from a .in file
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 79f2677143f85a2807b8d4e297f3617aafbd34da
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 8 20:44:10 2020 -0800
+
+    altosdroid: Change tracker selection dialog
+    
+    Create a table of trackers and allow sorting based on each column.
+    When a tracker is selected, the app will not change to another tracker
+    automatically.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e3c4493cfa8d92d96808d14d1c12abb35ecb442
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 8 20:42:11 2020 -0800
+
+    altosdroid: Fix a pile of compile warnings
+    
+    This deletes code which doesn't do anything in API versions past 21 and
+    changes a few bits of code to use the newer supported way.
+    
+    No functional changes are intended...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4fc7db3bc82d4a2222bcfc0cd33b298bc5d3430
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 7 22:00:53 2020 -0800
+
+    altosdroid: Use custom dialog themes for all dialogs
+    
+    Instead of a mixture of custom application and standard dialog themes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 953caffcb87f3aae5962ee2540eef9310c84d32d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 7 20:47:33 2020 -0800
+
+    Bump version to build a new android app (23)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d84a777f07c9a876acdcda44ebc9186ef226d896
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 7 18:44:14 2020 -0800
+
+    altosdroid: Add text size selection
+    
+    Add a setup menu item to change the size of the text everywhere.
+    This involved re-doing the layout for most of the tabs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 33be3363985ec4998c1ae09cab7969aebf775b60
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 6 23:32:24 2020 -0800
+
+    Bump version to build a new android app -- 1.9.1c
+    
+    This will suffice until we ship 1.9.2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d0891fbdcc13a61836462525edab776366f86a24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 6 23:21:02 2020 -0800
+
+    altosdroid: Check if the telem service is running when bluetooth gets enabled
+    
+    Make sure we aren't trying to send a message when the telem service is
+    shut down and the pointer is null.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5186c6f64b374404aeb88b64227a006a58634ab9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 6 23:17:30 2020 -0800
+
+    altosdroid: Request fine location permission if not already granted
+    
+    This avoids crashing if we don't have access to fine position
+    information.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 273bae40dfabc3249acd4427d92abb2ed9fefa6c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 6 17:15:14 2020 -0800
+
+    altosdroid: Switch to NotificationCompat
+    
+    Instead of Notification, which doesn't appear to work on older android
+    releases.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fc73795cd3ad95d8f177a2eb3792d8ed0c7c540f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 5 10:52:05 2020 -0800
+
+    Use 'must' instead of 'should' in reference to switch for pyro battery
+    
+    Make this consistent with docs for other boards.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ad947ec3f313bbd1295af5dc64f1af9ec09bfe27
+Merge: 5b1bd4f8 d8e9d152
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Feb 5 11:48:13 2020 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 5b1bd4f87f682c1956e173a27414ceb076b20ceb
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Feb 5 11:46:36 2020 -0700
+
+    update info on using separate pyro batteries to encourage including a switch
+
+commit d8e9d1529cb744742cfd7d4f5e9f168d4d6dc498
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 28 12:57:25 2020 -0800
+
+    Bump altosdroid version to 20, always build release apk
+    
+    Now that altosdroid doesn't need a maps key, we can always build the
+    release version. New version is 20 instead of 19 because I messed up
+    the upload and google play store is harsh.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 65169d0b33ce6651508127a5ca45b6de27616352
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 28 12:56:27 2020 -0800
+
+    Force using opensdk-8 to build altosdroid
+    
+    Current gradlew doesn't run on newer java
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db786c24510d2df8f5a5d3ec0931deaa252469ad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 28 12:55:47 2020 -0800
+
+    Generate altosdroid/app/build.gradle at configure time
+    
+    This file includes the release version numbers, which are set in
+    configure.ac.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ffbf340c516a7fff7c95b808586f623269fe4338
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 23 17:40:30 2020 -0800
+
+    altos: Always start application if boot pin isn't in use
+    
+    When there's no 'force boot loader' pin, jump to the application
+    instead of stopping in the boot loader.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee009332a17557076f4c9348a31658f5bf605240
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 23 17:31:13 2020 -0800
+
+    altos: Disable ao_btm debug. Avoids breaking 's' command
+    
+    The 's' command is used by altoslib to get the RSSI value during
+    monitor idle operations. Let's avoid breaking that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ced64381edf2478cd080a340a0f88b3d98a1b13d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 23 14:34:14 2020 -0800
+
+    altos: TeleMini beeper is on Tim2 CH4, not Tim3 CH4
+    
+    This makes the beeper work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 539598ce53744f7d70dad482e8865d427fca2fa2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 23 14:32:10 2020 -0800
+
+    altos: Make debug telemini firmware a bit easier to build
+    
+    To enable debugging, we need to stop using the SWD GPIO pins, which
+    are normally used to trigger boot-time firmware behavior -- SWDIO is
+    used to force entry to the boot loader while SWDCLK is used to force
+    default frequency and callsign.
+    
+    This patch makes it easy to edit ao_pins.h to disable the default
+    frequency option.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 54e98a498db0d7026ce16c3ad53bc60986c68253
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jan 22 12:41:40 2020 -0800
+
+    altos: Use AO_TICK_TYPE/AO_TICK_SIGNED for lco/pad code
+    
+    Was using 16-bit types, which 'mostly' worked, except that the pad
+    code compared ao_time() with a 16-bit value when determining the radio
+    status. After the box was on for 10 minutes (timer wrapped), the RF
+    timeout check would always fail, so the red LED would be lit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 366c1422f6d34c8f616dc95c2767d01c4f53f581
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 6 00:18:25 2020 -0800
+
+    altos: Build TeleMega v4.0 bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eae79e1429f1df53577f4ee78e8a0856a8ad5975
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jan 6 00:16:15 2020 -0800
+
+    altos: Initial bits for TeleMega v4.0
+    
+    ADXL375 and BMX160 instead of MMA655x and MPU9250
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c7031c5abbb56b99b067fb8705c8c32695c70e46
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Dec 10 18:17:42 2019 -0700
+
+    doc: update copyright year in footers, note need to check this doc/RELNOTEs
+
+commit b7ce0474eb30c0fb7e08f26891eb40f208de6a96
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Dec 9 03:51:02 2019 -0700
+
+    Releasing: add TeleMetrum v3.0 firmware to production list
+
+commit 5565bc256ccf1f32474d7080fe0f75ce4fad4dc1
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 5 23:16:34 2019 -0700
+
+    Releasing: capture notes from 1.9.1 release
+
+commit 12d6b4dc6ec0a18bb6b1e3dfddbb9d6f00f76f99
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Dec 5 22:22:32 2019 -0700
+
+    update ChangeLog for 1.9.1 release
+
 commit fdf1dbd3d945f6f34f404ffbcb57781f4df23015
 Merge: 5b4da841 bfc4999c
 Author: Bdale Garbee <bdale@gag.com>

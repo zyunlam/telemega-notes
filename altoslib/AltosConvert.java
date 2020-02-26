@@ -19,7 +19,7 @@
 /*
  * Sensor data conversion functions
  */
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.util.*;
 
@@ -473,7 +473,7 @@ public class AltosConvert {
 
 	public static AltosPyroName pyro_name = new AltosPyroName();
 
-	public static AltosUnits magnetic_field = null;
+	public static AltosUnits magnetic_field = new AltosGauss();
 
 	public static String show_gs(String format, double a) {
 		a = meters_to_g(a);

@@ -23,7 +23,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.location.Location;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class AltosVoice {
 
@@ -82,7 +82,7 @@ public class AltosVoice {
 		if (!tts_enabled) return;
 		last_speak_time = now();
 		if (!quiet)
-			tts.speak(s, TextToSpeech.QUEUE_ADD, null);
+			tts.speak(s, TextToSpeech.QUEUE_ADD, null, null);
 	}
 
 	public synchronized long time_since_speak() {
@@ -122,8 +122,6 @@ public class AltosVoice {
 
 		if (state == null)
 			return false;
-
-		AltosDebug.debug("tell_pad lag %b ltm %d\n", last_apogee_good, last_tell_mode);
 
 		if (state.apogee_voltage != AltosLib.MISSING)
 			last_apogee_good = tell_gonogo("apogee",

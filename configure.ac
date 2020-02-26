@@ -18,14 +18,18 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9.1)
-ANDROID_VERSION=18
+AC_INIT([altos], 1.9.2)
+ANDROID_VERSION=27
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2019-12-05
+RELEASE_DATE=2020-02-26
 AC_SUBST(RELEASE_DATE)
+
+DOC_DATE=`LC_ALL=C date -d $RELEASE_DATE +'%d %b %Y'`
+
+AC_SUBST(DOC_DATE)
 
 VERSION_DASH=`echo $VERSION | sed 's/\./-/g'`
 AC_SUBST(VERSION_DASH)
@@ -34,8 +38,8 @@ AC_SUBST(ANDROID_VERSION)
 dnl ==========================================================================
 dnl Java library versions
 
-ALTOSUILIB_VERSION=13
-ALTOSLIB_VERSION=13
+ALTOSUILIB_VERSION=14
+ALTOSLIB_VERSION=14
 
 AC_SUBST(ALTOSLIB_VERSION)
 AC_DEFINE(ALTOSLIB_VERSION,$ALTOSLIB_VERSION,[Version of the AltosLib package])
@@ -166,9 +170,7 @@ fi
 ANDROID_RELEASE=no
 if test "x$ANDROID_SDK" != "xno"; then
 	HAVE_ANDROID_SDK="yes"
-	if test -f "$HOME/altusmetrumllc/google-play-release.keystore" -a -f "$HOME/altusmetrumllc/google-play-passphrase"; then
-		ANDROID_RELEASE=yes
-	fi
+	ANDROID_RELEASE=yes
 else
 	HAVE_ANDROID_SDK="no"
 fi
@@ -556,6 +558,7 @@ telegps/telegps-windows.nsi
 altosdroid/Makefile
 altosdroid/local.properties
 altosdroid/app/src/main/AndroidManifest.xml
+altosdroid/app/build.gradle
 ao-tools/Makefile
 ao-tools/lib/Makefile
 ao-tools/ao-rawload/Makefile

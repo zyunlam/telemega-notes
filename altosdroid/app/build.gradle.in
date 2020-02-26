@@ -17,10 +17,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "org.altusmetrum.AltosDroid"
-        minSdkVersion 26
+        minSdkVersion 21
         targetSdkVersion 28
-        versionCode 19
-        versionName "1.9.1rc1"
+        versionCode @ANDROID_VERSION@
+        versionName "@VERSION@"
     }
     buildTypes {
         release {
@@ -41,7 +41,7 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.core:core:1.2.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
-

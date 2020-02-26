@@ -41,9 +41,9 @@ public class GoNoGoLights {
 		missing = true;
 		set = false;
 
-		dRed   = r.getDrawable(R.drawable.redled);
-		dGreen = r.getDrawable(R.drawable.greenled);
-		dGray  = r.getDrawable(R.drawable.grayled);
+		dRed   = in_red.getContext().getDrawable(R.drawable.redled);
+		dGreen = in_red.getContext().getDrawable(R.drawable.greenled);
+		dGray  = in_red.getContext().getDrawable(R.drawable.grayled);
 	}
 
 	public void set(Boolean s, Boolean m) {

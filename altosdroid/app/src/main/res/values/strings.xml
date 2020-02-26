@@ -38,19 +38,22 @@
 	<string name="select_tracker">Select Tracker</string>
 	<string name="delete_track">Delete Track</string>
 	<string name="map_type">Map Type</string>
-	<string name="map_source">Toggle Online/Offline maps</string>
+	<string name="map_source">Map Source</string>
 
 	<!-- MapTypeActivity -->
 	<!-- <string name="map_type">Map Type</string> -->
 
 	<!-- DeviceListActivity -->
-	<string name="scanning">scanning for devices…</string>
-	<string name="select_device">select a device to connect</string>
+	<string name="scanning">Scanning…</string>
+	<string name="select_device">Select device</string>
 	<string name="none_paired">No devices have been paired</string>
 	<string name="none_found">No devices found</string>
 	<string name="title_paired_devices">Paired Devices</string>
 	<string name="title_other_devices">Other Available Devices</string>
 	<string name="button_scan">Scan for devices</string>
+
+	<!-- TrackerListActivity -->
+	<string name="freq_label">Freq</string>
 
 	<!-- Service -->
 	<string name="telemetry_service_label">AltosDroid Telemetry Service</string>
@@ -59,7 +62,7 @@
 
 	<!-- UI fields -->
 	<!-- Header -->
-	<string name="callsign_label">Callsign</string>
+	<string name="callsign_label">Call</string>
 	<string name="serial_label">Serial</string>
 	<string name="flight_label">Flight</string>
 	<string name="state_label">State</string>
@@ -92,6 +95,8 @@
 	<string name="gps_ready_label">GPS Ready</string>
 	<string name="latitude_label">Latitude</string>
 	<string name="longitude_label">Longitude</string>
+	<string name="target_pos_label">Tar</string>
+	<string name="receiver_pos_label">Me</string>
 	<string name="target_latitude_label">Tar Lat</string>
 	<string name="target_longitude_label">Tar Lon</string>
 	<string name="receiver_latitude_label">My Lat</string>
@@ -116,7 +121,7 @@
 
 	<!-- Idle mode -->
 	<string name="idle_mode">Idle Mode</string>
-	<string name="set_callsign_label">Callsign</string>
+	<string name="set_callsign_label">Callsign: </string>
 	<string name="connect_idle">Monitor</string>
 	<string name="disconnect_idle">Disconnect</string>
 	<string name="reboot_idle">Reboot</string>
@@ -134,6 +139,7 @@
 	<!-- <string name="map_type">Map Type</string> -->
 	<!-- <string name="map_source">Map Source</string> -->
 	<!-- <string name="preload_maps">Preload Maps</string> -->
+	<string name="font_size">Text Size</string>
 	<string name="manage_frequencies">Manage Frequencies</string>
 	<string name="done">OK</string>
 	

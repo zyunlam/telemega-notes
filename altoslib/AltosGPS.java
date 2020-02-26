@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.text.*;
 import java.util.concurrent.*;
@@ -391,7 +391,7 @@ public class AltosGPS implements Cloneable {
 		try {
 			AltosGPS gps = new AltosGPS(link, link.config_data());
 			if (gps != null)
-				listener.set_gps(gps);
+				listener.set_gps(gps, true, true);
 		} catch (TimeoutException te) {
 		}
 	}

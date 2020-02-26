@@ -18,9 +18,10 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 import android.location.Location;
 import android.app.Activity;
+import android.content.*;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import android.widget.TextView;
@@ -66,9 +67,9 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		altos_droid = (AltosDroid) activity;
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		altos_droid = (AltosDroid) context;
 		altos_droid.registerTab(this);
 	}
 

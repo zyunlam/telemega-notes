@@ -18,7 +18,7 @@
 
 package org.altusmetrum.AltosDroid;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -61,8 +61,8 @@ public class TabRecover extends AltosDroidTab {
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
-			mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
-			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
+			mBearingView.setText(String.format("%1.0f°", from_receiver.bearing));
+			set_value(mDistanceView, AltosConvert.distance, 1, from_receiver.distance);
 			String direction = AltosDroid.direction(from_receiver, receiver);
 			if (direction == null)
 				mDirectionView.setText("");
@@ -80,9 +80,9 @@ public class TabRecover extends AltosDroidTab {
 		}
 
 		if (state != null) {
-			set_value(mMaxHeightView, AltosConvert.height, 6, state.max_height());
-			set_value(mMaxAccelView, AltosConvert.accel, 6, state.max_acceleration());
-			set_value(mMaxSpeedView, AltosConvert.speed, 6, state.max_speed());
+			set_value(mMaxHeightView, AltosConvert.height, 1, state.max_height());
+			set_value(mMaxAccelView, AltosConvert.accel, 1, state.max_acceleration());
+			set_value(mMaxSpeedView, AltosConvert.speed, 1, state.max_speed());
 		}
 	}
 }

@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.io.*;
 import java.util.*;
@@ -45,8 +45,8 @@ class AltosEepromNameData extends AltosDataListener {
 		avoid_duplicate_files = true;
 	}
 
-	public void set_gps(AltosGPS gps) {
-		super.set_gps(gps);
+	public void set_gps(AltosGPS gps, boolean set_location, boolean set_sats) {
+		super.set_gps(gps, set_location, set_sats);
 		if (gps != null &&
 		    gps.year != AltosLib.MISSING &&
 		    gps.month != AltosLib.MISSING &&

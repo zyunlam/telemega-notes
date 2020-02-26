@@ -19,6 +19,7 @@
 #include <ao.h>
 #include <ao_exti.h>
 
+#if HAS_FORCE_FREQ
 static void
 ao_check_recovery(void)
 {
@@ -33,11 +34,14 @@ ao_check_recovery(void)
 	ao_gpio_set_mode(AO_RECOVERY_PORT, AO_RECOVERY_PIN, 0);
 	ao_disable_port(AO_RECOVERY_PORT);
 }
+#endif
 
 int
 main(void)
 {
+#if HAS_FORCE_FREQ
 	ao_check_recovery();
+#endif
 
 	ao_clock_init();
 	ao_task_init();

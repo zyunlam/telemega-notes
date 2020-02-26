@@ -16,14 +16,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_13;
+package org.altusmetrum.altosuilib_14;
 
 import java.io.*;
 import java.util.ArrayList;
 
 import java.awt.*;
 import javax.swing.*;
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 import org.jfree.ui.*;
 import org.jfree.chart.*;
@@ -45,6 +45,8 @@ public class AltosGraph extends AltosUIGraph {
 	static final private AltosUILineStyle accel_color = new AltosUILineStyle();
 	static final private AltosUILineStyle vert_accel_color = new AltosUILineStyle();
 	static final private AltosUILineStyle orient_color = new AltosUILineStyle();
+	static final private AltosUILineStyle azimuth_color = new AltosUILineStyle();
+	static final private AltosUILineStyle compass_color = new AltosUILineStyle();
 
 	static final private AltosUILineStyle gps_height_color = new AltosUILineStyle();
 	static final private AltosUILineStyle altitude_color = new AltosUILineStyle();
@@ -84,6 +86,7 @@ public class AltosGraph extends AltosUIGraph {
 	static final private AltosUILineStyle mag_along_color = new AltosUILineStyle();
 	static final private AltosUILineStyle mag_across_color = new AltosUILineStyle();
 	static final private AltosUILineStyle mag_through_color = new AltosUILineStyle();
+	static final private AltosUILineStyle mag_total_color = new AltosUILineStyle();
 
 	static AltosUnits dop_units = null;
 	static AltosUnits tick_units = null;
@@ -114,7 +117,7 @@ public class AltosGraph extends AltosUIGraph {
 		dbm_axis = newAxis("Signal Strength", null, dbm_color, 0);
 
 		gyro_axis = newAxis("Rotation Rate", AltosConvert.rotation_rate, gyro_roll_color, 0);
-		orient_axis = newAxis("Tilt Angle", AltosConvert.orient, orient_color, 0);
+		orient_axis = newAxis("Angle", AltosConvert.orient, orient_color, 0);
 		mag_axis = newAxis("Magnetic Field", AltosConvert.magnetic_field, mag_along_color, 0);
 		course_axis = newAxis("Course", AltosConvert.orient, gps_course_color, 0);
 		dop_axis = newAxis("Dilution of Precision", dop_units, gps_pdop_color, 0);
@@ -317,8 +320,23 @@ public class AltosGraph extends AltosUIGraph {
 					    false,
 					    mag_axis);
 
+		flight_series.register_axis(AltosUIFlightSeries.mag_total_name,
+					    mag_total_color,
+					    false,
+					    mag_axis);
+
 		flight_series.register_axis(AltosUIFlightSeries.orient_name,
 					    orient_color,
+					    false,
+					    orient_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.azimuth_name,
+					    azimuth_color,
+					    false,
+					    orient_axis);
+
+		flight_series.register_axis(AltosUIFlightSeries.compass_name,
+					    compass_color,
 					    false,
 					    orient_axis);
 

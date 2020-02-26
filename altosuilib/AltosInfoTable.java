@@ -16,19 +16,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altosuilib_13;
+package org.altusmetrum.altosuilib_14;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class AltosInfoTable extends JTable implements AltosFlightDisplay, HierarchyListener {
 	private AltosFlightInfoTableModel model;
 
-	static final int info_columns = 3;
-	static final int info_rows = 17;
+	static final int info_columns = 4;
+	static final int info_rows = 18;
 
 	private AltosState		last_state;
 	private AltosListenerState	last_listener_state;
@@ -201,9 +201,9 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 				if (state.gps.lon != AltosLib.MISSING)
 					info_add_deg(1, "Longitude", state.gps.lon, 'E', 'W');
 				if (state.gps.alt != AltosLib.MISSING)
-					info_add_row(1, "GPS altitude", "%8.1f", state.gps.alt);
+					info_add_row(1, "GPS altitude", "%8.1f m", state.gps.alt);
 				if (state.gps_height != AltosLib.MISSING)
-					info_add_row(1, "GPS height", "%8.1f", state.gps_height);
+					info_add_row(1, "GPS height", "%8.1f m", state.gps_height);
 
 				if (state.gps.ground_speed != AltosLib.MISSING && state.gps.course != AltosLib.MISSING)
 					info_add_row(1, "GPS ground speed", "%6.1f m/s %3d°",
@@ -270,6 +270,28 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 				}
 			}
 		}
+
+		if (state != null && state.accel_along() != AltosLib.MISSING) {
+			info_add_row(3, "Accel along", "%8.1f m/s²", state.accel_along());
+			info_add_row(3, "Accel across", "%8.1f m/s²", state.accel_across());
+			info_add_row(3, "Accel through", "%8.1f m/s²", state.accel_through());
+			info_add_row(3, "Gyro roll", "%8.1f °/s", state.gyro_roll());
+			info_add_row(3, "Gyro pitch", "%8.1f °/s", state.gyro_pitch());
+			info_add_row(3, "Gyro yaw", "%8.1f °/s", state.gyro_yaw());
+			if (state.mag_along() != AltosLib.MISSING) {
+				/* Report mag in nanoteslas (1 G = 100000 nT (or γ)) */
+				info_add_row(3, "Mag along", "%8.1f µT", state.mag_along() * 100.0);
+				info_add_row(3, "Mag across", "%8.1f µT", state.mag_across() * 100.0);
+				info_add_row(3, "Mag Through", "%8.1f µT", state.mag_through() * 100.0);
+				info_add_row(3, "Mag Bearing", "%8.1f°", Math.atan2(state.mag_across(), state.mag_through()) * 180/Math.PI);
+			}
+		}
+
+		if (state != null && state.igniter_voltage != null) {
+			for (int i = 0; i < state.igniter_voltage.length; i++)
+				info_add_row(3, AltosLib.igniter_name(i), "%9.2f V", state.igniter_voltage[i]);
+		}
+
 		info_finish();
 	}
 }

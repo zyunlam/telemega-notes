@@ -12,7 +12,7 @@
  * General Public License for more details.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 public abstract class AltosDataListener {
 
@@ -70,6 +70,10 @@ public abstract class AltosDataListener {
 		return time;
 	}
 
+	public String state_name() {
+		return cal_data().state_name();
+	}
+
 	public void set_state(int state) {
 		cal_data().set_state(state);
 	}
@@ -114,7 +118,7 @@ public abstract class AltosDataListener {
 	public abstract void set_apogee_voltage(double volts);
 	public abstract void set_main_voltage(double volts);
 
-	public void set_gps(AltosGPS gps) {
+	public void set_gps(AltosGPS gps, boolean set_location, boolean set_sats) {
 		AltosCalData cal_data = cal_data();
 		cal_data.set_cal_gps(gps);
 	}

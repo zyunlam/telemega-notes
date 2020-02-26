@@ -151,13 +151,13 @@ static struct ao_task	ao_lco_drag_task;
 static void
 ao_lco_drag_monitor(void)
 {
-	uint16_t	delay = ~0;
-	uint16_t	now;
+	AO_TICK_TYPE	delay = ~0;
+	AO_TICK_TYPE	now;
 
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
 	for (;;) {
 		PRINTD("Drag monitor count %d delay %d\n", ao_lco_drag_beep_count, delay);
-		if (delay == (uint16_t) ~0)
+		if (delay == (AO_TICK_TYPE) ~0)
 			ao_sleep(&ao_lco_drag_beep_count);
 		else
 			ao_sleep_for(&ao_lco_drag_beep_count, delay);

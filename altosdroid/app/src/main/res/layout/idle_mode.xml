@@ -23,15 +23,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-      <TextView android:id="@+id/set_callsign_label"
+    <LinearLayout
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	>
+	<TextView android:id="@+id/set_callsign_label"
+		  android:layout_width="wrap_content"
+		  android:layout_height="wrap_content"
+		  android:text="@string/set_callsign_label"
+		  />
+	<EditText android:id="@+id/set_callsign"
+		  android:layout_width="wrap_content"
+		  android:layout_height="wrap_content"
+		  android:layout_weight="1"
+		  android:hint="@string/set_callsign_label"/>
+    </LinearLayout>
+      <TextView android:id="@+id/frequency"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:text="@string/set_callsign_label"
+		android:text=""
 		/>
-      <EditText android:id="@+id/set_callsign"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:hint="@string/set_callsign_label"/>
       <Button android:id="@+id/connect_idle"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"

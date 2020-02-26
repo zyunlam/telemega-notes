@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 
 public class AltosTelemetryLocation extends AltosTelemetryStandard {
@@ -78,6 +78,6 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
 		}
-		listener.set_gps(gps);
+		listener.set_gps(gps, true, false);
 	}
 }

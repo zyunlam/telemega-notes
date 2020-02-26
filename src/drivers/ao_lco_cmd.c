@@ -28,7 +28,6 @@
 
 static uint16_t	lco_box;
 static uint8_t	lco_channels;
-static uint16_t	tick_offset;
 
 static void
 lco_args(void) 

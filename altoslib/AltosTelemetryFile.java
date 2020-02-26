@@ -16,7 +16,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-package org.altusmetrum.altoslib_13;
+package org.altusmetrum.altoslib_14;
 
 import java.io.*;
 import java.util.*;
@@ -95,6 +95,7 @@ public class AltosTelemetryFile implements AltosRecordSet {
 
 	AltosTelemetryIterable	telems;
 	AltosCalData		cal_data;
+	int			first_state;
 
 	public void write_comments(PrintStream out) {
 	}
@@ -108,8 +109,11 @@ public class AltosTelemetryFile implements AltosRecordSet {
 			cal_data = new AltosCalData();
 			AltosTelemetryNullListener l = new AltosTelemetryNullListener(cal_data);
 
+			first_state = AltosLib.ao_flight_startup;
 			for (AltosTelemetry telem : telems) {
 				telem.provide_data(l);
+				if (cal_data.state == AltosLib.ao_flight_pad)
+					first_state = cal_data.state;
 				if (l.cal_data_complete())
 					break;
 			}
@@ -122,16 +126,11 @@ public class AltosTelemetryFile implements AltosRecordSet {
 	}
 
 	public void capture_series(AltosDataListener listener) {
-		AltosCalData	cal_data = cal_data();
-
+		cal_data();
 		cal_data.reset();
+		cal_data.state = first_state;
 		for (AltosTelemetry telem : telems) {
-			int tick = telem.tick();
-			cal_data.set_tick(tick);
-
-			/* Try to pick up at least one pre-boost value */
-			if (cal_data.time() >= -2)
-				telem.provide_data(listener);
+			telem.provide_data(listener);
 			if (listener.state() == AltosLib.ao_flight_landed)
 				break;
 		}

@@ -16,7 +16,7 @@ package altosmapd;
 
 import java.io.*;
 
-import org.altusmetrum.altoslib_13.*;
+import org.altusmetrum.altoslib_14.*;
 
 public class AltosMapdPreferences extends AltosPreferencesBackend {
 
