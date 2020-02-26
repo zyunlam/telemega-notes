@@ -6,7 +6,7 @@ Bdale Garbee <bdale@gag.com>
 :icons:
 :icontype: svg
 :revremark: initial draft
-:copyright: Bdale Garbee 2019
+:copyright: Bdale Garbee 2020
 :doctype: book
 :numbered:
 :stylesheet: am.css
