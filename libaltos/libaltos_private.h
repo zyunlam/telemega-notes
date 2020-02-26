@@ -65,4 +65,7 @@ altos_fill(struct altos_file *file, int timeout);
 int
 altos_bt_port(struct altos_bt_device *device);
 
+void
+altos_pause_one_second(void);
+
 #endif /* _LIBALTOS_PRIVATE_H_ */
