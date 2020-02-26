@@ -760,3 +760,9 @@ altos_bt_open(struct altos_bt_device *device)
 	}
 	return &file->file;
 }
+
+void
+altos_pause_one_second(void)
+{
+	Sleep(1000);
+}
