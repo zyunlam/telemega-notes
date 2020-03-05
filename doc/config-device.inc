@@ -118,6 +118,16 @@ ifdef::radio[]
 		altitude with Compressed format. Test before
 		you fly to see which to use.
 
+	==== APRS Offset
+	
+		The delay from the top of the minute before sending
+		the first APRS packet of the minute. Coordinating
+		values for this parameter between multiple devices can
+		allow a single receiver to reliably receive APRS
+		packets from multiple devices. Note that this offset only
+		takes effect while the GPS signal is locked so that the
+		transmitting device knows the current time.
+		
 	==== Callsign
 
 		This sets the call sign included in each
