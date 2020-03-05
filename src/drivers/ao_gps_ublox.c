@@ -615,6 +615,8 @@ ao_gps(void)
 	uint8_t			class, id;
 	struct ao_ublox_cksum	cksum;
 	uint8_t			i;
+	AO_TICK_TYPE		packet_start_tick;
+	AO_TICK_TYPE		solution_tick = 0;
 
 	ao_gps_setup();
 
@@ -645,6 +647,8 @@ ao_gps(void)
 		/* Locate the begining of the next record */
 		while (ao_ublox_byte() != (uint8_t) 0xb5)
 			;
+		packet_start_tick = ao_tick_count;
+
 		if (ao_ublox_byte() != (uint8_t) 0x62)
 			continue;
 
@@ -657,7 +661,7 @@ ao_gps(void)
 		ao_ublox_len = header_byte();
 		ao_ublox_len |= header_byte() << 8;
 
-		ao_gps_dbg(DBG_PROTO, "class %02x id %02x len %d\n", class, id, ao_ublox_len);
+		ao_gps_dbg(DBG_PROTO, "%6u class %02x id %02x len %d\n", packet_start_tick, class, id, ao_ublox_len);
 
 		if (ao_ublox_len > 1023)
 			continue;
@@ -679,6 +683,7 @@ ao_gps(void)
 				if (ao_ublox_len != 52)
 					break;
 				ao_ublox_parse_nav_sol();
+				solution_tick = packet_start_tick;
 				break;
 			case UBLOX_NAV_SVINFO:
 				if (ao_ublox_len < 8)
@@ -715,7 +720,7 @@ ao_gps(void)
 			switch (id) {
 			case UBLOX_NAV_TIMEUTC:
 				ao_mutex_get(&ao_gps_mutex);
-				ao_gps_tick = ao_time();
+				ao_gps_tick = solution_tick;
 
 				ao_gps_data.flags = 0;
 				ao_gps_data.flags |= AO_GPS_RUNNING;

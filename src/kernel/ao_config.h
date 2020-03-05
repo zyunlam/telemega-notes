@@ -58,7 +58,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	23
+#define AO_CONFIG_MINOR	24
 
 #define AO_AES_LEN 16
 
@@ -122,6 +122,9 @@ struct ao_config {
 #if HAS_FIXED_PAD_BOX
 	uint8_t		pad_box;		/* minor version 22 */
 	uint8_t		pad_idle;		/* minor version 23 */
+#endif
+#if HAS_APRS
+	uint8_t		aprs_offset;		/* minor version 24 */
 #endif
 };
 

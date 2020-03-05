@@ -239,6 +239,10 @@ _ao_config_get(void)
 		if (minor < 23)
 			ao_config.pad_idle = 120;
 #endif
+#if HAS_APRS
+		if (minor < 24)
+			ao_config.aprs_offset = 0;
+#endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
@@ -760,6 +764,24 @@ ao_config_aprs_set(void)
 	ao_telemetry_reset_interval();
 }
 
+static void
+ao_config_aprs_offset_show(void)
+{
+	printf ("APRS offset: %d\n", ao_config.aprs_offset);
+}
+
+static void
+ao_config_aprs_offset_set(void)
+{
+	uint16_t r = ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.aprs_offset = r;
+	_ao_config_edit_finish();
+	ao_telemetry_reset_interval();
+}
+
 #endif /* HAS_APRS */
 
 #if HAS_RADIO_AMP
@@ -1041,6 +1063,8 @@ const struct ao_config_var ao_config_vars[] = {
 	  ao_config_aprs_ssid_set, ao_config_aprs_ssid_show },
 	{ "C <0 compressed, 1 uncompressed>\0APRS format",
 	  ao_config_aprs_format_set, ao_config_aprs_format_show },
+	{ "O <aprs-offset>\0APRS Offset from top of minute",
+	  ao_config_aprs_offset_set, ao_config_aprs_offset_show },
 #endif
 #if HAS_FIXED_PAD_BOX
 	{ "B <box>\0Set pad box (1-99)",
