@@ -78,6 +78,7 @@ public class AltosConfigData {
 	public int		aprs_interval;
 	public int		aprs_ssid;
 	public int		aprs_format;
+	public int		aprs_offset;
 
 	/* HAS_BEEP */
 	public int		beep;
@@ -296,6 +297,7 @@ public class AltosConfigData {
 		aprs_interval = AltosLib.MISSING;
 		aprs_ssid = AltosLib.MISSING;
 		aprs_format = AltosLib.MISSING;
+		aprs_offset = AltosLib.MISSING;
 
 		beep = AltosLib.MISSING;
 
@@ -465,6 +467,7 @@ public class AltosConfigData {
 		try { aprs_interval = get_int(line, "APRS interval:"); } catch (Exception e) {}
 		try { aprs_ssid = get_int(line, "APRS SSID:"); } catch (Exception e) {}
 		try { aprs_format = get_int(line, "APRS format:"); } catch (Exception e) {}
+		try { aprs_offset = get_int(line, "APRS offset:"); } catch (Exception e) {}
 
 		/* HAS_BEEP */
 		try { beep = get_int(line, "Beeper setting:"); } catch (Exception e) {}
@@ -661,6 +664,8 @@ public class AltosConfigData {
 			aprs_ssid = source.aprs_ssid();
 		if (aprs_format != AltosLib.MISSING)
 			aprs_format = source.aprs_format();
+		if (aprs_offset != AltosLib.MISSING)
+			aprs_offset = source.aprs_offset();
 
 		/* HAS_BEEP */
 		if (beep != AltosLib.MISSING)
@@ -718,6 +723,7 @@ public class AltosConfigData {
 		dest.set_aprs_interval(aprs_interval);
 		dest.set_aprs_ssid(aprs_ssid);
 		dest.set_aprs_format(aprs_format);
+		dest.set_aprs_offset(aprs_offset);
 		dest.set_beep(beep);
 		dest.set_tracker_motion(tracker_motion);
 		dest.set_tracker_interval(tracker_interval);
@@ -822,6 +828,8 @@ public class AltosConfigData {
 			link.printf("c S %d\n", aprs_ssid);
 		if (aprs_format != AltosLib.MISSING)
 			link.printf("c C %d\n", aprs_format);
+		if (aprs_offset != AltosLib.MISSING)
+			link.printf("c O %d\n", aprs_offset);
 
 		/* HAS_BEEP */
 		if (beep != AltosLib.MISSING)
