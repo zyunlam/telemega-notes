@@ -66,13 +66,22 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 
 	public static double adc_to_n(int adc) {
 
-		/* sensor looks linear once it "gets going" */
-		double ADC_MIN = 156;		/* first non-zero cal value */
-		double ADC_SLOPE = 3.343;	/* adc counts per lb */
-		double ADC_OFFSET = 26.5;	/* lbs at ADC_MIN */
+		/* load cell sensor looks linear once it "gets going" */
+
+		/* cal values using 1 metric ton "S" load cell 2020.03.05 */
+		/* lowest useful cal data point in linear region */
+		double ADC_MIN_LBS = 71.4;
+		double ADC_MIN_COUNTS = 153; 
+
+		/* highest useful cal data point in linear region */
+		double ADC_MAX_LBS = 211.4;
+		double ADC_MAX_COUNTS = 313; 
+
+		/* slope of sensor response in ADC counts per lb */
+		double ADC_SLOPE = (ADC_MAX_COUNTS - ADC_MIN_COUNTS) / (ADC_MAX_LBS - ADC_MIN_LBS);
 
 		double raw = adc;
-		double lb = ((raw - ADC_MIN) / ADC_SLOPE) + ADC_OFFSET;
+		double lb = ((raw - ADC_MIN_COUNTS) / ADC_SLOPE) + ADC_MIN_LBS;
 		return AltosConvert.lb_to_n(lb);
 	}
 
