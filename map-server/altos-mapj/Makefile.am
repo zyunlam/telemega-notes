@@ -19,6 +19,8 @@ FATJAR=altosmap-fat.jar
 
 all-local: classes/altosmap $(JAR) altos-mapj altos-mapj-test altos-mapj-jdb
 
+fat: $(FATJAR)
+
 install-altosmapJAVA: altosmap.jar
 	@$(NORMAL_INSTALL)
 	test -z "$(altosmapdir)" || $(MKDIR_P) "$(DESTDIR)$(altosmapdir)"
@@ -48,6 +50,14 @@ altos-mapj: Makefile
 	echo "#!/bin/sh" > $@
 	echo 'exec java -Djava.library.path="$(altoslibdir)" -jar "$(altosmapdir)/altosmap.jar" "$$@"' >> $@
 	chmod +x $@
+
+Manifest.txt: Makefile
+	echo 'Main-Class: altosmap.AltosMap' > $@
+	echo "Class-Path: $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)" >> $@
+
+Manifest-fat.txt: Makefile
+	echo 'Main-Class: altosmap.AltosMap' > $@
+	echo "Class-Path: $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)" >> $@
 
 altos-mapj-test: Makefile
 	echo '#!/bin/sh' > $@
