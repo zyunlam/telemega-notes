@@ -307,13 +307,12 @@ public class AltosState extends AltosDataListener {
 	class AltosGpsGroundAltitude extends AltosValue {
 		void set(double a, double t) {
 			super.set(a, t);
-			pad_alt = value();
+
 			gps_altitude.set_gps_height();
 		}
 
 		void set_filtered(double a, double t) {
 			super.set_filtered(a, t);
-			pad_alt = value();
 			gps_altitude.set_gps_height();
 		}
 
@@ -693,7 +692,7 @@ public class AltosState extends AltosDataListener {
 
 	public double	gps_height;
 
-	public double pad_lat, pad_lon, pad_alt;
+	public double pad_lat, pad_lon;
 
 	public int	speak_tick;
 	public double	speak_altitude;
@@ -775,7 +774,6 @@ public class AltosState extends AltosDataListener {
 
 		pad_lat = AltosLib.MISSING;
 		pad_lon = AltosLib.MISSING;
-		pad_alt = AltosLib.MISSING;
 
 		gps_altitude = new AltosGpsAltitude();
 		gps_ground_altitude = new AltosGpsGroundAltitude();
