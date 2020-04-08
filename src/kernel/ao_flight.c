@@ -21,6 +21,8 @@
 #include <ao_log.h>
 #endif
 
+#include <ao_flight.h>
+
 #if HAS_MPU6000 || HAS_MPU9250
 #include <ao_quaternion.h>
 #endif

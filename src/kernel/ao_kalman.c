@@ -293,7 +293,9 @@ ao_kalman(void)
 #endif
 		ao_kalman_correct_baro();
 #else
+#if HAS_ACCEL
 	ao_kalman_correct_accel();
+#endif
 #endif
 	ao_height = from_fix(ao_k_height);
 	ao_speed = from_fix(ao_k_speed);

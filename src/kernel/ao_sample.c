@@ -21,6 +21,9 @@
 #include <ao_data.h>
 #endif
 
+#include <ao_sample.h>
+#include <ao_flight.h>
+
 #if HAS_GYRO
 #include <ao_quaternion.h>
 #endif
