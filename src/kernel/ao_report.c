@@ -40,6 +40,8 @@ static const uint8_t flight_reports[] = {
 	MORSE4(1,0,0,1),	/* invalid 'X' */
 };
 
+static enum ao_flight_state ao_report_state;
+
 #if HAS_BEEP
 #define low(time)	ao_beep_for(AO_BEEP_LOW, time)
 #define mid(time)	ao_beep_for(AO_BEEP_MID, time)
@@ -57,8 +59,6 @@ static const uint8_t flight_reports[] = {
 #define high(time)	ao_led_for(AO_LED_MID|AO_LED_LOW, time)
 #endif
 #define pause(time)	ao_delay(time)
-
-static enum ao_flight_state ao_report_state;
 
 /*
  * Farnsworth spacing
@@ -115,7 +115,7 @@ static enum ao_flight_state ao_report_state;
  */
 
 static void
-ao_report_beep(void) 
+ao_report_flight_state(void) 
 {
 	uint8_t r = flight_reports[ao_flight_state];
 	uint8_t l = r & 7;
@@ -206,13 +206,8 @@ ao_report_igniter(void)
 static void
 ao_report_continuity(void) 
 {
-	uint8_t	c;
-
-#if !HAS_IGNITE
-	if (!ao_igniter_present)
-		return;
-#endif
-	c = ao_report_igniter();
+#if HAS_IGNITE
+	uint8_t c = ao_report_igniter();
 	if (c) {
 		while (c--) {
 			high(AO_MS_TO_TICKS(25));
@@ -225,8 +220,11 @@ ao_report_continuity(void)
 			low(AO_MS_TO_TICKS(20));
 		}
 	}
+#endif
 #if AO_PYRO_NUM
+#if HAS_IGNITE
 	pause(AO_MS_TO_TICKS(250));
+#endif
 	for(c = 0; c < AO_PYRO_NUM; c++) {
 		enum ao_igniter_status	status = ao_pyro_status(c);
 		if (status == ao_igniter_ready)
@@ -261,7 +259,7 @@ ao_report(void)
 			ao_report_battery();
 		else
 #endif
-			ao_report_beep();
+			ao_report_flight_state();
 #if HAS_SENSOR_ERRORS
 		if (ao_report_state == ao_flight_invalid && ao_sensor_errors)
 			ao_report_number(ao_sensor_errors);

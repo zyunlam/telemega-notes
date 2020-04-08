@@ -60,6 +60,7 @@ ALTOS_SRC = \
 	ao_report.c \
 	ao_sample.c \
 	ao_kalman.c \
+	ao_timer_flight.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)

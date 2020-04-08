@@ -115,8 +115,8 @@
  * Igniter
  */
 
-#define HAS_IGNITE		1
-#define HAS_IGNITE_REPORT	1
+#define HAS_IGNITE		0
+#define HAS_IGNITE_REPORT	0
 
 #define AO_SENSE_PYRO(p,n)	((p)->adc.sense[n])
 #define AO_IGNITER_CLOSED	400

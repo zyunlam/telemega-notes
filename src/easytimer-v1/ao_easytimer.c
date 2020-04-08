@@ -54,7 +54,7 @@ main(void)
 
 	ao_eeprom_init();
 
-	ao_storage_init();
+//	ao_storage_init();
 
 	// ao_flight_init();
 	// ao_log_init();
