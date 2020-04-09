@@ -86,7 +86,7 @@ _ao_config_put(void)
 	ao_config_setup();
 	ao_config_erase();
 	ao_config_write(0, &ao_config, sizeof (ao_config));
-#if HAS_FLIGHT
+#if HAS_FLIGHT && HAS_LOG
 	ao_log_write_erase(0);
 #endif
 	ao_config_flush();
