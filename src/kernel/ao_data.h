@@ -135,6 +135,9 @@ struct ao_data {
 #endif
 #if HAS_BMX160
 	struct ao_bmx160_sample		bmx160;
+#if !HAS_ADXL375
+	int16_t z_accel;
+#endif
 #endif
 };
 
@@ -441,6 +444,19 @@ static inline float ao_convert_accel(int16_t sensor)
 {
 	return ao_mpu9250_accel(sensor);
 }
+
+#endif
+
+#if !HAS_ACCEL && HAS_BMX160
+
+#define HAS_ACCEL	1
+
+typedef int16_t accel_t;
+
+#define ao_data_accel(packet)			((packet)->z_accel)
+#define ao_data_accel_cook(packet)		((packet)->bmx160.acc_y)
+#define ao_data_set_accel(packet, accel)	((packet)->z_accel = (accel))
+#define ao_data_accel_invert(a)			(-(a))
 
 #endif
 
