@@ -129,9 +129,17 @@
 #define AO_PYRO_PORT_0  (&stm_gpiob)
 #define AO_PYRO_PIN_0   0
 
+#define AO_ADC_SENSE_A          1
+#define AO_ADC_SENSE_A_PORT     (&stm_gpioa)
+#define AO_ADC_SENSE_A_PIN      1
+
 /* Pyro B */
 #define AO_PYRO_PORT_1  (&stm_gpiob)
 #define AO_PYRO_PIN_1   11
+
+#define AO_ADC_SENSE_B          0
+#define AO_ADC_SENSE_B_PORT     (&stm_gpioa)
+#define AO_ADC_SENSE_B_PIN      0
 
 
 /*
@@ -162,15 +170,21 @@ struct ao_adc {
 				 (1 << STM_RCC_AHBENR_GPIOEEN) | \
 				 (1 << STM_RCC_AHBENR_GPIOBEN))
 
-#define AO_NUM_ADC_PIN		1
+#define AO_NUM_ADC_PIN		(AO_ADC_NUM_SENSE + 1)
 
+#define AO_ADC_PIN0_PORT        AO_ADC_SENSE_A_PORT
+#define AO_ADC_PIN0_PIN         AO_ADC_SENSE_A_PIN
+#define AO_ADC_PIN1_PORT        AO_ADC_SENSE_B_PORT
+#define AO_ADC_PIN1_PIN         AO_ADC_SENSE_B_PIN
 #define AO_ADC_PIN2_PORT	AO_ADC_V_BATT_PORT
 #define AO_ADC_PIN2_PIN		AO_ADC_V_BATT_PIN
 
 #define AO_NUM_ADC	       	(AO_NUM_ADC_PIN + 1)
 
-#define AO_ADC_SQ1		AO_ADC_V_BATT
-#define AO_ADC_SQ2		AO_ADC_TEMP
+#define AO_ADC_SQ1              AO_ADC_SENSE_A
+#define AO_ADC_SQ2              AO_ADC_SENSE_B
+#define AO_ADC_SQ3		AO_ADC_V_BATT
+#define AO_ADC_SQ4		AO_ADC_TEMP
 
 /*
  * Voltage divider on ADC battery sampler
@@ -195,10 +209,10 @@ struct ao_adc {
 
 #define HAS_BMX160              1
 #define AO_BMX160_INT_PORT      (&stm_gpioc)
-#define AO_BMX160_INT_PIN       15
-#define AO_BMX160_SPI_BUS       (AO_SPI_2_PB13_PB14_PB15 | AO_SPI_MODE_0)
-#define AO_BMX160_SPI_CS_PORT   (&stm_gpioc)
-#define AO_BMX160_SPI_CS_PIN    13
+#define AO_BMX160_INT_PIN       13
+#define AO_BMX160_SPI_BUS       (AO_SPI_1_PB3_PB4_PB5 | AO_SPI_MODE_0)
+#define AO_BMX160_SPI_CS_PORT   (&stm_gpioa)
+#define AO_BMX160_SPI_CS_PIN    15
 #define HAS_IMU                 1
 
 #define ao_data_along(packet)   ((packet)->bmx160.acc_x)
@@ -222,29 +236,5 @@ struct ao_adc {
 #define HAS_MONITOR_PUT		1
 #define AO_MONITOR_LED		0
 #define HAS_RSSI		0
-
-/*
- * bmx160
- */
-
-#define HAS_BMX160		1
-#define AO_BMX160_INT_PORT	(&stm_gpioc)
-#define AO_BMX160_INT_PIN	15
-#define AO_BMX160_SPI_BUS	(AO_SPI_2_PB13_PB14_PB15 | AO_SPI_MODE_0)
-#define AO_BMX160_SPI_CS_PORT	(&stm_gpioc)
-#define AO_BMX160_SPI_CS_PIN	13
-#define HAS_IMU			1
-
-#define ao_data_along(packet)	((packet)->bmx160.acc_x)
-#define ao_data_across(packet)	(-(packet)->bmx160.acc_y)
-#define ao_data_through(packet)	((packet)->bmx160.acc_z)
-
-#define ao_data_roll(packet)	((packet)->bmx160.gyr_x)
-#define ao_data_pitch(packet)	(-(packet)->bmx160.gyr_y)
-#define ao_data_yaw(packet)	((packet)->bmx160.gyr_z)
-
-#define ao_data_mag_along(packet)	((packet)->bmx160.mag_x)
-#define ao_data_mag_across(packet)	(-(packet)->bmx160.mag_y)
-#define ao_data_mag_through(packet)	((packet)->bmx160.mag_z)
 
 #endif /* _AO_PINS_H_ */
