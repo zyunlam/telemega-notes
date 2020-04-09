@@ -108,7 +108,7 @@
 #define LEDS_AVAILABLE		0
 
 #define HAS_GPS			0
-#define HAS_FLIGHT		0
+#define HAS_FLIGHT		1
 #define HAS_ADC			1
 #define HAS_ADC_TEMP		1
 #define HAS_LOG			0
@@ -222,5 +222,29 @@ struct ao_adc {
 #define HAS_MONITOR_PUT		1
 #define AO_MONITOR_LED		0
 #define HAS_RSSI		0
+
+/*
+ * bmx160
+ */
+
+#define HAS_BMX160		1
+#define AO_BMX160_INT_PORT	(&stm_gpioc)
+#define AO_BMX160_INT_PIN	15
+#define AO_BMX160_SPI_BUS	(AO_SPI_2_PB13_PB14_PB15 | AO_SPI_MODE_0)
+#define AO_BMX160_SPI_CS_PORT	(&stm_gpioc)
+#define AO_BMX160_SPI_CS_PIN	13
+#define HAS_IMU			1
+
+#define ao_data_along(packet)	((packet)->bmx160.acc_x)
+#define ao_data_across(packet)	(-(packet)->bmx160.acc_y)
+#define ao_data_through(packet)	((packet)->bmx160.acc_z)
+
+#define ao_data_roll(packet)	((packet)->bmx160.gyr_x)
+#define ao_data_pitch(packet)	(-(packet)->bmx160.gyr_y)
+#define ao_data_yaw(packet)	((packet)->bmx160.gyr_z)
+
+#define ao_data_mag_along(packet)	((packet)->bmx160.mag_x)
+#define ao_data_mag_across(packet)	(-(packet)->bmx160.mag_y)
+#define ao_data_mag_through(packet)	((packet)->bmx160.mag_z)
 
 #endif /* _AO_PINS_H_ */

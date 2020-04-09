@@ -56,7 +56,9 @@ main(void)
 
 //	ao_storage_init();
 
-	// ao_flight_init();
+	ao_bmx160_init();
+
+	ao_flight_init();
 	// ao_log_init();
 	ao_report_init();
 
