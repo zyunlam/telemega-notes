@@ -41,10 +41,8 @@ ao_v_t			ao_height;
 ao_v_t			ao_speed;
 ao_v_t			ao_accel;
 ao_v_t			ao_max_height;
-#if HAS_BARO
 static ao_k_t		ao_avg_height_scaled;
 ao_v_t			ao_avg_height;
-#endif
 
 ao_v_t			ao_error_h;
 #if !HAS_ACCEL || AO_FLIGHT_TEST
@@ -304,6 +302,9 @@ ao_kalman(void)
 		ao_max_height = ao_height;
 #if HAS_BARO
 	ao_avg_height_scaled = ao_avg_height_scaled - ao_avg_height + ao_sample_height;
+#else
+	ao_avg_height_scaled = ao_avg_height_scaled - ao_avg_height + ao_height;
+#endif
 #ifdef AO_FLIGHT_TEST
 	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50)
 		ao_avg_height = (ao_avg_height_scaled + 1) >> 1;
@@ -312,5 +313,4 @@ ao_kalman(void)
 	else 
 #endif
 		ao_avg_height = (ao_avg_height_scaled + 63) >> 7;
-#endif
 }
