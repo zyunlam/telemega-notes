@@ -51,6 +51,7 @@ ALTOS_SRC = \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
 	ao_data.c \
+	ao_bmx160.c \
 	ao_adc_stm.c \
 	ao_beep_stm.c \
 	ao_usb_stm.c \
@@ -60,14 +61,15 @@ ALTOS_SRC = \
 	ao_report.c \
 	ao_sample.c \
 	ao_kalman.c \
+	ao_pyro.c \
 	ao_timer_flight.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \
 	$(STACK_GUARD)
 
-PRODUCT=TeleMetrum-v3.0
-PRODUCT_DEF=-DTELEMETRUM_V_3_0
-IDPRODUCT=0x000b
+PRODUCT=EasyTimer-v1
+PRODUCT_DEF=-DEASYTIMER_V_1
+IDPRODUCT=0x000d
 
 CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF)
 

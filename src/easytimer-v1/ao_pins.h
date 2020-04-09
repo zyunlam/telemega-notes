@@ -60,6 +60,8 @@
 #define SERIAL_3_PC10_PC11	0
 #define SERIAL_3_PD8_PD9	0
 
+#define AO_CONFIG_MAX_SIZE	1024
+
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
 #define USE_EEPROM_CONFIG	1
@@ -117,6 +119,7 @@
 
 #define HAS_IGNITE		0
 #define HAS_IGNITE_REPORT	0
+#define AO_PYRO_NUM		2
 
 #define AO_SENSE_PYRO(p,n)	((p)->adc.sense[n])
 #define AO_IGNITER_CLOSED	400
@@ -138,13 +141,15 @@
 #define AO_ADC_NUM_SENSE	2
 
 struct ao_adc {
+	int16_t			sense[AO_ADC_NUM_SENSE];
 	int16_t			v_batt;
 	int16_t			temp;
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: %5u batt: %5d\n", \
+	printf("tick: %5u A: %5d B: %5d batt: %5d\n", \
 	       (p)->tick, \
+               (p)->adc.sense[0], (p)->adc.sense[1], \
 	       (p)->adc.v_batt);
 
 #define AO_ADC_V_BATT		2
@@ -183,6 +188,30 @@ struct ao_adc {
  * ADC reference in decivolts
  */
 #define AO_ADC_REFERENCE_DV	33
+
+/*
+ * bmx160
+ */
+
+#define HAS_BMX160              1
+#define AO_BMX160_INT_PORT      (&stm_gpioc)
+#define AO_BMX160_INT_PIN       15
+#define AO_BMX160_SPI_BUS       (AO_SPI_2_PB13_PB14_PB15 | AO_SPI_MODE_0)
+#define AO_BMX160_SPI_CS_PORT   (&stm_gpioc)
+#define AO_BMX160_SPI_CS_PIN    13
+#define HAS_IMU                 1
+
+#define ao_data_along(packet)   ((packet)->bmx160.acc_x)
+#define ao_data_across(packet)  (-(packet)->bmx160.acc_y)
+#define ao_data_through(packet) ((packet)->bmx160.acc_z)
+
+#define ao_data_roll(packet)    ((packet)->bmx160.gyr_x)
+#define ao_data_pitch(packet)   (-(packet)->bmx160.gyr_y)
+#define ao_data_yaw(packet)     ((packet)->bmx160.gyr_z)
+
+#define ao_data_mag_along(packet)       ((packet)->bmx160.mag_x)
+#define ao_data_mag_across(packet)      (-(packet)->bmx160.mag_y)
+#define ao_data_mag_through(packet)     ((packet)->bmx160.mag_z)
 
 /*
  * Monitor
