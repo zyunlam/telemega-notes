@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-uint32_t	ao_verbose;
+extern uint32_t	ao_verbose;
 
 #define AO_VERBOSE_EXE	1
 #define AO_VERBOSE_SELF	2
