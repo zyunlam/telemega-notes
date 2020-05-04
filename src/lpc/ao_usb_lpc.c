@@ -89,8 +89,6 @@ static uint8_t	*ao_usb_out_rx_buffer[2];
 static uint8_t	ao_usb_out_rx_cur;
 static uint8_t	ao_usb_rx_count, ao_usb_rx_pos;
 
-extern struct lpc_usb_endpoint lpc_usb_endpoint;
-
 /* Marks when we don't need to send an IN packet.
  * This happens only when the last IN packet is not full,
  * otherwise the host will expect to keep seeing packets.

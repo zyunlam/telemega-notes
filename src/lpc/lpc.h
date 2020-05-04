@@ -99,6 +99,7 @@ struct lpc_ioconf {
 };
 
 extern struct lpc_ioconf lpc_ioconf;
+#define lpc_ioconf (*(struct lpc_ioconf *) 0x40044000)
 
 #define LPC_IOCONF_FUNC		0
 
@@ -486,6 +487,7 @@ struct lpc_scb {
 };
 
 extern struct lpc_scb lpc_scb;
+#define lpc_scb (*(struct lpc_scb *) 0x40048000)
 
 #define LPC_SCB_SYSMEMREMAP_MAP		0
 # define LPC_SCB_SYSMEMREMAP_MAP_BOOT_LOADER	0
@@ -645,6 +647,7 @@ struct lpc_flash {
 };
 
 extern struct lpc_flash lpc_flash;
+#define lpc_flash (*(struct lpc_flash *) 0x4003c000)
 
 struct lpc_gpio_pin {
 	vuint32_t	isel;		/* 0x00 */
@@ -662,6 +665,7 @@ struct lpc_gpio_pin {
 };
 
 extern struct lpc_gpio_pin lpc_gpio_pin;
+#define lpc_gpio_pin (*(struct lpc_gpio_pin *) 0x4004c000)
 
 struct lpc_gpio_group0 {
 };
@@ -706,6 +710,7 @@ struct lpc_gpio {
 };
 
 extern struct lpc_gpio lpc_gpio;
+#define lpc_gpio (*(struct lpc_gpio *) 0x50000000)
 
 struct lpc_systick {
 	uint8_t		r0000[0x10];	/* 0x0000 */
@@ -717,6 +722,7 @@ struct lpc_systick {
 };
 
 extern struct lpc_systick lpc_systick;
+#define lpc_systick (*(struct lpc_systick *) 0xe000e000)
 
 #define LPC_SYSTICK_CSR_ENABLE		0
 #define LPC_SYSTICK_CSR_TICKINT		1
@@ -755,6 +761,7 @@ struct lpc_usart {
 };
 
 extern struct lpc_usart lpc_usart;
+#define lpc_usart (*(struct lpc_usart *) 0x40008000)
 
 #define LPC_USART_IER_RBRINTEN	0
 #define LPC_USART_IER_THREINTEN	1
@@ -864,6 +871,7 @@ struct lpc_usb {
 } lpc_usb;
 
 extern struct lpc_usb lpc_usb;
+#define lpc_usb (*(struct lpc_usb *) 0x40080000)
 
 #define LPC_USB_DEVCMDSTAT_DEV_ADDR	0
 #define LPC_USB_DEVCMDSTAT_DEV_ADDR_MASK	0x7f
@@ -953,12 +961,14 @@ struct lpc_usb_endpoint {
 	vuint32_t		reserved_0c;
 	struct lpc_usb_epn	epn[4];
 };
+#define lpc_usb_endpoint	(*(struct lpc_usb_endpoint *) 0x20004700)
 
 /* Assigned in registers.ld to point at the base
  * of USB ram
  */
 
 extern uint8_t lpc_usb_sram[];
+#define lpc_usb_sram		((uint8_t*) 0x20004000)
 
 #define LPC_USB_EP_ACTIVE		31
 #define LPC_USB_EP_DISABLED		30
@@ -1017,6 +1027,7 @@ struct lpc_nvic {
 };
 
 extern struct lpc_nvic lpc_nvic;
+#define lpc_nvic (*(struct lpc_nvic *) 0xe000e100)
 
 static inline void
 lpc_nvic_set_enable(int irq) {
@@ -1084,6 +1095,7 @@ struct arm_scb {
 };
 
 extern struct arm_scb arm_scb;
+#define arm_scb (*(struct arm_scb *) 0xe000ed00)
 
 struct lpc_ssp {
 	vuint32_t	cr0;	/* 0x00 */
@@ -1100,6 +1112,8 @@ struct lpc_ssp {
 };
 
 extern struct lpc_ssp lpc_ssp0, lpc_ssp1;
+#define lpc_ssp0 (*(struct lpc_ssp *) 0x40040000)
+#define lpc_ssp1 (*(struct lpc_ssp *) 0x40058000)
 
 #define LPC_NUM_SPI		2
 
@@ -1174,6 +1188,7 @@ struct lpc_adc {
 };
 
 extern struct lpc_adc lpc_adc;
+#define lpc_adc (*(struct lpc_adc *) 0x4001c000)
 
 #define LPC_ADC_CR_SEL		0
 #define LPC_ADC_CR_CLKDIV	8
@@ -1226,7 +1241,6 @@ struct lpc_ct16b {
 };
 
 extern struct lpc_ct16b	lpc_ct16b0, lpc_ct16b1;
-
 #define lpc_ct16b0	(*(struct lpc_ct16b *) 0x4000c000)
 #define lpc_ct16b1	(*(struct lpc_ct16b *) 0x40010000)
 
@@ -1326,6 +1340,8 @@ struct lpc_ct32b {
 };
 
 extern struct lpc_ct32b lpc_ct32b0, lpc_ct32b1;
+#define lpc_ct32b0 (*(struct lpc_ct32b *) 0x40014000)
+#define lpc_ct32b1 (*(struct lpc_ct32b *) 0x40018000)
 
 #define LPC_CT32B_TCR_CEN	0
 #define LPC_CT32B_TCR_CRST	1
