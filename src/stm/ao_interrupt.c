@@ -34,8 +34,6 @@ void stm_ignore_isr(void)
 {
 }
 
-void *const __interrupt_vector[];
-
 uint32_t
 stm_flash_size(void) {
 	uint16_t	dev_id = stm_dev_id();
@@ -144,7 +142,7 @@ void main(void) __attribute__((__noreturn__));
  */
 
 __attribute__ ((section(".init")))
-void * const __interrupt_vector[64] = {
+const void * const __interrupt_vector[64] = {
 	[0] = &__stack,
 	[1] = _start,
 	i(0x08, nmi),
