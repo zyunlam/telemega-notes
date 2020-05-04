@@ -18,7 +18,7 @@ WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
 	-Wshadow \
 	-Warray-bounds=2
 
-OPT=-Os
+OPT=-Os -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
 NEWLIB_PRINTF_CFLAGS = 	-DNEWLIB_INTEGER_PRINTF_SCANF
 
