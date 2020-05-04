@@ -20,7 +20,7 @@
 #include <ao_eeprom.h>
 
 /* Total bytes of available storage */
-const ao_pos_t ao_eeprom_total = 4096;
+#define ao_eeprom_total 4096
 
 /* Location of eeprom in address space */
 #define stm_eeprom	((uint8_t *) 0x08080000)
