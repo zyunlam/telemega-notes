@@ -3,3 +3,4 @@ altitude.h
 altitude-pa.h
 altitude-pa-small.h
 ao_whiten.h
+*.map
