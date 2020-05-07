@@ -190,6 +190,7 @@ ao_report_battery(void)
 #endif
 
 #if HAS_IGNITE_REPORT
+#if HAS_IGNITE
 static uint8_t
 ao_report_igniter_ready(enum ao_igniter igniter)
 {
@@ -202,12 +203,14 @@ ao_report_igniter(void)
 	return (ao_report_igniter_ready(ao_igniter_drogue) |
 		     (ao_report_igniter_ready(ao_igniter_main) << 1));
 }
+#endif
 
 static void
 ao_report_continuity(void) 
 {
+	uint8_t c;
 #if HAS_IGNITE
-	uint8_t c = ao_report_igniter();
+	c = ao_report_igniter();
 	if (c) {
 		while (c--) {
 			high(AO_MS_TO_TICKS(25));

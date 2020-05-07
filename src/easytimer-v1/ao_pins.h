@@ -118,7 +118,7 @@
  */
 
 #define HAS_IGNITE		0
-#define HAS_IGNITE_REPORT	0
+#define HAS_IGNITE_REPORT	1
 #define AO_PYRO_NUM		2
 
 #define AO_SENSE_PYRO(p,n)	((p)->adc.sense[n])
