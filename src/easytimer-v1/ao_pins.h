@@ -227,6 +227,8 @@ struct ao_adc {
 #define ao_data_mag_across(packet)      (-(packet)->bmx160.mag_y)
 #define ao_data_mag_through(packet)     ((packet)->bmx160.mag_z)
 
+#define ao_data_accel_cook(packet)		(-ao_data_along(packet))
+
 /*
  * Monitor
  */

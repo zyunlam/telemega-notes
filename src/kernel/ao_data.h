@@ -454,9 +454,10 @@ static inline float ao_convert_accel(int16_t sensor)
 typedef int16_t accel_t;
 
 #define ao_data_accel(packet)			((packet)->z_accel)
-#define ao_data_accel_cook(packet)		((packet)->bmx160.acc_y)
 #define ao_data_set_accel(packet, accel)	((packet)->z_accel = (accel))
 #define ao_data_accel_invert(a)			(-(a))
+
+#define ao_data_accel_to_sample(accel)		ao_bmx_accel_to_sample(accel)
 
 #endif
 
