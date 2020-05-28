@@ -306,4 +306,6 @@ ao_bmx160_accel(int16_t sensor) {
 	return (float) sensor * ((float) (BMX160_ACCEL_FULLSCALE * GRAVITY / 32767.0));
 }
 
+#define ao_bmx_accel_to_sample(accel) ((accel_t) (accel) * (32767.0f / (BMX160_ACCEL_FULLSCALE * GRAVITY)))
+
 #endif /* _BMX160_H_ */
