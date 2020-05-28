@@ -269,7 +269,7 @@ version(void)
 	printf("manufacturer     %s\n"
 	       "product          %s\n"
 	       "serial-number    %u\n"
-#if HAS_FLIGHT || HAS_TRACKER
+#if HAS_LOG && (HAS_FLIGHT || HAS_TRACKER)
 	       "current-flight   %u\n"
 #endif
 #if HAS_LOG
@@ -287,7 +287,7 @@ version(void)
 	       , ao_manufacturer
 	       , ao_product
 	       , ao_serial_number
-#if HAS_FLIGHT || HAS_TRACKER
+#if HAS_LOG && (HAS_FLIGHT || HAS_TRACKER)
 	       , ao_flight_number
 #endif
 #if HAS_LOG
