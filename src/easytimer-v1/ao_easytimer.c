@@ -63,6 +63,7 @@ main(void)
 	ao_report_init();
 
 	ao_usb_init();
+	ao_pyro_init();
 	ao_igniter_init();
 
 	ao_config_init();
