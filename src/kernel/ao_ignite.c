@@ -236,5 +236,7 @@ ao_igniter_init(void)
 	ao_ignite_set_pins();
 	ao_add_task(&ao_igniter_task, ao_igniter, "igniter");
 #endif
+#if HAS_IGNITE || AO_PYRO_NUM
 	ao_cmd_register(&ao_ignite_cmds[0]);
+#endif
 }
