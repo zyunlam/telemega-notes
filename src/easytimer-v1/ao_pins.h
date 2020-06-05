@@ -214,6 +214,7 @@ struct ao_adc {
 #define AO_BMX160_SPI_CS_PORT   (&stm_gpioa)
 #define AO_BMX160_SPI_CS_PIN    15
 #define HAS_IMU                 1
+#define ALLOW_SIX_AXIS_PAD	1
 
 #define ao_data_along(packet)   ((packet)->bmx160.acc_x)
 #define ao_data_across(packet)  (-(packet)->bmx160.acc_y)
@@ -226,8 +227,6 @@ struct ao_adc {
 #define ao_data_mag_along(packet)       ((packet)->bmx160.mag_x)
 #define ao_data_mag_across(packet)      (-(packet)->bmx160.mag_y)
 #define ao_data_mag_through(packet)     ((packet)->bmx160.mag_z)
-
-#define ao_data_accel_cook(packet)		(-ao_data_along(packet))
 
 /*
  * Monitor
