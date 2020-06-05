@@ -673,18 +673,56 @@ ao_config_pad_orientation_show(void)
 	printf("Pad orientation: %d\n", ao_config.pad_orientation);
 }
 
+#if ALLOW_SIX_AXIS_PAD
+#define PAD_ORIENTATION_MAX	5
+#else
+#define PAD_ORIENTATION_MAX	1
+#endif
+
 static void
 ao_config_pad_orientation_set(void) 
 {
-	uint16_t r = ao_cmd_decimal() & 1;
+	uint16_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
+	if (r > PAD_ORIENTATION_MAX) {
+		ao_cmd_status = ao_cmd_lex_error;
+		return;
+	}
 	_ao_config_edit_start();
 	if (ao_config.pad_orientation != r) {
+#if ALLOW_SIX_AXIS_PAD
+		accel_t zero;
+		switch (r >> 1) {
+		case 0:
+		default:
+			zero = ao_config.accel_zero_along;
+			break;
+		case 1:
+			zero = ao_config.accel_zero_across;
+			break;
+		case 2:
+			zero = ao_config.accel_zero_through;
+			break;
+		}
+		accel_t plus2 = ao_config.accel_minus_g - ao_config.accel_plus_g;
+		if (plus2 < 0)
+			plus2 = -plus2;
+		accel_t plus1 = (plus2 >> 1);
+		accel_t minus1 = plus2 - plus1;
+		if (r & 1) {
+			ao_config.accel_plus_g = ao_data_accel_invert(zero + minus1);
+			ao_config.accel_minus_g = ao_data_accel_invert(zero - plus1);
+		} else {
+			ao_config.accel_plus_g = zero - plus1;
+			ao_config.accel_minus_g = zero + minus1;
+		}
+#else
 		accel_t t;
 		t = ao_config.accel_plus_g;
 		ao_config.accel_plus_g = ao_data_accel_invert(ao_config.accel_minus_g);
 		ao_config.accel_minus_g = ao_data_accel_invert(t);
+#endif
 	}
 	ao_config.pad_orientation = r;
 	_ao_config_edit_finish();

@@ -36,8 +36,20 @@ ao_data_get(struct ao_data *packet)
 accel_t
 ao_data_accel(volatile struct ao_data *packet) {
 	accel_t raw;
+#if ALLOW_SIX_AXIS_PAD
+	switch (ao_config.pad_orientation >> 1) {
+	default:
+	case 0:
+		raw = -ao_data_along(packet); break;
+	case 1:
+		raw = -ao_data_across(packet); break;
+	case 2:
+		raw = -ao_data_through(packet); break;
+	}
+#else
 	raw = ao_data_accel_raw(packet);
-	if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
+#endif
+	if (ao_config.pad_orientation & 1)
 		raw = ao_data_accel_invert(raw);
 	return raw;
 }
