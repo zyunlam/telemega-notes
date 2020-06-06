@@ -134,7 +134,6 @@ public class AltosUsb extends AltosDroidLink {
 
 		if (want_product == AltosLib.product_basestation)
 			return have_product == AltosLib.product_teledongle ||
-				have_product == AltosLib.product_teleterra ||
 				have_product == AltosLib.product_telebt ||
 				have_product == AltosLib.product_megadongle;
 
@@ -144,7 +143,8 @@ public class AltosUsb extends AltosDroidLink {
 				have_product == AltosLib.product_easymega ||
 				have_product == AltosLib.product_telegps ||
 				have_product == AltosLib.product_easymini ||
-				have_product == AltosLib.product_telemini;
+				have_product == AltosLib.product_telemini ||
+				have_product == AltosLib.product_easytimer;
 
 		if (have_product == AltosLib.product_altusmetrum)	/* old devices match any request */
 			return true;

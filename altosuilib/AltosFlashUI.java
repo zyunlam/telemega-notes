@@ -64,8 +64,7 @@ public class AltosFlashUI
 		"telemetrum-v1",
 		"telemini-v1",
 		"telenano",
-		"teleshield",
-		"teleterra"
+		"teleshield"
 	};
 
 	private static final String[] pair_programmed_devices = {
@@ -78,8 +77,7 @@ public class AltosFlashUI
 		"TeleMetrum-v1",
 		"TeleMini-v1",
 		"TeleNano",
-		"TeleShield",
-		"TeleTerra"
+		"TeleShield"
 	};
 
 	private boolean is_pair_programmed() {

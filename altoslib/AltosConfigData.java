@@ -320,8 +320,12 @@ public class AltosConfigData {
 		adjust_accel_cal();
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_UP:
 			return accel_cal_plus_cooked;
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPSIDEDOWN:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_DOWN:
 			return invert_accel_value(accel_cal_minus_cooked);
 		default:
 			return AltosLib.MISSING;
@@ -333,8 +337,12 @@ public class AltosConfigData {
 		adjust_accel_cal();
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_UP:
 			return accel_cal_minus_cooked;
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPSIDEDOWN:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_DOWN:
 			return invert_accel_value(accel_cal_plus_cooked);
 		default:
 			return AltosLib.MISSING;
@@ -353,11 +361,15 @@ public class AltosConfigData {
 		{
 			switch (pad_orientation) {
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+			case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
+			case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_UP:
 				accel_cal_plus_cooked = accel_cal_plus;
 				accel_cal_minus_cooked = accel_cal_minus;
 				accel_cal_adjusted = true;
 				break;
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+			case AltosLib.AO_PAD_ORIENTATION_WORDS_UPSIDEDOWN:
+			case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_DOWN:
 				accel_cal_plus_cooked = invert_accel_value(accel_cal_minus);
 				accel_cal_minus_cooked = invert_accel_value(accel_cal_plus);
 				accel_cal_adjusted = true;

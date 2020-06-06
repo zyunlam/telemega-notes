@@ -142,10 +142,26 @@ public class AltosConfigFCUI
 		"4250",
 	};
 
-	static String[] 	pad_orientation_values = {
+	static String[] 	pad_orientation_values_radio = {
 		"Antenna Up",
 		"Antenna Down",
 	};
+
+	static String[] 	pad_orientation_values_no_radio = {
+		"Beeper Up",
+		"Beeper Down",
+	};
+
+	static String[] 	pad_orientation_values_six_axis = {
+		"Beeper Up",
+		"Beeper Down",
+		"Words Upright",
+		"Words Upsidedown",
+		"Big Parts Up",
+		"Big Parts Down",
+	};
+
+	String[] pad_orientation_values;
 
 	static String[]		tracker_motion_values_m = {
 		"2",
@@ -201,6 +217,25 @@ public class AltosConfigFCUI
 	boolean is_telemetrum() {
 		String	product = product_value.getText();
 		return product != null && product.startsWith("TeleMetrum");
+	}
+
+	boolean is_telemega() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("TeleMega");
+	}
+
+	boolean is_easymega() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("EasyMega");
+	}
+
+	boolean is_easytimer() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("EasyTimer");
+	}
+
+	boolean has_radio() {
+		return is_telemega() || is_telemetrum() || is_telemini();
 	}
 
 	void set_radio_enable_tool_tip() {
@@ -277,6 +312,8 @@ public class AltosConfigFCUI
 				pad_orientation_value.setToolTipText("Older TeleMetrum firmware must fly antenna forward");
 			else if (is_telemini() || is_easymini())
 				pad_orientation_value.setToolTipText("TeleMini and EasyMini don't care how they are mounted");
+			else if (is_easytimer())
+				pad_orientation_value.setToolTipText("EasyTimer can be mounted in any of six orientations");
 			else
 				pad_orientation_value.setToolTipText("Can't select orientation");
 		}
@@ -759,6 +796,13 @@ public class AltosConfigFCUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
+		if (has_radio())
+			pad_orientation_values = pad_orientation_values_radio;
+		else if (is_easytimer())
+			pad_orientation_values = pad_orientation_values_six_axis;
+		else
+			pad_orientation_values = pad_orientation_values_no_radio;
+
 		pad_orientation_value = new JComboBox<String>(pad_orientation_values);
 		pad_orientation_value.setEditable(false);
 		pad_orientation_value.addItemListener(this);

@@ -117,7 +117,7 @@ public class AltosLib {
 	public final static int product_altusmetrum = 0x000a;
 	public final static int product_telemetrum = 0x000b;
 	public final static int product_teledongle = 0x000c;
-	public final static int product_teleterra = 0x000d;
+	public final static int product_easytimer = 0x000d;
 	public final static int product_telebt = 0x000e;
 	public final static int product_telelaunch = 0x000f;
 	public final static int product_telelco = 0x0010;
@@ -153,7 +153,7 @@ public class AltosLib {
 		new Product("telemetrum", product_telemetrum),
 		new Product("teleballoon", product_telemetrum),
 		new Product("teledongle", product_teledongle),
-		new Product("teleterra", product_teledongle),
+		new Product("easytimer", product_easytimer),
 		new Product("telebt", product_telebt),
 		new Product("telelaunch", product_telelaunch),
 		new Product("telelco", product_telelco),
@@ -357,6 +357,10 @@ public class AltosLib {
 
 	public static final int AO_PAD_ORIENTATION_ANTENNA_UP = 0;
 	public static final int AO_PAD_ORIENTATION_ANTENNA_DOWN = 1;
+	public static final int AO_PAD_ORIENTATION_WORDS_UPRIGHT = 2;
+	public static final int AO_PAD_ORIENTATION_WORDS_UPSIDEDOWN = 3;
+	public static final int AO_PAD_ORIENTATION_BIG_PARTS_UP = 4;
+	public static final int AO_PAD_ORIENTATION_BIG_PARTS_DOWN = 5;
 
 	public static final int AO_LOG_FORMAT_UNKNOWN = 0;
 	public static final int AO_LOG_FORMAT_FULL = 1;
@@ -586,7 +590,7 @@ public class AltosLib {
 		case product_altusmetrum: return "AltusMetrum";
 		case product_telemetrum: return "TeleMetrum";
 		case product_teledongle: return "TeleDongle";
-		case product_teleterra: return "TeleTerra";
+		case product_easytimer: return "EasyTimer";
 		case product_telebt: return "TeleBT";
 		case product_telelaunch: return "TeleLaunch";
 		case product_telelco: return "TeleLco";
