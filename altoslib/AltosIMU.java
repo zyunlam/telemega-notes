@@ -37,6 +37,8 @@ public class AltosIMU implements Cloneable {
 	public static final double	counts_per_g_mpu = 2048.0;
 	public static final double	counts_per_g_bmx = 2048.0;
 
+	int			pad_orientation;
+
 	private static double counts_per_g(int imu_type) {
 		switch (imu_type) {
 		case imu_type_telemega_v1_v2:
@@ -112,9 +114,15 @@ public class AltosIMU implements Cloneable {
 		return counts / counts_per_gauss(imu_type, imu_axis);
 	}
 
-	public boolean parse_string(String line) {
+	public boolean parse_string(String line, AltosLink link) {
 		if (!line.startsWith("Accel:"))
 			return false;
+
+		try {
+			pad_orientation = link.config_data().pad_orientation;
+		} catch (Exception e) {
+			return false;
+		}
 
 		String[] items = line.split("\\s+");
 
@@ -349,7 +357,7 @@ public class AltosIMU implements Cloneable {
 			if (line == null) {
 				throw new TimeoutException();
 			}
-			if (parse_string(line))
+			if (parse_string(line, link))
 				break;
 		}
 	}

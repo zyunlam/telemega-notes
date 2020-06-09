@@ -142,6 +142,9 @@ public class AltosConfigFCUI
 		"4250",
 	};
 
+	static String[]		pad_orientation_values_none = {
+	};
+
 	static String[] 	pad_orientation_values_radio = {
 		"Antenna Up",
 		"Antenna Down",
@@ -796,14 +799,8 @@ public class AltosConfigFCUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		if (has_radio())
-			pad_orientation_values = pad_orientation_values_radio;
-		else if (is_easytimer())
-			pad_orientation_values = pad_orientation_values_six_axis;
-		else
-			pad_orientation_values = pad_orientation_values_no_radio;
 
-		pad_orientation_value = new JComboBox<String>(pad_orientation_values);
+		pad_orientation_value = new JComboBox<String>();
 		pad_orientation_value.setEditable(false);
 		pad_orientation_value.addItemListener(this);
 		pane.add(pad_orientation_value, c);
@@ -1105,13 +1102,27 @@ public class AltosConfigFCUI
 		listener = l;
 	}
 
+	void set_pad_orientation_values()
+	{
+		if (has_radio())
+			pad_orientation_values = pad_orientation_values_radio;
+		else if (is_easytimer())
+			pad_orientation_values = pad_orientation_values_six_axis;
+		else
+			pad_orientation_values = pad_orientation_values_no_radio;
+		pad_orientation_value.removeAllItems();
+		for (String s : pad_orientation_values)
+			pad_orientation_value.addItem(s);
+		set_pad_orientation_tool_tip();
+	}
+
 	/* set and get all of the dialog values */
 	public void set_product(String product) {
 		radio_frequency_value.set_product(product);
 		product_value.setText(product);
-		set_pad_orientation_tool_tip();
 		set_accel_tool_tips();
 		set_flight_log_max_tool_tip();
+		set_pad_orientation_values();
 	}
 
 	public void set_version(String version) {
