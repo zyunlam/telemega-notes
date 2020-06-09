@@ -152,15 +152,6 @@ public class AltosConfigFCUI
 		"Beeper Down",
 	};
 
-	static String[] 	pad_orientation_values_six_axis = {
-		"Beeper Up",
-		"Beeper Down",
-		"Words Upright",
-		"Words Upsidedown",
-		"Big Parts Up",
-		"Big Parts Down",
-	};
-
 	String[] pad_orientation_values;
 
 	static String[]		tracker_motion_values_m = {
@@ -798,8 +789,6 @@ public class AltosConfigFCUI
 		c.ipady = 5;
 		if (has_radio())
 			pad_orientation_values = pad_orientation_values_radio;
-		else if (is_easytimer())
-			pad_orientation_values = pad_orientation_values_six_axis;
 		else
 			pad_orientation_values = pad_orientation_values_no_radio;
 
