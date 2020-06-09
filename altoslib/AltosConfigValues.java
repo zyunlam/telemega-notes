@@ -64,7 +64,7 @@ public interface AltosConfigValues {
 
 	public abstract int flight_log_max() throws AltosConfigDataException;
 
-	public abstract void set_flight_log_max_limit(int flight_log_max_limit);
+	public abstract void set_flight_log_max_limit(int flight_log_max_limit, int storage_erase_unit);
 
 	public abstract void set_ignite_mode(int new_ignite_mode);
 

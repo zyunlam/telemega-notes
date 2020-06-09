@@ -89,6 +89,7 @@ public class AltosConfigData {
 
 	/* Log listing replies */
 	public int	stored_flight;
+	public AltosEepromFlight[] flights;
 
 	/* HAS_TRACKER */
 	public int	tracker_motion;
@@ -162,7 +163,7 @@ public class AltosConfigData {
 	public int log_available() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TINY:
-			if (stored_flight == 0)
+			if (flights == null)
 				return 1;
 			return 0;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
@@ -175,10 +176,10 @@ public class AltosConfigData {
 			int	log_space = log_space();
 			int	log_used;
 
-			if (stored_flight <= 0)
+			if (flights == null)
 				log_used = 0;
 			else
-				log_used = stored_flight * log_max;
+				log_used = flights.length * log_max;
 			int	log_avail;
 
 			if (log_used >= log_space)
@@ -306,7 +307,8 @@ public class AltosConfigData {
 
 		storage_size = AltosLib.MISSING;
 		storage_erase_unit = AltosLib.MISSING;
-		stored_flight = AltosLib.MISSING;
+		stored_flight = 0;
+		flights = null;
 
 		accel_zero_along = AltosLib.MISSING;
 		accel_zero_across = AltosLib.MISSING;
@@ -484,7 +486,32 @@ public class AltosConfigData {
 		try { storage_erase_unit = get_int(line, "Storage erase unit:"); } catch (Exception e) {}
 
 		/* Log listing replies */
-		try { get_int(line, "flight"); stored_flight++; }  catch (Exception e) {}
+		try {
+			int flight = get_int(line, "flight");
+			String[] tokens = line.split("\\s+");
+			if (tokens.length >= 6) {
+				int	start = -1, end = -1;
+				try {
+					if (tokens[2].equals("start"))
+						start = AltosParse.parse_hex(tokens[3]);
+					if (tokens[4].equals("end"))
+						end = AltosParse.parse_hex(tokens[5]);
+					if (flight != 0 && start >= 0 && end > 0) {
+						int len;
+						if (flights == null)
+							len = 0;
+						else
+							len = flights.length;
+						AltosEepromFlight [] new_flights = new AltosEepromFlight[len + 1];
+						for (int i = 0; i < len; i++)
+							new_flights[i] = flights[i];
+						new_flights[len] = new AltosEepromFlight(flight, start, end);
+						flights = new_flights;
+						stored_flight = flights.length;
+					}
+				} catch (ParseException pe) { System.out.printf("Parse error %s\n", pe.toString()); }
+			}
+		}  catch (Exception e) {}
 
 		/* HAS_GYRO */
 		try {
@@ -701,7 +728,7 @@ public class AltosConfigData {
 			max_enabled = false;
 			break;
 		default:
-			if (stored_flight != AltosLib.MISSING)
+			if (flights != null)
 				max_enabled = false;
 			break;
 		}
