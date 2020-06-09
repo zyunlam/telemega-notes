@@ -128,24 +128,9 @@ _ao_flash_write(uint32_t pos, void *sv, uint16_t len)
 	stm_flash.cr &= ~(1 << STM_FLASH_CR_PG);
 }
 
-static bool
-ao_storage_is_erased(uint32_t pos)
-{
-	uint16_t *flash = _ao_flash_addr(pos);
-	uint32_t i = ao_storage_block >> 1;
-
-	while (i--)
-		if (*flash++ != 0xffff)
-			return false;
-	return true;
-}
-
 uint8_t
-ao_storage_erase(uint32_t pos)
+ao_storage_device_erase(uint32_t pos)
 {
-	if (ao_storage_is_erased(pos))
-		return 1;
-
 	ao_arch_block_interrupts();
 	ao_flash_unlock();
 

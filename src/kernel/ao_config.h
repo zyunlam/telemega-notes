@@ -38,7 +38,7 @@
 #include <ao_storage.h>
 
 #define ao_config_setup() 		ao_storage_setup()
-#define ao_config_erase()		ao_storage_erase(ao_storage_config)
+#define ao_config_erase()		ao_storage_erase(ao_storage_config, ao_storage_block)
 #define ao_config_write(pos,bytes, len)	ao_storage_write(ao_storage_config+(pos), bytes, len)
 #define ao_config_read(pos,bytes, len)	ao_storage_read(ao_storage_config+(pos), bytes, len)
 #define ao_config_flush()		ao_storage_flush()

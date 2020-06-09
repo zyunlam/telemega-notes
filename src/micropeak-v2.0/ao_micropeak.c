@@ -167,9 +167,7 @@ ao_battery_voltage(void)
 static void
 ao_log_erase(void)
 {
-	uint32_t	pos;
-	for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block)
-		ao_storage_erase(pos);
+	ao_storage_erase(0, ao_storage_log_max);
 }
 
 uint8_t	ao_on_battery;
