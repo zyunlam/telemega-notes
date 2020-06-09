@@ -367,6 +367,8 @@ ao_config_send_frequency_set(void)
 
 #if HAS_FLIGHT
 
+#if HAS_BARO
+
 static void
 ao_config_main_deploy_show(void) 
 {
@@ -384,6 +386,8 @@ ao_config_main_deploy_set(void)
 	ao_config.main_deploy = r;
 	_ao_config_edit_finish();
 }
+
+#endif
 
 #if HAS_ACCEL
 static void
@@ -502,6 +506,7 @@ ao_config_accel_calibrate_set(void)
 }
 #endif /* HAS_ACCEL */
 
+#if HAS_BARO
 static void
 ao_config_apogee_delay_show(void) 
 {
@@ -537,6 +542,7 @@ ao_config_apogee_lockout_set(void)
 	ao_config.apogee_lockout = r;
 	_ao_config_edit_finish();
 }
+#endif
 
 #endif /* HAS_FLIGHT */
 
@@ -988,7 +994,7 @@ ao_config_save(void);
 #endif
 
 const struct ao_config_var ao_config_vars[] = {
-#if HAS_FLIGHT
+#if HAS_FLIGHT && HAS_BARO
 	{ "m <meters>\0Main deploy (m)",
 	  ao_config_main_deploy_set,	ao_config_main_deploy_show, },
 	{ "d <delay>\0Apogee delay (s)",
