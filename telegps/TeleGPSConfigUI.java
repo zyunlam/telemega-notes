@@ -874,14 +874,18 @@ public class TeleGPSConfigUI
 		return parse_int("flight log max", flight_log_max_value.getSelectedItem().toString(), true);
 	}
 
-	public void set_flight_log_max_limit(int new_flight_log_max_limit) {
+	public void set_flight_log_max_limit(int new_flight_log_max_limit, int new_storage_erase_unit) {
 		flight_log_max_limit = new_flight_log_max_limit;
-		flight_log_max_value.removeAllItems();
-		for (int i = 8; i >= 1; i--) {
-			int	size = flight_log_max_limit / i;
-			flight_log_max_value.addItem(String.format("%d (%d flights)", size, i));
+		if (new_flight_log_max_limit != AltosLib.MISSING) {
+			flight_log_max_value.removeAllItems();
+			for (int i = 8; i >= 1; i--) {
+				int	size = flight_log_max_limit / i;
+				if (new_storage_erase_unit != 0)
+					size &= ~(new_storage_erase_unit - 1);
+				flight_log_max_value.addItem(String.format("%d (%d flights)", size, i));
+			}
 		}
-		if (flight_log_max != 0)
+		if (flight_log_max != 0 && flight_log_max != AltosLib.MISSING)
 			set_flight_log_max(flight_log_max);
 	}
 

@@ -45,11 +45,13 @@ public class AltosEepromDelete implements Runnable {
 			serial_line.printf("d %d\n", log.flight);
 			for (;;) {
 				/* It can take a while to erase the flash... */
-				String line = serial_line.get_reply(20000);
+				String line = serial_line.get_reply(200000);
 				if (line == null)
 					throw new TimeoutException();
 				if (line.equals("Erased"))
 					break;
+				if (line.equals("Failed to erase"))
+					throw new IOException(line);
 				if (line.startsWith("No such"))
 					throw new IOException(line);
 			}

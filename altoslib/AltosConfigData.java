@@ -735,7 +735,7 @@ public class AltosConfigData {
 
 		dest.set_flight_log_max_enabled(max_enabled);
 		dest.set_radio_enable(radio_enable);
-		dest.set_flight_log_max_limit(log_space() / 1024);
+		dest.set_flight_log_max_limit(log_space() >> 10, storage_erase_unit >> 10);
 		dest.set_flight_log_max(flight_log_max);
 		dest.set_ignite_mode(ignite_mode);
 		dest.set_pad_orientation(pad_orientation);
@@ -828,7 +828,7 @@ public class AltosConfigData {
 			link.printf("c a %d %d\n", plus, minus);
 
 		/* HAS_LOG */
-		if (flight_log_max != 0)
+		if (flight_log_max != 0 && flight_log_max != AltosLib.MISSING)
 			link.printf("c l %d\n", flight_log_max);
 
 		/* HAS_IGNITE */
