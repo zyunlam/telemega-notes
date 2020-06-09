@@ -225,7 +225,10 @@ ao_sample_preflight_set(void)
 	ao_quaternion_vectors_to_rotation(&ao_rotation, &up, &orient);
 #if HAS_FLIGHT_DEBUG
 	if (ao_orient_test)
-		printf("\n\treset\n");
+		printf("\n\treset across %d through %d along %d\n",
+		       (ao_ground_accel_across - ao_config.accel_zero_across),
+		       (ao_ground_accel_through - ao_config.accel_zero_through),
+		       (ao_ground_accel_along - ao_config.accel_zero_along));
 #endif	
 
 	ao_sample_compute_orient();

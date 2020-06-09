@@ -491,20 +491,27 @@ ao_flight_dump(void)
 
 	printf ("sample:\n");
 	printf ("  tick        %d\n", ao_sample_tick);
+#if HAS_BARO
 	printf ("  raw pres    %d\n", ao_sample_pres);
+#endif
 #if HAS_ACCEL
 	printf ("  raw accel   %d\n", ao_sample_accel);
 #endif
+#if HAS_BARO
 	printf ("  ground pres %d\n", ao_ground_pres);
 	printf ("  ground alt  %d\n", ao_ground_height);
+#endif
 #if HAS_ACCEL
 	printf ("  raw accel   %d\n", ao_sample_accel);
 	printf ("  groundaccel %d\n", ao_ground_accel);
 	printf ("  accel_2g    %d\n", ao_accel_2g);
 #endif
 
+#if HAS_BARO
 	printf ("  alt         %d\n", ao_sample_alt);
 	printf ("  height      %d\n", ao_sample_height);
+#endif
+
 #if HAS_ACCEL
 	printf ("  accel       %d.%02d\n", int_part(accel), frac_part(accel));
 #endif
