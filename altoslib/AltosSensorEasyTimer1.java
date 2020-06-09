@@ -63,11 +63,11 @@ class AltosSensorEasyTimer1 {
 		try {
 			AltosSensorEasyTimer1	sensor_easytimer1 = new AltosSensorEasyTimer1(link);
 
-			listener.set_battery_voltage(AltosConvert.mega_battery_voltage(sensor_easytimer1.v_batt));
+			listener.set_battery_voltage(AltosConvert.easy_timer_voltage(sensor_easytimer1.v_batt));
 
 			double[]	igniter_voltage = new double[2];
 			for (int i = 0; i < 2; i++)
-				igniter_voltage[i] = AltosConvert.mega_pyro_voltage(sensor_easytimer1.sense[i]);
+				igniter_voltage[i] = AltosConvert.easy_timer_voltage(sensor_easytimer1.sense[i]);
 			listener.set_igniter_voltage(igniter_voltage);
 
 		} catch (TimeoutException te) {
