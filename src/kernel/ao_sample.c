@@ -348,10 +348,7 @@ ao_sample(void)
 #endif
 
 #if HAS_ACCEL
-		ao_sample_accel = ao_data_accel_cook(ao_data);
-		if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
-			ao_sample_accel = ao_data_accel_invert(ao_sample_accel);
-		ao_data_set_accel(ao_data, ao_sample_accel);
+		ao_sample_accel = ao_data_accel(ao_data);
 #endif
 #if HAS_GYRO
 		ao_sample_accel_along = ao_data_along(ao_data);
