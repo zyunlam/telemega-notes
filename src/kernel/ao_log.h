@@ -96,10 +96,6 @@ ao_log(void);
 uint8_t
 ao_log_scan(void);
 
-/* Return the position of the start of the given log slot */
-uint32_t
-ao_log_pos(uint8_t slot);
-
 /* Start logging to eeprom */
 void
 ao_log_start(void);
