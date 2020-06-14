@@ -81,3 +81,6 @@ $(ALTOSLIB_CLASS):
 	-rm -f "$@"
 	$(LN_S) ../../altoslib/"$@" .
 
+
+clean::
+	rm -f Manifest.txt
