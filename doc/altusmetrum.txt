@@ -20,6 +20,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>; Bob Finch; Anth
 :telemega: 1
 :easymega: 1
 :telegps: 1
+:easytimer: 1
 :application: AltosUI
 :pdf-stylesdir: .
 :pdf-style: altusmetrum
@@ -44,6 +45,8 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>; Bob Finch; Anth
 	include::telemega.adoc[]
 
 	include::easymega.adoc[]
+
+	include::easytimer.adoc[]
 
 	include::installation.adoc[]
 

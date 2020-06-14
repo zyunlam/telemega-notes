@@ -633,14 +633,14 @@
 			similar unit as a programming dongle (pair
 			programming).
 		endif::telemetrum,telemini[]
-		ifdef::telemega,easymega,telemetrum[]
+		ifdef::telemega,easymega,easytimer,telemetrum[]
 			TeleMega, EasyMega, TeleMetrum v2 or newer,
-			EasyMini, TeleBT v3 or newer and TeleDongle v3
+			EasyMini, EasyTimer, TeleBT v3 or newer and TeleDongle v3
 			or newer are all
-		endif::telemega,easymega,telemetrum[]
-		ifndef::telemega,easymega,telemetrum[]
+		endif::telemega,easymega,easytimer,telemetrum[]
+		ifndef::telemega,easymega,easytimer,telemetrum[]
 			EasyMini is
-		endif::telemega,easymega,telemetrum[]
+		endif::telemega,easymega,easytimer,telemetrum[]
 		programmed directly
 		over USB (self programming). Please read
 		the directions for flashing devices in

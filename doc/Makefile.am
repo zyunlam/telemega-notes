@@ -67,6 +67,7 @@ IMAGES=\
 	easymega-v1.0-top.jpg \
 	easymini.svg \
 	easymini-top.jpg \
+	easytimer.jpg \
 	fire-igniter.png \
 	graph-configure.png \
 	graph-map.png \
@@ -142,6 +143,7 @@ INC_FILES=\
 	easymini-device.inc \
 	telemega.inc \
 	easymega.inc \
+	easytimer.inc \
 	installation.inc \
 	using-am-products.inc \
 	updating-firmware.inc \

@@ -171,7 +171,7 @@ ifdef::altusmetrum[]
 		is fired first, followed after a two second
 		delay by the 'main' channel.
 
-	ifdef::telemetrum,telemega,easymega[]
+	ifdef::telemetrum,telemega,easymega,easytimer[]
 	==== Pad Orientation
 
 		Because they include accelerometers,
@@ -183,15 +183,16 @@ ifdef::altusmetrum[]
 		with the antenna pointing aft instead.
 
 		Antenna Up::
-		In this mode, the antenna end of the flight
-		computer must point forward, in line with the
-		expected flight path.
+		In this mode, the antenna (or beeper, for devices
+		without an antenna) of the flight computer must point
+		forward, in line with the expected flight path.
 
 		Antenna Down::
-		In this mode, the antenna end of the flight
-		computer must point aft, in line with the
-		expected flight path.
-	endif::telemetrum,telemega,easymega[]
+
+		In this mode, the antenna (or beeper, for devices
+		without an antenna) end of the flight computer must
+		point aft, in line with the expected flight path.
+		endif::telemetrum,telemega,easymega,easytimer[]
 
 	==== Beeper Frequency
 
@@ -222,7 +223,7 @@ ifdef::telegps[]
 		in the log.
 endif::telegps[]
 
-ifdef::telemega,easymega,telemetrum[]
+ifdef::telemega,easymega,easytimer,telemetrum[]
 
 	==== Calibrate Accelerometer
 
@@ -236,9 +237,9 @@ ifdef::telemega,easymega,telemetrum[]
 		Configure Altimeter window and save the new
 		calibration values.
 
-endif::telemega,easymega,telemetrum[]
+endif::telemega,easymega,easytimer,telemetrum[]
 
-ifdef::telemega,easymega[]
+ifdef::telemega,easymega,easytimer[]
 
 	==== Configure Pyro Channels
 
@@ -246,8 +247,8 @@ ifdef::telemega,easymega[]
 		image::configure-pyro.png[width=400]
 
 		This opens a separate window to configure the
-		additional pyro channels available on TeleMega
-		and EasyMega.  One column is presented for
+		additional pyro channels available on TeleMega,
+		EasyMega and EasyTimer.  One column is presented for
 		each channel. Each row represents a single
 		parameter, if enabled the parameter must meet
 		the specified test for the pyro channel to be
@@ -274,4 +275,4 @@ ifdef::telemega,easymega[]
 
 		include::pyro-channels.adoc[]
 
-endif::telemega,easymega[]
+endif::telemega,easymega,easytimer[]
