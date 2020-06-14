@@ -234,7 +234,7 @@ static void timeInit()
 #define TNC_TX_DELAY 45
 
 /// The size of the TNC output buffer.
-#define TNC_BUFFER_SIZE 40
+#define TNC_BUFFER_SIZE 48
 
 /// States that define the current mode of the 1200 bps (A-FSK) state machine.
 typedef enum

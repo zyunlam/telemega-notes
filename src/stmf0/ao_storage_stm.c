@@ -182,8 +182,8 @@ ao_storage_setup(void)
 void
 ao_storage_device_info(void) 
 {
-	printf ("Using internal flash, page %d bytes, total %d bytes\n",
-		ao_storage_block, ao_storage_total);
+	printf ("Using internal flash, page %ld bytes, total %ld bytes\n",
+		(long) ao_storage_block, (long) ao_storage_total);
 }
 
 void

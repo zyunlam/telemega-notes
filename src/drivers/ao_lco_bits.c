@@ -394,9 +394,9 @@ ao_lco_toggle_drag(void)
 AO_TICK_TYPE
 ao_lco_drag_beep_check(AO_TICK_TYPE now, AO_TICK_TYPE delay)
 {
-	PRINTD("beep check count %d delta %d\n",
+	PRINTD("beep check count %d delta %ld\n",
 	       ao_lco_drag_beep_count,
-	       (AO_TICK_SIGNED) (now - ao_lco_drag_beep_time));
+	       (long) (AO_TICK_SIGNED) (now - ao_lco_drag_beep_time));
 	if (ao_lco_drag_beep_count) {
 		if ((AO_TICK_SIGNED) (now - ao_lco_drag_beep_time) >= 0) {
 			if (ao_lco_drag_beep_on) {

@@ -29,7 +29,7 @@
 
 #if DEBUG
 extern uint8_t	ao_lco_debug;
-#define PRINTD(...) do { if (!ao_lco_debug) break; printf ("\r%5u %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } while(0)
+#define PRINTD(...) do { if (!ao_lco_debug) break; printf ("\r%5lu %s: ", (unsigned long) ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } while(0)
 #else
 #define PRINTD(...) 
 #endif

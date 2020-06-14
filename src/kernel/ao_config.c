@@ -629,7 +629,7 @@ static void
 ao_config_log_set(void) 
 {
 #if FLIGHT_LOG_APPEND
-	printf("Flight log fixed size %d kB\n", ao_storage_log_max >> 10);
+	printf("Flight log fixed size %u kB\n", (unsigned) (ao_storage_log_max >> 10));
 #else
 	uint32_t	r;
 
@@ -643,7 +643,7 @@ ao_config_log_set(void)
 		return;
 	}
 	if (r > ao_storage_log_max) {
-		printf("Flight log max %d kB\n", ao_storage_log_max >> 10);
+		printf("Flight log max %u kB\n", (unsigned) (ao_storage_log_max >> 10));
 		return;
 	}
 	_ao_config_edit_start();

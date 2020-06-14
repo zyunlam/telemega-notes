@@ -134,7 +134,7 @@ ao_tracker(void)
 						height = -height;
 
 					if (ao_tracker_force_telem > 1)
-						printf("head %d ring %d ground_distance %d height %d\n", gps_head, ring, ground_distance, height);
+						printf("head %d ring %d ground_distance %ld height %d\n", gps_head, ring, (long) ground_distance, height);
 					if (ground_distance > ao_config.tracker_motion ||
 					    height > (ao_config.tracker_motion << 1))
 					{

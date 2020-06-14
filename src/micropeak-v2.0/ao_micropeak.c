@@ -225,7 +225,7 @@ ao_log_list(void)
 	if (ao_log_present())
 		printf ("flight %d start %x end %x\n",
 			1,
-			0, MAX_LOG_OFFSET >> 8);
+			0, (unsigned) (MAX_LOG_OFFSET >> 8));
 	printf ("done\n");
 }
 

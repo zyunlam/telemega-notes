@@ -156,7 +156,7 @@ ao_lco_drag_monitor(void)
 
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
 	for (;;) {
-		PRINTD("Drag monitor count %d delay %d\n", ao_lco_drag_beep_count, delay);
+		PRINTD("Drag monitor count %d delay %lu\n", ao_lco_drag_beep_count, (unsigned long) delay);
 		if (delay == (AO_TICK_TYPE) ~0)
 			ao_sleep(&ao_lco_drag_beep_count);
 		else
@@ -176,8 +176,8 @@ ao_lco_input(void)
 
 	for (;;) {
 		ao_event_get(&event);
-		PRINTD("event type %d unit %d value %d\n",
-		       event.type, event.unit, event.value);
+		PRINTD("event type %d unit %d value %ld\n",
+		       event.type, event.unit, (long) event.value);
 		switch (event.type) {
 		case AO_EVENT_QUADRATURE:
 			switch (event.unit) {
