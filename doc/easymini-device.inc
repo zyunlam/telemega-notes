@@ -31,11 +31,11 @@
 		|Main pyro channel connection to pyro circuit
 	      
 		|Top 2
-		|Main +
-		|Main pyro channel common connection to battery +
+		|Main +++
+		|Main pyro channel common connection to battery +++
 	      
 		|Top 3
-		|Battery +
+		|Battery +++
 		|Positive external battery terminal
 	      
 		|Top 4
@@ -47,8 +47,8 @@
 		|Apogee pyro channel connection to pyro circuit
 	      
 		|Bottom 2
-		|Apogee +
-		|Apogee pyro channel common connection to battery +
+		|Apogee +++
+		|Apogee pyro channel common connection to battery +++
 	      
 		|Bottom 3
 		|Switch Output
