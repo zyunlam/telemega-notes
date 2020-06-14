@@ -20,8 +20,6 @@ WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
 
 OPT=-Os -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
-PICOLIBC_PRINTF_CFLAGS = -DPICOLIBC_INTEGER_PRINTF_SCANF
-
 PICOLIBC_CFLAGS= \
 	-specs=picolibc.specs \
 	$(PICOLIBC_PRINTF_CFLAGS)

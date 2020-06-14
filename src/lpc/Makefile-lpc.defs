@@ -2,6 +2,10 @@ ifndef TOPDIR
 TOPDIR=..
 endif
 
+# Disable floating-point support in printf to save space
+
+PICOLIBC_PRINTF_CFLAGS = -DPICOLIBC_INTEGER_PRINTF_SCANF
+
 include $(TOPDIR)/Makefile.defs
 
 vpath % $(TOPDIR)/lpc:$(AO_VPATH)
