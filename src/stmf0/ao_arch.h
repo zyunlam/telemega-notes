@@ -53,7 +53,8 @@
  * ao_romconfig.c
  */
 
-#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".init.1"))) const
+#define AO_USBCONFIG_SYMBOL __attribute__((section(".init.2"))) const
 
 extern const uint16_t ao_romconfig_version;
 extern const uint16_t ao_romconfig_check;

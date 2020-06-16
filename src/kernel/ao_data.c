@@ -27,11 +27,18 @@ volatile uint8_t		ao_data_present;
 void
 ao_data_get(struct ao_data *packet)
 {
-#if HAS_FLIGHT
-	uint8_t	i = ao_data_ring_prev(ao_sample_data);
-#else
 	uint8_t	i = ao_data_ring_prev(ao_data_head);
-#endif
 	memcpy(packet, (void *) &ao_data_ring[i], sizeof (struct ao_data));
+}
+#endif
+
+#if HAS_ACCEL
+accel_t
+ao_data_accel(volatile struct ao_data *packet) {
+	accel_t raw;
+	raw = ao_data_accel_raw(packet);
+	if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
+		raw = ao_data_accel_invert(raw);
+	return raw;
 }
 #endif

@@ -43,9 +43,9 @@
 		|Terminal #|Terminal Name|Description
 		|1	|Switch Output	|Switch connection to flight computer
 		|2	|Switch Input	|Switch connection to positive battery terminal
-		|3	|Main +		|Main pyro channel common connection to battery +
+		|3	|Main +++	|Main pyro channel common connection to battery +++
 		|4	|Main -		|Main pyro channel connection to pyro circuit
-		|5	|Apogee +	|Apogee pyro channel common connection to battery +
+		|5	|Apogee +++	|Apogee pyro channel common connection to battery +++
 		|6	|Apogee -	|Apogee pyro channel connection to pyro circuit
 		|===
 

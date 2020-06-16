@@ -16,6 +16,7 @@ ao_fec_test
 ao_flight_test_mm
 ao_flight_test_noisy_accel
 ao_flight_test_metrum
+ao_flight_test_mini
 ao_micropeak_test
 ao_aes_test
 ao_lisp_test

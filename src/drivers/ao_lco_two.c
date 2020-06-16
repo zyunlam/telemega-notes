@@ -79,8 +79,8 @@ ao_lco_input(void)
 			ao_event_get(&event);
 		}
 		ao_lco_wakeup();
-		PRINTD("event type %d unit %d value %d\n",
-		       event.type, event.unit, event.value);
+		PRINTD("event type %d unit %d value %ld\n",
+		       event.type, event.unit, (long) event.value);
 		switch (event.type) {
 		case AO_EVENT_BUTTON:
 			switch (event.unit) {

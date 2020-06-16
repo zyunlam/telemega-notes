@@ -106,6 +106,7 @@ These are Bdale's notes on how to do a release.
 	   src/easymega-v2.0/{*.elf,*.ihx} \
 	   src/easymini-v1.0/{*.elf,*.ihx} \
 	   src/easymini-v2.0/{*.elf,*.ihx} \
+	   src/easytimer-v1/{*.elf,*.ihx} \
 	   src/telebt-v3.0/{*.elf,*.ihx} \
 	   src/telebt-v4.0/{*.elf,*.ihx} \
 	   src/teledongle-v3.0/{*.elf,*.ihx} \
@@ -124,6 +125,7 @@ These are Bdale's notes on how to do a release.
 	   src/easymega-v2.0/flash-loader/*.elf \
 	   src/easymini-v1.0/flash-loader/*.elf \
 	   src/easymini-v2.0/flash-loader/{*.elf,*.bin} \
+	   src/easytimer-v1/flash-loader/{*.elf,*.bin} \
 	   src/telebt-v3.0/flash-loader/*.elf \
 	   src/telebt-v4.0/flash-loader/{*.elf,*.bin} \
 	   src/teledongle-v3.0/flash-loader/*.elf \

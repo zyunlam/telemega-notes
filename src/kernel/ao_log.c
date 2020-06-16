@@ -111,6 +111,27 @@ ao_log_erase_mark(void)
 	ao_config_put();
 }
 
+/* Position of first flight record in slot */
+static uint32_t
+ao_log_pos(uint8_t slot)
+{
+	return ((slot) * ao_config.flight_log_max);
+}
+
+/* Start of erase block containing first flight record */
+static uint32_t
+ao_log_pos_block_start(uint8_t slot)
+{
+	return ao_log_pos(slot) & ~(ao_storage_block - 1);
+}
+
+/* End of erase block containing last flight record */
+static uint32_t
+ao_log_pos_block_end(uint8_t slot)
+{
+	return ao_log_pos_block_start(slot + 1);
+}
+
 #ifndef AO_LOG_UNCOMMON
 /*
  * Common logging functions which depend on the type of the log data
@@ -159,29 +180,16 @@ ao_log_check_data(void)
 	return 1;
 }
 
-uint8_t
-ao_log_check_clear(void)
-{
-	uint8_t *b = (uint8_t *) &ao_log_data;
-	uint8_t i;
-
-	for (i = 0; i < sizeof (ao_log_type); i++) {
-		if (*b++ != 0xff)
-			return 0;
-	}
-	return 1;
-}
-
 int16_t
 ao_log_flight(uint8_t slot)
 {
+	if (ao_storage_is_erased(ao_log_pos_block_start(slot)))
+		return 0;
+
 	if (!ao_storage_read(ao_log_pos(slot),
 			     &ao_log_data,
 			     sizeof (ao_log_type)))
 		return -(int16_t) (slot + 1);
-
-	if (ao_log_check_clear())
-		return 0;
 
 	if (!ao_log_check_data() || ao_log_data.type != AO_LOG_FLIGHT)
 		return -(int16_t) (slot + 1);
@@ -194,12 +202,6 @@ static uint8_t
 ao_log_slots(void)
 {
 	return (uint8_t) (ao_storage_log_max / ao_config.flight_log_max);
-}
-
-uint32_t
-ao_log_pos(uint8_t slot)
-{
-	return ((slot) * ao_config.flight_log_max);
 }
 
 static int16_t
@@ -222,33 +224,16 @@ ao_log_max_flight(void)
 	return max_flight;
 }
 
-static void
+static uint8_t
 ao_log_erase(uint8_t slot) 
 {
-	uint32_t log_current_pos, log_end_pos;
+	uint32_t start_pos;
+	uint32_t end_pos;
 
 	ao_log_erase_mark();
-	log_current_pos = ao_log_pos(slot);
-	log_end_pos = log_current_pos + ao_config.flight_log_max;
-	while (log_current_pos < log_end_pos) {
-		uint8_t	i;
-		static uint8_t b;
-
-		/*
-		 * Check to see if we've reached the end of
-		 * the used memory to avoid re-erasing the same
-		 * memory over and over again
-		 */
-		for (i = 0; i < 16; i++) {
-			if (ao_storage_read(log_current_pos + i, &b, 1))
-				if (b != 0xff)
-					break;
-		}
-		if (i == 16)
-			break;
-		ao_storage_erase(log_current_pos);
-		log_current_pos += ao_storage_block;
-	}
+	start_pos = ao_log_pos_block_start(slot);
+	end_pos = ao_log_pos_block_end(slot);
+	return ao_storage_erase(start_pos, end_pos - start_pos);
 }
 
 static void
@@ -298,12 +283,13 @@ ao_log_scan(void)
 		log_slots = ao_log_slots();
 		for (log_slot = 1; log_slot < log_slots; log_slot++) {
 			if (ao_log_flight(log_slot) != 0)
-				ao_log_erase(log_slot);
+				if (!ao_log_erase(log_slot))
+					printf("erase %d failed\n", log_slot);
 		}
 		ao_config_log_fix_append();
 	}
 	ao_log_current_pos = ao_log_pos(0);
-	ao_log_end_pos = ao_log_current_pos + ao_storage_log_max;
+	ao_log_end_pos = ao_log_pos_block_end(0);
 
 	if (ao_flight_number) {
 		uint32_t	full = ao_log_current_pos;
@@ -359,7 +345,7 @@ ao_log_scan(void)
 	do {
 		if (ao_log_flight(log_slot) == 0) {
 			ao_log_current_pos = ao_log_pos(log_slot);
-			ao_log_end_pos = ao_log_current_pos + ao_config.flight_log_max;
+			ao_log_end_pos = ao_log_pos_block_end(log_slot);
 			break;
 		}
 		if (++log_slot >= log_slots)
@@ -420,7 +406,12 @@ ao_log_list(void)
 			printf ("flight %d start %x end %x\n",
 				flight,
 				(uint16_t) (ao_log_pos(slot) >> 8),
-				(uint16_t) (ao_log_pos(slot+1) >> 8));
+				(uint16_t) (ao_log_pos_block_end(slot) >> 8));
+		else
+			printf ("slot %d  start %x end %x\n",
+				slot,
+				(uint16_t) (ao_log_pos(slot) >> 8),
+				(uint16_t) (ao_log_pos_block_end(slot) >> 8));
 	}
 	printf ("done\n");
 }
@@ -449,11 +440,13 @@ ao_log_delete(void)
 #if HAS_TRACKER
 				ao_tracker_erase_start(cmd_flight);
 #endif
-				ao_log_erase(slot);
+				if (ao_log_erase(slot))
+					puts("Erased");
+				else
+					puts("Failed to erase");
 #if HAS_TRACKER
 				ao_tracker_erase_end();
 #endif
-				puts("Erased");
 				return;
 			}
 		}

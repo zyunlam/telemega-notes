@@ -66,7 +66,13 @@ ao_storage_read(ao_pos_t pos, void *buf, uint16_t len);
 
 /* Erase a block of storage. This always clears ao_storage_block bytes */
 uint8_t
-ao_storage_erase(ao_pos_t pos);
+ao_storage_erase(ao_pos_t pos, uint32_t len);
+
+/* Check storage starting at pos to see if the chunk there
+ * is erased
+ */
+uint8_t
+ao_storage_is_erased(uint32_t pos);
 
 /* Flush any pending writes to stable storage */
 void
@@ -87,6 +93,10 @@ ao_storage_device_read(ao_pos_t pos, void *buf, uint16_t len);
 /* Write data within a storage unit */
 uint8_t
 ao_storage_device_write(ao_pos_t pos, void *buf, uint16_t len);
+
+/* Erase device from pos through pos + ao_storage_block */
+uint8_t
+ao_storage_device_erase(uint32_t pos);
 
 /* Initialize low-level device bits */
 void

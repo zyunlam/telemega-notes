@@ -167,9 +167,7 @@ ao_battery_voltage(void)
 static void
 ao_log_erase(void)
 {
-	uint32_t	pos;
-	for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block)
-		ao_storage_erase(pos);
+	ao_storage_erase(0, ao_storage_log_max);
 }
 
 uint8_t	ao_on_battery;
@@ -227,7 +225,7 @@ ao_log_list(void)
 	if (ao_log_present())
 		printf ("flight %d start %x end %x\n",
 			1,
-			0, MAX_LOG_OFFSET >> 8);
+			0, (unsigned) (MAX_LOG_OFFSET >> 8));
 	printf ("done\n");
 }
 

@@ -22,10 +22,6 @@
 #include <ao_boot.h>
 
 extern void main(void);
-extern char __stack__;
-extern char __text_start__, __text_end__;
-extern char _start__, _end__;
-extern char __bss_start__, __bss_end__;
 
 /* Interrupt functions */
 
@@ -37,8 +33,6 @@ void stm_halt_isr(void)
 void stm_ignore_isr(void)
 {
 }
-
-const void *stm_interrupt_vector[];
 
 uint32_t
 stm_flash_size(void) {
@@ -70,25 +64,6 @@ stm_flash_size(void) {
 		break;
 	}
 	return (uint32_t) kbytes * 1024;
-}
-
-void start(void)
-{
-#ifdef AO_BOOT_CHAIN
-	if (ao_boot_check_chain()) {
-#ifdef AO_BOOT_PIN
-		if (ao_boot_check_pin())
-#endif
-		{
-			ao_boot_chain(AO_BOOT_APPLICATION_BASE);
-		}
-	}
-#endif
-	/* Set interrupt vector table offset */
-	stm_nvic.vto = (uint32_t) &stm_interrupt_vector;
-	memcpy(&_start__, &__text_end__, &_end__ - &_start__);
-	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);
-	main();
 }
 
 #define STRINGIFY(x) #x
@@ -158,10 +133,18 @@ isr(tim7)
 
 #define i(addr,name)	[(addr)/4] = stm_ ## name ## _isr
 
-__attribute__ ((section(".interrupt")))
-const void *stm_interrupt_vector[] = {
-	[0] = &__stack__,
-	[1] = start,
+extern char __stack[];
+void _start(void) __attribute__((__noreturn__));
+void main(void) __attribute__((__noreturn__));
+
+/* This must be exactly 256 bytes long so that the configuration data
+ * gets loaded at the right place
+ */
+
+__attribute__ ((section(".init")))
+const void * const __interrupt_vector[64] = {
+	[0] = &__stack,
+	[1] = _start,
 	i(0x08, nmi),
 	i(0x0c, hardfault),
 	i(0x10, memmanage),
@@ -217,3 +200,28 @@ const void *stm_interrupt_vector[] = {
 	i(0xec, tim6),
 	i(0xf0, tim7),
 };
+
+extern char __data_source[];
+extern char __data_start[];
+extern char __data_size[];
+extern char __bss_start[];
+extern char __bss_size[];
+
+void _start(void) {
+	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+
+#ifdef AO_BOOT_CHAIN
+	if (ao_boot_check_chain()) {
+#ifdef AO_BOOT_PIN
+		if (ao_boot_check_pin())
+#endif
+		{
+			ao_boot_chain(AO_BOOT_APPLICATION_BASE);
+		}
+	}
+#endif
+	/* Set interrupt vector table offset */
+	stm_nvic.vto = (uint32_t) &__interrupt_vector;
+	main();
+}

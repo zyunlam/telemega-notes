@@ -46,6 +46,7 @@ public class AltosConfigFCUI
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
 	JLabel			aprs_format_label;
+	JLabel			aprs_offset_label;
 	JLabel			flight_log_max_label;
 	JLabel			ignite_mode_label;
 	JLabel			pad_orientation_label;
@@ -72,6 +73,7 @@ public class AltosConfigFCUI
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
 	JComboBox<String>	aprs_format_value;
+	JComboBox<Integer>	aprs_offset_value;
 	JComboBox<String>	flight_log_max_value;
 	JComboBox<String>	ignite_mode_value;
 	JComboBox<String>	pad_orientation_value;
@@ -130,16 +132,27 @@ public class AltosConfigFCUI
 		0, 1, 2 ,3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 	};
 
+	static Integer[]	aprs_offset_values = {
+		0, 2, 4, 6, 8, 10, 12, 14, 16, 18
+	};
+
 	static String[] 	beep_values = {
 		"3750",
 		"4000",
 		"4250",
 	};
 
-	static String[] 	pad_orientation_values = {
+	static String[] 	pad_orientation_values_radio = {
 		"Antenna Up",
 		"Antenna Down",
 	};
+
+	static String[] 	pad_orientation_values_no_radio = {
+		"Beeper Up",
+		"Beeper Down",
+	};
+
+	String[] pad_orientation_values;
 
 	static String[]		tracker_motion_values_m = {
 		"2",
@@ -197,6 +210,25 @@ public class AltosConfigFCUI
 		return product != null && product.startsWith("TeleMetrum");
 	}
 
+	boolean is_telemega() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("TeleMega");
+	}
+
+	boolean is_easymega() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("EasyMega");
+	}
+
+	boolean is_easytimer() {
+		String	product = product_value.getText();
+		return product != null && product.startsWith("EasyTimer");
+	}
+
+	boolean has_radio() {
+		return is_telemega() || is_telemetrum() || is_telemini();
+	}
+
 	void set_radio_enable_tool_tip() {
 		if (radio_enable_value.isVisible())
 			radio_enable_value.setToolTipText("Enable/Disable telemetry and RDF transmissions");
@@ -236,6 +268,15 @@ public class AltosConfigFCUI
 			aprs_format_value.setToolTipText("Hardware doesn't support APRS");
 	}
 
+	void set_aprs_offset_tool_tip() {
+		if (aprs_offset_value.isVisible())
+			aprs_offset_value.setToolTipText("Set the APRS offset from top of minute");
+		else if (aprs_offset_value.isVisible())
+			aprs_offset_value.setToolTipText("Software version doesn't support setting the APRS offset");
+		else
+			aprs_offset_value.setToolTipText("Hardware doesn't support APRS");
+	}
+
 	void set_flight_log_max_tool_tip() {
 		if (flight_log_max_value.isVisible())
 			flight_log_max_value.setToolTipText("Size reserved for each flight log (in kB)");
@@ -262,6 +303,8 @@ public class AltosConfigFCUI
 				pad_orientation_value.setToolTipText("Older TeleMetrum firmware must fly antenna forward");
 			else if (is_telemini() || is_easymini())
 				pad_orientation_value.setToolTipText("TeleMini and EasyMini don't care how they are mounted");
+			else if (is_easytimer())
+				pad_orientation_value.setToolTipText("EasyTimer can be mounted in any of six orientations");
 			else
 				pad_orientation_value.setToolTipText("Can't select orientation");
 		}
@@ -621,6 +664,33 @@ public class AltosConfigFCUI
 		set_aprs_format_tool_tip();
 		row++;
 
+		/* APRS offset */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		aprs_offset_label = new JLabel("APRS offset:");
+		pane.add(aprs_offset_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		aprs_offset_value = new JComboBox<Integer>(aprs_offset_values);
+		aprs_offset_value.setEditable(false);
+		aprs_offset_value.addItemListener(this);
+		aprs_offset_value.setMaximumRowCount(aprs_offset_values.length);
+		pane.add(aprs_offset_value, c);
+		set_aprs_offset_tool_tip();
+		row++;
+
 		/* Callsign */
 		c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = row;
@@ -717,6 +787,11 @@ public class AltosConfigFCUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
+		if (has_radio())
+			pad_orientation_values = pad_orientation_values_radio;
+		else
+			pad_orientation_values = pad_orientation_values_no_radio;
+
 		pad_orientation_value = new JComboBox<String>(pad_orientation_values);
 		pad_orientation_value.setEditable(false);
 		pad_orientation_value.addItemListener(this);
@@ -1229,16 +1304,18 @@ public class AltosConfigFCUI
 		return AltosLib.MISSING;
 	}
 
-	public void set_flight_log_max_limit(int new_flight_log_max_limit) {
+	public void set_flight_log_max_limit(int new_flight_log_max_limit, int new_storage_erase_unit) {
 		flight_log_max_limit = new_flight_log_max_limit;
 		if (new_flight_log_max_limit != AltosLib.MISSING) {
 			flight_log_max_value.removeAllItems();
 			for (int i = 8; i >= 1; i--) {
 				int	size = flight_log_max_limit / i;
+				if (new_storage_erase_unit != 0)
+					size &= ~(new_storage_erase_unit - 1);
 				flight_log_max_value.addItem(String.format("%d (%d flights)", size, i));
 			}
 		}
-		if (flight_log_max != 0)
+		if (flight_log_max != 0 && flight_log_max != AltosLib.MISSING)
 			set_flight_log_max(flight_log_max);
 	}
 
@@ -1480,6 +1557,22 @@ public class AltosConfigFCUI
 	public int aprs_format() throws AltosConfigDataException {
 		if (aprs_format_value.isVisible())
 			return aprs_format_value.getSelectedIndex();
+		return AltosLib.MISSING;
+	}
+
+	public void set_aprs_offset(int new_aprs_offset) {
+		if (new_aprs_offset != AltosLib.MISSING)
+			aprs_offset_value.setSelectedItem(new_aprs_offset);
+		aprs_offset_value.setVisible(new_aprs_offset != AltosLib.MISSING);
+		aprs_offset_label.setVisible(new_aprs_offset != AltosLib.MISSING);
+		set_aprs_offset_tool_tip();
+	}
+
+	public int aprs_offset() throws AltosConfigDataException {
+		if (aprs_offset_value.isVisible()) {
+			Integer i = (Integer) aprs_offset_value.getSelectedItem();
+			return i;
+		}
 		return AltosLib.MISSING;
 	}
 }

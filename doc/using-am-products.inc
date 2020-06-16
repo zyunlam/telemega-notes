@@ -17,11 +17,11 @@
 		In the rocket itself, you just need a flight computer
 		and a single-cell, 3.7 volt nominal Li-Po rechargeable
 		battery.
-		ifdef::telemetrum,telemega,easymega[]
+		ifdef::telemetrum,telemega,easymega,easytimer[]
 		An 850mAh battery weighs less than a 9V
-		alkaline battery, and will run a TeleMetrum, TeleMega
-		or EasyMega for hours.
-		endif::telemetrum,telemega,easymega[]
+		alkaline battery, and will run a TeleMetrum, TeleMega,
+		EasyMega or EasyTimer for hours.
+		endif::telemetrum,telemega,easymega,easytimer[]
 		A 110mAh battery weighs less
 		than a triple A battery and is a good choice for use
 		with

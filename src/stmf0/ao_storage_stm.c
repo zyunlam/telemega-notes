@@ -70,7 +70,7 @@ stm_flash_page_size(void)
 
 #define ao_flash_wait_bsy() do { while (stm_flash.sr & (1 << STM_FLASH_SR_BSY)); } while (0)
 
-static void __attribute__ ((section(".ramtext"),noinline))
+static void __attribute__ ((section(".sdata2.flash"), noinline))
 _ao_flash_erase_page(uint16_t *page)
 {
 	stm_flash.cr |= (1 << STM_FLASH_CR_PER);
@@ -86,7 +86,8 @@ _ao_flash_erase_page(uint16_t *page)
 
 #define _ao_flash_addr(pos)	((uint16_t *) (void *) ((uint8_t *) __flash__ + (pos)))
 
-static void __attribute ((section(".ramtext"), noinline)) _ao_flash_byte(uint32_t pos, uint8_t b)
+static void __attribute__ ((section(".sdata2.flash"), noinline))
+_ao_flash_byte(uint32_t pos, uint8_t b)
 {
 	uint16_t	v;
 	uint16_t	*a = _ao_flash_addr(pos & ~1);
@@ -99,7 +100,7 @@ static void __attribute ((section(".ramtext"), noinline)) _ao_flash_byte(uint32_
 	ao_flash_wait_bsy();
 }
 
-static void __attribute__ ((section(".ramtext"), noinline))
+static void __attribute__ ((section(".sdata2.flash"), noinline))
 _ao_flash_write(uint32_t pos, void *sv, uint16_t len)
 {
 	uint8_t		*s = sv;
@@ -127,24 +128,9 @@ _ao_flash_write(uint32_t pos, void *sv, uint16_t len)
 	stm_flash.cr &= ~(1 << STM_FLASH_CR_PG);
 }
 
-static bool
-ao_storage_is_erased(uint32_t pos)
-{
-	uint16_t *flash = _ao_flash_addr(pos);
-	uint32_t i = ao_storage_block >> 1;
-
-	while (i--)
-		if (*flash++ != 0xffff)
-			return false;
-	return true;
-}
-
 uint8_t
-ao_storage_erase(uint32_t pos)
+ao_storage_device_erase(uint32_t pos)
 {
-	if (ao_storage_is_erased(pos))
-		return 1;
-
 	ao_arch_block_interrupts();
 	ao_flash_unlock();
 
@@ -196,8 +182,8 @@ ao_storage_setup(void)
 void
 ao_storage_device_info(void) 
 {
-	printf ("Using internal flash, page %d bytes, total %d bytes\n",
-		ao_storage_block, ao_storage_total);
+	printf ("Using internal flash, page %ld bytes, total %ld bytes\n",
+		(long) ao_storage_block, (long) ao_storage_total);
 }
 
 void

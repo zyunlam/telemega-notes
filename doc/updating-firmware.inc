@@ -105,6 +105,16 @@
 			the board.
 			endif::easymega[]
 
+			ifdef::easytimer[]
+			EasyTimer::
+
+			Connect pin 5 and pin 1 of the debug connector, which
+			is the six holes next to the beeper. Pin 1 can be
+			identified by the square pad around it, and then the
+			pins could sequentially across the board, making Pin 5
+			the one on the other end of the row.
+			endif::easytimer[]
+
 			ifdef::telemetrum[]
 			TeleMetrum v2 and newer::
 

@@ -29,15 +29,6 @@
 #define RELOCATE_INTERRUPT	1
 #endif
 
-extern void main(void);
-extern char __stack__;
-extern char __text_start__, __text_end__;
-extern char _start__, _end__;
-extern char __bss_start__, __bss_end__;
-#if RELOCATE_INTERRUPT
-extern char __interrupt_rom__, __interrupt_start__, __interrupt_end__;
-#endif
-
 /* Interrupt functions */
 
 void lpc_halt_isr(void)
@@ -47,26 +38,6 @@ void lpc_halt_isr(void)
 
 void lpc_ignore_isr(void)
 {
-}
-
-void start(void) {
-#ifdef AO_BOOT_CHAIN
-	if (ao_boot_check_chain()) {
-#ifdef AO_BOOT_PIN
-		if (ao_boot_check_pin())
-#endif
-		{
-			ao_boot_chain(AO_BOOT_APPLICATION_BASE);
-		}
-	}
-#endif
-#if RELOCATE_INTERRUPT
-	memcpy(&__interrupt_start__, &__interrupt_rom__, &__interrupt_end__ - &__interrupt_start__);
-	lpc_scb.sysmemremap = LPC_SCB_SYSMEMREMAP_MAP_RAM << LPC_SCB_SYSMEMREMAP_MAP;
-#endif
-	memcpy(&_start__, &__text_end__, &_end__ - &_start__);
-	memset(&__bss_start__, '\0', &__bss_end__ - &__bss_start__);
-	main();
 }
 
 #define STRINGIFY(x) #x
@@ -122,10 +93,13 @@ isr(usb_wakeup)
 #define i(addr,name)	[(addr)/4] = lpc_ ## name ## _isr
 #define c(addr,value)	[(addr)/4] = (value)
 
-__attribute__ ((section(".interrupt")))
-const void *lpc_interrupt_vector[] = {
-	[0] = &__stack__,
-	[1] = start,
+extern char __stack[];
+void _start(void) __attribute__((__noreturn__));
+
+__attribute__ ((section(".init")))
+const void *const __interrupt_vector[0x30] = {
+	[0] = __stack,
+	[1] = _start,
 	i(0x08, nmi),
 	i(0x0c, hardfault),
 	c(0x10, 0),
@@ -178,3 +152,43 @@ const void *lpc_interrupt_vector[] = {
 	i(0xb8, usb_wakeup),
 	i(0xbc, hardfault),
 };
+
+/*
+ * Previous versions of this code had a 256 byte interupt vector. Add
+ * some padding to make sure the other low ROM variables land at the
+ * same address
+ */
+
+__attribute__ ((section(".init.0")))
+const void *const __interrupt_pad[0x10];
+
+void main(void) __attribute__((__noreturn__));
+
+void *__interrupt_ram[sizeof(__interrupt_vector)/sizeof(__interrupt_vector[0])] __attribute((section(".preserve.1")));
+
+extern char __data_source[];
+extern char __data_start[];
+extern char __data_size[];
+extern char __bss_start[];
+extern char __bss_size[];
+
+void _start(void) {
+	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+
+#ifdef AO_BOOT_CHAIN
+	if (ao_boot_check_chain()) {
+#ifdef AO_BOOT_PIN
+		if (ao_boot_check_pin())
+#endif
+		{
+			ao_boot_chain(AO_BOOT_APPLICATION_BASE);
+		}
+	}
+#endif
+#if RELOCATE_INTERRUPT
+	memcpy(__interrupt_ram, __interrupt_vector, sizeof(__interrupt_ram));
+	lpc_scb.sysmemremap = LPC_SCB_SYSMEMREMAP_MAP_RAM << LPC_SCB_SYSMEMREMAP_MAP;
+#endif
+	main();
+}

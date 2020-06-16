@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9.2)
+AC_INIT([altos], 1.9.3)
 ANDROID_VERSION=27
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2020-02-26
+RELEASE_DATE=2020-06-15
 AC_SUBST(RELEASE_DATE)
 
 DOC_DATE=`LC_ALL=C date -d $RELEASE_DATE +'%d %b %Y'`
@@ -262,18 +262,18 @@ if test "x$HAVE_ARM_CC" = "xyes"; then
 	save_LIBS="$LIBS"
 	CC="$ARM_CC"
 	CFLAGS="-mthumb -mcpu=cortex-m0"
-	LIBS="-ffreestanding -nostdlib"
+	LIBS="--specs=picolibc.specs"
 	AC_LANG_PUSH([C])
 
 	AC_MSG_CHECKING([if ]$ARM_CC[ supports cortex-m0])
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([int i;])],
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
 			  [HAVE_ARM_M0_CC=yes],
 			  [HAVE_ARM_M0_CC=no])
         AC_MSG_RESULT([$HAVE_ARM_M0_CC])
 
 	CFLAGS="-mthumb -mcpu=cortex-m3"
 	AC_MSG_CHECKING([if ]$ARM_CC[ supports cortex-m3])
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([int i;])],
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
 			  [HAVE_ARM_M3_CC=yes],
 			  [HAVE_ARM_M3_CC=no])
         AC_MSG_RESULT([$HAVE_ARM_M3_CC])
@@ -294,39 +294,10 @@ if test "x$HAVE_ARM_M3_CC" = "xno"; then
 fi
 
 if test "x$HAVE_ARM_M0_CC" = "xno"; then
-	AC_MSG_WARN([No cortex-m0 arm compiler found, LPC11U14 binaries will not be built])
+	AC_MSG_WARN([No cortex-m0 arm compiler found, LPC11U14 and STM32F0 binaries will not be built])
 fi
 
-AC_ARG_WITH([newlib-nano],
-	    [AS_HELP_STRING([--with-newlib-nano],
-	                    [Root of newlib nano install])],
-	    [],
-	    [with_newlib_nano=auto])
 
-HAVE_NEWLIB_NANO=no
-if test "x$with_newlib_nano" != "xno"; then
-	if test "x$with_newlib_nano" = "xauto"; then
-		for d in /usr/local/lib/newlib-nano /usr/lib/newlib-nano; do
-			if test "x$with_newlib_nano" = "xauto" -a -d "$d"; then
-				with_newlib_nano="$d"
-				HAVE_NEWLIB_NANO=yes
-			fi
-		done
-	else
-		HAVE_NEWLIB_NANO=yes
-	fi
-fi
-
-if test "x$HAVE_NEWLIB_NANO" = "xno"; then
-	AC_MSG_WARN([No newlib-nano library found, ARM binaries will not be built])
-	HAVE_ARM_M3_CC=no
-	HAVE_ARM_M0_CC=no
-else
-	NEWLIB_NANO="$with_newlib_nano"
-fi
-
-AC_SUBST(HAVE_NEWLIB_NANO)
-AC_SUBST(NEWLIB_NANO)
 
 #
 # Configure AVR compiler
@@ -604,7 +575,6 @@ echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
 echo "    Android release support.....: ${ANDROID_RELEASE}"
 echo "    STlink support..............: ${HAVE_STLINK}"
-echo "    Newlib-nano support.........: ${NEWLIB_NANO}"
 echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
 echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
 echo "    Strip jar timestamps........: ${STRIP_NONDETERMINISM}"

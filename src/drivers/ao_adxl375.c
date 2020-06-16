@@ -235,13 +235,13 @@ static struct ao_task ao_adxl375_task;
 static void
 ao_adxl375_dump(void)
 {
-	printf ("ADXL375 value %d %d %d self test %d min %d max %d\n",
+	printf ("ADXL375 value %d %d %d self test %ld min %ld max %ld\n",
 		ao_adxl375_current.x,
 		ao_adxl375_current.y,
 		ao_adxl375_current.z,
-		self_test_value,
-		MIN_SELF_TEST,
-		MAX_SELF_TEST);
+		(long) self_test_value,
+		(long) MIN_SELF_TEST,
+		(long) MAX_SELF_TEST);
 }
 
 const struct ao_cmds ao_adxl375_cmds[] = {

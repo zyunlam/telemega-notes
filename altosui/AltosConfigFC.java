@@ -232,7 +232,9 @@ public class AltosConfigFC implements ActionListener {
 
 		try {
 			/* bounds check stuff */
-			if (config_ui.flight_log_max() > data.log_space() / 1024) {
+			if (config_ui.flight_log_max() != AltosLib.MISSING &&
+			    config_ui.flight_log_max() > data.log_space() / 1024)
+			{
 				JOptionPane.showMessageDialog(owner,
 							      String.format("Requested flight log, %dk, is larger than the available space, %dk.\n",
 									    config_ui.flight_log_max(),

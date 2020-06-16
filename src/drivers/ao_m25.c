@@ -239,7 +239,7 @@ ao_m25_scan(void)
  * Erase the specified sector
  */
 uint8_t
-ao_storage_erase(uint32_t pos) 
+ao_storage_device_erase(uint32_t pos)
 {
 	ao_port_t	cs;
 

@@ -78,6 +78,7 @@ public class AltosConfigData {
 	public int		aprs_interval;
 	public int		aprs_ssid;
 	public int		aprs_format;
+	public int		aprs_offset;
 
 	/* HAS_BEEP */
 	public int		beep;
@@ -88,6 +89,7 @@ public class AltosConfigData {
 
 	/* Log listing replies */
 	public int	stored_flight;
+	public AltosEepromFlight[] flights;
 
 	/* HAS_TRACKER */
 	public int	tracker_motion;
@@ -161,7 +163,7 @@ public class AltosConfigData {
 	public int log_available() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TINY:
-			if (stored_flight == 0)
+			if (flights == null)
 				return 1;
 			return 0;
 		case AltosLib.AO_LOG_FORMAT_TELEMETRY:
@@ -174,10 +176,10 @@ public class AltosConfigData {
 			int	log_space = log_space();
 			int	log_used;
 
-			if (stored_flight <= 0)
+			if (flights == null)
 				log_used = 0;
 			else
-				log_used = stored_flight * log_max;
+				log_used = flights.length * log_max;
 			int	log_avail;
 
 			if (log_used >= log_space)
@@ -296,6 +298,7 @@ public class AltosConfigData {
 		aprs_interval = AltosLib.MISSING;
 		aprs_ssid = AltosLib.MISSING;
 		aprs_format = AltosLib.MISSING;
+		aprs_offset = AltosLib.MISSING;
 
 		beep = AltosLib.MISSING;
 
@@ -304,7 +307,8 @@ public class AltosConfigData {
 
 		storage_size = AltosLib.MISSING;
 		storage_erase_unit = AltosLib.MISSING;
-		stored_flight = AltosLib.MISSING;
+		stored_flight = 0;
+		flights = null;
 
 		accel_zero_along = AltosLib.MISSING;
 		accel_zero_across = AltosLib.MISSING;
@@ -316,8 +320,12 @@ public class AltosConfigData {
 		adjust_accel_cal();
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_UP:
 			return accel_cal_plus_cooked;
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPSIDEDOWN:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_DOWN:
 			return invert_accel_value(accel_cal_minus_cooked);
 		default:
 			return AltosLib.MISSING;
@@ -329,8 +337,12 @@ public class AltosConfigData {
 		adjust_accel_cal();
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_UP:
 			return accel_cal_minus_cooked;
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPSIDEDOWN:
+		case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_DOWN:
 			return invert_accel_value(accel_cal_plus_cooked);
 		default:
 			return AltosLib.MISSING;
@@ -349,11 +361,15 @@ public class AltosConfigData {
 		{
 			switch (pad_orientation) {
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
+			case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
+			case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_UP:
 				accel_cal_plus_cooked = accel_cal_plus;
 				accel_cal_minus_cooked = accel_cal_minus;
 				accel_cal_adjusted = true;
 				break;
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN:
+			case AltosLib.AO_PAD_ORIENTATION_WORDS_UPSIDEDOWN:
+			case AltosLib.AO_PAD_ORIENTATION_BIG_PARTS_DOWN:
 				accel_cal_plus_cooked = invert_accel_value(accel_cal_minus);
 				accel_cal_minus_cooked = invert_accel_value(accel_cal_plus);
 				accel_cal_adjusted = true;
@@ -465,6 +481,7 @@ public class AltosConfigData {
 		try { aprs_interval = get_int(line, "APRS interval:"); } catch (Exception e) {}
 		try { aprs_ssid = get_int(line, "APRS SSID:"); } catch (Exception e) {}
 		try { aprs_format = get_int(line, "APRS format:"); } catch (Exception e) {}
+		try { aprs_offset = get_int(line, "APRS offset:"); } catch (Exception e) {}
 
 		/* HAS_BEEP */
 		try { beep = get_int(line, "Beeper setting:"); } catch (Exception e) {}
@@ -481,7 +498,32 @@ public class AltosConfigData {
 		try { storage_erase_unit = get_int(line, "Storage erase unit:"); } catch (Exception e) {}
 
 		/* Log listing replies */
-		try { get_int(line, "flight"); stored_flight++; }  catch (Exception e) {}
+		try {
+			int flight = get_int(line, "flight");
+			String[] tokens = line.split("\\s+");
+			if (tokens.length >= 6) {
+				int	start = -1, end = -1;
+				try {
+					if (tokens[2].equals("start"))
+						start = AltosParse.parse_hex(tokens[3]);
+					if (tokens[4].equals("end"))
+						end = AltosParse.parse_hex(tokens[5]);
+					if (flight != 0 && start >= 0 && end > 0) {
+						int len;
+						if (flights == null)
+							len = 0;
+						else
+							len = flights.length;
+						AltosEepromFlight [] new_flights = new AltosEepromFlight[len + 1];
+						for (int i = 0; i < len; i++)
+							new_flights[i] = flights[i];
+						new_flights[len] = new AltosEepromFlight(flight, start, end);
+						flights = new_flights;
+						stored_flight = flights.length;
+					}
+				} catch (ParseException pe) { System.out.printf("Parse error %s\n", pe.toString()); }
+			}
+		}  catch (Exception e) {}
 
 		/* HAS_GYRO */
 		try {
@@ -661,6 +703,8 @@ public class AltosConfigData {
 			aprs_ssid = source.aprs_ssid();
 		if (aprs_format != AltosLib.MISSING)
 			aprs_format = source.aprs_format();
+		if (aprs_offset != AltosLib.MISSING)
+			aprs_offset = source.aprs_offset();
 
 		/* HAS_BEEP */
 		if (beep != AltosLib.MISSING)
@@ -696,14 +740,14 @@ public class AltosConfigData {
 			max_enabled = false;
 			break;
 		default:
-			if (stored_flight != AltosLib.MISSING)
+			if (flights != null)
 				max_enabled = false;
 			break;
 		}
 
 		dest.set_flight_log_max_enabled(max_enabled);
 		dest.set_radio_enable(radio_enable);
-		dest.set_flight_log_max_limit(log_space() / 1024);
+		dest.set_flight_log_max_limit(log_space() >> 10, storage_erase_unit >> 10);
 		dest.set_flight_log_max(flight_log_max);
 		dest.set_ignite_mode(ignite_mode);
 		dest.set_pad_orientation(pad_orientation);
@@ -718,6 +762,7 @@ public class AltosConfigData {
 		dest.set_aprs_interval(aprs_interval);
 		dest.set_aprs_ssid(aprs_ssid);
 		dest.set_aprs_format(aprs_format);
+		dest.set_aprs_offset(aprs_offset);
 		dest.set_beep(beep);
 		dest.set_tracker_motion(tracker_motion);
 		dest.set_tracker_interval(tracker_interval);
@@ -795,7 +840,7 @@ public class AltosConfigData {
 			link.printf("c a %d %d\n", plus, minus);
 
 		/* HAS_LOG */
-		if (flight_log_max != 0)
+		if (flight_log_max != 0 && flight_log_max != AltosLib.MISSING)
 			link.printf("c l %d\n", flight_log_max);
 
 		/* HAS_IGNITE */
@@ -822,6 +867,8 @@ public class AltosConfigData {
 			link.printf("c S %d\n", aprs_ssid);
 		if (aprs_format != AltosLib.MISSING)
 			link.printf("c C %d\n", aprs_format);
+		if (aprs_offset != AltosLib.MISSING)
+			link.printf("c O %d\n", aprs_offset);
 
 		/* HAS_BEEP */
 		if (beep != AltosLib.MISSING)

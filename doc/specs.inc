@@ -154,6 +154,18 @@
 	|3.7V
 	endif::easymega[]
 
+	ifdef::easytimer[]
+	|EasyTimer v1.0
+	|-
+	|16g
+	|-
+	|BMX160
+	|-
+	|-
+	|3.7-12V
+	endif::easytimer[]
+	
+	
 	|===
 
 	<<<<
@@ -213,5 +225,14 @@
 	|2¼ inch (5.62cm)
 	|38mm coupler
 	endif::easymega[]
+
+	ifdef::easytimer[]
+	|EasyMini
+	|Debug USB Battery
+	|Pyro A Pyro B Battery
+	|0.8 inch (2.03cm)
+	|1½ inch (3.81cm)
+	|24mm coupler
+	endif::easytimer[]
 
 	|===

@@ -45,6 +45,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v2:
 			return counts_per_g_mpu;
 		case  imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return counts_per_g_bmx;
 		default:
 			return AltosLib.MISSING;
@@ -69,7 +70,8 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v1:
 		case imu_type_easymega_v2:
 			return counts_per_degree_mpu;
-		case  imu_type_telemega_v4:
+		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return counts_per_degree_bmx;
 		default:
 			return AltosLib.MISSING;
@@ -99,6 +101,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v2:
 			return counts_per_gauss_mpu;
 		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return 100.0;
 		default:
 			return AltosLib.MISSING;
@@ -156,6 +159,8 @@ public class AltosIMU implements Cloneable {
 	public static final int imu_type_easymega_v1 = 3;	/* MPU6000 */
 	public static final int imu_type_easymega_v2 = 4;	/* MPU9250 */
 
+	public static final int imu_type_easytimer_v1 = 5;	/* BMX160 */
+
 	private int accel_across(int imu_type) {
 		switch (imu_type) {
 		case imu_type_telemega_v1_v2:
@@ -164,7 +169,8 @@ public class AltosIMU implements Cloneable {
 			return accel_x;
 		case imu_type_easymega_v2:
 			return -accel_y;
-		case  imu_type_telemega_v4:
+		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return -accel_y;
 		default:
 			return AltosLib.MISSING;
@@ -179,6 +185,7 @@ public class AltosIMU implements Cloneable {
 			return accel_y;
 		case imu_type_easymega_v2:
 		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return accel_x;
 		default:
 			return AltosLib.MISSING;
@@ -197,6 +204,7 @@ public class AltosIMU implements Cloneable {
 			return gyro_y;
 		case imu_type_easymega_v2:
 		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return gyro_x;
 		default:
 			return AltosLib.MISSING;
@@ -212,6 +220,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v2:
 			return -gyro_y;
 		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return -gyro_y;
 		default:
 			return AltosLib.MISSING;
@@ -228,8 +237,9 @@ public class AltosIMU implements Cloneable {
 		case imu_type_telemega_v3:
 		case imu_type_easymega_v1:
 			return imu_axis_x;
-		case imu_type_telemega_v4:
 		case imu_type_easymega_v2:
+		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return imu_axis_y;
 		default:
 			return AltosLib.MISSING;
@@ -245,6 +255,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v2:
 			return -mag_y;
 		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return mag_y;
 		default:
 			return AltosLib.MISSING;
@@ -259,6 +270,7 @@ public class AltosIMU implements Cloneable {
 			return imu_axis_y;
 		case imu_type_easymega_v2:
 		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return imu_axis_x;
 		default:
 			return AltosLib.MISSING;
@@ -273,6 +285,7 @@ public class AltosIMU implements Cloneable {
 			return mag_y;
 		case imu_type_easymega_v2:
 		case imu_type_telemega_v4:
+		case imu_type_easytimer_v1:
 			return mag_x;
 		default:
 			return AltosLib.MISSING;

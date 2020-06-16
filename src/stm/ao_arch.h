@@ -51,7 +51,8 @@
  * ao_romconfig.c
  */
 
-#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".init.1"))) const
+#define AO_USBCONFIG_SYMBOL __attribute__((section(".init.2"))) const
 
 /*
  * For now, we're running at a weird frequency

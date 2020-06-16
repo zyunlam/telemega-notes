@@ -21,6 +21,8 @@
 #include <ao_log.h>
 #endif
 
+#include <ao_flight.h>
+
 #if HAS_MPU6000 || HAS_MPU9250
 #include <ao_quaternion.h>
 #endif
@@ -62,11 +64,28 @@ uint8_t			ao_sensor_errors;
  * resting
  */
 static uint16_t		ao_interval_end;
+#ifdef HAS_BARO
 static ao_v_t		ao_interval_min_height;
 static ao_v_t		ao_interval_max_height;
+#else
+static accel_t		ao_interval_min_accel_along, ao_interval_max_accel_along;
+static accel_t		ao_interval_min_accel_across, ao_interval_max_accel_across;
+static accel_t		ao_interval_min_accel_through, ao_interval_max_accel_through;
+#endif
 #if HAS_ACCEL
 static ao_v_t		ao_coast_avg_accel;
 #endif
+
+#define init_bounds(_cur, _min, _max) do {				\
+		_min = _max = _cur;					\
+	} while (0)
+
+#define check_bounds(_cur, _min, _max) do {	\
+		if (_cur < _min)		\
+			_min = _cur;		\
+		if (_cur > _max)		\
+			_max = _cur;		\
+	} while(0)
 
 uint8_t			ao_flight_force_idle;
 
@@ -109,9 +128,12 @@ ao_flight(void)
 			if (ao_config.accel_plus_g == 0 ||
 			    ao_config.accel_minus_g == 0 ||
 			    ao_ground_accel < ao_config.accel_plus_g - ACCEL_NOSE_UP ||
-			    ao_ground_accel > ao_config.accel_minus_g + ACCEL_NOSE_UP ||
-			    ao_ground_height < -1000 ||
-			    ao_ground_height > 7000)
+			    ao_ground_accel > ao_config.accel_minus_g + ACCEL_NOSE_UP
+#if HAS_BARO
+			    || ao_ground_height < -1000 ||
+			    ao_ground_height > 7000
+#endif
+				)
 			{
 				/* Detected an accel value outside -1.5g to 1.5g
 				 * (or uncalibrated values), so we go into invalid mode
@@ -203,7 +225,9 @@ ao_flight(void)
 				ao_launch_tick = ao_boost_tick = ao_sample_tick;
 
 				/* start logging data */
+#if HAS_LOG
 				ao_log_start();
+#endif
 
 #if HAS_TELEMETRY
 				/* Increase telemetry rate */
@@ -238,7 +262,18 @@ ao_flight(void)
 			    (int16_t) (ao_sample_tick - ao_boost_tick) > BOOST_TICKS_MAX)
 			{
 #if HAS_ACCEL
+#if HAS_BARO
 				ao_flight_state = ao_flight_fast;
+#else
+				ao_flight_state = ao_flight_coast;
+
+				/* Initialize landing detection interval values */
+				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;
+
+				init_bounds(ao_sample_accel_along, ao_interval_min_accel_along, ao_interval_max_accel_along);
+				init_bounds(ao_sample_accel_across, ao_interval_min_accel_across, ao_interval_max_accel_across);
+				init_bounds(ao_sample_accel_through, ao_interval_min_accel_through, ao_interval_max_accel_through);
+#endif
 				ao_coast_avg_accel = ao_accel;
 #else
 				ao_flight_state = ao_flight_coast;
@@ -247,7 +282,7 @@ ao_flight(void)
 				ao_wakeup(&ao_flight_state);
 			}
 			break;
-#if HAS_ACCEL
+#if HAS_ACCEL && HAS_BARO
 		case ao_flight_fast:
 			/*
 			 * This is essentially the same as coast,
@@ -264,6 +299,7 @@ ao_flight(void)
 #endif
 		case ao_flight_coast:
 
+#if HAS_BARO
 			/*
 			 * By customer request - allow the user
 			 * to lock out apogee detection for a specified
@@ -308,9 +344,45 @@ ao_flight(void)
 				ao_flight_state = ao_flight_drogue;
 				ao_wakeup(&ao_flight_state);
 			}
+			else
+#else /* not HAS_BARO */
+			/* coast to land:
+			 *
+			 * accel: values stable
+			 */
+			check_bounds(ao_sample_accel_along, ao_interval_min_accel_along, ao_interval_max_accel_along);
+			check_bounds(ao_sample_accel_across, ao_interval_min_accel_across, ao_interval_max_accel_across);
+			check_bounds(ao_sample_accel_through, ao_interval_min_accel_through, ao_interval_max_accel_through);
+
+#define MAX_QUIET_ACCEL	2
+
+			if ((int16_t) (ao_sample_tick - ao_interval_end) >= 0) {
+				if (ao_interval_max_accel_along - ao_interval_min_accel_along <= ao_data_accel_to_sample(MAX_QUIET_ACCEL) &&
+				    ao_interval_max_accel_across - ao_interval_min_accel_across <= ao_data_accel_to_sample(MAX_QUIET_ACCEL) &&
+				    ao_interval_max_accel_through - ao_interval_min_accel_through <= ao_data_accel_to_sample(MAX_QUIET_ACCEL))
+				{
+					ao_flight_state = ao_flight_landed;
+#if HAS_ADC
+					/* turn off the ADC capture */
+					ao_timer_set_adc_interval(0);
+#endif
+
+					ao_wakeup(&ao_flight_state);
+				}
+
+				/* Reset interval values */
+				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;
+
+				init_bounds(ao_sample_accel_along, ao_interval_min_accel_along, ao_interval_max_accel_along);
+				init_bounds(ao_sample_accel_across, ao_interval_min_accel_across, ao_interval_max_accel_across);
+				init_bounds(ao_sample_accel_through, ao_interval_min_accel_through, ao_interval_max_accel_through);
+			}
+#endif
 #if HAS_ACCEL
-			else {
+			{
+#if HAS_BARO
 			check_re_boost:
+#endif
 				ao_coast_avg_accel = ao_coast_avg_accel + ((ao_accel - ao_coast_avg_accel) >> 5);
 				if (ao_coast_avg_accel > AO_MSS_TO_ACCEL(20)) {
 					ao_boost_tick = ao_sample_tick;
@@ -321,6 +393,7 @@ ao_flight(void)
 #endif
 
 			break;
+#if HAS_BARO
 		case ao_flight_drogue:
 
 			/* drogue to main deploy:
@@ -363,7 +436,6 @@ ao_flight(void)
 			 *
 			 * barometer: altitude stable
 			 */
-
 			if (ao_avg_height < ao_interval_min_height)
 				ao_interval_min_height = ao_avg_height;
 			if (ao_avg_height > ao_interval_max_height)
@@ -385,6 +457,7 @@ ao_flight(void)
 				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;
 			}
 			break;
+#endif /* HAS_BARO */
 #if HAS_FLIGHT_DEBUG
 		case ao_flight_test:
 #if HAS_GYRO
@@ -418,20 +491,27 @@ ao_flight_dump(void)
 
 	printf ("sample:\n");
 	printf ("  tick        %d\n", ao_sample_tick);
+#if HAS_BARO
 	printf ("  raw pres    %d\n", ao_sample_pres);
+#endif
 #if HAS_ACCEL
 	printf ("  raw accel   %d\n", ao_sample_accel);
 #endif
+#if HAS_BARO
 	printf ("  ground pres %d\n", ao_ground_pres);
 	printf ("  ground alt  %d\n", ao_ground_height);
+#endif
 #if HAS_ACCEL
 	printf ("  raw accel   %d\n", ao_sample_accel);
 	printf ("  groundaccel %d\n", ao_ground_accel);
 	printf ("  accel_2g    %d\n", ao_accel_2g);
 #endif
 
+#if HAS_BARO
 	printf ("  alt         %d\n", ao_sample_alt);
 	printf ("  height      %d\n", ao_sample_height);
+#endif
+
 #if HAS_ACCEL
 	printf ("  accel       %d.%02d\n", int_part(accel), frac_part(accel));
 #endif

@@ -34,7 +34,11 @@ static uint8_t	ao_mpu9250_configured;
 
 #if AO_MPU9250_SPI
 
-#define ao_mpu9250_spi_get()	ao_spi_get(AO_MPU9250_SPI_BUS, AO_SPI_SPEED_1MHz)
+#ifndef AO_MPU9250_SPI_SPEED
+#define AO_MPU9250_SPI_SPEED	AO_SPI_SPEED_1MHz
+#endif
+
+#define ao_mpu9250_spi_get()	ao_spi_get(AO_MPU9250_SPI_BUS, AO_MPU9250_SPI_SPEED)
 #define ao_mpu9250_spi_put()	ao_spi_put(AO_MPU9250_SPI_BUS)
 
 #define ao_mpu9250_spi_start() 	ao_spi_set_cs(AO_MPU9250_SPI_CS_PORT,	\
@@ -559,7 +563,7 @@ ao_mpu9250_init(void)
 	 */
 
 	ao_cur_task = &ao_mpu9250_task;
-	ao_spi_get(AO_MPU9250_SPI_BUS, AO_SPI_SPEED_1MHz);
+	ao_mpu9250_spi_get();
 	ao_cur_task = NULL;
 #endif
 	ao_cmd_register(&ao_mpu9250_cmds[0]);

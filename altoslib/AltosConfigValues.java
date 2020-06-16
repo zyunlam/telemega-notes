@@ -64,7 +64,7 @@ public interface AltosConfigValues {
 
 	public abstract int flight_log_max() throws AltosConfigDataException;
 
-	public abstract void set_flight_log_max_limit(int flight_log_max_limit);
+	public abstract void set_flight_log_max_limit(int flight_log_max_limit, int storage_erase_unit);
 
 	public abstract void set_ignite_mode(int new_ignite_mode);
 
@@ -103,6 +103,10 @@ public interface AltosConfigValues {
 	public abstract int aprs_format() throws AltosConfigDataException;
 
 	public abstract void set_aprs_format(int new_aprs_format);
+
+	public abstract int aprs_offset() throws AltosConfigDataException;
+
+	public abstract void set_aprs_offset(int new_aprs_offset);
 
 	public abstract int beep() throws AltosConfigDataException;
 

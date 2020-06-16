@@ -440,8 +440,8 @@ ao_pad(void)
 				break;
 			}
 			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
-				PRINTD ("late pad arm_time %d time %d\n",
-					ao_pad_arm_time, ao_time());
+				PRINTD ("late pad arm_time %ld time %ld\n",
+					(long) ao_pad_arm_time, ao_time());
 				break;
 			}
 			PRINTD ("ignite\n");
@@ -458,8 +458,8 @@ ao_pad(void)
 			if (!ao_log_running) ao_log_start();
 #endif
 			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
-				PRINTD ("late pad arm_time %d time %d\n",
-					ao_pad_arm_time, ao_time());
+				PRINTD ("late pad arm_time %ld time %ld\n",
+					(long) ao_pad_arm_time, (long) ao_time());
 				break;
 			}
 			PRINTD ("ignite\n");

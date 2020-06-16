@@ -136,6 +136,7 @@ Section "Firmware"
 	File "../src/easymini-v2.0/easymini-v2.0-${VERSION}.ihx"
 	File "../src/easymega-v1.0/easymega-v1.0-${VERSION}.ihx"
 	File "../src/easymega-v2.0/easymega-v2.0-${VERSION}.ihx"
+	File "../src/easytimer-v1/easytimer-v1-${VERSION}.ihx"
 
 SectionEnd
 
