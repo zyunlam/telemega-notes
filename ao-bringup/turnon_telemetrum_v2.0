@@ -76,6 +76,6 @@ done
 
 echo 'E 1' > $dev
 
-./test-telemetrum
+./test-telemetrum-v2.0
 
 exit $?

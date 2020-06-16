@@ -16,81 +16,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-MEMORY {
-	rom : ORIGIN = 0x08000000, LENGTH = 4K
-	ram : ORIGIN = 0x20000000, LENGTH = 16K
-}
+__flash = 0x08000000;
+__flash_size = 4K;
+__ram =   0x20000000;
+__ram_size = 16K;
+__stack_size = 512;
 
 INCLUDE registers.ld
-
-EXTERN (stm_interrupt_vector)
-
-SECTIONS {
-	/*
-	 * Rom contents
-	 */
-
-	.text : {
-		__text_start__ = .;
-		*(.interrupt)	/* Interrupt vectors */
-
-		. = ORIGIN(rom) + 0x100;
-
-		ao_romconfig.o(.romconfig*)
-		ao_product.o(.romconfig*)
-		*(.text*)	/* Executable code */
-		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
-		*(.rodata*)	/* Constants */
-	} > rom
-	__text_end__ = .;
-
-	/* Boot data which must live at the start of ram so that
-	 * the application and bootloader share the same addresses.
-	 * This must be all uninitialized data
-	 */
-	.boot (NOLOAD) : {
-		__boot_start__ = .;
-		*(.boot)
-		__boot_end__ = .;
-	} >ram
-
-	/* Functions placed in RAM (required for flashing)
-	 *
-	 * Align to 8 bytes as that's what the ARM likes text
-	 * segment alignments to be, and if we don't, then
-	 * we end up with a mismatch between the location in
-	 * ROM and the desired location in RAM. I don't
-	 * entirely understand this, but at least this appears
-	 * to work...
-	 */
-
-	.textram BLOCK(8): {
-		_start__ = .;
-		__text_ram_start__ = .;
-		*(.ramtext)
-		__text_ram_end = .;
-	} >ram AT>rom
-
-	/* Data -- relocated to RAM, but written to ROM
-	 * Also aligned to 8 bytes to agree with textram
-	 */
-	.data BLOCK(8): {
-		*(.data)	/* initialized data */
-		_end__ = .;
-	} >ram AT>rom
-
-
-	.bss : {
-		__bss_start__ = .;
-		*(.bss)
-		*(COMMON)
-		__bss_end__ = .;
-	} >ram
-
-	PROVIDE(__stack__ = ORIGIN(ram) + LENGTH(ram));
-	PROVIDE(end = .);
-}
-
-ENTRY(start);
-
-
+INCLUDE picolibc.ld

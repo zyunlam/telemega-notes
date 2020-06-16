@@ -276,6 +276,10 @@ public class AltosConvert {
 		return 3.3 * mega_adc(raw) * (5.1 + 10.0) / 10.0;
 	}
 
+	static double easy_timer_voltage(int sensor) {
+		return 3.3 * mega_adc(sensor) * (100.0 + 27.0) / 27.0;
+	}
+
 	static double easy_mini_2_adc(int raw) {
 		return raw / 4095.0;
 	}

@@ -60,6 +60,10 @@ altos-mapd: Makefile
 	echo 'exec java -Djava.library.path="$(altoslibdir)" -jar "$(altosmapddir)/altosmapd.jar" "$$@"' >> $@
 	chmod +x $@
 
+Manifest.txt: Makefile
+	echo 'Main-Class: altosmapd.AltosMapd' > $@
+	echo "Class-Path: $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)" >> $@
+
 altos-mapd-test: Makefile
 	echo '#!/bin/sh' > $@
 	echo 'dir="$$(dirname $$0)"' >> $@
@@ -77,3 +81,6 @@ $(ALTOSLIB_CLASS):
 	-rm -f "$@"
 	$(LN_S) ../../altoslib/"$@" .
 
+
+clean::
+	rm -f Manifest.txt

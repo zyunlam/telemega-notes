@@ -17,6 +17,7 @@ FAKETIME=TZ=UTC faketime -f '$(RELEASE_DATE) 00:00:00 i0'
 endif
 
 RELNOTES_INC=\
+	release-notes-1.9.3.inc \
 	release-notes-1.9.2.inc \
 	release-notes-1.9.1.inc \
 	release-notes-1.9.inc \
@@ -67,6 +68,7 @@ IMAGES=\
 	easymega-v1.0-top.jpg \
 	easymini.svg \
 	easymini-top.jpg \
+	easytimer.jpg \
 	fire-igniter.png \
 	graph-configure.png \
 	graph-map.png \
@@ -142,6 +144,7 @@ INC_FILES=\
 	easymini-device.inc \
 	telemega.inc \
 	easymega.inc \
+	easytimer.inc \
 	installation.inc \
 	using-am-products.inc \
 	updating-firmware.inc \

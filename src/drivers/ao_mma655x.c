@@ -25,7 +25,7 @@
 #define DEBUG_LOW	1
 #define DEBUG_HIGH	2
 #if 1
-#define PRINTD(l, ...) do { if (DEBUG & (l)) { printf ("\r%5u %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } } while(0)
+#define PRINTD(l, ...) do { if (DEBUG & (l)) { printf ("\r%5lu %s: ", (unsigned long) ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } } while(0)
 #else
 #define PRINTD(l,...) 
 #endif

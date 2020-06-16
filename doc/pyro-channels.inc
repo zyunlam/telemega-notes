@@ -13,12 +13,14 @@ rate during descent is a bit noisy and so be careful when using it
 during these phases of the flight.
 
 Height above pad:: Select a value, and then choose whether the height
-above the launch pad should be above or below that value.
+above the launch pad should be above or below that value. Note that
+because EasyTimer has only a low-range accelerometer and no barometer,
+this value will not be very reliable on that device.
 
-Orientation:: TeleMega and EasyMega contain a 3-axis gyroscope and
-accelerometer which is used to compute the orientation of the
-rocket. A record of orientations over the last 0.64 seconds is kept
-and the largest value within this period is compared with the
+Orientation:: TeleMega, EasyMega and EasyTimer contain a 3-axis
+gyroscope and accelerometer which is used to compute the orientation
+of the rocket. A record of orientations over the last 0.64 seconds is
+kept and the largest value within this period is compared with the
 specified value. Note that the tilt angle is not the change in angle
 from the launch pad, but rather absolute relative to gravity—the
 3-axis accelerometer is used to compute the angle of the rocket on the
@@ -89,14 +91,14 @@ through a sequence of states:
    than 200m/s. Ascent rate will greater than zero. Vertical
    acceleration will be less than zero.
 
- * Drogue. The rocket has reached apogee and
-   is heading back down, but is above the
-   configured Main altitude. Ascent rate will be less than zero during
-   this state. Vertical acceleration will be negative until the rocket
-   reaches a terminal descent rate, at which point Vertical
-   acceleration will be zero. Both Ascent rate and Vertical
+ * Drogue. The rocket has reached apogee and is heading back down, but
+   is above the configured Main altitude. Ascent rate will be less
+   than zero during this state. Vertical acceleration will be negative
+   until the rocket reaches a terminal descent rate, at which point
+   Vertical acceleration will be zero. Both Ascent rate and Vertical
    acceleration are very noisy in this state, so be careful when
-   trying to use them to control pyro channels.
+   trying to use them to control pyro channels. This state selection
+   is not available on EasyTimer.
 
  * Main. The rocket is still descending, and
    is below the Main altitude. Ascent rate will be less than zero
@@ -105,7 +107,7 @@ through a sequence of states:
    it will settle down to a zero value once the rocket has reached the
    terminal velocity under the main chute. Ascent rate and Vertical
    acceleration should be much less noisy once the main chute has
-   deployed.
+   deployed. This state selection is not available on EasyTimer.
 
  * Landed. The rocket is no longer moving.
 

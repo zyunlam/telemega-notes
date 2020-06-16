@@ -1,3 +1,547 @@
+commit f31d842d0e07a1893441cb89fb287b31b86d28c1
+Merge: 0fd503fb f615725c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jun 15 20:26:35 2020 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit f615725cb6f963cf46715e936e1d60ce7866c3bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 15 19:11:49 2020 -0700
+
+    Version 1.9.3
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 765d4c96510c823b4e9410c55ba8466438846029
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 22:50:40 2020 -0700
+
+    doc: Update doc for 1.9.3
+    
+    Add release notes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4ab5855abccf704cc4cdbafb0e995de0a0162af5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 21:37:44 2020 -0700
+
+    Update 1.9.3 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d304f0ea2bfc48abc8c310828aa10c6d642065d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 14 00:04:31 2020 -0700
+
+    altos: Leave floating printf enabled on m3 devices
+    
+    These devices all use floating point computations, so leave the
+    floating point printf included in case they print one of those
+    values. If we run short on flash space, we can switch back.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 91b6d1e56a37a2cfae53c3727feaaa40505f48d9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 23:39:00 2020 -0700
+
+    altos: Fix printf format mis-matches
+    
+    Lots of values passed to printf are 'long' instead of 'int', so
+    fix the formats to use the right size indicator.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d0adf3f44b4a1b4bfc966dd4841c74157f60d604
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 23:36:13 2020 -0700
+
+    altos: Remove newlib-nano defines from Makedefs.in
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4802fe6dcae0e57c2e992dde008e3bcc84ea8d7f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 23:13:35 2020 -0700
+
+    altos/test: Ignore ao_flight_test_mini binary
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f550b645438e9f41afe0a45ff09caf05cf20003f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 23:12:55 2020 -0700
+
+    map-server: Manifest files are generated now
+    
+    Ignore in .gitignore
+    Remove in 'make clean'
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 52e0efd79e9043cde384089863920986a7331764
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 23:11:49 2020 -0700
+
+    Add EasyTimer firmware to packages and Releasing
+    
+    Make sure we include EasyTimer bits where required
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 00646d2700a2f4cf500e716e5a111057e3820475
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 23:09:54 2020 -0700
+
+    Check for picolibc when testing arm compilers
+    
+    Remove configuration checks for newlib as picolibc doesn't need
+    separate configuration variables.
+    
+    Make sure test program actually links as this tests to make sure
+    picolibc is working.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b9cc05bd3d417c957f47a64493f4a22caf660c55
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 22:40:42 2020 -0700
+
+    doc: Update for EasyTimer
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2eee4b8a3f358e2d649096149f3cedc1a39927e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 13 22:39:35 2020 -0700
+
+    doc: Avoid mis-interpretation of '+' in device wiring tables
+    
+    Looks like asciidoctor does something magic with '+' characters in
+    table contents. Avoid this by using +++. Sigh.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d779d8e5b1106aaec6170761e6f5bd4e8d5ac6e7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 9 11:48:17 2020 -0700
+
+    altos: Fix HAS_FLIGHT_DEBUG for easytimer
+    
+    Remove baro-specific bits of the debug output when
+    there's no barometer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d9c84d834f7fb4f36cee815dec2642737f73edc4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 9 11:47:22 2020 -0700
+
+    altos: Don't include baro-specific config values for easytimer
+    
+    These settings aren't used on easytimer, so don't include them in the
+    configuration system. This makes sure they don't appear in altosui.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 97cd271b3febf36d3e9943cea8d74332a128060c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 9 11:46:31 2020 -0700
+
+    altosui: Remove six-axis pad orientation for easy timer
+    
+    Wait until easytimer actually has six-axis support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2781c187d58955bbac5c9fcf498c3b46a84a13d5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 9 11:45:53 2020 -0700
+
+    altoslib: Fix easytimer voltage conversions
+    
+    Battery and pyros all use the same circuit (100k/27k).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b00a155bef319984ec2cf11898355edf94348a4a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 22:08:28 2020 -0700
+
+    Add some release note notes
+
+commit 869bc258b727d2046835ac52a361d2ef529895ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 20:55:28 2020 -0700
+
+    altoslib: Add EasyTimer idle monitor support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b07ca2827a498e6dd3c6b62819f71679291f9acc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jun 5 17:15:10 2020 -0700
+
+    Add EasyTimer configuration support
+    
+    Needed six-axis pad orientation support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fa30825d015d92bdbc95d2684386beef9fe9dc01
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 21:26:23 2020 -0700
+
+    altos: Leave accel data in ring raw; swap for orientation on fetch
+    
+    Instead of re-writing the acceleration data in the ring to adjust for
+    pad orientation, just leave it alone and flip it each time it is
+    fetched. Much simpler this way.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c246a366a6e0117e70abafc30db71c0545b88f6f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 21:05:17 2020 -0700
+
+    altos: Handle flight_log_max not being multiple of ao_storage_block
+    
+    In this case, flight records start in the middle of an erase block, but
+    now end at the erase block before the next flight.
+    
+    When checking for an empty log slot, the entire erase block containing
+    the start of the flight is checked to make sure it's clear, skipping
+    it if not.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 89726f5b1adceb243c5e2d5c958fc13c10f9a2d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 21:03:31 2020 -0700
+
+    altos: Round selected log size down to ao_storage_block multiple
+    
+    There was some (broken) code that complained if the value set wasn't
+    correct, that has been replaced by code that accepts any value and
+    just rounds it down to a multiple of ao_storage_block. The code also
+    stops complaining when set to the current value when storage isn't
+    empty.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 936eceded2d08f4eb7318b28bd1be6cd3b06a7b3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 21:01:31 2020 -0700
+
+    altos: Move ao_storage_erase to shared code. Add len
+    
+    This makes ao_storage_erase take an arbitrary length. The new version
+    erases each storage block if there's any un-erased data present, and
+    then also checks after erasing to make sure the block is clear.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e142c4bd6f2fbab74fb7b7cea7e9a19234ed0123
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 20:52:09 2020 -0700
+
+    altosui: Adjust max log setting for storage block size
+    
+    Need to round log sizes down to a multiple of the block size so that
+    erasing works sensibly on the device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e4c93942bbde7a538d1dca114f20dc827275a8e1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 8 20:49:42 2020 -0700
+
+    altoslib: Remember flight list in AltosConfigData
+    
+    Do this instead of having to re-fetch and re-parse in AltosEepromList
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 00492a0801eb93ad98be496585741a025ffea16b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 16:45:00 2020 -0700
+
+    altos: Initialize pyro code for easytimer-v1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0f110d01245762d905ad5b7fd1fc7753e17fb249
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 16:23:44 2020 -0700
+
+    easytimer-v1: Enable pyro commands
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5bfcefc475698dada8be8a2d66afbfcc064d4612
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 16:23:09 2020 -0700
+
+    altos: Fix ao_ignite.c to work without HAS_IGNITE
+    
+    Need to register commands even if HAS_IGNITE is not set
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0fb9e53a6b62c96d067e2974c5317e3bce638fb2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 15:48:16 2020 -0700
+
+    altos: Build easytimer-v1 by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a901ec5fef409a6675c24518aead2925dcd66cc3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Apr 8 13:43:22 2020 -0600
+
+    altos: add easytimer-v1 source directory
+
+commit 9416e5d71dc57df6612f62451433a34bf669b2cc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 16:03:23 2020 -0700
+
+    altos: Allow flight support without logging
+    
+    EasyTimer flies rockets, but doesn't have SPI flash for logging.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d4f1dd045465fbb7436a22d82b279319f7449fed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 16:02:54 2020 -0700
+
+    altos: Allow BMX160 to be used as primary accel
+    
+    EasyTimer doesn't have a high-g part.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d553e7448fe22f593eb8ab8246e872d856484bab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 16:01:45 2020 -0700
+
+    altos: Allow igniter status beeping with only 'extra' channels
+    
+    EasyTimer doesn't have main/apogee charges.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2f32a19aedb7d0e33899038e3fb04fe8a773291a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 12 17:00:47 2019 -0700
+
+    altos: Allow accel-only flight code
+    
+    EasyTimer won't have a baro sensor, so we need some way to track at least
+    the ascent part of a flight.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6363403d6c08310a16769bf49b8acc45a08bd619
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu May 28 16:00:04 2020 -0700
+
+    altos: Allow MPU9250 SPI speed to be set by application
+    
+    Rather than requiring 1MHz
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e5e7edb0aed5a183bbdd7484fec75a11160d01d4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 8 17:20:23 2020 -0700
+
+    ao-tools/ao-usbload: stubs in man page for missing options
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7797000eeaf11027200f12ee7f1eee5ed677f268
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 4 11:58:54 2020 -0700
+
+    Mark stm_interrupt_vector as const so it is READONLY
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2108da105ed9c915fc09d1251dc655bf11203d79
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 15 17:05:17 2019 -0700
+
+    altos: Move from newlib-nano to picolibc
+    
+    Use picolibc.ld, which involved some .ld file hacking, including:
+    
+     1) Defining ao_boot RAM address in the .ld file and declaring it 'extern'
+     2) Changing how m0 interrupt vector got moved to ram
+     3) Using -Taltos.ld instead of -Wl,-Taltos.ld so picolibc.specs wouldn't add picolibc.ld
+     4) Placing romconfig vars in '.init.1' and '.init.2' sections instead of '.romconfig'
+     5) Place code needing to run out of RAM in section .srodata instead of .ramtext
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 74d5dfd1801da8efbb7693a607fd25e35ad1158d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 4 10:36:41 2020 -0700
+
+    ignore .map files
+
+commit f32488556ce25e439fbab941f8019db639824f98
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 3 20:01:14 2020 -0700
+
+    altos/lpc: Add explicit defines for all register groups
+    
+    This lets the compiler see the constant address, rather than
+    having the linker stick it in later.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0459a4c7239c3017a61926bc8aab59e556b7eb5e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 4 10:35:23 2020 -0700
+
+    Create map file for all programs
+
+commit 3d70ca6bae383878d8a7c13b862031531fa4ff81
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 3 18:31:19 2020 -0700
+
+    altos/stm: Make ao_eeprom_total a #define instead of a const variable
+    
+    This is unused outside of ao_eeprom_stm.c, and as global const takes
+    up space in flash.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9b62e2b4831eb90c65ecdf05c219e8711840ef1e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu May 14 12:44:27 2020 -0600
+
+    point turnon_telemetrum_v2 to correct test script for v2.0
+
+commit 918865cca7297dde522e1886edf71b46d6ee2534
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 17 12:53:47 2020 -0700
+
+    ao-tools: Declare ao_verbose as extern in shared header.
+    
+    gcc-10 disables 'common' behavior by defaul, so we need to only define
+    variables in one location now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c2acda26c1e4e0d7ffda9cd985180562f61aa88b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Apr 17 12:51:13 2020 -0700
+
+    ao-tools: Use array indexing instead of addition to make gcc-10 happy
+    
+    A struct with a trailing zero-length array (for variable-length data) is
+    treated as a zero-sized object when doing pointer arithmetic, but treated
+    correctly when treated as an array. This generates a warning from gcc-10
+    
+            load->data + address - load->address
+    
+    while this, which is 'the same', does not:
+    
+            &load->data[address - load->address]
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 769f0e6049ae0440cf32f8cb0b5e504f67f5e911
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 26 10:09:51 2020 -0700
+
+    Start release notes for 1.9.4
+
+commit a6687ce902a3011796aee93f87d08545e5f0cec9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Mar 26 10:01:48 2020 -0700
+
+    altosui: Report baro ground alt for 'Pad Altitude' when GPS missing
+    
+    The 'Pad Altitude' field in the pad tab of AltosUI was originally one
+    of three fields designed to report the GPS position of the pad. When
+    TeleMini was added, the code was updated to separate the lat/lon from
+    altitude display, but the pad_alt field in AltosState used for that
+    was still only computed from GPS data.
+    
+    This fix gets rid of the confusing 'pad_alt' field in AltosState and
+    has the 'Pad Altitude' data select either GPS ground altitude or baro
+    ground altitude, depending on whether GPS data is available.
+    
+    signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 455a059b9c44332b8dadd87fba31d194f66997b5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 21 21:13:08 2020 -0700
+
+    map-server: Create Manifest.txt at build time
+    
+    This ensures the libraries have the right names
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c9c4c615578c94201140cf904cfd7e3334853973
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 4 18:52:35 2020 -0800
+
+    doc: start release notes for 1.9.3
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d8716b015cfeb4955c0224c32d3c01e66b092209
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 4 18:51:00 2020 -0800
+
+    doc: Document APRS offset configuration value
+    
+    Update screen shots including this as well.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 47f4121ae6596bdf18566295df2fdbe94fe676b8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 4 18:23:14 2020 -0800
+
+    altoslib, altosui, telegps: Add configuration support for APRS offset
+    
+    Configure the position within each minute that APRS transmissions
+    occur
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f4ff561bfaa7c59493eb9d6b99f0347db381a167
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 4 17:26:49 2020 -0800
+
+    altos: add APRS 'offset' value to set APRS transmision time
+    
+    This value is the offset from the top of the minute for the first APRS
+    packet in the minute. Subsequent packets will be transmitted
+    'interval' seconds apart for the rest of the minute.
+    
+    This allows multiple transmitters to be configured to share the same
+    frequency and not transmit at the same time.
+    
+    Note that this offset only works when the device has GPS lock.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0fd503fb65d513f54dade10256545043725d83e3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 25 23:57:51 2020 -0700
+
+    update ChangeLog for release 1.9.2
+
 commit 28e77f3520095a1e47ab25721b186e42110ffd3e
 Merge: c6ea2666 91ab3acc
 Author: Bdale Garbee <bdale@gag.com>

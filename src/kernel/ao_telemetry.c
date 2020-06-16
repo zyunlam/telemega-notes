@@ -443,6 +443,28 @@ ao_send_companion(void)
 }
 #endif
 
+#if HAS_APRS
+static void
+ao_set_aprs_time(void)
+{
+	uint16_t interval = ao_config.aprs_interval;
+
+	if ((ao_gps_data.flags & AO_GPS_DATE_VALID) && interval != 0) {
+		int second = (ao_gps_data.second / interval + 1) * interval + ao_config.aprs_offset;
+		int delta;
+		if (second >= 60) {
+			second = ao_config.aprs_offset;
+			delta = second + 60 - ao_gps_data.second;
+		} else {
+			delta = second - ao_gps_data.second;
+		}
+		ao_aprs_time = ao_gps_tick + AO_SEC_TO_TICKS(delta);
+	} else {
+		ao_aprs_time += AO_SEC_TO_TICKS(ao_config.aprs_interval);
+	}
+}
+#endif
+
 static void
 ao_telemetry(void)
 {
@@ -471,6 +493,7 @@ ao_telemetry(void)
 #endif
 #if HAS_APRS
 		ao_aprs_time = time;
+		ao_set_aprs_time();
 #endif
 		while (ao_telemetry_interval) {
 			time = ao_time() + AO_SEC_TO_TICKS(100);
@@ -539,7 +562,7 @@ ao_telemetry(void)
 #if HAS_APRS
 			if (ao_config.aprs_interval != 0) {
 				if ((int16_t) (ao_time() - ao_aprs_time) >= 0) {
-					ao_aprs_time = ao_time() + AO_SEC_TO_TICKS(ao_config.aprs_interval);
+					ao_set_aprs_time();
 					ao_aprs_send();
 				}
 				if ((int16_t) (time - ao_aprs_time) > 0)

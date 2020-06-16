@@ -21,7 +21,7 @@
 #include <ao_data.h>
 #include <ao_flight.h>
 
-static struct ao_log_telestatic log;
+static struct ao_log_telestatic log_data;
 
 const uint8_t ao_log_format = AO_LOG_FORMAT_TELESTATIC;
 
@@ -41,15 +41,15 @@ ao_log_telestatic(void)
 {
 	uint8_t wrote = 0;
 	/* set checksum */
-	log.csum = 0;
-	log.csum = ao_log_csum((uint8_t *) &log);
+	log_data.csum = 0;
+	log_data.csum = ao_log_csum((uint8_t *) &log_data);
 	ao_mutex_get(&ao_log_mutex); {
 		if (ao_log_current_pos >= ao_log_end_pos && ao_log_running)
 			ao_log_stop();
 		if (ao_log_running) {
 			wrote = 1;
 			ao_storage_write(ao_log_current_pos,
-					 &log,
+					 &log_data,
 					 sizeof (struct ao_log_telestatic));
 			ao_log_current_pos += sizeof (struct ao_log_telestatic);
 		}
@@ -75,9 +75,9 @@ ao_log(void)
 		while (!ao_log_running)
 			ao_sleep(&ao_log_running);
 	
-		log.type = AO_LOG_FLIGHT;
-		log.tick = ao_time();
-		log.u.flight.flight = ao_flight_number;
+		log_data.type = AO_LOG_FLIGHT;
+		log_data.tick = ao_time();
+		log_data.u.flight.flight = ao_flight_number;
 		ao_log_telestatic();
 
 		/* Write the whole contents of the ring to the log
@@ -87,18 +87,18 @@ ao_log(void)
 		for (;;) {
 			/* Write samples to EEPROM */
 			while (ao_log_data_pos != ao_data_head) {
-				log.tick = ao_data_ring[ao_log_data_pos].tick;
-				log.type = AO_LOG_SENSOR;
+				log_data.tick = ao_data_ring[ao_log_data_pos].tick;
+				log_data.type = AO_LOG_SENSOR;
 #if HAS_ADS131A0X
-				log.u.sensor.pressure = ao_data_ring[ao_log_data_pos].ads131a0x.ain[0];
-				log.u.sensor.pressure2 = ao_data_ring[ao_log_data_pos].ads131a0x.ain[1];
-				log.u.sensor.thrust = ao_data_ring[ao_log_data_pos].ads131a0x.ain[2];
-				log.u.sensor.mass = ao_data_ring[ao_log_data_pos].ads131a0x.ain[3];
+				log_data.u.sensor.pressure = ao_data_ring[ao_log_data_pos].ads131a0x.ain[0];
+				log_data.u.sensor.pressure2 = ao_data_ring[ao_log_data_pos].ads131a0x.ain[1];
+				log_data.u.sensor.thrust = ao_data_ring[ao_log_data_pos].ads131a0x.ain[2];
+				log_data.u.sensor.mass = ao_data_ring[ao_log_data_pos].ads131a0x.ain[3];
 #endif
-				log.u.sensor.t_low = ao_data_ring[ao_log_data_pos].max6691.sensor[0].t_low;
+				log_data.u.sensor.t_low = ao_data_ring[ao_log_data_pos].max6691.sensor[0].t_low;
 				int i;
 				for (i = 0; i < 4; i++)
-					log.u.sensor.t_high[i] = ao_data_ring[ao_log_data_pos].max6691.sensor[i].t_high;
+					log_data.u.sensor.t_high[i] = ao_data_ring[ao_log_data_pos].max6691.sensor[i].t_high;
 				ao_log_telestatic();
 				ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 			}

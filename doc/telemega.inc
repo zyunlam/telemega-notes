@@ -48,24 +48,24 @@
 		|Main pyro channel connection to pyro circuit
 
 		|Top 5
-		|Main +
-		|Main pyro channel common connection to battery +
+		|Main +++
+		|Main pyro channel common connection to battery +++
 
 		|Top 6
 		|Apogee -
 		|Apogee pyro channel connection to pyro circuit
 
 		|Top 7
-		|Apogee +
-		|Apogee pyro channel common connection to battery +
+		|Apogee +++
+		|Apogee pyro channel common connection to battery +++
 
 		|Top 8
 		|D -
 		|D pyro channel connection to pyro circuit
 
 		|Top 9
-		|D +
-		|D pyro channel common connection to battery +
+		|D +++
+		|D pyro channel common connection to battery +++
 
 		|Bottom 1
 		|GND
@@ -84,24 +84,24 @@
 		|A pyro channel connection to pyro circuit
 
 		|Bottom 5
-		|A +
-		|A pyro channel common connection to battery +
+		|A +++
+		|A pyro channel common connection to battery +++
 
 		|Bottom 6
 		|B -
 		|B pyro channel connection to pyro circuit
 
 		|Bottom 7
-		|B +
-		|B pyro channel common connection to battery +
+		|B +++
+		|B pyro channel common connection to battery +++
 
 		|Bottom 8
 		|C -
 		|C pyro channel connection to pyro circuit
 
 		|Bottom 9
-		|C +
-		|C pyro channel common connection to battery +
+		|C +++
+		|C pyro channel common connection to battery +++
 		|====
 
       	=== Using a Separate Pyro Battery with TeleMega

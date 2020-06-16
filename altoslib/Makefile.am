@@ -105,6 +105,7 @@ altoslib_JAVA = \
 	AltosUsbId.java \
 	AltosSensorMM.java \
 	AltosSensorEMini.java \
+	AltosSensorEasyTimer1.java \
 	AltosSensorTM.java \
 	AltosSensorTMini2.java \
 	AltosSensorTMini3.java \

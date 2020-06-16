@@ -7,7 +7,7 @@ include $(TOPDIR)/Makefile.defs
 vpath % $(TOPDIR)/stm:$(AO_VPATH)
 
 CC=$(ARM_CC)
-LIBS=-L$(NEWLIB_NANO)/arm-none-eabi/lib/thumb/v7-m -lm -lc -lgcc
+LIBS=-lm
 
 STM_CFLAGS=-mlittle-endian -mcpu=cortex-m3 -mthumb \
-	-I$(TOPDIR)/stm $(AO_CFLAGS) $(NEWLIB_CFLAGS)
+	-I$(TOPDIR)/stm $(AO_CFLAGS) $(PICOLIBC_CFLAGS)

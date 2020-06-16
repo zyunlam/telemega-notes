@@ -1,2 +1,0 @@
-Main-Class: altosmapd.AltosMapd
-Class-Path: altoslib_13.jar

@@ -19,8 +19,12 @@
 #include <ao.h>
 #include <ao_storage.h>
 
+#define AO_STORAGE_DATA_SIZE	256
+
+static uint8_t storage_data[AO_STORAGE_DATA_SIZE];
+
 uint8_t
-ao_storage_read(ao_pos_t pos, void *v_buf, uint16_t len) 
+ao_storage_read(ao_pos_t pos, void *v_buf, uint16_t len)
 {
 	uint8_t *buf = v_buf;
 	uint16_t this_len;
@@ -81,7 +85,60 @@ ao_storage_write(ao_pos_t pos, void *v_buf, uint16_t len)
 	return 1;
 }
 
-static uint8_t storage_data[128];
+uint8_t
+ao_storage_is_erased(uint32_t pos)
+{
+	uint32_t	read_pos;
+	uint32_t	read_len;
+	uint32_t	i;
+
+	read_pos = pos;
+	read_len = ao_storage_block;
+	while (read_len) {
+		uint32_t this_time = AO_STORAGE_DATA_SIZE;
+		if (this_time > read_len)
+			this_time = read_len;
+		if (!ao_storage_read(read_pos, storage_data, this_time))
+			return 0;
+		for (i = 0; i < this_time; i++)
+			if (storage_data[i] != 0xff)
+				return 0;
+		read_pos += this_time;
+		read_len -= this_time;
+	}
+	return 1;
+}
+
+uint8_t
+ao_storage_erase(uint32_t start_pos, uint32_t len)
+{
+	/* Round 'len' up to ao_storage_block units */
+	len = ((len + ao_storage_block - 1) / ao_storage_block) * ao_storage_block;
+
+	/*
+	 * Start at the end of the area to erase so that the
+	 * last block cleared is the first block; this will ensure
+	 * that partially erased flight logs still appear in the list
+	 * and can be re-erased.
+	 */
+	uint32_t pos = start_pos + len - ao_storage_block;
+	while (len) {
+		int tries;
+
+#define MAX_TRIES	4	/* needs to be at least 2 */
+		for (tries = 0; tries < MAX_TRIES; tries++) {
+			if (ao_storage_is_erased(pos))
+				break;
+			if (!ao_storage_device_erase(pos))
+				return 0;
+		}
+		if (tries == MAX_TRIES)
+			return 0;
+		pos -= ao_storage_block;
+		len -= ao_storage_block;
+	}
+	return 1;
+}
 
 static void
 ao_storage_dump(void) 
@@ -143,19 +200,16 @@ ao_storage_zap(void)
 	uint32_t v = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	ao_storage_erase((uint32_t) v << 8);
+	ao_storage_erase((uint32_t) v << 8, ao_storage_block);
 }
 
 static void
 ao_storage_zapall(void) 
 {
-	uint32_t	pos;
-
 	ao_cmd_white();
 	if (!ao_match_word("DoIt"))
 		return;
-	for (pos = 0; pos < ao_storage_log_max; pos += ao_storage_block)
-		ao_storage_erase(pos);
+	ao_storage_erase(0, ao_storage_log_max);
 }
 
 #if AO_STORAGE_TEST
@@ -265,26 +319,26 @@ ao_storage_incr_check_block(uint32_t pos)
 static uint8_t
 ao_storage_test_block(uint32_t pos) 
 {
-	ao_storage_erase(pos);
+	ao_storage_erase(pos, ao_storage_block);
 	printf(" erase"); flush();
 	if (!ao_storage_check_block(pos, 0xff))
 		return 0;
 	printf(" zero"); flush();
 	if (!ao_storage_fill_check_block(pos, 0x00))
 		return 0;
-	ao_storage_erase(pos);
+	ao_storage_erase(pos, ao_storage_block);
 	printf(" 0xaa"); flush();
 	if (!ao_storage_fill_check_block(pos, 0xaa))
 		return 0;
-	ao_storage_erase(pos);
+	ao_storage_erase(pos, ao_storage_block);
 	printf(" 0x55"); flush();
 	if (!ao_storage_fill_check_block(pos, 0x55))
 		return 0;
-	ao_storage_erase(pos);
+	ao_storage_erase(pos, ao_storage_block);
 	printf(" increment"); flush();
 	if (!ao_storage_incr_check_block(pos))
 		return 0;
-	ao_storage_erase(pos);
+	ao_storage_erase(pos, ao_storage_block);
 	printf(" pass\n"); flush();
 	return 1;
 }
@@ -303,6 +357,27 @@ ao_storage_test(void)
 			break;
 	}
 	printf("Test complete\n");
+}
+
+static void
+ao_storage_fill(void)
+{
+	uint32_t	pos;
+
+	ao_cmd_white();
+	if (!ao_match_word("DoIt"))
+		return;
+	printf("erase "); flush();
+	ao_storage_erase(0, ao_storage_log_max);
+	for (pos = 0; pos < sizeof (storage_data); pos++)
+		storage_data[pos] = (uint8_t) pos;
+	for (pos = 0; pos < ao_storage_log_max; pos += sizeof (storage_data)) {
+		if ((pos & 0xffff) == 0) {
+			printf("Fill 0x%x\n", pos); flush();
+		}
+		ao_storage_write(pos, storage_data, sizeof (storage_data));
+	}
+	printf("Fill complete\n");
 }
 #endif /* AO_STORAGE_TEST */
 
@@ -325,6 +400,7 @@ const struct ao_cmds ao_storage_cmds[] = {
 	{ ao_storage_zapall,"Z <key>\0Erase all. <key> is doit with D&I" },
 #if AO_STORAGE_TEST
 	{ ao_storage_test, "V <key>\0Validate flash (destructive). <key> is doit with D&I" },
+	{ ao_storage_fill, "F <key>\0Fill flash with data. <key> is doit with D&I" },
 #endif
 	{ 0, NULL },
 };

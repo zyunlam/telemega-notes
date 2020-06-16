@@ -242,7 +242,7 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 					}
 					info_add_deg(1, "Pad latitude", state.pad_lat, 'N', 'S');
 					info_add_deg(1, "Pad longitude", state.pad_lon, 'E', 'W');
-					info_add_row(1, "Pad GPS alt", "%6.0f m", state.pad_alt);
+					info_add_row(1, "Pad GPS alt", "%6.0f m", state.gps_ground_altitude());
 				}
 				if (state.gps.year != AltosLib.MISSING)
 					info_add_row(2, "GPS date", "%04d-%02d-%02d",

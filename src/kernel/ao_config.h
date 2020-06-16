@@ -38,7 +38,7 @@
 #include <ao_storage.h>
 
 #define ao_config_setup() 		ao_storage_setup()
-#define ao_config_erase()		ao_storage_erase(ao_storage_config)
+#define ao_config_erase()		ao_storage_erase(ao_storage_config, ao_storage_block)
 #define ao_config_write(pos,bytes, len)	ao_storage_write(ao_storage_config+(pos), bytes, len)
 #define ao_config_read(pos,bytes, len)	ao_storage_read(ao_storage_config+(pos), bytes, len)
 #define ao_config_flush()		ao_storage_flush()
@@ -58,7 +58,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	23
+#define AO_CONFIG_MINOR	24
 
 #define AO_AES_LEN 16
 
@@ -122,6 +122,9 @@ struct ao_config {
 #if HAS_FIXED_PAD_BOX
 	uint8_t		pad_box;		/* minor version 22 */
 	uint8_t		pad_idle;		/* minor version 23 */
+#endif
+#if HAS_APRS
+	uint8_t		aprs_offset;		/* minor version 24 */
 #endif
 };
 

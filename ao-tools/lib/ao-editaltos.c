@@ -56,7 +56,7 @@ rewrite(struct ao_hex_image *load, unsigned address, uint8_t *data, int length)
 	if (address < load->address || load->address + load->length < address + length)
 		return false;
 
-	memcpy(load->data + address - load->address, data, length);
+	memcpy(&load->data[address - load->address], data, length);
 	return true;
 }
 

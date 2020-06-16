@@ -97,7 +97,7 @@ public class AltosRotation extends AltosQuaternion {
 			     double z,
 			     int pad_orientation) {
 		AltosQuaternion	orient = AltosQuaternion.vector(x, y, z).normalize();
-		double sky = pad_orientation == 0 ? 1 : -1;
+		double sky = (pad_orientation & 1) == 0 ? 1 : -1;
 		AltosQuaternion	up = new AltosQuaternion(0, 0, 0, sky);
 		rotation = up.vectors_to_rotation(orient);
 	}

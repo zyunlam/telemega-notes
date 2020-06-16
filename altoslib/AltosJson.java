@@ -1218,6 +1218,10 @@ public class AltosJson extends JsonUtil {
 		} else if (object instanceof String) {
 			type = type_string;
 			string = (String) object;
+		} else if (object == null) {
+			System.out.printf("unexpected null object\n");
+		} else if (object.getClass() == null) {
+			System.out.printf("unexpected null object class\n");
 		} else if (object.getClass().isArray()) {
 			assert_array(true);
 

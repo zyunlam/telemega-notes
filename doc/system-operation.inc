@@ -7,9 +7,9 @@
 		fundamental modes, “idle” and “flight”.  Which of these modes
 		the firmware operates in is determined at start up
 		time.
-		ifdef::telemetrum,telemega,easymega[]
+		ifdef::telemetrum,telemega,easymega,easytimer[]
 		For
-		TeleMetrum, TeleMega and EasyMega, which have accelerometers, the mode is
+		TeleMetrum, TeleMega, EasyMega and EasyTimer, which have accelerometers, the mode is
 		controlled by the orientation of the
 		rocket (well, actually the board, of course...) at the time
 		power is switched on.  If the rocket is “nose up”, then
@@ -17,7 +17,7 @@
 		launch, so the firmware chooses flight mode.  However, if the
 		rocket is more or less horizontal, the firmware instead enters
 		idle mode.
-		endif::telemetrum,telemega,easymega[]
+		endif::telemetrum,telemega,easymega,easytimer[]
 		Since
 		EasyMini doesn't
 		have an

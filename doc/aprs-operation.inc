@@ -1,12 +1,19 @@
 	=== APRS
 
 		{aprsdevices} can send APRS if desired, and the
-		interval between APRS packets can be configured. As each APRS
-		packet takes a full second to transmit, we recommend an
-		interval of at least 5 seconds to avoid consuming too much
-		battery power or radio channel bandwidth. You can configure
-		the APRS interval using {application}; that process is described in
-		<<{configure_section}>>.
+		interval between APRS packets can be configured. As
+		each APRS packet takes a full second to transmit, we
+		recommend an interval of at least 5 seconds to avoid
+		consuming too much battery power or radio channel
+		bandwidth. You can configure the time within each
+		minute that APRS transmits by changing the APRS offset
+		value. When the GPS signal is locked and knows the
+		current time, the APRS offset selects the time with
+		each minute for the first APRS transmission;
+		subsequent transmissions occur each APRS interval
+		seconds thereafter.  You can configure the APRS
+		interval and APRS offset using {application}; that
+		process is described in <<{configure_section}>>.
 
 		AltOS supports both compressed and uncompressed APRS
 		position report data formats. The compressed format

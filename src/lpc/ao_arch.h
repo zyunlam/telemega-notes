@@ -53,7 +53,8 @@
  * ao_romconfig.c
  */
 
-#define AO_ROMCONFIG_SYMBOL __attribute__((section(".romconfig"))) const
+#define AO_ROMCONFIG_SYMBOL __attribute__((section(".init.1"))) const
+#define AO_USBCONFIG_SYMBOL __attribute__((section(".init.2"))) const
 
 #define ao_arch_block_interrupts()	asm("cpsid i")
 #define ao_arch_release_interrupts()	asm("cpsie i")

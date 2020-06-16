@@ -214,9 +214,13 @@ public class AltosPad extends AltosUIFlightTab {
 	class PadAlt extends AltosUIUnitsIndicator {
 
 		public double value(AltosState state, int i) {
-			if (report_pad(state))
-				return state.pad_alt;
-			else if (state.gps != null)
+			if (report_pad(state)) {
+				double alt = state.gps_ground_altitude();
+				if (alt == AltosLib.MISSING)
+					alt = state.ground_altitude();
+				return alt;
+			}
+			else if (state.gps != null && state.gps.alt != AltosLib.MISSING)
 				return state.gps.alt;
 			else
 				return state.altitude();

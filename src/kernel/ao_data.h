@@ -114,6 +114,9 @@ struct ao_data {
 #endif
 #if HAS_MPU9250
 	struct ao_mpu9250_sample	mpu9250;
+#if !HAS_MMA655X
+	int16_t				z_accel;
+#endif
 #endif
 #if HAS_HMC5883
 	struct ao_hmc5883_sample	hmc5883;
@@ -132,6 +135,9 @@ struct ao_data {
 #endif
 #if HAS_BMX160
 	struct ao_bmx160_sample		bmx160;
+#if !HAS_ADXL375
+	int16_t z_accel;
+#endif
 #endif
 };
 
@@ -188,26 +194,10 @@ typedef AO_ALT_TYPE	alt_t;
 
 #endif
 
-#if !HAS_BARO && HAS_ADC
-
-#define HAS_BARO	1
-
-typedef int16_t pres_t;
-typedef int16_t alt_t;
-
-#define ao_data_pres(packet)	((packet)->adc.pres)
-#define ao_data_temp(packet)	((packet)->adc.temp)
-#define pres_to_altitude(p)	ao_pres_to_altitude(p)
-#define ao_data_pres_cook(p)
-
-#endif
-
 /*
  * Need a few macros to pull data from the sensors:
  *
- * ao_data_accel_sample	- pull raw sensor and convert to normalized values
- * ao_data_accel	- pull normalized value (lives in the same memory)
- * ao_data_set_accel	- store normalized value back in the sensor location
+ * ao_data_accel_raw	- pull raw sensor
  * ao_data_accel_invert	- flip rocket ends for positive acceleration
  */
 
@@ -219,8 +209,7 @@ typedef int16_t alt_t;
  */
 
 typedef int16_t accel_t;
-#define ao_data_accel(packet)			((packet)->adc.accel)
-#define ao_data_set_accel(packet, a)		((packet)->adc.accel = (a))
+#define ao_data_accel_raw(packet)		((packet)->adc.accel)
 #define ao_data_accel_invert(a)			(0x7fff -(a))
 
 /*
@@ -306,12 +295,12 @@ typedef int16_t accel_t;
 
 #if HAS_ACCEL_REF
 
-#define ao_data_accel_cook(packet) \
+#define ao_data_accel_raw(packet) \
 	((uint16_t) ((((uint32_t) (packet)->adc.accel << 16) / ((packet)->adc.accel_ref << 1))) >> 1)
 
 #else
 
-#define ao_data_accel_cook(packet) ((packet)->adc.accel)
+#define ao_data_accel_raw(packet) ((packet)->adc.accel)
 
 #endif /* HAS_ACCEL_REF */
 
@@ -331,13 +320,11 @@ typedef int16_t accel_t;
 #error AO_MMA655X_INVERT not defined
 #endif
 
-#define ao_data_accel(packet)			((packet)->mma655x)
 #if AO_MMA655X_INVERT
-#define ao_data_accel_cook(packet)		(AO_ACCEL_INVERT - (packet)->mma655x)
+#define ao_data_accel_raw(packet)		(AO_ACCEL_INVERT - (packet)->mma655x)
 #else
-#define ao_data_accel_cook(packet)		((packet)->mma655x)
+#define ao_data_accel_raw(packet)		((packet)->mma655x)
 #endif
-#define ao_data_set_accel(packet, accel)	((packet)->mma655x = (accel))
 #define ao_data_accel_invert(accel)		(AO_ACCEL_INVERT - (accel))
 
 #endif
@@ -352,13 +339,11 @@ typedef int16_t	accel_t;
 #error AO_ADXL375_INVERT not defined
 #endif
 
-#define ao_data_accel(packet)			((packet)->adxl375.AO_ADXL375_AXIS)
 #if AO_ADXL375_INVERT
-#define ao_data_accel_cook(packet)		(-ao_data_accel(packet))
+#define ao_data_accel_raw(packet)		(-(packet)->adxl375.AO_ADXL375_AXIS)
 #else
-#define ao_data_accel_cook(packet)		ao_data_accel(packet)
+#define ao_data_accel_raw(packet)		((packet)->adxl375.AO_ADXL375_AXIS)
 #endif
-#define ao_data_set_accel(packet, accel)	(ao_data_accel(packet) = (accel))
 #define ao_data_accel_invert(accel)		(-(accel))
 
 #endif /* HAS_ADXL375 */
@@ -370,9 +355,7 @@ typedef int16_t	accel_t;
 typedef int16_t accel_t;
 
 /* MPU6000 is hooked up so that positive y is positive acceleration */
-#define ao_data_accel(packet)			((packet)->z_accel)
-#define ao_data_accel_cook(packet)		(-(packet)->mpu6000.accel_y)
-#define ao_data_set_accel(packet, accel)	((packet)->z_accel = (accel))
+#define ao_data_accel_raw(packet)		(-(packet)->mpu6000.accel_y)
 #define ao_data_accel_invert(a)			(-(a))
 
 #endif
@@ -408,6 +391,18 @@ static inline float ao_convert_accel(int16_t sensor)
 
 #endif
 
+#if !HAS_ACCEL && HAS_MPU9250
+
+#define HAS_ACCEL	1
+
+typedef int16_t accel_t;
+
+/* MPU9250 is hooked up so that positive y is positive acceleration */
+#define ao_data_accel_raw(packet)		(-(packet)->mpu9250.accel_y)
+#define ao_data_accel_invert(a)			(-(a))
+
+#endif
+
 #if !HAS_GYRO && HAS_MPU9250
 
 #define HAS_GYRO	1
@@ -438,6 +433,18 @@ static inline float ao_convert_accel(int16_t sensor)
 {
 	return ao_mpu9250_accel(sensor);
 }
+
+#endif
+
+#if !HAS_ACCEL && HAS_BMX160
+
+#define HAS_ACCEL	1
+
+typedef int16_t accel_t;
+
+#define ao_data_accel_raw(packet) 		-ao_data_along(packet)
+#define ao_data_accel_invert(a)			(-(a))
+#define ao_data_accel_to_sample(accel)		ao_bmx_accel_to_sample(accel)
 
 #endif
 
@@ -533,6 +540,11 @@ ao_data_fill(int head) {
 	}
 }
 
+#endif
+
+#if HAS_ACCEL
+accel_t
+ao_data_accel(volatile struct ao_data *packet);
 #endif
 
 #endif /* _AO_DATA_H_ */

@@ -55,7 +55,7 @@ public class AltosMma655x implements Cloneable {
 				int accel = mma655x.accel;
 				if (cal_data.mma655x_inverted)
 					accel = 4095 - accel;
-				if (cal_data.pad_orientation == 1)
+				if (cal_data.pad_orientation == AltosLib.AO_PAD_ORIENTATION_ANTENNA_DOWN)
 					accel = 4095 - accel;
 				listener.set_acceleration(cal_data.acceleration(accel));
 			}

@@ -19,8 +19,6 @@
 #ifndef _AO_EEPROM_H_
 #define _AO_EEPROM_H_
 
-extern const ao_pos_t	ao_eeprom_total;
-
 /*
  * Write to eeprom
  */

@@ -167,15 +167,15 @@
 		 signals, but no record of the flight will be
 		 stored in on-board flash.
 
-		ifdef::easymega,telemega[]
+		ifdef::easymega,telemega,easytimer[]
 		|Additional Igniters
 		|four very short beeps
-		|Continuity indication for the four additional pyro
-		 channels on TeleMega and EasyMega. One high tone for
-		 no continuity, one low tone for continuity. These are
+		|Continuity indication for the additional pyro
+		 channels on TeleMega, EasyMega and EasyTimer. One high tone for
+		 no continuity, one low tone for continuity. On TeleMega and EasyMegay, these are
 		 produced after the continuity indicators for the two
 		 primary igniter channels.
-		endif::easymega,telemega[]
+		endif::easymega,telemega,easytimer[]
 
 		|====
 
@@ -249,14 +249,14 @@
 		the current state. See below for how to get the flight
 		computer to come up in Idle mode at power on.
 
-		ifdef::telemetrum,easymega,telemega[]
+		ifdef::telemetrum,easymega,telemega,easytimer[]
 		For flight computers with accelerometers (TeleMetrum,
-		EasyMega and TeleMega), the mode is selected by the
+		EasyMega, TeleMega and EasyTimer), the mode is selected by the
 		orientation of the board during the self test
 		interval. If the board is pointing upwards as if ready
 		to fly, it will enter Flight/Pad mode. Otherwise, it will
 		enter Idle mode.
-		endif::telemetrum,easymega,telemega[]
+		endif::telemetrum,easymega,telemega,easytimer[]
 
 		ifdef::easymini[]
 		For EasyMini, if the USB cable is connected to a
@@ -315,21 +315,22 @@
 	=== Using a Different Kind of Battery
 
 		EasyMini
-		ifdef::telemini[and TeleMini v2 are]
-		ifndef::telemini[is]
+		ifdef::easytimer[and EasyTimer are]
+		ifndef::easytimer[is]
 		designed to use either a
 		lithium polymer battery or any other battery producing
 		between 4 and 12 volts, such as a rectangular 9V
 		battery.
 
-		ifdef::telemega,easymega,telemetrum[]
+		ifdef::telemega,easymega,telemetrum,telemini[]
 		[WARNING]
+		ifdef::telemini[TeleMini, ]
 		TeleMega, EasyMega and TeleMetrum are only designed to
 		operate off a single-cell Lithium Polymer battery and
 		cannot be used with any other kind. Connecting a
 		different kind of battery to any of these will destroy
 		the board.
-		endif::telemega,easymega,telemetrum[]
+		endif::telemega,easymega,telemetrum,telemini[]
 
 	=== Using Packet Link Mode
 

@@ -14,6 +14,7 @@
 		charging circuitry.
 		endif::telemetrum,telemega,easymega[]
 		The Lithium Polymer
+		ifdef::easytimer[EasyTimer, ]
 		ifdef::telemini[TeleMini and]
 		EasyMini battery can be charged by disconnecting it
 		from the board and plugging it into a standalone
@@ -22,6 +23,7 @@
 		USB power source.
 
 		You can also choose to use another battery with
+		ifdef::easytimer[EasyTimer and]
 		EasyMini, anything supplying between 4 and 12 volts should
 		work fine (like a standard 9V battery), but if you are planning
 		to fire pyro charges, ground testing is required to verify that
