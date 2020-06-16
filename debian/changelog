@@ -1,3 +1,65 @@
+altos (1.9.3-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altos: add APRS 'offset' value to set APRS transmision time
+  * altoslib, altosui, telegps: Add configuration support for APRS offset
+  * doc: Document APRS offset configuration value
+  * doc: start release notes for 1.9.3
+  * map-server: Create Manifest.txt at build time
+  * altosui: Report baro ground alt for 'Pad Altitude' when GPS missing
+  * Start release notes for 1.9.4
+  * ao-tools: Use array indexing instead of addition to make gcc-10 happy
+  * ao-tools: Declare ao_verbose as extern in shared header.
+  * debian: Switch debian dependency to picolibc
+  * altos/stm: Make ao_eeprom_total a #define instead of a const variable
+  * Create map file for all programs
+  * altos/lpc: Add explicit defines for all register groups
+  * ignore .map files
+  * altos: Move from newlib-nano to picolibc
+  * Mark stm_interrupt_vector as const so it is READONLY
+  * ao-tools/ao-usbload: stubs in man page for missing options
+  * altos: Allow MPU9250 SPI speed to be set by application
+  * altos: Allow accel-only flight code
+  * altos: Allow igniter status beeping with only 'extra' channels
+  * altos: Allow BMX160 to be used as primary accel
+  * altos: Allow flight support without logging
+  * altos: Build easytimer-v1 by default
+  * altos: Fix ao_ignite.c to work without HAS_IGNITE
+  * easytimer-v1: Enable pyro commands
+  * altos: Initialize pyro code for easytimer-v1
+  * altoslib: Remember flight list in AltosConfigData
+  * altosui: Adjust max log setting for storage block size
+  * altos: Move ao_storage_erase to shared code. Add len
+  * altos: Round selected log size down to ao_storage_block multiple
+  * altos: Handle flight_log_max not being multiple of ao_storage_block
+  * altos: Leave accel data in ring raw; swap for orientation on fetch
+  * Add EasyTimer configuration support
+  * altoslib: Add EasyTimer idle monitor support
+  * Add some release note notes
+  * altoslib: Fix easytimer voltage conversions
+  * altosui: Remove six-axis pad orientation for easy timer
+  * altos: Don't include baro-specific config values for easytimer
+  * altos: Fix HAS_FLIGHT_DEBUG for easytimer
+  * doc: Avoid mis-interpretation of '+' in device wiring tables
+  * doc: Update for EasyTimer
+  * Check for picolibc when testing arm compilers
+  * Add EasyTimer firmware to packages and Releasing
+  * map-server: Manifest files are generated now
+  * altos/test: Ignore ao_flight_test_mini binary
+  * altos: Remove newlib-nano defines from Makedefs.in
+  * altos: Fix printf format mis-matches
+  * altos: Leave floating printf enabled on m3 devices
+  * Update 1.9.3 release notes
+  * doc: Update doc for 1.9.3
+  * Version 1.9.3
+
+  [ Bdale Garbee ]
+  * point turnon_telemetrum_v2 to correct test script for v2.0
+  * altos: add easytimer-v1 source directory
+  * releasing 1.9.3
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 15 Jun 2020 20:36:15 -0600
+
 altos (1.9.2-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
