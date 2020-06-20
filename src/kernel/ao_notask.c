@@ -41,7 +41,7 @@ ao_sleep(void *wchan)
 
 #if HAS_AO_DELAY
 void
-ao_delay(uint16_t ticks)
+ao_delay(AO_TICK_TYPE ticks)
 {
 	AO_TICK_TYPE	target;
 

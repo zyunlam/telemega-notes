@@ -42,6 +42,11 @@ extern char ao_getchar(void);
 
 typedef AO_PORT_TYPE ao_port_t;
 
+#ifndef AO_TICK_TYPE
+#define AO_TICK_TYPE uint32_t
+#define AO_TICK_SIGNED int32_t
+#endif
+
 #if HAS_TASK
 #include <ao_task.h>
 #else
@@ -100,11 +105,6 @@ extern AO_ROMCONFIG_SYMBOL uint32_t ao_radio_cal;
  * ao_timer.c
  */
 
-#ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint32_t
-#define AO_TICK_SIGNED	int32_t
-#endif
-
 extern volatile AO_TICK_TYPE ao_tick_count;
 
 /* Our timer runs at 100Hz */
@@ -124,7 +124,7 @@ ao_time_ns(void);
 
 /* Suspend the current task until ticks time has passed */
 void
-ao_delay(uint16_t ticks);
+ao_delay(AO_TICK_TYPE ticks);
 
 /* Set the ADC interval */
 void

@@ -31,7 +31,7 @@ ISR(TIMER1_COMPA_vect)
 AO_TICK_TYPE
 ao_time(void)
 {
-	uint16_t	r;
+	AO_TICK_TYPE	r;
 
 	cli();
 	r = ao_tick_count;
@@ -127,7 +127,7 @@ void ao_delay_us(uint16_t us)
 }
 
 void
-ao_delay_until(uint16_t target)
+ao_delay_until(AO_TICK_TYPE target)
 {
 	cli();
 	ao_wakeup_count = target;
@@ -137,7 +137,7 @@ ao_delay_until(uint16_t target)
 }
 
 void
-ao_delay(uint16_t ticks)
+ao_delay(AO_TICK_TYPE ticks)
 {
 	ao_delay_until(ao_time() + ticks);
 }

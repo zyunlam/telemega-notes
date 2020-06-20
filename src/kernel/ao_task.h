@@ -38,7 +38,7 @@
 /* An AltOS task */
 struct ao_task {
 	void *wchan;			/* current wait channel (NULL if running) */
-	uint16_t alarm;			/* abort ao_sleep time */
+	AO_TICK_TYPE alarm;		/* abort ao_sleep time */
 	uint16_t task_id;		/* unique id */
 	/* Saved stack pointer */
 	union {
@@ -96,7 +96,7 @@ ao_sleep(void *wchan);
  *  1 on alarm
  */
 uint8_t
-ao_sleep_for(void *wchan, uint16_t timeout);
+ao_sleep_for(void *wchan, AO_TICK_TYPE timeout);
 
 /* Wake all tasks sleeping on wchan */
 void
@@ -105,7 +105,7 @@ ao_wakeup(void *wchan);
 #if 0
 /* set an alarm to go off in 'delay' ticks */
 void
-ao_alarm(uint16_t delay);
+ao_alarm(AO_TICK_TYPE delay);
 
 /* Clear any pending alarm */
 void
@@ -122,9 +122,9 @@ ao_add_task(struct ao_task * task, void (*start)(void), const char *name);
 
 #if HAS_TASK_QUEUE
 /* Called on timer interrupt to check alarms */
-extern uint16_t	ao_task_alarm_tick;
+extern AO_TICK_TYPE	ao_task_alarm_tick;
 void
-ao_task_check_alarm(uint16_t tick);
+ao_task_check_alarm(AO_TICK_TYPE tick);
 #endif
 
 /* Terminate the current task */

@@ -126,7 +126,7 @@ ao_task_validate_alarm_queue(void)
 #define ao_task_validate_alarm_queue()
 #endif
 
-uint16_t	ao_task_alarm_tick;
+AO_TICK_TYPE	ao_task_alarm_tick;
 
 static void
 ao_task_to_alarm_queue(struct ao_task *task)
@@ -174,7 +174,7 @@ ao_task_exit_queue(struct ao_task *task)
 }
 
 void
-ao_task_check_alarm(uint16_t tick)
+ao_task_check_alarm(AO_TICK_TYPE tick)
 {
 	struct ao_task	*alarm, *next;
 
@@ -359,8 +359,8 @@ ao_yield(void) ao_arch_naked_define
 	else
 	{
 #if HAS_SAMPLE_PROFILE
-		uint16_t	tick = ao_sample_profile_timer_value();
-		uint16_t	run = tick - ao_cur_task->start;
+		AO_TICK_TYPE	tick = ao_sample_profile_timer_value();
+		AO_TICK_TYPE	run = tick - ao_cur_task->start;
 		if (run > ao_cur_task->max_run)
 			ao_cur_task->max_run = run;
 		++ao_cur_task->yields;
@@ -493,7 +493,7 @@ ao_wakeup(void *wchan)
 }
 
 uint8_t
-ao_sleep_for(void *wchan, uint16_t timeout)
+ao_sleep_for(void *wchan, AO_TICK_TYPE timeout)
 {
 	uint8_t	ret;
 	if (timeout) {
@@ -530,7 +530,7 @@ ao_sleep_for(void *wchan, uint16_t timeout)
 static uint8_t ao_forever;
 
 void
-ao_delay(uint16_t ticks)
+ao_delay(AO_TICK_TYPE ticks)
 {
 	if (!ticks)
 		ticks = 1;
@@ -565,7 +565,7 @@ ao_task_info(void)
 {
 	uint8_t		i;
 	struct ao_task *task;
-	uint16_t	now = ao_time();
+	AO_TICK_TYPE	now = ao_time();
 
 	for (i = 0; i < ao_num_tasks; i++) {
 		task = ao_tasks[i];
