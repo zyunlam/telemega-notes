@@ -3,7 +3,7 @@
 #
 #
 
-include ../stmf0/Makefile.defs
+include ../stm32l0/Makefile.defs
 
 PUBLISH_DIR=$(HOME)/altusmetrumllc/Binaries
 PUBLISH_HEX=$(PUBLISH_DIR)/$(HEX)
@@ -14,7 +14,7 @@ MICRO_SRC=\
 	ao_microflight.c \
 	ao_microkalman.c
 
-ALTOS_SRC = \
+ALTOS_SRC_ = \
 	ao_micropeak.c \
 	ao_spi_stm.c \
 	ao_dma_stm.c \
@@ -54,13 +54,23 @@ INC=\
 	ao_micropeak.h \
 	altitude-pa.h \
 	ao_product.h \
-	stm32f0.h
+	stm32l0.h
+
+ALTOS_SRC = \
+	ao_interrupt.c \
+	ao_panic.c \
+	ao_micro.c \
+	ao_stdio.c \
+	ao_notask.c \
+	ao_serial_stm.c \
+	ao_timer.c \
+	ao_led.c
 
 IDPRODUCT=0x14
 PRODUCT=MicroPeak-v2.0
 PRODUCT_DEF=-DMICROPEAK
 
-CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS)
+CFLAGS = $(PRODUCT_DEF) $(STML0_CFLAGS)
 
 PROGNAME=micropeak-v2.0
 PROG=$(PROGNAME)-$(VERSION).elf
@@ -71,7 +81,7 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/stmf0 -Tmicropeak.ld -n
+LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/stm32l0 -Taltos.ld -n
 
 $(PROG): Makefile $(OBJ) micropeak.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS) -Wl,-Map=$(PROGNAME)-$(VERSION).map

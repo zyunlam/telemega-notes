@@ -56,7 +56,7 @@ ao_pips(void)
 }
 
 void
-ao_delay_until(uint16_t target) {
+ao_delay_until(AO_TICK_TYPE target) {
 	int16_t	delay = target - ao_time();
 	if (delay > 0) {
 		ao_sleep_for(ao_delay_until, delay);
@@ -145,10 +145,10 @@ ao_battery_fini(void)
 	stm_rcc.apb2enr &= ~(1 << STM_RCC_APB2ENR_ADCEN);
 }
 
-static uint16_t
+static AO_TICK_TYPE
 ao_battery_voltage(void)
 {
-	uint16_t	vrefint;
+	AO_TICK_TYPE	vrefint;
 
 	ao_battery_init();
 
@@ -212,7 +212,7 @@ ao_show_bat(void)
 uint8_t
 ao_log_present(void)
 {
-	uint16_t	n_samples;
+	AO_TICK_TYPE	n_samples;
 
 	ao_eeprom_read(N_SAMPLES_OFFSET, &n_samples, sizeof (n_samples));
 
