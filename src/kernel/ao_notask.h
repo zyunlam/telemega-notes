@@ -19,6 +19,9 @@
 #ifndef _AO_NOTASK_H_
 #define _AO_NOTASK_H_
 
+void
+ao_delay_until(AO_TICK_TYPE target);
+
 uint8_t
 ao_sleep(void *wchan);
 
