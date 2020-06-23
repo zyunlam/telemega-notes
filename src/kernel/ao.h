@@ -126,9 +126,6 @@ ao_time_ns(void);
 void
 ao_delay(AO_TICK_TYPE ticks);
 
-void
-ao_delay_until(AO_TICK_TYPE target);
-
 /* Set the ADC interval */
 void
 ao_timer_set_adc_interval(uint8_t interval);
