@@ -15,15 +15,6 @@
 #include <ao.h>
 #include <ao_exti.h>
 
-void
-ao_debug_out(char c)
-{
-	if (c == '\n')
-		ao_debug_out('\r');
-	while (!(stm_usart1.isr & (1 << STM_USART_ISR_TXE)));
-	stm_usart1.tdr = c;
-}
-
 static int
 _ao_usart_tx_start(struct ao_stm_usart *usart)
 {
@@ -154,6 +145,7 @@ ao_usart_putchar(struct ao_stm_usart *usart, char c)
 	ao_arch_release_interrupts();
 }
 
+#if 0
 static void
 ao_usart_drain(struct ao_stm_usart *usart)
 {
@@ -164,6 +156,7 @@ ao_usart_drain(struct ao_stm_usart *usart)
 	}
 	ao_arch_release_interrupts();
 }
+#endif
 
 static const uint32_t ao_usart_speeds[] = {
 	[AO_SERIAL_SPEED_4800] = 4800,
@@ -290,6 +283,7 @@ _ao_serial1_sleep_for(uint16_t timeout)
 }
 #endif
 
+#if 0
 void
 ao_serial1_drain(void)
 {
@@ -302,6 +296,7 @@ ao_serial1_set_speed(uint8_t speed)
 	ao_usart_drain(&ao_stm_usart1);
 	ao_usart_set_speed(&ao_stm_usart1, speed);
 }
+#endif
 #endif	/* HAS_SERIAL_1 */
 
 #if HAS_SERIAL_2
@@ -334,7 +329,6 @@ _ao_serial2_sleep_for(uint16_t timeout)
 {
 	return _ao_usart_sleep_for(&ao_stm_usart2, timeout);
 }
-#endif
 
 void
 ao_serial2_drain(void)
@@ -348,6 +342,7 @@ ao_serial2_set_speed(uint8_t speed)
 	ao_usart_drain(&ao_stm_usart2);
 	ao_usart_set_speed(&ao_stm_usart2, speed);
 }
+#endif
 
 #if USE_SERIAL_2_FLOW && USE_SERIAL_2_SW_FLOW
 void
@@ -381,6 +376,7 @@ ao_serial_set_sw_rts_cts(struct ao_stm_usart *usart,
 }
 #endif
 
+#if 0
 void
 ao_serial_shutdown(void)
 {
@@ -391,6 +387,7 @@ ao_serial_shutdown(void)
 	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_USART2EN);
 #endif
 }
+#endif
 
 void
 ao_serial_init(void)
