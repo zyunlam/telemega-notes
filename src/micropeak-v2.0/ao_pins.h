@@ -20,7 +20,10 @@
 
 extern uint8_t ao_on_battery;
 
-#define AO_SYSCLK	STM_MSI_FREQ
+#define HAS_TASK	0
+
+#define AO_SYSCLK	STM_MSI_FREQ_524288
+#define AO_MSI_RANGE	STM_RCC_ICSCR_MSIRANGE_524288
 
 #define LED_0_PORT	(&stm_gpioa)
 #define LED_0_PIN	1
@@ -136,5 +139,7 @@ extern uint32_t __flash_end__[];
 
 #define AO_BOOT_APPLICATION_BOUND	((uint32_t *) __flash__)
 #define USE_STORAGE_CONFIG	0
+
+#define HAS_STORAGE_DEBUG 1
 
 #endif /* _AO_PINS_H_ */

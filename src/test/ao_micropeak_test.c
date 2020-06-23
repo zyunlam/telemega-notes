@@ -46,10 +46,10 @@ static void ao_led_on(uint8_t led) {
 static void ao_led_off(uint8_t led) {
 }
 
-static void ao_delay_until(uint16_t target) {
+static void ao_delay_until(AO_TICK_TYPE target) {
 }
 
-static uint16_t ao_time(void) {
+static AO_TICK_TYPE ao_time(void) {
 	return 0;
 }
 
@@ -57,7 +57,7 @@ static uint16_t ao_time(void) {
 #include "ao_microkalman.c"
 #include "ao_convert_pa.c"
 
-uint16_t	now;
+AO_TICK_TYPE	now;
 uint8_t		running;
 
 void ao_log_micro_data() {
