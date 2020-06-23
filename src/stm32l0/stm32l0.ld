@@ -17,13 +17,13 @@ stm_dma1   = 0x40020000;
 stm_dbg    = 0x40015800;
 stm_usart1 = 0x40013800;
 stm_spi1   = 0x40013000;
-stm_adc1   = 0x40012400;
-stm_firewall = 0x41011c00;
-stm_tim22  = 0x41011400;
-stm_tim21  = 0x41010800;
-stm_exti   = 0x41010400;
-stm_syscfg = 0x41010000;
-stm_comp   = 0x41010000;
+stm_adc    = 0x40012400;
+stm_firewall = 0x40011c00;
+stm_tim22  = 0x40011400;
+stm_tim21  = 0x40010800;
+stm_exti   = 0x40010400;
+stm_syscfg = 0x40010000;
+stm_comp   = 0x40010000;
 
 /* APB1 */
 stm_lptim1 = 0x40007c00;
