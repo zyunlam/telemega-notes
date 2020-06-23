@@ -29,42 +29,54 @@ uint8_t ao_dma_done[NUM_DMA];
 static struct ao_dma_config ao_dma_config[NUM_DMA];
 static uint8_t ao_dma_allocated[NUM_DMA];
 static uint8_t ao_dma_mutex[NUM_DMA];
-
-static void
-ao_dma_isr(uint8_t index) {
-	/* Get channel interrupt bits */
-	uint32_t	isr = stm_dma.isr & (STM_DMA_ISR_MASK <<
-					     STM_DMA_ISR(index));
-
-	/* Ack them */
-	stm_dma.ifcr = isr;
-	if (ao_dma_config[index].isr)
-		(*ao_dma_config[index].isr)(index);
-	else {
-		ao_dma_done[index] = 1;
-		ao_wakeup(&ao_dma_done[index]);
-	}
-}
-
-void stm_dma1_channel1_isr(void) { ao_dma_isr(STM_DMA_INDEX(1)); }
-void stm_dma1_channel2_isr(void) { ao_dma_isr(STM_DMA_INDEX(2)); }
-#ifdef STM_DMA1_3_STOLEN
-#define LEAVE_DMA_ON
-#else
-void stm_dma1_channel3_isr(void) { ao_dma_isr(STM_DMA_INDEX(3)); }
-#endif
-void stm_dma1_channel4_isr(void) { ao_dma_isr(STM_DMA_INDEX(4)); }
-#ifdef STM_DMA1_5_STOLEN
-#define LEAVE_DMA_ON
-#else
-void stm_dma1_channel5_isr(void) { ao_dma_isr(STM_DMA_INDEX(5)); }
-#endif
-void stm_dma1_channel6_isr(void) { ao_dma_isr(STM_DMA_INDEX(6)); }
-void stm_dma1_channel7_isr(void) { ao_dma_isr(STM_DMA_INDEX(7)); }
+static uint8_t ao_dma_active;
 
 #ifndef LEAVE_DMA_ON
 static uint8_t ao_dma_active;
 #endif
+
+#define ch_mask(id)	(STM_DMA_ISR_MASK << STM_DMA_ISR(id))
+
+static void
+ao_dma_isr(uint8_t low_index, uint8_t high_index, uint32_t mask) {
+	/* Get channel interrupt bits */
+	uint32_t	isr = stm_dma1.isr & mask;
+	uint8_t		index;
+
+	/* Ack them */
+	stm_dma1.ifcr = isr;
+	for (index = low_index; index <= high_index; index++) {
+		if (isr & ch_mask(index)) {
+			if (ao_dma_config[index].isr)
+				(*ao_dma_config[index].isr)(index);
+			else {
+				ao_dma_done[index] = 1;
+				ao_wakeup(&ao_dma_done[index]);
+			}
+		}
+	}
+}
+
+void stm_dma1_channel1_isr(void) {
+	ao_dma_isr(STM_DMA_INDEX(1),
+		   STM_DMA_INDEX(1),
+		   ch_mask(STM_DMA_INDEX(1)));
+}
+
+void stm_dma1_channel3_2_isr(void) {
+	ao_dma_isr(STM_DMA_INDEX(2),
+		   STM_DMA_INDEX(3),
+		   ch_mask(STM_DMA_INDEX(2)) |
+		   ch_mask(STM_DMA_INDEX(3)));
+}
+
+void stm_dma1_channel7_4_isr(void) {
+	ao_dma_isr(STM_DMA_INDEX(4), STM_DMA_INDEX(7),
+		   ch_mask(STM_DMA_INDEX(4)) |
+		   ch_mask(STM_DMA_INDEX(5)) |
+		   ch_mask(STM_DMA_INDEX(6)) |
+		   ch_mask(STM_DMA_INDEX(7)));
+}
 
 void
 ao_dma_set_transfer(uint8_t 		index,
@@ -85,10 +97,10 @@ ao_dma_set_transfer(uint8_t 		index,
 			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_DMA1EN);
 		);
 #endif
-	stm_dma.channel[index].ccr = ccr | (1 << STM_DMA_CCR_TCIE);
-	stm_dma.channel[index].cndtr = count;
-	stm_dma.channel[index].cpar = peripheral;
-	stm_dma.channel[index].cmar = memory;
+	stm_dma1.channel[index].ccr = ccr | (1 << STM_DMA_CCR_TCIE);
+	stm_dma1.channel[index].cndtr = count;
+	stm_dma1.channel[index].cpar = peripheral;
+	stm_dma1.channel[index].cmar = memory;
 	ao_dma_config[index].isr = NULL;
 }
 
@@ -102,13 +114,13 @@ void
 ao_dma_start(uint8_t index)
 {
 	ao_dma_done[index] = 0;
-	stm_dma.channel[index].ccr |= (1 << STM_DMA_CCR_EN);
+	stm_dma1.channel[index].ccr |= (1 << STM_DMA_CCR_EN);
 }
 
 void
 ao_dma_done_transfer(uint8_t index)
 {
-	stm_dma.channel[index].ccr &= ~(1 << STM_DMA_CCR_EN);
+	stm_dma1.channel[index].ccr &= ~(1 << STM_DMA_CCR_EN);
 #ifndef LEAVE_DMA_ON
 	ao_arch_critical(
 		if (--ao_dma_active == 0)
@@ -122,11 +134,15 @@ ao_dma_done_transfer(uint8_t index)
 }
 
 void
-ao_dma_alloc(uint8_t index)
+ao_dma_alloc(uint8_t index, uint8_t cselr)
 {
 	if (ao_dma_allocated[index])
 		ao_panic(AO_PANIC_DMA);
 	ao_dma_allocated[index] = 1;
+
+	int shift = (index << 2);
+	uint32_t mask = ~(0xf << shift);
+	stm_dma1.cselr = (stm_dma1.cselr & mask) | (cselr << shift);
 }
 
 #if DEBUG
@@ -141,17 +157,17 @@ ao_dma_dump_cmd(void)
 			stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_DMA1EN);
 		);
 #endif
-	printf ("isr %08x ifcr%08x\n", stm_dma.isr, stm_dma.ifcr);
+	printf ("isr %08x ifcr%08x\n", stm_dma1.isr, stm_dma1.ifcr);
 	for (i = 0; i < NUM_DMA; i++)
 		printf("%d: done %d allocated %d mutex %2d ccr %04x cndtr %04x cpar %08x cmar %08x isr %08x\n",
 		       i,
 		       ao_dma_done[i],
 		       ao_dma_allocated[i],
 		       ao_dma_mutex[i],
-		       stm_dma.channel[i].ccr,
-		       stm_dma.channel[i].cndtr,
-		       stm_dma.channel[i].cpar,
-		       stm_dma.channel[i].cmar,
+		       stm_dma1.channel[i].ccr,
+		       stm_dma1.channel[i].cndtr,
+		       stm_dma1.channel[i].cpar,
+		       stm_dma1.channel[i].cmar,
 		       ao_dma_config[i].isr);
 #ifndef LEAVE_DMA_ON
 	ao_arch_critical(
@@ -176,20 +192,6 @@ ao_dma_init(void)
 	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_DMA1EN);
 #endif
 	for (index = 0; index < STM_NUM_DMA; index++) {
-#if STM_DMA1_5_STOLEN
-		if (index == STM_DMA_INDEX(5)) {
-			ao_dma_allocated[index] = 1;
-			ao_dma_mutex[index] = 0xff;
-			continue;
-		}
-#endif
-#if STM_DMA1_3_STOLEN
-		if (index == STM_DMA_INDEX(3)) {
-			ao_dma_allocated[index] = 1;
-			ao_dma_mutex[index] = 0xff;
-			continue;
-		}
-#endif
 		stm_nvic_set_enable(STM_ISR_DMA1_CHANNEL1_POS + index);
 		stm_nvic_set_priority(STM_ISR_DMA1_CHANNEL1_POS + index,
 				      AO_STM_NVIC_MED_PRIORITY);
