@@ -25,4 +25,7 @@ ao_sleep(void *wchan);
 void
 ao_wakeup(void *wchan);
 
+static inline void ao_mutex_get(uint8_t *m) {(void) m;}
+static inline void ao_mutex_put(uint8_t *m) {(void) m;}
+
 #endif /* _AO_NOTASK_H_ */
