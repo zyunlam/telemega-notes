@@ -35,6 +35,7 @@ ao_time(void)
 	return ao_tick_count;
 }
 
+#if 0
 uint64_t
 ao_time_ns(void)
 {
@@ -50,6 +51,7 @@ ao_time_ns(void)
 	return (uint64_t) after * (1000000000ULL / AO_HERTZ) +
 		(uint64_t) cvr * (1000000000ULL / AO_SYSTICK);
 }
+#endif
 
 #if AO_DATA_ALL
 volatile uint8_t	ao_data_interval = 1;
