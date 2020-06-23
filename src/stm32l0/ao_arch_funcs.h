@@ -44,14 +44,13 @@
 
 #define AO_SPI_CONFIG_1		0x00
 #define AO_SPI_1_CONFIG_PA5_PA6_PA7	AO_SPI_CONFIG_1
-#define AO_SPI_2_CONFIG_PB13_PB14_PB15	AO_SPI_CONFIG_1
 
 #define AO_SPI_CONFIG_2		0x04
-#define AO_SPI_1_CONFIG_PB3_PB4_PB5	AO_SPI_CONFIG_2
+#define AO_SPI_1_CONFIG_PA12_PA13_PA14	AO_SPI_CONFIG_2
 #define AO_SPI_2_CONFIG_PD1_PD3_PD4	AO_SPI_CONFIG_2
 
 #define AO_SPI_CONFIG_3		0x08
-#define AO_SPI_1_CONFIG_PE13_PE14_PE15	AO_SPI_CONFIG_3
+#define AO_SPI_1_CONFIG_PB3_PB4_PB5	AO_SPI_CONFIG_3
 
 #define AO_SPI_CONFIG_NONE	0x0c
 
@@ -59,8 +58,8 @@
 #define AO_SPI_CONFIG_MASK	0x0c
 
 #define AO_SPI_1_PA5_PA6_PA7	(STM_SPI_INDEX(1) | AO_SPI_1_CONFIG_PA5_PA6_PA7)
+#define AO_SPI_1_PA12_PA13_PA14	(STM_SPI_INDEX(1) | AO_SPI_1_CONFIG_PA12_PA13_PA14)
 #define AO_SPI_1_PB3_PB4_PB5	(STM_SPI_INDEX(1) | AO_SPI_1_CONFIG_PB3_PB4_PB5)
-#define AO_SPI_1_PE13_PE14_PE15	(STM_SPI_INDEX(1) | AO_SPI_1_CONFIG_PE13_PE14_PE15)
 
 #define AO_SPI_2_PB13_PB14_PB15	(STM_SPI_INDEX(2) | AO_SPI_2_CONFIG_PB13_PB14_PB15)
 #define AO_SPI_2_PD1_PD3_PD4	(STM_SPI_INDEX(2) | AO_SPI_2_CONFIG_PD1_PD3_PD4)
@@ -104,16 +103,8 @@ ao_spi_stop_bytes(uint8_t spi_index);
 static inline void
 ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
 {
-	struct stm_spi	*stm_spi;
-
-	switch (AO_SPI_INDEX(spi_index)) {
-	case 0:
-		stm_spi = &stm_spi1;
-		break;
-	case 1:
-		stm_spi = &stm_spi2;
-		break;
-	}
+	struct stm_spi	*stm_spi = &stm_spi1;
+	(void) spi_index;
 
 	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
 		;
@@ -126,16 +117,8 @@ ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
 static inline uint8_t
 ao_spi_recv_byte(uint8_t spi_index)
 {
-	struct stm_spi	*stm_spi;
-
-	switch (AO_SPI_INDEX(spi_index)) {
-	case 0:
-		stm_spi = &stm_spi1;
-		break;
-	case 1:
-		stm_spi = &stm_spi2;
-		break;
-	}
+	struct stm_spi	*stm_spi = &stm_spi1;
+	(void) spi_index;
 
 	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
 		;
@@ -341,7 +324,7 @@ void
 ao_dma_done_transfer(uint8_t index);
 
 void
-ao_dma_alloc(uint8_t index);
+ao_dma_alloc(uint8_t index, uint8_t cselr);
 
 void
 ao_dma_init(void);
