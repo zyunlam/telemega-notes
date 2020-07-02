@@ -19,7 +19,7 @@
 #include <ao.h>
 #include <ao_storage.h>
 
-#define AO_STORAGE_DATA_SIZE	256
+#define AO_STORAGE_DATA_SIZE	128
 
 static uint8_t storage_data[AO_STORAGE_DATA_SIZE];
 
