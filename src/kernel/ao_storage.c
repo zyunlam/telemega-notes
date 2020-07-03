@@ -19,7 +19,7 @@
 #include <ao.h>
 #include <ao_storage.h>
 
-#define AO_STORAGE_DATA_SIZE	256
+#define AO_STORAGE_DATA_SIZE	128
 
 static uint8_t storage_data[AO_STORAGE_DATA_SIZE];
 
@@ -214,6 +214,9 @@ ao_storage_zapall(void)
 
 #if AO_STORAGE_TEST
 
+#define AO_STORAGE_TEST_SIZE	256
+static uint8_t storage_test[AO_STORAGE_TEST_SIZE];
+
 static void
 ao_storage_failure(uint32_t pos, char *format, ...)
 {
@@ -230,16 +233,16 @@ ao_storage_check_block(uint32_t pos, uint8_t value)
 	uint32_t	offset;
 	uint32_t	byte;
 
-	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
-		if (!ao_storage_read(pos + offset, storage_data, sizeof (storage_data))) {
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_test)) {
+		if (!ao_storage_read(pos + offset, storage_test, sizeof (storage_test))) {
 			ao_storage_failure(pos + offset, "read failed\n");
 			return 0;
 		}
-		for (byte = 0; byte < sizeof (storage_data); byte++)
-			if (storage_data[byte] != value) {
+		for (byte = 0; byte < sizeof (storage_test); byte++)
+			if (storage_test[byte] != value) {
 				ao_storage_failure(pos + offset + byte,
 						   "want %02x got %02x\n",
-						   value, storage_data[byte]);
+						   value, storage_test[byte]);
 				return 0;
 			}
 	}
@@ -252,10 +255,10 @@ ao_storage_fill_block(uint32_t pos, uint8_t value)
 	uint32_t	offset;
 	uint32_t	byte;
 
-	for (byte = 0; byte < sizeof (storage_data); byte++)
-		storage_data[byte] = value;
-	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
-		if (!ao_storage_write(pos + offset, storage_data, sizeof (storage_data))) {
+	for (byte = 0; byte < sizeof (storage_test); byte++)
+		storage_test[byte] = value;
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_test)) {
+		if (!ao_storage_write(pos + offset, storage_test, sizeof (storage_test))) {
 			ao_storage_failure(pos + offset, "write failed\n");
 			return 0;
 		}
@@ -269,17 +272,17 @@ ao_storage_check_incr_block(uint32_t pos)
 	uint32_t	offset;
 	uint32_t	byte;
 
-	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
-		if (!ao_storage_read(pos + offset, storage_data, sizeof (storage_data))) {
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_test)) {
+		if (!ao_storage_read(pos + offset, storage_test, sizeof (storage_test))) {
 			ao_storage_failure(pos + offset, "read failed\n");
 			return 0;
 		}
-		for (byte = 0; byte < sizeof (storage_data); byte++) {
+		for (byte = 0; byte < sizeof (storage_test); byte++) {
 			uint8_t value = offset + byte;
-			if (storage_data[byte] != value) {
+			if (storage_test[byte] != value) {
 				ao_storage_failure(pos + offset + byte,
 						   "want %02x got %02x\n",
-						   value, storage_data[byte]);
+						   value, storage_test[byte]);
 				return 0;
 			}
 		}
@@ -293,10 +296,10 @@ ao_storage_fill_incr_block(uint32_t pos)
 	uint32_t	offset;
 	uint32_t	byte;
 
-	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_data)) {
-		for (byte = 0; byte < sizeof (storage_data); byte++)
-			storage_data[byte] = offset + byte;
-		if (!ao_storage_write(pos + offset, storage_data, sizeof (storage_data))) {
+	for (offset = 0; offset < ao_storage_block; offset += sizeof (storage_test)) {
+		for (byte = 0; byte < sizeof (storage_test); byte++)
+			storage_test[byte] = offset + byte;
+		if (!ao_storage_write(pos + offset, storage_test, sizeof (storage_test))) {
 			ao_storage_failure(pos + offset, "write failed\n");
 			return 0;
 		}
@@ -369,13 +372,13 @@ ao_storage_fill(void)
 		return;
 	printf("erase "); flush();
 	ao_storage_erase(0, ao_storage_log_max);
-	for (pos = 0; pos < sizeof (storage_data); pos++)
-		storage_data[pos] = (uint8_t) pos;
-	for (pos = 0; pos < ao_storage_log_max; pos += sizeof (storage_data)) {
+	for (pos = 0; pos < sizeof (storage_test); pos++)
+		storage_test[pos] = (uint8_t) pos;
+	for (pos = 0; pos < ao_storage_log_max; pos += sizeof (storage_test)) {
 		if ((pos & 0xffff) == 0) {
 			printf("Fill 0x%x\n", pos); flush();
 		}
-		ao_storage_write(pos, storage_data, sizeof (storage_data));
+		ao_storage_write(pos, storage_test, sizeof (storage_test));
 	}
 	printf("Fill complete\n");
 }
