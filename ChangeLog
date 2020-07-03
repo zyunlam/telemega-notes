@@ -1,3 +1,72 @@
+commit 8359fcc23a93a37ee3aee4c5d2ef183f18ea3f27
+Merge: b95d6674 9b62f683
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jul 2 20:20:59 2020 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit 9b62f683ff770970a87444dc25522fd771079333
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jul 2 15:26:10 2020 -0700
+
+    Version 1.9.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f74016150880265b3edb70637a6be3e6499432de
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jul 2 15:18:56 2020 -0700
+
+    doc: Doc updates for 1.9.4
+    
+    Add release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b08a793fb6e6167d635bfbd31605a43db1f5ac5d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jul 2 15:24:01 2020 -0700
+
+    altos: Make AO_STORAGE_TEST use a separate buffer
+    
+    The storage test code needs a buffer which can hold an entire erase
+    block from memory, which means 256 bytes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 651c66ce117f479158fb0eebd9af6d73f0d9875a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jul 2 15:11:42 2020 -0700
+
+    altos: Reduce flash temp buffer to make space for Em v1.0 ISR stack
+    
+    EasyMini has limited RAM; small enough that increasing the size of the
+    storage buffer from 128 to 256 bytes left too little space at the top
+    of memory for the interrupt stack, causing EasyMini v1.0 to crash at
+    boot.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 35b69569472b00e6937a5d3136d0c400f6b0378f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 17:33:08 2020 -0700
+
+    Add telemetrum v3.0 firmware to release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f337aecd0370f81c84c84857e1b6325350d96a81
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 16 12:28:39 2020 -0600
+
+    ao-bringup: first cut at turn-on scripts for EasyTimer v1
+
+commit b95d6674d29534363c1d8f46280c028864bdca10
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jun 15 20:34:50 2020 -0600
+
+    releasing 1.9.3
+
 commit f31d842d0e07a1893441cb89fb287b31b86d28c1
 Merge: 0fd503fb f615725c
 Author: Bdale Garbee <bdale@gag.com>
