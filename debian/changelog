@@ -1,3 +1,18 @@
+altos (1.9.4-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * ao-bringup: first cut at turn-on scripts for EasyTimer v1
+  * releasing 1.9.4
+
+  [ Keith Packard ]
+  * Add telemetrum v3.0 firmware to release
+  * altos: Reduce flash temp buffer to make space for Em v1.0 ISR stack
+  * altos: Make AO_STORAGE_TEST use a separate buffer
+  * doc: Doc updates for 1.9.4
+  * Version 1.9.4
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 02 Jul 2020 20:22:56 -0600
+
 altos (1.9.3-1) unstable; urgency=medium
 
   [ Keith Packard ]
