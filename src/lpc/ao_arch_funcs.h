@@ -107,9 +107,8 @@ ao_arch_memory_barrier(void) {
 
 #if HAS_TASK
 static inline void
-ao_arch_init_stack(struct ao_task *task, void *start)
+ao_arch_init_stack(struct ao_task *task, uint32_t *sp, void *start)
 {
-	uint32_t	*sp = &task->stack32[AO_STACK_SIZE >> 2];
 	uint32_t	a = (uint32_t) start;
 	int		i;
 
