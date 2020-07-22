@@ -119,6 +119,7 @@ public class AltosConfigFCUI
 		"Dual Deploy",
 		"Redundant Apogee",
 		"Redundant Main",
+		"Separation & Apogee",
 	};
 
 	static String[] 	aprs_interval_values = {

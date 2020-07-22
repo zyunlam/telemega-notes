@@ -127,6 +127,12 @@ ao_igniter(void)
 				ao_igniter_fire(ao_igniter_main);
 			}
 			break;
+		case AO_IGNITE_MODE_BOOSTER:
+			if (ao_flight_fast <= ao_flight_state && ao_flight_state < ao_flight_landed)
+				ao_igniter_fire(ao_igniter_main);
+			if (ao_flight_drogue <= ao_flight_state && ao_flight_state < ao_flight_landed)
+				ao_igniter_fire(ao_igniter_drogue);
+			break;
 		}
 	}
 }

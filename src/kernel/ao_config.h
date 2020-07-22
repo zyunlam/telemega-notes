@@ -139,6 +139,7 @@ extern uint32_t	ao_send_radio_setting;
 #define AO_IGNITE_MODE_DUAL		0
 #define AO_IGNITE_MODE_APOGEE		1
 #define AO_IGNITE_MODE_MAIN		2
+#define AO_IGNITE_MODE_BOOSTER		3
 
 #define AO_RADIO_ENABLE_CORE		1
 #define AO_RADIO_DISABLE_TELEMETRY	2
