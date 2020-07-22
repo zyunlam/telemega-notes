@@ -74,6 +74,7 @@ main(void)
 	ao_packet_slave_init(false);
 	ao_igniter_init();
 	ao_companion_init();
+	ao_pyro_init();
 
 	ao_config_init();
 #if AO_PROFILE

@@ -84,6 +84,7 @@ ALTOS_SRC = \
 	ao_packet_slave.c \
 	ao_packet.c \
 	ao_companion.c \
+	ao_pyro.c \
 	ao_aprs.c \
 	$(PROFILE) \
 	$(SAMPLE_PROFILE) \

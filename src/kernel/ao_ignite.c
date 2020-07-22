@@ -132,6 +132,18 @@ ao_igniter_fire(enum ao_igniter igniter)
 			break;
 		}
 		break;
+	case AO_IGNITE_MODE_BOOSTER:
+		switch (igniter) {
+		case ao_igniter_drogue:
+			AO_IGNITER_SET_DROGUE(1);
+			ao_delay(AO_IGNITER_FIRE_TIME);
+			AO_IGNITER_SET_DROGUE(0);
+			break;
+		/* in this mode, "main" is fired by ao_pyro code 
+		   as a separation charge event */
+		default:
+			break;
+		}
 	}
 	ao_ignition[igniter].firing = 0;
 }

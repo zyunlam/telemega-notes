@@ -131,6 +131,7 @@
 #define HAS_IGNITE		1
 #define HAS_IGNITE_REPORT	1
 
+#define AO_SENSE_PYRO(p,n)	((p)->adc.sense[n])
 #define AO_SENSE_DROGUE(p)	((p)->adc.sense_a)
 #define AO_SENSE_MAIN(p)	((p)->adc.sense_m)
 #define AO_IGNITER_CLOSED	400
@@ -143,6 +144,11 @@
 /* Main */
 #define AO_IGNITER_MAIN_PORT	(&stm_gpioa)
 #define AO_IGNITER_MAIN_PIN	9
+
+/* in booster mode, main output works like a pyro channel with fixed config */
+#define AO_PYRO_NUM		1
+#define AO_PYRO_PORT_1		AO_IGNITER_MAIN_PORT
+#define AO_PYRO_PIN_1		AO_IGNITER_MAIN_PIN
 
 /*
  * ADC
