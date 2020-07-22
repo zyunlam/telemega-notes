@@ -749,9 +749,6 @@ enum ao_igniter {
 	ao_igniter_main = 1
 };
 
-void
-ao_ignite(enum ao_igniter igniter);
-
 enum ao_igniter_status {
 	ao_igniter_unknown,	/* unknown status (ambiguous voltage) */
 	ao_igniter_ready,	/* continuity detected */
