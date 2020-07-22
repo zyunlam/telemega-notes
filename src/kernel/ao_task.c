@@ -24,6 +24,7 @@
 #if HAS_STACK_GUARD
 #include <ao_mpu.h>
 #endif
+#include <picotls.h>
 
 #define DEBUG	0
 
@@ -289,6 +290,21 @@ ao_task_validate(void)
 
 #endif /* HAS_TASK_QUEUE */
 
+static inline void *
+ao_stack_top(struct ao_task *task)
+{
+	uint8_t *top = &task->stack8[AO_STACK_SIZE];
+
+	/* Subtract off the TLS space, but keep the resulting
+	 * stack 8-byte aligned
+	 */
+#if USE_TLS
+	return top - ((_tls_size() + 7) & ~3);
+#else
+	return top;
+#endif
+}
+
 void
 ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name) 
 {
@@ -310,7 +326,11 @@ ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name)
 	 * Construct a stack frame so that it will 'return'
 	 * to the start of the task
 	 */
-	ao_arch_init_stack(task, task_func);
+	uint32_t *sp = ao_stack_top(task);
+#if USE_TLS
+	_init_tls(sp);
+#endif
+	ao_arch_init_stack(task, sp, task_func);
 	ao_arch_critical(
 #if HAS_TASK_QUEUE
 		ao_task_init_queue(task);
@@ -413,6 +433,9 @@ ao_yield(void) ao_arch_naked_define
 #endif
 #if AO_CHECK_STACK
 	in_yield = 0;
+#endif
+#if USE_TLS
+	_set_tls(ao_stack_top(ao_cur_task));
 #endif
 	ao_arch_restore_stack();
 }

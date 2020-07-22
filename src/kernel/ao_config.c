@@ -1039,7 +1039,7 @@ const struct ao_config_var ao_config_vars[] = {
 	  ao_config_log_set,		ao_config_log_show },
 #endif
 #if HAS_IGNITE
-	{ "i <0 dual, 1 apogee, 2 main>\0Igniter mode",
+	{ "i <0 dual, 1 apogee, 2 main, 3 booster>\0Igniter mode",
 	  ao_config_ignite_mode_set,	ao_config_ignite_mode_show },
 #endif
 #if HAS_AES
