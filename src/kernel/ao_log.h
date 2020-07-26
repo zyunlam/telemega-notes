@@ -59,6 +59,7 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELESTATIC	17	/* 32 byte typed telestatic records */
 #define AO_LOG_FORMAT_MICROPEAK2	18	/* 2-byte baro values with header */
 #define AO_LOG_FORMAT_TELEMEGA_4	19	/* 32 byte typed telemega records with 32 bit gyro cal and Bmx160 */
+#define AO_LOG_FORMAT_EASYMOTOR		20	/* ? byte typed easymotor records with pressure sensor and adxl375 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -516,6 +517,10 @@ typedef struct ao_log_firetwo ao_log_type;
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI1 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI3
 typedef struct ao_log_mini ao_log_type;
 #endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMOTOR
+typedef struct ao_log_motor ao_log_type;
+#endif 
 
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEGPS
 typedef struct ao_log_gps ao_log_type;
