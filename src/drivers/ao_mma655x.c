@@ -30,12 +30,14 @@
 #define PRINTD(l,...) 
 #endif
 
+#define AO_MMA655X_SPI_SPEED	ao_spi_speed(8333333)	/* 120ns clock period */
+
 static void
 ao_mma655x_start(void) {
 	ao_spi_get_bit(AO_MMA655X_CS_PORT,
 		       AO_MMA655X_CS_PIN,
 		       AO_MMA655X_SPI_INDEX,
-		       AO_SPI_SPEED_FAST);
+		       AO_MMA655X_SPI_SPEED);
 }
 
 static void

@@ -26,20 +26,27 @@
 
 /* PCLK is set to 48MHz (HCLK 48MHz, HPRE 1, PPRE 1) */
 
-#define AO_SPI_SPEED_24MHz	STM_SPI_CR1_BR_PCLK_2
-#define AO_SPI_SPEED_12MHz	STM_SPI_CR1_BR_PCLK_4
-#define AO_SPI_SPEED_6MHz	STM_SPI_CR1_BR_PCLK_8
-#define AO_SPI_SPEED_3MHz	STM_SPI_CR1_BR_PCLK_16
-#define AO_SPI_SPEED_1500kHz	STM_SPI_CR1_BR_PCLK_32
-#define AO_SPI_SPEED_750kHz	STM_SPI_CR1_BR_PCLK_64
-#define AO_SPI_SPEED_375kHz	STM_SPI_CR1_BR_PCLK_128
-#define AO_SPI_SPEED_187500Hz	STM_SPI_CR1_BR_PCLK_256
+#define _AO_SPI_SPEED_24MHz	STM_SPI_CR1_BR_PCLK_2
+#define _AO_SPI_SPEED_12MHz	STM_SPI_CR1_BR_PCLK_4
+#define _AO_SPI_SPEED_6MHz	STM_SPI_CR1_BR_PCLK_8
+#define _AO_SPI_SPEED_3MHz	STM_SPI_CR1_BR_PCLK_16
+#define _AO_SPI_SPEED_1500kHz	STM_SPI_CR1_BR_PCLK_32
+#define _AO_SPI_SPEED_750kHz	STM_SPI_CR1_BR_PCLK_64
+#define _AO_SPI_SPEED_375kHz	STM_SPI_CR1_BR_PCLK_128
+#define _AO_SPI_SPEED_187500Hz	STM_SPI_CR1_BR_PCLK_256
 
-#define AO_SPI_SPEED_FAST	AO_SPI_SPEED_24MHz
-
-/* Companion bus wants something no faster than 200kHz */
-
-#define AO_SPI_SPEED_200kHz	AO_SPI_SPEED_187500Hz
+static inline uint32_t
+ao_spi_speed(uint32_t hz)
+{
+	if (hz >=24000000) return _AO_SPI_SPEED_24MHz;
+	if (hz >=12000000) return _AO_SPI_SPEED_12MHz;
+	if (hz >= 6000000) return _AO_SPI_SPEED_6MHz;
+	if (hz >= 3000000) return _AO_SPI_SPEED_3MHz;
+	if (hz >= 1500000) return _AO_SPI_SPEED_1500kHz;
+	if (hz >=  750000) return _AO_SPI_SPEED_750kHz;
+	if (hz >=  375000) return _AO_SPI_SPEED_375kHz;
+	return _AO_SPI_SPEED_187500Hz;
+}
 
 #define AO_SPI_CONFIG_1		0x00
 #define AO_SPI_1_CONFIG_PA5_PA6_PA7	AO_SPI_CONFIG_1
@@ -140,8 +147,6 @@ ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
 
 void
 ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t spi_index);
-
-extern uint16_t	ao_spi_speed[STM_NUM_SPI];
 
 void
 ao_spi_init(void);

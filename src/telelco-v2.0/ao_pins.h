@@ -93,7 +93,6 @@
 #define AO_CC1200_SPI_CS_PIN	0
 #define AO_CC1200_SPI_BUS	AO_SPI_2_PD1_PD3_PD4
 #define AO_CC1200_SPI		stm_spi2
-#define AO_CC1200_SPI_SPEED	AO_SPI_SPEED_FAST
 
 #define AO_CC1200_INT_PORT		(&stm_gpiod)
 #define AO_CC1200_INT_PIN		(5)
