@@ -82,11 +82,11 @@ uint16_t	ao_storage_unit;
  */
 
 #if M25_MAX_CHIPS > 1
-static uint8_t ao_m25_size[M25_MAX_CHIPS];	/* number of sectors in each chip */
+static uint32_t ao_m25_size[M25_MAX_CHIPS];	/* number of sectors in each chip */
 static ao_port_t ao_m25_pin[M25_MAX_CHIPS];	/* chip select pin for each chip */
 static uint8_t ao_m25_numchips;			/* number of chips detected */
 #endif
-static uint8_t ao_m25_total;			/* total sectors available */
+static uint32_t ao_m25_total;			/* total sectors available */
 static ao_port_t ao_m25_wip;			/* write in progress */
 
 static uint8_t ao_m25_mutex;
@@ -106,7 +106,7 @@ static uint8_t	ao_m25_instruction[4];
 
 #define M25_BLOCK_SHIFT			16
 #define M25_BLOCK			65536L
-#define M25_POS_TO_SECTOR(pos)		((uint8_t) ((pos) >> M25_BLOCK_SHIFT))
+#define M25_POS_TO_SECTOR(pos)		((uint32_t) ((pos) >> M25_BLOCK_SHIFT))
 #define M25_SECTOR_TO_POS(sector)	(((uint32_t) (sector)) << M25_BLOCK_SHIFT)
 
 /*
@@ -146,7 +146,7 @@ ao_m25_write_enable(ao_port_t cs)
 /*
  * Returns the number of 64kB sectors
  */
-static uint8_t
+static uint32_t
 ao_m25_read_capacity(ao_port_t cs)
 {
 	uint8_t	capacity;
@@ -172,7 +172,7 @@ ao_m25_set_address(uint32_t pos)
 {
 	ao_port_t	mask;
 #if M25_MAX_CHIPS > 1
-	uint8_t	size;
+	uint32_t	size;
 	uint8_t		chip;
 
 	for (chip = 0; chip < ao_m25_numchips; chip++) {
@@ -204,7 +204,8 @@ static uint8_t
 ao_m25_scan(void)
 {
 #if M25_MAX_CHIPS > 1
-	uint8_t	pin, size;
+	uint8_t	pin;
+	uint32_t size;
 #endif
 
 	if (ao_m25_total)
@@ -344,12 +345,12 @@ ao_storage_device_info(void)
 	ao_mutex_put(&ao_m25_mutex);
 
 #if M25_MAX_CHIPS > 1
-	printf ("Detected chips %d size %d\n", ao_m25_numchips, ao_m25_total);
+	printf ("Detected chips %d size %ld\n", ao_m25_numchips, ao_m25_total);
 	for (chip = 0; chip < ao_m25_numchips; chip++)
 		printf ("Flash chip %d select %02x size %d\n",
 			chip, ao_m25_pin[chip], ao_m25_size[chip]);
 #else
-	printf ("Detected chips 1 size %d\n", ao_m25_total);
+	printf ("Detected chips 1 size %ld\n", ao_m25_total);
 #endif
 
 #if M25_DEBUG
