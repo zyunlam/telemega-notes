@@ -93,6 +93,8 @@
 
 #define AO_ADXL375_FIFO_STATUS		0x39
 
+#define ADXL375_ACCEL_FULLSCALE		200
+
 struct ao_adxl375_sample {
 	int16_t	x;
 	int16_t	y;
@@ -100,6 +102,8 @@ struct ao_adxl375_sample {
 };
 
 extern struct ao_adxl375_sample	ao_adxl375_current;
+
+#define ao_adxl375_accel_to_sample(accel) ((accel_t) (accel) * (4095.0f / (ADXL375_ACCEL_FULLSCALE * GRAVITY)))
 
 void
 ao_adxl375_init(void);
