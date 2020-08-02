@@ -36,8 +36,7 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_mega))] ;
 void
 ao_log(void)
 {
-	uint16_t	next_sensor, next_other;
-	uint8_t			i;
+	uint16_t	next_sensor;
 
 	ao_storage_setup();
 
@@ -46,22 +45,17 @@ ao_log(void)
 	while (!ao_log_running)
 		ao_sleep(&ao_log_running);
 
-#if HAS_FLIGHT
 	ao_log_data.type = AO_LOG_FLIGHT;
 	ao_log_data.tick = ao_sample_tick;
-#if HAS_ACCEL
 	ao_log_data.u.flight.ground_accel = ao_ground_accel;
-#endif
-	ao_log_data.u.flight.ground_pres = ao_ground_pres;
 	ao_log_data.u.flight.flight = ao_flight_number;
 	ao_log_write(&ao_log_data);
-#endif
 
 	/* Write the whole contents of the ring to the log
 	 * when starting up.
 	 */
 	ao_log_data_pos = ao_data_ring_next(ao_data_head);
-	next_other = next_sensor = ao_data_ring[ao_log_data_pos].tick;
+	next_sensor = ao_data_ring[ao_log_data_pos].tick;
 	ao_log_state = ao_flight_startup;
 	for (;;) {
 		/* Write samples to EEPROM */
@@ -70,20 +64,14 @@ ao_log(void)
 			if ((int16_t) (ao_log_data.tick - next_sensor) >= 0) {
 				ao_log_data.type = AO_LOG_SENSOR;
 				ao_log_data.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
+				ao_log_data.u.sensor.accel_across = ao_data_across(&ao_data_ring[ao_log_data_pos]);
+				ao_log_data.u.sensor.accel_along = ao_data_along(&ao_data_ring[ao_log_data_pos]);
+				ao_log_data.u.sensor.accel_through = ao_data_through(&ao_data_ring[ao_log_data_pos]);
 				ao_log_write(&ao_log_data);
 				if (ao_log_state <= ao_flight_coast)
 					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_ASCENT;
 				else
 					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_DESCENT;
-			}
-			if ((int16_t) (ao_log_data.tick - next_other) >= 0) {
-				ao_log_data.type = AO_LOG_TEMP_VOLT;
-				ao_log_data.u.volt.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
-				ao_log_data.u.volt.n_sense = AO_ADC_NUM_SENSE;
-				for (i = 0; i < AO_ADC_NUM_SENSE; i++)
-					ao_log_data.u.volt.sense[i] = ao_data_ring[ao_log_data_pos].adc.sense[i];
-				ao_log_write(&ao_log_data);
-				next_other = ao_log_data.tick + AO_OTHER_INTERVAL;
 			}
 			ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 		}

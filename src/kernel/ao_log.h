@@ -502,6 +502,36 @@ struct ao_log_gps {
 	} u;
 };
 
+struct ao_log_motor {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;			/* 4 */
+			int16_t		ground_accel;		/* 6 */
+			int16_t		ground_accel_along;	/* 8 */
+			int16_t		ground_accel_across;	/* 10 */
+			int16_t		ground_accel_through;	/* 12 */
+		} flight;
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;			/* 4 */
+			uint16_t	reason;			/* 6 */
+		} state;
+		/* AO_LOG_SENSOR */
+		struct {
+			uint16_t	pressure;		/* 4 */
+			uint16_t	v_batt;			/* 6 */
+			int16_t		accel;			/* 8 */
+			int16_t		accel_across;		/* 10 */
+			int16_t		accel_along;		/* 12 */
+			int16_t		accel_through;		/* 14 */
+		} sensor;					/* 16 */
+	} u;
+};
+
 #if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4
 typedef struct ao_log_mega ao_log_type;
 #endif
