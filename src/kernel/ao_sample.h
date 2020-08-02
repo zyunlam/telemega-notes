@@ -133,16 +133,21 @@ extern accel_t	ao_ground_accel;	/* startup acceleration */
 extern accel_t 	ao_accel_2g;		/* factory accel calibration */
 extern int32_t	ao_accel_scale;		/* sensor to m/s² conversion */
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 extern accel_t	ao_ground_accel_along;
 extern accel_t	ao_ground_accel_across;
 extern accel_t	ao_ground_accel_through;
-extern int32_t	ao_ground_pitch;	/* * 512 */
-extern int32_t	ao_ground_yaw;		/* * 512 */
-extern int32_t	ao_ground_roll;		/* * 512 */
 extern accel_t	ao_sample_accel_along;
 extern accel_t	ao_sample_accel_across;
 extern accel_t	ao_sample_accel_through;
+#endif
+#if HAS_GYRO
+#ifndef HAS_IMU
+#define HAS_IMU	1
+#endif
+extern int32_t	ao_ground_pitch;	/* * 512 */
+extern int32_t	ao_ground_yaw;		/* * 512 */
+extern int32_t	ao_ground_roll;		/* * 512 */
 extern gyro_t	ao_sample_roll;
 extern gyro_t	ao_sample_pitch;
 extern gyro_t	ao_sample_yaw;
