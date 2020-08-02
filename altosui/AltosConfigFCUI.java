@@ -311,6 +311,22 @@ public class AltosConfigFCUI
 		}
 	}
 
+	void set_pad_orientation_values() {
+		String [] new_values;
+		if (has_radio())
+			new_values = pad_orientation_values_radio;
+		else
+			new_values = pad_orientation_values_no_radio;
+		if (new_values != pad_orientation_values) {
+			int id = pad_orientation_value.getSelectedIndex();
+			pad_orientation_value.removeAllItems();
+			pad_orientation_values = new_values;
+			for (int i = 0; i < new_values.length; i++)
+				pad_orientation_value.addItem(pad_orientation_values[i]);
+			pad_orientation_value.setSelectedIndex(id);
+		}
+	}
+
 	void set_accel_tool_tips() {
 		if (accel_plus_value.isVisible()) {
 			accel_plus_value.setToolTipText("Pad acceleration value in flight orientation");
@@ -788,10 +804,7 @@ public class AltosConfigFCUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		if (has_radio())
-			pad_orientation_values = pad_orientation_values_radio;
-		else
-			pad_orientation_values = pad_orientation_values_no_radio;
+		pad_orientation_values = pad_orientation_values_no_radio;
 
 		pad_orientation_value = new JComboBox<String>(pad_orientation_values);
 		pad_orientation_value.setEditable(false);
@@ -1102,6 +1115,7 @@ public class AltosConfigFCUI
 		set_pad_orientation_tool_tip();
 		set_accel_tool_tips();
 		set_flight_log_max_tool_tip();
+		set_pad_orientation_values();
 	}
 
 	public void set_version(String version) {
