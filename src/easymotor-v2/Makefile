@@ -33,7 +33,6 @@ ALTOS_SRC = \
 	ao_kalman.c \
 	ao_sample.c \
 	ao_data.c \
-	ao_convert_pa.c \
 	ao_convert_volt.c \
 	ao_task.c \
 	ao_log.c \
