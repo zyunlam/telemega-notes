@@ -346,6 +346,13 @@ typedef int16_t	accel_t;
 #endif
 #define ao_data_accel_invert(accel)		(-(accel))
 
+#if USE_ADXL375_IMU
+#define ao_data_along(packet)			((packet)->adxl375.AO_ADXL375_AXIS)
+#define ao_data_across(packet)			((packet)->adxl375.AO_ADXL375_ACROSS_AXIS)
+#define ao_data_through(packet)			((packet)->adxl375.z)
+#define ao_data_accel_to_sample(accel)		ao_adxl375_accel_to_sample(accel)
+#endif
+
 #endif /* HAS_ADXL375 */
 
 #if !HAS_ACCEL && HAS_MPU6000
