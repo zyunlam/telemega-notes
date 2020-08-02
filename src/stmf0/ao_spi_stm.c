@@ -451,8 +451,8 @@ ao_spi_config(uint8_t spi_index, uint32_t speed)
 			(1 << STM_SPI_CR1_SPE) |			/* Enable SPI unit */
 			(speed << STM_SPI_CR1_BR) |			/* baud rate to pclk/4 */
 			(1 << STM_SPI_CR1_MSTR) |
-			(0 << STM_SPI_CR1_CPOL) |			/* Format 0 */
-			(0 << STM_SPI_CR1_CPHA));
+			(AO_SPI_CPOL(spi_index) << STM_SPI_CR1_CPOL) |	/* Format */
+			(AO_SPI_CPHA(spi_index) << STM_SPI_CR1_CPHA));
 }
 
 uint8_t
