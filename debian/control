@@ -45,7 +45,6 @@ Architecture: any
 Depends: default-jre | java2-runtime,
          freetts,
          libjfreechart-java,
-	 libjson-c5,
          nickle,
          ${misc:Depends},
          ${shlibs:Depends}
