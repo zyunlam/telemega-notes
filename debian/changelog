@@ -1,6 +1,6 @@
 altos (1.9.4-2) unstable; urgency=medium
 
-  * update run-time dependency to libjson-c5, closes: #966562
+  * eliminate old explicit run-time dep on libjson-c4, closes: #966562
 
  -- Bdale Garbee <bdale@gag.com>  Wed, 05 Aug 2020 11:27:40 -0600
 
