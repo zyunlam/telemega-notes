@@ -86,7 +86,7 @@ typedef AO_PORT_TYPE ao_port_t;
 
 /* Stop the operating system, beeping and blinking the reason */
 void
-ao_panic(uint8_t reason);
+ao_panic(uint8_t reason) __attribute__((noreturn));
 
 /*
  * ao_romconfig.c
