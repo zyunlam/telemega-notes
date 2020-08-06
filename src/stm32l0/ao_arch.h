@@ -120,6 +120,9 @@ ao_adc_init(void);
 #define AO_LED_TYPE uint16_t
 #endif
 
+void
+ao_timer_stop(void);
+
 #endif /* _AO_ARCH_H_ */
 
 

@@ -18,7 +18,6 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define HAS_TASK_QUEUE		1
 
 #define IS_FLASH_LOADER	0
 

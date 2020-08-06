@@ -19,7 +19,6 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define HAS_TASK_QUEUE		0
 
 /* Bridge SB17 on the board and use the MCO from the other chip */
 #define AO_HSE		8000000

@@ -28,15 +28,9 @@
 
 #define DEBUG	0
 
-#define AO_NO_TASK_INDEX	0xff
-
 struct ao_task * ao_tasks[AO_NUM_TASKS];
 uint8_t ao_num_tasks;
 struct ao_task *ao_cur_task;
-
-#if !HAS_TASK_QUEUE
-static uint8_t ao_cur_task_index;
-#endif
 
 #ifdef ao_arch_task_globals
 ao_arch_task_globals
@@ -62,16 +56,16 @@ static inline void ao_check_stack(void) {
 #define ao_task_irq_check()
 #endif
 
-#if HAS_TASK_QUEUE
-
+#ifndef SLEEP_HASH_SIZE
 #define SLEEP_HASH_SIZE	17
+#endif
 
 static struct ao_list	run_queue;
 static struct ao_list	alarm_queue;
 static struct ao_list	ao_sleep_queue[SLEEP_HASH_SIZE];
 
 static void
-ao_task_to_run_queue(struct ao_task *task)
+_ao_task_to_run_queue(struct ao_task *task)
 {
 	ao_task_irq_check();
 	ao_list_del(&task->queue);
@@ -85,7 +79,7 @@ ao_task_sleep_queue(void *wchan)
 }
 
 static void
-ao_task_to_sleep_queue(struct ao_task *task, void *wchan)
+_ao_task_to_sleep_queue(struct ao_task *task, void *wchan)
 {
 	ao_task_irq_check();
 	ao_list_del(&task->queue);
@@ -129,7 +123,7 @@ ao_task_validate_alarm_queue(void)
 AO_TICK_TYPE	ao_task_alarm_tick;
 
 static void
-ao_task_to_alarm_queue(struct ao_task *task)
+_ao_task_to_alarm_queue(struct ao_task *task)
 {
 	struct ao_task	*alarm;
 	ao_task_irq_check();
@@ -147,7 +141,7 @@ ao_task_to_alarm_queue(struct ao_task *task)
 }
 
 static void
-ao_task_from_alarm_queue(struct ao_task *task)
+_ao_task_from_alarm_queue(struct ao_task *task)
 {
 	ao_task_irq_check();
 	ao_list_del(&task->alarm_queue);
@@ -174,17 +168,17 @@ ao_task_exit_queue(struct ao_task *task)
 }
 
 void
-ao_task_check_alarm(AO_TICK_TYPE tick)
+ao_task_alarm(AO_TICK_TYPE tick)
 {
 	struct ao_task	*alarm, *next;
 
 	ao_arch_critical(
 		ao_list_for_each_entry_safe(alarm, next, &alarm_queue, struct ao_task, alarm_queue) {
-			if ((int16_t) (tick - alarm->alarm) < 0)
+			if ((AO_TICK_SIGNED) (tick - alarm->alarm) < 0)
 				break;
 			alarm->alarm = 0;
-			ao_task_from_alarm_queue(alarm);
-			ao_task_to_run_queue(alarm);
+			_ao_task_from_alarm_queue(alarm);
+			_ao_task_to_run_queue(alarm);
 		});
 }
 
@@ -288,8 +282,6 @@ ao_task_validate(void)
 }
 #endif /* DEBUG */
 
-#endif /* HAS_TASK_QUEUE */
-
 static inline void *
 ao_stack_top(struct ao_task *task)
 {
@@ -331,11 +323,9 @@ ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name)
 	_init_tls(sp);
 #endif
 	ao_arch_init_stack(task, sp, task_func);
+	ao_task_init_queue(task);
 	ao_arch_critical(
-#if HAS_TASK_QUEUE
-		ao_task_init_queue(task);
-		ao_task_to_run_queue(task);
-#endif
+		_ao_task_to_run_queue(task);
 		ao_tasks[ao_num_tasks] = task;
 		ao_num_tasks++;
 		);
@@ -343,20 +333,11 @@ ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name)
 
 uint8_t	ao_task_minimize_latency;
 
-/* Task switching function. This must not use any stack variables */
+/* Task switching function. */
 void
-ao_yield(void) ao_arch_naked_define
+ao_yield(void)
 {
-	ao_arch_save_regs();
-
-#if HAS_TASK_QUEUE
-	if (ao_cur_task == NULL)
-		ao_cur_task = ao_tasks[ao_num_tasks-1];
-#else
-	if (ao_cur_task_index == AO_NO_TASK_INDEX)
-		ao_cur_task_index = ao_num_tasks-1;
-#endif
-	else
+	if (ao_cur_task)
 	{
 #if HAS_SAMPLE_PROFILE
 		AO_TICK_TYPE	tick = ao_sample_profile_timer_value();
@@ -365,16 +346,12 @@ ao_yield(void) ao_arch_naked_define
 			ao_cur_task->max_run = run;
 		++ao_cur_task->yields;
 #endif
+		ao_arch_save_regs();
 		ao_arch_save_stack();
 	}
 
 	ao_arch_isr_stack();
-#if !HAS_TASK_QUEUE
-	if (ao_task_minimize_latency)
-		ao_arch_release_interrupts();
-	else
-#endif
-		ao_arch_block_interrupts();
+	ao_arch_block_interrupts();
 
 #if AO_CHECK_STACK
 	in_yield = 1;
@@ -382,12 +359,11 @@ ao_yield(void) ao_arch_naked_define
 	/* Find a task to run. If there isn't any runnable task,
 	 * this loop will run forever, which is just fine
 	 */
-#if HAS_TASK_QUEUE
 	/* If the current task is running, move it to the
 	 * end of the queue to allow other tasks a chance
 	 */
-	if (ao_cur_task->wchan == NULL)
-		ao_task_to_run_queue(ao_cur_task);
+	if (ao_cur_task && ao_cur_task->wchan == NULL)
+		_ao_task_to_run_queue(ao_cur_task);
 	for (;;) {
 		ao_arch_memory_barrier();
 		if (!ao_list_is_empty(&run_queue))
@@ -400,31 +376,6 @@ ao_yield(void) ao_arch_naked_define
 			ao_arch_wait_interrupt();
 	}
 	ao_cur_task = ao_list_first_entry(&run_queue, struct ao_task, queue);
-#else
-	{
-		uint8_t	ao_last_task_index = ao_cur_task_index;
-		for (;;) {
-			++ao_cur_task_index;
-			if (ao_cur_task_index == ao_num_tasks)
-				ao_cur_task_index = 0;
-
-			ao_cur_task = ao_tasks[ao_cur_task_index];
-
-			/* Check for ready task */
-			if (ao_cur_task->wchan == NULL)
-				break;
-
-			/* Check if the alarm is set for a time which has passed */
-			if (ao_cur_task->alarm &&
-			    (int16_t) (ao_time() - ao_cur_task->alarm) >= 0)
-				break;
-
-			/* Wait for interrupts when there's nothing ready */
-			if (ao_cur_task_index == ao_last_task_index && !ao_task_minimize_latency)
-				ao_arch_wait_interrupt();
-		}
-	}
-#endif
 #if HAS_SAMPLE_PROFILE
 	ao_cur_task->start = ao_sample_profile_timer_value();
 #endif
@@ -443,15 +394,10 @@ ao_yield(void) ao_arch_naked_define
 uint8_t
 ao_sleep(void *wchan)
 {
-#if HAS_TASK_QUEUE
-	uint32_t flags;
-	flags = ao_arch_irqsave();
-#endif
-	ao_cur_task->wchan = wchan;
-#if HAS_TASK_QUEUE
-	ao_task_to_sleep_queue(ao_cur_task, wchan);
-	ao_arch_irqrestore(flags);
-#endif
+	ao_arch_critical(
+		ao_cur_task->wchan = wchan;
+		_ao_task_to_sleep_queue(ao_cur_task, wchan);
+		);
 	ao_yield();
 	if (ao_cur_task->wchan) {
 		ao_cur_task->wchan = NULL;
@@ -465,7 +411,6 @@ void
 ao_wakeup(void *wchan) 
 {
 	ao_validate_cur_stack();
-#if HAS_TASK_QUEUE
 	struct ao_task	*sleep, *next;
 	struct ao_list	*sleep_queue;
 	uint32_t	flags;
@@ -477,18 +422,10 @@ ao_wakeup(void *wchan)
 	ao_list_for_each_entry_safe(sleep, next, sleep_queue, struct ao_task, queue) {
 		if (sleep->wchan == wchan) {
 			sleep->wchan = NULL;
-			ao_task_to_run_queue(sleep);
+			_ao_task_to_run_queue(sleep);
 		}
 	}
 	ao_arch_irqrestore(flags);
-#else
-	{
-	uint8_t	i;
-	for (i = 0; i < ao_num_tasks; i++)
-		if (ao_tasks[i]->wchan == wchan)
-			ao_tasks[i]->wchan = NULL;
-	}
-#endif
 	ao_check_stack();
 }
 
@@ -497,32 +434,21 @@ ao_sleep_for(void *wchan, AO_TICK_TYPE timeout)
 {
 	uint8_t	ret;
 	if (timeout) {
-#if HAS_TASK_QUEUE
-		uint32_t flags;
-		flags = ao_arch_irqsave();
-#endif
-		/* Make sure we sleep *at least* delay ticks, which means adding
-		 * one to account for the fact that we may be close to the next tick
-		 */
-		if (!(ao_cur_task->alarm = ao_time() + timeout + 1))
-			ao_cur_task->alarm = 1;
-#if HAS_TASK_QUEUE
-		ao_task_to_alarm_queue(ao_cur_task);
-		ao_arch_irqrestore(flags);
-#endif
+		ao_arch_critical(
+			/* Make sure we sleep *at least* delay ticks, which means adding
+			 * one to account for the fact that we may be close to the next tick
+			 */
+			if (!(ao_cur_task->alarm = ao_time() + timeout + 1))
+				ao_cur_task->alarm = 1;
+			_ao_task_to_alarm_queue(ao_cur_task);
+			);
 	}
 	ret = ao_sleep(wchan);
 	if (timeout) {
-#if HAS_TASK_QUEUE
-		uint32_t flags;
-
-		flags = ao_arch_irqsave();
-#endif
-		ao_cur_task->alarm = 0;
-#if HAS_TASK_QUEUE
-		ao_task_from_alarm_queue(ao_cur_task);
-		ao_arch_irqrestore(flags);
-#endif
+		ao_arch_critical(
+			ao_cur_task->alarm = 0;
+			_ao_task_from_alarm_queue(ao_cur_task);
+			);
 	}
 	return ret;
 }
@@ -542,21 +468,17 @@ ao_exit(void)
 {
 	uint8_t	i;
 	ao_arch_block_interrupts();
-	ao_num_tasks--;
-#if HAS_TASK_QUEUE
 	for (i = 0; i < ao_num_tasks; i++)
 		if (ao_tasks[i] == ao_cur_task)
 			break;
 	ao_task_exit_queue(ao_cur_task);
-#else
-	i = ao_cur_task_index;
-	ao_cur_task_index = AO_NO_TASK_INDEX;
-#endif
+	/* Remove task from list */
+	ao_num_tasks--;
 	for (; i < ao_num_tasks; i++)
 		ao_tasks[i] = ao_tasks[i+1];
 	ao_cur_task = NULL;
 	ao_yield();
-	/* we'll never get back here */
+	__builtin_unreachable();
 }
 
 #if HAS_TASK_INFO
@@ -575,7 +497,7 @@ ao_task_info(void)
 		       task->alarm ? (int16_t) (task->alarm - now) : 9999,
 		       task->name);
 	}
-#if HAS_TASK_QUEUE && DEBUG
+#if DEBUG
 	ao_task_validate();
 #endif
 }
@@ -584,9 +506,6 @@ ao_task_info(void)
 void
 ao_start_scheduler(void)
 {
-#if !HAS_TASK_QUEUE
-	ao_cur_task_index = AO_NO_TASK_INDEX;
-#endif
 	ao_cur_task = NULL;
 #if HAS_ARCH_START_SCHEDULER
 	ao_arch_start_scheduler();

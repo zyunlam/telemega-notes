@@ -40,7 +40,6 @@
 #define AO_PA11_PA12_RMP	0
 
 #define IS_FLASH_LOADER 	0
-#define HAS_TASK_QUEUE		1
 
 /*
  * Serial ports

@@ -47,10 +47,7 @@ void stm_systick_isr(void)
 #if HAS_TICK
 		++ao_tick_count;
 #endif
-#if HAS_TASK_QUEUE
-		if (ao_task_alarm_tick && (int16_t) (ao_tick_count - ao_task_alarm_tick) >= 0)
-			ao_task_check_alarm((uint16_t) ao_tick_count);
-#endif
+		ao_task_check_alarm();
 #if AO_DATA_ALL
 		if (++ao_data_count == ao_data_interval) {
 			ao_data_count = 0;

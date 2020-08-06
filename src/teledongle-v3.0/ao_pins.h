@@ -23,7 +23,6 @@
 
 #define AO_STACK_SIZE	320
 
-#define HAS_TASK_QUEUE		1
 
 #define IS_FLASH_LOADER	0
 
