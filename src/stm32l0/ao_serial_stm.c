@@ -158,7 +158,7 @@ ao_usart_drain(struct ao_stm_usart *usart)
 }
 #endif
 
-static const uint32_t ao_usart_speeds[] = {
+const uint32_t ao_usart_speeds[] = {
 	[AO_SERIAL_SPEED_4800] = 4800,
 	[AO_SERIAL_SPEED_9600] = 9600,
 	[AO_SERIAL_SPEED_19200] = 19200,

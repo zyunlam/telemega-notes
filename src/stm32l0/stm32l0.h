@@ -382,6 +382,99 @@ extern struct stm_usart stm_usart2;
 #define stm_usart1 (*((struct stm_usart *) 0x40013800))
 #define stm_usart2 (*((struct stm_usart *) 0x40004400))
 
+struct stm_lpuart {
+	vuint32_t	cr1;
+	vuint32_t	cr2;
+	vuint32_t	cr3;
+	vuint32_t	brr;
+
+	uint32_t	unused_10;
+	uint32_t	unused_14;
+	vuint32_t	rqr;
+	vuint32_t	isr;
+
+	vuint32_t	icr;
+	vuint32_t	rdr;
+	vuint32_t	tdr;
+};
+
+#define stm_lpuart1 (*((struct stm_lpuart *) 0x40004800))
+
+#define STM_LPUART_CR1_M1	28
+#define STM_LPUART_CR1_DEAT	21
+#define STM_LPUART_CR1_DEDT	16
+#define STM_LPUART_CR1_CMIE	14
+#define STM_LPUART_CR1_MME	13
+#define STM_LPUART_CR1_M0	12
+#define STM_LPUART_CR1_WAKE	11
+#define STM_LPUART_CR1_PCE	10
+#define STM_LPUART_CR1_PS	9
+#define STM_LPUART_CR1_PEIE	8
+#define STM_LPUART_CR1_TXEIE	7
+#define STM_LPUART_CR1_TCIE	6
+#define STM_LPUART_CR1_RXNEIE	5
+#define STM_LPUART_CR1_IDLEIE	4
+#define STM_LPUART_CR1_TE	3
+#define STM_LPUART_CR1_RE	2
+#define STM_LPUART_CR1_UESM	1
+#define STM_LPUART_CR1_UE	0
+
+#define STM_LPUART_CR2_ADD	24
+#define STM_LPUART_CR2_MSBFIRST	19
+#define STM_LPUART_CR2_DATAINV	18
+#define STM_LPUART_CR2_TXINV	17
+#define STM_LPUART_CR2_RXINV	16
+#define STM_LPUART_CR2_SWAP	15
+#define STM_LPUART_CR2_STOP	12
+#define STM_LPUART_CR2_ADDM7	4
+
+#define STM_LPUART_CR3_UCESM	23
+#define STM_LPUART_CR3_WUFIE	22
+#define STM_LPUART_CR3_WUS	20
+#define STM_LPUART_CR3_DEP	15
+#define STM_LPUART_CR3_DEM	14
+#define STM_LPUART_CR3_DDRE	13
+#define STM_LPUART_CR3_OVRDIS	12
+#define STM_LPUART_CR3_CTSIE	10
+#define STM_LPUART_CR3_CTSE	9
+#define STM_LPUART_CR3_RTSE	8
+#define STM_LPUART_CR3_DMAT	7
+#define STM_LPUART_CR3_DMAR	6
+#define STM_LPUART_CR3_HDSEL	3
+#define STM_LPUART_CR3_EIE	0
+
+#define STM_LPUART_RQR_RXFRQ	3
+#define STM_LPUART_RQR_MMRQ	2
+#define STM_LPUART_RQR_SBKRQ	1
+
+#define STM_LPUART_ISR_REACK	22
+#define STM_LPUART_ISR_TEACK	21
+#define STM_LPUART_ISR_WUF	20
+#define STM_LPUART_ISR_RWU	19
+#define STM_LPUART_ISR_SBKF	18
+#define STM_LPUART_ISR_CMF	17
+#define STM_LPUART_ISR_BUSY	16
+#define STM_LPUART_ISR_CTS	10
+#define STM_LPUART_ISR_CTSIF	9
+#define STM_LPUART_ISR_TXE	7
+#define STM_LPUART_ISR_TC	6
+#define STM_LPUART_ISR_RXNE	5
+#define STM_LPUART_ISR_IDLE	4
+#define STM_LPUART_ISR_ORE	3
+#define STM_LPUART_ISR_NF	2
+#define STM_LPUART_ISR_FE	1
+#define STM_LPUART_ISR_PE	1
+
+#define STM_LPUART_ICR_WUCF	20
+#define STM_LPUART_ICR_CMCF	17
+#define STM_LPUART_ICR_CTSCF	9
+#define STM_LPUART_ICR_TCCF	6
+#define STM_LPUART_ICR_IDLECF	4
+#define STM_LPUART_ICR_ORECF	3
+#define STM_LPUART_ICR_NCF	2
+#define STM_LPUART_ICR_FECF	1
+#define STM_LPUART_ICR_PECF	0
+
 struct stm_tim {
 };
 
@@ -709,6 +802,17 @@ extern struct stm_rcc stm_rcc;
 #define STM_RCC_APB1ENR_TIM6EN		4
 #define STM_RCC_APB1ENR_TIM3EN		1
 #define STM_RCC_APB1ENR_TIM2EN		0
+
+#define STM_RCC_CCIPR_LPTIM1SEL		18
+#define STM_RCC_CCIPR_I2C3SEL		16
+#define STM_RCC_CCIPR_I2C1SEL		12
+#define STM_RCC_CCIPR_LPUART1SEL	10
+#define  STM_RCC_CCIPR_LPUART1SEL_APB		0
+#define  STM_RCC_CCIPR_LPUART1SEL_SYSTEM	1
+#define  STM_RCC_CCIPR_LPUART1SEL_HSI16		2
+#define  STM_RCC_CCIPR_LPUART1SEL_LSE		3
+#define STM_RCC_CCIPR_USART2SEL		2
+#define STM_RCC_CCIPR_USART1SEL		0
 
 #define STM_RCC_CSR_LPWRRSTF		(31)
 #define STM_RCC_CSR_WWDGRSTF		(30)

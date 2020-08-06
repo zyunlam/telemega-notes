@@ -52,6 +52,12 @@ extern uint8_t ao_on_battery;
 #define USE_SERIAL_2_SW_FLOW	0
 #define SERIAL_2_PA9_PA10	1
 
+#define HAS_LPUART_1		1
+#define LPUART_1_PA0_PA1	1
+#define USE_LPUART_1_STDIN	0
+#define USE_LPUART_1_FLOW	0
+#define USE_LPUART_1_SW_FLOW	0
+
 #define IS_FLASH_LOADER		0
 
 #define HAS_MS5607		1

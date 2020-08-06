@@ -14,35 +14,6 @@ MICRO_SRC=\
 	ao_microflight.c \
 	ao_microkalman.c
 
-ALTOS_SRC_ = \
-	ao_micropeak.c \
-	ao_spi_stm.c \
-	ao_dma_stm.c \
-	ao_led_stmf0.c \
-	ao_timer.c \
-	ao_ms5607.c \
-	ao_exti_stm.c \
-	ao_convert_pa.c \
-	ao_romconfig.c \
-	ao_product.c \
-	ao_panic.c \
-	ao_stdio.c \
-	ao_serial_stm.c \
-	ao_usb_stm.c \
-	ao_mutex.c \
-	ao_interrupt.c \
-	ao_cmd.c \
-	ao_config.c \
-	ao_task.c \
-	ao_data.c \
-	ao_boot_chain.c \
-	ao_microflight.c \
-	ao_report_micro.c \
-	ao_storage_stm.c \
-	ao_storage.c \
-	ao_log_micro.c \
-	ao_microkalman.c
-
 INC=\
 	ao.h \
 	ao_pins.h \
@@ -52,6 +23,7 @@ INC=\
 	ao_ms5607.h \
 	ao_log_micro.h \
 	ao_micropeak.h \
+	ao_lpuart.h \
 	altitude-pa.h \
 	ao_product.h \
 	stm32l0.h
@@ -63,6 +35,7 @@ ALTOS_SRC = \
 	ao_stdio.c \
 	ao_notask.c \
 	ao_serial_stm.c \
+	ao_lpuart_stm.c \
 	ao_timer.c \
 	ao_spi_stm32l0.c \
 	ao_adc_stm32l0.c \
