@@ -19,13 +19,27 @@
 #ifndef _AO_LOG_MICRO_H_
 #define _AO_LOG_MICRO_H_
 
+#ifndef N_SAMPLES_TYPE
+#define N_SAMPLES_TYPE	uint16_t
+#endif
+
 #define PA_GROUND_OFFSET	0
 #define PA_MIN_OFFSET		4
 #define N_SAMPLES_OFFSET	8
-#define STARTING_LOG_OFFSET	10
+#define STARTING_LOG_OFFSET	(N_SAMPLES_OFFSET + sizeof (N_SAMPLES_TYPE))
 #ifndef MAX_LOG_OFFSET
 #define MAX_LOG_OFFSET		512
 #endif
+
+#define AO_LOG_ID_SHIFT	12
+#define AO_LOG_ID_WIDTH	4
+#define AO_LOG_ID_MASK	(((1 << AO_LOG_ID_WIDTH) - 1) << AO_LOG_ID_SHIFT);
+
+void
+ao_log_hex(uint8_t b);
+
+void
+ao_log_newline(void);
 
 void
 ao_log_micro_save(void);
