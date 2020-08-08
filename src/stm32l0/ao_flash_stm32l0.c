@@ -132,11 +132,6 @@ ao_flash_page(uint32_t *page, uint32_t *src)
 }
 #endif
 
-void
-ao_storage_setup(void)
-{
-}
-
 static ao_pos_t	write_pos;
 static uint8_t write_pending;
 static union {
@@ -210,23 +205,22 @@ ao_storage_device_write(ao_pos_t pos, void *buf, uint16_t len)
 	return 1;
 }
 
+bool
+ao_storage_device_is_erased(uint32_t pos)
+{
+	uint8_t *m = ((uint8_t *) __storage) + pos;
+	uint32_t i;
+
+	for (i = 0; i < STM_FLASH_PAGE_SIZE; i++)
+		if (*m++ != AO_STORAGE_ERASED_BYTE)
+			return false;
+	return true;
+}
+
 /* Erase device from pos through pos + ao_storage_block */
 uint8_t
 ao_storage_device_erase(uint32_t pos)
 {
-	ao_flash_erase_page(__storage + pos);
+	ao_flash_erase_page(__storage + (pos >> 2));
 	return 1;
-}
-
-/* Initialize low-level device bits */
-void
-ao_storage_device_init(void)
-{
-}
-
-/* Print out information about flash chips */
-void
-ao_storage_device_info(void)
-{
-	printf("Detected chips 1 size %d\n", ao_storage_total);
 }

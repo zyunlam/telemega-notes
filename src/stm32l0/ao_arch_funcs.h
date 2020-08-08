@@ -386,6 +386,8 @@ struct ao_stm_usart {
 #endif
 };
 
+#include <ao_lpuart.h>
+
 void
 ao_debug_out(char c);
 
@@ -590,5 +592,8 @@ ao_arch_wait_interrupt(void) {
 	} while (0)
 
 void start(void);
+
+bool
+ao_storage_device_is_erased(uint32_t pos);
 
 #endif /* _AO_ARCH_FUNCS_H_ */

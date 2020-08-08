@@ -380,10 +380,24 @@ ao_serial_set_sw_rts_cts(struct ao_stm_usart *usart,
 void
 ao_serial_shutdown(void)
 {
+# if SERIAL_2_PA2_PA3
+	stm_moder_set(&stm_gpioa, 2, STM_MODER_INPUT);
+	stm_moder_set(&stm_gpioa, 3, STM_MODER_INPUT);
+# elif SERIAL_2_PA9_PA10
+	stm_moder_set(&stm_gpioa, 9, STM_MODER_INPUT);
+	stm_moder_set(&stm_gpioa, 10, STM_MODER_INPUT);
+# elif SERIAL_2_PA14_PA15
+	stm_moder_set(&stm_gpioa, 14, STM_MODER_INPUT);
+	stm_moder_set(&stm_gpioa, 15, STM_MODER_INPUT);
+# elif SERIAL_2_PB6_PB7
+	stm_moder_set(&stm_gpiob, 6, STM_MODER_INPUT);
+	stm_moder_set(&stm_gpiob, 7, STM_MODER_INPUT);
+#endif
 #if HAS_SERIAL_1
 	stm_rcc.apb2enr &= ~(1 << STM_RCC_APB2ENR_USART1EN);
 #endif
 #if HAS_SERIAL_2
+	stm_nvic_set_disable(STM_ISR_USART2_POS);
 	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_USART2EN);
 #endif
 }

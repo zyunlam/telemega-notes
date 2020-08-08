@@ -182,7 +182,7 @@ ao_lpuart_set_speed(struct ao_stm_lpuart *lpuart, uint8_t speed)
 {
 	if (speed > AO_SERIAL_SPEED_115200)
 		return;
-	lpuart->reg->brr = AO_PCLK1 / ao_usart_speeds[speed];
+	lpuart->reg->brr = 256 * AO_PCLK1 / ao_usart_speeds[speed];
 }
 
 static void
@@ -355,16 +355,16 @@ ao_lpuart1_enable(void)
 void
 ao_lpuart1_disable(void)
 {
-	/* Disable interrupts */
-	stm_nvic_clear_enable(STM_ISR_LPUART1_AES_POS);
-
 	/* Stop LPUART */
 	ao_lpuart_disable(&ao_stm_lpuart1);
 
+	/* Disable interrupts */
+	stm_nvic_clear_enable(STM_ISR_LPUART1_AES_POS);
+
 	/* Remap pins to GPIO use */
 # if LPUART_1_PA0_PA1
-	stm_afr_set(&stm_gpioa, 0, STM_AFR_NONE);
-	stm_afr_set(&stm_gpioa, 1, STM_AFR_NONE);
+	stm_moder_set(&stm_gpioa, 0, STM_MODER_INPUT);
+	stm_moder_set(&stm_gpioa, 1, STM_MODER_OUTPUT);
 # else
 #  error "No LPUART_1 port configuration specified"
 # endif
@@ -372,3 +372,4 @@ ao_lpuart1_disable(void)
 	/* Disable LPUART */
 	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_LPUART1EN);
 }
+ 

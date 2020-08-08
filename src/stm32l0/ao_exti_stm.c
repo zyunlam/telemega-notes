@@ -50,7 +50,6 @@ void stm_exti15_4_isr(void) { ao_exti_range_isr(4, 15, 0xfff0); }
 void
 ao_exti_setup (struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback)(void)) {
 	uint32_t	mask = 1 << pin;
-	uint32_t	pupdr;
 	uint8_t		irq;
 	uint8_t		prio;
 
@@ -59,7 +58,9 @@ ao_exti_setup (struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback
 	/* configure gpio to interrupt routing */
 	stm_exticr_set(gpio, pin);
 
+#if 0
 	if (!(mode & AO_EXTI_PIN_NOCONFIGURE)) {
+		uint32_t	pupdr;
 		/* configure pin as input, setting selected pull-up/down mode */
 		stm_moder_set(gpio, pin, STM_MODER_INPUT);
 		switch (mode & (AO_EXTI_MODE_PULL_UP|AO_EXTI_MODE_PULL_DOWN)) {
@@ -76,6 +77,7 @@ ao_exti_setup (struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback
 		}
 		stm_pupdr_set(gpio, pin, pupdr);
 	}
+#endif
 
 	/* Set interrupt mask and rising/falling mode */
 	stm_exti.imr &= ~mask;

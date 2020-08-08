@@ -160,7 +160,6 @@ stm_pupdr_get(struct stm_gpio *gpio, int pin) {
 
 #define STM_AFR_SHIFT(pin)		((pin) << 2)
 #define STM_AFR_MASK			0xf
-#define STM_AFR_NONE			0
 #define STM_AFR_AF0			0x0
 #define STM_AFR_AF1			0x1
 #define STM_AFR_AF2			0x2
@@ -397,6 +396,7 @@ struct stm_lpuart {
 	vuint32_t	rdr;
 	vuint32_t	tdr;
 };
+extern struct stm_lpuart stm_lpuart1;
 
 #define stm_lpuart1 (*((struct stm_lpuart *) 0x40004800))
 
@@ -1155,6 +1155,10 @@ extern struct stm_scb stm_scb;
 #define STM_SCB_AIRCR_VECTCLRACTIVE	1
 #define STM_SCB_AIRCR_VECTRESET		0
 
+#define STM_SCB_SCR_SVONPEND		4
+#define STM_SCB_SCR_SLEEPDEEP		2
+#define STM_SCB_SCR_SLEEPONEXIT		1
+
 struct stm_mpu {
 	vuint32_t	typer;
 	vuint32_t	cr;
@@ -1673,21 +1677,15 @@ extern struct stm_flash_size	stm_flash_size_reg;
 extern uint32_t
 stm_flash_size(void);
 
-struct stm_unique_id {
-	uint32_t	u_id0;
-	uint32_t	u_id1;
-	uint32_t	u_id2;
-};
-
-extern struct stm_unique_id	stm_unique_id;
-#define stm_unique_id	(*((struct stm_unique_id) 0x1ff80050))
-
 struct stm_device_id {
-	uint32_t	device_id;
+	char		lot_num_4_6[3];
+	uint8_t		waf_num;
+	char		lot_num_0_3[4];
+	uint8_t		unique_id[4];
 };
 
 extern struct stm_device_id	stm_device_id;
-#define stm_device_id	(*((struct stm_device_id) 0x40015800))
+#define stm_device_id	(*((struct stm_device_id *) 0x1ff80050))
 
 #define STM_NUM_I2C	2
 
