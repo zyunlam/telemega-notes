@@ -562,8 +562,8 @@ ao_validate_cur_stack(void)
 
 	asm("mrs %0,psp" : "=&r" (psp));
 	if (ao_cur_task &&
-	    psp <= ao_cur_task->stack &&
-	    psp >= ao_cur_task->stack - 256)
+	    (psp <= ao_cur_task->stack8 ||
+	     psp >= ao_cur_task->stack8 + AO_STACK_SIZE))
 		ao_panic(AO_PANIC_STACK);
 }
 #endif
