@@ -539,6 +539,7 @@ public abstract class AltosLink implements Runnable {
 		if (debug)
 			System.out.printf("stop remote\n");
 		try {
+			flush_output();
 			flush_input();
 		} finally {
 			printf ("~\n");
