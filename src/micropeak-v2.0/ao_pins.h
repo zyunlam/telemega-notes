@@ -121,22 +121,16 @@ ao_power_off(void) {
 
 extern alt_t ao_max_height;
 
-#define ao_async_stop() do {					\
-		ao_serial2_drain();				\
-		stm_moder_set(&stm_gpioa, 2, STM_MODER_OUTPUT); \
-		ao_serial_shutdown();				\
-	} while (0)
+#define ao_async_stop()
+#define ao_async_start()
 
-#define ao_async_start() do {						\
-		ao_serial_init();					\
-		stm_moder_set(&stm_gpioa, 2, STM_MODER_ALTERNATE);	\
-		ao_delay(AO_MS_TO_TICKS(100));				\
-	} while (0)
+#define LOG_MICRO_ASYNC 0
 
-#define ao_async_byte(b) ao_serial2_putchar((char) (b))
+void ao_async_byte(char c);
 
-#define ao_eeprom_read(pos, ptr, size) ao_storage_read(pos, ptr, size)
-#define ao_eeprom_write(pos, ptr, size) ao_storage_write(pos, ptr, size)
+#define ao_eeprom_read(pos, ptr, size) ao_storage_device_read(pos, ptr, size)
+#define ao_eeprom_write(pos, ptr, size) ao_storage_device_write(pos, ptr, size)
+#define N_SAMPLES_TYPE uint32_t
 #define MAX_LOG_OFFSET	ao_storage_total
 #define ao_storage_log_max ao_storage_total
 

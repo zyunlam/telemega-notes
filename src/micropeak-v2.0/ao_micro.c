@@ -20,9 +20,12 @@
 #include <ao_exti.h>
 #include <ao_micropeak.h>
 #include <ao_adc_stm32l0.h>
+#include <ao_report_micro.h>
+#include <ao_log_micro.h>
 
-
-uint32_t pa;
+uint32_t 	pa;
+alt_t		ground_alt, max_alt;
+alt_t		ao_max_height;
 
 static void
 ao_msi_init(void)
@@ -41,18 +44,6 @@ ao_msi_init(void)
 	stm_pwr.cr = cr;
 }
 
-static void
-list_flights(void)
-{
-	printf("flight %d start %x end %x\n",
-	       1, 0 >> 8, ao_storage_total >> 8);
-}
-
-const struct ao_cmds ao_micro_cmds[] = {
-	{ list_flights,	"l\0List flights" },
-	{}
-};
-
 void
 ao_pa_get(void)
 {
@@ -63,32 +54,171 @@ ao_pa_get(void)
 	pa = value.pres;
 }
 
+static void
+ao_compute_height(void)
+{
+	ground_alt = ao_pa_to_altitude(pa_ground);
+	max_alt = ao_pa_to_altitude(pa_min);
+	ao_max_height = max_alt - ground_alt;
+}
+
+static void
+ao_pips(void)
+{
+	uint8_t	i;
+	for (i = 0; i < 5; i++) {
+		ao_led_on(AO_LED_REPORT);
+		ao_delay(AO_MS_TO_TICKS(80));
+		ao_led_off(AO_LED_REPORT);
+		ao_delay(AO_MS_TO_TICKS(80));
+	}
+	ao_delay(AO_MS_TO_TICKS(200));
+}
+
+static void
+power_down(void)
+{
+	ao_timer_stop();
+	for(;;) {
+		/*
+		 * Table 40, entering standby mode
+		 *
+		 * SLEEPDEEP = 1 in M0 SCR
+		 * PDDS = 1
+		 * WUF = 0
+		 */
+		stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGEN);
+		stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);
+		stm_scb.scr |= ((1 << STM_SCB_SCR_SLEEPDEEP) |
+				(1 << STM_SCB_SCR_SLEEPONEXIT));
+		stm_pwr.cr |= (1 << STM_PWR_CR_PDDS);
+		stm_pwr.csr &= ~(1 << STM_PWR_CSR_WUF);
+		ao_arch_wait_interrupt();
+	}
+}
+
+static bool log_stdout;
+
+static void
+log_micro_dump(void)
+{
+	int i;
+	if (!log_stdout) {
+		ao_led_off(AO_LED_REPORT);
+		ao_lpuart1_enable();
+	}
+	ao_log_micro_dump();
+	for (i = 0; i < 4; i++)
+		ao_async_byte(stm_device_id.lot_num_0_3[i]);
+	for (i = 0; i < 3; i++)
+		ao_async_byte(stm_device_id.lot_num_4_6[i]);
+	ao_async_byte('-');
+	ao_log_hex(stm_device_id.waf_num);
+	ao_async_byte('-');
+	for (i = 0; i < 4; i++)
+		ao_log_hex(stm_device_id.unique_id[i]);
+	ao_log_newline();
+	if (!log_stdout)
+		ao_lpuart1_disable();
+}
+
+static void
+log_erase(void)
+{
+	uint32_t	pos;
+
+	for (pos = 0; pos < ao_storage_total; pos += STM_FLASH_PAGE_SIZE)
+	{
+		if (!ao_storage_device_is_erased(pos))
+			ao_storage_device_erase(pos);
+	}
+}
+
+static void
+flight_mode(void)
+{
+	/* Give the person a second to get their finger out of the way */
+	ao_delay(AO_MS_TO_TICKS(1000));
+
+	ao_log_micro_restore();
+	ao_compute_height();
+	ao_report_altitude();
+	ao_pips();
+	log_micro_dump();
+#if BOOST_DELAY	
+	ao_delay(BOOST_DELAY);
+#endif
+	log_erase();
+	ao_microflight();
+	ao_log_micro_save();
+	ao_compute_height();
+	ao_report_altitude();
+	power_down();
+}
+
+void ao_async_byte(char c)
+{
+	if (log_stdout)
+		putchar(c);
+	else
+		ao_lpuart1_putchar(c);
+}
+
+static void
+log_micro_dump_uart(void)
+{
+	log_stdout = true;
+	log_micro_dump();
+	log_stdout = false;
+}
+
+static void
+log_erase_cmd(void)
+{
+	ao_cmd_white();
+	if (!ao_match_word("DoIt"))
+		return;
+	log_erase();
+}
+
+const struct ao_cmds ao_micro_cmds[] = {
+	{ log_micro_dump_uart, "l\0Dump log" },
+	{ flight_mode, "F\0Flight mode" },
+	{ power_down, "S\0Standby" },
+	{ log_erase_cmd, "z <key>\0Erase. <key> is doit with D&I" },
+	{}
+};
+
+static void
+cmd_mode(void)
+{
+	ao_serial_init();
+	ao_cmd_init();
+	ao_cmd_register(ao_micro_cmds);
+	ao_cmd();
+}
+
 int
 main(void)
 {
 	ao_msi_init();
-
 	ao_led_init();
-	ao_led_on(AO_LED_ORANGE);
-
 	ao_timer_init();
 	ao_spi_init();
 	ao_ms5607_init();
 	ao_ms5607_setup();
-	ao_storage_init();
 
+	/* Check the power supply voltage; it'll be 3.3V if
+	 * the I/O board is connected
+	 */
 	uint16_t vref = ao_adc_read_vref();
 
 	uint32_t vdda = 3 * stm_vrefint_cal.vrefint_cal * 1000 / vref;
-	ao_led_off(AO_LED_ORANGE);
 
 	/* Power supply > 3.25V means we're on USB power */
 	if (vdda > 3250) {
-		ao_serial_init();
-		ao_cmd_init();
-		ao_cmd_register(ao_micro_cmds);
-		ao_cmd();
+		cmd_mode();
 	} else {
-		ao_microflight();
+		flight_mode();
 	}
 }

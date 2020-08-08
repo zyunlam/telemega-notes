@@ -32,6 +32,7 @@ ALTOS_SRC = \
 	ao_interrupt.c \
 	ao_panic.c \
 	ao_micro.c \
+	ao_report_micro.c \
 	ao_stdio.c \
 	ao_notask.c \
 	ao_serial_stm.c \
@@ -47,7 +48,6 @@ ALTOS_SRC = \
 	ao_product.c \
 	ao_romconfig.c \
 	ao_flash_stm32l0.c \
-	ao_storage.c \
 	ao_microflight.c \
 	ao_log_micro.c \
 	ao_microkalman.c
@@ -56,7 +56,7 @@ IDPRODUCT=0x14
 PRODUCT=MicroPeak-v2.0
 PRODUCT_DEF=-DMICROPEAK
 
-CFLAGS = $(PRODUCT_DEF) $(STML0_CFLAGS) -Wl,--gc-sections -ffunction-sections
+CFLAGS = $(PRODUCT_DEF) $(STML0_CFLAGS) -Wl,--gc-sections -ffunction-sections -fdata-sections
 
 PROGNAME=micropeak-v2.0
 PROG=$(PROGNAME)-$(VERSION).elf
