@@ -148,10 +148,12 @@ ao_ignite_manual(void)
 	ao_cmd_white();
 #if HAS_IGNITE
 	if (ao_cmd_lex_c == 'm' && ao_match_word("main")) {
+		ao_ignition[ao_igniter_main].fired = 0;
 		ao_igniter_fire(ao_igniter_main);
 		return;
 	}
 	if (ao_cmd_lex_c == 'd' && ao_match_word("drogue")) {
+		ao_ignition[ao_igniter_drogue].fired = 0;
 		ao_igniter_fire(ao_igniter_drogue);
 		return;
 	}
