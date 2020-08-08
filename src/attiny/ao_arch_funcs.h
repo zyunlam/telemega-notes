@@ -121,3 +121,5 @@ extern void ao_report_altitude(void);
 
 void ao_delay_us(uint16_t us);
 
+void
+ao_led_toggle(uint8_t colors);
