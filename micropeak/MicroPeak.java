@@ -37,7 +37,29 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 	MicroData	data;
 	Container	container;
 	JTabbedPane	pane;
+	JMenuBar	menu_bar;
 	static int	number_of_windows;
+
+	/* File menu */
+	final static String	open_command = "open";
+	final static String	save_command = "save";
+	final static String	export_command = "export";
+	final static String	preferences_command = "preferences";
+	final static String	close_command = "close";
+	final static String	exit_command = "exit";
+
+	static final String[][] file_menu_entries = new String[][] {
+		{ "Open",		open_command },
+		{ "Save a Copy",	save_command },
+		{ "Export Data",	export_command },
+		{ "Preferences",	preferences_command },
+		{ "Close",		close_command },
+		{ "Exit",		exit_command },
+	};
+
+	/* Download menu */
+	final static String	download_command = "download";
+	final static String	download_label = "Download";
 
 	MicroPeak SetData(MicroData data) {
 		MicroPeak	mp = this;
@@ -174,20 +196,20 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 	}
 
 	public void actionPerformed(ActionEvent ev) {
-		if ("Exit".equals(ev.getActionCommand()))
-			System.exit(0);
-		else if ("Close".equals(ev.getActionCommand()))
-			Close();
-		else if ("Open".equals(ev.getActionCommand()))
+		if (open_command.equals(ev.getActionCommand()))
 			SelectFile();
-		else if ("Download".equals(ev.getActionCommand()))
-			DownloadData();
-		else if ("Export".equals(ev.getActionCommand()))
-			Export();
-		else if ("Preferences".equals(ev.getActionCommand()))
-			Preferences();
-		else if ("Save a Copy".equals(ev.getActionCommand()))
+		else if (save_command.equals(ev.getActionCommand()))
 			Save();
+		else if (export_command.equals(ev.getActionCommand()))
+			Export();
+		else if (preferences_command.equals(ev.getActionCommand()))
+			Preferences();
+		else if (close_command.equals(ev.getActionCommand()))
+			Close();
+		else if (exit_command.equals(ev.getActionCommand()))
+			System.exit(0);
+		else if (download_command.equals(ev.getActionCommand()))
+			DownloadData();
 	}
 
 	public void itemStateChanged(ItemEvent e) {
@@ -225,6 +247,29 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		return 1.0;
 	}
 
+	private void add_menu(JMenu menu, String label, String action) {
+		JMenuItem	item = new JMenuItem(label);
+		menu.add(item);
+		item.addActionListener(this);
+		item.setActionCommand(action);
+	}
+
+
+	private JMenu make_menu(String label, String[][] items) {
+		JMenu	menu = new JMenu(label);
+		for (int i = 0; i < items.length; i++) {
+			if (MAC_OS_X) {
+				if (items[i][1].equals("exit"))
+					continue;
+				if (items[i][1].equals("preferences"))
+					continue;
+			}
+			add_menu(menu, items[i][0], items[i][1]);
+		}
+		menu_bar.add(menu);
+		return menu;
+	}
+
 	public MicroPeak() {
 
 		++number_of_windows;
@@ -238,43 +283,15 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 
 		setTitle("MicroPeak");
 
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
+		menu_bar = new JMenuBar();
+		setJMenuBar(menu_bar);
 
-		JMenu fileMenu = new JMenu("File");
-		menuBar.add(fileMenu);
+		JMenu file_menu = make_menu("File", file_menu_entries);
 
-		JMenuItem openAction = new JMenuItem("Open");
-		fileMenu.add(openAction);
-		openAction.addActionListener(this);
-
-		JMenuItem downloadAction = new JMenuItem("Download");
-		fileMenu.add(downloadAction);
-		downloadAction.addActionListener(this);
-
-		JMenuItem saveAction = new JMenuItem("Save a Copy");
-		fileMenu.add(saveAction);
-		saveAction.addActionListener(this);
-
-		JMenuItem exportAction = new JMenuItem("Export");
-		fileMenu.add(exportAction);
-		exportAction.addActionListener(this);
-
-		JMenuItem preferencesAction = new JMenuItem("Preferences");
-		fileMenu.add(preferencesAction);
-		preferencesAction.addActionListener(this);
-
-		JMenuItem closeAction = new JMenuItem("Close");
-		fileMenu.add(closeAction);
-		closeAction.addActionListener(this);
-
-		JMenuItem exitAction = new JMenuItem("Exit");
-		fileMenu.add(exitAction);
-		exitAction.addActionListener(this);
-
-		JButton downloadButton = new JButton ("Download");
-		downloadButton.addActionListener(this);
-		menuBar.add(downloadButton);
+		JButton download_button = new JButton (download_label);
+		download_button.setActionCommand(download_command);
+		download_button.addActionListener(this);
+		menu_bar.add(download_button);
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -303,12 +320,7 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		container.validate();
 		doLayout();
 		validate();
-		Insets i = getInsets();
-		Dimension ps = pane.getPreferredSize();
-		ps.width += i.left + i.right;
-		ps.height += i.top + i.bottom;
-//		setPreferredSize(ps);
-		setSize(ps);
+		pack();
 		setVisible(true);
 	}
 
