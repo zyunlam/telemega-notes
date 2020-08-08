@@ -28,6 +28,8 @@ public class MicroSerial extends InputStream {
 	private MicroSerialLog	log;
 
 	public int read() {
+		if (file == null)
+			return -1;
 		int	c = libaltos.altos_getchar(file, 0);
 		if (Thread.interrupted())
 			return -1;
@@ -38,6 +40,14 @@ public class MicroSerial extends InputStream {
 		if (log != null)
 			log.log_char(c);
 		return c;
+	}
+
+	public void write(char c) {
+		libaltos.altos_putchar(file, c);
+	}
+
+	public void flush() {
+		libaltos.altos_flush(file);
 	}
 
 	public void close() {

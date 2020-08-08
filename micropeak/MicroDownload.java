@@ -158,6 +158,7 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 				} catch (MicroData.NonHexcharException nhe) {
 				}
 			}
+			write_thread.join();
 		} catch (FileNotFoundException fe) {
 		} catch (IOException ioe) {
 		} catch (InterruptedException ie) {
@@ -168,6 +169,25 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 	}
 
 	Thread	serial_thread;
+	Thread	write_thread;
+
+	public class SerialWriter implements Runnable {
+		MicroSerial serial;
+
+		public void run () {
+			try {
+				Thread.sleep(100);
+				serial.write('l');
+				serial.write('\n');
+				serial.flush();
+			} catch (InterruptedException ie) {
+			}
+		}
+
+		public SerialWriter(MicroSerial serial) {
+			this.serial = serial;
+		}
+	}
 
 	public void start() {
 		try {
@@ -178,6 +198,10 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 		}
 		serial_thread = new Thread(this);
 		serial_thread.start();
+
+		SerialWriter writer = new SerialWriter(serial);
+		write_thread = new Thread(writer);
+		write_thread.start();
 	}
 
 	public void actionPerformed(ActionEvent ae) {
