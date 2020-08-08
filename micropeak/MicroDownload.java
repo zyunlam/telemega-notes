@@ -64,21 +64,27 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 	}
 
 	private void done_internal() {
-		setVisible(false);
-		dispose();
-
 		if (data != null && data.crc_valid) {
-			status_value.setText("Received MicroPeak Data");
-			owner = owner.SetData(data);
-			MicroSave save = new MicroSave(owner, data);
-			if (save.runDialog())
-				owner.SetName(data.name);
+			if (data.nsamples == 0) {
+				JOptionPane.showMessageDialog(owner,
+							      "No Flight Data Present",
+							      "Empty Log",
+							      JOptionPane.WARNING_MESSAGE);
+			} else {
+				status_value.setText("Received MicroPeak Data");
+				owner = owner.SetData(data);
+				MicroSave save = new MicroSave(owner, data);
+				if (save.runDialog())
+					owner.SetName(data.name);
+			}
 		} else {
 			JOptionPane.showMessageDialog(owner,
 						      "Download Failed",
 						      "Flight data corrupted",
 						      JOptionPane.ERROR_MESSAGE);
 		}
+		setVisible(false);
+		dispose();
 	}
 
 	public void drain_queue() {
