@@ -66,11 +66,7 @@ esac
 
 CALFILE=cal-$SERIAL.txt
 
-echo 'E 0' > $dev
-
 ../ao-tools/ao-cal-freq/ao-cal-freq --nosave --output=$CALFILE --tty=$dev
-
-# echo 'E 1' > $dev
 
 CAL_VALUE=`cat $CALFILE`
 echo $SERIAL","$CAL_VALUE >> cal_values
