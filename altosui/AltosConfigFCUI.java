@@ -97,6 +97,8 @@ public class AltosConfigFCUI
 
 	ActionListener		listener;
 
+	static final String	title = "Configure Flight Computer";
+
 	static String[] 	main_deploy_values_m = {
 		"100", "150", "200", "250", "300", "350",
 		"400", "450", "500"
@@ -346,7 +348,7 @@ public class AltosConfigFCUI
 
 	/* Build the UI using a grid bag */
 	public AltosConfigFCUI(JFrame in_owner, boolean remote) {
-		super (in_owner, "Configure Flight Computer", false);
+		super (in_owner, title, false);
 
 		owner = in_owner;
 		GridBagConstraints c;
@@ -1044,11 +1046,13 @@ public class AltosConfigFCUI
 
 	public void set_dirty() {
 		dirty = true;
+		setTitle(title + " (modified)");
 		save.setEnabled(true);
 	}
 
 	public void set_clean() {
 		dirty = false;
+		setTitle(title);
 		save.setEnabled(false);
 	}
 
@@ -1076,13 +1080,13 @@ public class AltosConfigFCUI
 		if (cmd.equals("Close") || cmd.equals("Reboot"))
 			if (!check_dirty(cmd))
 				return;
+		if (cmd.equals("Save"))
+			save.setEnabled(false);
 		listener.actionPerformed(e);
 		if (cmd.equals("Close") || cmd.equals("Reboot")) {
 			setVisible(false);
 			dispose();
 		}
-		if (cmd.equals("Save") || cmd.equals("Reset"))
-			set_clean();
 	}
 
 	/* ItemListener interface method */
