@@ -28,6 +28,7 @@ public class AltosRomconfig implements AltosUnitInfoListener {
 	public int	check;
 	public int	serial_number;
 	public int	radio_calibration;
+	public int	address_offset;
 	public AltosUsbId	usb_id;
 	public String		usb_product;
 
@@ -46,9 +47,9 @@ public class AltosRomconfig implements AltosUnitInfoListener {
 		return (int) (find_address(hexfile, name, len) - hexfile.address);
 	}
 
-	static int get_int(AltosHexfile hexfile, String name, int len) throws AltosNoSymbol {
+	static private int get_int(AltosHexfile hexfile, String name, int len, int adjust) throws AltosNoSymbol {
 		byte[] bytes = hexfile.data;
-		int start = (int) find_offset(hexfile, name, len);
+		int start = (int) find_offset(hexfile, name, len) + adjust;
 
 		int	v = 0;
 		int	o = 0;
@@ -142,33 +143,44 @@ public class AltosRomconfig implements AltosUnitInfoListener {
 		}
 	}
 
+	static final int adjust_rom[] = { 0, -4, 4 };
+
 	public AltosRomconfig(AltosHexfile hexfile) {
 		try {
-			version = get_int(hexfile, ao_romconfig_version, 2);
-			check = get_int(hexfile, ao_romconfig_check, 2);
-			if (check == (~version & 0xffff)) {
-				switch (version) {
-				case 2:
-				case 1:
-					serial_number = get_int(hexfile, ao_serial_number, 2);
-					try {
-						radio_calibration = get_int(hexfile, ao_radio_cal, 4);
-					} catch (AltosNoSymbol missing) {
-						radio_calibration = 0;
+			for (int adjust : adjust_rom) {
+				try {
+					version = get_int(hexfile, ao_romconfig_version, 2, adjust);
+					check = get_int(hexfile, ao_romconfig_check, 2, adjust);
+					System.out.printf("adjust %d version %x check %x\n", adjust, version, check);
+					if (check == (~version & 0xffff)) {
+						switch (version) {
+						case 2:
+						case 1:
+							serial_number = get_int(hexfile, ao_serial_number, 2, adjust);
+							try {
+								radio_calibration = get_int(hexfile, ao_radio_cal, 4, adjust);
+							} catch (AltosNoSymbol missing) {
+								radio_calibration = 0;
+							}
+
+							valid = true;
+
+							/* XXX TeleBT v4.0 units originally shipped without RF calibration programmed. Go fetch
+							 * the correct value from the web site
+							 */
+							if (serial_number == 2584 ||
+							    (3686 <= serial_number && serial_number <= 3938 && radio_calibration == 5695485))
+							{
+								fetch_radio_cal();
+							}
+
+							break;
+						}
+						break;
 					}
-
-					valid = true;
-
-					/* XXX TeleBT v4.0 units originally shipped without RF calibration programmed. Go fetch
-					 * the correct value from the web site
-					 */
-					if (serial_number == 2584 ||
-					    (3686 <= serial_number && serial_number <= 3938 && radio_calibration == 5695485))
-					{
-						fetch_radio_cal();
-					}
-
-					break;
+				} catch (ArrayIndexOutOfBoundsException aie) {
+					System.out.printf("adjust %d failed\n", adjust);
+					continue;
 				}
 			}
 			usb_id = hexfile.find_usb_id();
