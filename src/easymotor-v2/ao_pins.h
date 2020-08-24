@@ -67,11 +67,11 @@
 #define AO_PA11_PA12_RMP	1
 #define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
-#define BEEPER_CHANNEL		4
-#define BEEPER_TIMER		3
-#define BEEPER_PORT		(&stm_gpiob)
-#define BEEPER_PIN		1
-#define BEEPER_AFR              STM_AFR_AF1
+#define BEEPER_CHANNEL		3
+#define BEEPER_TIMER		2
+#define BEEPER_PORT		(&stm_gpioa)
+#define BEEPER_PIN		2
+#define BEEPER_AFR              STM_AFR_AF2
 
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0
