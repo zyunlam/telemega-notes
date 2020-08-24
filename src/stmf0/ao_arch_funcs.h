@@ -73,6 +73,7 @@ ao_spi_speed(uint32_t hz)
 
 #define AO_SPI_INDEX(id)	((id) & AO_SPI_INDEX_MASK)
 #define AO_SPI_CONFIG(id)	((id) & AO_SPI_CONFIG_MASK)
+#define AO_SPI_PIN_CONFIG(id)	((id) & (AO_SPI_INDEX_MASK | AO_SPI_CONFIG_MASK))
 
 #define AO_SPI_CPOL_BIT		4
 #define AO_SPI_CPHA_BIT		5
