@@ -67,6 +67,7 @@
 #define AO_PA11_PA12_RMP	1
 #define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
+#define HAS_PAD_REPORT		1
 #define BEEPER_CHANNEL		3
 #define BEEPER_TIMER		2
 #define BEEPER_PORT		(&stm_gpioa)
