@@ -131,7 +131,7 @@ public class AltosFlashUI
 		Insets il = new Insets(4,4,4,4);
 		Insets ir = new Insets(4,4,4,4);
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		c = new GridBagConstraints();
@@ -637,7 +637,7 @@ public class AltosFlashUI
 			super(in_owner, "Open Flash Target Device", true);
 			owner = in_owner;
 
-			Container		pane = getContentPane();
+			Container		pane = getScrollablePane();
 			GridBagConstraints	c = new GridBagConstraints();
 			Insets			i = new Insets(4,4,4,4);
 

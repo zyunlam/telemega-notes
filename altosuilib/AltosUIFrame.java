@@ -41,6 +41,30 @@ public class AltosUIFrame extends JFrame implements AltosUIListener, AltosPositi
 		this.pack();
 	}
 
+	private Container scrollPane;
+
+	public Container getScrollablePane() {
+		if (scrollPane == null) {
+			Container content = super.getContentPane();
+			/* Create a container to hold the dialog contents */
+			scrollPane = new Container();
+
+			/* Make an opaque box to use the right color */
+			Box box = new Box(BoxLayout.X_AXIS);
+			box.add(scrollPane);
+			box.setOpaque(true);
+
+			/* Create a scrollpane to hold the box */
+			JScrollPane scroll = new JScrollPane();
+			JViewport view = scroll.getViewport();
+			view.add(box);
+
+			/* Add the scroll pane to the top level */
+			content.add(scroll);
+		}
+		return (Container) scrollPane;
+	}
+
 	static String[] altos_icon_names = {
 		"/altusmetrum-altosui-16.png",
 		"/altusmetrum-altosui-32.png",

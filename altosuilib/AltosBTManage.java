@@ -219,7 +219,7 @@ public class AltosBTManage extends AltosUIDialog implements ActionListener, Iter
 
 		found_devices = new LinkedBlockingQueue<AltosBTDevice>();
 
-		Container pane = getContentPane();
+		Container pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();

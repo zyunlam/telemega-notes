@@ -30,6 +30,30 @@ class AltosUIDialogListener extends WindowAdapter {
 
 public class AltosUIDialog extends JDialog implements AltosUIListener {
 
+	private Container scrollPane;
+
+	public Container getScrollablePane() {
+		if (scrollPane == null) {
+			Container content = super.getContentPane();
+			/* Create a container to hold the dialog contents */
+			scrollPane = new Container();
+
+			/* Make an opaque box to use the right color */
+			Box box = new Box(BoxLayout.X_AXIS);
+			box.add(scrollPane);
+			box.setOpaque(true);
+
+			/* Create a scrollpane to hold the box */
+			JScrollPane scroll = new JScrollPane();
+			JViewport view = scroll.getViewport();
+			view.add(box);
+
+			/* Add the scroll pane to the top level */
+			content.add(scroll);
+		}
+		return (Container) scrollPane;
+	}
+
 	public void ui_changed(String look_and_feel) {
 		SwingUtilities.updateComponentTreeUI(this);
 		this.pack();

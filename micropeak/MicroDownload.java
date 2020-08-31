@@ -224,7 +224,7 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 		this.owner = owner;
 		this.device = device;
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		c = new GridBagConstraints();

@@ -164,7 +164,7 @@ public class AltosUIAccelCal
 		this.link = link;
 		this.config_values = config_values;
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();

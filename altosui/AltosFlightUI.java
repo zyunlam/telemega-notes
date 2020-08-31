@@ -186,7 +186,7 @@ public class AltosFlightUI extends AltosUIFrame implements AltosFlightDisplay {
 		voice = in_voice;
 		reader = in_reader;
 
-		bag = getContentPane();
+		bag = getScrollablePane();
 		bag.setLayout(new GridBagLayout());
 
 		setTitle(String.format("AltOS %s", reader.name));

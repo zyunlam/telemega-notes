@@ -357,7 +357,8 @@ public class AltosConfigFCUI
 		Insets il = new Insets(4,4,4,4);
 		Insets ir = new Insets(4,4,4,4);
 
-		pane = getContentPane();
+		pane = getScrollablePane();
+
 		pane.setLayout(new GridBagLayout());
 
 		/* Product */

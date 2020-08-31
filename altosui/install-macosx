@@ -1,9 +1,37 @@
-#!/bin/sh
+#!/bin/bash
+
+case `id -u` in
+    0)
+    ;;
+    *)
+	# Check for java
+	if [ ! -d /Library/Java/JavaVirtualMachines/ -o `ls /Library/Java/JavaVirtualMachine` == '' ]; then
+	    open https://adoptopenjdk.net/
+	    osascript -e 'display dialog "Install Java from https://adoptopenjdk.net then click OK" buttons {"Continue"}'
+	fi
+	sudo "$0" "$@"
+	;;
+esac
+
 dir=`dirname "$0"`
 cd "$dir"
-mkdir -p ~/Applications/AltOS
-find ~/Applications/AltOS -type d -print0 | xargs -0 chmod +w
-cp -f -a * ~/Applications/AltOS
-cd ~/Applications/AltOS
-chmod +w *
-xattr -c *
+APP=`echo *.app`
+LIBRARY=/Library/AltusMetrum
+APPLICATIONS=/Applications/
+for file in *; do
+    case "$i" in
+	*.app)
+	    mkdir -p "$(APPLICATIONS)"
+	    if [ -d "$(APPLICATIONS)/$(APP)/." ]; then
+		rm -rf "$(APPLICATIONS)/$(APP)"
+	    fi
+	    cp -a "$i" "$(APPLICATIONS)/$(APP)"
+	    chmod +w "$(APPLICATIONS)/$(APP)"/*
+	    xattr -c "$(APPLICATIONS)/$(APP)"/*
+	    ;;
+	*)
+	    mkdir -p "$(LIBRARY)"
+	    cp -a "$i" "$(LIBRARY)"
+	    ;;
+    esac
+done
