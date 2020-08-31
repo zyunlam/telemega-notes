@@ -131,6 +131,15 @@ altos_ftdi_list_start(void)
 	return list;
 }
 
+static struct {
+	char	*windows;
+	char	*real;
+} name_map[] = {
+	{ .windows = "AltusMetrum28", .real = "EasyMega" },
+	{ .windows = "AltusMetrum2c", .real = "EasyMotor" },
+	{ 0, 0 },
+};
+
 PUBLIC int
 altos_list_next(struct altos_list *list, struct altos_device *device)
 {
@@ -148,6 +157,7 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 	DWORD		friendlyname_len;
 	char		instanceid[1024];
 	DWORD		instanceid_len;
+	int		i;
 
 	dev_info_data.cbSize = sizeof (SP_DEVINFO_DATA);
 	while(SetupDiEnumDeviceInfo(list->dev_info, list->index,
@@ -230,6 +240,12 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 			altos_set_last_windows_error();
 			continue;
 		}
+		for (i = 0; name_map[i].windows; i++)
+			if (!strcmp(name_map[i].windows, friendlyname)) {
+				strcpy(friendlyname, name_map[i].real);
+				break;
+			}
+
 		device->vendor = vid;
 		device->product = pid;
 		device->serial = serial;
