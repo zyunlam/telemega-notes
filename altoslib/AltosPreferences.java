@@ -72,8 +72,8 @@ public class AltosPreferences {
 	/* Launcher channel preference name */
 	public final static String launcherChannelPreference = "LAUNCHER-CHANNEL";
 
-	/* Default logdir is ~/TeleMetrum */
-	public final static String logdirName = "TeleMetrum";
+	/* Default logdir is ~/AltusMetrum */
+	public final static String logdirName = "AltusMetrum";
 
 	/* Log directory */
 	public static File logdir;
