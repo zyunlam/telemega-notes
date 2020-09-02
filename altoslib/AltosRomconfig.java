@@ -151,8 +151,8 @@ public class AltosRomconfig implements AltosUnitInfoListener {
 				try {
 					version = get_int(hexfile, ao_romconfig_version, 2, adjust);
 					check = get_int(hexfile, ao_romconfig_check, 2, adjust);
-					System.out.printf("adjust %d version %x check %x\n", adjust, version, check);
 					if (check == (~version & 0xffff)) {
+						System.out.printf("adjust %d version %x check %x success\n", adjust, version, check);
 						switch (version) {
 						case 2:
 						case 1:
@@ -177,9 +177,11 @@ public class AltosRomconfig implements AltosUnitInfoListener {
 							break;
 						}
 						break;
+					} else {
+						System.out.printf("adjust %d version %x check %x fail\n", adjust, version, check);
 					}
 				} catch (ArrayIndexOutOfBoundsException aie) {
-					System.out.printf("adjust %d failed\n", adjust);
+					System.out.printf("adjust %d out of bounds\n", adjust);
 					continue;
 				}
 			}
