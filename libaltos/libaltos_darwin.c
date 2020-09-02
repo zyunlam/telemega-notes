@@ -192,7 +192,8 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 		if (get_number (usb_device, CFSTR(kUSBVendorID), &device->vendor) &&
 		    get_number (usb_device, CFSTR(kUSBProductID), &device->product) &&
 		    get_string (object, CFSTR(kIOCalloutDeviceKey), device->path, sizeof (device->path)) &&
-		    get_string (usb_device, CFSTR(kUSBProductString), device->name, sizeof (device->name)) &&
+		    (get_string (usb_device, CFSTR("kUSBProductString"), device->name, sizeof (device->name)) ||
+		     get_string (usb_device, CFSTR(kUSBProductString), device->name, sizeof (device->name))) &&
 		    get_string (usb_device, CFSTR(kUSBSerialNumberString), serial_string, sizeof (serial_string))) {
 			device->serial = atoi(serial_string);
 			IOObjectRelease(object);
