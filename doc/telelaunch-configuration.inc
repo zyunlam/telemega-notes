@@ -59,7 +59,7 @@
 		memory.  For example, the default 435.750 MHz would be 
 		configured using
 
-			c f 435750 +
+			c F 435750
 			c w
 
 
