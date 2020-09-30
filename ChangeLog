@@ -1,3 +1,761 @@
+commit f763dfe6a684a16ec40503149adefdc074a63ad0
+Merge: bfe338d1 a1779f94
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 30 00:17:03 2020 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit a1779f9442787dbd5c40edbb476e6b765392196e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 29 20:10:38 2020 -0700
+
+    Version 1.9.5
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 67e8e9b5b51e259eda4a669de527111851bab78f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 29 22:02:56 2020 -0700
+
+    altosui: Work around lack of actual USB product names on Windows
+    
+    Windows doesn't provide an API to get the USB product name for
+    attached devices, it only provides the name listed in the .inf file
+    for each vid/pid. This means that you get 'TeleMega', or 'TeleMega
+    can't isolate the list to the correct version.
+    
+    With this fix, at least the '#2' is stripped off, and the matching
+    code restricts itself to showing only TeleMega files instead of all
+    filenames starting with 'tele'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9bee7d9b6be861909d8c89767f6eabf007f76612
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 29 20:08:31 2020 -0700
+
+    altosdroid: Copy generated .apks to bin directory
+    
+    This places them in the same location as the previous build system.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1fa1ba86f6e6e4ff469f0680cdbc39bc806474a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 25 20:06:18 2020 -0700
+
+    doc: Add 1.9.5 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2d239b9bf600fac46717980f45de3ca7a242236f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 1 18:47:23 2020 -0700
+
+    altoslib: Print more helpful debug messages when checking rom version
+    
+    Make sure success and failure include enough info to debug what
+    happened.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5bdc63a2086c1ffd4c34c9a503af638a47a1d98b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 1 18:31:03 2020 -0700
+
+    libaltos: Update to support Mac OS X 10.15 (catalina)
+    
+    They decided to break device names reported by USB for some reason,
+    but at least the real names are still available under a different
+    name.
+    
+    Also updated the Makefile-standalone to work on my current box;
+    presumably the next time I build this I'll have to update again...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 583a749724700845d2d3552a0d3a759f16b25cfe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 31 20:52:43 2020 -0700
+
+    macosx: Update macosx install script
+    
+    Use dialog engine to monitor progress and get sudo password
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ffbd99545ca0462161c24e0ed86978544f2c28f6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 31 15:08:08 2020 -0700
+
+    altosuilib: Make dialogs mostly scrollable
+    
+    When screens are too small, some dialogs aren't usable. Fix that by
+    wrapping them all with a scrollable pane.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 521dc6dbf9aa5f7aad7829cd98a815031725ac24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 31 15:07:13 2020 -0700
+
+    windows: Point windows users at adoptopenjdk.net by default
+    
+    This gives them a free software java which works fine with altosui.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7fc37f145a6ec3f913e908b6500d1e2c6dd405c8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 31 15:05:41 2020 -0700
+
+    macosx: Hack JavaApplicationStub to set freetype properties
+    
+    Set the FREETYPE_PROPERTIES environment variable to revert to
+    non-fuzzy text.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 075999e274dd1815b15c0d717d1af4e7717e5da9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 31 15:03:57 2020 -0700
+
+    altoslib: Set default logging directory to $HOME/AltusMetrum
+    
+    Change from ~/TeleMetrum
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4e07392c65ec512e3309d89c7465c1406a941b66
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 31 15:01:18 2020 -0700
+
+    libaltos: Map generic windows device names to actual names
+    
+    When we signed the .ini file for our windows 'driver', IDs 28 and 2c
+    hadn't been assigned to EasyMega and EasyMotor, so that file has
+    generic 'AltusMetrum28' and 'AltusMetrum2c' instead. Updating that
+    file is 'hard', so just map the names in the driver instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d298df9e4cf945f3d0dfdb583af07e498c685a0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Sep 18 11:38:06 2020 -0600
+
+    docs: add explicit admonition about avoiding 'c f' when configuring TeleLaunch
+
+commit 95b31cb200d59917fd3ad03c5c3a0ad99c8a140d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Sep 18 11:34:56 2020 -0600
+
+    docs: fix horrible typo in TeleLaunch configuration section
+
+commit 23e148bb3379969935bcbbbeb6c8dc66c0474f6d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 15:34:26 2020 -0700
+
+    altosuilib: Allow config to be missing in rom config dialog
+    
+    If the configuration data can't be fetched from the target board, it
+    will be missing while building the dialog box. Deal with that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2289fd36f7ba76692fe07d2ebc8d7eda33750180
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 15:32:57 2020 -0700
+
+    altoslib: Deal with reflashing EasyMega boards with ancient firmware
+    
+    Ancient EasyMega firmware included radio calibration data in the
+    romconfig bits, which has since been removed. That means the config
+    data from those boards will be at a different location than current
+    firmware. Deal with that by poking around in firmware looking for
+    valid bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 335e40873c238a67cea2c63d62b73fd9d29e94d2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 10:55:30 2020 -0700
+
+    doc: Fix spelling error in updating-firmware section.
+    
+    Thanks to Timothy Dixon for catching this (copy-and-pasted many times)
+    typo -- could sequentially -> count sequentially.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c1b754c12ac32ed38a561d8b35dcbdf82beea896
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 10:53:25 2020 -0700
+
+    altosui: Improve configuration save feedback
+    
+    Mark window title as (modified) with any unsaved changes. Disable the
+    'Save' button while the save is happening. Wait for the re-load of
+    configuration values before clearing the '(modified)' state. This lets
+    you see when the flight computer has accepted the updated values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 10a10667a28f82c24d895e44617e68c7c1848c45
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 10:51:00 2020 -0700
+
+    altoslib: Improve configuration performance over remote link
+    
+    Avoid re-setting dongle radio parameters when they haven't changed
+    during device configuration setting. This avoids flipping back and
+    forth from remote to local mode three times during config save.
+    
+    Wait for remote end to say 'Saved' before dropping radio link. This
+    ensures that the remote end actually gets the save command before the
+    link is terminated.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b3297909e58a2709d340f65181c22ef82341afb9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Aug 19 14:38:04 2020 -0600
+
+    fix broken TeleBT turnon script
+
+commit f82e0c5e3a3b3a505e35df23301cdc7dd4b1a869
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 21:51:39 2020 -0700
+
+    altoslib: Flush output when disabling remote
+    
+    This speeds up sending data to the other end.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 783a541d661f24f2df1dee86bad2e47950bee9da
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 21:50:38 2020 -0700
+
+    altoslib: Don't fetch config data for every idle status
+    
+    This makes fetching data during idle monitor much faster, especially
+    now that fetching the list of stored flights takes so long.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bbd052c0ad5b99673cf583198e50e6ed351fdfb7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 21:49:37 2020 -0700
+
+    altos: Allow multiple manual firing of main/drogue channels
+    
+    Reset the 'fired' status so that you can trigger these multiple times
+    without needing to reboot.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f3c8946d992889edabffbab40aead578963de75f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 21:48:09 2020 -0700
+
+    altos: Don't report inhibited pyro channels as fired
+    
+    Inhibiting channels happens when the channel conditions change during
+    the delay period and was done by marking them as already fired. This
+    worked, but the log file would then indicate that the channel had
+    fired when in fact it was inhibited instead. Separate out the inhibited status
+    so that the correct data appears in the log.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38db8202a4d6ab90305768410f1a37106cc95794
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:20:59 2020 -0700
+
+    micropeak: Add support for MicroPeak v2.0
+    
+    MicroPeak v2.0 sends a 'unique id' with the log data; capture that and
+    included it in the file name.
+    
+    MicroPeak v2.0 can be directly connected to the host using the µP I/O
+    board. Handle that case by sending the 'l' command which will cause
+    the device to dump the log.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0743e7213729df629aea90b3a5dc904fe397b5cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:19:28 2020 -0700
+
+    micropeak: Fix top-level window building
+    
+    The menu wasn't actually working, and the application would randomly
+    start at the wrong size or crash.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7dd23ac750226746f340df64107dab84cd7ea113
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:18:10 2020 -0700
+
+    micropeak: Check for empty data when fetching log
+    
+    Don't pop up the graph window and don't save data from an erased
+    device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 838d359ed8676f056fe487dad3dfbec34bd65009
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:16:55 2020 -0700
+
+    altos/mpusb-v3.0: Make this build again
+    
+    It's not built by default and the requirements in the Makefile have
+    changed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 52eaf4a2480ac0fd367978e423e2f252949f978b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:15:32 2020 -0700
+
+    altos/micropeak-v2.0: Functionally complete.
+    
+    Get flight mode working correctly.
+    Offer log dumping from serial link.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 999b3598019c75d77af6ab40c1942a7d57a2ec3c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:13:50 2020 -0700
+
+    altos: Add MicroPeak v2.0 support to ao_log_micro
+    
+    Support 4-byte sample count (required for stm32l0 flash storage
+    limitations).
+    
+    Mix in log ID on-the-fly so that erased flash parts still report
+    device type.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 476fd2f2c23da427b6b2a68f7d285767a924041e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:12:22 2020 -0700
+
+    altos/stm32l0: Big update in functionality
+    
+    Fix baud rate setting in LPUART
+    Add code to turn everything off.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b1f4177d42e5e951a7db4289c847d355a785c2a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 6 11:05:03 2020 -0700
+
+    altos: Remove support for !HAS_TASK_QUEUE
+    
+    This uses a bit more memory, but the amount can be controlled by
+    setting the size of the sleep hash table, which makes this fit on even
+    the smaller devices like the early EasyMini boards.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a6baf04bae3fe6a6b3da2f456419732ffeb4d056
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 18:17:07 2020 -0700
+
+    altos: Remove ao_led_toggle API from general code
+    
+    The generic implementation would need to record LED status as it
+    cannot be read back from the device on most hardware. Just get rid of
+    it and let attiny keep its implementation (which does work).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0385d7d68c51e05f5b555749ccc20e3c7c202370
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 18:15:47 2020 -0700
+
+    ao-tools: Add TeleGPS log parsing to ao-eeprom
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9df66f7589b663899e2c729b884eed4b64e5d4da
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Aug 6 10:44:49 2020 -0700
+
+    altos: add noreturn attribute to ao_panic
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 33ea5b3658377cea325db285a3e457724f660384
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 5 22:32:14 2020 -0700
+
+    altos/stm32l0: Add LPUART driver
+    
+    This is a simpler UART which micropeak has connected to the LED and
+    we'll use for transmitting the log on power up
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 980d54134bedb64d506c0702f09b4d5277000848
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 5 17:17:47 2020 -0700
+
+    altos/stm32l0: Provide ao_spi_speed inline as per new clocking API
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2cd7ecf437bec322e6a201992d0404f31207bd68
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:22:21 2020 -0700
+
+    altos/micropeak-v2.0: Finish hardware bring-up
+    
+    All of the hardware is working:
+    
+     * serial
+     * SPI
+     * ms56067
+     * ADC
+     * flash
+     * clocking
+     * timer
+    
+    Now we just need an application
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 845b51d09a6a6f257aebb6db202b12ee1fa9ed7e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:21:57 2020 -0700
+
+    altos/stm32l0: Add adc and flash drivers
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2b750a04bbaf428a38fd95891a7ce1cc7d3d2f3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:21:26 2020 -0700
+
+    altos/stm32l0: Remove some unused code in ao_timer.c
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9dea51ca2174d86d5ab4a8a27179519b34869a36
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:20:56 2020 -0700
+
+    altos/stm32l0: Remove some unused code in USART driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db7bf095dfa75858eb12328f104051ea1686e1d5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:20:26 2020 -0700
+
+    altos/stm32l0: Get exti working
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e58d08a93818b3d60746f0f17b34e96fbf8ba0e3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:19:47 2020 -0700
+
+    altos/stm32l0: Get SPI driver working
+    
+    This isn't using DMA, but it seems to work now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b0c4df25a0c419eeb53e0e241489c0bd6bee04ef
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:19:11 2020 -0700
+
+    altos/stm32l0: Some device addrs were wrong
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3df505b02fb7d4ba2d40351e658931b02425b74f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:18:27 2020 -0700
+
+    altos/stm32l0: More DMA fixes
+    
+    This code still doesn't work, but it should be closer'
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1e1a84e9ea21ef6037a2127098499e294d293fa8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:17:03 2020 -0700
+
+    altos: Micropeak v2.0 doesn't have a flash loader anymore
+    
+    The current version doesn't have USB, so the existing flash loader
+    protocol won't work anyways.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0375e9840ea1bcc486b56ccb3aaace57875312a7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:16:28 2020 -0700
+
+    altos/ao_storage: Allow apps to #define storage parameters
+    
+    This avoids placing them in RAM.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 45b00da14ea814cf8f14dcb2cfaccaddd0fbb38d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:15:28 2020 -0700
+
+    altos/ao_storage: allow erased byte value to be set by application
+    
+    External flash is usually 0xff for erased bytes, but other memory may
+    use different values
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6b4da0492c6d9066c8a118fba9b8ffca02fa84ba
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 23 16:15:14 2020 -0700
+
+    remove ao_delay_until from ao.h
+
+commit 48bc180211f226b0406aae28a85d5e5ee77455a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 17:42:03 2020 -0700
+
+    altos: Add ao_delay_until to ao_notask
+    
+    Used on micropeak
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b4a31f4bba8edee32d4f41780bd62bcfa064f20a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 22 17:41:11 2020 -0700
+
+    altos: Move empty ao_mutex_get/put to ao_notask.h
+    
+    Make it work on any no-task project.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7cd8e0aca8ea42a5ff077971e439b0816608b324
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 15:15:35 2020 -0700
+
+    altos: Declare ao_delay_until API in ao.h
+    
+    This uses AO_TICK_TYPE which isn't defined until we get to ao.h
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eea198932b8f12d4729f6138a40489d954d6f93a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 15:14:26 2020 -0700
+
+    altos: Switch micropeak v2.0 to stm32l0
+    
+    The stm32f042 takes too much power for micropeak. Try the stm32l0
+    instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d907b0fe40d31995848e5b207009ba230da2e36e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 15:13:09 2020 -0700
+
+    altos: Add initial stm32l0 support
+    
+    A low-power cortex M0 chip for MicroPeak v2.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b8a9273162b7016afc29f4c98fc3b66324d4c85b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jun 20 15:00:28 2020 -0700
+
+    altos: Fix a bunch of time variables to be AO_TICK_TYPE
+    
+    The default tick type is now 32 bits, so all of these
+    variables were mis-typed at 16 bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 304dbcbff72c6fa66c71224ecf98ec55447ffff7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 7 20:08:34 2020 -0700
+
+    altos/stm: Fix stack validation code
+    
+    This is not included by default, and broke at some point.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff3a2de3223f5cf3fd87f40cd9961e2c2890a867
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Aug 3 12:43:22 2020 -0600
+
+    doc: EasyMotor and EasyTimer have the same mounting geometry as EasyMini
+
+commit 21da942560863ed191953e1af2fbca66bcc29fb8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 17:29:44 2020 -0700
+
+    altos/stmf0, stm32f0: Call ao_boot_chain to start application
+    
+    This used to be done inside ao_boot_check_chain or ao_boot_check_pin,
+    but it made more sense to have it done in _start instead. stm and lpc
+    were adjusted, but stmf0 and stm32f4 were missed.
+    
+    This caused boards using this process to wedge in the boot loader.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6b5e5899d174466552a34a4d8574f0439776240d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 13:31:58 2020 -0700
+
+    altosui: Re-set pad orientation labels after product name is set
+    
+    We don't know what product is being configured until after we query
+    the configuration, which means we need to re-set the orientation label
+    once that has been fetched.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 341157c7415fcf879696c9d8167722a0c5ff264c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 29 10:53:39 2020 -0700
+
+    altos: Use new ao_spi_speed inline to set SPI speeds using spec'd frequencies
+    
+    Instead of hand-adjusting SPI speeds for each driver and product based
+    on processor supported rates, create an inline function that takes the
+    maximum frequency supported by the device and maps that to a value
+    supported by the SoC. This ensures that we don't accidentally drive devices
+    faster than they want (as could happen with AO_SPI_SPEED_FAST), but do go
+    as fast as possible in every configuration. Using an inline function means
+    the value is computed at compile time.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 202166275ba5220db54f63dcd9366e9115d09c0d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 28 23:44:33 2020 -0700
+
+    altos: Support flash parts > 8MB
+    
+    The number of sectors (64kB) units in the connected flash
+    part can be larger than 255, so switch from 8-bits to 32-bits for
+    holding this value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c56bcc315ac29d001e62859b61ede890a8b7c64f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 28 23:43:04 2020 -0700
+
+    altos: Protect shared storage_data with mutex
+    
+    As storage_data is shared between all threads, protect it
+    with a mutex to avoid collisions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8a24d37e40210b1fb5cdab944c3a6d9ae4e144d7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jul 28 23:40:36 2020 -0700
+
+    altos/stm: Increase MISO DMA priority to very high
+    
+    We're still losing incoming bytes in full duplex mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3058ecdeafdee959b1103965f3df4ffcd59683e4
+Merge: 0a53faa8 8ec51d69
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jul 22 15:23:02 2020 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 0a53faa8173565b1277d1a35c60022de567c2dce
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jul 22 15:22:21 2020 -0600
+
+    ao-bringup: ensure TeleMega turnon scripts are using the right test versions
+
+commit 8ec51d698921d07c394e6e0e48ac5d587f70ece8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 22 09:04:30 2020 -0700
+
+    altos: Add 'booster' mode for dual-deploy igniters
+    
+    Booster mode triggers the 'main' channel at first motor burnout
+    allowing the use of a simple flight computer in the booster while
+    providing both a separation charge and an apogee event for recovery.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d0c0dec140b8fa847704c9a22a39d254445188b9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 22 08:57:05 2020 -0700
+
+    altos: Use state transitions to directly drive igniters
+    
+    Instead of a separate igniter API, have the igniter code monitor
+    flight state changes to trigger igniter events. This simplifes the
+    code while allowing further changes in the igniter code.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6ff8e55581ca85b9cc892806a2481d57a65e8bae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 22 08:56:10 2020 -0700
+
+    Releasing: save .map files too
+    
+    These are useful to debug issues with linker scripts or library problems
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4c5942fb082811f136322ec26de615cdb7e17580
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jul 16 10:23:34 2020 -0700
+
+    Add support for TLS if needed
+    
+    Define USE_TLS if you want TLS support from altos.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8066ce73d96f85efe7f5e51b1576b5fd0ff9565e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jul 16 09:29:52 2020 -0700
+
+    altosui: Spurious ; in altos-windows.nsi.in kept out TM v3.0 ihx
+    
+    Looks like a semicolon got stuck in this file, which commented out the
+    TeleMetrum v3.0 firmware from being included in the windows build
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bfe338d11965d2d1715bdd81d92ef32f1b5ff9fa
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jul 2 20:21:19 2020 -0600
+
+    releasing 1.9.4
+
 commit 8359fcc23a93a37ee3aee4c5d2ef183f18ea3f27
 Merge: b95d6674 9b62f683
 Author: Bdale Garbee <bdale@gag.com>
