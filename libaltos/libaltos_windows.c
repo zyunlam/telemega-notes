@@ -246,6 +246,10 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 				break;
 			}
 
+		char *space = strchr(friendlyname, ' ');
+		if  (space)
+			*space = '\0';
+
 		device->vendor = vid;
 		device->product = pid;
 		device->serial = serial;
