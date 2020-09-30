@@ -1,3 +1,82 @@
+altos (1.9.5-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altosui: Spurious ; in altos-windows.nsi.in kept out TM v3.0 ihx
+  * Add support for TLS if needed
+  * Releasing: save .map files too
+  * altos: Use state transitions to directly drive igniters
+  * altos: Add 'booster' mode for dual-deploy igniters
+  * altos/stm: Increase MISO DMA priority to very high
+  * altos: Protect shared storage_data with mutex
+  * altos: Support flash parts > 8MB
+  * altos: Use new ao_spi_speed inline to set SPI speeds using spec'd frequencies
+  * altosui: Re-set pad orientation labels after product name is set
+  * altos/stmf0, stm32f0: Call ao_boot_chain to start application
+  * altos/stm: Fix stack validation code
+  * altos: Fix a bunch of time variables to be AO_TICK_TYPE
+  * altos: Add initial stm32l0 support
+  * altos: Switch micropeak v2.0 to stm32l0
+  * altos: Declare ao_delay_until API in ao.h
+  * altos: Move empty ao_mutex_get/put to ao_notask.h
+  * altos: Add ao_delay_until to ao_notask
+  * remove ao_delay_until from ao.h
+  * altos/ao_storage: allow erased byte value to be set by application
+  * altos/ao_storage: Allow apps to #define storage parameters
+  * altos: Micropeak v2.0 doesn't have a flash loader anymore
+  * altos/stm32l0: More DMA fixes
+  * altos/stm32l0: Some device addrs were wrong
+  * altos/stm32l0: Get SPI driver working
+  * altos/stm32l0: Get exti working
+  * altos/stm32l0: Remove some unused code in USART driver
+  * altos/stm32l0: Remove some unused code in ao_timer.c
+  * altos/stm32l0: Add adc and flash drivers
+  * altos/micropeak-v2.0: Finish hardware bring-up
+  * altos/stm32l0: Provide ao_spi_speed inline as per new clocking API
+  * altos/stm32l0: Add LPUART driver
+  * altos: add noreturn attribute to ao_panic
+  * ao-tools: Add TeleGPS log parsing to ao-eeprom
+  * altos: Remove ao_led_toggle API from general code
+  * altos: Remove support for !HAS_TASK_QUEUE
+  * altos/stm32l0: Big update in functionality
+  * altos: Add MicroPeak v2.0 support to ao_log_micro
+  * altos/micropeak-v2.0: Functionally complete.
+  * altos/mpusb-v3.0: Make this build again
+  * micropeak: Check for empty data when fetching log
+  * micropeak: Fix top-level window building
+  * micropeak: Add support for MicroPeak v2.0
+  * altos: Don't report inhibited pyro channels as fired
+  * altos: Allow multiple manual firing of main/drogue channels
+  * altoslib: Don't fetch config data for every idle status
+  * altoslib: Flush output when disabling remote
+  * altoslib: Improve configuration performance over remote link
+  * altosui: Improve configuration save feedback
+  * doc: Fix spelling error in updating-firmware section.
+  * altoslib: Deal with reflashing EasyMega boards with ancient firmware
+  * altosuilib: Allow config to be missing in rom config dialog
+  * libaltos: Map generic windows device names to actual names
+  * altoslib: Set default logging directory to $HOME/AltusMetrum
+  * macosx: Hack JavaApplicationStub to set freetype properties
+  * windows: Point windows users at adoptopenjdk.net by default
+  * altosuilib: Make dialogs mostly scrollable
+  * macosx: Update macosx install script
+  * libaltos: Update to support Mac OS X 10.15 (catalina)
+  * altoslib: Print more helpful debug messages when checking rom version
+  * doc: Add 1.9.5 release notes
+  * altosdroid: Copy generated .apks to bin directory
+  * altosui: Work around lack of actual USB product names on Windows
+  * Version 1.9.5
+
+  [ Bdale Garbee ]
+  * ao-bringup: ensure TeleMega turnon scripts are using the right test versions
+  * doc: EasyMotor and EasyTimer have the same mounting geometry as EasyMini
+  * fix broken TeleBT turnon script
+  * docs: fix horrible typo in TeleLaunch configuration section
+  * docs: add explicit admonition about avoiding 'c f' when configuring TeleLaunch
+  * debian: stop delivering gdm and slim theme materials, since we don't use them
+  * releasing 1.9.5
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 30 Sep 2020 00:19:56 -0600
+
 altos (1.9.4-2) unstable; urgency=medium
 
   * eliminate old explicit run-time dep on libjson-c4, closes: #966562
