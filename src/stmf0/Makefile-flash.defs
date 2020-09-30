@@ -37,9 +37,9 @@ CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS)
 
 LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/stmf0 -Taltos-loader.ld
 
-PROGNAME=altos-flash
-PROG=$(HARDWARE)-$(PROGNAME)-$(VERSION).elf
-BIN=$(HARDWARE)-$(PROGNAME)-$(VERSION).bin
+PROGNAME=$(HARDWARE)-altos-flash
+PROG=$(PROGNAME)-$(VERSION).elf
+BIN=$(PROGNAME)-$(VERSION).bin
 
 MAKEBIN=$(TOPDIR)/../ao-tools/ao-makebin/ao-makebin
 FLASH_ADDR=0x08000000
@@ -57,7 +57,7 @@ $(OBJ): $(INC)
 distclean:	clean
 
 clean:
-	rm -f *.o $(HARDWARE)-$(PROGNAME)-*.elf $(HARDWARE)-$(PROGNAME)-*.bin
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.bin $(PROGNAME)-*.map
 	rm -f ao_product.h
 
 install:
