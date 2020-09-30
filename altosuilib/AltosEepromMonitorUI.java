@@ -56,7 +56,7 @@ public class AltosEepromMonitorUI extends AltosUIDialog implements AltosEepromMo
 		Insets il = new Insets(4,4,4,4);
 		Insets ir = new Insets(4,4,4,4);
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		c = new GridBagConstraints();

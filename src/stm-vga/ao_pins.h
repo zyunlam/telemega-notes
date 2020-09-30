@@ -71,7 +71,6 @@
 #define HAS_USB			1
 #define HAS_BEEP		0
 #define PACKET_HAS_SLAVE	0
-#define HAS_TASK_QUEUE		1
 
 #define CONSOLE_STDIN		1
 

@@ -41,17 +41,20 @@ ao_sleep(void *wchan)
 
 #if HAS_AO_DELAY
 void
-ao_delay(uint16_t ticks)
+ao_delay_until(AO_TICK_TYPE target)
 {
-	AO_TICK_TYPE	target;
-
-	if (!ticks)
-		ticks = 1;
-	target = ao_tick_count + ticks;
-	do {
-		ao_sleep(&ao_time);
-	} while ((int16_t) (target - ao_tick_count) > 0);
+	ao_arch_block_interrupts();
+	while ((int16_t) (target - ao_tick_count) > 0)
+		ao_sleep((void *) &ao_tick_count);
+	ao_arch_release_interrupts();
 }
+
+void
+ao_delay(AO_TICK_TYPE ticks)
+{
+	ao_delay_until(ao_time() + ticks);
+}
+
 #endif
 
 void

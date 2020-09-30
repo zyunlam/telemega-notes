@@ -26,7 +26,7 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 
 	public String toString() {
 		String	name = getName();
-		if (name == null)
+		if (name == null || "".equals(name))
 			name = "Altus Metrum";
 		return String.format("%-20.20s %4d %s",
 				     name, getSerial(), getPath());
@@ -34,7 +34,7 @@ public class AltosUSBDevice  extends altos_device implements AltosDevice {
 
 	public String toShortString() {
 		String	name = getName();
-		if (name == null)
+		if (name == null || "".equals(name))
 			name = "Altus Metrum";
 		return String.format("%s %d %s",
 				     name, getSerial(), getPath());

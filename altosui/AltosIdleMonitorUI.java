@@ -226,7 +226,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 		/* We let the user set the freq/callsign, so don't bother with the cancel dialog */
 		link.set_cancel_enable(false);
 
-		bag = getContentPane();
+		bag = getScrollablePane();
 		bag.setLayout(new GridBagLayout());
 
 		setTitle(String.format("AltOS %s", device.toShortString()));

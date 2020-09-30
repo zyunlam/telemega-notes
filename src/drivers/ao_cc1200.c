@@ -51,9 +51,7 @@ extern const uint32_t	ao_radio_cal;
 #define FOSC	40000000
 #endif
 
-#ifndef AO_CC1200_SPI_SPEED
-#error AO_CC1200_SPI_SPEED undefined
-#endif
+#define AO_CC1200_SPI_SPEED	ao_spi_speed(7700000)	/* 7.7MHz max for extended memory reads */
 
 #define ao_radio_select()	ao_spi_get_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS,AO_CC1200_SPI_SPEED)
 #define ao_radio_deselect()	ao_spi_put_mask(AO_CC1200_SPI_CS_PORT,(1 << AO_CC1200_SPI_CS_PIN),AO_CC1200_SPI_BUS)

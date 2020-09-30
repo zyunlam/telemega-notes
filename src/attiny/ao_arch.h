@@ -73,11 +73,8 @@
 #define ao_arch_block_interrupts()	cli()
 #define ao_arch_release_interrupts()	sei()
 
-#define ao_mutex_get(m)
-#define ao_mutex_put(m)
-
 void
-ao_delay_until(uint16_t target);
+ao_delay_until(AO_TICK_TYPE target);
 
 /* We can't hit 100 Hz, but we can hit 125 */
 #define AO_HERTZ	125

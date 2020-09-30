@@ -64,21 +64,27 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 	}
 
 	private void done_internal() {
-		setVisible(false);
-		dispose();
-
 		if (data != null && data.crc_valid) {
-			status_value.setText("Received MicroPeak Data");
-			owner = owner.SetData(data);
-			MicroSave save = new MicroSave(owner, data);
-			if (save.runDialog())
-				owner.SetName(data.name);
+			if (data.nsamples == 0) {
+				JOptionPane.showMessageDialog(owner,
+							      "No Flight Data Present",
+							      "Empty Log",
+							      JOptionPane.WARNING_MESSAGE);
+			} else {
+				status_value.setText("Received MicroPeak Data");
+				owner = owner.SetData(data);
+				MicroSave save = new MicroSave(owner, data);
+				if (save.runDialog())
+					owner.SetName(data.name);
+			}
 		} else {
 			JOptionPane.showMessageDialog(owner,
 						      "Download Failed",
 						      "Flight data corrupted",
 						      JOptionPane.ERROR_MESSAGE);
 		}
+		setVisible(false);
+		dispose();
 	}
 
 	public void drain_queue() {
@@ -152,6 +158,7 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 				} catch (MicroData.NonHexcharException nhe) {
 				}
 			}
+			write_thread.join();
 		} catch (FileNotFoundException fe) {
 		} catch (IOException ioe) {
 		} catch (InterruptedException ie) {
@@ -162,6 +169,25 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 	}
 
 	Thread	serial_thread;
+	Thread	write_thread;
+
+	public class SerialWriter implements Runnable {
+		MicroSerial serial;
+
+		public void run () {
+			try {
+				Thread.sleep(100);
+				serial.write('l');
+				serial.write('\n');
+				serial.flush();
+			} catch (InterruptedException ie) {
+			}
+		}
+
+		public SerialWriter(MicroSerial serial) {
+			this.serial = serial;
+		}
+	}
 
 	public void start() {
 		try {
@@ -172,6 +198,10 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 		}
 		serial_thread = new Thread(this);
 		serial_thread.start();
+
+		SerialWriter writer = new SerialWriter(serial);
+		write_thread = new Thread(writer);
+		write_thread.start();
 	}
 
 	public void actionPerformed(ActionEvent ae) {
@@ -194,7 +224,7 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 		this.owner = owner;
 		this.device = device;
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		c = new GridBagConstraints();

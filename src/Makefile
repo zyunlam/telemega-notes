@@ -49,7 +49,7 @@ ARMM0DIRS=\
 	chaoskey-v1.0 chaoskey-v1.0/flash-loader \
 	telemini-v3.0 telemini-v3.0/flash-loader \
 	easymini-v2.0 easymini-v2.0/flash-loader \
-	micropeak-v2.0 micropeak-v2.0/flash-loader
+	micropeak-v2.0
 
 AVRDIRS=\
 	micropeak microkite microsplash

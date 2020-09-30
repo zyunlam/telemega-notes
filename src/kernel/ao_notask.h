@@ -19,10 +19,16 @@
 #ifndef _AO_NOTASK_H_
 #define _AO_NOTASK_H_
 
+void
+ao_delay_until(AO_TICK_TYPE target);
+
 uint8_t
 ao_sleep(void *wchan);
 
 void
 ao_wakeup(void *wchan);
+
+static inline void ao_mutex_get(uint8_t *m) {(void) m;}
+static inline void ao_mutex_put(uint8_t *m) {(void) m;}
 
 #endif /* _AO_NOTASK_H_ */

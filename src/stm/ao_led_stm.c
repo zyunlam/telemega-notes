@@ -69,24 +69,6 @@ ao_led_set(AO_LED_TYPE colors)
 }
 
 void
-ao_led_toggle(AO_LED_TYPE colors)
-{
-#ifdef LED_PORT
-	LED_PORT->odr ^= (colors & LEDS_AVAILABLE);
-#else
-#ifdef LED_PORT_0
-	LED_PORT_0->odr ^= ((colors & LEDS_AVAILABLE) & LED_PORT_0_MASK) << LED_PORT_0_SHIFT;
-#endif
-#ifdef LED_PORT_1
-	LED_PORT_1->odr ^= ((colors & LEDS_AVAILABLE) & LED_PORT_1_MASK) << LED_PORT_1_SHIFT;
-#endif
-#ifdef LED_PORT_2
-	LED_PORT_2->odr ^= ((colors & LEDS_AVAILABLE) & LED_PORT_2_MASK) << LED_PORT_2_SHIFT;
-#endif
-#endif
-}
-
-void
 ao_led_for(AO_LED_TYPE colors, AO_TICK_TYPE ticks) 
 {
 	ao_led_on(colors);

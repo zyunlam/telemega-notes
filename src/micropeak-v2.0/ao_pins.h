@@ -20,12 +20,14 @@
 
 extern uint8_t ao_on_battery;
 
-#define AO_SYSCLK	(ao_on_battery ? STM_HSI_FREQ : 48000000)
+#define HAS_TASK	0
 
-#define LED_PORT_ENABLE	STM_RCC_AHBENR_IOPAEN
-#define LED_PORT	(&stm_gpioa)
-#define LED_PIN_ORANGE	2
-#define AO_LED_ORANGE	(1 << LED_PIN_ORANGE)
+#define AO_SYSCLK	STM_MSI_FREQ_524288
+#define AO_MSI_RANGE	STM_RCC_ICSCR_MSIRANGE_524288
+
+#define LED_0_PORT	(&stm_gpioa)
+#define LED_0_PIN	1
+#define AO_LED_ORANGE	(1 << 0)
 #define AO_LED_REPORT	AO_LED_ORANGE
 #define AO_LED_PANIC	AO_LED_ORANGE
 
@@ -33,32 +35,28 @@ extern uint8_t ao_on_battery;
 
 #define AO_POWER_MANAGEMENT	0
 
-/* 48MHz clock based on USB */
-#define AO_HSI48	1
-/* Need HSI running to flash */
-#define AO_NEED_HSI	1
+/* HCLK = MSI (2.097MHz) */
+#define AO_AHB_PRESCALER	(1)
+#define AO_RCC_CFGR_HPRE_DIV	(STM_RCC_CFGR_HPRE_DIV_1)
 
-/* HCLK = 12MHz usb / 2MHz battery */
-#define AO_AHB_PRESCALER	(ao_on_battery ? 16 : 1)
-#define AO_RCC_CFGR_HPRE_DIV	(ao_on_battery ? STM_RCC_CFGR_HPRE_DIV_16 : STM_RCC_CFGR_HPRE_DIV_1)
-
-/* APB = 12MHz usb / 2MHz battery */
-#define AO_APB_PRESCALER	(ao_on_battery ? 2 : 1)
-#define AO_RCC_CFGR_PPRE_DIV	(ao_on_battery ? STM_RCC_CFGR_PPRE_DIV_2 : STM_RCC_CFGR_PPRE_DIV_1)
-
-#define HAS_USB			1
-#define AO_PA11_PA12_RMP	1
+/* APB = MSI */
+#define AO_APB1_PRESCALER	(1)
+#define AO_APB2_PRESCALER	(1)
+#define AO_RCC_CFGR_PPRE_DIV	(STM_RCC_CFGR_PPRE_DIV_1)
 
 #define PACKET_HAS_SLAVE	0
 #define HAS_SERIAL_1		0
 #define HAS_SERIAL_2		1
-#define USE_SERIAL_2_STDIN	0
+#define USE_SERIAL_2_STDIN	1
 #define USE_SERIAL_2_FLOW	0
 #define USE_SERIAL_2_SW_FLOW	0
-#define SERIAL_2_PA2_PA3	1
-#define SERIAL_2_PA14_PA15	0
-#define USE_SERIAL2_FLOW	0
-#define USE_SERIAL2_SW_FLOW	0
+#define SERIAL_2_PA9_PA10	1
+
+#define HAS_LPUART_1		1
+#define LPUART_1_PA0_PA1	1
+#define USE_LPUART_1_STDIN	0
+#define USE_LPUART_1_FLOW	0
+#define USE_LPUART_1_SW_FLOW	0
 
 #define IS_FLASH_LOADER		0
 
@@ -109,9 +107,8 @@ typedef int32_t alt_t;
 
 #define AO_ALT_VALUE(x)		((x) * (alt_t) 10)
 
-#define AO_DATA_RING		32
-
 #define HAS_ADC			0
+#define HAS_AO_DELAY		1
 
 static inline void
 ao_power_off(void) __attribute((noreturn));
@@ -124,24 +121,16 @@ ao_power_off(void) {
 
 extern alt_t ao_max_height;
 
-void ao_delay_until(uint16_t target);
+#define ao_async_stop()
+#define ao_async_start()
 
-#define ao_async_stop() do {					\
-		ao_serial2_drain();				\
-		stm_moder_set(&stm_gpioa, 2, STM_MODER_OUTPUT); \
-		ao_serial_shutdown();				\
-	} while (0)
+#define LOG_MICRO_ASYNC 0
 
-#define ao_async_start() do {						\
-		ao_serial_init();					\
-		stm_moder_set(&stm_gpioa, 2, STM_MODER_ALTERNATE);	\
-		ao_delay(AO_MS_TO_TICKS(100));				\
-	} while (0)
+void ao_async_byte(char c);
 
-#define ao_async_byte(b) ao_serial2_putchar((char) (b))
-
-#define ao_eeprom_read(pos, ptr, size) ao_storage_read(pos, ptr, size)
-#define ao_eeprom_write(pos, ptr, size) ao_storage_write(pos, ptr, size)
+#define ao_eeprom_read(pos, ptr, size) ao_storage_device_read(pos, ptr, size)
+#define ao_eeprom_write(pos, ptr, size) ao_storage_device_write(pos, ptr, size)
+#define N_SAMPLES_TYPE uint32_t
 #define MAX_LOG_OFFSET	ao_storage_total
 #define ao_storage_log_max ao_storage_total
 
@@ -150,5 +139,7 @@ extern uint32_t __flash_end__[];
 
 #define AO_BOOT_APPLICATION_BOUND	((uint32_t *) __flash__)
 #define USE_STORAGE_CONFIG	0
+
+#define HAS_STORAGE_DEBUG 1
 
 #endif /* _AO_PINS_H_ */

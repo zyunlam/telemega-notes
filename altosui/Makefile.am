@@ -183,7 +183,7 @@ LINUX_FILES=$(FAT_FILES) $(LINUX_LIBS) $(FIRMWARE) $(DOC) $(desktop_file).in $(L
 LINUX_EXTRA=altosui-fat
 
 MACOSX_INFO_PLIST=Info.plist
-MACOSX_INSTALL=install-macosx
+MACOSX_INSTALL=install-macosx ask-pass
 MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(DOC) ReadMe-Mac.rtf $(MACOSX_ICONS) $(MACOSX_INSTALL)
 MACOSX_EXTRA=$(FIRMWARE)
 

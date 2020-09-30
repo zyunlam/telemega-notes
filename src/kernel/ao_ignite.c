@@ -25,15 +25,6 @@
 #if HAS_IGNITE
 struct ao_ignition ao_ignition[2];
 
-void
-ao_ignite(enum ao_igniter igniter)
-{
-	ao_arch_block_interrupts();
-	ao_ignition[igniter].request = 1;
-	ao_wakeup(&ao_ignition);
-	ao_arch_release_interrupts();
-}
-
 #ifndef AO_SENSE_DROGUE
 #define AO_SENSE_DROGUE(p)	((p)->adc.sense_d)
 #define AO_SENSE_MAIN(p)	((p)->adc.sense_m)
@@ -86,9 +77,9 @@ ao_igniter_status(enum ao_igniter igniter)
 static void
 ao_igniter_fire(enum ao_igniter igniter)
 {
-	ao_ignition[igniter].firing = 1;
-	switch(ao_config.ignite_mode) {
-	case AO_IGNITE_MODE_DUAL:
+	if (!ao_ignition[igniter].fired) {
+		ao_ignition[igniter].firing = 1;
+		ao_ignition[igniter].fired = 1;
 		switch (igniter) {
 		case ao_igniter_drogue:
 			AO_IGNITER_SET_DROGUE(1);
@@ -101,58 +92,47 @@ ao_igniter_fire(enum ao_igniter igniter)
 			AO_IGNITER_SET_MAIN(0);
 			break;
 		}
-		break;
-	case AO_IGNITE_MODE_APOGEE:
-		switch (igniter) {
-		case ao_igniter_drogue:
-			AO_IGNITER_SET_DROGUE(1);
-			ao_delay(AO_IGNITER_FIRE_TIME);
-			AO_IGNITER_SET_DROGUE(0);
-			ao_delay(AO_IGNITER_CHARGE_TIME);
-			AO_IGNITER_SET_MAIN(1);
-			ao_delay(AO_IGNITER_FIRE_TIME);
-			AO_IGNITER_SET_MAIN(0);
-			break;
-		default:
-			break;
-		}
-		break;
-	case AO_IGNITE_MODE_MAIN:
-		switch (igniter) {
-		case ao_igniter_main:
-			AO_IGNITER_SET_DROGUE(1);
-			ao_delay(AO_IGNITER_FIRE_TIME);
-			AO_IGNITER_SET_DROGUE(0);
-			ao_delay(AO_IGNITER_CHARGE_TIME);
-			AO_IGNITER_SET_MAIN(1);
-			ao_delay(AO_IGNITER_FIRE_TIME);
-			AO_IGNITER_SET_MAIN(0);
-			break;
-		default:
-			break;
-		}
-		break;
+		ao_ignition[igniter].firing = 0;
+		ao_delay(AO_IGNITER_CHARGE_TIME);
 	}
-	ao_ignition[igniter].firing = 0;
 }
 
 static void
 ao_igniter(void)
 {
-	enum ao_igniter igniter;
-
 	ao_config_get();
 	for (;;) {
-		ao_sleep(&ao_ignition);
-		for (igniter = ao_igniter_drogue; igniter <= ao_igniter_main; igniter++) {
-			if (ao_ignition[igniter].request && !ao_ignition[igniter].fired) {
-				if (igniter == ao_igniter_drogue && ao_config.apogee_delay)
-					ao_delay(AO_SEC_TO_TICKS(ao_config.apogee_delay));
+		/* Wait for flight state change */
+		ao_sleep(&ao_flight_state);
 
-				ao_igniter_fire(igniter);
-				ao_delay(AO_IGNITER_CHARGE_TIME);
-				ao_ignition[igniter].fired = 1;
+		/* Fire any igniters that are supposed to be triggered
+		 * in this new state
+		 */
+		switch(ao_config.ignite_mode) {
+		case AO_IGNITE_MODE_DUAL:
+			if (ao_flight_drogue <= ao_flight_state && ao_flight_state < ao_flight_landed)
+				ao_igniter_fire(ao_igniter_drogue);
+			if (ao_flight_main <= ao_flight_state && ao_flight_state < ao_flight_landed)
+				ao_igniter_fire(ao_igniter_main);
+			break;
+		case AO_IGNITE_MODE_APOGEE:
+			if (ao_flight_drogue <= ao_flight_state && ao_flight_state < ao_flight_landed) {
+				ao_igniter_fire(ao_igniter_drogue);
+				ao_igniter_fire(ao_igniter_main);
 			}
+			break;
+		case AO_IGNITE_MODE_MAIN:
+			if (ao_flight_main <= ao_flight_state && ao_flight_state < ao_flight_landed) {
+				ao_igniter_fire(ao_igniter_drogue);
+				ao_igniter_fire(ao_igniter_main);
+			}
+			break;
+		case AO_IGNITE_MODE_BOOSTER:
+			if (ao_flight_fast <= ao_flight_state && ao_flight_state < ao_flight_landed)
+				ao_igniter_fire(ao_igniter_main);
+			if (ao_flight_drogue <= ao_flight_state && ao_flight_state < ao_flight_landed)
+				ao_igniter_fire(ao_igniter_drogue);
+			break;
 		}
 	}
 }
@@ -168,10 +148,12 @@ ao_ignite_manual(void)
 	ao_cmd_white();
 #if HAS_IGNITE
 	if (ao_cmd_lex_c == 'm' && ao_match_word("main")) {
+		ao_ignition[ao_igniter_main].fired = 0;
 		ao_igniter_fire(ao_igniter_main);
 		return;
 	}
 	if (ao_cmd_lex_c == 'd' && ao_match_word("drogue")) {
+		ao_ignition[ao_igniter_drogue].fired = 0;
 		ao_igniter_fire(ao_igniter_drogue);
 		return;
 	}

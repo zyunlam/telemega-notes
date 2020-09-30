@@ -51,7 +51,7 @@ public class AltosRomconfigUI
 		Insets il = new Insets(4,4,4,4);
 		Insets ir = new Insets(4,4,4,4);
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		int y = 0;
@@ -74,7 +74,10 @@ public class AltosRomconfigUI
 		c.weightx = 1;
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
-		product_value = new JLabel(config.usb_product);
+		String product = "unknown";
+		if (config != null)
+			product = config.usb_product;
+		product_value = new JLabel(product);
 		pane.add(product_value, c);
 
 		y++;

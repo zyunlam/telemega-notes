@@ -17,6 +17,7 @@
  */
 
 #include <ao.h>
+#include <ao_task.h>
 
 #define AO_SYSTICK	(AO_LPC_SYSCLK / 2)
 
@@ -53,10 +54,7 @@ void lpc_systick_isr(void)
 {
 	if (lpc_systick.csr & (1 << LPC_SYSTICK_CSR_COUNTFLAG)) {
 		++ao_tick_count;
-#if HAS_TASK_QUEUE
-		if (ao_task_alarm_tick && (int16_t) (ao_tick_count - ao_task_alarm_tick) >= 0)
-			ao_task_check_alarm((uint16_t) ao_tick_count);
-#endif
+		ao_task_check_alarm();
 #if AO_DATA_ALL
 		if (++ao_data_count == ao_data_interval) {
 			ao_data_count = 0;

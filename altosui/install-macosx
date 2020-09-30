@@ -1,9 +1,47 @@
-#!/bin/sh
+#!/bin/bash
+
+JVM=/Library/Java/JavaVirtualMachines
 dir=`dirname "$0"`
+
+case `id -u` in
+    0)
+    ;;
+    *)
+	SUDO_ASKPASS="${dir}/ask-pass" sudo -A "$0" "$@"
+	exit 0
+	;;
+esac
+
+# Check for java
+if ls "$JVM" | grep -q adopt; then
+    echo "Adopt OpenJDK already present"
+else
+    open https://adoptopenjdk.net/
+    osascript -e 'display dialog "Install Java from https://adoptopenjdk.net then click Continue" buttons {"Continue"} default button 1 with title "Install Java"' >/dev/null
+fi
+
 cd "$dir"
-mkdir -p ~/Applications/AltOS
-find ~/Applications/AltOS -type d -print0 | xargs -0 chmod +w
-cp -f -a * ~/Applications/AltOS
-cd ~/Applications/AltOS
-chmod +w *
-xattr -c *
+LIBRARY=/Library/AltusMetrum
+APPLICATIONS=/Applications
+INSTALLED=
+for file in *; do
+    echo 'Installing' "$file"
+    case "$file" in
+	*.app)
+	    mkdir -p "${APPLICATIONS}"
+	    if [ -d "${APPLICATIONS}/${file}" ]; then
+		rm -rf "${APPLICATIONS}/${file}"
+	    fi
+	    cp -a "$file" "${APPLICATIONS}/${file}"
+	    chmod -R +w "${APPLICATIONS}/${file}"
+	    xattr -rc "${APPLICATIONS}/${file}"
+	    APP=`basename "$file" .app`
+	    INSTALLED="${INSTALLED} ${APP}"
+	    ;;
+	*)
+	    mkdir -p "${LIBRARY}"
+	    cp -a "$file" "${LIBRARY}"
+	    ;;
+    esac
+done
+osascript -e 'display dialog "Installation of'"${INSTALLED}"' complete" with title "Installation Complete" buttons {"OK"} default button 1' >/dev/null

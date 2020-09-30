@@ -16,13 +16,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-__flash = 0x08001000;
-__flash_size = 22K;
+__flash = 0x08000000;
+__flash_size = 10K;
 __flash__ = __flash + __flash_size;
 __flash_end__ = __flash__ + 6K;
 __ram = 0x20000000;
-__ram_size = 6K;
+__ram_size = 2K;
 __stack_size = 512;
 
-INCLUDE registers.ld
 INCLUDE picolibc.ld

@@ -67,7 +67,7 @@ class AltosEditFreqUI extends AltosUIDialog implements ActionListener {
 		got_ok = false;
 		frame = in_frame;
 
-		Container pane = getContentPane();
+		Container pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -302,7 +302,7 @@ public class AltosConfigFreqUI extends AltosUIDialog implements ActionListener {
 
 		frequencies = new FrequencyList(in_frequencies);
 
-		Container pane = getContentPane();
+		Container pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();

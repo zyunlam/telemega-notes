@@ -1,6 +1,6 @@
 Creating documentation for a new release of AltOS
 
-* Write release notes in release-notes-${version}.inc. Add to Makefile
+* Write release notes in release-notes-${version}.inc.
 
 * Make sure that doc/altusmetrum.txt has the right copyright year
 

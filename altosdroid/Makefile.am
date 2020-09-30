@@ -3,8 +3,10 @@ REL_APK=app/build/outputs/apk/release/app-release.apk
 
 if ANDROID
 all_target=$(DBG_APK)
+all_target += bin/AltosDroid-debug.apk
 if ANDROID_RELEASE
 all_target+=$(REL_APK)
+all_target += bin/AltosDroid-release.apk
 endif
 else
 all_target=
@@ -52,6 +54,14 @@ RES=$(LAYOUTS) $(MENUS) $(VALUES) $(XMLS)
 SRC=$(JAVA_SRC) $(DRAWABLES) $(RES)
 
 all: $(all_target)
+
+bin/AltosDroid-debug.apk: $(DBG_APK)
+	mkdir -p bin
+	cp $^ $@
+
+bin/AltosDroid-release.apk: $(REL_APK)
+	mkdir -p bin
+	cp $^ $@
 
 .NOTPARALLEL:
 

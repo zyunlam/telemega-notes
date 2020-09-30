@@ -129,18 +129,23 @@ public class AltosUIPreferences extends AltosPreferences {
 			backend.putInt(fontSizePreference, font_size);
 			flush_preferences();
 			AltosUILib.set_fonts(font_size);
-			for (AltosFontListener l : font_listeners)
+			for (AltosFontListener l : font_listeners) {
+				System.out.printf("notifying %s of font size change\n", l);
 				l.font_size_changed(font_size);
+			}
+			System.out.printf("all fonts changed\n");
 		}
 	}
 
 	public static void register_font_listener(AltosFontListener l) {
+		System.out.printf("register font listener\n");
 		synchronized (backend) {
 			font_listeners.add(l);
 		}
 	}
 
 	public static void unregister_font_listener(AltosFontListener l) {
+		System.out.printf("unregister font listener\n");
 		synchronized (backend) {
 			font_listeners.remove(l);
 		}

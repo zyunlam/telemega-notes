@@ -69,6 +69,7 @@ ao_pyro_print_status(void)
 #endif
 
 uint16_t	ao_pyro_fired;
+uint16_t	ao_pyro_inhibited;
 
 #ifndef PYRO_DBG
 #define PYRO_DBG	0
@@ -274,9 +275,9 @@ ao_pyro_check(void)
 	for (p = 0; p < AO_PYRO_NUM; p++) {
 		pyro = &ao_config.pyro[p];
 
-		/* Ignore igniters which have already fired
+		/* Ignore igniters which have already fired or inhibited
 		 */
-		if (ao_pyro_fired & (1 << p))
+		if ((ao_pyro_fired|ao_pyro_inhibited) & (1 << p))
 			continue;
 
 		/* Ignore disabled igniters
@@ -308,10 +309,10 @@ ao_pyro_check(void)
 
 			/* Check to make sure the required conditions
 			 * remain valid. If not, inhibit the channel
-			 * by setting the fired bit
+			 * by setting the inhibited bit
 			 */
 			if (!ao_pyro_ready(pyro)) {
-				ao_pyro_fired |= (1 << p);
+				ao_pyro_inhibited |= (1 << p);
 				continue;
 			}
 

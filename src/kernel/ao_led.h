@@ -45,10 +45,6 @@ ao_led_set(AO_LED_TYPE colors);
 void
 ao_led_set_mask(AO_LED_TYPE colors, AO_LED_TYPE mask);
 
-/* Toggle the specified LEDs */
-void
-ao_led_toggle(AO_LED_TYPE colors);
-
 /* Turn on the specified LEDs for the indicated interval */
 void
 ao_led_for(AO_LED_TYPE colors, AO_TICK_TYPE ticks);

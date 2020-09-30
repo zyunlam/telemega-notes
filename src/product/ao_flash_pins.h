@@ -21,8 +21,6 @@
 
 /* Common definitions for the USB flash loader */
 
-#define HAS_TASK_QUEUE		0
-
 #define HAS_USB			1
 #define USE_USB_STDIO		0
 #define HAS_USB_DISABLE		0

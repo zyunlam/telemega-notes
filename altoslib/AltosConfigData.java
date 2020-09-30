@@ -796,33 +796,28 @@ public class AltosConfigData {
 							has_setting,
 							radio_calibration);
 			/* When remote, reset the dongle frequency at the same time */
-			if (remote) {
-				link.flush_output();
+			if (remote && frequency != link.frequency) {
 				link.stop_remote();
 				link.set_radio_frequency(frequency);
-				link.flush_output();
 				link.start_remote();
 			}
 		}
 
 		if (telemetry_rate != AltosLib.MISSING) {
 			link.printf("c T %d\n", telemetry_rate);
-			if (remote) {
-				link.flush_output();
+			if (remote && telemetry_rate != link.telemetry_rate) {
 				link.stop_remote();
 				link.set_telemetry_rate(telemetry_rate);
-				link.flush_output();
 				link.start_remote();
 			}
 		}
 
 		if (callsign != null) {
 			link.printf("c c %s\n", callsign);
-			if (remote) {
-				link.flush_output();
+			if (remote && !callsign.equals(link.callsign)) {
+				System.out.printf("changing link callsign from %s to %s\n", link.callsign, callsign);
 				link.stop_remote();
 				link.set_callsign(callsign);
-				link.flush_output();
 				link.start_remote();
 			}
 		}
@@ -882,7 +877,7 @@ public class AltosConfigData {
 		/* UI doesn't support accel cal */
 
 		link.printf("c w\n");
-		link.flush_output();
+		read_link(link, "Saved");
 	}
 
 	public AltosConfigData(AltosLink link) throws InterruptedException, TimeoutException {

@@ -58,6 +58,6 @@ SERIAL=$SERIAL ./cal-freq $dev
 
 echo 'E 1' > $dev
 
-./test-telemega
+./test-telemega-v1.0
 
 exit $?

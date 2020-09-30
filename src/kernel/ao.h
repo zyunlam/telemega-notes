@@ -42,6 +42,11 @@ extern char ao_getchar(void);
 
 typedef AO_PORT_TYPE ao_port_t;
 
+#ifndef AO_TICK_TYPE
+#define AO_TICK_TYPE uint32_t
+#define AO_TICK_SIGNED int32_t
+#endif
+
 #if HAS_TASK
 #include <ao_task.h>
 #else
@@ -81,7 +86,7 @@ typedef AO_PORT_TYPE ao_port_t;
 
 /* Stop the operating system, beeping and blinking the reason */
 void
-ao_panic(uint8_t reason);
+ao_panic(uint8_t reason) __attribute__((noreturn));
 
 /*
  * ao_romconfig.c
@@ -99,11 +104,6 @@ extern AO_ROMCONFIG_SYMBOL uint32_t ao_radio_cal;
 /*
  * ao_timer.c
  */
-
-#ifndef AO_TICK_TYPE
-#define AO_TICK_TYPE	uint32_t
-#define AO_TICK_SIGNED	int32_t
-#endif
 
 extern volatile AO_TICK_TYPE ao_tick_count;
 
@@ -124,7 +124,7 @@ ao_time_ns(void);
 
 /* Suspend the current task until ticks time has passed */
 void
-ao_delay(uint16_t ticks);
+ao_delay(AO_TICK_TYPE ticks);
 
 /* Set the ADC interval */
 void
@@ -748,9 +748,6 @@ enum ao_igniter {
 	ao_igniter_drogue = 0,
 	ao_igniter_main = 1
 };
-
-void
-ao_ignite(enum ao_igniter igniter);
 
 enum ao_igniter_status {
 	ao_igniter_unknown,	/* unknown status (ambiguous voltage) */
