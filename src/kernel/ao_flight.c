@@ -222,6 +222,8 @@ ao_flight(void)
 				)
 			{
 				ao_flight_state = ao_flight_boost;
+				ao_wakeup(&ao_flight_state);
+
 				ao_launch_tick = ao_boost_tick = ao_sample_tick;
 
 				/* start logging data */
@@ -242,8 +244,6 @@ ao_flight(void)
 				ao_gps_new = AO_GPS_NEW_DATA | AO_GPS_NEW_TRACKING;
 				ao_wakeup(&ao_gps_new);
 #endif
-
-				ao_wakeup(&ao_flight_state);
 			}
 			break;
 		case ao_flight_boost:
@@ -278,8 +278,8 @@ ao_flight(void)
 #else
 				ao_flight_state = ao_flight_coast;
 #endif
-				++ao_motor_number;
 				ao_wakeup(&ao_flight_state);
+				++ao_motor_number;
 			}
 			break;
 #if HAS_ACCEL && HAS_BARO
@@ -327,11 +327,9 @@ ao_flight(void)
 #endif
 				)
 			{
-#if HAS_IGNITE
-				/* ignite the drogue charge */
-				ao_ignite(ao_igniter_drogue);
-#endif
-
+				/* enter drogue state */
+				ao_flight_state = ao_flight_drogue;
+				ao_wakeup(&ao_flight_state);
 #if HAS_TELEMETRY
 				/* slow down the telemetry system */
 				ao_telemetry_set_interval(AO_TELEMETRY_INTERVAL_RECOVER);
@@ -339,10 +337,6 @@ ao_flight(void)
 				/* Turn the RDF beacon back on */
 				ao_rdf_set(1);
 #endif
-
-				/* and enter drogue state */
-				ao_flight_state = ao_flight_drogue;
-				ao_wakeup(&ao_flight_state);
 			}
 			else
 #else /* not HAS_BARO */
@@ -362,12 +356,11 @@ ao_flight(void)
 				    ao_interval_max_accel_through - ao_interval_min_accel_through <= ao_data_accel_to_sample(MAX_QUIET_ACCEL))
 				{
 					ao_flight_state = ao_flight_landed;
+					ao_wakeup(&ao_flight_state);
 #if HAS_ADC
 					/* turn off the ADC capture */
 					ao_timer_set_adc_interval(0);
 #endif
-
-					ao_wakeup(&ao_flight_state);
 				}
 
 				/* Reset interval values */
@@ -410,9 +403,8 @@ ao_flight(void)
 			 */
 			if (ao_height <= ao_config.main_deploy)
 			{
-#if HAS_IGNITE
-				ao_ignite(ao_igniter_main);
-#endif
+				ao_flight_state = ao_flight_main;
+				ao_wakeup(&ao_flight_state);
 
 				/*
 				 * Start recording min/max height
@@ -423,9 +415,6 @@ ao_flight(void)
 				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;
 
 				ao_interval_min_height = ao_interval_max_height = ao_avg_height;
-
-				ao_flight_state = ao_flight_main;
-				ao_wakeup(&ao_flight_state);
 			}
 			break;
 
@@ -445,13 +434,11 @@ ao_flight(void)
 				if (ao_interval_max_height - ao_interval_min_height <= AO_M_TO_HEIGHT(4))
 				{
 					ao_flight_state = ao_flight_landed;
-
+					ao_wakeup(&ao_flight_state);
 #if HAS_ADC
 					/* turn off the ADC capture */
 					ao_timer_set_adc_interval(0);
 #endif
-
-					ao_wakeup(&ao_flight_state);
 				}
 				ao_interval_min_height = ao_interval_max_height = ao_avg_height;
 				ao_interval_end = ao_sample_tick + AO_INTERVAL_TICKS;

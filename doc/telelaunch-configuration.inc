@@ -59,9 +59,13 @@
 		memory.  For example, the default 435.750 MHz would be 
 		configured using
 
-			c f 435750 +
+			c F 435750
 			c w
 
+		Note that the 'f' parameter is a frequency calibration value
+		that you really, really, really don't want to change.  So, 
+		please be careful to make sure you use capital 'F', not lower
+		case 'f' when changing the operating frequency!
 
 	=== Callsign
 

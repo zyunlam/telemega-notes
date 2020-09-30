@@ -78,9 +78,8 @@ extern uint8_t	ao_cpu_sleep_disable;
 
 #define ao_arch_task_globals	uint8_t ao_cpu_sleep_disable;
 
-#define ao_arch_init_stack(task, start) \
+#define ao_arch_init_stack(task, sp, start)				\
 	do {								\
-		uint8_t		*sp = task->stack8 + AO_STACK_SIZE - 1;	\
 		uint16_t	a = (uint16_t) start; 			\
 		int		i;					\
 									\

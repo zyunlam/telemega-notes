@@ -31,10 +31,14 @@
 typedef ao_storage_pos_t ao_pos_t;
 
 /* Total bytes of available storage */
+#ifndef ao_storage_total
 extern ao_pos_t	ao_storage_total;
+#endif
 
 /* Block size - device is erased in these units. At least 256 bytes */
+#ifndef ao_storage_block
 extern ao_pos_t	ao_storage_block;
+#endif
 
 #ifndef USE_STORAGE_CONFIG
 #define USE_STORAGE_CONFIG 1
@@ -50,7 +54,9 @@ extern ao_pos_t	ao_storage_config;
 #endif
 
 /* Storage unit size - device reads and writes must be within blocks of this size. Usually 256 bytes. */
+#ifndef ao_storage_unit
 extern uint16_t ao_storage_unit;
+#endif
 
 /* Initialize above values. Can only be called once the OS is running */
 void

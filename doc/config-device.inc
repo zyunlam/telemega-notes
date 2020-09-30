@@ -171,6 +171,10 @@ ifdef::altusmetrum[]
 		is fired first, followed after a two second
 		delay by the 'main' channel.
 
+		Separation & Apogee::
+		This fires the 'main' channel when the first motor
+		burns out and fires the 'apogee' charge at apogee.
+
 	ifdef::telemetrum,telemega,easymega,easytimer[]
 	==== Pad Orientation
 

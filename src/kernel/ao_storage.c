@@ -22,6 +22,7 @@
 #define AO_STORAGE_DATA_SIZE	128
 
 static uint8_t storage_data[AO_STORAGE_DATA_SIZE];
+static uint8_t storage_mutex;
 
 uint8_t
 ao_storage_read(ao_pos_t pos, void *v_buf, uint16_t len)
@@ -85,28 +86,41 @@ ao_storage_write(ao_pos_t pos, void *v_buf, uint16_t len)
 	return 1;
 }
 
+#ifndef AO_STORAGE_ERASED_BYTE
+#define AO_STORAGE_ERASED_BYTE 0xff
+#endif
+
 uint8_t
 ao_storage_is_erased(uint32_t pos)
 {
 	uint32_t	read_pos;
 	uint32_t	read_len;
 	uint32_t	i;
+	uint8_t		ret = 1;
 
+	ao_storage_setup();
+	ao_mutex_get(&storage_mutex);
 	read_pos = pos;
 	read_len = ao_storage_block;
 	while (read_len) {
 		uint32_t this_time = AO_STORAGE_DATA_SIZE;
 		if (this_time > read_len)
 			this_time = read_len;
-		if (!ao_storage_read(read_pos, storage_data, this_time))
-			return 0;
+		if (!ao_storage_read(read_pos, storage_data, this_time)) {
+			ret = 0;
+			goto done;
+		}
 		for (i = 0; i < this_time; i++)
-			if (storage_data[i] != 0xff)
-				return 0;
+			if (storage_data[i] != AO_STORAGE_ERASED_BYTE) {
+				ret = 0;
+				goto done;
+			}
 		read_pos += this_time;
 		read_len -= this_time;
 	}
-	return 1;
+done:
+	ao_mutex_put(&storage_mutex);
+	return ret;
 }
 
 uint8_t
@@ -144,25 +158,29 @@ static void
 ao_storage_dump(void) 
 {
 	uint32_t block;
-	uint8_t i, j;
+	uint8_t i, j, k;
 
 	block = ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	for (i = 0; ; i += 8) {
+	ao_mutex_get(&storage_mutex);
+	for (i = 0; ; i += AO_STORAGE_DATA_SIZE) {
 		if (ao_storage_read((block << 8) + i,
 				    storage_data,
-				    8)) {
-			ao_cmd_put16((uint16_t) i);
-			for (j = 0; j < 8; j++) {
-				putchar(' ');
-				ao_cmd_put8(storage_data[j]);
+				    AO_STORAGE_DATA_SIZE)) {
+			for (k = 0; k < AO_STORAGE_DATA_SIZE; k += 8) {
+				ao_cmd_put16((uint16_t) i + k);
+				for (j = 0; j < 8; j++) {
+					putchar(' ');
+					ao_cmd_put8(storage_data[k + j]);
+				}
+				putchar ('\n');
 			}
-			putchar ('\n');
 		}
-		if (i == 248)
+		if (i == 256 - AO_STORAGE_DATA_SIZE)
 			break;
 	}
+	ao_mutex_put(&storage_mutex);
 }
 
 #if HAS_STORAGE_DEBUG

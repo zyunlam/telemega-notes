@@ -260,7 +260,7 @@ public class AltosUIConfigure
 		super(in_owner, name, false);
 
 		owner = in_owner;
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		row = 0;

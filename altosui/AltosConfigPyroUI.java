@@ -386,7 +386,7 @@ public class AltosConfigPyroUI
 
 		GridBagConstraints	c;
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		int	nrow = 0;

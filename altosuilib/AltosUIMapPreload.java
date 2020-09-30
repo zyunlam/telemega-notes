@@ -336,7 +336,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 	public AltosUIMapPreload(AltosUIFrame in_owner) {
 		owner = in_owner;
 
-		Container		pane = getContentPane();
+		Container		pane = getScrollablePane();
 		GridBagConstraints	c = new GridBagConstraints();
 		Insets			i = new Insets(4,4,4,4);
 

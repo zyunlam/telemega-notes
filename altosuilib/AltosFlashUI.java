@@ -131,7 +131,7 @@ public class AltosFlashUI
 		Insets il = new Insets(4,4,4,4);
 		Insets ir = new Insets(4,4,4,4);
 
-		pane = getContentPane();
+		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());
 
 		c = new GridBagConstraints();
@@ -208,9 +208,18 @@ public class AltosFlashUI
 
 		public AltosHexfileFilter(String usb_product) {
 			int l;
+			int dash;
 
 			/* Trim off any trailing variants (1.0a vs 1.0) */
-			for (l = usb_product.length(); l > 0; l--) {
+			for (dash = usb_product.length(); dash > 0; dash--) {
+				char c = usb_product.charAt(dash-1);
+				if (c == '-')
+					break;
+			}
+			if (dash == 0)
+				dash = usb_product.length();
+
+			for (l = usb_product.length(); l > dash; l--) {
 				char c = usb_product.charAt(l-1);
 				if (c < 'a' || 'z' < c)
 					break;
@@ -637,7 +646,7 @@ public class AltosFlashUI
 			super(in_owner, "Open Flash Target Device", true);
 			owner = in_owner;
 
-			Container		pane = getContentPane();
+			Container		pane = getScrollablePane();
 			GridBagConstraints	c = new GridBagConstraints();
 			Insets			i = new Insets(4,4,4,4);
 

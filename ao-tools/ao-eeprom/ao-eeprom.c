@@ -636,7 +636,43 @@ main (int argc, char **argv)
 					break;
 				case AO_LOG_FORMAT_TELEGPS:
 					log_gps = (struct ao_log_gps *) &eeprom->data[pos];
-					(void) log_gps;
+					switch (log_gps->type) {
+					case AO_LOG_GPS_TIME:
+						printf(" lat %10.7f ° lon %10.7f ° alt %8d m",
+						       log_gps->u.gps.latitude / 10000000.0,
+						       log_gps->u.gps.longitude/ 10000000.0,
+						       (int32_t) (log_gps->u.gps.altitude_low |
+								  (log_gps->u.gps.altitude_high << 16)));
+						printf(" time %02d:%02d:%02d %04d-%02d-%02d flags %02x",
+						       log_gps->u.gps.hour,
+						       log_gps->u.gps.minute,
+						       log_gps->u.gps.second,
+						       log_gps->u.gps.year + 2000,
+						       log_gps->u.gps.month,
+						       log_gps->u.gps.day,
+						       log_gps->u.gps.flags);
+						printf(" course %3d ground_speed %5u climb_rate %6d pdop %3d hdop %3d vdop %3d mode %3d",
+						       log_gps->u.gps.course,
+						       log_gps->u.gps.ground_speed,
+						       log_gps->u.gps.climb_rate,
+						       log_gps->u.gps.pdop,
+						       log_gps->u.gps.hdop,
+						       log_gps->u.gps.vdop,
+						       log_gps->u.gps.mode);
+						break;
+					case AO_LOG_GPS_SAT:
+						printf(" channels %2d",
+						       log_gps->u.gps_sat.channels);
+						for (i = 0; i < 12; i++) {
+							printf(" svid %3d c_n %2d",
+							       log_gps->u.gps_sat.sats[i].svid,
+							       log_gps->u.gps_sat.sats[i].c_n);
+						}
+						break;
+					default:
+						printf (" unknown");
+						break;
+					}
 					break;
 				case AO_LOG_FORMAT_DETHERM:
 					break;

@@ -97,6 +97,8 @@ public class AltosConfigFCUI
 
 	ActionListener		listener;
 
+	static final String	title = "Configure Flight Computer";
+
 	static String[] 	main_deploy_values_m = {
 		"100", "150", "200", "250", "300", "350",
 		"400", "450", "500"
@@ -119,6 +121,7 @@ public class AltosConfigFCUI
 		"Dual Deploy",
 		"Redundant Apogee",
 		"Redundant Main",
+		"Separation & Apogee",
 	};
 
 	static String[] 	aprs_interval_values = {
@@ -310,6 +313,22 @@ public class AltosConfigFCUI
 		}
 	}
 
+	void set_pad_orientation_values() {
+		String [] new_values;
+		if (has_radio())
+			new_values = pad_orientation_values_radio;
+		else
+			new_values = pad_orientation_values_no_radio;
+		if (new_values != pad_orientation_values) {
+			int id = pad_orientation_value.getSelectedIndex();
+			pad_orientation_value.removeAllItems();
+			pad_orientation_values = new_values;
+			for (int i = 0; i < new_values.length; i++)
+				pad_orientation_value.addItem(pad_orientation_values[i]);
+			pad_orientation_value.setSelectedIndex(id);
+		}
+	}
+
 	void set_accel_tool_tips() {
 		if (accel_plus_value.isVisible()) {
 			accel_plus_value.setToolTipText("Pad acceleration value in flight orientation");
@@ -329,7 +348,7 @@ public class AltosConfigFCUI
 
 	/* Build the UI using a grid bag */
 	public AltosConfigFCUI(JFrame in_owner, boolean remote) {
-		super (in_owner, "Configure Flight Computer", false);
+		super (in_owner, title, false);
 
 		owner = in_owner;
 		GridBagConstraints c;
@@ -338,7 +357,8 @@ public class AltosConfigFCUI
 		Insets il = new Insets(4,4,4,4);
 		Insets ir = new Insets(4,4,4,4);
 
-		pane = getContentPane();
+		pane = getScrollablePane();
+
 		pane.setLayout(new GridBagLayout());
 
 		/* Product */
@@ -787,10 +807,7 @@ public class AltosConfigFCUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		if (has_radio())
-			pad_orientation_values = pad_orientation_values_radio;
-		else
-			pad_orientation_values = pad_orientation_values_no_radio;
+		pad_orientation_values = pad_orientation_values_no_radio;
 
 		pad_orientation_value = new JComboBox<String>(pad_orientation_values);
 		pad_orientation_value.setEditable(false);
@@ -1030,11 +1047,13 @@ public class AltosConfigFCUI
 
 	public void set_dirty() {
 		dirty = true;
+		setTitle(title + " (modified)");
 		save.setEnabled(true);
 	}
 
 	public void set_clean() {
 		dirty = false;
+		setTitle(title);
 		save.setEnabled(false);
 	}
 
@@ -1062,13 +1081,13 @@ public class AltosConfigFCUI
 		if (cmd.equals("Close") || cmd.equals("Reboot"))
 			if (!check_dirty(cmd))
 				return;
+		if (cmd.equals("Save"))
+			save.setEnabled(false);
 		listener.actionPerformed(e);
 		if (cmd.equals("Close") || cmd.equals("Reboot")) {
 			setVisible(false);
 			dispose();
 		}
-		if (cmd.equals("Save") || cmd.equals("Reset"))
-			set_clean();
 	}
 
 	/* ItemListener interface method */
@@ -1101,6 +1120,7 @@ public class AltosConfigFCUI
 		set_pad_orientation_tool_tip();
 		set_accel_tool_tips();
 		set_flight_log_max_tool_tip();
+		set_pad_orientation_values();
 	}
 
 	public void set_version(String version) {

@@ -23,7 +23,6 @@
 
 #define AO_STACK_SIZE	320
 
-#define HAS_TASK_QUEUE		1
 
 #define IS_FLASH_LOADER	0
 
@@ -96,7 +95,6 @@
 #define AO_CC1200_SPI_CS_PIN	3
 #define AO_CC1200_SPI_BUS	0
 #define AO_CC1200_SPI		0
-#define AO_CC1200_SPI_SPEED	AO_SPI_SPEED_8MHz
 
 #define AO_CC1200_INT_PORT	0
 #define AO_CC1200_INT_PIN	2

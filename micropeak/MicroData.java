@@ -34,8 +34,10 @@ public class MicroData {
 
 	private double		time_step;
 	private ArrayList<Integer>	bytes;
+	public int		nsamples;
 	public int		log_id;
 	String			name;
+	String			unique_id;
 
 	public static final int LOG_ID_MICROPEAK = 0;
 	public static final int LOG_ID_MICROKITE = 1;
@@ -132,6 +134,21 @@ public class MicroData {
 			v += get_hex(f) << (i * 8);
 		}
 		return v;
+	}
+
+	private String get_line(InputStream f) throws IOException, FileEndedException, NonHexcharException {
+		int c;
+		StringBuffer line = new StringBuffer();
+
+		do {
+			c = f.read();
+		} while (Character.isWhitespace(c));
+
+		do {
+			line.append((char) c);
+			c = f.read();
+		} while (!Character.isWhitespace(c));
+		return new String(line);
 	}
 
 	private int swap16(int i) {
@@ -277,10 +294,14 @@ public class MicroData {
 			file_crc = 0xffff;
 			ground_pressure = get_32(f);
 			min_pressure = get_32(f);
-			int nsamples = get_16(f);
+			nsamples = get_16(f);
 
 			log_id = nsamples >> 12;
 			nsamples &= 0xfff;
+			if (log_id == LOG_ID_MICROPEAK2) {
+				int nsamples_high = get_16(f);
+				nsamples |= (nsamples_high << 12);
+			}
 
 			cal_data.set_ground_pressure(ground_pressure);
 
@@ -328,6 +349,15 @@ public class MicroData {
 				flight_series.set_pressure(cur);
 			}
 
+			int current_crc = swap16(~file_crc & 0xffff);
+			int crc = get_16(f);
+
+			crc_valid = crc == current_crc;
+
+			if (log_id == LOG_ID_MICROPEAK2) {
+				unique_id = get_line(f);
+			}
+
 			flight_series.finish();
 
 			/* Build states */
@@ -335,8 +365,10 @@ public class MicroData {
 			flight_series.set_time(0);
 			flight_series.set_state(AltosLib.ao_flight_boost);
 
-			flight_series.set_time(flight_series.speed_series.max().time);
-			flight_series.set_state(AltosLib.ao_flight_coast);
+			if (flight_series.speed_series != null && flight_series.speed_series.max() != null) {
+				flight_series.set_time(flight_series.speed_series.max().time);
+				flight_series.set_state(AltosLib.ao_flight_coast);
+			}
 
 			flight_series.set_time(flight_series.height_series.max().time);
 			flight_series.set_state(AltosLib.ao_flight_drogue);
@@ -351,10 +383,6 @@ public class MicroData {
 
 			flight_stats = new AltosFlightStats(flight_series);
 
-			int current_crc = swap16(~file_crc & 0xffff);
-			int crc = get_16(f);
-
-			crc_valid = crc == current_crc;
 
 		} catch (FileEndedException fe) {
 			throw new IOException("File Ended Unexpectedly");

@@ -72,7 +72,7 @@ public class MicroSave extends JFileChooser {
 								      JOptionPane.YES_NO_OPTION);
 				if (r != JOptionPane.YES_OPTION)
 					continue;
-							      
+
 				if (!file.canWrite()) {
 					JOptionPane.showMessageDialog(frame,
 								      String.format("\"%s\" is not writable",
@@ -104,6 +104,6 @@ public class MicroSave extends JFileChooser {
 		setFileFilter(new FileNameExtensionFilter("MicroPeak data file",
 							  "mpd"));
 		setCurrentDirectory(AltosUIPreferences.last_logdir());
-		setSelectedFile(MicroFile.make());
+		setSelectedFile(MicroFile.make(data));
 	}
 }

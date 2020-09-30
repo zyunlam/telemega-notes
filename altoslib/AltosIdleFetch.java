@@ -227,7 +227,7 @@ public class AltosIdleFetch implements AltosDataProvider {
 		try {
 			boolean	matched = false;
 			/* Fetch config data from remote */
-			AltosConfigData config_data = new AltosConfigData(link);
+			AltosConfigData config_data = link.config_data();
 			listener.set_state(AltosLib.ao_flight_stateless);
 			for (AltosIdler idler : idlers) {
 				if (idler.matches(config_data)) {

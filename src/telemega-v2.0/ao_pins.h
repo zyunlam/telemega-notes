@@ -19,7 +19,6 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define HAS_TASK_QUEUE		1
 
 /* 8MHz High speed external crystal */
 #define AO_HSE			8000000
@@ -311,7 +310,6 @@ struct ao_adc {
 #define AO_CC1200_SPI_CS_PIN	5
 #define AO_CC1200_SPI_BUS	AO_SPI_2_PB13_PB14_PB15
 #define AO_CC1200_SPI		stm_spi2
-#define AO_CC1200_SPI_SPEED	AO_SPI_SPEED_FAST
 
 #define AO_CC1200_INT_PORT		(&stm_gpioe)
 #define AO_CC1200_INT_PIN		1

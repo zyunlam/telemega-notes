@@ -470,7 +470,7 @@ public class AltosScanUI
 		if (!open())
 			return;
 
-		Container		pane = getContentPane();
+		Container		pane = getScrollablePane();
 		GridBagConstraints	c = new GridBagConstraints();
 		Insets			i = new Insets(4,4,4,4);
 

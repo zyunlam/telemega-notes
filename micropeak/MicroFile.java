@@ -25,22 +25,29 @@ import org.altusmetrum.altosuilib_14.*;
 
 public class MicroFile {
 
-	public static File make(File directory, int year, int month, int day) {
+	public static File make(MicroData data, File directory, int year, int month, int day) {
+		String unique = "";
+		if (data != null && data.unique_id != null)
+			unique = String.format("-%s", data.unique_id);
 		for (int sequence = 1;; sequence++) {
-			String s = String.format("%04d-%02d-%02d-flight-%03d.mpd",
-						 year, month, day, sequence);
+			String s = String.format("%04d-%02d-%02d%s-flight-%03d.mpd",
+						 year, month, day, unique, sequence);
 			File file = new File(directory, s);
 			if (!file.exists())
 				return file;
 		}
 	}
 
-	public static File make(File directory) {
+	public static File make(MicroData data, File directory) {
 		Calendar	cal = Calendar.getInstance();
-		return make(directory, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
+		return make(data, directory, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
+	}
+
+	public static File make(MicroData data) {
+		return make(data, AltosUIPreferences.logdir());
 	}
 
 	public static File make() {
-		return make(AltosUIPreferences.logdir());
+		return make(null);
 	}
 }

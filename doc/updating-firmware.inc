@@ -84,7 +84,7 @@
 
 			Connect pin 6 and pin 1 of the companion
 			connector. Pin 1 can be identified by the square pad
-			around it, and then the pins could sequentially across
+			around it, and then the pins count sequentially across
 			the board. Be very careful to *not* short pin 8 to
 			anything as that is connected directly to the
 			battery. Pin 7 carries 3.3V and the board will crash
@@ -97,7 +97,7 @@
 
 			Connect pin 6 and pin 1 of the companion
 			connector. Pin 1 can be identified by the square pad
-			around it, and then the pins could sequentially across
+			around it, and then the pins count sequentially across
 			the board. Be very careful to *not* short pin 8 to
 			anything as that is connected directly to the
 			battery. Pin 7 carries 3.3V and the board will crash
@@ -111,7 +111,7 @@
 			Connect pin 5 and pin 1 of the debug connector, which
 			is the six holes next to the beeper. Pin 1 can be
 			identified by the square pad around it, and then the
-			pins could sequentially across the board, making Pin 5
+			pins count sequentially across the board, making Pin 5
 			the one on the other end of the row.
 			endif::easytimer[]
 
@@ -120,7 +120,7 @@
 
 			Connect pin 6 and pin 1 of the companion
 			connector. Pin 1 can be identified by the square pad
-			around it, and then the pins could sequentially across
+			around it, and then the pins count sequentially across
 			the board. Be very careful to *not* short pin 8 to
 			anything as that is connected directly to the
 			battery. Pin 7 carries 3.3V and the board will crash
@@ -134,7 +134,7 @@
 			Connect pin 6 and pin 1 of the debug connector, which
 			is the six holes next to the beeper. Pin 1 can be
 			identified by the square pad around it, and then the
-			pins could sequentially across the board, making Pin 6
+			pins count sequentially across the board, making Pin 6
 			the one on the other end of the row.
 			endif::easymini[]
 

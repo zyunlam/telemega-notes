@@ -103,18 +103,28 @@ ao_serial_init(void);
 
 /* SPI definitions */
 
-#define AO_SPI_SPEED_12MHz		4
-#define AO_SPI_SPEED_8MHz		6
-#define AO_SPI_SPEED_6MHz		8
-#define AO_SPI_SPEED_4MHz		12
-#define AO_SPI_SPEED_2MHz		24
-#define AO_SPI_SPEED_1MHz		48
-#define AO_SPI_SPEED_500kHz		96
-#define AO_SPI_SPEED_250kHz		192
-#define AO_SPI_SPEED_125kHz		384
-#define AO_SPI_SPEED_62500Hz		768
+#define _AO_SPI_SPEED_12MHz		4
+#define _AO_SPI_SPEED_8MHz		6
+#define _AO_SPI_SPEED_6MHz		8
+#define _AO_SPI_SPEED_4MHz		12
+#define _AO_SPI_SPEED_2MHz		24
+#define _AO_SPI_SPEED_1MHz		48
+#define _AO_SPI_SPEED_500kHz		96
+#define _AO_SPI_SPEED_250kHz		192
+#define _AO_SPI_SPEED_125kHz		384
+#define _AO_SPI_SPEED_62500Hz		768
 
-#define AO_SPI_SPEED_FAST	AO_SPI_SPEED_12MHz
+static inline uint32_t
+ao_spi_speed(uint32_t hz)
+{
+	if (hz >= 4000000) return _AO_SPI_SPEED_4MHz;
+	if (hz >= 2000000) return _AO_SPI_SPEED_2MHz;
+	if (hz >= 1000000) return _AO_SPI_SPEED_1MHz;
+	if (hz >=  500000) return _AO_SPI_SPEED_500kHz;
+	if (hz >=  250000) return _AO_SPI_SPEED_250kHz;
+	if (hz >=  125000) return _AO_SPI_SPEED_125kHz;
+	return _AO_SPI_SPEED_62500Hz;
+}
 
 #define AO_BOOT_APPLICATION_BASE	((uint32_t *) 0x00001000)
 #define AO_BOOT_APPLICATION_BOUND	((uint32_t *) (0x00000000 + 32 * 1024))

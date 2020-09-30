@@ -19,7 +19,9 @@
 #define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
 
-#define AO_STACK_SIZE	376
+#define AO_STACK_SIZE		360
+#define SLEEP_HASH_SIZE		3
+#define AO_NUM_TASKS		6
 
 #define IS_FLASH_LOADER	0
 
@@ -93,6 +95,7 @@
 #define USE_INTERNAL_FLASH	0
 #define HAS_IGNITE		1
 #define HAS_IGNITE_REPORT	1
+#define SLEEP_HASH_SIZE		3
 
 #define AO_DATA_RING		16
 

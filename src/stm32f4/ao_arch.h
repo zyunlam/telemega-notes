@@ -22,10 +22,6 @@
 #define AO_STACK_SIZE	2048
 #endif
 
-#ifndef HAS_TASK_QUEUE
-#define HAS_TASK_QUEUE 1
-#endif
-
 #define AO_STACK_ALIGNMENT __attribute__ ((aligned(8)))
 
 #define AO_PORT_TYPE	uint16_t

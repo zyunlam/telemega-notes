@@ -76,6 +76,6 @@ done
 
 echo 'E 1' > $dev
 
-./test-telemega
+./test-telemega-v3.0
 
 exit $?

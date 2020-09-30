@@ -39,6 +39,8 @@ static uint8_t ao_radio_abort;		/* radio operation should abort */
 
 #define FOSC	26000000
 
+#define AO_CC115L_SPI_SPEED	ao_spi_speed(6500000)	/* for back-to-back access */
+
 #define ao_radio_select()	ao_spi_get_mask(AO_CC115L_SPI_CS_PORT,(1 << AO_CC115L_SPI_CS_PIN),AO_CC115L_SPI_BUS,AO_CC115L_SPI_SPEED)
 #define ao_radio_deselect()	ao_spi_put_mask(AO_CC115L_SPI_CS_PORT,(1 << AO_CC115L_SPI_CS_PIN),AO_CC115L_SPI_BUS)
 #define ao_radio_spi_send(d,l)	ao_spi_send((d), (l), AO_CC115L_SPI_BUS)

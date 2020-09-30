@@ -1,4 +1,16 @@
 #!/bin/bash
+#
+# Fix fonts. I don't know why the getting the
+# basename of the app set to . matters, but it does
+#
+case "$0" in
+    /*)
+        cd `dirname "$0"`
+        ./`basename "$0"` "$@"
+        exit $?
+        ;;
+esac
+export FREETYPE_PROPERTIES=truetype:interpreter-version=35
 ##################################################################################
 #                                                                                #
 # universalJavaApplicationStub                                                   #

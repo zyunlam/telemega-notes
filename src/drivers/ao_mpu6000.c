@@ -32,7 +32,9 @@ static uint8_t	ao_mpu6000_configured;
 
 #if AO_MPU6000_SPI
 
-#define ao_mpu6000_spi_get()	ao_spi_get(AO_MPU6000_SPI_BUS, AO_SPI_SPEED_1MHz)
+#define AO_MPU6000_SPI_SPEED	ao_spi_speed(1000000)	/* 1Mhz for all register access */
+
+#define ao_mpu6000_spi_get()	ao_spi_get(AO_MPU6000_SPI_BUS, AO_MPU6000_SPI_SPEED)
 #define ao_mpu6000_spi_put()	ao_spi_put(AO_MPU6000_SPI_BUS)
 
 #define ao_mpu6000_spi_start() 	ao_spi_set_cs(AO_MPU6000_SPI_CS_PORT,	\
@@ -383,7 +385,7 @@ ao_mpu6000_init(void)
 	 */
 
 	ao_cur_task = &ao_mpu6000_task;
-	ao_spi_get(AO_MPU6000_SPI_BUS, AO_SPI_SPEED_1MHz);
+	ao_mpu6000_spi_get();
 	ao_cur_task = NULL;
 #endif
 

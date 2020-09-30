@@ -158,7 +158,6 @@ struct ao_adc {
 #define AO_CC1200_SPI_CS_PIN    1
 #define AO_CC1200_SPI_BUS       AO_SPI_1_PA5_PA6_PA7
 #define AO_CC1200_SPI           stm_spi1
-#define AO_CC1200_SPI_SPEED     AO_SPI_SPEED_6MHz
 
 #define AO_CC1200_INT_PORT              (&stm_gpioa)
 #define AO_CC1200_INT_PIN               4

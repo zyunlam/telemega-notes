@@ -18,9 +18,8 @@
 
 #ifndef _AO_TASK_H_
 #define _AO_TASK_H_
-#if HAS_TASK_QUEUE
+
 #include <ao_list.h>
-#endif
 
 #ifndef HAS_TASK_INFO
 #define HAS_TASK_INFO 1
@@ -38,7 +37,7 @@
 /* An AltOS task */
 struct ao_task {
 	void *wchan;			/* current wait channel (NULL if running) */
-	uint16_t alarm;			/* abort ao_sleep time */
+	AO_TICK_TYPE alarm;		/* abort ao_sleep time */
 	uint16_t task_id;		/* unique id */
 	/* Saved stack pointer */
 	union {
@@ -46,10 +45,8 @@ struct ao_task {
 		uint8_t		*sp8;
 	};
 	const char *name;		/* task name */
-#if HAS_TASK_QUEUE
 	struct ao_list	queue;
 	struct ao_list	alarm_queue;
-#endif
 	/* Provide both 32-bit and 8-bit stacks */
 	union {
 		uint32_t stack32[AO_STACK_SIZE>>2];
@@ -66,8 +63,6 @@ struct ao_task {
 #ifndef AO_NUM_TASKS
 #define AO_NUM_TASKS		16	/* maximum number of tasks */
 #endif
-
-#define AO_NO_TASK		0	/* no task id */
 
 extern struct ao_task * ao_tasks[AO_NUM_TASKS];
 extern uint8_t ao_num_tasks;
@@ -96,7 +91,7 @@ ao_sleep(void *wchan);
  *  1 on alarm
  */
 uint8_t
-ao_sleep_for(void *wchan, uint16_t timeout);
+ao_sleep_for(void *wchan, AO_TICK_TYPE timeout);
 
 /* Wake all tasks sleeping on wchan */
 void
@@ -105,7 +100,7 @@ ao_wakeup(void *wchan);
 #if 0
 /* set an alarm to go off in 'delay' ticks */
 void
-ao_alarm(uint16_t delay);
+ao_alarm(AO_TICK_TYPE delay);
 
 /* Clear any pending alarm */
 void
@@ -120,16 +115,24 @@ ao_yield(void) ao_arch_naked_declare;
 void
 ao_add_task(struct ao_task * task, void (*start)(void), const char *name);
 
-#if HAS_TASK_QUEUE
 /* Called on timer interrupt to check alarms */
-extern uint16_t	ao_task_alarm_tick;
+extern AO_TICK_TYPE		ao_task_alarm_tick;
+extern volatile AO_TICK_TYPE	ao_tick_count;
+
 void
-ao_task_check_alarm(uint16_t tick);
+ao_task_alarm(AO_TICK_TYPE tick);
+
+static inline void
+ao_task_check_alarm(void) {
+#if HAS_TASK
+	if ((AO_TICK_SIGNED) (ao_tick_count - ao_task_alarm_tick) >= 0)
+		ao_task_alarm(ao_tick_count);
 #endif
+}
 
 /* Terminate the current task */
 void
-ao_exit(void);
+ao_exit(void) __attribute__ ((noreturn));
 
 /* Dump task info to console */
 void
@@ -139,11 +142,7 @@ ao_task_info(void);
 void
 ao_start_scheduler(void) __attribute__((noreturn));
 
-#if HAS_TASK_QUEUE
 void
 ao_task_init(void);
-#else
-#define ao_task_init()
-#endif
 
 #endif

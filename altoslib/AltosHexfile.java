@@ -287,6 +287,8 @@ public class AltosHexfile {
 		return null;
 	}
 
+	private static final int look_around[] = { 0, -2, 2, -4, 4 };
+
 	private long find_usb_descriptors() {
 		AltosHexsym	usb_descriptors = lookup_symbol("ao_usb_descriptors");
 		long		a;
@@ -294,24 +296,22 @@ public class AltosHexfile {
 		if (usb_descriptors == null)
 			return -1;
 
-		try {
-			/* The address of this has moved depending on
-			 * padding in the linker script. Look forward
-			 * and backwards two bytes to see if we can find it
-			 */
-			a = usb_descriptors.address;
+		/* The address of this has moved depending on padding
+		 * in the linker script and romconfig symbols. Look
+		 * forward and backwards two and four bytes to see if
+		 * we can find it
+		 */
+		a = usb_descriptors.address;
 
-			if (get_u8(a) == 0x12 && get_u8(a+1) == AO_USB_DESC_DEVICE)
-				return a;
-			else if (get_u8(a+1) == 0x12 && get_u8(a+3) == AO_USB_DESC_DEVICE)
-				return a + 2;
-			else if (get_u8(a-2) == 0x12 && get_u8(a-1) == AO_USB_DESC_DEVICE)
-				return a - 2;
-
-			return -1;
-		} catch (ArrayIndexOutOfBoundsException ae) {
-			return -1;
+		for (int look : look_around) {
+			try {
+				if (get_u8(a + look) == 0x12 && get_u8(a + look + 1) == AO_USB_DESC_DEVICE)
+					return a;
+			} catch (ArrayIndexOutOfBoundsException ae) {
+				continue;
+			}
 		}
+		return -1;
 	}
 
 	public AltosUsbId find_usb_id() {

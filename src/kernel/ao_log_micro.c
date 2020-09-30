@@ -19,26 +19,24 @@
 #include <ao.h>
 #include <ao_micropeak.h>
 #include <ao_log_micro.h>
-#ifndef ao_async_byte
+#ifndef LOG_MICRO_ASYNC
+#define LOG_MICRO_ASYNC 1
+#endif
+#if LOG_MICRO_ASYNC
 #include <ao_async.h>
 #else
 #include <ao_serial.h>
 #endif
 #include <ao_storage.h>
 
-static uint16_t ao_log_offset = STARTING_LOG_OFFSET;
+static N_SAMPLES_TYPE ao_log_offset = STARTING_LOG_OFFSET;
 
-#define AO_LOG_ID_SHIFT	12
-#define AO_LOG_ID_MASK	((1 << AO_LOG_ID_SHIFT) - 1)
 
 void
 ao_log_micro_save(void)
 {
-	uint16_t	n_samples = (ao_log_offset - STARTING_LOG_OFFSET) / sizeof (uint16_t);
+	N_SAMPLES_TYPE	n_samples = (ao_log_offset - STARTING_LOG_OFFSET) / sizeof (uint16_t);
 
-#if AO_LOG_ID
-	n_samples |= AO_LOG_ID << AO_LOG_ID_SHIFT;
-#endif
 	ao_eeprom_write(PA_GROUND_OFFSET, &pa_ground, sizeof (pa_ground));
 	ao_eeprom_write(PA_MIN_OFFSET, &pa_min, sizeof (pa_min));
 	ao_eeprom_write(N_SAMPLES_OFFSET, &n_samples, sizeof (n_samples));
@@ -88,24 +86,26 @@ ao_log_hex_nibble(uint8_t b)
 		ao_async_byte('a' - 10 + b);
 }
 
-static void
+void
 ao_log_hex(uint8_t b)
 {
 	ao_log_hex_nibble(b>>4);
 	ao_log_hex_nibble(b&0xf);
 }
 
-static void
+void
 ao_log_newline(void)
 {
 	ao_async_byte('\r');
 	ao_async_byte('\n');
 }
 
+#define MAX_N_SAMPLES	((MAX_LOG_OFFSET - STARTING_LOG_OFFSET) / 2)
+
 void
 ao_log_micro_dump(void)
 {
-	uint16_t	n_samples;
+	N_SAMPLES_TYPE	n_samples;
 	uint16_t	nbytes;
 	uint8_t		byte;
 	uint16_t	b;
@@ -113,12 +113,24 @@ ao_log_micro_dump(void)
 
 	ao_eeprom_read(N_SAMPLES_OFFSET, &n_samples, sizeof (n_samples));
 
-	if (n_samples == 0xffff)
+	if (n_samples == (N_SAMPLES_TYPE) (~0))
 		n_samples = 0;
-#if AO_LOG_ID
-	n_samples &= AO_LOG_ID_MASK;
-#endif
 	nbytes = STARTING_LOG_OFFSET + sizeof (uint16_t) * n_samples;
+
+	/*
+	 * Rewrite n_samples so that it includes the log ID value with
+	 * 32-bit n_samples split into two chunks
+	 */
+	if (sizeof (n_samples) > 2) {
+		N_SAMPLES_TYPE	n_samples_low;
+		N_SAMPLES_TYPE	n_samples_high;
+		n_samples_low = n_samples & ((1 << AO_LOG_ID_SHIFT) - 1);
+		n_samples_high = (n_samples - n_samples_low) << AO_LOG_ID_WIDTH;
+		n_samples = n_samples_low | n_samples_high;
+	}
+#if AO_LOG_ID
+	n_samples |= AO_LOG_ID << AO_LOG_ID_SHIFT;
+#endif
 	ao_async_start();
 	ao_async_byte('M');
 	ao_async_byte('P');
@@ -126,6 +138,11 @@ ao_log_micro_dump(void)
 		if ((b & 0xf) == 0)
 			ao_log_newline();
 		ao_eeprom_read(b, &byte, 1);
+#if AO_LOG_ID
+		if (N_SAMPLES_OFFSET <= b && b < (N_SAMPLES_OFFSET + sizeof(n_samples))) {
+			byte = n_samples >> ((b - N_SAMPLES_OFFSET) << 3);
+		}
+#endif
 		ao_log_hex(byte);
 		crc = ao_log_micro_crc(crc, byte);
 	}
