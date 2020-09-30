@@ -73,7 +73,7 @@ load-slow: $(HEX)
 distclean:	clean
 
 clean:
-	rm -f *.o *.elf *.ihx $(SCRIPT)
+	rm -f *.o *.elf *.ihx *.map $(SCRIPT)
 	rm -f ao_product.h
 
 publish: $(PUBLISH_HEX) $(PUBLISH_SCRIPT)

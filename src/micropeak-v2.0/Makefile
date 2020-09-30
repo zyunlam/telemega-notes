@@ -75,7 +75,7 @@ $(PROG): Makefile $(OBJ) micropeak.ld
 distclean:	clean
 
 clean:
-	rm -f *.o *.elf *.ihx
+	rm -f *.o *.elf *.ihx *.map
 	rm -f ao_product.h
 
 publish: $(PUBLISH_HEX)
