@@ -132,6 +132,7 @@ public class AltosLib {
 	public final static int product_usbtrng = 0x0029;
 	public final static int product_usbrelay = 0x002a;
 	public final static int product_mpusb = 0x002b;
+	public final static int product_easymotor = 0x002c;
 	public final static int product_altusmetrum_min = 0x000a;
 	public final static int product_altusmetrum_max = 0x002c;
 
@@ -164,7 +165,8 @@ public class AltosLib {
 		new Product("telegps", product_telegps),
 		new Product("easymini", product_easymini),
 		new Product("telemini", product_telemini),
-		new Product("easymega", product_easymega)
+		new Product("easymega", product_easymega),
+		new Product("easymotor", product_easymotor)
 	};
 
 	public static int name_to_product(String name) {
@@ -602,6 +604,7 @@ public class AltosLib {
 		case product_telegps: return "TeleGPS";
 		case product_easymini: return "EasyMini";
 		case product_telemini: return "TeleMini";
+		case product_easymotor: return "EasyMotor";
 		default: return "unknown";
 		}
 	}
