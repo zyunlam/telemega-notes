@@ -105,7 +105,7 @@ struct ao_adxl375_total {
 
 #define MIN_LSB_G	18.4
 #define MAX_LSB_G	22.6
-#define SELF_TEST_MIN_G	6.0
+#define SELF_TEST_MIN_G	5.0
 #define SELF_TEST_MAX_G	6.8
 
 #define MIN_SELF_TEST	((int32_t) (MIN_LSB_G * SELF_TEST_MIN_G * AO_ADXL375_SELF_TEST_SAMPLES + 0.5))
