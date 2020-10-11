@@ -202,6 +202,7 @@ ao_flight(void)
 			break;
 
 		case ao_flight_idle:
+		case ao_flight_invalid:
 			printf("accel %ld speed %ld\n", ao_accel, ao_speed);
 			break;
 
