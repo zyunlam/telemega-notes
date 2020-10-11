@@ -226,8 +226,9 @@ ao_flight(void)
 #if HAS_ACCEL
 			    || (ao_accel > AO_MSS_TO_ACCEL(20)
 #if HAS_BARO
-				&& ao_speed > AO_MS_TO_SPEED(5))
+				&& ao_speed > AO_MS_TO_SPEED(5)
 #endif
+)
 #endif
 				)
 			{
