@@ -200,6 +200,11 @@ ao_flight(void)
 			ao_wakeup(&ao_flight_state);
 
 			break;
+
+		case ao_flight_idle:
+			printf("accel %ld speed %ld\n", ao_accel, ao_speed);
+			break;
+
 		case ao_flight_pad:
 			/* pad to boost:
 			 *
