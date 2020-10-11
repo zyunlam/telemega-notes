@@ -199,4 +199,8 @@ extern ao_v_t			ao_error_a;
 
 void ao_kalman(void);
 
+#if !HAS_BARO
+void ao_kalman_reset_accumulate(void);
+#endif
+
 #endif /* _AO_SAMPLE_H_ */

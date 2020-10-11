@@ -322,6 +322,10 @@ ao_sample_preflight_update(void)
 		++nsamples;
 	else
 		ao_sample_preflight_set();
+#if !HAS_BARO
+	if ((nsamples & 0x3f) == 0)
+		ao_kalman_reset_accumulate();
+#endif
 }
 
 #if 0
