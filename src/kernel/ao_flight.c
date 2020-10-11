@@ -251,10 +251,7 @@ ao_flight(void)
 			if (ao_height > AO_M_TO_HEIGHT(20)
 #if HAS_ACCEL
 			    || (ao_accel > AO_MSS_TO_ACCEL(20)
-#if HAS_BARO
-				&& ao_speed > AO_MS_TO_SPEED(5)
-#endif
-)
+				&& ao_speed > AO_MS_TO_SPEED(5))
 #endif
 				)
 			{
