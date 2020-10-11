@@ -157,6 +157,7 @@ struct ao_adc {
 
 #define AO_ADXL375_AXIS		x
 #define AO_ADXL375_ACROSS_AXIS	y
+#define AO_ADXL375_THROUGH_AXIS	z
 #define AO_ADXL375_INVERT	0
 #define HAS_IMU			1
 #define USE_ADXL375_IMU		1
