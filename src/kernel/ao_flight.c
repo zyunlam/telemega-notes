@@ -201,10 +201,12 @@ ao_flight(void)
 
 			break;
 
+#if 0
 		case ao_flight_idle:
 		case ao_flight_invalid:
 			printf("+g %d ga %d sa %d accel %ld speed %ld\n", ao_config.accel_plus_g, ao_ground_accel, ao_sample_accel, ao_accel, ao_speed);
 			break;
+#endif
 
 		case ao_flight_pad:
 			/* pad to boost:
@@ -222,8 +224,10 @@ ao_flight(void)
 			 */
 			if (ao_height > AO_M_TO_HEIGHT(20)
 #if HAS_ACCEL
-			    || (ao_accel > AO_MSS_TO_ACCEL(20) &&
-				ao_speed > AO_MS_TO_SPEED(5))
+			    || (ao_accel > AO_MSS_TO_ACCEL(20)
+#if HAS_BARO
+				&& ao_speed > AO_MS_TO_SPEED(5))
+#endif
 #endif
 				)
 			{
