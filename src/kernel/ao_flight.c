@@ -203,7 +203,7 @@ ao_flight(void)
 
 		case ao_flight_idle:
 		case ao_flight_invalid:
-			printf("accel %ld speed %ld\n", ao_accel, ao_speed);
+			printf("+g %d ga %d sa %d accel %ld speed %ld\n", ao_config.accel_plus_g, ao_ground_accel, ao_sample_accel, ao_accel, ao_speed);
 			break;
 
 		case ao_flight_pad:
