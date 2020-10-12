@@ -311,6 +311,25 @@ public class AltosConvert {
 		return easy_mini_2_adc(sensor) * supply * 127/27;
 	}
 
+	static double motor_pressure(double voltage) {
+		double	base = 0.5;
+		double	max = 4.5;
+		double	full_scale_pressure = psi_to_pa(1600);
+
+		if (voltage < base)
+			voltage = base;
+		if (voltage > max)
+			voltage = max;
+		return (voltage - base) / (max - base) * full_scale_pressure;
+	}
+
+	static double easy_motor_2_motor_pressure(int sensor) {
+		double	supply = 3.3;
+		double	voltage = easy_mini_2_adc(sensor) * supply * 15.6 / 10.0;
+
+		return motor_pressure(voltage);
+	}
+
 	public static double radio_to_frequency(int freq, int setting, int cal, int channel) {
 		double	f;
 
