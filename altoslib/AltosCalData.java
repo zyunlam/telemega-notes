@@ -333,7 +333,9 @@ public class AltosCalData {
 		return AltosIMU.convert_accel(counts - accel_zero_through, imu_type);
 	}
 
-	public double	gyro_zero_roll,	gyro_zero_pitch, gyro_zero_yaw;
+	public double	gyro_zero_roll = AltosLib.MISSING;
+	public double	gyro_zero_pitch = AltosLib.MISSING;
+	public double	gyro_zero_yaw = AltosLib.MISSING;
 
 	public void set_gyro_zero(double roll, double pitch, double yaw) {
 		if (roll != AltosLib.MISSING) {
