@@ -286,11 +286,16 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	private void compute_height() {
-		double ground_altitude = cal_data().ground_altitude;
-		if (height_series == null && ground_altitude != AltosLib.MISSING && altitude_series != null) {
-			height_series = add_series(height_name, AltosConvert.height);
-			for (AltosTimeValue alt : altitude_series)
-				height_series.add(alt.time, alt.value - ground_altitude);
+		if (height_series == null) {
+			double ground_altitude = cal_data().ground_altitude;
+			if (ground_altitude != AltosLib.MISSING && altitude_series != null) {
+				height_series = add_series(height_name, AltosConvert.height);
+				for (AltosTimeValue alt : altitude_series)
+					height_series.add(alt.time, alt.value - ground_altitude);
+			} else if (speed_series != null) {
+				height_series = add_series(height_name, AltosConvert.height);
+				speed_series.integrate(height_series);
+			}
 		}
 
 		if (gps_height == null && cal_data().gps_pad != null && cal_data().gps_pad.alt != AltosLib.MISSING && gps_altitude != null) {
@@ -399,6 +404,9 @@ public class AltosFlightSeries extends AltosDataListener {
 			return;
 
 		if (cal_data.accel_zero_across == AltosLib.MISSING)
+			return;
+
+		if (cal_data.gyro_zero_roll == AltosLib.MISSING)
 			return;
 
 		AltosRotation rotation = new AltosRotation(accel_ground_across,
@@ -756,6 +764,16 @@ public class AltosFlightSeries extends AltosDataListener {
 	}
 
 	public void set_companion(AltosCompanion companion) {
+	}
+
+	public static final String motor_pressure_name = "Motor Pressure";
+
+	public AltosTimeSeries motor_pressure_series;
+
+	public void set_motor_pressure(double motor_pressure) {
+		if (motor_pressure_series == null)
+			motor_pressure_series = add_series(motor_pressure_name, AltosConvert.pressure);
+		motor_pressure_series.add(time(), motor_pressure);
 	}
 
 	public void finish() {

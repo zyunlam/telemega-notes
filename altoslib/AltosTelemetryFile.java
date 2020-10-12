@@ -49,6 +49,7 @@ class AltosTelemetryNullListener extends AltosDataListener {
 	public void set_igniter_voltage(double[] voltage) { }
 	public void set_pyro_fired(int pyro_mask) { }
 	public void set_companion(AltosCompanion companion) { }
+	public void set_motor_pressure(double motor_pressure) { }
 
 	public boolean cal_data_complete() {
 		/* All telemetry packets */
