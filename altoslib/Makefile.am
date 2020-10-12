@@ -49,6 +49,7 @@ altoslib_JAVA = \
 	AltosEepromRecordGps.java \
 	AltosEepromRecordFireTwo.java \
 	AltosEepromRecordMicroPeak2.java \
+	AltosEepromRecordMotor.java \
 	AltosEepromRecordSet.java \
 	AltosEepromChunk.java \
 	AltosEepromDownload.java \
