@@ -86,6 +86,7 @@ class AltosReplay extends AltosDataListener implements Runnable {
 	public void set_igniter_voltage(double[] voltage) { state.set_igniter_voltage(voltage); }
 	public void set_pyro_fired(int pyro_mask) { state.set_pyro_fired(pyro_mask); }
 	public void set_companion(AltosCompanion companion) { state.set_companion(companion); }
+	public void set_motor_pressure(double motor_pressure) { state.set_motor_pressure(motor_pressure); }
 
 	public void run () {
 		/* Run the flight */

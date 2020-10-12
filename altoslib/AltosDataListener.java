@@ -140,6 +140,7 @@ public abstract class AltosDataListener {
 	public abstract void set_igniter_voltage(double[] voltage);
 	public abstract void set_pyro_fired(int pyro_mask);
 	public abstract void set_companion(AltosCompanion companion);
+	public abstract void set_motor_pressure(double motor_pressure);
 
 	public AltosDataListener() {
 	}
