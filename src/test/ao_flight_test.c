@@ -19,6 +19,7 @@
 #define _GNU_SOURCE
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -58,6 +59,7 @@ int ao_gps_new;
 #define HAS_MMA655X		1
 #define HAS_HMC5883 		1
 #define HAS_BEEP		1
+#define HAS_BARO		1
 #define AO_CONFIG_MAX_SIZE	1024
 #define AO_MMA655X_INVERT	0
 
@@ -75,6 +77,7 @@ struct ao_adc {
 #define HAS_MMA655X		1
 #define AO_MMA655X_INVERT	0
 #define HAS_BEEP		1
+#define HAS_BARO		1
 #define AO_CONFIG_MAX_SIZE	1024
 
 struct ao_adc {
@@ -116,6 +119,7 @@ struct ao_adc {
 #define HAS_ACCEL 1
 #define HAS_ACCEL_REF 0
 #endif
+#define HAS_BARO		1
 
 #endif
 
