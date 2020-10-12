@@ -106,6 +106,9 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 		case AltosLib.AO_LOG_FORMAT_MICROPEAK2:
 			record = new AltosEepromRecordMicroPeak2(eeprom);
 			break;
+		case AltosLib.AO_LOG_FORMAT_EASYMOTOR:
+			record = new AltosEepromRecordMotor(eeprom);
+			break;
 		}
 
 		ordered = new TreeSet<AltosEepromRecord>();
