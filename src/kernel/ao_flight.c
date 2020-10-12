@@ -102,12 +102,14 @@ uint8_t			ao_flight_force_idle;
 
 #define abs(a)	((a) < 0 ? -(a) : (a))
 
+#if 0
 static bool accel_plus_g_failed;
 static bool accel_minus_g_failed;
 static bool accel_plus_failed;
 static bool accel_minus_failed;
 
 static char *btos(bool x) { return x? "true" : "false"; }
+#endif
 
 void
 ao_flight(void)
@@ -142,6 +144,7 @@ ao_flight(void)
 #endif
 				)
 			{
+#if 0
 				if (ao_config.accel_plus_g == 0)
 					accel_plus_g_failed = true;
 				if (ao_config.accel_minus_g == 0)
@@ -150,6 +153,7 @@ ao_flight(void)
 					accel_plus_failed = true;
 				if (ao_ground_accel > (accel_t) ao_config.accel_minus_g + ACCEL_NOSE_UP)
 					accel_minus_failed = true;
+#endif
 				/* Detected an accel value outside -1.5g to 1.5g
 				 * (or uncalibrated values), so we go into invalid mode
 				 */
@@ -216,6 +220,7 @@ ao_flight(void)
 
 			break;
 
+#if 0
 		case ao_flight_invalid:
 			printf("+g? %s -g? %s +? %s -? %s +g %d -g %d ga %d +g-NU %d -g+NU %d\n",
 			       btos(accel_plus_g_failed),
@@ -228,7 +233,6 @@ ao_flight(void)
 			       ao_config.accel_plus_g - ACCEL_NOSE_UP,
 			       ao_config.accel_minus_g + ACCEL_NOSE_UP);
 			break;
-#if 0
 		case ao_flight_idle:
 			printf("+g %d ga %d sa %d accel %ld speed %ld\n", ao_config.accel_plus_g, ao_ground_accel, ao_sample_accel, ao_accel, ao_speed);
 			break;
