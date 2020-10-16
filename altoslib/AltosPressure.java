@@ -23,28 +23,28 @@ public class AltosPressure extends AltosUnits {
 	public double value(double v, boolean imperial_units) {
 		if (imperial_units)
 			return AltosConvert.pa_to_psi(v);
-		return v;
+		return v / 1000.0;
 	}
 
 	public double inverse(double v, boolean imperial_units) {
 		if (imperial_units)
 			return AltosConvert.psi_to_pa(v);
-		return v;
+		return v * 1000.0;
 	}
 
 	public String show_units(boolean imperial_units) {
 		if (imperial_units)
 			return "psi";
-		return "Pa";
+		return "kPa";
 	}
 
 	public String say_units(boolean imperial_units) {
 		if (imperial_units)
 			return "p s i";
-		return "pascals";
+		return "kilopascals";
 	}
 
 	public int show_fraction(int width, boolean imperial_units) {
-		return width / 9;
+		return width / 5;
 	}
 }
