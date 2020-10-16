@@ -48,6 +48,9 @@ ao_log(void)
 	ao_log_data.type = AO_LOG_FLIGHT;
 	ao_log_data.tick = ao_sample_tick;
 	ao_log_data.u.flight.ground_accel = ao_ground_accel;
+	ao_log_data.u.flight.ground_accel_along = ao_ground_accel_along;
+	ao_log_data.u.flight.ground_accel_through = ao_ground_accel_through;
+	ao_log_data.u.flight.ground_motor_pressure = ao_ground_motor_pressure;
 	ao_log_data.u.flight.flight = ao_flight_number;
 	ao_log_write(&ao_log_data);
 
@@ -63,7 +66,7 @@ ao_log(void)
 			ao_log_data.tick = ao_data_ring[ao_log_data_pos].tick;
 			if ((int16_t) (ao_log_data.tick - next_sensor) >= 0) {
 				ao_log_data.type = AO_LOG_SENSOR;
-				ao_log_data.u.sensor.pressure = ao_data_ring[ao_log_data_pos].adc.pressure;
+				ao_log_data.u.sensor.pressure = ao_data_motor_pressure(&ao_data_ring[ao_log_data_pos]);
 				ao_log_data.u.sensor.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
 				ao_log_data.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
 				ao_log_data.u.sensor.accel_across = ao_data_across(&ao_data_ring[ao_log_data_pos]);

@@ -57,6 +57,9 @@ angle_t		ao_sample_orient;
 angle_t		ao_sample_orients[AO_NUM_ORIENT];
 uint8_t		ao_sample_orient_pos;
 #endif
+#ifdef HAS_MOTOR_PRESSURE
+motor_pressure_t	ao_sample_motor_pressure;
+#endif
 
 uint8_t		ao_sample_data;
 
@@ -87,6 +90,10 @@ int32_t		ao_ground_yaw;
 int32_t		ao_ground_roll;
 #endif
 
+#if HAS_MOTOR_PRESSURE
+motor_pressure_t	ao_ground_motor_pressure;
+#endif
+
 static uint8_t	ao_preflight;		/* in preflight mode */
 
 static uint16_t	nsamples;
@@ -106,6 +113,9 @@ int32_t ao_sample_pitch_sum;
 int32_t ao_sample_yaw_sum;
 int32_t	ao_sample_roll_sum;
 static struct ao_quaternion ao_rotation;
+#endif
+#if HAS_MOTOR_PRESSURE
+int32_t ao_sample_motor_pressure_sum;
 #endif
 
 #if HAS_FLIGHT_DEBUG
@@ -130,6 +140,9 @@ ao_sample_preflight_add(void)
 	ao_sample_pitch_sum += ao_sample_pitch;
 	ao_sample_yaw_sum += ao_sample_yaw;
 	ao_sample_roll_sum += ao_sample_roll;
+#endif
+#if HAS_MOTOR_PRESSURE
+	ao_sample_motor_pressure_sum += ao_sample_motor_pressure;
 #endif
 	++nsamples;
 }
@@ -198,6 +211,9 @@ ao_sample_preflight_set(void)
 	ao_ground_accel_across = ao_sample_accel_across_sum >> 9;
 	ao_ground_accel_through = ao_sample_accel_through_sum >> 9;
 
+#endif
+#if HAS_MOTOR_PRESSURE
+	ao_ground_motor_pressure = ao_sample_motor_pressure_sum >> 9;
 #endif
 #if HAS_GYRO
 	ao_ground_pitch = ao_sample_pitch_sum;
@@ -378,6 +394,9 @@ ao_sample(void)
 		ao_sample_pitch = ao_data_pitch(ao_data);
 		ao_sample_yaw = ao_data_yaw(ao_data);
 		ao_sample_roll = ao_data_roll(ao_data);
+#endif
+#if HAS_MOTOR_PRESSURE
+		ao_sample_motor_pressure = ao_data_motor_pressure(ao_data);
 #endif
 
 		if (ao_preflight)
