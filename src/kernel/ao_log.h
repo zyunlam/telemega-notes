@@ -514,7 +514,8 @@ struct ao_log_motor {
 			int16_t		ground_accel_along;	/* 8 */
 			int16_t		ground_accel_across;	/* 10 */
 			int16_t		ground_accel_through;	/* 12 */
-		} flight;
+			int16_t		ground_motor_pressure;	/* 14 */
+		} flight;					/* 16 */
 		/* AO_LOG_STATE */
 		struct {
 			uint16_t	state;			/* 4 */

@@ -104,14 +104,14 @@
 #define AO_DATA_RING		64
 
 struct ao_adc {
-	int16_t			pressure;
+	int16_t			motor_pressure;
 	int16_t			v_batt;
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: %5u pressure: %5d batt: %5d\n", \
+	printf("tick: %5u motor_pressure: %5d batt: %5d\n", \
 	       (p)->tick, \
-	       (p)->adc.pressure, \
+	       (p)->adc.motor_pressure, \
 	       (p)->adc.v_batt);
 
 
@@ -161,5 +161,11 @@ struct ao_adc {
 #define AO_ADXL375_INVERT	0
 #define HAS_IMU			1
 #define USE_ADXL375_IMU		1
+
+/* Motor pressure */
+#define HAS_MOTOR_PRESSURE	1
+#define ao_data_motor_pressure(packet) ((packet)->adc.motor_pressure)
+
+typedef int16_t	motor_pressure_t;
 
 #endif /* _AO_PINS_H_ */

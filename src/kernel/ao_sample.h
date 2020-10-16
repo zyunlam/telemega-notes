@@ -156,6 +156,10 @@ extern angle_t	ao_sample_orient;
 extern angle_t	ao_sample_orients[AO_NUM_ORIENT];
 extern uint8_t	ao_sample_orient_pos;
 #endif
+#if HAS_MOTOR_PRESSURE
+extern motor_pressure_t ao_ground_motor_pressure;
+extern motor_pressure_t ao_sample_motor_pressure;
+#endif
 
 void ao_sample_init(void);
 
