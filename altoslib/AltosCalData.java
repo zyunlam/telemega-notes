@@ -120,6 +120,13 @@ public class AltosCalData {
 			this.ground_accel = ground_accel;
 	}
 
+	public double		ground_motor_pressure = AltosLib.MISSING;
+
+	public void set_ground_motor_pressure(double ground_motor_pressure) {
+		if (ground_motor_pressure != AltosLib.MISSING)
+			this.ground_motor_pressure = ground_motor_pressure;
+	}
+
 	/* Raw acceleration value */
 	public double		accel = AltosLib.MISSING;
 

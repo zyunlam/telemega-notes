@@ -25,6 +25,7 @@ public class AltosEepromRecordMotor extends AltosEepromRecord {
 	private int ground_accel_along() { return data16(4); }
 	private int ground_accel_across() { return data16(6); }
 	private int ground_accel_through() { return data16(8); }
+	private int ground_motor_pressure() { return data16(10); }
 
 	/* AO_LOG_STATE elements */
 	private int state() { return data16(0); }
@@ -59,6 +60,7 @@ public class AltosEepromRecordMotor extends AltosEepromRecord {
 			listener.set_accel_ground(cal_data.accel_along(ground_accel_along()),
 						  cal_data.accel_across(ground_accel_across()),
 						  cal_data.accel_through(ground_accel_through()));
+			cal_data.set_ground_motor_pressure(ground_motor_pressure());
 			break;
 		case AltosLib.AO_LOG_STATE:
 			listener.set_state(state());
@@ -67,7 +69,7 @@ public class AltosEepromRecordMotor extends AltosEepromRecord {
 			AltosConfigData config_data = eeprom.config_data();
 
 			listener.set_battery_voltage(AltosConvert.easy_mini_2_voltage(v_batt()));
-			double pa = AltosConvert.easy_motor_2_motor_pressure(motor_pres());
+			double pa = AltosConvert.easy_motor_2_motor_pressure(motor_pres(), cal_data.ground_motor_pressure);
 			listener.set_motor_pressure(pa);
 
 			int	accel_along = accel_along();
