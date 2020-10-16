@@ -205,8 +205,13 @@ ao_cmd_decimal(void)
 {
 	uint32_t result = 0;
 	uint8_t	r = ao_cmd_lex_error;
+	bool negative = false;
 
 	ao_cmd_white();
+	if (ao_cmd_lex_c == '-') {
+		negative = true;
+		ao_cmd_lex();
+	}
 	for(;;) {
 		if ('0' <= ao_cmd_lex_c && ao_cmd_lex_c <= '9')
 			result = result * 10 + (ao_cmd_lex_c - '0');
@@ -217,6 +222,8 @@ ao_cmd_decimal(void)
 	}
 	if (r != ao_cmd_success)
 		ao_cmd_status = r;
+	if (negative)
+		result = -result;
 	return result;
 }
 
