@@ -102,6 +102,10 @@ uint8_t			ao_flight_force_idle;
 
 #define abs(a)	((a) < 0 ? -(a) : (a))
 
+#if !HAS_BARO
+#define DEBUG_ACCEL_ONLY	1
+#endif
+
 void
 ao_flight(void)
 {
