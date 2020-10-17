@@ -36,7 +36,7 @@ public class AltosEepromRecordMotor extends AltosEepromRecord {
 	private int v_batt() { return data16(2); }
 	private int accel() { return data16(4); }
 	private int accel_across() { return data16(6); }
-	private int accel_along() { return data16(8); }
+	private int accel_along() { return -data16(8); }
 	private int accel_through() { return data16(10); }
 
 	private int imu_type() {
