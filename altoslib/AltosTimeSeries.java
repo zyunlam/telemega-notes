@@ -342,6 +342,16 @@ public class AltosTimeSeries implements Iterable<AltosTimeValue>, Comparable<Alt
 		return f;
 	}
 
+	public AltosTimeSeries clip(AltosTimeSeries clip, double min, double max) {
+		for (AltosTimeValue v: values) {
+			double value = v.value;
+			if (value < min) value = min;
+			if (value > max) value = max;
+			clip.add(v.time, value);
+		}
+		return clip;
+	}
+
 	public AltosTimeSeries(String label, AltosUnits units) {
 		this.label = label;
 		this.units = units;
