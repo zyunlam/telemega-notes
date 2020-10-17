@@ -49,7 +49,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easytimer_v1:
 			return counts_per_g_bmx;
 		case imu_type_easymotor_v2:
-			return counts_per_g_bmx;
+			return counts_per_g_adxl;
 		default:
 			return AltosLib.MISSING;
 		}
@@ -195,7 +195,7 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easytimer_v1:
 			return accel_x;
 		case imu_type_easymotor_v2:
-			return accel_x;
+			return -accel_x;
 		default:
 			return AltosLib.MISSING;
 		}
