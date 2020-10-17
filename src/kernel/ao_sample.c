@@ -210,18 +210,18 @@ ao_sample_preflight_set(void)
 	ao_ground_accel_along = ao_sample_accel_along_sum >> 9;
 	ao_ground_accel_across = ao_sample_accel_across_sum >> 9;
 	ao_ground_accel_through = ao_sample_accel_through_sum >> 9;
-
+	ao_sample_accel_along_sum = 0;
+	ao_sample_accel_across_sum = 0;
+	ao_sample_accel_through_sum = 0;
 #endif
 #if HAS_MOTOR_PRESSURE
 	ao_ground_motor_pressure = ao_sample_motor_pressure_sum >> 9;
+	ao_sample_motor_pressure_sum = 0;
 #endif
 #if HAS_GYRO
 	ao_ground_pitch = ao_sample_pitch_sum;
 	ao_ground_yaw = ao_sample_yaw_sum;
 	ao_ground_roll = ao_sample_roll_sum;
-	ao_sample_accel_along_sum = 0;
-	ao_sample_accel_across_sum = 0;
-	ao_sample_accel_through_sum = 0;
 	ao_sample_pitch_sum = 0;
 	ao_sample_yaw_sum = 0;
 	ao_sample_roll_sum = 0;
@@ -257,7 +257,7 @@ ao_sample_preflight_set(void)
 		       (ao_ground_accel_across - ao_config.accel_zero_across),
 		       (ao_ground_accel_through - ao_config.accel_zero_through),
 		       (ao_ground_accel_along - ao_config.accel_zero_along));
-#endif	
+#endif
 
 	ao_sample_compute_orient();
 	ao_sample_set_all_orients();
