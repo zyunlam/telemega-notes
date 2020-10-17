@@ -348,8 +348,12 @@ public class AltosFlightSeries extends AltosDataListener {
 			else
 				accel_series.integrate(temp_series);
 
+			AltosTimeSeries clip_series = make_series(speed_name, AltosConvert.speed);
+
+			temp_series.clip(clip_series, 0, Double.POSITIVE_INFINITY);
+
 			accel_speed_series = make_series(speed_name, AltosConvert.speed);
-			temp_series.filter(accel_speed_series, 0.1);
+			clip_series.filter(accel_speed_series, 0.1);
 		}
 
 		if (alt_speed_series != null && accel_speed_series != null) {
