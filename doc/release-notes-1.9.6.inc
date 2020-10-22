@@ -10,3 +10,7 @@ include::release-head.adoc[]
           detect it early or not at all) due to small errors in
           accelerometer calibration leading to large accumulated error
           in speed.
+
+	* Adjust self-test of new 9-axis IMU (BMX-160) so that it
+	  doesn't think the part has a failure when tested sitting
+	  horizontally.
