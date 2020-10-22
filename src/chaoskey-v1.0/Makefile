@@ -83,7 +83,7 @@ check: $(METAINFO)
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx *.bin
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx *.bin $(PROGNAME)-*.map
 	rm -f ao_product.h
 	rm -f *.cab
 

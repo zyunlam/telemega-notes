@@ -73,7 +73,7 @@ load: $(PROG)
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx $(PROGNAME)-*.map
 	rm -f ao_product.h
 
 install:

@@ -137,6 +137,9 @@ Section "Firmware"
 	File "../src/easymega-v1.0/easymega-v1.0-${VERSION}.ihx"
 	File "../src/easymega-v2.0/easymega-v2.0-${VERSION}.ihx"
 	File "../src/easytimer-v1/easytimer-v1-${VERSION}.ihx"
+	File "../src/telelco-v2.0/telelco-v2.0-${VERSION}.ihx"
+	File "../src/telefireeight-v1.0/telefireeight-v1.0-${VERSION}.ihx"
+	File "../src/telefireeight-v2.0/telefireeight-v2.0-${VERSION}.ihx"
 
 SectionEnd
 

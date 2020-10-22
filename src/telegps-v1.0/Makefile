@@ -78,7 +78,7 @@ $(OBJ): $(INC)
 distclean:	clean
 
 clean:
-	rm -f *.o ao_serial_lpc.h $(PROGNAME)-*.elf $(PROGNAME)-*.ihx
+	rm -f *.o ao_serial_lpc.h $(PROGNAME)-*.elf $(PROGNAME)-*.ihx $(PROGNAME)-*.map
 	rm -f ao_product.h
 
 install:

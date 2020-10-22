@@ -73,6 +73,18 @@ ao_spi_speed(uint32_t hz)
 
 #define AO_SPI_INDEX(id)	((id) & AO_SPI_INDEX_MASK)
 #define AO_SPI_CONFIG(id)	((id) & AO_SPI_CONFIG_MASK)
+#define AO_SPI_PIN_CONFIG(id)	((id) & (AO_SPI_INDEX_MASK | AO_SPI_CONFIG_MASK))
+
+#define AO_SPI_CPOL_BIT		4
+#define AO_SPI_CPHA_BIT		5
+#define AO_SPI_CPOL(id)		((uint32_t) (((id) >> AO_SPI_CPOL_BIT) & 1))
+#define AO_SPI_CPHA(id)		((uint32_t) (((id) >> AO_SPI_CPHA_BIT) & 1))
+
+#define AO_SPI_MAKE_MODE(pol,pha)	(((pol) << AO_SPI_CPOL_BIT) | ((pha) << AO_SPI_CPHA_BIT))
+#define AO_SPI_MODE_0		AO_SPI_MAKE_MODE(0,0)
+#define AO_SPI_MODE_1		AO_SPI_MAKE_MODE(0,1)
+#define AO_SPI_MODE_2		AO_SPI_MAKE_MODE(1,0)
+#define AO_SPI_MODE_3		AO_SPI_MAKE_MODE(1,1)
 
 uint8_t
 ao_spi_try_get(uint8_t spi_index, uint32_t speed, uint8_t task_id);

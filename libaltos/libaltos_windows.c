@@ -132,12 +132,12 @@ altos_ftdi_list_start(void)
 }
 
 static struct {
-	char	*windows;
-	char	*real;
+	unsigned int	vid, pid;
+	char	*name;
 } name_map[] = {
-	{ .windows = "AltusMetrum28", .real = "EasyMega" },
-	{ .windows = "AltusMetrum2c", .real = "EasyMotor" },
-	{ 0, 0 },
+	{ .vid = 0xfffe, .pid = 0x0028, .name = "EasyMega" },
+	{ .vid = 0xfffe, .pid = 0x002c, .name = "EasyMotor" },
+	{ .name = NULL },
 };
 
 PUBLIC int
@@ -240,15 +240,22 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 			altos_set_last_windows_error();
 			continue;
 		}
-		for (i = 0; name_map[i].windows; i++)
-			if (!strcmp(name_map[i].windows, friendlyname)) {
-				strcpy(friendlyname, name_map[i].real);
+
+		char *space = friendlyname;
+		while (*space) {
+			if (*space == ' ') {
+				*space = '\0';
 				break;
 			}
+			space++;
+		}
 
-		char *space = strchr(friendlyname, ' ');
-		if  (space)
-			*space = '\0';
+		for (i = 0; name_map[i].name; i++) {
+			if (name_map[i].vid == vid && name_map[i].pid == pid) {
+				strcpy(friendlyname, name_map[i].name);
+				break;
+			}
+		}
 
 		device->vendor = vid;
 		device->product = pid;

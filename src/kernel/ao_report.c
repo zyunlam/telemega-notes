@@ -286,6 +286,15 @@ ao_report(void)
 				pause(AO_MS_TO_TICKS(100));
 		}
 #endif
+#if HAS_PAD_REPORT
+		while (ao_flight_state == ao_flight_pad) {
+			uint8_t	c;
+			ao_report_flight_state();
+			c = 50;
+			while (c-- && ao_flight_state == ao_flight_pad)
+				pause(AO_MS_TO_TICKS(100));
+		}
+#endif
 		while (ao_report_state == ao_flight_state)
 			ao_sleep(&ao_flight_state);
 	}

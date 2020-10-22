@@ -133,16 +133,21 @@ extern accel_t	ao_ground_accel;	/* startup acceleration */
 extern accel_t 	ao_accel_2g;		/* factory accel calibration */
 extern int32_t	ao_accel_scale;		/* sensor to m/s² conversion */
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 extern accel_t	ao_ground_accel_along;
 extern accel_t	ao_ground_accel_across;
 extern accel_t	ao_ground_accel_through;
-extern int32_t	ao_ground_pitch;	/* * 512 */
-extern int32_t	ao_ground_yaw;		/* * 512 */
-extern int32_t	ao_ground_roll;		/* * 512 */
 extern accel_t	ao_sample_accel_along;
 extern accel_t	ao_sample_accel_across;
 extern accel_t	ao_sample_accel_through;
+#endif
+#if HAS_GYRO
+#ifndef HAS_IMU
+#define HAS_IMU	1
+#endif
+extern int32_t	ao_ground_pitch;	/* * 512 */
+extern int32_t	ao_ground_yaw;		/* * 512 */
+extern int32_t	ao_ground_roll;		/* * 512 */
 extern gyro_t	ao_sample_roll;
 extern gyro_t	ao_sample_pitch;
 extern gyro_t	ao_sample_yaw;
@@ -150,6 +155,10 @@ extern gyro_t	ao_sample_yaw;
 extern angle_t	ao_sample_orient;
 extern angle_t	ao_sample_orients[AO_NUM_ORIENT];
 extern uint8_t	ao_sample_orient_pos;
+#endif
+#if HAS_MOTOR_PRESSURE
+extern motor_pressure_t ao_ground_motor_pressure;
+extern motor_pressure_t ao_sample_motor_pressure;
 #endif
 
 void ao_sample_init(void);
@@ -193,5 +202,9 @@ extern ao_v_t			ao_error_a;
 #endif
 
 void ao_kalman(void);
+
+#if !HAS_BARO
+void ao_kalman_reset_accumulate(void);
+#endif
 
 #endif /* _AO_SAMPLE_H_ */

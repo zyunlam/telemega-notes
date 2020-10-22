@@ -120,6 +120,13 @@ public class AltosCalData {
 			this.ground_accel = ground_accel;
 	}
 
+	public double		ground_motor_pressure = AltosLib.MISSING;
+
+	public void set_ground_motor_pressure(double ground_motor_pressure) {
+		if (ground_motor_pressure != AltosLib.MISSING)
+			this.ground_motor_pressure = ground_motor_pressure;
+	}
+
 	/* Raw acceleration value */
 	public double		accel = AltosLib.MISSING;
 
@@ -333,7 +340,9 @@ public class AltosCalData {
 		return AltosIMU.convert_accel(counts - accel_zero_through, imu_type);
 	}
 
-	public double	gyro_zero_roll,	gyro_zero_pitch, gyro_zero_yaw;
+	public double	gyro_zero_roll = AltosLib.MISSING;
+	public double	gyro_zero_pitch = AltosLib.MISSING;
+	public double	gyro_zero_yaw = AltosLib.MISSING;
 
 	public void set_gyro_zero(double roll, double pitch, double yaw) {
 		if (roll != AltosLib.MISSING) {

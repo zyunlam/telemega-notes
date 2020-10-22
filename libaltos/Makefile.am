@@ -85,11 +85,12 @@ MINGLIBS=-lsetupapi -lws2_32
 
 fat: all altos.dll altos64.dll
 
-altos.dll: $(WINDOWS_SRC) $(WINDOWS_H)
-	$(MINGCC32) -o $@ $(MINGFLAGS) -shared $(WINDOWS_SRC) $(MINGLIBS)
+#altos.dll: $(WINDOWS_SRC) $(WINDOWS_H)
+#	$(MINGCC32) -o $@ $(MINGFLAGS) -shared $(WINDOWS_SRC) $(MINGLIBS)
 
-altos64.dll: $(WINDOWS_SRC) $(WINDOWS_H)
-	$(MINGCC64) -o $@ $(MINGFLAGS) -shared $(WINDOWS_SRC) $(MINGLIBS)
+#altos64.dll: $(WINDOWS_SRC) $(WINDOWS_H)
+#	$(MINGCC64) -o $@ $(MINGFLAGS) -shared $(WINDOWS_SRC) $(MINGLIBS)
 
 clean-local:
-	-rm -rf libaltosJNI *.class *.java classlibaltos.stamp $(SWIG_FILE) libaltos_wrap.c altos.dll altos64.dll
+	-rm -rf libaltosJNI *.class *.java classlibaltos.stamp $(SWIG_FILE) libaltos_wrap.c
+#	-rm -rf  altos.dll altos64.dll	

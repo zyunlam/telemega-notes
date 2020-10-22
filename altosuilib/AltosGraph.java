@@ -88,6 +88,8 @@ public class AltosGraph extends AltosUIGraph {
 	static final private AltosUILineStyle mag_through_color = new AltosUILineStyle();
 	static final private AltosUILineStyle mag_total_color = new AltosUILineStyle();
 
+	static final private AltosUILineStyle motor_pressure_color = new AltosUILineStyle();
+
 	static AltosUnits dop_units = null;
 	static AltosUnits tick_units = null;
 
@@ -100,6 +102,7 @@ public class AltosGraph extends AltosUIGraph {
 		AltosUIAxis	pressure_axis, thrust_axis;
 		AltosUIAxis	gyro_axis, orient_axis, mag_axis;
 		AltosUIAxis	course_axis, dop_axis, tick_axis;
+		AltosUIAxis	motor_pressure_axis;
 
 		if (stats != null && stats.serial != AltosLib.MISSING && stats.product != null && stats.flight != AltosLib.MISSING)
 			setName(String.format("%s %d flight %d\n", stats.product, stats.serial, stats.flight));
@@ -121,6 +124,8 @@ public class AltosGraph extends AltosUIGraph {
 		mag_axis = newAxis("Magnetic Field", AltosConvert.magnetic_field, mag_along_color, 0);
 		course_axis = newAxis("Course", AltosConvert.orient, gps_course_color, 0);
 		dop_axis = newAxis("Dilution of Precision", dop_units, gps_pdop_color, 0);
+
+		motor_pressure_axis = newAxis("Motor Pressure", AltosConvert.pressure, motor_pressure_color, 0);
 
 		flight_series.register_axis("default",
 					    speed_color,
@@ -351,6 +356,11 @@ public class AltosGraph extends AltosUIGraph {
 						    false,
 						    voltage_axis);
 		}
+
+		flight_series.register_axis(AltosUIFlightSeries.motor_pressure_name,
+					    motor_pressure_color,
+					    true,
+					    motor_pressure_axis);
 
 		flight_series.check_axes();
 

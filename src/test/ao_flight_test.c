@@ -19,6 +19,7 @@
 #define _GNU_SOURCE
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -47,7 +48,7 @@
 
 int ao_gps_new;
 
-#if !defined(TELEMEGA) && !defined(TELEMETRUM_V2) && !defined(EASYMINI)
+#if !defined(TELEMEGA) && !defined(TELEMETRUM_V2) && !defined(EASYMINI) && !defined(EASYMOTOR_V_2)
 #define TELEMETRUM_V1 1
 #endif
 
@@ -58,6 +59,7 @@ int ao_gps_new;
 #define HAS_MMA655X		1
 #define HAS_HMC5883 		1
 #define HAS_BEEP		1
+#define HAS_BARO		1
 #define AO_CONFIG_MAX_SIZE	1024
 #define AO_MMA655X_INVERT	0
 
@@ -75,6 +77,7 @@ struct ao_adc {
 #define HAS_MMA655X		1
 #define AO_MMA655X_INVERT	0
 #define HAS_BEEP		1
+#define HAS_BARO		1
 #define AO_CONFIG_MAX_SIZE	1024
 
 struct ao_adc {
@@ -116,6 +119,26 @@ struct ao_adc {
 #define HAS_ACCEL 1
 #define HAS_ACCEL_REF 0
 #endif
+#define HAS_BARO		1
+
+#endif
+
+#if EASYMOTOR_V_2
+#define AO_ADC_NUM_SENSE	0
+#define HAS_ADXL375		1
+#define HAS_BEEP		1
+#define AO_CONFIG_MAX_SIZE	1024
+#define USE_ADXL375_IMU		1
+#define AO_ADXL375_INVERT	0
+#define HAS_IMU			1
+#define AO_ADXL375_AXIS		x
+#define AO_ADXL375_ACROSS_AXIS	y
+#define AO_ADXL375_THROUGH_AXIS	z
+
+struct ao_adc {
+	int16_t			pressure;
+	int16_t			v_batt;
+};
 
 #endif
 
@@ -369,11 +392,15 @@ int16_t		ao_flight_number;
 
 extern uint16_t	ao_sample_tick;
 
+#if HAS_BARO
 extern alt_t	ao_sample_height;
+#endif
 extern accel_t	ao_sample_accel;
 extern int32_t	ao_accel_scale;
+#if HAS_BARO
 extern alt_t	ao_ground_height;
 extern alt_t	ao_sample_alt;
+#endif
 
 double ao_sample_qangle;
 
@@ -385,6 +412,7 @@ uint16_t	prev_tick;
 #include "ao_sqrt.c"
 #include "ao_sample.c"
 #include "ao_flight.c"
+#include "ao_data.c"
 #if TELEMEGA
 #define AO_PYRO_NUM	4
 
@@ -514,9 +542,11 @@ ao_insert(void)
 		prev_tick = ao_data_static.tick;
 		time = (double) (ao_data_static.tick + tick_offset) / 100;
 
+		double height = 0;
+#if HAS_BARO
 #if TELEMEGA || TELEMETRUM_V2 || EASYMINI
 		ao_ms5607_convert(&ao_data_static.ms5607_raw, &ao_data_static.ms5607_cooked);
-		double height = ao_pa_to_altitude(ao_data_static.ms5607_cooked.pres) - ao_ground_height;
+		height = ao_pa_to_altitude(ao_data_static.ms5607_cooked.pres) - ao_ground_height;
 
 		/* Hack to skip baro spike at accidental drogue charge
 		 * firing in 2015-09-26-serial-2093-flight-0012.eeprom
@@ -532,7 +562,8 @@ ao_insert(void)
 			}
 		}
 #else
-		double	height = ao_pres_to_altitude(ao_data_static.adc.pres_real) - ao_ground_height;
+		height = ao_pres_to_altitude(ao_data_static.adc.pres_real) - ao_ground_height;
+#endif
 #endif
 
 		if (ao_test_max_height < height) {
@@ -752,14 +783,20 @@ ao_sleep(void *wchan)
 #if TELEMETRUM_V1
 				ao_data_static.adc.accel = ao_flight_ground_accel;
 #endif
+#if EASYMOTOR_V_2
+				ao_data_static.adxl375.AO_ADXL375_AXIS = ao_flight_ground_accel;
+#endif
 
 				ao_insert();
 				return;
 			}
 
 			if (eeprom) {
-#if TELEMEGA
+#if TELEMEGA || EASYMOTOR_V_2
 				struct ao_log_mega	*log_mega;
+#endif
+#if EASYMOTOR_V_2
+				struct ao_log_motor	*log_motor;
 #endif
 #if TELEMETRUM_V2
 				struct ao_log_metrum	*log_metrum;
@@ -926,6 +963,63 @@ ao_sleep(void *wchan)
 						ao_data_static.adc.temp = log_record->u.temp_volt.temp;
 						ao_data_static.adc.v_batt = log_record->u.temp_volt.v_batt;
 						break;
+					}
+					break;
+#endif
+#if EASYMOTOR_V_2
+				case AO_LOG_FORMAT_TELEMEGA_3:
+					log_mega = (struct ao_log_mega *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_mega);
+					switch (log_mega->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_number = log_mega->u.flight.flight;
+						ao_flight_ground_accel = log_mega->u.flight.ground_accel;
+						ao_flight_started = 1;
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_mega->tick;
+						ao_data_static.adxl375.AO_ADXL375_AXIS = -log_mega->u.sensor.accel;
+						ao_records_read++;
+						ao_insert();
+						return;
+					}
+					break;
+				case AO_LOG_FORMAT_TELEMEGA_4:
+					log_mega = (struct ao_log_mega *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_mega);
+					switch (log_mega->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_number = log_mega->u.flight.flight;
+						ao_flight_ground_accel = log_mega->u.flight.ground_accel;
+						ao_flight_started = 1;
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_mega->tick;
+						ao_data_static.adxl375.AO_ADXL375_AXIS = log_mega->u.sensor.accel;
+						ao_records_read++;
+						ao_insert();
+						return;
+					}
+					break;
+				case AO_LOG_FORMAT_EASYMOTOR:
+					log_motor = (struct ao_log_motor *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_motor);
+					switch (log_motor->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_number = log_motor->u.flight.flight;
+						ao_flight_ground_accel = log_motor->u.flight.ground_accel;
+						ao_flight_started = 1;
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_motor->tick;
+						ao_data_static.adc.pressure = log_motor->u.sensor.pressure;
+						ao_data_static.adc.v_batt = log_motor->u.sensor.v_batt;
+						ao_data_static.adxl375.AO_ADXL375_AXIS = log_motor->u.sensor.accel_along;
+						ao_data_static.adxl375.AO_ADXL375_ACROSS_AXIS = log_motor->u.sensor.accel_across;
+						ao_data_static.adxl375.AO_ADXL375_THROUGH_AXIS = log_motor->u.sensor.accel_through;
+						ao_records_read++;
+						ao_insert();
+						return;
 					}
 					break;
 #endif

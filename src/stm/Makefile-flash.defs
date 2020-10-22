@@ -37,8 +37,8 @@ CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS)
 
 LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/stm -Taltos-loader.ld -n
 
-PROGNAME=altos-flash
-PROG=$(HARDWARE)-$(PROGNAME)-$(VERSION).elf
+PROGNAME=$(HARDWARE)-altos-flash
+PROG=$(PROGNAME)-$(VERSION).elf
 
 $(PROG): Makefile $(OBJ) altos-loader.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
@@ -50,7 +50,7 @@ all: $(PROG)
 distclean:	clean
 
 clean:
-	rm -f *.o $(HARDWARE)-$(PROGNAME)-*.elf
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.map
 	rm -f ao_product.h
 
 install:

@@ -25,7 +25,7 @@ struct ao_spi_stm_info {
 };
 
 static uint8_t		ao_spi_mutex[STM_NUM_SPI];
-static uint8_t		ao_spi_index[STM_NUM_SPI];
+static uint8_t		ao_spi_pin_config[STM_NUM_SPI];
 
 static const struct ao_spi_stm_info ao_spi_stm_info[STM_NUM_SPI] = {
 	{
@@ -358,11 +358,11 @@ ao_spi_duplex(void *out, void *in, uint16_t len, uint8_t spi_index)
 }
 
 static void
-ao_spi_disable_index(uint8_t spi_index)
+ao_spi_disable_pin_config(uint8_t spi_pin_config)
 {
-	/* Disable current config
+	/* disable config
 	 */
-	switch (spi_index) {
+	switch (spi_pin_config) {
 	case AO_SPI_1_PA5_PA6_PA7:
 		stm_gpio_set(&stm_gpioa, 5, 1);
 		stm_moder_set(&stm_gpioa, 5, STM_MODER_OUTPUT);
@@ -385,9 +385,11 @@ ao_spi_disable_index(uint8_t spi_index)
 }
 
 static void
-ao_spi_enable_index(uint8_t spi_index)
+ao_spi_enable_pin_config(uint8_t spi_pin_config)
 {
-	switch (spi_index) {
+	/* Disable current config
+	 */
+	switch (spi_pin_config) {
 	case AO_SPI_1_PA5_PA6_PA7:
 		stm_afr_set(&stm_gpioa, 5, STM_AFR_AF0);
 		stm_afr_set(&stm_gpioa, 6, STM_AFR_AF0);
@@ -409,6 +411,7 @@ ao_spi_enable_index(uint8_t spi_index)
 static void
 ao_spi_config(uint8_t spi_index, uint32_t speed)
 {
+	uint8_t		spi_pin_config = AO_SPI_PIN_CONFIG(spi_index);
 	uint8_t		id = AO_SPI_INDEX(spi_index);
 	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
 
@@ -424,19 +427,19 @@ ao_spi_config(uint8_t spi_index, uint32_t speed)
 		break;
 #endif
 	}
-	if (spi_index != ao_spi_index[id]) {
+	if (spi_pin_config != ao_spi_pin_config[id]) {
 
 		/* Disable old config
 		 */
-		ao_spi_disable_index(ao_spi_index[id]);
+		ao_spi_disable_pin_config(ao_spi_pin_config[id]);
 
 		/* Enable new config
 		 */
-		ao_spi_enable_index(spi_index);
+		ao_spi_enable_pin_config(spi_pin_config);
 
 		/* Remember current config
 		 */
-		ao_spi_index[id] = spi_index;
+		ao_spi_pin_config[id] = spi_pin_config;
 	}
 	stm_spi->cr2 = SPI_CR2;
 	stm_spi->cr1 = ((0 << STM_SPI_CR1_BIDIMODE) |			/* Three wire mode */
@@ -451,8 +454,8 @@ ao_spi_config(uint8_t spi_index, uint32_t speed)
 			(1 << STM_SPI_CR1_SPE) |			/* Enable SPI unit */
 			(speed << STM_SPI_CR1_BR) |			/* baud rate to pclk/4 */
 			(1 << STM_SPI_CR1_MSTR) |
-			(0 << STM_SPI_CR1_CPOL) |			/* Format 0 */
-			(0 << STM_SPI_CR1_CPHA));
+			(AO_SPI_CPOL(spi_index) << STM_SPI_CR1_CPOL) |	/* Format */
+			(AO_SPI_CPHA(spi_index) << STM_SPI_CR1_CPHA));
 }
 
 uint8_t
@@ -502,7 +505,7 @@ ao_spi_channel_init(uint8_t spi_index)
 	uint8_t		id = AO_SPI_INDEX(spi_index);
 	struct stm_spi	*stm_spi = ao_spi_stm_info[id].stm_spi;
 
-	ao_spi_disable_index(spi_index);
+	ao_spi_disable_pin_config(AO_SPI_PIN_CONFIG(spi_index));
 
 	stm_spi->cr1 = 0;
 	stm_spi->cr2 = SPI_CR2_SYNC;
@@ -579,7 +582,7 @@ ao_spi_init(void)
 	stm_ospeedr_set(&stm_gpiob, 5, SPI_1_OSPEEDR);
 # endif
 	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SPI1EN);
-	ao_spi_index[0] = AO_SPI_CONFIG_NONE;
+	ao_spi_pin_config[0] = AO_SPI_CONFIG_NONE;
 	ao_spi_channel_init(STM_SPI_INDEX(1));
 #endif
 

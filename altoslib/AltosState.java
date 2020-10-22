@@ -703,6 +703,8 @@ public class AltosState extends AltosDataListener {
 
 	public int	pyro_fired;
 
+	public double	motor_pressure;
+
 	public void set_npad(int npad) {
 		this.npad = npad;
 		gps_waiting = MIN_PAD_SAMPLES - npad;
@@ -1045,6 +1047,10 @@ public class AltosState extends AltosDataListener {
 
 	public void set_pyro_fired(int fired) {
 		this.pyro_fired = fired;
+	}
+
+	public void set_motor_pressure(double motor_pressure) {
+		this.motor_pressure = motor_pressure;
 	}
 
 	public AltosState() {
