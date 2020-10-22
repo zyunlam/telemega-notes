@@ -64,7 +64,10 @@ fat_altos = \
 	src/telemega-v3.0/telemega-v3.0-$(VERSION).ihx \
 	src/telemega-v4.0/telemega-v4.0-$(VERSION).ihx \
 	src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx \
-	src/telemetrum-v3.0/telemetrum-v3.0-$(VERSION).ihx
+	src/telemetrum-v3.0/telemetrum-v3.0-$(VERSION).ihx \
+	src/telelco-v2.0/telelco-v2.0-$(VERSION).ihx \
+	src/telefireeight-v1.0/telefireeight-v1.0-$(VERSION).ihx \
+	src/telefireeight-v2.0/telefireeight-v2.0-$(VERSION).ihx
 
 keithp-fat: fat
 	ssh keithp.com mkdir -p public_html/altos-$(VERSION)

@@ -71,6 +71,7 @@ class AltosEepromNameData extends AltosDataListener {
 	public void set_companion(AltosCompanion companion) { }
 	public void set_kalman(double height, double speed, double acceleration) { }
 	public void set_orient(double new_orient) { }
+	public void set_motor_pressure(double motor_pressure) { }
 
 	public AltosEepromNameData(AltosCalData cal_data) {
 		super(cal_data);

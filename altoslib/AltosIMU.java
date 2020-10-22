@@ -36,6 +36,7 @@ public class AltosIMU implements Cloneable {
 
 	public static final double	counts_per_g_mpu = 2048.0;
 	public static final double	counts_per_g_bmx = 2048.0;
+	public static final double	counts_per_g_adxl = 20.5;
 
 	private static double counts_per_g(int imu_type) {
 		switch (imu_type) {
@@ -47,6 +48,8 @@ public class AltosIMU implements Cloneable {
 		case  imu_type_telemega_v4:
 		case imu_type_easytimer_v1:
 			return counts_per_g_bmx;
+		case imu_type_easymotor_v2:
+			return counts_per_g_adxl;
 		default:
 			return AltosLib.MISSING;
 		}
@@ -161,6 +164,8 @@ public class AltosIMU implements Cloneable {
 
 	public static final int imu_type_easytimer_v1 = 5;	/* BMX160 */
 
+	public static final int imu_type_easymotor_v2 = 6;	/* ADXL375 (accel only) */
+
 	private int accel_across(int imu_type) {
 		switch (imu_type) {
 		case imu_type_telemega_v1_v2:
@@ -172,6 +177,8 @@ public class AltosIMU implements Cloneable {
 		case imu_type_telemega_v4:
 		case imu_type_easytimer_v1:
 			return -accel_y;
+		case imu_type_easymotor_v2:
+			return accel_y;
 		default:
 			return AltosLib.MISSING;
 		}
@@ -187,6 +194,8 @@ public class AltosIMU implements Cloneable {
 		case imu_type_telemega_v4:
 		case imu_type_easytimer_v1:
 			return accel_x;
+		case imu_type_easymotor_v2:
+			return -accel_x;
 		default:
 			return AltosLib.MISSING;
 		}
@@ -308,9 +317,11 @@ public class AltosIMU implements Cloneable {
 			cal_data.set_imu_type(imu_type);
 
 			if (imu != null) {
-				listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll(imu_type)),
-						  cal_data.gyro_pitch(imu.gyro_pitch(imu_type)),
-						  cal_data.gyro_yaw(imu.gyro_yaw(imu_type)));
+				if (imu.gyro_x != AltosLib.MISSING) {
+					listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll(imu_type)),
+							  cal_data.gyro_pitch(imu.gyro_pitch(imu_type)),
+							  cal_data.gyro_yaw(imu.gyro_yaw(imu_type)));
+				}
 				listener.set_accel_ground(cal_data.accel_along(imu.accel_along(imu_type)),
 							  cal_data.accel_across(imu.accel_across(imu_type)),
 							  cal_data.accel_through(imu.accel_through(imu_type)));

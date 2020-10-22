@@ -1,3 +1,475 @@
+commit 38bcc2b8b2b560271902eb8a3eba467866a38628
+Merge: 628da1fe c16cb712
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 22 16:17:33 2020 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit c16cb712f5dc2ad42a9bccbfc28f6b70704ccd55
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 22 16:17:04 2020 -0600
+
+    update configure.ac for 1.9.6 release
+
+commit 837ef5987a71a51cc42c3410bd440043a34fdd8c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 21 22:11:18 2020 -0700
+
+    doc: Mention BMX-160 self-test fix in 1.9.6 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2f10bf2c85ca7ec0cfb71c75a5bf77512072ba8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 21 22:01:47 2020 -0700
+
+    libaltos: Add pre-built windows dll binaries
+    
+    Current Debian unstable builds versions that don't run on all Windows
+    10 machines.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit edd50c5397764c8c8091e337f4045c806ff513ea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 21 21:45:53 2020 -0700
+
+    doc: 1.9.6 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3ace827de5907ee77ffdfcf54b0822a1e65570ea
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 6 18:54:27 2020 -0700
+
+    altoslib: Don't pass along GPS information when the GPS device is busted
+    
+    If the telemetry packet indicates that there's no functioning GPS receiver,
+    then don't pass along those packets so that the UI displays things more accurately.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 29c5336f775eacbfee354000c8b28de1813ede81
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Oct 6 18:53:38 2020 -0700
+
+    altoslib: Add defines for EasyMotor
+    
+    Just USB ids and product names.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c507e143aac0bc251b02bbe3c812bf81b7026ff7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 17 15:29:11 2020 -0700
+
+    altoslib: Clip accelerometer-based speed to >= 0
+    
+    Negative vertical speeds computed by axial acceleration aren't
+    sensible, so just clip them to zero so that plots are more useful.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2a0a683b06fefbf1b17cba2dc1bbe877a19ce9f4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 20:54:32 2020 -0700
+
+    altoslib: Limit .csv file output to valid fields for EasyMotor
+    
+    EasyMotor doesn't have a baro sensor, gyros, mag sensor or igniters.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 17ad31dcc24c66a9f4b3f1a1cd3689fbe5f16874
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 20:53:56 2020 -0700
+
+    altoslib: Easy Motor v2 x axis is inverted
+    
+    Provide positive accel values along rocket axis
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 02c7bb11a8a4270e40bd1f42abd00ae849ff7539
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 20:52:48 2020 -0700
+
+    altoslib: Correct ADXL counts_per_g
+    
+    When ADXL 375 is used as a 3d accel (as on EasyMotor), need the right
+    counts_per_g to do conversions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 85e22ee20974792c2376bf11a9f79e17e4008da9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 15:30:35 2020 -0700
+
+    altoslib: use motor pressure calibration data for EasyMotor
+    
+    EasyMotor stores an average sensor value for motor pressure, use that
+    to report pressure above that value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6f3e0411acffa7ff8b4b92b68abbe05482f9bf65
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 15:29:12 2020 -0700
+
+    altoslib: Report metric pressure in kPa instead of Pa
+    
+    Reduces the magnitude of pressure data when displayed.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 42ff9c7c096ad2b8e9a6152292ab12d315985aff
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 12 16:48:42 2020 -0700
+
+    altoslib: Add EasyMotor EEPROM support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 76b595f2daafe10941b380fe74fd12d1467ba029
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 12 16:47:54 2020 -0700
+
+    altosuilib: Graph motor pressure
+    
+    Use a separate axis from atmospheric pressure as the range will be
+    rather different.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6ac469fb46e9fabfd473b9a3d8bcd92db00b98b2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 12 16:46:28 2020 -0700
+
+    altoslib: Add 'motor_pressure' data value
+    
+    This value tracks the internal pressure of a motor in Pa.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41538b1b600eef242d1ede9fe9039d1079f6891a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 12 16:40:41 2020 -0700
+
+    altoslib: Add conversion for motor pressure sensor
+    
+    This assumes a standard 0.5-4.5 range 1600PSI sensor.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 109e39eb88e5f1fd897d0b818c7654b367ee8522
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 12 16:40:03 2020 -0700
+
+    altoslib: Initialize gyro offset values to MISSING
+    
+    This lets us detect a device without a gyro sensor.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c5796f686b1bf9e4effd7f9d8dca2ee5d7a38a16
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 20:48:55 2020 -0700
+
+    altos: Reset 3d-accel and motor pressure sums each ground interval
+    
+    We're repeatedly averaging 512 ground samples to get up-to-date values
+    for all of the sensors, but we need to clear the sums after each
+    sample interval. The 3d accel values were only cleared if there was a
+    full IMU, not for devices with only an accelerometer like
+    EasyMotor. The motor pressure sum was never cleared.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f10009b07b651f69014ac5608f3ca29bce874c24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 12:59:48 2020 -0700
+
+    altos: Add motor pressure calibration data to easy motor log
+    
+    Compute an average of ground motor pressure values and store those in
+    the log data in the AO_FLIGHT record.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a7f1925b81a429d9f387f7e26433326e37c43d4f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 16 12:57:07 2020 -0700
+
+    altos: Support negative decimal values on command line
+    
+    Add support for leading unary minus for decimal constants.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e69377ef31ecff5443177b51d7cd2b084e63523
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 12 16:55:23 2020 -0700
+
+    altos/test: Clean up easy motor test jig
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c66f494160bd2e99c01510acdd7e2d6624fc017a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 12 16:54:34 2020 -0700
+
+    altos: Log motor pressure and battery voltage for EasyMotor
+    
+    These were not logged at all.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4370b7e7bc48d3f3f3ec94665449f1fde4e9567c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 10 22:00:56 2020 -0700
+
+    altos: De-bias height/speed data while on pad
+    
+    Save speed/height values from 64 samples ago and subtract them from
+    the current value. This reduces the effect of systematic accelerometer
+    error causing these values to slowly creep when there's no barometric
+    sensor to keep them in check.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a7d8a0f8b26bf62b63f12110d6d66a4f9da76eae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 10 22:54:00 2020 -0700
+
+    altos: Change adxl375 self test parameters
+    
+    Try to make it not fail self test while horizontal
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 01b89c384e80990505a5abea18489360052beb70
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 10 21:56:38 2020 -0700
+
+    altos/easymotor-v2: Add 'through' axis definition
+    
+    This is used by the ao_flight_test_code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 32e0a6e3ee51f3c9bc150bb1a6890a82bcdd050f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 10 21:56:06 2020 -0700
+
+    altos/test: Build ao_flight_test_motor
+    
+    This tests the flight code in easymotor mode.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 291eddc6376dc414a32aab51d4ee7c4212e3e69d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 10 21:55:36 2020 -0700
+
+    altos: Let ao_data.c be used by ao_flight_test
+    
+    Just skip the ao headers in that case.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e48b6689527f51cc589ccd0ee88e2c7bc05747e0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 18:32:41 2020 -0600
+
+    altos/easymotor-v2: Beep out 'pad mode' repeatedly
+    
+    Easymotor doesn't have igniters, so it would have been silent on the
+    pad, which seems bad. Add HAS_PAD_REPORT code which beeps out 'pad'
+    once every five seconds.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 48c8efaae7ce8de8bb0727009436813cd4b560e7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 18:31:25 2020 -0600
+
+    altos/easymotor-v2: ADXL375 is upside-down compared with other boards
+    
+    Clear AO_ADXL375_INVERT to make it work
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f1ea931ca808b120b5f378269aa9a6e38e90b8af
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 18:15:14 2020 -0600
+
+    altos/stmf0: Fixup for SPI mode support
+    
+    The desired SPI mode comes in 'spi_index' and needs
+    to be split out before spi_index is used for pin configuration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c1ed5c2249abb7bd1bc85091179d5d208e776da6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 18:13:42 2020 -0600
+
+    altos/easymotor-v2: Fix beeper config
+    
+    The beeper changed pins at some point during the design
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4cdef1d311d5cdc18550fb51b31c3becf1dd86fa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 23 18:12:10 2020 -0600
+
+    altos/easymotor-v2: Use same init order as easymini
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c2dbbf99e503b9e3cde37af35a8ba33220be187c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Aug 21 20:40:44 2020 -0600
+
+    recover easymotor-v2/flash-loader/ao_pins.h from backups
+
+commit fa4bb77064a2606e82091e3e533dac897912c627
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 13:11:39 2020 -0700
+
+    altos/easymotor-v2: Get easy motor building
+    
+    Add some missing files and adjust configuration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 80a7cdfe3d6256cc86861195a78f422828b4ecc1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 13:11:16 2020 -0700
+
+    altos/easymotor-v2: Add .gitignore
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 48e0da4b2d1568f9f29058def12dc32d1cff3586
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 13:09:17 2020 -0700
+
+    altos/stmf0: Add spi format configuration options
+    
+    This lets different SPI devices use different SPI formats
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 18e24df0353c78ada8cc1d2439729bc2f2676205
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 13:07:01 2020 -0700
+
+    altos: Support accel-only IMU configurations
+    
+    This doesn't compute orientation, just allows for calibrating and recording
+    3-axis acceleration data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4006bf474f4fee1e2d47fdc930b3b08b4fecbe24
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 13:06:01 2020 -0700
+
+    altos: Add EasyMotor logging support
+    
+    Log EasyMotor sensor data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3a3fb807394a534b6d44aa089f3b72a95ff9085d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 13:04:27 2020 -0700
+
+    altos: Allow use of ADXL375 as IMU
+    
+    This lets EasyMotor report all three axes of acceleration and use
+    that for idle detection.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8ddade934e965e19b760cdde4eb8ecadf6abf70c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 2 12:51:16 2020 -0700
+
+    altos/drivers: Add ao_adxl375_accel_to_sample macro
+    
+    This converts from acceleration levels to sample counts for use in
+    detecting stability of airframe after landing when no other IMU is
+    present.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e5e240e764d3bf8196a3f5b5fb1a639ad0723138
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jul 27 14:52:50 2020 -0600
+
+    easymotor: override .gitignore to store Makefiles
+
+commit a0aad75a2a54cd9d478cc44159d7d01b549f806e
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Jul 25 18:07:36 2020 -0600
+
+    first cut at EasyMotor v2 .. not compiling yet
+
+commit a8ced69631415e26329594f7f0ae98dec577d1ae
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 30 15:53:38 2020 -0700
+
+    libaltos: Avoid using strcmp and strchr on windows
+    
+    At least one of these caused the library to not load on Windows
+    10. Work around that by changing the code to use vid/pid instead of
+    matching on the name provided back by the OS.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2d44477f5ab4ad82ba658eb327c25c61c8056035
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 30 00:20:24 2020 -0700
+
+    altosui: Include telelco and telefireeight firmware in FAT builds
+    
+    AltosUI can reflash these devices, so best to include the firmware
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2a6c0e80f64e793b68e29a18fafad730b55a06b6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 29 23:58:10 2020 -0700
+
+    altos: Fix flash loader map file names
+    
+    Make sure these include the product name too.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6846db985d77c25b4deb5f8a763eec245a0a3a71
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 29 23:57:26 2020 -0700
+
+    altos: Remove linker map files during 'make clean'
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f4448213efbafe2df53ad8d62d5be74473b794a2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 30 00:49:14 2020 -0600
+
+    Releasing: updated with changes from 1.9.5 release
+
+commit 628da1fe429045c7c687f8bb96ded7da9f437706
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 30 00:18:31 2020 -0600
+
+    releasing 1.9.5
+
 commit f763dfe6a684a16ec40503149adefdc074a63ad0
 Merge: bfe338d1 a1779f94
 Author: Bdale Garbee <bdale@gag.com>

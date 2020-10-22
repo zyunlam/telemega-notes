@@ -59,6 +59,7 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELESTATIC	17	/* 32 byte typed telestatic records */
 #define AO_LOG_FORMAT_MICROPEAK2	18	/* 2-byte baro values with header */
 #define AO_LOG_FORMAT_TELEMEGA_4	19	/* 32 byte typed telemega records with 32 bit gyro cal and Bmx160 */
+#define AO_LOG_FORMAT_EASYMOTOR		20	/* ? byte typed easymotor records with pressure sensor and adxl375 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -501,6 +502,37 @@ struct ao_log_gps {
 	} u;
 };
 
+struct ao_log_motor {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;			/* 4 */
+			int16_t		ground_accel;		/* 6 */
+			int16_t		ground_accel_along;	/* 8 */
+			int16_t		ground_accel_across;	/* 10 */
+			int16_t		ground_accel_through;	/* 12 */
+			int16_t		ground_motor_pressure;	/* 14 */
+		} flight;					/* 16 */
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;			/* 4 */
+			uint16_t	reason;			/* 6 */
+		} state;
+		/* AO_LOG_SENSOR */
+		struct {
+			uint16_t	pressure;		/* 4 */
+			uint16_t	v_batt;			/* 6 */
+			int16_t		accel;			/* 8 */
+			int16_t		accel_across;		/* 10 */
+			int16_t		accel_along;		/* 12 */
+			int16_t		accel_through;		/* 14 */
+		} sensor;					/* 16 */
+	} u;
+};
+
 #if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4
 typedef struct ao_log_mega ao_log_type;
 #endif
@@ -516,6 +548,10 @@ typedef struct ao_log_firetwo ao_log_type;
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI1 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMINI3
 typedef struct ao_log_mini ao_log_type;
 #endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMOTOR
+typedef struct ao_log_motor ao_log_type;
+#endif 
 
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEGPS
 typedef struct ao_log_gps ao_log_type;

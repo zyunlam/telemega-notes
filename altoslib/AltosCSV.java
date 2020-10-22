@@ -28,15 +28,21 @@ public class AltosCSV implements AltosWriter {
 	boolean			seen_boost;
 	int			boost_tick;
 
+	boolean			has_call;
 	boolean			has_basic;
+	boolean			has_accel;
+	boolean			has_baro;
+	boolean			has_pyro;
 	boolean			has_radio;
 	boolean			has_battery;
 	boolean			has_flight_state;
-	boolean			has_advanced;
+	boolean			has_3d_accel;
+	boolean			has_imu;
 	boolean			has_igniter;
 	boolean			has_gps;
 	boolean			has_gps_sat;
 	boolean			has_companion;
+	boolean			has_motor_pressure;
 
 	AltosFlightSeries	series;
 	int[]			indices;
@@ -126,7 +132,10 @@ public class AltosCSV implements AltosWriter {
 	 */
 
 	void write_general_header() {
-		out.printf("version,serial,flight,call,time");
+		out.printf("version,serial,flight");
+		if (series.cal_data().callsign != null)
+			out.printf(",call");
+		out.printf(",time");
 	}
 
 	double time() {
@@ -134,12 +143,13 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_general() {
-		out.printf("%s, %d, %d, %s, %8.2f",
+		out.printf("%s, %d, %d",
 			   ALTOS_CSV_VERSION,
 			   series.cal_data().serial,
-			   series.cal_data().flight,
-			   series.cal_data().callsign,
-			   time());
+			   series.cal_data().flight);
+		if (series.cal_data().callsign != null)
+			out.printf(",%s", series.cal_data().callsign);
+		out.printf(", %8.2f", time());
 	}
 
 	void write_radio_header() {
@@ -173,7 +183,15 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_basic_header() {
-		out.printf("acceleration,pressure,altitude,height,accel_speed,baro_speed,temperature,drogue_voltage,main_voltage");
+		if (has_accel)
+			out.printf("acceleration,");
+		if (has_baro)
+			out.printf("pressure,altitude,");
+		out.printf("height,speed");
+		if (has_baro)
+			out.printf(",temperature");
+		if (has_pyro)
+			out.printf(",drogue_voltage,main_voltage");
 	}
 
 	double acceleration() { return series.value(AltosFlightSeries.accel_name, indices); }
@@ -186,16 +204,19 @@ public class AltosCSV implements AltosWriter {
 	double main_voltage() { return series.value(AltosFlightSeries.main_voltage_name, indices); }
 
 	void write_basic() {
-		out.printf("%8.2f,%10.2f,%8.2f,%8.2f,%8.2f,%8.2f,%5.1f,%5.2f,%5.2f",
-			   acceleration(),
-			   pressure(),
-			   altitude(),
-			   height(),
-			   speed(),
-			   speed(),
-			   temperature(),
-			   apogee_voltage(),
-			   main_voltage());
+		if (has_accel)
+			out.printf("%8.2f,", acceleration());
+		if (has_baro)
+			out.printf("%10.2f,%8.2f,",
+				   pressure(), altitude());
+		out.printf("%8.2f,%8.2f",
+			   height(), speed());
+		if (has_baro)
+			out.printf(",%5.1f", temperature());
+		if (has_pyro)
+			out.printf(",%5.2f,%5.2f",
+				   apogee_voltage(),
+				   main_voltage());
 	}
 
 	void write_battery_header() {
@@ -208,13 +229,32 @@ public class AltosCSV implements AltosWriter {
 		out.printf("%5.2f", battery_voltage());
 	}
 
-	void write_advanced_header() {
-		out.printf("accel_x,accel_y,accel_z,gyro_roll,gyro_pitch,gyro_yaw,mag_x,mag_y,mag_z,tilt");
+	void write_motor_pressure_header() {
+		out.printf("motor_pressure");
+	}
+
+	double motor_pressure() { return series.value(AltosFlightSeries.motor_pressure_name, indices); }
+
+	void write_motor_pressure() {
+		out.printf("%10.1f", motor_pressure());
+	}
+
+	void write_3d_accel_header() {
+		out.printf("accel_x,accel_y,accel_z");
 	}
 
 	double accel_along() { return series.value(AltosFlightSeries.accel_along_name, indices); }
 	double accel_across() { return series.value(AltosFlightSeries.accel_across_name, indices); }
 	double accel_through() { return series.value(AltosFlightSeries.accel_through_name, indices); }
+
+	void write_3d_accel() {
+		out.printf("%7.2f,%7.2f,%7.2f",
+			   accel_along(), accel_across(), accel_through());
+	}
+
+	void write_imu_header() {
+		out.printf("gyro_roll,gyro_pitch,gyro_yaw,mag_x,mag_y,mag_z,tilt");
+	}
 
 	double gyro_roll() { return series.value(AltosFlightSeries.gyro_roll_name, indices); }
 	double gyro_pitch() { return series.value(AltosFlightSeries.gyro_pitch_name, indices); }
@@ -226,9 +266,8 @@ public class AltosCSV implements AltosWriter {
 
 	double tilt() { return series.value(AltosFlightSeries.orient_name, indices); }
 
-	void write_advanced() {
-		out.printf("%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
-			   accel_along(), accel_across(), accel_through(),
+	void write_imu() {
+		out.printf("%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
 			   gyro_roll(), gyro_pitch(), gyro_yaw(),
 			   mag_along(), mag_across(), mag_through(),
 			   tilt());
@@ -361,9 +400,13 @@ public class AltosCSV implements AltosWriter {
 			out.printf(",");
 			write_battery_header();
 		}
-		if (has_advanced) {
+		if (has_motor_pressure) {
 			out.printf(",");
-			write_advanced_header();
+			write_motor_pressure_header();
+		}
+		if (has_3d_accel) {
+			out.printf(",");
+			write_3d_accel_header();
 		}
 		if (has_igniter) {
 			out.printf(",");
@@ -402,9 +445,17 @@ public class AltosCSV implements AltosWriter {
 			out.printf(",");
 			write_battery();
 		}
-		if (has_advanced) {
+		if (has_motor_pressure) {
 			out.printf(",");
-			write_advanced();
+			write_motor_pressure();
+		}
+		if (has_3d_accel) {
+			out.printf(",");
+			write_3d_accel();
+		}
+		if (has_imu) {
+			out.printf(",");
+			write_imu();
 		}
 		if (has_igniter) {
 			out.printf(",");
@@ -453,8 +504,13 @@ public class AltosCSV implements AltosWriter {
 		has_radio = false;
 		has_flight_state = false;
 		has_basic = false;
+		has_accel = false;
+		has_baro = false;
+		has_pyro = false;
 		has_battery = false;
-		has_advanced = false;
+		has_motor_pressure = false;
+		has_3d_accel = false;
+		has_imu = false;
 		has_igniter = false;
 		has_gps = false;
 		has_gps_sat = false;
@@ -464,12 +520,24 @@ public class AltosCSV implements AltosWriter {
 			has_radio = true;
 		if (series.has_series(AltosFlightSeries.state_name))
 			has_flight_state = true;
-		if (series.has_series(AltosFlightSeries.accel_name) || series.has_series(AltosFlightSeries.pressure_name))
+		if (series.has_series(AltosFlightSeries.accel_name)) {
 			has_basic = true;
+			has_accel = true;
+		}
+		if (series.has_series(AltosFlightSeries.pressure_name)) {
+			has_basic = true;
+			has_baro = true;
+		}
+		if (series.has_series(AltosFlightSeries.apogee_voltage_name))
+			has_pyro = true;
 		if (series.has_series(AltosFlightSeries.battery_voltage_name))
 			has_battery = true;
+		if (series.has_series(AltosFlightSeries.motor_pressure_name))
+			has_motor_pressure = true;
 		if (series.has_series(AltosFlightSeries.accel_across_name))
-			has_advanced = true;
+			has_3d_accel = true;
+		if (series.has_series(AltosFlightSeries.gyro_roll_name))
+			has_imu = true;
 		if (series.has_series(AltosFlightSeries.pyro_voltage_name))
 			has_igniter = true;
 

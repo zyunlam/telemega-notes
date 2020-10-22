@@ -50,7 +50,6 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 	}
 
 	public void provide_data(AltosDataListener listener) {
-		super.provide_data(listener);
 
 		AltosCalData	cal_data = listener.cal_data();
 
@@ -63,6 +62,8 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 		gps.pdop = pdop() / 10.0;
 		gps.hdop = hdop() / 10.0;
 		gps.vdop = vdop() / 10.0;
+		if (gps.connected)
+			super.provide_data(listener);
 
 		if (gps.locked) {
 			gps.lat = latitude() * 1.0e-7;
@@ -78,6 +79,7 @@ public class AltosTelemetryLocation extends AltosTelemetryStandard {
 			gps.course = course() * 2;
 			gps.climb_rate = climb_rate() * 1.0e-2;
 		}
-		listener.set_gps(gps, true, false);
+		if (gps.connected)
+			listener.set_gps(gps, true, false);
 	}
 }

@@ -11,7 +11,7 @@ PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noi
 
 INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quaternion.h ao_eeprom_read.h
 TEST_SRC=ao_flight_test.c
-TEST_SRC_ALL=ao_flight_test.c ao_eeprom_read.c ao_eeprom_read_old.c
+TEST_SRC_ALL=ao_flight_test.c ao_eeprom_read.c ao_eeprom_read_old.c ao_data.c
 TEST_LIB=-ljson-c
 
 KALMAN=make-kalman 
@@ -45,6 +45,9 @@ ao_flight_test_metrum: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalm
 
 ao_flight_test_mini: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
 	cc -DEASYMINI=1 -DHAS_ACCEL=0 $(CFLAGS) -o $@ $(TEST_SRC)  $(TEST_LIB) -lm
+
+ao_flight_test_motor: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
+	cc -DEASYMOTOR_V_2=1 $(CFLAGS) -o $@ $(TEST_SRC) $(TEST_LIB) -lm
 
 ao_gps_test: ao_gps_test.c ao_gps_sirf.c ao_gps_print.c ao_host.h
 	cc $(CFLAGS) -o $@ $<

@@ -275,6 +275,25 @@ ao_kalman_correct_accel(void)
 #endif /* else FORCE_ACCEL */
 #endif /* HAS_ACCEL */
 
+#if !HAS_BARO
+static ao_k_t	ao_k_height_prev;
+static ao_k_t	ao_k_speed_prev;
+
+/*
+ * While in pad mode without a barometric sensor, remove accumulated
+ * speed and height values to reduce the effect of systematic sensor
+ * error
+ */
+void
+ao_kalman_reset_accumulate(void)
+{
+	ao_k_height -= ao_k_height_prev;
+	ao_k_speed -= ao_k_speed_prev;
+	ao_k_height_prev = ao_k_height;
+	ao_k_speed_prev = ao_k_speed;
+}
+#endif
+
 void
 ao_kalman(void)
 {

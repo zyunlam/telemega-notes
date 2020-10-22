@@ -44,16 +44,21 @@ alt_t		ao_sample_height;
 #if HAS_ACCEL
 accel_t		ao_sample_accel;
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 accel_t		ao_sample_accel_along;
 accel_t		ao_sample_accel_across;
 accel_t		ao_sample_accel_through;
+#endif
+#if HAS_GYRO
 gyro_t		ao_sample_roll;
 gyro_t		ao_sample_pitch;
 gyro_t		ao_sample_yaw;
 angle_t		ao_sample_orient;
 angle_t		ao_sample_orients[AO_NUM_ORIENT];
 uint8_t		ao_sample_orient_pos;
+#endif
+#ifdef HAS_MOTOR_PRESSURE
+motor_pressure_t	ao_sample_motor_pressure;
 #endif
 
 uint8_t		ao_sample_data;
@@ -73,13 +78,20 @@ accel_t		ao_accel_2g;		/* factory accel calibration */
 int32_t		ao_accel_scale;		/* sensor to m/s² conversion */
 #endif
 
-#if HAS_GYRO
+#if HAS_IMU
 accel_t		ao_ground_accel_along;
 accel_t		ao_ground_accel_across;
 accel_t		ao_ground_accel_through;
+#endif
+
+#if HAS_GYRO
 int32_t		ao_ground_pitch;
 int32_t		ao_ground_yaw;
 int32_t		ao_ground_roll;
+#endif
+
+#if HAS_MOTOR_PRESSURE
+motor_pressure_t	ao_ground_motor_pressure;
 #endif
 
 static uint8_t	ao_preflight;		/* in preflight mode */
@@ -91,14 +103,19 @@ int32_t ao_sample_pres_sum;
 #if HAS_ACCEL
 int32_t ao_sample_accel_sum;
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 int32_t ao_sample_accel_along_sum;
 int32_t ao_sample_accel_across_sum;
 int32_t	ao_sample_accel_through_sum;
+#endif
+#if HAS_GYRO
 int32_t ao_sample_pitch_sum;
 int32_t ao_sample_yaw_sum;
 int32_t	ao_sample_roll_sum;
 static struct ao_quaternion ao_rotation;
+#endif
+#if HAS_MOTOR_PRESSURE
+int32_t ao_sample_motor_pressure_sum;
 #endif
 
 #if HAS_FLIGHT_DEBUG
@@ -114,13 +131,18 @@ ao_sample_preflight_add(void)
 #if HAS_BARO
 	ao_sample_pres_sum += ao_sample_pres;
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 	ao_sample_accel_along_sum += ao_sample_accel_along;
 	ao_sample_accel_across_sum += ao_sample_accel_across;
 	ao_sample_accel_through_sum += ao_sample_accel_through;
+#endif
+#if HAS_GYRO
 	ao_sample_pitch_sum += ao_sample_pitch;
 	ao_sample_yaw_sum += ao_sample_yaw;
 	ao_sample_roll_sum += ao_sample_roll;
+#endif
+#if HAS_MOTOR_PRESSURE
+	ao_sample_motor_pressure_sum += ao_sample_motor_pressure;
 #endif
 	++nsamples;
 }
@@ -184,16 +206,22 @@ ao_sample_preflight_set(void)
 	ao_ground_height = pres_to_altitude(ao_ground_pres);
 	ao_sample_pres_sum = 0;
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 	ao_ground_accel_along = ao_sample_accel_along_sum >> 9;
 	ao_ground_accel_across = ao_sample_accel_across_sum >> 9;
 	ao_ground_accel_through = ao_sample_accel_through_sum >> 9;
-	ao_ground_pitch = ao_sample_pitch_sum;
-	ao_ground_yaw = ao_sample_yaw_sum;
-	ao_ground_roll = ao_sample_roll_sum;
 	ao_sample_accel_along_sum = 0;
 	ao_sample_accel_across_sum = 0;
 	ao_sample_accel_through_sum = 0;
+#endif
+#if HAS_MOTOR_PRESSURE
+	ao_ground_motor_pressure = ao_sample_motor_pressure_sum >> 9;
+	ao_sample_motor_pressure_sum = 0;
+#endif
+#if HAS_GYRO
+	ao_ground_pitch = ao_sample_pitch_sum;
+	ao_ground_yaw = ao_sample_yaw_sum;
+	ao_ground_roll = ao_sample_roll_sum;
 	ao_sample_pitch_sum = 0;
 	ao_sample_yaw_sum = 0;
 	ao_sample_roll_sum = 0;
@@ -229,7 +257,7 @@ ao_sample_preflight_set(void)
 		       (ao_ground_accel_across - ao_config.accel_zero_across),
 		       (ao_ground_accel_through - ao_config.accel_zero_through),
 		       (ao_ground_accel_along - ao_config.accel_zero_along));
-#endif	
+#endif
 
 	ao_sample_compute_orient();
 	ao_sample_set_all_orients();
@@ -310,6 +338,10 @@ ao_sample_preflight_update(void)
 		++nsamples;
 	else
 		ao_sample_preflight_set();
+#if !HAS_BARO
+	if ((nsamples & 0x3f) == 0)
+		ao_kalman_reset_accumulate();
+#endif
 }
 
 #if 0
@@ -353,13 +385,18 @@ ao_sample(void)
 #if HAS_ACCEL
 		ao_sample_accel = ao_data_accel(ao_data);
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 		ao_sample_accel_along = ao_data_along(ao_data);
 		ao_sample_accel_across = ao_data_across(ao_data);
 		ao_sample_accel_through = ao_data_through(ao_data);
+#endif
+#if HAS_GYRO
 		ao_sample_pitch = ao_data_pitch(ao_data);
 		ao_sample_yaw = ao_data_yaw(ao_data);
 		ao_sample_roll = ao_data_roll(ao_data);
+#endif
+#if HAS_MOTOR_PRESSURE
+		ao_sample_motor_pressure = ao_data_motor_pressure(ao_data);
 #endif
 
 		if (ao_preflight)
@@ -393,13 +430,15 @@ ao_sample_init(void)
 	ao_sample_accel_sum = 0;
 	ao_sample_accel = 0;
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 	ao_sample_accel_along_sum = 0;
 	ao_sample_accel_across_sum = 0;
 	ao_sample_accel_through_sum = 0;
 	ao_sample_accel_along = 0;
 	ao_sample_accel_across = 0;
 	ao_sample_accel_through = 0;
+#endif
+#if HAS_GYRO
 	ao_sample_pitch_sum = 0;
 	ao_sample_yaw_sum = 0;
 	ao_sample_roll_sum = 0;

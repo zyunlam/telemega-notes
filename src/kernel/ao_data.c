@@ -16,8 +16,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
+#ifndef AO_FLIGHT_TEST
 #include <ao.h>
 #include <ao_data.h>
+#endif
 
 volatile struct ao_data	ao_data_ring[AO_DATA_RING];
 volatile uint8_t		ao_data_head;
