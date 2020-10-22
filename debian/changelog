@@ -1,3 +1,59 @@
+altos (1.9.6-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * Releasing: updated with changes from 1.9.5 release
+  * first cut at EasyMotor v2 .. not compiling yet
+  * easymotor: override .gitignore to store Makefiles
+  * recover easymotor-v2/flash-loader/ao_pins.h from backups
+  * update configure.ac for 1.9.6 release
+  * releaseing 1.9.6
+
+  [ Keith Packard ]
+  * altos: Remove linker map files during 'make clean'
+  * altos: Fix flash loader map file names
+  * altosui: Include telelco and telefireeight firmware in FAT builds
+  * libaltos: Avoid using strcmp and strchr on windows
+  * altos/drivers: Add ao_adxl375_accel_to_sample macro
+  * altos: Allow use of ADXL375 as IMU
+  * altos: Add EasyMotor logging support
+  * altos: Support accel-only IMU configurations
+  * altos/stmf0: Add spi format configuration options
+  * altos/easymotor-v2: Add .gitignore
+  * altos/easymotor-v2: Get easy motor building
+  * altos/easymotor-v2: Use same init order as easymini
+  * altos/easymotor-v2: Fix beeper config
+  * altos/stmf0: Fixup for SPI mode support
+  * altos/easymotor-v2: ADXL375 is upside-down compared with other boards
+  * altos/easymotor-v2: Beep out 'pad mode' repeatedly
+  * altos: Let ao_data.c be used by ao_flight_test
+  * altos/test: Build ao_flight_test_motor
+  * altos/easymotor-v2: Add 'through' axis definition
+  * altos: Change adxl375 self test parameters
+  * altos: De-bias height/speed data while on pad
+  * altos: Log motor pressure and battery voltage for EasyMotor
+  * altos/test: Clean up easy motor test jig
+  * altos: Support negative decimal values on command line
+  * altos: Add motor pressure calibration data to easy motor log
+  * altos: Reset 3d-accel and motor pressure sums each ground interval
+  * altoslib: Initialize gyro offset values to MISSING
+  * altoslib: Add conversion for motor pressure sensor
+  * altoslib: Add 'motor_pressure' data value
+  * altosuilib: Graph motor pressure
+  * altoslib: Add EasyMotor EEPROM support
+  * altoslib: Report metric pressure in kPa instead of Pa
+  * altoslib: use motor pressure calibration data for EasyMotor
+  * altoslib: Correct ADXL counts_per_g
+  * altoslib: Easy Motor v2 x axis is inverted
+  * altoslib: Limit .csv file output to valid fields for EasyMotor
+  * altoslib: Clip accelerometer-based speed to >= 0
+  * altoslib: Add defines for EasyMotor
+  * altoslib: Don't pass along GPS information when the GPS device is busted
+  * doc: 1.9.6 release notes
+  * libaltos: Add pre-built windows dll binaries
+  * doc: Mention BMX-160 self-test fix in 1.9.6 release notes
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 22 Oct 2020 16:20:59 -0600
+
 altos (1.9.5-1) unstable; urgency=medium
 
   [ Keith Packard ]
