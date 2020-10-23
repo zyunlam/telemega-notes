@@ -38,6 +38,7 @@ class AltosIdler {
 	static final int	idle_mma655x = 8;
 	static final int	idle_ms5607 = 9;
 	static final int	idle_adxl375 = 10;
+	static final int	idle_adxl375_easymotor_v2 = 11;
 
 	static final int	idle_sensor_tm = 100;
 	static final int	idle_sensor_metrum = 101;
@@ -49,6 +50,7 @@ class AltosIdler {
 	static final int	idle_sensor_tgps2 = 107;
 	static final int	idle_sensor_tmini3 = 108;
 	static final int	idle_sensor_easytimer1 = 109;
+	static final int	idle_sensor_easymotor2 = 110;
 
 	public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
@@ -81,7 +83,10 @@ class AltosIdler {
 				AltosMma655x.provide_data(listener, link);
 				break;
 			case idle_adxl375:
-				AltosAdxl375.provide_data(listener, link);
+				AltosAdxl375.provide_data(listener, link, false, AltosLib.MISSING);
+				break;
+			case idle_adxl375_easymotor_v2:
+				AltosAdxl375.provide_data(listener, link, true, AltosIMU.imu_type_easymotor_v2);
 				break;
 			case idle_ms5607:
 				AltosMs5607.provide_data(listener, link);
@@ -115,6 +120,9 @@ class AltosIdler {
 				break;
 			case idle_sensor_easytimer1:
 				AltosSensorEasyTimer1.provide_data(listener, link);
+				break;
+			case idle_sensor_easymotor2:
+				AltosSensorEasyMotor2.provide_data(listener, link);
 				break;
 			}
 		}
@@ -219,6 +227,9 @@ public class AltosIdleFetch implements AltosDataProvider {
 		new AltosIdler("EasyTimer-v1",
 			       AltosIdler.idle_imu_et_v1,
 			       AltosIdler.idle_sensor_easytimer1),
+		new AltosIdler("EasyMotor-v2",
+			       AltosIdler.idle_adxl375_easymotor_v2,
+			       AltosIdler.idle_sensor_easymotor2),
 	};
 
 	AltosLink		link;

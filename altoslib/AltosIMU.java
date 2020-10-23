@@ -56,7 +56,10 @@ public class AltosIMU implements Cloneable {
 	}
 
 	public static double convert_accel(double counts, int imu_type) {
-		return counts / counts_per_g(imu_type) * AltosConvert.gravity;
+		double cpg = counts_per_g(imu_type);
+		if (cpg == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return counts / cpg * AltosConvert.gravity;
 	}
 
 	public static final double 	GYRO_FULLSCALE_DEGREES_MPU = 2000.0;
@@ -82,7 +85,10 @@ public class AltosIMU implements Cloneable {
 	}
 
 	public static double gyro_degrees_per_second(double counts, int imu_type) {
-		return counts / counts_per_degree(imu_type);
+		double cpd = counts_per_degree(imu_type);
+		if (cpd == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return counts / cpd;
 	}
 
 	public static final int imu_axis_x = 0;
@@ -112,7 +118,10 @@ public class AltosIMU implements Cloneable {
 	}
 
 	public static double convert_gauss(double counts, int imu_type, int imu_axis) {
-		return counts / counts_per_gauss(imu_type, imu_axis);
+		double cpg = counts_per_gauss(imu_type, imu_axis);
+		if (cpg == AltosLib.MISSING)
+			return AltosLib.MISSING;
+		return counts / cpg;
 	}
 
 	public boolean parse_string(String line) {
@@ -301,6 +310,15 @@ public class AltosIMU implements Cloneable {
 		}
 	}
 
+	private static boolean is_primary_accel(int imu_type) {
+		switch (imu_type) {
+		case imu_type_easytimer_v1:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	public static int mag_through_axis(int imu_type) {
 		return imu_axis_z;
 	}
@@ -318,6 +336,7 @@ public class AltosIMU implements Cloneable {
 
 			if (imu != null) {
 				if (imu.gyro_x != AltosLib.MISSING) {
+					cal_data.set_gyro_zero(0, 0, 0);
 					listener.set_gyro(cal_data.gyro_roll(imu.gyro_roll(imu_type)),
 							  cal_data.gyro_pitch(imu.gyro_pitch(imu_type)),
 							  cal_data.gyro_yaw(imu.gyro_yaw(imu_type)));
@@ -328,6 +347,14 @@ public class AltosIMU implements Cloneable {
 				listener.set_accel(cal_data.accel_along(imu.accel_along(imu_type)),
 						   cal_data.accel_across(imu.accel_across(imu_type)),
 						   cal_data.accel_through(imu.accel_through(imu_type)));
+				if (is_primary_accel(imu_type)) {
+					int accel = imu.accel_along(imu_type);
+					if (!cal_data.adxl375_inverted)
+						accel = -accel;
+					if (cal_data.pad_orientation == 1)
+						accel = -accel;
+					listener.set_acceleration(cal_data.acceleration(accel));
+				}
 				if (imu.mag_x != AltosLib.MISSING) {
 					listener.set_mag(cal_data.mag_along(imu.mag_along(imu_type)),
 							 cal_data.mag_across(imu.mag_across(imu_type)),
