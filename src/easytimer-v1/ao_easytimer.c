@@ -18,7 +18,7 @@
 
 #include <ao.h>
 #include <ao_ms5607.h>
-#include <ao_adxl375.h>
+#include <ao_bmx160.h>
 #include <ao_log.h>
 #include <ao_exti.h>
 #include <ao_packet.h>
