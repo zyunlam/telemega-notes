@@ -127,7 +127,7 @@ public class AltosIgniteUI
 		public void run () {
 			try {
 				ignite = new AltosIgnite(link,
-							 !device.matchProduct(Altos.product_altimeter));
+							 device.matchProduct(Altos.product_basestation));
 
 			} catch (Exception e) {
 				send_exception(e);

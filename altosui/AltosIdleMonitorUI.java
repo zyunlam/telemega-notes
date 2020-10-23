@@ -209,7 +209,7 @@ public class AltosIdleMonitorUI extends AltosUIFrame implements AltosFlightDispl
 
 		device = AltosDeviceUIDialog.show(in_owner, Altos.product_any);
 		remote = false;
-		if (!device.matchProduct(Altos.product_altimeter))
+		if (device.matchProduct(Altos.product_basestation))
 			remote = true;
 
 		serial = device.getSerial();
