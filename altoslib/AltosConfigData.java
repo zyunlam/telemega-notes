@@ -205,8 +205,11 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return 4095 - value;
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_EASYMOTOR:
 			return -value;
 		default:
+			if (product.startsWith("EasyTimer-"))
+				return -value;
 			return AltosLib.MISSING;
 		}
 	}
@@ -356,8 +359,7 @@ public class AltosConfigData {
 		if (!accel_cal_adjusted &&
 		    pad_orientation != AltosLib.MISSING &&
 		    accel_cal_plus != AltosLib.MISSING &&
-		    accel_cal_minus != AltosLib.MISSING &&
-		    log_format != AltosLib.AO_LOG_FORMAT_UNKNOWN)
+		    accel_cal_minus != AltosLib.MISSING)
 		{
 			switch (pad_orientation) {
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
@@ -636,6 +638,8 @@ public class AltosConfigData {
 				return true;
 			if (product.startsWith("TeleMega-v4"))
 				return true;
+			if (product.startsWith("EasyMotor-v2"))
+				return true;
 		}
 		throw new AltosUnknownProduct(product);
 	}
@@ -648,6 +652,9 @@ public class AltosConfigData {
 				return AltosAdxl375.X_AXIS;
 			if (product.startsWith("TeleMega-v4"))
 				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("EasyMotor-v2"))
+				return AltosAdxl375.X_AXIS;
+
 		}
 		throw new AltosUnknownProduct(product);
 	}
@@ -831,8 +838,18 @@ public class AltosConfigData {
 			link.printf("c o %d\n", pad_orientation);
 		int plus = accel_cal_plus(pad_orientation);
 		int minus = accel_cal_minus(pad_orientation);
-		if (plus != AltosLib.MISSING && minus != AltosLib.MISSING)
-			link.printf("c a %d %d\n", plus, minus);
+		if (plus != AltosLib.MISSING && minus != AltosLib.MISSING) {
+			if (accel_zero_along != AltosLib.MISSING &&
+			    accel_zero_across != AltosLib.MISSING &&
+			    accel_zero_through != AltosLib.MISSING)
+				link.printf("c a %d %d %d %d %d\n",
+ 					    plus, minus,
+					    accel_zero_along,
+					    accel_zero_across,
+					    accel_zero_through);
+			else
+				link.printf("c a %d %d\n", plus, minus);
+		}
 
 		/* HAS_LOG */
 		if (flight_log_max != 0 && flight_log_max != AltosLib.MISSING)
