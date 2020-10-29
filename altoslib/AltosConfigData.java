@@ -321,6 +321,9 @@ public class AltosConfigData {
 	/* Return + accel calibration relative to a specific pad orientation */
 	public int accel_cal_plus(int pad_orientation) {
 		adjust_accel_cal();
+		if (!accel_cal_adjusted)
+			return AltosLib.MISSING;
+
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
 		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
@@ -338,6 +341,9 @@ public class AltosConfigData {
 	/* Return - accel calibration relative to a specific pad orientation */
 	public int accel_cal_minus(int pad_orientation) {
 		adjust_accel_cal();
+		if (!accel_cal_adjusted)
+			return AltosLib.MISSING;
+
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
 		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
@@ -357,6 +363,7 @@ public class AltosConfigData {
 	 */
 	private void adjust_accel_cal() {
 		if (!accel_cal_adjusted &&
+		    product != null &&
 		    pad_orientation != AltosLib.MISSING &&
 		    accel_cal_plus != AltosLib.MISSING &&
 		    accel_cal_minus != AltosLib.MISSING)
@@ -538,9 +545,6 @@ public class AltosConfigData {
 				}
 			}
 		} catch (Exception e) {}
-
-		/* Fix accel cal as soon as all of the necessary values appear */
-		adjust_accel_cal();
 	}
 
 	public AltosConfigData() {
@@ -914,5 +918,6 @@ public class AltosConfigData {
 			read_link(link, "done");
 			break;
 		}
+		adjust_accel_cal();
 	}
 }
