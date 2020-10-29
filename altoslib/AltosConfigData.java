@@ -839,6 +839,10 @@ public class AltosConfigData {
 		int plus = accel_cal_plus(pad_orientation);
 		int minus = accel_cal_minus(pad_orientation);
 		if (plus != AltosLib.MISSING && minus != AltosLib.MISSING) {
+			if (plus < 0)
+				plus = 65536 + plus;
+			if (minus < 0)
+				minus = 65536 + minus;
 			if (accel_zero_along != AltosLib.MISSING &&
 			    accel_zero_across != AltosLib.MISSING &&
 			    accel_zero_through != AltosLib.MISSING)
