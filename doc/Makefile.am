@@ -163,7 +163,7 @@ INC_FILES=\
 
 ADOC_FILES=$(TXT_FILES:.txt=.adoc) $(INC_FILES:.inc=.adoc)
 
-TELELAUNCH_TXT_FILES=altusmetrum.txt
+TELELAUNCH_TXT_FILES=telelaunch.txt
 
 TELELAUNCH_INC_FILES=\
 	header.inc \
