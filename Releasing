@@ -27,6 +27,8 @@ These are Keith's notes on how to do a release
 
 	- make sure doc/Makefile points at that too
 
+	- confirm doc/header.inc has correct copyright year
+
 These are Bdale's notes on how to do a release.
 
 	- make sure Debian build environment is up to date
@@ -59,6 +61,7 @@ These are Bdale's notes on how to do a release.
 	- make sure there is a doc/release-notes-<version>.inc
 	- make sure that doc/*.txt have the right copyright year and the
 	  new release is included
+	- confirm doc/header.inc has correct copyright year
 	- make absolutely sure checked-out tree is "clean" 
 	- make absolutely sure any commits Keith might have pushed to branches
 	  like debian are already pulled
