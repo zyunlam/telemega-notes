@@ -182,6 +182,10 @@ public class AltosAccelCal implements Runnable {
 				if (config_data.pad_orientation != AltosLib.MISSING)
 					link.printf("c o %d\n", config_data.pad_orientation);
 				if (plus != AltosLib.MISSING && minus != AltosLib.MISSING && plus != 0) {
+					if (plus < 0)
+						plus = 65536 + plus;
+					if (minus < 0)
+						minus = 65536 + minus;
 					if (config_data.accel_zero_along != AltosLib.MISSING)
 						link.printf("c a %d %d %d %d %d\n",
 							    plus, minus,
