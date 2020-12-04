@@ -139,6 +139,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 	JProgressBar	pbar;
 
 	JLabel		site_list_label;
+	java.util.List<AltosLaunchSite> sites;
 	JComboBox<AltosLaunchSite>	site_list;
 
 	JToggleButton	load_button;
@@ -227,10 +228,33 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 		return 1 << AltosMap.maptype_hybrid;
 	}
 
+	void add_mark(double lat, double lon, int state, String label) {
+		map.add_mark(lat, lon, state, label);
+		if (lon <= 0)
+			map.add_mark(lat, lon + 360, state, label);
+		if (lon >= 0)
+			map.add_mark(lat, lon - 360, state, label);
+	}
+
+	void reset_marks() {
+		map.clear_marks();
+		AltosLatLon centre = null;
+		String centre_name = null;
+		if (map != null && map.map != null)
+			centre = map.map.centre;
+		for (AltosLaunchSite site : sites) {
+			if (centre != null && centre.lat == site.latitude && centre.lon == site.longitude)
+				centre_name = site.name;
+			else
+				add_mark(site.latitude, site.longitude, AltosLib.ao_flight_main, site.name);
+		}
+		if (centre != null)
+			add_mark(centre.lat, centre.lon, AltosLib.ao_flight_boost, centre_name);
+	}
+
 	void center_map(double latitude, double longitude) {
 		map.map.centre(new AltosLatLon(latitude, longitude));
-		map.clear_marks();
-		map.add_mark(latitude, longitude, AltosLib.ao_flight_boost);
+		reset_marks();
 	}
 
 	void center_map() {
@@ -294,6 +318,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 	}
 
 	public void notify_launch_sites(final java.util.List<AltosLaunchSite> sites) {
+		this.sites = sites;
 		SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					int	i = 1;
@@ -301,6 +326,7 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 						site_list.insertItemAt(site, i);
 						i++;
 					}
+					reset_marks();
 				}
 			});
 	}
