@@ -1,0 +1,29 @@
+= EasyMotor: In-Flight Motor Performance Data Collector
+Bdale Garbee <bdale@gag.com>
+:title-logo-image: image:../themes/background.png[]
+:revnumber: v{version}
+:revdate: 01 Jan 1970
+:icons:
+:icontype: svg
+:copyright: Bdale Garbee 2021
+:doctype: book
+:numbered:
+:stylesheet: am.css
+:linkcss:
+:toc:
+:easymotor: 1
+:application: EasyMotor
+:pdf-stylesdir: .
+:pdf-style: altusmetrum
+:pdf-fontsdir: fonts
+
+	include::header.adoc[]
+
+	include::easymotor-intro.adoc[]
+
+	include::easymotor-configuration.adoc[]
+
+	include::easymotor-installation.adoc[]
+
+	include::easymotor-operation.adoc[]
+
