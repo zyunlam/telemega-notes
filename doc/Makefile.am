@@ -163,6 +163,16 @@ INC_FILES=\
 
 ADOC_FILES=$(TXT_FILES:.txt=.adoc) $(INC_FILES:.inc=.adoc)
 
+MOTORTEST_TXT_FILES=motortest.txt
+
+MOTORTEST_INC_FILES=\
+	motortest-configuration.inc \
+	motortest-installation.inc \
+	motortest-intro.inc \
+	motortest-operation.inc
+
+MOTORTEST_ADOC_FILES=$(MOTORTEST_TXT_FILES:.txt=.adoc) $(MOTORTEST_INC_FILES:.inc=.adoc)
+
 TELELAUNCH_TXT_FILES=telelaunch.txt
 
 TELELAUNCH_INC_FILES=\
@@ -308,6 +318,8 @@ map-loading.adoc: $(MAP_SVG_FILES)
 
 altusmetrum.pdf altusmetrum.html: $(ADOC_FILES) $(IMAGES)
 
+motortest.pdf motortest.html: $(MOTORTEST_ADOC_FILES) $(IMAGES)
+
 telelaunch.pdf telelaunch.html: $(TELELAUNCH_ADOC_FILES) $(IMAGES)
 
 telegps.html telegps.pdf: $(TELEGPS_ADOC_FILES) $(IMAGES)
@@ -345,7 +357,7 @@ publish-keithp:	am.html $(DOC) $(FONTS)
 	scp -p $(ICONS) keithp.com:~keithp/public_html/altos/images/icons
 
 clean:
-	rm -f am.html $(HTML) $(PDF) $(ADOC_FILES) $(TELEGPS_ADOC_FILES) $(MICROPEAK_ADOC_FILES) $(TELELAUNCH_ADOC_FILES)
+	rm -f am.html $(HTML) $(PDF) $(ADOC_FILES) $(TELEGPS_ADOC_FILES) $(MICROPEAK_ADOC_FILES) $(TELELAUNCH_ADOC_FILES) $(MOTORTEST_ADOC_FILES)
 
 distclean: clean
 	rm -f $(HTML) $(PDF)
