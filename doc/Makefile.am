@@ -254,12 +254,12 @@ ONEFILE_HTML_FILES=$(ONEFILE_TXT_FILES:.txt=.html)
 
 AM_HTML=am.html
 
-PUBLISH_HTML=altusmetrum.html micropeak.html telegps.html easymini.html telelaunch.html $(ONEFILE_HTML_FILES)
+PUBLISH_HTML=altusmetrum.html micropeak.html telegps.html easymini.html motortest.html telelaunch.html $(ONEFILE_HTML_FILES)
 
 HTML=$(PUBLISH_HTML) $(RELNOTES_HTML)
 
 if ASCIIDOCTOR_PDF
-PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf telelaunch.pdf $(ONEFILE_PDF_FILES) \
+PDF=altusmetrum.pdf micropeak.pdf telegps.pdf easymini.pdf motortest.pdf telelaunch.pdf $(ONEFILE_PDF_FILES) \
 	$(OUTLINE_PDF_FILES)
 endif
 
