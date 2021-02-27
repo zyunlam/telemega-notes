@@ -51,4 +51,5 @@ for file in *; do
 	    ;;
     esac
 done
+open "${LIBRARY}"
 osascript -e 'display dialog "Installation of'"${INSTALLED}"' complete" with title "Installation Complete" buttons {"OK"} default button 1' >/dev/null
