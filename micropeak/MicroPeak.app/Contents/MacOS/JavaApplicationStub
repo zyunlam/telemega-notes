@@ -544,12 +544,32 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
 	# find installed JavaVirtualMachines (JDK + JRE)
 	allJVMs=()
 	# read JDK's from '/usr/libexec/java_home -V' command
-	while read -r line; do
-		version=$(echo $line | awk -F $',' '{print $1;}')
-		path=$(echo $line | awk -F $'" ' '{print $2;}')
-		path+="/bin/java"
-		allJVMs+=("$version:$path")
-	done < <(/usr/libexec/java_home -V 2>&1 | grep '^[[:space:]]')
+	case `sw_vers -productVersion` in
+	    10*)
+		# read JDK's from '/usr/libexec/java_home -V' command
+		while read -r line; do
+		    version=$(echo $line | awk -F $',' '{print $1;}')
+		    path=$(echo $line | awk -F $'" ' '{print $2;}')
+		    path+="/bin/java"
+		    allJVMs+=("$version:$path")
+		done < <(/usr/libexec/java_home -V 2>&1 | grep '^[[:space:]]')
+		;;
+	    *)
+		# read JDK's from java_home -X command
+		while read version path; do
+		    path+="/bin/java"
+		    allJVMs+=("$version:$path")
+		done < <(/usr/libexec/java_home -X |
+			     awk '/<dict>/ { version = ""; path = ""; }
+				  /<key>/ { key=$1; sub(/<key>/, "", key); sub(/<\/key>/, "", key); }
+				  /<string>/ { string=$1; sub(/<string>/, "", string); sub(/<\/string>/, "", string);
+						if (key == "JVMHomePath") path = string;
+						if (key == "JVMVersion") version = string;
+					     }
+				  /<\/dict>/ { if (version != "" && path != "") printf("%s %s\n", version, path); }')
+		;;
+	esac
+
 	# unset while loop variables
 	unset version path
 
@@ -566,6 +586,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
 	# debug output
 	for i in "${allJVMs[@]}"
 	do
+	    echo "found JVM $i"
 		stub_logger "[JavaSearch] ... found JVM: $i"
 	done
 
