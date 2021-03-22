@@ -230,10 +230,6 @@ public class AltosUIMapPreload extends AltosUIFrame implements ActionListener, I
 
 	void add_mark(double lat, double lon, int state, String label) {
 		map.add_mark(lat, lon, state, label);
-		if (lon <= 0)
-			map.add_mark(lat, lon + 360, state, label);
-		if (lon >= 0)
-			map.add_mark(lat, lon - 360, state, label);
 	}
 
 	void reset_marks() {
