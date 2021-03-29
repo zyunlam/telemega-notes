@@ -803,7 +803,13 @@ fi
 stub_logger "[JavaCommand] '$JAVACMD'"
 stub_logger "[JavaVersion] $(get_java_version_from_cmd "${JAVACMD}")${JAVACMD_version:+ / $JAVACMD_version}"
 
+# Make sure tabbing mode is disabled for the selected java version
 
+CFBundleIdentifier=net.java.openjdk.$(get_java_version_from_cmd "${JAVACMD}").java
+
+if [ x$(defaults read ${CFBundleIdentifier} AppleWindowTabbingMode) != "xnever" ]; then
+    defaults write ${CFBundleIdentifier} AppleWindowTabbingMode never
+fi
 
 if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
 
