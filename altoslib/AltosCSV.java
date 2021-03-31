@@ -408,6 +408,10 @@ public class AltosCSV implements AltosWriter {
 			out.printf(",");
 			write_3d_accel_header();
 		}
+		if (has_imu) {
+			out.printf(",");
+			write_imu_header();
+		}
 		if (has_igniter) {
 			out.printf(",");
 			write_igniter_header();
