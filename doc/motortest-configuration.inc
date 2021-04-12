@@ -13,6 +13,6 @@
 	=== Changing the Configuration
 
 		All available configuration options can be set using the 
-		"Configure Altimeter" menu selection within the AltosUI
+		“Configure Altimeter” menu selection within the AltosUI
 		program.
 
