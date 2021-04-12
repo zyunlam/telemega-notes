@@ -7,7 +7,8 @@ releasing all of our hardware and software designs under open licenses,
 we also hope to empower you to take as active a role in our collective
 future as you wish!
 
-Thank you for your interest in EasyMotor, an in-flight motor data collection
+Thank you for your interest in motor testing products from Altus Metrum.
+Our first such product is EasyMotor, an in-flight motor data collection
 board for hobby rockets.  EasyMotor is a small circuit board that is meant
 to log motor chamber pressure and rocket acceleration during flight.  With
 this data it's possible to determine whether a research motor is performing 
