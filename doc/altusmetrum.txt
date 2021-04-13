@@ -5,7 +5,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>; Bob Finch; Anth
 :revdate: 1 Jan 1970
 :icons:
 :icontype: svg
-:copyright: Bdale Garbee and Keith Packard 2020
+:copyright: Bdale Garbee and Keith Packard 2021
 :doctype: book
 :numbered:
 :stylesheet: am.css
@@ -21,6 +21,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>; Bob Finch; Anth
 :easymega: 1
 :telegps: 1
 :easytimer: 1
+:easymotor: 1
 :application: AltosUI
 :pdf-stylesdir: .
 :pdf-style: altusmetrum
