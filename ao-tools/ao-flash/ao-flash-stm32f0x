@@ -10,7 +10,7 @@ trap "rm $cmds" 0 1 15
 file="$1"
 echo "program $file verify reset" > $cmds
 openocd \
-	-f interface/stlink-v2.cfg \
-	-f target/stm32f0x_stlink.cfg \
+	-f interface/stlink.cfg \
+	-f target/stm32f0x.cfg \
 	-f $cmds \
 	-c shutdown
