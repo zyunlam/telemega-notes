@@ -285,7 +285,7 @@ ao_adc_init(void)
 			 (1 << STM_ADC_CFGR1_DMAEN));				  /* enable DMA */
 
 	/* Set the clock */
-	stm_adc.cfgr2 = STM_ADC_CFGR2_CKMODE_PCLK_2 << STM_ADC_CFGR2_CKMODE;
+	stm_adc.cfgr2 = STM_ADC_CFGR2_CKMODE_PCLK_4 << STM_ADC_CFGR2_CKMODE;
 
 	/* Shortest sample time */
 	stm_adc.smpr = STM_ADC_SMPR_SMP_239_5 << STM_ADC_SMPR_SMP;
