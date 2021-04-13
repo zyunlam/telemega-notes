@@ -288,7 +288,7 @@ ao_adc_init(void)
 	stm_adc.cfgr2 = STM_ADC_CFGR2_CKMODE_PCLK_2 << STM_ADC_CFGR2_CKMODE;
 
 	/* Shortest sample time */
-	stm_adc.smpr = STM_ADC_SMPR_SMP_71_5 << STM_ADC_SMPR_SMP;
+	stm_adc.smpr = STM_ADC_SMPR_SMP_239_5 << STM_ADC_SMPR_SMP;
 
 	stm_adc.chselr = chselr;
 
