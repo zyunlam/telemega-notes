@@ -97,22 +97,28 @@
 #define AO_ADC_PIN1_PIN		1
 #define AO_ADC_PIN1_CH		1
 
+#define AO_ADC_PIN2_PORT	(&stm_gpioa)	/* v_batt */
+#define AO_ADC_PIN2_PIN		3
+#define AO_ADC_PIN2_CH		3
+
 #define AO_ADC_RCC_AHBENR       ((1 << STM_RCC_AHBENR_IOPAEN))
 
-#define AO_NUM_ADC		2
+#define AO_NUM_ADC		3
 
 #define AO_DATA_RING		64
 
 struct ao_adc {
 	int16_t			motor_pressure;
 	int16_t			v_batt;
+	int16_t			force_bootloader;
 };
 
-#define AO_ADC_DUMP(p) \
-	printf("tick: %5u motor_pressure: %5d batt: %5d\n", \
-	       (p)->tick, \
-	       (p)->adc.motor_pressure, \
-	       (p)->adc.v_batt);
+#define AO_ADC_DUMP(p)							\
+	printf("tick: %5u motor_pressure: %5d batt: %5d boot: %5d\n",	\
+	       (p)->tick,						\
+	       (p)->adc.motor_pressure,					\
+	       (p)->adc.v_batt,						\
+	       (p)->adc.force_bootloader);
 
 
 /*
