@@ -44,7 +44,7 @@ esac
 
 echo $DFU_UTIL
 
-$DFU_UTIL -v -v -R -a 0 -s 0x08000000:leave -D $REPO/loaders/easymotor-v$VERSION*.elf
+$DFU_UTIL -v -v -R -a 0 -s 0x08000000:leave -D $REPO/loaders/easymotor-v$VERSION*.bin
 
 sleep 3
 
