@@ -81,18 +81,31 @@ ao_log_gps_tracking(uint16_t tick, struct ao_telemetry_satellite *gps_tracking_d
 	ao_log_write(&ao_log_data);
 }
 
+static uint8_t
+ao_log_check_empty(void)
+{
+	uint8_t *b = (void *) &ao_log_data;
+	unsigned i;
+
+	for (i = 0; i < sizeof (ao_log_type); i++)
+		if (*b++ != AO_STORAGE_ERASED_BYTE)
+			return 0;
+	return 1;
+}
+
 int8_t
 ao_log_check(uint32_t pos)
 {
-	if (ao_storage_is_erased(pos & ~(ao_storage_block - 1)))
-		return 0;
-
 	if (!ao_storage_read(pos,
 			     &ao_log_data,
 			     sizeof (struct ao_log_gps)))
 		return AO_LOG_INVALID;
 
+	if (ao_log_check_empty())
+		return AO_LOG_EMPTY;
+
 	if (!ao_log_check_data())
 		return AO_LOG_INVALID;
+
 	return AO_LOG_VALID;
 }

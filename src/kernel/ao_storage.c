@@ -86,10 +86,6 @@ ao_storage_write(ao_pos_t pos, void *v_buf, uint16_t len)
 	return 1;
 }
 
-#ifndef AO_STORAGE_ERASED_BYTE
-#define AO_STORAGE_ERASED_BYTE 0xff
-#endif
-
 uint8_t
 ao_storage_is_erased(uint32_t pos)
 {
