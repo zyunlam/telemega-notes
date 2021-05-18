@@ -507,6 +507,20 @@ public abstract class AltosLink implements Runnable {
 		return ret;
 	}
 
+	public void synchronize(int timeout) throws InterruptedException {
+		printf("v\n");
+		for (;;) {
+			String line = get_reply(timeout);
+
+			if (line == null)
+				break;
+			if (line.startsWith("software-version"))
+				break;
+			if (line.startsWith("altos-loader"))
+				break;
+		}
+	}
+
 	public void to_loader() throws InterruptedException {
 		printf("X\n");
 		flush_output();
