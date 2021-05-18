@@ -292,28 +292,28 @@ ao_log_scan(void)
 	ao_log_end_pos = ao_log_pos_block_end(0);
 
 	if (ao_flight_number) {
-		uint32_t	full = ao_log_current_pos;
-		uint32_t	empty = ao_log_end_pos - AO_LOG_SIZE;
+		uint32_t	full = (ao_log_current_pos) / AO_LOG_SIZE;
+		uint32_t	empty = (ao_log_end_pos - AO_LOG_SIZE) / AO_LOG_SIZE;
 
 		/* If there's already a flight started, then find the
 		 * end of it
 		 */
 		for (;;) {
-			ao_log_current_pos = (full + empty) >> 1;
-			ao_log_current_pos -= ao_log_current_pos % AO_LOG_SIZE;
+			uint32_t current = (full + empty) >> 1;
+			ao_log_current_pos = current * AO_LOG_SIZE;
 
-			if (ao_log_current_pos == full) {
+			if (current == full) {
 				if (ao_log_check(ao_log_current_pos) != AO_LOG_EMPTY)
 					ao_log_current_pos += AO_LOG_SIZE;
 				break;
 			}
-			if (ao_log_current_pos == empty)
+			if (current == empty)
 				break;
 
 			if (ao_log_check(ao_log_current_pos) != AO_LOG_EMPTY) {
-				full = ao_log_current_pos;
+				full = current;
 			} else {
-				empty = ao_log_current_pos;
+				empty = current;
 			}
 		}
 		ret = 1;
