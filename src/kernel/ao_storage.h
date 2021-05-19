@@ -44,6 +44,10 @@ extern ao_pos_t	ao_storage_block;
 #define USE_STORAGE_CONFIG 1
 #endif
 
+#ifndef AO_STORAGE_ERASED_BYTE
+#define AO_STORAGE_ERASED_BYTE 0xff
+#endif
+
 #if USE_STORAGE_CONFIG
 /* Byte offset of config block. Will be ao_storage_block bytes long */
 extern ao_pos_t	ao_storage_config;
