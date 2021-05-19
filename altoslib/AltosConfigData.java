@@ -199,10 +199,18 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_FULL:
 			return 0x7fff - value;
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
-		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 			return 4095 - value;
+		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
+			/*
+			 * TeleMetrum v2 and later use the same log format, but
+			 * have different accelerometers. This is the only place
+			 * it matters in altoslib.
+			 */
+			if (product.startsWith("TeleMetrum-v2"))
+				return 4095 - value;
+			/* fall through */
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_EASYMOTOR:
