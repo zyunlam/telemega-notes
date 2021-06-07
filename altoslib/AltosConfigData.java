@@ -223,6 +223,8 @@ public class AltosConfigData {
 	}
 
 	public boolean has_monitor_battery() {
+		if (product == null)
+			return false;
 		if (product.startsWith("TeleBT"))
 			return true;
 		return false;

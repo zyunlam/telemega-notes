@@ -174,10 +174,12 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 	}
 
 	private RocketOnline[] sorted_rockets() {
-		RocketOnline[]	rocket_array = rockets.values().toArray(new RocketOnline[0]);
+		synchronized(rockets) {
+			RocketOnline[]	rocket_array = rockets.values().toArray(new RocketOnline[0]);
 
-		Arrays.sort(rocket_array);
-		return rocket_array;
+			Arrays.sort(rocket_array);
+			return rocket_array;
+		}
 	}
 
 	public void onMapClick(LatLng lat_lng) {
@@ -260,22 +262,26 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 		if (mMap == null)
 			return;
 
-		if (rockets.containsKey(serial)) {
-			rocket = rockets.get(serial);
-			rocket.set_position(new AltosLatLon(state.gps.lat, state.gps.lon), state.received_time);
-		} else {
-			rocket = new RocketOnline(context,
-						  serial,
-						  mMap, state.gps.lat, state.gps.lon,
-						  state.received_time);
-			rockets.put(serial, rocket);
+		synchronized(rockets) {
+			if (rockets.containsKey(serial)) {
+				rocket = rockets.get(serial);
+				rocket.set_position(new AltosLatLon(state.gps.lat, state.gps.lon), state.received_time);
+			} else {
+				rocket = new RocketOnline(context,
+							  serial,
+							  mMap, state.gps.lat, state.gps.lon,
+							  state.received_time);
+				rockets.put(serial, rocket);
+			}
 		}
 	}
 
 	private void remove_rocket(int serial) {
-		RocketOnline rocket = rockets.get(serial);
-		rocket.remove();
-		rockets.remove(serial);
+		synchronized(rockets) {
+			RocketOnline rocket = rockets.get(serial);
+			rocket.remove();
+			rockets.remove(serial);
+		}
 	}
 
 	public void set_visible(boolean visible) {
@@ -286,13 +292,15 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 
 		if (telem_state != null) {
-			for (int serial : rockets.keySet()) {
-				if (!telem_state.containsKey(serial))
-					remove_rocket(serial);
-			}
+			synchronized(rockets) {
+				for (int serial : rockets.keySet()) {
+					if (!telem_state.containsKey(serial))
+						remove_rocket(serial);
+				}
 
-			for (int serial : telem_state.keySet()) {
-				set_rocket(serial, telem_state.get(serial));
+				for (int serial : telem_state.keySet()) {
+					set_rocket(serial, telem_state.get(serial));
+				}
 			}
 		}
 
