@@ -165,6 +165,17 @@
 	|3.7-12V
 	endif::easytimer[]
 	
+	ifdef::easymotor[]
+	|EasyMotor v2.0
+	|-
+	|ADXL375 200g
+	|-
+	|-
+	|-
+	|-
+	|6.5-15V
+	endif::easymotor[]
+	
 	
 	|===
 
@@ -227,12 +238,21 @@
 	endif::easymega[]
 
 	ifdef::easytimer[]
-	|EasyMini
+	|EasyTimer
 	|Debug USB Battery
 	|Pyro A Pyro B Battery
 	|0.8 inch (2.03cm)
 	|1½ inch (3.81cm)
 	|24mm coupler
 	endif::easytimer[]
+
+	ifdef::easymotor[]
+	|EasyMotor
+	|Debug USB
+	|+5V Pres GND Switch Battery
+	|0.8 inch (2.03cm)
+	|1½ inch (3.81cm)
+	|24mm coupler
+	endif::easymotor[]
 
 	|===

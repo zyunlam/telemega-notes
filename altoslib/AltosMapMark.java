@@ -27,13 +27,23 @@ public abstract class AltosMapMark {
 
 	public AltosLatLon	lat_lon;
 	public int		state;
+	public String		label;
 
 	static public int stroke_width = 6;
 
 	public abstract void paint(AltosMapTransform t);
 
-	public AltosMapMark (double lat, double lon, int state) {
+	public AltosMapMark (double lat, double lon, int state, String label) {
 		lat_lon = new AltosLatLon(lat, lon);
 		this.state = state;
+		this.label = label;
+	}
+
+	public AltosMapMark (double lat, double lon, int state) {
+		this(lat, lon, state, null);
+	}
+
+	public AltosMapMark () {
+		this(0, 0, 0);
 	}
 }

@@ -190,7 +190,7 @@ _ao_config_get(void)
 		if (minor  < 14)
 			ao_config.radio_amp = AO_CONFIG_DEFAULT_RADIO_AMP;
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 		if (minor < 15) {
 			ao_config.accel_zero_along = 0;
 			ao_config.accel_zero_across = 0;
@@ -395,7 +395,7 @@ ao_config_accel_calibrate_show(void)
 {
 	printf("Accel cal +1g: %d -1g: %d\n",
 	       ao_config.accel_plus_g, ao_config.accel_minus_g);
-#if HAS_GYRO
+#if HAS_IMU
 	printf ("IMU cal along %d across %d through %d\n",
 		ao_config.accel_zero_along,
 		ao_config.accel_zero_across,
@@ -406,7 +406,7 @@ ao_config_accel_calibrate_show(void)
 #define ACCEL_CALIBRATE_SAMPLES	1024
 #define ACCEL_CALIBRATE_SHIFT	10
 
-#if HAS_GYRO
+#if HAS_IMU
 static int16_t accel_cal_along;
 static int16_t accel_cal_across;
 static int16_t accel_cal_through;
@@ -418,7 +418,7 @@ ao_config_accel_calibrate_auto(char *orientation)
 	uint16_t	i;
 	int32_t		accel_total;
 	uint8_t		cal_data_ring;
-#if HAS_GYRO
+#if HAS_IMU
 	int32_t		accel_along_total = 0;
 	int32_t		accel_across_total = 0;
 	int32_t		accel_through_total = 0;
@@ -436,7 +436,7 @@ ao_config_accel_calibrate_auto(char *orientation)
 		ao_sleep(&ao_sample_data);
 		while (i && cal_data_ring != ao_sample_data) {
 			accel_total += (int32_t) ao_data_accel(&ao_data_ring[cal_data_ring]);
-#if HAS_GYRO
+#if HAS_IMU
 			accel_along_total += (int32_t) ao_data_along(&ao_data_ring[cal_data_ring]);
 			accel_across_total += (int32_t) ao_data_across(&ao_data_ring[cal_data_ring]);
 			accel_through_total += (int32_t) ao_data_through(&ao_data_ring[cal_data_ring]);
@@ -445,7 +445,7 @@ ao_config_accel_calibrate_auto(char *orientation)
 			i--;
 		}
 	}
-#if HAS_GYRO
+#if HAS_IMU
 	accel_cal_along = accel_along_total >> ACCEL_CALIBRATE_SHIFT;
 	accel_cal_across = accel_across_total >> ACCEL_CALIBRATE_SHIFT;
 	accel_cal_through = accel_through_total >> ACCEL_CALIBRATE_SHIFT;
@@ -457,35 +457,31 @@ static void
 ao_config_accel_calibrate_set(void) 
 {
 	int16_t	up, down;
-	uint16_t r;
-#if HAS_GYRO
+	bool	auto_cal;
+#if HAS_IMU
 	int16_t	accel_along_up = 0, accel_along_down = 0;
 	int16_t	accel_across_up = 0, accel_across_down = 0;
 	int16_t	accel_through_up = 0, accel_through_down = 0;
 #endif
 
-	r = ao_cmd_decimal();
+	up = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	if (r == 0) {
+	down = ao_cmd_decimal();
+	auto_cal = (up == 0 && ao_cmd_status != ao_cmd_success);
+	if (auto_cal) {
 		up = ao_config_accel_calibrate_auto("up");
-#if HAS_GYRO
+#if HAS_IMU
 		accel_along_up = accel_cal_along;
 		accel_across_up = accel_cal_across;
 		accel_through_up = accel_cal_through;
 #endif
 		down = ao_config_accel_calibrate_auto("down");
-#if HAS_GYRO
+#if HAS_IMU
 		accel_along_down = accel_cal_along;
 		accel_across_down = accel_cal_across;
 		accel_through_down = accel_cal_through;
 #endif
-	} else {
-		up = r;
-		r = ao_cmd_decimal();
-		if (ao_cmd_status != ao_cmd_success)
-			return;
-		down = r;
 	}
 	if (up >= down) {
 		printf("Invalid accel: up (%d) down (%d)\n",
@@ -495,11 +491,25 @@ ao_config_accel_calibrate_set(void)
 	_ao_config_edit_start();
 	ao_config.accel_plus_g = up;
 	ao_config.accel_minus_g = down;
-#if HAS_GYRO
-	if (r == 0) {
+#if HAS_IMU
+	if (auto_cal) {
 		ao_config.accel_zero_along = (accel_along_up + accel_along_down) / 2;
 		ao_config.accel_zero_across = (accel_across_up + accel_across_down) / 2;
 		ao_config.accel_zero_through = (accel_through_up + accel_through_down) / 2;
+	} else {
+		int16_t v;
+
+		v = ao_cmd_decimal();
+		if (ao_cmd_status == ao_cmd_success) {
+			ao_config.accel_zero_along = v;
+			v = ao_cmd_decimal();
+			if (ao_cmd_status == ao_cmd_success) {
+				ao_config.accel_zero_across = v;
+				v = ao_cmd_decimal();
+				if (ao_cmd_status == ao_cmd_success)
+					ao_config.accel_zero_through = v;
+			}
+		}
 	}
 #endif
 	_ao_config_edit_finish();

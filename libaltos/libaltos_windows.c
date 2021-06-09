@@ -135,6 +135,7 @@ static struct {
 	unsigned int	vid, pid;
 	char	*name;
 } name_map[] = {
+	{ .vid = 0xfffe, .pid = 0x000d, .name = "EasyTimer" },
 	{ .vid = 0xfffe, .pid = 0x0028, .name = "EasyMega" },
 	{ .vid = 0xfffe, .pid = 0x002c, .name = "EasyMotor" },
 	{ .name = NULL },

@@ -36,6 +36,10 @@
       
     	=== Connecting to TeleBT over Bluetooth™
 
+		Note that when turning TeleBT on, you may see a brief LED
+		flash, but there will be no "activity" indicated until you
+		pair with the device from AltosDroid.
+
 		Press the Android 'Menu' button or soft-key to see the
 		configuration options available. Select the 'Connect a
 		device' option and then the 'Scan for devices' entry

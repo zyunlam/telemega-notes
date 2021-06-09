@@ -315,7 +315,8 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	cp -a MicroPeak.app macosx/
 	cp -a $(MACOSX_README) macosx/ReadMe-MicroPeak.rtf
 	cp -a $(MACOSX_INSTALL) macosx
-	cp -a $(DOC) macosx
+	mkdir -p macosx/Doc
+	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/MicroPeak.app/Contents
 	cp -p $(MACOSX_DRIVERS) macosx
 	mkdir -p macosx/MicroPeak.app/Contents/Resources/Java

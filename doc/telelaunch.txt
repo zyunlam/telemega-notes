@@ -5,8 +5,7 @@ Bdale Garbee <bdale@gag.com>
 :revdate: 01 Jan 1970
 :icons:
 :icontype: svg
-:revremark: initial draft
-:copyright: Bdale Garbee 2020
+:copyright: Bdale Garbee 2021
 :doctype: book
 :numbered:
 :stylesheet: am.css

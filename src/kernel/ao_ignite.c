@@ -75,7 +75,7 @@ ao_igniter_status(enum ao_igniter igniter)
 #endif
 
 static void
-ao_igniter_fire(enum ao_igniter igniter)
+ao_igniter_fire(enum ao_igniter igniter, bool wait)
 {
 	if (!ao_ignition[igniter].fired) {
 		ao_ignition[igniter].firing = 1;
@@ -93,7 +93,8 @@ ao_igniter_fire(enum ao_igniter igniter)
 			break;
 		}
 		ao_ignition[igniter].firing = 0;
-		ao_delay(AO_IGNITER_CHARGE_TIME);
+		if (wait)
+			ao_delay(AO_IGNITER_CHARGE_TIME);
 	}
 }
 
@@ -111,27 +112,27 @@ ao_igniter(void)
 		switch(ao_config.ignite_mode) {
 		case AO_IGNITE_MODE_DUAL:
 			if (ao_flight_drogue <= ao_flight_state && ao_flight_state < ao_flight_landed)
-				ao_igniter_fire(ao_igniter_drogue);
+				ao_igniter_fire(ao_igniter_drogue, true);
 			if (ao_flight_main <= ao_flight_state && ao_flight_state < ao_flight_landed)
-				ao_igniter_fire(ao_igniter_main);
+				ao_igniter_fire(ao_igniter_main, true);
 			break;
 		case AO_IGNITE_MODE_APOGEE:
 			if (ao_flight_drogue <= ao_flight_state && ao_flight_state < ao_flight_landed) {
-				ao_igniter_fire(ao_igniter_drogue);
-				ao_igniter_fire(ao_igniter_main);
+				ao_igniter_fire(ao_igniter_drogue, true);
+				ao_igniter_fire(ao_igniter_main, true);
 			}
 			break;
 		case AO_IGNITE_MODE_MAIN:
 			if (ao_flight_main <= ao_flight_state && ao_flight_state < ao_flight_landed) {
-				ao_igniter_fire(ao_igniter_drogue);
-				ao_igniter_fire(ao_igniter_main);
+				ao_igniter_fire(ao_igniter_drogue, true);
+				ao_igniter_fire(ao_igniter_main, true);
 			}
 			break;
 		case AO_IGNITE_MODE_BOOSTER:
 			if (ao_flight_fast <= ao_flight_state && ao_flight_state < ao_flight_landed)
-				ao_igniter_fire(ao_igniter_main);
+				ao_igniter_fire(ao_igniter_main, true);
 			if (ao_flight_drogue <= ao_flight_state && ao_flight_state < ao_flight_landed)
-				ao_igniter_fire(ao_igniter_drogue);
+				ao_igniter_fire(ao_igniter_drogue, true);
 			break;
 		}
 	}
@@ -149,12 +150,12 @@ ao_ignite_manual(void)
 #if HAS_IGNITE
 	if (ao_cmd_lex_c == 'm' && ao_match_word("main")) {
 		ao_ignition[ao_igniter_main].fired = 0;
-		ao_igniter_fire(ao_igniter_main);
+		ao_igniter_fire(ao_igniter_main, false);
 		return;
 	}
 	if (ao_cmd_lex_c == 'd' && ao_match_word("drogue")) {
 		ao_ignition[ao_igniter_drogue].fired = 0;
-		ao_igniter_fire(ao_igniter_drogue);
+		ao_igniter_fire(ao_igniter_drogue, false);
 		return;
 	}
 #endif

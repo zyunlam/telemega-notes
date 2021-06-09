@@ -61,6 +61,10 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 	final static String	download_command = "download";
 	final static String	download_label = "Download";
 
+	static final String[][] download_menu_entries = new String[][] {
+		{ download_label,	download_command }
+	};
+
 	MicroPeak SetData(MicroData data) {
 		MicroPeak	mp = this;
 		if (this.data != null) {
@@ -255,7 +259,7 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 	}
 
 
-	private JMenu make_menu(String label, String[][] items) {
+	private void make_menu(String label, String[][] items) {
 		JMenu	menu = new JMenu(label);
 		for (int i = 0; i < items.length; i++) {
 			if (MAC_OS_X) {
@@ -267,7 +271,6 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 			add_menu(menu, items[i][0], items[i][1]);
 		}
 		menu_bar.add(menu);
-		return menu;
 	}
 
 	public MicroPeak() {
@@ -286,12 +289,16 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		menu_bar = new JMenuBar();
 		setJMenuBar(menu_bar);
 
-		JMenu file_menu = make_menu("File", file_menu_entries);
+		make_menu("File", file_menu_entries);
 
-		JButton download_button = new JButton (download_label);
-		download_button.setActionCommand(download_command);
-		download_button.addActionListener(this);
-		menu_bar.add(download_button);
+		if (MAC_OS_X) {
+			make_menu(download_label, download_menu_entries);
+		} else {
+			JButton download_button = new JButton (download_label);
+			download_button.setActionCommand(download_command);
+			download_button.addActionListener(this);
+			menu_bar.add(download_button);
+		}
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -320,6 +327,11 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 		container.validate();
 		doLayout();
 		validate();
+		Insets i = getInsets();
+		Dimension ps = pane.getPreferredSize();
+		ps.width += i.left + i.right;
+		ps.height += i.top + i.bottom;
+		setSize(ps);
 		pack();
 		setVisible(true);
 	}

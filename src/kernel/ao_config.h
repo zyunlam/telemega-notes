@@ -92,7 +92,7 @@ struct ao_config {
 #if HAS_RADIO_AMP
 	uint8_t		radio_amp;		/* minor version 14 */
 #endif
-#if HAS_GYRO
+#if HAS_IMU
 	int16_t		accel_zero_along;	/* minor version 15 */
 	int16_t		accel_zero_across;	/* minor version 15 */
 	int16_t		accel_zero_through;	/* minor version 15 */

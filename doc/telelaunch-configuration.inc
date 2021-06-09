@@ -59,7 +59,7 @@
 		memory.  For example, the default 435.750 MHz would be 
 		configured using
 
-			c F 435750
+			c F 435750 +
 			c w
 
 		Note that the 'f' parameter is a frequency calibration value

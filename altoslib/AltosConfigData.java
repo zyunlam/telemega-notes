@@ -199,19 +199,32 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_FULL:
 			return 0x7fff - value;
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
-		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
-		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 			return 4095 - value;
+		case AltosLib.AO_LOG_FORMAT_TELEMETRUM:
+			/*
+			 * TeleMetrum v2 and later use the same log format, but
+			 * have different accelerometers. This is the only place
+			 * it matters in altoslib.
+			 */
+			if (product.startsWith("TeleMetrum-v2"))
+				return 4095 - value;
+			/* fall through */
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_EASYMOTOR:
 			return -value;
 		default:
+			if (product.startsWith("EasyTimer-"))
+				return -value;
 			return AltosLib.MISSING;
 		}
 	}
 
 	public boolean has_monitor_battery() {
+		if (product == null)
+			return false;
 		if (product.startsWith("TeleBT"))
 			return true;
 		return false;
@@ -318,6 +331,9 @@ public class AltosConfigData {
 	/* Return + accel calibration relative to a specific pad orientation */
 	public int accel_cal_plus(int pad_orientation) {
 		adjust_accel_cal();
+		if (!accel_cal_adjusted)
+			return AltosLib.MISSING;
+
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
 		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
@@ -335,6 +351,9 @@ public class AltosConfigData {
 	/* Return - accel calibration relative to a specific pad orientation */
 	public int accel_cal_minus(int pad_orientation) {
 		adjust_accel_cal();
+		if (!accel_cal_adjusted)
+			return AltosLib.MISSING;
+
 		switch (pad_orientation) {
 		case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
 		case AltosLib.AO_PAD_ORIENTATION_WORDS_UPRIGHT:
@@ -354,10 +373,10 @@ public class AltosConfigData {
 	 */
 	private void adjust_accel_cal() {
 		if (!accel_cal_adjusted &&
+		    product != null &&
 		    pad_orientation != AltosLib.MISSING &&
 		    accel_cal_plus != AltosLib.MISSING &&
-		    accel_cal_minus != AltosLib.MISSING &&
-		    log_format != AltosLib.AO_LOG_FORMAT_UNKNOWN)
+		    accel_cal_minus != AltosLib.MISSING)
 		{
 			switch (pad_orientation) {
 			case AltosLib.AO_PAD_ORIENTATION_ANTENNA_UP:
@@ -536,9 +555,6 @@ public class AltosConfigData {
 				}
 			}
 		} catch (Exception e) {}
-
-		/* Fix accel cal as soon as all of the necessary values appear */
-		adjust_accel_cal();
 	}
 
 	public AltosConfigData() {
@@ -636,6 +652,8 @@ public class AltosConfigData {
 				return true;
 			if (product.startsWith("TeleMega-v4"))
 				return true;
+			if (product.startsWith("EasyMotor-v2"))
+				return true;
 		}
 		throw new AltosUnknownProduct(product);
 	}
@@ -648,6 +666,9 @@ public class AltosConfigData {
 				return AltosAdxl375.X_AXIS;
 			if (product.startsWith("TeleMega-v4"))
 				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("EasyMotor-v2"))
+				return AltosAdxl375.X_AXIS;
+
 		}
 		throw new AltosUnknownProduct(product);
 	}
@@ -831,8 +852,22 @@ public class AltosConfigData {
 			link.printf("c o %d\n", pad_orientation);
 		int plus = accel_cal_plus(pad_orientation);
 		int minus = accel_cal_minus(pad_orientation);
-		if (plus != AltosLib.MISSING && minus != AltosLib.MISSING)
-			link.printf("c a %d %d\n", plus, minus);
+		if (plus != AltosLib.MISSING && minus != AltosLib.MISSING) {
+			if (plus < 0)
+				plus = 65536 + plus;
+			if (minus < 0)
+				minus = 65536 + minus;
+			if (accel_zero_along != AltosLib.MISSING &&
+			    accel_zero_across != AltosLib.MISSING &&
+			    accel_zero_through != AltosLib.MISSING)
+				link.printf("c a %d %d %d %d %d\n",
+ 					    plus, minus,
+					    accel_zero_along,
+					    accel_zero_across,
+					    accel_zero_through);
+			else
+				link.printf("c a %d %d\n", plus, minus);
+		}
 
 		/* HAS_LOG */
 		if (flight_log_max != 0 && flight_log_max != AltosLib.MISSING)
@@ -893,5 +928,6 @@ public class AltosConfigData {
 			read_link(link, "done");
 			break;
 		}
+		adjust_accel_cal();
 	}
 }
