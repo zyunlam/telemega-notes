@@ -1,3 +1,653 @@
+commit 8750dde659cec836fa6354651d5967b7aac1dff0
+Merge: dcd1feb8 24215a4a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 8 22:56:04 2021 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit 24215a4a2049e51c335b76767f9ed13d186ac408
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 8 22:51:28 2021 -0600
+
+    doc: update copyright year assertions
+
+commit ec00f55171a6c5c827c1296178be43d311801be8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 12 18:39:48 2021 -0700
+
+    Version 1.9.7
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b5ab12ca11272479330a1d630da15cbf0d76735c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 19 11:01:16 2021 -0700
+
+    doc: Update 1.9.7 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1d9aaab9209a7afea60a8b394e4d3d5325f0f01e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 7 16:14:25 2021 -0700
+
+    altosdroid: Bump to version 29
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3104c3d2b1e781592f5d6841ba1ef2ba6c49642b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat May 15 20:19:56 2021 -0700
+
+    altosdroid: Update target API to 29
+    
+    Required by current Android store
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 82ef65a98e8e018fe8aa0665fd8a4af3fff3097a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 11 22:28:32 2021 -0700
+
+    altosdroid: Revert getResource().getColor to old API
+    
+    This should keep it compatible with API version 21
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 76847aadc1ea770099c6be05727dfa232e53205c
+Merge: daa635de 7643f408
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jun 7 17:11:01 2021 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 7643f408834a872ed5d7ae67770b1b7c98f3b90c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 30 15:08:25 2021 -0700
+
+    Version 1.9.6.5
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b45adfbc0eb769800068c2d432e9db52425ee316
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 19 10:52:47 2021 -0700
+
+    altoslib: Protect has_monitor_battery from unset product
+    
+    AltosDroid can query has_monitor_battery before the product data has
+    been set.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9a427131788a3e477629a0de26f0f41b5e98333b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 19 10:51:44 2021 -0700
+
+    altosdroid: Don't start bluetooth if address is null
+    
+    If the address.address string is null, don't bother starting the
+    bluetooth service.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9eb0fbd7eff5694064f9d123220b523a98fef0a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 19 10:50:22 2021 -0700
+
+    altosdroid: protect USB read/write when connection is null
+    
+    Check to see if connection is valid before attempting to read/write to
+    it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55a820e517f9705bc80c653b456ce5d8b3a634bc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 19 10:48:58 2021 -0700
+
+    altosdroid: Synchronize access to the 'rockets' list for online maps
+    
+    Online maps gets rockets added by the telem code and the same data are
+    used to create the maps UI. Synchronise access to that object to prevent
+    simutaneous operations.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 09a2a37b31b816236f023ba2a1d767646d5c8f34
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 19 10:47:37 2021 -0700
+
+    altosdroid: Safeguard preferences code in case it's called too early
+    
+    Make sure there's a backend set up before accessing data as it seems
+    this code can be called before the preferences code is called before
+    the backend is created.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0a7cc99d9db45c6c4ba929acf5b57e22d826c82a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 18 23:26:12 2021 -0700
+
+    altosdroid: Skip clicks on BT device entries that are too short
+    
+    Maybe these are some kind of extra object? In any case, nothing that
+    we care about, so just ignore the click.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit daa635de77da3a1926ceb2e2d91e31ec169e173c
+Merge: a2e71a40 362f11ff
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue May 18 23:54:48 2021 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 362f11fffb63c5c4d4e2ccfc59c0e6ae83a55d01
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 18 22:37:01 2021 -0700
+
+    altoslib: Fix accel value flipping for TM v3.0
+    
+    TM v3.0 uses the same log file format value as TM v2.0 but has a
+    different accelerometer, which requires a different function for
+    inverting the raw values. Detect v2.0 devices and use the old function
+    for them while using the new function for all others.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a575eebbf87243c3a314929a2469db5bac0c7b42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 17 23:09:29 2021 -0700
+
+    altosuilib: Zap all flash when upgrading TeleGPS from pre-1.9.7
+    
+    Old versions of TeleGPS firmware would end up spraying log data all
+    over flash as they mis-computed the place to append new log data.
+    
+    When the right hardware is detected, a warning dialog will pop up and,
+    if agreed to, the log storage flash will be completely erased before
+    the firmware upgrade happens.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 565778b66e59069fc6a6d6518f28354eae954dc1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 17 22:38:14 2021 -0700
+
+    altos: Simplify discovery of log end position
+    
+    Binary search using log block indices rather than byte positions. This
+    makes the code much easier to understand as there isn't a mystic modulus.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8dec0d1be5a2d7633045c5c0e86b32a9e6b60299
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 17 22:33:21 2021 -0700
+
+    altos/telegps-*: Fix log end discovery at startup
+    
+    We need to find the first unwritten log block to start appending data,
+    but the code was actually looking for the first empty 256-byte chunk,
+    which meant that we'd leave a gap of erased data after the previous
+    log. AltosUI would stop at that point and not recover the remaining
+    stored data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a2e71a40e53602c0cebe4c36d3658201dc0c2bae
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed May 12 00:27:55 2021 -0600
+
+    ao-bringup: fix easymotor script to use .bin for dfu-util
+
+commit fa273e51e772540f61fffbdc4431fe07bcd57630
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 12 18:38:50 2021 -0700
+
+    doc: Update for 1.9.7
+    
+    Add release notes
+    Add specs for EasyMotor
+    Update copyright year to 2021
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c4708930ebfbc056bb4faae9b23720d3be401978
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 12 18:39:48 2021 -0700
+
+    Version 1.9.7
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b8437a3f994845dd84080cc20122494aaf901124
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 12 18:36:45 2021 -0600
+
+    ao-bringup: add tools for flash/cal/test of EasyMotor v2
+
+commit 1451e2fd2092d720b0d49b93ac01bed7e88b831f
+Merge: 9c26fe3e b115522c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 12 18:27:17 2021 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 9c26fe3e4fddfd2a3f3e5a7da68ef65422053063
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 12 18:26:46 2021 -0600
+
+    ao-tools: update ao-flash-stm32f0x to work with openocd in Debian unstable
+
+commit b115522c41228b26133f322ea68ddb187c0b68cc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 12 13:04:20 2021 -0700
+
+    doc: Fix typography in motortest doc
+    
+     1. Use correct quotes.
+     2. Eliminate double space after punctuation.
+     3. Use elipses instead of three full stops.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 410af114b4827e46a5a297dbb7c26dc087b932fb
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 12 14:02:32 2021 -0600
+
+    altos: include EasyMotor v2 firmware in upcoming release
+
+commit 21da0503635a643529d457dccd7e12eb39029fdb
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 12 13:51:06 2021 -0600
+
+    docs: minor text tweak in motor testing docs
+
+commit c6bcfa5ede86a718105cc334099e4a6b028b08c3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Mar 31 09:23:14 2021 -0700
+
+    altoslib: Write IMU headers to CSV file when present
+    
+    The IMU data were being written, but somehow the header was not
+    included.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d6be8a279ad233d998c6df8b2efafa34dd5a9a98
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 28 18:03:56 2021 -0700
+
+    Version 1.9.6.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit da8d7fde56bfd7db02598d2880653fa71846abf7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 28 18:03:03 2021 -0700
+
+    JavaApplicationStub hacks for Big Sur tabbing mode
+    
+    Java does not support the 'tabbing' stuff that's in Big Sur, so
+    disable it.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 81a6f20fca5df08f3ac08d83a79439502c209df0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Mar 27 09:37:49 2021 -0700
+
+    Add local hacks to JavaApplicationStub
+    
+    Fix font rendering.
+    Add app directory to java.library.path.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2d45e21175453a69112fde22bf5b662d9e32adb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 22 00:06:14 2021 -0700
+
+    Update JavaApplicationStub to latest release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c6ef894263068839782716fece54154effd3d0fe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 22 00:02:33 2021 -0700
+
+    Add Mac OS X 11 support to JavaApplicationStub
+
+commit 1d29a584c8387798fb1558fd54a09b1d8fbe90b7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Mar 21 23:10:25 2021 -0700
+
+    altosuilib: Show launch sites at all visible locations on map
+    
+    Take each launch site and draw it at every location on the map it
+    occurs (in case the map shows more than the full globe). This also
+    automatically handles scrolling the map more than one "rotation".
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 07eecc0ff6e1104f911e5f83d67f3e14dc68c59c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 27 12:51:56 2021 -0800
+
+    Version 1.9.6.2
+    
+    Fix micropeak Download on Mac OS X
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38b360b0b7080b06998d1cac1d6d09957fa44844
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 27 13:38:54 2021 -0800
+
+    altosui: open /Library/AltusMetrum on Mac OS X after install
+    
+    This helps the user find the documentation.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 997931d545c977250918a2d608f8c5756de2afcf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 27 13:23:16 2021 -0800
+
+    micropeak: Stick docs in Doc dir on Mac OS X
+    
+    Follows altosui and telegps installation
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c07b0cd5881ae4e101c41ffa7a1dc6980c3ef357
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 27 13:22:39 2021 -0800
+
+    altosui: Show dialog box if sudo fails on Mac OS X
+    
+    If the user types the wrong password three times, sudo will give up
+    and return an error.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 82bad3d62b91e67f6089e403c4bd4983bf65e449
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 27 12:51:13 2021 -0800
+
+    micropeak: Use a menu for 'Download' on Mac OS X
+    
+    Attempts to add buttons to the menu bar fail leaving no access to the
+    download command.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0c33e88479ce5fe578cec4296d6196356175d40a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 15 14:27:30 2021 -0700
+
+    doc: add motortest docs to publish targets
+
+commit b8e21caf9602b55e9a042f8f0b3cfed1d8975c15
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 15 14:25:47 2021 -0700
+
+    doc: have motortest documents actually get built by default
+
+commit 6ac9b490efca17b15317965026c56b4a37d6be82
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Feb 15 14:12:46 2021 -0700
+
+    doc: make doc be about motor testing in general, not just EasyMotor
+
+commit afc90f63c6a0c2a511fddc97b72537e0a6f40cfd
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Jan 30 11:48:01 2021 -0700
+
+    doc: add a brief note about TeleBT appearing inert until paired
+
+commit 7f4059bbe74ecf86842134739ec521dcb646f04f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Jan 17 19:29:28 2021 -0700
+
+    doc: first draft of manual for EasyMotor
+
+commit 3af81a45be69b4693396de4a5e2c386be566b933
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Dec 4 14:58:15 2020 -0800
+
+    altoslib: Add all known launch sites and names to map preload
+    
+    This shows all of the known launch sites and their names in the map
+    preload screen.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4c40ba682acc3ed1808d5a170ddae4114740a39
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Nov 21 11:22:01 2020 -0700
+
+    doc: add documentation on how to re-flash a TeleMini v3 over USB
+
+commit 6550585af6d80306d037661be66004ccf8d09013
+Merge: c992792b 42226344
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Nov 21 11:00:43 2020 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 42226344f0b5443fdd93034dd51e608370717c46
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 5 21:59:27 2020 -0800
+
+    ao-tools/ao-dump-up: Recognize MicroTest data
+    
+    Spit out a special message when MicroTest data is read to make testing
+    µPusb easier.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a9d4856d3f03fae159c120d8d8030c78eaf15253
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 5 21:58:04 2020 -0800
+
+    altos: Add 'microtest' -- micropeak load for testing µPusb
+    
+    This is custom MicroPeak firmware that just repeatedly generates
+    constant flight log data which can be used to validate µPusb boards.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 898ef1a085f9d4541c3987d8d4f0daac0093ed49
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 11:41:55 2020 -0700
+
+    Version 1.9.6.1
+    
+    Intermediate release containing altoslib fixes for TeleMega v4.0 in
+    Antenna Down configuration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6dc5b468f84f04f28ea83757cee0486f654fb234
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 11:40:25 2020 -0700
+
+    altoslib: Delay accel cal value adjustment until data all read
+    
+    Instead of trying to compute these values as soon as the necessary
+    data are available, delay until all data are available as which data
+    are necessary depends on the target device, and some target devices
+    don't have some of the data values at all.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ceca79d6b20cf623e7a7214e400347fc0bc019dd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 11:38:55 2020 -0700
+
+    altoslib: Fix accel inversion for TeleMega v4.0
+    
+    TeleMega v4.0 uses the adxl375, just like EasyMega v2.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4358d83ba96b072cabd344e287fa77005968690f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 29 11:37:03 2020 -0700
+
+    altoslib: Avoid sending negative accel cal values to flight computer
+    
+    Pre-1.9.7 firmware does not handle negative values. Instead, send
+    large positive values which will wrap around to negative values inside
+    the flight computer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d1a2932e080041cfe107e00e7b23213026d1fb81
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 28 14:32:16 2020 -0700
+
+    ao-bringup: Delay before testing easymini for 0.25 seconds
+    
+    EasyMini isn't quite ready to play when the USB is first detected as
+    the sensors haven't yet been initialized. Wait for 0.25 seconds to
+    give the board time to finish initializing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a1d6499fd7ca2b3a9702e21af2a7584ef2b6480
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Oct 26 21:53:54 2020 -0700
+
+    altos: Don't wait after igniter in manual mode
+    
+    There's no reason to delay between igniter firings in manual mode, and
+    it slows down testing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c992792ba6a76a0bc1d31ccdcffa2d6ca52a9e55
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Nov 16 10:50:49 2020 -0700
+
+    put notes in Releasing about keeping doc/header.inc up to date
+
+commit 427e67f9e8914327243c0fdd1379365fe4e03623
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Nov 16 10:47:53 2020 -0700
+
+    TeleLaunch docs should use telelaunch.txt, update copyright year, lose "draft"
+
+commit 6e001281b01176963836d7b7d0bd6973b788dd63
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 23 17:05:37 2020 -0700
+
+    altoslib, altosui: Don't show apogee/main for EasyTimer Fire Igniter
+    
+    Don't create igniter lines for a device which doesn't have them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a214f039e8404da7529b6799ab6a907c3744e1bc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 23 16:14:13 2020 -0700
+
+    altos/easytimer-v1: Switch from including adxl375 to bmx160
+    
+    These aren't really necessary at all as ao_data includes them, but
+    it's nice to have them listed for documentation purposes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1a3c0805f88c50f27dd4e78b9be2a4c3ef9e46c8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 23 16:13:47 2020 -0700
+
+    altos/easymotor-v2: Increase default flight log size
+    
+    Switch to 4 flights by default, with 2MB per flight.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a9014be707c4325b55e0f2797796e7c96aea1e03
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 23 16:12:36 2020 -0700
+
+    altosui: Match against basestations when determining remote
+    
+    These two cases were matching against !altimeters instead, which isn't
+    true for EasyMotor or EasyTimer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 40c6aa050654d43f20c6a9c6bd67541e1747ae38
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 23 16:10:43 2020 -0700
+
+    altoslib, altosuilib: Get Idle Monitor working with EasyTimer and EasyMotor
+    
+    This involve splitting out the gyro and mag sensor handling from the
+    3-d accel stuff, displaying only information that is present. The IMU
+    support now allows for using the along axis as the primary
+    acceleration indicator. The Adxl375 now allows using all three axes as
+    the 3d accelerometer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b6c066d7261d398cb7bfe6503518022194431337
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 23 16:02:07 2020 -0700
+
+    altoslib: Set all 3 axes of accel cal data when present
+    
+    Use the new accel cal function in altos to set all three axes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f7c8f0b14cf19804106860a5689cf1f37df20669
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 23 16:00:01 2020 -0700
+
+    altos: Make accel cal take three axes when present
+    
+    This allows AltosUI to save/restore all of the accel calibration
+    values instead of just the primary axis.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ecf782359d3038399049ec5cc0a2b3071e14c78f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 22 20:48:26 2020 -0700
+
+    libaltos: Add windows override for EasyTimer USB ID
+    
+    Windows doesn't use the product name from the device, instead it uses
+    whatever was in the .ini file, which was "TeleTerra" for the EasyTimer ID.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 365bfb9c0720d537c7d65baf871d5dcd7c08de35
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 22 20:52:03 2020 -0700
+
+    Update 1.9.6 release date. Add note to Releasing about date
+    
+    Need to update the release date as well as the release version; that's
+    where all of the dates in the various docs comes from.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dcd1feb83e5534ea3135358456b748f242878b46
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 22 16:19:33 2020 -0600
+
+    releaseing 1.9.6
+
 commit 38bcc2b8b2b560271902eb8a3eba467866a38628
 Merge: 628da1fe c16cb712
 Author: Bdale Garbee <bdale@gag.com>
