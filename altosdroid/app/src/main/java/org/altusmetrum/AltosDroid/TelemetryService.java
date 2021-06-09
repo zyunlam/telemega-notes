@@ -416,7 +416,7 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 	}
 
 	private void start_altos_bluetooth(DeviceAddress address, boolean pause) {
-		if (bluetooth_adapter == null || !bluetooth_adapter.isEnabled())
+		if (bluetooth_adapter == null || !bluetooth_adapter.isEnabled() || address.address == null)
 			return;
 
 		disconnect(false);

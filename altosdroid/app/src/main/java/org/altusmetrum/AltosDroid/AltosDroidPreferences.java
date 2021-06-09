@@ -72,6 +72,8 @@ public class AltosDroidPreferences extends AltosPreferences {
 	}
 
 	public static void set_active_device(DeviceAddress address) {
+		if (backend == null)
+			return;
 		synchronized(backend) {
 			active_device_address = address;
 			if (active_device_address != null) {
@@ -86,6 +88,9 @@ public class AltosDroidPreferences extends AltosPreferences {
 	}
 
 	public static DeviceAddress active_device() {
+		if (backend == null)
+			return null;
+
 		synchronized(backend) {
 			return active_device_address;
 		}
@@ -94,6 +99,8 @@ public class AltosDroidPreferences extends AltosPreferences {
 	static LinkedList<AltosDroidMapSourceListener> map_source_listeners;
 
 	public static void set_map_source(int map_source) {
+		if (backend == null)
+			return;
 		synchronized(backend) {
 			AltosDroidPreferences.map_source = map_source;
 			backend.putInt(mapSourcePreference, map_source);
@@ -107,12 +114,17 @@ public class AltosDroidPreferences extends AltosPreferences {
 	}
 
 	public static int map_source() {
+		if (backend == null)
+			return MAP_SOURCE_ONLINE;
 		synchronized(backend) {
 			return map_source;
 		}
 	}
 
 	public static void register_map_source_listener(AltosDroidMapSourceListener l) {
+		if (backend == null)
+			return;
+
 		synchronized(backend) {
 			if (map_source_listeners == null)
 				map_source_listeners = new LinkedList<AltosDroidMapSourceListener>();
@@ -121,18 +133,25 @@ public class AltosDroidPreferences extends AltosPreferences {
 	}
 
 	public static void unregister_map_source_listener(AltosDroidMapSourceListener l) {
+		if (backend == null)
+			return;
 		synchronized(backend) {
 			map_source_listeners.remove(l);
 		}
 	}
 
 	public static int font_size() {
+		if (backend == null)
+			return font_size_medium;
+
 		synchronized (backend) {
 			return font_size;
 		}
 	}
 
 	public static void set_font_size(int new_font_size) {
+		if (backend == null)
+			return;
 		synchronized (backend) {
 			if (font_size != new_font_size) {
 				font_size = new_font_size;
@@ -144,12 +163,18 @@ public class AltosDroidPreferences extends AltosPreferences {
 
 
 	public static int tracker_sort() {
+		if (backend == null)
+			return 0;
+
 		synchronized(backend) {
 			return tracker_sort;
 		}
 	}
 
 	public static void set_tracker_sort(int new_tracker_sort) {
+		if (backend == null)
+			return;
+
 		synchronized(backend) {
 			if (tracker_sort != new_tracker_sort) {
 				tracker_sort = new_tracker_sort;

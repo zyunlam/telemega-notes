@@ -223,10 +223,18 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 		MapMark(double lat, double lon, int state) {
 			super(lat, lon, state);
 		}
+
+		MapMark(double lat, double lon, int state, String label) {
+			super(lat, lon, state, label);
+		}
 	}
 
 	public AltosMapMark new_mark(double lat, double lon, int state) {
 		return new MapMark(lat, lon, state);
+	}
+
+	public AltosMapMark new_mark(double lat, double lon, int state, String label) {
+		return new MapMark(lat, lon, state, label);
 	}
 
 	public int width() {

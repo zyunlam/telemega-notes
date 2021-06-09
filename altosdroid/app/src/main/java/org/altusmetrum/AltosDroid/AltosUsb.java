@@ -210,12 +210,16 @@ public class AltosUsb extends AltosDroidLink {
 	}
 
 	int read(byte[] buffer, int len) {
+		if (connection == null)
+			return 0;
 		int ret = connection.bulkTransfer(in, buffer, len, -1);
 		AltosDebug.debug("read(%d) = %d\n", len, ret);
 		return ret;
 	}
 
 	int write(byte[] buffer, int len) {
+		if (connection == null)
+			return 0;
 		int ret = connection.bulkTransfer(out, buffer, len, -1);
 		AltosDebug.debug("write(%d) = %d\n", len, ret);
 		return ret;

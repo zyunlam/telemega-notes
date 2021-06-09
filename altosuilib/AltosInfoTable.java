@@ -275,16 +275,18 @@ public class AltosInfoTable extends JTable implements AltosFlightDisplay, Hierar
 			info_add_row(3, "Accel along", "%8.1f m/s²", state.accel_along());
 			info_add_row(3, "Accel across", "%8.1f m/s²", state.accel_across());
 			info_add_row(3, "Accel through", "%8.1f m/s²", state.accel_through());
+		}
+		if (state != null && state.gyro_roll() != AltosLib.MISSING) {
 			info_add_row(3, "Gyro roll", "%8.1f °/s", state.gyro_roll());
 			info_add_row(3, "Gyro pitch", "%8.1f °/s", state.gyro_pitch());
 			info_add_row(3, "Gyro yaw", "%8.1f °/s", state.gyro_yaw());
-			if (state.mag_along() != AltosLib.MISSING) {
-				/* Report mag in nanoteslas (1 G = 100000 nT (or γ)) */
-				info_add_row(3, "Mag along", "%8.1f µT", state.mag_along() * 100.0);
-				info_add_row(3, "Mag across", "%8.1f µT", state.mag_across() * 100.0);
-				info_add_row(3, "Mag Through", "%8.1f µT", state.mag_through() * 100.0);
-				info_add_row(3, "Mag Bearing", "%8.1f°", Math.atan2(state.mag_across(), state.mag_through()) * 180/Math.PI);
-			}
+		}
+		if (state != null && state.mag_along() != AltosLib.MISSING) {
+			/* Report mag in nanoteslas (1 G = 100000 nT (or γ)) */
+			info_add_row(3, "Mag along", "%8.1f µT", state.mag_along() * 100.0);
+			info_add_row(3, "Mag across", "%8.1f µT", state.mag_across() * 100.0);
+			info_add_row(3, "Mag Through", "%8.1f µT", state.mag_through() * 100.0);
+			info_add_row(3, "Mag Bearing", "%8.1f°", Math.atan2(state.mag_across(), state.mag_through()) * 180/Math.PI);
 		}
 
 		if (state != null && state.igniter_voltage != null) {

@@ -80,6 +80,10 @@ public class AltosFlashUI
 		"TeleShield"
 	};
 
+	private static final String[] log_erased_devices = {
+		"TeleGPS"
+	};
+
 	private boolean is_pair_programmed() {
 
 		if (file != null) {
@@ -93,6 +97,17 @@ public class AltosFlashUI
 			String	name = device.toString();
 			for (int i = 0; i < pair_programmed_devices.length; i++) {
 				if (name.startsWith(pair_programmed_devices[i]))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean is_log_erased() {
+		if (device != null) {
+			String	name = device.toString();
+			for (int i = 0; i < log_erased_devices.length; i++) {
+				if (name.startsWith(log_erased_devices[i]))
 					return true;
 			}
 		}
@@ -443,13 +458,20 @@ public class AltosFlashUI
 
 	flash_task	flasher;
 
+	boolean erase_answer;
 
 	class open_task implements Runnable {
 		AltosDevice	device;
 		Thread		t;
 		open_dialog	dialog;
+		AltosLink 	link;
 
 		public void do_exception(final Exception e) {
+			if (link != null) {
+				try {
+					link.close();
+				} catch (Exception ex) {}
+			}
 			SwingUtilities.invokeLater(
 				new Runnable() {
 					public void run() {
@@ -467,27 +489,33 @@ public class AltosFlashUI
 				});
 		}
 
-		public void do_failure() {
+		public boolean do_notify_erase(final AltosConfigData config_data) {
+			erase_answer = false;
+			final Semaphore erase_answer_done = new Semaphore(0);
 			SwingUtilities.invokeLater(
 				new Runnable() {
 					public void run() {
-						try { dialog.open_failure(); } catch (Exception ex) { }
+						int ret = JOptionPane.showConfirmDialog(dialog.owner,
+											   String.format("Updating %s from firmware %s will erase stored data, continue?",
+													 config_data.product,
+													 config_data.version),
+											   "Erase Stored Data?",
+											   JOptionPane.YES_NO_OPTION);
+						erase_answer = ret == JOptionPane.YES_OPTION;
+						erase_answer_done.release();
 					}
 				});
-		}
-
-		public void do_cancel() {
-			SwingUtilities.invokeLater(
-				new Runnable() {
-					public void run() {
-						try { dialog.open_cancel(); } catch (Exception ex) { }
-					}
-				});
+			try {
+				erase_answer_done.acquire();
+			} catch (Exception ex) {
+				return false;
+			}
+			return erase_answer;
 		}
 
 		public void run () {
+			link = null;
 			try {
-				AltosLink link = null;
 				boolean new_device = false;
 
 				for (;;) {
@@ -510,11 +538,31 @@ public class AltosFlashUI
 						throw new IOException(String.format("%s: open failed",
 										    device.toShortString()));
 
+					System.out.printf("Checking device ready\n");
+
 					/* See if the link is usable already */
 					if (is_pair_programmed() || link.is_loader()) {
 						System.out.printf("Device ready for use\n");
 						do_success(link);
 						return;
+					}
+
+					System.out.printf("Checking log erased\n");
+
+					if (is_log_erased()) {
+						System.out.printf("Fetching config data\n");
+						AltosConfigData config_data = link.config_data();
+						System.out.printf("version %s\n", config_data.version);
+						/* Completely erase TeleGPS flash when firmware is old */
+						if (config_data.compare_version("1.9.7") < 0)
+						{
+							if (!do_notify_erase(config_data))
+								throw new IOException(String.format("%s: not erasing log",
+												    device.toShortString()));
+							System.out.printf("Erasing log\n");
+							link.printf("Z DoIt\n");
+							link.synchronize(120 * 1000);
+						}
 					}
 
 					java.util.List<AltosDevice> prev_devices =
@@ -569,7 +617,10 @@ public class AltosFlashUI
 				do_exception(fe);
 			} catch (IOException ie) {
 				do_exception (ie);
+			} catch (TimeoutException te) {
+				do_exception (te);
 			} catch (InterruptedException ie) {
+				do_exception (ie);
 			}
 		}
 
@@ -611,18 +662,6 @@ public class AltosFlashUI
 			System.out.printf("open_success\n");
 			setVisible(false);
 			this.link = link;
-			done = true;
-		}
-
-		public void open_failure() {
-			System.out.printf("open_failure\n");
-			setVisible(false);
-			done = true;
-		}
-
-		public void open_cancel() {
-			System.out.printf("open_cancel\n");
-			setVisible(false);
 			done = true;
 		}
 

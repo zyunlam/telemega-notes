@@ -29,6 +29,8 @@ public class AltosMapTransform {
 
 	double	offset_x, offset_y;
 
+	int	width, height;
+
 	public AltosLatLon lat_lon (AltosPointDouble point) {
 		double lat, lon;
 		double rads;
@@ -110,6 +112,39 @@ public class AltosMapTransform {
 		return screen(point(lat, lon));
 	}
 
+	/* Return first longitude value which ends up on-screen */
+	public double first_lon(double lon) {
+		/* Find a longitude left of the screen */
+		for (;;) {
+			double x = lon * scale_x - offset_x;
+			if (x < 0)
+				break;
+			lon -= 360.0;
+		}
+		/* Find the first longitude on the screen */
+		for (;;) {
+			double x = lon * scale_x - offset_x;
+			if (x >= 0)
+				break;
+			lon += 360.0;
+		}
+		return lon;
+	}
+
+	/* Return last longitude value which ends up on-screen */
+	public double last_lon(double lon) {
+		lon = first_lon(lon);
+
+		for(;;) {
+			double next_lon = lon + 360.0;
+			double next_x = next_lon * scale_x - offset_x;
+			if (next_x >= width)
+				break;
+			lon = next_lon;
+		}
+		return lon;
+	}
+
 	private boolean has_location;
 
 	public boolean has_location() {
@@ -119,6 +154,9 @@ public class AltosMapTransform {
 	public AltosMapTransform(int width, int height, int zoom, AltosLatLon centre_lat_lon) {
 		scale_x = 256/360.0 * Math.pow(2, zoom);
 		scale_y = 256/(2.0*Math.PI) * Math.pow(2, zoom);
+
+		this.width = width;
+		this.height = height;
 
 		AltosPointDouble centre_pt = point(centre_lat_lon);
 

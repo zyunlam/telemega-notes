@@ -152,11 +152,16 @@ public class DeviceListActivity extends Activity {
 	// The on-click listener for all devices in the ListViews
 	private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
+			// Get the device MAC address, which is the last 17 chars in the View
+			String info = ((TextView) v).getText().toString();
+
+			/* Ignore clicks on items that are too short */
+			if (info.length() <= 17)
+				return;
+
 			// Cancel discovery because it's costly and we're about to connect
 			mBtAdapter.cancelDiscovery();
 
-			// Get the device MAC address, which is the last 17 chars in the View
-			String info = ((TextView) v).getText().toString();
 			String address = info.substring(info.length() - 17);
 
 			int newline = info.indexOf('\n');

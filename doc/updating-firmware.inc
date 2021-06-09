@@ -17,6 +17,15 @@
 	you have before trying to reprogram them.
 	endif::telemega[]
 
+	TeleMini v3 can be updated directly over USB, but has no USB connector
+	on the board.  Instead, the USB signals are present on a row of 6
+	holes adjacent to the copyright assertion in the silk screen.  Thus, 
+	updating firmware on TeleMini v3 requires making up a special cable, 
+	after which you can treat it just like TeleMetrum or TeleMega.  Many
+	USB cables seem to follow the color code of red is +5V, black is GND,
+	green is USB +, and white is USB -.  On TeleMini v3, pin 3 which has 
+	a square copper pad is ground, pin 1 is USB -, and pin 2 is USB +.  
+
 	You may wish to begin by ensuring you have current firmware
 	images.  These are distributed as part of the AltOS software
 	bundle that also includes the AltosUI ground station program.
@@ -28,7 +37,7 @@
 
 	ifdef::telemega[]
 
-	=== Updating TeleMega, TeleMetrum v2 or newer, EasyMega, EasyMini, TeleDongle v3 or TeleBT v3 Firmware
+	=== Updating TeleMega, TeleMetrum v2 or newer, TeleMini v3, EasyMega, EasyMini, TeleDongle v3 or TeleBT v3 Firmware
 
 	endif::telemega[]
 	ifndef::telemega[]
@@ -44,7 +53,8 @@
 		  the target device. Power up the device.
 
 		. Using a Micro USB cable, connect the target device to your
-		  computer's USB socket.
+		  computer's USB socket.  If the target is a TeleMini v3,
+		  make up and attach a special USB cable.
 
 		. Run AltosUI, and select 'Flash Image' from the File menu.
 

@@ -42,6 +42,7 @@ public class AltosIgniteUI
 	ButtonGroup	group;
 	Boolean		opened;
 
+	boolean		has_standard;
 	int		npyro;
 
 	final static int	timeout = 1 * 1000;
@@ -127,7 +128,7 @@ public class AltosIgniteUI
 		public void run () {
 			try {
 				ignite = new AltosIgnite(link,
-							 !device.matchProduct(Altos.product_altimeter));
+							 device.matchProduct(Altos.product_basestation));
 
 			} catch (Exception e) {
 				send_exception(e);
@@ -151,7 +152,7 @@ public class AltosIgniteUI
 						}
 						reply = "status";
 					} else if (command.equals("get_npyro")) {
-						reply = String.format("npyro %d", ignite.npyro());
+						reply = String.format("npyro %d %d", ignite.npyro(), ignite.has_standard() ? 1 : 0);
 					} else if (command.equals("quit")) {
 						ignite.close();
 						break;
@@ -212,9 +213,11 @@ public class AltosIgniteUI
 		} else if (reply.equals("fired")) {
 			fired();
 		} else if (reply.startsWith("npyro")) {
-			npyro = Integer.parseInt(reply.substring(6));
+			String items[] = reply.split("\\s+");
+			npyro = Integer.parseInt(items[1]);
 			if (npyro == AltosLib.MISSING)
 				npyro = 0;
+			has_standard = Integer.parseInt(items[2]) != 0;
 			make_ui();
 		}
 	}
@@ -417,15 +420,21 @@ public class AltosIgniteUI
 
 		y++;
 
-		igniters = new Igniter[2 + npyro];
+		int nstandard = 0;
+		if (has_standard)
+			nstandard = 2;
 
-		igniters[0] = new Igniter(this, "Apogee", AltosIgnite.Apogee, y++);
-		igniters[1] = new Igniter(this, "Main", AltosIgnite.Main, y++);
+		igniters = new Igniter[nstandard + npyro];
+
+		if (has_standard) {
+			igniters[0] = new Igniter(this, "Apogee", AltosIgnite.Apogee, y++);
+			igniters[1] = new Igniter(this, "Main", AltosIgnite.Main, y++);
+		}
 
 		for (int p = 0; p < npyro; p++) {
 			String	name = String.format("%d", p);
 			String	label = String.format("%c", 'A' + p);
-			igniters[2+p] = new Igniter(this, label, name, y++);
+			igniters[nstandard+p] = new Igniter(this, label, name, y++);
 		}
 
 		c.gridx = 0;

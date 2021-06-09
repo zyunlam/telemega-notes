@@ -27,7 +27,8 @@ public class AltosIgnite {
 	boolean		remote;
 	boolean		close_on_exit;
 	boolean		link_started;
-	boolean		have_npyro = false;
+	boolean		has_pyro_info = false;
+	boolean		has_standard = false;
 	int		npyro;
 	AltosConfigData	config_data;
 
@@ -106,16 +107,28 @@ public class AltosIgnite {
 			npyro = config_data.npyro;
 		else
 			npyro = 0;
-		have_npyro = true;
+		if (config_data != null)
+			has_standard = config_data.ignite_mode != AltosLib.MISSING;
+
+		has_pyro_info = true;
 	}
 
 	public int npyro() throws InterruptedException, TimeoutException {
-		if (!have_npyro) {
+		if (!has_pyro_info) {
 			start_link();
 			get_npyro();
 			stop_link();
 		}
 		return npyro;
+	}
+
+	public boolean has_standard() throws InterruptedException, TimeoutException {
+		if (!has_pyro_info) {
+			start_link();
+			get_npyro();
+			stop_link();
+		}
+		return has_standard;
 	}
 
 	public HashMap<String,Integer> status() throws InterruptedException, TimeoutException {

@@ -21,6 +21,8 @@ while [ $found -eq 0 ]; do
 		echo -e '\e[34m'Testing $product $serial $dev'\e[39m'
 		echo ""
 		
+		sleep 0.25
+
 		./test-igniters-nowait "$dev" drogue main
 		echo ""
 
@@ -42,7 +44,6 @@ while [ $found -eq 0 ]; do
 		    echo -e '\e[31m'"$PRODUCT-$VERSION serial $serial failed"'\e[39m'
 		    exit 1
 		fi
-
 		echo ""
 
 		echo -e '\e[32m'"$PRODUCT-v$VERSION" serial "$serial" is ready to ship'\e[39m'
@@ -57,6 +58,5 @@ while [ $found -eq 0 ]; do
     if [ $result -ne 2 ]; then
 	exit $result
     fi
-    echo 'No device, sleeping...'
-    sleep 1
+    sleep 0.25
 done

@@ -48,20 +48,48 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 
 	class MapMark extends AltosMapMark {
 		public void paint(AltosMapTransform t) {
-			AltosPointDouble pt = t.screen(lat_lon);
+			double lat = lat_lon.lat;
+			double lon;
+			double first_lon = t.first_lon(lat_lon.lon);
+			double last_lon = t.last_lon(lat_lon.lon);
+			for (lon = first_lon; lon <= last_lon; lon += 360.0) {
+				AltosPointDouble pt = t.screen(lat, lon);
 
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					   RenderingHints.VALUE_ANTIALIAS_ON);
-			g.setStroke(new BasicStroke(stroke_width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+						   RenderingHints.VALUE_ANTIALIAS_ON);
+				g.setStroke(new BasicStroke(stroke_width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-			if (0 <= state && state < AltosUIMap.stateColors.length)
-				g.setColor(AltosUIMap.stateColors[state]);
-			else
-				g.setColor(AltosUIMap.stateColors[AltosLib.ao_flight_invalid]);
+				if (0 <= state && state < AltosUIMap.stateColors.length)
+					g.setColor(AltosUIMap.stateColors[state]);
+				else
+					g.setColor(AltosUIMap.stateColors[AltosLib.ao_flight_invalid]);
 
-			g.drawOval((int)pt.x-5, (int)pt.y-5, 10, 10);
-			g.drawOval((int)pt.x-20, (int)pt.y-20, 40, 40);
-			g.drawOval((int)pt.x-35, (int)pt.y-35, 70, 70);
+				g.drawOval((int)pt.x-5, (int)pt.y-5, 10, 10);
+				g.drawOval((int)pt.x-20, (int)pt.y-20, 40, 40);
+				g.drawOval((int)pt.x-35, (int)pt.y-35, 70, 70);
+
+				if (label != null) {
+					Rectangle2D	bounds;
+					bounds = line_font.getStringBounds(label, g.getFontRenderContext());
+					float x = (float) pt.x;
+					float y = (float) pt.y + (float) bounds.getHeight() / 2.0f;
+
+					g.setFont(line_font);
+					g.setColor(Color.WHITE);
+					for (int dy = -2; dy <= 2; dy += 2)
+						for (int dx = -2; dx <= 2; dx += 2)
+							g.drawString(label, x + dx, y + dy);
+					if (0 <= state && state < AltosUIMap.stateColors.length)
+						g.setColor(AltosUIMap.stateColors[state]);
+					else
+						g.setColor(AltosUIMap.stateColors[AltosLib.ao_flight_invalid]);
+					g.drawString(label, x, y);
+				}
+			}
+		}
+
+		MapMark(double lat, double lon, int state, String label) {
+			super(lat, lon, state, label);
 		}
 
 		MapMark(double lat, double lon, int state) {
@@ -403,6 +431,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 		return new MapMark(lat, lon, state);
 	}
 
+	public AltosMapMark new_mark(double lat, double lon, int state, String label) {
+		return new MapMark(lat, lon, state, label);
+	}
+
 	public AltosMapTile new_tile(AltosMapCache cache, AltosLatLon upper_left, AltosLatLon center, int zoom, int maptype, int px_size, int scale) {
 		return new MapTile(cache, upper_left, center, zoom, maptype, px_size, scale);
 	}
@@ -474,6 +506,10 @@ public class AltosUIMap extends JComponent implements AltosFlightDisplay, AltosM
 
 	public void add_mark(double lat, double lon, int status) {
 		map.add_mark(lat, lon, status);
+	}
+
+	public void add_mark(double lat, double lon, int status, String label) {
+		map.add_mark(lat, lon, status, label);
 	}
 
 	public void clear_marks() {

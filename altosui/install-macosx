@@ -8,6 +8,13 @@ case `id -u` in
     ;;
     *)
 	SUDO_ASKPASS="${dir}/ask-pass" sudo -A "$0" "$@"
+	case $? in
+	    0)
+	    ;;
+	    *)
+		osascript -e 'display dialog "Installation failed. Incorrect password?" buttons {"OK"} default button 1 with title "Installation Status"' > /dev/null
+		;;
+	esac
 	exit 0
 	;;
 esac
@@ -44,4 +51,5 @@ for file in *; do
 	    ;;
     esac
 done
+open "${LIBRARY}"
 osascript -e 'display dialog "Installation of'"${INSTALLED}"' complete" with title "Installation Complete" buttons {"OK"} default button 1' >/dev/null

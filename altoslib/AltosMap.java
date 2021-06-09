@@ -82,7 +82,7 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 	static final long auto_scroll_delay = 20 * 1000;
 
 	public AltosMapTransform	transform;
-	AltosLatLon		centre;
+	public AltosLatLon		centre;
 
 	public void reset() {
 		// nothing
@@ -289,15 +289,19 @@ public class AltosMap implements AltosMapTileListener, AltosMapStoreListener {
 			centre(lat_lon);
 	}
 
-	public AltosMapMark add_mark(double lat, double lon, int state) {
+	public AltosMapMark add_mark(double lat, double lon, int state, String label) {
 		AltosMapMark mark;
 		synchronized(marks) {
-			mark = map_interface.new_mark(lat, lon, state);
+			mark = map_interface.new_mark(lat, lon, state, label);
 			if (mark != null)
 				marks.add(mark);
 		}
 		repaint();
 		return mark;
+	}
+
+	public AltosMapMark add_mark(double lat, double lon, int state) {
+		return add_mark(lat, lon, state, null);
 	}
 
 	public void del_mark(AltosMapMark mark) {
