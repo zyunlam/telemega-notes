@@ -1,3 +1,125 @@
+altos (1.9.7-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * Update 1.9.6 release date. Add note to Releasing about date
+  * libaltos: Add windows override for EasyTimer USB ID
+  * altos: Make accel cal take three axes when present
+  * altoslib: Set all 3 axes of accel cal data when present
+  * altoslib, altosuilib: Get Idle Monitor working with EasyTimer and EasyMotor
+  * altosui: Match against basestations when determining remote
+  * altos/easymotor-v2: Increase default flight log size
+  * altos/easytimer-v1: Switch from including adxl375 to bmx160
+  * altoslib, altosui: Don't show apogee/main for EasyTimer Fire Igniter
+  * altos: Don't wait after igniter in manual mode
+  * ao-bringup: Delay before testing easymini for 0.25 seconds
+  * altoslib: Avoid sending negative accel cal values to flight computer
+  * altoslib: Fix accel inversion for TeleMega v4.0
+  * altoslib: Delay accel cal value adjustment until data all read
+  * Version 1.9.6.1
+  * altos: Add 'microtest' -- micropeak load for testing µPusb
+  * ao-tools/ao-dump-up: Recognize MicroTest data
+  * altoslib: Add all known launch sites and names to map preload
+  * micropeak: Use a menu for 'Download' on Mac OS X
+  * altosui: Show dialog box if sudo fails on Mac OS X
+  * micropeak: Stick docs in Doc dir on Mac OS X
+  * altosui: open /Library/AltusMetrum on Mac OS X after install
+  * Version 1.9.6.2
+  * altosuilib: Show launch sites at all visible locations on map
+  * Add Mac OS X 11 support to JavaApplicationStub
+  * Update JavaApplicationStub to latest release
+  * Add local hacks to JavaApplicationStub
+  * JavaApplicationStub hacks for Big Sur tabbing mode
+  * Version 1.9.6.4
+  * altoslib: Write IMU headers to CSV file when present
+  * doc: Fix typography in motortest doc
+  * Version 1.9.7
+  * doc: Update for 1.9.7
+  * altos/telegps-*: Fix log end discovery at startup
+  * altos: Simplify discovery of log end position
+  * Update 1.9.6 release date. Add note to Releasing about date
+  * libaltos: Add windows override for EasyTimer USB ID
+  * altos: Make accel cal take three axes when present
+  * altoslib: Set all 3 axes of accel cal data when present
+  * altoslib, altosuilib: Get Idle Monitor working with EasyTimer and EasyMotor
+  * altosui: Match against basestations when determining remote
+  * altos/easymotor-v2: Increase default flight log size
+  * altos/easytimer-v1: Switch from including adxl375 to bmx160
+  * altoslib, altosui: Don't show apogee/main for EasyTimer Fire Igniter
+  * altos: Don't wait after igniter in manual mode
+  * ao-bringup: Delay before testing easymini for 0.25 seconds
+  * altoslib: Avoid sending negative accel cal values to flight computer
+  * altoslib: Fix accel inversion for TeleMega v4.0
+  * altoslib: Delay accel cal value adjustment until data all read
+  * Version 1.9.6.1
+  * altos: Add 'microtest' -- micropeak load for testing µPusb
+  * ao-tools/ao-dump-up: Recognize MicroTest data
+  * altoslib: Add all known launch sites and names to map preload
+  * micropeak: Use a menu for 'Download' on Mac OS X
+  * altosui: Show dialog box if sudo fails on Mac OS X
+  * micropeak: Stick docs in Doc dir on Mac OS X
+  * altosui: open /Library/AltusMetrum on Mac OS X after install
+  * Version 1.9.6.2
+  * altosuilib: Show launch sites at all visible locations on map
+  * Add Mac OS X 11 support to JavaApplicationStub
+  * Update JavaApplicationStub to latest release
+  * Add local hacks to JavaApplicationStub
+  * JavaApplicationStub hacks for Big Sur tabbing mode
+  * Version 1.9.6.4
+  * altoslib: Write IMU headers to CSV file when present
+  * doc: Fix typography in motortest doc
+  * Version 1.9.7
+  * doc: Update for 1.9.7
+  * altos/telegps-*: Fix log end discovery at startup
+  * altos: Simplify discovery of log end position
+  * altosuilib: Zap all flash when upgrading TeleGPS from pre-1.9.7
+  * altoslib: Fix accel value flipping for TM v3.0
+  * altosdroid: Skip clicks on BT device entries that are too short
+  * altosdroid: Safeguard preferences code in case it's called too early
+  * altosdroid: Synchronize access to the 'rockets' list for online maps
+  * altosdroid: protect USB read/write when connection is null
+  * altosdroid: Don't start bluetooth if address is null
+  * altoslib: Protect has_monitor_battery from unset product
+  * Version 1.9.6.5
+  * altosdroid: Revert getResource().getColor to old API
+  * altosdroid: Update target API to 29
+  * altosdroid: Bump to version 29
+  * doc: Update 1.9.7 release notes
+  * Version 1.9.7
+
+  [ Bdale Garbee ]
+  * TeleLaunch docs should use telelaunch.txt, update copyright year, lose "draft"
+  * put notes in Releasing about keeping doc/header.inc up to date
+  * doc: add documentation on how to re-flash a TeleMini v3 over USB
+  * doc: first draft of manual for EasyMotor
+  * doc: add a brief note about TeleBT appearing inert until paired
+  * doc: make doc be about motor testing in general, not just EasyMotor
+  * doc: make doc be about motor testing in general, not just EasyMotor
+  * doc: have motortest documents actually get built by default
+  * doc: add motortest docs to publish targets
+  * docs: minor text tweak in motor testing docs
+  * altos: include EasyMotor v2 firmware in upcoming release
+  * ao-tools: update ao-flash-stm32f0x to work with openocd in Debian unstable
+  * ao-bringup: add tools for flash/cal/test of EasyMotor v2
+  * ao-bringup: fix easymotor script to use .bin for dfu-util
+  * TeleLaunch docs should use telelaunch.txt, update copyright year, lose "draft"
+  * put notes in Releasing about keeping doc/header.inc up to date
+  * doc: add documentation on how to re-flash a TeleMini v3 over USB
+  * doc: first draft of manual for EasyMotor
+  * doc: add a brief note about TeleBT appearing inert until paired
+  * doc: make doc be about motor testing in general, not just EasyMotor
+  * doc: make doc be about motor testing in general, not just EasyMotor
+  * doc: have motortest documents actually get built by default
+  * doc: add motortest docs to publish targets
+  * docs: minor text tweak in motor testing docs
+  * altos: include EasyMotor v2 firmware in upcoming release
+  * ao-tools: update ao-flash-stm32f0x to work with openocd in Debian unstable
+  * ao-bringup: add tools for flash/cal/test of EasyMotor v2
+  * ao-bringup: fix easymotor script to use .bin for dfu-util
+  * doc: update copyright year assertions
+  * update ChangeLog for 1.9.7 release
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 08 Jun 2021 23:10:20 -0600
+
 altos (1.9.6-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
