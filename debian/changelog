@@ -87,7 +87,7 @@ altos (1.9.7-1) unstable; urgency=medium
   * Version 1.9.7
 
   [ Bdale Garbee ]
-  * TeleLaunch docs should use telelaunch.txt, update copyright year, lose "draft"
+  * TeleLaunch docs use telelaunch.txt, update copyright year, lose "draft"
   * put notes in Releasing about keeping doc/header.inc up to date
   * doc: add documentation on how to re-flash a TeleMini v3 over USB
   * doc: first draft of manual for EasyMotor
@@ -101,7 +101,7 @@ altos (1.9.7-1) unstable; urgency=medium
   * ao-tools: update ao-flash-stm32f0x to work with openocd in Debian unstable
   * ao-bringup: add tools for flash/cal/test of EasyMotor v2
   * ao-bringup: fix easymotor script to use .bin for dfu-util
-  * TeleLaunch docs should use telelaunch.txt, update copyright year, lose "draft"
+  * TeleLaunch docs use telelaunch.txt, update copyright year, lose "draft"
   * put notes in Releasing about keeping doc/header.inc up to date
   * doc: add documentation on how to re-flash a TeleMini v3 over USB
   * doc: first draft of manual for EasyMotor
