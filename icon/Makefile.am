@@ -1,7 +1,8 @@
 JAVA_RES=16 32 48 64 128 256
 MAC_RES=16 32 128 256 512
 WIN_RES=16 24 32 48 64 72 96 128 180 256
-RES=$(shell echo $(JAVA_RES) $(MAC_RES) $(WIN_RES) | awk '{ for (i = 1; i <= NF; i++) printf("%s\n", $$i); }' | sort -n -u)
+AMAZON_RES=114 512
+RES=$(shell echo $(JAVA_RES) $(MAC_RES) $(WIN_RES) $(AMAZON_RES)| awk '{ for (i = 1; i <= NF; i++) printf("%s\n", $$i); }' | sort -n -u)
 
 # Application icon base names
 
@@ -73,6 +74,10 @@ JAVA_TG_FILES	= $(shell for i in $(JAVA_RES); do echo $(TG_NAME)-$$i.png; done)
 
 JAVA_FILES	= $(JAVA_AM_FILES) $(JAVA_MP_FILES) $(JAVA_TG_FILES)
 
+# Files needed for Amazon store
+
+AMAZON_FILES	= $(shell for i in $(AMAZON_RES); do echo $(AM_NAME)-$$i.png; done)
+
 # PNG files needed by anyone
 
 AM_FILES	= $(shell for i in $(RES); do echo $(AM_NAME)-$$i.png; done)
@@ -120,7 +125,7 @@ java-telegps:
 
 fat: all $(ICO_FILES) $(ICNS_FILES) $(EXE_FILES)
 
-all-local: $(JAVA_FILES) $(AM_XPM) $(LED_ICONS)
+all-local: $(JAVA_FILES) $(AM_XPM) $(LED_ICONS) $(AMAZON_FILES)
 
 clean-local:
 	$(RM) $(AM_NAME)-*.png $(TG_NAME)-*.png $(MP_NAME)-*.png
