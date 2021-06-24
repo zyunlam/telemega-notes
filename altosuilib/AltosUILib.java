@@ -112,10 +112,11 @@ public class AltosUILib extends AltosLib {
 					loaded_library = true;
 					break;
 				} catch (UnsatisfiedLinkError e) {
-					System.out.printf("Link error %s\n", e.getMessage());
 					loaded_library = false;
 				}
 			}
+			if (!loaded_library)
+				System.out.printf("Cannot find 'libaltos' device access library\n");
 
 			String OS = System.getProperty("os.name");
 
