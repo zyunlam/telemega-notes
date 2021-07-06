@@ -52,7 +52,7 @@ enum ao_pyro_flag {
 #endif
 	;
 
-struct ao_pyro {
+struct ao_pyro_1_24 {
 	enum ao_pyro_flag	flags;
 	int16_t			accel_less, accel_greater;
 	int16_t			speed_less, speed_greater;
@@ -66,7 +66,22 @@ struct ao_pyro {
 	uint8_t			_unused;	/* was 'fired' */
 };
 
+struct ao_pyro {
+	enum ao_pyro_flag	flags;
+	int16_t			accel_less, accel_greater;
+	int16_t			speed_less, speed_greater;
+	int16_t			height_less, height_greater;
+	int16_t			orient_less, orient_greater;
+	int32_t			time_less, time_greater;
+	int32_t			delay;
+	uint8_t			state_less, state_greater_or_equal;
+	int16_t			motor;
+	int32_t			delay_done;
+	uint8_t			_unused;	/* was 'fired' */
+};
+
 #define AO_PYRO_8_BIT_VALUE	(ao_pyro_state_less|ao_pyro_state_greater_or_equal)
+#define AO_PYRO_32_BIT_VALUE	(ao_pyro_time_less|ao_pyro_time_greater|ao_pyro_delay)
 
 extern uint8_t	ao_pyro_wakeup;
 
@@ -80,6 +95,9 @@ ao_pyro_show(void);
 
 void
 ao_pyro_init(void);
+
+void
+ao_pyro_update_version(void);
 
 void
 ao_pyro_manual(uint8_t p);

@@ -145,6 +145,9 @@ _ao_config_get(void)
 	}
 	minor = ao_config.minor;
 	if (minor != AO_CONFIG_MINOR) {
+#if AO_PYRO_NUM
+		ao_pyro_update_version();
+#endif
 		/* Fixups for minor version 1 */
 		if (minor < 1)
 			ao_config.apogee_delay = AO_CONFIG_DEFAULT_APOGEE_DELAY;
