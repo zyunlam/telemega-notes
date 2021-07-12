@@ -37,7 +37,7 @@ JAR=micropeak.jar
 FATJAR=micropeak-fat.jar
 
 if MULTI_ARCH
-LIBALTOS_LINUX=libaltos32.so libaltos64.so
+LIBALTOS_LINUX=libaltos_i686.so libaltos_amd64.so libaltos_aarch64.so libaltos_armel.so libaltos_armhf.so
 else
 LIBALTOS_LINUX=libaltos.so
 endif
@@ -241,11 +241,23 @@ libaltos.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
-libaltos32.so: build-libaltos
+libaltos_i686.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
-libaltos64.so: build-libaltos
+libaltos_amd64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_aarch64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_armel.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_armhf.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
@@ -273,6 +285,7 @@ altos64.dll: ../libaltos/altos64.dll
 
 build-libaltos:
 	+cd ../libaltos && make libaltos.la
+
 build-altos-dll:
 	+cd ../libaltos && make altos.dll
 
