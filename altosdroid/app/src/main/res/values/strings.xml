@@ -71,6 +71,7 @@
 
 	<!-- Tab fields -->
 	<string name="height_label">Height</string>
+	<string name="altitude_label">Altitude</string>
 	<string name="speed_label">Speed</string>
 	<string name="accel_label">Acceleration</string>
 	<string name="bearing_label">Bearing</string>
@@ -80,6 +81,7 @@
 	<string name="distance_label">Distance</string>
 	<string name="gnd_distance_label">Ground Distance</string>
 	<string name="max_height_label">Max Height</string>
+	<string name="max_altitude_label">Max Altitude</string>
 	<string name="max_speed_label">Max Speed</string>
 	<string name="max_accel_label">Max Accel</string>
 	<string name="battery_voltage_label">Battery</string>

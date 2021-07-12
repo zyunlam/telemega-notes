@@ -28,8 +28,10 @@ import android.location.Location;
 public class TabFlight extends AltosDroidTab {
 	private TextView speed_view;
 	private TextView height_view;
+	private TextView altitude_view;
 	private TextView max_speed_view;
 	private TextView max_height_view;
+	private TextView max_altitude_view;
 	private TextView elevation_view;
 	private TextView range_view;
 	private TextView bearing_view;
@@ -52,8 +54,10 @@ public class TabFlight extends AltosDroidTab {
 
 		speed_view     = (TextView) v.findViewById(R.id.speed_value);
 		height_view    = (TextView) v.findViewById(R.id.height_value);
+		altitude_view    = (TextView) v.findViewById(R.id.altitude_value);
 		max_speed_view = (TextView) v.findViewById(R.id.max_speed_value);
 		max_height_view= (TextView) v.findViewById(R.id.max_height_value);
+		max_altitude_view= (TextView) v.findViewById(R.id.max_altitude_value);
 		elevation_view = (TextView) v.findViewById(R.id.elevation_value);
 		range_view     = (TextView) v.findViewById(R.id.range_value);
 		bearing_view   = (TextView) v.findViewById(R.id.bearing_value);
@@ -85,8 +89,10 @@ public class TabFlight extends AltosDroidTab {
 		if (state != null) {
 			set_value(speed_view, AltosConvert.speed, 1, state.speed());
 			set_value(height_view, AltosConvert.height, 1, state.height());
+			set_value(altitude_view, AltosConvert.height, 1, state.altitude());
 			set_value(max_speed_view, AltosConvert.speed, 1, state.max_speed());
 			set_value(max_height_view, AltosConvert.height, 1, state.max_height());
+			set_value(max_altitude_view, AltosConvert.height, 1, state.max_altitude());
 			if (from_receiver != null) {
 				elevation_view.setText(AltosDroid.number("%1.0f°", from_receiver.elevation));
 				set_value(range_view, AltosConvert.distance, 1, from_receiver.range);
