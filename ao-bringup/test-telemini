@@ -19,7 +19,7 @@ ao-list | while read product serial dev; do
 	    echo "Testing $product $serial $dev"
 	    echo ""
 
-	    ./test-igniters "$dev" drogue main
+	    ./test-igniters "$dev" --rplus=100 --rminus=27 --adcmax=4095 drogue main
 	    echo ""
 
 	    echo "Testing baro sensor"
