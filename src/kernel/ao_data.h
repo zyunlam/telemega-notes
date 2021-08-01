@@ -55,6 +55,13 @@
 #define AO_DATA_HMC5883	0
 #endif
 
+#if HAS_MMC5983
+#include <ao_mmc5983.h>
+#define AO_DATA_MMC5983	(1 << 3)
+#else
+#define AO_DATA_MMC5983	0
+#endif
+
 #if HAS_MMA655X
 #include <ao_mma655x.h>
 #define AO_DATA_MMA655X (1 << 4)
@@ -95,7 +102,7 @@ extern uint8_t			ao_sensor_errors;
 
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375|AO_DATA_BMX160)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375|AO_DATA_BMX160|AO_DATA_MMC5983)
 
 struct ao_data {
 	uint16_t			tick;
@@ -120,6 +127,9 @@ struct ao_data {
 #endif
 #if HAS_HMC5883
 	struct ao_hmc5883_sample	hmc5883;
+#endif
+#if HAS_MMC5983
+	struct ao_mmc5983_sample	mmc5983;
 #endif
 #if HAS_MMA655X
 	uint16_t			mma655x;
@@ -378,6 +388,7 @@ typedef int16_t angle_t;	/* in degrees */
 /* X axis is aligned in the other board axis (across) */
 /* Z axis is aligned perpendicular to the board (through) */
 
+#ifndef ao_data_along
 #define ao_data_along(packet)	((packet)->mpu6000.accel_y)
 #define ao_data_across(packet)	((packet)->mpu6000.accel_x)
 #define ao_data_through(packet)	((packet)->mpu6000.accel_z)
@@ -385,6 +396,7 @@ typedef int16_t angle_t;	/* in degrees */
 #define ao_data_roll(packet)	((packet)->mpu6000.gyro_y)
 #define ao_data_pitch(packet)	((packet)->mpu6000.gyro_x)
 #define ao_data_yaw(packet)	((packet)->mpu6000.gyro_z)
+#endif
 
 static inline float ao_convert_gyro(float sensor)
 {
@@ -490,6 +502,14 @@ typedef int16_t ao_mag_t;		/* in raw sample units */
 
 #endif
 
+#if !HAS_MAG && HAS_MMC5983
+
+#define HAS_MAG		1
+
+typedef int16_t ao_mag_t;		/* in raw sample units */
+
+#endif
+
 #if !HAS_MAG && HAS_MPU9250
 
 #define HAS_MAG		1
@@ -522,6 +542,9 @@ ao_data_fill(int head) {
 #endif
 #if HAS_HMC5883
 		ao_data_ring[head].hmc5883 = ao_hmc5883_current;
+#endif
+#if HAS_MMC5983
+		ao_data_ring[head].mmc5983 = ao_mmc5983_current;
 #endif
 #if HAS_MPU6000
 		ao_data_ring[head].mpu6000 = ao_mpu6000_current;
