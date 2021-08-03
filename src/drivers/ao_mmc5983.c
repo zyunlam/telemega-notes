@@ -76,33 +76,11 @@ ao_mmc5983_duplex(uint8_t *dst, uint8_t len)
 	ao_mmc5983_stop();
 }
 
-static uint8_t ao_mmc5983_done;
-
-static void
-ao_mmc5983_isr(void)
-{
-	ao_exti_disable(AO_MMC5983_INT_PORT, AO_MMC5983_INT_PIN);
-	ao_mmc5983_done = 1;
-	ao_wakeup(&ao_mmc5983_done);
-}
-
-static uint32_t	ao_mmc5983_missed_irq;
-
 static void
 ao_mmc5983_sample(struct ao_mmc5983_sample *sample)
 {
 	struct ao_mmc5983_raw	raw;
 
-	ao_mmc5983_done = 0;
-	ao_exti_enable(AO_MMC5983_INT_PORT, AO_MMC5983_INT_PIN);
-	ao_mmc5983_reg_write(MMC5983_CONTROL_0,
-			     (1 << MMC5983_CONTROL_0_INT_MEAS_DONE_EN) |
-			     (1 << MMC5983_CONTROL_0_TM_M));
-	ao_arch_block_interrupts();
-	while (!ao_mmc5983_done)
-		if (ao_sleep_for(&ao_mmc5983_done, AO_MS_TO_TICKS(10)))
-			++ao_mmc5983_missed_irq;
-	ao_arch_release_interrupts();
 	raw.addr = MMC5983_X_OUT_0 | MMC5983_READ;
 	ao_mmc5983_duplex((uint8_t *) &raw, sizeof (raw));
 
@@ -128,13 +106,16 @@ ao_mmc5983_setup(void)
 	if (product_id != MMC5983_PRODUCT_ID_PRODUCT)
 		AO_SENSOR_ERROR(AO_DATA_MMC5983);
 
-	/* Set high bandwidth to reduce sample collection time */
+	/* Set bandwidth to 200Hz */
 	ao_mmc5983_reg_write(MMC5983_CONTROL_1,
-			     MMC5983_CONTROL_1_BW_800 << MMC5983_CONTROL_1_BW);
+			     MMC5983_CONTROL_1_BW_200 << MMC5983_CONTROL_1_BW);
 
-	/* Clear automatic measurement and 'set' operation */
+	/* Measure at 200Hz so we get recent samples by just reading
+	 * the registers
+	 */
 	ao_mmc5983_reg_write(MMC5983_CONTROL_2,
-			     0);
+			     (1 << MMC5983_CONTROL_2_CMM_EN) |
+			     (MMC5983_CONTROL_2_CM_FREQ_200HZ << MMC5983_CONTROL_2_CM_FREQ));
 
 	ao_mmc5983_configured = 1;
 	return 1;
@@ -162,8 +143,8 @@ static struct ao_task ao_mmc5983_task;
 static void
 ao_mmc5983_show(void)
 {
-	printf ("X: %d Z: %d Y: %d missed irq: %lu\n",
-		ao_mmc5983_current.x, ao_mmc5983_current.z, ao_mmc5983_current.y, ao_mmc5983_missed_irq);
+	printf ("X: %d Z: %d Y: %d\n",
+		ao_mmc5983_current.x, ao_mmc5983_current.z, ao_mmc5983_current.y);
 }
 
 static const struct ao_cmds ao_mmc5983_cmds[] = {
@@ -177,12 +158,6 @@ ao_mmc5983_init(void)
 	ao_mmc5983_configured = 0;
 
 	ao_spi_init_cs(AO_MMC5983_SPI_CS_PORT, (1 << AO_MMC5983_SPI_CS_PIN));
-
-	ao_enable_port(AO_MMC5983_INT_PORT);
-	ao_exti_setup(AO_MMC5983_INT_PORT,
-		      AO_MMC5983_INT_PIN,
-		      AO_EXTI_MODE_RISING | AO_EXTI_MODE_PULL_NONE,
-		      ao_mmc5983_isr);
 
 	ao_add_task(&ao_mmc5983_task, ao_mmc5983, "mmc5983");
 	ao_cmd_register(&ao_mmc5983_cmds[0]);
