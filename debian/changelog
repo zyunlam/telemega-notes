@@ -1,3 +1,9 @@
+altos (1.9.7-2) unstable; urgency=medium
+
+  * pull in fix from master branch for gcc-10 compilation, closes: #991800
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 03 Aug 2021 09:44:09 -0600
+
 altos (1.9.7-1) unstable; urgency=medium
 
   [ Keith Packard ]

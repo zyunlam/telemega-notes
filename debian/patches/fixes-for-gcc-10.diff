@@ -1,0 +1,21 @@
+--- altos-1.9.7.orig/src/lpc/lpc.h
++++ altos-1.9.7/src/lpc/lpc.h
+@@ -868,7 +868,7 @@ struct lpc_usb {
+ 	vuint32_t	introuting;
+ 	uint32_t	r30;
+ 	vuint32_t	eptoggle;
+-} lpc_usb;
++};
+ 
+ extern struct lpc_usb lpc_usb;
+ #define lpc_usb (*(struct lpc_usb *) 0x40080000)
+--- altos-1.9.7.orig/src/micropeak-v2.0/ao_micro.c
++++ altos-1.9.7/src/micropeak-v2.0/ao_micro.c
+@@ -23,7 +23,6 @@
+ #include <ao_report_micro.h>
+ #include <ao_log_micro.h>
+ 
+-uint32_t 	pa;
+ alt_t		ground_alt, max_alt;
+ alt_t		ao_max_height;
+ 
