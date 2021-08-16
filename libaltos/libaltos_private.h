@@ -25,6 +25,7 @@
 #include <string.h>
 
 #define BLUETOOTH_PRODUCT_TELEBT	"TeleBT"
+#define BT_PORT_DEFAULT		6
 
 #define USB_BUF_SIZE	64
 
