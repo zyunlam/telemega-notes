@@ -757,6 +757,7 @@ altos_bt_open(struct altos_bt_device *device)
 	struct altos_file_windows	*file;
 	SOCKADDR_BTH		sockaddr_bth;
 	int			ret;
+	int			channel = 0;
 
 	file = calloc(1, sizeof (struct altos_file_windows));
 	if (!file) {
@@ -775,7 +776,12 @@ altos_bt_open(struct altos_bt_device *device)
 	memset(&sockaddr_bth, '\0', sizeof (sockaddr_bth));
 	sockaddr_bth.addressFamily = AF_BTH;
 	sockaddr_bth.btAddr = str2ba(device->addr);
-	sockaddr_bth.port = altos_bt_port(device);
+
+	channel = altos_bt_port(device);
+	if (channel == 0)
+		channel = BT_PORT_DEFAULT;
+
+	sockaddr_bth.port = channel;
 
 	ret = connect(file->socket, (SOCKADDR *) &sockaddr_bth, sizeof (sockaddr_bth));
 

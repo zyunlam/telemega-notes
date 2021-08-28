@@ -512,58 +512,66 @@ altos_bt_open(struct altos_bt_device *device)
 		goto no_file;
 	}
 
-#if 0
-	/*
-	 * Search for the RFCOMM service to get the right channel
-	 */
-	session = sdp_connect(BDADDR_ANY, &addr.rc_bdaddr, SDP_RETRY_IF_BUSY);
+	/* Try the built-in vendor list */
+	channel = altos_bt_port(device);
 
-	if (session) {
-		static const uint8_t svc_uuid_int[] = {
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0x11, 0x01
-		};
-		int			err;
-		uuid_t			svc_uuid;
-		uint32_t		range;
-		sdp_list_t		*search_list, *attrid_list;
-		sdp_list_t		*response_list = NULL, *r;
-		sdp_uuid16_create(&svc_uuid, PUBLIC_BROWSE_GROUP);
-		search_list = sdp_list_append(NULL, &svc_uuid);
+	/* Not present, try to discover an RFCOMM service */
+	if (channel == 0) {
+		/*
+		 * Search for the RFCOMM service to get the right channel
+		 */
+		session = sdp_connect(BDADDR_ANY, &addr.rc_bdaddr, SDP_RETRY_IF_BUSY);
 
-		range = 0x0000ffff;
-		attrid_list = sdp_list_append(NULL, &range);
+		if (session) {
+			static const uint8_t svc_uuid_int[] = {
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0x11, 0x01
+			};
+			int			err;
+			uuid_t			svc_uuid;
+			uint32_t		range;
+			sdp_list_t		*search_list, *attrid_list;
+			sdp_list_t		*response_list = NULL, *r;
+			sdp_uuid16_create(&svc_uuid, PUBLIC_BROWSE_GROUP);
+			search_list = sdp_list_append(NULL, &svc_uuid);
 
-		err = sdp_service_search_attr_req(session, search_list,
-						  SDP_ATTR_REQ_RANGE, attrid_list, &response_list);
+			range = 0x0000ffff;
+			attrid_list = sdp_list_append(NULL, &range);
 
-		if (err >= 0) {
-			for (r = response_list; r; r = r->next) {
-				sdp_record_t *rec = (sdp_record_t*) r->data;
-				sdp_list_t *proto_list;
-				sdp_list_t *access = NULL;
-				int proto;
+			err = sdp_service_search_attr_req(session, search_list,
+							  SDP_ATTR_REQ_RANGE, attrid_list, &response_list);
 
-				proto = sdp_uuid_to_proto(&rec->svclass);
+			if (err >= 0) {
+				for (r = response_list; r; r = r->next) {
+					sdp_record_t *rec = (sdp_record_t*) r->data;
+					sdp_list_t *proto_list;
+					sdp_list_t *access = NULL;
+					int proto;
 
-				if (proto == SERIAL_PORT_SVCLASS_ID) {
-					sdp_get_access_protos(rec, &access);
-					if (access) {
-						int this_chan = sdp_get_proto_port(access, RFCOMM_UUID);
-						if (this_chan)
-							channel = this_chan;
+					proto = sdp_uuid_to_proto(&rec->svclass);
+
+					if (proto == SERIAL_PORT_SVCLASS_ID) {
+						sdp_get_access_protos(rec, &access);
+						if (access) {
+							int this_chan = sdp_get_proto_port(access, RFCOMM_UUID);
+							if (this_chan) {
+								printf("found service on channel %d\n", this_chan);
+								channel = this_chan;
+							}
+						}
 					}
 				}
 			}
-		}
 
-		/* Leave the session open so we don't disconnect from the device before opening
-		 * the RFCOMM channel
-		 */
+			/* Leave the session open so we don't disconnect from the device before opening
+			 * the RFCOMM channel
+			 */
+		}
 	}
-#endif
+
+	/* Still nothing, try the default */
 	if (channel == 0)
-		channel = altos_bt_port(device);
+		channel = BT_PORT_DEFAULT;
 
 	/* Connect to the channel */
 	file = calloc(1, sizeof (struct altos_file_posix));
