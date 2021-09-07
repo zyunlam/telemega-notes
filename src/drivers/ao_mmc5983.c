@@ -89,11 +89,11 @@ ao_mmc5983_sample(struct ao_mmc5983_sample *sample)
 	sample->z = raw.z0 << 10 | raw.z1 << 2 | ((raw.xyz2 >> 2) & 3);
 }
 
+static uint8_t product_id;
+
 static uint8_t
 ao_mmc5983_setup(void)
 {
-	uint8_t	product_id;
-
 	if (ao_mmc5983_configured)
 		return 1;
 
@@ -143,8 +143,8 @@ static struct ao_task ao_mmc5983_task;
 static void
 ao_mmc5983_show(void)
 {
-	printf ("X: %d Z: %d Y: %d\n",
-		ao_mmc5983_current.x, ao_mmc5983_current.z, ao_mmc5983_current.y);
+	printf ("X: %d Z: %d Y: %d id %d\n",
+		ao_mmc5983_current.x, ao_mmc5983_current.z, ao_mmc5983_current.y, product_id);
 }
 
 static const struct ao_cmds ao_mmc5983_cmds[] = {
