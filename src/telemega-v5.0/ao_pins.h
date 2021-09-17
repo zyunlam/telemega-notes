@@ -291,7 +291,7 @@ struct ao_adc {
 
 #define M25_MAX_CHIPS		1
 #define AO_M25_SPI_CS_PORT	(&stm_gpiod)
-#define AO_M25_SPI_CS_MASK	(1 << 3)
+#define AO_M25_SPI_CS_MASK	(1 << 10)
 #define AO_M25_SPI_BUS		AO_SPI_2_PB13_PB14_PB15
 
 /*
