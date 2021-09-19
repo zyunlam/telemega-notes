@@ -259,15 +259,30 @@ struct ao_log_mega {
 		struct {
 			uint32_t	pres;		/* 4 */
 			uint32_t	temp;		/* 8 */
-			int16_t		accel_x;	/* 12 */
-			int16_t		accel_y;	/* 14 */
-			int16_t		accel_z;	/* 16 */
-			int16_t		gyro_x;		/* 18 */
-			int16_t		gyro_y;		/* 20 */
-			int16_t		gyro_z;		/* 22 */
-			int16_t		mag_x;		/* 24 */
-			int16_t		mag_z;		/* 26 */
-			int16_t		mag_y;		/* 28 */
+			union {
+				struct {
+					int16_t		accel_along;	/* 12 */
+					int16_t		accel_across;	/* 14 */
+					int16_t		accel_through;	/* 16 */
+					int16_t		gyro_roll;	/* 18 */
+					int16_t		gyro_pitch;	/* 20 */
+					int16_t		gyro_yaw;	/* 22 */
+					int16_t		mag_along;	/* 24 */
+					int16_t		mag_across;	/* 26 */
+					int16_t		mag_through;	/* 28 */
+				};
+				struct {
+					int16_t		accel_x;	/* 12 */
+					int16_t		accel_y;	/* 14 */
+					int16_t		accel_z;	/* 16 */
+					int16_t		gyro_x;		/* 18 */
+					int16_t		gyro_y;		/* 20 */
+					int16_t		gyro_z;		/* 22 */
+					int16_t		mag_x;		/* 24 */
+					int16_t		mag_z;		/* 26 */
+					int16_t		mag_y;		/* 28 */
+				};
+			};
 			int16_t		accel;		/* 30 */
 		} sensor;	/* 32 */
 		/* AO_LOG_TEMP_VOLT */
