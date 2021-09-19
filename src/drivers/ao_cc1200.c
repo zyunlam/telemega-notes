@@ -25,6 +25,8 @@
 #include <ao_pad.h>
 #endif
 
+static uint8_t cc1201;
+
 static uint8_t ao_radio_mutex;
 
 static uint8_t ao_radio_wake;		/* radio ready. Also used as sleep address */
@@ -663,6 +665,11 @@ static uint8_t	ao_radio_configured = 0;
 static void
 ao_radio_setup(void)
 {
+	uint8_t partnumber = ao_radio_reg_read(CC1200_PARTNUMBER);
+
+	if (partnumber == CC1200_PARTNUMBER_CC1201)
+		cc1201 = 1;
+
 	ao_radio_strobe(CC1200_SRES);
 
 	ao_radio_set_regs(radio_setup);
@@ -719,8 +726,8 @@ ao_radio_state(void)
 	return (ao_radio_status() >> CC1200_STATUS_STATE) & CC1200_STATUS_STATE_MASK;
 }
 
-#if CC1200_DEBUG
-void
+#if CC1200_DEBUG_
+static void
 ao_radio_show_state(char *where)
 {
 	printf("%s: state %d len %d rxbytes %d\n",
@@ -1320,7 +1327,7 @@ static void ao_radio_packet(void) {
 	ao_radio_send(packet, sizeof (packet));
 }
 
-void
+static void
 ao_radio_test_recv(void)
 {
 	static uint8_t	bytes[34];
