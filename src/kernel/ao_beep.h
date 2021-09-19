@@ -35,7 +35,9 @@
  * frequency = 1/2 (24e6/32) / beep
  */
 
+#ifndef AO_BEEP_MID_DEFAULT
 #define AO_BEEP_MID_DEFAULT	94	/* 3989Hz */
+#endif
 
 #if HAS_BEEP_CONFIG
 #define AO_BEEP_MID	ao_config.mid_beep
