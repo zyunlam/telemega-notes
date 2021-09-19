@@ -71,6 +71,7 @@
 #define LOG_ERASE_MARK				0x55
 #define LOG_MAX_ERASE				128
 #define AO_LOG_FORMAT				AO_LOG_FORMAT_TELEMEGA_5
+#define AO_LOG_NORMALIZED			1
 
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
@@ -82,6 +83,7 @@
 #define BEEPER_CHANNEL		2
 #define BEEPER_PORT		(&stm_gpioe)
 #define BEEPER_PIN		4
+#define AO_BEEP_MID_DEFAULT	179	/* 2100 Hz */
 #define HAS_BATTERY_REPORT	1
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		1
@@ -312,10 +314,8 @@ struct ao_adc {
 #define AO_CC1200_SPI_BUS	AO_SPI_2_PB13_PB14_PB15
 #define AO_CC1200_SPI		stm_spi2
 
-#define AO_CC1200_INT_PORT		(&stm_gpioe)
-#define AO_CC1200_INT_PIN		1
-#define AO_CC1200_MCU_WAKEUP_PORT	(&stm_gpioc)
-#define AO_CC1200_MCU_WAKEUP_PIN	(0)
+#define AO_CC1200_INT_PORT		(&stm_gpiob)
+#define AO_CC1200_INT_PIN		11
 
 #define AO_CC1200_INT_GPIO	2
 #define AO_CC1200_INT_GPIO_IOCFG	CC1200_IOCFG2
@@ -327,7 +327,24 @@ struct ao_adc {
 
 
 /*
+ *
+ * If the board is laying component side up with
+ * the antenna (nose) pointing north
+ *
+ * +along	north	+roll	left up
+ * +across	west	+pitch	nose down
+ * +through	up	+yaw	left turn
+ */
+
+/*
  * mpu6000
+ *
+ *	pin 1 NW corner of chip
+ *
+ *	+along		+Y	+roll	+Y
+ *	+across		-X	+pitch	-X
+ *	+through	+Z	+yaw	+Z
+ *
  */
 
 #define HAS_MPU6000		1
@@ -338,13 +355,21 @@ struct ao_adc {
 #define AO_MPU6000_SPI_CS_PIN	13
 #define HAS_IMU			1
 
-#define ao_data_along(packet)	((packet)->mpu6000.accel_x)
-#define ao_data_across(packet)	(-(packet)->mpu6000.accel_y)
-#define ao_data_through(packet)	((packet)->mpu6000.accel_z)
+#define ao_mpu6000_along(m)	((m)->accel_y)
+#define ao_mpu6000_across(m)	(-(m)->accel_x)
+#define ao_mpu6000_through(m)	((m)->accel_z)
 
-#define ao_data_roll(packet)	((packet)->mpu6000.gyro_x)
-#define ao_data_pitch(packet)	(-(packet)->mpu6000.gyro_y)
-#define ao_data_yaw(packet)	((packet)->mpu6000.gyro_z)
+#define ao_mpu6000_roll(m)	((m)->gyro_y)
+#define ao_mpu6000_pitch(m)	(-(m)->gyro_x)
+#define ao_mpu6000_yaw(m)	((m)->gyro_z)
+
+#define ao_data_along(packet)	ao_mpu6000_along(&(packet)->mpu6000)
+#define ao_data_across(packet)	ao_mpu6000_across(&(packet)->mpu6000)
+#define ao_data_through(packet)	ao_mpu6000_through(&(packet)->mpu6000)
+
+#define ao_data_roll(packet)	ao_mpu6000_roll(&(packet)->mpu6000)
+#define ao_data_pitch(packet)	ao_mpu6000_pitch(&(packet)->mpu6000)
+#define ao_data_yaw(packet)	ao_mpu6000_yaw(&(packet)->mpu6000)
 
 /* Bit-banging i2c */
 #define AO_I2C_SCL_PORT		(&stm_gpiod)
@@ -352,7 +377,15 @@ struct ao_adc {
 #define AO_I2C_SDA_PORT		(&stm_gpiod)
 #define AO_I2C_SDA_PIN		4
 
-/* MMC5983 */
+/*
+ * MMC5983
+ *
+ *	pin 1 NE corner of chip
+ *
+ *	+along		-Y
+ *	+across		+X
+ *	+through	-Z
+ */
 
 #define HAS_MMC5983		1
 #define AO_MMC5983_INT_PORT	(&stm_gpiod)
@@ -367,12 +400,23 @@ struct ao_adc {
 #define AO_MMC5983_SPI_CS_PORT	(&stm_gpioa)
 #define AO_MMC5983_SPI_CS_PIN	15
 
+#define ao_mmc5983_along(m)		(-(m)->y)
+#define ao_mmc5983_across(m)		((m)->x)
+#define ao_mmc5983_through(m)		(-(m)->z)
 
-#define ao_data_mag_along(packet)	((packet)->mmc5983.x)
-#define ao_data_mag_across(packet)	((packet)->mmc5983.y)
-#define ao_data_mag_through(packet)	((packet)->mmc5983.z)
+#define ao_data_mag_along(packet)	ao_mmc5983_along(&(packet)->mmc5983)
+#define ao_data_mag_across(packet)	ao_mmc5983_across(&(packet)->mmc5983)
+#define ao_data_mag_through(packet)	ao_mmc5983_through(&(packet)->mmc5983)
 
-/* ADXL375 */
+/*
+ * ADXL375
+ *
+ * pin 1 NW corner of chip
+ *
+ *	+along		+X
+ *	+across		+Y
+ *	+through	+Z
+ */
 
 #define HAS_ADXL375		1
 #define AO_ADXL375_SPI_INDEX	(AO_SPI_1_PB3_PB4_PB5 | AO_SPI_MODE_3)
