@@ -136,9 +136,41 @@ ao_send_sensor(void)
 static void
 ao_send_mega_sensor(void)
 {
-		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+	struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
 	telemetry.generic.tick = packet->tick;
+#if AO_LOG_NORMALIZED
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5
+	telemetry.generic.type = AO_TELEMETRY_MEGA_NORM_MPU6000_MMC5983;
+#else
+#error unknown normalized log type
+#endif
+
+#if HAS_GYRO
+	telemetry.mega_norm.orient = ao_sample_orient;
+#endif
+	telemetry.mega_norm.accel = ao_data_accel(packet);
+	telemetry.mega_norm.pres = ao_data_pres(packet);
+	telemetry.mega_norm.temp = ao_data_temp(packet);
+
+#if HAS_MPU6000
+	telemetry.mega_norm.accel_along = ao_data_along(packet);
+	telemetry.mega_norm.accel_across = ao_data_across(packet);
+	telemetry.mega_norm.accel_through = ao_data_through(packet);
+
+	telemetry.mega_norm.gyro_roll = ao_data_roll(packet);
+	telemetry.mega_norm.gyro_pitch = ao_data_pitch(packet);
+	telemetry.mega_norm.gyro_yaw = ao_data_yaw(packet);
+#endif
+
+#if HAS_MMC5983
+	telemetry.mega_norm.mag_along = ao_data_mag_along(packet);
+	telemetry.mega_norm.mag_across = ao_data_mag_across(packet);
+	telemetry.mega_norm.mag_through = ao_data_mag_through(packet);
+#endif
+
+#else
+
 #if HAS_BMX160
 	telemetry.generic.type = AO_TELEMETRY_MEGA_SENSOR_BMX160;
 #else
@@ -199,7 +231,7 @@ ao_send_mega_sensor(void)
 	telemetry.mega_sensor.mag_z = packet->bmx160.mag_z;
 	telemetry.mega_sensor.mag_y = packet->bmx160.mag_y;
 #endif
-
+#endif
 	ao_telemetry_send();
 }
 
