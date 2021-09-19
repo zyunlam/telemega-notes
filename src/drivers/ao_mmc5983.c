@@ -22,7 +22,59 @@
 
 #if HAS_MMC5983
 
-#define AO_MMC5983_SPI_SPEED	ao_spi_speed(10000000)
+struct ao_mmc5983_sample	ao_mmc5983_current;
+
+static uint8_t	ao_mmc5983_configured;
+
+#ifdef MMC5983_I2C
+#include <ao_i2c_bit.h>
+
+static void
+ao_mmc5983_reg_write(uint8_t addr, uint8_t data)
+{
+	uint8_t d[2];
+
+	d[0] = addr;
+	d[1] = data;
+
+	ao_i2c_bit_start(MMC5983_I2C_ADDR);
+	ao_i2c_bit_send(d, 2);
+	ao_i2c_bit_stop();
+}
+
+static uint8_t
+ao_mmc5983_reg_read(uint8_t addr)
+{
+	uint8_t d[1];
+
+	ao_i2c_bit_start(MMC5983_I2C_ADDR);
+	d[0] = addr;
+	ao_i2c_bit_send(d, 1);
+	ao_i2c_bit_restart(MMC5983_I2C_ADDR | 1);
+	ao_i2c_bit_recv(d, 1);
+	ao_i2c_bit_stop();
+	return d[0];
+}
+
+static void
+ao_mmc5983_sample(struct ao_mmc5983_sample *sample)
+{
+	struct ao_mmc5983_raw	raw;
+
+	ao_i2c_bit_start(MMC5983_I2C_ADDR);
+	raw.addr = MMC5983_X_OUT_0;
+	ao_i2c_bit_send(&raw.addr, 1);
+	ao_i2c_bit_restart(MMC5983_I2C_ADDR | 1);
+	ao_i2c_bit_recv(&raw.x0, 7);
+	ao_i2c_bit_stop();
+
+	sample->x = raw.x0 << 10 | raw.x1 << 2 | ((raw.xyz2 >> 6) & 3);
+	sample->y = raw.y0 << 10 | raw.y1 << 2 | ((raw.xyz2 >> 4) & 3);
+	sample->z = raw.z0 << 10 | raw.z1 << 2 | ((raw.xyz2 >> 2) & 3);
+}
+
+#else
+#define AO_MMC5983_SPI_SPEED	ao_spi_speed(2000000)
 
 static void
 ao_mmc5983_start(void) {
@@ -39,9 +91,6 @@ ao_mmc5983_stop(void) {
 		       AO_MMC5983_SPI_INDEX);
 }
 
-struct ao_mmc5983_sample	ao_mmc5983_current;
-
-static uint8_t	ao_mmc5983_configured;
 
 static void
 ao_mmc5983_reg_write(uint8_t addr, uint8_t data)
@@ -88,23 +137,33 @@ ao_mmc5983_sample(struct ao_mmc5983_sample *sample)
 	sample->y = raw.y0 << 10 | raw.y1 << 2 | ((raw.xyz2 >> 4) & 3);
 	sample->z = raw.z0 << 10 | raw.z1 << 2 | ((raw.xyz2 >> 2) & 3);
 }
+#endif
 
 static uint8_t product_id;
 
 static uint8_t
 ao_mmc5983_setup(void)
 {
+
 	if (ao_mmc5983_configured)
 		return 1;
 
-	/* Place device in 3-wire mode */
-	ao_mmc5983_reg_write(MMC5983_CONTROL_3,
-			     1 << MMC5983_CONTROL_3_SPI_3W);
+	/* Delay for power up time (10ms) */
+	ao_delay(AO_MS_TO_TICKS(10));
+
+	ao_mmc5983_reg_write(MMC5983_CONTROL_1,
+			     1 << MMC5983_CONTROL_1_SW_RST);
+
+	/* Delay for power up time (10ms) */
+	ao_delay(AO_MS_TO_TICKS(10));
 
 	/* Check product ID */
 	product_id = ao_mmc5983_reg_read(MMC5983_PRODUCT_ID);
-	if (product_id != MMC5983_PRODUCT_ID_PRODUCT)
+	if (product_id != MMC5983_PRODUCT_ID_PRODUCT_I2C &&
+	    product_id != MMC5983_PRODUCT_ID_PRODUCT_SPI)
+	{
 		AO_SENSOR_ERROR(AO_DATA_MMC5983);
+	}
 
 	/* Set bandwidth to 200Hz */
 	ao_mmc5983_reg_write(MMC5983_CONTROL_1,
@@ -143,8 +202,9 @@ static struct ao_task ao_mmc5983_task;
 static void
 ao_mmc5983_show(void)
 {
-	printf ("X: %d Z: %d Y: %d id %d\n",
-		ao_mmc5983_current.x, ao_mmc5983_current.z, ao_mmc5983_current.y, product_id);
+	printf ("X: %d Z: %d Y: %d id: %d\n",
+		ao_mmc5983_current.x, ao_mmc5983_current.z, ao_mmc5983_current.y,
+		product_id);
 }
 
 static const struct ao_cmds ao_mmc5983_cmds[] = {
@@ -157,7 +217,23 @@ ao_mmc5983_init(void)
 {
 	ao_mmc5983_configured = 0;
 
+#ifdef MMC5983_I2C
+	ao_enable_output(AO_MMC5983_SPI_CS_PORT, AO_MMC5983_SPI_CS_PIN, 1);
+#else
+	ao_enable_input(AO_MMC5983_SPI_MISO_PORT,
+			AO_MMC5983_SPI_MISO_PIN,
+			AO_EXTI_MODE_PULL_NONE);
+
+	ao_enable_output(AO_MMC5983_SPI_CLK_PORT,
+			 AO_MMC5983_SPI_CLK_PIN,
+			 1);
+
+	ao_enable_output(AO_MMC5983_SPI_MOSI_PORT,
+			 AO_MMC5983_SPI_MOSI_PIN,
+			 0);
+
 	ao_spi_init_cs(AO_MMC5983_SPI_CS_PORT, (1 << AO_MMC5983_SPI_CS_PIN));
+#endif
 
 	ao_add_task(&ao_mmc5983_task, ao_mmc5983, "mmc5983");
 	ao_cmd_register(&ao_mmc5983_cmds[0]);

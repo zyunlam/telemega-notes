@@ -21,6 +21,8 @@
 
 #define MMC5983_READ		0x80
 
+#define MMC5983_I2C_ADDR	0x60
+
 #define MMC5983_CONFIG_A	0
 
 #define  MMC5983_CONFIG_A_MA		5
@@ -124,7 +126,9 @@
 #define  MMC5983_CONTROL_3_ST_ENP		1
 
 #define MMC5983_PRODUCT_ID	0x2f
-#define MMC5983_PRODUCT_ID_PRODUCT	0x30
+#define MMC5983_PRODUCT_ID_PRODUCT_I2C	0x30
+#define MMC5983_PRODUCT_ID_PRODUCT_SPI	0x31
+
 
 struct ao_mmc5983_sample {
 	int16_t		x, y, z;
