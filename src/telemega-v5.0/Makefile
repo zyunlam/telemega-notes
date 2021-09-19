@@ -46,6 +46,9 @@ INC = \
 #STACK_GUARD=ao_mpu_stm.c
 #STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
 
+# Bit-bang MMC5983 chip needs this
+#	ao_i2c_bit.c
+
 ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_interrupt.c \

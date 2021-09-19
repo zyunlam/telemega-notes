@@ -94,9 +94,13 @@
 #define SPI_1_PE13_PE14_PE15	1	/* MPU6000 */
 #define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
 
+//#define MMC5983_I2C		1
+
 #define HAS_SPI_2		1
 #define SPI_2_PB13_PB14_PB15	1	/* Flash, Companion */
+#ifndef MMC5983_I2C
 #define SPI_2_PD1_PD3_PD4	1	/* MMC5983 */
+#endif
 #define SPI_2_OSPEEDR		STM_OSPEEDR_10MHz
 
 #define HAS_I2C_1		0
@@ -342,14 +346,27 @@ struct ao_adc {
 #define ao_data_pitch(packet)	(-(packet)->mpu6000.gyro_y)
 #define ao_data_yaw(packet)	((packet)->mpu6000.gyro_z)
 
+/* Bit-banging i2c */
+#define AO_I2C_SCL_PORT		(&stm_gpiod)
+#define AO_I2C_SCL_PIN		1
+#define AO_I2C_SDA_PORT		(&stm_gpiod)
+#define AO_I2C_SDA_PIN		4
+
 /* MMC5983 */
 
 #define HAS_MMC5983		1
 #define AO_MMC5983_INT_PORT	(&stm_gpiod)
 #define AO_MMC5983_INT_PIN	5
-#define AO_MMC5983_SPI_INDEX	AO_SPI_2_PD1_PD3_PD4
+#define AO_MMC5983_SPI_CLK_PORT	(&stm_gpiod)
+#define AO_MMC5983_SPI_CLK_PIN	1
+#define AO_MMC5983_SPI_MISO_PORT	(&stm_gpiod)
+#define AO_MMC5983_SPI_MISO_PIN	3
+#define AO_MMC5983_SPI_MOSI_PORT	(&stm_gpiod)
+#define AO_MMC5983_SPI_MOSI_PIN	4
+#define AO_MMC5983_SPI_INDEX	(AO_SPI_2_PD1_PD3_PD4 | AO_SPI_MODE_3)
 #define AO_MMC5983_SPI_CS_PORT	(&stm_gpioa)
 #define AO_MMC5983_SPI_CS_PIN	15
+
 
 #define ao_data_mag_along(packet)	((packet)->mmc5983.x)
 #define ao_data_mag_across(packet)	((packet)->mmc5983.y)

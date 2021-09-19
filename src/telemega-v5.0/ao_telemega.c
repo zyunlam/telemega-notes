@@ -26,6 +26,7 @@
 #include <ao_companion.h>
 #include <ao_profile.h>
 #include <ao_eeprom.h>
+#include <ao_i2c_bit.h>
 #if HAS_SAMPLE_PROFILE
 #include <ao_sample_profile.h>
 #endif
@@ -51,6 +52,9 @@ main(void)
 	ao_timer_init();
 
 	ao_spi_init();
+#ifdef MMC5983_I2C
+	ao_i2c_bit_init();
+#endif
 	ao_dma_init();
 	ao_exti_init();
 
