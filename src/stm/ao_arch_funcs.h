@@ -182,8 +182,8 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 		ao_spi_put(bus);		\
 	} while (0)
 
-#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,(1<<bit),bus,speed)
-#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,(1<<bit),bus)
+#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,1<<(bit),bus,speed)
+#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,1<<(bit),bus)
 
 #define ao_enable_port(port) do {					\
 		if ((port) == &stm_gpioa)				\
@@ -239,7 +239,7 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 #define AO_OUTPUT_PUSH_PULL	STM_OTYPER_PUSH_PULL
 #define AO_OUTPUT_OPEN_DRAIN	STM_OTYPER_OPEN_DRAIN
 
-#define ao_gpio_set_output_mode(port,bit,mode) \
+#define ao_gpio_set_output_mode(port,pin,mode) \
 	stm_otyper_set(port, pin, mode)
 
 #define ao_gpio_set_mode(port,bit,mode) do {				\
