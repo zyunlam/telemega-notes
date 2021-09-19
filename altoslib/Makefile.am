@@ -127,6 +127,7 @@ altoslib_JAVA = \
 	AltosTelemetryLocation.java \
 	AltosTelemetryMap.java \
 	AltosTelemetryMegaSensor.java \
+	AltosTelemetryMegaNorm.java \
 	AltosTelemetryMegaData.java \
 	AltosTelemetryMini2.java \
 	AltosTelemetryMini3.java \

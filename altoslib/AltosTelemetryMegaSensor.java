@@ -105,20 +105,6 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		return gyro_z();
 	}
 
-	public static int mag_across_axis(int imu_type) {
-		switch (imu_type) {
-		case AltosIMU.imu_type_telemega_v1_v2:
-		case AltosIMU.imu_type_telemega_v3:
-		case AltosIMU.imu_type_easymega_v1:
-			return AltosIMU.imu_axis_x;
-		case AltosIMU.imu_type_telemega_v4:
-		case AltosIMU.imu_type_easymega_v2:
-			return AltosIMU.imu_axis_y;
-		default:
-			return AltosLib.MISSING;
-		}
-	}
-
 	private int mag_across(int imu_type) {
 		switch (imu_type) {
 		case AltosIMU.imu_type_telemega_v1_v2:
@@ -128,20 +114,6 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		case AltosIMU.imu_type_telemega_v4:
 		case AltosIMU.imu_type_easymega_v2:
 			return -mag_y();
-		default:
-			return AltosLib.MISSING;
-		}
-	}
-
-	public static int mag_along_axis(int imu_type) {
-		switch (imu_type) {
-		case AltosIMU.imu_type_telemega_v1_v2:
-		case AltosIMU.imu_type_telemega_v3:
-		case AltosIMU.imu_type_easymega_v1:
-			return AltosIMU.imu_axis_y;
-		case AltosIMU.imu_type_easymega_v2:
-		case AltosIMU.imu_type_telemega_v4:
-			return AltosIMU.imu_axis_x;
 		default:
 			return AltosLib.MISSING;
 		}
@@ -159,10 +131,6 @@ public class AltosTelemetryMegaSensor extends AltosTelemetryStandard {
 		default:
 			return AltosLib.MISSING;
 		}
-	}
-
-	public static int mag_through_axis(int imu_type) {
-		return AltosIMU.imu_axis_z;
 	}
 
 	private int mag_through(int imu_type) {

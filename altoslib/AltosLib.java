@@ -385,7 +385,15 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_MICROPEAK2 = 18;
 	public static final int AO_LOG_FORMAT_TELEMEGA_4 = 19;
 	public static final int AO_LOG_FORMAT_EASYMOTOR = 20;
+	public static final int AO_LOG_FORMAT_TELEMEGA_5 = 21;
 	public static final int AO_LOG_FORMAT_NONE = 127;
+
+	public static final int	model_mpu6000 = 0;
+	public static final int	model_mpu9250 = 1;
+	public static final int	model_adxl375 = 2;
+	public static final int	model_bmx160 = 3;
+	public static final int model_hmc5883 = 4;
+	public static final int model_mmc5983 = 5;
 
 	public static boolean isspace(int c) {
 		switch (c) {
