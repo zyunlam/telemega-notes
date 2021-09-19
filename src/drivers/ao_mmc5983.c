@@ -202,9 +202,10 @@ static struct ao_task ao_mmc5983_task;
 static void
 ao_mmc5983_show(void)
 {
-	printf ("X: %d Z: %d Y: %d id: %d\n",
-		ao_mmc5983_current.x, ao_mmc5983_current.z, ao_mmc5983_current.y,
-		product_id);
+	printf ("MMC5983: %d %d %d\n",
+		ao_mmc5983_along(&ao_mmc5983_current),
+		ao_mmc5983_across(&ao_mmc5983_current),
+		ao_mmc5983_through(&ao_mmc5983_current));
 }
 
 static const struct ao_cmds ao_mmc5983_cmds[] = {

@@ -357,14 +357,23 @@ static struct ao_task ao_mpu6000_task;
 static void
 ao_mpu6000_show(void)
 {
-	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d id %02x\n",
+#ifdef AO_LOG_NORMALIZED
+	printf ("MPU6000: %7d %7d %7d %7d %7d %7d\n",
+		ao_mpu6000_along(&ao_mpu6000_current),
+		ao_mpu6000_across(&ao_mpu6000_current),
+		ao_mpu6000_through(&ao_mpu6000_current),
+		ao_mpu6000_roll(&ao_mpu6000_current),
+		ao_mpu6000_pitch(&ao_mpu6000_current),
+		ao_mpu6000_yaw(&ao_mpu6000_current));
+#else
+	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d\n",
 		ao_mpu6000_current.accel_x,
 		ao_mpu6000_current.accel_y,
 		ao_mpu6000_current.accel_z,
 		ao_mpu6000_current.gyro_x,
 		ao_mpu6000_current.gyro_y,
-		ao_mpu6000_current.gyro_z,
-		mpu_id);
+		ao_mpu6000_current.gyro_z);
+#endif
 }
 
 static const struct ao_cmds ao_mpu6000_cmds[] = {
