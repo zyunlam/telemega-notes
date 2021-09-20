@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9.7)
+AC_INIT([altos], 1.9.7.1)
 ANDROID_VERSION=29
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2021-06-08
+RELEASE_DATE=2021-09-19
 AC_SUBST(RELEASE_DATE)
 
 DOC_DATE=`LC_ALL=C date -d $RELEASE_DATE +'%d %b %Y'`
