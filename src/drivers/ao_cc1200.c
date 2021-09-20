@@ -331,13 +331,24 @@ ao_radio_idle(void)
 #define PACKET_CHAN_BW_384	((CC1200_CHAN_BW_ADC_CIC_DECFACT_12 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
 				 (16 << CC1200_CHAN_BW_BB_CIC_DECFACT))
 
+/*
+ * CC1201 doesn't support our low bandwidth receive setups, so we use
+ * larger values for that part, leaving the bandwidth at over 50kHz
+ */
+
 /* 200 / 10 = 20 */
-#define PACKET_CHAN_BW_96	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
-				 (16 << CC1200_CHAN_BW_BB_CIC_DECFACT))
+#define PACKET_CHAN_BW_96_CC1200	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
+					 (16 << CC1200_CHAN_BW_BB_CIC_DECFACT))
+
+#define PACKET_CHAN_BW_96_CC1201	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
+					 (8 << CC1200_CHAN_BW_BB_CIC_DECFACT))
 
 /* 200 / 25 = 8 */
-#define PACKET_CHAN_BW_24	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
-				 (44 << CC1200_CHAN_BW_BB_CIC_DECFACT))
+#define PACKET_CHAN_BW_24_CC1200	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
+					 (44 << CC1200_CHAN_BW_BB_CIC_DECFACT))
+
+#define PACKET_CHAN_BW_24_CC1201	((CC1200_CHAN_BW_ADC_CIC_DECFACT_48 << CC1200_CHAN_BW_ADC_CIC_DECFACT) | \
+					 (8 << CC1200_CHAN_BW_BB_CIC_DECFACT))
 
 static const uint16_t packet_setup[] = {
 	CC1200_SYMBOL_RATE1,		((PACKET_SYMBOL_RATE_M >> 8) & 0xff),
@@ -379,7 +390,6 @@ static const uint16_t packet_setup_96[] = {
 				 (PACKET_DEV_E_96 << CC1200_MODCFG_DEV_E_DEV_E)),
 	CC1200_SYMBOL_RATE2,	((PACKET_SYMBOL_RATE_E_96 << CC1200_SYMBOL_RATE2_DATARATE_E) |
 				 (((PACKET_SYMBOL_RATE_M >> 16) & CC1200_SYMBOL_RATE2_DATARATE_M_19_16_MASK) << CC1200_SYMBOL_RATE2_DATARATE_M_19_16)),
-	CC1200_CHAN_BW,		PACKET_CHAN_BW_96,
         CC1200_MDMCFG2,                                  /* General Modem Parameter Configuration Reg. 2 */
 		((CC1200_MDMCFG2_ASK_SHAPE_8 << CC1200_MDMCFG2_ASK_SHAPE) |
 		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
@@ -394,7 +404,6 @@ static const uint16_t packet_setup_24[] = {
 				 (PACKET_DEV_E_24 << CC1200_MODCFG_DEV_E_DEV_E)),
 	CC1200_SYMBOL_RATE2,	((PACKET_SYMBOL_RATE_E_24 << CC1200_SYMBOL_RATE2_DATARATE_E) |
 				 (((PACKET_SYMBOL_RATE_M >> 16) & CC1200_SYMBOL_RATE2_DATARATE_M_19_16_MASK) << CC1200_SYMBOL_RATE2_DATARATE_M_19_16)),
-	CC1200_CHAN_BW,		PACKET_CHAN_BW_24,
         CC1200_MDMCFG2,                                  /* General Modem Parameter Configuration Reg. 2 */
 		((CC1200_MDMCFG2_ASK_SHAPE_8 << CC1200_MDMCFG2_ASK_SHAPE) |
 		 (CC1200_MDMCFG2_SYMBOL_MAP_CFG_MODE_0 << CC1200_MDMCFG2_SYMBOL_MAP_CFG) |
@@ -616,9 +625,17 @@ ao_radio_set_mode(uint16_t new_mode)
 			break;
 		case AO_RADIO_RATE_9600:
 			ao_radio_set_regs(packet_setup_96);
+			if (cc1201)
+				ao_radio_reg_write(CC1200_CHAN_BW, PACKET_CHAN_BW_96_CC1201);
+			else
+				ao_radio_reg_write(CC1200_CHAN_BW, PACKET_CHAN_BW_96_CC1200);
 			break;
 		case AO_RADIO_RATE_2400:
 			ao_radio_set_regs(packet_setup_24);
+			if (cc1201)
+				ao_radio_reg_write(CC1200_CHAN_BW, PACKET_CHAN_BW_24_CC1201);
+			else
+				ao_radio_reg_write(CC1200_CHAN_BW, PACKET_CHAN_BW_24_CC1200);
 			break;
 		}
 	}
