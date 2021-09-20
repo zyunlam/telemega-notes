@@ -74,6 +74,7 @@
 	<string name="altitude_label">Altitude</string>
 	<string name="speed_label">Speed</string>
 	<string name="accel_label">Acceleration</string>
+	<string name="tilt_label">Tilt</string>
 	<string name="bearing_label">Bearing</string>
 	<string name="direction_label">Direction</string>
 	<string name="elevation_label">Elevation</string>

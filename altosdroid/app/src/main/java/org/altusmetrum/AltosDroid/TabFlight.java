@@ -29,6 +29,8 @@ public class TabFlight extends AltosDroidTab {
 	private TextView speed_view;
 	private TextView height_view;
 	private TextView altitude_view;
+	private View tilt_view;
+	private TextView tilt_value;
 	private TextView max_speed_view;
 	private TextView max_height_view;
 	private TextView max_altitude_view;
@@ -52,11 +54,13 @@ public class TabFlight extends AltosDroidTab {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.tab_flight, container, false);
 
-		speed_view     = (TextView) v.findViewById(R.id.speed_value);
-		height_view    = (TextView) v.findViewById(R.id.height_value);
-		altitude_view    = (TextView) v.findViewById(R.id.altitude_value);
-		max_speed_view = (TextView) v.findViewById(R.id.max_speed_value);
-		max_height_view= (TextView) v.findViewById(R.id.max_height_value);
+		speed_view      = (TextView) v.findViewById(R.id.speed_value);
+		height_view     = (TextView) v.findViewById(R.id.height_value);
+		altitude_view   = (TextView) v.findViewById(R.id.altitude_value);
+		tilt_view 	= (View) v.findViewById(R.id.tilt_view);
+		tilt_value 	= (TextView) v.findViewById(R.id.tilt_value);
+		max_speed_view  = (TextView) v.findViewById(R.id.max_speed_value);
+		max_height_view = (TextView) v.findViewById(R.id.max_height_value);
 		max_altitude_view= (TextView) v.findViewById(R.id.max_altitude_value);
 		elevation_view = (TextView) v.findViewById(R.id.elevation_value);
 		range_view     = (TextView) v.findViewById(R.id.range_value);
@@ -90,6 +94,13 @@ public class TabFlight extends AltosDroidTab {
 			set_value(speed_view, AltosConvert.speed, 1, state.speed());
 			set_value(height_view, AltosConvert.height, 1, state.height());
 			set_value(altitude_view, AltosConvert.height, 1, state.altitude());
+			double orient = state.orient();
+			if (orient == AltosLib.MISSING) {
+				tilt_view.setVisibility(View.GONE);
+			} else {
+				tilt_value.setText(AltosDroid.number("%1.0f°", orient));
+				tilt_view.setVisibility(View.VISIBLE);
+			}
 			set_value(max_speed_view, AltosConvert.speed, 1, state.max_speed());
 			set_value(max_height_view, AltosConvert.height, 1, state.max_height());
 			set_value(max_altitude_view, AltosConvert.height, 1, state.max_altitude());
