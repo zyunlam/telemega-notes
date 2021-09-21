@@ -1,11 +1,11 @@
 #!/bin/sh
 
-VERSION=4.0
+VERSION=5.0
 PRODUCT=TeleMega
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 
 echo "$PRODUCT-v$VERSION Test Program"
-echo "Copyright 2020 by Bdale Garbee.  Released under GPL v3"
+echo "Copyright 2021 by Bdale Garbee.  Released under GPL v3"
 echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"
