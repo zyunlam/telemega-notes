@@ -19,6 +19,8 @@ These are Keith's notes on how to do a release
 
 	- update the version and date in configure.ac if Bdale hasn't already
 
+	- update the ANDROID_VERSION in configure.ac if releasing AltosDroid
+
 	- follow instructions in doc/RELNOTES
 
 	- make sure there is a doc/release-notes-<version>.inc
@@ -28,6 +30,7 @@ These are Keith's notes on how to do a release
 	- make sure doc/Makefile points at that too
 
 	- confirm doc/header.inc has correct copyright year
+
 
 These are Bdale's notes on how to do a release.
 
