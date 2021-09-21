@@ -1,3 +1,526 @@
+commit 47e98987fd8789583406eba7d2bc2d47bfad1f11
+Merge: 7d52b911 fbf4b677
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 20 21:24:45 2021 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit fbf4b67782f186172146e1ef911ed1bc083f4c12
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 19:56:45 2021 -0700
+
+    Version 1.9.8
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d7efc09d6ed5c128dfb1adb74627362d9263a64b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 19:54:36 2021 -0700
+
+    doc: Update for 1.9.8
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 969cf2419022727c30e6d2d8af6afbf7ff1c630b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 19:52:35 2021 -0700
+
+    doc: Add specs for TeleMega v5.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit aff90e4bbcfb62f84ce9d8679cfc0da0ebb5e301
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 19:49:49 2021 -0700
+
+    doc: Note pyro channel time limits on <1.9.8 firmware
+    
+    16-bit delay values instead of 32-bit
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c6de071bcfca217a28d94255339b2f5e09d05fa5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 19:59:45 2021 -0700
+
+    libaltos: Ignore cjnitest files for all targets
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b5f890661457e7dd0f4558c60e8d55a114401cc2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 19:58:30 2021 -0700
+
+    altoslib: Document how to add a new product
+    
+    Avoid missing some steps
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d7732ffbba08db0fcd6b8c2181584da1bc7d5d84
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 17:17:06 2021 -0700
+
+    Add test-easymini-v1.0 script
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 568379f381dbb4bf587e95ce1d9c400e856ff6c6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 16:28:37 2021 -0700
+
+    altos: All beep-enabled boards have beep config
+    
+    HAS_BEEP_CONFIG is no longer used, switch to HAS_BEEP
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c89268c1fa70fbdc661ac0963b9f8fe22c42bbfe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 21:04:41 2021 -0700
+
+    altos: Deal with cc1201 limitations
+    
+    The CC1201 works fine at higher data rates, but at lower rates it
+    can't crank the RX bandwidth as tight as the CC1200. Deal with this by
+    checking the part number and using the correct settings for each one
+    when running at 9600 or 2400 baud.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 839024907e2777c07e4722e7bb0ab8993abf5638
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 17:09:11 2021 -0700
+
+    Bump version to 1.9.7.1
+    
+    Preliminary release for TeleMega v5.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ebb5044b02c7933df4d3caf739b0e3d5c12d464d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 19:12:42 2021 -0700
+
+    libaltos: Update windows DLLs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 07fa6611080cc7a4ae2815e9867afde5be7a3f89
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 19:01:34 2021 -0700
+
+    altosdroid: Add tilt angle to pad and flight tabs
+    
+    Useful for monitoring attitude
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2c10d049ca9729dfe7832096c40f837d6510d5b2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 16:50:18 2021 -0700
+
+    Add TeleMega v5.0 firmware
+    
+    Followed steps in Releasing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a18da7cfcd45518eeb5433a1ad5d14a3cd65c160
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 16:30:51 2021 -0700
+
+    altos: Build TeleMega v5.0 bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 476e90203b14e4fc380c86e065cd6c41296caaa1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 16:30:08 2021 -0700
+
+    altos/telemega-v5.0: Space tones closer together
+    
+    TeleMega beeper needs tones fairly closely spaced to
+    keep them in range.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 91656c9d1d6175e06d4bed8e448ac6773e172de0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 16:29:33 2021 -0700
+
+    altos: Allow beep tone spacing to be changed
+    
+    New beeper needs closer spaced tones
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 82323e51d2372e559604545673c90dceb920f12d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 16:28:22 2021 -0700
+
+    altos: Fix up HAS_FLIGHT_DEBUG
+    
+    Some printf formats weren't right.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 43c375cf8835ad892f20c4b988badd893927f4ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:56:51 2021 -0700
+
+    altosui: Add options for low frequency beeper
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db950e97caefdd3257c1a2de3547ab88a2bd2344
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:56:16 2021 -0700
+
+    altoslib: Support TeleMega v5.0
+    
+    Add normalized data support
+    Add telemega idle monitor and telemetry packet support.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 064e30c73ff539ec53d15efe6cbab982b9c35eaf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:54:16 2021 -0700
+
+    altos: Update telemega-v5.0 config
+    
+    Fix cc120x interrupt pin.
+    Enable normalized data.
+    Select 2100Hz beeper default.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 876a0f9d2a3324e2591e21bcf2dafcfb6009c081
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:53:47 2021 -0700
+
+    altos: Add normalized telemetry support
+    
+    Just like logs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ea0ab578e4e745f4ee94c2551834e105152fdba1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:53:02 2021 -0700
+
+    altos: Support normalized log
+    
+    Write log data with standard axes instead of device-specific ones.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 363d42306bdc2f303b31e2ecae39fa11b503244f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:52:13 2021 -0700
+
+    altos: Allow devices to override default beep
+    
+    New beeper will want new default.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8a830c7f9ed41565c72edb85852e2df8bfa351f5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:50:28 2021 -0700
+
+    altos: Support normalized axes in mpu6000 and mmc5983
+    
+    For monitor idle, devices selecting 'normalized' log format also
+    get 'normalized' command mode. This reports data in a standard format,
+    along/across/through instead of raw device axes which depend on how the
+    part is mounted.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cdfa9303a024300141e8b328f81404a9b7466207
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 19 14:48:50 2021 -0700
+
+    altos: Detect CC120X device type
+    
+    Not that it has any effect on the driver, but maybe it should?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a913364ffd84edb36eb848e65863e963f51cd15
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 18 22:45:33 2021 -0700
+
+    altos/telemega-v5.0: Fix config for MMC5983
+    
+    SPI mode 3
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac2003b9556595db12e1fc671ef6226c56b777ad
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 18 22:44:19 2021 -0700
+
+    altos/stm: Minor cleanups in ao_arch_funcs.h
+    
+    Fix ao_gpio_set_output_mode to actually work again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71674569800c58db0a9f3d63495c0e1341e51b32
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 18 22:43:34 2021 -0700
+
+    altos: Get MMC5983 driver working
+    
+    SPI ID is different.
+    Clean up pin settings to avoid transients
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3ed101d634968666cd3ee2d8c49737970caf406b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 18 22:05:32 2021 -0700
+
+    altos: Add bit-bang i2c driver
+    
+    Useful for debugging stuff, not useful for flight code as it
+    burns the CPU for timing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41b754f955de6f196e44f30334436e5237fb9110
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 18 22:15:50 2021 -0700
+
+    altos/stm: Use picolibc startup code
+    
+    Instead of custom bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a0298477a4acfbfd78ab8dd150ee480bd14bd073
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 18 22:11:11 2021 -0700
+
+    altos: Record MPU6000 failure but let device boot
+    
+    Don't panic on MPU6000 failure
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4fed4123fd40a6fb211b542b7c922ec8b2ae0c6b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 17 14:24:21 2021 -0700
+
+    altos: Fix telemega v5.0 CS_FLASH pin
+    
+    It's on GPIOD 10, not GPIOD 3.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 98e54df2385fcaf263de14f89a1f0728bfdd541a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Sep 7 07:54:01 2021 -0700
+
+    Show mag sensor SPI ID
+
+commit 7230dbad9326d55427e23924e45cf8270411ff7b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 6 23:07:24 2021 -0700
+
+    telemega-v5.0: Add Makefiles
+    
+    Oops
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4891f212ab13941cbe89471114dc1e5cf0f8affb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 17 20:04:08 2021 -0700
+
+    altos: Prepare for picolibc stdio change
+    
+    Instead of __iob, picolibc will use stdin, stdout and stderr globals.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8384b9f6f2fe2c2a17566f771554d9b0e174d1b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Aug 17 20:02:05 2021 -0700
+
+    micropeak: Show error message if USB adapter open fails
+    
+    Pop up an error dialog and *don't* show the download dialog as if the
+    open had worked.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ea380005c74ba2ea9738de1d909b5650b2f44706
+Merge: cee8c407 b6619833
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Aug 28 13:16:45 2021 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit cee8c407bf2b22d40350672deacbc10768bffa46
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Aug 28 13:16:08 2021 -0600
+
+    doc: add mounting hole spacing information to product outlines
+
+commit b6619833a3a581e74796b5c2ab837b52a4e9f6f3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Aug 15 17:08:44 2021 -0700
+
+    libaltos: Add new microchip MAC address to bluetooth map
+    
+    The new batch of BT modules use a new MAC prefix.  On Linux, also add
+    the RFCOMM channel discovery code in case this happens again. On
+    windows, suffer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4d3a208c9d85d73cab7c2bac91c12e540d76c76f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Aug 2 17:04:20 2021 -0700
+
+    altos: Change MMC5893 driver to avoid interrupts
+    
+    Set the chip to sample at 200Hz and then simply read the results at
+    100Hz to get a reasonably recent sample. This avoids a delay at each
+    sample interval.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eb77758b7dcdd0bcef12cd1d56cf4d447cbe5c8c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 31 22:03:15 2021 -0600
+
+    altos: Add MMC5983 driver
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5b580ff01ef0618236bfeb63690fd32710c684b4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 31 22:02:42 2021 -0600
+
+    altos: Add preliminary TeleMega v5.0 bits
+    
+    Axes not checked yet.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 15dbd68ae4018180bb7a7aced849d23cd2200472
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 26 22:13:58 2021 -0700
+
+    ao-bringup: Use ao-test-igniter voltage check feature in pyro tests
+    
+    This makes sure all pyro channels are 'in range' during testing to
+    validate the ADC is operating nominally.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a63e025d1b0ae5d53f6281d49e66729f3cde36be
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 26 22:03:04 2021 -0700
+
+    ao-test-igniter: Also test ADC voltage for in-range of 1-4 volts
+    
+    This should catch ADC issues, like a solder bridge on the SoC.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 50385fa8941b58192f8955b3873a75251cde5844
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 21 14:26:35 2021 -0700
+
+    altos: Fixes for GCC 10 (-fno-common is default)
+    
+    A couple of duplicate global definitions which GCC 10 flags
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9a78fd63e8a1362af01d4f01e335ff449f0a5d7e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue May 11 22:27:27 2021 -0700
+
+    ao-bringup: Revert EasyMini scripts to 1.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dc765b10da7f1dc8e267bcd70b4dcee243475c83
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 12 10:08:05 2021 -0700
+
+    libaltos: Use cross compilers to build libaltos for i686, amd64, aarch64, armel and armhf
+    
+    Use current debian packages to build libraries for x86 and arm debian hosts.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 772b15425317d1da231c9925839320721cdb1269
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 12 10:03:24 2021 -0700
+
+    altosdroid: Show altitude as well as height
+    
+    TeleGPS is more useful with altitude
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0232784711f1f26f1972142920375e2e24ab1e2e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 12 10:00:30 2021 -0700
+
+    doc: telemini force freq is pin 6, not 7
+    
+    Telemini debug connector has only 6 pins
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db30a0dd958617cbe7fa8054ebb7b40ced90b602
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jul 5 22:52:35 2021 -0700
+
+    kernel: Widen pyro time values to 32 bits
+    
+    This lets time values of greater than 327 seconds be used. 99% of this
+    code is to adjust existing configurations to the new structure, which is
+    wider than the old.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5a7c2d3416594fc1cb43532970476631b407e975
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 23 21:35:07 2021 -0700
+
+    altosuilib: Remove spurious message about libaltos
+    
+    Wait until we've tried all libaltos options before complaining.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f6f6b53283d6a02cb62d3315d71e5a6911f59646
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Jun 20 17:06:28 2021 -0700
+
+    altosdroid: Work without GPS available
+    
+    On devices without GPS receivers, use network location instead of
+    crashing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7d52b9117c0c003506af1b103db4938efdafda5a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 8 22:56:37 2021 -0600
+
+    update ChangeLog for 1.9.7 release
+
 commit 8750dde659cec836fa6354651d5967b7aac1dff0
 Merge: dcd1feb8 24215a4a
 Author: Bdale Garbee <bdale@gag.com>
