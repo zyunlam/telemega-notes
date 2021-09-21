@@ -23,7 +23,7 @@ while [ $found -eq 0 ]; do
 		
 		sleep 0.25
 
-		./test-igniters-nowait "$dev" drogue main
+		./test-igniters-nowait "$dev" --rplus=100 --rminus=27 --adcmax=32767 drogue main
 		echo ""
 
 		echo "Testing baro sensor"

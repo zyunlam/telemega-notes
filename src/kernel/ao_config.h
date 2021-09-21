@@ -58,7 +58,7 @@
 #endif
 
 #define AO_CONFIG_MAJOR	1
-#define AO_CONFIG_MINOR	24
+#define AO_CONFIG_MINOR	25
 
 #define AO_AES_LEN 16
 

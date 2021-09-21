@@ -356,8 +356,11 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+		try {
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+		} catch (Exception e) {
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+		}
 
 		new AltosLaunchSites(this);
 	}

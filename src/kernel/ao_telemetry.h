@@ -297,6 +297,33 @@ struct ao_telemetry_mini {
 	/* 32 */
 };
 
+#define AO_TELEMETRY_MEGA_NORM_MPU6000_MMC5983	0x13
+
+struct ao_telemetry_mega_norm {
+	uint16_t	serial;		/*  0 */
+	uint16_t	tick;		/*  2 */
+	uint8_t		type;		/*  4 */
+
+	uint8_t		orient;		/*  5 angle from vertical */
+	int16_t		accel;		/*  6 Z axis */
+
+	int32_t		pres;		/*  8 Pa * 10 */
+	int16_t		temp;		/* 12 °C * 100 */
+
+	int16_t		accel_along;	/* 14 */
+	int16_t		accel_across;	/* 16 */
+	int16_t		accel_through;	/* 18 */
+
+	int16_t		gyro_roll;	/* 20 */
+	int16_t		gyro_pitch;	/* 22 */
+	int16_t		gyro_yaw;	/* 24 */
+
+	int16_t		mag_along;	/* 26 */
+	int16_t		mag_across;	/* 28 */
+	int16_t		mag_through;	/* 30 */
+	/* 32 */
+};
+
 /* #define AO_SEND_ALL_BARO */
 
 #define AO_TELEMETRY_BARO		0x80
@@ -334,6 +361,7 @@ union ao_telemetry_all {
 	struct ao_telemetry_metrum_data		metrum_data;
 	struct ao_telemetry_mini		mini;
 	struct ao_telemetry_baro		baro;
+	struct ao_telemetry_mega_norm		mega_norm;
 };
 
 typedef char ao_check_telemetry_size[sizeof(union ao_telemetry_all) == 32 ? 1 : -1];

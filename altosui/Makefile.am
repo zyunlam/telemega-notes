@@ -57,7 +57,7 @@ ALTOSUILIB_CLASS=\
 	altosuilib_$(ALTOSUILIB_VERSION).jar
 
 if MULTI_ARCH
-LIBALTOS_LINUX=libaltos32.so libaltos64.so
+LIBALTOS_LINUX=libaltos_i686.so libaltos_amd64.so libaltos_aarch64.so libaltos_armel.so libaltos_armhf.so
 else
 LIBALTOS_LINUX=libaltos.so
 endif
@@ -136,7 +136,8 @@ FIRMWARE_TMEGA_1_0=$(top_srcdir)/src/telemega-v1.0/telemega-v1.0-$(VERSION).ihx
 FIRMWARE_TMEGA_2_0=$(top_srcdir)/src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx
 FIRMWARE_TMEGA_3_0=$(top_srcdir)/src/telemega-v3.0/telemega-v3.0-$(VERSION).ihx
 FIRMWARE_TMEGA_4_0=$(top_srcdir)/src/telemega-v4.0/telemega-v4.0-$(VERSION).ihx
-FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0) $(FIRMWARE_TMEGA_4_0)
+FIRMWARE_TMEGA_5_0=$(top_srcdir)/src/telemega-v5.0/telemega-v5.0-$(VERSION).ihx
+FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0) $(FIRMWARE_TMEGA_4_0) $(FIRMWARE_TMEGA_5_0)
 
 FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
 FIRMWARE_EMINI_2_0=$(top_srcdir)/src/easymini-v2.0/easymini-v2.0-$(VERSION).ihx
@@ -266,7 +267,7 @@ install-altosuiJAVA: altosui.jar
 classes/altosui:
 	mkdir -p classes/altosui
 
-$(JAR): classaltosui.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS)
+$(JAR): classaltosui.stamp Manifest.txt $(JAVA_ICONS) $(ALTOSLIB_CLASS) $(ALTOSUILIB_CLASS) build-libaltos
 	jar cfm $@ Manifest.txt \
 		$(ICONJAR) \
 		-C classes altosui \
@@ -315,11 +316,23 @@ libaltos.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
-libaltos32.so: build-libaltos
+libaltos_i686.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
-libaltos64.so: build-libaltos
+libaltos_amd64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_aarch64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_armel.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_armhf.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
@@ -327,31 +340,16 @@ libaltos.dylib:
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
 
-altos.dll: ../libaltos/altos.dll
+altos.dll: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
 
-altos64.dll: ../libaltos/altos64.dll
+altos64.dll: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
-
-../libaltos/.libs/libaltos64.so: ../libaltos/.libs/libaltos32.so
-
-../libaltos/.libs/libaltos32.so: build-libaltos
-
-../libaltos/.libs/libaltos.so: build-libaltos
-
-../libaltos/altos.dll: build-altos-dll
-
-../libaltos/altos64.dll: build-altos64-dll
 
 build-libaltos:
-	+cd ../libaltos && make libaltos.la
-build-altos-dll:
-	+cd ../libaltos && make altos.dll
-
-build-altos64-dll:
-	+cd ../libaltos && make altos64.dll
+	+cd ../libaltos && make
 
 $(ALTOSLIB_CLASS):
 	-rm -f "$@"

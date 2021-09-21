@@ -62,6 +62,8 @@ public class TabPad extends AltosDroidTab {
 	private TextView[] ignite_voltage_label = new TextView[4];
 	private GoNoGoLights[] ignite_lights = new GoNoGoLights[4];
 
+	private View tilt_view;
+	private TextView tilt_value;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -106,6 +108,9 @@ public class TabPad extends AltosDroidTab {
 		gps_ready_lights = new GoNoGoLights((ImageView) v.findViewById(R.id.gps_ready_redled),
 		                                   (ImageView) v.findViewById(R.id.gps_ready_greenled),
 		                                   getResources());
+
+		tilt_view 	= (View) v.findViewById(R.id.tilt_view);
+		tilt_value 	= (TextView) v.findViewById(R.id.tilt_value);
 
 		for (int i = 0; i < 4; i++) {
 			int row_id, view_id, label_id, lights_id;
@@ -213,7 +218,17 @@ public class TabPad extends AltosDroidTab {
 			} else
 				gps_locked_lights.set(false, true);
 			gps_ready_lights.set(state.gps_ready, state.gps == null);
+
+			double orient = state.orient();
+
+			if (orient == AltosLib.MISSING) {
+				tilt_view.setVisibility(View.GONE);
+			} else {
+				tilt_value.setText(AltosDroid.number("%1.0f°", orient));
+				tilt_view.setVisibility(View.VISIBLE);
+			}
 		}
+
 
 		if (telem_state != null) {
 			if (telem_state.receiver_battery == AltosLib.MISSING) {

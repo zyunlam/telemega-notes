@@ -34,6 +34,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
 			return data32(16);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(14);
@@ -47,6 +48,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
 			return data32(20);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(16);
@@ -60,6 +62,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
 			return data32(24);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(18);
@@ -85,6 +88,17 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int mag_z() { return data16(22); }
 	private int mag_y() { return data16(24); }
 
+	/* normalized log data */
+	private int norm_accel_along() { return data16(8); }
+	private int norm_accel_across() { return data16(10); }
+	private int norm_accel_through() { return data16(12); }
+	private int norm_gyro_roll() { return data16(14); }
+	private int norm_gyro_pitch() { return data16(16); }
+	private int norm_gyro_yaw() { return data16(18); }
+	private int norm_mag_along() { return data16(20); }
+	private int norm_mag_across() { return data16(22); }
+	private int norm_mag_through() { return data16(24); }
+
 	private int imu_type() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
@@ -101,7 +115,35 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		}
 	}
 
+	private int imu_model() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+			return AltosLib.model_mpu6000;
+		}
+		return AltosLib.MISSING;
+	}
+
+	private boolean sensor_normalized() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+			return true;
+		}
+		return false;
+	}
+
+	private int mag_model() {
+		switch (log_format) {
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+			return AltosLib.model_mmc5983;
+		}
+		return AltosLib.MISSING;
+	}
+
 	private int accel_across() {
+		if (sensor_normalized()) {
+			return norm_accel_across();
+		}
+
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
@@ -116,6 +158,10 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	}
 
 	private int accel_along(){
+		if (sensor_normalized()) {
+			return norm_accel_along();
+		}
+
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
@@ -130,10 +176,18 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	}
 
 	private int accel_through() {
+		if (sensor_normalized()) {
+			return norm_accel_through();
+		}
+
 		return accel_z();
 	}
 
 	private int gyro_pitch() {
+		if (sensor_normalized()) {
+			return norm_gyro_pitch();
+		}
+
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
@@ -149,6 +203,10 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	}
 
 	private int gyro_roll() {
+		if (sensor_normalized()) {
+			return norm_gyro_roll();
+		}
+
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
@@ -163,10 +221,18 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	}
 
 	private int gyro_yaw() {
+		if (sensor_normalized()) {
+			return norm_gyro_yaw();
+		}
+
 		return gyro_z();
 	}
 
 	private int mag_across() {
+		if (sensor_normalized()) {
+			return norm_mag_across();
+		}
+
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
@@ -182,6 +248,10 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	}
 
 	private int mag_along() {
+		if (sensor_normalized()) {
+			return norm_mag_along();
+		}
+
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_3:
@@ -196,6 +266,10 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	}
 
 	private int mag_through() {
+		if (sensor_normalized()) {
+			return norm_mag_through();
+		}
+
 		return mag_z();
 	}
 
@@ -240,6 +314,8 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		AltosGPS	gps;
 
 		cal_data.set_imu_type(imu_type());
+		cal_data.set_imu_model(imu_model());
+		cal_data.set_mag_model(mag_model());
 
 		switch (cmd()) {
 		case AltosLib.AO_LOG_FLIGHT:

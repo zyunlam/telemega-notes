@@ -461,7 +461,7 @@ ao_flight(void)
 #if HAS_FLIGHT_DEBUG
 		case ao_flight_test:
 #if HAS_GYRO
-			printf ("angle %4d pitch %7d yaw %7d roll %7d\n",
+			printf ("angle %4d pitch %7ld yaw %7ld roll %7ld\n",
 				ao_sample_orient,
 				((ao_sample_pitch << 9) - ao_ground_pitch) >> 9,
 				((ao_sample_yaw << 9) - ao_ground_yaw) >> 9,
@@ -492,14 +492,14 @@ ao_flight_dump(void)
 	printf ("sample:\n");
 	printf ("  tick        %d\n", ao_sample_tick);
 #if HAS_BARO
-	printf ("  raw pres    %d\n", ao_sample_pres);
+	printf ("  raw pres    %ld\n", ao_sample_pres);
 #endif
 #if HAS_ACCEL
 	printf ("  raw accel   %d\n", ao_sample_accel);
 #endif
 #if HAS_BARO
-	printf ("  ground pres %d\n", ao_ground_pres);
-	printf ("  ground alt  %d\n", ao_ground_height);
+	printf ("  ground pres %ld\n", ao_ground_pres);
+	printf ("  ground alt  %ld\n", ao_ground_height);
 #endif
 #if HAS_ACCEL
 	printf ("  raw accel   %d\n", ao_sample_accel);
@@ -508,8 +508,8 @@ ao_flight_dump(void)
 #endif
 
 #if HAS_BARO
-	printf ("  alt         %d\n", ao_sample_alt);
-	printf ("  height      %d\n", ao_sample_height);
+	printf ("  alt         %ld\n", ao_sample_alt);
+	printf ("  height      %ld\n", ao_sample_height);
 #endif
 
 #if HAS_ACCEL
@@ -518,12 +518,12 @@ ao_flight_dump(void)
 
 
 	printf ("kalman:\n");
-	printf ("  height      %d\n", ao_height);
+	printf ("  height      %ld\n", ao_height);
 	printf ("  speed       %d.%02d\n", int_part(ao_speed), frac_part(ao_speed));
 	printf ("  accel       %d.%02d\n", int_part(ao_accel), frac_part(ao_accel));
-	printf ("  max_height  %d\n", ao_max_height);
-	printf ("  avg_height  %d\n", ao_avg_height);
-	printf ("  error_h     %d\n", ao_error_h);
+	printf ("  max_height  %ld\n", ao_max_height);
+	printf ("  avg_height  %ld\n", ao_avg_height);
+	printf ("  error_h     %ld\n", ao_error_h);
 #if !HAS_ACCEL
 	printf ("  error_avg   %d\n", ao_error_h_sq_avg);
 #endif
@@ -543,6 +543,7 @@ static void
 ao_orient_test_select(void)
 {
 	ao_orient_test = !ao_orient_test;
+	printf("orient test %d\n", ao_orient_test);
 }
 
 const struct ao_cmds ao_flight_cmds[] = {

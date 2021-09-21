@@ -868,7 +868,7 @@ struct lpc_usb {
 	vuint32_t	introuting;
 	uint32_t	r30;
 	vuint32_t	eptoggle;
-} lpc_usb;
+};
 
 extern struct lpc_usb lpc_usb;
 #define lpc_usb (*(struct lpc_usb *) 0x40080000)

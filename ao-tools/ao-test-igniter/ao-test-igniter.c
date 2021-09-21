@@ -27,6 +27,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include "ao-elf.h"
 #include "ccdbg.h"
 #include "cc-usb.h"
@@ -38,12 +39,15 @@ static const struct option options[] = {
 	{ .name = "device", .has_arg = 1, .val = 'D' },
 	{ .name = "raw", .has_arg = 0, .val = 'r' },
 	{ .name = "verbose", .has_arg = 1, .val = 'v' },
+	{ .name = "rplus", .has_arg = 1, .val = 'a' },
+	{ .name = "rminus", .has_arg = 1, .val = 'b' },
+	{ .name = "adcmax", .has_arg = 1, .val = 'm' },
 	{ 0, 0, 0, 0},
 };
 
 static void usage(char *program)
 {
-	fprintf(stderr, "usage: %s [--verbose=<verbose>] [--device=<device>] [-tty=<tty>] main|drogue\n", program);
+	fprintf(stderr, "usage: %s [--verbose=<verbose>] [--device=<device>] [--tty=<tty>] [--rplus=val] [--rminus=val] [--adcmax=val] main|drogue\n", program);
 	exit(1);
 }
 
@@ -59,28 +63,68 @@ struct igniter {
 	struct igniter	*next;
 	char		name[512];
 	char		status[512];
+	int		adc;
 };
+
+static bool
+map_igniter_name(char *adc_name, char *igniter_name)
+{
+	char	*colon = strchr(adc_name, ':');
+	if (!colon)
+		return false;
+	*colon = '\0';
+	if (strlen(adc_name) == 1 && isupper(adc_name[0])) {
+		igniter_name[0] = '0' + adc_name[0] - 'A';
+		igniter_name[1] = '\0';
+	} else {
+		strcpy(igniter_name, adc_name);
+	}
+	return true;
+}
 
 static struct igniter *
 igniters(struct cc_usb *usb)
 {
 	struct igniter	*head = NULL, **tail = &head;
-	cc_usb_printf(usb, "t\nv\n");
+	cc_usb_printf(usb, "t\na\nv\n");
 	for (;;) {
 		char	line[512];
 		char	name[512];
 		char	status[512];
+		char	adc_name[512];
+		char	igniter_name[512];
 
 		cc_usb_getline(usb, line, sizeof (line));
 		if (strstr(line, "software-version"))
 			break;
 		if (sscanf(line, "Igniter: %s Status: %s", name, status) == 2) {
-			struct igniter	*i = malloc (sizeof (struct igniter));
+			struct igniter	*i = calloc (1, sizeof (struct igniter));
 			strcpy(i->name, name);
 			strcpy(i->status, status);
 			i->next = NULL;
 			*tail = i;
 			tail = &i->next;
+		}
+		if (strncmp(line, "tick:", 5) == 0) {
+			char 	*tok;
+			char	*l = line;
+			bool	found_igniter = false;
+
+			while ((tok = strtok(l, " ")) != NULL) {
+				l = NULL;
+				if (found_igniter) {
+					struct igniter *i;
+					for (i = head; i; i = i->next)
+						if (!strcmp(i->name, igniter_name)) {
+							i->adc = atoi(tok);
+							break;
+						}
+					found_igniter = false;
+				} else {
+					strcpy(adc_name, tok);
+					found_igniter = map_igniter_name(adc_name, igniter_name);
+				}
+			}
 		}
 	}
 	return head;
@@ -101,16 +145,27 @@ static struct igniter *
 find_igniter(struct igniter *i, char *name)
 {
 	for (; i; i = i->next)
-		if (strcmp(i->name, name) == 0)
+		if (strcmp(i->name, name) == 0) {
+			printf("igniter %s adc %d\n", i->name, i->adc);
 			return i;
+		}
 	return NULL;
 }
 
+static const double ref_volts = 3.3;
+
+static double
+compute_voltage(int adc, double rplus, double rminus, int adc_max)
+{
+	return (double) adc / (double) adc_max * ref_volts * (rplus + rminus) / rminus;
+}
+
 static int
-do_igniter(struct cc_usb *usb, char *name)
+do_igniter(struct cc_usb *usb, char *name, double rplus, double rminus, int adc_max)
 {
 	struct igniter	*all = igniters(usb);
 	struct igniter	*this = find_igniter(all, name);
+	double volts = -1;
 	if (!this) {
 		struct igniter	*i;
 		printf("no igniter %s found in", name);
@@ -119,6 +174,14 @@ do_igniter(struct cc_usb *usb, char *name)
 		printf("\n");
 		free_igniters(all);
 		return 0;
+	}
+	if (rplus && rminus && adc_max) {
+		volts = compute_voltage(this->adc, rplus, rminus, adc_max);
+		if (volts < 1 || volts > 4) {
+			printf("igniter %s voltage is %f, not in range of 1-4 volts\n", this->name, volts);
+			free_igniters(all);
+			return 0;
+		}
 	}
 	if (strcmp(this->status, "ready") != 0) {
 		printf("igniter %s status is %s\n", this->name, this->status);
@@ -142,8 +205,11 @@ main (int argc, char **argv)
 	char			*tty = NULL;
 	int			verbose = 0;
 	int			ret = 0;
+	double			rplus = 0.0;
+	double			rminus = 0.0;
+	int			adcmax = 0;
 
-	while ((c = getopt_long(argc, argv, "rT:D:c:s:v:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "rT:D:c:s:v:a:b:m:", options, NULL)) != -1) {
 		switch (c) {
 		case 'T':
 			tty = optarg;
@@ -153,6 +219,15 @@ main (int argc, char **argv)
 			break;
 		case 'v':
 			verbose++;
+			break;
+		case 'a':
+			rplus = strtod(optarg, NULL);
+			break;
+		case 'b':
+			rminus = strtod(optarg, NULL);
+			break;
+		case 'm':
+			adcmax = strtol(optarg, NULL, 0);
 			break;
 		default:
 			usage(argv[0]);
@@ -190,7 +265,7 @@ main (int argc, char **argv)
 	for (i = optind; i < argc; i++) {
 		char	*name = argv[i];
 
-		if (!do_igniter(cc, name))
+		if (!do_igniter(cc, name, rplus, rminus, adcmax))
 			ret++;
 	}
 	done(cc, ret);

@@ -161,14 +161,14 @@ ao_pyro_ready(struct ao_pyro *pyro)
 #endif
 
 		case ao_pyro_time_less:
-			if ((int16_t) (ao_time() - ao_launch_tick) <= pyro->time_less)
+			if ((int32_t) (ao_time() - ao_launch_tick) <= pyro->time_less)
 				continue;
-			DBG("time %d > %d\n", (int16_t)(ao_time() - ao_launch_tick), pyro->time_less);
+			DBG("time %d > %d\n", (int32_t)(ao_time() - ao_launch_tick), pyro->time_less);
 			break;
 		case ao_pyro_time_greater:
-			if ((int16_t) (ao_time() - ao_launch_tick) >= pyro->time_greater)
+			if ((int32_t) (ao_time() - ao_launch_tick) >= pyro->time_greater)
 				continue;
-			DBG("time %d < %d\n", (int16_t)(ao_time() - ao_launch_tick), pyro->time_greater);
+			DBG("time %d < %d\n", (int32_t)(ao_time() - ao_launch_tick), pyro->time_greater);
 			break;
 
 		case ao_pyro_ascending:
@@ -316,7 +316,7 @@ ao_pyro_check(void)
 				continue;
 			}
 
-			if ((int16_t) (ao_time() - pyro->delay_done) < 0)
+			if ((int32_t) (ao_time() - pyro->delay_done) < 0)
 				continue;
 		}
 
@@ -431,6 +431,55 @@ ao_pyro_help(void)
 }
 #endif
 
+static int32_t
+ao_pyro_get(void *base, uint8_t offset, uint8_t size)
+{
+	int32_t value;
+	switch (size) {
+	case 8:
+		value = *((uint8_t *) ((char *) base + offset));
+		break;
+	case 16:
+	default:
+		value = *((int16_t *) (void *) ((char *) base + offset));
+		break;
+	case 32:
+		value = *((int32_t *) (void *) ((char *) base + offset));
+		break;
+	}
+	return value;
+}
+
+static bool
+ao_pyro_put(void *base, uint8_t offset, uint8_t size, int32_t value)
+{
+	switch (size) {
+	case 8:
+		if (value < 0)
+			return false;
+		*((uint8_t *) ((char *) base + offset)) = value;
+		break;
+	case 16:
+	default:
+		*((int16_t *) (void *) ((char *) base + offset)) = value;
+		break;
+	case 32:
+		*((int32_t *) (void *) ((char *) base + offset)) = value;
+		break;
+	}
+	return true;
+}
+
+static uint8_t
+ao_pyro_size(enum ao_pyro_flag flag)
+{
+	if (flag & AO_PYRO_8_BIT_VALUE)
+		return 8;
+	if (flag & AO_PYRO_32_BIT_VALUE)
+		return 32;
+	return 16;
+}
+
 void
 ao_pyro_show(void)
 {
@@ -451,13 +500,10 @@ ao_pyro_show(void)
 				continue;
 			ao_pyro_print_name(v);
 			if (ao_pyro_values[v].offset != NO_VALUE) {
-				int16_t	value;
-
-				if (ao_pyro_values[v].flag & AO_PYRO_8_BIT_VALUE)
-					value = *((uint8_t *) ((char *) pyro + ao_pyro_values[v].offset));
-				else
-					value = *((int16_t *) (void *) ((char *) pyro + ao_pyro_values[v].offset));
-				printf ("%6d ", value);
+				printf ("%6ld ",
+					(long) ao_pyro_get(pyro,
+							   ao_pyro_values[v].offset,
+							   ao_pyro_size(ao_pyro_values[v].flag)));
 			} else {
 				printf ("       ");
 			}
@@ -516,7 +562,7 @@ ao_pyro_set(void)
 		}
 		pyro_tmp.flags |= ao_pyro_values[v].flag;
 		if (ao_pyro_values[v].offset != NO_VALUE) {
-			int16_t r = 1;
+			int32_t r = 1;
 			ao_cmd_white();
 			if (ao_cmd_lex_c == '-') {
 				r = -1;
@@ -525,14 +571,11 @@ ao_pyro_set(void)
 			r *= ao_cmd_decimal();
 			if (ao_cmd_status != ao_cmd_success)
 				return;
-			if (ao_pyro_values[v].flag & AO_PYRO_8_BIT_VALUE) {
-				if (r < 0) {
-					ao_cmd_status = ao_cmd_syntax_error;
-					return;
-				}
-				*((uint8_t *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = r;
-			} else {
-				*((int16_t *) (void *) ((char *) &pyro_tmp + ao_pyro_values[v].offset)) = r;
+			if (!ao_pyro_put(&pyro_tmp, ao_pyro_values[v].offset,
+					 ao_pyro_size(ao_pyro_values[v].flag), r))
+			{
+				ao_cmd_status = ao_cmd_syntax_error;
+				return;
 			}
 		}
 	}
@@ -550,6 +593,88 @@ ao_pyro_manual(uint8_t p)
 		return;
 	}
 	ao_pyro_pins_fire(1 << p);
+}
+
+struct ao_pyro_old_values {
+	enum ao_pyro_flag	flag;
+	uint8_t			offset;
+	uint8_t			size;
+};
+
+static const struct ao_pyro_old_values ao_pyro_1_24_values[] = {
+	{ .flag = ao_pyro_accel_less, .offset = offsetof(struct ao_pyro_1_24, accel_less), 16 },
+	{ .flag = ao_pyro_accel_greater, .offset = offsetof(struct ao_pyro_1_24, accel_greater), 16 },
+	{ .flag = ao_pyro_speed_less, .offset = offsetof(struct ao_pyro_1_24, speed_less), 16 },
+	{ .flag = ao_pyro_speed_greater, .offset = offsetof(struct ao_pyro_1_24, speed_greater), 16 },
+	{ .flag = ao_pyro_height_less, .offset = offsetof(struct ao_pyro_1_24, height_less), 16 },
+	{ .flag = ao_pyro_height_greater, .offset = offsetof(struct ao_pyro_1_24, height_greater), 16 },
+	{ .flag = ao_pyro_orient_less, .offset = offsetof(struct ao_pyro_1_24, orient_less), 16 },
+	{ .flag = ao_pyro_orient_greater, .offset = offsetof(struct ao_pyro_1_24, orient_greater), 16 },
+	{ .flag = ao_pyro_time_less, .offset = offsetof(struct ao_pyro_1_24, time_less), 16 },
+	{ .flag = ao_pyro_time_greater, .offset = offsetof(struct ao_pyro_1_24, time_greater), 16 },
+	{ .flag = ao_pyro_delay, .offset = offsetof(struct ao_pyro_1_24, delay), 16 },
+	{ .flag = ao_pyro_state_less, .offset = offsetof(struct ao_pyro_1_24, state_less), 8 },
+	{ .flag = ao_pyro_state_greater_or_equal, .offset = offsetof(struct ao_pyro_1_24, state_greater_or_equal), 8 },
+	{ .flag = ao_pyro_after_motor, .offset = offsetof(struct ao_pyro_1_24, motor), 16 },
+};
+
+#define NUM_PYRO_1_24_VALUES (sizeof ao_pyro_1_24_values / sizeof ao_pyro_1_24_values[0])
+
+static int32_t
+ao_pyro_get_1_24(void *base, enum ao_pyro_flag flag)
+{
+	unsigned v;
+
+	for (v = 0; v < NUM_PYRO_1_24_VALUES; v++) {
+		if (ao_pyro_1_24_values[v].flag == flag)
+			return ao_pyro_get(base, ao_pyro_1_24_values[v].offset, ao_pyro_1_24_values[v].size);
+	}
+	return 0;
+}
+
+void
+ao_pyro_update_version(void)
+{
+	if (ao_config.minor <= 24)
+	{
+
+		/* First, move all of the config bits that follow the pyro data */
+
+		char	*pyro_base = (void *) &ao_config.pyro;
+		char	*after_pyro_new = pyro_base + AO_PYRO_NUM * sizeof (struct ao_pyro);
+		char	*after_pyro_1_24 = pyro_base + AO_PYRO_NUM * sizeof (struct ao_pyro_1_24);
+		char	*config_end = (void *) (&ao_config + 1);
+		size_t	to_move = config_end - after_pyro_new;
+
+		memmove(after_pyro_new, after_pyro_1_24, to_move);
+
+		/* Now, adjust all of the pyro entries */
+
+		struct ao_pyro		*pyro_new = ao_config.pyro;
+		struct ao_pyro_1_24	*pyro_old = (void *) ao_config.pyro;
+
+		int p = AO_PYRO_NUM;
+
+		/* New struct is larger than the old, so start at the
+		 * last one and work towards the first
+		 */
+		while (p-- > 0) {
+			unsigned v;
+			int32_t value;
+			struct ao_pyro	tmp;
+
+			memset(&tmp, '\0', sizeof(tmp));
+			tmp.flags = pyro_old[p].flags;
+
+			for (v = 0; v < NUM_PYRO_VALUES; v++)
+			{
+				value = ao_pyro_get_1_24(&pyro_old[v], ao_pyro_values[v].flag);
+				ao_pyro_put(&tmp, ao_pyro_values[v].offset,
+					    ao_pyro_size(ao_pyro_values[v].flag), value);
+			}
+			memcpy(&pyro_new[p], &tmp, sizeof(tmp));
+		}
+	}
 }
 
 void

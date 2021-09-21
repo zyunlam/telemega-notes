@@ -89,33 +89,31 @@ public class AltosUILib extends AltosLib {
 	static public boolean loaded_library = false;
 	static public boolean has_bluetooth = false;
 
-	static final String[] library_names_32 = { "altos", "altos32", "altos64" };
-	static final String[] library_names_64 = { "altos", "altos64", "altos32" };
+	static final String[] library_names = {
+		"altos",
+		"altos32",
+		"altos64",
+		"altos_i686",
+		"altos_amd64",
+		"altos_aarch64",
+		"altos_armel",
+		"altos_armhf"
+	};
 
 	public static boolean load_library() {
 		if (!initialized) {
-			String model = System.getProperty("sun.arch.data.model", "missing");
-			boolean is_64 = false;
-			if (model.equals("64")) {
-				is_64 = true;
-			} else if (model.equals("32")) {
-				;
-			} else {
-				String arch = System.getProperty("os.arch", "missing");
-				if (arch.endsWith("64"))
-					is_64 = true;
-			}
-			for (String name : is_64 ? library_names_64 : library_names_32) {
+			for (String name : library_names) {
 				try {
 					System.loadLibrary(name);
 					libaltos.altos_init();
 					loaded_library = true;
 					break;
 				} catch (UnsatisfiedLinkError e) {
-					System.out.printf("Link error %s\n", e.getMessage());
 					loaded_library = false;
 				}
 			}
+			if (!loaded_library)
+				System.out.printf("Cannot find 'libaltos' device access library\n");
 
 			String OS = System.getProperty("os.name");
 

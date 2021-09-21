@@ -136,6 +136,7 @@ isr(tim7)
 extern char __stack[];
 void _start(void) __attribute__((__noreturn__));
 void main(void) __attribute__((__noreturn__));
+void ao_setup(void) __attribute__((constructor));
 
 /* This must be exactly 256 bytes long so that the configuration data
  * gets loaded at the right place
@@ -201,16 +202,7 @@ const void * const __interrupt_vector[64] = {
 	i(0xf0, tim7),
 };
 
-extern char __data_source[];
-extern char __data_start[];
-extern char __data_size[];
-extern char __bss_start[];
-extern char __bss_size[];
-
-void _start(void) {
-	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
-	memset(__bss_start, '\0', (uintptr_t) __bss_size);
-
+void __attribute__((constructor)) ao_setup(void) {
 #ifdef AO_BOOT_CHAIN
 	if (ao_boot_check_chain()) {
 #ifdef AO_BOOT_PIN
@@ -223,5 +215,4 @@ void _start(void) {
 #endif
 	/* Set interrupt vector table offset */
 	stm_nvic.vto = (uint32_t) &__interrupt_vector;
-	main();
 }

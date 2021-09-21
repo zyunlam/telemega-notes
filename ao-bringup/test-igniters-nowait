@@ -2,13 +2,19 @@
 
 dev="$1"
 shift
+args=""
 
 for igniter in "$@"; do
-	pass="n"
-	while [ $pass != "y" ]; do
+    case "$igniter" in
+	-*)
+	    args="$args $igniter"
+	    ;;
+	*)
+	    pass="n"
+	    while [ $pass != "y" ]; do
 
 		echo "Testing $igniter igniter."
-		../ao-tools/ao-test-igniter/ao-test-igniter --tty="$dev" $igniter
+		../ao-tools/ao-test-igniter/ao-test-igniter --tty="$dev" $args $igniter
 
 		case $? in
 		    0)
@@ -20,7 +26,9 @@ for igniter in "$@"; do
 			read foo < /dev/tty
 			;;
 		esac
-	done
+	    done
+	    ;;
+    esac
 done
 
 exit 0
