@@ -1,3 +1,64 @@
+altos (1.9.8-1) UNRELEASED; urgency=medium
+
+  [ Keith Packard ]
+  * altosdroid: Work without GPS available
+  * altosuilib: Remove spurious message about libaltos
+  * kernel: Widen pyro time values to 32 bits
+  * doc: telemini force freq is pin 6, not 7
+  * altosdroid: Show altitude as well as height
+  * libaltos: Use cross compilers to build libaltos for i686, amd64, aarch64, armel and armhf
+  * ao-bringup: Revert EasyMini scripts to 1.0
+  * altos: Fixes for GCC 10 (-fno-common is default)
+  * ao-test-igniter: Also test ADC voltage for in-range of 1-4 volts
+  * ao-bringup: Use ao-test-igniter voltage check feature in pyro tests
+  * altos: Add preliminary TeleMega v5.0 bits
+  * altos: Add MMC5983 driver
+  * altos: Change MMC5893 driver to avoid interrupts
+  * libaltos: Add new microchip MAC address to bluetooth map
+  * micropeak: Show error message if USB adapter open fails
+  * altos: Prepare for picolibc stdio change
+  * telemega-v5.0: Add Makefiles
+  * Show mag sensor SPI ID
+  * altos: Fix telemega v5.0 CS_FLASH pin
+  * altos: Record MPU6000 failure but let device boot
+  * altos/stm: Use picolibc startup code
+  * altos: Add bit-bang i2c driver
+  * altos: Get MMC5983 driver working
+  * altos/stm: Minor cleanups in ao_arch_funcs.h
+  * altos/telemega-v5.0: Fix config for MMC5983
+  * altos: Detect CC120X device type
+  * altos: Support normalized axes in mpu6000 and mmc5983
+  * altos: Allow devices to override default beep
+  * altos: Support normalized log
+  * altos: Add normalized telemetry support
+  * altos: Update telemega-v5.0 config
+  * altoslib: Support TeleMega v5.0
+  * altosui: Add options for low frequency beeper
+  * altos: Fix up HAS_FLIGHT_DEBUG
+  * altos: Allow beep tone spacing to be changed
+  * altos/telemega-v5.0: Space tones closer together
+  * altos: Build TeleMega v5.0 bits
+  * Add TeleMega v5.0 firmware
+  * altosdroid: Add tilt angle to pad and flight tabs
+  * libaltos: Update windows DLLs
+  * Bump version to 1.9.7.1
+  * altos: Deal with cc1201 limitations
+  * altos: All beep-enabled boards have beep config
+  * Add test-easymini-v1.0 script
+  * altoslib: Document how to add a new product
+  * libaltos: Ignore cjnitest files for all targets
+  * doc: Note pyro channel time limits on <1.9.8 firmware
+  * doc: Add specs for TeleMega v5.0
+  * doc: Update for 1.9.8
+  * Version 1.9.8
+
+  [ Bdale Garbee ]
+  * doc: add mounting hole spacing information to product outlines
+  * debian: add --disable-multi-arch to configure
+  * update ChangeLog for 1.9.8 release
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 20 Sep 2021 21:30:49 -0600
+
 altos (1.9.7-2) unstable; urgency=medium
 
   * pull in fix from master branch for gcc-10 compilation, closes: #991800
