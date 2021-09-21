@@ -252,11 +252,13 @@ ao_sample_preflight_set(void)
 	 */
 	ao_quaternion_vectors_to_rotation(&ao_rotation, &up, &orient);
 #if HAS_FLIGHT_DEBUG
-	if (ao_orient_test)
+	if (ao_orient_test) {
 		printf("\n\treset across %d through %d along %d\n",
 		       (ao_ground_accel_across - ao_config.accel_zero_across),
 		       (ao_ground_accel_through - ao_config.accel_zero_through),
 		       (ao_ground_accel_along - ao_config.accel_zero_along));
+		fflush(stdout);
+	}
 #endif
 
 	ao_sample_compute_orient();
@@ -266,7 +268,6 @@ ao_sample_preflight_set(void)
 }
 
 #if HAS_GYRO
-
 #define TIME_DIV	200.0f
 
 static void
@@ -295,6 +296,7 @@ ao_sample_rotate(void)
 			(int) (y * 1000),
 			(int) (z * 1000),
 			ao_sample_orient);
+		fflush(stdout);
 	}
 #endif
 	ao_sample_compute_orient();

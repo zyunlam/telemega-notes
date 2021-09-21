@@ -145,6 +145,9 @@ _ao_config_get(void)
 	}
 	minor = ao_config.minor;
 	if (minor != AO_CONFIG_MINOR) {
+#if AO_PYRO_NUM
+		ao_pyro_update_version();
+#endif
 		/* Fixups for minor version 1 */
 		if (minor < 1)
 			ao_config.apogee_delay = AO_CONFIG_DEFAULT_APOGEE_DELAY;
@@ -203,7 +206,7 @@ _ao_config_get(void)
 			ao_config.accel_minus_g = 0;
 		}
 #endif
-#if HAS_BEEP_CONFIG
+#if HAS_BEEP
 		if (minor < 16)
 			ao_config.mid_beep = AO_BEEP_MID_DEFAULT;
 #endif
@@ -842,7 +845,7 @@ ao_config_radio_power_set(void)
 
 #endif
 
-#if HAS_BEEP_CONFIG
+#if HAS_BEEP
 static void
 ao_config_beep_show(void)
 {
@@ -1066,7 +1069,7 @@ const struct ao_config_var ao_config_vars[] = {
 	{ "A <secs>\0APRS packet interval (0 disable)",
 	  ao_config_aprs_set, ao_config_aprs_show },
 #endif
-#if HAS_BEEP_CONFIG
+#if HAS_BEEP
 	{ "b <val>\0Beeper tone (freq = 1/2 (24e6/32) / beep",
 	  ao_config_beep_set, ao_config_beep_show },
 #endif

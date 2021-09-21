@@ -75,46 +75,61 @@ ao_log(void)
 		/* Write samples to EEPROM */
 		while (ao_log_data_pos != ao_data_head) {
 			ao_log_data.tick = ao_data_ring[ao_log_data_pos].tick;
+			volatile struct ao_data *d = &ao_data_ring[ao_log_data_pos];
 			if ((int16_t) (ao_log_data.tick - next_sensor) >= 0) {
 				ao_log_data.type = AO_LOG_SENSOR;
 #if HAS_MS5607
-				ao_log_data.u.sensor.pres = ao_data_ring[ao_log_data_pos].ms5607_raw.pres;
-				ao_log_data.u.sensor.temp = ao_data_ring[ao_log_data_pos].ms5607_raw.temp;
+				ao_log_data.u.sensor.pres = d->ms5607_raw.pres;
+				ao_log_data.u.sensor.temp = d->ms5607_raw.temp;
 #endif
 #if HAS_MPU6000
-				ao_log_data.u.sensor.accel_x = ao_data_ring[ao_log_data_pos].mpu6000.accel_x;
-				ao_log_data.u.sensor.accel_y = ao_data_ring[ao_log_data_pos].mpu6000.accel_y;
-				ao_log_data.u.sensor.accel_z = ao_data_ring[ao_log_data_pos].mpu6000.accel_z;
-				ao_log_data.u.sensor.gyro_x = ao_data_ring[ao_log_data_pos].mpu6000.gyro_x;
-				ao_log_data.u.sensor.gyro_y = ao_data_ring[ao_log_data_pos].mpu6000.gyro_y;
-				ao_log_data.u.sensor.gyro_z = ao_data_ring[ao_log_data_pos].mpu6000.gyro_z;
+#ifdef AO_LOG_NORMALIZED
+				ao_log_data.u.sensor.accel_along = ao_data_along(d);
+				ao_log_data.u.sensor.accel_across = ao_data_across(d);
+				ao_log_data.u.sensor.accel_through = ao_data_through(d);
+				ao_log_data.u.sensor.gyro_roll = ao_data_roll(d);
+				ao_log_data.u.sensor.gyro_pitch = ao_data_pitch(d);
+				ao_log_data.u.sensor.gyro_yaw = ao_data_yaw(d);
+#else
+				ao_log_data.u.sensor.accel_x = d->mpu6000.accel_x;
+				ao_log_data.u.sensor.accel_y = d->mpu6000.accel_y;
+				ao_log_data.u.sensor.accel_z = d->mpu6000.accel_z;
+				ao_log_data.u.sensor.gyro_x = d->mpu6000.gyro_x;
+				ao_log_data.u.sensor.gyro_y = d->mpu6000.gyro_y;
+				ao_log_data.u.sensor.gyro_z = d->mpu6000.gyro_z;
+#endif
 #endif
 #if HAS_HMC5883
-				ao_log_data.u.sensor.mag_x = ao_data_ring[ao_log_data_pos].hmc5883.x;
-				ao_log_data.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].hmc5883.z;
-				ao_log_data.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].hmc5883.y;
+				ao_log_data.u.sensor.mag_x = d->hmc5883.x;
+				ao_log_data.u.sensor.mag_z = d->hmc5883.z;
+				ao_log_data.u.sensor.mag_y = d->hmc5883.y;
+#endif
+#ifdef HAS_MMC5983
+				ao_log_data.u.sensor.mag_along = ao_data_mag_along(d);
+				ao_log_data.u.sensor.mag_across = ao_data_mag_across(d);
+				ao_log_data.u.sensor.mag_through = ao_data_mag_through(d);
 #endif
 #if HAS_MPU9250
-				ao_log_data.u.sensor.accel_x = ao_data_ring[ao_log_data_pos].mpu9250.accel_x;
-				ao_log_data.u.sensor.accel_y = ao_data_ring[ao_log_data_pos].mpu9250.accel_y;
-				ao_log_data.u.sensor.accel_z = ao_data_ring[ao_log_data_pos].mpu9250.accel_z;
-				ao_log_data.u.sensor.gyro_x = ao_data_ring[ao_log_data_pos].mpu9250.gyro_x;
-				ao_log_data.u.sensor.gyro_y = ao_data_ring[ao_log_data_pos].mpu9250.gyro_y;
-				ao_log_data.u.sensor.gyro_z = ao_data_ring[ao_log_data_pos].mpu9250.gyro_z;
-				ao_log_data.u.sensor.mag_x = ao_data_ring[ao_log_data_pos].mpu9250.mag_x;
-				ao_log_data.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].mpu9250.mag_z;
-				ao_log_data.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].mpu9250.mag_y;
+				ao_log_data.u.sensor.accel_x = d->mpu9250.accel_x;
+				ao_log_data.u.sensor.accel_y = d->mpu9250.accel_y;
+				ao_log_data.u.sensor.accel_z = d->mpu9250.accel_z;
+				ao_log_data.u.sensor.gyro_x = d->mpu9250.gyro_x;
+				ao_log_data.u.sensor.gyro_y = d->mpu9250.gyro_y;
+				ao_log_data.u.sensor.gyro_z = d->mpu9250.gyro_z;
+				ao_log_data.u.sensor.mag_x = d->mpu9250.mag_x;
+				ao_log_data.u.sensor.mag_z = d->mpu9250.mag_z;
+				ao_log_data.u.sensor.mag_y = d->mpu9250.mag_y;
 #endif
 #if HAS_BMX160
-				ao_log_data.u.sensor.accel_x = ao_data_ring[ao_log_data_pos].bmx160.acc_x;
-				ao_log_data.u.sensor.accel_y = ao_data_ring[ao_log_data_pos].bmx160.acc_y;
-				ao_log_data.u.sensor.accel_z = ao_data_ring[ao_log_data_pos].bmx160.acc_z;
-				ao_log_data.u.sensor.gyro_x = ao_data_ring[ao_log_data_pos].bmx160.gyr_x;
-				ao_log_data.u.sensor.gyro_y = ao_data_ring[ao_log_data_pos].bmx160.gyr_y;
-				ao_log_data.u.sensor.gyro_z = ao_data_ring[ao_log_data_pos].bmx160.gyr_z;
-				ao_log_data.u.sensor.mag_x = ao_data_ring[ao_log_data_pos].bmx160.mag_x;
-				ao_log_data.u.sensor.mag_z = ao_data_ring[ao_log_data_pos].bmx160.mag_z;
-				ao_log_data.u.sensor.mag_y = ao_data_ring[ao_log_data_pos].bmx160.mag_y;
+				ao_log_data.u.sensor.accel_x = d->bmx160.acc_x;
+				ao_log_data.u.sensor.accel_y = d->bmx160.acc_y;
+				ao_log_data.u.sensor.accel_z = d->bmx160.acc_z;
+				ao_log_data.u.sensor.gyro_x = d->bmx160.gyr_x;
+				ao_log_data.u.sensor.gyro_y = d->bmx160.gyr_y;
+				ao_log_data.u.sensor.gyro_z = d->bmx160.gyr_z;
+				ao_log_data.u.sensor.mag_x = d->bmx160.mag_x;
+				ao_log_data.u.sensor.mag_z = d->bmx160.mag_z;
+				ao_log_data.u.sensor.mag_y = d->bmx160.mag_y;
 #endif
 				ao_log_data.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
 				ao_log_write(&ao_log_data);
@@ -125,11 +140,11 @@ ao_log(void)
 			}
 			if ((int16_t) (ao_log_data.tick - next_other) >= 0) {
 				ao_log_data.type = AO_LOG_TEMP_VOLT;
-				ao_log_data.u.volt.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
-				ao_log_data.u.volt.v_pbatt = ao_data_ring[ao_log_data_pos].adc.v_pbatt;
+				ao_log_data.u.volt.v_batt = d->adc.v_batt;
+				ao_log_data.u.volt.v_pbatt = d->adc.v_pbatt;
 				ao_log_data.u.volt.n_sense = AO_ADC_NUM_SENSE;
 				for (i = 0; i < AO_ADC_NUM_SENSE; i++)
-					ao_log_data.u.volt.sense[i] = ao_data_ring[ao_log_data_pos].adc.sense[i];
+					ao_log_data.u.volt.sense[i] = d->adc.sense[i];
 				ao_log_data.u.volt.pyro = ao_pyro_fired;
 				ao_log_write(&ao_log_data);
 				next_other = ao_log_data.tick + AO_OTHER_INTERVAL;

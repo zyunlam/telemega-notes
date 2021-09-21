@@ -164,6 +164,8 @@ ao_mpu6000_gyro_check(int16_t normal, int16_t test)
 	return 0;
 }
 
+static uint8_t	mpu_id;
+
 static void
 _ao_mpu6000_wait_alive(void)
 {
@@ -172,11 +174,11 @@ _ao_mpu6000_wait_alive(void)
 	/* Wait for the chip to wake up */
 	for (i = 0; i < 30; i++) {
 		ao_delay(AO_MS_TO_TICKS(100));
-		if (_ao_mpu6000_reg_read(MPU6000_WHO_AM_I) == 0x68)
-			break;
+		mpu_id = _ao_mpu6000_reg_read(MPU6000_WHO_AM_I);
+		if (mpu_id == 0x68)
+			return;
 	}
-	if (i == 30)
-		ao_panic(AO_PANIC_SELF_TEST_MPU6000);
+	AO_SENSOR_ERROR(AO_DATA_MPU6000);
 }
 
 #define ST_TRIES	10
@@ -355,6 +357,15 @@ static struct ao_task ao_mpu6000_task;
 static void
 ao_mpu6000_show(void)
 {
+#ifdef AO_LOG_NORMALIZED
+	printf ("MPU6000: %7d %7d %7d %7d %7d %7d\n",
+		ao_mpu6000_along(&ao_mpu6000_current),
+		ao_mpu6000_across(&ao_mpu6000_current),
+		ao_mpu6000_through(&ao_mpu6000_current),
+		ao_mpu6000_roll(&ao_mpu6000_current),
+		ao_mpu6000_pitch(&ao_mpu6000_current),
+		ao_mpu6000_yaw(&ao_mpu6000_current));
+#else
 	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d\n",
 		ao_mpu6000_current.accel_x,
 		ao_mpu6000_current.accel_y,
@@ -362,6 +373,7 @@ ao_mpu6000_show(void)
 		ao_mpu6000_current.gyro_x,
 		ao_mpu6000_current.gyro_y,
 		ao_mpu6000_current.gyro_z);
+#endif
 }
 
 static const struct ao_cmds ao_mpu6000_cmds[] = {

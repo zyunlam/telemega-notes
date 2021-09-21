@@ -190,12 +190,7 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 	}
 
 	public void start() {
-		try {
-			serial = new MicroSerial(device);
-			serial.set_log(this);
-		} catch (FileNotFoundException fe) {
-			return;
-		}
+		serial.set_log(this);
 		serial_thread = new Thread(this);
 		serial_thread.start();
 
@@ -212,7 +207,7 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 		setVisible(false);
 	}
 
-	public MicroDownload(MicroPeak owner, AltosDevice device) {
+	public MicroDownload(MicroPeak owner, AltosDevice device, MicroSerial serial) {
 		super (owner, "Download MicroPeak Data", false);
 
 		int y = 0;
@@ -223,6 +218,7 @@ public class MicroDownload extends AltosUIDialog implements Runnable, ActionList
 
 		this.owner = owner;
 		this.device = device;
+		this.serial = serial;
 
 		pane = getScrollablePane();
 		pane.setLayout(new GridBagLayout());

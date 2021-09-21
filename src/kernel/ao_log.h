@@ -60,6 +60,7 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_MICROPEAK2	18	/* 2-byte baro values with header */
 #define AO_LOG_FORMAT_TELEMEGA_4	19	/* 32 byte typed telemega records with 32 bit gyro cal and Bmx160 */
 #define AO_LOG_FORMAT_EASYMOTOR		20	/* ? byte typed easymotor records with pressure sensor and adxl375 */
+#define AO_LOG_FORMAT_TELEMEGA_5	21	/* 32 byte typed telemega records with 32 bit gyro cal, mpu6000 and mmc5983 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -258,15 +259,30 @@ struct ao_log_mega {
 		struct {
 			uint32_t	pres;		/* 4 */
 			uint32_t	temp;		/* 8 */
-			int16_t		accel_x;	/* 12 */
-			int16_t		accel_y;	/* 14 */
-			int16_t		accel_z;	/* 16 */
-			int16_t		gyro_x;		/* 18 */
-			int16_t		gyro_y;		/* 20 */
-			int16_t		gyro_z;		/* 22 */
-			int16_t		mag_x;		/* 24 */
-			int16_t		mag_z;		/* 26 */
-			int16_t		mag_y;		/* 28 */
+			union {
+				struct {
+					int16_t		accel_along;	/* 12 */
+					int16_t		accel_across;	/* 14 */
+					int16_t		accel_through;	/* 16 */
+					int16_t		gyro_roll;	/* 18 */
+					int16_t		gyro_pitch;	/* 20 */
+					int16_t		gyro_yaw;	/* 22 */
+					int16_t		mag_along;	/* 24 */
+					int16_t		mag_across;	/* 26 */
+					int16_t		mag_through;	/* 28 */
+				};
+				struct {
+					int16_t		accel_x;	/* 12 */
+					int16_t		accel_y;	/* 14 */
+					int16_t		accel_z;	/* 16 */
+					int16_t		gyro_x;		/* 18 */
+					int16_t		gyro_y;		/* 20 */
+					int16_t		gyro_z;		/* 22 */
+					int16_t		mag_x;		/* 24 */
+					int16_t		mag_z;		/* 26 */
+					int16_t		mag_y;		/* 28 */
+				};
+			};
 			int16_t		accel;		/* 30 */
 		} sensor;	/* 32 */
 		/* AO_LOG_TEMP_VOLT */
@@ -533,7 +549,7 @@ struct ao_log_motor {
 	} u;
 };
 
-#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4
+#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5
 typedef struct ao_log_mega ao_log_type;
 #endif
 

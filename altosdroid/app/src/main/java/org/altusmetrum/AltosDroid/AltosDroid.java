@@ -742,14 +742,23 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	private void enable_location_updates() {
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 
-		location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if (locationManager != null)
+		{
+			try {
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+				location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			} catch (Exception e) {
+				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+				location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			}
 
-		if (location != null)
-			AltosDebug.debug("Resume, location is %f,%f\n",
-					 location.getLatitude(),
-					 location.getLongitude());
+			if (location != null)
+				AltosDebug.debug("Resume, location is %f,%f\n",
+						 location.getLatitude(),
+						 location.getLongitude());
+			AltosDebug.debug("Failed to get GPS updates\n");
+		}
 
 		update_ui(telemetry_state, state, true);
 	}

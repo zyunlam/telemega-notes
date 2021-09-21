@@ -52,6 +52,10 @@ Firmware versions older than 1.8.6 have a bug which resets the time
 since launch to zero each time a motor starts burning. Update firmware
 to get the correct behavior.
 
+[WARNING]
+Firmware versions older than 1.9.8 cannot use times longer
+than 327.67 seconds. Update firmware if you need a longer time.
+
 Ascending:: A deprecated configuration value which was the same as
 setting Ascent rate > 0. Existing configurations using this will be
 cleared and must be reconfigured by the user.
@@ -73,6 +77,10 @@ the other parameters are checked repeatedly and if any of them become
 false, then the pyro channel is disabled and will not fire. If the
 timer expires and all of the other parameters have remained true for
 the entire time, then the pyro channel is fired.
+
+[WARNING]
+Firmware versions older than 1.9.8 cannot use delays longer
+than 327.67 seconds. Update firmware if you need a longer delay.
 
 Flight State:: The flight software tracks the flight
 through a sequence of states:

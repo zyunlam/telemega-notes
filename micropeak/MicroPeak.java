@@ -136,9 +136,18 @@ public class MicroPeak extends MicroFrame implements ActionListener, ItemListene
 
 	private void DownloadData() {
 		AltosDevice	device = MicroDeviceDialog.show(this);
+		MicroSerial	serial = null;
+		try {
+			serial = new MicroSerial(device);
+		} catch (FileNotFoundException fe) {
+			JOptionPane.showMessageDialog(this,
+						      fe.getMessage(),
+						      "Cannot open device",
+						      JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 
-		if (device != null)
-			new MicroDownload(this, device);
+		new MicroDownload(this, device, serial);
 	}
 
 	private void no_data() {

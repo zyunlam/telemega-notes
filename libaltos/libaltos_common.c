@@ -89,10 +89,10 @@ static const struct bt_vendor_map altos_bt_vendor_map[] = {
 	{ .vendor = "00:12:6f:", 1 },	/* Rayson */
 	{ .vendor = "8c:de:52:", 6 },	/* ISSC */
 	{ .vendor = "d8:80:39:", 6 },	/* Microchip */
+	{ .vendor = "04:91:62:", 6 },	/* New Microchip */
 };
 
 #define NUM_BT_VENDOR_MAP	(sizeof altos_bt_vendor_map / sizeof altos_bt_vendor_map[0])
-#define BT_PORT_DEFAULT		1
 
 static inline int
 ao_tolower(int c) {
@@ -114,7 +114,7 @@ int altos_bt_port(struct altos_bt_device *device) {
 				break;
 		}
 	}
-	return BT_PORT_DEFAULT;
+	return 0;
 }
 
 PUBLIC void

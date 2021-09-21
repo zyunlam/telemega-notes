@@ -23,7 +23,6 @@
 #include <ao_report_micro.h>
 #include <ao_log_micro.h>
 
-uint32_t 	pa;
 alt_t		ground_alt, max_alt;
 alt_t		ao_max_height;
 

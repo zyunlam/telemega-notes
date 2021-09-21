@@ -140,6 +140,9 @@ public class AltosConfigFCUI
 	};
 
 	static String[] 	beep_values = {
+		"2000",
+		"2100",
+		"2200",
 		"3750",
 		"4000",
 		"4250",

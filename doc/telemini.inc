@@ -136,8 +136,8 @@
 		callsign settings are, you can temporarily force it
 		back to the original default values (frequency
 		434.550MHz, callsign N0CALL) by connecting a wire
-		between hole 3 and hole 7 on the debug connector. Hole
-		3 has the square pad around it, hole 7 is the one
+		between hole 3 and hole 6 on the debug connector. Hole
+		3 has the square pad around it, hole 6 is the one
 		nearest the MS5607 baro sensor, which is a rectangular
 		component with a metal cap that has two holes in it.
 

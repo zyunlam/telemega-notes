@@ -43,7 +43,7 @@ JAR=telegps.jar
 FATJAR=telegps-fat.jar
 
 if MULTI_ARCH
-LIBALTOS_LINUX=libaltos32.so libaltos64.so
+LIBALTOS_LINUX=libaltos_i686.so libaltos_amd64.so libaltos_aarch64.so libaltos_armel.so libaltos_armhf.so
 else
 LIBALTOS_LINUX=libaltos.so
 endif
@@ -244,11 +244,23 @@ libaltos.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
-libaltos32.so: build-libaltos
+libaltos_i686.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
-libaltos64.so: build-libaltos
+libaltos_amd64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_aarch64.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_armel.so: build-libaltos
+	-rm -f "$@"
+	$(LN_S) ../libaltos/.libs/"$@" .
+
+libaltos_armhf.so: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/.libs/"$@" .
 
@@ -256,31 +268,16 @@ libaltos.dylib:
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
 
-altos.dll: ../libaltos/altos.dll
+altos.dll: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
 
-altos64.dll: ../libaltos/altos64.dll
+altos64.dll: build-libaltos
 	-rm -f "$@"
 	$(LN_S) ../libaltos/"$@" .
-
-../libaltos/.libs/libaltos64.so: ../libaltos/.libs/libaltos32.so
-
-../libaltos/.libs/libaltos32.so: build-libaltos
-
-../libaltos/.libs/libaltos.so: build-libaltos
-
-../libaltos/altos.dll: build-altos-dll
-
-../libaltos/altos64.dll: build-altos64-dll
 
 build-libaltos:
-	+cd ../libaltos && make libaltos.la
-build-altos-dll:
-	+cd ../libaltos && make altos.dll
-
-build-altos64-dll:
-	+cd ../libaltos && make altos64.dll
+	+cd ../libaltos && make
 
 $(ALTOSLIB_CLASS):
 	-rm -f "$@"

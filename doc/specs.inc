@@ -133,6 +133,15 @@
 	|40mW
 	|3.7V
 
+	|TeleMega v5.0
+	|MS5607 30km (100k')
+	|ADXL375 200g
+	|uBlox Max-8Q
+	|MPU6000 MMC5983
+	|8MB
+	|40mW
+	|3.7V
+
 	endif::telemega[]
 	ifdef::easymega[]
 	|EasyMega v1.0
