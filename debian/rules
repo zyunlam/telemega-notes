@@ -9,7 +9,10 @@ PKG_VERSION := $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)/\1/p')
 prebuild:
 	echo "not frobbing changelog for official builds"
 
-configure_flags = --disable-install-shared-mime-info --enable-faketime
+configure_flags = \
+	--disable-install-shared-mime-info \
+	--enable-faketime \
+	--disable-multi-arch
 
 configure: configure-stamp
 configure-stamp:
