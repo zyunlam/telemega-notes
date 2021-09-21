@@ -1,4 +1,4 @@
-altos (1.9.8-1) UNRELEASED; urgency=medium
+altos (1.9.8-1) unstable; urgency=medium
 
   [ Keith Packard ]
   * altosdroid: Work without GPS available
