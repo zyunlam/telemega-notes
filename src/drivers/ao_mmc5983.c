@@ -22,7 +22,10 @@
 
 #if HAS_MMC5983
 
+#define DEBUG_MMC5983	0
+
 struct ao_mmc5983_sample	ao_mmc5983_current;
+static struct ao_mmc5983_sample	ao_mmc5983_offset;
 
 static uint8_t	ao_mmc5983_configured;
 
@@ -57,20 +60,14 @@ ao_mmc5983_reg_read(uint8_t addr)
 }
 
 static void
-ao_mmc5983_sample(struct ao_mmc5983_sample *sample)
+ao_mmc5983_raw(struct ao_mmc5983_raw *raw)
 {
-	struct ao_mmc5983_raw	raw;
-
 	ao_i2c_bit_start(MMC5983_I2C_ADDR);
-	raw.addr = MMC5983_X_OUT_0;
-	ao_i2c_bit_send(&raw.addr, 1);
+	raw->addr = MMC5983_X_OUT_0;
+	ao_i2c_bit_send(&(raw->addr), 1);
 	ao_i2c_bit_restart(MMC5983_I2C_ADDR | 1);
-	ao_i2c_bit_recv(&raw.x0, 7);
+	ao_i2c_bit_recv(&(raw->x0), sizeof(*raw) - 1);
 	ao_i2c_bit_stop();
-
-	sample->x = raw.x0 << 10 | raw.x1 << 2 | ((raw.xyz2 >> 6) & 3);
-	sample->y = raw.y0 << 10 | raw.y1 << 2 | ((raw.xyz2 >> 4) & 3);
-	sample->z = raw.z0 << 10 | raw.z1 << 2 | ((raw.xyz2 >> 2) & 3);
 }
 
 #else
@@ -126,45 +123,109 @@ ao_mmc5983_duplex(uint8_t *dst, uint8_t len)
 }
 
 static void
-ao_mmc5983_sample(struct ao_mmc5983_sample *sample)
+ao_mmc5983_raw(struct ao_mmc5983_raw *raw)
 {
-	struct ao_mmc5983_raw	raw;
-
-	raw.addr = MMC5983_X_OUT_0 | MMC5983_READ;
-	ao_mmc5983_duplex((uint8_t *) &raw, sizeof (raw));
-
-	sample->x = raw.x0 << 10 | raw.x1 << 2 | ((raw.xyz2 >> 6) & 3);
-	sample->y = raw.y0 << 10 | raw.y1 << 2 | ((raw.xyz2 >> 4) & 3);
-	sample->z = raw.z0 << 10 | raw.z1 << 2 | ((raw.xyz2 >> 2) & 3);
+	raw->addr = MMC5983_X_OUT_0 | MMC5983_READ;
+	ao_mmc5983_duplex((uint8_t *) raw, sizeof (*raw));
 }
 #endif
 
-static uint8_t product_id;
-
-static uint8_t
-ao_mmc5983_setup(void)
+/* Saturating subtraction. Keep the result within range
+ * of an int16_t
+ */
+static int16_t
+sat_sub(int16_t a, int16_t b)
 {
+	int32_t v = (int32_t) a - (int32_t) b;
+	if (v < -32768)
+		v = -32768;
+	if (v > 32767)
+		v = 32767;
+	return v;
+}
 
-	if (ao_mmc5983_configured)
-		return 1;
-
-	/* Delay for power up time (10ms) */
-	ao_delay(AO_MS_TO_TICKS(10));
-
-	ao_mmc5983_reg_write(MMC5983_CONTROL_1,
-			     1 << MMC5983_CONTROL_1_SW_RST);
-
-	/* Delay for power up time (10ms) */
-	ao_delay(AO_MS_TO_TICKS(10));
-
-	/* Check product ID */
-	product_id = ao_mmc5983_reg_read(MMC5983_PRODUCT_ID);
-	if (product_id != MMC5983_PRODUCT_ID_PRODUCT_I2C &&
-	    product_id != MMC5983_PRODUCT_ID_PRODUCT_SPI)
-	{
-		AO_SENSOR_ERROR(AO_DATA_MMC5983);
+/* Wait for a synchronous sample to finish */
+static void
+ao_mmc5983_wait(void)
+{
+	for (;;) {
+		uint8_t status = ao_mmc5983_reg_read(MMC5983_STATUS);
+		if ((status & (1 << MMC5983_STATUS_MEAS_M_DONE)) != 0)
+			break;
+		ao_delay(0);
 	}
+}
 
+static void
+ao_mmc5983_set(void)
+{
+	ao_mmc5983_reg_write(MMC5983_CONTROL_0,
+			     (1 << MMC5983_CONTROL_0_SET));
+}
+
+static void
+ao_mmc5983_reset(void)
+{
+	ao_mmc5983_reg_write(MMC5983_CONTROL_0,
+			     (1 << MMC5983_CONTROL_0_RESET));
+}
+
+static struct ao_mmc5983_raw raw;
+
+/* Read the sensor values and convert to a sample struct */
+static void
+ao_mmc5983_sample(struct ao_mmc5983_sample *s)
+{
+	ao_mmc5983_raw(&raw);
+
+	/* Bias by 32768 to convert from uint16_t to int16_t */
+	s->x = (int32_t) (((uint16_t) raw.x0 << 8) | raw.x1) - 32768;
+	s->y = (int32_t) (((uint16_t) raw.y0 << 8) | raw.y1) - 32768;
+	s->z = (int32_t) (((uint16_t) raw.z0 << 8) | raw.z1) - 32768;;
+}
+
+/* Synchronously sample the sensors */
+static void
+ao_mmc5983_sync_sample(struct ao_mmc5983_sample *v)
+{
+	ao_mmc5983_reg_write(MMC5983_CONTROL_0,
+			     (1 << MMC5983_CONTROL_0_TM_M));
+	ao_mmc5983_wait();
+	ao_mmc5983_sample(v);
+}
+
+static struct ao_mmc5983_sample	set, reset;
+
+/* Calibrate the device by finding the zero point */
+static void
+ao_mmc5983_cal(void)
+{
+	/* Compute offset */
+
+	ao_delay(AO_MS_TO_TICKS(100));
+
+	/* Measure in 'SET' mode */
+	ao_mmc5983_set();
+	ao_delay(AO_MS_TO_TICKS(100));
+	ao_mmc5983_sync_sample(&set);
+
+	ao_delay(AO_MS_TO_TICKS(100));
+
+	/* Measure in 'RESET' mode */
+	ao_mmc5983_reset();
+	ao_delay(AO_MS_TO_TICKS(100));
+	ao_mmc5983_sync_sample(&reset);
+
+	/* The zero point is the average of SET and RESET values */
+	ao_mmc5983_offset.x = ((int32_t) set.x + (int32_t) reset.x) / 2;
+	ao_mmc5983_offset.y = ((int32_t) set.y + (int32_t) reset.y) / 2;
+	ao_mmc5983_offset.z = ((int32_t) set.z + (int32_t) reset.z) / 2;
+}
+
+/* Configure the device to automatically sample at 200Hz */
+static void
+ao_mmc5983_run(void)
+{
 	/* Set bandwidth to 200Hz */
 	ao_mmc5983_reg_write(MMC5983_CONTROL_1,
 			     MMC5983_CONTROL_1_BW_200 << MMC5983_CONTROL_1_BW);
@@ -174,9 +235,48 @@ ao_mmc5983_setup(void)
 	 */
 	ao_mmc5983_reg_write(MMC5983_CONTROL_2,
 			     (1 << MMC5983_CONTROL_2_CMM_EN) |
-			     (MMC5983_CONTROL_2_CM_FREQ_200HZ << MMC5983_CONTROL_2_CM_FREQ));
-
+			     (MMC5983_CONTROL_2_CM_FREQ_200HZ << MMC5983_CONTROL_2_CM_FREQ) |
+			     (0 << MMC5983_CONTROL_2_EN_PRD_SET) |
+			     (MMC5983_CONTROL_2_PRD_SET_1000));
 	ao_mmc5983_configured = 1;
+}
+
+/* Reboot the device by setting the SW_RST bit and waiting 10ms */
+static void
+ao_mmc5983_reboot(void)
+{
+	ao_mmc5983_configured = 0;
+
+	ao_mmc5983_reg_write(MMC5983_CONTROL_1,
+			     1 << MMC5983_CONTROL_1_SW_RST);
+
+	/* Delay for power up time (10ms) */
+	ao_delay(AO_MS_TO_TICKS(10));
+}
+
+/* Configure the device for operation */
+static uint8_t
+ao_mmc5983_setup(void)
+{
+	uint8_t product_id;
+
+	/* Reboot the device */
+	ao_mmc5983_reboot();
+
+	/* Check product ID */
+	product_id = ao_mmc5983_reg_read(MMC5983_PRODUCT_ID);
+	if (product_id != MMC5983_PRODUCT_ID_PRODUCT_I2C &&
+	    product_id != MMC5983_PRODUCT_ID_PRODUCT_SPI)
+	{
+		AO_SENSOR_ERROR(AO_DATA_MMC5983);
+	}
+
+	/* Calibrate */
+	ao_mmc5983_cal();
+
+	/* Start automatic sampling */
+	ao_mmc5983_run();
+
 	return 1;
 }
 
@@ -188,7 +288,11 @@ ao_mmc5983(void)
 	struct ao_mmc5983_sample	sample;
 	ao_mmc5983_setup();
 	for (;;) {
-		ao_mmc5983_sample(&sample);
+		if (ao_mmc5983_configured)
+			ao_mmc5983_sample(&sample);
+		sample.x = sat_sub(sample.x, ao_mmc5983_offset.x);
+		sample.y = sat_sub(sample.y, ao_mmc5983_offset.y);
+		sample.z = sat_sub(sample.z, ao_mmc5983_offset.z);
 		ao_arch_block_interrupts();
 		ao_mmc5983_current = sample;
 		AO_DATA_PRESENT(AO_DATA_MMC5983);
@@ -202,14 +306,48 @@ static struct ao_task ao_mmc5983_task;
 static void
 ao_mmc5983_show(void)
 {
+#if DEBUG_MMC5983
+	printf ("x0 %02x x1 %02x y0 %02x y1 %02x z0 %02x z1 %02x\n",
+		raw.x0, raw.x1, raw.y0, raw.y1, raw.z0, raw.z1);
+
+	printf ("set.x %d set.y %d set.z %d\n",
+		set.x, set.y, set.z);
+
+	printf ("reset.x %d reset.y %d reset.z %d\n",
+		reset.x, reset.y, reset.z);
+
+	printf ("offset.x %d offset.y %d offset.z %d\n",
+		ao_mmc5983_offset.x,
+		ao_mmc5983_offset.y,
+		ao_mmc5983_offset.z);
+#endif
 	printf ("MMC5983: %d %d %d\n",
 		ao_mmc5983_along(&ao_mmc5983_current),
 		ao_mmc5983_across(&ao_mmc5983_current),
 		ao_mmc5983_through(&ao_mmc5983_current));
 }
 
+#if DEBUG_MMC5983
+static void
+ao_mmc5983_recal(void)
+{
+	printf("recal\n"); fflush(stdout);
+	ao_mmc5983_reboot();
+	printf("reboot\n"); fflush(stdout);
+	ao_mmc5983_cal();
+	printf("cal\n"); fflush(stdout);
+	ao_mmc5983_show();
+	printf("show\n"); fflush(stdout);
+	ao_mmc5983_run();
+	printf("run\n"); fflush(stdout);
+}
+#endif
+
 static const struct ao_cmds ao_mmc5983_cmds[] = {
 	{ ao_mmc5983_show,	"M\0Show MMC5983 status" },
+#if DEBUG_MMC5983
+	{ ao_mmc5983_recal,	"m\0Recalibrate MMC5983" },
+#endif
 	{ 0, NULL }
 };
 
