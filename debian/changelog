@@ -1,3 +1,23 @@
+altos (1.9.9-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * capture updates to Releasing from 1.9.8 release
+  * update TeleMega bench scripts for v5.0 hardware
+  * snapshot TeleMega v4 turnon and test scripts before crafting v5 versions
+  * libaltos: don't carry pre-built .dll files in the repo any more
+  * releasing 1.9.9
+
+  [ Keith Packard ]
+  * altosdroid: Set android version to 30
+  * Remind us to update ANDROID_VERSION
+  * altos: Fix config upgrade from 1.24 to 1.25
+  * altoslib: Parse TeleMega v5.0 eeprom records
+  * altos: Measure mmc5983 offset
+  * 1.9.9 release notes
+  * Version 1.9.9
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 07 Oct 2021 00:01:59 -0600
+
 altos (1.9.8-1) unstable; urgency=medium
 
   [ Keith Packard ]
