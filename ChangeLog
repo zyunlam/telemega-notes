@@ -1,3 +1,108 @@
+commit 2f1d5b25e72324512238920b45e864bf7c5d16fe
+Merge: c0fe810e 6ef22682
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Oct 6 23:59:20 2021 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit 6ef2268220a8ee6a83ce7400614d27589c57534a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Oct 6 23:53:28 2021 -0600
+
+    libaltos: don't carry pre-built .dll files in the repo any more
+
+commit 44530c7439c311c573cbd4b865e7bf2c1581ab83
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 6 21:13:38 2021 -0700
+
+    Version 1.9.9
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9841667f100585ccf50879a6bf627198578c8313
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 24 09:44:56 2021 -0700
+
+    1.9.9 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 071bcedab48d3bd71f42c685d01fc5c64f702ba3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 29 10:24:02 2021 -0700
+
+    altos: Measure mmc5983 offset
+    
+    This improves mmc5983 accuracy by using the SET/RESET mechanism which
+    flips the orientation of the mag sensor to cal-out any sensor bias.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1a268f959f5ee76133f4f707cf81a2c0fe4c8e73
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Sep 29 10:22:13 2021 -0700
+
+    altoslib: Parse TeleMega v5.0 eeprom records
+    
+    Oops. Missed one spot in adding TeleMega v5.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 236200c028dd48bbffbde1278d8b1c6de39fbdb1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Sep 24 09:43:15 2021 -0700
+
+    altos: Fix config upgrade from 1.24 to 1.25
+    
+    Alignment of pyro field changed due to increased size of fields which
+    shifted the whole struct by two bytes, leading to mis-updating the struct.
+    Fix that by creating a mirror of the ao_config type for version 1.24 and
+    then using that to fetch the old data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1115f566119deaa508f753576703917f28ef54b7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 20:24:13 2021 -0700
+
+    Remind us to update ANDROID_VERSION
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ce5cb9b985fbb803de8794af69027fba55e48f79
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 20 20:23:10 2021 -0700
+
+    altosdroid: Set android version to 30
+    
+    Need to change this for each release we do
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e7a19e6dec201603e98b94b0ba790aa7d2d344f8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 20 18:17:49 2021 -0600
+
+    snapshot TeleMega v4 turnon and test scripts before crafting v5 versions
+
+commit 95fc564503ced6febe7136813e76592ecac9c1d7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 20 18:22:55 2021 -0600
+
+    update TeleMega bench scripts for v5.0 hardware
+
+commit 3fb07b29d7bad57a52e4b0c75d623577ca1d4da3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 20 22:06:30 2021 -0600
+
+    capture updates to Releasing from 1.9.8 release
+
+commit c0fe810e9b12a07c59ed12124bf9045a7c13d122
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Sep 20 21:25:42 2021 -0600
+
+    update ChangeLog for 1.9.8 release
+
 commit 47e98987fd8789583406eba7d2bc2d47bfad1f11
 Merge: 7d52b911 fbf4b677
 Author: Bdale Garbee <bdale@gag.com>

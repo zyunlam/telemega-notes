@@ -640,18 +640,22 @@ ao_pyro_update_version(void)
 
 		/* First, move all of the config bits that follow the pyro data */
 
-		char	*pyro_base = (void *) &ao_config.pyro;
-		char	*after_pyro_new = pyro_base + AO_PYRO_NUM * sizeof (struct ao_pyro);
-		char	*after_pyro_1_24 = pyro_base + AO_PYRO_NUM * sizeof (struct ao_pyro_1_24);
-		char	*config_end = (void *) (&ao_config + 1);
-		size_t	to_move = config_end - after_pyro_new;
+		struct ao_config_1_24 *ao_config_1_24 = (void *) &ao_config;
+		struct ao_pyro		*pyro_1_25 = &ao_config.pyro[0];
+		struct ao_pyro_1_24	*pyro_1_24 = &(ao_config_1_24->pyro)[0];
 
-		memmove(after_pyro_new, after_pyro_1_24, to_move);
+
+		char	*pyro_base_1_25 = (void *) pyro_1_25;
+		char	*pyro_base_1_24 = (void *) pyro_1_24;
+		char	*after_pyro_1_25 = pyro_base_1_25 + AO_PYRO_NUM * sizeof (struct ao_pyro);
+		char	*after_pyro_1_24 = pyro_base_1_24 + AO_PYRO_NUM * sizeof (struct ao_pyro_1_24);
+
+		char	*config_end_1_25 = (void *) (&ao_config + 1);
+		size_t	to_move = config_end_1_25 - after_pyro_1_25;
+
+		memmove(after_pyro_1_25, after_pyro_1_24, to_move);
 
 		/* Now, adjust all of the pyro entries */
-
-		struct ao_pyro		*pyro_new = ao_config.pyro;
-		struct ao_pyro_1_24	*pyro_old = (void *) ao_config.pyro;
 
 		int p = AO_PYRO_NUM;
 
@@ -664,15 +668,15 @@ ao_pyro_update_version(void)
 			struct ao_pyro	tmp;
 
 			memset(&tmp, '\0', sizeof(tmp));
-			tmp.flags = pyro_old[p].flags;
+			tmp.flags = pyro_1_24[p].flags;
 
 			for (v = 0; v < NUM_PYRO_VALUES; v++)
 			{
-				value = ao_pyro_get_1_24(&pyro_old[v], ao_pyro_values[v].flag);
+				value = ao_pyro_get_1_24(&pyro_1_24[p], ao_pyro_values[v].flag);
 				ao_pyro_put(&tmp, ao_pyro_values[v].offset,
 					    ao_pyro_size(ao_pyro_values[v].flag), value);
 			}
-			memcpy(&pyro_new[p], &tmp, sizeof(tmp));
+			memcpy(&pyro_1_25[p], &tmp, sizeof(tmp));
 		}
 	}
 }
