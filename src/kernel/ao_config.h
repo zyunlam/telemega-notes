@@ -128,6 +128,70 @@ struct ao_config {
 #endif
 };
 
+struct ao_config_1_24 {
+	uint8_t		major;
+	uint8_t		minor;
+	uint16_t	main_deploy;
+	int16_t		accel_plus_g;		/* changed for minor version 2 */
+	uint8_t		_legacy_radio_channel;
+	char		callsign[AO_MAX_CALLSIGN + 1];
+	uint8_t		apogee_delay;		/* minor version 1 */
+	int16_t		accel_minus_g;		/* minor version 2 */
+	uint32_t	radio_cal;		/* minor version 3 */
+	uint32_t	flight_log_max;		/* minor version 4 */
+	uint8_t		ignite_mode;		/* minor version 5 */
+	uint8_t		pad_orientation;	/* minor version 6 */
+	uint32_t	radio_setting;		/* minor version 7 */
+	uint8_t		radio_enable;		/* minor version 8 */
+	uint8_t		aes_key[AO_AES_LEN];	/* minor version 9 */
+	uint32_t	frequency;		/* minor version 10 */
+	uint16_t	apogee_lockout;		/* minor version 11 */
+#if AO_PYRO_NUM
+	struct ao_pyro_1_24	pyro[AO_PYRO_NUM];	/* minor version 12 */
+#endif
+	uint16_t	aprs_interval;		/* minor version 13 */
+#if HAS_RADIO_POWER
+	uint8_t		radio_power;		/* minor version 14 */
+#endif
+#if HAS_RADIO_AMP
+	uint8_t		radio_amp;		/* minor version 14 */
+#endif
+#if HAS_IMU
+	int16_t		accel_zero_along;	/* minor version 15 */
+	int16_t		accel_zero_across;	/* minor version 15 */
+	int16_t		accel_zero_through;	/* minor version 15 */
+#endif
+#if HAS_BEEP
+	uint8_t		mid_beep;		/* minor version 16 */
+#endif
+#if HAS_TRACKER
+	uint16_t	tracker_motion;		/* minor version 17 */
+	uint8_t		tracker_interval;	/* minor version 17 */
+#endif
+#if AO_PYRO_NUM
+	uint16_t	pyro_time;		/* minor version 18 */
+#endif
+#if HAS_APRS
+	uint8_t		aprs_ssid;		/* minor version 19 */
+#endif
+#if HAS_RADIO_RATE
+	uint8_t		radio_rate;		/* minor version 20 */
+#endif
+#if HAS_RADIO_FORWARD
+	uint32_t	send_frequency;		/* minor version 21 */
+#endif
+#if HAS_APRS
+	uint8_t		aprs_format;		/* minor version 22 */
+#endif
+#if HAS_FIXED_PAD_BOX
+	uint8_t		pad_box;		/* minor version 22 */
+	uint8_t		pad_idle;		/* minor version 23 */
+#endif
+#if HAS_APRS
+	uint8_t		aprs_offset;		/* minor version 24 */
+#endif
+};
+
 #define AO_APRS_FORMAT_COMPRESSED	0
 #define AO_APRS_FORMAT_UNCOMPRESSED	1
 #define AO_CONFIG_DEFAULT_APRS_FORMAT	AO_APRS_FORMAT_COMPRESSED

@@ -142,7 +142,6 @@ struct ao_mmc5983_raw {
 	uint8_t		y1;
 	uint8_t		z0;
 	uint8_t		z1;
-	uint8_t		xyz2;
 };
 
 extern struct ao_mmc5983_sample	ao_mmc5983_current;
