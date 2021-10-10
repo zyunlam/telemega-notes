@@ -37,6 +37,12 @@ public class AltosLog implements Runnable {
 	Thread				log_thread;
 	AltosFile			file;
 	AltosLink			link;
+	AltosLogTrace			trace;
+
+	private void trace(String format, Object ... arguments) {
+		if (trace != null)
+			trace.trace(format, arguments);
+	}
 
 	private void close_log_file() {
 		if (log_file != null) {
@@ -62,10 +68,25 @@ public class AltosLog implements Runnable {
 	}
 
 	boolean open (AltosCalData cal_data) throws IOException, InterruptedException {
+		trace("open serial %d flight %d receiver_serial %d",
+		      cal_data.serial,
+		      cal_data.flight,
+		      cal_data.receiver_serial);
+
 		AltosFile	a = new AltosFile(cal_data);
 
-		log_file = new FileWriter(a, true);
+		trace("open file %s\n", a.getPath());
+
+		try {
+			log_file = new FileWriter(a, true);
+		} catch (IOException ie) {
+			log_file = null;
+			trace("open file failed\n");
+			if (trace != null)
+				trace.open_failed(a);
+		}
 		if (log_file != null) {
+			trace("open file success\n");
 			while (!pending_queue.isEmpty()) {
 				String s = pending_queue.take();
 				log_file.write(s);
@@ -79,6 +100,7 @@ public class AltosLog implements Runnable {
 	}
 
 	public void run () {
+		trace("log run start\n");
 		try {
 			AltosConfigData	receiver_config = link.config_data();
 			AltosCalData	cal_data = new AltosCalData();
@@ -117,21 +139,30 @@ public class AltosLog implements Runnable {
 					pending_queue.put(line.line);
 			}
 		} catch (InterruptedException ie) {
+			trace("interrupted exception\n");
 		} catch (TimeoutException te) {
+			trace("timeout exception\n");
 		} catch (IOException ie) {
+			trace("io exception %s message %s\n", ie.toString(), ie.getMessage());
 		}
+		trace("log run done\n");
 		close();
 	}
 
-	public AltosLog (AltosLink link) {
+	public AltosLog (AltosLink link, AltosLogTrace trace) {
 		pending_queue = new LinkedBlockingQueue<String> ();
 		input_queue = new LinkedBlockingQueue<AltosLine> ();
 		link.add_monitor(input_queue);
 		serial = -1;
 		flight = -1;
+		this.trace = trace;
 		this.link = link;
 		log_file = null;
 		log_thread = new Thread(this);
 		log_thread.start();
+	}
+
+	public AltosLog (AltosLink link) {
+		this(link, null);
 	}
 }
