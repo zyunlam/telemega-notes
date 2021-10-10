@@ -78,15 +78,18 @@ public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 
 	public String getString(String key, String def) {
 		String	ret;
-		ret = prefs.getString(key, def);
-//		AltosDebug.debug("AltosDroidPreferencesBackend get string %s:\n", key);
-//		if (ret == null)
-//			AltosDebug.debug("      (null)\n");
-//		else {
-//			String[] lines = ret.split("\n");
-//			for (String l : lines)
-//				AltosDebug.debug("        %s\n", l);
-//		}
+		if (key.equals(AltosPreferences.logdirPreference))
+			ret = null;
+		else
+			ret = prefs.getString(key, def);
+		AltosDebug.debug("AltosDroidPreferencesBackend get string %s:\n", key);
+		if (ret == null)
+			AltosDebug.debug("      (null)\n");
+		else {
+			String[] lines = ret.split("\n");
+			for (String l : lines)
+				AltosDebug.debug("        %s\n", l);
+		}
 		return ret;
 	}
 
@@ -135,7 +138,7 @@ public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	}
 
 	public File homeDirectory() {
-		return Environment.getExternalStorageDirectory();
+		return context.getExternalMediaDirs()[0];
 	}
 
 	public void debug(String format, Object ... arguments) {
