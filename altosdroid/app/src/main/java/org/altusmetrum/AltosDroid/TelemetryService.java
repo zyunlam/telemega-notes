@@ -20,6 +20,7 @@ package org.altusmetrum.AltosDroid;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeoutException;
+import java.io.*;
 import java.util.*;
 
 import android.app.*;
@@ -338,6 +339,21 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 	private void send_idle_mode_to_clients() {
 		for (Messenger client : clients)
 			send_idle_mode_to_client(client);
+	}
+
+	private void send_file_failed_to_client(Messenger client, File f) {
+		Message m = Message.obtain(null, AltosDroid.MSG_FILE_FAILED, f);
+		try {
+			client.send(m);
+		} catch (RemoteException e) {
+			AltosDebug.error("Client %s disappeared", client.toString());
+			remove_client(client);
+		}
+	}
+
+	public void send_file_failed_to_clients(File f) {
+		for (Messenger client : clients)
+			send_file_failed_to_client(client, f);
 	}
 
 	private void telemetry_start() {

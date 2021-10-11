@@ -87,6 +87,7 @@ altoslib_JAVA = \
 	AltosLink.java \
 	AltosListenerState.java \
 	AltosLog.java \
+	AltosLogTrace.java \
 	AltosMag.java \
 	AltosMma655x.java \
 	AltosMs5607.java \
