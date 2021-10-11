@@ -8,7 +8,7 @@ Build-Depends: asciidoctor,
                strip-nondeterminism,
                autoconf,
                automake,
-               debhelper (>= 10),
+               debhelper (>= 13),
                default-jdk,
 	       faketime,
                freetts,
@@ -35,7 +35,7 @@ Build-Depends: asciidoctor,
                pkg-config,
                shared-mime-info,
                swig
-Standards-Version: 4.3.0
+Standards-Version: 4.6.0
 Homepage: http://altusmetrum.org/AltOS
 Vcs-Git: git://git.gag.com/fw/altos -b debian
 Vcs-Browser: http://git.gag.com/?p=fw/altos
