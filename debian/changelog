@@ -1,3 +1,22 @@
+altos (1.9.10-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * libaltos: Make windows dlls reproducible
+  * libaltos: Use original windows printf/scanf
+  * Version 1.9.9.1
+  * altosdroid: Switch storage to media dir
+  * altoslib: Add callback from AltosLog on file open failure
+  * altosdroid: Catch log file open failures and show an error dialog
+  * doc: Version 1.9.10 notes
+  * altos/telemega-v5.0: Add .gitignore
+  * Version 1.9.10
+
+  [ Bdale Garbee ]
+  * update to latest policy and debhelper versions
+  * releasing 1.9.10
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 10 Oct 2021 21:44:54 -0600
+
 altos (1.9.9-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
