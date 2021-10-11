@@ -1,3 +1,105 @@
+commit ed267e76eb03c34ec233c33a002ec9e5e53ec83a
+Merge: bd71c839 ef70f80b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Oct 10 21:41:50 2021 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit ef70f80b324e9c8ba7046b5000e0f28f77a54f8c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 10 09:57:45 2021 -0700
+
+    Version 1.9.10
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 67a1d9b5bcd9bd7dd4156010264cef6b9c87caa3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 10 09:49:49 2021 -0700
+
+    altos/telemega-v5.0: Add .gitignore
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 47d7affffdf97188a034bb48918ec22f03ea5b38
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 10 09:47:52 2021 -0700
+
+    doc: Version 1.9.10 notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eb39995ded6b564efcb5a5312119d2672b437bc8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 9 21:32:17 2021 -0700
+
+    altosdroid: Catch log file open failures and show an error dialog
+    
+    Android changed which directories we can write to once, let's hope it
+    doesn't happen again.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3488d86de2e114a46e59bd4d2a2d7b95bf633963
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 9 21:31:24 2021 -0700
+
+    altoslib: Add callback from AltosLog on file open failure
+    
+    This lets the UI tell the user that logging isn't working.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4b3ccb73a26f91917d327558295506ce3c02d684
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 9 20:58:26 2021 -0700
+
+    altosdroid: Switch storage to media dir
+    
+    Even with the WRITE_EXTERNAL_STORAGE permission, we appear to no
+    longer have permission to write to a random external storage
+    dir. Instead, we only have permission to write to an app-specific dir,
+    buried deep in the directory tree. We can get that directory name with
+    getExternalMediaDirs()[0].
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 536e53c2e17b37df8c65d2f6921a5d68791a7789
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 8 18:31:35 2021 -0700
+
+    Version 1.9.9.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5cb393c1743a5c0f307631199abba067821db370
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 7 22:45:37 2021 -0700
+
+    libaltos: Use original windows printf/scanf
+    
+    mingw now uses "improved" versions of printf/scanf, which may cause
+    trouble with some windows 10 installs. Just use the old versions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c15bb9513ab0f8636bf52ec827551134c773e832
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Oct 6 22:58:09 2021 -0700
+
+    libaltos: Make windows dlls reproducible
+    
+    Use SOURCE_DATE_EPOCH=0 to ensure these dlls are
+    reproducible.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bd71c839b542c417a90ab59db97e0969f7e27731
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 7 00:00:42 2021 -0600
+
+    releasing 1.9.9
+
 commit 2f1d5b25e72324512238920b45e864bf7c5d16fe
 Merge: c0fe810e 6ef22682
 Author: Bdale Garbee <bdale@gag.com>

@@ -20,6 +20,7 @@ package org.altusmetrum.AltosDroid;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.io.*;
 
 import android.Manifest;
 import android.app.Activity;
@@ -86,6 +87,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	public static final int MSG_UPDATE_AGE      = 2;
 	public static final int	MSG_IDLE_MODE	    = 3;
 	public static final int MSG_IGNITER_STATUS  = 4;
+	public static final int MSG_FILE_FAILED     = 5;
 
 	// Intent request codes
 	public static final int REQUEST_CONNECT_DEVICE = 1;
@@ -189,6 +191,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			case MSG_IDLE_MODE:
 				ad.idle_mode = (Boolean) msg.obj;
 				ad.update_state(null);
+				break;
+			case MSG_FILE_FAILED:
+				ad.file_failed((File) msg.obj);
 				break;
 			}
 		}
@@ -1007,6 +1012,24 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			Intent serverIntent = new Intent(this, IgniterActivity.class);
 			startActivityForResult(serverIntent, REQUEST_IGNITERS);
 			break;
+		}
+	}
+
+	boolean fail_shown;
+
+	private void file_failed(File file) {
+		if (!fail_shown) {
+			fail_shown = true;
+			AlertDialog fail = new AlertDialog.Builder(this).create();
+			fail.setTitle("Failed to Create Log File");
+			fail.setMessage(file.getPath());
+			fail.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+				       new DialogInterface.OnClickListener() {
+					       public void onClick(DialogInterface dialog, int which) {
+						       dialog.dismiss();
+					       }
+				       });
+			fail.show();
 		}
 	}
 

@@ -59,12 +59,12 @@ log_message(char *fmt, ...)
 		char	buffer[4096];
 
 		GetLocalTime(&time);
-		sprintf (buffer, "%4d-%02d-%02d %2d:%02d:%02d. ",
+		__ms_sprintf (buffer, "%4d-%02d-%02d %2d:%02d:%02d. ",
 			 time.wYear, time.wMonth, time.wDay,
 			 time.wHour, time.wMinute, time.wSecond);
 		va_start(a, fmt);
 
-		vsprintf(buffer + strlen(buffer), fmt, a);
+		__ms_vsprintf(buffer + strlen(buffer), fmt, a);
 		va_end(a);
 
 		fputs(buffer, log);
@@ -188,11 +188,11 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 			if (result != 0) {
 				altos_set_last_windows_error();
 			} else {
-				sscanf((char *) symbolic + sizeof("\\??\\USB#VID_") - 1,
+				__ms_sscanf((char *) symbolic + sizeof("\\??\\USB#VID_") - 1,
 				       "%04X", &vid);
-				sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_") - 1,
+				__ms_sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_") - 1,
 				       "%04X", &pid);
-				sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_XXXX#") - 1,
+				__ms_sscanf((char *) symbolic + sizeof("\\??\\USB#VID_XXXX&PID_XXXX#") - 1,
 				       "%d", &serial);
 			}
 			if (vid == 0 || pid == 0 || serial == 0) {
@@ -201,11 +201,11 @@ altos_list_next(struct altos_list *list, struct altos_device *device)
 							       instanceid,
 							       sizeof (instanceid),
 							       &instanceid_len)) {
-					sscanf((char *) instanceid + sizeof("USB\\VID_") - 1,
+					__ms_sscanf((char *) instanceid + sizeof("USB\\VID_") - 1,
 					       "%04X", &vid);
-					sscanf((char *) instanceid + sizeof("USB\\VID_XXXX&PID_") - 1,
+					__ms_sscanf((char *) instanceid + sizeof("USB\\VID_XXXX&PID_") - 1,
 					       "%04X", &pid);
-					sscanf((char *) instanceid + sizeof("USB\\VID_XXXX&PID_XXXX\\") - 1,
+					__ms_sscanf((char *) instanceid + sizeof("USB\\VID_XXXX&PID_XXXX\\") - 1,
 					       "%d", &serial);
 				} else {
 					altos_set_last_windows_error();
@@ -667,7 +667,7 @@ static void
 ba2str(BTH_ADDR ba, char *str)
 {
 
-	sprintf(str, "%02X:%02X:%02X:%02X:%02X:%02X",
+	__ms_sprintf(str, "%02X:%02X:%02X:%02X:%02X:%02X",
 		get_byte(ba, 0),
 		get_byte(ba, 1),
 		get_byte(ba, 2),
@@ -681,7 +681,7 @@ str2ba(char *str)
 {
 	unsigned int	bytes[6];
 
-	sscanf(str,  "%02x:%02x:%02x:%02x:%02x:%02x",
+	__ms_sscanf(str,  "%02x:%02x:%02x:%02x:%02x:%02x",
 	       &bytes[0],
 	       &bytes[1],
 	       &bytes[2],
