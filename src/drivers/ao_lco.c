@@ -217,7 +217,7 @@ ao_lco_input(void)
 
 	for (;;) {
 		ao_event_get(&event);
-		PRINTD("event type %d unit %d value %d\n",
+		PRINTD("event type %d unit %d value %ld\n",
 		       event.type, event.unit, event.value);
 		switch (event.type) {
 		case AO_EVENT_QUADRATURE:

@@ -192,7 +192,7 @@ ao_quadrature_test(void)
 			t = ao_quadrature_step[q];
 			printf("step %3d ", t);
 #endif
-			printf ("count %3d state %2x\n", c, s);
+			printf ("count %3ld state %2x\n", c, s);
 			flush();
 		}
 	}
