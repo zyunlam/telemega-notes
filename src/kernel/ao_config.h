@@ -119,7 +119,7 @@ struct ao_config {
 #if HAS_APRS
 	uint8_t		aprs_format;		/* minor version 22 */
 #endif
-#if HAS_FIXED_PAD_BOX
+#if HAS_PAD
 	uint8_t		pad_box;		/* minor version 22 */
 	uint8_t		pad_idle;		/* minor version 23 */
 #endif

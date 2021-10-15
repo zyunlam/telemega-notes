@@ -229,9 +229,14 @@ _ao_config_get(void)
 		if (minor < 22)
 			ao_config.aprs_format = AO_CONFIG_DEFAULT_APRS_FORMAT;
 #endif
+#if HAS_PAD
+		if (minor < 22) {
 #if HAS_FIXED_PAD_BOX
-		if (minor < 22)
 			ao_config.pad_box = 1;
+#else
+			ao_config.pad_box = 0;
+#endif
+		}
 		if (minor < 23)
 			ao_config.pad_idle = 120;
 #endif
@@ -913,7 +918,7 @@ ao_config_aprs_format_show(void)
 }
 #endif /* HAS_APRS */
 
-#if HAS_FIXED_PAD_BOX
+#if HAS_PAD
 void
 ao_config_pad_box_show(void)
 {
@@ -1043,7 +1048,7 @@ __code struct ao_config_var ao_config_vars[] = {
 	{ "C <0 compressed, 1 uncompressed>\0APRS format",
 	  ao_config_aprs_format_set, ao_config_aprs_format_show },
 #endif
-#if HAS_FIXED_PAD_BOX
+#if HAS_PAD
 	{ "B <box>\0Set pad box (1-99)",
 	  ao_config_pad_box_set, ao_config_pad_box_show },
 	{ "i <seconds>\0Set idle timeout (0 disable)",

@@ -334,6 +334,7 @@ ao_pad_read_box(void)
 	uint8_t		byte = ao_74hc165_read();
 	uint8_t		h, l;
 
+	PRINTD("box %02x\n", byte);
 	h = byte >> 4;
 	l = byte & 0xf;
 	return h * 10 + l;
@@ -356,10 +357,6 @@ static int ao_pad_read_box(void) {
 	return ao_config.pad_box;
 }
 #else
-
-#if HAS_FIXED_PAD_BOX
-#define ao_pad_read_box()	ao_config.pad_box
-#endif
 
 #ifdef PAD_BOX
 #define ao_pad_read_box()	PAD_BOX
@@ -384,7 +381,11 @@ ao_pad(void)
 			continue;
 		ao_pad_packet_time = ao_time();
 
-		ao_pad_box = ao_pad_read_box();
+		ao_pad_box = ao_config.pad_box;
+#ifndef HAS_FIXED_PAD_BOX
+		if (ao_pad_box == 0 || ao_pad_box == 0xff)
+			ao_pad_box = ao_pad_read_box();
+#endif
 
 		PRINTD ("tick %d box %d (me %d) cmd %d channels %02x\n",
 			command.tick, command.box, ao_pad_box, command.cmd, command.channels);
