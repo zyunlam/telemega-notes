@@ -33,6 +33,7 @@
 #define HAS_EEPROM		1
 #define HAS_LOG			0
 #define HAS_PAD			1
+#define HAS_FIXED_PAD_BOX	1
 #define USE_INTERNAL_FLASH	1
 #define DBG_ON_P1 		0
 #define IGNITE_ON_P2		0

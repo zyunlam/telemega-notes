@@ -39,8 +39,8 @@ static __pdata uint16_t	ao_pad_packet_time;
 
 #if DEBUG
 static __pdata uint8_t	ao_pad_debug;
-#define PRINTD(...) (ao_pad_debug ? (printf(__VA_ARGS__), 0) : 0)
-#define FLUSHD()    (ao_pad_debug ? (flush(), 0) : 0)
+#define PRINTD(...) do { if (ao_pad_debug) { printf(__VA_ARGS__); flush(); } } while(0)
+#define FLUSHD()
 #else
 #define PRINTD(...)
 #define FLUSHD()
@@ -139,13 +139,14 @@ ao_pad_run(void)
 			ao_pad_ignite = 0;
 
 			ao_delay(AO_PAD_FIRE_TIME);
+			PRINTD("ao_pad_ignite now %d\n", ao_pad_ignite);
 		}
 #ifdef AO_PAD_PORT_1
 		ao_gpio_clr_bits(AO_PAD_PORT_0, pins0);
 		ao_gpio_clr_bits(AO_PAD_PORT_1, pins1);
 		PRINTD("turn off pins 0x%x 0x%x\n", pins0, pins1);
 #else
-		ao_gpio_set_bits(AO_PAD_PORT_0, pins0);
+		ao_gpio_clr_bits(AO_PAD_PORT_0, pins0);
 		PRINTD("turn off pins 0x%x\n", pins0);
 #endif
 	}
@@ -281,9 +282,9 @@ ao_pad_monitor(void)
 			query.igniter_status[c] = status;
 		}
 		if (cur != prev) {
-			PRINTD("change leds from %02x to %02x\n",
-			       prev, cur);
-			FLUSHD();
+//			PRINTD("change leds from %02x to %02x\n",
+//			       prev, cur);
+//			FLUSHD();
 			ao_led_set(cur);
 			prev = cur;
 		}
