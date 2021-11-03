@@ -67,6 +67,7 @@ public class TabPad extends AltosDroidTab {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		AltosDebug.debug("TabPad onCreateView\n");
 		View v = inflater.inflate(R.layout.tab_pad, container, false);
 		battery_voltage_view = (TextView) v.findViewById(R.id.battery_voltage_value);
 		battery_lights = new GoNoGoLights((ImageView) v.findViewById(R.id.battery_redled),
@@ -157,12 +158,15 @@ public class TabPad extends AltosDroidTab {
 		receiver_latitude_view = (TextView) v.findViewById(R.id.receiver_lat_value);
 		receiver_longitude_view = (TextView) v.findViewById(R.id.receiver_lon_value);
 		receiver_altitude_view = (TextView) v.findViewById(R.id.receiver_alt_value);
-        return v;
+
+		AltosDebug.debug("TabPad onCreateView done battery_voltage_view %s\n", battery_voltage_view);
+		return v;
 	}
 
 	public String tab_name() { return AltosDroid.tab_pad_name; }
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
+		AltosDebug.debug("pad show state %b bvv %s\n", state != null, battery_voltage_view);
 		if (state != null) {
 			battery_voltage_view.setText(AltosDroid.number("%1.2f V", state.battery_voltage));
 			battery_lights.set(state.battery_voltage >= AltosLib.ao_battery_good, state.battery_voltage == AltosLib.MISSING);
@@ -244,8 +248,11 @@ public class TabPad extends AltosDroidTab {
 			double altitude = AltosLib.MISSING;
 			if (receiver.hasAltitude())
 				altitude = receiver.getAltitude();
-			receiver_latitude_view.setText(AltosDroid.pos(receiver.getLatitude(), "N", "S"));
-			receiver_longitude_view.setText(AltosDroid.pos(receiver.getLongitude(), "E", "W"));
+			String lat_text = AltosDroid.pos(receiver.getLatitude(), "N", "S");
+			String lon_text = AltosDroid.pos(receiver.getLongitude(), "E", "W");
+			AltosDebug.debug("lat %s lon %s\n", lat_text, lon_text);
+			receiver_latitude_view.setText(lat_text);
+			receiver_longitude_view.setText(lon_text);
 			set_value(receiver_altitude_view, AltosConvert.height, 1, altitude);
 		}
 	}

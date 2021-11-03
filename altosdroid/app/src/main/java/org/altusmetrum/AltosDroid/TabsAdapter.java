@@ -54,10 +54,11 @@ public class TabsAdapter extends FragmentPagerAdapter
 		private final Bundle args;
 		private Fragment fragment;
 
-		TabInfo(String _tag, Class<?> _class, Bundle _args) {
+		TabInfo(String _tag, Class<?> _class, Bundle _args, Fragment _fragment) {
 			tag = _tag;
 			clss = _class;
 			args = _args;
+			fragment = _fragment;
 		}
 	}
 
@@ -86,11 +87,11 @@ public class TabsAdapter extends FragmentPagerAdapter
 		mViewPager.addOnPageChangeListener(this);
 	}
 
-	public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
+	public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args, Fragment fragment) {
 		tabSpec.setContent(new DummyTabFactory(mContext));
 		String tag = tabSpec.getTag();
 
-		TabInfo info = new TabInfo(tag, clss, args);
+		TabInfo info = new TabInfo(tag, clss, args, fragment);
 		mTabs.add(info);
 		mTabHost.addTab(tabSpec);
 		notifyDataSetChanged();
@@ -105,7 +106,8 @@ public class TabsAdapter extends FragmentPagerAdapter
 	public Fragment getItem(int position) {
 		TabInfo info = mTabs.get(position);
 		AltosDebug.debug("TabsAdapter.getItem(%d)", position);
-		info.fragment = Fragment.instantiate(mContext, info.clss.getName(), info.args);
+		if (info.fragment == null)
+			info.fragment = Fragment.instantiate(mContext, info.clss.getName(), info.args);
 		return info.fragment;
 	}
 
@@ -121,15 +123,19 @@ public class TabsAdapter extends FragmentPagerAdapter
 
 		AltosDroidTab	cur_frag = (AltosDroidTab) mTabs.get(position).fragment;
 
+		AltosDebug.debug("TabsAdapter.onTabChanged(%s) = %d cur %s prev %s", tabId, position, cur_frag, prev_frag);
+
 		if (prev_frag != cur_frag) {
 			if (prev_frag != null) {
 				prev_frag.set_visible(false);
 			}
 		}
-		if (cur_frag != null) {
+
+		/* This happens when the tab is selected before any of them
+		 * have been created, like during rotation
+		 */
+		if (cur_frag != null)
 			cur_frag.set_visible(true);
-		}
-		AltosDebug.debug("TabsAdapter.onTabChanged(%s) = %d", tabId, position);
 		mViewPager.setCurrentItem(position);
 	}
 
