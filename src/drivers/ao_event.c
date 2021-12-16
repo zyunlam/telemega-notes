@@ -43,7 +43,7 @@ ao_event_get(struct ao_event *ev)
 }
 
 uint8_t
-ao_event_get_for(struct ao_event *ev, uint16_t timeout)
+ao_event_get_for(struct ao_event *ev, AO_TICK_TYPE timeout)
 {
 	uint8_t	empty = 1;
 	ao_arch_critical(

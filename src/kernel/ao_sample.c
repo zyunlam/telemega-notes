@@ -35,7 +35,7 @@
 #define ACCEL_TYPE int16_t
 #endif
 
-uint16_t	ao_sample_tick;		/* time of last data */
+AO_TICK_TYPE	ao_sample_tick;		/* time of last data */
 #if HAS_BARO
 pres_t		ao_sample_pres;
 alt_t		ao_sample_alt;
@@ -274,7 +274,7 @@ static void
 ao_sample_rotate(void)
 {
 #ifdef AO_FLIGHT_TEST
-	float	dt = (int16_t) (ao_sample_tick - ao_sample_prev_tick) / TIME_DIV;
+	float	dt = (AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) / TIME_DIV;
 #else
 	static const float dt = 1/TIME_DIV;
 #endif

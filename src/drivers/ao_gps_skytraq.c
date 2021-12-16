@@ -39,11 +39,11 @@ static char ao_gps_char;
 static uint8_t ao_gps_cksum;
 static uint8_t ao_gps_error;
 
-uint16_t ao_gps_tick;
+AO_TICK_TYPE ao_gps_tick;
 struct ao_telemetry_location	ao_gps_data;
 struct ao_telemetry_satellite	ao_gps_tracking_data;
 
-static uint16_t				ao_gps_next_tick;
+static AO_TICK_TYPE			ao_gps_next_tick;
 static struct ao_telemetry_location	ao_gps_next;
 static uint8_t				ao_gps_date_flags;
 static struct ao_telemetry_satellite	ao_gps_tracking_next;

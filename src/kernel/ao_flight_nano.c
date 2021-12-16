@@ -21,13 +21,13 @@
 /* Main flight thread. */
 
 enum ao_flight_state	ao_flight_state;	/* current flight state */
-uint16_t		ao_launch_tick;		/* time of launch detect */
+AO_TICK_TYPE		ao_launch_tick;		/* time of launch detect */
 
 /*
  * track min/max data over a long interval to detect
  * resting
  */
-uint16_t		ao_interval_end;
+AO_TICK_TYPE		ao_interval_end;
 alt_t			ao_interval_min_height;
 alt_t			ao_interval_max_height;
 
@@ -94,7 +94,7 @@ ao_flight_nano(void)
 			if (ao_height > ao_interval_max_height)
 				ao_interval_max_height = ao_height;
 
-			if ((int16_t) (ao_sample_tick - ao_interval_end) >= 0) {
+			if ((AO_TICK_SIGNED) (ao_sample_tick - ao_interval_end) >= 0) {
 				if (ao_interval_max_height - ao_interval_min_height < AO_M_TO_HEIGHT(5))
 				{
 					ao_flight_state = ao_flight_landed;

@@ -105,7 +105,7 @@ extern uint8_t			ao_sensor_errors;
 #define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375|AO_DATA_BMX160|AO_DATA_MMC5983)
 
 struct ao_data {
-	uint16_t			tick;
+	AO_TICK_TYPE			tick;
 #if HAS_ADC
 	struct ao_adc			adc;
 #endif

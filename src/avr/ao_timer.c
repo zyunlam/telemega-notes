@@ -18,9 +18,9 @@
 
 #include "ao.h"
 
-volatile uint16_t ao_tick_count;
+volatile AO_TICK_TYPE ao_tick_count;
 
-uint16_t ao_time(void)
+AO_TICK_TYPE ao_time(void)
 {
 	uint16_t	v;
 	ao_arch_critical(

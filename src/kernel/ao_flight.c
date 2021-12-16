@@ -50,8 +50,8 @@
 /* Main flight thread. */
 
 enum ao_flight_state	ao_flight_state;	/* current flight state */
-uint16_t		ao_boost_tick;		/* time of most recent boost detect */
-uint16_t		ao_launch_tick;		/* time of first boost detect */
+AO_TICK_TYPE		ao_boost_tick;		/* time of most recent boost detect */
+AO_TICK_TYPE		ao_launch_tick;		/* time of first boost detect */
 uint16_t		ao_motor_number;	/* number of motors burned so far */
 
 #if HAS_SENSOR_ERRORS
@@ -272,7 +272,7 @@ ao_flight(void)
 			 * (15 seconds) has past.
 			 */
 			if ((ao_accel < AO_MSS_TO_ACCEL(-2.5)) ||
-			    (int16_t) (ao_sample_tick - ao_boost_tick) > BOOST_TICKS_MAX)
+			    (AO_TICK_SIGNED) (ao_sample_tick - ao_boost_tick) > BOOST_TICKS_MAX)
 			{
 #if HAS_ACCEL
 #if HAS_BARO
@@ -319,7 +319,7 @@ ao_flight(void)
 			 * number of seconds.
 			 */
 			if (ao_config.apogee_lockout) {
-				if ((int16_t) (ao_sample_tick - ao_launch_tick) <
+				if ((AO_TICK_SIGNED) (ao_sample_tick - ao_launch_tick) <
 				    AO_SEC_TO_TICKS(ao_config.apogee_lockout))
 					break;
 			}
@@ -363,7 +363,7 @@ ao_flight(void)
 
 #define MAX_QUIET_ACCEL	2
 
-			if ((int16_t) (ao_sample_tick - ao_interval_end) >= 0) {
+			if ((AO_TICK_SIGNED) (ao_sample_tick - ao_interval_end) >= 0) {
 				if (ao_interval_max_accel_along - ao_interval_min_accel_along <= ao_data_accel_to_sample(MAX_QUIET_ACCEL) &&
 				    ao_interval_max_accel_across - ao_interval_min_accel_across <= ao_data_accel_to_sample(MAX_QUIET_ACCEL) &&
 				    ao_interval_max_accel_through - ao_interval_min_accel_through <= ao_data_accel_to_sample(MAX_QUIET_ACCEL))
@@ -443,7 +443,7 @@ ao_flight(void)
 			if (ao_avg_height > ao_interval_max_height)
 				ao_interval_max_height = ao_avg_height;
 
-			if ((int16_t) (ao_sample_tick - ao_interval_end) >= 0) {
+			if ((AO_TICK_SIGNED) (ao_sample_tick - ao_interval_end) >= 0) {
 				if (ao_interval_max_height - ao_interval_min_height <= AO_M_TO_HEIGHT(4))
 				{
 					ao_flight_state = ao_flight_landed;

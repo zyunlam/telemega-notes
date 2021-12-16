@@ -34,7 +34,7 @@ ao_log_gps_flight(void)
 }
 
 void
-ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data)
+ao_log_gps_data(AO_TICK_TYPE tick, struct ao_telemetry_location *gps_data)
 {
 	ao_log_data.tick = tick;
 	ao_log_data.type = AO_LOG_GPS_TIME;
@@ -61,7 +61,7 @@ ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data)
 }
 
 void
-ao_log_gps_tracking(uint16_t tick, struct ao_telemetry_satellite *gps_tracking_data)
+ao_log_gps_tracking(AO_TICK_TYPE tick, struct ao_telemetry_satellite *gps_tracking_data)
 {
 	uint8_t c, n, i;
 

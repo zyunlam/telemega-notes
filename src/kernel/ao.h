@@ -389,7 +389,7 @@ ao_spi_slave(void);
 #define AO_GPS_NEW_TRACKING	2
 
 extern uint8_t ao_gps_new;
-extern uint16_t ao_gps_tick;
+extern AO_TICK_TYPE ao_gps_tick;
 extern uint8_t ao_gps_mutex;
 extern struct ao_telemetry_location ao_gps_data;
 extern struct ao_telemetry_satellite ao_gps_tracking_data;

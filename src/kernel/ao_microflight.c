@@ -24,6 +24,7 @@
 
 uint32_t	pa;
 uint32_t	pa_ground;
+uint32_t	pa_ground_next;
 uint32_t	pa_min;
 
 static void
@@ -58,7 +59,7 @@ ao_microflight(void)
 	time = ao_time();
 	ao_pa_get();
 	ao_microkalman_init();
-	pa_ground = pa;
+	pa_ground_next = pa_ground = pa;
 	sample_count = 0;
 	h = 0;
 	for (;;) {
@@ -88,7 +89,8 @@ ao_microflight(void)
 				pa_sum += pa;
 			++sample_count;
 		} else {
-			pa_ground = pa_sum >> GROUND_AVG_SHIFT;
+			pa_ground = pa_ground_next;
+			pa_ground_next = pa_sum >> GROUND_AVG_SHIFT;
 			pa_sum = 0;
 			sample_count = 0;
 #if !BOOST_DETECT

@@ -63,7 +63,7 @@ ao_tracker(void)
 	uint8_t	new;
 	int32_t	ground_distance;
 	int16_t height;
-	uint16_t gps_tick;
+	AO_TICK_TYPE gps_tick;
 	uint8_t new_tracker_running;
 
 #if HAS_ADC

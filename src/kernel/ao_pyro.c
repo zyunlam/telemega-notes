@@ -161,14 +161,14 @@ ao_pyro_ready(struct ao_pyro *pyro)
 #endif
 
 		case ao_pyro_time_less:
-			if ((int32_t) (ao_time() - ao_launch_tick) <= pyro->time_less)
+			if ((AO_TICK_SIGNED) (ao_time() - ao_launch_tick) <= pyro->time_less)
 				continue;
-			DBG("time %d > %d\n", (int32_t)(ao_time() - ao_launch_tick), pyro->time_less);
+			DBG("time %d > %d\n", (AO_TICK_SIGNED)(ao_time() - ao_launch_tick), pyro->time_less);
 			break;
 		case ao_pyro_time_greater:
-			if ((int32_t) (ao_time() - ao_launch_tick) >= pyro->time_greater)
+			if ((AO_TICK_SIGNED) (ao_time() - ao_launch_tick) >= pyro->time_greater)
 				continue;
-			DBG("time %d < %d\n", (int32_t)(ao_time() - ao_launch_tick), pyro->time_greater);
+			DBG("time %d < %d\n", (AO_TICK_SIGNED)(ao_time() - ao_launch_tick), pyro->time_greater);
 			break;
 
 		case ao_pyro_ascending:
@@ -316,7 +316,7 @@ ao_pyro_check(void)
 				continue;
 			}
 
-			if ((int32_t) (ao_time() - pyro->delay_done) < 0)
+			if ((AO_TICK_SIGNED) (ao_time() - pyro->delay_done) < 0)
 				continue;
 		}
 

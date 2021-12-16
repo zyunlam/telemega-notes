@@ -22,7 +22,7 @@
 
 uint8_t ao_gps_new;
 uint8_t ao_gps_mutex;
-uint16_t ao_gps_tick;
+AO_TICK_TYPE ao_gps_tick;
 struct ao_telemetry_location	ao_gps_data;
 struct ao_telemetry_satellite	ao_gps_tracking_data;
 

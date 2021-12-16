@@ -210,7 +210,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p)							\
-	printf ("tick: %5u 0: %5d 1: %5d pyro: %5d batt %5d\n", \
+	printf ("tick: %5lu 0: %5d 1: %5d pyro: %5d batt %5d\n", \
 		(p)->tick,						\
 		(p)->adc.sense[0],					\
 		(p)->adc.sense[1],					\

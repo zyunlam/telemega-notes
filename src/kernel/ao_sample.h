@@ -115,7 +115,7 @@ typedef int16_t			ao_v_t;
 #define AO_MS_TO_SPEED(ms)	((ao_v_t) ((ms) * 16))
 #define AO_MSS_TO_ACCEL(mss)	((ao_v_t) ((mss) * 16))
 
-extern uint16_t	ao_sample_tick;		/* time of last data */
+extern AO_TICK_TYPE ao_sample_tick;		/* time of last data */
 extern uint8_t	ao_sample_adc;		/* Ring position of last processed sample */
 extern uint8_t	ao_sample_data;		/* Ring position of last processed sample */
 

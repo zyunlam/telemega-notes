@@ -61,14 +61,14 @@ static void
 ao_kalman_predict(void)
 {
 #ifdef AO_FLIGHT_TEST
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50) {
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 50) {
 		ao_k_height += ((ao_k_t) ao_speed * AO_K_STEP_1 +
 				(ao_k_t) ao_accel * AO_K_STEP_2_2_1) >> 4;
 		ao_k_speed += (ao_k_t) ao_accel * AO_K_STEP_1;
 
 		return;
 	}
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		ao_k_height += ((ao_k_t) ao_speed * AO_K_STEP_10 +
 				(ao_k_t) ao_accel * AO_K_STEP_2_2_10) >> 4;
 		ao_k_speed += (ao_k_t) ao_accel * AO_K_STEP_10;
@@ -149,13 +149,13 @@ ao_kalman_correct_baro(void)
 {
 	ao_kalman_err_height();
 #ifdef AO_FLIGHT_TEST
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50) {
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 50) {
 		ao_k_height += (ao_k_t) AO_BARO_K0_1 * ao_error_h;
 		ao_k_speed  += (ao_k_t) AO_BARO_K1_1 * ao_error_h;
 		ao_k_accel  += (ao_k_t) AO_BARO_K2_1 * ao_error_h;
 		return;
 	}
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		ao_k_height += (ao_k_t) AO_BARO_K0_10 * ao_error_h;
 		ao_k_speed  += (ao_k_t) AO_BARO_K1_10 * ao_error_h;
 		ao_k_accel  += (ao_k_t) AO_BARO_K2_10 * ao_error_h;
@@ -189,7 +189,7 @@ ao_kalman_correct_both(void)
 	ao_kalman_err_accel();
 
 #ifdef AO_FLIGHT_TEST
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50) {
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 50) {
 		if (ao_flight_debug) {
 			printf ("correct speed %g + (%g * %g) + (%g * %g) = %g\n",
 				ao_k_speed / (65536.0 * 16.0),
@@ -210,7 +210,7 @@ ao_kalman_correct_both(void)
 			(ao_k_t) AO_BOTH_K21_1 * ao_error_a;
 		return;
 	}
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		if (ao_flight_debug) {
 			printf ("correct speed %g + (%g * %g) + (%g * %g) = %g\n",
 				ao_k_speed / (65536.0 * 16.0),
@@ -260,7 +260,7 @@ ao_kalman_correct_accel(void)
 	ao_kalman_err_accel();
 
 #ifdef AO_FLIGHT_TEST
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5) {
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 5) {
 		ao_k_height +=(ao_k_t) AO_ACCEL_K0_10 * ao_error_a;
 		ao_k_speed  += (ao_k_t) AO_ACCEL_K1_10 * ao_error_a;
 		ao_k_accel  += (ao_k_t) AO_ACCEL_K2_10 * ao_error_a;
@@ -325,9 +325,9 @@ ao_kalman(void)
 	ao_avg_height_scaled = ao_avg_height_scaled - ao_avg_height + ao_height;
 #endif
 #ifdef AO_FLIGHT_TEST
-	if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 50)
+	if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 50)
 		ao_avg_height = (ao_avg_height_scaled + 1) >> 1;
-	else if ((int16_t) (ao_sample_tick - ao_sample_prev_tick) > 5)
+	else if ((AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) > 5)
 		ao_avg_height = (ao_avg_height_scaled + 7) >> 4;
 	else 
 #endif

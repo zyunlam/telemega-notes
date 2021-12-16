@@ -65,8 +65,9 @@ ao_log(void)
 	for (;;) {
 		/* Write samples to EEPROM */
 		while (ao_log_data_pos != ao_data_head) {
-			ao_log_data.tick = ao_data_ring[ao_log_data_pos].tick;
-			if ((int16_t) (ao_log_data.tick - next_sensor) >= 0) {
+			AO_TICK_TYPE tick = ao_data_ring[ao_log_data_pos].tick;
+			ao_log_data.tick = tick;
+			if ((AO_TICK_SIGNED) (tick - next_sensor) >= 0) {
 				ao_log_data.type = AO_LOG_SENSOR;
 #if HAS_MS5607
 				ao_log_data.u.sensor.pres = ao_data_ring[ao_log_data_pos].ms5607_raw.pres;
@@ -77,17 +78,17 @@ ao_log(void)
 #endif
 				ao_log_write(&ao_log_data);
 				if (ao_log_state <= ao_flight_coast)
-					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_ASCENT;
+					next_sensor = tick + AO_SENSOR_INTERVAL_ASCENT;
 				else
-					next_sensor = ao_log_data.tick + AO_SENSOR_INTERVAL_DESCENT;
+					next_sensor = tick + AO_SENSOR_INTERVAL_DESCENT;
 			}
-			if ((int16_t) (ao_log_data.tick - next_other) >= 0) {
+			if ((AO_TICK_SIGNED) (tick - next_other) >= 0) {
 				ao_log_data.type = AO_LOG_TEMP_VOLT;
 				ao_log_data.u.volt.v_batt = ao_data_ring[ao_log_data_pos].adc.v_batt;
 				ao_log_data.u.volt.sense_a = ao_data_ring[ao_log_data_pos].adc.sense_a;
 				ao_log_data.u.volt.sense_m = ao_data_ring[ao_log_data_pos].adc.sense_m;
 				ao_log_write(&ao_log_data);
-				next_other = ao_log_data.tick + AO_OTHER_INTERVAL;
+				next_other = tick + AO_OTHER_INTERVAL;
 			}
 			ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 		}
