@@ -360,6 +360,10 @@ public class AltosMapOffline extends View implements ScaleGestureDetector.OnScal
 			debug("MapView draw without map\n");
 			return;
 		}
+		if (map.transform == null) {
+			debug("MapView draw without transform\n");
+			return;
+		}
 		canvas = view_canvas;
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setStrokeWidth(stroke_width);

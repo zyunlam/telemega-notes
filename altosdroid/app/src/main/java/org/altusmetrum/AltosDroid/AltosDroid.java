@@ -199,15 +199,16 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 	};
 
-
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
+			AltosDebug.debug("onServiceConnected\n");
 			mService = new Messenger(service);
 			try {
 				Message msg = Message.obtain(null, TelemetryService.MSG_REGISTER_CLIENT);
 				msg.replyTo = mMessenger;
 				mService.send(msg);
 			} catch (RemoteException e) {
+				AltosDebug.debug("attempt to register telemetry service client failed\n");
 				// In this case the service has crashed before we could even do anything with it
 			}
 			if (pending_usb_device != null) {
@@ -220,17 +221,20 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
+			AltosDebug.debug("onServiceDisconnected\n");
 			// This is called when the connection with the service has been unexpectedly disconnected - process crashed.
 			mService = null;
 		}
 	};
 
 	void doBindService() {
+		AltosDebug.debug("doBindService\n");
 		bindService(new Intent(this, TelemetryService.class), mConnection, Context.BIND_AUTO_CREATE);
 		mIsBound = true;
 	}
 
 	void doUnbindService() {
+		AltosDebug.debug("doUnbindService\n");
 		if (mIsBound) {
 			// If we have received the service, and hence registered with it, then now is the time to unregister.
 			if (mService != null) {
@@ -246,6 +250,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			unbindService(mConnection);
 			mIsBound = false;
 		}
+	}
+
+	public AltosDroidTab findTab(String name) {
+		for (AltosDroidTab mTab : mTabs)
+			if (name.equals(mTab.tab_name()))
+				return mTab;
+		return null;
 	}
 
 	public void registerTab(AltosDroidTab mTab) {
@@ -441,6 +452,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	void update_ui(TelemetryState telem_state, AltosState state, boolean quiet) {
 
+		AltosDebug.debug("update_ui telem %b state %b quiet %b saved_state %b\n",
+				 telem_state != null,
+				 state != null,
+				 quiet,
+				 saved_state != null);
+
 		this.state = state;
 
 		int prev_state = AltosLib.ao_flight_invalid;
@@ -530,8 +547,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			saved_state = new SavedState(state);
 		}
 
-		for (AltosDroidTab mTab : mTabs)
+		for (AltosDroidTab mTab : mTabs) {
+			AltosDebug.debug("mTab %s current %s\n",
+					 mTab, mTabsAdapter.currentItem());
 			mTab.update_ui(telem_state, state, from_receiver, location, mTab == mTabsAdapter.currentItem());
+		}
 
 		if (mAltosVoice != null && mTabsAdapter.currentItem() != null)
 			mAltosVoice.tell(telem_state, state, from_receiver, location, (AltosDroidTab) mTabsAdapter.currentItem(), quiet);
@@ -594,13 +614,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		AltosDebug.init(this);
+		AltosDebug.debug("+++ ON CREATE +++");
+
 		// Initialise preferences
 		AltosDroidPreferences.init(this);
 		setTheme(themes[AltosDroidPreferences.font_size()]);
 		super.onCreate(savedInstanceState);
-		AltosDebug.init(this);
-		AltosDebug.debug("+++ ON CREATE +++");
-
 
 		fm = getSupportFragmentManager();
 
@@ -616,10 +636,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_pad_name).setIndicator(create_tab_view("Pad")), TabPad.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_flight_name).setIndicator(create_tab_view("Flight")), TabFlight.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_recover_name).setIndicator(create_tab_view("Recover")), TabRecover.class, null);
-		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_map_name).setIndicator(create_tab_view("Map")), TabMap.class, null);
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_pad_name).setIndicator(create_tab_view("Pad")), TabPad.class, null, findTab(tab_pad_name));
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_flight_name).setIndicator(create_tab_view("Flight")), TabFlight.class, null, findTab(tab_flight_name));
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_recover_name).setIndicator(create_tab_view("Recover")), TabRecover.class, null, findTab(tab_recover_name));
+		mTabsAdapter.addTab(mTabHost.newTabSpec(tab_map_name).setIndicator(create_tab_view("Map")), TabMap.class, null, findTab(tab_map_name));
 
 		// Display the Version
 		mVersion = (TextView) findViewById(R.id.version);
@@ -740,11 +760,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	@Override
 	public void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		AltosDebug.debug("onNewIntent");
+		AltosDebug.debug("+ ON NEW INTENT +");
 		noticeIntent(intent);
 	}
 
-	private void enable_location_updates() {
+	private void enable_location_updates(boolean do_update) {
 		// Listen for GPS and Network position updates
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -765,7 +785,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			AltosDebug.debug("Failed to get GPS updates\n");
 		}
 
-		update_ui(telemetry_state, state, true);
+		if (do_update)
+			update_ui(telemetry_state, state, true);
 	}
 
 	static final int MY_PERMISSION_REQUEST = 1001;
@@ -789,7 +810,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
 					if (permissions[i].equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
 						have_location_permission = true;
-						enable_location_updates();
+						enable_location_updates(true);
 						if (map_online != null)
 							map_online.position_permission();
 					}
@@ -803,8 +824,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	@Override
 	public void onResume() {
-		super.onResume();
 		AltosDebug.debug("+ ON RESUME +");
+
+		super.onResume();
 
 		if (!asked_permission) {
 			asked_permission = true;
@@ -833,13 +855,15 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			}
 		}
 		if (have_location_permission)
-			enable_location_updates();
+			enable_location_updates(false);
 	}
 
 	@Override
 	public void onPause() {
-		super.onPause();
 		AltosDebug.debug("- ON PAUSE -");
+
+		super.onPause();
+
 		// Stop listening for location updates
 		if (have_location_permission)
 			((LocationManager) getSystemService(Context.LOCATION_SERVICE)).removeUpdates(this);
@@ -847,14 +871,18 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	@Override
 	public void onStop() {
-		super.onStop();
 		AltosDebug.debug("-- ON STOP --");
+
+		super.onStop();
 	}
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		AltosDebug.debug("--- ON DESTROY ---");
+
+		super.onDestroy();
+
+		saved_state = null;
 
 		doUnbindService();
 		if (mAltosVoice != null) {
