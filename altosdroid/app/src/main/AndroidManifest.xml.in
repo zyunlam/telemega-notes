@@ -28,6 +28,7 @@
     <!-- Permissions needed to access bluetooth -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <!-- Permissions needed to save Telemetry logs to SD card -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- Permissions needed for GoogleMaps -->

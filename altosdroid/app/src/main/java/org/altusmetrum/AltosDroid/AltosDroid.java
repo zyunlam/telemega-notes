@@ -793,7 +793,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 	public boolean have_location_permission = false;
 	public boolean have_storage_permission = false;
+	public boolean have_bluetooth_permission = false;
+	public boolean have_bluetooth_connect_permission = false;
 	public boolean asked_permission = false;
+
+	static final String BLUETOOTH_CONNECT = "android.permission.BLUETOOTH_CONNECT";
 
 	AltosMapOnline map_online;
 
@@ -816,6 +820,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 					}
 					if (permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 						have_storage_permission = true;
+					}
+					if (permissions[i].equals(Manifest.permission.BLUETOOTH)) {
+						have_bluetooth_permission = true;
+					}
+					if (permissions[i].equals(BLUETOOTH_CONNECT)) {
+						have_bluetooth_connect_permission = true;
 					}
 				}
 			}
@@ -842,15 +852,39 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			{
 				have_storage_permission = true;
 			}
-			int count = (have_location_permission ? 0 : 1) + (have_storage_permission ? 0 : 1);
+			if (ActivityCompat.checkSelfPermission(this,
+							       Manifest.permission.BLUETOOTH)
+			    == PackageManager.PERMISSION_GRANTED)
+			{
+				have_bluetooth_permission = true;
+			}
+			if (ActivityCompat.checkSelfPermission(this,
+							       BLUETOOTH_CONNECT)
+			    == PackageManager.PERMISSION_GRANTED)
+			{
+				have_bluetooth_connect_permission = true;
+			}
+			int count = 0;
+			if (!have_location_permission)
+				count += 1;
+			if (!have_storage_permission)
+				count += 1;
+			if (!have_bluetooth_permission)
+				count += 1;
+			if (!have_bluetooth_connect_permission)
+				count += 1;
 			if (count > 0)
 			{
 				String[] permissions = new String[count];
 				int i = 0;
 				if (!have_location_permission)
 					permissions[i++] = Manifest.permission.ACCESS_FINE_LOCATION;
-				if (!have_location_permission)
+				if (!have_storage_permission)
 					permissions[i++] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+				if (!have_bluetooth_permission)
+					permissions[i++] = Manifest.permission.BLUETOOTH;
+				if (!have_bluetooth_connect_permission)
+					permissions[i++] = BLUETOOTH_CONNECT;
 				ActivityCompat.requestPermissions(this, permissions, MY_PERMISSION_REQUEST);
 			}
 		}
