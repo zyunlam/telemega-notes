@@ -33,7 +33,7 @@ ao_async_start(void)
 void
 ao_async_stop(void)
 {
-	LED_PORT &= ~(1 << AO_LED_SERIAL);
+	LED_PORT &= (uint8_t) ~(1 << AO_LED_SERIAL);
 }
 
 void
@@ -45,11 +45,11 @@ ao_async_byte(uint8_t byte)
 	uint8_t		bit;
 	uint8_t		w_hi, w_lo;
 
-	/*    start           data           stop */
-	w = (0x000 << 0) | (byte << 1) | (0x001 << 9);
+	/*                start           data           stop */
+	w = (uint16_t) ((0x000 << 0) | (byte << 1) | (0x001 << 9));
 
-	w_hi = w >> 8;
-	w_lo = w;
+	w_hi = (uint8_t) (w >> 8);
+	w_lo = (uint8_t) w;
 
 	ao_arch_block_interrupts();
 

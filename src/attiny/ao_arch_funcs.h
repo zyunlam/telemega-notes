@@ -21,7 +21,7 @@
  */
 
 #define ao_spi_get_mask(reg,mask,bus,speed) do {	\
-		(reg) &= ~(mask);			\
+		(reg) &= (uint8_t) ~(mask);		\
 	} while (0)
 
 #define ao_spi_put_mask(reg,mask,bus) do {	\
