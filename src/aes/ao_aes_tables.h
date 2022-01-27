@@ -4,7 +4,7 @@
 
 extern const word8x4 M0[4][256];
 extern const word8x4 M1[4][256];
-extern const int xrcon[30];
+extern const word8 xrcon[30];
 extern const word8 xS[256];
 extern const word8 xSi[256];
 
