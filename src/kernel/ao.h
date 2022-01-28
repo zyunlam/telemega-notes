@@ -724,8 +724,8 @@ struct ao_stdio {
 };
 
 extern struct ao_stdio ao_stdios[];
-extern int8_t ao_cur_stdio;
-extern int8_t ao_num_stdios;
+extern uint8_t ao_cur_stdio;
+extern uint8_t ao_num_stdios;
 
 void
 flush(void);
@@ -735,7 +735,7 @@ extern uint8_t ao_stdin_ready;
 uint8_t
 ao_echo(void);
 
-int8_t
+uint8_t
 ao_add_stdio(int (*pollchar)(void),
 	     void (*putchar)(char) ,
 	     void (*flush)(void));

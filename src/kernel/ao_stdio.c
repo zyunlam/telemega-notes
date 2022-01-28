@@ -75,10 +75,10 @@
 struct ao_stdio ao_stdios[AO_NUM_STDIOS];
 
 #if AO_NUM_STDIOS > 1
-int8_t ao_cur_stdio;
-int8_t ao_num_stdios;
+uint8_t ao_cur_stdio;
+uint8_t ao_num_stdios;
 #else
-int8_t ao_cur_stdio;
+uint8_t ao_cur_stdio;
 #define ao_cur_stdio	0
 #define ao_num_stdios	0
 #endif
@@ -114,7 +114,7 @@ char
 ao_getchar(void) 
 {
 	int c;
-	int8_t stdio;
+	uint8_t stdio;
 
 	ao_arch_block_interrupts();
 	stdio = ao_cur_stdio;
@@ -133,7 +133,7 @@ ao_getchar(void)
 	ao_cur_stdio = stdio;
 #endif
 	ao_arch_release_interrupts();
-	return c;
+	return (char) c;
 }
 
 uint8_t
@@ -142,7 +142,7 @@ ao_echo(void)
 	return ao_stdios[ao_cur_stdio].echo;
 }
 
-int8_t
+uint8_t
 ao_add_stdio(int (*_pollchar)(void),
 	     void (*putchar)(char),
 	     void (*_flush)(void)) 
