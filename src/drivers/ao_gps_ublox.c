@@ -115,8 +115,8 @@ static void ao_ublox_put_i8(int8_t c)
 
 static void ao_ublox_put_u16(uint16_t c)
 {
-	ao_ublox_put_u8(c);
-	ao_ublox_put_u8(c>>8);
+	ao_ublox_put_u8((uint8_t) c);
+	ao_ublox_put_u8((uint8_t) (c>>8));
 }
 
 #if 0
@@ -128,10 +128,10 @@ static void ao_ublox_put_i16(int16_t c)
 
 static void ao_ublox_put_u32(uint32_t c)
 {
-	ao_ublox_put_u8(c);
-	ao_ublox_put_u8(c>>8);
-	ao_ublox_put_u8(c>>16);
-	ao_ublox_put_u8(c>>24);
+	ao_ublox_put_u8((uint8_t) c);
+	ao_ublox_put_u8((uint8_t) (c>>8));
+	ao_ublox_put_u8((uint8_t) (c>>16));
+	ao_ublox_put_u8((uint8_t) (c>>24));
 }
 
 static void ao_ublox_put_i32(int32_t c)
@@ -160,7 +160,7 @@ static void ublox_u16(uint8_t offset)
 	uint16_t val;
 
 	val = data_byte();
-	val |= data_byte () << 8;
+	val |= (uint16_t) ((uint16_t) data_byte () << 8);
 	*ptr = val;
 }
 
@@ -515,8 +515,8 @@ ao_ublox_putstart(uint8_t class, uint8_t id, uint16_t len)
 	ao_gps_putchar(0x62);
 	ao_ublox_put_u8(class);
 	ao_ublox_put_u8(id);
-	ao_ublox_put_u8(len);
-	ao_ublox_put_u8(len >> 8);
+	ao_ublox_put_u8((uint8_t) len);
+	ao_ublox_put_u8((uint8_t) (len >> 8));
 }
 
 static void
@@ -659,7 +659,7 @@ ao_gps(void)
 
 		/* Length */
 		ao_ublox_len = header_byte();
-		ao_ublox_len |= header_byte() << 8;
+		ao_ublox_len |= (uint16_t) ((uint16_t) header_byte() << 8);
 
 		ao_gps_dbg(DBG_PROTO, "%6u class %02x id %02x len %d\n", packet_start_tick, class, id, ao_ublox_len);
 
@@ -738,7 +738,7 @@ ao_gps(void)
 				ao_gps_data.latitude = nav_posllh.lat;
 				ao_gps_data.longitude = nav_posllh.lon;
 
-				ao_gps_data.year = nav_timeutc.year - 2000;
+				ao_gps_data.year = (uint8_t) (nav_timeutc.year - 2000);
 				ao_gps_data.month = nav_timeutc.month;
 				ao_gps_data.day = nav_timeutc.day;
 
@@ -748,13 +748,13 @@ ao_gps(void)
 
 				/* we report dop scaled by 10, but ublox provides dop scaled by 100
 				 */
-				ao_gps_data.pdop = nav_dop.pdop / 10;
-				ao_gps_data.hdop = nav_dop.hdop / 10;
-				ao_gps_data.vdop = nav_dop.vdop / 10;
+				ao_gps_data.pdop = (uint8_t) (nav_dop.pdop / 10);
+				ao_gps_data.hdop = (uint8_t) (nav_dop.hdop / 10);
+				ao_gps_data.vdop = (uint8_t) (nav_dop.vdop / 10);
 
-				ao_gps_data.ground_speed = nav_velned.g_speed;
-				ao_gps_data.climb_rate = -nav_velned.vel_d;
-				ao_gps_data.course = nav_velned.heading / 200000;
+				ao_gps_data.ground_speed = (uint16_t) nav_velned.g_speed;
+				ao_gps_data.climb_rate = -(int16_t) nav_velned.vel_d;
+				ao_gps_data.course = (uint8_t) (nav_velned.heading / 200000);
 
 				ao_gps_tracking_data.channels = 0;
 

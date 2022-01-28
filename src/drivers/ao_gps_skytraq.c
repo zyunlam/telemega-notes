@@ -126,7 +126,7 @@ ao_gps_decimal(uint8_t max_width)
 		uint8_t c = ao_gps_char;
 		if (c < (uint8_t) '0' || (uint8_t) '9' < c)
 			break;
-		v = v * 10 + (uint8_t) (c - (uint8_t) '0');
+		v = (int16_t) (v * 10 + (uint8_t) (c - (uint8_t) '0'));
 		ao_gps_num_width++;
 		ao_gps_lexchar();
 	}
@@ -145,16 +145,15 @@ ao_gps_hex(void)
 	ao_gps_num_width = 0;
 	while (ao_gps_num_width < 2) {
 		uint8_t c = ao_gps_char;
-		uint8_t	d;
 		if ((uint8_t) '0' <= c && c <= (uint8_t) '9')
-			d = - '0';
+			c -= '0';
 		else if ((uint8_t) 'A' <= c && c <= (uint8_t) 'F')
-			d = - 'A' + 10;
+			c -= 'A' - 10;
 		else if ((uint8_t) 'a' <= c && c <= (uint8_t) 'f')
-			d = - 'a' + 10;
+			c -= 'a' - 10;
 		else
 			break;
-		v = (v << 4) | (c + d);
+		v = (uint8_t) ((v << 4) | c);
 		ao_gps_num_width++;
 		ao_gps_lexchar();
 	}
@@ -164,9 +163,9 @@ ao_gps_hex(void)
 static int32_t
 ao_gps_parse_pos(uint8_t deg_width) 
 {
-	static uint16_t	d;
-	static uint8_t	m;
-	static uint16_t	f;
+	int16_t		d;
+	int16_t		m;
+	int16_t		f;
 	char c;
 
 	d = ao_gps_decimal(deg_width);
@@ -256,9 +255,9 @@ ao_nmea_gga(void)
 
 	ao_gps_next_tick = ao_time();
 	ao_gps_next.flags = AO_GPS_RUNNING | ao_gps_date_flags;
-	ao_gps_next.hour = ao_gps_decimal(2);
-	ao_gps_next.minute = ao_gps_decimal(2);
-	ao_gps_next.second = ao_gps_decimal(2);
+	ao_gps_next.hour = (uint8_t) ao_gps_decimal(2);
+	ao_gps_next.minute = (uint8_t) ao_gps_decimal(2);
+	ao_gps_next.second = (uint8_t) ao_gps_decimal(2);
 	ao_gps_skip_field();	/* skip seconds fraction */
 
 	ao_gps_next.latitude = ao_gps_parse_pos(2);
@@ -268,17 +267,17 @@ ao_nmea_gga(void)
 	if (ao_gps_parse_flag('E', 'W'))
 		ao_gps_next.longitude = -ao_gps_next.longitude;
 
-	i = ao_gps_decimal(0xff);
+	i = (uint8_t) ao_gps_decimal(0xff);
 	if (i == 1)
 		ao_gps_next.flags |= AO_GPS_VALID;
 
-	i = ao_gps_decimal(0xff) << AO_GPS_NUM_SAT_SHIFT;
+	i = (uint8_t) (ao_gps_decimal(0xff) << AO_GPS_NUM_SAT_SHIFT);
 	if (i > AO_GPS_NUM_SAT_MASK)
 		i = AO_GPS_NUM_SAT_MASK;
 	ao_gps_next.flags |= i;
 
 	ao_gps_lexchar();
-	i = ao_gps_decimal(0xff);
+	i = (uint8_t) ao_gps_decimal(0xff);
 	if (i <= 25) {
 		i = (uint8_t) 10 * i;
 		if (ao_gps_char == '.')
@@ -307,7 +306,7 @@ ao_nmea_gga(void)
 static void
 ao_nmea_gsv(void)
 {
-	char	c;
+	uint8_t	c;
 	uint8_t	i;
 	uint8_t	done;
 	/* Now read the data into the GPS tracking data record
@@ -326,8 +325,8 @@ ao_nmea_gsv(void)
 	 *	...		other SVIDs
 	 *	72		checksum
 	 */
-	c = ao_gps_decimal(1);	/* total messages */
-	i = ao_gps_decimal(1);	/* message sequence */
+	c = (uint8_t) ao_gps_decimal(1);	/* total messages */
+	i = (uint8_t) ao_gps_decimal(1);	/* message sequence */
 	if (i == 1) {
 		ao_gps_tracking_next.channels = 0;
 	}
@@ -336,14 +335,14 @@ ao_nmea_gsv(void)
 	ao_gps_skip_field();	/* sats in view */
 	while (ao_gps_char != '*' && ao_gps_char != '\n' && ao_gps_char != '\r') {
 		i = ao_gps_tracking_next.channels;
-		c = ao_gps_decimal(2);	/* SVID */
+		c = (uint8_t) ao_gps_decimal(2);	/* SVID */
 		if (i < AO_MAX_GPS_TRACKING)
 			ao_gps_tracking_next.sats[i].svid = c;
 		ao_gps_lexchar();
 		ao_gps_skip_field();	/* elevation */
 		ao_gps_lexchar();
 		ao_gps_skip_field();	/* azimuth */
-		c = ao_gps_decimal(2);	/* C/N0 */
+		c = (uint8_t) ao_gps_decimal(2);	/* C/N0 */
 		if (i < AO_MAX_GPS_TRACKING) {
 			if ((ao_gps_tracking_next.sats[i].c_n_1 = c) != 0)
 				ao_gps_tracking_next.channels = i + 1;
@@ -366,7 +365,7 @@ ao_nmea_gsv(void)
 static void
 ao_nmea_rmc(void)
 {
-	char	a, c;
+	uint8_t	a, c;
 	uint8_t	i;
 	/* Parse the RMC record to read out the current date */
 
@@ -397,9 +396,9 @@ ao_nmea_rmc(void)
 		ao_gps_lexchar();
 		ao_gps_skip_field();
 	}
-	a = ao_gps_decimal(2);
-	c = ao_gps_decimal(2);
-	i = ao_gps_decimal(2);
+	a = (uint8_t) ao_gps_decimal(2);
+	c = (uint8_t) ao_gps_decimal(2);
+	i = (uint8_t) ao_gps_decimal(2);
 
 	ao_nmea_finish();
 
