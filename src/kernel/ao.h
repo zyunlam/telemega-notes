@@ -965,7 +965,7 @@ ao_sqrt(uint32_t op);
  * ao_freq.c
  */
 
-int32_t ao_freq_to_set(int32_t freq, int32_t cal);
+uint32_t ao_freq_to_set(uint32_t freq, uint32_t cal);
 
 /*
  * ao_ms5607.c
