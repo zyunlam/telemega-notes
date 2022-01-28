@@ -26,7 +26,7 @@ static uint8_t ao_send[AO_MAX_SEND];
 static void
 ao_send_packet(void)
 {
-	uint16_t count;
+	uint32_t count;
 	uint8_t b;
 	uint8_t	i;
 
@@ -44,7 +44,7 @@ ao_send_packet(void)
 			return;
 		ao_send[i] = b;
 	}
-	ao_radio_send(ao_send, count);
+	ao_radio_send(ao_send, (uint8_t) count);
 }
 
 static const struct ao_cmds ao_send_packet_cmds[] = {

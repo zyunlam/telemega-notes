@@ -314,9 +314,9 @@ ao_kalman(void)
 	ao_kalman_correct_accel();
 #endif
 #endif
-	ao_height = from_fix(ao_k_height);
-	ao_speed = from_fix(ao_k_speed);
-	ao_accel = from_fix(ao_k_accel);
+	ao_height = (ao_v_t) from_fix(ao_k_height);
+	ao_speed = (ao_v_t) from_fix(ao_k_speed);
+	ao_accel = (ao_v_t) from_fix(ao_k_accel);
 	if (ao_height > ao_max_height)
 		ao_max_height = ao_height;
 #if HAS_BARO
