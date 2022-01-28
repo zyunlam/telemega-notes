@@ -531,7 +531,7 @@ struct ao_telemetry_tiny_recv {
  * for reporting RSSI. So, now we use these values everywhere
  */
 #define AO_RSSI_FROM_RADIO(radio)	((int16_t) ((int8_t) (radio) >> 1) - 74)
-#define AO_RADIO_FROM_RSSI(rssi)	(((int8_t) (rssi) + 74) << 1)
+#define AO_RADIO_FROM_RSSI(rssi)	((uint8_t) (((rssi) + 74) << 1))
 
 /*
  * ao_radio_recv tacks on rssi and status bytes
@@ -828,15 +828,15 @@ struct ao_fifo {
 	char	fifo[AO_FIFO_SIZE];
 };
 
-#define ao_fifo_insert(f,c) do { \
-	(f).fifo[(f).insert] = (c); \
-	(f).insert = ((f).insert + 1) & (AO_FIFO_SIZE-1); \
-} while(0)
+#define ao_fifo_insert(f,c) do {					\
+		(f).fifo[(f).insert] = (char) (c);			\
+		(f).insert = ((f).insert + 1) & (AO_FIFO_SIZE-1);	\
+	} while(0)
 
-#define ao_fifo_remove(f,c) do {\
-	c = (f).fifo[(f).remove]; \
-	(f).remove = ((f).remove + 1) & (AO_FIFO_SIZE-1); \
-} while(0)
+#define ao_fifo_remove(f,c) do {					\
+		c = (f).fifo[(f).remove];				\
+		(f).remove = ((f).remove + 1) & (AO_FIFO_SIZE-1);	\
+	} while(0)
 
 #define ao_fifo_full(f)		((((f).insert + 1) & (AO_FIFO_SIZE-1)) == (f).remove)
 #define ao_fifo_mostly(f)	((((f).insert - (f).remove) & (AO_FIFO_SIZE-1)) >= (AO_FIFO_SIZE * 3 / 4))
