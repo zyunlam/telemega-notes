@@ -101,7 +101,7 @@ ao_sample_max_orient(void)
  * of the requirements
  */
 static uint8_t
-ao_pyro_ready(struct ao_pyro *pyro)
+ao_pyro_ready(const struct ao_pyro *pyro)
 {
 	enum ao_pyro_flag flag, flags;
 #if HAS_GYRO
@@ -264,10 +264,12 @@ ao_pyro_pins_fire(uint16_t fire)
 	ao_delay(AO_MS_TO_TICKS(50));
 }
 
+static AO_TICK_TYPE pyro_delay_done[AO_PYRO_NUM];
+
 static uint8_t
 ao_pyro_check(void)
 {
-	struct ao_pyro	*pyro;
+	const struct ao_pyro	*pyro;
 	uint8_t		p, any_waiting;
 	uint16_t	fire = 0;
 
@@ -288,7 +290,7 @@ ao_pyro_check(void)
 		any_waiting = 1;
 		/* Check pyro state to see if it should fire
 		 */
-		if (!pyro->delay_done) {
+		if (!pyro_delay_done[p]) {
 			if (!ao_pyro_ready(pyro))
 				continue;
 
@@ -296,31 +298,36 @@ ao_pyro_check(void)
 			 * it expires
 			 */
 			if (pyro->flags & ao_pyro_delay) {
-				pyro->delay_done = ao_time() + pyro->delay;
-				if (!pyro->delay_done)
-					pyro->delay_done = 1;
+				AO_TICK_TYPE delay_done;
+				AO_TICK_SIGNED delay = pyro->delay;
+				if (delay < 0)
+					delay = 0;
+				delay_done = ao_time() + (AO_TICK_TYPE) delay;
+				if (!delay_done)
+					delay_done = 1;
+				pyro_delay_done[p] = delay_done;
 			}
 		}
 
 		/* Check to see if we're just waiting for
 		 * the delay to expire
 		 */
-		if (pyro->delay_done) {
+		if (pyro_delay_done[p]) {
 
 			/* Check to make sure the required conditions
 			 * remain valid. If not, inhibit the channel
 			 * by setting the inhibited bit
 			 */
 			if (!ao_pyro_ready(pyro)) {
-				ao_pyro_inhibited |= (1 << p);
+				ao_pyro_inhibited |= (uint16_t) (1 << p);
 				continue;
 			}
 
-			if ((AO_TICK_SIGNED) (ao_time() - pyro->delay_done) < 0)
+			if ((AO_TICK_SIGNED) (ao_time() - pyro_delay_done[p]) < 0)
 				continue;
 		}
 
-		fire |= (1 << p);
+		fire |= (uint16_t) (1U << p);
 	}
 
 	if (fire) {
@@ -457,11 +464,11 @@ ao_pyro_put(void *base, uint8_t offset, uint8_t size, int32_t value)
 	case 8:
 		if (value < 0)
 			return false;
-		*((uint8_t *) ((char *) base + offset)) = value;
+		*((uint8_t *) ((char *) base + offset)) = (uint8_t) value;
 		break;
 	case 16:
 	default:
-		*((int16_t *) (void *) ((char *) base + offset)) = value;
+		*((int16_t *) (void *) ((char *) base + offset)) = (int16_t) value;
 		break;
 	case 32:
 		*((int32_t *) (void *) ((char *) base + offset)) = value;
@@ -515,7 +522,7 @@ ao_pyro_show(void)
 void
 ao_pyro_set(void)
 {
-	uint8_t	p;
+	uint32_t	p;
 	struct ao_pyro pyro_tmp;
 	char	name[AO_PYRO_NAME_LEN];
 	uint8_t	c;
@@ -535,7 +542,7 @@ ao_pyro_set(void)
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	if (AO_PYRO_NUM <= p) {
-		printf ("invalid pyro channel %d\n", p);
+		printf ("invalid pyro channel %lu\n", p);
 		return;
 	}
 	memset(&pyro_tmp, '\0', sizeof (pyro_tmp));
@@ -568,7 +575,7 @@ ao_pyro_set(void)
 				r = -1;
 				ao_cmd_lex();
 			}
-			r *= ao_cmd_decimal();
+			r *= (int32_t) ao_cmd_decimal();
 			if (ao_cmd_status != ao_cmd_success)
 				return;
 			if (!ao_pyro_put(&pyro_tmp, ao_pyro_values[v].offset,
@@ -651,7 +658,7 @@ ao_pyro_update_version(void)
 		char	*after_pyro_1_24 = pyro_base_1_24 + AO_PYRO_NUM * sizeof (struct ao_pyro_1_24);
 
 		char	*config_end_1_25 = (void *) (&ao_config + 1);
-		size_t	to_move = config_end_1_25 - after_pyro_1_25;
+		size_t	to_move = (size_t) (config_end_1_25 - after_pyro_1_25);
 
 		memmove(after_pyro_1_25, after_pyro_1_24, to_move);
 
