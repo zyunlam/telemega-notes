@@ -76,7 +76,7 @@ ao_log(void)
 			ao_sleep(&ao_log_running);
 	
 		ao_fireone_data.type = AO_LOG_FLIGHT;
-		ao_fireone_data.tick = ao_time();
+		ao_fireone_data.tick = (uint16_t) ao_time();
 		ao_fireone_data.u.flight.flight = ao_flight_number;
 		ao_log_firetwo();
 
@@ -87,7 +87,7 @@ ao_log(void)
 		for (;;) {
 			/* Write samples to EEPROM */
 			while (ao_fireone_data_pos != ao_data_head) {
-				ao_fireone_data.tick = ao_data_ring[ao_fireone_data_pos].tick;
+				ao_fireone_data.tick = (uint16_t) ao_data_ring[ao_fireone_data_pos].tick;
 				ao_fireone_data.type = AO_LOG_SENSOR;
 				ao_fireone_data.u.sensor.pressure = ao_data_ring[ao_fireone_data_pos].adc.pressure;
 				ao_fireone_data.u.sensor.thrust = ao_data_ring[ao_fireone_data_pos].adc.thrust;
