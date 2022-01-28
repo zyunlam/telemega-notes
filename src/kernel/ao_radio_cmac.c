@@ -37,7 +37,7 @@ round_len(uint8_t len)
 		len = AO_CMAC_KEY_LEN;
 	rem = len % AO_CMAC_KEY_LEN;
 	if (rem != 0)
-		len += (AO_CMAC_KEY_LEN - rem);
+		len += (uint8_t) (AO_CMAC_KEY_LEN - rem);
 	return len;
 }
 
@@ -77,7 +77,7 @@ radio_cmac_send(uint8_t len)
  */
 
 static int8_t
-radio_cmac_recv(uint8_t len, uint16_t timeout) 
+radio_cmac_recv(uint8_t len, AO_TICK_TYPE timeout) 
 {
 	uint8_t	i;
 
@@ -145,7 +145,7 @@ ao_radio_cmac_send(void *packet, uint8_t len)
 }
 
 int8_t
-ao_radio_cmac_recv(void *packet, uint8_t len, uint16_t timeout) 
+ao_radio_cmac_recv(void *packet, uint8_t len, AO_TICK_TYPE timeout) 
 {
 	int8_t	i;
 	if (len > AO_CMAC_MAX_LEN)
