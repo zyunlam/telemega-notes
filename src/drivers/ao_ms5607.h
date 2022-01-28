@@ -34,7 +34,7 @@
 #define AO_MS5607_CONVERT_D2_4096	0x58
 
 #define AO_MS5607_ADC_READ		0x00
-#define AO_MS5607_PROM_READ(ad)		(0xA0 | ((ad) << 1))
+#define AO_MS5607_PROM_READ(ad)		(0xA0U | (uint8_t) ((ad) << 1))
 
 struct ao_ms5607_prom {
 	uint16_t	reserved;
