@@ -39,10 +39,10 @@ ao_fec_crc_byte(uint8_t byte, uint16_t crc)
 
 	for (bit = 0; bit < 8; bit++) {
 		if (((crc & 0x8000) >> 8) ^ (byte & 0x80))
-			crc = (crc << 1) ^ 0x8005;
+			crc = (uint16_t) ((crc << 1) ^ 0x8005);
 		else
 			crc = (crc << 1);
-		byte <<= 1;
+		byte = (uint8_t) (byte << 1);
 	}
 	return crc;
 }

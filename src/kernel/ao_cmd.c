@@ -132,8 +132,8 @@ ao_getnibble(void)
 void
 ao_cmd_put16(uint16_t v)
 {
-	ao_cmd_put8(v >> 8);
-	ao_cmd_put8(v);
+	ao_cmd_put8((uint8_t) (v >> 8));
+	ao_cmd_put8((uint8_t) v);
 }
 
 void
@@ -160,11 +160,11 @@ int8_t
 ao_cmd_hexchar(char c)
 {
 	if ('0' <= c && c <= '9')
-		return (c - '0');
+		return (int8_t) (c - '0');
 	if ('a' <= c && c <= 'f')
-		return (c - 'a' + 10);
+		return (int8_t) (c - 'a' + 10);
 	if ('A' <= c && c <= 'F')
-		return (c - 'A' + 10);
+		return (int8_t) (c - 'A' + 10);
 	return -1;
 }
 
@@ -182,7 +182,7 @@ get_hex(uint8_t lim)
 				ao_cmd_status = ao_cmd_lex_error;
 			break;
 		}
-		result = (result << 4) | n;
+		result = (uint32_t) ((result << 4) | (uint32_t) n);
 		ao_cmd_lex();
 	}
 	return result;
@@ -191,7 +191,7 @@ get_hex(uint8_t lim)
 uint8_t
 ao_cmd_hexbyte(void)
 {
-	return get_hex(2);
+	return (uint8_t) get_hex(2);
 }
 
 uint32_t
@@ -325,7 +325,7 @@ help(void)
 	uint8_t cmd;
 	const struct ao_cmds * cs;
 	const char *h;
-	uint8_t e;
+	size_t e;
 
 	for (cmds = 0; cmds < ao_ncmds; cmds++) {
 		cs = ao_cmds[cmds];
