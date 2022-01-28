@@ -40,16 +40,16 @@ static uint16_t ao_telemetry_desired_interval;
 #define RDF_SPACE	
 #else
 #define RDF_SPACE	
-static uint16_t ao_telemetry_time;
+static AO_TICK_TYPE	ao_telemetry_time;
 #endif
 
 #if HAS_RDF
 static RDF_SPACE uint8_t ao_rdf = 0;
-static RDF_SPACE uint16_t ao_rdf_time;
+static RDF_SPACE AO_TICK_TYPE	ao_rdf_time;
 #endif
 
 #if HAS_APRS
-static uint16_t ao_aprs_time;
+static AO_TICK_TYPE ao_aprs_time;
 
 #include <ao_aprs.h>
 #endif
@@ -500,8 +500,8 @@ ao_set_aprs_time(void)
 static void
 ao_telemetry(void)
 {
-	uint16_t	time;
-	int16_t		delay;
+	AO_TICK_TYPE	time;
+	AO_TICK_SIGNED	delay;
 
 	ao_config_get();
 	if (!ao_config.radio_enable)
@@ -601,9 +601,9 @@ ao_telemetry(void)
 					time = ao_aprs_time;
 			}
 #endif /* HAS_APRS */
-			delay = time - ao_time();
+			delay = (AO_TICK_SIGNED) (time - ao_time());
 			if (delay > 0) {
-				ao_sleep_for(&telemetry, delay);
+				ao_sleep_for(&telemetry, (AO_TICK_TYPE) delay);
 			}
 		}
 	}
