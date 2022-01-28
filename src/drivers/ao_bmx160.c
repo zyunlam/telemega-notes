@@ -109,7 +109,7 @@ _ao_bmm150_reg_read2(uint8_t lo_addr, uint8_t hi_addr)
 	uint8_t lo = _ao_bmm150_reg_read(lo_addr);
 	uint8_t hi = _ao_bmm150_reg_read(hi_addr);
 
-	return ((uint16_t) hi << 8) | lo;
+	return (uint16_t) (((uint16_t) hi << 8) | (uint16_t) lo);
 }
 
 /*
@@ -217,7 +217,7 @@ static int16_t compensate_x(int16_t mag_data_x, uint16_t data_rhall)
 	    //printf("comp_x10 %d\n", process_comp_x10);
             retval = ((int16_t)(process_comp_x10 / 8192));
 	    //printf("ret 1 %d\n", retval);
-            retval = (retval + (((int16_t)ao_bmm150_trim.dig_x1) * 8)) / 16;
+            retval = (int16_t) ((retval + (((int16_t)ao_bmm150_trim.dig_x1) * 8)) / 16);
 	    //printf("final %d\n", retval);
         }
         else
@@ -282,7 +282,7 @@ static int16_t compensate_y(int16_t mag_data_y, uint16_t data_rhall)
             process_comp_y8 = (((process_comp_y6 + ((int32_t)0x100000)) * process_comp_y7) / 4096);
             process_comp_y9 = (((int32_t)mag_data_y) * process_comp_y8);
             retval = (int16_t)(process_comp_y9 / 8192);
-            retval = (retval + (((int16_t)ao_bmm150_trim.dig_y1) * 8)) / 16;
+            retval = (int16_t) ((retval + (((int16_t)ao_bmm150_trim.dig_y1) * 8)) / 16);
         }
         else
         {
@@ -504,7 +504,7 @@ _ao_bmx160_setup(void)
 			     BMX160_ACC_RANGE_16G);
 
 	for (r = 0x3; r <= 0x1b; r++)
-		(void) _ao_bmx160_reg_read(r);
+		(void) _ao_bmx160_reg_read((uint8_t) r);
 
 	/* Configure gyro:
 	 *
@@ -560,16 +560,16 @@ _ao_bmx160_setup(void)
 	_ao_bmm150_reg_write(BMM150_REPZ, BMM150_REPZ_VALUE(15));
 
 	/* Read Trim values */
-	ao_bmm150_trim.dig_x1   = _ao_bmm150_reg_read(BMM150_DIG_X1);
-	ao_bmm150_trim.dig_y1   = _ao_bmm150_reg_read(BMM150_DIG_Y1);
-	ao_bmm150_trim.dig_z4   = _ao_bmm150_reg_read2(BMM150_DIG_Z4_LSB, BMM150_DIG_Z4_MSB);
-	ao_bmm150_trim.dig_x2   = _ao_bmm150_reg_read(BMM150_DIG_X2);
-	ao_bmm150_trim.dig_y2   = _ao_bmm150_reg_read(BMM150_DIG_Y2);
-	ao_bmm150_trim.dig_z2   = _ao_bmm150_reg_read2(BMM150_DIG_Z2_LSB, BMM150_DIG_Z2_MSB);
+	ao_bmm150_trim.dig_x1   = (int8_t) _ao_bmm150_reg_read(BMM150_DIG_X1);
+	ao_bmm150_trim.dig_y1   = (int8_t) _ao_bmm150_reg_read(BMM150_DIG_Y1);
+	ao_bmm150_trim.dig_z4   = (int8_t) _ao_bmm150_reg_read2(BMM150_DIG_Z4_LSB, BMM150_DIG_Z4_MSB);
+	ao_bmm150_trim.dig_x2   = (int8_t) _ao_bmm150_reg_read(BMM150_DIG_X2);
+	ao_bmm150_trim.dig_y2   = (int8_t) _ao_bmm150_reg_read(BMM150_DIG_Y2);
+	ao_bmm150_trim.dig_z2   = (int8_t) _ao_bmm150_reg_read2(BMM150_DIG_Z2_LSB, BMM150_DIG_Z2_MSB);
 	ao_bmm150_trim.dig_z1   = _ao_bmm150_reg_read2(BMM150_DIG_Z1_LSB, BMM150_DIG_Z1_MSB);
 	ao_bmm150_trim.dig_xyz1 = _ao_bmm150_reg_read2(BMM150_DIG_XYZ1_LSB, BMM150_DIG_XYZ1_MSB);
-	ao_bmm150_trim.dig_z3   = _ao_bmm150_reg_read2(BMM150_DIG_Z3_LSB, BMM150_DIG_Z3_MSB);
-	ao_bmm150_trim.dig_xy2  = _ao_bmm150_reg_read(BMM150_DIG_XY2);
+	ao_bmm150_trim.dig_z3   = (int8_t) _ao_bmm150_reg_read2(BMM150_DIG_Z3_LSB, BMM150_DIG_Z3_MSB);
+	ao_bmm150_trim.dig_xy2  = (int8_t) _ao_bmm150_reg_read(BMM150_DIG_XY2);
 	ao_bmm150_trim.dig_xy1  = _ao_bmm150_reg_read(BMM150_DIG_XY1);
 
 	/* To get data out of the magnetometer, set the control op mode to 'forced', then read

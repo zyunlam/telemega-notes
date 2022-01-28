@@ -29,7 +29,7 @@
 #define ao_serial_btm_drain	ao_serial1_drain
 #endif
 
-int8_t			ao_btm_stdio;
+uint8_t		ao_btm_stdio;
 uint8_t		ao_btm_connected;
 
 #define BT_DEBUG 0
@@ -197,7 +197,7 @@ ao_btm_get_line(void)
 	while ((c = ao_btm_getchar()) != AO_READ_AGAIN) {
 		ao_btm_log_in_char(c);
 		if (ao_btm_reply_len < sizeof (ao_btm_reply))
-			ao_btm_reply[ao_btm_reply_len++] = c;
+			ao_btm_reply[ao_btm_reply_len++] = (char) c;
 		if (c == '\r' || c == '\n')
 			break;
 	}
@@ -242,7 +242,7 @@ ao_btm_putchar(char c)
  * Wait for the bluetooth device to return
  * status from the previously executed command
  */
-static uint8_t
+static int
 ao_btm_wait_reply(void)
 {
 	for (;;) {
@@ -265,7 +265,7 @@ ao_btm_string(const char *cmd)
 		ao_btm_putchar(c);
 }
 
-static uint8_t
+static int
 ao_btm_cmd(const char *cmd)
 {
 	ao_btm_drain();
@@ -282,7 +282,7 @@ ao_btm_cmd(const char *cmd)
 	return ao_btm_wait_reply();
 }
 
-static uint8_t
+static int
 ao_btm_set_name(void)
 {
 	char	sn[8];
@@ -294,7 +294,7 @@ ao_btm_set_name(void)
 	*--s = '\r';
 	n = ao_serial_number;
 	do {
-		*--s = '0' + n % 10;
+		*--s = (uint8_t) ('0' + n % 10);
 	} while (n /= 10);
 	while ((c = *s++))
 		ao_btm_putchar(c);
