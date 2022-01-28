@@ -47,8 +47,8 @@ getbyte(void)
 static void
 radio_cmac_send_cmd(void) 
 {
-	uint8_t	i;
-	uint8_t	len;
+	uint32_t i;
+	uint32_t len;
 
 	len = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
@@ -63,26 +63,31 @@ radio_cmac_send_cmd(void)
 		if (ao_cmd_status != ao_cmd_success)
 			return;
 	}
-	ao_radio_cmac_send(cmac_data, len);
+	ao_radio_cmac_send(cmac_data, (uint8_t) len);
 }
 
 static void
 radio_cmac_recv_cmd(void) 
 {
-	uint8_t		len, i;
-	uint16_t	timeout;
+	uint32_t len, l;
+	int8_t i;
+	AO_TICK_TYPE	timeout;
 
 	len = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
+	if (len > AO_CMAC_MAX_LEN) {
+		ao_cmd_status = ao_cmd_syntax_error;
+		return;
+	}
 	timeout = AO_MS_TO_TICKS(ao_cmd_decimal());
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	i = ao_radio_cmac_recv(cmac_data, len, timeout);
+	i = ao_radio_cmac_recv(cmac_data, (uint8_t) len, timeout);
 	if (i == AO_RADIO_CMAC_OK) {
 		printf ("PACKET ");
-		for (i = 0; i < len; i++)
-			printf("%02x", cmac_data[i]);
+		for (l = 0; l < len; l++)
+			printf("%02x", cmac_data[l]);
 		printf (" %d\n", ao_radio_cmac_rssi);
 	} else
 		printf ("ERROR %d %d\n", i, ao_radio_cmac_rssi);
