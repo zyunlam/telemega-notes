@@ -36,7 +36,7 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_metrum))] ;
 void
 ao_log(void)
 {
-	uint16_t	next_sensor, next_other;
+	AO_TICK_TYPE	next_sensor, next_other;
 
 	ao_storage_setup();
 
