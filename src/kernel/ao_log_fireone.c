@@ -89,8 +89,8 @@ ao_log(void)
 			while (ao_fireone_data_pos != ao_data_head) {
 				ao_fireone_data.tick = (uint16_t) ao_data_ring[ao_fireone_data_pos].tick;
 				ao_fireone_data.type = AO_LOG_SENSOR;
-				ao_fireone_data.u.sensor.pressure = ao_data_ring[ao_fireone_data_pos].adc.pressure;
-				ao_fireone_data.u.sensor.thrust = ao_data_ring[ao_fireone_data_pos].adc.thrust;
+				ao_fireone_data.u.sensor.pressure = (uint16_t) ao_data_ring[ao_fireone_data_pos].adc.pressure;
+				ao_fireone_data.u.sensor.thrust = (uint16_t) ao_data_ring[ao_fireone_data_pos].adc.thrust;
 	//			for (i = 0; i < 4; i++) {
 	//				ao_fireone_data.u.sensor.thermistor[i] = ao_data_ring[ao_fireone_data_pos].sensor.thermistor[i];
 	//			}
