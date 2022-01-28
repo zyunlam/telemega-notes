@@ -181,7 +181,7 @@ ao_pad_decivolt(int16_t adc, int16_t r_plus, int16_t r_minus)
 {
 	int32_t	mul = (int32_t) AO_ADC_REFERENCE_DV * (r_plus + r_minus);
 	int32_t div = (int32_t) AO_ADC_MAX * r_minus;
-	return ((int32_t) adc * mul + mul/2) / div;
+	return (int16_t) (((int32_t) adc * mul + mul/2) / div);
 }
 
 static void
@@ -211,7 +211,7 @@ ao_pad_monitor(void)
 		sample = ao_data_ring_next(sample);
 
 		/* Reply battery voltage */
-		query.battery = ao_pad_decivolt(packet->adc.batt, AO_PAD_R_V_BATT_BATT_SENSE, AO_PAD_R_BATT_SENSE_GND);
+		query.battery = (uint8_t) ao_pad_decivolt(packet->adc.batt, AO_PAD_R_V_BATT_BATT_SENSE, AO_PAD_R_BATT_SENSE_GND);
 
 		/* Current pyro voltage */
 		pyro = ao_pad_decivolt(packet->adc.pyro,
@@ -288,7 +288,7 @@ ao_pad_monitor(void)
 			prev = cur;
 		}
 
-		if (ao_pad_armed && (AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_PAD_ARM_TIME)
+		if (ao_pad_armed && (AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > (AO_TICK_SIGNED) AO_PAD_ARM_TIME)
 			ao_pad_armed = 0;
 
 		if (ao_pad_armed) {
@@ -340,10 +340,10 @@ ao_pad_read_box(void)
 #endif
 
 #ifdef AO_PAD_SELECTOR_PORT
-static int ao_pad_read_box(void) {
+static uint8_t ao_pad_read_box(void) {
 	AO_PORT_TYPE	value = ao_gpio_get_all(AO_PAD_SELECTOR_PORT);
 	unsigned	pin;
-	int		select = 1;
+	uint8_t		select = 1;
 
 	for (pin = 0; pin < sizeof (AO_PORT_TYPE) * 8; pin++) {
 		if (AO_PAD_SELECTOR_PINS & (1 << pin)) {
@@ -398,7 +398,7 @@ ao_pad(void)
 			if (command.channels & ~(AO_PAD_ALL_CHANNELS))
 				break;
 
-			tick_difference = command.tick - (uint16_t) ao_time();
+			tick_difference = (int16_t) (command.tick - (uint16_t) ao_time());
 			PRINTD ("arm tick %d local tick %d\n", command.tick, (uint16_t) ao_time());
 			if (tick_difference < 0)
 				tick_difference = -tick_difference;
@@ -421,7 +421,7 @@ ao_pad(void)
 				break;
 			}
 
-			query.tick = ao_time();
+			query.tick = (uint16_t) ao_time();
 			query.box = ao_pad_box;
 			query.channels = AO_PAD_ALL_CHANNELS;
 			query.armed = ao_pad_armed;
@@ -439,7 +439,7 @@ ao_pad(void)
 				PRINTD ("not armed\n");
 				break;
 			}
-			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
+			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > (AO_TICK_SIGNED) AO_SEC_TO_TICKS(20)) {
 				PRINTD ("late pad arm_time %ld time %ld\n",
 					(long) ao_pad_arm_time, ao_time());
 				break;
@@ -457,7 +457,7 @@ ao_pad(void)
 #if HAS_LOG
 			if (!ao_log_running) ao_log_start();
 #endif
-			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > AO_SEC_TO_TICKS(20)) {
+			if ((AO_TICK_SIGNED) (ao_time() - ao_pad_arm_time) > (AO_TICK_SIGNED) AO_SEC_TO_TICKS(20)) {
 				PRINTD ("late pad arm_time %ld time %ld\n",
 					(long) ao_pad_arm_time, (long) ao_time());
 				break;
@@ -516,7 +516,7 @@ ao_pad_manual(void)
 	ignite = 1 << ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	repeat = ao_cmd_decimal();
+	repeat = (uint8_t) ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success) {
 		repeat = 1;
 		ao_cmd_status = ao_cmd_success;
@@ -536,7 +536,7 @@ static struct ao_task ao_pad_monitor_task;
 static void
 ao_pad_set_debug(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success)
 		ao_pad_debug = r != 0;
 }
@@ -546,10 +546,10 @@ static void
 ao_pad_alarm_debug(void)
 {
 	uint8_t	which, value;
-	which = ao_cmd_decimal();
+	which = ao_cmd_decimal() != 0;
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	value = ao_cmd_decimal();
+	value = ao_cmd_decimal() != 0;
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	printf ("Set %s to %d\n", which ? "siren" : "strobe", value);
@@ -585,9 +585,9 @@ void
 ao_pad_init(void)
 {
 #ifdef AO_PAD_SELECTOR_PORT
-	unsigned pin;
+	int pin;
 
-	for (pin = 0; pin < sizeof (AO_PORT_TYPE) * 8; pin++) {
+	for (pin = 0; pin < (int) sizeof (AO_PORT_TYPE) * 8; pin++) {
 		if (AO_PAD_SELECTOR_PINS & (1 << pin))
 			ao_enable_input(AO_PAD_SELECTOR_PORT, pin, AO_EXTI_MODE_PULL_UP);
 	}
