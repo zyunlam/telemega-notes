@@ -29,7 +29,7 @@
  * the log. Tasks may wait for this to be initialized
  * by sleeping on this variable.
  */
-extern int16_t ao_flight_number;
+extern uint16_t ao_flight_number;
 extern uint8_t	ao_log_mutex;
 extern uint32_t ao_log_current_pos;
 extern uint32_t ao_log_end_pos;
@@ -65,7 +65,7 @@ extern enum ao_flight_state ao_log_state;
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
 
-int16_t
+int32_t
 ao_log_flight(uint8_t slot);
 
 /* Checksum the loaded log record */
@@ -230,7 +230,7 @@ struct ao_log_mega {
 		struct {
 			uint16_t	flight;			/* 4 */
 			int16_t		ground_accel;		/* 6 */
-			uint32_t	ground_pres;		/* 8 */
+			int32_t		ground_pres;		/* 8 */
 			int16_t		ground_accel_along;	/* 12 */
 			int16_t		ground_accel_across;	/* 14 */
 			int16_t		ground_accel_through;	/* 16 */
@@ -242,7 +242,7 @@ struct ao_log_mega {
 		struct {
 			uint16_t	flight;			/* 4 */
 			int16_t		ground_accel;		/* 6 */
-			uint32_t	ground_pres;		/* 8 */
+			int32_t		ground_pres;		/* 8 */
 			int16_t		ground_accel_along;	/* 12 */
 			int16_t		ground_accel_across;	/* 14 */
 			int16_t		ground_accel_through;	/* 16 */
@@ -390,7 +390,7 @@ struct ao_log_metrum {
 		struct {
 			uint16_t	flight;		/* 4 */
 			int16_t		ground_accel;	/* 6 */
-			uint32_t	ground_pres;	/* 8 */
+			int32_t		ground_pres;	/* 8 */
 			uint32_t	ground_temp;	/* 12 */
 		} flight;	/* 16 */
 		/* AO_LOG_STATE */
@@ -450,7 +450,7 @@ struct ao_log_mini {
 		struct {
 			uint16_t	flight;		/* 4 */
 			uint16_t	r6;
-			uint32_t	ground_pres;	/* 8 */
+			int32_t		ground_pres;	/* 8 */
 		} flight;
 		/* AO_LOG_STATE */
 		struct {
@@ -469,9 +469,9 @@ struct ao_log_mini {
 };							/* 16 */
 
 #define ao_log_pack24(dst,value) do {		\
-		(dst)[0] = (value);		\
-		(dst)[1] = (value) >> 8;	\
-		(dst)[2] = (value) >> 16;	\
+		(dst)[0] = (uint8_t) (value);	\
+		(dst)[1] = (uint8_t) ((value) >> 8);	\
+		(dst)[2] = (uint8_t) ((value) >> 16);	\
 	} while (0)
 
 struct ao_log_gps {

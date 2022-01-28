@@ -186,9 +186,9 @@ ao_gps_lock(void)
 static uint8_t erasing_current;
 
 void
-ao_tracker_erase_start(uint16_t flight)
+ao_tracker_erase_start(int32_t flight)
 {
-	erasing_current = flight == ao_flight_number;
+	erasing_current = flight == (int32_t) ao_flight_number;
 	if (erasing_current) {
 		ao_mutex_get(&tracker_mutex);
 		ao_log_stop();
