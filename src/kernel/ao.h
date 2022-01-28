@@ -112,7 +112,7 @@ extern volatile AO_TICK_TYPE ao_tick_count;
 #define AO_HERTZ		100
 #endif
 #define AO_MS_TO_TICKS(ms)	((ms) / (1000 / AO_HERTZ))
-#define AO_SEC_TO_TICKS(s)	((s) * AO_HERTZ)
+#define AO_SEC_TO_TICKS(s)	((AO_TICK_TYPE) (s) * AO_HERTZ)
 
 /* Returns the current time in ticks */
 AO_TICK_TYPE
@@ -603,7 +603,7 @@ ao_radio_send(const void *d, uint8_t size);
 
 #if HAS_RADIO_RECV
 uint8_t
-ao_radio_recv(void *d, uint8_t size, uint8_t timeout);
+ao_radio_recv(void *d, uint8_t size, AO_TICK_TYPE timeout);
 
 void
 ao_radio_recv_abort(void);
