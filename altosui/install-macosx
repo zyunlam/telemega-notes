@@ -20,8 +20,8 @@ case `id -u` in
 esac
 
 # Check for java
-if ls "$JVM" | grep -q adopt; then
-    echo "Adopt OpenJDK already present"
+if ls "$JVM" | grep -q temurin; then
+    echo "Adoptium already present"
 else
     open https://adoptium.net/
     osascript -e 'display dialog "Install Java from https://adoptium.net then click Continue" buttons {"Continue"} default button 1 with title "Install Java"' >/dev/null
