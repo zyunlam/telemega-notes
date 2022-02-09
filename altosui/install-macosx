@@ -23,8 +23,8 @@ esac
 if ls "$JVM" | grep -q adopt; then
     echo "Adopt OpenJDK already present"
 else
-    open https://adoptopenjdk.net/
-    osascript -e 'display dialog "Install Java from https://adoptopenjdk.net then click Continue" buttons {"Continue"} default button 1 with title "Install Java"' >/dev/null
+    open https://adoptium.net/
+    osascript -e 'display dialog "Install Java from https://adoptium.net then click Continue" buttons {"Continue"} default button 1 with title "Install Java"' >/dev/null
 fi
 
 cd "$dir"
