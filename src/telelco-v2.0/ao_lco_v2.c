@@ -42,7 +42,7 @@ void
 ao_lco_show_pad(uint8_t pad)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
-	ao_seven_segment_set(AO_LCO_PAD_DIGIT, pad | (ao_lco_drag_race << 4));
+	ao_seven_segment_set(AO_LCO_PAD_DIGIT, (uint8_t) (pad | (ao_lco_drag_race << 4)));
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
@@ -67,8 +67,8 @@ void
 ao_lco_show_box(uint16_t box)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
-	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, box % 10 | (ao_lco_drag_race << 4));
-	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, box / 10 | (ao_lco_drag_race << 4));
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, (uint8_t) (box % 10 | (ao_lco_drag_race << 4)));
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, (uint8_t) (box / 10 | (ao_lco_drag_race << 4)));
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
@@ -78,9 +78,9 @@ ao_lco_show_voltage(uint16_t decivolts)
 	uint8_t	tens, ones, tenths;
 
 	PRINTD("voltage %d\n", decivolts);
-	tenths = decivolts % 10;
-	ones = (decivolts / 10) % 10;
-	tens = (decivolts / 100) % 10;
+	tenths = (uint8_t) (decivolts % 10);
+	ones = (uint8_t) ((decivolts / 10) % 10);
+	tens = (uint8_t) ((decivolts / 100) % 10);
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_seven_segment_set(AO_LCO_PAD_DIGIT, tenths);
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, ones | 0x10);
@@ -151,7 +151,7 @@ static struct ao_task	ao_lco_drag_task;
 static void
 ao_lco_drag_monitor(void)
 {
-	AO_TICK_TYPE	delay = ~0;
+	AO_TICK_TYPE	delay = ~0UL;
 	AO_TICK_TYPE	now;
 
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
@@ -162,7 +162,7 @@ ao_lco_drag_monitor(void)
 		else
 			ao_sleep_for(&ao_lco_drag_beep_count, delay);
 
-		delay = ~0;
+		delay = ~0UL;
 		now = ao_time();
 		delay = ao_lco_drag_warn_check(now, delay);
 		delay = ao_lco_drag_beep_check(now, delay);
@@ -200,12 +200,12 @@ ao_lco_input(void)
 		case AO_EVENT_BUTTON:
 			switch (event.unit) {
 			case AO_BUTTON_ARM:
-				ao_lco_set_armed(event.value);
+				ao_lco_set_armed((uint8_t) event.value);
 				ao_lco_set_select();
 				break;
 			case AO_BUTTON_FIRE:
 				if (ao_lco_armed)
-					ao_lco_set_firing(event.value);
+					ao_lco_set_firing((uint8_t) event.value);
 				break;
 			case AO_BUTTON_DRAG_SELECT:
 				if (event.value)
@@ -256,7 +256,7 @@ ao_lco_batt_voltage(void)
 
 	ao_adc_single_get(&packet);
 	decivolt = ao_battery_decivolt(packet.v_batt);
-	ao_lco_show_voltage(decivolt);
+	ao_lco_show_voltage((uint16_t) decivolt);
 	ao_delay(AO_MS_TO_TICKS(1000));
 }
 
@@ -282,7 +282,7 @@ ao_lco_main(void)
 static void
 ao_lco_set_debug(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success)
 		ao_lco_debug = r != 0;
 }
