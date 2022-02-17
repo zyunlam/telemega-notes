@@ -49,7 +49,7 @@ ao_application(void)
 static uint32_t
 ao_get_hex32(void)
 {
-	int8_t	n;
+	int	n;
 	uint32_t v = 0;
 
 	for (;;) {
@@ -66,7 +66,7 @@ ao_get_hex32(void)
 			n = n - ('A' - 10);
 		else
 			break;
-		v = (v << 4) | n;
+		v = (v << 4) | (uint8_t) n;
 		n = ao_usb_getchar();
 	}
 	return v;
