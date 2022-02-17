@@ -186,7 +186,7 @@ ao_storage_device_write(ao_pos_t pos, void *buf, uint16_t len)
 		flash_write_select(this_pos);
 
 		/* Update write buffer with new contents */
-		int this_word = 4 - (pos & 3);
+		uint16_t this_word = 4 - (pos & 3);
 		if (this_word > len)
 			this_word = len;
 		memcpy(&write_buf.u8[pos & 3], b8, this_word);
