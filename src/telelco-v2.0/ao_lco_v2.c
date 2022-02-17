@@ -132,7 +132,7 @@ ao_lco_set_select(void)
 static void
 ao_lco_step_box(int8_t dir)
 {
-	int16_t new_box = ao_lco_box;
+	int32_t new_box = (int32_t) ao_lco_box;
 
 	do {
 		new_box += dir;
@@ -142,8 +142,8 @@ ao_lco_step_box(int8_t dir)
 			new_box = ao_lco_max_box;
 		if (new_box == ao_lco_box)
 			break;
-	} while (!ao_lco_box_present(new_box));
-	ao_lco_set_box(new_box);
+	} while (!ao_lco_box_present((uint16_t) new_box));
+	ao_lco_set_box((uint16_t) new_box);
 }
 
 static struct ao_task	ao_lco_drag_task;
