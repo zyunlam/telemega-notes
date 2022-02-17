@@ -116,7 +116,7 @@
 #define LED_7_PORT		(&stm_gpioa)
 #define LED_7_PIN		10
 
-#define AO_LED_CONTINUITY(c)	(1 << (c))
+#define AO_LED_CONTINUITY(c)	((AO_LED_TYPE) (1 << (c)))
 #define AO_LED_CONTINUITY_MASK	(0xff)
 
 /* ARM */
