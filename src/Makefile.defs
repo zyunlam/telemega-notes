@@ -16,7 +16,8 @@ WARN_FLAGS=-Wall -Wextra -Werror -Wcast-align \
 	-Wmissing-declarations \
 	-Wnested-externs \
 	-Wshadow \
-	-Warray-bounds=2
+	-Warray-bounds=2 \
+	-Wconversion
 
 OPT=-Os -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
