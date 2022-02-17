@@ -55,14 +55,14 @@ static uint8_t	tracker_mutex;
 static uint8_t	log_started;
 static struct ao_telemetry_location gps_data;
 static uint8_t	tracker_running;
-static uint16_t tracker_interval;
+static uint8_t	tracker_interval;
 
 static void
 ao_tracker(void)
 {
 	uint8_t	new;
-	int32_t	ground_distance;
-	int16_t height;
+	uint32_t ground_distance;
+	gps_alt_t height;
 	AO_TICK_TYPE gps_tick;
 	uint8_t new_tracker_running;
 
@@ -134,8 +134,8 @@ ao_tracker(void)
 						height = -height;
 
 					if (ao_tracker_force_telem > 1)
-						printf("head %d ring %d ground_distance %ld height %d\n", gps_head, ring, (long) ground_distance, height);
-					if (ground_distance > ao_config.tracker_motion ||
+						printf("head %d ring %d ground_distance %lu height %ld\n", gps_head, ring, (long) ground_distance, height);
+					if (ground_distance > (uint32_t) ao_config.tracker_motion ||
 					    height > (ao_config.tracker_motion << 1))
 					{
 						moving = 1;
@@ -211,9 +211,9 @@ static struct ao_task ao_tracker_task;
 static void
 ao_tracker_set_telem(void)
 {
-	uint16_t r = ao_cmd_hex();
+	uint32_t r = ao_cmd_hex();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_tracker_force_telem = r;
+		ao_tracker_force_telem = r != 0;
 	ao_cmd_status = ao_cmd_success;
 	printf ("flight: %d\n", ao_flight_number);
 	printf ("force_telem: %d\n", ao_tracker_force_telem);
