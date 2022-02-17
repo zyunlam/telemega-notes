@@ -121,13 +121,13 @@ ao_clock_init(void)
 	 * make sure the flash part remains happy
 	 */
 
-	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_BOD_PD);
+	lpc_scb.pdruncfg &= ~(1UL << LPC_SCB_PDRUNCFG_BOD_PD);
 	lpc_scb.bodctrl = ((LPC_SCB_BOD_BODRSTLEV_2_63 << LPC_SCB_BOD_BODRSTLEV) |
 			   (LPC_SCB_BOD_BODINTVAL_RESERVED << LPC_SCB_BOD_BODINTVAL) |
 			   (1 << LPC_SCB_BOD_BODRSTENA));
 
 	/* Turn the IRC clock back on */
-	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_IRC_PD);
+	lpc_scb.pdruncfg &= ~(1UL << LPC_SCB_PDRUNCFG_IRC_PD);
 	ao_clock_delay();
 
 	/* Switch to the IRC clock */
@@ -158,7 +158,7 @@ ao_clock_init(void)
 
 	/* Set PLL divider values */
 	lpc_scb.syspllctrl = ((AO_LPC_M << LPC_SCB_SYSPLLCTRL_MSEL) |
-			      (p << LPC_SCB_SYSPLLCTRL_PSEL));
+			      ((uint32_t) p << LPC_SCB_SYSPLLCTRL_PSEL));
 
 	/* Turn off the external crystal clock */
 	lpc_scb.pdruncfg |= (1 << LPC_SCB_PDRUNCFG_SYSOSC_PD);
@@ -169,7 +169,7 @@ ao_clock_init(void)
 			      ((AO_LPC_CLKIN > 15000000) << LPC_SCB_SYSOSCCTRL_FREQRANGE));/* set range */
 
 	/* Turn on the external crystal clock */
-	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_SYSOSC_PD);
+	lpc_scb.pdruncfg &= ~(1UL << LPC_SCB_PDRUNCFG_SYSOSC_PD);
 	ao_clock_delay();
 
 	/* Select crystal as PLL input */
@@ -182,7 +182,7 @@ ao_clock_init(void)
 		;
 
 	/* Turn on the PLL */
-	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_SYSPLL_PD);
+	lpc_scb.pdruncfg &= ~(1UL << LPC_SCB_PDRUNCFG_SYSPLL_PD);
 
 	/* Wait for it to lock */
 
