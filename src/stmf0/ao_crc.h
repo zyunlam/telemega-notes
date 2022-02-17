@@ -36,7 +36,7 @@ static inline uint16_t
 ao_crc_in_32_out_16(uint32_t v) {
 	stm_crc.dr.u32 = v;
 	v = stm_crc.dr.u32;
-	return v ^ (v >> 16);
+	return (uint16_t) (v ^ (v >> 16));
 }
 
 static inline uint16_t
