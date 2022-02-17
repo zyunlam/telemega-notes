@@ -235,8 +235,8 @@ ao_send_mega_sensor(void)
 	ao_telemetry_send();
 }
 
-static int8_t ao_telemetry_mega_data_max;
-static int8_t ao_telemetry_mega_data_cur;
+static int16_t ao_telemetry_mega_data_max;
+static int16_t ao_telemetry_mega_data_cur;
 
 /* Send mega data packet */
 static void
@@ -300,8 +300,8 @@ ao_send_metrum_sensor(void)
 	ao_telemetry_send();
 }
 
-static int8_t ao_telemetry_metrum_data_max;
-static int8_t ao_telemetry_metrum_data_cur;
+static int16_t ao_telemetry_metrum_data_max;
+static int16_t ao_telemetry_metrum_data_cur;
 
 /* Send telemetrum data packet */
 static void
@@ -360,8 +360,8 @@ ao_send_mini(void)
 
 #endif /* AO_SEND_MINI */
 
-static int8_t ao_telemetry_config_max;
-static int8_t ao_telemetry_config_cur;
+static int16_t ao_telemetry_config_max;
+static int16_t ao_telemetry_config_cur;
 static uint16_t ao_telemetry_flight_number;
 
 #ifndef ao_telemetry_battery_convert
@@ -400,9 +400,9 @@ ao_send_configuration(void)
 
 #if HAS_GPS
 
-static int8_t ao_telemetry_gps_max;
-static int8_t ao_telemetry_loc_cur;
-static int8_t ao_telemetry_sat_cur;
+static int16_t ao_telemetry_gps_max;
+static int16_t ao_telemetry_loc_cur;
+static int16_t ao_telemetry_sat_cur;
 
 static inline void *
 telemetry_bits(struct ao_telemetry_location *l)
@@ -453,8 +453,8 @@ ao_send_satellite(void)
 
 #if HAS_COMPANION
 
-static int8_t ao_telemetry_companion_max;
-static int8_t ao_telemetry_companion_cur;
+static int16_t ao_telemetry_companion_max;
+static int16_t ao_telemetry_companion_cur;
 
 static void
 ao_send_companion(void)
@@ -620,7 +620,7 @@ ao_telemetry_reset_interval(void)
 void
 ao_telemetry_set_interval(uint16_t interval)
 {
-	int8_t	cur = 0;
+	int16_t	cur = 0;
 
 #if HAS_RADIO_RATE
 	/* Limit max telemetry rate based on available radio bandwidth.
@@ -646,7 +646,7 @@ ao_telemetry_set_interval(uint16_t interval)
 	ao_telemetry_mega_data_cur = cur;
 #endif
 #if AO_SEND_METRUM
-	ao_telemetry_metrum_data_max = AO_SEC_TO_TICKS(1) / interval;
+	ao_telemetry_metrum_data_max = (int16_t) (AO_SEC_TO_TICKS(1) / interval);
 	if (ao_telemetry_metrum_data_max > cur)
 		cur++;
 	ao_telemetry_metrum_data_cur = cur;
@@ -655,14 +655,14 @@ ao_telemetry_set_interval(uint16_t interval)
 #if HAS_COMPANION
 	if (!ao_companion_setup.update_period)
 		ao_companion_setup.update_period = AO_SEC_TO_TICKS(1);
-	ao_telemetry_companion_max = ao_companion_setup.update_period / interval;
+	ao_telemetry_companion_max = (int16_t) (ao_companion_setup.update_period / interval);
 	if (ao_telemetry_companion_max > cur)
 		cur++;
 	ao_telemetry_companion_cur = cur;
 #endif
 
 #if HAS_GPS
-	ao_telemetry_gps_max = AO_SEC_TO_TICKS(1) / interval;
+	ao_telemetry_gps_max = (int16_t) (AO_SEC_TO_TICKS(1) / interval);
 	if (ao_telemetry_gps_max > cur)
 		cur++;
 	ao_telemetry_loc_cur = cur;
@@ -671,7 +671,7 @@ ao_telemetry_set_interval(uint16_t interval)
 	ao_telemetry_sat_cur = cur;
 #endif
 
-	ao_telemetry_config_max = AO_SEC_TO_TICKS(5) / interval;
+	ao_telemetry_config_max = (int16_t) (AO_SEC_TO_TICKS(5) / interval);
 	if (ao_telemetry_config_max > cur)
 		cur++;
 	ao_telemetry_config_cur = cur;
