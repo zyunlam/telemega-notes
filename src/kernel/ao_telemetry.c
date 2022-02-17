@@ -138,7 +138,7 @@ ao_send_mega_sensor(void)
 {
 	struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
-	telemetry.generic.tick = packet->tick;
+	telemetry.generic.tick = (uint16_t) packet->tick;
 #if AO_LOG_NORMALIZED
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5
 	telemetry.generic.type = AO_TELEMETRY_MEGA_NORM_MPU6000_MMC5983;
@@ -147,7 +147,7 @@ ao_send_mega_sensor(void)
 #endif
 
 #if HAS_GYRO
-	telemetry.mega_norm.orient = ao_sample_orient;
+	telemetry.mega_norm.orient = (uint8_t) ao_sample_orient;
 #endif
 	telemetry.mega_norm.accel = ao_data_accel(packet);
 	telemetry.mega_norm.pres = ao_data_pres(packet);
@@ -182,7 +182,7 @@ ao_send_mega_sensor(void)
 #endif
 
 #if HAS_GYRO
-	telemetry.mega_sensor.orient = ao_sample_orient;
+	telemetry.mega_sensor.orient = (uint8_t) ao_sample_orient;
 #endif
 	telemetry.mega_sensor.accel = ao_data_accel(packet);
 	telemetry.mega_sensor.pres = ao_data_pres(packet);
@@ -243,10 +243,10 @@ static void
 ao_send_mega_data(void)
 {
 	if (--ao_telemetry_mega_data_cur <= 0) {
-			struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 		uint8_t	i;
 
-		telemetry.generic.tick = packet->tick;
+		telemetry.generic.tick = (uint16_t) packet->tick;
 		telemetry.generic.type = AO_TELEMETRY_MEGA_DATA;
 
 		telemetry.mega_data.state = ao_flight_state;
@@ -255,16 +255,16 @@ ao_send_mega_data(void)
 
 		/* ADC range is 0-4095, so shift by four to save the high 8 bits */
 		for (i = 0; i < AO_ADC_NUM_SENSE; i++)
-			telemetry.mega_data.sense[i] = packet->adc.sense[i] >> 4;
+			telemetry.mega_data.sense[i] = (int8_t) (packet->adc.sense[i] >> 4);
 
 		telemetry.mega_data.ground_pres = ao_ground_pres;
 		telemetry.mega_data.ground_accel = ao_ground_accel;
 		telemetry.mega_data.accel_plus_g = ao_config.accel_plus_g;
 		telemetry.mega_data.accel_minus_g = ao_config.accel_minus_g;
 
-		telemetry.mega_data.acceleration = ao_accel;
-		telemetry.mega_data.speed = ao_speed;
-		telemetry.mega_data.height = ao_height;
+		telemetry.mega_data.acceleration = (int16_t) ao_accel;
+		telemetry.mega_data.speed = (int16_t) ao_speed;
+		telemetry.mega_data.height = (int16_t) ao_height;
 
 		ao_telemetry_mega_data_cur = ao_telemetry_mega_data_max;
 		ao_telemetry_send();
@@ -277,9 +277,9 @@ ao_send_mega_data(void)
 static void
 ao_send_metrum_sensor(void)
 {
-		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+	struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
-	telemetry.generic.tick = packet->tick;
+	telemetry.generic.tick = (uint16_t) packet->tick;
 	telemetry.generic.type = AO_TELEMETRY_METRUM_SENSOR;
 
 	telemetry.metrum_sensor.state = ao_flight_state;
@@ -289,9 +289,9 @@ ao_send_metrum_sensor(void)
 	telemetry.metrum_sensor.pres = ao_data_pres(packet);
 	telemetry.metrum_sensor.temp = ao_data_temp(packet);
 
-	telemetry.metrum_sensor.acceleration = ao_accel;
-	telemetry.metrum_sensor.speed = ao_speed;
-	telemetry.metrum_sensor.height = ao_height;
+	telemetry.metrum_sensor.acceleration = (int16_t) ao_accel;
+	telemetry.metrum_sensor.speed = (int16_t) ao_speed;
+	telemetry.metrum_sensor.height = (int16_t) ao_height;
 
 	telemetry.metrum_sensor.v_batt = packet->adc.v_batt;
 	telemetry.metrum_sensor.sense_a = packet->adc.sense_a;
@@ -308,9 +308,9 @@ static void
 ao_send_metrum_data(void)
 {
 	if (--ao_telemetry_metrum_data_cur <= 0) {
-			struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
-		telemetry.generic.tick = packet->tick;
+		telemetry.generic.tick = (uint16_t) packet->tick;
 		telemetry.generic.type = AO_TELEMETRY_METRUM_DATA;
 
 		telemetry.metrum_data.ground_pres = ao_ground_pres;
@@ -335,9 +335,9 @@ ao_send_metrum_data(void)
 static void
 ao_send_mini(void)
 {
-		struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
+	struct ao_data *packet = (struct ao_data *) &ao_data_ring[ao_data_ring_prev(ao_sample_data)];
 
-	telemetry.generic.tick = packet->tick;
+	telemetry.generic.tick = (uint16_t) packet->tick;
 	telemetry.generic.type = AO_SEND_MINI;
 
 	telemetry.mini.state = ao_flight_state;
@@ -349,9 +349,9 @@ ao_send_mini(void)
 	telemetry.mini.pres = ao_data_pres(packet);
 	telemetry.mini.temp = ao_data_temp(packet);
 
-	telemetry.mini.acceleration = ao_accel;
-	telemetry.mini.speed = ao_speed;
-	telemetry.mini.height = ao_height;
+	telemetry.mini.acceleration = (int16_t) ao_accel;
+	telemetry.mini.speed = (int16_t) ao_speed;
+	telemetry.mini.height = (int16_t) ao_height;
 
 	telemetry.mini.ground_pres = ao_ground_pres;
 
@@ -380,13 +380,13 @@ ao_send_configuration(void)
 		telemetry.configuration.config_minor = AO_CONFIG_MINOR;
 #if AO_idProduct_NUMBER == 0x25 && HAS_ADC
 		/* TeleGPS gets battery voltage instead of apogee delay */
-		telemetry.configuration.apogee_delay = ao_telemetry_battery_convert(ao_data_ring[ao_data_ring_prev(ao_data_head)].adc.v_batt);
+		telemetry.configuration.apogee_delay = (uint16_t) ao_telemetry_battery_convert(ao_data_ring[ao_data_ring_prev(ao_data_head)].adc.v_batt);
 #else
 		telemetry.configuration.apogee_delay = ao_config.apogee_delay;
 		telemetry.configuration.main_deploy = ao_config.main_deploy;
 #endif
 
-		telemetry.configuration.flight_log_max = ao_config.flight_log_max >> 10;
+		telemetry.configuration.flight_log_max = (uint16_t) (ao_config.flight_log_max >> 10);
 		memcpy (telemetry.configuration.callsign,
 			ao_config.callsign,
 			AO_MAX_CALLSIGN);
@@ -410,7 +410,7 @@ telemetry_bits(struct ao_telemetry_location *l)
 	return ((uint8_t *) l) + offsetof(struct ao_telemetry_location, flags);
 }
 
-static inline int
+static inline size_t
 telemetry_size(void)
 {
 	return sizeof(struct ao_telemetry_location) - offsetof(struct ao_telemetry_location, flags);
@@ -426,7 +426,7 @@ ao_send_location(void)
 		memcpy(telemetry_bits(&telemetry.location),
 		       telemetry_bits(&ao_gps_data),
 		       telemetry_size());
-		telemetry.location.tick = ao_gps_tick;
+		telemetry.location.tick = (uint16_t) ao_gps_tick;
 		ao_mutex_put(&ao_gps_mutex);
 		ao_telemetry_loc_cur = ao_telemetry_gps_max;
 		ao_telemetry_send();
@@ -461,7 +461,7 @@ ao_send_companion(void)
 {
 	if (--ao_telemetry_companion_cur <= 0) {
 		telemetry.generic.type = AO_TELEMETRY_COMPANION;
-		telemetry.companion.board_id = ao_companion_setup.board_id;
+		telemetry.companion.board_id = (uint8_t) ao_companion_setup.board_id;
 		telemetry.companion.update_period = ao_companion_setup.update_period;
 		telemetry.companion.channels = ao_companion_setup.channels;
 		ao_mutex_get(&ao_companion_mutex);
