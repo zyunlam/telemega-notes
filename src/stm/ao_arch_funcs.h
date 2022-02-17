@@ -148,7 +148,7 @@ ao_spi_recv_byte(uint8_t spi_index)
 	stm_spi->dr = 0xff;
 	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
 		;
-	return stm_spi->dr;
+	return (uint8_t) stm_spi->dr;
 }
 
 void
@@ -200,15 +200,15 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 
 #define ao_disable_port(port) do {					\
 		if ((port) == &stm_gpioa)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOAEN); \
+			stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_GPIOAEN); \
 		else if ((port) == &stm_gpiob)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOBEN); \
+			stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_GPIOBEN); \
 		else if ((port) == &stm_gpioc)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOCEN); \
+			stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_GPIOCEN); \
 		else if ((port) == &stm_gpiod)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIODEN); \
+			stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_GPIODEN); \
 		else if ((port) == &stm_gpioe)				\
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_GPIOEEN); \
+			stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_GPIOEEN); \
 	} while (0)
 
 
