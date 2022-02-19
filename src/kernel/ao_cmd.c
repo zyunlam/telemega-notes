@@ -270,6 +270,8 @@ ao_reboot(void)
 #endif
 
 #if HAS_VERSION
+#define _stringify(x) #x
+#define stringify(x) _stringify(x)
 static void
 version(void)
 {
@@ -307,7 +309,7 @@ version(void)
 	       , (unsigned) ((uint32_t) AO_BOOT_APPLICATION_BOUND - (uint32_t) AO_BOOT_APPLICATION_BASE)
 #endif
 		);
-	printf("software-version %s\n", ao_version);
+	printf("software-version %." stringify(AO_MAX_VERSION) "s\n", ao_version);
 }
 #endif
 
