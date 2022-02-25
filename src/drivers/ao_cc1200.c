@@ -716,6 +716,7 @@ ao_radio_get(uint8_t len)
 {
 	static uint32_t	last_radio_setting;
 	static uint8_t	last_radio_rate;
+	static uint8_t	last_radio_10mw;
 
 	ao_mutex_get(&ao_radio_mutex);
 
@@ -731,6 +732,18 @@ ao_radio_get(uint8_t len)
 	if (ao_config.radio_rate != last_radio_rate) {
 		ao_radio_mode &= (uint16_t) ~AO_RADIO_MODE_BITS_PACKET;
 		last_radio_rate = ao_config.radio_rate;
+	}
+	if(ao_config.radio_10mw != last_radio_10mw) {
+		last_radio_10mw = ao_config.radio_10mw;
+		/*
+		 * 0x37 "should" be 10dBm, but measurements on TBT
+		 * v4.0 show that too hot by a about 1.5dB, so use
+		 * 0x34 to make sure we're in spec.
+		 */
+		if (ao_config.radio_10mw)
+			ao_radio_reg_write(CC1200_PA_CFG1, 0x34);
+		else
+			ao_radio_reg_write(CC1200_PA_CFG1, 0x3f);
 	}
 	ao_radio_set_len(len);
 }

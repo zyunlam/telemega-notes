@@ -54,6 +54,7 @@ uint8_t ao_force_freq;
 #define AO_CONFIG_DEFAULT_IGNITE_MODE	AO_IGNITE_MODE_DUAL
 #define AO_CONFIG_DEFAULT_PAD_ORIENTATION	AO_PAD_ORIENTATION_ANTENNA_UP
 #define AO_CONFIG_DEFAULT_PYRO_TIME	AO_MS_TO_TICKS(50)
+#define AO_CONFIG_DEFAULT_RADIO_10MW	0
 #if HAS_CONFIG_SAVE
 #ifndef USE_INTERNAL_FLASH
 #error Please define USE_INTERNAL_FLASH
@@ -188,7 +189,7 @@ _ao_config_get(void)
 #if HAS_RADIO_POWER
 		if (minor < 14)
 			ao_config.radio_power = AO_CONFIG_DEFAULT_RADIO_POWER;
-		#endif
+#endif
 #if HAS_RADIO_AMP
 		if (minor  < 14)
 			ao_config.radio_amp = AO_CONFIG_DEFAULT_RADIO_AMP;
@@ -245,6 +246,10 @@ _ao_config_get(void)
 #if HAS_APRS
 		if (minor < 24)
 			ao_config.aprs_offset = 0;
+#endif
+#if HAS_RADIO_10MW
+		if (minor < 25)
+			ao_config.radio_10mw = AO_CONFIG_DEFAULT_RADIO_10MW;
 #endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
@@ -853,6 +858,27 @@ ao_config_radio_power_set(void)
 
 #endif
 
+#if HAS_RADIO_10MW
+
+static void
+ao_config_radio_10mw_show(void)
+{
+	printf ("Radio 10mw limit: %d\n", ao_config.radio_10mw);
+}
+
+static void
+ao_config_radio_10mw_set(void)
+{
+	uint32_t r = ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.radio_10mw = !!r;
+	_ao_config_edit_finish();
+}
+
+#endif
+
 #if HAS_BEEP
 static void
 ao_config_beep_show(void)
@@ -1099,6 +1125,10 @@ const struct ao_config_var ao_config_vars[] = {
 	  ao_config_pad_box_set, ao_config_pad_box_show },
 	{ "i <seconds>\0Set idle timeout (0 disable)",
 	  ao_config_pad_idle_set, ao_config_pad_idle_show },
+#endif
+#if HAS_RADIO_10MW
+	{ "p <0 no limit, 1 limit>\0Limit radio power to 10mW",
+	  ao_config_radio_10mw_set,	ao_config_radio_10mw_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

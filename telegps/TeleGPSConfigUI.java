@@ -39,6 +39,7 @@ public class TeleGPSConfigUI
 	JLabel			radio_calibration_label;
 	JLabel			radio_frequency_label;
 	JLabel			radio_enable_label;
+	JLabel			radio_10mw_label;
 	JLabel			rate_label;
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
@@ -58,6 +59,7 @@ public class TeleGPSConfigUI
 	AltosUIFreqList		radio_frequency_value;
 	JLabel			radio_calibration_value;
 	JRadioButton		radio_enable_value;
+	JRadioButton		radio_10mw_value;
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
@@ -150,6 +152,13 @@ public class TeleGPSConfigUI
 			radio_enable_value.setToolTipText("Enable/Disable telemetry and RDF transmissions");
 		else
 			radio_enable_value.setToolTipText("Firmware version does not support disabling radio");
+	}
+
+	void set_radio_10mw_tool_tip() {
+		if (radio_10mw_value.isVisible())
+			radio_10mw_value.setToolTipText("Should transmitter power be limited to 10mW");
+		else
+			radio_10mw_value.setToolTipText("Older firmware could not limit radio power");
 	}
 
 	void set_rate_tool_tip() {
@@ -352,6 +361,31 @@ public class TeleGPSConfigUI
 		radio_enable_value.addItemListener(this);
 		pane.add(radio_enable_value, c);
 		set_radio_enable_tool_tip();
+		row++;
+
+		/* Radio 10mW limit */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		radio_10mw_label = new JLabel("Limit transmit to 10mW:");
+		pane.add(radio_10mw_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		radio_10mw_value = new JRadioButton("Limited");
+		radio_10mw_value.addItemListener(this);
+		pane.add(radio_10mw_value, c);
+		set_radio_10mw_tool_tip();
 		row++;
 
 		/* Telemetry Rate */
@@ -807,6 +841,22 @@ public class TeleGPSConfigUI
 	public int radio_enable() {
 		if (radio_enable_value.isVisible())
 			return radio_enable_value.isSelected() ? 1 : 0;
+		else
+			return AltosLib.MISSING;
+	}
+
+	public void set_radio_10mw(int new_radio_10mw) {
+		if (new_radio_10mw != AltosLib.MISSING) {
+			radio_10mw_value.setSelected(new_radio_10mw != 0);
+		}
+		radio_10mw_value.setVisible(new_radio_10mw != AltosLib.MISSING);
+		radio_10mw_label.setVisible(new_radio_10mw != AltosLib.MISSING);
+		set_radio_10mw_tool_tip();
+	}
+
+	public int radio_10mw() {
+		if (radio_10mw_value.isVisible())
+			return radio_10mw_value.isSelected() ? 1 : 0;
 		else
 			return AltosLib.MISSING;
 	}
