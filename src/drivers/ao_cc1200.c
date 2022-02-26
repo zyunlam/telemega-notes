@@ -737,11 +737,11 @@ ao_radio_get(uint8_t len)
 		last_radio_10mw = ao_config.radio_10mw;
 		/*
 		 * 0x37 "should" be 10dBm, but measurements on TBT
-		 * v4.0 show that too hot by a about 1.5dB, so use
-		 * 0x34 to make sure we're in spec.
+		 * v4.0 show that too hot, so use * 0x32 to make sure 
+		 * we're in spec.
 		 */
 		if (ao_config.radio_10mw)
-			ao_radio_reg_write(CC1200_PA_CFG1, 0x34);
+			ao_radio_reg_write(CC1200_PA_CFG1, 0x32);
 		else
 			ao_radio_reg_write(CC1200_PA_CFG1, 0x3f);
 	}
