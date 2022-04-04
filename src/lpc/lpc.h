@@ -110,7 +110,7 @@ extern struct lpc_ioconf lpc_ioconf;
 /* PIO0_1 */
 #define  LPC_IOCONF_FUNC_PIO0_1		0
 #define  LPC_IOCONF_FUNC_CLKOUT		1
-#define  LPC_IOCONF_FUNC_CT32B0_MAT2	2
+#define  LPC_IOCONF_FUNC_PIO0_1_CT32B0_MAT2	2
 #define  LPC_IOCONF_FUNC_USB_FTOGGLE	3
 
 /* PIO0_2 */
