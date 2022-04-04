@@ -18,48 +18,62 @@
 
 #include "ao.h"
 
+#define _cat(a,b) a##b
+#define cat(a,b) _cat(a,b)
+#define _cat4(a,b,c,d) a##b##c##d
+#define cat4(a,b,c,d) _cat4(a,b,c,d)
+#define _cat8(a,b,c,d,e,f,g,h) a##b##c##d##e##f##g##h
+#define cat8(a,b,c,d,e,f,g,h) _cat8(a,b,c,d,e,f,g,h)
+
+#define AO_TIMER_CLKCTRL	cat(LPC_SCB_SYSAHBCLKCTRL_CT32B, BEEPER_TIMER)
+#define AO_TIMER		cat(lpc_ct32b, BEEPER_TIMER)
+#define AO_TIMER_EMC 		cat(LPC_CT32B_EMR_EMC, BEEPER_OUTPUT)
+#define AO_TIMER_PIO		cat4(pio, BEEPER_PORT, _, BEEPER_PIN)
+/* LPC_IOCONF_FUNC_PIO0_14_CT32B1_MAT1 */
+#define AO_TIMER_FUNC		cat8(LPC_IOCONF_FUNC_PIO, BEEPER_PORT, _, BEEPER_PIN, _CT32B, BEEPER_TIMER, _MAT, BEEPER_OUTPUT)
+
 void
 ao_beep(uint8_t beep)
 {
 	if (beep == 0) {
-		lpc_ct32b1.tcr = ((0 << LPC_CT32B_TCR_CEN) |
+		AO_TIMER.tcr = ((0 << LPC_CT32B_TCR_CEN) |
 				  (1 << LPC_CT32B_TCR_CRST));
-		lpc_scb.sysahbclkctrl &= ~(1UL << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
+		lpc_scb.sysahbclkctrl &= ~(1UL << AO_TIMER_CLKCTRL);
 	} else {
-		lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
+		lpc_scb.sysahbclkctrl |= (1 << AO_TIMER_CLKCTRL);
 
 		/* Set prescaler to match cc1111 clocks
 		 */
-		lpc_ct32b1.pr = AO_LPC_SYSCLK / 750000 - 1;
+		AO_TIMER.pr = AO_LPC_SYSCLK / 750000 - 1;
 
 		/* Write the desired data in the match registers */
 
 		/* Reset after two time units */
-		lpc_ct32b1.mr[0] = beep << 1;
+		AO_TIMER.mr[0] = beep << 1;
 
 		/* PWM width is half of that */
-		lpc_ct32b1.mr[1] = beep;
+		AO_TIMER.mr[1] = beep;
 
 		/* Flip output 1 on PWM match */
-		lpc_ct32b1.emr = (LPC_CT32B_EMR_EMC_TOGGLE << LPC_CT32B_EMR_EMC1);
+		AO_TIMER.emr = (LPC_CT32B_EMR_EMC_TOGGLE << LPC_CT32B_EMR_EMC1);
 
 		/* Reset on match 0 */
-		lpc_ct32b1.mcr = (1 << LPC_CT32B_MCR_MR0R);
+		AO_TIMER.mcr = (1 << LPC_CT32B_MCR_MR0R);
 
 		/* PWM on match 1 */
-		lpc_ct32b1.pwmc = (1 << LPC_CT32B_PWMC_PWMEN1);
-		
+		AO_TIMER.pwmc = (1 << LPC_CT32B_PWMC_PWMEN1);
+
 		/* timer mode */
-		lpc_ct32b1.ctcr = 0;
+		AO_TIMER.ctcr = 0;
 
 		/* And turn the timer on */
-		lpc_ct32b1.tcr = ((1 << LPC_CT32B_TCR_CEN) |
+		AO_TIMER.tcr = ((1 << LPC_CT32B_TCR_CEN) |
 				  (0 << LPC_CT32B_TCR_CRST));
 	}
 }
 
 void
-ao_beep_for(uint8_t beep, AO_TICK_TYPE ticks) 
+ao_beep_for(uint8_t beep, AO_TICK_TYPE ticks)
 {
 	ao_beep(beep);
 	ao_delay(ticks);
@@ -69,20 +83,10 @@ ao_beep_for(uint8_t beep, AO_TICK_TYPE ticks)
 void
 ao_beep_init(void)
 {
-	/* Our beeper is on c32b1_mat1
-	 * which is on pin pio0_14
-	 */
-
-	lpc_ioconf.pio0_14 = ((LPC_IOCONF_FUNC_PIO0_14_CT32B1_MAT1 << LPC_IOCONF_FUNC) |
+	lpc_ioconf.AO_TIMER_PIO = ((AO_TIMER_FUNC << LPC_IOCONF_FUNC) |
 			      (LPC_IOCONF_MODE_INACTIVE << LPC_IOCONF_MODE) |
 			      (0 << LPC_IOCONF_HYS) |
 			      (0 << LPC_IOCONF_INV) |
 			      (1 << LPC_IOCONF_ADMODE) |
 			      (0 << LPC_IOCONF_OD));
-
-	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
-
-	/* Disable the counter and reset the value */
-	lpc_ct32b1.tcr = ((0 << LPC_CT32B_TCR_CEN) |
-			  (1 << LPC_CT32B_TCR_CRST));
 }
