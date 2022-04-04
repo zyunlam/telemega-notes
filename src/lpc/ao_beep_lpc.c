@@ -31,6 +31,7 @@
 #define AO_TIMER_PIO		cat4(pio, BEEPER_PORT, _, BEEPER_PIN)
 /* LPC_IOCONF_FUNC_PIO0_14_CT32B1_MAT1 */
 #define AO_TIMER_FUNC		cat8(LPC_IOCONF_FUNC_PIO, BEEPER_PORT, _, BEEPER_PIN, _CT32B, BEEPER_TIMER, _MAT, BEEPER_OUTPUT)
+#define AO_TIMER_PWM		cat(LPC_CT32B_PWMC_PWMEN, BEEPER_OUTPUT)
 
 void
 ao_beep(uint8_t beep)
@@ -52,16 +53,16 @@ ao_beep(uint8_t beep)
 		AO_TIMER.mr[0] = beep << 1;
 
 		/* PWM width is half of that */
-		AO_TIMER.mr[1] = beep;
+		AO_TIMER.mr[BEEPER_OUTPUT] = beep;
 
-		/* Flip output 1 on PWM match */
+		/* Flip output on PWM match */
 		AO_TIMER.emr = (LPC_CT32B_EMR_EMC_TOGGLE << AO_TIMER_EMC);
 
 		/* Reset on match 0 */
 		AO_TIMER.mcr = (1 << LPC_CT32B_MCR_MR0R);
 
-		/* PWM on match 1 */
-		AO_TIMER.pwmc = (1 << LPC_CT32B_PWMC_PWMEN1);
+		/* PWM on match */
+		AO_TIMER.pwmc = (1 << AO_TIMER_PWM);
 
 		/* timer mode */
 		AO_TIMER.ctcr = 0;
