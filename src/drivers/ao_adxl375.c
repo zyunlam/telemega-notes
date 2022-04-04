@@ -48,16 +48,17 @@ ao_adxl375_stop(void) {
 static uint8_t
 ao_adxl375_reg_read(uint8_t addr)
 {
-	uint8_t	d[2];
+	uint8_t	d[1];
 
 	d[0] = addr | AO_ADXL375_READ;
 	ao_adxl375_start();
-	ao_spi_duplex(d, d, 2, AO_ADXL375_SPI_INDEX);
+	ao_spi_send(d, 1, AO_ADXL375_SPI_INDEX);
+	ao_spi_recv(d, 1, AO_ADXL375_SPI_INDEX);
 	ao_adxl375_stop();
 
-	PRINTD(DEBUG_LOW, "read %x = %x\n", addr, d[1]);
+	PRINTD(DEBUG_LOW, "read %x = %x\n", addr, d[0]);
 
-	return d[1];
+	return d[0];
 }
 
 static void
@@ -74,11 +75,11 @@ ao_adxl375_reg_write(uint8_t addr, uint8_t value)
 
 #if DEBUG & DEBUG_LOW
 	d[0] = addr | AO_ADXL375_READ;
-	d[1] = 0;
 	ao_adxl375_start();
-	ao_spi_duplex(d, d, 2, AO_ADXL375_SPI_INDEX);
+	ao_spi_send(d, 1, AO_ADXL375_SPI_INDEX);
+	ao_spi_recv(d, 1, AO_ADXL375_SPI_INDEX);
 	ao_adxl375_stop();
-	PRINTD(DEBUG_LOW, "readback %x %x\n", d[0], d[1]);
+	PRINTD(DEBUG_LOW, "readback %x\n", d[0]);
 #endif
 }
 
@@ -89,9 +90,9 @@ ao_adxl375_value(struct ao_adxl375_sample *value)
 
 	d[0] = AO_ADXL375_DATAX0 | AO_ADXL375_READ | AO_ADXL375_MULTI_BYTE;
 	ao_adxl375_start();
-	ao_spi_duplex(d, d, 7, AO_ADXL375_SPI_INDEX);
+	ao_spi_send(d, 1, AO_ADXL375_SPI_INDEX);
+	ao_spi_recv(value, 6, AO_ADXL375_SPI_INDEX);
 	ao_adxl375_stop();
-	memcpy(value, &d[1], 6);
 }
 
 struct ao_adxl375_total {
