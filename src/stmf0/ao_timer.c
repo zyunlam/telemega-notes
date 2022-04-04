@@ -62,7 +62,7 @@ void stm_systick_isr(void)
 		++ao_tick_count;
 		ao_task_check_alarm();
 #if AO_DATA_ALL
-		if (++ao_data_count == ao_data_interval) {
+		if (++ao_data_count == ao_data_interval && ao_data_interval) {
 			ao_data_count = 0;
 #if HAS_ADC
 #if HAS_FAKE_FLIGHT
