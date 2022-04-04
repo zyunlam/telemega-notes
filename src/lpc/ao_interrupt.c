@@ -162,6 +162,12 @@ const void *const __interrupt_vector[0x30] = {
 __attribute__ ((section(".init.0")))
 const void *const __interrupt_pad[0x10];
 
+#if IS_FLASH_LOADER
+/* Flash loader needs a magic value at 0x2fc to be 0x4E69 7370 */
+__attribute__ ((section(".no_isp")))
+const uint32_t force_no_isp = 0x4E697370;
+#endif
+
 void main(void) __attribute__((__noreturn__));
 
 void *__interrupt_ram[sizeof(__interrupt_vector)/sizeof(__interrupt_vector[0])] __attribute((section(".preserve.1")));
