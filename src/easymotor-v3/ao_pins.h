@@ -65,8 +65,12 @@
 #define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
 #define HAS_PAD_REPORT		1
-#define BEEPER_CHANNEL		3
-#define BEEPER_TIMER		2
+
+/* Beeper is on pio0_1 ct32b0_mat2 */
+#define BEEPER_PORT		0
+#define BEEPER_PIN		1
+#define BEEPER_TIMER		0
+#define BEEPER_OUTPUT		2
 
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0
