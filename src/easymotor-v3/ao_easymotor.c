@@ -28,7 +28,7 @@ main(void)
 	ao_task_init();
 	ao_timer_init();
 
-	ao_dma_init();
+//	ao_dma_init();
 	ao_spi_init();
 	ao_exti_init();
 

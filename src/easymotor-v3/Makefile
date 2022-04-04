@@ -39,8 +39,7 @@ ALTOS_SRC = \
 	ao_log_motor.c \
 	ao_cmd.c \
 	ao_config.c \
-	ao_dma_lpc.c \
-	ao_timer_lpc.c \
+	ao_timer.c \
 	ao_exti_lpc.c \
 	ao_spi_lpc.c \
 	ao_adc_lpc.c \
@@ -55,7 +54,7 @@ IDPRODUCT=0x002c
 
 CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS)
 
-PROGNAME=easymotor-v2
+PROGNAME=easymotor-v3
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
 

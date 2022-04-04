@@ -58,7 +58,7 @@
 #define USE_EEPROM_CONFIG	0
 #define USE_STORAGE_CONFIG	1
 #define AO_PA11_PA12_RMP	1
-#define HAS_BEEP		1
+#define HAS_BEEP		0
 #define HAS_BATTERY_REPORT	1
 #define HAS_PAD_REPORT		1
 #define BEEPER_CHANNEL		3
@@ -96,10 +96,10 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: batt: %5d %5lu motor_pressure: %5d\n", \
+	printf("tick: %5lu batt: %5d motor_pressure: %5d\n", \
 	       (p)->tick, \
-	       (p)->adc.v_batt);
-	       (p)->adc.motor_pressure, \
+	       (p)->adc.v_batt, \
+	       (p)->adc.motor_pressure); 
 
 /*
  * Voltage divider on ADC battery sampler
@@ -139,9 +139,9 @@ struct ao_adc {
 /* ADXL375 */
 
 #define HAS_ADXL375		1
+#define AO_ADXL375_SPI_INDEX	0
 #define AO_ADXL375_CS_PORT	0
-#define AO_ADXL375_CS_MASK	(1 << 19)
-#define AO_ADXL375_SPI_BUS	1
+#define AO_ADXL375_CS_PIN	19
 
 #define AO_ADXL375_AXIS		x
 #define AO_ADXL375_ACROSS_AXIS	y
