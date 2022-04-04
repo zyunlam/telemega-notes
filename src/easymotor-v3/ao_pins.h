@@ -19,6 +19,10 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
+#define AO_STACK_SIZE           352
+#define SLEEP_HASH_SIZE         3
+#define AO_NUM_TASKS            6
+
 #define HAS_TASK_QUEUE		1
 #define IS_FLASH_LOADER		0
 
@@ -58,14 +62,11 @@
 #define USE_EEPROM_CONFIG	0
 #define USE_STORAGE_CONFIG	1
 #define AO_PA11_PA12_RMP	1
-#define HAS_BEEP		0
+#define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
 #define HAS_PAD_REPORT		1
 #define BEEPER_CHANNEL		3
 #define BEEPER_TIMER		2
-#define BEEPER_PORT		(&stm_gpioa)
-#define BEEPER_PIN		2
-#define BEEPER_AFR              STM_AFR_AF2
 
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0
@@ -88,7 +89,7 @@
 #define AO_ADC_0		1
 #define AO_ADC_1		1
 
-#define AO_DATA_RING		64
+#define AO_DATA_RING		32
 
 struct ao_adc {
 	int16_t			v_batt;
