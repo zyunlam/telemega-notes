@@ -18,10 +18,10 @@
 #define DEBUG_LOW	1
 #define DEBUG_HIGH	2
 
-#define DEBUG		0
+#define DEBUG		3
 
 #if DEBUG
-#define PRINTD(l, ...) do { if (DEBUG & (l)) { printf ("\r%5u %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } } while(0)
+#define PRINTD(l, ...) do { if (DEBUG & (l)) { printf ("\r%5lu %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } } while(0)
 #else
 #define PRINTD(l,...)
 #endif
@@ -55,7 +55,7 @@ ao_adxl375_reg_read(uint8_t addr)
 	ao_spi_duplex(d, d, 2, AO_ADXL375_SPI_INDEX);
 	ao_adxl375_stop();
 
-	PRINTD(DEBUG_LOW, "read %x = %x\n", addr, d);
+	PRINTD(DEBUG_LOW, "read %x = %x\n", addr, d[1]);
 
 	return d[1];
 }
@@ -73,7 +73,7 @@ ao_adxl375_reg_write(uint8_t addr, uint8_t value)
 	ao_adxl375_stop();
 
 #if DEBUG & DEBUG_LOW
-	d[0] = addr | AO_ADXL375_READ
+	d[0] = addr | AO_ADXL375_READ;
 	d[1] = 0;
 	ao_adxl375_start();
 	ao_spi_duplex(d, d, 2, AO_ADXL375_SPI_INDEX);
