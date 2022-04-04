@@ -55,7 +55,7 @@ ao_beep(uint8_t beep)
 		AO_TIMER.mr[1] = beep;
 
 		/* Flip output 1 on PWM match */
-		AO_TIMER.emr = (LPC_CT32B_EMR_EMC_TOGGLE << LPC_CT32B_EMR_EMC1);
+		AO_TIMER.emr = (LPC_CT32B_EMR_EMC_TOGGLE << AO_TIMER_EMC);
 
 		/* Reset on match 0 */
 		AO_TIMER.mcr = (1 << LPC_CT32B_MCR_MR0R);
