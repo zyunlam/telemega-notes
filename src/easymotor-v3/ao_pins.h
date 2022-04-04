@@ -144,7 +144,7 @@ struct ao_adc {
 /* ADXL375 */
 
 #define HAS_ADXL375		1
-#define AO_ADXL375_SPI_INDEX	0
+#define AO_ADXL375_SPI_INDEX	1
 #define AO_ADXL375_CS_PORT	0
 #define AO_ADXL375_CS_PIN	19
 
