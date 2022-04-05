@@ -93,7 +93,7 @@ ao_led_toggle(uint8_t colors)
 }
 
 void
-ao_led_for(uint8_t colors, uint16_t ticks) 
+ao_led_for(uint8_t colors, AO_TICK_TYPE ticks) 
 {
 	ao_led_on(colors);
 	ao_delay(ticks);

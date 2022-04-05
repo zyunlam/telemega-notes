@@ -84,8 +84,8 @@
 #define BEEPER_PORT		(&stm_gpioe)
 #define BEEPER_PIN		4
 #define AO_BEEP_MID_DEFAULT	179		/* 2100 Hz */
-#define AO_BEEP_MAKE_LOW(m)	((m) * 197/179)	/* 1900 Hz */
-#define AO_BEEP_MAKE_HIGH(m)	((m) * 163/179) /* 2300 Hz */
+#define AO_BEEP_MAKE_LOW(m)	((uint8_t) ((m) * 197U/179U)) /* 1900 Hz */
+#define AO_BEEP_MAKE_HIGH(m)	((uint8_t) ((m) * 163U/179U)) /* 2300 Hz */
 #define HAS_BATTERY_REPORT	1
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		1
@@ -187,7 +187,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: %5u A: %5d B: %5d C: %5d D: %5d drogue: %5d main: %5d batt: %5d pbatt: %5d temp: %5d\n", \
+	printf("tick: %5lu A: %5d B: %5d C: %5d D: %5d drogue: %5d main: %5d batt: %5d pbatt: %5d temp: %5d\n", \
 	       (p)->tick, \
 	       (p)->adc.sense[0], (p)->adc.sense[1], (p)->adc.sense[2], \
 	       (p)->adc.sense[3], (p)->adc.sense[4], (p)->adc.sense[5], \

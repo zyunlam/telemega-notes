@@ -54,8 +54,8 @@ ao_adc_init(void)
 		       (0 << STM_ADC_CCR_VREFEN));
 
 	/* Calibrate. This also enables the ADC vreg */
-	stm_adc.cr |= (1 << STM_ADC_CR_ADCAL);
-	while ((stm_adc.cr & (1 << STM_ADC_CR_ADCAL)) != 0)
+	stm_adc.cr |= (1UL << STM_ADC_CR_ADCAL);
+	while ((stm_adc.cr & (1UL << STM_ADC_CR_ADCAL)) != 0)
 		;
 
 	/* Enable */
@@ -77,10 +77,10 @@ ao_adc_shutdown(void)
 	stm_adc.isr = (1 << STM_ADC_ISR_ADRDY);
 
 	/* Disable ADC vreg */
-	stm_adc.cr &= ~(1 << STM_ADC_CR_ADVREGEN);
+	stm_adc.cr &= ~(1UL << STM_ADC_CR_ADVREGEN);
 
 	/* Disable ADC clocks */
-	stm_rcc.apb2enr &= ~(1 << STM_RCC_APB2ENR_ADCEN);
+	stm_rcc.apb2enr &= ~(1UL << STM_RCC_APB2ENR_ADCEN);
 }
 
 uint16_t
@@ -104,7 +104,7 @@ ao_adc_read_vref(void)
 		;
 
 	/* Fetch result */
-	value = stm_adc.dr;
+	value = (uint16_t) stm_adc.dr;
 
 	ao_adc_shutdown();
 	return value;

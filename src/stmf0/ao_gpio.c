@@ -23,13 +23,13 @@ ao_gpio_suspend(void *arg)
 {
 	struct stm_gpio *port = arg;
 	if (port == &stm_gpioa)
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPAEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPAEN);
 	else if ((port) == &stm_gpiob)
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPBEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPBEN);
 	else if ((port) == &stm_gpioc)
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPCEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPCEN);
 	else if ((port) == &stm_gpiof)
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPFEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPFEN);
 }
 
 static void

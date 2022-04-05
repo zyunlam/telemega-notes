@@ -29,15 +29,24 @@ ao_panic(uint8_t reason)
 	for (;;);
 }
 
-void
-ao_put_string(const char *s)
+static void
+ao_put_stringn(const char *s, int max)
 {
 	char	c;
-	while ((c = *s++)) {
+	while (max--) {
+		c = *s++;
+		if (!c)
+			break;
 		if (c == '\n')
 			ao_usb_putchar('\r');
 		ao_usb_putchar(c);
 	}
+}
+
+void
+ao_put_string(const char *s)
+{
+	ao_put_stringn(s, 65535);
 }
 
 static void
@@ -49,7 +58,7 @@ ao_application(void)
 static uint32_t
 ao_get_hex32(void)
 {
-	int8_t	n;
+	int	n;
 	uint32_t v = 0;
 
 	for (;;) {
@@ -66,7 +75,7 @@ ao_get_hex32(void)
 			n = n - ('A' - 10);
 		else
 			break;
-		v = (v << 4) | n;
+		v = (v << 4) | (uint8_t) n;
 		n = ao_usb_getchar();
 	}
 	return v;
@@ -149,7 +158,7 @@ ao_show_version(void)
 	ao_put_hex((uint32_t) AO_BOOT_APPLICATION_BASE);
 	ao_usb_putchar(' ');
 	ao_put_hex((uint32_t) AO_BOOT_APPLICATION_BOUND);
-	ao_put_string("\nsoftware-version "); ao_put_string(ao_version);
+	ao_put_string("\nsoftware-version "); ao_put_stringn(ao_version, AO_MAX_VERSION);
 	ao_put_string("\n");
 }
 

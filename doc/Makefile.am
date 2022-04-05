@@ -155,6 +155,7 @@ INC_FILES=\
 	installation.inc \
 	using-am-products.inc \
 	updating-firmware.inc \
+	frequency-cal.inc \
 	altosui.inc \
 	altosdroid.inc \
 	system-operation.inc \

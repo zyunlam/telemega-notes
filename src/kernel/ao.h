@@ -112,7 +112,7 @@ extern volatile AO_TICK_TYPE ao_tick_count;
 #define AO_HERTZ		100
 #endif
 #define AO_MS_TO_TICKS(ms)	((ms) / (1000 / AO_HERTZ))
-#define AO_SEC_TO_TICKS(s)	((s) * AO_HERTZ)
+#define AO_SEC_TO_TICKS(s)	((AO_TICK_TYPE) (s) * AO_HERTZ)
 
 /* Returns the current time in ticks */
 AO_TICK_TYPE
@@ -389,7 +389,7 @@ ao_spi_slave(void);
 #define AO_GPS_NEW_TRACKING	2
 
 extern uint8_t ao_gps_new;
-extern uint16_t ao_gps_tick;
+extern AO_TICK_TYPE ao_gps_tick;
 extern uint8_t ao_gps_mutex;
 extern struct ao_telemetry_location ao_gps_data;
 extern struct ao_telemetry_satellite ao_gps_tracking_data;
@@ -531,7 +531,7 @@ struct ao_telemetry_tiny_recv {
  * for reporting RSSI. So, now we use these values everywhere
  */
 #define AO_RSSI_FROM_RADIO(radio)	((int16_t) ((int8_t) (radio) >> 1) - 74)
-#define AO_RADIO_FROM_RSSI(rssi)	(((int8_t) (rssi) + 74) << 1)
+#define AO_RADIO_FROM_RSSI(rssi)	((uint8_t) (((rssi) + 74) << 1))
 
 /*
  * ao_radio_recv tacks on rssi and status bytes
@@ -603,7 +603,7 @@ ao_radio_send(const void *d, uint8_t size);
 
 #if HAS_RADIO_RECV
 uint8_t
-ao_radio_recv(void *d, uint8_t size, uint8_t timeout);
+ao_radio_recv(void *d, uint8_t size, AO_TICK_TYPE timeout);
 
 void
 ao_radio_recv_abort(void);
@@ -724,8 +724,8 @@ struct ao_stdio {
 };
 
 extern struct ao_stdio ao_stdios[];
-extern int8_t ao_cur_stdio;
-extern int8_t ao_num_stdios;
+extern uint8_t ao_cur_stdio;
+extern uint8_t ao_num_stdios;
 
 void
 flush(void);
@@ -735,7 +735,7 @@ extern uint8_t ao_stdin_ready;
 uint8_t
 ao_echo(void);
 
-int8_t
+uint8_t
 ao_add_stdio(int (*pollchar)(void),
 	     void (*putchar)(char) ,
 	     void (*flush)(void));
@@ -828,15 +828,15 @@ struct ao_fifo {
 	char	fifo[AO_FIFO_SIZE];
 };
 
-#define ao_fifo_insert(f,c) do { \
-	(f).fifo[(f).insert] = (c); \
-	(f).insert = ((f).insert + 1) & (AO_FIFO_SIZE-1); \
-} while(0)
+#define ao_fifo_insert(f,c) do {					\
+		(f).fifo[(f).insert] = (char) (c);			\
+		(f).insert = ((f).insert + 1) & (AO_FIFO_SIZE-1);	\
+	} while(0)
 
-#define ao_fifo_remove(f,c) do {\
-	c = (f).fifo[(f).remove]; \
-	(f).remove = ((f).remove + 1) & (AO_FIFO_SIZE-1); \
-} while(0)
+#define ao_fifo_remove(f,c) do {					\
+		c = (f).fifo[(f).remove];				\
+		(f).remove = ((f).remove + 1) & (AO_FIFO_SIZE-1);	\
+	} while(0)
 
 #define ao_fifo_full(f)		((((f).insert + 1) & (AO_FIFO_SIZE-1)) == (f).remove)
 #define ao_fifo_mostly(f)	((((f).insert - (f).remove) & (AO_FIFO_SIZE-1)) >= (AO_FIFO_SIZE * 3 / 4))
@@ -965,7 +965,7 @@ ao_sqrt(uint32_t op);
  * ao_freq.c
  */
 
-int32_t ao_freq_to_set(int32_t freq, int32_t cal);
+uint32_t ao_freq_to_set(uint32_t freq, uint32_t cal);
 
 /*
  * ao_ms5607.c

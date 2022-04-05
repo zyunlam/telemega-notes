@@ -109,7 +109,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: %5u motor_pressure: %5d batt: %5d\n", \
+	printf("tick: %5lu motor_pressure: %5d batt: %5d\n", \
 	       (p)->tick, \
 	       (p)->adc.motor_pressure, \
 	       (p)->adc.v_batt);

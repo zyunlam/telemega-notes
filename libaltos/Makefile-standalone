@@ -34,11 +34,11 @@ OS_SRCS=libaltos_posix.c libaltos_darwin.c
 #	-iwithsysroot /System/Library/Frameworks/CoreFoundation.framework/Headers
 
 XCODE=/Applications/Xcode.app
-SDK=$(XCODE)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk
+SDK=$(XCODE)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
 MINVERSION=10.5
 
 OS_LIB_CFLAGS=\
-	-DDARWIN -DPOSIX_TTY -arch x86_64 -isysroot $(SDK) \
+	-DDARWIN -DPOSIX_TTY -arch x86_64 -arch arm64 -isysroot $(SDK) \
 	-mmacosx-version-min=10.5 \
 	-iwithsysroot /System/Library/Frameworks/JavaVM.framework/Headers \
 	-iwithsysroot /System/Library/Frameworks/IOKit.framework/Headers \

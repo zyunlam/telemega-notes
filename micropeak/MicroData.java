@@ -157,6 +157,8 @@ public class MicroData {
 
 	public boolean	crc_valid;
 
+	public boolean	log_empty;
+
 	int mix_in (int high, int low) {
 		return  high - (high & 0xffff) + low;
 	}
@@ -244,6 +246,15 @@ public class MicroData {
 		for (int c : bytes)
 			f.write(c);
 		f.write('\n');
+	}
+
+	public boolean is_empty() {
+		boolean empty = true;
+		for (int c : bytes) {
+			if (!Character.isWhitespace(c) && c != 'f')
+				empty = false;
+		}
+		return empty;
 	}
 
 	public void export (Writer f) throws IOException {
@@ -352,7 +363,12 @@ public class MicroData {
 			int current_crc = swap16(~file_crc & 0xffff);
 			int crc = get_16(f);
 
-			crc_valid = crc == current_crc;
+			crc_valid = (crc == current_crc);
+
+			if (!crc_valid && is_empty()) {
+				crc_valid = true;
+				nsamples = 0;
+			}
 
 			if (log_id == LOG_ID_MICROPEAK2) {
 				unique_id = get_line(f);

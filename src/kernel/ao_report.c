@@ -149,7 +149,7 @@ ao_report_digit(uint8_t digit)
 }
 
 static void
-ao_report_number(int16_t n)
+ao_report_number(ao_v_t n)
 {
 	uint8_t	digits[10];
 	uint8_t ndigits, i;
@@ -158,7 +158,7 @@ ao_report_number(int16_t n)
 		n = 0;
 	ndigits = 0;
 	do {
-		digits[ndigits++] = n % 10;
+		digits[ndigits++] = (uint8_t) (n % 10);
 		n /= 10;
 	} while (n);
 
@@ -200,8 +200,8 @@ ao_report_igniter_ready(enum ao_igniter igniter)
 uint8_t
 ao_report_igniter(void)
 {
-	return (ao_report_igniter_ready(ao_igniter_drogue) |
-		     (ao_report_igniter_ready(ao_igniter_main) << 1));
+	return (uint8_t) (ao_report_igniter_ready(ao_igniter_drogue) |
+			  (ao_report_igniter_ready(ao_igniter_main) << 1));
 }
 #endif
 

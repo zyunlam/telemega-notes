@@ -66,7 +66,7 @@ _ao_usart_rx(struct ao_stm_usart *usart, int is_stdin)
 			}
 #endif
 		} else {
-			usart->reg->cr1 &= ~(1 << STM_USART_CR1_RXNEIE);
+			usart->reg->cr1 &= ~(1UL << STM_USART_CR1_RXNEIE);
 		}
 	}
 }
@@ -77,11 +77,11 @@ ao_usart_isr(struct ao_stm_usart *usart, int is_stdin)
 	_ao_usart_rx(usart, is_stdin);
 
 	if (!_ao_usart_tx_start(usart))
-		usart->reg->cr1 &= ~(1<< STM_USART_CR1_TXEIE);
+		usart->reg->cr1 &= ~(1UL << STM_USART_CR1_TXEIE);
 
 	if (usart->reg->isr & (1 << STM_USART_ISR_TC)) {
 		usart->tx_running = 0;
-		usart->reg->cr1 &= ~(1 << STM_USART_CR1_TCIE);
+		usart->reg->cr1 &= ~(1UL << STM_USART_CR1_TCIE);
 		if (usart->draining) {
 			usart->draining = 0;
 			ao_wakeup(&usart->tx_fifo);

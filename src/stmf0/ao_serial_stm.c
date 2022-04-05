@@ -75,7 +75,7 @@ _ao_usart_rx(struct ao_stm_usart *usart, int is_stdin)
 			}
 #endif
 		} else {
-			usart->reg->cr1 &= ~(1 << STM_USART_CR1_RXNEIE);
+			usart->reg->cr1 &= ~(1UL << STM_USART_CR1_RXNEIE);
 		}
 	}
 }
@@ -86,11 +86,11 @@ ao_usart_isr(struct ao_stm_usart *usart, int is_stdin)
 	_ao_usart_rx(usart, is_stdin);
 
 	if (!_ao_usart_tx_start(usart))
-		usart->reg->cr1 &= ~(1<< STM_USART_CR1_TXEIE);
+		usart->reg->cr1 &= ~(1UL << STM_USART_CR1_TXEIE);
 
 	if (usart->reg->isr & (1 << STM_USART_ISR_TC)) {
 		usart->tx_running = 0;
-		usart->reg->cr1 &= ~(1 << STM_USART_CR1_TCIE);
+		usart->reg->cr1 &= ~(1UL << STM_USART_CR1_TCIE);
 		if (usart->draining) {
 			usart->draining = 0;
 			ao_wakeup(&usart->tx_fifo);
@@ -136,7 +136,7 @@ ao_usart_getchar(struct ao_stm_usart *usart)
 }
 
 static inline uint8_t
-_ao_usart_sleep_for(struct ao_stm_usart *usart, uint16_t timeout)
+_ao_usart_sleep_for(struct ao_stm_usart *usart, AO_TICK_TYPE timeout)
 {
 	return ao_sleep_for(&usart->rx_fifo, timeout);
 }
@@ -281,7 +281,7 @@ _ao_serial1_pollchar(void)
 }
 
 uint8_t
-_ao_serial1_sleep_for(uint16_t timeout)
+_ao_serial1_sleep_for(AO_TICK_TYPE timeout)
 {
 	return _ao_usart_sleep_for(&ao_stm_usart1, timeout);
 }
@@ -325,7 +325,7 @@ _ao_serial2_pollchar(void)
 }
 
 uint8_t
-_ao_serial2_sleep_for(uint16_t timeout)
+_ao_serial2_sleep_for(AO_TICK_TYPE timeout)
 {
 	return _ao_usart_sleep_for(&ao_stm_usart2, timeout);
 }
@@ -379,10 +379,10 @@ void
 ao_serial_shutdown(void)
 {
 #if HAS_SERIAL_1
-	stm_rcc.apb2enr &= ~(1 << STM_RCC_APB2ENR_USART1EN);
+	stm_rcc.apb2enr &= ~(1UL << STM_RCC_APB2ENR_USART1EN);
 #endif
 #if HAS_SERIAL_2
-	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_USART2EN);
+	stm_rcc.apb1enr &= ~(1UL << STM_RCC_APB1ENR_USART2EN);
 #endif
 }
 

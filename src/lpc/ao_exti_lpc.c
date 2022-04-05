@@ -53,7 +53,7 @@ pin_isr(5)
 pin_isr(6)
 pin_isr(7)
 
-#define pin_id(port,pin)	((port) * 24 + (pin));
+#define pin_id(port,pin)	((uint8_t) ((port) * 24 + (pin)))
 
 static void
 _ao_exti_set_enable(uint8_t pint)
@@ -83,7 +83,7 @@ void
 ao_exti_setup (uint8_t port, uint8_t pin, uint8_t mode, void (*callback)(void)) {
 	uint8_t		id = pin_id(port,pin);
 	uint8_t	       	pint;
-	uint32_t	mask;
+	uint8_t		mask;
 	uint8_t		prio;
 
 	for (pint = 0; pint < LPC_NUM_PINT; pint++)
@@ -98,7 +98,7 @@ ao_exti_setup (uint8_t port, uint8_t pin, uint8_t mode, void (*callback)(void)) 
 	ao_arch_block_interrupts();
 	mask = (1 << pint);
 	ao_pint_inuse |= mask;
-	ao_pint_enabled &= ~mask;
+	ao_pint_enabled &= (uint8_t) ~mask;
 
 	ao_pint_map[id] = pint;
 	ao_exti_callback[pint] = callback;
@@ -109,7 +109,7 @@ ao_exti_setup (uint8_t port, uint8_t pin, uint8_t mode, void (*callback)(void)) 
 	/* Set edge triggered */
 	lpc_gpio_pin.isel &= ~mask;
 
-	ao_pint_enabled &= ~mask;
+	ao_pint_enabled &= (uint8_t) ~mask;
 	ao_pint_mode[pint] = mode;
 	_ao_exti_set_enable(pint);
 
@@ -167,7 +167,7 @@ ao_exti_disable(uint8_t port, uint8_t pin) {
 	uint8_t		mask = 1 << pint;
 
 	ao_arch_block_interrupts();
-	ao_pint_enabled &= ~mask;
+	ao_pint_enabled &= (uint8_t) ~mask;
 	_ao_exti_set_enable(pint);
 	ao_arch_release_interrupts();
 }

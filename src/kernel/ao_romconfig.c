@@ -19,7 +19,7 @@
 #include "ao.h"
 
 AO_ROMCONFIG_SYMBOL uint16_t ao_romconfig_version = AO_ROMCONFIG_VERSION;
-AO_ROMCONFIG_SYMBOL uint16_t ao_romconfig_check = ~AO_ROMCONFIG_VERSION;
+AO_ROMCONFIG_SYMBOL uint16_t ao_romconfig_check = (uint16_t) ~AO_ROMCONFIG_VERSION;
 AO_ROMCONFIG_SYMBOL uint16_t ao_serial_number = 0;
 #if HAS_RADIO
 AO_ROMCONFIG_SYMBOL uint32_t ao_radio_cal = AO_RADIO_CAL_DEFAULT;

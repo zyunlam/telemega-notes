@@ -101,7 +101,7 @@ ao_lon_dist(int32_t lon_a, int32_t lon_b)
 
 	/* check if it's shorter to go the other way around */
 	if ((lon_a >> 1) < (lon_b >> 1) - (1800000000 >> 1))
-		lon_a += 3600000000;
+		lon_a = (int32_t) ((uint32_t) lon_a + 3600000000UL);
 	lon_dist = ao_dist(lon_a, lon_b);
 	if (c) {
 		if (lon_dist & 0x7f800000)

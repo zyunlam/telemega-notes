@@ -151,7 +151,7 @@ ao_spi_recv_byte(uint8_t spi_index)
 	stm_spi->dr = 0xff;
 	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
 		;
-	return stm_spi->dr;
+	return (uint8_t) stm_spi->dr;
 }
 
 void
@@ -215,16 +215,16 @@ static inline void ao_enable_port(struct stm_gpio *port)
 static inline void ao_disable_port(struct stm_gpio *port)
 {
 	if ((port) == &stm_gpioa) {
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPAEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPAEN);
 		ao_power_unregister(&ao_power_gpioa);
 	} else if ((port) == &stm_gpiob) {
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPBEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPBEN);
 		ao_power_unregister(&ao_power_gpiob);
 	} else if ((port) == &stm_gpioc) {
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPCEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPCEN);
 		ao_power_unregister(&ao_power_gpioc);
 	} else if ((port) == &stm_gpiof) {
-		stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_IOPFEN);
+		stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_IOPFEN);
 		ao_power_unregister(&ao_power_gpiof);
 	}
 }

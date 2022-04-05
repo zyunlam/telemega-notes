@@ -24,7 +24,7 @@ static volatile AO_TICK_TYPE	ao_wakeup_count;
 ISR(TIMER1_COMPA_vect)
 {
 	++ao_tick_count;
-	if ((int16_t) (ao_tick_count - ao_wakeup_count) >= 0)
+	if ((AO_TICK_SIGNED) (ao_tick_count - ao_wakeup_count) >= 0)
 		ao_wakeup((void *) &ao_tick_count);
 }
 
@@ -131,7 +131,7 @@ ao_delay_until(AO_TICK_TYPE target)
 {
 	cli();
 	ao_wakeup_count = target;
-	while ((int16_t) (target - ao_tick_count) > 0)
+	while ((AO_TICK_SIGNED) (target - ao_tick_count) > 0)
 		ao_sleep((void *) &ao_tick_count);
 	sei();
 }

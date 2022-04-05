@@ -52,7 +52,7 @@ ao_log_micro_restore(void)
 void
 ao_log_micro_data(void)
 {
-	uint16_t	low_bits = pa;
+	uint16_t	low_bits = (uint16_t) pa;
 
 	if (ao_log_offset < MAX_LOG_OFFSET) {
 		ao_eeprom_write(ao_log_offset, &low_bits, sizeof (low_bits));
@@ -81,9 +81,9 @@ static void
 ao_log_hex_nibble(uint8_t b)
 {
 	if (b < 10)
-		ao_async_byte('0' + b);
+		ao_async_byte((uint8_t) ('0' + b));
 	else
-		ao_async_byte('a' - 10 + b);
+		ao_async_byte((uint8_t) ('a' - 10 + b));
 }
 
 void
@@ -115,7 +115,7 @@ ao_log_micro_dump(void)
 
 	if (n_samples == (N_SAMPLES_TYPE) (~0))
 		n_samples = 0;
-	nbytes = STARTING_LOG_OFFSET + sizeof (uint16_t) * n_samples;
+	nbytes = (uint16_t) (STARTING_LOG_OFFSET + sizeof (uint16_t) * n_samples);
 
 	/*
 	 * Rewrite n_samples so that it includes the log ID value with
@@ -140,7 +140,7 @@ ao_log_micro_dump(void)
 		ao_eeprom_read(b, &byte, 1);
 #if AO_LOG_ID
 		if (N_SAMPLES_OFFSET <= b && b < (N_SAMPLES_OFFSET + sizeof(n_samples))) {
-			byte = n_samples >> ((b - N_SAMPLES_OFFSET) << 3);
+			byte = (uint8_t) (n_samples >> ((b - N_SAMPLES_OFFSET) << 3));
 		}
 #endif
 		ao_log_hex(byte);
@@ -148,8 +148,8 @@ ao_log_micro_dump(void)
 	}
 	ao_log_newline();
 	crc = ~crc;
-	ao_log_hex(crc >> 8);
-	ao_log_hex(crc);
+	ao_log_hex((uint8_t) (crc >> 8));
+	ao_log_hex((uint8_t) crc);
 	ao_log_newline();
 	ao_async_stop();
 }

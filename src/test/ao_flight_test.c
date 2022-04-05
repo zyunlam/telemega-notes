@@ -390,7 +390,7 @@ typedef int16_t	accel_t;
 uint16_t	ao_serial_number;
 int16_t		ao_flight_number;
 
-extern uint16_t	ao_sample_tick;
+extern AO_TICK_TYPE	ao_sample_tick;
 
 #if HAS_BARO
 extern alt_t	ao_sample_height;
@@ -404,8 +404,8 @@ extern alt_t	ao_sample_alt;
 
 double ao_sample_qangle;
 
-int ao_sample_prev_tick;
-uint16_t	prev_tick;
+AO_TICK_TYPE	ao_sample_prev_tick;
+AO_TICK_TYPE	prev_tick;
 
 
 #include "ao_kalman.c"

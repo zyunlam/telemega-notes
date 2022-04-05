@@ -27,7 +27,7 @@
 struct ao_event {
 	uint8_t		type;
 	uint8_t		unit;
-	uint16_t	tick;
+	AO_TICK_TYPE	tick;
 	int32_t		value;
 };
 
@@ -35,7 +35,7 @@ void
 ao_event_get(struct ao_event *ev);
 
 uint8_t
-ao_event_get_for(struct ao_event *ev, uint16_t timeout);
+ao_event_get_for(struct ao_event *ev, AO_TICK_TYPE timeout);
 
 void
 ao_event_put_isr(uint8_t type, uint8_t unit, int32_t value);

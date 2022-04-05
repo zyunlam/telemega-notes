@@ -87,7 +87,7 @@ ao_hmc5883_sample(struct ao_hmc5883_sample *sample)
 	/* byte swap */
 	while (i--) {
 		uint16_t	t = *d;
-		*d++ = (t >> 8) | (t << 8);
+		*d++ = (uint16_t) ((t >> 8) | (t << 8));
 	}
 #endif
 }

@@ -45,14 +45,14 @@ ao_packet_echo(void)
 	while (ao_packet_enable) {
 		c = ao_packet_getchar();
 		if (c != AO_READ_AGAIN)
-			putchar(c);
+			putchar((char) c);
 	}
 	ao_exit();
 }
 
 static struct ao_task	ao_packet_echo_task;
-static uint16_t		ao_packet_master_delay;
-static uint16_t		ao_packet_master_time;
+static AO_TICK_TYPE	ao_packet_master_delay;
+static AO_TICK_TYPE	ao_packet_master_time;
 
 #define AO_PACKET_MASTER_DELAY_SHORT	AO_MS_TO_TICKS(100)
 #define AO_PACKET_MASTER_DELAY_LONG	AO_MS_TO_TICKS(1000)
@@ -74,10 +74,10 @@ ao_packet_master_busy(void)
 static void
 ao_packet_master_check_busy(void)
 {
-	int16_t	idle;
+	AO_TICK_SIGNED	idle;
 	if (ao_packet_master_delay != AO_PACKET_MASTER_DELAY_SHORT)
 		return;
-	idle = (int16_t) (ao_time() - ao_packet_master_time);
+	idle = (AO_TICK_SIGNED) (ao_time() - ao_packet_master_time);
 
 	if (idle > AO_PACKET_MASTER_DELAY_TIMEOUT)
 		ao_packet_master_delay = AO_PACKET_MASTER_DELAY_LONG;
@@ -87,7 +87,7 @@ static void
 ao_packet_master(void)
 {
 	ao_config_get();
-	ao_tx_packet.addr = ao_serial_number;
+	ao_tx_packet.addr = (uint8_t) ao_serial_number;
 	ao_tx_packet.len = AO_PACKET_SYN;
 	ao_packet_master_time = ao_time();
 	ao_packet_master_delay = AO_PACKET_MASTER_DELAY_SHORT;

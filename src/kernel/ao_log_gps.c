@@ -28,15 +28,15 @@ void
 ao_log_gps_flight(void)
 {
 	ao_log_data.type = AO_LOG_FLIGHT;
-	ao_log_data.tick = ao_time();
+	ao_log_data.tick = (uint16_t) ao_time();
 	ao_log_data.u.flight.flight = ao_flight_number;
 	ao_log_write(&ao_log_data);
 }
 
 void
-ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data)
+ao_log_gps_data(AO_TICK_TYPE tick, struct ao_telemetry_location *gps_data)
 {
-	ao_log_data.tick = tick;
+	ao_log_data.tick = (uint16_t) tick;
 	ao_log_data.type = AO_LOG_GPS_TIME;
 	ao_log_data.u.gps.latitude = gps_data->latitude;
 	ao_log_data.u.gps.longitude = gps_data->longitude;
@@ -61,11 +61,11 @@ ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data)
 }
 
 void
-ao_log_gps_tracking(uint16_t tick, struct ao_telemetry_satellite *gps_tracking_data)
+ao_log_gps_tracking(AO_TICK_TYPE tick, struct ao_telemetry_satellite *gps_tracking_data)
 {
 	uint8_t c, n, i;
 
-	ao_log_data.tick = tick;
+	ao_log_data.tick = (uint16_t) tick;
 	ao_log_data.type = AO_LOG_GPS_SAT;
 	i = 0;
 	n = gps_tracking_data->channels;

@@ -125,7 +125,7 @@ _ao_button_check(uint8_t b)
 static void
 _ao_button_init(uint8_t b)
 {
-	uint8_t	m = ao_arch_irqsave();
+	uint32_t	m = ao_arch_irqsave();
 	uint8_t value = _ao_button_get(b);
 	ao_button_state[b].value = value;
 	ao_button_state[b].time = ao_time();

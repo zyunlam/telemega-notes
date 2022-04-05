@@ -133,7 +133,7 @@ static void
 ao_usb_set_address(uint8_t address)
 {
 	debug("ao_usb_set_address %02x\n", address);
-	lpc_usb.devcmdstat = ((address << LPC_USB_DEVCMDSTAT_DEV_ADDR) |
+	lpc_usb.devcmdstat = (((uint32_t) address << LPC_USB_DEVCMDSTAT_DEV_ADDR) |
 			      (1 << LPC_USB_DEVCMDSTAT_DEV_EN) |
 			      (0 << LPC_USB_DEVCMDSTAT_SETUP) |
 			      (0 << LPC_USB_DEVCMDSTAT_PLL_ON) |
@@ -196,14 +196,14 @@ ao_usb_sram_offset(uint8_t *addr)
 static void
 ao_usb_set_ep(vuint32_t *ep, uint8_t *addr, uint16_t nbytes)
 {
-	*ep = ((ao_usb_sram_offset(addr) << LPC_USB_EP_OFFSET) |
-	       (nbytes << LPC_USB_EP_NBYTES) |
+	*ep = (((uint32_t) ao_usb_sram_offset(addr) << LPC_USB_EP_OFFSET) |
+	       ((uint32_t) nbytes << LPC_USB_EP_NBYTES) |
 	       (0 << LPC_USB_EP_ENDPOINT_ISO) |
 	       (0 << LPC_USB_EP_RATE_FEEDBACK) |
 	       (0 << LPC_USB_EP_TOGGLE_RESET) |
 	       (0 << LPC_USB_EP_STALL) |
 	       (0 << LPC_USB_EP_DISABLED) |
-	       (1 << LPC_USB_EP_ACTIVE));
+	       (1UL << LPC_USB_EP_ACTIVE));
 }
 
 static inline uint16_t
@@ -326,7 +326,7 @@ ao_usb_reset(void)
 static void
 ao_usb_set_ep0(void)
 {
-	int			e;
+	uint8_t	e;
 
 	/* Everything is single buffered for now */
 	lpc_usb.epbufcfg = 0;
@@ -425,7 +425,7 @@ ao_usb_ep0_fill(void)
 
 	if (len > ao_usb_ep0_out_len)
 		len = ao_usb_ep0_out_len;
-	ao_usb_ep0_out_len -= len;
+	ao_usb_ep0_out_len -= (uint8_t) len;
 
 	debug_data ("Fill EP0 len %d:", len);
 	memcpy(ao_usb_ep0_out_data, rx_buffer, len);
@@ -471,7 +471,7 @@ ao_usb_ep0_in_start(uint16_t max)
 	ao_usb_ep0_in_max = max;
 	/* Don't send more than asked for */
 	if (ao_usb_ep0_in_len > max)
-		ao_usb_ep0_in_len = max;
+		ao_usb_ep0_in_len = (uint8_t) max;
 	ao_usb_ep0_flush();
 }
 
@@ -483,8 +483,8 @@ static void
 ao_usb_get_descriptor(uint16_t value, uint16_t length)
 {
 	const uint8_t		*descriptor;
-	uint8_t		type = value >> 8;
-	uint8_t		index = value;
+	uint8_t		type = (uint8_t) (value >> 8);
+	uint8_t		index = (uint8_t) value;
 
 	descriptor = ao_usb_descriptors;
 	while (descriptor[0] != 0) {
@@ -495,7 +495,7 @@ ao_usb_get_descriptor(uint16_t value, uint16_t length)
 			else
 				len = descriptor[0];
 			if (len > length)
-				len = length;
+				len = (uint8_t) length;
 			ao_usb_ep0_in_set(descriptor, len);
 			break;
 		}
@@ -535,7 +535,7 @@ ao_usb_ep0_setup(void)
 				break;
 			case AO_USB_REQ_SET_ADDRESS:
 				debug ("set address %d\n", ao_usb_setup.value);
-				ao_usb_address = ao_usb_setup.value;
+				ao_usb_address = (uint8_t) ao_usb_setup.value;
 				ao_usb_address_pending = 1;
 				break;
 			case AO_USB_REQ_GET_DESCRIPTOR:
@@ -547,7 +547,7 @@ ao_usb_ep0_setup(void)
 				ao_usb_ep0_in_queue_byte(ao_usb_configuration);
 				break;
 			case AO_USB_REQ_SET_CONFIGURATION:
-				ao_usb_configuration = ao_usb_setup.value;
+				ao_usb_configuration = (uint8_t) ao_usb_setup.value;
 				debug ("set configuration %d\n", ao_usb_configuration);
 				ao_usb_set_configuration();
 				break;
@@ -704,7 +704,7 @@ lpc_usb_irq_isr(void)
 	}
 
 	/* Check for reset */
-	if (intstat & (1 << LPC_USB_INT_DEV)) {
+	if (intstat & (1UL << LPC_USB_INT_DEV)) {
 		if (lpc_usb.devcmdstat & (1 << LPC_USB_DEVCMDSTAT_DRES_C))
 		{
 			lpc_usb.devcmdstat |= (1 << LPC_USB_DEVCMDSTAT_DRES_C);
@@ -799,7 +799,7 @@ _ao_usb_out_recv(void)
 	_rx_dbg0("out_recv top");
 	ao_usb_out_avail = 0;
 
-	ao_usb_rx_count = AO_USB_OUT_SIZE - ao_usb_epn_out_count(AO_USB_OUT_EP);
+	ao_usb_rx_count = (uint8_t) (AO_USB_OUT_SIZE - ao_usb_epn_out_count(AO_USB_OUT_EP));
 
 	_rx_dbg1("out_recv count", ao_usb_rx_count);
 	debug ("recv %d\n", ao_usb_rx_count);
@@ -846,7 +846,7 @@ ao_usb_getchar(void)
 	while ((c = _ao_usb_pollchar()) == AO_READ_AGAIN)
 		ao_sleep(AO_USB_OUT_SLEEP_ADDR);
 	ao_arch_release_interrupts();
-	return c;
+	return (char) c;
 }
 
 void
@@ -873,8 +873,8 @@ ao_usb_disable(void)
 			     (1 << LPC_SCB_PDRUNCFG_USBPLL_PD));
 
 	/* Disable USB registers and RAM */
-	lpc_scb.sysahbclkctrl &= ~((1 << LPC_SCB_SYSAHBCLKCTRL_USB) |
-				   (1 << LPC_SCB_SYSAHBCLKCTRL_USBRAM));
+	lpc_scb.sysahbclkctrl &= ~((1UL << LPC_SCB_SYSAHBCLKCTRL_USB) |
+				   (1UL << LPC_SCB_SYSAHBCLKCTRL_USBRAM));
 
 	ao_arch_release_interrupts();
 }
@@ -906,10 +906,10 @@ ao_usb_enable(void)
 				  (1 << LPC_SCB_SYSAHBCLKCTRL_USBRAM));
 
 	/* Enable USB PHY */
-	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_USBPAD_PD);
+	lpc_scb.pdruncfg &= ~(1UL << LPC_SCB_PDRUNCFG_USBPAD_PD);
 
 	/* Turn on USB PLL */
-	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_USBPLL_PD);
+	lpc_scb.pdruncfg &= ~(1UL << LPC_SCB_PDRUNCFG_USBPLL_PD);
 
 	lpc_scb.usbpllclksel = (LPC_SCB_SYSPLLCLKSEL_SEL_SYSOSC << LPC_SCB_SYSPLLCLKSEL_SEL);
 	lpc_scb.usbpllclkuen = (0 << LPC_SCB_USBPLLCLKUEN_ENA);
@@ -946,12 +946,12 @@ ao_usb_enable(void)
 	debug ("ao_usb_enable\n");
 
 	/* Enable interrupts */
-	lpc_usb.inten = ((1 << LPC_USB_INT_EPOUT(0)) |
-			 (1 << LPC_USB_INT_EPIN(0)) |
-			 (1 << LPC_USB_INT_EPIN(AO_USB_INT_EP)) |
-			 (1 << LPC_USB_INT_EPOUT(AO_USB_OUT_EP)) |
-			 (1 << LPC_USB_INT_EPIN(AO_USB_IN_EP)) |
-			 (1 << LPC_USB_INT_DEV));
+	lpc_usb.inten = ((1UL << LPC_USB_INT_EPOUT(0)) |
+			 (1UL << LPC_USB_INT_EPIN(0)) |
+			 (1UL << LPC_USB_INT_EPIN(AO_USB_INT_EP)) |
+			 (1UL << LPC_USB_INT_EPOUT(AO_USB_OUT_EP)) |
+			 (1UL << LPC_USB_INT_EPIN(AO_USB_IN_EP)) |
+			 (1UL << LPC_USB_INT_DEV));
 
 	ao_arch_release_interrupts();
 

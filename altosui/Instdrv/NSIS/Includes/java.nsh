@@ -150,7 +150,7 @@ var quit
 var skip
 
 Function GetJRE
-  ${OpenURL} "adoptopenjdk.net"
+  ${OpenURL} "adoptium.net"
   MessageBox MB_OK "Click OK to continue after completing the Java Install."
 FunctionEnd
 

@@ -32,7 +32,7 @@ static void ao_exti_one_isr(uint8_t pin) {
 }
 
 static void ao_exti_range_isr(uint8_t first, uint8_t last, uint16_t mask) {
-	uint16_t	pending = (ao_last_exti = stm_exti.pr) & mask;
+	uint16_t	pending = (uint16_t) (ao_last_exti = stm_exti.pr) & mask;
 	uint8_t		pin;
 	static uint16_t	last_mask;
 	static uint8_t	last_pin;

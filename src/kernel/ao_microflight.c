@@ -24,6 +24,7 @@
 
 uint32_t	pa;
 uint32_t	pa_ground;
+uint32_t	pa_ground_next;
 uint32_t	pa_min;
 
 static void
@@ -45,7 +46,7 @@ ao_microflight(void)
 {
 	int16_t		sample_count;
 	int16_t		log_count;
-	uint16_t	time;
+	AO_TICK_TYPE	time;
 	uint32_t	pa_interval_min, pa_interval_max;
 	int32_t		pa_diff;
 	uint8_t		h;
@@ -58,7 +59,7 @@ ao_microflight(void)
 	time = ao_time();
 	ao_pa_get();
 	ao_microkalman_init();
-	pa_ground = pa;
+	pa_ground_next = pa_ground = pa;
 	sample_count = 0;
 	h = 0;
 	for (;;) {
@@ -75,7 +76,7 @@ ao_microflight(void)
 #endif
 		pa_hist[h] = pa;
 		h = SKIP_PA_HIST(h,1);
-		pa_diff = pa_ground - ao_pa;
+		pa_diff = (int32_t) (pa_ground - ao_pa);
 
 #if BOOST_DETECT
 		/* Check for a significant pressure change */
@@ -88,7 +89,8 @@ ao_microflight(void)
 				pa_sum += pa;
 			++sample_count;
 		} else {
-			pa_ground = pa_sum >> GROUND_AVG_SHIFT;
+			pa_ground = pa_ground_next;
+			pa_ground_next = pa_sum >> GROUND_AVG_SHIFT;
 			pa_sum = 0;
 			sample_count = 0;
 #if !BOOST_DETECT
@@ -143,7 +145,7 @@ ao_microflight(void)
 			pa_min = ao_pa;
 
 		if (sample_count == (GROUND_AVG - 1)) {
-			pa_diff = pa_interval_max - pa_interval_min;
+			pa_diff = (int32_t) (pa_interval_max - pa_interval_min);
 
 			/* Check to see if the pressure is now stable */
 			if (pa_diff < LAND_DETECT)

@@ -229,7 +229,7 @@ ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
 		while ((stm_spi->sr & (1 << STM_SPI_SR_TXE)) == 0);
 		stm_spi->dr = 0xff;
 		while ((stm_spi->sr & (1 << STM_SPI_SR_RXNE)) == 0);
-		*bytes++ = stm_spi->dr;
+		*bytes++ = (uint8_t) stm_spi->dr;
 	}
 #endif
 }

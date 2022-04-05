@@ -19,7 +19,7 @@
 #define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
 
-#define AO_STACK_SIZE		360
+#define AO_STACK_SIZE		352
 #define SLEEP_HASH_SIZE		3
 #define AO_NUM_TASKS		6
 
@@ -134,7 +134,7 @@ struct ao_adc {
 #define AO_SENSE_MAIN(p)	((p)->adc.sense_m)
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: %5u apogee: %5d main: %5d batt: %5d\n", \
+	printf("tick: %5lu apogee: %5d main: %5d batt: %5d\n", \
 	       (p)->tick, (p)->adc.sense_a, (p)->adc.sense_m, (p)->adc.v_batt)
 
 /*

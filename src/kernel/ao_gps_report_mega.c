@@ -85,7 +85,7 @@ ao_gps_report_mega(void)
 #endif
 		if ((new & AO_GPS_NEW_DATA) && (gps_data.flags & AO_GPS_VALID)) {
 
-			gps_log.tick = ao_gps_tick;
+			gps_log.tick = (uint16_t) ao_gps_tick;
 			gps_log.type = AO_LOG_GPS_TIME;
 			gps_log.u.gps.latitude = gps_data.latitude;
 			gps_log.u.gps.longitude = gps_data.longitude;
@@ -108,7 +108,7 @@ ao_gps_report_mega(void)
 			ao_log_write(&gps_log);
 		}
 		if ((new & AO_GPS_NEW_TRACKING) && (n = gps_tracking_data.channels) != 0) {
-			gps_log.tick = ao_gps_tick;
+			gps_log.tick = (uint16_t) ao_gps_tick;
 			gps_log.type = AO_LOG_GPS_SAT;
 			i = 0;
 			for (c = 0; c < n; c++)
