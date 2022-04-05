@@ -71,6 +71,6 @@ echo 'E 0' > $dev
 
 echo 'E 1' > $dev
 
-./test-easymega
+./test-easymega-v1.0
 
 exit $?
