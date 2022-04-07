@@ -18,7 +18,7 @@
 #define DEBUG_LOW	1
 #define DEBUG_HIGH	2
 
-#define DEBUG		3
+#define DEBUG		0
 
 #if DEBUG
 #define PRINTD(l, ...) do { if (DEBUG & (l)) { printf ("\r%5lu %s: ", ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } } while(0)
@@ -222,6 +222,7 @@ ao_adxl375_setup(void)
 static void
 ao_adxl375(void)
 {
+	ao_delay(AO_SEC_TO_TICKS(5));
 	ao_adxl375_setup();
 	for (;;) {
 		ao_adxl375_value(&ao_adxl375_current);
