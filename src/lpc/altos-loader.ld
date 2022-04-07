@@ -85,10 +85,6 @@ SECTIONS
 {
 	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
 
-	.no_isp : {
-		*(.no_isp)
-	} > no_isp AT>no_isp :text
-
 	.init : {
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
@@ -98,8 +94,14 @@ SECTIONS
 	.text.low : {
 		ao_boot_chain.o(.text .text.*)
 		ao_boot_pin.o(.text .text.*)
+		ao_flash_loader_lpc.o(.text .text.*)
+		ao_notask.o(*.text .text.*)
 		ao_product.o(.rodata .rodata.*)
 	} >low AT>low :text
+
+	.no_isp : {
+		*(.no_isp)
+	} > no_isp AT>no_isp :text
 
 	.text : {
 
