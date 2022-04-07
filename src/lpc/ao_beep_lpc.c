@@ -24,7 +24,7 @@ ao_beep(uint8_t beep)
 	if (beep == 0) {
 		lpc_ct32b1.tcr = ((0 << LPC_CT32B_TCR_CEN) |
 				  (1 << LPC_CT32B_TCR_CRST));
-		lpc_scb.sysahbclkctrl &= ~(1 << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
+		lpc_scb.sysahbclkctrl &= ~(1UL << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
 	} else {
 		lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
 

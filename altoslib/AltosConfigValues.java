@@ -119,4 +119,8 @@ public interface AltosConfigValues {
 	public abstract int tracker_interval() throws AltosConfigDataException;
 
 	public abstract void set_tracker_interval(int tracker_motion);
+
+	public abstract int radio_10mw() throws AltosConfigDataException;
+
+	public abstract void set_radio_10mw(int radio_10mw);
 }

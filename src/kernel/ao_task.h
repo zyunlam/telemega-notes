@@ -38,7 +38,7 @@
 struct ao_task {
 	void *wchan;			/* current wait channel (NULL if running) */
 	AO_TICK_TYPE alarm;		/* abort ao_sleep time */
-	uint16_t task_id;		/* unique id */
+	uint8_t task_id;		/* unique id */
 	/* Saved stack pointer */
 	union {
 		uint32_t	*sp32;

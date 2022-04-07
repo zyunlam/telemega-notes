@@ -26,7 +26,7 @@ ao_exti_setup_port(uint8_t pin, uint8_t mode, void (*callback)(void));
 
 #define ao_exti_enable(gpio, pin) 	(PCMSK |= (1 << (pin)))
 
-#define ao_exti_disable(gpio, pin)	(PCMSK &= ~(1 << (pin)))
+#define ao_exti_disable(gpio, pin)	(PCMSK &= (uint8_t) ~(1 << (pin)))
 
 #define ao_exti_init()
 

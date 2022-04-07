@@ -50,14 +50,14 @@ ao_pa_get(void)
 
 	ao_ms5607_sample(&ao_ms5607_current);
 	ao_ms5607_convert(&ao_ms5607_current, &value);
-	pa = value.pres;
+	pa = (uint32_t) value.pres;
 }
 
 static void
 ao_compute_height(void)
 {
-	ground_alt = ao_pa_to_altitude(pa_ground);
-	max_alt = ao_pa_to_altitude(pa_min);
+	ground_alt = ao_pa_to_altitude((pres_t) pa_ground);
+	max_alt = ao_pa_to_altitude((pres_t) pa_min);
 	ao_max_height = max_alt - ground_alt;
 }
 
@@ -91,7 +91,7 @@ power_down(void)
 		stm_scb.scr |= ((1 << STM_SCB_SCR_SLEEPDEEP) |
 				(1 << STM_SCB_SCR_SLEEPONEXIT));
 		stm_pwr.cr |= (1 << STM_PWR_CR_PDDS);
-		stm_pwr.csr &= ~(1 << STM_PWR_CSR_WUF);
+		stm_pwr.csr &= ~(1UL << STM_PWR_CSR_WUF);
 		ao_arch_wait_interrupt();
 	}
 }
@@ -144,7 +144,7 @@ flight_mode(void)
 	ao_report_altitude();
 	ao_pips();
 	log_micro_dump();
-#if BOOST_DELAY	
+#ifdef BOOST_DELAY
 	ao_delay(BOOST_DELAY);
 #endif
 	log_erase();
@@ -212,7 +212,7 @@ main(void)
 	 */
 	uint16_t vref = ao_adc_read_vref();
 
-	uint32_t vdda = 3 * stm_vrefint_cal.vrefint_cal * 1000 / vref;
+	uint32_t vdda = 3UL * stm_vrefint_cal.vrefint_cal * 1000 / vref;
 
 	/* Power supply > 3.25V means we're on USB power */
 	if (vdda > 3250) {

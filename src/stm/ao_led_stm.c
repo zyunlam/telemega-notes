@@ -61,8 +61,8 @@ ao_led_off(AO_LED_TYPE colors)
 void
 ao_led_set(AO_LED_TYPE colors)
 {
-	AO_LED_TYPE	on = colors & LEDS_AVAILABLE;
-	AO_LED_TYPE	off = ~colors & LEDS_AVAILABLE;
+	AO_LED_TYPE	on = colors & (AO_LED_TYPE) LEDS_AVAILABLE;
+	AO_LED_TYPE	off = (AO_LED_TYPE) (~colors & (AO_LED_TYPE) LEDS_AVAILABLE);
 
 	ao_led_off(off);
 	ao_led_on(on);
@@ -88,7 +88,7 @@ ao_led_init(void)
 
 #ifdef LED_PORT
 	stm_rcc.ahbenr |= (1 << LED_PORT_ENABLE);
-	LED_PORT->odr &= ~LEDS_AVAILABLE;
+	LED_PORT->odr &= ~(uint32_t) LEDS_AVAILABLE;
 #else
 #ifdef LED_PORT_0
 	stm_rcc.ahbenr |= (1 << LED_PORT_0_ENABLE);

@@ -178,7 +178,7 @@ ao_kalman_err_accel(void)
 	accel = (ao_config.accel_plus_g - ao_sample_accel) * ao_accel_scale;
 
 	/* Can't use ao_accel here as it is the pre-prediction value still */
-	ao_error_a = (accel - ao_k_accel) >> 16;
+	ao_error_a = (ao_v_t) ((accel - ao_k_accel) >> 16);
 }
 
 #if !defined(FORCE_ACCEL) && HAS_BARO
@@ -314,9 +314,9 @@ ao_kalman(void)
 	ao_kalman_correct_accel();
 #endif
 #endif
-	ao_height = from_fix(ao_k_height);
-	ao_speed = from_fix(ao_k_speed);
-	ao_accel = from_fix(ao_k_accel);
+	ao_height = (ao_v_t) from_fix(ao_k_height);
+	ao_speed = (ao_v_t) from_fix(ao_k_speed);
+	ao_accel = (ao_v_t) from_fix(ao_k_accel);
 	if (ao_height > ao_max_height)
 		ao_max_height = ao_height;
 #if HAS_BARO
@@ -331,5 +331,5 @@ ao_kalman(void)
 		ao_avg_height = (ao_avg_height_scaled + 7) >> 4;
 	else 
 #endif
-		ao_avg_height = (ao_avg_height_scaled + 63) >> 7;
+		ao_avg_height = (ao_v_t) ((ao_avg_height_scaled + 63) >> 7);
 }

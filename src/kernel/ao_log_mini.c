@@ -34,7 +34,7 @@ typedef uint8_t check_log_size[1-(256 % sizeof(struct ao_log_mini))] ;
 void
 ao_log(void)
 {
-	uint16_t	next_sensor;
+	AO_TICK_TYPE	next_sensor;
 
 	ao_storage_setup();
 
@@ -45,7 +45,7 @@ ao_log(void)
 
 #if HAS_FLIGHT
 	ao_log_data.type = AO_LOG_FLIGHT;
-	ao_log_data.tick = ao_sample_tick;
+	ao_log_data.tick = (uint16_t) ao_sample_tick;
 	ao_log_data.u.flight.flight = ao_flight_number;
 	ao_log_data.u.flight.ground_pres = ao_ground_pres;
 	ao_log_write(&ao_log_data);
@@ -61,7 +61,7 @@ ao_log(void)
 		/* Write samples to EEPROM */
 		while (ao_log_data_pos != ao_data_head) {
 			AO_TICK_TYPE tick = ao_data_ring[ao_log_data_pos].tick;
-			ao_log_data.tick = tick;
+			ao_log_data.tick = (uint16_t) tick;
 			if ((AO_TICK_SIGNED) (tick - next_sensor) >= 0) {
 				ao_log_data.type = AO_LOG_SENSOR;
 				ao_log_pack24(ao_log_data.u.sensor.pres,
@@ -86,7 +86,7 @@ ao_log(void)
 		if (ao_flight_state != ao_log_state) {
 			ao_log_state = ao_flight_state;
 			ao_log_data.type = AO_LOG_STATE;
-			ao_log_data.tick = ao_time();
+			ao_log_data.tick = (uint16_t) ao_time();
 			ao_log_data.u.state.state = ao_log_state;
 			ao_log_data.u.state.reason = 0;
 			ao_log_write(&ao_log_data);

@@ -45,7 +45,7 @@ ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 	}
 #endif
 	ao_mutex_get(&ao_lco_mutex);
-	command.tick = ao_time();
+	command.tick = (uint16_t) ao_time();
 	command.box = box;
 	command.cmd = AO_PAD_QUERY;
 	command.channels = 0;
@@ -53,7 +53,7 @@ ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 	sent_time = ao_time();
 	r = ao_radio_cmac_recv(query, sizeof (*query), timeout);
 	if (r == AO_RADIO_CMAC_OK)
-		*tick_offset = sent_time - query->tick;
+		*tick_offset = (uint16_t) sent_time - query->tick;
 	ao_mutex_put(&ao_lco_mutex);
 	return r;
 }

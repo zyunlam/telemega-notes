@@ -38,11 +38,11 @@
 #define AO_BEEP_MID_PANIC	AO_BEEP_MID_DEFAULT
 
 #ifndef AO_BEEP_MAKE_LOW
-#define AO_BEEP_MAKE_LOW(m)	((m) * 150 / 94)	/* 2500Hz */
+#define AO_BEEP_MAKE_LOW(m)	((uint8_t) ((m) * 150 / 94))	/* 2500Hz */
 #endif
 
 #ifndef AO_BEEP_MAKE_HIGH
-#define AO_BEEP_MAKE_HIGH(m)	((m) * 75 / 94)		/* 5000Hz */
+#define AO_BEEP_MAKE_HIGH(m)	((uint8_t) ((m) * 75 / 94))	/* 5000Hz */
 #endif
 
 #define AO_BEEP_LOW	AO_BEEP_MAKE_LOW(AO_BEEP_MID)

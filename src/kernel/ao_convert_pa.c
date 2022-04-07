@@ -42,7 +42,7 @@ static const alt_t altitude_table[] AO_CONST_ATTRIB = {
 alt_t
 ao_pa_to_altitude(pres_t pa)
 {
-	int16_t	o;
+	uint16_t o;
 	int16_t	part;
 	alt_t low, high;
 
@@ -50,12 +50,12 @@ ao_pa_to_altitude(pres_t pa)
 		pa = 0;
 	if (pa > 120000L)
 		pa = 120000L;
-	o = pa >> ALT_SHIFT;
+	o = (uint16_t) (pa >> ALT_SHIFT);
 	part = pa & ALT_MASK;
 
 	low = (alt_t) FETCH_ALT(o) * (ALT_SCALE - part);
-	high = (alt_t) FETCH_ALT(o+1) * part + (ALT_SCALE >> 1);
-	return (low + high) >> ALT_SHIFT;
+	high = (alt_t) FETCH_ALT(o+1) * part;
+	return (low + high + (ALT_SCALE >> 1)) >> ALT_SHIFT;
 }
 
 #ifdef AO_CONVERT_TEST

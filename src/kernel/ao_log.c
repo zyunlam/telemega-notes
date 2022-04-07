@@ -29,7 +29,7 @@ uint32_t ao_log_end_pos;
 uint32_t ao_log_start_pos;
 uint8_t	ao_log_running;
 enum ao_flight_state ao_log_state;
-int16_t ao_flight_number;
+uint16_t ao_flight_number;
 
 void
 ao_log_flush(void)
@@ -77,7 +77,7 @@ ao_log_write_erase(uint8_t pos)
 	if (pos == 0) {
 		uint8_t	i;
 		for (i = 1; i < LOG_MAX_ERASE; i++) {
-			erase.mark = ~LOG_ERASE_MARK;
+			erase.mark = (uint8_t) ~LOG_ERASE_MARK;
 			erase.flight = 0;
 			ao_config_write(ao_log_erase_pos(i), &erase, sizeof (erase));
 		}
@@ -180,7 +180,7 @@ ao_log_check_data(void)
 	return 1;
 }
 
-int16_t
+int32_t
 ao_log_flight(uint8_t slot)
 {
 	if (ao_storage_is_erased(ao_log_pos_block_start(slot)))
@@ -189,12 +189,12 @@ ao_log_flight(uint8_t slot)
 	if (!ao_storage_read(ao_log_pos(slot),
 			     &ao_log_data,
 			     sizeof (ao_log_type)))
-		return -(int16_t) (slot + 1);
+		return -(int32_t) (slot + 1);
 
 	if (!ao_log_check_data() || ao_log_data.type != AO_LOG_FLIGHT)
-		return -(int16_t) (slot + 1);
+		return -(int32_t) (slot + 1);
 
-	return ao_log_data.u.flight.flight;
+	return (int32_t) ao_log_data.u.flight.flight;
 }
 #endif
 
@@ -204,13 +204,13 @@ ao_log_slots(void)
 	return (uint8_t) (ao_storage_log_max / ao_config.flight_log_max);
 }
 
-static int16_t
+static uint16_t
 ao_log_max_flight(void)
 {
 	uint8_t		log_slot;
 	uint8_t		log_slots;
-	int16_t		log_flight;
-	int16_t		max_flight = 0;
+	int32_t		log_flight;
+	uint16_t	max_flight = 0;
 
 	/* Scan the log space looking for the biggest flight number */
 	log_slots = ao_log_slots();
@@ -219,7 +219,7 @@ ao_log_max_flight(void)
 		if (log_flight <= 0)
 			continue;
 		if (max_flight == 0 || log_flight > max_flight)
-			max_flight = log_flight;
+			max_flight = (uint16_t) log_flight;
 	}
 	return max_flight;
 }
@@ -340,7 +340,7 @@ ao_log_scan(void)
 	/* Find a log slot for the next flight, if available */
 	ao_log_current_pos = ao_log_end_pos = 0;
 	log_slots = ao_log_slots();
-	log_want = (ao_flight_number - 1) % log_slots;
+	log_want = (uint8_t) ((ao_flight_number - 1) % log_slots);
 	log_slot = log_want;
 	do {
 		if (ao_log_flight(log_slot) == 0) {
@@ -396,14 +396,14 @@ ao_log_list(void)
 {
 	uint8_t	slot;
 	uint8_t slots;
-	int16_t flight;
+	int32_t flight;
 
 	slots = ao_log_slots();
 	for (slot = 0; slot < slots; slot++)
 	{
 		flight = ao_log_flight(slot);
 		if (flight)
-			printf ("flight %d start %x end %x\n",
+			printf ("flight %ld start %x end %x\n",
 				flight,
 				(uint16_t) (ao_log_pos(slot) >> 8),
 				(uint16_t) (ao_log_pos_block_end(slot) >> 8));
@@ -421,14 +421,14 @@ ao_log_delete(void)
 {
 	uint8_t slot;
 	uint8_t slots;
-	int16_t cmd_flight = 1;
+	int32_t cmd_flight = 1;
 
 	ao_cmd_white();
 	if (ao_cmd_lex_c == '-') {
 		cmd_flight = -1;
 		ao_cmd_lex();
 	}
-	cmd_flight *= ao_cmd_decimal();
+	cmd_flight *= (int32_t) ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 
@@ -451,7 +451,7 @@ ao_log_delete(void)
 			}
 		}
 	}
-	printf("No such flight: %d\n", cmd_flight);
+	printf("No such flight: %ld\n", cmd_flight);
 }
 
 const struct ao_cmds ao_log_cmds[] = {

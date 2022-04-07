@@ -183,7 +183,7 @@ ao_clock_normal_start(void)
 #if AO_HSE_BYPASS
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEBYP);
 #else
-	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSEBYP);
+	stm_rcc.cr &= ~(1UL << STM_RCC_CR_HSEBYP);
 #endif
 	/* Enable HSE clock */
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEON);
@@ -191,8 +191,8 @@ ao_clock_normal_start(void)
 		asm("nop");
 
 	/* Disable the PLL */
-	stm_rcc.cr &= ~(1 << STM_RCC_CR_PLLON);
-	while (stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY))
+	stm_rcc.cr &= ~(1UL << STM_RCC_CR_PLLON);
+	while (stm_rcc.cr & (1UL << STM_RCC_CR_PLLRDY))
 		asm("nop");
 
 	/* Set multiplier */
@@ -201,7 +201,7 @@ ao_clock_normal_start(void)
 	cfgr |= (AO_RCC_CFGR_PLLMUL << STM_RCC_CFGR_PLLMUL);
 
 	/* PLL source */
-	cfgr &= ~(1 << STM_RCC_CFGR_PLLSRC);
+	cfgr &= ~(1UL << STM_RCC_CFGR_PLLSRC);
 	cfgr |= (STM_RCC_CFGR_PLLSRC_TARGET_CLOCK  << STM_RCC_CFGR_PLLSRC);
 	stm_rcc.cfgr = cfgr;
 
@@ -261,7 +261,7 @@ ao_clock_normal_switch(void)
 	}
 #if !AO_HSI && !AO_NEED_HSI
 	/* Turn off the HSI clock */
-	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSION);
+	stm_rcc.cr &= ~(1UL << STM_RCC_CR_HSION);
 #endif
 #ifdef STM_PLLSRC
 	/* USB PLL source */

@@ -125,7 +125,7 @@ ao_m25_wait_wip(ao_port_t cs)
 			ao_spi_recv(ao_m25_instruction, 1, AO_M25_SPI_BUS);
 		} while (ao_m25_instruction[0] & M25_STATUS_WIP);
 		M25_DESELECT(cs);
-		ao_m25_wip &= ~cs;
+		ao_m25_wip &= (ao_port_t) ~cs;
 	}
 }
 
@@ -192,9 +192,9 @@ ao_m25_set_address(uint32_t pos)
 #endif
 	ao_m25_wait_wip(mask);
 
-	ao_m25_instruction[1] = pos >> 16;
-	ao_m25_instruction[2] = pos >> 8;
-	ao_m25_instruction[3] = pos;
+	ao_m25_instruction[1] = (uint8_t) (pos >> 16);
+	ao_m25_instruction[2] = (uint8_t) (pos >> 8);
+	ao_m25_instruction[3] = (uint8_t) (pos);
 	return mask;
 }
 

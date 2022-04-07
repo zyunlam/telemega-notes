@@ -75,12 +75,12 @@ ao_radio_reg_read(uint16_t addr)
 		data[0] = ((1 << CC1200_READ)  |
 			   (0 << CC1200_BURST) |
 			   CC1200_EXTENDED);
-		data[1] = addr;
+		data[1] = (uint8_t) addr;
 		d = 2;
 	} else {
 		data[0] = ((1 << CC1200_READ)  |
 			   (0 << CC1200_BURST) |
-			   addr);
+			   (uint8_t) addr);
 		d = 1;
 	}
 	ao_radio_select();
@@ -106,12 +106,12 @@ ao_radio_reg_write(uint16_t addr, uint8_t value)
 		data[0] = ((0 << CC1200_READ)  |
 			   (0 << CC1200_BURST) |
 			   CC1200_EXTENDED);
-		data[1] = addr;
+		data[1] = (uint8_t) addr;
 		d = 2;
 	} else {
 		data[0] = ((0 << CC1200_READ)  |
 			   (0 << CC1200_BURST) |
-			   addr);
+			   (uint8_t) addr);
 		d = 1;
 	}
 	data[d] = value;
@@ -598,7 +598,7 @@ _ao_radio_set_regs(const uint16_t *regs, int nreg)
 	int i;
 
 	for (i = 0; i < nreg; i++) {
-		ao_radio_reg_write(regs[0], regs[1]);
+		ao_radio_reg_write(regs[0], (uint8_t) regs[1]);
 		regs += 2;
 	}
 }
@@ -613,7 +613,7 @@ ao_radio_set_mode(uint16_t new_mode)
 	if (new_mode == ao_radio_mode)
 		return;
 
-	changes = new_mode & (~ao_radio_mode);
+	changes = (uint16_t) (new_mode & (~ao_radio_mode));
 
 	if (changes & AO_RADIO_MODE_BITS_PACKET) {
 		ao_radio_set_regs(packet_setup);
@@ -716,21 +716,34 @@ ao_radio_get(uint8_t len)
 {
 	static uint32_t	last_radio_setting;
 	static uint8_t	last_radio_rate;
+	static uint8_t	last_radio_10mw;
 
 	ao_mutex_get(&ao_radio_mutex);
 
 	if (!ao_radio_configured)
 		ao_radio_setup();
 	if (ao_config.radio_setting != last_radio_setting) {
-		ao_radio_reg_write(CC1200_FREQ2, ao_config.radio_setting >> 16);
-		ao_radio_reg_write(CC1200_FREQ1, ao_config.radio_setting >> 8);
-		ao_radio_reg_write(CC1200_FREQ0, ao_config.radio_setting);
+		ao_radio_reg_write(CC1200_FREQ2, (uint8_t) (ao_config.radio_setting >> 16));
+		ao_radio_reg_write(CC1200_FREQ1, (uint8_t) (ao_config.radio_setting >> 8));
+		ao_radio_reg_write(CC1200_FREQ0, (uint8_t) ao_config.radio_setting);
 		last_radio_setting = ao_config.radio_setting;
 		ao_radio_strobe(CC1200_SCAL);
 	}
 	if (ao_config.radio_rate != last_radio_rate) {
-		ao_radio_mode &= ~AO_RADIO_MODE_BITS_PACKET;
+		ao_radio_mode &= (uint16_t) ~AO_RADIO_MODE_BITS_PACKET;
 		last_radio_rate = ao_config.radio_rate;
+	}
+	if(ao_config.radio_10mw != last_radio_10mw) {
+		last_radio_10mw = ao_config.radio_10mw;
+		/*
+		 * 0x37 "should" be 10dBm, but measurements on TBT
+		 * v4.0 show that too hot, so use * 0x32 to make sure 
+		 * we're in spec.
+		 */
+		if (ao_config.radio_10mw)
+			ao_radio_reg_write(CC1200_PA_CFG1, 0x32);
+		else
+			ao_radio_reg_write(CC1200_PA_CFG1, 0x3f);
 	}
 	ao_radio_set_len(len);
 }
@@ -759,7 +772,7 @@ ao_radio_show_state(char *where)
 /* Wait for the radio to signal an interrupt
  */
 static void
-ao_radio_wait_isr(uint16_t timeout)
+ao_radio_wait_isr(AO_TICK_TYPE timeout)
 {
 	ao_arch_block_interrupts();
 	while (!ao_radio_wake && !ao_radio_abort)
@@ -881,7 +894,7 @@ ao_radio_test_cmd(void)
 	uint8_t	mode = 2;
 	ao_cmd_white();
 	if (ao_cmd_lex_c != '\n')
-		mode = ao_cmd_decimal();
+		mode = (uint8_t) ao_cmd_decimal();
 	mode++;
 	if ((mode & 2))
 		ao_radio_test_on();
@@ -927,7 +940,7 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 
 		/* At the last buffer, set the total length */
 		if (done)
-			ao_radio_set_len(total & 0xff);
+			ao_radio_set_len((uint8_t) (total & 0xff));
 
 		/* Wait for some space in the fifo */
 		while (started && ao_radio_int_pin() != 0 && !ao_radio_abort) {
@@ -943,7 +956,7 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 		else
 			ao_radio_set_mode(AO_RADIO_MODE_APRS_BUF);
 
-		ao_radio_fifo_write(buf, cnt);
+		ao_radio_fifo_write(buf, (uint8_t) cnt);
 		if (!started) {
 			ao_radio_strobe(CC1200_STX);
 			started = 1;
@@ -1008,7 +1021,7 @@ ao_radio_dump_state(struct ao_radio_state *s)
 #endif
 
 uint8_t
-ao_radio_recv(void *d, uint8_t size, uint8_t timeout)
+ao_radio_recv(void *d, uint8_t size, AO_TICK_TYPE timeout)
 {
 	uint8_t	success = 0;
 
@@ -1069,13 +1082,13 @@ ao_radio_recv(void *d, uint8_t size, uint8_t timeout)
 				switch (ao_config.radio_rate) {
 				default:
 				case AO_RADIO_RATE_38400:
-					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 384) + 1;
+					timeout = AO_MS_TO_TICKS((AO_TICK_TYPE) size * (8 * 2 * 10) / 384) + 1;
 					break;
 				case AO_RADIO_RATE_9600:
-					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 96) + 1;
+					timeout = AO_MS_TO_TICKS((AO_TICK_TYPE) size * (8 * 2 * 10) / 96) + 1;
 					break;
 				case AO_RADIO_RATE_2400:
-					timeout = AO_MS_TO_TICKS(size * (8 * 2 * 10) / 24) + 1;
+					timeout = AO_MS_TO_TICKS((AO_TICK_TYPE) size * (8 * 2 * 10) / 24) + 1;
 					break;
 				}
 			}
@@ -1096,7 +1109,7 @@ ao_radio_recv(void *d, uint8_t size, uint8_t timeout)
 			rssi = -11;
 
 		/* Write it back to the packet */
-		((int8_t *) d)[size-2] = AO_RADIO_FROM_RSSI(rssi);
+		((uint8_t *) d)[size-2] = AO_RADIO_FROM_RSSI(rssi);
 	} else {
 		ao_radio_idle();
 		ao_radio_rssi = 0;

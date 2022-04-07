@@ -70,14 +70,14 @@ int16_t		ao_pa_accel;		/* integer portion */
 void
 ao_microkalman_init(void)
 {
-	ao_pa = pa;
-	ao_k_pa = pa << 8;
+	ao_pa = (uint32_t) pa;
+	ao_k_pa = (uint32_t) (pa << 8);
 }
 
 void
 ao_microkalman_predict(void)
 {
-	ao_k_pa       += fix16_to_fix8((int32_t) ao_pa_speed * AO_MK_STEP + (int32_t) ao_pa_accel * AO_MK_STEP_2_2);
+	ao_k_pa       += (uint32_t) (int32_t) fix16_to_fix8((int32_t) ao_pa_speed * AO_MK_STEP + (int32_t) ao_pa_accel * AO_MK_STEP_2_2);
 	ao_k_pa_speed += (int32_t) ao_pa_accel * AO_MK_STEP;
 }
 
@@ -86,12 +86,12 @@ ao_microkalman_correct(void)
 {
 	int16_t	e;	/* Height error in Pa */
 
-	e = pa - from_fix8(ao_k_pa);
+	e = (int16_t) (pa - from_fix8(ao_k_pa));
 
-	ao_k_pa       += fix16_to_fix8((int32_t) e * AO_K0_10);
+	ao_k_pa       += (uint32_t)(int32_t)fix16_to_fix8(e * AO_K0_10);
 	ao_k_pa_speed += (int32_t) e * AO_K1_10;
 	ao_k_pa_accel += (int32_t) e * AO_K2_10;
 	ao_pa = from_fix8(ao_k_pa);
-	ao_pa_speed = from_fix(ao_k_pa_speed);
-	ao_pa_accel = from_fix(ao_k_pa_accel);
+	ao_pa_speed = (int16_t) from_fix(ao_k_pa_speed);
+	ao_pa_accel = (int16_t) from_fix(ao_k_pa_accel);
 }

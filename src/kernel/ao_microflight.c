@@ -46,7 +46,7 @@ ao_microflight(void)
 {
 	int16_t		sample_count;
 	int16_t		log_count;
-	uint16_t	time;
+	AO_TICK_TYPE	time;
 	uint32_t	pa_interval_min, pa_interval_max;
 	int32_t		pa_diff;
 	uint8_t		h;
@@ -76,7 +76,7 @@ ao_microflight(void)
 #endif
 		pa_hist[h] = pa;
 		h = SKIP_PA_HIST(h,1);
-		pa_diff = pa_ground - ao_pa;
+		pa_diff = (int32_t) (pa_ground - ao_pa);
 
 #if BOOST_DETECT
 		/* Check for a significant pressure change */
@@ -145,7 +145,7 @@ ao_microflight(void)
 			pa_min = ao_pa;
 
 		if (sample_count == (GROUND_AVG - 1)) {
-			pa_diff = pa_interval_max - pa_interval_min;
+			pa_diff = (int32_t) (pa_interval_max - pa_interval_min);
 
 			/* Check to see if the pressure is now stable */
 			if (pa_diff < LAND_DETECT)

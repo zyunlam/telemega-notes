@@ -303,7 +303,18 @@ ao_pyro_check(void)
 				if (delay < 0)
 					delay = 0;
 				delay_done = ao_time() + (AO_TICK_TYPE) delay;
-				if (!delay_done)
+
+				/*
+				 * delay_done is the time at which the
+				 * delay ends, but it is also used as
+				 * an indication that a delay is
+				 * active -- non-zero values indicate
+				 * an active delay. This code ensures
+				 * the value is non-zero, which might
+				 * introduce an additional tick
+				 * of delay.
+				 */
+				if (delay_done == 0)
 					delay_done = 1;
 				pyro_delay_done[p] = delay_done;
 			}
@@ -312,7 +323,7 @@ ao_pyro_check(void)
 		/* Check to see if we're just waiting for
 		 * the delay to expire
 		 */
-		if (pyro_delay_done[p]) {
+		if (pyro_delay_done[p] != 0) {
 
 			/* Check to make sure the required conditions
 			 * remain valid. If not, inhibit the channel

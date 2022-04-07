@@ -141,7 +141,7 @@
 #define LED_PIN_ARMED		5
 
 #define AO_LED_ARMED		(1 << LED_PIN_ARMED)
-#define AO_LED_CONTINUITY(c)	(1 << (4 - (c)))
+#define AO_LED_CONTINUITY(c)	((AO_LED_TYPE) (1 << (4 - (c))))
 #define AO_LED_CONTINUITY_MASK	(0x3 << 3)
 
 #define LEDS_AVAILABLE		(LED_PORT_0_MASK|LED_PORT_1_MASK)

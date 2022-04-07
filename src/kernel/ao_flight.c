@@ -63,7 +63,7 @@ uint8_t			ao_sensor_errors;
  * track min/max data over a long interval to detect
  * resting
  */
-static uint16_t		ao_interval_end;
+static AO_TICK_TYPE	ao_interval_end;
 #ifdef HAS_BARO
 static ao_v_t		ao_interval_min_height;
 static ao_v_t		ao_interval_max_height;
@@ -272,7 +272,7 @@ ao_flight(void)
 			 * (15 seconds) has past.
 			 */
 			if ((ao_accel < AO_MSS_TO_ACCEL(-2.5)) ||
-			    (AO_TICK_SIGNED) (ao_sample_tick - ao_boost_tick) > BOOST_TICKS_MAX)
+			    (AO_TICK_SIGNED) (ao_sample_tick - ao_boost_tick) > (AO_TICK_SIGNED) BOOST_TICKS_MAX)
 			{
 #if HAS_ACCEL
 #if HAS_BARO
@@ -320,7 +320,7 @@ ao_flight(void)
 			 */
 			if (ao_config.apogee_lockout) {
 				if ((AO_TICK_SIGNED) (ao_sample_tick - ao_launch_tick) <
-				    AO_SEC_TO_TICKS(ao_config.apogee_lockout))
+				    (AO_TICK_SIGNED) AO_SEC_TO_TICKS(ao_config.apogee_lockout))
 					break;
 			}
 

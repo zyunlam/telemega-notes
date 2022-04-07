@@ -19,7 +19,7 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define AO_STACK_SIZE	448
+#define AO_STACK_SIZE	440
 
 #define IS_FLASH_LOADER		0
 

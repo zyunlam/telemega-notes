@@ -198,7 +198,7 @@ typedef AO_ALT_TYPE	alt_t;
 #define ao_data_pres_cook(packet)	ao_ms5607_convert(&packet->ms5607_raw, &packet->ms5607_cooked)
 
 #define ao_data_pres(packet)	((packet)->ms5607_cooked.pres)
-#define ao_data_temp(packet)	((packet)->ms5607_cooked.temp)
+#define ao_data_temp(packet)	((int16_t) (packet)->ms5607_cooked.temp)
 
 #define pres_to_altitude(p)	ao_pa_to_altitude(p)
 
@@ -331,9 +331,9 @@ typedef int16_t accel_t;
 #endif
 
 #if AO_MMA655X_INVERT
-#define ao_data_accel_raw(packet)		(AO_ACCEL_INVERT - (packet)->mma655x)
+#define ao_data_accel_raw(packet)		((accel_t) (AO_ACCEL_INVERT - (packet)->mma655x))
 #else
-#define ao_data_accel_raw(packet)		((packet)->mma655x)
+#define ao_data_accel_raw(packet)		((accel_t) (packet)->mma655x)
 #endif
 #define ao_data_accel_invert(accel)		(AO_ACCEL_INVERT - (accel))
 

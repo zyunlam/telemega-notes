@@ -19,12 +19,12 @@
 uint8_t		ao_lco_debug;
 
 uint8_t		ao_lco_pad;
-int16_t		ao_lco_box;
+uint16_t	ao_lco_box;
 
 uint8_t		ao_lco_armed;					/* arm active */
 uint8_t		ao_lco_firing;					/* fire active */
 
-uint8_t		ao_lco_min_box, ao_lco_max_box;
+uint16_t	ao_lco_min_box, ao_lco_max_box;
 
 #if AO_LCO_DRAG
 uint8_t		ao_lco_drag_race;
@@ -136,7 +136,7 @@ ao_lco_igniter_status(void)
 }
 
 uint8_t
-ao_lco_pad_present(uint8_t box, uint8_t pad)
+ao_lco_pad_present(uint16_t box, uint8_t pad)
 {
 	/* voltage measurement is always valid */
 	if (pad == AO_LCO_PAD_VOLTAGE)
@@ -149,7 +149,7 @@ ao_lco_pad_present(uint8_t box, uint8_t pad)
 }
 
 uint8_t
-ao_lco_pad_first(uint8_t box)
+ao_lco_pad_first(uint16_t box)
 {
 	uint8_t	pad;
 
@@ -160,7 +160,7 @@ ao_lco_pad_first(uint8_t box)
 }
 
 static uint8_t
-ao_lco_get_channels(uint8_t box, struct ao_pad_query *query)
+ao_lco_get_channels(uint16_t box, struct ao_pad_query *query)
 {
 	int8_t			r;
 
@@ -169,7 +169,7 @@ ao_lco_get_channels(uint8_t box, struct ao_pad_query *query)
 		ao_lco_channels[box] = query->channels;
 		ao_lco_valid[box] = AO_LCO_VALID_LAST | AO_LCO_VALID_EVER;
 	} else
-		ao_lco_valid[box] &= ~AO_LCO_VALID_LAST;
+		ao_lco_valid[box] &= (uint8_t) ~AO_LCO_VALID_LAST;
 	PRINTD("ao_lco_get_channels(%d) rssi %d valid %d ret %d offset %d\n", box, ao_radio_cmac_rssi, ao_lco_valid[box], r, ao_lco_tick_offset[box]);
 	ao_wakeup(&ao_pad_query);
 	return ao_lco_valid[box];
@@ -201,7 +201,7 @@ ao_lco_box_reset_present(void)
 }
 
 static void
-ao_lco_box_set_present(uint8_t box)
+ao_lco_box_set_present(uint16_t box)
 {
 	if (box < ao_lco_min_box)
 		ao_lco_min_box = box;
@@ -209,7 +209,7 @@ ao_lco_box_set_present(uint8_t box)
 		ao_lco_max_box = box;
 	if (box >= AO_PAD_MAX_BOXES)
 		return;
-	ao_lco_box_mask[AO_LCO_MASK_ID(box)] |= 1 << AO_LCO_MASK_SHIFT(box);
+	ao_lco_box_mask[AO_LCO_MASK_ID(box)] |= (uint8_t) (1 << AO_LCO_MASK_SHIFT(box));
 }
 
 void
@@ -232,9 +232,9 @@ ao_lco_set_box(uint16_t new_box)
 void
 ao_lco_step_pad(int8_t dir)
 {
-	int8_t	new_pad;
+	int16_t	new_pad;
 
-	new_pad = ao_lco_pad;
+	new_pad = (int16_t) ao_lco_pad;
 	do {
 		new_pad += dir;
 		if (new_pad > AO_PAD_MAX_CHANNELS)
@@ -243,8 +243,8 @@ ao_lco_step_pad(int8_t dir)
 			new_pad = AO_PAD_MAX_CHANNELS;
 		if (new_pad == ao_lco_pad)
 			break;
-	} while (!ao_lco_pad_present(ao_lco_box, new_pad));
-	ao_lco_set_pad(new_pad);
+	} while (!ao_lco_pad_present(ao_lco_box, (uint8_t) new_pad));
+	ao_lco_set_pad((uint8_t) new_pad);
 }
 
 void
@@ -255,7 +255,7 @@ ao_lco_set_armed(uint8_t armed)
 	if (ao_lco_armed) {
 #if AO_LCO_DRAG
 		if (ao_lco_drag_race) {
-			uint8_t	box;
+			uint16_t	box;
 
 			for (box = ao_lco_min_box; box <= ao_lco_max_box; box++)
 				if (ao_lco_selected[box])
@@ -323,7 +323,7 @@ void
 ao_lco_monitor(void)
 {
 	AO_TICK_TYPE		delay;
-	uint8_t			box;
+	uint16_t		box;
 
 	for (;;) {
 		PRINTD("monitor armed %d firing %d\n",
@@ -380,7 +380,7 @@ void
 ao_lco_toggle_drag(void)
 {
 	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE) {
-		ao_lco_selected[ao_lco_box] ^= (1 << (ao_lco_pad - 1));
+		ao_lco_selected[ao_lco_box] ^= (uint8_t) (1 << (ao_lco_pad - 1));
 		PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
 		       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);
 		ao_lco_drag_add_beeps(ao_lco_pad);

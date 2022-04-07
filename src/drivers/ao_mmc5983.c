@@ -141,7 +141,7 @@ sat_sub(int16_t a, int16_t b)
 		v = -32768;
 	if (v > 32767)
 		v = 32767;
-	return v;
+	return (int16_t) v;
 }
 
 /* Wait for a synchronous sample to finish */
@@ -179,9 +179,9 @@ ao_mmc5983_sample(struct ao_mmc5983_sample *s)
 	ao_mmc5983_raw(&raw);
 
 	/* Bias by 32768 to convert from uint16_t to int16_t */
-	s->x = (int32_t) (((uint16_t) raw.x0 << 8) | raw.x1) - 32768;
-	s->y = (int32_t) (((uint16_t) raw.y0 << 8) | raw.y1) - 32768;
-	s->z = (int32_t) (((uint16_t) raw.z0 << 8) | raw.z1) - 32768;;
+	s->x = (int16_t) ((((uint16_t) raw.x0 << 8) | raw.x1) - 32768);
+	s->y = (int16_t) ((((uint16_t) raw.y0 << 8) | raw.y1) - 32768);
+	s->z = (int16_t) ((((uint16_t) raw.z0 << 8) | raw.z1) - 32768);
 }
 
 /* Synchronously sample the sensors */
@@ -217,9 +217,9 @@ ao_mmc5983_cal(void)
 	ao_mmc5983_sync_sample(&reset);
 
 	/* The zero point is the average of SET and RESET values */
-	ao_mmc5983_offset.x = ((int32_t) set.x + (int32_t) reset.x) / 2;
-	ao_mmc5983_offset.y = ((int32_t) set.y + (int32_t) reset.y) / 2;
-	ao_mmc5983_offset.z = ((int32_t) set.z + (int32_t) reset.z) / 2;
+	ao_mmc5983_offset.x = (int16_t) (((int32_t) set.x + (int32_t) reset.x) / 2);
+	ao_mmc5983_offset.y = (int16_t) (((int32_t) set.y + (int32_t) reset.y) / 2);
+	ao_mmc5983_offset.z = (int16_t) (((int32_t) set.z + (int32_t) reset.z) / 2);
 }
 
 /* Configure the device to automatically sample at 200Hz */
