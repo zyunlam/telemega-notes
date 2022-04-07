@@ -26,7 +26,7 @@
 #define PRINTD(l,...)
 #endif
 
-#define AO_ADXL375_SPI_SPEED	ao_spi_speed(100000)
+#define AO_ADXL375_SPI_SPEED	ao_spi_speed(5000000)
 
 struct ao_adxl375_sample	ao_adxl375_current;
 
@@ -222,7 +222,6 @@ ao_adxl375_setup(void)
 static void
 ao_adxl375(void)
 {
-	ao_delay(AO_SEC_TO_TICKS(5));
 	ao_adxl375_setup();
 	for (;;) {
 		ao_adxl375_value(&ao_adxl375_current);

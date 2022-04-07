@@ -45,11 +45,6 @@
 #define PACKET_HAS_SLAVE	0
 
 #define HAS_SERIAL		0
-#define USE_SERIAL_0_STDIN	1
-#define SERIAL_0_18_19          1
-#define SERIAL_0_14_15          0
-#define SERIAL_0_17_18          0
-#define SERIAL_0_26_27          0
 
 #define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	(1984 * 1024)
 #define AO_CONFIG_MAX_SIZE			1024
