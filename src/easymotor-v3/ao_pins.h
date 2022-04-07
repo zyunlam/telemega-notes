@@ -126,11 +126,13 @@ struct ao_adc {
 /* SPI */
 
 #define HAS_SPI_0		1
+#define SPI_0_MODE		((0 << LPC_SSP_CR0_CPOL) | (0 << LPC_SSP_CR0_CPHA))
 #define SPI_SCK0_P0_6           1
 #define HAS_SPI_1               1
 #define SPI_SCK1_P1_15          1
 #define SPI_MISO1_P0_22         1
 #define SPI_MOSI1_P0_21         1
+#define SPI_1_MODE		((1 << LPC_SSP_CR0_CPOL) | (1 << LPC_SSP_CR0_CPHA))
 
 /*
  * SPI Flash memory
