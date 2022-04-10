@@ -45,6 +45,7 @@
 #define AO_LOG_FORMAT_TELESTATIC	17	/* 32 byte typed telestatic records */
 #define AO_LOG_FORMAT_MICROPEAK2	18	/* 2-byte baro values with header */
 #define AO_LOG_FORMAT_TELEMEGA_4	19	/* 32 byte typed telemega records with 32 bit gyro cal and Bmx160 */
+#define AO_LOG_FORMAT_EASYMOTOR		20	/* 16 byte typed easymotor records */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 enum ao_pyro_flag {
@@ -464,6 +465,37 @@ struct ao_log_mini {
 		} sensor;				/* 16 */
 	} u;						/* 16 */
 };							/* 16 */
+
+struct ao_log_motor {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;			/* 4 */
+			int16_t		ground_accel;		/* 6 */
+			int16_t		ground_accel_along;	/* 8 */
+			int16_t		ground_accel_across;	/* 10 */
+			int16_t		ground_accel_through;	/* 12 */
+			int16_t		ground_motor_pressure;	/* 14 */
+		} flight;					/* 16 */
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;			/* 4 */
+			uint16_t	reason;			/* 6 */
+		} state;
+		/* AO_LOG_SENSOR */
+		struct {
+			uint16_t	pressure;		/* 4 */
+			uint16_t	v_batt;			/* 6 */
+			int16_t		accel;			/* 8 */
+			int16_t		accel_across;		/* 10 */
+			int16_t		accel_along;		/* 12 */
+			int16_t		accel_through;		/* 14 */
+		} sensor;					/* 16 */
+	} u;
+};
 
 #define ao_log_pack24(dst,value) do {		\
 		(dst)[0] = (value);		\
