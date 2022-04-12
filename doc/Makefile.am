@@ -137,6 +137,7 @@ COMMON_INC_FILES=\
 	config-ui.inc \
 	load-maps.inc \
 	aprs-operation.inc \
+	pyro-examples.inc \
 	handling.inc \
 	release-head.inc
 
