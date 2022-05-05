@@ -412,11 +412,14 @@ main (int argc, char **argv)
 					log_mega = (struct ao_log_mega *) &eeprom->data[pos];
 					switch (log_mega->type) {
 					case AO_LOG_FLIGHT:
-						printf(" serial %5u flight %5u ground_accel %6d ground_pres %9u",
+						printf(" serial %5u flight %5u ground_accel %6d ground_pres %9u kPa  %7.1f  %7.1f m",
 						       eeprom->serial_number,
 						       log_mega->u.flight.flight,
 						       log_mega->u.flight.ground_accel,
-						       log_mega->u.flight.ground_pres);
+						       log_mega->u.flight.ground_pres,
+						       log_mega->u.flight.ground_pres / 1000.0,
+						       ao_pressure_to_altitude(log_mega->u.flight.ground_pres));
+
 						printf(" along %6d aross %6d through %6d",
 						       log_mega->u.flight.ground_accel_along,
 						       log_mega->u.flight.ground_accel_across,
@@ -513,10 +516,12 @@ main (int argc, char **argv)
 					log_mini = (struct ao_log_mini *) &eeprom->data[pos];
 					switch (log_mini->type) {
 					case AO_LOG_FLIGHT:
-						printf(" serial %5u flight %5u ground_pres %9u",
+						printf(" serial %5u flight %5u ground_pres %9u kPa  %7.1f  %7.1f m",
 						       eeprom->serial_number,
 						       log_mini->u.flight.flight,
-						       log_mini->u.flight.ground_pres);
+						       log_mini->u.flight.ground_pres,
+						       log_mini->u.flight.ground_pres / 1000.0,
+						       ao_pressure_to_altitude(log_mini->u.flight.ground_pres));
 						break;
 					case AO_LOG_STATE:
 						ao_state(log_mini->u.state.state,
@@ -542,11 +547,13 @@ main (int argc, char **argv)
 					log_metrum = (struct ao_log_metrum *) &eeprom->data[pos];
 					switch (log_metrum->type) {
 					case AO_LOG_FLIGHT:
-						printf(" serial %5u flight %5u ground_accel %6d ground_pres %9u ground_temp %9u",
+						printf(" serial %5u flight %5u ground_accel %6d ground_pres %9u kPa  %7.1f  %7.1f m ground_temp %9u",
 						       eeprom->serial_number,
 						       log_metrum->u.flight.flight,
 						       log_metrum->u.flight.ground_accel,
 						       log_metrum->u.flight.ground_pres,
+						       log_metrum->u.flight.ground_pres / 1000.0,
+						       ao_pressure_to_altitude(log_metrum->u.flight.ground_pres),
 						       log_metrum->u.flight.ground_temp);
 						break;
 					case AO_LOG_SENSOR:
