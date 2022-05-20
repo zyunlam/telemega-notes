@@ -128,11 +128,11 @@ struct ao_adc {
 #define AO_IGNITER_CLOSED	400
 #define AO_IGNITER_OPEN		60
 
-#define AO_IGNITER_DROGUE_PORT	0
-#define AO_IGNITER_DROGUE_PIN	2
+#define AO_IGNITER_DROGUE_PORT	1
+#define AO_IGNITER_DROGUE_PIN	25
 
 #define AO_IGNITER_MAIN_PORT	0
-#define AO_IGNITER_MAIN_PIN	3
+#define AO_IGNITER_MAIN_PIN	2
 
 #define AO_SENSE_DROGUE(p)	((p)->adc.sense_a)
 #define AO_SENSE_MAIN(p)	((p)->adc.sense_m)
