@@ -18,42 +18,49 @@
 
 #include "ao.h"
 
+#ifndef AO_LPC_CT_BEEP
+/* XXX need to adjust this for configurable beeper */
+#define AO_LPC_CT_BEEP 		lpc_ct32b1
+#define AO_LPC_CT_BEEP_CLKCTRL	LPC_SCB_SYSAHBCLKCTRL_CT32B1
+#define AO_LPC_CT_BEEP_EMR	LPC_CT32B_EMR_EMC1
+#endif
+
 void
 ao_beep(uint8_t beep)
 {
 	if (beep == 0) {
-		lpc_ct32b1.tcr = ((0 << LPC_CT32B_TCR_CEN) |
+		AO_LPC_CT_BEEP.tcr = ((0 << LPC_CT32B_TCR_CEN) |
 				  (1 << LPC_CT32B_TCR_CRST));
-		lpc_scb.sysahbclkctrl &= ~(1UL << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
+		lpc_scb.sysahbclkctrl &= ~(1UL << AO_LPC_CT_BEEP_CLKCTRL);
 	} else {
-		lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
+		lpc_scb.sysahbclkctrl |= (1UL << AO_LPC_CT_BEEP_CLKCTRL);
 
 		/* Set prescaler to match cc1111 clocks
 		 */
-		lpc_ct32b1.pr = AO_LPC_SYSCLK / 750000 - 1;
+		AO_LPC_CT_BEEP.pr = AO_LPC_SYSCLK / 750000 - 1;
 
 		/* Write the desired data in the match registers */
 
 		/* Reset after two time units */
-		lpc_ct32b1.mr[0] = beep << 1;
+		AO_LPC_CT_BEEP.mr[0] = beep << 1;
 
 		/* PWM width is half of that */
-		lpc_ct32b1.mr[1] = beep;
+		AO_LPC_CT_BEEP.mr[1] = beep;
 
 		/* Flip output 1 on PWM match */
-		lpc_ct32b1.emr = (LPC_CT32B_EMR_EMC_TOGGLE << LPC_CT32B_EMR_EMC1);
+		AO_LPC_CT_BEEP.emr = (LPC_CT32B_EMR_EMC_TOGGLE << AO_LPC_CT_BEEP_EMR);
 
 		/* Reset on match 0 */
-		lpc_ct32b1.mcr = (1 << LPC_CT32B_MCR_MR0R);
+		AO_LPC_CT_BEEP.mcr = (1 << LPC_CT32B_MCR_MR0R);
 
 		/* PWM on match 1 */
-		lpc_ct32b1.pwmc = (1 << LPC_CT32B_PWMC_PWMEN1);
-		
+		AO_LPC_CT_BEEP.pwmc = (1 << LPC_CT32B_PWMC_PWMEN1);
+
 		/* timer mode */
-		lpc_ct32b1.ctcr = 0;
+		AO_LPC_CT_BEEP.ctcr = 0;
 
 		/* And turn the timer on */
-		lpc_ct32b1.tcr = ((1 << LPC_CT32B_TCR_CEN) |
+		AO_LPC_CT_BEEP.tcr = ((1 << LPC_CT32B_TCR_CEN) |
 				  (0 << LPC_CT32B_TCR_CRST));
 	}
 }
@@ -83,6 +90,6 @@ ao_beep_init(void)
 	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
 
 	/* Disable the counter and reset the value */
-	lpc_ct32b1.tcr = ((0 << LPC_CT32B_TCR_CEN) |
+	AO_LPC_CT_BEEP.tcr = ((0 << LPC_CT32B_TCR_CEN) |
 			  (1 << LPC_CT32B_TCR_CRST));
 }
