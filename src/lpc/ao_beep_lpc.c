@@ -18,21 +18,27 @@
 
 #include "ao.h"
 
-#define _cat(a,b) a##b
-#define cat(a,b) _cat(a,b)
+#define _cat2(a,b) a##b
+#define cat2(a,b) _cat2(a,b)
+#define _cat4(a,b,c,d) a##b##c##d
+#define cat4(a,b,c,d) _cat4(a,b,c,d)
+#define _cat8(a,b,c,d,e,f,g,h) a##b##c##d##e##f##g##h
+#define cat8(a,b,c,d,e,f,g,h) _cat8(a,b,c,d,e,f,g,h)
 
 #ifndef AO_LPC_BEEP_TIMER
 #define AO_LPC_BEEP_TIMER 1
 #define AO_LPC_BEEP_CHANNEL 1
+#define AO_LPC_BEEP_PORT	0
+#define AO_LPC_BEEP_PIN		14
 #endif
 
-#ifndef AO_LPC_CT_BEEP
-#define AO_LPC_CT_BEEP 		cat(lpc_ct32b, AO_LPC_BEEP_TIMER)
-#define AO_LPC_CT_BEEP_CLKCTRL	cat(LPC_SCB_SYSAHBCLKCTRL_CT32B, AO_LPC_BEEP_TIMER)
-#define AO_LPC_CT_BEEP_EMR	cat(LPC_CT32B_EMR_EMC, AO_LPC_BEEP_CHANNEL)
+#define AO_LPC_CT_BEEP 		cat2(lpc_ct32b, AO_LPC_BEEP_TIMER)
+#define AO_LPC_CT_BEEP_CLKCTRL	cat2(LPC_SCB_SYSAHBCLKCTRL_CT32B, AO_LPC_BEEP_TIMER)
+#define AO_LPC_CT_BEEP_EMR	cat2(LPC_CT32B_EMR_EMC, AO_LPC_BEEP_CHANNEL)
 #define AO_LPC_CT_BEEP_MR	AO_LPC_BEEP_CHANNEL
-#define AO_LPC_CT_BEEP_PWMC	cat(LPC_CT32B_PWMC_PWMEN, AO_LPC_BEEP_CHANNEL)
-#endif
+#define AO_LPC_CT_BEEP_PWMC	cat2(LPC_CT32B_PWMC_PWMEN, AO_LPC_BEEP_CHANNEL)
+#define AO_LPC_CT_BEEP_IOCONF	cat4(pio,AO_LPC_BEEP_PORT,_,AO_LPC_BEEP_PIN)
+#define AO_LPC_CT_BEEP_FUNC	cat8(LPC_IOCONF_FUNC_PIO,AO_LPC_BEEP_PORT,_,AO_LPC_BEEP_PIN,_CT32B,AO_LPC_BEEP_TIMER,_MAT,AO_LPC_BEEP_CHANNEL)
 
 void
 ao_beep(uint8_t beep)
@@ -89,14 +95,14 @@ ao_beep_init(void)
 	 * which is on pin pio0_14
 	 */
 
-	lpc_ioconf.pio0_14 = ((LPC_IOCONF_FUNC_PIO0_14_CT32B1_MAT1 << LPC_IOCONF_FUNC) |
+	lpc_ioconf.AO_LPC_CT_BEEP_IOCONF = ((AO_LPC_CT_BEEP_FUNC << LPC_IOCONF_FUNC) |
 			      (LPC_IOCONF_MODE_INACTIVE << LPC_IOCONF_MODE) |
 			      (0 << LPC_IOCONF_HYS) |
 			      (0 << LPC_IOCONF_INV) |
 			      (1 << LPC_IOCONF_ADMODE) |
 			      (0 << LPC_IOCONF_OD));
 
-	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_CT32B1);
+	lpc_scb.sysahbclkctrl |= (1 << AO_LPC_CT_BEEP_CLKCTRL);
 
 	/* Disable the counter and reset the value */
 	AO_LPC_CT_BEEP.tcr = ((0 << LPC_CT32B_TCR_CEN) |
