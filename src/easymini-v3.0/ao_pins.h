@@ -49,6 +49,8 @@
 /* Beeper */
 #define AO_LPC_BEEP_TIMER	0
 #define AO_LPC_BEEP_CHANNEL	3
+#define AO_LPC_BEEP_PORT	1
+#define AO_LPC_BEEP_PIN		27
 
 /* USART */
 
