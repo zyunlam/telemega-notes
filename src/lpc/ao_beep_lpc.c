@@ -21,7 +21,7 @@
 #define _cat(a,b) a##b
 #define cat(a,b) _cat(a,b)
 
-#ifdef AO_LPC_BEEP_TIMER
+#ifndef AO_LPC_BEEP_TIMER
 #define AO_LPC_BEEP_TIMER 1
 #define AO_LPC_BEEP_CHANNEL 1
 #endif
