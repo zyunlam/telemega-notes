@@ -23,6 +23,8 @@
 #define AO_LPC_CT_BEEP 		lpc_ct32b1
 #define AO_LPC_CT_BEEP_CLKCTRL	LPC_SCB_SYSAHBCLKCTRL_CT32B1
 #define AO_LPC_CT_BEEP_EMR	LPC_CT32B_EMR_EMC1
+#define AO_LPC_CT_BEEP_EM	1
+#define AO_LPC_CT_BEEP_PWMC	LPC_CT32B_PWMC_PWMEN1
 #endif
 
 void
@@ -45,16 +47,16 @@ ao_beep(uint8_t beep)
 		AO_LPC_CT_BEEP.mr[0] = beep << 1;
 
 		/* PWM width is half of that */
-		AO_LPC_CT_BEEP.mr[1] = beep;
+		AO_LPC_CT_BEEP.mr[AO_LPC_CT_BEEP_EM] = beep;
 
-		/* Flip output 1 on PWM match */
+		/* Flip output on PWM match */
 		AO_LPC_CT_BEEP.emr = (LPC_CT32B_EMR_EMC_TOGGLE << AO_LPC_CT_BEEP_EMR);
 
 		/* Reset on match 0 */
 		AO_LPC_CT_BEEP.mcr = (1 << LPC_CT32B_MCR_MR0R);
 
 		/* PWM on match 1 */
-		AO_LPC_CT_BEEP.pwmc = (1 << LPC_CT32B_PWMC_PWMEN1);
+		AO_LPC_CT_BEEP.pwmc = (1 << AO_LPC_CT_BEEP_PWMC);
 
 		/* timer mode */
 		AO_LPC_CT_BEEP.ctcr = 0;
