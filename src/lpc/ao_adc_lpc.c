@@ -79,7 +79,7 @@ static const uint8_t	ao_adc_mask_seq[AO_ADC_NUM] = {
 	1 << 4,
 #endif
 #if AO_ADC_5
-	1 << 6,
+	1 << 5,
 #endif
 #if AO_ADC_6
 	1 << 6,
