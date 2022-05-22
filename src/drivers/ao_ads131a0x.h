@@ -15,47 +15,46 @@
 #ifndef _AO_ADS131A0X_H_
 #define _AO_ADS131A0X_H_
 
-/* control commands */
-#define AO_ADS131A0X_NOP		0x00
-#define AO_ADS131A0X_WAKEUP		0x02
-#define AO_ADS131A0X_POWERDOWN		0x04
-#define AO_ADS131A0X_RESET		0x06
-#define AO_ADS131A0X_START		0x08
-#define AO_ADS131A0X_STOP		0x0a
+/* system commands */
+#define AO_ADS131A0X_NULL		0x0000
+#define AO_ADS131A0X_RESET		0x0011
+#define AO_ADS131A0X_STANDBY		0x0022
+#define AO_ADS131A0X_WAKEUP		0x0033
+#define AO_ADS131A0X_LOCK		0x0555
+#define AO_ADS131A0X_UNLOCK		0x0655
 
-/* calibration commands */
-#define AO_ADS131A0X_SYOCAL		0x16
-#define AO_ADS131A0X_SYGCAL		0x17
-#define AO_ADS131A0X_SFOCAL		0x19
-
-/* data read command */
-#define AO_ADS131A0X_RDATA		0x12
-
-/* register read and write commands */
-#define AO_ADS131A0X_RREG		0x20
-#define AO_ADS131A0X_WREG		0x40
+/* register write and read commands */
+#define AO_ADS131A0X_RREG		0x2000
+#define AO_ADS131A0X_RREGS		0x2000
+#define AO_ADS131A0X_WREG		0x4000
+#define AO_ADS131A0X_WREGS		0x6000
 
 /* configuration register map */
-#define AO_ADS131A0X_ID			0x00
-#define AO_ADS131A0X_ID_ADS131A08		0x00
-#define AO_ADS131A0X_ID_ADS131A06		0x01
-#define AO_ADS131A0X_STATUS		0x01
-#define AO_ADS131A0X_INPMUX		0x02
-#define AO_ADS131A0X_PGA		0x03
-#define AO_ADS131A0X_DATARATE		0x04
-#define AO_ADS131A0X_REF		0x05
-#define AO_ADS131A0X_IDACMAG		0x06
-#define AO_ADS131A0X_IDACMUX		0x07
-#define AO_ADS131A0X_VBIAS		0x08
-#define AO_ADS131A0X_SYS		0x09
-#define AO_ADS131A0X_OFCAL0		0x0a
-#define AO_ADS131A0X_OFCAL1		0x0b
-#define AO_ADS131A0X_OFCAL2		0x0c
-#define AO_ADS131A0X_FSCAL0		0x0d
-#define AO_ADS131A0X_FSCAL1		0x0e
-#define AO_ADS131A0X_FSCAL2		0x0f
-#define AO_ADS131A0X_GPIODAT		0x10
-#define AO_ADS131A0X_GPIOCON		0x11
+
+/* read-only ID registers */
+#define AO_ADS131A0X_ID_MSB		0x00
+#define AO_ADS131A0X_ID_ADS124A02               0x02
+#define AO_ADS131A0X_ID_ADS131A04               0x04
+#define AO_ADS131A0X_ID_LSB		0x01
+
+/* status registers */
+#define AO_ADS131A0X_STAT_1		0x02
+#define AO_ADS131A0X_STAT_P		0x03
+#define AO_ADS131A0X_STAT_N		0x04
+#define AO_ADS131A0X_STAT_S		0x05
+#define AO_ADS131A0X_ERROR_CNT		0x06
+#define AO_ADS131A0X_STAT_M2		0x07
+
+/* user configuration registers */
+#define AO_ADS131A0X_A_SYS_CFG		0x0b
+#define AO_ADS131A0X_D_SYS_CFG		0x0c
+#define AO_ADS131A0X_CLK1		0x0d
+#define AO_ADS131A0X_CLK2		0x0e
+#define AO_ADS131A0X_ADC_ENA		0x0f
+#define AO_ADS131A0X_ADC1		0x11
+#define AO_ADS131A0X_ADC2		0x12
+#define AO_ADS131A0X_ADC3		0x13
+#define AO_ADS131A0X_ADC4		0x14
 
 struct ao_ads131a0x_sample {
 	int32_t	ain[AO_ADS131A0X_CHANNELS];

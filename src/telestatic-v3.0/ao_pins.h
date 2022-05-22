@@ -108,7 +108,7 @@
  * ADS131A0X analog to digital converter
  */
 
-#define HAS_ADS131A0X			0
+#define HAS_ADS131A0X			1
 #define AO_ADS131A0X_SPI_CS_PORT	(&stm_gpioa)
 #define AO_ADS131A0X_SPI_CS_PIN		4
 #define AO_ADS131A0X_SPI_CS_MASK	(1 << AO_ADS131A0X_SPI_CS_PIN)
@@ -120,6 +120,9 @@
 
 #define AO_ADS131A0X_DONE_PORT		(&stm_gpioc)
 #define AO_ADS131A0X_DONE_PIN		14
+
+#define AO_ADS131A0X_RESET_PORT         (&stm_gpiob)
+#define AO_ADS131A0X_RESET_PIN          4
 
 #define AO_ADS131A0X_CHANNELS		4	/* how many inputs in use */
 
