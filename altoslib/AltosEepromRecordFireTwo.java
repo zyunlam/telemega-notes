@@ -47,25 +47,42 @@ public class AltosEepromRecordFireTwo extends AltosEepromRecord {
 
 	public static double adc_to_pa(int adc) {
 
-		/* raw adc to processor voltage, then back through the
-		 * voltage divider to the sensor voltage
-		 */
+		/* 1600psi sensor measured 2019.07.10, these values based on that */
+		double ADC_MIN = 405;
+		double ADC_SLOPE = 2.020;	/* adc counts per psi */
+		double ADC_OFFSET = 14.79;	/* psi at ADC_MIN */
 
-		double	v = firetwo_adc(adc) * v_adc * (r_above + r_below) / r_below;
+//		/* 2500psi sensor measured 2019.04.30, these values based on that */
+//		double ADC_MIN = 392;
+//		double ADC_SLOPE = 0.46;	/* adc counts per psi */
 
-		/* Bound to ranges provided in sensor */
-		if (v < 0.5) v = 0.5;
-		if (v > 4.5) v = 4.5;
+		/* sensor is asserted to be linear 0 - max psi over ADC_MIN to ADC_MAX */
+		double raw = adc;
+		double psi = ((raw - ADC_MIN) / ADC_SLOPE) + ADC_OFFSET;
 
-		double	psi = (v - 0.5) / 4.0 * 2500.0;
 		return AltosConvert.psi_to_pa(psi);
+
 	}
 
 	public static double adc_to_n(int adc) {
-		double v = firetwo_adc(adc);
 
-		/* this is a total guess */
-		return AltosConvert.lb_to_n(v * 298 * 9.807);
+		/* load cell sensor looks linear once it "gets going" */
+
+		/* cal values using 1 metric ton "S" load cell 2020.03.05 */
+		/* lowest useful cal data point in linear region */
+		double ADC_MIN_LBS = 71.4;
+		double ADC_MIN_COUNTS = 153; 
+
+		/* highest useful cal data point in linear region */
+		double ADC_MAX_LBS = 211.4;
+		double ADC_MAX_COUNTS = 313; 
+
+		/* slope of sensor response in ADC counts per lb */
+		double ADC_SLOPE = (ADC_MAX_COUNTS - ADC_MIN_COUNTS) / (ADC_MAX_LBS - ADC_MIN_LBS);
+
+		double raw = adc;
+		double lb = ((raw - ADC_MIN_COUNTS) / ADC_SLOPE) + ADC_MIN_LBS;
+		return AltosConvert.lb_to_n(lb);
 	}
 
 	public void provide_data(AltosDataListener listener, AltosCalData cal_data) {

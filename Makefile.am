@@ -1,4 +1,4 @@
-SUBDIRS=ao-tools src doc icon altoslib libaltos altosuilib altosui micropeak ao-utils altosdroid telegps map-server
+SUBDIRS=ao-tools src doc icon altoslib libaltos altosuilib altosui micropeak ao-utils altosdroid telegps map-server teststand
 
 EXTRA_DIST = ChangeLog
 
@@ -17,6 +17,7 @@ fat-install: fat
 	cd altosui && $(MAKE) fat-install
 	cd telegps && $(MAKE) fat-install
 	cd micropeak && $(MAKE) fat-install
+	cd teststand && $(MAKE) fat-install
 endif
 
 fat:
@@ -29,19 +30,23 @@ fat:
 	cd altosui && $(MAKE) fat
 	cd micropeak && $(MAKE) fat
 	cd telegps && $(MAKE) fat
+	cd teststand && $(MAKE) fat
 
 fat_linux = \
 	altosui/Altos-Linux-$(VERSION).sh altosui/Altos-Linux-$(VERSION).tar.bz2 \
+	teststand/TestStand-Linux-$(VERSION).sh teststand/TestStand-Linux-$(VERSION).tar.bz2 \
 	telegps/TeleGPS-Linux-$(VERSION).sh telegps/TeleGPS-Linux-$(VERSION).tar.bz2 \
 	micropeak/MicroPeak-Linux-$(VERSION).sh micropeak/MicroPeak-Linux-$(VERSION).tar.bz2
 
 fat_mac = \
 	altosui/Altos-Mac-$(VERSION).dmg \
+	teststand/TestStand-Mac-$(VERSION).dmg \
 	telegps/TeleGPS-Mac-$(VERSION).dmg \
 	micropeak/MicroPeak-Mac-$(VERSION).dmg
 
 fat_windows = \
 	altosui/Altos-Windows-$(VERSION_DASH).exe \
+	teststand/TestStand-Windows-$(VERSION_DASH).exe \
 	telegps/TeleGPS-Windows-$(VERSION_DASH).exe \
 	micropeak/MicroPeak-Windows-$(VERSION_DASH).exe
 

@@ -183,40 +183,46 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_basic_header() {
-		if (has_accel)
-			out.printf("acceleration,");
-		if (has_baro)
-			out.printf("pressure,altitude,");
-		out.printf("height,speed");
-		if (has_baro)
-			out.printf(",temperature");
-		if (has_pyro)
-			out.printf(",drogue_voltage,main_voltage");
+		/* presence of thrust data means this is a test stand */
+		if (has_thrust)
+			out.printf("pressure,thrust");
+		else {
+			if (has_accel)
+				out.printf("acceleration,");
+			if (has_baro)
+				out.printf("pressure,altitude,");
+			out.printf("height,speed");
+			if (has_baro)
+				out.printf(",temperature");
+			if (has_pyro)
+				out.printf(",drogue_voltage,main_voltage");
+		}
 	}
 
-	double acceleration() { return series.value(AltosFlightSeries.accel_name, indices); }
 	double pressure() { return series.value(AltosFlightSeries.pressure_name, indices); }
-	double altitude() { return series.value(AltosFlightSeries.altitude_name, indices); }
-	double height() { return series.value(AltosFlightSeries.height_name, indices); }
-	double speed() { return series.value(AltosFlightSeries.speed_name, indices); }
-	double temperature() { return series.value(AltosFlightSeries.temperature_name, indices); }
-	double apogee_voltage() { return series.value(AltosFlightSeries.apogee_voltage_name, indices); }
-	double main_voltage() { return series.value(AltosFlightSeries.main_voltage_name, indices); }
+	double thrust() { return series.value(AltosFlightSeries.thrust_name, indices); }
 
 	void write_basic() {
-		if (has_accel)
-			out.printf("%8.2f,", acceleration());
-		if (has_baro)
-			out.printf("%10.2f,%8.2f,",
-				   pressure(), altitude());
-		out.printf("%8.2f,%8.2f",
-			   height(), speed());
-		if (has_baro)
-			out.printf(",%5.1f", temperature());
-		if (has_pyro)
-			out.printf(",%5.2f,%5.2f",
-				   apogee_voltage(),
-				   main_voltage());
+		/* presence of thrust data means this is a test stand */
+		if (has_thrust)
+			out.printf("%10.2f,%10.2f", 
+				pressure(), 
+				thrust());
+		else {
+			if (has_accel)
+				out.printf("%8.2f,", acceleration());
+			if (has_baro)
+				out.printf("%10.2f,%8.2f,",
+				   	pressure(), altitude());
+			out.printf("%8.2f,%8.2f",
+			   	height(), speed());
+			if (has_baro)
+				out.printf(",%5.1f", temperature());
+			if (has_pyro)
+				out.printf(",%5.2f,%5.2f",
+				   	apogee_voltage(),
+				   	main_voltage());
+		}
 	}
 
 	void write_battery_header() {
@@ -528,6 +534,10 @@ public class AltosCSV implements AltosWriter {
 			has_basic = true;
 			has_accel = true;
 		}
+
+		if (series.has_series(AltosFlightSeries.thrust_name)) 
+			has_thrust = true;
+
 		if (series.has_series(AltosFlightSeries.pressure_name)) {
 			has_basic = true;
 			has_baro = true;
