@@ -113,8 +113,6 @@
 #define AO_ADS131A0X_SPI_CS_PIN		15
 #define AO_ADS131A0X_SPI_CS_MASK	(1 << AO_ADS131A0X_SPI_CS_PIN)
 #define AO_ADS131A0X_SPI_BUS		(AO_SPI_1_PE13_PE14_PE15 | AO_SPI_MODE_1)
-#define AO_ADS131A0X_SPI_SPEED		AO_SPI_SPEED_8MHz
-
 #define AO_ADS131A0X_DRDY_PORT		(&stm_gpiob)
 #define AO_ADS131A0X_DRDY_PIN		10
 
@@ -240,7 +238,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p)							\
-	printf ("tick: %5u 0: %5d pyro: %5d batt %5d\n", \
+	printf ("tick: %5lu 0: %5d pyro: %5d batt %5d\n", \
 		(p)->tick,						\
 		(p)->adc.sense[0],					\
 		(p)->adc.pyro,						\

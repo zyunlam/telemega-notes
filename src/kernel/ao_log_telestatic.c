@@ -76,7 +76,7 @@ ao_log(void)
 			ao_sleep(&ao_log_running);
 	
 		log_data.type = AO_LOG_FLIGHT;
-		log_data.tick = ao_time();
+		log_data.tick = (uint16_t) ao_time();
 		log_data.u.flight.flight = ao_flight_number;
 		ao_log_telestatic();
 
@@ -87,18 +87,20 @@ ao_log(void)
 		for (;;) {
 			/* Write samples to EEPROM */
 			while (ao_log_data_pos != ao_data_head) {
-				log_data.tick = ao_data_ring[ao_log_data_pos].tick;
+				log_data.tick = (uint16_t) ao_data_ring[ao_log_data_pos].tick;
 				log_data.type = AO_LOG_SENSOR;
 #if HAS_ADS131A0X
-				log_data.u.sensor.pressure = ao_data_ring[ao_log_data_pos].ads131a0x.ain[0];
-				log_data.u.sensor.pressure2 = ao_data_ring[ao_log_data_pos].ads131a0x.ain[1];
-				log_data.u.sensor.thrust = ao_data_ring[ao_log_data_pos].ads131a0x.ain[2];
-				log_data.u.sensor.mass = ao_data_ring[ao_log_data_pos].ads131a0x.ain[3];
+				log_data.u.sensor.pressure = (uint32_t) ao_data_ring[ao_log_data_pos].ads131a0x.ain[0];
+				log_data.u.sensor.pressure2 = (uint32_t) ao_data_ring[ao_log_data_pos].ads131a0x.ain[1];
+				log_data.u.sensor.thrust = (uint32_t) ao_data_ring[ao_log_data_pos].ads131a0x.ain[2];
+				log_data.u.sensor.mass = (uint32_t) ao_data_ring[ao_log_data_pos].ads131a0x.ain[3];
 #endif
-				log_data.u.sensor.t_low = ao_data_ring[ao_log_data_pos].max6691.sensor[0].t_low;
+#ifdef HAS_MAX6691
+				log_data.u.sensor.t_low = (uint32_t) ao_data_ring[ao_log_data_pos].max6691.sensor[0].t_low;
 				int i;
 				for (i = 0; i < 4; i++)
-					log_data.u.sensor.t_high[i] = ao_data_ring[ao_log_data_pos].max6691.sensor[i].t_high;
+					log_data.u.sensor.t_high[i] = (uint32_t) ao_data_ring[ao_log_data_pos].max6691.sensor[i].t_high;
+#endif
 				ao_log_telestatic();
 				ao_log_data_pos = ao_data_ring_next(ao_log_data_pos);
 			}

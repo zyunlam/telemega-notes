@@ -55,8 +55,7 @@ ALTOS_SRC = \
 	ao_radio_cmac_cmd.c \
 	ao_log.c \
 	ao_log_telestatic.c \
-	ao_ads131a0x.c \
-	ao_max6691.c
+	ao_ads131a0x.c 
 
 PRODUCT_SRC = \
 	ao_telestatic.c

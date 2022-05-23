@@ -16,6 +16,8 @@
 #include <ao_exti.h>
 #include "ao_ads131a0x.h"
 
+#define AO_ADS131A0X_SPI_SPEED ao_spi_speed(8000000)
+
 #define DEBUG_LOW	1
 #define DEBUG_HIGH	2
 
@@ -265,7 +267,7 @@ ao_ads131a0x_dump(void)
 		ao_add_task(&ao_ads131a0x_task, ao_ads131a0x, "ads131a0x");
 	}
 		
-	printf ("ADS131A0X value %8x %8x %8x %8x\n",
+	printf ("ADS131A0X value %8lx %8lx %8lx %8lx\n",
 		ao_ads131a0x_current.ain[0],
 		ao_ads131a0x_current.ain[1],
 		ao_ads131a0x_current.ain[2],
