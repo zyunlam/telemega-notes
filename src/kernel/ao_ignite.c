@@ -82,6 +82,9 @@ ao_igniter_fire(enum ao_igniter igniter, bool wait)
 		ao_ignition[igniter].fired = 1;
 		switch (igniter) {
 		case ao_igniter_drogue:
+			if (wait && ao_config.apogee_delay &&
+			    ao_config.ignite_mode != AO_IGNITE_MODE_MAIN)
+				ao_delay(AO_SEC_TO_TICKS(ao_config.apogee_delay));
 			AO_IGNITER_SET_DROGUE(1);
 			ao_delay(AO_IGNITER_FIRE_TIME);
 			AO_IGNITER_SET_DROGUE(0);

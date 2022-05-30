@@ -32,14 +32,14 @@ ao_pa_get(void)
 {
 	ao_ms5607_sample(&ao_ms5607_current);
 	ao_ms5607_convert(&ao_ms5607_current, &value);
-	pa = value.pres;
+	pa = (uint32_t) value.pres;
 }
 
 static void
 ao_compute_height(void)
 {
-	ground_alt = ao_pa_to_altitude(pa_ground);
-	max_alt = ao_pa_to_altitude(pa_min);
+	ground_alt = ao_pa_to_altitude((pres_t) pa_ground);
+	max_alt = ao_pa_to_altitude((pres_t) pa_min);
 	ao_max_height = max_alt - ground_alt;
 }
 
@@ -73,7 +73,7 @@ main(void)
 	ao_report_altitude();
 	ao_pips();
 	ao_log_micro_dump();
-#if BOOST_DELAY	
+#ifdef BOOST_DELAY
 	ao_delay(BOOST_DELAY);
 #endif
 
@@ -84,7 +84,8 @@ main(void)
 	ao_report_altitude();
 	for (;;) {
 		cli();
-		set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+#pragma GCC diagnostic ignored "-Wconversion"
+		set_sleep_mode((uint8_t) SLEEP_MODE_PWR_DOWN);
 		sleep_mode();
 	}
 }

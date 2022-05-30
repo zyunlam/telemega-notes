@@ -186,7 +186,7 @@ static uint16_t sysCRC16(const uint8_t *buffer, uint8_t length, uint16_t crc)
 
         for (bit = 0; bit < 8; ++bit)
         {
-            crc ^= (value & 0x01);
+	    crc = (uint16_t) (crc ^ (value & 0x01));
             crc = ( crc & 0x01 ) ? ( crc >> 1 ) ^ 0x8408 : ( crc >> 1 );
             value = value >> 1;
         } // END for
@@ -282,7 +282,7 @@ tncSetCallsign(void)
 		TNC_AX25_HEADER[TNC_CALLSIGN_OFF + i] = ' ' << 1;
 
 	/* Fill in the SSID with the low digit of the serial number */
-	TNC_AX25_HEADER[TNC_SSID_OFF] = 0x60 | ((ao_config.aprs_ssid & 0xf) << 1);
+	TNC_AX25_HEADER[TNC_SSID_OFF] = (uint8_t) (0x60 | ((ao_config.aprs_ssid & 0xf) << 1));
 #endif
 }
 
@@ -490,7 +490,7 @@ static void tnc1200TimerTick()
 static void tncCompressInt(uint8_t *dest, int32_t value, int len) {
 	int i;
 	for (i = len - 1; i >= 0; i--) {
-		dest[i] = value % 91 + 33;
+		dest[i] = (uint8_t) (value % 91 + 33);
 		value /= 91;
 	}
 }
@@ -611,7 +611,7 @@ fixed23_mul(uint32_t x, uint32_t y)
 static inline uint32_t
 fixed30_mul(uint32_t x, uint32_t y)
 {
-	return ((uint64_t) x * y + fixed30_half) >> 30;
+	return (uint32_t) (((uint64_t) x * y + fixed30_half) >> 30);
 }
 
 /*
@@ -620,14 +620,17 @@ fixed30_mul(uint32_t x, uint32_t y)
  */
 
 static uint32_t
-ao_fixed_log2(uint32_t x)
+ao_fixed_log2(int32_t ix)
 {
 	uint32_t	result;
 	uint32_t	frac = fixed23_one;
+	uint32_t	x;
 
 	/* Bounds check for sanity */
-	if (x <= 0)
+	if (ix <= 0)
 		return 0;
+
+	x = (uint32_t) ix;
 
 	if (x >= fixed30_one)
 		return 0xffffffff;
@@ -693,16 +696,16 @@ ao_fixed_log2(uint32_t x)
 #define APRS_LOG_CONVERT	fixed23_real(1.714065192056127)
 #define APRS_LOG_BASE		fixed23_real(346.920048461100941)
 
-static int
+static int32_t
 ao_aprs_encode_altitude(int meters)
 {
-	return fixed23_floor(fixed23_mul(ao_fixed_log2(meters) + APRS_LOG_CONVERT, APRS_LOG_BASE) + fixed23_half);
+	return (int32_t) fixed23_floor(fixed23_mul(ao_fixed_log2(meters) + APRS_LOG_CONVERT, APRS_LOG_BASE) + fixed23_half);
 }
 
 /**
  *   Generate the plain text position packet.
  */
-static int tncPositionPacket(void)
+static uint8_t tncPositionPacket(void)
 {
     static int32_t	latitude;
     static int32_t	longitude;
@@ -736,8 +739,8 @@ static int tncPositionPacket(void)
 	    /* Symbol table ID */
 	    *buf++ = '/';
 
-	    lat = ((uint64_t) 380926 * (900000000 - latitude)) / 10000000;
-	    lon = ((uint64_t) 190463 * (1800000000 + longitude)) / 10000000;
+	    lat = (int32_t) (((int64_t) 380926 * (900000000 - latitude)) / 10000000);
+	    lon = (int32_t) (((int64_t) 190463 * (1800000000 + longitude)) / 10000000);
 
 	    alt = ao_aprs_encode_altitude(altitude);
 
@@ -787,19 +790,19 @@ static int tncPositionPacket(void)
 	    if (lon > 1800000000)
 		    lon = 1800000000;
 
-	    lat_deg = lat / 10000000;
+	    lat_deg = (uint16_t) (lat / 10000000);
 	    lat -= lat_deg * 10000000;
 	    lat *= 60;
-	    lat_min = lat / 10000000;
+	    lat_min = (uint16_t) (lat / 10000000);
 	    lat -= lat_min * 10000000;
-	    lat_frac = lat / 100000;
+	    lat_frac = (uint16_t) (lat / 100000);
 
-	    lon_deg = lon / 10000000;
+	    lon_deg = (uint16_t) (lon / 10000000);
 	    lon -= lon_deg * 10000000;
 	    lon *= 60;
-	    lon_min = lon / 10000000;
+	    lon_min = (uint16_t) (lon / 10000000);
 	    lon -= lon_min * 10000000;
-	    lon_frac = lon / 100000;
+	    lon_frac = (uint16_t) (lon / 100000);
 
 	    /* Convert from meters to feet */
 	    alt = (alt * 328 + 50) / 100;
@@ -814,7 +817,7 @@ static int tncPositionPacket(void)
 
     buf += tncComment(buf);
 
-    return buf - tncBuffer;
+    return (uint8_t) (buf - tncBuffer);
 }
 
 static int16_t
@@ -827,7 +830,7 @@ tncFill(uint8_t *buf, int16_t len)
     while (tncMode != TNC_TX_READY && l < len) {
 	b = 0;
 	for (bit = 0; bit < 8; bit++) {
-	    b = b << 1 | (timeNCO >> 15);
+	    b = (uint8_t) (b << 1 | (timeNCO >> 15));
 	    timeNCO += timeNCOFreq;
 	}
 	*buf++ = b;
@@ -860,8 +863,8 @@ void ao_aprs_send(void)
     crc = sysCRC16(tncBuffer, tncLength, crc ^ 0xffff);
 
     // Save the CRC in the message.
-    tncBuffer[tncLength++] = crc & 0xff;
-    tncBuffer[tncLength++] = (crc >> 8) & 0xff;
+    tncBuffer[tncLength++] = (uint8_t) (crc & 0xff);
+    tncBuffer[tncLength++] = (uint8_t) ((crc >> 8) & 0xff);
 
     // Prepare the variables that are used in the real-time clock interrupt.
     tncBitCount = 0;

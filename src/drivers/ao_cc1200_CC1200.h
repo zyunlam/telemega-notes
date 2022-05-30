@@ -55,7 +55,7 @@
         CC1200_AGC_REF,                      0x27,       /* AGC Reference Level Configuration */
         CC1200_AGC_CS_THR,                   0xec,       /* Carrier Sense Threshold Configuration */
 	CC1200_AGC_GAIN_ADJUST,				 /* RSSI adjustment */
-		AO_CC1200_AGC_GAIN_ADJUST,
+		(uint16_t) AO_CC1200_AGC_GAIN_ADJUST,
         CC1200_AGC_CFG1,                     0x51,       /* Automatic Gain Control Configuration Reg. 1 */
         CC1200_AGC_CFG0,                     0x87,       /* Automatic Gain Control Configuration Reg. 0 */
         CC1200_FIFO_CFG,                     0x40,       /* FIFO Configuration */

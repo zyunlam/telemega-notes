@@ -30,7 +30,7 @@ static struct lpc_ssp * const ao_lpc_ssp[LPC_NUM_SPI] = { &lpc_ssp0, &lpc_ssp1 }
 			while ((lpc_ssp->sr & (1 << LPC_SSP_SR_RNE)) == 0) \
 				;					\
 			/* receive a byte */				\
-			get lpc_ssp->dr;				\
+			get (uint8_t) lpc_ssp->dr;			\
 		}							\
 		/* Wait for the SSP to go idle (it already should be) */ \
 		while (lpc_ssp->sr & (1 << LPC_SSP_SR_BSY));		\
@@ -147,7 +147,7 @@ ao_spi_init(void)
 	lpc_scb.ssp0clkdiv = 1;
 
 	/* Reset the device */
-	lpc_scb.presetctrl &= ~(1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
+	lpc_scb.presetctrl &= ~(1UL << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	ao_spi_channel_init(0);
 #endif
@@ -197,7 +197,7 @@ ao_spi_init(void)
 	lpc_scb.ssp1clkdiv = 1;
 
 	/* Reset the device */
-	lpc_scb.presetctrl &= ~(1 << LPC_SCB_PRESETCTRL_SSP1_RST_N);
+	lpc_scb.presetctrl &= ~(1UL << LPC_SCB_PRESETCTRL_SSP1_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP1_RST_N);
 	ao_spi_channel_init(1);
 #endif /* HAS_SPI_1 */

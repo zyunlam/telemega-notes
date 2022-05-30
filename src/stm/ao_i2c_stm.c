@@ -132,17 +132,17 @@ ao_i2c_ev_isr(uint8_t index)
 	if (sr1 & (1 << STM_I2C_SR1_SB))
 		stm_i2c->dr = ao_i2c_addr[index];
 	if (sr1 & (1 << STM_I2C_SR1_ADDR)) {
-		stm_i2c->cr2 &= ~(1 << STM_I2C_CR2_ITEVTEN);
+		stm_i2c->cr2 &= ~(1UL << STM_I2C_CR2_ITEVTEN);
 		ao_i2c_state[index] = I2C_RUNNING;
 		ao_wakeup(&ao_i2c_state[index]);
 	}
 	if (sr1 & (1 << STM_I2C_SR1_BTF)) {
-		stm_i2c->cr2 &= ~(1 << STM_I2C_CR2_ITEVTEN);
+		stm_i2c->cr2 &= ~(1UL << STM_I2C_CR2_ITEVTEN);
 		ao_wakeup(&ao_i2c_state[index]);
 	}
 	if (sr1 & (1 << STM_I2C_SR1_RXNE)) {
 		if (ao_i2c_recv_len[index]) {
-			*(ao_i2c_recv_data[index]++) = stm_i2c->dr;
+			*(ao_i2c_recv_data[index]++) = (uint8_t) stm_i2c->dr;
 			if (!--ao_i2c_recv_len[index])
 				ao_wakeup(&ao_i2c_recv_len[index]);
 		}
@@ -161,7 +161,7 @@ ao_i2c_er_isr(uint8_t index)
 	sr1 = stm_i2c->sr1;
 	if (sr1 & (1 << STM_I2C_SR1_AF)) {
 		ao_i2c_state[index] = I2C_ERROR;
-		stm_i2c->sr1 = sr1 & ~(1 << STM_I2C_SR1_AF);
+		stm_i2c->sr1 = sr1 & ~(1UL << STM_I2C_SR1_AF);
 		ao_wakeup(&ao_i2c_state[index]);
 	}
 }

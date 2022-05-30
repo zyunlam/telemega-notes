@@ -105,10 +105,11 @@ public class DeviceListActivity extends Activity {
 		// If there are paired devices, add each one to the ArrayAdapter
 		if (pairedDevices.size() > 0) {
 			findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
-			for (BluetoothDevice device : pairedDevices)
-				if (device.getName().startsWith("TeleBT"))
-					mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-
+			for (BluetoothDevice device : pairedDevices) {
+				String name = device.getName();
+				if (name != null && name.startsWith("TeleBT"))
+					mPairedDevicesArrayAdapter.add(name + "\n" + device.getAddress());
+			}
 		} else {
 			String noDevices = getResources().getText(R.string.none_paired).toString();
 			mPairedDevicesArrayAdapter.add(noDevices);
@@ -205,7 +206,7 @@ public class DeviceListActivity extends Activity {
 				{
 					String	name = device.getName();
 					if (name != null && name.startsWith("TeleBT"))
-						mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+						mNewDevicesArrayAdapter.add(name + "\n" + device.getAddress());
 				}
 
 			/* When discovery is finished, change the Activity title

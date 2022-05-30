@@ -40,9 +40,9 @@ ao_beep(uint8_t beep)
 {
 	if (beep == 0) {
 		stm_beeper.cr1 = 0;
-		stm_rcc.apb1enr &= ~(1 << RCC_BEEPER);
+		stm_rcc.apb1enr &= ~(1UL << RCC_BEEPER);
 	} else {
-		stm_rcc.apb1enr |= (1 << RCC_BEEPER);
+		stm_rcc.apb1enr |= (1UL << RCC_BEEPER);
 
 		stm_beeper.cr2 = ((0 << STM_TIM234_CR2_TI1S) |
 				(STM_TIM234_CR2_MMS_RESET << STM_TIM234_CR2_MMS) |
@@ -162,5 +162,5 @@ ao_beep_init(void)
 	stm_afr_set(BEEPER_PORT, BEEPER_PIN, BEEPER_AFR);
 
 	/* Leave the timer off until requested */
-	stm_rcc.apb1enr &= ~(1 << RCC_BEEPER);
+	stm_rcc.apb1enr &= ~(1UL << RCC_BEEPER);
 }

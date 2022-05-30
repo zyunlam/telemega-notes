@@ -83,6 +83,9 @@ public class AltosConfigData {
 	/* HAS_BEEP */
 	public int		beep;
 
+	/* HAS_RADIO_10MW */
+	public int		radio_10mw;
+
 	/* Storage info replies */
 	public int	storage_size;
 	public int	storage_erase_unit;
@@ -315,6 +318,8 @@ public class AltosConfigData {
 
 		beep = AltosLib.MISSING;
 
+		radio_10mw = AltosLib.MISSING;
+
 		tracker_motion = AltosLib.MISSING;
 		tracker_interval = AltosLib.MISSING;
 
@@ -504,6 +509,9 @@ public class AltosConfigData {
 
 		/* HAS_BEEP */
 		try { beep = get_int(line, "Beeper setting:"); } catch (Exception e) {}
+
+		/* HAS_RADIO_10MW */
+		try { radio_10mw = get_int(line, "Radio 10mw limit:"); } catch (Exception e) {}
 
 		/* HAS_TRACKER */
 		try {
@@ -730,6 +738,11 @@ public class AltosConfigData {
 		/* HAS_BEEP */
 		if (beep != AltosLib.MISSING)
 			beep = source.beep();
+
+		/* HAS_RADIO_10MW */
+		if (radio_10mw != AltosLib.MISSING)
+			radio_10mw = source.radio_10mw();
+
 		/* HAS_TRACKER */
 		if (tracker_motion != AltosLib.MISSING)
 			tracker_motion = source.tracker_motion();
@@ -785,6 +798,7 @@ public class AltosConfigData {
 		dest.set_aprs_format(aprs_format);
 		dest.set_aprs_offset(aprs_offset);
 		dest.set_beep(beep);
+		dest.set_radio_10mw(radio_10mw);
 		dest.set_tracker_motion(tracker_motion);
 		dest.set_tracker_interval(tracker_interval);
 	}
@@ -903,6 +917,10 @@ public class AltosConfigData {
 		/* HAS_BEEP */
 		if (beep != AltosLib.MISSING)
 			link.printf("c b %d\n", beep);
+
+		/* HAS_RADIO_10MW */
+		if (radio_10mw != AltosLib.MISSING)
+			link.printf("c p %d\n", radio_10mw);
 
 		/* HAS_TRACKER */
 		if (tracker_motion != AltosLib.MISSING && tracker_interval != AltosLib.MISSING)

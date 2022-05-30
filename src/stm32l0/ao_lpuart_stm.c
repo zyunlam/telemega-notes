@@ -85,7 +85,7 @@ _ao_lpuart_rx(struct ao_stm_lpuart *lpuart, int is_stdin)
 			}
 #endif
 		} else {
-			lpuart->reg->cr1 &= ~(1 << STM_LPUART_CR1_RXNEIE);
+			lpuart->reg->cr1 &= ~(1UL << STM_LPUART_CR1_RXNEIE);
 		}
 	}
 }
@@ -96,11 +96,11 @@ ao_lpuart_isr(struct ao_stm_lpuart *lpuart, int is_stdin)
 	_ao_lpuart_rx(lpuart, is_stdin);
 
 	if (!_ao_lpuart_tx_start(lpuart))
-		lpuart->reg->cr1 &= ~(1<< STM_LPUART_CR1_TXEIE);
+		lpuart->reg->cr1 &= ~(1UL << STM_LPUART_CR1_TXEIE);
 
 	if (lpuart->reg->isr & (1 << STM_LPUART_ISR_TC)) {
 		lpuart->tx_running = 0;
-		lpuart->reg->cr1 &= ~(1 << STM_LPUART_CR1_TCIE);
+		lpuart->reg->cr1 &= ~(1UL << STM_LPUART_CR1_TCIE);
 		if (lpuart->draining) {
 			lpuart->draining = 0;
 			ao_wakeup(&lpuart->tx_fifo);
@@ -370,6 +370,6 @@ ao_lpuart1_disable(void)
 # endif
 
 	/* Disable LPUART */
-	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_LPUART1EN);
+	stm_rcc.apb1enr &= ~(1UL << STM_RCC_APB1ENR_LPUART1EN);
 }
  

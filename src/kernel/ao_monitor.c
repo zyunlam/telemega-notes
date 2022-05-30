@@ -296,7 +296,7 @@ ao_monitor_enable(void)
 static void
 set_monitor(void)
 {
-	ao_external_monitoring = ao_cmd_hex();
+	ao_external_monitoring = (uint8_t) ao_cmd_hex();
 	ao_wakeup(&ao_external_monitoring);
 	ao_wakeup(&ao_monitor_head);
 	_ao_monitor_adjust();

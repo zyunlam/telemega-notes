@@ -158,7 +158,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: %5u drogue: %5d main: %5d batt: %5d\n", \
+	printf("tick: %5lu drogue: %5d main: %5d batt: %5d\n", \
 	       (p)->tick, \
 	       (p)->adc.sense_a, (p)->adc.sense_m, \
 	       (p)->adc.v_batt);

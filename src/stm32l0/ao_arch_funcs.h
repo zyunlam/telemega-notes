@@ -133,7 +133,7 @@ ao_spi_recv_byte(uint8_t spi_index)
 	stm_spi->dr = 0xff;
 	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
 		;
-	return stm_spi->dr;
+	return (uint8_t) stm_spi->dr;
 }
 
 void

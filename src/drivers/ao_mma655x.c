@@ -89,7 +89,7 @@ ao_mma655x_reg_read(uint8_t addr)
 {
 	uint8_t	d[2];
 	ao_mma655x_start();
-	d[0] = addr | (ao_parity(addr) << 7);
+	d[0] = (uint8_t) (addr | (ao_parity(addr) << 7));
 	d[1] = 0;
 	ao_spi_send(&d, 2, AO_MMA655X_SPI_INDEX);
 	ao_mma655x_restart();
@@ -110,13 +110,11 @@ ao_mma655x_reg_write(uint8_t addr, uint8_t value)
 
 	PRINTD(DEBUG_LOW, "write %x %x\n", addr, value);
 	addr |= (1 << 6);	/* write mode */
-	d[0] = addr | (ao_parity(addr^value) << 7);
+	d[0] = (uint8_t) (addr | (ao_parity(addr^value) << 7));
 	d[1] = value;
 	ao_mma655x_start();
 	ao_spi_send(d, 2, AO_MMA655X_SPI_INDEX);
 	ao_mma655x_stop();
-
-	addr &= ~(1 << 6);
 }
 
 static uint16_t
@@ -143,8 +141,8 @@ ao_mma655x_value(void)
 	PRINTD(DEBUG_LOW, "value RECV %02x %02x\n", d[0], d[1]);
 
 	v = (uint16_t) d[1] << 2;
-	v |= d[0] >> 6;
-	v |= (uint16_t) (d[0] & 3) << 10;
+	v = (uint16_t) (v | (d[0] >> 6));
+	v = (uint16_t) (v | ((d[0] & 3) << 10));
 	return v;
 }
 
@@ -225,7 +223,7 @@ ao_mma655x_setup(void)
 
 		a = ao_mma655x_value();
 
-		st_change = a_st - a;
+		st_change = (int16_t) (a_st - a);
 
 		PRINTD(DEBUG_HIGH, "self test %d normal %d change %d\n", a_st, a, st_change);
 

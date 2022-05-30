@@ -85,15 +85,15 @@ ao_lco_input(void)
 		case AO_EVENT_BUTTON:
 			switch (event.unit) {
 			case AO_BUTTON_BOX:
-				ao_lco_set_box(event.value);
+				ao_lco_set_box((uint16_t) event.value);
 				ao_lco_set_armed(0);
 				break;
 			case AO_BUTTON_ARM:
-				ao_lco_set_armed(event.value);
+				ao_lco_set_armed((uint8_t) event.value);
 				break;
 			case AO_BUTTON_FIRE:
 				if (ao_lco_armed)
-					ao_lco_set_firing(event.value);
+					ao_lco_set_firing((uint8_t) event.value);
 				break;
 			}
 			break;
@@ -114,9 +114,9 @@ ao_lco_main(void)
 	ao_add_task(&ao_lco_input_task, ao_lco_input, "lco input");
 	ao_add_task(&ao_lco_arm_warn_task, ao_lco_arm_warn, "lco arm warn");
 	ao_add_task(&ao_lco_igniter_status_task, ao_lco_igniter_status, "lco igniter status");
-	ao_led_on(~0);
+	ao_led_on((uint16_t) ~0);
 	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
-	ao_led_off(~0);
+	ao_led_off((uint16_t) ~0);
 	ao_lco_monitor();
 }
 
@@ -124,9 +124,9 @@ ao_lco_main(void)
 static void
 ao_lco_set_debug(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status == ao_cmd_success)
-		ao_lco_debug = r;
+		ao_lco_debug = r != 0;
 }
 
 const struct ao_cmds ao_lco_cmds[] = {

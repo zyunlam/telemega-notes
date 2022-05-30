@@ -68,6 +68,7 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 
 	@Override
 	public void onAttach(Context context) {
+		AltosDebug.debug("tab onAttach %s %s\n", tab_name(), this);
 		super.onAttach(context);
 		altos_droid = (AltosDroid) context;
 		altos_droid.registerTab(this);
@@ -75,6 +76,7 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 
 	@Override
 	public void onDetach() {
+		AltosDebug.debug("tab onDetach %s %s\n", tab_name(), this);
 		super.onDetach();
 		altos_droid.unregisterTab(this);
 		altos_droid = null;
@@ -83,13 +85,14 @@ public abstract class AltosDroidTab extends Fragment implements AltosUnitsListen
 	@Override
 	public void onResume() {
 		super.onResume();
-		AltosDebug.debug("onResume tab %s\n", tab_name());
+		AltosDebug.debug("onResume tab %s %s\n", tab_name(), this);
 		set_visible(true);
 	}
 
 	public void update_ui(TelemetryState telem_state, AltosState state,
 			      AltosGreatCircle from_receiver, Location receiver, boolean is_current)
 	{
+		AltosDebug.debug("update_ui %s is_current %b\n", tab_name(), is_current);
 		last_telem_state = telem_state;
 		last_state = state;
 		last_from_receiver = from_receiver;

@@ -154,7 +154,7 @@
 #define AO_ADC_RING		32
 
 struct ao_adc {
-	uint16_t		tick;
+	AO_TICK_TYPE		tick;
 	int16_t			idd;
 	int16_t			temp;
 	int16_t			vref;

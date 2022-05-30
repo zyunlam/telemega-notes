@@ -26,9 +26,9 @@ void
 ao_log_gps_flight(void);
 
 void
-ao_log_gps_data(uint16_t tick, struct ao_telemetry_location *gps_data);
+ao_log_gps_data(AO_TICK_TYPE tick, struct ao_telemetry_location *gps_data);
 
 void
-ao_log_gps_tracking(uint16_t tick, struct ao_telemetry_satellite *gps_tracking_data);
+ao_log_gps_tracking(AO_TICK_TYPE tick, struct ao_telemetry_satellite *gps_tracking_data);
 
 #endif /* _AO_LOG_GPS_H_ */

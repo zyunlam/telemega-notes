@@ -76,7 +76,7 @@ static uint32_t	iap_in[5], iap_out[5];
 static uint32_t
 ao_lpc_addr_to_sector(uint8_t *addr)
 {
-	uint32_t	off = addr - LPC_FLASH_BASE;
+	uint32_t	off = (uint32_t) (addr - LPC_FLASH_BASE);
 
 	return off >> LPC_FLASH_SECTOR_SHIFT;
 }
@@ -84,7 +84,7 @@ ao_lpc_addr_to_sector(uint8_t *addr)
 static uint8_t
 ao_lpc_addr_is_sector_aligned(uint8_t *addr)
 {
-	uint32_t	off = addr - LPC_FLASH_BASE;
+	uint32_t	off = (uint32_t) (addr - LPC_FLASH_BASE);
 	return		(off & LPC_FLASH_SECTOR_MASK) == 0;
 }
 

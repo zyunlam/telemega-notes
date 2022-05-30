@@ -60,6 +60,11 @@
 #define AO_CONFIG_MAJOR	1
 #define AO_CONFIG_MINOR	25
 
+/* All cc1200 devices support limiting TX power to 10mW */
+#if !defined(HAS_RADIO_10MW) && defined(AO_CC1200_SPI)
+#define HAS_RADIO_10MW 1
+#endif
+
 #define AO_AES_LEN 16
 
 extern uint8_t ao_config_aes_seq;
@@ -125,6 +130,9 @@ struct ao_config {
 #endif
 #if HAS_APRS
 	uint8_t		aprs_offset;		/* minor version 24 */
+#endif
+#if HAS_RADIO_10MW
+	uint8_t		radio_10mw;		/* minor version 25 */
 #endif
 };
 

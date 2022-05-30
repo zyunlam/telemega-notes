@@ -25,9 +25,9 @@ static inline uint32_t ao_profile_tick(void) {
 	uint16_t	hi, lo, second_hi;
 
 	do {
-		hi = stm_tim2.cnt;
-		lo = stm_tim4.cnt;
-		second_hi = stm_tim2.cnt;
+		hi = (uint16_t) stm_tim2.cnt;
+		lo = (uint16_t) stm_tim4.cnt;
+		second_hi = (uint16_t) stm_tim2.cnt;
 	} while (hi != second_hi);
 	return ((uint32_t) hi << 16) | lo;
 }

@@ -39,7 +39,7 @@ ao_storage_read(ao_pos_t pos, void *v_buf, uint16_t len)
 		/* Compute portion of transfer within
 		 * a single block
 		 */
-		this_off = (uint16_t) pos & (ao_storage_unit - 1);
+		this_off = (uint16_t) (pos & (ao_storage_unit - 1));
 		this_len = ao_storage_unit - this_off;
 		if (this_len > len)
 			this_len = len;
@@ -70,7 +70,7 @@ ao_storage_write(ao_pos_t pos, void *v_buf, uint16_t len)
 		/* Compute portion of transfer within
 		 * a single block
 		 */
-		this_off = (uint16_t) pos & (ao_storage_unit - 1);
+		this_off = (uint16_t) (pos & (ao_storage_unit - 1));
 		this_len = ao_storage_unit - this_off;
 		if (this_len > len)
 			this_len = len;
@@ -102,7 +102,7 @@ ao_storage_is_erased(uint32_t pos)
 		uint32_t this_time = AO_STORAGE_DATA_SIZE;
 		if (this_time > read_len)
 			this_time = read_len;
-		if (!ao_storage_read(read_pos, storage_data, this_time)) {
+		if (!ao_storage_read(read_pos, storage_data, (uint16_t) this_time)) {
 			ret = 0;
 			goto done;
 		}

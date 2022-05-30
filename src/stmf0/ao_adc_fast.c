@@ -89,7 +89,7 @@ ao_adc_init(void)
 
 	/* Reset ADC */
 	stm_rcc.apb2rstr |= (1 << STM_RCC_APB2RSTR_ADCRST);
-	stm_rcc.apb2rstr &= ~(1 << STM_RCC_APB2RSTR_ADCRST);
+	stm_rcc.apb2rstr &= ~(1UL << STM_RCC_APB2RSTR_ADCRST);
 
 	/* Turn on ADC pins */
 	stm_rcc.ahbenr |= AO_ADC_RCC_AHBENR;
@@ -160,11 +160,11 @@ ao_adc_init(void)
 	stm_adc.smpr = STM_ADC_SMPR_SMP_1_5 << STM_ADC_SMPR_SMP;
 
 	/* Turn off enable and start */
-	stm_adc.cr &= ~((1 << STM_ADC_CR_ADEN) | (1 << STM_ADC_CR_ADSTART));
+	stm_adc.cr &= ~((1UL << STM_ADC_CR_ADEN) | (1 << STM_ADC_CR_ADSTART));
 
 	/* Calibrate */
-	stm_adc.cr |= (1 << STM_ADC_CR_ADCAL);
-	while ((stm_adc.cr & (1 << STM_ADC_CR_ADCAL)) != 0)
+	stm_adc.cr |= (1UL << STM_ADC_CR_ADCAL);
+	while ((stm_adc.cr & (1UL << STM_ADC_CR_ADCAL)) != 0)
 		;
 
 	/* Enable */
@@ -197,7 +197,7 @@ ao_adc_init(void)
 	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGCOMPEN);
 
 	/* Set ADC to use DMA channel 1 (option 1) */
-	stm_syscfg.cfgr1 &= ~(1 << STM_SYSCFG_CFGR1_ADC_DMA_RMP);
+	stm_syscfg.cfgr1 &= ~(1UL << STM_SYSCFG_CFGR1_ADC_DMA_RMP);
 
 	ao_dma_alloc(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
 }

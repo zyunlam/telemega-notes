@@ -178,7 +178,7 @@ ao_adc_init(void)
 
 	/* Reset ADC */
 	stm_rcc.apb2rstr |= (1 << STM_RCC_APB2RSTR_ADCRST);
-	stm_rcc.apb2rstr &= ~(1 << STM_RCC_APB2RSTR_ADCRST);
+	stm_rcc.apb2rstr &= ~(1UL << STM_RCC_APB2RSTR_ADCRST);
 
 	/* Turn on ADC pins */
 	stm_rcc.ahbenr |= AO_ADC_RCC_AHBENR;
@@ -251,8 +251,8 @@ ao_adc_init(void)
 #endif
 
 	/* Wait for ADC to be idle */
-	while (stm_adc.cr & ((1 << STM_ADC_CR_ADCAL) |
-			     (1 << STM_ADC_CR_ADDIS)))
+	while (stm_adc.cr & ((1UL << STM_ADC_CR_ADCAL) |
+			     (1UL << STM_ADC_CR_ADDIS)))
 		;
 
 	/* Disable */
@@ -263,10 +263,10 @@ ao_adc_init(void)
 	}
 
 	/* Turn off everything */
-	stm_adc.cr &= ~((1 << STM_ADC_CR_ADCAL) |
-			(1 << STM_ADC_CR_ADSTP) |
-			(1 << STM_ADC_CR_ADSTART) |
-			(1 << STM_ADC_CR_ADEN));
+	stm_adc.cr &= ~((1UL << STM_ADC_CR_ADCAL) |
+			(1UL << STM_ADC_CR_ADSTP) |
+			(1UL << STM_ADC_CR_ADSTART) |
+			(1UL << STM_ADC_CR_ADEN));
 
 	/* Configure */
 	stm_adc.cfgr1 = ((0 << STM_ADC_CFGR1_AWDCH) |				  /* analog watchdog channel 0 */
@@ -297,8 +297,8 @@ ao_adc_init(void)
 		       (0 << STM_ADC_CCR_VREFEN));
 
 	/* Calibrate */
-	stm_adc.cr |= (1 << STM_ADC_CR_ADCAL);
-	while ((stm_adc.cr & (1 << STM_ADC_CR_ADCAL)) != 0)
+	stm_adc.cr |= (1UL << STM_ADC_CR_ADCAL);
+	while ((stm_adc.cr & (1UL << STM_ADC_CR_ADCAL)) != 0)
 		;
 
 	/* Enable */
@@ -313,7 +313,7 @@ ao_adc_init(void)
 	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_SYSCFGCOMPEN);
 
 	/* Set ADC to use DMA channel 1 (option 1) */
-	stm_syscfg.cfgr1 &= ~(1 << STM_SYSCFG_CFGR1_ADC_DMA_RMP);
+	stm_syscfg.cfgr1 &= ~(1UL << STM_SYSCFG_CFGR1_ADC_DMA_RMP);
 
 	ao_dma_alloc(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC_1));
 

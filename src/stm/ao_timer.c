@@ -69,7 +69,7 @@ void stm_systick_isr(void)
 #endif
 		ao_task_check_alarm();
 #if AO_DATA_ALL
-		if (++ao_data_count == ao_data_interval) {
+		if (++ao_data_count == ao_data_interval && ao_data_interval) {
 			ao_data_count = 0;
 #if HAS_FAKE_FLIGHT
 			if (ao_fake_flight_active)
@@ -109,7 +109,7 @@ ao_timer_init(void)
 	stm_systick.csr = ((1 << STM_SYSTICK_CSR_ENABLE) |
 			   (1 << STM_SYSTICK_CSR_TICKINT) |
 			   (STM_SYSTICK_CSR_CLKSOURCE_HCLK_8 << STM_SYSTICK_CSR_CLKSOURCE));
-	stm_nvic.shpr15_12 |= AO_STM_NVIC_CLOCK_PRIORITY << 24;
+	stm_nvic.shpr15_12 |= (uint32_t) AO_STM_NVIC_CLOCK_PRIORITY << 24;
 }
 
 #endif
@@ -125,7 +125,7 @@ ao_clock_init(void)
 	while (!(stm_rcc.cr & (1 << STM_RCC_CR_MSIRDY)))
 		ao_arch_nop();
 
-	stm_rcc.cfgr = (stm_rcc.cfgr & ~(STM_RCC_CFGR_SW_MASK << STM_RCC_CFGR_SW)) |
+	stm_rcc.cfgr = (stm_rcc.cfgr & ~(uint32_t) (STM_RCC_CFGR_SW_MASK << STM_RCC_CFGR_SW)) |
 		(STM_RCC_CFGR_SW_MSI << STM_RCC_CFGR_SW);
 
 	/* wait for system to switch to MSI */
@@ -149,7 +149,7 @@ ao_clock_init(void)
 #if AO_HSE_BYPASS
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEBYP);
 #else
-	stm_rcc.cr &= ~(1 << STM_RCC_CR_HSEBYP);
+	stm_rcc.cr &= ~(uint32_t) (1 << STM_RCC_CR_HSEBYP);
 #endif
 	/* Enable HSE clock */
 	stm_rcc.cr |= (1 << STM_RCC_CR_HSEON);
@@ -225,8 +225,8 @@ ao_clock_init(void)
 	stm_rcc.cfgr = cfgr;
 
 	/* Disable the PLL */
-	stm_rcc.cr &= ~(1 << STM_RCC_CR_PLLON);
-	while (stm_rcc.cr & (1 << STM_RCC_CR_PLLRDY))
+	stm_rcc.cr &= ~(1UL << STM_RCC_CR_PLLON);
+	while (stm_rcc.cr & (1UL << STM_RCC_CR_PLLRDY))
 		asm("nop");
 	
 	/* PLLVCO to 96MHz (for USB) -> PLLMUL = 6, PLLDIV = 4 */
@@ -238,7 +238,7 @@ ao_clock_init(void)
 	cfgr |= (AO_RCC_CFGR_PLLDIV << STM_RCC_CFGR_PLLDIV);
 
 	/* PLL source */
-	cfgr &= ~(1 << STM_RCC_CFGR_PLLSRC);
+	cfgr &= ~(1UL << STM_RCC_CFGR_PLLSRC);
 	cfgr |= STM_RCC_CFGR_PLLSRC_TARGET_CLOCK;
 
 	stm_rcc.cfgr = cfgr;

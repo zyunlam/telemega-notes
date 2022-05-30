@@ -35,7 +35,7 @@
 #define ACCEL_TYPE int16_t
 #endif
 
-uint16_t	ao_sample_tick;		/* time of last data */
+AO_TICK_TYPE	ao_sample_tick;		/* time of last data */
 #if HAS_BARO
 pres_t		ao_sample_pres;
 alt_t		ao_sample_alt;
@@ -161,7 +161,7 @@ static void
 ao_sample_set_one_orient(void)
 {
 	ao_sample_orients[ao_sample_orient_pos] = ao_sample_orient;
-	ao_sample_orient_pos = (ao_sample_orient_pos + 1) % AO_NUM_ORIENT;
+	ao_sample_orient_pos = (uint8_t) ((ao_sample_orient_pos + 1) % AO_NUM_ORIENT);
 }
 
 static void
@@ -190,7 +190,7 @@ ao_sample_compute_orient(void)
 	float rotz;
 	rotz = ao_rotation.z * ao_rotation.z - ao_rotation.y * ao_rotation.y - ao_rotation.x * ao_rotation.x + ao_rotation.r * ao_rotation.r;
 
-	ao_sample_orient = acosf(rotz) * (float) (180.0/M_PI);
+	ao_sample_orient = (angle_t) (acosf(rotz) * (float) (180.0/M_PI));
 }
 #endif /* HAS_GYRO */
 
@@ -198,7 +198,7 @@ static void
 ao_sample_preflight_set(void)
 {
 #if HAS_ACCEL
-	ao_ground_accel = ao_sample_accel_sum >> 9;
+	ao_ground_accel = (accel_t) (ao_sample_accel_sum >> 9);
 	ao_sample_accel_sum = 0;
 #endif
 #if HAS_BARO
@@ -207,15 +207,15 @@ ao_sample_preflight_set(void)
 	ao_sample_pres_sum = 0;
 #endif
 #if HAS_IMU
-	ao_ground_accel_along = ao_sample_accel_along_sum >> 9;
-	ao_ground_accel_across = ao_sample_accel_across_sum >> 9;
-	ao_ground_accel_through = ao_sample_accel_through_sum >> 9;
+	ao_ground_accel_along = (accel_t) (ao_sample_accel_along_sum >> 9);
+	ao_ground_accel_across = (accel_t) (ao_sample_accel_across_sum >> 9);
+	ao_ground_accel_through = (accel_t) (ao_sample_accel_through_sum >> 9);
 	ao_sample_accel_along_sum = 0;
 	ao_sample_accel_across_sum = 0;
 	ao_sample_accel_through_sum = 0;
 #endif
 #if HAS_MOTOR_PRESSURE
-	ao_ground_motor_pressure = ao_sample_motor_pressure_sum >> 9;
+	ao_ground_motor_pressure = (motor_pressure_t) (ao_sample_motor_pressure_sum >> 9);
 	ao_sample_motor_pressure_sum = 0;
 #endif
 #if HAS_GYRO
@@ -274,7 +274,7 @@ static void
 ao_sample_rotate(void)
 {
 #ifdef AO_FLIGHT_TEST
-	float	dt = (int16_t) (ao_sample_tick - ao_sample_prev_tick) / TIME_DIV;
+	float	dt = (AO_TICK_SIGNED) (ao_sample_tick - ao_sample_prev_tick) / TIME_DIV;
 #else
 	static const float dt = 1/TIME_DIV;
 #endif

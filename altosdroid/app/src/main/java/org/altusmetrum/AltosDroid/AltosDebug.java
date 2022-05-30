@@ -56,11 +56,14 @@ public class AltosDebug {
 		Log.e(TAG, String.format(format, arguments));
 	}
 
+	static void trace(String format, Object ... arguments) {
+		error(format, arguments);
+		for (StackTraceElement el : Thread.currentThread().getStackTrace())
+			Log.e(TAG, "\t" + el.toString() + "\n");
+	}
+
 	static void check_ui(String format, Object ... arguments) {
-		if (Looper.myLooper() == Looper.getMainLooper()) {
-			Log.e(TAG, String.format("ON UI THREAD " + format, arguments));
-			for (StackTraceElement el : Thread.currentThread().getStackTrace())
-				Log.e(TAG, "\t" + el.toString() + "\n");
-		}
+		if (Looper.myLooper() == Looper.getMainLooper())
+			trace("ON UI THREAD " + format, arguments);
 	}
 }

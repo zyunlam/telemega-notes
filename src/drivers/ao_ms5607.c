@@ -59,17 +59,17 @@ ao_ms5607_crc(uint8_t *prom)
 
 	prom[15] = 0;
 	for (cnt = 0; cnt < 16; cnt++) {
-		n_rem ^= *p++;
+		n_rem ^= (uint16_t) *p++;
 		for (n_bit = 8; n_bit > 0; n_bit--) {
 			if (n_rem & 0x8000)
-				n_rem = (n_rem << 1) ^ 0x3000;
+				n_rem = (uint16_t) ((n_rem << 1) ^ 0x3000U);
 			else
 				n_rem = (n_rem << 1);
 		}
 	}
 	n_rem = (n_rem >> 12) & 0xf;
 	prom[15] = crc_byte;
-	return n_rem;
+	return (uint8_t) n_rem;
 }
 
 static bool

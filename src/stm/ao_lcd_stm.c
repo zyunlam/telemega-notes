@@ -42,14 +42,14 @@ static struct stm_gpio *gpios[] = {
 	&stm_gpioe
 };
 
-static inline int ao_lcd_stm_seg_enabled(int seg) {
+static inline int ao_lcd_stm_seg_enabled(uint32_t seg) {
 	if (seg < 32)
 		return (AO_LCD_STM_SEG_ENABLED_0 >> seg) & 1;
 	else
 		return (AO_LCD_STM_SEG_ENABLED_1 >> (seg - 32)) & 1;
 }
 
-static inline int ao_lcd_stm_com_enabled(int com) {
+static inline int ao_lcd_stm_com_enabled(uint32_t com) {
 	return (AO_LCD_STM_COM_ENABLED >> com) & 1;
 }
 
@@ -294,7 +294,7 @@ ao_lcd_set(uint8_t digit, uint8_t segment, uint8_t value)
 
 #ifdef AO_SEGMENT_MAP
 #if AO_LCD_PER_DIGIT
-	n = digit * AO_LCD_SEGMENTS + segment;
+	n = (uint8_t) (digit * AO_LCD_SEGMENTS + segment);
 	com = ao_lcd_map[n].com;
 	seg = ao_lcd_map[n].seg;
 #else
@@ -315,9 +315,9 @@ ao_lcd_set(uint8_t digit, uint8_t segment, uint8_t value)
 #endif
 	n = (seg >> 5) & 1;
 	if (value)
-		stm_lcd.ram[com * 2 + n] |= (1 << (seg & 0x1f));
+		stm_lcd.ram[com * 2 + n] |= (1UL << (seg & 0x1f));
 	else
-		stm_lcd.ram[com * 2 + n] &= ~(1 << (seg & 0x1f));
+		stm_lcd.ram[com * 2 + n] &= ~(1UL << (seg & 0x1f));
 }
 
 #if LCD_DEBUG
@@ -347,11 +347,11 @@ ao_lcd_stm_init(void)
 	unsigned int s, c;
 	uint32_t	csr;
 
-	stm_rcc.ahbenr |= ((AO_LCD_STM_USES_GPIOA << STM_RCC_AHBENR_GPIOAEN) |
-			   (AO_LCD_STM_USES_GPIOB << STM_RCC_AHBENR_GPIOBEN) |
-			   (AO_LCD_STM_USES_GPIOC << STM_RCC_AHBENR_GPIOCEN) |
-			   (AO_LCD_STM_USES_GPIOD << STM_RCC_AHBENR_GPIODEN) |
-			   (AO_LCD_STM_USES_GPIOE << STM_RCC_AHBENR_GPIOEEN));
+	stm_rcc.ahbenr |= (((uint32_t) AO_LCD_STM_USES_GPIOA << STM_RCC_AHBENR_GPIOAEN) |
+			   ((uint32_t) AO_LCD_STM_USES_GPIOB << STM_RCC_AHBENR_GPIOBEN) |
+			   ((uint32_t) AO_LCD_STM_USES_GPIOC << STM_RCC_AHBENR_GPIOCEN) |
+			   ((uint32_t) AO_LCD_STM_USES_GPIOD << STM_RCC_AHBENR_GPIODEN) |
+			   ((uint32_t) AO_LCD_STM_USES_GPIOE << STM_RCC_AHBENR_GPIOEEN));
 
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_LCDEN);
 

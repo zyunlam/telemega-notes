@@ -33,12 +33,12 @@
  *                             cal_freq
  */
 
-int32_t ao_freq_to_set(int32_t target_freq, int32_t cal_value)
+uint32_t ao_freq_to_set(uint32_t target_freq, uint32_t cal_value)
 {
-	int64_t	prod = (int64_t) target_freq * (int64_t) cal_value;
+	uint64_t	prod = (uint64_t) target_freq * (uint64_t) cal_value;
 
 	/* Round to nearest */
-	int32_t target_value = (prod + (434550 / 2)) / 434550;
+	uint32_t target_value = (uint32_t) ((prod + (434550U / 2U)) / 434550U);
 
 	return target_value;
 }

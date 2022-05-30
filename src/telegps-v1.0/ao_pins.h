@@ -143,7 +143,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p) \
-	printf("tick: %5u batt: %5d\n", \
+	printf("tick: %5lu batt: %5d\n", \
 	       (p)->tick, \
 	       (p)->adc.v_batt)
 

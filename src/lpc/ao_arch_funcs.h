@@ -23,7 +23,7 @@
 #define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,(1<<bit),bus)
 
 #define ao_enable_port(port) (lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_GPIO))
-#define ao_disable_port(port) (lpc_scb.sysahbclkctrl &= ~(1 << LPC_SCB_SYSAHBCLKCTRL_GPIO))
+#define ao_disable_port(port) (lpc_scb.sysahbclkctrl &= ~(1UL << LPC_SCB_SYSAHBCLKCTRL_GPIO))
 
 #define lpc_all_bit(port,bit)	(((port) << 5) | (bit))
 
@@ -65,7 +65,7 @@ static inline void lpc_set_gpio(int port, int bit) {
 #define ao_enable_input(port,bit,mode) do {				\
 		ao_enable_port(port);					\
 		lpc_set_gpio(port,bit);					\
-		lpc_gpio.dir[port] &= ~(1 << bit);			\
+		lpc_gpio.dir[port] &= ~(1UL << bit);			\
 		ao_gpio_set_mode(port,bit,mode);			\
 	} while (0)
 
@@ -80,7 +80,7 @@ static inline void lpc_set_gpio(int port, int bit) {
 
 #define ao_enable_analog(port,bit,id) do {				\
 		ao_enable_port(port);					\
-		lpc_gpio.dir[port] &= ~(1 << bit);			\
+		lpc_gpio.dir[port] &= ~(1UL << bit);			\
 		lpc_ioconf.analog_reg(port,bit) = ((analog_func(id) << LPC_IOCONF_FUNC) | \
 						   (0 << LPC_IOCONF_ADMODE)); \
 	} while (0)

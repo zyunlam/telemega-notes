@@ -103,7 +103,7 @@ ao_intflash_write8(uint16_t pos, uint8_t d)
 	mask = 0xff << shift;
 	w = (*addr & ~mask) | (d << shift);
 
-	ao_intflash_write32(pos & ~3, w);
+	ao_intflash_write32(pos & (uint16_t)~3, w);
 }
 
 static uint8_t
@@ -119,7 +119,7 @@ ao_intflash_read(uint16_t pos)
 uint8_t
 ao_eeprom_write(ao_pos_t pos32, void *v, uint16_t len)
 {
-	uint16_t pos = pos32;
+	uint16_t pos = (uint16_t) pos32;
 	uint8_t *d = v;
 
 	if (pos >= ao_eeprom_total || pos + len > ao_eeprom_total)
@@ -130,7 +130,7 @@ ao_eeprom_write(ao_pos_t pos32, void *v, uint16_t len)
 		if ((pos & 3) == 0 && len >= 4) {
 			uint32_t	w;
 
-			w = d[0] | (d[1] << 8) | (d[2] << 16) | (d[3] << 24);
+			w = (uint32_t) d[0] | ((uint32_t) d[1] << 8) | ((uint32_t) d[2] << 16) | ((uint32_t) d[3] << 24);
 			ao_intflash_write32(pos, w);
 			pos += 4;
 			d += 4;
@@ -158,7 +158,7 @@ ao_eeprom_read(ao_pos_t pos, void *v, uint16_t len)
 	if (pos >= ao_eeprom_total || pos + len > ao_eeprom_total)
 		return 0;
 	while (len--)
-		*d++ = ao_intflash_read(pos++);
+		*d++ = ao_intflash_read((uint16_t) (pos++));
 	return 1;
 }
 

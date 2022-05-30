@@ -153,7 +153,7 @@
 #define LED_PIN_ARMED		5
 
 #define AO_LED_ARMED		(1 << LED_PIN_ARMED)
-#define AO_LED_CONTINUITY(c)	(1 << (4 - (c)))
+#define AO_LED_CONTINUITY(c)	((AO_LED_TYPE) (1 << (4 - (c))))
 #define AO_LED_CONTINUITY_MASK	(0x1 << 4)
 
 #define LEDS_AVAILABLE		(LED_PORT_0_MASK|LED_PORT_1_MASK)
@@ -231,7 +231,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p)							\
-	printf ("tick: %5u 0: %5d pyro: %5d batt %5d thrust %5d pressure %5d\n", \
+	printf ("tick: %5lu 0: %5d pyro: %5d batt %5d thrust %5d pressure %5d\n", \
 		(p)->tick,						\
 		(p)->adc.sense[0],					\
 		(p)->adc.pyro,						\

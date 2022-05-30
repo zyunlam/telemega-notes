@@ -624,7 +624,7 @@ static struct ao_task ao_terramonitor_task;
 static void
 ao_terragps(void)
 {
-	uint16_t	gps_tick = ao_gps_progress;
+	AO_TICK_TYPE	gps_tick = ao_gps_progress;
 
 	for (;;) {
 		while (ao_gps_tick == gps_tick)
