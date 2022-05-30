@@ -1,3 +1,947 @@
+commit 7904b36eaae2468d76f2627bebd86b663afea1f8
+Merge: 8970d45e 4e237bd4
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun May 29 21:07:44 2022 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit 4e237bd43fef1858f88ff8f8750759e16442ea7e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 29 17:50:47 2022 -0700
+
+    Version 1.9.11
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 922a6e4f5c79fe46c1dca4df42c1c97e67dc7d68
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 29 17:48:01 2022 -0700
+
+    doc: Update copyrights to 2022
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 019884004098adfc6e9f285d127a791f4204b180
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 29 17:47:41 2022 -0700
+
+    doc: Add release notes for 1.9.11
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ce3e42c286755f3c4e1ee6dedc87e15a76343a37
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 29 17:46:43 2022 -0700
+
+    doc: Document 10mw limit configuration
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2ec815a17e9327414bab7ea09ed483c4f47f460
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 20 16:20:13 2022 -0700
+
+    src: Add easymini-v3.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d95995ec702a891884f353cf2078d7ed3261c5c2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 20 16:20:32 2022 -0700
+
+    lpc: Make beeper configurable
+    
+    Need to set the port, pin, timer and channel values
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 03753fbddfbc82f18b2e4527a2e3afc58ea972f4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri May 20 16:41:19 2022 -0700
+
+    lpc: ADC 5 was busted
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6edf62c6a1f41fa5cd698067d2327b4847708cc8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed May 4 17:06:36 2022 -0700
+
+    ao-tools/ao-eeprom: Dump converted info for F packets
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0e4fb5c9bc33bb6d2a337f89daec4e6bb94cd8d8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Apr 12 11:13:44 2022 -0600
+
+    doc: add an appendix with examples for configurable pyro channels
+
+commit c49bd3cb0c31a51fae79ddc92237cc309be9a242
+Merge: d225adc3 b140da92
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Apr 6 22:51:13 2022 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit b140da92536d7c48ba37868f1c2afce7bb86dfdb
+Merge: 1d208c95 302e9b8f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Apr 5 17:55:06 2022 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 1d208c9509f03f7e2c913abe5c0dd78ef0083c0f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Apr 5 17:54:32 2022 -0600
+
+    use correct test script for v1.0 easymega
+
+commit 302e9b8fda7b36e5009044086737b7791f81addd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 4 14:40:37 2022 -0700
+
+    telegps-v0.3: Reduce stack size to fit in ram
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ad23f26709b822c6d30f7160ffb2f2f51a8af4ce
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 27 16:10:30 2022 -0800
+
+    ao-telem: Read from stdin if no filenames
+    
+    Make ao-telem work as a filter if no filenames are passed on the
+    command line.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d225adc3af9e5726d436cbbdbf8dcc5837e50804
+Merge: 3759d670 85dd82b2
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 4 01:22:04 2022 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit d0160ed97b432d59e2111d8b17580b9a83e0b03b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Feb 25 22:11:17 2022 -0700
+
+    dial it down a bit more to not exceed +10 dBm, or 10 mW
+
+commit 3e7661761f6ea81b6a9732359edf4c5ada3e8e20
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 25 15:43:15 2022 -0800
+
+    Allow TX power to be limited to 10mW
+    
+    This allows the radio power to be limited so that it doesn't generate
+    more than 10mW.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 58a0a242f31ebe4532564f5c04162e8fb82f9aeb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 21 09:40:07 2022 -0800
+
+    Version 1.9.10.4
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 57a6f844e2490a963ce1ef3a2beb9e47258967af
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 21 09:43:54 2022 -0800
+
+    altos: Document how delay_done is used in ao_pyro.c
+    
+    delay_done is the time at which the delay finishes, but non-zero
+    values also indicate that some delay is pending. Add a comment about
+    why the value is set to 1 when it is zero, and switch the tests of
+    this value to comparisons against zero.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d29047255c8e78d4ab2beeef678d466a6bfc0ae2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 19 15:35:31 2022 -0800
+
+    altos: Deal with 8-character version numbers
+    
+    With 8 characters, the version number isn't null-terminated, so we
+    need to limit use to the available length in a couple of places.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 76358fb6e68c1f466e4d76a291f60e1053aa50d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:48:01 2022 -0800
+
+    altos: Add -Wconversion
+    
+    This adds the -Wconversion flag to detect potential mistakes in
+    implicit type conversion.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 48971ced7999b7d1265be967b971ccb9555ce40e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:46:57 2022 -0800
+
+    altos/telemega-v5.0: Add casts to beep values
+    
+    Need to be careful with types to make sure the math doesn't overflow.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8d53868e67b51d8908e55c6a2e7a3b687529957d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:46:07 2022 -0800
+
+    ao_lco_v2: Add casts to reduce -Wconversion warnings
+    
+    No bugs identified
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2f06b7c66dfa05c51d8b2afbc1e3c94e20767e4f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:44:52 2022 -0800
+
+    ao_lco_v2: Use int32_t for temporary box value in step_box
+    
+    Stepping to the next box will generate negative values and values
+    beyond the highest box number. Use a type capable of holding all of
+    those values, instead of int16_t.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2f84f860917f88a34571b8b0f64d03adf5c8f54
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:42:50 2022 -0800
+
+    telefireone-v1.0: Use a boolean value for ao_log_running
+    
+    Instead of reading a hex value and saving it directly, use
+    zero/none-zero to compute a boolean instead, avoiding a type
+    conversion warning.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 52e9443d540aa5d3f29576a0440149b1b0f9c359
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:41:44 2022 -0800
+
+    altos/telefire: Add cast to AO_LED_CONTINUITY to eliminate -Wconversion warning
+    
+    All of these products had the same warning.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 877d4643b45ca2099f602390b71e1c77d5e11ef1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:38:25 2022 -0800
+
+    altos/stmf0: Add casts to reduce -Wconversion warnings. Use AO_TICK_TYPE
+    
+    No bugs identified. Serial timeout types updated to AO_TICK_TYPE.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2d4484e1577edc66c52bcb260329387f93123a6d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:34:37 2022 -0800
+
+    altos/stm32l0: Add casts to reduce -Wconversion warnings
+    
+    No bugs identified
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5b3a457f232e39977a437fc52256fc15c612b377
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 21:32:07 2022 -0800
+
+    altos/stm: Add casts to reduce -Wconversion warnings
+    
+    No bugs identified
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 709666e00339be7b12730c1f4d35721db292f815
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:53:41 2022 -0800
+
+    ao_micropeak.c: Add casts to reduce -Wconversion warnings
+    
+    No bugs identified
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 63fc45973ec92bf3ef7122da0f76d6e111ecd342
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:53:11 2022 -0800
+
+    ao_flash_task: Add casts to reduce -Wconversion warnings
+    
+    No bugs identified
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7c5b9b2c6bf57aea4332177e7fb0eb2d490f4f6e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:52:11 2022 -0800
+
+    altos/micropeak-v2.0: Add casts to reduce -Wconversion warnings
+    
+    No bugs identified
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e80a45c1565b14479e3a4cfc968d49b13cef4fe0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:49:42 2022 -0800
+
+    altos/lpc: Add casts to reduce -Wconversion warnings
+    
+    Most of these were caused by int/long mixes as uint32_t is 'long' on
+    arm for reasons, meaning that bare int constants need to be cast to
+    avoid a warning.
+    
+    No bugs identified.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f2c02cac5442015fee14f88ee016c687c53d8576
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:38:56 2022 -0800
+
+    ao_tracker: Fix tracker_interval type to match config type (plus -Wconversion)
+    
+    config.tracker_interval is uint8_t, so make the local copy match that
+    type.
+    
+    Also fix other warnings found by -Wconversion.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 63c089e2e110a7fe501dd097bd7d26ce4feeb935
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:36:12 2022 -0800
+
+    ao_telemetry: Add casts to reduce -Wconversion warnings
+    
+    No bugs noted
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a2505dc4be4a368911533d42d6344ad03b220468
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:34:41 2022 -0800
+
+    ao_telemetry: Use int16_t types for telemetry packet intervals
+    
+    This avoids concerns about overflow from int8_t types when computing
+    long intervals between packets as the base interface type was an
+    int16_t. This should help deal with higher sample rate sensors when
+    that occurs.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 86bd5f53ba4b13df502ec1bc70512f30cac94010
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:49:48 2022 -0800
+
+    ao_telemetry: Switch time variables to AO_TICK_TYPE
+    
+    This makes sure telemetry packet intervals are computed correctly.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b10049d847fac855b1139d6441de853641b7365b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:44:03 2022 -0800
+
+    ao_task: Task ids are 8-bits, fix type in struct ao_task
+    
+    These are densely allocated and should never be larger than the
+    maximum number of task slots, so fix the type to be 8-bits just like
+    all other places where a task_id is used.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55ca3cb64e19664e5ffc19d6ff92f46e4252f3b8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:40:19 2022 -0800
+
+    ao_serial: Change serial_sleep_for APIs to use AO_TICK_TYPE
+    
+    These timeouts should all be short, but there's no reason to use a
+    different type.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8a95afdd417119da6089403f870959a726b0c548
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:39:45 2022 -0800
+
+    kalman, report, romconfig, sample, send_packet: Clean up -Wconversion warnings
+    
+    No bugs detected
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8275b761d182ec587104f084f331d7c2ebc2d1e6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:35:18 2022 -0800
+
+    ao_monitor: Clean up -Wconversion warnings
+    
+    No bugs detected
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b5962ab4f804df3145481a54b00fed27561f8725
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:33:12 2022 -0800
+
+    ao_radio_cmac_cmd: Clean up types for -Wconversion
+    
+    Use more reasonable types for lengths and the like to avoid
+    overflows. No actual bugs detected.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit acc642801aa5f8c0c05bde134e5924fe957ce023
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:31:09 2022 -0800
+
+    ao_radio_cmac: Make recv timeouts AO_TICK_TYPE
+    
+    While these should generally be short enough to live in a 16-bit type,
+    use AO_TICK_TYPE for consistency.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f385aabe458ed162fa8b45afc433ee5de8bb7b60
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:18:49 2022 -0800
+
+    ao_micro: Add casts to micropeak code for -Wconversion warnings
+    
+    No bugs detected
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b123c095384b57446d45d8678dff5448a7c659e4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:12:47 2022 -0800
+
+    ao_log: Add casts to reduce -Wconversion warnings
+    
+    No bugs noted here.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0b870641ff0299b973de815523bdfd3db5be8bbf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:11:07 2022 -0800
+
+    ao_log: Fix sensor time triggers to use AO_TICK_TYPE
+    
+    These values were used to determine when various log information would
+    be recorded. Using the wrong type meant that they would always
+    trigger, causing the log to fill up rapidly with data that should be
+    sampled at a lower rate.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dc2d28eab4a998bf5fc60831aaa48d094cbe8785
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:10:06 2022 -0800
+
+    more 16-bit log tick values
+
+commit 9020a82d8b1496bc47dbe454b0735467b5a599b8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:06:18 2022 -0800
+
+    ao_log: Change flight type to uint16_t, widen APIs dealing with flight numbers to int32_t
+    
+    Real Flight numbers are 16-bit unsigned values, but APIs using them
+    pass values that areoverloaded to also represent broken log slots
+    using negative numbers. This means that these APIs need to be able to
+    represent all 65535 possible flight numbers *and* all possible log
+    slots as negative values. Switch the variables holding only flight
+    numbers to uint16_t and those holding either a flight number or log
+    slot to int32_t.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8e73e5298206db0e781cc76ee151e96d29f29341
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:00:38 2022 -0800
+
+    ao_gps, ao_log: Make conversions to 16-bit time log values explicit
+    
+    All log formats record only the low 16-bits of the time value, make
+    conversions to those explicit to silence -Wconversion warnings.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7917ec1f105f39799acbea0f4c28d25db4f66eb4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:50:58 2022 -0800
+
+    ao_flight: ao_interval_end type was too small, could cause premature landing state
+    
+    ao_interval_end is used to provide a window of time during which the
+    max/min values for sensors are measured. After that time expires,
+    those bounds are compared to see if the airframe has been stable and
+    should be moved to landing state. With a type that is too small, that
+    could happen immediately after transitioning to main (for baro-enabled
+    devices) or coast (for accel-only devices). For baro devices, this
+    would disable any redundant main firing events. For accel-only
+    devices, this could disable all events occuring after coast, including
+    firing separation charges or motor igniters.
+    
+    There are also a couple of additional changes to reduce -Wconversion
+    messages.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6f06cf3e8fe0531b927d5e11ae2b0e9af3663b0f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:43:31 2022 -0800
+
+    ao_convert_pa: Switch array index to unsigned type
+    
+    This seems more appropriate for this use.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4aa984bbcce1cdc4f4b82516a9f2a32cf5061dfa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:42:45 2022 -0800
+
+    ao_companion: Make motor_number uint16_t
+    
+    Make it match the types used elsewhere
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f51316c02a8385223567e1aa8e3f5a0b74c16cd6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:41:59 2022 -0800
+
+    fifo: Add casts to fifo operation macros for -Wconversion
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ba0239ca6839605c7ce45d56677bb9a3b782b7f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:41:10 2022 -0800
+
+    beep, cmd, config, convert_volt, data, distance, fec, kalman: -Wconversion warnings
+    
+    No bugs noted, just adding casts to resolve -Wconversion warnings.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bdf0671cb36daca741c4842a37a3fc71744a63a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:15:42 2022 -0800
+
+    altos/ao_freq: Use uint32_t for radio freq setting value
+    
+    These values are always unsigned; changing this resolves some
+    -Wconversion messages.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3d276e01ba96e8174e590b101cc9ef002e6cb67b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:13:53 2022 -0800
+
+    altos/ao_stdio: use uint8_t for stdio index
+    
+    This makes type usage of this value consistent. Also fix another
+    -Wconversion warning.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 161f2a3aa7f7364c6d972df4199200828dfe3294
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:12:31 2022 -0800
+
+    altos: Switch ao_radio_recv timeout to AO_TICK_TYPE
+    
+    Make sure all times are in the wider type.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 72a452d1ca5b3f9f1defef47465e24a10ca72d58
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:10:31 2022 -0800
+
+    drivers/ao_rn4678: Fix timeouts to use AO_TICK_TYPE
+    
+    Also fix other -Wconversion messages.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9f56c5763d1c078c5de15e92103b751ea26b7684
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:08:56 2022 -0800
+
+    drivers/ao_quadrature: Fix -Wconversion warnings
+    
+    No bugs detected.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dbaef3237cc6874faf8eb9030a15b578b58fd83f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:06:25 2022 -0800
+
+    drivers/ao_pad: Convert from/to 16-bit times over the air
+    
+    The radio protocol sends only 16 bits of time, make sure we translate
+    from/to those correctly. No bugs detected, just casts added to
+    clarify. Also fix other -Wconversion warnings.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 11d6e27bfd94ce58b702bfd0889f064ce1ef5a48
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 14:00:43 2022 -0800
+
+    drivers/ao_packet: Switch time values to AO_TICK_TYPE
+    
+    Make sure times are kept in the right type. Also resolved other
+    -Wconversion issues.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c309956389acc01f784f3d0e11745f5ac0a77e06
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 13:59:26 2022 -0800
+
+    drivers: Resolve -Wconversion in m25, mma655x, mmc5983, mpu and ms5607
+    
+    No bugs identified.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9c27459fe1417b460f01f053bc44474623b1cbca
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 09:33:17 2022 -0800
+
+    drivers/ao_lco: Fix box types to be uint16_t. Also clean other -Wconversion messages
+    
+    Old LCO code uses 0x1000 as magic value for "DRAG" box, so we need 16
+    bits. Switch all box variables to 16 bits, use int32_t when switching
+    box numbers to deal with negative values and still hold the whole
+    possible range (even though 16 bits "should" be plenty).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 71c3652d6c511db03402f5b7487bc4098e6d850f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 09:29:06 2022 -0800
+
+    ao_hmc5883: Add explicit casts for -Wconversion
+    
+    No bugs noted.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c783aafd89777626c362e15c47360b399d03c45d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 09:26:08 2022 -0800
+
+    ao_companion: Make time conversion to 16-bits in companion protocol explicit
+    
+    Companion protocol only passes low 16-bits. Also add explicit casts for -Wconversion
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fadb563f8aeeee895a7232bb71fa5bade6ef66f0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 09:25:15 2022 -0800
+
+    ao_gps_skytrac, ao_gps_ublox: Add explicit casts to quiet -Wconversion
+    
+    No bugs noted.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 452dd07575a118f29a0dfa712deeb18e92ffb1f4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 09:20:29 2022 -0800
+
+    drivers: Fix type of radio timeout parameter
+    
+    Move from uint16_t to AO_TICK_TYPE. Also add explicit casts to quiet
+    remaining -Wconversion messages.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 46200359c388062a5e7bc40d780808d92a59f0ed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 09:16:49 2022 -0800
+
+    altos/drivers/ao_button: Save all 32-bits of irq status
+    
+    Was saving in a uint8_t
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7fd29d922be98ddc6406f2323599ef63061044ed
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 09:15:57 2022 -0800
+
+    altos/drivers: Add explicit casts in ao_aprs, ao_bmx160 and ao_btm
+    
+    No bugs spotted here, but this quiets -Wconversion warnings
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5bdb250a43c9e87185f3ddedbd8364f24306bbfd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 27 15:52:44 2022 -0800
+
+    altos/attiny: Eliminate warnings from -Wconversion
+    
+    These have no effect on the generated code as they simply make
+    implicit conversions explicit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 85dd82b200d649fbf08aa31e5acde8f1f40d531a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 16 17:00:59 2022 -0800
+
+    altos: Re-enable apogee delay
+    
+    When the igniter code was changed to support booster mode, the code
+    which delayed apogee firing based on the configure apogee delay value
+    was lost. Re-enable that by sticking a delay before firing the drogue
+    charge when the ignite mode is not redundant apogee.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d91e0b962d95051a10147e691b133927bf3fb8cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 9 09:58:07 2022 -0800
+
+    Version 1.9.10.3
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d11edd6d595eb1a0786f61d4ae4bdf37ecf1a4fb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 9 09:51:33 2022 -0800
+
+    libaltos: Build Mac OSX libaltos.dylib for arm64 too
+    
+    Make this work on the M1.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5c67c0c789787fcd18b513a775d2415e0af0a2d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 9 09:49:49 2022 -0800
+
+    Switch from AdoptOpenJDK to Adoptium
+    
+    This project moved to Eclipse foundation but seems otherwise about the same.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c5d39fe3ac9252547f966a86f413eebd7b44088f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 28 15:27:02 2022 -0800
+
+    ao_pyro: Move delay_done out of pyro structure
+    
+    The pyro structure should be read-only in flight operations. Move the
+    'delay_done' element to a parallel array as that gets written. Change
+    types to pointers to const structs to enforce this in the future.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 606a67724dea8ab3d52d52456722dc593cf8ac8d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 27 15:49:15 2022 -0800
+
+    altos: AES code was storing bytes in an int array
+    
+    The only operations using these values are logic using bytes, not
+    arithmetic, so shrinking the size of the elements should have no
+    effect on operation.
+    
+    This saves space *and* eliminates a type conversion warning from
+    -Wconversion.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3759d6707d67e2584670ea89086576b695ea3509
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jan 25 12:34:31 2022 -0700
+
+    need to save .bin for TeleGPS v2.0
+
+commit 59cbf80e63b4c88de45e59c6e3d209f99910fcf3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jan 21 19:45:14 2022 -0800
+
+    data_interval == 0 means no data collection
+    
+    All of the timer functions were still taking one sample every 256
+    clock ticks.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2dc5d4eecc97b640a2e1f012b4411955682b61c8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 11 14:34:14 2022 -0800
+
+    Version 1.9.10.2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d24aba871ee9aa3671e15510ee4e2a0266c3d583
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jan 11 14:32:55 2022 -0800
+
+    altosdroid: Add BLUETOOTH_CONNECT permission, handle its lack
+    
+    Android 12 switched how bluetooth permissions work, so now we need a
+    new one to talk to devices. Also deal with a lack of that by not
+    crashing when we can't get the name of a BT device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7f46240dfc57164f0c1b0c4c4ed9695bca63860d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 16 13:39:33 2021 -0800
+
+    altos: Switch all tick variables to AO_TICK_TYPE/AO_TICK_SIGNED
+    
+    Instead of trying to pick and choose which work as 16-bit values,
+    change everything that doesn't affect external values (log, companion,
+    radio) to AO_TICK_TYPE.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0e068689f41b74c883615f9f11a322a962cbb792
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 16 13:38:39 2021 -0800
+
+    altos/attiny: Switch to avrisp2 for development programmer
+    
+    My bench programmer puck is the avrisp2, not usbtiny
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d317c2e30c408909807bde7c5577e499bd3c6f17
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 16 13:37:17 2021 -0800
+
+    ao-tools/ao-test-igniter: Deal with devices that use both 'apogee' for ADC
+    
+    Some devices report drogue igniter ADC value with 'apogee' tag. Deal
+    with this.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 55698a6232bde408ce7e12bb7ee52ba72985fc78
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Dec 16 13:36:10 2021 -0800
+
+    micropeak: detect empty log received from device
+    
+    Avoid reporting a failure to the user when the device has no flight
+    log.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e3127155c02cd42ef8aa42d167fc214e8997113f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Dec 22 11:35:52 2021 -0700
+
+    doc: add an appendix on frequency calibration to the all-in-one manual
+
+commit 66152b176bad12fbff3188397c607793c0bdd380
+Merge: 8e1145b9 0921e8b1
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Dec 20 13:49:41 2021 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 8e1145b9894537e33747fecc7d61d87eadab6135
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Dec 20 13:49:28 2021 -0700
+
+    need to capture .bin file for telebt loader, too
+
+commit 0921e8b166c41ea8f65df14cea893481d8e1f0f1
+Merge: 236d80fa 9db486f6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Nov 3 13:24:41 2021 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 9db486f6d78b8a2ae855168338e0ea7d6ee4231f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 16 16:27:52 2021 -0700
+
+    Version 1.9.10.1
+    
+    AltosDroid fixes (rotation, crash in maps stuff)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a1b7357aa5bca6afb588b0bfb5cfe72c4d0255ef
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Oct 16 15:48:22 2021 -0700
+
+    altosdroid: Fix tab updates on Android 11 after rotate
+    
+    Android 11 appears to have "optimized" application rotation by
+    regenerating fragments automatically. This means the tab fragments
+    aren't getting created by TabsAdapter.getItem, so that code didn't
+    know about them, which caused it to not know which tab was active so
+    all of the application state wasn't getting updated in the tabs after
+    rotation.
+    
+    Fix this by telling TabsAdapter about fragments that are already
+    created -- altosdroid hears about them in the registerTab hook.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5ef3cd5abdb863c534a0abc5d0a726cfa5108eb4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 10 23:01:18 2021 -0700
+
+    altosdroid: Skip map draw before transform is set
+    
+    A crash report indicates that this can happen.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f426462c7e86dc0aa48c004e115144b25eadacf8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Oct 10 22:21:49 2021 -0600
+
+    fix version in 1.9.10 release notes
+
+commit 8970d45ea43bfff1de38778ee8b14c3e54639555
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Oct 10 21:42:19 2021 -0600
+
+    releasing 1.9.10
+
 commit ed267e76eb03c34ec233c33a002ec9e5e53ec83a
 Merge: bd71c839 ef70f80b
 Author: Bdale Garbee <bdale@gag.com>
@@ -82,6 +1026,13 @@ Date:   Thu Oct 7 22:45:37 2021 -0700
     trouble with some windows 10 installs. Just use the old versions.
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 236d80fac2b4293c5750c9d80b387afd4d0fc5cc
+Merge: 047a3f1f 6ef22682
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 7 12:11:06 2021 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
 
 commit c15bb9513ab0f8636bf52ec827551134c773e832
 Author: Keith Packard <keithp@keithp.com>
@@ -181,6 +1132,13 @@ Date:   Mon Sep 20 20:23:10 2021 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
+commit 047a3f1f08687113b80123cc7568d7057a23bcc3
+Merge: 01b5d271 e7a19e6d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 22 11:53:17 2021 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
 commit e7a19e6dec201603e98b94b0ba790aa7d2d344f8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 20 18:17:49 2021 -0600
@@ -192,6 +1150,12 @@ Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 20 18:22:55 2021 -0600
 
     update TeleMega bench scripts for v5.0 hardware
+
+commit 01b5d271d21e0c60508c06f4af1ff34bf75bf9fe
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Sep 22 11:45:49 2021 -0600
+
+    capture odd changes from production machine?
 
 commit 3fb07b29d7bad57a52e4b0c75d623577ca1d4da3
 Author: Bdale Garbee <bdale@gag.com>
