@@ -131,7 +131,7 @@
 #define LED_7_PORT		(&stm_gpioa)
 #define LED_7_PIN		10
 
-#define AO_LED_CONTINUITY(c)	(1 << (c))
+#define AO_LED_CONTINUITY(c)	((AO_LED_TYPE) (1 << (c)))
 #define AO_LED_CONTINUITY_MASK	(0xff)
 
 /* ARM */
@@ -310,7 +310,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p)							\
-	printf ("tick: %5u "						\
+	printf ("tick: %5lu "						\
 		"0: %5d 1: %5d 2: %5d 3: %5d "				\
 		"4: %5d 5: %5d 6: %5d 7: %5d "				\
 		"pyro: %5d batt: %5d\n",				\

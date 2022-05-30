@@ -18,7 +18,7 @@
 
 #include "ao.h"
 
-static uint16_t	ao_log_tiny_interval;
+static AO_TICK_TYPE	ao_log_tiny_interval;
 
 #define AO_LOG_TINY_INTERVAL_DEFAULT	AO_MS_TO_TICKS(1000)
 #if USE_FAST_ASCENT_LOG
@@ -30,7 +30,7 @@ static uint16_t	ao_log_tiny_interval;
 #endif
 
 void
-ao_log_tiny_set_interval(uint16_t ticks)
+ao_log_tiny_set_interval(AO_TICK_TYPE ticks)
 {
 	ao_log_tiny_interval = ticks;
 }
@@ -134,7 +134,7 @@ ao_log(void)
 		 * Write out the sample when finished
 		 */
 		now = ao_time();
-		if ((int16_t) (now - (last_time + ao_log_tiny_interval)) >= 0 && count) {
+		if ((AO_TICK_SIGNED) (now - (last_time + ao_log_tiny_interval)) >= 0 && count) {
 			count = sum / count;
 			if (ao_log_started)
 				ao_log_tiny_data(count);

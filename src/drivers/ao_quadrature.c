@@ -73,7 +73,7 @@ ao_quadrature_read(struct stm_gpio *gpio, uint8_t pin_a, uint8_t pin_b, struct a
 	a = ao_debounce(a, &debounce_state[0]);
 	b = ao_debounce(b, &debounce_state[1]);
 
-	return a | (b << 1);
+	return (uint16_t) (a | (b << 1));
 }
 
 #define _ao_quadrature_get(q)	ao_quadrature_read(port(q), bita(q), bitb(q), ao_debounce_state[q])
@@ -130,10 +130,10 @@ static void
 ao_quadrature_isr(void)
 {
 #if AO_QUADRATURE_COUNT > 0
-	_ao_quadrature_set(0, _ao_quadrature_get(0));
+	_ao_quadrature_set(0, (uint8_t) _ao_quadrature_get(0));
 #endif
 #if AO_QUADRATURE_COUNT > 1
-	_ao_quadrature_set(1, _ao_quadrature_get(1));
+	_ao_quadrature_set(1, (uint8_t) _ao_quadrature_get(1));
 #endif
 }
 
@@ -163,7 +163,7 @@ ao_quadrature_wait(uint8_t q)
 static void
 ao_quadrature_test(void)
 {
-	uint8_t	q;
+	uint32_t q;
 	int32_t	c;
 	uint8_t	s;
 #ifndef AO_QUADRATURE_SINGLE_CODE
@@ -215,7 +215,7 @@ static const struct ao_cmds ao_quadrature_cmds[] = {
 #define init(q) do {							\
 		ao_enable_input(port(q), bita(q), 0);			\
 		ao_enable_input(port(q), bitb(q), 0);			\
-		_ao_quadrature_start_one(q, _ao_quadrature_get(q));	\
+		_ao_quadrature_start_one(q, (uint8_t) _ao_quadrature_get(q)); \
 	} while (0)
 
 void

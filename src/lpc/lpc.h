@@ -359,7 +359,7 @@ extern struct lpc_ioconf lpc_ioconf;
 /* PIO1_31 */
 #define  LPC_IOCONF_FUNC_PIO1_31	0
 
-#define  LPC_IOCONF_FUNC_MASK		0x7
+#define  LPC_IOCONF_FUNC_MASK		0x7UL
 
 #define ao_lpc_alternate(func) (((func) << LPC_IOCONF_FUNC) | \
 				(LPC_IOCONF_MODE_INACTIVE << LPC_IOCONF_MODE) | \
@@ -373,7 +373,7 @@ extern struct lpc_ioconf lpc_ioconf;
 #define  LPC_IOCONF_MODE_PULL_DOWN		1
 #define  LPC_IOCONF_MODE_PULL_UP		2
 #define  LPC_IOCONF_MODE_REPEATER		3
-#define  LPC_IOCONF_MODE_MASK			3
+#define  LPC_IOCONF_MODE_MASK			3UL
 
 #define LPC_IOCONF_HYS			5
 
@@ -504,7 +504,7 @@ extern struct lpc_scb lpc_scb;
 #define  LPC_SCB_SYSPLLCTRL_PSEL_2		1
 #define  LPC_SCB_SYSPLLCTRL_PSEL_4		2
 #define  LPC_SCB_SYSPLLCTRL_PSEL_8		3
-#define  LPC_SCB_SYSPLLCTRL_PSEL_MASK		3
+#define  LPC_SCB_SYSPLLCTRL_PSEL_MASK		3UL
 
 #define LPC_SCB_SYSPLLSTAT_LOCK		0
 
@@ -514,7 +514,7 @@ extern struct lpc_scb lpc_scb;
 #define  LPC_SCB_USBPLLCTRL_PSEL_2		1
 #define  LPC_SCB_USBPLLCTRL_PSEL_4		2
 #define  LPC_SCB_USBPLLCTRL_PSEL_8		3
-#define  LPC_SCB_USBPLLCTRL_PSEL_MASK		3
+#define  LPC_SCB_USBPLLCTRL_PSEL_MASK		3UL
 
 #define LPC_SCB_USBPLLSTAT_LOCK		0
 
@@ -524,7 +524,7 @@ extern struct lpc_scb lpc_scb;
 #define  LPC_SCB_SYSOSCCTRL_FREQRANGE_15_25	1
 
 #define LPC_SCB_WDTOSCCTRL_DIVSEL		0
-#define  LPC_SCB_WDTOSCCTRL_DIVSEL_MASK			0x1f
+#define  LPC_SCB_WDTOSCCTRL_DIVSEL_MASK			0x1fUL
 #define LPC_SCB_WDTOSCCTRL_FREQSEL		5
 #define  LPC_SCB_WDTOSCCTRL_FREQSEL_0_6			1
 #define  LPC_SCB_WDTOSCCTRL_FREQSEL_1_05		2
@@ -541,7 +541,7 @@ extern struct lpc_scb lpc_scb;
 #define  LPC_SCB_WDTOSCCTRL_FREQSEL_4_2			0x0d
 #define  LPC_SCB_WDTOSCCTRL_FREQSEL_4_4			0x0e
 #define  LPC_SCB_WDTOSCCTRL_FREQSEL_4_6			0x0f
-#define  LPC_SCB_WDTOSCCTRL_FREQSEL_MASK		0x0f
+#define  LPC_SCB_WDTOSCCTRL_FREQSEL_MASK		0x0fUL
 
 #define LPC_SCB_SYSRSTSTAT_POR		0
 #define LPC_SCB_SYSRSTSTAT_EXTRST	1
@@ -552,14 +552,14 @@ extern struct lpc_scb lpc_scb;
 #define LPC_SCB_SYSPLLCLKSEL_SEL	0
 #define  LPC_SCB_SYSPLLCLKSEL_SEL_IRC		0
 #define  LPC_SCB_SYSPLLCLKSEL_SEL_SYSOSC	1
-#define  LPC_SCB_SYSPLLCLKSEL_SEL_MASK		3
+#define  LPC_SCB_SYSPLLCLKSEL_SEL_MASK		3UL
 
 #define LPC_SCB_SYSPLLCLKUEN_ENA	0
 
 #define LPC_SCB_USBPLLCLKSEL_SEL	0
 #define  LPC_SCB_USBPLLCLKSEL_SEL_IRC		0
 #define  LPC_SCB_USBPLLCLKSEL_SEL_SYSOSC	1
-#define  LPC_SCB_USBPLLCLKSEL_SEL_MASK		3
+#define  LPC_SCB_USBPLLCLKSEL_SEL_MASK		3UL
 
 #define LPC_SCB_USBPLLCLKUEN_ENA	0
 
@@ -568,7 +568,7 @@ extern struct lpc_scb lpc_scb;
 #define  LPC_SCB_MAINCLKSEL_SEL_PLL_INPUT	1
 #define  LPC_SCB_MAINCLKSEL_SEL_WATCHDOG	2
 #define  LPC_SCB_MAINCLKSEL_SEL_PLL_OUTPUT	3
-#define  LPC_SCB_MAINCLKSEL_SEL_MASK		3
+#define  LPC_SCB_MAINCLKSEL_SEL_MASK		3UL
 
 #define LPC_SCB_MAINCLKUEN_ENA		0
 
@@ -777,7 +777,7 @@ extern struct lpc_usart lpc_usart;
 #define LPC_USART_IIR_INTID_CTI			6
 #define LPC_USART_IIR_INTID_THRE		1
 #define LPC_USART_IIR_INTID_MS			0
-#define LPC_USART_IIR_INTID_MASK		7
+#define LPC_USART_IIR_INTID_MASK		7UL
 #define LPC_USART_IIR_FIFOEN		6
 #define LPC_USART_IIR_ABEOINT		8
 #define LPC_USART_IIR_ABTOINT		9
@@ -796,18 +796,18 @@ extern struct lpc_usart lpc_usart;
 #define LPC_USART_LCR_WLS_6		1
 #define LPC_USART_LCR_WLS_7		2
 #define LPC_USART_LCR_WLS_8		3
-#define LPC_USART_LCR_WLS_MASK		3
+#define LPC_USART_LCR_WLS_MASK		3UL
 #define LPC_USART_LCR_SBS	2
 #define LPC_USART_LCR_SBS_1		0
 #define LPC_USART_LCR_SBS_2		1
-#define LPC_USART_LCR_SBS_MASK		1
+#define LPC_USART_LCR_SBS_MASK		1UL
 #define LPC_USART_LCR_PE	3
 #define LPC_USART_LCR_PS	4
 #define LPC_USART_LCR_PS_ODD		0
 #define LPC_USART_LCR_PS_EVEN		1
 #define LPC_USART_LCR_PS_ONE		2
 #define LPC_USART_LCR_PS_ZERO		3
-#define LPC_USART_LCR_PS_MASK		3
+#define LPC_USART_LCR_PS_MASK		3UL
 #define LPC_USART_LCR_BC	6
 #define LPC_USART_LCR_DLAB	7
 
@@ -874,7 +874,7 @@ extern struct lpc_usb lpc_usb;
 #define lpc_usb (*(struct lpc_usb *) 0x40080000)
 
 #define LPC_USB_DEVCMDSTAT_DEV_ADDR	0
-#define LPC_USB_DEVCMDSTAT_DEV_ADDR_MASK	0x7f
+#define LPC_USB_DEVCMDSTAT_DEV_ADDR_MASK	0x7fUL
 #define LPC_USB_DEVCMDSTAT_DEV_EN	7
 #define LPC_USB_DEVCMDSTAT_SETUP	8
 #define LPC_USB_DEVCMDSTAT_PLL_ON	9
@@ -893,7 +893,7 @@ extern struct lpc_usb lpc_usb;
 #define LPC_USB_DEVCMDSTAT_VBUSDEBOUNCED	28
 
 #define LPC_USB_INFO_FRAME_NR		0
-#define LPC_USB_INFO_FRAME_NR_MASK	0x3ff
+#define LPC_USB_INFO_FRAME_NR_MASK	0x3ffUL
 #define LPC_USB_INFO_ERR_CODE		11
 #define LPC_USB_INFO_ERR_CODE_NO_ERROR			0
 #define LPC_USB_INFO_ERR_CODE_PID_ENCODING_ERROR	1
@@ -911,16 +911,16 @@ extern struct lpc_usb lpc_usb;
 #define LPC_USB_INFO_ERR_CODE_BITSTUFF_ERROR		0xd
 #define LPC_USB_INFO_ERR_CODE_SYNC_ERROR		0xe
 #define LPC_USB_INFO_ERR_CODE_WRONG_DATA_TOGGLE		0xf
-#define LPC_USB_INFO_ERR_CODE_MASK			0xf
+#define LPC_USB_INFO_ERR_CODE_MASK			0xfUL
 
 #define LPC_USB_EPLISTSTART_EP_LIST			0
 
 #define LPC_USB_DATABUFSTART_DA_BUF			0
 
 #define LPC_USB_LPM_HIRD_HW		0
-#define LPC_USB_LPM_HIRD_HW_MASK		0xf
+#define LPC_USB_LPM_HIRD_HW_MASK		0xfUL
 #define LPC_USB_LPM_HIRD_SW		4
-#define LPC_USB_LPM_HIRD_SW_MASK		0xf
+#define LPC_USB_LPM_HIRD_SW_MASK		0xfUL
 #define LPC_USB_LPM_DATA_PENDING	8
 
 #define LPC_USB_EPSKIP_SKIP		0
@@ -977,7 +977,7 @@ extern uint8_t lpc_usb_sram[];
 #define LPC_USB_EP_RATE_FEEDBACK	27
 #define LPC_USB_EP_ENDPOINT_ISO		26
 #define LPC_USB_EP_NBYTES		16
-#define  LPC_USB_EP_NBYTES_MASK			0x3ff
+#define  LPC_USB_EP_NBYTES_MASK			0x3ffUL
 #define LPC_USB_EP_OFFSET		0
 
 #define LPC_ISR_PIN_INT0_POS	0
@@ -1062,7 +1062,7 @@ lpc_nvic_pending(int irq) {
 
 #define IRQ_PRIO_REG(irq)	((irq) >> 2)
 #define IRQ_PRIO_BIT(irq)	(((irq) & 3) << 3)
-#define IRQ_PRIO_MASK(irq)	(0xff << IRQ_PRIO_BIT(irq))
+#define IRQ_PRIO_MASK(irq)	(0xffUL << IRQ_PRIO_BIT(irq))
 
 static inline void
 lpc_nvic_set_priority(int irq, uint8_t prio) {

@@ -26,9 +26,9 @@ ao_ms5607_convert(struct ao_ms5607_sample *sample, struct ao_ms5607_value *value
 	int64_t OFF;
 	int64_t SENS;
 
-	dT = sample->temp - ((int32_t) ao_ms5607_prom.tref << 8);
+	dT = (int32_t) ((int32_t) sample->temp - ((int32_t) ao_ms5607_prom.tref << 8));
 	
-	TEMP = 2000 + (((int64_t) dT * ao_ms5607_prom.tempsens) >> 23);
+	TEMP = (int32_t) (2000 + (((int64_t) dT * ao_ms5607_prom.tempsens) >> 23));
 
 #if HAS_MS5611
 	OFF = ((int64_t) ao_ms5607_prom.off << 16) + (((int64_t) ao_ms5607_prom.tco * dT) >> 7);
@@ -39,7 +39,7 @@ ao_ms5607_convert(struct ao_ms5607_sample *sample, struct ao_ms5607_value *value
 #endif
 
 	if (TEMP < 2000) {
-		int32_t	T2 = ((int64_t) dT * (int64_t) dT) >> 31;
+		int32_t	T2 = (int32_t) (((int64_t) dT * (int64_t) dT) >> 31);
 		int32_t TEMPM = TEMP - 2000;
 		int64_t OFF2 = (61 * (int64_t) TEMPM * (int64_t) TEMPM) >> 4;
 		int64_t SENS2 = 2 * (int64_t) TEMPM * (int64_t) TEMPM;
@@ -57,6 +57,6 @@ ao_ms5607_convert(struct ao_ms5607_sample *sample, struct ao_ms5607_value *value
 		SENS -= SENS2;
 	}
 
-	value->pres = ((((int64_t) sample->pres * SENS) >> 21) - OFF) >> 15;
+	value->pres = (int32_t) (((((int64_t) sample->pres * SENS) >> 21) - OFF) >> 15);
 	value->temp = TEMP;
 }

@@ -54,7 +54,7 @@ lpc_usart_isr(void)
 	(void) lpc_usart.iir_fcr;
 
 	while (lpc_usart.lsr & (1 << LPC_USART_LSR_RDR)) {
-		char c = lpc_usart.rbr_thr;
+		char c = (char) lpc_usart.rbr_thr;
 		if (!ao_fifo_full(ao_usart_rx_fifo))
 			ao_fifo_insert(ao_usart_rx_fifo, c);
 		wake_input = 1;
@@ -135,11 +135,11 @@ ao_serial0_set_speed(uint8_t speed)
 	/* DL MSB */
 	lpc_usart.ier = (ao_usart_speeds[speed].dl >> 8) & 0xff;
 
-	lpc_usart.fdr = ((ao_usart_speeds[speed].divaddval << LPC_USART_FDR_DIVADDVAL) |
-			 (ao_usart_speeds[speed].mulval << LPC_USART_FDR_MULVAL));
+	lpc_usart.fdr = (((uint32_t) ao_usart_speeds[speed].divaddval << LPC_USART_FDR_DIVADDVAL) |
+			 ((uint32_t) ao_usart_speeds[speed].mulval << LPC_USART_FDR_MULVAL));
 
 	/* Turn access to divisor latches back off */
-	lpc_usart.lcr &= ~(1 << LPC_USART_LCR_DLAB);
+	lpc_usart.lcr &= ~(1UL << LPC_USART_LCR_DLAB);
 }
 
 void

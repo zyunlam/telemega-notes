@@ -2,7 +2,7 @@
 include::release-head.adoc[]
 :doctype: article
 
-	Version 1.9.9
+	Version 1.9.10
 
 	This release contains a couple of bug fixes for ground station software.
 

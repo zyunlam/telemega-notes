@@ -71,6 +71,11 @@ ifdef::radio[]
 		flight. When disabled, the radio will not
 		transmit anything during flight at all.
 
+	==== Limit transmit to 10mW
+
+		Reduces transmit power to no more than 10mW. This is
+		useful when operating under some UK radio regulations.
+
 	==== Telemetry baud rate
 
 		This sets the modulation bit rate for data

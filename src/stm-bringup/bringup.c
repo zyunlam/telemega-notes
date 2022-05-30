@@ -251,7 +251,7 @@ serial_string(char *string)
 		outbyte(c);
 }
 
-volatile uint16_t	tick_count;
+volatile AO_TICK_TYPE	tick_count;
 
 void
 stm_tim6_isr(void)

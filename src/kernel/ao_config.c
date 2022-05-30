@@ -54,6 +54,7 @@ uint8_t ao_force_freq;
 #define AO_CONFIG_DEFAULT_IGNITE_MODE	AO_IGNITE_MODE_DUAL
 #define AO_CONFIG_DEFAULT_PAD_ORIENTATION	AO_PAD_ORIENTATION_ANTENNA_UP
 #define AO_CONFIG_DEFAULT_PYRO_TIME	AO_MS_TO_TICKS(50)
+#define AO_CONFIG_DEFAULT_RADIO_10MW	0
 #if HAS_CONFIG_SAVE
 #ifndef USE_INTERNAL_FLASH
 #error Please define USE_INTERNAL_FLASH
@@ -76,7 +77,7 @@ uint8_t ao_force_freq;
 #define AO_CONFIG_DEFAULT_RADIO_POWER		0x60
 #endif
 #define AO_CONFIG_DEFAULT_RADIO_AMP		0
-#define AO_CONFIG_DEFAULT_APRS_SSID		(ao_serial_number % 10)
+#define AO_CONFIG_DEFAULT_APRS_SSID		((uint8_t) (ao_serial_number % 10))
 #define AO_CONFIG_DEFAULT_RADIO_RATE		AO_RADIO_RATE_38400
 
 #if HAS_CONFIG_SAVE
@@ -176,7 +177,7 @@ _ao_config_get(void)
 		if (minor < 9)
 			memset(&ao_config.aes_key, '\0', AO_AES_LEN);
 		if (minor < 10)
-			ao_config.frequency = 434550 + ao_config._legacy_radio_channel * 100;
+			ao_config.frequency = 434550U + ao_config._legacy_radio_channel * 100U;
 		if (minor < 11)
 			ao_config.apogee_lockout = 0;
 #if AO_PYRO_NUM
@@ -188,7 +189,7 @@ _ao_config_get(void)
 #if HAS_RADIO_POWER
 		if (minor < 14)
 			ao_config.radio_power = AO_CONFIG_DEFAULT_RADIO_POWER;
-		#endif
+#endif
 #if HAS_RADIO_AMP
 		if (minor  < 14)
 			ao_config.radio_amp = AO_CONFIG_DEFAULT_RADIO_AMP;
@@ -245,6 +246,10 @@ _ao_config_get(void)
 #if HAS_APRS
 		if (minor < 24)
 			ao_config.aprs_offset = 0;
+#endif
+#if HAS_RADIO_10MW
+		if (minor < 25)
+			ao_config.radio_10mw = AO_CONFIG_DEFAULT_RADIO_10MW;
 #endif
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
@@ -386,7 +391,7 @@ ao_config_main_deploy_set(void)
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.main_deploy = r;
+	ao_config.main_deploy = (uint16_t) r;
 	_ao_config_edit_finish();
 }
 
@@ -449,11 +454,11 @@ ao_config_accel_calibrate_auto(char *orientation)
 		}
 	}
 #if HAS_IMU
-	accel_cal_along = accel_along_total >> ACCEL_CALIBRATE_SHIFT;
-	accel_cal_across = accel_across_total >> ACCEL_CALIBRATE_SHIFT;
-	accel_cal_through = accel_through_total >> ACCEL_CALIBRATE_SHIFT;
+	accel_cal_along = (int16_t) (accel_along_total >> ACCEL_CALIBRATE_SHIFT);
+	accel_cal_across = (int16_t) (accel_across_total >> ACCEL_CALIBRATE_SHIFT);
+	accel_cal_through = (int16_t) (accel_through_total >> ACCEL_CALIBRATE_SHIFT);
 #endif
-	return accel_total >> ACCEL_CALIBRATE_SHIFT;
+	return (int16_t) (accel_total >> ACCEL_CALIBRATE_SHIFT);
 }
 
 static void
@@ -467,10 +472,10 @@ ao_config_accel_calibrate_set(void)
 	int16_t	accel_through_up = 0, accel_through_down = 0;
 #endif
 
-	up = ao_cmd_decimal();
+	up = (int16_t) ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	down = ao_cmd_decimal();
+	down = (int16_t) ao_cmd_decimal();
 	auto_cal = (up == 0 && ao_cmd_status != ao_cmd_success);
 	if (auto_cal) {
 		up = ao_config_accel_calibrate_auto("up");
@@ -496,19 +501,19 @@ ao_config_accel_calibrate_set(void)
 	ao_config.accel_minus_g = down;
 #if HAS_IMU
 	if (auto_cal) {
-		ao_config.accel_zero_along = (accel_along_up + accel_along_down) / 2;
-		ao_config.accel_zero_across = (accel_across_up + accel_across_down) / 2;
-		ao_config.accel_zero_through = (accel_through_up + accel_through_down) / 2;
+		ao_config.accel_zero_along = (int16_t) ((accel_along_up + accel_along_down) / 2);
+		ao_config.accel_zero_across = (int16_t) ((accel_across_up + accel_across_down) / 2);
+		ao_config.accel_zero_through = (int16_t) ((accel_through_up + accel_through_down) / 2);
 	} else {
 		int16_t v;
 
-		v = ao_cmd_decimal();
+		v = (int16_t) ao_cmd_decimal();
 		if (ao_cmd_status == ao_cmd_success) {
 			ao_config.accel_zero_along = v;
-			v = ao_cmd_decimal();
+			v = (int16_t) ao_cmd_decimal();
 			if (ao_cmd_status == ao_cmd_success) {
 				ao_config.accel_zero_across = v;
-				v = ao_cmd_decimal();
+				v = (int16_t) ao_cmd_decimal();
 				if (ao_cmd_status == ao_cmd_success)
 					ao_config.accel_zero_through = v;
 			}
@@ -533,8 +538,12 @@ ao_config_apogee_delay_set(void)
 	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
+	if (r > 255) {
+		ao_cmd_status = ao_cmd_lex_error;
+		return;
+	}
 	_ao_config_edit_start();
-	ao_config.apogee_delay = r;
+	ao_config.apogee_delay = (uint8_t) r;
 	_ao_config_edit_finish();
 }
 
@@ -548,11 +557,15 @@ ao_config_apogee_lockout_show(void)
 static void
 ao_config_apogee_lockout_set(void) 
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
+	if (r > 65535) {
+		ao_cmd_status = ao_cmd_lex_error;
+		return;
+	}
 	_ao_config_edit_start();
-	ao_config.apogee_lockout = r;
+	ao_config.apogee_lockout = (uint16_t) r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -594,7 +607,7 @@ ao_config_radio_rate_show(void)
 static void
 ao_config_radio_rate_set(void) 
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	if (AO_RADIO_RATE_MAX < r) {
@@ -602,7 +615,7 @@ ao_config_radio_rate_set(void)
 		return;
 	}
 	_ao_config_edit_start();
-	ao_config.radio_rate = r;
+	ao_config.radio_rate = (uint8_t) r;
 	_ao_config_edit_finish();
 #if HAS_TELEMETRY
 	ao_telemetry_reset_interval();
@@ -676,11 +689,11 @@ ao_config_ignite_mode_show(void)
 static void
 ao_config_ignite_mode_set(void) 
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.ignite_mode = r;
+	ao_config.ignite_mode = (uint8_t) r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -695,7 +708,7 @@ ao_config_pad_orientation_show(void)
 static void
 ao_config_pad_orientation_set(void) 
 {
-	uint16_t r = ao_cmd_decimal() & 1;
+	uint8_t r = ao_cmd_decimal() & 1;
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
@@ -720,11 +733,11 @@ ao_config_radio_enable_show(void)
 static void
 ao_config_radio_enable_set(void) 
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.radio_enable = r;
+	ao_config.radio_enable = r != 0;
 	_ao_config_edit_finish();
 #if HAS_TELEMETRY && HAS_RADIO_RATE
 	ao_telemetry_reset_interval();
@@ -774,11 +787,11 @@ ao_config_aprs_show(void)
 static void
 ao_config_aprs_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.aprs_interval = r;
+	ao_config.aprs_interval = (uint16_t) r;
 	_ao_config_edit_finish();
 	ao_telemetry_reset_interval();
 }
@@ -792,11 +805,11 @@ ao_config_aprs_offset_show(void)
 static void
 ao_config_aprs_offset_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.aprs_offset = r;
+	ao_config.aprs_offset = (uint8_t) r;
 	_ao_config_edit_finish();
 	ao_telemetry_reset_interval();
 }
@@ -845,6 +858,27 @@ ao_config_radio_power_set(void)
 
 #endif
 
+#if HAS_RADIO_10MW
+
+static void
+ao_config_radio_10mw_show(void)
+{
+	printf ("Radio 10mw limit: %d\n", ao_config.radio_10mw);
+}
+
+static void
+ao_config_radio_10mw_set(void)
+{
+	uint32_t r = ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.radio_10mw = !!r;
+	_ao_config_edit_finish();
+}
+
+#endif
+
 #if HAS_BEEP
 static void
 ao_config_beep_show(void)
@@ -855,11 +889,11 @@ ao_config_beep_show(void)
 static void
 ao_config_beep_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.mid_beep = r;
+	ao_config.mid_beep = (uint8_t) r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -876,11 +910,12 @@ ao_config_tracker_show(void)
 static void
 ao_config_tracker_set(void)
 {
-	uint16_t	m, i;
-	m = ao_cmd_decimal();
+	uint16_t	m;
+	uint8_t		i;
+	m = (uint16_t) ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
-	i = ao_cmd_decimal();
+	i = (uint8_t) ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
@@ -903,11 +938,11 @@ ao_config_pyro_time_show(void)
 static void
 ao_config_pyro_time_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.pyro_time = r;
+	ao_config.pyro_time = (uint16_t) r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -923,7 +958,7 @@ ao_config_aprs_ssid_show(void)
 static void
 ao_config_aprs_ssid_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	if (15 < r) {
@@ -931,14 +966,14 @@ ao_config_aprs_ssid_set(void)
 		return;
 	}
 	_ao_config_edit_start();
-	ao_config.aprs_ssid = r;
+	ao_config.aprs_ssid = (uint8_t) r;
 	_ao_config_edit_finish();
 }
 
 static void
 ao_config_aprs_format_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
@@ -963,11 +998,11 @@ ao_config_pad_box_show(void)
 static void
 ao_config_pad_box_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.pad_box = r;
+	ao_config.pad_box = (uint8_t) r;
 	_ao_config_edit_finish();
 }
 
@@ -980,11 +1015,11 @@ ao_config_pad_idle_show(void)
 static void
 ao_config_pad_idle_set(void)
 {
-	uint16_t r = ao_cmd_decimal();
+	uint32_t r = ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	_ao_config_edit_start();
-	ao_config.pad_idle = r;
+	ao_config.pad_idle = (uint8_t) r;
 	_ao_config_edit_finish();
 }
 #endif
@@ -1090,6 +1125,10 @@ const struct ao_config_var ao_config_vars[] = {
 	  ao_config_pad_box_set, ao_config_pad_box_show },
 	{ "i <seconds>\0Set idle timeout (0 disable)",
 	  ao_config_pad_idle_set, ao_config_pad_idle_show },
+#endif
+#if HAS_RADIO_10MW
+	{ "p <0 no limit, 1 limit>\0Limit radio power to 10mW",
+	  ao_config_radio_10mw_set,	ao_config_radio_10mw_show },
 #endif
 	{ "s\0Show",
 	  ao_config_show,		0 },

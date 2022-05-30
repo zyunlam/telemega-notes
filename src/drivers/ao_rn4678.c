@@ -108,7 +108,7 @@ static const char *status_strings[] = {
 #define NUM_STATUS_STRING	(sizeof status_strings/sizeof status_strings[0])
 
 static char		ao_rn_buffer[64];
-static int		ao_rn_buf_cnt, ao_rn_buf_ptr;
+static size_t		ao_rn_buf_cnt, ao_rn_buf_ptr;
 static int		ao_rn_draining;
 static AO_TICK_TYPE	ao_rn_buf_time;
 
@@ -146,9 +146,9 @@ _ao_wrap_rn_pollchar(void)
 				/* If we filled the buffer, just give up */
 				ao_rn_draining = 1;
 			} else {
-				ao_rn_buffer[ao_rn_buf_cnt++] = c;
+				ao_rn_buffer[ao_rn_buf_cnt++] = (char) c;
 				for (i = 0; i < NUM_STATUS_STRING; i++) {
-					int cmp = strlen(status_strings[i]);
+					size_t cmp = strlen(status_strings[i]);
 					if (cmp >= ao_rn_buf_cnt)
 						cmp = ao_rn_buf_cnt-1;
 					if (memcmp(ao_rn_buffer+1, status_strings[i], cmp) == 0)
@@ -158,7 +158,7 @@ _ao_wrap_rn_pollchar(void)
 					ao_rn_draining = 1;
 			}
 		} else if (c == STATUS_CHAR) {
-			ao_rn_buffer[0] = c;
+			ao_rn_buffer[0] = (char) c;
 			ao_rn_buf_cnt = 1;
 			ao_rn_buf_ptr = 0;
 			ao_rn_buf_time = ao_time();
@@ -227,17 +227,17 @@ ao_rn_wait_char(AO_TICK_TYPE giveup_time)
 			ao_arch_release_interrupts();
 			return AO_READ_AGAIN;
 		}
-		_ao_serial_rn_sleep_for(delay);
+		_ao_serial_rn_sleep_for((AO_TICK_TYPE) delay);
 	}
 	ao_arch_release_interrupts();
 	return c;
 }
 
 static int
-ao_rn_wait_for(int timeout, char *match)
+ao_rn_wait_for(AO_TICK_TYPE timeout, char *match)
 {
 	char		reply[AO_RN_MAX_REPLY_LEN + 1];
-	int		match_len = strlen(match);
+	size_t		match_len = strlen(match);
 	AO_TICK_TYPE	giveup_time = ao_time() + timeout;
 	int		c;
 
@@ -318,7 +318,7 @@ ao_rn_set_name(void)
 	*--s = '\0';
 	n = ao_serial_number;
 	do {
-		*--s = '0' + n % 10;
+		*--s = (uint8_t) ('0' + n % 10);
 	} while (n /= 10);
 	ao_rn_send_cmd(AO_RN_SET_NAME_CMD "TeleBT-", s);
 	return ao_rn_wait_status();
@@ -521,7 +521,7 @@ static void
 ao_rn_factory(void)
 {
 	int	i;
-	int	v = 0;
+	uint8_t	v = 0;
 
 	/*
 	 * Factory reset. Flip pin P3_1 5 times within the first five

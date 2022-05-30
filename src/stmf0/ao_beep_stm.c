@@ -58,7 +58,7 @@ disable(void)
 #if BEEPER_TIMER == 1
 	timer.bdtr = 0;
 #endif
-	stm_rcc_enr &= ~(1 << STM_RCC_TIMER);
+	stm_rcc_enr &= ~(1UL << STM_RCC_TIMER);
 
 	/* Disconnect the timer from the pin */
 	stm_afr_set(BEEPER_PORT, BEEPER_PIN, STM_AFR_NONE);
@@ -389,5 +389,5 @@ ao_beep_init(void)
 	ao_enable_output(BEEPER_PORT, BEEPER_PIN, 0);
 
 	/* Leave the timer off until requested */
-	stm_rcc_enr &= ~(1 << STM_RCC_TIMER);
+	stm_rcc_enr &= ~(1UL << STM_RCC_TIMER);
 }

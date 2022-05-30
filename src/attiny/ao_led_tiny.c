@@ -30,19 +30,19 @@ ao_led_on(uint8_t colors)
 void
 ao_led_off(uint8_t colors)
 {
-	LED_PORT &= ~colors;
+	LED_PORT &= (uint8_t) ~colors;
 }
 
 void
 ao_led_set(uint8_t colors)
 {
-	LED_PORT = (LED_PORT & ~LEDS_AVAILABLE) | (colors & LEDS_AVAILABLE);
+	LED_PORT = (uint8_t) ((LED_PORT & ~LEDS_AVAILABLE) | (colors & LEDS_AVAILABLE));
 }
 
 void
 ao_led_toggle(uint8_t colors)
 {
-	LED_PORT ^= (colors & LEDS_AVAILABLE);
+	LED_PORT = (uint8_t) (LED_PORT ^ (colors & LEDS_AVAILABLE));
 }
 
 void
@@ -56,6 +56,6 @@ ao_led_for(uint8_t colors, AO_TICK_TYPE ticks)
 void
 ao_led_init(void)
 {
-	LED_PORT &= ~LEDS_AVAILABLE;
+	LED_PORT &= (uint8_t) ~LEDS_AVAILABLE;
 	LED_DDR |= LEDS_AVAILABLE;
 }

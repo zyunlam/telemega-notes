@@ -63,7 +63,7 @@ _ao_flash_erase_page(uint32_t *page)
 
 	ao_flash_wait_bsy();
 
-	stm_flash.cr &= ~(1 << STM_FLASH_CR_PER);
+	stm_flash.cr &= ~(1UL << STM_FLASH_CR_PER);
 }
 
 static uint32_t
@@ -115,7 +115,7 @@ _ao_flash_page(uint16_t *dst, uint16_t *src)
 		ao_flash_wait_bsy();
 	}
 
-	stm_flash.cr &= ~(1 << STM_FLASH_CR_PG);
+	stm_flash.cr &= ~(1UL << STM_FLASH_CR_PG);
 }
 
 void

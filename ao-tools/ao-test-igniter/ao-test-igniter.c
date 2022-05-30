@@ -82,6 +82,16 @@ map_igniter_name(char *adc_name, char *igniter_name)
 	return true;
 }
 
+static const char *
+other_igniter_name(const char *name)
+{
+	if (!strcmp(name, "drogue"))
+		return "apogee";
+	if (!strcmp(name, "apogee"))
+		return "drogue";
+	return name;
+}
+
 static struct igniter *
 igniters(struct cc_usb *usb)
 {
@@ -115,7 +125,9 @@ igniters(struct cc_usb *usb)
 				if (found_igniter) {
 					struct igniter *i;
 					for (i = head; i; i = i->next)
-						if (!strcmp(i->name, igniter_name)) {
+						if (!strcmp(i->name, igniter_name) ||
+						    !strcmp(i->name, other_igniter_name(igniter_name)))
+						{
 							i->adc = atoi(tok);
 							break;
 						}

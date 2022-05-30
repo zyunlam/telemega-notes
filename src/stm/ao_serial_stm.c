@@ -64,7 +64,7 @@ _ao_usart_rx(struct ao_stm_usart *usart, int is_stdin)
 {
 	if (usart->reg->sr & (1 << STM_USART_SR_RXNE)) {
 		if (!ao_fifo_full(usart->rx_fifo)) {
-			ao_fifo_insert(usart->rx_fifo, usart->reg->dr);
+			ao_fifo_insert(usart->rx_fifo, (char) usart->reg->dr);
 			ao_wakeup(&usart->rx_fifo);
 			if (is_stdin)
 				ao_wakeup(&ao_stdin_ready);
@@ -78,7 +78,7 @@ _ao_usart_rx(struct ao_stm_usart *usart, int is_stdin)
 			}
 #endif
 		} else {
-			usart->reg->cr1 &= ~(1 << STM_USART_CR1_RXNEIE);
+			usart->reg->cr1 &= ~(1UL << STM_USART_CR1_RXNEIE);
 		}
 	}
 }
@@ -89,11 +89,11 @@ ao_usart_isr(struct ao_stm_usart *usart, int is_stdin)
 	_ao_usart_rx(usart, is_stdin);
 
 	if (!_ao_usart_tx_start(usart))
-		usart->reg->cr1 &= ~(1<< STM_USART_CR1_TXEIE);
+		usart->reg->cr1 &= ~(1UL << STM_USART_CR1_TXEIE);
 
 	if (usart->reg->sr & (1 << STM_USART_SR_TC)) {
 		usart->tx_running = 0;
-		usart->reg->cr1 &= ~(1 << STM_USART_CR1_TCIE);
+		usart->reg->cr1 &= ~(1UL << STM_USART_CR1_TCIE);
 		if (usart->draining) {
 			usart->draining = 0;
 			ao_wakeup(&usart->tx_fifo);
@@ -139,7 +139,7 @@ ao_usart_getchar(struct ao_stm_usart *usart)
 }
 
 static inline uint8_t
-_ao_usart_sleep_for(struct ao_stm_usart *usart, uint16_t timeout)
+_ao_usart_sleep_for(struct ao_stm_usart *usart, AO_TICK_TYPE timeout)
 {
 	return ao_sleep_for(&usart->rx_fifo, timeout);
 }
@@ -276,7 +276,7 @@ _ao_serial1_pollchar(void)
 }
 
 uint8_t
-_ao_serial1_sleep_for(uint16_t timeout)
+_ao_serial1_sleep_for(AO_TICK_TYPE timeout)
 {
 	return _ao_usart_sleep_for(&ao_stm_usart1, timeout);
 }
@@ -320,7 +320,7 @@ _ao_serial2_pollchar(void)
 }
 
 uint8_t
-_ao_serial2_sleep_for(uint16_t timeout)
+_ao_serial2_sleep_for(AO_TICK_TYPE timeout)
 {
 	return _ao_usart_sleep_for(&ao_stm_usart2, timeout);
 }
@@ -373,7 +373,7 @@ _ao_serial3_pollchar(void)
 }
 
 uint8_t
-_ao_serial3_sleep_for(uint16_t timeout)
+_ao_serial3_sleep_for(AO_TICK_TYPE timeout)
 {
 	return _ao_usart_sleep_for(&ao_stm_usart3, timeout);
 }
@@ -397,9 +397,9 @@ static void
 ao_serial_set_sw_rts_cts(struct ao_stm_usart *usart,
 			 void (*isr)(void),
 			 struct stm_gpio *port_rts,
-			 int pin_rts,
+			 uint8_t pin_rts,
 			 struct stm_gpio *port_cts,
-			 int pin_cts)
+			 uint8_t pin_cts)
 {
 	/* Pull RTS low to note that there's space in the FIFO
 	 */

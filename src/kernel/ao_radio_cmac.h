@@ -36,7 +36,7 @@ ao_radio_cmac_send(void *packet, uint8_t len);
 #define AO_RADIO_CMAC_TIMEOUT	-4
 
 int8_t
-ao_radio_cmac_recv(void *packet, uint8_t len, uint16_t timeout);
+ao_radio_cmac_recv(void *packet, uint8_t len, AO_TICK_TYPE timeout);
 
 void
 ao_radio_cmac_init(void);

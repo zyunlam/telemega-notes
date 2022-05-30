@@ -39,7 +39,7 @@ extern uint8_t	ao_lco_drag_race;	/* true when drag race mode enabled */
 #endif
 
 extern uint8_t	ao_lco_pad;		/* Currently selected pad */
-extern int16_t	ao_lco_box;		/* Currently selected box */
+extern uint16_t	ao_lco_box;		/* Currently selected box */
 
 extern uint8_t	ao_lco_armed;		/* armed mode active */
 extern uint8_t	ao_lco_firing;		/* fire button pressed */
@@ -48,7 +48,7 @@ extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 
 #define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
 
-extern uint8_t	ao_lco_min_box, ao_lco_max_box;
+extern uint16_t	ao_lco_min_box, ao_lco_max_box;
 
 #define AO_LCO_MASK_SIZE(n)	(((n) + 7) >> 3)
 #define AO_LCO_MASK_ID(n)	((n) >> 3)
@@ -67,10 +67,10 @@ void
 ao_lco_update(void);
 
 uint8_t
-ao_lco_pad_present(uint8_t box, uint8_t pad);
+ao_lco_pad_present(uint16_t box, uint8_t pad);
 
 uint8_t
-ao_lco_pad_first(uint8_t box);
+ao_lco_pad_first(uint16_t box);
 
 void
 ao_lco_set_pad(uint8_t new_pad);

@@ -41,6 +41,6 @@ ao_boot_check_pin(void)
 	/* Reset the chip to turn off the port and the power interface clock */
 	ao_gpio_set_mode(&AO_BOOT_APPLICATION_GPIO, AO_BOOT_APPLICATION_PIN, 0);
 	ao_disable_port(&AO_BOOT_APPLICATION_GPIO);
-	stm_rcc.apb1enr &= ~(1 << STM_RCC_APB1ENR_PWREN);
+	stm_rcc.apb1enr &= ~(1UL << STM_RCC_APB1ENR_PWREN);
 	return v == AO_BOOT_APPLICATION_VALUE;
 }

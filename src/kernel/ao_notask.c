@@ -44,7 +44,7 @@ void
 ao_delay_until(AO_TICK_TYPE target)
 {
 	ao_arch_block_interrupts();
-	while ((int16_t) (target - ao_tick_count) > 0)
+	while ((AO_TICK_SIGNED) (target - ao_tick_count) > 0)
 		ao_sleep((void *) &ao_tick_count);
 	ao_arch_release_interrupts();
 }

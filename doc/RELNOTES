@@ -6,6 +6,8 @@ Creating documentation for a new release of AltOS
 
 * Make sure doc/altusmetrum-theme.yml has the right copyright year
 
+* Make sure header.inc has the right copyright year
+
 * Add references to that as appropriate from each of the documents:
 
 	release-notes.inc

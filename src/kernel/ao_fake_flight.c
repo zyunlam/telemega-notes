@@ -27,7 +27,7 @@ uint8_t			ao_fake_flight_active;
 static uint8_t		ao_fake_has_cur;
 static volatile uint8_t	ao_fake_has_next;
 static uint8_t		ao_fake_has_offset;
-static uint16_t		ao_fake_tick_offset;
+static AO_TICK_TYPE	ao_fake_tick_offset;
 static struct ao_data	ao_fake_cur, ao_fake_next;
 
 void

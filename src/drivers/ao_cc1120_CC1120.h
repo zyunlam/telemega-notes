@@ -66,7 +66,7 @@
 	/* Carrier sense threshold - 25dB above the noise */
         CC1120_AGC_CS_THR,                     25,         /* Carrier Sense Threshold Configuration */
         CC1120_AGC_GAIN_ADJUST,				   /* RSSI Offset Configuration */
-                AO_CC1120_AGC_GAIN_ADJUST,
+                (uint16_t) AO_CC1120_AGC_GAIN_ADJUST,
 
 	CC1120_AGC_CFG3,                              	   /* AGC Configuration */
 		(1 << CC1120_AGC_CFG3_RSSI_STEP_THR) |

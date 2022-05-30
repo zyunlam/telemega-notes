@@ -449,22 +449,22 @@ ao_radio_set_mode(uint16_t new_mode)
 	if (new_mode == ao_radio_mode)
 		return;
 
-	changes = new_mode & (~ao_radio_mode);
+	changes = (uint16_t) (new_mode & (~ao_radio_mode));
 	if (changes & AO_RADIO_MODE_BITS_PACKET_TX) {
 		ao_radio_reg_write(CC115L_MDMCFG4, packet_rate_setup[ao_config.radio_rate].mdmcfg4);
 		ao_radio_reg_write(CC115L_DEVIATN, packet_rate_setup[ao_config.radio_rate].deviatn);
 
 		for (i = 0; i < sizeof (packet_setup) / sizeof (packet_setup[0]); i += 2)
-			ao_radio_reg_write(packet_setup[i], packet_setup[i+1]);
+			ao_radio_reg_write((uint8_t) packet_setup[i], (uint8_t) packet_setup[i+1]);
 	}
 
 	if (changes & AO_RADIO_MODE_BITS_RDF)
 		for (i = 0; i < sizeof (rdf_setup) / sizeof (rdf_setup[0]); i += 2)
-			ao_radio_reg_write(rdf_setup[i], rdf_setup[i+1]);
+			ao_radio_reg_write((uint8_t) rdf_setup[i], (uint8_t) rdf_setup[i+1]);
 
 	if (changes & AO_RADIO_MODE_BITS_APRS)
 		for (i = 0; i < sizeof (aprs_setup) / sizeof (aprs_setup[0]); i += 2)
-			ao_radio_reg_write(aprs_setup[i], aprs_setup[i+1]);
+			ao_radio_reg_write((uint8_t) aprs_setup[i], (uint8_t) aprs_setup[i+1]);
 
 	if (changes & AO_RADIO_MODE_BITS_INFINITE)
 		ao_radio_reg_write(CC115L_PKTCTRL0, AO_PKTCTRL0_INFINITE);
@@ -536,7 +536,7 @@ ao_radio_setup(void)
 	ao_delay(AO_MS_TO_TICKS(10));
 
 	for (i = 0; i < sizeof (radio_setup) / sizeof (radio_setup[0]); i += 2)
-		ao_radio_reg_write(radio_setup[i], radio_setup[i+1]);
+		ao_radio_reg_write((uint8_t) radio_setup[i], (uint8_t) radio_setup[i+1]);
 
 	ao_radio_mode = 0;
 
@@ -570,15 +570,15 @@ ao_radio_get(void)
 	if (!ao_radio_configured)
 		ao_radio_setup();
 	if (ao_config.radio_setting != last_radio_setting) {
-		ao_radio_reg_write(CC115L_FREQ2, ao_config.radio_setting >> 16);
-		ao_radio_reg_write(CC115L_FREQ1, ao_config.radio_setting >> 8);
-		ao_radio_reg_write(CC115L_FREQ0, ao_config.radio_setting);
+		ao_radio_reg_write(CC115L_FREQ2, (uint8_t) (ao_config.radio_setting >> 16));
+		ao_radio_reg_write(CC115L_FREQ1, (uint8_t) (ao_config.radio_setting >> 8));
+		ao_radio_reg_write(CC115L_FREQ0, (uint8_t) (ao_config.radio_setting));
 		last_radio_setting = ao_config.radio_setting;
 		/* Make sure the RF calibration is current */
 		ao_radio_strobe(CC115L_SCAL);
 	}
 	if (ao_config.radio_rate != last_radio_rate) {
-		ao_radio_mode &= ~AO_RADIO_MODE_BITS_PACKET_TX;
+		ao_radio_mode &= (uint16_t) ~AO_RADIO_MODE_BITS_PACKET_TX;
 		last_radio_rate = ao_config.radio_rate;
 	}
 }
@@ -614,11 +614,11 @@ ao_radio_tone_fill(uint8_t *buf, int16_t len)
 			this_time = len;
 
 		/* queue the data */
-		memset(buf, t->value, this_time);
+		memset(buf, t->value, (size_t) this_time);
 
 		/* mark as sent */
 		len -= this_time;
-		ao_radio_tone_offset += this_time;
+		ao_radio_tone_offset += (uint8_t) this_time;
 		ret += this_time;
 
 		if (ao_radio_tone_offset >= t->len) {
@@ -641,7 +641,7 @@ ao_radio_tone_run(struct ao_radio_tone *tones, int ntones)
 	ao_radio_tone = tones;
 	ao_radio_tone_current = 0;
 	ao_radio_tone_offset = 0;
-	ao_radio_tone_count = ntones;
+	ao_radio_tone_count = (uint8_t) ntones;
 	_ao_radio_send_lots(ao_radio_tone_fill, AO_RADIO_MODE_RDF);
 	ao_radio_put();
 }
@@ -703,7 +703,7 @@ ao_radio_test_cmd(void)
 	static uint8_t radio_on;
 	ao_cmd_white();
 	if (ao_cmd_lex_c != '\n')
-		mode = ao_cmd_decimal();
+		mode = (uint8_t) ao_cmd_decimal();
 	mode++;
 	if ((mode & 2) && !radio_on) {
 #if HAS_MONITOR
@@ -786,7 +786,7 @@ ao_radio_send_fill(uint8_t *buf, int16_t len)
 	this_time = ao_radio_send_len;
 	if (this_time > len)
 		this_time = len;
-	memcpy(buf, ao_radio_send_buf, this_time);
+	memcpy(buf, ao_radio_send_buf, (size_t) this_time);
 	ao_radio_send_buf += this_time;
 	ao_radio_send_len -= this_time;
 	if (ao_radio_send_len == 0)
@@ -834,7 +834,7 @@ _ao_radio_send_lots(ao_radio_fill_func fill, uint8_t mode)
 
 		/* At the last buffer, set the total length */
 		if (done) {
-			ao_radio_set_len(total & 0xff);
+			ao_radio_set_len((uint8_t) (total & 0xff));
 			ao_radio_set_mode(mode | AO_RADIO_MODE_BITS_FIXED);
 		} else {
 			ao_radio_set_len(0xff);
@@ -843,7 +843,7 @@ _ao_radio_send_lots(ao_radio_fill_func fill, uint8_t mode)
 
 		b = buf;
 		while (cnt) {
-			uint8_t	this_len = cnt;
+			uint8_t	this_len = (uint8_t) cnt;
 
 			/* Wait for some space in the fifo */
 			while (!ao_radio_abort && (fifo_space = ao_radio_tx_fifo_space()) == 0) {

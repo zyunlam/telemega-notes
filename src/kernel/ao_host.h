@@ -32,7 +32,7 @@
  * One set of samples read from the A/D converter
  */
 struct ao_adc {
-	uint16_t	tick;		/* tick when the sample was read */
+	AO_TICK_TYPE	tick;		/* tick when the sample was read */
 	int16_t		accel;		/* accelerometer */
 	int16_t		pres;		/* pressure sensor */
 	int16_t		temp;		/* temperature sensor */

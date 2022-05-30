@@ -39,8 +39,8 @@ enum ao_flight_state {
 };
 
 extern enum ao_flight_state	ao_flight_state;
-extern uint16_t			ao_boost_tick;
-extern uint16_t			ao_launch_tick;
+extern AO_TICK_TYPE		ao_boost_tick;
+extern AO_TICK_TYPE		ao_launch_tick;
 extern uint16_t			ao_motor_number;
 
 extern uint16_t			ao_launch_time;

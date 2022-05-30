@@ -17,6 +17,7 @@ FAKETIME=TZ=UTC faketime -f '$(RELEASE_DATE) 00:00:00 i0'
 endif
 
 RELNOTES_INC=\
+	release-notes-1.9.11.inc \
 	release-notes-1.9.10.inc \
 	release-notes-1.9.9.inc \
 	release-notes-1.9.8.inc \
@@ -137,6 +138,7 @@ COMMON_INC_FILES=\
 	config-ui.inc \
 	load-maps.inc \
 	aprs-operation.inc \
+	pyro-examples.inc \
 	handling.inc \
 	release-head.inc
 
@@ -155,6 +157,7 @@ INC_FILES=\
 	installation.inc \
 	using-am-products.inc \
 	updating-firmware.inc \
+	frequency-cal.inc \
 	altosui.inc \
 	altosdroid.inc \
 	system-operation.inc \

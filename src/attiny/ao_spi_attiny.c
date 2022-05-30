@@ -117,7 +117,7 @@ ao_spi_init(void)
 #else
 	USICR = SPI_USICR_FAST_2;
 #endif
-	SPI_DIR &= ~(1 << DDB0);	/* DI */
+	SPI_DIR &= (uint8_t) ~(1 << DDB0);	/* DI */
 	SPI_DIR |= (1 << DDB1);		/* DO */
 	SPI_DIR |= (1 << DDB2);		/* SCLK */
 }

@@ -79,7 +79,7 @@ static const uint8_t	ao_adc_mask_seq[AO_ADC_NUM] = {
 	1 << 4,
 #endif
 #if AO_ADC_5
-	1 << 6,
+	1 << 5,
 #endif
 #if AO_ADC_6
 	1 << 6,
@@ -92,7 +92,7 @@ static const uint8_t	ao_adc_mask_seq[AO_ADC_NUM] = {
 #define sample(id)	(*out++ = (uint16_t) lpc_adc.dr[id] >> 1)
 
 static inline void lpc_adc_start(void) {
-	lpc_adc.cr = ((ao_adc_mask_seq[ao_adc_sequence] << LPC_ADC_CR_SEL) |
+	lpc_adc.cr = (((uint32_t) ao_adc_mask_seq[ao_adc_sequence] << LPC_ADC_CR_SEL) |
 		      (AO_ADC_CLKDIV << LPC_ADC_CR_CLKDIV) |
 		      (0 << LPC_ADC_CR_BURST) |
 		      (LPC_ADC_CR_CLKS_11 << LPC_ADC_CR_CLKS) |
@@ -160,7 +160,7 @@ void
 ao_adc_init(void)
 {
 	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_ADC);
-	lpc_scb.pdruncfg &= ~(1 << LPC_SCB_PDRUNCFG_ADC_PD);
+	lpc_scb.pdruncfg &= ~(1UL << LPC_SCB_PDRUNCFG_ADC_PD);
 
 	/* Enable interrupt when channel is complete */
 	lpc_adc.inten = (1 << LPC_ADC_INTEN_ADGINTEN);

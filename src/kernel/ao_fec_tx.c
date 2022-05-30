@@ -54,7 +54,7 @@ uint8_t
 ao_fec_check_crc(const uint8_t *bytes, uint8_t len)
 {
 	uint16_t	computed_crc = ao_fec_crc(bytes, len);
-	uint16_t	received_crc = (bytes[len] << 8) | (bytes[len+1]);
+	uint16_t	received_crc = (uint16_t) ((bytes[len] << 8) | (bytes[len+1]));
 
 	return computed_crc == received_crc;
 }
@@ -70,8 +70,8 @@ ao_fec_prepare(const uint8_t *in, uint8_t len, uint8_t *extra)
 	uint8_t		num_fec;
 
 	/* Append CRC */
-	extra[i++] = crc >> 8;
-	extra[i++] = crc;
+	extra[i++] = (uint8_t) (crc >> 8);
+	extra[i++] = (uint8_t) crc;
 
 	/* Append FEC -- 1 byte if odd, two bytes if even */
 	num_fec = 2 - (i & 1);
@@ -112,7 +112,7 @@ ao_fec_encode(const uint8_t *in, uint8_t len, uint8_t *out)
 		for (byte = 0; byte < 2; byte++) {
 			if (pair + byte == len)
 				in = extra;
-			fec |= *in++ ^ *whiten++;
+			fec |= (uint16_t) (*in++ ^ *whiten++);
 			for (bit = 0; bit < 8; bit++) {
 				encode = encode << 2 | ao_fec_encode_table[fec >> 7];
 				fec = (fec << 1) & 0x7ff;
@@ -126,10 +126,10 @@ ao_fec_encode(const uint8_t *in, uint8_t len, uint8_t *out)
 
 			interleave = (interleave << 2) | ((encode >> (byte_shift + bit_shift)) & 0x3);
 		}
-		*out++ = interleave >> 24;
-		*out++ = interleave >> 16;
-		*out++ = interleave >> 8;
-		*out++ = interleave >> 0;
+		*out++ = (uint8_t) (interleave >> 24);
+		*out++ = (uint8_t) (interleave >> 16);
+		*out++ = (uint8_t) (interleave >> 8);
+		*out++ = (uint8_t) (interleave >> 0);
 	}
-	return (len + extra_len) * 2;
+	return (uint8_t) ((len + extra_len) * 2);
 }

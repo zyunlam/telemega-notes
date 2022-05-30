@@ -76,8 +76,8 @@ struct ao_pyro {
 	int32_t			delay;
 	uint8_t			state_less, state_greater_or_equal;
 	int16_t			motor;
-	int32_t			delay_done;
-	uint8_t			_unused;	/* was 'fired' */
+	uint32_t		_unused1;	/* was 'delay_done' */
+	uint8_t			_unused2;	/* was 'fired' */
 };
 
 #define AO_PYRO_8_BIT_VALUE	(ao_pyro_state_less|ao_pyro_state_greater_or_equal)

@@ -102,17 +102,17 @@ void
 ao_dma_start(uint8_t index)
 {
 	ao_dma_done[index] = 0;
-	stm_dma.channel[index].ccr |= (1 << STM_DMA_CCR_EN);
+	stm_dma.channel[index].ccr |= (1UL << STM_DMA_CCR_EN);
 }
 
 void
 ao_dma_done_transfer(uint8_t index)
 {
-	stm_dma.channel[index].ccr &= ~(1 << STM_DMA_CCR_EN);
+	stm_dma.channel[index].ccr &= ~(1UL << STM_DMA_CCR_EN);
 #ifndef LEAVE_DMA_ON
 	ao_arch_critical(
 		if (--ao_dma_active == 0)
-			stm_rcc.ahbenr &= ~(1 << STM_RCC_AHBENR_DMA1EN);
+			stm_rcc.ahbenr &= ~(1UL << STM_RCC_AHBENR_DMA1EN);
 		);
 #endif
 	if (ao_dma_allocated[index])

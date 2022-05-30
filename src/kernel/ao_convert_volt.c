@@ -27,7 +27,7 @@
 int16_t
 ao_battery_decivolt(int16_t adc)
 {
-	return scale(adc, AO_BATTERY_DIV_PLUS, AO_BATTERY_DIV_MINUS);
+	return (int16_t) scale(adc, AO_BATTERY_DIV_PLUS, AO_BATTERY_DIV_MINUS);
 }
 #endif
 
@@ -35,6 +35,6 @@ ao_battery_decivolt(int16_t adc)
 int16_t
 ao_ignite_decivolt(int16_t adc)
 {
-	return scale(adc, AO_IGNITE_DIV_PLUS, AO_IGNITE_DIV_MINUS);
+	return (int16_t) scale(adc, AO_IGNITE_DIV_PLUS, AO_IGNITE_DIV_MINUS);
 }
 #endif

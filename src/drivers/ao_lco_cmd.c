@@ -32,8 +32,8 @@ static uint8_t	lco_channels;
 static void
 lco_args(void) 
 {
-	lco_box = ao_cmd_decimal();
-	lco_channels = ao_cmd_hex();
+	lco_box = (uint16_t) ao_cmd_decimal();
+	lco_channels = (uint8_t) ao_cmd_hex();
 }
 
 static struct ao_pad_query	ao_pad_query;
@@ -126,7 +126,7 @@ lco_fire_cmd(void)
 	int8_t		r;
 
 	lco_args();
-	secs = ao_cmd_decimal();
+	secs = (uint8_t) ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	r = lco_query();
@@ -140,7 +140,7 @@ lco_fire_cmd(void)
 		lco_arm();
 	}
 
-	secs = secs * 10 - 5;
+	secs = (uint8_t) (secs * 10 - 5);
 	if (secs > 100)
 		secs = 100;
 	for (i = 0; i < secs; i++) {
@@ -159,7 +159,7 @@ lco_static_cmd(void)
 	int8_t		r;
 
 	lco_args();
-	secs = ao_cmd_decimal();
+	secs = (uint8_t) ao_cmd_decimal();
 	if (ao_cmd_status != ao_cmd_success)
 		return;
 	r = lco_query();
@@ -173,7 +173,7 @@ lco_static_cmd(void)
 		lco_arm();
 	}
 
-	secs = secs * 10 - 5;
+	secs = (uint8_t) (secs * 10 - 5);
 	if (secs > 100)
 		secs = 100;
 	for (i = 0; i < secs; i++) {

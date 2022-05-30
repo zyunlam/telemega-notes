@@ -126,9 +126,9 @@ These are Bdale's notes on how to do a release.
 	   src/easymini-v[1-2].0/flash-loader/*.elf \
 	   src/easymotor-v2/flash-loader/*.elf \
 	   src/easytimer-v1/flash-loader/*.elf \
-	   src/telebt-v[3-4].0/flash-loader/*.elf \
+	   src/telebt-v[3-4].0/flash-loader/{*.elf,*.bin,*.map} \
 	   src/teledongle-v3.0/flash-loader/*.elf \
-	   src/telegps-v[1-2].0/flash-loader/*.elf \
+	   src/telegps-v[1-2].0/flash-loader/{*.elf,*.bin,*.map} \
 	   src/telemega-v[1-5].0/flash-loader/*.elf \
 	   src/telemetrum-v[2-3].0/flash-loader/*.elf \
 	   src/telemini-v3.0/flash-loader/{*.elf,*.bin,*.map} \

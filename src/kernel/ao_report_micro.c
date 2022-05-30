@@ -48,7 +48,7 @@ ao_report_altitude(void)
 		agl = 0;
 	ndigits = 0;
 	do {
-		digits[ndigits++] = agl % 10;
+		digits[ndigits++] = (uint8_t) agl % 10;
 		agl /= 10;
 	} while (agl);
 
