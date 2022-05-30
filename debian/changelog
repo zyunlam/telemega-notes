@@ -1,3 +1,102 @@
+altos (1.9.11-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * capture odd changes from production machine?
+  * fix version in 1.9.10 release notes
+  * fix version in 1.9.10 release notes
+  * need to capture .bin file for telebt loader, too
+  * doc: add an appendix on frequency calibration to the all-in-one manual
+  * need to capture .bin file for telebt loader, too
+  * need to save .bin for TeleGPS v2.0
+  * dial it down a bit more to not exceed +10 dBm, or 10 mW
+  * use correct test script for v1.0 easymega
+  * doc: add an appendix with examples for configurable pyro channels
+  * releasing 1.9.11
+
+  [ Keith Packard ]
+  * altosdroid: Skip map draw before transform is set
+  * altosdroid: Fix tab updates on Android 11 after rotate
+  * Version 1.9.10.1
+  * micropeak: detect empty log received from device
+  * ao-tools/ao-test-igniter: Deal with devices that use both 'apogee' for ADC
+  * altos/attiny: Switch to avrisp2 for development programmer
+  * altos: Switch all tick variables to AO_TICK_TYPE/AO_TICK_SIGNED
+  * altosdroid: Add BLUETOOTH_CONNECT permission, handle its lack
+  * Version 1.9.10.2
+  * data_interval == 0 means no data collection
+  * altos: AES code was storing bytes in an int array
+  * ao_pyro: Move delay_done out of pyro structure
+  * Switch from AdoptOpenJDK to Adoptium
+  * libaltos: Build Mac OSX libaltos.dylib for arm64 too
+  * Version 1.9.10.3
+  * altos: Re-enable apogee delay
+  * altos/attiny: Eliminate warnings from -Wconversion
+  * altos/drivers: Add explicit casts in ao_aprs, ao_bmx160 and ao_btm
+  * altos/drivers/ao_button: Save all 32-bits of irq status
+  * drivers: Fix type of radio timeout parameter
+  * ao_gps_skytrac, ao_gps_ublox: Add explicit casts to quiet -Wconversion
+  * ao_companion: Make time conversion to 16-bits in companion protocol explicit
+  * ao_hmc5883: Add explicit casts for -Wconversion
+  * drivers/ao_lco: Fix box types to be uint16_t. Also clean other -Wconversion messages
+  * drivers: Resolve -Wconversion in m25, mma655x, mmc5983, mpu and ms5607
+  * drivers/ao_packet: Switch time values to AO_TICK_TYPE
+  * drivers/ao_pad: Convert from/to 16-bit times over the air
+  * drivers/ao_quadrature: Fix -Wconversion warnings
+  * drivers/ao_rn4678: Fix timeouts to use AO_TICK_TYPE
+  * altos: Switch ao_radio_recv timeout to AO_TICK_TYPE
+  * altos/ao_stdio: use uint8_t for stdio index
+  * altos/ao_freq: Use uint32_t for radio freq setting value
+  * beep, cmd, config, convert_volt, data, distance, fec, kalman: -Wconversion warnings
+  * fifo: Add casts to fifo operation macros for -Wconversion
+  * ao_companion: Make motor_number uint16_t
+  * ao_convert_pa: Switch array index to unsigned type
+  * ao_flight: ao_interval_end type was too small, could cause premature landing state
+  * ao_gps, ao_log: Make conversions to 16-bit time log values explicit
+  * ao_log: Change flight type to uint16_t, widen APIs dealing with flight numbers to int32_t
+  * more 16-bit log tick values
+  * ao_log: Fix sensor time triggers to use AO_TICK_TYPE
+  * ao_log: Add casts to reduce -Wconversion warnings
+  * ao_micro: Add casts to micropeak code for -Wconversion warnings
+  * ao_radio_cmac: Make recv timeouts AO_TICK_TYPE
+  * ao_radio_cmac_cmd: Clean up types for -Wconversion
+  * ao_monitor: Clean up -Wconversion warnings
+  * kalman, report, romconfig, sample, send_packet: Clean up -Wconversion warnings
+  * ao_serial: Change serial_sleep_for APIs to use AO_TICK_TYPE
+  * ao_task: Task ids are 8-bits, fix type in struct ao_task
+  * ao_telemetry: Switch time variables to AO_TICK_TYPE
+  * ao_telemetry: Use int16_t types for telemetry packet intervals
+  * ao_telemetry: Add casts to reduce -Wconversion warnings
+  * ao_tracker: Fix tracker_interval type to match config type (plus -Wconversion)
+  * altos/lpc: Add casts to reduce -Wconversion warnings
+  * altos/micropeak-v2.0: Add casts to reduce -Wconversion warnings
+  * ao_flash_task: Add casts to reduce -Wconversion warnings
+  * ao_micropeak.c: Add casts to reduce -Wconversion warnings
+  * altos/stm: Add casts to reduce -Wconversion warnings
+  * altos/stm32l0: Add casts to reduce -Wconversion warnings
+  * altos/stmf0: Add casts to reduce -Wconversion warnings. Use AO_TICK_TYPE
+  * altos/telefire: Add cast to AO_LED_CONTINUITY to eliminate -Wconversion warning
+  * telefireone-v1.0: Use a boolean value for ao_log_running
+  * ao_lco_v2: Use int32_t for temporary box value in step_box
+  * ao_lco_v2: Add casts to reduce -Wconversion warnings
+  * altos/telemega-v5.0: Add casts to beep values
+  * altos: Add -Wconversion
+  * altos: Deal with 8-character version numbers
+  * altos: Document how delay_done is used in ao_pyro.c
+  * Version 1.9.10.4
+  * Allow TX power to be limited to 10mW
+  * ao-telem: Read from stdin if no filenames
+  * telegps-v0.3: Reduce stack size to fit in ram
+  * ao-tools/ao-eeprom: Dump converted info for F packets
+  * lpc: ADC 5 was busted
+  * lpc: Make beeper configurable
+  * src: Add easymini-v3.0
+  * doc: Document 10mw limit configuration
+  * doc: Add release notes for 1.9.11
+  * doc: Update copyrights to 2022
+  * Version 1.9.11
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 29 May 2022 21:09:27 -0600
+
 altos (1.9.10-1) unstable; urgency=medium
 
   [ Keith Packard ]
