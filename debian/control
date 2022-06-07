@@ -35,24 +35,70 @@ Build-Depends: asciidoctor,
                pkg-config,
                shared-mime-info,
                swig
-Standards-Version: 4.6.0
+Standards-Version: 4.6.1
 Homepage: http://altusmetrum.org/AltOS
 Vcs-Git: git://git.gag.com/fw/altos -b debian
 Vcs-Browser: http://git.gag.com/?p=fw/altos
 
 Package: altos
 Architecture: any
-Depends: default-jre | java2-runtime,
+Depends: altos-common,
+	 default-jre | java2-runtime,
          freetts,
          libjfreechart-java,
          nickle,
          ${misc:Depends},
          ${shlibs:Depends}
-Suggests: slim | gdm
-Replaces: altusmetrum-themes, slim-altusmetrum
-Conflicts: altusmetrum-themes, slim-altusmetrum
-Description: Altus Metrum firmware and utilities
+Description: Altus Metrum support software
  Firmware and utilities needed to support high power model rocketry products
- from Altus Metrum, including TeleMetrum, TeleMini, and TeleDongle.
+ from Altus Metrum.
  .
  See http://altusmetrum.org/ for more information.
+ .
+ This package contains architecture-specific files.
+
+Package: altos-common
+Architecture: all
+Depends: altos-jars
+Replaces: altusmetrum-themes, slim-altusmetrum
+Conflicts: altusmetrum-themes, slim-altusmetrum
+Description: Altus Metrum support software
+ Firmware and utilities needed to support high power model rocketry products
+ from Altus Metrum.
+ .
+ See http://altusmetrum.org/ for more information.
+ .
+ This package contains architecture-independent files.
+
+Package: altos-jars
+Architecture: all
+Description: Altus Metrum support software
+ Firmware and utilities needed to support high power model rocketry products
+ from Altus Metrum.
+ .
+ See http://altusmetrum.org/ for more information.
+ .
+ This package contains Java class library jar files.
+
+Package: altos-mapservice
+Architecture: any
+Depends: altos-jars
+Description: Altus Metrum support software
+ Firmware and utilities needed to support high power model rocketry products
+ from Altus Metrum.
+ .
+ See http://altusmetrum.org/ for more information.
+ .
+ This package contains the map tile server used on maps.altusmetrum.org.
+
+Package: altos-mfg
+Architecture: any
+Depends: altos
+Description: Altus Metrum support software
+ Firmware and utilities needed to support high power model rocketry products
+ from Altus Metrum.
+ .
+ See http://altusmetrum.org/ for more information.
+ .
+ This package contains production test programs and scripts.
+
