@@ -1,3 +1,9 @@
+altos (1.9.11-2) UNRELEASED; urgency=medium
+
+  * refactor package build for multiple binary packages
+
+ -- Bdale Garbee <bdale@gag.com>  Tue, 07 Jun 2022 16:21:57 -0400
+
 altos (1.9.11-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
