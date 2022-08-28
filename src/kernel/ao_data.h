@@ -90,6 +90,13 @@
 #define AO_DATA_BMX160	0
 #endif
 
+#if HAS_BMI088
+#include <ao_bmi088.h>
+#define AO_DATA_BMI088 (1 << 2)
+#else
+#define AO_DATA_BMI088	0
+#endif
+
 #ifndef HAS_SENSOR_ERRORS
 #if HAS_IMU || HAS_MMA655X || HAS_MS5607 || HAS_MS5611
 #define HAS_SENSOR_ERRORS	1
@@ -102,7 +109,7 @@ extern uint8_t			ao_sensor_errors;
 
 #ifdef AO_DATA_RING
 
-#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375|AO_DATA_BMX160|AO_DATA_MMC5983)
+#define AO_DATA_ALL	(AO_DATA_ADC|AO_DATA_MS5607|AO_DATA_MPU6000|AO_DATA_HMC5883|AO_DATA_MMA655X|AO_DATA_MPU9250|AO_DATA_ADXL375|AO_DATA_BMX160|AO_DATA_MMC5983|AO_DATA_BMI088)
 
 struct ao_data {
 	AO_TICK_TYPE			tick;
@@ -145,6 +152,12 @@ struct ao_data {
 #endif
 #if HAS_BMX160
 	struct ao_bmx160_sample		bmx160;
+#if !HAS_ADXL375
+	int16_t z_accel;
+#endif
+#endif
+#if HAS_BMI088
+	struct ao_bmi088_sample		bmi088;
 #if !HAS_ADXL375
 	int16_t z_accel;
 #endif
@@ -490,6 +503,29 @@ static inline float ao_convert_accel(int16_t sensor)
 
 #endif
 
+#if !HAS_GYRO && HAS_BMI088
+
+#define HAS_GYRO	1
+
+typedef int16_t	gyro_t;		/* in raw sample units */
+typedef int16_t angle_t;	/* in degrees */
+
+/* X axis is aligned with the direction of motion (along) */
+/* Y axis is aligned in the other board axis (across) */
+/* Z axis is aligned perpendicular to the board (through) */
+
+static inline float ao_convert_gyro(float sensor)
+{
+	return ao_bmi088_gyro(sensor);
+}
+
+static inline float ao_convert_accel(int16_t sensor)
+{
+	return ao_bmi088_accel(sensor);
+}
+
+#endif
+
 #if !HAS_MAG && HAS_HMC5883
 
 #define HAS_MAG		1
@@ -563,6 +599,9 @@ ao_data_fill(int head) {
 #endif
 #if HAS_BMX160
 		ao_data_ring[head].bmx160 = ao_bmx160_current;
+#endif
+#if HAS_BMI088
+		ao_data_ring[head].bmi088 = ao_bmi088_current;
 #endif
 		ao_data_ring[head].tick = ao_tick_count;
 		ao_data_head = ao_data_ring_next(head);
