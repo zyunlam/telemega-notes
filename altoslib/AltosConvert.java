@@ -323,10 +323,28 @@ public class AltosConvert {
 		return (voltage - base) / (max - base) * full_scale_pressure;
 	}
 
+	static double easy_motor_3_adc(double raw) {
+		return raw / 32767.0;
+	}
+
+	static double easy_motor_3_voltage(int sensor) {
+		double	supply = 3.3;
+
+		return easy_motor_3_adc(sensor) * supply * 15.6 / 10.0;
+	}
+
 	static double easy_motor_2_motor_pressure(int sensor, double ground_sensor) {
 		double	supply = 3.3;
 		double	ground_voltage = easy_mini_2_adc(ground_sensor) * supply * 15.6 / 10.0;
 		double	voltage = easy_mini_2_adc(sensor) * supply * 15.6 / 10.0;
+
+		return motor_pressure(voltage) - motor_pressure(ground_voltage);
+	}
+
+	static double easy_motor_3_motor_pressure(int sensor, double ground_sensor) {
+		double	supply = 3.3;
+		double	ground_voltage = easy_motor_3_adc(ground_sensor) * supply * 15.6 / 10.0;
+		double	voltage = easy_motor_3_adc(sensor) * supply * 15.6 / 10.0;
 
 		return motor_pressure(voltage) - motor_pressure(ground_voltage);
 	}
