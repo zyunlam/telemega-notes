@@ -148,7 +148,7 @@ ao_thrust(int16_t value, int16_t max_adc, double ref, double r1, double r2)
 }
 
 static void
-ao_pressure(int16_t value, int16_t max_adc, double ref, double r1, double r2)
+ao_pressure(int16_t value, int16_t max_adc, double ref, double r1, double r2, double sensor_range)
 {
 	printf(" pressure %5d", value);
 	if (r1 && r2 && ref) {
@@ -156,7 +156,7 @@ ao_pressure(int16_t value, int16_t max_adc, double ref, double r1, double r2)
 		if (volts < 0.5) volts = 0.5;
 		if (volts > 4.5) volts = 4.5;
 
-		double psi = (volts - 0.5) / 4.0 * 2500.0;
+		double psi = (volts - 0.5) / 4.0 * sensor_range;
 		double pa = psi_to_pa(psi);
 		printf(" %9.3f kPa", pa / 1000.0);
 	}
@@ -261,6 +261,7 @@ main (int argc, char **argv)
 		double	sense_r1 = 0.0, sense_r2 = 0.0;
 		double	batt_r1 = 0.0, batt_r2 = 0.0;
 		double	adc_ref = 0.0;
+		double	pressure_sensor = 0.0;
 		int16_t	max_adc = 0;
 
 		switch (eeprom->log_format) {
@@ -315,6 +316,7 @@ main (int argc, char **argv)
 			break;
 		case AO_LOG_FORMAT_TELEFIRETWO:
 			len = 32;
+			pressure_sensor = 2500.0;
 			max_adc = 4095;
 			adc_ref = 3.3;
 			sense_r1 = batt_r1 = 5600;
@@ -361,6 +363,16 @@ main (int argc, char **argv)
 			sense_r1 = 100e3;
 			sense_r2 = 27e3;
 			break;
+		case AO_LOG_FORMAT_EASYMOTOR:
+			len = 16;
+			max_adc = 32767;
+			adc_ref = 3.3;
+			pressure_sensor = 1600.0;
+			batt_r1 = 5600;
+			batt_r2 = 10000;
+			sense_r1 = 5600;
+			sense_r2 = 10000;
+			break;
 		}
 		if (arg_len)
 			len = arg_len;
@@ -385,6 +397,7 @@ main (int argc, char **argv)
 				struct ao_log_metrum *log_metrum;
 				struct ao_log_gps *log_gps;
 				struct ao_log_firetwo *log_firetwo;
+				struct ao_log_motor *log_motor;
 
 				if (!csum && !ao_csum_valid(&eeprom->data[pos], len)) {
 					if (verbose)
@@ -626,7 +639,8 @@ main (int argc, char **argv)
 					case AO_LOG_SENSOR:
 						ao_pressure(log_firetwo->u.sensor.pressure,
 							    max_adc, adc_ref,
-							    sense_r1, sense_r2);
+							    sense_r1, sense_r2,
+							    pressure_sensor);
 						ao_thrust(log_firetwo->u.sensor.thrust,
 							  max_adc, adc_ref,
 							  sense_r1, sense_r2);
@@ -682,6 +696,31 @@ main (int argc, char **argv)
 					}
 					break;
 				case AO_LOG_FORMAT_DETHERM:
+					break;
+				case AO_LOG_FORMAT_EASYMOTOR:
+					log_motor = (struct ao_log_motor *) &eeprom->data[pos];
+					switch (log_motor->type) {
+					case AO_LOG_FLIGHT:
+						printf(" serial %5u flight %5u",
+						       eeprom->serial_number,
+						       log_motor->u.flight.flight);
+						break;
+					case AO_LOG_STATE:
+						ao_state(log_motor->u.state.state,
+							 log_motor->u.state.reason);
+						break;
+					case AO_LOG_SENSOR:
+						ao_pressure(log_motor->u.sensor.pressure,
+							    max_adc, adc_ref,
+							    sense_r1, sense_r2,
+							    pressure_sensor);
+						ao_volts("v_batt",
+							 log_motor->u.sensor.v_batt,
+							 max_adc,
+							 adc_ref,
+							 batt_r1, batt_r2);
+						break;
+					}
 					break;
 				}
 			}
