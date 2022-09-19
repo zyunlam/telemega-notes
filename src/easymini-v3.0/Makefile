@@ -56,14 +56,22 @@ CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS)
 PROGNAME=easymini-v3.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
+FLASH_PROG=flash-loader/$(PROGNAME)-altos-flash-$(VERSION).elf
+BOTH_HEX=$(PROGNAME)-combined-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_easymini.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG) $(HEX)
+all: $(PROG) $(HEX) $(BOTH_HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+
+$(BOTH_HEX): $(PROG) $(FLASH_PROG)
+	../../ao-tools/ao-elftohex/ao-elftohex --output=$@ $(FLASH_PROG) $(PROG)
+
+$(FLASH_PROG): FRC
+	+cd flash-loader && make
 
 $(OBJ): $(INC)
 
@@ -79,3 +87,5 @@ clean:
 install:
 
 uninstall:
+
+FRC:
