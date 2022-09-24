@@ -68,7 +68,7 @@ $(PROG): Makefile $(OBJ) altos.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(BOTH_HEX): $(PROG) $(FLASH_PROG)
-	../../ao-tools/ao-elftohex/ao-elftohex --output=$@ $(FLASH_PROG) $(PROG)
+	../../ao-tools/ao-elftohex/ao-elftohex -n --output=$@ $(FLASH_PROG) $(PROG)
 
 $(FLASH_PROG): FRC
 	+cd flash-loader && make
