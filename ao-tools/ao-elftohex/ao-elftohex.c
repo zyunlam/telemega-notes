@@ -27,6 +27,7 @@
 static const struct option options[] = {
 	{ .name = "verbose", .has_arg = 1, .val = 'v' },
 	{ .name = "output", .has_arg = 1, .val = 'o' },
+	{ .name = "nosym", .has_arg = 0, .val = 'n' },
 	{ 0, 0, 0, 0},
 };
 
@@ -53,19 +54,23 @@ main (int argc, char **argv)
 	char			*input = NULL;
 	char			*output = NULL;
 	struct ao_hex_image	*full_image = NULL;
-	struct ao_sym		*file_symbols;
+	struct ao_sym		*file_symbols = NULL;
 	int			num_file_symbols;
 	FILE			*file;
 	int			c;
 	int			i;
+	int			nosym = 0;
 
-	while ((c = getopt_long(argc, argv, "v:o:", options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "nv:o:", options, NULL)) != -1) {
 		switch (c) {
 		case 'o':
 			output = optarg;
 			break;
 		case 'v':
 			ao_verbose = (int) strtol(optarg, NULL, 0);
+			break;
+		case 'n':
+			nosym = 1;
 			break;
 		default:
 			usage(argv[0]);
@@ -81,6 +86,8 @@ main (int argc, char **argv)
 
 		input = argv[i];
 
+		free(file_symbols);
+		num_file_symbols = 0;
 		if (ends_with (input, ".ihx"))
 			image = ao_hex_load(input, &file_symbols, &num_file_symbols);
 		else
@@ -89,6 +96,12 @@ main (int argc, char **argv)
 		if (!image) {
 			fprintf(stderr, "Failed to load %s\n", input);
 			usage(argv[0]);
+		}
+
+		if (nosym) {
+			free(file_symbols);
+			file_symbols = NULL;
+			num_file_symbols = 0;
 		}
 
 		if (full_image) {
