@@ -20,7 +20,7 @@
 
 static const struct {
 	void		*port;
-	uint16_t	pin;
+	uint8_t		pin;
 } ao_leds[] = {
 #ifdef LED_0_PORT
     [0] { LED_0_PORT, LED_0_PIN },
