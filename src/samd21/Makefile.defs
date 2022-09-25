@@ -1,0 +1,9 @@
+ifndef TOPDIR
+TOPDIR=..
+endif
+
+include $(TOPDIR)/samd21/Makefile-samd21.defs
+
+LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/samd21 -Taltos.ld -n
+
+.DEFAULT_GOAL=all
