@@ -32,7 +32,11 @@
 static struct ao_fifo	ao_usb_rx_fifo;
 #endif
 
+#if USE_USB_STDIO
+#define AO_USB_OUT_SLEEP_ADDR	(&ao_stdin_ready)
+#else
 #define AO_USB_OUT_SLEEP_ADDR	(&ao_usb_out_avail)
+#endif
 
 #define SAMD21_USB_ALIGN	__attribute__ ((aligned(4)))
 
@@ -540,9 +544,6 @@ ao_usb_fifo_check(void)
 		if (ao_fifo_has_space(&ao_usb_rx_fifo, len)) {
 			uint16_t	i;
 
-#if AO_USB_OUT_HOOK
-			ao_usb_out_hook(buf, len);
-#endif
 			for (i = 0; i < len; i++)
 				ao_fifo_insert(&ao_usb_rx_fifo, buf[i]);
 			samd21_usb_ep_clr_ready(AO_USB_OUT_EP, next_which);
@@ -550,6 +551,9 @@ ao_usb_fifo_check(void)
 			ao_usb_out_rx_which = next_which;
 			ao_wakeup(AO_USB_OUT_SLEEP_ADDR);
 		}
+#if AO_USB_OUT_HOOK
+		ao_usb_out_hook(buf, len);
+#endif
 	}
 }
 #endif
@@ -671,8 +675,6 @@ ao_usb_putchar(char c)
 	if (!ao_usb_running)
 		return;
 
-	if (c == '\n')
-		ao_usb_putchar('\r');
 	ao_arch_block_interrupts();
 	_ao_usb_in_wait();
 
@@ -778,6 +780,8 @@ ao_usb_enable(void)
 {
 	int	t;
 
+	ao_enable_port(&samd21_port_a);
+
 	/* Set up USB DM/DP pins */
 	samd21_port_pmux_set(&samd21_port_a, 24, SAMD21_PORT_PMUX_FUNC_G);
 	samd21_port_pmux_set(&samd21_port_a, 25, SAMD21_PORT_PMUX_FUNC_G);
@@ -792,7 +796,7 @@ ao_usb_enable(void)
 
 	samd21_usb.ctrla |= (1 << SAMD21_USB_CTRLA_SWRST);
 
-	while ((samd21_usb.syncbusy & (1 << SAMD21_USB_SYNCBUSY_SWRST)) == 0)
+	while ((samd21_usb.ctrla & (1 << SAMD21_USB_CTRLA_SWRST)) != 0)
 		;
 
 	while ((samd21_usb.syncbusy & (1 << SAMD21_USB_SYNCBUSY_SWRST)) != 0)
@@ -864,4 +868,8 @@ ao_usb_init(void)
 #endif
 
 	ao_usb_ep0_state = AO_USB_EP0_IDLE;
+
+#if USE_USB_STDIO
+	ao_add_stdio(_ao_usb_pollchar, ao_usb_putchar, ao_usb_flush);
+#endif
 }
