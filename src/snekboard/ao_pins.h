@@ -29,6 +29,7 @@
 #define HAS_BEEP	0
 
 #define HAS_USB		1
+#define USE_USB_STDIO	1
 
 #define HAS_LED		1
 
