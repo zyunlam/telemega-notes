@@ -101,6 +101,9 @@ ao_flash_erase_page(uint32_t *page)
 	uint32_t row_size = samd21_nvmctrl_row_size();
 	uint32_t rows = (row_size + 255) / 256;
 
+	if ((uintptr_t) page & (row_size - 1))
+		return;
+
 	ao_arch_block_interrupts();
 
 	if (((uintptr_t) row & (row_size - 1)) == 0) {
@@ -120,6 +123,8 @@ ao_flash_page(uint32_t *page, uint32_t *src)
 	uint32_t	pages = 256 / page_size;
 	uint32_t	i;
 	uint32_t	per_page = page_size / sizeof(uint32_t);
+
+	ao_flash_erase_page(page);
 
 	ao_arch_block_interrupts();
 
