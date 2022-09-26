@@ -1,0 +1,22 @@
+#!/bin/sh
+case "$#" in
+1)
+    ;;
+*)
+    echo "usage: $0 <filename> ..."
+    exit 1
+    ;;
+esac
+
+openocd \
+    -f interface/stlink.cfg \
+    -c 'transport select hla_swd' \
+    -c 'set CPUTAPID 0x0bc11477' \
+    -f target/at91samdXX.cfg \
+    -c 'adapter speed 10' \
+    -c init \
+    -c 'reset init' \
+    -c 'at91samd bootloader 0' \
+    -c 'reset init' \
+    -c "program $1" \
+    -c "shutdown"
