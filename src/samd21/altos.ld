@@ -22,4 +22,5 @@ __ram = 0x20000000;
 __ram_size = 32k;
 __stack_size = 256;
 
+INCLUDE registers.ld
 INCLUDE picolibc.ld
