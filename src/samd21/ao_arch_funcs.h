@@ -123,6 +123,112 @@ ao_enable_cs(struct samd21_port *port, uint8_t pin)
 	ao_enable_output(port, pin, 1);
 }
 
+/* ao_spi_samd21.c */
+
+#define AO_SPI_CPOL_BIT		6
+#define AO_SPI_CPHA_BIT		7
+
+#define AO_SPI_CONFIG_1		0x00
+/*
+ * PA08 SERCOM0.0 -> MOSI	(DOPO 0)
+ * PA09 SERCOM0.1 -> SCLK	(DOPO 0)
+ * PA10 SERCOM0.2 -> MISO	(DIPO 2)
+ */
+#define AO_SPI_0_CONFIG_PA08_PA09_PA10	AO_SPI_CONFIG_1
+
+#define AO_SPI_CONFIG_2		0x08
+/*
+ * PA04 SERCOM0.0 -> MOSI	(DOPO 0)
+ * PA05 SERCOM0.1 -> SCLK	(DOPO 0)
+ * PA16 SERCOM0.2 -> MISO	(DIPO 2)
+ */
+#define AO_SPI_0_CONFIG_PA04_PA05_PA06	AO_SPI_CONFIG_2
+
+#define AO_SPI_CONFIG_NONE	0x0c
+
+#define AO_SPI_INDEX_MASK	0x07
+#define AO_SPI_CONFIG_MASK	0x18
+
+#define AO_SPI_INDEX(id)	((id) & AO_SPI_INDEX_MASK)
+#define AO_SPI_CONFIG(id)	((id) & AO_SPI_CONFIG_MASK)
+#define AO_SPI_PIN_CONFIG(id)	((id) & (AO_SPI_INDEX_MASK | AO_SPI_CONFIG_MASK))
+#define AO_SPI_CPOL(id)		((uint32_t) (((id) >> AO_SPI_CPOL_BIT) & 1))
+#define AO_SPI_CPHA(id)		((uint32_t) (((id) >> AO_SPI_CPHA_BIT) & 1))
+
+/*
+ * We're not going to do any fancy SPI pin remapping, just use the first
+ * three PAD pins, which means:
+ *
+ * MOSI: PAD.0
+ * SCK:  PAD.1
+ * MISO: PAD.2
+ */
+
+#define AO_SPI_0_PA08_PA09_PA10	(0 | AO_SPI_0_CONFIG_PA08_PA09_PA10)
+#define AO_SPI_0_PA04_PA05_PA06	(0 | AO_SPI_0_CONFIG_PA04_PA05_PA06)
+
+void
+ao_spi_send(const void *block, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_get(uint8_t spi_index, uint32_t speed);
+
+void
+ao_spi_put(uint8_t spi_index);
+
+void
+ao_spi_init(void);
+
+#define ao_spi_get_mask(reg,mask,bus, speed) do {		\
+		ao_spi_get(bus, speed);				\
+		ao_spi_set_cs(reg,mask);			\
+	} while (0)
+
+#define ao_spi_put_mask(reg,mask,bus) do {	\
+		ao_spi_clr_cs(reg,mask);	\
+		ao_spi_put(bus);		\
+	} while (0)
+
+static inline void
+ao_spi_get_bit(struct samd21_port *port, uint8_t bit, uint8_t bus, uint32_t speed)
+{
+	ao_spi_get(bus, speed);
+	ao_gpio_set(port, bit, 0);
+}
+
+static inline void
+ao_spi_put_bit(struct samd21_port *port, uint8_t bit, uint8_t bus)
+{
+	ao_gpio_set(port, bit, 1);
+	ao_spi_put(bus);
+}
+
+static inline uint8_t
+ao_spi_speed(uint32_t hz)
+{
+	int32_t	baud = (int32_t) (AO_SYSCLK / (2 * hz)) - 1;
+
+	if (baud < 0)
+		baud = 0;
+	if (baud > 255)
+		baud = 255;
+	return (uint8_t) baud;
+}
+
+#define ao_spi_init_cs(port, mask) do {					\
+		uint8_t __bit__;					\
+		for (__bit__ = 0; __bit__ < 32; __bit__++) {		\
+			if (mask & (1 << __bit__))			\
+				ao_enable_output(port, __bit__, 1); \
+		}							\
+	} while (0)
+
 #define ARM_PUSH32(stack, val)	(*(--(stack)) = (val))
 
 typedef uint32_t	ao_arch_irq_t;

@@ -701,6 +701,14 @@ samd21_port_pmux_set(struct samd21_port *port, uint8_t pin, uint8_t func)
 			       (1 << SAMD21_PORT_PINCFG_PMUXEN));
 }
 
+static inline void
+samd21_port_pmux_clr(struct samd21_port *port, uint8_t pin)
+{
+	samd21_port_pincfg_set(port, pin,
+			       (0 << SAMD21_PORT_PINCFG_PMUXEN),
+			       (1 << SAMD21_PORT_PINCFG_PMUXEN));
+}
+
 struct samd21_adc {
 	vuint8_t	ctrla;
 	vuint8_t	refctrl;
@@ -1378,6 +1386,8 @@ extern struct samd21_sercom samd21_sercom3;
 extern struct samd21_sercom samd21_sercom4;
 extern struct samd21_sercom samd21_sercom5;
 
+#define SAMD21_NUM_SERCOM	6
+
 #define samd21_sercom0	(*(struct samd21_sercom *) 0x42000800)
 #define samd21_sercom1	(*(struct samd21_sercom *) 0x42000c00)
 #define samd21_sercom2	(*(struct samd21_sercom *) 0x42001000)
@@ -1389,7 +1399,10 @@ extern struct samd21_sercom samd21_sercom5;
 #define SAMD21_SERCOM_CTRLA_ENABLE	1
 #define SAMD21_SERCOM_CTRLA_MODE	2
 # define SAMD21_SERCOM_CTRLA_MODE_USART		1
-# define SAMD21_SERCOM_CTRLA_MODE_I2C_LEADER	5
+# define SAMD21_SERCOM_CTRLA_MODE_SPI_CLIENT	2
+# define SAMD21_SERCOM_CTRLA_MODE_SPI_HOST	3
+# define SAMD21_SERCOM_CTRLA_MODE_I2C_CLIENT	4
+# define SAMD21_SERCOM_CTRLA_MODE_I2C_HOST	5
 
 #define SAMD21_SERCOM_CTRLA_RUNSTDBY	7
 
@@ -1425,6 +1438,16 @@ extern struct samd21_sercom samd21_sercom5;
 #define  SAMD21_SERCOM_CTRLA_INACTOUT_205US	3
 #define SAMD21_SERCOM_CTRLA_LOWTOUT	30
 
+/* SPI controller mode */
+#define SAMD21_SERCOM_CTRLA_DOPO	16
+#define SAMD21_SERCOM_CTRLA_DIPO	20
+#define SAMD21_SERCOM_CTRLA_FORM	24
+#define SAMD21_SERCOM_CTRLA_CPHA	28
+#define SAMD21_SERCOM_CTRLA_CPOL	29
+#define SAMD21_SERCOM_CTRLA_DORD	30
+#define  SAMD21_SERCOM_CTRLA_DORD_LSB	1
+#define  SAMD21_SERCOM_CTRLA_DORD_MSB	0
+
 /* USART mode */
 #define SAMD21_SERCOM_CTRLB_CHSIZE	0
 #define SAMD21_SERCOM_CTRLB_SBMODE	6
@@ -1449,6 +1472,15 @@ extern struct samd21_sercom samd21_sercom5;
 #define  SAMD21_SERCOM_CTRLB_ACKACT_NACK	1
 #define SAMD21_SERCOM_CTRLB_FIFOCLR	22
 
+/* SPI mode */
+#define SAMD21_SERCOM_CTRLB_CHSIZE	0
+# define SAMD21_SERCOM_CTRLB_CHSIZE_8		0
+#define SAMD21_SERCOM_CTRLB_PLOADEN	6
+#define SAMD21_SERCOM_CTRLB_SSDE	9
+#define SAMD21_SERCOM_CTRLB_MSSEN	13
+#define SAMD21_SERCOM_CTRLB_AMODE	14
+#define SAMD21_SERCOM_CTRLB_RXEN	17
+
 /* USART mode */
 #define SAMD21_SERCOM_INTFLAG_DRE	0
 #define SAMD21_SERCOM_INTFLAG_TXC	1
@@ -1465,6 +1497,9 @@ extern struct samd21_sercom samd21_sercom5;
 #define SAMD21_SERCOM_INTFLAG_SB	1
 #define SAMD21_SERCOM_INTFLAG_MB	0
 
+/* SPI mode */
+#define SAMD21_SERCOM_INTFLAG_SSL	3
+
 #define SAMD21_SERCOM_INTENCLR_DRE	0
 #define SAMD21_SERCOM_INTENCLR_TXC	1
 #define SAMD21_SERCOM_INTENCLR_RXC	2
@@ -1476,10 +1511,10 @@ extern struct samd21_sercom samd21_sercom5;
 #define SAMD21_SERCOM_STATUS_PERR	0
 #define SAMD21_SERCOM_STATUS_FERR	1
 #define SAMD21_SERCOM_STATUS_BUFOVF	2
-#define SAMD21_SERCOM_STATUS_CTS		3
-#define SAMD21_SERCOM_STATUS_ISF		4
+#define SAMD21_SERCOM_STATUS_CTS	3
+#define SAMD21_SERCOM_STATUS_ISF	4
 #define SAMD21_SERCOM_STATUS_COLL	5
-#define SAMD21_SERCOM_STATUS_TXE		6
+#define SAMD21_SERCOM_STATUS_TXE	6
 
 #define SAMD21_SERCOM_SYNCBUSY_SWRST	0
 #define SAMD21_SERCOM_SYNCBUSY_ENABLE	1
