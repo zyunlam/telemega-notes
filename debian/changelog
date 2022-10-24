@@ -1,3 +1,10 @@
+altos (1.9.11-2) unstable; urgency=medium
+
+  * cherry pick patch from master that increases AES IV buffer to hold 
+    maximum AES state, closes: #1022301
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 24 Oct 2022 10:02:35 -0600
+
 altos (1.9.11-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
