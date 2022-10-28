@@ -636,45 +636,47 @@ ao_telemetry_set_interval(uint16_t interval)
 		interval = min_interval[ao_config.radio_rate];
 #endif
 	ao_telemetry_interval = interval;
+	if (interval) {
 #if AO_SEND_MEGA
-	if (interval > 1)
-		ao_telemetry_mega_data_max = 1;
-	else
-		ao_telemetry_mega_data_max = 2;
-	if (ao_telemetry_mega_data_max > cur)
-		cur++;
-	ao_telemetry_mega_data_cur = cur;
+		if (interval > 1)
+			ao_telemetry_mega_data_max = 1;
+		else
+			ao_telemetry_mega_data_max = 2;
+		if (ao_telemetry_mega_data_max > cur)
+			cur++;
+		ao_telemetry_mega_data_cur = cur;
 #endif
 #if AO_SEND_METRUM
-	ao_telemetry_metrum_data_max = (int16_t) (AO_SEC_TO_TICKS(1) / interval);
-	if (ao_telemetry_metrum_data_max > cur)
-		cur++;
-	ao_telemetry_metrum_data_cur = cur;
+		ao_telemetry_metrum_data_max = (int16_t) (AO_SEC_TO_TICKS(1) / interval);
+		if (ao_telemetry_metrum_data_max > cur)
+			cur++;
+		ao_telemetry_metrum_data_cur = cur;
 #endif
 
 #if HAS_COMPANION
-	if (!ao_companion_setup.update_period)
-		ao_companion_setup.update_period = AO_SEC_TO_TICKS(1);
-	ao_telemetry_companion_max = (int16_t) (ao_companion_setup.update_period / interval);
-	if (ao_telemetry_companion_max > cur)
-		cur++;
-	ao_telemetry_companion_cur = cur;
+		if (!ao_companion_setup.update_period)
+			ao_companion_setup.update_period = AO_SEC_TO_TICKS(1);
+		ao_telemetry_companion_max = (int16_t) (ao_companion_setup.update_period / interval);
+		if (ao_telemetry_companion_max > cur)
+			cur++;
+		ao_telemetry_companion_cur = cur;
 #endif
 
 #if HAS_GPS
-	ao_telemetry_gps_max = (int16_t) (AO_SEC_TO_TICKS(1) / interval);
-	if (ao_telemetry_gps_max > cur)
-		cur++;
-	ao_telemetry_loc_cur = cur;
-	if (ao_telemetry_gps_max > cur)
-		cur++;
-	ao_telemetry_sat_cur = cur;
+		ao_telemetry_gps_max = (int16_t) (AO_SEC_TO_TICKS(1) / interval);
+		if (ao_telemetry_gps_max > cur)
+			cur++;
+		ao_telemetry_loc_cur = cur;
+		if (ao_telemetry_gps_max > cur)
+			cur++;
+		ao_telemetry_sat_cur = cur;
 #endif
 
-	ao_telemetry_config_max = (int16_t) (AO_SEC_TO_TICKS(5) / interval);
-	if (ao_telemetry_config_max > cur)
-		cur++;
-	ao_telemetry_config_cur = cur;
+		ao_telemetry_config_max = (int16_t) (AO_SEC_TO_TICKS(5) / interval);
+		if (ao_telemetry_config_max > cur)
+			cur++;
+		ao_telemetry_config_cur = cur;
+	}
 
 #ifndef SIMPLIFY
 	ao_telemetry_time = 
