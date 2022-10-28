@@ -355,7 +355,6 @@ main (int argc, char **argv)
 			break;
 		case AO_LOG_FORMAT_TELEMEGA_4:
 			len = 32;
-			break;
 			max_adc= 4095;
 			adc_ref = 3.3;
 			batt_r1 = 5600;
@@ -692,6 +691,45 @@ main (int argc, char **argv)
 						break;
 					default:
 						printf (" unknown");
+						break;
+					}
+					break;
+				case AO_LOG_FORMAT_EASYMOTOR:
+					log_motor = (struct ao_log_motor *) &eeprom->data[pos];
+					switch (log_motor->type) {
+					case AO_LOG_FLIGHT:
+						printf(" serial %5u flight %5u ground_accel %6d",
+						       eeprom->serial_number,
+						       log_motor->u.flight.flight,
+						       log_motor->u.flight.ground_accel);
+						printf(" along %6d aross %6d through %6d",
+						       log_motor->u.flight.ground_accel_along,
+						       log_motor->u.flight.ground_accel_across,
+						       log_motor->u.flight.ground_accel_through);
+						ao_volts("ground pressure",
+							 log_motor->u.flight.ground_motor_pressure,
+							 max_adc, adc_ref,
+							 sense_r1, sense_r2);
+						break;
+					case AO_LOG_STATE:
+						ao_state(log_motor->u.state.state,
+							 log_motor->u.state.reason);
+						break;
+					case AO_LOG_SENSOR:
+						ao_volts("pressure",
+							 log_motor->u.sensor.pressure,
+							 max_adc, adc_ref,
+							 sense_r1, sense_r2);
+						ao_volts("v_batt",
+							 log_motor->u.sensor.v_batt,
+							 max_adc,
+							 adc_ref, batt_r1, batt_r2);
+						printf(" accel %6d",
+						       log_motor->u.sensor.accel);
+						printf(" along %6d aross %6d through %6d",
+						       log_motor->u.sensor.accel_along,
+						       log_motor->u.sensor.accel_across,
+						       log_motor->u.sensor.accel_through);
 						break;
 					}
 					break;

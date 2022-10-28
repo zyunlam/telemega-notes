@@ -34,6 +34,12 @@
 /* System clock frequency */
 #define AO_LPC_SYSCLK	24000000
 
+/* Beeper is on pio0_14 ct32b1_mat1 */
+#define BEEPER_PORT	0
+#define BEEPER_PIN	14
+#define BEEPER_TIMER	1
+#define BEEPER_OUTPUT	1
+
 #define HAS_USB		1
 
 #define HAS_USB_CONNECT	0

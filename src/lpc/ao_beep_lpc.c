@@ -81,7 +81,7 @@ ao_beep(uint8_t beep)
 }
 
 void
-ao_beep_for(uint8_t beep, AO_TICK_TYPE ticks) 
+ao_beep_for(uint8_t beep, AO_TICK_TYPE ticks)
 {
 	ao_beep(beep);
 	ao_delay(ticks);
