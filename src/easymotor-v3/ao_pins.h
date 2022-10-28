@@ -62,10 +62,10 @@
 #define HAS_PAD_REPORT		1
 
 /* Beeper is on pio0_1 ct32b0_mat2 */
-#define BEEPER_PORT		0
-#define BEEPER_PIN		1
-#define BEEPER_TIMER		0
-#define BEEPER_OUTPUT		2
+#define AO_LPC_BEEP_PORT	0
+#define AO_LPC_BEEP_PIN		1
+#define AO_LPC_BEEP_TIMER	0
+#define AO_LPC_BEEP_CHANNEL	2
 
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0
