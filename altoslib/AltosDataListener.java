@@ -59,6 +59,8 @@ public abstract class AltosDataListener {
 
 	public void set_log_format(int log_format) {
 		cal_data().set_log_format(log_format);
+		if (cal_data().device_type == AltosLib.MISSING)
+			cal_data().set_device_type(AltosLib.product_id_from_log_format(log_format));
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEGPS:
 			set_state(AltosLib.ao_flight_stateless);
