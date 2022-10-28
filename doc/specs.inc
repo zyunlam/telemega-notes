@@ -166,12 +166,12 @@
 	endif::easytimer[]
 	
 	ifdef::easymotor[]
-	|EasyMotor v2.0
+	|EasyMotor v3.0
 	|-
 	|ADXL375 200g
 	|-
 	|-
-	|-
+	|8MB
 	|-
 	|6.5-15V
 	endif::easymotor[]
