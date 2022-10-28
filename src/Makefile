@@ -19,7 +19,6 @@ include Makedefs
 ARMM3DIRS=\
 	easymega-v1.0 easymega-v1.0/flash-loader \
 	easymega-v2.0 easymega-v2.0/flash-loader \
-	easymotor-v2 easymotor-v2/flash-loader \
 	easymotor-v3 easymotor-v3/flash-loader \
 	easytimer-v1 easytimer-v1/flash-loader \
 	telemega-v0.1 telemega-v0.1/flash-loader \
