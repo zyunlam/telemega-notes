@@ -735,31 +735,6 @@ main (int argc, char **argv)
 					break;
 				case AO_LOG_FORMAT_DETHERM:
 					break;
-				case AO_LOG_FORMAT_EASYMOTOR:
-					log_motor = (struct ao_log_motor *) &eeprom->data[pos];
-					switch (log_motor->type) {
-					case AO_LOG_FLIGHT:
-						printf(" serial %5u flight %5u",
-						       eeprom->serial_number,
-						       log_motor->u.flight.flight);
-						break;
-					case AO_LOG_STATE:
-						ao_state(log_motor->u.state.state,
-							 log_motor->u.state.reason);
-						break;
-					case AO_LOG_SENSOR:
-						ao_pressure(log_motor->u.sensor.pressure,
-							    max_adc, adc_ref,
-							    sense_r1, sense_r2,
-							    pressure_sensor);
-						ao_volts("v_batt",
-							 log_motor->u.sensor.v_batt,
-							 max_adc,
-							 adc_ref,
-							 batt_r1, batt_r2);
-						break;
-					}
-					break;
 				}
 			}
 			printf("\n");
