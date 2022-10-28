@@ -170,6 +170,7 @@ FIRMWARE=$(FIRMWARE_TM) $(FIRMWARE_TELEMINI) $(FIRMWARE_TD) $(FIRMWARE_TBT) $(FI
 ALTUSMETRUM_DOC=$(top_srcdir)/doc/altusmetrum.pdf
 ALTOS_DOC=$(top_srcdir)/doc/altos.pdf
 TELEMETRY_DOC=$(top_srcdir)/doc/telemetry.pdf
+MOTORTEST_DOC=$(top_srcdir)/doc/motortest.pdf
 TEMPLATE_DOC=\
 	$(top_srcdir)/doc/telemetrum-outline.pdf \
 	$(top_srcdir)/doc/easymini-outline.pdf \
@@ -177,7 +178,7 @@ TEMPLATE_DOC=\
 	$(top_srcdir)/doc/telemini-v1-outline.pdf \
 	$(top_srcdir)/doc/telemini-v3-outline.pdf
 
-DOC=$(ALTUSMETRUM_DOC) $(ALTOS_DOC) $(TELEMETRY_DOC) $(TEMPLATE_DOC)
+DOC=$(ALTUSMETRUM_DOC) $(ALTOS_DOC) $(TELEMETRY_DOC) $(MOTORTEST_DOC) $(TEMPLATE_DOC)
 
 # Distribution targets
 LINUX_DIST=Altos-Linux-$(VERSION).tar.bz2
