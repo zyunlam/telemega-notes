@@ -477,6 +477,7 @@ ao_config_accel_calibrate_set(void)
 		return;
 	down = (int16_t) ao_cmd_decimal();
 	auto_cal = (up == 0 && ao_cmd_status != ao_cmd_success);
+	ao_cmd_status = ao_cmd_success;
 	if (auto_cal) {
 		up = ao_config_accel_calibrate_auto("up");
 #if HAS_IMU

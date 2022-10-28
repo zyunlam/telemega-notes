@@ -77,16 +77,7 @@
 
 	endif::telemini[]
 	ifdef::easymini[]
-	|EasyMini v1.0
-	|MS5607 30km (100k')
-	|-
-	|-
-	|-
-	|1MB
-	|-
-	|3.7-12V
-
-	|EasyMini v2.0
+	|EasyMini v1.0-v3.0
 	|MS5607 30km (100k')
 	|-
 	|-
