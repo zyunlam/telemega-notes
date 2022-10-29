@@ -10,5 +10,7 @@
 	data 100 times per second throughout the flight.
 
 	After flight, AltosUI can be used to download the flight data,
-	then export it to a comma separated values (CSV) file. Such a
-	file can easily be loaded into a spreadsheet for analysis.
+	view a quick graph of acceleration and pressure with pan and
+	zoom capabilities, then export it to a comma separated values 
+	(CSV) file. Such a file can easily be loaded into a spreadsheet 
+	for analysis.

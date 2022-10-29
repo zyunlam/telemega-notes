@@ -662,6 +662,8 @@ public class AltosConfigData {
 				return true;
 			if (product.startsWith("EasyMotor-v2"))
 				return true;
+			if (product.startsWith("EasyMotor-v3"))
+				return true;
 		}
 		throw new AltosUnknownProduct(product);
 	}
@@ -675,6 +677,8 @@ public class AltosConfigData {
 			if (product.startsWith("TeleMega-v4"))
 				return AltosAdxl375.X_AXIS;
 			if (product.startsWith("EasyMotor-v2"))
+				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("EasyMotor-v3"))
 				return AltosAdxl375.X_AXIS;
 
 		}

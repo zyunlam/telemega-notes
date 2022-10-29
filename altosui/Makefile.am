@@ -1,3 +1,4 @@
+# location of code signing key, et al
 
 JAVAROOT=classes
 AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
@@ -141,14 +142,15 @@ FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0)
 
 FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
 FIRMWARE_EMINI_2_0=$(top_srcdir)/src/easymini-v2.0/easymini-v2.0-$(VERSION).ihx
-FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0) $(FIRMWARE_EMINI_2_0)
+FIRMWARE_EMINI_3_0=$(top_srcdir)/src/easymini-v3.0/easymini-v3.0-$(VERSION).ihx
+FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0) $(FIRMWARE_EMINI_2_0) $(FIRMWARE_EMINI_3_0)
 
 FIRMWARE_EMEGA_1_0=$(top_srcdir)/src/easymega-v1.0/easymega-v1.0-$(VERSION).ihx
 FIRMWARE_EMEGA_2_0=$(top_srcdir)/src/easymega-v2.0/easymega-v2.0-$(VERSION).ihx
 FIRMWARE_EMEGA=$(FIRMWARE_EMEGA_1_0) $(FIRMWARE_EMEGA_2_0)
 
-FIRMWARE_EMOTOR_2=$(top_srcdir)/src/easymotor-v2/easymotor-v2-$(VERSION).ihx
-FIRMWARE_EMOTOR=$(FIRMWARE_EMOTOR_2)
+FIRMWARE_EMOTOR_3=$(top_srcdir)/src/easymotor-v3/easymotor-v3-$(VERSION).ihx
+FIRMWARE_EMOTOR=$(FIRMWARE_EMOTOR_3)
 
 FIRMWARE_ETIMER_1=$(top_srcdir)/src/easytimer-v1/easytimer-v1-$(VERSION).ihx
 FIRMWARE_ETIMER=$(FIRMWARE_ETIMER_1)
@@ -169,6 +171,7 @@ FIRMWARE=$(FIRMWARE_TM) $(FIRMWARE_TELEMINI) $(FIRMWARE_TD) $(FIRMWARE_TBT) $(FI
 ALTUSMETRUM_DOC=$(top_srcdir)/doc/altusmetrum.pdf
 ALTOS_DOC=$(top_srcdir)/doc/altos.pdf
 TELEMETRY_DOC=$(top_srcdir)/doc/telemetry.pdf
+MOTORTEST_DOC=$(top_srcdir)/doc/motortest.pdf
 TEMPLATE_DOC=\
 	$(top_srcdir)/doc/telemetrum-outline.pdf \
 	$(top_srcdir)/doc/easymini-outline.pdf \
@@ -176,7 +179,7 @@ TEMPLATE_DOC=\
 	$(top_srcdir)/doc/telemini-v1-outline.pdf \
 	$(top_srcdir)/doc/telemini-v3-outline.pdf
 
-DOC=$(ALTUSMETRUM_DOC) $(ALTOS_DOC) $(TELEMETRY_DOC) $(TEMPLATE_DOC)
+DOC=$(ALTUSMETRUM_DOC) $(ALTOS_DOC) $(TELEMETRY_DOC) $(MOTORTEST_DOC) $(TEMPLATE_DOC)
 
 # Distribution targets
 LINUX_DIST=Altos-Linux-$(VERSION).tar.bz2
@@ -409,3 +412,8 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 $(WINDOWS_DIST): $(WINDOWS_FILES) altos-windows.nsi Instdrv/NSIS/Includes/java.nsh
 	-rm -f $@
 	makensis -Oaltos-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" altos-windows.nsi || (cat altos-windows.log && exit 1)
+	if [ "$(HAVE_WINDOWS_KEY)" = "yes" ]; then \
+	jsign --keystore "$(WINDOWSKEYFILE)" --alias 1 \
+		--storetype PKCS12 --storepass `cat "$(WINDOWSKEYPASSFILE)"` \
+		--tsaurl http://ts.ssl.com --tsmode RFC3161 $@ ; \
+	fi

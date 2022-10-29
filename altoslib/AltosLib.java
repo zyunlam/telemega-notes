@@ -617,6 +617,59 @@ public class AltosLib {
 		}
 	}
 
+	public static int product_id_from_log_format(int log_format) {
+		switch (log_format){
+		case AO_LOG_FORMAT_UNKNOWN:
+			return product_altusmetrum;
+		case AO_LOG_FORMAT_FULL:
+			return product_telemetrum;
+		case AO_LOG_FORMAT_TINY:
+			return product_telemini;
+		case AO_LOG_FORMAT_TELEMETRY:
+			return product_altusmetrum;
+		case AO_LOG_FORMAT_TELESCIENCE:
+			return product_telescience;
+		case AO_LOG_FORMAT_TELEMEGA_OLD:
+			return product_telemega;
+		case AO_LOG_FORMAT_EASYMINI1:
+			return product_easymini;
+		case AO_LOG_FORMAT_TELEMETRUM:
+			return product_telemetrum;
+		case AO_LOG_FORMAT_TELEMINI2:
+			return product_telemini;
+		case AO_LOG_FORMAT_TELEGPS:
+			return product_telegps;
+		case AO_LOG_FORMAT_TELEMEGA:
+			return product_telemega;
+		case AO_LOG_FORMAT_DETHERM:
+			return product_altusmetrum;
+		case AO_LOG_FORMAT_TELEMINI3:
+			return product_telemini;
+		case AO_LOG_FORMAT_TELEFIRETWO:
+			return product_altusmetrum;
+		case AO_LOG_FORMAT_EASYMINI2:
+			return product_easymini;
+		case AO_LOG_FORMAT_TELEMEGA_3:
+			return product_telemega;
+		case AO_LOG_FORMAT_EASYMEGA_2:
+			return product_easymega;
+		case AO_LOG_FORMAT_TELESTATIC:
+			return product_altusmetrum;
+		case AO_LOG_FORMAT_MICROPEAK2:
+			return product_altusmetrum;
+		case AO_LOG_FORMAT_TELEMEGA_4:
+			return product_telemega;
+		case AO_LOG_FORMAT_EASYMOTOR:
+			return product_easymotor;
+		case AO_LOG_FORMAT_TELEMEGA_5:
+			return product_telemega;
+		case AO_LOG_FORMAT_NONE:
+			return product_altusmetrum;
+		default:
+			return product_altusmetrum;
+		}
+	}
+
 	public static String igniter_name(int i) {
 		return String.format("Igniter %c", 'A' + i);
 	}

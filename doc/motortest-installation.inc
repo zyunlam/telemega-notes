@@ -9,14 +9,11 @@
 	=== Power Switch and Battery
 
 		In addition to the circuit board itself, EasyMotor needs
-		a power switch and battery to operate. Unlike most other
-		Altus Metrum products, EasyMotor does not work with
-		single-cell LiPo batteries. That's because commonly
-		available inexpensive pressure sensors need 5V, which is
-		more than a single-cell LiPo provides. Any battery that
-		provides from 6.5 to about 15 volts should work. Good
-		choices are the common 9V alkaline battery, or the very
-		small and light A23 12V alkaline batteries.
+		a power switch and battery to operate.  Like many Altus 
+		Metrum products, EasyMotor requires a single-cell LiPo 
+		battery, and has an on-board charging circuit.  The 5V
+		needed for inexpensive pressure sensors is generated 
+		onboard using a switching regulator to boost the voltage.
 
 		Because he often mounts EasyMotor to the motor's forward
 		bulkhead instead of to the airframe itself, Bdale often
@@ -40,7 +37,8 @@
 		by the sensor. Very inexpensive sensors that have a
 		“1/8 NPT” threaded input, a “Buick-style” 3-pin connector,
 		and typically ship with a short cable and mating
-		connector, are readily available on eBay and AliExpress.
+		connector, are readily available through various vendors
+		including Amazon, eBay, and AliExpress.
 
 		To log in-flight chamber pressure, a typical approach
 		might be to drill a 1/8" sampling hole all the way
@@ -49,3 +47,8 @@
 		NPT” pipe tap. Fill the touch hole with grease, screw in
 		the pressure sensor, and attach the sensor leads to
 		EasyMotor.
+
+		If you aren't up for machining closures yourself, 
+		link:http://lokiresearch.com[Loki Research] sells 
+		54mm and 75mm "experimental bulkheads" with threaded
+		sensor ports that can be used with snap ring cases.

@@ -15,5 +15,5 @@
 	NAR #87103, TRA #12201
 
 	[verse]
-	Keith Packard, KD7SQG
+	Keith Packard, K7WQ
 	NAR #88757, TRA #12200

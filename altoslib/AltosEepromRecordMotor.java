@@ -68,8 +68,8 @@ public class AltosEepromRecordMotor extends AltosEepromRecord {
 		case AltosLib.AO_LOG_SENSOR:
 			AltosConfigData config_data = eeprom.config_data();
 
-			listener.set_battery_voltage(AltosConvert.easy_mini_2_voltage(v_batt()));
-			double pa = AltosConvert.easy_motor_2_motor_pressure(motor_pres(), cal_data.ground_motor_pressure);
+			listener.set_battery_voltage(AltosConvert.easy_motor_3_voltage(v_batt()));
+			double pa = AltosConvert.easy_motor_3_motor_pressure(motor_pres(), cal_data.ground_motor_pressure);
 			listener.set_motor_pressure(pa);
 
 			int	accel_along = accel_along();

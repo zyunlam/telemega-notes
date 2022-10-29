@@ -95,8 +95,19 @@ public class AltosGraph extends AltosUIGraph {
 
 	AltosUIFlightSeries flight_series;
 
+	boolean enable_axis(int product_id, String label) {
+		switch (product_id) {
+		case AltosLib.product_easymotor:
+			return(label.equals(AltosUIFlightSeries.motor_pressure_name) ||
+			       label.equals(AltosUIFlightSeries.accel_name));
+		default:
+			return true;
+		}
+	}
+
 	AltosUITimeSeries[] setup(AltosFlightStats stats, AltosUIFlightSeries flight_series) {
 		AltosCalData	cal_data = flight_series.cal_data();
+		int		product_id = cal_data.device_type;
 
 		AltosUIAxis	height_axis, speed_axis, accel_axis, voltage_axis, temperature_axis, nsat_axis, dbm_axis;
 		AltosUIAxis	pressure_axis, thrust_axis;
@@ -134,7 +145,7 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_marker(AltosUIFlightSeries.state_name,
 					      state_color,
-					      true,
+					      enable_axis(product_id, AltosUIFlightSeries.state_name),
 					      plot,
 					      true);
 
@@ -151,12 +162,12 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.accel_name,
 					    accel_color,
-					    true,
+					    enable_axis(product_id, AltosUIFlightSeries.accel_name),
 					    accel_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.vert_accel_name,
 					    vert_accel_color,
-					    true,
+					    enable_axis(product_id, AltosUIFlightSeries.vert_accel_name),
 					    accel_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.kalman_accel_name,
@@ -171,12 +182,12 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.speed_name,
 					    speed_color,
-					    true,
+					    enable_axis(product_id, AltosUIFlightSeries.speed_name),
 					    speed_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.kalman_speed_name,
 					    kalman_speed_color,
-					    true,
+					    enable_axis(product_id, AltosUIFlightSeries.kalman_speed_name),
 					    speed_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.pressure_name,
@@ -186,7 +197,7 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.height_name,
 					    height_color,
-					    true,
+					    enable_axis(product_id, AltosUIFlightSeries.height_name),
 					    height_axis);
 
 		flight_series.register_axis(AltosUIFlightSeries.altitude_name,
@@ -347,7 +358,7 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.thrust_name,
 					    accel_color,
-					    true,
+					    enable_axis(product_id, AltosUIFlightSeries.thrust_name),
 					    thrust_axis);
 
 		for (int channel = 0; channel < 8; channel++) {
@@ -359,7 +370,7 @@ public class AltosGraph extends AltosUIGraph {
 
 		flight_series.register_axis(AltosUIFlightSeries.motor_pressure_name,
 					    motor_pressure_color,
-					    true,
+					    enable_axis(product_id, AltosUIFlightSeries.motor_pressure_name),
 					    motor_pressure_axis);
 
 		flight_series.check_axes();

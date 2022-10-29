@@ -48,6 +48,8 @@ These are Bdale's notes on how to do a release.
 			gcc-i686-linux-gnu gcc-aarch64-linux-gnu \
 			gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf
 
+	- make sure jsign is installed so we can sign Windows installers
+
 	- make sure ~/web/altusmetrum has no pending pullable commits
 
 	git checkout master
@@ -109,8 +111,8 @@ These are Bdale's notes on how to do a release.
 
 	cp src/chaoskey-v1.0/{*.elf,*.ihx,*.bin,*.map} \
 	   src/easymega-v[1-2].0/{*.elf,*.ihx,*.map} \
-	   src/easymini-v[1-2].0/{*.elf,*.ihx,*.map} \
-	   src/easymotor-v2/{*.elf,*.ihx,*.map} \
+	   src/easymini-v[1-3].0/{*.elf,*.ihx,*.map} \
+	   src/easymotor-v3/{*.elf,*.ihx,*.map} \
 	   src/easytimer-v1/{*.elf,*.ihx,*.map} \
 	   src/telebt-v[3-4].0/{*.elf,*.ihx,*.map} \
 	   src/teledongle-v3.0/{*.elf,*.ihx,*.map} \

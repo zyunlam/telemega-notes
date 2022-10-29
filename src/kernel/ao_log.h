@@ -59,7 +59,7 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELESTATIC	17	/* 32 byte typed telestatic records */
 #define AO_LOG_FORMAT_MICROPEAK2	18	/* 2-byte baro values with header */
 #define AO_LOG_FORMAT_TELEMEGA_4	19	/* 32 byte typed telemega records with 32 bit gyro cal and Bmx160 */
-#define AO_LOG_FORMAT_EASYMOTOR		20	/* ? byte typed easymotor records with pressure sensor and adxl375 */
+#define AO_LOG_FORMAT_EASYMOTOR		20	/* 16 byte typed easymotor records with pressure sensor and adxl375 */
 #define AO_LOG_FORMAT_TELEMEGA_5	21	/* 32 byte typed telemega records with 32 bit gyro cal, mpu6000 and mmc5983 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
