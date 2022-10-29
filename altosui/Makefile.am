@@ -1,5 +1,4 @@
 # location of code signing key, et al
-CODEKEYDIR=~/altusmetrumllc/ssl.com
 
 JAVAROOT=classes
 AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
@@ -413,7 +412,8 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 $(WINDOWS_DIST): $(WINDOWS_FILES) altos-windows.nsi Instdrv/NSIS/Includes/java.nsh
 	-rm -f $@
 	makensis -Oaltos-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" altos-windows.nsi || (cat altos-windows.log && exit 1)
-	jsign --keystore $(CODEKEYDIR)/altus_metrum,_llc.p12 --alias 1 \
-		--storetype PKCS12 --storepass `cat $(CODEKEYDIR)/password` \
-		--tsaurl http://ts.ssl.com --tsmode RFC3161 $@
-
+	if [ "$(HAVE_WINDOWS_KEY)" = "yes" ]; then \
+	jsign --keystore "$(WINDOWSKEYFILE)" --alias 1 \
+		--storetype PKCS12 --storepass `cat "$(WINDOWSKEYPASSFILE)"` \
+		--tsaurl http://ts.ssl.com --tsmode RFC3161 $@ ; \
+	fi

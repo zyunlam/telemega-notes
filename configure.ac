@@ -200,6 +200,22 @@ else
 	HAVE_GOOGLE_KEY="no"
 fi
 
+AC_ARG_WITH(windows-key, AS_HELP_STRING([--with-windows-key=PATH],
+            [Set the file containing the Windows installer signing key (defaults to ~/altusmetrumllc/ssl.com/altus_metrum,_llc.p12)]),
+	    [WINDOWSKEYFILE="$withval"], [WINDOWSKEYFILE=$HOME/altusmetrumllc/ssl.com/altus_metrum,_llc.p12])
+
+AC_ARG_WITH(windows-key-pass, AS_HELP_STRING([--with-windows-key-pass=PATH],
+            [Set the file containing the Windows installer signing key password (defaults to ~/altusmetrumllc/ssl.com/password)]),
+	    [WINDOWSKEYPASSFILE="$withval"], [WINDOWSKEYPASSFILE=$HOME/altusmetrumllc/ssl.com/password])
+
+AC_CHECK_PROG(jsign, jsign, "yes", "no")
+
+if test -s "$WINDOWSKEYFILE" -a -s "$WINDOWSKEYPASSFILE" -a "$jsign" = yes; then
+	HAVE_WINDOWS_KEY="yes"
+else
+	HAVE_WINDOWS_KEY="no"
+fi
+
 WARN_CFLAGS="-Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wnested-externs"
 AC_SUBST(WARN_CFLAGS)
 
@@ -210,6 +226,9 @@ AC_ARG_ENABLE(faketime, AS_HELP_STRING([--enable-faketime],
 AM_CONDITIONAL(FAKETIME, [test x$FAKETIME = xyes])
 
 AC_SUBST(GOOGLEKEY)
+AC_SUBST(WINDOWSKEYFILE)
+AC_SUBST(WINDOWSKEYPASSFILE)
+AC_SUBST(HAVE_WINDOWS_KEY)
 
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -585,6 +604,7 @@ echo "    jfreechart..................: ${JFREECHART}"
 echo "    jcommon.....................: ${JCOMMON}"
 echo "    JVM include.................: ${JVM_INCLUDE}"
 echo "    AltosDroid maps API key.....: ${HAVE_GOOGLE_KEY}"
+echo "    Windows installer key.......: ${HAVE_WINDOWS_KEY}"
 if test x${ANDROID_SDK} != "xno"; then
 echo ""
 echo "  Android path"

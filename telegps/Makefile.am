@@ -1,5 +1,4 @@
 # location of code signing key, et al
-CODEKEYDIR=~/altusmetrumllc/ssl.com
  
 JAVAROOT=classes
 AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
@@ -340,9 +339,11 @@ $(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 $(WINDOWS_DIST): $(WINDOWS_FILES) telegps-windows.nsi
 	-rm -f $@
 	makensis -Otelegps-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" telegps-windows.nsi || (cat telegps-windows.log && exit 1)
-	jsign --keystore $(CODEKEYDIR)/altus_metrum,_llc.p12 --alias 1 \
-		--storetype PKCS12 --storepass `cat $(CODEKEYDIR)/password` \
-		--tsaurl http://ts.ssl.com --tsmode RFC3161 $@
+	if [ "$(HAVE_WINDOWS_KEY)" = "yes" ]; then \
+	jsign --keystore "$(WINDOWSKEYFILE)" --alias 1 \
+		--storetype PKCS12 --storepass `cat "$(WINDOWSKEYPASSFILE)"` \
+		--tsaurl http://ts.ssl.com --tsmode RFC3161 $@ ; \
+	fi
 
 Manifest.txt: Makefile
 	echo 'Main-Class: org.altusmetrum.telegps.TeleGPS' > $@
