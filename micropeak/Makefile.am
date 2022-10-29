@@ -1,3 +1,6 @@
+# location of code signing key, et al
+CODEKEYDIR=~/altusmetrumllc/ssl.com
+ 
 JAVAROOT=classes
 AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
 
@@ -345,6 +348,9 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 $(WINDOWS_DIST): $(WINDOWS_FILES) micropeak-windows.nsi
 	-rm -f $@
 	makensis -Omicropeak-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" micropeak-windows.nsi || (cat micropeak-windows.log && exit 1)
+	jsign --keystore $(CODEKEYDIR)/altus_metrum,_llc.p12 --alias 1 \
+		--storetype PKCS12 --storepass `cat $(CODEKEYDIR)/password` \
+		--tsaurl http://ts.ssl.com --tsmode RFC3161 $@
 
 Manifest.txt: Makefile
 	echo 'Main-Class: org.altusmetrum.micropeak.MicroPeak' > $@
