@@ -17,7 +17,6 @@ Files:	altoslib/AltosMap.java
 	altosui/AltosGraphUI.java
 	altosuilib/AltosUIMap.java
 	src/avr/ao_eeprom_avr.c
-	src/cc1111/ao_intflash.c
 	telegps/TeleGPSGraphUI.java
 Copyright: 2010-2011 Anthony Towns <aj@erisian.com.au>
 License: GPL-2+
@@ -34,10 +33,6 @@ License: GPL-2+
 Files: ao-tools/lib/cephes.h ao-tools/lib/chbevl.c ao-tools/lib/i0.c ao-tools/lib/mconf.h
 Copyright: 1984, 1987, 1989, 1995 Stephen L. Moshier
 License: GPL-2+
-
-Files: src/cc1111/cc1111.h ao-tools/target/timer/cc1111.h
-Copyright: 2003 Maarten Brock, sourceforge.brock@dse.nl
-License: LGPL-2.1+
 
 License: Zlib
  This software is provided 'as-is', without any express or implied

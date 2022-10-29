@@ -57,7 +57,7 @@ altos (1.9.12-1) unstable; urgency=medium
   * Auto-detect windows signing stuff
   * Version 1.9.12
 
- -- Bdale Garbee <Bdale Garbee <bdale@gag.com>  Fri, 28 Oct 2022 23:12:21 -0600
+ -- Bdale Garbee <bdale@gag.com>  Fri, 28 Oct 2022 23:12:21 -0600
 
 altos (1.9.11-2) unstable; urgency=medium
 
