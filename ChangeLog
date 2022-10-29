@@ -1,3 +1,278 @@
+commit bdabc6814b066a9b17a6557910f21b1ed03de3f0
+Merge: 37dda254 c5e8826a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 28 23:10:00 2022 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit c5e8826aa260d4aca492d684b94adc7eea0254eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 21:07:15 2022 -0700
+
+    Version 1.9.12
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 140a84ba8ac1e6548ab63ff586cf214d87f727a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Oct 28 21:57:02 2022 -0700
+
+    Auto-detect windows signing stuff
+    
+    Still build installers even without signing key
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7c4f9aa882256182485f7f2086221841368ddfc7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 28 22:28:40 2022 -0600
+
+    update Releasing to include reference to jsign as a release dependency
+
+commit 5fd95471791842234a1840477c55ba175fff5a8c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 28 22:20:03 2022 -0600
+
+    fat: sign Windows installers with our new code signing certificate
+
+commit ef969428f293e5155c00af514ce0782a7cdf25d5
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 28 21:47:04 2022 -0600
+
+    doc: include reference to Loki Research closures in motortest document
+
+commit 74c73edc93110874636b4bbbe01f9f0327230b50
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 21:35:55 2022 -0700
+
+    altosuilib: Remove some debug printfs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 055803ceca56065ea2253ab3eab20a5defd00135
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 21:21:28 2022 -0700
+
+    altosui: Ship motortest.pdf with packaged builds
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f57cba7dd193c5608be187d3d81781215ab38a44
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 27 22:31:34 2022 -0600
+
+    doc: additional improvements to motortest manual
+
+commit f249b61f403b8d2a042641c5ebe0fe4a720ae436
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Oct 27 22:20:19 2022 -0600
+
+    fix mailing list reference to use mailman3 path
+
+commit edef072dd5cffdbd3e8346719a81808b17bdc570
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 21:05:10 2022 -0700
+
+    Add EasyMotor v3 firmware to release
+    
+    Remove EasyMotor v2
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a4be94096281536db12378c6fee66ffb774a3eac
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 21:01:19 2022 -0700
+
+    doc: Add preliminary 1.9.12 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 12b03f494462bdf8c076ea474176ec14a18026fa
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 21:00:47 2022 -0700
+
+    doc: Add specs for EasyMini v3 and EasyMotor v3
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2fdf4e798bd67b0d7e96f2b8fff49915b71b089e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 21:00:07 2022 -0700
+
+    altosuilib: Limit EasyMotor graphs to motor pressure and accel by default
+    
+    Change which axes are turned on when the graph is created.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 76f0fe177a38bd16e346edf0808ee8fca343f1a2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 20:59:20 2022 -0700
+
+    altoslib: Map log format back to USB device id
+    
+    This lets us use the device_id for both telem and eeprom files.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14a65822fa2a8bb120638633b068847c8a0197b9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 19:39:16 2022 -0700
+
+    altos: Allow 'c a 0' without Syntax Error
+    
+    Need to clear error after checking for second value in accel cal
+    command.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7172638c3810f6c39e4262fa80edf5ef0dec62d8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 19:25:02 2022 -0700
+
+    easymotor-v3: Fix beeper config
+    
+    the branch had different beeper config code than mainline.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 898eeb609aa7eb078161a78ac48c727a5255a51c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 19:19:59 2022 -0700
+
+    ao-eeprom: Handle merge conflict from easymotor-v3 branch
+    
+    Had two copies of the new easymotor log format parsing bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 611ef4497b97bcf5239d6bc2ee13eeba9efd1503
+Merge: 1e694ad4 083464b5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 19:16:39 2022 -0700
+
+    Merge branch 'easymotor-v3'
+
+commit 1e694ad4f67735585f0897e2dffac755868f3150
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 17:50:36 2022 -0700
+
+    Add EasyMini v3.0 firmware to release
+    
+    Followed instructions in Releasing
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a81f5a78172663376ad9687976b9821a755d5e31
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Oct 27 17:43:08 2022 -0700
+
+    altos: Allow setting telemetry interval to zero without crashing
+    
+    Setting telemetry interval to zero means disable telemetry, but the
+    code was using the zero value to compute a bunch of packet delays,
+    which involved dividing by the interval value causing a crash when it
+    was zero. Skip those subsequent computations as they won't be used
+    anyways.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 48a8ae2d38ecad5aa84b2158045c6a2fd8abe5ab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 23 16:48:05 2022 -0700
+
+    altos: Increase AES IV buffer to hold maximum AES state
+    
+    The compiler emits warnings if this buffer is only 16 bytes. I'm hoping
+    that's because the max key size could be 256 bits instead of 128 bits?
+    
+    In any case, this makes the compiler happy.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3735e1eb27afb873d60164a79a9e2769dc92b3a3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 24 15:54:20 2022 -0700
+
+    easymini: Elide symbols from combined .ihx file
+    
+    Also add combined hex file to easymini v1.0 for testing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d299191a298f6b6ffeadff15334738810062cf58
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Sep 24 15:53:04 2022 -0700
+
+    ao-elftohex: Add '-n' option to elide symbol table from output
+    
+    The symbol table is a non-standard Altus Metrum hex file extension;
+    add this option to allow use with standard hex file tools.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit dc4de8365de5829b587a845e0517e8c5fc8c9e29
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 19 09:20:23 2022 -0700
+
+    easymini-v3.0: Create combined .ihx file for testing
+    
+    This doesn't set the serial number, so it's not useful for production,
+    but it should at least provide an easy way to check a board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ed795c24e6269a10e74b9bc3c385e787bcc230fe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 19 09:09:04 2022 -0700
+
+    ao-elftohex: Allow multiple elf files to be merged together
+    
+    This allows combining the flash loader and core firmware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1d963cf10f3f54f77a6edf8e7843f70c0268cd31
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Sep 19 08:37:31 2022 -0700
+
+    doc: Update call sign
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 065c60d38f38343bd1f319a87f6b50367a3abbe3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 4 21:05:47 2022 -0700
+
+    altos: Document easymotor record length
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 681638032041efcb05b9623e2a0332ca4e2d0958
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 4 21:05:25 2022 -0700
+
+    ao-eeprom: Add easy motor support
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41cf6f6f65681961ed98a59b9fc9da4fe5abef5a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 4 21:04:28 2022 -0700
+
+    altoslib: Replace EasyMotor v2 code with v3
+    
+    No v2 boards remain in usable condition and we didn't create a new log
+    format value for v3, so just replace the v2 code with v3.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 37dda2541ce440a40fcd4dc8387f7cb1cd3f0816
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun May 29 21:08:03 2022 -0600
+
+    releasing 1.9.11
+
 commit 7904b36eaae2468d76f2627bebd86b663afea1f8
 Merge: 8970d45e 4e237bd4
 Author: Bdale Garbee <bdale@gag.com>
@@ -77,6 +352,84 @@ Date:   Tue Apr 12 11:13:44 2022 -0600
 
     doc: add an appendix with examples for configurable pyro channels
 
+commit 083464b52c835c09a66c06a87246fcd138748a5d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 9 22:38:28 2022 -0700
+
+    ao-eeprom: Add EasyMotor decode
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 61b837129a1b1bbf17413957006fa31a305f6247
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Apr 9 22:50:21 2022 -0500
+
+    recognize EasyMotor-v3 too
+
+commit 9cded6d2b2888b6fd1dbcb08d7404fbc8f52ba60
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 6 23:29:31 2022 -0700
+
+    altos: Add EasyMotor-v3.0 to regular builds
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3a2adf8011237852187046a551216736bd1e6bbb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 6 23:28:40 2022 -0700
+
+    lpc: Shuffle more bits around for flash loader
+    
+    Having a fixed value at 0x2fc means splitting flash and trying to make
+    enough space on both sides. Sigh.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 72d0c00a063338642a3448f39b0308751285e5ee
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 6 23:20:03 2022 -0700
+
+    easymotor-v3: Increase ADXL spi speed back to normal, remove delay
+    
+    All done debugging, it seems to work on EasyMotor now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 40a56ed2b5af30c93daa74a15f21e7c8b4cb2a1a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 6 22:45:41 2022 -0700
+
+    lpc: Add SPI mode support. Use for ADXL375 on easymotor
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 434e98d39a19af9c3cf52cba041091f190972a83
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 6 22:32:03 2022 -0700
+
+    reduce adxl speed to 100kHz
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c6a7ea9168f1669840eef0fb080759968f4a2f97
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 6 22:31:39 2022 -0700
+
+    Disable adxl debug, set long delay
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b930b52922a1bbb34cb3fda67c2e9b4695a7330f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 6 22:14:32 2022 -0700
+
+    altos: Fix ADXL375 SPI mode definitions and usage
+    
+    3-wire mode is 1, 4-wire mode is 0. Fortunately, I also messed up the
+    shift value, so the 1 got shifted on top of one of the fixed-value bits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
 commit c49bd3cb0c31a51fae79ddc92237cc309be9a242
 Merge: d225adc3 b140da92
 Author: Bdale Garbee <bdale@gag.com>
@@ -96,6 +449,132 @@ Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Apr 5 17:54:32 2022 -0600
 
     use correct test script for v1.0 easymega
+
+commit f35d18ca773a109fea572ee1e7134bdc5c4bce14
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 4 14:15:17 2022 -0700
+
+    lpc: Attempt to make beeper generate correct tone
+    
+    The timer docs are confusing; I can't tell how the PWM configuration
+    works.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6659ec1002da325588a631d9c43a7a9b9a4dbfe3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 4 01:21:44 2022 -0600
+
+    fix SPI index definition
+
+commit 16004c790189bc439285b8afb599ae2b02a13c95
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 4 01:14:36 2022 -0600
+
+    Revert "adxl375: Disable spi duplex"
+    
+    This reverts commit 21e6dad505677a6b2e19844638ea5b09038b04ae.
+
+commit 3fb95b34a85fb79713c258937a9005faf6f89a03
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Apr 4 00:00:00 2022 -0700
+
+    adxl375: Disable spi duplex
+    
+    See if this fixes LPC
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 06ec7480b669a5bc007d82fbdbe56e4a1a4cf68c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 3 23:53:24 2022 -0700
+
+    easymotor-v3: enable adxl debugging
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5740b82174c70888f6f047917574567bcbca58dc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 3 23:31:44 2022 -0700
+
+    lpc: Fixes for timer configuration
+    
+    Missed one magic value to make the beeper configurable
+
+commit a6dc1a7098e44bd1b3250b12ca6fda3bb626cbb1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 3 23:23:51 2022 -0700
+
+    lpc: Fix name of timer ioconf constants
+    
+    All iopin configuration values are per-pin, so they all need to have
+    the pin name included in the name.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 741796d39437e850fc255b8b324530bb988b0797
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 3 23:23:51 2022 -0700
+
+    lpc: Fix name of timer ioconf for pio0_1
+    
+    There are lots more...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9df0b79ed7d66369b31dbdc7acde8e23f5f8612e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 3 23:18:28 2022 -0700
+
+    lpc: Stick magic value at 0x2fc to let us use PIO0_1
+    
+    This pin is used by the built-in ROM boot loader code to force
+    ISP. That keeps us from attaching anything that might be connected to
+    ground.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4b15c98449da54bae8c4efbfddc7734aeaa43b04
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 3 22:17:15 2022 -0700
+
+    easymotor-v3: Configure beeper
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2e585a947c7f07fe204e50fc47beb1cc1e479718
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 3 22:16:48 2022 -0700
+
+    lpc: Make beeper timer configurable
+    
+    Allow use of any 32-bit timer.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 243da063ef0dae656f940eb81ada55867924406f
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 4 00:19:42 2022 -0600
+
+    get ram usage under control, etc
+
+commit 987ad2eb3a89ad920988d38fe8068dda1cd6f16d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 3 22:11:13 2022 -0600
+
+    a few config tweaks
+
+commit 2bec5edbb068cab88b8d4f30f609712feb186a30
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 3 18:12:20 2022 -0600
+
+    first cut at EasyMotor v3 support
+
+commit 9519f7fc894f08d4841556d0efc520b9cc08a899
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jan 25 12:34:31 2022 -0700
+
+    need to save .bin for TeleGPS v2.0
 
 commit 302e9b8fda7b36e5009044086737b7791f81addd
 Author: Keith Packard <keithp@keithp.com>
