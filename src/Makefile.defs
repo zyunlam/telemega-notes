@@ -23,7 +23,7 @@ OPT=-Os -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
 PICOLIBC_CFLAGS= \
 	-specs=picolibc.specs \
-	-Wl,--gc-sections -ffunction-sections -fdata-sections \
+	-Wl,--gc-sections \
 	$(PICOLIBC_PRINTF_CFLAGS)
 
 AO_CFLAGS=\

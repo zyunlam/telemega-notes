@@ -362,7 +362,7 @@ uint8_t ao_aes_mutex;
 static word32 key[16/4];
 static roundkey	rkk;
 
-static word32 iv[16/4];
+static word32 iv[32/4];
 
 void
 ao_aes_set_mode(enum ao_aes_mode mode)
