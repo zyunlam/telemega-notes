@@ -82,6 +82,7 @@ These are Bdale's notes on how to do a release.
 
 	- verify debian/changelog is "clean" ending in last release version
 	- craft a suitable debian/changelog entry, possibly using:
+	export EMAIL=bdale@gag.com
 	gbp dch --release --multimaint-merge --new-version=<version>-1 
 
         git commit -n debian/changelog -m "update changelog for Debian build"
@@ -126,7 +127,7 @@ These are Bdale's notes on how to do a release.
 	cp src/chaoskey-v1.0/flash-loader/{*.elf,*.bin,*.map} \
 	   src/easymega-v[1-2].0/flash-loader/*.elf \
 	   src/easymini-v[1-2].0/flash-loader/*.elf \
-	   src/easymotor-v2/flash-loader/*.elf \
+	   src/easymotor-v3/flash-loader/*.elf \
 	   src/easytimer-v1/flash-loader/*.elf \
 	   src/telebt-v[3-4].0/flash-loader/{*.elf,*.bin,*.map} \
 	   src/teledongle-v3.0/flash-loader/*.elf \
