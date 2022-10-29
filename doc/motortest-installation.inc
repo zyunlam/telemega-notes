@@ -47,3 +47,8 @@
 		NPT” pipe tap. Fill the touch hole with grease, screw in
 		the pressure sensor, and attach the sensor leads to
 		EasyMotor.
+
+		If you aren't up for machining closures yourself, 
+		link:http://lokiresearch.com[Loki Research] sells 
+		54mm and 75mm "experimental bulkheads" with threaded
+		sensor ports that can be used with snap ring cases.
