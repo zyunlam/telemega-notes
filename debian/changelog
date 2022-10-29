@@ -1,3 +1,64 @@
+altos (1.9.12-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * need to save .bin for TeleGPS v2.0
+  * first cut at EasyMotor v3 support
+  * a few config tweaks
+  * get ram usage under control, etc
+  * Revert "adxl375: Disable spi duplex"
+  * fix SPI index definition
+  * recognize EasyMotor-v3 too
+  * fix mailing list reference to use mailman3 path
+  * doc: additional improvements to motortest manual
+  * doc: include reference to Loki Research closures in motortest document
+  * fat: sign Windows installers with our new code signing certificate
+  * update Releasing to include reference to jsign as a release dependency
+  * updating changelog for 1.9.12 release
+
+  [ Keith Packard ]
+  * lpc: Make beeper timer configurable
+  * easymotor-v3: Configure beeper
+  * lpc: Stick magic value at 0x2fc to let us use PIO0_1
+  * lpc: Fix name of timer ioconf for pio0_1
+  * lpc: Fix name of timer ioconf constants
+  * lpc: Fixes for timer configuration
+  * easymotor-v3: enable adxl debugging
+  * adxl375: Disable spi duplex
+  * lpc: Attempt to make beeper generate correct tone
+  * altos: Fix ADXL375 SPI mode definitions and usage
+  * Disable adxl debug, set long delay
+  * reduce adxl speed to 100kHz
+  * lpc: Add SPI mode support. Use for ADXL375 on easymotor
+  * easymotor-v3: Increase ADXL spi speed back to normal, remove delay
+  * lpc: Shuffle more bits around for flash loader
+  * altos: Add EasyMotor-v3.0 to regular builds
+  * ao-eeprom: Add EasyMotor decode
+  * altoslib: Replace EasyMotor v2 code with v3
+  * ao-eeprom: Add easy motor support
+  * altos: Document easymotor record length
+  * doc: Update call sign
+  * ao-elftohex: Allow multiple elf files to be merged together
+  * easymini-v3.0: Create combined .ihx file for testing
+  * ao-elftohex: Add '-n' option to elide symbol table from output
+  * easymini: Elide symbols from combined .ihx file
+  * altos: Increase AES IV buffer to hold maximum AES state
+  * altos: Allow setting telemetry interval to zero without crashing
+  * Add EasyMini v3.0 firmware to release
+  * ao-eeprom: Handle merge conflict from easymotor-v3 branch
+  * easymotor-v3: Fix beeper config
+  * altos: Allow 'c a 0' without Syntax Error
+  * altoslib: Map log format back to USB device id
+  * altosuilib: Limit EasyMotor graphs to motor pressure and accel by default
+  * doc: Add specs for EasyMini v3 and EasyMotor v3
+  * doc: Add preliminary 1.9.12 release notes
+  * Add EasyMotor v3 firmware to release
+  * altosui: Ship motortest.pdf with packaged builds
+  * altosuilib: Remove some debug printfs
+  * Auto-detect windows signing stuff
+  * Version 1.9.12
+
+ -- Bdale Garbee <Bdale Garbee <bdale@gag.com>  Fri, 28 Oct 2022 23:12:21 -0600
+
 altos (1.9.11-2) unstable; urgency=medium
 
   * cherry pick patch from master that increases AES IV buffer to hold 
