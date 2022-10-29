@@ -48,6 +48,8 @@ These are Bdale's notes on how to do a release.
 			gcc-i686-linux-gnu gcc-aarch64-linux-gnu \
 			gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf
 
+	- make sure jsign is installed so we can sign Windows installers
+
 	- make sure ~/web/altusmetrum has no pending pullable commits
 
 	git checkout master
