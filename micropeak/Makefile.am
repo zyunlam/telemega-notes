@@ -1,3 +1,5 @@
+# location of code signing key, et al
+ 
 JAVAROOT=classes
 AM_JAVACFLAGS=$(JAVAC_VERSION_FLAGS) -encoding UTF-8 -Xlint:deprecation -Xlint:unchecked
 
@@ -345,6 +347,11 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 $(WINDOWS_DIST): $(WINDOWS_FILES) micropeak-windows.nsi
 	-rm -f $@
 	makensis -Omicropeak-windows.log "-XOutFile $@" "-DVERSION=$(VERSION)" micropeak-windows.nsi || (cat micropeak-windows.log && exit 1)
+	if [ "$(HAVE_WINDOWS_KEY)" = "yes" ]; then \
+	jsign --keystore "$(WINDOWSKEYFILE)" --alias 1 \
+		--storetype PKCS12 --storepass `cat "$(WINDOWSKEYPASSFILE)"` \
+		--tsaurl http://ts.ssl.com --tsmode RFC3161 $@ ; \
+	fi
 
 Manifest.txt: Makefile
 	echo 'Main-Class: org.altusmetrum.micropeak.MicroPeak' > $@

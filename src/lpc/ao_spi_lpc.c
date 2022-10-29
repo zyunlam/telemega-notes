@@ -90,7 +90,7 @@ ao_spi_put(uint8_t id)
 }
 
 static void
-ao_spi_channel_init(uint8_t id)
+ao_spi_channel_init(uint8_t id, uint8_t mode)
 {
 	struct lpc_ssp	*lpc_ssp = ao_lpc_ssp[id];
 	uint8_t	d;
@@ -102,8 +102,7 @@ ao_spi_channel_init(uint8_t id)
 
 	lpc_ssp->cr0 = ((LPC_SSP_CR0_DSS_8 << LPC_SSP_CR0_DSS) |
 			(LPC_SSP_CR0_FRF_SPI << LPC_SSP_CR0_FRF) |
-			(0 << LPC_SSP_CR0_CPOL) |
-			(0 << LPC_SSP_CR0_CPHA) |
+			mode |
 			(0 << LPC_SSP_CR0_SCR));
 
 	/* Enable the device */
@@ -121,6 +120,9 @@ void
 ao_spi_init(void)
 {
 #if HAS_SPI_0
+#ifndef SPI_0_MODE
+#define SPI_0_MODE	0
+#endif
 	/* Configure pins */
 #if SPI_SCK0_P0_6
 	lpc_ioconf.pio0_6 = ao_lpc_alternate(LPC_IOCONF_FUNC_PIO0_6_SCK0);
@@ -149,10 +151,13 @@ ao_spi_init(void)
 	/* Reset the device */
 	lpc_scb.presetctrl &= ~(1UL << LPC_SCB_PRESETCTRL_SSP0_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP0_RST_N);
-	ao_spi_channel_init(0);
+	ao_spi_channel_init(0, SPI_0_MODE);
 #endif
 
 #if HAS_SPI_1
+#ifndef SPI_1_MODE
+#define SPI_1_MODE	0
+#endif
 
 #if SPI_SCK1_P1_15
 	lpc_ioconf.pio1_15 = ao_lpc_alternate(LPC_IOCONF_FUNC_PIO1_15_SCK1);
@@ -199,6 +204,6 @@ ao_spi_init(void)
 	/* Reset the device */
 	lpc_scb.presetctrl &= ~(1UL << LPC_SCB_PRESETCTRL_SSP1_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_SSP1_RST_N);
-	ao_spi_channel_init(1);
+	ao_spi_channel_init(1, SPI_1_MODE);
 #endif /* HAS_SPI_1 */
 }
