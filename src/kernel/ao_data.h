@@ -182,6 +182,10 @@ extern volatile uint8_t		ao_data_count;
 
 #endif /* AO_DATA_RING */
 
+#define AO_ALT_TYPE	int32_t
+
+typedef AO_ALT_TYPE	alt_t;
+
 #if !HAS_BARO && HAS_MS5607
 
 /* Either an MS5607 or an MS5611 hooked to a SPI port
@@ -190,10 +194,6 @@ extern volatile uint8_t		ao_data_count;
 #define HAS_BARO	1
 
 typedef int32_t	pres_t;
-
-#define AO_ALT_TYPE	int32_t
-
-typedef AO_ALT_TYPE	alt_t;
 
 #define ao_data_pres_cook(packet)	ao_ms5607_convert(&packet->ms5607_raw, &packet->ms5607_cooked)
 
