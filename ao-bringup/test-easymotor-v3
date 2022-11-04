@@ -24,6 +24,11 @@ ao-list | while read product serial dev; do
 	    echo "Testing flash"
 	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
 
+	    echo "" 
+
+	    echo "Testing pressure sensor input"
+	    ../ao-tools/ao-test-pressure/ao-test-pressure --tty="$dev" 
+
 	    case $? in
 		0)
 		    ;;
