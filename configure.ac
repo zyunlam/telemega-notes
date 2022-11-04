@@ -570,6 +570,7 @@ ao-tools/ao-flash/Makefile
 ao-tools/ao-test-igniter/Makefile
 ao-tools/ao-test-baro/Makefile
 ao-tools/ao-test-flash/Makefile
+ao-tools/ao-test-pressure/Makefile
 ao-tools/ao-cal-accel/Makefile
 ao-tools/ao-cal-freq/Makefile
 ao-tools/ao-test-gps/Makefile
