@@ -9,6 +9,7 @@ echo "Copyright 2022 by Bdale Garbee.  Released under GPL v3"
 echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"
+echo "\t\tand precision 2:1 resistor divider feeding pressure input from 5V out"
 echo
 
 ret=1
