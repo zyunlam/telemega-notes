@@ -42,6 +42,6 @@
 #define AO_APBA_PRESCALER	1
 
 #define HAS_SPI_0		1
-#define SPI_0_PA08_PA09_PA10_PA11	1
+#define SPI_0_PA08_PA09_PA10	1
 
 #endif /* _AO_PINS_H_ */
