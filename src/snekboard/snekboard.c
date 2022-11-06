@@ -14,17 +14,22 @@
 
 #include <ao.h>
 #include <ao_led.h>
+#include <ao_dma_samd21.h>
 
 #define SNEK_CS_PORT	(&samd21_port_a)
 #define SNEK_CS_PIN	(11)
 #define SNEK_SPI_INDEX	AO_SPI_0_PA08_PA09_PA10
 #define SNEK_SPI_SPEED	ao_spi_speed(1000000)
 
+static const uint8_t spi_test[] = {
+	0x55,
+};
+
 static void
 ao_spi_test(void)
 {
 	ao_spi_get_bit(SNEK_CS_PORT, SNEK_CS_PIN, SNEK_SPI_INDEX, SNEK_SPI_SPEED);
-	ao_spi_send("hello", 5, SNEK_SPI_INDEX);
+	ao_spi_send(spi_test, sizeof(spi_test), SNEK_SPI_INDEX);
 	ao_spi_put_bit(SNEK_CS_PORT, SNEK_CS_PIN, SNEK_SPI_INDEX);
 }
 
@@ -39,6 +44,7 @@ int main(void)
 	ao_clock_init();
 	ao_task_init();
 	ao_timer_init();
+	ao_dma_init();
 	ao_spi_init();
 	ao_usb_init();
 	ao_cmd_register(ao_spi_cmds);

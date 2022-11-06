@@ -28,6 +28,7 @@ ALTOS_SRC = \
 	ao_panic.c \
 	ao_timer.c \
 	ao_mutex.c \
+	ao_dma_samd21.c \
 	ao_usb_samd21.c \
 	ao_spi_samd21.c
 
