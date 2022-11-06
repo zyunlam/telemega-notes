@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ * Copyright © 2022 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-__flash = 0x00000000;
-__flash_size = 4K;
+__flash = 0x00001000;
+__flash_size = 128K - 4K;
 __ram = 0x20000000;
-__ram_size = 4k;
+__ram_size = 16k;
 __stack_size = 256;
 
 INCLUDE registers.ld

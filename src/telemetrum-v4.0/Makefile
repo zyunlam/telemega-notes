@@ -28,6 +28,11 @@ INC = \
 	samd21.h \
 	Makefile
 
+# SAMD21G17D
+
+SAMD21_ROM=128
+SAMD21_RAM=32
+
 #PROFILE=ao_profile.c
 #PROFILE_DEF=-DAO_PROFILE=1
 

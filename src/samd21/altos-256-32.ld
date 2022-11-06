@@ -17,7 +17,7 @@
  */
 
 __flash = 0x00001000;
-__flash_size = 128K - 4K;
+__flash_size = 256 - 4K;
 __ram = 0x20000000;
 __ram_size = 32k;
 __stack_size = 256;

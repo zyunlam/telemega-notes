@@ -31,6 +31,11 @@ ALTOS_SRC = \
 	ao_usb_samd21.c \
 	ao_spi_samd21.c
 
+# SAMD21G18A
+
+SAMD21_ROM=256
+SAMD21_RAM=32
+
 PRODUCT=SnekBoard
 PRODUCT_DEF=-DSNEKBOARD
 IDPRODUCT=0x000a
@@ -46,7 +51,7 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-$(PROG): Makefile $(OBJ) altos.ld
+$(PROG): Makefile $(OBJ) 
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
