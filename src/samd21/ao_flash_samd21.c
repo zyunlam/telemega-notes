@@ -38,7 +38,15 @@ samd21_nvmctrl_lock_region(void)
 static uint8_t
 ao_flash_lock_region_bit(void *addr)
 {
-	return (uint8_t) (((uintptr_t) addr) / samd21_nvmctrl_lock_region());
+	uint32_t lock_region = samd21_nvmctrl_lock_region();
+	uintptr_t a = (uintptr_t) addr;
+
+	while (lock_region) {
+		a >>= 1;
+		lock_region >>= 1;
+	}
+
+	return (uint8_t) a;
 }
 
 static uint8_t
@@ -119,10 +127,10 @@ ao_flash_erase_page(uint32_t *page)
 void
 ao_flash_page(uint32_t *page, uint32_t *src)
 {
-	uint32_t	page_size = samd21_nvmctrl_page_size();
-	uint32_t	pages = 256 / page_size;
+	uint32_t	page_shift = samd21_nvmctrl_page_shift();
+	uint32_t	pages = 256 >> page_shift;
 	uint32_t	i;
-	uint32_t	per_page = page_size / sizeof(uint32_t);
+	uint32_t	per_page = 1 << (page_shift - 2);
 
 	ao_flash_erase_page(page);
 
