@@ -24,7 +24,7 @@ ao_dma_init(void);
 
 void
 _ao_dma_start_transfer(uint8_t		id,
-		       void		*src,
+		       const void	*src,
 		       void		*dst,
 		       uint16_t		count,
 		       uint32_t		chctrlb,
