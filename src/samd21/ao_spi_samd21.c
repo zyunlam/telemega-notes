@@ -13,6 +13,7 @@
  */
 
 #include <ao.h>
+#include <ao_dma_samd21.h>
 
 static uint8_t		ao_spi_mutex[SAMD21_NUM_SERCOM];
 static uint8_t		ao_spi_pin_config[SAMD21_NUM_SERCOM];
@@ -42,14 +43,96 @@ static const struct ao_spi_samd21_info ao_spi_samd21_info[SAMD21_NUM_SERCOM] = {
 	},
 };
 
-//static uint8_t	spi_dev_null;
+static uint8_t	spi_dev_null;
+
+#define USE_DMA	1
+
+#if USE_DMA
+
+#define AO_SAMD21_SPI_MISO_DMA_ID	0
+#define AO_SAMD21_SPI_MOSI_DMA_ID	1
+
+static uint8_t	ao_spi_done[SAMD21_NUM_SERCOM];
+
+static void
+_ao_spi_recv_dma_done(uint8_t dma_id, void *closure)
+{
+	uint8_t	id = (uint8_t) (uintptr_t) closure;
+
+	(void) dma_id;
+	ao_spi_done[id] = 1;
+	ao_wakeup(&ao_spi_done[id]);
+}
+#endif
 
 void
 ao_spi_send(const void *block, uint16_t len, uint8_t spi_index)
 {
 	uint8_t			id = AO_SPI_INDEX(spi_index);
 	struct samd21_sercom	*sercom = ao_spi_samd21_info[id].sercom;
+#if USE_DMA
 
+	ao_arch_block_interrupts();
+	ao_spi_done[id] = 0;
+	_ao_dma_start_transfer(AO_SAMD21_SPI_MISO_DMA_ID,
+			       (void *) &sercom->data,
+			       &spi_dev_null,
+			       len,
+
+			       (SAMD21_DMAC_CHCTRLB_CMD_NOACT << SAMD21_DMAC_CHCTRLB_CMD) |
+			       (SAMD21_DMAC_CHCTRLB_TRIGACT_BEAT << SAMD21_DMAC_CHCTRLB_TRIGACT) |
+			       (SAMD21_DMAC_CHCTRLB_TRIGSRC_SERCOM_RX(id) << SAMD21_DMAC_CHCTRLB_TRIGSRC) |
+			       (SAMD21_DMAC_CHCTRLB_LVL_LVL3 << SAMD21_DMAC_CHCTRLB_LVL) |
+			       (0UL << SAMD21_DMAC_CHCTRLB_EVOE) |
+			       (0UL << SAMD21_DMAC_CHCTRLB_EVIE) |
+			       (SAMD21_DMAC_CHCTRLB_EVACT_NOACT << SAMD21_DMAC_CHCTRLB_EVACT),
+
+			       (SAMD21_DMAC_DESC_BTCTRL_STEPSIZE_X1 << SAMD21_DMAC_DESC_BTCTRL_STEPSIZE) |
+			       (SAMD21_DMAC_DESC_BTCTRL_STEPSEL_DST << SAMD21_DMAC_DESC_BTCTRL_STEPSEL) |
+			       (0UL << SAMD21_DMAC_DESC_BTCTRL_DSTINC) |
+			       (0UL << SAMD21_DMAC_DESC_BTCTRL_SRCINC) |
+			       (SAMD21_DMAC_DESC_BTCTRL_BEATSIZE_BYTE << SAMD21_DMAC_DESC_BTCTRL_BEATSIZE) |
+			       (SAMD21_DMAC_DESC_BTCTRL_BLOCKACT_INT << SAMD21_DMAC_DESC_BTCTRL_BLOCKACT) |
+			       (SAMD21_DMAC_DESC_BTCTRL_EVOSEL_DISABLE << SAMD21_DMAC_DESC_BTCTRL_EVOSEL) |
+			       (1UL << SAMD21_DMAC_DESC_BTCTRL_VALID),
+
+			       _ao_spi_recv_dma_done,
+			       (void *) (uintptr_t) id
+		);
+
+	_ao_dma_start_transfer(AO_SAMD21_SPI_MOSI_DMA_ID,
+			       (uint8_t *) block + len,
+			       (void *) &sercom->data,
+			       len,
+
+			       (SAMD21_DMAC_CHCTRLB_CMD_NOACT << SAMD21_DMAC_CHCTRLB_CMD) |
+			       (SAMD21_DMAC_CHCTRLB_TRIGACT_BEAT << SAMD21_DMAC_CHCTRLB_TRIGACT) |
+			       (SAMD21_DMAC_CHCTRLB_TRIGSRC_SERCOM_TX(id) << SAMD21_DMAC_CHCTRLB_TRIGSRC) |
+			       (SAMD21_DMAC_CHCTRLB_LVL_LVL2 << SAMD21_DMAC_CHCTRLB_LVL) |
+			       (0UL << SAMD21_DMAC_CHCTRLB_EVOE) |
+			       (0UL << SAMD21_DMAC_CHCTRLB_EVIE) |
+			       (SAMD21_DMAC_CHCTRLB_EVACT_NOACT << SAMD21_DMAC_CHCTRLB_EVACT),
+
+			       (SAMD21_DMAC_DESC_BTCTRL_STEPSIZE_X1 << SAMD21_DMAC_DESC_BTCTRL_STEPSIZE) |
+			       (SAMD21_DMAC_DESC_BTCTRL_STEPSEL_SRC << SAMD21_DMAC_DESC_BTCTRL_STEPSEL) |
+			       (0UL << SAMD21_DMAC_DESC_BTCTRL_DSTINC) |
+			       (1UL << SAMD21_DMAC_DESC_BTCTRL_SRCINC) |
+			       (SAMD21_DMAC_DESC_BTCTRL_BEATSIZE_BYTE << SAMD21_DMAC_DESC_BTCTRL_BEATSIZE) |
+			       (SAMD21_DMAC_DESC_BTCTRL_BLOCKACT_NOACT << SAMD21_DMAC_DESC_BTCTRL_BLOCKACT) |
+			       (SAMD21_DMAC_DESC_BTCTRL_EVOSEL_DISABLE << SAMD21_DMAC_DESC_BTCTRL_EVOSEL) |
+			       (1 << SAMD21_DMAC_DESC_BTCTRL_VALID),
+
+			       NULL,
+			       NULL
+		);
+
+	while (ao_spi_done[id] == 0)
+		ao_sleep(&ao_spi_done[id]);
+
+	_ao_dma_done_transfer(AO_SAMD21_SPI_MOSI_DMA_ID);
+	_ao_dma_done_transfer(AO_SAMD21_SPI_MISO_DMA_ID);
+	ao_arch_release_interrupts();
+#else
 	const uint8_t *b = block;
 
 	while (len--) {
@@ -58,7 +141,9 @@ ao_spi_send(const void *block, uint16_t len, uint8_t spi_index)
 			;
 		(void) sercom->data;
 	}
+#endif
 }
+
 
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index)
