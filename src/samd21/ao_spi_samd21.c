@@ -65,6 +65,89 @@ _ao_spi_recv_dma_done(uint8_t dma_id, void *closure)
 }
 #endif
 
+static inline uint32_t
+dma_chctrlb(uint8_t id, bool tx)
+{
+	uint32_t	chctrlb = 0;
+
+	/* No complicated actions needed */
+	chctrlb |= SAMD21_DMAC_CHCTRLB_CMD_NOACT << SAMD21_DMAC_CHCTRLB_CMD;
+
+	/* Trigger after each byte transferred */
+	chctrlb |= SAMD21_DMAC_CHCTRLB_TRIGACT_BEAT << SAMD21_DMAC_CHCTRLB_TRIGACT;
+
+	/* Set the trigger source */
+	if (tx)
+		chctrlb |= SAMD21_DMAC_CHCTRLB_TRIGSRC_SERCOM_TX(id) << SAMD21_DMAC_CHCTRLB_TRIGSRC;
+	else
+		chctrlb |= SAMD21_DMAC_CHCTRLB_TRIGSRC_SERCOM_RX(id) << SAMD21_DMAC_CHCTRLB_TRIGSRC;
+
+	/* RX has priority over TX so that we don't drop incoming bytes */
+	if (tx)
+		chctrlb |= SAMD21_DMAC_CHCTRLB_LVL_LVL0 << SAMD21_DMAC_CHCTRLB_LVL;
+	else
+		chctrlb |= SAMD21_DMAC_CHCTRLB_LVL_LVL3 << SAMD21_DMAC_CHCTRLB_LVL;
+
+	/* No events needed */
+	chctrlb |= 0UL << SAMD21_DMAC_CHCTRLB_EVOE;
+	chctrlb |= 0UL << SAMD21_DMAC_CHCTRLB_EVIE;
+
+	/* And no actions either */
+	chctrlb |= SAMD21_DMAC_CHCTRLB_EVACT_NOACT << SAMD21_DMAC_CHCTRLB_EVACT;
+
+	return chctrlb;
+}
+
+static inline uint16_t
+dma_btctrl(bool tx, bool step)
+{
+	uint16_t	btctrl = 0;
+
+	/* Always step by 1 */
+	btctrl |= SAMD21_DMAC_DESC_BTCTRL_STEPSIZE_X1 << SAMD21_DMAC_DESC_BTCTRL_STEPSIZE;
+
+	/* Step the source if transmit, otherwise step the dest */
+	if (tx)
+		btctrl |= SAMD21_DMAC_DESC_BTCTRL_STEPSEL_SRC << SAMD21_DMAC_DESC_BTCTRL_STEPSEL;
+	else
+		btctrl |= SAMD21_DMAC_DESC_BTCTRL_STEPSEL_DST << SAMD21_DMAC_DESC_BTCTRL_STEPSEL;
+
+	/* Set the increment if stepping */
+	if (tx) {
+		if (step)
+			btctrl |= 1UL << SAMD21_DMAC_DESC_BTCTRL_SRCINC;
+		else
+			btctrl |= 0UL << SAMD21_DMAC_DESC_BTCTRL_SRCINC;
+		btctrl |= 0UL << SAMD21_DMAC_DESC_BTCTRL_DSTINC;
+	} else {
+		btctrl |= 0UL << SAMD21_DMAC_DESC_BTCTRL_SRCINC;
+		if (step)
+			btctrl |= 1UL << SAMD21_DMAC_DESC_BTCTRL_DSTINC;
+		else
+			btctrl |= 0UL << SAMD21_DMAC_DESC_BTCTRL_DSTINC;
+	}
+
+	/* byte at a time please */
+	btctrl |= SAMD21_DMAC_DESC_BTCTRL_BEATSIZE_BYTE << SAMD21_DMAC_DESC_BTCTRL_BEATSIZE;
+
+	/*
+	 * Watch for interrupts on RX -- we need to wait for the last byte to get received
+	 * to know the SPI bus is idle
+	 */
+	if (tx)
+		btctrl |= SAMD21_DMAC_DESC_BTCTRL_BLOCKACT_NOACT << SAMD21_DMAC_DESC_BTCTRL_BLOCKACT;
+	else
+		btctrl |= SAMD21_DMAC_DESC_BTCTRL_BLOCKACT_INT << SAMD21_DMAC_DESC_BTCTRL_BLOCKACT;
+
+	/* don't need any events */
+	btctrl |= SAMD21_DMAC_DESC_BTCTRL_EVOSEL_DISABLE << SAMD21_DMAC_DESC_BTCTRL_EVOSEL;
+
+	/* And make the descriptor valid */
+	btctrl |= 1UL << SAMD21_DMAC_DESC_BTCTRL_VALID;
+
+	return btctrl;
+}
+
 void
 ao_spi_send(const void *block, uint16_t len, uint8_t spi_index)
 {
@@ -74,54 +157,24 @@ ao_spi_send(const void *block, uint16_t len, uint8_t spi_index)
 
 	ao_arch_block_interrupts();
 	ao_spi_done[id] = 0;
+
 	_ao_dma_start_transfer(AO_SAMD21_SPI_MISO_DMA_ID,
 			       (void *) &sercom->data,
 			       &spi_dev_null,
 			       len,
-
-			       (SAMD21_DMAC_CHCTRLB_CMD_NOACT << SAMD21_DMAC_CHCTRLB_CMD) |
-			       (SAMD21_DMAC_CHCTRLB_TRIGACT_BEAT << SAMD21_DMAC_CHCTRLB_TRIGACT) |
-			       (SAMD21_DMAC_CHCTRLB_TRIGSRC_SERCOM_RX(id) << SAMD21_DMAC_CHCTRLB_TRIGSRC) |
-			       (SAMD21_DMAC_CHCTRLB_LVL_LVL3 << SAMD21_DMAC_CHCTRLB_LVL) |
-			       (0UL << SAMD21_DMAC_CHCTRLB_EVOE) |
-			       (0UL << SAMD21_DMAC_CHCTRLB_EVIE) |
-			       (SAMD21_DMAC_CHCTRLB_EVACT_NOACT << SAMD21_DMAC_CHCTRLB_EVACT),
-
-			       (SAMD21_DMAC_DESC_BTCTRL_STEPSIZE_X1 << SAMD21_DMAC_DESC_BTCTRL_STEPSIZE) |
-			       (SAMD21_DMAC_DESC_BTCTRL_STEPSEL_DST << SAMD21_DMAC_DESC_BTCTRL_STEPSEL) |
-			       (0UL << SAMD21_DMAC_DESC_BTCTRL_DSTINC) |
-			       (0UL << SAMD21_DMAC_DESC_BTCTRL_SRCINC) |
-			       (SAMD21_DMAC_DESC_BTCTRL_BEATSIZE_BYTE << SAMD21_DMAC_DESC_BTCTRL_BEATSIZE) |
-			       (SAMD21_DMAC_DESC_BTCTRL_BLOCKACT_INT << SAMD21_DMAC_DESC_BTCTRL_BLOCKACT) |
-			       (SAMD21_DMAC_DESC_BTCTRL_EVOSEL_DISABLE << SAMD21_DMAC_DESC_BTCTRL_EVOSEL) |
-			       (1UL << SAMD21_DMAC_DESC_BTCTRL_VALID),
+			       dma_chctrlb(id, false),
+			       dma_btctrl(false, false),
 
 			       _ao_spi_recv_dma_done,
 			       (void *) (uintptr_t) id
 		);
 
 	_ao_dma_start_transfer(AO_SAMD21_SPI_MOSI_DMA_ID,
-			       (uint8_t *) block + len,
+			       (uint8_t *) block + len,	/* must point past the end of the block */
 			       (void *) &sercom->data,
 			       len,
-
-			       (SAMD21_DMAC_CHCTRLB_CMD_NOACT << SAMD21_DMAC_CHCTRLB_CMD) |
-			       (SAMD21_DMAC_CHCTRLB_TRIGACT_BEAT << SAMD21_DMAC_CHCTRLB_TRIGACT) |
-			       (SAMD21_DMAC_CHCTRLB_TRIGSRC_SERCOM_TX(id) << SAMD21_DMAC_CHCTRLB_TRIGSRC) |
-			       (SAMD21_DMAC_CHCTRLB_LVL_LVL2 << SAMD21_DMAC_CHCTRLB_LVL) |
-			       (0UL << SAMD21_DMAC_CHCTRLB_EVOE) |
-			       (0UL << SAMD21_DMAC_CHCTRLB_EVIE) |
-			       (SAMD21_DMAC_CHCTRLB_EVACT_NOACT << SAMD21_DMAC_CHCTRLB_EVACT),
-
-			       (SAMD21_DMAC_DESC_BTCTRL_STEPSIZE_X1 << SAMD21_DMAC_DESC_BTCTRL_STEPSIZE) |
-			       (SAMD21_DMAC_DESC_BTCTRL_STEPSEL_SRC << SAMD21_DMAC_DESC_BTCTRL_STEPSEL) |
-			       (0UL << SAMD21_DMAC_DESC_BTCTRL_DSTINC) |
-			       (1UL << SAMD21_DMAC_DESC_BTCTRL_SRCINC) |
-			       (SAMD21_DMAC_DESC_BTCTRL_BEATSIZE_BYTE << SAMD21_DMAC_DESC_BTCTRL_BEATSIZE) |
-			       (SAMD21_DMAC_DESC_BTCTRL_BLOCKACT_NOACT << SAMD21_DMAC_DESC_BTCTRL_BLOCKACT) |
-			       (SAMD21_DMAC_DESC_BTCTRL_EVOSEL_DISABLE << SAMD21_DMAC_DESC_BTCTRL_EVOSEL) |
-			       (1 << SAMD21_DMAC_DESC_BTCTRL_VALID),
-
+			       dma_chctrlb(id, true),
+			       dma_btctrl(true, true),
 			       NULL,
 			       NULL
 		);
