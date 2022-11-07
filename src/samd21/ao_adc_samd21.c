@@ -13,7 +13,7 @@
  */
 
 #include <ao.h>
-#include <ao_adc-samd21.h>
+#include <ao_adc_samd21.h>
 
 static void
 ao_adc_sync(void)
@@ -73,8 +73,8 @@ ao_adc_init(void)
 	uint32_t b = (samd21_aux1.calibration >> SAMD21_AUX1_CALIBRATION_ADC_BIASCAL) & SAMD21_AUX1_CALIBRATION_ADC_BIASCAL_MASK;
 	uint32_t l = (samd21_aux1.calibration >> SAMD21_AUX1_CALIBRATION_ADC_LINEARITY) & SAMD21_AUX1_CALIBRATION_ADC_LINEARITY_MASK;
 
-	samd21_adc.calib = ((b << SAMD21_ADC_CALIB_BIAS_CAL) |
-			    (l << SAMD21_ADC_CALIB_LINEARITY_CAL));
+	samd21_adc.calib = (uint16_t) ((b << SAMD21_ADC_CALIB_BIAS_CAL) |
+				       (l << SAMD21_ADC_CALIB_LINEARITY_CAL));
 
 
 	ao_adc_sync();
