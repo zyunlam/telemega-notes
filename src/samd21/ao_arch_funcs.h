@@ -153,42 +153,6 @@ ao_enable_cs(struct samd21_port *port, uint8_t pin)
 #define AO_SPI_CONFIG_2		(2 << AO_SPI_CONFIG_BIT)
 #define AO_SPI_CONFIG_3		(3 << AO_SPI_CONFIG_BIT)
 
-/*
- * PA08 SERCOM0.0 -> MOSI	(DOPO 0)
- * PA09 SERCOM0.1 -> SCLK	(DOPO 0)
- * PA10 SERCOM0.2 -> MISO	(DIPO 2)
- */
-#define AO_SPI_0_CONFIG_PA08_PA09_PA10	(AO_SPI_CONFIG_0 | \
-					 AO_SPI_DOPO_MOSI_0_SCLK_1 | \
-					 AO_SPI_DIPO_MISO_2)
-
-/*
- * PA04 SERCOM0.0 -> MOSI	(DOPO 0)
- * PA05 SERCOM0.1 -> SCLK	(DOPO 0)
- * PA16 SERCOM0.2 -> MISO	(DIPO 2)
- */
-#define AO_SPI_0_CONFIG_PA04_PA05_PA06	(AO_SPI_CONFIG_1 |		\
-					 AO_SPI_DOPO_MOSI_0_SCLK_1 |	\
-					 AO_SPI_DIPO_MISO_2)
-
-/*
- * PB10 SERCOM4.2 -> MOSI	(DOPO 1)
- * PB11 SERCOM4.3 -> SCLK	(DOPO 1)
- * PA12	SERCOM4.0 -> MISO	(DIPO 0)
- */
-#define AO_SPI_4_CONFIG_PB10_PB11_PA12	(AO_SPI_CONFIG_0 |		\
-					 AO_SPI_DOPO_MOSI_2_SCLK_3 |	\
-					 AO_SPI_DIPO_MISO_0)
-
-/*
- * PB22 SERCOM5.2 -> MOSI	(DOPO 1)
- * PB23 SERCOM5.3 -> SCLK	(DOPO 1)
- * PB03 SERCOM5.1 -> MISO	(DIPO 1)
- */
-#define AO_SPI_5_CONFIG_PB22_PB23_PB03	(AO_SPI_CONFIG_3 |		\
-					 AO_SPI_DOPO_MOSI_2_SCLK_3 |	\
-					 AO_SPI_DIPO_MISO_1)
-
 #define AO_SPI_INDEX(id)	((uint8_t) ((id) & AO_SPI_INDEX_MASK))
 #define AO_SPI_CONFIG(id)	((id) & AO_SPI_CONFIG_MASK)
 #define AO_SPI_PIN_CONFIG(id)	((id) & (AO_SPI_INDEX_MASK | AO_SPI_CONFIG_MASK))
@@ -197,24 +161,78 @@ ao_enable_cs(struct samd21_port *port, uint8_t pin)
 #define AO_SPI_DOPO(id)		((uint32_t) (((id) >> AO_SPI_DOPO_BIT) & 3))
 #define AO_SPI_DIPO(id)		((uint32_t) (((id) >> AO_SPI_DIPO_BIT) & 3))
 
+#define AO_SPI_MAKE_MODE(pol,pha)	(((pol) << AO_SPI_CPOL_BIT) | ((pha) << AO_SPI_CPHA_BIT))
+#define AO_SPI_MODE_0		AO_SPI_MAKE_MODE(0,0)
+#define AO_SPI_MODE_1		AO_SPI_MAKE_MODE(0,1)
+#define AO_SPI_MODE_2		AO_SPI_MAKE_MODE(1,0)
+#define AO_SPI_MODE_3		AO_SPI_MAKE_MODE(1,1)
+
+#if HAS_SPI_0
 /*
- * We're not going to do any fancy SPI pin remapping, just use the first
- * three PAD pins, which means:
- *
- * MOSI: PAD.0
- * SCK:  PAD.1
- * MISO: PAD.2
+ * PA08 SERCOM0.0 -> MOSI	(DOPO 0)
+ * PA09 SERCOM0.1 -> SCLK	(DOPO 0)
+ * PA10 SERCOM0.2 -> MISO	(DIPO 2)
  */
+#define AO_SPI_0_PA08_PA09_PA10	(0 | AO_SPI_CONFIG_0 |		\
+				 AO_SPI_DOPO_MOSI_0_SCLK_1 |	\
+				 AO_SPI_DIPO_MISO_2)
+/*
+ * PA04 SERCOM0.0 -> MOSI	(DOPO 0)
+ * PA05 SERCOM0.1 -> SCLK	(DOPO 0)
+ * PA06 SERCOM0.2 -> MISO	(DIPO 2)
+ */
+#define AO_SPI_0_PA04_PA05_PA06	(0 | AO_SPI_CONFIG_1 |		\
+				 AO_SPI_DOPO_MOSI_0_SCLK_1 |	\
+				 AO_SPI_DIPO_MISO_2)
+#endif /* HAS_SPI_0 */
 
-#define AO_SPI_0_PA08_PA09_PA10	(0 | AO_SPI_0_CONFIG_PA08_PA09_PA10)
-#define AO_SPI_0_PA04_PA05_PA06	(0 | AO_SPI_0_CONFIG_PA04_PA05_PA06)
+#if HAS_SPI_3
+/*
+ * PA22 SERCOM3.0 -> MOSI	(DOPO 0)
+ * PA23 SERCOM3.1 -> SCLK	(DOPO 0)
+ * PA20 SERCOM3.3 -> MISO	(DIPO 3)
+ */
+#define AO_SPI_3_PA22_PA23_PA20	(3 | AO_SPI_CONFIG_0 |		\
+				 AO_SPI_DOPO_MOSI_0_SCLK_1 |	\
+				 AO_SPI_DIPO_MISO_3)
+#endif /* HAS_SPI_3 */
 
-#define AO_SPI_4_PB10_PB11_PA12 (4 | AO_SPI_4_CONFIG_PB10_PB11_PA12)
+#if HAS_SPI_4
+/*
+ * PA04 SERCOM0.0 -> MOSI	(DOPO 0)
+ * PA05 SERCOM0.1 -> SCLK	(DOPO 0)
+ * PA16 SERCOM0.2 -> MISO	(DIPO 2)
+ */
+#define AO_SPI_CONFIG_PA04_PA05_PA06	(0 | AO_SPI_CONFIG_1 |		\
+					 AO_SPI_DOPO_MOSI_0_SCLK_1 |	\
+					 AO_SPI_DIPO_MISO_2)
 
-#define AO_SPI_5_PB22_PB23_PB03	(5 | AO_SPI_5_CONFIG_PB22_PB23_PB03)
+/*
+ * PB10 SERCOM4.2 -> MOSI	(DOPO 1)
+ * PB11 SERCOM4.3 -> SCLK	(DOPO 1)
+ * PA12	SERCOM4.0 -> MISO	(DIPO 0)
+ */
+#define AO_SPI_4_PB10_PB11_PA12	(4 | AO_SPI_CONFIG_0 |		\
+				 AO_SPI_DOPO_MOSI_2_SCLK_3 |	\
+				 AO_SPI_DIPO_MISO_0)
+#endif /* HAS_SPI_4 */
+
+#if HAS_SPI_5
+/*
+ * PB22 SERCOM5.2 -> MOSI	(DOPO 1)
+ * PB23 SERCOM5.3 -> SCLK	(DOPO 1)
+ * PB03 SERCOM5.1 -> MISO	(DIPO 1)
+ */
+#define AO_SPI_5_PB22_PB23_PB03	(5 | AO_SPI_CONFIG_0 |		\
+				 AO_SPI_DOPO_MOSI_2_SCLK_3 |	\
+				 AO_SPI_DIPO_MISO_1)
+#endif /* HAS_SPI_5 */
 
 void
 ao_spi_send(const void *block, uint16_t len, uint16_t spi_index);
+
+void
+ao_spi_send_fixed(uint8_t data, uint16_t len, uint16_t spi_index);
 
 void
 ao_spi_recv(void *block, uint16_t len, uint16_t spi_index);

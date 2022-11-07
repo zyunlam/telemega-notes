@@ -241,6 +241,11 @@ ao_spi_send(const void *block, uint16_t len, uint16_t spi_index)
 	spi_run(block, &spi_dev_null, len, spi_index, true, false);
 }
 
+void
+ao_spi_send_fixed(uint8_t data, uint16_t len, uint16_t spi_index)
+{
+	spi_run(&data, &spi_dev_null, len, spi_index, false, false);
+}
 
 void
 ao_spi_recv(void *block, uint16_t len, uint16_t spi_index)
@@ -270,6 +275,20 @@ ao_spi_disable_pin_config(uint16_t spi_pin_config)
 		samd21_port_pmux_clr(&samd21_port_a, 4);	/* MOSI */
 		samd21_port_pmux_clr(&samd21_port_a, 5);	/* SCLK */
 		samd21_port_pmux_clr(&samd21_port_a, 6);	/* MISO */
+		break;
+#endif
+#if HAS_SPI_3
+	case AO_SPI_PIN_CONFIG(AO_SPI_3_PA22_PA23_PA20):
+		samd21_port_pmux_clr(&samd21_port_a, 22);	/* MOSI */
+		samd21_port_pmux_clr(&samd21_port_a, 23);	/* SCLK */
+		samd21_port_pmux_clr(&samd21_port_a, 20);	/* MISO */
+		break;
+#endif
+#if HAS_SPI_4
+	case AO_SPI_PIN_CONFIG(AO_SPI_4_PB10_PB11_PA12):
+		samd21_port_pmux_clr(&samd21_port_b, 10);	/* MOSI */
+		samd21_port_pmux_clr(&samd21_port_b, 11);	/* SCLK */
+		samd21_port_pmux_clr(&samd21_port_a, 12);	/* MISO */
 		break;
 #endif
 #if HAS_SPI_5
@@ -306,6 +325,17 @@ ao_spi_enable_pin_config(uint16_t spi_pin_config)
 		samd21_port_pmux_set(&samd21_port_a, 4, SAMD21_PORT_PMUX_FUNC_C);	/* MOSI */
 		samd21_port_pmux_set(&samd21_port_a, 5, SAMD21_PORT_PMUX_FUNC_C);	/* SCLK */
 		samd21_port_pmux_set(&samd21_port_a, 6, SAMD21_PORT_PMUX_FUNC_C);	/* MISO */
+		break;
+#endif
+#if HAS_SPI_3
+	case AO_SPI_PIN_CONFIG(AO_SPI_3_PA22_PA23_PA20):
+		ao_enable_output(&samd21_port_a, 22, 1);
+		ao_enable_output(&samd21_port_a, 23, 1);
+		ao_enable_input(&samd21_port_a, 20, AO_MODE_PULL_NONE);
+
+		samd21_port_pmux_set(&samd21_port_a, 22, SAMD21_PORT_PMUX_FUNC_C);	/* MOSI */
+		samd21_port_pmux_set(&samd21_port_a, 23, SAMD21_PORT_PMUX_FUNC_C);	/* SCLK */
+		samd21_port_pmux_set(&samd21_port_a, 20, SAMD21_PORT_PMUX_FUNC_D);	/* MISO */
 		break;
 #endif
 #if HAS_SPI_4
