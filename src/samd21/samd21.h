@@ -1373,6 +1373,28 @@ samd21_usb_ep_curbk(uint8_t ep)
 	return (samd21_usb.ep[ep].epstatus >> SAMD21_USB_EP_EPSTATUS_CURBK) & 1;
 }
 
+/* evsys */
+
+struct samd21_evsys {
+	vuint8_t	ctrl;
+	vuint8_t	reserved_01;
+	vuint16_t	reserved_02;
+	vuint32_t	channel;
+	vuint16_t	user;
+	vuint16_t	reserved_0a;
+	vuint32_t	chstatus;
+
+	vuint32_t	intenclr;
+	vuint32_t	intenset;
+	vuint32_t	intflag;
+};
+
+extern struct samd21_evsys samd21_evsys;
+
+#define SAMD21_NUM_EVSYS	16
+
+#define samd21_evsys	(*(struct samd21_evsys *) 0x42000400)
+
 /* sercom */
 
 struct samd21_sercom {
