@@ -125,35 +125,77 @@ ao_enable_cs(struct samd21_port *port, uint8_t pin)
 
 /* ao_spi_samd21.c */
 
+#define AO_SPI_INDEX_BIT	0
+#define AO_SPI_INDEX_MASK	0x07
+
+#define AO_SPI_CONFIG_BIT	4
+#define AO_SPI_CONFIG_MASK	(3 << AO_SPI_CONFIG_BIT)
+
 #define AO_SPI_CPOL_BIT		6
 #define AO_SPI_CPHA_BIT		7
 
-#define AO_SPI_CONFIG_1		0x00
+#define AO_SPI_DOPO_BIT		8
+#define  AO_SPI_DOPO_MOSI_0_SCLK_1	(0 << AO_SPI_DOPO_BIT)
+#define  AO_SPI_DOPO_MOSI_2_SCLK_3	(1 << AO_SPI_DOPO_BIT)
+#define  AO_SPI_DOPO_MOSI_3_SCLK_1	(2 << AO_SPI_DOPO_BIT)
+#define  AO_SPI_DOPO_MOSI_0_SCLK_3	(3 << AO_SPI_DOPO_BIT)
+#define  AO_SPI_DOPO_MASK		(3 << AO_SPI_DOPO_BIT)
+
+#define AO_SPI_DIPO_BIT		10
+#define  AO_SPI_DIPO_MISO_0		(0 << AO_SPI_DIPO_BIT)
+#define  AO_SPI_DIPO_MISO_1		(1 << AO_SPI_DIPO_BIT)
+#define  AO_SPI_DIPO_MISO_2		(2 << AO_SPI_DIPO_BIT)
+#define  AO_SPI_DIPO_MISO_3		(3 << AO_SPI_DIPO_BIT)
+#define  AO_SPI_DIPO_MASK		(3 << AO_SPI_DIPO_MASK)
+
+#define AO_SPI_CONFIG_0		(0 << AO_SPI_CONFIG_BIT)
+#define AO_SPI_CONFIG_1		(1 << AO_SPI_CONFIG_BIT)
+#define AO_SPI_CONFIG_2		(2 << AO_SPI_CONFIG_BIT)
+#define AO_SPI_CONFIG_3		(3 << AO_SPI_CONFIG_BIT)
+
 /*
  * PA08 SERCOM0.0 -> MOSI	(DOPO 0)
  * PA09 SERCOM0.1 -> SCLK	(DOPO 0)
  * PA10 SERCOM0.2 -> MISO	(DIPO 2)
  */
-#define AO_SPI_0_CONFIG_PA08_PA09_PA10	AO_SPI_CONFIG_1
+#define AO_SPI_0_CONFIG_PA08_PA09_PA10	(AO_SPI_CONFIG_0 | \
+					 AO_SPI_DOPO_MOSI_0_SCLK_1 | \
+					 AO_SPI_DIPO_MISO_2)
 
-#define AO_SPI_CONFIG_2		0x08
 /*
  * PA04 SERCOM0.0 -> MOSI	(DOPO 0)
  * PA05 SERCOM0.1 -> SCLK	(DOPO 0)
  * PA16 SERCOM0.2 -> MISO	(DIPO 2)
  */
-#define AO_SPI_0_CONFIG_PA04_PA05_PA06	AO_SPI_CONFIG_2
+#define AO_SPI_0_CONFIG_PA04_PA05_PA06	(AO_SPI_CONFIG_1 |		\
+					 AO_SPI_DOPO_MOSI_0_SCLK_1 |	\
+					 AO_SPI_DIPO_MISO_2)
 
-#define AO_SPI_CONFIG_NONE	0x0c
+/*
+ * PB10 SERCOM4.2 -> MOSI	(DOPO 1)
+ * PB11 SERCOM4.3 -> SCLK	(DOPO 1)
+ * PA12	SERCOM4.0 -> MISO	(DIPO 0)
+ */
+#define AO_SPI_4_CONFIG_PB10_PB11_PA12	(AO_SPI_CONFIG_0 |		\
+					 AO_SPI_DOPO_MOSI_2_SCLK_3 |	\
+					 AO_SPI_DIPO_MISO_0)
 
-#define AO_SPI_INDEX_MASK	0x07
-#define AO_SPI_CONFIG_MASK	0x18
+/*
+ * PB22 SERCOM5.2 -> MOSI	(DOPO 1)
+ * PB23 SERCOM5.3 -> SCLK	(DOPO 1)
+ * PB03 SERCOM5.1 -> MISO	(DIPO 1)
+ */
+#define AO_SPI_5_CONFIG_PB22_PB23_PB03	(AO_SPI_CONFIG_3 |		\
+					 AO_SPI_DOPO_MOSI_2_SCLK_3 |	\
+					 AO_SPI_DIPO_MISO_1)
 
-#define AO_SPI_INDEX(id)	((id) & AO_SPI_INDEX_MASK)
+#define AO_SPI_INDEX(id)	((uint8_t) ((id) & AO_SPI_INDEX_MASK))
 #define AO_SPI_CONFIG(id)	((id) & AO_SPI_CONFIG_MASK)
 #define AO_SPI_PIN_CONFIG(id)	((id) & (AO_SPI_INDEX_MASK | AO_SPI_CONFIG_MASK))
 #define AO_SPI_CPOL(id)		((uint32_t) (((id) >> AO_SPI_CPOL_BIT) & 1))
 #define AO_SPI_CPHA(id)		((uint32_t) (((id) >> AO_SPI_CPHA_BIT) & 1))
+#define AO_SPI_DOPO(id)		((uint32_t) (((id) >> AO_SPI_DOPO_BIT) & 3))
+#define AO_SPI_DIPO(id)		((uint32_t) (((id) >> AO_SPI_DIPO_BIT) & 3))
 
 /*
  * We're not going to do any fancy SPI pin remapping, just use the first
@@ -167,46 +209,58 @@ ao_enable_cs(struct samd21_port *port, uint8_t pin)
 #define AO_SPI_0_PA08_PA09_PA10	(0 | AO_SPI_0_CONFIG_PA08_PA09_PA10)
 #define AO_SPI_0_PA04_PA05_PA06	(0 | AO_SPI_0_CONFIG_PA04_PA05_PA06)
 
-void
-ao_spi_send(const void *block, uint16_t len, uint8_t spi_index);
+#define AO_SPI_4_PB10_PB11_PA12 (4 | AO_SPI_4_CONFIG_PB10_PB11_PA12)
+
+#define AO_SPI_5_PB22_PB23_PB03	(5 | AO_SPI_5_CONFIG_PB22_PB23_PB03)
 
 void
-ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
+ao_spi_send(const void *block, uint16_t len, uint16_t spi_index);
 
 void
-ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
+ao_spi_recv(void *block, uint16_t len, uint16_t spi_index);
 
 void
-ao_spi_get(uint8_t spi_index, uint32_t speed);
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint16_t spi_index);
 
 void
-ao_spi_put(uint8_t spi_index);
+ao_spi_get(uint16_t spi_index, uint32_t speed);
+
+void
+ao_spi_put(uint16_t spi_index);
 
 void
 ao_spi_init(void);
 
-#define ao_spi_get_mask(reg,mask,bus, speed) do {		\
-		ao_spi_get(bus, speed);				\
+#define ao_spi_set_cs(reg,mask) do {		\
+		reg->outclr = mask;		\
+	} while(0)
+
+#define ao_spi_clr_cs(reg,mask) do {		\
+		reg->outset = mask;		\
+	} while(0)
+
+#define ao_spi_get_mask(reg,mask,spi_index, speed) do {		\
+		ao_spi_get(spi_index, speed);				\
 		ao_spi_set_cs(reg,mask);			\
 	} while (0)
 
-#define ao_spi_put_mask(reg,mask,bus) do {	\
+#define ao_spi_put_mask(reg,mask,spi_index) do {	\
 		ao_spi_clr_cs(reg,mask);	\
-		ao_spi_put(bus);		\
+		ao_spi_put(spi_index);		\
 	} while (0)
 
 static inline void
-ao_spi_get_bit(struct samd21_port *port, uint8_t bit, uint8_t bus, uint32_t speed)
+ao_spi_get_bit(struct samd21_port *port, uint8_t bit, uint16_t spi_index, uint32_t speed)
 {
-	ao_spi_get(bus, speed);
+	ao_spi_get(spi_index, speed);
 	ao_gpio_set(port, bit, 0);
 }
 
 static inline void
-ao_spi_put_bit(struct samd21_port *port, uint8_t bit, uint8_t bus)
+ao_spi_put_bit(struct samd21_port *port, uint8_t bit, uint16_t spi_index)
 {
 	ao_gpio_set(port, bit, 1);
-	ao_spi_put(bus);
+	ao_spi_put(spi_index);
 }
 
 static inline uint8_t
