@@ -39,7 +39,28 @@
 #define AO_AHB_PRESCALER	1
 #define AO_APBA_PRESCALER	1
 
-#define HAS_SPI_0		1
-#define SPI_0_PA08_PA09_PA10	1
+#define HAS_SPI_5		1
+#define SPI_5_PB22_PB23_PB03	1
+
+#define HAS_SPI_4		1
+#define SPI_4_PB10_PB11_PA12	1
+
+/*
+ * SPI Flash memory
+ */
+
+#define M25_MAX_CHIPS		1
+
+#if 1
+#define AO_M25_SPI_CS_PORT	(&samd21_port_a)
+#define AO_M25_SPI_CS_MASK	(1 << 13)
+#define AO_M25_SPI_BUS		AO_SPI_5_PB22_PB23_PB03
+#else
+
+#define AO_M25_SPI_CS_PORT	(&samd21_port_a)
+#define AO_M25_SPI_CS_MASK	(1 << 14) /* D2 */
+#define AO_M25_SPI_BUS		AO_SPI_4_PB10_PB11_PA12
+
+#endif
 
 #endif /* _AO_PINS_H_ */

@@ -52,6 +52,7 @@ int main(void)
 	ao_usb_init();
 	ao_cmd_register(ao_spi_cmds);
 	ao_spi_init_cs(&samd21_port_a, 1 << 11); /* analog 8 for CS */
+	ao_storage_init();
 	ao_cmd_init();
 	ao_start_scheduler();
 	return 0;
