@@ -62,13 +62,11 @@ ALTOS_SRC = \
         ao_dma_samd21.c \
         ao_spi_samd21.c \
         ao_cc1200.c \
-        ao_fec_tx.c \
-        ao_fec_rx.c \
         ao_data.c \
         ao_ms5607.c \
         ao_adxl375.c \
         ao_adc_samd21.c \
-        ao_beep_stm.c \
+        ao_beep_samd21.c \
         ao_storage.c \
         ao_m25.c \
 	ao_usb_samd21.c \

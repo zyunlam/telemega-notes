@@ -59,8 +59,6 @@ main(void)
 	ao_ms5607_init();
 	ao_adxl375_init();
 
-	ao_eeprom_init();
-
 	ao_storage_init();
 
 	ao_flight_init();

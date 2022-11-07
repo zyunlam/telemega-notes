@@ -38,8 +38,8 @@
 
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
-#define USE_EEPROM_CONFIG	1
-#define USE_STORAGE_CONFIG	0
+#define USE_EEPROM_CONFIG	0
+#define USE_STORAGE_CONFIG	1
 #define HAS_USB			1
 #define USE_USB_STDIO	1
 #define HAS_BEEP		1
