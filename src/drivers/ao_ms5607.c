@@ -173,7 +173,7 @@ ao_ms5607_get_sample(uint8_t cmd) {
 		ao_sleep((void *) &ao_ms5607_done);
 	ao_arch_release_interrupts();
 #if AO_MS5607_PRIVATE_PINS
-	stm_gpio_set(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, 1);
+	ao_gpio_set(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, 1);
 #else
 	ao_ms5607_stop();
 #endif
