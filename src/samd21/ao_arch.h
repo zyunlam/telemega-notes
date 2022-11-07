@@ -192,7 +192,10 @@ bool
 ao_usb_waiting(void);
 
 #define AO_CMD_LEN		128
-#define AO_STACK_SIZE		2048
+
+#ifndef AO_STACK_SIZE
+#define AO_STACK_SIZE		512
+#endif
 
 #ifndef HAS_BOOT_LOADER
 #define HAS_BOOT_LOADER			1
