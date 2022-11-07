@@ -24,13 +24,14 @@
 #include <ao_packet.h>
 #include <ao_companion.h>
 #include <ao_eeprom.h>
-#include <ao_profile.h>
 #if HAS_SAMPLE_PROFILE
+#include <ao_profile.h>
 #include <ao_sample_profile.h>
 #endif
 #if HAS_STACK_GUARD
 #include <ao_mpu.h>
 #endif
+#include <ao_dma_samd21.h>
 
 int
 main(void)

@@ -49,33 +49,27 @@
 #define BEEPER_PORT		(&samd21_port_a)
 #define BEEPER_PIN		16
 #define HAS_RADIO		1
+#define HAS_RADIO_10MW		1
 #define HAS_TELEMETRY		1
 #define HAS_APRS		1
 #define HAS_COMPANION		1
 
-#define HAS_SPI_1		1
-#define SPI_1_PA5_PA6_PA7	1	/* Barometer */
-#define SPI_1_PB3_PB4_PB5	1	/* Accelerometer */
-#define SPI_1_PE13_PE14_PE15	0
-#define SPI_1_OSPEEDR		STM_OSPEEDR_10MHz
-
-#define HAS_SPI_2		1
-#define SPI_2_PB13_PB14_PB15	1	/* Flash, Companion, Radio */
-#define SPI_2_PD1_PD3_PD4	0
-#define SPI_2_OSPEEDR		STM_OSPEEDR_10MHz
+#define HAS_SPI_0		1
+#define HAS_SPI_3		1
+#define HAS_SPI_5		1
 
 #define PACKET_HAS_SLAVE	1
 #define PACKET_HAS_MASTER	0
 
 #define LOW_LEVEL_DEBUG		0
 
-#define LED_PORT		(&samd21_port_b)
-#define LED_PIN_RED		10
-#define LED_PIN_GREEN		11
-#define AO_LED_RED		(1 << LED_PIN_RED)
-#define AO_LED_GREEN		(1 << LED_PIN_GREEN)
-
-#define LEDS_AVAILABLE		(AO_LED_RED | AO_LED_GREEN)
+#define HAS_LED			1
+#define LED_0_PORT		(&samd21_port_b)
+#define LED_0_PIN		10
+#define LED_1_PORT		(&samd21_port_b)
+#define LED_1_PIN		11
+#define AO_LED_RED		(1 << 0)
+#define AO_LED_GREEN		(1 << 1)
 
 #define HAS_GPS			1
 #define HAS_FLIGHT		1
@@ -175,10 +169,13 @@ struct ao_adc {
 
 #define AO_SERIAL_SPEED_UBLOX	AO_SERIAL_SPEED_9600
 
-#define ao_gps_getchar		ao_serial3_getchar
-#define ao_gps_putchar		ao_serial3_putchar
-#define ao_gps_set_speed	ao_serial3_set_speed
-#define ao_gps_fifo		(ao_stm_usart3.rx_fifo)
+#define HAS_SERIAL_1		1
+#define SERIAL_1_PA00_PA01	1
+
+#define ao_gps_getchar		ao_serial1_getchar
+#define ao_gps_putchar		ao_serial1_putchar
+#define ao_gps_set_speed	ao_serial1_set_speed
+#define ao_gps_fifo		(ao_samd21_usart1.rx_fifo)
 
 /*
  * Pressure sensor settings
@@ -191,6 +188,7 @@ struct ao_adc {
 #define AO_MS5607_CS_MASK	(1 << AO_MS5607_CS)
 #define AO_MS5607_MISO_PORT	(&samd21_port_a)
 #define AO_MS5607_MISO_PIN	20
+#define AO_MS5607_SPI_INDEX	AO_SPI_3_PA22_PA23_PA20
 
 /*
  * SPI Flash memory
@@ -198,7 +196,9 @@ struct ao_adc {
 
 #define M25_MAX_CHIPS		1
 #define AO_M25_SPI_CS_PORT	(&samd21_port_a)
-#define AO_M25_SPI_CS_MASK	(1 << 8)
+#define AO_M25_SPI_CS_MASK	(1 << 27)
+#define AO_M25_SPI_BUS		AO_SPI_5_PB22_PB23_PB03
+
 
 /*
  * Radio (cc1200)
@@ -210,6 +210,7 @@ struct ao_adc {
 
 #define AO_CC1200_SPI_CS_PORT	(&samd21_port_a)
 #define AO_CC1200_SPI_CS_PIN	7
+#define AO_CC1200_SPI_BUS	AO_SPI_5_PB22_PB23_PB03
 
 #define AO_CC1200_INT_PORT		(&samd21_port_b)
 #define AO_CC1200_INT_PIN		(8)
@@ -231,6 +232,7 @@ struct ao_adc {
 #define HAS_ADXL375		1
 #define AO_ADXL375_CS_PORT	(&samd21_port_a)
 #define AO_ADXL375_CS_PIN	8
+#define AO_ADXL375_SPI_INDEX	(AO_SPI_0_PA04_PA05_PA06 | AO_SPI_MODE_3)
 
 #define AO_ADXL375_AXIS		x
 #define AO_ADXL375_INVERT	1
@@ -243,6 +245,7 @@ struct ao_adc {
 
 #define AO_COMPANION_CS_PORT	(&samd21_port_a)
 #define AO_COMPANION_CS_PIN	(13)
+#define AO_COMPANION_SPI_BUS	AO_SPI_5_PB22_PB23_PB03
 
 /*
  * Monitor
