@@ -17,7 +17,7 @@
 static int
 _ao_usart_tx_start(struct ao_samd21_usart *usart)
 {
-	if (!ao_fifo_empty(&usart->tx_fifo)) {
+	if (!ao_fifo_empty(usart->tx_fifo)) {
 #if HAS_SERIAL_SW_FLOW
 		if (usart->gpio_cts && ao_gpio_get(usart->gpio_cts, usart->pin_cts, foo) == 1) {
 			ao_exti_enable(usart->gpio_cts, usart->pin_cts);
@@ -28,7 +28,7 @@ _ao_usart_tx_start(struct ao_samd21_usart *usart)
 		{
 			usart->tx_running = 1;
 			usart->reg->intenset = (1 << SAMD21_SERCOM_INTFLAG_DRE) | (1 << SAMD21_SERCOM_INTFLAG_TXC);
-			usart->reg->data = ao_fifo_remove(&usart->tx_fifo);
+			ao_fifo_remove(usart->tx_fifo, usart->reg->data);
 			ao_wakeup(&usart->tx_fifo);
 			return 1;
 		}
@@ -40,8 +40,8 @@ static void
 _ao_usart_rx(struct ao_samd21_usart *usart, int is_stdin)
 {
 	if (usart->reg->intflag & (1 << SAMD21_SERCOM_INTFLAG_RXC)) {
-		if (!ao_fifo_full(&usart->rx_fifo)) {
-			ao_fifo_insert(&usart->rx_fifo, usart->reg->data);
+		if (!ao_fifo_full(usart->rx_fifo)) {
+			ao_fifo_insert(usart->rx_fifo, usart->reg->data);
 			ao_wakeup(&usart->rx_fifo);
 			if (is_stdin)
 				ao_wakeup(&ao_stdin_ready);
@@ -90,13 +90,13 @@ static void
 ao_usart_set_speed(struct ao_samd21_usart *usart, uint8_t speed)
 {
 	uint64_t	top = (uint64_t) ao_usart_speeds[speed] << (4 + 16);
-	uint16_t	baud = 65536 - (top + AO_SYSCLK/2) / AO_SYSCLK;
+	uint16_t	baud = (uint16_t) (65536 - (top + AO_SYSCLK/2) / AO_SYSCLK);
 
 	usart->reg->baud = baud;
 }
 
 static void
-ao_usart_init(struct ao_samd21_usart *usart, int hw_flow, int id)
+ao_usart_init(struct ao_samd21_usart *usart, bool hw_flow, uint8_t id)
 {
 	struct samd21_sercom *reg = usart->reg;
 
@@ -154,13 +154,13 @@ _ao_usart_pollchar(struct ao_samd21_usart *usart)
 {
 	int	c;
 
-	if (ao_fifo_empty(&usart->rx_fifo))
+	if (ao_fifo_empty(usart->rx_fifo))
 		c = AO_READ_AGAIN;
 	else {
 		uint8_t	u;
-		u = ao_fifo_remove(&usart->rx_fifo);
+		ao_fifo_remove(usart->rx_fifo, u);
 		if ((usart->reg->intenset & (1 << SAMD21_SERCOM_INTFLAG_RXC)) == 0) {
-			if (ao_fifo_barely(&usart->rx_fifo))
+			if (ao_fifo_barely(usart->rx_fifo))
 				usart->reg->intenset = (1 << SAMD21_SERCOM_INTFLAG_RXC);
 		}
 #if HAS_SERIAL_SW_FLOW
@@ -190,9 +190,9 @@ static void
 ao_usart_putchar(struct ao_samd21_usart *usart, char c)
 {
 	ao_arch_block_interrupts();
-	while (ao_fifo_full(&usart->tx_fifo))
+	while (ao_fifo_full(usart->tx_fifo))
 		ao_sleep(&usart->tx_fifo);
-	ao_fifo_insert(&usart->tx_fifo, c);
+	ao_fifo_insert(usart->tx_fifo, c);
 	_ao_usart_tx_start(usart);
 	ao_arch_release_interrupts();
 }
@@ -201,7 +201,7 @@ static void
 ao_usart_drain(struct ao_samd21_usart *usart)
 {
 	ao_arch_block_interrupts();
-	while (!ao_fifo_empty(&usart->tx_fifo) || usart->tx_running) {
+	while (!ao_fifo_empty(usart->tx_fifo) || usart->tx_running) {
 		usart->draining = 1;
 		ao_sleep(&usart->tx_fifo);
 	}
@@ -246,6 +246,44 @@ ao_serial0_set_speed(uint8_t speed)
 }
 #endif	/* HAS_SERIAL_0 */
 
+#if HAS_SERIAL_1
+
+struct ao_samd21_usart ao_samd21_usart1;
+
+void samd21_sercom1_isr(void) { ao_usart_isr(&ao_samd21_usart1, USE_SERIAL_1_STDIN); }
+
+char
+ao_serial1_getchar(void)
+{
+	return ao_usart_getchar(&ao_samd21_usart1);
+}
+
+void
+ao_serial1_putchar(char c)
+{
+	ao_usart_putchar(&ao_samd21_usart1, c);
+}
+
+int
+_ao_serial1_pollchar(void)
+{
+	return _ao_usart_pollchar(&ao_samd21_usart1);
+}
+
+void
+ao_serial1_drain(void)
+{
+	ao_usart_drain(&ao_samd21_usart1);
+}
+
+void
+ao_serial1_set_speed(uint8_t speed)
+{
+	ao_usart_drain(&ao_samd21_usart1);
+	ao_usart_set_speed(&ao_samd21_usart1, speed);
+}
+#endif	/* HAS_SERIAL_1 */
+
 void
 ao_serial_init(void)
 {
@@ -266,6 +304,26 @@ ao_serial_init(void)
 #if USE_SERIAL_0_STDIN
 	ao_add_stdio(_ao_serial0_pollchar,
 		     ao_serial0_putchar,
+		     NULL);
+#endif
+#endif
+#if HAS_SERIAL_1
+
+#if SERIAL_1_PA00_PA01
+	/* Pin settings */
+	ao_enable_port(&samd21_port_a);
+	samd21_port_pmux_set(&samd21_port_a, 0, SAMD21_PORT_PMUX_FUNC_D);
+	samd21_port_pmux_set(&samd21_port_a, 1, SAMD21_PORT_PMUX_FUNC_D);
+#else
+#error "No SERIAL_1 port configuration specified"
+#endif
+
+	ao_samd21_usart1.reg = &samd21_sercom1;
+	ao_usart_init(&ao_samd21_usart1, 0, 0);
+
+#if USE_SERIAL_1_STDIN
+	ao_add_stdio(_ao_serial1_pollchar,
+		     ao_serial1_putchar,
 		     NULL);
 #endif
 #endif

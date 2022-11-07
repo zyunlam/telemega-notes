@@ -26,8 +26,7 @@
 #define AO_SERIAL_SPEED_115200	4
 
 #if HAS_SERIAL_0
-extern volatile struct ao_fifo	ao_serial0_rx_fifo;
-extern volatile struct ao_fifo	ao_serial0_tx_fifo;
+extern struct ao_samd21_usart	ao_samd21_usart0;
 
 char
 ao_serial0_getchar(void);
@@ -49,8 +48,7 @@ ao_serial0_set_speed(uint8_t speed);
 #endif
 
 #if HAS_SERIAL_1
-extern volatile struct ao_fifo	ao_serial1_rx_fifo;
-extern volatile struct ao_fifo	ao_serial1_tx_fifo;
+extern struct ao_samd21_usart	ao_samd21_usart1;
 
 char
 ao_serial1_getchar(void);
@@ -72,8 +70,7 @@ ao_serial1_set_speed(uint8_t speed);
 #endif
 
 #if HAS_SERIAL_2
-extern volatile struct ao_fifo	ao_serial2_rx_fifo;
-extern volatile struct ao_fifo	ao_serial2_tx_fifo;
+extern struct ao_samd21_usart	ao_samd21_usart2;
 
 char
 ao_serial2_getchar(void);
@@ -95,8 +92,7 @@ ao_serial2_set_speed(uint8_t speed);
 #endif
 
 #if HAS_SERIAL_3
-extern volatile struct ao_fifo	ao_serial3_rx_fifo;
-extern volatile struct ao_fifo	ao_serial3_tx_fifo;
+extern struct ao_samd21_usart	ao_samd21_usart3;
 
 char
 ao_serial3_getchar(void);
@@ -115,6 +111,50 @@ ao_serial3_drain(void);
 
 void
 ao_serial3_set_speed(uint8_t speed);
+#endif
+
+#if HAS_SERIAL_4
+extern struct ao_samd21_usart	ao_samd21_usart4;
+
+char
+ao_serial4_getchar(void);
+
+int
+_ao_serial4_pollchar(void);
+
+uint8_t
+_ao_serial4_sleep_for(uint16_t timeout);
+
+void
+ao_serial4_putchar(char c);
+
+void
+ao_serial4_drain(void);
+
+void
+ao_serial4_set_speed(uint8_t speed);
+#endif
+
+#if HAS_SERIAL_5
+extern struct ao_samd21_usart	ao_samd21_usart5;
+
+char
+ao_serial5_getchar(void);
+
+int
+_ao_serial5_pollchar(void);
+
+uint8_t
+_ao_serial5_sleep_for(uint16_t timeout);
+
+void
+ao_serial5_putchar(char c);
+
+void
+ao_serial5_drain(void);
+
+void
+ao_serial5_set_speed(uint8_t speed);
 #endif
 
 void
