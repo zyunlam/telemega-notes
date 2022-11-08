@@ -39,11 +39,8 @@
 #define AO_AHB_PRESCALER	1
 #define AO_APBA_PRESCALER	1
 
+#define HAS_SPI_0		1
 #define HAS_SPI_5		1
-#define SPI_5_PB22_PB23_PB03	1
-
-#define HAS_SPI_4		1
-#define SPI_4_PB10_PB11_PA12	1
 
 /*
  * SPI Flash memory

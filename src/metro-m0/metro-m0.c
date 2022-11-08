@@ -15,6 +15,7 @@
 #include <ao.h>
 #include <ao_led.h>
 #include <ao_dma_samd21.h>
+#include <ao_exti.h>
 
 #define SNEK_CS_PORT	(&samd21_port_a)
 #define SNEK_CS_PIN	(11)
@@ -41,6 +42,33 @@ const struct ao_cmds ao_spi_cmds[] = {
 	{ 0, NULL },
 };
 
+static int	pressed;
+
+static void
+ao_button_callback(void)
+{
+	pressed = 1;
+	ao_wakeup(&pressed);
+}
+
+static void
+ao_button(void)
+{
+	ao_exti_setup(&samd21_port_a, 11, AO_EXTI_MODE_FALLING | AO_EXTI_MODE_PULL_UP, ao_button_callback);
+	ao_exti_enable(&samd21_port_a, 11);
+	for (;;) {
+		ao_arch_block_interrupts();
+		pressed = 0;
+		while (!pressed)
+			ao_sleep(&pressed);
+		ao_arch_release_interrupts();
+		printf("pressed\n");
+		fflush(stdout);
+	}
+}
+
+static struct ao_task ao_button_task;
+
 int main(void)
 {
 	ao_led_init();
@@ -48,12 +76,14 @@ int main(void)
 	ao_task_init();
 	ao_timer_init();
 	ao_dma_init();
+	ao_exti_init();
 	ao_spi_init();
 	ao_usb_init();
 	ao_cmd_register(ao_spi_cmds);
 	ao_spi_init_cs(&samd21_port_a, 1 << 11); /* analog 8 for CS */
 	ao_storage_init();
 	ao_cmd_init();
+	ao_add_task(&ao_button_task, ao_button, "button");
 	ao_start_scheduler();
 	return 0;
 }
