@@ -39,13 +39,11 @@ void
 ao_dma_dump(char *where);
 
 /*
- * DMA is used for ADC and SERCOM
+ * DMA is only used for SERCOM
  */
 
-#define AO_SERCOM_DMA_BASE			2U
+#define AO_SERCOM_DMA_BASE			0U
 #define AO_SERCOM_INPUT_DMA_ID(id)		((uint8_t) ((id) * 2U + 0U + AO_SERCOM_DMA_BASE))
 #define AO_SERCOM_OUTPUT_DMA_ID(id)		((uint8_t) ((id) * 2U + 1U + AO_SERCOM_DMA_BASE))
-
-#define AO_ADC_DMA_ID				0
 
 #endif /* _AO_DMA_SAM21_H_ */

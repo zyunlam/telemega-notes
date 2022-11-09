@@ -89,14 +89,26 @@ static const uint32_t ao_usart_speeds[] = {
 static void
 ao_usart_set_speed(struct ao_samd21_usart *usart, uint8_t speed)
 {
+	struct samd21_sercom *reg = usart->reg;
 	uint64_t	top = (uint64_t) ao_usart_speeds[speed] << (4 + 16);
 	uint16_t	baud = (uint16_t) (65536 - (top + AO_SYSCLK/2) / AO_SYSCLK);
+	uint32_t	ctrla = reg->ctrla;
 
+	if (ctrla & (1UL << SAMD21_SERCOM_CTRLA_ENABLE)) {
+		usart->reg->ctrla = ctrla & ~(1UL << SAMD21_SERCOM_CTRLA_ENABLE);
+		while (reg->syncbusy & (1 << SAMD21_SERCOM_SYNCBUSY_ENABLE))
+			;
+	}
 	usart->reg->baud = baud;
+	if (ctrla & (1UL << SAMD21_SERCOM_CTRLA_ENABLE)) {
+		usart->reg->ctrla = ctrla;
+		while (reg->syncbusy & (1 << SAMD21_SERCOM_SYNCBUSY_ENABLE))
+			;
+	}
 }
 
 static void
-ao_usart_init(struct ao_samd21_usart *usart, bool hw_flow, uint8_t id)
+ao_usart_init(struct ao_samd21_usart *usart, bool hw_flow, uint8_t id, uint8_t txpo, uint8_t rxpo)
 {
 	struct samd21_sercom *reg = usart->reg;
 
@@ -137,13 +149,16 @@ ao_usart_init(struct ao_samd21_usart *usart, bool hw_flow, uint8_t id)
 		      (1 << SAMD21_SERCOM_CTRLA_RUNSTDBY) |
 		      (0 << SAMD21_SERCOM_CTRLA_IBON) |
 		      (0 << SAMD21_SERCOM_CTRLA_SAMPR) |
-		      (1 << SAMD21_SERCOM_CTRLA_TXPO) |	/* pad[2] */
-		      (3 << SAMD21_SERCOM_CTRLA_RXPO) |	/* pad[3] */
+		      (txpo << SAMD21_SERCOM_CTRLA_TXPO) |	/* pad[2] */
+		      (rxpo << SAMD21_SERCOM_CTRLA_RXPO) |	/* pad[3] */
 		      (0 << SAMD21_SERCOM_CTRLA_SAMPA) |
 		      (0 << SAMD21_SERCOM_CTRLA_FORM) |	/* no parity */
 		      (0 << SAMD21_SERCOM_CTRLA_CMODE) | /* async */
 		      (0 << SAMD21_SERCOM_CTRLA_CPOL) |
 		      (1 << SAMD21_SERCOM_CTRLA_DORD));	/* LSB first */
+
+	while (reg->syncbusy & (1 << SAMD21_SERCOM_SYNCBUSY_ENABLE))
+		;
 
 	/* Enable receive interrupt */
 	reg->intenset = (1 << SAMD21_SERCOM_INTFLAG_RXC);
@@ -287,6 +302,7 @@ ao_serial1_set_speed(uint8_t speed)
 void
 ao_serial_init(void)
 {
+	uint8_t	txpo, rxpo;
 #if HAS_SERIAL_0
 
 #if SERIAL_0_PA10_PA11
@@ -294,12 +310,14 @@ ao_serial_init(void)
 	ao_enable_port(&samd21_port_a);
 	samd21_port_pmux_set(&samd21_port_a, 10, SAMD21_PORT_PMUX_FUNC_C);
 	samd21_port_pmux_set(&samd21_port_a, 11, SAMD21_PORT_PMUX_FUNC_C);
+	txpo = SAMD21_SERCOM_CTRLA_TXPO_TX_2; /* pad 2 */
+	rxpo = SAMD21_SERCOM_CTRLA_RXPO_RX_3; /* pad 3 */
 #else
 #error "No SERIAL_0 port configuration specified"
 #endif
 
 	ao_samd21_usart0.reg = &samd21_sercom0;
-	ao_usart_init(&ao_samd21_usart0, 0, 0);
+	ao_usart_init(&ao_samd21_usart0, 0, 0, txpo, rxpo);
 
 #if USE_SERIAL_0_STDIN
 	ao_add_stdio(_ao_serial0_pollchar,
@@ -314,12 +332,14 @@ ao_serial_init(void)
 	ao_enable_port(&samd21_port_a);
 	samd21_port_pmux_set(&samd21_port_a, 0, SAMD21_PORT_PMUX_FUNC_D);
 	samd21_port_pmux_set(&samd21_port_a, 1, SAMD21_PORT_PMUX_FUNC_D);
+	txpo = SAMD21_SERCOM_CTRLA_TXPO_TX_0;
+	rxpo = SAMD21_SERCOM_CTRLA_RXPO_RX_1;
 #else
 #error "No SERIAL_1 port configuration specified"
 #endif
 
 	ao_samd21_usart1.reg = &samd21_sercom1;
-	ao_usart_init(&ao_samd21_usart1, 0, 0);
+	ao_usart_init(&ao_samd21_usart1, 0, 1, txpo, rxpo);
 
 #if USE_SERIAL_1_STDIN
 	ao_add_stdio(_ao_serial1_pollchar,
