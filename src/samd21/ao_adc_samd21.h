@@ -15,8 +15,8 @@
 #ifndef _AO_ADC_SAMD21_H_
 #define _AO_ADC_SAMD21_H_
 
-uint16_t
-ao_adc_read(uint8_t channel);
+void
+ao_adc_poll(void);
 
 void
 ao_adc_init(void);
