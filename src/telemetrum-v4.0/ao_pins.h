@@ -42,7 +42,6 @@
 #define USE_STORAGE_CONFIG	1
 #define HAS_USB			1
 #define USE_USB_STDIO	1
-#define HAS_BEEP		1
 #define HAS_BATTERY_REPORT	1
 #define BEEPER_CHANNEL		4
 #define BEEPER_TIMER		3
@@ -76,6 +75,19 @@
 #define HAS_ADC			1
 #define HAS_ADC_TEMP		1
 #define HAS_LOG			1
+
+/*
+ * Beeper
+ */
+
+#define HAS_BEEP		1
+/* Beep on PA11 function F TCC0.3 */
+
+#define AO_BEEP_TCC		(&samd21_tcc0)
+#define AO_BEEP_TCC_APBC_MASK	SAMD21_PM_APBCMASK_TCC0
+#define AO_BEEP_PORT		(&samd21_port_a)
+#define AO_BEEP_PIN		(11)
+#define AO_BEEP_FUNC		SAMD21_PORT_PMUX_FUNC_F
 
 /*
  * Igniter
@@ -116,21 +128,21 @@ struct ao_adc {
 	       (p)->adc.sense_a, (p)->adc.sense_m, \
 	       (p)->adc.v_batt);
 
-#define AO_ADC_SENSE_DROGUE	1
+#define AO_ADC_SENSE_DROGUE		18
 #define AO_ADC_SENSE_DROGUE_PORT	(&samd21_port_a)
-#define AO_ADC_SENSE_DROGUE_PIN	10
+#define AO_ADC_SENSE_DROGUE_PIN		10
 
-#define AO_ADC_SENSE_MAIN	1
-#define AO_ADC_SENSE_MAIN_PORT	(&samd21_port_a)
-#define AO_ADC_SENSE_MAIN_PIN	11
+#define AO_ADC_SENSE_MAIN		19
+#define AO_ADC_SENSE_MAIN_PORT		(&samd21_port_a)
+#define AO_ADC_SENSE_MAIN_PIN		11
 
-#define AO_ADC_V_BATT		8
-#define AO_ADC_V_BATT_PORT	(&samd21_port_a)
-#define AO_ADC_V_BATT_PIN	9
+#define AO_ADC_V_BATT			17
+#define AO_ADC_V_BATT_PORT		(&samd21_port_a)
+#define AO_ADC_V_BATT_PIN		9
 
-#define AO_ADC_TEMP		16
+#define AO_ADC_TEMP			SAMD21_ADC_INPUTCTRL_MUXPOS_TEMP
 
-#define AO_NUM_ADC_PIN		3
+#define AO_NUM_ADC_PIN			3
 
 #define AO_ADC_PIN0_PORT	AO_ADC_SENSE_DROGUE_PORT
 #define AO_ADC_PIN0_PIN		AO_ADC_SENSE_DROGUE_PIN
@@ -141,10 +153,10 @@ struct ao_adc {
 
 #define AO_NUM_ADC	       	(AO_NUM_ADC_PIN + 1)
 
-#define AO_ADC_SQ1		AO_ADC_SENSE_DROGUE
-#define AO_ADC_SQ2		AO_ADC_SENSE_MAIN
-#define AO_ADC_SQ3		AO_ADC_V_BATT
-#define AO_ADC_SQ4		AO_ADC_TEMP
+#define AO_ADC_SQ0		AO_ADC_SENSE_DROGUE
+#define AO_ADC_SQ1		AO_ADC_SENSE_MAIN
+#define AO_ADC_SQ2		AO_ADC_V_BATT
+#define AO_ADC_SQ3		AO_ADC_TEMP
 
 /*
  * Voltage divider on ADC battery sampler
