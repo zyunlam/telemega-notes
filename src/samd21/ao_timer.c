@@ -53,6 +53,21 @@ void samd21_systick_isr(void)
 	ao_arch_release_interrupts();
 	if (samd21_systick.csr & (1 << SAMD21_SYSTICK_CSR_COUNTFLAG)) {
 		++ao_tick_count;
+		ao_task_check_alarm();
+#if AO_DATA_ALL
+		if (++ao_data_count == ao_data_interval && ao_data_interval) {
+			ao_data_count = 0;
+#if HAS_FAKE_FLIGHT
+			if (ao_fake_flight_active)
+				ao_fake_flight_poll();
+			else
+#endif
+				ao_adc_poll();
+#if (AO_DATA_ALL & ~(AO_DATA_ADC))
+			ao_wakeup((void *) &ao_data_count);
+#endif
+		}
+#endif
 #ifdef AO_TIMER_HOOK
 		AO_TIMER_HOOK;
 #endif
