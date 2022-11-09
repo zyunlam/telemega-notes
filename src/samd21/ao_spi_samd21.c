@@ -21,14 +21,6 @@ static uint16_t		ao_spi_pin_config[SAMD21_NUM_SERCOM];
 #define SPI_DEBUG	0
 #define SPI_USE_DMA	1
 
-/*
- * DMA is only used for USARTs in altos, which makes assigning DMA IDs
- * pretty easy
- */
-
-#define MISO_DMA_ID(id)		((uint8_t) ((id) * 2U + 0U))
-#define MOSI_DMA_ID(id)		((uint8_t) ((id) * 2U + 1U))
-
 struct ao_spi_samd21_info {
 	struct samd21_sercom	*sercom;
 };
@@ -176,7 +168,7 @@ spi_run(const void *out, void *in, uint16_t len, uint16_t spi_index, bool step_o
 	/* read any stuck data */
 	(void) sercom->data;
 
-	_ao_dma_start_transfer(MISO_DMA_ID(id),
+	_ao_dma_start_transfer(AO_SERCOM_INPUT_DMA_ID(id),
 			       (void *) &sercom->data,
 			       i,
 			       len,
@@ -187,7 +179,7 @@ spi_run(const void *out, void *in, uint16_t len, uint16_t spi_index, bool step_o
 			       (void *) (uintptr_t) id
 		);
 
-	_ao_dma_start_transfer(MOSI_DMA_ID(id),
+	_ao_dma_start_transfer(AO_SERCOM_OUTPUT_DMA_ID(id),
 			       o,
 			       (void *) &sercom->data,
 			       len,
@@ -200,8 +192,8 @@ spi_run(const void *out, void *in, uint16_t len, uint16_t spi_index, bool step_o
 	while (ao_spi_done[id] == 0)
 		ao_sleep(&ao_spi_done[id]);
 
-	_ao_dma_done_transfer(MOSI_DMA_ID(id));
-	_ao_dma_done_transfer(MISO_DMA_ID(id));
+	_ao_dma_done_transfer(AO_SERCOM_OUTPUT_DMA_ID(id));
+	_ao_dma_done_transfer(AO_SERCOM_INPUT_DMA_ID(id));
 	ao_arch_release_interrupts();
 }
 
