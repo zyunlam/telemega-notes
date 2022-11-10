@@ -40,6 +40,7 @@ public class TeleGPSConfigUI
 	JLabel			radio_frequency_label;
 	JLabel			radio_enable_label;
 	JLabel			radio_10mw_label;
+	JLabel			report_feet_label;
 	JLabel			rate_label;
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
@@ -60,6 +61,7 @@ public class TeleGPSConfigUI
 	JLabel			radio_calibration_value;
 	JRadioButton		radio_enable_value;
 	JRadioButton		radio_10mw_value;
+	JComboBox<String>	report_feet_value;
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
@@ -113,6 +115,11 @@ public class TeleGPSConfigUI
 		"10"
 	};
 
+	static String[] 	report_feet_values = {
+		"Meters",
+		"Feet",
+	};
+
 	/* A window listener to catch closing events and tell the config code */
 	class ConfigListener extends WindowAdapter {
 		TeleGPSConfigUI	ui;
@@ -159,6 +166,38 @@ public class TeleGPSConfigUI
 			radio_10mw_value.setToolTipText("Should transmitter power be limited to 10mW");
 		else
 			radio_10mw_value.setToolTipText("Older firmware could not limit radio power");
+	}
+
+	void set_report_feet_tool_tip() {
+		if (report_feet_value.isVisible())
+			report_feet_value.setToolTipText("Units used after landing to beep max height");
+		else
+			report_feet_value.setToolTipText("Older firmware always beeps max height in meters");
+	}
+
+	public void set_report_feet(int new_report_feet) {
+		if (new_report_feet != AltosLib.MISSING) {
+			if (new_report_feet >= report_feet_values.length)
+				new_report_feet = 0;
+			if (new_report_feet < 0) {
+				report_feet_value.setEnabled(false);
+				new_report_feet = 0;
+			} else {
+				report_feet_value.setEnabled(true);
+			}
+			report_feet_value.setSelectedIndex(new_report_feet);
+		}
+		report_feet_value.setVisible(new_report_feet != AltosLib.MISSING);
+		report_feet_label.setVisible(new_report_feet != AltosLib.MISSING);
+
+		set_report_feet_tool_tip();
+	}
+
+	public int report_feet() {
+		if (report_feet_value.isVisible())
+			return report_feet_value.getSelectedIndex();
+		else
+			return AltosLib.MISSING;
 	}
 
 	void set_rate_tool_tip() {
