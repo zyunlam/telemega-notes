@@ -182,6 +182,7 @@ struct ao_adc {
 #define AO_SERIAL_SPEED_UBLOX	AO_SERIAL_SPEED_9600
 
 #define HAS_SERIAL_1		1
+#define USE_SERIAL_1_STDIN	0
 #define SERIAL_1_PA00_PA01	1
 
 #define ao_gps_getchar		ao_serial1_getchar
