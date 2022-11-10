@@ -67,6 +67,8 @@ int main(void)
 	ao_exti_init();
 	ao_spi_init();
 	ao_adc_init();
+	ao_serial_init();
+	ao_gps_init();
 	ao_beep_init();
 	ao_usb_init();
 	ao_storage_init();

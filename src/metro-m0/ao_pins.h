@@ -118,4 +118,18 @@ struct ao_adc {
 
 #define AO_ADC_SQ6		SAMD21_ADC_INPUTCTRL_MUXPOS_TEMP
 
+/* GPS */
+#define HAS_GPS			1
+
+#define AO_SERIAL_SPEED_UBLOX	AO_SERIAL_SPEED_9600
+
+#define HAS_SERIAL_0		1
+#define USE_SERIAL_0_STDIN	0
+#define SERIAL_0_PA08_PA09	1
+
+#define ao_gps_getchar		ao_serial0_getchar
+#define ao_gps_putchar		ao_serial0_putchar
+#define ao_gps_set_speed	ao_serial0_set_speed
+#define ao_gps_fifo		(ao_samd21_usart0.rx_fifo)
+
 #endif /* _AO_PINS_H_ */
