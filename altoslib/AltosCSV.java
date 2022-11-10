@@ -132,10 +132,10 @@ public class AltosCSV implements AltosWriter {
 	 */
 
 	void write_general_header() {
-		out.printf("version,serial,flight");
+		out.printf(Locale.ROOT,"version,serial,flight");
 		if (series.cal_data().callsign != null)
-			out.printf(",call");
-		out.printf(",time");
+			out.printf(Locale.ROOT,",call");
+		out.printf(Locale.ROOT,",time");
 	}
 
 	double time() {
@@ -143,17 +143,17 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_general() {
-		out.printf("%s, %d, %d",
+		out.printf(Locale.ROOT,"%s, %d, %d",
 			   ALTOS_CSV_VERSION,
 			   series.cal_data().serial,
 			   series.cal_data().flight);
 		if (series.cal_data().callsign != null)
-			out.printf(",%s", series.cal_data().callsign);
-		out.printf(", %8.2f", time());
+			out.printf(Locale.ROOT,",%s", series.cal_data().callsign);
+		out.printf(Locale.ROOT,", %8.2f", time());
 	}
 
 	void write_radio_header() {
-		out.printf("rssi,lqi");
+		out.printf(Locale.ROOT,"rssi,lqi");
 	}
 
 	int rssi() {
@@ -165,12 +165,12 @@ public class AltosCSV implements AltosWriter {
 	}
 
 	void write_radio() {
-		out.printf("%4d, %3d",
+		out.printf(Locale.ROOT,"%4d, %3d",
 			   rssi(), status() & 0x7f);
 	}
 
 	void write_flight_header() {
-		out.printf("state,state_name");
+		out.printf(Locale.ROOT,"state,state_name");
 	}
 
 	int state() {
@@ -179,19 +179,19 @@ public class AltosCSV implements AltosWriter {
 
 	void write_flight() {
 		int state = state();
-		out.printf("%2d,%8s", state, AltosLib.state_name(state));
+		out.printf(Locale.ROOT,"%2d,%8s", state, AltosLib.state_name(state));
 	}
 
 	void write_basic_header() {
 		if (has_accel)
-			out.printf("acceleration,");
+			out.printf(Locale.ROOT,"acceleration,");
 		if (has_baro)
-			out.printf("pressure,altitude,");
-		out.printf("height,speed");
+			out.printf(Locale.ROOT,"pressure,altitude,");
+		out.printf(Locale.ROOT,"height,speed");
 		if (has_baro)
-			out.printf(",temperature");
+			out.printf(Locale.ROOT,",temperature");
 		if (has_pyro)
-			out.printf(",drogue_voltage,main_voltage");
+			out.printf(Locale.ROOT,",drogue_voltage,main_voltage");
 	}
 
 	double acceleration() { return series.value(AltosFlightSeries.accel_name, indices); }
@@ -205,42 +205,42 @@ public class AltosCSV implements AltosWriter {
 
 	void write_basic() {
 		if (has_accel)
-			out.printf("%8.2f,", acceleration());
+			out.printf(Locale.ROOT,"%8.2f,", acceleration());
 		if (has_baro)
-			out.printf("%10.2f,%8.2f,",
+			out.printf(Locale.ROOT,"%10.2f,%8.2f,",
 				   pressure(), altitude());
-		out.printf("%8.2f,%8.2f",
+		out.printf(Locale.ROOT,"%8.2f,%8.2f",
 			   height(), speed());
 		if (has_baro)
-			out.printf(",%5.1f", temperature());
+			out.printf(Locale.ROOT,",%5.1f", temperature());
 		if (has_pyro)
-			out.printf(",%5.2f,%5.2f",
+			out.printf(Locale.ROOT,",%5.2f,%5.2f",
 				   apogee_voltage(),
 				   main_voltage());
 	}
 
 	void write_battery_header() {
-		out.printf("battery_voltage");
+		out.printf(Locale.ROOT,"battery_voltage");
 	}
 
 	double battery_voltage() { return series.value(AltosFlightSeries.battery_voltage_name, indices); }
 
 	void write_battery() {
-		out.printf("%5.2f", battery_voltage());
+		out.printf(Locale.ROOT,"%5.2f", battery_voltage());
 	}
 
 	void write_motor_pressure_header() {
-		out.printf("motor_pressure");
+		out.printf(Locale.ROOT,"motor_pressure");
 	}
 
 	double motor_pressure() { return series.value(AltosFlightSeries.motor_pressure_name, indices); }
 
 	void write_motor_pressure() {
-		out.printf("%10.1f", motor_pressure());
+		out.printf(Locale.ROOT,"%10.1f", motor_pressure());
 	}
 
 	void write_3d_accel_header() {
-		out.printf("accel_x,accel_y,accel_z");
+		out.printf(Locale.ROOT,"accel_x,accel_y,accel_z");
 	}
 
 	double accel_along() { return series.value(AltosFlightSeries.accel_along_name, indices); }
@@ -248,12 +248,12 @@ public class AltosCSV implements AltosWriter {
 	double accel_through() { return series.value(AltosFlightSeries.accel_through_name, indices); }
 
 	void write_3d_accel() {
-		out.printf("%7.2f,%7.2f,%7.2f",
+		out.printf(Locale.ROOT,"%7.2f,%7.2f,%7.2f",
 			   accel_along(), accel_across(), accel_through());
 	}
 
 	void write_imu_header() {
-		out.printf("gyro_roll,gyro_pitch,gyro_yaw,mag_x,mag_y,mag_z,tilt");
+		out.printf(Locale.ROOT,"gyro_roll,gyro_pitch,gyro_yaw,mag_x,mag_y,mag_z,tilt");
 	}
 
 	double gyro_roll() { return series.value(AltosFlightSeries.gyro_roll_name, indices); }
@@ -267,16 +267,16 @@ public class AltosCSV implements AltosWriter {
 	double tilt() { return series.value(AltosFlightSeries.orient_name, indices); }
 
 	void write_imu() {
-		out.printf("%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
+		out.printf(Locale.ROOT,"%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f",
 			   gyro_roll(), gyro_pitch(), gyro_yaw(),
 			   mag_along(), mag_across(), mag_through(),
 			   tilt());
 	}
 
 	void write_igniter_header() {
-		out.printf("pyro");
+		out.printf(Locale.ROOT,"pyro");
 		for (int i = 0; i < series.igniter_voltage.length; i++)
-			out.printf(",%s", AltosLib.igniter_short_name(i));
+			out.printf(Locale.ROOT,",%s", AltosLib.igniter_short_name(i));
 	}
 
 	double pyro() { return series.value(AltosFlightSeries.pyro_voltage_name, indices); }
@@ -284,13 +284,13 @@ public class AltosCSV implements AltosWriter {
 	double igniter_value(int channel) { return series.value(series.igniter_voltage_name(channel), indices);	}
 
 	void write_igniter() {
-		out.printf("%5.2f", pyro());
+		out.printf(Locale.ROOT,"%5.2f", pyro());
 		for (int i = 0; i < series.igniter_voltage.length; i++)
-			out.printf(",%5.2f", igniter_value(i));
+			out.printf(Locale.ROOT,",%5.2f", igniter_value(i));
 	}
 
 	void write_gps_header() {
-		out.printf("connected,locked,nsat,latitude,longitude,altitude,year,month,day,hour,minute,second,pad_dist,pad_range,pad_az,pad_el,pdop,hdop,vdop");
+		out.printf(Locale.ROOT,"connected,locked,nsat,latitude,longitude,altitude,year,month,day,hour,minute,second,pad_dist,pad_range,pad_az,pad_el,pdop,hdop,vdop");
 	}
 
 	void write_gps() {
@@ -306,7 +306,7 @@ public class AltosCSV implements AltosWriter {
 		if (gps == null)
 			gps = new AltosGPS();
 
-		out.printf("%2d,%2d,%3d,%12.7f,%12.7f,%8.1f,%5d,%3d,%3d,%3d,%3d,%3d,%9.0f,%9.0f,%4.0f,%4.0f,%6.1f,%6.1f,%6.1f",
+		out.printf(Locale.ROOT,"%2d,%2d,%3d,%12.7f,%12.7f,%8.1f,%5d,%3d,%3d,%3d,%3d,%3d,%9.0f,%9.0f,%4.0f,%4.0f,%6.1f,%6.1f,%6.1f",
 			   gps.connected?1:0,
 			   gps.locked?1:0,
 			   gps.nsat,
@@ -330,9 +330,9 @@ public class AltosCSV implements AltosWriter {
 
 	void write_gps_sat_header() {
 		for(int i = 1; i <= 32; i++) {
-			out.printf("sat%02d", i);
+			out.printf(Locale.ROOT,"sat%02d", i);
 			if (i != 32)
-				out.printf(",");
+				out.printf(Locale.ROOT,",");
 		}
 	}
 
@@ -349,15 +349,15 @@ public class AltosCSV implements AltosWriter {
 			}
 			out.printf ("%3d", c_n0);
 			if (i != 32)
-				out.printf(",");
+				out.printf(Locale.ROOT,",");
 		}
 	}
 
 	void write_companion_header() {
 /*
-		out.printf("companion_id,companion_time,companion_update,companion_channels");
+		out.printf(Locale.ROOT,"companion_id,companion_time,companion_update,companion_channels");
 		for (int i = 0; i < 12; i++)
-			out.printf(",companion_%02d", i);
+			out.printf(Locale.ROOT,",companion_%02d", i);
 */
 	}
 
@@ -367,65 +367,65 @@ public class AltosCSV implements AltosWriter {
 
 		int	channels_written = 0;
 		if (companion == null) {
-			out.printf("0,0,0,0");
+			out.printf(Locale.ROOT,"0,0,0,0");
 		} else {
-			out.printf("%3d,%5.2f,%5.2f,%2d",
+			out.printf(Locale.ROOT,"%3d,%5.2f,%5.2f,%2d",
 				   companion.board_id,
 				   (companion.tick - boost_tick) / 100.0,
 				   companion.update_period / 100.0,
 				   companion.channels);
 			for (; channels_written < companion.channels; channels_written++)
-				out.printf(",%5d", companion.companion_data[channels_written]);
+				out.printf(Locale.ROOT,",%5d", companion.companion_data[channels_written]);
 		}
 		for (; channels_written < 12; channels_written++)
-			out.printf(",0");
+			out.printf(Locale.ROOT,",0");
 */
 	}
 
 	void write_header() {
-		out.printf("#"); write_general_header();
+		out.printf(Locale.ROOT,"#"); write_general_header();
 		if (has_radio) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_radio_header();
 		}
 		if (has_flight_state) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_flight_header();
 		}
 		if (has_basic) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_basic_header();
 		}
 		if (has_battery) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_battery_header();
 		}
 		if (has_motor_pressure) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_motor_pressure_header();
 		}
 		if (has_3d_accel) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_3d_accel_header();
 		}
 		if (has_imu) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_imu_header();
 		}
 		if (has_igniter) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_igniter_header();
 		}
 		if (has_gps) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_gps_header();
 		}
 		if (has_gps_sat) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_gps_sat_header();
 		}
 		if (has_companion) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_companion_header();
 		}
 		out.printf ("\n");
@@ -434,47 +434,47 @@ public class AltosCSV implements AltosWriter {
 	void write_one() {
 		write_general();
 		if (has_radio) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_radio();
 		}
 		if (has_flight_state) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_flight();
 		}
 		if (has_basic) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_basic();
 		}
 		if (has_battery) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_battery();
 		}
 		if (has_motor_pressure) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_motor_pressure();
 		}
 		if (has_3d_accel) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_3d_accel();
 		}
 		if (has_imu) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_imu();
 		}
 		if (has_igniter) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_igniter();
 		}
 		if (has_gps) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_gps();
 		}
 		if (has_gps_sat) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_gps_sat();
 		}
 		if (has_companion) {
-			out.printf(",");
+			out.printf(Locale.ROOT,",");
 			write_companion();
 		}
 		out.printf ("\n");
