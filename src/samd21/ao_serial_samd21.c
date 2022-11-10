@@ -40,8 +40,9 @@ static void
 _ao_usart_rx(struct ao_samd21_usart *usart, int is_stdin)
 {
 	if (usart->reg->intflag & (1 << SAMD21_SERCOM_INTFLAG_RXC)) {
+		uint8_t data = (uint8_t) usart->reg->data;
 		if (!ao_fifo_full(usart->rx_fifo)) {
-			ao_fifo_insert(usart->rx_fifo, usart->reg->data);
+			ao_fifo_insert(usart->rx_fifo, data);
 			ao_wakeup(&usart->rx_fifo);
 			if (is_stdin)
 				ao_wakeup(&ao_stdin_ready);
@@ -54,8 +55,6 @@ _ao_usart_rx(struct ao_samd21_usart *usart, int is_stdin)
 				usart->rts = 0;
 			}
 #endif
-		} else {
-			usart->reg->intenclr = (1 << SAMD21_SERCOM_INTFLAG_RXC);
 		}
 	}
 }
@@ -157,11 +156,12 @@ ao_usart_init(struct ao_samd21_usart *usart, bool hw_flow, uint8_t id, uint8_t t
 		      (0 << SAMD21_SERCOM_CTRLA_CPOL) |
 		      (1 << SAMD21_SERCOM_CTRLA_DORD));	/* LSB first */
 
+	/* Enable receive interrupt */
+	reg->intenset = (1 << SAMD21_SERCOM_INTFLAG_RXC);
+
 	while (reg->syncbusy & (1 << SAMD21_SERCOM_SYNCBUSY_ENABLE))
 		;
 
-	/* Enable receive interrupt */
-	reg->intenset = (1 << SAMD21_SERCOM_INTFLAG_RXC);
 }
 
 static int
@@ -174,10 +174,6 @@ _ao_usart_pollchar(struct ao_samd21_usart *usart)
 	else {
 		uint8_t	u;
 		ao_fifo_remove(usart->rx_fifo, u);
-		if ((usart->reg->intenset & (1 << SAMD21_SERCOM_INTFLAG_RXC)) == 0) {
-			if (ao_fifo_barely(usart->rx_fifo))
-				usart->reg->intenset = (1 << SAMD21_SERCOM_INTFLAG_RXC);
-		}
 #if HAS_SERIAL_SW_FLOW
 		/* If we've cleared RTS, check if there's space now and turn it back on */
 		if (usart->gpio_rts && usart->rts == 0 && ao_fifo_barely(usart->rx_fifo)) {
@@ -312,6 +308,13 @@ ao_serial_init(void)
 	samd21_port_pmux_set(&samd21_port_a, 11, SAMD21_PORT_PMUX_FUNC_C);
 	txpo = SAMD21_SERCOM_CTRLA_TXPO_TX_2; /* pad 2 */
 	rxpo = SAMD21_SERCOM_CTRLA_RXPO_RX_3; /* pad 3 */
+#elif SERIAL_0_PA08_PA09
+	/* Pin settings */
+	ao_enable_port(&samd21_port_a);
+	samd21_port_pmux_set(&samd21_port_a, 8, SAMD21_PORT_PMUX_FUNC_C);
+	samd21_port_pmux_set(&samd21_port_a, 9, SAMD21_PORT_PMUX_FUNC_C);
+	txpo = SAMD21_SERCOM_CTRLA_TXPO_TX_0; /* pad 0 */
+	rxpo = SAMD21_SERCOM_CTRLA_RXPO_RX_1; /* pad 1 */
 #else
 #error "No SERIAL_0 port configuration specified"
 #endif
