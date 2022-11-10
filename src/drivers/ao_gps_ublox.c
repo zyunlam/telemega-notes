@@ -63,11 +63,12 @@ static uint16_t ao_ublox_len;
 
 #if AO_UBLOX_DEBUG
 
-static uint8_t ao_gps_dbg_enable;
 
 #define DBG_PROTO	1
 #define DBG_CHAR	2
 #define DBG_INIT	4
+
+static uint8_t ao_gps_dbg_enable = DBG_PROTO|DBG_CHAR|DBG_INIT;
 
 static void ao_gps_dbg(int level, char *format, ...) {
 	va_list a;
@@ -788,7 +789,7 @@ ao_gps(void)
 #if AO_UBLOX_DEBUG
 static void ao_gps_option(void)
 {
-	uint16_t r = ao_cmd_hex();
+	uint8_t r = (uint8_t) ao_cmd_hex();
 	if (ao_cmd_status != ao_cmd_success) {
 		ao_cmd_status = ao_cmd_success;
 		ao_gps_show();
