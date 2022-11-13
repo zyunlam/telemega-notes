@@ -195,10 +195,9 @@ struct ao_adc {
  */
 #define HAS_MS5607		1
 #define HAS_MS5611		0
-#define AO_MS5607_PRIVATE_PINS	1
+#define AO_MS5607_PRIVATE_PINS	0
 #define AO_MS5607_CS_PORT	(&samd21_port_a)
 #define AO_MS5607_CS_PIN	21
-#define AO_MS5607_CS_MASK	(1 << AO_MS5607_CS)
 #define AO_MS5607_MISO_PORT	(&samd21_port_a)
 #define AO_MS5607_MISO_PIN	20
 #define AO_MS5607_SPI_INDEX	AO_SPI_3_PA22_PA23_PA20
