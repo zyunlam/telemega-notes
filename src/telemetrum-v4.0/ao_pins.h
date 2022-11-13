@@ -81,13 +81,13 @@
  */
 
 #define HAS_BEEP		1
-/* Beep on PA11 function F TCC0.3 */
+/* Beep on PA16 function E TCC2.0 */
 
-#define AO_BEEP_TCC		(&samd21_tcc0)
-#define AO_BEEP_TCC_APBC_MASK	SAMD21_PM_APBCMASK_TCC0
+#define AO_BEEP_TCC		(&samd21_tcc2)
+#define AO_BEEP_TCC_APBC_MASK	SAMD21_PM_APBCMASK_TCC2
 #define AO_BEEP_PORT		(&samd21_port_a)
-#define AO_BEEP_PIN		(11)
-#define AO_BEEP_FUNC		SAMD21_PORT_PMUX_FUNC_F
+#define AO_BEEP_PIN		(16)
+#define AO_BEEP_FUNC		SAMD21_PORT_PMUX_FUNC_E
 
 /*
  * Igniter
