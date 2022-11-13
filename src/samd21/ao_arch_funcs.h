@@ -190,11 +190,11 @@ ao_enable_cs(struct samd21_port *port, uint8_t pin)
 /*
  * PA22 SERCOM3.0 -> MOSI	(DOPO 0)
  * PA23 SERCOM3.1 -> SCLK	(DOPO 0)
- * PA20 SERCOM3.3 -> MISO	(DIPO 3)
+ * PA20 SERCOM3.2 -> MISO	(DIPO 2)
  */
 #define AO_SPI_3_PA22_PA23_PA20	(3 | AO_SPI_CONFIG_0 |		\
 				 AO_SPI_DOPO_MOSI_0_SCLK_1 |	\
-				 AO_SPI_DIPO_MISO_3)
+				 AO_SPI_DIPO_MISO_2)
 #endif /* HAS_SPI_3 */
 
 #if HAS_SPI_4
