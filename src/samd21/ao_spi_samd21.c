@@ -314,9 +314,9 @@ ao_spi_enable_pin_config(uint16_t spi_pin_config)
 		ao_enable_output(&samd21_port_a, 5, 1);
 		ao_enable_input(&samd21_port_a, 6, AO_MODE_PULL_NONE);
 
-		samd21_port_pmux_set(&samd21_port_a, 4, SAMD21_PORT_PMUX_FUNC_C);	/* MOSI */
-		samd21_port_pmux_set(&samd21_port_a, 5, SAMD21_PORT_PMUX_FUNC_C);	/* SCLK */
-		samd21_port_pmux_set(&samd21_port_a, 6, SAMD21_PORT_PMUX_FUNC_C);	/* MISO */
+		samd21_port_pmux_set(&samd21_port_a, 4, SAMD21_PORT_PMUX_FUNC_D);	/* MOSI */
+		samd21_port_pmux_set(&samd21_port_a, 5, SAMD21_PORT_PMUX_FUNC_D);	/* SCLK */
+		samd21_port_pmux_set(&samd21_port_a, 6, SAMD21_PORT_PMUX_FUNC_D);	/* MISO */
 		break;
 #endif
 #if HAS_SPI_3
