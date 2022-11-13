@@ -286,8 +286,8 @@ ao_spi_speed(uint32_t hz)
 {
 	int32_t	baud = (int32_t) (AO_SYSCLK / (2 * hz)) - 1;
 
-	if (baud < 0)
-		baud = 0;
+	if (baud < 1)
+		baud = 1;
 	if (baud > 255)
 		baud = 255;
 	return (uint8_t) baud;
