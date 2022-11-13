@@ -21,8 +21,8 @@
 
 struct ao_samd21_exti {
 	void			(*callback)(void);
-	struct samd21_port	*port;
-	uint8_t 		pin;
+	uint8_t			pmux;
+	uint8_t			pincfg;
 };
 
 static struct ao_samd21_exti ao_samd21_exti[SAMD21_NUM_EIC];
@@ -87,16 +87,21 @@ ao_exti_setup (struct samd21_port *port, uint8_t pin, uint8_t mode, void (*callb
 	uint8_t			id = pin_id(port,pin);
 	struct ao_samd21_exti	*exti = &ao_samd21_exti[id];
 
-	if (exti->port)
+	if (exti->callback)
 		ao_panic(AO_PANIC_EXTI);
 
-	if (!(mode & AO_EXTI_PIN_NOCONFIGURE))
+	if (mode & AO_EXTI_PIN_NOCONFIGURE) {
+		ao_enable_port(port);
+		samd21_port_dir_set(port, pin, SAMD21_PORT_DIR_IN);
+		samd21_port_pincfg_set(port, pin,
+				       (1 << SAMD21_PORT_PINCFG_INEN),
+				       (1 << SAMD21_PORT_PINCFG_INEN));
+	} else {
 		ao_enable_input(port, pin, mode);
+	}
 
 	ao_arch_block_interrupts();
 
-	exti->port = port;
-	exti->pin = pin;
 	exti->callback = callback;
 
 	/* Set edge triggered */
@@ -133,6 +138,8 @@ ao_exti_enable(struct samd21_port *port, uint8_t pin)
 	ao_arch_block_interrupts();
 	samd21_eic.intenset = 1 << id;
 	/* configure gpio to interrupt routing */
+	ao_samd21_exti[id].pmux = samd21_port_pmux_get(port, pin);
+	ao_samd21_exti[id].pincfg = samd21_port_pincfg_get(port, pin);
 	samd21_port_pmux_set(port, pin, SAMD21_PORT_PMUX_FUNC_A);
 	ao_arch_release_interrupts();
 }
@@ -144,8 +151,11 @@ ao_exti_disable(struct samd21_port *port, uint8_t pin)
 
 	ao_arch_block_interrupts();
 	samd21_eic.intenclr = 1 << id;
-	/* configure gpio to interrupt routing */
-	samd21_port_pmux_clr(port, pin);
+	/* restore gpio config */
+	if (ao_samd21_exti[id].pincfg & (1 << SAMD21_PORT_PINCFG_PMUXEN))
+		samd21_port_pmux_set(port, pin, ao_samd21_exti[id].pmux);
+	else
+		samd21_port_pmux_clr(port, pin);
 	ao_arch_release_interrupts();
 }
 
