@@ -29,6 +29,7 @@
 uint8_t ao_gps_new;
 uint8_t ao_gps_mutex;
 AO_TICK_TYPE ao_gps_tick;
+AO_TICK_TYPE ao_gps_utc_tick;
 struct ao_telemetry_location	ao_gps_data;
 struct ao_telemetry_satellite	ao_gps_tracking_data;
 
@@ -398,6 +399,7 @@ ao_ublox_parse_nav_svinfo(void)
  * NAV-TIMEUTC message parsing
  */
 static struct nav_timeutc {
+	int32_t		nano;
 	uint16_t	year;
 	uint8_t		month;
 	uint8_t		day;
@@ -412,7 +414,8 @@ static struct nav_timeutc {
 #define NAV_TIMEUTC_VALID_UTC	2
 
 static const struct ublox_packet_parse nav_timeutc_packet[] = {
-	{ UBLOX_DISCARD, 12 },						/* 0 iTOW, tAcc, nano */
+	{ UBLOX_DISCARD, 8 },						/* 0 iTOW, tAcc */
+	{ UBLOX_U32, offsetof(struct nav_timeutc, nano) },		/* 8 nano */
 	{ UBLOX_U16, offsetof(struct nav_timeutc, year) },		/* 12 year */
 	{ UBLOX_U8, offsetof(struct nav_timeutc, month) },		/* 14 month */
 	{ UBLOX_U8, offsetof(struct nav_timeutc, day) },		/* 15 day */
@@ -722,7 +725,7 @@ ao_gps(void)
 			case UBLOX_NAV_TIMEUTC:
 				ao_mutex_get(&ao_gps_mutex);
 				ao_gps_tick = solution_tick;
-
+				ao_gps_utc_tick = packet_start_tick + (AO_TICK_TYPE) AO_NS_TO_TICKS(nav_timeutc.nano);
 				ao_gps_data.flags = 0;
 				ao_gps_data.flags |= AO_GPS_RUNNING;
 				if (nav_sol.gps_fix & (1 << NAV_SOL_FLAGS_GPSFIXOK)) {

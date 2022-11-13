@@ -40,6 +40,7 @@ static uint8_t ao_gps_cksum;
 static uint8_t ao_gps_error;
 
 AO_TICK_TYPE ao_gps_tick;
+AO_TICK_TYPE ao_gps_utc_tick;
 struct ao_telemetry_location	ao_gps_data;
 struct ao_telemetry_satellite	ao_gps_tracking_data;
 
@@ -296,7 +297,7 @@ ao_nmea_gga(void)
 	if (!ao_gps_error) {
 		ao_mutex_get(&ao_gps_mutex);
 		ao_gps_new |= AO_GPS_NEW_DATA;
-		ao_gps_tick = ao_gps_next_tick;
+		ao_gps_tick = ao_gps_utc_tick = ao_gps_next_tick;
 		memcpy(&ao_gps_data, &ao_gps_next, sizeof (ao_gps_data));
 		ao_mutex_put(&ao_gps_mutex);
 		ao_wakeup(&ao_gps_new);
