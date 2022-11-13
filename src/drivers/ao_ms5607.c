@@ -178,9 +178,13 @@ ao_ms5607_get_sample(uint8_t cmd) {
 #endif
 
 	ao_ms5607_start();
-	memset(reply, 0, sizeof(reply));
 	reply[0] = AO_MS5607_ADC_READ;
-	ao_spi_duplex(&reply, &reply, 6, AO_MS5607_SPI_INDEX);
+#if defined(AO_SPI_DUPLEX) && AO_SPI_DUPLEX == 0
+	ao_spi_send(reply, 1, AO_MS5607_SPI_INDEX);
+	ao_spi_recv(reply+1, 3, AO_MS5607_SPI_INDEX);
+#else
+	ao_spi_duplex(&reply, &reply, 4, AO_MS5607_SPI_INDEX);
+#endif
 	ao_ms5607_stop();
 
 	return ((uint32_t) reply[1] << 16) | ((uint32_t) reply[2] << 8) | (uint32_t) reply[3];
