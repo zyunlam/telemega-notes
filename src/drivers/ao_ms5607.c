@@ -154,8 +154,7 @@ ao_ms5607_isr(void)
 
 static uint32_t
 ao_ms5607_get_sample(uint8_t cmd) {
-	uint8_t	reply[3];
-	uint8_t read;
+	uint8_t	reply[4];
 
 	ao_ms5607_done = 0;
 
@@ -179,12 +178,12 @@ ao_ms5607_get_sample(uint8_t cmd) {
 #endif
 
 	ao_ms5607_start();
-	read = AO_MS5607_ADC_READ;
-	ao_spi_send(&read, 1, AO_MS5607_SPI_INDEX);
-	ao_spi_recv(&reply, 3, AO_MS5607_SPI_INDEX);
+	memset(reply, 0, sizeof(reply));
+	reply[0] = AO_MS5607_ADC_READ;
+	ao_spi_duplex(&reply, &reply, 6, AO_MS5607_SPI_INDEX);
 	ao_ms5607_stop();
 
-	return ((uint32_t) reply[0] << 16) | ((uint32_t) reply[1] << 8) | (uint32_t) reply[2];
+	return ((uint32_t) reply[1] << 16) | ((uint32_t) reply[2] << 8) | (uint32_t) reply[3];
 }
 
 #ifndef AO_MS5607_BARO_OVERSAMPLE
