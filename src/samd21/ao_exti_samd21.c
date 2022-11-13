@@ -136,11 +136,13 @@ ao_exti_enable(struct samd21_port *port, uint8_t pin)
 	uint8_t		id = pin_id(port,pin);
 
 	ao_arch_block_interrupts();
-	samd21_eic.intenset = 1 << id;
 	/* configure gpio to interrupt routing */
-	ao_samd21_exti[id].pmux = samd21_port_pmux_get(port, pin);
-	ao_samd21_exti[id].pincfg = samd21_port_pincfg_get(port, pin);
+	if ((samd21_eic.intenset & (1 << id)) == 0) {
+		ao_samd21_exti[id].pmux = samd21_port_pmux_get(port, pin);
+		ao_samd21_exti[id].pincfg = samd21_port_pincfg_get(port, pin);
+	}
 	samd21_port_pmux_set(port, pin, SAMD21_PORT_PMUX_FUNC_A);
+	samd21_eic.intenset = 1 << id;
 	ao_arch_release_interrupts();
 }
 
