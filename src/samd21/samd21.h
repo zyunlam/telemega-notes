@@ -777,6 +777,16 @@ samd21_port_pmux_set(struct samd21_port *port, uint8_t pin, uint8_t func)
 			       (1 << SAMD21_PORT_PINCFG_PMUXEN));
 }
 
+static inline uint8_t
+samd21_port_pmux_get(struct samd21_port *port, uint8_t pin)
+{
+	uint8_t	byte = pin >> 1;
+	uint8_t bit = (pin & 1) << 2;
+	uint8_t mask = 0xf << bit;
+	uint8_t value = (uint8_t) ((port->pmux[byte] & mask) >> bit);
+	return value;
+}
+
 static inline void
 samd21_port_pmux_clr(struct samd21_port *port, uint8_t pin)
 {
