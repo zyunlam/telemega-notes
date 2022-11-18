@@ -6,6 +6,12 @@
 	unit, which early customers (before this manual was even written)
 	reported were sufficient to successfully use the system.
 
+	[WARNING]
+	The siren used on TeleFire boxes is intended to be heard at a distance
+	outdoors.  We strongly recommend that you do NOT test the system on
+	your kitchen counter when your significant other has a cup of hot
+	coffee in hand nearby!
+
 	The remainder of this section assumes the system has already been
 	properly configured with callsign, AES key, and bank numbers for each
 	TeleFire box.
