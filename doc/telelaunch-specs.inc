@@ -15,7 +15,9 @@
 
 	TeleFire uses an internal sealed lead-acid 12V battery, which is
 	charged by an external charger attached through the PowerPole
-	connector on the rear panel.
+	connector on the rear panel.  These connectors were chosen because
+	they are an link:https://www.qsl.net/w2vtm/powerpole.html[ARES/RACES]
+	standard for 12 volt DC power distribution.
 
 	Pyro initiation uses the 12V sealed lead-acid battery.  Current
 	to any pad can exceed 30A, and with typical igniters every pad on
