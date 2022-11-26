@@ -119,7 +119,7 @@ These are Bdale's notes on how to do a release.
 	   src/teledongle-v3.0/{*.elf,*.ihx,*.map} \
 	   src/telegps-v[1-2].0/{*.elf,*.ihx,*.map} \
 	   src/telemega-v[1-5].0/{*.elf,*.ihx,*.map} \
-	   src/telemetrum-v[2-3].0/{*.elf,*.ihx,*.map} \
+	   src/telemetrum-v[2-4].0/{*.elf,*.ihx,*.map} \
 	   src/telemini-v3.0/{*.elf,*.ihx,*.map} \
 	   src/telelco-v2.0/{*.elf,*.ihx,*.map} \
 	   src/telefireeight-v[1-2].0/{*.elf,*.ihx,*.map} \
@@ -133,7 +133,7 @@ These are Bdale's notes on how to do a release.
 	   src/teledongle-v3.0/flash-loader/*.elf \
 	   src/telegps-v[1-2].0/flash-loader/{*.elf,*.bin,*.map} \
 	   src/telemega-v[1-5].0/flash-loader/*.elf \
-	   src/telemetrum-v[2-3].0/flash-loader/*.elf \
+	   src/telemetrum-v[2-4].0/flash-loader/*.elf \
 	   src/telemini-v3.0/flash-loader/{*.elf,*.bin,*.map} \
 	   src/telelco-v2.0/flash-loader/*.elf \
 	   src/telefireeight-v[1-2].0/flash-loader/*.elf \

@@ -178,49 +178,9 @@ struct ao_adc {
 #define AO_RN_SW_BTN_PORT	(&stm_gpioc)
 #define AO_RN_SW_BTN_PIN	14
 
-/* Pin 9. BM70 P2_3 */
-#define AO_RN_WAKEUP_PORT	(&stm_gpiob)
-#define AO_RN_WAKEUP_PIN	9
-
-/* Pin 11. BM70 P2_7/tx_ind. Status indication along with P1_5 */
-#define AO_RN_P0_4_PORT		(&stm_gpioc)
-#define AO_RN_P0_4_PIN		13
-
-/* Pin 12. BM70 P1_1. Status indication along with P0_4 */
+/* Pin 12. BM70 P1_5. Status indication along with P0_4 */
 #define AO_RN_P1_5_PORT		(&stm_gpiob)
 #define AO_RN_P1_5_PIN		6
-
-/* Pin 13. BM70 P1_2. Also I2C SCL */
-#define AO_RN_P1_2_PORT		(&stm_gpiob)
-#define AO_RN_P1_2_PIN		7
-
-/* Pin 14. BM70 P1_3. Also I2C SDA */
-#define AO_RN_P1_3_PORT		(&stm_gpiob)
-#define AO_RN_P1_3_PIN		8
-
-/* Pin 15. BM70 P0_0/cts. */
-#define AO_RN_CTS_PORT		(&stm_gpioa)
-#define AO_RN_CTS_PIN		1
-
-/* Pin 16. BM70 P1_0. */
-#define AO_RN_P0_5_PORT		(&stm_gpiob)
-#define AO_RN_P0_5_PIN		5
-
-/* Pin 17. BM70 P3_6. */
-#define AO_RN_RTS_PORT		(&stm_gpioa)
-#define AO_RN_RTS_PIN		0
-
-/* Pin 18. BM70 P2_0. */
-#define AO_RN_P2_0_PORT		(&stm_gpiob)
-#define AO_RN_P2_0_PIN		3
-
-/* Pin 19. BM70 P2_4. */
-#define AO_RN_P2_4_PORT		(&stm_gpioa)
-#define AO_RN_P2_4_PIN		10
-
-/* Pin 20. BM70 NC. */
-#define AO_RN_EAN_PORT
-#define AO_RN_EAN_PIN
 
 /* Pin 21. BM70 RST_N. */
 #define AO_RN_RST_N_PORT	(&stm_gpioa)
@@ -237,22 +197,6 @@ struct ao_adc {
 /* Pin 24. BM70 P3_1/RSSI_IND. */
 #define AO_RN_P3_1_PORT		(&stm_gpiob)
 #define AO_RN_P3_1_PIN		2
-
-/* Pin 25. BM70 P3_2/LINK_DROP. */
-#define AO_RN_P3_2_PORT		(&stm_gpioa)
-#define AO_RN_P3_2_PIN		8
-
-/* Pin 26. BM70 P3_3/UART_RX_IND. */
-#define AO_RN_P3_3_PORT		(&stm_gpiob)
-#define AO_RN_P3_3_PIN		15
-
-/* Pin 27. BM70 P3_4/PAIRING_KEY. */
-#define AO_RN_P3_4_PORT		(&stm_gpiob)
-#define AO_RN_P3_4_PIN		14
-
-/* Pin 28. BM70 P3_5. */
-#define AO_RN_P3_6_PORT		(&stm_gpiob)
-#define AO_RN_P3_6_PIN		13
 
 /* Pin 29. BM70 P0_7. */
 #define AO_RN_P3_7_PORT		(&stm_gpiob)

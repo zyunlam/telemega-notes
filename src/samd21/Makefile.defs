@@ -1,0 +1,11 @@
+ifndef TOPDIR
+TOPDIR=..
+endif
+
+include $(TOPDIR)/samd21/Makefile-samd21.defs
+
+SAMD21_LINKER_SCRIPT=altos-$(SAMD21_ROM)-$(SAMD21_RAM).ld 
+
+LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/samd21 -T$(SAMD21_LINKER_SCRIPT) -n
+
+.DEFAULT_GOAL=all

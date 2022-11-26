@@ -182,6 +182,12 @@ public class AltosIdleFetch implements AltosDataProvider {
 			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_sensor_metrum),
 
+		new AltosIdler("TeleMetrum-v4",
+			       AltosIdler.idle_gps,
+			       AltosIdler.idle_adxl375,
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_sensor_metrum),
+
 		new AltosIdler("TeleMega-v0",
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_mma655x,

@@ -65,6 +65,8 @@ ao_spi_recv_bus(void *block, uint16_t len);
 #define ao_spi_send(block, len, bus) ao_spi_send_bus(block, len)
 #define ao_spi_recv(block, len, bus) ao_spi_recv_bus(block, len)
 
+#define AO_SPI_DUPLEX	0
+
 void
 ao_spi_init(void);
 

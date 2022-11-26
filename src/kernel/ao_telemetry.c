@@ -58,7 +58,7 @@ static AO_TICK_TYPE ao_aprs_time;
 #define AO_SEND_MEGA	1
 #endif
 
-#if defined (TELEMETRUM_V_2_0) || defined (TELEMETRUM_V_3_0)
+#if defined (TELEMETRUM_V_2_0) || defined (TELEMETRUM_V_3_0) || defined (TELEMETRUM_V_4_0)
 #define AO_SEND_METRUM	1
 #endif
 
@@ -490,7 +490,10 @@ ao_set_aprs_time(void)
 		} else {
 			delta = second - ao_gps_data.second;
 		}
-		ao_aprs_time = ao_gps_tick + AO_SEC_TO_TICKS(delta);
+		if (delta < (interval >> 1))
+			delta += interval;
+
+		ao_aprs_time = ao_gps_utc_tick + AO_SEC_TO_TICKS(delta);
 	} else {
 		ao_aprs_time += AO_SEC_TO_TICKS(ao_config.aprs_interval);
 	}
