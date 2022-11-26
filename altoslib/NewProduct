@@ -50,3 +50,15 @@ altosuilib/
  1. AltosUSBDevice.java
 
 	Add new product ID as appropriate to matchProduct
+
+ao-tools/lib/
+
+ 1. ao-eeprom-read.h
+
+	Add new log file format as appropriate
+
+ao-tools/ao-eeprom/
+
+ 1. ao-eeprom.c
+
+	Parse new log file contents
