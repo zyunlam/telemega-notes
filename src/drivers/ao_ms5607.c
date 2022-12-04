@@ -169,7 +169,10 @@ ao_ms5607_get_sample(uint8_t cmd) {
 	ao_arch_block_interrupts();
 	while (!ao_gpio_get(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN) &&
 	       !ao_ms5607_done)
-		ao_sleep((void *) &ao_ms5607_done);
+	{
+		if (ao_sleep_for((void *) &ao_ms5607_done, AO_MS_TO_TICKS(10)))
+			break;
+	}
 	ao_arch_release_interrupts();
 #if AO_MS5607_PRIVATE_PINS
 	ao_gpio_set(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, 1);
