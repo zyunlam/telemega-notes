@@ -168,6 +168,7 @@ ao_report_number(int32_t n)
 	while (i != 0);
 }
 
+#ifdef HAS_BARO
 static void
 ao_report_altitude(void)
 {
@@ -180,6 +181,7 @@ ao_report_altitude(void)
 	}
 	ao_report_number(max_h);
 }
+#endif
 
 #if HAS_BATTERY_REPORT
 static void
@@ -276,7 +278,9 @@ ao_report(void)
 #endif
 
 		if (ao_report_state == ao_flight_landed) {
+#if HAS_BARO
 			ao_report_altitude();
+#endif
 #if HAS_FLIGHT
 			ao_delay(AO_SEC_TO_TICKS(5));
 			continue;

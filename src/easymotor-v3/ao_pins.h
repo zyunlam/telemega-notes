@@ -90,10 +90,6 @@
 
 #define AO_DATA_RING		32
 
-struct ao_adc {
-	int16_t			v_batt;
-	int16_t			motor_pressure;
-};
 
 #define AO_ADC_DUMP(p) \
 	printf("tick: %5lu batt: %5d motor_pressure: %5d\n", \
@@ -152,10 +148,42 @@ struct ao_adc {
 #define HAS_IMU			1
 #define USE_ADXL375_IMU		1
 
+#define HAS_KALMAN		0
+
 /* Motor pressure */
 #define HAS_MOTOR_PRESSURE	1
 #define ao_data_motor_pressure(packet) ((packet)->adc.motor_pressure)
 
 typedef int16_t	motor_pressure_t;
+
+/* want about 50psi, or 344kPa */
+
+#define AO_FULL_SCALE_PRESSURE		11031612	/* 1600psi */
+#define AO_BOOST_DETECT_PRESSURE	344000		/* 50psi */
+#define AO_QUIET_DETECT_PRESSURE	207000		/* 30psi */
+
+static inline int16_t ao_delta_pressure_to_adc(uint32_t pressure)
+{
+	static const double volts_base = 0.5;
+	static const double volts_max = 4.5;
+
+	double	volts = (double) pressure / AO_FULL_SCALE_PRESSURE * (volts_max - volts_base);
+	double	adc_volts = volts * 10.0/15.6;	/* voltage divider in front of the ADC input */
+	if (adc_volts > 1.0)
+		adc_volts = 1.0;
+	double	adc = adc_volts * 32767.0;
+
+	if (adc < 0)
+		adc = 0;
+	return (int16_t) adc;
+}
+
+#define AO_BOOST_DETECT			ao_delta_pressure_to_adc(AO_BOOST_DETECT_PRESSURE)
+#define AO_QUIET_DETECT			ao_delta_pressure_to_adc(AO_QUIET_DETECT_PRESSURE)
+
+struct ao_adc {
+	int16_t			v_batt;
+	int16_t			motor_pressure;
+};
 
 #endif /* _AO_PINS_H_ */

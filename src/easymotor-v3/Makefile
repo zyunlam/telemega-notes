@@ -28,8 +28,7 @@ ALTOS_SRC = \
 	ao_stdio.c \
 	ao_storage.c \
 	ao_report.c \
-	ao_flight.c \
-	ao_kalman.c \
+	ao_motor_flight.c \
 	ao_sample.c \
 	ao_data.c \
 	ao_convert_volt.c \
