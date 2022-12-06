@@ -148,7 +148,6 @@ static void
 ao_ms5607_isr(void)
 {
 	ao_exti_disable(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN);
-	ao_ms5607_done = 1;
 	ao_wakeup((void *) &ao_ms5607_done);
 }
 
@@ -156,26 +155,27 @@ static uint32_t
 ao_ms5607_get_sample(uint8_t cmd) {
 	uint8_t	reply[4];
 
-	ao_ms5607_done = 0;
-
 	ao_ms5607_start();
-	ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
 
 	ao_exti_enable(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN);
 
+	ao_spi_send(&cmd, 1, AO_MS5607_SPI_INDEX);
+
 #if AO_MS5607_PRIVATE_PINS
-	ao_spi_put(AO_MS5607_SPI_INDEX);
+	ao_spi_put_pins(AO_MS5607_SPI_INDEX);
 #endif
 	ao_arch_block_interrupts();
-	while (!ao_gpio_get(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN) &&
-	       !ao_ms5607_done)
-	{
+#if !HAS_TASK
+#define ao_sleep_for(a,t) ao_sleep(a)
+#endif
+	while (!ao_gpio_get(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN)) {
 		if (ao_sleep_for((void *) &ao_ms5607_done, AO_MS_TO_TICKS(10)))
 			break;
 	}
+	ao_exti_disable(AO_MS5607_MISO_PORT, AO_MS5607_MISO_PIN);
 	ao_arch_release_interrupts();
 #if AO_MS5607_PRIVATE_PINS
-	ao_gpio_set(AO_MS5607_CS_PORT, AO_MS5607_CS_PIN, 1);
+	ao_spi_clr_cs(AO_MS5607_CS_PORT, 1 << (AO_MS5607_CS_PIN));
 #else
 	ao_ms5607_stop();
 #endif
