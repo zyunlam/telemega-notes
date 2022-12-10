@@ -146,7 +146,7 @@ ao_adc_dump(void)
 #ifdef AO_ADC_DUMP
 	AO_ADC_DUMP(&packet);
 #else
-	printf("tick: %5u",  packet.tick);
+	printf("tick: %5lu",  packet.tick);
 	d = (int16_t *) (&packet.adc);
 	for (i = 0; i < AO_ADC_NUM; i++)
 		printf (" %2d: %5d", i, d[i]);
