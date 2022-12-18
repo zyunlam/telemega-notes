@@ -22,11 +22,13 @@ ALTOS_SRC = \
 	ao_romconfig.c \
 	ao_product.c \
 	ao_panic.c \
+	ao_mutex.c \
 	ao_led_lpc.c \
 	ao_task.c \
 	ao_cmd.c \
 	ao_timer_lpc.c \
 	ao_serial_lpc.c \
+	ao_i2c_lpc.c \
 	ao_usb_lpc.c \
 	ao_exti_lpc.c \
 	ao_stdio.c
@@ -46,7 +48,7 @@ BOTH_HEX=$(PROGNAME)-combined-$(VERSION).ihx
 SRC=$(ALTOS_SRC) ao_demo.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG)
+all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
@@ -65,3 +67,5 @@ clean:
 install:
 
 uninstall:
+
+FRC:

@@ -640,6 +640,62 @@ extern struct lpc_scb lpc_scb;
 #define LPC_SCB_PDRUNCFG_USBPLL_PD	8
 #define LPC_SCB_PDRUNCFG_USBPAD_PD	10
 
+struct lpc_i2c {
+	vuint32_t	conset;
+	vuint32_t	stat;
+	vuint32_t	dat;
+	vuint32_t	adr0;
+
+	vuint32_t	sclh;
+	vuint32_t	scll;
+	vuint32_t	conclr;
+	vuint32_t	mmctrl;
+
+	vuint32_t	adr[3];
+	vuint32_t	data_buffer;
+
+	vuint32_t	mask[4];
+};
+
+extern struct lpc_i2c lpc_i2c;
+
+#define lpc_i2c (*(struct lpc_i2c *) 0x40000000)
+
+#define LPC_I2C_CONSET_AA	2
+#define LPC_I2C_CONSET_SI	3
+#define LPC_I2C_CONSET_STO	4
+#define LPC_I2C_CONSET_STA	5
+#define LPC_I2C_CONSET_I2EN	6
+
+/* master status values */
+#define LPC_I2C_STAT_ERROR		0x00
+#define LPC_I2C_STAT_START		0x08
+#define LPC_I2C_STAT_REPEAT_START	0x10
+#define LPC_I2C_STAT_TX_START_ACK	0x18
+#define LPC_I2C_STAT_TX_START_NACK	0x20
+#define LPC_I2C_STAT_TX_ACK		0x28
+#define LPC_I2C_STAT_TX_NACK		0x30
+#define LPC_I2C_STAT_TX_ARB_LOST	0x38
+#define LPC_I2C_STAT_RX_START_ACK	0x40
+#define LPC_I2C_STAT_RX_START_NACK	0x48
+#define LPC_I2C_STAT_RX_ACK		0x50
+#define LPC_I2C_STAT_RX_NACK		0x58
+
+
+#define LPC_I2C_ADR_GC		0
+#define LPC_I2C_ADR_ADDRESS	1
+
+#define LPC_I2C_CONCLR_AAC	2
+#define LPC_I2C_CONCLR_SIC	3
+#define LPC_I2C_CONCLR_STAC	5
+#define LPC_I2C_CONCLR_I2ENC	6
+
+#define LPC_I2C_MMCTRL_MM_ENA	0
+#define LPC_I2C_MMCTRL_ENA_SCL	1
+#define LPC_I2C_MMCTRL_MATCH_ALL	2
+
+#define LPC_I2C_MASK_MASK	1
+
 struct lpc_flash {
 	uint32_t	r0[4];		/* 0x0 */
 

@@ -16,6 +16,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
+#define IS_FLASH_LOADER	0
+
+#define HAS_LED		1
+
 #define HAS_BEEP	0
 
 #define IS_FLASH_LOADER	0

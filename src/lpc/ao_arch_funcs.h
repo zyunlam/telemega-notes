@@ -184,6 +184,12 @@ static inline void ao_arch_restore_stack(void) {
 	} while (0)
 
 /*
+ * I2C
+ */
+
+#include <ao_i2c.h>
+
+/*
  * SPI
  */
 

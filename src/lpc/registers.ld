@@ -1,5 +1,6 @@
 lpc_usb_sram	= 0x20004000;
 lpc_usb_endpoint = 0x20004700;
+lpc_i2c		= 0x40000000;
 lpc_usart	= 0x40008000;
 lpc_ct16b0	= 0x4000c000;
 lpc_ct16b1	= 0x40010000;

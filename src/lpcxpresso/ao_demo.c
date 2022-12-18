@@ -19,6 +19,21 @@
 #include <ao.h>
 #include <ao_exti.h>
 #include <ao_i2c.h>
+#include <ao_i2c.h>
+
+static void
+ao_i2c_test(void)
+{
+	ao_i2c_get(0);
+	ao_i2c_start(0, 0x44);
+	ao_i2c_send("hello", 5, 0, 1);
+	ao_i2c_put(0);
+}
+
+const struct ao_cmds ao_test_cmds[] = {
+	{ ao_i2c_test,	"s \0Send some bytes over i2c" },
+	{ 0, NULL },
+};
 
 int
 main(void)
@@ -35,6 +50,6 @@ main(void)
 	ao_serial_init();
 	ao_i2c_init();
 	ao_cmd_init();
-
+	ao_cmd_register(ao_test_cmds);
 	ao_start_scheduler();
 }
