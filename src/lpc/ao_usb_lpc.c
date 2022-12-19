@@ -24,6 +24,15 @@
 #define USE_USB_STDIO	1
 #endif
 
+#ifdef HAS_USB_PULLUP_INVERT
+#define USB_CONNECT_VAL		0
+#define USB_DISCONNECT_VAL	1
+#else
+#define USB_CONNECT_VAL		1
+#define USB_DISCONNECT_VAL	0
+#endif
+
+
 #if USE_USB_STDIO
 #define AO_USB_OUT_SLEEP_ADDR	(&ao_stdin_ready)
 #else
@@ -855,7 +864,7 @@ ao_usb_disable(void)
 	ao_arch_block_interrupts();
 
 #if HAS_USB_PULLUP
-	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, 0);
+	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, USB_DISCONNECT_VAL);
 #endif
 	/* Disable interrupts */
 	lpc_usb.inten = 0;
@@ -973,7 +982,7 @@ ao_usb_enable(void)
 	ao_usb_set_ep0();
 
 #if HAS_USB_PULLUP
-	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, 1);
+	ao_gpio_set(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, USB_CONNECT_VAL);
 #endif
 }
 
@@ -1012,7 +1021,7 @@ ao_usb_init(void)
 {
 #if HAS_USB_PULLUP
 	int	i;
-	ao_enable_output(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, 0);
+	ao_enable_output(AO_USB_PULLUP_PORT, AO_USB_PULLUP_PIN, USB_DISCONNECT_VAL);
 
 	for (i = 0; i < 40000; i++)
 		ao_arch_nop();
