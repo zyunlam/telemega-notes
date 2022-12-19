@@ -47,10 +47,42 @@ _ao_i2c_get_byte(void)
 	}
 }
 
+struct lpc_stat {
+	const char 	*where;
+	uint8_t		stat;
+};
+
+#define NHISTORY	128
+static struct lpc_stat	stat_history[NHISTORY];
+static int		stat_count;
+
+static uint8_t
+lpc_i2c_stat(const char *where)
+{
+	uint8_t stat = (uint8_t) lpc_i2c.stat;
+	if (stat_count < NHISTORY) {
+		stat_history[stat_count].where = where;
+		stat_history[stat_count].stat = stat;
+		stat_count++;
+	}
+	return stat;
+}
+
+static void
+lpc_i2c_dump(void)
+{
+	int i;
+
+	for (i = 0; i < stat_count; i++) {
+		printf("0x%02x %s\n", stat_history[i].stat, stat_history[i].where);
+	}
+	stat_count = 0;
+}
+
 void
 lpc_i2c_isr(void)
 {
-	switch (lpc_i2c.stat) {
+	switch (lpc_i2c_stat("isr")) {
 	case LPC_I2C_STAT_ERROR:
 		lpc_i2c.conset = ((1 << LPC_I2C_CONSET_STO) |
 				  (1 << LPC_I2C_CONSET_AA));
@@ -107,6 +139,8 @@ ao_i2c_get(uint8_t index)
 	(void) index;
 	ao_mutex_get(&ao_i2c_mutex);
 	lpc_i2c.conset = (1 << LPC_I2C_CONSET_I2EN);
+	lpc_i2c.sclh = 0xff;
+	lpc_i2c.scll = 0xff;
 }
 
 void
@@ -124,6 +158,7 @@ ao_i2c_start(uint8_t index, uint16_t addr)
 
 	(void) index;
 	ao_arch_block_interrupts();
+	(void) lpc_i2c_stat("start");
 	i2c_send = &a;
 	i2c_send_len = 1;
 	i2c_stop = 0;
@@ -139,13 +174,17 @@ ao_i2c_send(const void *block, uint16_t len, uint8_t index, uint8_t stop)
 {
 	(void) index;
 	ao_arch_block_interrupts();
+	(void) lpc_i2c_stat("send");
 	i2c_send = block;
 	i2c_send_len = len;
 	i2c_stop = stop;
 	_ao_i2c_put_byte();
-	while (i2c_send_len)
-		ao_sleep(&i2c_send_len);
+	while (i2c_send_len) {
+		if (ao_sleep_for(&i2c_send_len, AO_SEC_TO_TICKS(2)))
+			break;
+	}
 	ao_arch_release_interrupts();
+	lpc_i2c_dump();
 	return 0;
 }
 
@@ -179,4 +218,8 @@ ao_i2c_init(void)
 	/* Reset the device */
 	lpc_scb.presetctrl &= ~(1UL << LPC_SCB_PRESETCTRL_I2C_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_I2C_RST_N);
+
+	/* Enable interrupts */
+	lpc_nvic_set_enable(LPC_ISR_I2C_POS);
+	lpc_nvic_set_priority(LPC_ISR_I2C_POS, 0);
 }
