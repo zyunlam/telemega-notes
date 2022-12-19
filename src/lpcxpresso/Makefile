@@ -18,6 +18,7 @@ INC = \
 #
 ALTOS_SRC = \
 	ao_interrupt.c \
+	ao_boot_chain.c \
 	ao_romconfig.c \
 	ao_product.c \
 	ao_panic.c \
@@ -27,6 +28,7 @@ ALTOS_SRC = \
 	ao_timer_lpc.c \
 	ao_serial_lpc.c \
 	ao_usb_lpc.c \
+	ao_exti_lpc.c \
 	ao_stdio.c
 
 PRODUCT=LpcDemo-v0.0
@@ -35,20 +37,19 @@ IDPRODUCT=0x000a
 
 CFLAGS = $(PRODUCT_DEF) $(LPC_CFLAGS)
 
-PROG=lpc-demo.elf
+PROGNAME=lpcxpresso
+PROG=$(PROGNAME)-$(VERSION).elf
+HEX=$(PROGNAME)-$(VERSION).ihx
+FLASH_PROG=flash-loader/$(PROGNAME)-altos-flash-$(VERSION).elf
+BOTH_HEX=$(PROGNAME)-combined-$(VERSION).ihx
 
 SRC=$(ALTOS_SRC) ao_demo.c
 OBJ=$(SRC:.c=.o)
 
 all: $(PROG)
 
-LDFLAGS=-L../lpc -Wl,-Taltos.ld
-
-$(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
+$(PROG): Makefile $(OBJ) altos.ld
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 
@@ -58,7 +59,7 @@ load: $(PROG)
 distclean:	clean
 
 clean:
-	rm -f *.o $(PROG)
+	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx $(PROGNAME)-*.map
 	rm -f ao_product.h
 
 install:

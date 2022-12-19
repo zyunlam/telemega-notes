@@ -17,32 +17,24 @@
  */
 
 #include <ao.h>
-#include <ao_usb.h>
+#include <ao_exti.h>
+#include <ao_i2c.h>
 
 int
 main(void)
 {
-	int	i;
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 	ao_led_on(AO_LED_RED);
+
 	ao_clock_init();
-	ao_timer_init();
-	
-	ao_serial_init();
-	ao_usb_init();
-	ao_cmd_init();
 	ao_task_init();
+	ao_timer_init();
+	ao_exti_init();
+
+	ao_usb_init();
+	ao_serial_init();
+	ao_i2c_init();
+	ao_cmd_init();
 
 	ao_start_scheduler();
-
-	for (;;) {
-		ao_led_off(AO_LED_RED);
-		for (;;)
-			if (ao_tick_count & 1)
-				break;
-		ao_led_on(AO_LED_RED);
-		for (;;)
-			if (!(ao_tick_count & 1))
-				break;
-	}
 }
