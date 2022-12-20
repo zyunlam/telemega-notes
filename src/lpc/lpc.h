@@ -687,6 +687,7 @@ extern struct lpc_i2c lpc_i2c;
 
 #define LPC_I2C_CONCLR_AAC	2
 #define LPC_I2C_CONCLR_SIC	3
+#define LPC_I2C_CONCLR_STOC	4
 #define LPC_I2C_CONCLR_STAC	5
 #define LPC_I2C_CONCLR_I2ENC	6
 

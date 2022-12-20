@@ -24,10 +24,29 @@
 static void
 ao_i2c_test(void)
 {
+	uint8_t	reg[2] = { 0, 0 };
+	uint8_t	val[1];
+	unsigned i = 0x0;
+	unsigned j;
+	uint8_t success;
+
+	i = ao_cmd_hex();
+	if (ao_cmd_status == ao_cmd_lex_error) {
+		i = 0;
+		ao_cmd_status = ao_cmd_success;
+	}
+	reg[0] = (uint8_t) (i >> 8);
+	reg[1] = (uint8_t) i;
 	ao_i2c_get(0);
-	ao_i2c_start(0, 0x44);
-	ao_i2c_send("hello", 5, 0, 1);
+	ao_i2c_start(0, 0x29<<1);
+	success = ao_i2c_send(&reg, 2, 0, 0) && ao_i2c_recv(val, sizeof(val), 0, 1);
 	ao_i2c_put(0);
+	if (!success) {
+		printf("i2c transaction failed\n");
+		return;
+	}
+	for (j = 0; j < sizeof(val); j++)
+		printf("reg 0x%04x = 0x%02x\n", i+j, val[j]);
 }
 
 const struct ao_cmds ao_test_cmds[] = {

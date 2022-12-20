@@ -59,34 +59,6 @@
 #define ao_arch_block_interrupts()	asm("cpsid i")
 #define ao_arch_release_interrupts()	asm("cpsie i")
 
-/*
- * For now, we're running at a weird frequency
- */
-
-#if AO_HSE
-#define AO_PLLSRC	AO_HSE
-#else
-#define AO_PLLSRC	STM_HSI_FREQ
-#endif
-
-#define AO_PLLVCO	(AO_PLLSRC * AO_PLLMUL)
-#define AO_SYSCLK	(AO_PLLVCO / AO_PLLDIV)
-#define AO_HCLK		(AO_SYSCLK / AO_AHB_PRESCALER)
-#define AO_PCLK1	(AO_HCLK / AO_APB1_PRESCALER)
-#define AO_PCLK2	(AO_HCLK / AO_APB2_PRESCALER)
-
-#if AO_APB1_PRESCALER == 1
-#define AO_TIM23467_CLK		AO_PCLK1
-#else
-#define AO_TIM23467_CLK		(2 * AO_PCLK1)
-#endif
-
-#if AO_APB2_PRESCALER == 1
-#define AO_TIM91011_CLK		AO_PCLK2
-#else
-#define AO_TIM91011_CLK		(2 * AO_PCLK2)
-#endif
-
 #define AO_LPC_NVIC_HIGH_PRIORITY	0
 #define AO_LPC_NVIC_CLOCK_PRIORITY	1
 #define AO_LPC_NVIC_MED_PRIORITY	2

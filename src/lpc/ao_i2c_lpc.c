@@ -18,38 +18,42 @@
 
 #include <ao.h>
 
+#define AO_I2C_CLK	AO_LPC_SYSCLK
+
+//#define LPC_I2C_DEBUG
+
+/* Use 400kHz by default */
+#ifndef I2C_FAST
+#define I2C_FAST	1
+#endif
+
+#if I2C_FAST
+#define I2C_TIME	1250	/* ns per phase, 400kHz clock */
+#else
+#define I2C_TIME	5000	/* ns per phase, 100kHz clock */
+#endif
+
+#define I2C_DUTY	((I2C_TIME * (AO_I2C_CLK / 1000)) / 1000000)
+
 static uint8_t ao_i2c_mutex;
 
+static uint8_t		i2c_addr;
 static const uint8_t	*i2c_send;
 static uint16_t		i2c_send_len;
 static uint8_t		*i2c_recv;
 static uint16_t		i2c_recv_len;
 static uint8_t		i2c_stop;
 static uint8_t		i2c_error;
+static uint8_t		i2c_done;
 
-static void
-_ao_i2c_put_byte(void)
-{
-	lpc_i2c.dat = *i2c_send++;
-	lpc_i2c.conset = (1 << LPC_I2C_CONSET_AA);
-}
-
-static void
-_ao_i2c_get_byte(void)
-{
-	*i2c_recv++ = (uint8_t) lpc_i2c.dat;
-	i2c_recv_len--;
-	if (i2c_recv_len == 0) {
-		lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_AAC);
-		ao_wakeup(&i2c_recv_len);
-	} else {
-		lpc_i2c.conset = (1 << LPC_I2C_CONSET_AA);
-	}
-}
-
+#ifdef LPC_I2C_DEBUG
 struct lpc_stat {
 	const char 	*where;
 	uint8_t		stat;
+	uint8_t		i2c_con;
+	uint8_t		i2c_addr;
+	uint16_t	i2c_send_len;
+	uint16_t	i2c_recv_len;
 };
 
 #define NHISTORY	128
@@ -63,6 +67,10 @@ lpc_i2c_stat(const char *where)
 	if (stat_count < NHISTORY) {
 		stat_history[stat_count].where = where;
 		stat_history[stat_count].stat = stat;
+		stat_history[stat_count].i2c_con = (uint8_t) lpc_i2c.conset;
+		stat_history[stat_count].i2c_addr = i2c_addr;
+		stat_history[stat_count].i2c_send_len = i2c_send_len;
+		stat_history[stat_count].i2c_recv_len = i2c_recv_len;
 		stat_count++;
 	}
 	return stat;
@@ -74,9 +82,39 @@ lpc_i2c_dump(void)
 	int i;
 
 	for (i = 0; i < stat_count; i++) {
-		printf("0x%02x %s\n", stat_history[i].stat, stat_history[i].where);
+		printf("0x%02x c(%02x) a(%02x) s(%d) r(%d) %s\n",
+		       stat_history[i].stat,
+		       stat_history[i].i2c_con,
+		       stat_history[i].i2c_addr,
+		       stat_history[i].i2c_send_len,
+		       stat_history[i].i2c_recv_len,
+		       stat_history[i].where);
 	}
 	stat_count = 0;
+}
+#else
+#define lpc_i2c_stat(x) lpc_i2c.stat
+#define lpc_i2c_dump()	do {} while(0)
+#endif
+
+static void
+lpc_i2c_error(void)
+{
+	lpc_i2c.conclr = ((1 << LPC_I2C_CONCLR_STAC) |
+			  (1 << LPC_I2C_CONCLR_SIC));
+	lpc_i2c.conset = (1 << LPC_I2C_CONSET_STO);
+	i2c_error = 1;
+	ao_wakeup(&i2c_done);
+}
+
+static void
+lpc_i2c_set_ack(void)
+{
+	/* if more than one byte to go, enable ack, else disable ack */
+	if (i2c_recv_len > 1)
+		lpc_i2c.conset = (1 << LPC_I2C_CONSET_AA);
+	else
+		lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_AAC);
 }
 
 void
@@ -84,53 +122,67 @@ lpc_i2c_isr(void)
 {
 	switch (lpc_i2c_stat("isr")) {
 	case LPC_I2C_STAT_ERROR:
-		lpc_i2c.conset = ((1 << LPC_I2C_CONSET_STO) |
-				  (1 << LPC_I2C_CONSET_AA));
+		lpc_i2c_error();
 		break;
 	case LPC_I2C_STAT_START:
 	case LPC_I2C_STAT_REPEAT_START:
-		i2c_error = 0;
-		/* fall through ... */
+		lpc_i2c.dat = i2c_addr;
+		lpc_i2c.conclr = ((1 << LPC_I2C_CONCLR_STAC) |
+				  (1 << LPC_I2C_CONCLR_SIC));
+		break;
 	case LPC_I2C_STAT_TX_START_ACK:
 	case LPC_I2C_STAT_TX_ACK:
-		--i2c_send_len;
 		if (i2c_send_len) {
-			_ao_i2c_put_byte();
+			lpc_i2c_stat("dout");
+			lpc_i2c.dat = *i2c_send++;
+			i2c_send_len--;
+			lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_SIC);
 		} else {
-			if (i2c_stop)
-				lpc_i2c.conset =(1 << LPC_I2C_CONSET_STO);
-			ao_wakeup(&i2c_send_len);
+			lpc_i2c_stat("dend");
+			if (i2c_stop) {
+				lpc_i2c.conset = (1 << LPC_I2C_CONSET_STO);
+				lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_SIC);
+			}
+			i2c_done = 1;
+			/*
+			 * Need to disable interrupts as the IRQ will
+			 * remain asserted until we clear it, and we
+			 * can't clear it if we're going to restart as
+			 * that will not generate a restart event
+			 */
+			lpc_nvic_clear_enable(LPC_ISR_I2C_POS);
+			ao_wakeup(&i2c_done);
 		}
 		break;
+	case LPC_I2C_STAT_RX_START_NACK:
 	case LPC_I2C_STAT_TX_START_NACK:
 	case LPC_I2C_STAT_TX_NACK:
-		lpc_i2c.conset = ((1 << LPC_I2C_CONSET_AA) |
-				  (1 << LPC_I2C_CONSET_STO));
-		i2c_send_len = 0;
-		i2c_error = 1;
-		ao_wakeup(&i2c_send_len);
-		break;
 	case LPC_I2C_STAT_TX_ARB_LOST:
-		lpc_i2c.conset =((1 << LPC_I2C_CONSET_AA)|
-				 (1 << LPC_I2C_CONSET_STA));
+		lpc_i2c_error();
 		break;
 	case LPC_I2C_STAT_RX_START_ACK:
-		lpc_i2c.conset = (1 << LPC_I2C_CONSET_AA);
+		lpc_i2c_set_ack();
+		lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_SIC);
 		break;
-	case LPC_I2C_STAT_RX_START_NACK:
 	case LPC_I2C_STAT_RX_NACK:
-		lpc_i2c.conset = ((1 << LPC_I2C_CONSET_AA) |
-				  (1 << LPC_I2C_CONSET_STO));
-		i2c_recv_len = 0;
-		i2c_error = 1;
-		ao_wakeup(&i2c_recv_len);
-		break;
+		/* fall through */
 	case LPC_I2C_STAT_RX_ACK:
-		if (i2c_recv_len)
-			_ao_i2c_get_byte();
+		if (i2c_recv_len) {
+			*i2c_recv++ = (uint8_t) lpc_i2c.dat;
+			i2c_recv_len--;
+			lpc_i2c_set_ack();
+			if (i2c_recv_len == 0) {
+				if (i2c_stop) {
+					lpc_i2c.conset = (1 << LPC_I2C_CONSET_STO);
+					lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_SIC);
+				}
+				i2c_done = 1;
+				lpc_nvic_clear_enable(LPC_ISR_I2C_POS);
+				ao_wakeup(&i2c_done);
+			}
+		}
 		break;
 	}
-	lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_SIC);
 }
 
 void
@@ -138,71 +190,90 @@ ao_i2c_get(uint8_t index)
 {
 	(void) index;
 	ao_mutex_get(&ao_i2c_mutex);
-	lpc_i2c.conset = (1 << LPC_I2C_CONSET_I2EN);
-	lpc_i2c.sclh = 0xff;
-	lpc_i2c.scll = 0xff;
+	i2c_error = 0;
 }
 
 void
 ao_i2c_put(uint8_t index)
 {
 	(void) index;
-	lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_I2ENC);
 	ao_mutex_put(&ao_i2c_mutex);
 }
 
 uint8_t
 ao_i2c_start(uint8_t index, uint16_t addr)
 {
-	uint8_t	a = (uint8_t) addr;
-
 	(void) index;
-	ao_arch_block_interrupts();
-	(void) lpc_i2c_stat("start");
-	i2c_send = &a;
-	i2c_send_len = 1;
-	i2c_stop = 0;
-	lpc_i2c.conset = (1 << LPC_I2C_CONSET_STA);
-	while (i2c_send_len)
-		ao_sleep(&i2c_send_len);
-	ao_arch_release_interrupts();
+	i2c_addr = (uint8_t) addr;
 	return 0;
 }
 
 uint8_t
 ao_i2c_send(const void *block, uint16_t len, uint8_t index, uint8_t stop)
 {
+	uint8_t	stopped = i2c_stop;
+
 	(void) index;
 	ao_arch_block_interrupts();
 	(void) lpc_i2c_stat("send");
+
+	i2c_done = 0;
 	i2c_send = block;
 	i2c_send_len = len;
 	i2c_stop = stop;
-	_ao_i2c_put_byte();
-	while (i2c_send_len) {
-		if (ao_sleep_for(&i2c_send_len, AO_SEC_TO_TICKS(2)))
-			break;
-	}
+
+	/* Clear read bit */
+	i2c_addr &= 0xfe;
+
+	lpc_nvic_set_enable(LPC_ISR_I2C_POS);
+
+	/* Send start */
+	lpc_i2c.conset = (1 << LPC_I2C_CONSET_STA);
+
+	/* If we're restarting, clear the pending interrupt now */
+	if (!stopped)
+		lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_SIC);
+
+	while (!i2c_done && !i2c_error)
+		ao_sleep(&i2c_done);
+
 	ao_arch_release_interrupts();
-	lpc_i2c_dump();
-	return 0;
+	if (stop)
+		lpc_i2c_dump();
+	return i2c_error == 0;
 }
 
 uint8_t
 ao_i2c_recv(void *block, uint16_t len, uint8_t index, uint8_t stop)
 {
+	uint8_t stopped = i2c_stop;
 	(void) index;
 	ao_arch_block_interrupts();
+	(void) lpc_i2c_stat("recv");
+
+	i2c_done = 0;
 	i2c_recv = block;
 	i2c_recv_len = len;
 	i2c_stop = stop;
-	/* Check to see if a byte is already here */
-	if (lpc_i2c.stat == LPC_I2C_STAT_RX_ACK)
-		_ao_i2c_get_byte();
-	while (i2c_recv_len)
-		ao_sleep(&i2c_recv_len);
+
+	/* Set read bit */
+	i2c_addr |= 0x01;
+
+	lpc_nvic_set_enable(LPC_ISR_I2C_POS);
+
+	/* Send start */
+	lpc_i2c.conset = (1 << LPC_I2C_CONSET_STA);
+
+	/* If we're restarting, clear the pending interrupt now */
+	if (!stopped)
+		lpc_i2c.conclr = (1 << LPC_I2C_CONCLR_SIC);
+
+	while (!i2c_done && !i2c_error)
+		ao_sleep(&i2c_done);
+
 	ao_arch_release_interrupts();
-	return 0;
+	lpc_i2c_dump();
+	return i2c_error == 0;
 }
 
 void
@@ -219,7 +290,20 @@ ao_i2c_init(void)
 	lpc_scb.presetctrl &= ~(1UL << LPC_SCB_PRESETCTRL_I2C_RST_N);
 	lpc_scb.presetctrl |= (1 << LPC_SCB_PRESETCTRL_I2C_RST_N);
 
+	lpc_i2c.conclr = ((1 << LPC_I2C_CONCLR_I2ENC) |
+			  (1 << LPC_I2C_CONCLR_STAC) |
+			  (1 << LPC_I2C_CONCLR_STOC) |
+			  (1 << LPC_I2C_CONCLR_SIC) |
+			  (1 << LPC_I2C_CONCLR_AAC));
+
+	lpc_i2c.conset = (1 << LPC_I2C_CONSET_I2EN);
+
+	i2c_stop = 1;
+
+	/* experimentally determined to be off-by-two? */
+	lpc_i2c.sclh = I2C_DUTY - 2;
+	lpc_i2c.scll = I2C_DUTY - 2;
+
 	/* Enable interrupts */
-	lpc_nvic_set_enable(LPC_ISR_I2C_POS);
 	lpc_nvic_set_priority(LPC_ISR_I2C_POS, 0);
 }

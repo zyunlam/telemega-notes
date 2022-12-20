@@ -237,7 +237,7 @@ ao_i2c_wait_addr(uint8_t index)
 }
 
 uint8_t
-ao_i2c_send(void *block, uint16_t len, uint8_t index, uint8_t stop)
+ao_i2c_send(const void *block, uint16_t len, uint8_t index, uint8_t stop)
 {
 	struct stm_i2c	*stm_i2c = ao_i2c_stm_info[index].stm_i2c;
 	uint8_t		tx_dma_index = ao_i2c_stm_info[index].tx_dma_index;
@@ -248,7 +248,7 @@ ao_i2c_send(void *block, uint16_t len, uint8_t index, uint8_t stop)
 	stm_i2c->cr2 = AO_STM_I2C_CR2 | (1 << STM_I2C_CR2_DMAEN);
 	ao_dma_set_transfer(tx_dma_index,
 			    &stm_i2c->dr,
-			    block,
+			    (void *) block,
 			    len,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
 			    (STM_DMA_CCR_PL_MEDIUM << STM_DMA_CCR_PL) |
