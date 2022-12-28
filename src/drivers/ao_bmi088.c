@@ -288,6 +288,15 @@ static struct ao_task ao_bmi088_task;
 static void
 ao_bmi088_show(void)
 {
+#ifdef AO_LOG_NORMALIZED
+	printf ("BMI088: %7d %7d %7d %7d %7d %7d\n",
+		ao_bmi088_along(&ao_bmi088_current),
+		ao_bmi088_across(&ao_bmi088_current),
+		ao_bmi088_through(&ao_bmi088_current),
+		ao_bmi088_roll(&ao_bmi088_current),
+		ao_bmi088_pitch(&ao_bmi088_current),
+		ao_bmi088_yaw(&ao_bmi088_current));
+#else
 	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d\n",
 		ao_bmi088_current.acc.x,
 		ao_bmi088_current.acc.y,
@@ -295,6 +304,7 @@ ao_bmi088_show(void)
 		ao_bmi088_current.gyr.x,
 		ao_bmi088_current.gyr.y,
 		ao_bmi088_current.gyr.z);
+#endif
 }
 
 static const struct ao_cmds bmi_cmds[] = {
