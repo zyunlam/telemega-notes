@@ -1,10 +1,13 @@
+extends: default
 base:
   font_family: Open Sans Light
+  font-size: 12
 heading:
   font_color: #78079a
   font_size: 17
 font:
   catalog:
+    merge: true
     Open Sans Light:
       normal: OpenSans-Light.ttf
       italic: OpenSans-LightItalic.ttf
@@ -42,7 +45,7 @@ admonition_label:
 page:
   background_color: ffffff
   layout: portrait
-  margin: [0.5in, 0.67in, 0.75in, 0.67in]
+  margin: [0.5in, 0.67in, 0.67in, 0.67in]
   size: letter
 footer:
   height: 0.5in
@@ -57,7 +60,7 @@ footer:
       content: $footer_recto_right_content
     right:
       content: '{page-number}'
-literal:
+codespan:
   font_family: DejaVu Sans Mono
 code:
   font_family: DejaVu Sans Mono
