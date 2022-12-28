@@ -386,6 +386,7 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_TELEMEGA_4 = 19;
 	public static final int AO_LOG_FORMAT_EASYMOTOR = 20;
 	public static final int AO_LOG_FORMAT_TELEMEGA_5 = 21;
+	public static final int AO_LOG_FORMAT_TELEMEGA_6 = 22;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static final int	model_mpu6000 = 0;
@@ -394,6 +395,7 @@ public class AltosLib {
 	public static final int	model_bmx160 = 3;
 	public static final int model_hmc5883 = 4;
 	public static final int model_mmc5983 = 5;
+	public static final int model_bmi088 = 6;
 
 	public static boolean isspace(int c) {
 		switch (c) {
@@ -662,6 +664,8 @@ public class AltosLib {
 		case AO_LOG_FORMAT_EASYMOTOR:
 			return product_easymotor;
 		case AO_LOG_FORMAT_TELEMEGA_5:
+			return product_telemega;
+		case AO_LOG_FORMAT_TELEMEGA_6:
 			return product_telemega;
 		case AO_LOG_FORMAT_NONE:
 			return product_altusmetrum;

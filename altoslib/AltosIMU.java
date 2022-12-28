@@ -52,6 +52,7 @@ public class AltosIMU implements Cloneable {
 	public static final double	counts_per_g_mpu = 2048.0;
 	public static final double	counts_per_g_bmx = 2048.0;
 	public static final double	counts_per_g_adxl = 20.5;
+	public static final double	counts_per_g_bmi088 = 1365.0;
 
 	private static double counts_per_g(int imu_type, int imu_model) {
 		switch (imu_model) {
@@ -62,6 +63,8 @@ public class AltosIMU implements Cloneable {
 			return counts_per_g_adxl;
 		case AltosLib.model_bmx160:
 			return counts_per_g_bmx;
+		case AltosLib.model_bmi088:
+			return counts_per_g_bmi088;
 		}
 
 		switch (imu_type) {
@@ -93,6 +96,7 @@ public class AltosIMU implements Cloneable {
 	public static final double 	GYRO_FULLSCALE_DEGREES_BMX = 2000.0;
 	public static final double	GYRO_COUNTS_BMX = 32767.0;
 	public static final double	counts_per_degree_bmx = GYRO_COUNTS_BMX / GYRO_FULLSCALE_DEGREES_BMX;
+	public static final double	counts_per_degree_bmi088 = 16.384;
 
 	private static double counts_per_degree(int imu_type, int imu_model) {
 		switch (imu_model) {
@@ -101,6 +105,8 @@ public class AltosIMU implements Cloneable {
 			return counts_per_degree_mpu;
 		case AltosLib.model_bmx160:
 			return counts_per_degree_bmx;
+		case AltosLib.model_bmi088:
+			return counts_per_degree_bmi088;
 		}
 
 		switch (imu_type) {
@@ -174,6 +180,21 @@ public class AltosIMU implements Cloneable {
 			String[] items = line.split("\\s+");
 
 			imu_model = AltosLib.model_mpu6000;
+
+			if (items.length >= 7) {
+				accel_along = Integer.parseInt(items[1]);
+				accel_across = Integer.parseInt(items[2]);
+				accel_through = Integer.parseInt(items[3]);
+				gyro_roll = Integer.parseInt(items[4]);
+				gyro_pitch = Integer.parseInt(items[5]);
+				gyro_yaw = Integer.parseInt(items[6]);
+			}
+			return true;
+		}
+		if (line.startsWith("BMI088:")) {
+			String[] items = line.split("\\s+");
+
+			imu_model = AltosLib.model_bmi088;
 
 			if (items.length >= 7) {
 				accel_along = Integer.parseInt(items[1]);
