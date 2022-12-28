@@ -565,7 +565,7 @@ ao_hex_file_create(struct ao_hex_image *image, struct ao_sym *symbols, int num_s
 
 	/* Stick an EOF after the data
 	 */
-	record = calloc(sizeof (struct ao_hex_record), 1);
+	record = calloc(1,sizeof (struct ao_hex_record) + 2);
 	record->type = AO_HEX_RECORD_EOF;
 	record->address = 0;
 	record->length = 0;
