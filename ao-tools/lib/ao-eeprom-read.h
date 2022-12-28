@@ -47,6 +47,7 @@
 #define AO_LOG_FORMAT_TELEMEGA_4	19	/* 32 byte typed telemega records with 32 bit gyro cal and Bmx160 */
 #define AO_LOG_FORMAT_EASYMOTOR		20	/* 16 byte typed easymotor records with pressure sensor and adxl375 */
 #define AO_LOG_FORMAT_TELEMEGA_5	21	/* 32 byte typed telemega records with 32 bit gyro cal, mpu6000 and mmc5983 */
+#define AO_LOG_FORMAT_TELEMEGA_6	22	/* 32 byte typed telemega records with 32 bit gyro cal, bmi088 and mmc5983 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 enum ao_pyro_flag {
