@@ -83,15 +83,23 @@ ao_log(void)
 				ao_log_data.u.sensor.pres = d->ms5607_raw.pres;
 				ao_log_data.u.sensor.temp = d->ms5607_raw.temp;
 #endif
-#if HAS_MPU6000
+
 #ifdef AO_LOG_NORMALIZED
+# if HAS_IMU
 				ao_log_data.u.sensor.accel_along = ao_data_along(d);
 				ao_log_data.u.sensor.accel_across = ao_data_across(d);
 				ao_log_data.u.sensor.accel_through = ao_data_through(d);
 				ao_log_data.u.sensor.gyro_roll = ao_data_roll(d);
 				ao_log_data.u.sensor.gyro_pitch = ao_data_pitch(d);
 				ao_log_data.u.sensor.gyro_yaw = ao_data_yaw(d);
-#else
+# endif
+# if HAS_MAG
+				ao_log_data.u.sensor.mag_along = ao_data_mag_along(d);
+				ao_log_data.u.sensor.mag_across = ao_data_mag_across(d);
+				ao_log_data.u.sensor.mag_through = ao_data_mag_through(d);
+# endif
+#else	/* AO_LOG_NORMALIZED */
+#if HAS_MPU6000
 				ao_log_data.u.sensor.accel_x = d->mpu6000.accel_x;
 				ao_log_data.u.sensor.accel_y = d->mpu6000.accel_y;
 				ao_log_data.u.sensor.accel_z = d->mpu6000.accel_z;
@@ -99,16 +107,10 @@ ao_log(void)
 				ao_log_data.u.sensor.gyro_y = d->mpu6000.gyro_y;
 				ao_log_data.u.sensor.gyro_z = d->mpu6000.gyro_z;
 #endif
-#endif
 #if HAS_HMC5883
 				ao_log_data.u.sensor.mag_x = d->hmc5883.x;
 				ao_log_data.u.sensor.mag_z = d->hmc5883.z;
 				ao_log_data.u.sensor.mag_y = d->hmc5883.y;
-#endif
-#ifdef HAS_MMC5983
-				ao_log_data.u.sensor.mag_along = ao_data_mag_along(d);
-				ao_log_data.u.sensor.mag_across = ao_data_mag_across(d);
-				ao_log_data.u.sensor.mag_through = ao_data_mag_through(d);
 #endif
 #if HAS_MPU9250
 				ao_log_data.u.sensor.accel_x = d->mpu9250.accel_x;
@@ -132,6 +134,7 @@ ao_log(void)
 				ao_log_data.u.sensor.mag_z = d->bmx160.mag_z;
 				ao_log_data.u.sensor.mag_y = d->bmx160.mag_y;
 #endif
+#endif /* !AO_LOG_NORMALIZED */
 				ao_log_data.u.sensor.accel = ao_data_accel(&ao_data_ring[ao_log_data_pos]);
 				ao_log_write(&ao_log_data);
 				if (ao_log_state <= ao_flight_coast)
