@@ -52,6 +52,35 @@ static AO_TICK_TYPE	ao_interval_end;
 
 uint8_t			ao_flight_force_idle;
 
+/* Compute ADC value change given a defined pressure change in Pa */
+
+static inline int16_t
+ao_delta_pressure_to_adc(uint32_t pressure)
+{
+	static const double volts_base = AO_PRESSURE_VOLTS_BASE;
+	static const double volts_max = AO_PRESSURE_VOLTS_MAX;
+
+	/* Compute change in voltage from the sensor */
+	double	volts = (double) pressure / AO_FULL_SCALE_PRESSURE * (volts_max - volts_base);
+
+	/* voltage divider in front of the ADC input to decivolts */
+	double	adc_dv = volts * (10.0 * (double) AO_PRESSURE_DIV_MINUS /
+				  ((double) AO_PRESSURE_DIV_PLUS + (double) AO_PRESSURE_DIV_MINUS));
+
+	/* convert to ADC output value */
+	double	adc = adc_dv * AO_ADC_MAX / AO_ADC_REFERENCE_DV;
+
+	if (adc > AO_ADC_MAX)
+		adc = AO_ADC_MAX;
+	if (adc < 0)
+		adc = 0;
+
+	return (int16_t) adc;
+}
+
+#define AO_BOOST_DETECT			ao_delta_pressure_to_adc(AO_BOOST_DETECT_PRESSURE)
+#define AO_QUIET_DETECT			ao_delta_pressure_to_adc(AO_QUIET_DETECT_PRESSURE)
+
 /*
  * Landing is detected by getting constant readings from pressure sensor
  * for a fairly long time (AO_INTERVAL_TICKS), along with the max being

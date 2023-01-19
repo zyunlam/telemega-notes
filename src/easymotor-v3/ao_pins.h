@@ -156,36 +156,14 @@
 
 typedef int16_t	motor_pressure_t;
 
-/* want about 50psi, or 344kPa */
+/* want about 50psi, or 344kPa for boost and 30psi for coast */
 
 #define AO_FULL_SCALE_PRESSURE		11031612	/* 1600psi */
 #define AO_BOOST_DETECT_PRESSURE	344000		/* 50psi */
 #define AO_QUIET_DETECT_PRESSURE	207000		/* 30psi */
 
-static inline int16_t ao_delta_pressure_to_adc(uint32_t pressure)
-{
-	static const double volts_base = 0.5;
-	static const double volts_max = 4.5;
-
-	/* Compute change in voltage from the sensor */
-	double	volts = (double) pressure / AO_FULL_SCALE_PRESSURE * (volts_max - volts_base);
-
-	/* voltage divider in front of the ADC input to decivolts */
-	double	adc_dv = volts * 10 * 10.0/15.6;
-
-	/* convert to ADC output value */
-	double	adc = adc_dv * AO_ADC_MAX / AO_ADC_REFERENCE_DV;
-
-	if (adc > AO_ADC_MAX)
-		adc = AO_ADC_MAX;
-	if (adc < 0)
-		adc = 0;
-
-	return (int16_t) adc;
-}
-
-#define AO_BOOST_DETECT			ao_delta_pressure_to_adc(AO_BOOST_DETECT_PRESSURE)
-#define AO_QUIET_DETECT			ao_delta_pressure_to_adc(AO_QUIET_DETECT_PRESSURE)
+#define AO_PRESSURE_VOLTS_BASE	0.5
+#define AO_PRESSURE_VOLTS_MAX	4.5
 
 struct ao_adc {
 	int16_t			v_batt;
