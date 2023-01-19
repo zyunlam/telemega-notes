@@ -167,14 +167,20 @@ static inline int16_t ao_delta_pressure_to_adc(uint32_t pressure)
 	static const double volts_base = 0.5;
 	static const double volts_max = 4.5;
 
+	/* Compute change in voltage from the sensor */
 	double	volts = (double) pressure / AO_FULL_SCALE_PRESSURE * (volts_max - volts_base);
-	double	adc_volts = volts * 10.0/15.6;	/* voltage divider in front of the ADC input */
-	if (adc_volts > 1.0)
-		adc_volts = 1.0;
-	double	adc = adc_volts * 32767.0;
 
+	/* voltage divider in front of the ADC input to decivolts */
+	double	adc_dv = volts * 10 * 10.0/15.6;
+
+	/* convert to ADC output value */
+	double	adc = adc_dv * AO_ADC_MAX / AO_ADC_REFERENCE_DV;
+
+	if (adc > AO_ADC_MAX)
+		adc = AO_ADC_MAX;
 	if (adc < 0)
 		adc = 0;
+
 	return (int16_t) adc;
 }
 
