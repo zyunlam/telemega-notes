@@ -17,6 +17,7 @@ main(void)
 	ao_adc_init();
 
 	ao_usb_init();
+	ao_serial_init();
 
 	ao_cmd_init();
 	ao_config_init();
