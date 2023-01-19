@@ -31,6 +31,12 @@
 #define AO_USB_PULLUP_PORT	0
 #define AO_USB_PULLUP_PIN	20
 
+/* USART */
+
+#define HAS_SERIAL              1
+#define USE_SERIAL_0_STDIN      0
+#define SERIAL_0_18_19          1
+
 #define HAS_BEEP		0
 #define HAS_RADIO		0
 #define HAS_TELEMETRY		0
