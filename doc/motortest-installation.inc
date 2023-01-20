@@ -1,10 +1,27 @@
 == Installation
 
-	EasyMotor needs to be rigidly attached in the airframe, and the
-	long axis of the circuit board needs to be aligned with the axis
-	of flight. By default, the round beeper on the board should be
-	“up” towards the nose cone, and the screw terminal strips should
-	be “down” towards the fins and motor nozzle end of the rocket.
+	[WARNING]
+	Firmware versions prior to 1.9.13 used acceleration to detect
+	launch.  Starting with 1.9.13, the firmware switched to using
+	pressure to trigger recording. Altus Metrum strongly recommends 
+	upgrading all EasyMotor boards to current firmware, the
+	behavior of which is described here.
+
+	EasyMotor needs to be rigidly attached in the airframe, in any
+	convenient orientation.
+
+	=== Trigger to Start Recording
+
+	Starting with firmware version 1.9.13, a pressure sensor must
+	be attached, and pressure change is used to initiate and conclude
+	data recording.  Pressure and 3 axes of acceleration are recorded
+	for later analysis.
+
+	EasyMotor looks for a 50 psi rise in pressure from ambient to
+	start recording.  Recording stops when the pressure drops 
+	below 50 psi and shows variation of less than 30 psi for at 
+	least 10 seconds. These conditions are intended to capture all
+	actual burn data including anomalies such as "chuffs".
 
 	=== Power Switch and Battery
 

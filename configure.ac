@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9.12)
-ANDROID_VERSION=35
+AC_INIT([altos], 1.9.13)
+ANDROID_VERSION=36
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2022-10-28
+RELEASE_DATE=2023-01-19
 AC_SUBST(RELEASE_DATE)
 
 DOC_DATE=`LC_ALL=C date -d $RELEASE_DATE +'%d %b %Y'`
@@ -570,6 +570,7 @@ ao-tools/ao-flash/Makefile
 ao-tools/ao-test-igniter/Makefile
 ao-tools/ao-test-baro/Makefile
 ao-tools/ao-test-flash/Makefile
+ao-tools/ao-test-pressure/Makefile
 ao-tools/ao-cal-accel/Makefile
 ao-tools/ao-cal-freq/Makefile
 ao-tools/ao-test-gps/Makefile

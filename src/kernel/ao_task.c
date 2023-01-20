@@ -57,7 +57,17 @@ static inline void ao_check_stack(void) {
 #endif
 
 #ifndef SLEEP_HASH_SIZE
+#ifdef __ARM_FEATURE_IDIV__
 #define SLEEP_HASH_SIZE	17
+#else
+#define SLEEP_HASH_SIZE 16
+#endif
+#endif
+
+#if SLEEP_HASH_SIZE & (SLEEP_HASH_SIZE - 1)
+#define SLEEP_HASH_SHIFT 0
+#else
+#define SLEEP_HASH_SHIFT 2
 #endif
 
 static struct ao_list	run_queue;
@@ -75,7 +85,7 @@ _ao_task_to_run_queue(struct ao_task *task)
 static struct ao_list *
 ao_task_sleep_queue(void *wchan)
 {
-	return &ao_sleep_queue[(uintptr_t) wchan % SLEEP_HASH_SIZE];
+	return &ao_sleep_queue[(((uintptr_t) wchan) >> SLEEP_HASH_SHIFT) % SLEEP_HASH_SIZE];
 }
 
 static void

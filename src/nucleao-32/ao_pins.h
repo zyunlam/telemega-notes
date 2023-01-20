@@ -47,19 +47,40 @@
 #define HAS_USB				1
 #define AO_USB_DIRECTIO			0
 #define AO_PA11_PA12_RMP		0
-#define HAS_BEEP			1
-
-#define BEEPER_TIMER			2
-#define BEEPER_CHANNEL			4
-#define BEEPER_PORT			(&stm_gpioa)
-#define BEEPER_PIN			3
+#define HAS_BEEP			0
 
 #define IS_FLASH_LOADER	0
 
-#define HAS_SERIAL_2		1
+#define HAS_SERIAL_2		0
 #define SERIAL_2_PA2_PA15	1
 #define USE_SERIAL_2_FLOW	0
 #define USE_SERIAL_2_STDIN	1
 #define DELAY_SERIAL_2_STDIN	0
+
+#define HAS_SPI_1	1
+#define SPI_1_PA5_PA6_PA7	1
+#define SPI_1_OSPEEDR		STM_OSPEEDR_HIGH
+#define SPI_1_PB3_PB4_PB5	0
+
+#define HAS_SPI_2	0
+
+#define HAS_BMI088	1
+#define HAS_IMU		1
+
+#define ao_data_along(packet)   ((packet)->bmi088.acc.x)
+#define ao_data_across(packet)  (-(packet)->bmi088.acc.y)
+#define ao_data_through(packet) ((packet)->bmi088.acc.z)
+
+#define ao_data_roll(packet)    ((packet)->bmi088.gyr.x)
+#define ao_data_pitch(packet)   (-(packet)->bmi088.gyr.y)
+#define ao_data_yaw(packet)     ((packet)->bmi088.gyr.z)
+
+#define AO_BMI088_ACC_CS_PORT	(&stm_gpioa)
+#define AO_BMI088_ACC_CS_PIN	0
+#define AO_BMI088_GYR_CS_PORT	(&stm_gpioa)
+#define AO_BMI088_GYR_CS_PIN	1
+#define AO_BMI088_SPI_BUS	(AO_SPI_1_PA5_PA6_PA7 | AO_SPI_MODE_0)
+
+#define AO_DATA_RING	32
 
 #endif /* _AO_PINS_H_ */

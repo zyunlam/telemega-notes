@@ -9,6 +9,8 @@ altoslib/
 	Declare new USB ids
 	Declare new Product name
 	Add item to product_name function
+	Add entry in product_id_from_log_format
+	Declare new sensor model
 
  2. AltosIdleFetch.java
 
@@ -50,3 +52,15 @@ altosuilib/
  1. AltosUSBDevice.java
 
 	Add new product ID as appropriate to matchProduct
+
+ao-tools/lib/
+
+ 1. ao-eeprom-read.h
+
+	Add new log file format as appropriate
+
+ao-tools/ao-eeprom/
+
+ 1. ao-eeprom.c
+
+	Parse new log file contents

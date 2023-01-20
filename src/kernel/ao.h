@@ -113,6 +113,7 @@ extern volatile AO_TICK_TYPE ao_tick_count;
 #endif
 #define AO_MS_TO_TICKS(ms)	((ms) / (1000 / AO_HERTZ))
 #define AO_SEC_TO_TICKS(s)	((AO_TICK_TYPE) (s) * AO_HERTZ)
+#define AO_NS_TO_TICKS(ns)	((ns) / (1000000000L / AO_HERTZ))
 
 /* Returns the current time in ticks */
 AO_TICK_TYPE
@@ -390,6 +391,7 @@ ao_spi_slave(void);
 
 extern uint8_t ao_gps_new;
 extern AO_TICK_TYPE ao_gps_tick;
+extern AO_TICK_TYPE ao_gps_utc_tick;
 extern uint8_t ao_gps_mutex;
 extern struct ao_telemetry_location ao_gps_data;
 extern struct ao_telemetry_satellite ao_gps_tracking_data;

@@ -55,6 +55,7 @@ uint8_t ao_force_freq;
 #define AO_CONFIG_DEFAULT_PAD_ORIENTATION	AO_PAD_ORIENTATION_ANTENNA_UP
 #define AO_CONFIG_DEFAULT_PYRO_TIME	AO_MS_TO_TICKS(50)
 #define AO_CONFIG_DEFAULT_RADIO_10MW	0
+#define AO_CONFIG_DEFAULT_REPORT_FEET	0
 #if HAS_CONFIG_SAVE
 #ifndef USE_INTERNAL_FLASH
 #error Please define USE_INTERNAL_FLASH
@@ -251,6 +252,8 @@ _ao_config_get(void)
 		if (minor < 25)
 			ao_config.radio_10mw = AO_CONFIG_DEFAULT_RADIO_10MW;
 #endif
+		if (minor < 26)
+			ao_config.report_feet = AO_CONFIG_DEFAULT_REPORT_FEET;
 		ao_config.minor = AO_CONFIG_MINOR;
 		ao_config_dirty = 1;
 	}
@@ -880,6 +883,24 @@ ao_config_radio_10mw_set(void)
 
 #endif
 
+static void
+ao_config_report_feet_show(void)
+{
+	printf ("Report in feet: %d\n", ao_config.report_feet);
+}
+
+static void
+ao_config_report_feet_set(void)
+{
+	uint32_t r = ao_cmd_decimal();
+	if (ao_cmd_status != ao_cmd_success)
+		return;
+	_ao_config_edit_start();
+	ao_config.report_feet = !!r;
+	_ao_config_edit_finish();
+}
+
+
 #if HAS_BEEP
 static void
 ao_config_beep_show(void)
@@ -1131,6 +1152,8 @@ const struct ao_config_var ao_config_vars[] = {
 	{ "p <0 no limit, 1 limit>\0Limit radio power to 10mW",
 	  ao_config_radio_10mw_set,	ao_config_radio_10mw_show },
 #endif
+	{ "u <0 meters, 1 feet>\0Units to report height after landing",
+	  ao_config_report_feet_set,	ao_config_report_feet_show },
 	{ "s\0Show",
 	  ao_config_show,		0 },
 #if HAS_CONFIG_SAVE

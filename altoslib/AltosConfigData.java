@@ -86,6 +86,8 @@ public class AltosConfigData {
 	/* HAS_RADIO_10MW */
 	public int		radio_10mw;
 
+	public int		report_feet;
+
 	/* Storage info replies */
 	public int	storage_size;
 	public int	storage_erase_unit;
@@ -215,8 +217,11 @@ public class AltosConfigData {
 				return 4095 - value;
 			/* fall through */
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_EASYMOTOR:
+			/* ADXL375 */
 			return -value;
 		default:
 			if (product.startsWith("EasyTimer-"))
@@ -319,6 +324,8 @@ public class AltosConfigData {
 		beep = AltosLib.MISSING;
 
 		radio_10mw = AltosLib.MISSING;
+
+		report_feet = AltosLib.MISSING;
 
 		tracker_motion = AltosLib.MISSING;
 		tracker_interval = AltosLib.MISSING;
@@ -513,6 +520,8 @@ public class AltosConfigData {
 		/* HAS_RADIO_10MW */
 		try { radio_10mw = get_int(line, "Radio 10mw limit:"); } catch (Exception e) {}
 
+		try { report_feet = get_int(line, "Report in feet:"); } catch (Exception e) {}
+
 		/* HAS_TRACKER */
 		try {
 			int[] values = get_values(line, "Tracker setting:");
@@ -632,6 +641,8 @@ public class AltosConfigData {
 			return false;
 		if (product.startsWith("TeleMetrum-v3"))
 			return false;
+		if (product.startsWith("TeleMetrum-v4"))
+			return true;
 		if (product.startsWith("EasyMega"))
 			return false;
 		return true;
@@ -658,7 +669,13 @@ public class AltosConfigData {
 				return true;
 			if (product.startsWith("TeleMetrum-v3"))
 				return true;
+			if (product.startsWith("TeleMetrum-v4"))
+				return true;
 			if (product.startsWith("TeleMega-v4"))
+				return true;
+			if (product.startsWith("TeleMega-v5"))
+				return true;
+			if (product.startsWith("TeleMega-v6"))
 				return true;
 			if (product.startsWith("EasyMotor-v2"))
 				return true;
@@ -674,7 +691,13 @@ public class AltosConfigData {
 				return AltosAdxl375.X_AXIS;
 			if (product.startsWith("TeleMetrum-v3"))
 				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("TeleMetrum-v4"))
+				return AltosAdxl375.X_AXIS;
 			if (product.startsWith("TeleMega-v4"))
+				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("TeleMega-v5"))
+				return AltosAdxl375.X_AXIS;
+			if (product.startsWith("TeleMega-v6"))
 				return AltosAdxl375.X_AXIS;
 			if (product.startsWith("EasyMotor-v2"))
 				return AltosAdxl375.X_AXIS;
@@ -747,6 +770,9 @@ public class AltosConfigData {
 		if (radio_10mw != AltosLib.MISSING)
 			radio_10mw = source.radio_10mw();
 
+		if (report_feet != AltosLib.MISSING)
+			report_feet = source.report_feet();
+
 		/* HAS_TRACKER */
 		if (tracker_motion != AltosLib.MISSING)
 			tracker_motion = source.tracker_motion();
@@ -803,6 +829,7 @@ public class AltosConfigData {
 		dest.set_aprs_offset(aprs_offset);
 		dest.set_beep(beep);
 		dest.set_radio_10mw(radio_10mw);
+		dest.set_report_feet(report_feet);
 		dest.set_tracker_motion(tracker_motion);
 		dest.set_tracker_interval(tracker_interval);
 	}
@@ -925,6 +952,10 @@ public class AltosConfigData {
 		/* HAS_RADIO_10MW */
 		if (radio_10mw != AltosLib.MISSING)
 			link.printf("c p %d\n", radio_10mw);
+
+		/* HAS_RADIO_10MW */
+		if (report_feet != AltosLib.MISSING)
+			link.printf("c u %d\n", report_feet);
 
 		/* HAS_TRACKER */
 		if (tracker_motion != AltosLib.MISSING && tracker_interval != AltosLib.MISSING)

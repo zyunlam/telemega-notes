@@ -1,29 +1,35 @@
 #!/bin/sh
 
-PRODUCT=EasyMotor
-VERSION=2
-REPO=~/altusmetrumllc/Binaries
-
-if [ -x /usr/bin/dfu-util ]; then
-    DFU_UTIL=/usr/bin/dfu-util
+if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+	FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+elif [ -x /usr/bin/ao-flash-lpc ]; then
+	FLASH_LPC=/usr/bin/ao-flash-lpc
 else
-    echo "Can't find dfu-util! Aborting."
-    exit 1
+	echo "Can't find ao-flash-lpc!  Aborting."
+	exit 1
 fi
 
-if [ -x /usr/bin/ao-usbload ]; then
+if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
+	USBLOAD=../ao-tools/ao-usbload/ao-usbload
+elif [ -x /usr/bin/ao-usbload ]; then
 	USBLOAD=/usr/bin/ao-usbload
 else
 	echo "Can't find ao-usbload!  Aborting."
 	exit 1
 fi
 
+VERSION=3
+PRODUCT=EasyMotor
+BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
+echo $FILE
+
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
-echo "Copyright 2021 by Bdale Garbee.  Released under GPL v3"
+echo "Copyright 2022 by Bdale Garbee.  Released under GPL v3"
 echo
 echo "Expectations:"
-echo "\t$PRODUCT v$VERSION"
-echo "\t\twith USB cable attached"
+echo "\t$PRODUCT v$VERSION powered from USB"
+echo "\t\twith ST-Link-V2 cabled to debug header"
+echo "\t\tand precision 2:1 resistor divider feeding pressure input from 5V out"
 echo
 
 case $# in
@@ -40,36 +46,49 @@ case $# in
 	exit 1;
 	;;
 esac
+otootor
+#
+# Use released versions of everything
+#
+FLASH_FILE=~/altusmetrumllc/Binaries/loaders/easymotor-v3-altos-flash-*.elf
+ALTOS_FILE=~/altusmetrumllc/Binaries/easymotor-v3-*.elf
 
+echo $FLASH_LPC $FLASH_FILE
 
-echo $DFU_UTIL
+$FLASH_LPC $FLASH_FILE || exit 1
 
-$DFU_UTIL -v -v -R -a 0 -s 0x08000000:leave -D $REPO/loaders/easymotor-v$VERSION*.bin
+sleep 1
 
-sleep 3
+echo $USBLOAD $ALTOS_FILE
 
-$USBLOAD --serial=$SERIAL $REPO/easymotor-v$VERSION*.elf || exit 1
+$USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 
-sleep 5
+sleep 2
 
-dev=`ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
+dev=`ao-list | awk '/EasyMotor-v'"$VERSION"'/ { print $3; exit(0); }'`
 
 case "$dev" in
 /dev/tty*)
-	echo "$PRODUCT found on $dev"
+	echo "EasyMotor found on $dev"
 	;;
 *)
-	echo 'No '"$PRODUCT"'-v'"$VERSION"' found'
+	echo 'No EasyMotor-v'"$VERSION"' found'
 	exit 1
 	;;
 esac
 
+echo 'E 0' > $dev
+
 failed=1
-while [ $failed =  1 ]; do
+while [ $failed = 1 ]; do
     ../ao-tools/ao-cal-accel/ao-cal-accel $dev
     failed=$?
 done
 
-./test-easymotor
+echo 'E 1' > $dev
+
+sleep 1
+
+./test-easymotor-v3
 
 exit $?

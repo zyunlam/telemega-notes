@@ -499,6 +499,16 @@ ao_spi_put(uint8_t spi_index)
 	ao_mutex_put(&ao_spi_mutex[id]);
 }
 
+void
+ao_spi_put_pins(uint8_t spi_index)
+{
+	uint8_t		id = AO_SPI_INDEX(spi_index);
+
+	ao_spi_disable_pin_config(ao_spi_pin_config[id]);
+	ao_spi_pin_config[id] = AO_SPI_CONFIG_NONE;
+	ao_spi_put(spi_index);
+}
+
 static void
 ao_spi_channel_init(uint8_t spi_index)
 {

@@ -88,6 +88,9 @@ void
 ao_lco_set_firing(uint8_t firing);
 
 void
+ao_lco_pretend(void);
+
+void
 ao_lco_toggle_drag(void);
 
 void

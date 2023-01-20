@@ -61,6 +61,7 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_TELEMEGA_4	19	/* 32 byte typed telemega records with 32 bit gyro cal and Bmx160 */
 #define AO_LOG_FORMAT_EASYMOTOR		20	/* 16 byte typed easymotor records with pressure sensor and adxl375 */
 #define AO_LOG_FORMAT_TELEMEGA_5	21	/* 32 byte typed telemega records with 32 bit gyro cal, mpu6000 and mmc5983 */
+#define AO_LOG_FORMAT_TELEMEGA_6	22	/* 32 byte typed telemega records with 32 bit gyro cal, bmi088 and mmc5983 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -549,7 +550,7 @@ struct ao_log_motor {
 	} u;
 };
 
-#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5
+#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_6
 typedef struct ao_log_mega ao_log_type;
 #endif
 

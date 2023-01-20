@@ -42,6 +42,7 @@ struct altos_device {
 	int				serial;
 	char				name[256];
 	char				path[256];
+	int				(*method_1)(int x, int y);
 	//%mutable;
 };
 

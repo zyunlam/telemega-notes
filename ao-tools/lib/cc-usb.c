@@ -460,7 +460,7 @@ cc_usb_open(char *tty)
 	cfsetospeed(&termios, B9600);
 	cfsetispeed(&termios, B9600);
 	tcsetattr(cc->fd, TCSAFLUSH, &termios);
-	cc_usb_printf(cc, "\nE 0\nm 0\n");
+	cc_usb_printf(cc, "\nE 0\n");
 	do {
 		cc->in_count = cc->in_pos = 0;
 		_cc_usb_sync(cc, 100, cc_default_timeout);

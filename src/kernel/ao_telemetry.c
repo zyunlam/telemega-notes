@@ -58,7 +58,7 @@ static AO_TICK_TYPE ao_aprs_time;
 #define AO_SEND_MEGA	1
 #endif
 
-#if defined (TELEMETRUM_V_2_0) || defined (TELEMETRUM_V_3_0)
+#if defined (TELEMETRUM_V_2_0) || defined (TELEMETRUM_V_3_0) || defined (TELEMETRUM_V_4_0)
 #define AO_SEND_METRUM	1
 #endif
 
@@ -142,6 +142,8 @@ ao_send_mega_sensor(void)
 #if AO_LOG_NORMALIZED
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5
 	telemetry.generic.type = AO_TELEMETRY_MEGA_NORM_MPU6000_MMC5983;
+#elif AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_6
+	telemetry.generic.type = AO_TELEMETRY_MEGA_NORM_BMI088_MMC5983;
 #else
 #error unknown normalized log type
 #endif
@@ -153,7 +155,7 @@ ao_send_mega_sensor(void)
 	telemetry.mega_norm.pres = ao_data_pres(packet);
 	telemetry.mega_norm.temp = ao_data_temp(packet);
 
-#if HAS_MPU6000
+#ifdef ao_data_along
 	telemetry.mega_norm.accel_along = ao_data_along(packet);
 	telemetry.mega_norm.accel_across = ao_data_across(packet);
 	telemetry.mega_norm.accel_through = ao_data_through(packet);
@@ -163,7 +165,7 @@ ao_send_mega_sensor(void)
 	telemetry.mega_norm.gyro_yaw = ao_data_yaw(packet);
 #endif
 
-#if HAS_MMC5983
+#ifdef ao_data_mag_along
 	telemetry.mega_norm.mag_along = ao_data_mag_along(packet);
 	telemetry.mega_norm.mag_across = ao_data_mag_across(packet);
 	telemetry.mega_norm.mag_through = ao_data_mag_through(packet);
@@ -490,7 +492,10 @@ ao_set_aprs_time(void)
 		} else {
 			delta = second - ao_gps_data.second;
 		}
-		ao_aprs_time = ao_gps_tick + AO_SEC_TO_TICKS(delta);
+		if (delta < (interval >> 1))
+			delta += interval;
+
+		ao_aprs_time = ao_gps_utc_tick + AO_SEC_TO_TICKS(delta);
 	} else {
 		ao_aprs_time += AO_SEC_TO_TICKS(ao_config.aprs_interval);
 	}

@@ -1,14 +1,15 @@
 #!/bin/sh
 
-VERSION=2
+VERSION=3
 PRODUCT=EasyMotor
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 
 echo "$PRODUCT-v$VERSION Test Program"
-echo "Copyright 2021 by Bdale Garbee.  Released under GPL v3"
+echo "Copyright 2022 by Bdale Garbee.  Released under GPL v3"
 echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"
+echo "\t\tand precision 2:1 resistor divider feeding pressure input from 5V out"
 echo
 
 ret=1
@@ -23,6 +24,11 @@ ao-list | while read product serial dev; do
 
 	    echo "Testing flash"
 	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
+
+	    echo "" 
+
+	    echo "Testing pressure sensor input"
+	    ../ao-tools/ao-test-pressure/ao-test-pressure --tty="$dev" 
 
 	    case $? in
 		0)

@@ -13,8 +13,8 @@ Bdale Garbee <bdale@gag.com>
 :toc:
 :telelaunch: 1
 :application: TeleLaunch
-:pdf-stylesdir: .
-:pdf-style: altusmetrum
+:pdf-themesdir: .
+:pdf-theme: altusmetrum
 :pdf-fontsdir: fonts
 
 	include::header.adoc[]

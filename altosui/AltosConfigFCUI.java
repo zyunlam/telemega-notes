@@ -43,6 +43,7 @@ public class AltosConfigFCUI
 	JLabel			radio_frequency_label;
 	JLabel			radio_enable_label;
 	JLabel			radio_10mw_label;
+	JLabel			report_feet_label;
 	JLabel			rate_label;
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
@@ -71,6 +72,7 @@ public class AltosConfigFCUI
 	JLabel			radio_calibration_value;
 	JRadioButton		radio_enable_value;
 	JRadioButton		radio_10mw_value;
+	JComboBox<String>	report_feet_value;
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
@@ -181,6 +183,11 @@ public class AltosConfigFCUI
 		"2",
 		"5",
 		"10"
+	};
+
+	static String[] 	report_feet_values = {
+		"Meters",
+		"Feet",
 	};
 
 	/* A window listener to catch closing events and tell the config code */
@@ -356,6 +363,13 @@ public class AltosConfigFCUI
 			radio_10mw_value.setToolTipText("Should transmitter power be limited to 10mW");
 		else
 			radio_10mw_value.setToolTipText("Older firmware could not limit radio power");
+	}
+
+	void set_report_feet_tool_tip() {
+		if (report_feet_value.isVisible())
+			report_feet_value.setToolTipText("Units used after landing to beep max height");
+		else
+			report_feet_value.setToolTipText("Older firmware always beeps max height in meters");
 	}
 
 	/* Build the UI using a grid bag */
@@ -614,6 +628,32 @@ public class AltosConfigFCUI
 		radio_10mw_value.addItemListener(this);
 		pane.add(radio_10mw_value, c);
 		set_radio_10mw_tool_tip();
+		row++;
+
+		/* Report feet */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		report_feet_label = new JLabel("Beep max height in:");
+		pane.add(report_feet_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		report_feet_value = new JComboBox<String>(report_feet_values);
+		report_feet_value.setEditable(false);
+		report_feet_value.addItemListener(this);
+		pane.add(report_feet_value, c);
+		set_report_feet_tool_tip();
 		row++;
 
 		/* Telemetry Rate */
@@ -1484,6 +1524,31 @@ public class AltosConfigFCUI
 	public int radio_10mw() {
 		if (radio_10mw_value.isVisible())
 			return radio_10mw_value.isSelected() ? 1 : 0;
+		else
+			return AltosLib.MISSING;
+	}
+
+	public void set_report_feet(int new_report_feet) {
+		if (new_report_feet != AltosLib.MISSING) {
+			if (new_report_feet >= report_feet_values.length)
+				new_report_feet = 0;
+			if (new_report_feet < 0) {
+				report_feet_value.setEnabled(false);
+				new_report_feet = 0;
+			} else {
+				report_feet_value.setEnabled(true);
+			}
+			report_feet_value.setSelectedIndex(new_report_feet);
+		}
+		report_feet_value.setVisible(new_report_feet != AltosLib.MISSING);
+		report_feet_label.setVisible(new_report_feet != AltosLib.MISSING);
+
+		set_report_feet_tool_tip();
+	}
+
+	public int report_feet() {
+		if (report_feet_value.isVisible())
+			return report_feet_value.getSelectedIndex();
 		else
 			return AltosLib.MISSING;
 	}

@@ -2,4 +2,8 @@
 %{
 #include "libaltos.h"
 %}
-
+%extend altos_device {
+	int method_1(int x, int y) {
+		return ($self->method_1)(x, y);
+	}
+}

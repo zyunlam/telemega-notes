@@ -1,0 +1,12 @@
+ifndef TOPDIR
+TOPDIR=..
+endif
+
+include $(TOPDIR)/Makefile.defs
+
+vpath % $(TOPDIR)/samd21:$(AO_VPATH)
+
+CC=$(ARM_CC)
+
+SAMD21_CFLAGS=-mlittle-endian -mcpu=cortex-m0 -mthumb \
+	-I$(TOPDIR)/samd21 $(AO_CFLAGS) $(PICOLIBC_CFLAGS)

@@ -1,3 +1,984 @@
+commit 8e42773e7834638464b46495123dbdc2356032bf
+Merge: a6c32739 7fe1408a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jan 19 22:55:56 2023 -0700
+
+    Merge branch 'master' into branch-1.9
+
+commit 7fe1408af6fd65c13cebf33d7bb7bf8517d8ce1e
+Merge: 234b275d 5f007934
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jan 19 22:51:27 2023 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 5f007934c12863b5df1adc8d286b20b3488b5a6f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:28:36 2023 -0800
+
+    Version 1.9.13
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 97e6f06783006f59dd596d4f3d741408a1e4e5b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:27:18 2023 -0800
+
+    doc: Update copyright year to 2023
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1803c15b9d9110df9e54374b2576681835d6cd87
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:27:02 2023 -0800
+
+    doc: Add release notes for 1.9.13
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96181ff1e0d376d7a2c9519abbf4f346d8fd47ea
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jan 19 22:41:24 2023 -0700
+
+    doc: update EasyMotor behavior description for firmware 1.9.13 and later
+
+commit 234b275db125304829d1859713388775fd3791db
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jan 19 22:41:24 2023 -0700
+
+    doc: update EasyMotor behavior description for firmware 1.9.13 and later
+
+commit 22f9fb47d97ba13f6b30fab25bce552bccc91997
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:39:42 2023 -0800
+
+    Disable TM v4.0 firmware for 1.9.13
+    
+    This will be in 1.9.14
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3021764629a438d1d1b0323a09d6fb2350ce1bfb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:28:36 2023 -0800
+
+    Version 1.9.13
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2689b30cdccba18d46505774aafc8e6119948191
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:27:18 2023 -0800
+
+    doc: Update copyright year to 2023
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 399c85245542d95f05063fdd34939dc746f1ea2d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:27:02 2023 -0800
+
+    doc: Add release notes for 1.9.13
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 691869aa6c542999a4e915c23b6696451dd42f65
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 17:20:44 2023 -0800
+
+    altos: Add makefiles for telemega v6
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e4ce0ce186b68497cfb14a400410fdd38aa93abc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 14:04:50 2023 -0800
+
+    altos/easymotor: Move pressure conversion code to ao_motor_flight.c
+    
+    This inline function uses a pile of constants which aren't defined in
+    ao_pins.h, so move it to ao_motor_flight.c where it is used
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 28e4cb24e0f0ee5abf66c5a0466edfd0e31f4df0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 13:20:56 2023 -0800
+
+    easymotor-v3: Fix pressure to adc conversion to use reference voltage
+    
+    Wasn't taking reference voltage into account, which meant the computed values
+    were 3.3 times too high.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7b40813fdafce4ebd635aceb4c32355339a4d98d
+Merge: 026ab589 4c61c113
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 12:21:32 2023 -0800
+
+    Merge branch 'easymotor-flight'
+
+commit 026ab589d0ade3dd59d26888fffd8699ef534671
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jan 19 12:18:46 2023 -0800
+
+    altos/telelco: Add some debug aids for TeleLCO event stuff
+    
+    Use (debug & 2) to select just event debugging.
+    Add 'pretend' mode to cycle through all possible pad boxes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ee49d3c202e1fee14328006e2beb2e774313de2e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 27 21:33:14 2022 -0800
+
+    altoslib: Add TeleMega v6 support
+    
+    New sensor (bmi088) support, plus other changes as needed. Also found
+    some places missing TeleMega-v5 support?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 96444c1e0e6a1c179d9695b454012d0b16d0a76c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 27 21:32:39 2022 -0800
+
+    ao-tools: Update ao-eeprom for TeleMega v6
+    
+    Add new log file format; no other changes needed here.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 95d39febfa9b6c6f2696fb1b47cf72aa808ec7c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 27 21:31:38 2022 -0800
+
+    ao-tools: Fix buffer overflow in lib/ao-hex.c
+    
+    ao_hex_file_create allocated a buffer too short when writing EOF.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 08f13d3301bfcf9a5b9b566df4ffd4ed33f236d0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 27 21:30:13 2022 -0800
+
+    altos: Split AO_LOG_NORMALIZED support out in telemetry code
+    
+    This avoids needing per-driver changes to the telemetry code by using
+    the normalized data gathering techniques.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0d16160ce2207fd248c2d93a4f7a77a05176204d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 27 21:29:12 2022 -0800
+
+    drivers: Add AO_LOG_NORMALIZED support to BMI088 command
+    
+    Make this driver work in monitor idle mode
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ad4679dd0bd2d759f708a6ab6d0425eb1cbde7c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 27 21:01:06 2022 -0800
+
+    src/drivers: Ignore printf warnings in ao_aprs.c
+    
+    This code uses sprintf to generate the tnc buffer, but the compiler doesn't
+    really understand the value limits.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0c34739489b23e729cd7d35c5ec74416fb51164a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Dec 27 20:24:51 2022 -0800
+
+    doc: Update docs for asciidoctor-pdf version 2.x
+    
+    Some of the theming stuff changed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fc042fa0a77d808fa7670e213e7e0c273200a043
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Dec 17 18:01:01 2022 -0800
+
+    altos: Add TeleMega v6.0
+    
+    Like TeleMega v5.0, but replaces MPU6000 with BMI088
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9d515a031d388bec41583f0335e97ecd78c75864
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 27 17:06:58 2022 -0700
+
+    altos: Add BMI088 test framework using Nucleo32 board for stm32f042
+    
+    This allows a BMI088 chip to be connected to a nucleo-32 board
+    with an stm32f042 chip to be tested.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bc0adb3723e9d383c8a379850c4cb0650003772e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Aug 27 17:05:51 2022 -0700
+
+    drivers: Add BMI088 driver
+    
+    Supports the Bosch BMI-088 3-d accel/gyro device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 560767497057c08a6fc3bc24aaba23a8d6192259
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 5 19:26:42 2022 -0800
+
+    altos: Add timeout in MS5607 get_sample code
+    
+    MISO is supposed to rise when the sample value is ready, but sometimes
+    we miss the interrupt which should be generated. I spent a day
+    attempting to fix this, but was unable to make it 100%. Instead, add a
+    10ms timeout, which is longer than the sample time (8.2ms), and then
+    read MISO directly. If the interrupt fires, we'll read a bit sooner.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4af1fba120644f38e91bae283c9ff2ef32c2e49c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 5 19:51:02 2022 -0800
+
+    altos/stmf0: Add ao_spi_put_pins for MS5067 driver
+    
+    TeleMini needs this on stmf0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2ea3f551b3c4649320efe2fd999f01012bca03bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Dec 5 19:29:28 2022 -0800
+
+    altos/stm: Add ao_spi_put_pins for MS5607 driver
+    
+    This function re-configures the GPIO mux to disconnect the SPI block
+    from the pins driving the MS5607.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4c61c11322b57ed1910bba33bd2ce11a368e6583
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 4 16:33:02 2022 -0800
+
+    easymotor-v3.0: Clean up build bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1a467bf13485649419e1205ee788ef0d58b42d01
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 4 16:32:05 2022 -0800
+
+    easymotor-v3.0: Use motor pressure to trigger data logging
+    
+    Use this instead of acceleration so it can be used on the ground as
+    well as for staged flights.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit da253f1ee9510fba93ddf5c1895570eb5081af46
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Dec 4 14:17:58 2022 -0800
+
+    altos: Add timeout for MS5607 ADC conversion
+    
+    The MS5607 should signal conversion done by pulling MISO low, but in
+    case it doesn't, add a 10ms timeout to wake up after the conversion
+    should be done.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c2eb61af64b8f38d88fff885f0fccdc0100ab233
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 26 09:57:33 2022 -0800
+
+    altoslib: Add notes about updating ao-eeprom for new product
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c1708f3fa4ff412da8817ba0fa58d05fe7ef44f5
+Merge: 414ad269 999cc72a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 26 09:52:37 2022 -0800
+
+    Merge branch 'master'
+
+commit 414ad2696bbe2a2f245ae7bb2ec8f57bc8cc0097
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 26 09:48:19 2022 -0800
+
+    ao-tools/ao-eeprom: Add support for TeleMega v5.0
+    
+    Same as TeleMega v4.0 (ao-eeprom doesn't do much with imu data)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 999cc72af08ebf9ce0fd44ed00b42a2cd1a53594
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 15:57:44 2022 -0800
+
+    Add TeleMetrum v4.0 to release files
+    
+    Releasing
+    altosui/Makefile
+    altosui/altos-windows.nsi.in
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6cb7457b87913d5f18b6b87d401b2782d8f665a4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 15:56:06 2022 -0800
+
+    altoslib: Handle TeleMetrum v4.0 in idle mode
+    
+    Handle config data and idle fetch stuff. Note that TM v4.0 differs
+    from older versions a bit as it stores config data in the SPI flash
+    chip, not in the SoC.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f80839cec9fef10e182901e08dec81a41c28f34b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 20 15:31:27 2022 -0800
+
+    altos: Enable telemetrum telemetry for telemetrum v4.0
+    
+    This configuration could be done better ...
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a616233dcdb3bcc1ac2b16436f3c6a0f3c746a63
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 18 13:06:12 2022 -0700
+
+    doc: add a link to a reference on ARES/RACES use of PowerPole connectors
+
+commit abcc8ca13005155b11d2316cf88be8cfa0294f44
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 18 12:51:08 2022 -0700
+
+    doc: add a warning to TeleLaunch docs about siren volume levels
+
+commit 4ff9f3271f9d20603626c18ee16b20e50c579ddf
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 23:37:29 2022 -0800
+
+    altos: Make sure APRS packets are reasonably separated
+    
+    Don't let them come too close together.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b4960336c0ae960bee40fdd337e58fcc8846ac87
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 23:35:40 2022 -0800
+
+    altos/ms5607: Fixup ms5607 changes for other chips
+    
+    A couple of chips don't bother providing duplex, so allow for that.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6c3f98370a7244a053f8e4858b8f136e2fd659b2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 23:34:34 2022 -0800
+
+    altos: Add ao_gps_utc_tick
+    
+    This indicates which tick is associated with the UTC time found
+    in the current ao gps data
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ce20ccccdf9464877a73f6ff2a5f9ce91f88fc27
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 23:33:29 2022 -0800
+
+    attiny, stm32l0: Note that these chips don't support spi duplex
+    
+    This makes the ms5607 driver use send/recv instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1bf40aa4c9ea9844046b7b84342225274622d7c2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 22:48:28 2022 -0800
+
+    samd21: Save interrupt pin status before enabling interrupts
+    
+    Make sure we capture the correct external interrupt pin state before
+    anything changes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8c0a7dfa4ba4b46dabce0ac7daecf0edd5fb6b62
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 22:47:00 2022 -0800
+
+    altos: Avoid modulus in task queue on parts without idiv
+    
+    Cortex-M0 parts don't have a hardware divide, so doing a modulus
+    to compute task hash indexes is super slow. Avoid that by making the sleep
+    queue a power of two.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf51520898fb30b289b2e03b31a1719c172cf422
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 22:38:12 2022 -0800
+
+    altos/cc1200: Simplify interrupt handling
+    
+    Use PKT_SYNC_RXTX for both packet send/recv signaling. This avoids
+    needing to flip the interrupt sense around between tx and rx, allowing
+    us to leave interrupts always enabled which avoids adventures on
+    samd21 with interrupt configuration.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9ed81c072f0c4c2044a284176d66be00a1439a40
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 20:44:38 2022 -0800
+
+    telemetrum-v4.0: Correct beeper configuration
+    
+    Beeper is on PA16, which is TCC2/0 with config E
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a69c3009a0583d04d1f52a88f4b0135b1944ee35
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 19:39:18 2022 -0800
+
+    telemetrum-v4.0: MS5607 doesn't share SPI controller
+    
+    The PRIVATE_PINS value is a bit misleading.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c450b5cd80534d067a760e5f0768f39a20604761
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 19:38:56 2022 -0800
+
+    fixup for exti restore
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c82b214e34763e0206cd676cae2d82e735ef2576
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 19:38:09 2022 -0800
+
+    samd21: AO_SPI_0_PA04_PA05_PA06 is FUNC_D
+    
+    Not FUNC_C
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 479bf2d88544f7f848ae42f77b0fbb74ca61ca27
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 19:37:23 2022 -0800
+
+    samd21: Restore pin cfg when exti is disabled
+    
+    Instead of clearing the pmux, set it back to the previous value as is
+    needed by ms5607.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1cdcaea940864bbe531b32f228bc169b50f4d3a9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 19:36:52 2022 -0800
+
+    samd21: Limit SPI baud value to 1
+    
+    Keep speeds slow enough
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4cb051d8ec1cdd7fd9cb87129c7425feb21f284e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 19:36:10 2022 -0800
+
+    samd21: PA20 maps to SERCOM3.2 not SERCOM3.3
+    
+    Flip the DIPO config around for AO_SPI_3_PA22_PA23_PA20
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5c182ab460fef614e2b987c808d4b4e2c4240a4f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 12 19:35:26 2022 -0800
+
+    altos/ms5607: Use duplex for fetching data
+    
+    Much more efficient than send/recv
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 997d68e13c32118c665fa273c515726c5ab2ce6b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 11:47:39 2022 -0800
+
+    telegps: Copy altosui 'beep feet' bits to telegps
+    
+    Yeah, this is cut&paste coding. Sorry.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit af241f03c5ec286f536c367b8cd27e9083af792b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Nov 10 11:40:29 2022 -0800
+
+    telemetrum-v4.0: Set USE_SERIAL_1_STDIN to 0
+    
+    This makes sure the serial driver knows how to manage this port
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 53a9d3b3c2d9fb04d8f5fba42ce19cd13dc65f28
+Merge: 31f32f20 543b6d08
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Nov 10 12:34:49 2022 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 31f32f200c3f64b42617638eb2fc390857d2b2e6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Nov 10 12:34:12 2022 -0700
+
+    ao-tools: return ao-flash-lpc operaton to "full speed"
+
+commit abd437a372932dcc1aafe939e65919a50c203af0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 9 16:29:56 2022 -0800
+
+    metro-m0: Add GPS support
+    
+    Plug a ublox GPS module into D4(tx)/D3(rx)
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4bd22c0cf3fc0358cff263e63ad2cc788be2bb14
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 9 16:29:13 2022 -0800
+
+    samd21: Leave serial RX interrupts enabled
+    
+    Just discard characters in the ISR. This avoids complex management of
+    the enable bit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3b0e4fd74d6c6e5ca972d7341c7155663c230e86
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 9 16:28:21 2022 -0800
+
+    drivers/ublox: Clean up some debug mode code
+    
+    Not used in production, so we didn't catch a couple of type errors.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1dfa369085208a37f1b9c4d42ca85c261abbb1f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Nov 9 16:02:55 2022 -0800
+
+    telemetrum-v4.0: Remove unused file
+    
+    Not sure what 'telemetrum.c' was supposed to do, but it's not used.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 543b6d08617fccc55e7dab142017969e5b565690
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Nov 9 09:06:17 2022 -0700
+
+    altosui: force Locale.ROOT during CSV export to avoid commas in decimals
+
+commit c035f20392828c60da75d092eea4d64736316c7b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Nov 9 08:27:28 2022 -0700
+
+    TeleMetrum v4.0 work in progress
+
+commit 09a2575840f95f9bce6c1da25b04d297455b1487
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 8 16:25:35 2022 -0800
+
+    telemetrum-v4.0: Add beeper and fix ADC defs
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9c556954d25daa6fda6771ca6d011d76b5d17524
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 8 16:20:07 2022 -0800
+
+    metro-m0: Hook up ADC sample from A pins
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7bcde16c96f05595969bceef76905aa2e285c66b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 8 16:18:57 2022 -0800
+
+    samd21: Hook up AltOS style ADC
+    
+    Can't use DMA; samd21 only does ADC in continuous pins. ISR per ADC,
+    manually step through.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5ca0ed94f30943952b9c63ee558733d37c896b5f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 8 16:17:58 2022 -0800
+
+    samd21: Hook up AltOS timer functionality
+    
+    Need to run the data sampling stuff.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf793f94a2218b42794fa1ae11babab8cd565a66
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 8 16:17:14 2022 -0800
+
+    samd21: Move DMA channel defs to ao_dma_samd21.h
+    
+    This way if we need to use DMA for something else, we've got
+    a central place to set things up.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 925d1cfb19da373249af716a6d7adc6d7450ec25
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 8 16:16:40 2022 -0800
+
+    samd21: Get beep code working
+    
+    Only supports TCC currently.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f354d17c7f15dcbc8c5b07fe2f950df3cb4552b2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 7 22:23:44 2022 -0800
+
+    metro-m0: Demo pin interrupts
+    
+    Prints 'pressed' whenever D0 goes low.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 13f0b70a6346c9cfe04e5c494d3f34aa92e0db8b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Nov 7 22:22:26 2022 -0800
+
+    samd21: Wire up pin interrupts
+    
+    Uses the external interrupt controller. Careful about pin mapping.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ca76309700a3f6ec9775f6e6cce5915dcb4515c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 19:31:05 2022 -0800
+
+    altos/telemetrum-v4.0: It links
+    
+    Still much work to do, but at least it links with most
+    of the pieces in place.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7ed85dc90345baec2c4143b75c4be819bb6a4d56
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 19:30:38 2022 -0800
+
+    samd21: Stub out beep code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 62381d8582749dc2672a65cb6e7c5b8a404a3b45
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 19:30:27 2022 -0800
+
+    samd21: Stub out exti code
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b24faa163ede640305f0660c30d84e558bd2b909
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 19:29:41 2022 -0800
+
+    samd21: Shrink default stack to 512 bytes
+    
+    Kinda needed to get TM v4.0 to fit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6a44cf7f77f0b2e098ef1afc4628898234bf7fb6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 18:33:45 2022 -0800
+
+    altos/telemetrum-v4.0: Almost building
+    
+    Pin config looks good now, need to get beep and exti drivers
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f3d95af6866018bf8d472bae192907efcbe5aaa1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 18:33:14 2022 -0800
+
+    samd21: Get serial driver building
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a06c84a27bd760039c522460f79bfe242d2d22c8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 18:31:42 2022 -0800
+
+    samd21: Add SPI configurations used by TM v4.0
+    
+    SPI 0 on PA04 PA05 PA06
+    SPI 3 on PA22 PA23 PA20
+    SPI 5 on PB22 PB23 PB03
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6e895d310224e612f0294bc953e24ffbe8d29437
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 18:31:16 2022 -0800
+
+    samd21: Get ADC code compiling
+    
+    This probably isn't complete yet, but it builds
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 79613a403cbb545672afc7b169b3a833d587903a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 18:30:31 2022 -0800
+
+    altos/ms5607: Use ao_gpio_set instead of stm_gpio_set
+    
+    The former is architecture independent.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 30149c4764984972eb5d482cfc51657d4ed09ed1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 17:47:57 2022 -0800
+
+    metro-m0: Configure on-board SPI flash part
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9481e33348f098f3df73006641b9a18a04f2c482
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 17:46:56 2022 -0800
+
+    samd21: Add ability to use arbitrary pin configs with SPI
+    
+    This embeds the DOPO and DIPO configs in the address
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5d18ef0a25248f0192c3b539cad36d3de60a6f32
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 15:31:50 2022 -0800
+
+    samd21: Macro-ize the DMA register settings a bit
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 61a3971b7bda2c5a165088befe55467c09292090
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 15:12:33 2022 -0800
+
+    snekboard: Need DMA for SPI now.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 183e1bbde14cc33f1e9cc3857dbfc60d2c0c5b82
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 15:11:31 2022 -0800
+
+    samd21: Use DMA for SPI send
+    
+    Appears to work even
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e5c84201f2a8968ed60941edbc6756c7dbda8a06
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 15:10:31 2022 -0800
+
+    samd21: Fix value defines to be unsigned long
+    
+    This makes the compiler happy
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cbff1483ae7469d3961341a1cfdfeb8b4bb557c1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 15:09:55 2022 -0800
+
+    samd21: Avoid divides in boot loader
+    
+    The divide code is huge and overflows flash.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4839569abef7f1d9592a9da5d40fe67dcc048ce1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 15:08:56 2022 -0800
+
+    samd21: Fix up DMA driver
+    
+    Surprisingly few changes, just some function signatures and a few bit
+    twiddles.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4be4ffe72c5f678a66658e9e61d3cfac7f20a9b3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Nov 6 15:07:46 2022 -0800
+
+    altos: Add metro-m0 port for SAMD21G18 testing
+    
+    Useful as a test target
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 13a9247afabfaf93ebf46f9a33862864d2772074
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 5 21:05:13 2022 -0700
+
+    samd21: Configure ROM/RAM values per device and provide linker scripts for each
+    
+    SAMD21 has 4-32k of RAM and 32-256K of ROM
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 608640858d0d02ac06fca22aa3b9db9c89733adb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 5 20:53:23 2022 -0700
+
+    This is what I'm using locally for flashing samd21 parts
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fdc1facebf1d2818394b155a91b68e06db198728
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Nov 5 15:18:27 2022 -0700
+
+    snekboard: Add samd21 SPI test function
+    
+    Just sends 'hello'
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a54f4fae343b7524db508dc1a29d36847a2decde
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Oct 23 16:33:28 2022 -0700
+
+    altos: Get SAMD21 SPI driver working in non-DMA mode
+    
+    Only sercom0, and only with fixed pin configurations
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ba28c5e7f6aa3d41abc1f598dbc3c2689c9bef9c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 4 03:15:08 2022 -0600
+
+    ao-tools: increase robustness of turnon_easymotor
+
+commit 1066699ea2e0377af67b3b0c32ec1b023dea0719
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 4 02:56:31 2022 -0600
+
+    ao-bringup: final production test script for EasyMotor v3
+
+commit a2fdfd4f9c92c1d3331f8be0e15ae19209b4ee15
+Merge: 28fd8e6f 4a1f441b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 4 02:41:43 2022 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 28fd8e6f157c37b08b6a17dae664597f01e8aa8a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 4 02:41:11 2022 -0600
+
+    ao-tools: new ao-test-pressure utility for bench testing EasyMotor
+
+commit fddda6bbe5accb4868ee9bbc337937147da92ad8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 4 02:40:53 2022 -0600
+
+    update Releasing to include EasyMini v3.0 loader
+
+commit bcc15fb429724956e72f06a4f4b1002b1def7a94
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Nov 4 02:39:34 2022 -0600
+
+    ao-tools: don't do 'm 0' after 'E 0' since EasyMotor doesn't support it
+
+commit 4a1f441b746d4c9d1cb4a52401d76b5e81ba6f48
+Merge: e5feac1a d80c1317
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Nov 2 11:34:35 2022 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit e5feac1a3db00816e82cd6b1b4dbde62e40d16a6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Nov 2 11:33:29 2022 -0600
+
+    EasyMotor v3 production script working, sans pressure input test
+
+commit d80c1317f596f73d192e6fbb33c3579d54802182
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Nov 1 13:00:22 2022 -0700
+
+    Add option to beep max height in feet rather than just meters
+    
+    Available on all products, plus config UI changes.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d999b56de8775cd5c2f98f913e555febd92357a9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Nov 1 10:41:03 2022 -0600
+
+    easymini v3.0 production scripts working
+
+commit 274522bc26910051e30aaebd78e96794161b87e8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 28 23:43:40 2022 -0600
+
+    update Releasing with tweaks made during 1.9.12 release process
+
+commit a6c32739c75d8c0369617f575a83d70031faf36a
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 28 23:10:24 2022 -0600
+
+    updating changelog for 1.9.12 release
+
 commit bdabc6814b066a9b17a6557910f21b1ed03de3f0
 Merge: 37dda254 c5e8826a
 Author: Bdale Garbee <bdale@gag.com>
@@ -68,6 +1049,13 @@ Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Oct 27 22:20:19 2022 -0600
 
     fix mailing list reference to use mailman3 path
+
+commit 975e3133e25c6fb5ea0c0b2487ea34e528660a45
+Merge: 05278307 bda33b76
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Oct 28 21:49:16 2022 -0600
+
+    Merge branch 'samd21' of ssh://git.gag.com/scm/git/fw/altos into samd21
 
 commit edef072dd5cffdbd3e8346719a81808b17bdc570
 Author: Keith Packard <keithp@keithp.com>
@@ -177,6 +1165,105 @@ Date:   Thu Oct 27 17:43:08 2022 -0700
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
+commit bda33b7697456516c3022f91d2119a56448b42bb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:34:56 2022 -0700
+
+    altos/snekboard: Indicate that USB is used for stdio
+    
+    This isn't the default for some reason?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 59f08a3079ccecaeb91b637e7d311f3f98d10c42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:34:11 2022 -0700
+
+    altos/samd21: Automatically erase flash when writing
+    
+    Need to erase pages before writing them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f7e6cbeaf3e84935b38da8605a6d5bb702eff3a5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:33:09 2022 -0700
+
+    altos/samd21: Get USB driver working in AltOS
+    
+    Make sure it deals with the stdio mux, enable the clock for the GPIO
+    device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0585dd012a9f76f1ad0f3a85d03075125704dfd3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:32:35 2022 -0700
+
+    altos/samd21: Add register definitions
+    
+    This adds symbols for all of the device registers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c4a63617f0eb825a295ae8ee1ee0caf4580b7a13
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:31:27 2022 -0700
+
+    ao-tools: Add ao-flash-samd21 script
+    
+    This takes an .elf or .ihx file and flashes that to a SAMD21 based
+    board using openocd. Note that you must have a hacked version of
+    OpenOCD for this to work via the ST-link device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4d116df20ae2d13bbc29344a91e557448cd8c19b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:57:08 2022 -0700
+
+    altos: Add sample samd21 application for snekboard
+    
+    This runs a primitive application and flash loader on snekboard for
+    samd21 development.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c59892cd337162c63e5d7ba8e8eec779d201022d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:55:43 2022 -0700
+
+    altos: Add SAMD21 bits
+    
+    Brought back from snek, these bits provide Altos support for the Atmel
+    SAMD21 family of chips.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3a7ae9e964c9554a667a09d6b437fef136bc0fa0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:55:04 2022 -0700
+
+    altos: Use --gc-sections
+    
+    This allows the linker to discard unused functions.
+    
+    Don't use -ffunctions-sections and -fdata-sections as that eliminates
+    several optimization opportunities and increases code size.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1523a986a7c2e8402c628e2697e44fe6281c164e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:54:24 2022 -0700
+
+    altos: Switch LED pin number to 8 bits
+    
+    This assumes each port has fewer than 256 pins and avoids some
+    compiler warnings
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
 commit 48a8ae2d38ecad5aa84b2158045c6a2fd8abe5ab
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Oct 23 16:48:05 2022 -0700
@@ -187,6 +1274,108 @@ Date:   Sun Oct 23 16:48:05 2022 -0700
     that's because the max key size could be 256 bits instead of 128 bits?
     
     In any case, this makes the compiler happy.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 05278307f5e9fd5f8b1a53078e6f3b125785b019
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sat Oct 15 21:40:50 2022 -0600
+
+    first stab at support for TeleMetrum v4.0
+
+commit 01811a649548987d3c5c29ca13725717d090502b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:34:56 2022 -0700
+
+    altos/snekboard: Indicate that USB is used for stdio
+    
+    This isn't the default for some reason?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38a40c850716c545004dae01412b3350e5ef8cfd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:34:11 2022 -0700
+
+    altos/samd21: Automatically erase flash when writing
+    
+    Need to erase pages before writing them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bd088d263172dbe9ffe399a93a836cac26a37708
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:33:09 2022 -0700
+
+    altos/samd21: Get USB driver working in AltOS
+    
+    Make sure it deals with the stdio mux, enable the clock for the GPIO
+    device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4a6a5de714f346b7c57c77e5f6712d39c2042479
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:32:35 2022 -0700
+
+    altos/samd21: Add register definitions
+    
+    This adds symbols for all of the device registers.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit be0a7f000250704bcdbad82aa4ef4d9966fc6307
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 17:31:27 2022 -0700
+
+    ao-tools: Add ao-flash-samd21 script
+    
+    This takes an .elf or .ihx file and flashes that to a SAMD21 based
+    board using openocd. Note that you must have a hacked version of
+    OpenOCD for this to work via the ST-link device.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c869985188ce9d28c332e449b36c4c88077cd587
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:57:08 2022 -0700
+
+    altos: Add sample samd21 application for snekboard
+    
+    This runs a primitive application and flash loader on snekboard for
+    samd21 development.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5e7e4303f161e38ac2d84110dccafc67b3aa7fc8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:55:43 2022 -0700
+
+    altos: Add SAMD21 bits
+    
+    Brought back from snek, these bits provide Altos support for the Atmel
+    SAMD21 family of chips.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 643a1f736d2e57c577458d0e4d2948718d90b301
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:55:04 2022 -0700
+
+    altos: Use -ffunction-sections -fdata-sections
+    
+    This allows the linker to discard unused functions.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c1f7bf876a67dc176a7a24b241c6dd3fe780082d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Sep 25 13:54:24 2022 -0700
+
+    altos: Switch LED pin number to 8 bits
+    
+    This assumes each port has fewer than 256 pins and avoids some
+    compiler warnings
     
     Signed-off-by: Keith Packard <keithp@keithp.com>
 

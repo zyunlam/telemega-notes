@@ -3,7 +3,7 @@ SUBDIRS=lib ao-rawload ao-dbg ao-bitbang ao-eeprom ao-list \
 	ao-dumpflash ao-edit-telem ao-dump-up ao-elftohex \
 	ao-flash ao-usbload ao-test-igniter ao-test-baro \
 	ao-test-flash ao-cal-accel ao-test-gps ao-usbtrng \
-	ao-cal-freq ao-makebin
+	ao-cal-freq ao-makebin ao-test-pressure
 if LIBSTLINK
 SUBDIRS += ao-stmload
 endif
