@@ -5,8 +5,8 @@ Keith Packard <keithp@keithp.com>
 :stylesheet: am.css
 :linkcss:
 :numbered:
-:pdf-stylesdir: .
-:pdf-style: altusmetrum
+:pdf-themesdir: .
+:pdf-theme: altusmetrum
 :pdf-fontsdir: fonts
 
 	include::header.adoc[]

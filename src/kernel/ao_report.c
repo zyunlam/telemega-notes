@@ -149,7 +149,7 @@ ao_report_digit(uint8_t digit)
 }
 
 static void
-ao_report_number(ao_v_t n)
+ao_report_number(int32_t n)
 {
 	uint8_t	digits[10];
 	uint8_t ndigits, i;
@@ -168,11 +168,20 @@ ao_report_number(ao_v_t n)
 	while (i != 0);
 }
 
+#ifdef HAS_BARO
 static void
 ao_report_altitude(void)
 {
-	ao_report_number(ao_max_height);
+	alt_t max_h = ao_max_height;
+	if (ao_config.report_feet) {
+		max_h = max_h * 39 / 12;
+		/* report a leading zero to distinguish */
+		if (max_h)
+			ao_report_digit(0);
+	}
+	ao_report_number(max_h);
 }
+#endif
 
 #if HAS_BATTERY_REPORT
 static void
@@ -269,7 +278,9 @@ ao_report(void)
 #endif
 
 		if (ao_report_state == ao_flight_landed) {
+#if HAS_BARO
 			ao_report_altitude();
+#endif
 #if HAS_FLIGHT
 			ao_delay(AO_SEC_TO_TICKS(5));
 			continue;

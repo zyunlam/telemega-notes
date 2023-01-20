@@ -298,6 +298,7 @@ struct ao_telemetry_mini {
 };
 
 #define AO_TELEMETRY_MEGA_NORM_MPU6000_MMC5983	0x13
+#define AO_TELEMETRY_MEGA_NORM_BMI088_MMC5983	0x14
 
 struct ao_telemetry_mega_norm {
 	uint16_t	serial;		/*  0 */

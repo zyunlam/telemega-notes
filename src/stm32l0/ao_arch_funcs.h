@@ -139,8 +139,7 @@ ao_spi_recv_byte(uint8_t spi_index)
 void
 ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
 
-void
-ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
+#define AO_SPI_DUPLEX	0
 
 void
 ao_spi_init(void);

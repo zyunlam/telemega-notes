@@ -204,6 +204,7 @@ ao_radio_status(void)
 void
 ao_radio_recv_abort(void)
 {
+	ao_exti_disable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
 	ao_radio_abort = 1;
 	ao_wakeup(&ao_radio_wake);
 }
@@ -213,7 +214,6 @@ ao_radio_recv_abort(void)
 static void
 ao_radio_isr(void)
 {
-	ao_exti_disable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
 	ao_radio_wake = 1;
 	ao_wakeup(&ao_radio_wake);
 }
@@ -221,14 +221,12 @@ ao_radio_isr(void)
 static void
 ao_radio_start_tx(void)
 {
-	ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
 	ao_radio_strobe(CC1200_STX);
 }
 
 static void
 ao_radio_start_rx(void)
 {
-	ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
 	ao_radio_strobe(CC1200_SRX);
 }
 
@@ -575,8 +573,7 @@ static uint16_t ao_radio_mode;
 
 #define AO_RADIO_MODE_BITS_PACKET	1
 #define AO_RADIO_MODE_BITS_TX_BUF	4
-#define AO_RADIO_MODE_BITS_TX_FINISH	8
-#define AO_RADIO_MODE_BITS_RX		16
+#define AO_RADIO_MODE_BITS_FINISH	8
 #define AO_RADIO_MODE_BITS_RDF		32
 #define AO_RADIO_MODE_BITS_APRS		64
 #define AO_RADIO_MODE_BITS_TEST		128
@@ -584,12 +581,12 @@ static uint16_t ao_radio_mode;
 #define AO_RADIO_MODE_BITS_FIXED	512
 
 #define AO_RADIO_MODE_NONE		0
-#define AO_RADIO_MODE_PACKET_TX		(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_FINISH)
-#define AO_RADIO_MODE_PACKET_RX		(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_RX)
-#define AO_RADIO_MODE_RDF		(AO_RADIO_MODE_BITS_RDF    | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_FINISH)
+#define AO_RADIO_MODE_PACKET_TX		(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_FINISH)
+#define AO_RADIO_MODE_PACKET_RX		(AO_RADIO_MODE_BITS_PACKET | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_FINISH)
+#define AO_RADIO_MODE_RDF		(AO_RADIO_MODE_BITS_RDF    | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_FINISH)
 #define AO_RADIO_MODE_APRS_BUF		(AO_RADIO_MODE_BITS_APRS   | AO_RADIO_MODE_BITS_INFINITE | AO_RADIO_MODE_BITS_TX_BUF)
 #define AO_RADIO_MODE_APRS_LAST_BUF	(AO_RADIO_MODE_BITS_APRS   | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_BUF)
-#define AO_RADIO_MODE_APRS_FINISH	(AO_RADIO_MODE_BITS_APRS   | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_TX_FINISH)
+#define AO_RADIO_MODE_APRS_FINISH	(AO_RADIO_MODE_BITS_APRS   | AO_RADIO_MODE_BITS_FIXED    | AO_RADIO_MODE_BITS_FINISH)
 #define AO_RADIO_MODE_TEST		(AO_RADIO_MODE_BITS_TEST   | AO_RADIO_MODE_BITS_INFINITE | AO_RADIO_MODE_BITS_TX_BUF)
 
 static void
@@ -642,17 +639,10 @@ ao_radio_set_mode(uint16_t new_mode)
 
 	if (changes & AO_RADIO_MODE_BITS_TX_BUF) {
 		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_TXFIFO_THR);
-		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH);
 	}
 
-	if (changes & AO_RADIO_MODE_BITS_TX_FINISH) {
+	if (changes & AO_RADIO_MODE_BITS_FINISH) {
 		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_PKT_SYNC_RXTX);
-		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH);
-	}
-
-	if (changes & AO_RADIO_MODE_BITS_RX) {
-		ao_radio_reg_write(AO_CC1200_INT_GPIO_IOCFG, CC1200_IOCFG_GPIO_CFG_MARC_MCU_WAKEUP);
-		ao_exti_set_mode(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN, AO_EXTI_MODE_RISING|AO_EXTI_PRIORITY_HIGH);
 	}
 
 	if (changes & AO_RADIO_MODE_BITS_RDF)
@@ -772,12 +762,18 @@ ao_radio_show_state(char *where)
 /* Wait for the radio to signal an interrupt
  */
 static void
-ao_radio_wait_isr(AO_TICK_TYPE timeout)
+_ao_radio_wait_isr(AO_TICK_TYPE timeout)
 {
-	ao_arch_block_interrupts();
 	while (!ao_radio_wake && !ao_radio_abort)
 		if (ao_sleep_for(&ao_radio_wake, timeout))
 			ao_radio_abort = 1;
+}
+
+static void
+ao_radio_wait_isr(AO_TICK_TYPE timeout)
+{
+	ao_arch_block_interrupts();
+	_ao_radio_wait_isr(timeout);
 	ao_arch_release_interrupts();
 }
 
@@ -943,11 +939,12 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 			ao_radio_set_len((uint8_t) (total & 0xff));
 
 		/* Wait for some space in the fifo */
+		ao_arch_block_interrupts();
 		while (started && ao_radio_int_pin() != 0 && !ao_radio_abort) {
 			ao_radio_wake = 0;
-			ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
-			ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
+			_ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
 		}
+		ao_arch_release_interrupts();
 		if (ao_radio_abort)
 			break;
 
@@ -963,11 +960,12 @@ ao_radio_send_aprs(ao_radio_fill_func fill)
 		}
 	}
 	/* Wait for the transmitter to go idle */
+	ao_arch_block_interrupts();
 	while (started && ao_radio_int_pin() != 0 && !ao_radio_abort) {
 		ao_radio_wake = 0;
-		ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
-		ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
+		_ao_radio_wait_isr(AO_MS_TO_TICKS(1000));
 	}
+	ao_arch_release_interrupts();
 	if (ao_radio_abort)
 		ao_radio_idle();
 	ao_radio_put();
@@ -1033,6 +1031,8 @@ ao_radio_recv(void *d, uint8_t size, AO_TICK_TYPE timeout)
 
 	while (!ao_radio_abort) {
 		ao_radio_wait_isr(timeout);
+		if (ao_radio_abort)
+			break;
 		if (ao_radio_wake) {
 			uint8_t		marc_status1 = ao_radio_reg_read(CC1200_MARC_STATUS1);
 
@@ -1480,6 +1480,8 @@ ao_radio_init(void)
 	ao_exti_setup(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN,
 		      AO_EXTI_MODE_FALLING|AO_EXTI_PRIORITY_HIGH,
 		      ao_radio_isr);
+
+	ao_exti_enable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
 
 	ao_cmd_register(&ao_radio_cmds[0]);
 }

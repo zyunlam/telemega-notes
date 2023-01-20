@@ -35,6 +35,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
 			return data32(16);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(14);
@@ -49,6 +50,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
 			return data32(20);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(16);
@@ -63,6 +65,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_4:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
 			return data32(24);
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_OLD:
 			return data16(18);
@@ -119,6 +122,8 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
 			return AltosLib.model_mpu6000;
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
+			return AltosLib.model_bmi088;
 		}
 		return AltosLib.MISSING;
 	}
@@ -126,6 +131,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private boolean sensor_normalized() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
 			return true;
 		}
 		return false;
@@ -134,6 +140,7 @@ public class AltosEepromRecordMega extends AltosEepromRecord {
 	private int mag_model() {
 		switch (log_format) {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
+		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
 			return AltosLib.model_mmc5983;
 		}
 		return AltosLib.MISSING;

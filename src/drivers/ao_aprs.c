@@ -310,6 +310,7 @@ static uint8_t tncBitStuff;
 /// Buffer to hold the message portion of the AX.25 packet as we prepare it.
 static uint8_t tncBuffer[TNC_BUFFER_SIZE];
 
+#pragma GCC diagnostic ignored "-Wformat-overflow="
 /**
  *   Initialize the TNC internal variables.
  */

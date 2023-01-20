@@ -21,6 +21,10 @@
 #include <ao_data.h>
 #endif
 
+#ifndef HAS_KALMAN
+#define HAS_KALMAN 1
+#endif
+
 #if HAS_GYRO
 #include <ao_quaternion.h>
 #endif
@@ -57,7 +61,7 @@ angle_t		ao_sample_orient;
 angle_t		ao_sample_orients[AO_NUM_ORIENT];
 uint8_t		ao_sample_orient_pos;
 #endif
-#ifdef HAS_MOTOR_PRESSURE
+#if HAS_MOTOR_PRESSURE
 motor_pressure_t	ao_sample_motor_pressure;
 #endif
 
@@ -340,7 +344,7 @@ ao_sample_preflight_update(void)
 		++nsamples;
 	else
 		ao_sample_preflight_set();
-#if !HAS_BARO
+#if !HAS_BARO && HAS_KALMAN
 	if ((nsamples & 0x3f) == 0)
 		ao_kalman_reset_accumulate();
 #endif
@@ -406,7 +410,9 @@ ao_sample(void)
 		else {
 			if (ao_flight_state < ao_flight_boost)
 				ao_sample_preflight_update();
+#if HAS_KALMAN
 			ao_kalman();
+#endif
 #if HAS_GYRO
 			ao_sample_rotate();
 #endif

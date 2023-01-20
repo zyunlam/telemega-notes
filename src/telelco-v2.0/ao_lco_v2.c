@@ -33,6 +33,9 @@
 
 /* UI values */
 static uint8_t	ao_lco_select_mode;
+static uint8_t	ao_lco_event_debug;
+
+#define PRINTE(...) do { if (!ao_lco_debug && !ao_lco_event_debug) break; printf ("\r%5lu %s: ", (unsigned long) ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } while(0)
 #define AO_LCO_SELECT_PAD	0
 #define AO_LCO_SELECT_BOX	1
 
@@ -176,7 +179,7 @@ ao_lco_input(void)
 
 	for (;;) {
 		ao_event_get(&event);
-		PRINTD("event type %d unit %d value %ld\n",
+		PRINTE("event type %d unit %d value %ld\n",
 		       event.type, event.unit, (long) event.value);
 		switch (event.type) {
 		case AO_EVENT_QUADRATURE:
@@ -283,13 +286,16 @@ static void
 ao_lco_set_debug(void)
 {
 	uint32_t r = ao_cmd_decimal();
-	if (ao_cmd_status == ao_cmd_success)
-		ao_lco_debug = r != 0;
+	if (ao_cmd_status == ao_cmd_success){
+		ao_lco_debug = r & 1;
+		ao_lco_event_debug = (r & 2) >> 1;
+	}
 }
 
 const struct ao_cmds ao_lco_cmds[] = {
 	{ ao_lco_set_debug,	"D <0 off, 1 on>\0Debug" },
 	{ ao_lco_search,	"s\0Search for pad boxes" },
+	{ ao_lco_pretend,	"p\0Pretend there are lots of pad boxes" },
 	{ 0, NULL }
 };
 #endif

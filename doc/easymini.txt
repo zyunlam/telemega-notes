@@ -12,8 +12,8 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 :altusmetrum: 1
 :easymini: 1
 :application: AltosUI
-:pdf-stylesdir: .
-:pdf-style: altusmetrum
+:pdf-themesdir: .
+:pdf-theme: altusmetrum
 :pdf-fontsdir: fonts
 
 	include::header.adoc[]

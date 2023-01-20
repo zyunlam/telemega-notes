@@ -90,10 +90,6 @@
 
 #define AO_DATA_RING		32
 
-struct ao_adc {
-	int16_t			v_batt;
-	int16_t			motor_pressure;
-};
 
 #define AO_ADC_DUMP(p) \
 	printf("tick: %5lu batt: %5d motor_pressure: %5d\n", \
@@ -152,10 +148,26 @@ struct ao_adc {
 #define HAS_IMU			1
 #define USE_ADXL375_IMU		1
 
+#define HAS_KALMAN		0
+
 /* Motor pressure */
 #define HAS_MOTOR_PRESSURE	1
 #define ao_data_motor_pressure(packet) ((packet)->adc.motor_pressure)
 
 typedef int16_t	motor_pressure_t;
+
+/* want about 50psi, or 344kPa for boost and 30psi for coast */
+
+#define AO_FULL_SCALE_PRESSURE		11031612	/* 1600psi */
+#define AO_BOOST_DETECT_PRESSURE	344000		/* 50psi */
+#define AO_QUIET_DETECT_PRESSURE	207000		/* 30psi */
+
+#define AO_PRESSURE_VOLTS_BASE	0.5
+#define AO_PRESSURE_VOLTS_MAX	4.5
+
+struct ao_adc {
+	int16_t			v_batt;
+	int16_t			motor_pressure;
+};
 
 #endif /* _AO_PINS_H_ */

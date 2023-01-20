@@ -26,6 +26,8 @@ uint8_t		ao_lco_firing;					/* fire active */
 
 uint16_t	ao_lco_min_box, ao_lco_max_box;
 
+uint8_t		ao_lco_pretending;
+
 #if AO_LCO_DRAG
 uint8_t		ao_lco_drag_race;
 #endif
@@ -197,6 +199,7 @@ ao_lco_box_reset_present(void)
 {
 	ao_lco_min_box = 0xff;
 	ao_lco_max_box = 0x00;
+	ao_lco_pretending = 0;
 	memset(ao_lco_box_mask, 0, sizeof (ao_lco_box_mask));
 }
 
@@ -223,8 +226,12 @@ void
 ao_lco_set_box(uint16_t new_box)
 {
 	ao_lco_box = new_box;
-	if (ao_lco_box < AO_PAD_MAX_BOXES)
-		ao_lco_channels[ao_lco_box] = 0;
+	if (ao_lco_box < AO_PAD_MAX_BOXES) {
+		if (ao_lco_pretending)
+			ao_lco_channels[ao_lco_box] = 0xff;
+		else
+			ao_lco_channels[ao_lco_box] = 0;
+	}
 	ao_lco_pad = 1;
 	ao_lco_show();
 }
@@ -288,8 +295,8 @@ ao_lco_search(void)
 {
 	int8_t		r;
 	int8_t		try;
-	uint8_t		box;
-	uint8_t		boxes = 0;
+	uint16_t	box;
+	uint16_t	boxes = 0;
 
 	ao_lco_box_reset_present();
 	ao_lco_show_box(0);
@@ -304,7 +311,7 @@ ao_lco_search(void)
 			if (r == AO_RADIO_CMAC_OK) {
 				++boxes;
 				ao_lco_box_set_present(box);
-				ao_lco_show_pad(boxes % 10);
+				ao_lco_show_pad((uint8_t) (boxes % 10));
 				ao_delay(AO_MS_TO_TICKS(30));
 				break;
 			}
@@ -314,6 +321,22 @@ ao_lco_search(void)
 		ao_lco_box = ao_lco_min_box;
 	else
 		ao_lco_min_box = ao_lco_max_box = ao_lco_box = 0;
+	memset(ao_lco_valid, 0, sizeof (ao_lco_valid));
+	memset(ao_lco_channels, 0, sizeof (ao_lco_channels));
+	ao_lco_set_box(ao_lco_min_box);
+}
+
+void
+ao_lco_pretend(void)
+{
+	uint16_t box;
+
+	ao_lco_pretending = 1;
+	ao_lco_min_box = 1;
+	ao_lco_max_box = AO_PAD_MAX_BOXES - 1;
+	for (box = ao_lco_min_box; box < ao_lco_max_box; box++)
+		ao_lco_box_set_present(box);
+	ao_lco_box = ao_lco_min_box;
 	memset(ao_lco_valid, 0, sizeof (ao_lco_valid));
 	memset(ao_lco_channels, 0, sizeof (ao_lco_channels));
 	ao_lco_set_box(ao_lco_min_box);
