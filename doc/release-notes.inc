@@ -1,6 +1,10 @@
 [appendix]
 == Release Notes
 	:leveloffset: 2
+	include::release-notes-1.9.13.adoc[]
+
+	<<<<
+	:leveloffset: 2
 	include::release-notes-1.9.12.adoc[]
 
 	<<<<
