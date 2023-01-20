@@ -1,3 +1,130 @@
+altos (1.9.13-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altos: Switch LED pin number to 8 bits
+  * altos: Use -ffunction-sections -fdata-sections
+  * altos: Add SAMD21 bits
+  * altos: Add sample samd21 application for snekboard
+  * ao-tools: Add ao-flash-samd21 script
+  * altos/samd21: Add register definitions
+  * altos/samd21: Get USB driver working in AltOS
+  * altos/samd21: Automatically erase flash when writing
+  * altos/snekboard: Indicate that USB is used for stdio
+  * altos: Switch LED pin number to 8 bits
+  * altos: Use --gc-sections
+  * altos: Add SAMD21 bits
+  * altos: Add sample samd21 application for snekboard
+  * ao-tools: Add ao-flash-samd21 script
+  * altos/samd21: Add register definitions
+  * altos/samd21: Get USB driver working in AltOS
+  * altos/samd21: Automatically erase flash when writing
+  * altos/snekboard: Indicate that USB is used for stdio
+  * Add option to beep max height in feet rather than just meters
+  * altos: Get SAMD21 SPI driver working in non-DMA mode
+  * snekboard: Add samd21 SPI test function
+  * This is what I'm using locally for flashing samd21 parts
+  * samd21: Configure ROM/RAM values per device and provide linker scripts for each
+  * altos: Add metro-m0 port for SAMD21G18 testing
+  * samd21: Fix up DMA driver
+  * samd21: Avoid divides in boot loader
+  * samd21: Fix value defines to be unsigned long
+  * samd21: Use DMA for SPI send
+  * snekboard: Need DMA for SPI now.
+  * samd21: Macro-ize the DMA register settings a bit
+  * samd21: Add ability to use arbitrary pin configs with SPI
+  * metro-m0: Configure on-board SPI flash part
+  * altos/ms5607: Use ao_gpio_set instead of stm_gpio_set
+  * samd21: Get ADC code compiling
+  * samd21: Add SPI configurations used by TM v4.0
+  * samd21: Get serial driver building
+  * altos/telemetrum-v4.0: Almost building
+  * samd21: Shrink default stack to 512 bytes
+  * samd21: Stub out exti code
+  * samd21: Stub out beep code
+  * altos/telemetrum-v4.0: It links
+  * samd21: Wire up pin interrupts
+  * metro-m0: Demo pin interrupts
+  * samd21: Get beep code working
+  * samd21: Move DMA channel defs to ao_dma_samd21.h
+  * samd21: Hook up AltOS timer functionality
+  * samd21: Hook up AltOS style ADC
+  * metro-m0: Hook up ADC sample from A pins
+  * telemetrum-v4.0: Add beeper and fix ADC defs
+  * telemetrum-v4.0: Remove unused file
+  * drivers/ublox: Clean up some debug mode code
+  * samd21: Leave serial RX interrupts enabled
+  * metro-m0: Add GPS support
+  * telemetrum-v4.0: Set USE_SERIAL_1_STDIN to 0
+  * telegps: Copy altosui 'beep feet' bits to telegps
+  * altos/ms5607: Use duplex for fetching data
+  * samd21: PA20 maps to SERCOM3.2 not SERCOM3.3
+  * samd21: Limit SPI baud value to 1
+  * samd21: Restore pin cfg when exti is disabled
+  * samd21: AO_SPI_0_PA04_PA05_PA06 is FUNC_D
+  * fixup for exti restore
+  * telemetrum-v4.0: MS5607 doesn't share SPI controller
+  * telemetrum-v4.0: Correct beeper configuration
+  * altos/cc1200: Simplify interrupt handling
+  * altos: Avoid modulus in task queue on parts without idiv
+  * samd21: Save interrupt pin status before enabling interrupts
+  * attiny, stm32l0: Note that these chips don't support spi duplex
+  * altos: Add ao_gps_utc_tick
+  * altos/ms5607: Fixup ms5607 changes for other chips
+  * altos: Make sure APRS packets are reasonably separated
+  * altos: Enable telemetrum telemetry for telemetrum v4.0
+  * altoslib: Handle TeleMetrum v4.0 in idle mode
+  * Add TeleMetrum v4.0 to release files
+  * ao-tools/ao-eeprom: Add support for TeleMega v5.0
+  * altoslib: Add notes about updating ao-eeprom for new product
+  * altos: Add timeout for MS5607 ADC conversion
+  * easymotor-v3.0: Use motor pressure to trigger data logging
+  * easymotor-v3.0: Clean up build bits
+  * altos/stm: Add ao_spi_put_pins for MS5607 driver
+  * altos/stmf0: Add ao_spi_put_pins for MS5067 driver
+  * altos: Add timeout in MS5607 get_sample code
+  * drivers: Add BMI088 driver
+  * altos: Add BMI088 test framework using Nucleo32 board for stm32f042
+  * altos: Add TeleMega v6.0
+  * doc: Update docs for asciidoctor-pdf version 2.x
+  * src/drivers: Ignore printf warnings in ao_aprs.c
+  * drivers: Add AO_LOG_NORMALIZED support to BMI088 command
+  * altos: Split AO_LOG_NORMALIZED support out in telemetry code
+  * ao-tools: Fix buffer overflow in lib/ao-hex.c
+  * ao-tools: Update ao-eeprom for TeleMega v6
+  * altoslib: Add TeleMega v6 support
+  * altos/telelco: Add some debug aids for TeleLCO event stuff
+  * easymotor-v3: Fix pressure to adc conversion to use reference voltage
+  * altos/easymotor: Move pressure conversion code to ao_motor_flight.c
+  * altos: Add makefiles for telemega v6
+  * doc: Add release notes for 1.9.13
+  * doc: Update copyright year to 2023
+  * Version 1.9.13
+  * Disable TM v4.0 firmware for 1.9.13
+  * doc: Add release notes for 1.9.13
+  * doc: Update copyright year to 2023
+  * Version 1.9.13
+
+  [ Bdale Garbee ]
+  * first stab at support for TeleMetrum v4.0
+  * update Releasing with tweaks made during 1.9.12 release process
+  * easymini v3.0 production scripts working
+  * EasyMotor v3 production script working, sans pressure input test
+  * ao-tools: don't do 'm 0' after 'E 0' since EasyMotor doesn't support it
+  * update Releasing to include EasyMini v3.0 loader
+  * ao-tools: new ao-test-pressure utility for bench testing EasyMotor
+  * ao-bringup: final production test script for EasyMotor v3
+  * ao-tools: increase robustness of turnon_easymotor
+  * TeleMetrum v4.0 work in progress
+  * altosui: force Locale.ROOT during CSV export to avoid commas in decimals
+  * ao-tools: return ao-flash-lpc operaton to "full speed"
+  * doc: add a warning to TeleLaunch docs about siren volume levels
+  * doc: add a link to a reference on ARES/RACES use of PowerPole connectors
+  * doc: update EasyMotor behavior description for firmware 1.9.13 and later
+  * doc: update EasyMotor behavior description for firmware 1.9.13 and later
+  * releasing 1.9.13
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 19 Jan 2023 22:59:20 -0700
+
 altos (1.9.12-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
