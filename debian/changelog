@@ -1,3 +1,9 @@
+altos (1.9.13-2) unstable; urgency=medium
+
+  * drop the suggests on slim | gdm, it's just no useful
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 29 Jan 2023 15:11:04 -0700
+
 altos (1.9.13-1) unstable; urgency=medium
 
   [ Keith Packard ]

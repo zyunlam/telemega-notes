@@ -48,7 +48,6 @@ Depends: default-jre | java2-runtime,
          nickle,
          ${misc:Depends},
          ${shlibs:Depends}
-Suggests: slim | gdm
 Replaces: altusmetrum-themes, slim-altusmetrum
 Conflicts: altusmetrum-themes, slim-altusmetrum
 Description: Altus Metrum firmware and utilities
