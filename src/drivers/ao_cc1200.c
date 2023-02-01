@@ -204,7 +204,6 @@ ao_radio_status(void)
 void
 ao_radio_recv_abort(void)
 {
-	ao_exti_disable(AO_CC1200_INT_PORT, AO_CC1200_INT_PIN);
 	ao_radio_abort = 1;
 	ao_wakeup(&ao_radio_wake);
 }
