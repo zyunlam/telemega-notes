@@ -65,7 +65,7 @@ extern const uint32_t	ao_radio_cal;
 static uint8_t
 ao_radio_reg_read(uint16_t addr)
 {
-	uint8_t	data[2];
+	uint8_t	data[3];
 	uint8_t	d;
 
 #if CC1200_TRACE
@@ -84,13 +84,12 @@ ao_radio_reg_read(uint16_t addr)
 		d = 1;
 	}
 	ao_radio_select();
-	ao_radio_spi_send(data, d);
-	ao_radio_spi_recv(data, 1);
+	ao_radio_duplex(data, data, d + 1);
 	ao_radio_deselect();
 #if CC1200_TRACE
-	printf (" %02x\n", data[0]);
+	printf (" %02x\n", data[d]);
 #endif
-	return data[0];
+	return data[d];
 }
 
 static void
