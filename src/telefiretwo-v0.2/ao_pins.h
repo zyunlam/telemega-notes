@@ -26,8 +26,10 @@
 #define HAS_FLIGHT		0
 #define HAS_USB			1
 #define HAS_BEEP		1
-#define BEEPER_CHANNEL		4
+#define BEEPER_PORT		(&stm_gpiob)
+#define BEEPER_PIN		1
 #define BEEPER_TIMER		3
+#define BEEPER_CHANNEL		4
 #define HAS_GPS			0
 #define HAS_SERIAL_1		0
 #define HAS_ADC			1
@@ -118,33 +120,33 @@
 #define AO_CC1200_INT_GPIO	2
 #define AO_CC1200_INT_GPIO_IOCFG	CC1200_IOCFG2
 
-#define LED_PORT_0		(&stm_gpioa)
-#define LED_PORT_1		(&stm_gpiob)
-
-#define LED_PORT_0_ENABLE	STM_RCC_AHBENR_GPIOAEN
-#define LED_PORT_1_ENABLE	STM_RCC_AHBENR_GPIOBEN
+#define HAS_LED			1
 
 /* Port A, pins 4-6 */
-#define LED_PORT_0_SHIFT	4
-#define LED_PORT_0_MASK		0x7
-#define LED_PIN_GREEN		0
-#define LED_PIN_AMBER		1
-#define LED_PIN_RED		2
-#define AO_LED_RED		(1 << LED_PIN_RED)
-#define AO_LED_AMBER		(1 << LED_PIN_AMBER)
-#define AO_LED_GREEN		(1 << LED_PIN_GREEN)
+#define LED_0_PORT		(&stm_gpioa)
+#define LED_0_PIN		4
+#define LED_1_PORT		(&stm_gpioa)
+#define LED_1_PIN		5
+#define LED_2_PORT		(&stm_gpioa)
+#define LED_2_PIN		6
+
+#define AO_LED_GREEN		AO_LED_0
+#define AO_LED_AMBER		AO_LED_1
+#define AO_LED_RED		AO_LED_2
 
 /* Port B, pins 4-5 */
+#define LED_3_PORT		(&stm_gpiob)
+#define LED_3_PIN		4
+#define LED_4_PORT		(&stm_gpiob)
+#define LED_4_PIN		5
 #define LED_PORT_1_SHIFT	0
 #define LED_PORT_1_MASK		(0x3 << 4)
 #define LED_PIN_CONT_0		4
 #define LED_PIN_ARMED		5
 
-#define AO_LED_ARMED		(1 << LED_PIN_ARMED)
-#define AO_LED_CONTINUITY(c)	(1 << (4 - (c)))
-#define AO_LED_CONTINUITY_MASK	(0x1 << 4)
-
-#define LEDS_AVAILABLE		(LED_PORT_0_MASK|LED_PORT_1_MASK)
+#define AO_LED_ARMED		AO_LED_3
+#define AO_LED_CONTINUITY(c)	AO_LED_4
+#define AO_LED_CONTINUITY_MASK	AO_LED_4
 
 /* Alarm A */
 #define AO_SIREN
@@ -183,14 +185,21 @@
 #define AO_ADC_SQ2		AO_PAD_ADC_PYRO
 #define AO_ADC_SQ3		AO_PAD_ADC_BATT
 
-#define AO_PYRO_R_PYRO_SENSE	200
-#define AO_PYRO_R_SENSE_GND	22
+#define AO_PAD_R_V_BATT_BATT_SENSE	200
+#define AO_PAD_R_BATT_SENSE_GND		22
+#define AO_PAD_R_V_PYRO_PYRO_SENSE	200
+#define AO_PAD_R_PYRO_SENSE_GND		22
+
+#define AO_PAD_R_IGNITER_IGNITER_SENSE	200
+#define AO_PAD_R_IGNITER_SENSE_GND	22
 
 #define AO_FIRE_R_POWER_FET	0
 #define AO_FIRE_R_FET_SENSE	200
 #define AO_FIRE_R_SENSE_GND	22
 
 #define HAS_ADC_TEMP		0
+
+#define AO_ADC_REFERENCE_DV	33
 
 struct ao_adc {
 	int16_t		sense[AO_PAD_NUM];
@@ -199,7 +208,7 @@ struct ao_adc {
 };
 
 #define AO_ADC_DUMP(p)							\
-	printf ("tick: %5u 0: %5d pyro: %5d batt %5d\n", \
+	printf ("tick: %5lu 0: %5d pyro: %5d batt %5d\n", \
 		(p)->tick,						\
 		(p)->adc.sense[0],					\
 		(p)->adc.pyro,						\
