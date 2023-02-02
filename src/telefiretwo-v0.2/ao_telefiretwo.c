@@ -20,13 +20,14 @@
 #include <ao_pad.h>
 #include <ao_exti.h>
 #include <ao_radio_cmac_cmd.h>
+#include <ao_led.h>
 
-void
+int
 main(void)
 {
 	ao_clock_init();
 
-	ao_led_init(LEDS_AVAILABLE);
+	ao_led_init();
 
 	ao_task_init();
 
@@ -52,4 +53,5 @@ main(void)
 //	ao_radio_cmac_cmd_init();
 
 	ao_start_scheduler();
+	return 0;
 }

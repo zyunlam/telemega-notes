@@ -1,3 +1,77 @@
+commit 0d34cacb37ad37208bd0602364a0be660ddd12bc
+Merge: e6a83e73 360aa73c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 2 12:52:01 2023 -0700
+
+    Merge branch 'master' into branch-1.9
+
+commit 360aa73cef6fd7b782c3559aa26b3e501ee72d70
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 2 11:33:35 2023 -0800
+
+    Version 1.9.14
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit eb66d5f1121cbc7680a61539d97973482c4dae25
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 2 11:33:00 2023 -0800
+
+    doc: Release notes for 1.9.14
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 015ebe291695d0588294a523b864aed73a5178c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 1 18:00:24 2023 -0800
+
+    altos/drivers: Increase LCO receive timeout to 20ms
+    
+    Changes in the cc1200 driver appear to have sped up the transition
+    from TX to RX enough that we now need to wait a bit longer for
+    TeleFire to return a packet. Increase the 38400 bps timeout to 20ms
+    and the 9600 bps timeout to 30ms.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fe99a50a7c1b4834193bbb73fbfd1b0e49b7ff45
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 1 17:59:28 2023 -0800
+
+    altos/drivers: Use spi duplex to fetch register values
+    
+    We read register values during regular operation, so let's improve
+    performance a bit by making this faster.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a2d18d43722355e834288b0b4c83b021218f15cb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 1 16:29:42 2023 -0800
+
+    altos/telefiretwo-v0.2: Get things building again
+    
+    This code got very stale and needed some config updates
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 05aacbd4a37d8bbe5b89664fc3630ffc4096ec69
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Feb 1 14:14:55 2023 -0800
+
+    drivers/cc1200: Don't disable cc1200 interrupts ever
+    
+    The driver now leaves interrupts always enabled, don't disable them in
+    ao_radio_recv_abort as nothing will ever turn them back on.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit e6a83e73b4b2c56b14853f1e717aeaa9f874728d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Jan 19 22:57:39 2023 -0700
+
+    releasing 1.9.13
+
 commit 8e42773e7834638464b46495123dbdc2356032bf
 Merge: a6c32739 7fe1408a
 Author: Bdale Garbee <bdale@gag.com>
