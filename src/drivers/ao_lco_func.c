@@ -29,7 +29,7 @@ ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 {
 	int8_t		r;
 	AO_TICK_TYPE	sent_time;
-	AO_TICK_TYPE	timeout = AO_MS_TO_TICKS(10);
+	AO_TICK_TYPE	timeout = AO_MS_TO_TICKS(20);
 
 #if HAS_RADIO_RATE
 	switch (ao_config.radio_rate) {
@@ -37,7 +37,7 @@ ao_lco_query(uint16_t box, struct ao_pad_query *query, uint16_t *tick_offset)
 	default:
 		break;
 	case AO_RADIO_RATE_9600:
-		timeout = AO_MS_TO_TICKS(20);
+		timeout = AO_MS_TO_TICKS(30);
 		break;
 	case AO_RADIO_RATE_2400:
 		timeout = AO_MS_TO_TICKS(80);
