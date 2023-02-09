@@ -340,8 +340,8 @@ struct ao_adc {
  *
  *	pin 1 NE corner of chip
  *
- *	+along		+Y	+roll	+Y
- *	+across		-X	+pitch	-X
+ *	+along		+X	+roll	+X
+ *	+across		-Y	+pitch	-Y
  *	+through	+Z	+yaw	+Z
  */
 
@@ -353,12 +353,12 @@ struct ao_adc {
 #define AO_BMI088_GYR_CS_PIN	13
 #define HAS_IMU			1
 
-#define ao_bmi088_along(m)	((m)->acc.y)
-#define ao_bmi088_across(m)	(-(m)->acc.x)
+#define ao_bmi088_along(m)	((m)->acc.x)
+#define ao_bmi088_across(m)	((m)->acc.y)
 #define ao_bmi088_through(m)	((m)->acc.z)
 
-#define ao_bmi088_roll(m)	((m)->gyr.y)
-#define ao_bmi088_pitch(m)	(-(m)->gyr.x)
+#define ao_bmi088_roll(m)	((m)->gyr.x)
+#define ao_bmi088_pitch(m)	((m)->gyr.y)
 #define ao_bmi088_yaw(m)	((m)->gyr.z)
 
 #define ao_data_along(packet)	ao_bmi088_along(&(packet)->bmi088)
