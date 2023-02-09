@@ -83,9 +83,6 @@
 #define BEEPER_CHANNEL		2
 #define BEEPER_PORT		(&stm_gpioe)
 #define BEEPER_PIN		4
-#define AO_BEEP_MID_DEFAULT	179		/* 2100 Hz */
-#define AO_BEEP_MAKE_LOW(m)	((uint8_t) ((m) * 197U/179U)) /* 1900 Hz */
-#define AO_BEEP_MAKE_HIGH(m)	((uint8_t) ((m) * 163U/179U)) /* 2300 Hz */
 #define HAS_BATTERY_REPORT	1
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		1
