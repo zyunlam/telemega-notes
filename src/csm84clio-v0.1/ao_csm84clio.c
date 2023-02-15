@@ -83,8 +83,8 @@ fet outputs[] = {
 static void
 ao_fet_control(uint32_t output, uint8_t value)
 {
-	/* map output 1-50 to corresponding GPIO port and pin, set to value */
-	ao_gpio_set(outputs[output - 1].port, outputs[output - 1].pin, value);
+	/* map output 0-49 to corresponding GPIO port and pin, set to value */
+	ao_gpio_set(outputs[output].port, outputs[output].pin, value);
 }
 
 static void
@@ -107,8 +107,8 @@ ao_fet_on(void)
 	output = ao_cmd_decimal();
         if (ao_cmd_status != ao_cmd_success)
                 return;
-	if ((output < 1) || (output > 50))
-		printf ("Invalid FET selection %lu, must be 1..50\n", output);
+	if (output > 49)		/* can't be less than 0 since unsigned! */
+		printf ("Invalid FET selection %lu, must be 0..49\n", output);
 	else {
 		ao_fet_control(output, 1);
 		ao_led_on(AO_LED_RED);
@@ -123,8 +123,8 @@ ao_fet_off(void)
 	output = ao_cmd_decimal();
         if (ao_cmd_status != ao_cmd_success)
                 return;
-	if ((output < 1) || (output > 50))
-		printf ("Invalid FET selection %lu, must be 1..50\n", output);
+	if (output > 49)		/* can't be less than 0 since unsigned! */
+		printf ("Invalid FET selection %lu, must be 0..49\n", output);
 	else {
 		ao_fet_control(output, 0);
 		ao_led_off(AO_LED_RED);
