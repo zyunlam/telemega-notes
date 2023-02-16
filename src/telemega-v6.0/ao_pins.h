@@ -333,6 +333,20 @@ struct ao_adc {
  * +along	north	+roll	left up
  * +across	west	+pitch	nose down
  * +through	up	+yaw	left turn
+ *
+ * 2023-2-16 -- keithp -- I think this is incorrect. Bdale
+ * measured all of the boards with the following results.
+ *
+ * +along	nose up
+ * +across 	USB down
+ * +through	TH down
+ *
+ * And, with the board aligned to have positive accel for the relevant axis,
+ * looking down from above we have:
+ *
+ * +roll	counter clockwise (nose up)
+ * +pitch	counter clockwise (USB down)
+ * +yaw		counter clockwise (TH down)
  */
 
 /*

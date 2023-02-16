@@ -344,7 +344,7 @@ struct ao_adc {
  *	pin 1 NW corner of chip
  *
  *	+along		+Y	+roll	+Y
- *	+across		-X	+pitch	-X
+ *	+across		+X	+pitch	+X
  *	+through	+Z	+yaw	+Z
  *
  */
@@ -358,11 +358,11 @@ struct ao_adc {
 #define HAS_IMU			1
 
 #define ao_mpu6000_along(m)	((m)->accel_y)
-#define ao_mpu6000_across(m)	(-(m)->accel_x)
+#define ao_mpu6000_across(m)	((m)->accel_x)
 #define ao_mpu6000_through(m)	((m)->accel_z)
 
 #define ao_mpu6000_roll(m)	((m)->gyro_y)
-#define ao_mpu6000_pitch(m)	(-(m)->gyro_x)
+#define ao_mpu6000_pitch(m)	((m)->gyro_x)
 #define ao_mpu6000_yaw(m)	((m)->gyro_z)
 
 #define ao_data_along(packet)	ao_mpu6000_along(&(packet)->mpu6000)

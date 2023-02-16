@@ -297,6 +297,7 @@ ao_bmi088_show(void)
 		ao_bmi088_pitch(&ao_bmi088_current),
 		ao_bmi088_yaw(&ao_bmi088_current));
 #else
+#error BMI088 should only be used with normalized values
 	printf ("Accel: %7d %7d %7d Gyro: %7d %7d %7d\n",
 		ao_bmi088_current.acc.x,
 		ao_bmi088_current.acc.y,
