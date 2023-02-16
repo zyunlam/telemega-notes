@@ -327,18 +327,25 @@ struct ao_adc {
 
 /*
  *
- * If the board is laying component side up with
- * the antenna (nose) pointing north
+ * Here are the required sensor signs:
  *
- * +along	north	+roll	left up
- * +across	west	+pitch	nose down
- * +through	up	+yaw	left turn
+ * +along	nose up
+ * +across 	USB down
+ * +through	TH down
+ *
+ * With the board aligned to have positive accel for the relevant
+ * axis, looking down from above we have:
+ *
+ * +roll	counter clockwise (nose up)
+ * +pitch	counter clockwise (USB down)
+ * +yaw		counter clockwise (TH down)
  */
 
 /*
- * bmi088
- *
- *	pin 1 NE corner of chip
+ * On TMega v6, bmi088 pin 1 (NE corner of chip) is placed towards the
+ * USB and antenna edges of the board. Relative to bmi088 specs, to
+ * get the above values, we need to flip the Y axis, assigning values
+ * as follows:
  *
  *	+along		+X	+roll	+X
  *	+across		-Y	+pitch	-Y
@@ -354,11 +361,11 @@ struct ao_adc {
 #define HAS_IMU			1
 
 #define ao_bmi088_along(m)	((m)->acc.x)
-#define ao_bmi088_across(m)	((m)->acc.y)
+#define ao_bmi088_across(m)	(-(m)->acc.y)
 #define ao_bmi088_through(m)	((m)->acc.z)
 
 #define ao_bmi088_roll(m)	((m)->gyr.x)
-#define ao_bmi088_pitch(m)	((m)->gyr.y)
+#define ao_bmi088_pitch(m)	(-(m)->gyr.y)
 #define ao_bmi088_yaw(m)	((m)->gyr.z)
 
 #define ao_data_along(packet)	ao_bmi088_along(&(packet)->bmi088)

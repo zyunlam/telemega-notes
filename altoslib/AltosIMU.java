@@ -22,37 +22,37 @@ import java.util.concurrent.*;
 import java.io.*;
 
 public class AltosIMU implements Cloneable {
-	public int		accel_x = AltosLib.MISSING;
-	public int		accel_y = AltosLib.MISSING;
-	public int		accel_z = AltosLib.MISSING;
+	private int		accel_x = AltosLib.MISSING;
+	private int		accel_y = AltosLib.MISSING;
+	private int		accel_z = AltosLib.MISSING;
 
-	public int		accel_along = AltosLib.MISSING;
-	public int		accel_across = AltosLib.MISSING;
-	public int		accel_through = AltosLib.MISSING;
+	private int		accel_along = AltosLib.MISSING;
+	private int		accel_across = AltosLib.MISSING;
+	private int		accel_through = AltosLib.MISSING;
 
-	public int		gyro_x = AltosLib.MISSING;
-	public int		gyro_y = AltosLib.MISSING;
-	public int		gyro_z = AltosLib.MISSING;
+	private int		gyro_x = AltosLib.MISSING;
+	private int		gyro_y = AltosLib.MISSING;
+	private int		gyro_z = AltosLib.MISSING;
 
-	public int		gyro_roll = AltosLib.MISSING;
-	public int		gyro_pitch = AltosLib.MISSING;
-	public int		gyro_yaw = AltosLib.MISSING;
+	private int		gyro_roll = AltosLib.MISSING;
+	private int		gyro_pitch = AltosLib.MISSING;
+	private int		gyro_yaw = AltosLib.MISSING;
 
-	public int		mag_x = AltosLib.MISSING;
-	public int		mag_y = AltosLib.MISSING;
-	public int		mag_z = AltosLib.MISSING;
+	private int		mag_x = AltosLib.MISSING;
+	private int		mag_y = AltosLib.MISSING;
+	private int		mag_z = AltosLib.MISSING;
 
-	public int		mag_along = AltosLib.MISSING;
-	public int		mag_across = AltosLib.MISSING;
-	public int		mag_through = AltosLib.MISSING;
+	private int		mag_along = AltosLib.MISSING;
+	private int		mag_across = AltosLib.MISSING;
+	private int		mag_through = AltosLib.MISSING;
 
-	public int		imu_model = AltosLib.MISSING;
-	public int		mag_model = AltosLib.MISSING;
+	private int		imu_model = AltosLib.MISSING;
+	private int		mag_model = AltosLib.MISSING;
 
-	public static final double	counts_per_g_mpu = 2048.0;
-	public static final double	counts_per_g_bmx = 2048.0;
-	public static final double	counts_per_g_adxl = 20.5;
-	public static final double	counts_per_g_bmi088 = 1365.0;
+	private static final double	counts_per_g_mpu = 2048.0;
+	private static final double	counts_per_g_bmx = 2048.0;
+	private static final double	counts_per_g_adxl = 20.5;
+	private static final double	counts_per_g_bmi088 = 1365.0;
 
 	private static double counts_per_g(int imu_type, int imu_model) {
 		switch (imu_model) {
@@ -90,13 +90,13 @@ public class AltosIMU implements Cloneable {
 		return counts / cpg * AltosConvert.gravity;
 	}
 
-	public static final double 	GYRO_FULLSCALE_DEGREES_MPU = 2000.0;
-	public static final double	GYRO_COUNTS_MPU = 32767.0;
-	public static final double	counts_per_degree_mpu = GYRO_COUNTS_MPU / GYRO_FULLSCALE_DEGREES_MPU;
-	public static final double 	GYRO_FULLSCALE_DEGREES_BMX = 2000.0;
-	public static final double	GYRO_COUNTS_BMX = 32767.0;
-	public static final double	counts_per_degree_bmx = GYRO_COUNTS_BMX / GYRO_FULLSCALE_DEGREES_BMX;
-	public static final double	counts_per_degree_bmi088 = 16.384;
+	private static final double 	GYRO_FULLSCALE_DEGREES_MPU = 2000.0;
+	private static final double	GYRO_COUNTS_MPU = 32767.0;
+	private static final double	counts_per_degree_mpu = GYRO_COUNTS_MPU / GYRO_FULLSCALE_DEGREES_MPU;
+	private static final double 	GYRO_FULLSCALE_DEGREES_BMX = 2000.0;
+	private static final double	GYRO_COUNTS_BMX = 32767.0;
+	private static final double	counts_per_degree_bmx = GYRO_COUNTS_BMX / GYRO_FULLSCALE_DEGREES_BMX;
+	private static final double	counts_per_degree_bmi088 = 16.384;
 
 	private static double counts_per_degree(int imu_type, int imu_model) {
 		switch (imu_model) {
@@ -131,11 +131,11 @@ public class AltosIMU implements Cloneable {
 		return counts / cpd;
 	}
 
-	public static final double MAG_FULLSCALE_GAUSS_MPU = 48.00;	/* 4800µT */
-	public static final double MAG_COUNTS_MPU = 32767.0;
-	public static final double counts_per_gauss_mpu = MAG_COUNTS_MPU / MAG_FULLSCALE_GAUSS_MPU;
+	private static final double MAG_FULLSCALE_GAUSS_MPU = 48.00;	/* 4800µT */
+	private static final double MAG_COUNTS_MPU = 32767.0;
+	private static final double counts_per_gauss_mpu = MAG_COUNTS_MPU / MAG_FULLSCALE_GAUSS_MPU;
 
-	public static final double counts_per_gauss_bmx = 100.0;	/* BMX driver converts to µT */
+	private static final double counts_per_gauss_bmx = 100.0;	/* BMX driver converts to µT */
 
 	public static double counts_per_gauss(int imu_type, int imu_model) {
 		switch (imu_model) {
@@ -156,7 +156,7 @@ public class AltosIMU implements Cloneable {
 		return AltosLib.MISSING;
 	}
 
-	public boolean parse_string(String line) {
+	private boolean parse_string(String line) {
 		if (line.startsWith("Accel:")) {
 
 			String[] items = line.split("\\s+");
