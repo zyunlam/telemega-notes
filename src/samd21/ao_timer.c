@@ -122,6 +122,7 @@ ao_clock_init(void)
 		;
 
 #ifdef AO_XOSC
+	ao_enable_output(&samd21_port_b, 10, 1);
 	/* Enable xosc (external xtal oscillator) */
 	samd21_sysctrl.xosc = ((SAMD21_SYSCTRL_XOSC_STARTUP_8192 << SAMD21_SYSCTRL_XOSC_STARTUP) |
 			       (0 << SAMD21_SYSCTRL_XOSC_AMPGC) |
@@ -134,6 +135,8 @@ ao_clock_init(void)
 	/* Wait for xosc */
 	while ((samd21_sysctrl.pclksr & (1 << SAMD21_SYSCTRL_PCLKSR_XOSCRDY)) == 0)
 		;
+
+	ao_enable_output(&samd21_port_b, 11, 1);
 
 	/* program DPLL */
 
@@ -289,4 +292,6 @@ ao_clock_init(void)
 
 	/* Disable automatic NVM write operations */
 	samd21_nvmctrl.ctrlb |= (1UL << SAMD21_NVMCTRL_CTRLB_MANW);
+
+	ao_gpio_set(&samd21_port_b, 10, 0);
 }
