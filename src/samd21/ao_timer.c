@@ -124,8 +124,8 @@ ao_clock_init(void)
 #ifdef AO_XOSC
 	ao_enable_output(&samd21_port_b, 10, 1);
 	/* Enable xosc (external xtal oscillator) */
-	samd21_sysctrl.xosc = ((SAMD21_SYSCTRL_XOSC_STARTUP_8192 << SAMD21_SYSCTRL_XOSC_STARTUP) |
-			       (0 << SAMD21_SYSCTRL_XOSC_AMPGC) |
+	samd21_sysctrl.xosc = ((SAMD21_SYSCTRL_XOSC_STARTUP_16384 << SAMD21_SYSCTRL_XOSC_STARTUP) |
+			       (1 << SAMD21_SYSCTRL_XOSC_AMPGC) |
 			       (SAMD21_SYSCTRL_XOSC_GAIN_16MHz << SAMD21_SYSCTRL_XOSC_GAIN) |
 			       (0 << SAMD21_SYSCTRL_XOSC_ONDEMAND) |
 			       (1 << SAMD21_SYSCTRL_XOSC_RUNSTDBY) |
