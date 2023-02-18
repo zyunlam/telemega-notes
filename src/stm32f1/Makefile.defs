@@ -1,0 +1,11 @@
+ifndef TOPDIR
+TOPDIR=..
+endif
+
+include $(TOPDIR)/stm32f1/Makefile-stm32f1.defs
+
+STM32F1_LINKER_SCRIPT=altos-raw.ld
+
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm32f1 -T$(STM32F1_LINKER_SCRIPT) -n
+
+.DEFAULT_GOAL=all
