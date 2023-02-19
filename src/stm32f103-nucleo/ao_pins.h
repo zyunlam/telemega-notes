@@ -33,7 +33,20 @@
 #define AO_RCC_CFGR_HPRE_DIV	STM_RCC_CFGR_HPRE_DIV_1
 #define AO_RCC_CFGR_ADCPRE	STM_RCC_CFGR_ADCPRE_6
 
+#define HAS_BEEP	0
+#define HAS_USB		1
+
+#define HAS_USB_PULLUP	1
+#define AO_USB_PULLUP_PORT	(&stm_gpiob)
+#define AO_USB_PULLUP_PIN	12
+
+
 #define HAS_LED		1
 #define LED_0_PORT	(&stm_gpioa)
 #define LED_0_PIN	5
 #define AO_LED_GREEN	(1 << 0)
+#define AO_LED_PANIC	AO_LED_GREEN
+
+#define HAS_SERIAL_1		1
+#define USE_SERIAL_1_STDIN	1
+#define SERIAL_1_PA9_PA10	1

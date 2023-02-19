@@ -18,21 +18,25 @@
 
 #include <ao.h>
 
-void
-ao_delay(AO_TICK_TYPE ticks)
+static void blink(void)
 {
-	uint32_t then = ao_time();
-	while ((int32_t) (ao_time() - then) < (int32_t) ticks)
-		ao_arch_nop();
-}
-
-int main(void)
-{
-	ao_clock_init();
-	ao_timer_init();
-	ao_led_init();
 	for (;;) {
 		ao_led_for(AO_LED_GREEN, 50);
 		ao_delay(50);
 	}
+}
+
+static struct ao_task blink_task;
+
+int main(void)
+{
+	ao_clock_init();
+	ao_led_init();
+	ao_timer_init();
+	ao_serial_init();
+	ao_usb_init();
+	ao_task_init();
+	ao_cmd_init();
+	ao_add_task(&blink_task, blink, "blink");
+	ao_start_scheduler();
 }

@@ -5,6 +5,8 @@ INC = \
 	ao_pins.h \
 	ao_arch.h \
 	ao_arch_funcs.h \
+	ao_exti.h \
+	ao_product.h \
 	stm32f1.h \
 	Makefile
 
@@ -12,7 +14,19 @@ ALTOS_SRC = \
 	ao_clock.c \
 	ao_timer.c \
 	ao_interrupt.c \
-	ao_led.c
+	ao_product.c \
+	ao_romconfig.c \
+	ao_led.c \
+	ao_task.c \
+	ao_panic.c \
+	ao_stdio.c \
+	ao_serial_stm.c \
+	ao_usb_stm.c \
+	ao_cmd.c
+
+PRODUCT=Nucleo-f103
+PRODUCT_DEF=-DNUCLEO_F103
+IDPRODUCT=0x000a
 
 CFLAGS = $(PRODUCT_DEF) $(STM32F1_CFLAGS)
 
@@ -26,7 +40,7 @@ OBJ=$(SRC:.c=.o)
 all: $(PROG) $(HEX)
 
 $(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS) --oslib=semihost
+	$(call quiet,CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)
 
