@@ -51,7 +51,7 @@ void stm_systick_isr(void)
 {
 	if (stm_systick.ctrl & (1 << STM_SYSTICK_CTRL_COUNTFLAG)) {
 		++ao_tick_count;
-//		ao_task_check_alarm();
+		ao_task_check_alarm();
 #ifdef AO_TIMER_HOOK
 		AO_TIMER_HOOK;
 #endif
@@ -68,5 +68,5 @@ ao_timer_init(void)
 	stm_systick.ctrl = ((1 << STM_SYSTICK_CTRL_ENABLE) |
 			    (1 << STM_SYSTICK_CTRL_TICKINT) |
 			    (STM_SYSTICK_CTRL_CLKSOURCE_HCLK_8 << STM_SYSTICK_CTRL_CLKSOURCE));
-//	stm_nvic.shpr15_12 |= (uint32_t) AO_STM_NVIC_CLOCK_PRIORITY << 24;
+	stm_scb.shpr3 |= (uint32_t) AO_STM_NVIC_CLOCK_PRIORITY << 24;
 }

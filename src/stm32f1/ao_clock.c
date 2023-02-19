@@ -69,16 +69,12 @@ ao_clock_init(void)
 		asm("nop");
 #endif
 
-#if 0
-	/* Set flash latency to tolerate 32MHz SYSCLK  -> 1 wait state */
+	/* Set flash latency to tolerate 72MHz SYSCLK  -> 2 wait states */
 
 	/* Enable 64-bit access and prefetch */
-	stm_flash.acr |= (1 << STM_FLASH_ACR_ACC64);
-	stm_flash.acr |= (1 << STM_FLASH_ACR_PRFEN);
-
-	/* Enable 1 wait state so the CPU can run at 32MHz */
-	stm_flash.acr |= (1 << STM_FLASH_ACR_LATENCY);
-#endif
+	stm_flash.acr = ((1 << STM_FLASH_ACR_PRFTBE) |
+			 (0 << STM_FLASH_ACR_HLFCYA) |
+			 (STM_FLASH_ACR_LATENCY_2 << STM_FLASH_ACR_LATENCY));
 
 	/* Enable power interface clock */
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_PWREN);

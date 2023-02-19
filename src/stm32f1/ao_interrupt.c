@@ -27,7 +27,7 @@ extern void main(void);
 
 void stm_halt_isr(void)
 {
-//	ao_panic(AO_PANIC_CRASH);
+	ao_panic(AO_PANIC_CRASH);
 }
 
 void stm_ignore_isr(void)
@@ -212,5 +212,5 @@ void __attribute__((constructor)) ao_setup(void) {
 	}
 #endif
 	/* Set interrupt vector table offset */
-	stm_nvic.vto = (uint32_t) &__interrupt_vector;
+	stm_scb.vtor = (uint32_t) &__interrupt_vector;
 }

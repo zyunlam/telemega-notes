@@ -55,4 +55,7 @@
 #define AO_STM_NVIC_LOW_PRIORITY	0xC0
 #define AO_STM_NVIC_CLOCK_PRIORITY	0xf0
 
+#define AO_PCLK1	AO_APB1CLK
+#define AO_PCLK2	AO_APB2CLK
+
 #endif /* _AO_ARCH_H_ */
