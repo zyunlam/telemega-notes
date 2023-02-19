@@ -15,5 +15,5 @@ openocd -f interface/stlink.cfg \
 	-c init \
 	-c 'reset halt' \
 	-c 'at91samd bootloader 0' \
-	-c "flash write_image erase unlock $1" \
+	-c "program $1 verify reset" \
 	-c "shutdown"
