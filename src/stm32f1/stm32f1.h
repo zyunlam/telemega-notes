@@ -381,9 +381,25 @@ extern struct stm_flash stm_flash;
 #define  STM_FLASH_ACR_LATENCY_1	1
 #define  STM_FLASH_ACR_LATENCY_2	2
 
+#define STM_FLASH_SR_EOP	5
+#define STM_FLASH_SR_WRPRTERR	4
+#define STM_FLASH_SR_PGERR	2
+#define STM_FLASH_SR_BSY	0
+
+#define STM_FLASH_CR_EOPIE	12
+#define STM_FLASH_CR_ERRIE	10
+#define STM_FLASH_CR_OPTWRE	9
+#define STM_FLASH_CR_LOCK	7
+#define STM_FLASH_CR_STRT	6
+#define STM_FLASH_CR_OPTER	5
+#define STM_FLASH_CR_OPTPG	4
+#define STM_FLASH_CR_MER	2
+#define STM_FLASH_CR_PER	1
+#define STM_FLASH_CR_PG		0
+
 #define STM_FLASH_RDPRT_KEY	0x00A5
-#define STM_FLASH_KEY1		0x45670123
-#define STM_FLASH_KEY2		0xCDEF89AB
+#define STM_FLASH_FPEC_KEY1	0x45670123
+#define STM_FLASH_FPEC_KEY2	0xCDEF89AB
 
 
 struct stm_flash_data {
