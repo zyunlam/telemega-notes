@@ -329,22 +329,27 @@ struct ao_adc {
 
 
 /*
+ * Here are the required sensor signs:
  *
- * If the board is laying component side up with
- * the antenna (nose) pointing north
+ * +along	nose up
+ * +across 	USB down
+ * +through	TH down
  *
- * +along	north	+roll	left up
- * +across	west	+pitch	nose down
- * +through	up	+yaw	left turn
+ * With the board aligned to have positive accel for the relevant
+ * axis, looking down from above we have:
+ *
+ * +roll	counter clockwise (nose up)
+ * +pitch	counter clockwise (USB down)
+ * +yaw		counter clockwise (TH down)
  */
 
 /*
- * mpu6000
- *
- *	pin 1 NW corner of chip
+ * On TMega v5, MPU6000 pin 1 (NW corner of chip) is placed towards
+ * the USB and antenna edges of the board. Relative to MPU6000 specs,
+ * we don't need to change any signs and so the correct values are:
  *
  *	+along		+Y	+roll	+Y
- *	+across		-X	+pitch	-X
+ *	+across		+X	+pitch	+X
  *	+through	+Z	+yaw	+Z
  *
  */
@@ -358,11 +363,11 @@ struct ao_adc {
 #define HAS_IMU			1
 
 #define ao_mpu6000_along(m)	((m)->accel_y)
-#define ao_mpu6000_across(m)	(-(m)->accel_x)
+#define ao_mpu6000_across(m)	((m)->accel_x)
 #define ao_mpu6000_through(m)	((m)->accel_z)
 
 #define ao_mpu6000_roll(m)	((m)->gyro_y)
-#define ao_mpu6000_pitch(m)	(-(m)->gyro_x)
+#define ao_mpu6000_pitch(m)	((m)->gyro_x)
 #define ao_mpu6000_yaw(m)	((m)->gyro_z)
 
 #define ao_data_along(packet)	ao_mpu6000_along(&(packet)->mpu6000)

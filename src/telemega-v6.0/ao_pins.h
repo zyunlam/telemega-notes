@@ -83,9 +83,6 @@
 #define BEEPER_CHANNEL		2
 #define BEEPER_PORT		(&stm_gpioe)
 #define BEEPER_PIN		4
-#define AO_BEEP_MID_DEFAULT	179		/* 2100 Hz */
-#define AO_BEEP_MAKE_LOW(m)	((uint8_t) ((m) * 197U/179U)) /* 1900 Hz */
-#define AO_BEEP_MAKE_HIGH(m)	((uint8_t) ((m) * 163U/179U)) /* 2300 Hz */
 #define HAS_BATTERY_REPORT	1
 #define HAS_RADIO		1
 #define HAS_TELEMETRY		1
@@ -330,21 +327,28 @@ struct ao_adc {
 
 /*
  *
- * If the board is laying component side up with
- * the antenna (nose) pointing north
+ * Here are the required sensor signs:
  *
- * +along	north	+roll	left up
- * +across	west	+pitch	nose down
- * +through	up	+yaw	left turn
+ * +along	nose up
+ * +across 	USB down
+ * +through	TH down
+ *
+ * With the board aligned to have positive accel for the relevant
+ * axis, looking down from above we have:
+ *
+ * +roll	counter clockwise (nose up)
+ * +pitch	counter clockwise (USB down)
+ * +yaw		counter clockwise (TH down)
  */
 
 /*
- * bmi088
+ * On TMega v6, bmi088 pin 1 (NE corner of chip) is placed towards the
+ * USB and antenna edges of the board. Relative to bmi088 specs, to
+ * get the above values, we need to flip the Y axis, assigning values
+ * as follows:
  *
- *	pin 1 NE corner of chip
- *
- *	+along		+Y	+roll	+Y
- *	+across		-X	+pitch	-X
+ *	+along		+X	+roll	+X
+ *	+across		-Y	+pitch	-Y
  *	+through	+Z	+yaw	+Z
  */
 
@@ -356,12 +360,12 @@ struct ao_adc {
 #define AO_BMI088_GYR_CS_PIN	13
 #define HAS_IMU			1
 
-#define ao_bmi088_along(m)	((m)->acc.y)
-#define ao_bmi088_across(m)	(-(m)->acc.x)
+#define ao_bmi088_along(m)	((m)->acc.x)
+#define ao_bmi088_across(m)	(-(m)->acc.y)
 #define ao_bmi088_through(m)	((m)->acc.z)
 
-#define ao_bmi088_roll(m)	((m)->gyr.y)
-#define ao_bmi088_pitch(m)	(-(m)->gyr.x)
+#define ao_bmi088_roll(m)	((m)->gyr.x)
+#define ao_bmi088_pitch(m)	(-(m)->gyr.y)
 #define ao_bmi088_yaw(m)	((m)->gyr.z)
 
 #define ao_data_along(packet)	ao_bmi088_along(&(packet)->bmi088)

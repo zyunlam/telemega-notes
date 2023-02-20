@@ -50,6 +50,7 @@ ARMM3DIRS=\
 ARMM0DIRS=\
 	easymini-v1.0 easymini-v1.0/flash-loader \
 	chaoskey-v1.0 chaoskey-v1.0/flash-loader \
+	telemetrum-v4.0 telemetrum-v4.0/flash-loader \
 	telemini-v3.0 telemini-v3.0/flash-loader \
 	easymini-v2.0 easymini-v2.0/flash-loader \
 	easymini-v3.0 easymini-v3.0/flash-loader \
