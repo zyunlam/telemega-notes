@@ -1,3 +1,28 @@
+altos (1.9.15-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altos: Add .gitignore for telemega v6.0
+  * altos/telemega-v6: Remove beep freq defs and use defaults
+  * altos/telemega-v6.0: bmi088 axes were wrong
+  * altoslib: Hide internals of AltosIMU
+  * altos: Fix TMega v6.0 and v5.0 IMU axes
+  * doc: Add initial 1.9.15 release notes
+  * doc: Add HW specs for TeleMega v6.0
+  * Add TeleMega v6.0 firmware to release
+  * Add TeleMetrum v4.0 firmware to releases
+  * altos/telemetrum-v4.0: Add .gitignore
+  * doc: Add TeleMetrum v4.0 to specs and 1.9.15 release notes
+  * ao-tools/ao-flash: Use 'program' instead of 'flash' for samd21
+  * Version 1.9.15
+
+  [ Bdale Garbee ]
+  * altos: add csm84clio-v0.1 firmware
+  * altos: re-number csm85clio outputs 0..49 to match schematic and silkscreen
+  * ao-bringup: turnon and test scripts for TeleMetrum v4.0 & TeleMega v6.0
+  * releasing 1.9.15
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 19 Feb 2023 18:29:00 -0700
+
 altos (1.9.14-1) unstable; urgency=medium
 
   [ Keith Packard ]
