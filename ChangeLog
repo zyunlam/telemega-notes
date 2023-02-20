@@ -1,3 +1,172 @@
+commit 38fac9fd1ebdc0900f598c859453b5fc8fc6b4a6
+Merge: 94fdc596 6f1686d7
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 19 18:24:56 2023 -0700
+
+    Merge branch 'master' into branch-1.9
+
+commit 6f1686d7a1de7543a844aa86a8c1e7968911a329
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 16 15:13:01 2023 -0800
+
+    Version 1.9.15
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d2d7dc527f1168a344ea0f72770e487753f740c8
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 19 17:50:40 2023 -0700
+
+    ao-bringup: turnon and test scripts for TeleMetrum v4.0 & TeleMega v6.0
+
+commit 213bb501970370d16642c2fc3f5bd9c0a5f9aadb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 18 16:51:09 2023 -0800
+
+    ao-tools/ao-flash: Use 'program' instead of 'flash' for samd21
+    
+    Switch to the program command, which has a 'reset' option, to get the
+    device back to running after loading the boot loader.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c7161117ab85720776b2b964885a57053e3ff640
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 16 15:36:30 2023 -0800
+
+    doc: Add TeleMetrum v4.0 to specs and 1.9.15 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 6d7da481dbdb48729edbf41f2b87273f10511163
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 16 15:36:11 2023 -0800
+
+    altos/telemetrum-v4.0: Add .gitignore
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f0eba09d4027d3d4e7a9c35980e405998b2487b1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 16 15:35:29 2023 -0800
+
+    Add TeleMetrum v4.0 firmware to releases
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 35c1102409ff1b68a4856748a40bff7861a2fdf2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 16 15:12:24 2023 -0800
+
+    Add TeleMega v6.0 firmware to release
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit a8c3f09a162359eec40d05a875ca7a09c0efc457
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 16 15:07:20 2023 -0800
+
+    doc: Add HW specs for TeleMega v6.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b780edfc970f67adde7c9b78671b9dab7eeced5f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 16 15:05:27 2023 -0800
+
+    doc: Add initial 1.9.15 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d5d835d65e909de24538ee0edb37d0ad0877f0c6
+Merge: 4591878f 7e696108
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 16 15:52:56 2023 -0700
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 7e69610859e88cacbc5801bcafecaf84b9f7f455
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 9 15:22:17 2023 -0800
+
+    altos: Fix TMega v6.0 and v5.0 IMU axes
+    
+    Add documentation to each board in ao_pins.h to clarify
+    the required sensor axis orientations.
+    
+    TeleMega v5.0 had flipped the 'across' axis sensor value signs
+    incorrectly, so remove that.
+    
+    TeleMega v6.0 had selected the wrong axes for across and along, along
+    is X and across is Y for this board.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit b08930aa0f67a445bf2300f3cea07cecf513a2f0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Feb 10 17:58:08 2023 -0800
+
+    altoslib: Hide internals of AltosIMU
+    
+    Make most of the variables private to prevent access to un-corrected
+    data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4591878f7179efc0b784d7358cf3f4063547fb7b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Feb 14 19:00:29 2023 -0700
+
+    altos: re-number csm85clio outputs 0..49 to match schematic and silkscreen
+
+commit 7b24be27f67f95d909d19d767e4ac5376ea670cf
+Merge: 58d13bd9 36ef74a9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Feb 10 06:52:43 2023 -0700
+
+    Merge branch 'clio'
+
+commit 36ef74a9ce4d4b066c51b76c1155f6ee7811a6cc
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Feb 10 06:52:11 2023 -0700
+
+    altos: add csm84clio-v0.1 firmware
+
+commit 58d13bd9bd0af42ebb3770038cd531e6ca5e9d30
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 9 15:22:17 2023 -0800
+
+    altos/telemega-v6.0: bmi088 axes were wrong
+    
+    X is 'along', Y is 'across'.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 589c1af82a9bccff46ecb3aa0a557b9216b818a8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 9 14:54:19 2023 -0800
+
+    altos/telemega-v6: Remove beep freq defs and use defaults
+    
+    These values came from the magnetic beeper on Tmega v5 which we aren't
+    using.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9518da9c5296a0172ae214b90f03043c786d3e73
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Feb 9 12:35:13 2023 -0800
+
+    altos: Add .gitignore for telemega v6.0
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 94fdc596ec5177d8a5acb7cf40ecb44e605b605d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Feb 2 12:53:51 2023 -0700
+
+    ChangeLog for releas 1.9.14
+
 commit 0d34cacb37ad37208bd0602364a0be660ddd12bc
 Merge: e6a83e73 360aa73c
 Author: Bdale Garbee <bdale@gag.com>
