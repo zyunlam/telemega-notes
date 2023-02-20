@@ -1,9 +1,9 @@
 #!/bin/sh
 
-if [ -x /usr/bin/ao-flash-stm ]; then
-	FLASH_STM=/usr/bin/ao-flash-stm
+if [ -x /usr/bin/ao-flash-samd21 ]; then
+	FLASH_STM=/usr/bin/ao-flash-samd21
 else
-	echo "Can't find ao-flash-stm!  Aborting."
+	echo "Can't find ao-flash-samd21!  Aborting."
 	exit 1
 fi
 
@@ -14,11 +14,11 @@ else
 	exit 1
 fi
 
-VERSION=3.0
+VERSION=4.0
 PRODUCT=TeleMetrum
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
-echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
+echo "Copyright 2023 by Bdale Garbee.  Released under GPL v2"
 echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"
@@ -76,6 +76,6 @@ done
 
 echo 'E 1' > $dev
 
-./test-telemetrum
+./test-telemetrum-v4.0
 
 exit $?

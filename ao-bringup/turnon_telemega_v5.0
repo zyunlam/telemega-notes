@@ -14,12 +14,12 @@ else
 	exit 1
 fi
 
-VERSION=6.0
+VERSION=5.0
 REPO=~/altusmetrumllc/Binaries
 PRODUCT=TeleMega
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
-echo "Copyright 2023 by Bdale Garbee.  Released under GPL v3"
+echo "Copyright 2021 by Bdale Garbee.  Released under GPL v3"
 echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"
@@ -76,6 +76,6 @@ done
 
 echo 'E 1' > $dev
 
-./test-telemega-v6.0
+./test-telemega-v5.0
 
 exit $?

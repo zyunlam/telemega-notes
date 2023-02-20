@@ -124,7 +124,7 @@ FIRMWARE_TD=$(FIRMWARE_TD_3_0)
 
 FIRMWARE_TM_2_0=$(top_srcdir)/src/telemetrum-v2.0/telemetrum-v2.0-$(VERSION).ihx
 FIRMWARE_TM_3_0=$(top_srcdir)/src/telemetrum-v3.0/telemetrum-v3.0-$(VERSION).ihx
-#FIRMWARE_TM_4_0=$(top_srcdir)/src/telemetrum-v4.0/telemetrum-v4.0-$(VERSION).ihx
+FIRMWARE_TM_4_0=$(top_srcdir)/src/telemetrum-v4.0/telemetrum-v4.0-$(VERSION).ihx
 FIRMWARE_TM=$(FIRMWARE_TM_2_0) $(FIRMWARE_TM_3_0) $(FIRMWARE_TM_4_0)
 
 FIRMWARE_TELEMINI_3_0=$(top_srcdir)/src/telemini-v3.0/telemini-v3.0-$(VERSION).ihx
@@ -139,7 +139,8 @@ FIRMWARE_TMEGA_2_0=$(top_srcdir)/src/telemega-v2.0/telemega-v2.0-$(VERSION).ihx
 FIRMWARE_TMEGA_3_0=$(top_srcdir)/src/telemega-v3.0/telemega-v3.0-$(VERSION).ihx
 FIRMWARE_TMEGA_4_0=$(top_srcdir)/src/telemega-v4.0/telemega-v4.0-$(VERSION).ihx
 FIRMWARE_TMEGA_5_0=$(top_srcdir)/src/telemega-v5.0/telemega-v5.0-$(VERSION).ihx
-FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0) $(FIRMWARE_TMEGA_4_0) $(FIRMWARE_TMEGA_5_0)
+FIRMWARE_TMEGA_6_0=$(top_srcdir)/src/telemega-v6.0/telemega-v6.0-$(VERSION).ihx
+FIRMWARE_TMEGA=$(FIRMWARE_TMEGA_1_0) $(FIRMWARE_TMEGA_2_0) $(FIRMWARE_TMEGA_3_0) $(FIRMWARE_TMEGA_4_0) $(FIRMWARE_TMEGA_5_0) $(FIRMWARE_TMEGA_6_0)
 
 FIRMWARE_EMINI_1_0=$(top_srcdir)/src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx
 FIRMWARE_EMINI_2_0=$(top_srcdir)/src/easymini-v2.0/easymini-v2.0-$(VERSION).ihx
