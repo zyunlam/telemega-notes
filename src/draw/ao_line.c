@@ -12,7 +12,6 @@
  * General Public License for more details.
  */
 
-#include "ao.h"
 #include "ao_draw.h"
 #include "ao_draw_int.h"
 
@@ -80,11 +79,11 @@ ao_bres(const struct ao_bitmap	*dst_bitmap,
 	if (signdx < 0)
 		mask0 = ao_right(1, AO_UNIT - 1);
 
-	if (signdy < 0)
-		stride = -stride;
-
 	dst = dst + y1 * stride + (x1 >> AO_SHIFT);
 	mask = ao_right(1, x1 & AO_MASK);
+
+	if (signdy < 0)
+		stride = -stride;
 
 	while (len--) {
 		/* clip each point */

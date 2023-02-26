@@ -12,7 +12,6 @@
  * General Public License for more details.
  */
 
-#include "ao.h"
 #include "ao_draw.h"
 #include "ao_draw_int.h"
 

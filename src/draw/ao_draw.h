@@ -15,6 +15,10 @@
 #ifndef _AO_DRAW_H_
 #define _AO_DRAW_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+#include "ao_font.h"
+
 struct ao_bitmap {
 	uint32_t	*base;
 	int16_t		stride;	/* in units */
@@ -24,6 +28,23 @@ struct ao_bitmap {
 
 struct ao_pattern {
 	uint8_t		pattern[8];
+};
+
+struct ao_glyph_metrics {
+	int8_t	width;
+	int8_t	height;
+	int8_t	x_off;
+	int8_t	y_off;
+	int8_t	advance;
+};
+
+struct ao_font {
+	const uint8_t	*bytes;
+	const uint16_t	*pos;
+	const struct ao_glyph_metrics *metrics;
+	int	max_width;
+	int	max_height;
+	int	ascent;
 };
 
 void
@@ -68,20 +89,14 @@ ao_line(const struct ao_bitmap	*dst,
 
 void
 ao_text(const struct ao_bitmap	*dst,
+	const struct ao_font	*font,
 	int16_t			x,
 	int16_t			y,
 	char			*string,
 	uint32_t		fill,
 	uint8_t			rop);
 
-struct ao_font {
-	int	width;
-	int	height;
-	int	ascent;
-	int	descent;
-};
-
-extern const struct ao_font ao_font;
+extern const struct ao_font FrutigerLT_Roman_50_font;
 
 #define AO_SHIFT	5
 #define AO_UNIT		(1 << AO_SHIFT)
