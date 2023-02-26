@@ -19,6 +19,16 @@
 #ifndef _AO_ARCH_FUNCS_H_
 #define _AO_ARCH_FUNCS_H_
 
+#define AO_EXTI_MODE_RISING	1
+#define AO_EXTI_MODE_FALLING	2
+#define AO_EXTI_MODE_PULL_NONE	0
+#define AO_EXTI_MODE_PULL_UP	4
+#define AO_EXTI_MODE_PULL_DOWN	8
+#define AO_EXTI_PRIORITY_LOW	16
+#define AO_EXTI_PRIORITY_MED	0
+#define AO_EXTI_PRIORITY_HIGH	32
+#define AO_EXTI_PIN_NOCONFIGURE	64
+
 static inline void
 ao_enable_port(struct stm_gpio *port)
 {
@@ -69,6 +79,29 @@ ao_enable_output(struct stm_gpio *port, int bit, uint8_t v)
 	stm_gpio_conf(port, bit,
 		      STM_GPIO_CR_MODE_OUTPUT_10MHZ,
 		      STM_GPIO_CR_CNF_OUTPUT_PUSH_PULL);
+}
+
+static inline void
+ao_gpio_set_mode(struct stm_gpio *port, int bit, int mode)
+{
+	uint8_t cnf;
+
+	if (mode == AO_EXTI_MODE_PULL_NONE)
+		cnf = STM_GPIO_CR_CNF_INPUT_FLOATING;
+	else {
+		cnf = STM_GPIO_CR_CNF_INPUT_PULL;
+		ao_gpio_set(port, bit, mode == AO_EXTI_MODE_PULL_UP);
+	}
+	stm_gpio_conf(port, bit,
+		      STM_GPIO_CR_MODE_INPUT,
+		      cnf);
+}
+
+static inline void
+ao_enable_input(struct stm_gpio *port, int bit, int mode)
+{
+	ao_enable_port(port);
+	ao_gpio_set_mode(port, bit, mode);
 }
 
 #if USE_SERIAL_1_SW_FLOW || USE_SERIAL_2_SW_FLOW || USE_SERIAL_3_SW_FLOW

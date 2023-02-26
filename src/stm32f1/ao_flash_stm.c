@@ -72,12 +72,12 @@ stm_flash_page_size(void)
 	uint16_t	dev_id = stm_dev_id();
 
 	switch (dev_id) {
-	case 0x440:	/* stm32f05x */
-	case 0x444:	/* stm32f03x */
-	case 0x445:	/* stm32f04x */
+	case 0x412:	/* low-density devices */
+	case 0x410:	/* medium-density devices */
 		return 1024;
-	case 0x442:	/* stm32f09x */
-	case 0x448:	/* stm32f07x */
+	case 0x414:	/* high-density devices */
+	case 0x430:	/* XL-density devices */
+	case 0x418:	/* Connectivity devices */
 		return 2048;
 	}
 	ao_panic(AO_PANIC_FLASH);

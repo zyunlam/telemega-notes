@@ -4,8 +4,8 @@ endif
 
 include $(TOPDIR)/stm32f1/Makefile-stm32f1.defs
 
-STM32F1_LINKER_SCRIPT=altos-raw.ld
+STM32F1_LINKER_SCRIPT=altos.ld
 
-LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm32f1 -T$(STM32F1_LINKER_SCRIPT) -n
+LDFLAGS=$(CFLAGS) -L$(TOPDIR)/stm32f1 -T$(STM32F1_LINKER_SCRIPT) -n -Wl,--gc-sections
 
 .DEFAULT_GOAL=all

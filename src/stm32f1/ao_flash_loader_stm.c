@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +16,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#ifndef _AO_EXTI_H_
-#define _AO_EXTI_H_
+#include "ao.h"
+#include <ao_exti.h>
+#include <ao_boot.h>
+#include <ao_flash_task.h>
 
-void
-ao_exti_setup(struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback)(void));
+int
+main(void)
+{
+	ao_clock_init();
 
-void
-ao_exti_set_mode(struct stm_gpio *gpio, uint8_t pin, uint8_t mode);
+	ao_usb_init();
 
-void
-ao_exti_set_callback(struct stm_gpio *gpio, uint8_t pin, void (*callback)(void));
+#if HAS_TICK
+	ao_timer_init();
+#endif
 
-void
-ao_exti_enable(struct stm_gpio *gpio, uint8_t pin);
-
-void
-ao_exti_disable(struct stm_gpio *gpio, uint8_t pin);
-
-void
-ao_exti_init(void);
-
-#endif /* _AO_EXTI_H_ */
+#ifdef AO_FLASH_LOADER_INIT
+	AO_FLASH_LOADER_INIT;
+#endif
+	ao_flash_task();
+	return 0;
+}
