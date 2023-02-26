@@ -103,7 +103,7 @@ void print_font(font_t font, string font_name) {
 	int	height = font.glyphs[0].height;
 	int	max_width = width;
 	int	max_height = height;
-	int[256] pos = { -1 ... };
+	int[128] pos = { -1 ... };
 	int[...] bytes;
 	bool fixed_size = true;
 
@@ -122,9 +122,12 @@ void print_font(font_t font, string font_name) {
 
 	/* build byte array */
 	for (int i = 0; i < dim(font.glyphs); i++) {
-		pos[font.glyphs[i].encoding] = dim(bytes);
-		for (int b = 0; b < dim(font.glyphs[i].bytes); b++)
-			bytes[dim(bytes)] = font.glyphs[i].bytes[b];
+		if (font.glyphs[i].encoding < dim(pos))
+		{
+			pos[font.glyphs[i].encoding] = dim(bytes);
+			for (int b = 0; b < dim(font.glyphs[i].bytes); b++)
+				bytes[dim(bytes)] = font.glyphs[i].bytes[b];
+		}
 	}
 
 	/* Fill in default glyph */
