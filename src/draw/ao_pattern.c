@@ -21,7 +21,7 @@ ao_pattern_expand(uint8_t v, uint8_t rot)
 	uint32_t	r;
 
 	if (rot)
-		v = ao_left(v, 8-rot) | ao_right(v, rot);
+		v = (uint8_t) ao_left(v, 8-rot) | (uint8_t) ao_right(v, rot);
 	r = v;
 	return (r << 24) | (r << 16) | (r << 8) | (r);
 }
@@ -53,17 +53,17 @@ ao_pattern(const struct ao_bitmap	*dst,
 	ao_clip(y2, 0, dst->height);
 
 	if (x < x2 && y < y2) {
-		int	xrot = (x - pat_x) & 7;
-		int	yrot = (y - pat_y) & 7;
-		int	i;
+		uint8_t	xrot = (x - pat_x) & 7;
+		uint8_t	yrot = (y - pat_y) & 7;
+		uint8_t	i;
 		int16_t	dst_x, dst_y;
 
 		for (i = 0; i < 8; i++)
 			pat[(i + yrot) & 7] = ao_pattern_expand(pattern->pattern[i], xrot);
 		for (dst_y = y; dst_y < y2; dst_y += 8) {
-			int	h = min(y2 - dst_y, 8);
+			int16_t	h = (int16_t) min(y2 - dst_y, 8);
 			for (dst_x = x; dst_x < x2; dst_x += 8) {
-				int	w = min(x2 - dst_x, 8);
+				int16_t	w = (int16_t) min(x2 - dst_x, 8);
 
 				ao_blt(pat, 1, 0,
 				       dst->base + dst_y * dst->stride,

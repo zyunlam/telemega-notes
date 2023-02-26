@@ -22,6 +22,33 @@
 #include <math.h>
 #include <float.h>
 
+const struct ao_transform ao_identity = {
+	.x_scale = 1.0f, .x_off = 0.0f,
+	.y_scale = 1.0f, .y_off = 0.0f
+};
+
+static float
+_x(const struct ao_coord	*coords,
+   const struct ao_transform	*transform,
+   uint16_t			coord)
+{
+	return ao_t_x_c(&coords[coord], transform);
+}
+
+static float
+_y(const struct ao_coord	*coords,
+   const struct ao_transform	*transform,
+   uint16_t			coord)
+{
+	return ao_t_y_c(&coords[coord], transform);
+}
+
+static uint16_t
+_next(uint16_t ncoords, uint16_t edge)
+{
+	return edge == ncoords - 1 ? 0 : edge + 1;
+}
+
 /*
  * Return if the given edge is 'live' at the specified y coordinate.
  * That means the edge spans the y value. Horizontal lines are never
@@ -30,12 +57,12 @@
 static bool
 ao_edge_live(const struct ao_coord	*coords,
 	     uint16_t			ncoords,
+	     const struct ao_transform	*transform,
 	     uint16_t			edge,
 	     float			y)
 {
-	int next_edge = (edge == ncoords - 1) ? 0 : edge + 1;
-	float y1 = coords[edge].y;
-	float y2 = coords[next_edge].y;
+	float y1 = _y(coords, transform, edge);
+	float y2 = _y(coords, transform, _next(ncoords, edge));
 
 	if (y1 > y2)
 		return y2 <= y && y < y1;
@@ -47,21 +74,22 @@ ao_edge_live(const struct ao_coord	*coords,
  * Compute the X coordinate for a given edge at a specified y value
  */
 static int16_t
-ao_edge_x(const struct ao_coord	*coords,
-	  uint16_t		ncoords,
-	  uint16_t		edge,
-	  float			y)
+ao_edge_x(const struct ao_coord		*coords,
+	  uint16_t			ncoords,
+	  const struct ao_transform	*transform,
+	  uint16_t			edge,
+	  float				y)
 {
-	int	next_edge = (edge == ncoords - 1) ? 0 : edge + 1;
-	float x1 = coords[edge].x;
-	float x2 = coords[next_edge].x;
-	float y1 = coords[edge].y;
-	float y2 = coords[next_edge].y;
+	uint16_t next_edge = _next(ncoords, edge);
+	float x1 = _x(coords, transform, edge);
+	float x2 = _x(coords, transform, next_edge);
+	float y1 = _y(coords, transform, edge);
+	float y2 = _y(coords, transform, next_edge);
 	float dx = x2 - x1;
 	float dy = y2 - y1;
 	float off_y = y - y1;
 
-	return x1 + (off_y * dx) / dy;
+	return (int16_t) (x1 + (off_y * dx) / dy + 0.5f);
 }
 
 struct next_x {
@@ -75,10 +103,11 @@ struct next_x {
  * if there are no more edges.
  */
 static bool
-ao_next_x(const struct ao_coord	*coords,
-	  uint16_t		ncoords,
-	  struct next_x		*this_x,
-	  float		y)
+ao_next_x(const struct ao_coord		*coords,
+	  uint16_t			ncoords,
+	  const struct ao_transform	*transform,
+	  struct next_x			*this_x,
+	  float				y)
 {
 	uint16_t 	edge;
 	float		next_x = FLT_MAX;
@@ -86,8 +115,8 @@ ao_next_x(const struct ao_coord	*coords,
 	bool		ret = false;
 
 	for (edge = 0; edge < ncoords; edge++) {
-		if (ao_edge_live(coords, ncoords, edge, y)) {
-			float	nx = ao_edge_x(coords, ncoords, edge, y);
+		if (ao_edge_live(coords, ncoords, transform, edge, y)) {
+			float	nx = ao_edge_x(coords, ncoords, transform, edge, y);
 			if (this_x->x < nx || (this_x->x == nx && this_x->edge < edge)) {
 				if (nx < next_x) {
 					next_x = nx;
@@ -113,8 +142,8 @@ ao_span(const struct ao_bitmap	*dst,
 	uint32_t		fill,
 	uint8_t			rop)
 {
-	int16_t	ix1 = floorf(x1 + 0.5f);
-	int16_t ix2 = floorf(x2 + 0.5f);
+	int16_t	ix1 = (int16_t) floorf(x1 + 0.5f);
+	int16_t ix2 = (int16_t) floorf(x2 + 0.5f);
 	int16_t iy = (int16_t) y;
 	ao_rect(dst, ix1, iy, ix2 - ix1, 1, fill, rop);
 }
@@ -124,12 +153,13 @@ ao_span(const struct ao_bitmap	*dst,
  * indication of whether the edge goes upwards or downwards
  */
 static int
-ao_wind(const struct ao_coord	*coords,
-	uint16_t		ncoords,
-	uint16_t		edge)
+ao_wind(const struct ao_coord		*coords,
+	uint16_t			ncoords,
+	const struct ao_transform	*transform,
+	uint16_t			edge)
 {
-	uint16_t next_edge = (edge == ncoords - 1) ? 0 : edge + 1;
-	return coords[edge].y > coords[next_edge].y ? 1 : -1;
+	uint16_t next_edge = _next(ncoords, edge);
+	return _y(coords, transform, edge) > _y(coords, transform, next_edge) ? 1 : -1;
 }
 
 /*
@@ -137,9 +167,10 @@ ao_wind(const struct ao_coord	*coords,
  */
 void
 ao_poly(const struct ao_bitmap	*dst,
-	const struct ao_coord	*coords,
-	uint16_t		ncoords,
-	uint32_t		fill,
+	const struct ao_coord		*coords,
+	uint16_t			ncoords,
+	const struct ao_transform	*transform,
+	uint32_t			fill,
 	uint8_t			rop)
 {
 	float		y_min, y_max;
@@ -149,12 +180,15 @@ ao_poly(const struct ao_bitmap	*dst,
 	struct next_x	next_x;
 	int		wind;
 
+	if (!transform)
+		transform = &ao_identity;
+
 	/*
 	 * Find the y limits of the polygon
 	 */
-	y_min = y_max = coords[0].y;
+	y_min = y_max = _y(coords, transform, 0);
 	for (edge = 1; edge < ncoords; edge++) {
-		y = coords[edge].y;
+		y = _y(coords, transform, edge);
 		if (y < y_min)
 			y_min = y;
 		else if (y > y_max)
@@ -172,7 +206,7 @@ ao_poly(const struct ao_bitmap	*dst,
 		next_x.x = INT16_MIN;
 		next_x.edge = 0;
 		wind = 0;
-		while (ao_next_x(coords, ncoords, &next_x, y)) {
+		while (ao_next_x(coords, ncoords, transform, &next_x, y)) {
 
 			/*
 			 * Fill the previous span if winding is
@@ -182,7 +216,7 @@ ao_poly(const struct ao_bitmap	*dst,
 				ao_span(dst, x, next_x.x, y, fill, rop);
 
 			/* Adjust winding for the current span */
-			wind += ao_wind(coords, ncoords, next_x.edge);
+			wind += ao_wind(coords, ncoords, transform, next_x.edge);
 
 			/* Step to next span start x value */
 			x = next_x.x;

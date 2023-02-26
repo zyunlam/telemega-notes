@@ -142,12 +142,12 @@ struct ao_cbox {
 /* -b <= a, so we need to make a bigger */
 static int16_t
 div_ceil(int32_t a, int16_t b) {
-	return (a + b + b - 1) / b - 1;
+	return (int16_t) ((a + b + b - 1) / b - 1);
 }
 
 static int16_t
 div_floor_plus_one(int32_t a, int16_t b) {
-	return (a + b) / b;
+	return (int16_t) ((a + b) / b);
 }
 
 static int8_t
@@ -202,10 +202,10 @@ ao_clip_line(struct ao_cc *c, struct ao_cbox *b)
 		adjust_minor = adj_min;
 	}
 
-	c->e += adjust_major * c->e1 + adjust_minor * c->e3;
+	c->e = (int16_t) (c->e + adjust_major * c->e1 + adjust_minor * c->e3);
 
-	c->major += c->sign_major * adjust_major;
-	c->minor += c->sign_minor * adjust_minor;
+	c->major = (int16_t) (c->major + c->sign_major * adjust_major);
+	c->minor = (int16_t) (c->minor + c->sign_minor * adjust_minor);
 
 	return true;
 }
@@ -239,7 +239,7 @@ ao_line(const struct ao_bitmap	*dst,
 	if (adx > ady) {
 		axis = X_AXIS;
 		e1 = ady << 1;
-		e2 = e1 - (adx << 1);
+		e2 = e1 - (int16_t) (adx << 1);
 		e = e1 - adx;
 
 		clip_1.major = x1;
@@ -256,7 +256,7 @@ ao_line(const struct ao_bitmap	*dst,
 	} else {
 		axis = Y_AXIS;
 		e1 = adx << 1;
-		e2 = e1 - (ady << 1);
+		e2 = e1 - (int16_t) (ady << 1);
 		e = e1 - ady;
 
 		clip_1.major = y1;
@@ -289,7 +289,7 @@ ao_line(const struct ao_bitmap	*dst,
 	if (!ao_clip_line(&clip_2, &cbox))
 		return;
 
-	len = clip_1.sign_major * (clip_2.major - clip_1.major) + clip_2.first;
+	len = (int16_t) (clip_1.sign_major * (clip_2.major - clip_1.major) + clip_2.first);
 
 	if (len <= 0)
 		return;

@@ -22,13 +22,19 @@
 #define ARRAYSIZE(a)	(sizeof(a) / sizeof((a)[0]))
 
 void
-ao_logo(const struct ao_bitmap	*dst,
-	const struct ao_font	*font,
-	uint32_t		fill,
-	uint8_t			rop)
+ao_logo(const struct ao_bitmap		*dst,
+	const struct ao_transform	*transform,
+	const struct ao_font		*font,
+	uint32_t			fill,
+	uint8_t				rop)
 {
-	ao_poly(dst, ao_logo_top, ARRAYSIZE(ao_logo_top), 0x00000000, AO_COPY);
-	ao_poly(dst, ao_logo_bottom, ARRAYSIZE(ao_logo_bottom), 0x00000000, AO_COPY);
-	ao_text(dst, font, 38, 31, "Altus", 0x00000000, AO_COPY);
-	ao_text(dst, font, 38, 57, "Metrum", 0x00000000, AO_COPY);
+	if (!transform)
+		transform = &ao_identity;
+	int16_t name_x = ao_t_xi(ao_logo_width, 0.0f, transform);
+	int16_t name_y1 = ao_t_yi(ao_logo_width, 0.5f, transform);
+	int16_t name_y2 = ao_t_yi(ao_logo_width, 0.98f, transform);
+	ao_poly(dst, ao_logo_top, ARRAYSIZE(ao_logo_top), transform, fill, rop);
+	ao_poly(dst, ao_logo_bottom, ARRAYSIZE(ao_logo_bottom), transform, fill, rop);
+	ao_text(dst, font, name_x, name_y1, "Altus", fill, rop);
+	ao_text(dst, font, name_x, name_y2, "Metrum", fill, rop);
 }

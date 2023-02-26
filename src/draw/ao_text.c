@@ -27,12 +27,12 @@ ao_text(const struct ao_bitmap	*dst,
 	uint32_t		fill,
 	uint8_t			rop)
 {
-	int		glyph_stride = (font->max_width + 31) / 32;
+	int16_t		glyph_stride = ao_stride(font->max_width);
 	uint32_t	src[glyph_stride * font->max_height];
 	char		c;
 	int		h;
-	int8_t		x_off, y_off, advance;
-	int		byte_width;
+	int16_t		x_off = 0, y_off = 0, advance = 0;
+	int16_t		byte_width = 0;
 
 	struct ao_bitmap	src_bitmap = {
 		.base = src,
@@ -45,11 +45,12 @@ ao_text(const struct ao_bitmap	*dst,
 
 	if (!font->metrics) {
 		src_bitmap.width = font->max_width;
-		src_bitmap.height = font->max_width;
+		src_bitmap.height = font->max_height;
 		src_bitmap.stride = glyph_stride;
 		x_off = 0;
 		y_off = font->ascent;
 		advance = font->max_width;
+		byte_width = ao_stride_bytes(font->max_width);
 	}
 	while ((c = *string++)) {
 		const uint8_t	*bytes = &font->bytes[font->pos[(uint8_t) c]];
@@ -58,15 +59,15 @@ ao_text(const struct ao_bitmap	*dst,
 			const struct ao_glyph_metrics *m = &font->metrics[(uint8_t) c];
 			src_bitmap.width = m->width;
 			src_bitmap.height = m->height;
-			src_bitmap.stride = (m->width + 31) / 32;
+			src_bitmap.stride = ao_stride(m->width);
 			x_off = m->x_off;
 			y_off = m->y_off;
 			advance = m->advance;
-			byte_width = ((src_bitmap.width + 7) / 8);
+			byte_width = ao_stride_bytes(m->width);
 		}
 
 		for (h = 0; h < src_bitmap.height; h++)
-			memcpy(&src[h * src_bitmap.stride], &bytes[h * byte_width], byte_width);
+			memcpy(&src[h * src_bitmap.stride], &bytes[h * byte_width], (size_t) byte_width);
 
 		ao_copy(dst,
 			x + x_off, y - y_off, src_bitmap.width, src_bitmap.height,

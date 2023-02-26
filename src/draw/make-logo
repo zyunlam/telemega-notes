@@ -94,9 +94,9 @@ print_poly(coord_t[] polygon, real height, bounds_t bounds, real x_pos, real y_p
 			y = polygon[i].y;
 			break;
 		}
-		printf("\t{ .x = %8g, .y = %8g },\n",
-		       (x - x_off) * scale + x_pos,
-		       (y - y_off) * scale + y_pos);
+		printf("\t{ .x = %8.6ff, .y = %8.6ff },\n",
+		       imprecise((x - x_off) * scale + x_pos),
+		       imprecise((y - y_off) * scale + y_pos));
 	}
 }
 
@@ -113,6 +113,10 @@ print_logo(string name, real height, real x_pos, real y_pos)
 	printf("const struct ao_coord %s_bottom[] = {\n", name);
 	print_poly(bottom, height, bounds, x_pos, y_pos);
 	printf("};\n");
+	printf("\n");
+	real width = height * (bounds.max_x - bounds.min_x) / (bounds.max_y - bounds.min_y);
+	printf("static const float %s_height = %8.6ff;\n", name, height);
+	printf("static const float %s_width = %8.6ff;\n", name, width);
 }
 
-print_logo(argv[1], string_to_real(argv[2]), string_to_real(argv[3]), string_to_real(argv[4]));
+print_logo(argv[1], 1.0, 0, 0);

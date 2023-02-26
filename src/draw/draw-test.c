@@ -39,10 +39,10 @@ static struct ao_bitmap fb = {
 
 #define BIG_FONT FrutigerLT_Roman_64_font
 #define SMALL_FONT FrutigerLT_Roman_12_font
-#define LOGO_FONT FrutigerLT_Roman_24_font
+#define LOGO_FONT BenguiatGothicStd_Bold_26_font
 
 #define VALUE_Y		BIG_FONT.ascent
-#define LABEL_Y		BIG_FONT.ascent + SMALL_FONT.ascent + 2
+#define LABEL_Y		(int16_t) (BIG_FONT.ascent + SMALL_FONT.ascent + 2)
 #define BOX_X		2
 #define PAD_X		90
 #define BOX_LABEL_X	30
@@ -51,7 +51,7 @@ static struct ao_bitmap fb = {
 
 static int	box_number = 1;
 static int	pad_number = 1;
-static bool	do_polys = false;
+static int	do_polys = 0;
 
 static const struct ao_coord trek[] = {
 	{ .x = 90, .y = 0 },
@@ -77,16 +77,39 @@ static const struct ao_coord donut[] = {
 
 #define NCOORD_DONUT (sizeof(donut)/sizeof(donut[0]))
 
+static const struct ao_coord bowtie[] = {
+	{ .x = 0, .y = 0 },
+	{ .x = 32, .y = 32 },
+	{ .x = 0, .y = 32 },
+	{ .x = 32, .y = 0 },
+};
+
+#define NCOORD_BOWTIE (sizeof(bowtie)/sizeof(bowtie[0]))
+
+static const struct ao_transform logo_transform = {
+	.x_scale = 48, .x_off = 0,
+	.y_scale = 48, .y_off = 10,
+};
+
 void HandleExpose(Display *dpy, Window win, GC gc)
 {
+	char	str[64];
+
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, 0xffffffff, AO_COPY);
 
-	if (do_polys) {
-		ao_logo(&fb, &LOGO_FONT, 0x00000000, AO_COPY);
-//		ao_poly(&fb, trek, NCOORD_TREK, 0x00000000, AO_COPY);
-//		ao_poly(&fb, donut, NCOORD_DONUT, 0x00000000, AO_COPY);
-	} else {
-		char	str[64];
+	switch (do_polys) {
+	case 1:
+		ao_logo(&fb, &logo_transform, &LOGO_FONT, 0x00000000, AO_COPY);
+		break;
+	case 2:
+		ao_poly(&fb, trek, NCOORD_TREK, NULL, 0x00000000, AO_COPY);
+		ao_poly(&fb, donut, NCOORD_DONUT, NULL, 0x00000000, AO_COPY);
+		break;
+	case 3:
+		ao_poly(&fb, bowtie, NCOORD_BOWTIE, NULL, 0x00000000, AO_COPY);
+		break;
+	default:
+	case 0:
 
 		sprintf(str, "%02d", box_number);
 		ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
@@ -97,6 +120,7 @@ void HandleExpose(Display *dpy, Window win, GC gc)
 		ao_text(&fb, &SMALL_FONT, PAD_LABEL_X, LABEL_Y, "pad", 0x00000000, AO_COPY);
 
 		ao_line(&fb, SEP_X, 0, SEP_X, HEIGHT, 0x00000000, AO_COPY);
+		break;
 	}
 
 	XImage *image = XCreateImage(dpy, visual, 1, XYBitmap, 0, (char *) bits, WIDTH, HEIGHT, 32, STRIDE*4);
@@ -135,7 +159,9 @@ HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev)
 				box_number = 99;
 			break;
 		case 's':
-			do_polys = !do_polys;
+			do_polys++;
+			if (do_polys == 4)
+				do_polys = 0;
 			break;
 		case 'c':
 			break;
@@ -147,4 +173,8 @@ HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev)
 void
 HandleKeyRelease(Display *dpy, Window win, GC gc, XEvent *ev)
 {
+	(void) dpy;
+	(void) win;
+	(void) gc;
+	(void) ev;
 }

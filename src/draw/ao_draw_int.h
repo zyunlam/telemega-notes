@@ -76,7 +76,7 @@ ao_bits_mask(int16_t x, int16_t w) {
     r = ao_right_mask((x)+n); \
     l = ao_left_mask(x); \
     if (l) { \
-	n -= AO_UNIT - ((x) & AO_MASK); \
+	n -= (int16_t) (AO_UNIT - ((x) & AO_MASK));	\
 	if (n < 0) { \
 	    n = 0; \
 	    l &= r; \

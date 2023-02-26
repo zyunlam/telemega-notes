@@ -73,8 +73,8 @@ $(FONT_SRCS): font-convert
 ao_font.h: $(FONT_SRCS)
 	grep -h '^const struct ao_font' $(FONT_SRCS) | sed -e 's/^/extern /' -e 's/ =.*$$/;/' > $@
 
-ao_logo.h: make-logo Makefile
-	nickle make-logo ao_logo 48 0 10 > $@
+ao_logo.h: make-logo
+	nickle make-logo ao_logo > $@
 
 SRCS=\
 	draw-test.c \
@@ -92,7 +92,7 @@ OBJS=$(SRCS:.c=.o)
 
 LIBS=-lXrender -lX11 -lm
 
-CFLAGS=-O0 -g
+CFLAGS=-O2 -g $(WARN_FLAGS)
 
 HEADERS=\
 	ao_draw.h \

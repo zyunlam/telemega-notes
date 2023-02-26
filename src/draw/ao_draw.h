@@ -30,6 +30,57 @@ struct ao_coord {
 	float	x, y;
 };
 
+struct ao_transform {
+	float	x_scale, x_off;
+	float	y_scale, y_off;
+};
+
+static inline float ao_t_x(float x, float y, const struct ao_transform *t)
+{
+	(void) y;
+	return x * t->x_scale + t->x_off;
+}
+
+static inline int16_t ao_t_xi(float x, float y, const struct ao_transform *t)
+{
+	return (int16_t) (ao_t_x(x, y, t) + 0.5f);
+}
+
+static inline float ao_t_y(float x, float y, const struct ao_transform *t)
+{
+	(void) x;
+	return y * t->y_scale + t->y_off;
+}
+
+static inline int16_t ao_t_yi(float x, float y, const struct ao_transform *t)
+{
+	return (int16_t) (ao_t_y(x, y, t) + 0.5f);
+}
+
+static inline float ao_t_x_c(const struct ao_coord	*c,
+			     const struct ao_transform	*t)
+{
+	return ao_t_x(c->x, c->y, t);
+}
+
+static inline float ao_t_y_c(const struct ao_coord	*c,
+			     const struct ao_transform	*t)
+{
+	return ao_t_y(c->x, c->y, t);
+}
+
+static inline int16_t
+ao_stride(int16_t width)
+{
+	return (int16_t) ((width + 31) >> 5);
+}
+
+static inline int16_t
+ao_stride_bytes(int16_t width)
+{
+	return (int16_t) ((width + 7) >> 3);
+}
+
 struct ao_pattern {
 	uint8_t		pattern[8];
 };
@@ -46,9 +97,9 @@ struct ao_font {
 	const uint8_t	*bytes;
 	const uint16_t	*pos;
 	const struct ao_glyph_metrics *metrics;
-	int	max_width;
-	int	max_height;
-	int	ascent;
+	int16_t	max_width;
+	int16_t	max_height;
+	int16_t	ascent;
 };
 
 void
@@ -92,11 +143,12 @@ ao_line(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_poly(const struct ao_bitmap	*dst,
-	const struct ao_coord	*coords,
-	uint16_t		ncoords,
-	uint32_t		fill,
-	uint8_t			rop);
+ao_poly(const struct ao_bitmap		*dst,
+	const struct ao_coord		*coords,
+	uint16_t			ncoords,
+	const struct ao_transform	*transform,
+	uint32_t			fill,
+	uint8_t				rop);
 
 void
 ao_text(const struct ao_bitmap	*dst,
@@ -108,12 +160,13 @@ ao_text(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_logo(const struct ao_bitmap	*dst,
-	const struct ao_font	*font,
-	uint32_t		fill,
-	uint8_t			rop);
+ao_logo(const struct ao_bitmap		*dst,
+	const struct ao_transform	*transform,
+	const struct ao_font		*font,
+	uint32_t			fill,
+	uint8_t				rop);
 
-extern const struct ao_font FrutigerLT_Roman_50_font;
+extern const struct ao_transform ao_identity;
 
 #define AO_SHIFT	5
 #define AO_UNIT		(1 << AO_SHIFT)

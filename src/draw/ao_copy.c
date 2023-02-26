@@ -17,11 +17,11 @@
 
 #define bound(val,max,other) do {		\
 		if (val < 0) {			\
-			other -= val;		\
+			other += (typeof(other)) (-val);	\
 			val = 0;		\
 		}				\
 		if (val > max) {		\
-			other -= (val - max);	\
+			other -= (typeof(other)) (val - max);	\
 			val = max;		\
 		}				\
 	} while (0)
