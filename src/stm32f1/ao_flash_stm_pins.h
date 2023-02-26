@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +16,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#ifndef _AO_EXTI_H_
-#define _AO_EXTI_H_
+#ifndef _AO_FLASH_STM_PINS_H_
+#define _AO_FLASH_STM_PINS_H_
 
-void
-ao_exti_setup(struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback)(void));
+#include <ao_flash_pins.h>
 
-void
-ao_exti_set_mode(struct stm_gpio *gpio, uint8_t pin, uint8_t mode);
+#ifndef AO_SYSCLK
 
-void
-ao_exti_set_callback(struct stm_gpio *gpio, uint8_t pin, void (*callback)(void));
+#define AO_SYSCLK	72000000
+#define AO_HCLK		72000000
+#define AO_APB1CLK	36000000
+#define AO_APB2CLK	72000000
+#define AO_ADCCLK	12000000
 
-void
-ao_exti_enable(struct stm_gpio *gpio, uint8_t pin);
+#define AO_RCC_CFGR_USBPRE	STM_RCC_CFGR_USBPRE_1_5
+#define AO_RCC_CFGR_PLLMUL	STM_RCC_CFGR_PLLMUL_9
+#define AO_RCC_CFGR_PLLXTPRE	STM_RCC_CFGR_PLLXTPRE_1
+#define AO_RCC_CFGR_PPRE2_DIV	STM_RCC_CFGR_PPRE2_DIV_1
+#define AO_RCC_CFGR_PPRE1_DIV	STM_RCC_CFGR_PPRE1_DIV_2
+#define AO_RCC_CFGR_HPRE_DIV	STM_RCC_CFGR_HPRE_DIV_1
+#define AO_RCC_CFGR_ADCPRE	STM_RCC_CFGR_ADCPRE_6
 
-void
-ao_exti_disable(struct stm_gpio *gpio, uint8_t pin);
+#endif
 
-void
-ao_exti_init(void);
-
-#endif /* _AO_EXTI_H_ */
+#endif /* _AO_FLASH_STM_PINS_H_ */

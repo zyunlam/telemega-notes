@@ -39,7 +39,7 @@ stm_scb    = 0xe000ed00;
 
 stm_mpu    = 0xe000ed90;
 
-stm_dbg_mcu = 0xe0042000;
+stm_dbgmcu = 0xe0042000;
 
 /* data in system memory */
 stm_flash_data = 0x1ffff7e0;

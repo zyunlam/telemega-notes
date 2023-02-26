@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ * Copyright © 2018 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +16,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#ifndef _AO_EXTI_H_
-#define _AO_EXTI_H_
+__flash = 0x08000000;
+__flash_size = 4k;
+__ram = 0x20000000;
+__ram_size = 20k;
+__stack_size = 512;
 
-void
-ao_exti_setup(struct stm_gpio *gpio, uint8_t pin, uint8_t mode, void (*callback)(void));
-
-void
-ao_exti_set_mode(struct stm_gpio *gpio, uint8_t pin, uint8_t mode);
-
-void
-ao_exti_set_callback(struct stm_gpio *gpio, uint8_t pin, void (*callback)(void));
-
-void
-ao_exti_enable(struct stm_gpio *gpio, uint8_t pin);
-
-void
-ao_exti_disable(struct stm_gpio *gpio, uint8_t pin);
-
-void
-ao_exti_init(void);
-
-#endif /* _AO_EXTI_H_ */
+INCLUDE registers.ld
+INCLUDE picolibc.ld

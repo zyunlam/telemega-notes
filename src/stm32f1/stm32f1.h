@@ -355,6 +355,17 @@ extern struct stm_scb stm_scb;
 #define STM_SCB_AIRCR_VECTCLRACTIVE	1
 #define STM_SCB_AIRCR_VECTRESET		0
 
+struct stm_dbgmcu {
+	uint32_t	idcode;
+};
+
+extern struct stm_dbgmcu	stm_dbgmcu;
+
+static inline uint16_t
+stm_dev_id(void) {
+	return stm_dbgmcu.idcode & 0xfff;
+}
+
 struct stm_flash {
 	vuint32_t	acr;
 	vuint32_t	keyr;
@@ -398,8 +409,8 @@ extern struct stm_flash stm_flash;
 #define STM_FLASH_CR_PG		0
 
 #define STM_FLASH_RDPRT_KEY	0x00A5
-#define STM_FLASH_FPEC_KEY1	0x45670123
-#define STM_FLASH_FPEC_KEY2	0xCDEF89AB
+#define STM_FLASH_KEYR_KEY1	0x45670123
+#define STM_FLASH_KEYR_KEY2	0xCDEF89AB
 
 
 struct stm_flash_data {

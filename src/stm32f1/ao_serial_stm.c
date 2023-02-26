@@ -196,15 +196,17 @@ ao_usart_set_speed(struct ao_stm_usart *usart, uint8_t speed)
 
 	if (speed > AO_SERIAL_SPEED_115200)
 		return;
+#if HAS_SERIAL_1
 	if (usart == &ao_stm_usart1)
 		brr = AO_PCLK2 / ao_usart_speeds[speed].baud;
 	else
+#endif
 		brr = AO_PCLK1 / ao_usart_speeds[speed].baud;
 	usart->reg->brr = brr;
 }
 
 static void
-ao_usart_init(struct ao_stm_usart *usart, int hw_flow)
+ao_usart_init(struct ao_stm_usart *usart, int hw_flow, uint8_t speed)
 {
 	usart->reg->cr1 = ((1 << STM_USART_CR1_UE) |
 			  (0 << STM_USART_CR1_M) |
@@ -247,16 +249,8 @@ ao_usart_init(struct ao_stm_usart *usart, int hw_flow)
 		usart->reg->cr3 |= ((1 << STM_USART_CR3_CTSE) |
 				    (1 << STM_USART_CR3_RTSE));
 
-	/* Pick a 9600 baud rate */
-	ao_usart_set_speed(usart, AO_SERIAL_SPEED_9600);
+	ao_usart_set_speed(usart, speed);
 }
-
-#if HAS_SERIAL_HW_FLOW
-static void
-ao_usart_set_flow(struct ao_stm_usart *usart)
-{
-}
-#endif
 
 #if HAS_SERIAL_1
 
@@ -485,10 +479,20 @@ ao_serial_init(void)
 	 */
 
 #if SERIAL_2_PA2_PA3
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIOAEN);
+	ao_enable_port(&stm_gpioa);
+	stm_gpio_conf(&stm_gpioa, 2,
+		      STM_GPIO_CR_MODE_OUTPUT_2MHZ,
+		      STM_GPIO_CR_CNF_OUTPUT_AF_PUSH_PULL);
 
-	stm_afr_set(&stm_gpioa, 2, STM_AFR_AF7);
-	stm_afr_set(&stm_gpioa, 3, STM_AFR_AF7);
+	stm_gpio_conf(&stm_gpioa, 3,
+		      STM_GPIO_CR_MODE_INPUT,
+		      STM_GPIO_CR_CNF_INPUT_FLOATING);
+
+#ifndef USE_SERIAL_2_FLOW
+#define USE_SERIAL_2_FLOW	0
+#define USE_SERIAL_2_SW_FLOW	0
+#endif
+
 # if USE_SERIAL_2_FLOW
 #  if USE_SERIAL_2_SW_FLOW
 	ao_serial_set_sw_rts_cts(&ao_stm_usart2,
@@ -498,28 +502,57 @@ ao_serial_init(void)
 				 SERIAL_2_PORT_CTS,
 				 SERIAL_2_PIN_CTS);
 #  else
-	stm_afr_set(&stm_gpioa, 0, STM_AFR_AF7);
-	stm_afr_set(&stm_gpioa, 1, STM_AFR_AF7);
+	stm_gpio_conf(&stm_gpioa, 0,			/* CTS */
+		      STM_GPIO_CR_MODE_INPUT,
+		      STM_GPIO_CR_CNF_INPUT_FLOATING);
+	stm_gpio_conf(&stm_gpioa, 1,			/* RTS */
+		      STM_GPIO_CR_MODE_OUTPUT_2MHZ,
+		      STM_GPIO_CR_CNF_OUTPUT_AF_PUSH_PULL);
+
 #  endif
 # endif
-#else
-#if SERIAL_2_PD5_PD6
-	stm_rcc.ahbenr |= (1 << STM_RCC_AHBENR_GPIODEN);
+	stm_set_afio_mapr(STM_AFIO_MAPR_USART2_REMAP,
+			  STM_AFIO_MAPR_USART2_REMAP_PA0_PA1_PA2_PA3_PA4,
+			  STM_AFIO_MAPR_USART2_REMAP_MASK);
+#elif SERIAL_2_PD5_PD6
+	ao_enable_port(&stm_gpiod);
+	stm_gpio_conf(&stm_gpiod, 5,
+		      STM_GPIO_CR_MODE_OUTPUT_2MHZ,
+		      STM_GPIO_CR_CNF_OUTPUT_AF_PUSH_PULL);
 
-	stm_afr_set(&stm_gpiod, 5, STM_AFR_AF7);
-	stm_afr_set(&stm_gpiod, 6, STM_AFR_AF7);
-#if USE_SERIAL_2_FLOW
-#error "Don't know how to set flowcontrol for serial 2 on PD"
-#endif
+	stm_gpio_conf(&stm_gpiod, 6,
+		      STM_GPIO_CR_MODE_INPUT,
+		      STM_GPIO_CR_CNF_INPUT_FLOATING);
+
+# if USE_SERIAL_2_FLOW
+#  if USE_SERIAL_2_SW_FLOW
+	ao_serial_set_sw_rts_cts(&ao_stm_usart2,
+				 ao_serial2_cts,
+				 SERIAL_2_PORT_RTS,
+				 SERIAL_2_PIN_RTS,
+				 SERIAL_2_PORT_CTS,
+				 SERIAL_2_PIN_CTS);
+#  else
+	stm_gpio_conf(&stm_gpiod, 3,			/* CTS */
+		      STM_GPIO_CR_MODE_INPUT,
+		      STM_GPIO_CR_CNF_INPUT_FLOATING);
+	stm_gpio_conf(&stm_gpiod, 4,			/* RTS */
+		      STM_GPIO_CR_MODE_OUTPUT_2MHZ,
+		      STM_GPIO_CR_CNF_OUTPUT_AF_PUSH_PULL);
+
+#  endif
+# endif
+	stm_set_afio_mapr(STM_AFIO_MAPR_USART2_REMAP,
+			  STM_AFIO_MAPR_USART2_REMAP_PD3_PD4_PD5_PD6_PD7,
+			  STM_AFIO_MAPR_USART2_REMAP_MASK);
 #else
 #error "No SERIAL_2 port configuration specified"
-#endif
 #endif
 	/* Enable USART */
 	stm_rcc.apb1enr |= (1 << STM_RCC_APB1ENR_USART2EN);
 
 	ao_stm_usart2.reg = &stm_usart2;
-	ao_usart_init(&ao_stm_usart2, USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW);
+	ao_usart_init(&ao_stm_usart2, USE_SERIAL_2_FLOW && !USE_SERIAL_2_SW_FLOW, SERIAL_2_SPEED);
 
 	stm_nvic_set_enable(STM_ISR_USART2_POS);
 	stm_nvic_set_priority(STM_ISR_USART2_POS, AO_STM_NVIC_MED_PRIORITY);
