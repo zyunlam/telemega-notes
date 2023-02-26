@@ -35,7 +35,7 @@ SRCS=\
 
 OBJS=$(SRCS:.c=.o)
 
-LIBS=-lXrender -lX11
+LIBS=-lXrender -lX11 -lm
 
 CFLAGS=-O0 -g
 

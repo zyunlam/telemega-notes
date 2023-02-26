@@ -27,7 +27,7 @@ struct ao_bitmap {
 };
 
 struct ao_coord {
-	int16_t		x, y;
+	float	x, y;
 };
 
 struct ao_pattern {

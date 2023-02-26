@@ -19,6 +19,8 @@
 #include "ao_draw.h"
 #include "ao_draw_int.h"
 #include <stdio.h>
+#include <math.h>
+#include <float.h>
 
 /*
  * Return if the given edge is 'live' at the specified y coordinate.
@@ -29,11 +31,11 @@ static bool
 ao_edge_live(const struct ao_coord	*coords,
 	     uint16_t			ncoords,
 	     uint16_t			edge,
-	     int16_t			y)
+	     float			y)
 {
 	int next_edge = (edge == ncoords - 1) ? 0 : edge + 1;
-	int16_t y1 = coords[edge].y;
-	int16_t y2 = coords[next_edge].y;
+	float y1 = coords[edge].y;
+	float y2 = coords[next_edge].y;
 
 	if (y1 > y2)
 		return y2 <= y && y < y1;
@@ -48,22 +50,22 @@ static int16_t
 ao_edge_x(const struct ao_coord	*coords,
 	  uint16_t		ncoords,
 	  uint16_t		edge,
-	  int16_t		y)
+	  float			y)
 {
 	int	next_edge = (edge == ncoords - 1) ? 0 : edge + 1;
-	int16_t x1 = coords[edge].x;
-	int16_t x2 = coords[next_edge].x;
-	int16_t y1 = coords[edge].y;
-	int16_t y2 = coords[next_edge].y;
-	int16_t dx = x2 - x1;
-	int16_t dy = y2 - y1;
-	int16_t off_y = y - y1;
+	float x1 = coords[edge].x;
+	float x2 = coords[next_edge].x;
+	float y1 = coords[edge].y;
+	float y2 = coords[next_edge].y;
+	float dx = x2 - x1;
+	float dy = y2 - y1;
+	float off_y = y - y1;
 
 	return x1 + (off_y * dx) / dy;
 }
 
 struct next_x {
-	int16_t		x;
+	float		x;
 	uint16_t	edge;
 };
 
@@ -76,16 +78,16 @@ static bool
 ao_next_x(const struct ao_coord	*coords,
 	  uint16_t		ncoords,
 	  struct next_x		*this_x,
-	  int16_t		y)
+	  float		y)
 {
 	uint16_t 	edge;
-	int16_t		next_x = INT16_MAX;
+	float		next_x = FLT_MAX;
 	uint16_t	next_edge = UINT16_MAX;
 	bool		ret = false;
 
 	for (edge = 0; edge < ncoords; edge++) {
 		if (ao_edge_live(coords, ncoords, edge, y)) {
-			int16_t	nx = ao_edge_x(coords, ncoords, edge, y);
+			float	nx = ao_edge_x(coords, ncoords, edge, y);
 			if (this_x->x < nx || (this_x->x == nx && this_x->edge < edge)) {
 				if (nx < next_x) {
 					next_x = nx;
@@ -105,13 +107,16 @@ ao_next_x(const struct ao_coord	*coords,
  */
 static void
 ao_span(const struct ao_bitmap	*dst,
-	int16_t			x1,
-	int16_t			x2,
-	int16_t			y,
+	float			x1,
+	float			x2,
+	float			y,
 	uint32_t		fill,
 	uint8_t			rop)
 {
-	ao_rect(dst, x1, y, x2 - x1, 1, fill, rop);
+	int16_t	ix1 = floorf(x1 + 0.5f);
+	int16_t ix2 = floorf(x2 + 0.5f);
+	int16_t iy = (int16_t) y;
+	ao_rect(dst, ix1, iy, ix2 - ix1, 1, fill, rop);
 }
 
 /*
@@ -137,10 +142,10 @@ ao_poly(const struct ao_bitmap	*dst,
 	uint32_t		fill,
 	uint8_t			rop)
 {
-	int16_t		y_min, y_max;
+	float		y_min, y_max;
 	uint16_t	edge;
-	int16_t		y;
-	int16_t		x;
+	float		y;
+	float		x;
 	struct next_x	next_x;
 	int		wind;
 
@@ -155,6 +160,9 @@ ao_poly(const struct ao_bitmap	*dst,
 		else if (y > y_max)
 			y_max = y;
 	}
+
+	y_min = floorf(y_min);
+	y_max = ceilf(y_max);
 
 	/*
 	 * Walk each scanline in the range and fill included spans
