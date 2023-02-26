@@ -103,7 +103,7 @@ SRCS=\
 
 OBJS=$(SRCS:.c=.o)
 
-LIBS=-lXrender -lX11 -lm
+LIBS=-lXrender -lX11 -lm -Wl,--gc-sections
 
 CFLAGS=-O2 -g $(WARN_FLAGS)
 
