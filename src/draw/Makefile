@@ -57,7 +57,20 @@ BDFS=\
 	FrutigerLT-Roman-36.bdf \
 	FrutigerLT-Roman-48.bdf \
 	FrutigerLT-Roman-64.bdf \
-	FrutigerLT-Roman-72.bdf
+	FrutigerLT-Roman-72.bdf \
+	NotoMono-10.bdf \
+	NotoMono-12.bdf \
+	NotoMono-14.bdf \
+	NotoMono-16.bdf \
+	NotoMono-18.bdf \
+	NotoMono-24.bdf \
+	NotoMono-26.bdf \
+	NotoMono-28.bdf \
+	NotoMono-32.bdf \
+	NotoMono-36.bdf \
+	NotoMono-48.bdf \
+	NotoMono-64.bdf \
+	NotoMono-72.bdf
 
 FONT_SRCS=$(BDFS:.bdf=.c)
 

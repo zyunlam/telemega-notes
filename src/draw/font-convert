@@ -106,7 +106,7 @@ void print_font(file out, font_t font, string font_name) {
 	int	height = font.glyphs[0].height;
 	int	max_width = width;
 	int	max_height = height;
-	int[128] pos = { -1 ... };
+	int[128] pos = { 0 ... };
 	int[...] bytes;
 	bool fixed_size = true;
 
