@@ -1,19 +1,57 @@
+TOPDIR=..
+include $(TOPDIR)/Makefile.defs
+
+vpath %.bdf fonts
+
+BITMAP_SIZES = 10, 12, 14, 16, 18, 24, 26, 28, 32, 36, 48, 64, 72
+
 BDFS=\
+	BenguiatGothicStd-Bold-10.bdf \
+	BenguiatGothicStd-Bold-12.bdf \
+	BenguiatGothicStd-Bold-14.bdf \
+	BenguiatGothicStd-Bold-16.bdf \
+	BenguiatGothicStd-Bold-18.bdf \
+	BenguiatGothicStd-Bold-24.bdf \
+	BenguiatGothicStd-Bold-26.bdf \
+	BenguiatGothicStd-Bold-28.bdf \
+	BenguiatGothicStd-Bold-32.bdf \
+	BenguiatGothicStd-Bold-36.bdf \
+	BenguiatGothicStd-Bold-48.bdf \
+	BenguiatGothicStd-Bold-64.bdf \
+	BenguiatGothicStd-Bold-72.bdf \
+	BenguiatGothicStd-Medium-10.bdf \
+	BenguiatGothicStd-Medium-12.bdf \
+	BenguiatGothicStd-Medium-14.bdf \
+	BenguiatGothicStd-Medium-16.bdf \
+	BenguiatGothicStd-Medium-18.bdf \
+	BenguiatGothicStd-Medium-24.bdf \
+	BenguiatGothicStd-Medium-26.bdf \
+	BenguiatGothicStd-Medium-28.bdf \
+	BenguiatGothicStd-Medium-32.bdf \
+	BenguiatGothicStd-Medium-36.bdf \
+	BenguiatGothicStd-Medium-48.bdf \
+	BenguiatGothicStd-Medium-64.bdf \
+	BenguiatGothicStd-Medium-72.bdf \
 	FrutigerLT-Roman-10.bdf \
 	FrutigerLT-Roman-12.bdf \
 	FrutigerLT-Roman-14.bdf \
+	FrutigerLT-Roman-16.bdf \
 	FrutigerLT-Roman-18.bdf \
 	FrutigerLT-Roman-24.bdf \
+	FrutigerLT-Roman-26.bdf \
+	FrutigerLT-Roman-28.bdf \
+	FrutigerLT-Roman-32.bdf \
 	FrutigerLT-Roman-36.bdf \
 	FrutigerLT-Roman-48.bdf \
 	FrutigerLT-Roman-64.bdf \
+	FrutigerLT-Roman-72.bdf
 
 FONT_SRCS=$(BDFS:.bdf=.c)
 
 .SUFFIXES: .bdf .c
 
 .bdf.c:
-	nickle font-convert $*.bdf > $@
+	nickle font-convert -o $@ $<
 
 all: ao_font.h ao_logo.h draw-test
 

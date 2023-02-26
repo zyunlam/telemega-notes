@@ -1,5 +1,8 @@
 #!/usr/bin/nickle
 
+autoimport ParseArgs
+import File;
+
 typedef struct {
 	int[]	bytes;
 	int	width;
@@ -98,7 +101,7 @@ flip_byte(int x)
 	return dest;
 }
 
-void print_font(font_t font, string font_name) {
+void print_font(file out, font_t font, string font_name) {
 	int	width = font.glyphs[0].width;
 	int	height = font.glyphs[0].height;
 	int	max_width = width;
@@ -135,35 +138,35 @@ void print_font(font_t font, string font_name) {
 		if (pos[i] == -1)
 			pos[i] = pos[font.default_char];
 
-	printf("#include \"ao_draw.h\"\n");
-	printf("static const uint8_t %s_bytes[%d] = {", font_name, dim(bytes));
+	fprintf(out, "#include \"ao_draw.h\"\n");
+	fprintf(out, "static const uint8_t %s_bytes[%d] = {", font_name, dim(bytes));
 	for (int b = 0; b < dim(bytes); b++) {
 		if ((b & 15) == 0)
-			printf("\n\t");
+			fprintf(out, "\n\t");
 		else
-			printf(" ");
-		printf("0x%02x,", flip_byte(bytes[b]));
+			fprintf(out, " ");
+		fprintf(out, "0x%02x,", flip_byte(bytes[b]));
 	}
-	printf("\n};\n\n");
+	fprintf(out, "\n};\n\n");
 
-	printf("static const uint16_t %s_pos[%d] = {", font_name, dim(pos));
+	fprintf(out, "static const uint16_t %s_pos[%d] = {", font_name, dim(pos));
 	for (int i = 0; i < dim(pos); i++) {
 		if ((i & 7) == 0)
-			printf("\n\t");
+			fprintf(out, "\n\t");
 		else
-			printf(" ");
-		printf("%6d,", pos[i]);
+			fprintf(out, " ");
+		fprintf(out, "%6d,", pos[i]);
 	}
-	printf("\n};\n\n");
+	fprintf(out, "\n};\n\n");
 
-	printf("#define GLYPH_WIDTH_MAX %d\n", max_width);
-	printf("#define GLYPH_HEIGHT_MAX %d\n", max_height);
+	fprintf(out, "#define GLYPH_WIDTH_MAX %d\n", max_width);
+	fprintf(out, "#define GLYPH_HEIGHT_MAX %d\n", max_height);
 	if (fixed_size) {
-		printf("#define GLYPH_WIDTH %d\n", width);
-		printf("#define GLYPH_HEIGHT %d\n", height);
-		printf("#define GLYPH_ASCENT %d\n", font.ascent);
+		fprintf(out, "#define GLYPH_WIDTH %d\n", width);
+		fprintf(out, "#define GLYPH_HEIGHT %d\n", height);
+		fprintf(out, "#define GLYPH_ASCENT %d\n", font.ascent);
 	} else {
-		printf("static const struct ao_glyph_metrics %s_metrics[%d] = {\n", font_name, dim(pos));
+		fprintf(out, "static const struct ao_glyph_metrics %s_metrics[%d] = {\n", font_name, dim(pos));
 		for (int i = 0; i < dim(pos); i++) {
 			int g = 0;
 			for (int j = 0; j < dim(font.glyphs); j++) {
@@ -177,21 +180,21 @@ void print_font(font_t font, string font_name) {
 				c = sprintf("%c", i);
 			else
 				c = sprintf("%02x", i);
-			printf("    { .width = %d, .height = %d, .x_off = %d, .y_off = %d, .advance = %d }, /* %s */\n",
+			fprintf(out, "    { .width = %d, .height = %d, .x_off = %d, .y_off = %d, .advance = %d }, /* %s */\n",
 			       font.glyphs[g].width, font.glyphs[g].height,
 			       font.glyphs[g].x_off, font.glyphs[g].y_off, font.glyphs[g].advance, c);
 		}
-		printf("};\n");
+		fprintf(out, "};\n");
 	}
-	printf("const struct ao_font %s_font = {\n", font_name);
-	printf("\t.bytes = %s_bytes,\n", font_name);
-	printf("\t.pos = %s_pos,\n", font_name);
+	fprintf(out, "const struct ao_font %s_font = {\n", font_name);
+	fprintf(out, "\t.bytes = %s_bytes,\n", font_name);
+	fprintf(out, "\t.pos = %s_pos,\n", font_name);
 	if (!fixed_size)
-		printf("\t.metrics = %s_metrics,\n", font_name);
-	printf("\t.max_width = %d,\n", max_width);
-	printf("\t.max_height = %d,\n", max_height);
-	printf("\t.ascent = %d,\n", font.ascent);
-	printf("};\n");
+		fprintf(out, "\t.metrics = %s_metrics,\n", font_name);
+	fprintf(out, "\t.max_width = %d,\n", max_width);
+	fprintf(out, "\t.max_height = %d,\n", max_height);
+	fprintf(out, "\t.ascent = %d,\n", font.ascent);
+	fprintf(out, "};\n");
 }
 
 string
@@ -212,12 +215,37 @@ to_c(string a)
 }
 
 void
-do_font(string name)
+do_font(string name, file out)
 {
 	twixt (file f = File::open(name, "r"); File::close(f)) {
 		font_t font = read_font(f);
-		print_font(font, to_c(name));
+		print_font(out, font, to_c(name));
 	}
 }
 
-do_font(argv[1]);
+argdesc argd = {
+	args = {
+		{
+			.var = (arg_var.arg_string) &(string output),
+			.name = "output",
+			.abbr = 'o',
+			.expr_name = "file",
+			.desc = "Output file name"
+		},
+	},
+	posn_args = {
+		{
+			var = (arg_var.arg_string) &(string input),
+			name = "input",
+		}
+	}
+};
+
+parseargs(&argd, &argv)
+
+if (is_uninit(&output))
+	do_font(input, stdout);
+else {
+	twixt(file f = File::open(output, "w"); File::close(f))
+		do_font(input, f);
+}
