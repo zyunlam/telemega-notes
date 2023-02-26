@@ -105,7 +105,7 @@ RopNameRec ropNames[] = {
 	{ "set",		GXset,		}, /* 1 */
 };
 
-int
+static int
 RopNameToRop (char *name)
 {
     int	rop;
@@ -118,7 +118,7 @@ RopNameToRop (char *name)
     return GXcopy;
 }
 
-void
+static void
 Error (char *s, char *a)
 {
     fprintf (stderr, s, a);
@@ -126,7 +126,7 @@ Error (char *s, char *a)
     exit (1);
 }
 
-int
+static int
 MatchCapStyle (char *s)
 {
     if (!strcmp (s, "round"))
@@ -141,7 +141,7 @@ MatchCapStyle (char *s)
     return CapNotLast;
 }
 
-int
+static int
 MatchJoinStyle (char *s)
 {
     if (!strcmp (s, "round"))
@@ -154,7 +154,7 @@ MatchJoinStyle (char *s)
     return JoinBevel;
 }
 
-int
+static int
 MatchFillStyle(char *s)
 {
     if (!strcmp (s, "solid"))
@@ -169,7 +169,7 @@ MatchFillStyle(char *s)
     return FillSolid;
 }
 
-int
+static int
 MatchLineStyle(char *s)
 {
     if (!strcmp (s, "solid"))
@@ -296,27 +296,21 @@ DisplayPositions (dpy, win, gc, positions)
 
 #endif
 
-void
-SetToFg (dpy, gc)
-    Display *dpy;
-    GC	    gc;
+static inline void
+SetToFg (Display *dpy, GC gc)
 {
     XSetForeground (dpy, gc, fg_pixel);
     XSetFunction (dpy, gc, default_rop);
 }
 
-void
-SetToBg (dpy, gc)
-    Display *dpy;
-    GC	    gc;
+static inline void
+SetToBg (Display *dpy, GC gc)
 {
     XSetForeground (dpy, gc, bg_pixel);
     XSetFunction (dpy, gc, GXcopy);
 }
-
-void
-Usage (program)
-    char    *program;
+static void
+Usage (char *program)
 {
     int	i;
     fprintf (stderr, "Usage: %s\n", program);
@@ -361,7 +355,7 @@ double	line_width = DEFAULT_LINE_WIDTH;
 char	dashes[256] = { DEFAULT_DASHES };
 int	ndashes = DEFAULT_NUM_DASHES;
 VisualID    vid = DEFAULT_VISUAL;
-unsigned long	planemask = ~0;
+unsigned long	planemask = ~0UL;
 Colormap    colormap;
 Visual	    *visual;
 int	    depth;
@@ -377,10 +371,63 @@ HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev);
 void
 HandleKeyRelease(Display *dpy, Window win, GC gc, XEvent *ev);
 
+#include <X11/extensions/Xrender.h>
+
+XRenderColor	renderBlack = { 0, 0, 0, 0xffff };
+XRenderColor	renderWhite = { 0xffff, 0xffff, 0xffff, 0xffff };
+XRenderColor	renderRed = { 0xffff, 0, 0, 0xffff };
+XRenderColor	renderGreen = { 0, 0xffff, 0, 0xffff };
+XRenderColor	renderBlue = { 0, 0, 0xffff, 0xffff };
+
+XRenderColor	renderClearRed = { 0x8000, 0, 0, 0x8000 };
+XRenderColor	renderClearGreen = { 0, 0x8000, 0, 0x8000 };
+XRenderColor	renderClearBlue = { 0, 0, 0x8000, 0x8000 };
+
+static inline Picture
+GetPicture (Display *dpy, Window w)
+{
+    static Picture p;
+
+    if (!p)
+	p = XRenderCreatePicture (dpy, w, 
+				  XRenderFindVisualFormat (dpy, visual),
+				  0, 0);
+    return p;
+}
+
+static inline Picture
+GetSrc (Display *dpy, XRenderColor *color)
+{
+    static Picture	p;
+    static Pixmap	pix;
+    static XRenderColor	lastColor;
+    XRenderPictFormat	*f;
+    XRenderPictureAttributes	attr;
+
+    if (p && !memcmp (color, &lastColor, sizeof (XRenderColor)))
+	return p;
+    if (!p)
+    {
+	f = XRenderFindStandardFormat (dpy, PictStandardARGB32);
+	pix = XCreatePixmap (dpy, RootWindow (dpy, DefaultScreen (dpy)),
+			     1, 1, (unsigned) f->depth);
+	attr.repeat = True;
+	p = XRenderCreatePicture (dpy, pix, f, CPRepeat, &attr);
+	XFreePixmap (dpy, pix);
+    }
+    XRenderFillRectangle (dpy, PictOpSrc, p, color, 0, 0, 1, 1);
+    lastColor = *color;
+    return p;
+}
+
+static inline XRenderPictFormat *
+GetMask (Display *dpy)
+{
+    return XRenderFindStandardFormat (dpy, PictStandardA8);
+}
+
 int
-main (argc, argv)
-    int	    argc;
-    char    **argv;
+main (int argc, char **argv)
 {
     Display *dpy;
     Window  win;
@@ -390,17 +437,18 @@ main (argc, argv)
     XColor  hard, exact;
     int	    x = 0, y = 0;
     unsigned int    width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
-    int	    geometryMask;
-    int	    border_width = 1;
+    unsigned int	    border_width = 1u;
     XSizeHints	sizeHints;
     XWMHints	wmHints;
-    XClassHint	classHints;
-    XEvent	ev, mev;
+    XEvent	ev;
     XGCValues	gcv;
 #ifdef MATCH_ARGUMENT
     int		i;
 #endif
+#ifdef PASS_BUTTONS
     int		HasMotion = 0;
+    XEvent	mev;
+#endif
 #ifdef COMPRESS_EXPOSE
     XEvent	eev;
     int		HasExpose = 0;
@@ -411,7 +459,6 @@ main (argc, argv)
     int		has_fg_pixel = 0, has_bg_pixel = 0;
     int		has_colormap = 0;
     unsigned long   gc_mask;
-    char	quit_string[10];
     unsigned long   window_mask;
 
     if (!rop_name)
@@ -419,17 +466,17 @@ main (argc, argv)
     wm_name.value = (unsigned char *) argv[0];
     wm_name.encoding = XA_STRING;
     wm_name.format = 8;
-    wm_name.nitems = strlen (wm_name.value) + 1;
+    wm_name.nitems = strlen ((const char *) wm_name.value) + 1;
     icon_name = wm_name;
     gc_mask = 0;
     while (*++argv) {
 	if (!strcmp (*argv, "-display"))
 	    dpy_name = *++argv;
 	else if (!strcmp (*argv, "-visual"))
-	    vid = strtol(*++argv, NULL, 0);
+	    vid = strtoul(*++argv, NULL, 0);
 	else if (!strcmp (*argv, "-cmap"))
 	{
-	    colormap = strtol(*++argv, NULL, 0);
+	    colormap = strtoul(*++argv, NULL, 0);
 	    has_colormap = 1;
 	}
 	else if (!strcmp (*argv, "-rop"))
@@ -440,24 +487,24 @@ main (argc, argv)
 	    bg = *++argv;
 	else if (!strcmp (*argv, "-fg_pixel"))
 	{
-	    fg_pixel = strtol(*++argv, NULL, 0);
+	    fg_pixel = strtoul(*++argv, NULL, 0);
 	    has_fg_pixel = 1;
 	}
 	else if (!strcmp (*argv, "-bg_pixel"))
 	{
-	    bg_pixel = strtol(*++argv, NULL, 0);
+	    bg_pixel = strtoul(*++argv, NULL, 0);
 	    has_bg_pixel = 1;
 	}
 	else if (!strcmp (*argv, "-fn"))
 	    font_name = *++argv;
 	else if (!strcmp (*argv, "-pm"))
-	    planemask = strtol(*++argv, NULL, 0);
+	    planemask = strtoul(*++argv, NULL, 0);
 	else if (!strcmp (*argv, "-geometry"))
-	    geometryMask = XParseGeometry (*++argv, &x, &y, &width, &height);
+	    XParseGeometry (*++argv, &x, &y, &width, &height);
 	else if (!strcmp (*argv, "-sync"))
 	    sync = 1;
 	else if (!strcmp (*argv, "-bw"))
-	    border_width = strtol(*++argv, NULL, 0);
+	    border_width = (unsigned int) strtoul(*++argv, NULL, 0);
 	else if (!strcmp (*argv, "-lw"))
 	    line_width = strtod(*++argv, NULL);
 	else if (!strcmp (*argv, "-cap"))
@@ -475,7 +522,7 @@ main (argc, argv)
 	    argv++;
 	    ndashes = 0;
 	    while (*argv && isdigit (**argv))
-		dashes[ndashes++] = atoi(*argv++);
+		dashes[ndashes++] = (char) atoi(*argv++);
 	    argv--;
 	}
 #ifdef MATCH_ARGUMENT
@@ -483,15 +530,13 @@ main (argc, argv)
 	    argv += i - 1;
 #endif
 	else if (!strcmp (*argv, "-root"))
-	    root = strtol (*++argv, NULL, 0);
+	    root = strtoul (*++argv, NULL, 0);
 	else
 	    Usage (*init_argv);
     }
     sizeHints.flags = 0;
     wmHints.flags = InputHint;
     wmHints.input = True;
-    classHints.res_name = init_argv[0];
-    classHints.res_class = init_argv[0];
     dpy = XOpenDisplay (dpy_name);
     if (!dpy)
 	Error ("Can't open display", "");
@@ -603,27 +648,30 @@ main (argc, argv)
     gc_mask |= GCFunction|GCForeground|GCBackground|GCPlaneMask;
     if (bitmap_file)
     {
-	unsigned int	width, height;
+	unsigned int	b_width, b_height;
 	int		ret;
 	Pixmap		bitmap, pixmap;
 
-	ret = XReadBitmapFile (dpy, win, bitmap_file, &width, &height,
+	ret = XReadBitmapFile (dpy, win, bitmap_file, &b_width, &b_height,
 			       &bitmap, (int *) 0, (int *) 0);
 	switch (ret) {
 	case BitmapOpenFailed:
 	    Error ("Can't open bitmap file %s", bitmap_file);
+	    break;
 	case BitmapFileInvalid:
 	    Error ("Bitmap file %s invalid", bitmap_file);
+	    break;
 	case BitmapNoMemory:
 	    Error ("Out of memory reading bitmap file %s", bitmap_file);
+	    break;
 	case BitmapSuccess:
 	    break;
 	}
 	switch (gcv.fill_style) {
 	case FillTiled:
-	    pixmap = XCreatePixmap (dpy, win, width, height, DefaultDepth (dpy, screen));
+	    pixmap = XCreatePixmap (dpy, win, b_width, b_height, (unsigned) DefaultDepth (dpy, screen));
 	    gc = XCreateGC (dpy, pixmap, GCForeground|GCBackground, &gcv);
-	    XCopyPlane (dpy, bitmap, pixmap, gc, 0, 0, width, height, 0, 0, 1);
+	    XCopyPlane (dpy, bitmap, pixmap, gc, 0, 0, b_width, b_height, 0, 0, 1);
 	    XFreeGC (dpy, gc);
 	    XFreePixmap (dpy, bitmap);
 	    gcv.tile = pixmap;
@@ -711,59 +759,4 @@ main (argc, argv)
 #endif
 	}
     }
-}
-
-#include <X11/extensions/Xrender.h>
-
-XRenderColor	renderBlack = { 0, 0, 0, 0xffff };
-XRenderColor	renderWhite = { 0xffff, 0xffff, 0xffff, 0xffff };
-XRenderColor	renderRed = { 0xffff, 0, 0, 0xffff };
-XRenderColor	renderGreen = { 0, 0xffff, 0, 0xffff };
-XRenderColor	renderBlue = { 0, 0, 0xffff, 0xffff };
-
-XRenderColor	renderClearRed = { 0x8000, 0, 0, 0x8000 };
-XRenderColor	renderClearGreen = { 0, 0x8000, 0, 0x8000 };
-XRenderColor	renderClearBlue = { 0, 0, 0x8000, 0x8000 };
-
-Picture
-GetPicture (Display *dpy, Window w)
-{
-    static Picture p;
-
-    if (!p)
-	p = XRenderCreatePicture (dpy, w, 
-				  XRenderFindVisualFormat (dpy, visual),
-				  0, 0);
-    return p;
-}
-
-Picture
-GetSrc (Display *dpy, XRenderColor *color)
-{
-    static Picture	p;
-    static Pixmap	pix;
-    static XRenderColor	lastColor;
-    XRenderPictFormat	*f;
-    XRenderPictureAttributes	attr;
-
-    if (p && !memcmp (color, &lastColor, sizeof (XRenderColor)))
-	return p;
-    if (!p)
-    {
-	f = XRenderFindStandardFormat (dpy, PictStandardARGB32);
-	pix = XCreatePixmap (dpy, RootWindow (dpy, DefaultScreen (dpy)),
-			     1, 1, f->depth);
-	attr.repeat = True;
-	p = XRenderCreatePicture (dpy, pix, f, CPRepeat, &attr);
-	XFreePixmap (dpy, pix);
-    }
-    XRenderFillRectangle (dpy, PictOpSrc, p, color, 0, 0, 1, 1);
-    lastColor = *color;
-    return p;
-}
-
-XRenderPictFormat *
-GetMask (Display *dpy)
-{
-    return XRenderFindStandardFormat (dpy, PictStandardA8);
 }
