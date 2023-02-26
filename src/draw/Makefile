@@ -32,6 +32,19 @@ BDFS=\
 	BenguiatGothicStd-Medium-48.bdf \
 	BenguiatGothicStd-Medium-64.bdf \
 	BenguiatGothicStd-Medium-72.bdf \
+	BitstreamVeraSansMono-Roman-10.bdf \
+	BitstreamVeraSansMono-Roman-12.bdf \
+	BitstreamVeraSansMono-Roman-14.bdf \
+	BitstreamVeraSansMono-Roman-16.bdf \
+	BitstreamVeraSansMono-Roman-18.bdf \
+	BitstreamVeraSansMono-Roman-24.bdf \
+	BitstreamVeraSansMono-Roman-26.bdf \
+	BitstreamVeraSansMono-Roman-28.bdf \
+	BitstreamVeraSansMono-Roman-32.bdf \
+	BitstreamVeraSansMono-Roman-36.bdf \
+	BitstreamVeraSansMono-Roman-48.bdf \
+	BitstreamVeraSansMono-Roman-64.bdf \
+	BitstreamVeraSansMono-Roman-72.bdf \
 	FrutigerLT-Roman-10.bdf \
 	FrutigerLT-Roman-12.bdf \
 	FrutigerLT-Roman-14.bdf \

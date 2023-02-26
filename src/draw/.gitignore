@@ -1,4 +1,6 @@
 Frutiger*.c
+Benguiat*.c
+Bitstream*.c
 ao_font.h
 ao_logo.h
 draw-test
