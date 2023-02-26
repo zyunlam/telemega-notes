@@ -371,6 +371,12 @@ int	    screen;
 void
 HandleExpose(Display *dpy, Window win, GC gc);
 
+void
+HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev);
+
+void
+HandleKeyRelease(Display *dpy, Window win, GC gc, XEvent *ev);
+
 int
 main (argc, argv)
     int	    argc;
