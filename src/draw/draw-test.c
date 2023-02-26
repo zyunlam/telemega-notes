@@ -38,14 +38,17 @@ static struct ao_bitmap fb = {
 };
 
 #define BIG_FONT FrutigerLT_Roman_64_font
-#define SMALL_FONT FrutigerLT_Roman_12_font
+#define VOLT_FONT FrutigerLT_Roman_64_font
+#define SMALL_FONT NotoMono_12_font
 #define LOGO_FONT BenguiatGothicStd_Bold_26_font
 
-#define VALUE_Y		BIG_FONT.ascent
-#define LABEL_Y		(int16_t) (BIG_FONT.ascent + SMALL_FONT.ascent + 2)
+#define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
+#define VALUE_Y		(int16_t) (LABEL_Y + BIG_FONT.ascent)
 #define BOX_X		2
 #define PAD_X		90
 #define BOX_LABEL_X	30
+#define VOLT_LABEL_X	35
+#define RSSI_LABEL_X	15
 #define PAD_LABEL_X	95
 #define SEP_X		(PAD_X - 8)
 
@@ -91,6 +94,15 @@ static const struct ao_transform logo_transform = {
 	.y_scale = 48, .y_off = 10,
 };
 
+static const struct ao_transform bowtie_transform = {
+	.x_scale = 1, .x_off = 50,
+	.y_scale = 1, .y_off = 20,
+};
+
+static const float pad_volts = 12.3f;
+static const float lco_volts = 4.1f;
+static const int rssi = -30;
+
 void HandleExpose(Display *dpy, Window win, GC gc)
 {
 	char	str[64];
@@ -106,20 +118,41 @@ void HandleExpose(Display *dpy, Window win, GC gc)
 		ao_poly(&fb, donut, NCOORD_DONUT, NULL, 0x00000000, AO_COPY);
 		break;
 	case 3:
-		ao_poly(&fb, bowtie, NCOORD_BOWTIE, NULL, 0x00000000, AO_COPY);
+		ao_poly(&fb, bowtie, NCOORD_BOWTIE, &bowtie_transform, 0x00000000, AO_COPY);
 		break;
 	default:
 	case 0:
+		switch (box_number) {
+		case 0:
+			sprintf(str, "%4.1f", lco_volts);
+			ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+			ao_text(&fb, &SMALL_FONT, VOLT_LABEL_X, LABEL_Y, "LCO Battery", 0x00000000, AO_COPY);
+			break;
+		default:
+			switch (pad_number) {
+			case -1:
+				sprintf(str, "%4.1f", pad_volts);
+				ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+				ao_text(&fb, &SMALL_FONT, VOLT_LABEL_X, LABEL_Y, "Pad Battery", 0x00000000, AO_COPY);
+				break;
+			case 0:
+				sprintf(str, "%4d", rssi);
+				ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+				ao_text(&fb, &SMALL_FONT, RSSI_LABEL_X, LABEL_Y, "Signal Strength", 0x00000000, AO_COPY);
+				break;
+			default:
+				sprintf(str, "%02d", box_number);
+				ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+				ao_text(&fb, &SMALL_FONT, BOX_LABEL_X, LABEL_Y, "Box", 0x00000000, AO_COPY);
 
-		sprintf(str, "%02d", box_number);
-		ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
-		ao_text(&fb, &SMALL_FONT, BOX_LABEL_X, LABEL_Y, "box", 0x00000000, AO_COPY);
+				sprintf(str, "%d", pad_number);
+				ao_text(&fb, &BIG_FONT, PAD_X, VALUE_Y, str, 0x00000000, AO_COPY);
+				ao_text(&fb, &SMALL_FONT, PAD_LABEL_X, LABEL_Y, "Pad", 0x00000000, AO_COPY);
 
-		sprintf(str, "%d", pad_number);
-		ao_text(&fb, &BIG_FONT, PAD_X, VALUE_Y, str, 0x00000000, AO_COPY);
-		ao_text(&fb, &SMALL_FONT, PAD_LABEL_X, LABEL_Y, "pad", 0x00000000, AO_COPY);
-
-		ao_line(&fb, SEP_X, 0, SEP_X, HEIGHT, 0x00000000, AO_COPY);
+				ao_line(&fb, SEP_X, 0, SEP_X, HEIGHT, 0x00000000, AO_COPY);
+			}
+			break;
+		}
 		break;
 	}
 
@@ -139,23 +172,27 @@ HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev)
 		case 'q':
 			exit (0);
 		case 'p':
-			pad_number++;
-			if (pad_number > 8)
-				pad_number = 1;
+			if (box_number != 0) {
+				pad_number++;
+				if (pad_number > 8)
+					pad_number = -1;
+			}
 			break;
 		case 'P':
-			pad_number--;
-			if (pad_number < 1)
-				pad_number = 8;
+			if (box_number != 0) {
+				pad_number--;
+				if (pad_number < -1)
+					pad_number = 8;
+			}
 			break;
 		case 'b':
 			box_number++;
 			if (box_number > 99)
-				box_number = 1;
+				box_number = 0;
 			break;
 		case 'B':
 			box_number--;
-			if (box_number < 1)
+			if (box_number < 0)
 				box_number = 99;
 			break;
 		case 's':
