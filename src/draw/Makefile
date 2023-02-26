@@ -29,6 +29,7 @@ SRCS=\
 	ao_line.c \
 	ao_pattern.c \
 	ao_rect.c \
+	ao_poly.c \
 	ao_text.c \
 	$(FONT_SRCS)
 

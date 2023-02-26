@@ -26,6 +26,10 @@ struct ao_bitmap {
 	int16_t		height;	/* in pixels */
 };
 
+struct ao_coord {
+	int16_t		x, y;
+};
+
 struct ao_pattern {
 	uint8_t		pattern[8];
 };
@@ -84,6 +88,13 @@ ao_line(const struct ao_bitmap	*dst,
 	int16_t			y1,
 	int16_t			x2,
 	int16_t			y2,
+	uint32_t		fill,
+	uint8_t			rop);
+
+void
+ao_poly(const struct ao_bitmap	*dst,
+	const struct ao_coord	*coords,
+	uint16_t		ncoords,
 	uint32_t		fill,
 	uint8_t			rop);
 
