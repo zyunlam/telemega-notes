@@ -107,6 +107,12 @@ ao_text(const struct ao_bitmap	*dst,
 	uint32_t		fill,
 	uint8_t			rop);
 
+void
+ao_logo(const struct ao_bitmap	*dst,
+	const struct ao_font	*font,
+	uint32_t		fill,
+	uint8_t			rop);
+
 extern const struct ao_font FrutigerLT_Roman_50_font;
 
 #define AO_SHIFT	5

@@ -39,6 +39,7 @@ static struct ao_bitmap fb = {
 
 #define BIG_FONT FrutigerLT_Roman_64_font
 #define SMALL_FONT FrutigerLT_Roman_12_font
+#define LOGO_FONT FrutigerLT_Roman_24_font
 
 #define VALUE_Y		BIG_FONT.ascent
 #define LABEL_Y		BIG_FONT.ascent + SMALL_FONT.ascent + 2
@@ -81,8 +82,9 @@ void HandleExpose(Display *dpy, Window win, GC gc)
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, 0xffffffff, AO_COPY);
 
 	if (do_polys) {
-		ao_poly(&fb, trek, NCOORD_TREK, 0x00000000, AO_COPY);
-		ao_poly(&fb, donut, NCOORD_DONUT, 0x00000000, AO_COPY);
+		ao_logo(&fb, &LOGO_FONT, 0x00000000, AO_COPY);
+//		ao_poly(&fb, trek, NCOORD_TREK, 0x00000000, AO_COPY);
+//		ao_poly(&fb, donut, NCOORD_DONUT, 0x00000000, AO_COPY);
 	} else {
 		char	str[64];
 
@@ -109,7 +111,6 @@ HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev)
 {
 	char	string[10];
 	if (XLookupString ((XKeyEvent *) ev, string, sizeof (string), 0, 0) >= 1) {
-		printf("key %s\n", string);
 		switch (string[0]) {
 		case 'q':
 			exit (0);

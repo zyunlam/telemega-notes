@@ -15,12 +15,15 @@ FONT_SRCS=$(BDFS:.bdf=.c)
 .bdf.c:
 	nickle font-convert $*.bdf > $@
 
-all: ao_font.h draw-test
+all: ao_font.h ao_logo.h draw-test
 
 $(FONT_SRCS): font-convert
 
 ao_font.h: $(FONT_SRCS)
 	grep -h '^const struct ao_font' $(FONT_SRCS) | sed -e 's/^/extern /' -e 's/ =.*$$/;/' > $@
+
+ao_logo.h: make-logo Makefile
+	nickle make-logo ao_logo 48 0 10 > $@
 
 SRCS=\
 	draw-test.c \
@@ -31,6 +34,7 @@ SRCS=\
 	ao_rect.c \
 	ao_poly.c \
 	ao_text.c \
+	ao_logo.c \
 	$(FONT_SRCS)
 
 OBJS=$(SRCS:.c=.o)
@@ -42,7 +46,8 @@ CFLAGS=-O0 -g
 HEADERS=\
 	ao_draw.h \
 	ao_draw_int.h \
-	ao_font.h
+	ao_font.h \
+	ao_logo.h
 
 draw-test: $(OBJS)
 	cc $(CFLAGS) -o $@ $(OBJS) $(LIBS)
@@ -50,4 +55,4 @@ draw-test: $(OBJS)
 $(OBJS): $(HEADERS)
 
 clean:
-	rm -f $(OBJS) ao_font.h $(FONT_SRCS)
+	rm -f $(OBJS) ao_font.h ao_logo.h $(FONT_SRCS)
