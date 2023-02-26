@@ -1,9 +1,9 @@
 /*
- * Copyright © 2023 Keith Packard <keithp@keithp.com>
+ * Copyright © 2013 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
@@ -15,6 +15,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
+
+#ifndef _AO_PINS_H_
+#define _AO_PINS_H_
 
 #define AO_HSE		1
 #define AO_HSE_BYPASS	1
@@ -33,24 +36,18 @@
 #define AO_RCC_CFGR_HPRE_DIV	STM_RCC_CFGR_HPRE_DIV_1
 #define AO_RCC_CFGR_ADCPRE	STM_RCC_CFGR_ADCPRE_6
 
-#define HAS_BEEP	0
-#define HAS_USB		1
+#include <ao_flash_stm_pins.h>
+
+/* Companion port cs_companion0 PB6 */
+
+#define AO_BOOT_PIN			1
+#define AO_BOOT_APPLICATION_GPIO	stm_gpiob
+#define AO_BOOT_APPLICATION_PIN		6
+#define AO_BOOT_APPLICATION_VALUE	1
+#define AO_BOOT_APPLICATION_MODE	AO_EXTI_MODE_PULL_UP
 
 #define HAS_USB_PULLUP	1
 #define AO_USB_PULLUP_PORT	(&stm_gpiob)
 #define AO_USB_PULLUP_PIN	12
 
-#define HAS_LED		1
-#define LED_0_PORT	(&stm_gpioa)
-#define LED_0_PIN	5
-#define AO_LED_GREEN	(1 << 0)
-#define AO_LED_PANIC	AO_LED_GREEN
-
-#define HAS_SERIAL_1		0
-#define USE_SERIAL_1_STDIN	0
-#define SERIAL_1_PA9_PA10	1
-
-#define HAS_SERIAL_2		1
-#define USE_SERIAL_2_STDIN	1
-#define SERIAL_2_PA2_PA3	1
-#define SERIAL_2_SPEED		AO_SERIAL_SPEED_115200
+#endif /* _AO_PINS_H_ */

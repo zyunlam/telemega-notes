@@ -1,4 +1,4 @@
-include ../stm32f1/Makefile-raw.defs
+include ../stm32f1/Makefile.defs
 
 INC = \
 	ao.h \
@@ -13,6 +13,7 @@ INC = \
 ALTOS_SRC = \
 	ao_clock.c \
 	ao_timer.c \
+	ao_boot_chain.c \
 	ao_interrupt.c \
 	ao_product.c \
 	ao_romconfig.c \
