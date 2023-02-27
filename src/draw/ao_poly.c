@@ -145,7 +145,16 @@ ao_span(const struct ao_bitmap	*dst,
 	int16_t	ix1 = (int16_t) floorf(x1 + 0.5f);
 	int16_t ix2 = (int16_t) floorf(x2 + 0.5f);
 	int16_t iy = (int16_t) y;
-	ao_rect(dst, ix1, iy, ix2 - ix1, 1, fill, rop);
+
+	ao_clip(ix1, 0, dst->width);
+	ao_clip(ix2, 0, dst->width);
+	ao_solid(ao_and(rop, fill),
+		 ao_xor(rop, fill),
+		 dst->base + iy * dst->stride,
+		 dst->stride,
+		 ix1,
+		 ix2 - ix1,
+		 1);
 }
 
 /*
@@ -197,6 +206,9 @@ ao_poly(const struct ao_bitmap	*dst,
 
 	y_min = floorf(y_min);
 	y_max = ceilf(y_max);
+
+	ao_clip(y_min, 0, dst->height);
+	ao_clip(y_max, 0, dst->height);
 
 	/*
 	 * Walk each scanline in the range and fill included spans
