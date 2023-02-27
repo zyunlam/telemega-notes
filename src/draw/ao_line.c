@@ -54,8 +54,9 @@
  *	adjust_x = e / e1;
  */
 
-
-
+#ifdef VALIDATE
+#include <stdio.h>
+#endif
 
 static void
 ao_bres(const struct ao_bitmap	*dst_bitmap,
@@ -88,9 +89,22 @@ ao_bres(const struct ao_bitmap	*dst_bitmap,
 	while (len--) {
 		/* clip each point */
 
+#ifdef VALIDATE
+		if (x1 < 0 || dst_bitmap->width <= x1) {
+			printf("bad line x %d\n", x1);
+			return;
+		}
+		if (y1 < 0 || dst_bitmap->height <= y1) {
+			printf("bad line y %d\n", y1);
+			return;
+		}
+#endif
 		*dst = ao_do_mask_rrop(*dst, and, xor, mask);
 
 		if (axis == X_AXIS) {
+#ifdef VALIDATE
+			x1 += signdx;
+#endif
 			if (signdx < 0)
 				mask = ao_left(mask, 1);
 			else
@@ -101,13 +115,22 @@ ao_bres(const struct ao_bitmap	*dst_bitmap,
 			}
 			e += e1;
 			if (e >= 0) {
+#ifdef VALIDATE
+				y1 += signdy;
+#endif
 				dst += stride;
 				e += e3;
 			}
 		} else {
+#ifdef VALIDATE
+			y1 += signdy;
+#endif
 			dst += stride;
 			e += e1;
 			if (e >= 0) {
+#ifdef VALIDATE
+				x1 += signdx;
+#endif
 				if (signdx < 0)
 					mask = ao_left(mask, 1);
 				else
