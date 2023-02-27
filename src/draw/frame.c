@@ -183,7 +183,17 @@ MatchLineStyle(char *s)
     return LineSolid;
 }
 
+void
+HandleButtonPress(Display *dpy, Window win, GC gc, XEvent *ev);
+
+void
+HandleButtonRelease(Display *dpy, Window win, GC gc, XEvent *ev);
+
+void
+HandleMotionNotify(Display *dpy, Window win, GC gc, XEvent *ev);
+
 #ifdef TRACK_POINTER
+
 #define PASS_BUTTONS
 typedef struct _Position {
     int	seen;
@@ -192,10 +202,16 @@ typedef struct _Position {
     int	end_x, end_y;
 } PositionRec, *PositionPtr;
 
-PositionRec positions[5];
+void
+Draw(Display *dpy, Window win, GC gc, PositionRec positions[5]);
 
 void
-UpdatePositions (state, x, y)
+Undraw(Display *dpy, Window win, GC gc, PositionRec positions[5]);
+
+PositionRec current_positions[5];
+
+static void
+UpdatePositions (unsigned state, int x, int y)
 {
     int	i;
 
@@ -203,69 +219,53 @@ UpdatePositions (state, x, y)
     for (i = 0; i < 5; i++)
     {
 	if (state & (1 << i)) {
-	    positions[i].cur_x = x;
-	    positions[i].cur_y = y;
+	    current_positions[i].cur_x = x;
+	    current_positions[i].cur_y = y;
 	}
     }
 }
 
 void
-HandleButtonPress (dpy, win, gc, ev)
-    Display *dpy;
-    Window  win;
-    GC	    gc;
-    XEvent  *ev;
+HandleButtonPress (Display *dpy, Window win, GC gc, XEvent *ev)
 {
     XButtonEvent    *bev = (XButtonEvent *) ev;
 
-    Undraw (dpy, win, gc, positions);
-    positions[bev->button - 1].seen = 1;
-    positions[bev->button - 1].start_x = bev->x;
-    positions[bev->button - 1].start_y = bev->y;
-    positions[bev->button - 1].cur_x = bev->x;
-    positions[bev->button - 1].cur_y = bev->y;
-    positions[bev->button - 1].end_x = bev->x;
-    positions[bev->button - 1].end_y = bev->y;
+    Undraw (dpy, win, gc, current_positions);
+    current_positions[bev->button - 1].seen = 1;
+    current_positions[bev->button - 1].start_x = bev->x;
+    current_positions[bev->button - 1].start_y = bev->y;
+    current_positions[bev->button - 1].cur_x = bev->x;
+    current_positions[bev->button - 1].cur_y = bev->y;
+    current_positions[bev->button - 1].end_x = bev->x;
+    current_positions[bev->button - 1].end_y = bev->y;
     UpdatePositions (bev->state, bev->x, bev->y);
-    Draw (dpy, win, gc, positions);
+    Draw (dpy, win, gc, current_positions);
 }
 
 void
-HandleButtonRelease (dpy, win, gc, ev)
-    Display *dpy;
-    Window  win;
-    GC	    gc;
-    XEvent  *ev;
+HandleButtonRelease (Display *dpy, Window win, GC gc, XEvent *ev)
 {
     XButtonEvent    *bev = (XButtonEvent *) ev;
 
-    Undraw (dpy, win, gc, positions);
+    Undraw (dpy, win, gc, current_positions);
     UpdatePositions (bev->state, bev->x, bev->y);
-    positions[bev->button - 1].end_x = bev->x;
-    positions[bev->button - 1].end_y = bev->y;
-    Draw (dpy, win, gc, positions);
+    current_positions[bev->button - 1].end_x = bev->x;
+    current_positions[bev->button - 1].end_y = bev->y;
+    Draw (dpy, win, gc, current_positions);
 }
 
 void
-HandleMotionNotify (dpy, win, gc, ev)
-    Display *dpy;
-    Window  win;
-    GC	    gc;
-    XEvent  *ev;
+HandleMotionNotify (Display *dpy, Window win, GC gc, XEvent *ev)
 {
     XMotionEvent    *mev = (XMotionEvent *) ev;
 
-    Undraw (dpy, win, gc, positions);
+    Undraw (dpy, win, gc, current_positions);
     UpdatePositions (mev->state, mev->x, mev->y);
-    Draw (dpy, win, gc, positions);
+    Draw (dpy, win, gc, current_positions);
 }
 
-void
-DisplayPositions (dpy, win, gc, positions)
-    Display	    *dpy;
-    Window	    win;
-    GC		    gc;
-    PositionRec	    positions[5];
+static inline void
+DisplayPositions (Display *dpy, Window win, GC gc, PositionRec positions[5])
 {
     static char	text[1024];
     static int	hastext;
@@ -274,10 +274,10 @@ DisplayPositions (dpy, win, gc, positions)
     int		dir, font_ascent, font_descent;
     XCharStruct	overall;
 
-    XTextExtents (default_font , text, strlen(text),
+    XTextExtents (default_font, text, (int) strlen(text),
 	    &dir, &font_ascent, &font_descent, &overall);
     if (hastext)
-	XClearArea (dpy, win, 0, 0, overall.width, font_ascent + font_descent, False);
+	    XClearArea (dpy, win, 0, 0, (unsigned) overall.width, (unsigned) (font_ascent + font_descent), False);
     pos = 0;
     for (i = 0; i < 5; i++)
     {
@@ -288,7 +288,7 @@ DisplayPositions (dpy, win, gc, positions)
 	    sprintf (text + pos, "%1d: (%4d,%4d),(%4d,%4d)",
 		i, positions[i].start_x, positions[i].start_y,
 		positions[i].cur_x, positions[i].cur_y);
-	    pos = strlen (text);
+	    pos = (int) strlen (text);
 	}
     }
     XDrawString (dpy, win, gc, 0, font_ascent, text, pos);
@@ -365,6 +365,9 @@ int	    screen;
 #ifdef TIMEOUT
 int	current_timeout = TIMEOUT;
 #endif
+
+void
+Setup(Display *dpy, Window win);
 
 void
 HandleExpose(Display *dpy, Window win, GC gc);
@@ -466,6 +469,9 @@ main (int argc, char **argv)
     int		has_fg_pixel = 0, has_bg_pixel = 0;
     int		has_colormap = 0;
     unsigned long   gc_mask;
+#ifndef PASS_KEYS
+    char	quit_string[10];
+#endif
     unsigned long   window_mask;
 
     if (!rop_name)

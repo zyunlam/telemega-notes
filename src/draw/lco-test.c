@@ -16,32 +16,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#define IMAGE_SCALE	8
-#define WIDTH	128
-#define HEIGHT	64
-
-#define IMAGE_WIDTH	(WIDTH * IMAGE_SCALE)
-#define IMAGE_HEIGHT	(HEIGHT * IMAGE_SCALE)
-
-#define DEFAULT_WIDTH	IMAGE_WIDTH
-#define DEFAULT_HEIGHT	IMAGE_HEIGHT
-
 #define TIMEOUT	50
 
 #define PASS_KEYS
-#include "frame.c"
-#include "ao_draw.h"
-
-#define STRIDE	((WIDTH + 31) / 32)
-
-static uint32_t bits[STRIDE * HEIGHT];
-
-static struct ao_bitmap fb = {
-	.base = bits,
-	.stride = STRIDE,
-	.width = WIDTH,
-	.height = HEIGHT
-};
+#include "test-frame.c"
 
 #define BIG_FONT FrutigerLT_Roman_64_font
 #define VOLT_FONT FrutigerLT_Roman_64_font
@@ -117,10 +95,6 @@ static const struct ao_transform bowtie_transform = {
 static const float pad_volts = 12.3f;
 static const float lco_volts = 4.1f;
 static const int rssi = -30;
-
-#define IMAGE_STRIDE	((IMAGE_WIDTH + 31) / 32)
-
-static uint32_t image_bits[IMAGE_STRIDE * IMAGE_HEIGHT];
 
 static int	boxes[] = { 1, 2, 3, 5, 8, 11, 13, 17, 19, 23, 29, 31, 37, 62, 97 };
 
@@ -241,26 +215,7 @@ void HandleExpose(Display *dpy, Window win, GC gc)
 		break;
 	}
 
-	XImage *source_image = XCreateImage(dpy, visual, 1, XYBitmap, 0, (char *) bits, WIDTH, HEIGHT, 32, STRIDE*4);
-	XImage *image = XCreateImage(dpy, visual, 1, XYBitmap, 0, (char *) image_bits, IMAGE_WIDTH, IMAGE_HEIGHT, 32, IMAGE_STRIDE * 4);
-	int ix, iy;
-	int dx, dy;
-
-	for (iy = 0; iy < HEIGHT; iy++) {
-		for (ix = 0; ix < WIDTH; ix++) {
-			unsigned long bit = XGetPixel(source_image, ix, iy);
-			for (dy = 0; dy < IMAGE_SCALE; dy++) {
-
-				for (dx = 0; dx < IMAGE_SCALE; dx++) {
-					XPutPixel(image, ix * IMAGE_SCALE + dx, iy * IMAGE_SCALE + dy, bit);
-				}
-			}
-		}
-	}
-	XSetForeground(dpy, gc, WhitePixel(dpy, screen));
-	XSetBackground(dpy, gc, BlackPixel(dpy, screen));
-	XPutImage(dpy, win, gc, image, 0, 0, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-	free(image);
+	DoDisplay(dpy, win, gc);
 }
 
 void
