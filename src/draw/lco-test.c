@@ -24,7 +24,7 @@
 #define BIG_FONT FrutigerLT_Roman_64_font
 #define VOLT_FONT FrutigerLT_Roman_64_font
 #define SMALL_FONT NotoMono_12_font
-#define TINY_FONT NotoMono_10_font
+#define TINY_FONT NotoMono_12_font
 #define LOGO_FONT BenguiatGothicStd_Bold_26_font
 
 #define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
@@ -36,6 +36,12 @@
 #define RSSI_LABEL_X	15
 #define PAD_LABEL_X	95
 #define SEP_X		(PAD_X - 10)
+#define SCAN_X		(WIDTH - 100) / 2
+#define SCAN_Y		49
+#define SCAN_HEIGHT	4
+#define FOUND_Y		64
+#define FOUND_WIDTH	18
+#define MAX_VALID	(WIDTH / FOUND_WIDTH)
 
 static int	box_number = 1;
 static int	pad_number = 1;
@@ -79,13 +85,6 @@ static const struct ao_transform logo_transform = {
 	.x_scale = 48, .x_off = 0,
 	.y_scale = 48, .y_off = 0,
 };
-
-#define SCAN_X		(WIDTH - 100) / 2
-#define SCAN_Y		51
-#define SCAN_HEIGHT	4
-#define FOUND_Y		64
-#define FOUND_WIDTH	14
-#define MAX_VALID	(WIDTH / FOUND_WIDTH)
 
 static const struct ao_transform bowtie_transform = {
 	.x_scale = 1, .x_off = 50,
