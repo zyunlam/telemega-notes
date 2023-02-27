@@ -138,7 +138,7 @@ void print_font(file out, font_t font, string font_name) {
 		if (pos[i] == -1)
 			pos[i] = pos[font.default_char];
 
-	fprintf(out, "#include \"ao_draw.h\"\n");
+	fprintf(out, "#include <ao_draw.h>\n");
 	fprintf(out, "static const uint8_t %s_bytes[%d] = {", font_name, dim(bytes));
 	for (int b = 0; b < dim(bytes); b++) {
 		if ((b & 15) == 0)

@@ -30,7 +30,7 @@
 #define PASS_SETUP
 
 #include "frame.c"
-#include "ao_draw.h"
+#include <ao_draw.h>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
