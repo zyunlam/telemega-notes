@@ -79,7 +79,7 @@ FONT_SRCS=$(BDFS:.bdf=.c)
 .bdf.c:
 	nickle font-convert -o $@ $<
 
-all: ao_font.h ao_logo.h lco-test
+all: ao_font.h ao_logo.h lco-test line-test
 
 $(FONT_SRCS): font-convert
 
@@ -103,9 +103,12 @@ LIB_SRCS=\
 LCO_TEST_SRCS=$(LIB_SRCS) lco-test.c
 LCO_TEST_OBJS=$(LCO_TEST_SRCS:.c=.o)
 
-TEST_LIBS=-lXrender -lX11 -lm -Wl,--gc-sections
+LINE_TEST_SRCS=$(LIB_SRCS) line-test.c
+LINE_TEST_OBJS=$(LINE_TEST_SRCS:.c=.o)
 
-CFLAGS=-O0 -g $(WARN_FLAGS)
+TEST_LIBS=-lXrender -lXext -lX11 -lm -Wl,--gc-sections
+
+CFLAGS=-O0 -g $(WARN_FLAGS) -DVALIDATE
 
 HEADERS=\
 	ao_draw.h \
@@ -116,7 +119,16 @@ HEADERS=\
 lco-test: $(LCO_TEST_OBJS)
 	cc $(CFLAGS) -o $@ $(LCO_TEST_OBJS) $(TEST_LIBS)
 
+lco-test.o: test-frame.c frame.c
+
 $(LCO_TEST_OBJS): $(HEADERS)
+
+line-test: $(LINE_TEST_OBJS)
+	cc $(CFLAGS) -o $@ $(LINE_TEST_OBJS) $(TEST_LIBS)
+
+line-test.o: test-frame.c frame.c
+
+$(LINE_TEST_OBJS): $(HEADERS)
 
 clean:
 	rm -f $(LCO_TEST_OBJS) ao_font.h ao_logo.h $(FONT_SRCS)
