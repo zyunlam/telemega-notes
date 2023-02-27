@@ -211,16 +211,20 @@ ao_clip_line(struct ao_cc *c, struct ao_cbox *b)
 	 */
 	int32_t	adj_min;
 
-	if (!c->first)
-		adj_min = div_ceil(c->e + adjust_major * c->e1, -c->e3);
-	else
-		adj_min = div_floor_plus_one(c->e + adjust_major * c->e1, -c->e3);
+	if (c->e3) {
+		if (!c->first)
+			adj_min = div_ceil(c->e + adjust_major * c->e1, -c->e3);
+		else
+			adj_min = div_floor_plus_one(c->e + adjust_major * c->e1, -c->e3);
+	}
 
 	if (adj_min < adjust_minor) {
-		if (c->first)
-			adjust_major = div_ceil(c->e - adjust_minor * c->e3, c->e1);
-		else
-			adjust_major = div_floor_plus_one(c->e - adjust_minor * c->e3, c->e1);
+		if (c->e1) {
+			if (c->first)
+				adjust_major = div_ceil(c->e - adjust_minor * c->e3, c->e1);
+			else
+				adjust_major = div_floor_plus_one(c->e - adjust_minor * c->e3, c->e1);
+		}
 	} else {
 		adjust_minor = adj_min;
 	}
