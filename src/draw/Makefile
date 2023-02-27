@@ -105,7 +105,7 @@ OBJS=$(SRCS:.c=.o)
 
 LIBS=-lXrender -lX11 -lm -Wl,--gc-sections
 
-CFLAGS=-O2 -g $(WARN_FLAGS)
+CFLAGS=-O0 -g $(WARN_FLAGS)
 
 HEADERS=\
 	ao_draw.h \

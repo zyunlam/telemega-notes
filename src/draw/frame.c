@@ -19,6 +19,7 @@
 #include    <stdlib.h>
 #include    <ctype.h>
 #include    <strings.h>
+#include    <poll.h>
 #include    <X11/Xos.h>
 #include    <X11/Xlib.h>
 #include    <X11/Xutil.h>
@@ -361,6 +362,9 @@ Visual	    *visual;
 int	    depth;
 Window  root = 0;
 int	    screen;
+#ifdef TIMEOUT
+int	current_timeout = TIMEOUT;
+#endif
 
 void
 HandleExpose(Display *dpy, Window win, GC gc);
@@ -370,6 +374,9 @@ HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev);
 
 void
 HandleKeyRelease(Display *dpy, Window win, GC gc, XEvent *ev);
+
+void
+HandleTimeout(Display *dpy, Window win, GC gc);
 
 #include <X11/extensions/Xrender.h>
 
@@ -691,6 +698,17 @@ main (int argc, char **argv)
 	XSetDashes (dpy, gc, 0, dashes, ndashes);
     XMapWindow (dpy, win);
     for (;;) {
+#ifdef TIMEOUT
+	while (current_timeout && !XEventsQueued(dpy, QueuedAfterFlush)) {
+	    struct pollfd pollfd = {
+		.fd = ConnectionNumber(dpy),
+		.events = POLLIN
+	    };
+	    int r = poll(&pollfd, 1, current_timeout);
+	    if (r == 0)
+		HandleTimeout(dpy, win, gc);
+	}
+#endif
 	XNextEvent (dpy, &ev);
 #ifdef PASS_BUTTONS
 	if (HasMotion && ev.type != MotionNotify) {
