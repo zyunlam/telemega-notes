@@ -3,7 +3,7 @@ include $(TOPDIR)/Makefile.defs
 
 vpath %.bdf fonts
 
-BITMAP_SIZES = 10, 12, 14, 16, 18, 24, 26, 28, 32, 36, 48, 64, 72
+BITMAP_SIZES = 10, 12, 14, 16, 18, 24, 26, 28, 32, 36, 48, 58, 60, 62, 64, 72
 
 BDFS=\
 	BenguiatGothicStd-Bold-10.bdf \
@@ -45,6 +45,22 @@ BDFS=\
 	BitstreamVeraSansMono-Roman-48.bdf \
 	BitstreamVeraSansMono-Roman-64.bdf \
 	BitstreamVeraSansMono-Roman-72.bdf \
+	BitstreamVeraSans-Roman-10.bdf \
+	BitstreamVeraSans-Roman-12.bdf \
+	BitstreamVeraSans-Roman-14.bdf \
+	BitstreamVeraSans-Roman-16.bdf \
+	BitstreamVeraSans-Roman-18.bdf \
+	BitstreamVeraSans-Roman-24.bdf \
+	BitstreamVeraSans-Roman-26.bdf \
+	BitstreamVeraSans-Roman-28.bdf \
+	BitstreamVeraSans-Roman-32.bdf \
+	BitstreamVeraSans-Roman-36.bdf \
+	BitstreamVeraSans-Roman-48.bdf \
+	BitstreamVeraSans-Roman-58.bdf \
+	BitstreamVeraSans-Roman-60.bdf \
+	BitstreamVeraSans-Roman-62.bdf \
+	BitstreamVeraSans-Roman-64.bdf \
+	BitstreamVeraSans-Roman-72.bdf \
 	FrutigerLT-Roman-10.bdf \
 	FrutigerLT-Roman-12.bdf \
 	FrutigerLT-Roman-14.bdf \
