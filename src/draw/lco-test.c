@@ -21,14 +21,14 @@
 #define PASS_KEYS
 #include "test-frame.c"
 
-#define BIG_FONT FrutigerLT_Roman_64_font
-#define VOLT_FONT FrutigerLT_Roman_64_font
-#define SMALL_FONT NotoMono_12_font
-#define TINY_FONT NotoMono_12_font
+#define BIG_FONT BitstreamVeraSans_Roman_58_font
+#define VOLT_FONT BitstreamVeraSans_Roman_58_font
+#define SMALL_FONT BitstreamVeraSans_Roman_12_font
+#define TINY_FONT BitstreamVeraSans_Roman_12_font
 #define LOGO_FONT BenguiatGothicStd_Bold_26_font
 
 #define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
-#define VALUE_Y		(int16_t) (LABEL_Y + BIG_FONT.ascent)
+#define VALUE_Y		(int16_t) (LABEL_Y + BIG_FONT.ascent + 3)
 #define BOX_X		2
 #define PAD_X		90
 #define BOX_LABEL_X	30
@@ -39,8 +39,8 @@
 #define SCAN_X		(WIDTH - 100) / 2
 #define SCAN_Y		49
 #define SCAN_HEIGHT	4
-#define FOUND_Y		64
-#define FOUND_WIDTH	18
+#define FOUND_Y		63
+#define FOUND_WIDTH	21
 #define MAX_VALID	(WIDTH / FOUND_WIDTH)
 
 static int	box_number = 1;
