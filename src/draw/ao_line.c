@@ -234,6 +234,7 @@ ao_clip_line(struct ao_cc *c, struct ao_cbox *b)
 	c->major = (int16_t) (c->major + c->sign_major * adjust_major);
 	c->minor = (int16_t) (c->minor + c->sign_minor * adjust_minor);
 
+	c->first = true;	/* signal to extend len */
 	return true;
 }
 
