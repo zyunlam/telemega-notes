@@ -16,8 +16,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include "ao_draw.h"
-#include "ao_draw_int.h"
+#include <ao_draw.h>
+#include <ao_draw_int.h>
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
@@ -175,7 +175,7 @@ ao_wind(const struct ao_coord		*coords,
  * Fill the specified polygon with non-zero winding rule
  */
 void
-ao_poly(const struct ao_bitmap	*dst,
+ao_poly(struct ao_bitmap		*dst,
 	const struct ao_coord		*coords,
 	uint16_t			ncoords,
 	const struct ao_transform	*transform,
@@ -183,6 +183,7 @@ ao_poly(const struct ao_bitmap	*dst,
 	uint8_t			rop)
 {
 	float		y_min, y_max;
+	float		x_min, x_max;
 	uint16_t	edge;
 	float		y;
 	float		x;
@@ -193,10 +194,16 @@ ao_poly(const struct ao_bitmap	*dst,
 		transform = &ao_identity;
 
 	/*
-	 * Find the y limits of the polygon
+	 * Find the limits of the polygon
 	 */
+	x_min = x_max = _x(coords, transform, 0);
 	y_min = y_max = _y(coords, transform, 0);
 	for (edge = 1; edge < ncoords; edge++) {
+		x = _x(coords, transform, edge);
+		if (x < x_min)
+			x_min = x;
+		else if (x > x_max)
+			x_max = x;
 		y = _y(coords, transform, edge);
 		if (y < y_min)
 			y_min = y;
@@ -204,11 +211,17 @@ ao_poly(const struct ao_bitmap	*dst,
 			y_max = y;
 	}
 
+	x_min = floorf(x_min);
+	x_max = ceilf(x_max);
+	ao_clip(x_min, 0, dst->width);
+	ao_clip(x_max, 0, dst->width);
+
 	y_min = floorf(y_min);
 	y_max = ceilf(y_max);
-
 	ao_clip(y_min, 0, dst->height);
 	ao_clip(y_max, 0, dst->height);
+
+	ao_damage(dst, (int16_t) x_min, (int16_t) y_min, (int16_t) x_max, (int16_t) y_max);
 
 	/*
 	 * Walk each scanline in the range and fill included spans

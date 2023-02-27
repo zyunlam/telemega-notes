@@ -16,25 +16,35 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include <ao_draw.h>
-#include "ao_logo.h"
+#ifndef _AO_BOX_H_
+#define _AO_BOX_H_
 
-#define ARRAYSIZE(a)	(sizeof(a) / sizeof((a)[0]))
+#include <stdint.h>
+#include <stdbool.h>
+
+struct ao_box {
+	int16_t		x1, y1;
+	int16_t		x2, y2;
+};
+
+static inline bool
+ao_box_is_empty(struct ao_box *box)
+{
+	return box->x1 == INT16_MAX;
+}
+
+static inline void
+ao_box_set_empty(struct ao_box *box)
+{
+	box->x1 = INT16_MAX;
+	box->y1 = INT16_MAX;
+	box->x2 = INT16_MIN;
+	box->y2 = INT16_MIN;
+}
+
+#define AO_BOX_INIT	{ .x1 = INT16_MAX, .y1 = INT16_MAX, .x2 = INT16_MIN, .y2 = INT16_MIN }
 
 void
-ao_logo(struct ao_bitmap		*dst,
-	const struct ao_transform	*transform,
-	const struct ao_font		*font,
-	uint32_t			fill,
-	uint8_t				rop)
-{
-	if (!transform)
-		transform = &ao_identity;
-	int16_t name_x = ao_t_xi(ao_logo_width, 0.0f, transform);
-	int16_t name_y1 = ao_t_yi(ao_logo_width, 0.5f, transform);
-	int16_t name_y2 = ao_t_yi(ao_logo_width, 0.98f, transform);
-	ao_poly(dst, ao_logo_top, ARRAYSIZE(ao_logo_top), transform, fill, rop);
-	ao_poly(dst, ao_logo_bottom, ARRAYSIZE(ao_logo_bottom), transform, fill, rop);
-	ao_text(dst, font, name_x, name_y1, "Altus", fill, rop);
-	ao_text(dst, font, name_x, name_y2, "Metrum", fill, rop);
-}
+ao_box_union(struct ao_box *dst, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+
+#endif /* _AO_BOX_H_ */

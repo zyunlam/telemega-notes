@@ -12,8 +12,8 @@
  * General Public License for more details.
  */
 
-#include "ao_draw.h"
-#include "ao_draw_int.h"
+#include <ao_draw.h>
+#include <ao_draw_int.h>
 
 #define bound(val,max,other) do {		\
 		if (val < 0) {			\
@@ -32,7 +32,7 @@
 	} while (0)
 
 void
-ao_copy(const struct ao_bitmap	*dst,
+ao_copy(struct ao_bitmap	*dst,
 	int16_t			dst_x,
 	int16_t			dst_y,
 	int16_t			width,
@@ -56,6 +56,8 @@ ao_copy(const struct ao_bitmap	*dst,
 		reverse = (dst_x > src_x);
 		upsidedown = (dst_y > src_y);
 	}
+
+	ao_damage(dst, dst_x, dst_y, dst_x2, dst_y2);
 
 	if (dst_x < dst_x2 && dst_y < dst_y2) {
 		ao_blt(src->base + src_y * src->stride,

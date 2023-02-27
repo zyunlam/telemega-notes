@@ -91,6 +91,7 @@ ao_logo.h: make-logo
 
 LIB_SRCS=\
 	ao_blt.c \
+	ao_box.c \
 	ao_copy.c \
 	ao_line.c \
 	ao_pattern.c \
@@ -108,7 +109,7 @@ LINE_TEST_OBJS=$(LINE_TEST_SRCS:.c=.o)
 
 TEST_LIBS=-lXrender -lXext -lX11 -lm -Wl,--gc-sections
 
-CFLAGS=-O0 -g $(WARN_FLAGS) -DVALIDATE
+CFLAGS=-O0 -g $(WARN_FLAGS) -DVALIDATE -I.
 
 HEADERS=\
 	ao_draw.h \

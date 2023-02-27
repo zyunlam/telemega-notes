@@ -12,11 +12,11 @@
  * General Public License for more details.
  */
 
-#include "ao_draw.h"
-#include "ao_draw_int.h"
+#include <ao_draw.h>
+#include <ao_draw_int.h>
 
 void
-ao_rect(const struct ao_bitmap	*dst,
+ao_rect(struct ao_bitmap	*dst,
 	int16_t			x,
 	int16_t			y,
 	int16_t			width,
@@ -31,6 +31,8 @@ ao_rect(const struct ao_bitmap	*dst,
 	ao_clip(x2, 0, dst->width);
 	ao_clip(y, 0, dst->height);
 	ao_clip(y2, 0, dst->height);
+
+	ao_damage(dst, x, y, x2, y2);
 
 	if (x < x2 && y < y2) {
 		ao_solid(ao_and(rop, fill),

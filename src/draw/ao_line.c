@@ -12,8 +12,8 @@
  * General Public License for more details.
  */
 
-#include "ao_draw.h"
-#include "ao_draw_int.h"
+#include <ao_draw.h>
+#include <ao_draw_int.h>
 
 #define ao_mask(x,w)	(ao_right(AO_ALLONES,(x) & AO_MASK) & \
 			 ao_left(AO_ALLONES,(FB_UNIT - ((x)+(w))) & AO_MASK))
@@ -239,7 +239,7 @@ ao_clip_line(struct ao_cc *c, struct ao_cbox *b)
 }
 
 void
-ao_line(const struct ao_bitmap	*dst,
+ao_line(struct ao_bitmap	*dst,
 	int16_t			x1,
 	int16_t			y1,
 	int16_t			x2,
@@ -325,10 +325,17 @@ ao_line(const struct ao_bitmap	*dst,
 	if (adx > ady) {
 		x1 = clip_1.major;
 		y1 = clip_1.minor;
+		x2 = clip_2.major;
+		y2 = clip_2.minor;
 	} else {
 		x1 = clip_1.minor;
 		y1 = clip_1.major;
+		x2 = clip_2.minor;
+		y2 = clip_2.major;
 	}
+
+	ao_damage(dst, ao_min16(x1, x2), ao_max16(x1, x2), ao_min16(y1, y2), ao_max16(y1, y2));
+
 	ao_bres(dst,
 		signdx,
 		signdy,

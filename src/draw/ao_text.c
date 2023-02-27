@@ -12,14 +12,14 @@
  * General Public License for more details.
  */
 
-#include "ao_draw.h"
-#include "ao_draw_int.h"
+#include <ao_draw.h>
+#include <ao_draw_int.h>
 #include "ao_font.h"
 #include <string.h>
 #include <stdio.h>
 
 void
-ao_text(const struct ao_bitmap	*dst,
+ao_text(struct ao_bitmap	*dst,
 	const struct ao_font	*font,
 	int16_t			x,
 	int16_t			y,

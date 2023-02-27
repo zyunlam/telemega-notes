@@ -18,12 +18,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "ao_font.h"
+#include "ao_box.h"
 
 struct ao_bitmap {
 	uint32_t	*base;
 	int16_t		stride;	/* in units */
 	int16_t		width;	/* in pixels */
 	int16_t		height;	/* in pixels */
+	struct ao_box	damage;
 };
 
 struct ao_coord {
@@ -81,6 +83,12 @@ ao_stride_bytes(int16_t width)
 	return (int16_t) ((width + 7) >> 3);
 }
 
+static inline void
+ao_damage_set_empty(struct ao_bitmap *dst)
+{
+	ao_box_set_empty(&dst->damage);
+}
+
 struct ao_pattern {
 	uint8_t		pattern[8];
 };
@@ -103,7 +111,7 @@ struct ao_font {
 };
 
 void
-ao_copy(const struct ao_bitmap	*dst,
+ao_copy(struct ao_bitmap	*dst,
 	int16_t			dst_x,
 	int16_t			dst_y,
 	int16_t			width,
@@ -114,7 +122,7 @@ ao_copy(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_rect(const struct ao_bitmap	*dst,
+ao_rect(struct ao_bitmap	*dst,
 	int16_t			x,
 	int16_t			y,
 	int16_t			width,
@@ -123,7 +131,7 @@ ao_rect(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_pattern(const struct ao_bitmap	*dst,
+ao_pattern(struct ao_bitmap		*dst,
 	   int16_t			x,
 	   int16_t			y,
 	   int16_t			width,
@@ -134,7 +142,7 @@ ao_pattern(const struct ao_bitmap	*dst,
 	   uint8_t			rop);
 
 void
-ao_line(const struct ao_bitmap	*dst,
+ao_line(struct ao_bitmap	*dst,
 	int16_t			x1,
 	int16_t			y1,
 	int16_t			x2,
@@ -143,7 +151,7 @@ ao_line(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_poly(const struct ao_bitmap		*dst,
+ao_poly(struct ao_bitmap		*dst,
 	const struct ao_coord		*coords,
 	uint16_t			ncoords,
 	const struct ao_transform	*transform,
@@ -151,7 +159,7 @@ ao_poly(const struct ao_bitmap		*dst,
 	uint8_t				rop);
 
 void
-ao_text(const struct ao_bitmap	*dst,
+ao_text(struct ao_bitmap	*dst,
 	const struct ao_font	*font,
 	int16_t			x,
 	int16_t			y,
@@ -160,7 +168,7 @@ ao_text(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_logo(const struct ao_bitmap		*dst,
+ao_logo(struct ao_bitmap		*dst,
 	const struct ao_transform	*transform,
 	const struct ao_font		*font,
 	uint32_t			fill,

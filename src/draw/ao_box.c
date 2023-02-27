@@ -16,25 +16,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include <ao_draw.h>
-#include "ao_logo.h"
-
-#define ARRAYSIZE(a)	(sizeof(a) / sizeof((a)[0]))
+#include <ao_box.h>
 
 void
-ao_logo(struct ao_bitmap		*dst,
-	const struct ao_transform	*transform,
-	const struct ao_font		*font,
-	uint32_t			fill,
-	uint8_t				rop)
+ao_box_union(struct ao_box *dst, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
-	if (!transform)
-		transform = &ao_identity;
-	int16_t name_x = ao_t_xi(ao_logo_width, 0.0f, transform);
-	int16_t name_y1 = ao_t_yi(ao_logo_width, 0.5f, transform);
-	int16_t name_y2 = ao_t_yi(ao_logo_width, 0.98f, transform);
-	ao_poly(dst, ao_logo_top, ARRAYSIZE(ao_logo_top), transform, fill, rop);
-	ao_poly(dst, ao_logo_bottom, ARRAYSIZE(ao_logo_bottom), transform, fill, rop);
-	ao_text(dst, font, name_x, name_y1, "Altus", fill, rop);
-	ao_text(dst, font, name_x, name_y2, "Metrum", fill, rop);
+	if (x1 < dst->x1) dst->x1 = x1;
+	if (x2 > dst->x2) dst->x2 = x2;
+	if (y1 < dst->y1) dst->y1 = y1;
+	if (y2 > dst->y2) dst->y2 = y2;
 }
