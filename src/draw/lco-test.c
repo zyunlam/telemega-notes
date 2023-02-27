@@ -135,14 +135,18 @@ prev_box(void)
 	box_number = max_box;
 }
 
+static bool redraw_all = true;
+
 void HandleExpose(Display *dpy, Window win, GC gc)
 {
 	char	str[64];
 	int 	i;
 	int	v;
+	int	last_box;
 	int16_t	b;
 
-	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, 0xffffffff, AO_COPY);
+	if (redraw_all)
+		ao_rect(&fb, 0, 0, WIDTH, HEIGHT, 0xffffffff, AO_COPY);
 
 	if (do_polys == 1)
 		current_timeout = TIMEOUT;
@@ -150,13 +154,19 @@ void HandleExpose(Display *dpy, Window win, GC gc)
 		current_timeout = 0;
 	switch (do_polys) {
 	case 1:
-		ao_logo(&fb, &logo_transform, &LOGO_FONT, 0x00000000, AO_COPY);
+		if (redraw_all)
+			ao_logo(&fb, &logo_transform, &LOGO_FONT, 0x00000000, AO_COPY);
+		else
+			ao_rect(&fb, 0, SCAN_Y, WIDTH, HEIGHT-SCAN_Y, 0xffffffff, AO_COPY);
 		if (scan_number) {
 			ao_rect(&fb, SCAN_X, SCAN_Y, (int16_t) scan_number, SCAN_HEIGHT, 0x00000000, AO_COPY);
 			b = 0;
 			v = 0;
+			last_box = 0;
 			for (i = scan_number; i > 1; i--) {
 				if (valid_box(i)) {
+					if (!last_box)
+						last_box = i;
 					v++;
 					if (v == MAX_VALID)
 						break;
@@ -164,11 +174,12 @@ void HandleExpose(Display *dpy, Window win, GC gc)
 			}
 			for (; i <= scan_number; i++) {
 				if (valid_box(i)) {
-					sprintf(str, "%02d", i);
+					sprintf(str, "%02d%s", i, i == last_box ? "" : ",");
 					ao_text(&fb, &TINY_FONT, 0 + FOUND_WIDTH * b, FOUND_Y, str, 0x00000000, AO_COPY);
 					b++;
 				}
 			}
+			redraw_all = false;
 		}
 		break;
 	case 2:
@@ -221,6 +232,8 @@ void
 HandleKeyPress(Display *dpy, Window win, GC gc, XEvent *ev)
 {
 	char	string[10];
+
+	redraw_all = true;
 	if (XLookupString ((XKeyEvent *) ev, string, sizeof (string), 0, 0) >= 1) {
 		switch (string[0]) {
 		case 'q':
@@ -290,6 +303,7 @@ HandleTimeout(Display *dpy, Window win, GC gc)
 		if (scan_number < 99)
 			scan_number++;
 		else {
+			redraw_all = true;
 			box_number = boxes[0];
 			pad_number = 1;
 			do_polys = 0;

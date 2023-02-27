@@ -44,7 +44,8 @@ static struct ao_bitmap fb = {
 	.base = bits,
 	.stride = STRIDE,
 	.width = WIDTH,
-	.height = HEIGHT
+	.height = HEIGHT,
+	.damage = AO_BOX_INIT,
 };
 
 static XImage *shm_image;
@@ -83,11 +84,11 @@ DoDisplay(Display *dpy, Window win, GC gc)
 	else
 		image = nonshm_image;
 
-	scan = bits;
-	for (iy = 0; iy < HEIGHT; iy++) {
+	scan = bits + STRIDE * fb.damage.y1;
+	for (iy = fb.damage.y1; iy < fb.damage.y2; iy++) {
 		w = scan;
 		scan += STRIDE;
-		for (ix = 0; ix < WIDTH; ix += 32) {
+		for (ix = fb.damage.x1 & ~31; ix < fb.damage.x2; ix += 32) {
 			d = *w++;
 			for (ib = 0; ib < 32 && ix + ib < WIDTH; ib++) {
 				unsigned long p = d & 1 ? white : black;
@@ -105,4 +106,5 @@ DoDisplay(Display *dpy, Window win, GC gc)
 		XShmPutImage(dpy, win, gc, image, 0, 0, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, False);
 	else
 		XPutImage(dpy, win, gc, image, 0, 0, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+	ao_damage_set_empty(&fb);
 }
