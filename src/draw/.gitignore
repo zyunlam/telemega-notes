@@ -4,4 +4,4 @@ Bitstream*.c
 NotoMono*.c
 ao_font.h
 ao_logo.h
-draw-test
+lco-test
