@@ -28,6 +28,8 @@ struct ao_bitmap {
 	struct ao_box	damage;
 };
 
+#define AO_BITMAP_STRIDE(width)	(((width) + 31) >> 5)
+
 struct ao_coord {
 	float	x, y;
 };
@@ -208,5 +210,8 @@ extern const struct ao_transform ao_identity;
 #define AO_OR_INVERTED   0xd	/* NOT src OR dst */
 #define AO_NAND          0xe	/* NOT src OR NOT dst */
 #define AO_SET           0xf	/* 1 */
+
+#define AO_WHITE	0xffffffff
+#define AO_BLACK	0x00000000
 
 #endif /* _AO_DRAW_H_ */
