@@ -7,12 +7,14 @@ INC = \
 	ao_arch_funcs.h \
 	ao_exti.h \
 	ao_product.h \
+	ao_st7565.h \
 	stm32f1.h \
 	Makefile
 
 ALTOS_SRC = \
 	ao_clock.c \
 	ao_timer.c \
+	ao_mutex.c \
 	ao_boot_chain.c \
 	ao_interrupt.c \
 	ao_product.c \
@@ -23,6 +25,19 @@ ALTOS_SRC = \
 	ao_stdio.c \
 	ao_serial_stm.c \
 	ao_usb_stm.c \
+	ao_dma_stm.c \
+	ao_spi_stm.c \
+	ao_st7565.c \
+	ao_rect.c \
+	ao_text.c \
+	ao_box.c \
+	ao_copy.c \
+	ao_blt.c \
+	ao_line.c \
+	ao_logo.c \
+	ao_poly.c \
+	BitstreamVeraSans-Roman-24.c \
+	BenguiatGothicStd-Bold-26.c \
 	ao_cmd.c
 
 PRODUCT=Nucleo-f103
