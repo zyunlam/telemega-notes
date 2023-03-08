@@ -125,7 +125,7 @@ LINE_TEST_OBJS=$(LINE_TEST_SRCS:.c=.o)
 
 TEST_LIBS=-lXrender -lXext -lX11 -lm -Wl,--gc-sections
 
-CFLAGS=-O0 -g $(WARN_FLAGS) -DVALIDATE -I.
+CFLAGS=-O3 -g $(WARN_FLAGS) -DVALIDATE -I.
 
 HEADERS=\
 	ao_draw.h \
