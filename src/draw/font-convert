@@ -195,6 +195,8 @@ void print_font(file out, font_t font, string font_name) {
 	fprintf(out, "\t.max_height = %d,\n", max_height);
 	fprintf(out, "\t.ascent = %d,\n", font.ascent);
 	fprintf(out, "};\n");
+	int max_stride = (max_width + 31) >> 5;
+	fprintf(out, "__asm__(\".balign 4\\n.comm ao_glyph_temp 0x%x\");\n", max_stride * max_height * 4);
 }
 
 string
