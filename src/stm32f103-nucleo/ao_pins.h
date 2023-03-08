@@ -54,3 +54,18 @@
 #define USE_SERIAL_2_STDIN	1
 #define SERIAL_2_PA2_PA3	1
 #define SERIAL_2_SPEED		AO_SERIAL_SPEED_115200
+
+#define HAS_SPI_1		1
+#define SPI_1_PA5_PA6_PA7	1
+#define SPI_1_MODE_OUTPUT	STM_GPIO_CR_MODE_OUTPUT_10MHZ
+
+#define AO_ST7565_CS_PORT	(&stm_gpioa)	/* pin 1 */
+#define AO_ST7565_CS_PIN	4
+#define AO_ST7565_RESET_PORT	(&stm_gpioa)	/* pin 2 */
+#define AO_ST7565_RESET_PIN	0
+#define AO_ST7565_A0_PORT	(&stm_gpioa)	/* pin 3 */
+#define AO_ST7565_A0_PIN	1
+#define AO_ST7565_SPI_BUS	AO_SPI_1_PA5_PA6_PA7
+#define AO_ST7565_WIDTH		128
+#define AO_ST7565_HEIGHT	64
+#define AO_ST7565_BIAS		AO_ST7565_LCD_BIAS_1_9
