@@ -104,6 +104,12 @@ ao_enable_input(struct stm_gpio *port, int bit, int mode)
 	ao_gpio_set_mode(port, bit, mode);
 }
 
+static inline void
+ao_enable_cs(struct stm_gpio *port, int bit)
+{
+	ao_enable_output(port, bit, 1);
+}
+
 #if USE_SERIAL_1_SW_FLOW || USE_SERIAL_2_SW_FLOW || USE_SERIAL_3_SW_FLOW
 #define HAS_SERIAL_SW_FLOW 1
 #else
@@ -331,5 +337,202 @@ ao_arch_wait_interrupt(void) {
 #define ao_arch_reboot() \
 	(stm_scb.aircr = ((STM_SCB_AIRCR_VECTKEY_KEY << STM_SCB_AIRCR_VECTKEY) | \
 			  (1 << STM_SCB_AIRCR_SYSRESETREQ)))
+
+/* ao_dma_stm.c
+ */
+
+extern uint8_t ao_dma_done[STM_NUM_DMA];
+
+void
+ao_dma_set_transfer(uint8_t 		index,
+		    volatile void	*peripheral,
+		    void		*memory,
+		    uint16_t		count,
+		    uint32_t		ccr);
+
+void
+ao_dma_set_isr(uint8_t index, void (*isr)(int index));
+
+void
+ao_dma_start(uint8_t index);
+
+void
+ao_dma_done_transfer(uint8_t index);
+
+void
+ao_dma_alloc(uint8_t index);
+
+void
+ao_dma_init(void);
+
+/* ao_spi_stm.c
+ */
+
+/* PCLK is set to 16MHz (HCLK 32MHz, APB prescaler 2) */
+
+#define _AO_SPI_SPEED_8MHz	STM_SPI_CR1_BR_PCLK_2
+#define _AO_SPI_SPEED_4MHz	STM_SPI_CR1_BR_PCLK_4
+#define _AO_SPI_SPEED_2MHz	STM_SPI_CR1_BR_PCLK_8
+#define _AO_SPI_SPEED_1MHz	STM_SPI_CR1_BR_PCLK_16
+#define _AO_SPI_SPEED_500kHz	STM_SPI_CR1_BR_PCLK_32
+#define _AO_SPI_SPEED_250kHz	STM_SPI_CR1_BR_PCLK_64
+#define _AO_SPI_SPEED_125kHz	STM_SPI_CR1_BR_PCLK_128
+#define _AO_SPI_SPEED_62500Hz	STM_SPI_CR1_BR_PCLK_256
+
+static inline uint32_t
+ao_spi_speed(uint32_t hz)
+{
+	if (hz >= 8000000) return _AO_SPI_SPEED_8MHz;
+	if (hz >= 4000000) return _AO_SPI_SPEED_4MHz;
+	if (hz >= 2000000) return _AO_SPI_SPEED_2MHz;
+	if (hz >= 1000000) return _AO_SPI_SPEED_1MHz;
+	if (hz >=  500000) return _AO_SPI_SPEED_500kHz;
+	if (hz >=  250000) return _AO_SPI_SPEED_250kHz;
+	if (hz >=  125000) return _AO_SPI_SPEED_125kHz;
+	return _AO_SPI_SPEED_62500Hz;
+}
+
+#define AO_SPI_CPOL_BIT		4
+#define AO_SPI_CPHA_BIT		5
+
+#define AO_SPI_CONFIG_1		0x00
+#define AO_SPI_1_CONFIG_PA5_PA6_PA7	AO_SPI_CONFIG_1
+#define AO_SPI_2_CONFIG_PB13_PB14_PB15	AO_SPI_CONFIG_1
+
+#define AO_SPI_CONFIG_2		0x04
+#define AO_SPI_1_CONFIG_PB3_PB4_PB5	AO_SPI_CONFIG_2
+#define AO_SPI_2_CONFIG_PD1_PD3_PD4	AO_SPI_CONFIG_2
+
+#define AO_SPI_CONFIG_3		0x08
+#define AO_SPI_1_CONFIG_PE13_PE14_PE15	AO_SPI_CONFIG_3
+
+#define AO_SPI_CONFIG_NONE	0x0c
+
+#define AO_SPI_INDEX_MASK	0x01
+#define AO_SPI_CONFIG_MASK	0x0c
+
+#define AO_SPI_1_PA5_PA6_PA7	(STM_SPI_INDEX(1) | AO_SPI_1_CONFIG_PA5_PA6_PA7)
+#define AO_SPI_1_PB3_PB4_PB5	(STM_SPI_INDEX(1) | AO_SPI_1_CONFIG_PB3_PB4_PB5)
+#define AO_SPI_1_PE13_PE14_PE15	(STM_SPI_INDEX(1) | AO_SPI_1_CONFIG_PE13_PE14_PE15)
+
+#define AO_SPI_2_PB13_PB14_PB15	(STM_SPI_INDEX(2) | AO_SPI_2_CONFIG_PB13_PB14_PB15)
+#define AO_SPI_2_PD1_PD3_PD4	(STM_SPI_INDEX(2) | AO_SPI_2_CONFIG_PD1_PD3_PD4)
+
+#define AO_SPI_INDEX(id)	((id) & AO_SPI_INDEX_MASK)
+#define AO_SPI_CONFIG(id)	((id) & AO_SPI_CONFIG_MASK)
+#define AO_SPI_PIN_CONFIG(id)	((id) & (AO_SPI_INDEX_MASK | AO_SPI_CONFIG_MASK))
+#define AO_SPI_CPOL(id)		((uint32_t) (((id) >> AO_SPI_CPOL_BIT) & 1))
+#define AO_SPI_CPHA(id)		((uint32_t) (((id) >> AO_SPI_CPHA_BIT) & 1))
+
+#define AO_SPI_MAKE_MODE(pol,pha)	(((pol) << AO_SPI_CPOL_BIT) | ((pha) << AO_SPI_CPHA_BIT))
+#define AO_SPI_MODE_0		AO_SPI_MAKE_MODE(0,0)
+#define AO_SPI_MODE_1		AO_SPI_MAKE_MODE(0,1)
+#define AO_SPI_MODE_2		AO_SPI_MAKE_MODE(1,0)
+#define AO_SPI_MODE_3		AO_SPI_MAKE_MODE(1,1)
+
+uint8_t
+ao_spi_try_get(uint8_t spi_index, uint32_t speed, uint8_t task_id);
+
+void
+ao_spi_get(uint8_t spi_index, uint32_t speed);
+
+void
+ao_spi_put(uint8_t spi_index);
+
+void
+ao_spi_put_pins(uint8_t spi_index);
+
+void
+ao_spi_send(const void *block, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_send_fixed(uint8_t value, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_send_sync(const void *block, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_start_bytes(uint8_t spi_index);
+
+void
+ao_spi_stop_bytes(uint8_t spi_index);
+
+static inline void
+ao_spi_send_byte(uint8_t byte, uint8_t spi_index)
+{
+	struct stm_spi	*stm_spi;
+
+	switch (AO_SPI_INDEX(spi_index)) {
+	case 0:
+		stm_spi = &stm_spi1;
+		break;
+	case 1:
+		stm_spi = &stm_spi2;
+		break;
+	}
+
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
+		;
+	stm_spi->dr = byte;
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
+		;
+	(void) stm_spi->dr;
+}
+
+static inline uint8_t
+ao_spi_recv_byte(uint8_t spi_index)
+{
+	struct stm_spi	*stm_spi;
+
+	switch (AO_SPI_INDEX(spi_index)) {
+	case 0:
+		stm_spi = &stm_spi1;
+		break;
+	case 1:
+		stm_spi = &stm_spi2;
+		break;
+	}
+
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_TXE)))
+		;
+	stm_spi->dr = 0xff;
+	while (!(stm_spi->sr & (1 << STM_SPI_SR_RXNE)))
+		;
+	return (uint8_t) stm_spi->dr;
+}
+
+void
+ao_spi_recv(void *block, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
+
+void
+ao_spi_init(void);
+
+#define ao_spi_set_cs(reg,mask) ((reg)->bsrr = ((uint32_t) (mask)) << 16)
+#define ao_spi_clr_cs(reg,mask) ((reg)->bsrr = (mask))
+
+#define ao_spi_get_mask(reg,mask,bus, speed) do {		\
+		ao_spi_get(bus, speed);				\
+		ao_spi_set_cs(reg,mask);			\
+	} while (0)
+
+static inline uint8_t
+ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t speed, uint8_t task_id)
+{
+	if (!ao_spi_try_get(bus, speed, task_id))
+		return 0;
+	ao_spi_set_cs(reg, mask);
+	return 1;
+}
+
+#define ao_spi_put_mask(reg,mask,bus) do {	\
+		ao_spi_clr_cs(reg,mask);	\
+		ao_spi_put(bus);		\
+	} while (0)
+
+#define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,1<<(bit),bus,speed)
+#define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,1<<(bit),bus)
 
 #endif /* _AO_ARCH_FUNCS_H_ */
