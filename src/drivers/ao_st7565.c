@@ -97,6 +97,10 @@ ao_st7565_setup(void)
 		return;
 	setup_done = true;
 	ao_st7565_reset();
+	/*
+	 * Should be set to one of AO_ST7565_LCD_BIAS_1_9 or
+	 * AO_ST7565_LCD_BIAS_1_7
+	 */
 	ao_st7565_instruction(AO_ST7565_BIAS);
 	ao_st7565_instruction(AO_ST7565_ADC_SELECT_NORMAL);
 
