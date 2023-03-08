@@ -18,6 +18,12 @@
 #include <string.h>
 #include <stdio.h>
 
+extern uint32_t ao_glyph_temp[];
+
+static struct ao_bitmap	src_bitmap = {
+	.base = ao_glyph_temp,
+};
+
 void
 ao_text(struct ao_bitmap	*dst,
 	const struct ao_font	*font,
@@ -28,15 +34,10 @@ ao_text(struct ao_bitmap	*dst,
 	uint8_t			rop)
 {
 	int16_t		glyph_stride = ao_stride(font->max_width);
-	uint32_t	src[glyph_stride * font->max_height];
 	char		c;
 	int		h;
 	int16_t		x_off = 0, y_off = 0, advance = 0;
 	int16_t		byte_width = 0;
-
-	struct ao_bitmap	src_bitmap = {
-		.base = src,
-	};
 
 	rop = (rop & 3) | 0x4;
 
@@ -67,7 +68,7 @@ ao_text(struct ao_bitmap	*dst,
 		}
 
 		for (h = 0; h < src_bitmap.height; h++)
-			memcpy(&src[h * src_bitmap.stride], &bytes[h * byte_width], (size_t) byte_width);
+			memcpy(&ao_glyph_temp[h * src_bitmap.stride], &bytes[h * byte_width], (size_t) byte_width);
 
 		ao_copy(dst,
 			x + x_off, y - y_off, src_bitmap.width, src_bitmap.height,
