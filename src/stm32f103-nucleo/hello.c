@@ -78,18 +78,152 @@ ao_st7565_line(void)
 	}
 }
 
+static const float pad_volts = 12.3f;
+static const float lco_volts = 4.1f;
+static const int rssi = -30;
+
+static int	boxes[] = { 1, 2, 3, 5, 8, 11, 13, 17, 19, 23, 29, 31, 37, 62, 97 };
+
+//static int	max_box = 97;
+
+#define ARRAYSIZE(a)	(sizeof(a) / sizeof((a)[0]))
+
+static bool
+valid_box(int box)
+{
+	size_t i;
+	if (box == 0)
+		return true;
+	for (i = 0; i < ARRAYSIZE(boxes); i++)
+		if (boxes[i] == box)
+			return true;
+	return false;
+}
+
+#if 0
+static void
+next_box(void)
+{
+	for (int n = box_number + 1; n <= max_box; n++)
+		if (valid_box(n)) {
+			box_number = n;
+			return;
+		}
+	box_number = 0;
+}
+
+static void
+prev_box(void)
+{
+	for (int n = box_number - 1; n >= 0; n--)
+		if (valid_box(n)) {
+			box_number = n;
+			return;
+		}
+	box_number = max_box;
+}
+#endif
+
 static const struct ao_transform logo_transform = {
 	.x_scale = 48, .x_off = 0,
 	.y_scale = 48, .y_off = 0,
 };
 
+#define BIG_FONT BitstreamVeraSans_Roman_58_font
+#define VOLT_FONT BitstreamVeraSans_Roman_58_font
+#define SMALL_FONT BitstreamVeraSans_Roman_12_font
+#define TINY_FONT BitstreamVeraSans_Roman_10_font
 #define LOGO_FONT BenguiatGothicStd_Bold_26_font
+
+#define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
+#define VALUE_Y		(int16_t) (LABEL_Y + BIG_FONT.ascent + 3)
+#define BOX_X		2
+#define PAD_X		90
+#define BOX_LABEL_X	30
+#define VOLT_LABEL_X	25
+#define RSSI_LABEL_X	15
+#define PAD_LABEL_X	95
+#define SEP_X		(PAD_X - 10)
+#define SCAN_X		(WIDTH - 100) / 2
+#define SCAN_Y		49
+#define SCAN_HEIGHT	4
+#define FOUND_Y		63
+#define FOUND_WIDTH	17
+#define MAX_VALID	(WIDTH / FOUND_WIDTH)
+
+static int16_t	box_number = 1;
+static int16_t	pad_number = 1;
 
 static void
 ao_st7565_poly(void)
 {
+	int16_t scan_number;
+	char	str[8];
+	int 	i;
+	int	v;
+	int	last_box;
+	int16_t	b;
+
+	for (scan_number = 0; scan_number < 100; scan_number++) {
+		ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
+		ao_logo(&fb, &logo_transform, &LOGO_FONT, 0x00000000, AO_COPY);
+		if (scan_number) {
+			ao_rect(&fb, SCAN_X, SCAN_Y, (int16_t) scan_number, SCAN_HEIGHT, 0x00000000, AO_COPY);
+			b = 0;
+			v = 0;
+			last_box = 0;
+			for (i = scan_number; i > 1; i--) {
+				if (valid_box(i)) {
+					if (!last_box)
+						last_box = i;
+					v++;
+					if (v == MAX_VALID)
+						break;
+				}
+			}
+			for (; i <= scan_number; i++) {
+				if (valid_box(i)) {
+					sprintf(str, "%02d%s", i, i == last_box ? "" : ",");
+					ao_text(&fb, &TINY_FONT, 0 + FOUND_WIDTH * b, FOUND_Y, str, 0x00000000, AO_COPY);
+					b++;
+				}
+			}
+		}
+		ao_st7565_update(&fb);
+		ao_delay(AO_MS_TO_TICKS(50));
+	}
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
-	ao_logo(&fb, &logo_transform, &LOGO_FONT, 0x00000000, AO_COPY);
+	switch (box_number) {
+	case 0:
+		sprintf(str, "%4.1f", lco_volts);
+		ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+		ao_text(&fb, &SMALL_FONT, VOLT_LABEL_X, LABEL_Y, "LCO Battery", 0x00000000, AO_COPY);
+		break;
+	default:
+		switch (pad_number) {
+		case -1:
+			sprintf(str, "%4.1f", pad_volts);
+			ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+			ao_text(&fb, &SMALL_FONT, VOLT_LABEL_X, LABEL_Y, "Pad Battery", 0x00000000, AO_COPY);
+			break;
+		case 0:
+			sprintf(str, "%4d", rssi);
+			ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+			ao_text(&fb, &SMALL_FONT, RSSI_LABEL_X, LABEL_Y, "Signal Strength", 0x00000000, AO_COPY);
+			break;
+		default:
+			sprintf(str, "%02d", box_number);
+			ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, 0x00000000, AO_COPY);
+			ao_text(&fb, &SMALL_FONT, BOX_LABEL_X, LABEL_Y, "Box", 0x00000000, AO_COPY);
+
+			sprintf(str, "%d", pad_number);
+			ao_text(&fb, &BIG_FONT, PAD_X, VALUE_Y, str, 0x00000000, AO_COPY);
+			ao_text(&fb, &SMALL_FONT, PAD_LABEL_X, LABEL_Y, "Pad", 0x00000000, AO_COPY);
+
+			ao_rect(&fb, SEP_X, 0, 2, HEIGHT, 0x00000000, AO_COPY);
+		}
+		break;
+	}
 	ao_st7565_update(&fb);
 }
 

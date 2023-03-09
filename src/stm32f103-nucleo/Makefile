@@ -36,7 +36,10 @@ ALTOS_SRC = \
 	ao_line.c \
 	ao_logo.c \
 	ao_poly.c \
+	BitstreamVeraSans-Roman-58.c \
 	BitstreamVeraSans-Roman-24.c \
+	BitstreamVeraSans-Roman-10.c \
+	BitstreamVeraSans-Roman-12.c \
 	BenguiatGothicStd-Bold-26.c \
 	ao_cmd.c
 
