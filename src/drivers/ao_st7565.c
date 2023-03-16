@@ -67,7 +67,7 @@ ao_st7565_instruction_param(uint8_t cmd, uint8_t param)
 }
 
 static void
-ao_st7565_instructions(uint8_t *cmd, uint16_t len)
+ao_st7565_instructions(const uint8_t *cmd, uint16_t len)
 {
 	ao_st7565_start(0);
 	ao_spi_send(cmd, len, AO_ST7565_SPI_BUS);
@@ -85,7 +85,7 @@ ao_st7565_data(const void *base, uint16_t len)
 static void
 ao_st7565_set_brightness(uint8_t val)
 {
-	ao_st7565_instruction_param(AO_ST7565_ELECTRONIC_VOLUME_SET, val);
+	ao_st7565_instruction_param(ST7565_ELECTRONIC_VOLUME_SET, val);
 }
 
 static bool setup_done;
@@ -93,27 +93,30 @@ static bool setup_done;
 static void
 ao_st7565_setup(void)
 {
+	static const uint8_t init[] = {
+		/*
+		 * Should be set to one of ST7565_LCD_BIAS_1_9 or
+		 * ST7565_LCD_BIAS_1_7
+		 */
+		AO_ST7565_BIAS,
+		ST7565_ADC_SELECT_NORMAL,
+		ST7565_COMMON_MODE_NORMAL,
+		ST7565_DISPLAY_START_LINE_SET(0),
+		ST7565_POWER_CONTROL_SET(0x4),
+	};
+
 	if (setup_done)
 		return;
 	setup_done = true;
 	ao_st7565_reset();
-	/*
-	 * Should be set to one of AO_ST7565_LCD_BIAS_1_9 or
-	 * AO_ST7565_LCD_BIAS_1_7
-	 */
-	ao_st7565_instruction(AO_ST7565_BIAS);
-	ao_st7565_instruction(AO_ST7565_ADC_SELECT_NORMAL);
-
-	ao_st7565_instruction(AO_ST7565_COMMON_MODE_NORMAL);
-	ao_st7565_instruction(AO_ST7565_DISPLAY_START_LINE_SET(0));
-	ao_st7565_instruction(AO_ST7565_POWER_CONTROL_SET(0x4));
+	ao_st7565_instructions(init, sizeof(init));
 	ao_delay(AO_MS_TO_TICKS(50));
-	ao_st7565_instruction(AO_ST7565_POWER_CONTROL_SET(0x6));
+	ao_st7565_instruction(ST7565_POWER_CONTROL_SET(0x6));
 	ao_delay(AO_MS_TO_TICKS(50));
-	ao_st7565_instruction(AO_ST7565_POWER_CONTROL_SET(0x7));
+	ao_st7565_instruction(ST7565_POWER_CONTROL_SET(0x7));
 	ao_delay(AO_MS_TO_TICKS(10));
-	ao_st7565_instruction(AO_ST7565_RESISTOR_RATIO_SET(5));
-	ao_st7565_instruction(AO_ST7565_DISPLAY_ON);
+	ao_st7565_instruction(ST7565_RESISTOR_RATIO_SET(5));
+	ao_st7565_instruction(ST7565_DISPLAY_ON);
 	ao_st7565_set_brightness(0x10);
 }
 
@@ -132,10 +135,10 @@ ao_st7565_update(struct ao_bitmap *bitmap)
 	line = bitmap->base;
 	for (page = 0; page < 8; page++) {
 		uint8_t		i[4] = {
-			AO_ST7565_PAGE_ADDRESS_SET(7-page),
-			AO_ST7565_COLUMN_ADDRESS_SET_MSN(0 >> 4),
-			AO_ST7565_COLUMN_ADDRESS_SET_MSN(0 & 0xf),
-			AO_ST7565_RMW
+			ST7565_PAGE_ADDRESS_SET(7-page),
+			ST7565_COLUMN_ADDRESS_SET_MSN(0 >> 4),
+			ST7565_COLUMN_ADDRESS_SET_MSN(0 & 0xf),
+			ST7565_RMW
 		};
 		memset(rotbuf, 0, sizeof(rotbuf));
 		for (row = 7; row >= 0; row--) {
