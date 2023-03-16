@@ -503,6 +503,18 @@ static inline float ao_convert_accel(int16_t sensor)
 
 #endif
 
+#if !HAS_ACCEL && HAS_BMI088
+
+#define HAS_ACCEL	1
+
+typedef int16_t accel_t;
+
+#define ao_data_accel_raw(packet) 		-ao_data_along(packet)
+#define ao_data_accel_invert(a)			(-(a))
+#define ao_data_accel_to_sample(accel)		ao_bmi_accel_to_sample(accel)
+
+#endif
+
 #if !HAS_GYRO && HAS_BMI088
 
 #define HAS_GYRO	1
