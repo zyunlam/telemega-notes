@@ -40,6 +40,11 @@ extern char ao_getchar(void);
 #define HAS_TASK	1
 #endif
 
+#ifndef AO_GPIO_TYPE
+#define AO_GPIO_TYPE void *
+#endif
+
+typedef AO_GPIO_TYPE ao_gpio_t;
 typedef AO_PORT_TYPE ao_port_t;
 
 #ifndef AO_TICK_TYPE
