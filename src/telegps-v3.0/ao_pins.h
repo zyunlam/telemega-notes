@@ -79,7 +79,6 @@
 #define SPI_SCK1_P1_20		1
 #define SPI_MISO1_P0_22		1
 #define SPI_MOSI1_P1_22		1
-#define SPI_1_OSPEEDR		AO_SPI_OSPEED_12MHz
 
 #define HAS_GPS			1
 #define HAS_FLIGHT		0
@@ -107,7 +106,7 @@
 #define AO_FEC_DEBUG            0
 #define AO_CC1200_SPI_CS_PORT   1
 #define AO_CC1200_SPI_CS_PIN    27
-#define AO_CC1200_SPI_BUS       1
+#define AO_CC1200_SPI_BUS       0
 #define AO_CC1200_SPI		1
 
 #define AO_CC1200_INT_PORT      1
@@ -124,7 +123,7 @@
 #define M25_MAX_CHIPS		1
 #define AO_M25_SPI_CS_PORT	0
 #define AO_M25_SPI_CS_MASK	(1 << 23)
-#define AO_M25_SPI_BUS		0
+#define AO_M25_SPI_BUS		1
 
 #define PACKET_HAS_SLAVE	0
 
