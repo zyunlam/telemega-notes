@@ -18,6 +18,7 @@ INC = \
 #
 ALTOS_SRC = \
 	ao_interrupt.c \
+	ao_boot_chain.c \
 	ao_romconfig.c \
 	ao_product.c \
 	ao_panic.c \
@@ -42,13 +43,8 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG)
 
-LDFLAGS=-L../lpc -Wl,-Taltos.ld
-
 $(PROG): Makefile $(OBJ)
-	$(call quiet,CC) $(LDFLAGS) $(CFLAGS) -o $(PROG) $(OBJ) $(LIBS)
-
-ao_product.h: ao-make-product.5c ../Version
-	$(call quiet,NICKLE,$<) $< -m altusmetrum.org -i $(IDPRODUCT) -p $(PRODUCT) -v $(VERSION) > $@
+	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS) -Wl,-Map=$(PROGNAME)-$(VERSION).map
 
 $(OBJ): $(INC)
 
