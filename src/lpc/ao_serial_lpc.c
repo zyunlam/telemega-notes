@@ -157,6 +157,18 @@ ao_serial_init(void)
 			      (0 << LPC_IOCONF_INV) |
 			      (0 << LPC_IOCONF_OD));
 #endif
+#if SERIAL_1_13_14
+	lpc_ioconf.pio1_13 = ((LPC_IOCONF_FUNC_PIO1_13_TXD << LPC_IOCONF_FUNC) |
+			      (LPC_IOCONF_MODE_INACTIVE << LPC_IOCONF_MODE) |
+			      (0 << LPC_IOCONF_HYS) |
+			      (0 << LPC_IOCONF_INV) |
+			      (0 << LPC_IOCONF_OD));
+	lpc_ioconf.pio1_14 = ((LPC_IOCONF_FUNC_PIO1_14_RXD << LPC_IOCONF_FUNC) |
+			      (LPC_IOCONF_MODE_INACTIVE << LPC_IOCONF_MODE) |
+			      (0 << LPC_IOCONF_HYS) |
+			      (0 << LPC_IOCONF_INV) |
+			      (0 << LPC_IOCONF_OD));
+#endif
 
 	/* Turn on the USART */
 	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_USART);

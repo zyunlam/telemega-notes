@@ -280,7 +280,7 @@ extern struct lpc_ioconf lpc_ioconf;
 #define  LPC_IOCONF_FUNC_PIO1_14	0
 #define  LPC_IOCONF_FUNC_DSR		1
 #define  LPC_IOCONF_FUNC_PIO1_14_CT16B0_MAT1	2
-#define  LPC_IOCONF_FUNC_PIO1_13_RXD		3
+#define  LPC_IOCONF_FUNC_PIO1_14_RXD		3
 
 /* PIO1_15 */
 #define  LPC_IOCONF_FUNC_PIO1_15	0
