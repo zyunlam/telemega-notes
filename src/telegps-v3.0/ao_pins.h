@@ -23,6 +23,8 @@
 
 #define IS_FLASH_LOADER		0
 
+#define LPC_EEPROM_BYTES	2048
+
 /* Crystal on the board */
 #define AO_LPC_CLKIN	12000000
 
@@ -43,6 +45,9 @@
 
 #define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
+#define USE_EEPROM_CONFIG	1
+#define USE_STORAGE_CONFIG	0
+#define LOG_ERASE_MARK		0
 #define HAS_USB			1
 #define HAS_BEEP		0
 #define HAS_RADIO		1
