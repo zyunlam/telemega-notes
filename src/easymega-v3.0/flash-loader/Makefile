@@ -5,4 +5,4 @@
 
 TOPDIR=../..
 HARDWARE=easymega-v3.0
-include $(TOPDIR)/stm/Makefile-flash.defs
+include $(TOPDIR)/stm32f1/Makefile-flash.defs

@@ -3,7 +3,7 @@
 #
 #
 
-include ../stm/Makefile.defs
+include ../stm32f1/Makefile.defs
 
 INC = \
 	ao.h \
@@ -20,38 +20,27 @@ INC = \
 	ao_ms5607.h \
 	ao_bmx160.h \
 	ao_adxl375.h \
-	ao_profile.h \
 	ao_task.h \
 	ao_whiten.h \
 	ao_sample_profile.h \
 	ao_quaternion.h \
-	ao_mpu.h \
-	stm32l.h \
+	stm32f1.h \
 	Makefile
 
 #
 # Common AltOS sources
 #
 
-#PROFILE=ao_profile.c
-#PROFILE_DEF=-DAO_PROFILE=1
-
-#SAMPLE_PROFILE=ao_sample_profile.c \
-#	ao_sample_profile_timer.c
-#SAMPLE_PROFILE_DEF=-DHAS_SAMPLE_PROFILE=1
-
-#STACK_GUARD=ao_mpu_stm.c
-#STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
-
 ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_interrupt.c \
+	ao_clock.c \
 	ao_product.c \
 	ao_romconfig.c \
 	ao_cmd.c \
 	ao_config.c \
 	ao_task.c \
-	ao_led_stm.c \
+	ao_led.c \
 	ao_stdio.c \
 	ao_panic.c \
 	ao_timer.c \
@@ -60,19 +49,19 @@ ALTOS_SRC = \
 	ao_freq.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
+	ao_i2c_stm.c \
 	ao_data.c \
 	ao_ms5607.c \
-	ao_bmx160.c \
+	ao_bmi088.c \
+	ao_mmc5983.c \
 	ao_adxl375.c \
 	ao_adc_stm.c \
 	ao_beep_stm.c \
-	ao_eeprom_stm.c \
 	ao_storage.c \
 	ao_m25.c \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
 	ao_report.c \
-	ao_i2c_stm.c \
 	ao_convert_pa.c \
 	ao_convert_volt.c \
 	ao_log.c \
@@ -90,7 +79,7 @@ PRODUCT=EasyMega-v3.0
 PRODUCT_DEF=-DEASYMEGA
 IDPRODUCT=0x0028
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF)
+CFLAGS = $(PRODUCT_DEF) $(STM32F1_CFLAGS)
 
 PROGNAME=easymega-v3.0
 PROG=$(PROGNAME)-$(VERSION).elf
