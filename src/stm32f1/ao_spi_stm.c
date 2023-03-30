@@ -347,6 +347,9 @@ ao_spi_enable_pin_config(uint8_t spi_pin_config)
 	switch (spi_pin_config) {
 #if SPI_1_PA5_PA6_PA7
 	case AO_SPI_1_PA5_PA6_PA7:
+		stm_set_afio_mapr(STM_AFIO_MAPR_SPI1_REMAP,
+				  STM_AFIO_MAPR_SPI1_REMAP_PA4_PA5_PA6_PA7,
+				  STM_AFIO_MAPR_SPI1_REMAP_MASK);
 		stm_spi_output_enable(&stm_gpioa, 5, SPI_1_MODE_OUTPUT);
 		stm_spi_input_enable(&stm_gpioa, 6);
 		stm_spi_output_enable(&stm_gpioa, 7, SPI_1_MODE_OUTPUT);
@@ -354,6 +357,9 @@ ao_spi_enable_pin_config(uint8_t spi_pin_config)
 #endif
 #if SPI_1_PB3_PB4_PB5
 	case AO_SPI_1_PB3_PB4_PB5:
+		stm_set_afio_mapr(STM_AFIO_MAPR_SPI1_REMAP,
+				  STM_AFIO_MAPR_SPI1_REMAP_PA15_PB3_PB4_PB5,
+				  STM_AFIO_MAPR_SPI1_REMAP_MASK);
 		stm_spi_output_enable(&stm_gpiob, 3, SPI_1_MODE_OUTPUT);
 		stm_spi_input_enable(&stm_gpiob, 4);
 		stm_spi_output_enable(&stm_gpiob, 5, SPI_1_MODE_OUTPUT);

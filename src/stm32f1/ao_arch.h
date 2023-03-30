@@ -58,6 +58,15 @@
 #define AO_PCLK1	AO_APB1CLK
 #define AO_PCLK2	AO_APB2CLK
 
+#if AO_RCC_CFGR_PPRE1_DIV == STM_RCC_CFGR_PPRE1_DIV_1
+#define AO_TIM23467_CLK		AO_APB1CLK
+#else
+#define AO_TIM23467_CLK		(2 * AO_APB1CLK)
+#endif
+
+/* ADC maximum reported value */
+#define AO_ADC_MAX			4095
+
 #define AO_BOOT_APPLICATION_BASE	((uint32_t *) 0x08001000)
 #define AO_BOOT_APPLICATION_BOUND	((uint32_t *) (0x08000000 + stm_flash_size()))
 #define AO_BOOT_LOADER_BASE		((uint32_t *) 0x08000000)

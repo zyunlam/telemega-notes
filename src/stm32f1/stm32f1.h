@@ -503,11 +503,11 @@ extern struct stm_gpio stm_gpioc;
 extern struct stm_gpio stm_gpiod;
 extern struct stm_gpio stm_gpioe;
 
-//#define stm_gpioe  (*((struct stm_gpio *) 0x40011800))
-//#define stm_gpiod  (*((struct stm_gpio *) 0x40011400))
-//#define stm_gpioc  (*((struct stm_gpio *) 0x40011000))
-//#define stm_gpiob  (*((struct stm_gpio *) 0x40010c00))
-//#define stm_gpioa  (*((struct stm_gpio *) 0x40010800))
+#define stm_gpioe  (*((struct stm_gpio *) 0x40011800))
+#define stm_gpiod  (*((struct stm_gpio *) 0x40011400))
+#define stm_gpioc  (*((struct stm_gpio *) 0x40011000))
+#define stm_gpiob  (*((struct stm_gpio *) 0x40010c00))
+#define stm_gpioa  (*((struct stm_gpio *) 0x40010800))
 
 struct stm_afio {
 	vuint32_t	evcr;
@@ -518,7 +518,7 @@ struct stm_afio {
 
 extern struct stm_afio stm_afio;
 
-//#define stm_afio	(*((struct stm_afio *) 0x40010000))
+#define stm_afio	(*((struct stm_afio *) 0x40010000))
 
 #define STM_AFIO_MAPR_ADC2_ETRGREG_REMAP	20
 #define STM_AFIO_MAPR_ADC2_ETRGINJ_REMAP	19
@@ -569,6 +569,14 @@ extern struct stm_afio stm_afio;
 #define  STM_AFIO_MAPR_SPI1_REMAP_PA4_PA5_PA6_PA7	0
 #define  STM_AFIO_MAPR_SPI1_REMAP_PA15_PB3_PB4_PB5	1
 #define  STM_AFIO_MAPR_SPI1_REMAP_MASK			1
+
+#define STM_AFIO_EXTICR_PA		0
+#define STM_AFIO_EXTICR_PB		1
+#define STM_AFIO_EXTICR_PC		2
+#define STM_AFIO_EXTICR_PD		3
+#define STM_AFIO_EXTICR_PE		4
+#define STM_AFIO_EXTICR_PF		5
+#define STM_AFIO_EXTICR_PG		6
 
 static inline void
 stm_set_afio_mapr(uint8_t bit, uint32_t val, uint32_t mask) {
@@ -747,8 +755,7 @@ struct stm_usb {
 
 extern struct stm_usb stm_usb;
 
-
-//#define stm_usb (*((struct stm_usb *) 0x40005c00))
+#define stm_usb (*((struct stm_usb *) 0x40005c00))
 
 union stm_usb_bdt {
 	struct {
@@ -927,8 +934,8 @@ struct stm_spi {
 
 extern struct stm_spi stm_spi1, stm_spi2;
 
-//#define stm_spi1 (*((struct stm_spi *) 0x40013000))
-//#define stm_spi2 (*((struct stm_spi *) 0x40003800))
+#define stm_spi1 (*((struct stm_spi *) 0x40013000))
+#define stm_spi2 (*((struct stm_spi *) 0x40003800))
 
 /* SPI channels go from 1 to 2, instead of 0 to 1 (sigh)
  */
@@ -979,7 +986,515 @@ extern struct stm_spi stm_spi1, stm_spi2;
 #define STM_SPI_SR_TXE		1
 #define STM_SPI_SR_RXNE		0
 
+#define STM_NUM_I2C	2
 
+#define STM_I2C_INDEX(channel)	((channel) - 1)
+
+struct stm_i2c {
+	vuint32_t	cr1;
+	vuint32_t	cr2;
+	vuint32_t	oar1;
+	vuint32_t	oar2;
+	vuint32_t	dr;
+	vuint32_t	sr1;
+	vuint32_t	sr2;
+	vuint32_t	ccr;
+	vuint32_t	trise;
+};
+
+extern struct stm_i2c stm_i2c1, stm_i2c2;
+
+#define stm_i2c1	(*((struct stm_i2c *) 0x40005400))
+#define stm_i2c2	(*((struct stm_i2c *) 0x40005800))
+
+#define STM_I2C_CR1_SWRST	15
+#define STM_I2C_CR1_ALERT	13
+#define STM_I2C_CR1_PEC		12
+#define STM_I2C_CR1_POS		11
+#define STM_I2C_CR1_ACK		10
+#define STM_I2C_CR1_STOP	9
+#define STM_I2C_CR1_START	8
+#define STM_I2C_CR1_NOSTRETCH	7
+#define STM_I2C_CR1_ENGC	6
+#define STM_I2C_CR1_ENPEC	5
+#define STM_I2C_CR1_ENARP	4
+#define STM_I2C_CR1_SMBTYPE	3
+#define STM_I2C_CR1_SMBUS	1
+#define STM_I2C_CR1_PE		0
+
+#define STM_I2C_CR2_LAST	12
+#define STM_I2C_CR2_DMAEN	11
+#define STM_I2C_CR2_ITBUFEN	10
+#define STM_I2C_CR2_ITEVTEN	9
+#define STM_I2C_CR2_ITERREN	8
+#define STM_I2C_CR2_FREQ	0
+#define  STM_I2C_CR2_FREQ_MASK		0x3fUL
+
+#define STM_I2C_SR1_SMBALERT	15
+#define STM_I2C_SR1_TIMEOUT	14
+#define STM_I2C_SR1_PECERR	12
+#define STM_I2C_SR1_OVR		11
+#define STM_I2C_SR1_AF		10
+#define STM_I2C_SR1_ARLO	9
+#define STM_I2C_SR1_BERR	8
+#define STM_I2C_SR1_TXE		7
+#define STM_I2C_SR1_RXNE	6
+#define STM_I2C_SR1_STOPF	4
+#define STM_I2C_SR1_ADD10	3
+#define STM_I2C_SR1_BTF		2
+#define STM_I2C_SR1_ADDR	1
+#define STM_I2C_SR1_SB		0
+
+#define STM_I2C_SR2_PEC		8
+#define  STM_I2C_SR2_PEC_MASK	0xff00UL
+#define STM_I2C_SR2_DUALF	7
+#define STM_I2C_SR2_SMBHOST	6
+#define STM_I2C_SR2_SMBDEFAULT	5
+#define STM_I2C_SR2_GENCALL	4
+#define STM_I2C_SR2_TRA		2
+#define STM_I2C_SR2_BUSY       	1
+#define STM_I2C_SR2_MSL		0
+
+#define STM_I2C_CCR_FS		15
+#define STM_I2C_CCR_DUTY	14
+#define STM_I2C_CCR_CCR		0
+#define  STM_I2C_CCR_MASK	0x7ffUL
+
+struct stm_adc {
+	vuint32_t	sr;
+	vuint32_t	cr1;
+	vuint32_t	cr2;
+	vuint32_t	smpr1;
+
+	vuint32_t	smpr2;
+	vuint32_t	jofr1;
+	vuint32_t	jofr2;
+	vuint32_t	jofr3;
+
+	vuint32_t	jofr4;
+	vuint32_t	htr;
+	vuint32_t	ltr;
+	vuint32_t	sqr1;
+
+	vuint32_t	sqr2;
+	vuint32_t	sqr3;
+	vuint32_t	jsqr;
+	vuint32_t	jdr1;
+
+	vuint32_t	jdr2;
+	vuint32_t	jdr3;
+	vuint32_t	jdr4;
+	vuint32_t	dr;
+};
+
+extern struct stm_adc stm_adc;
+
+#define stm_adc (*((struct stm_adc *) 0x40012400))
+
+#define STM_ADC_SQ_TEMP		16
+#define STM_ADC_SQ_V_REF	17
+
+#define STM_ADC_SR_STRT		4
+#define STM_ADC_SR_JSTRT	3
+#define STM_ADC_SR_JEOC		2
+#define STM_ADC_SR_EOC		1
+#define STM_ADC_SR_AWD		0
+
+#define STM_ADC_CR1_AWDEN       23
+#define STM_ADC_CR1_JAWDEN	22
+#define STM_ADC_CR1_DUALMOD	16
+# define STM_ADC_CR1_DUALMOD_INDEPENDENT		0
+# define STM_ADC_CR1_DUALMOD_COMB_REG_SIM_INJ_SIM	1
+# define STM_ADC_CR1_DUALMOD_COMB_REG_SIM_ALT_TRIG	2
+# define STM_ADC_CR1_DUALMOD_COMB_INJ_SIM_FAST_INT	3
+# define STM_ADC_CR1_DUALMOD_COMB_INJ_SIM_SLOW_INT	4
+# define STM_ADC_CR1_DUALMOD_INJ_SIM			5
+# define STM_ADC_CR1_DUALMOD_REG_SIM			6
+# define STM_ADC_CR1_DUALMOD_FAST_INT			7
+# define STM_ADC_CR1_DUALMOD_SLOW_INT			8
+# define STM_ADC_CR1_DUALMOD_ALT_TRIG			9
+
+#define STM_ADC_CR1_DISCNUM	13
+#define  STM_ADC_CR1_DISCNUM_1		0
+#define  STM_ADC_CR1_DISCNUM_2		1
+#define  STM_ADC_CR1_DISCNUM_3		2
+#define  STM_ADC_CR1_DISCNUM_4		3
+#define  STM_ADC_CR1_DISCNUM_5		4
+#define  STM_ADC_CR1_DISCNUM_6		5
+#define  STM_ADC_CR1_DISCNUM_7		6
+#define  STM_ADC_CR1_DISCNUM_8		7
+#define  STM_ADC_CR1_DISCNUM_MASK	7UL
+#define STM_ADC_CR1_JDISCEN	12
+#define STM_ADC_CR1_DISCEN	11
+#define STM_ADC_CR1_JAUTO	10
+#define STM_ADC_CR1_AWDSGL	9
+#define STM_ADC_CR1_SCAN	8
+#define STM_ADC_CR1_JEOCIE	7
+#define STM_ADC_CR1_AWDIE	6
+#define STM_ADC_CR1_EOCIE	5
+#define STM_ADC_CR1_AWDCH	0
+#define  STM_ADC_CR1_AWDCH_MASK		0x1fUL
+
+#define STM_ADC_CR2_TSVREF	23
+#define STM_ADC_CR2_SWSTART	21
+#define STM_ADC_CR2_JWSTART	21
+#define STM_ADC_CR2_EXTTRIG	20
+#define STM_ADC_CR2_EXTSEL	17
+#define  STM_ADC_CR2_EXTSEL_TIM1_CC1	0
+#define  STM_ADC_CR2_EXTSEL_TIM1_CC2	1
+#define  STM_ADC_CR2_EXTSEL_TIM1_CC3	2
+#define  STM_ADC_CR2_EXTSEL_TIM2_CC2	3
+#define  STM_ADC_CR2_EXTSEL_TIM3_TRGO	4
+#define  STM_ADC_CR2_EXTSEL_TIM4_CC4	5
+#define  STM_ADC_CR2_EXTSEL_EXTI	6
+#define  STM_ADC_CR2_EXTSEL_SWSTART	7
+#define  STM_ADC_CR2_EXTSEL_MASK	7UL
+#define STM_ADC_CR2_JEXTTRIG	15
+#define STM_ADC_CR2_JEXTSEL	12
+#define  STM_ADC_CR2_JEXTSEL_TIM1_TRGO	0
+#define  STM_ADC_CR2_JEXTSEL_TIM1_CC4	1
+#define  STM_ADC_CR2_JEXTSEL_TIM2_TRGO	2
+#define  STM_ADC_CR2_JEXTSEL_TIM2_CC1	3
+#define  STM_ADC_CR2_JEXTSEL_TIM3_CC4	4
+#define  STM_ADC_CR2_JEXTSEL_TIM4_TRGO	5
+#define  STM_ADC_CR2_JEXTSEL_EXTI_15	6
+#define  STM_ADC_CR2_JEXTSEL_JSWSTART	7
+#define  STM_ADC_CR2_JEXTSEL_MASK	7UL
+#define STM_ADC_CR2_ALIGN	11
+#define STM_ADC_CR2_DMA		8
+#define STM_ADC_CR2_RSTCAL	3
+#define STM_ADC_CR2_CAL		2
+#define STM_ADC_CR2_CONT	1
+#define STM_ADC_CR2_ADON	0
+
+struct stm_exti {
+	vuint32_t	imr;
+	vuint32_t	emr;
+	vuint32_t	rtsr;
+	vuint32_t	ftsr;
+
+	vuint32_t	swier;
+	vuint32_t	pr;
+};
+
+extern struct stm_exti stm_exti;
+
+#define stm_exti	(*((struct stm_exti *) 0x40010400))
+
+static inline void
+stm_exticr_set(struct stm_gpio *gpio, int pin) {
+	uint8_t	reg = (uint8_t) (pin >> 2);
+	uint8_t	shift = (pin & 3) << 2;
+	uint8_t	val = 0;
+
+	/* Enable AFIO */
+	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_AFIOEN);
+
+	if (gpio == &stm_gpioa)
+		val = STM_AFIO_EXTICR_PA;
+	else if (gpio == &stm_gpiob)
+		val = STM_AFIO_EXTICR_PB;
+	else if (gpio == &stm_gpioc)
+		val = STM_AFIO_EXTICR_PC;
+	else if (gpio == &stm_gpiod)
+		val = STM_AFIO_EXTICR_PD;
+	else if (gpio == &stm_gpioe)
+		val = STM_AFIO_EXTICR_PE;
+
+	stm_afio.exticr[reg] = (stm_afio.exticr[reg] & (uint32_t) ~(0xf << shift)) | val << shift;
+}
+
+struct stm_tim234 {
+	vuint32_t	cr1;
+	vuint32_t	cr2;
+	vuint32_t	smcr;
+	vuint32_t	dier;
+
+	vuint32_t	sr;
+	vuint32_t	egr;
+	vuint32_t	ccmr1;
+	vuint32_t	ccmr2;
+
+	vuint32_t	ccer;
+	vuint32_t	cnt;
+	vuint32_t	psc;
+	vuint32_t	arr;
+
+	uint32_t	reserved_30;
+	vuint32_t	ccr1;
+	vuint32_t	ccr2;
+	vuint32_t	ccr3;
+
+	vuint32_t	ccr4;
+	uint32_t	reserved_44;
+	vuint32_t	dcr;
+	vuint32_t	dmar;
+};
+
+extern struct stm_tim234 stm_tim2, stm_tim3, stm_tim4;
+
+#define stm_tim2	(*((struct stm_tim234 *) 0x40000000))
+#define stm_tim3	(*((struct stm_tim234 *) 0x40000400))
+#define stm_tim4	(*((struct stm_tim234 *) 0x40000800))
+
+#define STM_TIM234_CR1_CKD	8
+#define  STM_TIM234_CR1_CKD_1		0
+#define  STM_TIM234_CR1_CKD_2		1
+#define  STM_TIM234_CR1_CKD_4		2
+#define  STM_TIM234_CR1_CKD_MASK	3UL
+#define STM_TIM234_CR1_ARPE	7
+#define STM_TIM234_CR1_CMS	5
+#define  STM_TIM234_CR1_CMS_EDGE	0
+#define  STM_TIM234_CR1_CMS_CENTER_1	1
+#define  STM_TIM234_CR1_CMS_CENTER_2	2
+#define  STM_TIM234_CR1_CMS_CENTER_3	3
+#define  STM_TIM234_CR1_CMS_MASK	3UL
+#define STM_TIM234_CR1_DIR	4
+#define  STM_TIM234_CR1_DIR_UP		0
+#define  STM_TIM234_CR1_DIR_DOWN	1
+#define STM_TIM234_CR1_OPM	3
+#define STM_TIM234_CR1_URS	2
+#define STM_TIM234_CR1_UDIS	1
+#define STM_TIM234_CR1_CEN	0
+
+#define STM_TIM234_CR2_TI1S	7
+#define STM_TIM234_CR2_MMS	4
+#define  STM_TIM234_CR2_MMS_RESET		0
+#define  STM_TIM234_CR2_MMS_ENABLE		1
+#define  STM_TIM234_CR2_MMS_UPDATE		2
+#define  STM_TIM234_CR2_MMS_COMPARE_PULSE	3
+#define  STM_TIM234_CR2_MMS_COMPARE_OC1REF	4
+#define  STM_TIM234_CR2_MMS_COMPARE_OC2REF	5
+#define  STM_TIM234_CR2_MMS_COMPARE_OC3REF	6
+#define  STM_TIM234_CR2_MMS_COMPARE_OC4REF	7
+#define  STM_TIM234_CR2_MMS_MASK		7UL
+#define STM_TIM234_CR2_CCDS	3
+
+#define STM_TIM234_SMCR_ETP	15
+#define STM_TIM234_SMCR_ECE	14
+#define STM_TIM234_SMCR_ETPS	12
+#define  STM_TIM234_SMCR_ETPS_OFF		0
+#define  STM_TIM234_SMCR_ETPS_DIV_2	       	1
+#define  STM_TIM234_SMCR_ETPS_DIV_4		2
+#define  STM_TIM234_SMCR_ETPS_DIV_8		3
+#define  STM_TIM234_SMCR_ETPS_MASK		3UL
+#define STM_TIM234_SMCR_ETF	8
+#define  STM_TIM234_SMCR_ETF_NONE		0
+#define  STM_TIM234_SMCR_ETF_INT_N_2		1
+#define  STM_TIM234_SMCR_ETF_INT_N_4		2
+#define  STM_TIM234_SMCR_ETF_INT_N_8		3
+#define  STM_TIM234_SMCR_ETF_DTS_2_N_6		4
+#define  STM_TIM234_SMCR_ETF_DTS_2_N_8		5
+#define  STM_TIM234_SMCR_ETF_DTS_4_N_6		6
+#define  STM_TIM234_SMCR_ETF_DTS_4_N_8		7
+#define  STM_TIM234_SMCR_ETF_DTS_8_N_6		8
+#define  STM_TIM234_SMCR_ETF_DTS_8_N_8		9
+#define  STM_TIM234_SMCR_ETF_DTS_16_N_5		10
+#define  STM_TIM234_SMCR_ETF_DTS_16_N_6		11
+#define  STM_TIM234_SMCR_ETF_DTS_16_N_8		12
+#define  STM_TIM234_SMCR_ETF_DTS_32_N_5		13
+#define  STM_TIM234_SMCR_ETF_DTS_32_N_6		14
+#define  STM_TIM234_SMCR_ETF_DTS_32_N_8		15
+#define  STM_TIM234_SMCR_ETF_MASK		15UL
+#define STM_TIM234_SMCR_MSM	7
+#define STM_TIM234_SMCR_TS	4
+#define  STM_TIM234_SMCR_TS_ITR0		0
+#define  STM_TIM234_SMCR_TS_ITR1		1
+#define  STM_TIM234_SMCR_TS_ITR2		2
+#define  STM_TIM234_SMCR_TS_ITR3		3
+#define  STM_TIM234_SMCR_TS_TI1F_ED		4
+#define  STM_TIM234_SMCR_TS_TI1FP1		5
+#define  STM_TIM234_SMCR_TS_TI2FP2		6
+#define  STM_TIM234_SMCR_TS_ETRF		7
+#define  STM_TIM234_SMCR_TS_MASK		7UL
+#define STM_TIM234_SMCR_SMS	0
+#define  STM_TIM234_SMCR_SMS_DISABLE		0
+#define  STM_TIM234_SMCR_SMS_ENCODER_MODE_1	1
+#define  STM_TIM234_SMCR_SMS_ENCODER_MODE_2	2
+#define  STM_TIM234_SMCR_SMS_ENCODER_MODE_3	3
+#define  STM_TIM234_SMCR_SMS_RESET_MODE		4
+#define  STM_TIM234_SMCR_SMS_GATED_MODE		5
+#define  STM_TIM234_SMCR_SMS_TRIGGER_MODE	6
+#define  STM_TIM234_SMCR_SMS_EXTERNAL_CLOCK	7
+#define  STM_TIM234_SMCR_SMS_MASK		7UL
+
+#define STM_TIM234_DIER_TDE		14
+#define STM_TIM234_DIER_CC4DE		12
+#define STM_TIM234_DIER_CC3DE		11
+#define STM_TIM234_DIER_CC2DE		10
+#define STM_TIM234_DIER_CC1DE		9
+#define STM_TIM234_DIER_UDE		8
+
+#define STM_TIM234_DIER_TIE		6
+#define STM_TIM234_DIER_CC4IE		4
+#define STM_TIM234_DIER_CC3IE		3
+#define STM_TIM234_DIER_CC2IE		2
+#define STM_TIM234_DIER_CC1IE		1
+#define STM_TIM234_DIER_UIE		0
+
+#define STM_TIM234_SR_CC4OF	12
+#define STM_TIM234_SR_CC3OF	11
+#define STM_TIM234_SR_CC2OF	10
+#define STM_TIM234_SR_CC1OF	9
+#define STM_TIM234_SR_TIF	6
+#define STM_TIM234_SR_CC4IF	4
+#define STM_TIM234_SR_CC3IF	3
+#define STM_TIM234_SR_CC2IF	2
+#define STM_TIM234_SR_CC1IF	1
+#define STM_TIM234_SR_UIF	0
+
+#define STM_TIM234_EGR_TG	6
+#define STM_TIM234_EGR_CC4G	4
+#define STM_TIM234_EGR_CC3G	3
+#define STM_TIM234_EGR_CC2G	2
+#define STM_TIM234_EGR_CC1G	1
+#define STM_TIM234_EGR_UG	0
+
+#define STM_TIM234_CCMR1_OC2CE	15
+#define STM_TIM234_CCMR1_OC2M	12
+#define  STM_TIM234_CCMR1_OC2M_FROZEN			0
+#define  STM_TIM234_CCMR1_OC2M_SET_HIGH_ON_MATCH	1
+#define  STM_TIM234_CCMR1_OC2M_SET_LOW_ON_MATCH		2
+#define  STM_TIM234_CCMR1_OC2M_TOGGLE			3
+#define  STM_TIM234_CCMR1_OC2M_FORCE_LOW		4
+#define  STM_TIM234_CCMR1_OC2M_FORCE_HIGH		5
+#define  STM_TIM234_CCMR1_OC2M_PWM_MODE_1		6
+#define  STM_TIM234_CCMR1_OC2M_PWM_MODE_2		7
+#define  STM_TIM234_CCMR1_OC2M_MASK			7UL
+#define STM_TIM234_CCMR1_OC2PE	11
+#define STM_TIM234_CCMR1_OC2FE	10
+#define STM_TIM234_CCMR1_CC2S	8
+#define  STM_TIM234_CCMR1_CC2S_OUTPUT			0
+#define  STM_TIM234_CCMR1_CC2S_INPUT_TI2		1
+#define  STM_TIM234_CCMR1_CC2S_INPUT_TI1		2
+#define  STM_TIM234_CCMR1_CC2S_INPUT_TRC		3
+#define  STM_TIM234_CCMR1_CC2S_MASK			3UL
+
+#define STM_TIM234_CCMR1_OC1CE	7
+#define STM_TIM234_CCMR1_OC1M	4
+#define  STM_TIM234_CCMR1_OC1M_FROZEN			0
+#define  STM_TIM234_CCMR1_OC1M_SET_HIGH_ON_MATCH	1
+#define  STM_TIM234_CCMR1_OC1M_SET_LOW_ON_MATCH		2
+#define  STM_TIM234_CCMR1_OC1M_TOGGLE			3
+#define  STM_TIM234_CCMR1_OC1M_FORCE_LOW		4
+#define  STM_TIM234_CCMR1_OC1M_FORCE_HIGH		5
+#define  STM_TIM234_CCMR1_OC1M_PWM_MODE_1		6
+#define  STM_TIM234_CCMR1_OC1M_PWM_MODE_2		7
+#define  STM_TIM234_CCMR1_OC1M_MASK			7UL
+#define STM_TIM234_CCMR1_OC1PE	3
+#define STM_TIM234_CCMR1_OC1FE	2
+#define STM_TIM234_CCMR1_CC1S	0
+#define  STM_TIM234_CCMR1_CC1S_OUTPUT			0
+#define  STM_TIM234_CCMR1_CC1S_INPUT_TI1		1
+#define  STM_TIM234_CCMR1_CC1S_INPUT_TI2		2
+#define  STM_TIM234_CCMR1_CC1S_INPUT_TRC		3
+#define  STM_TIM234_CCMR1_CC1S_MASK			3UL
+
+#define STM_TIM234_CCMR1_IC2F	12
+#define  STM_TIM234_CCMR1_IC2F_NONE			0
+#define  STM_TIM234_CCMR1_IC2F_CK_INT_N_2		1
+#define  STM_TIM234_CCMR1_IC2F_CK_INT_N_4		2
+#define  STM_TIM234_CCMR1_IC2F_CK_INT_N_8		3
+#define  STM_TIM234_CCMR1_IC2F_DTS_2_N_6		4
+#define  STM_TIM234_CCMR1_IC2F_DTS_2_N_8		5
+#define  STM_TIM234_CCMR1_IC2F_DTS_4_N_6		6
+#define  STM_TIM234_CCMR1_IC2F_DTS_4_N_8		7
+#define  STM_TIM234_CCMR1_IC2F_DTS_8_N_6		8
+#define  STM_TIM234_CCMR1_IC2F_DTS_8_N_8		9
+#define  STM_TIM234_CCMR1_IC2F_DTS_16_N_5		10
+#define  STM_TIM234_CCMR1_IC2F_DTS_16_N_6		11
+#define  STM_TIM234_CCMR1_IC2F_DTS_16_N_8		12
+#define  STM_TIM234_CCMR1_IC2F_DTS_32_N_5		13
+#define  STM_TIM234_CCMR1_IC2F_DTS_32_N_6		14
+#define  STM_TIM234_CCMR1_IC2F_DTS_32_N_8		15
+#define STM_TIM234_CCMR1_IC2PSC	10
+#define  STM_TIM234_CCMR1_IC2PSC_NONE			0
+#define  STM_TIM234_CCMR1_IC2PSC_2			1
+#define  STM_TIM234_CCMR1_IC2PSC_4			2
+#define  STM_TIM234_CCMR1_IC2PSC_8			3
+#define STM_TIM234_CCMR1_IC1F	4
+#define  STM_TIM234_CCMR1_IC1F_NONE			0
+#define  STM_TIM234_CCMR1_IC1F_CK_INT_N_2		1
+#define  STM_TIM234_CCMR1_IC1F_CK_INT_N_4		2
+#define  STM_TIM234_CCMR1_IC1F_CK_INT_N_8		3
+#define  STM_TIM234_CCMR1_IC1F_DTS_2_N_6		4
+#define  STM_TIM234_CCMR1_IC1F_DTS_2_N_8		5
+#define  STM_TIM234_CCMR1_IC1F_DTS_4_N_6		6
+#define  STM_TIM234_CCMR1_IC1F_DTS_4_N_8		7
+#define  STM_TIM234_CCMR1_IC1F_DTS_8_N_6		8
+#define  STM_TIM234_CCMR1_IC1F_DTS_8_N_8		9
+#define  STM_TIM234_CCMR1_IC1F_DTS_16_N_5		10
+#define  STM_TIM234_CCMR1_IC1F_DTS_16_N_6		11
+#define  STM_TIM234_CCMR1_IC1F_DTS_16_N_8		12
+#define  STM_TIM234_CCMR1_IC1F_DTS_32_N_5		13
+#define  STM_TIM234_CCMR1_IC1F_DTS_32_N_6		14
+#define  STM_TIM234_CCMR1_IC1F_DTS_32_N_8		15
+#define STM_TIM234_CCMR1_IC1PSC	2
+#define  STM_TIM234_CCMR1_IC1PSC_NONE			0
+#define  STM_TIM234_CCMR1_IC1PSC_2			1
+#define  STM_TIM234_CCMR1_IC1PSC_4			2
+#define  STM_TIM234_CCMR1_IC1PSC_8			3
+
+#define STM_TIM234_CCMR2_OC4CE	15
+#define STM_TIM234_CCMR2_OC4M	12
+#define  STM_TIM234_CCMR2_OC4M_FROZEN			0
+#define  STM_TIM234_CCMR2_OC4M_SET_HIGH_ON_MATCH	1
+#define  STM_TIM234_CCMR2_OC4M_SET_LOW_ON_MATCH		2
+#define  STM_TIM234_CCMR2_OC4M_TOGGLE			3
+#define  STM_TIM234_CCMR2_OC4M_FORCE_LOW		4
+#define  STM_TIM234_CCMR2_OC4M_FORCE_HIGH		5
+#define  STM_TIM234_CCMR2_OC4M_PWM_MODE_1		6
+#define  STM_TIM234_CCMR2_OC4M_PWM_MODE_2		7
+#define  STM_TIM234_CCMR2_OC4M_MASK			7UL
+#define STM_TIM234_CCMR2_OC4PE	11
+#define STM_TIM234_CCMR2_OC4FE	10
+#define STM_TIM234_CCMR2_CC4S	8
+#define  STM_TIM234_CCMR2_CC4S_OUTPUT			0
+#define  STM_TIM234_CCMR2_CC4S_INPUT_TI4		1
+#define  STM_TIM234_CCMR2_CC4S_INPUT_TI3		2
+#define  STM_TIM234_CCMR2_CC4S_INPUT_TRC		3
+#define  STM_TIM234_CCMR2_CC4S_MASK			3UL
+
+#define STM_TIM234_CCMR2_OC3CE	7
+#define STM_TIM234_CCMR2_OC3M	4
+#define  STM_TIM234_CCMR2_OC3M_FROZEN			0
+#define  STM_TIM234_CCMR2_OC3M_SET_HIGH_ON_MATCH	1
+#define  STM_TIM234_CCMR2_OC3M_SET_LOW_ON_MATCH		2
+#define  STM_TIM234_CCMR2_OC3M_TOGGLE			3
+#define  STM_TIM234_CCMR2_OC3M_FORCE_LOW		4
+#define  STM_TIM234_CCMR2_OC3M_FORCE_HIGH		5
+#define  STM_TIM234_CCMR2_OC3M_PWM_MODE_1		6
+#define  STM_TIM234_CCMR2_OC3M_PWM_MODE_2		7
+#define  STM_TIM234_CCMR2_OC3M_MASK			7UL
+#define STM_TIM234_CCMR2_OC3PE	3
+#define STM_TIM234_CCMR2_OC3FE	2
+#define STM_TIM234_CCMR2_CC3S	0
+#define  STM_TIM234_CCMR2_CC3S_OUTPUT			0
+#define  STM_TIM234_CCMR2_CC3S_INPUT_TI3		1
+#define  STM_TIM234_CCMR2_CC3S_INPUT_TI4		2
+#define  STM_TIM234_CCMR2_CC3S_INPUT_TRC		3
+#define  STM_TIM234_CCMR2_CC3S_MASK			3UL
+
+#define STM_TIM234_CCER_CC4NP	15
+#define STM_TIM234_CCER_CC4P	13
+#define  STM_TIM234_CCER_CC4P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC4P_ACTIVE_LOW	1
+#define STM_TIM234_CCER_CC4E	12
+#define STM_TIM234_CCER_CC3NP	11
+#define STM_TIM234_CCER_CC3P	9
+#define  STM_TIM234_CCER_CC3P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC3P_ACTIVE_LOW	1
+#define STM_TIM234_CCER_CC3E	8
+#define STM_TIM234_CCER_CC2NP	7
+#define STM_TIM234_CCER_CC2P	5
+#define  STM_TIM234_CCER_CC2P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC2P_ACTIVE_LOW	1
+#define STM_TIM234_CCER_CC2E	4
+#define STM_TIM234_CCER_CC1NP	3
+#define STM_TIM234_CCER_CC1P	1
+#define  STM_TIM234_CCER_CC1P_ACTIVE_HIGH	0
+#define  STM_TIM234_CCER_CC1P_ACTIVE_LOW	1
+#define STM_TIM234_CCER_CC1E	0
 
 #define isr_decl(name) void stm_ ## name ## _isr(void)
 

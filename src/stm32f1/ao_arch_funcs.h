@@ -510,6 +510,14 @@ ao_spi_duplex(const void *out, void *in, uint16_t len, uint8_t spi_index);
 void
 ao_spi_init(void);
 
+#define ao_spi_init_cs(port, mask) do {					\
+		uint8_t __bit__;					\
+		for (__bit__ = 0; __bit__ < 32; __bit__++) {		\
+			if (mask & (1 << __bit__))			\
+				ao_enable_output(port, __bit__, 1); \
+		}							\
+	} while (0)
+
 #define ao_spi_set_cs(reg,mask) ((reg)->bsrr = ((uint32_t) (mask)) << 16)
 #define ao_spi_clr_cs(reg,mask) ((reg)->bsrr = (mask))
 
@@ -534,5 +542,23 @@ ao_spi_try_get_mask(struct stm_gpio *reg, uint16_t mask, uint8_t bus, uint32_t s
 
 #define ao_spi_get_bit(reg,bit,bus,speed) ao_spi_get_mask(reg,1<<(bit),bus,speed)
 #define ao_spi_put_bit(reg,bit,bus) ao_spi_put_mask(reg,1<<(bit),bus)
+
+void
+ao_i2c_get(uint8_t i2c_index);
+
+uint8_t
+ao_i2c_start(uint8_t i2c_index, uint16_t address);
+
+void
+ao_i2c_put(uint8_t i2c_index);
+
+uint8_t
+ao_i2c_send(void *block, uint16_t len, uint8_t i2c_index, uint8_t stop);
+
+uint8_t
+ao_i2c_recv(void *block, uint16_t len, uint8_t i2c_index, uint8_t stop);
+
+void
+ao_i2c_init(void);
 
 #endif /* _AO_ARCH_FUNCS_H_ */
