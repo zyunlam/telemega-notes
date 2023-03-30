@@ -30,6 +30,60 @@ static struct ao_mmc5983_sample	ao_mmc5983_offset;
 static uint8_t	ao_mmc5983_configured;
 
 #ifdef MMC5983_I2C
+#ifdef AO_MMC5983_I2C_INDEX
+
+static void
+ao_mmc5983_start(void) {
+	ao_i2c_get(AO_MMC5983_I2C_INDEX);
+}
+
+static void
+ao_mmc5983_stop(void) {
+	ao_i2c_put(AO_MMC5983_I2C_INDEX);
+}
+
+static void
+ao_mmc5983_reg_write(uint8_t addr, uint8_t data)
+{
+	uint8_t d[2];
+
+	d[0] = addr;
+	d[1] = data;
+
+	ao_mmc5983_start();
+	ao_i2c_start(AO_MMC5983_I2C_INDEX, MMC5983_I2C_ADDR);
+	ao_i2c_send(d, 2, AO_MMC5983_I2C_INDEX, true);
+	ao_mmc5983_stop();
+}
+
+static uint8_t
+ao_mmc5983_reg_read(uint8_t addr)
+{
+	uint8_t d[1];
+
+	ao_mmc5983_start();
+	ao_i2c_start(AO_MMC5983_I2C_INDEX, MMC5983_I2C_ADDR);
+	d[0] = addr;
+	ao_i2c_send(d, 1, AO_MMC5983_I2C_INDEX, false);
+	ao_i2c_start(AO_MMC5983_I2C_INDEX, MMC5983_I2C_ADDR | 1);
+	ao_i2c_recv(d, 1, AO_MMC5983_I2C_INDEX, true);
+	ao_mmc5983_stop();
+	return d[0];
+}
+
+static void
+ao_mmc5983_raw(struct ao_mmc5983_raw *raw)
+{
+	ao_mmc5983_start();
+	ao_i2c_start(AO_MMC5983_I2C_INDEX, MMC5983_I2C_ADDR);
+	raw->addr = MMC5983_X_OUT_0;
+	ao_i2c_send(&(raw->addr), 1, AO_MMC5983_I2C_INDEX, false);
+	ao_i2c_start(AO_MMC5983_I2C_INDEX, MMC5983_I2C_ADDR | 1);
+	ao_i2c_recv(&(raw->x0), sizeof(*raw) - 1, AO_MMC5983_I2C_INDEX, true);
+	ao_mmc5983_stop();
+}
+
+#else
 #include <ao_i2c_bit.h>
 
 static void
@@ -69,6 +123,8 @@ ao_mmc5983_raw(struct ao_mmc5983_raw *raw)
 	ao_i2c_bit_recv(&(raw->x0), sizeof(*raw) - 1);
 	ao_i2c_bit_stop();
 }
+
+#endif
 
 #else
 #define AO_MMC5983_SPI_SPEED	ao_spi_speed(2000000)
@@ -356,9 +412,7 @@ ao_mmc5983_init(void)
 {
 	ao_mmc5983_configured = 0;
 
-#ifdef MMC5983_I2C
-	ao_enable_output(AO_MMC5983_SPI_CS_PORT, AO_MMC5983_SPI_CS_PIN, 1);
-#else
+#ifndef MMC5983_I2C
 	ao_enable_input(AO_MMC5983_SPI_MISO_PORT,
 			AO_MMC5983_SPI_MISO_PIN,
 			AO_EXTI_MODE_PULL_NONE);
