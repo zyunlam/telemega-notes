@@ -94,6 +94,7 @@
  */
 
 #define AO_SERIAL_SPEED_UBLOX	AO_SERIAL_SPEED_9600
+#define AO_UBLOX_VERSION	10
 
 /*
  * Radio (cc1200)

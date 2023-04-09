@@ -15,6 +15,7 @@ INC = \
 	ao_task.h \
 	ao_whiten.h \
 	ao_cc115l.h \
+	ao_gps_ublox.h \
 	ao_fec.h \
 	lpc.h \
 	Makefile
