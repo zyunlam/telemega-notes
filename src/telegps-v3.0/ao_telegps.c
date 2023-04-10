@@ -25,6 +25,8 @@ main(void)
 {
 	ao_clock_init();
 
+	ao_led_init();
+
 	ao_task_init();
 	ao_timer_init();
 

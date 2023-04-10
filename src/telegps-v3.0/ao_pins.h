@@ -68,6 +68,7 @@
 #define LED_0_PIN		25
 #define AO_LED_GREEN		(1 << 0)
 #define AO_LED_PANIC		AO_LED_GREEN
+#define AO_LED_GPS_LOCK		AO_LED_GREEN
 
 /* Radio */
 #define HAS_SPI_0		1
