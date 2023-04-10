@@ -3,6 +3,8 @@
 #
 #
 
+RAMSIZE=6k
+
 include ../lpc/Makefile.defs
 
 INC = \
