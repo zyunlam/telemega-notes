@@ -402,6 +402,32 @@ public class TeleGPSConfigUI
 		set_radio_enable_tool_tip();
 		row++;
 
+		/* Report feet */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		report_feet_label = new JLabel("Beep max height in:");
+		pane.add(report_feet_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		report_feet_value = new JComboBox<String>(report_feet_values);
+		report_feet_value.setEditable(false);
+		report_feet_value.addItemListener(this);
+		pane.add(report_feet_value, c);
+		set_report_feet_tool_tip();
+		row++;
+
 		/* Radio 10mW limit */
 		c = new GridBagConstraints();
 		c.gridx = 0; c.gridy = row;
