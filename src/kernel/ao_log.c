@@ -273,6 +273,8 @@ ao_log_scan(void)
 	/* Get any existing flight number */
 	ao_flight_number = ao_log_max_flight();
 
+	ao_storage_setup();
+
 #if FLIGHT_LOG_APPEND
 
 	/* Deal with older OS versions which stored multiple

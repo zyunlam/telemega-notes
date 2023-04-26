@@ -49,9 +49,10 @@ class AltosIdler {
 	static final int	idle_sensor_tmini2 = 105;
 	static final int	idle_sensor_tgps1 = 106;
 	static final int	idle_sensor_tgps2 = 107;
-	static final int	idle_sensor_tmini3 = 108;
-	static final int	idle_sensor_easytimer1 = 109;
-	static final int	idle_sensor_easymotor2 = 110;
+	static final int	idle_sensor_tgps3 = 108;
+	static final int	idle_sensor_tmini3 = 109;
+	static final int	idle_sensor_easytimer1 = 110;
+	static final int	idle_sensor_easymotor2 = 111;
 
 	public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
@@ -118,6 +119,9 @@ class AltosIdler {
 				break;
 			case idle_sensor_tgps2:
 				AltosSensorTGPS2.provide_data(listener, link);
+				break;
+			case idle_sensor_tgps3:
+				AltosSensorTGPS3.provide_data(listener, link);
 				break;
 			case idle_sensor_tmini3:
 				AltosSensorTMini3.provide_data(listener, link);
@@ -246,6 +250,9 @@ public class AltosIdleFetch implements AltosDataProvider {
 		new AltosIdler("TeleGPS-v2",
 			       AltosIdler.idle_gps,
 			       AltosIdler.idle_sensor_tgps2),
+		new AltosIdler("TeleGPS-v3",
+			       AltosIdler.idle_gps,
+			       AltosIdler.idle_sensor_tgps3),
 		new AltosIdler("EasyTimer-v1",
 			       AltosIdler.idle_imu_et_v1,
 			       AltosIdler.idle_sensor_easytimer1),

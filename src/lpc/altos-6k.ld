@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Keith Packard <keithp@keithp.com>
+ * Copyright © 2012 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,47 +16,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-#include <ao.h>
-#include <ao_exti.h>
-#include <ao_tracker.h>
+__flash = 0x1000;
+__flash_size = 28K;
+__ram = 0x10000000;
+__ram_size = 6k;
+__stack_size = 128;
 
-int
-main(void)
-{
-	ao_clock_init();
-
-	ao_led_init();
-
-	ao_task_init();
-	ao_timer_init();
-
-	ao_spi_init();
-	ao_exti_init();
-
-	ao_storage_init();
-
-	ao_serial_init();
-
-	ao_cmd_init();
-
-	ao_usb_init();
-	ao_radio_init();
-
-#if HAS_ADC
-	ao_adc_init();
-#endif
-
-	ao_gps_init();
-#if HAS_LOG
-	ao_log_init();
-#endif
-
-	ao_tracker_init();
-
-	ao_telemetry_init();
-
-	ao_config_init();
-
-	ao_start_scheduler();
-	return 0;
-}
+INCLUDE registers.ld
+INCLUDE picolibc.ld

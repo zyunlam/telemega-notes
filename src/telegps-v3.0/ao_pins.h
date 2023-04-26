@@ -68,6 +68,7 @@
 #define LED_0_PIN		25
 #define AO_LED_GREEN		(1 << 0)
 #define AO_LED_PANIC		AO_LED_GREEN
+#define AO_LED_GPS_LOCK		AO_LED_GREEN
 
 /* Radio */
 #define HAS_SPI_0		1
@@ -94,6 +95,7 @@
  */
 
 #define AO_SERIAL_SPEED_UBLOX	AO_SERIAL_SPEED_9600
+#define AO_UBLOX_VERSION	10
 
 /*
  * Radio (cc1200)
