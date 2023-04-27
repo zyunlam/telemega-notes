@@ -47,20 +47,20 @@ esac
 #
 # Use released versions of everything
 #
-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telegps-v1.0-altos-flash-*.elf
-ALTOS_FILE=~/altusmetrumllc/Binaries/telegps-v1.0-*.elf
+FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telegps-v3.0-altos-flash-*.elf
+ALTOS_FILE=~/altusmetrumllc/Binaries/telegps-v3.0-*.elf
 
 echo $FLASH_LPC $FLASH_FILE
 
 $FLASH_LPC $FLASH_FILE || exit 1
 
-sleep 2
+sleep 1
 
 echo $USBLOAD $ALTOS_FILE
 
 $USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 
-sleep 2
+sleep 1
 
 dev=`ao-list | awk '/TeleGPS-v'"$VERSION"'/ { print $3; exit(0); }'`
 
