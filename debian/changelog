@@ -1,3 +1,69 @@
+altos (1.9.16-1) unstable; urgency=medium
+
+  [ Keith Packard ]
+  * altos: Fill in more of the draw code
+  * altos/draw: Add poly fill function
+  * altos/draw: Only cover ASCII
+  * altos/draw: Make test drawing app emulate TeleLCO
+  * altos/draw: Use float for polygon coords
+  * altos/draw: Add logo
+  * altos/draw: Add more fonts
+  * altos/draw: Move font files to subdirectory
+  * altos/draw: Add monospaced font
+  * altos/draw: Convert draw test framework to modern C
+  * altos/draw: Add transforms to polygon code
+  * altos/draw: Add NotoMono font
+  * altos/draw: Rearrange sample LCO screen in draw-test
+  * altos/draw: use --gc-sections in demo program
+  * altos/draw: Mock up TeleLCO boot sequence
+  * altos/draw: Rename test app to 'lco-test'
+  * altos/draw: Add validation for line drawing
+  * altos/draw: Check for horiz/vert line when clipping
+  * altos/draw: Fix clipping far line end
+  * altos/draw: Inline span fill for polygons
+  * altos/draw: Split out draw test scaffolding from lco-test.c
+  * altos/draw: Add line test app
+  * altos/draw: Use fewer fonts in lco sample
+  * altos/draw: hand-edit 64-pixel 3/5 to avoid jank
+  * altos/draw: Add damage tracking
+  * altos/draw: Add vera sans fonts
+  * altos/draw: Use <> for include files
+  * altos/draw: Use bitstream fonts for LCO demo
+  * altos/draw: Use damage for lco demo
+  * altos: Allow ports to use type other than 'void *' for gpio block
+  * altos/lpc: Support UART on pio1_13/pio1_14
+  * altos: Add TeleGPS v3.0 support
+  * altos: Build TeleGPS v3.0 by default
+  * altos/lpc: Add support for eeprom on 2x/3x chips
+  * altos/telegps-v3.0: Use eeprom for config
+  * altos/lpc: Validate UART pin config
+  * altos/lpcxpresso: Update for 11u24 board
+  * altos/telegps-v3.0: Fix SPI bus usage
+  * altoslib: Support TeleGPS v3 monitor idle
+  * altoslib: Parse more GPS monitor data
+  * altos/drivers: Support uBlox Max 10 chips
+  * altos: Dump GPS dop/course data from 'g' command
+  * altos/telegps-v3.0: Use new MAX 10 support in uBlox driver
+  * altos: Make sure storage is setup before starting log
+  * altos/lpc: Support 6k ram targets
+  * altos/telegps-v3.0: Use all 6kB of available ram
+  * altos/telegps-v3.0: Get LED blinking when GPS locks
+  * telegps: Add unit setting to device configuration dialog
+  * altos/stmf0: Remove some incorrect defines in stm32f0.h
+  * altos/stm32f04x: Smite the OPL_LAUNCH bit to reset boot config
+  * Version 1.9.15.1
+  * doc: Add 1.9.16 release notes
+  * Add TeleGPS v3.0 firmware
+  * altosdroid: Deal with Google requiring API version 31
+  * Version 1.9.16
+
+  [ Bdale Garbee ]
+  * add production scripts for TeleGPS v3.0
+  * update TeleGPS v3.0 production script to flash correct firmware versions
+  * updte ChangeLog for 1.9.16 release
+
+ -- Bdale Garbee <bdale@gag.com>  Thu, 27 Apr 2023 23:55:05 -0600
+
 altos (1.9.15-1) unstable; urgency=medium
 
   [ Keith Packard ]
