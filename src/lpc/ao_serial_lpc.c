@@ -156,6 +156,19 @@ ao_serial_init(void)
 			      (0 << LPC_IOCONF_HYS) |
 			      (0 << LPC_IOCONF_INV) |
 			      (0 << LPC_IOCONF_OD));
+#elif SERIAL_1_13_14
+	lpc_ioconf.pio1_13 = ((LPC_IOCONF_FUNC_PIO1_13_TXD << LPC_IOCONF_FUNC) |
+			      (LPC_IOCONF_MODE_INACTIVE << LPC_IOCONF_MODE) |
+			      (0 << LPC_IOCONF_HYS) |
+			      (0 << LPC_IOCONF_INV) |
+			      (0 << LPC_IOCONF_OD));
+	lpc_ioconf.pio1_14 = ((LPC_IOCONF_FUNC_PIO1_14_RXD << LPC_IOCONF_FUNC) |
+			      (LPC_IOCONF_MODE_INACTIVE << LPC_IOCONF_MODE) |
+			      (0 << LPC_IOCONF_HYS) |
+			      (0 << LPC_IOCONF_INV) |
+			      (0 << LPC_IOCONF_OD));
+#else
+#error No serial pin configuration selected
 #endif
 
 	/* Turn on the USART */

@@ -24,6 +24,10 @@
 
 #define AO_UBLOX_DEBUG 0
 
+#ifndef AO_UBLOX_VERSION
+#define AO_UBLOX_VERSION	8
+#endif
+
 #include <stdarg.h>
 
 uint8_t ao_gps_new;
@@ -69,7 +73,7 @@ static uint16_t ao_ublox_len;
 #define DBG_CHAR	2
 #define DBG_INIT	4
 
-static uint8_t ao_gps_dbg_enable = DBG_PROTO|DBG_CHAR|DBG_INIT;
+static uint8_t ao_gps_dbg_enable = 0;
 
 static void ao_gps_dbg(int level, char *format, ...) {
 	va_list a;
@@ -175,7 +179,7 @@ static void ublox_u8(uint8_t offset)
 	*ptr = val;
 }
 
-static void ublox_u32(uint8_t offset) 
+static void ublox_u32(uint8_t offset)
 {
 	uint32_t *ptr = (uint32_t *) (void *) (ublox_target + offset);
 	uint32_t val;
@@ -205,7 +209,7 @@ struct ublox_packet_parse {
 };
 
 static void
-ao_ublox_parse(void *target, const struct ublox_packet_parse *parse) 
+ao_ublox_parse(void *target, const struct ublox_packet_parse *parse)
 {
 	uint8_t	i, offset;
 
@@ -258,6 +262,39 @@ ao_ublox_parse_nav_dop(void)
 	ao_ublox_parse(&nav_dop, nav_dop_packet);
 }
 
+static const struct ublox_packet_parse ack_ack_packet[] = {
+	{ UBLOX_DISCARD, 2 },					/* 0 class ID, msg ID */
+	{ UBLOX_END, 0 },
+};
+
+static void
+ao_ublox_parse_ack_ack(void)
+{
+	ao_ublox_parse(NULL, ack_ack_packet);
+}
+
+static struct ack_nak {
+	uint8_t	class_id;
+	uint8_t	msg_id;
+} ack_nak;
+
+static const struct ublox_packet_parse ack_nak_packet[] = {
+	{ UBLOX_U8, offsetof(struct ack_nak, class_id) },	/* 0 class ID */
+	{ UBLOX_U8, offsetof(struct ack_nak, msg_id) },		/* 1 msg ID */
+	{ UBLOX_END, 0 },
+};
+
+static void
+ao_ublox_parse_ack_nak(void)
+{
+	ao_ublox_parse(&ack_nak, ack_nak_packet);
+#if AO_UBLOX_DEBUG
+	ao_gps_dbg(DBG_PROTO, "NAK class 0x%02x msg 0x%02x\n",
+		   ack_nak.class_id, ack_nak.msg_id);
+#endif
+}
+
+#if AO_UBLOX_VERSION < 10
 /*
  * NAV-POSLLH message parsing
  */
@@ -458,6 +495,171 @@ ao_ublox_parse_nav_velned(void)
 	ao_ublox_parse(&nav_velned, nav_velned_packet);
 }
 
+#else	/* AO_UBLOX_VERSION < 10 */
+
+/*
+ * NAV-PVT message parsing
+ */
+
+static struct nav_pvt {
+	uint16_t	year;
+	uint8_t		month;
+	uint8_t		day;
+	uint8_t		hour;
+	uint8_t		min;
+	uint8_t		sec;
+	uint8_t		valid;
+	int32_t		nano;
+	uint8_t		flags;
+	uint8_t		num_sv;
+	int32_t		lat;
+	int32_t		lon;
+	int32_t		alt_msl;
+	int32_t		vel_d;
+	int32_t		g_speed;
+	int32_t		heading;
+} nav_pvt;
+
+static const struct ublox_packet_parse nav_pvt_packet[] = {
+	{ UBLOX_DISCARD, 4 },						/* 0 iTOW */
+	{ UBLOX_U16, offsetof(struct nav_pvt, year) },			/* 4 year */
+	{ UBLOX_U8, offsetof(struct nav_pvt, month) },			/* 6 month */
+	{ UBLOX_U8, offsetof(struct nav_pvt, day) },			/* 7 day */
+	{ UBLOX_U8, offsetof(struct nav_pvt, hour) },			/* 8 hour */
+	{ UBLOX_U8, offsetof(struct nav_pvt, min) },			/* 9 min */
+	{ UBLOX_U8, offsetof(struct nav_pvt, sec) },			/* 10 sec */
+	{ UBLOX_U8, offsetof(struct nav_pvt, valid) },			/* 11 valid */
+	{ UBLOX_DISCARD, 4 },						/* 12 tAcc */
+	{ UBLOX_U32, offsetof(struct nav_pvt, nano) },			/* 16 nano */
+	{ UBLOX_DISCARD, 1 },						/* 20 fixType */
+	{ UBLOX_U8, offsetof(struct nav_pvt, flags) },			/* 21 gpsFix */
+	{ UBLOX_DISCARD, 1 },						/* 22 flags2 */
+	{ UBLOX_U8, offsetof(struct nav_pvt, num_sv) },			/* 23 numSV */
+	{ UBLOX_U32, offsetof(struct nav_pvt, lon) },			/* 24 Longitude */
+	{ UBLOX_U32, offsetof(struct nav_pvt, lat) },			/* 28 Latitude */
+	{ UBLOX_DISCARD, 4 },						/* 32 height above ellipsoid */
+	{ UBLOX_U32, offsetof(struct nav_pvt, alt_msl) },		/* 36 Height above mean sea level */
+	{ UBLOX_DISCARD, 16 },						/* 40 hAcc, vAcc, velN, velE */
+	{ UBLOX_U32, offsetof(struct nav_pvt, vel_d) },			/* 56 velD */
+	{ UBLOX_U32, offsetof(struct nav_pvt, g_speed) },		/* 60 gSpeed */
+	{ UBLOX_U32, offsetof(struct nav_pvt, heading) },		/* 64 headMot */
+	{ UBLOX_DISCARD, 92 - 68 },					/* 68 sAcc .. magAcc  */
+	{ UBLOX_END, 0 }
+};
+
+#define NAV_PVT_VALID_DATE		0
+#define NAV_PVT_VALID_TIME		1
+#define NAV_PVT_VALID_FULLY_RESOLVED	2
+#define NAV_PVT_VALID_MAG		3
+
+#define NAV_PVT_FLAGS_GNSSFIXOK		0
+#define NAV_PVT_FLAGS_DIFFSOLN		1
+#define NAV_PVT_FLAGS_PSM_STATE		2
+#define NAV_PVT_FLAGS_HEAD_VEH_VALID	5
+#define NAV_PVT_FLAGS_CARR_SOLN		6
+
+static void
+ao_ublox_parse_nav_pvt(void)
+{
+	ao_ublox_parse(&nav_pvt, nav_pvt_packet);
+#if AO_UBLOX_DEBUG
+	ao_gps_dbg(DBG_PROTO, "\t%d-%d-%d %02d:%02d:%02d %ld (%02x)\n",
+		   nav_pvt.year, nav_pvt.month, nav_pvt.day,
+		   nav_pvt.hour, nav_pvt.min, nav_pvt.sec,
+		   (long) nav_pvt.nano, nav_pvt.valid);
+	ao_gps_dbg(DBG_PROTO, "\tflags %02x numSV %d lon %ld lat %ld alt %ld\n",
+		   nav_pvt.flags, nav_pvt.num_sv,
+		   (long) nav_pvt.lon, (long) nav_pvt.lat, (long) nav_pvt.alt_msl);
+#endif
+}
+
+/*
+ * NAV-SAT message parsing
+ */
+
+static struct nav_sat {
+	uint8_t	num_svs;
+} nav_sat;
+
+static const struct ublox_packet_parse nav_sat_packet[] = {
+	{ UBLOX_DISCARD, 4 },						/* 0 iTOW */
+	{ UBLOX_DISCARD, 1 },						/* 4 version */
+	{ UBLOX_U8, offsetof(struct nav_sat, num_svs) },			/* 4 numSvs */
+	{ UBLOX_DISCARD, 2 },						/* 6 reserved0 */
+	{ UBLOX_END, 0 }
+};
+
+#define NAV_SAT_MAX_SAT		AO_TELEMETRY_SATELLITE_MAX_SAT
+
+static struct nav_sat_sat {
+	uint8_t svid;
+	uint8_t cno;
+} nav_sat_sat[NAV_SAT_MAX_SAT];
+
+static uint8_t	nav_sat_nsat;
+
+static struct nav_sat_real_sat {
+	uint8_t svid;
+	uint8_t cno;
+	uint32_t flags;
+} nav_sat_real_sat;
+
+static const struct ublox_packet_parse nav_sat_sat_packet[] = {
+	{ UBLOX_DISCARD, 1 },						/* 8 + 12*N gnssid */
+	{ UBLOX_U8, offsetof(struct nav_sat_real_sat, svid) },		/* 9 + 12*N svid */
+	{ UBLOX_U8, offsetof(struct nav_sat_real_sat, cno) },		/* 10 + 12*N cno */
+	{ UBLOX_DISCARD, 5 },						/* 11 + 12*N elev, azim, prRes */
+	{ UBLOX_U32, offsetof(struct nav_sat_real_sat, flags) },	/* 16 + 12*N flags */
+	{ UBLOX_END, 0 }
+};
+
+static uint32_t
+ao_ublox_sat_quality(struct nav_sat_real_sat *sat)
+{
+	return (sat->flags >> UBLOX_NAV_SAT_FLAGS_QUALITY) & UBLOX_NAV_SAT_FLAGS_QUALITY_MASK;
+}
+
+static uint32_t
+ao_ublox_sat_health(struct nav_sat_real_sat *sat)
+{
+	return (sat->flags >> UBLOX_NAV_SAT_FLAGS_SV_HEALTH) & UBLOX_NAV_SAT_FLAGS_SV_HEALTH_MASK;
+}
+
+static void
+ao_ublox_parse_nav_sat(void)
+{
+	uint8_t	nsat;
+	nav_sat_nsat = 0;
+
+	ao_ublox_parse(&nav_sat, nav_sat_packet);
+	for (nsat = 0; nsat < nav_sat.num_svs && ao_ublox_len >= 12; nsat++) {
+		ao_ublox_parse(&nav_sat_real_sat, nav_sat_sat_packet);
+		if (nav_sat_nsat < NAV_SAT_MAX_SAT &&
+		    ao_ublox_sat_health(&nav_sat_real_sat) == UBLOX_NAV_SAT_FLAGS_SV_HEALTH_HEALTHY &&
+		    ao_ublox_sat_quality(&nav_sat_real_sat) >= UBLOX_NAV_SAT_FLAGS_QUALITY_ACQUIRED)
+		{
+			nav_sat_sat[nav_sat_nsat].svid = nav_sat_real_sat.svid;
+			nav_sat_sat[nav_sat_nsat].cno = nav_sat_real_sat.cno;
+			nav_sat_nsat++;
+		}
+	}
+#if AO_UBLOX_DEBUG
+	ao_gps_dbg(DBG_PROTO, "sat num_svs %d\n", nav_sat.num_svs);
+	for (nsat = 0; nsat < nav_sat.num_svs; nsat++) {
+		if (nsat < NAV_SAT_MAX_SAT) {
+		ao_gps_dbg(DBG_PROTO, "\t%d: svid %d cno %d\n",
+			   nsat,
+			   nav_sat_sat[nsat].svid,
+			   nav_sat_sat[nsat].cno);
+		} else {
+			ao_gps_dbg(DBG_PROTO, "\t%d: skipped\n", nsat);
+		}
+	}
+#endif
+}
+
+#endif	/* else AO_UBLOX_VERSION < 10 */
+
 /*
  * Set the protocol mode and baud rate
  */
@@ -533,7 +735,7 @@ ao_ublox_putend(void)
 static void
 ao_ublox_set_message_rate(uint8_t class, uint8_t msgid, uint8_t rate)
 {
-	ao_ublox_putstart(0x06, 0x01, 3);
+	ao_ublox_putstart(UBLOX_CFG, UBLOX_CFG_MSG, 3);
 	ao_ublox_put_u8(class);
 	ao_ublox_put_u8(msgid);
 	ao_ublox_put_u8(rate);
@@ -575,7 +777,6 @@ ao_ublox_set_navigation_settings(uint16_t mask,
 	ao_ublox_putend();
 }
 
-
 /*
  * Disable all MON message
  */
@@ -597,12 +798,17 @@ static const uint8_t ublox_disable_nav[] = {
  * Enable enough messages to get all of the data we want
  */
 static const uint8_t ublox_enable_nav[] = {
-	UBLOX_NAV_DOP,
-	UBLOX_NAV_POSLLH,
-	UBLOX_NAV_SOL,
-	UBLOX_NAV_SVINFO,
-	UBLOX_NAV_VELNED,
-	UBLOX_NAV_TIMEUTC
+	UBLOX_NAV_DOP,		/* both */
+#if AO_UBLOX_VERSION >= 10
+	UBLOX_NAV_PVT,		/* new */
+	UBLOX_NAV_SAT,		/* new */
+#else
+	UBLOX_NAV_POSLLH,	/* both, but redundant with PVT */
+	UBLOX_NAV_SOL,		/* old */
+	UBLOX_NAV_SVINFO,	/* old */
+	UBLOX_NAV_VELNED,	/* both, but redundant with PVT */
+	UBLOX_NAV_TIMEUTC	/* both, but redundant with PVT */
+#endif
 };
 
 void
@@ -614,7 +820,7 @@ ao_gps_set_rate(uint8_t rate)
 }
 
 void
-ao_gps(void) 
+ao_gps(void)
 {
 	uint8_t			class, id;
 	struct ao_ublox_cksum	cksum;
@@ -670,6 +876,8 @@ ao_gps(void)
 		if (ao_ublox_len > 1023)
 			continue;
 
+		bool gps_ready = false;
+
 		switch (class) {
 		case UBLOX_NAV:
 			switch (id) {
@@ -677,7 +885,23 @@ ao_gps(void)
 				if (ao_ublox_len != 18)
 					break;
 				ao_ublox_parse_nav_dop();
+#if AO_UBLOX_VERSION >= 10
+				gps_ready = true;
+#endif
 				break;
+#if AO_UBLOX_VERSION >= 10
+			case UBLOX_NAV_PVT:
+				if (ao_ublox_len != 92)
+					break;
+				ao_ublox_parse_nav_pvt();
+				solution_tick = packet_start_tick;
+				break;
+			case UBLOX_NAV_SAT:
+				if (ao_ublox_len < 8)
+					break;
+				ao_ublox_parse_nav_sat();
+				break;
+#else
 			case UBLOX_NAV_POSLLH:
 				if (ao_ublox_len != 28)
 					break;
@@ -703,9 +927,24 @@ ao_gps(void)
 				if (ao_ublox_len != 20)
 					break;
 				ao_ublox_parse_nav_timeutc();
+				gps_ready = true;
 				break;
+#endif
 			}
 			break;
+		case UBLOX_ACK:
+			switch (id) {
+			case UBLOX_ACK_ACK:
+				if (ao_ublox_len != 2)
+					break;
+				ao_ublox_parse_ack_ack();
+				break;
+			case UBLOX_ACK_NAK:
+				if (ao_ublox_len != 2)
+					break;
+				ao_ublox_parse_ack_nak();
+				break;
+			}
 		}
 
 		if (ao_ublox_len != 0) {
@@ -719,73 +958,112 @@ ao_gps(void)
 		if (ao_ublox_cksum.a != cksum.a || ao_ublox_cksum.b != cksum.b)
 			continue;
 
-		switch (class) {
-		case UBLOX_NAV:
-			switch (id) {
-			case UBLOX_NAV_TIMEUTC:
-				ao_mutex_get(&ao_gps_mutex);
-				ao_gps_tick = solution_tick;
-				ao_gps_utc_tick = packet_start_tick + (AO_TICK_TYPE) AO_NS_TO_TICKS(nav_timeutc.nano);
-				ao_gps_data.flags = 0;
-				ao_gps_data.flags |= AO_GPS_RUNNING;
-				if (nav_sol.gps_fix & (1 << NAV_SOL_FLAGS_GPSFIXOK)) {
-					uint8_t	nsat = nav_sol.nsat;
-					ao_gps_data.flags |= AO_GPS_VALID | AO_GPS_COURSE_VALID;
-					if (nsat > 15)
-						nsat = 15;
-					ao_gps_data.flags |= nsat;
-				}
-				if (nav_timeutc.valid & (1 << NAV_TIMEUTC_VALID_UTC))
-					ao_gps_data.flags |= AO_GPS_DATE_VALID;
+		if (!gps_ready)
+			continue;
 
-				AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_data, nav_posllh.alt_msl / 1000);
-				ao_gps_data.latitude = nav_posllh.lat;
-				ao_gps_data.longitude = nav_posllh.lon;
+		ao_mutex_get(&ao_gps_mutex);
+		ao_gps_data.flags = 0;
+		ao_gps_data.flags |= AO_GPS_RUNNING;
+		ao_gps_tick = solution_tick;
 
-				ao_gps_data.year = (uint8_t) (nav_timeutc.year - 2000);
-				ao_gps_data.month = nav_timeutc.month;
-				ao_gps_data.day = nav_timeutc.day;
+		/* we report dop scaled by 10, but ublox provides dop scaled by 100
+		 */
+		ao_gps_data.pdop = (uint8_t) (nav_dop.pdop / 10);
+		ao_gps_data.hdop = (uint8_t) (nav_dop.hdop / 10);
+		ao_gps_data.vdop = (uint8_t) (nav_dop.vdop / 10);
 
-				ao_gps_data.hour = nav_timeutc.hour;
-				ao_gps_data.minute = nav_timeutc.min;
-				ao_gps_data.second = nav_timeutc.sec;
-
-				/* we report dop scaled by 10, but ublox provides dop scaled by 100
-				 */
-				ao_gps_data.pdop = (uint8_t) (nav_dop.pdop / 10);
-				ao_gps_data.hdop = (uint8_t) (nav_dop.hdop / 10);
-				ao_gps_data.vdop = (uint8_t) (nav_dop.vdop / 10);
-
-				ao_gps_data.ground_speed = (uint16_t) nav_velned.g_speed;
-				ao_gps_data.climb_rate = -(int16_t) nav_velned.vel_d;
-				ao_gps_data.course = (uint8_t) (nav_velned.heading / 200000);
-
-				ao_gps_tracking_data.channels = 0;
-
-				struct ao_telemetry_satellite_info *dst = &ao_gps_tracking_data.sats[0];
-				struct nav_svinfo_sat *src = &nav_svinfo_sat[0];
-
-				for (i = 0; i < nav_svinfo_nsat; i++) {
-					if (!(src->flags & (1 << NAV_SVINFO_SAT_FLAGS_UNHEALTHY)) &&
-					    src->quality >= NAV_SVINFO_SAT_QUALITY_ACQUIRED)
-					{
-						if (ao_gps_tracking_data.channels < AO_TELEMETRY_SATELLITE_MAX_SAT) {
-							dst->svid = src->svid;
-							dst->c_n_1 = src->cno;
-							dst++;
-							ao_gps_tracking_data.channels++;
-						}
-					}
-					src++;
-				}
-
-				ao_mutex_put(&ao_gps_mutex);
-				ao_gps_new = AO_GPS_NEW_DATA | AO_GPS_NEW_TRACKING;
-				ao_wakeup(&ao_gps_new);
-				break;
-			}
-			break;
+#if AO_UBLOX_VERSION >= 10
+		ao_gps_utc_tick = packet_start_tick + (AO_TICK_TYPE) AO_NS_TO_TICKS(nav_pvt.nano);
+		if (nav_pvt.flags & (1 << NAV_PVT_FLAGS_GNSSFIXOK)) {
+			uint8_t	nsat = nav_pvt.num_sv;
+			ao_gps_data.flags |= AO_GPS_VALID | AO_GPS_COURSE_VALID;
+			if (nsat > 15)
+				nsat = 15;
+			ao_gps_data.flags |= nsat;
 		}
+		if (nav_pvt.valid & (1 << NAV_PVT_VALID_DATE))
+			ao_gps_data.flags |= AO_GPS_DATE_VALID;
+		AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_data, nav_pvt.alt_msl / 1000);
+		ao_gps_data.latitude = nav_pvt.lat;
+		ao_gps_data.longitude = nav_pvt.lon;
+
+		ao_gps_data.year = (uint8_t) (nav_pvt.year - 2000);
+		ao_gps_data.month = nav_pvt.month;
+		ao_gps_data.day = nav_pvt.day;
+
+		ao_gps_data.hour = nav_pvt.hour;
+		ao_gps_data.minute = nav_pvt.min;
+		ao_gps_data.second = nav_pvt.sec;
+
+		/* ublox speeds are mm/s */
+		ao_gps_data.ground_speed = (uint16_t) (nav_pvt.g_speed / 10);
+		ao_gps_data.climb_rate = -(int16_t) (nav_pvt.vel_d / 10);
+		ao_gps_data.course = (uint8_t) (nav_pvt.heading / 200000);
+#else
+		ao_gps_utc_tick = packet_start_tick + (AO_TICK_TYPE) AO_NS_TO_TICKS(nav_timeutc.nano);
+		if (nav_sol.gps_fix & (1 << NAV_SOL_FLAGS_GPSFIXOK)) {
+			uint8_t	nsat = nav_sol.nsat;
+			ao_gps_data.flags |= AO_GPS_VALID | AO_GPS_COURSE_VALID;
+			if (nsat > 15)
+				nsat = 15;
+			ao_gps_data.flags |= nsat;
+		}
+		if (nav_timeutc.valid & (1 << NAV_TIMEUTC_VALID_UTC))
+			ao_gps_data.flags |= AO_GPS_DATE_VALID;
+
+		AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_data, nav_posllh.alt_msl / 1000);
+		ao_gps_data.latitude = nav_posllh.lat;
+		ao_gps_data.longitude = nav_posllh.lon;
+
+		ao_gps_data.year = (uint8_t) (nav_timeutc.year - 2000);
+		ao_gps_data.month = nav_timeutc.month;
+		ao_gps_data.day = nav_timeutc.day;
+
+		ao_gps_data.hour = nav_timeutc.hour;
+		ao_gps_data.minute = nav_timeutc.min;
+		ao_gps_data.second = nav_timeutc.sec;
+
+		/* ublox speeds are cm/s */
+		ao_gps_data.ground_speed = (uint16_t) nav_velned.g_speed;
+		ao_gps_data.climb_rate = -(int16_t) nav_velned.vel_d;
+		ao_gps_data.course = (uint8_t) (nav_velned.heading / 200000);
+#endif
+
+		ao_gps_tracking_data.channels = 0;
+
+		struct ao_telemetry_satellite_info *dst = &ao_gps_tracking_data.sats[0];
+#if AO_UBLOX_VERSION >= 10
+		struct nav_sat_sat *src = &nav_sat_sat[0];
+
+		for (i = 0; i < nav_sat_nsat; i++) {
+			if (ao_gps_tracking_data.channels < AO_TELEMETRY_SATELLITE_MAX_SAT) {
+				dst->svid = src->svid;
+				dst->c_n_1 = src->cno;
+				dst++;
+				ao_gps_tracking_data.channels++;
+			}
+			src++;
+		}
+#else
+		struct nav_svinfo_sat *src = &nav_svinfo_sat[0];
+
+		for (i = 0; i < nav_svinfo_nsat; i++) {
+			if (!(src->flags & (1 << NAV_SVINFO_SAT_FLAGS_UNHEALTHY)) &&
+			    src->quality >= NAV_SVINFO_SAT_QUALITY_ACQUIRED)
+			{
+				if (ao_gps_tracking_data.channels < AO_TELEMETRY_SATELLITE_MAX_SAT) {
+					dst->svid = src->svid;
+					dst->c_n_1 = src->cno;
+					dst++;
+					ao_gps_tracking_data.channels++;
+				}
+			}
+			src++;
+		}
+#endif
+		ao_mutex_put(&ao_gps_mutex);
+		ao_gps_new = AO_GPS_NEW_DATA | AO_GPS_NEW_TRACKING;
+		ao_wakeup(&ao_gps_new);
 	}
 }
 

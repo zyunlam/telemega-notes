@@ -15,19 +15,103 @@
 #ifndef _AO_DRAW_H_
 #define _AO_DRAW_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+#include "ao_font.h"
+#include "ao_box.h"
+
 struct ao_bitmap {
 	uint32_t	*base;
 	int16_t		stride;	/* in units */
 	int16_t		width;	/* in pixels */
 	int16_t		height;	/* in pixels */
+	struct ao_box	damage;
 };
+
+struct ao_coord {
+	float	x, y;
+};
+
+struct ao_transform {
+	float	x_scale, x_off;
+	float	y_scale, y_off;
+};
+
+static inline float ao_t_x(float x, float y, const struct ao_transform *t)
+{
+	(void) y;
+	return x * t->x_scale + t->x_off;
+}
+
+static inline int16_t ao_t_xi(float x, float y, const struct ao_transform *t)
+{
+	return (int16_t) (ao_t_x(x, y, t) + 0.5f);
+}
+
+static inline float ao_t_y(float x, float y, const struct ao_transform *t)
+{
+	(void) x;
+	return y * t->y_scale + t->y_off;
+}
+
+static inline int16_t ao_t_yi(float x, float y, const struct ao_transform *t)
+{
+	return (int16_t) (ao_t_y(x, y, t) + 0.5f);
+}
+
+static inline float ao_t_x_c(const struct ao_coord	*c,
+			     const struct ao_transform	*t)
+{
+	return ao_t_x(c->x, c->y, t);
+}
+
+static inline float ao_t_y_c(const struct ao_coord	*c,
+			     const struct ao_transform	*t)
+{
+	return ao_t_y(c->x, c->y, t);
+}
+
+static inline int16_t
+ao_stride(int16_t width)
+{
+	return (int16_t) ((width + 31) >> 5);
+}
+
+static inline int16_t
+ao_stride_bytes(int16_t width)
+{
+	return (int16_t) ((width + 7) >> 3);
+}
+
+static inline void
+ao_damage_set_empty(struct ao_bitmap *dst)
+{
+	ao_box_set_empty(&dst->damage);
+}
 
 struct ao_pattern {
 	uint8_t		pattern[8];
 };
 
+struct ao_glyph_metrics {
+	int8_t	width;
+	int8_t	height;
+	int8_t	x_off;
+	int8_t	y_off;
+	int8_t	advance;
+};
+
+struct ao_font {
+	const uint8_t	*bytes;
+	const uint16_t	*pos;
+	const struct ao_glyph_metrics *metrics;
+	int16_t	max_width;
+	int16_t	max_height;
+	int16_t	ascent;
+};
+
 void
-ao_copy(const struct ao_bitmap	*dst,
+ao_copy(struct ao_bitmap	*dst,
 	int16_t			dst_x,
 	int16_t			dst_y,
 	int16_t			width,
@@ -38,7 +122,7 @@ ao_copy(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_rect(const struct ao_bitmap	*dst,
+ao_rect(struct ao_bitmap	*dst,
 	int16_t			x,
 	int16_t			y,
 	int16_t			width,
@@ -47,7 +131,7 @@ ao_rect(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_pattern(const struct ao_bitmap	*dst,
+ao_pattern(struct ao_bitmap		*dst,
 	   int16_t			x,
 	   int16_t			y,
 	   int16_t			width,
@@ -58,7 +142,7 @@ ao_pattern(const struct ao_bitmap	*dst,
 	   uint8_t			rop);
 
 void
-ao_line(const struct ao_bitmap	*dst,
+ao_line(struct ao_bitmap	*dst,
 	int16_t			x1,
 	int16_t			y1,
 	int16_t			x2,
@@ -67,21 +151,30 @@ ao_line(const struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
-ao_text(const struct ao_bitmap	*dst,
+ao_poly(struct ao_bitmap		*dst,
+	const struct ao_coord		*coords,
+	uint16_t			ncoords,
+	const struct ao_transform	*transform,
+	uint32_t			fill,
+	uint8_t				rop);
+
+void
+ao_text(struct ao_bitmap	*dst,
+	const struct ao_font	*font,
 	int16_t			x,
 	int16_t			y,
 	char			*string,
 	uint32_t		fill,
 	uint8_t			rop);
 
-struct ao_font {
-	int	width;
-	int	height;
-	int	ascent;
-	int	descent;
-};
+void
+ao_logo(struct ao_bitmap		*dst,
+	const struct ao_transform	*transform,
+	const struct ao_font		*font,
+	uint32_t			fill,
+	uint8_t				rop);
 
-extern const struct ao_font ao_font;
+extern const struct ao_transform ao_identity;
 
 #define AO_SHIFT	5
 #define AO_UNIT		(1 << AO_SHIFT)

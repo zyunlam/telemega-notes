@@ -41,9 +41,11 @@
 #define __interrupt(n)
 #define __at(n)
 
-#define ao_arch_reboot() \
-	(stm_scb.aircr = ((STM_SCB_AIRCR_VECTKEY_KEY << STM_SCB_AIRCR_VECTKEY) | \
-			  (1 << STM_SCB_AIRCR_SYSRESETREQ)))
+static inline void ao_arch_reboot(void) {
+	stm_flash.cr = (1 << STM_FLASH_CR_OBL_LAUNCH);
+	stm_scb.aircr = ((STM_SCB_AIRCR_VECTKEY_KEY << STM_SCB_AIRCR_VECTKEY) |
+			 (1 << STM_SCB_AIRCR_SYSRESETREQ));
+}
 
 #define ao_arch_nop()		asm("nop")
 

@@ -1,9 +1,15 @@
 #!/usr/bin/nickle
 
+autoimport ParseArgs
+import File;
+
 typedef struct {
 	int[]	bytes;
 	int	width;
 	int	height;
+	int	x_off;
+	int	y_off;
+	int	advance;
 	int	encoding;
 	int	location;
 } glyph_t;
@@ -31,19 +37,24 @@ read_glyph(file f)
 			glyph.encoding = atoi(tokens[1]);
 			break;
 		case "DWIDTH":
-			glyph.width = atoi(tokens[1]);
+			glyph.advance = atoi(tokens[1]);
 			break;
 		case "BBX":
+			glyph.width = atoi(tokens[1]);
 			glyph.height = atoi(tokens[2]);
+			glyph.x_off = atoi(tokens[3]);
+			glyph.y_off = glyph.height + atoi(tokens[4]);
 			break;
 		case "ENDCHAR":
 			return glyph;
 		case "BITMAP":
-			while (!File::end(f)) {
+			int byte_stride = ceil(glyph.width/8);
+			for (int y = 0; y < glyph.height; y++) {
 				string l = fgets(f);
-				if (l == "ENDCHAR")
-					return glyph;
-				glyph.bytes[dim(glyph.bytes)] = atoi(l, 16);
+				for (int x = 0; x < byte_stride; x++) {
+					string v = String::substr(l, x * 2, 2);
+					glyph.bytes[dim(glyph.bytes)] = atoi(v, 16);
+				}
 			}
 			break;
 		}
@@ -90,22 +101,23 @@ flip_byte(int x)
 	return dest;
 }
 
-void print_font(font_t font) {
+void print_font(file out, font_t font, string font_name) {
 	int	width = font.glyphs[0].width;
 	int	height = font.glyphs[0].height;
-	int[256] pos = { -1 ... };
+	int	max_width = width;
+	int	max_height = height;
+	int[128] pos = { 0 ... };
 	int[...] bytes;
+	bool fixed_size = true;
 
-	if (false) {
 	for (int i = 1; i < dim(font.glyphs); i++) {
 		if (font.glyphs[i].width != width ||
 		   font.glyphs[i].height != height)
 		{
-			File::fprintf(stderr, "font not constant size, glyph %d is %dx%d\n",
-				      font.glyphs[i].encoding, font.glyphs[i].width, font.glyphs[i].height);
-			exit(1);
+			fixed_size = false;
 		}
-	}
+		max_width = max(max_width, font.glyphs[i].width);
+		max_height = max(max_height, font.glyphs[i].height);
 	}
 
 	if (font.default_char == -1)
@@ -113,9 +125,12 @@ void print_font(font_t font) {
 
 	/* build byte array */
 	for (int i = 0; i < dim(font.glyphs); i++) {
-		pos[font.glyphs[i].encoding] = dim(bytes);
-		for (int b = 0; b < dim(font.glyphs[i].bytes); b++)
-			bytes[dim(bytes)] = font.glyphs[i].bytes[b];
+		if (font.glyphs[i].encoding < dim(pos))
+		{
+			pos[font.glyphs[i].encoding] = dim(bytes);
+			for (int b = 0; b < dim(font.glyphs[i].bytes); b++)
+				bytes[dim(bytes)] = font.glyphs[i].bytes[b];
+		}
 	}
 
 	/* Fill in default glyph */
@@ -123,28 +138,114 @@ void print_font(font_t font) {
 		if (pos[i] == -1)
 			pos[i] = pos[font.default_char];
 
-	printf("static const uint8_t glyph_bytes[%d] = {", dim(bytes));
+	fprintf(out, "#include <ao_draw.h>\n");
+	fprintf(out, "static const uint8_t %s_bytes[%d] = {", font_name, dim(bytes));
 	for (int b = 0; b < dim(bytes); b++) {
 		if ((b & 15) == 0)
-			printf("\n\t");
-		printf("0x%02x, ", flip_byte(bytes[b]));
+			fprintf(out, "\n\t");
+		else
+			fprintf(out, " ");
+		fprintf(out, "0x%02x,", flip_byte(bytes[b]));
 	}
-	printf("\n};\n\n");
+	fprintf(out, "\n};\n\n");
 
-	printf("static const uint16_t glyph_pos[%d] = {", dim(pos));
+	fprintf(out, "static const uint16_t %s_pos[%d] = {", font_name, dim(pos));
 	for (int i = 0; i < dim(pos); i++) {
 		if ((i & 7) == 0)
-			printf("\n\t");
-		printf("%4d, ", pos[i]);
+			fprintf(out, "\n\t");
+		else
+			fprintf(out, " ");
+		fprintf(out, "%6d,", pos[i]);
 	}
-	printf("\n};\n\n");
+	fprintf(out, "\n};\n\n");
 
-	printf("#define GLYPH_WIDTH %d\n", width);
-	printf("#define GLYPH_HEIGHT %d\n", height);
-	printf("#define GLYPH_ASCENT %d\n", font.ascent);
+	fprintf(out, "#define GLYPH_WIDTH_MAX %d\n", max_width);
+	fprintf(out, "#define GLYPH_HEIGHT_MAX %d\n", max_height);
+	if (fixed_size) {
+		fprintf(out, "#define GLYPH_WIDTH %d\n", width);
+		fprintf(out, "#define GLYPH_HEIGHT %d\n", height);
+		fprintf(out, "#define GLYPH_ASCENT %d\n", font.ascent);
+	} else {
+		fprintf(out, "static const struct ao_glyph_metrics %s_metrics[%d] = {\n", font_name, dim(pos));
+		for (int i = 0; i < dim(pos); i++) {
+			int g = 0;
+			for (int j = 0; j < dim(font.glyphs); j++) {
+				if (font.glyphs[j].encoding == i) {
+					g = j;
+					break;
+				}
+			}
+			string c;
+			if (' ' <= i && i <= '~')
+				c = sprintf("%c", i);
+			else
+				c = sprintf("%02x", i);
+			fprintf(out, "    { .width = %d, .height = %d, .x_off = %d, .y_off = %d, .advance = %d }, /* %s */\n",
+			       font.glyphs[g].width, font.glyphs[g].height,
+			       font.glyphs[g].x_off, font.glyphs[g].y_off, font.glyphs[g].advance, c);
+		}
+		fprintf(out, "};\n");
+	}
+	fprintf(out, "const struct ao_font %s_font = {\n", font_name);
+	fprintf(out, "\t.bytes = %s_bytes,\n", font_name);
+	fprintf(out, "\t.pos = %s_pos,\n", font_name);
+	if (!fixed_size)
+		fprintf(out, "\t.metrics = %s_metrics,\n", font_name);
+	fprintf(out, "\t.max_width = %d,\n", max_width);
+	fprintf(out, "\t.max_height = %d,\n", max_height);
+	fprintf(out, "\t.ascent = %d,\n", font.ascent);
+	fprintf(out, "};\n");
 }
 
-twixt (file f = File::open(argv[1], "r"); File::close(f)) {
-       font_t font = read_font(f);
-       print_font(font);
+string
+to_c(string a)
+{
+	string r = "";
+	for (int i = String::rindex(a, "/") + 1; i < String::length(a); i++) {
+		int c = a[i];
+		if (c == '.')
+			break;
+		if (!(Ctype::isalnum(c) || c == '_'))
+			c = '_';
+		r += String::new(c);
+	}
+	if (!Ctype::isalpha(r[0]))
+		r = "_" + r;
+	return r;
+}
+
+void
+do_font(string name, file out)
+{
+	twixt (file f = File::open(name, "r"); File::close(f)) {
+		font_t font = read_font(f);
+		print_font(out, font, to_c(name));
+	}
+}
+
+argdesc argd = {
+	args = {
+		{
+			.var = (arg_var.arg_string) &(string output),
+			.name = "output",
+			.abbr = 'o',
+			.expr_name = "file",
+			.desc = "Output file name"
+		},
+	},
+	posn_args = {
+		{
+			var = (arg_var.arg_string) &(string input),
+			name = "input",
+		}
+	}
+};
+
+parseargs(&argd, &argv)
+
+if (is_uninit(&output))
+	do_font(input, stdout);
+else {
+	twixt(file f = File::open(output, "w"); File::close(f))
+		do_font(input, f);
 }

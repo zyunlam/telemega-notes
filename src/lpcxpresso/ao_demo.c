@@ -19,30 +19,37 @@
 #include <ao.h>
 #include <ao_usb.h>
 
+#if 0
+static void
+hello(void)
+{
+	for (;;) {
+		const char *s = "hello, world\r\n";
+		char c;
+		while ((c = *s++))
+			ao_serial0_putchar(c);
+	}
+}
+
+struct ao_task hello_task;
+#endif
+
 int
 main(void)
 {
-	int	i;
-	ao_led_init(LEDS_AVAILABLE);
-	ao_led_on(AO_LED_RED);
 	ao_clock_init();
 	ao_timer_init();
-	
+
+	ao_led_init();
+	ao_led_on(AO_LED_RED);
+
+	ao_task_init();
+
+//	ao_add_task(&hello_task, hello, "hello");
+
 	ao_serial_init();
 	ao_usb_init();
 	ao_cmd_init();
-	ao_task_init();
 
 	ao_start_scheduler();
-
-	for (;;) {
-		ao_led_off(AO_LED_RED);
-		for (;;)
-			if (ao_tick_count & 1)
-				break;
-		ao_led_on(AO_LED_RED);
-		for (;;)
-			if (!(ao_tick_count & 1))
-				break;
-	}
 }

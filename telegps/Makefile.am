@@ -111,11 +111,12 @@ FIRMWARE_TBT_3_0=$(top_srcdir)/src/telebt-v3.0/telebt-v3.0-$(VERSION).ihx
 FIRMWARE_TBT_4_0=$(top_srcdir)/src/telebt-v4.0/telebt-v4.0-$(VERSION).ihx
 FIRMWARE_TBT=$(FIRMWARE_TBT_3_0) $(FIRMWARE_TBT_4_0)
 
-FIRMWARE_TG_1_0=$(top_srcdir)/src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx
-FIRMWARE_TG_2_0=$(top_srcdir)/src/telegps-v2.0/telegps-v2.0-$(VERSION).ihx
-FIRMWARE_TG=$(FIRMWARE_TG_1_0) $(FIRMWARE_TG_2_0)
+FIRMWARE_TGPS_1_0=$(top_srcdir)/src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx
+FIRMWARE_TGPS_2_0=$(top_srcdir)/src/telegps-v2.0/telegps-v2.0-$(VERSION).ihx
+FIRMWARE_TGPS_3_0=$(top_srcdir)/src/telegps-v3.0/telegps-v3.0-$(VERSION).ihx
+FIRMWARE_TGPS=$(FIRMWARE_TGPS_1_0) $(FIRMWARE_TGPS_2_0) $(FIRMWARE_TGPS_3_0)
 
-FIRMWARE=$(FIRMWARE_TG) $(FIRMWARE_TD) $(FIRMWARE_TBT)
+FIRMWARE=$(FIRMWARE_TGPS) $(FIRMWARE_TD) $(FIRMWARE_TBT)
 
 desktopdir = $(datadir)/applications
 desktop_file = altusmetrum-telegps.desktop

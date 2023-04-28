@@ -35,6 +35,9 @@ ao_gps_show(void)
 #else
 	printf ("Alt: %d\n", AO_TELEMETRY_LOCATION_ALTITUDE(&ao_gps_data));
 #endif
+	printf ("Pdop/Hdop/Vdop: %u %u %u\n", ao_gps_data.pdop, ao_gps_data.hdop, ao_gps_data.vdop);
+	printf ("Ground Speed/Climb Rate/Course: %u %d %u\n", ao_gps_data.ground_speed,
+		ao_gps_data.climb_rate, ao_gps_data.course);
 	printf ("Flags: 0x%x\n", ao_gps_data.flags);
 	printf ("Sats: %d", ao_gps_tracking_data.channels);
 	for (i = 0; i < ao_gps_tracking_data.channels; i++)

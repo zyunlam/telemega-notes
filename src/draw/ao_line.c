@@ -12,9 +12,8 @@
  * General Public License for more details.
  */
 
-#include "ao.h"
-#include "ao_draw.h"
-#include "ao_draw_int.h"
+#include <ao_draw.h>
+#include <ao_draw_int.h>
 
 #define ao_mask(x,w)	(ao_right(AO_ALLONES,(x) & AO_MASK) & \
 			 ao_left(AO_ALLONES,(FB_UNIT - ((x)+(w))) & AO_MASK))
@@ -55,8 +54,9 @@
  *	adjust_x = e / e1;
  */
 
-
-
+#ifdef VALIDATE
+#include <stdio.h>
+#endif
 
 static void
 ao_bres(const struct ao_bitmap	*dst_bitmap,
@@ -80,18 +80,31 @@ ao_bres(const struct ao_bitmap	*dst_bitmap,
 	if (signdx < 0)
 		mask0 = ao_right(1, AO_UNIT - 1);
 
-	if (signdy < 0)
-		stride = -stride;
-
 	dst = dst + y1 * stride + (x1 >> AO_SHIFT);
 	mask = ao_right(1, x1 & AO_MASK);
+
+	if (signdy < 0)
+		stride = -stride;
 
 	while (len--) {
 		/* clip each point */
 
+#ifdef VALIDATE
+		if (x1 < 0 || dst_bitmap->width <= x1) {
+			printf("bad line x %d\n", x1);
+			return;
+		}
+		if (y1 < 0 || dst_bitmap->height <= y1) {
+			printf("bad line y %d\n", y1);
+			return;
+		}
+#endif
 		*dst = ao_do_mask_rrop(*dst, and, xor, mask);
 
 		if (axis == X_AXIS) {
+#ifdef VALIDATE
+			x1 += signdx;
+#endif
 			if (signdx < 0)
 				mask = ao_left(mask, 1);
 			else
@@ -102,13 +115,22 @@ ao_bres(const struct ao_bitmap	*dst_bitmap,
 			}
 			e += e1;
 			if (e >= 0) {
+#ifdef VALIDATE
+				y1 += signdy;
+#endif
 				dst += stride;
 				e += e3;
 			}
 		} else {
+#ifdef VALIDATE
+			y1 += signdy;
+#endif
 			dst += stride;
 			e += e1;
 			if (e >= 0) {
+#ifdef VALIDATE
+				x1 += signdx;
+#endif
 				if (signdx < 0)
 					mask = ao_left(mask, 1);
 				else
@@ -143,12 +165,12 @@ struct ao_cbox {
 /* -b <= a, so we need to make a bigger */
 static int16_t
 div_ceil(int32_t a, int16_t b) {
-	return (a + b + b - 1) / b - 1;
+	return (int16_t) ((a + b + b - 1) / b - 1);
 }
 
 static int16_t
 div_floor_plus_one(int32_t a, int16_t b) {
-	return (a + b) / b;
+	return (int16_t) ((a + b) / b);
 }
 
 static int8_t
@@ -189,30 +211,35 @@ ao_clip_line(struct ao_cc *c, struct ao_cbox *b)
 	 */
 	int32_t	adj_min;
 
-	if (!c->first)
-		adj_min = div_ceil(c->e + adjust_major * c->e1, -c->e3);
-	else
-		adj_min = div_floor_plus_one(c->e + adjust_major * c->e1, -c->e3);
+	if (c->e3) {
+		if (!c->first)
+			adj_min = div_ceil(c->e + adjust_major * c->e1, -c->e3);
+		else
+			adj_min = div_floor_plus_one(c->e + adjust_major * c->e1, -c->e3);
+	}
 
 	if (adj_min < adjust_minor) {
-		if (c->first)
-			adjust_major = div_ceil(c->e - adjust_minor * c->e3, c->e1);
-		else
-			adjust_major = div_floor_plus_one(c->e - adjust_minor * c->e3, c->e1);
+		if (c->e1) {
+			if (c->first)
+				adjust_major = div_ceil(c->e - adjust_minor * c->e3, c->e1);
+			else
+				adjust_major = div_floor_plus_one(c->e - adjust_minor * c->e3, c->e1);
+		}
 	} else {
 		adjust_minor = adj_min;
 	}
 
-	c->e += adjust_major * c->e1 + adjust_minor * c->e3;
+	c->e = (int16_t) (c->e + adjust_major * c->e1 + adjust_minor * c->e3);
 
-	c->major += c->sign_major * adjust_major;
-	c->minor += c->sign_minor * adjust_minor;
+	c->major = (int16_t) (c->major + c->sign_major * adjust_major);
+	c->minor = (int16_t) (c->minor + c->sign_minor * adjust_minor);
 
+	c->first = true;	/* signal to extend len */
 	return true;
 }
 
 void
-ao_line(const struct ao_bitmap	*dst,
+ao_line(struct ao_bitmap	*dst,
 	int16_t			x1,
 	int16_t			y1,
 	int16_t			x2,
@@ -240,7 +267,7 @@ ao_line(const struct ao_bitmap	*dst,
 	if (adx > ady) {
 		axis = X_AXIS;
 		e1 = ady << 1;
-		e2 = e1 - (adx << 1);
+		e2 = e1 - (int16_t) (adx << 1);
 		e = e1 - adx;
 
 		clip_1.major = x1;
@@ -257,7 +284,7 @@ ao_line(const struct ao_bitmap	*dst,
 	} else {
 		axis = Y_AXIS;
 		e1 = adx << 1;
-		e2 = e1 - (ady << 1);
+		e2 = e1 - (int16_t) (ady << 1);
 		e = e1 - ady;
 
 		clip_1.major = y1;
@@ -290,7 +317,7 @@ ao_line(const struct ao_bitmap	*dst,
 	if (!ao_clip_line(&clip_2, &cbox))
 		return;
 
-	len = clip_1.sign_major * (clip_2.major - clip_1.major) + clip_2.first;
+	len = (int16_t) (clip_1.sign_major * (clip_2.major - clip_1.major) + clip_2.first);
 
 	if (len <= 0)
 		return;
@@ -298,10 +325,17 @@ ao_line(const struct ao_bitmap	*dst,
 	if (adx > ady) {
 		x1 = clip_1.major;
 		y1 = clip_1.minor;
+		x2 = clip_2.major;
+		y2 = clip_2.minor;
 	} else {
 		x1 = clip_1.minor;
 		y1 = clip_1.major;
+		x2 = clip_2.minor;
+		y2 = clip_2.major;
 	}
+
+	ao_damage(dst, ao_min16(x1, x2), ao_max16(x1, x2), ao_min16(y1, y2), ao_max16(y1, y2));
+
 	ao_bres(dst,
 		signdx,
 		signdy,

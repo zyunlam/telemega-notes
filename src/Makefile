@@ -33,6 +33,7 @@ ARMM3DIRS=\
 	telegps-v0.3 telegps-v0.3/flash-loader \
 	telegps-v1.0 telegps-v1.0/flash-loader \
 	telegps-v2.0 telegps-v2.0/flash-loader \
+	telegps-v3.0 telegps-v3.0/flash-loader \
 	telelco-v0.2 telelco-v0.2/flash-loader \
 	telelco-v0.2-cc1200 telelco-v0.2-cc1200/flash-loader \
 	telelco-v0.3 telelco-v0.3/flash-loader \

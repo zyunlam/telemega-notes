@@ -19,7 +19,7 @@
 #include "ao.h"
 
 static const struct {
-	void		*port;
+	ao_gpio_t	port;
 	uint8_t		pin;
 } ao_leds[] = {
 #ifdef LED_0_PORT

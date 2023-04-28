@@ -76,7 +76,7 @@ ao_bits_mask(int16_t x, int16_t w) {
     r = ao_right_mask((x)+n); \
     l = ao_left_mask(x); \
     if (l) { \
-	n -= AO_UNIT - ((x) & AO_MASK); \
+	n -= (int16_t) (AO_UNIT - ((x) & AO_MASK));	\
 	if (n < 0) { \
 	    n = 0; \
 	    l &= r; \
@@ -94,6 +94,18 @@ ao_bits_mask(int16_t x, int16_t w) {
 		}				\
 	} while (0)
 
+static inline int16_t
+ao_min16(int16_t a, int16_t b)
+{
+	return a < b ? a : b;
+}
+
+static inline int16_t
+ao_max16(int16_t a, int16_t b)
+{
+	return a > b ? a : b;
+}
+
 static inline uint32_t
 ao_do_mask_rrop(uint32_t dst, uint32_t and, uint32_t xor, uint32_t mask) {
 	return (dst & (and | ~mask)) ^ (xor & mask);
@@ -102,6 +114,16 @@ ao_do_mask_rrop(uint32_t dst, uint32_t and, uint32_t xor, uint32_t mask) {
 static inline uint32_t
 ao_do_rrop(uint32_t dst, uint32_t and, uint32_t xor) {
 	return (dst & and) ^ xor;
+}
+
+static inline void
+ao_damage(struct ao_bitmap	*dst,
+	  int16_t		x1,
+	  int16_t		y1,
+	  int16_t		x2,
+	  int16_t		y2)
+{
+	ao_box_union(&dst->damage, x1, y1, x2, y2);
 }
 
 void
