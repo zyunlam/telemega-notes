@@ -12,54 +12,67 @@
  * General Public License for more details.
  */
 
-#include "ao.h"
-#include "ao_draw.h"
-#include "ao_draw_int.h"
+#include <ao_draw.h>
+#include <ao_draw_int.h>
 #include "ao_font.h"
-
-const struct ao_font ao_font = {
-	.width = GLYPH_WIDTH,
-	.height = GLYPH_HEIGHT,
-	.ascent = GLYPH_ASCENT,
-	.descent = GLYPH_HEIGHT - GLYPH_ASCENT,
-};
+#include <string.h>
+#include <stdio.h>
 
 void
-ao_text(const struct ao_bitmap	*dst,
+ao_text(struct ao_bitmap	*dst,
+	const struct ao_font	*font,
 	int16_t			x,
 	int16_t			y,
 	char			*string,
 	uint32_t		fill,
 	uint8_t			rop)
 {
-	uint32_t	src[GLYPH_HEIGHT];
+	int16_t		glyph_stride = ao_stride(font->max_width);
+	uint32_t	src[glyph_stride * font->max_height];
 	char		c;
 	int		h;
+	int16_t		x_off = 0, y_off = 0, advance = 0;
+	int16_t		byte_width = 0;
 
 	struct ao_bitmap	src_bitmap = {
 		.base = src,
-		.stride = 1,
-		.width = GLYPH_WIDTH,
-		.height = GLYPH_HEIGHT
 	};
-
-	y -= GLYPH_ASCENT;
 
 	rop = (rop & 3) | 0x4;
 
 	if ((fill&1) == 0)
 		rop ^= 3;
 
+	if (!font->metrics) {
+		src_bitmap.width = font->max_width;
+		src_bitmap.height = font->max_height;
+		src_bitmap.stride = glyph_stride;
+		x_off = 0;
+		y_off = font->ascent;
+		advance = font->max_width;
+		byte_width = ao_stride_bytes(font->max_width);
+	}
 	while ((c = *string++)) {
-		const uint8_t	*bytes = &glyph_bytes[glyph_pos[(uint8_t) c]];
+		const uint8_t	*bytes = &font->bytes[font->pos[(uint8_t) c]];
 
-		for (h = 0; h < GLYPH_HEIGHT; h++)
-			src[h] = bytes[h];
+		if (font->metrics) {
+			const struct ao_glyph_metrics *m = &font->metrics[(uint8_t) c];
+			src_bitmap.width = m->width;
+			src_bitmap.height = m->height;
+			src_bitmap.stride = ao_stride(m->width);
+			x_off = m->x_off;
+			y_off = m->y_off;
+			advance = m->advance;
+			byte_width = ao_stride_bytes(m->width);
+		}
+
+		for (h = 0; h < src_bitmap.height; h++)
+			memcpy(&src[h * src_bitmap.stride], &bytes[h * byte_width], (size_t) byte_width);
 
 		ao_copy(dst,
-			x, y, GLYPH_WIDTH, GLYPH_HEIGHT,
+			x + x_off, y - y_off, src_bitmap.width, src_bitmap.height,
 			&src_bitmap,
 			0, 0, rop);
-		x += GLYPH_WIDTH;
+		x += advance;
 	}
 }

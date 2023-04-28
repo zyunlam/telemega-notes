@@ -73,6 +73,8 @@ iap(uint32_t *in, uint32_t *out)
 
 static uint32_t	iap_in[5], iap_out[5];
 
+#if IS_FLASH_LOADER
+
 static uint32_t
 ao_lpc_addr_to_sector(uint8_t *addr)
 {
@@ -157,3 +159,45 @@ ao_flash_page(uint8_t *page, uint8_t *src)
 	ret = ao_lpc_copy_ram_to_flash(page, src, 256, AO_LPC_SYSCLK / 1000);
 	return ret;
 }
+
+#endif
+
+#if LPC_EEPROM_BYTES
+
+/*
+ * Write to eeprom
+ */
+
+uint8_t
+ao_eeprom_write(ao_pos_t pos, void *v, uint16_t len)
+{
+	iap_in[0] = LPC_IAP_EEPROM_WRITE;
+	iap_in[1] = (uint32_t) pos;
+	iap_in[2] = (uint32_t) v;
+	iap_in[3] = (uint32_t) len;
+	iap_in[4] = AO_LPC_SYSCLK / 1000;
+	iap(iap_in,iap_out);
+	return iap_out[0] == LPC_IAP_CMD_SUCCESS;
+}
+
+/*
+ * Read from eeprom
+ */
+uint8_t
+ao_eeprom_read(ao_pos_t pos, void *v, uint16_t len)
+{
+	iap_in[0] = LPC_IAP_EEPROM_READ;
+	iap_in[1] = (uint32_t) pos;
+	iap_in[2] = (uint32_t) v;
+	iap_in[3] = (uint32_t) len;
+	iap_in[4] = AO_LPC_SYSCLK / 1000;
+	iap(iap_in,iap_out);
+	return iap_out[0] == LPC_IAP_CMD_SUCCESS;
+}
+
+void
+ao_eeprom_init(void)
+{
+	/* Nothing to do here */
+}
+#endif

@@ -18,6 +18,8 @@
 
 #define HAS_BEEP	0
 
+#define IS_FLASH_LOADER	0
+
 /* Crystal on the board */
 #define AO_LPC_CLKIN	12000000
 
@@ -35,17 +37,18 @@
 #define LEDS_AVAILABLE	AO_LED_RED
 
 #define HAS_USB		1
-
-#define HAS_USB_CONNECT	1
-#define HAS_USB_VBUS	1
+#define HAS_USB_PULLUP		1
+#define AO_USB_PULLUP_PORT	1
+#define AO_USB_PULLUP_PIN	23
 
 #define PACKET_HAS_SLAVE	0
 
 /* USART */
 
-#define HAS_SERIAL		1
+#define HAS_SERIAL_0		1
 #define USE_SERIAL_0_STDIN	1
-#define SERIAL_0_18_19		1
+#define SERIAL_0_18_19		0
+#define SERIAL_1_13_14		1
 #define SERIAL_0_14_15		0
 #define SERIAL_0_17_18		0
 #define SERIAL_0_26_27		0

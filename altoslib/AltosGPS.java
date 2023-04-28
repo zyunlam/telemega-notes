@@ -166,20 +166,33 @@ public class AltosGPS implements Cloneable {
 			if (bits.length < 2)
 				return false;
 			alt = Integer.parseInt(bits[1]);
+		} else if (line.startsWith("Pdop/Hdop/Vdop:")) {
+			if (bits.length < 4)
+				return false;
+			pdop = Integer.parseInt(bits[1]) / 10.0;
+			hdop = Integer.parseInt(bits[2]) / 10.0;
+			vdop = Integer.parseInt(bits[3]) / 10.0;
+		} else if (line.startsWith("Ground Speed/Climb Rate/Course:")) {
+			if (bits.length < 6)
+				return false;
+			ground_speed = Integer.parseInt(bits[3]) * 1.0e-2;
+			climb_rate = Integer.parseInt(bits[4]) * 1.0e-2;
+			course = Integer.parseInt(bits[5]) * 2;
 		} else if (line.startsWith("Flags:")) {
 			if (bits.length < 2)
 				return false;
 			int status = Integer.decode(bits[1]);
 			connected = (status & AltosLib.AO_GPS_RUNNING) != 0;
 			locked = (status & AltosLib.AO_GPS_VALID) != 0;
+			nsat = (status >> AltosLib.AO_GPS_NUM_SAT_SHIFT) & AltosLib.AO_GPS_NUM_SAT_MASK;
 			if (!says_done)
 				return false;
 		} else if (line.startsWith("Sats:")) {
 			if (bits.length < 2)
 				return false;
-			nsat = Integer.parseInt(bits[1]);
-			cc_gps_sat = new AltosGPSSat[nsat];
-			for (int i = 0; i < nsat; i++) {
+			int nsvs = Integer.parseInt(bits[1]);
+			cc_gps_sat = new AltosGPSSat[nsvs];
+			for (int i = 0; i < nsvs; i++) {
 				int	svid = Integer.parseInt(bits[2+i*2]);
 				int	cc_n0 = Integer.parseInt(bits[3+i*2]);
 				cc_gps_sat[i] = new AltosGPSSat(svid, cc_n0);

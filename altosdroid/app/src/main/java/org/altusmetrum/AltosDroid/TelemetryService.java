@@ -31,6 +31,7 @@ import android.hardware.usb.*;
 import android.content.Intent;
 import android.content.Context;
 import android.os.*;
+import android.os.Build.*;
 import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 
@@ -662,10 +663,16 @@ public class TelemetryService extends Service implements AltosIdleMonitorListene
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		AltosDebug.debug("Received start id %d: %s", startId, intent);
+		int		flag;
+
+		if (android.os.Build.VERSION.SDK_INT >= 31) // android.os.Build.VERSION_CODES.S
+			flag = 33554432; // PendingIntent.FLAG_MUTABLE
+		else
+			flag = 0;
 
 		// The PendingIntent to launch our activity if the user selects this notification
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, AltosDroid.class), 0);
+				new Intent(this, AltosDroid.class), flag);
 
 		String channelId =
 				(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

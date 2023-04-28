@@ -122,6 +122,7 @@ Section "TeleGPS, TeleDongle and TeleBT Firmware"
 
 	File "../src/telegps-v1.0/telegps-v1.0-${VERSION}.ihx"
 	File "../src/telegps-v2.0/telegps-v2.0-${VERSION}.ihx"
+	File "../src/telegps-v3.0/telegps-v3.0-${VERSION}.ihx"
 	File "../src/teledongle-v3.0/teledongle-v3.0-${VERSION}.ihx"
 	File "../src/telebt-v3.0/telebt-v3.0-${VERSION}.ihx"
 	File "../src/telebt-v4.0/telebt-v4.0-${VERSION}.ihx"

@@ -18,7 +18,7 @@ android {
     defaultConfig {
         applicationId "org.altusmetrum.AltosDroid"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode @ANDROID_VERSION@
         versionName "@VERSION@"
     }

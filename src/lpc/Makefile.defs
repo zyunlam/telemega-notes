@@ -2,9 +2,15 @@ ifndef TOPDIR
 TOPDIR=..
 endif
 
+ifdef RAMSIZE
+LINKER_SCRIPT=altos-$(RAMSIZE).ld
+else
+LINKER_SCRIPT=altos.ld
+endif
+
 include $(TOPDIR)/lpc/Makefile-lpc.defs
 
-LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/lpc -Taltos.ld -n
+LDFLAGS=-nostartfiles $(CFLAGS) -L$(TOPDIR)/lpc -T$(LINKER_SCRIPT) -n
 
 ao_serial_lpc.h: $(TOPDIR)/lpc/baud_rate ao_pins.h
 	nickle $(TOPDIR)/lpc/baud_rate `awk '/AO_LPC_CLKOUT/{print $$3}' ao_pins.h` > $@

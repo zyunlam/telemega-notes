@@ -1,0 +1,122 @@
+#!/usr/bin/nickle
+
+typedef struct {
+	string	cmd;
+	real	x, y;
+} coord_t;
+
+coord_t[] top = {
+	{ .cmd = "m",  .x = 931.07168, .y = 27.69425 },
+	{ .cmd = "l",  .x = 224.03682, .y = 720.46517 },
+	{ .cmd = "l",  .x = -63.341, .y = 76.00913 },
+	{ .cmd = "L",  .x = 931.07168, .y = 486.3269 },
+	{ .cmd = "L",  .x = 770.37586, .y = 824.16855 },
+	{ .cmd = "L",  .x = 707.03486, .y = 748.15942 },
+	{ .cmd = "L",  .x = 931.07168, .y = 27.69425 },
+};
+
+coord_t[] bottom = {
+	{ .cmd = "m",  .x = 931.07168, .y = 1164.597 },
+	{ .cmd = "l",  .x = 248.86992, .y = -331.80265 },
+	{ .cmd = "l",  .x = 416.1687, .y = 1338.32935 },
+	{ .cmd = "l",  .x = 286.6484, .y = 267.1042 },
+	{ .cmd = "l",  .x = -520.4224, .y = 0 },
+	{ .cmd = "l",  .x = -270.2797, .y = -262.2181 },
+	{ .cmd = "l",  .x = 0, .y = -1033.0627 },
+	{ .cmd = "l",  .x = -160.98492, .y = 106.6818 },
+	{ .cmd = "l",  .x = -160.98492, .y = -106.6818 },
+	{ .cmd = "l",  .x = 0, .y = 1033.0627 },
+	{ .cmd = "l",  .x = -270.2797, .y = 262.2181 },
+	{ .cmd = "l",  .x = -520.4224, .y = 0 },
+	{ .cmd = "l",  .x = 286.6484, .y = -267.1042 },
+	{ .cmd = "l",  .x = 416.1687, .y = -1338.32935 },
+	{ .cmd = "l",  .x = 248.86992, .y = 331.80265 },
+};
+
+typedef struct {
+	bool	set;
+	real	min_x, max_x, min_y, max_y;
+} bounds_t;
+
+bounds_t
+merge_bounds(coord_t[] polygon, bounds_t bounds)
+{
+	real x = 0.0;
+	real y = 0.0;
+
+	for (int i = 0; i < dim(polygon); i++) {
+		switch (polygon[i].cmd) {
+		case "m":
+		case "l":
+			x += polygon[i].x;
+			y += polygon[i].y;
+			break;
+		case "M":
+		case "L":
+			x = polygon[i].x;
+			y = polygon[i].y;
+			break;
+		}
+		if (!bounds.set) {
+			bounds.min_x = bounds.max_x = x;
+			bounds.min_y = bounds.max_y = y;
+			bounds.set = true;
+		} else {
+			bounds.min_x = min(x, bounds.min_x);
+			bounds.max_x = max(x, bounds.max_x);
+			bounds.min_y = min(y, bounds.min_y);
+			bounds.max_y = max(y, bounds.max_y);
+		}
+	}
+	return bounds;
+}
+
+void
+print_poly(coord_t[] polygon, real height, bounds_t bounds, real x_pos, real y_pos)
+{
+	real x = 0.0;
+	real y = 0.0;
+
+	real scale = height / (bounds.max_y - bounds.min_y);
+	real x_off = bounds.min_x;
+	real y_off = bounds.min_y;
+
+	for (int i = 0; i < dim(polygon); i++) {
+		switch (polygon[i].cmd) {
+		case "m":
+		case "l":
+			x += polygon[i].x;
+			y += polygon[i].y;
+			break;
+		case "M":
+		case "L":
+			x = polygon[i].x;
+			y = polygon[i].y;
+			break;
+		}
+		printf("\t{ .x = %8.6ff, .y = %8.6ff },\n",
+		       imprecise((x - x_off) * scale + x_pos),
+		       imprecise((y - y_off) * scale + y_pos));
+	}
+}
+
+void
+print_logo(string name, real height, real x_pos, real y_pos)
+{
+	bounds_t bounds = { .set = false };
+	bounds = merge_bounds(top, bounds);
+	bounds = merge_bounds(bottom, bounds);
+	printf("const struct ao_coord %s_top[] = {\n", name);
+	print_poly(top, height, bounds, x_pos, y_pos);
+	printf("};\n");
+	printf("\n");
+	printf("const struct ao_coord %s_bottom[] = {\n", name);
+	print_poly(bottom, height, bounds, x_pos, y_pos);
+	printf("};\n");
+	printf("\n");
+	real width = height * (bounds.max_x - bounds.min_x) / (bounds.max_y - bounds.min_y);
+	printf("static const float %s_height = %8.6ff;\n", name, height);
+	printf("static const float %s_width = %8.6ff;\n", name, width);
+}
+
+print_logo(argv[1], 1.0, 0, 0);
