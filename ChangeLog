@@ -1,3 +1,597 @@
+commit 1605f722a7e0b2ba54620ce334e79374842e6957
+Merge: 459f421a 58fa3379
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Apr 27 23:52:46 2023 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit 58fa337960b7b528c4755514f5faee894527de92
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 27 20:25:43 2023 -0700
+
+    Version 1.9.16
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5214a559acc582d639e2489c82594e5fb3a4c540
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Apr 27 22:11:30 2023 -0700
+
+    altosdroid: Deal with Google requiring API version 31
+    
+    Need to add some magic constants to the build.
+    Need to support BLUETOOTH_SCAN permission.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1414ad9a8e5b3dce6462f410760e56fd7a1938cb
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Apr 26 18:08:09 2023 -0600
+
+    update TeleGPS v3.0 production script to flash correct firmware versions
+
+commit 7d9933328e2fbbe636d88dd49aa539ee59c5edf6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 26 16:08:38 2023 -0700
+
+    Add TeleGPS v3.0 firmware
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 8b346b1bc86306f2565d8af4ac8a2bab35145a38
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 26 16:04:21 2023 -0700
+
+    doc: Add 1.9.16 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 12258676d2c19dfe85c3484b064b970865c2f418
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Apr 26 17:06:42 2023 -0600
+
+    add production scripts for TeleGPS v3.0
+
+commit 1ab3cdedb83296a3296aeaaf1e0fa6a11800e331
+Merge: 90256e02 38450798
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Apr 26 15:46:15 2023 -0700
+
+    Merge branch 'telegps-v3'
+
+commit 90256e02ccb19646816c428d103460385bee8fb5
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Apr 25 14:11:48 2023 -0700
+
+    Version 1.9.15.1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cb756983a26595a5d2f317a6693f9a670665c86a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 15 21:53:28 2023 -0700
+
+    altos/stm32f04x: Smite the OPL_LAUNCH bit to reset boot config
+    
+    When rebooting, make sure the option bytes are recomputed based upon
+    the latest flash configuration, including whether there's a program
+    loaded. This ensures that we don't end up re-starting the DFU loader
+    and mangling our ao_boot values. Without this, our flash loader code
+    wouldn't be able to see the signal to stay in the loader and we'd end
+    up back in the application.
+    
+    Of course, this is only necessary if we want to reboot just after
+    flashing the boot loader without power cycling. Once the chip is power
+    cycled, it recomputes the option bytes automatically.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 16c3f541e80d77f4adc1a69f15e82c23d7947138
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Apr 15 21:50:08 2023 -0700
+
+    altos/stmf0: Remove some incorrect defines in stm32f0.h
+    
+    These got copied from the stm32l15x bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38450798207d7bafb72fbc9a4bcdf2c8fec84653
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 20:13:57 2023 -0700
+
+    telegps: Add unit setting to device configuration dialog
+    
+    This isn't used by TeleGPS, but is needed to make the config system
+    work.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4f1cdc5c10295ace4940a9b1f9068fd885dc789b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 19:41:02 2023 -0700
+
+    altos/telegps-v3.0: Get LED blinking when GPS locks
+    
+    Initialize the LED subsystem and assign the green LED to report GPS
+    lock.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2aa60e8d3a88b067816e0e90413bbf7c3a0a2f8b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 19:42:31 2023 -0700
+
+    altos/telegps-v3.0: Use all 6kB of available ram
+    
+    We need more ram for LED blinking.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf26932b4ac73b6945887bdd3bc63d74d0b91f69
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 19:41:50 2023 -0700
+
+    altos/lpc: Support 6k ram targets
+    
+    Set RAMSIZE in Makefile before including ../lpc/Makefile.defs and it
+    will select a suitable linker script.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 07bade3be82f8fb0edda6481cc3bda9df425d996
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 19:39:37 2023 -0700
+
+    altos: Make sure storage is setup before starting log
+    
+    TeleGPS v3.0 uses internal eeprom for config, so storage wasn't
+    getting setup before doing the telegps-specific init bits. Instead of
+    worrying about it, just call ao_storage_setup at the top so that
+    storage is always ready to go.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9307f3bcaa7790fedbed4bedab71ace28bd639e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 16:44:47 2023 -0700
+
+    altos/telegps-v3.0: Use new MAX 10 support in uBlox driver
+    
+    Switches to the new packet types as required by this chip.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 957768164e71249c4d9cf4afe29d34dea395b68a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 16:44:04 2023 -0700
+
+    altos: Dump GPS dop/course data from 'g' command
+    
+    This lets monitor idle show more of the GPS status
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c412aecbb495f3bdb521d0427d4b26cf86f201e7
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 16:42:57 2023 -0700
+
+    altos/drivers: Support uBlox Max 10 chips
+    
+    The set of supported packet types has changed from the last chip;
+    update the driver to switch to new packets.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f0f7962eedd4408cd0c6570ac4468979fd971378
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 16:38:03 2023 -0700
+
+    altoslib: Parse more GPS monitor data
+    
+    GPS is being updated to send dop and course data.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c6da41f0ce2c3394c8910135bcf48d3ec80d2e63
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 9 16:37:29 2023 -0700
+
+    altoslib: Support TeleGPS v3 monitor idle
+    
+    Needed to deal with ADC difference from STM-based devices.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2d15724c4a175a4807dbbde6d2c2f241a9c49021
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 28 13:43:38 2023 -0700
+
+    altos/telegps-v3.0: Fix SPI bus usage
+    
+    CC1200 is on SPI 0, M25 is on SPI 1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5240c06a757dbe9548a7394611b2a121dccf13e2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 28 13:32:48 2023 -0700
+
+    altos/lpcxpresso: Update for 11u24 board
+    
+    This updates the lpcxpresso demo to support the 11u24 board with
+    serial connected like telegps v3.0 on p1_13/p1_14
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cbc7a40fd29dd9a2e5f55dd58e9d50e009e7fb22
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Mar 28 11:56:27 2023 -0700
+
+    altos/lpc: Validate UART pin config
+    
+    Make sure some UART pin configuration has been selected
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cb357c306465925f020f756db6b4f0914b1f223f
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 27 21:52:27 2023 -0700
+
+    altos/telegps-v3.0: Use eeprom for config
+    
+    Avoid wasting space in the SPI flash part for device config
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bac27453db0ebfad1c27745200fe6f168d26bd43
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 27 21:51:31 2023 -0700
+
+    altos/lpc: Add support for eeprom on 2x/3x chips
+    
+    The newer 11U2x and 11U3x parts have enough eeprom to support storing
+    config data there. Add support for the IAP calls for read/write.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ac188661d3965f150d9b279b107b07e282f50861
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 27 21:29:06 2023 -0700
+
+    altos: Build TeleGPS v3.0 by default
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 168b5b31eec79aa93bc68ec52ff83dd1948cd4f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 27 21:27:43 2023 -0700
+
+    altos: Add TeleGPS v3.0 support
+    
+    LPC 11U24FET48 with CC1200 radio. A bit like TeleGPS v1.0 but with different
+    pin assignments and a different radio chip.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 68c3a1f238be808b23573dbd19bcfc135d25bd03
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 27 21:26:41 2023 -0700
+
+    altos/lpc: Support UART on pio1_13/pio1_14
+    
+    This is an alternate configuration for this chip.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4d9874c473887a4f43ba14ac855a2db00a740d2d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Mar 27 21:25:43 2023 -0700
+
+    altos: Allow ports to use type other than 'void *' for gpio block
+    
+    LPC uses integers while everyone else has a struct for each gpio block.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 79826cdbba8fe52e05ccf69e7722890e85cc0d1a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 27 14:39:03 2023 -0800
+
+    altos/draw: Use damage for lco demo
+    
+    Do some incremental drawing to demonstrate damage in action
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 99b9f6386018ad201c5defc595b22bf6d5d825fe
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 27 14:38:41 2023 -0800
+
+    altos/draw: Use bitstream fonts for LCO demo
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 176b750e26a583e71b68fadd989f66ac965efab3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 27 14:38:09 2023 -0800
+
+    altos/draw: Use <> for include files
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c40d91ec83d0af715256747dc4be5cabd2c13959
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 27 14:36:33 2023 -0800
+
+    altos/draw: Add vera sans fonts
+    
+    These work better in 1-bit mode than frutiger
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c3414603bb9993e4cf3f0163ae0575758201b041
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 27 14:35:36 2023 -0800
+
+    altos/draw: Add damage tracking
+    
+    This will allow more efficient updating of the screen
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0c1fd7fe05092a179f0ce3c0a2294f14e71300f9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Feb 27 14:11:06 2023 -0800
+
+    altos/draw: hand-edit 64-pixel 3/5 to avoid jank
+    
+    These had random-looking pixels hanging off the ends.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ec077209becf9ad8429f6cdf98fa06831263c813
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 18:55:54 2023 -0800
+
+    altos/draw: Use fewer fonts in lco sample
+    
+    Saves some memory
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit da605a15bbdc3b0f15cf7c70256ce4c32da071c6
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 18:50:31 2023 -0800
+
+    altos/draw: Add line test app
+    
+    There were bugs, now there's a app to check them.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c2a21c0f6a770f989833d0bd35761e17f9843353
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 18:49:47 2023 -0800
+
+    altos/draw: Split out draw test scaffolding from lco-test.c
+    
+    Allows it to be reused.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit cd5b0ac6f2b0c709fe3d419c4c090aa5638d09e1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 18:48:54 2023 -0800
+
+    altos/draw: Inline span fill for polygons
+    
+    Instead of calling ao_rect, do the clipping by hand
+    and call ao_solid instead.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bc17e4ed423c75624115ee3921aee2111ec1139b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 18:48:05 2023 -0800
+
+    altos/draw: Fix clipping far line end
+    
+    Make sure the final unclipped pixel gets drawn.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 9a79e8d8903b63f3f630d7f6455ee09715f55615
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 18:46:40 2023 -0800
+
+    altos/draw: Check for horiz/vert line when clipping
+    
+    Horizontal or vertical lines won't step along the minor axis while
+    clipping.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 4fa489276826e33fa5e21d0a94a8ed3e29ebcfd0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 18:46:09 2023 -0800
+
+    altos/draw: Add validation for line drawing
+    
+    Just make sure it never draws outside the dest.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d804a00a7576d5e3c59c413762248787a1282c16
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 16:04:17 2023 -0800
+
+    altos/draw: Rename test app to 'lco-test'
+    
+    This seems like a good place to do the LCO UX prototyping
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0f4cf599bc358c478a9e0a4b86f26704434a47e4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 16:01:20 2023 -0800
+
+    altos/draw: Mock up TeleLCO boot sequence
+    
+    Show logo, progress bar and discovered box numbers during
+    boot sequence
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 5139675bfad723e6a9a606e080541bb0b791f43b
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 14:59:58 2023 -0800
+
+    altos/draw: use --gc-sections in demo program
+    
+    This cleans up all of the unused font bits
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 79fe00b3c8931c3e6a96cb57fcde2a97cc78ff14
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 14:14:56 2023 -0800
+
+    altos/draw: Rearrange sample LCO screen in draw-test
+    
+    Place labels at the top, use proportional font so
+    the voltage values fit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 0c6b7a34f8f52dafe7f75d790f74d4dd63fd53d3
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 13:57:34 2023 -0800
+
+    altos/draw: Add NotoMono font
+    
+    This has a zero without a dot in it, so it might
+    look better on TeleLCO
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit c3dff4d7286991888bd79484c19adccc6926afc1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 13:47:34 2023 -0800
+
+    altos/draw: Add transforms to polygon code
+    
+    This lets the polygons remain constant but have them get
+    scaled/translated when presented on the screen.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fbbb3a06e42ec51d5d0582fe674528bd0e9e13f2
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 13:46:15 2023 -0800
+
+    altos/draw: Convert draw test framework to modern C
+    
+    Was still using K&R function definitions?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bb9f561571dbe8b88a5989c0dc9b33b4a3061e49
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 13:44:52 2023 -0800
+
+    altos/draw: Add monospaced font
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2f68d82238ff869b76b554fd8de61e3b6d06e8f9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 13:42:05 2023 -0800
+
+    altos/draw: Move font files to subdirectory
+    
+    It looks like we might end up with a lot of these
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 126013bb10faeba31bb52aa72b272dbfc3afb9ce
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Feb 26 13:21:24 2023 -0800
+
+    altos/draw: Add more fonts
+    
+    Add our logo font and more sizes of Frutiger
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2e784b9e726a59f2aed71c20d96ebc94aa2d19fb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 25 23:46:25 2023 -0800
+
+    altos/draw: Add logo
+    
+    Captures the SVG logo polygons and allows them to be
+    scaled to suit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 331e2833e178a1a4b0400e1ea06e1e387009f245
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 25 23:45:25 2023 -0800
+
+    altos/draw: Use float for polygon coords
+    
+    This makes polygons look way better.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 033e32989aab05fe6174a3db4a5eca4df07d7ab8
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 25 22:39:07 2023 -0800
+
+    altos/draw: Make test drawing app emulate TeleLCO
+    
+    Draw some numbers for box and pad. Also allow display of a couple of
+    polygons.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 994e8b9e62e561561e49f2cffb82e07fabdd25a0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 25 22:38:33 2023 -0800
+
+    altos/draw: Only cover ASCII
+    
+    Skip the rest of latin-1
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 38ff7005463ae83bd662ad06434840327bde729d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 25 22:37:16 2023 -0800
+
+    altos/draw: Add poly fill function
+    
+    Fill polygons using non-zero winding rule.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f9e2f41feac8ccd4e02020cf672366b194d2d60d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 25 19:22:58 2023 -0800
+
+    altos: Fill in more of the draw code
+    
+    Get multiple fonts working, allow for variable-pitch fonts.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 459f421aa6d7f86db9bb35767af75eb75817f28c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Feb 19 18:26:57 2023 -0700
+
+    releasing 1.9.15
+
 commit 38fac9fd1ebdc0900f598c859453b5fc8fc6b4a6
 Merge: 94fdc596 6f1686d7
 Author: Bdale Garbee <bdale@gag.com>
