@@ -674,7 +674,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 		if (device != null) {
 			Intent		i = new Intent(this, AltosDroid.class);
-			PendingIntent	pi = PendingIntent.getActivity(this, 0, new Intent("hello world", null, this, AltosDroid.class), 0);
+			int		flag;
+
+			if (android.os.Build.VERSION.SDK_INT >= 31) // android.os.Build.VERSION_CODES.S
+				flag = 33554432; // PendingIntent.FLAG_MUTABLE
+			else
+				flag = 0;
+			PendingIntent	pi = PendingIntent.getActivity(this, 0, new Intent("hello world", null, this, AltosDroid.class), flag);
 
 			if (AltosUsb.request_permission(this, device, pi)) {
 				connectUsb(device);
@@ -795,9 +801,11 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	public boolean have_storage_permission = false;
 	public boolean have_bluetooth_permission = false;
 	public boolean have_bluetooth_connect_permission = false;
+	public boolean have_bluetooth_scan_permission = false;
 	public boolean asked_permission = false;
 
 	static final String BLUETOOTH_CONNECT = "android.permission.BLUETOOTH_CONNECT";
+	static final String BLUETOOTH_SCAN = "android.permission.BLUETOOTH_SCAN";
 
 	AltosMapOnline map_online;
 
@@ -826,6 +834,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 					}
 					if (permissions[i].equals(BLUETOOTH_CONNECT)) {
 						have_bluetooth_connect_permission = true;
+					}
+					if (permissions[i].equals(BLUETOOTH_SCAN)) {
+						have_bluetooth_scan_permission = true;
 					}
 				}
 			}
@@ -864,6 +875,12 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			{
 				have_bluetooth_connect_permission = true;
 			}
+			if (ActivityCompat.checkSelfPermission(this,
+							       BLUETOOTH_SCAN)
+			    == PackageManager.PERMISSION_GRANTED)
+			{
+				have_bluetooth_scan_permission = true;
+			}
 			int count = 0;
 			if (!have_location_permission)
 				count += 1;
@@ -872,6 +889,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			if (!have_bluetooth_permission)
 				count += 1;
 			if (!have_bluetooth_connect_permission)
+				count += 1;
+			if (!have_bluetooth_scan_permission)
 				count += 1;
 			if (count > 0)
 			{
@@ -885,6 +904,8 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 					permissions[i++] = Manifest.permission.BLUETOOTH;
 				if (!have_bluetooth_connect_permission)
 					permissions[i++] = BLUETOOTH_CONNECT;
+				if (!have_bluetooth_scan_permission)
+					permissions[i++] = BLUETOOTH_SCAN;
 				ActivityCompat.requestPermissions(this, permissions, MY_PERMISSION_REQUEST);
 			}
 		}
