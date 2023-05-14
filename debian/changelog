@@ -1,3 +1,9 @@
+altos (1.9.16-2) unstable; urgency=medium
+
+  * fix path systemd service file for mapd is deliverd to, closes: #1036022
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 14 May 2023 10:48:57 -0700
+
 altos (1.9.16-1) unstable; urgency=medium
 
   [ Keith Packard ]

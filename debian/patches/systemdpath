@@ -1,0 +1,13 @@
+diff --git a/map-server/altos-mapd/Makefile.am b/map-server/altos-mapd/Makefile.am
+index f92c3e5a..29ee65e8 100644
+--- a/map-server/altos-mapd/Makefile.am
++++ b/map-server/altos-mapd/Makefile.am
+@@ -26,7 +26,7 @@ defaultsdir=$(sysconfdir)/default
+ 
+ defaults_DATA=altos-mapd-default
+ 
+-systemddir=$(libdir)/systemd/system
++systemddir=$(bindir)/../lib/systemd/system
+ 
+ systemd_DATA=altos-mapd.service
+ 
