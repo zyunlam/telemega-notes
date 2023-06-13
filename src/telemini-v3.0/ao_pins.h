@@ -20,7 +20,7 @@
 #define HAS_SERIAL_1		0
 #define HAS_BATTERY_REPORT	1
 
-#define AO_STACK_SIZE	448
+#define AO_STACK_SIZE	428
 
 #define IS_FLASH_LOADER	0
 
