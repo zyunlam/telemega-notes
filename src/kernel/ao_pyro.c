@@ -45,14 +45,8 @@ ao_pyro_status(uint8_t p)
 		ao_data_get(&packet);
 		);
 
-	value = (AO_IGNITER_CLOSED>>1);
 	value = AO_SENSE_PYRO(&packet, p);
-	if (value < AO_IGNITER_OPEN)
-		return ao_igniter_open;
-	else if (value > AO_IGNITER_CLOSED)
-		return ao_igniter_ready;
-	else
-		return ao_igniter_unknown;
+	return ao_igniter_check(value, AO_SENSE_PBATT(&packet));
 }
 
 void

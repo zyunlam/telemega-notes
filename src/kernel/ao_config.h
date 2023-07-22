@@ -19,7 +19,11 @@
 #ifndef _AO_CONFIG_H_
 #define _AO_CONFIG_H_
 
+#include <ao.h>
+
+#if AO_PYRO_NUM
 #include <ao_pyro.h>
+#endif
 
 #ifndef USE_STORAGE_CONFIG
 #define USE_STORAGE_CONFIG 1

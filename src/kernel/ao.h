@@ -982,26 +982,4 @@ void ao_ms5607_init(void);
 
 #include <ao_arch_funcs.h>
 
-/*
- * dv = (sensor * (p+m) * ref_dv)/ (max * m)
- * value * (max * m) = (sensor * (p+m) * ref)
- * value * (max * m) / ((p+m) * ref) = sensor
- */
-
-#define AO_DV_MUL(p,m) ((int32_t) AO_ADC_MAX * (m))
-#define AO_DV_DIV(p,m) ((int32_t) AO_ADC_REFERENCE_DV * ((p) + (m)))
-#define AO_DV_ADD(p,m) (AO_DV_DIV(p,m) / 2)
-
-#define ao_decivolt_to_adc(dv, p, m) \
-	((int16_t) (((int32_t) (dv) * AO_DV_MUL(p,m) + AO_DV_ADD(p,m)) / AO_DV_DIV(p,m)))
-
-#define AO_IGNITER_CLOSED_DV	35
-#define AO_IGNITER_OPEN_DV	10
-
-#undef AO_IGNITER_OPEN
-#undef AO_IGNITER_CLOSED
-
-#define AO_IGNITER_OPEN ao_decivolt_to_adc(AO_IGNITER_OPEN_DV, AO_IGNITE_DIV_PLUS, AO_IGNITE_DIV_MINUS)
-#define AO_IGNITER_CLOSED ao_decivolt_to_adc(AO_IGNITER_CLOSED_DV, AO_IGNITE_DIV_PLUS, AO_IGNITE_DIV_MINUS)
-
 #endif /* _AO_H_ */

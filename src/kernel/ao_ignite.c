@@ -18,9 +18,7 @@
 
 #include "ao.h"
 #include <ao_data.h>
-#if AO_PYRO_NUM
 #include <ao_pyro.h>
-#endif
 
 #if HAS_IGNITE
 struct ao_ignition ao_ignition[2];
@@ -55,12 +53,7 @@ ao_igniter_status(enum ao_igniter igniter)
 		value = AO_SENSE_MAIN(&packet);
 		break;
 	}
-	if (value < AO_IGNITER_OPEN)
-		return ao_igniter_open;
-	else if (value > AO_IGNITER_CLOSED)
-		return ao_igniter_ready;
-	else
-		return ao_igniter_unknown;
+	return ao_igniter_check(value, AO_SENSE_PBATT(&packet));
 }
 
 #define AO_IGNITER_SET_DROGUE(v)	ao_gpio_set(AO_IGNITER_DROGUE_PORT, AO_IGNITER_DROGUE_PIN, v)
