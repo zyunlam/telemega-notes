@@ -1,3 +1,29 @@
+altos (1.9.17-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * have TeleGPS production script save RF cal value
+  * update Releasing based on 1.9.16 release experiences
+  * doc: fix a typo in the staging example
+  * ao-test-igniter: allow anything other than 'open' to be valid so LED tests work
+  * ao-bringup: be consistent with success text in TeleGPS test script
+  * update ChangeLog for 1.9.17 release
+
+  [ Keith Packard ]
+  * altos-mapd: Install systemd dir in arch-independent location
+  * altoslib: Support Monitor Idle for EasyMini-3
+  * altos/stm32f042: Increase interrupt stack to 256 bytes
+  * altos: Add AO_STACK_CANARY to detect stack overflows sometimes
+  * altos/stmf0: Disable ao_boot_check_pin if not in use
+  * altos: Compute igniter good/bad thresholds using 3.5V value
+  * altos: Add pyro voltage divider values to boards with them
+  * altos: Don't include ao_pyro.h into telelco code
+  * altos: Use pyro voltage to check igniters
+  * altos: Use ublox-10 mode for TM v4.0
+  * doc: Release notes for 1.9.17
+  * Version 1.9.17
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 30 Aug 2023 10:50:23 -0600
+
 altos (1.9.16-2) unstable; urgency=medium
 
   * fix path systemd service file for mapd is deliverd to, closes: #1036022
