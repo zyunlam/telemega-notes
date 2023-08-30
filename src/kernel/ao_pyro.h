@@ -108,4 +108,84 @@ ao_pyro_status(uint8_t p);
 void
 ao_pyro_print_status(void);
 
+#ifndef AO_PYRO_BATTERY_DIV_PLUS
+#define AO_PYRO_BATTERY_DIV_PLUS AO_BATTERY_DIV_PLUS
+#define AO_PYRO_BATTERY_DIV_MINUS AO_BATTERY_DIV_MINUS
+#ifndef AO_SENSE_PBATT
+#define AO_SENSE_PBATT(p) ((p)->adc.v_batt)
+#endif
+#else
+#ifndef AO_SENSE_PBATT
+#define AO_SENSE_PBATT(p) ((p)->adc.v_pbatt)
+#endif
+#endif
+
+/*
+ * dv = (sensor * (p+m) * ref_dv)/ (max * m)
+ * value * (max * m) = (sensor * (p+m) * ref)
+ * value * (max * m) / ((p+m) * ref) = sensor
+ */
+
+#define AO_DV_MUL(p,m) ((int32_t) AO_ADC_MAX * (m))
+#define AO_DV_DIV(p,m) ((int32_t) AO_ADC_REFERENCE_DV * ((p) + (m)))
+#define AO_DV_ADD(p,m) (AO_DV_DIV(p,m) / 2)
+
+#define ao_decivolt_to_adc(dv, p, m) \
+	((int16_t) (((int32_t) (dv) * AO_DV_MUL(p,m) + AO_DV_ADD(p,m)) / AO_DV_DIV(p,m)))
+
+#define AO_IGNITER_CLOSED_DV	35
+#define AO_IGNITER_OPEN_DV	10
+
+#define AO_PYRO_BATTERY_GOOD_DV	38
+
+#undef AO_IGNITER_OPEN
+#undef AO_IGNITER_CLOSED
+
+#define AO_IGNITER_OPEN ao_decivolt_to_adc(AO_IGNITER_OPEN_DV, AO_IGNITE_DIV_PLUS, AO_IGNITE_DIV_MINUS)
+#define AO_IGNITER_CLOSED ao_decivolt_to_adc(AO_IGNITER_CLOSED_DV, AO_IGNITE_DIV_PLUS, AO_IGNITE_DIV_MINUS)
+
+#define AO_PYRO_BATTERY_GOOD ao_decivolt_to_adc(AO_PYRO_BATTERY_GOOD_DV, AO_PYRO_BATTERY_DIV_PLUS, AO_PYRO_BATTERY_DIV_MINUS)
+
+/* For devices measuring the pyro battery voltage, we want to use a
+ * fraction of that. We'll use 15/16 of the battery voltage as a limit
+ * For devices not measuring the pyro battery voltage, we'll use 3.5V
+ * instead (this is just TeleMetrum, which permits external pyro
+ * batteries but has not provision to measure the voltage)
+ */
+
+static inline int16_t
+ao_igniter_closed_value(int16_t battery)
+{
+#if AO_PYRO_BATTERY_DIV_PLUS != AO_IGNITE_DIV_PLUS || AO_PYRO_BATTERY_DIV_MINUS != AO_IGNITE_DIV_MINUS
+	(void) battery;
+	return AO_IGNITER_CLOSED;
+#else
+	return (int16_t) (((int32_t) battery * 15) / 16);
+#endif
+}
+
+static inline int16_t
+ao_igniter_open_value(int16_t battery)
+{
+#if AO_PYRO_BATTERY_DIV_PLUS != AO_IGNITE_DIV_PLUS || AO_PYRO_BATTERY_DIV_MINUS != AO_IGNITE_DIV_MINUS
+	(void) battery;
+	return AO_IGNITER_OPEN;
+#else
+	return (int16_t) (((int32_t) battery * 1) / 8);
+#endif
+}
+
+static inline enum ao_igniter_status
+ao_igniter_check(int16_t value, int16_t battery)
+{
+	if (battery < AO_PYRO_BATTERY_GOOD)
+		return ao_igniter_open;
+	if (value < ao_igniter_open_value(battery))
+		return ao_igniter_open;
+	else if (value > ao_igniter_closed_value(battery))
+		return ao_igniter_ready;
+	else
+		return ao_igniter_unknown;
+}
+
 #endif

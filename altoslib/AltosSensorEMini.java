@@ -44,6 +44,11 @@ public class AltosSensorEMini {
 				listener.set_apogee_voltage(AltosConvert.easy_mini_2_voltage(sensor_emini.apogee));
 				listener.set_main_voltage(AltosConvert.easy_mini_2_voltage(sensor_emini.main));
 				break;
+			case 3:
+				listener.set_battery_voltage(AltosConvert.easy_mini_3_voltage(sensor_emini.batt));
+				listener.set_apogee_voltage(AltosConvert.easy_mini_3_voltage(sensor_emini.apogee));
+				listener.set_main_voltage(AltosConvert.easy_mini_3_voltage(sensor_emini.main));
+				break;
 			}
 
 		} catch (TimeoutException te) {

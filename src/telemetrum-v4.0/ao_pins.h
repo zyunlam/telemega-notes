@@ -180,6 +180,7 @@ struct ao_adc {
  */
 
 #define AO_SERIAL_SPEED_UBLOX	AO_SERIAL_SPEED_9600
+#define AO_UBLOX_VERSION	10
 
 #define HAS_SERIAL_1		1
 #define USE_SERIAL_1_STDIN	0

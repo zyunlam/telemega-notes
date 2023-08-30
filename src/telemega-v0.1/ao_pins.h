@@ -264,6 +264,12 @@ struct ao_adc {
 #define AO_BATTERY_DIV_MINUS	100	/* 10k */
 
 /*
+ * Voltage divider on ADC pyro battery sampler
+ */
+#define AO_PYRO_BATTERY_DIV_PLUS	100	/* 100k */
+#define AO_PYRO_BATTERY_DIV_MINUS	27	/* 27k */
+
+/*
  * Voltage divider on ADC igniter samplers
  */
 #define AO_IGNITE_DIV_PLUS	100	/* 100k */

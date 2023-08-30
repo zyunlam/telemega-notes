@@ -19,8 +19,8 @@
 #include "ao.h"
 
 #define MUL(p,m)	((int32_t) AO_ADC_REFERENCE_DV * ((p) + (m)))
-#define ADD(p,m)	(MUL(p,m)/2)
 #define DIV(p,m)	((int32_t) AO_ADC_MAX * (m))
+#define ADD(p,m)	(DIV(p,m) / 2)
 #define scale(v,p,m)	(((int32_t) (v) * MUL(p,m) + ADD(p,m)) / DIV(p,m))
 
 #if HAS_APRS || HAS_BATTERY_REPORT

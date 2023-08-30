@@ -72,8 +72,8 @@ These are Bdale's notes on how to do a release.
 	  like debian are already pulled
 
         git log > ChangeLog
-	git commit -a
-	git tag -a <version>			# full x.y.z version
+	git commit -a -m'update ChangeLog for <version> release'
+	git tag -a <version> -m'Releasing <version>'	# full x.y.z version
 
 	- make sure .git/gbp.conf set to use branch-<version> as upstream
 

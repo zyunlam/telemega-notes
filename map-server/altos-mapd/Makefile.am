@@ -26,7 +26,7 @@ defaultsdir=$(sysconfdir)/default
 
 defaults_DATA=altos-mapd-default
 
-systemddir=$(libdir)/systemd/system
+systemddir=$(bindir)/../lib/systemd/system
 
 systemd_DATA=altos-mapd.service
 

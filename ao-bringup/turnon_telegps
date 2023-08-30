@@ -74,7 +74,10 @@ case "$dev" in
         ;;
 esac
 
-SERIAL=$SERIAL ./cal-freq $dev
+CALFILE=cal-$SERIAL.txt
+../ao-tools/ao-cal-freq/ao-cal-freq --output=$CALFILE --tty=$dev
+CAL_VALUE=`cat $CALFILE`
+echo $SERIAL","$CAL_VALUE >> cal_values
 
 ./test-telegps-v3
 

@@ -48,10 +48,16 @@ struct ao_task {
 	struct ao_list	queue;
 	struct ao_list	alarm_queue;
 	/* Provide both 32-bit and 8-bit stacks */
+#ifdef AO_STACK_CANARY
+	uint32_t	bottom_canary;
+#endif
 	union {
 		uint32_t stack32[AO_STACK_SIZE>>2];
 		uint8_t stack8[AO_STACK_SIZE];
 	} AO_STACK_ALIGNMENT;
+#ifdef AO_STACK_CANARY
+	uint32_t top_canary;
+#endif
 #if HAS_SAMPLE_PROFILE
 	uint32_t ticks;
 	uint32_t yields;
