@@ -317,6 +317,10 @@ public class AltosConvert {
 		return easy_mini_2_adc(sensor) * supply * 127/27;
 	}
 
+	static double easy_mini_3_voltage(int sensor) {
+		return easy_mini_1_voltage(sensor, 10000);
+	}
+
 	static double motor_pressure(double voltage) {
 		double	base = 0.5;
 		double	max = 4.5;

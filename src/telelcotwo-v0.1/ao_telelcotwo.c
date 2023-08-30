@@ -21,7 +21,6 @@
 #include <ao_packet.h>
 #include <ao_companion.h>
 #include <ao_profile.h>
-#include <ao_pyro.h>
 #include <ao_aes.h>
 #include <ao_button.h>
 #include <ao_lco.h>

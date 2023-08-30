@@ -19,7 +19,7 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-#define AO_STACK_SIZE		512
+#define AO_STACK_SIZE		504
 
 #define AO_HSE                  32000000
 #define AO_RCC_CFGR_PLLMUL	STM_RCC_CFGR_PLLMUL_3

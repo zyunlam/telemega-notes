@@ -195,7 +195,7 @@ do_igniter(struct cc_usb *usb, char *name, double rplus, double rminus, int adc_
 			return 0;
 		}
 	}
-	if (strcmp(this->status, "ready") != 0) {
+	if (strcmp(this->status, "open") == 0) {
 		printf("igniter %s status is %s\n", this->name, this->status);
 		free_igniters(all);
 		return 0;

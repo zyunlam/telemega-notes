@@ -20,6 +20,7 @@
 #include <ao_boot.h>
 #include <ao_exti.h>
 
+#if AO_BOOT_PIN
 int
 ao_boot_check_pin(void)
 {
@@ -44,3 +45,4 @@ ao_boot_check_pin(void)
 	stm_rcc.apb1enr &= ~(1UL << STM_RCC_APB1ENR_PWREN);
 	return v == AO_BOOT_APPLICATION_VALUE;
 }
+#endif

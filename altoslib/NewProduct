@@ -47,6 +47,10 @@ altoslib/
 	Adjust existing telemetry decoders for new sensors
 
 
+ 9. AltosConvert.java
+
+	Add conversion functions for ADC values
+
 altosuilib/
 
  1. AltosUSBDevice.java

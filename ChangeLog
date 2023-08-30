@@ -1,3 +1,173 @@
+commit 63a8707ee4120148f6ec5cb073b349beefe377fa
+Merge: b071450f a4995df3
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Aug 30 10:46:42 2023 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit a4995df3d75359d258881934f60980e486681b9d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 30 09:15:28 2023 -0700
+
+    Version 1.9.17
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 847d011791caec4d3b28052d5b4f2f25a7df135a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Aug 30 09:12:34 2023 -0700
+
+    doc: Release notes for 1.9.17
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 914fb3d53bf6fd4b8be8e10eb1a9e1e3e1a323be
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Aug 30 10:27:39 2023 -0600
+
+    ao-bringup: be consistent with success text in TeleGPS test script
+
+commit 484290b35761add128e34c017bbf0e91d9a4a7bc
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Aug 28 11:44:40 2023 -0600
+
+    ao-test-igniter: allow anything other than 'open' to be valid so LED tests work
+
+commit 05b689b29a964a233b2389390c9669538160888e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 4 11:54:10 2023 -0700
+
+    altos: Use ublox-10 mode for TM v4.0
+    
+    This will only work on a hacked board with a swapped GPS unit.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 342bd580ac9f7e5ddd585c795c3aca44f7cde51d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 22 00:01:03 2023 -0700
+
+    altos: Use pyro voltage to check igniters
+    
+    Instead of using an absolute value for the igniter continuity good
+    voltage, use 15/16 of the pyro voltage instead. This ensures we scale
+    with the pyro voltage to find marginal igniters even with high voltage
+    pyro systems.
+    
+    This doesn't work on TeleMetrum where we have no pyro voltage
+    value. On these boards, continue to use a fixed 3.5V value.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 92bbfacb64568b3b6d132ba23e17dc57da582626
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 22 00:00:12 2023 -0700
+
+    altos: Don't include ao_pyro.h into telelco code
+    
+    This isn't used at all.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d6bdabbdfa0cd3854e67fd363dc1bb4bd14e68d9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jul 21 23:59:07 2023 -0700
+
+    altos: Add pyro voltage divider values to boards with them
+    
+    EasyMega and TeleMega have separate measurement circuits for pyro
+    battery voltages, provide the resistor values.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 70481772386d556b8a7981da38a03f5c9b181a7c
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Jul 21 23:19:06 2023 -0700
+
+    altos: Compute igniter good/bad thresholds using 3.5V value
+    
+    Instead of requiring each product to set the ADC values for good/bad
+    igniters, compute them based upon a 3.5V value using the ADC
+    characteristics already present in ao_pins.h.
+    
+    This changes the threshold used on LPC parts from 400 (0.189V) to
+    7388.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit f495f2a479569d839f4efe8f115d51ae162edcfd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 12 23:15:36 2023 -0700
+
+    altos/stmf0: Disable ao_boot_check_pin if not in use
+    
+    This allows rebuilding the boot loader without boot pin support (as
+    required to debug TeleMini) by only editing ao_pins.h
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2dd10fcc43369129b1d5067f10365574a12943eb
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 12 23:13:29 2023 -0700
+
+    altos: Add AO_STACK_CANARY to detect stack overflows sometimes
+    
+    Checks above and below the current task stack at each switch.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 41301eea02a25c77129c852d11977accf26152db
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 12 23:11:01 2023 -0700
+
+    altos/stm32f042: Increase interrupt stack to 256 bytes
+    
+    Running the radio on TeleMini in monitor idle mode ended up
+    overflowing the interrupt stack of 128 bytes. Increase to 256 bytes
+    and adjust task stack sizes so targets continue to build.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 444e6b28f99e7849bbc96cb040b2d73f6bc228b9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 6 14:57:53 2023 -0700
+
+    altoslib: Support Monitor Idle for EasyMini-3
+    
+    Needed to explicitly support this target even though it was almost the
+    same as EasyMini v1.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 83480da31923ba078746a0f5370cf63d87f31e1e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun May 14 10:38:01 2023 -0700
+
+    altos-mapd: Install systemd dir in arch-independent location
+    
+    Use $(bindir)/../lib instead of $(libdir) as the latter has the
+    arch-specific directory added.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 062b9709e66ac9f678efc8531dd65dbb497feaee
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Apr 28 00:35:28 2023 -0600
+
+    update Releasing based on 1.9.16 release experiences
+
+commit b4e136c63d5e02b1ce94e6981a99c99ff1389658
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Apr 28 00:29:01 2023 -0600
+
+    have TeleGPS production script save RF cal value
+
+commit b071450f0cf70c2d10d78cc5ca48be1ec7b05c4d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Thu Apr 27 23:53:30 2023 -0600
+
+    updte ChangeLog for 1.9.16 release
+
 commit 1605f722a7e0b2ba54620ce334e79374842e6957
 Merge: 459f421a 58fa3379
 Author: Bdale Garbee <bdale@gag.com>

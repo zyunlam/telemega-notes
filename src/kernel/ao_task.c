@@ -307,6 +307,8 @@ ao_stack_top(struct ao_task *task)
 #endif
 }
 
+#define AO_STACK_CANARY_VALUE	0xbaadf00dU
+
 void
 ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name) 
 {
@@ -324,6 +326,10 @@ ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name)
 	task->task_id = task_id;
 	task->name = name;
 	task->wchan = NULL;
+#ifdef AO_STACK_CANARY
+	task->bottom_canary = AO_STACK_CANARY_VALUE;
+	task->top_canary = AO_STACK_CANARY_VALUE;
+#endif
 	/*
 	 * Construct a stack frame so that it will 'return'
 	 * to the start of the task
@@ -341,6 +347,19 @@ ao_add_task(struct ao_task * task, void (*task_func)(void), const char *name)
 		);
 }
 
+#ifdef AO_STACK_CANARY
+static void
+ao_check_stack_canary(void)
+{
+	if (ao_cur_task->bottom_canary != AO_STACK_CANARY_VALUE)
+		ao_panic(AO_PANIC_STACK);
+	if (ao_cur_task->top_canary != AO_STACK_CANARY_VALUE)
+		ao_panic(AO_PANIC_STACK);
+}
+#else
+#define ao_check_stack_canary()
+#endif
+
 uint8_t	ao_task_minimize_latency;
 
 /* Task switching function. */
@@ -356,6 +375,7 @@ ao_yield(void)
 			ao_cur_task->max_run = run;
 		++ao_cur_task->yields;
 #endif
+		ao_check_stack_canary();
 		ao_arch_save_regs();
 		ao_arch_save_stack();
 	}
@@ -398,6 +418,7 @@ ao_yield(void)
 #if USE_TLS
 	_set_tls(ao_stack_top(ao_cur_task));
 #endif
+	ao_check_stack_canary();
 	ao_arch_restore_stack();
 }
 

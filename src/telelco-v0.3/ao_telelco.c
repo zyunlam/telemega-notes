@@ -21,7 +21,6 @@
 #include <ao_packet.h>
 #include <ao_companion.h>
 #include <ao_profile.h>
-#include <ao_pyro.h>
 #include <ao_aes.h>
 #include <ao_seven_segment.h>
 #include <ao_quadrature.h>
