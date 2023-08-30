@@ -38,7 +38,7 @@ These are Bdale's notes on how to do a release.
 		sudo cowbuilder --update
 
 	- make sure fat build environment is up to date
-		sudo apt update && sudo apt upgrade
+		sudo apt update && sudo apt upgrade && sudo apt autoremove
 
 	- ensure i386 build support is available, and we have tools to build
 	  installers for Windows and Mac OS X
@@ -46,9 +46,12 @@ These are Bdale's notes on how to do a release.
 		sudo apt update
 		sudo apt install genisoimage nsis \
 			gcc-i686-linux-gnu gcc-aarch64-linux-gnu \
-			gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf
+			gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf \
+			gcc-mingw-w64-i686-posix gcc-mingw-w64-x86-64-win32
 
-	- make sure jsign is installed so we can sign Windows installers
+	- make sure jsign is installed so we can sign Windows installers:
+	
+	https://github.com/ebourg/jsign/releases/download/5.0/jsign_5.0_all.deb
 
 	- make sure ~/web/altusmetrum has no pending pullable commits
 
