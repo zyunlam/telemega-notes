@@ -10,6 +10,7 @@ prebuild:
 	echo "not frobbing changelog for official builds"
 
 configure_flags = \
+	--with-java-version=8 \
 	--disable-install-shared-mime-info \
 	--enable-faketime \
 	--disable-multi-arch
