@@ -1,0 +1,3 @@
+src/*/*.elf			usr/share/altos/mfg-fw
+src/*/flash-loader/*.elf	usr/share/altos/mfg-fw/loaders
+ao-bringup/*			usr/share/altos/bringup

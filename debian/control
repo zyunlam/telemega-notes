@@ -55,3 +55,11 @@ Description: Altus Metrum firmware and utilities
  from Altus Metrum, including TeleMetrum, TeleMini, and TeleDongle.
  .
  See http://altusmetrum.org/ for more information.
+
+Package: altos-mfg
+Architecture: any
+Depends: altos,
+         ${misc:Depends},
+         ${shlibs:Depends}
+Description: Altus Metrum manufacturing support
+ Firmware and utilities needed for Altus Metrum manufacturing processes.
