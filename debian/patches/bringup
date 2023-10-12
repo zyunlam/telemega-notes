@@ -1,0 +1,1539 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ altos (1.9.17-2) unstable; urgency=medium
+ .
+   * work on adding altos-mfg production support package
+Author: Bdale Garbee <bdale@gag.com>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout https://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: (upstream|backport|vendor|other), (<patch-url>|commit:<commit-id>)
+Bug: <upstream-bugtracker-url>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: (no|not-needed|<patch-forwarded-url>)
+Applied-Upstream: <version>, (<commit-url>|commit:<commid-id>)
+Reviewed-By: <name and email of someone who approved/reviewed the patch>
+Last-Update: 2023-10-12
+
+--- altos-1.9.17.orig/ao-bringup/cal-freq
++++ altos-1.9.17/ao-bringup/cal-freq
+@@ -10,10 +10,10 @@ case $# in
+ 	;;
+ esac
+ 
+-../ao-tools/ao-cal-freq/ao-cal-freq --tty=$dev
++ao-cal-freq --tty=$dev
+ case $? in
+     0)
+-	calline=`./get-radio-cal $dev`
++	calline=`get-radio-cal $dev`
+ 	CAL_VALUE=`echo $calline | awk '{print $2}'`
+ 	CURRENT_FREQ=`echo $calline | awk '{print $4}'`
+ 	echo $SERIAL","$CAL_VALUE >> cal_values
+--- altos-1.9.17.orig/ao-bringup/fix-telebt
++++ altos-1.9.17/ao-bringup/fix-telebt
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ 
+ VERSION=4.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleBT
+ 
+ ALTOS_FILE=$REPO/telebt-v$VERSION-*.elf
+--- altos-1.9.17.orig/ao-bringup/test-easymega
++++ altos-1.9.17/ao-bringup/test-easymega
+@@ -19,11 +19,11 @@ ao-list | while read product serial dev;
+ 	    echo "Testing $product $serial $dev"
+ 	    echo ""
+ 
+-	    ./test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
++	    test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -37,7 +37,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-easymega-v1.0
++++ altos-1.9.17/ao-bringup/test-easymega-v1.0
+@@ -12,18 +12,18 @@ echo "\t$PRODUCT v$VERSION powered from
+ echo
+ 
+ ret=1
+-../ao-tools/ao-list/ao-list | while read product serial dev; do
++ao-list | while read product serial dev; do
+     case "$product" in
+ 	"$PRODUCT-v$VERSION")
+ 
+ 	    echo "Testing $product $serial $dev"
+ 	    echo ""
+ 
+-	    ./test-igniters $dev drogue main 0 1 2 3
++	    test-igniters $dev drogue main 0 1 2 3
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -37,7 +37,7 @@ ret=1
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-easymini
++++ altos-1.9.17/ao-bringup/test-easymini
+@@ -23,11 +23,11 @@ while [ $found -eq 0 ]; do
+ 		
+ 		sleep 0.25
+ 
+-		./test-igniters-nowait "$dev" --rplus=100 --rminus=27 --adcmax=32767 drogue main
++		test-igniters-nowait "$dev" --rplus=100 --rminus=27 --adcmax=32767 drogue main
+ 		echo ""
+ 
+ 		echo "Testing baro sensor"
+-		../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++		ao-test-baro --tty="$dev"
+ 
+ 		if [ $? -ne 0 ]; then
+ 		    echo -e '\e[31m'"$PRODUCT-$VERSION serial $serial failed"'\e[39m'
+@@ -38,7 +38,7 @@ while [ $found -eq 0 ]; do
+ 		FLASHSIZE=1048576
+ 
+ 		echo "Testing flash"
+-		../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++		ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 		if [ $? -ne 0 ]; then
+ 		    echo -e '\e[31m'"$PRODUCT-$VERSION serial $serial failed"'\e[39m'
+--- altos-1.9.17.orig/ao-bringup/test-easymini-v1.0
++++ altos-1.9.17/ao-bringup/test-easymini-v1.0
+@@ -23,11 +23,11 @@ while [ $found -eq 0 ]; do
+ 		
+ 		sleep 2
+ 
+-		./test-igniters-nowait "$dev" drogue main
++		test-igniters-nowait "$dev" drogue main
+ 		echo ""
+ 
+ 		echo "Testing baro sensor"
+-		../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++		ao-test-baro --tty="$dev"
+ 
+ 		if [ $? -ne 0 ]; then
+ 		    echo -e '\e[31m'"$PRODUCT-$VERSION serial $serial failed"'\e[39m'
+@@ -38,7 +38,7 @@ while [ $found -eq 0 ]; do
+ 		FLASHSIZE=1048576
+ 
+ 		echo "Testing flash"
+-		../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++		ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 		if [ $? -ne 0 ]; then
+ 		    echo -e '\e[31m'"$PRODUCT-$VERSION serial $serial failed"'\e[39m'
+--- altos-1.9.17.orig/ao-bringup/test-easymini-v3.0
++++ altos-1.9.17/ao-bringup/test-easymini-v3.0
+@@ -23,11 +23,11 @@ while [ $found -eq 0 ]; do
+ 		
+ 		sleep 2
+ 
+-		./test-igniters-nowait "$dev" drogue main
++		test-igniters-nowait "$dev" drogue main
+ 		echo ""
+ 
+ 		echo "Testing baro sensor"
+-		../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++		ao-test-baro --tty="$dev"
+ 
+ 		if [ $? -ne 0 ]; then
+ 		    echo -e '\e[31m'"$PRODUCT-$VERSION serial $serial failed"'\e[39m'
+@@ -38,7 +38,7 @@ while [ $found -eq 0 ]; do
+ 		FLASHSIZE=1048576
+ 
+ 		echo "Testing flash"
+-		../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++		ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 		if [ $? -ne 0 ]; then
+ 		    echo -e '\e[31m'"$PRODUCT-$VERSION serial $serial failed"'\e[39m'
+--- altos-1.9.17.orig/ao-bringup/test-easymotor-v3
++++ altos-1.9.17/ao-bringup/test-easymotor-v3
+@@ -23,12 +23,12 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    echo "" 
+ 
+ 	    echo "Testing pressure sensor input"
+-	    ../ao-tools/ao-test-pressure/ao-test-pressure --tty="$dev" 
++	    ao-test-pressure --tty="$dev" 
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-easytimer
++++ altos-1.9.17/ao-bringup/test-easytimer
+@@ -18,7 +18,7 @@ ao-list | while read product serial dev;
+ 
+ 	    echo "Testing $product $serial $dev"
+ 
+-	    ./test-igniters $dev 0 1
++	    test-igniters $dev 0 1
+ 	    echo""
+ 
+ 	    case $? in
+--- altos-1.9.17.orig/ao-bringup/test-igniters
++++ altos-1.9.17/ao-bringup/test-igniters
+@@ -14,7 +14,7 @@ for igniter in "$@"; do
+ 	    while [ $pass != "y" ]; do
+ 		echo -n "Testing $igniter igniter. Press enter to continue..."
+ 		read foo < /dev/tty
+-		../ao-tools/ao-test-igniter/ao-test-igniter --tty="$dev" $args $igniter
++		ao-test-igniter --tty="$dev" $args $igniter
+ 
+ 		case $? in
+ 		    0)
+--- altos-1.9.17.orig/ao-bringup/test-igniters-nowait
++++ altos-1.9.17/ao-bringup/test-igniters-nowait
+@@ -14,7 +14,7 @@ for igniter in "$@"; do
+ 	    while [ $pass != "y" ]; do
+ 
+ 		echo "Testing $igniter igniter."
+-		../ao-tools/ao-test-igniter/ao-test-igniter --tty="$dev" $args $igniter
++		ao-test-igniter --tty="$dev" $args $igniter
+ 
+ 		case $? in
+ 		    0)
+--- altos-1.9.17.orig/ao-bringup/test-telegps-v1
++++ altos-1.9.17/ao-bringup/test-telegps-v1
+@@ -21,7 +21,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=2097152
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -32,7 +32,7 @@ ao-list | while read product serial dev;
+ 	    esac
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telegps-v2
++++ altos-1.9.17/ao-bringup/test-telegps-v2
+@@ -21,7 +21,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=2097152
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -32,7 +32,7 @@ ao-list | while read product serial dev;
+ 	    esac
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telegps-v3
++++ altos-1.9.17/ao-bringup/test-telegps-v3
+@@ -21,7 +21,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=2097152
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -32,7 +32,7 @@ ao-list | while read product serial dev;
+ 	    esac
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemega-v1.0
++++ altos-1.9.17/ao-bringup/test-telemega-v1.0
+@@ -18,11 +18,11 @@ ao-list | while read product serial dev;
+ 
+ 	    echo "Testing $product $serial $dev"
+ 
+-	    ./test-igniters $dev main drogue 3 0 1 2
++	    test-igniters $dev main drogue 3 0 1 2
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -36,7 +36,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -48,7 +48,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemega-v2.0
++++ altos-1.9.17/ao-bringup/test-telemega-v2.0
+@@ -18,11 +18,11 @@ ao-list | while read product serial dev;
+ 
+ 	    echo "Testing $product $serial $dev"
+ 
+-	    ./test-igniters $dev main drogue 3 0 1 2
++	    test-igniters $dev main drogue 3 0 1 2
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -36,7 +36,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -48,7 +48,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemega-v3.0
++++ altos-1.9.17/ao-bringup/test-telemega-v3.0
+@@ -18,11 +18,11 @@ ao-list | while read product serial dev;
+ 
+ 	    echo "Testing $product $serial $dev"
+ 
+-	    ./test-igniters $dev main drogue 3 0 1 2
++	    test-igniters $dev main drogue 3 0 1 2
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -36,7 +36,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -48,7 +48,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemega-v4.0
++++ altos-1.9.17/ao-bringup/test-telemega-v4.0
+@@ -18,11 +18,11 @@ ao-list | while read product serial dev;
+ 
+ 	    echo "Testing $product $serial $dev"
+ 
+-	    ./test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
++	    test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -36,7 +36,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -48,7 +48,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemega-v5.0
++++ altos-1.9.17/ao-bringup/test-telemega-v5.0
+@@ -18,11 +18,11 @@ ao-list | while read product serial dev;
+ 
+ 	    echo "Testing $product $serial $dev"
+ 
+-	    ./test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
++	    test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -36,7 +36,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -48,7 +48,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemega-v6.0
++++ altos-1.9.17/ao-bringup/test-telemega-v6.0
+@@ -18,11 +18,11 @@ ao-list | while read product serial dev;
+ 
+ 	    echo "Testing $product $serial $dev"
+ 
+-	    ./test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
++	    test-igniters $dev --rplus=100 --rminus=27 --adcmax=4095 main drogue 3 0 1 2
+ 	    echo""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -36,7 +36,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -48,7 +48,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemetrum-v2.0
++++ altos-1.9.17/ao-bringup/test-telemetrum-v2.0
+@@ -19,11 +19,11 @@ ao-list | while read product serial dev;
+ 	    echo "Testing $product $serial $dev"
+ 	    echo ""
+ 
+-	    ./test-igniters "$dev" drogue main
++	    test-igniters "$dev" drogue main
+ 	    echo ""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -37,7 +37,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -49,7 +49,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemetrum-v3.0
++++ altos-1.9.17/ao-bringup/test-telemetrum-v3.0
+@@ -19,11 +19,11 @@ ao-list | while read product serial dev;
+ 	    echo "Testing $product $serial $dev"
+ 	    echo ""
+ 
+-	    ./test-igniters "$dev" --rplus=100 --rminus=27 --adcmax=4095 drogue main
++	    test-igniters "$dev" --rplus=100 --rminus=27 --adcmax=4095 drogue main
+ 	    echo ""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -37,7 +37,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -49,7 +49,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemetrum-v4.0
++++ altos-1.9.17/ao-bringup/test-telemetrum-v4.0
+@@ -19,11 +19,11 @@ ao-list | while read product serial dev;
+ 	    echo "Testing $product $serial $dev"
+ 	    echo ""
+ 
+-	    ./test-igniters "$dev" --rplus=100 --rminus=27 --adcmax=4095 drogue main
++	    test-igniters "$dev" --rplus=100 --rminus=27 --adcmax=4095 drogue main
+ 	    echo ""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -37,7 +37,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=8388608
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+@@ -49,7 +49,7 @@ ao-list | while read product serial dev;
+ 	    echo""
+ 
+ 	    echo "Testing GPS"
+-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
++	    ao-test-gps --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/test-telemini
++++ altos-1.9.17/ao-bringup/test-telemini
+@@ -19,11 +19,11 @@ ao-list | while read product serial dev;
+ 	    echo "Testing $product $serial $dev"
+ 	    echo ""
+ 
+-	    ./test-igniters "$dev" --rplus=100 --rminus=27 --adcmax=4095 drogue main
++	    test-igniters "$dev" --rplus=100 --rminus=27 --adcmax=4095 drogue main
+ 	    echo ""
+ 
+ 	    echo "Testing baro sensor"
+-	    ../ao-tools/ao-test-baro/ao-test-baro --tty="$dev"
++	    ao-test-baro --tty="$dev"
+ 
+ 	    case $? in
+ 		0)
+@@ -37,7 +37,7 @@ ao-list | while read product serial dev;
+ 	    FLASHSIZE=524288
+ 
+ 	    echo "Testing flash"
+-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
++	    ao-test-flash --tty="$dev" "$FLASHSIZE"
+ 
+ 	    case $? in
+ 		0)
+--- altos-1.9.17.orig/ao-bringup/turnon_chaoskey
++++ altos-1.9.17/ao-bringup/turnon_chaoskey
+@@ -16,6 +16,7 @@ fi
+ 
+ VERSION=1.0
+ PRODUCT=ChaosKey
++REPO=/usr/share/altos/mfg-fw
+ 
+ echo "ChaosKey v$VERSION Turn-On and Calibration Program"
+ echo "Copyright 2015 by Keith Packard.  Released under GPL v2"
+@@ -24,8 +25,7 @@ echo "Expectations:"
+ echo "\tChaosKey v$VERSION powered from USB"
+ echo
+ 
+-FLASH_FILE=~/altusmetrumllc/Binaries/chaoskey-v1.0-all-*.bin
+-#ALTOS_FILE=~/altusmetrumllc/Binaries/chaoskey-v1.0-*.elf
++FLASH_FILE=$REPO/chaoskey-v1.0-all-*.bin
+ 
+ $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || true
+ 
+@@ -35,6 +35,6 @@ $DFU_UTIL -a 0 -s 0x08000000:leave -D $F
+ 
+ sleep 3
+ 
+-./test-chaoskey
++test-chaoskey
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_easymega
++++ altos-1.9.17/ao-bringup/turnon_easymega
+@@ -2,7 +2,7 @@
+ 
+ PRODUCT=EasyMega
+ VERSION=2.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ 
+ if [ -x /usr/bin/ao-flash-stm ]; then
+ 	FLASH_STM=/usr/bin/ao-flash-stm
+@@ -68,12 +68,12 @@ echo 'E 0' > $dev
+ 
+ failed=1
+ while [ $failed =  1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-easymega
++test-easymega
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_easymega_v1.0
++++ altos-1.9.17/ao-bringup/turnon_easymega_v1.0
+@@ -2,22 +2,22 @@
+ 
+ PRODUCT=EasyMega
+ 
+-if [ -x ../ao-tools/ao-flash/ao-flash-stm ]; then
+-	STMLOAD=../ao-tools/ao-flash/ao-flash-stm
++if [ -x /usr/bin/ao-flash-stm ]; then
++	STMLOAD=/usr/bin/ao-flash-stm
+ else
+ 	echo "Can't find ao-flash-stm!  Aborting."
+ 	exit 1
+ fi
+ 
+-if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
+-	USBLOAD=../ao-tools/ao-usbload/ao-usbload
++if [ -x /usr/bin/ao-usbload ]; then
++	USBLOAD=/usr/bin/ao-usbload
+ else
+ 	echo "Can't find ao-usbload!  Aborting."
+ 	exit 1
+ fi
+ 
+ VERSION=1.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+ echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
+@@ -53,7 +53,7 @@ $USBLOAD --serial=$SERIAL $REPO/easymega
+ 
+ sleep 2
+ 
+-dev=`../ao-tools/ao-list/ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
++dev=`ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
+ 
+ case "$dev" in
+ /dev/tty*)
+@@ -67,10 +67,10 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-../ao-tools/ao-cal-accel/ao-cal-accel $dev || exit 1
++ao-cal-accel $dev || exit 1
+ 
+ echo 'E 1' > $dev
+ 
+-./test-easymega-v1.0
++test-easymega-v1.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_easymini
++++ altos-1.9.17/ao-bringup/turnon_easymini
+@@ -1,17 +1,13 @@
+ #!/bin/sh
+ 
+-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+-	FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+-elif [ -x /usr/bin/ao-flash-lpc ]; then
++if [ -x /usr/bin/ao-flash-lpc ]; then
+ 	FLASH_LPC=/usr/bin/ao-flash-lpc
+ else
+ 	echo "Can't find ao-flash-lpc!  Aborting."
+ 	exit 1
+ fi
+ 
+-if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
+-	USBLOAD=../ao-tools/ao-usbload/ao-usbload
+-elif [ -x /usr/bin/ao-usbload ]; then
++if [ -x /usr/bin/ao-usbload ]; then
+ 	USBLOAD=/usr/bin/ao-usbload
+ else
+ 	echo "Can't find ao-usbload!  Aborting."
+@@ -20,6 +16,7 @@ fi
+ 
+ VERSION=3.0
+ PRODUCT=EasyMini
++REPO=/usr/share/altos/mfg-fw
+ BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
+ echo $FILE
+ 
+@@ -49,8 +46,8 @@ esac
+ #
+ # Use released versions of everything
+ #
+-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/easymini-v3.0-altos-flash-*.elf
+-ALTOS_FILE=~/altusmetrumllc/Binaries/easymini-v3.0-*.elf
++FLASH_FILE=$REPO/loaders/easymini-v3.0-altos-flash-*.elf
++ALTOS_FILE=$REPO/easymini-v3.0-*.elf
+ 
+ echo $FLASH_LPC $FLASH_FILE
+ 
+@@ -64,6 +61,6 @@ $USBLOAD --serial=$SERIAL $ALTOS_FILE ||
+ 
+ sleep 1
+ 
+-./test-easymini-v3.0
++test-easymini-v3.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_easymini_v1.0
++++ altos-1.9.17/ao-bringup/turnon_easymini_v1.0
+@@ -1,17 +1,13 @@
+ #!/bin/sh
+ 
+-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+-	FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+-elif [ -x /usr/bin/ao-flash-lpc ]; then
++if [ -x /usr/bin/ao-flash-lpc ]; then
+ 	FLASH_LPC=/usr/bin/ao-flash-lpc
+ else
+ 	echo "Can't find ao-flash-lpc!  Aborting."
+ 	exit 1
+ fi
+ 
+-if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
+-	USBLOAD=../ao-tools/ao-usbload/ao-usbload
+-elif [ -x /usr/bin/ao-usbload ]; then
++if [ -x /usr/bin/ao-usbload ]; then
+ 	USBLOAD=/usr/bin/ao-usbload
+ else
+ 	echo "Can't find ao-usbload!  Aborting."
+@@ -20,6 +16,7 @@ fi
+ 
+ VERSION=1.0
+ PRODUCT=EasyMini
++REPO=/usr/share/altos/mfg-fw
+ BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
+ echo $FILE
+ 
+@@ -49,11 +46,8 @@ esac
+ #
+ # Use released versions of everything
+ #
+-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/easymini-v1.0-altos-flash-*.elf
+-ALTOS_FILE=~/altusmetrumllc/Binaries/easymini-v1.0-*.elf
+-
+-#FLASH_FILE=../src/$BASE-v$VERSION/flash-loader/$BASE-v$VERSION-altos-flash-*.elf
+-#ALTOS_FILE=../src/$BASE-v$VERSION/*.ihx
++FLASH_FILE=$REPO/loaders/easymini-v1.0-altos-flash-*.elf
++ALTOS_FILE=$REPO/easymini-v1.0-*.elf
+ 
+ echo $FLASH_LPC $FLASH_FILE
+ 
+@@ -67,6 +61,6 @@ $USBLOAD --serial=$SERIAL $ALTOS_FILE ||
+ 
+ sleep 1
+ 
+-./test-easymini-v1.0
++test-easymini-v1.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_easymotor
++++ altos-1.9.17/ao-bringup/turnon_easymotor
+@@ -1,17 +1,13 @@
+ #!/bin/sh
+ 
+-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+-	FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+-elif [ -x /usr/bin/ao-flash-lpc ]; then
++if [ -x /usr/bin/ao-flash-lpc ]; then
+ 	FLASH_LPC=/usr/bin/ao-flash-lpc
+ else
+ 	echo "Can't find ao-flash-lpc!  Aborting."
+ 	exit 1
+ fi
+ 
+-if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
+-	USBLOAD=../ao-tools/ao-usbload/ao-usbload
+-elif [ -x /usr/bin/ao-usbload ]; then
++if [ -x /usr/bin/ao-usbload ]; then
+ 	USBLOAD=/usr/bin/ao-usbload
+ else
+ 	echo "Can't find ao-usbload!  Aborting."
+@@ -20,6 +16,7 @@ fi
+ 
+ VERSION=3
+ PRODUCT=EasyMotor
++REPO=/usr/share/altos/mfg-fw
+ BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
+ echo $FILE
+ 
+@@ -50,8 +47,8 @@ otootor
+ #
+ # Use released versions of everything
+ #
+-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/easymotor-v3-altos-flash-*.elf
+-ALTOS_FILE=~/altusmetrumllc/Binaries/easymotor-v3-*.elf
++FLASH_FILE=$REPO/loaders/easymotor-v3-altos-flash-*.elf
++ALTOS_FILE=$REPO/easymotor-v3-*.elf
+ 
+ echo $FLASH_LPC $FLASH_FILE
+ 
+@@ -81,7 +78,7 @@ echo 'E 0' > $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+@@ -89,6 +86,6 @@ echo 'E 1' > $dev
+ 
+ sleep 1
+ 
+-./test-easymotor-v3
++test-easymotor-v3
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_easytimer
++++ altos-1.9.17/ao-bringup/turnon_easytimer
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=1
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=EasyTimer
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -67,12 +67,12 @@ echo 'E 0' > $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-easytimer
++test-easytimer
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telebt
++++ altos-1.9.17/ao-bringup/turnon_telebt
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=4.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleBT
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -66,7 +66,7 @@ esac
+ 
+ CALFILE=cal-$SERIAL.txt
+ 
+-../ao-tools/ao-cal-freq/ao-cal-freq --nosave --output=$CALFILE --tty=$dev
++ao-cal-freq --nosave --output=$CALFILE --tty=$dev
+ 
+ CAL_VALUE=`cat $CALFILE`
+ echo $SERIAL","$CAL_VALUE >> cal_values
+--- altos-1.9.17.orig/ao-bringup/turnon_telebt_v3
++++ altos-1.9.17/ao-bringup/turnon_telebt_v3
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=3.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ 
+ echo "TeleBT v$VERSION Turn-On and Calibration Program"
+ echo "Copyright 2015 by Bdale Garbee.  Released under GPL v2"
+@@ -52,7 +52,7 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ echo 'E 1' > $dev
+ 
+--- altos-1.9.17.orig/ao-bringup/turnon_teledongle
++++ altos-1.9.17/ao-bringup/turnon_teledongle
+@@ -1,8 +1,6 @@
+ #!/bin/sh
+ 
+-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+-	FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+-elif [ -x /usr/bin/ao-flash-lpc ]; then
++if [ -x /usr/bin/ao-flash-lpc ]; then
+ 	FLASH_LPC=/usr/bin/ao-flash-lpc
+ else
+ 	echo "Can't find ao-flash-lpc!  Aborting."
+@@ -44,7 +42,7 @@ case $# in
+ 	;;
+ esac
+ 
+-BINARIES=$HOME/altusmetrumllc/Binaries
++BINARIES=/usr/share/altos/mfg-fw
+ 
+ LOADER="$BINARIES/loaders/$PRODUCT-v$VERSION-"*.elf
+ ALTOS="$BINARIES/$PRODUCT-v$VERSION"*.elf
+@@ -73,7 +71,7 @@ echo 'E 0' > $dev
+ 
+ CALFILE=cal-$SERIAL.txt
+ 
+-../ao-tools/ao-cal-freq/ao-cal-freq --verbose --nosave --output=$CALFILE --tty=$dev
++ao-cal-freq --verbose --nosave --output=$CALFILE --tty=$dev
+ 
+ case $? in
+     0)
+--- altos-1.9.17.orig/ao-bringup/turnon_telefireeight
++++ altos-1.9.17/ao-bringup/turnon_telefireeight
+@@ -2,7 +2,7 @@
+ 
+ PRODUCT=TeleFireEight
+ VERSION=2.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ 
+ if [ -x /usr/bin/ao-flash-stm ]; then
+ 	FLASH_STM=/usr/bin/ao-flash-stm
+@@ -65,7 +65,7 @@ case "$dev" in
+ esac
+ 
+ echo 'E 0' > $dev
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ echo 'E 1' > $dev
+ 
+ echo "$PRODUCT-v$VERSION" serial "$SERIAL" is ready for integration and testing
+--- altos-1.9.17.orig/ao-bringup/turnon_telegps
++++ altos-1.9.17/ao-bringup/turnon_telegps
+@@ -1,8 +1,6 @@
+ #!/bin/sh
+ 
+-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+-        FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+-elif [ -x /usr/bin/ao-flash-lpc ]; then
++if [ -x /usr/bin/ao-flash-lpc ]; then
+         FLASH_LPC=/usr/bin/ao-flash-lpc
+ else
+         echo "Can't find ao-flash-lpc!  Aborting."
+@@ -17,6 +15,7 @@ else
+ fi
+ 
+ PRODUCT=TeleGPS
++REPO=/usr/share/altos/mfg-fw
+ VERSION=3.0
+ BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
+ echo $FILE
+@@ -47,8 +46,8 @@ esac
+ #
+ # Use released versions of everything
+ #
+-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telegps-v3.0-altos-flash-*.elf
+-ALTOS_FILE=~/altusmetrumllc/Binaries/telegps-v3.0-*.elf
++FLASH_FILE=$REPO/loaders/telegps-v3.0-altos-flash-*.elf
++ALTOS_FILE=$REPO/telegps-v3.0-*.elf
+ 
+ echo $FLASH_LPC $FLASH_FILE
+ 
+@@ -75,10 +74,10 @@ case "$dev" in
+ esac
+ 
+ CALFILE=cal-$SERIAL.txt
+-../ao-tools/ao-cal-freq/ao-cal-freq --output=$CALFILE --tty=$dev
++ao-cal-freq --output=$CALFILE --tty=$dev
+ CAL_VALUE=`cat $CALFILE`
+ echo $SERIAL","$CAL_VALUE >> cal_values
+ 
+-./test-telegps-v3
++test-telegps-v3
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telegps_v1
++++ altos-1.9.17/ao-bringup/turnon_telegps_v1
+@@ -1,8 +1,6 @@
+ #!/bin/sh
+ 
+-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
+-        FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
+-elif [ -x /usr/bin/ao-flash-lpc ]; then
++if [ -x /usr/bin/ao-flash-lpc ]; then
+         FLASH_LPC=/usr/bin/ao-flash-lpc
+ else
+         echo "Can't find ao-flash-lpc!  Aborting."
+@@ -18,6 +16,7 @@ fi
+ 
+ PRODUCT=TeleGPS
+ VERSION=1.0
++REPO=/usr/share/altos/mfg-fw
+ BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
+ echo $FILE
+ 
+@@ -47,8 +46,8 @@ esac
+ #
+ # Use released versions of everything
+ #
+-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telegps-v1.0-altos-flash-*.elf
+-ALTOS_FILE=~/altusmetrumllc/Binaries/telegps-v1.0-*.elf
++FLASH_FILE=$REPO/loaders/telegps-v1.0-altos-flash-*.elf
++ALTOS_FILE=$REPO/telegps-v1.0-*.elf
+ 
+ echo $FLASH_LPC $FLASH_FILE
+ 
+@@ -74,8 +73,8 @@ case "$dev" in
+         ;;
+ esac
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+-./test-telegps-v1
++test-telegps-v1
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telegps_v2
++++ altos-1.9.17/ao-bringup/turnon_telegps_v2
+@@ -16,7 +16,7 @@ fi
+ 
+ PRODUCT=TeleGPS
+ VERSION=2.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ 
+ #BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
+ #echo $FILE
+@@ -69,8 +69,8 @@ case "$dev" in
+         ;;
+ esac
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+-./test-telegps-v2
++test-telegps-v2
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telelco
++++ altos-1.9.17/ao-bringup/turnon_telelco
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=2.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleLCO
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -66,7 +66,7 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ echo 'E 1' > $dev
+ 
+--- altos-1.9.17.orig/ao-bringup/turnon_telemega
++++ altos-1.9.17/ao-bringup/turnon_telemega
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=6.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMega
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -66,16 +66,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemega-v6.0
++test-telemega-v6.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemega_v1.0
++++ altos-1.9.17/ao-bringup/turnon_telemega_v1.0
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=1.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ 
+ echo "TeleMega v$VERSION Turn-On and Calibration Program"
+ echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
+@@ -52,12 +52,12 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+-../ao-tools/ao-cal-accel/ao-cal-accel $dev
++ao-cal-accel $dev
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemega-v1.0
++test-telemega-v1.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemega_v2.0
++++ altos-1.9.17/ao-bringup/turnon_telemega_v2.0
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=2.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMega
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -66,16 +66,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemega-v2.0
++test-telemega-v2.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemega_v3.0
++++ altos-1.9.17/ao-bringup/turnon_telemega_v3.0
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=3.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMega
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -66,16 +66,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemega-v3.0
++test-telemega-v3.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemega_v4.0
++++ altos-1.9.17/ao-bringup/turnon_telemega_v4.0
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=4.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMega
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -66,16 +66,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemega
++test-telemega
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemega_v5.0
++++ altos-1.9.17/ao-bringup/turnon_telemega_v5.0
+@@ -15,7 +15,7 @@ else
+ fi
+ 
+ VERSION=5.0
+-REPO=~/altusmetrumllc/Binaries
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMega
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -66,16 +66,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemega-v5.0
++test-telemega-v5.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemetrum
++++ altos-1.9.17/ao-bringup/turnon_telemetrum
+@@ -15,6 +15,7 @@ else
+ fi
+ 
+ VERSION=4.0
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMetrum
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -44,11 +45,11 @@ esac
+ 
+ echo $FLASH_STM
+ 
+-$FLASH_STM ~/altusmetrumllc/Binaries/loaders/telemetrum-v$VERSION-*.elf || exit 1
++$FLASH_STM $REPO/loaders/telemetrum-v$VERSION-*.elf || exit 1
+ 
+ sleep 3
+ 
+-$USBLOAD --serial=$SERIAL ~/altusmetrumllc/Binaries/telemetrum-v$VERSION-*.elf || exit 1
++$USBLOAD --serial=$SERIAL $REPO/telemetrum-v$VERSION-*.elf || exit 1
+ 
+ sleep 5
+ 
+@@ -66,16 +67,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemetrum-v4.0
++test-telemetrum-v4.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemetrum_v2.0
++++ altos-1.9.17/ao-bringup/turnon_telemetrum_v2.0
+@@ -15,6 +15,7 @@ else
+ fi
+ 
+ VERSION=2.0
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMetrum
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -44,11 +45,11 @@ esac
+ 
+ echo $FLASH_STM
+ 
+-$FLASH_STM ~/altusmetrumllc/Binaries/loaders/telemetrum-v$VERSION-*.elf || exit 1
++$FLASH_STM $REPO/loaders/telemetrum-v$VERSION-*.elf || exit 1
+ 
+ sleep 3
+ 
+-$USBLOAD --serial=$SERIAL ~/altusmetrumllc/Binaries/telemetrum-v$VERSION-*.elf || exit 1
++$USBLOAD --serial=$SERIAL $REPO/telemetrum-v$VERSION-*.elf || exit 1
+ 
+ sleep 5
+ 
+@@ -66,16 +67,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemetrum-v2.0
++test-telemetrum-v2.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemetrum_v3.0
++++ altos-1.9.17/ao-bringup/turnon_telemetrum_v3.0
+@@ -15,6 +15,7 @@ else
+ fi
+ 
+ VERSION=3.0
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMetrum
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -44,11 +45,11 @@ esac
+ 
+ echo $FLASH_STM
+ 
+-$FLASH_STM ~/altusmetrumllc/Binaries/loaders/telemetrum-v$VERSION-*.elf || exit 1
++$FLASH_STM $REPO/loaders/telemetrum-v$VERSION-*.elf || exit 1
+ 
+ sleep 3
+ 
+-$USBLOAD --serial=$SERIAL ~/altusmetrumllc/Binaries/telemetrum-v$VERSION-*.elf || exit 1
++$USBLOAD --serial=$SERIAL $REPO/telemetrum-v$VERSION-*.elf || exit 1
+ 
+ sleep 5
+ 
+@@ -66,16 +67,16 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ failed=1
+ while [ $failed = 1 ]; do
+-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
++    ao-cal-accel $dev
+     failed=$?
+ done
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemetrum-v3.0
++test-telemetrum-v3.0
+ 
+ exit $?
+--- altos-1.9.17.orig/ao-bringup/turnon_telemini
++++ altos-1.9.17/ao-bringup/turnon_telemini
+@@ -15,6 +15,7 @@ else
+ fi
+ 
+ VERSION=3.0
++REPO=/usr/share/altos/mfg-fw
+ PRODUCT=TeleMini
+ 
+ echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+@@ -40,10 +41,8 @@ case $# in
+ 	;;
+ esac
+ 
+-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telemini-v$VERSION-altos-flash-*.bin
+-ALTOS_FILE=~/altusmetrumllc/Binaries/telemini-v$VERSION-*.elf
+-#FLASH_FILE=../src/telemini-v3.0/flash-loader/telemini-v$VERSION-altos-flash-*.bin
+-#ALTOS_FILE=../src/telemini-v3.0/telemini-v$VERSION-*.elf
++FLASH_FILE=$REPO/loaders/telemini-v$VERSION-altos-flash-*.bin
++ALTOS_FILE=$REPO/telemini-v$VERSION-*.elf
+ 
+ if lsusb -d 0483:df11 | grep -q STM; then
+     $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
+@@ -69,10 +68,10 @@ esac
+ 
+ echo 'E 0' > $dev
+ 
+-SERIAL=$SERIAL ./cal-freq $dev
++SERIAL=$SERIAL cal-freq $dev
+ 
+ echo 'E 1' > $dev
+ 
+-./test-telemini
++test-telemini
+ 
+ exit $?
+--- /dev/null
++++ altos-1.9.17/ao-bringup/turnon_telemini_v2
+@@ -0,0 +1,51 @@
++#!/bin/sh
++
++REPO=/usr/share/altos/mfg-fw
++
++if [ -x /usr/bin/ao-load ]; then
++	AOLOAD=/usr/bin/ao-load
++else
++	echo "Can't find ao-load!  Aborting."
++	exit 1
++fi
++
++if [ -x /usr/bin/ao-rawload ]; then
++	RAWLOAD=/usr/bin/ao-rawload
++else
++	echo "Can't find ao-rawload!  Aborting."
++	exit 1
++fi
++
++echo "TeleMini v2.0 Turn-On and Calibration Program"
++echo "Copyright 2011 by Bdale Garbee.  Released under GPL v2"
++echo "Copyright 2013 by Keith Packard.  Released under GPL v2"
++echo
++echo "Expectations:"
++echo "\tTeleMini v2.0 powered from LiPo"
++echo "\t\twith TeleDongle (on /dev/ttyACM0) cabled to debug header"
++echo "\t\twith frequency counter able to sample RF output"
++echo
++echo -n "TeleMini serial number: "
++read SERIAL
++
++echo $RAWLOAD
++
++#TTY=/dev/ttyACM0
++PROGRAMMER="-D 186"
++BIN=$REPO/telemini-v2.0*.ihx
++
++$RAWLOAD $PROGRAMMER -r ao_led_blink.ihx
++echo "LEDs should be blinking"
++sleep 5
++
++$RAWLOAD $PROGRAMMER -r ao_radio_xmit.ihx
++echo -n "Generating RF carrier.  Please enter measured frequency: "
++read FREQ
++
++CAL_VALUE=`nickle -e "floor(434.55 / $FREQ * 1186611 + 0.5)"`
++
++echo "Programming flash with cal value " $CAL_VALUE
++$AOLOAD $PROGRAMMER --cal=$CAL_VALUE $BIN $SERIAL
++
++echo "Serial number "$SERIAL" programmed with RF cal value "$CAL_VALUE
++echo "Unplug and replug USB, cu to the board, confirm freq and record power"
