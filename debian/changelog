@@ -1,3 +1,9 @@
+altos (1.9.17-2) unstable; urgency=medium
+
+  * work on adding altos-mfg production support package
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 11 Oct 2023 18:08:14 -0600
+
 altos (1.9.17-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
