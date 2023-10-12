@@ -15,7 +15,7 @@ else
 fi
 
 VERSION=2.0
-REPO=~/altusmetrumllc/Binaries
+REPO=/usr/share/altos/mfg-fw
 PRODUCT=TeleLCO
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
@@ -66,7 +66,7 @@ esac
 
 echo 'E 0' > $dev
 
-SERIAL=$SERIAL ./cal-freq $dev
+SERIAL=$SERIAL cal-freq $dev
 
 echo 'E 1' > $dev
 

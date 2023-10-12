@@ -16,6 +16,7 @@ fi
 
 VERSION=1.0
 PRODUCT=ChaosKey
+REPO=/usr/share/altos/mfg-fw
 
 echo "ChaosKey v$VERSION Turn-On and Calibration Program"
 echo "Copyright 2015 by Keith Packard.  Released under GPL v2"
@@ -24,8 +25,7 @@ echo "Expectations:"
 echo "\tChaosKey v$VERSION powered from USB"
 echo
 
-FLASH_FILE=~/altusmetrumllc/Binaries/chaoskey-v1.0-all-*.bin
-#ALTOS_FILE=~/altusmetrumllc/Binaries/chaoskey-v1.0-*.elf
+FLASH_FILE=$REPO/chaoskey-v1.0-all-*.bin
 
 $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || true
 
@@ -35,6 +35,6 @@ $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || true
 
 sleep 3
 
-./test-chaoskey
+test-chaoskey
 
 exit $?

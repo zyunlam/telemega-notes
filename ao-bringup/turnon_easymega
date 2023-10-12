@@ -2,7 +2,7 @@
 
 PRODUCT=EasyMega
 VERSION=2.0
-REPO=~/altusmetrumllc/Binaries
+REPO=/usr/share/altos/mfg-fw
 
 if [ -x /usr/bin/ao-flash-stm ]; then
 	FLASH_STM=/usr/bin/ao-flash-stm
@@ -68,12 +68,12 @@ echo 'E 0' > $dev
 
 failed=1
 while [ $failed =  1 ]; do
-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
+    ao-cal-accel $dev
     failed=$?
 done
 
 echo 'E 1' > $dev
 
-./test-easymega
+test-easymega
 
 exit $?

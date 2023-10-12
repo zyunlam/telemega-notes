@@ -1,17 +1,15 @@
 #!/bin/sh
 
-if [ -x ../ao-tools/ao-load/ao-load ]; then
-	AOLOAD=../ao-tools/ao-load/ao-load
-elif [ -x /usr/bin/ao-load ]; then
+REPO=/usr/share/altos/mfg-fw
+
+if [ -x /usr/bin/ao-load ]; then
 	AOLOAD=/usr/bin/ao-load
 else
 	echo "Can't find ao-load!  Aborting."
 	exit 1
 fi
 
-if [ -x ../ao-tools/ao-rawload/ao-rawload ]; then
-	RAWLOAD=../ao-tools/ao-rawload/ao-rawload
-elif [ -x /usr/bin/ao-rawload ]; then
+if [ -x /usr/bin/ao-rawload ]; then
 	RAWLOAD=/usr/bin/ao-rawload
 else
 	echo "Can't find ao-rawload!  Aborting."
@@ -34,7 +32,7 @@ echo $RAWLOAD
 
 #TTY=/dev/ttyACM0
 PROGRAMMER="-D 186"
-BIN=../src/telemini-v2.0*.ihx
+BIN=$REPO/telemini-v2.0*.ihx
 
 $RAWLOAD $PROGRAMMER -r ao_led_blink.ihx
 echo "LEDs should be blinking"

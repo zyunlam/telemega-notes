@@ -18,7 +18,7 @@ ao-list | while read product serial dev; do
 
 	    echo "Testing $product $serial $dev"
 
-	    ./test-igniters $dev 0 1
+	    test-igniters $dev 0 1
 	    echo""
 
 	    case $? in

@@ -15,6 +15,7 @@ else
 fi
 
 VERSION=3.0
+REPO=/usr/share/altos/mfg-fw
 PRODUCT=TeleMini
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
@@ -40,10 +41,8 @@ case $# in
 	;;
 esac
 
-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telemini-v$VERSION-altos-flash-*.bin
-ALTOS_FILE=~/altusmetrumllc/Binaries/telemini-v$VERSION-*.elf
-#FLASH_FILE=../src/telemini-v3.0/flash-loader/telemini-v$VERSION-altos-flash-*.bin
-#ALTOS_FILE=../src/telemini-v3.0/telemini-v$VERSION-*.elf
+FLASH_FILE=$REPO/loaders/telemini-v$VERSION-altos-flash-*.bin
+ALTOS_FILE=$REPO/telemini-v$VERSION-*.elf
 
 if lsusb -d 0483:df11 | grep -q STM; then
     $DFU_UTIL -a 0 -s 0x08000000:leave -D $FLASH_FILE || exit 1
@@ -69,10 +68,10 @@ esac
 
 echo 'E 0' > $dev
 
-SERIAL=$SERIAL ./cal-freq $dev
+SERIAL=$SERIAL cal-freq $dev
 
 echo 'E 1' > $dev
 
-./test-telemini
+test-telemini
 
 exit $?

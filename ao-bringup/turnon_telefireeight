@@ -2,7 +2,7 @@
 
 PRODUCT=TeleFireEight
 VERSION=2.0
-REPO=~/altusmetrumllc/Binaries
+REPO=/usr/share/altos/mfg-fw
 
 if [ -x /usr/bin/ao-flash-stm ]; then
 	FLASH_STM=/usr/bin/ao-flash-stm
@@ -65,7 +65,7 @@ case "$dev" in
 esac
 
 echo 'E 0' > $dev
-SERIAL=$SERIAL ./cal-freq $dev
+SERIAL=$SERIAL cal-freq $dev
 echo 'E 1' > $dev
 
 echo "$PRODUCT-v$VERSION" serial "$SERIAL" is ready for integration and testing

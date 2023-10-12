@@ -14,7 +14,7 @@ for igniter in "$@"; do
 	    while [ $pass != "y" ]; do
 		echo -n "Testing $igniter igniter. Press enter to continue..."
 		read foo < /dev/tty
-		../ao-tools/ao-test-igniter/ao-test-igniter --tty="$dev" $args $igniter
+		ao-test-igniter --tty="$dev" $args $igniter
 
 		case $? in
 		    0)

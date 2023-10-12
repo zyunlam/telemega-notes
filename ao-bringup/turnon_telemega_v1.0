@@ -15,7 +15,7 @@ else
 fi
 
 VERSION=1.0
-REPO=~/altusmetrumllc/Binaries
+REPO=/usr/share/altos/mfg-fw
 
 echo "TeleMega v$VERSION Turn-On and Calibration Program"
 echo "Copyright 2014 by Bdale Garbee.  Released under GPL v2"
@@ -52,12 +52,12 @@ esac
 
 echo 'E 0' > $dev
 
-SERIAL=$SERIAL ./cal-freq $dev
+SERIAL=$SERIAL cal-freq $dev
 
-../ao-tools/ao-cal-accel/ao-cal-accel $dev
+ao-cal-accel $dev
 
 echo 'E 1' > $dev
 
-./test-telemega-v1.0
+test-telemega-v1.0
 
 exit $?

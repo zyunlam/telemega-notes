@@ -15,7 +15,7 @@ else
 fi
 
 VERSION=3.0
-REPO=~/altusmetrumllc/Binaries
+REPO=/usr/share/altos/mfg-fw
 
 echo "TeleBT v$VERSION Turn-On and Calibration Program"
 echo "Copyright 2015 by Bdale Garbee.  Released under GPL v2"
@@ -52,7 +52,7 @@ esac
 
 echo 'E 0' > $dev
 
-SERIAL=$SERIAL ./cal-freq $dev
+SERIAL=$SERIAL cal-freq $dev
 
 echo 'E 1' > $dev
 

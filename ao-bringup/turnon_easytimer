@@ -15,7 +15,7 @@ else
 fi
 
 VERSION=1
-REPO=~/altusmetrumllc/Binaries
+REPO=/usr/share/altos/mfg-fw
 PRODUCT=EasyTimer
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
@@ -67,12 +67,12 @@ echo 'E 0' > $dev
 
 failed=1
 while [ $failed = 1 ]; do
-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
+    ao-cal-accel $dev
     failed=$?
 done
 
 echo 'E 1' > $dev
 
-./test-easytimer
+test-easytimer
 
 exit $?

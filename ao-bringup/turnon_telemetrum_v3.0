@@ -15,6 +15,7 @@ else
 fi
 
 VERSION=3.0
+REPO=/usr/share/altos/mfg-fw
 PRODUCT=TeleMetrum
 
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
@@ -44,11 +45,11 @@ esac
 
 echo $FLASH_STM
 
-$FLASH_STM ~/altusmetrumllc/Binaries/loaders/telemetrum-v$VERSION-*.elf || exit 1
+$FLASH_STM $REPO/loaders/telemetrum-v$VERSION-*.elf || exit 1
 
 sleep 3
 
-$USBLOAD --serial=$SERIAL ~/altusmetrumllc/Binaries/telemetrum-v$VERSION-*.elf || exit 1
+$USBLOAD --serial=$SERIAL $REPO/telemetrum-v$VERSION-*.elf || exit 1
 
 sleep 5
 
@@ -66,16 +67,16 @@ esac
 
 echo 'E 0' > $dev
 
-SERIAL=$SERIAL ./cal-freq $dev
+SERIAL=$SERIAL cal-freq $dev
 
 failed=1
 while [ $failed = 1 ]; do
-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
+    ao-cal-accel $dev
     failed=$?
 done
 
 echo 'E 1' > $dev
 
-./test-telemetrum-v3.0
+test-telemetrum-v3.0
 
 exit $?

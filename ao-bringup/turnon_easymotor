@@ -1,17 +1,13 @@
 #!/bin/sh
 
-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
-	FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
-elif [ -x /usr/bin/ao-flash-lpc ]; then
+if [ -x /usr/bin/ao-flash-lpc ]; then
 	FLASH_LPC=/usr/bin/ao-flash-lpc
 else
 	echo "Can't find ao-flash-lpc!  Aborting."
 	exit 1
 fi
 
-if [ -x ../ao-tools/ao-usbload/ao-usbload ]; then
-	USBLOAD=../ao-tools/ao-usbload/ao-usbload
-elif [ -x /usr/bin/ao-usbload ]; then
+if [ -x /usr/bin/ao-usbload ]; then
 	USBLOAD=/usr/bin/ao-usbload
 else
 	echo "Can't find ao-usbload!  Aborting."
@@ -20,6 +16,7 @@ fi
 
 VERSION=3
 PRODUCT=EasyMotor
+REPO=/usr/share/altos/mfg-fw
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 echo $FILE
 
@@ -50,8 +47,8 @@ otootor
 #
 # Use released versions of everything
 #
-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/easymotor-v3-altos-flash-*.elf
-ALTOS_FILE=~/altusmetrumllc/Binaries/easymotor-v3-*.elf
+FLASH_FILE=$REPO/loaders/easymotor-v3-altos-flash-*.elf
+ALTOS_FILE=$REPO/easymotor-v3-*.elf
 
 echo $FLASH_LPC $FLASH_FILE
 
@@ -81,7 +78,7 @@ echo 'E 0' > $dev
 
 failed=1
 while [ $failed = 1 ]; do
-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
+    ao-cal-accel $dev
     failed=$?
 done
 
@@ -89,6 +86,6 @@ echo 'E 1' > $dev
 
 sleep 1
 
-./test-easymotor-v3
+test-easymotor-v3
 
 exit $?

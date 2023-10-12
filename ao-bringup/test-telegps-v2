@@ -21,7 +21,7 @@ ao-list | while read product serial dev; do
 	    FLASHSIZE=2097152
 
 	    echo "Testing flash"
-	    ../ao-tools/ao-test-flash/ao-test-flash --tty="$dev" "$FLASHSIZE"
+	    ao-test-flash --tty="$dev" "$FLASHSIZE"
 
 	    case $? in
 		0)
@@ -32,7 +32,7 @@ ao-list | while read product serial dev; do
 	    esac
 
 	    echo "Testing GPS"
-	    ../ao-tools/ao-test-gps/ao-test-gps --tty="$dev"
+	    ao-test-gps --tty="$dev"
 
 	    case $? in
 		0)

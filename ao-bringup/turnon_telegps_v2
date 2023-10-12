@@ -16,7 +16,7 @@ fi
 
 PRODUCT=TeleGPS
 VERSION=2.0
-REPO=~/altusmetrumllc/Binaries
+REPO=/usr/share/altos/mfg-fw
 
 #BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 #echo $FILE
@@ -69,8 +69,8 @@ case "$dev" in
         ;;
 esac
 
-SERIAL=$SERIAL ./cal-freq $dev
+SERIAL=$SERIAL cal-freq $dev
 
-./test-telegps-v2
+test-telegps-v2
 
 exit $?

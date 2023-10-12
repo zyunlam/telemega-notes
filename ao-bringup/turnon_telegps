@@ -1,8 +1,6 @@
 #!/bin/sh
 
-if [ -x ../ao-tools/ao-flash/ao-flash-lpc ]; then
-        FLASH_LPC=../ao-tools/ao-flash/ao-flash-lpc
-elif [ -x /usr/bin/ao-flash-lpc ]; then
+if [ -x /usr/bin/ao-flash-lpc ]; then
         FLASH_LPC=/usr/bin/ao-flash-lpc
 else
         echo "Can't find ao-flash-lpc!  Aborting."
@@ -17,6 +15,7 @@ else
 fi
 
 PRODUCT=TeleGPS
+REPO=/usr/share/altos/mfg-fw
 VERSION=3.0
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 echo $FILE
@@ -47,8 +46,8 @@ esac
 #
 # Use released versions of everything
 #
-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/telegps-v3.0-altos-flash-*.elf
-ALTOS_FILE=~/altusmetrumllc/Binaries/telegps-v3.0-*.elf
+FLASH_FILE=$REPO/loaders/telegps-v3.0-altos-flash-*.elf
+ALTOS_FILE=$REPO/telegps-v3.0-*.elf
 
 echo $FLASH_LPC $FLASH_FILE
 
@@ -75,10 +74,10 @@ case "$dev" in
 esac
 
 CALFILE=cal-$SERIAL.txt
-../ao-tools/ao-cal-freq/ao-cal-freq --output=$CALFILE --tty=$dev
+ao-cal-freq --output=$CALFILE --tty=$dev
 CAL_VALUE=`cat $CALFILE`
 echo $SERIAL","$CAL_VALUE >> cal_values
 
-./test-telegps-v3
+test-telegps-v3
 
 exit $?
