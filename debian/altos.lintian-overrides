@@ -1,2 +1,1 @@
-altos: bad-jar-name usr/share/java/altoslib_14.jar
-altos: bad-jar-name usr/share/java/altosuilib_14.jar
+altos: bad-jar-name [usr/share/java/*]
