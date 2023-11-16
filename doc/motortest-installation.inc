@@ -57,6 +57,16 @@
 		connector, are readily available through various vendors
 		including Amazon, eBay, and AliExpress.
 
+		These pressure sensors have three wires and sometimes a 
+		shield around those wires.  The colors of the wires can vary, 
+		but typically are red for power, black for ground, and green 
+		for the analog output.  Hook red to '+5', green to 'PRES', and
+		black to one of the two 'GND' screws on the board.  The other
+		'GND' screw is available for connecting the shield if one is
+		present.  This is mostly relevant if you're using the product
+		for static testing on the ground with a longer than usual
+		cable. 
+
 		To log in-flight chamber pressure, a typical approach
 		might be to drill a 1/8" sampling hole all the way
 		through the center of the motor's forward closure, then
@@ -68,4 +78,5 @@
 		If you aren't up for machining closures yourself, 
 		link:http://lokiresearch.com[Loki Research] sells 
 		54mm and 75mm "experimental bulkheads" with threaded
-		sensor ports that can be used with snap ring cases.
+		sensor ports that can be used with snap ring cases, 
+		and other related mechanical bits and pieces.
