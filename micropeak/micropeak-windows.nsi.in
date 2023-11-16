@@ -117,6 +117,14 @@ Section "FTDI USB Driver"
 	ExecWait $2
 SectionEnd
 
+Section "Firmware"
+
+	SetOutPath $INSTDIR
+	File "../src/micropeak/micropeak-v0.1-${VERSION}.ihx"
+	File "../src/microsplash/microsplash-v1.0-${VERSION}.ihx"
+
+SectionEnd
+
 Section "Documentation"
 
 	SetOutPath $INSTDIR

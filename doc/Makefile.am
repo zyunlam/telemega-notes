@@ -323,7 +323,7 @@ ATTRIBUTES=--attribute="revdate=$(DOC_DATE)" --attribute="version=$(VERSION)"
 	asciidoctor $(ATTRIBUTES) -b html5 $*.adoc
 
 .adoc.pdf:
-	asciidoctor-pdf $(ATTRIBUTES) $*.adoc
+	asciidoctor-pdf $(ATTRIBUTES) -a optimize $*.adoc
 
 all:	$(HTML) $(PDF)
 
