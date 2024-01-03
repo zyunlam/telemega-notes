@@ -41,6 +41,7 @@ public class TeleGPSConfigUI
 	JLabel			radio_enable_label;
 	JLabel			radio_10mw_label;
 	JLabel			report_feet_label;
+	JLabel			gps_receiver_label;
 	JLabel			rate_label;
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
@@ -62,6 +63,7 @@ public class TeleGPSConfigUI
 	JRadioButton		radio_enable_value;
 	JRadioButton		radio_10mw_value;
 	JComboBox<String>	report_feet_value;
+	JComboBox<String>	gps_receiver_value;
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
@@ -196,6 +198,39 @@ public class TeleGPSConfigUI
 	public int report_feet() {
 		if (report_feet_value.isVisible())
 			return report_feet_value.getSelectedIndex();
+		else
+			return AltosLib.MISSING;
+	}
+
+	void set_gps_receiver_tool_tip() {
+		if (gps_receiver_value.isVisible())
+			gps_receiver_value.setToolTipText("GPS receiver selection");
+		else
+			gps_receiver_value.setToolTipText("Only TeleMega with new firmware supports alternate GPS receivers");
+	}
+
+	public void set_gps_receiver(int new_gps_receiver) {
+		System.out.printf("set_gps_receiver %d\n", new_gps_receiver);
+		if (new_gps_receiver != AltosLib.MISSING) {
+			if (new_gps_receiver >= AltosLib.gps_receiver_names.length)
+				new_gps_receiver = 0;
+			if (new_gps_receiver < 0) {
+				gps_receiver_value.setEnabled(false);
+				new_gps_receiver = 0;
+			} else {
+				gps_receiver_value.setEnabled(true);
+			}
+			gps_receiver_value.setSelectedIndex(new_gps_receiver);
+		}
+		gps_receiver_value.setVisible(new_gps_receiver != AltosLib.MISSING);
+		gps_receiver_label.setVisible(new_gps_receiver != AltosLib.MISSING);
+
+		set_gps_receiver_tool_tip();
+	}
+
+	public int gps_receiver() {
+		if (gps_receiver_value.isVisible())
+			return gps_receiver_value.getSelectedIndex();
 		else
 			return AltosLib.MISSING;
 	}
@@ -428,6 +463,32 @@ public class TeleGPSConfigUI
 		report_feet_value.addItemListener(this);
 		pane.add(report_feet_value, c);
 		set_report_feet_tool_tip();
+		row++;
+
+		/* GPS Receiver */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		gps_receiver_label = new JLabel("GPS Receiver:");
+		pane.add(gps_receiver_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		gps_receiver_value = new JComboBox<String>(AltosLib.gps_receiver_names);
+		gps_receiver_value.setEditable(false);
+		gps_receiver_value.addItemListener(this);
+		pane.add(gps_receiver_value, c);
+		set_gps_receiver_tool_tip();
 		row++;
 
 		/* Radio 10mW limit */

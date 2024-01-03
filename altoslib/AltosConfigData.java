@@ -88,6 +88,9 @@ public class AltosConfigData {
 
 	public int		report_feet;
 
+	/* HAS_GPS_MOSAIC */
+	public int		gps_receiver;
+
 	/* Storage info replies */
 	public int	storage_size;
 	public int	storage_erase_unit;
@@ -331,6 +334,8 @@ public class AltosConfigData {
 
 		report_feet = AltosLib.MISSING;
 
+		gps_receiver = AltosLib.MISSING;
+
 		tracker_motion = AltosLib.MISSING;
 		tracker_interval = AltosLib.MISSING;
 
@@ -525,6 +530,8 @@ public class AltosConfigData {
 		try { radio_10mw = get_int(line, "Radio 10mw limit:"); } catch (Exception e) {}
 
 		try { report_feet = get_int(line, "Report in feet:"); } catch (Exception e) {}
+
+		try { gps_receiver = get_int(line, "GPS receiver:"); } catch (Exception e) {}
 
 		/* HAS_TRACKER */
 		try {
@@ -777,6 +784,9 @@ public class AltosConfigData {
 		if (report_feet != AltosLib.MISSING)
 			report_feet = source.report_feet();
 
+		if (gps_receiver != AltosLib.MISSING)
+			gps_receiver = source.gps_receiver();
+
 		/* HAS_TRACKER */
 		if (tracker_motion != AltosLib.MISSING)
 			tracker_motion = source.tracker_motion();
@@ -834,6 +844,7 @@ public class AltosConfigData {
 		dest.set_beep(beep);
 		dest.set_radio_10mw(radio_10mw);
 		dest.set_report_feet(report_feet);
+		dest.set_gps_receiver(gps_receiver);
 		dest.set_tracker_motion(tracker_motion);
 		dest.set_tracker_interval(tracker_interval);
 	}
@@ -957,9 +968,12 @@ public class AltosConfigData {
 		if (radio_10mw != AltosLib.MISSING)
 			link.printf("c p %d\n", radio_10mw);
 
-		/* HAS_RADIO_10MW */
 		if (report_feet != AltosLib.MISSING)
 			link.printf("c u %d\n", report_feet);
+
+		/* HAS_GPS_MOSAIC */
+		if (gps_receiver != AltosLib.MISSING)
+			link.printf("c g %d\n", gps_receiver);
 
 		/* HAS_TRACKER */
 		if (tracker_motion != AltosLib.MISSING && tracker_interval != AltosLib.MISSING)
