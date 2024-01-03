@@ -140,6 +140,13 @@ public class AltosLib {
 	public final static int product_basestation = 0x10000 + 1;
 	public final static int product_altimeter = 0x10000 + 2;
 
+	public final static int gps_builtin = 0;
+	public final static int gps_mosaic = 1;
+
+	public final static String[] gps_receiver_names = {
+		"Builtin", "Mosaic-X5"
+	};
+
 	private static class Product {
 		final String	name;
 		final int	product;
