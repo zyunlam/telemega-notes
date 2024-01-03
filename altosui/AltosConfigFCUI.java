@@ -353,7 +353,7 @@ public class AltosConfigFCUI
 
 	void set_beep_tool_tip() {
 		if (beep_value.isVisible())
-			beep_value.setToolTipText("What frequency the beeper will sound at");
+			beep_value.setToolTipText("What frequency the beeper will sound at (0 for off)");
 		else
 			beep_value.setToolTipText("Older firmware could not select beeper frequency");
 	}

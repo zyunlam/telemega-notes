@@ -559,7 +559,7 @@ public class AltosConvert {
 
 	public static int beep_freq_to_value(double freq) {
 		if (freq == 0)
-			return 94;
+			return 0;
 		return (int) Math.floor (1.0/2.0 * (24.0e6/32.0) / freq + 0.5);
 	}
 
