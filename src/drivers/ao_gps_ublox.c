@@ -20,6 +20,10 @@
 #include "ao.h"
 #endif
 
+#ifdef HAS_GPS_MOSAIC
+#include "ao_gps_mosaic.h"
+#endif
+
 #include "ao_gps_ublox.h"
 
 #define AO_UBLOX_DEBUG 0
@@ -851,10 +855,14 @@ ao_gps(void)
 
 #ifdef HAS_GPS_MOSAIC
 	ao_config_get();
-	if (ao_config.gps_mosaic)
-		ao_exit();
+	if (ao_config.gps_mosaic) {
+		ao_gps_mosaic();
+		return;
+	}
 #endif
+#ifndef AO_GPS_TEST
 	ao_cmd_register(&ao_gps_cmds[0]);
+#endif
 
 	ao_gps_setup();
 

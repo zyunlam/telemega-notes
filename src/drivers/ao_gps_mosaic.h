@@ -20,7 +20,7 @@
 #define _AO_GPS_MOSAIC_H_
 
 void
-ao_gps_mosaic_init(void);
+ao_gps_mosaic(void);
 
 struct sbf_header {
 	uint16_t	crc;

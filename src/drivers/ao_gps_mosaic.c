@@ -183,17 +183,13 @@ clip_value(float value, float low, float high)
 	return (int32_t) roundf(value);
 }
 
-static void
-mosaic(void)
+void
+ao_gps_mosaic(void)
 {
 	AO_TICK_TYPE		packet_start_tick;
 	AO_TICK_TYPE		solution_tick = 0;
 
 #ifndef AO_GPS_TEST
-	ao_config_get();
-	if (!ao_config.gps_mosaic)
-		ao_exit();
-
 	ao_cmd_register(&ao_mosaic_cmds[0]);
 #endif
 	mosaic_setup();
@@ -360,15 +356,5 @@ mosaic(void)
 		ao_wakeup(&ao_gps_new);
 	}
 }
-
-#ifndef AO_GPS_TEST
-static struct ao_task mosaic_task;
-
-void
-ao_gps_mosaic_init(void)
-{
-	ao_add_task(&mosaic_task, mosaic, "mosaic");
-}
-#endif
 
 #endif
