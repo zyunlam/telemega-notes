@@ -25,6 +25,9 @@
 #include <ao_companion.h>
 #include <ao_profile.h>
 #include <ao_eeprom.h>
+#ifdef HAS_GPS_MOSAIC
+#include <ao_gps_mosaic.h>
+#endif
 #if HAS_SAMPLE_PROFILE
 #include <ao_sample_profile.h>
 #endif
@@ -72,6 +75,9 @@ main(void)
 
 	ao_usb_init();
 	ao_gps_init();
+#ifdef HAS_GPS_MOSAIC
+	ao_gps_mosaic_init();
+#endif
 	ao_gps_report_mega_init();
 	ao_telemetry_init();
 	ao_radio_init();
