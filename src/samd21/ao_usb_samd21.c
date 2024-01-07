@@ -28,6 +28,10 @@
 #define AO_USB_DEVICE_ID_SERIAL 0
 #endif
 
+#ifndef USE_USB_STDIO
+#define USE_USB_STDIO	1
+#endif
+
 #if USE_USB_FIFO
 static struct ao_fifo	ao_usb_rx_fifo;
 #endif
