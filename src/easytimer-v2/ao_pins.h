@@ -29,7 +29,7 @@
 
 #define AO_CONFIG_MAX_SIZE	1024
 
-#define HAS_EEPROM		0
+#define HAS_EEPROM		1
 #define USE_INTERNAL_FLASH	0
 #define USE_EEPROM_CONFIG	0
 #define USE_STORAGE_CONFIG	1
@@ -56,7 +56,7 @@
 #define HAS_FLIGHT		1
 #define HAS_ADC			1
 #define HAS_ADC_TEMP		1
-#define HAS_LOG			0
+#define HAS_LOG			1
 
 /*
  * Igniter
@@ -228,5 +228,16 @@ struct ao_adc {
 #define HAS_MONITOR_PUT		1
 #define AO_MONITOR_LED		0
 #define HAS_RSSI		0
+
+/*
+ * Logging
+ */
+
+#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	(1024 * 1024)
+#define AO_CONFIG_MAX_SIZE			1024
+#define LOG_ERASE_MARK				0x55
+#define LOG_MAX_ERASE				128
+#define AO_LOG_FORMAT				AO_LOG_FORMAT_EASYTIMER_2
+#define AO_LOG_NORMALIZED			1
 
 #endif /* _AO_PINS_H_ */
