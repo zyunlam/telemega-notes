@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Keith Packard <keithp@keithp.com>
+ * Copyright © 2024 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 #include <ao_flash_samd21_pins.h>
 
-/* Companion port cs_companion0 PB6 */
+/* Debug connector, pin 5 cs_companion0 PA18 */
 
 #define AO_BOOT_PIN			1
 #define AO_BOOT_APPLICATION_GPIO	(samd21_port_a)
