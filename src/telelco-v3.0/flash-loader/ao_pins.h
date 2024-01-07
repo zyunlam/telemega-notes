@@ -60,6 +60,6 @@
 
 #define HAS_USB_PULLUP	1
 #define AO_USB_PULLUP_PORT	(&stm_gpioa)
-#define AO_USB_PULLUP_PIN	9
+#define AO_USB_PULLUP_PIN	10
 
 #endif /* _AO_PINS_H_ */
