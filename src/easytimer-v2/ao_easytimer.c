@@ -52,7 +52,7 @@ main(void)
 	ao_mmc5983_init();
 
 	ao_flight_init();
-	// ao_log_init();
+	ao_log_init();
 	ao_report_init();
 
 	ao_usb_init();
