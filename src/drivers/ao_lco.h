@@ -46,6 +46,7 @@ extern uint8_t	ao_lco_firing;		/* fire button pressed */
 
 extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 
+#define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
 #define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
 
 extern uint16_t	ao_lco_min_box, ao_lco_max_box;
@@ -80,6 +81,9 @@ ao_lco_step_pad(int8_t dir);
 
 void
 ao_lco_set_box(uint16_t new_box);
+
+void
+ao_lco_step_box(int8_t dir);
 
 void
 ao_lco_set_armed(uint8_t armed);
@@ -143,5 +147,21 @@ ao_lco_init(void);
 
 uint8_t
 ao_lco_box_present(uint16_t box);
+
+#ifdef AO_LCO_SEARCH_API
+
+void
+ao_lco_search_start(void);
+
+void
+ao_lco_search_box_check(uint16_t box);
+
+void
+ao_lco_search_box_present(uint16_t box);
+
+void
+ao_lco_search_done(void);
+
+#endif /* AO_LCO_SEARCH_API */
 
 #endif /* _AO_LCO_H_ */

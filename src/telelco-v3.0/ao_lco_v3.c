@@ -63,8 +63,7 @@ static const struct ao_transform logo_transform = {
 #define SCAN_HEIGHT	3
 #define FOUND_Y		63
 #define FOUND_X		6
-#define FOUND_WIDTH	17
-#define MAX_VALID	(WIDTH / FOUND_WIDTH)
+#define FOUND_WIDTH	(WIDTH - 6)
 
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
@@ -79,61 +78,65 @@ static uint8_t	ao_lco_event_debug;
 
 static uint8_t	ao_lco_display_mutex;
 
-void
-ao_lco_show_pad(uint8_t pad)
+static void
+_ao_lco_show_pad(uint8_t pad)
 {
 	char	str[5];
 
-	ao_mutex_get(&ao_lco_display_mutex);
 	snprintf(str, sizeof(str), "%d", pad);
 	ao_text(&fb, &BIG_FONT, PAD_X, VALUE_Y, str, AO_BLACK, AO_COPY);
 	ao_text(&fb, &SMALL_FONT, PAD_LABEL_X, LABEL_Y, "Pad", AO_BLACK, AO_COPY);
-	ao_rect(&fb, SEP_X, 0, 2, HEIGHT, AO_BLACK, AO_COPY);
-	ao_mutex_put(&ao_lco_display_mutex);
-}
-void
-ao_lco_show_box(uint16_t box)
-{
-	char	str[7];
-
-	ao_mutex_get(&ao_lco_display_mutex);
-	snprintf(str, sizeof(str), "%2d", box);
-	ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
-	ao_text(&fb, &SMALL_FONT, BOX_LABEL_X, LABEL_Y, "Box", AO_BLACK, AO_COPY);
-	ao_mutex_put(&ao_lco_display_mutex);
 }
 
 static void
-ao_lco_show_voltage(uint16_t decivolts, const char *label)
+_ao_lco_show_box(uint16_t box)
+{
+	char	str[7];
+
+	snprintf(str, sizeof(str), "%2d", box);
+	ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
+	ao_text(&fb, &SMALL_FONT, BOX_LABEL_X, LABEL_Y, "Box", AO_BLACK, AO_COPY);
+}
+
+static void
+_ao_lco_show_voltage(uint16_t decivolts, const char *label)
 {
 	char	str[7];
 
 	PRINTD("voltage %d\n", decivolts);
 	snprintf(str, sizeof(str), "%2d.%d", decivolts / 10, decivolts % 10);
-	ao_mutex_get(&ao_lco_display_mutex);
-	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
 	ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
 	ao_text(&fb, &SMALL_FONT, VOLT_LABEL_X, LABEL_Y, label, AO_BLACK, AO_COPY);
-	ao_mutex_put(&ao_lco_display_mutex);
+}
+
+static void
+_ao_lco_batt_voltage(void)
+{
+	struct ao_adc	packet;
+	int16_t		decivolt;
+
+	ao_adc_single_get(&packet);
+	decivolt = ao_battery_decivolt(packet.v_batt);
+	_ao_lco_show_voltage((uint16_t) decivolt, "LCO battery");
+	ao_st7565_update(&fb);
 }
 
 void
 ao_lco_show(void)
 {
-	if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
-		ao_lco_show_voltage(ao_pad_query.battery, "Pad battery");
+	ao_mutex_get(&ao_lco_display_mutex);
+	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
+	if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+		_ao_lco_batt_voltage();
+	} else if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
+		_ao_lco_show_voltage(ao_pad_query.battery, "Pad battery");
 	} else {
-		ao_lco_show_pad(ao_lco_pad);
-		ao_lco_show_box(ao_lco_box);
+		_ao_lco_show_pad(ao_lco_pad);
+		_ao_lco_show_box(ao_lco_box);
+		ao_rect(&fb, SEP_X, 0, 2, HEIGHT, AO_BLACK, AO_COPY);
 	}
-}
-
-uint8_t
-ao_lco_box_present(uint16_t box)
-{
-	if (box >= AO_PAD_MAX_BOXES)
-		return 0;
-	return (ao_lco_box_mask[AO_LCO_MASK_ID(box)] >> AO_LCO_MASK_SHIFT(box)) & 1;
+	ao_st7565_update(&fb);
+	ao_mutex_put(&ao_lco_display_mutex);
 }
 
 static void
@@ -158,22 +161,6 @@ ao_lco_set_select(void)
 	}
 }
 
-static void
-ao_lco_step_box(int8_t dir)
-{
-	int32_t new_box = (int32_t) ao_lco_box;
-
-	do {
-		new_box += dir;
-		if (new_box > ao_lco_max_box)
-			new_box = ao_lco_min_box;
-		else if (new_box < ao_lco_min_box)
-			new_box = ao_lco_max_box;
-		if (new_box == ao_lco_box)
-			break;
-	} while (!ao_lco_box_present((uint16_t) new_box));
-	ao_lco_set_box((uint16_t) new_box);
-}
 
 static struct ao_task	ao_lco_drag_task;
 
@@ -267,31 +254,61 @@ ao_lco_input(void)
 static void
 ao_lco_display_test(void)
 {
-	ao_mutex_get(&ao_lco_display_mutex);
-	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
-	ao_logo(&fb, &logo_transform, &LOGO_FONT, AO_BLACK, AO_COPY);
-	ao_mutex_put(&ao_lco_display_mutex);
 	ao_led_on(AO_LEDS_AVAILABLE);
-	ao_delay(AO_MS_TO_TICKS(1000));
+	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_BLACK, AO_COPY);
+	ao_st7565_update(&fb);
+	ao_delay(AO_MS_TO_TICKS(250));
 	ao_led_off(AO_LEDS_AVAILABLE);
-}
-
-static void
-ao_lco_batt_voltage(void)
-{
-	struct ao_adc	packet;
-	int16_t		decivolt;
-
-	ao_adc_single_get(&packet);
-	decivolt = ao_battery_decivolt(packet.v_batt);
-	ao_lco_show_voltage((uint16_t) decivolt, "LCO battery");
-	ao_delay(AO_MS_TO_TICKS(1000));
 }
 
 static struct ao_task ao_lco_input_task;
 static struct ao_task ao_lco_monitor_task;
 static struct ao_task ao_lco_arm_warn_task;
 static struct ao_task ao_lco_igniter_status_task;
+
+static int16_t	found_x;
+
+void
+ao_lco_search_start(void)
+{
+	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
+	ao_logo(&fb, &logo_transform, &LOGO_FONT, AO_BLACK, AO_COPY);
+	found_x = FOUND_X;
+}
+
+void
+ao_lco_search_box_check(uint16_t box)
+{
+	if (box > 0)
+		ao_rect(&fb, SCAN_X, SCAN_Y, (int16_t) box, SCAN_HEIGHT, AO_BLACK, AO_COPY);
+	ao_st7565_update(&fb);
+}
+
+void
+ao_lco_search_box_present(uint16_t box)
+{
+	char	str[8];
+	if (found_x < FOUND_WIDTH)
+	{
+		snprintf(str, sizeof(str), "%s%02u", found_x ? ", " : "", box);
+		found_x = ao_text(&fb, &TINY_FONT, found_x, FOUND_Y, str, AO_BLACK, AO_COPY);
+	}
+}
+
+void
+ao_lco_search_done(void)
+{
+	ao_st7565_update(&fb);
+}
+
+static void
+ao_lco_batt_voltage(void)
+{
+	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
+	_ao_lco_batt_voltage();
+	ao_st7565_update(&fb);
+	ao_delay(AO_MS_TO_TICKS(1000));
+}
 
 static void
 ao_lco_main(void)

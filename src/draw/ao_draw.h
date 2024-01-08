@@ -160,7 +160,7 @@ ao_poly(struct ao_bitmap		*dst,
 	uint32_t			fill,
 	uint8_t				rop);
 
-void
+int16_t
 ao_text(struct ao_bitmap	*dst,
 	const struct ao_font	*font,
 	int16_t			x,

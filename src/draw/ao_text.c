@@ -24,7 +24,7 @@ static struct ao_bitmap	src_bitmap = {
 	.base = ao_glyph_temp,
 };
 
-void
+int16_t
 ao_text(struct ao_bitmap	*dst,
 	const struct ao_font	*font,
 	int16_t			x,
@@ -76,4 +76,5 @@ ao_text(struct ao_bitmap	*dst,
 			0, 0, rop);
 		x += advance;
 	}
+	return x;
 }

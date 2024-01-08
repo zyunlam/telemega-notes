@@ -288,4 +288,6 @@ struct ao_adc {
  */
 #define AO_ADC_REFERENCE_DV	33
 
+#define AO_LCO_SEARCH_API
+
 #endif /* _AO_PINS_H_ */

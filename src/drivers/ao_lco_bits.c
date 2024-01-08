@@ -84,6 +84,10 @@ ao_lco_igniter_status(void)
 		else
 #endif
 			ao_sleep(&ao_pad_query);
+		if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+			ao_led_off(AO_LED_GREEN|AO_LED_AMBER|AO_LED_RED);
+			continue;
+		}
 		PRINTD("RSSI %d VALID %d\n", ao_radio_cmac_rssi, ao_lco_valid[ao_lco_box]);
 		if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST)) {
 			ao_led_on(AO_LED_RED);
@@ -180,6 +184,11 @@ ao_lco_get_channels(uint16_t box, struct ao_pad_query *query)
 void
 ao_lco_update(void)
 {
+	if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+		ao_lco_show();
+		return;
+	}
+
 	uint8_t	previous_valid = ao_lco_valid[ao_lco_box];
 
 	if (ao_lco_get_channels(ao_lco_box, &ao_pad_query) & AO_LCO_VALID_LAST) {
@@ -226,11 +235,14 @@ void
 ao_lco_set_box(uint16_t new_box)
 {
 	ao_lco_box = new_box;
-	if (ao_lco_box < AO_PAD_MAX_BOXES) {
-		if (ao_lco_pretending)
-			ao_lco_channels[ao_lco_box] = 0xff;
-		else
-			ao_lco_channels[ao_lco_box] = 0;
+	if (ao_lco_box != AO_LCO_LCO_VOLTAGE)
+	{
+		if (ao_lco_box < AO_PAD_MAX_BOXES) {
+			if (ao_lco_pretending)
+				ao_lco_channels[ao_lco_box] = 0xff;
+			else
+				ao_lco_channels[ao_lco_box] = 0;
+		}
 	}
 	ao_lco_pad = 1;
 	ao_lco_show();
@@ -254,9 +266,39 @@ ao_lco_step_pad(int8_t dir)
 	ao_lco_set_pad((uint8_t) new_pad);
 }
 
+uint8_t
+ao_lco_box_present(uint16_t box)
+{
+	if (box == AO_LCO_LCO_VOLTAGE)
+		return 1;
+	if (box >= AO_PAD_MAX_BOXES)
+		return 0;
+	return (ao_lco_box_mask[AO_LCO_MASK_ID(box)] >> AO_LCO_MASK_SHIFT(box)) & 1;
+}
+
+void
+ao_lco_step_box(int8_t dir)
+{
+	int32_t new_box = (int32_t) ao_lco_box;
+
+	do {
+		new_box += dir;
+		if (new_box > ao_lco_max_box)
+			new_box = AO_LCO_LCO_VOLTAGE;
+		else if (new_box < 0)
+			new_box = ao_lco_max_box;
+		if (new_box == ao_lco_box)
+			break;
+	} while (!ao_lco_box_present((uint16_t) new_box));
+	ao_lco_set_box((uint16_t) new_box);
+}
+
 void
 ao_lco_set_armed(uint8_t armed)
 {
+	if (ao_lco_box == AO_LCO_LCO_VOLTAGE)
+		return;
+
 	ao_lco_armed = armed;
 	PRINTD("Armed %d\n", ao_lco_armed);
 	if (ao_lco_armed) {
@@ -299,11 +341,19 @@ ao_lco_search(void)
 	uint16_t	boxes = 0;
 
 	ao_lco_box_reset_present();
+#ifdef AO_LCO_SEARCH_API
+	ao_lco_search_start();
+#else
 	ao_lco_show_box(0);
 	ao_lco_show_pad(0);
+#endif
 	for (box = 0; box < AO_PAD_MAX_BOXES; box++) {
+#ifdef AO_LCO_SEARCH_API
+		ao_lco_search_box_check(box);
+#else
 		if ((box % 10) == 0)
 			ao_lco_show_box(box);
+#endif
 		for (try = 0; try < 3; try++) {
 			ao_lco_tick_offset[box] = 0;
 			r = ao_lco_query(box, &ao_pad_query, &ao_lco_tick_offset[box]);
@@ -311,7 +361,11 @@ ao_lco_search(void)
 			if (r == AO_RADIO_CMAC_OK) {
 				++boxes;
 				ao_lco_box_set_present(box);
+#ifdef AO_LCO_SEARCH_API
+				ao_lco_search_box_present(box);
+#else
 				ao_lco_show_pad((uint8_t) (boxes % 10));
+#endif
 				ao_delay(AO_MS_TO_TICKS(30));
 				break;
 			}
@@ -323,6 +377,9 @@ ao_lco_search(void)
 		ao_lco_min_box = ao_lco_max_box = ao_lco_box = 0;
 	memset(ao_lco_valid, 0, sizeof (ao_lco_valid));
 	memset(ao_lco_channels, 0, sizeof (ao_lco_channels));
+#ifdef AO_LCO_SEARCH_API
+	ao_lco_search_done();
+#endif
 	ao_lco_set_box(ao_lco_min_box);
 }
 
@@ -402,7 +459,7 @@ ao_lco_drag_add_beeps(uint8_t beeps)
 void
 ao_lco_toggle_drag(void)
 {
-	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE) {
+	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE && ao_lco_box != AO_LCO_LCO_VOLTAGE) {
 		ao_lco_selected[ao_lco_box] ^= (uint8_t) (1 << (ao_lco_pad - 1));
 		PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
 		       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);
