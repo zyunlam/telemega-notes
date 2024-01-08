@@ -30,24 +30,6 @@
 //#include <ao_adc_single.h>
 #include <ao_st7565.h>
 
-uint8_t
-ao_eeprom_read(ao_pos_t pos, void *v, uint16_t len)
-{
-	(void) pos;
-	(void) v;
-	(void) len;
-	return 0;
-}
-
-uint8_t
-ao_eeprom_write(ao_pos_t pos32, void *v, uint16_t len)
-{
-	(void) pos32;
-	(void) v;
-	(void) len;
-	return 0;
-}
-
 int
 main(void)
 {
