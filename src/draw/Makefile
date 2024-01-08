@@ -95,7 +95,9 @@ FONT_SRCS=$(BDFS:.bdf=.c)
 .bdf.c:
 	nickle font-convert -o $@ $<
 
-all: ao_font.h ao_logo.h lco-test line-test
+all: ao_font.h ao_logo.h
+
+test: lco-test line-test
 
 $(FONT_SRCS): font-convert
 

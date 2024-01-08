@@ -61,7 +61,7 @@ ARMM0DIRS=\
 AVRDIRS=\
 	micropeak microkite microsplash
 
-SUBDIRS=
+SUBDIRS=draw
 
 ifeq ($(strip $(HAVE_ARM_M3_CC)),yes)
 SUBDIRS+=$(ARMM3DIRS)
