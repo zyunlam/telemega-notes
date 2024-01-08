@@ -21,6 +21,49 @@
 #include <ao_event.h>
 #include <ao_quadrature.h>
 #include <ao_radio_cmac.h>
+#include <ao_st7565.h>
+
+#define WIDTH	AO_ST7565_WIDTH
+#define HEIGHT	AO_ST7565_HEIGHT
+#define STRIDE	AO_BITMAP_STRIDE(WIDTH)
+
+static uint32_t	image[STRIDE * HEIGHT];
+
+static struct ao_bitmap fb = {
+	.base = image,
+	.stride = STRIDE,
+	.width = WIDTH,
+	.height = HEIGHT,
+	.damage = AO_BOX_INIT,
+};
+
+static const struct ao_transform logo_transform = {
+	.x_scale = 48, .x_off = 2,
+	.y_scale = 48, .y_off = 0,
+};
+
+#define BIG_FONT BitstreamVeraSans_Roman_58_font
+#define VOLT_FONT BitstreamVeraSans_Roman_58_font
+#define SMALL_FONT BitstreamVeraSans_Roman_12_font
+#define TINY_FONT BitstreamVeraSans_Roman_10_font
+#define LOGO_FONT BenguiatGothicStd_Bold_26_font
+
+#define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
+#define VALUE_Y		(int16_t) (LABEL_Y + BIG_FONT.ascent + 5)
+#define BOX_X		2
+#define PAD_X		90
+#define BOX_LABEL_X	30
+#define VOLT_LABEL_X	25
+#define RSSI_LABEL_X	15
+#define PAD_LABEL_X	95
+#define SEP_X		(PAD_X - 8)
+#define SCAN_X		(WIDTH - 100) / 2
+#define SCAN_Y		50
+#define SCAN_HEIGHT	3
+#define FOUND_Y		63
+#define FOUND_X		6
+#define FOUND_WIDTH	17
+#define MAX_VALID	(WIDTH / FOUND_WIDTH)
 
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
@@ -38,37 +81,38 @@ static uint8_t	ao_lco_display_mutex;
 void
 ao_lco_show_pad(uint8_t pad)
 {
+	char	str[5];
+
 	ao_mutex_get(&ao_lco_display_mutex);
-	(void) pad;
-//	ao_seven_segment_set(AO_LCO_PAD_DIGIT, (uint8_t) (pad | (ao_lco_drag_race << 4)));
+	snprintf(str, sizeof(str), "%d", pad);
+	ao_text(&fb, &BIG_FONT, PAD_X, VALUE_Y, str, AO_BLACK, AO_COPY);
+	ao_text(&fb, &SMALL_FONT, PAD_LABEL_X, LABEL_Y, "Pad", AO_BLACK, AO_COPY);
+	ao_rect(&fb, SEP_X, 0, 2, HEIGHT, AO_BLACK, AO_COPY);
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 void
 ao_lco_show_box(uint16_t box)
 {
+	char	str[7];
+
 	ao_mutex_get(&ao_lco_display_mutex);
-	(void) box;
-//	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, (uint8_t) (box % 10 | (ao_lco_drag_race << 4)));
-//	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, (uint8_t) (box / 10 | (ao_lco_drag_race << 4)));
+	snprintf(str, sizeof(str), "%2d", box);
+	ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
+	ao_text(&fb, &SMALL_FONT, BOX_LABEL_X, LABEL_Y, "Box", AO_BLACK, AO_COPY);
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
 static void
-ao_lco_show_voltage(uint16_t decivolts)
+ao_lco_show_voltage(uint16_t decivolts, const char *label)
 {
-	uint8_t	tens, ones, tenths;
+	char	str[7];
 
 	PRINTD("voltage %d\n", decivolts);
-	tenths = (uint8_t) (decivolts % 10);
-	ones = (uint8_t) ((decivolts / 10) % 10);
-	tens = (uint8_t) ((decivolts / 100) % 10);
+	snprintf(str, sizeof(str), "%2d.%d", decivolts / 10, decivolts % 10);
 	ao_mutex_get(&ao_lco_display_mutex);
-	(void) tenths;
-	(void) ones;
-	(void) tens;
-//	ao_seven_segment_set(AO_LCO_PAD_DIGIT, tenths);
-//	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, ones | 0x10);
-//	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, tens);
+	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
+	ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
+	ao_text(&fb, &SMALL_FONT, VOLT_LABEL_X, LABEL_Y, label, AO_BLACK, AO_COPY);
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
@@ -76,7 +120,7 @@ void
 ao_lco_show(void)
 {
 	if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
-		ao_lco_show_voltage(ao_pad_query.battery);
+		ao_lco_show_voltage(ao_pad_query.battery, "Pad battery");
 	} else {
 		ao_lco_show_pad(ao_lco_pad);
 		ao_lco_show_box(ao_lco_box);
@@ -223,9 +267,8 @@ static void
 ao_lco_display_test(void)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
-//	ao_seven_segment_set(AO_LCO_PAD_DIGIT, 8 | 0x10);
-//	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, 8 | 0x10);
-//	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, 8 | 0x10);
+	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
+	ao_logo(&fb, &logo_transform, &LOGO_FONT, AO_BLACK, AO_COPY);
 	ao_mutex_put(&ao_lco_display_mutex);
 	ao_led_on(AO_LEDS_AVAILABLE);
 	ao_delay(AO_MS_TO_TICKS(1000));
@@ -241,7 +284,7 @@ ao_lco_batt_voltage(void)
 //	ao_adc_single_get(&packet);
 	packet.v_batt = 0;
 	decivolt = ao_battery_decivolt(packet.v_batt);
-	ao_lco_show_voltage((uint16_t) decivolt);
+	ao_lco_show_voltage((uint16_t) decivolt, "LCO battery");
 	ao_delay(AO_MS_TO_TICKS(1000));
 }
 

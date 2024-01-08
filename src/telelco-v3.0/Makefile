@@ -3,6 +3,8 @@
 #
 #
 
+STM32F1_LINKER_SCRIPT=altos-128.ld
+
 include ../stm32f1/Makefile.defs
 
 INC = \
@@ -97,7 +99,7 @@ OBJ=$(SRC:.c=.o)
 
 all: $(PROG) $(HEX)
 
-$(PROG): Makefile $(OBJ) altos.ld
+$(PROG): Makefile $(OBJ) altos-128.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
 $(OBJ): $(INC)

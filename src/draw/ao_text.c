@@ -29,7 +29,7 @@ ao_text(struct ao_bitmap	*dst,
 	const struct ao_font	*font,
 	int16_t			x,
 	int16_t			y,
-	char			*string,
+	const char		*string,
 	uint32_t		fill,
 	uint8_t			rop)
 {
