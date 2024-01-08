@@ -34,8 +34,6 @@
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
 
-#define AO_LCO_BOX_DRAG		0x1000
-
 /* UI values */
 static AO_TICK_TYPE	ao_lco_fire_tick;
 static uint8_t	ao_lco_fire_down;
@@ -110,17 +108,6 @@ ao_lco_show(void)
 	}
 }
 
-uint8_t
-ao_lco_box_present(uint16_t box)
-{
-	if (box == AO_LCO_BOX_DRAG)
-		return 1;
-
-	if (box >= AO_PAD_MAX_BOXES)
-		return 0;
-	return (ao_lco_box_mask[AO_LCO_MASK_ID(box)] >> AO_LCO_MASK_SHIFT(box)) & 1;
-}
-
 static struct ao_task	ao_lco_drag_task;
 static uint8_t		ao_lco_drag_active;
 
@@ -185,29 +172,6 @@ ao_lco_drag_monitor(void)
 			ao_lco_drag_active = 0;
 		}
 	}
-}
-
-static void
-ao_lco_step_box(int8_t dir)
-{
-	int32_t new_box = (int32_t) ao_lco_box;
-	do {
-		if (new_box == AO_LCO_BOX_DRAG) {
-			if (dir < 0)
-				new_box = ao_lco_max_box;
-			else
-				new_box = ao_lco_min_box;
-		} else {
-			new_box += dir;
-			if (new_box > ao_lco_max_box)
-				new_box = AO_LCO_BOX_DRAG;
-			else if (new_box < ao_lco_min_box)
-				new_box = AO_LCO_BOX_DRAG;
-		}
-		if (new_box == (int32_t) ao_lco_box)
-			break;
-	} while (!ao_lco_box_present((uint16_t) new_box));
-	ao_lco_set_box((uint16_t) new_box);
 }
 
 static void

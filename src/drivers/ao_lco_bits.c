@@ -84,7 +84,7 @@ ao_lco_igniter_status(void)
 		else
 #endif
 			ao_sleep(&ao_pad_query);
-		if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+		if (ao_lco_box_pseudo(ao_lco_box)) {
 			ao_led_off(AO_LED_GREEN|AO_LED_AMBER|AO_LED_RED);
 			continue;
 		}
@@ -184,7 +184,7 @@ ao_lco_get_channels(uint16_t box, struct ao_pad_query *query)
 void
 ao_lco_update(void)
 {
-	if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+	if (ao_lco_box_pseudo(ao_lco_box)) {
 		ao_lco_show();
 		return;
 	}
@@ -235,8 +235,7 @@ void
 ao_lco_set_box(uint16_t new_box)
 {
 	ao_lco_box = new_box;
-	if (ao_lco_box != AO_LCO_LCO_VOLTAGE)
-	{
+	if (!ao_lco_box_pseudo(ao_lco_box)) {
 		if (ao_lco_box < AO_PAD_MAX_BOXES) {
 			if (ao_lco_pretending)
 				ao_lco_channels[ao_lco_box] = 0xff;
@@ -269,7 +268,7 @@ ao_lco_step_pad(int8_t dir)
 uint8_t
 ao_lco_box_present(uint16_t box)
 {
-	if (box == AO_LCO_LCO_VOLTAGE)
+	if (ao_lco_box_pseudo(box))
 		return 1;
 	if (box >= AO_PAD_MAX_BOXES)
 		return 0;
@@ -284,7 +283,7 @@ ao_lco_step_box(int8_t dir)
 	do {
 		new_box += dir;
 		if (new_box > ao_lco_max_box)
-			new_box = AO_LCO_LCO_VOLTAGE;
+			new_box = AO_LCO_BOX_FIRST;
 		else if (new_box < 0)
 			new_box = ao_lco_max_box;
 		if (new_box == ao_lco_box)
@@ -296,7 +295,7 @@ ao_lco_step_box(int8_t dir)
 void
 ao_lco_set_armed(uint8_t armed)
 {
-	if (ao_lco_box == AO_LCO_LCO_VOLTAGE)
+	if (ao_lco_box_pseudo(ao_lco_box))
 		return;
 
 	ao_lco_armed = armed;
@@ -459,7 +458,7 @@ ao_lco_drag_add_beeps(uint8_t beeps)
 void
 ao_lco_toggle_drag(void)
 {
-	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE && ao_lco_box != AO_LCO_LCO_VOLTAGE) {
+	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE && !ao_lco_box_pseudo(ao_lco_box)) {
 		ao_lco_selected[ao_lco_box] ^= (uint8_t) (1 << (ao_lco_pad - 1));
 		PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
 		       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);

@@ -91,23 +91,28 @@ ao_lco_show_voltage(uint16_t decivolts)
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
+static void
+ao_lco_show_lco_voltage(void)
+{
+	struct ao_adc	packet;
+	int16_t		decivolt;
+
+	ao_adc_single_get(&packet);
+	decivolt = ao_battery_decivolt(packet.v_batt);
+	ao_lco_show_voltage((uint16_t) decivolt);
+}
+
 void
 ao_lco_show(void)
 {
-	if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
+	if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+		ao_lco_show_lco_voltage();
+	} else if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
 		ao_lco_show_voltage(ao_pad_query.battery);
 	} else {
 		ao_lco_show_pad(ao_lco_pad);
 		ao_lco_show_box(ao_lco_box);
 	}
-}
-
-uint8_t
-ao_lco_box_present(uint16_t box)
-{
-	if (box >= AO_PAD_MAX_BOXES)
-		return 0;
-	return (ao_lco_box_mask[AO_LCO_MASK_ID(box)] >> AO_LCO_MASK_SHIFT(box)) & 1;
 }
 
 static void
@@ -130,23 +135,6 @@ ao_lco_set_select(void)
 			break;
 		}
 	}
-}
-
-static void
-ao_lco_step_box(int8_t dir)
-{
-	int32_t new_box = (int32_t) ao_lco_box;
-
-	do {
-		new_box += dir;
-		if (new_box > ao_lco_max_box)
-			new_box = ao_lco_min_box;
-		else if (new_box < ao_lco_min_box)
-			new_box = ao_lco_max_box;
-		if (new_box == ao_lco_box)
-			break;
-	} while (!ao_lco_box_present((uint16_t) new_box));
-	ao_lco_set_box((uint16_t) new_box);
 }
 
 static struct ao_task	ao_lco_drag_task;
@@ -254,12 +242,7 @@ ao_lco_display_test(void)
 static void
 ao_lco_batt_voltage(void)
 {
-	struct ao_adc	packet;
-	int16_t		decivolt;
-
-	ao_adc_single_get(&packet);
-	decivolt = ao_battery_decivolt(packet.v_batt);
-	ao_lco_show_voltage((uint16_t) decivolt);
+	ao_lco_show_lco_voltage();
 	ao_delay(AO_MS_TO_TICKS(1000));
 }
 

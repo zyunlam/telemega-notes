@@ -46,8 +46,31 @@ extern uint8_t	ao_lco_firing;		/* fire button pressed */
 
 extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 
+#ifdef AO_LCO_DRAG_RACE_BOX
+#define AO_LCO_BOX_DRAG		0		/* Box number to enable drag race mode (old LCO bits) */
+#define AO_LCO_BOX_FIRST	AO_LCO_BOX_DRAG
+#else
 #define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
+#define AO_LCO_BOX_FIRST	AO_LCO_LCO_VOLTAGE
+#endif
 #define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
+
+static inline bool
+ao_lco_box_pseudo(uint16_t box)
+{
+	switch (box) {
+#ifdef AO_LCO_LCO_VOLTAGE
+	case AO_LCO_LCO_VOLTAGE:
+		return true;
+#endif
+#ifdef AO_LCO_DRAG_RACE_BOX
+	case AO_LCO_BOX_DRAG:
+		return true;
+#endif
+	default:
+		return false;
+	}
+}
 
 extern uint16_t	ao_lco_min_box, ao_lco_max_box;
 
