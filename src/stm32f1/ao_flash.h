@@ -25,4 +25,7 @@ ao_flash_erase_page(uint32_t *page);
 void
 ao_flash_page(uint32_t *page, uint32_t *src);
 
+void
+ao_flash_bytes(void *page, void *src, size_t size);
+
 #endif /* _AO_FLASH_STM_H_ */

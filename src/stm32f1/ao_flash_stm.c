@@ -104,13 +104,13 @@ ao_flash_erase_page(uint32_t *page)
 }
 
 static void __attribute__ ((section(".sdata2.flash"), noinline))
-_ao_flash_page(uint16_t *dst, uint16_t *src)
+_ao_flash_page(uint16_t *dst, uint16_t *src, unsigned int shorts)
 {
 	uint8_t		i;
 
 	stm_flash.cr |= (1 << STM_FLASH_CR_PG);
 
-	for (i = 0; i < 128; i++) {
+	for (i = 0; i < shorts; i++) {
 		*dst++ = *src++;
 		ao_flash_wait_bsy();
 	}
@@ -126,7 +126,24 @@ ao_flash_page(uint32_t *page, uint32_t *src)
 	ao_arch_block_interrupts();
 	ao_flash_unlock();
 
-	_ao_flash_page((uint16_t *) page, (uint16_t *) src);
+	_ao_flash_page((uint16_t *) page, (uint16_t *) src, 128);
+
+	ao_flash_lock();
+	ao_arch_release_interrupts();
+}
+
+/* Stores less than a full page while still smashing the full page */
+void
+ao_flash_bytes(void *page, void *src, size_t size)
+{
+	unsigned int shorts = (unsigned int) ((size + 1) >> 1);
+
+	ao_flash_erase_page(page);
+
+	ao_arch_block_interrupts();
+	ao_flash_unlock();
+
+	_ao_flash_page((uint16_t *) page, (uint16_t *) src, shorts);
 
 	ao_flash_lock();
 	ao_arch_release_interrupts();

@@ -16,8 +16,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
 
-__flash = 0x08001000;
-__flash_size = 60K;
+__flash       = 0x08001000;
+__eeprom_base = 0x0800e800;
+__flash_size = 58K;
 __ram = 0x20000000;
 __ram_size = 20k;
 __stack_size = 512;
