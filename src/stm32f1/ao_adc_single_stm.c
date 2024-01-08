@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Keith Packard <keithp@keithp.com>
+ * Copyright © 2024 Keith Packard <keithp@keithp.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <ao.h>
 #include <ao_data.h>
+#include <ao_adc_single.h>
 
 static uint8_t			ao_adc_ready;
 
@@ -36,30 +37,27 @@ static uint8_t			ao_adc_ready;
 /*
  * Callback from DMA ISR
  *
- * Mark time in ring, shut down DMA engine
+ * Shut down DMA engine, signal anyone waiting
  */
 static void ao_adc_done(int index)
 {
 	(void) index;
-	AO_DATA_PRESENT(AO_DATA_ADC);
 	ao_dma_done_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
-	ao_data_fill(ao_data_head);
 	ao_adc_ready = 1;
+	ao_wakeup((void *) &ao_adc_ready);
 }
 
 /*
  * Start the ADC sequence using the DMA engine
  */
-void
-ao_adc_poll(void)
+static void
+ao_adc_poll(struct ao_adc *packet)
 {
-	if (!ao_adc_ready)
-		return;
 	ao_adc_ready = 0;
 	stm_adc.sr = 0;
 	ao_dma_set_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1),
 			    &stm_adc.dr,
-			    (void *) (&ao_data_ring[ao_data_head].adc),
+			    (void *) packet,
 			    AO_NUM_ADC,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
 			    (STM_DMA_CCR_PL_HIGH << STM_DMA_CCR_PL) |
@@ -75,97 +73,25 @@ ao_adc_poll(void)
 	stm_adc.cr2 = AO_ADC_CR2_VAL | (1 << STM_ADC_CR2_SWSTART);
 }
 
-#ifdef AO_ADC_SQ1_NAME
-static const char *ao_adc_name[AO_NUM_ADC] = {
-	AO_ADC_SQ1_NAME,
-#ifdef AO_ADC_SQ2_NAME
-	AO_ADC_SQ2_NAME,
-#endif
-#ifdef AO_ADC_SQ3_NAME
-	AO_ADC_SQ3_NAME,
-#endif
-#ifdef AO_ADC_SQ4_NAME
-	AO_ADC_SQ4_NAME,
-#endif
-#ifdef AO_ADC_SQ5_NAME
-	AO_ADC_SQ5_NAME,
-#endif
-#ifdef AO_ADC_SQ6_NAME
-	AO_ADC_SQ6_NAME,
-#endif
-#ifdef AO_ADC_SQ7_NAME
-	AO_ADC_SQ7_NAME,
-#endif
-#ifdef AO_ADC_SQ8_NAME
-	AO_ADC_SQ8_NAME,
-#endif
-#ifdef AO_ADC_SQ9_NAME
-	AO_ADC_SQ9_NAME,
-#endif
-#ifdef AO_ADC_SQ10_NAME
-	AO_ADC_SQ10_NAME,
-#endif
-#ifdef AO_ADC_SQ11_NAME
-	AO_ADC_SQ11_NAME,
-#endif
-#ifdef AO_ADC_SQ12_NAME
-	AO_ADC_SQ12_NAME,
-#endif
-#ifdef AO_ADC_SQ13_NAME
-	AO_ADC_SQ13_NAME,
-#endif
-#ifdef AO_ADC_SQ14_NAME
-	AO_ADC_SQ14_NAME,
-#endif
-#ifdef AO_ADC_SQ15_NAME
-	AO_ADC_SQ15_NAME,
-#endif
-#ifdef AO_ADC_SQ16_NAME
-	AO_ADC_SQ16_NAME,
-#endif
-#ifdef AO_ADC_SQ17_NAME
-	AO_ADC_SQ17_NAME,
-#endif
-#ifdef AO_ADC_SQ18_NAME
-	AO_ADC_SQ18_NAME,
-#endif
-#ifdef AO_ADC_SQ19_NAME
-	AO_ADC_SQ19_NAME,
-#endif
-#ifdef AO_ADC_SQ20_NAME
-	AO_ADC_SQ20_NAME,
-#endif
-#ifdef AO_ADC_SQ21_NAME
-	#error "too many ADC names"
-#endif
-};
-#endif
+/*
+ * Fetch a copy of the most recent ADC data
+ */
+void
+ao_adc_single_get(struct ao_adc *packet)
+{
+	ao_adc_poll(packet);
+	ao_arch_block_interrupts();
+	while (!ao_adc_ready)
+		ao_sleep(&ao_adc_ready);
+	ao_arch_release_interrupts();
+}
 
 static void
-ao_adc_dump(void) 
+ao_adc_dump(void)
 {
-	struct ao_data	packet;
-#ifndef AO_ADC_DUMP
-	uint8_t i;
-	int16_t *d;
-#endif
-
-	ao_data_get(&packet);
-#ifdef AO_ADC_DUMP
+	struct ao_adc	packet;
+	ao_adc_single_get(&packet);
 	AO_ADC_DUMP(&packet);
-#else
-	printf("tick: %5u",  packet.tick);
-	d = (int16_t *) (&packet.adc);
-	for (i = 0; i < AO_NUM_ADC; i++) {
-#ifdef AO_ADC_SQ1_NAME
-		if (ao_adc_name[i])
-			printf (" %s: %5d", ao_adc_name[i], d[i]);
-		else
-#endif
-			printf (" %2d: %5d", i, d[i]);
-	}
-	printf("\n");
-#endif
 }
 
 const struct ao_cmds ao_adc_cmds[] = {
@@ -183,7 +109,7 @@ adc_pin_set(struct stm_gpio *gpio, int pin)
 }
 
 void
-ao_adc_init(void)
+ao_adc_single_init(void)
 {
 #ifdef AO_ADC_PIN0_PORT
 	adc_pin_set(AO_ADC_PIN0_PORT, AO_ADC_PIN0_PIN);
@@ -350,6 +276,4 @@ ao_adc_init(void)
 	ao_dma_alloc(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
 
 	ao_cmd_register(&ao_adc_cmds[0]);
-
-	ao_adc_ready = 1;
 }
