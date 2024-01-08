@@ -17,7 +17,6 @@ INC = \
 	ao_sample.h \
 	ao_pins.h \
 	ao_product.h \
-	ao_seven_segment.h \
 	ao_lco.h \
 	ao_lco_cmd.h \
 	ao_lco_func.h \
@@ -48,6 +47,7 @@ ALTOS_SRC = \
 	ao_timer.c \
 	ao_mutex.c \
 	ao_freq.c \
+	ao_adc_single_stm.c \
 	ao_dma_stm.c \
 	ao_spi_stm.c \
 	ao_beep_stm.c \

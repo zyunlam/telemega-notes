@@ -22,6 +22,7 @@
 #include <ao_quadrature.h>
 #include <ao_radio_cmac.h>
 #include <ao_st7565.h>
+#include <ao_adc_single.h>
 
 #define WIDTH	AO_ST7565_WIDTH
 #define HEIGHT	AO_ST7565_HEIGHT
@@ -281,8 +282,7 @@ ao_lco_batt_voltage(void)
 	struct ao_adc	packet;
 	int16_t		decivolt;
 
-//	ao_adc_single_get(&packet);
-	packet.v_batt = 0;
+	ao_adc_single_get(&packet);
 	decivolt = ao_battery_decivolt(packet.v_batt);
 	ao_lco_show_voltage((uint16_t) decivolt, "LCO battery");
 	ao_delay(AO_MS_TO_TICKS(1000));

@@ -270,8 +270,6 @@ struct ao_adc {
 #define AO_ADC_V_BATT_PORT	(&stm_gpioa)
 #define AO_ADC_V_BATT_PIN	2
 
-#define AO_ADC_RCC_AHBENR	(1 << STM_RCC_AHBENR_GPIOAEN)
-
 #define AO_ADC_PIN0_PORT	AO_ADC_V_BATT_PORT
 #define AO_ADC_PIN0_PIN		AO_ADC_V_BATT_PIN
 
