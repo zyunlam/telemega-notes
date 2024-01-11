@@ -271,7 +271,7 @@ struct ao_adc {
 #define HAS_ADC_TEMP		0
 #define HAS_BATTERY_REPORT	1
 
-#define AO_ADC_V_BATT		0
+#define AO_ADC_V_BATT		2
 #define AO_ADC_V_BATT_PORT	(&stm_gpioa)
 #define AO_ADC_V_BATT_PIN	2
 
