@@ -207,7 +207,7 @@ ao_adc_single_init(void)
 		       (0 << STM_ADC_CR1_AWDCH ));
 
 	/* 384 cycle sample time for everyone */
-	stm_adc.smpr1 = 0x3ffff;
+	stm_adc.smpr1 = 0x00ffffff;
 	stm_adc.smpr2 = 0x3fffffff;
 
 	stm_adc.sqr1 = ((AO_NUM_ADC - 1) << 20);
@@ -263,17 +263,14 @@ ao_adc_single_init(void)
 #error "too many ADC channels"
 #endif
 
-#ifndef HAS_ADC_TEMP
-#error Please define HAS_ADC_TEMP
-#endif
-#if HAS_ADC_TEMP
-	stm_adc.cr2 |= ((1 << STM_ADC_CR2_TSVREFE));
-#endif
-
 	/* Clear any stale status bits */
 	stm_adc.sr = 0;
 
 	ao_dma_alloc(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
+
+	/* Turn on the ADC so that it is ready to convert */
+
+	stm_adc.cr2 = AO_ADC_CR2_VAL;
 
 	ao_cmd_register(&ao_adc_cmds[0]);
 }

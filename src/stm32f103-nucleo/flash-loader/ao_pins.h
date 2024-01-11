@@ -38,7 +38,9 @@
 
 #include <ao_flash_stm_pins.h>
 
-/* Companion port cs_companion0 PB6 */
+/* USB DM is on PA11 (CN10 pin 14). USB DP is on PA12 (CN10 pin 12) */
+
+/* For pullup, we'll use PB6 (CN10 pin 16) */
 
 #define AO_BOOT_PIN			1
 #define AO_BOOT_APPLICATION_GPIO	stm_gpiob
