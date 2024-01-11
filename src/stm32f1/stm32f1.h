@@ -112,6 +112,7 @@ extern struct stm_rcc stm_rcc;
 #define  STM_RCC_CFGR_ADCPRE_4		1
 #define  STM_RCC_CFGR_ADCPRE_6		2
 #define  STM_RCC_CFGR_ADCPRE_8		3
+#define  STM_RCC_CFGR_ADCPRE_MASK	3UL
 
 #define STM_RCC_CFGR_PPRE2	(11)
 #define  STM_RCC_CFGR_PPRE2_DIV_1	0
@@ -513,6 +514,12 @@ extern struct stm_afio stm_afio;
 
 #define stm_afio	(*((struct stm_afio *) 0x40010000))
 
+#define STM_AFIO_MAPR_SWJ_CFG			24
+#define  STM_AFIO_MAPR_SWJ_CFG_FULL_SWJ			0
+#define  STM_AFIO_MAPR_SWJ_CFG_FULL_SWJ_NO_NJTRST	1
+#define  STM_AFIO_MAPR_SWJ_CFG_SW_DP			2
+#define  STM_AFIO_MAPR_SWJ_CFG_DISABLE			4
+#define  STM_AFIO_MAPR_SWJ_CFG_MASK			7UL
 #define STM_AFIO_MAPR_ADC2_ETRGREG_REMAP	20
 #define STM_AFIO_MAPR_ADC2_ETRGINJ_REMAP	19
 #define STM_AFIO_MAPR_ADC1_ETRGREG_REMAP	18
@@ -1080,9 +1087,9 @@ struct stm_adc {
 	vuint32_t	dr;
 };
 
-extern struct stm_adc stm_adc;
+extern struct stm_adc stm_adc1;
 
-#define stm_adc (*((struct stm_adc *) 0x40012400))
+//#define stm_adc1 (*((struct stm_adc *) 0x40012400))
 
 #define STM_ADC_SQ_TEMP		16
 #define STM_ADC_SQ_V_REF	17
@@ -1129,7 +1136,7 @@ extern struct stm_adc stm_adc;
 #define  STM_ADC_CR1_AWDCH_MASK		0x1fUL
 
 #define STM_ADC_CR2_TSVREF	23
-#define STM_ADC_CR2_SWSTART	21
+#define STM_ADC_CR2_SWSTART	22
 #define STM_ADC_CR2_JWSTART	21
 #define STM_ADC_CR2_EXTTRIG	20
 #define STM_ADC_CR2_EXTSEL	17

@@ -118,6 +118,12 @@ ao_clock_init(void)
 	cfgr |= (AO_RCC_CFGR_PPRE2_DIV << STM_RCC_CFGR_PPRE2);
 	stm_rcc.cfgr = cfgr;
 
+	/* ADC Prescaler */
+	cfgr = stm_rcc.cfgr;
+	cfgr &= ~(STM_RCC_CFGR_ADCPRE_MASK << STM_RCC_CFGR_ADCPRE);
+	cfgr |= (AO_RCC_CFGR_ADCPRE << STM_RCC_CFGR_ADCPRE);
+	stm_rcc.cfgr = cfgr;
+
 	/* Disable the PLL */
 	stm_rcc.cr &= ~(1UL << STM_RCC_CR_PLLON);
 	while (stm_rcc.cr & (1UL << STM_RCC_CR_PLLRDY))
@@ -175,6 +181,11 @@ ao_clock_init(void)
 	/* Clear reset flags */
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
+
+	/* Release PB3, PA15 and PB4 from JTAG use */
+	stm_afio.mapr = (stm_afio.mapr &
+			 ~(STM_AFIO_MAPR_SWJ_CFG_MASK << STM_AFIO_MAPR_SWJ_CFG)) |
+		STM_AFIO_MAPR_SWJ_CFG_SW_DP << STM_AFIO_MAPR_SWJ_CFG;
 
 #if DEBUG_THE_CLOCK
 	/* Output SYSCLK on PA8 for measurments */
