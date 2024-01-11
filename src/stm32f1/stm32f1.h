@@ -68,14 +68,6 @@ extern struct stm_rcc stm_rcc;
 #define STM_RCC_CR_HSIRDY	(1)
 #define STM_RCC_CR_HSION	(0)
 
-#define STM_RCC_CFGR_MCOPRE	(28)
-#define  STM_RCC_CFGR_MCOPRE_DIV_1	0
-#define  STM_RCC_CFGR_MCOPRE_DIV_2	1
-#define  STM_RCC_CFGR_MCOPRE_DIV_4	2
-#define  STM_RCC_CFGR_MCOPRE_DIV_8	3
-#define  STM_RCC_CFGR_MCOPRE_DIV_16	4
-#define  STM_RCC_CFGR_MCOPRE_MASK	7UL
-
 #define STM_RCC_CFGR_MCO	(24)
 #define  STM_RCC_CFGR_MCO_DISABLE	0
 #define  STM_RCC_CFGR_MCO_SYSCLK	4
@@ -109,6 +101,7 @@ extern struct stm_rcc stm_rcc;
 #define STM_RCC_CFGR_PLLXTPRE	(17)
 #define  STM_RCC_CFGR_PLLXTPRE_1	0
 #define  STM_RCC_CFGR_PLLXTPRE_2	1
+#define  STM_RCC_CFGR_PLLXTPRE_MASK	1UL
 
 #define STM_RCC_CFGR_PLLSRC	(16)
 #define  STM_RCC_CFGR_PLLSRC_HSI_2	0
