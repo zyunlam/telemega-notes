@@ -123,11 +123,14 @@ ao_clock_init(void)
 	while (stm_rcc.cr & (1UL << STM_RCC_CR_PLLRDY))
 		asm("nop");
 
-	/* PLLVCO */
+	/* PLLMUL */
 	cfgr = stm_rcc.cfgr;
 	cfgr &= ~(STM_RCC_CFGR_PLLMUL_MASK << STM_RCC_CFGR_PLLMUL);
-
 	cfgr |= (AO_RCC_CFGR_PLLMUL << STM_RCC_CFGR_PLLMUL);
+
+	/* PLLXTPRE */
+	cfgr &= ~(STM_RCC_CFGR_PLLXTPRE_MASK << STM_RCC_CFGR_PLLXTPRE);
+	cfgr |= (AO_RCC_CFGR_PLLXTPRE << STM_RCC_CFGR_PLLXTPRE);
 
 	/* PLL source */
 	cfgr &= ~(1UL << STM_RCC_CFGR_PLLSRC);
