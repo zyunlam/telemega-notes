@@ -22,15 +22,12 @@
 #if BEEPER_TIMER == 2
 #define stm_beeper	stm_tim2
 #define RCC_BEEPER	STM_RCC_APB1ENR_TIM2EN
-#define BEEPER_AFR	STM_AFR_AF1
 #elif BEEPER_TIMER == 3
 #define stm_beeper	stm_tim3
 #define RCC_BEEPER	STM_RCC_APB1ENR_TIM3EN
-#define BEEPER_AFR	STM_AFR_AF2
 #elif BEEPER_TIMER == 4
 #define stm_beeper	stm_tim4
 #define RCC_BEEPER	STM_RCC_APB1ENR_TIM4EN
-#define BEEPER_AFR	STM_AFR_AF2
 #else
 #error BEEPER_TIMER must be 2, 3 or 4
 #endif
@@ -176,7 +173,47 @@ ao_beep_init(void)
 		}
 	}
 #elif BEEPER_TIMER == 3
-	ao_panic(AO_PANIC_CRASH);
+	if (BEEPER_PORT == &stm_gpioa) {
+		switch (BEEPER_PIN) {
+		case 6:
+		case 7:
+			stm_set_afio_mapr(STM_AFIO_MAPR_TIM3_REMAP,
+					  STM_AFIO_MAPR_TIM3_REMAP_PA6_PA7_PB0_PB1,
+					  STM_AFIO_MAPR_TIM3_REMAP_MASK);
+			break;
+		default:
+			ao_panic(AO_PANIC_CRASH);
+			break;
+		}
+	} else if (BEEPER_PORT == &stm_gpiob) {
+		switch (BEEPER_PIN) {
+		case 4:
+		case 5:
+		case 0:
+		case 1:
+			stm_set_afio_mapr(STM_AFIO_MAPR_TIM3_REMAP,
+					  STM_AFIO_MAPR_TIM3_REMAP_PB4_PB5_PB0_PB1,
+					  STM_AFIO_MAPR_TIM3_REMAP_MASK);
+			break;
+		default:
+			ao_panic(AO_PANIC_CRASH);
+			break;
+		}
+	} else if (BEEPER_PORT == &stm_gpioc) {
+		switch (BEEPER_PIN) {
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+			stm_set_afio_mapr(STM_AFIO_MAPR_TIM3_REMAP,
+					  STM_AFIO_MAPR_TIM3_REMAP_PC6_PC7_PC8_PC9,
+					  STM_AFIO_MAPR_TIM3_REMAP_MASK);
+			break;
+		default:
+			ao_panic(AO_PANIC_CRASH);
+			break;
+		}
+	}
 #elif BEEPER_TIMER == 4
 	ao_panic(AO_PANIC_CRASH);
 #endif
