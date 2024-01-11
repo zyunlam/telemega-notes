@@ -306,7 +306,9 @@ ao_spi_disable_pin_config(uint8_t spi_pin_config)
 #if SPI_1_PA5_PA6_PA7
 	case AO_SPI_1_PA5_PA6_PA7:
 		stm_spi_output_disable(&stm_gpioa, 5, SPI_1_MODE_OUTPUT);
+#ifndef SPI_1_PA6_DISABLE
 		stm_spi_input_disable(&stm_gpioa, 6);
+#endif
 		stm_spi_output_disable(&stm_gpioa, 7, SPI_1_MODE_OUTPUT);
 		break;
 #endif
@@ -351,7 +353,9 @@ ao_spi_enable_pin_config(uint8_t spi_pin_config)
 				  STM_AFIO_MAPR_SPI1_REMAP_PA4_PA5_PA6_PA7,
 				  STM_AFIO_MAPR_SPI1_REMAP_MASK);
 		stm_spi_output_enable(&stm_gpioa, 5, SPI_1_MODE_OUTPUT);
+#ifndef SPI_1_PA6_DISABLE
 		stm_spi_input_enable(&stm_gpioa, 6);
+#endif
 		stm_spi_output_enable(&stm_gpioa, 7, SPI_1_MODE_OUTPUT);
 		break;
 #endif
