@@ -67,6 +67,10 @@
 #define HAS_AES			1
 #define HAS_STATIC_TEST		0
 
+#define HAS_USB_PULLUP		1
+#define AO_USB_PULLUP_PORT	(&stm_gpioa)
+#define AO_USB_PULLUP_PIN	10
+
 #define HAS_SPI_1		1	/* NHD-C12864LZ LCD Module */
 #define SPI_1_PA5_PA6_PA7	1
 #define SPI_1_MODE_OUTPUT	STM_GPIO_CR_MODE_OUTPUT_10MHZ
@@ -136,9 +140,9 @@
 #define LED_2_PORT		(&stm_gpioc)
 #define LED_2_PIN		9
 
-#define AO_LED_BOX		AO_LED_3	/* PA10 */
+#define AO_LED_BOX		AO_LED_3	/* PA9 */
 #define LED_3_PORT		(&stm_gpioa)
-#define LED_3_PIN		10
+#define LED_3_PIN		9
 
 #define AO_LED_PAD		AO_LED_4	/* PA15 */
 #define LED_4_PORT		(&stm_gpioa)
