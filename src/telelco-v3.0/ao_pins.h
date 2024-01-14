@@ -94,6 +94,7 @@
 #define PACKET_HAS_SLAVE	0
 #define PACKET_HAS_MASTER	0
 
+#define AO_FAST_TIMER		2
 #define FAST_TIMER_FREQ		10000	/* .1ms for debouncing */
 
 /* LCD module */
