@@ -1187,9 +1187,6 @@ stm_exticr_set(struct stm_gpio *gpio, int pin) {
 	uint8_t	shift = (pin & 3) << 2;
 	uint8_t	val = 0;
 
-	/* Enable AFIO */
-	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_AFIOEN);
-
 	if (gpio == &stm_gpioa)
 		val = STM_AFIO_EXTICR_PA;
 	else if (gpio == &stm_gpiob)

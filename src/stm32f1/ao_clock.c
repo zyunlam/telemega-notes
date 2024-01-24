@@ -181,6 +181,8 @@ ao_clock_init(void)
 	/* Clear reset flags */
 	stm_rcc.csr |= (1 << STM_RCC_CSR_RMVF);
 
+	/* Enable AFIO */
+	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_AFIOEN);
 
 	/* Release PB3, PA15 and PB4 from JTAG use */
 	stm_afio.mapr = (stm_afio.mapr &
