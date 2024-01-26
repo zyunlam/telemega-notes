@@ -21,6 +21,40 @@
 
 #include <ao_draw.h>
 
+/*
+ * Wiring the NewHaven NHD-C12864LZ-FSW-FBW-3V3 display
+ *
+ * PIN	Symbol	Connection
+ *  1	/CS1	Chip select. Active low.
+ *  2	/RES	Reset. Active low.
+ *  3	A0	Register select. 0: instruction, 1: data
+ *  4	/WR	NC
+ *  5	/RD	NC
+ *  6	DB0	NC
+ *  7	DB1	NC
+ *  8	DB2	NC
+ *  8	DB3	NC
+ *  10	DB4	NC
+ *  11	DB5	NC
+ *  12	DB6	SPI clock. Mode 3 (idle high, rising edge)
+ *  13	DB7	SPI data.
+ *  14	Vdd	+3.3V
+ *  15	Vss	Ground
+ *  16	Vout	1uF to ground
+ *  17  CAP3+	1uF to CAP1-
+ *  18	CAP1-	1uF to CAP3+ and CAP1+
+ *  19	CAP1+	1uF to CAP1-
+ *  20	CAP2+	1uF to CAP2-
+ *  21	CAP2-	1uF to CAP2+
+ *  22	V4	1uF to ground
+ *  23	V3	1uF to ground
+ *  24	V2	1uF to ground
+ *  25	V1	1uF to ground
+ *  26	V0	1uF to ground
+ *  27	C86	MPU select. Ground
+ *  28	PS	Parallel/serial select. Ground
+ */
+
 #define ST7565_DISPLAY_OFF			0xae
 #define ST7565_DISPLAY_ON			0xaf
 #define ST7565_DISPLAY_START_LINE_SET(line)	(0x40 | (line))
