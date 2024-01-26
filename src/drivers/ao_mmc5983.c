@@ -127,7 +127,7 @@ ao_mmc5983_raw(struct ao_mmc5983_raw *raw)
 #endif
 
 #else
-#define AO_MMC5983_SPI_SPEED	ao_spi_speed(2000000)
+#define AO_MMC5983_SPI_SPEED	ao_spi_speed(AO_MMC5983_SPI_INDEX, 2000000)
 
 static void
 ao_mmc5983_start(void) {

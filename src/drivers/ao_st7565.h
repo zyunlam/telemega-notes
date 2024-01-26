@@ -47,7 +47,7 @@
 #define ST7565_BOOSTER_RATIO_SET		0xf8
 #define ST7565_NOP				0xe3
 
-#define AO_ST7565_SPI_SPEED			ao_spi_speed(20000000)
+#define AO_ST7565_SPI_SPEED			ao_spi_speed(AO_ST7565_SPI_BUS, 10000000)
 
 void
 ao_st7565_update(struct ao_bitmap *bitmap);

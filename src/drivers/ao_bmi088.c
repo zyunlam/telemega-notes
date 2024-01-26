@@ -20,7 +20,7 @@
 #include <ao_bmi088.h>
 #include <ao_data.h>
 
-#define AO_BMI088_SPI_SPEED	ao_spi_speed(100000)
+#define AO_BMI088_SPI_SPEED	ao_spi_speed(AO_BMI088_SPI_BUS, 100000)
 
 #define ao_bmi088_spi_get()	ao_spi_get(AO_BMI088_SPI_BUS, AO_BMI088_SPI_SPEED)
 #define ao_bmi088_spi_put()	ao_spi_put(AO_BMI088_SPI_BUS)

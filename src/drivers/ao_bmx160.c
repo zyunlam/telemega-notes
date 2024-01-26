@@ -24,7 +24,7 @@ static uint8_t	ao_bmx160_configured;
 
 static struct ao_bmm150_trim ao_bmm150_trim;
 
-#define AO_BMX160_SPI_SPEED	ao_spi_speed(10000000)
+#define AO_BMX160_SPI_SPEED	ao_spi_speed(AO_BMX160_SPI_BUS, 10000000)
 
 #define ao_bmx160_spi_get()	ao_spi_get(AO_BMX160_SPI_BUS, AO_BMX160_SPI_SPEED)
 #define ao_bmx160_spi_put()	ao_spi_put(AO_BMX160_SPI_BUS)
