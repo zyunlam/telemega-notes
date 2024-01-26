@@ -59,13 +59,21 @@
 #define SPI_1_PA5_PA6_PA7	1
 #define SPI_1_MODE_OUTPUT	STM_GPIO_CR_MODE_OUTPUT_10MHZ
 
+/* Chip Select. LCD pin 1. nucleo PA4 = A2  */
 #define AO_ST7565_CS_PORT	(&stm_gpioa)	/* pin 1 */
 #define AO_ST7565_CS_PIN	4
+
+/* Reset. LCD pin 2. nucleo PA0 = A0 */
 #define AO_ST7565_RESET_PORT	(&stm_gpioa)	/* pin 2 */
 #define AO_ST7565_RESET_PIN	0
+
+/* A0. LCD pin 3. nucleo PA1 = A1 */
 #define AO_ST7565_A0_PORT	(&stm_gpioa)	/* pin 3 */
 #define AO_ST7565_A0_PIN	1
-#define AO_ST7565_SPI_BUS	AO_SPI_1_PA5_PA6_PA7
+
+/* SCLK. LCD DB6 pin 12. nucleo PA5 = D13 */
+/* MOSI. LCD DB7 pin 13. nucleo PA7 = D11 */
+#define AO_ST7565_SPI_BUS	(AO_SPI_1_PA5_PA6_PA7 | AO_SPI_MODE_3)
 #define AO_ST7565_WIDTH		128
 #define AO_ST7565_HEIGHT	64
 #define AO_ST7565_BIAS		ST7565_LCD_BIAS_1_9
