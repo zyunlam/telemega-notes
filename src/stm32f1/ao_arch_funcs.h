@@ -368,30 +368,6 @@ ao_dma_init(void);
 /* ao_spi_stm.c
  */
 
-/* PCLK is set to 16MHz (HCLK 32MHz, APB prescaler 2) */
-
-#define _AO_SPI_SPEED_8MHz	STM_SPI_CR1_BR_PCLK_2
-#define _AO_SPI_SPEED_4MHz	STM_SPI_CR1_BR_PCLK_4
-#define _AO_SPI_SPEED_2MHz	STM_SPI_CR1_BR_PCLK_8
-#define _AO_SPI_SPEED_1MHz	STM_SPI_CR1_BR_PCLK_16
-#define _AO_SPI_SPEED_500kHz	STM_SPI_CR1_BR_PCLK_32
-#define _AO_SPI_SPEED_250kHz	STM_SPI_CR1_BR_PCLK_64
-#define _AO_SPI_SPEED_125kHz	STM_SPI_CR1_BR_PCLK_128
-#define _AO_SPI_SPEED_62500Hz	STM_SPI_CR1_BR_PCLK_256
-
-static inline uint32_t
-ao_spi_speed(uint32_t hz)
-{
-	if (hz >= 8000000) return _AO_SPI_SPEED_8MHz;
-	if (hz >= 4000000) return _AO_SPI_SPEED_4MHz;
-	if (hz >= 2000000) return _AO_SPI_SPEED_2MHz;
-	if (hz >= 1000000) return _AO_SPI_SPEED_1MHz;
-	if (hz >=  500000) return _AO_SPI_SPEED_500kHz;
-	if (hz >=  250000) return _AO_SPI_SPEED_250kHz;
-	if (hz >=  125000) return _AO_SPI_SPEED_125kHz;
-	return _AO_SPI_SPEED_62500Hz;
-}
-
 #define AO_SPI_CPOL_BIT		4
 #define AO_SPI_CPHA_BIT		5
 
@@ -429,6 +405,22 @@ ao_spi_speed(uint32_t hz)
 #define AO_SPI_MODE_1		AO_SPI_MAKE_MODE(0,1)
 #define AO_SPI_MODE_2		AO_SPI_MAKE_MODE(1,0)
 #define AO_SPI_MODE_3		AO_SPI_MAKE_MODE(1,1)
+
+/* SPI1 is on APB2, SPI2 is on APB1 */
+#define AO_SPI_FREQ(bus, div)	((AO_SPI_INDEX(bus) == 0 ? AO_APB2CLK : AO_APB1CLK) / (div))
+
+static inline uint32_t
+ao_spi_speed(int num, uint32_t hz)
+{
+	if (hz >= AO_SPI_FREQ(num, 2)) return STM_SPI_CR1_BR_PCLK_2;
+	if (hz >= AO_SPI_FREQ(num, 4)) return STM_SPI_CR1_BR_PCLK_4;
+	if (hz >= AO_SPI_FREQ(num, 8)) return STM_SPI_CR1_BR_PCLK_8;
+	if (hz >= AO_SPI_FREQ(num, 16)) return STM_SPI_CR1_BR_PCLK_16;
+	if (hz >= AO_SPI_FREQ(num, 32)) return STM_SPI_CR1_BR_PCLK_32;
+	if (hz >= AO_SPI_FREQ(num, 64)) return STM_SPI_CR1_BR_PCLK_64;
+	if (hz >= AO_SPI_FREQ(num, 128)) return STM_SPI_CR1_BR_PCLK_128;
+	return STM_SPI_CR1_BR_PCLK_256;
+}
 
 uint8_t
 ao_spi_try_get(uint8_t spi_index, uint32_t speed, uint8_t task_id);
