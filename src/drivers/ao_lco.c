@@ -66,7 +66,7 @@ ao_lco_show_pad(uint8_t pad)
 				 (0 << 6))
 
 void
-ao_lco_show_box(uint16_t box)
+ao_lco_show_box(int16_t box)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	if (box == AO_LCO_BOX_DRAG) {

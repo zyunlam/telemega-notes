@@ -24,6 +24,7 @@ INC = \
 	ao_radio_cmac.h \
 	ao_cc1200_CC1200.h \
 	ao_cc1200.h \
+	ao_st7565.h \
 	ao_font.h \
 	ao_logo.h \
 	stm32f1.h

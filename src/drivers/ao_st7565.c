@@ -82,10 +82,21 @@ ao_st7565_data(const void *base, uint16_t len)
 	ao_st7565_stop();
 }
 
-static void
+static uint8_t brightness;
+
+void
 ao_st7565_set_brightness(uint8_t val)
 {
+	if (val > 63)
+		val = 63;
+	brightness = val;
 	ao_st7565_instruction_param(ST7565_ELECTRONIC_VOLUME_SET, val);
+}
+
+uint8_t
+ao_st7565_get_brightness(void)
+{
+	return brightness;
 }
 
 static bool setup_done;

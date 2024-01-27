@@ -296,5 +296,9 @@ struct ao_adc {
 #define AO_ADC_REFERENCE_DV	33
 
 #define AO_LCO_SEARCH_API
+#define AO_LCO_HAS_CONTRAST	1
+#define AO_LCO_MIN_CONTRAST	0
+#define AO_LCO_MAX_CONTRAST	63
+#define AO_LCO_CONTRAST_STEP	1
 
 #endif /* _AO_PINS_H_ */

@@ -52,7 +52,7 @@ ao_lco_show_pad(uint8_t pad)
 }
 
 void
-ao_lco_show_box(uint16_t box)
+ao_lco_show_box(int16_t box)
 {
 	(void) box;
 }
@@ -85,7 +85,7 @@ ao_lco_input(void)
 		case AO_EVENT_BUTTON:
 			switch (event.unit) {
 			case AO_BUTTON_BOX:
-				ao_lco_set_box((uint16_t) event.value);
+				ao_lco_set_box((int16_t) event.value);
 				ao_lco_set_armed(0);
 				break;
 			case AO_BUTTON_ARM:

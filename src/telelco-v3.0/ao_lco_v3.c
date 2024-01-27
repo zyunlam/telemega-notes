@@ -45,6 +45,7 @@ static const struct ao_transform logo_transform = {
 
 #define BIG_FONT BitstreamVeraSans_Roman_58_font
 #define VOLT_FONT BitstreamVeraSans_Roman_58_font
+#define CONTRAST_FONT BitstreamVeraSans_Roman_58_font
 #define SMALL_FONT BitstreamVeraSans_Roman_12_font
 #define TINY_FONT BitstreamVeraSans_Roman_10_font
 #define LOGO_FONT BenguiatGothicStd_Bold_26_font
@@ -64,6 +65,11 @@ static const struct ao_transform logo_transform = {
 #define FOUND_Y		63
 #define FOUND_X		6
 #define FOUND_WIDTH	(WIDTH - 6)
+#define CONTRAST_LABEL_X	37
+#define CONTRAST_WIDTH	100
+#define CONTRAST_X	(WIDTH - CONTRAST_WIDTH) / 2
+#define CONTRAST_Y	20
+#define CONTRAST_HEIGHT	20
 
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
@@ -89,7 +95,7 @@ _ao_lco_show_pad(uint8_t pad)
 }
 
 static void
-_ao_lco_show_box(uint16_t box)
+_ao_lco_show_box(int16_t box)
 {
 	char	str[7];
 
@@ -121,6 +127,16 @@ _ao_lco_batt_voltage(void)
 	ao_st7565_update(&fb);
 }
 
+static void
+_ao_lco_show_contrast(void)
+{
+	uint8_t	brightness = ao_st7565_get_brightness();
+	int16_t contrast = (int16_t) (brightness * CONTRAST_WIDTH / AO_LCO_MAX_CONTRAST);
+
+	ao_text(&fb, &SMALL_FONT, CONTRAST_LABEL_X, LABEL_Y, "Contrast", AO_BLACK, AO_COPY);
+	ao_rect(&fb, CONTRAST_X, CONTRAST_Y, contrast, CONTRAST_HEIGHT, AO_BLACK, AO_COPY);
+}
+
 void
 ao_lco_show(void)
 {
@@ -128,6 +144,8 @@ ao_lco_show(void)
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
 	if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
 		_ao_lco_batt_voltage();
+	} else if (ao_lco_box == AO_LCO_CONTRAST) {
+		_ao_lco_show_contrast();
 	} else if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
 		_ao_lco_show_voltage(ao_pad_query.battery, "Pad battery");
 	} else {
@@ -161,6 +179,18 @@ ao_lco_set_select(void)
 	}
 }
 
+
+void
+ao_lco_set_contrast(int16_t contrast)
+{
+	ao_st7565_set_brightness((uint8_t) contrast);
+}
+
+int16_t
+ao_lco_get_contrast(void)
+{
+	return (int16_t) ao_st7565_get_brightness();
+}
 
 static struct ao_task	ao_lco_drag_task;
 
@@ -277,15 +307,15 @@ ao_lco_search_start(void)
 }
 
 void
-ao_lco_search_box_check(uint16_t box)
+ao_lco_search_box_check(int16_t box)
 {
 	if (box > 0)
-		ao_rect(&fb, SCAN_X, SCAN_Y, (int16_t) box, SCAN_HEIGHT, AO_BLACK, AO_COPY);
+		ao_rect(&fb, SCAN_X, SCAN_Y, box, SCAN_HEIGHT, AO_BLACK, AO_COPY);
 	ao_st7565_update(&fb);
 }
 
 void
-ao_lco_search_box_present(uint16_t box)
+ao_lco_search_box_present(int16_t box)
 {
 	char	str[8];
 	if (found_x < FOUND_WIDTH)
@@ -302,19 +332,9 @@ ao_lco_search_done(void)
 }
 
 static void
-ao_lco_batt_voltage(void)
-{
-	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
-	_ao_lco_batt_voltage();
-	ao_st7565_update(&fb);
-	ao_delay(AO_MS_TO_TICKS(1000));
-}
-
-static void
 ao_lco_main(void)
 {
 	ao_lco_display_test();
-	ao_lco_batt_voltage();
 	ao_lco_search();
 	ao_add_task(&ao_lco_input_task, ao_lco_input, "lco input");
 	ao_add_task(&ao_lco_arm_warn_task, ao_lco_arm_warn, "lco arm warn");

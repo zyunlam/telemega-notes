@@ -87,6 +87,12 @@ void
 ao_st7565_update(struct ao_bitmap *bitmap);
 
 void
+ao_st7565_set_brightness(uint8_t val);
+
+uint8_t
+ao_st7565_get_brightness(void);
+
+void
 ao_st7565_init(void);
 
 #endif /* _AO_ST7565_H_ */

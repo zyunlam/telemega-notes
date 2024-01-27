@@ -19,12 +19,12 @@
 uint8_t		ao_lco_debug;
 
 uint8_t		ao_lco_pad;
-uint16_t	ao_lco_box;
+int16_t		ao_lco_box;
 
 uint8_t		ao_lco_armed;					/* arm active */
 uint8_t		ao_lco_firing;					/* fire active */
 
-uint16_t	ao_lco_min_box, ao_lco_max_box;
+int16_t		ao_lco_min_box, ao_lco_max_box;
 
 uint8_t		ao_lco_pretending;
 
@@ -142,7 +142,7 @@ ao_lco_igniter_status(void)
 }
 
 uint8_t
-ao_lco_pad_present(uint16_t box, uint8_t pad)
+ao_lco_pad_present(int16_t box, uint8_t pad)
 {
 	/* voltage measurement is always valid */
 	if (pad == AO_LCO_PAD_VOLTAGE)
@@ -155,7 +155,7 @@ ao_lco_pad_present(uint16_t box, uint8_t pad)
 }
 
 uint8_t
-ao_lco_pad_first(uint16_t box)
+ao_lco_pad_first(int16_t box)
 {
 	uint8_t	pad;
 
@@ -166,11 +166,11 @@ ao_lco_pad_first(uint16_t box)
 }
 
 static uint8_t
-ao_lco_get_channels(uint16_t box, struct ao_pad_query *query)
+ao_lco_get_channels(int16_t box, struct ao_pad_query *query)
 {
 	int8_t			r;
 
-	r = ao_lco_query(box, query, &ao_lco_tick_offset[box]);
+	r = ao_lco_query((uint16_t) box, query, &ao_lco_tick_offset[box]);
 	if (r == AO_RADIO_CMAC_OK) {
 		ao_lco_channels[box] = query->channels;
 		ao_lco_valid[box] = AO_LCO_VALID_LAST | AO_LCO_VALID_EVER;
@@ -213,7 +213,7 @@ ao_lco_box_reset_present(void)
 }
 
 static void
-ao_lco_box_set_present(uint16_t box)
+ao_lco_box_set_present(int16_t box)
 {
 	if (box < ao_lco_min_box)
 		ao_lco_min_box = box;
@@ -232,7 +232,7 @@ ao_lco_set_pad(uint8_t new_pad)
 }
 
 void
-ao_lco_set_box(uint16_t new_box)
+ao_lco_set_box(int16_t new_box)
 {
 	ao_lco_box = new_box;
 	if (!ao_lco_box_pseudo(ao_lco_box)) {
@@ -252,6 +252,18 @@ ao_lco_step_pad(int8_t dir)
 {
 	int16_t	new_pad;
 
+#ifdef AO_LCO_HAS_CONTRAST
+	if (ao_lco_box == AO_LCO_CONTRAST) {
+		int16_t contrast = ao_lco_get_contrast();
+
+		contrast += (int16_t) (dir * AO_LCO_CONTRAST_STEP);
+		if (contrast < AO_LCO_MIN_CONTRAST)
+			contrast = AO_LCO_MIN_CONTRAST;
+		if (contrast > AO_LCO_MAX_CONTRAST)
+			contrast = AO_LCO_MAX_CONTRAST;
+		ao_lco_set_contrast(contrast);
+	}
+#endif
 	new_pad = (int16_t) ao_lco_pad;
 	do {
 		new_pad += dir;
@@ -267,7 +279,7 @@ ao_lco_step_pad(int8_t dir)
 }
 
 uint8_t
-ao_lco_box_present(uint16_t box)
+ao_lco_box_present(int16_t box)
 {
 	if (ao_lco_box_pseudo(box))
 		return 1;
@@ -279,19 +291,23 @@ ao_lco_box_present(uint16_t box)
 void
 ao_lco_step_box(int8_t dir)
 {
-	int32_t new_box = (int32_t) ao_lco_box;
+	int16_t new_box = ao_lco_box;
 
 	do {
 		new_box += dir;
 		if (new_box > ao_lco_max_box)
 			new_box = AO_LCO_BOX_FIRST;
+#ifdef AO_LCO_HAS_CONTRAST
+		else if (new_box < AO_LCO_CONTRAST)
+#else
 		else if (new_box < 0)
+#endif
 			new_box = ao_lco_max_box;
 		if (new_box == ao_lco_box)
 			break;
-	} while (!ao_lco_box_present((uint16_t) new_box));
-	PRINTD("New box %ld\n", new_box);
-	ao_lco_set_box((uint16_t) new_box);
+	} while (!ao_lco_box_present(new_box));
+	PRINTD("New box %d\n", new_box);
+	ao_lco_set_box(new_box);
 }
 
 void
@@ -305,7 +321,7 @@ ao_lco_set_armed(uint8_t armed)
 	if (ao_lco_armed) {
 #if AO_LCO_DRAG
 		if (ao_lco_drag_race) {
-			uint16_t	box;
+			int16_t	box;
 
 			for (box = ao_lco_min_box; box <= ao_lco_max_box; box++)
 				if (ao_lco_selected[box])
@@ -338,7 +354,7 @@ ao_lco_search(void)
 {
 	int8_t		r;
 	int8_t		try;
-	uint16_t	box;
+	int16_t		box;
 	uint16_t	boxes = 0;
 
 	ao_lco_box_reset_present();
@@ -357,7 +373,7 @@ ao_lco_search(void)
 #endif
 		for (try = 0; try < 3; try++) {
 			ao_lco_tick_offset[box] = 0;
-			r = ao_lco_query(box, &ao_pad_query, &ao_lco_tick_offset[box]);
+			r = ao_lco_query((uint16_t) box, &ao_pad_query, &ao_lco_tick_offset[box]);
 			PRINTD("box %d result %d offset %d\n", box, r, ao_lco_tick_offset[box]);
 			if (r == AO_RADIO_CMAC_OK) {
 				++boxes;
@@ -387,7 +403,7 @@ ao_lco_search(void)
 void
 ao_lco_pretend(void)
 {
-	uint16_t box;
+	int16_t box;
 
 	ao_lco_pretending = 1;
 	ao_lco_min_box = 1;
@@ -403,8 +419,8 @@ ao_lco_pretend(void)
 void
 ao_lco_monitor(void)
 {
-	AO_TICK_TYPE		delay;
-	uint16_t		box;
+	AO_TICK_TYPE	delay;
+	int16_t		box;
 
 	for (;;) {
 		PRINTD("monitor armed %d firing %d\n",
@@ -420,7 +436,7 @@ ao_lco_monitor(void)
 						PRINTD("Arming box %d pads %x\n",
 						       box, ao_lco_selected[box]);
 						if (ao_lco_valid[box] & AO_LCO_VALID_EVER) {
-							ao_lco_arm(box, ao_lco_selected[box], ao_lco_tick_offset[box]);
+							ao_lco_arm((uint16_t) box, ao_lco_selected[box], ao_lco_tick_offset[box]);
 							ao_delay(AO_MS_TO_TICKS(10));
 						}
 					}

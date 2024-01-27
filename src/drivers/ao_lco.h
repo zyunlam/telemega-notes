@@ -39,7 +39,7 @@ extern uint8_t	ao_lco_drag_race;	/* true when drag race mode enabled */
 #endif
 
 extern uint8_t	ao_lco_pad;		/* Currently selected pad */
-extern uint16_t	ao_lco_box;		/* Currently selected box */
+extern int16_t	ao_lco_box;		/* Currently selected box */
 
 extern uint8_t	ao_lco_armed;		/* armed mode active */
 extern uint8_t	ao_lco_firing;		/* fire button pressed */
@@ -51,12 +51,17 @@ extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 #define AO_LCO_BOX_FIRST	AO_LCO_BOX_DRAG
 #else
 #define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
-#define AO_LCO_BOX_FIRST	AO_LCO_LCO_VOLTAGE
+# ifdef AO_LCO_HAS_CONTRAST
+#  define AO_LCO_CONTRAST	-1
+#  define AO_LCO_BOX_FIRST	AO_LCO_CONTRAST
+# else
+#  define AO_LCO_BOX_FIRST	AO_LCO_LCO_VOLTAGE
+# endif
 #endif
 #define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
 
 static inline bool
-ao_lco_box_pseudo(uint16_t box)
+ao_lco_box_pseudo(int16_t box)
 {
 	switch (box) {
 #ifdef AO_LCO_LCO_VOLTAGE
@@ -67,12 +72,16 @@ ao_lco_box_pseudo(uint16_t box)
 	case AO_LCO_BOX_DRAG:
 		return true;
 #endif
+#ifdef AO_LCO_CONTRAST
+	case AO_LCO_CONTRAST:
+		return true;
+#endif
 	default:
 		return false;
 	}
 }
 
-extern uint16_t	ao_lco_min_box, ao_lco_max_box;
+extern int16_t	ao_lco_min_box, ao_lco_max_box;
 
 #define AO_LCO_MASK_SIZE(n)	(((n) + 7) >> 3)
 #define AO_LCO_MASK_ID(n)	((n) >> 3)
@@ -91,10 +100,10 @@ void
 ao_lco_update(void);
 
 uint8_t
-ao_lco_pad_present(uint16_t box, uint8_t pad);
+ao_lco_pad_present(int16_t box, uint8_t pad);
 
 uint8_t
-ao_lco_pad_first(uint16_t box);
+ao_lco_pad_first(int16_t box);
 
 void
 ao_lco_set_pad(uint8_t new_pad);
@@ -103,7 +112,7 @@ void
 ao_lco_step_pad(int8_t dir);
 
 void
-ao_lco_set_box(uint16_t new_box);
+ao_lco_set_box(int16_t new_box);
 
 void
 ao_lco_step_box(int8_t dir);
@@ -160,7 +169,7 @@ void
 ao_lco_show_pad(uint8_t pad);
 
 void
-ao_lco_show_box(uint16_t box);
+ao_lco_show_box(int16_t box);
 
 void
 ao_lco_show(void);
@@ -169,7 +178,15 @@ void
 ao_lco_init(void);
 
 uint8_t
-ao_lco_box_present(uint16_t box);
+ao_lco_box_present(int16_t box);
+
+#ifdef AO_LCO_HAS_CONTRAST
+void
+ao_lco_set_contrast(int16_t contrast);
+
+int16_t
+ao_lco_get_contrast(void);
+#endif
 
 #ifdef AO_LCO_SEARCH_API
 
@@ -177,10 +194,10 @@ void
 ao_lco_search_start(void);
 
 void
-ao_lco_search_box_check(uint16_t box);
+ao_lco_search_box_check(int16_t box);
 
 void
-ao_lco_search_box_present(uint16_t box);
+ao_lco_search_box_present(int16_t box);
 
 void
 ao_lco_search_done(void);

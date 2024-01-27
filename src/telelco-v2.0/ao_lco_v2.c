@@ -67,7 +67,7 @@ ao_lco_show_pad(uint8_t pad)
 				 (0 << 6))
 
 void
-ao_lco_show_box(uint16_t box)
+ao_lco_show_box(int16_t box)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, (uint8_t) (box % 10 | (ao_lco_drag_race << 4)));
