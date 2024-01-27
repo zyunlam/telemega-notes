@@ -262,6 +262,7 @@ ao_lco_step_pad(int8_t dir)
 		if (new_pad == ao_lco_pad)
 			break;
 	} while (!ao_lco_pad_present(ao_lco_box, (uint8_t) new_pad));
+	PRINTD("New pad %d\n", new_pad);
 	ao_lco_set_pad((uint8_t) new_pad);
 }
 
@@ -289,6 +290,7 @@ ao_lco_step_box(int8_t dir)
 		if (new_box == ao_lco_box)
 			break;
 	} while (!ao_lco_box_present((uint16_t) new_box));
+	PRINTD("New box %ld\n", new_box);
 	ao_lco_set_box((uint16_t) new_box);
 }
 
@@ -390,7 +392,7 @@ ao_lco_pretend(void)
 	ao_lco_pretending = 1;
 	ao_lco_min_box = 1;
 	ao_lco_max_box = AO_PAD_MAX_BOXES - 1;
-	for (box = ao_lco_min_box; box < ao_lco_max_box; box++)
+	for (box = ao_lco_min_box; box <= ao_lco_max_box; box++)
 		ao_lco_box_set_present(box);
 	ao_lco_box = ao_lco_min_box;
 	memset(ao_lco_valid, 0, sizeof (ao_lco_valid));
