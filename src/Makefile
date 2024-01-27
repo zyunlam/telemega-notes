@@ -56,6 +56,7 @@ ARMM0DIRS=\
 	telemini-v3.0 telemini-v3.0/flash-loader \
 	easymini-v2.0 easymini-v2.0/flash-loader \
 	easymini-v3.0 easymini-v3.0/flash-loader \
+	telelco-v3.0 telelco-v3.0/flash-loader \
 	micropeak-v2.0
 
 AVRDIRS=\
