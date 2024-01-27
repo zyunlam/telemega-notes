@@ -61,6 +61,7 @@
 #define BEEPER_CHANNEL		1
 #define BEEPER_PORT		(&stm_gpioc)
 #define BEEPER_PIN		6
+#define AO_BEEP_MID_DEFAULT	179	/* 2100 Hz */
 #define HAS_RADIO		1
 #define HAS_RADIO_RATE		1
 #define HAS_TELEMETRY		0
@@ -104,7 +105,7 @@
 #define AO_ST7565_RESET_PIN	5
 #define AO_ST7565_A0_PORT	(&stm_gpioa)	/* pin 3 */
 #define AO_ST7565_A0_PIN	3
-#define AO_ST7565_SPI_BUS	AO_SPI_1_PA5_PA6_PA7
+#define AO_ST7565_SPI_BUS	(AO_SPI_1_PA5_PA6_PA7 | AO_SPI_MODE_3)
 #define AO_ST7565_WIDTH		128
 #define AO_ST7565_HEIGHT	64
 #define AO_ST7565_BIAS		ST7565_LCD_BIAS_1_9
@@ -214,7 +215,7 @@
 #define AO_QUADRATURE_0_A	12
 #define AO_QUADRATURE_0_B	11
 
-#define AO_QUADRATURE_SELECT	10
+#define AO_QUADRATURE_SELECT	0
 
 /*
  * Buttons
