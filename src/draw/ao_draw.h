@@ -103,6 +103,14 @@ struct ao_glyph_metrics {
 	int8_t	advance;
 };
 
+struct ao_text_metrics {
+	int16_t	width;
+	int16_t	height;
+	int16_t	x_off;
+	int16_t	y_off;
+	int16_t	advance;
+};
+
 struct ao_font {
 	const uint8_t	*bytes;
 	const uint16_t	*pos;
@@ -168,6 +176,10 @@ ao_text(struct ao_bitmap	*dst,
 	const char		*string,
 	uint32_t		fill,
 	uint8_t			rop);
+
+int16_t
+ao_text_width(const struct ao_font	*font,
+	      const char		*string);
 
 void
 ao_logo_poly(struct ao_bitmap		*dst,
