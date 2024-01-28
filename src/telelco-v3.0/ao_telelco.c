@@ -29,6 +29,7 @@
 #include <ao_eeprom.h>
 #include <ao_adc_single.h>
 #include <ao_st7565.h>
+#include <ao_pwm.h>
 
 #define WIDTH	AO_ST7565_WIDTH
 #define HEIGHT	AO_ST7565_HEIGHT
@@ -253,7 +254,6 @@ main(void)
 	ao_clock_init();
 
 	ao_led_init();
-	ao_led_on(LEDS_AVAILABLE);
 	ao_task_init();
 
 	ao_timer_init();
@@ -264,6 +264,7 @@ main(void)
 	ao_adc_single_init();
 
 	ao_beep_init();
+	ao_pwm_init();
 	ao_cmd_init();
 
 	ao_quadrature_init();
@@ -281,8 +282,6 @@ main(void)
 	ao_lco_cmd_init();
 
 //	ao_cmd_register(ao_st7565_cmds);
-
-	ao_led_off(LEDS_AVAILABLE);
 
 	ao_start_scheduler();
 	return 0;

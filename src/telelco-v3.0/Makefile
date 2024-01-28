@@ -54,6 +54,7 @@ ALTOS_SRC = \
 	ao_beep_stm.c \
 	ao_convert_volt.c \
 	ao_fast_timer.c \
+	ao_pwm_stm.c \
 	ao_eeprom.c \
 	ao_flash_stm.c \
 	ao_usb_stm.c \

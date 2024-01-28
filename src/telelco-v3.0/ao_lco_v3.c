@@ -23,6 +23,7 @@
 #include <ao_radio_cmac.h>
 #include <ao_st7565.h>
 #include <ao_adc_single.h>
+#include <ao_pwm.h>
 
 #define WIDTH	AO_ST7565_WIDTH
 #define HEIGHT	AO_ST7565_HEIGHT
@@ -45,7 +46,6 @@ static const struct ao_transform logo_transform = {
 
 #define BIG_FONT BitstreamVeraSans_Roman_58_font
 #define VOLT_FONT BitstreamVeraSans_Roman_58_font
-#define CONTRAST_FONT BitstreamVeraSans_Roman_58_font
 #define SMALL_FONT BitstreamVeraSans_Roman_12_font
 #define TINY_FONT BitstreamVeraSans_Roman_10_font
 #define LOGO_FONT BenguiatGothicStd_Bold_26_font
@@ -70,6 +70,12 @@ static const struct ao_transform logo_transform = {
 #define CONTRAST_X	(WIDTH - CONTRAST_WIDTH) / 2
 #define CONTRAST_Y	20
 #define CONTRAST_HEIGHT	20
+
+#define BACKLIGHT_LABEL_X	37
+#define BACKLIGHT_WIDTH	100
+#define BACKLIGHT_X	(WIDTH - BACKLIGHT_WIDTH) / 2
+#define BACKLIGHT_Y	20
+#define BACKLIGHT_HEIGHT	20
 
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
@@ -137,21 +143,40 @@ _ao_lco_show_contrast(void)
 	ao_rect(&fb, CONTRAST_X, CONTRAST_Y, contrast, CONTRAST_HEIGHT, AO_BLACK, AO_COPY);
 }
 
+static void
+_ao_lco_show_backlight(void)
+{
+	int32_t	backlight = ao_lco_get_backlight();
+	int16_t value = (int16_t) (backlight * BACKLIGHT_WIDTH / AO_LCO_MAX_BACKLIGHT);
+
+	ao_text(&fb, &SMALL_FONT, BACKLIGHT_LABEL_X, LABEL_Y, "Backlight", AO_BLACK, AO_COPY);
+	ao_rect(&fb, BACKLIGHT_X, BACKLIGHT_Y, value, BACKLIGHT_HEIGHT, AO_BLACK, AO_COPY);
+}
+
 void
 ao_lco_show(void)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
-	if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+	switch (ao_lco_box) {
+	case AO_LCO_LCO_VOLTAGE:
 		_ao_lco_batt_voltage();
-	} else if (ao_lco_box == AO_LCO_CONTRAST) {
+		break;
+	case AO_LCO_CONTRAST:
 		_ao_lco_show_contrast();
-	} else if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
-		_ao_lco_show_voltage(ao_pad_query.battery, "Pad battery");
-	} else {
-		_ao_lco_show_pad(ao_lco_pad);
-		_ao_lco_show_box(ao_lco_box);
-		ao_rect(&fb, SEP_X, 0, 2, HEIGHT, AO_BLACK, AO_COPY);
+		break;
+	case AO_LCO_BACKLIGHT:
+		_ao_lco_show_backlight();
+		break;
+	default:
+		if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
+			_ao_lco_show_voltage(ao_pad_query.battery, "Pad battery");
+		} else {
+			_ao_lco_show_pad(ao_lco_pad);
+			_ao_lco_show_box(ao_lco_box);
+			ao_rect(&fb, SEP_X, 0, 2, HEIGHT, AO_BLACK, AO_COPY);
+		}
+		break;
 	}
 	ao_st7565_update(&fb);
 	ao_mutex_put(&ao_lco_display_mutex);
@@ -181,15 +206,30 @@ ao_lco_set_select(void)
 
 
 void
-ao_lco_set_contrast(int16_t contrast)
+ao_lco_set_contrast(int32_t contrast)
 {
 	ao_st7565_set_brightness((uint8_t) contrast);
 }
 
-int16_t
+int32_t
 ao_lco_get_contrast(void)
 {
-	return (int16_t) ao_st7565_get_brightness();
+	return (int32_t) ao_st7565_get_brightness();
+}
+
+static uint16_t ao_backlight;
+
+void
+ao_lco_set_backlight(int32_t backlight)
+{
+	ao_backlight = (uint16_t) backlight;
+	ao_pwm_set(AO_LCD_BL_PWM_CHAN, ao_backlight);
+}
+
+int32_t
+ao_lco_get_backlight(void)
+{
+	return (int32_t) ao_backlight;
 }
 
 static struct ao_task	ao_lco_drag_task;

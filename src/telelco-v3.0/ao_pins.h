@@ -95,7 +95,7 @@
 #define PACKET_HAS_SLAVE	0
 #define PACKET_HAS_MASTER	0
 
-#define AO_FAST_TIMER		2
+#define AO_FAST_TIMER		4
 #define FAST_TIMER_FREQ		10000	/* .1ms for debouncing */
 
 /* LCD module */
@@ -179,9 +179,9 @@
 #define LED_11_PORT		(&stm_gpioa)
 #define LED_11_PIN		0
 
-#define AO_LED_CONTINUITY_1	AO_LED_12	/* PA1 */
+#define AO_LED_CONTINUITY_1	AO_LED_12	/* PA6 */
 #define LED_12_PORT		(&stm_gpioa)
-#define LED_12_PIN		1
+#define LED_12_PIN		6
 
 #define AO_LED_CONTINUITY_0	AO_LED_13	/* PB1 */
 #define LED_13_PORT		(&stm_gpiob)
@@ -300,5 +300,30 @@ struct ao_adc {
 #define AO_LCO_MIN_CONTRAST	0
 #define AO_LCO_MAX_CONTRAST	63
 #define AO_LCO_CONTRAST_STEP	1
+
+#define AO_LCO_HAS_BACKLIGHT	1
+#define AO_LCO_MIN_BACKLIGHT	0
+#define AO_LCO_MAX_BACKLIGHT	65535
+#define AO_LCO_BACKLIGHT_STEP	771
+
+/*
+ * LCD Backlight via PWM.
+ *
+ * Pin PA1, TIM2_CH2
+ */
+
+#define NUM_PWM			1
+#define PWM_MAX			65535
+#define AO_PWM_TIMER		stm_tim2
+#define AO_LCD_BL_PWM_CHAN	1
+#define AO_PWM_0_GPIO		(&stm_gpioa)
+#define AO_PWM_0_PIN		1
+#define AO_PWM_TIMER_ENABLE	STM_RCC_APB1ENR_TIM2EN
+#define AO_PWM_TIMER_SCALE	1
+
+#define AO_AFIO_PWM_REMAP	STM_AFIO_MAPR_TIM2_REMAP
+#define AO_AFIO_PWM_REMAP_VAL	STM_AFIO_MAPR_TIM2_REMAP_PA0_PA1_PA2_PA3
+#define AO_AFIO_PWM_REMAP_MASK	STM_AFIO_MAPR_TIM2_REMAP_MASK
+
 
 #endif /* _AO_PINS_H_ */
