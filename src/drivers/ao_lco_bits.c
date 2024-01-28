@@ -254,14 +254,30 @@ ao_lco_step_pad(int8_t dir)
 
 #ifdef AO_LCO_HAS_CONTRAST
 	if (ao_lco_box == AO_LCO_CONTRAST) {
-		int16_t contrast = ao_lco_get_contrast();
+		int32_t contrast = ao_lco_get_contrast();
 
-		contrast += (int16_t) (dir * AO_LCO_CONTRAST_STEP);
+		contrast = (contrast + AO_LCO_CONTRAST_STEP - 1) / AO_LCO_CONTRAST_STEP;
+		contrast += dir;
+		contrast *= AO_LCO_CONTRAST_STEP;
 		if (contrast < AO_LCO_MIN_CONTRAST)
 			contrast = AO_LCO_MIN_CONTRAST;
 		if (contrast > AO_LCO_MAX_CONTRAST)
 			contrast = AO_LCO_MAX_CONTRAST;
 		ao_lco_set_contrast(contrast);
+	}
+#endif
+#ifdef AO_LCO_HAS_BACKLIGHT
+	if (ao_lco_box == AO_LCO_BACKLIGHT) {
+		int32_t backlight = ao_lco_get_backlight();
+
+		backlight = (backlight + AO_LCO_BACKLIGHT_STEP - 1) / AO_LCO_BACKLIGHT_STEP;
+		backlight += dir;
+		backlight *= AO_LCO_BACKLIGHT_STEP;
+		if (backlight < AO_LCO_MIN_BACKLIGHT)
+			backlight = AO_LCO_MIN_BACKLIGHT;
+		if (backlight > AO_LCO_MAX_BACKLIGHT)
+			backlight = AO_LCO_MAX_BACKLIGHT;
+		ao_lco_set_backlight(backlight);
 	}
 #endif
 	new_pad = (int16_t) ao_lco_pad;
@@ -297,11 +313,7 @@ ao_lco_step_box(int8_t dir)
 		new_box += dir;
 		if (new_box > ao_lco_max_box)
 			new_box = AO_LCO_BOX_FIRST;
-#ifdef AO_LCO_HAS_CONTRAST
-		else if (new_box < AO_LCO_CONTRAST)
-#else
-		else if (new_box < 0)
-#endif
+		else if (new_box < AO_LCO_BOX_FIRST)
 			new_box = ao_lco_max_box;
 		if (new_box == ao_lco_box)
 			break;

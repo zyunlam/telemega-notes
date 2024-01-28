@@ -51,10 +51,19 @@ extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 #define AO_LCO_BOX_FIRST	AO_LCO_BOX_DRAG
 #else
 #define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
+# ifdef AO_LCO_HAS_BACKLIGHT
+#   define AO_LCO_BACKLIGHT 	-2
+#   ifndef AO_LCO_BOX_FIRST
+#    define AO_LCO_BOX_FIRST AO_LCO_BACKLIGHT
+#   endif
+# endif
 # ifdef AO_LCO_HAS_CONTRAST
 #  define AO_LCO_CONTRAST	-1
-#  define AO_LCO_BOX_FIRST	AO_LCO_CONTRAST
-# else
+#  ifndef AO_LCO_BOX_FIRST
+#   define AO_LCO_BOX_FIRST	AO_LCO_CONTRAST
+#  endif
+# endif
+# ifndef AO_LCO_BOX_FIRST
 #  define AO_LCO_BOX_FIRST	AO_LCO_LCO_VOLTAGE
 # endif
 #endif
@@ -74,6 +83,10 @@ ao_lco_box_pseudo(int16_t box)
 #endif
 #ifdef AO_LCO_CONTRAST
 	case AO_LCO_CONTRAST:
+		return true;
+#endif
+#ifdef AO_LCO_BACKLIGHT
+	case AO_LCO_BACKLIGHT:
 		return true;
 #endif
 	default:
@@ -182,10 +195,18 @@ ao_lco_box_present(int16_t box);
 
 #ifdef AO_LCO_HAS_CONTRAST
 void
-ao_lco_set_contrast(int16_t contrast);
+ao_lco_set_contrast(int32_t contrast);
 
-int16_t
+int32_t
 ao_lco_get_contrast(void);
+#endif
+
+#ifdef AO_LCO_HAS_BACKLIGHT
+void
+ao_lco_set_backlight(int32_t backlight);
+
+int32_t
+ao_lco_get_backlight(void);
 #endif
 
 #ifdef AO_LCO_SEARCH_API
