@@ -133,42 +133,87 @@ ao_st7565_setup(void)
 
 static uint8_t	rotbuf[AO_ST7565_WIDTH];
 
+#define WIDTH	AO_ST7565_WIDTH
+#define HEIGHT	AO_ST7565_HEIGHT
+#define STRIDE	AO_BITMAP_STRIDE(WIDTH)
+
+static uint32_t	previous_image[STRIDE * HEIGHT];
+
 void
 ao_st7565_update(struct ao_bitmap *bitmap)
 {
-	uint8_t 	col, c, page;
-	int		row;
-	uint32_t	*line;
+	int16_t		col, c, page;
+	int16_t		row;
+	uint32_t	*line, *prev, *l;
+	uint32_t	bits;
 	uint8_t		*r;
+	int16_t		min_col, min_row, max_col, max_row;
+	int16_t		min_page, max_page;
 
 	ao_st7565_setup();
 
+	min_col = STRIDE - 1;
+	max_col = 0;
+	min_row = HEIGHT - 1;
+	max_row = 0;
 	line = bitmap->base;
-	for (page = 0; page < 8; page++) {
+	prev = previous_image;
+	for (row = 0; row < HEIGHT; row++) {
+		for (col = 0; col < STRIDE; col++) {
+			bits = *line++;
+			if (bits != *prev) {
+				*prev = bits;
+				if (row < min_row)
+					min_row = row;
+				if (row > max_row)
+					max_row = row;
+				if (col < min_col)
+					min_col = col;
+				if (col > max_col)
+					max_col = col;
+			}
+			prev++;
+		}
+	}
+
+	if (min_col > max_col || min_row > max_row)
+		return;
+
+	min_page = min_row >> 3;
+	max_page = max_row >> 3;
+	line = bitmap->base + min_page * 8 * STRIDE + min_col;
+
+	uint8_t first_col = (uint8_t) (min_col * 32);
+	uint8_t num_col = (uint8_t) (max_col + 1 - min_col) * 32;
+
+	for (page = min_page; page <= max_page; page++) {
 		uint8_t		i[4] = {
-			ST7565_PAGE_ADDRESS_SET(7-page),
-			ST7565_COLUMN_ADDRESS_SET_MSN(0 >> 4),
-			ST7565_COLUMN_ADDRESS_SET_MSN(0 & 0xf),
+			ST7565_PAGE_ADDRESS_SET(7-(uint8_t) page),
+			ST7565_COLUMN_ADDRESS_SET_MSN(first_col >> 4),
+			ST7565_COLUMN_ADDRESS_SET_LSN(first_col & 0xf),
 			ST7565_RMW
 		};
-		memset(rotbuf, 0, sizeof(rotbuf));
+		memset(rotbuf, 0, num_col);
 		for (row = 7; row >= 0; row--) {
 			r = rotbuf;
-			for (col = 0; col < AO_BITMAP_STRIDE(AO_ST7565_WIDTH); col++) {
-				uint32_t	bits = ~*line++;
+			l = line;
+			line += STRIDE;
+			for (col = min_col; col <= max_col; col++) {
+				bits = ~*l++;
 				for (c = 0; c < 32; c++) {
 					*r++ |= ((bits >> c) & 1) << row;
 				}
 			}
 		}
 		ao_st7565_instructions(i, 4);
-		ao_st7565_data(rotbuf, AO_ST7565_WIDTH);
+		ao_st7565_data(rotbuf, num_col);
 	}
 }
 
 void
 ao_st7565_init(void)
 {
+	memset(previous_image, 0xff, sizeof(previous_image));
 	ao_enable_output(AO_ST7565_RESET_PORT, AO_ST7565_RESET_PIN, 1);
 	ao_enable_output(AO_ST7565_A0_PORT, AO_ST7565_A0_PIN, 1);
 
