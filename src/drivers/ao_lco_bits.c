@@ -252,8 +252,9 @@ ao_lco_step_pad(int8_t dir)
 {
 	int16_t	new_pad;
 
+	switch (ao_lco_box) {
 #ifdef AO_LCO_HAS_CONTRAST
-	if (ao_lco_box == AO_LCO_CONTRAST) {
+	case AO_LCO_CONTRAST: {
 		int32_t contrast = ao_lco_get_contrast();
 
 		contrast = (contrast + AO_LCO_CONTRAST_STEP - 1) / AO_LCO_CONTRAST_STEP;
@@ -264,10 +265,11 @@ ao_lco_step_pad(int8_t dir)
 		if (contrast > AO_LCO_MAX_CONTRAST)
 			contrast = AO_LCO_MAX_CONTRAST;
 		ao_lco_set_contrast(contrast);
+		break;
 	}
 #endif
 #ifdef AO_LCO_HAS_BACKLIGHT
-	if (ao_lco_box == AO_LCO_BACKLIGHT) {
+	case AO_LCO_BACKLIGHT: {
 		int32_t backlight = ao_lco_get_backlight();
 
 		backlight = (backlight + AO_LCO_BACKLIGHT_STEP - 1) / AO_LCO_BACKLIGHT_STEP;
@@ -278,20 +280,39 @@ ao_lco_step_pad(int8_t dir)
 		if (backlight > AO_LCO_MAX_BACKLIGHT)
 			backlight = AO_LCO_MAX_BACKLIGHT;
 		ao_lco_set_backlight(backlight);
+		break;
 	}
 #endif
-	new_pad = (int16_t) ao_lco_pad;
-	do {
-		new_pad += dir;
-		if (new_pad > AO_PAD_MAX_CHANNELS)
-			new_pad = AO_LCO_PAD_VOLTAGE;
-		if (new_pad < 0)
-			new_pad = AO_PAD_MAX_CHANNELS;
-		if (new_pad == ao_lco_pad)
-			break;
-	} while (!ao_lco_pad_present(ao_lco_box, (uint8_t) new_pad));
-	PRINTD("New pad %d\n", new_pad);
-	ao_lco_set_pad((uint8_t) new_pad);
+#ifdef AO_LCO_HAS_INFO
+	case AO_LCO_INFO: {
+#if AO_LCO_MIN_INFO_PAGE < AO_LCO_MAX_INFO_PAGE
+		int32_t info_page = ao_lco_get_info_page();
+
+		info += dir;
+		if (info_page < AO_LCO_MIN_INFO_PAGE)
+			info_page = AO_LCO_MIN_INFO_PAGE;
+		if (info_page > AO_LCO_MAX_INFO_PAGE)
+			info_page = AO_LCO_MAX_INFO_PAGE;
+		ao_lco_set_info_page();
+#endif
+		break;
+	}
+#endif
+	default:
+		new_pad = (int16_t) ao_lco_pad;
+		do {
+			new_pad += dir;
+			if (new_pad > AO_PAD_MAX_CHANNELS)
+				new_pad = AO_LCO_PAD_VOLTAGE;
+			if (new_pad < 0)
+				new_pad = AO_PAD_MAX_CHANNELS;
+			if (new_pad == ao_lco_pad)
+				break;
+		} while (!ao_lco_pad_present(ao_lco_box, (uint8_t) new_pad));
+		PRINTD("New pad %d\n", new_pad);
+		ao_lco_set_pad((uint8_t) new_pad);
+		break;
+	}
 }
 
 uint8_t

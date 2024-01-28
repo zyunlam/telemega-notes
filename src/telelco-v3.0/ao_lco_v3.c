@@ -70,12 +70,13 @@ static const struct ao_transform logo_transform = {
 #define CONTRAST_X	(WIDTH - CONTRAST_WIDTH) / 2
 #define CONTRAST_Y	20
 #define CONTRAST_HEIGHT	20
-
 #define BACKLIGHT_LABEL_X	37
 #define BACKLIGHT_WIDTH	100
 #define BACKLIGHT_X	(WIDTH - BACKLIGHT_WIDTH) / 2
 #define BACKLIGHT_Y	20
 #define BACKLIGHT_HEIGHT	20
+#define INFO_START_Y	((int16_t) (SMALL_FONT.ascent + 2))
+#define INFO_STEP_Y	((int16_t) (SMALL_FONT.ascent + 3))
 
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
@@ -153,6 +154,33 @@ _ao_lco_show_backlight(void)
 	ao_rect(&fb, BACKLIGHT_X, BACKLIGHT_Y, value, BACKLIGHT_HEIGHT, AO_BLACK, AO_COPY);
 }
 
+static int16_t info_y;
+
+static void
+_ao_lco_info(const char *format, ...)
+{
+	va_list a;
+	char	buf[20];
+	va_start(a, format);
+	vsnprintf(buf, sizeof(buf), format, a);
+	va_end(a);
+	ao_text(&fb, &SMALL_FONT, 0, info_y, buf, AO_BLACK, AO_COPY);
+	info_y += INFO_STEP_Y;
+}
+
+static void
+_ao_lco_show_info(void)
+{
+	info_y = INFO_START_Y;
+	_ao_lco_info("%s", ao_product);
+	_ao_lco_info("Version: %s", ao_version);
+	_ao_lco_info("Serial: %d", ao_serial_number);
+	_ao_lco_info("Callsign: %s", ao_config.callsign);
+	_ao_lco_info("Frequency: %ld.%03d",
+		     ao_config.frequency / 1000,
+		     (int) (ao_config.frequency % 1000));
+}
+
 void
 ao_lco_show(void)
 {
@@ -167,6 +195,9 @@ ao_lco_show(void)
 		break;
 	case AO_LCO_BACKLIGHT:
 		_ao_lco_show_backlight();
+		break;
+	case AO_LCO_INFO:
+		_ao_lco_show_info();
 		break;
 	default:
 		if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {

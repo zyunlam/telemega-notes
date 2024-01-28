@@ -306,6 +306,10 @@ struct ao_adc {
 #define AO_LCO_MAX_BACKLIGHT	65535
 #define AO_LCO_BACKLIGHT_STEP	771
 
+#define AO_LCO_HAS_INFO		1
+#define AO_LCO_MIN_INFO_PAGE	0
+#define AO_LCO_MAX_INFO_PAGE	0
+
 /*
  * LCD Backlight via PWM.
  *

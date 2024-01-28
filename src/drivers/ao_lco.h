@@ -50,7 +50,13 @@ extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 #define AO_LCO_BOX_DRAG		0		/* Box number to enable drag race mode (old LCO bits) */
 #define AO_LCO_BOX_FIRST	AO_LCO_BOX_DRAG
 #else
-#define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
+# define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
+# ifdef AO_LCO_HAS_INFO
+#  define AO_LCO_INFO		-3
+#  ifndef AO_LCO_BOX_FIRST
+#   define AO_LCO_BOX_FIRST AO_LCO_INFO
+#  endif
+# endif
 # ifdef AO_LCO_HAS_BACKLIGHT
 #   define AO_LCO_BACKLIGHT 	-2
 #   ifndef AO_LCO_BOX_FIRST
@@ -87,6 +93,10 @@ ao_lco_box_pseudo(int16_t box)
 #endif
 #ifdef AO_LCO_BACKLIGHT
 	case AO_LCO_BACKLIGHT:
+		return true;
+#endif
+#ifdef AO_LCO_INFO
+	case AO_LCO_INFO:
 		return true;
 #endif
 	default:
