@@ -38,7 +38,13 @@ ao_beep(uint8_t beep)
 	if (beep == 0) {
 		stm_beeper.cr1 = 0;
 		stm_rcc.apb1enr &= ~(1UL << RCC_BEEPER);
+		stm_gpio_conf(BEEPER_PORT, BEEPER_PIN,
+			      STM_GPIO_CR_MODE_OUTPUT_2MHZ,
+			      STM_GPIO_CR_CNF_OUTPUT_PUSH_PULL);
 	} else {
+		stm_gpio_conf(BEEPER_PORT, BEEPER_PIN,
+			      STM_GPIO_CR_MODE_OUTPUT_2MHZ,
+			      STM_GPIO_CR_CNF_OUTPUT_AF_PUSH_PULL);
 		stm_rcc.apb1enr |= (1UL << RCC_BEEPER);
 
 		stm_beeper.cr2 = ((0 << STM_TIM234_CR2_TI1S) |
@@ -155,7 +161,6 @@ ao_beep_for(uint8_t beep, AO_TICK_TYPE ticks)
 void
 ao_beep_init(void)
 {
-	ao_enable_port(BEEPER_PORT);
 #if BEEPER_TIMER == 2
 	if (BEEPER_PORT == &stm_gpioa) {
 		switch (BEEPER_PIN) {
@@ -217,9 +222,7 @@ ao_beep_init(void)
 #elif BEEPER_TIMER == 4
 	ao_panic(AO_PANIC_CRASH);
 #endif
-	stm_gpio_conf(BEEPER_PORT, BEEPER_PIN,
-		      STM_GPIO_CR_MODE_OUTPUT_2MHZ,
-		      STM_GPIO_CR_CNF_OUTPUT_AF_PUSH_PULL);
+	ao_enable_output(BEEPER_PORT, BEEPER_PIN, 0);
 
 	/* Leave the timer off until requested */
 	stm_rcc.apb1enr &= ~(1UL << RCC_BEEPER);
