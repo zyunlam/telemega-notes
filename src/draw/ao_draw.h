@@ -170,6 +170,12 @@ ao_text(struct ao_bitmap	*dst,
 	uint8_t			rop);
 
 void
+ao_logo_poly(struct ao_bitmap		*dst,
+	     const struct ao_transform	*transform,
+	     uint32_t			fill,
+	     uint8_t			rop);
+
+void
 ao_logo(struct ao_bitmap		*dst,
 	const struct ao_transform	*transform,
 	const struct ao_font		*font,

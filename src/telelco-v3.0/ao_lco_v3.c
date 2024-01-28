@@ -44,6 +44,11 @@ static const struct ao_transform logo_transform = {
 	.y_scale = 48, .y_off = 0,
 };
 
+static const struct ao_transform show_transform = {
+	.x_scale = 36, .x_off = 100,
+	.y_scale = 36, .y_off = 0,
+};
+
 #define BIG_FONT BitstreamVeraSans_Roman_58_font
 #define VOLT_FONT BitstreamVeraSans_Roman_58_font
 #define SMALL_FONT BitstreamVeraSans_Roman_12_font
@@ -172,6 +177,7 @@ static void
 _ao_lco_show_info(void)
 {
 	info_y = INFO_START_Y;
+	ao_logo_poly(&fb, &show_transform, AO_BLACK, AO_COPY);
 	_ao_lco_info("%s", ao_product);
 	_ao_lco_info("Version: %s", ao_version);
 	_ao_lco_info("Serial: %d", ao_serial_number);
