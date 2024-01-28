@@ -18,7 +18,7 @@
 
 uint8_t		ao_lco_debug;
 
-uint8_t		ao_lco_pad;
+int8_t		ao_lco_pad;
 int16_t		ao_lco_box;
 
 uint8_t		ao_lco_armed;					/* arm active */
@@ -38,10 +38,7 @@ static uint8_t		ao_lco_channels[AO_PAD_MAX_BOXES];	/* pad channels available on 
 static uint16_t		ao_lco_tick_offset[AO_PAD_MAX_BOXES];	/* 16 bit offset from local to remote tick count */
 static uint8_t		ao_lco_selected[AO_PAD_MAX_BOXES];	/* pads selected to fire */
 
-#define AO_LCO_VALID_LAST	1
-#define AO_LCO_VALID_EVER	2
-
-static uint8_t		ao_lco_valid[AO_PAD_MAX_BOXES];		/* AO_LCO_VALID bits per box */
+uint8_t		ao_lco_valid[AO_PAD_MAX_BOXES];		/* AO_LCO_VALID bits per box */
 
 static const AO_LED_TYPE	continuity_led[AO_LED_CONTINUITY_NUM] = {
 #ifdef AO_LED_CONTINUITY_0
@@ -142,10 +139,10 @@ ao_lco_igniter_status(void)
 }
 
 uint8_t
-ao_lco_pad_present(int16_t box, uint8_t pad)
+ao_lco_pad_present(int16_t box, int8_t pad)
 {
 	/* voltage measurement is always valid */
-	if (pad == AO_LCO_PAD_VOLTAGE)
+	if (ao_lco_pad_pseudo(pad))
 		return 1;
 	if (!ao_lco_channels[box])
 		return 0;
@@ -154,10 +151,10 @@ ao_lco_pad_present(int16_t box, uint8_t pad)
 	return (ao_lco_channels[box] >> (pad - 1)) & 1;
 }
 
-uint8_t
+int8_t
 ao_lco_pad_first(int16_t box)
 {
-	uint8_t	pad;
+	int8_t	pad;
 
 	for (pad = 1; pad <= AO_PAD_MAX_CHANNELS; pad++)
 		if (ao_lco_pad_present(box, pad))
@@ -193,10 +190,10 @@ ao_lco_update(void)
 
 	if (ao_lco_get_channels(ao_lco_box, &ao_pad_query) & AO_LCO_VALID_LAST) {
 		if (!(previous_valid & AO_LCO_VALID_EVER)) {
-			if (ao_lco_pad != AO_LCO_PAD_VOLTAGE)
+			if (!ao_lco_pad_pseudo(ao_lco_pad))
 				ao_lco_set_pad(ao_lco_pad_first(ao_lco_box));
 		}
-		if (ao_lco_pad == AO_LCO_PAD_VOLTAGE)
+		if (ao_lco_pad_pseudo(ao_lco_pad))
 			ao_lco_show();
 	}
 }
@@ -225,7 +222,7 @@ ao_lco_box_set_present(int16_t box)
 }
 
 void
-ao_lco_set_pad(uint8_t new_pad)
+ao_lco_set_pad(int8_t new_pad)
 {
 	ao_lco_pad = new_pad;
 	ao_lco_show();
@@ -305,14 +302,14 @@ ao_lco_step_pad(int8_t dir)
 		do {
 			new_pad += dir;
 			if (new_pad > AO_PAD_MAX_CHANNELS)
-				new_pad = AO_LCO_PAD_VOLTAGE;
-			if (new_pad < 0)
+				new_pad = AO_LCO_PAD_FIRST;
+			if (new_pad < AO_LCO_PAD_FIRST)
 				new_pad = AO_PAD_MAX_CHANNELS;
 			if (new_pad == ao_lco_pad)
 				break;
-		} while (!ao_lco_pad_present(ao_lco_box, (uint8_t) new_pad));
+		} while (!ao_lco_pad_present(ao_lco_box, (int8_t) new_pad));
 		PRINTD("New pad %d\n", new_pad);
-		ao_lco_set_pad((uint8_t) new_pad);
+		ao_lco_set_pad((int8_t) new_pad);
 		break;
 	}
 }
@@ -488,7 +485,7 @@ ao_lco_monitor(void)
 
 #if AO_LCO_DRAG
 
-uint8_t			ao_lco_drag_beep_count;
+int8_t			ao_lco_drag_beep_count;
 static uint8_t		ao_lco_drag_beep_on;
 static AO_TICK_TYPE	ao_lco_drag_beep_time;
 static AO_TICK_TYPE	ao_lco_drag_warn_time;
@@ -498,7 +495,7 @@ static AO_TICK_TYPE	ao_lco_drag_warn_time;
 
 /* Request 'beeps' additional drag race beeps */
 void
-ao_lco_drag_add_beeps(uint8_t beeps)
+ao_lco_drag_add_beeps(int8_t beeps)
 {
 	PRINTD("beep %d\n", beeps);
 	if (ao_lco_drag_beep_count == 0)
@@ -511,7 +508,7 @@ ao_lco_drag_add_beeps(uint8_t beeps)
 void
 ao_lco_toggle_drag(void)
 {
-	if (ao_lco_drag_race && ao_lco_pad != AO_LCO_PAD_VOLTAGE && !ao_lco_box_pseudo(ao_lco_box)) {
+	if (ao_lco_drag_race && !ao_lco_pad_pseudo(ao_lco_pad) && !ao_lco_box_pseudo(ao_lco_box)) {
 		ao_lco_selected[ao_lco_box] ^= (uint8_t) (1 << (ao_lco_pad - 1));
 		PRINTD("Toggle box %d pad %d (pads now %x) to drag race\n",
 		       ao_lco_pad, ao_lco_box, ao_lco_selected[ao_lco_box]);

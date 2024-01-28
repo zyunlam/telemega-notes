@@ -59,8 +59,8 @@ static const struct ao_transform show_transform = {
 #define VALUE_Y		(int16_t) (LABEL_Y + BIG_FONT.ascent + 5)
 #define BOX_X		2
 #define PAD_X		90
-#define BOX_LABEL_X	30
-#define VOLT_LABEL_X	25
+#define BOX_LABEL_X	26
+#define VALUE_LABEL_X	64
 #define RSSI_LABEL_X	15
 #define PAD_LABEL_X	95
 #define SEP_X		(PAD_X - 8)
@@ -101,7 +101,7 @@ static uint8_t	ao_lco_event_debug;
 static uint8_t	ao_lco_display_mutex;
 
 static void
-_ao_lco_show_pad(uint8_t pad)
+_ao_lco_show_pad(int8_t pad)
 {
 	char	str[5];
 
@@ -124,11 +124,13 @@ static void
 _ao_lco_show_voltage(uint16_t decivolts, const char *label)
 {
 	char	str[7];
+	int16_t	width;
 
 	PRINTD("voltage %d\n", decivolts);
 	snprintf(str, sizeof(str), "%2d.%d", decivolts / 10, decivolts % 10);
 	ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
-	ao_text(&fb, &SMALL_FONT, VOLT_LABEL_X, LABEL_Y, label, AO_BLACK, AO_COPY);
+	width = ao_text_width(&SMALL_FONT, label);
+	ao_text(&fb, &SMALL_FONT, VALUE_LABEL_X - width/2, LABEL_Y, label, AO_BLACK, AO_COPY);
 }
 
 static void
@@ -139,7 +141,7 @@ _ao_lco_batt_voltage(void)
 
 	ao_adc_single_get(&packet);
 	decivolt = ao_battery_decivolt(packet.v_batt);
-	_ao_lco_show_voltage((uint16_t) decivolt, "LCO battery");
+	_ao_lco_show_voltage((uint16_t) decivolt, "LCO Battery");
 	ao_st7565_update(&fb);
 }
 
@@ -203,6 +205,30 @@ _ao_lco_show_info(void)
 		     (int) (ao_config.frequency % 1000));
 }
 
+static void
+_ao_lco_show_rssi(void)
+{
+	char label[20];
+	int16_t width;
+	snprintf(label, sizeof(label), "Box %d RSSI", ao_lco_box);
+	width = ao_text_width(&SMALL_FONT, label);
+	ao_text(&fb, &SMALL_FONT, VALUE_LABEL_X - width / 2, LABEL_Y, label, AO_BLACK, AO_COPY);
+	if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST))
+		strcpy(label, "---");
+	else
+		snprintf(label, sizeof(label), "%d", ao_radio_cmac_rssi);
+	width = ao_text_width(&VOLT_FONT, label);
+	ao_text(&fb, &VOLT_FONT, VALUE_LABEL_X - width / 2, VALUE_Y, label, AO_BLACK, AO_COPY);
+}
+
+static void
+_ao_lco_show_pad_battery(void)
+{
+	char label[20];
+	snprintf(label, sizeof(label), "Box %d Battery", ao_lco_box);
+	_ao_lco_show_voltage(ao_pad_query.battery, label);
+}
+
 void
 ao_lco_show(void)
 {
@@ -222,9 +248,14 @@ ao_lco_show(void)
 		_ao_lco_show_info();
 		break;
 	default:
-		if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
-			_ao_lco_show_voltage(ao_pad_query.battery, "Pad battery");
-		} else {
+		switch (ao_lco_pad) {
+		case AO_LCO_PAD_RSSI:
+			_ao_lco_show_rssi();
+			break;
+		case AO_LCO_PAD_VOLTAGE:
+			_ao_lco_show_pad_battery();
+			break;
+		default:
 			_ao_lco_show_pad(ao_lco_pad);
 			_ao_lco_show_box(ao_lco_box);
 			ao_rect(&fb, SEP_X, 0, 2, HEIGHT, AO_BLACK, AO_COPY);
