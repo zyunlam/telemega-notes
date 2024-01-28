@@ -128,7 +128,7 @@ ao_st7565_setup(void)
 	ao_delay(AO_MS_TO_TICKS(10));
 	ao_st7565_instruction(ST7565_RESISTOR_RATIO_SET(5));
 	ao_st7565_instruction(ST7565_DISPLAY_ON);
-	ao_st7565_set_brightness(0x10);
+	ao_st7565_set_brightness(13);
 }
 
 static uint8_t	rotbuf[AO_ST7565_WIDTH];
