@@ -42,7 +42,7 @@ static uint8_t	ao_lco_event_debug;
 static uint8_t	ao_lco_display_mutex;
 
 void
-ao_lco_show_pad(uint8_t pad)
+ao_lco_show_pad(int8_t pad)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_seven_segment_set(AO_LCO_PAD_DIGIT, (uint8_t) (pad | (ao_lco_drag_race << 4)));
@@ -76,18 +76,31 @@ ao_lco_show_box(int16_t box)
 }
 
 static void
-ao_lco_show_voltage(uint16_t decivolts)
+ao_lco_show_value(uint16_t value, uint8_t point)
 {
-	uint8_t	tens, ones, tenths;
+	uint8_t	hundreds, tens, ones;
 
-	PRINTD("voltage %d\n", decivolts);
-	tenths = (uint8_t) (decivolts % 10);
-	ones = (uint8_t) ((decivolts / 10) % 10);
-	tens = (uint8_t) ((decivolts / 100) % 10);
+	PRINTD("value %d\n", value);
+	ones = (uint8_t) (value % 10);
+	tens = (uint8_t) ((value / 10) % 10);
+	hundreds = (uint8_t) ((value / 100) % 10);
+	switch (point) {
+	case 2:
+		hundreds |= 0x10;
+		break;
+	case 1:
+		tens |= 0x10;
+		break;
+	case 0:
+		ones |= 0x10;
+		break;
+	default:
+		break;
+	}
 	ao_mutex_get(&ao_lco_display_mutex);
-	ao_seven_segment_set(AO_LCO_PAD_DIGIT, tenths);
-	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, ones | 0x10);
-	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, tens);
+	ao_seven_segment_set(AO_LCO_PAD_DIGIT, ones);
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_1, tens);
+	ao_seven_segment_set(AO_LCO_BOX_DIGIT_10, hundreds);
 	ao_mutex_put(&ao_lco_display_mutex);
 }
 
@@ -99,19 +112,32 @@ ao_lco_show_lco_voltage(void)
 
 	ao_adc_single_get(&packet);
 	decivolt = ao_battery_decivolt(packet.v_batt);
-	ao_lco_show_voltage((uint16_t) decivolt);
+	ao_lco_show_value((uint16_t) decivolt, 1);
 }
 
 void
 ao_lco_show(void)
 {
-	if (ao_lco_box == AO_LCO_LCO_VOLTAGE) {
+	switch (ao_lco_box) {
+	case AO_LCO_LCO_VOLTAGE:
 		ao_lco_show_lco_voltage();
-	} else if (ao_lco_pad == AO_LCO_PAD_VOLTAGE) {
-		ao_lco_show_voltage(ao_pad_query.battery);
-	} else {
-		ao_lco_show_pad(ao_lco_pad);
-		ao_lco_show_box(ao_lco_box);
+		break;
+	default:
+		switch (ao_lco_pad) {
+		case AO_LCO_PAD_VOLTAGE:
+			ao_lco_show_value(ao_pad_query.battery, 1);
+			break;
+		case AO_LCO_PAD_RSSI:
+			if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST))
+				ao_lco_show_value(888, 0);
+			else
+				ao_lco_show_value((uint16_t) (-ao_radio_cmac_rssi), 0);
+			break;
+		default:
+			ao_lco_show_pad(ao_lco_pad);
+			ao_lco_show_box(ao_lco_box);
+			break;
+		}
 	}
 }
 

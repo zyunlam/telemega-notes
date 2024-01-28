@@ -41,7 +41,7 @@ static uint8_t	ao_lco_fire_down;
 static uint8_t	ao_lco_display_mutex;
 
 void
-ao_lco_show_pad(uint8_t pad)
+ao_lco_show_pad(int8_t pad)
 {
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_seven_segment_set(AO_LCO_PAD_DIGIT, (uint8_t) (pad | (ao_lco_drag_race << 4)));
@@ -101,7 +101,7 @@ ao_lco_show(void)
 		ao_lco_show_voltage(ao_pad_query.battery);
 	} else {
 		if (ao_lco_box == AO_LCO_BOX_DRAG)
-			ao_lco_show_pad(ao_lco_drag_race);
+			ao_lco_show_pad((int8_t) ao_lco_drag_race);
 		else
 			ao_lco_show_pad(ao_lco_pad);
 		ao_lco_show_box(ao_lco_box);

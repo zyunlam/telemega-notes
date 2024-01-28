@@ -46,7 +46,7 @@ ao_lco_wakeup(void)
 }
 
 void
-ao_lco_show_pad(uint8_t pad)
+ao_lco_show_pad(int8_t pad)
 {
 	(void) pad;
 }

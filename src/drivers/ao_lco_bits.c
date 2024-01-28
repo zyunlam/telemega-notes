@@ -413,7 +413,7 @@ ao_lco_search(void)
 #ifdef AO_LCO_SEARCH_API
 				ao_lco_search_box_present(box);
 #else
-				ao_lco_show_pad((uint8_t) (boxes % 10));
+				ao_lco_show_pad((int8_t) (boxes % 10));
 #endif
 				ao_delay(AO_MS_TO_TICKS(30));
 				break;
