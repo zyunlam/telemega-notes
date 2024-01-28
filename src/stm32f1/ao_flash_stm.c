@@ -69,19 +69,18 @@ _ao_flash_erase_page(uint32_t *page)
 static uint32_t
 stm_flash_page_size(void)
 {
-	uint16_t	dev_id = stm_dev_id();
+	uint16_t	f_size = stm_flash_data.f_size;
 
-	switch (dev_id) {
-	case 0x412:	/* low-density devices */
-	case 0x410:	/* medium-density devices */
+	if (f_size <= 128) {
+		/* low-density and medium-density devices */
 		return 1024;
-	case 0x414:	/* high-density devices */
-	case 0x430:	/* XL-density devices */
-	case 0x418:	/* Connectivity devices */
+	} else {
+		/*
+		 * high-density devices, XL-density devices and
+		 * Connectivity devices
+		 */
 		return 2048;
 	}
-	ao_panic(AO_PANIC_FLASH);
-	return 0;
 }
 
 void
