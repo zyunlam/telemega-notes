@@ -265,6 +265,7 @@ ao_lco_step_pad(int8_t dir)
 		if (contrast > AO_LCO_MAX_CONTRAST)
 			contrast = AO_LCO_MAX_CONTRAST;
 		ao_lco_set_contrast(contrast);
+		ao_lco_show();
 		break;
 	}
 #endif
@@ -280,6 +281,7 @@ ao_lco_step_pad(int8_t dir)
 		if (backlight > AO_LCO_MAX_BACKLIGHT)
 			backlight = AO_LCO_MAX_BACKLIGHT;
 		ao_lco_set_backlight(backlight);
+		ao_lco_show();
 		break;
 	}
 #endif
