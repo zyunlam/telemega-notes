@@ -75,11 +75,15 @@ static const struct ao_transform show_transform = {
 #define CONTRAST_X	(WIDTH - CONTRAST_WIDTH) / 2
 #define CONTRAST_Y	20
 #define CONTRAST_HEIGHT	20
+#define CONTRAST_VALUE_X	64
+#define CONTRAST_VALUE_Y	(CONTRAST_Y + CONTRAST_HEIGHT + SMALL_FONT.ascent + 3)
 #define BACKLIGHT_LABEL_X	37
 #define BACKLIGHT_WIDTH	100
 #define BACKLIGHT_X	(WIDTH - BACKLIGHT_WIDTH) / 2
 #define BACKLIGHT_Y	20
 #define BACKLIGHT_HEIGHT	20
+#define BACKLIGHT_VALUE_X	64
+#define BACKLIGHT_VALUE_Y	(BACKLIGHT_Y + BACKLIGHT_HEIGHT + SMALL_FONT.ascent + 3)
 #define INFO_START_Y	((int16_t) (SMALL_FONT.ascent + 2))
 #define INFO_STEP_Y	((int16_t) (SMALL_FONT.ascent + 3))
 
@@ -142,21 +146,33 @@ _ao_lco_batt_voltage(void)
 static void
 _ao_lco_show_contrast(void)
 {
+	char buf[8];
 	uint8_t	brightness = ao_st7565_get_brightness();
 	int16_t contrast = (int16_t) (brightness * CONTRAST_WIDTH / AO_LCO_MAX_CONTRAST);
+	int16_t width;
 
 	ao_text(&fb, &SMALL_FONT, CONTRAST_LABEL_X, LABEL_Y, "Contrast", AO_BLACK, AO_COPY);
 	ao_rect(&fb, CONTRAST_X, CONTRAST_Y, contrast, CONTRAST_HEIGHT, AO_BLACK, AO_COPY);
+	/* this "knows" that CONTRAST_WIDTH == 100 */
+	snprintf(buf, sizeof(buf), "%d %%", contrast);
+	width = ao_text_width(&SMALL_FONT, buf);
+	ao_text(&fb, &SMALL_FONT, BACKLIGHT_VALUE_X - width / 2, BACKLIGHT_VALUE_Y, buf, AO_BLACK, AO_COPY);
 }
 
 static void
 _ao_lco_show_backlight(void)
 {
+	char buf[8];
 	int32_t	backlight = ao_lco_get_backlight();
 	int16_t value = (int16_t) (backlight * BACKLIGHT_WIDTH / AO_LCO_MAX_BACKLIGHT);
+	int16_t width;
 
 	ao_text(&fb, &SMALL_FONT, BACKLIGHT_LABEL_X, LABEL_Y, "Backlight", AO_BLACK, AO_COPY);
 	ao_rect(&fb, BACKLIGHT_X, BACKLIGHT_Y, value, BACKLIGHT_HEIGHT, AO_BLACK, AO_COPY);
+	/* this "knows" that BACKLIGHT_WIDTH == 100 */
+	snprintf(buf, sizeof(buf), "%d %%", value);
+	width = ao_text_width(&SMALL_FONT, buf);
+	ao_text(&fb, &SMALL_FONT, BACKLIGHT_VALUE_X - width / 2, BACKLIGHT_VALUE_Y, buf, AO_BLACK, AO_COPY);
 }
 
 static int16_t info_y;

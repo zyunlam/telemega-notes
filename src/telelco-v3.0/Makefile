@@ -66,6 +66,7 @@ ALTOS_SRC = \
 	ao_st7565.c \
 	ao_rect.c \
 	ao_text.c \
+	ao_text_width.c \
 	ao_box.c \
 	ao_copy.c \
 	ao_blt.c \
