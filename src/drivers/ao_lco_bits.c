@@ -381,6 +381,26 @@ ao_lco_set_firing(uint8_t firing)
 	ao_wakeup(&ao_lco_armed);
 }
 
+#if 0
+static int16_t fake_boxes[] = {
+	1, 2, 3, 5, 8, 11, 13, 17, 19, 23, 29, 31, 37, 62, 97
+};
+#define ARRAYSIZE(a)	(sizeof(a) / sizeof((a)[0]))
+#define NFAKE ARRAYSIZE(fake_boxes)
+
+static bool
+is_fake(int16_t box)
+{
+	unsigned i;
+	for (i = 0; i < NFAKE; i++)
+		if (fake_boxes[i] == box)
+			return true;
+	return false;
+}
+#else
+#define is_fake(b)	false
+#endif
+
 void
 ao_lco_search(void)
 {
@@ -407,7 +427,7 @@ ao_lco_search(void)
 			ao_lco_tick_offset[box] = 0;
 			r = ao_lco_query((uint16_t) box, &ao_pad_query, &ao_lco_tick_offset[box]);
 			PRINTD("box %d result %d offset %d\n", box, r, ao_lco_tick_offset[box]);
-			if (r == AO_RADIO_CMAC_OK) {
+			if (r == AO_RADIO_CMAC_OK || is_fake(box)) {
 				++boxes;
 				ao_lco_box_set_present(box);
 #ifdef AO_LCO_SEARCH_API

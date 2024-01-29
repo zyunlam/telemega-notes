@@ -56,19 +56,22 @@ static const struct ao_transform show_transform = {
 #define LOGO_FONT BenguiatGothicStd_Bold_26_font
 
 #define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
-#define VALUE_Y		(int16_t) (LABEL_Y + BIG_FONT.ascent + 5)
-#define BOX_X		2
-#define PAD_X		90
-#define BOX_LABEL_X	26
+#define VALUE_Y		(int16_t) (LABEL_Y + 5 + BIG_FONT.ascent)
+
+#define SEP_X		82
+#define SEP_WIDTH	2
+
+#define BOX_X		(SEP_X / 2)
+#define PAD_X		((WIDTH + SEP_X + SEP_WIDTH) / 2)
+
 #define VALUE_LABEL_X	64
 #define RSSI_LABEL_X	15
-#define PAD_LABEL_X	95
-#define SEP_X		(PAD_X - 8)
+
 #define SCAN_X		(WIDTH - 100) / 2
 #define SCAN_Y		50
 #define SCAN_HEIGHT	3
 #define FOUND_Y		63
-#define FOUND_X		6
+#define FOUND_X		3
 #define FOUND_WIDTH	(WIDTH - 6)
 #define CONTRAST_LABEL_X	37
 #define CONTRAST_WIDTH	100
@@ -95,19 +98,26 @@ static uint8_t	ao_lco_select_mode;
 static uint8_t	ao_lco_event_debug;
 
 #define PRINTE(...) do { if (!ao_lco_debug && !ao_lco_event_debug) break; printf ("\r%5lu %s: ", (unsigned long) ao_tick_count, __func__); printf(__VA_ARGS__); flush(); } while(0)
-#define AO_LCO_SELECT_PAD	0
-#define AO_LCO_SELECT_BOX	1
+#define AO_LCO_SELECT_BOX	0
+#define AO_LCO_SELECT_PAD	1
 
 static uint8_t	ao_lco_display_mutex;
+
+static void
+_ao_center_text(int16_t x, int16_t y, const struct ao_font *font, const char *str)
+{
+	int16_t width = ao_text_width(font, str);
+	ao_text(&fb, font, x - width/2, y, str, AO_BLACK, AO_COPY);
+}
 
 static void
 _ao_lco_show_pad(int8_t pad)
 {
 	char	str[5];
 
+	_ao_center_text(PAD_X, LABEL_Y, &SMALL_FONT, "Pad");
 	snprintf(str, sizeof(str), "%d", pad);
-	ao_text(&fb, &BIG_FONT, PAD_X, VALUE_Y, str, AO_BLACK, AO_COPY);
-	ao_text(&fb, &SMALL_FONT, PAD_LABEL_X, LABEL_Y, "Pad", AO_BLACK, AO_COPY);
+	_ao_center_text(PAD_X, VALUE_Y, &BIG_FONT, str);
 }
 
 static void
@@ -115,22 +125,20 @@ _ao_lco_show_box(int16_t box)
 {
 	char	str[7];
 
-	snprintf(str, sizeof(str), "%2d", box);
-	ao_text(&fb, &BIG_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
-	ao_text(&fb, &SMALL_FONT, BOX_LABEL_X, LABEL_Y, "Box", AO_BLACK, AO_COPY);
+	_ao_center_text(BOX_X, LABEL_Y, &SMALL_FONT, "Bank");
+	snprintf(str, sizeof(str), "%d", box);
+	_ao_center_text(BOX_X, VALUE_Y, &BIG_FONT, str);
 }
 
 static void
 _ao_lco_show_voltage(uint16_t decivolts, const char *label)
 {
 	char	str[7];
-	int16_t	width;
 
 	PRINTD("voltage %d\n", decivolts);
-	snprintf(str, sizeof(str), "%2d.%d", decivolts / 10, decivolts % 10);
-	ao_text(&fb, &VOLT_FONT, BOX_X, VALUE_Y, str, AO_BLACK, AO_COPY);
-	width = ao_text_width(&SMALL_FONT, label);
-	ao_text(&fb, &SMALL_FONT, VALUE_LABEL_X - width/2, LABEL_Y, label, AO_BLACK, AO_COPY);
+	_ao_center_text(WIDTH/2, LABEL_Y, &SMALL_FONT, label);
+	snprintf(str, sizeof(str), "%d.%d", decivolts / 10, decivolts % 10);
+	_ao_center_text(WIDTH/2, VALUE_Y, &BIG_FONT, str);
 }
 
 static void
@@ -151,14 +159,11 @@ _ao_lco_show_contrast(void)
 	char buf[8];
 	uint8_t	brightness = ao_st7565_get_brightness();
 	int16_t contrast = (int16_t) (brightness * CONTRAST_WIDTH / AO_LCO_MAX_CONTRAST);
-	int16_t width;
 
-	ao_text(&fb, &SMALL_FONT, CONTRAST_LABEL_X, LABEL_Y, "Contrast", AO_BLACK, AO_COPY);
+	_ao_center_text(WIDTH/2, LABEL_Y, &SMALL_FONT, "Contrast");
 	ao_rect(&fb, CONTRAST_X, CONTRAST_Y, contrast, CONTRAST_HEIGHT, AO_BLACK, AO_COPY);
-	/* this "knows" that CONTRAST_WIDTH == 100 */
-	snprintf(buf, sizeof(buf), "%d %%", contrast);
-	width = ao_text_width(&SMALL_FONT, buf);
-	ao_text(&fb, &SMALL_FONT, BACKLIGHT_VALUE_X - width / 2, BACKLIGHT_VALUE_Y, buf, AO_BLACK, AO_COPY);
+	snprintf(buf, sizeof(buf), "%d %%", brightness * 100 / AO_LCO_MAX_CONTRAST);
+	_ao_center_text(WIDTH/2, CONTRAST_VALUE_Y, &SMALL_FONT, buf);
 }
 
 static void
@@ -167,14 +172,11 @@ _ao_lco_show_backlight(void)
 	char buf[8];
 	int32_t	backlight = ao_lco_get_backlight();
 	int16_t value = (int16_t) (backlight * BACKLIGHT_WIDTH / AO_LCO_MAX_BACKLIGHT);
-	int16_t width;
 
-	ao_text(&fb, &SMALL_FONT, BACKLIGHT_LABEL_X, LABEL_Y, "Backlight", AO_BLACK, AO_COPY);
+	_ao_center_text(WIDTH/2, LABEL_Y, &SMALL_FONT, "Backlight");
 	ao_rect(&fb, BACKLIGHT_X, BACKLIGHT_Y, value, BACKLIGHT_HEIGHT, AO_BLACK, AO_COPY);
-	/* this "knows" that BACKLIGHT_WIDTH == 100 */
-	snprintf(buf, sizeof(buf), "%d %%", value);
-	width = ao_text_width(&SMALL_FONT, buf);
-	ao_text(&fb, &SMALL_FONT, BACKLIGHT_VALUE_X - width / 2, BACKLIGHT_VALUE_Y, buf, AO_BLACK, AO_COPY);
+	snprintf(buf, sizeof(buf), "%ld %%", backlight * 100 / AO_LCO_MAX_BACKLIGHT);
+	_ao_center_text(WIDTH/2, BACKLIGHT_VALUE_Y, &SMALL_FONT, buf);
 }
 
 static int16_t info_y;
@@ -210,7 +212,7 @@ _ao_lco_show_rssi(void)
 {
 	char label[20];
 	int16_t width;
-	snprintf(label, sizeof(label), "Box %d RSSI", ao_lco_box);
+	snprintf(label, sizeof(label), "Bank %d RSSI", ao_lco_box);
 	width = ao_text_width(&SMALL_FONT, label);
 	ao_text(&fb, &SMALL_FONT, VALUE_LABEL_X - width / 2, LABEL_Y, label, AO_BLACK, AO_COPY);
 	if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST))
@@ -225,7 +227,7 @@ static void
 _ao_lco_show_pad_battery(void)
 {
 	char label[20];
-	snprintf(label, sizeof(label), "Box %d Battery", ao_lco_box);
+	snprintf(label, sizeof(label), "Bank %d Battery", ao_lco_box);
 	_ao_lco_show_voltage(ao_pad_query.battery, label);
 }
 
@@ -258,7 +260,7 @@ ao_lco_show(void)
 		default:
 			_ao_lco_show_pad(ao_lco_pad);
 			_ao_lco_show_box(ao_lco_box);
-			ao_rect(&fb, SEP_X, 0, 2, HEIGHT, AO_BLACK, AO_COPY);
+			ao_rect(&fb, SEP_X, 0, SEP_WIDTH, HEIGHT, AO_BLACK, AO_COPY);
 		}
 		break;
 	}
@@ -420,14 +422,18 @@ static struct ao_task ao_lco_monitor_task;
 static struct ao_task ao_lco_arm_warn_task;
 static struct ao_task ao_lco_igniter_status_task;
 
-static int16_t	found_x;
+static int16_t	found_width;
+#define MAX_FOUND	32
+static int16_t	found_boxes[MAX_FOUND];
+static uint8_t	nfound;
 
 void
 ao_lco_search_start(void)
 {
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
 	ao_logo(&fb, &logo_transform, &LOGO_FONT, AO_BLACK, AO_COPY);
-	found_x = FOUND_X;
+	found_width = 0;
+	nfound = 0;
 }
 
 void
@@ -442,11 +448,30 @@ void
 ao_lco_search_box_present(int16_t box)
 {
 	char	str[8];
-	if (found_x < FOUND_WIDTH)
+	int16_t	width;
+	int16_t box_top = FOUND_Y - TINY_FONT.ascent;
+	int16_t	x;
+	uint8_t	n;
+
+	snprintf(str, sizeof(str), "%s%u", nfound ? ", " : "", box);
+	width = ao_text_width(&TINY_FONT, str);
+	while (found_width + width > FOUND_WIDTH || nfound == MAX_FOUND)
 	{
-		snprintf(str, sizeof(str), "%s%02u", found_x ? ", " : "", box);
-		found_x = ao_text(&fb, &TINY_FONT, found_x, FOUND_Y, str, AO_BLACK, AO_COPY);
+		snprintf(str, sizeof(str), "%u, ", found_boxes[0]);
+		found_width -= ao_text_width(&TINY_FONT, str);
+		memmove(&found_boxes[0], &found_boxes[1], (nfound - 1) * sizeof (int16_t));
+		nfound--;
 	}
+	found_boxes[nfound++] = box;
+
+	ao_rect(&fb, FOUND_X, FOUND_Y - TINY_FONT.ascent, FOUND_WIDTH, HEIGHT - box_top, AO_WHITE, AO_COPY);
+	x = FOUND_X;
+	for (n = 0; n < nfound; n++) {
+		snprintf(str, sizeof(str), "%s%u", n ? ", " : "", found_boxes[n]);
+		int16_t next_x = ao_text(&fb, &TINY_FONT, x, FOUND_Y, str, AO_BLACK, AO_COPY);
+		x = next_x;
+	}
+	found_width = x - FOUND_X;
 }
 
 void
