@@ -250,7 +250,7 @@ struct ao_adc {
  * Logging
  */
 
-#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	(1024 * 1024)
+#define AO_CONFIG_DEFAULT_FLIGHT_LOG_MAX	(192 * 1024)
 #define AO_CONFIG_MAX_SIZE			1024
 #define LOG_ERASE_MARK				0x55
 #define LOG_MAX_ERASE				128
