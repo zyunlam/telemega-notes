@@ -45,6 +45,8 @@ public class AltosMag implements Cloneable {
 		case AltosIMU.imu_type_telemega_v1_v2:
 		case AltosIMU.imu_type_easymega_v1:
 			return counts_per_gauss_hmc5883;
+		case AltosIMU.imu_type_easytimer_v2:
+			return counts_per_gauss_mmc5983;
 		}
 
 		return AltosIMU.counts_per_gauss(imu_type, mag_model);

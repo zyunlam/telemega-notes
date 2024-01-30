@@ -223,6 +223,9 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_EASYMOTOR:
 			/* ADXL375 */
 			return -value;
+		case AltosLib.AO_LOG_FORMAT_EASYTIMER_2:
+			/* BMI088 */
+			return -value;
 		default:
 			if (product.startsWith("EasyTimer-"))
 				return -value;
