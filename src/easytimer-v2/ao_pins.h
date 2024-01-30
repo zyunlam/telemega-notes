@@ -149,18 +149,35 @@ struct ao_adc {
  */
 
 #define M25_MAX_CHIPS		1
-#define AO_M25_SPI_CS_PORT	(&samd21_port_a)
-#define AO_M25_SPI_CS_MASK	(1 << 27)
+#define AO_M25_SPI_CS_PORT	(&samd21_port_b)
+#define AO_M25_SPI_CS_MASK	(1 << 10)
 #define AO_M25_SPI_BUS		AO_SPI_0_PA04_PA05_PA06
 
 /*
- * On EasyTimer v2, bmi088 pin 1 (NE corner of chip) is placed towards the
- * USB and antenna edges of the board. Relative to bmi088 specs, to
- * get the above values, we need to flip the Y axis, assigning values
- * as follows:
  *
- *	+along		+X	+roll	+X
- *	+across		-Y	+pitch	-Y
+ * Here are the required sensor signs:
+ *
+ * +along	nose up
+ * +across 	switch screws down
+ * +through	TH down
+ *
+ * With the board aligned to have positive accel for the relevant
+ * axis, looking down from above we have:
+ *
+ * +roll	counter clockwise (nose up)
+ * +pitch	counter clockwise (switch screws down)
+ * +yaw		counter clockwise (TH down)
+ */
+
+
+/*
+ * On EasyTimer v2, bmi088 pin 1 (NE corner of chip) is placed away
+ * from the USB edge of the board. Relative to bmi088 specs, to get
+ * the above values, we need to flip the X and Y axes, assigning
+ * values as follows:
+ *
+ *	+along		-Y	+roll	-Y
+ *	+across		-X	+pitch	-X
  *	+through	+Z	+yaw	+Z
  */
 
@@ -172,12 +189,12 @@ struct ao_adc {
 #define AO_BMI088_GYR_CS_PIN	11
 #define HAS_IMU			1
 
-#define ao_bmi088_along(m)	((m)->acc.x)
-#define ao_bmi088_across(m)	(-(m)->acc.y)
+#define ao_bmi088_along(m)	(-(m)->acc.y)
+#define ao_bmi088_across(m)	(-(m)->acc.x)
 #define ao_bmi088_through(m)	((m)->acc.z)
 
-#define ao_bmi088_roll(m)	((m)->gyr.x)
-#define ao_bmi088_pitch(m)	(-(m)->gyr.y)
+#define ao_bmi088_roll(m)	(-(m)->gyr.y)
+#define ao_bmi088_pitch(m)	(-(m)->gyr.x)
 #define ao_bmi088_yaw(m)	((m)->gyr.z)
 
 #define ao_data_along(packet)	ao_bmi088_along(&(packet)->bmi088)
@@ -193,7 +210,7 @@ struct ao_adc {
  *
  *	pin 1 NE corner of chip
  *
- *	+along		-Y
+ *	+along		+Y
  *	+across		+X
  *	+through	-Z
  */
@@ -211,7 +228,7 @@ struct ao_adc {
 #define AO_MMC5983_SPI_CS_PORT		(&samd21_port_a)
 #define AO_MMC5983_SPI_CS_PIN		8
 
-#define ao_mmc5983_along(m)		(-(m)->y)
+#define ao_mmc5983_along(m)		((m)->y)
 #define ao_mmc5983_across(m)		((m)->x)
 #define ao_mmc5983_through(m)		(-(m)->z)
 
