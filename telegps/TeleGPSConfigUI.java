@@ -248,6 +248,8 @@ public class TeleGPSConfigUI
 			flight_log_max_value.setToolTipText("Cannot set max value with flight logs in memory");
 	}
 
+	public boolean has_radio() { return true; }
+
 	/* Build the UI using a grid bag */
 	public TeleGPSConfigUI(JFrame in_owner) {
 		super (in_owner, "Configure Device", false);

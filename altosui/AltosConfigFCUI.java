@@ -240,7 +240,7 @@ public class AltosConfigFCUI
 		return product != null && product.startsWith("EasyTimer");
 	}
 
-	boolean has_radio() {
+	public boolean has_radio() {
 		return is_telemega() || is_telemetrum() || is_telemini();
 	}
 
