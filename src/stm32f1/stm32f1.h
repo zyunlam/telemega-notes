@@ -1132,7 +1132,7 @@ extern struct stm_adc stm_adc1;
 #define STM_ADC_CR1_AWDCH	0
 #define  STM_ADC_CR1_AWDCH_MASK		0x1fUL
 
-#define STM_ADC_CR2_TSVREF	23
+#define STM_ADC_CR2_TSVREFE	23
 #define STM_ADC_CR2_SWSTART	22
 #define STM_ADC_CR2_JWSTART	21
 #define STM_ADC_CR2_EXTTRIG	20

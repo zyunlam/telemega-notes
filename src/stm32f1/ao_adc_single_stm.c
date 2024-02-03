@@ -22,7 +22,7 @@
 
 static uint8_t			ao_adc_ready;
 
-#define AO_ADC_CR2_VAL(start)	((HAS_ADC_TEMP << STM_ADC_CR2_TSVREF) | \
+#define AO_ADC_CR2_VAL(start)	((HAS_ADC_TEMP << STM_ADC_CR2_TSVREFE) |\
 				 ((start) << STM_ADC_CR2_SWSTART) |	\
 				 (0 << STM_ADC_CR2_JWSTART) |		\
 				 (0 << STM_ADC_CR2_EXTTRIG) |		\

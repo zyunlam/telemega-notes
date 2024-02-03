@@ -21,7 +21,7 @@
 
 static uint8_t			ao_adc_ready;
 
-#define AO_ADC_CR2_VAL		((HAS_ADC_TEMP << STM_ADC_CR2_TSVREF) | \
+#define AO_ADC_CR2_VAL		((HAS_ADC_TEMP << STM_ADC_CR2_TSVREFE) |\
 				 (0 << STM_ADC_CR2_SWSTART) |		\
 				 (0 << STM_ADC_CR2_JWSTART) |		\
 				 (0 << STM_ADC_CR2_EXTTRIG) |		\
@@ -56,9 +56,9 @@ ao_adc_poll(void)
 	if (!ao_adc_ready)
 		return;
 	ao_adc_ready = 0;
-	stm_adc.sr = 0;
+	stm_adc1.sr = 0;
 	ao_dma_set_transfer(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1),
-			    &stm_adc.dr,
+			    &stm_adc1.dr,
 			    (void *) (&ao_data_ring[ao_data_head].adc),
 			    AO_NUM_ADC,
 			    (0 << STM_DMA_CCR_MEM2MEM) |
@@ -72,7 +72,7 @@ ao_adc_poll(void)
 	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1), ao_adc_done);
 	ao_dma_start(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
 
-	stm_adc.cr2 = AO_ADC_CR2_VAL | (1 << STM_ADC_CR2_SWSTART);
+	stm_adc1.cr2 = AO_ADC_CR2_VAL | (1 << STM_ADC_CR2_SWSTART);
 }
 
 #ifdef AO_ADC_SQ1_NAME
@@ -264,9 +264,9 @@ ao_adc_init(void)
 	stm_rcc.apb2enr |= (1 << STM_RCC_APB2ENR_ADC1EN);
 
 	/* Turn off ADC during configuration */
-	stm_adc.cr2 = 0;
+	stm_adc1.cr2 = 0;
 
-	stm_adc.cr1 = ((0 << STM_ADC_CR1_AWDEN ) |
+	stm_adc1.cr1 = ((0 << STM_ADC_CR1_AWDEN ) |
 		       (0 << STM_ADC_CR1_JAWDEN ) |
 		       (STM_ADC_CR1_DUALMOD_INDEPENDENT << STM_ADC_CR1_DUALMOD ) |
 		       (0 << STM_ADC_CR1_DISCNUM ) |
@@ -281,57 +281,57 @@ ao_adc_init(void)
 		       (0 << STM_ADC_CR1_AWDCH ));
 
 	/* 384 cycle sample time for everyone */
-	stm_adc.smpr1 = 0x3ffff;
-	stm_adc.smpr2 = 0x3fffffff;
+	stm_adc1.smpr1 = 0x3ffff;
+	stm_adc1.smpr2 = 0x3fffffff;
 
-	stm_adc.sqr1 = ((AO_NUM_ADC - 1) << 20);
+	stm_adc1.sqr1 = ((AO_NUM_ADC - 1) << 20);
 #if AO_NUM_ADC > 0
-	stm_adc.sqr3 |= (AO_ADC_SQ1 << 0);
+	stm_adc1.sqr3 |= (AO_ADC_SQ1 << 0);
 #endif
 #if AO_NUM_ADC > 1
-	stm_adc.sqr3 |= (AO_ADC_SQ2 << 5);
+	stm_adc1.sqr3 |= (AO_ADC_SQ2 << 5);
 #endif
 #if AO_NUM_ADC > 2
-	stm_adc.sqr3 |= (AO_ADC_SQ3 << 10);
+	stm_adc1.sqr3 |= (AO_ADC_SQ3 << 10);
 #endif
 #if AO_NUM_ADC > 3
-	stm_adc.sqr3 |= (AO_ADC_SQ4 << 15);
+	stm_adc1.sqr3 |= (AO_ADC_SQ4 << 15);
 #endif
 #if AO_NUM_ADC > 4
-	stm_adc.sqr3 |= (AO_ADC_SQ5 << 20);
+	stm_adc1.sqr3 |= (AO_ADC_SQ5 << 20);
 #endif
 #if AO_NUM_ADC > 5
-	stm_adc.sqr3 |= (AO_ADC_SQ6 << 25);
+	stm_adc1.sqr3 |= (AO_ADC_SQ6 << 25);
 #endif
 #if AO_NUM_ADC > 6
-	stm_adc.sqr2 |= (AO_ADC_SQ7 << 0);
+	stm_adc1.sqr2 |= (AO_ADC_SQ7 << 0);
 #endif
 #if AO_NUM_ADC > 7
-	stm_adc.sqr2 |= (AO_ADC_SQ8 << 5);
+	stm_adc1.sqr2 |= (AO_ADC_SQ8 << 5);
 #endif
 #if AO_NUM_ADC > 8
-	stm_adc.sqr2 |= (AO_ADC_SQ9 << 10);
+	stm_adc1.sqr2 |= (AO_ADC_SQ9 << 10);
 #endif
 #if AO_NUM_ADC > 9
-	stm_adc.sqr2 |= (AO_ADC_SQ10 << 15);
+	stm_adc1.sqr2 |= (AO_ADC_SQ10 << 15);
 #endif
 #if AO_NUM_ADC > 10
-	stm_adc.sqr2 |= (AO_ADC_SQ11 << 20);
+	stm_adc1.sqr2 |= (AO_ADC_SQ11 << 20);
 #endif
 #if AO_NUM_ADC > 11
-	stm_adc.sqr2 |= (AO_ADC_SQ12 << 25);
+	stm_adc1.sqr2 |= (AO_ADC_SQ12 << 25);
 #endif
 #if AO_NUM_ADC > 12
-	stm_adc.sqr1 |= (AO_ADC_SQ13 << 0);
+	stm_adc1.sqr1 |= (AO_ADC_SQ13 << 0);
 #endif
 #if AO_NUM_ADC > 13
-	stm_adc.sqr1 |= (AO_ADC_SQ14 << 5);
+	stm_adc1.sqr1 |= (AO_ADC_SQ14 << 5);
 #endif
 #if AO_NUM_ADC > 14
-	stm_adc.sqr1 |= (AO_ADC_SQ15 << 10);
+	stm_adc1.sqr1 |= (AO_ADC_SQ15 << 10);
 #endif
 #if AO_NUM_ADC > 15
-	stm_adc.sqr1 |= (AO_ADC_SQ16 << 15);
+	stm_adc1.sqr1 |= (AO_ADC_SQ16 << 15);
 #endif
 #if AO_NUM_ADC > 15
 #error "too many ADC channels"
@@ -341,11 +341,11 @@ ao_adc_init(void)
 #error Please define HAS_ADC_TEMP
 #endif
 #if HAS_ADC_TEMP
-	stm_adc.cr2 |= ((1 << STM_ADC_CR2_TSVREFE));
+	stm_adc1.cr2 |= ((1 << STM_ADC_CR2_TSVREFE));
 #endif
 
 	/* Clear any stale status bits */
-	stm_adc.sr = 0;
+	stm_adc1.sr = 0;
 
 	ao_dma_alloc(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
 
