@@ -21,12 +21,12 @@
 
 static uint8_t			ao_adc_ready;
 
-#define AO_ADC_CR2_VAL		((HAS_ADC_TEMP << STM_ADC_CR2_TSVREFE) |\
-				 (0 << STM_ADC_CR2_SWSTART) |		\
+#define AO_ADC_CR2_VAL(start)	((HAS_ADC_TEMP << STM_ADC_CR2_TSVREFE) |\
+				 ((start) << STM_ADC_CR2_SWSTART) |	\
 				 (0 << STM_ADC_CR2_JWSTART) |		\
 				 (0 << STM_ADC_CR2_EXTTRIG) |		\
-				 (0 << STM_ADC_CR2_EXTSEL) |		\
-				 (0 << STM_ADC_CR2_JEXTTRIG) | \
+				 (STM_ADC_CR2_EXTSEL_SWSTART << STM_ADC_CR2_EXTSEL) | \
+				 (0 << STM_ADC_CR2_JEXTTRIG) |		\
 				 (0 << STM_ADC_CR2_JEXTSEL) |		\
 				 (0 << STM_ADC_CR2_ALIGN) |		\
 				 (1 << STM_ADC_CR2_DMA) |		\
@@ -72,7 +72,9 @@ ao_adc_poll(void)
 	ao_dma_set_isr(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1), ao_adc_done);
 	ao_dma_start(STM_DMA_INDEX(STM_DMA_CHANNEL_ADC1));
 
-	stm_adc1.cr2 = AO_ADC_CR2_VAL | (1 << STM_ADC_CR2_SWSTART);
+	stm_adc1.cr2 = AO_ADC_CR2_VAL(0);
+	stm_adc1.cr2 = AO_ADC_CR2_VAL(0);
+	stm_adc1.cr2 = AO_ADC_CR2_VAL(1);
 }
 
 #ifdef AO_ADC_SQ1_NAME
