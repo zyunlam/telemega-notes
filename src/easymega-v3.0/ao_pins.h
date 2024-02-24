@@ -85,11 +85,11 @@
 #define SPI_2_PB13_PB14_PB15	1	/* Flash, IMU, Companion */
 #define SPI_2_MODE_OUTPUT	STM_GPIO_CR_MODE_OUTPUT_50MHZ
 
-#define HAS_I2C_1		1
-#define I2C_1_PB8_PB9		1
+#define HAS_I2C_1		0
+#define I2C_1_PB8_PB9		0
 
-#define HAS_I2C_2		0
-#define I2C_2_PB10_PB11		0
+#define HAS_I2C_2		1
+#define I2C_2_PB10_PB11		1
 
 #define PACKET_HAS_SLAVE	0
 #define PACKET_HAS_MASTER	0
@@ -134,11 +134,11 @@
 
 /* Pyro C */
 #define AO_PYRO_PORT_2	(&stm_gpiob)
-#define AO_PYRO_PIN_2	11
+#define AO_PYRO_PIN_2	9
 
 /* Pyro D */
 #define AO_PYRO_PORT_3	(&stm_gpiob)
-#define AO_PYRO_PIN_3	10
+#define AO_PYRO_PIN_3	8
 
 /* Drogue */
 #define AO_IGNITER_DROGUE_PORT	(&stm_gpioa)
@@ -321,7 +321,7 @@ struct ao_adc {
 
 #define HAS_MMC5983		1
 #define MMC5983_I2C		1
-#define AO_MMC5983_I2C_INDEX	STM_I2C_INDEX(1)
+#define AO_MMC5983_I2C_INDEX	STM_I2C_INDEX(2)
 
 #define ao_mmc5983_along(m)		(-(m)->y)
 #define ao_mmc5983_across(m)		((m)->x)
@@ -337,12 +337,6 @@ struct ao_adc {
 #define AO_ADXL375_SPI_INDEX	(AO_SPI_1_PB3_PB4_PB5 | AO_SPI_MODE_3)
 #define AO_ADXL375_CS_PORT	(&stm_gpioc)
 #define AO_ADXL375_CS_PIN	12
-
-#define AO_ADXL375_INT1_PORT	(&stm_gpiob)
-#define AO_ADXL375_INT1_PIN	8
-
-#define AO_ADXL375_INT2_PORT	(&stm_gpiob)
-#define AO_ADXL375_INT2_PIN	9
 
 #define AO_ADXL375_AXIS		x
 #define AO_ADXL375_INVERT	1
