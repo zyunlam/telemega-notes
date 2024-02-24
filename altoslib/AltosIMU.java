@@ -278,8 +278,10 @@ public class AltosIMU implements Cloneable {
 	}
 
 	private int accel_along(int imu_type) {
-		if (accel_along != AltosLib.MISSING)
+		if (accel_along != AltosLib.MISSING) {
+			System.out.printf("accel along %d\n", accel_along);
 			return accel_along;
+		}
 
 		switch (imu_type) {
 		case imu_type_telemega_v1_v2:
@@ -407,6 +409,7 @@ public class AltosIMU implements Cloneable {
 			AltosIMU	imu = new AltosIMU(link);
 			AltosCalData	cal_data = listener.cal_data();
 
+			System.out.printf("imu_model %d mag_model %d\n", imu.imu_model, imu.mag_model);
 			if (imu_type != AltosLib.MISSING)
 				cal_data.set_imu_type(imu_type);
 			if (imu != null) {

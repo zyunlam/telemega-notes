@@ -220,6 +220,7 @@ public class AltosConfigData {
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_5:
 		case AltosLib.AO_LOG_FORMAT_TELEMEGA_6:
 		case AltosLib.AO_LOG_FORMAT_EASYMEGA_2:
+		case AltosLib.AO_LOG_FORMAT_EASYMEGA_3:
 		case AltosLib.AO_LOG_FORMAT_EASYMOTOR:
 			/* ADXL375 */
 			return -value;

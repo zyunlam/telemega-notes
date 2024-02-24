@@ -41,6 +41,7 @@ class AltosIdler {
 	static final int	idle_adxl375_easymotor_v2 = 11;
 	static final int	idle_imu = 12;
 	static final int	idle_imu_et_v2 = 13;
+	static final int	idle_imu_em_v3 = 14;
 
 	static final int	idle_sensor_tm = 100;
 	static final int	idle_sensor_metrum = 101;
@@ -56,6 +57,7 @@ class AltosIdler {
 	static final int	idle_sensor_easymotor2 = 111;
 	static final int	idle_sensor_emini3 = 112;
 	static final int	idle_sensor_etimer2 = 113;
+	static final int	idle_sensor_emega3 = 114;
 
 	public void provide_data(AltosDataListener listener, AltosLink link) throws InterruptedException, TimeoutException, AltosUnknownProduct {
 		for (int idler : idlers) {
@@ -256,6 +258,12 @@ public class AltosIdleFetch implements AltosDataProvider {
 			       AltosIdler.idle_adxl375,
 			       AltosIdler.idle_ms5607,
 			       AltosIdler.idle_imu_em_v2,
+			       AltosIdler.idle_sensor_mega),
+		new AltosIdler("EasyMega-v3",
+			       AltosIdler.idle_adxl375,
+			       AltosIdler.idle_ms5607,
+			       AltosIdler.idle_imu,
+			       AltosIdler.idle_mag,
 			       AltosIdler.idle_sensor_mega),
 		new AltosIdler("TeleGPS-v1",
 			       AltosIdler.idle_gps,
