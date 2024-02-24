@@ -351,12 +351,16 @@ ao_bt_panic(int where)
 	int i;
 	for (;;) {
 		for (i = 0; i < 25; i++) {
+#if AO_BT_LED
 			ao_led_for(AO_BT_LED, AO_MS_TO_TICKS(10));
+#endif
 			ao_delay(AO_MS_TO_TICKS(10));
 		}
 		ao_delay(AO_MS_TO_TICKS(500));
 		for (i = 0; i < where; i++) {
+#if AO_BT_LED
 			ao_led_for(AO_BT_LED, AO_MS_TO_TICKS(200));
+#endif
 			ao_delay(AO_MS_TO_TICKS(200));
 		}
 	}
@@ -506,7 +510,9 @@ ao_rn(void)
 			ao_sleep(&ao_rn_connected);
 		ao_arch_release_interrupts();
 		while (ao_rn_connected) {
+#if AO_BT_LED
 			ao_led_for(AO_BT_LED, AO_MS_TO_TICKS(20));
+#endif
 			if (ao_rn_buf_cnt != 0)
 				ao_wakeup(&ao_stdin_ready);
 			ao_delay(AO_SEC_TO_TICKS(3));
@@ -547,10 +553,12 @@ ao_rn_factory(void)
 		v = 1-v;
 		ao_delay(AO_MS_TO_TICKS(50));
 		ao_gpio_set(AO_RN_P3_1_PORT, AO_RN_P3_1_PIN, v);
+#if AO_BT_LED
 		if (v)
 			ao_led_on(AO_BT_LED);
 		else
 			ao_led_off(AO_BT_LED);
+#endif
 	}
 
 	/* And let P3_1 float again */
