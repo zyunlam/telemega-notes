@@ -351,6 +351,12 @@ ao_dma_set_transfer(uint8_t 		index,
 		    uint32_t		ccr);
 
 void
+ao_dma_mutex_get(uint8_t index);
+
+void
+ao_dma_mutex_put(uint8_t index);
+
+void
 ao_dma_set_isr(uint8_t index, void (*isr)(int index));
 
 void

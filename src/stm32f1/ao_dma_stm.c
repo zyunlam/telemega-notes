@@ -67,6 +67,27 @@ static uint8_t ao_dma_active;
 #endif
 
 void
+ao_dma_mutex_get(uint8_t index)
+{
+	if (ao_dma_allocated[index]) {
+		if (ao_dma_mutex[index])
+			ao_panic(AO_PANIC_DMA);
+		ao_dma_mutex[index] = 0xff;
+	} else
+		ao_mutex_get(&ao_dma_mutex[index]);
+}
+
+void
+ao_dma_mutex_put(uint8_t index)
+{
+	if (ao_dma_allocated[index])
+		ao_dma_mutex[index] = 0;
+	else
+		ao_mutex_put(&ao_dma_mutex[index]);
+}
+
+
+void
 ao_dma_set_transfer(uint8_t 		index,
 		    volatile void	*peripheral,
 		    void		*memory,
