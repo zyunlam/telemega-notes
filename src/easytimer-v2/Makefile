@@ -71,16 +71,29 @@ CFLAGS = $(PRODUCT_DEF) $(SAMD21_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(
 PROGNAME=easytimer-v2
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
+FLASH_PROG=flash-loader/$(PROGNAME)-altos-flash-$(VERSION).elf
+BOTH_HEX=$(PROGNAME)-combined-$(VERSION).ihx
+
+ELFTOHEX=$(TOPDIR)/../ao-tools/ao-elftohex/ao-elftohex
 
 SRC=$(ALTOS_SRC) ao_easytimer.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG) $(HEX)
+all: $(PROG) $(HEX) $(BOTH_HEX)
 
 $(PROG): Makefile $(OBJ)
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
+$(BOTH_HEX): $(PROG) $(FLASH_PROG)
+	$(ELFTOHEX) --nosym --output=$@ $(FLASH_PROG) $(PROG)
+
 $(OBJ): $(INC)
+
+
+$(FLASH_PROG): FRC
+	+cd flash-loader && make
+
+FRC:
 
 distclean:	clean
 
