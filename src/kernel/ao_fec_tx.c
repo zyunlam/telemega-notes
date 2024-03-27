@@ -74,7 +74,7 @@ ao_fec_prepare(const uint8_t *in, uint8_t len, uint8_t *extra)
 	extra[i++] = (uint8_t) crc;
 
 	/* Append FEC -- 1 byte if odd, two bytes if even */
-	num_fec = 2 - (i & 1);
+	num_fec = 2 - (len & 1);
 	while (num_fec--)
 		extra[i++] = AO_FEC_TRELLIS_TERMINATOR;
 	return i;
