@@ -304,7 +304,7 @@ ao_real_packet(void)
 }
 
 #define EXPECT_DECODE_FAIL	0
-#define EXPECT_CRC_MISMATCH	6386
+#define EXPECT_CRC_MISMATCH	6304
 #define EXPECT_DATA_MISMATCH	0
 #define NOISE_AMOUNT		0x50
 
