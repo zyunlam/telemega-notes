@@ -181,6 +181,15 @@
 	|-
 	|-
 	|3.7-12V
+
+	|EasyTimer v2.0
+	|-
+	|24g
+	|-
+	|BMI088
+	|1MB
+	|-
+	|3.7-12V
 	endif::easytimer[]
 	
 	ifdef::easymotor[]
