@@ -827,7 +827,13 @@ extern const char ao_product[];
  * Fifos
  */
 
+#ifndef AO_FIFO_SIZE
+#ifdef HAS_GPS_MOSAIC
+#define AO_FIFO_SIZE	256
+#else
 #define AO_FIFO_SIZE	32
+#endif
+#endif
 
 struct ao_fifo {
 	uint8_t	insert;
