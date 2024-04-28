@@ -19,12 +19,9 @@ fat-install: fat
 	cd micropeak && $(MAKE) fat-install
 endif
 
-fat:
-	cd src && $(MAKE) all
-	cd doc && $(MAKE) all
+fat: all-recursive
 	cd libaltos && $(MAKE) fat
 	cd altoslib && $(MAKE) all
-	cd altosuilib && $(MAKE) all
 	cd icon && $(MAKE) fat
 	cd altosui && $(MAKE) fat
 	cd micropeak && $(MAKE) fat
