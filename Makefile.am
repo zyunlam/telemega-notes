@@ -57,6 +57,7 @@ fat_altos = \
 	src/easymini-v3.0/easymini-v3.0-$(VERSION).ihx \
 	src/easymotor-v3/easymotor-v3-$(VERSION).ihx \
 	src/easytimer-v1/easytimer-v1-$(VERSION).ihx \
+	src/easytimer-v2/easytimer-v2-$(VERSION).ihx \
 	src/telebt-v3.0/telebt-v3.0-$(VERSION).ihx \
 	src/telebt-v4.0/telebt-v4.0-$(VERSION).ihx \
 	src/teledongle-v3.0/teledongle-v3.0-$(VERSION).ihx \

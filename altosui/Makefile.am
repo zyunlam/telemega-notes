@@ -155,7 +155,8 @@ FIRMWARE_EMOTOR_3=$(top_srcdir)/src/easymotor-v3/easymotor-v3-$(VERSION).ihx
 FIRMWARE_EMOTOR=$(FIRMWARE_EMOTOR_3)
 
 FIRMWARE_ETIMER_1=$(top_srcdir)/src/easytimer-v1/easytimer-v1-$(VERSION).ihx
-FIRMWARE_ETIMER=$(FIRMWARE_ETIMER_1)
+FIRMWARE_ETIMER_2=$(top_srcdir)/src/easytimer-v2/easytimer-v2-$(VERSION).ihx
+FIRMWARE_ETIMER=$(FIRMWARE_ETIMER_1) $(FIRMWARE_ETIMER_2)
 
 FIRMWARE_TGPS_1_0=$(top_srcdir)/src/telegps-v1.0/telegps-v1.0-$(VERSION).ihx
 FIRMWARE_TGPS_2_0=$(top_srcdir)/src/telegps-v2.0/telegps-v2.0-$(VERSION).ihx
