@@ -151,3 +151,5 @@ $(LINE_TEST_OBJS): $(HEADERS)
 
 clean:
 	rm -f $(LCO_TEST_OBJS) ao_font.h ao_logo.h $(FONT_SRCS)
+
+install:
