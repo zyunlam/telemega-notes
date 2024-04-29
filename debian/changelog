@@ -1,3 +1,126 @@
+altos (1.9.18-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * doc: fix a typo in the staging example
+  * update Releasing with learnings from 1.9.17 release
+  * set java-version=8 in rules to enable openjdk 21 support, closes: #1052587
+  * add a paragraph about how to hook up a pressure sensor to an EasyMotor
+  * kernel: conditionalize config "report in feet" on presence of baro sensor
+  * fix product name
+  * update ChangeLog for 1.9.18 release
+
+  [ Keith Packard ]
+  * doc: Use -optimize with asciidoctorpdf
+  * micropeak: Include firmware in install bits
+  * fixup seven segment debug code
+  * altos: Use BMI088 as z-axis accel as needed
+  * altos: Initial easytimer-v2 bits
+  * altos: Build easytimer-v2 bits
+  * altos/easytimer-v2: Add logging bits
+  * altos/easytimer-v2: Update comments in flash loader ao_pins.h
+  * altos/samd21: Enable stdio for USB by default
+  * altos: Updating pyro format tried to copy entries with no value
+  * altos/easytimer-v2: Initialize logging too
+  * Fix configure tests for multi-arch libaltos
+  * altos/lpc: Adjust ADC clock from 450kHz to 4.5MHz
+  * ao-tools: Add flash utility for stm32f1x chips
+  * altos: Start work on stm32f1 support
+  * altos/stm32f1: More stm32f103 work
+  * altos/stm32f103-nucleo: Use more bits
+  * altos/stm32f1: Start work on self-flash code
+  * stm32f1: Get boot loader working
+  * altos/stm32f103-nucleo: Add boot loader
+  * altos: Add ST7565 LCD driver
+  * src/draw: Provide some useful constants
+  * altos/draw: Build demos with -O3 to catch more bugs
+  * altos/draw: Skip line adjustment for vertical/horizontal
+  * altos/draw: Have each font declare ao_glyph_temp as .comm
+  * altos/driver: Document setting for AO_ST7565_BIAS
+  * altos/stm32f1: Add DMA and SPI drivers
+  * altos/stm32f103-nucleo: Drive a screen too
+  * altos/stm32f103-nucleo: Draw more of the LCO demo screen
+  * altos: Clean up st7565 LCD driver
+  * altos: Fix up stm32f103-nucleo 'lco' demo mode
+  * altos/stm32f1: Add more IP block drivers
+  * drivers: Add real i2c support to mmc5983
+  * altos/easymega-v3.0: Switch to STM32F103
+  * altos/telelco-v3: Create initial flash loader setup
+  * altos/telelco-v3: Move USB pullup from PA9 to PA10
+  * altos/stm32f1: Add ao_fast_timer.c
+  * altos: Build in 'draw' directory first
+  * altos: Add initial TeleLCO-v3 bits
+  * altos/stm32f1: Add eeprom emulation using flash
+  * altos/telelco-v3.0: Use eeprom emulation for config storage
+  * altos/telelco-v3.0: Add some real drawing stuff
+  * altos: Move ao_adc_single.h API header to kernel/
+  * altos/stm32f1: Add ao_adc_single support
+  * altos/telelco-v3.0: Add ao_adc_single usage to get battery voltage
+  * altos/telelco-v3.0: Fix up search UI
+  * altos/telelco*: Make LCO voltage display work on 2.0 and 3.0
+  * altos/stm32f1: Support beeper on tim3
+  * altos/stm32f1: Set PLLXTPRE value
+  * altos/stm32f1: Add STM_RCC_CFGR_PLLXTPRE_MASK value
+  * altos/telelco-v3.0: Add USB pull up
+  * altos/stm32f1: Turn on ADC during initialization sequence
+  * altos/stm32f1: Poke the ADC harder to get it to sample
+  * altos/stm32f1: Allow PA6 to be left alone in the SPI code
+  * altos/telelco-v3.0: Don't connect PA6 to SPI
+  * altos/telelco-v3.0: Battery voltage is on PA2
+  * altos/stm32f1: Support timers 2,3,4 for fast timer
+  * altos/telelco-v3.0: Use timer 2 for fast timer
+  * src/stm32f1: Disable extra JTAG pins in ao_clock_init
+  * switch to mode 3 for LCD
+  * stm32f1: make spi speed per-bus
+  * altos: Add SPI bus parameter to ao_spi_speed
+  * altos: Add wiring docs to st-7565 header
+  * altos: Fix pretend pad range for TeleLCO
+  * telelco-v3.0: Minor setup fixes
+  * altos: Build TeleLCO v3.0 bits by default
+  * altos/telelco-v3.0: Add contrast setting
+  * altos: Bump ST7565 speed to 20MHz
+  * altos/telelco-v3.0: Configure SPI GPIO pins to 50MHz
+  * altos/stm32f1: For some reason the DBG registers aren't always available
+  * altos: Add support for backlight control in ao_lco_bits
+  * altos/telelco-v3.0: Control LCD backlight with PWM
+  * telelco-v3.0: Add info page
+  * altos/telelco-v3: Add logo to 'info' page
+  * altos/draw: Add ao_text_width
+  * altos/telelco: Update backlight/contrast display upon change
+  * altos/st7565: Diff image during update
+  * altos/telelco-v3.0: Show backlight/contrast value as percent
+  * altos/stm32f1: Set beeper pin to 0 while off
+  * altos/telelco: Add per-box RSSI display screen
+  * altos/telelco: Add RSSI display to older devices
+  * altos/st7565: Set default contrast to 13
+  * altos/telelco-v3: Minor UI tweaks
+  * altos/easytimer-v2: Fix up ao_pins.h
+  * altoslib: Add EasyTimer-v2 support
+  * altos/easytimer-v2: Set default log size to 192kB
+  * altos/easytimer-v2: Fix product name
+  * altosui: Make accel cal dialog say 'beeper' instead of 'antenna'
+  * stm32f1: Clean up some ADC definitions
+  * src/easymini-2.0: Add combined .dfu file for Seeed testing
+  * altoslib: Add EasyMega v3.0 support
+  * altos/stm32f103: Fix continuous ADC code
+  * altos: Build EasyMega v3.0 by defaul
+  * altos/easymega-v3.0: Update i2c pin usage
+  * altos/stm32f1: Grab both TX/RX DMA mutexes while doing I2C
+  * altos/easytimer-v2: Generate combined .ihx file for seeed testing
+  * altos: ao_fec_prepare using wrong value for input len
+  * altos/test: Adjust CRC error rate after FEC fix
+  * altos/test: Add FEC test for simple 'hello' message
+  * altosui: Set the beeper to 0 to disable
+  * altosui: Support gps receiver setting
+  * Add EasyTimer v2 firmware
+  * doc: Add 1.9.18 release notes
+  * Version 1.9.18
+  * Fix up fat build target
+  * altos/draw: Add 'install' target
+  * doc: Add 1.9.18 release notes
+  * Version 1.9.18
+
+ -- Bdale Garbee <bdale@gag.com>  Sun, 28 Apr 2024 19:45:15 -0600
+
 altos (1.9.17-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
