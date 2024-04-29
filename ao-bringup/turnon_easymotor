@@ -46,7 +46,6 @@ case $# in
 	exit 1;
 	;;
 esac
-otootor
 #
 # Use released versions of everything
 #
