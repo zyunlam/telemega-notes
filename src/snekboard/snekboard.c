@@ -19,7 +19,7 @@
 #define SNEK_CS_PORT	(&samd21_port_a)
 #define SNEK_CS_PIN	(11)
 #define SNEK_SPI_INDEX	AO_SPI_0_PA08_PA09_PA10
-#define SNEK_SPI_SPEED	ao_spi_speed(1000000)
+#define SNEK_SPI_SPEED	ao_spi_speed(SNEK_SPI_INDEX, 1000000)
 
 static const uint8_t spi_test[] = {
 	0x55,

@@ -276,4 +276,6 @@
 
 #define AO_BUTTON_FIRE		1
 
+#define AO_LCO_DRAG_RACE_BOX	1
+
 #endif /* _AO_PINS_H_ */

@@ -30,7 +30,7 @@
 		the previous stage has completed providing acceleration, to
 		minimize drag of the sustainer's coast phase before ignition.
 		Recovery, whether the remainder of the flight is nominal or
-		not, usually works best when the states are separated.  So,
+		not, usually works best when the stages are separated.  So,
 		the "best" way to configure a pyro channel for a separation
 		charge is to just set "after motor number".  For a 2-stage
 		project, set this to "1".  This will cause the pyro channel

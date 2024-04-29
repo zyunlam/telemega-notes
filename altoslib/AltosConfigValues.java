@@ -124,7 +124,13 @@ public interface AltosConfigValues {
 
 	public abstract void set_radio_10mw(int radio_10mw);
 
+	public abstract boolean has_radio();
+
 	public abstract int report_feet() throws AltosConfigDataException;
 
-	public abstract void set_report_feet(int radio_10mw);
+	public abstract void set_report_feet(int report_feet);
+
+	public abstract int gps_receiver() throws AltosConfigDataException;
+
+	public abstract void set_gps_receiver(int gps_receiver);
 }

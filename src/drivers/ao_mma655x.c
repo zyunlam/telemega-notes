@@ -30,7 +30,7 @@
 #define PRINTD(l,...) 
 #endif
 
-#define AO_MMA655X_SPI_SPEED	ao_spi_speed(8333333)	/* 120ns clock period */
+#define AO_MMA655X_SPI_SPEED	ao_spi_speed(AO_MMA655X_SPI_INDEX, 8333333)	/* 120ns clock period */
 
 static void
 ao_mma655x_start(void) {

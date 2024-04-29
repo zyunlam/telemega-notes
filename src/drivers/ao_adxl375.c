@@ -26,7 +26,7 @@
 #define PRINTD(l,...)
 #endif
 
-#define AO_ADXL375_SPI_SPEED	ao_spi_speed(5000000)
+#define AO_ADXL375_SPI_SPEED	ao_spi_speed(AO_ADXL375_SPI_INDEX, 5000000)
 
 struct ao_adxl375_sample	ao_adxl375_current;
 

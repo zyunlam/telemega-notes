@@ -282,10 +282,11 @@ ao_spi_put_bit(struct samd21_port *port, uint8_t bit, uint16_t spi_index)
 }
 
 static inline uint8_t
-ao_spi_speed(uint32_t hz)
+ao_spi_speed(int index, uint32_t hz)
 {
 	int32_t	baud = (int32_t) (AO_SYSCLK / (2 * hz)) - 1;
 
+	(void) index;
 	if (baud < 1)
 		baud = 1;
 	if (baud > 255)

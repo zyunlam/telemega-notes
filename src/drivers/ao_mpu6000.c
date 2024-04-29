@@ -32,7 +32,7 @@ static uint8_t	ao_mpu6000_configured;
 
 #if AO_MPU6000_SPI
 
-#define AO_MPU6000_SPI_SPEED	ao_spi_speed(1000000)	/* 1Mhz for all register access */
+#define AO_MPU6000_SPI_SPEED	ao_spi_speed(AO_MPU6000_SPI_BUS, 1000000)	/* 1Mhz for all register access */
 
 #define ao_mpu6000_spi_get()	ao_spi_get(AO_MPU6000_SPI_BUS, AO_MPU6000_SPI_SPEED)
 #define ao_mpu6000_spi_put()	ao_spi_put(AO_MPU6000_SPI_BUS)

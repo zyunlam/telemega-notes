@@ -883,6 +883,7 @@ ao_config_radio_10mw_set(void)
 
 #endif
 
+#if HAS_BARO
 static void
 ao_config_report_feet_show(void)
 {
@@ -899,7 +900,7 @@ ao_config_report_feet_set(void)
 	ao_config.report_feet = !!r;
 	_ao_config_edit_finish();
 }
-
+#endif
 
 #if HAS_BEEP
 static void
@@ -1152,8 +1153,10 @@ const struct ao_config_var ao_config_vars[] = {
 	{ "p <0 no limit, 1 limit>\0Limit radio power to 10mW",
 	  ao_config_radio_10mw_set,	ao_config_radio_10mw_show },
 #endif
+#if HAS_BARO
 	{ "u <0 meters, 1 feet>\0Units to report height after landing",
 	  ao_config_report_feet_set,	ao_config_report_feet_show },
+#endif
 	{ "s\0Show",
 	  ao_config_show,		0 },
 #if HAS_CONFIG_SAVE

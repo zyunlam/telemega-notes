@@ -35,7 +35,7 @@ static uint8_t	ao_mpu9250_configured;
 #if AO_MPU9250_SPI
 
 #ifndef AO_MPU9250_SPI_SPEED
-#define AO_MPU9250_SPI_SPEED	ao_spi_speed(1000000)	/* 1MHz max SCLK */
+#define AO_MPU9250_SPI_SPEED	ao_spi_speed(AO_MPU9250_SPI_BUS, 1000000)	/* 1MHz max SCLK */
 #endif
 
 #define ao_mpu9250_spi_get()	ao_spi_get(AO_MPU9250_SPI_BUS, AO_MPU9250_SPI_SPEED)

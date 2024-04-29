@@ -73,11 +73,13 @@ public class AltosIMU implements Cloneable {
 		case imu_type_easymega_v1:
 		case imu_type_easymega_v2:
 			return counts_per_g_mpu;
-		case  imu_type_telemega_v4:
+		case imu_type_telemega_v4:
 		case imu_type_easytimer_v1:
 			return counts_per_g_bmx;
 		case imu_type_easymotor_v2:
 			return counts_per_g_adxl;
+		case imu_type_easytimer_v2:
+			return counts_per_g_bmi088;
 		}
 
 		return AltosLib.MISSING;
@@ -251,6 +253,8 @@ public class AltosIMU implements Cloneable {
 
 	public static final int imu_type_easymotor_v2 = 6;	/* ADXL375 (accel only) */
 
+	public static final int imu_type_easytimer_v2 = 7;	/* BMI088 */
+
 	private int accel_across(int imu_type) {
 
 		if (accel_across != AltosLib.MISSING)
@@ -274,8 +278,10 @@ public class AltosIMU implements Cloneable {
 	}
 
 	private int accel_along(int imu_type) {
-		if (accel_along != AltosLib.MISSING)
+		if (accel_along != AltosLib.MISSING) {
+			System.out.printf("accel along %d\n", accel_along);
 			return accel_along;
+		}
 
 		switch (imu_type) {
 		case imu_type_telemega_v1_v2:
@@ -391,6 +397,7 @@ public class AltosIMU implements Cloneable {
 	private static boolean is_primary_accel(int imu_type) {
 		switch (imu_type) {
 		case imu_type_easytimer_v1:
+		case imu_type_easytimer_v2:
 			return true;
 		default:
 			return false;
@@ -402,6 +409,7 @@ public class AltosIMU implements Cloneable {
 			AltosIMU	imu = new AltosIMU(link);
 			AltosCalData	cal_data = listener.cal_data();
 
+			System.out.printf("imu_model %d mag_model %d\n", imu.imu_model, imu.mag_model);
 			if (imu_type != AltosLib.MISSING)
 				cal_data.set_imu_type(imu_type);
 			if (imu != null) {

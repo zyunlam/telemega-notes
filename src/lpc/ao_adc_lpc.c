@@ -57,7 +57,10 @@
 /* ADC clock is divided by this value + 1, which ensures that
  * the ADC clock will be strictly less than 4.5MHz as required
  */
-#define AO_ADC_CLKDIV	(AO_LPC_SYSCLK / 450000)
+#ifndef AO_LPC_ADC_CLOCK
+#define AO_LPC_ADC_CLOCK	4500000
+#endif
+#define AO_ADC_CLKDIV	(AO_LPC_SYSCLK / AO_LPC_ADC_CLOCK)
 
 static uint8_t		ao_adc_ready;
 static uint8_t		ao_adc_sequence;

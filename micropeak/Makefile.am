@@ -93,6 +93,13 @@ LINUX_ICONS	=\
 LINUX_MIMETYPE	=\
 	$(ICONDIR)/org-altusmetrum-mimetypes.xml
 
+FIRMWARE_MP_0_1=$(top_srcdir)/src/micropeak/micropeak-v0.1-$(VERSION).ihx
+FIRMWARE_MP=$(FIRMWARE_MP_0_1)
+FIRMWARE_MS_1_0=$(top_srcdir)/src/microsplash/microsplash-v1.0-$(VERSION).ihx
+FIRMWARE_MS=$(FIRMWARE_MS_1_0)
+
+FIRMWARE=$(FIRMWARE_MP) $(FIRMWARE_MS)
+
 desktopdir = $(datadir)/applications
 desktop_file = altusmetrum-micropeak.desktop
 desktop_SCRIPTS = $(desktop_file)
@@ -141,6 +148,7 @@ MACOSX_INFO_PLIST=Info.plist
 MACOSX_README=ReadMe-Mac.rtf
 MACOSX_INSTALL=../altosui/install-macosx ../altosui/ask-pass
 MACOSX_FILES=$(FAT_FILES) libaltos.dylib $(MACOSX_INFO_PLIST) $(MACOSX_DRIVERS) $(MACOSX_README) $(DOC) $(MACOSX_ICONS) $(MACOSX_INSTALL)
+MACOSX_EXTRA=$(FIRMWARE)
 
 $(MACOSX_DRIVER_0):
 	wget -O $@ $(MACOSX_DRIVER_0_URL)
@@ -154,7 +162,7 @@ WINDOWS_DRIVER=CDM_v2.12.00_WHQL_Certified.exe
 $(WINDOWS_DRIVER):
 	wget -O "$(WINDOWS_DRIVER)" "$(WINDOWS_DRIVER_URL)"
 
-WINDOWS_FILES=$(FAT_FILES) altos.dll altos64.dll $(DOC) $(WINDOWS_ICONS) $(WINDOWS_DRIVER)
+WINDOWS_FILES=$(FAT_FILES) $(FIRMWARE) altos.dll altos64.dll $(DOC) $(WINDOWS_ICONS) $(WINDOWS_DRIVER)
 
 if FATINSTALL
 
@@ -323,7 +331,7 @@ $(LINUX_SH): $(LINUX_DIST) $(srcdir)/../altosui/linux-install.sh
 	sed 's/AltOS/MicroPeak/g' $(srcdir)/../altosui/linux-install.sh | cat - $(LINUX_DIST) > $@
 	chmod +x $@
 
-$(MACOSX_DIST): $(MACOSX_FILES)
+$(MACOSX_DIST): $(MACOSX_FILES) $(MACOSX_EXTRA) Makefile
 	-rm -f $@
 	-rm -rf macosx
 	mkdir macosx
@@ -334,7 +342,7 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	cp -a $(DOC) macosx/Doc
 	cp -p Info.plist macosx/MicroPeak.app/Contents
 	cp -p $(MACOSX_DRIVERS) macosx
-	mkdir -p macosx/MicroPeak.app/Contents/Resources/Java
+	mkdir -p macosx/MicroPeak-$(VERSION) macosx/MicroPeak.app/Contents/Resources/Java
 	cp -p $(MACOSX_ICONS) macosx/MicroPeak.app/Contents/Resources
 	cp -p $(FATJAR) macosx/MicroPeak.app/Contents/Resources/Java/micropeak.jar
 	cp -p libaltos.dylib macosx/MicroPeak.app/Contents/Resources/Java
@@ -342,6 +350,7 @@ $(MACOSX_DIST): $(MACOSX_FILES)
 	cp -p $(ALTOSUILIB_CLASS) macosx/MicroPeak.app/Contents/Resources/Java
 	cp -p $(JFREECHART_CLASS) macosx/MicroPeak.app/Contents/Resources/Java
 	cp -p $(JCOMMON_CLASS) macosx/MicroPeak.app/Contents/Resources/Java
+	cp -p $(MACOSX_EXTRA) macosx/MicroPeak-$(VERSION)
 	genisoimage -D -V MicroPeak-$(VERSION) -no-pad -r -apple -o $@ macosx
 
 $(WINDOWS_DIST): $(WINDOWS_FILES) micropeak-windows.nsi

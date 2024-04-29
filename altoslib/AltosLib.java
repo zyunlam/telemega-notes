@@ -140,6 +140,13 @@ public class AltosLib {
 	public final static int product_basestation = 0x10000 + 1;
 	public final static int product_altimeter = 0x10000 + 2;
 
+	public final static int gps_builtin = 0;
+	public final static int gps_mosaic = 1;
+
+	public final static String[] gps_receiver_names = {
+		"Builtin", "Mosaic-X5"
+	};
+
 	private static class Product {
 		final String	name;
 		final int	product;
@@ -387,6 +394,8 @@ public class AltosLib {
 	public static final int AO_LOG_FORMAT_EASYMOTOR = 20;
 	public static final int AO_LOG_FORMAT_TELEMEGA_5 = 21;
 	public static final int AO_LOG_FORMAT_TELEMEGA_6 = 22;
+	public static final int AO_LOG_FORMAT_EASYTIMER_2 = 23;
+	public static final int AO_LOG_FORMAT_EASYMEGA_3 = 24;
 	public static final int AO_LOG_FORMAT_NONE = 127;
 
 	public static final int	model_mpu6000 = 0;
@@ -614,6 +623,7 @@ public class AltosLib {
 		case product_telegps: return "TeleGPS";
 		case product_easymini: return "EasyMini";
 		case product_telemini: return "TeleMini";
+		case product_easymega: return "EasyMega";
 		case product_easymotor: return "EasyMotor";
 		default: return "unknown";
 		}
@@ -654,6 +664,7 @@ public class AltosLib {
 		case AO_LOG_FORMAT_TELEMEGA_3:
 			return product_telemega;
 		case AO_LOG_FORMAT_EASYMEGA_2:
+		case AO_LOG_FORMAT_EASYMEGA_3:
 			return product_easymega;
 		case AO_LOG_FORMAT_TELESTATIC:
 			return product_altusmetrum;

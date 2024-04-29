@@ -1,0 +1,12 @@
+#!/bin/sh
+#OPENOCD=openocd
+#OPENOCD=/usr/bin/openocd
+#OPENOCD=/local/src/openocd/src/openocd
+OPENOCD=/local/bin/openocd
+exec $OPENOCD \
+	-f interface/stlink.cfg \
+	-c 'transport select hla_swd' \
+	-f target/stm32f1x.cfg -c init \
+	-c 'reset halt' \
+	-c 'stm32f1x.cpu arm semihosting enable' \
+	"$@"

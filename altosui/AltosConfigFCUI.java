@@ -44,6 +44,7 @@ public class AltosConfigFCUI
 	JLabel			radio_enable_label;
 	JLabel			radio_10mw_label;
 	JLabel			report_feet_label;
+	JLabel			gps_receiver_label;
 	JLabel			rate_label;
 	JLabel			aprs_interval_label;
 	JLabel			aprs_ssid_label;
@@ -73,6 +74,7 @@ public class AltosConfigFCUI
 	JRadioButton		radio_enable_value;
 	JRadioButton		radio_10mw_value;
 	JComboBox<String>	report_feet_value;
+	JComboBox<String>	gps_receiver_value;
 	AltosUIRateList		rate_value;
 	JComboBox<String>	aprs_interval_value;
 	JComboBox<Integer>	aprs_ssid_value;
@@ -240,7 +242,7 @@ public class AltosConfigFCUI
 		return product != null && product.startsWith("EasyTimer");
 	}
 
-	boolean has_radio() {
+	public boolean has_radio() {
 		return is_telemega() || is_telemetrum() || is_telemini();
 	}
 
@@ -353,7 +355,7 @@ public class AltosConfigFCUI
 
 	void set_beep_tool_tip() {
 		if (beep_value.isVisible())
-			beep_value.setToolTipText("What frequency the beeper will sound at");
+			beep_value.setToolTipText("What frequency the beeper will sound at (0 for off)");
 		else
 			beep_value.setToolTipText("Older firmware could not select beeper frequency");
 	}
@@ -370,6 +372,13 @@ public class AltosConfigFCUI
 			report_feet_value.setToolTipText("Units used after landing to beep max height");
 		else
 			report_feet_value.setToolTipText("Older firmware always beeps max height in meters");
+	}
+
+	void set_gps_receiver_tool_tip() {
+		if (gps_receiver_value.isVisible())
+			gps_receiver_value.setToolTipText("GPS receiver selection");
+		else
+			gps_receiver_value.setToolTipText("Only TeleMega with new firmware supports alternate GPS receivers");
 	}
 
 	/* Build the UI using a grid bag */
@@ -654,6 +663,32 @@ public class AltosConfigFCUI
 		report_feet_value.addItemListener(this);
 		pane.add(report_feet_value, c);
 		set_report_feet_tool_tip();
+		row++;
+
+		/* GPS Receiver */
+		c = new GridBagConstraints();
+		c.gridx = 0; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = il;
+		c.ipady = 5;
+		gps_receiver_label = new JLabel("GPS Receiver:");
+		pane.add(gps_receiver_label, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 4; c.gridy = row;
+		c.gridwidth = 4;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = ir;
+		c.ipady = 5;
+		gps_receiver_value = new JComboBox<String>(AltosLib.gps_receiver_names);
+		gps_receiver_value.setEditable(false);
+		gps_receiver_value.addItemListener(this);
+		pane.add(gps_receiver_value, c);
+		set_gps_receiver_tool_tip();
 		row++;
 
 		/* Telemetry Rate */
@@ -1549,6 +1584,32 @@ public class AltosConfigFCUI
 	public int report_feet() {
 		if (report_feet_value.isVisible())
 			return report_feet_value.getSelectedIndex();
+		else
+			return AltosLib.MISSING;
+	}
+
+	public void set_gps_receiver(int new_gps_receiver) {
+		System.out.printf("set_gps_receiver %d\n", new_gps_receiver);
+		if (new_gps_receiver != AltosLib.MISSING) {
+			if (new_gps_receiver >= AltosLib.gps_receiver_names.length)
+				new_gps_receiver = 0;
+			if (new_gps_receiver < 0) {
+				gps_receiver_value.setEnabled(false);
+				new_gps_receiver = 0;
+			} else {
+				gps_receiver_value.setEnabled(true);
+			}
+			gps_receiver_value.setSelectedIndex(new_gps_receiver);
+		}
+		gps_receiver_value.setVisible(new_gps_receiver != AltosLib.MISSING);
+		gps_receiver_label.setVisible(new_gps_receiver != AltosLib.MISSING);
+
+		set_gps_receiver_tool_tip();
+	}
+
+	public int gps_receiver() {
+		if (gps_receiver_value.isVisible())
+			return gps_receiver_value.getSelectedIndex();
 		else
 			return AltosLib.MISSING;
 	}

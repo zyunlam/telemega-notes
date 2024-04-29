@@ -62,6 +62,8 @@ extern enum ao_flight_state ao_log_state;
 #define AO_LOG_FORMAT_EASYMOTOR		20	/* 16 byte typed easymotor records with pressure sensor and adxl375 */
 #define AO_LOG_FORMAT_TELEMEGA_5	21	/* 32 byte typed telemega records with 32 bit gyro cal, mpu6000 and mmc5983 */
 #define AO_LOG_FORMAT_TELEMEGA_6	22	/* 32 byte typed telemega records with 32 bit gyro cal, bmi088 and mmc5983 */
+#define AO_LOG_FORMAT_EASYTIMER_2	23	/* 32 byte typed easytimer records with 32 bit gyro cal, bmi088 and mmc5983 */
+#define AO_LOG_FORMAT_EASYMEGA_3	24	/* 32 byte typed telemega records with 32 bit gyro cal, bmi088 and mmc5983 */
 #define AO_LOG_FORMAT_NONE		127	/* No log at all */
 
 /* Return the flight number from the given log slot, 0 if none, -slot on failure */
@@ -550,7 +552,48 @@ struct ao_log_motor {
 	} u;
 };
 
-#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_6
+struct ao_log_timer {
+	char			type;			/* 0 */
+	uint8_t			csum;			/* 1 */
+	uint16_t		tick;			/* 2 */
+	union {						/* 4 */
+		/* AO_LOG_FLIGHT */
+		struct {
+			uint16_t	flight;			/* 4 */
+			int16_t		ground_accel;		/* 6 */
+			int16_t		ground_accel_along;	/* 8 */
+			int16_t		ground_accel_across;	/* 10 */
+			int16_t		ground_accel_through;	/* 12 */
+			int16_t		pad_14;			/* 14 */
+			int32_t		ground_roll;		/* 16 */
+			int32_t		ground_pitch;		/* 20 */
+			int32_t		ground_yaw;		/* 24 */
+		} flight;					/* 32 */
+		/* AO_LOG_STATE */
+		struct {
+			uint16_t	state;			/* 4 */
+			uint16_t	reason;			/* 6 */
+		} state;
+		/* AO_LOG_SENSOR */
+		struct {
+			int16_t		accel_along;	/* 4 */
+			int16_t		accel_across;	/* 6 */
+			int16_t		accel_through;	/* 8 */
+			int16_t		gyro_roll;	/* 10 */
+			int16_t		gyro_pitch;	/* 12 */
+			int16_t		gyro_yaw;	/* 14 */
+			int16_t		mag_along;	/* 16 */
+			int16_t		mag_across;	/* 18 */
+			int16_t		mag_through;	/* 20 */
+			int16_t		v_batt;		/* 22 */
+			int16_t		v_pbatt;	/* 24 */
+			int16_t		sense[2];	/* 26 */
+			uint16_t	pyro;		/* 30 */
+		} sensor;	/* 32 */
+	} u;
+};
+
+#if AO_LOG_FORMAT == AO_LOG_FOMAT_TELEMEGA_OLD || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_3 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_2 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_4 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_5 || AO_LOG_FORMAT == AO_LOG_FORMAT_TELEMEGA_6 || AO_LOG_FORMAT == AO_LOG_FORMAT_EASYMEGA_3
 typedef struct ao_log_mega ao_log_type;
 #endif
 
@@ -592,6 +635,10 @@ typedef struct ao_log_record ao_log_type;
 
 #if AO_LOG_FORMAT == AO_LOG_FORMAT_MICROPEAK2
 #define AO_LOG_UNCOMMON	1
+#endif
+
+#if AO_LOG_FORMAT == AO_LOG_FORMAT_EASYTIMER_2
+typedef struct ao_log_timer ao_log_type;
 #endif
 
 #ifndef AO_LOG_UNCOMMON

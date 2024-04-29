@@ -21,6 +21,7 @@ ARMM3DIRS=\
 	easymega-v2.0 easymega-v2.0/flash-loader \
 	easymotor-v3 easymotor-v3/flash-loader \
 	easytimer-v1 easytimer-v1/flash-loader \
+	easytimer-v2 easytimer-v2/flash-loader \
 	telemega-v0.1 telemega-v0.1/flash-loader \
 	telemega-v1.0 telemega-v1.0/flash-loader \
 	telemega-v2.0 telemega-v2.0/flash-loader \
@@ -55,12 +56,14 @@ ARMM0DIRS=\
 	telemini-v3.0 telemini-v3.0/flash-loader \
 	easymini-v2.0 easymini-v2.0/flash-loader \
 	easymini-v3.0 easymini-v3.0/flash-loader \
+	telelco-v3.0 telelco-v3.0/flash-loader \
+	easymega-v3.0 easymega-v3.0/flash-loader \
 	micropeak-v2.0
 
 AVRDIRS=\
 	micropeak microkite microsplash
 
-SUBDIRS=
+SUBDIRS=draw
 
 ifeq ($(strip $(HAVE_ARM_M3_CC)),yes)
 SUBDIRS+=$(ARMM3DIRS)

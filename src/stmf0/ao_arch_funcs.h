@@ -36,8 +36,9 @@
 #define _AO_SPI_SPEED_187500Hz	STM_SPI_CR1_BR_PCLK_256
 
 static inline uint32_t
-ao_spi_speed(uint32_t hz)
+ao_spi_speed(int index, uint32_t hz)
 {
+	(void) index;
 	if (hz >=24000000) return _AO_SPI_SPEED_24MHz;
 	if (hz >=12000000) return _AO_SPI_SPEED_12MHz;
 	if (hz >= 6000000) return _AO_SPI_SPEED_6MHz;

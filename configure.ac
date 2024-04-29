@@ -18,13 +18,13 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ(2.57)
-AC_INIT([altos], 1.9.17)
+AC_INIT([altos], 1.9.18)
 ANDROID_VERSION=37
 AC_CONFIG_SRCDIR([src/kernel/ao.h])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-RELEASE_DATE=2023-08-30
+RELEASE_DATE=2024-04-28
 AC_SUBST(RELEASE_DATE)
 
 DOC_DATE=`LC_ALL=C date -d $RELEASE_DATE +'%d %b %Y'`
@@ -475,39 +475,20 @@ AC_ARG_ENABLE([multi-arch],
 
 case x"$MULTI_ARCH" in
 xauto)
-	arch=`uname -m`
-	case x"$arch" in
-	xx86_64|xi*86)
-		save_CFLAGS="$CFLAGS"
-		save_LIBS="$LIBS"
-		LIBS="-ldl"
-		CFLAGS="-m64"
-		AC_MSG_CHECKING([if ]$CC[ ]$CFLAGS[ can link programs])
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
-				[M64_LINK=yes],
-				[M64_LINK=no])
-		AC_MSG_RESULT([$M64_LINK])
-		CFLAGS="-m32"
-		AC_MSG_CHECKING([if ]$CC[ ]$CFLAGS[ can link programs])
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([])],
-				[M32_LINK=yes],
-				[M32_LINK=no])
-		AC_MSG_RESULT([$M32_LINK])
-		CFLAGS="$save_CFLAGS"
-		LIBS="$save_LIBS"
-		case x"$M64_LINK"x"$M32_LINK" in
-		xyesxyes)
-			MULTI_ARCH=yes
+	MULTI_ARCH=yes
+	for arch in i686-linux-gnu x86_64-linux-gnu aarch64-linux-gnu arm-linux-gnueabi arm-linux-gnueabihf; do
+		crossgcc="$arch"-gcc
+		AC_CHECK_PROG(ARCH_SUPPORTED,$crossgcc,yes,no)
+		case "$ARCH_SUPPORTED" in
+		yes)
 			;;
 		*)
 			MULTI_ARCH=no
 			;;
 		esac
-		;;
-	*)
-		MULTI_ARCH=no
-		;;
-	esac
+	done
+	AC_MSG_CHECKING([MULTI_ARCH])
+	AC_MSG_RESULT([$MULTI_ARCH])
 	;;
 xyes|xno)
 	;;
@@ -595,7 +576,7 @@ echo "    AVR support.................: ${HAVE_AVR_CC}"
 echo "    Android support.............: ${HAVE_ANDROID_SDK}"
 echo "    Android release support.....: ${ANDROID_RELEASE}"
 echo "    STlink support..............: ${HAVE_STLINK}"
-echo "    i386 and amd64 libaltos.....: ${MULTI_ARCH}"
+echo "    multi-arch libaltos.........: ${MULTI_ARCH}"
 echo "    install shared mime info....: ${INSTALL_SHARED_MIME_INFO}"
 echo "    Strip jar timestamps........: ${STRIP_NONDETERMINISM}"
 echo ""

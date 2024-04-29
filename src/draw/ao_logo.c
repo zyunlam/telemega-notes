@@ -22,6 +22,18 @@
 #define ARRAYSIZE(a)	(sizeof(a) / sizeof((a)[0]))
 
 void
+ao_logo_poly(struct ao_bitmap		*dst,
+	     const struct ao_transform	*transform,
+	     uint32_t			fill,
+	     uint8_t			rop)
+{
+	if (!transform)
+		transform = &ao_identity;
+	ao_poly(dst, ao_logo_top, ARRAYSIZE(ao_logo_top), transform, fill, rop);
+	ao_poly(dst, ao_logo_bottom, ARRAYSIZE(ao_logo_bottom), transform, fill, rop);
+}
+
+void
 ao_logo(struct ao_bitmap		*dst,
 	const struct ao_transform	*transform,
 	const struct ao_font		*font,
@@ -33,8 +45,7 @@ ao_logo(struct ao_bitmap		*dst,
 	int16_t name_x = ao_t_xi(ao_logo_width, 0.0f, transform);
 	int16_t name_y1 = ao_t_yi(ao_logo_width, 0.5f, transform);
 	int16_t name_y2 = ao_t_yi(ao_logo_width, 0.98f, transform);
-	ao_poly(dst, ao_logo_top, ARRAYSIZE(ao_logo_top), transform, fill, rop);
-	ao_poly(dst, ao_logo_bottom, ARRAYSIZE(ao_logo_bottom), transform, fill, rop);
+	ao_logo_poly(dst, transform, fill, rop);
 	ao_text(dst, font, name_x, name_y1, "Altus", fill, rop);
 	ao_text(dst, font, name_x, name_y2, "Metrum", fill, rop);
 }
