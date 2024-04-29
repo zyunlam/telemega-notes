@@ -684,9 +684,11 @@ ao_pyro_update_version(void)
 
 			for (v = 0; v < NUM_PYRO_VALUES; v++)
 			{
-				value = ao_pyro_get_1_24(&pyro_1_24[p], ao_pyro_values[v].flag);
-				ao_pyro_put(&tmp, ao_pyro_values[v].offset,
-					    ao_pyro_size(ao_pyro_values[v].flag), value);
+				if (ao_pyro_values[v].offset != NO_VALUE) {
+					value = ao_pyro_get_1_24(&pyro_1_24[p], ao_pyro_values[v].flag);
+					ao_pyro_put(&tmp, ao_pyro_values[v].offset,
+						    ao_pyro_size(ao_pyro_values[v].flag), value);
+				}
 			}
 			memcpy(&pyro_1_25[p], &tmp, sizeof(tmp));
 		}

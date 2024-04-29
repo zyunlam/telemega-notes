@@ -51,6 +51,7 @@ altoslib_JAVA = \
 	AltosEepromRecordMicroPeak2.java \
 	AltosEepromRecordMotor.java \
 	AltosEepromRecordSet.java \
+	AltosEepromRecordTimer.java \
 	AltosEepromChunk.java \
 	AltosEepromDownload.java \
 	AltosEepromMonitor.java \
@@ -108,6 +109,7 @@ altoslib_JAVA = \
 	AltosSensorMM.java \
 	AltosSensorEMini.java \
 	AltosSensorEasyTimer1.java \
+	AltosSensorEasyTimer2.java \
 	AltosSensorTM.java \
 	AltosSensorTMini2.java \
 	AltosSensorTMini3.java \

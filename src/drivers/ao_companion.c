@@ -28,7 +28,7 @@
 #error HAS_COMPANION not set in ao_companion.c
 #endif
 
-#define AO_COMPANION_SPI_SPEED	ao_spi_speed(200000)
+#define AO_COMPANION_SPI_SPEED	ao_spi_speed(AO_COMPANION_SPI_BUS, 200000)
 
 #define COMPANION_SELECT()	do {			\
 		ao_spi_get_bit(AO_COMPANION_CS_PORT,	\

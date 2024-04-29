@@ -81,14 +81,14 @@ public class AltosUIAccelCal
 				public void run() {
 					switch (phase) {
 					case AltosAccelCal.phase_antenna_up:
-						message.setText("Orient antenna upwards and click on Antenna Up");
+						message.setText(String.format ("Orient antenna upwards and click on %s", up_msg()));
 						antenna_up.setEnabled(true);
 						setDefaultButton(antenna_up);
 						antenna_down.setEnabled(false);
 						ok.setEnabled(false);
 						break;
 					case AltosAccelCal.phase_antenna_down:
-						message.setText("Orient antenna downwards and click on Antenna Down");
+						message.setText(String.format("Orient antenna downwards and click on %s", down_msg()));
 						antenna_up.setEnabled(false);
 						antenna_down.setEnabled(true);
 						setDefaultButton(antenna_down);
@@ -157,6 +157,10 @@ public class AltosUIAccelCal
 			}
 		}
 	}
+
+	public String up_msg() { return config_values.has_radio() ? "Antenna Up" : "Beeper Up"; }
+	public String down_msg() { return config_values.has_radio() ? "Antenna Down" : "Beeper Down"; }
+
 	public AltosUIAccelCal(Frame owner, AltosLink link, AltosConfigValues config_values) {
 		super(owner, "Calibrate Accelerometer", true);
 
@@ -193,7 +197,7 @@ public class AltosUIAccelCal
 		c.gridheight = 1;
 		c.weightx = 0;
 		c.weighty = 0;
-		antenna_up = new JButton("Antenna Up");
+		antenna_up = new JButton(up_msg());
 		antenna_up.setActionCommand("up");
 		antenna_up.setEnabled(false);
 		antenna_up.addActionListener(this);
@@ -208,7 +212,7 @@ public class AltosUIAccelCal
 		c.gridheight = 1;
 		c.weightx = 0;
 		c.weighty = 0;
-		antenna_down = new JButton("Antenna Down");
+		antenna_down = new JButton(down_msg());
 		antenna_down.setActionCommand("down");
 		antenna_down.setEnabled(false);
 		antenna_down.addActionListener(this);

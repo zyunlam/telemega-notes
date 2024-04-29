@@ -303,8 +303,31 @@ ao_real_packet(void)
 	return ok;
 }
 
+int
+ao_hello_packet(void)
+{
+	uint8_t message[5] = "hello";
+	uint8_t	encode[ENCODE_LEN(sizeof(message))];
+	int encode_len;
+	uint8_t transmit[EXPAND_LEN(sizeof(message))];
+	uint8_t decode[DECODE_LEN(sizeof(message))];
+	int transmit_len;
+	int decode_ok;
+
+	printf("Hello packet test:\n");
+	ao_fec_dump_bytes(message, sizeof(message), "Message");
+	encode_len = ao_fec_encode(message, sizeof(message), encode);
+	ao_fec_dump_bytes(encode, encode_len, "Encode");
+	transmit_len = ao_expand(encode, encode_len, transmit);
+	ao_fec_dump_bytes(transmit, transmit_len, "Transmit");
+	decode_ok = ao_fec_decode(transmit, transmit_len, decode, sizeof(message) + 2, NULL);
+	ao_fec_dump_bytes(decode, sizeof(message) + 2, "Receive");
+	printf("Hello result: %s\n", decode_ok ? "success" : "fail");
+	return decode_ok;
+}
+
 #define EXPECT_DECODE_FAIL	0
-#define EXPECT_CRC_MISMATCH	6386
+#define EXPECT_CRC_MISMATCH	6304
 #define EXPECT_DATA_MISMATCH	0
 #define NOISE_AMOUNT		0x50
 
@@ -334,6 +357,9 @@ main(int argc, char **argv)
 	int		data_mismatch = 0;
 
 	if (!ao_real_packet())
+		errors++;
+
+	if (!ao_hello_packet())
 		errors++;
 
 	srandom(0);

@@ -116,8 +116,9 @@ ao_serial_init(void);
 #define _AO_SPI_SPEED_62500Hz		768
 
 static inline uint32_t
-ao_spi_speed(uint32_t hz)
+ao_spi_speed(int index, uint32_t hz)
 {
+	(void) index;
 	if (hz >= 4000000) return _AO_SPI_SPEED_4MHz;
 	if (hz >= 2000000) return _AO_SPI_SPEED_2MHz;
 	if (hz >= 1000000) return _AO_SPI_SPEED_1MHz;

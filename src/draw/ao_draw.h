@@ -28,6 +28,8 @@ struct ao_bitmap {
 	struct ao_box	damage;
 };
 
+#define AO_BITMAP_STRIDE(width)	(((width) + 31) >> 5)
+
 struct ao_coord {
 	float	x, y;
 };
@@ -101,6 +103,14 @@ struct ao_glyph_metrics {
 	int8_t	advance;
 };
 
+struct ao_text_metrics {
+	int16_t	width;
+	int16_t	height;
+	int16_t	x_off;
+	int16_t	y_off;
+	int16_t	advance;
+};
+
 struct ao_font {
 	const uint8_t	*bytes;
 	const uint16_t	*pos;
@@ -158,14 +168,24 @@ ao_poly(struct ao_bitmap		*dst,
 	uint32_t			fill,
 	uint8_t				rop);
 
-void
+int16_t
 ao_text(struct ao_bitmap	*dst,
 	const struct ao_font	*font,
 	int16_t			x,
 	int16_t			y,
-	char			*string,
+	const char		*string,
 	uint32_t		fill,
 	uint8_t			rop);
+
+int16_t
+ao_text_width(const struct ao_font	*font,
+	      const char		*string);
+
+void
+ao_logo_poly(struct ao_bitmap		*dst,
+	     const struct ao_transform	*transform,
+	     uint32_t			fill,
+	     uint8_t			rop);
 
 void
 ao_logo(struct ao_bitmap		*dst,
@@ -208,5 +228,8 @@ extern const struct ao_transform ao_identity;
 #define AO_OR_INVERTED   0xd	/* NOT src OR dst */
 #define AO_NAND          0xe	/* NOT src OR NOT dst */
 #define AO_SET           0xf	/* 1 */
+
+#define AO_WHITE	0xffffffff
+#define AO_BLACK	0x00000000
 
 #endif /* _AO_DRAW_H_ */

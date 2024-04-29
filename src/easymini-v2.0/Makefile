@@ -58,14 +58,24 @@ CFLAGS = $(PRODUCT_DEF) $(STMF0_CFLAGS)
 PROGNAME=easymini-v2.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
+FLASH_PROG=flash-loader/$(PROGNAME)-altos-flash-$(VERSION).elf
+BOTH_DFU=$(PROGNAME)-combined-$(VERSION).dfu
+
+MAKEBIN=$(TOPDIR)/../ao-tools/ao-makebin/ao-makebin
 
 SRC=$(ALTOS_SRC) ao_easymini.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG) $(HEX)
+all: $(PROG) $(HEX) $(BOTH_DFU)
 
 $(PROG): Makefile $(OBJ)
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
+
+$(BOTH_DFU): $(PROG) $(FLASH_PROG)
+	$(MAKEBIN) --dfu --output=$@ --base=$(FLASH_ADDR) $(FLASH_PROG) $(PROG)
+
+$(FLASH_PROG): FRC
+	+cd flash-loader && make
 
 $(OBJ): $(INC)
 
@@ -78,3 +88,5 @@ clean:
 install:
 
 uninstall:
+
+FRC:

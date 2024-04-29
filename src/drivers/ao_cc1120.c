@@ -42,7 +42,7 @@ extern const uint32_t	ao_radio_cal;
 
 #define FOSC	32000000
 
-#define AO_CC1120_SPI_SPEED	ao_spi_speed(6100000)	/* 6.1MHz max with 32MHz osc */
+#define AO_CC1120_SPI_SPEED	ao_spi_speed(AO_CC1120_SPI_BUS, 6100000)	/* 6.1MHz max with 32MHz osc */
 
 #define ao_radio_try_select(task_id)	ao_spi_try_get_mask(AO_CC1120_SPI_CS_PORT,(1 << AO_CC1120_SPI_CS_PIN),AO_CC1120_SPI_BUS,AO_CC1120_SPI_SPEED, task_id)
 #define ao_radio_select()	ao_spi_get_mask(AO_CC1120_SPI_CS_PORT,(1 << AO_CC1120_SPI_CS_PIN),AO_CC1120_SPI_BUS,AO_CC1120_SPI_SPEED)

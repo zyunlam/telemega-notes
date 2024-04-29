@@ -25,7 +25,7 @@
 struct ao_ms5607_prom	ao_ms5607_prom;
 static uint8_t	  	ms5607_configured;
 
-#define AO_MS5607_SPI_SPEED	ao_spi_speed(20000000)
+#define AO_MS5607_SPI_SPEED	ao_spi_speed(AO_MS5607_SPI_INDEX, 20000000)
 
 static void
 ao_ms5607_start(void) {

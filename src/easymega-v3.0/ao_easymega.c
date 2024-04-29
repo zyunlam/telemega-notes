@@ -18,20 +18,14 @@
 
 #include <ao.h>
 #include <ao_ms5607.h>
-#include <ao_bmx160.h>
+#include <ao_bmi088.h>
+#include <ao_mmc5983.h>
 #include <ao_adxl375.h>
 #include <ao_log.h>
 #include <ao_exti.h>
 #include <ao_companion.h>
-#include <ao_profile.h>
 #include <ao_eeprom.h>
-#if HAS_SAMPLE_PROFILE
-#include <ao_sample_profile.h>
-#endif
 #include <ao_pyro.h>
-#if HAS_STACK_GUARD
-#include <ao_mpu.h>
-#endif
 
 int
 main(void)
@@ -57,10 +51,10 @@ main(void)
 	ao_cmd_init();
 
 	ao_ms5607_init();
-	ao_bmx160_init();
+	ao_bmi088_init();
+	ao_mmc5983_init();
 	ao_adxl375_init();
 
-	ao_eeprom_init();
 	ao_storage_init();
 
 	ao_flight_init();

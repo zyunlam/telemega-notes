@@ -38,23 +38,99 @@ extern uint8_t	ao_lco_debug;
 extern uint8_t	ao_lco_drag_race;	/* true when drag race mode enabled */
 #endif
 
-extern uint8_t	ao_lco_pad;		/* Currently selected pad */
-extern uint16_t	ao_lco_box;		/* Currently selected box */
+extern int8_t	ao_lco_pad;		/* Currently selected pad */
+extern int16_t	ao_lco_box;		/* Currently selected box */
 
 extern uint8_t	ao_lco_armed;		/* armed mode active */
 extern uint8_t	ao_lco_firing;		/* fire button pressed */
 
 extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 
+#ifdef AO_LCO_DRAG_RACE_BOX
+#define AO_LCO_BOX_DRAG		0		/* Box number to enable drag race mode (old LCO bits) */
+#define AO_LCO_BOX_FIRST	AO_LCO_BOX_DRAG
+#else
+# define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
+# ifdef AO_LCO_HAS_INFO
+#  define AO_LCO_INFO		-3
+#  ifndef AO_LCO_BOX_FIRST
+#   define AO_LCO_BOX_FIRST AO_LCO_INFO
+#  endif
+# endif
+# ifdef AO_LCO_HAS_BACKLIGHT
+#   define AO_LCO_BACKLIGHT 	-2
+#   ifndef AO_LCO_BOX_FIRST
+#    define AO_LCO_BOX_FIRST AO_LCO_BACKLIGHT
+#   endif
+# endif
+# ifdef AO_LCO_HAS_CONTRAST
+#  define AO_LCO_CONTRAST	-1
+#  ifndef AO_LCO_BOX_FIRST
+#   define AO_LCO_BOX_FIRST	AO_LCO_CONTRAST
+#  endif
+# endif
+# ifndef AO_LCO_BOX_FIRST
+#  define AO_LCO_BOX_FIRST	AO_LCO_LCO_VOLTAGE
+# endif
+#endif
 #define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
+#define AO_LCO_PAD_RSSI		-1		/* Pad number to show box RSSI */
+#define AO_LCO_PAD_FIRST	AO_LCO_PAD_RSSI
 
-extern uint16_t	ao_lco_min_box, ao_lco_max_box;
+static inline bool
+ao_lco_box_pseudo(int16_t box)
+{
+	switch (box) {
+#ifdef AO_LCO_LCO_VOLTAGE
+	case AO_LCO_LCO_VOLTAGE:
+		return true;
+#endif
+#ifdef AO_LCO_DRAG_RACE_BOX
+	case AO_LCO_BOX_DRAG:
+		return true;
+#endif
+#ifdef AO_LCO_CONTRAST
+	case AO_LCO_CONTRAST:
+		return true;
+#endif
+#ifdef AO_LCO_BACKLIGHT
+	case AO_LCO_BACKLIGHT:
+		return true;
+#endif
+#ifdef AO_LCO_INFO
+	case AO_LCO_INFO:
+		return true;
+#endif
+	default:
+		return false;
+	}
+}
+
+static inline bool
+ao_lco_pad_pseudo(int8_t pad)
+{
+	switch (pad) {
+	case AO_LCO_PAD_VOLTAGE:
+		return true;
+	case AO_LCO_PAD_RSSI:
+		return true;
+	default:
+		return false;
+	}
+}
+
+extern int16_t	ao_lco_min_box, ao_lco_max_box;
 
 #define AO_LCO_MASK_SIZE(n)	(((n) + 7) >> 3)
 #define AO_LCO_MASK_ID(n)	((n) >> 3)
 #define AO_LCO_MASK_SHIFT(n)	((n) & 7)
 
 extern uint8_t	ao_lco_box_mask[AO_LCO_MASK_SIZE(AO_PAD_MAX_BOXES)];
+
+#define AO_LCO_VALID_LAST	1
+#define AO_LCO_VALID_EVER	2
+
+extern uint8_t	ao_lco_valid[AO_PAD_MAX_BOXES];		/* AO_LCO_VALID bits per box */
 
 /*
  * Shared functions
@@ -67,19 +143,22 @@ void
 ao_lco_update(void);
 
 uint8_t
-ao_lco_pad_present(uint16_t box, uint8_t pad);
+ao_lco_pad_present(int16_t box, int8_t pad);
 
-uint8_t
-ao_lco_pad_first(uint16_t box);
+int8_t
+ao_lco_pad_first(int16_t box);
 
 void
-ao_lco_set_pad(uint8_t new_pad);
+ao_lco_set_pad(int8_t new_pad);
 
 void
 ao_lco_step_pad(int8_t dir);
 
 void
-ao_lco_set_box(uint16_t new_box);
+ao_lco_set_box(int16_t new_box);
+
+void
+ao_lco_step_box(int8_t dir);
 
 void
 ao_lco_set_armed(uint8_t armed);
@@ -99,7 +178,7 @@ ao_lco_search(void);
 void
 ao_lco_monitor(void);
 
-extern uint8_t			ao_lco_drag_beep_count;
+extern int8_t			ao_lco_drag_beep_count;
 
 /* enable drag race mode */
 void
@@ -119,7 +198,7 @@ ao_lco_drag_warn_check(AO_TICK_TYPE now, AO_TICK_TYPE delay);
 
 /* Request 'beeps' additional drag race beeps */
 void
-ao_lco_drag_add_beeps(uint8_t beeps);
+ao_lco_drag_add_beeps(int8_t beeps);
 
 /* task function for beeping while arm is active */
 void
@@ -130,10 +209,10 @@ ao_lco_arm_warn(void);
  */
 
 void
-ao_lco_show_pad(uint8_t pad);
+ao_lco_show_pad(int8_t pad);
 
 void
-ao_lco_show_box(uint16_t box);
+ao_lco_show_box(int16_t box);
 
 void
 ao_lco_show(void);
@@ -142,6 +221,38 @@ void
 ao_lco_init(void);
 
 uint8_t
-ao_lco_box_present(uint16_t box);
+ao_lco_box_present(int16_t box);
+
+#ifdef AO_LCO_HAS_CONTRAST
+void
+ao_lco_set_contrast(int32_t contrast);
+
+int32_t
+ao_lco_get_contrast(void);
+#endif
+
+#ifdef AO_LCO_HAS_BACKLIGHT
+void
+ao_lco_set_backlight(int32_t backlight);
+
+int32_t
+ao_lco_get_backlight(void);
+#endif
+
+#ifdef AO_LCO_SEARCH_API
+
+void
+ao_lco_search_start(void);
+
+void
+ao_lco_search_box_check(int16_t box);
+
+void
+ao_lco_search_box_present(int16_t box);
+
+void
+ao_lco_search_done(void);
+
+#endif /* AO_LCO_SEARCH_API */
 
 #endif /* _AO_LCO_H_ */

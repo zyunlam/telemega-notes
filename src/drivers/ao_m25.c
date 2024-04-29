@@ -101,7 +101,7 @@ static uint8_t ao_m25_mutex;
 
 static uint8_t	ao_m25_instruction[4];
 
-#define AO_M25_SPI_SPEED	ao_spi_speed(10000000)	/* this seems like a reasonable minimum speed to require */
+#define AO_M25_SPI_SPEED	ao_spi_speed(AO_M25_SPI_BUS, 10000000)	/* this seems like a reasonable minimum speed to require */
 
 #define M25_SELECT(cs)		ao_spi_get_mask(AO_M25_SPI_CS_PORT,cs,AO_M25_SPI_BUS,AO_M25_SPI_SPEED)
 #define M25_DESELECT(cs)	ao_spi_put_mask(AO_M25_SPI_CS_PORT,cs,AO_M25_SPI_BUS)
