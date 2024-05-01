@@ -60,8 +60,8 @@
 /* LED */
 
 #define LED_PORT		0
-#define LED_PIN_RED		23
-#define LED_PIN_GREEN		7
+#define LED_PIN_RED		7
+#define LED_PIN_GREEN		8
 #define AO_LED_RED		(1 << LED_PIN_RED)
 #define AO_LED_GREEN		(1 << LED_PIN_GREEN)
 
