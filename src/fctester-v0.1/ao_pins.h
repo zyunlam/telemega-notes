@@ -57,7 +57,7 @@
 #define SPI_MISO1_P0_22		0
 #define SPI_MOSI1_P0_21		0
 
-/* LED */
+/* LEDs and FET switches (treat them like LEDs to avoid code duplication)  */
 
 #define LED_PORT		0
 #define LED_PIN_RED		7
@@ -65,13 +65,26 @@
 #define AO_LED_RED		(1 << LED_PIN_RED)
 #define AO_LED_GREEN		(1 << LED_PIN_GREEN)
 
-#define LEDS_AVAILABLE		(AO_LED_RED | AO_LED_GREEN)
+#define FET_PIN_A		11
+#define FET_A			(1 << FET_PIN_A)
+#define FET_PIN_B		22
+#define FET_B			(1 << FET_PIN_B)
+#define FET_PIN_C		12
+#define FET_C			(1 << FET_PIN_C)
+#define FET_PIN_D		9
+#define FET_D			(1 << FET_PIN_D)
+#define FET_PIN_E		13
+#define FET_E			(1 << FET_PIN_E)
+#define FET_PIN_F		16
+#define FET_F			(1 << FET_PIN_F)
 
-/* RELAY */
+/*	ignore the 'short' FET for now 
+#define FET_PORT_SHORT		1
+#define FET_PIN_SHORT		16
+#define FET_SHORT		(1 << FET_PIN_SHORT)
+*/
 
-#define RELAY_PORT		0
-#define RELAY_PIN		3
-#define RELAY_BIT		(1 << RELAY_PIN)
+#define LEDS_AVAILABLE		(AO_LED_RED | AO_LED_GREEN | FET_A | FET_B | FET_C | FET_D | FET_E | FET_F)
 
 /* Kludge the SPI driver to not configure any
  * pin for SCK or MOSI

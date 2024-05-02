@@ -18,36 +18,25 @@
 
 #include <ao.h>
 
-uint8_t		relay_output;
+uint8_t		fet_output;
 
-void ao_relay_init(void);
-
-void
-ao_relay_init(void)
-{
-	lpc_scb.sysahbclkctrl |= (1 << LPC_SCB_SYSAHBCLKCTRL_GPIO);
-        lpc_gpio.dir[RELAY_PORT] |= RELAY_BIT;
-}
-
-// switch relay to selected output, turn correct LED on as a side effect
+// switch fet to selected output, red LED on as a side effect
 static void
-ao_relay_control(uint8_t output)
+ao_fet_control(uint8_t output)
 {
 	switch (output) {
 	case 1:
-		lpc_gpio.pin[RELAY_PORT] |= RELAY_BIT;
+		ao_led_on(FET_A);
 		ao_led_on(AO_LED_RED);
-		ao_led_off(AO_LED_GREEN);
 		break;
 	default:
-		lpc_gpio.pin[RELAY_PORT] &= (uint8_t) ~RELAY_BIT;
+		ao_led_off(FET_A);
 		ao_led_off(AO_LED_RED);
-		ao_led_on(AO_LED_GREEN);
 	}
 }
 
 static void
-ao_relay_select(void) 
+ao_fet_select(void) 
 {
 	uint8_t output;
 
@@ -55,13 +44,13 @@ ao_relay_select(void)
         if (ao_cmd_status != ao_cmd_success)
                 return;
 	if (output > 1) 
-		printf ("Invalid relay position %u\n", output);
+		printf ("Invalid fet position %u\n", output);
 	else
-		ao_relay_control(output);
+		ao_fet_control(output);
 }
 
-static const struct ao_cmds ao_relay_cmds[] = {
-	{ ao_relay_select, "R <output>\0Select relay output" },
+static const struct ao_cmds ao_fet_cmds[] = {
+	{ ao_fet_select, "R <output>\0Select fet output" },
 	{ 0, NULL }
 };
 
@@ -74,17 +63,12 @@ main(void)
 
 	ao_usb_init();
 
-	ao_led_init();
-
-	ao_relay_init();
-
-	// initialize to default output
-	relay_output = 0;
-	ao_relay_control(relay_output);
+	ao_led_init();			// also handles FET switches 
+	ao_led_on(AO_LED_GREEN);	// indicate we're alive
 
 	ao_cmd_init();
 
-	ao_cmd_register(ao_relay_cmds);
+	ao_cmd_register(ao_fet_cmds);
 
 	ao_start_scheduler();
 }
