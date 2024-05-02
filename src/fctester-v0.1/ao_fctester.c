@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Bdale Garbee <bdale@gag.com>
+ * Copyright © 2024 Bdale Garbee <bdale@gag.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,39 +18,58 @@
 
 #include <ao.h>
 
-uint8_t		fet_output;
+// all FET switches assumed to be on the same port
+int	 fets[] = { FET_A, FET_B, FET_C, FET_D, FET_E, FET_F };
 
-// switch fet to selected output, red LED on as a side effect
+int howmanyon = 0;
+
+// switch selected fet to selected state, turn red LED on if any FETs are on
 static void
-ao_fet_control(uint8_t output)
+ao_fet_control(uint32_t output, uint8_t value)
 {
-	switch (output) {
+	switch (value) {
 	case 1:
-		ao_led_on(FET_A);
-		ao_led_on(AO_LED_RED);
+		ao_led_on((AO_PORT_TYPE) fets[output]);
+		howmanyon++;
 		break;
 	default:
-		ao_led_off(FET_A);
-		ao_led_off(AO_LED_RED);
+		ao_led_off((AO_PORT_TYPE) fets[output]);
+		howmanyon--;
 	}
+	if (howmanyon) ao_led_on(AO_LED_RED); else ao_led_off(AO_LED_RED);
 }
 
 static void
-ao_fet_select(void) 
+ao_fet_on(void)
 {
-	uint8_t output;
+	uint32_t output;
 
-	output = (uint8_t) ao_cmd_decimal();
+	output = ao_cmd_decimal();
         if (ao_cmd_status != ao_cmd_success)
                 return;
-	if (output > 1) 
-		printf ("Invalid fet position %u\n", output);
-	else
-		ao_fet_control(output);
+	if (output > 5)		// can't be less than 0 since unsigned! 
+		printf ("Invalid FET selection %lu, must be 0..5\n", output);
+	else 
+		ao_fet_control(output, 1);
+}
+
+static void
+ao_fet_off(void)
+{
+	uint32_t output;
+
+	output = ao_cmd_decimal();
+        if (ao_cmd_status != ao_cmd_success)
+                return;
+	if (output > 5)		// can't be less than 0 since unsigned! 
+		printf ("Invalid FET selection %lu, must be 0..5\n", output);
+	else 
+		ao_fet_control(output, 0);
 }
 
 static const struct ao_cmds ao_fet_cmds[] = {
-	{ ao_fet_select, "R <output>\0Select fet output" },
+	{ ao_fet_on,  "S <output>\0Set (turn on) FET" },
+	{ ao_fet_off, "R <output>\0Reset (turn off) FET" },
 	{ 0, NULL }
 };
 
