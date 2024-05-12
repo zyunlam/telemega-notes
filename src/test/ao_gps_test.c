@@ -17,6 +17,7 @@
  */
 
 #define AO_GPS_TEST
+#define AO_TICK_TYPE uint32_t
 #include "ao_host.h"
 #include <termios.h>
 #include <errno.h>

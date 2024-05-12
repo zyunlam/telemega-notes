@@ -17,6 +17,7 @@
  */
 
 #include <stdint.h>
+#define AO_TICK_TYPE uint32_t
 #define AO_CONVERT_TEST
 #define AO_NEED_ALTITUDE_TO_PRES 1
 #include "ao_host.h"

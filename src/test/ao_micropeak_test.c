@@ -17,6 +17,7 @@
  */
 
 #define _GNU_SOURCE
+#define AO_TICK_TYPE uint32_t
 
 #include <stdint.h>
 #include <stdio.h>
