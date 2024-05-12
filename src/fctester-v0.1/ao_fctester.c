@@ -80,6 +80,8 @@ main(void)
 	ao_task_init();
 	ao_timer_init();
 
+	ao_adc_init();
+
 	ao_usb_init();
 
 	ao_led_init();			// also handles FET switches 

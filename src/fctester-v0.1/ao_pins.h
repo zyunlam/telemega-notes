@@ -86,6 +86,24 @@
 
 #define LEDS_AVAILABLE		(AO_LED_RED | AO_LED_GREEN | FET_A | FET_B | FET_C | FET_D | FET_E | FET_F)
 
+/*
+ * ADC
+ */
+
+#define HAS_ADC                 1
+
+#define AO_NUM_ADC              1
+#define AO_DATA_RING		4
+
+#define AO_ADC_0                3
+
+struct ao_adc {
+        int16_t         current;
+};
+
+#define AO_ADC_DUMP(p) \
+        printf("tick: %5lu current: %5d\n", (p)->tick, (p)->adc.current)
+
 /* Kludge the SPI driver to not configure any
  * pin for SCK or MOSI
  */

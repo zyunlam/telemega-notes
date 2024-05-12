@@ -19,6 +19,7 @@ INC = \
 ALTOS_SRC = \
 	ao_interrupt.c \
 	ao_boot_chain.c \
+	ao_data.c \
 	ao_product.c \
 	ao_romconfig.c \
 	ao_mutex.c \
@@ -27,7 +28,7 @@ ALTOS_SRC = \
 	ao_task.c \
 	ao_cmd.c \
 	ao_timer_lpc.c \
-	ao_exti_lpc.c \
+	ao_adc_lpc.c \
 	ao_usb_lpc.c \
 	ao_led_lpc.c
 
