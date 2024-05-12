@@ -138,6 +138,10 @@ public class AltosTelemetryFile implements AltosRecordSet {
 		listener.finish();
 	}
 
+	public AltosConfigData config_data() {
+		return null;
+	}
+
 	public AltosTelemetryFile(FileInputStream input) throws IOException {
 		telems = new AltosTelemetryIterable(input);
 	}

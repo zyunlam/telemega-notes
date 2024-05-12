@@ -245,6 +245,10 @@ public class AltosConfigData {
 		return false;
 	}
 
+	public boolean has_radio() {
+		return product.startsWith("Tele");
+	}
+
 	int[] parse_version(String v) {
 		String[] parts = v.split("\\.");
 		int r[] = new int[parts.length];

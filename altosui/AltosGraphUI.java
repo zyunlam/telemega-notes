@@ -39,6 +39,8 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	AltosUIMap		map;
 	AltosFlightStats	stats;
 	AltosFlightStatsTable	statsTable;
+	AltosFlightConfigTable	configTable;
+	AltosFlightPyroTable	pyroTable;
 	AltosGPS		gps;
 	boolean			has_gps;
 
@@ -77,6 +79,10 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 			map.font_size_changed(font_size);
 		if (statsTable != null)
 			statsTable.font_size_changed(font_size);
+		if (configTable != null)
+			configTable.font_size_changed(font_size);
+		if (pyroTable != null)
+			pyroTable.font_size_changed(font_size);
 	}
 
 	public void units_changed(boolean imperial_units) {
@@ -84,6 +90,10 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 			map.units_changed(imperial_units);
 		if (enable != null)
 			enable.units_changed(imperial_units);
+		if (configTable != null)
+			configTable.units_changed(imperial_units);
+		if (pyroTable != null)
+			pyroTable.units_changed(imperial_units);
 	}
 
 	AltosUIFlightSeries flight_series;
@@ -106,7 +116,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 	AltosGraphUI(AltosRecordSet set, File file) throws InterruptedException, IOException {
 		super(file.getName());
 		AltosCalData	cal_data = set.cal_data();
-
+		AltosConfigData	config_data = set.config_data();
 
 		pane = new JTabbedPane();
 
@@ -127,6 +137,14 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		pane.add("Flight Graph", graph.panel);
 		pane.add("Configure Graph", enable);
 		pane.add("Flight Statistics", statsTable);
+		if (config_data != null) {
+			configTable = new AltosFlightConfigTable(config_data);
+			pane.add("Configuration", configTable);
+			if (config_data.npyro > 0) {
+				pyroTable = new AltosFlightPyroTable(config_data.pyros, config_data.npyro);
+				pane.add("Pyros", pyroTable);
+			}
+		}
 
 		has_gps = false;
 		fill_map(flight_series);

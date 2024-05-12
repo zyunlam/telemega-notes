@@ -39,6 +39,10 @@ public abstract class AltosDataListener {
 		return cal_data;
 	}
 
+	public AltosConfigData config_data() {
+		return null;
+	}
+
 	public void set_time(double time) {
 		if (time != AltosLib.MISSING)
 			this.time = time;

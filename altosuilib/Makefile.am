@@ -51,7 +51,9 @@ altosuilib_JAVA = \
 	AltosFlashUI.java \
 	AltosRomconfigUI.java \
 	AltosInfoTable.java \
+	AltosFlightConfigTable.java \
 	AltosFlightInfoTableModel.java \
+	AltosFlightPyroTable.java \
 	AltosFlightStatsTable.java \
 	AltosBTDevice.java \
 	AltosBTDeviceIterator.java \
