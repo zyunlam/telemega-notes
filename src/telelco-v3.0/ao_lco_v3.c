@@ -413,7 +413,7 @@ ao_lco_display_test(void)
 	ao_led_on(AO_LEDS_AVAILABLE);
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_BLACK, AO_COPY);
 	ao_st7565_update(&fb);
-	ao_delay(AO_MS_TO_TICKS(250));
+	ao_delay(AO_MS_TO_TICKS(1000));
 	ao_led_off(AO_LEDS_AVAILABLE);
 }
 
