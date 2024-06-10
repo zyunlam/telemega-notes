@@ -40,8 +40,8 @@ static struct ao_bitmap fb = {
 };
 
 static const struct ao_transform logo_transform = {
-	.x_scale = 48, .x_off = 2,
-	.y_scale = 48, .y_off = 0,
+	.x_scale = 40, .x_off = 8,
+	.y_scale = 40, .y_off = 0,
 };
 
 static const struct ao_transform show_transform = {
@@ -53,7 +53,7 @@ static const struct ao_transform show_transform = {
 #define VOLT_FONT BitstreamVeraSans_Roman_58_font
 #define SMALL_FONT BitstreamVeraSans_Roman_12_font
 #define TINY_FONT BitstreamVeraSans_Roman_10_font
-#define LOGO_FONT BenguiatGothicStd_Bold_26_font
+#define LOGO_FONT BenguiatGothicStd_Bold_24_font
 
 #define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
 #define VALUE_Y		(int16_t) (LABEL_Y + 5 + BIG_FONT.ascent)
@@ -70,6 +70,8 @@ static const struct ao_transform show_transform = {
 #define SCAN_X		(WIDTH - 100) / 2
 #define SCAN_Y		50
 #define SCAN_HEIGHT	3
+#define SCANNING_X	(WIDTH / 2)
+#define SCANNING_Y	(SCAN_Y - 2)
 #define FOUND_Y		63
 #define FOUND_X		3
 #define FOUND_WIDTH	(WIDTH - 6)
@@ -432,6 +434,7 @@ ao_lco_search_start(void)
 {
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
 	ao_logo(&fb, &logo_transform, &LOGO_FONT, AO_BLACK, AO_COPY);
+	_ao_center_text(SCANNING_X, SCANNING_Y, &TINY_FONT, "Scanning...");
 	found_width = 0;
 	nfound = 0;
 }

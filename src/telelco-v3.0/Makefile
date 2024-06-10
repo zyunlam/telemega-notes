@@ -77,7 +77,7 @@ ALTOS_SRC = \
 	BitstreamVeraSans-Roman-24.c \
 	BitstreamVeraSans-Roman-10.c \
 	BitstreamVeraSans-Roman-12.c \
-	BenguiatGothicStd-Bold-26.c \
+	BenguiatGothicStd-Bold-24.c \
 	ao_quadrature.c \
 	ao_button.c \
 	ao_event.c \
@@ -122,7 +122,7 @@ BitstreamVeraSans-Roman-58.c: ao_font.h
 BitstreamVeraSans-Roman-24.c: ao_font.h
 BitstreamVeraSans-Roman-10.c: ao_font.h
 BitstreamVeraSans-Roman-12.c: ao_font.h
-BenguiatGothicStd-Bold-26.c: ao_font.h
+BenguiatGothicStd-Bold-24.c: ao_font.h
 
 install:
 
