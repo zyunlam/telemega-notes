@@ -38,6 +38,8 @@ static uint8_t		ao_lco_channels[AO_PAD_MAX_BOXES];	/* pad channels available on 
 static uint16_t		ao_lco_tick_offset[AO_PAD_MAX_BOXES];	/* 16 bit offset from local to remote tick count */
 static uint8_t		ao_lco_selected[AO_PAD_MAX_BOXES];	/* pads selected to fire */
 
+static uint32_t		ao_lco_query_good, ao_lco_query_bad;
+
 uint8_t		ao_lco_valid[AO_PAD_MAX_BOXES];		/* AO_LCO_VALID bits per box */
 
 static const AO_LED_TYPE	continuity_led[AO_LED_CONTINUITY_NUM] = {
@@ -171,9 +173,14 @@ ao_lco_get_channels(int16_t box, struct ao_pad_query *query)
 	if (r == AO_RADIO_CMAC_OK) {
 		ao_lco_channels[box] = query->channels;
 		ao_lco_valid[box] = AO_LCO_VALID_LAST | AO_LCO_VALID_EVER;
-	} else
+		++ao_lco_query_good;
+	} else {
 		ao_lco_valid[box] &= (uint8_t) ~AO_LCO_VALID_LAST;
-	PRINTD("ao_lco_get_channels(%d) rssi %d valid %d ret %d offset %d\n", box, ao_radio_cmac_rssi, ao_lco_valid[box], r, ao_lco_tick_offset[box]);
+		++ao_lco_query_bad;
+	}
+	PRINTD("ao_lco_get_channels(%d) rssi %d valid %d ret %d offset %d good %"PRIu32" bad %"PRIu32"\n",
+	       box, ao_radio_cmac_rssi, ao_lco_valid[box], r, ao_lco_tick_offset[box],
+	       ao_lco_query_good, ao_lco_query_bad);
 	ao_wakeup(&ao_pad_query);
 	return ao_lco_valid[box];
 }
