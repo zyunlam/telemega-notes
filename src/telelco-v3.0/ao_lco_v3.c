@@ -89,8 +89,9 @@ static const struct ao_transform show_transform = {
 #define BACKLIGHT_HEIGHT	20
 #define BACKLIGHT_VALUE_X	64
 #define BACKLIGHT_VALUE_Y	(BACKLIGHT_Y + BACKLIGHT_HEIGHT + SMALL_FONT.ascent + 3)
-#define INFO_START_Y	((int16_t) (SMALL_FONT.ascent + 2))
-#define INFO_STEP_Y	((int16_t) (SMALL_FONT.ascent + 3))
+#define INFO_FONT	TINY_FONT
+#define INFO_START_Y	((int16_t) (INFO_FONT.ascent + 2))
+#define INFO_STEP_Y	((int16_t) (INFO_FONT.ascent + 2))
 
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
@@ -133,28 +134,12 @@ _ao_lco_show_box(int16_t box)
 }
 
 static void
-_ao_lco_show_voltage(uint16_t decivolts, const char *label)
+_ao_format_voltage(char *str, size_t size, uint16_t decivolts)
 {
-	char	str[7];
-
-	PRINTD("voltage %d\n", decivolts);
-	_ao_center_text(WIDTH/2, LABEL_Y, &SMALL_FONT, label);
-	snprintf(str, sizeof(str), "%d.%d", decivolts / 10, decivolts % 10);
-	_ao_center_text(WIDTH/2, VALUE_Y, &BIG_FONT, str);
+	snprintf(str, size, "%d.%d", decivolts / 10, decivolts % 10);
 }
 
-static void
-_ao_lco_batt_voltage(void)
-{
-	struct ao_adc	packet;
-	int16_t		decivolt;
-
-	ao_adc_single_get(&packet);
-	decivolt = ao_battery_decivolt(packet.v_batt);
-	_ao_lco_show_voltage((uint16_t) decivolt, "LCO Battery");
-	ao_st7565_update(&fb);
-}
-
+#if AO_LCO_HAS_CONTRAST
 static void
 _ao_lco_show_contrast(void)
 {
@@ -167,7 +152,9 @@ _ao_lco_show_contrast(void)
 	snprintf(buf, sizeof(buf), "%d %%", brightness * 100 / AO_LCO_MAX_CONTRAST);
 	_ao_center_text(WIDTH/2, CONTRAST_VALUE_Y, &SMALL_FONT, buf);
 }
+#endif
 
+#if AO_LCO_HAS_BACKLIGHT
 static void
 _ao_lco_show_backlight(void)
 {
@@ -180,6 +167,7 @@ _ao_lco_show_backlight(void)
 	snprintf(buf, sizeof(buf), "%ld %%", backlight * 100 / AO_LCO_MAX_BACKLIGHT);
 	_ao_center_text(WIDTH/2, BACKLIGHT_VALUE_Y, &SMALL_FONT, buf);
 }
+#endif
 
 static int16_t info_y;
 
@@ -191,17 +179,27 @@ _ao_lco_info(const char *format, ...)
 	va_start(a, format);
 	vsnprintf(buf, sizeof(buf), format, a);
 	va_end(a);
-	ao_text(&fb, &SMALL_FONT, 0, info_y, buf, AO_BLACK, AO_COPY);
+	ao_text(&fb, &INFO_FONT, 0, info_y, buf, AO_BLACK, AO_COPY);
 	info_y += INFO_STEP_Y;
 }
 
 static void
-_ao_lco_show_info(void)
+_ao_lco_show_lco_info(void)
 {
-	info_y = INFO_START_Y;
+	char		battery[7];
+	struct ao_adc	packet;
+	int16_t		decivolt;
+
 	ao_logo_poly(&fb, &show_transform, AO_BLACK, AO_COPY);
+
+	ao_adc_single_get(&packet);
+	decivolt = ao_battery_decivolt(packet.v_batt);
+	_ao_format_voltage(battery, sizeof(battery), (uint16_t) decivolt);
+
+	info_y = INFO_START_Y;
 	_ao_lco_info("%s", ao_product);
 	_ao_lco_info("Serial: %d", ao_serial_number);
+	_ao_lco_info("Battery: %sV", battery);
 	_ao_lco_info("Version: %s", ao_version);
 	_ao_lco_info("Callsign: %s", ao_config.callsign);
 	_ao_lco_info("Frequency: %ld.%03d",
@@ -209,28 +207,35 @@ _ao_lco_show_info(void)
 		     (int) (ao_config.frequency % 1000));
 }
 
-static void
-_ao_lco_show_rssi(void)
+static uint8_t
+popcount(uint32_t value)
 {
-	char label[20];
-	int16_t width;
-	snprintf(label, sizeof(label), "Bank %d RSSI", ao_lco_box);
-	width = ao_text_width(&SMALL_FONT, label);
-	ao_text(&fb, &SMALL_FONT, VALUE_LABEL_X - width / 2, LABEL_Y, label, AO_BLACK, AO_COPY);
-	if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST))
-		strcpy(label, "---");
-	else
-		snprintf(label, sizeof(label), "%d", ao_radio_cmac_rssi);
-	width = ao_text_width(&VOLT_FONT, label);
-	ao_text(&fb, &VOLT_FONT, VALUE_LABEL_X - width / 2, VALUE_Y, label, AO_BLACK, AO_COPY);
+	uint8_t count = 0;
+	while(value != 0) {
+		count += value & 1;
+		value >>= 1;
+	}
+	return count;
 }
 
 static void
-_ao_lco_show_pad_battery(void)
+_ao_lco_show_pad_info(void)
 {
-	char label[20];
-	snprintf(label, sizeof(label), "Bank %d Battery", ao_lco_box);
-	_ao_lco_show_voltage(ao_pad_query.battery, label);
+	char	pad_battery[7];
+
+	ao_logo_poly(&fb, &show_transform, AO_BLACK, AO_COPY);
+	info_y = INFO_START_Y;
+	_ao_lco_info("Bank: %d", ao_lco_box);
+	if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST)) {
+		_ao_lco_info("Contact lost");
+		_ao_lco_info("Last RSSI: %ddBm", ao_radio_cmac_last_rssi);
+	} else {
+		_ao_lco_info("Total pads: %d", popcount(ao_pad_query.channels));
+		_ao_lco_info("RSSI: %ddBm", ao_radio_cmac_rssi);
+		_ao_format_voltage(pad_battery, sizeof(pad_battery), ao_pad_query.battery);
+		_ao_lco_info("Battery: %sV", pad_battery);
+		_ao_lco_info("Arming switch: %s", ao_pad_query.arm_status ? "On" : "Off");
+	}
 }
 
 void
@@ -239,25 +244,23 @@ ao_lco_show(void)
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
 	switch (ao_lco_box) {
-	case AO_LCO_LCO_VOLTAGE:
-		_ao_lco_batt_voltage();
-		break;
+#if AO_LCO_HAS_CONTRAST
 	case AO_LCO_CONTRAST:
 		_ao_lco_show_contrast();
 		break;
+#endif
+#if AO_LCO_HAS_BACKLIGHT
 	case AO_LCO_BACKLIGHT:
 		_ao_lco_show_backlight();
 		break;
-	case AO_LCO_INFO:
-		_ao_lco_show_info();
+#endif
+	case AO_LCO_LCO_INFO:
+		_ao_lco_show_lco_info();
 		break;
 	default:
 		switch (ao_lco_pad) {
-		case AO_LCO_PAD_RSSI:
-			_ao_lco_show_rssi();
-			break;
-		case AO_LCO_PAD_VOLTAGE:
-			_ao_lco_show_pad_battery();
+		case AO_LCO_PAD_INFO:
+			_ao_lco_show_pad_info();
 			break;
 		default:
 			_ao_lco_show_pad(ao_lco_pad);
@@ -293,6 +296,7 @@ ao_lco_set_select(void)
 }
 
 
+#if AO_LCO_HAS_CONTRAST
 void
 ao_lco_set_contrast(int32_t contrast)
 {
@@ -304,7 +308,9 @@ ao_lco_get_contrast(void)
 {
 	return (int32_t) ao_st7565_get_brightness();
 }
+#endif
 
+#if AO_LCO_HAS_BACKLIGHT
 static uint16_t ao_backlight;
 
 void
@@ -319,6 +325,7 @@ ao_lco_get_backlight(void)
 {
 	return (int32_t) ao_backlight;
 }
+#endif
 
 static struct ao_task	ao_lco_drag_task;
 

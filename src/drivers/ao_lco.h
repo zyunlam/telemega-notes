@@ -47,35 +47,45 @@ extern uint8_t	ao_lco_firing;		/* fire button pressed */
 extern struct ao_pad_query	ao_pad_query;	/* Last received QUERY from pad */
 
 #ifdef AO_LCO_DRAG_RACE_BOX
-#define AO_LCO_BOX_DRAG		0		/* Box number to enable drag race mode (old LCO bits) */
-#define AO_LCO_BOX_FIRST	AO_LCO_BOX_DRAG
+# define AO_LCO_BOX_DRAG	0		/* Box number to enable drag race mode (old LCO bits) */
+# define AO_LCO_BOX_FIRST	AO_LCO_BOX_DRAG
 #else
-# define AO_LCO_LCO_VOLTAGE	0		/* Box number to show LCO voltage */
-# ifdef AO_LCO_HAS_INFO
-#  define AO_LCO_INFO		-3
-#  ifndef AO_LCO_BOX_FIRST
-#   define AO_LCO_BOX_FIRST AO_LCO_INFO
-#  endif
-# endif
-# ifdef AO_LCO_HAS_BACKLIGHT
-#   define AO_LCO_BACKLIGHT 	-2
-#   ifndef AO_LCO_BOX_FIRST
-#    define AO_LCO_BOX_FIRST AO_LCO_BACKLIGHT
-#   endif
-# endif
 # ifdef AO_LCO_HAS_CONTRAST
-#  define AO_LCO_CONTRAST	-1
+#  define AO_LCO_CONTRAST	-2
 #  ifndef AO_LCO_BOX_FIRST
 #   define AO_LCO_BOX_FIRST	AO_LCO_CONTRAST
 #  endif
 # endif
+# ifdef AO_LCO_HAS_BACKLIGHT
+#  define AO_LCO_BACKLIGHT 	-1
+#  ifndef AO_LCO_BOX_FIRST
+#   define AO_LCO_BOX_FIRST 	AO_LCO_BACKLIGHT
+#  endif
+# endif
+# if AO_LCO_HAS_LCO_INFO
+#  define AO_LCO_LCO_INFO	0		/* Box number to show LCO info */
+#  ifndef AO_LCO_BOX_FIRST
+#   define AO_LCO_BOX_FIRST	AO_LCO_LCO_INFO
+#  endif
+# else
+#  define AO_LCO_LCO_VOLTAGE	-1
+#  ifndef AO_LCO_BOX_FIRST
+#   define AO_LCO_BOX_FIRST	AO_LCO_LCO_VOLTAGE
+#  endif
+# endif
 # ifndef AO_LCO_BOX_FIRST
-#  define AO_LCO_BOX_FIRST	AO_LCO_LCO_VOLTAGE
+#  define AO_LCO_BOX_FIRST	1
 # endif
 #endif
-#define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
-#define AO_LCO_PAD_RSSI		-1		/* Pad number to show box RSSI */
-#define AO_LCO_PAD_FIRST	AO_LCO_PAD_RSSI
+
+#ifdef AO_LCO_HAS_PAD_INFO
+# define AO_LCO_PAD_INFO	0		/* Pad number to show box info */
+# define AO_LCO_PAD_FIRST	AO_LCO_PAD_INFO
+#else
+# define AO_LCO_PAD_VOLTAGE	0		/* Pad number to show box voltage */
+# define AO_LCO_PAD_RSSI	-1		/* Pad number to show box RSSI */
+# define AO_LCO_PAD_FIRST	AO_LCO_PAD_RSSI
+#endif
 
 static inline bool
 ao_lco_box_pseudo(int16_t box)
@@ -97,8 +107,8 @@ ao_lco_box_pseudo(int16_t box)
 	case AO_LCO_BACKLIGHT:
 		return true;
 #endif
-#ifdef AO_LCO_INFO
-	case AO_LCO_INFO:
+#ifdef AO_LCO_LCO_INFO
+	case AO_LCO_LCO_INFO:
 		return true;
 #endif
 	default:
@@ -110,10 +120,18 @@ static inline bool
 ao_lco_pad_pseudo(int8_t pad)
 {
 	switch (pad) {
+#ifdef AO_LCO_PAD_VOLTAGE
 	case AO_LCO_PAD_VOLTAGE:
 		return true;
+#endif
+#ifdef AO_LCO_PAD_RSSI
 	case AO_LCO_PAD_RSSI:
 		return true;
+#endif
+#ifdef AO_LCO_PAD_INFO
+	case AO_LCO_PAD_INFO:
+		return true;
+#endif
 	default:
 		return false;
 	}

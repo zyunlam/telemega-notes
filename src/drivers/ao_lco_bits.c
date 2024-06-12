@@ -200,9 +200,9 @@ ao_lco_update(void)
 			if (!ao_lco_pad_pseudo(ao_lco_pad))
 				ao_lco_set_pad(ao_lco_pad_first(ao_lco_box));
 		}
-		if (ao_lco_pad_pseudo(ao_lco_pad))
-			ao_lco_show();
 	}
+	if (ao_lco_pad_pseudo(ao_lco_pad))
+		ao_lco_show();
 }
 
 uint8_t	ao_lco_box_mask[AO_LCO_MASK_SIZE(AO_PAD_MAX_BOXES)];
@@ -289,8 +289,8 @@ ao_lco_step_pad(int8_t dir)
 		break;
 	}
 #endif
-#ifdef AO_LCO_HAS_INFO
-	case AO_LCO_INFO: {
+#if AO_LCO_HAS_LCO_INFO
+	case AO_LCO_LCO_INFO: {
 #if AO_LCO_MIN_INFO_PAGE < AO_LCO_MAX_INFO_PAGE
 		int32_t info_page = ao_lco_get_info_page();
 
