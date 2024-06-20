@@ -202,8 +202,11 @@ public class AltosCalData {
 	public void set_tick(int tick) {
 		if (tick != AltosLib.MISSING) {
 			if (prev_tick != AltosLib.MISSING) {
-				while (tick < prev_tick - 1000) {
+				while (tick < prev_tick - 32767) {
 					tick += 65536;
+				}
+				while (tick > prev_tick + 32767) {
+					tick -= 65536;
 				}
 			}
 			if (first_tick == AltosLib.MISSING)
