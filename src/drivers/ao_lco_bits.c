@@ -273,7 +273,7 @@ ao_lco_step_pad(int8_t dir)
 		break;
 	}
 #endif
-#ifdef AO_LCO_HAS_BACKLIGHT
+#ifdef AO_LCO_HAS_BACKLIGHT_UI
 	case AO_LCO_BACKLIGHT: {
 		int32_t backlight = ao_lco_get_backlight();
 

@@ -24,6 +24,7 @@
 #include <ao_st7565.h>
 #include <ao_adc_single.h>
 #include <ao_pwm.h>
+#include <limits.h>
 
 #define WIDTH	AO_ST7565_WIDTH
 #define HEIGHT	AO_ST7565_HEIGHT
@@ -106,6 +107,9 @@ static uint8_t	ao_lco_event_debug;
 
 static uint8_t	ao_lco_display_mutex;
 
+static uint8_t		ao_sample_data;
+static struct ao_data	ao_data_cur;
+
 static void
 _ao_center_text(int16_t x, int16_t y, const struct ao_font *font, const char *str)
 {
@@ -154,7 +158,7 @@ _ao_lco_show_contrast(void)
 }
 #endif
 
-#if AO_LCO_HAS_BACKLIGHT
+#if AO_LCO_HAS_BACKLIGHT_UI
 static void
 _ao_lco_show_backlight(void)
 {
@@ -187,13 +191,11 @@ static void
 _ao_lco_show_lco_info(void)
 {
 	char		battery[7];
-	struct ao_adc	packet;
 	int16_t		decivolt;
 
 	ao_logo_poly(&fb, &show_transform, AO_BLACK, AO_COPY);
 
-	ao_adc_single_get(&packet);
-	decivolt = ao_battery_decivolt(packet.v_batt);
+	decivolt = ao_battery_decivolt(ao_data_cur.adc.v_batt);
 	_ao_format_voltage(battery, sizeof(battery), (uint16_t) decivolt);
 
 	info_y = INFO_START_Y;
@@ -238,6 +240,86 @@ _ao_lco_show_pad_info(void)
 	}
 }
 
+#define AO_LCO_DIM_BACKLIGHT	(AO_LCO_MIN_BACKLIGHT + 3 * AO_LCO_BACKLIGHT_STEP)
+#define AO_AUTO_BACKLIGHT_RANGE	(AO_LCO_MAX_BACKLIGHT - AO_LCO_DIM_BACKLIGHT)
+#define AO_AUTO_BACKLIGHT_GAP	AO_ADC_MAX / 6
+
+static struct {
+	int16_t	v_als;
+	int32_t	backlight;
+} ao_lco_backlight_map[] = {
+	{ .v_als = AO_ADC_MAX / 6, .backlight = AO_LCO_DIM_BACKLIGHT },
+	{ .v_als = AO_ADC_MAX / 3, .backlight = (AO_LCO_MAX_BACKLIGHT - AO_LCO_MIN_BACKLIGHT) / 2 },
+	{ .v_als = AO_ADC_MAX / 2, .backlight = AO_LCO_MAX_BACKLIGHT },
+	{ .v_als = AO_ADC_MAX * 3 / 4,	.backlight = 0 },
+};
+
+#define NUM_BACKLIGHT_MAP sizeof(ao_lco_backlight_map)/sizeof(ao_lco_backlight_map[0])
+
+static unsigned ao_backlight_prev = NUM_BACKLIGHT_MAP - 1;
+
+static void
+ao_auto_backlight(int16_t als_min, int16_t als_max)
+{
+	unsigned ao_backlight;
+
+	PRINTD("ao_auto_backlight min %d max %d\n", als_min, als_max);
+	ao_backlight = ao_backlight_prev;
+	while (als_min > ao_lco_backlight_map[ao_backlight].v_als + AO_AUTO_BACKLIGHT_GAP) {
+		if (ao_backlight == NUM_BACKLIGHT_MAP - 1)
+			break;
+		ao_backlight++;
+	}
+	while (als_max < ao_lco_backlight_map[ao_backlight].v_als - AO_AUTO_BACKLIGHT_GAP) {
+		if (ao_backlight == 0)
+			return;
+		ao_backlight--;
+	}
+	if (ao_backlight != ao_backlight_prev)
+	{
+		PRINTD("   set backlight to %ld\n", ao_lco_backlight_map[ao_backlight].backlight);
+		ao_lco_set_backlight(ao_lco_backlight_map[ao_backlight].backlight);
+		ao_backlight_prev = ao_backlight;
+	}
+}
+
+#define AO_LCO_BACKLIGHT_INTERVAL	AO_SEC_TO_TICKS(2)
+
+static void
+ao_lco_data(void)
+{
+	AO_TICK_TYPE	backlight_tick = ao_time() + AO_LCO_BACKLIGHT_INTERVAL;
+	AO_TICK_TYPE	now;
+	int16_t		als_min = INT16_MAX;
+	int16_t		als_max = INT16_MIN;
+
+	ao_timer_set_adc_interval(AO_MS_TO_TICKS(100));
+	for (;;) {
+		ao_sleep((void *) &ao_data_head);
+
+		while (ao_sample_data != ao_data_head) {
+			struct ao_data *ao_data;
+
+			/* Capture a sample */
+			ao_data = (struct ao_data *) &ao_data_ring[ao_sample_data];
+
+			ao_data_cur = *ao_data;
+			if (ao_data_cur.adc.v_als < als_min)
+				als_min = ao_data_cur.adc.v_als;
+			if (ao_data_cur.adc.v_als > als_max)
+				als_max = ao_data_cur.adc.v_als;
+			ao_sample_data = ao_data_ring_next(ao_sample_data);
+		}
+		now = ao_time();
+		if ((AO_TICK_SIGNED) (backlight_tick - now) < 0) {
+			backlight_tick = now + AO_LCO_BACKLIGHT_INTERVAL;
+			ao_auto_backlight(als_min, als_max);
+			als_min = INT16_MAX;
+			als_max = INT16_MIN;
+		}
+	}
+}
+
 void
 ao_lco_show(void)
 {
@@ -249,7 +331,7 @@ ao_lco_show(void)
 		_ao_lco_show_contrast();
 		break;
 #endif
-#if AO_LCO_HAS_BACKLIGHT
+#if AO_LCO_HAS_BACKLIGHT_UI
 	case AO_LCO_BACKLIGHT:
 		_ao_lco_show_backlight();
 		break;
@@ -428,6 +510,7 @@ ao_lco_display_test(void)
 
 static struct ao_task ao_lco_input_task;
 static struct ao_task ao_lco_monitor_task;
+static struct ao_task ao_lco_data_task;
 static struct ao_task ao_lco_arm_warn_task;
 static struct ao_task ao_lco_igniter_status_task;
 
@@ -525,6 +608,7 @@ void
 ao_lco_init(void)
 {
 	ao_add_task(&ao_lco_monitor_task, ao_lco_main, "lco monitor");
+	ao_add_task(&ao_lco_data_task, ao_lco_data, "lco data");
 #if DEBUG
 	ao_cmd_register(&ao_lco_cmds[0]);
 #endif

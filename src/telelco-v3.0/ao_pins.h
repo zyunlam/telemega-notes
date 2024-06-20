@@ -229,8 +229,8 @@
 #define AO_BUTTON_0		1
 
 #define AO_BUTTON_DRAG_SELECT	1
-#define AO_BUTTON_1_PORT	&stm_gpioc
-#define AO_BUTTON_1		0
+#define AO_BUTTON_1_PORT	&stm_gpiod
+#define AO_BUTTON_1		2
 
 #define AO_BUTTON_SPARE1       	2
 #define AO_BUTTON_2_PORT	&stm_gpiob
@@ -262,14 +262,9 @@
 
 /* ADC */
 
-struct ao_adc {
-	int16_t		v_batt;
-};
+#define AO_DATA_RING		8
 
-#define AO_ADC_DUMP(p) \
-	printf("batt: %5d\n", (p)->v_batt)
-
-#define HAS_ADC_SINGLE		1
+#define HAS_ADC			1
 #define HAS_ADC_TEMP		0
 #define HAS_BATTERY_REPORT	1
 
@@ -277,12 +272,33 @@ struct ao_adc {
 #define AO_ADC_V_BATT_PORT	(&stm_gpioa)
 #define AO_ADC_V_BATT_PIN	2
 
+#define AO_ADC_V_ALS		10
+#define AO_ADC_V_ALS_PORT	(&stm_gpioc)
+#define AO_ADC_V_ALS_PIN	0
+
 #define AO_ADC_PIN0_PORT	AO_ADC_V_BATT_PORT
 #define AO_ADC_PIN0_PIN		AO_ADC_V_BATT_PIN
 
-#define AO_ADC_SQ1		AO_ADC_V_BATT
+#define AO_ADC_PIN1_PORT	AO_ADC_V_ALS_PORT
+#define AO_ADC_PIN1_PIN		AO_ADC_V_ALS_PIN
 
-#define AO_NUM_ADC		1
+#define AO_ADC_SQ1		AO_ADC_V_BATT
+#define AO_ADC_SQ2		AO_ADC_V_ALS
+
+#define AO_NUM_ADC		2
+
+struct ao_adc {
+	union {
+		struct {
+			int16_t		v_batt;
+			int16_t		v_als;
+		};
+		int16_t	v_vals[AO_NUM_ADC];
+	};
+};
+
+#define AO_ADC_DUMP(p) \
+	printf("batt: %5d als %5d\n", (p)->adc.v_batt, (p)->adc.v_als)
 
 /*
  * Voltage divider on ADC battery sampler

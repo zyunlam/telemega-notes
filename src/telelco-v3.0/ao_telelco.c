@@ -44,7 +44,7 @@ main(void)
 	ao_spi_init();
 	ao_dma_init();
 	ao_exti_init();
-	ao_adc_single_init();
+	ao_adc_init();
 
 	ao_beep_init();
 	ao_pwm_init();
