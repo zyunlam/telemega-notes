@@ -140,7 +140,7 @@ public class AltosGraphUI extends AltosUIFrame implements AltosFontListener, Alt
 		if (config_data != null) {
 			configTable = new AltosFlightConfigTable(config_data);
 			pane.add("Configuration", configTable);
-			if (config_data.npyro > 0) {
+			if (config_data.npyro > 0 && config_data.npyro != AltosLib.MISSING) {
 				pyroTable = new AltosFlightPyroTable(config_data.pyros, config_data.npyro);
 				pane.add("Pyros", pyroTable);
 			}
