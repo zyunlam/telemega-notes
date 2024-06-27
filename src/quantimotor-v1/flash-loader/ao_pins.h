@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Bdale Garbee <bdale@gag.com>
+ * Copyright © 2024 Bdale Garbee <bdale@gag.com>
  * GPLv3
  */
 

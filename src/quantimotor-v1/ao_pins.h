@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Bdale Garbee <bdale@gag.com
+ * Copyright © 2024 Bdale Garbee <bdale@gag.com
  * GPLv3
  */
 
@@ -33,7 +33,7 @@
 
 /* USART */
 
-#define HAS_SERIAL              1
+#define HAS_SERIAL_0            1
 #define USE_SERIAL_0_STDIN      0
 #define SERIAL_0_18_19          1
 

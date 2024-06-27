@@ -1,10 +1,11 @@
 /*
- * Copyright © 2022 Bdale Garbee <bdale@gag.com>
+ * Copyright © 2024 Bdale Garbee <bdale@gag.com>
  * GPLv3
  */
 
 #include <ao.h>
 #include <ao_exti.h>
+#include <ao_serial.h>
 
 int
 main(void)
