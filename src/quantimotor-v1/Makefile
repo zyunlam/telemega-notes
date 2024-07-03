@@ -29,9 +29,7 @@ ALTOS_SRC = \
 	ao_convert_volt.c \
 	ao_task.c \
 	ao_cmd.c \
-	ao_config.c \
 	ao_timer_lpc.c \
-	ao_exti_lpc.c \
 	ao_romconfig.c \
 	ao_adc_lpc.c \
 	ao_serial_lpc.c \
