@@ -29,9 +29,7 @@
 #define HAS_USB_VBUS		0
 #define HAS_USB_PULLUP		1
 #define AO_USB_PULLUP_PORT	0
-/* #define AO_USB_PULLUP_PIN	20 */
-/* following is for use of fctester proto as development device */
-#define AO_USB_PULLUP_PIN	6
+#define AO_USB_PULLUP_PIN	20 
 
 /* USART */
 
