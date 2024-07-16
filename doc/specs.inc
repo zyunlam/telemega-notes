@@ -200,7 +200,7 @@
 	|-
 	|8MB
 	|-
-	|6.5-15V
+	|3.7V
 	endif::easymotor[]
 	
 	
