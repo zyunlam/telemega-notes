@@ -56,6 +56,18 @@
 
 #define AO_DATA_RING		16
 
+/* SOM sets "health" high when system is ready */
+#define HEALTH_PORT		1
+#define HEALTH_PIN		19
+
+/* LED */
+
+#define LED_PORT                0
+#define LED_PIN_HEALTH          8
+#define AO_LED_HEALTH           (1 << LED_PIN_HEALTH)
+#define LEDS_AVAILABLE          (AO_LED_HEALTH)
+#define AO_LED_PANIC		AO_LED_HEALTH
+
 /*
  * ADC
  */

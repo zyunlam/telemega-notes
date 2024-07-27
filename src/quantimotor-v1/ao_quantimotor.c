@@ -5,9 +5,11 @@
 
 #include <ao.h>
 #include <ao_serial.h>
+#include <ao_exti.h>
 
 static struct ao_task ao_console_read_task;
 static struct ao_task ao_console_write_task;
+static struct ao_task ao_health_indicator_task;
 
 static void
 ao_console_read(void)
@@ -35,12 +37,39 @@ ao_console_write(void)
         }
 }
 
+static void
+ao_health_indicator(void)
+{
+	int	ledstate = 0;
+
+        for (;;) {
+		if (ao_gpio_get(HEALTH_PORT, HEALTH_PIN)) {
+                	ao_led_on(AO_LED_HEALTH);
+		} else {
+	    		if (ledstate) {
+				ledstate = 0;
+				ao_led_off(AO_LED_HEALTH);
+			} else {
+				ledstate = 1;
+                		ao_led_on(AO_LED_HEALTH);
+			}
+		}
+		ao_delay(AO_MS_TO_TICKS(1000));
+	}
+}
+
 int
 main(void)
 {
 	ao_clock_init();
 	ao_task_init();
 	ao_timer_init();
+
+	ao_led_init();
+
+	/* set up the input we watch to sense SOM "health" */
+	/* choosing pull down so SOM has to actually assert readiness */
+	ao_enable_input(HEALTH_PORT, HEALTH_PIN, AO_EXTI_MODE_PULL_DOWN);
 
 	ao_adc_init();
 
@@ -54,6 +83,7 @@ main(void)
 
 	ao_add_task(&ao_console_read_task, ao_console_read, "console_read");
 	ao_add_task(&ao_console_write_task, ao_console_write, "console_write");
+	ao_add_task(&ao_health_indicator_task, ao_health_indicator, "health_indicator");
 
 	ao_start_scheduler();
 	return 0;

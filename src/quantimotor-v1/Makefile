@@ -33,7 +33,8 @@ ALTOS_SRC = \
 	ao_romconfig.c \
 	ao_adc_lpc.c \
 	ao_serial_lpc.c \
-	ao_usb_lpc.c 
+	ao_usb_lpc.c \
+	ao_led_lpc.c
 
 PRODUCT=QuantiMotor-v1
 PRODUCT_DEF=-DQUANTIMOTOR_V_1
