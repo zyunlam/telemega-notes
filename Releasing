@@ -114,7 +114,7 @@ These are Bdale's notes on how to do a release.
 	- store a stable copy of ARM binaries for production use
 
 	cp src/chaoskey-v1.0/{*.elf,*.ihx,*.bin,*.map} \
-	   src/easymega-v[1-2].0/{*.elf,*.ihx,*.map} \
+	   src/easymega-v[1-3].0/{*.elf,*.ihx,*.map} \
 	   src/easymini-v[1-3].0/{*.elf,*.ihx,*.map} \
 	   src/easymotor-v3/{*.elf,*.ihx,*.map} \
 	   src/easytimer-v[1-2]/{*.elf,*.ihx,*.map} \
@@ -128,7 +128,7 @@ These are Bdale's notes on how to do a release.
 	   src/telefireeight-v[1-2].0/{*.elf,*.ihx,*.map} \
 	   ~/altusmetrumllc/Binaries/
 	cp src/chaoskey-v1.0/flash-loader/{*.elf,*.bin,*.map} \
-	   src/easymega-v[1-2].0/flash-loader/*.elf \
+	   src/easymega-v[1-3].0/flash-loader/*.elf \
 	   src/easymini-v[1-3].0/flash-loader/*.elf \
 	   src/easymotor-v3/flash-loader/*.elf \
 	   src/easytimer-v[1-2]/flash-loader/*.elf \
