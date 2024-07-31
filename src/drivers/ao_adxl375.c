@@ -102,11 +102,14 @@ struct ao_adxl375_total {
 
 #define AO_ADXL375_SELF_TEST_SAMPLES	10
 #define AO_ADXL375_SELF_TEST_SETTLE	4
+#define AO_ADXL375_SELF_TEST_DELAY	AO_MS_TO_TICKS(10)
 
 #define MIN_LSB_G	18.4
 #define MAX_LSB_G	22.6
-#define SELF_TEST_MIN_G	5.0
-#define SELF_TEST_MAX_G	6.8
+
+/* The self test value can vary within a rather wide range */
+#define SELF_TEST_MIN_G	4.0
+#define SELF_TEST_MAX_G	12.0
 
 #define MIN_SELF_TEST	((int32_t) (MIN_LSB_G * SELF_TEST_MIN_G * AO_ADXL375_SELF_TEST_SAMPLES + 0.5))
 #define MAX_SELF_TEST	((int32_t) (MAX_LSB_G * SELF_TEST_MAX_G * AO_ADXL375_SELF_TEST_SAMPLES + 0.5))
@@ -122,7 +125,7 @@ ao_adxl375_total_value(struct ao_adxl375_total *total, int samples)
 		total->x += value.x;
 		total->y += value.y;
 		total->z += value.z;
-		ao_delay(AO_MS_TO_TICKS(10));
+		ao_delay(AO_ADXL375_SELF_TEST_DELAY);
 	}
 }
 
@@ -174,6 +177,11 @@ ao_adxl375_setup(void)
 			     (0 << AO_ADXL375_POWER_CTL_SLEEP) |
 			     (AO_ADXL375_POWER_CTL_WAKEUP_8 << AO_ADXL375_POWER_CTL_WAKEUP));
 
+	/* Set to normal mode */
+
+	ao_adxl375_reg_write(AO_ADXL375_DATA_FORMAT,
+			     AO_ADXL375_DATA_FORMAT_SETTINGS(0));
+
 	/* Perform self-test */
 
 	struct ao_adxl375_total	self_test_off, self_test_on;
@@ -208,12 +216,8 @@ ao_adxl375_setup(void)
 	if (z_change < MIN_SELF_TEST)
 		AO_SENSOR_ERROR(AO_DATA_ADXL375);
 
-	/* This check is commented out as maximum self test is unreliable
-
-	   if (z_change > MAX_SELF_TEST)
+	if (z_change > MAX_SELF_TEST)
 		AO_SENSOR_ERROR(AO_DATA_ADXL375);
-
-	*/
 
 	/* Discard some samples to let it settle down */
 	ao_adxl375_total_value(&self_test_off, AO_ADXL375_SELF_TEST_SETTLE);
