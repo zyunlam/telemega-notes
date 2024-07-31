@@ -80,7 +80,7 @@ static struct flash *
 flash(struct cc_usb *usb)
 {
 	struct flash	*head = NULL, **tail = &head;
-	cc_usb_printf(usb, "c s\nv\n");
+	cc_usb_printf(usb, "c s\nA\nv\n");
 	for (;;) {
 		char	line[512];
 		struct flash	*b;
@@ -125,6 +125,7 @@ static int
 do_cal(struct cc_usb *usb) {
 	struct flash	*b;
 	char	**accel;
+	char	**sensor;
 	char	line[1024];
 	int	l = 0;
 	int	running = 0;
@@ -171,6 +172,35 @@ do_cal(struct cc_usb *usb) {
 
 	printf ("Accel cal +1g: %s -1g: %s\n",
 		accel[3], accel[5]);
+
+	sensor = find_flash(b, "ADXL375");
+
+	if (sensor) {
+		char	*plus_end = NULL, *minus_end = NULL;
+		long	accel_plus = strtol(accel[3], &plus_end, 10);
+		long	accel_minus = strtol(accel[5], &minus_end, 10);
+		double	one_g;
+
+		if (plus_end == NULL || plus_end == accel[3]) {
+			printf("can't extract plus value from %s\n", accel[3]);
+			return 0;
+		}
+
+		if (minus_end == NULL || minus_end == accel[5]) {
+			printf("can't extract minus value from %s\n", accel[5]);
+			return 0;
+		}
+		one_g = (accel_minus - accel_plus) / 2.0;
+		if (one_g < 0)
+			one_g = -one_g;
+
+		if (one_g < 18 || 23 < one_g) {
+			printf("Device out of spec. LSB/g is %g. Should be >= 18.4 and <= 22.6\n", one_g);
+			return 0;
+		}
+
+		printf("Device sensitivity: %g LSB/g\n", one_g);
+	}
 
 	printf ("Saving..."); fflush(stdout);
 	cc_usb_printf (usb, "c w\n");
