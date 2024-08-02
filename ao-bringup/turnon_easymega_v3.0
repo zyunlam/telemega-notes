@@ -1,0 +1,65 @@
+#!/bin/sh
+
+PRODUCT=EasyMega
+VERSION=3.0
+REPO=~/altusmetrumllc/Binaries
+
+if [ -x /usr/bin/ao-usbload ]; then
+	USBLOAD=/usr/bin/ao-usbload
+else
+	echo "Can't find ao-usbload!  Aborting."
+	exit 1
+fi
+
+echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
+echo "Copyright 2024 by Bdale Garbee.  Released under GPL v3"
+echo
+echo "Expectations:"
+echo "\t$PRODUCT v$VERSION"
+echo "\t\twith USB cable attached"
+echo
+
+case $# in
+    1)
+	SERIAL="$1"
+	echo "$PRODUCT-$VERSION serial number: $SERIAL" 
+	;;
+    0)
+	echo -n "$PRODUCT-$VERSION serial number: "
+	read SERIAL
+	;;
+    *)
+	echo "Usage: $0 <serial-number>" 1>&2
+	exit 1;
+	;;
+esac
+
+$USBLOAD --serial=$SERIAL $REPO/easymega-v$VERSION*.elf || exit 1
+
+sleep 5
+
+dev=`ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
+
+case "$dev" in
+/dev/tty*)
+	echo "$PRODUCT found on $dev"
+	;;
+*)
+	echo 'No '"$PRODUCT"'-v'"$VERSION"' found'
+	exit 1
+	;;
+esac
+
+echo 'E 0' > $dev
+
+failed=1
+while [ $failed =  1 ]; do
+    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
+    failed=$?
+done
+
+echo 'E 1' > $dev
+
+./test-easymega-v3.0
+
+exit $?
