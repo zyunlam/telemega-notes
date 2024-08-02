@@ -149,7 +149,8 @@ FIRMWARE_EMINI=$(FIRMWARE_EMINI_1_0) $(FIRMWARE_EMINI_2_0) $(FIRMWARE_EMINI_3_0)
 
 FIRMWARE_EMEGA_1_0=$(top_srcdir)/src/easymega-v1.0/easymega-v1.0-$(VERSION).ihx
 FIRMWARE_EMEGA_2_0=$(top_srcdir)/src/easymega-v2.0/easymega-v2.0-$(VERSION).ihx
-FIRMWARE_EMEGA=$(FIRMWARE_EMEGA_1_0) $(FIRMWARE_EMEGA_2_0)
+FIRMWARE_EMEGA_3_0=$(top_srcdir)/src/easymega-v3.0/easymega-v3.0-$(VERSION).ihx
+FIRMWARE_EMEGA=$(FIRMWARE_EMEGA_1_0) $(FIRMWARE_EMEGA_2_0) $(FIRMWARE_EMEGA_3_0)
 
 FIRMWARE_EMOTOR_3=$(top_srcdir)/src/easymotor-v3/easymotor-v3-$(VERSION).ihx
 FIRMWARE_EMOTOR=$(FIRMWARE_EMOTOR_3)
