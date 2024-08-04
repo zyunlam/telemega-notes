@@ -62,10 +62,10 @@
 
 /* LED */
 
-#define LED_PORT                0
-#define LED_PIN_HEALTH          8
-#define AO_LED_HEALTH           (1 << LED_PIN_HEALTH)
-#define LEDS_AVAILABLE          (AO_LED_HEALTH)
+#define HAS_LED			1
+#define LED_0_PORT              0
+#define LED_0_PIN          	8
+#define AO_LED_HEALTH           (1 << 0)
 #define AO_LED_PANIC		AO_LED_HEALTH
 
 /*
