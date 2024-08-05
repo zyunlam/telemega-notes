@@ -1,3 +1,43 @@
+altos (1.9.19-1) unstable; urgency=medium
+
+  [ Bdale Garbee ]
+  * capture things learned during 1.9.18 release
+  * remove garbage line from easymotor turnon script
+  * first cut at turnon scripts for EasyTimer v2
+  * doc: add Terry Lee's TRA and NAR numbers to TeleLaunch doc
+  * doc: clarify how EasyMotor gets put into idle mode
+  * docs: correct EasyMotor v3.0 battery in specs table
+  * doc: EasyTimer v2.0 also has mag sensor
+  * doc: reflect move of mailing list from lists.gag.com to groups.io
+  * include EasyMega v3 firmware in that captured in LLC repo during release
+  * make EasyMini v2.1 our "current" thing to flash/cal/test
+  * production bench scripts for EasyMega v3
+  * capture link for EasyMini production scripts
+  * update ChangeLog for 1.9.19 release
+
+  [ Keith Packard ]
+  * altos/easymini-v2.0: Remove combined .dfu file
+  * altos/test: Get the flight software test code working again
+  * altosui: Add config and pyro tabs to graph widget
+  * altos/easymega-v3.0: Add combined dfu and ihx targets
+  * src/telelco-v3.0: Increase LED test time to 1 second
+  * altos/telelco-v3.0: Delete debug code
+  * altos/telelco-v3.0: Add "Scanning..." to startup screen
+  * altos/telelco-v3.0: Display good vs bad packets received
+  * altos/telelco-v3.0: Swap version and serial on info page
+  * altos/telelco-v3.0: Merge info into one screen
+  * telelco-v3.0: Support ambient light sensor
+  * altosui: Don't add pyro table to graph UI when npyro == MISSING
+  * altoslib: Check for negative tick wrap when importing flight records
+  * ao-bringup: Re-add cal-freq
+  * src: Open up the ADXL375 self test range
+  * ao-accel-cal: Validate ADXL375 sensitivity
+  * doc: Version 1.9.19 release notes
+  * Add easymega v3.0 firmware to fat images
+  * Version 1.9.19
+
+ -- Bdale Garbee <bdale@gag.com>  Mon, 05 Aug 2024 10:40:21 -0600
+
 altos (1.9.18-1) unstable; urgency=medium
 
   [ Bdale Garbee ]
